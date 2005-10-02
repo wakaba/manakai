@@ -23,7 +23,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2005/09/30 13:06:17 $
+      $Date: 2005/10/02 23:35:32 $
     @@ContentType:
       dis:Date.RCS
   
@@ -2622,6 +2622,73 @@ IFClsDef:
         }
 
   @Method:
+    @@Name: getAnyResource
+    @@enDesc:
+      Returns a resource object, either module, <Q::for>, or resource.
+    @@Param:
+      @@@Name: resourceURI
+      @@@Type: ResourceURI
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          A resource URI.
+      @@@nullCase:
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            Defaulted to <Q::DOMMain:any>. 
+    @@ForParam:
+    @@Return:
+      @@@Type: DIS|DISAnyResource
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The resource definition. 
+      @@@RaiseException:
+        @@@@@: DIS|RESOURCE_NOT_DEFINED_ERR
+        @@@@enDesc:
+          The resource should be included in database submodule but
+          it is not.
+      @@@PerlDef:
+        $resourceURI = <Q::DOMMain:any> unless defined $resourceURI;
+        my $resURI;
+        if (defined $forArg) {
+          __CODE{tfurisToURI:: $turi => $resourceURI, $furi => $forArg,
+                               $uri => $resURI}__;
+        } else {
+          $resURI = $resourceURI;
+        }
+
+        if (defined $self->{resDef}->{$resURI}) {
+          $r = $self->{resDef}->{$resURI};
+        } elsif (defined $self->{modDef}->{$resURI}) {
+          $r = $self->{modDef}->{$resURI};
+        } elsif (defined $self->{forDef}->{$resURI}) {
+          $r = $self->{forDef}->{$resURI};
+        } elsif (defined $self->{<H::DIS|resourceModuleMap>}->{$resURI}) {
+          __DEEP{
+            $self-><M::dp|ManakaiDISDatabasePerl.plLoadDISDatabaseModule>
+              ($self-><M::DIS|DISDatabase.getModule>
+                 (${$self->{<H::DIS|resourceModuleMap>}->{$resURI}}));
+          }__;
+          if (defined $self->{resDef}->{$resURI}) {
+            $r = $self->{resDef}->{$resURI};
+          } elsif (defined $self->{forDef}->{$resURI}) {
+            $r = $self->{forDef}->{$resURI};
+          } else {
+            __EXCEPTION{DIS|RESOURCE_NOT_DEFINED_ERR::
+              DIS:uri => {$resURI},
+              DIS:moduleURI => {${$self->{<H::DIS|resourceModuleMap>}
+                                       ->{$resURI}}},
+            }__;
+          }
+        } else {
+          __DEEP{
+            $r = $self-><M::DIS|DISDatabase.getAnyResource> ($resURI);
+          }__;
+        }
+
+  @Method:
     @@Name: getSourceFile
     @@enDesc:
       Gets <QUOTE::dis> source document. 
@@ -4501,6 +4568,26 @@ IFClsDef:
             ($onResourceRead or sub () {})->($self, $self);
           }
         }__;
+
+  @Method:
+    @@ForCheck: ManakaiDOM|ForIF
+    @@Name: isTypeURI
+    @@enDesc:
+      Tests whether this resource is of a type or not. 
+    @@Param:
+      @@@Name: typeURI
+      @@@Type: ResourceURI
+      @@@enDesc:
+        A type URI reference to test. 
+    @@Return:
+      @@@Type:
+        DOMMain:boolean::ManakaiDOM:all 
+      @@@TrueCase:
+        @@@@enDesc:
+          This is a <P::typeURI> resource. 
+      @@@FalseCase:
+        @@@@enDesc:
+          This is not a <P::typeURI> resource. 
 ##DISAnyResource
 
 IFClsDef:
@@ -4666,6 +4753,32 @@ IFClsDef:
         } else {
           CORE::delete $self->{<H::DIS|defaultNamespaceURI>};
         }
+
+  @Method:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@Name: isTypeURI
+    @@enDesc:
+      Tests whether this resource is of a type or not. 
+    @@Param:
+      @@@Name: typeURI
+      @@@Type: ResourceURI
+      @@@enDesc:
+        A type URI reference to test. 
+    @@Return:
+      @@@Type:
+        DOMMain:boolean::ManakaiDOM:all 
+      @@@TrueCase:
+        @@@@enDesc:
+          This is a <P::typeURI> resource. 
+      @@@FalseCase:
+        @@@@enDesc:
+          This is not a <P::typeURI> resource. 
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><AG::DIS|DISAnyResource.database>
+                    -><M::DIS|DISDatabase.getResource> (<Q::DISCore:Module>)
+                    -><M::DIS|DISAnyResource.isTypeURI> ($typeURI);
+        }__;
 ##DISModule
 
 ClsDef:
@@ -4768,6 +4881,32 @@ ClsDef:
       @@@PerlDef:
         $r = defined $self->{<H::DIS|defaultNamespaceURI>}
              ? ${$self->{<H::DIS|defaultNamespaceURI>}} : null;
+
+  @Method:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@Name: isTypeURI
+    @@enDesc:
+      Tests whether this resource is of a type or not. 
+    @@Param:
+      @@@Name: typeURI
+      @@@Type: ResourceURI
+      @@@enDesc:
+        A type URI reference to test. 
+    @@Return:
+      @@@Type:
+        DOMMain:boolean::ManakaiDOM:all 
+      @@@TrueCase:
+        @@@@enDesc:
+          This is a <P::typeURI> resource. 
+      @@@FalseCase:
+        @@@@enDesc:
+          This is not a <P::typeURI> resource. 
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><AG::DIS|DISAnyResource.database>
+                    -><M::DIS|DISDatabase.getResource> (<Q::DISCore:Module>)
+                    -><M::DIS|DISAnyResource.isTypeURI> ($typeURI);
+        }__;
 ##DISModuleLite
 
 IFClsDef:
@@ -4980,6 +5119,32 @@ IFClsDef:
         The attribute value is always equals to
         <A::DISAnyResource.uri> for <QUOTE::for> resources.
       @@@PerlDef: $r = $self->{uri};
+
+  @Method:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@Name: isTypeURI
+    @@enDesc:
+      Tests whether this resource is of a type or not. 
+    @@Param:
+      @@@Name: typeURI
+      @@@Type: ResourceURI
+      @@@enDesc:
+        A type URI reference to test. 
+    @@Return:
+      @@@Type:
+        DOMMain:boolean::ManakaiDOM:all 
+      @@@TrueCase:
+        @@@@enDesc:
+          This is a <P::typeURI> resource. 
+      @@@FalseCase:
+        @@@@enDesc:
+          This is not a <P::typeURI> resource. 
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><AG::DIS|DISAnyResource.database>
+                    -><M::DIS|DISDatabase.getResource> (<Q::DISCore:For>)
+                    -><M::DIS|DISAnyResource.isTypeURI> ($typeURI);
+        }__;
 ##DISFor
 
 PropDef:
@@ -6206,8 +6371,7 @@ IFClsDef:
         @@@@enDesc:
           Defaulted to <Q::dis:TypeQName>.
     @@Return:
-      @@@Type: DISResource
-      @@@clsActualType: ManakaiDISResourceDefinition
+      @@@Type: DIS|DISAnyResource
       @@@enDesc:
         The property value resource. 
       @@@nullCase:
@@ -6224,7 +6388,7 @@ IFClsDef:
           my $v = $self-><M::DISResourceProp.getPropertyValue>
                              ($propName);
           if (UNIVERSAL::isa ($v, <IFName::dv|DVURIValue>)) {
-            $r = $v-><M::dv|DVURIValue.getResource>
+            $r = $v-><M::dv|DVURIValue.getAnyResource>
                           ($self-><AG::DISAnyResource.database>);
           }
         }__;
@@ -6305,7 +6469,7 @@ IFClsDef:
           my $db = $self-><AG::DISAnyResource.database>;
           for my $a (@$v) {
             if ($a->isa (<IFName::dv|DVURIValue>)) {
-              push @$r, $a-><M::dv|DVURIValue.getResource> ($db);
+              push @$r, $a-><M::dv|DVURIValue.getAnyResource> ($db);
             }
             if ($isaRecursive) {
               my $b = $a-><M::dv|DVValue.getProperty>
@@ -6368,41 +6532,6 @@ IFClsDef:
             }
           }__;
         }
-
-  @Method:
-    @@Name: getPropertyModuleList
-    @@enDesc:
-      Gets property value module list. 
-    @@PropNameParam:
-    @@Return:
-      @@@Type: ResourceList
-      @@@enDesc:
-        An array reference of the property value resources. 
-        \
-        {NOTE:: This list is <QUOTE::dead>.
-        \
-        }
-      @@@UndeclaredPrefixException:
-      @@@RaiseException:
-        @@@@@:UNSUPPORTED_MEDIA_TYPE_ERR
-        @@@@enDesc:
-          The media type of the attribute node in the source tree
-          corresponding to this resource is not supported. 
-      @@@PerlDef:
-        $r = [];
-        __DEEP{
-          my $v = $self-><M::DISResourceProp.getPropertyValueList> ($propName);
-          my $db = $self-><AG::DISAnyResource.database>;
-          for my $a (@$v) {
-            if ($a->isa (<IFName::dv|DVURIValue>)) {
-              push @$r, $db-><M::DIS|DISDatabase.getModule>
-                                ($a-><AG::dv|DVURIValue.uri>);
-            } else {
-              push @$r, $db-><M::DIS|DISDatabase.getModule>
-                                ($a-><AG::dv|DVValue.stringValue>);
-            }
-          }
-        }__;
 
   @Method:
     @@Name: addPropertyResourceList

@@ -25,7 +25,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/30 13:06:21 $
+      $Date: 2005/10/02 23:35:34 $
     @@ContentType:
       dis:Date.RCS
   
@@ -39,6 +39,8 @@ Module:
     @@Module:
       @@@QName:
         DIS:XML
+    @@Module:
+      @@@QName: DIS|DISSource
 
 Namespace:
   @DIS:
@@ -72,6 +74,8 @@ ResourceDef:
   @Description:
     @@lang:en
     @@@: An RDF resource.
+  @rdfs:subClassOf: DISCore|AnyResource
+  @subsetOf: DISCore|AnyResource
 
 ResourceDef:
   @QName:
@@ -179,6 +183,15 @@ ElementTypeBinding:
     @@rdf:type:
       rdf:Property
 
+ElementTypeBinding:
+  @Name: SPropDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: rdf|Property
+    @@rdf:type: DISSource|Property
+    @@rdf:type: DISSource|ResourceProperty
+
 ResourceDef:
   @QName:
     owl:DeprecatedProperty
@@ -193,7 +206,7 @@ ResourceDef:
     @@@:
       Deperecated properties. 
 
-PropDef:
+SPropDef:
   @QName:
     rdf:type
   @rdfs:domain:
@@ -203,7 +216,7 @@ PropDef:
   @dataType: DISCore|QName
   @multipleProperties: DISCore|UnorderedList
 
-PropDef:
+SPropDef:
   @QName:
     rdfs:subClassOf
   @Description:
@@ -219,7 +232,7 @@ PropDef:
   @dataType: DISCore|TFQNames
   @multipleProperties: DISCore|UnorderedList
 
-PropDef:
+SPropDef:
   @QName:
     rdfs:subPropertyOf
   @Description:
@@ -235,7 +248,7 @@ PropDef:
   @dataType: DISCore|TFQNames
   @multipleProperties: DISCore|UnorderedList
 
-PropDef:
+SPropDef:
   @QName:
     owl:sameAs
   @Description:
@@ -245,7 +258,7 @@ PropDef:
   @dataType: DISCore|TFQNames
   @multipleProperties: DISCore|UnorderedList
 
-PropDef:
+SPropDef:
   @QName:
     rdfs:domain
   @rdfs:domain:
@@ -255,7 +268,7 @@ PropDef:
   @dataType: DISCore|TFQNames
   @multipleProperties: DISCore|UnorderedList
 
-PropDef:
+SPropDef:
   @QName:
     rdfs:range
   @rdfs:domain:
@@ -473,7 +486,7 @@ ResourceDef:
   @subsetOf: foaf|Agent
   @rdf:type: rdfs|Class
 
-PropDef:
+SPropDef:
   @QName: foaf|name
   @enFN: Name
   @rdfs:subPropertyOf: rdf|label
@@ -481,7 +494,7 @@ PropDef:
   @multipleProperties: DISCore|UnorderedList
   @dataType: lang|disdocInline
 
-PropDef:
+SPropDef:
   @QName: foaf|mbox
   @enFN: Mailbox
   @multipleProperties: DISCore|UnorderedList

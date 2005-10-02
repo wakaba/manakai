@@ -8,7 +8,7 @@ Module:
 
   @DISCore:author: DISCore|Wakaba
   @Date:
-    $Date: 2005/10/01 12:14:31 $
+    $Date: 2005/10/02 23:35:35 $
   @License: license|Perl+MPL
   
   @DefaultFor: ManakaiDOM|all
@@ -244,6 +244,11 @@ PropDef:
   @dataType: DISCore|ScriptTag
   @multipleProperties: DISCore|Single
 
+PropDef:
+  @QName: dis|ddid
+  @dataType: DISCore|String
+  @multipleProperties: DISCore|Single
+
 ElementTypeBinding:
   @Name: enDesc
   @ElementType:
@@ -271,7 +276,7 @@ PropDef:
 PropDef:
   @QName: doc|section
   @enDesc:
-    A main, additional or appendix section.
+    A main, additional, sub or appendix section.
   @rdfs:subPropertyOf: doc|part
   @subsetOf: doc|part
   @multipleProperties: DISCore|OrderedList
@@ -289,6 +294,13 @@ PropDef:
 PropDef:
   @QName: doc|additionalSection
   @rdfs:subPropertyOf: doc|section
+  @subsetOf: doc|section
+  @multipleProperties: DISCore|OrderedList
+  @dataType: DISCore|TFQNames
+
+PropDef:
+  @QName: doc|subsection
+  @rdfs:subPropertyOf: doc|subsection
   @subsetOf: doc|section
   @multipleProperties: DISCore|OrderedList
   @dataType: DISCore|TFQNames
@@ -376,10 +388,22 @@ PropDef:
   @multipleProperties: DISCore|OrderedList
   @dataType: DISCore|TFQNames
 
+ResourceTypeDef:
+  @QName: doc|Relationship
+
 PropDef:
   @QName: doc|rel
   @multipleProperties: DISCore|UnorderedList
   @dataType: DISCore|QName
+  @rdf:type: DISSource|PropertyProperty
+  @rdfs:range: doc|Relationship
+
+PropDef:
+  @QName: doc|as
+  @multipleProperties: DISCore|UnorderedList
+  @dataType: DISCore|QName
+  @rdf:type: DISSource|PropertyProperty
+  @rdfs:range: rdfs|Class
 
 PropDef:
   @QName: doc|isNormative
@@ -548,3 +572,20 @@ LexTypeDef:
       the script tag namespace.  See <Module::DIS:NaturalLanguage> module.
   @rdfs:subClassOf: DISCore|QName
   @subsetOf: DISCore|QName
+
+
+
+ResourceDef:
+  @QName:
+    ManakaiDOM:InCase
+  @rdf:type:
+    rdfs:Class
+  @subsetOf:
+    rdfs:Class
+  @rdfs:subClassOf:
+    rdfs:Class
+  @Description:
+    @@lang:en
+    @@@: 
+      Cases. 
+

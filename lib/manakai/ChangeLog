@@ -1,3 +1,27 @@
+2005-10-02  Wakaba  <wakaba@suika.fam.cx>
+
+	* DISSource.dis: New module split from "DISCore.dis".
+
+	* DISCore.dis: "dis" resource concept such as "DISCore:Module"
+	and "DISCore:Resource" added.
+	(DISCore:File): New class.
+
+	* DISLang.dis (DISLang:Array, DISLang:Exception,
+	DISLang:Constructor): New classes.
+	(DISLang:File): New class.
+	(ManakaiDOM:Java, lang:Java): Moved to new "Java.dis" module.
+
+	* Java.dis: New module.
+
+	* DISPerl.dis (DISPerl:File): New class.
+	(Package, Module, Class, Interface, Sub, Const, AnyExported): New
+	classes.
+
+	* Document.dis (dis:ddid): New property.
+	(doc:subsection): New rel.
+	(doc:as): New attribute.
+	(ManakaiDOM:InCase): Moved from "DISCore.dis".
+
 2005-10-01  Wakaba  <wakaba@suika.fam.cx>
 
 	* DISIDL.dis: Missing properties added.  IDL name

@@ -1,3 +1,11 @@
+2005-10-02  Wakaba  <wakaba@suika.fam.cx>
+
+	* DIS.dis (getAnyResource): New method.
+	(isTypeURI): Now it is a method of "DIS:DISAnyResource" interface.
+	(getPropertyResource, getPropertyResourceList): Now
+	they uses "getAnyResource" method.
+	(getPropertyModuleList): Removed.
+
 2005-09-30  Wakaba  <wakaba@suika.fam.cx>
 
 	* DIS.dis (readProperties): Saves property name to values.

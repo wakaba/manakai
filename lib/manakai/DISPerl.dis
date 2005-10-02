@@ -13,7 +13,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/30 13:06:21 $
+      $Date: 2005/10/02 23:35:34 $
     @@ContentType:
       dis:Date.RCS
   
@@ -78,6 +78,23 @@ ElementTypeBinding:
     @@rdf:type:
       rdf:Property
 
+ElementTypeBinding:
+  @Name: SPropDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: rdf|Property
+    @@rdf:type: DISSource|Property
+
+ElementTypeBinding:
+  @Name: RPropDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: rdf|Property
+    @@rdf:type: DISSource|Property
+    @@rdf:type: DISSource|ResourceProperty
+
 ## -- For Perl
 
 ForDef:
@@ -100,6 +117,36 @@ ElementTypeBinding:
     dis:FullName
   @ShadowContent:
     @@lang:en
+
+## -- Perl Files
+
+ResourceTypeDef:
+  @QName: DISPerl|File
+  @enFN: Perl File
+  @rdfs:subClassOf: DISLang|SourceFile
+  @subsetOf: DISLang|SourceFile
+
+ResourceTypeDef:
+  @QName: DISPerl|ModuleFile
+  @enFN: Perl Module File
+  @rdfs:subClassOf: DISPerl|File
+  @subsetOf: DISPerl|File
+  @rdfs:subClassOf: DISLang|ModuleFile
+  @subsetOf: DISLang|ModuleFile
+
+ResourceTypeDef:
+  @QName: DISPerl|ExecutableFile
+  @enFN: Perl Executable Script File
+  @rdfs:subClassOf: DISPerl|File
+  @subsetOf: DISPerl|File
+  @rdfs:subClassOf: DISLang|ExecutableFile
+  @subsetOf: DISLang|ExecutableFile
+
+ResourceTypeDef:
+  @QName: DISPerl|TestScriptFile
+  @enFN: Perl Test Script File
+  @rdfs:subClassOf: DISPerl|ExecutableFile
+  @subsetOf: DISPerl|ExecutableFile
 
 ## -- Perl lexical types
 
@@ -247,6 +294,8 @@ DataTypeDef:
     @@@: Perl Array
   @rdfs:subClassOf: DISPerl|Any
   @subsetOf: DISPerl|Any
+  @rdfs:subClassOf: DISLang|Array
+  @subsetOf: DISLang|Array
 
 ResourceDef:
   @QName: pl|Array
@@ -337,6 +386,81 @@ ResourceTypeDef:
   @enFN: Perl list
   @rdf:type: DISLang|AnyDataType
 
+ResourceTypeDef:
+  @QName: DISPerl|Package
+  @enFN: Perl Package
+
+ResourceTypeDef:
+  @QName: DISPerl|Module
+  @enFN: Perl Module
+
+ResourceTypeDef:
+  @QName: DISPerl|Class
+  @enFN: Perl Class
+  @rdfs:subClassOf: DISPerl|Package
+  @subsetOf: DISPerl|Package
+  @rdfs:subClassOf: DISLang|Class
+  @subsetOf: DISLang|Class
+
+ResourceTypeDef:
+  @QName: DISPerl|Interface
+  @enFN: Perl Interface Package
+  @rdfs:subClassOf: DISPerl|Package
+  @subsetOf: DISPerl|Package
+  @rdfs:subClassOf: DISLang|Interface
+  @subsetOf: DISLang|Interface
+
+ResourceTypeDef:
+  @QName: DISPerl|Sub
+  @enFN: Perl Subroutine
+
+ResourceTypeDef:
+  @QName: DISPerl|Method
+  @enFN: Perl Method
+  @rdfs:subClassOf: DISPerl|Sub
+  @subsetOf: DISPerl|Sub
+  @rdfs:subClassOf: DISLang|Method
+  @subsetOf: DISLang|Method
+
+ResourceTypeDef:
+  @QName: DISPerl|MethodParameter
+  @enFN: Perl Method Parameter
+  @rdfs:subClassOf: DISPerl|Variable
+  @subsetOf: DISPerl|Variable
+  @rdfs:subClassOf: DISLang|MethodParameter
+  @subsetOf: DISLang|Method
+
+ResourceTypeDef:
+  @QName: DISPerl|Const
+  @enFN: Perl Constant Function
+  @rdfs:subClassOf: DISPerl|Sub
+  @subsetOf: DISPerl|Sub
+  @rdfs:subClassOf: DISLang|Const
+  @subsetOf: DISLang|Const
+
+ResourceTypeDef:
+  @QName: DISPerl|AnyExported
+
+ResourceTypeDef:
+  @QName: DISPerl|ExportedSub
+  @enFN: Perl Exported Subroutine
+  @rdfs:subClassOf: DISPerl|Sub
+  @subsetOf: DISPerl|Sub
+  @rdfs:subClassOf: DISPerl|AnyExported
+  @subsetOf: DISPerl|AnyExported
+
+ResourceTypeDef:
+  @QName: DISPerl|ExportedVariable
+  @enFN: Perl Exported Variable
+  @rdfs:subClassOf: DISPerl|AnyExported
+  @subsetOf: DISPerl|AnyExported
+
+ResourceTypeDef:
+  @QName: DISPerl|ExportTag
+  @enFN: Perl Export Tag
+  @rdfs:subClassOf: DISPerl|AnyExported
+  @subsetOf: DISPerl|AnyExported
+
 ResourceDef:
   @QName: AsStringMethod
   @rdf:type: DISLang|Operator
@@ -402,7 +526,7 @@ ResourceDef:
 
 ## -- Perl construct properties
 
-PropDef:
+RPropDef:
   @QName: isExportOK
   @Description:
     @@lang:en
@@ -412,7 +536,7 @@ PropDef:
   @dataType: DISCore|Boolean
   @multipleProperties: DISCore|Single
 
-PropDef:
+RPropDef:
   @QName: isNamedParameter
   @Description:
     @@lang:en
@@ -424,7 +548,7 @@ PropDef:
     DISLang:MethodParameter
   @multipleProperties: DISCore|Single
 
-PropDef:
+RPropDef:
   @QName: defaultValueHasSelfReference
   @Description:
     @@lang:en
@@ -433,7 +557,7 @@ PropDef:
   @dataType: DISCore|Boolean
   @multipleProperties: DISCore|Single
 
-PropDef:
+SPropDef:
   @QName: DISPerl|name
   @enFN: Perl name (or any identifying string)
   @rdfs:subPropertyOf: dis|AppName
@@ -441,7 +565,7 @@ PropDef:
   @dataType: DISPerl|Perl
   @multipleProperties: DISCore|UnorderedList
 
-PropDef:
+RPropDef:
   @QName: DISPerl|packageName
   @FullName:
     @@lang:en
@@ -451,8 +575,9 @@ PropDef:
   @subsetOf: DISPerl|name
   @dataType: DISPerl|PackageName
   @multipleProperties: DISCore|UnorderedList
+  @rdfs:domain: DISPerl|Package
 
-PropDef:
+RPropDef:
   @QName: DISPerl|interfacePackageName
   @FullName:
     @@lang:en
@@ -462,8 +587,9 @@ PropDef:
   @subsetOf: DISPerl|packageName
   @dataType: DISPerl|PackageName
   @multipleProperties: DISCore|Single
+  @rdfs:domain: DISPerl|Interface
 
-PropDef:
+RPropDef:
   @QName: DISPerl|classPackageName
   @FullName:
     @@lang:en
@@ -473,54 +599,61 @@ PropDef:
   @subsetOf: DISPerl|packageName
   @dataType: DISPerl|PackageName
   @multipleProperties: DISCore|Single
+  @rdfs:domain: DISPerl|Class
 
-PropDef:
+RPropDef:
   @QName: DISPerl|subName
   @enFN: Perl subroutine name
   @rdfs:subPropertyOf: dis|AppName
   @subsetOf: dis|AppName
   @dataType: DISPerl|SubName
   @multipleProperties: DISCore|Single
+  @rdfs:domain: DISPerl|Sub
 
-PropDef:
+RPropDef:
   @QName: DISPerl|methodName
   @enFN: Perl method name
   @rdfs:subPropertyOf: DISPerl|subName
   @subsetOf: DISPerl|subName
   @dataType: DISPerl|SubName
   @multipleProperties: DISCore|Single
+  @rdfs:domain: DISPerl|Method
 
-PropDef:
+RPropDef:
   @QName: DISPerl|constName
   @enFN: Perl constant function name
   @rdfs:subPropertyOf: DISPerl|subName
   @subsetOf: DISPerl|subName
   @dataType: DISPerl|SubName
   @multipleProperties: DISCore|Single
+  @rdfs:domain: DISPerl|Const
 
-PropDef:
+RPropDef:
   @QName: DISPerl|exportTagName
   @enFN: Perl export tag name
   @rdfs:subPropertyOf: DISPerl|name
   @subsetOf: DISPerl|name
   @dataType: DISCore|String
   @multipleProperties: DISCore|Single
+  @rdfs:domain: DISPerl|ExportTag
 
-PropDef:
+RPropDef:
   @QName: DISPerl|variableName
   @enFN: Perl variable name without type prefix
   @rdfs:subPropertyOf: DISPerl|name
   @subsetOf: DISPerl|name
   @dataType: DISCore|String
   @multipleProperties: DISCore|Single
+  @rdfs:domain: DISPerl|Variable
 
-PropDef:
+RPropDef:
   @QName: DISPerl|paramName
   @enFN: Perl parameter name without type prefix
   @rdfs:subPropertyOf: DISPerl|variableName
   @subsetOf: DISPerl|variableName
   @dataType: DISCore|String
   @multipleProperties: DISCore|Single
+  @rdfs:domain: DISPerl|MethodParameter
 
 ## -- Perl binding specific properties and datatypes
 
@@ -531,21 +664,23 @@ LexTypeDef:
     Perl 5 code with <QUOTE::dis> preprocessing instructions
   @rdfs:subClassOf: DISCore|NSString
 
-PropDef:
+SPropDef:
   @QName: DISPerl|moduleSuffix
+  @rdf:type: DISSource|PropertyProperty
   @Description:
     @@lang:en
     @@@:
       A string suffixing module names.
   @dataType: DISCore|String
   @multipleProperties: DISCore|Single
+  @rdfs:domain: DISPerl|packageName
 
 ResourceDef:
   @QName:
     ManakaiDOM:moduleSuffix
   @AliasFor: DISPerl|moduleSuffix
 
-PropDef:
+RPropDef:
   @QName: DISPerl|propHashKey
   @enFN: Internal hash key name
   @enDesc:
@@ -917,7 +1052,7 @@ ResourceTypeDef:
   @rdfs:subClassOf: DISLang|AnyParameter
   @subsetOf: DISLang|AnyParameter
 
-PropDef:
+RPropDef:
   @QName: paramStyle
   @Description:
     @@lang:en

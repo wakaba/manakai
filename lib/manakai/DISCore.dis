@@ -19,7 +19,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/30 13:06:21 $
+      $Date: 2005/10/02 23:35:34 $
     @@ContentType:
       dis:Date.RCS
   
@@ -41,6 +41,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
   @DISCore:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Core#
+  @kwd:
+    http://suika.fam.cx/~wakaba/archive/2005/rfc2119/
   @lang:
      http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
   @license:
@@ -54,70 +56,98 @@ Namespace:
   @rdfs:
     http://www.w3.org/2000/01/rdf-schema#
 
-## -- Syntax sugar vocabularies
+## -- dis Resources
 
 ResourceTypeDef:
-  @QName: ElementType
-  @Description:
-    @@lang:en
-    @@@:
-      A dis element type.
+  @QName: DISCore|AnyResource
+  @enFN: 
+    <QUOTE::dis> Any Kind of Resource
+  @rdfs:subClassOf: rdfs|Resource
+  @subsetOf: rdfs|Resource
 
-ResourceDef:
-  @QName:
-    dis:ElementTypeBinding
-  @Description:
-    @@lang:en
-    @@@:
-      Binds a <QUOTE::dis> <CODE::NCName> with global element type name and 
-      shadow contents.
-      \
-      {NOTE:: Scope of <Q::dis:ElementTypeBinding> is limited to 
-              the file in which the element occurs.
-      \
-      }
-  @rdf:type: ElementType
+## -- dis Module
 
-ResourceDef:
-  @QName:
-    dis:ElementType
-  @Description:
-    @@lang:en
-    @@@:
-      A global element type to which an <CODE::NCName> is bound to.  
-      This type of element is used in <Q::dis:ElementTypeBinding> elements.
-  @rdf:type: ElementType
-  @dataType:
-    dis:TypeQName
-  @rdfs:range: ElementType
+ResourceTypeDef:
+  @QName: DISCore|Module
+  @enFN: 
+    <QUOTE::dis> Module
+  @rdfs:subClassOf: DISCore|AnyResource
+  @subsetOf: DISCore|AnyResource
+  @rdfs:subClassOf: DISCore|AnyModule
+  @subsetOf: DISCore|AnyModule
 
-ResourceDef:
-  @QName:
-    dis:ShadowContent
-  @Description:
-    @@lang:en
-    @@@:
-      A element content value and/or child elements that is appended 
-      to elements bound to. 
-  @rdf:type: ElementType
-  @dataType:
-    lang:dis
+ResourceTypeDef:
+  @QName: DISCore|requires
+  @enFN:
+    Required <QUOTE::dis> Module
+  @rdfs:domain: DISCore|Module
+  @rdfs:range: DISCore|Module
+  @dataType: DISCore|ModuleTFQNames
+  @multipleProperties: DISCore|UnorderedList
 
-ResourceDef:
-  @QName:
-    dis:Namespace
+## -- dis "for"
+
+ResourceTypeDef:
+  @QName: DISCore|For
+  @enFN:
+    <QUOTE::dis> <QUOTE::for>
+  @enDesc:
+    The target <EM::for> which resources are defined.
+  @rdfs:subClassOf: DISCore|AnyResource
+  @subsetOf: DISCore|AnyResource
+
+CPropDef:
+  @QName: DISCore|for
+  @enFN: For
+  @enDesc:
+    The target for which the resource is defined.
+
+    {NOTE:: For the <Q::DISCore:For> resources, the <Q::DISCore:for>
+            resource is the <Q::ManakaiDOM:all> by definition.
+    }
+  @rdfs:domain: DISCore|AnyResource
+  @rdfs:range: DISCore|For
+  @multipleProperties: DISCore|Single
+
+CPropDef:
+  @QName: DISCore|forp
+  @enFN: For (additional)
+  @enDesc:
+    Additional target specification.
+
+    {NOTE:: The <Q::DISCore:For> resources have no <Q::DISCore:forp>
+            resource.
+    }
+  @rdfs:domain: DISCore|AnyResource
+  @rdfs:range: DISCore|For
+  @multipleProperties: DISCore|OrderedList
+
+SPropDef:
+  @QName: dis|DefaultFor
   @Description:
     @@lang:en
     @@@:
-      Binds <CODE::NCName>s (i.e. namespace prefixes) to namespace URI 
-      references. 
-      \
-      {NOTE:: Scope of namespace bindings is limited to the file 
-              in which the element occurs.
-      \
-      }
-  @rdf:type: ElementType
-  @rdf:type: rdf|Property
+      The default <QUOTE::for> for the module.
+  @rdfs:domain: DISCore|Module
+  @rdfs:range: DISCore|For
+  @dataType: DISCore|ForQName
+  @multipleProperties: DISCore|Single
+
+ForDef:
+  @QName:
+    ManakaiDOM:all
+  @FullName:
+    @@lang:en
+    @@@: For all
+
+## -- dis Resources
+
+ResourceTypeDef:
+  @QName: DISCore|Resource
+  @enFN: 
+    <QUOTE::dis> Resource (in a narrow sense)
+  @rdfs:subClassOf: DISCore|AnyResource
+  @subsetOf: DISCore|AnyResource
 
 ElementTypeBinding:
   @Name: ResourceTypeDef
@@ -138,6 +168,22 @@ ElementTypeBinding:
       rdf:Property
 
 ElementTypeBinding:
+  @Name: SPropDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: rdf|Property
+    @@rdf:type: DISSource|Property
+    @@rdf:type: DISSource|ResourceProperty
+
+ElementTypeBinding:
+  @Name: CPropDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISCore|Property
+
+ElementTypeBinding:
   @Name: dataType
   @ElementType:
     dis:dataType
@@ -151,7 +197,46 @@ ElementTypeBinding:
   @ShadowContent:
     @@ContentType: DISCore|QName
 
-## -- Module group defining
+## -- Any Modules
+
+ResourceTypeDef:
+  @QName: DISCore|AnyModule
+  @enFN: Any Kind of Module
+  @enDesc:
+    A <Q::DISCore:AnyModule> is a module in some sense.  It might
+    be a <Q::DISCore:Module> or might be a programming language module.
+  @rdfs:subClassOf: DISCore|AnyResource
+  @subsetOf: DISCore|AnyResource
+
+CPropDef:
+  @QName: DISCore|anyResource
+  @enDesc:
+    The subject resource has the object resource as a member.
+  @multipleProperties: DISCore|UnorderedList
+  @dataType: DISCore|TFQNames
+  @rdfs:range: DISCore|AnyResource
+
+SPropDef:
+  @QName: DISCore|module
+  @enDesc:
+    The subject resource has the object module as a member.
+  @multipleProperties: DISCore|UnorderedList
+  @dataType: DISCore|ModuleTFQNames
+  @rdfs:range: DISCore|Module
+  @rdfs:subPropertyOf: DISCore|anyResource
+  @subsetOf: DISCore|anyResource
+
+SPropDef:
+  @QName: DISCore|resource
+  @enDesc:
+    The subject resource has the object <QUOTE::dis> resource as a member.
+  @multipleProperties: DISCore|UnorderedList
+  @dataType: DISCore|TFQNames
+  @rdfs:range: DISCore|Module
+  @rdfs:subPropertyOf: DISCore|anyResource
+  @subsetOf: DISCore|anyResource
+
+## -- Module groups
 
 ResourceTypeDef:
   @QName: 
@@ -159,6 +244,8 @@ ResourceTypeDef:
   @Description:
     @@lang:en
     @@@: A set of modules
+  @rdfs:subClassOf: DISCore|AnyModule
+  @subsetOf: DISCore|AnyModule
 
 ResourceDef:
   @QName:
@@ -171,151 +258,62 @@ ResourceDef:
       The <QUOTE::dis> core library.
   @DISPerl:packageName: manakai
 
-## -- Module defining
+## -- Resource Names
 
-ResourceDef:
-  @QName:
-    dis:Module
-  @rdf:type: ElementType
-  @Description:
-    @@lang:en
-    @@@:
-      An element that contains information about a <QUOTE::dis> module. 
-
-PropDef:
-  @QName:
-    dis:Require
-  @Description:
-    @@lang:en
-    @@@: 
-      References to external modules.
-  @multipleProperties: Single
-
-PropDef:
-  @QName: DISCore|module
+CPropDef:
+  @QName: DISCore|uri
+  @enFN: URI
   @enDesc:
-    The subject resource has the object module as a member.
-  @multipleProperties: DISCore|UnorderedList
-  @dataType: DISCore|TFQNames
-  @rdfs:range: dis|Module
+    A URI of the resource.  A <Q::DISCore:AnyResource> have
+    zero or more URIs.
 
-PropDef:
-  @QName: DISCore|resource
+    Note that <Q::DISCore:For> have exact one URI by definition.
+  @rdfs:domain: DISCore|AnyResource
+  @multipleProperties: DISCore|UnorderedList
+
+CPropDef:
+  @QName: DISCore|nameURI
+  @enFN: Name URI
   @enDesc:
-    The subject resource has the object <QUOTE::dis> resource as a member.
-  @multipleProperties: DISCore|UnorderedList
-  @dataType: DISCore|TFQNames
+    A name URI of the resource.  A <Q::DISCore:AnyResource>
+    <kwd:MAY> have one or more name URIs, which might or might not be
+    <Q::DISCore:uri>s of the resource.  Note that more than
+    one <Q::DISCore:AnyResource>s might share the same
+    <Q::DISCore:nameURI>.
 
-## -- Resource defining
+    For <Q::DISCore:For> resources, the only name URI is the <Q::DISCore:uri>
+    of the resource.
+  @rdfs:domain: DISCore|AnyResource
 
-ResourceDef:
-  @QName:
-    dis:ResourceDef
-  @rdf:type: ElementType
-  @Description:
-    @@lang:en
-    @@@:
-      A <Q::dis:ResourceDef> element defines a resource.
+CPropDef:
+  @QName: DISCore|namespaceURI
+  @enFN: Namespace URI
+  @enDesc:
+    A namespace URI of the resource.  Note that when a resource
+    has a namespace URI, then the resource also has a <Q::DISCore:localName>
+    associated to the namespace URI.
+  @rdfs:domain: DISCore|AnyResource
+  @rdfs:range: DISCore|Namespace
 
 ResourceTypeDef:
-  @QName: 
-    dis:MultipleResource
-  @Description:
-    @@lang:en
-    @@@:
-      An abstract resource - it has zero or more concrete representations, 
-      that are distinguished by <CODE::for> URI references.
+  @QName: DISCore|Namespace
+  @enFN: Namespace
+  @rdfs:subClassOf: DISCore|Resource
+  @subsetOf: DISCore|Resource
 
-PropDef:
-  @QName:
-    dis:resourceFor
-  @rdfs:domain:
-    dis:MultipleResource
-  @rdfs:range:
-    dis:For
-  @Description:
-    @@lang:en
-    @@@:
-      A <CODE::for> URI reference that can identity one representation 
-      of the resource.
-      \
-      {NOTE:: To test <CODE::for> declared with <Q::dis:resourceFor> 
-              element, use <Q::dis:ForCheck> attribute, rather than
-              <Q::dis:For> attribute.  <Q::dis:For> attribute does 
-              not check additional <CODE::For> URI references 
-              declared with <Q::dis:resourceFor> element.
-      \
-      }
-  @multipleProperties: UnorderedList
-  @dataType: dis|TypeQName
+CPropDef:
+  @QName: DISCore|localName
+  @enFN: Local Name
+  @enDesc:
+    A local name of the resource.
 
-## -- Definition for
+    {NOTE:: More than one <Q::DISCore:AnyResource>s share the same
+            local name in a namespace, as more than one
+            <Q::DISCore:AnyResource>s share their name URI.
+    }
+  @rdfs:domain: DISCore|AnyResource
 
-PropDef:
-  @QName:
-    dis:For
-  @rdfs:domain:
-    rdfs:Resource
-  @dataType:
-    dis:TypeQName
-  @Description:
-    @@lang:en
-    @@@:
-      A <Q::For> for which the resource is used (<QUOTE::OR> filter).
-  @multipleProperties: UnorderedList
-
-PropDef:
-  @QName:
-    dis:ForCheck
-  @rdfs:domain:
-    rdfs:Resource
-  @dataType:
-    dis:TypeQName
-  @Description:
-    @@lang:en
-    @@@:
-      A <Q::For> for which the resource is used (<QUOTE::AND> filter).
-  @multipleProperties: UnorderedList
-
-PropDef:
-  @QName: dis|DefaultFor
-  @Description:
-    @@lang:en
-    @@@:
-      The default <QUOTE::for> for the module.
-  @dataType: dis|TypeQName
-  @multipleProperties: Single
-
-ForDef:
-  @QName:
-    ManakaiDOM:all
-  @FullName:
-    @@lang:en
-    @@@: For all
-
-## -- Resource naming
-
-PropDef:
-  @QName:
-    dis:Name
-  @Description:
-    @@lang:en
-    @@@:
-      A name of a resource.
-  @dataType: String
-  @multipleProperties: Single
-
-PropDef:
-  @QName:
-    dis:QName
-  @Description:
-    @@lang:en
-    @@@:
-      A qualified name of a resource.
-  @dataType: dis|TypeQName
-  @multipleProperties: Single
-
-PropDef:
+CPropDef:
   @QName:
     dis:AppName
   @Description:
@@ -324,53 +322,21 @@ PropDef:
   @dataType: String
   @multipleProperties: UnorderedList
 
-PropDef:
+SPropDef:
   @QName:
     dis:FullName
   @Description:
     @@lang:en
     @@@:
       A human-readable name of a resource.
-  @ISA:
-    rdfs:label
   @dataType: lang|disdocInline
   @multipleProperties: DISCore|OrderedList
-
-PropDef:
-  @QName: 
-    dis:FileName
-  @Description:
-    @@lang:en
-    @@@:
-      A file name.
-  @dataType: String
-  @multipleProperties: Single
-
-PropDef:
-  @QName:
-    dis:Condition
-  @Description:
-    @@lang:en
-    @@@:
-      Condition (obsolete) - use <CODE::For> instead.
-
-ResourceDef:
-  @QName:
-    ManakaiDOM:InCase
-  @rdf:type:
-    rdfs:Class
-  @subsetOf:
-    rdfs:Class
-  @rdfs:subClassOf:
-    rdfs:Class
-  @Description:
-    @@lang:en
-    @@@: 
-      Cases. 
+  @rdfs:subClassOf: rdfs|label
+  @subsetOf: rdfs|label
 
 ## -- Resource-to-resource relationships
 
-PropDef:
+CPropDef:
   @QName: derivedFrom
   @Description:
     @@lang:en
@@ -380,10 +346,10 @@ PropDef:
     rdfs:Resource
   @rdfs:range:
     rdfs:Resource
-  @dataType: dis|TFQNames
+  @dataType: DISCore|TFQNames
   @multipleProperties: OrderedList
 
-PropDef:
+SPropDef:
   @QName:
     dis:subsetOf
   @Description:
@@ -396,11 +362,10 @@ PropDef:
     rdfs:Resource
   @subsetOf: derivedFrom
   @rdfs:subPropertyOf:derivedFrom
-  @dataType:
-    dis:TFQNames
+  @dataType: DISCore|TFQNames
   @multipleProperties: UnorderedList
 
-PropDef:
+CPropDef:
   @QName:
     dis:supersetOf
   @Description:
@@ -412,35 +377,43 @@ PropDef:
               not be directly specified in the <Q::dis> files.
       \
       }
-  @dataType: dis|TFQNames
+  @dataType: DISCore|TFQNames
   @multipleProperties: UnorderedList
 
-PropDef:
+SPropDef:
   @QName:
     dis:ISA
   @Description:
     @@lang:en
     @@@:
       Inheritance relationship of a resource.
+
+    If a <Q::dis:ISA> element is specified as a child element
+    of a <Q::dis:ForDef> element, then the <Q::dis:ISA> value
+    defines a superresource of the <Q::DISCore:For> defined
+    by the <Q::dis:ForDef> element.  The <Q::dis:ISA> value
+    <kwd:MUST> be a <Q::DISCore:ForQName>.
+  @rdf:type: DISCore|ElementType
   @subsetOf: derivedFrom
   @rdfs:subPropertyOf:derivedFrom
-  @dataType:
-    dis:TFQNames
+  @dataType: DISCore|TFQNames
   @multipleProperties: OrderedList
 
-PropDef:
+CPropDef:
   @QName:
     dis:AppISA
   @Description:
     @@lang:en
     @@@:
       Application dependent is-a relationship.
+
+    (This property might be marked as obsolete in future revision.)
   @subsetOf: derivedFrom
   @rdfs:subPropertyOf:derivedFrom
   @multipleProperties: OrderedList
   @dataType: String
 
-PropDef:
+SPropDef:
   @QName:
     dis:Implement
   @Description:
@@ -449,55 +422,10 @@ PropDef:
       <QUOTE::Implementing> relationship of a resource.
   @subsetOf:derivedFrom
   @rdfs:subPropertyOf:derivedFrom
-  @dataType:
-    dis:TFQNames
+  @dataType: DISCore|TFQNames
   @multipleProperties: UnorderedList
 
-PropDef:
-  @QName:
-    dis:AliasFor
-  @Description:
-    @@lang:en
-    @@@:
-      Makes the subject an alias for another resource. 
-      \
-      {NOTE:: Although its semantics is almost same as 
-              <Q::owl:sameAs>, this property carries 
-              an additional meaning that the object has 
-              a <QUOTE::superior> or canonical name to the subject's. 
-      \
-      }
-  @rdfs:subClassOf:
-    owl:sameAs
-  @subsetOf:
-    owl:sameAs
-  @rdfs:domain:
-    rdfs:Resource
-  @rdfs:range:
-    rdfs:Resource
-  @dataType:
-    dis:TFQNames
-  @multipleProperties: Single
-
-PropDef:
-  @QName:
-    dis:aliasChild
-  @Description:
-    @@lang:en
-    @@@:
-      A <QUOTE::dis> processing instruction whether the subject resource 
-      should be interpreted as a resource when the subject resource 
-      is described as an <Q::dis:aliasFor> another resource.  Any 
-      <Q::dis:ResourceDef> that is a child of alias <Q::dis:ResourceDef> 
-      is not processed when a <QUOTE::dis> file 
-      is compiled, unless <Q::dis:aliasChild> is <CODE::1>. 
-  @rdfs:domain:
-    dis:ResourceDef
-  @dataType: 
-    dis:Boolean
-  @multipleProperties: Single
-
-PropDef:
+SPropDef:
   @QName:
     ManakaiDOM:isRedefining
   @dataType: DISCore|Boolean
@@ -509,7 +437,7 @@ PropDef:
       class or not.  (Obsolete)
   @multipleProperties: Single
 
-PropDef:
+SPropDef:
   @QName:
     dis:IsAbstract
   @Description:
@@ -518,10 +446,12 @@ PropDef:
       Whether the resource is defined abstractly or concretly. 
       Abstractly defined resource must be concretly overloaded 
       by inheriting class.
+
+    (Move to DISLang?)
   @dataType: dis|Boolean
   @multipleProperties: Single
 
-PropDef:
+SPropDef:
   @QName:
     dis:IsFinal
   @Description: 
@@ -534,22 +464,13 @@ PropDef:
       - <CODE::0>  :: The subject resource is able to be overrided. 
       \
       - <CODE::1>  :: The subject resource is unable to be overrided.
+
+    (Move to DISLang?)
   @dataType:
     DISCore:Tristate
   @multipleProperties: Single
 
-PropDef:
-  @QName: stopISARecursive
-  @Description:
-    @@lang:en
-    @@@:
-      Whether the <Q::dis:ISA>-recursive property search
-      (i.e. <M::DIS:ManakaiDISPropertyAccessor.getPropertyResourceList>)
-       should be stopped or not.
-  @dataType: DISCore|Boolean
-  @multipleProperties: Single
-
-## --- Datatype
+## -- Datatypes
 
 ResourceDef:
   @QName: AnyType
@@ -587,26 +508,25 @@ ResourceDef:
   @QName: StringDataType
   @AliasFor: LexicalType
 
-PropDef:
+SPropDef:
   @QName:
     dis:dataType
   @Description:
     @@lang:en
     @@@:
       Lexical data type of the property object.
-  @rdfs:domain:
-    rdf:Property
+  @rdfs:domain: DISSource|Property
   @rdfs:range: DISCore|LexicalType
-  @dataType:
-    dis:TypeQName
+  @dataType: DISCore|QName
   @multipleProperties: Single
 
 PropDef:
   @QName:
     dis:ContentType
   @rdfs:range: LexicalType
-  @dataType:
-    dis:TypeQName
+  @rdf:type: DISCore|ElementType
+  @rdf:type: DISSource|PropertyProperty
+  @dataType: DISCore|QName
   @Description:
     @@lang:en
     @@@:
@@ -807,6 +727,13 @@ ResourceDef:
   @AliasFor: DISCore|QName
 
 LexTypeDef:
+  @QName: DISCore|ForQName
+  @enFN: 
+    <QUOTE::dis> QName Referencing a <Q::DISCore|For>
+  @rdfs:subClassOf: DISCore|QName
+  @subsetOf: DISCore|QName
+
+LexTypeDef:
   @QName: DISCore|NCNameOrQName
   @enFN:
     <QUOTE::dis> NCName or <QUOTE::dis> QName with prefix
@@ -835,6 +762,13 @@ ResourceDef:
   @AliasFor: DISCore|TFQNames
 
 LexTypeDef:
+  @QName: DISCore|ModuleTFQNames
+  @enFN:
+    <QUOTE::dis> T & F QNames identifying a <Q::DISCore:Module>
+  @rdfs:subClassOf: DISCore|TFQNames
+  @subsetOf: DISCore|TFQNames
+
+LexTypeDef:
   @QName: DISCore|TFPQNames
   @enFN:
     <QUOTE::dis> T & F & P QName triplet
@@ -848,7 +782,25 @@ LexTypeDef:
 
 ## -- Properties
 
+ResourceTypeDef:
+  @QName: DISCore|Property
+  @enFN: Property
+  @rdfs:subClassOf: rdf|Property
+  @subsetOf: rdf|Property
+
 PropDef:
+  @QName: stopISARecursive
+  @Description:
+    @@lang:en
+    @@@:
+      Whether the <Q::dis:ISA>-recursive property search
+      (i.e. <M::DIS:ManakaiDISPropertyAccessor.getPropertyResourceList>)
+       should be stopped or not.
+  @rdf:type: DISSource|PropertyProperty
+  @dataType: DISCore|Boolean
+  @multipleProperties: DISCore|Single
+
+SPropDef:
   @QName: dis|multipleProperties
   @Description:
     @@lang:en
@@ -858,8 +810,11 @@ PropDef:
       <QUOTE::dis> source tree.
   @rdfs:domain: rdf|Property
   @rdfs:range: rdfs|Resource
-  @dataType: dis|TypeQName
+  @dataType: DISCore|QName
   @multipleProperties: Single
+
+ResourceTypeDef:
+  @QName: DISCore|PropertyValueOrder
 
 ResourceDef:
   @QName: OrderedList
@@ -869,7 +824,7 @@ ResourceDef:
       If multiple values are specified to a property, then
       they makes up an ordered collection of values in document
       order.
-  @rdf:type: rdfs|Resource
+  @rdf:type: DISCore|PropertyValueOrder
 
 ResourceDef:
   @QName: UnorderedList
@@ -878,7 +833,7 @@ ResourceDef:
     @@@:
       If multiple valus are specified to a property, then
       they makes up an unordered collection of values.
-  @rdf:type: rdfs|Resource
+  @rdf:type: DISCore|PropertyValueOrder
 
 ResourceDef:
   @QName: Single
@@ -887,31 +842,52 @@ ResourceDef:
     @@@:
       Only a value is allowed for the property; if there
       are more than one attributes in the source tree, it is an error.
-  @rdf:type: rdfs|Resource
+  @rdf:type: DISCore|PropertyValueOrder
 
 ## -- Definitions
 
-PropDef:
+CPropDef:
+  @QName: DISCore|definition
+  @enFN: Definition
+
+SPropDef:
+  @QName:
+    dis:Def
+  @Description:
+    @@lang:en
+    @@@:
+      A primary definition of the resource.
+  @dataType: DISCore|String
+  @multipleProperties: DISCore|OrderedList
+  @rdfs:subPropertyOf: DISCore|definition
+  @subsetOf: DISCore|definition
+
+SPropDef:
   @QName:
     dis:Value
   @Description:
     @@lang:en
     @@@:
       A value of the resource.
-  @dataType: String
-  @multipleProperties: Single
+  @dataType: DISCore|String
+  @multipleProperties: DISCore|Single
+  @rdfs:subPropertyOf: dis|Def
+  @subsetOf: dis|Def
 
-PropDef:
+SPropDef:
   @QName:
     dis:DefaultValue
   @Description:
     @@lang:en
     @@@: The default value of the resource.
-  @dataType: String
-  @multipleProperties: Single
+  @dataType: DISCore|String
+  @multipleProperties: DISCore|Single
+  @rdfs:subPropertyOf: DISCore|definition
+  @subsetOf: DISCore|definition
 
-PropDef:
+CPropDef:
   @QName: dis|is-null
+  @rdf:type: DISSource|PropertyProperty
   @Description:
     @@lang:en
     @@@:
@@ -920,18 +896,8 @@ PropDef:
     @@lang:en
     @@@:
       Is <DOM::null> value
-  @dataType: dis|Boolean
-  @multipleProperties: Single
-
-PropDef:
-  @QName:
-    dis:Def
-  @Description:
-    @@lang:en
-    @@@:
-      A definition of the resource.
-  @dataType: String
-  @multipleProperties: OrderedList
+  @dataType: DISCore|Boolean
+  @multipleProperties: DISCore|Single
 
 ResourceTypeDef:
   @QName: AnyDefContainer
@@ -942,10 +908,12 @@ ResourceTypeDef:
 
 ResourceTypeDef:
   @QName: DISCore|AnyValueContainer
+  @rdfs:subClassOf: DISCore|AnyDefContainer
+  @subsetOf: DISCore|AnyDefContainer
 
 ## -- Access controls
 
-PropDef:
+SPropDef:
   @QName:
     ManakaiDOM:isForInternal
   @dataType:
@@ -956,11 +924,13 @@ PropDef:
       Whether the subject resource is prepared for the internal use.  
       In other word, the subject resource is a public member or 
       a private member.
+
+    (move to DISLang?)
   @multipleProperties: Single
 
 ## -- Status
 
-PropDef:
+SPropDef:
   @QName: isDeprecated
   @dataType: DISCore|Boolean
   @Description:
@@ -969,9 +939,10 @@ PropDef:
       Whether the use of the subject resource is deprecated or not. 
   @multipleProperties: Single
 
-PropDef:
+CPropDef:
   @QName: alt
   @dataType: DISCore|TFQNames
+  @rdf:type: DISSource|PropertyProperty
   @Description:
     @@lang:en
     @@@:
@@ -981,3 +952,18 @@ PropDef:
       <Q::isDeprecated> property element.
   @multipleProperties: OrderedList
 
+## -- Files
+
+ResourceTypeDef:
+  @QName: DISCore|File
+  @enFN: File
+
+SPropDef:
+  @QName: 
+    dis:FileName
+  @Description:
+    @@lang:en
+    @@@:
+      A file name.
+  @dataType: String
+  @multipleProperties: Single

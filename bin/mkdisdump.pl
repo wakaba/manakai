@@ -321,12 +321,18 @@ sub append_document_documentation (%) {
   for my $v (@{$opt{source_resource}->get_property_value_list
                    (ExpandedURI q<doc:part>)}) {
     my $res = $v->get_resource ($opt{source_resource}->database);
-    $ReferredResource{$res->uri} ||= 1;
+    $ReferredResource{$res->uri} ||= 2;
+    $ReferredResource{$res->uri} = 2
+      if $ReferredResource{$res->uri} == 1;
     my $doc = $section->append_child
       ($od->create_element_ns (ExpandedURI q<dump:>, 'document'));
     $doc->ref ($res->uri);
     for my $vv (@{$v->get_property (ExpandedURI q<doc:rel>)||[]}) {
       $doc->append_child ($od->create_element_ns (ExpandedURI q<doc:>, 'rel'))
+        ->set_attribute_ns (ExpandedURI q<dump:>, 'dump:uri', $vv->uri);
+    }
+    for my $vv (@{$v->get_property (ExpandedURI q<doc:as>)||[]}) {
+      $doc->append_child ($od->create_element_ns (ExpandedURI q<doc:>, 'as'))
         ->set_attribute_ns (ExpandedURI q<dump:>, 'dump:uri', $vv->uri);
     }
   }
@@ -335,6 +341,7 @@ sub append_document_documentation (%) {
 sub append_module_documentation (%) {
   my %opt = @_;
   my $section = $opt{result_parent}->create_module ($opt{source_resource}->uri);
+  my $od = $opt{result_parent}->owner_document;
   
   add_uri ($opt{source_resource} => $section);
 
@@ -351,6 +358,19 @@ sub append_module_documentation (%) {
       (ExpandedURI q<ddoct:>, 'ddoct:basePath', '../' x ($path =~ tr#/#/#));
     $pl_full_name =~ s/.*:://g;
     $section->perl_name ($pl_full_name);
+  }
+
+  for my $con (@{$opt{source_resource}->get_property_value_list
+                   (ExpandedURI q<dis:AppName>)},
+               @{$opt{source_resource}->get_property_value_list
+                   (ExpandedURI q<idl:prefix>)}) {
+    my $ns = $con->name;
+    my $ln = $1 if ($ns =~ s/(\w+)$//);
+    $section->append_child ($od->create_element_ns ($ns, $ln))
+      ->text_content ($con->string_value);
+    if ($con->isa ('Message::Util::IF::DVURIValue')) {
+      $ReferredResource{$con->uri} ||= 1;
+    }
   }
 
   append_description (source_resource => $opt{source_resource},
@@ -454,23 +474,27 @@ sub append_interface_documentation (%) {
   add_uri ($opt{source_resource} => $section);
 
   my $pl_full_name = $opt{source_resource}->pl_fully_qualified_name;
+  my $path;
   if (defined $pl_full_name) {
     $section->perl_package_name ($pl_full_name);
 
-    my $path = $opt{source_resource}->get_property_text
+    $path = $opt{source_resource}->get_property_text
                    (ExpandedURI q<dis:FileName>, $pl_full_name);
     $path =~ s#::#/#g;
     $section->resource_file_path_stem ($path);
-
-    $section->set_attribute_ns
-      (ExpandedURI q<ddoct:>, 'ddoct:basePath',
-       join '', '../' x ($path =~ tr#/#/#));
-    $pl_full_name =~ s/.*:://g;
     $section->perl_name ($pl_full_name);
+  } else {
+    $path = $opt{source_resource}->get_property_text
+      (ExpandedURI q<dis:FileName>, $opt{source_resource}->local_name);
+    $section->resource_file_path_stem ($path);
   }
+  $section->set_attribute_ns
+    (ExpandedURI q<ddoct:>, 'ddoct:basePath',
+     join '', '../' x ($path =~ tr#/#/#));
+  $pl_full_name =~ s/.*:://g;
 
   $section->is_exception_interface (1)
-    if $opt{source_resource}->is_type_uri (ExpandedURI q<dx:Interface>);
+    if $opt{source_resource}->is_type_uri (ExpandedURI q<DISLang:Exception>);
 
   append_description (source_resource => $opt{source_resource},
                       result_parent => $section);
@@ -505,52 +529,10 @@ sub append_interface_documentation (%) {
                       result_parent => $section,
                       class_uri => $class_uri);
 
-} # append_interface_documentation
-
-sub append_idl_interface_documentation (%) {
-  my %opt = @_;
-  my $section = $opt{result_parent}->append_child
-    ($opt{result_parent}->owner_document->create_element_ns
-       (ExpandedURI q<dump:>, 'interface'));
-  
-  add_uri ($opt{source_resource} => $section);
-
-  my $path = $opt{source_resource}->get_property_text
-                   (ExpandedURI q<dis:FileName>,
-                    $opt{source_resource}->local_name);
-  $path =~ s#::#/#g;
-  $section->resource_file_path_stem ($path);
-
-  $section->set_attribute_ns
-      (ExpandedURI q<ddoct:>, 'ddoct:basePath',
-       join '', '../' x ($path =~ tr#/#/#));
-
-  $section->is_exception_interface (1)
-    if $opt{source_resource}->is_type_uri (ExpandedURI q<idl:Exception>);
-
-  append_description (source_resource => $opt{source_resource},
-                      result_parent => $section);
-
-  for my $memres (@{$opt{source_resource}->get_child_resource_list}) {
-    if ($memres->is_type_uri (ExpandedURI q<DISLang:Method>)) {
-      append_method_documentation (source_resource => $memres,
-                                   result_parent => $section);
-    } elsif ($memres->is_type_uri (ExpandedURI q<DISLang:Attribute>)) {
-      append_attr_documentation (source_resource => $memres,
-                                 result_parent => $section);
-    } elsif ($memres->is_type_uri (ExpandedURI q<DISLang:ConstGroup>)) {
-      append_constgroup_documentation (source_resource => $memres,
-                                       result_parent => $section);
-    }
+  if ($opt{source_resource}->is_type_uri (ExpandedURI q<idl:AnyInterface>)) {
+    $ReferredResource{ExpandedURI q<idl:void>} ||= 1;
   }
-
-  ## Inheritance
-  append_inheritance (source_resource => $opt{source_resource},
-                      result_parent => $section,
-                      target => 'idl');
-
-  $ReferredResource{ExpandedURI q<idl:void>} ||= 1;
-} # append_idl_interface_documentation
+} # append_interface_documentation
 
 sub append_class_documentation (%) {
   my %opt = @_;
@@ -1389,27 +1371,43 @@ while (my @ruri = grep {$ReferredResource{$_} > 0} keys %ReferredResource) {
         $ReferredResource{$uri} = -1;
         next U;
       }
+      progress_reset;
+      status_msg qq<Module <$uri>...>;
       append_module_documentation
         (result_parent => $body,
          source_resource => $res,
-         is_partial => 1);
-    } elsif ($res->is_type_uri (ExpandedURI q<idl:Interface>) or
-             $res->is_type_uri (ExpandedURI q<idl:Exception>)) {
-      append_idl_interface_documentation
-        (result_parent => $body,
-         source_resource => $res);
+         is_partial => ($ReferredResource{$uri} == 1));
+      status_msg qq<done>;
+      progress_reset;
     } elsif ($res->is_type_uri (ExpandedURI q<DISLang:Class>)) {
       my $mod = $res->owner_module;
-      unless ($ReferredResource{$mod->uri} < 0) {
+      my $mod_uri = $mod->uri;
+      unless ($ReferredResource{$mod_uri} < 0) {
+        $ReferredResource{$mod_uri} = $ReferredResource{$uri}
+          if $ReferredResource{$mod_uri} < $ReferredResource{$uri};
         unshift @ruri, $uri;
-        unshift @ruri, $mod->uri;
+        unshift @ruri, $mod_uri;
         next U;
       }
       append_class_documentation
+        (result_parent => $body->create_module ($mod_uri),
+         source_resource => $res,
+         is_partial => ($ReferredResource{$uri} == 1));
+    } elsif ($res->is_type_uri (ExpandedURI q<DISLang:Interface>)) {
+      my $mod = $res->owner_module;
+      my $mod_uri = $mod->uri;
+      unless ($ReferredResource{$mod_uri} < 0) {
+        $ReferredResource{$mod_uri} = $ReferredResource{$uri}
+          if $ReferredResource{$mod_uri} < $ReferredResource{$uri};
+        unshift @ruri, $uri;
+        unshift @ruri, $mod_uri;
+        next U;
+      }
+      append_interface_documentation
         (result_parent => $body->create_module ($mod->uri),
          source_resource => $res,
-         is_partial => 1);
-    } elsif ($res->is_type_uri (ExpandedURI q<DISLang:Interface>)) {
+         is_partial => ($ReferredResource{$uri} == 1));
+    } elsif ($res->is_type_uri (ExpandedURI q<DISCore:AnyType>)) {
       my $mod = $res->owner_module;
       unless ($mod->is_defined) {
         $ReferredResource{$uri} = -1;
@@ -1419,29 +1417,9 @@ while (my @ruri = grep {$ReferredResource{$_} > 0} keys %ReferredResource) {
         unshift @ruri, $mod->uri;
         next U;
       }
-      append_interface_documentation
+      append_datatype_documentation
         (result_parent => $body->create_module ($mod->uri),
-         source_resource => $res,
-         is_partial => 1);
-    } elsif ($res->is_type_uri (ExpandedURI q<DISCore:AnyType>)) {
-      if ($res->is_type_uri (ExpandedURI q<idl:IDLDataType>)) {
-        append_datatype_documentation
-          (result_parent => $body,
-           source_resource => $res);
-      } else {
-        my $mod = $res->owner_module;
-        unless ($mod->is_defined) {
-          $ReferredResource{$uri} = -1;
-          next U;
-        } elsif (not ($ReferredResource{$mod->uri} < 0)) {
-          unshift @ruri, $uri;
-          unshift @ruri, $mod->uri;
-          next U;
-        }
-        append_datatype_documentation
-          (result_parent => $body->create_module ($mod->uri),
-           source_resource => $res);
-      }
+         source_resource => $res);
     } elsif ($res->is_type_uri (ExpandedURI q<DISLang:AnyMethod>) or
              $res->is_type_uri (ExpandedURI q<DISLang:ConstGroup>)) {
       my $cls = $res->parent_resource;
@@ -1669,4 +1647,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2005/10/01 12:14:29 $
+1; # $Date: 2005/10/02 23:35:32 $

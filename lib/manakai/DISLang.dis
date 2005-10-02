@@ -13,7 +13,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/30 13:06:21 $
+      $Date: 2005/10/02 23:35:34 $
     @@ContentType:
       dis:Date.RCS
   
@@ -118,6 +118,12 @@ ResourceDef:
   @AliasFor: DISLang|DataType
 
 ResourceTypeDef:
+  @QName: DISLang|Array
+  @enFN: array
+  @rdfs:subClassOf: DISLang|AnyDataType
+  @subsetOf: DISLang|AnyDataType
+
+ResourceTypeDef:
   @QName: DISLang|AnyClass
   @enFN: Class / interface
   @enDesc:
@@ -176,6 +182,12 @@ ResourceTypeDef:
   @subsetOf: DISLang|Class
 
 ResourceTypeDef:
+  @QName: DISLang|Exception
+  @enFN: Exception
+  @rdfs:subClassOf: DISLang|AnyDataType
+  @subsetOf: DISLang|AnyDataType
+
+ResourceTypeDef:
   @QName: AnyMethod
   @FullName:
     @@lang:en
@@ -231,6 +243,12 @@ ResourceTypeDef:
       Method return values (or returning subroutines). 
   @rdfs:subClassOf: DISCore|AnyDefContainer
   @subsetOf: DISCore|AnyDefContainer
+
+ResourceTypeDef:
+  @QName: DISLang|Constructor
+  @enFN: constructor
+  @rdfs:subClassOf: DISLang|AnyMethod
+  @subsetOf: DISLang|AnyMethod
 
 ResourceTypeDef:
   @QName: AnyParameter
@@ -604,18 +622,36 @@ TreeElementType:
     @@@:
       Inserts an input normalizing code, if any, for a parameter.
 
+## -- Phyisical Objects
+
+ResourceTypeDef:
+  @QName: DISLang|File
+  @enFN: File
+  @rdfs:subClassOf: DISCore|File
+  @subsetOf: DISCore|File
+
+ResourceTypeDef:
+  @QName: DISLang|SourceFile
+  @enFN: Source File
+  @enDesc:
+    A <Q::DISLang:SourceFile> is a file which would be
+    passed to compiler or interpreter and it is intended
+    to be human-modifiable.
+  @rdfs:subClassOf: DISLang|File
+  @subsetOf: DISLang|File
+
+ResourceTypeDef:
+  @QName: DISLang|ExecutableFile
+  @enFN: Executable File
+  @enDesc:
+    A <Q::DISLang:ExecutableFile> is a file which would be
+    runnable in machine or be passed to interpreter to execute.
+  @rdfs:subClassOf: DISLang|File
+  @subsetOf: DISLang|File
+
 ## -- Reserved for potential future extensions
 
 ## NOTE: These definitions may be moved to another modules in future revision.
-
-LexTypeDef:
-  @QName:
-    lang:Java
-  @FullName:
-    @@lang:en
-    @@@: Java code
-  @rdfs:subClassOf: DISCore|String
-  @subsetOf: DISCore|String
 
 LexTypeDef:
   @QName:
@@ -625,13 +661,6 @@ LexTypeDef:
     @@@: ECMAScript code
   @rdfs:subClassOf: DISCore|String
   @subsetOf: DISCore|String
-
-ForDef:
-  @QName:
-    ManakaiDOM:Java
-  @FullName:
-    @@lang:en
-    @@@: For Java binding
 
 ForDef:
   @QName:

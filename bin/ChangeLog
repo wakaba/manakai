@@ -1,3 +1,14 @@
+2005-10-02  Wakaba  <wakaba@suika.fam.cx>
+
+	* mkdisdump.pl (append_document_documentation): Outputs "doc:as"
+	properties if available.
+	(append_module_documentation): Outputs "dis:AppName" 
+	and "idl:prefix" attribute if available.
+	(append_idl_interface_documentation): Removed (Merged
+	to "append_interface_documentation").
+	(ReferredResource): Don't set "is_partial" flag
+	if ReferredResource value is greater than "1".
+
 2005-10-01  Wakaba  <wakaba@suika.fam.cx>
 
 	* mkdisdump.pl (append_document_properties): New subroutine.

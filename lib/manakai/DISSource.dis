@@ -1,0 +1,411 @@
+Module:
+  @QName: DIS|DISSource
+  @enFN:
+    <QUOTE::dis> Source Format Module
+  @Namespace:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Source#
+
+  @DISCore:author: DISCore|Wakaba
+  @Date:
+    $Date: 2005/10/02 23:35:34 $
+  @License: license|Perl+MPL
+  
+  @DefaultFor: ManakaiDOM|all
+  @Require:
+    @@Module:
+      @@@QName: DIS|DISCore
+    @@Module:
+      @@@QName: DIS|XML
+
+Namespace:
+  @DIS:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/
+  @dis:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
+  @DISCore:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Core#
+  @infoset:
+    http://www.w3.org/2001/04/infoset#
+  @is:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/XML#
+  @kwd:
+    http://suika.fam.cx/~wakaba/archive/2005/rfc2119/
+  @lang:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
+  @license:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
+  @ManakaiDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
+  @owl:
+    http://www.w3.org/2002/07/owl#
+  @rdf:
+    http://www.w3.org/1999/02/22-rdf-syntax-ns#
+  @rdfs:
+    http://www.w3.org/2000/01/rdf-schema#
+  @sc:
+    http://suika.fam.cx/~wakaba/archive/2005/10/swcfg#
+
+## -- SuikaWikiConfig Objects
+
+InfoItemDef:
+  @QName: sc|InfoItem
+  @enFN: SuikaWikiConfig Information Item
+
+InfoItemDef:
+  @QName: sc|Document
+  @enFN: SuikaWikiConfig Document Information Item
+  @is:hasProperty: sc|elementTypeBindings
+  @is:hasProperty: sc|namespaceBindings
+
+InfoPropDef:
+  @QName: sc|elementTypeBindings
+  @enFN: Element Type Bindings
+  @rdfs:domain: sc|Document
+
+InfoPropDef:
+  @QName: sc|namespaceBindings
+  @enFN: Namespace Bindings
+  @rdfs:domain: sc|Document
+  @rdfs:range: dis|Namespace
+  
+InfoItemDef:
+  @QName: sc|Comment
+  @enFN: SuikaWikiConfig Comment Information Item
+
+InfoItemDef:
+  @QName: sc|Element
+  @enFN: SuikaWikiConfig Element Information Item
+
+ResourceTypeDef:
+  @QName: DISCore|ElementType
+  @Description:
+    @@lang:en
+    @@@:
+      A dis element type.
+
+ElementTypeBinding:
+  @Name: InfoPropDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: is|InfosetProperty
+
+## -- Reserved SuikaWikiConfig Element Types
+
+ResourceDef:
+  @QName:
+    dis:ElementTypeBinding
+  @Description:
+    @@lang:en
+    @@@:
+      Binds a <QUOTE::dis> <CODE::NCName> with global element type name and 
+      shadow contents.
+      \
+      {NOTE:: Scope of <Q::dis:ElementTypeBinding> is limited to 
+              the file in which the element occurs.
+      \
+      }
+  @rdf:type: DISCore|ElementType
+
+ResourceDef:
+  @QName:
+    dis:ElementType
+  @Description:
+    @@lang:en
+    @@@:
+      A global element type to which an <CODE::NCName> is bound to.  
+      This type of element is used in <Q::dis:ElementTypeBinding> elements.
+  @rdf:type: DISCore|ElementType
+  @dataType: DISCore|QName
+  @rdfs:range: DISCore|ElementType
+  @rdfs:domain: DISCore|ElementTypeBinding
+
+ResourceDef:
+  @QName:
+    dis:ShadowContent
+  @Description:
+    @@lang:en
+    @@@:
+      A element content value and/or child elements that is appended 
+      to elements bound to. 
+  @rdf:type: DISCore|ElementType
+  @rdfs:domain: DISCore|ElementTypeBinding
+
+ResourceDef:
+  @QName:
+    dis:Namespace
+  @Description:
+    @@lang:en
+    @@@:
+      Binds <CODE::NCName>s (i.e. namespace prefixes) to namespace URI 
+      references. 
+      \
+      {NOTE:: Scope of namespace bindings is limited to the file 
+              in which the element occurs.
+      \
+      }
+  @rdf:type: DISCore|ElementType
+  @rdf:type: rdf|Property
+
+## -- dis Element Types
+
+ResourceDef:
+  @QName:
+    dis:Module
+  @rdf:type: DISCore|ElementType
+  @Description:
+    @@lang:en
+    @@@:
+      An element that contains information about a <QUOTE::dis> module. 
+
+ResourceDef:
+  @QName:
+    dis:Require
+  @rdf:type: DISCore|ElementType
+  @Description:
+    @@lang:en
+    @@@: 
+      References to external modules.
+  @rdfs:domain: dis|Module
+
+ResourceDef:
+  @QName: dis|ForDef
+  @rdf:type: DISCore|ElementType
+  @enDesc:
+    A <Q::dis:ForDef> element defines a <Q::DISCore|For>.
+    It <kwd:MUST> have children of exact one <Q::dis:QName> element and
+    zero or more <Q::dis:ISA>, <Q::dis:Implement>, <Q::dis:Description>,
+    <Q::dis:FullName> and/or <Q::dis:ImplNote> elements.
+
+ResourceDef:
+  @QName:
+    dis:ResourceDef
+  @rdf:type: DISCore|ElementType
+  @Description:
+    @@lang:en
+    @@@:
+      A <Q::dis:ResourceDef> element defines a resource.
+
+PropDef:
+  @QName:
+    dis:Name
+  @Description:
+    @@lang:en
+    @@@:
+      A name of a resource.
+
+    {NOTE:: If the parent of the <Q::dis:Name> element is a 
+            <Q::dis:ResourceDef> element, then the <Q::dis:Name>
+            defines a <Q::DISCore:localName> of the <Q::DISCore:Resource>.
+            If the parent of the <Q::dis:ResourceDef> is the document,
+            then the namespace URI associated to the local name
+            is the <Q::DISCore:targetNamespaceURI> of the <Q::DISCore:Module>
+            in which the <Q::DISCore:Resource> is defined.  A
+            <Q::DISCore:nameURI> is defined by concatenating the
+            namespace URI and the local name.  Otherwise,
+            the namespace URI associated to the local name is <CODE::null>.
+
+            A <Q::dis:ResourceDef> element <kwd:MUST-NOT>
+            have both <Q::dis:Name> and <Q::dis:QName> child elements.
+
+            If the parent of the <Q::dis:Name> element is an
+            <Q::dis:ElementTypeBinding> element, then the <Q::dis:Name>
+            value defines the name of the element type binding.
+    }
+  @rdf:type: DISCore|ElementType
+  @dataType: DISCore|LocalName
+  @multipleProperties: DISCore|Single
+
+PropDef:
+  @QName:
+    dis:QName
+  @Description:
+    @@lang:en
+    @@@:
+      A qualified name of a resource.
+
+    {NOTE:: The parent of the <Q::dis:QName> <kwd:MUST> be either
+            <Q::dis:Module>, <Q::dis:ForDef>, or <Q::dis:ResourceDef>
+            and its value defines the <Q::DISCore:namespaceURI>,
+            <Q::DISCore:localName> and <Q::DISCore:nameURI>.
+
+            A <Q::dis:ResourceDef> element <kwd:MUST-NOT>
+            have both <Q::dis:Name> and <Q::dis:QName> child elements.
+
+            If the parent is a <Q::dis:ForDef>, it also defines
+            a <Q::DISCore:uri> of the resource.
+    }
+  @dataType: DISCore|QName
+  @multipleProperties: DISCore|Single
+
+PropDef:
+  @QName:
+    dis:AliasFor
+  @Description:
+    @@lang:en
+    @@@:
+      Makes the subject an alias for another resource. 
+      \
+      {NOTE:: Although its semantics is almost same as 
+              <Q::owl:sameAs>, this property carries 
+              an additional meaning that the object has 
+              a <QUOTE::superior> or canonical name to the subject's. 
+      \
+      }
+  @rdf:type: DISCore|ElementType
+  @rdfs:domain: DISCore|Resource
+  @rdfs:range: DISCore|Resource
+  @dataType: DISCore|TFQNames
+  @multipleProperties: DISCore|Single
+
+PropDef:
+  @QName:
+    dis:aliasChild
+  @Description:
+    @@lang:en
+    @@@:
+      A <QUOTE::dis> processing instruction whether the subject resource 
+      should be interpreted as a resource when the subject resource 
+      is described as an <Q::dis:aliasFor> another resource.  Any 
+      <Q::dis:ResourceDef> that is a child of alias <Q::dis:ResourceDef> 
+      is not processed when a <QUOTE::dis> file 
+      is compiled, unless <Q::dis:aliasChild> is <CODE::1>. 
+
+    (obsolete?)
+  @rdfs:domain:
+    dis:ResourceDef
+  @dataType: DISCore|Boolean
+  @multipleProperties: DISCore|Single
+
+## -- Pseudo Resource Type
+
+ResourceDef:
+  @QName: 
+    dis:MultipleResource
+  @rdf:type: rdfs|Class
+  @Description:
+    @@lang:en
+    @@@:
+      A set of resources defined by a <Q::dis:ResourceDef> element.
+
+PropDef:
+  @QName:
+    dis:resourceFor
+  @rdfs:domain:
+    dis:MultipleResource
+  @rdfs:range: DISCore|For
+  @rdf:type: DISCore|ElementType
+  @Description:
+    @@lang:en
+    @@@:
+      A <CODE::for> URI reference that can identity one representation 
+      of the resource.
+      \
+      {NOTE:: To test <CODE::for> declared with <Q::dis:resourceFor> 
+              element, use <Q::dis:ForCheck> attribute, rather than
+              <Q::dis:For> attribute.  <Q::dis:For> attribute does 
+              not check additional <CODE::For> URI references 
+              declared with <Q::dis:resourceFor> element.
+      \
+      }
+  @multipleProperties: DISCore|UnorderedList
+  @dataType: DISCore|ForQName
+
+## -- Targets
+
+PropDef:
+  @QName:
+    dis:For
+  @Description:
+    @@lang:en
+    @@@:
+      A <Q::For> for which the resource is used (<QUOTE::OR> filter).
+  @rdf:type: DISCore|ElementType
+  @rdfs:domain: DISCore|AnyResource
+  @multipleProperties: DISCore|UnorderedList
+
+PropDef:
+  @QName:
+    dis:ForCheck
+  @Description:
+    @@lang:en
+    @@@:
+      A <Q::For> for which the resource is used (<QUOTE::AND> filter).
+  @rdf:type: DISCore|ElementType
+  @rdfs:domain: DISCore|AnyResource
+  @multipleProperties: DISCore|UnorderedList
+
+ElementTypeBinding:
+  @Name: ResourceTypeDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdfs:subClassOf: rdfs|Class
+    @@subsetOf: rdfs|Class
+    @@rdf:type: rdfs|Class
+
+ElementTypeBinding:
+  @Name: PropDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: rdf|Property
+
+ElementTypeBinding:
+  @Name: enDesc
+  @ElementType:
+    dis:Description
+  @ShadowContent:
+    @@lang:en
+
+ElementTypeBinding:
+  @Name: enFN
+  @ElementType:
+    dis:FullName
+  @ShadowContent:
+    @@lang:en
+
+ElementTypeBinding:
+  @Name: InfoItemDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      rdfs:Class
+    @@rdfs:subClassOf:
+      infoset:InfoItem
+    @@subsetOf: infoset|InfoItem
+    @@rdfs:subClassOf: sc|InfoItem
+    @@subsetOf: sc|InfoItem
+
+## -- Properties
+
+ResourceTypeDef:
+  @QName: DISSource|Property
+  @enFN: Property
+  @enDesc:
+    A <Q::DISSource:Property> is a <Q::DISCore:Property>
+    whose value can be specified in <QUOTE::dis> source.
+  @rdfs:subClassOf: DISCore|Property
+  @subsetOf: DISCore|Property
+  @rdf:type: DISCore|ElementType
+
+ResourceTypeDef:
+  @QName: DISSource|ResourceProperty
+  @enFN: Resource Property
+  @enDesc:
+    A <Q::DISSource:SourceProperty> is a <Q::DISCore:Property>
+    whose value can be specified by child element of element
+    which defines the resource in the <QUOTE::dis> source.
+  @rdfs:subClassOf: DISSource|Property
+  @subsetOf: DISSource|Property
+
+ResourceTypeDef:
+  @QName: DISSource|PropertyProperty
+  @enFN: Property Property
+  @enDesc:
+    A <Q::DISSource:PropertyProperty> is a <Q::DISCore:Property>
+    whose value can be specified by child element of element
+    which specifies a property value in the <QUOTE::dis> source.
+  @rdfs:subClassOf: DISSource|Property
+  @subsetOf: DISSource|Property
