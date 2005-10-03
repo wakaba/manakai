@@ -13,7 +13,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/10/02 23:35:34 $
+      $Date: 2005/10/03 13:20:21 $
     @@ContentType:
       dis:Date.RCS
   
@@ -461,20 +461,48 @@ PropDef:
       An operator the subject resource (either method or attribute) 
       is to be used to evaluate an expression whose at least one operand object 
       is of a class to which the subject resource belongs.
-  @rdfs:range: DISLang|Operator
   @rdfs:domain: DISLang|AnyMethod
+  @rdfs:range: DISLang|Operation
   @dataType: DISCore|QName
   @multipleProperties: DISCore|UnorderedList
 
 ResourceTypeDef:
-  @QName: DISLang|Operator
-  @enFN: Operator
-  @enDesc:
-    Operator in programming languages.
+  @QName: DISLang|Operation
+  @enFN: operation
 
+ResourceDef:
+  @QName: DISLang|Operator
+  @AliasFor: DISLang|Operation
 ResourceDef:
   @QName: DOMMain|Operator
   @AliasFor: DISLang|Operator
+
+OPDef:
+  @QName: DISLang|ToString
+  @enFN: stringify operation
+
+OPDef:
+  @QName: DISLang|ArrayGet
+  @enFN: array-like retrieval operation
+
+OPDef:
+  @QName: DISLang|ArraySet
+  @enFN: array-like setting operation
+
+OPDef:
+  @QName: DISLang|HashGet
+  @enFN: associative-array-like retrieval operation
+
+OPDef:
+  @QName: DISLang|HashSet
+  @enFN: associative-array-like retrieval operation
+
+ElementTypeBinding:
+  @Name: OPDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|Operation
 
 ## -- "Role" properties
 
@@ -648,23 +676,3 @@ ResourceTypeDef:
     runnable in machine or be passed to interpreter to execute.
   @rdfs:subClassOf: DISLang|File
   @subsetOf: DISLang|File
-
-## -- Reserved for potential future extensions
-
-## NOTE: These definitions may be moved to another modules in future revision.
-
-LexTypeDef:
-  @QName:
-    lang:ECMAScript
-  @FullName:
-    @@lang:en
-    @@@: ECMAScript code
-  @rdfs:subClassOf: DISCore|String
-  @subsetOf: DISCore|String
-
-ForDef:
-  @QName:
-    ManakaiDOM:ECMAScript
-  @FullName:
-    @@lang:en
-    @@@: For ECMAScript binding

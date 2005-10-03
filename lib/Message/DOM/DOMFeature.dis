@@ -43,45 +43,39 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/10/02 23:35:32 $
+      $Date: 2005/10/03 13:20:21 $
     @@ContentType:
       dis:Date.RCS
   
   @Require:
     @@Module:
-      @@@Name: DISIDL
-      @@@QName:
-        DISlib:DISIDL
-      @@@WithFor:
-        ManakaiDOM:all
+      @@@QName: DISlib|DISIDL
+      @@@WithFor: ManakaiDOM|all
+      @@@ImplNote:
+        @@@@lang:en
+        @@@@@:
+          <Module::DISlib|DISPerl>, <Module::DISlib|Java>,
+          <Module::DISlib|ECMAScript> is also referenced.
     @@Module:
-      @@@Name: DISPerl
-      @@@QName:
-        DISlib:DISPerl
-      @@@WithFor:
-        ManakaiDOM:all
-    @@Module:
-      @@@Name: DOMException
       @@@QName:
         UtilError:DOMException
       @@@WithFor:
         ManakaiDOM:all
     @@Module:
-      @@@Name: ManakaiNode
       @@@QName:
         Util:ManakaiNode
       @@@WithFor:
         ManakaiDOM:Perl
     @@Module:
-      @@@Name: DOMFeature
+      @@@QName: MDOM|DOMFeature
       @@@WithFor:
         ManakaiDOM:ManakaiDOM
     @@Module:
-      @@@Name: DOMFeature
+      @@@QName: MDOM|DOMFeature
       @@@WithFor:
         ManakaiDOM:ManakaiDOM3
     @@Module:
-      @@@Name: DOMFeature
+      @@@QName: MDOM|DOMFeature
       @@@WithFor:
         ManakaiDOM:ManakaiDOMLatest
   @DefaultFor:
@@ -118,6 +112,12 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dis/IDL#
   @infoset:
     http://www.w3.org/2001/04/infoset#
+  @j:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Java#
+  @jlang:
+    java:java.lang.
+  @js:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/ECMAScript#
   @kwd:
     http://suika.fam.cx/~wakaba/archive/2005/rfc2119/
   @lang:
@@ -134,6 +134,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/ManakaiNode#
   @owl:
     http://www.w3.org/2002/07/owl#
+  @p:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Perl#
   @Perl:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#Perl--
   @rdf:
@@ -1283,7 +1285,10 @@ ResourceDef:
     A <TYPE::MIString> is a sequence of characters.  How
     the characters are represented is implementation dependent.
 
-  @idl:sequenceOf: idl|unsignedShort||ManakaiDOM|all
+  @idl:sequenceOf: idl|unsignedShort
+  @idl:java: jlang|String
+  @idl:ecmascript: js|StringType
+  @idl:perl: p|String
 
 Doc:
   @QName: def|MIStringBindings
@@ -1634,6 +1639,7 @@ minIFClsDef:
   
   @Method:
      @@Name:  item
+    @@Operator: DISLang|ArrayGetter
      @@Description:
        @@@lang:en
        @@@@: 

@@ -1,3 +1,20 @@
+2005-10-03  Wakaba  <wakaba@suika.fam.cx>
+
+	* DISIDL.dis (idl:valuetypeAs): New property.
+	(idl:java, idl:ecmascript, idl:perl): New properties.
+
+	* ECMAScript.dis: New module.
+
+	* DISLang.dis (DISLang:Operation): New name for "DISLang:Operator".
+	(ToString, ArrayGet, ArraySet, HashGet, HashSet): New operations.
+	(ManakaiDOM:ECMAScript, lang:ECMAScript): Moved to "ECMAScript.dis"
+	module.
+
+	* DISPerl.dis (CharacterString, ByteString, VString, Typeglob,
+	GLOB, IOHandle, Context, ISA, isClassMethod, isInstanceMethod,
+	Constructor, CommonMethod, Attribute, main, CORE,
+	CORE_GLOBAL, SUPER): New resources.
+
 2005-10-02  Wakaba  <wakaba@suika.fam.cx>
 
 	* DISSource.dis: New module split from "DISCore.dis".

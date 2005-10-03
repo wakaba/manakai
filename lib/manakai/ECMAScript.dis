@@ -1,0 +1,356 @@
+Module:
+  @QName: DIS|ECMAScript
+  @enFN: 
+    <QUOTE::dis> ECMAScript Module
+  @Namespace:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/ECMAScript#
+
+  @DISCore:author: DISCore|Wakaba
+  @Date:
+    $Date: 2005/10/03 13:20:22 $
+  @License: license|Perl+MPL
+
+  @DefaultFor: ManakaiDOM|all
+  @Require:
+    @@Module:
+      @@@QName: DIS|DISLang
+
+Namespace:
+  @DIS:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/
+  @dis:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
+  @DISCore:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Core#
+  @html5:
+    http://www.w3.org/1999/xhtml
+  @infoset:
+    http://www.w3.org/2001/04/infoset#
+  @is:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/XML#
+  @js:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/ECMAScript#
+  @kwd:
+    http://suika.fam.cx/~wakaba/archive/2005/rfc2119/
+  @lang:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
+  @license:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
+  @ManakaiDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
+  @owl:
+    http://www.w3.org/2002/07/owl#
+  @rdf:
+    http://www.w3.org/1999/02/22-rdf-syntax-ns#
+  @rdfs:
+    http://www.w3.org/2000/01/rdf-schema#
+  @sc:
+    http://suika.fam.cx/~wakaba/archive/2005/10/swcfg#
+
+## -- Types
+
+ResourceTypeDef:
+  @QName: js|Type
+  @enFN: type
+  @rdfs:subClassOf: DISLang|DataType
+  @subsetOf: DISLang|DataType
+
+ElementTypeBinding:
+  @Name: ResourceTypeDef
+  @ElementType: 
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: rdfs|Class
+    @@rdfs:subClassOf: rdfs|Class
+    @@subsetOf: rdfs|Class
+
+ElementTypeBinding:
+  @Name: TypeDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: js|Type
+
+ResourceTypeDef:
+  @QName: js|PrimitiveType
+  @enFN: primitive type
+  @rdfs:subClassOf: js|Type
+  @subsetOf: js|Type
+
+TypeDef:
+  @QName: js|AnyType
+  @enFN: any type
+
+TypeDef:
+  @QName: js|UndefinedType
+  @enFN: 
+    <JS::Undefined> type
+  @enDesc:
+    The <JS::Undefined> type has exactly one value: <JS::undefined>.
+  @rdf:type: js|PrimitiveType
+  @rdfs:subClassOf: js|AnyType
+  @subsetOf: js|AnyType
+
+ElementTypeBinding:
+  @Name: enFN
+  @ElementType:
+    dis:FullName
+  @ShadowContent:
+    @@lang:en
+
+ElementTypeBinding:
+  @Name: enDesc
+  @ElementType:
+    dis:Description
+  @ShadowContent:
+    @@lang:en
+
+TypeDef:
+  @QName: js|NullType
+  @enFN: 
+    <JS::Null> type
+  @enDesc:
+    The <JS::Null> type has exact one value: <JS::null>.
+  @rdf:type: js|PrimitiveType
+  @rdfs:subClassOf: js|AnyType
+  @subsetOf: js|AnyType
+
+TypeDef:
+  @QName: js|BooleanType
+  @enFN:
+    <JS::Boolean> type
+  @enDesc:
+    The <JS::Boolean> type has two value: <JS::true> and <JS::false>.
+  @rdf:type: js|PrimitiveType
+  @rdfs:subClassOf: js|AnyType
+  @subsetOf: js|AnyType
+
+TypeDef:
+  @QName: js|StringType
+  @enFN:
+    <JS::String> type
+  @enDesc:
+    A <JS::String> value is a finite ordered sequence
+    of zero or more 16-bit unsigned integer.  Each integer
+    is interpreted as an UTF-16 code unit.
+  @rdf:type: js|PrimitiveType
+  @rdfs:subClassOf: js|AnyType
+  @subsetOf: js|AnyType
+
+TypeDef:
+  @QName: js|NumberType
+  @enFN:
+    <JS::Number> type
+  @enDesc:
+    The <JS::Number> type has <MATH::2<html5:sup::64> - 2<html5:sup::53>
+    + 3> values and they represent double-precision 64-bit
+    IEEE 754 floating-point numbers, except that the 
+    <MATH::2<html5:sup::53> - 2> NaN values are represented
+    as a single <JS::NaN> value in ECMAScript.
+  @rdf:type: js|PrimitiveType
+  @rdfs:subClassOf: js|AnyType
+  @subsetOf: js|AnyType
+
+TypeDef:
+  @QName: js|Int32
+  @enFN: signed 32-bit integer
+  @rdfs:subClassOf: js|Number
+  @subsetOf: js|Number
+
+TypeDef:
+  @QName: js|Uint32
+  @enFN: unsigned 32-bit integer
+  @rdfs:subClassOf: js|NumberType
+  @subsetOf: js|NumberType
+
+TypeDef:
+  @QName: js|Uint16
+  @enFN: unsigned 16-bit integer
+  @rdfs:subClassOf: js|NumberType
+  @subsetOf: js|NumberType
+
+TypeDef:
+  @QName: js|ObjectType
+  @enFN:
+    <JS::Object> type
+  @enDesc:
+    An <JS::Object> is an unordered collection of properties.
+    Each property is a combination of name, value, and attributes.
+  @rdfs:subClassOf: js|AnyType
+  @subsetOf: js|AnyType
+
+TypeDef:
+  @QName: js|NativeObject
+  @rdfs:subClassOf: js|ObjectType
+  @subsetOf: js|ObjectType
+
+TypeDef:
+  @QName: js|HostObject
+  @rdfs:subClassOf: js|ObjectType
+  @subsetOf: js|ObjectType
+
+TypeDef:
+  @QName: js|ReferenceType
+  @enFN:
+    <JS::Reference> type
+
+TypeDef:
+  @QName: js|ListType
+  @enFN:
+    <JS::List> type
+
+TypeDef:
+  @QName: js|CompletionType
+  @enFN:
+    <JS::Completion> type
+
+## -- Property
+
+ResourceTypeDef:
+  @QName: js|Property
+  @enFN: property
+  @rdfs:subClassOf: rdf|Property
+  @subsetOf: rdf|Property
+  @rdfs:subClassOf: DISLang|AnyMethod
+  @subsetOf: DISLang|AnyMethod
+
+ResourceTypeDef:
+  @QName: js|Method
+  @enFN: method
+  @rdfs:subClassOf: js|Property
+  @subsetOf: js|Property
+  @rdfs:subClassOf: DISLang|Method
+  @subsetOf: DISLang|Method
+
+ResourceTypeDef:
+  @QName: js|Constant
+  @enFN: constant
+  @rdfs:subClassOf: js|Property
+  @subsetOf: js|Property
+  @rdfs:subClassOf: DISLang|Const
+  @subsetOf: DISLang|Const
+
+ResourceTypeDef:
+  @QName: js|PropertyAttribute
+  @enFN: property attribute
+  @enDesc:
+    Property can have zero or more attributes.
+  @rdfs:subClassOf: rdf|Property
+  @subsetOf: rdf|Property
+
+ElementTypeBinding:
+  @Name: PropAttrDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: js|PropertyAttribute
+
+ElementTypeBinding:
+  @Name: LexTypeDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISCore|LexicalType
+
+PropAttrDef:
+  @QName: js|ReadOnly
+  @enDesc:
+    The property is a read-only property.
+
+PropAttrDef:
+  @QName: js|DontEnum
+
+PropAttrDef:
+  @QName: js|DontDelete
+
+PropAttrDef:
+  @QName: js|Internal
+
+## -- Objects
+
+ObjectTypeDef:
+  @QName: js|Global
+
+ObjectTypeDef:
+  @QName: js|Object
+
+ObjectTypeDef:
+  @QName: js|Function
+
+ResourceTypeDef:
+  @QName: js|ProgramFunction
+  @enFN: program function
+  @rdfs:subClassOf: js|Function
+  @subsetOf: js|Function
+
+ResourceTypeDef:
+  @QName: js|InternalFunction
+  @enFN: internal function
+  @rdfs:subClassOf: js|Function
+  @subsetOf: js|Function
+
+ResourceTypeDef:
+  @QName: js|Constructor
+  @rdfs:subClassOf: js|Function
+  @subsetOf: js|Function
+  @rdfs:subClassOf: DISLang|Constructor
+  @subsetOf: DISLang|Constructor
+
+ObjectTypeDef:
+  @QName: js|Activation
+
+ObjectTypeDef:
+  @QName: js|Array
+
+ObjectTypeDef:
+  @QName: js|String
+
+ObjectTypeDef:
+  @QName: js|Boolean
+
+ObjectTypeDef:
+  @QName: js|Number
+
+ObjectTypeDef:
+  @QName: js|Date
+
+ObjectTypeDef:
+  @QName: js|RegExp
+
+ObjectTypeDef:
+  @QName: js|Error
+  @rdfs:subClassOf: DISLang|Exception
+  @subsetOf: DISLang|Exception
+
+ObjectTypeDef:
+  @QName: js|NativeError
+  @rdfs:subClassOf: js|Error
+  @subsetOf: js|Error
+  @enDesc:
+     When an ECMAScript implementation detects a runtime error,
+     then it throws an instance of one of <Class::js:NativeError> object.
+
+ElementTypeBinding:
+  @Name: ObjectTypeDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|AnyClass
+    @@rdfs:subClassOf: js|Object
+    @@subsetOf: js|Object
+
+LexTypeDef:
+  @QName:
+    lang:ECMAScript
+  @FullName:
+    @@lang:en
+    @@@: ECMAScript code
+  @rdfs:subClassOf: DISCore|String
+  @subsetOf: DISCore|String
+
+ForDef:
+  @QName:
+    ManakaiDOM:ECMAScript
+  @FullName:
+    @@lang:en
+    @@@: For ECMAScript binding

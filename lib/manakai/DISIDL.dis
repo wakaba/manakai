@@ -26,7 +26,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/10/02 23:35:34 $
+      $Date: 2005/10/03 13:20:21 $
     @@ContentType:
       dis:Date.RCS
   
@@ -35,7 +35,11 @@ Module:
 
   @Require:
     @@Module:
-      @@@Name: DISCore
+      @@@QName: DIS|DISPerl
+    @@Module:
+      @@@QName: DIS|Java
+    @@Module:
+      @@@QName: DIS|ECMAScript
 
 Namespace:
   @DIS:
@@ -46,6 +50,12 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dom/main#
   @idl:
     http://suika.fam.cx/~wakaba/archive/2004/dis/IDL#
+  @j:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Java#
+  @jlang:
+    java:java.lang.
+  @js:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/ECMAScript#
   @lang:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
   @license:
@@ -54,6 +64,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
   @owl:
     http://www.w3.org/2002/07/owl#
+  @p:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Perl#
   @rdf:
     http://www.w3.org/1999/02/22-rdf-syntax-ns#
   @rdfs:
@@ -184,9 +196,21 @@ ResourceTypeDef:
 
 PropDef:
   @QName: idl|aliasFor
-  @enFN: IDL Type Reference
+  @enFN: IDL Type Reference (obsolete)
   @multipleProperties: DISCore|Single
   @dataType: DISCore|TFQNames
+
+RPropDef:
+  @QName: idl|typedefAs
+  @enFN:
+    <CODE::typedef>ed as
+  @enDesc:
+    The subject type is declared by IDL <CODE::typedef> declaration
+    as the object type.
+  @dataType: DISCore|QName
+  @multipleProperties: DISCore|Single
+  @rdfs:domain: idl|IDLDataType
+  @rdfs:range: idl|IDLDataType
 
 ResourceTypeDef:
   @QName: idl|ValueType
@@ -200,7 +224,7 @@ PropDef:
   @QName: idl|sequenceOf
   @enDesc:
     The IDL type is defined as a <CODE::sequence> of the type.
-  @dataType: DISCore|TFQNames
+  @dataType: DISCore|QName
   @multipleProperties: DISCore|Single
   @rdfs:subPropertyOf: dis|Def
   @subsetOf: dis|Def
@@ -426,6 +450,23 @@ PropDef:
   @dataType: DISCore|TFQNames
   @multipleProperties: DISCore|OrderedList
 
+ElementTypeBinding:
+  @Name: SPropDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: rdf|Property
+    @@rdf:type: DISSource|Property
+
+ElementTypeBinding:
+  @Name: RPropDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: rdf|Property
+    @@rdf:type: DISSource|Property
+    @@rdf:type: DISSource|ResourceProperty
+
 ## -- IDL datatypes
 
 ResourceDef:
@@ -451,6 +492,7 @@ IDLDataTypeDef:
   @QName: idl|void
   @enFN:
     IDL <CODE::void> Type
+  @idl:java: j|void
 
 ResourceDef:
   @QName: AnyRealNumber
@@ -460,6 +502,7 @@ ResourceDef:
     @@@:
       Any IDL datatype that represents a subset of the real numbers.
   @rdf:type: DISLang|DataType
+  @idl:perl: p|Number
 
 IDLDataTypeDef:
   @QName: idl|long
@@ -470,6 +513,9 @@ IDLDataTypeDef:
       Long signed integer representing the range -2^31 ... 2^31 - 1. 
   @rdfs:subClassOf: AnyRealNumber
   @subsetOf: DISIDL|AnyRealNumber
+  @idl:java: j|int
+  @idl:perl: p|Number
+  @idl:ecmascript: js|NumberType
 
 ResourceDef:
   @QName: DOMMain|long
@@ -482,9 +528,16 @@ IDLDataTypeDef:
     @@lang:en
     @@@: 
       Long unsigned integer representing the range 0 ... 2^32 - 1. 
+
+    {NOTE:: In DOM Java Binding, the IDL type <TYPE::idl:unsignedLong>,
+            32-bit <EM::unsigned> integer, is bound to the Java
+            type <TYPE::j:int>, 32-bit <EM::signed> integer.
+    }
   @rdfs:subClassOf: AnyRealNumber
   @subsetOf: DISIDL|AnyRealNumber
   @idl:typeName: unsigned long
+  @idl:java: j|int
+  @idl:ecmascript: js|NumberType
 
 ResourceDef:
   @QName: DOMMain|unsigned-long
@@ -499,6 +552,9 @@ IDLDataTypeDef:
       Short signed integer representing the range -2^15 ... 2^15 - 1.
   @rdfs:subClassOf: AnyRealNumber
   @subsetOf: DISIDL|AnyRealNumber
+  @idl:java: j|short
+  @idl:perl: p|Number
+  @idl:ecmascript: js|NumberType
 
 ResourceDef:
   @QName: DOMMain|short
@@ -514,6 +570,7 @@ IDLDataTypeDef:
       Short unsigned integer representing the range 0 ... 2^16 - 1.
   @rdfs:subClassOf: AnyRealNumber
   @subsetOf: DISIDL|AnyRealNumber
+  @idl:perl: p|Number
 
 ResourceDef:
   @QName: DOMMain|unsigned-short
@@ -537,6 +594,9 @@ IDLDataTypeDef:
       }
   @rdfs:subClassOf: AnyRealNumber
   @subsetOf: DISIDL|AnyRealNumber
+  @idl:java: j|float
+  @idl:perl: p|Number
+  @idl:ecmascript: js|NumberType
 
 ResourceDef:
   @QName: DOMMain|float
@@ -559,6 +619,9 @@ IDLDataTypeDef:
       }
   @rdfs:subClassOf: AnyRealNumber
   @subsetOf: DISIDL|AnyRealNumber
+  @idl:java: j|double
+  @idl:perl: p|Number
+  @idl:ecmascript: js|NumberType
 
 ResourceDef:
   @QName: DOMMain|double
@@ -583,6 +646,9 @@ IDLDataTypeDef:
     @@lang:en
     @@@:
       The boolean data type, i.e. true or false. 
+  @idl:java: j|boolean
+  @idl:perl: p|Boolean
+  @idl:ecmascript: js|BooleanType
 
 ResourceDef:
   @QName: DOMMain|boolean
@@ -607,6 +673,9 @@ IDLDataTypeDef:
       express any OMG IDL type. 
   @rdfs:subClassOf: DISLang|Any
   @subsetOf: DISLang|Any
+  @idl:java: jlang|Object
+  @idl:perl: p|Any
+  @idl:ecmascript: js|AnyType
 
 ResourceDef:
   @QName: DOMMain|any
@@ -618,6 +687,9 @@ IDLDataTypeDef:
   @Description:
     @@lang:en
     @@@: An object.
+  @idl:java: jlang|Object
+  @idl:perl: p|Object
+  @idl:ecmascript: js|Object
 
 ResourceDef:
   @QName: DOMMain|Object
@@ -635,10 +707,38 @@ IDLDataTypeDef:
     @@@: Unsigned long long integer
   @rdfs:subClassOf: AnyRealNumber
   @subsetOf: DISIDL|AnyRealNumber
+  @idl:java: jlang|long
+  @idl:perl: p|Number
 
 ResourceDef:
   @QName: DOMMain|unsigned-long-long
   @AliasFor: idl|unsignedLongLong
+
+## -- Relationship to Other Languages
+
+RPropDef:
+  @QName: idl|java
+  @enFN: Java type
+  @rdfs:domain: idl|IDLDataType
+  @rdfs:range: j|Type
+  @dataType: DISCore|QName
+  @multipleProperties: DISCore|Single
+
+RPropDef:
+  @QName: idl|ecmascript
+  @enFN: ECMAScript type
+  @rdfs:domain: idl|IDLDataType
+  @rdfs:range: j|Type
+  @dataType: DISCore|QName
+  @multipleProperties: DISCore|Single
+
+RPropDef:
+  @QName: idl|perl
+  @enFN: Perl type
+  @rdfs:domain: idl|IDLDataType
+  @rdfs:range: p|DataType
+  @dataType: DISCore|QName
+  @multipleProperties: DISCore|Single
 
 ResourceDef:
   @QName: lang|IDL

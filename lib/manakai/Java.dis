@@ -7,7 +7,7 @@ Module:
 
   @DISCore:author: DISCore|Wakaba
   @Date:
-    $Date: 2005/10/02 23:35:35 $
+    $Date: 2005/10/03 13:20:22 $
   @License: license|Perl+MPL
 
   @DefaultFor: ManakaiDOM|all
@@ -66,131 +66,6 @@ LexTypeDef:
     @@@: Java code
   @rdfs:subClassOf: DISCore|String
   @subsetOf: DISCore|String
-
-LexTypeDef:
-  @QName: j|Token
-  @enFN: Token
-
-LexTypeDef:
-  @QName: j|Identifier
-  @enFN: Identifier
-  @enDesc:
-    An <DFN::identifier> is an unlimited-length sequence of 
-    <html5:i::Java letter>s and <html5:i::Java digit>s, the first
-    of which must be a <html5:i::Java letter>.
-
-    <CODE::true>, <CODE::false>, and <CODE::null> are not identifiers.
-    In addition, keywords cannot be used as identifiers.
-  @rdfs:subClassOf: j|Token
-  @subsetOf: j|Token
-
-LexTypeDef:
-  @QName: j|Keyword
-  @enFN: Keyword
-  @ImplNote:
-    @@lang:en
-    @@@:
-        abstract    continue    for           new          switch
-        assert      default     if            package      synchronized
-        boolean     do          goto          private      this
-        break       double      implements    protected    throw
-        byte        else        import        public       throws
-        case        enum        instanceof    return       transient
-        catch       extends     int           short        try
-        char        final       interface     static       void 
-        class       finally     long          strictfp     volatile
-        const       float       native        super        while   
-  @rdfs:subClassOf: j|Token
-  @subsetOf: j|Token
-
-LexTypeDef:
-  @QName: j|Literal
-  @enFN: Literal
-  @rdfs:subClassOf: j|Token
-  @subsetOf: j|Token
-
-LexTypeDef:
-  @QName: j|IntegerLiteral
-  @enFN: Integer Literal
-  @enDesc:
-    integer-literal := decimal-integer-literal | hex-integer-literal |
-                       octal-integer-literal
-
-    decimal-integer-literal := decimal-numeral [integer-type-suffix]
-
-    hex-integer-literal := hex-numeral [integer-type-suffix]
-
-    octal-integer-literal := octal-numeral [integer-type-suffix]
-
-    integer-type-suffix := 'l' / 'L'
-
-    decimal-numeral = "0" / non-zero-digit [digits]
-
-    digits = 1*digit
-
-    digit = "0" / non-zero-digit
-
-    non-zero-digit = "1" / "2" / "3" / "4" / "5" / "6" / "7" / "8" / "9"
-
-    hex-numeral = "0x" hex-digits
-
-    hex-digits = 1*hex-digit
-
-    hex-digit = digit / "A" / "B" / "C" / "D" / "E" / "F"
-
-    octal-numeral = "0" octal-digits
-
-    octal-digits = 1*octal-digit
-
-    octal-digit = "0" / "1" / "2" / "3" / "4" / "5" / "6" / "7"
-  @rdfs:subClassOf: j|Literal
-  @subsetOf: j|Literal
-
-LexTypeDef:
-  @QName: j|FloatingPointLiteral
-  @enFN: Floating-Point Literal
-  @rdfs:subClassOf: j|Literal
-  @subsetOf: j|Literal
-
-LexTypeDef:
-  @QName: j|BooleanLiteral
-  @enFN: Boolean Literal
-  @enDesc:
-    <CODE::true> or <CODE::false>.
-  @rdfs:subClassOf: j|Literal
-  @subsetOf: j|Literal
-
-LexTypeDef:
-  @QName: j|CharacterLiteral
-  @enFN: Character Literal
-  @rdfs:subClassOf: j|Literal
-  @subsetOf: j|Literal
-
-LexTypeDef:
-  @QName: j|StringLiteral
-  @enFN: String Literal
-  @rdfs:subClassOf: j|Literal
-  @subsetOf: j|Literal
-
-LexTypeDef:
-  @QName: j|NullLiteral
-  @enFN: Null Literal
-  @enDesc:
-    <CODE::null>.
-  @rdfs:subClassOf: j|Literal
-  @subsetOf: j|Literal
-
-LexTypeDef:
-  @QName: j|Seprator
-  @enFN: Separator
-  @rdfs:subClassOf: j|Token
-  @subsetOf: j|Token
-
-LexTypeDef:
-  @QName: j|Operator
-  @enFN: Operator
-  @rdfs:subClassOf: j|Token
-  @subsetOf: j|Token
 
 ElementTypeBinding:
   @Name: PropDef
@@ -462,6 +337,10 @@ ResourceTypeDef:
   @QName: j|DoubleExtendedExponentValueSet
   @rdfs:subClassOf: j|FloatingPointValue
   @subsetOf: j|FloatingPointValue
+
+ResourceDef:
+  @QName: j|void
+  @rdf:type: DISLang|AnyDataType
 
 PropDef:
   @QName: j|type

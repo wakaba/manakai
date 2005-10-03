@@ -13,7 +13,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/10/02 23:35:34 $
+      $Date: 2005/10/03 13:20:22 $
     @@ContentType:
       dis:Date.RCS
   
@@ -49,6 +49,8 @@ Namespace:
      http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
   @ManakaiDOM:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
+  @p:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Perl#
   @pl:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#Perl--
   @rdf:
@@ -61,7 +63,7 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type: DISLang|DataType
+    @@rdf:type: DISPerl|DataType
 
 ElementTypeBinding:
   @Name: LexTypeDef
@@ -202,17 +204,52 @@ LexTypeDef:
 
 ## -- Perl datatypes
 
+ResourceTypeDef:
+  @QName: p|AnyDataType
+  @rdfs:subClassOf: DISLang|AnyDataType
+  @subsetOf: DISLang|AnyDataType
+
+ResourceTypeDef:
+  @QName: p|DataType
+  @enFN: Perl data type
+  @enDesc:
+    Perl has three built-in data types: <TYPE::p|Scalar>,
+    <TYPE::p|Array>, and <TYPE::p|Hash>.
+  @rdfs:subClassOf: DISLang|DataType
+  @subsetOf: DISLang|DataType
+  @rdfs:subClassOf: p|AnyDataType
+  @subsetOf: p|AnyDataType
+
 DataTypeDef:
   @QName: DISPerl|Any
   @enFN: Any
   @rdfs:subClassOf: DISLang|Any
+  @subsetOf: DISLang|Any
+
+DataTypeDef:
+  @QName: p|Data
+  @enFN: data
+  @enDesc:
+    All data in Perl is a scalar, an array of scalars, or 
+    a hash of scalars.
+  @rdfs:subClassOf: p|Any
+  @subsetOf: p|Any
 
 DataTypeDef:
   @QName: DISPerl|Scalar
   @FullName:
     @@lang:en
-    @@@: Perl Scalar Value
-  @rdfs:subClassOf: DISPerl|Any
+    @@@: Perl Scalar
+  @enDesc:
+    A <DFN::scalar> is a single string (of any size), number, 
+    or a reference to something.
+
+    A scalar may contain one single value in any of three
+    different flavors: a number, a string, or a reference.  In
+    general, conversion from one form to another is transparent.
+  @rdfs:subClassOf: p|Data
+  @subsetOf: p|Data
+  @rdf:type: p|DataType
 
 ResourceDef:
   @QName: pl|Scalar
@@ -229,16 +266,57 @@ DataTypeDef:
   @subsetOf: DISPerl|Scalar
 
 DataTypeDef:
+  @QName: p|ByteString
+  @enFN: byte string
+  @enDesc:
+    A Perl string value which is semantically a byte sequence.
+  @rdfs:subClassOf: p|String
+  @subsetOf: p|String
+
+DataTypeDef:
+  @QName: p|CharacterString
+  @enFN: utf8 string
+  @enDesc:
+    A Perl string value which is semantically a character sequence.
+  @rdfs:subClassOf: p|String
+  @subsetOf: p|String
+
+DataTypeDef:
   @QName: DISPerl|Number
   @enFN: Perl number value
   @rdfs:subClassOf: DISPerl|Scalar
   @subsetOf: DISPerl|Scalar
 
 DataTypeDef:
+  @QName: p|NativeInteger
+  @enFN: native integer
+  @rdfs:subClassOf: p|Number
+  @subsetOf: p|Number
+
+DataTypeDef:
+  @QName: p|NativeFloatingPointNumber
+  @enFN: native floating point number
+  @rdfs:subClassOf: p|Number
+  @subsetOf: p|Number
+
+DataTypeDef:
+  @QName: p|DecimalString
+  @enFN: decimal string
+  @rdfs:subClassOf: p|Number
+  @subsetOf: p|Number
+  @rdfs:subClassOf: p|String
+  @subsetOf: p|String
+
+DataTypeDef:
   @QName: DISPerl|Boolean
   @FullName:
     @@lang:en
     @@@: Perl Boolean Value
+  @enDesc:
+    Perl has no <QUOTE::Boolean> data type.  A scalar value
+    is interpreted as <CODE::true> in the Boolean sense if it
+    is not the null string (i.e. zero-length string or <Perl::undef>)
+    or the number <Perl::0> (or its string equivalent, <Perl::"0">).
   @rdfs:subClassOf: DISPerl|Scalar
   @subsetOf: DISPerl|Scalar
 
@@ -247,6 +325,9 @@ DataTypeDef:
   @FullName:
     @@lang:en
     @@@: Perl reference
+  @enDesc:
+    A <DFN::reference> is a strongly-typed, uncastable pointer
+    with built-in reference-counting and destructor invocation.
   @rdfs:subClassOf: DISPerl|Scalar
   @subsetOf: DISPerl|Scalar
 
@@ -255,9 +336,11 @@ ResourceDef:
   @AliasFor: DISPerl|Ref
 
 DataTypeDef:
-  @QName: DISPerl|BlessedRef
-  @enFN:
-    Perl <Perl::bless>ed reference
+  @QName: p|Object
+  @enFN: object
+  @enDesc: 
+    An <DFN::object> is simply a reference that happens
+    to know which class it belongs to.
   @rdfs:subClassOf: DISPerl|Ref
   @subsetOf: DISPerl|Ref
 
@@ -292,10 +375,14 @@ DataTypeDef:
   @FullName:
     @@lang:en
     @@@: Perl Array
-  @rdfs:subClassOf: DISPerl|Any
-  @subsetOf: DISPerl|Any
+  @enDesc:
+    An <DFN::array> is an ordered list of <TYPE::p:Scalar>s
+    indexed by number, starting with <Perl::0>.
+  @rdfs:subClassOf: DISPerl|Data
+  @subsetOf: DISPerl|Data
   @rdfs:subClassOf: DISLang|Array
   @subsetOf: DISLang|Array
+  @rdf:type: p|DataType
 
 ResourceDef:
   @QName: pl|Array
@@ -318,8 +405,13 @@ DataTypeDef:
   @FullName:
     @@lang:en
     @@@: Perl Hash
-  @rdfs:subClassOf: DISPerl|Any
-  @subsetOf: DISPerl|Any
+  @enDesc:
+    A <DFN::hash>, also known as <DFN::associative array>, is
+    an unordered collection of <TYPE::p:Scalar> values
+    indexed by their associated string key.
+  @rdfs:subClassOf: DISPerl|Data
+  @subsetOf: DISPerl|Data
+  @rdf:type: p|DataType
 
 ResourceDef:
   @QName: pl|Hash
@@ -345,17 +437,117 @@ ResourceDef:
     @@@:
       <Q::Perl:hash> is obsolete; use <Q::Perl:HASH> instead.
 
+ResourceTypeDef:
+  @QName: DISPerl|Sub
+  @enFN: subroutine
+
 DataTypeDef:
   @QName: DISPerl|CODE
-  @FullName:
-    @@lang:en
-    @@@: Perl code reference
+  @enFN: reference to an anonymous subroutine
   @rdfs:subClassOf: DISPerl|Ref
   @subsetOf: DISPerl|Ref
 
 ResourceDef:
   @QName: pl|CODE
   @AliasFor: DISPerl|CODE
+
+DataTypeDef:
+  @QName: p|VString
+  @enFN: v-string
+  @rdfs:subClassOf: p|Scalar
+  @subsetOf: p|Scalar
+
+DataTypeDef:
+  @QName: DISPerl|List
+  @enFN: list
+  @enDesc:
+    <DFN::List value>s are denoted by separating individual values
+    by commas in the source code.
+
+DataTypeDef:
+  @QName: p|Typeglob
+  @enFN: typeglob
+  @enDesc:
+    A <DFN::typeglob>, an internal type, holds an entire symbol table
+    entry.
+
+DataTypeDef:
+  @QName: p|GLOB
+  @enFN: reference to a typeglob
+  @rdfs:subClassOf: p|Ref
+  @subsetOf: p|Ref
+
+DataTypeDef:
+  @QName: p|IOHandle
+  @enFN: IO handle
+
+DataTypeDef:
+  @QName: p|Filehandle
+  @enFN: filehandle
+  @rdfs:subClassOf: p|IOHandle
+  @subsetOf: p|IOHandle
+
+DataTypeDef:
+  @QName: p|Dirhandle
+  @enFN: directory handle
+  @rdfs:subClassOf: p|IOHandle
+  @subsetOf: p|IOHandle
+
+DataTypeDef:
+  @QName: p|Socket
+  @enFN: socket
+  @rdfs:subClassOf: p|IOHandle
+  @subsetOf: p|IOHandle
+
+## -- Contexts
+
+ResourceTypeDef:
+  @QName: p|Context
+  @enFN: context
+  @enDesc:
+    The <DFN::context> around the operation or value.
+
+ResourceDef:
+  @QName: p|ListContext
+  @enFN: list context
+  @rdf:type: p|Context
+
+ResourceDef:
+  @QName: p|ScalarContext
+  @enFN: scalar context
+  @rdf:type: p|Context
+
+ResourceDef:
+  @QName: p|VoidContext
+  @enFN: void context
+  @rdf:type: p|Context
+  @rdfs:subClassOf: p|ScalarContext
+  @subsetOf: p|ScalarContext
+
+ResourceDef:
+  @QName: p|BooleanContext
+  @enFN: Boolean context
+  @enDesc:
+    The <DFN::Boolean context> is just a special kind of scalar
+    context where no conversion to a string or a number is
+    ever performed.
+  @rdf:type: p|Context
+  @rdfs:subClassOf: p|ScalarContext
+  @subsetOf: p|ScalarContext
+
+ResourceDef:
+  @QName: p|StringContext
+  @enFN: string context
+  @rdf:type: p|Context
+  @rdfs:subClassOf: p|ScalarContext
+  @subsetOf: p|ScalarContext
+
+ResourceDef:
+  @QName: p|NumericContext
+  @enFN: numeric context
+  @rdf:type: p|Context
+  @rdfs:subClassOf: p|ScalarContext
+  @subsetOf: p|ScalarContext
 
 ## -- Perl constructs
 
@@ -382,11 +574,6 @@ ResourceTypeDef:
   @subsetOf: DISPerl|Variable
 
 ResourceTypeDef:
-  @QName: DISPerl|List
-  @enFN: Perl list
-  @rdf:type: DISLang|AnyDataType
-
-ResourceTypeDef:
   @QName: DISPerl|Package
   @enFN: Perl Package
 
@@ -396,11 +583,22 @@ ResourceTypeDef:
 
 ResourceTypeDef:
   @QName: DISPerl|Class
-  @enFN: Perl Class
+  @enFN: class
+  @enDesc:
+    A <DFN::class> is simply a package that happens to provide
+    methods to deal with object references.
   @rdfs:subClassOf: DISPerl|Package
   @subsetOf: DISPerl|Package
   @rdfs:subClassOf: DISLang|Class
   @subsetOf: DISLang|Class
+
+RPropDef:
+  @QName: p|ISA
+  @enFN: base class
+  @rdfs:subPropertyOf: dis|ISA
+  @subsetOf: dis|ISA
+  @dataType: DISCore|TFQNames
+  @multipleProperties: DISCore|OrderedList
 
 ResourceTypeDef:
   @QName: DISPerl|Interface
@@ -411,16 +609,44 @@ ResourceTypeDef:
   @subsetOf: DISLang|Interface
 
 ResourceTypeDef:
-  @QName: DISPerl|Sub
-  @enFN: Perl Subroutine
-
-ResourceTypeDef:
   @QName: DISPerl|Method
-  @enFN: Perl Method
+  @enFN: method
+  @enDesc:
+    A <DFN::method> is simply a subroutine that expects an object
+    reference (or a package name, for class methods) as the first
+    argument.
   @rdfs:subClassOf: DISPerl|Sub
   @subsetOf: DISPerl|Sub
   @rdfs:subClassOf: DISLang|Method
   @subsetOf: DISLang|Method
+
+RPropDef:
+  @QName: p|isClassMethod
+  @enDesc:
+    Whether the method is a class method or not.  A <DFN::class method>
+    is a subroutine that expects a package name as the
+    first argument.
+  @dataType: DISCore|Boolean
+  @multipleProperties: DISCore|Single
+
+RPropDef:
+  @QName: p|isInstanceMethod
+  @enDesc:
+    Whether the method is an instance method or not.  An <DFN::instance
+    method> is a subroutine that expects an object reference
+    as its first argument.
+  @dataType: DISCore|Boolean
+  @multipleProperties: DISCore|Single
+
+ResourceTypeDef:
+  @QName: p|Constructor
+  @enFN: constructor
+  @enDesc:
+    A <DFN::constructor> is a subroutine that returns a
+    reference to something <QUOTE::blessed> into a class,
+    generally the class that the subroutien is defined in.
+  @rdfs:subClassOf: p|Sub
+  @subsetOf: p|Sub
 
 ResourceTypeDef:
   @QName: DISPerl|MethodParameter
@@ -432,7 +658,7 @@ ResourceTypeDef:
 
 ResourceTypeDef:
   @QName: DISPerl|Const
-  @enFN: Perl Constant Function
+  @enFN: constant function
   @rdfs:subClassOf: DISPerl|Sub
   @subsetOf: DISPerl|Sub
   @rdfs:subClassOf: DISLang|Const
@@ -461,68 +687,97 @@ ResourceTypeDef:
   @rdfs:subClassOf: DISPerl|AnyExported
   @subsetOf: DISPerl|AnyExported
 
+ResourceTypeDef:
+  @QName: p|CommonMethod
+  @enDesc:
+    A method with common or conventional name.
+  @rdfs:subClassOf: DISLang|Operation
+  @subsetOf: DISLang|Operation
+  @rdfs:subClassOf: p|Method
+  @subsetOf: p|Method
+
 ResourceDef:
   @QName: AsStringMethod
-  @rdf:type: DISLang|Operator
-  @FullName:
-    @@lang:en
-    @@@:
-      Methods to searialize an object as a string. 
+  @rdf:type: p|CommonMethod
+  @enFN:
+    <Perl::stringify> method
+  @enDesc:
+    A <Perl::stringify> method returns a string representation
+    of the object.  How and what data should be stringified
+    is object dependent.  The method may take zero or more parameters;
+    if no parameter is specified, a <QUOTE::common> stringified
+    representation should be returned.
+  @rdfs:subClassOf: DISLang|ToString
+  @subsetOf: DISLang|ToString
 
 ResourceDef:
   @QName: NewMethod
-  @rdf:type: DISLang|Operator
-  @FullName:
-    @@lang:en
-    @@@:
-      Methods to construct an instance of a class. 
+  @rdf:type: p|CommonMethod
+  @rdf:type: p|Constructor
+  @enFN:
+    <Perl::new> method
+  @enDesc:
+    A <Perl::new> method returns a new instance of the class.
+    Generally the method is a class method but the class
+    might allow the method being called as an object method.
+    The method may take zero or more parameters.
 
 ResourceDef:
   @QName:CloneMethod
-  @rdf:type: DISLang|Operator
-  @FullName:
-    @@lang:en
-    @@@:Methods to make a clone of an object. 
+  @rdf:type: p|CommonMethod
+  @rdf:type: p|Constructor
+  @enFN:
+    <Perl::clone> method
+  @enDesc:
+    A <Perl::clone> method returns a copy of the object.
+    How the copy is made is object dependent.  The
+    method may take zero or more parameters; if no parameter
+    is specified, the most natural way to clone should be used.
 
 ResourceDef:
   @QName: ImportMethod
-  @rdf:type: DISLang|Operator
-  @FullName:
-    @@lang:en
-    @@@:
-      The <Perl::import> method.
+  @rdf:type: p|CommonMethod
+  @enFN:
+    <Perl::import> method
+  @enDesc:
+    An <Perl::import> class method, if exists, is automatically
+    called by Perl when the <Perl::use> statement is read for
+    the class.  The <Class::Exporter> module provides an
+    example for the method.
 
 ResourceDef:
   @QName: UnimportMethod
-  @rdf:type: DISLang|Operator
-  @FullName:
-    @@lang:en
-    @@@:
-      The <Perl::unimport> method.
+  @rdf:type: p|CommonMethod
+  @enFN:
+    <Perl::unimport> method
+  @enDesc:
+    A <Perl::unimport> class method, if exists, is automatically
+    called by Perl when the <Perl::no> statement is done for 
+    the class.
 
 ResourceDef:
   @QName: ISAMethod
-  @rdf:type: DISLang|Operator
-  @FullName:
-    @@lang:en
-    @@@:
-      The <Perl::isa> method.
+  @rdf:type: p|CommonMethod
+  @enFN:
+    <Perl::isa> method
+  @enDesc:
+    See <Class::UNIVERSAL> class.
 
 ResourceDef:
   @QName: CanMethod
-  @rdf:type: DISLang|Operator
-  @FullName:
-    @@lang:en
-    @@@:
-      The <Perl::can> method.
+  @rdf:type: p|CommonMethod
+  @enFN:
+    <Perl::can> method
+  @enDesc:
+    See <Class::UNIVERSAL> class.
 
 ResourceDef:
   @QName: VERSIONMethod
-  @rdf:type: DISLang|Operator
-  @FullName:
-    @@lang:en
-    @@@:
-      The <Perl::VERSION> method.
+  @rdf:type: p|CommonMethod
+  @enFN:
+    <Perl::VERSION> method
+  @enDesc:
+    See <Class::UNIVERSAL> class.
 
 ## -- Perl construct properties
 
@@ -654,6 +909,37 @@ RPropDef:
   @dataType: DISCore|String
   @multipleProperties: DISCore|Single
   @rdfs:domain: DISPerl|MethodParameter
+
+ResourceTypeDef:
+  @QName: p|Attribute
+  @enFN: attribute
+  @rdfs:subClassOf: rdfs|Property
+  @subsetOf: rdfs|Property
+
+ResourceDef:
+  @QName: p|unique
+  @rdf:type: p|Attribute
+  @rdfs:domain: p|Variable
+
+ResourceDef:
+  @QName: p|shared
+  @rdf:type: p|Attribute
+  @rdfs:domain: p|Variable
+
+ResourceDef:
+  @QName: p|locked
+  @rdf:type: p|Attribute
+  @rdfs:domain: p|Sub
+
+ResourceDef:
+  @QName: p|method
+  @rdf:type: p|Attribute
+  @rdfs:domain: p|Sub
+
+ResourceDef:
+  @QName: p|lvalue
+  @rdf:type: p|Attribute
+  @rdfs:domain: p|Sub
 
 ## -- Perl binding specific properties and datatypes
 
@@ -1138,6 +1424,34 @@ ElementTypeBinding:
 
 ## -- Interface for standard Perl modules
 
+ResourceDef:
+  @QName: p|main
+  @rdf:type: p|Package
+
+ResourceDef:
+  @QName: p|CORE
+  @rdf:type: p|Package
+  @enDesc:
+    <Perl::CORE::> is a special package qualifier to
+    unambiguously refer built-in functions.
+
+ResourceDef:
+  @QName: p|CORE_GLOBAL
+  @p:packageName: 
+    CORE::GLOBAL
+  @enDesc:
+    The special namespace <Perl::CORE::GLOBAL::> is used
+    to override built-in functions without regard to namespace
+    boundaries.
+  @rdf:type: p|Package
+
+CDef:
+  @ClsQName: p|SUPER
+  @enDesc:
+    The <Perl::SUPER> pseudo-class is used to start looking
+    for the method in the packages named in the current class's
+    <Perl::@ISA> list.
+
 ICDef:
   @IFQName: UNIVERSALInterface
   @ClsQName: UNIVERSAL
@@ -1149,13 +1463,22 @@ ICDef:
   @ClsFileName: UNIVERSAL
 
   @enDesc:
-    The <Class::UNIVERSAL> class is a base class for <EM::all>
-    classes (blessed references).
+    The <Class::UNIVERSAL> class is a base class for <EM::all> classes.
+
+  @enDesc:
+    @@@:
+      {NOTE:: Applications may add methods to the <Class::UNIVERSAL>
+              class via Perl or XS code.
+      }
+    @@ddid:add
+    @@ForCheck:ManakaiDOM|ForClass
 
   @Method:
     @@Operator:
       @@@@: ISAMethod
       @@@ContentType: DISCore|QName
+    @@p:isClassMethod:1
+    @@p:isInstanceMethod:1
     @@enDesc:
       Returns whether the class or object is an instance of a class or interface.
     @@Param:
@@ -1175,6 +1498,8 @@ ICDef:
     @@Operator:
       @@@@: CanMethod
       @@@ContentType: DISCore|QName
+    @@p:isClassMethod:1
+    @@p:isInstanceMethod:1
     @@enDesc:
       Checks if the object or class has a method.
       
@@ -1200,6 +1525,7 @@ ICDef:
     @@Operator:
       @@@@: VERSIONMethod
       @@@ContentType: DISCore|QName
+    @@p:isClassMethod:1
     @@enDesc:
       Returns the package version, i.e. the value of the variable
       <Perl::$VERSION> in the package the object is blessed into.

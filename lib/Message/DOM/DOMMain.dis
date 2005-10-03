@@ -25,7 +25,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/24 11:57:21 $
+      $Date: 2005/10/03 13:20:21 $
     @@ContentType:
       dis:Date.RCS
   
@@ -103,8 +103,16 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dom/feature#
   @html5:
     http://www.w3.org/1999/xhtml
+  @idl:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/IDL#
   @infoset:
     http://www.w3.org/2001/04/infoset#
+  @j:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Java#
+  @jlang:
+    java:java.lang.
+  @js:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/ECMAScript#
   @kwd:
     http://suika.fam.cx/~wakaba/archive/2005/rfc2119/
   @lang:
@@ -116,7 +124,9 @@ Namespace:
   @MDOM:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
   @MDOMX:
-    http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
+    http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception# 
+  @p:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Perl#
   @rdf:
     http://www.w3.org/1999/02/22-rdf-syntax-ns#
   @rdfs:
@@ -637,7 +647,7 @@ ResourceDef:
       A DOM data type.
   @rdf:type:
     rdfs:Class
-  @rdfs:subClassOf: DISLang|DataType
+  @rdfs:subClassOf: idl|IDLDataType
   @For: =ManakaiDOM|all
 
 ElementTypeBinding:
@@ -661,21 +671,12 @@ ResourceDef:
       An absolute or relative time.  It is represented 
       as a number of milliseconds.
 
-  @Def:
-    @@ContentType:
-      lang:dis
-    @@DISLang:dataTypeAliasFor: 
-      DOMMain:unsigned-long-long::ManakaiDOM:all
-    @@ForCheck: ManakaiDOM|IDL
+  @rdfs:subClassOf: idl|unsignedLongLong||ManakaiDOM|all
 
-  @rdfs:subClassOf: DOMMain|unsigned-long-long||ManakaiDOM|all
-
-  @ImplNote:
-    @@lang:en
-    @@@:
-      {TODO:: How implements this type is not yet decided.
-      }
-    @@ForCheck: ManakaiDOM|ManakaiDOM
+  @idl:typedefAs: idl|unsignedLongLong
+  @idl:java: j|long
+  @idl:perl: p|Number
+  @idl:ecmascript: js|Date
 ##DOMTimeStamp
 
 DOMDataTypeDef:
@@ -690,6 +691,10 @@ DOMDataTypeDef:
     @@ContentType: lang|dis
     @@DISLang:dataTypeAliasFor: DOMMain|any||ManakaiDOM|all
     @@For: ManakaiDOM|IDL
+
+  @idl:java: jlang|Object
+  @idl:ecmascript: js|AnyType
+  @idl:perl: p|Any
 ##DOMUserData
 
 ElementTypeBinding:
@@ -704,15 +709,23 @@ DOMDataTypeDef:
   @For: ManakaiDOM|DOM3
   @enLabel:
     <DOM::DOMObject>
-  
-  @Def:
-    @@ContentType: lang|dis
-    @@DISLang:dataTypeAliasFor: DOMMain|Object||ManakaiDOM|all
-    @@For: ManakaiDOM|IDL
 
-  @rdfs:subClassOf: DOMMain|Object||ManakaiDOM|all
+  @rdfs:subClassOf: idl|Object||ManakaiDOM|all
   
   @enDesc: An object reference.
+
+  @idl:typedefAs: idl|Object  
+  @idl:java: j|Object
+  @idl:ecmascript:
+    @@@: js|Object
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        DOM spec text describes as the <TYPE::DOMObject> is bound
+        to <TYPE::js|ObjectType> type while DOM ECMAScript binding
+        appendix describes as it is an object which
+        implements the <Class::js|Object> interface.
+  @idl:perl: p|Object
 ##DOMObject
 
 ResourceDef:
@@ -721,11 +734,10 @@ ResourceDef:
   @enLabel:
     <DOM::DOMString>
 
-  @Def:
-    @@ContentType:
-      lang:IDL-DOM
-    @@@: sequence<unsigned short>
-    @@ForCheck: ManakaiDOM|IDL
+  @idl:sequenceOf: idl|unsignedShort
+  @idl:java: jlang|String
+  @idl:ecmascript: js|StringType
+  @idl:perl: p|String
 
   @rdfs:subClassOf:
     DISLang:String

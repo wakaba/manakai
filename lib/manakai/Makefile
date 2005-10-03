@@ -50,12 +50,11 @@ all$(DAC_SUFFIX): $(DIS_FILES) $(DAC_PL)
 	$(DAC).$@.1.tmp DISPerl.dis
 	$(DAC).$@.2.tmp --input-db-file-name=".$@.1.tmp" DISMarkup.dis
 	$(DAC).$@.3.tmp --input-db-file-name=".$@.2.tmp" DISIDL.dis
-	$(DAC).$@.4.tmp --input-db-file-name=".$@.3.tmp" Java.dis
-	$(DAC)$@ --input-db-file-name=".$@.4.tmp" NaturalLanguage.dis
-	$(RM) .$@.1.tmp .$@.2.tmp .$@.3.tmp .$@.4.tmp
+	$(DAC)$@ --input-db-file-name=".$@.3.tmp" NaturalLanguage.dis
+	$(RM) .$@.1.tmp .$@.2.tmp .$@.3.tmp
 
 clean:
 	$(RM) $(GENERATED_FILES) .*.tmp *~ .*~
 
-## $Date: 2005/10/02 23:35:35 $
+## $Date: 2005/10/03 13:20:22 $
 ## License: Public Domain.
