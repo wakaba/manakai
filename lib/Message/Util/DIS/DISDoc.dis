@@ -25,7 +25,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2005/10/02 23:35:33 $
+      $Date: 2005/10/05 11:50:35 $
     @@ContentType:
       dis:Date.RCS
   
@@ -1649,7 +1649,7 @@ IFClassDef:
                                 '=' => '=', '-' => '-',
                               }->{$1}));
             } elsif ($sourceText =~
-                s/^<([0-9A-Za-z_.:|\@-][0-9A-Za-z_.:|\@\s-]*?)(?:::|(?=>))//) {
+                s/^<([0-9A-Za-z_.:|\@-][0-9A-Za-z_.:|\@^\s-]*?)(?:::|(?=>))//) {
               my $t = $1;
               $t =~ s/^\s+//;
               $t =~ s/\s+$//;

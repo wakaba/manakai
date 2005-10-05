@@ -8,6 +8,7 @@ Module:
     http://suika.fam.cx/~wakaba/archive/2004/dom/feature#
   @idl:prefix: manakai.suika.fam.cx
   @idl:moduleName: mi
+  @j:packageQualifiedName: cx.fam.suika.manakai
   
   @Description:
     @@lang:en
@@ -43,7 +44,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/10/03 13:20:21 $
+      $Date: 2005/10/05 11:50:35 $
     @@ContentType:
       dis:Date.RCS
   
@@ -106,6 +107,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dom/meta#
   @DOMXML:
     http://suika.fam.cx/~wakaba/archive/2004/dom/xml#
+  @dx:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#
   @f:
     http://suika.fam.cx/~wakaba/archive/2004/dom/feature#
   @idl:
@@ -142,6 +145,8 @@ Namespace:
     http://www.w3.org/1999/02/22-rdf-syntax-ns#
   @rdfs:
     http://www.w3.org/2000/01/rdf-schema#
+  @ty:
+    http://suika.fam.cx/~wakaba/archive/2005/7/tutorial#
   @Util:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/
   @UtilError:
@@ -181,6 +186,7 @@ ResourceDef:
     @@@:
       Message::DOM::IFLevel3::
     @@For: ManakaiDOM|ManakaiDOM3 !ManakaiDOM|ManakaiDOMLatest
+    @@For: ManakaiDOM|ForSpec3
   @DISPerl:interfacePackageName:
     @@@:
       Message::DOM::IFLevel2::
@@ -360,6 +366,31 @@ ForDef:
     @@@: For the latest version of specification
     @@lang:en
 
+ForDef:
+  @QName: ManakaiDOM|ForSpecAll
+  @ISA: ManakaiDOM|ForSpec
+  @ISA: ManakaiDOM|Java
+
+ForDef:
+  @QName: ManakaiDOM|ForSpecIDL
+  @ISA: ManakaiDOM|ForSpec
+  @ISA: ManakaiDOM|Java
+
+ForDef:
+  @QName: ManakaiDOM|ForSpecJava
+  @ISA: ManakaiDOM|ForSpec
+  @ISA: ManakaiDOM|Java
+
+ForDef:
+  @QName: ManakaiDOM|ForSpecECMAScript
+  @ISA: ManakaiDOM|ForSpec
+  @ISA: ManakaiDOM|ECMAScript
+
+ForDef:
+  @QName: ManakaiDOM|ForSpecPerl
+  @ISA: ManakaiDOM|ForSpec
+  @ISA: ManakaiDOM|Perl
+
 ## -- The DOM "feature" system
 
 StringDataTypeDef:
@@ -371,43 +402,102 @@ StringDataTypeDef:
   @enTitle: Feature Names
 
   @enDesc:
-      A <DFN::feature name> identifies a <DFN::feature> with
-      its version.
+    Features are identified by pairs of <DFN::feature name>s (which
+    is often referred simply as <QUOTE::features>) and
+    feature versions.
 
-      <EM::Syntax>.  The syntax for the feature names are
-      not well-defined.  In DOM Level 1, the only feature names
-      are <Feature::HTML> and <Feature::XML>.  In DOM Level 2,
-      it is extended to any XML 1.0 <CODE::Name> but later
-      the restriction is removed in the errata document.  In 
-      DOM Level 3 there is no explicit restriction although
-      the usage of <CHAR::PLUS SIGN> implies the first character
-      of the actual feature name should not be a <CHAR::PLUS SIGN>
-      and the <CODE::features> parameter in various methods
-      implies the feature name cannot contain the space character
-      and it must be distingulishable from feature version numbers.
-
-      <EM::Case-sensitivility>.  The feature names are 
-      case-sensitive.
-
-      <EM::Preceeding <CHAR::PLUS SIGN> rule>.  In some context
-      (not all), a feature name can be preceeded by a
-      <CHAR::PLUS SIGN>.  It means that the feature may not
-      be <EM::directly> accessible but it may be accessible
-      in some manner, e.g. by binding-specific cast mechanism
-      or by <M::GetFeature.getFeature> method.
-
-      <EM::Naming convention>.  In DOM Level 2 the reversed
-      Internet domain name like Java package names was encouraged.
-      (This recommendation has been removed in the errata.)
-      The current recommended way to assume featrue name
-      uniqueness is using URI.
-
-      {NOTE:: For example, SVG 1.1, which is based on DOM Level 2,
-              defines feature names in reversed Internet domain
-              name syntax.  SVG 1.2, which is based on DOM Level 3,
-              deprecates old feature names and defines URI-syntax
-              feature names.
+    {ps::
+      {ty:caption::Syntax
       }
+
+      The syntax of feature names, that is, what kind of character
+      sequences can be feature names, is not well-defined.
+
+      In DOM Level 1 First Edition <bibref::DOM1FE>, which has introduced
+      features, the only legal feature names are <Feature::HTML>
+      and <Feature::XML>.
+
+      In DOM Level 1 Second Edition on September, 2000 <bibref::DOM1SE>
+      and DOM Level 2 Core Recommendation on November, 2000 <bibref::DOM2Core>,
+      feature names are defined as XML <CODE::Name>s <bibref::XML10FE>.
+
+      In DOM Level 3 <bibref::DOM3Core>, there is no explicit restriction
+      defined on feature names, although the <CHAR::PLUS SIGN> rule
+      described below prevents the use of <CHAR::PLUS SIGN> as the 
+      first character of a feature name and the <CODE::features>
+      parameters imply that white space characters must not 
+      be used in feature names and feature names must be
+      distingulishable from feature version numbers.
+
+      {P:: The DOM Level 3 Minimum Implementation enforces the restrictions that:
+
+        - The first character of feature names <kwd:MUST-NOT> be
+          a <CHAR::PLUS SIGN>.  Feature names <kwd:SHOULD-NOT>
+          contain one or more <CHAR::PLUS SIGN> characters.
+        
+        - The first character of feature names <kwd:MUST-NOT> be
+          one from <CHAR::DIGIT ZERO>, <CHAR::DIGIT ONE>, 
+          <CHAR::DIGIT TWO>, <CHAR::DIGIT THREE>, <CHAR::DIGIT FOUR>,
+          <CHAR::DIGIT FIVE>, <CHAR::DIGIT SIX>, <CHAR::DIGIT SEVEN>,
+          <CHAR::DIGIT EIGHT>, or <CHAR::DIGIT NINE>.
+
+        - Feature names <kwd:MUST-NOT> contain white space characters
+          such as <CHAR::SPACE> and <CHAR::HORIZONTAL TAB>.
+
+        - A feature name defined outside W3C DOM specifications
+          <kwd:SHOULD> be a URI <bibref::URI>.
+      }
+    }
+
+    {ps::
+      {ty:caption::Case-sensitivility
+      }
+
+      Feature names are case-insensitive <bibref::DOM1FE> <bibref::DOM1SE>
+      <bibref::DOM2Core> <bibref::DOM3Core>.
+    }
+
+    {ps::
+      {ty:caption::Nameing convention
+      }
+      
+      In DOM Level 1 Second Edition on September, 2000 <bibref::DOM1SE> and
+      DOM Level 2 Core Recommendation on November, 2000 <bibref::DOM2Core>,
+      it was encouraged that feature names referring to features
+      defined outside the DOM specifications should be made unique
+      by <EM::reversed Internet domain name>.
+
+      This suggestion was removed by DOM Level 2 Errata <bibref::DOM2Errata>.
+      So, while DOM Level 2 and DOM Level 3 <bibref::DOM3Core> ask
+      feature names being unique, the way to ensure the uniqueness
+      is remain undefined.
+
+      The DOM Level 3 Minimum Implementation specification recommends
+      that URIs <bibref::URI> <kwd:SHOULD> be used for feature names.
+
+      {NOTE:: For example, SVG 1.1, which is built on DOM Level 2,
+              defined feature names as reversed Internet domain
+              names.  SVG 1.2, which is built on DOM Level 3,
+              deprecates SVG 1.1 feature names and defines URI
+              feature names instead.
+      }
+    }
+
+    {ps::
+      {ty:caption::<CHAR::PLUS SIGN> Prepended to Feature Name
+      }
+
+      Some contexts allows a <CHAR::PLUS SIGN> prepended to
+      any feature name.  It means that the feature may not directly
+      castable but would be accessible in some manner, e.g.
+      by binding-specific cast mechanism
+      or by <M::GetFeature.getFeature> method.
+      Some contexts simple ignores the first <CHAR::PLUS SIGN>.
+      <bibref::DOM3Core>  Since this rule is introduced in 
+      DOM Level 3, pre-Level 3 implementations might not 
+      ignore the character even if it would be ignored in Level 3
+      implementations.
+    }
 
   @InputProcessor:
     @@PerlDef:
@@ -436,11 +526,44 @@ StringDataTypeDef:
   @enTitle: Feature Version Numbers
 
   @enDesc:
-      A DOM feature version number. 
-      \
-      In most contexts, an empty string and the <DOM::null> value are 
-      also valid values.  Both values indicate that any version of 
-      that feature is acceptable.
+    <DFN::Feature version> identifies a version of the feature.
+
+    {ps::
+      {ty:caption::Syntax
+      }
+
+      Syntax of the feature version numbers are not well-defined.
+
+      In DOM Level 1 <bibref::DOM1FE> <bibref::DOM1SE>, the
+      only legal version number string was <FeatureVer::1.0>.
+      
+      In DOM Level 2 <bibref::DOM2Core>, the only legal version
+      number strings were <FeatureVer::1.0> and <FeatureVer::2.0>.
+
+      In DOM Level 3 <bibref::DOM3Core>, there is no explicit
+      syntactical restriction on feature version numbers.
+
+      The DOM Level 3 Minimum Implementation defines the 
+      feature version numbers as one or more digits followed
+      by a <CHAR::FULL STOP> followed by one or more digits,
+      where a digit is a character from <CHAR::DIGIT ZERO>, <CHAR::DIGIT ONE>,
+      <CHAR::DIGIT TWO>, <CHAR::DIGIT THREE>, <CHAR::DIGIT FOUR>,
+      <CHAR::DIGIT FIVE>, <CHAR::DIGIT SIX>, <CHAR::DIGIT SEVEN>,
+      <CHAR::DIGIT EIGHT>, or <CHAR::DIGIT NINE>.  The first
+      character of the string or the first character just after
+      the <CHAR::FULL STOP> <kwd:SHOULD-NOT> be a <CHAR::DIGIT ZERO>
+      unless the character following it is a <CHAR::FULL STOP>
+      or the character is the last character in the string.
+
+      Some contexts where a feature version is expected also
+      allow an empty string or <DOM::null>.  These values
+      reference any version of the feature.  For example,
+      method <M::GetFeature.hasFeature> with feature <Feature::Core>
+      and version of <DOM::null> would return <DOM::true>
+      if it has support for one or more of versions <FeatureVer::2.0>,
+      <FeatureVer::3.0>, or any other version.  <bibref::DOM1FE>
+      <bibref::DOM1SE> <bibref::DOM2Core> <bibref::DOM3Core>
+    }
 
   @InputProcessor:
     @@PerlDef:
@@ -466,19 +589,55 @@ StringDataTypeDef:
     <CODE::features>
 
   @enDesc:
-      A list of zero or more pairs of a <TYPE::ManakaiDOM:ManakaiDOMFeature> 
-      and an optional <TYPE::ManakaiDOM:ManakaiDOMFeatureVersion>, 
-      separated by white space.
-  @enDesc:
-    @@For:
-      ManakaiDOM:ManakaiDOM
-    @@@:
-      In the manakai DOM implementation, method parameters and attributes 
-      whose actual datatype is <CODE::features> also accept a reference 
-      to hash whose key is a feature name and value is either
-      a feature version string or an empty string.  Don't forget to quote 
-      version number when its fraction part is <CODE::0> (e.g. 
-      quote <FeatureVer::2.0> like <Perl::'2.0'>).      
+    Some methods takes a parameter known as <DFN::<CODE::features>>,
+    which expects a list of zero or more features.
+
+    {ps::
+       {ty:caption::Syntax
+       }
+
+       A <CODE::features> string is a space-separeted list
+       in which each feature is specified by its name optionally
+       followed by a space and a version number.  A <CHAR::PLUS SIGN>
+       may be prepended to a feature name.  <bibref::DOM3Core>
+
+       What is a <QUOTE::space> is unclear.  In DOM Level 3
+       Minimum Implementation, it <kwd:MUST> be a <CHAR::SPACE>.
+       Implementations <kwd:MAY> accept any other <QUOTE::white space>
+       characters either.  Implementations <kwd:MAY> choose also to
+       simple ignore more than one white space characters or leading or trailing
+       white space characters.
+
+       In DOM Level 3 Minimum Implementation, the order in which
+       features are specified is not significant.  A feature name
+       <kwd:MAY> be specified more than once, with or without
+       <CHAR::PLUS SIGN> and with or without any version numbers.
+    }
+
+    {ps::
+      {ty:caption::<CODE::features> as Hash Reference
+      }
+
+      In Perl binding, applications can specify a reference to
+      a hash where the <CODE::featuers>-list string is expected.
+      Keys are considered as feature names and values are
+      as their versions.  Values might be empty strings or <DOM::null>s.
+      Implementations which receives such <CODE::features> values
+      <kwd:MUST-NOT> modify hashs.
+
+        {NOTE:: In this way, applications cannot specify
+                a feature with more than one different versions
+                at once.
+        }
+
+        {NOTE:: Perl application developers are advised not to
+                forget to quote version number in source code
+                when its fraction part is <CODE::0>.  For example,
+                version <FeatureVer::2.0> must be quoted as
+                <Perl::'2.0'> in Perl source code.
+        }
+    }
+
   @InputProcessor:
     @@PerlDef:
       if (CORE::defined $INPUT) {
@@ -525,6 +684,12 @@ StringDataTypeDef:
         This input normalizer creates a copy of feature list even if 
         it is given as a hash reference; it means that <QUOTE::breaking> 
         any parameter does not affect the input source. 
+
+      {NOTE:: Feature <Feature::HTML> versions <FeatureVer::2.0>
+              and <FeatureVer::5.0> are not compatible;
+              it would be a use case for one feature name with
+              multiple version numbers.
+      }
 
   @ResourceDef:
     @@QName:
@@ -1179,7 +1344,7 @@ Doc:
     @@@: f|FeaturesString
     @@doc:rel: doc|subsection
   @doc:part:
-    @@@: f|ImplementationRegistry
+    @@@: def|ImplRegDescription
     @@doc:rel: doc|subsection
 
 Doc:
@@ -1216,18 +1381,141 @@ Doc:
 
 Doc:
   @QName: def|JavaBinding
-
   @FileName: java-binding
+
+  @enContent:
+    This appendix contains the complete Java binding for the
+    Level 3 Document Object Model Minimum Implementation.
+
+  @doc:part:
+    @@@: def|MIStringJava
+    @@doc:rel: doc|subsection
+  @doc:part:
+    @@@: def|ImplRegJava
+    @@doc:rel: doc|subsection
+  @doc:part:
+    @@@: MDOM|DOMFeature
+    @@doc:as: j|Package
+    @@doc:rel: doc|subsection
 
 Doc:
   @QName: def|ECMAScriptBinding
-
   @FileName: ecma-script-binding
+
+  @enContent:
+    This appendix contains the complete ECMAScript binding for the
+    Level 3 Document Object Model Minimum Implementation.
+
+  @doc:part:
+    @@@: def|MIStringECMAScript
+    @@doc:rel: doc|subsection
+  @doc:part:
+    @@@: def|ImplRegECMAScript
+    @@doc:rel: doc|subsection
+  @doc:part:
+    @@@: MDOM|DOMFeature
+    @@doc:as: f|ECMAScriptBindingDefinition
+    @@doc:rel: doc|subsection
+
+ResourceDef:
+  @QName: f|ECMAScriptBindingDefinition
+  @rdf:type: rdfs|Class
 
 Doc:
   @QName: def|PerlBinding
-
   @FileName: perl-binding
+
+  @enContent:
+    This appendix contains the complete Perl binding for the
+    Level 3 Document Object Model Minimum Implementation.
+
+  @doc:part:
+    @@@: def|PerlTypes
+    @@doc:rel: doc|subsection
+  @doc:part:
+    @@@: def|MIStringPerl
+    @@doc:rel: doc|subsection
+  @doc:part:
+    @@@: def|PerlInterfaces
+    @@doc:rel: doc|subsection
+  @doc:part:
+    @@@: def|PerlMethods
+    @@doc:rel: doc|subsection
+  @doc:part:
+    @@@: def|PerlExceptions
+    @@doc:rel: doc|subsection
+  @doc:part:
+    @@@: def|ImplRegPerl
+    @@doc:rel: doc|subsection
+  @doc:part:
+    @@@: MDOM|DOMFeature
+    @@doc:as: f|PerlBindingDefinition
+    @@doc:rel: doc|subsection
+
+Doc:
+  @QName: def|PerlTypes
+  @enTitle: Basic Data Types
+  @enContent:
+    For Perl, IDL types <TYPE^^DISCore|QName::idl|long>,
+    <TYPE^^DISCore|QName::idl|unsignedLong>,
+    <TYPE^^DISCore|QName::idl|unsignedLongLong>,
+    <TYPE^^DISCore|QName::idl|short>, and
+    <TYPE^^DISCore|QName::idl|unsignedShort> are bound to number value.
+    This does not means that a parameter value whose type is e.g. 
+    <TYPE^^DISCore|QName::idl|unsignedLong> must be a Perl scalar value whose
+    internal representation has number value.  Rather,
+    it should be interpreted as the value would be 
+    evaluated in the number context.  For example, the
+    value obtained from a string literal <Perl::"123">
+    in the source code is a valid value of
+    <TYPE^^DISCore|QName::idl|unsignedLong>
+    parameter.  Similary, IDL type <TYPE^^DISCore|QName::idl|boolean>
+    is expected to be evaluated in the Boolean context.
+
+    IDL type <TYPE^^DISCore|QName::idl|any> is corresponding to any scalar value
+    in Perl.  IDL type <TYPE^^DISCore|QName::idl|Object> is bound to object.
+
+    The <DOM::null> value is bound to <Perl::undef>.
+
+Doc:
+  @QName: def|PerlInterfaces
+  @enTitle: Interfaces, Modules and Constants
+  @enContent:
+    {TODO:: tbd
+    }
+
+Doc:
+  @QName: def|PerlMethods
+  @enTitle: Methods and Attributes in Perl Binding
+  @enContent:
+    In Perl, DOM methods and attributes are implemented
+    as methods.  Read-only attributes are methods with no
+    parameter in Perl.  Read-write attributes are methods
+    with one parameter.  If the parameter is specified, then
+    an attribute value is set to the value.  Otherwise, 
+    the method returns the attribute value.  Note that the
+    parameter value might be <DOM::null> and it is different
+    from not specifying the parameter.
+
+    A parameter of any method is <DFN::optional> if 
+    either <DOM::null> or Boolean <DOM::false> is a possible value
+    for the parameter and any other parameters following it, if any,
+    is all optional.  Applications don't have to specify
+    optional parameters if their values are <DOM::null> or <DOM::false>.
+
+Doc:
+  @QName: def|PerlExceptions
+  @enTitle: Exceptions
+  @enContent:
+    Some methods and attributes might throw exceptions.  In Perl,
+    throwing an exception is done by the function <Perl::die>.
+    To improve compatibility among implementations, the
+    <Class::dx:Error||ManakaiDOM|Perl> module <kwd:SHOULD>
+    be employed as a basis of exception throwing mechanism.
+
+ResourceDef:
+  @QName: f|PerlBindingDefinition
+  @rdf:type: rdfs|Class
 
 Doc:
   @QName: def|References
@@ -1267,7 +1555,6 @@ Doc:
   @enContent:
     The <TYPE::MIString> type is used to store character.
   @doc:part: f|MIString
-  @doc:part: def|MIStringBindings
 
 ResourceDef:
   @QName: MIString
@@ -1288,23 +1575,55 @@ ResourceDef:
   @idl:sequenceOf: idl|unsignedShort
   @idl:java: jlang|String
   @idl:ecmascript: js|StringType
-  @idl:perl: p|String
+  @idl:perl: p|CharacterString
 
 Doc:
-  @QName: def|MIStringBindings
+  @QName: def|MIStringJava
+  @enTitle:
+    The <TYPE::MIString> Type
   @enContent:
-    For Java and ECMAScript, <TYPE::MIString> is bound to
-    the <CODE::String> type, which is a sequence of UTF-16's
-    16-bit units.
+    For Java, <TYPE::MIString> is bound to the <Java::String> class,
+    which is a sequence of UTF-16's 16-bit code units.
 
-    For Perl, <TYPE::MIString> is bound to Perl string.  If 
-    the utf8 flag is unset, the string is interpreted as
-    a sequence of ISO/IEC 8859-1 characters.
+Doc:
+  @QName: def|MIStringECMAScript
+  @enTitle:
+    The <TYPE::MIString> Type
+  @enContent:
+    For Perl, <TYPE::MIString> is bound to the <JS::String> type,
+    which is a sequence of UTF-16's 16-bit code units.
+
+Doc:
+  @QName: def|MIStringPerl
+  @enTitle:
+    The <TYPE::MIString> Type
+  @enContent:
+    The <TYPE::MIString> type is bound to Perl string value and
+    expected to be evaluated in the string context.  A <TYPE::MIString>
+    value <kwd:MUST> be interpreted as a sequence of characters rather than
+    a sequence of bytes or octets.  If it is represented
+    internally as a byte string, i.e. the utf8 flag turned off,
+    it <kwd:MUST> be interpreted as a ISO/IEC 8859-1 <bibref::ISO8859-1> string.
 
 ## -- The implementation registry object
 
 ResourceDef:
-  @QName: ImplementationRegistry
+  @QName:
+    @@@: ImplementationRegistry
+    @@ForCheck: !ManakaiDOM|ForSpec
+  @QName: 
+    @@@: def|ImplRegDescription
+    @@ForCheck: ManakaiDOM|ForSpecAll
+  @QName: 
+    @@@: def|ImplRegJava
+    @@ForCheck: ManakaiDOM|ForSpecJava
+  @QName: 
+    @@@: def|ImplRegECMAScript
+    @@ForCheck: ManakaiDOM|ForSpecECMAScript
+  @QName: 
+    @@@: def|ImplRegPerl
+    @@ForCheck: ManakaiDOM|ForSpecPerl
+
   @enTitle:
     The <CODE::ImplementationRegistry> Object
 
@@ -1313,8 +1632,27 @@ ResourceDef:
     @@@ForCheck: ManakaiDOM|ManakaiDOM
 
   @rdf:type:
+    @@@@: dis|MultipleResource
+    @@@ForCheck:
+      ManakaiDOM|ForSpec !ManakaiDOM|ForSpecJava !ManakaiDOM|ForSpecAll
+      !ManakaiDOM|ForSpecPerl !ManakaiDOM|ForSpecECMAScript
+  @resourceFor: ManakaiDOM|ForSpecAll
+  @resourceFor: ManakaiDOM|ForSpecJava
+  @resourceFor: ManakaiDOM|ForSpecECMAScript
+  @resourceFor: ManakaiDOM|ForSpecPerl
+
+  @rdf:type:
     @@@@: doc|Documentation
-    @@@ForCheck: ManakaiDOM|ForSpec
+    @@@ForCheck: ManakaiDOM|ForSpecAll
+  @rdf:type:
+    @@@@: doc|Documentation
+    @@@ForCheck: ManakaiDOM|ForSpecJava
+  @rdf:type:
+    @@@@: doc|Documentation
+    @@@ForCheck: ManakaiDOM|ForSpecECMAScript
+  @rdf:type:
+    @@@@: doc|Documentation
+    @@@ForCheck: ManakaiDOM|ForSpecPerl
 
   @For: ManakaiDOM|DOM3
   @For: ManakaiDOM|ForSpec3
@@ -1323,6 +1661,64 @@ ResourceDef:
   @Implement:
     @@@: ImplementationSource||ManakaiDOM|ManakaiDOMLatest
     @@For: ManakaiDOM|ManakaiDOMLatest
+
+  @enContent:
+    @@ForCheck: ManakaiDOM|ForSpecAll
+    @@@:
+    DOM Level 3 Core specification introduces a <CODE::DOMImplementationRegistry>
+    object with a function that lets an application find DOM
+    implementations, based on the specific features it requires.
+    DOM Level 3 Minimum Implementation defines a more generalized
+    <CODE::ImplementationRegistry> object, with which an application
+    can find implementations that supports specific features.
+
+    How this object is found and what it exactly looks like is 
+    not defined here, because this cannot done in a
+    language-independent manner.  Instead, each language binding
+    defines its own way of doing this.  The object
+    <kwd:MUST> implement the <IF::ImplementationSource>
+    interface.
+
+  @enContent:
+    @@ForCheck: ManakaiDOM|ForSpecJava
+    @@@:
+      The <Java::ImplementationRegistry> is first initialized by 
+      the application or the implementation, depending on the context, 
+      through the Java system property
+      <Java::cx.fam.suika.manakai.ImplementationSourceList>.
+      The value of this property is a space separated list of
+      names of available classes implementing the 
+      <IF::ImplementationSource> interface.
+
+      {TODO:: Defines the class and clarifies the relationship
+              to <Java::DOMImplementationRegistry> object.
+      }
+
+  @enContent:
+    @@ForCheck: ManakaiDOM|ForSpecECMAScript
+    @@@:
+      In ECMAScript binding, the global scope object
+      has the <JS::ImplementationRegistry> property whose value
+      is an object which implements
+      the <IF::ImplementationSource> interface.
+
+      {TODO:: How the object finds implementations?
+      }
+
+  @enContent:
+    @@ForCheck: ManakaiDOM|ForSpecPerl
+    @@@:
+      In Perl binding, the scalar variable 
+      <Perl::$Message::DOM::ImplementationRegistry> has a reference
+      with which methods defined in <IF::ImplementationSource> interface
+      can be called.
+
+        {NOTE:: The variable value might be a package name
+                rather than a hard reference.
+        }
+
+      {TODO:: Describes how the object finds implementations.
+      }
 
   @Description:
     @@lang:en
@@ -1639,7 +2035,7 @@ minIFClsDef:
   
   @Method:
      @@Name:  item
-    @@Operator: DISLang|ArrayGetter
+    @@Operator: DISLang|ArrayGet
      @@Description:
        @@@lang:en
        @@@@: 
@@ -1704,7 +2100,12 @@ minIFClsDef:
   @Method:
     @@Name: appendItems
     @@enDesc:
-      Appends all the items in a list to the last of the collection.
+      Appends a list of implementations after the last item
+      in the collection.
+
+      {NOTE:: This method is provided for the convinience of
+              <IF::ImplementationSource>s.
+      }
     @@Param:
       @@@Name: list
       @@@Type: ImplementationList
@@ -1712,6 +2113,7 @@ minIFClsDef:
         A list of implementations.
       @@@enDesc:
         @@@@For: ManakaiDOM|Perl
+        @@@@For: ManakaiDOM|ForSpec
         @@@@@:
           In the Perl binding, the parameter value <kwd:MAY> be 
           a <IF::MinimumImplementation> object.
@@ -1833,6 +2235,15 @@ minIFClsDef:
         @@@@: 
           Returns the first DOM implementation that support specific 
           features.
+
+          {NOTE:: An implementation supports the DOM if 
+                  it supports the <Feature::Core> feature.
+                  In the <IF::ImplementationSource> objects
+                  implementing the <Feature::ManakaiDOM|Minimum>
+                  version <FeatureVer::3.0>, a DOM implementation
+                  <kwd:MUST> support the <Feature::Core> feature
+                  version <FeatureVer::3.0>.
+          }
      @@Param:
         @@@Name:  features
         @@@Type: MIString
@@ -2271,6 +2682,10 @@ ResourceDef:
         @@@@lang:en
         @@@@@:
           The version number of the feature to test. 
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@enDesc: Any version of the feature.
     @@Return:
       @@@Type:  
         DOMMain:boolean::ManakaiDOM:all
@@ -2323,6 +2738,10 @@ ResourceDef:
           @@@@lang:en
           @@@@@:
             A feature version number to request.
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@enDesc: Any version of the feature.
      @@Return:
         @@@Type: DOMMain|Object||ManakaiDOM|all
         @@@Description:

@@ -43,7 +43,7 @@ NS_MANAKAIDOM = http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom\#
 NS_MDOM = http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom\#ManakaiDOM.
 NS_UTIL = http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/
 
-ALL_HTML = dom.html util.html
+ALL_HTML = dom.html util.html error.html dis.html
 
 DOM_DAC_FILE = $(MANAKAI_LIB_DIR)Message/DOM/core$(DAC_SUFFIX)
 MINIMPL_DAC_FILE = $(MANAKAI_LIB_DIR)Message/DOM/feature-spec$(DAC_SUFFIX)
@@ -90,9 +90,10 @@ util.xml: $(UTIL_DAC_FILE)
 	  --module-uri="$(NS_DISLIB)DISMarkup" \
 	  --module-uri="$(NS_DISLIB)XML" \
 	  --module-uri="$(NS_DISLIB)NaturalLanguage" \
+	  --module-uri="$(NS_DISLIB)Java" \
+	  --module-uri="$(NS_DISLIB)ECMAScript" \
+	  --module-uri="$(NS_DISLIB)Document" \
 	  --module-uri="$(NS_UTIL)ManakaiNode" \
-	  --module-uri="$(NS_ERROR)Core" \
-	  --module-uri="$(NS_ERROR)DOMException" \
 	  --with-implementators-note > $@
 
 error.xml: $(UTIL_DAC_FILE)
@@ -125,5 +126,5 @@ clean:
 distclean: clean
 	$(RMR) ./Message ./http
 
-## $Date: 2005/09/30 13:06:13 $
+## $Date: 2005/10/05 11:50:35 $
 ## License: Public Domain

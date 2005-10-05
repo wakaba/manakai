@@ -1,3 +1,16 @@
+2005-10-05  Wakaba  <wakaba@suika.fam.cx>
+
+	* mkdisdump.pl (dd_get_qname_uri): Sets "dump:uri" attribute.
+
+2005-10-03  Wakaba  <wakaba@suika.fam.cx>
+
+	* mkdisdump.pl (append_module_documentation): Outputs
+	any "DISCore:AnyAppName" property value in
+	addition to "dis:AppName" values.  Use "dump:ref"
+	property if the value is a URI.
+	(append_method_documentation): Likewise.
+	(append_document_documentation): Likewise.
+
 2005-10-02  Wakaba  <wakaba@suika.fam.cx>
 
 	* mkdisdump.pl (append_document_documentation): Outputs "doc:as"

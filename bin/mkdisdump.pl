@@ -361,13 +361,18 @@ sub append_module_documentation (%) {
   }
 
   for my $con (@{$opt{source_resource}->get_property_value_list
-                   (ExpandedURI q<dis:AppName>)},
-               @{$opt{source_resource}->get_property_value_list
-                   (ExpandedURI q<idl:prefix>)}) {
+                   (ExpandedURI q<DISCore:AnyAppName>)}) {
     my $ns = $con->name;
     my $ln = $1 if ($ns =~ s/(\w+)$//);
-    $section->append_child ($od->create_element_ns ($ns, $ln))
-      ->text_content ($con->string_value);
+    if ($con->isa ('Message::Util::IF::DVURIValue')) {
+      $section->append_child ($od->create_element_ns ($ns, $ln))
+        ->set_attribute_ns (ExpandedURI q<dump:>, 'dump:ref',
+                            $con->string_value);
+      $ReferredResource{$con->uri} ||= 1;
+    } else {
+      $section->append_child ($od->create_element_ns ($ns, $ln))
+        ->text_content ($con->string_value);
+    }
     if ($con->isa ('Message::Util::IF::DVURIValue')) {
       $ReferredResource{$con->uri} ||= 1;
     }
@@ -441,10 +446,14 @@ sub append_datatype_documentation (%) {
                    (ExpandedURI q<dis:Def>)}) {
     my $ns = $con->name;
     my $ln = $1 if ($ns =~ s/(\w+)$//);
-    $section->append_child ($od->create_element_ns ($ns, $ln))
-      ->text_content ($con->string_value);
     if ($con->isa ('Message::Util::IF::DVURIValue')) {
+      $section->append_child ($od->create_element_ns ($ns, $ln))
+        ->set_attribute_ns (ExpandedURI q<dump:>, 'dump:ref',
+                            $con->string_value);
       $ReferredResource{$con->uri} ||= 1;
+    } else {
+      $section->append_child ($od->create_element_ns ($ns, $ln))
+        ->text_content ($con->string_value);
     }
   }
 
@@ -601,6 +610,7 @@ sub append_class_documentation (%) {
 sub append_method_documentation (%) {
   my %opt = @_;
   my $perl_name = $opt{source_resource}->pl_name;
+  my $od = $opt{result_parent}->owner_document;
   my $m;
   if (defined $perl_name) {
     $m = $opt{result_parent}->create_method ($perl_name);
@@ -616,6 +626,21 @@ sub append_method_documentation (%) {
   }
   
   add_uri ($opt{source_resource} => $m);
+
+  for my $con (@{$opt{source_resource}->get_property_value_list
+                   (ExpandedURI q<DISCore:AnyAppName>)}) {
+    my $ns = $con->name;
+    my $ln = $1 if ($ns =~ s/(\w+)$//);
+    if ($con->isa ('Message::Util::IF::DVURIValue')) {
+      $m->append_child ($od->create_element_ns ($ns, $ln))
+        ->set_attribute_ns (ExpandedURI q<dump:>, 'dump:ref',
+                            $con->string_value);
+      $ReferredResource{$con->uri} ||= 1;
+    } else {
+      $m->append_child ($od->create_element_ns ($ns, $ln))
+        ->text_content ($con->string_value);
+    }
+  }
   
   append_description (source_resource => $opt{source_resource},
                       result_parent => $m,
@@ -1065,11 +1090,14 @@ sub dd_get_qname_uri ($;%) {
   } else {
     $el->set_attribute_ns (ExpandedURI q<dump:>, 'dump:namespaceURI', $nsuri);
   }
+  my $r;
   if ($lnel) {
-    $nsuri . $lnel->text_content;
+    $r = $nsuri . $lnel->text_content;
   } else {
-    $el->get_attribute_ns (ExpandedURI q<ddel:>, 'defaultURI');
+    $r = $el->get_attribute_ns (ExpandedURI q<ddel:>, 'defaultURI');
   }
+  $el->set_attribute_ns (ExpandedURI q<dump:>, 'dump:uri', $r);
+  $r;
 } # dd_get_qname_uri
 
 sub tfuris2uri ($$) {
@@ -1423,6 +1451,10 @@ while (my @ruri = grep {$ReferredResource{$_} > 0} keys %ReferredResource) {
     } elsif ($res->is_type_uri (ExpandedURI q<DISLang:AnyMethod>) or
              $res->is_type_uri (ExpandedURI q<DISLang:ConstGroup>)) {
       my $cls = $res->parent_resource;
+      unless ($cls) {
+        $ReferredResource{$res->uri} = -1;
+        next U;
+      }
       if (not ($ReferredResource{$cls->uri} < 0) and
           ($cls->is_type_uri (ExpandedURI q<DISLang:Class>) or
            $cls->is_type_uri (ExpandedURI q<DISLang:Interface>))) {
@@ -1647,4 +1679,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2005/10/02 23:35:32 $
+1; # $Date: 2005/10/05 11:50:35 $
