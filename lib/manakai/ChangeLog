@@ -1,3 +1,19 @@
+2005-10-04  Wakaba  <wakaba@suika.fam.cx>
+
+	* DISCore.dis (DISCore:AnyAppName): New superproperty
+	of "dis:AppName".
+
+	* DISIDL.dis (idl:prefix): It is now a subproperty
+	of "DISCore:AnyAppName".
+	(idl:unsignedLong): Missing "idl:perl" property added.
+	(idl:boundType): New superproperty of "idl:perl" and so on.
+
+	* DISLang.dis (dis:Operator): It is now a subproperty
+	of "DISCore:AnyAppName".
+
+	* ECMAScript.dis (js:name, js:typeName): Added.  "js:typeName"
+	propery values added to types.
+
 2005-10-03  Wakaba  <wakaba@suika.fam.cx>
 
 	* DISIDL.dis (idl:valuetypeAs): New property.

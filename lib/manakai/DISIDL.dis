@@ -26,7 +26,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/10/03 13:20:21 $
+      $Date: 2005/10/05 11:51:15 $
     @@ContentType:
       dis:Date.RCS
   
@@ -149,11 +149,14 @@ PropDef:
   @subsetOf: dis|FileName
   @rdfs:domain: idl|File
 
-PropDef:
+RPropDef:
   @QName: idl|prefix
   @enFN:
     IDL <CODE::pragma> <CODE::prefix>
+  @dataType: DISCore|String
   @multipleProperties: DISCore|Single
+  @rdfs:subPropertyOf: DISCore|AnyAppName
+  @subsetOf: DISCore|AnyAppName
 
 ResourceDef:
   @QName: dis|prefix
@@ -538,6 +541,7 @@ IDLDataTypeDef:
   @idl:typeName: unsigned long
   @idl:java: j|int
   @idl:ecmascript: js|NumberType
+  @idl:perl: p|Number
 
 ResourceDef:
   @QName: DOMMain|unsigned-long
@@ -716,6 +720,11 @@ ResourceDef:
 
 ## -- Relationship to Other Languages
 
+SPropDef:
+  @QName: idl|boundType
+  @rdfs:subPropertyOf: dis|Def
+  @subsetOf: dis|Def
+
 RPropDef:
   @QName: idl|java
   @enFN: Java type
@@ -723,6 +732,8 @@ RPropDef:
   @rdfs:range: j|Type
   @dataType: DISCore|QName
   @multipleProperties: DISCore|Single
+  @rdfs:subPropertyOf: idl|boundType
+  @subsetOf: idl|boundType
 
 RPropDef:
   @QName: idl|ecmascript
@@ -731,6 +742,8 @@ RPropDef:
   @rdfs:range: j|Type
   @dataType: DISCore|QName
   @multipleProperties: DISCore|Single
+  @rdfs:subPropertyOf: idl|boundType
+  @subsetOf: idl|boundType
 
 RPropDef:
   @QName: idl|perl
@@ -739,6 +752,8 @@ RPropDef:
   @rdfs:range: p|DataType
   @dataType: DISCore|QName
   @multipleProperties: DISCore|Single
+  @rdfs:subPropertyOf: idl|boundType
+  @subsetOf: idl|boundType
 
 ResourceDef:
   @QName: lang|IDL

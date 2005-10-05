@@ -19,7 +19,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/10/02 23:35:34 $
+      $Date: 2005/10/05 11:51:15 $
     @@ContentType:
       dis:Date.RCS
   
@@ -314,6 +314,12 @@ CPropDef:
   @rdfs:domain: DISCore|AnyResource
 
 CPropDef:
+  @QName: DISCore|AnyAppName
+  @enFN: part of or entire name
+  @enDesc:
+    A name or a part of a name of the resource in some application.
+
+CPropDef:
   @QName:
     dis:AppName
   @Description:
@@ -321,6 +327,8 @@ CPropDef:
     @@@: An application (binding) dependent name of a resource.
   @dataType: String
   @multipleProperties: UnorderedList
+  @rdfs:subPropertyOf: DISCore|AnyAppName
+  @subsetOf: DISCore|AnyAppName
 
 SPropDef:
   @QName:

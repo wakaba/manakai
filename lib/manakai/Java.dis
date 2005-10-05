@@ -7,7 +7,7 @@ Module:
 
   @DISCore:author: DISCore|Wakaba
   @Date:
-    $Date: 2005/10/03 13:20:22 $
+    $Date: 2005/10/05 11:51:15 $
   @License: license|Perl+MPL
 
   @DefaultFor: ManakaiDOM|all
@@ -145,6 +145,8 @@ SPropDef:
   @QName: j|name
   @enFN: name
   @rdfs:domain: j|Entity
+  @rdfs:subClassOf: dis|AppName
+  @subsetOf: dis|AppName
 
 ResourceTypeDef:
   @QName: j|Declaration
@@ -520,6 +522,8 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: j|Class
+    @@rdfs:subClassOf: j|Object
+    @@subsetOf: j|Object
 
 ## -- Fields
 

@@ -7,7 +7,7 @@ Module:
 
   @DISCore:author: DISCore|Wakaba
   @Date:
-    $Date: 2005/10/03 13:20:22 $
+    $Date: 2005/10/05 11:51:15 $
   @License: license|Perl+MPL
 
   @DefaultFor: ManakaiDOM|all
@@ -47,6 +47,29 @@ Namespace:
   @sc:
     http://suika.fam.cx/~wakaba/archive/2005/10/swcfg#
 
+SPropDef:
+  @QName: js|name
+  @enFN: ECMAScript name
+  @rdfs:subPropertyOf: dis|AppName
+  @subsetOf: dis|AppName
+
+ElementTypeBinding:
+  @Name: SPropDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: rdf|Property
+    @@rdf:type: DISSource|Property
+
+ElementTypeBinding:
+  @Name: RPropDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: rdf|Property
+    @@rdf:type: DISSource|Property
+    @@rdf:type: DISSource|ResourceProperty
+
 ## -- Types
 
 ResourceTypeDef:
@@ -54,6 +77,14 @@ ResourceTypeDef:
   @enFN: type
   @rdfs:subClassOf: DISLang|DataType
   @subsetOf: DISLang|DataType
+
+RPropDef:
+  @QName: js|typeName
+  @enFN: type name
+  @rdfs:subPropertyOf: js|name
+  @subsetOf: js|name
+  @multipleProperties: DISCore|Single
+  @dataType: DISCore|String
 
 ElementTypeBinding:
   @Name: ResourceTypeDef
@@ -90,6 +121,7 @@ TypeDef:
   @rdf:type: js|PrimitiveType
   @rdfs:subClassOf: js|AnyType
   @subsetOf: js|AnyType
+  @js:typeName: Undefined
 
 ElementTypeBinding:
   @Name: enFN
@@ -114,6 +146,7 @@ TypeDef:
   @rdf:type: js|PrimitiveType
   @rdfs:subClassOf: js|AnyType
   @subsetOf: js|AnyType
+  @js:typeName: Null
 
 TypeDef:
   @QName: js|BooleanType
@@ -124,6 +157,7 @@ TypeDef:
   @rdf:type: js|PrimitiveType
   @rdfs:subClassOf: js|AnyType
   @subsetOf: js|AnyType
+  @js:typeName: Boolean
 
 TypeDef:
   @QName: js|StringType
@@ -136,6 +170,7 @@ TypeDef:
   @rdf:type: js|PrimitiveType
   @rdfs:subClassOf: js|AnyType
   @subsetOf: js|AnyType
+  @js:typeName: String
 
 TypeDef:
   @QName: js|NumberType
@@ -150,6 +185,7 @@ TypeDef:
   @rdf:type: js|PrimitiveType
   @rdfs:subClassOf: js|AnyType
   @subsetOf: js|AnyType
+  @js:typeName: Number
 
 TypeDef:
   @QName: js|Int32
@@ -178,6 +214,7 @@ TypeDef:
     Each property is a combination of name, value, and attributes.
   @rdfs:subClassOf: js|AnyType
   @subsetOf: js|AnyType
+  @js:typeName: Object
 
 TypeDef:
   @QName: js|NativeObject
