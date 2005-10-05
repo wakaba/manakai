@@ -5,7 +5,8 @@
   
   <!ENTITY referent.variable '
     <t:variable name="referent"
-        select="($rootDocument | $allDataType | $anyIDLType | $allIDLInterface)
+        select="($rootDocument | $allDataType | $anyIDLType | $allIDLInterface |
+                 $allModules)
                 [child::dump:uri/@dump:uri = current ()/@dump:ref]"/>
   '>
 ]>
@@ -24,6 +25,9 @@
     xmlns:dump="http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#DISDump/"
     xmlns:ddel="http://suika.fam.cx/~wakaba/archive/2005/disdoc#"
     xmlns:idl="http://suika.fam.cx/~wakaba/archive/2004/dis/IDL#"
+    xmlns:j="http://suika.fam.cx/~wakaba/archive/2004/dis/Java#"
+    xmlns:js="http://suika.fam.cx/~wakaba/archive/2004/dis/ECMAScript#"
+    xmlns:p="http://suika.fam.cx/~wakaba/archive/2004/dis/Perl#"
     xmlns:script="http://suika.fam.cx/~wakaba/archive/2005/5/script#"
     xmlns:sw010="urn:x-suika-fam-cx:markup:suikawiki:0:10:"
     xmlns:ddoct="http://suika.fam.cx/~wakaba/archive/2005/8/disdump-xslt#"
@@ -36,11 +40,8 @@
 
   <t:variable name="rootDocument" select="/child::dump:moduleSet
                                           /child::dump:document"/>
-  <t:variable name="allIDLInterface" select="/child::dump:moduleSet
-                                          /child::dump:interface"/>
-  <t:variable name="anyIDLType" select="$allIDLInterface |
-                                        /child::dump:moduleSet
-                                        /child::dump:dataType"/>
+  <t:variable name="allIDLInterface" select="$allModules/child::dump:interface"/>
+  <t:variable name="anyIDLType" select="$allIDLInterface | $allDataType"/>
 
 <!-- Modes -->
   
@@ -70,6 +71,30 @@
         <t:with-param name="referencer" select="$referencer"/>
       </t:apply-templates>
     </t:when>
+    <t:when test="string ($mode) = 'idl-file'">
+      <idl:File>
+        <t:attribute name="xml:space">preserve</t:attribute>
+        <t:variable name="a">
+          <t:apply-templates select="$allModules
+                                     [
+                                       child::dump:uri/@dump:uri = string ($uri)
+                                     ]" mode="idl-file"/>
+        </t:variable>
+        <t:value-of select="$a"/>
+      </idl:File>
+    </t:when>
+    <t:when test="string ($mode) = 'java-file'">
+      <idl:File>
+        <t:attribute name="xml:space">preserve</t:attribute>
+        <t:variable name="a">
+          <t:apply-templates select="$allIDLInterface
+                                     [
+                                       child::dump:uri/@dump:uri = string ($uri)
+                                     ]" mode="java-file"/>
+        </t:variable>
+        <t:value-of select="$a"/>
+      </idl:File>
+    </t:when>
     <t:when test="string ($mode) = 'list'">
       <t:apply-templates select="self::node ()" mode="list"/>
     </t:when>
@@ -90,6 +115,14 @@
     <t:apply-templates select="child::dump:document
                                [child::ddoc:rel/@dump:uri = '&ddoc;Document']"
         mode="list"/>
+    <t:for-each select="$allModules">
+      <t:if test="$rootDocument/child::dump:document
+                  [(child::ddoc:as/@dump:uri =
+                    'http://suika.fam.cx/~wakaba/archive/2004/dis/IDL#File') and
+                   (@dump:ref = current ()/child::dump:uri/@dump:uri)]">
+        <t:apply-templates select="self::node ()" mode="list"/>
+      </t:if>
+    </t:for-each>
   </t:template>
 
   <t:template match="dump:document[child::ddoc:rel/@dump:uri = '&ddoc;Document']"
@@ -124,6 +157,37 @@
       </t:attribute>
       <t:attribute name="ddoct:fileName">
         <t:apply-templates select="self::node ()" mode="file-name"/>
+      </t:attribute>
+    </ddoct:item>
+  </t:template>
+  
+  <t:template match="dump:module" mode="list">
+    <ddoct:item ddoct:mode="idl-file">
+      <t:attribute name="ddoct:uri">
+        <t:apply-templates select="self::node ()" mode="list-uri"/>
+      </t:attribute>
+      <t:attribute name="ddoct:fileName">
+        <t:variable name="fileName">
+          <t:apply-templates select="self::node ()" mode="idl-file-name-dir"/>
+          <t:apply-templates select="self::node ()" mode="idl-file-name-name"/>
+        </t:variable>
+        <t:value-of select="$fileName"/>
+      </t:attribute>
+    </ddoct:item>
+    <t:apply-templates select="child::dump:interface" mode="list"/>
+  </t:template>
+
+  <t:template match="dump:interface" mode="list">
+    <ddoct:item ddoct:mode="java-file">
+      <t:attribute name="ddoct:uri">
+        <t:apply-templates select="self::node ()" mode="list-uri"/>
+      </t:attribute>
+      <t:attribute name="ddoct:fileName">
+        <t:variable name="fileName">
+          <t:apply-templates select="self::node ()" mode="java-file-name-dir"/>
+          <t:apply-templates select="self::node ()" mode="java-file-name-name"/>
+        </t:variable>
+        <t:value-of select="$fileName"/>
       </t:attribute>
     </ddoct:item>
   </t:template>
@@ -338,18 +402,27 @@
     </t:call-template>
   </t:template>
   
-  <t:template match="dump:document | dump:dataType | dump:interface"
+  <t:template match="dump:document | dump:dataType | dump:interface |
+                     dump:module"
       mode="heading-content">
     <t:param name="rank" select="1"/>
     <t:param name="docType" select="child::ddoc:rel/@dump:uri"/>
     <t:param name="number" select="/parent::node ()"/>
+    <t:param name="value" select="/parent::node ()"/>
     <t:if test="$number">
       <t:copy-of select="$number"/>
       <t:text> </t:text>
     </t:if>
-    <t:apply-templates select="self::node ()" mode="title-text">
-      <t:with-param name="docType" select="$docType"/>
-    </t:apply-templates>
+    <t:choose>
+    <t:when test="string-length ($value)">
+      <t:copy-of select="$value"/>
+    </t:when>
+    <t:otherwise>
+      <t:apply-templates select="self::node ()" mode="title-text">
+        <t:with-param name="docType" select="$docType"/>
+      </t:apply-templates>
+    </t:otherwise>
+    </t:choose>
   </t:template>
   
   <t:template match="ddoc:title" mode="title-text">
@@ -449,6 +522,14 @@
           format="1."/>
     </t:when>
     </t:choose>
+  </t:template>
+  
+  <t:template match="dump:interface" mode="number">
+    <t:param name="number" select="/parent::node ()"/>
+    <t:copy-of select="$number"/>
+    <t:number
+          count="dump:interface"
+          format="1."/>
   </t:template>
 
   <t:template match="dump:dataType | dump:document" mode="ref">
@@ -638,17 +719,44 @@
     <dl class="dump-info dump-info-interface">
       <dt><t:call-template name="label-idl-definition"/></dt>
       <dd><t:apply-templates select="self::node ()" mode="idl"/></dd>
+      <dt><t:call-template name="label-bindings"/></dt>
+      <dd>
+        <a>
+          <t:attribute name="href">
+            <t:apply-templates select="self::node ()" mode="uri-java"/>
+          </t:attribute>
+          <t:call-template name="label-java-binding"/>
+        </a>
+        <t:call-template name="label-sep"/>
+        <a>
+          <t:attribute name="href">
+            <t:apply-templates select="self::node ()" mode="uri-es"/>
+          </t:attribute>
+          <t:call-template name="label-ecma-script-binding"/>
+        </a>
+        <t:call-template name="label-sep"/>
+        <a>
+          <t:attribute name="href">
+            <t:apply-templates select="self::node ()" mode="uri-pl"/>
+          </t:attribute>
+          <t:call-template name="label-perl-binding"/>
+        </a>
+      </dd>
       <t:apply-templates select="child::dump:constGroup" mode="dl"/>
-      <t:if test="child::dump:attribute">
+      <t:if test="child::dump:attribute[not (@dump:ref)]">
         <dt><t:call-template name="label-attributes"/></dt>
         <dd>
-          <dl><t:apply-templates select="dump:attribute" mode="dl"/></dl>
+          <dl>
+            <t:apply-templates select="dump:attribute[not (@dump:ref)]" mode="dl"/>
+          </dl>
         </dd>
       </t:if>
-      <t:if test="child::dump:method">
+      <t:if test="child::dump:method[not (@dump:ref)]">
         <dt><t:call-template name="label-methods"/></dt>
         <dd>
-          <dl><t:apply-templates select="dump:method" mode="dl"/></dl>
+          <dl>
+            <t:apply-templates select="dump:method[not (@dump:ref)]" mode="dl"/>
+          </dl>
         </dd>
       </t:if>
     </dl>
@@ -658,7 +766,104 @@
     <t:param name="rank" select="1"/>
     <t:param name="number" select="/parent::node ()"/>
     &referent.variable;
+    <t:apply-templates select="$referent" mode="hb">
+      <t:with-param name="rank" select="$rank"/>
+      <t:with-param name="docType" select="child::ddoc:rel/@dump:uri"/>
+      <t:with-param name="number">
+        <t:apply-templates select="self::node ()" mode="number">
+          <t:with-param name="number" select="$number"/>
+        </t:apply-templates>
+      </t:with-param>
+    </t:apply-templates>
+    <t:if test="not ($referent)">
+      <t:apply-templates select="self::node ()" mode="unknown"/>
+    </t:if>
+  </t:template>
+  
+  <t:template match="dump:document[@dump:ref]
+                     [child::ddoc:rel/@dump:uri = '&ddoc;subsection']">
+    <t:param name="rank" select="1"/>
+    <t:param name="number" select="/parent::node ()"/>
+    &referent.variable;
     <t:apply-templates select="$referent">
+      <t:with-param name="rank" select="$rank"/>
+      <t:with-param name="docType" select="child::ddoc:rel/@dump:uri"/>
+      <t:with-param name="number">
+        <t:apply-templates select="self::node ()" mode="number">
+          <t:with-param name="number" select="$number"/>
+        </t:apply-templates>
+      </t:with-param>
+    </t:apply-templates>
+    <t:if test="not ($referent)">
+      <t:apply-templates select="self::node ()" mode="unknown"/>
+    </t:if>
+  </t:template>
+  
+  <t:template match="dump:document[@dump:ref]
+                     [child::ddoc:as/@dump:uri =
+                      'http://suika.fam.cx/~wakaba/archive/2004/dis/IDL#File']">
+    <t:param name="rank" select="1"/>
+    <t:param name="number" select="/parent::node ()"/>
+    &referent.variable;
+    <t:apply-templates select="$referent" mode="idl">
+      <t:with-param name="rank" select="$rank"/>
+      <t:with-param name="docType" select="child::ddoc:rel/@dump:uri"/>
+      <t:with-param name="number">
+        <t:apply-templates select="self::node ()" mode="number">
+          <t:with-param name="number" select="$number"/>
+        </t:apply-templates>
+      </t:with-param>
+    </t:apply-templates>
+    <t:if test="not ($referent)">
+      <t:apply-templates select="self::node ()" mode="unknown"/>
+    </t:if>
+  </t:template>
+  
+  <t:template match="dump:document[@dump:ref]
+                     [child::ddoc:as/@dump:uri =
+                      'http://suika.fam.cx/~wakaba/archive/2004/dis/Java#Package']">
+    <t:param name="rank" select="1"/>
+    <t:param name="number" select="/parent::node ()"/>
+    &referent.variable;
+    <t:apply-templates select="$referent" mode="java">
+      <t:with-param name="rank" select="$rank"/>
+      <t:with-param name="docType" select="child::ddoc:rel/@dump:uri"/>
+      <t:with-param name="number">
+        <t:apply-templates select="self::node ()" mode="number">
+          <t:with-param name="number" select="$number"/>
+        </t:apply-templates>
+      </t:with-param>
+    </t:apply-templates>
+    <t:if test="not ($referent)">
+      <t:apply-templates select="self::node ()" mode="unknown"/>
+    </t:if>
+  </t:template>
+  
+  <t:template match="dump:document[@dump:ref]
+                     [child::ddoc:as/@dump:uri = '&f;ECMAScriptBindingDefinition']">
+    <t:param name="rank" select="1"/>
+    <t:param name="number" select="/parent::node ()"/>
+    &referent.variable;
+    <t:apply-templates select="$referent" mode="es">
+      <t:with-param name="rank" select="$rank"/>
+      <t:with-param name="docType" select="child::ddoc:rel/@dump:uri"/>
+      <t:with-param name="number">
+        <t:apply-templates select="self::node ()" mode="number">
+          <t:with-param name="number" select="$number"/>
+        </t:apply-templates>
+      </t:with-param>
+    </t:apply-templates>
+    <t:if test="not ($referent)">
+      <t:apply-templates select="self::node ()" mode="unknown"/>
+    </t:if>
+  </t:template>
+  
+  <t:template match="dump:document[@dump:ref]
+                     [child::ddoc:as/@dump:uri = '&f;PerlBindingDefinition']">
+    <t:param name="rank" select="1"/>
+    <t:param name="number" select="/parent::node ()"/>
+    &referent.variable;
+    <t:apply-templates select="$referent" mode="pl">
       <t:with-param name="rank" select="$rank"/>
       <t:with-param name="docType" select="child::ddoc:rel/@dump:uri"/>
       <t:with-param name="number">
@@ -807,7 +1012,7 @@
   
   <t:template match="ddel:TYPE[@dump:uri]">
     <t:variable name="referent"
-        select="($anyIDLType | $allDataType)
+        select="$anyIDLType
                 [child::dump:uri/@dump:uri = current ()/@dump:uri]"/>
     <t:choose>
     <t:when test="$referent">
@@ -939,7 +1144,11 @@
           select="$p/child::dump:document
                   [not (child::ddoc:rel/@dump:uri = '&ddoc;abstract') and
                    not (child::ddoc:rel/@dump:uri = '&ddoc;status') and
-                   not (child::ddoc:rel/@dump:uri = '&ddoc;shortTOC')] |
+                   not (child::ddoc:rel/@dump:uri = '&ddoc;shortTOC') and
+                   ((child::ddoc:rel/@dump:uri = '&ddoc;section') or
+                    (child::ddoc:rel/@dump:uri = '&ddoc;mainSection') or
+                    (child::ddoc:rel/@dump:uri = '&ddoc;additionalSection') or
+                    (child::ddoc:rel/@dump:uri = '&ddoc;appendix'))] |
                   $p/child::dump:dataType"
           mode="toc-li">
         <t:with-param name="recursive" select="boolean (@dump:ref = '&f;LongTOC')"/>
@@ -973,7 +1182,9 @@
         </t:apply-templates>
         <t:if test="$recursive">
           <t:variable name="q">
-            <t:apply-templates select="$referent/child::dump:document |
+            <t:apply-templates select="$referent/child::dump:document
+                   [(child::ddoc:rel/@dump:uri = '&ddoc;subsection') or
+                    (child::ddoc:rel/@dump:uri = '&ddoc;section')] |
                         $referent/child::dump:dataType" mode="toc-li">
               <t:with-param name="recursive" select="true ()"/>
               <t:with-param name="number" select="$this-number"/>
@@ -991,30 +1202,139 @@
                                    @dump:ref = '&f;LongTOC']" mode="toc-li"/>
 
 <!-- IDL Definition -->
+
+  <t:template match="dump:module" mode="idl">
+    <t:param name="number" select="/parent::node ()"/>
+    <t:param name="rank" select="1"/>
+    <t:param name="docType" select="/parent::node ()"/>
+    <t:variable name="moduleName">
+      <t:apply-templates select="self::node ()" mode="idl-name"/>
+    </t:variable>
+    <t:variable name="fileDirectory">
+      <t:apply-templates select="self::node ()" mode="idl-file-name-dir"/>
+    </t:variable>
+    <t:variable name="fileName">
+      <t:apply-templates select="self::node ()" mode="idl-file-name-name">
+        <t:with-param name="moduleName" select="$moduleName"/>
+      </t:apply-templates>
+    </t:variable>
+    
+    <div class="section" id="{concat ('idl-', $fileName)}">
+      <t:apply-templates select="self::node ()" mode="heading">
+        <t:with-param name="number" select="$number"/>
+        <t:with-param name="rank" select="$rank"/>
+        <t:with-param name="docType" select="$docType"/>
+        <t:with-param name="value">
+          <a href="{$fileDirectory}{$fileName}"><t:copy-of select="$fileName"/></a>
+        </t:with-param>
+      </t:apply-templates>
+    
+      <pre class="idl idl-file" lang="en" xml:lang="en">
+        <t:apply-templates select="self::node ()" mode="idl-file">
+          <t:with-param name="moduleName" select="$moduleName"/>
+          <t:with-param name="fileName" select="$fileName"/>
+        </t:apply-templates>
+      </pre>
+    </div>
+  </t:template>
   
   <t:template match="dump:interface" mode="idl">
-    <pre class="idl idl-interface">
+    <pre class="idl idl-interface" lang="en" xml:lang="en">
       <t:apply-templates select="self::node ()" mode="idl-file"/>
     </pre>
   </t:template>
   
   <t:template match="dump:dataType" mode="idl">
-    <pre class="idl idl-data-type">
+    <pre class="idl idl-data-type" lang="en" xml:lang="en">
       <t:apply-templates select="self::node ()" mode="idl-file"/>
     </pre>
   </t:template>
   
+  <t:template match="dump:module" mode="idl-file">
+    <t:param name="moduleName">
+      <t:apply-templates select="self::node ()" mode="idl-name"/>
+    </t:param>
+    <t:param name="fileName">
+      <t:apply-templates select="self::node ()" mode="idl-file-name-name">
+        <t:with-param name="moduleName" select="$moduleName"/>
+      </t:apply-templates>
+    </t:param>
+    <t:variable name="const">
+      <t:apply-templates select="self::node ()" mode="idl-const-name">
+        <t:with-param name="fileName" select="$fileName"/>
+      </t:apply-templates>
+    </t:variable>
+      <t:text>// File: </t:text><t:copy-of select="$fileName"/><t:text>&#xA;</t:text>
+      <t:text>&#xA;</t:text>
+      <t:text>#ifndef </t:text><t:copy-of select="$const"/><t:text>&#xA;</t:text>
+      <t:text>#define </t:text><t:copy-of select="$const"/><t:text>&#xA;</t:text>
+      <t:text>&#xA;</t:text>
+      <!-- include -->
+      <t:text>#pragma prefix "</t:text>
+      <t:value-of select="child::idl:prefix"/>
+      <t:text>"&#xA;</t:text>
+      <t:text>module </t:text><t:copy-of select="$moduleName"/><t:text>&#xA;</t:text>
+      <t:text>{&#xA;&#xA;</t:text>
+      <t:for-each select="child::dump:dataType[child::idl:sequenceOf]">
+        <t:apply-templates select="self::node ()" mode="idl-file">
+          <t:with-param name="indent" select="'  '"/>
+        </t:apply-templates>
+        <t:text>&#xA;</t:text>
+      </t:for-each>
+      <!-- typedef -->
+      <t:for-each select="child::dump:interface[not (@dump:isException)]">
+        <t:if test="(preceding-sibling::dump:interface/child::dump:method/
+                       child::dump:return/@dump:dataType =
+                     current ()/child::dump:uri/@dump:uri) or
+                    (preceding-sibling::dump:interface/child::dump:attribute/
+                       child::dump:*/@dump:dataType =
+                     current ()/child::dump:uri/@dump:uri)">
+          <t:text>  interface </t:text>
+          <t:apply-templates select="self::node ()" mode="idl-name"/>
+          <t:text>;&#xA;</t:text>
+        </t:if>
+      </t:for-each>
+      <t:for-each select="child::dump:interface[@dump:isException]">
+        <t:text>&#xA;</t:text>
+        <t:apply-templates select="self::node ()" mode="idl-file">
+          <t:with-param name="indent" select="'  '"/>
+        </t:apply-templates>
+      </t:for-each>
+      <t:for-each select="child::dump:interface[not (@dump:isException)]">
+        <t:text>&#xA;</t:text>
+        <t:apply-templates select="self::node ()" mode="idl-file">
+          <t:with-param name="indent" select="'  '"/>
+        </t:apply-templates>
+      </t:for-each>
+      <t:text>};&#xA;</t:text>
+      <t:text>&#xA;</t:text>
+      <t:text>#endif // </t:text><t:copy-of select="$const"/><t:text>&#xA;</t:text>
+  </t:template>
+  
   <t:template match="dump:interface" mode="idl-file">
+    <t:param name="indent" select="''"/>
+    
+    <t:copy-of select="$indent"/>
     <t:text>interface </t:text>
     <t:apply-templates select="self::node ()" mode="ref"/>
     <t:apply-templates select="child::dump:extends" mode="idl-file"/>
     <t:text> {&#xA;</t:text>
-    <t:apply-templates select="child::dump:method | child::dump:attribute |
-                               child::dump:constGroup" mode="idl-file"/>
-    <t:text>}</t:text>
+    
+    <t:apply-templates select="child::dump:method[not (@dump:ref)] |
+                               child::dump:attribute[not (@dump:ref)] |
+                               child::dump:constGroup[not (@dump:ref)]"
+        mode="idl-file">
+      <t:with-param name="indent" select="concat ($indent, '  ')"/>
+    </t:apply-templates>
+    
+    <t:copy-of select="$indent"/>
+    <t:text>}&#xA;</t:text>
   </t:template>
   
   <t:template match="dump:dataType[child::idl:sequenceOf]" mode="idl-file">
+    <t:param name="indent" select="''"/>
+    
+    <t:copy-of select="$indent"/>
     <t:text>valuetype </t:text>
     <t:apply-templates select="self::node ()" mode="ref"/>
     <t:text> sequence&lt;</t:text>
@@ -1023,6 +1343,7 @@
   </t:template>
   
   <t:template match="dump:method" mode="idl-file">
+    <t:param name="indent" select="''"/>
     <t:variable name="method-name">
       <t:apply-templates select="self::node ()" mode="ref">
         <t:with-param name="short" select="true ()"/>
@@ -1031,7 +1352,8 @@
     <t:variable name="type">
       <t:apply-templates select="self::node ()" mode="idl-type"/>
     </t:variable>
-    <t:text>  </t:text>
+    
+    <t:copy-of select="$indent"/>
     <t:copy-of select="$type"/>
     <t:call-template name="space">
       <t:with-param name="length" select="18 - string-length ($type)"/>
@@ -1041,6 +1363,7 @@
     <t:text>(</t:text>
     <t:apply-templates select="child::dump:param" mode="idl-file">
       <t:with-param name="method-name" select="$method-name"/>
+      <t:with-param name="indent" select="$indent"/>
     </t:apply-templates>
     <t:text>);&#xA;</t:text>
   </t:template>
@@ -1057,7 +1380,12 @@
   
   <t:template match="dump:param[position () != 1]" mode="idl-file">
     <t:param name="method-name"/>
-    <t:text>,&#xA;                      </t:text>
+    <t:param name="indent" select="''"/>
+    
+    <t:text>,&#xA;</t:text>
+    
+    <t:copy-of select="$indent"/>
+    <t:text>                    </t:text>
     <t:call-template name="space">
       <t:with-param name="length" select="string-length ($method-name)"/>
     </t:call-template>
@@ -1070,10 +1398,12 @@
   </t:template>
   
   <t:template match="dump:attribute" mode="idl-file">
+    <t:param name="indent" select="''"/>
     <t:variable name="type">
       <t:apply-templates select="self::node ()" mode="idl-type"/>
     </t:variable>
-    <t:text>  </t:text>
+    
+    <t:copy-of select="$indent"/>
     <t:choose>
     <t:when test="@dump:isReadOnly">readonly attribute </t:when>
     <t:otherwise>         attribute </t:otherwise>
@@ -1087,6 +1417,45 @@
       <t:with-param name="short" select="true ()"/>
     </t:apply-templates>
     <t:text>;&#xA;</t:text>
+  </t:template>
+  
+  <t:template match="dump:module" mode="idl-file-name-name">
+    <t:param name="moduleName">
+      <t:apply-templates select="self::node ()" mode="idl-name"/>
+    </t:param>
+    <code class="file" lang="en" xml:lang="en">
+      <t:value-of select="$moduleName"/>
+      <t:text>.idl</t:text>
+    </code>
+  </t:template>
+  <t:template match="dump:module" mode="idl-file-name-dir">
+    <code class="file" lang="en" xml:lang="en">
+      <t:text>idl/</t:text>
+    </code>
+  </t:template>
+  
+  <t:template match="dump:module" mode="idl-name">
+    <code class="idl" lang="en" xml:lang="en">
+      <t:choose>
+      <t:when test="child::idl:moduleName">
+        <t:value-of select="child::idl:moduleName"/>
+      </t:when>
+      <t:otherwise>
+        <t:value-of select="@dump:localName"/>
+      </t:otherwise>
+      </t:choose>
+    </code>
+  </t:template>
+  
+  <t:template match="dump:module" mode="idl-const-name">
+    <t:param name="fileName">
+      <t:apply-templates select="self::node ()" mode="idl-file-name-name"/>
+    </t:param>
+    <t:text>_</t:text>
+    <t:value-of select="translate ($fileName,
+                                   'abcdefghijklmnopqrstuvwxyz-.',
+                                   'ABCDEFGHIJKLMNOPQRSTUVWXYZ__')"/>
+    <t:text>_</t:text>
   </t:template>
   
   <t:template match="dump:interface" mode="idl-name">
@@ -1189,7 +1558,968 @@
       </t:choose>
     </code>
   </t:template>
+
+<!-- Java Binding -->
+
+  <t:template match="dump:module" mode="java">
+    <t:param name="number" select="/parent::node ()"/>
+    <t:param name="rank" select="1"/>
+    <t:param name="docType" select="/parent::node ()"/>
+    <t:variable name="packageName">
+      <t:apply-templates select="self::node ()" mode="java-name"/>
+    </t:variable>
+    <t:variable name="fileDirectory">
+      <t:apply-templates select="self::node ()" mode="java-file-name-dir"/>
+    </t:variable>
+    
+    <div class="section" id="{$packageName}">
+      <t:apply-templates select="self::node ()" mode="heading">
+        <t:with-param name="number" select="$number"/>
+        <t:with-param name="rank" select="$rank"/>
+        <t:with-param name="docType" select="$docType"/>
+        <t:with-param name="value">
+          <t:call-template name="prefix-package"/>
+          <t:copy-of select="$packageName"/>
+        </t:with-param>
+      </t:apply-templates>
+      
+      <t:apply-templates select="child::dump:interface" mode="java">
+        <t:with-param name="number" select="$number"/>
+        <t:with-param name="rank" select="$rank"/>
+        <t:with-param name="docType" select="$docType"/>
+        <t:with-param name="packageName" select="$packageName"/>
+        <t:with-param name="fileDirectory" select="$fileDirectory"/>
+      </t:apply-templates>
+    </div>
+  </t:template>
   
+  <t:template match="dump:interface" mode="java">
+    <t:param name="number" select="/parent::node ()"/>
+    <t:param name="rank" select="1"/>
+    <t:param name="docType" select="/parent::node ()"/>
+    <t:param name="packageName">
+      <t:apply-templates select="parent::node ()" mode="java-name"/>
+    </t:param>
+    <t:param name="interfaceName">
+      <t:apply-templates select="self::node ()" mode="java-name"/>
+    </t:param>
+    <t:param name="fileDirectory">
+      <t:apply-templates select="parent::node ()" mode="java-file-name-dir"/>
+    </t:param>
+    <t:variable name="fileName">
+      <t:apply-templates select="self::node ()" mode="java-file-name-name">
+        <t:with-param name="interfaceName" select="$interfaceName"/>
+      </t:apply-templates>
+    </t:variable>
+    
+    <div class="section" id="{$packageName}.{$interfaceName}">
+      <t:apply-templates select="self::node ()" mode="heading">
+        <t:with-param name="number">
+          <t:apply-templates select="self::node ()" mode="number">
+            <t:with-param name="number" select="$number"/>
+          </t:apply-templates>
+        </t:with-param>
+        <t:with-param name="rank" select="$rank"/>
+        <t:with-param name="docType" select="$docType"/>
+        <t:with-param name="value">
+          <a href="{$fileDirectory}{$fileName}"><t:copy-of select="$fileName"/></a>
+        </t:with-param>
+      </t:apply-templates>
+    
+      <t:apply-templates select="self::node ()" mode="java-file">
+        <t:with-param name="packageName" select="$packageName"/>
+        <t:with-param name="interfaceName" select="$interfaceName"/>
+      </t:apply-templates>
+    </div>
+  </t:template>
+  
+  <t:template match="dump:interface" mode="id-java">
+    <t:variable name="v">
+      <t:apply-templates select="parent::node ()" mode="java-name"/>
+      <t:text>.</t:text>
+      <t:apply-templates select="self::node ()" mode="java-name"/>
+    </t:variable>
+    <t:value-of select="$v"/>
+  </t:template>
+  
+  <t:template match="dump:interface" mode="java-file">
+    <t:param name="packageName">
+      <t:apply-templates select="parent::node ()" mode="java-name"/>
+    </t:param>
+    <t:param name="interfaceName">
+      <t:apply-templates select="self::node ()" mode="java-name"/>
+    </t:param>
+    
+      <pre class="Java Java-file" lang="en" xml:lang="en">
+        <t:text>package </t:text>
+        <t:copy-of select="$packageName"/>
+        <t:text>;&#xA;&#xA;</t:text>
+        
+        <t:text>public interface </t:text>
+        <t:copy-of select="$interfaceName"/>
+        <t:if test="child::dump:extends">
+          <t:text> extends </t:text>
+          <t:apply-templates select="child::dump:extends[position () = 1]"
+              mode="java-name"/>
+          <t:if test="child::dump:extends[position () = 2]">
+            <t:for-each select="child::dump:extends[position () != 1]">
+              <t:text>, </t:text>
+              <t:apply-templates select="self::node ()" mode="java-name"/>
+            </t:for-each>
+          </t:if>
+        </t:if>
+        <t:text> {&#xA;</t:text>
+        
+        <t:apply-templates select="child::dump:method[not (@dump:ref)] |
+                                   child::dump:attribute[not (@dump:ref)] |
+                                   child::dump:constGroup[not (@dump:ref)]"
+            mode="java-file">
+          <t:with-param name="indent" select="'    '"/>
+        </t:apply-templates>
+        <t:text>}&#xA;</t:text>
+      </pre>
+  </t:template>
+  
+  <t:template match="dump:method" mode="java-file">
+    <t:param name="indent" select="''"/>
+    
+    <t:variable name="v">
+      <t:copy-of select="$indent"/>
+      <t:text>public </t:text>
+      <t:apply-templates select="self::node ()" mode="java-type"/>
+      <t:text> </t:text>
+      <t:apply-templates select="self::node ()" mode="java-name"/>
+      <t:text>(</t:text>
+    </t:variable>
+    <t:copy-of select="$v"/>
+    <t:if test="child::dump:param">
+      <t:variable name="s">
+        <t:call-template name="space">
+          <t:with-param name="length" select="string-length ($v)"/>
+        </t:call-template>
+      </t:variable>
+      <t:apply-templates select="child::dump:param" mode="java-file">
+        <t:with-param name="indent" select="$s"/>
+      </t:apply-templates>
+    </t:if>
+    <t:text>);&#xA;&#xA;</t:text>
+  </t:template>
+  
+  <t:template match="dump:attribute" mode="java-file">
+    <t:param name="indent" select="''"/>
+    
+    <t:copy-of select="$indent"/>
+    <t:text>public </t:text>
+    <t:apply-templates select="self::node ()" mode="java-type">
+      <t:with-param name="set" select="false ()"/>
+    </t:apply-templates>
+    <t:text> </t:text>
+    <t:apply-templates select="self::node ()" mode="java-name">
+      <t:with-param name="set" select="false ()"/>
+    </t:apply-templates>
+    <t:text>();&#xA;</t:text>
+    
+    <t:if test="not (@dump:isReadOnly)">
+      <t:copy-of select="$indent"/>
+      <t:text>public </t:text>
+      <t:apply-templates select="self::node ()" mode="java-type">
+        <t:with-param name="set" select="true ()"/>
+      </t:apply-templates>
+      <t:text> </t:text>
+      <t:apply-templates select="self::node ()" mode="java-name">
+        <t:with-param name="set" select="true ()"/>
+      </t:apply-templates>
+      <t:text>(</t:text>
+      <t:apply-templates select="self::node ()" mode="java-type">
+        <t:with-param name="set" select="'param'"/>
+      </t:apply-templates>
+      <t:text> </t:text>
+      <t:apply-templates select="self::node ()" mode="java-name">
+        <t:with-param name="set" select="'param'"/>
+      </t:apply-templates>
+      <t:text>);&#xA;</t:text>
+    </t:if>
+    <t:text>&#xA;</t:text>
+  </t:template>
+  
+  <t:template match="dump:param[position () = 1]" mode="java-file">
+    <t:param name="indent" select="''"/>
+    <t:apply-templates select="self::node ()" mode="java-type"/>
+    <t:text> </t:text>
+    <t:apply-templates select="self::node ()" mode="java-name"/>
+  </t:template>
+  
+  <t:template match="dump:param[position () != 1]" mode="java-file">
+    <t:param name="indent" select="''"/>
+    <t:text>,&#xA;</t:text>
+    <t:copy-of select="$indent"/>
+    <t:apply-templates select="self::node ()" mode="java-type"/>
+    <t:text> </t:text>
+    <t:apply-templates select="self::node ()" mode="java-name"/>
+  </t:template>
+  
+  <t:template match="dump:module" mode="java-name">
+    <t:choose>
+    <t:when test="child::j:packageQualifiedName">
+      <code class="Java" lang="en" xml:lang="en">
+        <t:value-of select="child::j:packageQualifiedName"/>
+      </code>
+    </t:when>
+    <t:otherwise>
+      <code class="Java" lang="en" xml:lang="en">
+        <t:value-of select="@dump:localName"/>
+      </code>
+    </t:otherwise>
+    </t:choose>
+  </t:template>
+  
+  <t:template match="dump:module" mode="java-file-name-dir">
+    <t:variable name="name">
+      <t:choose>
+      <t:when test="child::j:packageQualifiedName">
+        <t:value-of select="child::j:packageQualifiedName"/>
+      </t:when>
+      <t:otherwise>
+        <t:value-of select="@dump:localName"/>
+      </t:otherwise>
+      </t:choose>
+    </t:variable>
+    <code class="file" lang="en" xml:lang="en">
+      <t:value-of select="translate ($name, '.', '/')"/>
+      <t:text>/</t:text>
+    </code>
+  </t:template>
+  
+  <t:template match="dump:interface" mode="java-file-name-dir">
+    <t:apply-templates select="parent::node ()" mode="java-file-name-dir"/>
+  </t:template>
+  
+  <t:template match="dump:interface | dump:dataType" mode="java-name">
+    <t:choose>
+    <t:when test="child::j:interfaceName">
+      <code class="Java" lang="en" xml:lang="en">
+        <t:value-of select="child::j:interfaceName"/>
+      </code>
+    </t:when>
+    <t:when test="child::j:className">
+      <code class="Java" lang="en" xml:lang="en">
+        <t:value-of select="child::j:interfaceName"/>
+      </code>
+    </t:when>
+    <t:otherwise>
+      <code class="Java" lang="en" xml:lang="en">
+        <t:value-of select="@dump:localName"/>
+      </code>
+    </t:otherwise>
+    </t:choose>
+  </t:template>
+  
+  <t:template match="dump:class" mode="java-name">
+    <t:choose>
+    <t:when test="child::j:className">
+      <code class="Java" lang="en" xml:lang="en">
+        <t:value-of select="child::j:interfaceName"/>
+      </code>
+    </t:when>
+    <t:otherwise>
+      <code class="Java" lang="en" xml:lang="en">
+        <t:value-of select="@dump:localName"/>
+      </code>
+    </t:otherwise>
+    </t:choose>
+  </t:template>
+  
+  <t:template match="dump:dataType[child::idl:java]" mode="java-name">
+    <t:variable name="v" select="string (child::idl:java/@dump:ref)"/>
+    <t:variable name="type" select="($anyIDLType | $allClass)[not (child::idl:java)]
+                                               [child::dump:uri/@dump:uri = $v]"/>
+    <t:apply-templates select="$type" mode="java-name"/>
+    <t:if test="not ($type)">
+      <t:value-of select="$v"/>
+    </t:if>
+  </t:template>
+  
+  <t:template match="dump:interface" mode="java-file-name-name">
+    <t:variable name="a">
+      <t:apply-templates select="self::node ()" mode="java-name"/>
+    </t:variable>
+    <code class="file" lang="en" xml:lang="en">
+      <t:value-of select="$a"/>
+      <t:text>.java</t:text>
+    </code>
+  </t:template>
+  
+  <t:template match="dump:method" mode="java-name">
+    <code class="Java" lang="en" xml:lang="en">
+      <t:value-of select="@dump:localName"/>
+    </code>
+  </t:template>
+  
+  <t:template match="dump:param" mode="java-name">
+    <code class="Java" lang="en" xml:lang="en">
+      <t:value-of select="@dump:localName"/>
+    </code>
+  </t:template>
+  
+  <t:template match="dump:attribute" mode="java-name">
+    <t:param name="set" select="false ()"/>
+    <code class="Java" lang="en" xml:lang="en">
+      <t:variable name="name" select="string (@dump:localName)"/>
+      <t:choose>
+      <t:when test="$set = 'param' or
+                    (substring ($name, 0, 2) = 'is' and $name != 'isMap')">
+        <t:value-of select="@dump:localName"/>
+      </t:when>
+      <t:otherwise>
+        <t:choose>
+        <t:when test="$set">set</t:when>
+        <t:otherwise>get</t:otherwise>
+        </t:choose>
+        <t:value-of select="translate (substring ($name, 1, 1),
+                                       'abcdefghijklmnopqrstuvwxyz',
+                                       'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"/>
+        <t:value-of select="substring ($name, 2)"/>
+      </t:otherwise>
+      </t:choose>
+    </code>
+  </t:template>
+  
+  <t:template match="dump:method" mode="java-type">
+    <t:variable name="typeName">
+      <t:choose>
+      <t:when test="child::dump:return/@dump:dataType">
+        <t:value-of select="child::dump:return/@dump:dataType"/>
+      </t:when>
+      <t:otherwise
+      >http://suika.fam.cx/~wakaba/archive/2004/dis/IDL#void</t:otherwise>
+      </t:choose>
+    </t:variable>
+    <t:apply-templates select="$anyIDLType[child::dump:uri/@dump:uri = $typeName]"
+        mode="java-name"/>
+  </t:template>
+  
+  <t:template match="dump:attribute" mode="java-type">
+    <t:param name="set" select="false ()"/>
+    <t:variable name="typeName">
+      <t:choose>
+      <t:when
+          test="$set">http://suika.fam.cx/~wakaba/archive/2004/dis/IDL#void</t:when>
+      <t:otherwise>
+        <t:value-of select="child::dump:get/@dump:dataType"/>
+      </t:otherwise>
+      </t:choose>
+    </t:variable>
+    <t:apply-templates select="$anyIDLType[child::dump:uri/@dump:uri = $typeName]"
+        mode="java-name"/>
+  </t:template>
+  
+  <t:template match="dump:param" mode="java-type">
+    <t:variable name="typeName">
+      <t:value-of select="@dump:dataType"/>
+    </t:variable>
+    <t:apply-templates select="$anyIDLType[child::dump:uri/@dump:uri = $typeName]"
+        mode="java-name"/>
+  </t:template>
+  
+  <t:template match="dump:extends" mode="java-name">
+    <t:variable name="u" select="string (@dump:uri)"/>
+    <t:variable name="v"
+        select="($allIDLInterface | $allClass)[child::dump:uri/@dump:uri = $u]"/>
+    <t:apply-templates select="$v" mode="java-name"/>
+    <t:if test="not ($v)">
+      <t:value-of select="$u"/>
+    </t:if>
+  </t:template>
+  
+  <t:template match="dump:module" mode="uri-java">
+    <t:apply-templates
+        select="$rootDocument/child::dump:document
+          [@dump:ref = current ()/child::dump:uri/@dump:uri]
+          [child::ddoc:as/@dump:uri =
+              'http://suika.fam.cx/~wakaba/archive/2004/dis/Java#Package']/
+          parent::node ()"
+        mode="doc-uri"/>
+  </t:template>
+  
+  <t:template match="dump:interface" mode="uri-java">
+    <t:apply-templates select="parent::node ()" mode="uri-java"/>
+    <t:text>#</t:text>
+    <t:apply-templates select="self::node ()" mode="id-java"/>
+  </t:template>
+
+<!-- ECMAScript Binding -->
+
+  <t:template match="dump:module" mode="es">
+    <t:param name="number" select="/parent::node ()"/>
+    <t:param name="rank" select="1"/>
+    <t:param name="docType" select="/parent::node ()"/>
+    
+    <div class="section" id="interfaces">
+      <t:apply-templates select="self::node ()" mode="heading">
+        <t:with-param name="number" select="$number"/>
+        <t:with-param name="rank" select="$rank"/>
+        <t:with-param name="docType" select="$docType"/>
+        <t:with-param name="value">
+          <t:call-template name="label-interfaces"/>
+        </t:with-param>
+      </t:apply-templates>
+      
+      <dl class="ecmascript-binding">
+        <t:apply-templates select="child::dump:interface" mode="es"/>
+      </dl>
+    </div>
+  </t:template>
+  
+  <t:template match="dump:interface" mode="es">
+    <t:variable name="name">
+      <t:apply-templates select="self::node ()" mode="es-name"/>
+    </t:variable>
+    <dt>
+      <t:apply-templates select="self::node ()" mode="id-attr-es"/>
+      <t:call-template name="label-objects-of-interface">
+        <t:with-param name="interface" select="$name"/>
+      </t:call-template>
+    </dt>
+    <dd>
+      <dl>
+        <t:apply-templates select="child::dump:extends" mode="es">
+          <t:with-param name="interface" select="$name"/>
+        </t:apply-templates>
+        <t:if test="child::dump:attribute[not (@dump:ref)]">
+          <dt>
+            <t:call-template name="label-properties-of-objects-of-interface">
+              <t:with-param name="interface" select="$name"/>
+            </t:call-template>
+          </dt>
+          <t:apply-templates select="child::dump:attribute[not (@dump:ref)]"
+              mode="es"/>
+        </t:if>
+        <t:if test="child::dump:method[not (@dump:ref)]">
+          <dt>
+            <t:call-template name="label-functions-of-objects-of-interface">
+              <t:with-param name="interface" select="$name"/>
+            </t:call-template>
+          </dt>
+          <t:apply-templates select="child::dump:method[not (@dump:ref)]" mode="es"/>
+        </t:if>
+      </dl>
+    </dd>
+  </t:template>
+  
+  <t:template match="child::dump:extends" mode="es">
+    <t:param name="interface">
+      <t:apply-templates select="parent::node ()" mode="es-name"/>
+    </t:param>
+    <dd>
+      <t:call-template name="desc-properties-functions-of-super-interface">
+        <t:with-param name="interface" select="$interface"/>
+        <t:with-param name="superInterface">
+          <t:variable name="siURI" select="string (@dump:uri)"/>
+          <t:variable name="siNode"
+              select="$allIDLInterface[child::dump:uri/@dump:uri = $siURI]"/>
+          <t:apply-templates select="$siNode" mode="es-name"/>
+          <t:if test="not ($siNode)">
+            <t:value-of select="$siURI"/>
+          </t:if>
+        </t:with-param>
+        <t:with-param name="hasOtherMember"
+            select="boolean (parent::node ()/
+                               child::dump:attribute[not (@dump:ref)] or
+                             parent::node ()/child::dump:method[not (@dump:ref)])"/>
+      </t:call-template>
+    </dd>
+  </t:template>
+  
+  <t:template match="dump:attribute" mode="es">
+    <dd>
+      <dl class="ecmascript-binding-attribute">
+        <dt>
+          <dfn>
+            <t:apply-templates select="self::node ()" mode="es-name"/>
+          </dfn>
+        </dt>
+        <dd>
+          <t:call-template name="desc-property-value-type-is">
+            <t:with-param name="isReadOnly" select="boolean (@dump:isReadOnly)"/>
+            <t:with-param name="valueDesc">
+              <t:apply-templates select="self::node ()" mode="es-type"/>
+            </t:with-param>
+          </t:call-template>
+        </dd>
+      </dl>
+    </dd>
+  </t:template>
+  
+  <t:template match="dump:method" mode="es">
+    <t:variable name="methodName">
+      <t:apply-templates select="self::node ()" mode="es-name"/>
+    </t:variable>
+    <dd>
+      <dl class="ecmaescript-binding-method">
+        <dt>
+          <dfn>
+            <code class="JS">
+              <t:copy-of select="$methodName"/>
+              <t:text>(</t:text>
+              <t:apply-templates select="child::dump:param[position () = 1]"
+                  mode="es-name"/>
+              <t:for-each select="child::dump:param[position () != 1]">
+                <t:text>, </t:text>
+                <t:apply-templates select="self::node ()" mode="es-name"/>
+              </t:for-each>
+              <t:text>)</t:text>
+            </code>
+          </dfn>
+        </dt>
+        <dd>
+          <t:call-template name="desc-function-return-type-is">
+            <t:with-param name="valueDesc">
+              <t:apply-templates select="self::node ()" mode="es-type"/>
+            </t:with-param>
+          </t:call-template>
+        </dd>
+        <t:apply-templates select="child::dump:param" mode="es"/>
+        <t:if test="child::dis:Operator/@dump:ref =
+                    'http://suika.fam.cx/~wakaba/archive/2004/dis/Lang#ArrayGet'">
+          <dd>
+            <div class="note memo">
+              <t:call-template name="desc-array-dereference-method">
+                <t:with-param name="methodName">
+                  <t:copy-of select="$methodName"/>
+                </t:with-param>
+                <t:with-param name="paramName">
+                  <t:apply-templates select="child::dump:param[position () = 1]"
+                      mode="es-name"/>
+                </t:with-param>
+              </t:call-template>
+            </div>
+          </dd>
+        </t:if>
+      </dl>
+    </dd>
+  </t:template>
+  
+  <t:template match="dump:param" mode="es">
+    <dd>
+      <t:call-template name="desc-param-type-is">
+        <t:with-param name="name">
+          <t:apply-templates select="self::node ()" mode="es-name"/>
+        </t:with-param>
+        <t:with-param name="valueDesc">
+          <t:apply-templates select="self::node ()" mode="es-type"/>
+        </t:with-param>
+      </t:call-template>
+    </dd>
+  </t:template>
+  
+  <t:template match="dump:interface | dump:dataType" mode="es-name">
+    <t:choose>
+    <t:when test="child::js:typeName">
+      <code class="JS" lang="en" xml:lang="en">
+        <t:value-of select="child::js:typeName"/>
+      </code>
+    </t:when>
+    <t:otherwise>
+      <code class="JS" lang="en" xml:lang="en">
+        <t:value-of select="@dump:localName"/>
+      </code>
+    </t:otherwise>
+    </t:choose>
+  </t:template>
+  
+  <t:template match="dump:dataType[child::idl:ecmascript]" mode="es-name">
+    <t:variable name="v" select="string (child::idl:ecmascript/@dump:ref)"/>
+    <t:variable name="type" select="$anyIDLType[not (child::idl:ecmascript)]
+                                               [child::dump:uri/@dump:uri = $v]"/>
+    <t:apply-templates select="$type" mode="es-name"/>
+    <t:if test="not ($type)">
+      <t:value-of select="$v"/>
+    </t:if>
+  </t:template>
+  
+  <t:template match="dump:method | dump:attribute | dump:param" mode="es-name">
+    <code class="JS" lang="en" xml:lang="en">
+      <t:value-of select="@dump:localName"/>
+    </code>
+  </t:template>
+  
+  <t:template match="dump:method | dump:attribute | dump:param" mode="es-type">
+    <t:variable name="typeName">
+      <t:value-of select="@dump:dataType |
+                          child::dump:return/@dump:dataType |
+                          child::dump:get/@dump:dataType"/>
+    </t:variable>
+    <t:variable name="type"
+        select="$anyIDLType[child::dump:uri/@dump:uri = $typeName]"/>
+    <t:choose>
+    <t:when test="$type/self::dump:interface">
+      <t:call-template name="label-object-of-interface">
+        <t:with-param name="interface">
+          <t:apply-templates select="$type" mode="es-name"/>
+        </t:with-param>
+      </t:call-template>
+    </t:when>
+    <t:when test="$type/self::dump:dataType">
+      <t:call-template name="label-type-is">
+        <t:with-param name="type">
+          <t:apply-templates select="$type" mode="es-name"/>
+        </t:with-param>
+      </t:call-template>
+    </t:when>
+    <t:when test="$type">
+      <t:value-of select="$type"/>
+    </t:when>
+    <t:otherwise/>
+    </t:choose>
+  </t:template>
+  
+  <t:template match="dump:module" mode="uri-es">
+    <t:apply-templates
+        select="$rootDocument/child::dump:document
+          [@dump:ref = current ()/child::dump:uri/@dump:uri]
+          [child::ddoc:as/@dump:uri = '&f;ECMAScriptBindingDefinition']/
+          parent::node ()"
+        mode="doc-uri"/>
+  </t:template>
+  
+  <t:template match="dump:interface" mode="uri-es">
+    <t:apply-templates select="parent::node ()" mode="uri-es"/>
+    <t:text>#</t:text>
+    <t:apply-templates select="self::node ()" mode="id-es"/>
+  </t:template>
+  
+  <t:template match="dump:*" mode="id-attr-es">
+    <t:attribute name="id">
+      <t:apply-templates select="self::node ()" mode="id-es"/>
+    </t:attribute>
+  </t:template>
+  
+  <t:template match="dump:interface" mode="id-es">
+    <t:text>ecmascript-binding-</t:text>
+    <t:variable name="v">
+      <t:apply-templates select="self::node ()" mode="es-name"/>
+    </t:variable>
+    <t:value-of select="$v"/>
+  </t:template>
+  
+<!-- Perl Binding -->
+
+  <t:template match="dump:module" mode="pl">
+    <t:param name="number" select="/parent::node ()"/>
+    <t:param name="rank" select="1"/>
+    <t:param name="docType" select="/parent::node ()"/>
+    
+    <div class="section" id="interfaces">
+      <t:apply-templates select="self::node ()" mode="heading">
+        <t:with-param name="number" select="$number"/>
+        <t:with-param name="rank" select="$rank"/>
+        <t:with-param name="docType" select="$docType"/>
+        <t:with-param name="value">
+          <t:call-template name="label-interfaces"/>
+        </t:with-param>
+      </t:apply-templates>
+
+      <dl class="perl-binding">
+        <t:apply-templates select="child::dump:interface" mode="pl"/>
+      </dl>
+    </div>
+  </t:template>
+  
+  <t:template match="dump:interface" mode="pl">
+    <t:variable name="name">
+      <t:apply-templates select="self::node ()" mode="pl-name"/>
+    </t:variable>
+    <dt>
+      <t:apply-templates select="self::node ()" mode="id-attr-pl"/>
+      <t:call-template name="prefix-interface"/>
+      <dfn>
+        <t:copy-of select="$name"/>
+      </dfn>
+    </dt>
+    <t:apply-templates select="child::dump:extends" mode="pl">
+      <t:with-param name="interface" select="$name"/>
+    </t:apply-templates>
+    <dd>
+      <t:if test="child::dump:method[not (@dump:ref)] or
+                  child::dump:attribute[not (@dump:ref)]">
+        <dl class="perl-binding-methods">
+          <t:apply-templates
+              select="child::dump:method[not (@dump:ref)] |
+                      child::dump:attribute[not (@dump:ref)]" mode="pl"/>
+        </dl>
+      </t:if>
+    </dd>
+  </t:template>
+  
+  <t:template match="dump:method" mode="pl">
+    <dt>
+      <t:apply-templates select="self::node ()" mode="id-attr-pl"/>
+      <t:call-template name="prefix-method"/>
+      <dfn>
+        <code class="perl">
+          <t:apply-templates select="self::node ()" mode="pl-name"/>
+          <t:text> (</t:text>
+          <t:apply-templates select="child::dump:param[position () = 1]"
+              mode="pl-name"/>
+          <t:for-each select="child::dump:param[position () != 1]">
+            <t:text>, </t:text>
+            <t:apply-templates select="self::node ()" mode="pl-name"/>
+          </t:for-each>
+          <t:text>)</t:text>
+        </code>
+      </dfn>
+    </dt>
+    <dd>
+      <t:call-template name="desc-method-return-type-is">
+        <t:with-param name="valueDesc">
+          <t:apply-templates select="self::node ()" mode="pl-type"/>
+        </t:with-param>
+      </t:call-template>
+    </dd>
+    <t:apply-templates select="child::dump:param" mode="pl"/>
+  </t:template>
+  
+  <t:template match="dump:param" mode="pl">
+    <dd>
+      <t:apply-templates select="self::node ()" mode="id-attr-pl"/>
+      <t:call-template name="desc-param-type-is">
+        <t:with-param name="name">
+          <t:apply-templates select="self::node ()" mode="pl-name"/>
+        </t:with-param>
+        <t:with-param name="valueDesc">
+          <t:apply-templates select="self::node ()" mode="pl-type"/>
+        </t:with-param>
+      </t:call-template>
+      <t:if test="@dump:isNullable and
+                  not (following-sibling::dump:param[not (@dump:isNullable)])">
+        <t:call-template name="desc-param-is-optional"/>
+      </t:if>
+    </dd>
+  </t:template>
+  
+  <t:template match="dump:attribute" mode="pl">
+    <t:variable name="name">
+      <t:apply-templates select="self::node ()" mode="pl-name"/>
+    </t:variable>
+    <t:variable name="valueDesc">
+      <t:apply-templates select="self::node ()" mode="pl-type"/>
+    </t:variable>
+    <t:variable name="newValueParam">
+    <t:if test="not (@dump:isReadOnly)">
+      <var lang="en" xml:lang="en">
+        <t:text>$</t:text>
+        <t:value-of select="$name"/>
+      </var>
+    </t:if>
+    </t:variable>
+    <dt>
+      <t:apply-templates select="self::node ()" mode="id-attr-pl"/>
+      <t:call-template name="prefix-method"/>
+      <dfn>
+        <code class="perl">
+          <t:copy-of select="$name"/>
+          <t:text> (</t:text>
+          <t:copy-of select="$newValueParam"/>
+          <t:text>)</t:text>
+        </code>
+      </dfn>
+    </dt>
+    <dd>
+      <t:call-template name="desc-attribute-return-type-is">
+        <t:with-param name="valueDesc" select="$valueDesc"/>
+        <t:with-param name="newValueParam" select="$newValueParam"/>
+      </t:call-template>
+    </dd>
+    <t:if test="not (@dump:isReadOnly)">
+      <dd>
+        <t:attribute name="id">
+          <t:apply-templates select="self::node ()" mode="id-pl"/>
+          <t:text>-param-</t:text>
+          <t:value-of select="translate ($newValueParam, '$', '_')"/>
+        </t:attribute>
+        <t:call-template name="desc-param-type-is">
+          <t:with-param name="name" select="$newValueParam"/>
+          <t:with-param name="valueDesc" select="$valueDesc"/>
+        </t:call-template>
+        <t:call-template name="desc-param-is-optional"/>
+      </dd>
+    </t:if>
+  </t:template>
+  
+  <t:template match="dump:interface | dump:method |
+                     dump:attribute | dump:constGroup |
+                     dump:const | dump:dataType" mode="pl-name">
+    <t:choose>
+    <t:when test="child::dump:perlPackageName">
+      <code class="perl" lang="en" xml:lang="en">
+        <t:value-of select="child::dump:perlPackageName"/>
+      </code>
+    </t:when>
+    <t:when test="child::dump:perlName">
+      <code class="perl" lang="en" xml:lang="en">
+        <t:value-of select="child::dump:perlName"/>
+      </code>
+    </t:when>
+    <t:otherwise>
+      <code class="perl" lang="en" xml:lang="en">
+        <t:value-of select="@dump:localName"/>
+      </code>
+    </t:otherwise>
+    </t:choose>
+  </t:template>
+  
+  <t:template match="dump:interface | dump:dataType" mode="id-pl">
+    <t:text>perl-binding-</t:text>
+    <t:variable name="v">
+      <t:apply-templates select="self::node ()" mode="pl-name"/>
+    </t:variable>
+    <t:value-of select="translate ($v, ':', '_')"/>
+  </t:template>
+  
+  <t:template match="dump:method | dump:attribute | dump:constGroup |
+                     dump:const" mode="id-pl">
+    <t:apply-templates select="parent::node ()" mode="id-pl"/>
+    <t:text>-</t:text>
+    <t:variable name="v">
+      <t:apply-templates select="self::node ()" mode="pl-name"/>
+    </t:variable>
+    <t:value-of select="$v"/>
+  </t:template>
+  
+  <t:template match="dump:param" mode="id-pl">
+    <t:apply-templates select="parent::node ()" mode="id-pl"/>
+    <t:text>-</t:text>
+    <t:variable name="v">
+      <t:apply-templates select="self::node ()" mode="pl-name"/>
+    </t:variable>
+    <t:value-of select="translate ($v, '$@%:', '____')"/>
+  </t:template>
+  
+  <t:template match="dump:*" mode="id-attr-pl">
+    <t:attribute name="id">
+      <t:apply-templates select="self::node ()" mode="id-pl"/>
+    </t:attribute>
+  </t:template>
+  
+  <t:template match="dump:dataType[child::idl:perl]" mode="pl-name">
+    <t:variable name="v" select="string (child::idl:perl/@dump:ref)"/>
+    <t:variable name="type" select="$anyIDLType[not (child::idl:perl)]
+                                               [child::dump:uri/@dump:uri = $v]"/>
+    <t:apply-templates select="$type" mode="pl-name"/>
+    <t:if test="not ($type)">
+      <t:value-of select="$v"/>
+    </t:if>
+  </t:template>
+  
+  <t:template match="dump:dataType
+                     [child::dump:uri/@dump:uri =
+                     'http://suika.fam.cx/~wakaba/archive/2004/dis/Perl#Number']"
+      mode="pl-name">
+    <t:call-template name="desc-perl-number"/>
+  </t:template>
+  
+  <t:template match="dump:dataType
+             [child::dump:uri/@dump:uri =
+             'http://suika.fam.cx/~wakaba/archive/2004/dis/Perl#CharacterString']"
+      mode="pl-name">
+    <t:call-template name="desc-perl-character-string"/>
+  </t:template>
+  
+  <t:template match="dump:dataType
+             [child::dump:uri/@dump:uri =
+             'http://suika.fam.cx/~wakaba/archive/2004/dis/Perl#Object']"
+      mode="pl-name">
+    <t:call-template name="desc-perl-object"/>
+  </t:template>
+  
+  <t:template match="dump:dataType
+             [child::dump:uri/@dump:uri =
+             'http://suika.fam.cx/~wakaba/archive/2004/dis/Perl#Boolean']"
+      mode="pl-name">
+    <t:call-template name="desc-perl-boolean"/>
+  </t:template>
+  
+  <t:template match="dump:param" mode="pl-name">
+    <t:choose>
+    <t:when test="child::dump:perlName">
+      <var class="perl" lang="en" xml:lang="en">
+        <t:value-of select="@dump:prefix"/>
+        <t:value-of select="child::dump:perlName"/>
+      </var>
+    </t:when>
+    <t:otherwise>
+      <var class="perl" lang="en" xml:lang="en">
+        <t:value-of select="@dump:prefix"/>
+        <t:value-of select="@dump:localName"/>
+      </var>
+    </t:otherwise>
+    </t:choose>
+  </t:template>
+  
+  <t:template match="dump:method | dump:attribute | dump:param" mode="pl-type">
+    <t:variable name="typeName">
+      <t:value-of select="@dump:dataType |
+                          child::dump:return/@dump:dataType |
+                          child::dump:get/@dump:dataType"/>
+    </t:variable>
+    <t:variable name="type"
+        select="$anyIDLType[child::dump:uri/@dump:uri = $typeName]"/>
+    <t:choose>
+    <t:when test="$type/self::dump:interface">
+      <t:call-template name="label-object-of-interface">
+        <t:with-param name="interface">
+          <t:apply-templates select="$type" mode="pl-name"/>
+        </t:with-param>
+      </t:call-template>
+    </t:when>
+    <t:when test="$type/self::dump:dataType">
+      <t:apply-templates select="$type" mode="pl-name"/>
+    </t:when>
+    <t:when test="$type">
+      <t:value-of select="$type"/>
+    </t:when>
+    <t:otherwise/>
+    </t:choose>
+  </t:template>
+  
+  <t:template match="child::dump:extends" mode="pl">
+    <t:param name="interface">
+      <t:apply-templates select="parent::node ()" mode="pl-name"/>
+    </t:param>
+    <dd>
+      <t:call-template name="desc-methods-of-super-interface">
+        <t:with-param name="interface" select="$interface"/>
+        <t:with-param name="superInterface">
+          <t:variable name="siURI" select="string (@dump:uri)"/>
+          <t:variable name="siNode"
+              select="$allIDLInterface[child::dump:uri/@dump:uri = $siURI]"/>
+          <t:apply-templates select="$siNode" mode="pl-name"/>
+          <t:if test="not ($siNode)">
+            <t:value-of select="$siURI"/>
+          </t:if>
+        </t:with-param>
+        <t:with-param name="hasOtherMember"
+            select="boolean (parent::node ()/
+                               child::dump:attribute[not (@dump:ref)] or
+                             parent::node ()/child::dump:method[not (@dump:ref)])"/>
+      </t:call-template>
+    </dd>
+  </t:template>
+  
+  <t:template match="dump:module" mode="uri-pl">
+    <t:apply-templates
+        select="$rootDocument/child::dump:document
+          [@dump:ref = current ()/child::dump:uri/@dump:uri]
+          [child::ddoc:as/@dump:uri = '&f;PerlBindingDefinition']/parent::node ()"
+        mode="doc-uri"/>
+  </t:template>
+  
+  <t:template match="dump:interface" mode="uri-pl">
+    <t:apply-templates select="parent::node ()" mode="uri-pl"/>
+    <t:text>#</t:text>
+    <t:apply-templates select="self::node ()" mode="id-pl"/>
+  </t:template>
+
 <!-- Unknowns -->
 
   <t:template match="child::*" mode="dom-document">
@@ -1219,6 +2549,15 @@
   <t:template match="child::*" mode="idl-file">
     <t:apply-templates select="self::node ()" mode="unknown"/>
   </t:template>
+  <t:template match="child::*" mode="idl-file-name">
+    <t:apply-templates select="self::node ()" mode="unknown"/>
+  </t:template>
+  <t:template match="child::*" mode="idl-file-dir">
+    <t:apply-templates select="self::node ()" mode="unknown"/>
+  </t:template>
+  <t:template match="child::*" mode="idl-const-name">
+    <t:apply-templates select="self::node ()" mode="unknown"/>
+  </t:template>
   <t:template match="child::*" mode="idl-name">
     <t:apply-templates select="self::node ()" mode="unknown"/>
   </t:template>
@@ -1228,10 +2567,76 @@
   <t:template match="child::*" mode="doc-uri">
     <t:apply-templates select="self::node ()" mode="unknown"/>
   </t:template>
+  <t:template match="child::*" mode="java">
+    <t:apply-templates select="self::node ()" mode="unknown"/>
+  </t:template>
+  <t:template match="child::*" mode="java-name">
+    <t:apply-templates select="self::node ()" mode="unknown"/>
+  </t:template>
+  <t:template match="child::*" mode="java-file-name-dir">
+    <t:apply-templates select="self::node ()" mode="unknown"/>
+  </t:template>
+  <t:template match="child::*" mode="java-file-name-name">
+    <t:apply-templates select="self::node ()" mode="unknown"/>
+  </t:template>
+  <t:template match="child::*" mode="java-file">
+    <t:apply-templates select="self::node ()" mode="unknown"/>
+  </t:template>
+  <t:template match="child::*" mode="java-name">
+    <t:apply-templates select="self::node ()" mode="unknown"/>
+  </t:template>
+  <t:template match="*" mode="java-type">
+    <t:apply-templates select="self::node ()" mode="unknown"/>
+  </t:template>
+  <t:template match="*" mode="es">
+    <t:apply-templates select="self::node ()" mode="unknown"/>
+  </t:template>
+  <t:template match="*" mode="es-name">
+    <t:apply-templates select="self::node ()" mode="unknown"/>
+  </t:template>
+  <t:template match="*" mode="es-type">
+    <t:apply-templates select="self::node ()" mode="unknown"/>
+  </t:template>
+  <t:template match="*" mode="pl">
+    <t:apply-templates select="self::node ()" mode="unknown"/>
+  </t:template>
+  <t:template match="*" mode="pl-name">
+    <t:apply-templates select="self::node ()" mode="unknown"/>
+  </t:template>
+  <t:template match="*" mode="pl-type">
+    <t:apply-templates select="self::node ()" mode="unknown"/>
+  </t:template>
+  <t:template match="*" mode="uri-java">
+    <t:apply-templates select="self::node ()" mode="unknown"/>
+  </t:template>
+  <t:template match="*" mode="uri-es">
+    <t:apply-templates select="self::node ()" mode="unknown"/>
+  </t:template>
+  <t:template match="*" mode="uri-pl">
+    <t:apply-templates select="self::node ()" mode="unknown"/>
+  </t:template>
+  <t:template match="*" mode="id-java">
+    <t:apply-templates select="self::node ()" mode="unknown"/>
+  </t:template>
+  <t:template match="*" mode="id-attr-java">
+    <t:apply-templates select="self::node ()" mode="unknown"/>
+  </t:template>
+  <t:template match="*" mode="id-es">
+    <t:apply-templates select="self::node ()" mode="unknown"/>
+  </t:template>
+  <t:template match="*" mode="id-attr-es">
+    <t:apply-templates select="self::node ()" mode="unknown"/>
+  </t:template>
+  <t:template match="*" mode="id-pl">
+    <t:apply-templates select="self::node ()" mode="unknown"/>
+  </t:template>
+  <t:template match="*" mode="id-attr-pl">
+    <t:apply-templates select="self::node ()" mode="unknown"/>
+  </t:template>
 
 </t:stylesheet>
 
-<!-- Revision: $Date: 2005/10/01 12:17:37 $ -->
+<!-- Revision: $Date: 2005/10/05 11:38:26 $ -->
 
 <!-- ***** BEGIN LICENSE BLOCK *****
    - Copyright 2005 Wakaba <w@suika.fam.cx>.  All rights reserved.

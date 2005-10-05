@@ -28,13 +28,15 @@
       select="'http://suika.fam.cx/www/style/html/xhtml'"/>
   <t:param name="is-html-style-sheet-uri-relative" select="false ()"/>
   
+  <t:variable name="allModules"
+        select="/child::dump:moduleSet/child::dump:module"/>
   <t:variable name="allClass"
-        select="/child::dump:moduleSet/child::dump:module/child::dump:class"/>
+        select="$allModules/child::dump:class"/>
   <t:variable name="anyClass"
         select="$allClass |
-                /child::dump:moduleSet/child::dump:module/child::dump:interface"/>
+                $allModules/child::dump:interface"/>
   <t:variable name="allDataType"
-        select="/child::dump:moduleSet/child::dump:module/child::dump:dataType"/>
+        select="$allModules/child::dump:dataType"/>
 
   <t:template name="global-lang-attr">
     <t:attribute name="lang">ja</t:attribute>
@@ -188,6 +190,11 @@
   
   <t:template name="prefix-module-attr">モジュール </t:template>
   
+  <t:template name="prefix-package">
+    <span lang="ja" xml:lang="ja">パッケージ</span>
+    <t:value-of select="' '"/>
+  </t:template>
+  
   <t:template name="suffix-attr">
     <t:value-of select="' '"/>
     <span lang="ja" xml:lang="ja" class="weak">(属性)</span>
@@ -225,6 +232,28 @@
   
   <t:template name="label-attributes">
     <span lang="ja" xml:lang="ja">属性</span>
+  </t:template>
+  
+  <t:template name="label-bindings">
+    <span lang="ja" xml:lang="ja">束縛</span>
+  </t:template>
+  
+  <t:template name="label-java-binding">
+    <span lang="en" xml:lang="en">Java</span>
+    <t:text> </t:text>
+    <span lang="ja" xml:lang="ja">束縛</span>
+  </t:template>
+  
+  <t:template name="label-ecma-script-binding">
+    <span lang="en" xml:lang="en">ECMAScript</span>
+    <t:text> </t:text>
+    <span lang="ja" xml:lang="ja">束縛</span>
+  </t:template>
+  
+  <t:template name="label-perl-binding">
+    <span lang="en" xml:lang="en">Perl</span>
+    <t:text> </t:text>
+    <span lang="ja" xml:lang="ja">束縛</span>
   </t:template>
   
   <t:template name="label-const-groups">
@@ -358,6 +387,42 @@
     <span lang="ja" xml:lang="ja">上書きされている定義</span>
   </t:template>
   
+  <t:template name="label-object-of-interface">
+    <t:param name="interface"/>
+    <span lang="ja" xml:lang="ja">
+      <t:text>界面 </t:text>
+      <t:copy-of select="$interface"/>
+      <t:text>を実装した物体</t:text>
+    </span>
+  </t:template>
+  
+  <t:template name="label-objects-of-interface">
+    <t:param name="interface"/>
+    <span lang="ja" xml:lang="ja">
+      <t:text>界面 </t:text>
+      <t:copy-of select="$interface"/>
+      <t:text>を実装した物体</t:text>
+    </span>
+  </t:template>
+  
+  <t:template name="label-functions-of-objects-of-interface">
+    <t:param name="interface"/>
+    <span lang="ja" xml:lang="ja">
+      <t:text>界面 </t:text>
+      <t:copy-of select="$interface"/>
+      <t:text>を実装した物体の関数</t:text>
+    </span>
+  </t:template>
+  
+  <t:template name="label-properties-of-objects-of-interface">
+    <t:param name="interface"/>
+    <span lang="ja" xml:lang="ja">
+      <t:text>界面 </t:text>
+      <t:copy-of select="$interface"/>
+      <t:text>を実装した物体の特性</t:text>
+    </span>
+  </t:template>
+  
   <t:template name="label-parameters">
     <span lang="ja" xml:lang="ja">引数</span>
   </t:template>
@@ -398,6 +463,11 @@
     <span lang="ja" xml:lang="ja">なし</span>
   </t:template>
   
+  <t:template name="label-type-is">
+    <t:param name="type"/>
+    <t:copy-of select="$type"/>
+  </t:template>
+  
   <t:template name="label-type-definition">
     <span lang="ja" xml:lang="ja">型定義</span>
   </t:template>
@@ -435,6 +505,157 @@
     <t:param name="param"/>
     <t:copy-of select="$param"/>
     <t:value-of select="' が指定されていない場合。'"/>
+  </t:template>
+  
+  <t:template name="desc-array-dereference-method">
+    <t:param name="methodName"/>
+    <t:param name="paramName"/>
+    <span lang="ja" xml:lang="ja">
+      <t:text>この物体は角括弧記法 (例: </t:text>
+      <code class="JS" lang="en" xml:lang="en"><var>obj</var>[1]</code>
+      <t:text>) を使って参照を解くこともできます。整数 </t:text>
+      <t:copy-of select="$paramName"/>
+      <t:text> を使って参照を解くことは、関数 </t:text>
+      <t:copy-of select="$methodName"/>
+      <t:text> をその</t:text>
+      <t:copy-of select="$methodName"/>
+      <t:text>で呼出すことと等価です。</t:text>
+    </span>
+  </t:template>
+  
+  <t:template name="desc-function-return-type-is">
+    <t:param name="valueDesc"/>
+    <span lang="ja" xml:lang="ja">
+      <t:text>この関数は</t:text>
+      <t:choose>
+      <t:when test="string-length ($valueDesc)">
+        <t:copy-of select="$valueDesc"/>
+        <t:text>を返します。</t:text>
+      </t:when>
+      <t:otherwise>値を返しません。</t:otherwise>
+      </t:choose>
+    </span>
+  </t:template>
+  
+  <t:template name="desc-method-return-type-is">
+    <t:param name="valueDesc"/>
+    <span lang="ja" xml:lang="ja">
+      <t:text>このメソッドは</t:text>
+      <t:choose>
+      <t:when test="string-length ($valueDesc)">
+        <t:copy-of select="$valueDesc"/>
+        <t:text>を返します。</t:text>
+      </t:when>
+      <t:otherwise>値を返しません。</t:otherwise>
+      </t:choose>
+    </span>
+  </t:template>
+  
+  <t:template name="desc-attribute-return-type-is">
+    <t:param name="valueDesc"/>
+    <t:param name="newValueParam"/>
+    <span lang="ja" xml:lang="ja">
+      <t:text>このメソッドは</t:text>
+      <t:if test="string-length ($newValueParam)">
+        <t:text>引数 </t:text>
+        <t:copy-of select="$newValueParam"/>
+        <t:text> が指定されていなければ</t:text>
+      </t:if>
+      <t:choose>
+      <t:when test="string-length ($valueDesc)">
+        <t:copy-of select="$valueDesc"/>
+        <t:text>を返します。</t:text>
+      </t:when>
+      <t:otherwise>値を返しません。</t:otherwise>
+      </t:choose>
+      <t:if test="string-length ($newValueParam)">
+        <t:text>引数 </t:text>
+        <t:copy-of select="$newValueParam"/>
+        <t:text> が指定されていれば値は返しません。</t:text>
+      </t:if>
+    </span>
+  </t:template>
+  
+  <t:template name="desc-param-is-optional">
+    <span lang="ja" xml:lang="ja">
+      <t:text>この引数は省略可能です。</t:text>
+    </span>
+  </t:template>
+  
+  <t:template name="desc-param-type-is">
+    <t:param name="name"/>
+    <t:param name="valueDesc"/>
+    <span lang="ja" xml:lang="ja">
+      <t:text>引数 </t:text>
+      <t:copy-of select="$name"/>
+      <t:text> は</t:text>
+      <t:copy-of select="$valueDesc"/>
+      <t:text>です。</t:text>
+    </span>
+  </t:template>
+  
+  <t:template name="desc-perl-boolean">
+    <em lang="ja" xml:lang="ja">真理値</em>
+  </t:template>
+  
+  <t:template name="desc-perl-number">
+    <em lang="ja" xml:lang="ja">数値</em>
+  </t:template>
+  
+  <t:template name="desc-perl-object">
+    <em lang="ja" xml:lang="ja">物体</em>
+  </t:template>
+  
+  <t:template name="desc-perl-character-string">
+    <em lang="ja" xml:lang="ja">文字列</em>
+  </t:template>
+  
+  <t:template name="desc-properties-functions-of-super-interface">
+    <t:param name="interface"/>
+    <t:param name="superInterface"/>
+    <t:param name="hasOtherMember" select="false ()"/>
+    <span lang="ja" xml:lang="ja">
+      <t:text>界面 </t:text>
+      <t:copy-of select="$interface"/>
+      <t:text>を実装した物体は、</t:text>
+      <t:if test="$hasOtherMember">
+        <t:text>次に定義する特性と関数に加えて、</t:text>
+      </t:if>
+      <t:text>界面 </t:text>
+      <t:copy-of select="$superInterface"/>
+      <t:text>のすべての特性と関数をも持ちます。</t:text>
+    </span>
+  </t:template>
+  
+  <t:template name="desc-methods-of-super-interface">
+    <t:param name="interface"/>
+    <t:param name="superInterface"/>
+    <t:param name="hasOtherMember" select="false ()"/>
+    <span lang="ja" xml:lang="ja">
+      <t:text>界面 </t:text>
+      <t:copy-of select="$interface"/>
+      <t:text>を実装した物体は、</t:text>
+      <t:if test="$hasOtherMember">
+        <t:text>次に定義するメソッドに加えて、</t:text>
+      </t:if>
+      <t:text>界面 </t:text>
+      <t:copy-of select="$superInterface"/>
+      <t:text>のすべてのメソッドをも持ちます。</t:text>
+    </span>
+  </t:template>
+  
+  <t:template name="desc-property-value-type-is">
+    <t:param name="valueDesc"/>
+    <t:param name="isReadOnly" select="false ()"/>
+    <span lang="ja" xml:lang="ja">
+      <t:text>この</t:text>
+      <t:if test="$isReadOnly">
+        <t:text>読取専用の</t:text>
+      </t:if>
+      <t:text>属性は</t:text>
+      <t:copy-of select="$valueDesc"/>
+      <t:text>です。</t:text>
+    </span>
   </t:template>
   
   <t:template name="space">
@@ -3115,6 +3336,7 @@
     <t:param name="rank" select="1"/>
     <t:param name="docType" select="/parent::node ()"/>
     <t:param name="number" select="/parent::node ()"/>
+    <t:param name="value" select="/parent::node ()"/>
     <t:choose>
     <t:when test="$rank = 1">
       <h1>
@@ -3122,6 +3344,7 @@
           <t:with-param name="rank" select="$rank"/>
           <t:with-param name="docType" select="$docType"/>
           <t:with-param name="number" select="$number"/>
+          <t:with-param name="value" select="$value"/>
         </t:apply-templates>
       </h1>
     </t:when>
@@ -3131,6 +3354,7 @@
           <t:with-param name="rank" select="$rank"/>
           <t:with-param name="docType" select="$docType"/>
           <t:with-param name="number" select="$number"/>
+          <t:with-param name="value" select="$value"/>
         </t:apply-templates>
       </h2>
     </t:when>
@@ -3140,6 +3364,7 @@
           <t:with-param name="rank" select="$rank"/>
           <t:with-param name="docType" select="$docType"/>
           <t:with-param name="number" select="$number"/>
+          <t:with-param name="value" select="$value"/>
         </t:apply-templates>
       </h3>
     </t:when>
@@ -3149,6 +3374,7 @@
           <t:with-param name="rank" select="$rank"/>
           <t:with-param name="docType" select="$docType"/>
           <t:with-param name="number" select="$number"/>
+          <t:with-param name="value" select="$value"/>
         </t:apply-templates>
       </h4>
     </t:when>
@@ -3158,6 +3384,7 @@
           <t:with-param name="rank" select="$rank"/>
           <t:with-param name="docType" select="$docType"/>
           <t:with-param name="number" select="$number"/>
+          <t:with-param name="value" select="$value"/>
         </t:apply-templates>
       </h5>
     </t:when>
@@ -3167,6 +3394,7 @@
           <t:with-param name="rank" select="$rank"/>
           <t:with-param name="docType" select="$docType"/>
           <t:with-param name="number" select="$number"/>
+          <t:with-param name="value" select="$value"/>
         </t:apply-templates>
       </h6>
     </t:otherwise>
@@ -3742,14 +3970,16 @@
     </span>
   </t:template>
   
-  <t:template match="ddel:DOM | ddel:SGML | ddel:XML | ddel:InfoItem">
+  <t:template match="ddel:DOM | ddel:SGML | ddel:XML | ddel:InfoItem |
+                     ddel:Java | ddel:JS">
     <code class="{local-name ()}">
       <t:apply-templates select="@*"/>
       <t:apply-templates select="child::node ()"/>
     </code>
   </t:template>
   
-  <t:template match="ddel:DOM | ddel:SGML | ddel:XML" mode="attr">
+  <t:template match="ddel:DOM | ddel:SGML | ddel:XML |
+                     ddel:Java | ddel:JS" mode="attr">
     <t:text>|</t:text>
     <t:apply-templates select="child::node ()"/>
     <t:text>|</t:text>
@@ -3782,18 +4012,25 @@
     
     <t:variable name="name" select="string (self::node ())"/>
     <t:choose>
-    <t:when test="$name = 'COLON'">
-      <t:text> </t:text>
-      (<code class="char">:</code>)
-    </t:when>
-    <t:when test="$name = 'PLUS SIGN'">
-      <t:text> </t:text>
-      (<code class="char">+</code>)
-    </t:when>
     <t:when test="$name = 'SPACE'">
-      <t:text> </t:text>
       (<code class="char" xml:space="preserve"> </code>)
     </t:when>
+    <t:when test="$name = 'HYPHEN-MINUS'"> (<code class="char">-</code>) </t:when>
+    <t:when test="$name = 'PLUS SIGN'"> (<code class="char">+</code>) </t:when>
+    <t:when test="$name = 'FULL STOP'"> (<code class="char">.</code>) </t:when>
+    <t:when test="$name = 'COMMA'"> (<code class="char">,</code>) </t:when>
+    <t:when test="$name = 'DIGIT ZERO'"> (<code class="char">0</code>)</t:when>
+    <t:when test="$name = 'DIGIT ONE'"> (<code class="char">1</code>)</t:when>
+    <t:when test="$name = 'DIGIT TWO'"> (<code class="char">2</code>)</t:when>
+    <t:when test="$name = 'DIGIT THREE'"> (<code class="char">3</code>)</t:when>
+    <t:when test="$name = 'DIGIT FOUR'"> (<code class="char">4</code>)</t:when>
+    <t:when test="$name = 'DIGIT FIVE'"> (<code class="char">5</code>)</t:when>
+    <t:when test="$name = 'DIGIT SIX'"> (<code class="char">6</code>)</t:when>
+    <t:when test="$name = 'DIGIT SEVEN'"> (<code class="char">7</code>)</t:when>
+    <t:when test="$name = 'DIGIT EIGHT'"> (<code class="char">8</code>)</t:when>
+    <t:when test="$name = 'DIGIT NINE'"> (<code class="char">9</code>)</t:when>
+    <t:when test="$name = 'COLON'"> (<code class="char">:</code>) </t:when>
+    <t:when test="$name = 'SEMICOLON'"> (<code class="char">;</code>) </t:when>
     </t:choose>
   </t:template>
   
@@ -4480,7 +4717,7 @@
   </t:template>
 </t:stylesheet>
 
-<!-- Revision: $Date: 2005/10/01 12:17:37 $ -->
+<!-- Revision: $Date: 2005/10/05 11:38:26 $ -->
 
 <!-- ***** BEGIN LICENSE BLOCK *****
    - Copyright 2005 Wakaba <w@suika.fam.cx>.  All rights reserved.
