@@ -1,3 +1,20 @@
+2005-10-06  Wakaba  <wakaba@suika.fam.cx>
+
+	* DOMCore.dis (ManakaiDOMEmptyNodeList): New class.
+	(ManakaiDOMCharacterData): Methods reimplemented.
+	(splitText): Reimplemented.
+	(childNodes): Returns a "ManakaiDOMEmptyNodeList" 
+	for non-parent node types.
+
+	* DOMXML.dis (childNodes): Returns a "ManakaiDOMEmptyNodeList"
+	        for non-parent node types.
+
+2005-10-05  Wakaba  <wakaba@suika.fam.cx>
+
+	* ManakaiDOMLS2003.dis: Revised to new format.
+
+	* GenericLS.dis (DOMLS:ParseString): New feature.
+
 2005-10-05  Wakaba  <wakaba@suika.fam.cx>
 
 	* DOMFeature.dis: Description added and revised.  (Still more
@@ -94,7 +111,7 @@
 	* DOMCore.pm (DOMImplementation): Provides "XML" and "XMLVersion"
 	features if it is "for" ManakaiDOM:DOMXMLFeature.
 
-	* DOMMain.pm (StringExtended): Code portions of raising
+	* DOMMain.pm (StringExtend): Code portions of raising
 	StringOutOfBoundsException is temporary disabled since
 	it is not a DOM-style exception supported by 
 	current implementation of ManakaiNode - it will be 

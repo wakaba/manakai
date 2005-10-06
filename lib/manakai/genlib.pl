@@ -75,7 +75,7 @@ sub valid_err ($;%) {
     if ($opt{node}->isa ('Message::Markup::SuikaWikiConfig20::Node')) {
       $s = $opt{node}->node_path (key => $NodePathKey) . ': ' . $s;
     } elsif ($opt{node}->isa ('Message::DOM::IF::Node')) {
-      $s = 'dom:nodeName ("'.$opt{node}->nodeName . '"): ' . $s;
+      $s = 'dom:nodeName ("'.$opt{node}->node_name . '"): ' . $s;
     }
   }
   Carp::croak ($s);
@@ -528,4 +528,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2005/04/04 15:21:32 $
+1; # $Date: 2005/10/06 10:53:39 $

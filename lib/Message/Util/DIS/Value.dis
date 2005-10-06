@@ -18,7 +18,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/30 13:06:21 $
+      $Date: 2005/10/06 10:53:38 $
     @@ContentType:
       dis:Date.RCS
   
@@ -1452,7 +1452,6 @@ IFClsDef:
         A database from which a resource should be retrieved.
     @@Return:
       @@@Type: DIS|DISAnyResource
-      @@@caType: DIS|ManakaiDISResourceDefinition
       @@@enDesc:
         The resource whose URI equals to the value.
       @@@ImplNote:
@@ -1466,7 +1465,7 @@ IFClsDef:
       @@@PerlDef:
         __DEEP{
           my $uri = $self-><AG::DVURIValue.uri>;
-          $r = $database-><M::DIS|DISDatabase.getResource> ($uri);
+          $r = $database-><M::DIS|DISDatabase.getAnyResource> ($uri);
         }__;
   
   @Attr:

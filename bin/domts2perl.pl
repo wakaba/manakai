@@ -6,7 +6,14 @@ my $dir;
 my $out_dir;
 my $file_pattern;
 my $domtest2perl = 'domtest2perl.pl';
+my %Opt = (
+  test2perl_option => [],
+);
 GetOptions (
+  'domtest2perl-option=s' => sub {
+    shift;
+    push @{$Opt{test2perl_option}}, shift;
+  },
   'domtest2perl-path=s' => \$domtest2perl,
   'test-directory=s' => \$dir,
   'test-file-pattern=s' => \$file_pattern,
@@ -26,8 +33,9 @@ for (grep {$_ ne 'alltests.xml'} grep /$file_pattern/, readdir $dirh) {
   }
   my @cmd = ('perl', map ({"-I$_"} @INC),
              $domtest2perl, $in_file,
-             '--output-file' => $out_file);
-  #print STDERR join " ", @cmd, "\n";
+             '--output-file-name' => $out_file,
+             @{$Opt{test2perl_option}});
+  print STDERR join " ", @cmd, "\n";
   print STDERR $in_file, "\n";
   print STDERR '-> ' . $out_file, "\n";
   system @cmd and die "$0: $domtest2perl: $@";

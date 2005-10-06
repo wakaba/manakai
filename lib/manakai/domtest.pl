@@ -294,18 +294,18 @@ sub load ($) {
 
   ## TODO: select an implementation to test by argument
   my $dom = $Message::DOM::DOMImplementationRegistry
-              ->getDOMImplementation
+              ->get_dom_implementation
                   ({q<http://suika.fam.cx/~wakaba/archive/2004/9/27/mdom-old-ls#LS> => undef});
   $dom or die "$0: load: DOM implementation with LS not found";
 
   $Info->{__impl} = $dom;
   
-  my $parser = $dom->createLSParser (MODE_SYNCHRONOUS);
-  my $input = $dom->createLSInput;
+  my $parser = $dom->create_ls_parser (MODE_SYNCHRONOUS);
+  my $input = $dom->create_ls_input;
   {
     open my $f, '<', $file or die "$0: load: $file: $!";
     local $/ = undef;
-    $input->stringData (<$f>);
+    $input->string_data (<$f>);
     close $f;
   }
   return $parser->parse ($input);
@@ -335,7 +335,7 @@ this test script is skipped.
 
 sub hasFeature ($;$) {
   my ($name, $ver) = @_;
-  unless ($Info->{__impl}->hasFeature ($name, $ver)) {
+  unless ($Info->{__impl}->has_feature ($name, $ver)) {
     no warnings 'uninitialized';
     skip_rest (msg => qq<feature "$name"/"$ver" is not supported>);
   }
@@ -535,4 +535,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2005/01/07 13:07:14 $
+1; # $Date: 2005/10/06 10:53:39 $

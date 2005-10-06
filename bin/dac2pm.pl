@@ -149,6 +149,7 @@ $Opt{file_name} = shift;
 pod2usage ({-exitval => 2, -verbose => 0}) unless $Opt{file_name};
 $Message::DOM::DOMFeature::DEBUG = 1 if $Opt{debug};
 $Opt{daem_suffix} = '.daem' unless defined $Opt{daem_suffix};
+$Opt{dis_suffix} = '.dis' unless defined $Opt{dis_suffix};
 
 if ($Opt{module_uri}) {
   push @{$Opt{create_module}},
@@ -289,4 +290,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2005/09/25 14:53:02 $
+1; # $Date: 2005/10/06 10:53:34 $

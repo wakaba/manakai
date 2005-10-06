@@ -17,10 +17,8 @@ Module:
       numbers of problems and its successor is now under development. 
       This DOM module is intended to be used for only the 
       transitional period.
-    
-  @Author:
-     @@FullName: Wakaba
-     @@Mail: w@suika.fam.cx
+
+  @DISCore:author: DISCore|Wakaba
   @License:
     @@@:
       license:Perl+MPL
@@ -28,12 +26,10 @@ Module:
       @@@FullName:
         manakai <FILE:xml-validator.pl>
       @@@Year:2003
-      @@@Author:
-        @@@@FullName:Wakaba
-        @@@@Mail:w@suika.fam.cx
+      @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2005/02/19 07:21:14 $
+      $Date: 2005/10/06 10:53:36 $
     @@ContentType:
       dis:Date.RCS
 
@@ -41,20 +37,21 @@ Module:
     ManakaiDOM:ManakaiDOMLatest
 
   @Require:
-     @@Module:
-        @@@Name:  DOMCore
-     @@Module:
-        @@@Name:  DOMXML
-     @@Module:
-       @@@Name: DOMLS
-     @@Module:
-       @@@Name: ManakaiDOMLS2003
-       @@@WithFor:
-         ManakaiDOM:ManakaiDOMLatest
+    @@Module:
+      @@@QName: MDOM|DOMXML
+      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
+    @@Module:
+      @@@QName: MDOM|DOMLS
+      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
+    @@Module:
+      @@@QName: MDOM|GenericLS
+      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
 
 Namespace:
   @dis:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
+  @f:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/feature#
   @infoset:
      http://www.w3.org/2001/04/infoset#
   @lang:
@@ -73,8 +70,12 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
   @MDOMX:
     http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
+  @mn:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/ManakaiNode#
   @null:
     http://suika.fam.cx/~wakaba/-temp/2003/09/27/null
+  @oldls:
+    http://suika.fam.cx/~wakaba/archive/2004/9/27/mdom-old-ls#
   @rdf:
     http://www.w3.org/1999/02/22-rdf-syntax-ns#
   @rdfs:
@@ -92,38 +93,30 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      DOMMain:DOMFeature
-    @@AliasFor:
-      @@@@:
-        ::ManakaiDOM:all
-      @@@For:
-        !=ManakaiDOM:all
+    @@rdf:type: f|Feature
+    @@For: =ManakaiDOM|all
+
 ElementTypeBinding:
   @Name: FeatureVerDef
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      DOMMain:DOMFeature
+    @@rdf:type: f|Feature
+
 ElementTypeBinding:
   @Name: featureQName
-  @ElementType:
-    dis:AppName
+  @ElementType: f|name
   @ShadowContent:
-    @@ContentType:
-      dis:TypeQName
+    @@ContentType: DISCore|QName
 
 FeatureDef:
   @QName:
     ManakaiDOMLS2003:LS
   @FeatureVerDef:
-    @@Version:1.0
-    @@QName: LSFeature10
-    @@ISA: 
-      ManakaiDOMLS2003:LS
-    @@DOMMain:requireFeature:
-      DOMXML:XMLFeature30
+    @@f:version:1.0
+    @@QName: oldls|LSFeature10
+    @@f:instanceOf: ManakaiDOMLS2003|LS
+    @@f:requires: DOMXML|XMLFeature30
     @@FullName:
       @@@lang:en
       @@@@:
@@ -134,19 +127,16 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMMethod
-    @@ForCheck:
-      ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM
+    @@rdf:type: DISLang|Method
+    @@For: ManakaiDOM|DOM !=ManakaiDOM|ManakaiDOM
+
 ElementTypeBinding:
   @Name: IntMethod
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMMethod
-    @@ForCheck:
-      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
+    @@rdf:type: DISLang|Method
+    @@For: ManakaiDOM|DOM !=ManakaiDOM|ManakaiDOM
     @@ManakaiDOM:isForInternal: 1
 
 ElementTypeBinding:
@@ -154,33 +144,29 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMMethodParameter
+    @@rdf:type: DISLang|MethodParameter
+
 ElementTypeBinding:
   @Name: Return
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMMethodReturn
+    @@rdf:type: DISLang|MethodReturn
 
 ElementTypeBinding:
   @Name: Attr
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMAttribute
-    @@ForCheck:
-      ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM
+    @@rdf:type: DISLang|Attribute
+    @@ForCheck: ManakaiDOM|DOM !=ManakaiDOM|ManakaiDOM
 
 ElementTypeBinding:
   @Name: Get
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMAttrGet
+    @@rdf:type: DISLang|AttributeGet
 
 ElementTypeBinding:
   @Name: InCase
@@ -203,33 +189,29 @@ ElementTypeBinding:
     @@ContentType:
       lang:Perl
 
+ElementTypeBinding:
+  @Name: enDesc
+  @ElementType:
+    dis:Description
+  @ShadowContent:
+    @@lang:en
+
 ResourceDef:
   @Name:  ManakaiDOMImplementationLS2003
-  @rdf:type:
-    ManakaiDOM:Class
+  @rdf:type: DISLang|Class
   @For:
     ManakaiDOM:ManakaiDOMLatest
   @ISA:
     DOMCore:ManakaiDOMImplementation
-  @Role:
-    @@@:
-      DOMCore:DOMImplementation::ManakaiDOM:ManakaiDOM
-    @@compat:
-      DOMCore:ManakaiDOMImplementation::ManakaiDOM:ManakaiDOMLatest
-  @DOMMain:implementFeature: LSFeature10
 
-  @Description:
-    @@lang:en
-    @@@:
-      The factory methods for creating the objects required for loading.
-  @ImplNote:
-    @@lang:en
-    @@@:
-      It is expected that an instance of the <IF:ManakaiDOMImplementationLS2003> 
-      interface can be obtained by binding-specific casting 
-      methods on an instance of the <IF:DOMImplementation> interface 
-      or <M:DOMImplementation.getFeature> with parameters 
-      <Feature:ManakaiDOMLS2003:LS> and <FeatureVer:1.0>.
+  @f:implements: oldls|LSFeature10
+  @f:provides: oldls|LSFeature10
+
+  @enDesc:
+    The <Class::ManakaiDOMImplementationLS2003> class implements
+    factory methods for creating objects required for loading
+    XML documents, which is a subset of <IF::DOMLS:DOMImplementationLS>
+    interface.
 
   @Method:
      @@Name:  createLSParser
@@ -243,11 +225,11 @@ ResourceDef:
           DOMLS:DOMImplementationLSMode
         @@@InCase:
           @@@@Label:
-            <DOM:MODE_SYNCHRONOUS>
+            <X::DOMLS:DOMImplementationLS.MODE_SYNCHRONOUS>
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              The <IF:ManakaiXMLParser2003> created will 
+              The <IF::ManakaiXMLParser2003> created will 
               operate in synchronous mode.
      @@Param:
         @@@Name:  schemaType
@@ -259,15 +241,15 @@ ResourceDef:
           @@@@lang:en
           @@@@@:
             An absolute URI representing the type of the schema language 
-            used during the load of a <IF:Document> using the newly 
-            created <IF:ManakaiXMLParser2003>.
+            used during the load of a <IF::DOMCore:Document> using the newly 
+            created <IF::ManakaiXMLParser2003>.
         @@@InCase:
           @@@@Value:
             @@@@@is-null:1
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
-              The <IF:ManakaiXMLParser2003> will be free to use any schema 
+              The <IF::ManakaiXMLParser2003> will be free to use any schema 
               found.
         @@@InCase:
           @@@@Value:
@@ -284,25 +266,15 @@ ResourceDef:
         @@@ImplNote:
           @@@@lang:en
           @@@@@:
-            By default, the parameter <DOM:error-handler> of the 
-            <A:LSParser.domConfig> is <DOM:null>.  However, 
+            By default, the parameter <DOM::error-handler> of the 
+            <A::DOMLS:LSParser.domConfig> is <DOM::null>.  However, 
             the DOM implementation may provide a default error handler instead.
         @@@Exception:
-           @@@@Name:  NOT_SUPPORTED_ERR
-           @@@@Type:
-              DOMCore:DOMException
-           @@@@SubType:
-             @@@@@QName:
-               ManakaiDOMLS:MDOMLS_IMPL_NOSUPPORT_MODE
-             @@@@@Description:
-               @@@@@@lang:en
-               @@@@@@@: The requested mode is not supported.
-           @@@@SubType:
-             @@@@@QName:
-               MDOMX:MDOM_IMPL_NOSUPPORT_SCHEMA
-             @@@@@Description:
-               @@@@@@lang:en
-               @@@@@@@: The requested schema language is not supported.
+          @@@@@: ManakaiDOMLS|MDOMLS_IMPL_NOSUPPORT_MODE
+          @@@@enDesc: The requested mode is not supported.
+        @@@Exception:
+          @@@@@: MDOMX|MDOM_IMPL_NOSUPPORT_SCHEMA
+          @@@@enDesc: The requested schema language is not supported.
        @@@PerlDef:
          if (not defined $mode or 
              $mode != <C::DOMLS:DOMImplementationLS.MODE_SYNCHRONOUS>) {
@@ -323,7 +295,7 @@ ResourceDef:
          
          ## ** Code from bin/xml-validator.pl **
          my $eh = sub {
-           \#line 1 "Error handler code from bin/xml-validator.pl"
+      \#line 1 "Error handler code from bin/xml-validator.pl"
 		my ($self, $o, $error_type, $error_msg, $err) = @_;
 		if ($err->{raiser_type} and
                     $err->{raiser_type} eq 'Message::Markup::XML::Validator') {
@@ -352,7 +324,7 @@ ResourceDef:
                   #warn "{$error_type->{level}} $error_msg.\n";
                 }
 	   return 0;
-           \#line 1 "ManakaiDOMImplementationLS2003.createLSParser #2"
+    \#line 1 "ManakaiDOMImplementationLS2003.createLSParser #2"
          };
 
                                                ## Method from MMXParser
@@ -376,18 +348,18 @@ ResourceDef:
 		#                                           return_default => 1);
 		#print STDERR "Retriving external entity <$p->{uri}>...\n";
 		return 1;
-           \#line 1 "ManakaiDOMImplementationLS2003.createLSParser #3"
+    \#line 1 "ManakaiDOMImplementationLS2003.createLSParser #3"
           },
 	   error_handler => $eh,
          });
          ## ** End Code from bin/xml-validator.pl **
 
-         $r->flag (<Q::DOMCore:implementation> => $self);
-         $r->flag (<Q::ManakaiDOM:implID> => $self->{<Q::TreeCore:node>}
-                                                 ->{<Q::ManakaiDOM:implID>});
+         $r->flag (<H::DOMCore:implementation> => $self);
+         $r->flag (<H::ManakaiDOM:implID> => $self->{<H::mn:node>}
+                                                 ->{<H::ManakaiDOM:implID>});
 
-         $r->flag (<Q::DOMCore:domConfig> => $self->{<Q::TreeCore:node>}
-                                                 ->{<Q::DOMCore:domConfig>});
+         $r->flag (<H::DOMCore:domConfig> => $self->{<H::mn:node>}
+                                                 ->{<H::DOMCore:domConfig>});
 
   @Method:
      @@Name:  createLSInput
@@ -407,12 +379,15 @@ ResourceDef:
          @@@lang:en
          @@@@:
            See also <M:DOMImplementationLS.createLSInput>.
-##IF:ManakaiDOMImplementationLS2003
+##DOMImplementationLS2003
+
+ResourceDef:
+  @QName: NodeStem
+  @AliasFor: mn|NodeStem||ManakaiDOM|Perl
 
 ResourceDef:
   @Name:  ManakaiXMLParser2003
-  @rdf:type:
-    ManakaiDOM:Class
+  @rdf:type: DISLang|Class
   @For:
     ManakaiDOM:ManakaiDOMLatest
   @AppISA:
@@ -422,7 +397,10 @@ ResourceDef:
       lang:Perl
   @ISA:
     ManakaiDOM:ManakaiDOMObject
-  @DOMMain:implementFeature: LSFeature10
+
+  @f:implements: oldls|LSFeature10
+  @f:implements: DOMLS|ParseString
+  @DISLang:role: DOMLS|ParserRole
 
   @Description:
     @@lang:en
@@ -459,14 +437,14 @@ ResourceDef:
         @@@Type:  
           DOMCore:DOMConfiguration
         @@@PerlDef:
-            $r = $self->option (<Q::DOMCore:domConfig>);
+            $r = $self->option (<H::DOMCore:domConfig>);
   @Method:
      @@Name:  parse
      @@Description:
        @@@lang:en
        @@@@:
          Parse an XML document from a resource identified by a 
-         <IF:LSInput>.
+         <IF::DOMLS|LSInput>.
      @@Param:
         @@@Name:  input
         @@@Type:  
@@ -474,7 +452,7 @@ ResourceDef:
         @@@Description:
           @@@@lang:en
           @@@@@:
-            The <IF:LSInput> object from which the source of 
+            The <IF::DOMLS|LSInput> object from which the source of 
             the document is to be read.
      @@Return:
         @@@Type: 
@@ -486,13 +464,9 @@ ResourceDef:
           @@@@@:
             The newly created and populated <IF:Document>.
         @@@Exception:
-           @@@@Name:  PARSE_ERR
-           @@@@Type:  
-             DOMLS:LSException
-           @@@@Description:
-             @@@@@lang:en
-             @@@@@@:
-               The <IF:LSParser> was unable to load the XML document. 
+          @@@@@: DOMLS|LSException.PARSE_ERR
+          @@@@enDesc:
+            The parser was unable to load the XML document.
        @@@PerlDef:
            my $text;
            my $uri;
@@ -530,11 +504,11 @@ ResourceDef:
 
            my $node = <ClassM::DOMCore:ManakaiDOMDocument.newObject>;
            $node->{<Q::DOMCore:implementation>}
-                = $self->flag (<Q::DOMCore:implementation>);
-           $node->{<Q::ManakaiDOM:implID>}
-                = $self->flag (<Q::ManakaiDOM:implID>);
-           $node->{<Q::infoset:version>} = '1.0';
-           $node->{<Q::DOMCore:hasFeature>}->{XML} = 1;
+                = $self->flag (<H::DOMCore:implementation>);
+           $node->{<H::ManakaiDOM:implID>}
+                = $self->flag (<H::ManakaiDOM:implID>);
+           $node->{<H::infoset:version>} = '1.0';
+           $node->{<H::DOMCore:hasFeature>}->{XML} = 1;
            if ($doc->node_type eq '#document') {
              __DEEP{
              for my $src (@{$doc->child_nodes}) {
@@ -542,11 +516,11 @@ ResourceDef:
                  $self-><M::ManakaiXMLParser2003.toDOMNode> ($src => $node);
                } elsif ($src->node_type eq '#pi' and
                         $src->local_name eq 'xml') {
-                 $node->{<Q::infoset:version>}
+                 $node->{<H::infoset:version>}
                       = $src->get_attribute_value ('version', default => '1.0');
-                 $node->{<Q::DOMCore:xmlEncoding>}
+                 $node->{<H::DOMCore:xmlEncoding>}
                       = $src->get_attribute_value ('encoding');
-                 $node->{<Q::infoset:xmlStandalone>}
+                 $node->{<H::infoset:xmlStandalone>}
                       = $src->get_attribute_value ('standalone');
                } elsif ({
                           '#pi' => 1, '#comment' => 1,
@@ -558,7 +532,7 @@ ResourceDef:
              }}__;
            } else {
              __EXCEPTION{
-               MDOMX:MDOM_DEBUG_BUG::
+               MDOMX:MDOM_DEBUG_BUG||ManakaiDOM|Perl::
                MDOMX:values => {{node_type => $doc->node_type}},
              }__;
            }
@@ -573,7 +547,7 @@ ResourceDef:
       @@@Description:
         @@@@lang:en
         @@@@@:
-          A <PerlModule:Message::Markup::XML::Node> object to be converted.
+          A <PerlModule::Message::Markup::XML::Node> object to be converted.
     @@Param:
       @@@Name:parent
       @@@Type:
@@ -581,7 +555,7 @@ ResourceDef:
       @@@Description:
         @@@@lang:en
         @@@@@:
-          The parent DOM <IF:Node> object.
+          The parent DOM <IF::DOMCore|Node> object.
     @@Return:
       @@@PerlDef:
         use Message::Markup::XML::QName qw/DEFAULT_PFX NULL_URI/;
@@ -590,11 +564,10 @@ ResourceDef:
 
              if ($src->node_type eq '#element') {
                my $newNode = <ClassM::DOMCore:ManakaiDOMElement.newObject>;
-               $parent-><M::ManakaiDOM:ManakaiDOMNodeObject.importTree>
-                                                           ($newNode);
-               $newNode->{<Q::DOMCore:ownerDocument>}
-                 = $parent->{<Q::DOMCore:ownerDocument>} || $parent;
-               $newNode->{<Q::infoset:prefix>}
+               $parent-><M::NodeStem.importTree> ($newNode);
+               $newNode->{<H::DOMCore:ownerDocument>}
+                 = $parent->{<H::DOMCore:ownerDocument>} || $parent;
+               $newNode->{<H::infoset:prefix>}
                  = defined $src->{namespace_prefix}
                      ? $src->{namespace_prefix} eq DEFAULT_PFX
                          ? null : length $src->{namespace_prefix}
@@ -604,109 +577,104 @@ ResourceDef:
                if (defined $src->{namespace_uri} and
                    $src->{namespace_uri} ne '' and
                    $src->{namespace_uri} ne NULL_URI) {
-                 $newNode->{<Q::infoset:namespaceName>} = $src->{namespace_uri};
-               } else {
-                 $newNode->{<Q::infoset:namespaceName>} = null;
+                 $newNode->{<H::infoset:namespaceName>}
+                   = \($src->{namespace_uri});
                }
-               $newNode->{<Q::infoset:localName>} = $src->{local_name};
-               $newNode->{<Q::infoset:parent>} = $parent;
-               push @{$parent->{<Q::infoset:children>}}, $newNode;
+               $newNode->{<H::infoset:localName>} = $src->{local_name};
+               $newNode->{<H::infoset:parent>} = $parent;
+               push @{$parent->{<H::infoset:children>}}, $newNode;
                for (@{$src->{node}}) {
                  $self-><M::ManakaiXMLParser2003.toDOMNode> ($_ => $newNode);
                }
                for my $prefix (keys %{$src->{ns}||{}}) {
                  my $ns = <ClassM::DOMCore:ManakaiDOMAttr.newObject>;
-                 $newNode-><M::ManakaiDOM:ManakaiDOMNodeObject.importTree> ($ns);
-                 $ns->{<Q::DOMCore:ownerDocument>}
-                   = $newNode->{<Q::DOMCore:ownerDocument>};
-                 $ns->{<Q::infoset:prefix>}
+                 $newNode-><M::NodeStem.importTree> ($ns);
+                 $ns->{<H::DOMCore:ownerDocument>}
+                   = $newNode->{<H::DOMCore:ownerDocument>};
+                 $ns->{<H::infoset:prefix>}
                    = $prefix eq DEFAULT_PFX ? null : $prefix;
-                 $ns->{<Q::infoset:namespaceName>} = <Q::xmlns:>;
-                 $ns->{<Q::infoset:localName>}
+                 $ns->{<H::infoset:namespaceName>} = \<Q::xmlns:>;
+                 $ns->{<H::infoset:localName>}
                    = $prefix eq DEFAULT_PFX ? 'xmlns' : $prefix;
-                 $ns->{<Q::infoset:ownerElement>} = $newNode;
-                 $ns->{<Q::infoset:specified>} = true;
-                 $newNode->{<Q::infoset:attributes>}
+                 $ns->{<H::infoset:ownerElement>} = $newNode;
+                 $ns->{<H::infoset:specified>} = true;
+                 $newNode->{<H::infoset:attributes>}
                          ->{<Q::xmlns:>}
-                         ->{$ns->{<Q::infoset:localName>}} = $ns;
+                         ->{$ns->{<H::infoset:localName>}} = $ns;
                  if (defined $src->{ns}->{$prefix} and
                      length $src->{ns}->{$prefix} and 
                      $src->{ns}->{$prefix} ne NULL_URI) {
                    my $text = <ClassM::DOMCore:ManakaiDOMText.newObject>;
-                   $ns-><M::ManakaiDOM:ManakaiDOMNodeObject.importTree> ($text);
-                   $text->{<Q::DOMCore:ownerDocument>}
-                     = $ns->{<Q::DOMCore:ownerDocument>};
-                   $text->{<Q::infoset:content>} = $src->{ns}->{$prefix};
-                   $text->{<Q::infoset:parent>} = $ns;
-                   push @{$ns->{<Q::infoset:children>}}, $text;
+                   $ns-><M::NodeStem.importTree> ($text);
+                   $text->{<H::DOMCore:ownerDocument>}
+                     = $ns->{<H::DOMCore:ownerDocument>};
+                   $text->{<H::infoset:content>} = $src->{ns}->{$prefix};
+                   $text->{<H::infoset:parent>} = $ns;
+                   push @{$ns->{<H::infoset:children>}}, $text;
                  }
                }
              } elsif ($src->node_type eq '#attribute') {
                my $newNode = <ClassM::DOMCore:ManakaiDOMAttr.newObject>;
-               $parent-><M::ManakaiDOM:ManakaiDOMNodeObject.importTree>
-                                                           ($newNode);
-               $newNode->{<Q::DOMCore:ownerDocument>}
-                 = $parent->{<Q::DOMCore:ownerDocument>};
-               $newNode->{<Q::infoset:prefix>}
+               $parent-><M::NodeStem.importTree> ($newNode);
+               $newNode->{<H::DOMCore:ownerDocument>}
+                 = $parent->{<H::DOMCore:ownerDocument>};
+               $newNode->{<H::infoset:prefix>}
                  = defined $src->{namespace_prefix}
                      ? $src->{namespace_prefix} eq DEFAULT_PFX
                          ? null : length $src->{namespace_prefix}
                                 ? $src->{namespace_prefix}
                          : null
                      : null;
-               $newNode->{<Q::infoset:localName>} = $src->{local_name};
-               $newNode->{<Q::infoset:ownerElement>} = $parent;
-               $newNode->{<Q::infoset:specified>} = true;
+               $newNode->{<H::infoset:localName>} = $src->{local_name};
+               $newNode->{<H::infoset:ownerElement>} = $parent;
+               $newNode->{<H::infoset:specified>} = true;
                if (defined $src->{namespace_uri} and
                    $src->{namespace_uri} ne '' and
                    $src->{namespace_uri} ne NULL_URI) {
-                 $newNode->{<Q::infoset:namespaceName>} = $src->{namespace_uri};
-                 $parent->{<Q::infoset:attributes>}
+                 $newNode->{<H::infoset:namespaceName>}
+                   = \($src->{namespace_uri});
+                 $parent->{<H::infoset:attributes>}
                         ->{$src->{namespace_uri}}
-                        ->{$newNode->{<Q::infoset:localName>}} = $newNode;
+                        ->{$newNode->{<H::infoset:localName>}} = $newNode;
                } else {
-                 $newNode->{<Q::infoset:namespaceName>} = null;
-                 $parent->{<Q::infoset:attributes>}
+                 $parent->{<H::infoset:attributes>}
                         ->{<Q::null:>}
-                        ->{$newNode->{<Q::infoset:localName>}} = $newNode;
+                        ->{$newNode->{<H::infoset:localName>}} = $newNode;
                }
                if (defined $src->{value} and length $src->{value}) {
                  my $text = <ClassM::DOMCore:ManakaiDOMText.newObject>;
-                 $newNode-><M::ManakaiDOM:ManakaiDOMNodeObject.importTree>
-                                                           ($text);
-                 $text->{<Q::DOMCore:ownerDocument>}
-                   = $newNode->{<Q::DOMCore:ownerDocument>};
-                 $text->{<Q::infoset:content>} = $src->{value};
-                 $text->{<Q::infoset:parent>} = $newNode;
-                 push @{$newNode->{<Q::infoset:children>}}, $text;
+                 $newNode-><M::NodeStem.importTree> ($text);
+                 $text->{<H::DOMCore:ownerDocument>}
+                   = $newNode->{<H::DOMCore:ownerDocument>};
+                 $text->{<H::infoset:content>} = $src->{value};
+                 $text->{<H::infoset:parent>} = $newNode;
+                 push @{$newNode->{<H::infoset:children>}}, $text;
                }
                for (@{$src->{node}}) {
                  $self-><M::ManakaiXMLParser2003.toDOMNode> ($_ => $newNode);
                }
              } elsif ($src->node_type eq '#text') {
-               my $lc = $parent->{<Q::infoset:children>}->[-1];
-               if ($lc and $lc->{<Q::DOMCore:nodeType>} eq <Q::DOMCore:Text>) {
-                 $lc->{<Q::infoset:content>} .= $src->{value};
+               my $lc = $parent->{<H::infoset:children>}->[-1];
+               if ($lc and $lc->{<H::DOMCore:nodeType>} eq <H::DOMCore:Text>) {
+                 $lc->{<H::infoset:content>} .= $src->{value};
                } elsif (defined $src->{value} and length $src->{value}) {
                  my $text = <ClassM::DOMCore:ManakaiDOMText.newObject>;
-                 $parent-><M::ManakaiDOM:ManakaiDOMNodeObject.importTree>
-                                                           ($text);
-                 $text->{<Q::DOMCore:ownerDocument>}
-                   = $parent->{<Q::DOMCore:ownerDocument>};
-                 $text->{<Q::infoset:content>} = $src->inner_text;
-                 $text->{<Q::infoset:parent>} = $parent;
-                 push @{$parent->{<Q::infoset:children>}}, $text;
+                 $parent-><M::NodeStem.importTree> ($text);
+                 $text->{<H::DOMCore:ownerDocument>}
+                   = $parent->{<H::DOMCore:ownerDocument>};
+                 $text->{<H::infoset:content>} = $src->inner_text;
+                 $text->{<H::infoset:parent>} = $parent;
+                 push @{$parent->{<H::infoset:children>}}, $text;
                }
              } elsif ($src->node_type eq '#comment') {
                if (defined $src->{value} and length $src->{value}) {
                  my $text = <ClassM::DOMCore:ManakaiDOMComment.newObject>;
-                 $parent-><M::ManakaiDOM:ManakaiDOMNodeObject.importTree>
-                                ($text);
-                 $text->{<Q::DOMCore:ownerDocument>}
-                   = $parent->{<Q::DOMCore:ownerDocument>} || $parent;
-                 $text->{<Q::infoset:content>} = $src->inner_text;
-                 $text->{<Q::infoset:parent>} = $parent;
-                 push @{$parent->{<Q::infoset:children>}}, $text;
+                 $parent-><M::NodeStem.importTree> ($text);
+                 $text->{<H::DOMCore:ownerDocument>}
+                   = $parent->{<H::DOMCore:ownerDocument>} || $parent;
+                 $text->{<H::infoset:content>} = $src->inner_text;
+                 $text->{<H::infoset:parent>} = $parent;
+                 push @{$parent->{<H::infoset:children>}}, $text;
                }
              } elsif ($src->node_type eq '#reference') {
                if ($src->namespace_uri eq SGML_NCR or
@@ -720,138 +688,63 @@ ResourceDef:
                  } else {
                    $val = chr $src->{value};
                  }
-                 my $lc = $parent->{<Q::infoset:children>}->[-1];
-                 if ($lc and $lc->{<Q::DOMCore:nodeType>} eq <Q::DOMCore:Text>) {
-                   $lc->{<Q::infoset:content>} .= $val;
+                 my $lc = $parent->{<H::infoset:children>}->[-1];
+                 if ($lc and $lc->{<H::DOMCore:nodeType>} eq <H::DOMCore:Text>) {
+                   $lc->{<H::infoset:content>} .= $val;
                  } else {
                    my $text = <ClassM::DOMCore:ManakaiDOMText.newObject>;
-                   $parent-><M::ManakaiDOM:ManakaiDOMNodeObject.importTree>
-                                                           ($text);
-                   $text->{<Q::DOMCore:ownerDocument>}
-                     = $parent->{<Q::DOMCore:ownerDocument>};
-                   $text->{<Q::infoset:content>} = $val;
-                   $text->{<Q::infoset:parent>} = $parent;
-                   push @{$parent->{<Q::infoset:children>}}, $text;
+                   $parent-><M::NodeStem.importTree> ($text);
+                   $text->{<H::DOMCore:ownerDocument>}
+                     = $parent->{<H::DOMCore:ownerDocument>};
+                   $text->{<H::infoset:content>} = $val;
+                   $text->{<H::infoset:parent>} = $parent;
+                   push @{$parent->{<H::infoset:children>}}, $text;
                  }
                } elsif ($src->namespace_uri eq SGML_GENERAL_ENTITY) {
                  my $text = <ClassM::DOMXML:ManakaiDOMEntityReference.newObject>;
-                 $parent-><M::ManakaiDOM:ManakaiDOMNodeObject.importTree>
-                                                           ($text);
-                 $text->{<Q::DOMCore:ownerDocument>}
-                   = $parent->{<Q::DOMCore:ownerDocument>} || $parent;
-                 $text->{<Q::DOMCore:name>} = $src->{local_name};
-                 $text->{<Q::ManakaiDOM:isExpanded>} = false;
+                 $parent-><M::NodeStem.importTree> ($text);
+                 $text->{<H::DOMCore:ownerDocument>}
+                   = $parent->{<H::DOMCore:ownerDocument>} || $parent;
+                 $text->{<H::DOMCore:name>} = $src->{local_name};
+                 $text->{<H::ManakaiDOM:isExpanded>} = false;
                     ## TODO: Expansion
-                 $text->{<Q::infoset:parent>} = $parent;
-                 push @{$parent->{<Q::infoset:children>}}, $text;
+                 $text->{<H::infoset:parent>} = $parent;
+                 push @{$parent->{<H::infoset:children>}}, $text;
                  if ($src->get_attribute ('base', namespace_uri => <Q::xml:>)) {
-                   $text->{<Q::infoset:baseURI>} = $src->get_attribute_value
+                   $text->{<H::infoset:baseURI>} = $src->get_attribute_value
                                          ('base', namespace_uri => <Q::xml:>);
                  }
                } else {
                  warn "{Impl} References not supported.\n";
                  __EXCEPTION{
                    DOMLS:ManakaiDOMLSException.PARSE_ERR::
-                    ## Not supported err
                  }__;
+                    ## Not supported err
                }
              } elsif ($src->node_type eq '#pi') {
                my $text = <ClassM::DOMXML:ManakaiDOMProcessingInstruction
                                            .newObject>;
-               $parent-><M::ManakaiDOM:ManakaiDOMNodeObject.importTree>
-                                                           ($text);
-               $text->{<Q::DOMCore:ownerDocument>}
-                   = $parent->{<Q::DOMCore:ownerDocument>} || $parent;
-               $text->{<Q::infoset:target>} = $src->{local_name};
-               $text->{<Q::infoset:data>} = $src->inner_text;
-               $text->{<Q::infoset:parent>} = $parent;
-               push @{$parent->{<Q::infoset:children>}}, $text;
+               $parent-><M::NodeStem.importTree> ($text);
+               $text->{<H::DOMCore:ownerDocument>}
+                   = $parent->{<H::DOMCore:ownerDocument>} || $parent;
+               $text->{<H::infoset:target>} = $src->{local_name};
+               $text->{<H::infoset:data>} = $src->inner_text;
+               $text->{<H::infoset:parent>} = $parent;
+               push @{$parent->{<H::infoset:children>}}, $text;
              } elsif ($src->node_type eq '#section') {
                \## TODO: Include/Ignore sections
                my $text = <ClassM::DOMXML:ManakaiDOMCDATASection.newObject>;
-               $parent-><M::ManakaiDOM:ManakaiDOMNodeObject.importTree>
-                                                           ($text);
-               $text->{<Q::DOMCore:ownerDocument>}
-                   = $parent->{<Q::DOMCore:ownerDocument>};
-               $text->{<Q::infoset:content>} = $src->inner_text;
-               $text->{<Q::infoset:parent>} = $parent;
-               push @{$parent->{<Q::infoset:children>}}, $text;
+               $parent-><M::NodeStem.importTree> ($text);
+               $text->{<H::DOMCore:ownerDocument>}
+                   = $parent->{<H::DOMCore:ownerDocument>};
+               $text->{<H::infoset:content>} = $src->inner_text;
+               $text->{<H::infoset:parent>} = $parent;
+               push @{$parent->{<H::infoset:children>}}, $text;
              } else {
                warn "{Impl} Node of type ".$src->node_type." not supported.\n";
                __EXCEPTION{
                  DOMLS:ManakaiDOMLSException.PARSE_ERR::
-                  ## Not supported err
                }__;
+                  ## Not supported err
              }
-
-
-  @Method:
-     @@Name:  parseURI
-     @@Description:
-       @@@lang:en
-       @@@@:
-         Parse an XML document from a location identified by a 
-         URI reference <SRC:<CITE:RFC 2396>>.
-     @@Param:
-        @@@Name:  uri
-        @@@Type: 
-          DOMMain:DOMString
-        @@@actualType:
-          ManakaiDOM:ManakaiDOMURI
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            The location of the XML document to be read, 
-            as a URI reference <SRC:<CITE:RFC 2396>>. 
-        @@@InCase:
-          @@@@Label:
-            @@@@@lang:en
-            @@@@@@: URI reference with a fragemnt identifier
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              The behavior is undefined; it may be defined in future 
-              version of the DOM specification.
-     @@Return:
-        @@@Type:  
-          DOMCore:Document
-        @@@actualType:
-          DOMCore:ManakaiDOMDocument
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            The newly created and populated <IF:Document>.
-        @@@InCase:
-          @@@@Value:
-            @@@@@is-null:1
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              The <IF:LSParser> is asynchronous.
-        @@@Exception:
-           @@@@Name:  INVALID_STATE_ERR
-           @@@@Type:
-              DOMCore:DOMException
-           @@@@SubType:
-             @@@@@QName:
-               ManakaiDOMLS:MDOMLS_BUSY
-             @@@@@Description:
-               @@@@@@lang:en
-               @@@@@@@:
-                 <A:LSParser.busy> is <DOM:true>.
-        @@@Exception:
-           @@@@Name:  PARSE_ERR
-           @@@@Type:  
-             DOMLS:LSException
-           @@@@Description:
-             @@@@@lang:en
-             @@@@@@:
-               The <IF:LSParser> was unable to load the XML document. 
-           @@@@ImplNote:
-             @@@@@lang:en
-             @@@@@@:
-               DOM applications should use an error handler to get 
-               details on the error.
-##IF:ManakaiXMLParser2003
-
-## ManakaiDOMLS2003.dis ends here
+##XMLParser2003

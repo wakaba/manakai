@@ -23,7 +23,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2005/10/02 23:35:32 $
+      $Date: 2005/10/06 10:53:36 $
     @@ContentType:
       dis:Date.RCS
   
@@ -2684,7 +2684,7 @@ IFClsDef:
           }
         } else {
           __DEEP{
-            $r = $self-><M::DIS|DISDatabase.getAnyResource> ($resURI);
+            $r = $self-><M::DIS|DISDatabase.getResource> ($resURI);
           }__;
         }
 
@@ -3601,6 +3601,29 @@ IFClsDef:
         CORE::delete $self->{modDef};
         CORE::delete $self->{forDef};
         CORE::delete $self->{resDef};
+
+  @Method:
+    @@Name: getModuleURIList
+    @@enDesc:
+      Returns a snapshot list of URIs of modules in the database.
+    @@Return:
+      @@@Type: DISPerl|ARRAY||ManakaiDOM|all
+      @@@enDesc:
+        A snapshot list of URIs.
+      @@@PerlDef:
+        $r = [map {$_-><AG::DIS|DISAnyResource.uri>} values %{$self->{modDef}}];
+
+  @Method:
+    @@Name: getAnyResourceURIList
+    @@enDesc:
+      Returns a snapshot list of URIs of resources in the database.
+    @@Return:
+      @@@Type: DISPerl|ARRAY||ManakaiDOM|all
+      @@@enDesc:
+        A snapshot list of URIs.
+      @@@PerlDef:
+        $r = [keys %{$self->{<H::DIS|resourceModuleMap>}},
+              map {$_-><AG::DIS|DISAnyResource.uri>} values %{$self->{modDef}}];
 ##DISDatabase
 
 PropDef:
@@ -6388,7 +6411,7 @@ IFClsDef:
           my $v = $self-><M::DISResourceProp.getPropertyValue>
                              ($propName);
           if (UNIVERSAL::isa ($v, <IFName::dv|DVURIValue>)) {
-            $r = $v-><M::dv|DVURIValue.getAnyResource>
+            $r = $v-><M::dv|DVURIValue.getResource>
                           ($self-><AG::DISAnyResource.database>);
           }
         }__;
@@ -6469,7 +6492,7 @@ IFClsDef:
           my $db = $self-><AG::DISAnyResource.database>;
           for my $a (@$v) {
             if ($a->isa (<IFName::dv|DVURIValue>)) {
-              push @$r, $a-><M::dv|DVURIValue.getAnyResource> ($db);
+              push @$r, $a-><M::dv|DVURIValue.getResource> ($db);
             }
             if ($isaRecursive) {
               my $b = $a-><M::dv|DVValue.getProperty>

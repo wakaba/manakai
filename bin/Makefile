@@ -1,32 +1,40 @@
-
 MANAKAI_ROOT_DIR = ../
-BIN_DIR = $(MANAKAI_ROOT_DIR)bin/
-LIB_DIR = $(MANAKAI_ROOT_DIR)lib/
-LIB_DOM_DIR = $(LIB_DIR)Message/DOM/
+MANAKAI_BIN_DIR = $(MANAKAI_ROOT_DIR)bin/
+MANAKAI_LIB_DIR = $(MANAKAI_ROOT_DIR)lib/
 
-DIS_DIR = $(LIB_DOM_DIR)
-DIS_FILES = $(DIS_DIR)DOM*.dis
-
-PERL = perl -I$(LIB_DIR)
-PERLC = $(PERL) -c -w 
 RM = rm -fv
 
-MKDOMMEMLIST_PL = $(BIN_DIR)mkdommemlist.pl
-MKDOMMEMLIST = $(PERL) $(MKDOMMEMLIST_PL)
+DIS_SUFFIX = .dis
+DAC_SUFFIX = .dae
+DAEM_SUFFIX = .daem
+
+PERL_OPTIONS =
+PERL = perl
+PERL_ = $(PERL) $(PERL_OPTIONS) -I$(MANAKAI_LIB_DIR)
+PERLC = $(PERL) -c -w
+PERLC_ = $(PERLC) $(PERL_OPTIONS) -I$(MANAKAI_LIB_DIR)
+
+DIS_OPTIONS = 
+DIS_OPTIONS_ALL = $(DIS_OPTIONS) \
+  --search-path-catalog-file-name="$(MANAKAI_LIB_DIR)manakai/dis-catalog" \
+  --dis-file-suffix="$(DIS_SUFFIX)" \
+  --daem-file-suffix="$(DAEM_SUFFIX)"
+
+MKDOMMEMLIST_OPTIONS =
+MKDOMMEMLIST_PL = $(MANAKAI_BIN_DIR)mkdommemlist.pl
+MKDOMMEMLIST = $(PERL_) $(MKDOMMEMLIST_PL) $(MKDOMMEMLIST_OPTIONS) \
+  $(DIS_OPTIONS_ALL)
 
 DOMMEMLIST = dommemlist.pl.tmp
 GENERATED_FILES = $(DOMMEMLIST)
 
-DOM_CDIS = $(LIB_DOM_DIR)html.cdis
+DOM_DAC = $(MANAKAI_LIB_DIR)Message/DOM/core$(DAC_SUFFIX)
 
 all: $(GENERATED_FILES)
 
-$(DOM_CDIS): $(DIS_FILES)
-	cd $(LIB_DOM_DIR) && make $<
-
-$(DOMMEMLIST): $(DOM_CDIS) $(MKDOMMEMLIST_PL)
+$(DOMMEMLIST): $(DOM_DAC) $(MKDOMMEMLIST_PL)
 	$(MKDOMMEMLIST) $< > $@
-	$(PERLC) $@
+	$(PERLC_) $@
 
 clean:
 	$(RM) $(GENERATED_FILES) *~ .*~ *.BAK .*.BAK

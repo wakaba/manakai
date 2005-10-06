@@ -45,7 +45,7 @@ UTIL_CORE_DAC_FILE = $(MANAKAI_LIB_DIR)Message/Util/core$(DAC_SUFFIX)
 DOM_FEATURE_DIS_FILES = DOMFeature$(DIS_SUFFIX)
 DOM_CORE_DIS_FILES = DOMMain.dis DOMCore.dis DOMXML.dis \
                      DOMLS.dis GenericLS.dis
-DOM_LS_DIS_FILES   = SimpleLS.dis
+DOM_LS_DIS_FILES   = SimpleLS$(DIS_SUFFIX) ManakaiDOMLS2003$(DIS_SUFFIX)
 DOM_HTML_DIS_FILES = DOMHTML.dis DOMWebForms.dis
 DIS_FILES = $(DOM_FEATURE_DIS_FILES) $(DOM_CORE_DIS_FILES) \
   $(DOM_LS_DIS_FILES) $(DOM_HTML_DIS_FILES)
@@ -55,7 +55,7 @@ GENERATED_FILES = \
   core$(DAC_SUFFIX)  DOMMain$(PM_SUFFIX) \
                      DOMCore$(PM_SUFFIX) DOMXML$(PM_SUFFIX) DOMLS$(PM_SUFFIX) \
                      GenericLS$(PM_SUFFIX) \
-  ls$(DAC_SUFFIX)    SimpleLS$(PM_SUFFIX) \
+  ls$(DAC_SUFFIX)    SimpleLS$(PM_SUFFIX) ManakaiDOMLS2003$(PM_SUFFIX) \
   html$(DAC_SUFFIX)  DOMHTML$(PM_SUFFIX) DOMWebForms$(PM_SUFFIX)
 GENERATED_DAC_FILES = feature$(DAC_SUFFIX) \
   core$(DAC_SUFFIX) ls$(DAC_SUFFIX) html$(DAC_SUFFIX)
@@ -71,7 +71,9 @@ core$(DAC_SUFFIX): feature$(DAC_SUFFIX) $(DOM_CORE_DIS_FILES) $(DAC_PL)
 	$(RM) $@.tmp.1
 
 ls$(DAC_SUFFIX): core$(DAC_SUFFIX) $(DOM_LS_DIS_FILES) $(DAC_PL)
-	$(DAC)$@ --input-db-file-name="$<" SimpleLS.dis
+	$(DAC)$@.tmp.1 --input-db-file-name="$<" SimpleLS.dis
+	$(DAC)$@ --input-db-file-name="$@.tmp.1" ManakaiDOMLS2003.dis
+	$(RM) $@.tmp.1
 
 html$(DAC_SUFFIX): core$(DAC_SUFFIX) $(DOM_HTML_DIS_FILES) $(DAC_PL)
 	$(DAC)$@ --input-db-file-name="$<" DOMHTML.dis
@@ -97,15 +99,17 @@ $(DOM_CORE_DIS_FILES:.dis=$(PM_SUFFIX)): core$(DAC_SUFFIX) $(DAC2PM_PL)
 	$(PERL_CHK) GenericLS$(PM_SUFFIX)
 	$(TOUCH) $@
 
-$(DOM_LS_DIS_FILES:.dis=$(PM_SUFFIX)): ls$(DAC_SUFFIX) $(DAC2PM_PL)
+$(DOM_LS_DIS_FILES:$(DIS_SUFFIX)=$(PM_SUFFIX)): ls$(DAC_SUFFIX) $(DAC2PM_PL)
 	$(DAC2PM) $< --module-uri="$(NS_MDOM)$(@:$(PM_SUFFIX)=)" \
 	  --output-file-path="$@"
 	$(PERL_CHK) $@
 
 .ls$(PM_SUFFIX): ls$(DAC_SUFFIX) $(DAC2PM_PL)
 	$(DAC2PM) $< \
-	  --create-perl-module="$(NS_MDOM)SimpleLS SimpleLS$(PM_SUFFIX)" 
+	  --create-perl-module="$(NS_MDOM)SimpleLS SimpleLS$(PM_SUFFIX)" \
+	  --create-perl-module="$(NS_MDOM)ManakaiDOMLS2003 ManakaiDOMLS2003$(PM_SUFFIX)" 
 	$(PERL_CHK) SimpleLS$(PM_SUFFIX)
+	$(PERL_CHK) ManakaiDOMLS2003$(PM_SUFFIX)
 	$(TOUCH) $@
 
 $(DOM_HTML_DIS_FILES:.dis=$(PM_SUFFIX)): html$(DAC_SUFFIX) $(DAC2PM_PL)
@@ -135,5 +139,5 @@ clean:
 	$(RM) .*.tmp *~ .*~ *.BAK .*.BAK
 	$(RM) .core$(PM_SUFFIX) .ls$(PM_SUFFIX) .html$(PM_SUFFIX)
 
-## $Date: 2005/09/30 13:06:15 $
+## $Date: 2005/10/06 10:53:36 $
 ## License: Public Domain.

@@ -40,7 +40,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/10/01 12:14:29 $
+      $Date: 2005/10/06 10:53:34 $
     @@ContentType:
       dis:Date.RCS
 
@@ -5361,8 +5361,7 @@ IFCls1Def:
         __DEEP{
           for my $__cno (@{$node->{<H::mn:node>}
                                 ->{<H::infoset:children>}}) {
-            if ($__cno->{<H::mn:node>}->{<Q::nodeType>}
-                   eq <H::DOMCore:TextNode>) {
+            if ($__cno->{<H::DOMCore:nodeType>} eq <H::DOMCore:TextNode>) {
               $result .= $__cno->{<H::infoset:content>}
                 unless $__cno->{<H::infoset:elementContentWhitespace>};
             } elsif (not {
@@ -7412,6 +7411,10 @@ ForDef:
       For <Class::ManakaiDOMCore:ManakaiDOMGetElementsNodeList> class.
   @ISA: ManakaiDOM|ForClass
 
+ForDef:
+  @QName: DOMCore|ForEmptyNodeList
+  @ISA: ManakaiDOM|ForClass
+
 ResourceDef:
   @QName: getWeakRef
   @AliasFor:
@@ -7424,6 +7427,7 @@ ResourceDef:
       dis:MultipleResource
     @@ForCheck:
       !ManakaiDOM:ForIF !DOMCore:ForChildNodeList !DOMCore:ForGetNodeList
+      !DOMCore|ForEmptyNodeList
   @ForCheck: ManakaiDOM|DOM
 
   @resourceFor:
@@ -7506,6 +7510,20 @@ ResourceDef:
       lang:Perl
     @@@:
       Tie::Array
+
+  @resourceFor:
+    @@@: DOMCore|ForEmptyNodeList
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
+  @QName:
+    @@@: DOMCore|ManakaiDOMEmptyNodeList
+    @@ForCheck: DOMCore|ForEmptyNodeList
+  @rdf:type:
+    @@@: DISLang|Class
+    @@ForCheck: DOMCore|ForEmptyNodeList
+  @ISA:
+    @@@: ManakaiDOM|ManakaiDOMObject
+    @@ForCheck: DOMCore|ForEmptyNodeList
 
   @Implement:
     @@@: NodeList||ManakaiDOM|ManakaiDOM
@@ -7616,6 +7634,9 @@ ResourceDef:
            @@@@@lang:en
            @@@@@@:
              TODO: Cache mechanism required.
+      @@@PerlDef:
+        @@@@ForCheck: DOMCore|ForEmptyNodeList
+        @@@@@: \
 
   @IntMethod:
     @@Perlop: STORE
@@ -7662,8 +7683,19 @@ ResourceDef:
             A <IF::NodeList> returned by <M::Document.getElementsByTagNameNS> 
             or like is unable to be edited. 
         @@@@ForCheck:ForGetNodeList
+      @@@Exception:
+        @@@@@:NOMOD_NODELIST_ERR
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            A <IF::NodeList> is unable to be edited. 
+        @@@@ForCheck: DOMCore|ForEmptyNodeList
       @@@disDef:
         @@@@DOMMain:raiseException:NOMOD_NODELIST_ERR
+        @@@@ForCheck: DOMCore|ForGetNodeList
+      @@@disDef:
+        @@@@DOMMain:raiseException:NOMOD_NODELIST_ERR
+        @@@@ForCheck: DOMCore|ForEmptyNodeList
       @@@Exception:
         @@@@ForCheck:ForChildNodeList
           @@@@Type: DOMException
@@ -7757,9 +7789,10 @@ ResourceDef:
           @@@@@@:
             A <IF::NodeList> returned by <M::Document.getElementsByTagNameNS> 
             or like is unable to be edited. 
-        @@@@ForCheck:ForGetNodeList
+        @@@@ForCheck: !DOMCore|ForChildNodeList
       @@@disDef:
         @@@@DOMMain:raiseException:NOMOD_NODELIST_ERR
+        @@@@ForCheck: !DOMCore|ForChildNodeList
       @@@Exception:
         @@@@ForCheck:ForChildNodeList
           @@@@Type: DOMException
@@ -7821,6 +7854,9 @@ ResourceDef:
                                   .getElementsBy>
                              ($self->{<H::ManakaiDOMCore:nodeMatch>});
             $r = @$l;
+      @@@PerlDef:
+        @@@@ForCheck: DOMCore|ForEmptyNodeList
+        @@@@@:\
 
   @IntMethod:
     @@Perlop: STORESIZE
@@ -7886,9 +7922,12 @@ ResourceDef:
               $r = $self-><M::ManakaiDOMCore:ManakaiDOMGetElementsNodeList.item>
                                ($index) ? 1 : 0;
             }__;
+       @@@PerlDef:
+         @@@@ForCheck: DOMCore|ForEmptyNodeList
+         @@@@@:\
   @IntMethod:
     @@Name: isEqualNodeList
-    @@ForCheck: ForChildNodeList
+    @@ForCheck: !DOMCore|ForGetNodeList
     @@Perlop: ==
     @@Description:
       @@@lang:en
@@ -7928,8 +7967,15 @@ ResourceDef:
             }
             $r = true;
           }
+    @@PerlDef:
+      @@@ForCheck: DOMCore|ForEmptyNodeList
+      @@@@:
+        __DEEP{
+          $r = ($arg-><AG::NodeList.length> == 0);
+        }__;
 
   @IntMethod:
+    @@ForCheck: !DOMCore|ForEmptyNodeList
     @@Perlop:TIEARRAY
     @@ManakaiDOM:isStatic:1
     @@Description:
@@ -7975,9 +8021,10 @@ ResourceDef:
           @@@@@@:
             A <IF::NodeList> returned by <M::Document.getElementsByTagNameNS> 
             or like is unable to be edited. 
-        @@@@ForCheck:ForGetNodeList
+        @@@@ForCheck: !DOMCore|ForChildNodeList
       @@@disDef:
         @@@@DOMMain:raiseException:NOMOD_NODELIST_ERR
+        @@@@ForCheck: !DOMCore|ForChildNodeList
       @@@Exception:
         @@@@ForCheck:ForChildNodeList
           @@@@Type: DOMException
@@ -8142,8 +8189,13 @@ ResourceDef:
       @@@Type:
         perl:ARRAY::ManakaiDOM:all
       @@@PerlDef:
-        tie my @list, ref $self, $self;
-        $r = \@list;
+        @@@@ForCheck: !DOMCore|ForEmptyNodeList
+        @@@@@:
+          tie my @list, ref $self, $self;
+          $r = \@list;
+      @@@PerlDef:
+        @@@@ForCheck: DOMCore|ForEmptyNodeList
+        @@@@@: \
 
   @IntMethod:
     @@Perlop:DESTROY
@@ -8158,6 +8210,17 @@ ResourceDef:
         @@@@DISPerl:cloneCode:
           ManakaiNode|ManakaiNodeRef||ManakaiDOM|Perl.destroy
 
+  @Method:
+    @@ForCheck: DOMCore|ForEmptyNodeList
+    @@Operator: DISPerl|NewMethod
+    @@enDesc:
+      Creats a new instance of <Class::ManakaiDOMEmptyNodeList>.
+    @@Return:
+      @@@Type: NodeList
+      @@@dis:actualType: ManakaiDOMEmptyNodeList
+      @@@enDesc: The newly created node list.
+      @@@PerlDef:
+        $r = bless [], $self;
 ##NodeList
 
 ElementTypeBinding:
@@ -8174,10 +8237,10 @@ ElementTypeBinding:
         @@@@@:
           A <IF::NodeList> returned by <M::Document.getElementsByTagNameNS> 
           or like is unable to be edited. 
-      @@@ForCheck:ForGetNodeList
+      @@@ForCheck: !DOMCore|ForEmptyNodeList
     @@disDef:
       @@@DOMMain:raiseException:NOMOD_NODELIST_ERR
-
+      @@@ForCheck: !DOMCore|ForEmptyNodeList
 
 ElementTypeBinding:
   @Name: Perlop
@@ -9230,6 +9293,7 @@ NodeTypeDef:
        @@@lang:en
        @@@@: 
          The number of 16-bit units of the "data".
+    @@Offset16Note:
      @@Get:
         @@@Type:  
           DOMMain:unsigned-long||ManakaiDOM|all
@@ -9246,6 +9310,7 @@ NodeTypeDef:
        @@@lang:en
        @@@@:
          Extract a range of data from the node.
+    @@Offset16Note:
      @@Param:
         @@@Name:  offset
         @@@Type:  
@@ -9294,9 +9359,12 @@ NodeTypeDef:
           @@@@@@: An attempt is made to break surrogate pair.
       @@@ImplNote:
         __DEEP{
-          $r = <ClassM::DOMMain:ManakaiDOMString.substring>
-                   (\$self->{ Q::TreeCore:node>}
-                          ->{ Q::infoset:content>}, $offset, $count);
+          my $offset32 = <ClassM::DOMMain:ManakaiDOMStringExtend.findOffset32>
+                            ($offset);
+          my $coffset32 = <ClassM::DOMMain:ManakaiDOMStringExtend.findOffset32>
+                            ($offset + $count);
+          $r = substr ($self->{<H::mn:node>}->{<H::infoset:content>},
+                       $offset32, $coffset32 - $offset32);
         }__;
   @Method:
      @@Name:  appendData
@@ -9331,6 +9399,7 @@ NodeTypeDef:
      @@Description:
        @@@lang:en
        @@@@: Insert a string at the specified 16-bit unit offset. 
+    @@Offset16Note:
     @@Param:
       @@@Name: offset
       @@@Type: 
@@ -9368,15 +9437,16 @@ NodeTypeDef:
           @@@@@lang:en
           @@@@@@: An attempt is made to break surrogate pair.
       @@@ImplNote:
-        if ($self->{ Q::TreeCore:node>}->{ Q::DOMCore:read-only>}) {
+        if ($self->{<H::mn:node>}->{<H::DOMCore:read-only>}) {
           __EXCEPTION{
             MDOMX:NOMOD_THIS::
           }__;
         }
         __DEEP{
-          <ClassM::DOMMain:ManakaiDOMString.insert>
-                   (\$self->{ Q::TreeCore:node>}
-                          ->{ Q::infoset:content>}, $offset, $arg);
+          my $offset32 = <ClassM::DOMMain:ManakaiDOMStringExtend.findOffset32>
+                            ($offset);
+          substring ($self->{<H::mn:node>}->{<H::infoset:content>},
+                     $offset32, 0) = $arg;
         }__;
   @Method:
      @@Name:  deleteData
@@ -9384,6 +9454,7 @@ NodeTypeDef:
         @@@lang:en
         @@@@: 
           Remove a range of 16-bit units from the node.
+    @@Offset16Note:
     @@Param:
       @@@Name: offset
       @@@Type: 
@@ -9427,15 +9498,16 @@ NodeTypeDef:
           @@@@@@: 
             An attempt is made to break surrogate pair.
       @@@ImplNote:
-        if ($self->{ Q::TreeCore:node>}->{ Q::DOMCore:read-only>}) {
+        if ($self->{<H::mn:node>}->{<H::DOMCore:read-only>}) {
           __EXCEPTION{
             MDOMX:NOMOD_THIS::
           }__;
         }
         __DEEP{
-          <ClassM::DOMMain:ManakaiDOMString.delete>
-                   (\$self->{ Q::TreeCore:node>}
-                          ->{ Q::infoset:content>}, $offset, $count);
+          my $offset32 = <ClassM::DOMMain:ManakaiDOMStringExtend.findOffset32>
+                            ($offset);
+          substr ($self->{<H::mn:node>}->{<H::infoset:content>}, $offset32, 0)
+            = '';
         }__;
   @Method:
     @@Name:  replaceData
@@ -9444,6 +9516,7 @@ NodeTypeDef:
       @@@@:
         Replace the characters starting at the specified 16-bit unit 
         offset with the specified string.
+    @@Offset16Note:
     @@Param:
       @@@Name: offset
       @@@Type: 
@@ -9493,15 +9566,18 @@ NodeTypeDef:
           @@@@@lang:en
           @@@@@@: An attempt is made to break surrogate pair.
       @@@ImplNote:
-        if ($self->{ Q::TreeCore:node>}->{ Q::DOMCore:read-only>}) {
+        if ($self->{<H::mn:node>}->{<H::DOMCore:read-only>}) {
           __EXCEPTION{
             MDOMX:NOMOD_THIS::
           }__;
         }
         __DEEP{
-          <ClassM::DOMMain:ManakaiDOMString.replace>
-                   (\$self->{ Q::TreeCore:node>}
-                          ->{ Q::infoset:content>}, $offset, $count, $arg);
+          my $offset32 = <ClassM::DOMMain:ManakaiDOMStringExtend.findOffset32>
+                            ($offset);
+          my $coffset32 = <ClassM::DOMMain:ManakaiDOMStringExtend.findOffset32>
+                            ($offset + $count);
+          substr ($self->{<H::mn:node>}->{<H::infoset:content>},
+                  $offset32, $coffset32 - $offset32) = $arg;
         }__;
   @ReAttr:
      @@Name:  nodeValue
@@ -9597,7 +9673,38 @@ NodeTypeDef:
      @@SpecLevel:3
      @@For:
        ManakaiDOM:DOM3
+
+  @Attr:
+    @@Name: childNodes
+    @@ForCheck: ManakaiDOM|ForClass
+    @@enDesc:
+      A list of nodes that contains all children of the node.
+    @@Get:
+      @@@Type: DOMCore|NodeList
+      @@@actualType: DOMCore|ManakaiDOMEmptyNodeList
+      @@@enDesc:
+        Since <IF::DOMCore|CharacterData> nodes cannot have any child nodes,
+        the node list is always empty.
+      @@@PerlDef:
+        $r = <Class::DOMCore|ManakaiDOMEmptyNodeList>->new;
 ##CharacterData
+
+ElementTypeBinding:
+  @Name: Offset16Note
+  @ElementType:
+    dis:Description
+  @ShadowContent:
+    @@lang:en
+    @@@:
+      {NOTE::
+        Since strings are hold as sequences of characters in Perl
+        rather than as sequences of UTF-16 code units in DOM,
+        use of this method would be a bad choice in the viewpoint
+        of performance.  Usually applications should prefer normal
+        string functions of Perl.
+      }
+    @@For: ManakaiDOM|ManakaiDOM
+    @@ddid:Offset16Note
 
 NodeTypeDef:
   @IFQName: Attr
@@ -13026,32 +13133,25 @@ IFCls1Def:
         @@@Description:
           @@@@lang:en
           @@@@@: The new node, of the same type as this node.
-        @@@Exception:
-          @@@@Type: DOMException
-          @@@@Name: INDEX_SIZE_ERR
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              The "offset" is negative or greater than the number 
-              of 16-bit units.
-        @@@Exception:
-          @@@@Type: DOMException
-          @@@@Name: NO_MODIFICATION_ALLOWED_ERR
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              Either this node is read-only [DOM 1, 2, 3] or 
-              the parent node of this node is read-only.
-      @@@Exception:
-        @@@@Type: 
-          ManakaiDOM:ManakaiDOMImplementationException
-        @@@@Name: MDOM_INDEX_IN_SURROGATE_PAIR
-        @@@@Description:
-          @@@@@lang:en
-          @@@@@@: An attempt is made to break surrogate pair.
+       @@@raises:
+         @@@@@: DOMCore|NEGATIVE_INDEX_ERR
+         @@@@enDesc:
+           The <P::offset> is negative.
+       @@@raises:
+         @@@@@: DOMCore|OUT_OF_UPPER_BOUND_ERR
+         @@@@enDesc:
+           The <P::offset> is greater than the number of
+           16-bit units.
+       @@@raises:
+         @@@@@: MDOMX|NOMOD_THIS
+         @@@@enDesc:
+           The node is read-only.
+       @@@raises:
+         @@@@@: MDOMX|NOMOD_PARENT
+         @@@@enDesc:
+           The parent node is read-only.
+         @@@@For: ManakaiDOM|ManakaiDOM
       @@@PerlDef:
-        @@@@For:!ManakaiDOM|all
-        @@@@@:
           my $node = $self->{<H::mn:node>};
           my $parentNode = $node->{<H::infoset:parent>};
           if ($node->{<H::DOMCore:read-only>}) {
@@ -13064,17 +13164,19 @@ IFCls1Def:
             }__;
           }
           my $ds = \$node->{<H::infoset:content>};
-          my $len = CORE::length ($$ds) * 2;
           my $after;
-          __DEEP{
-            $after = <ClassM::DOMMain:ManakaiDOMString.substring>
-                                         ($ds, $offset, $len);
-            <ClassM::DOMMain:ManakaiDOMString.delete> ($ds, $offset, $len);
-          }__;
+          try {
+            my $offset32 = <ClassM::DOMMain:ManakaiDOMStringExtend
+                                   .findOffset32> ($offset);
+            $after = substring ($$ds, $offset32);
+            substring ($$ds, $offset32) = '';
+          ## TODO: Catch StringIndexOutOfBoundsException
+          };
           my $newNode;
           if ($node->{<H::DOMCore:nodeType>} eq <H::DOMCore:TextNode>) {
             $newNode = <ClassM::ManakaiDOMText.newObject>;
-          } elsif ($node->{<H::DOMCore:nodeType>} eq <H::DOMXML:CDATASectionNode>) {
+          } elsif ($node->{<H::DOMCore:nodeType>} eq
+                   <H::DOMXML:CDATASectionNode>) {
             $newNode = <ClassM::DOMXML:ManakaiDOMCDATASection.newObject>;
           } else {
             __EXCEPTION{
@@ -13090,8 +13192,7 @@ IFCls1Def:
           if ($parentNode) {
             $parentNode-><M::NodeStem.importTree> ($newNode);
             for my $i (0..$#{$parentNode->{<H::infoset:children>}}) {
-              if ($parentNode->{<H::infoset:children>}->[$i]
-                             ->{<H::mn:nodeID>} eq
+              if ($parentNode->{<H::infoset:children>}->[$i]->{<H::mn:nodeID>} eq
                   $node->{<H::mn:nodeID>}) {
                 splice @{$parentNode->{<H::infoset:children>}},
                        $i + 1, 0, $newNode;

@@ -42,7 +42,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/30 13:06:15 $
+      $Date: 2005/10/06 10:53:36 $
     @@ContentType:
       dis:Date.RCS
 
@@ -1134,6 +1134,20 @@ NodeTypeDef:
                 }
               }
             }
+
+  @Attr:
+    @@Name: childNodes
+    @@ForCheck: ManakaiDOM|ForClass
+    @@enDesc:
+      A list of nodes that contains all children of the node.
+    @@Get:
+      @@@Type: DOMCore|NodeList
+      @@@actualType: DOMCore|ManakaiDOMEmptyNodeList
+      @@@enDesc:
+        Since <IF::DOMCore|CharacterData> nodes cannot have any child nodes,
+        the node list is always empty.
+      @@@PerlDef:
+        $r = <Class::DOMCore|ManakaiDOMEmptyNodeList>->new;
 ##DocumentType
 
 NodeTypeDef:
@@ -1434,6 +1448,21 @@ NodeTypeDef:
                 }
               }
             }
+
+
+  @Attr:
+    @@Name: childNodes
+    @@ForCheck: ManakaiDOM|ForClass
+    @@enDesc:
+      A list of nodes that contains all children of the node.
+    @@Get:
+      @@@Type: DOMCore|NodeList
+      @@@actualType: DOMCore|ManakaiDOMEmptyNodeList
+      @@@enDesc:
+        Since <IF::DOMCore|CharacterData> nodes cannot have any child nodes,
+        the node list is always empty.
+      @@@PerlDef:
+        $r = <Class::DOMCore|ManakaiDOMEmptyNodeList>->new;
 ##Notation
 
 NodeTypeDef:
@@ -1845,6 +1874,21 @@ NodeTypeDef:
                 }
               }
             }
+
+
+  @Attr:
+    @@Name: childNodes
+    @@ForCheck: ManakaiDOM|ForClass
+    @@enDesc:
+      A list of nodes that contains all children of the node.
+    @@Get:
+      @@@Type: DOMCore|NodeList
+      @@@actualType: DOMCore|ManakaiDOMEmptyNodeList
+      @@@enDesc:
+        Since <IF::DOMCore|CharacterData> nodes cannot have any child nodes,
+        the node list is always empty.
+      @@@PerlDef:
+        $r = <Class::DOMCore|ManakaiDOMEmptyNodeList>->new;
 ##Entity
 
 NodeTypeDef:
@@ -2314,4 +2358,19 @@ NodeTypeDef:
                 }
               }
             }
+
+
+  @Attr:
+    @@Name: childNodes
+    @@ForCheck: ManakaiDOM|ForClass
+    @@enDesc:
+      A list of nodes that contains all children of the node.
+    @@Get:
+      @@@Type: DOMCore|NodeList
+      @@@actualType: DOMCore|ManakaiDOMEmptyNodeList
+      @@@enDesc:
+        Since <IF::DOMCore|CharacterData> nodes cannot have any child nodes,
+        the node list is always empty.
+      @@@PerlDef:
+        $r = <Class::DOMCore|ManakaiDOMEmptyNodeList>->new;
 ##ProcessingInstruction

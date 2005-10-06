@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/10/01 12:14:30 $
+      $Date: 2005/10/06 10:53:38 $
     @@ContentType:
       dis:Date.RCS
   
@@ -2495,6 +2495,11 @@ IFClsDef:
                        <Q::DISPerl:UnimportMethod> => 'unimport',
                        <Q::DISPerl:VERSIONMethod> => 'VERSION',
                        <Q::DISPerl:ISAMethod> => 'isa',
+                       <Q::DISLang:ArrayGet> => 'FETCH',
+                       <Q::DISLang:ArraySet> => 'STORE',
+                       <Q::DISLang:HashGet> => 'FETCH',
+                       <Q::DISLang:HashSet> => 'STORE',
+                       <Q::DISLang:ToString> => 'stringify',
                      }->{$op_uri};
                 $r = $op_uri if $op_uri =~ /^[A-Z]+$/;
             } else {
@@ -2613,7 +2618,8 @@ IFClsDef:
             }
           } elsif ($self-><M::DIS|DISResource.isTypeURI>
                               (<Q::DISLang:Const>)) {
-            $r = $self-><AG::DIS|DISAnyResource.ownerModule>
+            $r = $self-><AG::DIS|DISResource.parentResource>
+                      -><AG::DIS|DISResource.parentResource>
                       -><AG::DISModulePerl.plFullyQualifiedName>
                . '::' . $self-><AG::DISResourcePerl.plName>;
           } else {
