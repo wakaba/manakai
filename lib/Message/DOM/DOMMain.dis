@@ -25,7 +25,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/10/08 12:05:57 $
+      $Date: 2005/10/08 15:05:42 $
     @@ContentType:
       dis:Date.RCS
   
@@ -237,18 +237,12 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:ExceptionOrWarningSubType
-    @@ForCheck:
-      ManakaiDOM:ManakaiDOM
+    @@rdf:type: dx|ErrorSubCode
 
 ElementTypeBinding:
   @Name: XParam
   @ElementType:
-    ManakaiDOM:exceptionOrWarningParameter
-  @ShadowContent:
-    @@ForCheck:
-      ManakaiDOM:ManakaiDOM
+    ecore:hasParameter
 
 ElementTypeBinding:
   @Name: Const
@@ -257,13 +251,13 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type: 
       ManakaiDOM:Const
+
 ElementTypeBinding:
   @Name: XConst
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type: 
-      ManakaiDOM:Const
+    @@rdf:type: dx|ErrorCode
 
 ElementTypeBinding:
   @Name: Attr
@@ -619,7 +613,7 @@ ResourceDef:
           }
     @@Return:
       @@@PerlDef:
-          if ($err->isa (<ClassName::ManakaiDOM:ManakaiDOMException
+          if ($err->isa (<ClassName::dx|Exception
                                    ::ManakaiDOM:Perl>)) {
             $err->throw;
           } else {

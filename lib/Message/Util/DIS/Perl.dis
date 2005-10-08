@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/10/08 12:05:59 $
+      $Date: 2005/10/08 15:05:47 $
     @@ContentType:
       dis:Date.RCS
   
@@ -3445,7 +3445,7 @@ IFClsDef:
                         }__}__;
                       }
                       $r-><M::DIS|PLPack.setSubAliasName> ($op => $pname);
-                    } else {
+                    } elsif ($op !~ /:/) {
                       if ($r-><M::DIS|PLPack.getOverloadMethodName> ($op)) {
                         __UNDEEP{__EXCEPTION{
                           DIS|PERL_OPERATOR_ALREADY_OVERLOADED_ERR::
@@ -3660,7 +3660,7 @@ IFClsDef:
                                },
                              } grep {
                                $_-><M::DIS|DISResource.isTypeURI>
-                                    (<Q::ManakaiDOM:ExceptionOrWarningSubType>)
+                                    (<Q::dx:ErrorSubCode>)
                              } @{$_-><M::DIS|DISResource.getChildResourceList>}
                            },
                          },

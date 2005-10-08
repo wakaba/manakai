@@ -23,7 +23,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2005/10/08 12:05:58 $
+      $Date: 2005/10/08 15:05:45 $
     @@ContentType:
       dis:Date.RCS
   
@@ -3486,7 +3486,7 @@ IFClsDef:
                          ($contextNode-><M::NSResolverDIS.tfqnamesToURI>
                                           ($q1, null, $forArg, node => $node));
             if ($r->[2]-><M::ManakaiDISResourceDefinition
-                      .isTypeURI> (<Q::ManakaiDOM:ExceptionOrWarningSubType>)) {
+                      .isTypeURI> (<Q::dx:ErrorSubCode>)) {
               $r->[1] = $r->[2]-><AG::DIS|DISResource.parentResource>;
             } else {
               $r->[1] = $r->[2]; CORE::delete $r->[2];
@@ -3495,10 +3495,10 @@ IFClsDef:
 
           if ($r->[2] and
               not $r->[2]-><M::ManakaiDISResourceDefinition
-                      .isTypeURI> (<Q::ManakaiDOM:ExceptionOrWarningSubType>)) {
+                      .isTypeURI> (<Q::dx:ErrorSubCode>)) {
             __UNDEEP{__EXCEPTION{RESOURCE_NOT_DEFINED_ERR::
               DIS:uri => {$r->[2]->{uri}},
-              DIS:expectedType => {<Q::ManakaiDOM:ExceptionOrWarningSubType>},
+              DIS:expectedType => {<Q::dx:ErrorSubCode>},
               DIS:sourceNode => {$node},
               DIS:sourceCode => {$xcref},
             }__}__;
@@ -4481,6 +4481,22 @@ IFClsDef:
                       $name => $prop_uri,
                     }__;
                     $elc-><M::DISElement.unlinkFromDocument> ($db);
+                  } elsif ($el-><M::DISElement.mediaTypeMatch>
+                                     (<Q::DISCore:Integer>,
+                                      $mtopt{default_media_type}, %mtopt)) {
+                    my $v = $el-><M::SWCFGNode.value>;
+                    if ($v =~ /^0x/) {
+                      $v = hex $v;
+                    } else {
+                      $v += 0;
+                    }
+                    __CODE{dv|createValue::
+                      $value => $v,
+                      $base_type => {$base_type = <Q::DISCore:String>},
+                      $type => $new_value_type,
+                      $result => $new_value,
+                      $name => $prop_uri,
+                    }__;
                   } else {
                     __CODE{dv|createValue::
                       $value => {$el-><M::SWCFGNode.value>},
@@ -7653,7 +7669,7 @@ XParamDef:
 ElementTypeBinding:
   @Name: XSourceNodeParam
   @ElementType:
-    ManakaiDOM:exceptionOrWarningParameter
+    ecore:hasParameter
   @ShadowContent:
     @@QName: sourceNode
     @@Description:
@@ -7664,7 +7680,7 @@ ElementTypeBinding:
 ElementTypeBinding:
   @Name: XSourceCodeParam
   @ElementType:
-    ManakaiDOM:exceptionOrWarningParameter
+    ecore:hasParameter
   @ShadowContent:
     @@QName: sourceCode
     @@Description:

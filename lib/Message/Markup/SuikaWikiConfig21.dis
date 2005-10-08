@@ -25,7 +25,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2005/10/08 12:05:57 $
+      $Date: 2005/10/08 15:05:42 $
     @@ContentType:
       dis:Date.RCS
   
@@ -254,6 +254,7 @@ IFClsDef:
   @ClsQName: ManakaiSWCFGNode
 
   @ClsISA: ManakaiNode|ManakaiNodeRef||ManakaiDOM|Perl
+  @ClsISA: dx|ManakaiDefaultExceptionHandler||ManakaiDOM|Perl
   
   @Description:
     @@lang:en
@@ -2589,57 +2590,6 @@ IFClsDef:
   @mn:anydata1: swcfg21|flag
   @mn:anydata1: swcfg21|option
 
-  @IntMethod:
-    @@ForCheck: ManakaiDOM|ForClass
-    @@Operator:
-      @@@@:
-        ManakaiDOM:MUErrorHandler
-      @@@ContentType:
-        dis:TypeQName
-    @@Description:
-      @@@lang:en
-      @@@@:
-        This method is a generic error handler; all manakai exceptions 
-        and warnings associated to an object are once reported to this method 
-        and then delivered to appropriate entities. 
-        \
-        If the error is an exception (such as <X::DOMCore:DOMException> or 
-        <X::ManakaiDOM:ManakaiDOMImplementationException>), it is 
-        simply thrown.  If the error is only a warning, it is reported 
-        via the <IF::DOMCore:DOMError> interface. 
-        \
-        See <PerlModule::Message::Util::Error> documentation for more 
-        information on the error reporting mechanism.
-        \
-        {NOTE:: This kind of methods are named as <Perl::___report_error> 
-                in the convention of <PerlModule::Message::Util::Error>. 
-        \
-        }
-    @@Param:
-      @@@Name:err
-      @@@Type: 
-        ManakaiDOM:ManakaiDOMExceptionOrWarning::ManakaiDOM:Perl
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          An exception object that describes what kind of error it is 
-          and how it should be recovered. 
-          \
-          {NOTE:: Exception objects in manakai implementation 
-                  inherit the class <PerlModule::Message::Util::Error>, 
-                  that in turn inherits <PerlModule::Error>.
-          \
-          }
-    @@Return:
-      @@@PerlDef:
-          if ($err->isa (<ClassName::ManakaiDOM:ManakaiDOMException
-                                   ::ManakaiDOM:Perl>)) {
-            $err->throw;
-          } else {
-            \## TODO: Implement warning reporting
-            warn $err->stringify;
-          }
-
   @Attr:
     @@Name: nodeID
     @@Description:
@@ -2674,8 +2624,7 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type: 
-      DOMMain:XWParameter
+    @@rdf:type: ecore|Parameter
     @@For:
       =ManakaiDOM:all
 
@@ -4246,7 +4195,7 @@ ElementTypeBinding:
 ElementTypeBinding:
   @Name: XSourceNodeParam
   @ElementType:
-    ManakaiDOM:exceptionOrWarningParameter
+    ecore:hasParameter
   @ShadowContent:
     @@QName: 
       DIS:sourceNode

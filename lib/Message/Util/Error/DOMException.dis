@@ -20,7 +20,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/10/08 12:06:02 $
+      $Date: 2005/10/08 15:05:50 $
     @@ContentType:
       dis:Date.RCS
   
@@ -169,11 +169,6 @@ ResourceTypeDef:
   @rdfs:subClassOf: Err|MUErrorInterface
   @rdfs:subClassOf: DISLang|Exception
 
-ResourceDef:
-  @QName: ManakaiDOM|ExceptionIF
-  @AliasFor: dx|Interface
-  @For: =ManakaiDOM|all
-
 ResourceTypeDef:
   @QName: AnyExceptionClass
   @FullName:
@@ -200,11 +195,6 @@ ResourceTypeDef:
     AnyExceptionClass::ManakaiDOM:all
   @rdfs:subClassOf: DISLang|Exception
   @rdfs:subClassOf: ecore|AnyErrorCode
-
-ResourceDef:
-  @QName: ManakaiDOM|ExceptionClass
-  @AliasFor: dx|Class
-  @For: =ManakaiDOM|all
 
 SPropDef:
   @QName: dx|implementedBy
@@ -247,24 +237,6 @@ ResourceTypeDef:
     @@@:
       A subtype of an exception or warning.
   @rdfs:subClassOf: ecore|AnyErrorCode
-
-ResourceDef:
-  @QName:
-    ManakaiDOM:ExceptionOrWarningSubType
-  @AliasFor: dx|ErrorSubCode
-  @For: =ManakaiDOM|all
-
-ResourceDef:
-  @QName:
-    ManakaiDOM:exceptionOrWarningParameter
-  @AliasFor: ecore|hasParameter
-  @For: =ManakaiDOM|all
-
-ResourceDef:
-  @QName: 
-    DOMMain:XWParameter
-  @AliasFor: ecore|Parameter
-  @For: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: ResourceTypeDef
@@ -599,15 +571,6 @@ ResourceDef:
 ##ManakaiDOMExceptionOrWarning
 
 ResourceDef:
-  @QName: 
-    DOMMain:ManakaiDOMExceptionIF
-  @rdf:type:
-    ManakaiDOM:ExceptionIF
-  @For:
-    ManakaiDOM:Perl
-##ManakaiDOMExceptionIF
-
-ResourceDef:
   @QName: dx|Exception
   @rdf:type: dx|Class
   @ISA:
@@ -619,12 +582,6 @@ ResourceDef:
     The <Class::dx|Exception> class is a basis for implementation
     of exceptions thrown in DOM compatible manner.
 ##Exception
-
-ResourceDef:
-  @QName: 
-    ManakaiDOM:ManakaiDOMException
-  @For: ManakaiDOM|Perl
-  @AliasFor: dx|Exception
 
 ResourceDef:
   @QName: 
@@ -910,13 +867,12 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:ExceptionOrWarningSubType
+    @@rdf:type: dx|ErrorSubCode
 
 ElementTypeBinding:
   @Name: XParam
   @ElementType:
-    ManakaiDOM:exceptionOrWarningParameter
+    ecore:hasParameter
 
 ## -- Common exception parameters
 
@@ -956,8 +912,7 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type: 
-      DOMMain:XWParameter
+    @@rdf:type: ecore|Parameter
     @@For: =ManakaiDOM|all
 
 ## -- Exception target
@@ -1014,9 +969,8 @@ ResourceDef:
           }
     @@Return:
       @@@PerlDef:
-          if ($err->isa (<ClassName::ManakaiDOM:ManakaiDOMException
-                                   ::ManakaiDOM:Perl>)) {
-            $err->throw;
+          if ($err->isa (<ClassName::dx|Exception>)) {
+            $err-><M::ecore|ErrorInterface.throw>;
           } else {
             \## TODO: Implement warning reporting
             warn $err->stringify;

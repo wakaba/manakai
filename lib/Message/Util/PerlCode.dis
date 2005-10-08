@@ -25,7 +25,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2005/10/08 12:05:59 $
+      $Date: 2005/10/08 15:05:46 $
     @@ContentType:
       dis:Date.RCS
   
@@ -1606,7 +1606,7 @@ IFClsDef:
 
 
         ## -- Exports
-        if (sort {$a cmp $b} keys %{$node->{<H::pc:export>} || {}}) {
+        if (%{$node->{<H::pc:export>} || {}}) {
           $r .= q[our %EXPORT_TAG = (] . 
                   <ClassM::ManakaiPerlCodeImplementation.perlList>
                      ([map {$_ => [sort {$a cmp $b}
