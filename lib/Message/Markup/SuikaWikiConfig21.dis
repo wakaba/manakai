@@ -25,7 +25,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2005/09/29 09:15:00 $
+      $Date: 2005/10/08 12:05:57 $
     @@ContentType:
       dis:Date.RCS
   
@@ -62,8 +62,6 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#
   @dis:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
-  @dis2pm:
-    http://suika.fam.cx/~wakaba/archive/2004/11/8/dis2pm#
   @DISLang:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Lang#
   @DISlib:
@@ -76,6 +74,14 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dom/main#
   @DOMMetaImpl:
     http://suika.fam.cx/~wakaba/archive/2004/dom/meta#
+  @dx:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#
+  @ecore:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/Core/
+  @f:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/feature#
+  @idl:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/IDL#
   @infoset:
     http://www.w3.org/2001/04/infoset#
   @kwd:
@@ -3039,11 +3045,11 @@ IFClsDef:
 
   @RedefAttr:
     @@Name:namespaceURI
-    @@NewIn21:
     @@Description:
       @@@lang:en
       @@@@:
         The namespace URI of the node. 
+    @@NewIn21:
     @@Type:SWCFGString
     @@Get:
       @@@Type:SWCFGString
@@ -3106,11 +3112,11 @@ IFClsDef:
 
   @Attr:
     @@Name:realNamespaceURI
-    @@NewIn21:
     @@Description:
       @@@lang:en
       @@@@:
         The namespace URI of the node. 
+    @@NewIn21:
     @@Type:SWCFGString
     @@Get:
       @@@Type:SWCFGString
@@ -3209,8 +3215,7 @@ IFClsDef:
 
   @ResourceDef:
     @@QName: expandETBinding
-    @@rdf:type:
-      dis2pm:BlockCode
+    @@rdf:type: DISPerl|BlockCode
     @@Description:
       @@@lang:en
       @@@@:
@@ -3268,8 +3273,7 @@ IFClsDef:
 
   @ResourceDef:
     @@QName: expandNamespace
-    @@rdf:type:
-      dis2pm:BlockCode
+    @@rdf:type: DISPerl|BlockCode
     @@ForCheck: ManakaiDOM|ForClass
     @@Description:
       @@@lang:en
@@ -4014,11 +4018,11 @@ ResourceDef:
   @For: =ForEmpty
 
   @rdf:type:
-    @@@: ManakaiDOM|ExceptionIF
+    @@@: dx|Interface
     @@ForCheck: ManakaiDOM|ForIF
 
   @rdf:type:
-    @@@: ManakaiDOM|ExceptionClass
+    @@@: dx|Class
     @@ForCheck: ManakaiDOM|ForClass
 
   @Implement:
@@ -4029,17 +4033,14 @@ ResourceDef:
     @@@: ||ForLatest||ManakaiDOM|ForIF
     @@ContentType: DISCore|TFPQNames
     @@ForCheck: ManakaiDOM|ForClass ForLatest
+  @dx:implementedBy: ||swcfg21|ForLatest||ManakaiDOM|ForClass
 
-  @DOMMain:implementFeature:
+  @f:implements:
     @@@: CoreFeature21
     @@For: ForLatest
 
-  @Implement:
-    @@@: DOMMain|ManakaiDOMExceptionIF||ManakaiDOM|Perl
-    @@ForCheck: ManakaiDOM|ForClass
-
   @ISA:
-    @@@: ManakaiDOM|ManakaiDOMException||ManakaiDOM|Perl
+    @@@: dx|Exception||ManakaiDOM|Perl
     @@ForCheck: ManakaiDOM|ForClass
 
   @IFQName: SWCFGException
@@ -4051,17 +4052,13 @@ ResourceDef:
       Exceptions raised if an attempt to make a bad operation has made. 
 
   @ResourceDef:
-    @@rdf:type: ManakaiDOM|ConstGroup
-    @@ForCheck: !=ForEmpty
+    @@rdf:type: DISLang|ConstGroup
+    @@ForCheck: ManakaiDOM|ForIF !=ForEmpty
 
     @@IFQName: SWCFGExceptionCode
-    @@ClsQName: ManakaiSWCFGExceptionCode
-    @@plCName: SWCFGExceptionCode
 
-    @@rdfs:subClassOf:
-      DOMMain:unsigned-short::ManakaiDOM:all
-    @@Type:
-      DOMMain:unsigned-short::ManakaiDOM:all
+    @@rdfs:subClassOf: idl|unsignedShort||ManakaiDOM|all
+    @@Type:idl|unsignedShort||ManakaiDOM|all
 
     @@XConst:
       @@@Name:HIERARCHY_REQUEST_ERR
@@ -4369,7 +4366,7 @@ IFClsDef:
            elsif (defined (my $bs = $input-><AG::DOMLS:LSInput
                               ::ManakaiDOM:ManakaiDOMLatest.byteStream>)) {
              __EXCEPTION{
-               ManakaiSWCFGException.NOT_SUPPORTED_ERR::
+               SWCFGException.NOT_SUPPORTED_ERR::
                  MDOMX:param-name => 'input',
              }__;
            }
@@ -4385,7 +4382,7 @@ IFClsDef:
                   defined (my $pubId = $input-><AG::DOMLS:LSInput
                                       ::ManakaiDOM:ManakaiDOMLatest.publicId>)) {
              __EXCEPTION{
-               ManakaiSWCFGException.NOT_SUPPORTED_ERR::
+               SWCFGException.NOT_SUPPORTED_ERR::
                  MDOMX:param-name => 'input',
              }__;
            } else {
@@ -5256,11 +5253,7 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       DISLang:TreeElementType
-    @@AliasFor:
-      @@@@:
-        ::ManakaiDOM:all
-      @@@For:
-        !=ManakaiDOM:all
+    @@For: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: NSVariant
@@ -5299,55 +5292,34 @@ ElementTypeBinding:
 ElementTypeBinding:
   @Name: RaiseException
   @ElementType:
-    ManakaiDOM:raises
+    dx:raises
 
 ElementTypeBinding:
   @Name: XConst
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:Const
+    @@rdf:type: dx|ErrorCode
 
 ElementTypeBinding:
   @Name: XSubTypeDef
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:ExceptionOrWarningSubType
-    @@ForCheck: ManakaiDOM|ForClass
+    @@rdf:type: dx|ErrorSubCode
 
 ElementTypeBinding:
   @Name: XParam
   @ElementType:
-    ManakaiDOM:exceptionOrWarningParameter
+    ecore:hasParameter
 
 ElementTypeBinding:
   @Name: XPropDef
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type: 
-      DOMMain:XWParameter
-    @@AliasFor:
-      @@@For:
-        !=ManakaiDOM:all
-      @@@@:
-        ::ManakaiDOM:all
-
-ElementTypeBinding:
-  @Name: TypeDef
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DataType
-    @@AliasFor:
-      @@@@:
-        ::ManakaiDOM:all
-      @@@For: 
-        ManakaiDOM:all !=ManakaiDOM:all
+    @@rdf:type: ecore|Parameter
+    @@For: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: ConstValue

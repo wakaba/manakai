@@ -42,7 +42,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/10/06 10:53:36 $
+      $Date: 2005/10/08 12:05:57 $
     @@ContentType:
       dis:Date.RCS
 
@@ -62,6 +62,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dom/main#
   @DOMMetaImpl:
     http://suika.fam.cx/~wakaba/archive/2004/dom/meta#
+  @dx:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#
   @dxm:
     http://suika.fam.cx/~wakaba/archive/2004/dis/XML#
   @f:
@@ -2100,9 +2102,8 @@ NodeTypeDef:
           @@@@@:
             The content.  It may contain the <CODE::PIC> (<XML::?<gt>>) but such 
             data result the document in unserializable.
-        @@@ManakaiDOM:raises:
-          @@@@@:
-            DOMCore:DOMException.NO_MODIFICATION_ALLOWED_ERR
+        @@@dx:raises:
+          @@@@@: DOMCore|DOMException.NO_MODIFICATION_ALLOWED_ERR
           @@@@Description:
             @@@@@lang:en
             @@@@@@: This node is read-only.
@@ -2186,9 +2187,9 @@ NodeTypeDef:
           DOMMain:DOMString
         @@@actualType:
           DOMMain:ManakaiDOMString
-        @@@ManakaiDOM:raises:
-          @@@@@: 
-            DOMCore:DOMException.DOMSTRING_SIZE_ERR
+        @@@dx:raises:
+          @@@@@: DOMCore|DOMException.DOMSTRING_SIZE_ERR
+          @@@@For: !ManakaiDOM|Perl
           @@@@Description:
             @@@@@lang:en
             @@@@@@: 
@@ -2200,9 +2201,8 @@ NodeTypeDef:
           DOMMain:DOMString
         @@@actualType:
           DOMMain:ManakaiDOMString
-        @@@ManakaiDOM:raises:
-          @@@@@:
-            DOMCore:DOMException.NO_MODIFICATION_ALLOWED_ERR
+        @@@dx:raises:
+          @@@@@: DOMCore|DOMException.NO_MODIFICATION_ALLOWED_ERR
           @@@@Description:
             @@@@@lang:en
             @@@@@@: 
@@ -2233,9 +2233,9 @@ NodeTypeDef:
           @@@@lang:en
           @@@@@:
             The text content of this node, i.e. the <A::DOMCore:Node.nodeValue>.
-        @@@ManakaiDOM:raises:
-          @@@@@: 
-            DOMCore:DOMException.DOMSTRING_SIZE_ERR
+        @@@dx:raises:
+          @@@@@: DOMCore|DOMException.DOMSTRING_SIZE_ERR
+          @@@@For: !ManakaiDOM|Perl
           @@@@Description:
             @@@@@lang:en
             @@@@@@:
@@ -2249,9 +2249,8 @@ NodeTypeDef:
           @@@@lang:en
           @@@@@:
             The new text content of the node.
-        @@@ManakaiDOM:raises:
-          @@@@@: 
-            DOMCore:DOMException.NO_MODIFICATION_ALLOWED_ERR
+        @@@dx:raises:
+          @@@@@: DOMCore|DOMException.NO_MODIFICATION_ALLOWED_ERR
           @@@@Description:
             @@@@@lang:en
             @@@@@@: This node is read-only.

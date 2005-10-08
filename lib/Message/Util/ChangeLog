@@ -1,3 +1,18 @@
+2005-10-08  Wakaba  <wakaba@suika.fam.cx>
+
+	* PerlCode.dis (getExceptionInterfacePackageNameList,
+	addExceptionInterfacePackageName): New methods.
+	(ToString): Sorts hash keys where they result in
+	the order of statements in result code.
+
+	* Error.pm ($DEBUG): New option variable.
+	(___get_error_def): Calls "___error_def" method in second or later "@ISA"
+	package even if elder package has "___error_def" method.
+
+	* DIS.dis: Now constant values are only defined
+	in interfaces.
+	(DIS:NO_EXCEPTION_CLASS_ERR): New exception subcode.
+
 2005-10-06  Wakaba  <wakaba@suika.fam.cx>
 
 	* DIS.dis (getAnyResourceURIList, getModuleURIList): New methods.

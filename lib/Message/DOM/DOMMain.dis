@@ -25,7 +25,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/10/06 10:53:36 $
+      $Date: 2005/10/08 12:05:57 $
     @@ContentType:
       dis:Date.RCS
   
@@ -97,8 +97,12 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dom/main#
   @DOMMetaImpl:
     http://suika.fam.cx/~wakaba/archive/2004/dom/meta#
+  @dx:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#
   @ecore:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/Core/
+  @Err:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/
   @f:
     http://suika.fam.cx/~wakaba/archive/2004/dom/feature#
   @html5:
@@ -202,20 +206,6 @@ ElementTypeBinding:
     @@rdf:type:
       DISLang:TreeElementType
     @@For: =ManakaiDOM|all
-
-ElementTypeBinding:
-  @Name: ExceptionDef
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:ExceptionClass
-    @@ISA: 
-      ManakaiDOM:ManakaiDOMException::ManakaiDOM:Perl
-    @@ISA:
-      ManakaiDOM:ManakaiDOMObject
-    @@ForCheck:
-      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
 
 ResourceTypeDef:
   @QName: ErrorClass
@@ -864,14 +854,14 @@ ResourceDef:
       @@@Description:
         @@@@lang:en
         @@@@@: The UTF-16 offset.
-#      @@@ManakaiDOM:raises:
-#        @@@@@: StringIndexOutOfBoundsException
-#        @@@@Description:
-#          @@@@@lang:en
-#          @@@@@@:
-#            The specified <P::offset32> is negative or greater than
-#            the number of characters, i.e. the number of UTF-32 32-bit
-#            code units.
+      @@@ecore:raises:
+        @@@@@: StringIndexOutOfBoundsException
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The specified <P::offset32> is negative or greater than
+            the number of characters, i.e. the number of UTF-32 32-bit
+            code units.
       @@@PerlDef:
         @@@@DefaultValue: $offset32
         @@@@ForCheck: ManakaiDOM|ForClass
@@ -944,13 +934,13 @@ ResourceDef:
           The UTF-32 offset.  If the <P::offset16> value is into middle of a 
           surrogate pair, the UTF-32 offset at the end of the pair is 
           returned.
-#      @@@ManakaiDOM:raises:
-#        @@@@@: StringIndexOutOfBoundsException
-#        @@@@Description:
-#          @@@@@lang:en
-#          @@@@@@:
-#            The specified <P::offset16> is negative or greater than
-#            the number of UTF-16 16-bit code-units.
+      @@@ecore:raises:
+        @@@@@: StringIndexOutOfBoundsException
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@:
+            The specified <P::offset16> is negative or greater than
+            the number of UTF-16 16-bit code-units.
       @@@PerlDef:
         @@@@DefaultValue: $offset16
         @@@@ForCheck: ManakaiDOM|ForClass
@@ -1000,11 +990,11 @@ ResourceDef:
   @For: =ManakaiDOM|ManakaiDOM
 
   @rdf:type:
-    @@@: ManakaiDOM|ExceptionIF
+    @@@: Err|MUErrorInterface
     @@ForCheck: ManakaiDOM|ForIF
 
   @rdf:type:
-    @@@: ManakaiDOM|ExceptionClass
+    @@@: Err|MUErrorClass
     @@ForCheck: ManakaiDOM|ForClass
 
   @Implement:
@@ -1024,13 +1014,10 @@ ResourceDef:
     @@ContentType: DISCore|TFPQNames
     @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
 
-  @Implement:
-    @@@: DOMMain|ManakaiDOMExceptionIF||ManakaiDOM|Perl
-    @@ForCheck: ManakaiDOM|ForClass
-
-  @ISA:
-    @@@: ManakaiDOM|ManakaiDOMException||ManakaiDOM|Perl
-    @@ForCheck: ManakaiDOM|ForClass
+  @AppISA:
+    @@@:
+      Message::Util::Error
+    @@For: ManakaiDOM|ManakaiDOM
   @ISA:
     @@@: ManakaiDOM|ManakaiDOMObject
     @@ForCheck: ManakaiDOM|ForClass
@@ -1716,11 +1703,17 @@ ResourceDef:
 
 ## -- Manakai implementation-specific exception and warning
 
-ExceptionDef:
-  @QName: 
+ResourceDef:
+  @QName:
     ManakaiDOM:ManakaiDOMImplementationException
   @For: 
     ManakaiDOM:ManakaiDOM
+
+  @rdf:type: dx|Class
+
+  @DISPerl:ISA: dx|Exception
+  @DISPerl:ISA: ManakaiDOM|ManakaiDOMObject
+
   @Description:
     @@lang:en
     @@@:

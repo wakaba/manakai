@@ -13,7 +13,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/10/05 11:51:15 $
+      $Date: 2005/10/08 12:06:02 $
     @@ContentType:
       dis:Date.RCS
   
@@ -262,6 +262,17 @@ ResourceTypeDef:
     @@lang:en
     @@@:
       Method parameters. 
+  @rdfs:subClassOf: DISLang|AnyParameter
+  @subsetOf: DISLang|AnyParameter
+
+ResourceTypeDef:
+  @QName: DISLang|ExceptionParameter
+  @enDesc:
+    Exception parameter.
+    
+    {NOTE:: Exception parameters are different from 
+            exception handler parameters.
+    }
   @rdfs:subClassOf: DISLang|AnyParameter
   @subsetOf: DISLang|AnyParameter
 

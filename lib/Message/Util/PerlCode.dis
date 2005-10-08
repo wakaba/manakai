@@ -25,7 +25,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2005/09/29 15:18:10 $
+      $Date: 2005/10/08 12:05:59 $
     @@ContentType:
       dis:Date.RCS
   
@@ -62,6 +62,12 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dom/meta#
   @dx:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#
+  @ecore:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/Core/
+  @f:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/feature#
+  @idl:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/IDL#
   @infoset:
     http://www.w3.org/2001/04/infoset#
   @kwd:
@@ -440,6 +446,21 @@ IFClsDef:
              ->{$moduleName} = true;
 
   @Method:
+    @@Name: addExceptionInterfacePackageName
+    @@enDesc:
+      Adds a Perl exception interface into the list of Perl packages.
+    @@Param:
+      @@@Name: moduleName
+      @@@Type:
+        Perl:package-name::ManakaiDOM:all
+      @@@enDesc:
+        The name of the interface package.
+    @@Return:
+      @@@PerlDef:
+        $self->{<H::mn:node>}->{<H::pc:exceptionInterfaceName>}
+             ->{$moduleName} = true;
+
+  @Method:
     @@Name: getUsePerlModuleNameList
     @@enDesc:
       Returns a list of Perl modules names that is <Perl::use>d
@@ -535,6 +556,37 @@ IFClsDef:
         $r = [grep {$list->{$_}} keys %$list];
 
   @Method:
+    @@Name: getExceptionInterfacePackageNameList
+    @@enDesc:
+      Returns a list of Perl exception interface package names 
+      by this code fragment, including all descendant nodes. 
+    @@Return:
+      @@@Type:
+        DISPerl:ARRAY::ManakaiDOM:all
+      @@@enDesc:
+        A list of package names.  Note that the list is <EM::dead>; 
+        any modification to it does not affect to the code fragment
+        and vice versa.
+      @@@PerlDef:
+        my $list = {};
+        my @node = ($self->{<H::mn:node>});
+        while (my $node = shift @node) {
+          next unless ref $node;
+          for my $mname (keys %{$node->{<H::pc:exceptionInterfaceName>} || {}}) {
+            $list->{$mname} ||= $node->{<H::pc:exceptionInterfaceName>}->{$mname};
+          }
+          push @node, $node->{$_} for @{$node->{<Q::TreeCore:subnode0>}};
+          my @n;
+          for my $nn (map {$node->{$_}} @{$node->{<Q::TreeCore:subnode2>}}) {
+            push @n, (ref $nn eq 'ARRAY' ? @$nn : values %{$nn || {}});
+          }
+          for my $n ((map {$node->{$_}} @{$node->{<Q::TreeCore:subnode>}}), @n) {
+            push @node, (ref $n eq 'ARRAY' ? @$n : values %{$n || {}});
+          }
+        }
+        $r = [grep {$list->{$_}} keys %$list];
+
+  @Method:
     @@Name: disAddRequireURI
     @@enDesc:
       Adds a <QUOTE::dis> resource into the list of <Perl::require>d
@@ -586,6 +638,11 @@ PropDef:
   @QName: useModuleName
   @enDesc:
     The list of modules. 
+
+PropDef:
+  @QName: pc|exceptionInterfaceName
+  @enDesc:
+    The list of exception interface packages.
 
 PropDef:
   @QName: useCharClassName
@@ -951,8 +1008,18 @@ IFClsDef:
             }
           }
 
+          ## -- Exception interface packages
+          for (sort {$a cmp $b} @{$self-><M::PerlCode
+                                     .getExceptionInterfacePackageNameList>}) {
+            next if ref $pack->{$_};
+            $pack->{$_} = [];
+            $r .= sprintf q<push @%s::ISA, 'Message::Util::Error' >.
+                          q<unless @%s::ISA;%s>, $_, $_, "\n";
+          }
+
           ## -- Enables interface packages
           my @packs = map {'$' . $_ . '::'}
+                      sort {$a cmp $b}
                       grep {not ref $pack->{$_} and $pack->{$_}}
                       keys %$pack;
           $r .= q<for (>. join (', ', @packs) . qq<){}\n> if @packs;
@@ -1478,7 +1545,7 @@ IFClsDef:
 
         ## Inheritance
         my @isa = (@{$node->{<H::dis:ISA>}},
-                   sort keys %{$node->{<H::dis:Implement>}});
+                   sort {$a cmp $b} keys %{$node->{<H::dis:Implement>}});
         if (@isa) {
           $r .= 'push our @ISA, ' .
                 <ClassM::ManakaiPerlCodeImplementation.perlList> (\@isa) .
@@ -1492,7 +1559,7 @@ IFClsDef:
         }
 
         my $cls = $self-><M::ManakaiPerlCodeFragment.getUseCharClassNameList>;
-        for my $pack (keys %$cls) {
+        for my $pack (sort {$a cmp $b} keys %$cls) {
           $r .= 'use ' . $pack . ' ' .
                 <ClassM::ManakaiPerlCodeImplementation.perlList>
                    ([grep {$cls->{$pack}->{$_}} keys %{$cls->{$pack}}]) . ";\n";
@@ -1505,7 +1572,7 @@ IFClsDef:
         }
 
         ## Subroutines
-        for my $cnk (keys %{$node->{<H::pc:sub>}}) {
+        for my $cnk (sort {$a cmp $b} keys %{$node->{<H::pc:sub>}}) {
           my $cno = $node->{<H::pc:sub>}->{$cnk};
           if (ref $cno) {
             my $cn;
@@ -1520,7 +1587,7 @@ IFClsDef:
 
         ## Operators
         my $op = '';
-        for my $cnk (keys %{$node->{<H::dis2pm:operator>}}) {
+        for my $cnk (sort {$a cmp $b} keys %{$node->{<H::dis2pm:operator>}}) {
           my $cno = $node->{<H::dis2pm:operator>}->{$cnk};
           if (ref $cno) {
             my $cn;
@@ -1539,14 +1606,18 @@ IFClsDef:
 
 
         ## -- Exports
-        if (keys %{$node->{<H::pc:export>} || {}}) {
+        if (sort {$a cmp $b} keys %{$node->{<H::pc:export>} || {}}) {
           $r .= q[our %EXPORT_TAG = (] . 
                   <ClassM::ManakaiPerlCodeImplementation.perlList>
-                     ([map {$_ => [keys %{$node->{<H::pc:export>}->{$_}}]}
+                     ([map {$_ => [sort {$a cmp $b}
+                                        keys %{$node->{<H::pc:export>}->{$_}}]}
+                       sort {$a cmp $b}
                        grep {$_} keys %{$node->{<H::pc:export>}}]) . qq[);\n];
           $r .= q[our @EXPORT_OK = (] .
                   <ClassM::ManakaiPerlCodeImplementation.perlList>
-                     ([map {keys %{$node->{<H::pc:export>}->{$_}}}
+                     ([map {sort {$a cmp $b}
+                            keys %{$node->{<H::pc:export>}->{$_}}}
+                       sort {$a cmp $b}
                        keys %{$node->{<H::pc:export>}}]) . qq[);\n];
           $r .= q[use Exporter; push our @ISA, 'Exporter';] . qq[\n];
         }
@@ -4331,26 +4402,23 @@ ResourceDef:
   @For: ManakaiDOM|Perl
 
   @rdf:type:
-    @@@: ManakaiDOM|ExceptionIF
+    @@@: dx|Interface
     @@ForCheck: ManakaiDOM|ForIF
 
   @rdf:type:
-    @@@: ManakaiDOM|ExceptionClass
+    @@@: dx|Class
     @@ForCheck: ManakaiDOM|ForClass
 
   @Implement:
     @@@: ||ManakaiDOM|Perl||ManakaiDOM|ForIF
     @@ContentType: DISCore|TFPQNames
     @@ForCheck: ManakaiDOM|ForClass
+  @dx:implementedBy: ||ManakaiDOM|Perl||ManakaiDOM|ForClass
 
-  @DOMMain:implementFeature: CoreFeature10
-
-  @Implement:
-    @@@: DOMMain|ManakaiDOMExceptionIF||ManakaiDOM|Perl
-    @@ForCheck: ManakaiDOM|ForClass
+  @f:implements: CoreFeature10
 
   @ISA:
-    @@@: ManakaiDOM|ManakaiDOMException||ManakaiDOM|Perl
+    @@@: dx|Exception||ManakaiDOM|Perl
     @@ForCheck: ManakaiDOM|ForClass
 
   @IFQName: PCException
@@ -4360,17 +4428,16 @@ ResourceDef:
     Exceptions for the <Module::Util:PerlCode> module.
 
   @ResourceDef:
-    @@rdf:type: ManakaiDOM|ConstGroup
+    @@ForCheck: ManakaiDOM|ForIF
+    @@rdf:type: DISLang|ConstGroup
 
     @@IFQName: PCExceptionCode
-    @@ClsQName: ManakaiPerlCodeExceptionCode
-    @@plCName: PCExceptionCode
 
     @@enDesc:
       Exception codes for <IF::PCException>. 
 
-    @@Type: DOMMain|unsigned-short||ManakaiDOM|all
-    @@rdfs:subClassOf: DOMMain|unsigned-short||ManakaiDOM|all
+    @@Type: idl|unsignedShort||ManakaiDOM|all
+    @@rdfs:subClassOf: idl|unsignedShort||ManakaiDOM|all
 
     @@XConstDef:
       @@@Name: HIERARCHY_REQUEST_ERR
@@ -4429,30 +4496,26 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:Const
+    @@rdf:type: dx|ErrorCode
 
 ElementTypeBinding:
   @Name: XSubTypeDef
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:ExceptionOrWarningSubType
-    @@ForCheck: ManakaiDOM|ForClass
+    @@rdf:type: dx|ErrorSubCode
 
 ElementTypeBinding:
   @Name: XParam
   @ElementType:
-    ManakaiDOM:exceptionOrWarningParameter
+    ecore:hasParameter
 
 ElementTypeBinding:
   @Name: XParamDef
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type: 
-      DOMMain:XWParameter
+    @@rdf:type: ecore|Parameter
     @@For: =ManakaiDOM|all
 
 ElementTypeBinding:

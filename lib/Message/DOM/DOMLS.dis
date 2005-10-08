@@ -29,7 +29,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/30 13:06:15 $
+      $Date: 2005/10/08 12:05:57 $
     @@ContentType:
       dis:Date.RCS
 
@@ -65,8 +65,14 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
   @DOMMain:
     http://suika.fam.cx/~wakaba/archive/2004/dom/main#
+  @dx:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#
+  @ecore:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/Core/
   @f:
     http://suika.fam.cx/~wakaba/archive/2004/dom/feature#
+  @idl:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/IDL#
   @infoset:
      http://www.w3.org/2001/04/infoset#
   @lang:
@@ -438,11 +444,11 @@ ResourceDef:
   @For: =ManakaiDOM|ManakaiDOM
 
   @rdf:type:
-    @@@: ManakaiDOM|ExceptionIF
+    @@@: dx|Interface
     @@ForCheck: ManakaiDOM|ForIF
 
   @rdf:type:
-    @@@: ManakaiDOM|ExceptionClass
+    @@@: dx|Class
     @@ForCheck: ManakaiDOM|ForClass
 
   @Implement:
@@ -457,22 +463,25 @@ ResourceDef:
     @@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
     @@ContentType: DISCore|TFPQNames
     @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
+  @dx:implementedBy:
+    @@@: ||ManakaiDOM|ManakaiDOM3||ManakaiDOM|ForClass
+    @@ForCheck:
+      ManakaiDOM|ForIF ManakaiDOM|ManakaiDOM3 !ManakaiDOM|ManakaiDOMLatest
+  @dx:implementedBy:
+    @@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForClass
+    @@ForCheck: ManakaiDOM|ForIF ManakaiDOM|ManakaiDOMLatest
 
-  @DOMMain:implementFeature:
+  @f:implements:
     @@@: LSFeature30
     @@For: ManakaiDOM|DOM3
-  @DOMMain:implementFeature:
+  @f:implements:
     @@@: LSAsyncFeature30
     @@For: ManakaiDOM|DOM3
 
-  @Implement:
-    @@@: DOMMain|ManakaiDOMExceptionIF||ManakaiDOM|Perl
+  @DISPerl:ISA:
+    @@@: dx|Exception||ManakaiDOM|Perl
     @@ForCheck: ManakaiDOM|ForClass
-
-  @ISA:
-    @@@: ManakaiDOM|ManakaiDOMException||ManakaiDOM|Perl
-    @@ForCheck: ManakaiDOM|ForClass
-  @ISA:
+  @DISPerl:ISA:
     @@@: ManakaiDOM|ManakaiDOMObject
     @@ForCheck: ManakaiDOM|ForClass
 
@@ -495,26 +504,21 @@ ResourceDef:
   @Attr:
      @@Name:  code
      @@Get:
-        @@@Type:
-           DOMMain:unsigned-short||ManakaiDOM|all
+        @@@Type: idl|unsignedShort||ManakaiDOM|all
         @@@actualType: LSExceptionCode
      @@ForCheck: ManakaiDOM|ForIF
 
   @ResourceDef:
-    @@rdf:type: ManakaiDOM|ConstGroup
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM
+    @@rdf:type: DISLang|ConstGroup
+    @@ForCheck: ManakaiDOM|ForIF !=ManakaiDOM|ManakaiDOM
 
-    @@IFQName: LSExceptionCode
-    @@ClsQName: ManakaiDOMLSExceptionCode
-    @@plCName: LSExceptionCode
+    @@QName: LSExceptionCode
 
-     @@rdfs:subClassOf:
-       @@@@: DOMMain|unsigned-short||ManakaiDOM|all
-       @@@ForCheck: ManakaiDOM|ForClass
-     @@Type: DOMMain|unsigned-short||ManakaiDOM|all
+    @@rdfs:subClassOf: idl|unsignedShort||ManakaiDOM|all
+    @@Type: idl|unsignedShort||ManakaiDOM|all
 
-   @@enDesc:
-     An integer indicating the type of error generated.
+    @@enDesc:
+      An integer indicating the type of error generated.
 
      @@Const:
         @@@Name:  PARSE_ERR
@@ -534,7 +538,6 @@ ResourceDef:
             <IF::LSSerializer> and the processing has been stop.
 ##LSException
 
-
 ElementTypeBinding:
   @Name: IFQName
   @ElementType:
@@ -548,7 +551,6 @@ ElementTypeBinding:
     dis:QName
   @ShadowContent:
     @@ForCheck: ManakaiDOM|ForClass
-
 
 ElementTypeBinding:
   @Name: IFISA
@@ -690,8 +692,7 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:ConstGroup
+    @@rdf:type: DISLang|ConstGroup
     @@ForCheck: !=ManakaiDOM|ManakaiDOM
 
 ElementTypeBinding:
@@ -699,28 +700,20 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type: 
-      ManakaiDOM:Const
+    @@rdf:type: dx|ErrorCode
 
 ElementTypeBinding:
   @Name: XParam
   @ElementType:
-    ManakaiDOM:exceptionOrWarningParameter
-  @ShadowContent:
-    @@ForCheck:
-      ManakaiDOM:ManakaiDOM
+    ecore:hasParameter
+
 ElementTypeBinding:
   @Name: SubTypeDef
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:ExceptionOrWarningSubType
-    @@ForCheck:
-      ManakaiDOM:ManakaiDOM
-    @@ForCheck:
-      ManakaiDOM:ForClass
-    @@aliasChild:1
+    @@rdf:type: dx|ErrorSubCode
+    @@For: ManakaiDOM|ManakaiDOM
 
 IFCls3Def:
   @IFQName: DOMImplementationLS
@@ -749,14 +742,11 @@ IFCls3Def:
       and <FeatureVer::3.0> respectively.
    
   @ConstGroup:
-    @@IFQName: DOMImplementationLSMode
-    @@ClsQName: ManakaiDOMImplementationLSMode
-    @@plCName: DOMImplementationLSMode
+    @@ForCheck: ManakaiDOM|ForIF
+    @@QName: DOMImplementationLSMode
 
-     @@rdfs:subClassOf:
-       @@@@: DOMMain|unsigned-short||ManakaiDOM|all
-       @@@ForCheck: ManakaiDOM|ForClass
-     @@Type: DOMMain|unsigned-short||ManakaiDOM|all
+    @@rdfs:subClassOf: idl|unsignedShort||ManakaiDOM|all
+    @@Type: idl|unsignedShort||ManakaiDOM|all
 
      @@Description:
        @@@lang:en
@@ -878,13 +868,6 @@ IFCls3Def:
        @@@PerlDef:
          $r = <ClassM::ManakaiDOMLSOutput.new>;
 ##DOMImplementationLS
-
-ElementTypeBinding:
-  @Name: plCName
-  @ElementType:
-    DISPerl:exportTagName
-  @ShadowContent:
-    @@For: ManakaiDOM|Perl
 
 ElementTypeBinding:
   @Name: enDesc
@@ -1095,15 +1078,10 @@ IFDef:
                DOM applications should use an error handler to get 
                details on the error.
   @ConstGroup:
-     @@QName:  
-       @@@@: ACTION_TYPES
+    @@QName: ACTION_TYPES
 
-     @@rdfs:subClassOf:
-       @@@@:
-         DOMMain:unsigned-short||ManakaiDOM|all
-       @@@ForCheck:
-         ManakaiDOM:ForClass
-     @@Type: DOMMain|unsigned-short||ManakaiDOM|all
+    @@rdfs:subClassOf: idl|unsignedShort||ManakaiDOM|all
+    @@Type: idl|unsignedShort||ManakaiDOM|all
 
      @@Description:
        @@@lang:en
@@ -1483,17 +1461,16 @@ IFDef:
     @@@:
       Examine and remove nodes as they are being processed while parsing.
   @ConstGroup:
-     @@IFQName: FilterReturnValue
-     @@plCName: FILTER_RETURN_VALUE
+    @@QName: FilterReturnValue
+
      @@FullName:
         @@@@:
         Constants returned by startElement and acceptNode
         @@@lang:  en
-     @@Type:
-        DOMMain:short||ManakaiDOM|all
-     @@rdfs:subClassOf:
-       @@@@: DOMMain|short||ManakaiDOM|all
-       @@@ForCheck: ManakaiDOM|ForClass
+
+    @@rdfs:subClassOf: idl|short||ManakaiDOM|all
+    @@Type: idl|short||ManakaiDOM|all
+
      @@Const:
         @@@Name:  FILTER_ACCEPT
         @@@Type:

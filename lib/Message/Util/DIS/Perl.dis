@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/10/06 10:53:38 $
+      $Date: 2005/10/08 12:05:59 $
     @@ContentType:
       dis:Date.RCS
   
@@ -63,10 +63,14 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#Perl/
   @dv:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#Value/
+  @dx:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#
   @dump:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#DISDump/
   @ecore:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/Core/
+  @Err:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/
   @html3:
     urn:x-suika-fam-cx:markup:ietf:html:3:draft:00:
   @html5:
@@ -2260,9 +2264,23 @@ IFClsDef:
                   }
                 }
               } elsif ($cls-><M::DIS|DISResource.isTypeURI>
-                              (<Q::ManakaiDOM:ExceptionIF>)) {
+                              (<Q::DISLang:Interface>)) {
                 my $pack = $cls-><AG::DISResourcePerl.plCodeFragment>;
                 $r-><M::DIS|PLFile.appendPackage> ($pack);
+
+                for my $cr (@{$cls-><M::DIS|DISResource
+                                 .getChildResourceListByType>
+                                          (<Q::DISLang:ConstGroup>)}) {
+                  my $tag = $cr-><AG::DISResourcePerl.plName>;
+                  for my $gcr (@{$cr-><M::DIS|DISResource
+                                                    .getChildResourceListByType>
+                                          (<Q::DISLang:Const>)}) {
+                    $thismod_pack-><M::DIS|PLPack.addExport>
+                          ($tag, my $nm = $gcr-><AG::DISResourcePerl.plName>);
+                    $const{$nm} = $gcr-><AG::DISResourcePerl
+                                                   .plFullyQualifiedName>;
+                  }
+                }
               } elsif ($cls-><M::DIS|DISResource.isTypeURI>
                               (<Q::DISPerl:ScalarVariable>) and
                        not $cls-><AG::DIS|DISResource.parentResource>) {
@@ -3384,12 +3402,16 @@ IFClsDef:
                                          .plFullyQualifiedName>;
               if (defined $spack_name) {
                 $r-><M::DIS|PLPack.addImplementPackage> ($spack_name);
+                if ($scls-><M::DIS|DISAnyResource.isTypeURI>
+                      (<Q::Err:MUErrorInterface>)) {
+                  $r-><M::DIS|MPLCodeFragment.addExceptionInterfacePackageName>
+                      ($spack_name);
+                }
               }
             }
     
             ## - Class members
             my @cr = @{$self-><M::DIS|DISResource.getChildResourceList>};
-            my @const;
             for my $cr (@cr) {
               ## - Subroutines
               if ($cr-><M::DIS|DISResource.isTypeURI>
@@ -3463,7 +3485,6 @@ IFClsDef:
                     }
                     $r-><M::DIS|PLPack.setSub>
                              ($sub-><AG::DIS|MPLSub.localName> => $sub);
-                    push @const, $gcr;
                   }
                 }
               ## - Constants
@@ -3482,7 +3503,6 @@ IFClsDef:
                 }
                 $r-><M::DIS|PLPack.setSub>
                                 ($sub-><AG::DIS|MPLSub.localName> => $sub);
-                push @const, $cr;
               ## Package-scope variables
               } elsif ($cr-><M::DIS|DISResource.isTypeURI>
                                 (<Q::DISPerl:ScalarVariable>)) {
@@ -3519,52 +3539,6 @@ IFClsDef:
                 $r-><M::DIS|PLBlockCon.appendStatement>
                   -><M::DIS|PLAnyCon.appendNewAssignment> ($var => $value);
               } # Type of child resources
-            }
-
-            ## - Exceptions
-            if ($self-><M::DIS|DISResource.isTypeURI>
-                             (<Q::DOMException:AnyExceptionClass>)) {
-              my $err_def = $plimpl-><M::DIS|MPLImpl.createPerlSub>
-                                            ('___error_def');
-              $err_def-><AS::DIS|MPLSub.prototype> ('');
-              $err_def-><M::DIS|PLBlockCon.appendCode>
-                 ($plimpl-><M::DIS|MPLImpl.perlList>
-                   ([{
-                       map {
-                         $_-><AG::DISResourcePerl.plName> => {
-                           <Q::DOMCore:code> => 0 + $_
-                             -><AG::DISResourcePerl.plCodeFragment>,
-                           description => $_
-                             -><M::ManakaiDISResourcePerl.plMufDescriptionText>,
-#                           ($_->{ExpandedURI q< DOMCore:severity>}
-#                              ? (ExpandedURI q< DOMCore:severity>
-#                                      => $_->{ExpandedURI q< DOMCore:severity>},
-#                                 ExpandedURI q< DOMCore:type>
-#                                       => $_->{ExpandedURI q< DOMCore:type>})
-#                                    : ()),
-                           <Q::MDOMX:subtype> => {
-                             map {
-                               $_-><AG::DIS|DISAnyResource.nameURI>
-                               => {
-                                 description => $_
-                                   -><M::ManakaiDISResourcePerl
-                                         .plMufDescriptionText>,
-#                                 ($_->{ExpandedURI q< DOMCore:severity>}
-#                                    ? (ExpandedURI q< DOMCore:severity>
-#                                      => $_->{ExpandedURI q< DOMCore:severity>},
-#                                       ExpandedURI q< DOMCore:type>
-#                                       => $_->{ExpandedURI q< DOMCore:type>})
-#                                    : ()),
-                               },
-                             } grep {
-                               $_-><M::DIS|DISResource.isTypeURI>
-                                    (<Q::ManakaiDOM:ExceptionOrWarningSubType>)
-                             } @{$_-><M::DIS|DISResource.getChildResourceList>}
-                           },
-                         },
-                       } @const
-                    }]));
-              $r-><M::DIS|PLPack.setSub> (___error_def => $err_def);
             }
 
           ## -- Global variables
@@ -3616,15 +3590,84 @@ IFClsDef:
 
           ## -- Exception Interfaces
           } elsif ($self-><M::DIS|DISResource.isTypeURI>
-                              (<Q::ManakaiDOM:ExceptionIF>)) {
+                              (<Q::DISLang:Interface>)) {
             my $plimpl = $self-><AG::DISAnyResourcePerl.plImplementation>;
             $r = $plimpl-><M::DIS|MPLImpl.createPerlPackage>
                               ($self-><AG::DISResourcePerl
                                          .plFullyQualifiedName>);
+
             ## - Inheritance
+            if ($self-><M::DIS|DISResource.isTypeURI> (<Q::dx:Interface>)) {
               $r-><M::DIS|PLPack.addISAPackage> ('Message::Util::Error');
               $r-><M::DIS|MPLCodeFragment.addRequirePerlModuleName>
                                             ('Message::Util::Error');
+            }
+
+            ## - Constants
+            my @const;
+            for my $cr (@{$self-><M::DIS|DISResource.getChildResourceListByType>
+                                         (<Q::DISLang:ConstGroup>)}) {
+              for my $gcr (@{$cr-><M::DIS|DISResource.getChildResourceListByType>
+                                         (<Q::DISLang:Const>)}) {
+                my $sub = $gcr-><AG::DISResourcePerl.plCodeFragment>;
+                if ($r-><M::DIS|PLPack.getSub>
+                                          ($sub-><AG::DIS|MPLSub.localName>)) {
+                  __UNDEEP{__EXCEPTION{DIS|PERL_SUBROUTINE_ALREADY_DEFINED_ERR::
+                    PerlCode:localName => {$sub-><AG::DIS|MPLSub.localName>},
+                    DIS:uri => {$gcr->{uri}},
+                    DIS:sourceNode => {$gcr->{src}},
+                  }__}__;
+                }
+                $r-><M::DIS|PLPack.setSub>
+                             ($sub-><AG::DIS|MPLSub.localName> => $sub);
+                push @const, $gcr;
+              }
+            }
+
+            ## - Error Descriptions
+            if ($self-><M::DIS|DISResource.isTypeURI> (<Q::dx:Interface>)) {
+              my $err_def = $plimpl-><M::DIS|MPLImpl.createPerlSub>
+                                            ('___error_def');
+              $err_def-><AS::DIS|MPLSub.prototype> ('');
+              $err_def-><M::DIS|PLBlockCon.appendCode>
+                 ($plimpl-><M::DIS|MPLImpl.perlList>
+                   ([{
+                       map {
+                         $_-><AG::DISResourcePerl.plName> => {
+                           <Q::DOMCore:code> => 0 + $_
+                             -><AG::DISResourcePerl.plCodeFragment>,
+                           description => $_
+                             -><M::ManakaiDISResourcePerl.plMufDescriptionText>,
+#                           ($_->{ExpandedURI q< DOMCore:severity>}
+#                              ? (ExpandedURI q< DOMCore:severity>
+#                                      => $_->{ExpandedURI q< DOMCore:severity>},
+#                                 ExpandedURI q< DOMCore:type>
+#                                       => $_->{ExpandedURI q< DOMCore:type>})
+#                                    : ()),
+                           <Q::MDOMX:subtype> => {
+                             map {
+                               $_-><AG::DIS|DISAnyResource.nameURI>
+                               => {
+                                 description => $_
+                                   -><M::ManakaiDISResourcePerl
+                                         .plMufDescriptionText>,
+#                                 ($_->{ExpandedURI q< DOMCore:severity>}
+#                                    ? (ExpandedURI q< DOMCore:severity>
+#                                      => $_->{ExpandedURI q< DOMCore:severity>},
+#                                       ExpandedURI q< DOMCore:type>
+#                                       => $_->{ExpandedURI q< DOMCore:type>})
+#                                    : ()),
+                               },
+                             } grep {
+                               $_-><M::DIS|DISResource.isTypeURI>
+                                    (<Q::ManakaiDOM:ExceptionOrWarningSubType>)
+                             } @{$_-><M::DIS|DISResource.getChildResourceList>}
+                           },
+                         },
+                       } @const
+                    }]));
+              $r-><M::DIS|PLPack.setSub> (___error_def => $err_def);
+            }
 
           ## -- Unsupported types
           } else {
@@ -3797,11 +3840,23 @@ IFClsDef:
               }->{$et}) {
                 $r-><M::DIS|PLBlockCon.skipLines> ($source_code);
                 if ($source_code =~ s/^((?:(?!::).)+)(?:::\s*)?//s) {
-                  my ($cls, $const, $subtype)
+                  my ($if, $const, $subtype)
                     = @{$self->{db}-><M::DIS|DISDatabase.xcrefToResource>
                                          ($1, $nsr,
                                           node => $node,
                             for_arg => $self-><AG::DIS|DISAnyResource.forURI>)};
+                  my $cls = $if-><M::DIS|DISAnyResource.isTypeURI>
+                                         (<Q::DISLang:Class>)
+                          ? $if
+                          : $if-><M::DIS|DISResourceProp.getPropertyResource>
+                                         (<Q::dx:implementedBy>);
+                  unless ($cls and
+                          $cls-><M::DIS|DISAnyResource.isTypeURI>
+                                         (<Q::DISLang:Class>)) {
+                    __UNDEEP{__EXCEPTION{DIS|NO_EXCEPTION_CLASS_ERR::
+                      DIS:uri => {$if-><AG::DIS|DISAnyResource.uri>},
+                    }__}__;
+                  }
                   my $param = $self-><M::ManakaiDISResourcePerl
                                         .plParsePreprocessParameter>
                                          ($source_code, node => $node,

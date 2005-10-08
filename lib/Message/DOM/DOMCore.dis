@@ -40,7 +40,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/10/06 10:53:34 $
+      $Date: 2005/10/08 12:05:56 $
     @@ContentType:
       dis:Date.RCS
 
@@ -102,10 +102,18 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dom/meta#
   @DOMViews:
     http://suika.fam.cx/~wakaba/archive/2004/dom/views#
+  @dx:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#
   @dxm:
     http://suika.fam.cx/~wakaba/archive/2004/dis/XML#
+  @ecore:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/Core/
   @ev:
     http://www.w3.org/2001/xml-events
+  @f:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/feature#
+  @idl:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/IDL#
   @f:
     http://suika.fam.cx/~wakaba/archive/2004/dom/feature#
   @infoset:
@@ -134,7 +142,6 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
   @mn:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/ManakaiNode#
-  @MUErrorCore:-
   @null:
     http://suika.fam.cx/~wakaba/-temp/2003/09/27/null
   @perl:
@@ -425,9 +432,8 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:ConstGroup
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM
+    @@rdf:type: DISLang|ConstGroup
+    @@ForCheck: ManakaiDOM|ForIF !=ManakaiDOM|ManakaiDOM
 
 ElementTypeBinding:
   @Name: ErrorSet
@@ -457,16 +463,14 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type: 
-      ManakaiDOM:Const
+    @@rdf:type: DISLang|Const
 
 ElementTypeBinding:
   @Name: XConst
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type: 
-      ManakaiDOM:Const
+    @@rdf:type: dx|ErrorCode
 
 ElementTypeBinding:
   @Name: ErrorDef
@@ -497,17 +501,15 @@ ElementTypeBinding:
 ElementTypeBinding:
   @Name: XParam
   @ElementType:
-    ManakaiDOM:exceptionOrWarningParameter
+    ecore:hasParameter
 
 ElementTypeBinding:
   @Name: SubTypeDef
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:ExceptionOrWarningSubType
-    @@ForCheck:
-      ManakaiDOM:ManakaiDOM ManakaiDOM|ForClass
+    @@rdf:type: dx|ErrorSubCode
+    @@For: ManakaiDOM|ManakaiDOM
 
 ElementTypeBinding:
   @Name: SubType
@@ -675,11 +677,11 @@ ResourceDef:
   @For: =ManakaiDOM|ManakaiDOM
 
   @rdf:type:
-    @@@: ManakaiDOM|ExceptionIF
+    @@@: dx|Interface
     @@ForCheck: ManakaiDOM|ForIF
 
   @rdf:type:
-    @@@: ManakaiDOM|ExceptionClass
+    @@@: dx|Class
     @@ForCheck: ManakaiDOM|ForClass
 
   @Implement:
@@ -702,39 +704,49 @@ ResourceDef:
     @@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
     @@ContentType: DISCore|TFPQNames
     @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
+  @dx:implementedBy:
+    @@@: ||ManakaiDOM|ManakaiDOM1||ManakaiDOM|ForClass
+    @@ForCheck: ManakaiDOM|ForIF ManakaiDOM|ManakaiDOM1 !ManakaiDOM|ManakaiDOM2
+  @dx:implementedBy:
+    @@@: ||ManakaiDOM|ManakaiDOM2||ManakaiDOM|ForClass
+    @@ForCheck: ManakaiDOM|ForIF ManakaiDOM|ManakaiDOM2 !ManakaiDOM|ManakaiDOM3
+  @dx:implementedBy:
+    @@@: ||ManakaiDOM|ManakaiDOM2||ManakaiDOM|ForClass
+    @@ForCheck:
+      ManakaiDOM|ForIF ManakaiDOM|ManakaiDOM3
+      !ManakaiDOM|ManakaiDOMLatest
+  @dx:implementedBy:
+    @@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForClass
+    @@ForCheck: ManakaiDOM|ForIF ManakaiDOM|ManakaiDOMLatest
 
-  @DOMMain:implementFeature:
+  @f:implements:
     @@@: CoreFeature10
     @@For: ManakaiDOM|DOM1
-  @DOMMain:implementFeature:
+  @f:implements:
     @@@: CoreFeature20
     @@For: ManakaiDOM|DOM2
-  @DOMMain:implementFeature:
+  @f:implements:
     @@@: CoreFeature30
     @@For: ManakaiDOM|DOM3
 
-  @DOMMain:implementFeature:
+  @f:implements:
     @@@: DOMXML|XMLFeature10
     @@For: ManakaiDOM|DOM1 ManakaiDOM|DOMXMLFeature
-  @DOMMain:implementFeature:
+  @f:implements:
     @@@: DOMXML|XMLFeature20
     @@For: ManakaiDOM|DOM2 ManakaiDOM|DOMXMLFeature
-  @DOMMain:implementFeature:
+  @f:implements:
     @@@: DOMXML|XMLFeature30
     @@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeature
-  @DOMMain:implementFeature:
+  @f:implements:
     @@@: DOMXML|XMLVersionFeature10
     @@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeature
-  @DOMMain:implementFeature:
+  @f:implements:
     @@@: DOMXML|XMLVersionFeature11
     @@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeatureXML11
 
-  @Implement:
-    @@@: DOMMain|ManakaiDOMExceptionIF||ManakaiDOM|Perl
-    @@ForCheck: ManakaiDOM|ForClass
-
   @ISA:
-    @@@: ManakaiDOM|ManakaiDOMException||ManakaiDOM|Perl
+    @@@: dx|Exception||ManakaiDOM|Perl
     @@ForCheck: ManakaiDOM|ForClass
   @ISA:
     @@@: ManakaiDOM|ManakaiDOMObject
@@ -750,8 +762,7 @@ ResourceDef:
   @Attr:
      @@Name:  code
      @@Get:
-       @@@Type:  
-         DOMMain:unsigned-short||ManakaiDOM|all
+       @@@Type: idl|unsignedShort||ManakaiDOM|all
        @@@actualType: ExceptionCode
        @@@Description:
          @@@@lang:en
@@ -760,23 +771,16 @@ ResourceDef:
      @@ForCheck: ManakaiDOM|ForIF
 
   @ResourceDef:
-    @@rdf:type: ManakaiDOM|ConstGroup
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM
+    @@rdf:type: DISLang|ConstGroup
+    @@ForCheck: ManakaiDOM|ForIF !=ManakaiDOM|ManakaiDOM
 
-    @@IFQName: ExceptionCode
-    @@ClsQName: ManakaiDOMExceptionCode
-    @@plCName: ExceptionCode
+    @@QName: ExceptionCode
 
      @@Description:
        @@@lang:en
        @@@@: Integers indicating the type of error generated.
-     @@rdfs:subClassOf:
-       @@@@:
-         DOMMain:unsigned-short::ManakaiDOM:all
-       @@@ForCheck:
-         ManakaiDOM:ForClass
-     @@Type:
-       DOMMain:unsigned-short::ManakaiDOM:all
+     @@rdfs:subClassOf: idl|unsignedShort||ManakaiDOM|all
+     @@Type: idl|unsignedShort||ManakaiDOM|all
      @@XConst:
         @@@Name:  INDEX_SIZE_ERR
         @@@intValue:  1
@@ -996,12 +1000,7 @@ ResourceDef:
           @@@@lang:en
           @@@@@: How is this exception code used?
      @@XConst:
-        @@@QName:
-          @@@@@:NO_MODIFICATION_ALLOWED_ERR
-          @@@@ForCheck:
-            ManakaiDOM:ForClass
-          @@@@ImplNote: Temporary.
-        @@@Name:  NO_MODIFICATION_ALLOWED_ERR
+        @@@QName:  NO_MODIFICATION_ALLOWED_ERR
         @@@intValue:  7
         @@@Description:
           @@@@lang:en
@@ -3268,14 +3267,10 @@ IFCls1Def:
   @ClsISA: ManakaiDOM|ManakaiDOMObject
 
   @ConstGroup:
-    @@IFQName: NodeType
-    @@ClsQName: ManakaiDOMNodeType
-    @@plCName: NodeType
+    @@QName: NodeType
 
-   @@rdfs:subClassOf:
-     @@@@: DOMMain|unsigned-short||ManakaiDOM|all
-     @@@ForCheck: ManakaiDOM|ForClass
-   @@Type: DOMMain|unsigned-short||ManakaiDOM|all
+    @@rdfs:subClassOf: idl|unsignedShort||ManakaiDOM|all
+    @@Type: idl|unsignedShort||ManakaiDOM|all
 
    @@enDesc:
      Constant values in this group are integers indicating of which
@@ -3451,7 +3446,7 @@ IFCls1Def:
      @@Get:
         @@@Type:  
           DOMMain:unsigned-short||ManakaiDOM|all
-        @@@actualType: ManakaiDOMNodeType
+        @@@actualType: NodeType
         @@@Description:
           @@@@lang:en
           @@@@@: 
@@ -3855,7 +3850,7 @@ IFCls1Def:
                 }
               }
               __EXCEPTION{
-                ManakaiDOMException.WRONG_DOCUMENT_ERR::
+                DOMException.WRONG_DOCUMENT_ERR::
                   MDOMX:param-name => 'newChild',
               }__;
             } # CHKDOC
@@ -4001,7 +3996,7 @@ IFCls1Def:
                     }
                   }
                   __EXCEPTION{
-                    ManakaiDOMException.NOT_FOUND_ERR::
+                    DOMException.NOT_FOUND_ERR::
                       MDOMX:param-name => 'refChild',
                   }__;
                 }
@@ -4188,8 +4183,7 @@ IFCls1Def:
                   }
                 }
               }
-              __EXCEPTION{
-                ManakaiDOMException.WRONG_DOCUMENT_ERR::
+              __EXCEPTION{DOMException.WRONG_DOCUMENT_ERR::
                   MDOMX:param-name => 'newChild',
               }__;
             } # CHKDOC
@@ -4334,13 +4328,11 @@ IFCls1Def:
                       last REFCHILD;
                     }
                   }
-                  __EXCEPTION{
-                    ManakaiDOMException.NOT_FOUND_ERR::
+                  __EXCEPTION{DOMException.NOT_FOUND_ERR::
                       MDOMX:param-name => 'oldChild',
                   }__;
                 } else { ## oldChild is n u l l
-                  __EXCEPTION{
-                    ManakaiDOMException.NOT_FOUND_ERR::
+                  __EXCEPTION{DOMException.NOT_FOUND_ERR::
                       MDOMX:param-name => 'oldChild',
                   }__;
                 }
@@ -4472,8 +4464,7 @@ IFCls1Def:
                   last FIND;
                 }
               }
-              __EXCEPTION{
-                ManakaiDOMException.NOT_FOUND_ERR::
+              __EXCEPTION{DOMException.NOT_FOUND_ERR::
               }__;
             }
             if (ref $oldChild) {
@@ -4591,8 +4582,7 @@ IFCls1Def:
                   }
                 }
               }
-              __EXCEPTION{
-                ManakaiDOMException.WRONG_DOCUMENT_ERR::
+              __EXCEPTION{DOMException.WRONG_DOCUMENT_ERR::
                   MDOMX:param-name => 'newChild',
               }__;
             } # CHKDOC
@@ -5142,16 +5132,9 @@ IFCls1Def:
          http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#baseURIs-Considerations
     @@For:
       ManakaiDOM:DOM2
+
   @ConstGroup:
-     @@QName: 
-       @@@@: DocumentPosition
-       @@@ForCheck:
-         ManakaiDOM:ForIF
-     @@QName:
-       @@@@: ManakaiDOMDocumentPosition
-       @@@ForCheck:
-         ManakaiDOM:ForClass
-     @@plCName: DocumentPosition
+    @@QName: DocumentPosition
 
      @@Description:
        @@@lang:en
@@ -5162,11 +5145,10 @@ IFCls1Def:
      @@SpecLevel:3
      @@For:
        ManakaiDOM:DOM3
-     @@rdfs:subClassOf:
-       @@@@: DOMMain|unsigned-short||ManakaiDOM|all
-       @@@ForCheck: ManakaiDOM|ForClass
-     @@Type:
-       DOMMain:unsigned-short::ManakaiDOM:all
+
+     @@rdfs:subClassOf: idl|unsignedShort||ManakaiDOM|all
+     @@Type: idl|unsignedShort||ManakaiDOM|all
+
      @@Const:
         @@@Name:  DOCUMENT_POSITION_DISCONNECTED
         @@@intValue:  0x01
@@ -5217,7 +5199,7 @@ IFCls1Def:
      @@Return:
         @@@Type:  
           DOMMain:unsigned-short||ManakaiDOM|all
-        @@@actualType: ManakaiDOMDocumentPosition
+        @@@actualType: DocumentPosition
         @@@Exception[list]:  DOMException
      @@Param:
         @@@Name:  other
@@ -8670,8 +8652,7 @@ ResourceDef:
               CORE::delete $obj->{<H::infoset:ownerElement>};
               $obj-><M::NodeStem.orphanate>;
             } else {
-              __EXCEPTION{
-                ManakaiDOMException.NOT_FOUND_ERR::
+              __EXCEPTION{DOMException.NOT_FOUND_ERR::
               }__;
             }
           @@@@ImplNote:
@@ -8932,16 +8913,14 @@ ResourceDef:
             }
             my $attrNode = $arg->{<H::mn:node>};
             if ($attrNode->{<H::infoset:ownerElement>}) {
-              __EXCEPTION{
-                ManakaiDOMException.INUSE_ATTRIBUTE_ERR::
+              __EXCEPTION{DOMException.INUSE_ATTRIBUTE_ERR::
                   MDOMX:param-name => 'arg',
               }__;
             } elsif ($attrNode->{<H::DOMCore:ownerDocument>}
                               ->{<H::mn:nodeID>} ne
                      $self->{<H::mn:node>}->{<H::DOMCore:ownerDocument>}
                           ->{<H::mn:nodeID>}) {
-              __EXCEPTION{
-                ManakaiDOMException.WRONG_DOCUMENT_ERR::
+              __EXCEPTION{DOMException.WRONG_DOCUMENT_ERR::
               }__;
             } elsif ($attrNode->{<H::DOMCore:nodeType>} ne
                      <H::infoset:Attribute>) {
@@ -9113,8 +9092,7 @@ ResourceDef:
               CORE::delete $obj->{<H::infoset:ownerElement>};
               $obj-><M::NodeStem.orphanate>;
             } else {
-              __EXCEPTION{
-                ManakaiDOMException.NOT_FOUND_ERR::
+              __EXCEPTION{DOMException.NOT_FOUND_ERR::
               }__;
             }
         @@@disDef:
@@ -10149,7 +10127,7 @@ NodeTypeDef:
     @@Get:
       @@@Type: 
         DOMMain:unsigned-short||ManakaiDOM|all
-      @@@actualType: ManakaiDOMNodeType
+      @@@actualType: NodeType
       @@@InCase:
         @@@@Label: ATTRIBUTE_NODE
         @@@@Description:
@@ -10928,16 +10906,14 @@ NodeTypeDef:
             }
             my $attrNode = $newAttr->{<H::mn:node>};
             if ($attrNode->{<H::infoset:ownerElement>}) {
-              __EXCEPTION{
-                ManakaiDOMException.INUSE_ATTRIBUTE_ERR::
+              __EXCEPTION{DOMException.INUSE_ATTRIBUTE_ERR::
                   MDOMX:param-name => 'newAttr',
               }__;
             } elsif ($attrNode->{<H::DOMCore:ownerDocument>}
                               ->{<H::mn:nodeID>} ne
                      $self->{<H::mn:node>}->{<H::DOMCore:ownerDocument>}
                           ->{<H::mn:nodeID>}) {
-              __EXCEPTION{
-                ManakaiDOMException.WRONG_DOCUMENT_ERR::
+              __EXCEPTION{DOMException.WRONG_DOCUMENT_ERR::
               }__;
             }
 
@@ -11052,8 +11028,7 @@ NodeTypeDef:
                   }
                 }
               }
-              __EXCEPTION{
-                ManakaiDOMException.NOT_FOUND_ERR::
+              __EXCEPTION{DOMException.NOT_FOUND_ERR::
                   MDOMX:param-name => 'oldAttr',
               }__;
             }
@@ -11796,16 +11771,14 @@ NodeTypeDef:
             }
             my $attrNode = $newAttr->{<H::mn:node>};
             if ($attrNode->{<H::infoset:ownerElement>}) {
-              __EXCEPTION{
-                ManakaiDOMException.INUSE_ATTRIBUTE_ERR::
+              __EXCEPTION{DOMException.INUSE_ATTRIBUTE_ERR::
                   MDOMX:param-name => 'newAttr',
               }__;
             } elsif ($attrNode->{<H::DOMCore:ownerDocument>}
                               ->{<H::mn:nodeID>} ne
                      $self->{<H::mn:node>}->{<H::DOMCore:ownerDocument>}
                           ->{<H::mn:nodeID>}) {
-              __EXCEPTION{
-                ManakaiDOMException.WRONG_DOCUMENT_ERR::
+              __EXCEPTION{DOMException.WRONG_DOCUMENT_ERR::
               }__;
             }
 
@@ -12243,8 +12216,7 @@ NodeTypeDef:
             my $r;
             __CODE{selectAttrNodeObject}__;
             unless ($r) {
-              __EXCEPTION{
-                ManakaiDOMException.NOT_FOUND_ERR::
+              __EXCEPTION{DOMException.NOT_FOUND_ERR::
               }__;
             }
             if ($r->{<H::DOMCore:read-only>}) {
@@ -12353,8 +12325,7 @@ NodeTypeDef:
             my $r;
             __CODE{selectAttrNodeObjectNS}__;
             unless ($r) {
-              __EXCEPTION{
-                ManakaiDOMException.NOT_FOUND_ERR::
+              __EXCEPTION{DOMException.NOT_FOUND_ERR::
               }__;
             }
             if ($r->{<H::DOMCore:read-only>}) {
@@ -12452,8 +12423,7 @@ NodeTypeDef:
                     $idAttr->{<H::mn:node>}->{<H::infoset:ownerElement>}
                            ->{<H::mn:nodeID>} eq
                     $self->{<H::mn:node>}->{<H::mn:nodeID>}) {
-              __EXCEPTION{
-                ManakaiDOMException.NOT_FOUND_ERR::
+              __EXCEPTION{DOMException.NOT_FOUND_ERR::
               }__;
             }
             if ($idAttr->{<H::mn:node>}->{<H::DOMCore:read-only>}) {
@@ -12732,7 +12702,7 @@ NodeTypeDef:
     @@Get:
       @@@Type: 
         DOMMain:unsigned-short||ManakaiDOM|all
-      @@@actualType:ManakaiDOMNodeType
+      @@@actualType: NodeType
       @@@InCase:
         @@@@Label: ELEMENT_NODE
         @@@@Description:
@@ -13759,18 +13729,17 @@ IFDef:
      @@ImplNote:
        @@@lang:en
        @@@@: Is this namespace *URI*?
+
   @ConstGroup:
-     @@QName: DerivationMethods
-     @@plCName: DerivationMethods
+    @@QName: DerivationMethods
+
      @@Description:
        @@@lang:en
        @@@@:
          A set of possible types of derivation.
-     @@rdfs:subClassOf: 
-       @@@@: DOMMain|unsigned-long||ManakaiDOM|all
-       @@@ForCheck: ManakaiDOM|ForClass
-     @@Type:
-       DOMMain:unsigned-long::ManakaiDOM:all
+
+    @@rdfs:subClassOf: idl|unsignedLong||ManakaiDOM|all
+    @@Type: idl|unsignedLong||ManakaiDOM|all
      @@IsBitMask:1
      @@ImplNote:
        @@@lang:en
@@ -13907,14 +13876,13 @@ IFDef:
     =ManakaiDOM:ManakaiDOM
   @For:
     ManakaiDOM:DOM3
+
   @ConstGroup:
-     @@QName:  OperationType
-     @@plCName: OperationType
-     @@rdfs:subClassOf: 
-       @@@@: DOMMain|unsigned-short||ManakaiDOM|all
-       @@@ForCheck: ManakaiDOM|ForClass
-     @@Type:
-       DOMMain:unsigned-short::ManakaiDOM:all
+    @@QName:  OperationType
+
+    @@rdfs:subClassOf: idl|unsignedShort||ManakaiDOM|all
+    @@Type: idl|unsignedShort||ManakaiDOM|all
+
      @@Description:
        @@@lang:en
        @@@@: The type of operation being performed on a node.
@@ -14055,15 +14023,11 @@ IFCls3Def:
     @@@: Describes an error.
 
   @ConstGroup:
-    @@IFQName: ErrorSeverity
-    @@ClsQName: ManakaiDOMErrorSeverity
-    @@plCName: ErrorSeverity
+    @@QName: ErrorSeverity
   
-     @@rdfs:subClassOf: 
-       @@@@: DOMMain|unsigned-short||ManakaiDOM|all
-       @@@ForCheck: ManakaiDOM|ForClass
-     @@Type: 
-       DOMMain:unsigned-short::ManakaiDOM:all
+    @@rdfs:subClassOf: idl|unsignedShort||ManakaiDOM|all
+    @@Type: idl|unsignedShort||ManakaiDOM|all
+
      @@Description:
        @@@lang:en
        @@@@: The severity of the error.
@@ -14103,9 +14067,9 @@ IFCls3Def:
      @@Get:
         @@@Type:  
           DOMMain:unsigned-short||ManakaiDOM|all
-        @@@actualType:ManakaiDOMErrorSeverity
+        @@@actualType: ErrorSeverity
         @@@PerlDef:
-          $r = $self->{<Q::MUErrorCore:def>}->{<H::DOMCore:severity>};
+          $r = $self->{<H::ecore:def>}->{<H::DOMCore:severity>};
   @Attr:
      @@Name:  message
      @@Description:
@@ -14149,7 +14113,7 @@ IFCls3Def:
           DOMMain:DOMString
         @@@actualType:DOMErrorType
         @@@PerlDef:
-          $r = $self->{<Q::MUErrorCore:def>}->{<H::DOMCore:type>};
+          $r = $self->{<H::ecore:def>}->{<H::DOMCore:type>};
   @Attr:
      @@Name:  relatedException
      @@Description:
@@ -14547,13 +14511,6 @@ IFDef:
           @@@@Description:
             @@@@@lang:en
             @@@@@@: There is no URI is available.
-
-ElementTypeBinding:
-  @Name: plCName
-  @ElementType:
-    DISPerl:exportTagName
-  @ShadowContent:
-    @@For: ManakaiDOM|Perl
 
 ElementTypeBinding:
   @Name: plMName
@@ -16872,7 +16829,7 @@ NodeTypeDef:
     @@Get:
       @@@Type: 
         DOMMain:unsigned-short||ManakaiDOM|all
-      @@@actualType: ManakaiDOMNodeType
+      @@@actualType: NodeType
       @@@InCase:
         @@@@Label: DOCUMENT_NODE
         @@@@Description:

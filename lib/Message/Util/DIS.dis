@@ -23,7 +23,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2005/10/06 10:53:36 $
+      $Date: 2005/10/08 12:05:58 $
     @@ContentType:
       dis:Date.RCS
   
@@ -71,6 +71,10 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#
   @ecore:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/Core/
+  @f:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/feature#
+  @idl:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/IDL#
   @infoset:
     http://www.w3.org/2001/04/infoset#
   @kwd:
@@ -3507,8 +3511,10 @@ IFClsDef:
               not $r->[1]-><M::ManakaiDISResourceDefinition
                       .isTypeURI> (<Q::ManakaiDOM:Const>)) {
             __UNDEEP{__EXCEPTION{RESOURCE_NOT_DEFINED_ERR::
-              DIS:uri => {$r->[1]->{uri}},
-              DIS:localName => {$r->[1]-><AG::DIS|DISAnyResource.localName>},
+              DIS:uri => {($r->[1] ? $r->[1]-><AG::DIS|DISAnyResource.uri>
+                                   : null)},
+              DIS:localName => {($r->[1] ? $r->[1]-><AG::DIS|DISAnyResource
+                                           .localName> : null)},
               DIS:expectedType => {<Q::ManakaiDOM:Const>},
               DIS:sourceNode => {$node},
               DIS:sourceCode => {$xcref},
@@ -6866,11 +6872,11 @@ ResourceDef:
   @For: =ForEmpty
 
   @rdf:type:
-    @@@: ManakaiDOM|ExceptionIF
+    @@@: dx|Interface
     @@ForCheck: ManakaiDOM|ForIF
 
   @rdf:type:
-    @@@: ManakaiDOM|ExceptionClass
+    @@@: dx|Class
     @@ForCheck: ManakaiDOM|ForClass
 
   @Implement:
@@ -6881,17 +6887,14 @@ ResourceDef:
     @@@: ||ForLatest||ManakaiDOM|ForIF
     @@ContentType: DISCore|TFPQNames
     @@ForCheck: ManakaiDOM|ForClass ForLatest
+  @dx:implementedBy: ||DIS|ForLatest||ManakaiDOM|ForClass
 
-  @DOMMain:implementFeature:
+  @f:implements:
     @@@: CoreFeature10
     @@For: ForLatest
 
-  @Implement:
-    @@@: DOMMain|ManakaiDOMExceptionIF||ManakaiDOM|Perl
-    @@ForCheck: ManakaiDOM|ForClass
-
   @ISA:
-    @@@: ManakaiDOM|ManakaiDOMException||ManakaiDOM|Perl
+    @@@: dx|Exception||ManakaiDOM|Perl
     @@ForCheck: ManakaiDOM|ForClass
 
   @IFQName: DISException
@@ -6903,20 +6906,16 @@ ResourceDef:
       Exceptions for the <QUOTE::dis> operations. 
 
   @ResourceDef:
-    @@rdf:type: ManakaiDOM|ConstGroup
-    @@ForCheck: !=ForEmpty
+    @@rdf:type: DISLang|ConstGroup
+    @@ForCheck: ManakaiDOM|ForIF !=DIS|ForEmpty
 
     @@IFQName: DISExceptionCode
-    @@ClsQName: ManakaiDISExceptionCode
-    @@plCName: DISExceptionCode
 
-    @@rdfs:subClassOf:
-      DOMMain:unsigned-short::ManakaiDOM:all
-    @@Type:
-      DOMMain:unsigned-short::ManakaiDOM:all
+    @@rdfs:subClassOf: idl|unsignedShort||ManakaiDOM|all
+    @@Type: idl|unsignedShort||ManakaiDOM|all
 
     @@enDesc:
-      Exception codes for <Class::ManakaiDISException>. 
+      Exception codes for <Class::DISException>. 
 
     @@XConstDef:
       @@@Name: HIERARCHY_REQUEST_ERR
@@ -6994,7 +6993,7 @@ ResourceDef:
     @@XConstDef:
       @@@Name: INVALID_SOURCE_ERR
       @@@Value:
-        @@@@@: 200
+        @@@@@: 501
         @@@@ContentType: DISCore|Integer
       @@@enDesc:
         The source input is well-formed but invalid. 
@@ -7571,6 +7570,17 @@ ResourceDef:
           Hash key "%p (name => {<Q::DIS:hashKeyName>});" in
           <%p (mame => {<Q::DIS:hashKeyScope>});> is already
           defined for <%p (name => {<Q::DIS:anotherURI>});>
+      @@@XSubTypeDef:
+        @@@@QName: DIS|NO_EXCEPTION_CLASS_ERR
+        @@@@enDesc:
+          The exception interface has no class that implements the interface.
+        @@@@enMufDef:
+          Exception interface <%p (name => {<Q::DIS:uri>});>:
+          There is no class that implements this interface
+        @@@@XParam:
+          @@@@@@: DIS|uri
+          @@@@@enDesc:
+            The URI of the interface.
   @ImplNote:
     @@lang:en
     @@@:
@@ -7993,32 +8003,27 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:Const
+    @@rdf:type: dx|ErrorCode
 
 ElementTypeBinding:
   @Name: XSubTypeDef
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:ExceptionOrWarningSubType
-    @@ForCheck: ManakaiDOM|ForClass
+    @@rdf:type: dx|ErrorSubCode
 
 ElementTypeBinding:
   @Name: XParam
   @ElementType:
-    ManakaiDOM:exceptionOrWarningParameter
+    ecore:hasParameter
 
 ElementTypeBinding:
   @Name: XParamDef
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type: 
-      DOMMain:XWParameter
-    @@For:
-      =ManakaiDOM:all
+    @@rdf:type: ecore|Parameter
+    @@For: =ManakaiDOM|all
 
 XParamDef:
   @QName: DIS|moduleURI
@@ -8033,5 +8038,3 @@ ElementTypeBinding:
     @@ContentType:
       lang:muf
     @@lang:en
-
-

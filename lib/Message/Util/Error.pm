@@ -15,9 +15,10 @@ This module is part of manakai.
 
 package Message::Util::Error;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error;
 push our @ISA, 'Error';
+our $DEBUG;
 
 sub import {
   shift;
@@ -39,12 +40,14 @@ sub ___error_def () {+{
 sub ___get_error_def ($$) {
   my ($self, $name) = @_;
   my $err;
+  warn ((ref $self or $self)."->___get_error_def ('$name')\n") if $DEBUG;
   $err = $self->___error_def->{$name} if $self->can ('___error_def');
   return $err if $err;
   no strict 'refs';
   for my $SUPER (@{(ref ($self) || $self).'::ISA'}) {
     if ($SUPER->can ('___get_error_def')) {
-      return $SUPER->___get_error_def ($name);
+      $err = $SUPER->___get_error_def ($name);
+      return $err if $err;
     }
   }
   return undef;
@@ -279,4 +282,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2005/01/05 12:19:39 $
+1; # $Date: 2005/10/08 12:05:59 $

@@ -20,7 +20,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/10/02 23:35:34 $
+      $Date: 2005/10/08 12:06:02 $
     @@ContentType:
       dis:Date.RCS
   
@@ -64,6 +64,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/Core/
   @Err:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/
+  @idl:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/IDL#
   @kwd:
     http://suika.fam.cx/~wakaba/archive/2005/rfc2119/
   @lang:
@@ -75,7 +77,6 @@ Namespace:
   @MDOMX:
     http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
   @MUError:\
-  @MUErrorCore:-
   @Perl:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#Perl--
   @rdf:
@@ -158,10 +159,11 @@ ResourceTypeDef:
   @QName: dx|Interface
   @enFN:
     DOM-style exception interface
-  @Description:
-    @@lang:en
-    @@@:
-      An exception type.
+  @enDesc:
+    A <Q::dx|Interface> is a <Q::DISLang:Interface> which should 
+    be implemented in the manner compatible with DOM exceptions.
+    It is expected that the interfaces of this type have
+    a <CODE::code> attribute which returns the error code.
   @rdfs:subClassOf:
     AnyExceptionAnyClass::ManakaiDOM:all
   @rdfs:subClassOf: Err|MUErrorInterface
@@ -197,11 +199,22 @@ ResourceTypeDef:
   @rdfs:subClassOf:
     AnyExceptionClass::ManakaiDOM:all
   @rdfs:subClassOf: DISLang|Exception
+  @rdfs:subClassOf: ecore|AnyErrorCode
 
 ResourceDef:
   @QName: ManakaiDOM|ExceptionClass
   @AliasFor: dx|Class
   @For: =ManakaiDOM|all
+
+SPropDef:
+  @QName: dx|implementedBy
+  @enDesc:
+    The subject resource, which is an <Q::dx:Interface>,
+    is implemented by the object resource, which is a <Q::dx:Class>.
+  @rdfs:range: dx|Class
+  @rdfs:domain: dx|Interface
+  @dataType: DISCore|TFPQNames
+  @multipleProperties: DISCore|UnorderedList
 
 ResourceTypeDef:
   @QName: 
@@ -217,8 +230,15 @@ ResourceTypeDef:
     AnyExceptionClass::ManakaiDOM:all
 
 ResourceTypeDef:
-  @QName: 
-    ManakaiDOM:ExceptionOrWarningSubType
+  @QName: dx|ErrorCode
+  @enFN: error code
+  @enDesc:
+    A <Q::dx:ErrorCode> is a kind of error.
+  @rdfs:subClassOf: DISLang|Const
+  @rdfs:subClassOf: ecore|AnyErrorCode
+
+ResourceTypeDef:
+  @QName: dx|ErrorSubCode
   @FullName:
     @@lang:en
     @@@: Exception/warning subtype
@@ -226,31 +246,25 @@ ResourceTypeDef:
     @@lang:en
     @@@:
       A subtype of an exception or warning.
+  @rdfs:subClassOf: ecore|AnyErrorCode
 
-PropDef:
-  @QName: 
+ResourceDef:
+  @QName:
+    ManakaiDOM:ExceptionOrWarningSubType
+  @AliasFor: dx|ErrorSubCode
+  @For: =ManakaiDOM|all
+
+ResourceDef:
+  @QName:
     ManakaiDOM:exceptionOrWarningParameter
-  @FullName:
-    @@lang:en
-    @@@: Parameter (for an exception or warning)
-  @rdfs:domain: 
-    ManakaiDOM:Const
-  @Description:
-    @@lang:en
-    @@@:
-      Declares the existence of an additional information about the exception.
+  @AliasFor: ecore|hasParameter
+  @For: =ManakaiDOM|all
 
-ResourceTypeDef:
+ResourceDef:
   @QName: 
     DOMMain:XWParameter
-  @FullName:
-    @@lang:en
-    @@@:
-      Exception parameter
-  @Description:
-    @@lang:en
-    @@@:
-      A parameter that is used to describe exceptions and warnings. 
+  @AliasFor: ecore|Parameter
+  @For: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: ResourceTypeDef
@@ -264,7 +278,7 @@ ElementTypeBinding:
 
 ## -- Throwing of exceptions
 
-PropDef:
+SPropDef:
   @QName: dx|raises
   @Description:
     @@lang:en
@@ -272,6 +286,7 @@ PropDef:
       An exception the method or attribute might raise.
   @multipleProperties: DISCore|OrderedList
   @dataType: dx|XCRef
+  @rdfs:subPropertyOf: ecore|raises
 
 ResourceDef:
   @QName: ManakaiDOM|raises
@@ -300,6 +315,17 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       rdf:Property
+    @@For: =ManakaiDOM|all
+
+ElementTypeBinding:
+  @Name: SPropDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      rdf:Property
+    @@rdf:type: DISSource|Property
+    @@rdf:type: DISSource|ResourceProperty
     @@For: =ManakaiDOM|all
 
 ## -- lang:Perl vocabulary
@@ -460,19 +486,19 @@ ResourceDef:
       @@@PerlDef:
           my $template;
           if (defined $self->{<Q::MDOMX:subtype>} and
-              defined $self->{<Q::MUErrorCore:def>}->{<Q::MDOMX:subtype>}
+              defined $self->{<H::ecore:def>}->{<Q::MDOMX:subtype>}
                    ->{$self->{<Q::MDOMX:subtype>}}
                    ->{<Q::MUError:description>}) {
-            $template = $self->{<Q::MUErrorCore:def>}
+            $template = $self->{<H::ecore:def>}
                    ->{<Q::MDOMX:subtype>}
                    ->{$self->{<Q::MDOMX:subtype>}}
                    ->{<Q::MUError:description>};
-          } elsif (defined $self->{<Q::MUErrorCore:def>}
+          } elsif (defined $self->{<H::ecore:def>}
                    ->{<Q::MUError:description>}) {
-            $template = $self->{<Q::MUErrorCore:def>}
+            $template = $self->{<H::ecore:def>}
                    ->{<Q::MUError:description>};
           } else {
-            $template = $self->{<Q::MUErrorCore:type>};
+            $template = $self->{<H::ecore:type>};
           }
           $r = $self->_FORMATTER_PACKAGE_->new
                     ->replace ($template, param => $self);
@@ -526,7 +552,7 @@ ResourceDef:
       DOMMain:unsigned-short::ManakaiDOM:all
     @@Get:
       @@@PerlDef:
-        $r = $self->{<Q::MUErrorCore:def>}->{<Q::DOMCore:code>};
+        $r = $self->{<H::ecore:def>}->{<Q::DOMCore:code>};
 
   @Attr:
     @@Name: value
@@ -543,7 +569,7 @@ ResourceDef:
     @@Type: DOMMain|unsigned-short||ManakaiDOM|all
     @@Get:
       @@@PerlDef:
-        $r = $self->{<Q::MUErrorCore:def>}->{<Q::DOMCore:code>};
+        $r = $self->{<H::ecore:def>}->{<Q::DOMCore:code>};
 
   @Attr:
     @@Name: type
@@ -582,21 +608,23 @@ ResourceDef:
 ##ManakaiDOMExceptionIF
 
 ResourceDef:
-  @QName: 
-    ManakaiDOM:ManakaiDOMException
-  @rdf:type:
-    ManakaiDOM:ExceptionClass
-  @ISA: 
+  @QName: dx|Exception
+  @rdf:type: dx|Class
+  @ISA:
     ManakaiDOM:ManakaiDOMExceptionOrWarning
   @For:
     ManakaiDOM:Perl
 
-  @Description:
-    @@lang:en
-    @@@:
-      An abstract class that is inherited by all manakai DOM-style
-      exception classes.
-##ManakaiDOMException
+  @enDesc:
+    The <Class::dx|Exception> class is a basis for implementation
+    of exceptions thrown in DOM compatible manner.
+##Exception
+
+ResourceDef:
+  @QName: 
+    ManakaiDOM:ManakaiDOMException
+  @For: ManakaiDOM|Perl
+  @AliasFor: dx|Exception
 
 ResourceDef:
   @QName: 
@@ -616,8 +644,7 @@ ResourceDef:
 ResourceDef:
   @QName: dx|CoreException
   @rdf:type: dx|Class
-  @ISA:
-    ManakaiDOM:ManakaiDOMException
+  @ISA: dx|Exception
   @Description:
     @@lang:en
     @@@:
@@ -627,10 +654,8 @@ ResourceDef:
   @ResourceDef:
     @@QName: dx|CoreExceptionCode
     @@rdf:type: DISLang|ConstGroup
-    @@Type:
-      DOMMain:unsigned-short::ManakaiDOM:all
-    @@rdfs:subClassOf:
-      DOMMain:unsigned-short::ManakaiDOM:all
+    @@Type: idl|unsignedShort||ManakaiDOM|all
+    @@rdfs:subClassOf: idl|unsignedShort||ManakaiDOM|all
 
     @@ResourceDef:
       @@@QName: 
