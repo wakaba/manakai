@@ -1,3 +1,23 @@
+2005-10-09  Wakaba  <wakaba@suika.fam.cx>
+
+	* DOMHTML.dis, DOMWebForms.dis: Typos in element type prefix fixed.
+
+	* DOMFeature.dis (DOMCore:implementation): Short name added.
+
+	* DOMCore.dis (CLONE_NODE_TYPE_NOT_SUPPORTED_ERR): New error subcode.
+	(DOMCore:node): New error parameter.
+	(DOMCore:ownerDocument): Changed from "mn:irefnode0" 
+	to "mn:xrefnode0".  For this reason, all assignments
+	to this property have been rewritten to references 
+	to code "mn:setXRefNode".
+	(cloneNode): Implemented.
+	(setAttributeNode): A missing "importTree" method call added.
+	(setAttributeNodeNS): Perl code removed and changed
+	to a reference to "setAttributeNode" method code.
+
+	* DOMXML.dis (DOMCore:ownerDocument): Changed from "mn:irefnode0"
+	property to "mn:xrefnode0" property.
+
 2005-10-08  Wakaba  <wakaba@suika.fam.cx>
 
 	* DOMCore.dis, DOMLS.dis: Now constant values are defined only 

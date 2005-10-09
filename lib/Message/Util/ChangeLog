@@ -1,3 +1,15 @@
+2005-10-09  Wakaba  <wakaba@suika.fam.cx>
+
+	* ManakaiNode.dis: New "mn:xrefnode0" property type has
+	been introduced and methods are fixed to support it.
+	(mn:setXRefNode, mn:unsetXRefNode): New codes.
+
+	* DIS.dis (loadResource): Skips a root resource definition
+	if it is an alias and it has "dis:Name" attribute and
+	referenced canonical definition is already read.  (Note
+	that similar case that the resource definition has "dis:QName"
+	attribute is already fixed in the same way.)
+
 2005-10-08  Wakaba  <wakaba@suika.fam.cx>
 
 	* DIS.dis (readProperties): Recognizes hexdecimal 

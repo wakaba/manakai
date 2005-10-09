@@ -42,7 +42,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/25 14:53:03 $
+      $Date: 2005/10/09 13:57:12 $
     @@ContentType:
       dis:Date.RCS
 
@@ -921,44 +921,6 @@ ImplNote:
     ManakaiDOM:DOM
 
 ElementTypeBinding:
-  @Name: L1
-  @ElementType:
-    DOMMain:implementFeature
-  @ShadowContent:
-    @@@: HTMLFeature10
-    @@For:
-      ManakaiDOM:DOM1 !ManakaiDOM:DOM2
-  @ShadowSibling:
-    @@DOMMain:implementFeature:
-      @@@@: HTMLFeature20
-      @@@For:
-        ManakaiDOM:DOM2
-
-ElementTypeBinding:
-  @Name: L1IF
-  @ElementType:
-    DOMMain:implementFeature
-  @ShadowContent:
-    @@@: HTMLFeature10
-    @@For:
-      ManakaiDOM:DOM1 !ManakaiDOM:DOM2
-  @ShadowSibling:
-    @@DOMMain:implementFeature:
-      @@@@: HTMLFeature20
-      @@@For:
-        ManakaiDOM:DOM2
-    @@For:
-      ManakaiDOM:DOM1
-    @@For:
-      =ManakaiDOM:ManakaiDOM
-    @@For: ForHTML
-    @@ISA:
-      @@@@: ||ManakaiDOM|ManakaiDOM2||ManakaiDOM|ForIF
-      @@@ForCheck: ManakaiDOM|ForIF ManakaiDOM|ManakaiDOMLatest
-      @@@ContentType: DISCore|TFPQNames
-## NOTE: A Level 2 interface is not always upward-compatible with Level 1 i.f.
-
-ElementTypeBinding:
   @Name: L2
   @ElementType:
     DOMMain:implementFeature
@@ -966,30 +928,6 @@ ElementTypeBinding:
     @@@: HTMLFeature20
     @@For:
       ManakaiDOM:DOM2
-
-ElementTypeBinding:
-  @Name: L2ISAL1
-  @ElementType:
-    dis:ISA
-  @ShadowContent:
-    @@@: ||ManakaiDOM|ManakaiDOM1||ManakaiDOM|ForIF
-    @@ForCheck: ManakaiDOM|ForIF ManakaiDOM|ManakaiDOM
-    @@ContentType: DISCore|TFPQNames
-
-ElementTypeBinding:
-  @Name: L2IF
-  @ElementType:
-    DOMMain:implementFeature
-  @ShadowContent:
-    @@@: HTMLFeature20
-    @@For:
-      ManakaiDOM:DOM2
-  @ShadowSibling:
-    @@For:
-      ManakaiDOM:DOM2
-    @@For:
-      =ManakaiDOM:ManakaiDOM
-    @@For: ForHTML
 
 ElementTypeBinding:
   @Name: PerlDef
@@ -1223,8 +1161,8 @@ ElementTypeBinding:
       @@@For: ManakaiDOM|DOM2
 
     @@rdf:type:
-      @@@: s|ElementType
-      @@ForCheck: ForHTML
+      @@@@: s|ElementType
+      @@@ForCheck: ForHTML
 
     @@s:elementType:
       @@@@: ||ForHTML40SE
@@ -1293,8 +1231,8 @@ ElementTypeBinding:
       @@@For: ManakaiDOM|DOM2
 
     @@rdf:type:
-      @@@: s|ElementType
-      @@ForCheck: ForHTML
+      @@@@: s|ElementType
+      @@@ForCheck: ForHTML
 
     @@s:elementType:
       @@@@: ||ForHTML40SE
@@ -1445,14 +1383,6 @@ ElementTypeBinding:
     @@ManakaiDOM:isForInternal: 1
 
 ElementTypeBinding:
-  @Name: ReMethod
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type: DISLang|Method
-    @@ForCheck: ManakaiDOM|ForClass
-
-ElementTypeBinding:
   @Name: Param
   @ElementType:
     dis:ResourceDef
@@ -1533,14 +1463,6 @@ ElementTypeBinding:
       @@@ForCheck: ManakaiDOM|DOM2
 
 ElementTypeBinding:
-  @Name: ReAttr
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type: DISLang|Attribute
-    @@ForCheck: ManakaiDOM|ForClass
-
-ElementTypeBinding:
   @Name: Get
   @ElementType:
     dis:ResourceDef
@@ -1563,22 +1485,6 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       ManakaiDOM:InCase
-
-ElementTypeBinding:
-  @Name: ConstGroup
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type: DISLang|ConstGroup
-    @@ForCheck: ManakaiDOM|DOM !=ManakaiDOM|ManakaiDOM
-
-ElementTypeBinding:
-  @Name: Const
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type: DISLang|Const
-    @@ForCheck: ManakaiDOM|DOM !=ManakaiDOM|ManakaiDOM
 
 ElementTypeBinding:
   @Name: Deprecated

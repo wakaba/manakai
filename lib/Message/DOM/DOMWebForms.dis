@@ -24,7 +24,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/24 11:57:21 $
+      $Date: 2005/10/09 13:57:13 $
     @@ContentType:
       dis:Date.RCS
 
@@ -98,52 +98,6 @@ Namespace:
     http://www.w3.org/1999/xhtml
 
 ElementTypeBinding:
-  @Name: L1
-  @ElementType:
-    DOMMain:implementFeature
-  @ShadowContent:
-    @@@: 
-      DOMHTML:HTMLFeature10
-    @@For:
-      ManakaiDOM:DOM1 !ManakaiDOM:DOM2
-  @ShadowSibling:
-    @@DOMMain:implementFeature:
-      @@@@: 
-        DOMHTML:HTMLFeature20
-      @@@For:
-        ManakaiDOM:DOM2
-
-ElementTypeBinding:
-  @Name: L1IF
-  @ElementType:
-    DOMMain:implementFeature
-  @ShadowContent:
-    @@@: 
-      DOMHTML:HTMLFeature10
-    @@For:
-      ManakaiDOM:DOM1 !ManakaiDOM:DOM2
-  @ShadowSibling:
-    @@DOMMain:implementFeature:
-      @@@@: 
-        DOMHTML:HTMLFeature20
-      @@@For:
-        ManakaiDOM:DOM2
-    @@ISA:
-      @@@@:
-        ::ManakaiDOM:ManakaiDOM1||ManakaiDOM|ForIF
-      @@@ForCheck:
-        ManakaiDOM:ForIF
-      @@@For:
-        ManakaiDOM:ManakaiDOM2
-      @@@ContentType: DISCore|TFPQNames
-    @@For:
-      ManakaiDOM:DOM1
-    @@For:
-      =ManakaiDOM:ManakaiDOM
-    @@For:
-      DOMHTML:ForHTML
-
-ElementTypeBinding:
   @Name: L2
   @ElementType:
     DOMMain:implementFeature
@@ -152,23 +106,6 @@ ElementTypeBinding:
       DOMHTML:HTMLFeature20
     @@For:
       ManakaiDOM:DOM2
-
-ElementTypeBinding:
-  @Name: L2IF
-  @ElementType:
-    DOMMain:implementFeature
-  @ShadowContent:
-    @@@: 
-      DOMHTML:HTMLFeature20
-    @@For:
-      ManakaiDOM:DOM2
-  @ShadowSibling:
-    @@For:
-      ManakaiDOM:DOM2
-    @@For:
-      =ManakaiDOM:ManakaiDOM
-    @@For:
-      DOMHTML:ForHTML
 
 ElementTypeBinding:
   @Name: PerlDef
@@ -275,8 +212,8 @@ ElementTypeBinding:
       @@@For: ManakaiDOM|DOM2
 
     @@rdf:type:
-      @@@: s|ElementType
-      @@ForCheck: DOMHTML|ForHTML
+      @@@@: s|ElementType
+      @@@ForCheck: DOMHTML|ForHTML
 
     @@s:elementType:
       @@@@: ||DOMHTML|ForHTML40SE

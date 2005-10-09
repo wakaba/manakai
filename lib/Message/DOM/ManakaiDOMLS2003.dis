@@ -29,7 +29,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2005/10/06 10:53:36 $
+      $Date: 2005/10/09 13:57:14 $
     @@ContentType:
       dis:Date.RCS
 
@@ -50,6 +50,8 @@ Module:
 Namespace:
   @dis:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
+  @dx:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#
   @f:
     http://suika.fam.cx/~wakaba/archive/2004/dom/feature#
   @infoset:
@@ -179,7 +181,7 @@ ElementTypeBinding:
 ElementTypeBinding:
   @Name: Exception
   @ElementType:
-    ManakaiDOM:raises
+    dx:raises
 
 ElementTypeBinding:
   @Name: PerlDef
@@ -318,7 +320,7 @@ ResourceDef:
                 if ({fatal=>1, wfc=>1, nswfc=>1}->{$error_type->{level}}) {
                   warn "{{$error_type->{level}}} $error_msg.\n";
                   __EXCEPTION{
-                    DOMLS:ManakaiDOMLSException.PARSE_ERR::
+                    DOMLS:LSException.PARSE_ERR::
                   }__;
                 } else {
                   #warn "{$error_type->{level}} $error_msg.\n";
@@ -485,7 +487,7 @@ ResourceDef:
                                     ::ManakaiDOM:ManakaiDOMLatest.publicId>)) {
              $uri = $sysId;
              __EXCEPTION{
-               DOMCore:ManakaiDOMException.NOT_SUPPORTED_ERR::
+               DOMCore:DOMException.NOT_SUPPORTED_ERR::
              }__;
            }
 
@@ -717,7 +719,7 @@ ResourceDef:
                } else {
                  warn "{Impl} References not supported.\n";
                  __EXCEPTION{
-                   DOMLS:ManakaiDOMLSException.PARSE_ERR::
+                   DOMLS:LSException.PARSE_ERR::
                  }__;
                     ## Not supported err
                }
@@ -743,7 +745,7 @@ ResourceDef:
              } else {
                warn "{Impl} Node of type ".$src->node_type." not supported.\n";
                __EXCEPTION{
-                 DOMLS:ManakaiDOMLSException.PARSE_ERR::
+                 DOMLS:LSException.PARSE_ERR::
                }__;
                   ## Not supported err
              }

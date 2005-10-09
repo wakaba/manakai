@@ -25,7 +25,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2005/10/08 15:05:42 $
+      $Date: 2005/10/09 13:57:14 $
     @@ContentType:
       dis:Date.RCS
   
@@ -2154,7 +2154,11 @@ IFClsDef:
               my @l = $c->{<H::mn:node>};
               while (@l) {
                 my $l = shift @l; next unless $l;
-                $l->{<H::swcfg21:ownerDocument>} = $r->{<H::mn:node>};
+                __CODE{mn|setXRefNode||ManakaiDOM|Perl::
+                  $referrer => {$l},
+                  $propName => {<H::swcfg21:ownerDocument>},
+                  $referent => {$r->{<H::mn:node>}},
+                }__;
                 for my $n (@{$l->{<H::swcfg21:childNodes>}}, 
                            $l->{<H::swcfg21:shadowContent>},
                            $l->{<H::swcfg21:shadowSibling>}) {
@@ -3308,7 +3312,11 @@ IFClsDef:
           The newly created element. 
       @@@PerlDef:
         $r = <ClassM::ManakaiSWCFGElement.newObject>;
-        $r->{<H::swcfg21:ownerDocument>} = $self->{<H::mn:node>};
+        __CODE{mn|setXRefNode||ManakaiDOM|Perl::
+          $referrer => {$r},
+          $propName => {<H::swcfg21:ownerDocument>},
+          $referent => {$self->{<H::mn:node>}},
+        }__;
         $r->{<H::swcfg21:namespaceURI>} = $namespaceURI;
         $r->{<H::swcfg21:localName>} = $localName;
         $r->{<H::swcfg21:namespaceExpanded>} = true;
@@ -3345,7 +3353,11 @@ IFClsDef:
           The newly created comment. 
       @@@PerlDef:
         $r = <ClassM::ManakaiSWCFGComment.newObject>;
-        $r->{<H::swcfg21:ownerDocument>} = $self->{<H::mn:node>};
+        __CODE{mn|setXRefNode||ManakaiDOM|Perl::
+          $referrer => {$r},
+          $propName => {<H::swcfg21:ownerDocument>},
+          $referent => {$self->{<H::mn:node>}},
+        }__;
         $r->{<H::swcfg21:value>} = defined $data ? $data : '';
         $r = $self-><M::ManakaiSWCFGNode.getNodeReference> ($r);
 
@@ -3364,7 +3376,11 @@ IFClsDef:
           The newly created document fragment node. 
       @@@PerlDef:
         $r = <ClassM::ManakaiSWCFGDocumentFragment.newObject>;
-        $r->{<H::swcfg21:ownerDocument>} = $self->{<H::mn:node>};
+        __CODE{mn|setXRefNode||ManakaiDOM|Perl::
+          $referrer => {$r},
+          $propName => {<H::swcfg21:ownerDocument>},
+          $referent => {$self->{<H::mn:node>}},
+        }__;
         $r = $self-><M::ManakaiSWCFGNode.getNodeReference> ($r);
 
   @Attr:
@@ -4572,7 +4588,6 @@ IFClsDef:
                 ## TODO: DOM error if unknown node
                 push @remove, $i;
                 CORE::delete $n->{<H::swcfg21:parent>};
-                CORE::delete $n->{<H::swcfg21:ownerDocument>};
                 $n-><M::NodeStem.orphanate>;
               } elsif (not $no_binding and
                        $n->{<H::swcfg21:localName>} eq 'ElementTypeBinding') {
@@ -4616,7 +4631,6 @@ IFClsDef:
                 $n->{<H::swcfg21:childNodes>} = [];
                 for (@etr) {
                   CORE::delete $_->{<H::swcfg21:parent>};
-                  CORE::delete $_->{<H::swcfg21:ownerDocument>};
                   $_-><M::NodeStem.orphanate>;
                 }
                 unless (defined $root->{<H::mn:node>}
@@ -4633,7 +4647,6 @@ IFClsDef:
                 ## TODO: DOM error if unknown node
                 push @remove, $i;
                 CORE::delete $n->{<H::swcfg21:parent>};
-                CORE::delete $n->{<H::swcfg21:ownerDocument>};
                 $n-><M::NodeStem.orphanate>;
               }
             } # $i

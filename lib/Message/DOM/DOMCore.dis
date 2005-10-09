@@ -40,7 +40,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/10/08 15:05:41 $
+      $Date: 2005/10/09 13:57:11 $
     @@ContentType:
       dis:Date.RCS
 
@@ -1285,6 +1285,15 @@ ResourceDef:
          @@@@enDesc:
            A method or attribute is not implemented; it is expected
            that a DOM application implements it.
+       @@@SubTypeDef:
+         @@@@QName: CLONE_NODE_TYPE_NOT_SUPPORTED_ERR
+         @@@@enDesc:
+           The implementation does not support cloning of nodes
+           of the type.
+         @@@@XParam:
+           @@@@@@: DOMCore|node
+           @@@@@enDesc:
+             The node that is attempted to clone.
 
      @@XConst:
         @@@Name:  INUSE_ATTRIBUTE_ERR
@@ -1634,6 +1643,27 @@ ResourceDef:
           @@@@@:
             The type of an object is incompatible with the expected 
             type of the parameter associated to the object.
+
+ElementTypeBinding:
+  @Name: enImplNote
+  @ElementType:
+    dis:ImplNote
+  @ShadowContent:
+    @@lang:en
+
+ElementTypeBinding:
+  @Name: XParamDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: ecore|Parameter
+    @@For: =ManakaiDOM|all
+
+XParamDef:
+  @QName: DOMCore|node
+  @enDesc:
+    The node with which an error occurred.
+  @Type: DOMCore|Node||ManakaiDOM|ManakaiDOM
 
 PropDef:
   @QName: features
@@ -3023,7 +3053,11 @@ IFCls1Def:
                 }__;
               }
               $doctypeNode-><M::NodeStem.importTree> ($node);
-              $doctypeNode->{<H::DOMCore:ownerDocument>} = $node;
+              __CODE{mn|setXRefNode||ManakaiDOM|Perl::
+                $referrer => {$doctypeNode},
+                $propName => {<H::DOMCore:ownerDocument>},
+                $referent => {$node},
+              }__;
               $doctypeNode->{<H::infoset:parent>} = $node;
               push @{$node->{<H::infoset:children>}}, $doctypeNode;
               __FOR{ManakaiDOM:ManakaiDOMLatest::
@@ -3047,7 +3081,11 @@ IFCls1Def:
               }__;
               $docElObj->{<H::infoset:localName>} = $lname;
               $docElObj->{<H::infoset:parent>} = $node;
-              $docElObj->{<H::DOMCore:ownerDocument>} = $node;
+              __CODE{mn|setXRefNode||ManakaiDOM|Perl::
+                $referrer => {$docElObj},
+                $propName => {<H::DOMCore:ownerDocument>},
+                $referent => {$node},
+              }__;
               push @{$node->{<H::infoset:children>}}, $docElObj;
             }
             $r = <ClassM::ManakaiDOMNode.getNodeReference> ($node);
@@ -3109,7 +3147,11 @@ IFCls1Def:
                 }__;
               }
               $doctypeNode-><M::NodeStem.importTree> ($node);
-              $doctypeNode->{<H::DOMCore:ownerDocument>} = $node;
+              __CODE{mn|setXRefNode||ManakaiDOM|Perl::
+                $referrer => {$doctypeNode},
+                $propName => {<H::DOMCore:ownerDocument>},
+                $referent => {$node},
+              }__;
               $doctypeNode->{<H::infoset:parent>} = $node;
               push @{$node->{<H::infoset:children>}}, $doctypeNode;
               __FOR{ManakaiDOM:ManakaiDOMLatest::
@@ -3131,7 +3173,11 @@ IFCls1Def:
               }__;
               $docElObj->{<H::infoset:localName>} = $lname;
               $docElObj->{<H::infoset:parent>} = $node;
-              $docElObj->{<H::DOMCore:ownerDocument>} = $node;
+              __CODE{mn|setXRefNode||ManakaiDOM|Perl::
+                $referrer => {$docElObj},
+                $propName => {<H::DOMCore:ownerDocument>},
+                $referent => {$node},
+              }__;
               push @{$node->{<H::infoset:children>}}, $docElObj;
             }
             $r = <ClassM::ManakaiDOMNode.getNodeReference> ($node);
@@ -4763,14 +4809,280 @@ IFCls1Def:
         @@@PerlDef:
             $r = @{$self->{<H::mn:node>}->{<H::infoset:children>}}
                    ? true : false;
+
   @Method:
-     @@Name:  cloneNode
-     @@Return:
-        @@@Type:  Node
+    @@Name: cloneNode
+    @@rdf:type: DISLang|Constructor
+    @@Operator: DISPerl|CloneMethod
+    @@enDesc:
+      Returns a duplicate of the node, i.e. serves as a generic
+      copy constructor for nodes.
+
+      - The duplicate node has no parent, i.e. <A::Node.parentNode>
+        is <DOM::null>.  <SRC::DOM Level 1> <SRC::DOM Level 2> <SRC::DOM Level 3>
+
+      - The duplicate node has no user data, i.e. user data 
+        associated to the node is not carried over.  However,
+        if any <IF::UserDataHandlers> has been specified along with
+        the associated data, those handlers will be called with
+        the appropriate parameters before this methd returns.
+        <SRC::DOM Level 3>
+
+      - If the node is an <IF::Element>, all attributes and their values,
+        including those representing defaulted attributes (i.e.
+        attributes whose <A::Attr.specified> are <DOM::false>),
+        but the method does not copy any children it contains
+        unless it is a deep clone (i.e. <P::deep> is <DOM::true>).
+        <SRC::DOM Level 1> <SRC::DOM Level 2> <SRC::DOM Level 3>
+
+      - Cloning an <IF::Attr> directly, as oppsed to be cloned
+        as part of an <IF::Element> cloning operation, returns
+        a specified attribute (i.e. its <A::Attr.specified> is
+        set to <DOM::true>).  <SRC::DOM Level 1 SE> <SRC::DOM Level 2>
+        <SRC::DOM Level 3>
+
+      - Cloning an <IF::Attr> always clones its children, since 
+        they represent its value, no matter whether this is a 
+        deep clone or not.  <SRC::DOM Level 3>
+
+      - Cloning an <IF::DOMXML:EntityReference> automatically constructs
+        its subtree if a corresponding <IF::DOMXML:Entity> is available,  
+        no matter whether this is a deep clone or not.  <SRC::DOM Level 3>
+
+      - Cloning <IF::Document>, <IF::DOMXML:DocumentType>, <IF::DOMXML:Entity>,
+        <IF::DOMXML:Notation> nodes is implementation dependent.
+        <SRC::DOM Level 1 SE> <SRC::DOM Level 2> <SRC::DOM Level 3>
+
+      - Cloning any other type of node simply returns a copy of the node.
+        <SRC::DOM Level 1> <SRC::DOM Level 2> <SRC::DOM Level 3>
+
+      - Cloning an immutable subtree results in a mutable copy, but
+        the children of an <IF::DOMXML:EntityReference> clone are
+        read-only.  <SRC::DOM Level 2> <SRC::DOM Level 3>
+
+      - Cloning a node does not copy the event listeners attached to it.
+        <SRC::DOM Level 2 Events> <SRC::DOM Level 3 Events>
+
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         How affects to style sheets?
+
      @@Param:
-        @@@Name:  deep
-        @@@Type:  
-          DOMMain:boolean::ManakaiDOM:all
+       @@@Name: deep
+       @@@Type:  
+         idl:boolean::ManakaiDOM:all
+       @@@enDesc:
+         Whether the subtree under the node should be recursively cloned
+         or not.
+       @@@TrueCase:
+         @@@@enDesc:
+           Recusively clones the subtree under the node.
+       @@@FalseCase:
+         @@@@enDesc:
+           Doesn't clone the subtree under the node.
+
+     @@Return:
+       @@@Type:  Node
+       @@@enDesc: The duplicate node.
+
+       @@@raises:
+         @@@@@: CLONE_NODE_TYPE_NOT_SUPPORTED_ERR
+         @@@@enDesc:
+           The node is of type <IF::Document>, <IF::DOMXML:DocumentType>,
+           <IF::DOMXML:Entity>, or <IF::DOMXML:Notation> and the implementation
+           does not support cloning that type of node.
+           <SRC::DOM Level 1 SE>
+         @@@@ImplNote:
+           @@@@@lang:en
+           @@@@@@:
+             Only in DOM Level 1 SE.
+
+       @@@PerlDef:
+         __DEEP{
+           my @node = ([$self]);
+           my $od = $self-><AG::Node.ownerDocument>;
+           my $strict_check;
+           __FOR{ManakaiDOM|DOM3::
+             $strict_check = $od-><AG::Document.strictErrorChecking>;
+             $od-><AS::Document.strictErrorChecking> (false);
+           }__;
+           while (@node) {
+             my ($node, $parent, $read_only) = @{shift @node};
+             my $nt = $node-><AG::Node.nodeType>;
+             if ($nt == <C::Node.ELEMENT_NODE>) {
+               my $clone;
+               if ($node->isa (<IFName::Node||ManakaiDOM|ManakaiDOM>) and
+                   defined $node-><AG::Node.localName>) {
+                 $clone = $od-><M::Document.createElementNS>
+                                   ($node-><AG::Node.namespaceURI>,
+                                    $node-><AG::Node.localName>);
+               } else {  ## DOM Level 1 node
+                 $clone = $od-><M::Document.createAttribute>
+                                   ($node-><AG::Node.nodeName>);
+               }
+               if ($parent) {
+                 local $parent->{<H::mn:node>}
+                              ->{<H::DOMCore:read-only>} = false;
+                 $parent-><M::Node.appendChild> ($clone);
+               } else {
+                 $r = $clone;
+               }
+               my $attrs = $node-><AG::Node.attributes>;
+               my $attrsLength = $attrs-><AG::NamedNodeMap.length>;
+               for (my $i = 0; $i < $attrsLength; $i++) {
+                 push @node, [$attrs-><M::NamedNodeMap.item> ($i),
+                              $clone, $read_only];
+               }
+               if ($deep) {
+                 push @node, map {[$_, $clone, $read_only]} @{$node
+                                                      -><AG::Node.childNodes>};
+               }
+               $clone->{<H::mn:node>}->{<H::DOMCore:read-only>} = true
+                 if $read_only;
+             } elsif ($nt == <C::Node.TEXT_NODE>) {
+               my $clone = $od-><M::Document.createTextNode>
+                                   ($node-><AG::CharacterData.data>);
+               if ($parent) {
+                 local $parent->{<H::mn:node>}->{<H::DOMCore:read-only>} = false;
+                 $parent-><M::Node.appendChild> ($clone);
+               } else {
+                 $r = $clone;
+               }
+               $clone->{<H::mn:node>}->{<H::DOMCore:read-only>} = true
+                 if $read_only;
+               __FOR{ManakaiDOM|DOM3::
+                 if ($node->isa (<IFName::Text||ManakaiDOM|ManakaiDOM3>)) {
+                   $clone-><AS::Text.isElementContentWhitespace>
+                             ($node-><AG::Text.isElementContentWhitespace>);
+                 }
+               }__;
+             } elsif ($nt == <C::Node.ATTRIBUTE_NODE>) {
+               my $clone;
+               if ($node->isa (<IFName::Node||ManakaiDOM|ManakaiDOM>) and
+                   defined $node-><AG::Node.localName>) {
+                 $clone = $od-><M::Document.createAttributeNS>
+                                   ($node-><AG::Node.namespaceURI>,
+                                    $node-><AG::Node.localName>);
+                 if ($parent) {
+                   local $parent->{<H::mn:node>}
+                                ->{<H::DOMCore:read-only>} = false;
+                   $parent-><M::Element.setAttributeNodeNS> ($clone);
+                   $clone->{<H::mn:node>}->{<H::infoset:specified>}
+                     = $node-><AG::Attr.specified>;
+                 } else {
+                   $r = $clone;
+                   $clone->{<H::mn:node>}->{<H::infoset:specified>} = true;
+                 }
+               } else {  ## DOM Level 1 node
+                 $clone = $od-><M::Document.createAttribute>
+                                   ($node-><AG::Node.nodeName>);
+                 if ($parent) {
+                   local $parent->{<H::mn:node>}
+                                ->{<H::DOMCore:read-only>} = false;
+                   $parent-><M::Element.setAttributeNode> ($clone);
+                   $clone->{<H::mn:node>}->{<H::infoset:specified>}
+                     = $node-><AG::Attr.specified>;
+                 } else {
+                   $r = $clone;
+                   $clone->{<H::mn:node>}->{<H::infoset:specified>} = true;
+                 }
+               }
+               push @node, map {[$_, $clone, $read_only]} @{$node
+                                                      -><AG::Node.childNodes>};
+               $clone->{<H::mn:node>}->{<H::DOMCore:read-only>} = true
+                 if $read_only;
+             } elsif ($nt == <C::Node.COMMENT_NODE>) {
+               my $clone = $od-><M::Document.createComment>
+                                   ($node-><AG::CharacterData.data>);
+               if ($parent) {
+                 local $parent->{<H::mn:node>}->{<H::DOMCore:read-only>} = false;
+                 $parent-><M::Node.appendChild> ($clone);
+               } else {
+                 $r = $clone;
+               }
+               $clone->{<H::mn:node>}->{<H::DOMCore:read-only>} = true
+                 if $read_only;
+             } elsif ($nt == <C::Node.CDATA_SECTION_NODE>) {
+               my $clone = $od-><M::Document.createTextNode>
+                                   ($node-><AG::CharacterData.data>);
+               if ($parent) {
+                 local $parent->{<H::mn:node>}->{<H::DOMCore:read-only>} = false;
+                 $parent-><M::Node.appendChild> ($clone);
+               } else {
+                 $r = $clone;
+               }
+               $clone->{<H::mn:node>}->{<H::DOMCore:read-only>} = true
+                 if $read_only;
+             } elsif ($nt == <C::Node.PROCESSING_INSTRUCTION_NODE>) {
+               my $clone = $od-><M::Document.createProcessingInstruction>
+                              ($node-><AG::DOMXML:ProcessingInstruction.target>);
+               $clone-><AS::DOMXML:ProcessingInstruction.data>
+                              ($node-><AG::DOMXML:ProcessingInstruction.data>);
+               if ($parent) {
+                 local $parent->{<H::mn:node>}->{<H::DOMCore:read-only>} = false;
+                 $parent-><M::Node.appendChild> ($clone);
+               } else {
+                 $r = $clone;
+               }
+               $clone->{<H::mn:node>}->{<H::DOMCore:read-only>} = true
+                 if $read_only;
+             } elsif ($nt == <C::Node.ENTITY_REFERENCE_NODE>) {
+               my $clone = $od-><M::Document.createEntityReference>
+                                    ($node-><AG::Node.nodeName>);
+               if ($parent) {
+                 local $parent->{<H::mn:node>}->{<H::DOMCore:read-only>} = false;
+                 $parent-><M::Node.appendChild> ($clone);
+               } else {
+                 $r = $clone;
+               }
+               $clone->{<H::mn:node>}->{<H::DOMCore:read-only>} = true
+                 if $read_only;
+             } elsif ($nt == <C::Node.DOCUMENT_FRAGMENT_NODE>) {
+               my $clone = $od-><M::Document.createDocumentFragment>;
+               $r = $clone;
+               push @node, map {[$_, $clone]} @{$node-><AG::Node.childNodes>};
+             } elsif ($nt == <C::Node.DOCUMENT_NODE>) {
+               __FOR{ManakaiDOM|DOM3::
+                 $od-><AS::Document.strictErrorChecking> ($strict_check);
+               }__;
+               __UNDEEP{__EXCEPTION{CLONE_NODE_TYPE_NOT_SUPPORTED_ERR::
+                 DOMCore:node => $node,
+               }__}__;
+             } elsif ($nt == <C::Node.DOCUMENT_TYPE_NODE>) {
+               __FOR{ManakaiDOM|DOM3::
+                 $od-><AS::Document.strictErrorChecking> ($strict_check);
+               }__;
+               __UNDEEP{__EXCEPTION{CLONE_NODE_TYPE_NOT_SUPPORTED_ERR::
+                 DOMCore:node => $node,
+               }__}__;
+             } elsif ($nt == <C::Node.ENTITY_NODE>) {
+               __FOR{ManakaiDOM|DOM3::
+                 $od-><AS::Document.strictErrorChecking> ($strict_check);
+               }__;
+               __UNDEEP{__EXCEPTION{CLONE_NODE_TYPE_NOT_SUPPORTED_ERR::
+                 DOMCore:node => $node,
+               }__}__;
+             } elsif ($nt == <C::Node.NOTATION_NODE>) {
+               __FOR{ManakaiDOM|DOM3::
+                 $od-><AS::Document.strictErrorChecking> ($strict_check);
+               }__;
+               __UNDEEP{__EXCEPTION{CLONE_NODE_TYPE_NOT_SUPPORTED_ERR::
+                 DOMCore:node => $node,
+               }__}__;
+             } else {
+               ## TODO: Assertion
+             }
+           }
+           __FOR{ManakaiDOM|DOM3::
+             $od-><AS::Document.strictErrorChecking> ($strict_check);
+           }__;
+         }__;
+
+        @@@enImplNote:
+          {TODO:: UserDataHandler support
+          }
+
   @Method:
      @@Name:  normalize
      @@Description:
@@ -5414,9 +5726,12 @@ IFCls1Def:
             }
             $__node->{<H::infoset:children>} = [];
             my $__textNode = <ClassM::DOMCore:ManakaiDOMText.newObject>;
-            $__textNode->{<H::DOMCore:ownerDocument>}
-                                   = $__node->{<H::DOMCore:ownerDocument>};
             $__node-><M::NodeStem.importTree> ($__textNode);
+            __CODE{mn|setXRefNode||ManakaiDOM|Perl::
+              $referrer => {$__textNode},
+              $propName => {<H::DOMCore:ownerDocument>},
+              $referent => {$__node->{<H::DOMCore:ownerDocument>}},
+            }__;
             $__textNode->{<H::infoset:content>} = $given;
             $__textNode->{<H::infoset:parent>} = $__node;
             $__node->{<H::infoset:children>} = [$__textNode];
@@ -6046,8 +6361,7 @@ IFCls1Def:
               }
             } # CHILD
 
-            if ($object->{<H::DOMCore:ownerDocument>}
-                       ->{<H::DOMCore:hasFeature>}->{HTML}) {
+            if ($object->{<H::DOMCore:hasFeature>}->{HTML}) {
               for my $pack ((sort {
                     $Message::DOM::ClassPoint{$b} <=>
                     $Message::DOM::ClassPoint{$a}
@@ -7257,8 +7571,11 @@ ClassDef:
                        push @change, [$text, 'append', $pchild];
                        push @change, [$text, 'append', $child];
                        $text->{<H::infoset:content>} = '';
-                       $text->{<H::DOMCore:ownerDocument>}
-                                    = $child->{<H::DOMCore:ownerDocument>};
+                       __CODE{mn|setXRefNode||ManakaiDOM|Perl::
+                         $referrer => {$text},
+                         $propName => {<H::DOMCore:ownerDocument>},
+                         $referent => {$child->{<H::DOMCore:ownerDocument>}},
+                       }__;
                        $text->{<H::infoset:parent>} = $self;
                        push @removed, $pchild, $child;
                        $pchild = $text;
@@ -10357,7 +10674,7 @@ NodeTypeDef:
          <Q::infoset:ownerElement>, <Q::infoset:children>, 
          <Q::infoset:namespaceName>, <Q::DOMCore:userDeterminedId>.
 
-  @mn:irefnode0: DOMCore|ownerDocument
+  @mn:xrefnode0: DOMCore|ownerDocument
   @mn:origin0: infoset|ownerElement
   @mn:subnode1: infoset|children
 
@@ -10736,16 +11053,22 @@ NodeTypeDef:
               $node-><M::NodeStem.importTree> ($r);
               $r->{<H::DOMCore:name>} = $name;
               $r->{<H::infoset:ownerElement>} = $node;
-              $r->{<H::DOMCore:ownerDocument>} = $node
-                                                 ->{<H::DOMCore:ownerDocument>};
+              __CODE{mn|setXRefNode||ManakaiDOM|Perl::
+                $referrer => {$r},
+                $propName => {<H::DOMCore:ownerDocument>},
+                $referent => {$node->{<H::DOMCore:ownerDocument>}},
+              }__;
               $node->{<H::infoset:attributes>}
                    ->{<Q::ManakaiDOM:noNS>}->{$name} = $r;
             }
             my $text = <ClassM::ManakaiDOMText.newObject>;
             $node-><M::NodeStem.importTree> ($text);
             $text->{<H::infoset:content>} = defined $value ? $value : '';
-            $text->{<H::DOMCore:ownerDocument>} = $self->{<H::mn:node>}
-                                                 ->{<H::DOMCore:ownerDocument>};
+            __CODE{mn|setXRefNode||ManakaiDOM|Perl::
+              $referrer => {$text},
+              $propName => {<H::DOMCore:ownerDocument>},
+              $referent => {$self->{<H::mn:node>}->{<H::DOMCore:ownerDocument>}},
+            }__;
             $text->{<H::infoset:parent>} = $r;
             $r->{<H::infoset:children>} = [$text];
             $r->{<H::infoset:specified>} = true;
@@ -10935,6 +11258,7 @@ NodeTypeDef:
               }__;
               $r = $newAttr;
             } else {
+              $self->{<H::mn:node>}-><M::NodeStem.importTree> ($attrNode);
               $attrNode->{<H::infoset:ownerElement>} = $self->{<H::mn:node>};
               if (defined $attrNode->{<H::infoset:localName>}) {
                 $self->{<H::mn:node>}->{<H::infoset:attributes>}
@@ -10951,7 +11275,7 @@ NodeTypeDef:
                 my $obj = $r;
                 $r = <ClassM::ManakaiDOMNode.getNodeReference> ($obj)
                   if defined wantarray;
-                CORE::delete $obj->{<H::infoset:parent>};
+                CORE::delete $obj->{<H::infoset:ownerElement>};
                 $obj-><M::NodeStem.orphanate>;
               }
             }
@@ -11483,8 +11807,11 @@ NodeTypeDef:
             } else {
               $r = <ClassM::ManakaiDOMAttr.newObject>;
               $node-><M::NodeStem.importTree> ($r);
-              $r->{<H::DOMCore:ownerDocument>} = $node
-                                                 ->{<H::DOMCore:ownerDocument>};
+              __CODE{mn|setXRefNode||ManakaiDOM|Perl::
+                $referrer => {$r},
+                $propName => {<H::DOMCore:ownerDocument>},
+                $referent => {$node->{<H::DOMCore:ownerDocument>}},
+              }__;
               $r->{<H::infoset:prefix>} = $prefix;
               __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
                 $result => {$r->{<H::infoset:namespaceName>}},
@@ -11498,8 +11825,11 @@ NodeTypeDef:
             }
             my $text = <ClassM::ManakaiDOMText.newObject>;
             $node-><M::NodeStem.importTree> ($text);
-            $text->{<H::DOMCore:ownerDocument>} = $self->{<H::mn:node>}
-                                                 ->{<H::DOMCore:ownerDocument>};
+            __CODE{mn|setXRefNode||ManakaiDOM|Perl::
+              $referrer => {$text},
+              $propName => {<H::DOMCore:ownerDocument>},
+              $referent => {$self->{<H::mn:node>}->{<H::DOMCore:ownerDocument>}},
+            }__;
             $text->{<H::infoset:content>} = defined $value ? $value : '';
             $text->{<H::infoset:parent>} = $r;
             $r->{<H::infoset:children>} = [$text];
@@ -11759,69 +12089,9 @@ NodeTypeDef:
                @@@@@@@:
                  The <P::newAttr> node does not support XML Namespace.
              @@@@@SpecLevel[list]:
-         @@@PerlDef:
-           @@@@For:
-             ManakaiDOM:DOMXMLFeature
-           @@@@@:
-            if ($self->{<H::mn:node>}->{<H::DOMCore:read-only>}) {
-              __EXCEPTION{
-                MDOMX:NOMOD_THIS::
-              }__;
-            }
-            my $attrNode = $newAttr->{<H::mn:node>};
-            if ($attrNode->{<H::infoset:ownerElement>}) {
-              __EXCEPTION{DOMException.INUSE_ATTRIBUTE_ERR::
-                  MDOMX:param-name => 'newAttr',
-              }__;
-            } elsif ($attrNode->{<H::DOMCore:ownerDocument>}
-                              ->{<H::mn:nodeID>} ne
-                     $self->{<H::mn:node>}->{<H::DOMCore:ownerDocument>}
-                          ->{<H::mn:nodeID>}) {
-              __EXCEPTION{DOMException.WRONG_DOCUMENT_ERR::
-              }__;
-            }
-
-            if (defined $attrNode->{<H::infoset:localName>}) {
-              $r = $self->{<H::mn:node>}->{<H::infoset:attributes>}
-                     ->{defined $attrNode->{<H::infoset:namespaceName>}
-                              ? ${$attrNode->{<H::infoset:namespaceName>}}
-                              : <Q::null:>}
-                     ->{$attrNode->{<H::infoset:localName>}};
-            } else {
-              __EXCEPTION{
-                MDOMX:MDOM_NODE_NOSUPPORT_XMLNS::
-                  MDOMX:param-name => 'newAttr',
-              }__;
-            }
-
-            if (defined $r and
-                $r->{<H::mn:nodeID>} eq $attrNode->{<H::mn:nodeID>}) {
-              __WARNING{
-                MDOMX:MDOM_REPLACE_BY_ITSELF_NO_EFFECT::
-                  MDOMX:param-name => 'newAttr',
-              }__;
-              $r = $newAttr;
-            } else {
-              $attrNode->{<H::infoset:ownerElement>} = $self->{<H::mn:node>};
-              if (defined $attrNode->{<H::infoset:localName>}) {
-                $self->{<H::mn:node>}->{<H::infoset:attributes>}
-                     ->{defined $attrNode->{<H::infoset:namespaceName>}
-                              ? ${$attrNode->{<H::infoset:namespaceName>}}
-                              : <Q::null:>}
-                     ->{$attrNode->{<H::infoset:localName>}} = $attrNode;
-              } else {
-                $self->{<H::mn:node>}->{<H::infoset:attributes>}
-                     ->{<Q::ManakaiDOM:noNS>}
-                     ->{$attrNode->{<H::DOMCore:name>}} = $attrNode;
-              }
-              if ($r) {
-                my $obj = $r;
-                $r = <ClassM::ManakaiDOMNode.getNodeReference> ($obj)
-                  if defined wantarray;
-                CORE::delete $obj->{<H::infoset:parent>};
-                $obj-><M::NodeStem.orphanate>;
-              }
-            }
+        @@@disDef:
+          @@@@For: ManakaiDOM|DOMXMLFeature
+          @@@@DISPerl:cloneCode: .setAttributeNode
           @@@@ImplNote:
             @@@@@lang:en
             @@@@@@:
@@ -12885,7 +13155,7 @@ NodeTypeDef:
          <Q::DOMCore:read-only>, <Q::infoset:parent>, <Q::infoset:children>, 
          <Q::infoset:attributes>, <Q::infoset:namespaceName>.
 
-  @mn:irefnode0: DOMCore|ownerDocument
+  @mn:xrefnode0: DOMCore|ownerDocument
   @mn:origin0: infoset|parent
   @mn:subnode2: infoset|attributes
   @mn:subnode1: infoset|children
@@ -13156,8 +13426,11 @@ IFCls1Def:
             }__;
           }
           $newNode->{<H::infoset:content>} = $after;
-          $newNode->{<H::DOMCore:ownerDocument>} = $parentNode
-                                                 ->{<H::DOMCore:ownerDocument>};
+          __CODE{mn|setXRefNode||ManakaiDOM|Perl::
+            $referrer => {$newNode},
+            $propName => {<H::DOMCore:ownerDocument>},
+            $referent => {$parentNode->{<H::DOMCore:ownerDocument>}},
+          }__;
           if ($parentNode) {
             $parentNode-><M::NodeStem.importTree> ($newNode);
             for my $i (0..$#{$parentNode->{<H::infoset:children>}}) {
@@ -13170,8 +13443,12 @@ IFCls1Def:
             }
             $newNode->{<H::infoset:parent>} = $parentNode;
           }
-          $newNode->{<H::DOMCore:ownerDocument>}
-                                           = $node->{<H::DOMCore:ownerDocument>};
+          __CODE{mn|setXRefNode||ManakaiDOM|Perl::
+            $referrer => {$newNode},
+            $propName => {<H::DOMCore:ownerDocument>},
+            $referent => {$node->{<H::DOMCore:ownerDocument>}},
+          }__;
+
   @Attr:
      @@Name:  isElementContentWhitespace
      @@Description:
@@ -13388,7 +13665,7 @@ IFCls1Def:
          Other available properties: <Q::infoset:ElementContentWhitespace>, 
          <Q::infoset:parent>, <Q::infoset:content>, <Q::DOMCore:read-only>.
 
-  @mn:irefnode0: DOMCore|ownerDocument
+  @mn:xrefnode0: DOMCore|ownerDocument
   @mn:origin0: infoset|parent
 
   @Method:
@@ -13542,7 +13819,7 @@ IFCls1Def:
          Other available properties: <Q::infoset:parent>, <Q::infoset:content>, 
          <Q::DOMCore:read-only>.
 
-  @mn:irefnode0: DOMCore|ownerDocument
+  @mn:xrefnode0: DOMCore|ownerDocument
   @mn:origin0: infoset|parent
 
   @Method:
@@ -14732,7 +15009,7 @@ NodeTypeDef:
            Other available properties: <Q::infoset:children>, 
            <Q::DOMCore:read-only>.
 
-  @mn:irefnode0: DOMCore|ownerDocument
+  @mn:xrefnode0: DOMCore|ownerDocument
   @mn:origin0: infoset|parent
   @mn:subnode1: infoset|children
   
@@ -15050,7 +15327,11 @@ NodeTypeDef:
                                            $INPUT_PARAM_NAME => 'tagName',
                                            $XMLVERSION => $version}__;
             my $node = <ClassM::ManakaiDOMElement.newObject>;
-            $node->{<H::DOMCore:ownerDocument>} = $docNode;
+            __CODE{mn|setXRefNode||ManakaiDOM|Perl::
+              $referrer => {$node},
+              $propName => {<H::DOMCore:ownerDocument>},
+              $referent => {$docNode},
+            }__;
             $node->{<H::DOMCore:name>} = $tagName;
             $r = <ClassM::ManakaiDOMNode.getNodeReference> ($node);
           @@@@ImplNote:
@@ -15074,7 +15355,11 @@ NodeTypeDef:
         @@@PerlDef:
             my $docNode = $self->{<H::mn:node>};
             my $node = <ClassM::ManakaiDOMDocumentFragment.newObject>;
-            $node->{<H::DOMCore:ownerDocument>} = $docNode;
+            __CODE{mn|setXRefNode||ManakaiDOM|Perl::
+              $referrer => {$node},
+              $propName => {<H::DOMCore:ownerDocument>},
+              $referent => {$docNode},
+            }__;
             $r = <ClassM::ManakaiDOMNode.getNodeReference> ($node);
     @@SpecLevel:1
     @@Level[list]:
@@ -15103,7 +15388,11 @@ NodeTypeDef:
         @@@PerlDef:
             my $docNode = $self->{<H::mn:node>};
             my $node = <ClassM::ManakaiDOMText.newObject>;
-            $node->{<H::DOMCore:ownerDocument>} = $docNode;
+            __CODE{mn|setXRefNode||ManakaiDOM|Perl::
+              $referrer => {$node},
+              $propName => {<H::DOMCore:ownerDocument>},
+              $referent => {$docNode},
+            }__;
             $node->{<H::infoset:content>} = defined $data ? $data : '';
             $r = <ClassM::ManakaiDOMNode.getNodeReference> ($node);
     @@SpecLevel:1
@@ -15133,7 +15422,11 @@ NodeTypeDef:
         @@@PerlDef:
             my $docNode = $self->{<H::mn:node>};
             my $node = <ClassM::ManakaiDOMComment.newObject>;
-            $node->{<H::DOMCore:ownerDocument>} = $docNode;
+            __CODE{mn|setXRefNode||ManakaiDOM|Perl::
+              $referrer => {$node},
+              $propName => {<H::DOMCore:ownerDocument>},
+              $referent => {$docNode},
+            }__;
             $node->{<H::infoset:content>} = defined $data ? $data : '';
             $r = <ClassM::ManakaiDOMNode.getNodeReference> ($node);
     @@SpecLevel:1
@@ -15189,7 +15482,11 @@ NodeTypeDef:
               }__;
             }
             my $node = <ClassM::DOMXML:ManakaiDOMCDATASection.newObject>;
-            $node->{<H::DOMCore:ownerDocument>} = $docNode;
+            __CODE{mn|setXRefNode||ManakaiDOM|Perl::
+              $referrer => {$node},
+              $propName => {<H::DOMCore:ownerDocument>},
+              $referent => {$docNode},
+            }__;
             $node->{<H::infoset:content>} = defined $data ? $data : '';
             $r = <ClassM::ManakaiDOMNode.getNodeReference> ($node);
     @@SpecLevel:1
@@ -15270,7 +15567,11 @@ NodeTypeDef:
                                            $XMLVERSION => $version}__;
             my $node = <ClassM::DOMXML:ManakaiDOMProcessingInstruction
                                                .newObject>;
-            $node->{<H::DOMCore:ownerDocument>} = $docNode;
+            __CODE{mn|setXRefNode||ManakaiDOM|Perl::
+              $referrer => {$node},
+              $propName => {<H::DOMCore:ownerDocument>},
+              $referent => {$docNode},
+            }__;
             $node->{<H::infoset:target>} = $target;
             $node->{<H::infoset:content>} = defined $data ? $data : '';
             $r = <ClassM::ManakaiDOMNode.getNodeReference> ($node);
@@ -15311,6 +15612,9 @@ NodeTypeDef:
           <A::Node.nodeName> := <P::name>, <A::Node.localName> := <DOM::null>, 
           <A::Node.prefix> := <DOM::null>, <A::Node.namespaceURI> := <DOM::null>, 
           value := empty.
+
+          Spec does not say to set <A::Node.specified> to <DOM::true>.
+          Neither Gecko does.
         @@@Exception:
           @@@@Type: DOMException
           @@@@Name: INVALID_CHARACTER_ERR
@@ -15329,7 +15633,11 @@ NodeTypeDef:
                                            $INPUT_PARAM_NAME => 'name',
                                            $XMLVERSION => $version}__;
             my $node = <ClassM::ManakaiDOMAttr.newObject>;
-            $node->{<H::DOMCore:ownerDocument>} = $docNode;
+            __CODE{mn|setXRefNode||ManakaiDOM|Perl::
+              $referrer => {$node},
+              $propName => {<H::DOMCore:ownerDocument>},
+              $referent => {$docNode},
+            }__;
             $node->{<H::DOMCore:name>} = $name;
             $r = <ClassM::ManakaiDOMNode.getNodeReference> ($node);
           @@@@ImplNote:
@@ -15408,7 +15716,11 @@ NodeTypeDef:
                         $INPUT => $name, $XMLVERSION => $version,
                         $INPUT_PARAM_NAME => 'name'}__;
             my $node = <ClassM::DOMXML:ManakaiDOMEntityReference.newObject>;
-            $node->{<H::DOMCore:ownerDocument>} = $docNode;
+            __CODE{mn|setXRefNode||ManakaiDOM|Perl::
+              $referrer => {$node},
+              $propName => {<H::DOMCore:ownerDocument>},
+              $referent => {$docNode},
+            }__;
             $node->{<H::DOMCore:name>} = $name;
             #$node->{< Q::??:expanded>} = false;
             $r = <ClassM::ManakaiDOMNode.getNodeReference> ($node);
@@ -15779,7 +16091,11 @@ NodeTypeDef:
             }__;
 
             my $node = <ClassM::ManakaiDOMElement.newObject>;
-            $node->{<H::DOMCore:ownerDocument>} = $docNode;
+            __CODE{mn|setXRefNode||ManakaiDOM|Perl::
+              $referrer => {$node},
+              $propName => {<H::DOMCore:ownerDocument>},
+              $referent => {$docNode},
+            }__;
             __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
               $result => {$node->{<H::infoset:namespaceName>}},
               $given => $namespaceURI,
@@ -15966,7 +16282,11 @@ NodeTypeDef:
             }__;
             
             my $node = <ClassM::ManakaiDOMAttr.newObject>;
-            $node->{<H::DOMCore:ownerDocument>} = $docNode;
+            __CODE{mn|setXRefNode||ManakaiDOM|Perl::
+              $referrer => {$node},
+              $propName => {<H::DOMCore:ownerDocument>},
+              $referent => {$docNode},
+            }__;
             $node->{<H::infoset:localName>} = $lname;
             __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
               $result => {$node->{<H::infoset:namespaceName>}},
@@ -16914,7 +17234,7 @@ NodeTypeDef:
            <Q::DOMCore:documentURI>, <Q::DOMCore:strictErrorChecking>, 
            <Q::infoset:children>, <Q::DOMViews:view>.
 
-  @mn:irefnode0: DOMCore|ownerDocument
+  @mn:xrefnode0: DOMCore|ownerDocument
   @mn:origin0: infoset|parent
   @mn:subnode1: infoset|children
   @mn:subnode1: DOMViews|view

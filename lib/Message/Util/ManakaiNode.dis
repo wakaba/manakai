@@ -19,7 +19,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/30 13:06:18 $
+      $Date: 2005/10/09 13:57:18 $
     @@ContentType:
       dis:Date.RCS
   
@@ -564,12 +564,15 @@ ClassDef:
                   if defined $node->{$p} and
                      defined $node->{$p}->{<H::mn:nodeID>};
               }
+
           %$node = ();
-        }
+        } # @node
       @@@PerlDef:
         @@@@ForCheck: ForCompact
         @@@@@:
         my @node = ($self);
+        my $tid = $self->{<H::mn:treeID>};
+        my %xrnode;
         NODES: while (@node) {
           my $node = shift @node;
           next NODES unless ref $node and defined $node->{<H::mn:nodeID>};
@@ -596,7 +599,24 @@ ClassDef:
            \             @{$nt->{<H::mn:subnode0>}||[]}) {
                 push @node, $node->{$p};
               }
+
+          for my $p (@{$nt->{<H::mn:xrefnode0>}||[]}) {
+            if (defined $node->{$p} and 
+                ${$node->{$p}->{<H::mn:treeID>}||$tid} ne $$tid) {
+              $node->{$p}->{<H::mn:rc>}--;
+              ${$node->{$p}->{<H::mn:groveReferenceCounter>}}--;
+              $xrnode{${$node->{$p}->{<H::mn:treeID>}}} = $node->{$p};
+            }
+          }
+
           %$node = ();
+        } # @node
+
+        CORE::delete $xrnode{$$tid};
+        for my $node (values %xrnode) {
+          unless (<Code::isGroveReferenced:: $node = $node>) {
+            $node-><M::NodeStem.destroy>;
+          }
         }
     @@ImplNote:
       @@@lang:en
@@ -672,6 +692,8 @@ ClassDef:
           my @node = ($node);
           my $newgrc = $self->{<H::mn:groveReferenceCounter>};
           my $newtid = $self->{<H::mn:treeID>};
+          my $oldtid = $node->{<H::mn:treeID>};
+          my @xrnode;
           NODES: while (@node) {
             my $node = shift @node;
             next NODES unless ref $node;
@@ -700,10 +722,27 @@ ClassDef:
               push @node, $node->{$p};
             }
 
+            for (@{$nt->{<H::mn:xrefnode0>}||[]}) {
+              push @xrnode, $node->{$_} if defined $node->{$_};
+            }
+
             ${$node->{<H::mn:groveReferenceCounter>}} -= $node->{<H::mn:rc>};
             $node->{<H::mn:treeID>} = $newtid;
             $node->{<H::mn:groveReferenceCounter>} = $newgrc;
             ${$node->{<H::mn:groveReferenceCounter>}} += $node->{<H::mn:rc>};
+          }
+
+          for my $n (@xrnode) {
+            if (${$n->{<H::mn:treeID>}} eq $$oldtid) {
+              $n->{<H::mn:rc>}++;
+              ${$n->{<H::mn:groveReferenceCounter>}}++;
+            } elsif (${$n->{<H::mn:treeID>}} eq $$newtid) {
+              $n->{<H::mn:rc>}--;
+              ${$n->{<H::mn:groveReferenceCounter>}}--;
+              ## Is it necessary to test whether rc is 0 or not
+              ## and if so call "destroy" method?  Maybe it need not
+              ## (or should not, rather).
+            }
           }
 
   @IntMethod:
@@ -712,6 +751,12 @@ ClassDef:
       @@@lang:en
       @@@@:
         Changes tree identifier of all nodes traversable from this node. 
+    @@enDesc:
+      @@@ForCheck: ForCompact
+      @@@@:
+        If a node has <Q::mn:xrefnode0> property value and it
+        is a node in the tree to which the node formally belongs,
+        then reference counters are updated to new status.
     @@Param:
       @@@Name: treeID
       @@@Type: 
@@ -776,6 +821,8 @@ ClassDef:
         @@@@ForCheck: ForCompact
         @@@@@:
           my $tid = ref $treeID ? $treeID : \$treeID;
+          my $oldtid = $self->{<H::mn:treeID>};
+          my @xrnode;
           my @node = ($self);
           NODES: while (@node) {
             my $node = shift @node;
@@ -805,10 +852,27 @@ ClassDef:
               push @node, $node->{$p};
             }
 
+            for (@{$nt->{<H::mn:xrefnode0>}||[]}) {
+              push @xrnode, $node->{$_} if defined $node->{$_};
+            }
+
             ${$node->{<H::mn:groveReferenceCounter>}} -= $node->{<H::mn:rc>};
             $node->{<H::mn:treeID>} = $tid;
             $node->{<H::mn:groveReferenceCounter>} = $groveRC;
             ${$node->{<H::mn:groveReferenceCounter>}} += $node->{<H::mn:rc>};
+          }
+
+          for my $n (@xrnode) {
+            if (${$n->{<H::mn:treeID>}} eq $$oldtid) {
+              $n->{<H::mn:rc>}++;
+              ${$n->{<H::mn:groveReferenceCounter>}}++;
+            } elsif (${$n->{<H::mn:treeID>}} eq $$tid) {
+              $n->{<H::mn:rc>}--;
+              ${$n->{<H::mn:groveReferenceCounter>}}--;
+              ## Is it necessary to test whether rc is 0 or not
+              ## and if so call "destroy" method?  Maybe it need not
+              ## (or should not, rather).
+            }
           }
 
   @IntMethod:
@@ -895,6 +959,37 @@ ClassDef:
           } else {
             $self-><M::NodeStem.destroy>;
           }
+
+  @ResourceDef:
+    @@ForCheck: ForCompact
+    @@QName: mn|setXRefNode
+    @@enDesc:
+      Sets a <Q::mn:xrefnode0> property.
+    @@rdf:type: DISPerl|BlockCode
+    @@PerlDef:
+      $referrer->{$propName} = $referent;
+      if (${$referrer->{<H::mn:treeID>}} ne ${$referent->{<H::mn:treeID>}}) {
+        $referent->{<H::mn:rc>}++;
+        ${$referent->{<H::mn:groveReferenceCounter>}}++;
+      }
+
+  @ResourceDef:
+    @@ForCheck: ForCompact
+    @@QName: mn|unsetXRefNode
+    @@enDesc:
+      Unsets a <Q::mn:xrefnode0> property.
+    @@rdf:type: DISPerl|BlockCode
+    @@PerlDef:
+      if (defined $referrer->{$propName}) {
+        if (${$referrer->{<H::mn:treeID>}} ne ${$referent->{<H::mn:treeID>}}) {
+          $referent->{<H::mn:rc>}--;
+          ${$referent->{<H::mn:groveReferenceCounter>}}--;
+          unless (<Code::isGroveReferenced:: $node = $referent>) {
+            $referent-><M::NodeStem.destroy>;
+          }
+        }
+        CORE::delete $referrer->{$propName};
+      }
 ##NodeStem
 
 ## -- Public node object
@@ -1099,6 +1194,27 @@ PropDef:
   @dataType: DISCore|QName
   @multipleProperties: DISCore|UnorderedList
   @mn:stemName: o
+
+PropDef:
+  @QName: mn|xrefnode0
+  @rdfs:subPropertyOf: mn|noderef
+  @dataType: DISCore|QName
+  @multipleProperties: DISCore|UnorderedList
+  @mn:stemName: x
+  @rdf:type: DISSource|ResourceProperty
+  @enDesc:
+    An <Q::mn:xrefnode0> property references a node <html5:var::m> in the tree
+    <html5:var::s> that might be different from the tree <html5:var::t> to which
+    the subject node <html5::var::n> of the property belongs.
+
+    When the property value is set and <html5:var::s> is
+    different from <html5:var::t>, then reference counters for
+    <html5:var::m> and <html5:var::s> are increased, so that
+    the tree <html5:var::s> would not be deleted while this
+    link has been maintained.  When the property value is unset
+    or an <M::NodeStem||ManakaiDOM|Perl.importTree> operation
+    makes two trees to one, then two reference counters
+    are decreased.
 
 PropDef:
   @QName: mn|irefnode0

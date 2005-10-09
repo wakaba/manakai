@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/10/08 15:05:47 $
+      $Date: 2005/10/09 13:57:20 $
     @@ContentType:
       dis:Date.RCS
   
@@ -850,7 +850,7 @@ IFClsDef:
                                (<Q::ManakaiDOM:ManakaiDOM1>)
                             ? $forArg : <Q::ManakaiDOM:ManakaiDOMLatest>;
               my $cls = $disResource->{db}-><M::DIS|DISDatabase.getResource>
-                                                (<Q::DOMCore:DOMException>,
+                                            (<Q::DOMCore:ManakaiDOMException>,
                                                        for_arg => $for_uri);
               my $const = $disResource->{db}-><M::DIS|DISDatabase.getResource>
                                  (<Q::DOMCore:NO_MODIFICATION_ALLOWED_ERR>,
@@ -2240,6 +2240,7 @@ IFClsDef:
                                <Q::mn|subnode1>,
                                <Q::mn|subnode2>,
                                <Q::mn|origin0>,
+                               <Q::mn|xrefnode0>,
                                <Q::mn|irefnode0>,
                                <Q::mn|anydata1>,
                                <Q::mn|anydata2>) {
@@ -3411,6 +3412,7 @@ IFClsDef:
             }
     
             ## - Class members
+            my @const;
             my @cr = @{$self-><M::DIS|DISResource.getChildResourceList>};
             for my $cr (@cr) {
               ## - Subroutines
@@ -3485,6 +3487,7 @@ IFClsDef:
                     }
                     $r-><M::DIS|PLPack.setSub>
                              ($sub-><AG::DIS|MPLSub.localName> => $sub);
+                    push @const, $gcr;
                   }
                 }
               ## - Constants
@@ -3539,6 +3542,51 @@ IFClsDef:
                 $r-><M::DIS|PLBlockCon.appendStatement>
                   -><M::DIS|PLAnyCon.appendNewAssignment> ($var => $value);
               } # Type of child resources
+            }
+
+            ## - Error Descriptions
+            if ($self-><M::DIS|DISResource.isTypeURI> (<Q::dx:Class>)) {
+              my $err_def = $plimpl-><M::DIS|MPLImpl.createPerlSub>
+                                            ('___error_def');
+              $err_def-><AS::DIS|MPLSub.prototype> ('');
+              $err_def-><M::DIS|PLBlockCon.appendCode>
+                 ($plimpl-><M::DIS|MPLImpl.perlList>
+                   ([{
+                       map {
+                         $_-><AG::DISResourcePerl.plName> => {
+                           <Q::DOMCore:code> => 0 + $_
+                             -><AG::DISResourcePerl.plCodeFragment>,
+                           description => $_
+                             -><M::ManakaiDISResourcePerl.plMufDescriptionText>,
+#                           ($_->{ExpandedURI q< DOMCore:severity>}
+#                              ? (ExpandedURI q< DOMCore:severity>
+#                                      => $_->{ExpandedURI q< DOMCore:severity>},
+#                                 ExpandedURI q< DOMCore:type>
+#                                       => $_->{ExpandedURI q< DOMCore:type>})
+#                                    : ()),
+                           <Q::MDOMX:subtype> => {
+                             map {
+                               $_-><AG::DIS|DISAnyResource.nameURI>
+                               => {
+                                 description => $_
+                                   -><M::ManakaiDISResourcePerl
+                                         .plMufDescriptionText>,
+#                                 ($_->{ExpandedURI q< DOMCore:severity>}
+#                                    ? (ExpandedURI q< DOMCore:severity>
+#                                      => $_->{ExpandedURI q< DOMCore:severity>},
+#                                       ExpandedURI q< DOMCore:type>
+#                                       => $_->{ExpandedURI q< DOMCore:type>})
+#                                    : ()),
+                               },
+                             } grep {
+                               $_-><M::DIS|DISResource.isTypeURI>
+                                    (<Q::dx:ErrorSubCode>)
+                             } @{$_-><M::DIS|DISResource.getChildResourceList>}
+                           },
+                         },
+                       } @const
+                    }]));
+              $r-><M::DIS|PLPack.setSub> (___error_def => $err_def);
             }
 
           ## -- Global variables
