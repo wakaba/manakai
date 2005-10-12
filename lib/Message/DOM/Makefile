@@ -11,13 +11,13 @@ CD = cd
 MAKE = make
 RM = rm
 PERL = perl
-PERL_OPTIONS3 = -I$(MANAKAI_LIB_DIR)
-PERL_OPTIONS = $(PERL_OPTIONS3)
-PERL_ = $(PERL) $(PERL_OPTIONS)
+PERL_OPTIONS =
+PERL_OPTIONS_ALL = $(PERL_OPTIONS) -I$(MANAKAI_LIB_DIR)
+PERL_ = $(PERL) $(PERL_OPTIONS_ALL)
 PERLC = $(PERL) -c -w
-PERLC_OPTIONS3 = $(PERL_OPTIONS)
-PERLC_OPTIONS = $(PERLC_OPTIONS3)
-PERL_CHK = $(PERLC) $(PERLC_OPTIONS)
+PERLC_OPTIONS = 
+PERLC_OPTIONS_ALL = $(PERLC_OPTIONS) -I$(MANAKAI_LIB_DIR)
+PERL_CHK = $(PERLC) $(PERLC_OPTIONS_ALL)
 TOUCH = touch
 
 NS_MDOM = http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom\#ManakaiDOM.
@@ -145,5 +145,5 @@ clean:
 	$(RM) .*.tmp *~ .*~ *.BAK .*.BAK
 	$(RM) .core$(PM_SUFFIX) .ls$(PM_SUFFIX) .html$(PM_SUFFIX)
 
-## $Date: 2005/10/12 00:30:57 $
+## $Date: 2005/10/12 14:46:01 $
 ## License: Public Domain.

@@ -42,7 +42,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/10/09 13:57:13 $
+      $Date: 2005/10/12 14:46:01 $
     @@ContentType:
       dis:Date.RCS
 
@@ -628,6 +628,7 @@ ResourceDef:
       @@@lang:en
       @@@@:
         Construct an object for a new instance of the <IF::CDATASection> node.
+    @@NewObjectRefNodeParam:
     @@Return:
       @@@Type: DOMCore|NodeStem
       @@@Description:
@@ -635,7 +636,7 @@ ResourceDef:
         @@@@@:
           The new object for the <IF::CDATASection> node.
       @@@PerlDef:
-        $r = <ClassM::DOMCore:ManakaiDOMNode.newObject> ($self);
+        $r = <ClassM::DOMCore:ManakaiDOMNode.newObject> ($self, $refNode);
         $r->{<H::DOMCore:nodeType>} = <H::DOMXML:CDATASectionNode>;
         $r->{<H::infoset:content>} = '';
      @@ImplNote:
@@ -713,6 +714,27 @@ ResourceDef:
               }
             }
 ##CDATASection
+
+ElementTypeBinding:
+  @Name: NewObjectRefNodeParam
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@Name: refNode
+    @@Type: NodeStem
+    @@Description:
+      @@@lang:en
+      @@@@:
+        A node from the tree to which the new node will belong.
+    @@rdf:type: DISLang|MethodParameter
+    @@ResourceDef:
+      @@@rdf:type: ManakaiDOM|InCase
+      @@@Value:
+        @@@@is-null:1
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The node belongs to a new tree.
 
 PropDef:
   @QName: ManakaiDOM|isExpanded
@@ -1047,6 +1069,7 @@ NodeTypeDef:
       @@@lang:en
       @@@@:
         Construct an object for a new instance of the <IF::DocumentType> node.
+    @@NewObjectRefNodeParam:
     @@Return:
       @@@Type: DOMCore|NodeStem
       @@@Description:
@@ -1054,7 +1077,7 @@ NodeTypeDef:
         @@@@@:
           The new object for the <IF::DocumentType> node.
       @@@PerlDef:
-        $r = <ClassM::DOMCore:ManakaiDOMNode.newObject> ($self);
+        $r = <ClassM::DOMCore:ManakaiDOMNode.newObject> ($self, $refNode);
         $r->{<H::DOMCore:nodeType>} = <H::infoset:DocumentTypeDeclaration>;
      @@ImplNote:
        @@@lang:en
@@ -1366,6 +1389,7 @@ NodeTypeDef:
       @@@lang:en
       @@@@:
         Construct an object for a new instance of the <IF::Notation> node.
+    @@NewObjectRefNodeParam:
     @@Return:
       @@@Type: DOMCore|NodeStem
       @@@Description:
@@ -1373,7 +1397,7 @@ NodeTypeDef:
         @@@@@:
           The new object for the <IF::Notation> node.
       @@@PerlDef:
-        $r = <ClassM::DOMCore:ManakaiDOMNode.newObject> ($self);
+        $r = <ClassM::DOMCore:ManakaiDOMNode.newObject> ($self, $refNode);
         $r->{<H::DOMCore:nodeType>} = <H::infoset:Notation>;
      @@ImplNote:
        @@@lang:en
@@ -1776,6 +1800,7 @@ NodeTypeDef:
       @@@lang:en
       @@@@:
         Construct an object for a new instance of the <IF::Entity> node.
+    @@NewObjectRefNodeParam:
     @@Return:
       @@@Type: DOMCore|NodeStem
       @@@Description:
@@ -1783,7 +1808,7 @@ NodeTypeDef:
         @@@@@:
           The new object for the <IF::Entity> node.
       @@@PerlDef:
-        $r = <ClassM::DOMCore:ManakaiDOMNode.newObject> ($self);
+        $r = <ClassM::DOMCore:ManakaiDOMNode.newObject> ($self, $refNode);
         $r->{<H::infoset:children>} = [];
         $r->{<H::DOMCore:nodeType>} = <H::DOMXML:EntityNode>;
      @@Level[list]:
@@ -2011,6 +2036,7 @@ NodeTypeDef:
       @@@lang:en
       @@@@:
         Construct an object for a new instance of the <IF::EntityReference> node.
+    @@NewObjectRefNodeParam:
     @@Return:
       @@@Type: DOMCore|NodeStem
       @@@Description:
@@ -2018,7 +2044,7 @@ NodeTypeDef:
         @@@@@:
           The new object for the <IF::EntityReference> node.
       @@@PerlDef:
-        $r = <ClassM::DOMCore:ManakaiDOMNode.newObject> ($self);
+        $r = <ClassM::DOMCore:ManakaiDOMNode.newObject> ($self, $refNode);
         $r->{<H::infoset:children>} = [];
         $r->{<H::DOMCore:nodeType>} = <H::DOMXML:EntityReferenceNode>;
      @@ImplNote:
@@ -2268,6 +2294,7 @@ NodeTypeDef:
       @@@@:
         Construct an object for a new instance of the 
         <IF::ProcessingInstruction> node.
+    @@NewObjectRefNodeParam:
     @@Return:
       @@@Type: DOMCore|NodeStem
       @@@Description:
@@ -2275,7 +2302,7 @@ NodeTypeDef:
         @@@@@:
           The new object for the <IF::ProcessingInstruction> node.
       @@@PerlDef:
-        $r = <ClassM::DOMCore:ManakaiDOMNode.newObject> ($self);
+        $r = <ClassM::DOMCore:ManakaiDOMNode.newObject> ($self, $refNode);
         $r->{<H::DOMCore:nodeType>} = <H::infoset:ProcessingInstruction>;
         $r->{<H::infoset:content>} = '';
      @@ImplNote:

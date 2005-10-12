@@ -1,3 +1,15 @@
+2005-10-12  Wakaba  <wakaba@suika.fam.cx>
+
+	* PerlCode.dis (ForClassCompat): Removed.
+
+	* ManakaiNode.dis (ManakaiDOMNodeObject, ManakaiDOMNodeReference):
+	Removed.
+	(newNode): New method.
+	(generateUniqueID): Algorithm has changed to save random
+	string generation time.
+
+	* DIS.dis (AUTOLOAD): "$Error::Level" fixed to "$Error::Depth".
+
 2005-10-11  Wakaba  <wakaba@suika.fam.cx>
 
 	* PerlCode.dis (IfClsDef, IFClsETDef): New version of classes based

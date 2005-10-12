@@ -40,7 +40,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/10/12 00:30:54 $
+      $Date: 2005/10/12 14:45:56 $
     @@ContentType:
       dis:Date.RCS
 
@@ -2786,15 +2786,17 @@ IFCls1Def:
               ($prefix, $lname) = (null, $prefix);
             }
             my $node = <ClassM::DOMXML:ManakaiDOMDocumentType.newObject>;
-            $node->{<H::infoset:prefix>} = $prefix;
+            $node->{<H::infoset:prefix>} = $prefix if defined $prefix;
             $node->{<H::infoset:localName>} = $lname;
             __FOR{ManakaiDOM:ManakaiDOMLatest::
               unless (<Code::DOMMain:testXML10QName:: $INPUT = $qualifiedName>) {
                 $node->{<H::infoset:version>} = '1.1';
               }
             }__;
-            $node->{<H::infoset:publicIdentifier>} = $publicId;
-            $node->{<H::infoset:systemIdentifier>} = $systemId; 
+            $node->{<H::infoset:publicIdentifier>} = $publicId
+              if defined $publicId;
+            $node->{<H::infoset:systemIdentifier>} = $systemId
+              if defined $systemId; 
             ## Note: No DOM Level 3 method/attribute provides access 
             ##       to the DOM implementation object when the "DocumentType" 
             ##       does not have the parent node (= owner "Document").
@@ -3045,10 +3047,11 @@ IFCls1Def:
             $node->{<H::DOMCore:implementation>} = $self;
             $node->{<H::ManakaiDOM:implID>}
                 = $self->{<H::mn:node>}->{<H::ManakaiDOM:implID>};
-            $node->{<H::DOMCore:hasFeature>}->{XML} = 1;
-            $node->{<H::DOMCore:hasFeature>}->{HTML} = 1
+            $node->{<H::DOMCore:hasFeature>}->{XML} = true;
+            $node->{<H::DOMCore:hasFeature>}->{HTML} = true
               if (defined $namespaceURI and $namespaceURI eq <Q::xhtml1:>) or
                  (defined $qualifiedName and $qualifiedName eq 'html');
+
             if ($doctype) {
               if (not UNIVERSAL::isa
                         ($doctype, <ClassName::DOMXML:ManakaiDOMDocumentType>)) {
@@ -3079,6 +3082,7 @@ IFCls1Def:
                     = $doctypeNode->{<H::infoset:version>};
               }__;
             }
+
             if ($lname) {
               __FOR{ManakaiDOM:ManakaiDOMLatest::
                 if (not defined $node->{<H::infoset:version>} and
@@ -3086,9 +3090,8 @@ IFCls1Def:
                   $node->{<H::infoset:version>} = '1.1';
                 }
               }__;
-              my $docElObj = <ClassM::ManakaiDOMElement.newObject>;
-              $node-><M::NodeStem.importTree> ($docElObj);
-              $docElObj->{<H::infoset:prefix>} = $prefix;
+              my $docElObj = <ClassM::ManakaiDOMElement.newObject> ($node);
+              $docElObj->{<H::infoset:prefix>} = $prefix if defined $prefix;
               __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
                 $result => {$docElObj->{<H::infoset:namespaceName>}},
                 $given => $namespaceURI,
@@ -3102,6 +3105,7 @@ IFCls1Def:
               }__;
               push @{$node->{<H::infoset:children>}}, $docElObj;
             }
+
             $r = <ClassM::ManakaiDOMNode.getNodeReference> ($node);
         @@@PerlDef:
           @@@@ForCheck:
@@ -3178,9 +3182,8 @@ IFCls1Def:
               }__;
             }
             if ($lname) {
-              my $docElObj = <ClassM::ManakaiDOMElement.newObject>;
-              $node-><M::NodeStem.importTree> ($docElObj);
-              $docElObj->{<H::infoset:prefix>} = $prefix;
+              my $docElObj = <ClassM::ManakaiDOMElement.newObject> ($node);
+              $docElObj->{<H::infoset:prefix>} = $prefix if defined $prefix;
               __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
                 $result => {$docElObj->{<H::infoset:namespaceName>}},
                 $given => $namespaceURI,
@@ -3196,8 +3199,9 @@ IFCls1Def:
             }
             $r = <ClassM::ManakaiDOMNode.getNodeReference> ($node);
         @@@disDef:
-          @@@@ForCheck:
-            !ManakaiDOM:DOMXMLFeature
+          @@@@For:
+            !ManakaiDOM:DOMXMLFeature !ManakaiDOM|DOMHTMLFeature
+          @@@@For: !ManakaiDOM|DOMXMLFeature !ManakaiDOM|DOM3
           @@@@DOMMain:raiseException:
             MDOMX:MDOM_IMPL_NOSUPPORT_XMLNS
      @@SpecLevel:2
@@ -4920,76 +4924,67 @@ IFCls1Def:
 
        @@@PerlDef:
          __DEEP{
-           my @node = ([$self]);
            my $od = $self-><AG::Node.ownerDocument>;
            my $strict_check;
-           __FOR{ManakaiDOM|DOM3::
+           __FOR{ManakaiDOM:DOM3::
              $strict_check = $od-><AG::Document.strictErrorChecking>;
              $od-><AS::Document.strictErrorChecking> (false);
            }__;
+           my @node = ([$self]);
            while (@node) {
-             my ($node, $parent, $read_only) = @{shift @node};
+             my ($node, $parent) = @{shift @node};
              my $nt = $node-><AG::Node.nodeType>;
              if ($nt == <C::Node.ELEMENT_NODE>) {
                my $clone;
-               if ($node->isa (<IFName::Node||ManakaiDOM|ManakaiDOM2>) and
-                   defined $node-><AG::Node.localName>) {
+               my $ln;
+               __FOR{ManakaiDOM:DOM2::
+                 $ln = $node-><AG::Node.localName>;
+               }__;
+               if (defined $ln) {
                  $clone = $od-><M::Document.createElementNS>
-                                   ($node-><AG::Node.namespaceURI>,
-                                    $node-><AG::Node.localName>);
+                                   ($node-><AG::Node.namespaceURI>, $ln);
                } else {  ## DOM Level 1 node
                  $clone = $od-><M::Document.createAttribute>
                                    ($node-><AG::Node.nodeName>);
                }
                if ($parent) {
-                 local $parent->{<H::mn:node>}
-                              ->{<H::DOMCore:read-only>} = false;
                  $parent-><M::Node.appendChild> ($clone);
                } else {
                  $r = $clone;
                }
                my $attrs = $node-><AG::Node.attributes>;
-               my $attrsLength = $attrs-><AG::NamedNodeMap.length>;
-               for (my $i = 0; $i < $attrsLength; $i++) {
-                 push @node, [$attrs-><M::NamedNodeMap.item> ($i),
-                              $clone, $read_only];
+               my $attrsMax = $attrs-><AG::NamedNodeMap.length> - 1;
+               for my $i (0..$attrsMax) {
+                 push @node, [$attrs-><M::NamedNodeMap.item> ($i), $clone];
                }
                if ($deep) {
-                 push @node, map {[$_, $clone, $read_only]} @{$node
-                                                      -><AG::Node.childNodes>};
+                 push @node, map {[$_, $clone]} @{$node-><AG::Node.childNodes>};
                }
-               $clone->{<H::mn:node>}->{<H::DOMCore:read-only>} = true
-                 if $read_only;
              } elsif ($nt == <C::Node.TEXT_NODE>) {
                my $clone = $od-><M::Document.createTextNode>
                                    ($node-><AG::CharacterData.data>);
                if ($parent) {
-                 local $parent->{<H::mn:node>}->{<H::DOMCore:read-only>} = false;
                  $parent-><M::Node.appendChild> ($clone);
                } else {
                  $r = $clone;
                }
-               $clone->{<H::mn:node>}->{<H::DOMCore:read-only>} = true
-                 if $read_only;
-               __FOR{ManakaiDOM|DOM3::
-                 if ($node->isa (<IFName::Text||ManakaiDOM|ManakaiDOM3>)) {
-                   $clone-><AS::Text.isElementContentWhitespace>
-                             ($node-><AG::Text.isElementContentWhitespace>);
-                 }
+               __FOR{ManakaiDOM:DOM3::
+                 $clone-><AS::Text.isElementContentWhitespace> (true)
+                   if $node-><AG::Text.isElementContentWhitespace>;
                }__;
              } elsif ($nt == <C::Node.ATTRIBUTE_NODE>) {
                my $clone;
-               if ($node->isa (<IFName::Node||ManakaiDOM|ManakaiDOM2>) and
-                   defined $node-><AG::Node.localName>) {
+               my $ln;
+               __FOR{ManakaiDOM:DOM2::
+                 $ln = $node-><AG::Node.localName>;
+               }__;
+               if (defined $ln) {
                  $clone = $od-><M::Document.createAttributeNS>
-                                   ($node-><AG::Node.namespaceURI>,
-                                    $node-><AG::Node.localName>);
+                                   ($node-><AG::Node.namespaceURI>, $ln);
                  if ($parent) {
-                   local $parent->{<H::mn:node>}
-                                ->{<H::DOMCore:read-only>} = false;
                    $parent-><M::Element.setAttributeNodeNS> ($clone);
-                   $clone->{<H::mn:node>}->{<H::infoset:specified>}
-                     = $node-><AG::Attr.specified>;
+                   $clone->{<H::mn:node>}->{<H::infoset:specified>} = true
+                     if $node-><AG::Attr.specified>;
                  } else {
                    $r = $clone;
                    $clone->{<H::mn:node>}->{<H::infoset:specified>} = true;
@@ -4998,93 +4993,76 @@ IFCls1Def:
                  $clone = $od-><M::Document.createAttribute>
                                    ($node-><AG::Node.nodeName>);
                  if ($parent) {
-                   local $parent->{<H::mn:node>}
-                                ->{<H::DOMCore:read-only>} = false;
                    $parent-><M::Element.setAttributeNode> ($clone);
-                   $clone->{<H::mn:node>}->{<H::infoset:specified>}
-                     = $node-><AG::Attr.specified>;
+                   $clone->{<H::mn:node>}->{<H::infoset:specified>} = true
+                     if $node-><AG::Attr.specified>;
                  } else {
                    $r = $clone;
                    $clone->{<H::mn:node>}->{<H::infoset:specified>} = true;
                  }
                }
-               push @node, map {[$_, $clone, $read_only]} @{$node
-                                                      -><AG::Node.childNodes>};
-               $clone->{<H::mn:node>}->{<H::DOMCore:read-only>} = true
-                 if $read_only;
+               push @node, map {[$_, $clone]} @{$node-><AG::Node.childNodes>};
              } elsif ($nt == <C::Node.COMMENT_NODE>) {
                my $clone = $od-><M::Document.createComment>
                                    ($node-><AG::CharacterData.data>);
                if ($parent) {
-                 local $parent->{<H::mn:node>}->{<H::DOMCore:read-only>} = false;
                  $parent-><M::Node.appendChild> ($clone);
                } else {
                  $r = $clone;
                }
-               $clone->{<H::mn:node>}->{<H::DOMCore:read-only>} = true
-                 if $read_only;
              } elsif ($nt == <C::Node.CDATA_SECTION_NODE>) {
                my $clone = $od-><M::Document.createTextNode>
                                    ($node-><AG::CharacterData.data>);
                if ($parent) {
-                 local $parent->{<H::mn:node>}->{<H::DOMCore:read-only>} = false;
                  $parent-><M::Node.appendChild> ($clone);
                } else {
                  $r = $clone;
                }
-               $clone->{<H::mn:node>}->{<H::DOMCore:read-only>} = true
-                 if $read_only;
              } elsif ($nt == <C::Node.PROCESSING_INSTRUCTION_NODE>) {
                my $clone = $od-><M::Document.createProcessingInstruction>
                               ($node-><AG::DOMXML:ProcessingInstruction.target>);
                $clone-><AS::DOMXML:ProcessingInstruction.data>
                               ($node-><AG::DOMXML:ProcessingInstruction.data>);
                if ($parent) {
-                 local $parent->{<H::mn:node>}->{<H::DOMCore:read-only>} = false;
                  $parent-><M::Node.appendChild> ($clone);
                } else {
                  $r = $clone;
                }
-               $clone->{<H::mn:node>}->{<H::DOMCore:read-only>} = true
-                 if $read_only;
              } elsif ($nt == <C::Node.ENTITY_REFERENCE_NODE>) {
                my $clone = $od-><M::Document.createEntityReference>
                                     ($node-><AG::Node.nodeName>);
                if ($parent) {
-                 local $parent->{<H::mn:node>}->{<H::DOMCore:read-only>} = false;
                  $parent-><M::Node.appendChild> ($clone);
                } else {
                  $r = $clone;
                }
-               $clone->{<H::mn:node>}->{<H::DOMCore:read-only>} = true
-                 if $read_only;
              } elsif ($nt == <C::Node.DOCUMENT_FRAGMENT_NODE>) {
                my $clone = $od-><M::Document.createDocumentFragment>;
                $r = $clone;
                push @node, map {[$_, $clone]} @{$node-><AG::Node.childNodes>};
              } elsif ($nt == <C::Node.DOCUMENT_NODE>) {
-               __FOR{ManakaiDOM|DOM3::
+               __FOR{ManakaiDOM:DOM3::
                  $od-><AS::Document.strictErrorChecking> ($strict_check);
                }__;
                __UNDEEP{__EXCEPTION{CLONE_NODE_TYPE_NOT_SUPPORTED_ERR::
                  DOMCore:node => $node,
                }__}__;
              } elsif ($nt == <C::Node.DOCUMENT_TYPE_NODE>) {
-               __FOR{ManakaiDOM|DOM3::
+               __FOR{ManakaiDOM:DOM3::
                  $od-><AS::Document.strictErrorChecking> ($strict_check);
                }__;
                __UNDEEP{__EXCEPTION{CLONE_NODE_TYPE_NOT_SUPPORTED_ERR::
                  DOMCore:node => $node,
                }__}__;
              } elsif ($nt == <C::Node.ENTITY_NODE>) {
-               __FOR{ManakaiDOM|DOM3::
+               __FOR{ManakaiDOM:DOM3::
                  $od-><AS::Document.strictErrorChecking> ($strict_check);
                }__;
                __UNDEEP{__EXCEPTION{CLONE_NODE_TYPE_NOT_SUPPORTED_ERR::
                  DOMCore:node => $node,
                }__}__;
              } elsif ($nt == <C::Node.NOTATION_NODE>) {
-               __FOR{ManakaiDOM|DOM3::
+               __FOR{ManakaiDOM:DOM3::
                  $od-><AS::Document.strictErrorChecking> ($strict_check);
                }__;
                __UNDEEP{__EXCEPTION{CLONE_NODE_TYPE_NOT_SUPPORTED_ERR::
@@ -5094,8 +5072,8 @@ IFCls1Def:
                ## TODO: Assertion
              }
            }
-           __FOR{ManakaiDOM|DOM3::
-             $od-><AS::Document.strictErrorChecking> ($strict_check);
+           __FOR{ManakaiDOM:DOM3::
+             $od-><AS::Document.strictErrorChecking> (true) if $strict_check;
            }__;
          }__;
 
@@ -5745,8 +5723,7 @@ IFCls1Def:
               CORE::delete $__oc->{<H::infoset:parent>};
             }
             $__node->{<H::infoset:children>} = [];
-            my $__textNode = <ClassM::DOMCore:ManakaiDOMText.newObject>;
-            $__node-><M::NodeStem.importTree> ($__textNode);
+            my $__textNode = <ClassM::ManakaiDOMText.newObject> ($__node);
             __CODE{mn|setXRefNode||ManakaiDOM|Perl::
               $referrer => {$__textNode},
               $propName => {<H::DOMCore:ownerDocument>},
@@ -6206,6 +6183,7 @@ IFCls1Def:
       @@@Type: DOMString
       @@@enDesc:
         The name of a <IF::mn|NodeRef||ManakaiDOM|Perl> class.
+    @@NewObjectRefNodeParam:
     @@Return:
       @@@Type: NodeStem
       @@@Description:
@@ -6213,9 +6191,14 @@ IFCls1Def:
         @@@@@:
           The object for the <IF::Node> to be created.
       @@@PerlDef:
-          my $node = $r = bless <ClassM::ManakaiNode|ManakaiNodeStem||
+        if (defined $refNode) {
+          $r = bless $refNode-><M::NodeStem.newNode> ($refClass),
+                            <ClassName::ManakaiDOMCore:ManakaiDOMNodeObjectNode>;
+        } else {
+          $r = bless <ClassM::ManakaiNode|ManakaiNodeStem||
                                          ManakaiDOM|Perl.new> ($refClass),
                             <ClassName::ManakaiDOMCore:ManakaiDOMNodeObjectNode>;
+        }
        @@@ImplNote:
          @@@@lang:en
          @@@@@:
@@ -6255,6 +6238,11 @@ IFCls1Def:
       @@@PerlDef:
           my $nt = $object->{<H::DOMCore:nodeType>};
           my $class;
+        UNKNOWN: {
+          if (defined $object->{<H::DOMCore:nodeRefClass>}) {
+            $class = ${$object->{<H::DOMCore:nodeRefClass>}};
+            last UNKNOWN;
+          }
           FIND: {
           if ($nt eq <H::infoset:Element>) {
             my $ns;
@@ -6269,68 +6257,65 @@ IFCls1Def:
               $ln = lc $object->{<H::DOMCore:name>};
             }
             if (defined $ln) {
-              for my $pack ((sort {
+              for my $pack (sort {
                 $Message::DOM::ClassPoint{$b} <=> $Message::DOM::ClassPoint{$a}
-              } grep {
-                $Message::DOM::ManakaiDOMElement::CompatClassET{$$ns}
-                        ->{$ln}->{$_} and
-                $_->isa (<IFName::Element>)
-              } keys %{$Message::DOM::ManakaiDOMElement::CompatClassET{$$ns}
-                               ->{$ln}}),
-              (sort {
+              } keys %{
+                $Message::DOM::ManakaiDOMElement::CompatClassET{$$ns}->{$ln}
+              }) {
+                if ($pack->isa (<IFName::Element>)) {
+                  $class = $pack;
+                  last FIND;
+                }
+              }
+              for my $pack (sort {
                 $Message::DOM::ClassPoint{$b} <=> $Message::DOM::ClassPoint{$a}
-              } grep {
-                $Message::DOM::ManakaiDOMElement::CompatClassET{$$ns}
-                        ->{'*'}->{$_} and
-                $_->isa (<IFName::Element>)
-              } keys %{$Message::DOM::ManakaiDOMElement::CompatClassET{$$ns}
-                               ->{'*'}})) {
-                $class = $pack;
-                last FIND;
+              } keys %{
+                $Message::DOM::ManakaiDOMElement::CompatClassET{$$ns}->{'*'}
+              }) {
+                if ($pack->isa (<IFName::Element>)) {
+                  $class = $pack;
+                  last FIND;
+                }
               }
             }
             for my $pack (sort {
               $Message::DOM::ClassPoint{$b} <=> $Message::DOM::ClassPoint{$a}
-            } grep {
-              $Message::DOM::ManakaiDOMElement::CompatClass{$_} and
-              $_->isa (<IFName::Element>)
             } keys %{$Message::DOM::ManakaiDOMElement::CompatClass}) {
-              $class = $pack;
-              last FIND;
+              if ($pack->isa (<IFName::Element>)) {
+                $class = $pack;
+                last FIND;
+              }
             }
             $class = <ClassName::ManakaiDOMElement>;
           } elsif ($nt eq <H::infoset:Attribute>) {
             ## TODO: Find class by namespace URI and local name
             for my $pack (sort {
               $Message::DOM::ClassPoint{$b} <=> $Message::DOM::ClassPoint{$a}
-            } grep {
-              $Message::DOM::ManakaiDOMAttr::CompatClass{$_} and
-              $_->isa (<IFName::Attr>)
             } keys %{$Message::DOM::ManakaiDOMAttr::CompatClass}) {
-              $class = $pack;
-              last FIND;
+              if ($pack->isa (<IFName::Attr>)) {
+                $class = $pack;
+                last FIND;
+              }
             }
             $class = <ClassName::ManakaiDOMAttr>;
           } elsif ($nt eq <H::DOMCore:TextNode>) {
             for my $pack (sort {
               $Message::DOM::ClassPoint{$b} <=> $Message::DOM::ClassPoint{$a}
-            } grep {
-              $Message::DOM::ManakaiDOMText::CompatClass{$_} and
-              $_->isa (<IFName::Text>)
             } keys %{$Message::DOM::ManakaiDOMText::CompatClass}) {
-              $class = $pack;
-              last FIND;
+              if ($pack->isa (<IFName::Text>)) {
+                $class = $pack;
+                last FIND;
+              }
             }
             $class = <ClassName::ManakaiDOMText>;
           } elsif ($nt eq <H::infoset:Comment>) {
             for my $pack (sort {
               $Message::DOM::ClassPoint{$b} <=> $Message::DOM::ClassPoint{$a}
-            } grep {
-              $Message::DOM::ManakaiDOMComment::CompatClass{$_} and
-              $_->isa (<IFName::Comment>)
             } keys %{$Message::DOM::ManakaiDOMComment::CompatClass}) {
-              $class = $pack;
-              last FIND;
+              if ($pack->isa (<IFName::Comment>)) {
+                $class = $pack;
+                last FIND;
+              }
             }
             $class = <ClassName::ManakaiDOMComment>;
           } elsif ($nt eq <H::infoset:Document>) {
@@ -6349,26 +6334,27 @@ IFCls1Def:
                   $ln = lc $co->{<H::DOMCore:name>};
                 }
                 if (defined $ln) {
-                  for my $pack ((sort {
+                  for my $pack (sort {
                     $Message::DOM::ClassPoint{$b} <=>
                     $Message::DOM::ClassPoint{$a}
-                  } grep {
-                    $Message::DOM::ManakaiDOMDocument::CompatClassET{$$ns}
-                        ->{$ln}->{$_} and
-                    $_->isa (<IFName::Document>)
-                  } keys %{$Message::DOM::ManakaiDOMDocument::CompatClassET{$$ns}
-                               ->{$ln}}),
-                  (sort {
+                  } keys %{
+                    $Message::DOM::ManakaiDOMDocument::CompatClassET{$$ns}->{$ln}
+                  }) {
+                    if ($pack->isa (<IFName::Document>)) {
+                      $class = $pack;
+                      last FIND;
+                    }
+                  }
+                  for my $pack (sort {
                     $Message::DOM::ClassPoint{$b} <=>
                     $Message::DOM::ClassPoint{$a}
-                  } grep {
-                    $Message::DOM::ManakaiDOMDocument::CompatClassET{$$ns}
-                        ->{'*'}->{$_} and
-                    $_->isa (<IFName::Document>)
-                  } keys %{$Message::DOM::ManakaiDOMDocument::CompatClassET{$$ns}
-                               ->{'*'}})) {
-                    $class = $pack;
-                    last FIND;
+                  } keys %{
+                    $Message::DOM::ManakaiDOMDocument::CompatClassET{$$ns}->{'*'}
+                  }) {
+                    if ($pack->isa (<IFName::Document>)) {
+                      $class = $pack;
+                      last FIND;
+                    }
                   }
                 }
                 last CHILD; # Not found
@@ -6382,107 +6368,100 @@ IFCls1Def:
             } # CHILD
 
             if ($object->{<H::DOMCore:hasFeature>}->{HTML}) {
-              for my $pack ((sort {
+              for my $pack (sort {
                     $Message::DOM::ClassPoint{$b} <=>
                     $Message::DOM::ClassPoint{$a}
-              } grep {
-                  $Message::DOM::ManakaiDOMDocument::CompatClassET{<Q::xhtml1:>}
-                      ->{'*'}->{$_} and
-                  $_->isa (<IFName::Document>)
-              } keys %{$Message::DOM::ManakaiDOMDocument::CompatClassET{
-                               <Q::xhtml1:>}->{'*'}})) {
-                $class = $pack;
-                last FIND;
+              } keys %{
+                $Message::DOM::ManakaiDOMDocument::CompatClassET{<Q::xhtml1:>}
+                                                              ->{'*'}
+              }) {
+                if ($pack->isa (<IFName::Document>)) {
+                  $class = $pack;
+                  last FIND;
+                }
               }
             }
 
             for my $pack (sort {
               $Message::DOM::ClassPoint{$b} <=> $Message::DOM::ClassPoint{$a}
-            } grep {
-              $Message::DOM::ManakaiDOMDocument::CompatClass{$_} and
-              $_->isa (<IFName::Document>)
             } keys %{$Message::DOM::ManakaiDOMDocument::CompatClass}) {
-              $class = $pack;
-              last FIND;
+              if ($pack->isa (<IFName::Document>)) {
+                $class = $pack;
+                last FIND;
+              }
             }
             $class = <ClassName::ManakaiDOMDocument>;
           } elsif ($nt eq <H::infoset:ProcessingInstruction>) {
             ## TODO: Find class by namespace URI and local name
             for my $pack (sort {
               $Message::DOM::ClassPoint{$b} <=> $Message::DOM::ClassPoint{$a}
-            } grep {
-              $Message::DOM::ManakaiDOMProcessingInstruction::CompatClass{$_} and
-              $_->isa (<IFName::DOMXML:ProcessingInstruction>)
-            } keys %{$Message::DOM::ManakaiDOMProcessingInstruction::CompatClass
+            } keys %{
+              $Message::DOM::ManakaiDOMProcessingInstruction::CompatClass
             }) {
-              $class = $pack;
-              last FIND;
+              if ($pack->isa (<IFName::DOMXML:ProcessingInstruction>)) {
+                $class = $pack;
+                last FIND;
+              }
             }
             $class = <ClassName::DOMXML:ManakaiDOMProcessingInstruction>;
           } elsif ($nt eq <H::DOMXML:CDATASectionNode>) {
             for my $pack (sort {
               $Message::DOM::ClassPoint{$b} <=> $Message::DOM::ClassPoint{$a}
-            } grep {
-              $Message::DOM::ManakaiDOMCDATASection::CompatClass{$_} and
-              $_->isa (<IFName::DOMXML:CDATASection>)
             } keys %{$Message::DOM::ManakaiDOMCDATASection::CompatClass}) {
-              $class = $pack;
-              last FIND;
+              if ($pack->isa (<IFName::DOMXML:CDATASection>)) {
+                $class = $pack;
+                last FIND;
+              }
             }
             $class = <ClassName::DOMXML:ManakaiDOMCDATASection>;
           } elsif ($nt eq <H::DOMXML:EntityReferenceNode>) {
             for my $pack (sort {
               $Message::DOM::ClassPoint{$b} <=> $Message::DOM::ClassPoint{$a}
-            } grep {
-              $Message::DOM::ManakaiDOMEntityReference::CompatClass{$_} and
-              $_->isa (<IFName::DOMXML:EntityReference>)
             } keys %{$Message::DOM::ManakaiDOMEntityReference::CompatClass}) {
-              $class = $pack;
-              last FIND;
+              if ($pack->isa (<IFName::DOMXML:EntityReference>)) {
+                $class = $pack;
+                last FIND;
+              }
             }
             $class = <ClassName::DOMXML:ManakaiDOMEntityReference>;
           } elsif ($nt eq <H::DOMCore:DocumentFragmentNode>) {
             for my $pack (sort {
               $Message::DOM::ClassPoint{$b} <=> $Message::DOM::ClassPoint{$a}
-            } grep {
-              $Message::DOM::ManakaiDOMDocumentFragment::CompatClass{$_} and
-              $_->isa (<IFName::DocumentFragment>)
             } keys %{$Message::DOM::ManakaiDOMDocumentFragment::CompatClass}) {
-              $class = $pack;
-              last FIND;
+              if ($pack->isa (<IFName::DocumentFragment>)) {
+                $class = $pack;
+                last FIND;
+              }
             }
             $class = <ClassName::ManakaiDOMDocumentFragment>;
           } elsif ($nt eq <H::infoset:DocumentTypeDeclaration>) {
             for my $pack (sort {
               $Message::DOM::ClassPoint{$b} <=> $Message::DOM::ClassPoint{$a}
-            } grep {
-              $Message::DOM::ManakaiDOMDocumentType::CompatClass{$_} and
-              $_->isa (<IFName::DOMXML:DocumentType>)
             } keys %{$Message::DOM::ManakaiDOMDocumentType::CompatClass}) {
-              $class = $pack;
-              last FIND;
+              if ($pack->isa (<IFName::DOMXML:DocumentType>)) {
+                $class = $pack;
+                last FIND;
+              }
             }
             $class = <ClassName::DOMXML:ManakaiDOMDocumentType>;
           } elsif ($nt eq <H::DOMXML:EntityNode>) {
             for my $pack (sort {
               $Message::DOM::ClassPoint{$b} <=> $Message::DOM::ClassPoint{$a}
-            } grep {
-              $Message::DOM::ManakaiDOMEntity::CompatClass{$_} and
-              $_->isa (<IFName::DOMXML:Entity>)
             } keys %{$Message::DOM::ManakaiDOMEntity::CompatClass}) {
-              $class = $pack;
-              last FIND;
+              if ($pack->isa (<IFName::DOMXML:Entity>)) {
+                $class = $pack;
+                last FIND;
+              }
             }
             $class = <ClassName::DOMXML:ManakaiDOMEntity>;
           } elsif ($nt eq <H::infoset:Notation>) {
             for my $pack (sort {
               $Message::DOM::ClassPoint{$b} <=> $Message::DOM::ClassPoint{$a}
-            } grep {
-              $Message::DOM::ManakaiDOMNotation::CompatClass{$_} and
-              $_->isa (<IFName::DOMXML:Notation>)
             } keys %{$Message::DOM::ManakaiDOMNotation::CompatClass}) {
-              $class = $pack;
-              last FIND;
+              if ($pack->isa (<IFName::DOMXML:Notation>)) {
+                $class = $pack;
+                last FIND;
+              }
             }
             $class = <ClassName::DOMXML:ManakaiDOMNotation>;
           ## TODO: Namespace
@@ -6495,6 +6474,11 @@ IFCls1Def:
             }__;
           }
           } # FIND
+          __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
+            $result => {$object->{<H::DOMCore:nodeRefClass>}},
+            $given => $class,
+          }__;
+        } # UNKNOWN
           __CODE{getNodeRef::
             $object => $object,
             $ref => $r,
@@ -6558,6 +6542,13 @@ IFCls1Def:
             $class => $class,
           }__;
 ##Node
+
+PropDef:
+  @QName: DOMCore|nodeRefClass
+  @enDesc:
+    A fully qualified package name of the node reference class that is most
+    <QUOTE::natural> for the node.
+  @DOMCore:nodeProp: cp
 
 PropDef:
   @QName: dis|DOM3
@@ -7586,8 +7577,7 @@ ClassDef:
                    } elsif ($pchild->{<H::DOMCore:read-only>}) {
                      if ($child->{<H::DOMCore:read-only>}) {
                        ## Creates a new node
-                       my $text = <ClassM::ManakaiDOMText.newObject>;
-                       $self-><M::NodeStem.importTree> ($text);
+                       my $text = <ClassM::ManakaiDOMText.newObject> ($self);
                        push @change, [$text, 'append', $pchild];
                        push @change, [$text, 'append', $child];
                        $text->{<H::infoset:content>} = '';
@@ -10672,6 +10662,7 @@ NodeTypeDef:
       @@@@:
         Construct an object for a new instance of the <IF::Attr> node.
     @@ManakaiDOM:isStatic:1
+    @@NewObjectRefNodeParam:
     @@Return:
       @@@Type: NodeStem
       @@@Description:
@@ -10679,7 +10670,7 @@ NodeTypeDef:
         @@@@@:
           The new object for the <IF::Attr> node.
       @@@PerlDef:
-          $r = <ClassM::ManakaiDOMNode.newObject> ($self);
+          $r = <ClassM::ManakaiDOMNode.newObject> ($self, $refNode);
           $r->{<H::infoset:children>} = [];
           $r->{<H::DOMCore:nodeType>} = <H::infoset:Attribute>;
      @@ImplNote:
@@ -10764,6 +10755,27 @@ NodeTypeDef:
               }
             }
 ##Attr
+
+ElementTypeBinding:
+  @Name: NewObjectRefNodeParam
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@Name: refNode
+    @@Type: NodeStem
+    @@Description:
+      @@@lang:en
+      @@@@:
+        A node from the tree to which the new node will belong.
+    @@rdf:type: DISLang|MethodParameter
+    @@ResourceDef:
+      @@@rdf:type: ManakaiDOM|InCase
+      @@@Value:
+        @@@@is-null:1
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The node belongs to a new tree.
 
 NodeTypeDef:
   @IFQName: Element
@@ -10888,7 +10900,7 @@ NodeTypeDef:
             if ($attr->{<Q::ManakaiDOM:noNS>}->{$name}) {
               $r = $attr->{<Q::ManakaiDOM:noNS>}->{$name};
               __FOR{ForRemove::
-                CORE::delete $attr->{<Q::ManakaiDOM:noNS>};
+                CORE::delete $attr->{<Q::ManakaiDOM:noNS>}->{$name};
               }__;
             } elsif ($name eq 'xmlns') {
               for my $a (keys %{$attr->{<Q::xmlns:>}||{}}) {
@@ -11071,8 +11083,7 @@ NodeTypeDef:
                                              $INPUT_PARAM_NAME => 'name',
                                              $XMLVERSION => $version}__;
               }
-              $r = <ClassM::ManakaiDOMAttr.newObject>;
-              $node-><M::NodeStem.importTree> ($r);
+              $r = <ClassM::ManakaiDOMAttr.newObject> ($node);
               $r->{<H::DOMCore:name>} = $name;
               $r->{<H::infoset:ownerElement>} = $node;
               __CODE{mn|setXRefNode||ManakaiDOM|Perl::
@@ -11083,8 +11094,7 @@ NodeTypeDef:
               $node->{<H::infoset:attributes>}
                    ->{<Q::ManakaiDOM:noNS>}->{$name} = $r;
             }
-            my $text = <ClassM::ManakaiDOMText.newObject>;
-            $node-><M::NodeStem.importTree> ($text);
+            my $text = <ClassM::ManakaiDOMText.newObject> ($node);
             $text->{<H::infoset:content>} = defined $value ? $value : '';
             __CODE{mn|setXRefNode||ManakaiDOM|Perl::
               $referrer => {$text},
@@ -11829,8 +11839,7 @@ NodeTypeDef:
                 $_-><M::NodeStem.orphanate>;
               }
             } else {
-              $r = <ClassM::ManakaiDOMAttr.newObject>;
-              $node-><M::NodeStem.importTree> ($r);
+              $r = <ClassM::ManakaiDOMAttr.newObject> ($node);
               __CODE{mn|setXRefNode||ManakaiDOM|Perl::
                 $referrer => {$r},
                 $propName => {<H::DOMCore:ownerDocument>},
@@ -11847,8 +11856,7 @@ NodeTypeDef:
                    ->{defined $namespaceURI ? $namespaceURI : <Q::null:>}
                    ->{$localName} = $r;
             }
-            my $text = <ClassM::ManakaiDOMText.newObject>;
-            $node-><M::NodeStem.importTree> ($text);
+            my $text = <ClassM::ManakaiDOMText.newObject> ($node);
             __CODE{mn|setXRefNode||ManakaiDOM|Perl::
               $referrer => {$text},
               $propName => {<H::DOMCore:ownerDocument>},
@@ -13157,6 +13165,7 @@ NodeTypeDef:
       @@@lang:en
       @@@@:
         Construct an object for a new instance of the <IF::Element> node.
+    @@NewObjectRefNodeParam:
     @@Return:
       @@@Type: NodeStem
       @@@Description:
@@ -13164,7 +13173,7 @@ NodeTypeDef:
         @@@@@:
           The new object for the <IF::Element> node.
       @@@PerlDef:
-        $r = <ClassM::ManakaiDOMNode.newObject> ($self);
+        $r = <ClassM::ManakaiDOMNode.newObject> ($self, $refNode);
         $r->{<H::infoset:attributes>} = {};
         $r->{<H::infoset:children>} = [];
         $r->{<H::DOMCore:nodeType>} = <H::infoset:Element>;
@@ -13437,10 +13446,10 @@ IFCls1Def:
           };
           my $newNode;
           if ($node->{<H::DOMCore:nodeType>} eq <H::DOMCore:TextNode>) {
-            $newNode = <ClassM::ManakaiDOMText.newObject>;
+            $newNode = <ClassM::ManakaiDOMText.newObject> ($node);
           } elsif ($node->{<H::DOMCore:nodeType>} eq
                    <H::DOMXML:CDATASectionNode>) {
-            $newNode = <ClassM::DOMXML:ManakaiDOMCDATASection.newObject>;
+            $newNode = <ClassM::DOMXML:ManakaiDOMCDATASection.newObject> ($node);
           } else {
             __EXCEPTION{
               MDOMX:MDOM_DEBUG_BUG||ManakaiDOM:Perl::
@@ -13670,6 +13679,7 @@ IFCls1Def:
       @@@lang:en
       @@@@:
         Construct an object for a new instance of the <IF::Text> node.
+    @@NewObjectRefNodeParam:
     @@Return:
       @@@Type: NodeStem
       @@@Description:
@@ -13677,7 +13687,7 @@ IFCls1Def:
         @@@@@:
           The new object for the <IF::Text> node.
       @@@PerlDef:
-          $r = <ClassM::ManakaiDOMNode.newObject> ($self);
+          $r = <ClassM::ManakaiDOMNode.newObject> ($self, $refNode);
           $r->{<H::DOMCore:nodeType>} = <H::DOMCore:TextNode>;
           $r->{<H::infoset:content>} = '';
      @@ImplNote:
@@ -13824,6 +13834,7 @@ IFCls1Def:
       @@@lang:en
       @@@@:
         Construct an object for a new instance of the <IF::Comment> node.
+    @@NewObjectRefNodeParam:
     @@Return:
       @@@Type: NodeStem
       @@@Description:
@@ -13831,7 +13842,7 @@ IFCls1Def:
         @@@@@:
           The new object for the <IF::Comment> node.
       @@@PerlDef:
-          $r = <ClassM::ManakaiDOMNode.newObject> ($self);
+          $r = <ClassM::ManakaiDOMNode.newObject> ($self, $refNode);
           $r->{<H::DOMCore:nodeType>} = <H::infoset:Comment>;    
           $r->{<H::infoset:content>} = '';
      @@ImplNote:
@@ -15014,6 +15025,7 @@ NodeTypeDef:
         Note that this method is for the internal use.  The DOM 
         applications must use the <M::Document.createDocumentFragment> method 
         to create a new <IF::DocumentFragment> object.
+    @@NewObjectRefNodeParam:
     @@Return:
       @@@Type: NodeStem
       @@@Description:
@@ -15021,7 +15033,7 @@ NodeTypeDef:
         @@@@@: 
           The new node stem object of type <IF::DocumentFragment>.
       @@@PerlDef:
-          $r = <ClassM::ManakaiDOMNode.newObject> ($self);
+          $r = <ClassM::ManakaiDOMNode.newObject> ($self, $refNode);
           $r->{<H::infoset:children>} = [];
           $r->{<H::DOMCore:nodeType>} = <H::DOMCore:DocumentFragmentNode>;
        @@@ImplNote:
@@ -17425,18 +17437,18 @@ NodeTypeDef:
       @@@@:
         The caller of this internal method MUST ensure to set 
         the attributes: <Q::DOMCore:implementation>.
+    @@NewObjectRefNodeParam:
     @@Return:
       @@@Type: NodeStem
       @@@Description:
         @@@@lang:en
         @@@@@: The new object for the "Document".
       @@@PerlDef:
-          $r = <ClassM::ManakaiDOMNode.newObject> ($self);
+          $r = <ClassM::ManakaiDOMNode.newObject> ($self, $refNode);
           $r->{<H::DOMCore:nodeType>} = <H::infoset:Document>;
           $r->{<H::infoset:version>} = '1.0';
           $r->{<H::DOMCore:strictErrorChecking>} = true;
           $r->{<H::infoset:children>} = [];
-          $r->{<H::DOMViews:view>} = [];
        @@@ImplNote:
          @@@@lang:en
          @@@@@:

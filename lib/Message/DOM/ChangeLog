@@ -1,3 +1,15 @@
+2005-10-12  Wakaba  <wakaba@suika.fam.cx>
+
+	* DOMCore.dis: Don't set "infoset:prefix" internal
+	property unless it has non-null value.
+	(newObject): "refNode" parameter introduced.
+	(ManakaiDOMNode.newObject): Calls "NodeStem.newNode"
+	method if "refNode" parameter is specified.
+	(cloneNode): Don't set "read-only" flag.
+	(getNodeReference): Caches the result.
+	(selectAttributeNodeForRemove): Don't removes any other
+	non-namespace-aware attribute nodes.
+
 2005-10-11  Wakaba  <wakaba@suika.fam.cx>
 
 	* DOMCore.dis (appendChild, createElementNS, createAttributeNS,

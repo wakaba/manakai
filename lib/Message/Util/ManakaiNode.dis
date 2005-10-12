@@ -18,36 +18,21 @@ Module:
   @License:
      license:Perl+MPL
   @Date:
-    @@@:
-      $Date: 2005/10/12 00:31:05 $
-    @@ContentType:
-      dis:Date.RCS
+    $Date: 2005/10/12 14:46:06 $
   
   @Require:
     @@Module:
-      @@@QName: 
-        DISlib:DISPerl
-      @@@WithFor:
-        ManakaiDOM:all
-    @@Module:
-      @@@QName: Util|ManakaiNode
-      @@@WithFor:
-        ManakaiDOM:Perl
+      @@@QName: DISlib|DISPerl
+      @@@WithFor: ManakaiDOM|all
 
   @DefaultFor:
     ManakaiDOM:Perl
 
 Namespace:
-  @DIS:
-    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#
   @dis:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
-  @dis2pm:
-    http://suika.fam.cx/~wakaba/archive/2004/11/8/dis2pm#
   @DISlib:
     http://suika.fam.cx/~wakaba/archive/2004/dis/
-  @doc:
-    http://suika.fam.cx/~wakaba/archive/2005/7/tutorial#
   @kwd:
     http://suika.fam.cx/~wakaba/archive/2005/rfc2119/
   @lang:
@@ -58,13 +43,10 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
   @mn:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/ManakaiNode#
-  @Perl:
-    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#Perl--
   @rdf:
     http://www.w3.org/1999/02/22-rdf-syntax-ns#
   @rdfs:
     http://www.w3.org/2000/01/rdf-schema#
-  @TreeCore:\
   @Util:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/
 
@@ -90,32 +72,24 @@ ResourceDef:
 ## -- Internal node object
 
 ClassDef:
-  @resourceFor: ForFull
-  @resourceFor: ForCompact
-  @resourceFor:
-    ManakaiDOM:ForIF
+  @resourceFor: ManakaiDOM|ForIF
+  @resourceFor: ManakaiDOM|ForClass
   
   @QName:
     @@@: NodeStem
-    @@ForCheck: 
-      ManakaiDOM:ForIF
-
-  @QName: 
-    @@@:
-      ManakaiDOM:ManakaiDOMNodeObject
-    @@ForCheck: ForFull
+    @@ForCheck: ManakaiDOM|ForIF
 
   @QName:
     @@@: ManakaiNodeStem
-    @@ForCheck: ForCompact
+    @@ForCheck: ManakaiDOM|ForClass
 
   @Implement:
     @@@: NodeStem
-    @@ForCheck: ForFull
+    @@ForCheck: ManakaiDOM|ForClass
 
   @Implement:
     @@@: NodeStem
-    @@ForCheck: ForCompact
+    @@ForCheck: ManakaiDOM|ForClass
 
   @Description:
     @@lang:en
@@ -135,43 +109,8 @@ ClassDef:
       A <Class::> object is a blessed hash 
       reference.  Each hash key and value pair is called as a 
       <DFN::property>.  Currently, several core properties  
-      are defined as listed below.  Applications of this class, 
-      such as <Class::DOMCore:ManakaiDOMNode::ManakaiDOM:all>,
-      defines additional properties for their own purpose and scope. 
-      \
-      {doc:fig:: <doc:caption::Core node properties>
-
-         {doc:figBody::
-         \
-         - <CODE::TreeCore:origin>::: An array reference, containing 
-                                  hash key names of <DFN::origin> 
-                                  properties for this node. 
-         \
-         - <CODE::TreeCore:subnode0>::: An array reference, containing 
-                                  hash key names of <DFN::subnode> 
-                                  properties for this node. 
-         \
-         - <CODE::TreeCore:subnode>::: An array reference, containing 
-                                hash key names of <DFN::subnode> list 
-                                properties for this node. 
-         \
-         - <CODE::TreeCore:subnode2>::: An array reference, containing 
-                    hash key names of <DFN::subnode> (two steps) list
-                    properties for this node. 
-         \
-         - <CODE::TreeCore:irefnode>::: An array reference, containing 
-                    hash key names of <DFN::irefnode> 
-                    properties for this node. 
-         \
-         - <CODE::TreeCore:anydata>::: An array reference, containing 
-                    hash key names of <DFN::anydata> list 
-                    properties for this node. 
-         \
-         - <CODE::TreeCore:anydata2>::: An array reference, containing 
-                    hash key names of <DFN::anydata> (two steps) list properties 
-                    for this node. 
-         }
-       }
+      are defined.  Applications of this class
+      define additional properties for their own purpose and scope. 
 
   @IntMethod:
     @@Name: new
@@ -181,7 +120,6 @@ ClassDef:
         Constructs a new instance of 
         <Class::ManakaiDOM:ManakaiDOMNodeObject> and returns it.
     @@Param:
-      @@@ForCheck: ForCompact
       @@@Name: className
       @@@Type: DISLang|String||ManakaiDOM|all
       @@@enDesc:
@@ -197,23 +135,6 @@ ClassDef:
         @@@@@: 
           The newly created <Class::ManakaiDOM:ManakaiDOMNodeObject> instance.
       @@@PerlDef: 
-        @@@@ForCheck: ForFull
-        @@@@@:
-          $r = bless {
-            <Q::TreeCore:origin> => [],
-            <Q::TreeCore:subnode0> => [],
-            <Q::TreeCore:subnode> => [],
-            <Q::TreeCore:subnode2> => [],
-            <Q::TreeCore:irefnode> => [],
-            <Q::TreeCore:anydata> => [],
-            <Q::TreeCore:anydata2> => [],
-            <H::mn:rc> => 0,
-            <H::mn:treeID> => <Code::ManakaiDOM:generateUniqueID>,
-            <H::mn:nodeID> => <Code::ManakaiDOM:generateUniqueID>,
-          }, ref $self || $self;
-      @@@PerlDef: 
-        @@@@ForCheck: ForCompact
-        @@@@@:
           my $grc = 0;
           $r = bless {
             <H::mn:type>   => $className,
@@ -224,41 +145,36 @@ ClassDef:
           }, ref $self || $self;
 
   @IntMethod:
-    @@Name: newReference
-    @@Description:
-      @@@lang:en
-      @@@@:
-        Creates a new reference to this node and returns it.
-    @@ForCheck: ForFull
+    @@Name: newNode
+    @@enDesc:
+      Returns a new node that belongs to the same grove with
+      the node.
     @@Param:
-      @@@Name: class
-      @@@Type:
-        Perl:package-name::ManakaiDOM:all
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          A Perl class package name with which the newly created 
-          reference is blessed.  The <P::class> class must be a 
-          subclass of <Class::ManakaiDOM:ManakaiDOM:ManakaiDOMNodeReference>.
+      @@@Name: className
+      @@@Type: DISLang|String||ManakaiDOM|all
+      @@@enDesc:
+        The name of a class which is typically used as reference
+        to the node.  The class <kwd:SHOULD> implement the 
+        <IF::NodeRef> interface.  The <QUOTE::dis> definition
+        for the class <kwd:SHOULD> play the role of <Q::mn|NodeRefRole
+        ||ManakaiDOM|all>.
     @@Return:
-      @@@Type: 
-        ManakaiDOM:ManakaiDOMNodeReference
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          The newly created node reference.
+      @@@Type: NodeStem
+      @@@enDesc: The newly created node.
       @@@PerlDef:
-          $r = bless {
-            <H::mn:node> => $self,
-          }, ref $class ? ref $class : defined $class ? $class :
-             <ClassName::ManakaiDOM:ManakaiDOMNodeReference>;
-          $self->{<H::mn:rc>}++;
+        $r = bless {
+          <H::mn:type>   => $className,
+          <H::mn:groveReferenceCounter>
+                         => $self->{<H::mn:groveReferenceCounter>},
+          <H::mn:rc>     => 0,
+          <H::mn:treeID> => $self->{<H::mn:treeID>},
+          <H::mn:nodeID> => <Code::ManakaiDOM:generateUniqueID>,
+        }, ref $self;
 
   @ResourceDef:
     @@QName: getNewReference
-    @@rdf:type:
-      dis2pm:BlockCode
-    @@ForCheck: ForCompact
+    @@rdf:type: DISPerl|BlockCode
+    @@ForCheck: ManakaiDOM|ForClass
     @@Description:
       @@@lang:en
       @@@@:
@@ -286,8 +202,7 @@ ClassDef:
       @@@rdf:type:
         DISPerl:CodeParameter
       @@@Name: $class
-      @@@Type:
-        Perl:package-name::ManakaiDOM:all
+      @@@Type: DISLang|String||ManakaiDOM|all
       @@@enDesc:
         A package name with which <P::$ref> is blessed. 
       @@@In:1
@@ -301,9 +216,8 @@ ClassDef:
 
   @ResourceDef:
     @@QName: getWeakReference
-    @@rdf:type:
-      dis2pm:BlockCode
-    @@ForCheck: ForCompact
+    @@rdf:type: DISPerl|BlockCode
+    @@ForCheck: ManakaiDOM|ForClass
     @@Description:
       @@@lang:en
       @@@@:
@@ -343,8 +257,7 @@ ClassDef:
       @@@rdf:type:
         DISPerl:CodeParameter
       @@@Name: $class
-      @@@Type:
-        Perl:package-name::ManakaiDOM:all
+      @@@Type: DISLang|String||ManakaiDOM|all
       @@@enDesc:
         A package name with which <P::$ref> is blessed. 
       @@@In:1
@@ -357,23 +270,22 @@ ClassDef:
 
   @ResourceDef:
     @@QName: getWeakRef
-    @@rdf:type:
-      dis2pm:InlineCode
-    @@ForCheck: ForFull
+    @@rdf:type: DISPerl|InlineCode
+    @@ForCheck: ManakaiDOM|ForClass
     @@Description:
       @@@lang:en
       @@@@:
-        Creates a new weak node reference object. 
+        Creates a new weak node reference object.
         \
         The weak node reference is actually a node reference
         except that this code fragment does not increment
-        the reference count of the object.  When all non-weak 
+        the reference count of the object.  When all non-weak
         references to the object are destructed, then
-        the object is destructed and any operation via 
+        the object is destructed and any operation via
         weak references will lead unexpected result.
         \
         {NOTE:: It is intended that internal code creates a weak reference
-                so that it gets access to public interface. 
+                so that it gets access to public interface.
         \
         }
     @@ResourceDef:
@@ -389,10 +301,9 @@ ClassDef:
       @@@rdf:type:
         DISPerl:CodeParameter
       @@@Name: $class
-      @@@Type:
-        Perl:package-name::ManakaiDOM:all
+      @@@Type: DISLang|String||ManakaiDOM|all
       @@@enDesc:
-        A package name with which <P::$ref> is blessed. 
+        A package name with which <P::$ref> is blessed.
       @@@In:1
       @@@DISPerl:paramStyle: any
     @@PerlDef:
@@ -428,54 +339,6 @@ ClassDef:
           @@@@@lang:en
           @@@@@@: No external reference found.
       @@@PerlDef:
-        @@@@ForCheck: ForFull
-        @@@@@:
-          if ($self->{<H::mn:rc>}) {
-            $r = true;
-          } else {
-            my @node = ($self);
-            my %checked;
-            NODES: while (@node) {
-              my $node = shift @node;
-              next NODES unless UNIVERSAL::isa ($node,
-                           <ClassName::ManakaiDOM:ManakaiDOMNodeObject>);
-              if ($node->{<H::mn:rc>}) {
-                $r = true;
-                last NODES;
-              } elsif ($checked{$node->{<H::mn:nodeID>}}) {
-                next NODES;
-              }
-              my @n;
-              for my $p (@{$node->{<Q::TreeCore:subnode2>}}) {
-                if (ref $node->{$p} eq 'ARRAY') {
-                  push @n, @{$node->{$p}};
-                } elsif (ref $node->{$p} eq 'HASH') {
-                  push @n, values %{$node->{$p}};
-                }
-              }
-              for my $p (@n,
-                         map {$node->{$_}} @{$node->{<Q::TreeCore:subnode>}}) {
-                if (ref $p eq 'ARRAY') {
-                  push @node, @$p;
-                } elsif (ref $p eq 'HASH') {
-                  push @node, values %$p;
-                }
-              }
-              for my $p (@{$node->{<Q::TreeCore:origin>}}) {
-                unshift @node, $node->{$p} if $node->{$p};
-                ## NOTE: Puts the top of the list,
-                ##       since upper-level nodes are expected to be referred
-                ##       more than lower-levels.
-              }
-              for my $p (@{$node->{<Q::TreeCore:subnode0>}}) {
-                push @node, $node->{$p} if $node->{$p};
-              }
-              $checked{$node->{<H::mn:nodeID>}} = true;
-            }
-          }
-      @@@PerlDef:
-        @@@@ForCheck: ForCompact
-        @@@@@:
           if ($self->{<H::mn:rc>}) {
             $r = true;
           } else {
@@ -525,9 +388,9 @@ ClassDef:
   @ResourceDef:
     @@QName: mn|isGroveReferenced
     @@rdf:type: DISPerl|InlineCode
+    @@ForCheck: ManakaiDOM|ForClass
     @@PerlDef:
       (${$node->{<H::mn:groveReferenceCounter>}} > 0)
-    @@ForCheck: ForCompact
 
   @IntMethod:
     @@Name: destroy
@@ -537,44 +400,6 @@ ClassDef:
         Destructs the tree containing this node. 
     @@Return:
       @@@PerlDef:
-        @@@@ForCheck: ForFull
-        @@@@@:
-        my @node = ($self);
-        NODES: while (@node) {
-              my $node = shift @node;
-              my @n;
-              for my $p (@{$node->{<Q::TreeCore:subnode2>}}) {
-                if (ref $node->{$p} eq 'ARRAY') {
-                  push @n, @{$node->{$p}};
-                } elsif (ref $node->{$p} eq 'HASH') {
-                  push @n, values %{$node->{$p}};
-                }
-              }
-              for my $p (@n,
-                         map {$node->{$_}} @{$node->{<Q::TreeCore:subnode>}}) {
-                if (ref $p eq 'ARRAY') {
-                  push @node, grep {UNIVERSAL::isa ($_,
-                                    <ClassName::ManakaiDOM:ManakaiDOMNodeObject>)
-                                    and defined $_->{<H::mn:nodeID>}} @$p;
-                } elsif (ref $p eq 'HASH') {
-                  push @node, grep {UNIVERSAL::isa ($_,
-                                    <ClassName::ManakaiDOM:ManakaiDOMNodeObject>)
-                                    and defined $_->{<H::mn:nodeID>}}
-                               values %$p;
-                }
-              }
-              for my $p (@{$node->{<Q::TreeCore:origin>}},
-           \             @{$node->{<Q::TreeCore:subnode0>}}) {
-                push @node, $node->{$p}
-                  if defined $node->{$p} and
-                     defined $node->{$p}->{<H::mn:nodeID>};
-              }
-
-          %$node = ();
-        } # @node
-      @@@PerlDef:
-        @@@@ForCheck: ForCompact
-        @@@@@:
         my @node = ($self);
         my $tid = $self->{<H::mn:treeID>};
         my %xrnode;
@@ -586,17 +411,18 @@ ClassDef:
                 $node->{<H::mn:type>}
               }; 
               for my $p (@{$nt->{<H::mn:subnode2>}||[]}) {
-                if (ref $node->{$p} eq 'ARRAY') {
-                  push @n, @{$node->{$p}};
-                } elsif (ref $node->{$p} eq 'HASH') {
+                my $ref = ref $node->{$p};
+                if ($ref eq 'HASH') {
                   push @n, values %{$node->{$p}};
+                } elsif ($ref eq 'ARRAY') {
+                  push @n, @{$node->{$p}};
                 }
               }
-              for my $p (@n,
-                         map {$node->{$_}} @{$nt->{<H::mn:subnode1>}||[]}) {
-                if (ref $p eq 'ARRAY') {
+              for my $p (@n, map {$node->{$_}} @{$nt->{<H::mn:subnode1>}||[]}) {
+                my $ref = ref $p;
+                if ($ref eq 'ARRAY') {
                   push @node, @$p;
-                } elsif (ref $p eq 'HASH') {
+                } elsif ($ref eq 'HASH') {
                   push @node, values %$p;
                 }
               }
@@ -641,59 +467,13 @@ ClassDef:
         to be same as this node's tree identifier. 
     @@Param:
       @@@Name: node
-      @@@Type: 
-        ManakaiDOM:ManakaiDOMNodeObject
+      @@@Type: NodeStem
       @@@Description:
         @@@@lang:en
         @@@@@:
           Any node from the tree to change its identifier. 
     @@Return:
       @@@PerlDef:
-        @@@@ForCheck: ForFull
-        @@@@@:
-        unless ($node->{<H::mn:treeID>} eq
-                $self->{<H::mn:treeID>}) {
-          my @node = ($node);
-          NODES: while (@node) {
-            my $node = shift @node;
-            next NODES unless UNIVERSAL::isa ($node,
-                         <ClassName::ManakaiDOM:ManakaiDOMNodeObject>);
-              my @n;
-              for my $p (@{$node->{<Q::TreeCore:subnode2>}}) {
-                if (ref $node->{$p} eq 'ARRAY') {
-                  push @n, @{$node->{$p}};
-                } elsif (ref $node->{$p} eq 'HASH') {
-                  push @n, values %{$node->{$p}};
-                }
-              }
-              for my $p (@n,
-                         map {$node->{$_}} @{$node->{<Q::TreeCore:subnode>}}) {
-                if (ref $p eq 'ARRAY') {
-                  push @node, grep {UNIVERSAL::isa ($_,
-                                    <ClassName::ManakaiDOM:ManakaiDOMNodeObject>)
-                                    and $_->{<H::mn:treeID>} ne
-                                    $self->{<H::mn:treeID>}} @$p;
-                } elsif (ref $p eq 'HASH') {
-                  push @node, grep {UNIVERSAL::isa ($_,
-                                    <ClassName::ManakaiDOM:ManakaiDOMNodeObject>)
-                                    and $_->{<H::mn:treeID>} ne
-                                    $self->{<H::mn:treeID>}}
-                              values %$p;
-                }
-              }
-            for my $p (@{$node->{<Q::TreeCore:origin>}},
-           \           @{$node->{<Q::TreeCore:subnode0>}}) {
-              push @node, $node->{$p}
-                if defined $node->{$p} and
-                   $node->{$p}->{<H::mn:treeID>} ne
-                   $self->{<H::mn:treeID>};
-            }
-            $node->{<H::mn:treeID>} = $self->{<H::mn:treeID>};
-          }
-        }
-      @@@PerlDef:
-        @@@@ForCheck: ForCompact
-        @@@@@:
           my @node = ($node);
           my $newgrc = $self->{<H::mn:groveReferenceCounter>};
           my $newtid = $self->{<H::mn:treeID>};
@@ -708,23 +488,24 @@ ClassDef:
                 $node->{<H::mn:type>}
               }; 
               for my $p (@{$nt->{<H::mn:subnode2>}||[]}) {
-                if (ref $node->{$p} eq 'ARRAY') {
-                  push @n, @{$node->{$p}};
-                } elsif (ref $node->{$p} eq 'HASH') {
+                my $ref = ref $node->{$p};
+                if ($ref eq 'HASH') {
                   push @n, values %{$node->{$p}};
+                } elsif ($ref eq 'ARRAY') {
+                  push @n, @{$node->{$p}};
                 }
               }
-              for my $p (@n,
-                         map {$node->{$_}} @{$nt->{<H::mn:subnode1>}||[]}) {
-                if (ref $p eq 'ARRAY') {
+              for my $p (@n, map {$node->{$_}} @{$nt->{<H::mn:subnode1>}||[]}) {
+                my $ref = ref $p;
+                if ($ref eq 'ARRAY') {
                   push @node, @$p;
-                } elsif (ref $p eq 'HASH') {
+                } elsif ($ref eq 'HASH') {
                   push @node, values %$p;
                 }
               }
             for my $p (@{$nt->{<H::mn:origin0>}||[]},
            \           @{$nt->{<H::mn:subnode0>}||[]}) {
-              push @node, $node->{$p};
+              push @node, $node->{$p} if defined $node->{$p};
             }
 
             for (@{$nt->{<H::mn:xrefnode0>}||[]}) {
@@ -734,7 +515,7 @@ ClassDef:
             ${$node->{<H::mn:groveReferenceCounter>}} -= $node->{<H::mn:rc>};
             $node->{<H::mn:treeID>} = $newtid;
             $node->{<H::mn:groveReferenceCounter>} = $newgrc;
-            ${$node->{<H::mn:groveReferenceCounter>}} += $node->{<H::mn:rc>};
+            $$newgrc += $node->{<H::mn:rc>};
           }
 
           for my $n (@xrnode) {
@@ -756,9 +537,7 @@ ClassDef:
       @@@lang:en
       @@@@:
         Changes tree identifier of all nodes traversable from this node. 
-    @@enDesc:
-      @@@ForCheck: ForCompact
-      @@@@:
+
         If a node has <Q::mn:xrefnode0> property value and it
         is a node in the tree to which the node formally belongs,
         then reference counters are updated to new status.
@@ -776,55 +555,12 @@ ClassDef:
           A reference to the new tree identifier.
           The tree will reference the identifier as it.
     @@Param:
-      @@@ForCheck: ForCompact
       @@@Name: groveRC
       @@@Type: DISPerl|SCALAR||ManakaiDOM|all
       @@@enDesc:
         The new reference counter.
     @@Return:
       @@@PerlDef:
-        @@@@ForCheck: ForFull
-        @@@@@:
-        unless ($self->{<H::mn:treeID>} eq $treeID) {
-          my @node = ($self);
-          NODES: while (@node) {
-            my $node = shift @node;
-            next NODES unless UNIVERSAL::isa ($node,
-                        <ClassName::ManakaiDOM:ManakaiDOMNodeObject>);
-              my @n;
-              for my $p (@{$node->{<Q::TreeCore:subnode2>}}) {
-                if (ref $node->{$p} eq 'ARRAY') {
-                  push @n, @{$node->{$p}};
-                } elsif (ref $node->{$p} eq 'HASH') {
-                  push @n, values %{$node->{$p}};
-                }
-              }
-              for my $p (@n,
-                         map {$node->{$_}} @{$node->{<Q::TreeCore:subnode>}}) {
-                if (ref $p eq 'ARRAY') {
-                  push @node, grep {UNIVERSAL::isa ($_,
-                                    <ClassName::ManakaiDOM:ManakaiDOMNodeObject>)
-                                    and
-                                    $_->{<H::mn:treeID>} ne $treeID} @$p;
-                } elsif (ref $p eq 'HASH') {
-                  push @node, grep {UNIVERSAL::isa ($_,
-                                    <ClassName::ManakaiDOM:ManakaiDOMNodeObject>)
-                                    and $_->{<H::mn:treeID>} ne $treeID}
-                              values %$p;
-                }
-              }
-            for my $p (@{$node->{<Q::TreeCore:origin>}},
-       \               @{$node->{<Q::TreeCore:subnode0>}}) {
-              push @node, $node->{$p}
-                if defined $node->{$p} and
-                   $node->{$p}->{<H::mn:treeID>} ne $treeID;
-            }
-            $node->{<H::mn:treeID>} = $treeID;
-          }
-        }
-      @@@PerlDef:
-        @@@@ForCheck: ForCompact
-        @@@@@:
           my $tid = ref $treeID ? $treeID : \$treeID;
           my $oldtid = $self->{<H::mn:treeID>};
           my @xrnode;
@@ -909,17 +645,6 @@ ClassDef:
         @@@@lang:en
         @@@@@: Whether the two nodes are same or not.
       @@@PerlDef:
-        @@@@ForCheck: ForFull
-        @@@@@:
-          if (ref $node and
-              UNIVERSAL::isa ($node,
-                              <ClassName::ManakaiDOM:ManakaiDOMNodeObject>) and
-              $node->{<H::mn:nodeID>} eq $self->{<H::mn:nodeID>}) {
-            $r = true;
-          }
-      @@@PerlDef:
-        @@@@ForCheck: ForCompact
-        @@@@@:
           if (ref $node and
               UNIVERSAL::isa ($node, <ClassName::ManakaiNodeStem>) and
               $node->{<H::mn:nodeID>} eq $self->{<H::mn:nodeID>}) {
@@ -946,17 +671,6 @@ ClassDef:
         }
     @@Return:
       @@@PerlDef:
-        @@@@ForCheck: ForFull
-        @@@@@:
-          if ($self-><M::NodeStem.isExternallyReferred>) {
-            $self-><M::NodeStem.changeTreeID>
-                         (<Code::ManakaiDOM:generateUniqueID>);
-          } else {
-            $self-><M::NodeStem.destroy>;
-          }
-      @@@PerlDef:
-        @@@@ForCheck: ForCompact
-        @@@@@:
           if ($self-><M::NodeStem.isExternallyReferred>) {
             my $grc = 0;
             $self-><M::NodeStem.changeTreeID>
@@ -966,7 +680,7 @@ ClassDef:
           }
 
   @ResourceDef:
-    @@ForCheck: ForCompact
+    @@ForCheck: ManakaiDOM|ForClass
     @@QName: mn|setXRefNode
     @@enDesc:
       Sets a <Q::mn:xrefnode0> property.
@@ -979,7 +693,7 @@ ClassDef:
       }
 
   @ResourceDef:
-    @@ForCheck: ForCompact
+    @@ForCheck: ManakaiDOM|ForClass
     @@QName: mn|unsetXRefNode
     @@enDesc:
       Unsets a <Q::mn:xrefnode0> property.
@@ -1001,36 +715,24 @@ ClassDef:
 ## -- Public node object
 
 ClassDef:
-  @resourceFor: ForFull
-  @resourceFor: ForCompact
-  @resourceFor: 
-    ManakaiDOM:ForIF
+  @resourceFor: ManakaiDOM|ForClass
+  @resourceFor: ManakaiDOM|ForIF
 
   @QName:
     @@@: NodeRef
-    @@ForCheck:
-      ManakaiDOM:ForIF
-
-  @QName: 
-    @@@:
-      ManakaiDOM:ManakaiDOMNodeReference
-    @@ForCheck: ForFull
-
-  @Implement:
-    @@@: NodeRef
-    @@ForCheck: ForFull
+    @@ForCheck: ManakaiDOM|ForIF
 
   @QName:
     @@@: ManakaiNodeRef
-    @@ForCheck: ForCompact
+    @@ForCheck: ManakaiDOM|ForClass
 
   @Implement:
     @@@: NodeRef
-    @@ForCheck: ForCompact
+    @@ForCheck: ManakaiDOM|ForClass
 
   @DISLang:role:
     @@@: mn|NodeRefRole
-    @@ForCheck: ForCompact
+    @@ForCheck: ManakaiDOM|ForClass
 
   @Description:
     @@lang:en
@@ -1045,11 +747,11 @@ ClassDef:
       {P:: A <Class::ManakaiDOM:ManakaiDOMNodeReference> is a blessed hash 
       reference; currently there is a hash key defined:
         \
-        - <CODE::TreeCore:node>::: A node object 
+        - <Q::mn:node>::: A node object 
              (<Class::ManakaiDOM:ManakaiDOMNodeObject>) to which 
              this is referring. 
         
-        - <CODE::TreeCore:isWeak>::: Whether the reference is <QUOTE::weak>
+        - <Q::mn:isWeak>::: Whether the reference is <QUOTE::weak>
              or not.
       }
 
@@ -1060,7 +762,6 @@ ClassDef:
       Frees the grove referenced by this object.  Once
       this operation is done, results of operations to objects belonging
       to the grove are unknown.
-    @@ForCheck: ForCompact
     @@Return:
       @@@PerlDef:
         $self->{<H::mn:node>}-><M::NodeStem.destroy>;
@@ -1076,27 +777,8 @@ ClassDef:
       @@@@: DESTROY
     @@Return:
       @@@PerlDef:
-        @@@@ForCheck: ForFull
         @@@@@:
-          my $node = $self->{<H::mn:node>};
-          if ($node) {
-            CORE::delete $self->{<H::mn:node>};
-            unless ($self->{<H::mn:isWeak>}) {
-              $node->{<H::mn:rc>}--;
-              unless ($node-><M::NodeStem.isExternallyReferred>) {
-                $node-><M::NodeStem.destroy>;
-              }
-            }
-          } else {
-            warn ref ($self) . q{->DESTROY: there is no associated }.
-                 q{node object - you have a global variable or }.
-                 qq{potential memory-leak detected\n};
-          }
-      @@@PerlDef:
-        @@@@ForCheck: ForCompact
-        @@@@@:
-          my $node = $self->{<H::mn:node>};
-          if ($node) {
+          if (my $node = $self->{<H::mn:node>}) {
             CORE::delete $self->{<H::mn:node>};
             unless ($self->{<H::mn:isWeak>}) {
               $node->{<H::mn:rc>}--;
@@ -1324,8 +1006,7 @@ ElementTypeBinding:
 ResourceDef:
   @QName:
     ManakaiDOM:generateUniqueID
-  @rdf:type:
-    dis2pm:InlineCode
+  @rdf:type: DISPerl|InlineCode
   @Description:
     @@lang:en
     @@@:
@@ -1339,13 +1020,24 @@ ResourceDef:
 
   @PerlDef:
       (
-        sprintf 'tag:suika.fam.cx,2005-09:%x:%x%s',
-                time, $$,
-                ['A'..'Z', 'a'..'z', '0'..'9']->[rand 62] .
-                ['A'..'Z', 'a'..'z', '0'..'9']->[rand 62] .
-                ['A'..'Z', 'a'..'z', '0'..'9']->[rand 62] .
-                ['A'..'Z', 'a'..'z', '0'..'9']->[rand 62] .
-                ['A'..'Z', 'a'..'z', '0'..'9']->[rand 62]
+        'tag:suika.fam.cx,2005-09:' . time . ':' . $$ . ':' .
+        ($Message::Util::ManakaiNode::UniqueIDR ||=
+          [qw/A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
+              a b c d e f g h i j k l m n o p q r s t u v w x y z
+              0 1 2 3 4 5 6 7 8 9/]->[rand 62] .
+          [qw/A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
+              a b c d e f g h i j k l m n o p q r s t u v w x y z
+              0 1 2 3 4 5 6 7 8 9/]->[rand 62] .
+          [qw/A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
+              a b c d e f g h i j k l m n o p q r s t u v w x y z
+              0 1 2 3 4 5 6 7 8 9/]->[rand 62] .
+          [qw/A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
+              a b c d e f g h i j k l m n o p q r s t u v w x y z
+              0 1 2 3 4 5 6 7 8 9/]->[rand 62] .
+          [qw/A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
+              a b c d e f g h i j k l m n o p q r s t u v w x y z
+              0 1 2 3 4 5 6 7 8 9/]->[rand 62]) .
+        (++$Message::Util::ManakaiNode::UniqueIDN)
       )
 ##ManakaiDOM:generateUniqueID
 
@@ -1367,8 +1059,7 @@ TreeElementType:
 TreeElementType:
   @QName:
     dis:SetProp
-  @dataType:
-    dis:TypeQName
+  @dataType: DISCore|QName
   @rdfs:range:
     rdf:Property
   @Description:
@@ -1396,28 +1087,14 @@ ElementTypeBinding:
     @@rdf:type:
       @@@@:
         dis:MultipleResource
-      @@@ForCheck:
-        !ForFull !ForCompact !ManakaiDOM:ForIF
+      @@@ForCheck: !ManakaiDOM|ForClass !ManakaiDOM|ForIF
     @@rdf:type:
       @@@@: DISLang|Interface
       @@@ForCheck: ManakaiDOM|ForIF
     @@rdf:type:
       @@@@: DISLang|Class
-      @@@ForCheck: ForFull
-    @@rdf:type:
-      @@@@: DISLang|Class
-      @@@ForCheck: ForCompact
+      @@@ForCheck: ManakaiDOM|ForClass
     @@ForCheck: ManakaiDOM|Perl
-
-ForDef:
-  @QName:
-    mn:ForFull
-  @ISA: ManakaiDOM|ForClass
-
-ForDef:
-  @QName:
-    mn:ForCompact
-  @ISA: ManakaiDOM|ForClass
 
 ElementTypeBinding:
   @Name: IntMethod
