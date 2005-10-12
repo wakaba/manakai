@@ -1,3 +1,19 @@
+2005-10-11  Wakaba  <wakaba@suika.fam.cx>
+
+	* DOMCore.dis (appendChild, createElementNS, createAttributeNS,
+	setAttribute, setAttributeNS): "strictErrorChecking" attribute supported.
+	(doStrictErrorChecking): New code.
+
+	* DOMMain.dis (XML10Name, XML11Name): "strictErrorChecking" attribute
+	supported.
+
+	* Makefile: Rule to make "DOMFeature.pm" restored.
+
+2005-10-10  Wakaba  <wakaba@suika.fam.cx>
+
+	* DOMCore.dis (ADOPT_NODE_TYPE_NOT_SUPPORTED_ERR): New error subcode.
+	(adoptNode): Implemented.
+
 2005-10-09  Wakaba  <wakaba@suika.fam.cx>
 
 	* DOMHTML.dis, DOMWebForms.dis: Typos in element type prefix fixed.

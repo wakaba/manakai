@@ -40,7 +40,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/10/09 13:57:11 $
+      $Date: 2005/10/12 00:30:54 $
     @@ContentType:
       dis:Date.RCS
 
@@ -1294,6 +1294,20 @@ ResourceDef:
            @@@@@@: DOMCore|node
            @@@@@enDesc:
              The node that is attempted to clone.
+       @@@SubTypeDef:
+         @@@@QName: ADOPT_NODE_TYPE_NOT_SUPPORTED_ERR
+         @@@@enDesc:
+           The implementation does not support adopting of nodes
+           of the type.
+         @@@@XParam:
+           @@@@@@: DOMCore|node
+           @@@@@enDesc:
+             The node that is attempted to adopt.
+         @@@@XParam:
+           @@@@@@: MDOMX|param-name
+           @@@@@enDesc:
+             The name of the parameter to which the node is
+             specified directly or indirectly.
 
      @@XConst:
         @@@Name:  INUSE_ATTRIBUTE_ERR
@@ -4609,7 +4623,11 @@ IFCls1Def:
             my $node;
             my $newNode;
             CHKDOC: {
-              if (UNIVERSAL::isa ($newChild, <IFName::Node
+              unless (<Code::doStrictErrorChecking:: $nodeRef = $self>) {
+                $node = $self->{<H::mn:node>};
+                $newNode = $newChild->{<H::mn:node>};
+                last CHKDOC;
+              } elsif (UNIVERSAL::isa ($newChild, <IFName::Node
                                               ::ManakaiDOM:ManakaiDOM>) and
                   UNIVERSAL::isa ($newChild, <IFName::NodeRef>)) {
                 $node = $self->{<H::mn:node>};
@@ -4652,7 +4670,8 @@ IFCls1Def:
                     MDOMX:param-name => 'newChild',
                 }__;
               }
-              
+            
+            if (<Code::doStrictErrorChecking:: $nodeRef = $self>) {  
               ## Check type of this node and new child node
               CHKTYPE: {
                 if ({
@@ -4758,6 +4777,7 @@ IFCls1Def:
                   }
                 }
               }
+            } # chk
               
               for my $newNode (@newNode) {
                 CORE::delete $newNode->{<H::infoset:parent>};
@@ -4912,7 +4932,7 @@ IFCls1Def:
              my $nt = $node-><AG::Node.nodeType>;
              if ($nt == <C::Node.ELEMENT_NODE>) {
                my $clone;
-               if ($node->isa (<IFName::Node||ManakaiDOM|ManakaiDOM>) and
+               if ($node->isa (<IFName::Node||ManakaiDOM|ManakaiDOM2>) and
                    defined $node-><AG::Node.localName>) {
                  $clone = $od-><M::Document.createElementNS>
                                    ($node-><AG::Node.namespaceURI>,
@@ -4959,7 +4979,7 @@ IFCls1Def:
                }__;
              } elsif ($nt == <C::Node.ATTRIBUTE_NODE>) {
                my $clone;
-               if ($node->isa (<IFName::Node||ManakaiDOM|ManakaiDOM>) and
+               if ($node->isa (<IFName::Node||ManakaiDOM|ManakaiDOM2>) and
                    defined $node-><AG::Node.localName>) {
                  $clone = $od-><M::Document.createAttributeNS>
                                    ($node-><AG::Node.namespaceURI>,
@@ -11045,10 +11065,12 @@ NodeTypeDef:
               }
             } else {
               my $docNode = $self->{<H::DOMCore:ownerDocument>};
-              my $version = <Code::getDocumentXMLVersion:: $DOCOBJ = $docNode>;
-              __CODE{DOMMain:ensureXMLName:: $INPUT => $name,
+              if (<Code::doStrictErrorChecking:: $nodeRef = $self>) {
+                my $version = <Code::getDocumentXMLVersion:: $DOCOBJ = $docNode>;
+                __CODE{DOMMain:ensureXMLName:: $INPUT => $name,
                                              $INPUT_PARAM_NAME => 'name',
                                              $XMLVERSION => $version}__;
+              }
               $r = <ClassM::ManakaiDOMAttr.newObject>;
               $node-><M::NodeStem.importTree> ($r);
               $r->{<H::DOMCore:name>} = $name;
@@ -11766,29 +11788,31 @@ NodeTypeDef:
           @@@@For:
             ManakaiDOM:DOMXMLFeature
           @@@@@:
-            if ($self->{<H::mn:node>}->{<H::DOMCore:read-only>}) {
-              __EXCEPTION{
-                MDOMX:NOMOD_THIS::
-              }__;
-            }
             my $docNode = $self->{<H::mn:node>}
                                ->{<H::DOMCore:ownerDocument>};
-            my $version = <Code::getDocumentXMLVersion:: $DOCOBJ = $docNode>;
-            unless (defined $version) {
-              __EXCEPTION{MDOMX:MDOM_DOC_NOSUPPORT_XMLNS}__;
-            }
-            __CODE{DOMMain:ensureXMLQName::
+            my ($prefix, $localName) = split /:/, $qualifiedName, 2;
+            ($prefix, $localName) = (null, $prefix) unless defined $localName;
+
+            if (<Code::doStrictErrorChecking:: $nodeRef = $self>) {
+              if ($self->{<H::mn:node>}->{<H::DOMCore:read-only>}) {
+                __EXCEPTION{MDOMX:NOMOD_THIS::
+                }__;
+              }
+              my $version = <Code::getDocumentXMLVersion:: $DOCOBJ = $docNode>;
+              unless (defined $version) {
+                __EXCEPTION{MDOMX:MDOM_DOC_NOSUPPORT_XMLNS}__;
+              }
+              __CODE{DOMMain:ensureXMLQName::
                      $INPUT = $qualifiedName, 
                      $INPUT_PARAM_NAME = 'qualifiedName',
                      $XMLVERSION = $version,
-            }__;
-            my ($prefix, $localName) = split /:/, $qualifiedName, 2;
-            ($prefix, $localName) = (null, $prefix) unless defined $localName;
-            __CODE{DOMMain:checkXMLNamesQName::
+              }__;
+              __CODE{DOMMain:checkXMLNamesQName::
                      $PREFIX => $prefix, $NSURI => $namespaceURI,
                      $LNAME => $localName,
-            }__;
-            ## TODO: Check prefix if nsuri
+              }__;
+              ## TODO: Check prefix if nsuri
+            }
             my $r;
             __CODE{selectAttrNodeObjectNS:: $localName => $localName}__;
             my $node = $self->{<H::mn:node>};
@@ -16074,21 +16098,23 @@ NodeTypeDef:
             ManakaiDOM:DOMXMLFeature
           @@@@@:
             my $docNode = $self->{<H::mn:node>};
-            my $version = <Code::getDocumentXMLVersion:: $DOCOBJ = $docNode>;
-            unless (defined $version) {
-              __EXCEPTION{MDOMX:MDOM_DOC_NOSUPPORT_XMLNS}__;
-            }
-            __CODE{DOMMain:ensureXMLQName::
+            my ($prefix, $lname) = split /:/, $qualifiedName, 2;
+            ($prefix, $lname) = (null, $prefix) unless defined $lname;
+            if (<Code::doStrictErrorChecking:: $nodeRef = $self>) {
+              my $version = <Code::getDocumentXMLVersion:: $DOCOBJ = $docNode>;
+              unless (defined $version) {
+                __EXCEPTION{MDOMX:MDOM_DOC_NOSUPPORT_XMLNS}__;
+              }
+              __CODE{DOMMain:ensureXMLQName::
                      $INPUT = $qualifiedName, 
                      $INPUT_PARAM_NAME = 'qualifiedName',
                      $XMLVERSION = $version,
-            }__;
-            my ($prefix, $lname) = split /:/, $qualifiedName, 2;
-            ($prefix, $lname) = (null, $prefix) unless defined $lname;
-            __CODE{DOMMain:checkXMLNamesQName::
+              }__;
+              __CODE{DOMMain:checkXMLNamesQName::
                      $PREFIX => $prefix, $NSURI => $namespaceURI,
                      $LNAME => $lname,
-            }__;
+              }__;
+            } # error checking
 
             my $node = <ClassM::ManakaiDOMElement.newObject>;
             __CODE{mn|setXRefNode||ManakaiDOM|Perl::
@@ -16265,22 +16291,25 @@ NodeTypeDef:
             ManakaiDOM:DOMXMLFeature
           @@@@@:
             my $docNode = $self->{<H::mn:node>};
-            my $version = <Code::getDocumentXMLVersion:: $DOCOBJ = $docNode>;
-            unless (defined $version) {
-              __EXCEPTION{MDOMX:MDOM_DOC_NOSUPPORT_XMLNS}__;
-            }
-            __CODE{DOMMain:ensureXMLQName::
+            my ($prefix, $lname) = split /:/, $qualifiedName, 2;
+            ($prefix, $lname) = (null, $prefix) unless defined $lname;
+
+            if (<Code::doStrictErrorChecking:: $nodeRef = $self>) {
+              my $version = <Code::getDocumentXMLVersion:: $DOCOBJ = $docNode>;
+              unless (defined $version) {
+               __EXCEPTION{MDOMX:MDOM_DOC_NOSUPPORT_XMLNS}__;
+              }
+              __CODE{DOMMain:ensureXMLQName::
                      $INPUT = $qualifiedName, 
                      $INPUT_PARAM_NAME = 'qualifiedName',
                      $XMLVERSION = $version,
-            }__;
-            my ($prefix, $lname) = split /:/, $qualifiedName, 2;
-            ($prefix, $lname) = (null, $prefix) unless defined $lname;
-            __CODE{DOMMain:checkXMLNamesQName::
+              }__;
+              __CODE{DOMMain:checkXMLNamesQName::
                      $PREFIX => $prefix, $NSURI => $namespaceURI,
                      $LNAME => $lname,
-            }__;
-            
+              }__;
+            } # error checking
+
             my $node = <ClassM::ManakaiDOMAttr.newObject>;
             __CODE{mn|setXRefNode||ManakaiDOM|Perl::
               $referrer => {$node},
@@ -16779,6 +16808,16 @@ NodeTypeDef:
      @@ImplNote:
        @@@lang:en
        @@@@: This attribute is "true" by default.
+
+  @ResourceDef:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@QName: doStrictErrorChecking
+    @@rdf:type: DISPerl|InlineCode
+    @@PerlDef:
+      (($nodeRef->{<H::mn:node>}->{<H::DOMCore:ownerDocument>} or
+        $nodeRef->{<H::mn:node>})
+         ->{<H::DOMCore:strictErrorChecking>})
+
   @Attr:
      @@Name:  documentURI
      @@Description:
@@ -16822,19 +16861,196 @@ NodeTypeDef:
         @@@disDef:
           @@@@SetProp:
             DOMCore:documentURI
+
   @Method:
-     @@Name:  adoptNode
-     @@Param:
-        @@@Name:  source
-        @@@Type:  Node
-     @@Return:
-        @@@Type:  Node
-        @@@actualType: ManakaiDOMNode
-        @@@Exception[list]:  DOMException
-     @@Level[list]:  3
-     @@SpecLevel:3
-     @@For:
-       ManakaiDOM:DOM3
+    @@Name: adoptNode
+    @@For: ManakaiDOM|DOM3
+    @@enDesc:
+      Attempts to adopt a node from another document to this document.
+      
+      If supported, it changes the <A::Node.ownerDocument> of
+      the source node, its children, as well as the attached attribute
+      nodes if any.  If the source node has a <A::Node.parentNode>
+      it is first removed from the children list of the parent.
+      
+      This method effectively allowes moving a subtree from one
+      document to another, unlike <M::Document.importNode> which
+      creates a copy of the source node instead of moving it.
+      When it fails, applications should use <M::Document.importNode> instead.
+
+      Note that if the adopted node is already part of this document,
+      i.e. the source and target document are the same, this method
+      still has the effect of removing the source node from the
+      children list of its parent, if any.
+
+      - <IF::Element>::: All <A::Attr.specified> attributes are adopted.
+                      Default attributes are discarded, though the 
+                      target document defines default attributes 
+                      for the element type, then those are assigned.
+                      The descendant nodes are recursively adopted.
+
+      - <IF::Attr>::: The <A::Node.ownerElement> attribute is set to
+                      <DOM::null> and the <A::Attr.specified> attribute
+                      is set to <DOM::true>.  The descendant nodes
+                      are recursively adopted.
+      
+      - <IF::DocumentFragment>::: The descendant nodes
+                      are recursively adopted.
+
+      - <IF::DOMXML:EntityReference>::: Only the node itself is adopted
+                      and the descendants are discarded, since the source
+                      and target documents might have defined the entity
+                      differently.  If the target document provides a
+                      definition for the entity name, then its value is
+                      assigned.
+
+      - <IF::Text>, <IF::Comment>, <IF::DOMXML:CDATASection>,
+        <IF::DOMXML:ProcessingInstruction>:::
+                      These nodes can be adopted.  No specifics.
+
+      - <IF::Document>, <IF::DOMXML:DocumentType>,
+        <IF::DOMXML:Entity>, <IF::DOMXML:Notation>:::
+                      This kind of nodes cannot be adopted.
+      
+      {NOTE:: Since this method does not create new nodes unlike
+              the <M::Document.importNode> method, this method does
+              not raise an <X::DOMException.INVALID_CHARACTER_ERR>
+              exception and applications should use the 
+              <M::Document.normalizeDocument> method to check if
+              an imported name is not an XML <CODE::Name> according
+              to the XML version in use.
+      }    
+
+    @@Param:
+      @@@Name:  source
+      @@@Type:  Node
+      @@@enDesc:
+        The node to move into this document.
+    @@Return:
+      @@@Type:  Node
+      @@@enDesc:
+        The adopted node.
+      @@@nullCase:
+        @@@@enDesc:
+          The adopting operation fails, such as when the <P::source>
+          node comes from a different implementation.
+      @@@raises:
+        @@@@@: ADOPT_NODE_TYPE_NOT_SUPPORTED_ERR
+        @@@@enDesc:
+          The <P::source> node is of type <IF::Document>,
+          <IF::DOMXML:DocumentType>, <IF::DOMXML:Entity>, or
+          <IF::DOMXML:Notation>.
+        @@@@enImplNote:
+          In DOM Level 3 Core spec: <QUOTE::Raised if the source
+          node is of type <CODE::DOCUMENT>, <CODE::DOCUMENT_TYPE>>.
+      @@@raises:
+        @@@@@: MDOMX|NOMOD_THIS
+        @@@@enDesc:
+          The <P::source> node is read-only.
+      @@@raises:
+        @@@@@: MDOMX|NOMOD_PARENT
+        @@@@enDesc:
+          The parent or owner element node is read-only.
+        @@@@For: ManakaiDOM|ManakaiDOM
+      @@@raises:
+        @@@@@: NOMOD_DESCENDANT_ERR
+        @@@@enDesc:
+          One or more descendant or attribute node is read-only.
+        @@@@For: ManakaiDOM|ManakaiDOM
+      @@@PerlDef:
+        if ($source->isa (<ClassName::ManakaiDOMNode>)) {
+          if ($self->{<H::mn:node>}->{<H::DOMCore:read-only>}) {
+            __EXCEPTION{MDOMX|NOMOD_THIS::
+              MDOMX:param-name => 'source',
+              DOMCore:node => $source,
+            }__;
+          }
+          my $parent = $source-><AG::Node.parentNode>;
+          if ($parent and $parent->{<H::mn:node>}->{<H::DOMCore:read-only>}) {
+            __EXCEPTION{MDOMX|NOMOD_PARENT::
+              MDOMX:param-name => 'source',
+              DOMCore:node => $parent,
+            }__;
+          }
+          my $nt = $source-><AG::Node.nodeType>;
+          my $oe;
+          if ($nt == <C::Node.ATTRIBUTE_NODE>) {
+            $oe = $source-><AG::Attr.ownerElement>;
+            if ($oe and $oe->{<H::mn:node>}->{<H::DOMCore:read-only>}) {
+              __EXCEPTION{MDOMX|NOMOD_PARENT::
+                MDOMX:param-name => 'source', 
+                DOMCore:node => $oe,
+              }__;
+            }
+          } elsif ($nt == <C::Node.DOCUMENT_NODE> or 
+                   $nt == <C::Node.DOCUMENT_TYPE_NODE> or
+                   $nt == <C::Node.ENTITY_NODE> or
+                   $nt == <C::Node.NOTATION_NODE>) {
+            __EXCEPTION{ADOPT_NODE_TYPE_NOT_SUPPORTED_ERR::
+              MDOMX:param-name => 'source',
+              DOMCore:node => $source,
+            }__;
+          }
+
+          my @change_od;
+          my @nodes = ($source);
+          while (@nodes) {
+            my $node = shift @nodes;
+            my $nt = $node-><AG::Node.nodeType>;
+            if ($node->{<H::mn:node>}->{<H::DOMCore:read-only>}) {
+              __EXCEPTION{NOMOD_DESCENDANT_ERR::
+                MDOMX:param-name => 'source',
+                DOMCore:node => {$node},
+              }__;
+            }
+            if ($nt == <C::Node.ELEMENT_NODE>) {
+              push @change_od, $node;
+              push @nodes, @{$node-><AG::Node.childNodes>};
+              my $attrs = $node-><AG::Node.attributes>;
+              my $attrsLength = $attrs-><AG::NamedNodeMap.length>;
+              for my $i (0..($attrsLength - 1)) {
+                push @nodes, $attrs-><M::NamedNodeMap.item> ($i);
+              }
+            } elsif ($nt == <C::Node.ATTRIBUTE_NODE> or
+                     $nt == <C::Node.ENTITY_REFERENCE_NODE> or
+                     $nt == <C::Node.DOCUMENT_FRAGMENT_NODE>) {
+              push @change_od, $node;
+              push @nodes, @{$node-><AG::Node.childNodes>};
+            } elsif ($nt == <C::Node.TEXT_NODE> or
+                     $nt == <C::Node.COMMENT_NODE> or
+                     $nt == <C::Node.PROCESSING_INSTRUCTION_NODE> or
+                     $nt == <C::Node.CDATA_SECTION_NODE>) {
+              push @change_od, $node;
+            } else {
+              ## TODO: assertion
+            }
+          } # nodes
+          
+          if ($parent) {
+            __DEEP{
+              $parent-><M::Node.removeChild> ($source);
+            }__;
+          } elsif ($oe) {
+            __DEEP{
+              $oe-><M::Element.removeAttributeNode> ($source);
+            }__;
+          }
+          if (${$self->{<H::mn:node>}->{<H::mn:treeID>}} ne
+              ${$source->{<H::mn:node>}->{<H::mn:treeID>}}) {
+            for my $n (map {$_->{<H::mn:node>}} @change_od) {
+              __CODE{mn|unsetXRefNode||ManakaiDOM|Perl::
+                $referrer => {$n},
+                $propName => {<H::DOMCore:ownerDocument>},
+              }__;
+              __CODE{mn|setXRefNode||ManakaiDOM|Perl::
+                $referrer => {$n},
+                $propName => {<H::DOMCore:ownerDocument>},
+                $referent => {$self->{<H::mn:node>}},
+              }__;
+            }
+          }
+        } # compatible class
+
   @Attr:
      @@Name:  domConfig
      @@Description:

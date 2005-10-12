@@ -19,7 +19,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/10/09 13:57:18 $
+      $Date: 2005/10/12 00:31:05 $
     @@ContentType:
       dis:Date.RCS
   
@@ -81,6 +81,11 @@ ResourceDef:
     Message::Util::
   @DISPerl:interfacePackageName:
     Message::Util::IF::
+  @ImplNote:
+    @@lang:en
+    @@@:
+      This resource is also defined in <Module::Util:DIS> and
+      <Module::Util:PerlCode> modules.
 
 ## -- Internal node object
 
@@ -981,11 +986,12 @@ ClassDef:
     @@rdf:type: DISPerl|BlockCode
     @@PerlDef:
       if (defined $referrer->{$propName}) {
-        if (${$referrer->{<H::mn:treeID>}} ne ${$referent->{<H::mn:treeID>}}) {
-          $referent->{<H::mn:rc>}--;
-          ${$referent->{<H::mn:groveReferenceCounter>}}--;
-          unless (<Code::isGroveReferenced:: $node = $referent>) {
-            $referent-><M::NodeStem.destroy>;
+        my $__referent = $referrer->{$propName};
+        if (${$referrer->{<H::mn:treeID>}} ne ${$__referent->{<H::mn:treeID>}}) {
+          $__referent->{<H::mn:rc>}--;
+          ${$__referent->{<H::mn:groveReferenceCounter>}}--;
+          unless (<Code::isGroveReferenced:: $node = $__referent>) {
+            $__referent-><M::NodeStem.destroy>;
           }
         }
         CORE::delete $referrer->{$propName};

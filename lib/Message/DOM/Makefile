@@ -78,6 +78,12 @@ ls$(DAC_SUFFIX): core$(DAC_SUFFIX) $(DOM_LS_DIS_FILES) $(DAC_PL)
 html$(DAC_SUFFIX): core$(DAC_SUFFIX) $(DOM_HTML_DIS_FILES) $(DAC_PL)
 	$(DAC)$@ --input-db-file-name="$<" DOMHTML.dis
 
+$(DOM_FEATURE_DIS_FILES:$(DIS_SUFFIX)=$(PM_SUFFIX)): \
+  feature$(DAC_SUFFIX) $(DAC2PM_PL)
+	$(DAC2PM) $< --module-uri="$(NS_MDOM)$(@:$(PM_SUFFIX)=)" \
+	  --output-file-path="$@"
+	$(PERL_CHK) $@
+
 $(DOM_CORE_DIS_FILES:.dis=$(PM_SUFFIX)): core$(DAC_SUFFIX) $(DAC2PM_PL)
 	$(DAC2PM) $< --module-uri="$(NS_MDOM)$(@:$(PM_SUFFIX)=)" \
 	  --output-file-path="$@"
@@ -139,5 +145,5 @@ clean:
 	$(RM) .*.tmp *~ .*~ *.BAK .*.BAK
 	$(RM) .core$(PM_SUFFIX) .ls$(PM_SUFFIX) .html$(PM_SUFFIX)
 
-## $Date: 2005/10/06 10:53:36 $
+## $Date: 2005/10/12 00:30:57 $
 ## License: Public Domain.

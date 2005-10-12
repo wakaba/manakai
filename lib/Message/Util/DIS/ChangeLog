@@ -1,3 +1,18 @@
+2005-10-11  Wakaba  <wakaba@suika.fam.cx>
+
+	* Perl.dis (plImplementation): Changed to direct
+	instantiation of "ManakaiPCImplementation" class.
+	(getPerlNameList, getPerlOperatorList): New methods.
+	(plCodeFragment): Now allows subroutines having more than
+	two method names and operators.
+	(plMethodOperator): Removed.
+
+2005-10-10  Wakaba  <wakaba@suika.fam.cx>
+
+	* DNLite.dis (Require): Reference to "DIS/Perl.dis" added.
+
+	* Perl.dis (Require): Reference to "PerlCode.dis" added.
+
 2005-10-09  Wakaba  <wakaba@suika.fam.cx>
 
 	* Perl.dis (plGeneratePerlModule): Generates information

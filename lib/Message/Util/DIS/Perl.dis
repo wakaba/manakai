@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/10/09 13:57:20 $
+      $Date: 2005/10/12 00:31:14 $
     @@ContentType:
       dis:Date.RCS
   
@@ -30,6 +30,9 @@ Module:
     @@Module:
       @@@QName: DIS|Value
       @@@WithFor: DIS|ForLatest
+    @@Module:
+      @@@QName: Util|PerlCode
+      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
 
   @DefaultFor: 
     DIS:ForLatest
@@ -101,6 +104,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/-temp/2003/09/27/null
   @owl:
     http://www.w3.org/2002/07/owl#
+  @pc:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/PerlCode#
   @pl:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#Perl--
   @rdf:
@@ -389,20 +394,21 @@ IFClsDef:
       The implementation object, which the object belongs to and
       which implements the feature <Feature::Util|PerlCode>
       version <FeatureVer::1.0>.
-    @@Type:
-      PerlCode:PCImplementation::ManakaiDOM:Perl
+    @@Type: DIS|MPLImpl
     @@Get:
       @@@nullCase:
         @@@@enDesc:
           There is no implementation that supports the feature
           <Feature::Util:PerlCode> version <FeatureVer::1.0>.
       @@@PerlDef:
-        __DEEP{
-          $r = ($self-><AG::DIS|SWCFGNode.ownerDocument> or
-                        $self)-><AG::DIS|SWCFGDoc.implementation>
-                           -><M::DIS|DOMMinImpl.getFeature>
-                                   (<Q::Util:PerlCode> => '1.0');
-        }__;
+                                   ## NOTE: Method name is directly written
+        $r = <Class::PLImplClass>->_new;
+#        __DEEP{
+#          $r = ($self-><AG::DIS|SWCFGNode.ownerDocument> or
+#                        $self)-><AG::DIS|SWCFGDoc.implementation>
+#                           -><M::DIS|DOMMinImpl.getFeature>
+#                                   (<Q::Util:PerlCode> => '1.0');
+#        }__;
 
   @Method:
     @@Name: plValueCodeFragment
@@ -927,62 +933,57 @@ ResourceDef:
 
 ResourceDef:
   @QName: DIS|MPLImpl
-  @AliasFor:
-    PerlCode:PCImplementation::ManakaiDOM:Perl
+  @AliasFor: pc|PCImplementation||ManakaiDOM|ManakaiDOMLatest
   @For: DIS|ForEmpty
 
 ResourceDef:
   @QName: DIS|MPLCodeFragment
-  @AliasFor:
-    PerlCode:PerlCode::ManakaiDOM:Perl
+  @AliasFor: pc|PerlCode||ManakaiDOM|ManakaiDOMLatest
   @For: DIS|ForEmpty
 
 ResourceDef:
   @QName: DIS|PLFile
-  @AliasFor:
-    PerlCode:PerlFile::ManakaiDOM:Perl
+  @AliasFor: pc|PerlFile||ManakaiDOM|ManakaiDOMLatest
   @For: DIS|ForEmpty
 
 ResourceDef:
   @QName: DIS|PLPack
-  @AliasFor:
-    PerlCode:PerlPackage::ManakaiDOM:Perl
+  @AliasFor: pc|PerlPackage||ManakaiDOM|ManakaiDOMLatest
   @For: DIS|ForEmpty
 
 ResourceDef:
   @QName: DIS|PLInCon
-  @AliasFor:
-    PerlCode:PerlCodeInlines::ManakaiDOM:Perl
+  @AliasFor: pc|PerlCodeInlines||ManakaiDOM|ManakaiDOMLatest
   @For: DIS|ForEmpty
 
 ResourceDef:
   @QName: DIS|PLBlockCon
-  @AliasFor:
-    PerlCode:PerlCodeStatements::ManakaiDOM:Perl
+  @AliasFor: pc|PerlCodeStatements||ManakaiDOM|ManakaiDOMLatest
   @For: DIS|ForEmpty
 
 ResourceDef:
   @QName: DIS|MPLSS
-  @AliasFor:
-    PerlCode:PerlCodeStatements::ManakaiDOM:Perl
+  @AliasFor: pc|PerlCodeStatements||ManakaiDOM|ManakaiDOMLatest
   @For: DIS|ForEmpty
 
 ResourceDef:
   @QName: DIS|PLAnyCon
-  @AliasFor:
-    PerlCode:PerlCodeUnits::ManakaiDOM:Perl
+  @AliasFor: pc|PerlCodeUnits||ManakaiDOM|ManakaiDOMLatest
   @For: DIS|ForEmpty
 
 ResourceDef:
   @QName: DIS|MPLSub
-  @AliasFor:
-    PerlCode:ManakaiPerlSub::ManakaiDOM:Perl
+  @AliasFor: pc|PerlSub||ManakaiDOM|ManakaiDOMLatest
   @For: DIS|ForEmpty
 
 ResourceDef:
   @QName: DIS|MPLUnparsedCode
-  @AliasFor:
-    PerlCode:ManakaiPerlUnparsedCode::ManakaiDOM:Perl
+  @AliasFor: pc|PerlUnparsedCode||ManakaiDOM|ManakaiDOMLatest
+  @For: DIS|ForEmpty
+
+ResourceDef:
+  @QName: PCVar
+  @AliasFor: pc|PerlVariable||ManakaiDOM|ManakaiDOMLatest
   @For: DIS|ForEmpty
 
 PropDef:
@@ -1105,8 +1106,7 @@ IFClsDef:
       The implementation object, which the object belongs to and
       which implements the feature <Feature::Util|PerlCode>
       version <FeatureVer::1.0>.
-    @@Type:
-      PerlCode:PCImplementation::ManakaiDOM:Perl
+    @@Type: DIS|MPLImpl
     @@Get:
       @@@enDesc:
         The Perl code implementation object. 
@@ -1160,7 +1160,7 @@ ElementTypeBinding:
 
 ResourceDef:
   @QName: PLImplClass
-  @AliasFor: PerlCode|ManakaiPerlCodeImplementation||ManakaiDOM|Perl
+  @AliasFor: PerlCode|ManakaiPCImplementation||ManakaiDOM|ManakaiDOMLatest
   @For: DIS|ForEmpty
 
 ElementTypeBinding:
@@ -1656,8 +1656,7 @@ IFClsDef:
       The implementation object, which the object belongs to and
       which implements the feature <Feature::Util|PerlCode>
       version <FeatureVer::1.0>.
-    @@Type:
-      PerlCode:PCImplementation::ManakaiDOM:Perl
+    @@Type: DIS|MPLImpl
     @@Get:
       @@@enDesc:
         The Perl code implementation object. 
@@ -1672,25 +1671,25 @@ IFClsDef:
           There is no implementation that implements 
           the <Feature::Util:PerlCode> feature, version <FeatureVer::1.0>. 
       @@@PerlDef:
-        if ($self->{src}) {
-          __DEEP{
-            $r = ($self->{src}-><AG::DIS|SWCFGNode.ownerDocument> or
-                        $self->{src})-><AG::DIS|SWCFGDoc.implementation>
-                           -><M::DIS|DOMMinImpl.getFeature>
-                                   (<Q::Util:PerlCode> => '1.0');
-          }__;
-          unless (defined $r) {
-            __EXCEPTION{DIS|NO_PERL_CODE_IMPL_ERR::
-             
-            }__;
-          }
-        } else {
+#        if ($self->{src}) {
+#          __DEEP{
+#            $r = ($self->{src}-><AG::DIS|SWCFGNode.ownerDocument> or
+#                        $self->{src})-><AG::DIS|SWCFGDoc.implementation>
+#                           -><M::DIS|DOMMinImpl.getFeature>
+#                                   (<Q::Util:PerlCode> => '1.0');
+#          }__;
+#          unless (defined $r) {
+#            __EXCEPTION{DIS|NO_PERL_CODE_IMPL_ERR::
+#             
+#            }__;
+#          }
+#        } else {
 #          $r = $Message::DOM::ImplementationRegistry
 #                 ->get_implementation
 #                      ({<Q::Util:PerlCode> => '1.0'});
-                                    ## NOTE: Method name directly written
+#                                    ## NOTE: Method name directly written
           $r = <Class::PLImplClass>->_new;
-        }
+#        }
 ##DISAnyResourcePerl
 
 IFClsDef:
@@ -2466,64 +2465,7 @@ IFClsDef:
             $r = $self->{<H::dis2pm:name>};
           } elsif ($self-><M::DIS|DISResource.isTypeURI>
                               (<Q::DISLang:AnyMethod>)) {
-            
-            $r = $self-><M::DIS|DISResourceProp.getPropertyText>
-                              (<Q::DISPerl:methodName>, null);
-            if (defined $r) {
-              if ($self-><M::DIS|DISResourceProp.getPropertyBoolean>
-                                (<Q::ManakaiDOM:isForInternal>, false)) {
-                $r = '_' . $r;
-              }
-              ## No reserved name checks
-            } elsif (defined (my $ln = $self-><AG::DIS|DISAnyResource
-                                                             .localName>)) {
-              $r = <ClassM::DIS|ManakaiDISImplementation
-                           .camelCaseToUnderscoreName> ($ln);
-              if ($self-><M::DIS|DISResourceProp.getPropertyBoolean>
-                                (<Q::ManakaiDOM:isForInternal>, false)) {
-                $r = '_' . $r;
-              }
-              if ({
-                    import => 1,
-                    unimport => 1,
-                    isa => 1,
-                    can => 1,
-                    new => 1,
-                    as_string => 1,
-                    stringify => 1,
-                    clone => 1,
-                  }->{$r} or $r =~ /^___/) {
-                __UNDEEP{
-                  __EXCEPTION{DIS|RESERVED_PERL_METHOD_NAME_ERR::
-                    DIS:uri => {$self->{uri}},
-                    DIS:sourceNode => {$self->{src}},
-                    DIS:generatedName => {$r},
-                  }__;
-                }__;
-              }
-            } elsif (my $op_uri = $self-><AG::DISResourcePerl
-                                                  .plMethodOperator>) {
-                $r = {
-                       <Q::ManakaiDOM:MUErrorHandler> => '___report_error',
-                       <Q::ecore:ErrorDefMethod> => '___error_def',
-                       <Q::DISPerl:AsStringMethod> => 'stringify',
-                       <Q::DISPerl:NewMethod> => 'new',
-                       <Q::DISPerl:CloneMethod> => 'clone',
-                       <Q::DISPerl:ImportMethod> => 'import',
-                       <Q::DISPerl:CanMethod> => 'can',
-                       <Q::DISPerl:UnimportMethod> => 'unimport',
-                       <Q::DISPerl:VERSIONMethod> => 'VERSION',
-                       <Q::DISPerl:ISAMethod> => 'isa',
-                       <Q::DISLang:ArrayGet> => 'FETCH',
-                       <Q::DISLang:ArraySet> => 'STORE',
-                       <Q::DISLang:HashGet> => 'FETCH',
-                       <Q::DISLang:HashSet> => 'STORE',
-                       <Q::DISLang:ToString> => 'stringify',
-                     }->{$op_uri};
-                $r = $op_uri if $op_uri =~ /^[A-Z]+$/;
-            } else {
-              $r = null;
-            }
+            $r = $self-><M::dp|DISResourcePerl.getPerlNameList>->[0];
           } elsif ($self-><M::DIS|DISResource.isTypeURI>
                               (<Q::ManakaiDOM:Const>)) {
             unless (defined $self-><AG::DIS|DISAnyResource.localName>) {
@@ -2580,6 +2522,121 @@ IFClsDef:
           $self->{<H::dis2pm:name>} = $r;
         }__;
 
+  @Method:
+    @@Name: getPerlNameList
+    @@enDesc:
+      Returns a list of Perl method names assigned to the resource.
+    @@Return:
+      @@@Type: DISPerl|ARRAY||ManakaiDOM|all
+      @@@enDesc:
+        An unordered snapshot list of Perl names.
+      @@@RaiseException:
+        @@@@@: DIS|RESERVED_PERL_METHOD_NAME_ERR
+        @@@@enDesc:
+          The Perl method name constructed from the source 
+          result in a reserved name. 
+      @@@PerlDef:
+        __DEEP{
+          ## Primary name
+          my $nm = $self-><M::DIS|DISResourceProp.getPropertyText>
+                                     (<Q::DISPerl:methodName>);
+          if (defined $nm) {
+            if ($self-><M::DIS|DISResourceProp.getPropertyBoolean>
+                                (<Q::ManakaiDOM:isForInternal>)) {
+              push @$r, '_' . $nm;
+            } else {
+              push @$r, $nm;
+            }
+            ## NOTE: No reserved name checks enforced in this case
+          } elsif (defined (my $ln = $self-><AG::DIS|DISAnyResource
+                                                               .localName>)) {
+            $nm = <ClassM::DIS|ManakaiDISImplementation
+                           .camelCaseToUnderscoreName> ($ln);
+            if ($self-><M::DIS|DISResourceProp.getPropertyBoolean>
+                                (<Q::ManakaiDOM:isForInternal>)) {
+              $nm = '_' . $nm;
+            }
+            if ({
+                    import => 1,
+                    unimport => 1,
+                    isa => 1,
+                    can => 1,
+                    new => 1,
+                    as_string => 1,
+                    stringify => 1,
+                    clone => 1,
+                }->{$nm} or $nm =~ /^___/) {
+              __UNDEEP{__EXCEPTION{DIS|RESERVED_PERL_METHOD_NAME_ERR::
+                  DIS:uri => {$self-><AG::DIS|DISAnyResource.uri>},
+                  DIS:sourceNode =>
+                             {$self-><AG::DIS|DISAnyResource.sourceElement>},
+                  DIS:generatedName => {$nm},
+                }__;
+              }__;
+            }
+            push @$r, $nm;
+          }
+
+          ## Names specified via "dis:Operator" attributes
+          for my $opv (@{$self-><M::DIS|DISResourceProp.getPropertyValueList>
+                             (<Q::dis:Operator>)}) {
+            if ($opv->isa (<IFName::dv|DVURIValue>)) {
+              my $op_uri = $opv-><AG::dv|DVURIValue.uri>;
+              my $nm = {
+                       <Q::ManakaiDOM:MUErrorHandler> => '___report_error',
+                       <Q::ecore:ErrorDefMethod> => '___error_def',
+                       <Q::DISPerl:AsStringMethod> => 'stringify',
+                       <Q::DISPerl:NewMethod> => 'new',
+                       <Q::DISPerl:CloneMethod> => 'clone',
+                       <Q::DISPerl:ImportMethod> => 'import',
+                       <Q::DISPerl:CanMethod> => 'can',
+                       <Q::DISPerl:UnimportMethod> => 'unimport',
+                       <Q::DISPerl:VERSIONMethod> => 'VERSION',
+                       <Q::DISPerl:ISAMethod> => 'isa',
+                       <Q::DISLang:ArrayGet> => 'FETCH',
+                       <Q::DISLang:ArraySet> => 'STORE',
+                       <Q::DISLang:HashGet> => 'FETCH',
+                       <Q::DISLang:HashSet> => 'STORE',
+                       <Q::DISLang:ToString> => 'stringify',
+                     }->{$op_uri};
+              push @$r, $nm if defined $nm;
+            } else {
+              my $nm = $opv-><AG::dv|DVValue.stringValue>;
+              if ($nm =~ /^[A-Z]+$/) {
+                push @$r, $nm;
+              }
+            }
+          } # operators
+        }__;
+
+  @Method:
+    @@Name: getPerlOperatorList
+    @@enDesc:
+      Returns a list of Perl operators assigned to the resource.
+    @@Return:
+      @@@Type: DISPerl|ARRAY||ManakaiDOM|all
+      @@@enDesc:
+        An unordered snapshot list of Perl operators.
+      @@@PerlDef:
+        __DEEP{
+          for my $opv (@{$self-><M::DIS|DISResourceProp.getPropertyValueList>
+                             (<Q::dis:Operator>)}) {
+            if ($opv->isa (<IFName::dv|DVURIValue>)) {
+              my $op_uri = $opv-><AG::dv|DVURIValue.uri>;
+              my $nm = {
+                         <Q::DISPerl:AsStringMethod> => '""',
+                         <Q::DISLang:ToString> => '""',
+                       }->{$op_uri};
+              push @$r, $nm if defined $nm;
+            } else {
+              my $nm = $opv-><AG::dv|DVValue.stringValue>;
+              if ($nm !~ /^[A-Z]+$/) {
+                push @$r, $nm;
+              }
+            }
+          } # operators
+        }__;
+
   @Attr:
     @@Name: plFullyQualifiedName
     @@enDesc:
@@ -2606,8 +2663,8 @@ IFClsDef:
           The local name of this resource is not defined. 
       @@@PerlDef:
         __DEEP{
-          if (exists $self->{<H::PerlCode:plFullyQualifiedName>}) {
-            $r = $self->{<H::PerlCode:plFullyQualifiedName>};
+          if (exists $self->{<H::pc:plFullyQualifiedName>}) {
+            $r = $self->{<H::pc:plFullyQualifiedName>};
           } elsif ($self-><M::DIS|DISResource.isTypeURI>
                               (<Q::DISLang:AnyClass>) or
                    $self-><M::DIS|DISResource.isTypeURI>
@@ -2644,7 +2701,7 @@ IFClsDef:
           } else {
             $r = null;
           }
-          $self->{<H::PerlCode:plFullyQualifiedName>} = $r;
+          $self->{<H::pc:plFullyQualifiedName>} = $r;
         }__;
 
   @Attr:
@@ -2707,40 +2764,6 @@ IFClsDef:
               $r = '$' . $r;
             }
           }__;
-
-  @Attr:
-    @@Name: plMethodOperator
-    @@enDesc:
-      The operator to overload by this method. 
-    @@Type:
-      DISLang:String::ManakaiDOM:all
-    @@Get:
-      @@@enDesc:
-        The operator, either Perl <CODE::use operator> operator name
-        of manakai operator URI reference. 
-      @@@nullCase:
-        @@@@enDesc:
-          Either this resource does not define a Perl method or 
-          this method does not overload any operator. 
-      @@@UndeclaredPrefixException:
-      @@@RaiseException:
-        @@@@@: DIS|UNSUPPORTED_MEDIA_TYPE_ERR
-        @@@@enDesc:
-          Media type of the <Q::dis:Operator> node is not supported. 
-      @@@PerlDef:
-        __DEEP{
-            my $op_node = $self-><M::DIS|DISResourceProp.getPropertyValue>
-                             (<Q::dis:Operator>);
-            if ($op_node) {
-              if ($op_node->isa (<IFName::dv|DVURIValue>)) {
-                $r = $op_node-><AG::dv|DVURIValue.uri>;
-              } else {
-                $r = $op_node-><AG::dv|DVValue.stringValue>;
-              }
-            } else {
-              $r = null;
-            }
-        }__;
 
   @Attr:
     @@Name: plCodeFragment
@@ -3012,8 +3035,7 @@ IFClsDef:
               my $rs = $plimpl-><M::DIS|MPLImpl.createPerlStatement>;
               my $rvar = $plimpl-><M::DIS|MPLImpl.createPerlVariable>
                                                ('$', null, 'r');
-              $rvar-><AS::PerlCode:ManakaiPerlVariable::ManakaiDOM:Perl
-                               .variableScope> ('my');
+              $rvar-><AS::PCVar.variableScope> ('my');
               if ($def) {
                 $def = $def-><M::DVValuePerl.plCodeFragment>
                                ($self,
@@ -3165,8 +3187,7 @@ IFClsDef:
               my $rs = $plimpl-><M::DIS|MPLImpl.createPerlStatement>;
               my $rvar = $plimpl-><M::DIS|MPLImpl.createPerlVariable>
                                                ('$', null, 'r');
-              $rvar-><AS::PerlCode:PerlVariable::ManakaiDOM:Perl
-                                 .variableScope> ('my');
+              $rvar-><AS::PCVar.variableScope> ('my');
               if ($def) {
                 $rs-><M::DIS|PLAnyCon.appendNewAssignment> ($rvar => $def);
               } else {
@@ -3422,51 +3443,14 @@ IFClsDef:
                                     (<Q::DISLang:Attribute>)) {
                 my $is_attr = $cr-><M::DIS|DISResource.isTypeURI>
                                     (<Q::DISLang:Attribute>) ? true : false;
-                my $pname = $cr-><AG::DISResourcePerl.plName>;
-                my $op = $cr-><AG::DISResourcePerl.plMethodOperator>;
                 my $psub = $cr-><AG::DISResourcePerl.plCodeFragment>->clone;
-                if (defined $pname) {
-                  if ($r-><M::DIS|PLPack.getSub> ($pname)) {
-                   __UNDEEP{__EXCEPTION{DIS|PERL_SUBROUTINE_ALREADY_DEFINED_ERR::
-                      PerlCode:localName => {$pname},
-                      DIS:uri => {$cr->{uri}},
-                      DIS:sourceNode => {$cr->{src}},
-                    }__}__;
-                  }
-                  $r-><M::DIS|PLPack.setSub> ($pname => $psub);
-          
-                  if (defined $op and
-                      defined $cr-><AG::DIS|DISAnyResource.localName>) {
-                    if ($op =~ /^[A-Z]+$/) {
-                      if ($r-><M::DIS|PLPack.getSubAliasName> ($op)) {
-                        __UNDEEP{__EXCEPTION{
-                          DIS|PERL_SUBROUTINE_ALREADY_DEFINED_ERR::
-                            PerlCode:localName => {$op},
-                            DIS:uri => {$cr->{uri}},
-                            DIS:sourceNode => {$cr->{src}},
-                        }__}__;
-                      }
-                      $r-><M::DIS|PLPack.setSubAliasName> ($op => $pname);
-                    } elsif ($op !~ /:/) {
-                      if ($r-><M::DIS|PLPack.getOverloadMethodName> ($op)) {
-                        __UNDEEP{__EXCEPTION{
-                          DIS|PERL_OPERATOR_ALREADY_OVERLOADED_ERR::
-                            PerlCode:operator => {$op},
-                            DIS:uri => {$cr->{uri}},
-                            DIS:sourceNode => {$cr->{src}},
-                        }__}__;
-                      }
-                      $r-><M::DIS|PLPack.setOverloadMethodName> ($op => $pname);
-                    }
-                  }
-                } elsif (defined $op) {
-                  $r-><M::DIS|PLPack.setOverloadSub> ($op => $psub);
-                } else {
-                  __UNDEEP{__EXCEPTION{DIS|PERL_UNUSED_SUBROUTINE_ERR::
-                    DIS:uri => {$cr->{uri}},
-                    DIS:sourceNode => {$cr->{src}},
-                  }__}__;
+                for (@{$cr-><M::dp|DISResourcePerl.getPerlNameList>}) {
+                  $psub-><M::DIS|MPLSub.addPerlName> ($_);
                 }
+                for (@{$cr-><M::dp|DISResourcePerl.getPerlOperatorList>}) {
+                  $psub-><M::DIS|MPLSub.addPerlOperator> ($_);
+                }
+                $r-><M::DIS|PLPack.setSubNode> ($psub);
               ## - Constant groups
               } elsif ($cr-><M::DIS|DISResource.isTypeURI>
                                 (<Q::ManakaiDOM:ConstGroup>)) {
@@ -3476,17 +3460,16 @@ IFClsDef:
                     my $sub = $gcr-><AG::DISResourcePerl
                                         .plCodeFragment>;
                     if ($r-><M::DIS|PLPack.getSub>
-                                          ($sub-><AG::DIS|MPLSub.localName>)) {
+                                          ($sub-><AG::DIS|MPLSub.pcLocalName>)) {
                       __UNDEEP{__EXCEPTION{
                           DIS|PERL_SUBROUTINE_ALREADY_DEFINED_ERR::
-                            PerlCode:localName
-                                    => {$sub-><AG::DIS|MPLSub.localName>},
+                            pc:localName
+                                    => {$sub-><AG::DIS|MPLSub.pcLocalName>},
                             DIS:uri => {$gcr->{uri}},
                             DIS:sourceNode => {$gcr->{src}},
                       }__}__;
                     }
-                    $r-><M::DIS|PLPack.setSub>
-                             ($sub-><AG::DIS|MPLSub.localName> => $sub);
+                    $r-><M::DIS|PLPack.setSubNode> ($sub);
                     push @const, $gcr;
                   }
                 }
@@ -3495,17 +3478,16 @@ IFClsDef:
                                 (<Q::ManakaiDOM:Const>)) {
                 my $sub = $cr-><AG::DISResourcePerl.plCodeFragment>;
                 if ($r-><M::DIS|PLPack.getSub>
-                               ($sub-><AG::DIS|MPLSub.localName>)) {
+                               ($sub-><AG::DIS|MPLSub.pcLocalName>)) {
                   __UNDEEP{__EXCEPTION{
                           DIS|PERL_SUBROUTINE_ALREADY_DEFINED_ERR::
-                            PerlCode:localName
-                                    => {$sub-><AG::DIS|MPLSub.localName>},
+                            pc:localName
+                                    => {$sub-><AG::DIS|MPLSub.pcLocalName>},
                             DIS:uri => {$cr->{uri}},
                             DIS:sourceNode => {$cr->{src}},
                   }__}__;
                 }
-                $r-><M::DIS|PLPack.setSub>
-                                ($sub-><AG::DIS|MPLSub.localName> => $sub);
+                $r-><M::DIS|PLPack.setSubNode> ($sub);
               ## Package-scope variables
               } elsif ($cr-><M::DIS|DISResource.isTypeURI>
                                 (<Q::DISPerl:ScalarVariable>)) {
@@ -3533,11 +3515,9 @@ IFClsDef:
                   $r-><M::DIS|PLBlockCon.appendStatement>
                     -><M::DIS|PLBlockCon.appendCodeFragment>
                                                        (my $v = $var->clone);
-                  $v-><AS::PerlCode:PerlVariable::ManakaiDOM:Perl
-                                                     .variableScope> ('our');
+                  $v-><AS::PCVar.variableScope> ('our');
                 } else {
-                  $var-><AS::PerlCode:PerlVariable::ManakaiDOM:Perl
-                                                     .variableScope> ('our');
+                  $var-><AS::PCVar.variableScope> ('our');
                 }
                 $r-><M::DIS|PLBlockCon.appendStatement>
                   -><M::DIS|PLAnyCon.appendNewAssignment> ($var => $value);
@@ -3545,7 +3525,8 @@ IFClsDef:
             }
 
             ## - Error Descriptions
-            if ($self-><M::DIS|DISResource.isTypeURI> (<Q::dx:Class>)) {
+            if ($self-><M::DIS|DISResource.isTypeURI>
+                                            (<Q::dx:Class>) and @const) {
               my $err_def = $plimpl-><M::DIS|MPLImpl.createPerlSub>
                                             ('___error_def');
               $err_def-><AS::DIS|MPLSub.prototype> ('');
@@ -3586,7 +3567,7 @@ IFClsDef:
                          },
                        } @const
                     }]));
-              $r-><M::DIS|PLPack.setSub> (___error_def => $err_def);
+              $r-><M::DIS|PLPack.setSubNode> ($err_def);
             }
 
           ## -- Global variables
@@ -3659,15 +3640,14 @@ IFClsDef:
                                          (<Q::DISLang:Const>)}) {
                 my $sub = $gcr-><AG::DISResourcePerl.plCodeFragment>;
                 if ($r-><M::DIS|PLPack.getSub>
-                                          ($sub-><AG::DIS|MPLSub.localName>)) {
+                                          ($sub-><AG::DIS|MPLSub.pcLocalName>)) {
                   __UNDEEP{__EXCEPTION{DIS|PERL_SUBROUTINE_ALREADY_DEFINED_ERR::
-                    PerlCode:localName => {$sub-><AG::DIS|MPLSub.localName>},
+                    pc:localName => {$sub-><AG::DIS|MPLSub.pcLocalName>},
                     DIS:uri => {$gcr->{uri}},
                     DIS:sourceNode => {$gcr->{src}},
                   }__}__;
                 }
-                $r-><M::DIS|PLPack.setSub>
-                             ($sub-><AG::DIS|MPLSub.localName> => $sub);
+                $r-><M::DIS|PLPack.setSubNode> ($sub);
                 push @const, $gcr;
               }
             }
@@ -3714,7 +3694,7 @@ IFClsDef:
                          },
                        } @const
                     }]));
-              $r-><M::DIS|PLPack.setSub> (___error_def => $err_def);
+              $r-><M::DIS|PLPack.setSubNode> ($err_def);
             }
 
           ## -- Unsupported types
@@ -4223,13 +4203,11 @@ IFClsDef:
       @@@enDesc:
         Preprocessed Perl code.
       @@@InCase:
-        @@@@Type:
-          PerlCode:PerlBlock::ManakaiDOM:Perl
+        @@@@Type: PCBlock
         @@@@enDesc:
           If <P::containsStatements> is <DOM::false>.
       @@@InCase:
-        @@@@Type:
-          PerlCode:PerlInlines::ManakaiDOM:Perl
+        @@@@Type: DIS|PLInCon
         @@@@enDesc:
           If <P::containsStatements> is <DOM::true>.
       @@@InlineElementException:

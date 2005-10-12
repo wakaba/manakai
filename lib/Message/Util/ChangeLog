@@ -1,3 +1,24 @@
+2005-10-11  Wakaba  <wakaba@suika.fam.cx>
+
+	* PerlCode.dis (IfClsDef, IFClsETDef): New version of classes based
+	on DOMCore and element type definitions added.
+	(localName): Renamed to "pcLocalName" to avoid
+	conflict with "Node.localName" attribute.
+
+2005-10-10  Wakaba  <wakaba@suika.fam.cx>
+
+	* DIS.dis (Require): Unused reference to "PerlCode.dis" removed.
+
+	* Makefile: Rules to make "PerlCode.pm" separated
+	from ones for "DIS.pm".
+
+	* ManakaiNode.dis (mn:unsetXRefNode): "$referent"
+	parameter is replaced with "$referrer->{$propName}".
+
+	* PerlCode.dis (Require): References "DOMCore.dis".
+	(DefaultFor): Changed to "ManakaiDOM:ManakaiDOMLatest".
+	(Util: for ManakaiDOM:ManakaiDOM): New.
+
 2005-10-09  Wakaba  <wakaba@suika.fam.cx>
 
 	* ManakaiNode.dis: New "mn:xrefnode0" property type has

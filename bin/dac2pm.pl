@@ -184,6 +184,9 @@ sub verbose_msg_ ($) {
 
 use Message::Util::DIS::DNLite;
 
+my $start_time;
+BEGIN { $start_time = time }
+
 my $impl = $Message::DOM::ImplementationRegistry->get_implementation
                ({
                  ExpandedURI q<ManakaiDOM:Minimum> => '3.0',
@@ -248,6 +251,12 @@ status_msg_ "Closing the database...";
 $db->free;
 undef $db;
 status_msg q<done>;
+
+END {
+  use integer;
+  my $time = time - $start_time;
+  status_msg sprintf qq<%d'%02d''>, $time / 60, $time % 60;
+}
 exit;
 
 sub dac_search_file_path_stem ($$$) {
@@ -290,4 +299,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2005/10/06 10:53:34 $
+1; # $Date: 2005/10/12 00:30:54 $

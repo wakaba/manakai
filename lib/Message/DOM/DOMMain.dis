@@ -25,7 +25,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/10/08 15:05:42 $
+      $Date: 2005/10/12 00:30:57 $
     @@ContentType:
       dis:Date.RCS
   
@@ -1570,6 +1570,7 @@ StringDataTypeDef:
   @ResourceDef:
     @@rdf:type: DISLang|InputProcessor
     @@PerlDef:
+    if (<Code::DOMCore:doStrictErrorChecking:: $nodeRef = $self>) {
       unless (<Code::DOMMain:testXML10Name:: $INPUT = $INPUT>) {
         __EXCEPTION{MDOMX:MDOM_BAD_NAME::
             DOMCore:name => {$INPUT},
@@ -1584,6 +1585,7 @@ StringDataTypeDef:
           infoset:version => '1.0',
         }__;
       }
+    }
 
   @ResourceDef:
     @@QName: testXML10QName
@@ -1615,6 +1617,7 @@ StringDataTypeDef:
   @ResourceDef:
     @@rdf:type: DISLang|InputProcessor
     @@PerlDef:
+    if (<Code::DOMCore:doStrictErrorChecking:: $nodeRef = $self>) {
       unless (<Code::DOMMain:testXML11Name:: $INPUT = $INPUT>) {
         __EXCEPTION{MDOMX:MDOM_BAD_NAME::
           DOMCore:name => {$INPUT},
@@ -1629,6 +1632,7 @@ StringDataTypeDef:
           infoset:version => '1.1',
         }__;
       }
+    }
 
   @ResourceDef:
     @@QName: testXML11QName

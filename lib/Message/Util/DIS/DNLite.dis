@@ -19,13 +19,16 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/29 15:18:11 $
+      $Date: 2005/10/12 00:31:13 $
     @@ContentType:
       dis:Date.RCS
   
   @Require:
     @@Module:
       @@@QName: Util|DIS
+      @@@WithFor: DIS|ForLatest
+    @@Module:
+      @@@QName: DIS|Perl
       @@@WithFor: DIS|ForLatest
 
   @DefaultFor: 
@@ -1435,8 +1438,7 @@ IFClsDef:
       The implementation object, which the object belongs to and
       which implements the feature <Feature::Util|PerlCode>
       version <FeatureVer::1.0>.
-    @@Type:
-      PerlCode:PCImplementation::ManakaiDOM:Perl
+    @@Type: DIS|MPLImpl
     @@Get:
       @@@nullCase:
         @@@@enDesc:

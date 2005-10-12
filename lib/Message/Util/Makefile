@@ -51,31 +51,36 @@ DOM_CORE_DAC_FILE = $(MANAKAI_LIB_DIR)Message/DOM/core$(DAC_SUFFIX)
 SWCFG_DAC_FILE = $(MANAKAI_LIB_DIR)Message/Markup/all$(DAC_SUFFIX)
 
 UTIL_CORE_DIS_FILES    = ManakaiNode.dis Error/DOMException.dis Error/Core.dis
-DIS_CORE_DIS_FILES_    = DIS.dis PerlCode.dis
+DIS_CORE_DIS_FILES_    = DIS$(DIS_SUFFIX)
 DIS_CORE_DIS_FILES_DIS = DIS/Perl.dis DIS/Value.dis DIS/DNLite.dis
 DIS_CORE_DIS_FILES     = $(DIS_CORE_DIS_FILES_) $(DIS_CORE_DIS_FILES_DIS)
 DIS_DOC_DIS_FILES      = DIS/DISDoc.dis
 DIS_DUMP_DIS_FILES     = DIS/DISDump.dis
+PC_DIS_FILES           = PerlCode$(DIS_SUFFIX)
 DIS_FILES = $(UTIL_CORE_DIS_FILES) $(DIS_CORE_DIS_FILES) \
-  $(DIS_DOC_DIS_FILES) $(DIS_DUMP_DIS_FILES)
+  $(DIS_DOC_DIS_FILES) $(DIS_DUMP_DIS_FILES) $(PC_DIS_FILES)
 
 GENERATED_FILES = \
   core$(DAC_SUFFIX)     ManakaiNode$(PM_SUFFIX) Error/DOMException$(PM_SUFFIX) \
-  discore$(DAC_SUFFIX)  DIS$(PM_SUFFIX) PerlCode$(PM_SUFFIX) \
+  pc$(DAC_SUFFIX)       PerlCode$(PM_SUFFIX) \
+  discore$(DAC_SUFFIX)  DIS$(PM_SUFFIX) \
                         DIS/Perl$(PM_SUFFIX) DIS/Value$(PM_SUFFIX) \
                         DIS/DNLite$(PM_SUFFIX) \
   disdoc$(DAC_SUFFIX)   DIS/DISDoc$(PM_SUFFIX) \
   disdump$(DAC_SUFFIX)  DIS/DISDump$(PM_SUFFIX)
 GENERATED_DAC_FILES = core$(DAC_SUFFIX) discore$(DAC_SUFFIX) disdoc$(DAC_SUFFIX)
 
-all: .discore$(PM_SUFFIX) $(GENERATED_FILES)
+all: PerlCode$(PM_SUFFIX) .discore$(PM_SUFFIX) $(GENERATED_FILES)
 
 core$(DAC_SUFFIX): $(CORE_DAC_FILE) $(UTIL_CORE_DIS_FILES) $(DAC_PL)
 	$(DAC)$@.1.tmp --input-db-file-name="$<" ManakaiNode.dis
 	$(DAC)$@ --input-db-file-name="$@.1.tmp" Error/DOMException.dis
 	$(RM) $@.1.tmp
 
-discore$(DAC_SUFFIX): $(SWCFG_DAC_FILE) $(DIS_CORE_DIS_FILES) $(DAC_PL)
+pc$(DAC_SUFFIX): $(SWCFG_DAC_FILE) $(PC_DIS_FILES) $(DAC_PL)
+	$(DAC)$@ --input-db-file-name="$<" PerlCode$(DIS_SUFFIX)
+
+discore$(DAC_SUFFIX): pc$(DAC_SUFFIX) $(DIS_CORE_DIS_FILES) $(DAC_PL)
 	$(DAC)$@ --input-db-file-name="$<" DIS/DNLite.dis
 
 disdoc$(DAC_SUFFIX): discore$(DAC_SUFFIX) $(DIS_DOC_DIS_FILES) $(DAC_PL)
@@ -113,16 +118,21 @@ $(DIS_CORE_DIS_FILES_DIS:.dis=$(PM_SUFFIX)): %$(PM_SUFFIX): \
 .discore$(PM_SUFFIX): discore$(DAC_SUFFIX) $(DAC2PM_PL)
 	$(DAC2PM) $< \
 	  --create-perl-module="$(NS_UTIL)DIS       DIS$(PM_SUFFIX)" \
-	  --create-perl-module="$(NS_UTIL)PerlCode  PerlCode$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_UTIL_DIS)Value DIS/Value$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_UTIL_DIS)Perl  DIS/Perl$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_UTIL_DIS)DNLite DIS/DNLite$(PM_SUFFIX)"
 	$(PERL_CHK) DIS$(PM_SUFFIX)
-	$(PERL_CHK) PerlCode$(PM_SUFFIX)
 	$(PERL_CHK) DIS/Value$(PM_SUFFIX)
 	$(PERL_CHK) DIS/Perl$(PM_SUFFIX)
 	$(PERL_CHK) DIS/DNLite$(PM_SUFFIX)
 	$(TOUCH) $@
+
+$(PC_DIS_FILES:$(DIS_SUFFIX)=$(PM_SUFFIX)): %$(PM_SUFFIX): \
+  pc$(DAC_SUFFIX) $(DAC2PM_PL)
+	$(DAC2PM) $< \
+	  --module-uri="$(NS_UTIL)$*" \
+	  --output-file-path="$@"
+	$(PERL_CHK) $@
 
 .discore-all$(PM_SUFFIX): discore$(DAC_SUFFIX) $(DAC2PM_PL)
 	$(DAC2PM) $< \
@@ -130,23 +140,23 @@ $(DIS_CORE_DIS_FILES_DIS:.dis=$(PM_SUFFIX)): %$(PM_SUFFIX): \
 	  --create-perl-module="$(NS_UTIL_ERR)DOMException Error/DOMException$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_MARKUP)SuikaWikiConfig21 ../Markup/SuikaWikiConfig21$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_UTIL)DIS        DIS$(PM_SUFFIX)" \
-	  --create-perl-module="$(NS_UTIL)PerlCode   PerlCode$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_UTIL_DIS)Value  DIS/Value$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_UTIL_DIS)Perl   DIS/Perl$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_UTIL_DIS)DNLite DIS/DNLite$(PM_SUFFIX)"
 	$(PERL_CHK) ../Markup/SuikaWikiConfig21$(PM_SUFFIX)
 	$(PERL_CHK) DIS$(PM_SUFFIX)
-	$(PERL_CHK) PerlCode$(PM_SUFFIX)
 	$(PERL_CHK) DIS/Value$(PM_SUFFIX)
 	$(PERL_CHK) DIS/Perl$(PM_SUFFIX)
 	$(PERL_CHK) DIS/DNLite$(PM_SUFFIX)
 	$(DAC2PM) $< \
+	  --create-perl-module="$(NS_UTIL)PerlCode   PerlCode$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_MDOM)DOMFeature ../DOM/DOMFeature$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_MDOM)DOMMain    ../DOM/DOMMain$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_MDOM)DOMCore    ../DOM/DOMCore$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_MDOM)DOMXML     ../DOM/DOMXML$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_MDOM)DOMLS      ../DOM/DOMLS$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_MDOM)GenericLS  ../DOM/GenericLS$(PM_SUFFIX)"
+	$(PERL_CHK) PerlCode$(PM_SUFFIX)
 	$(PERL_CHK) ../DOM/DOMFeature$(PM_SUFFIX)
 	$(PERL_CHK) ../DOM/DOMMain$(PM_SUFFIX)
 	$(PERL_CHK) ../DOM/DOMCore$(PM_SUFFIX)

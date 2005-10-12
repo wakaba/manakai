@@ -25,23 +25,16 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2005/10/08 15:05:46 $
+      $Date: 2005/10/12 00:31:06 $
     @@ContentType:
       dis:Date.RCS
   
   @Require:
     @@Module:
-      @@@Name: ManakaiNode
-      @@@WithFor:
-        ManakaiDOM:Perl
-    @@Module:
-      @@@QName:
-        MDOM:DOMFeature
-      @@@WithFor:
-        ManakaiDOM:ManakaiDOMLatest
+      @@@QName: MDOM|DOMCore
+      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
 
-  @DefaultFor: 
-    ManakaiDOM:Perl
+  @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
 Namespace:
   @DIS:
@@ -96,11 +89,39 @@ Namespace:
     http://www.w3.org/1999/02/22-rdf-syntax-ns#
   @rdfs:
     http://www.w3.org/2000/01/rdf-schema#
+  @s:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Markup#
   @swcfg21:
     http://suika.fam.cx/~wakaba/archive/2005/swcfg21#
   @TreeCore:\
   @Util:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/
+
+## -- Module sets
+
+ResourceDef:
+  @QName: Util|
+  @For: ManakaiDOM|DOM
+  @rdf:type: dis|ModuleGroup
+  @FullName:
+    @@lang:en
+    @@@:
+      Manakai support modules
+  @DISPerl:packageName:
+    Message::Util::
+  @DISPerl:interfacePackageName:
+    @@@:
+      Message::Util::IF::
+    @@For: ManakaiDOM|ManakaiDOM !ManakaiDOM|ManakaiDOMLatest
+  @DISPerl:interfacePackageName:
+    @@@:
+      Message::Util::IFLatest::
+    @@For: ManakaiDOM|ManakaiDOMLatest
+  @ImplNote:
+    @@lang:en
+    @@@:
+      Resources <Q::Util|> for <Q::ManakaiDOM|all> and for <Q::ManakaiDOM|Perl>
+      is defined in module <Module::Util|ManakaiNode>.
 
 ## -- Features
 
@@ -152,22 +173,80 @@ ElementTypeBinding:
       @@@@: dis|MultipleResource
       @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
     @@resourceFor: ManakaiDOM|ForIF
-    @@resourceFor: ManakaiDOM|ForClass
+    @@resourceFor: pc|ForClassCompat
+    @@resourceFor: pc|ForClass
     @@For: ManakaiDOM|Perl
 
     @@rdf:type:
-      @@@@: ManakaiDOM|IF
+      @@@@: DISLang|Interface
       @@@ForCheck: ManakaiDOM|ForIF
 
     @@rdf:type:
-      @@@@: ManakaiDOM|Class
+      @@@@: DISLang|Class
       @@@ForCheck: ManakaiDOM|ForClass
     @@Implement:
-      @@@@: ||ManakaiDOM|Perl||ManakaiDOM|ForIF
+      @@@@: ||ManakaiDOM|ManakaiDOM||ManakaiDOM|ForIF
       @@@ContentType: DISCore|TFPQNames
-      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|Perl
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
 
-    @@DOMMain:implementFeature: CoreFeature10
+    @@f:implements: pc|CoreFeature10
+
+ForDef:
+  @QName: pc|ForClassCompat
+  @ISA: ManakaiDOM|ForClass
+
+ForDef:
+  @QName: pc|ForClass
+  @ISA: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: IFClsETDef
+  @ElementType: 
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@: dis|MultipleResource
+      @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass !s|ForML
+    @@resourceFor: ManakaiDOM|ForIF
+    @@resourceFor: pc|ForClassCompat
+    @@resourceFor: pc|ForClass
+    @@resourceFor: s|ForML
+    @@For: ManakaiDOM|Perl
+
+    @@rdf:type:
+      @@@@: DISLang|Interface
+      @@@ForCheck: ManakaiDOM|ForIF
+    @@s:elementType:
+      @@@@: ||+||s|ForML
+      @@@ForCheck: ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+
+    @@rdf:type:
+      @@@@: DISLang|Class
+      @@@ForCheck: ManakaiDOM|ForClass
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOM||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
+    @@s:elementType:
+      @@@@: ||+||s|ForML
+      @@@ForCheck: pc|ForClass
+      @@@ContentType: DISCore|TFPQNames
+      @@@DISCore:stopISARecursive:1
+
+    @@rdf:type:
+      @@@@: s|ElementType
+      @@@ForCheck: s|ForML
+
+    @@f:implements: pc|CoreFeature10
 
 ElementTypeBinding:
   @Name: ClsDef
@@ -206,7 +285,14 @@ ElementTypeBinding:
   @ElementType:
     dis:QName
   @ShadowContent:
-    @@ForCheck: ManakaiDOM|ForClass
+    @@ForCheck: pc|ForClassCompat
+
+ElementTypeBinding:
+  @Name: CQName
+  @ElementType:
+    dis:QName
+  @ShadowContent:
+    @@ForCheck: pc|ForClass
 
 ElementTypeBinding:
   @Name: IFISA
@@ -220,16 +306,25 @@ ElementTypeBinding:
   @ElementType:
     dis:ISA
   @ShadowContent:
-    @@ForCheck: ManakaiDOM|ForClass
+    @@ForCheck: pc|ForClassCompat
+
+ElementTypeBinding:
+  @Name: CISA
+  @ElementType:
+    dis:ISA
+  @ShadowContent:
+    @@ForCheck: pc|ForClass
 
 ## -- Classes
 
 IFClsDef:
   @IFQName: PerlCode
   @ClsQName: ManakaiPerlCodeFragment
+  @CQName: ManakaiPCCode
 
   @ClsISA:
     ManakaiDOM:ManakaiDOMNodeReference::ManakaiDOM:Perl
+  @CISA: DOMCore|ManakaiDOMElement
   @ClsISA:
     dx:ManakaiDefaultExceptionHandler::ManakaiDOM:Perl
 
@@ -237,6 +332,7 @@ IFClsDef:
     A class on which another Perl code classes are constructed based. 
 
   @Attr:
+    @@ForCheck: !pc|ForClass
     @@Name: parentNode
     @@enDesc:
       The parent construction of this object. 
@@ -255,7 +351,6 @@ IFClsDef:
     @@enDesc:
       The root <QUOTE::file> node of the tree to which this node belongs.
     @@Type: PerlCode
-    @@caType: ManakaiPerlCodeFragment
     @@Get:
       @@@enDesc:
         The <QUOTE::file> node of the tree.
@@ -263,6 +358,8 @@ IFClsDef:
         @@@@enDesc:
           This node does not belong to any file tree.
       @@@PerlDef:
+        @@@@ForCheck: !pc|ForClass
+        @@@@@:
         $r = $self->{<H::mn:node>}->{<H::pc:parent>};
         {
           if ($r->{<H::pc:parent>}) {
@@ -281,8 +378,23 @@ IFClsDef:
         } elsif ($self->{<H::mn:node>}->{<H::pc:nodeType>} eq 'file') {
           $r = $self;
         }
+      @@@PerlDef:
+        @@@@ForCheck: pc|ForClass
+        @@@@@:
+          __DEEP{
+            $r = $self-><AG::Node.ownerDocument>
+                      -><AG::Document.documentElement>;
+            if ($r) {
+              unless (defined $r-><AG::Node.namespaceURI> and
+                      $r-><AG::Node.namespaceURI> eq <Q::pc:> and
+                      $r-><AG::Node.localName> eq 'file') {
+                $r = null;
+              }
+            }
+          }__;
 
   @IntMethod:
+    @@ForCheck: !pc|ForClass
     @@Name: getNodeReference
     @@ManakaiDOM:isStatic:1
     @@enDesc:
@@ -301,7 +413,7 @@ IFClsDef:
         my $pack;
         __CODE{pc:nodeTypeToPackageName::
                  $nodeType => $nt, $packageName => $pack, $object => $object}__;
-        __CODE{ManakaiNode:getNewReference::
+        __CODE{ManakaiNode:getNewReference||ManakaiDOM|Perl::
                  $object => $object, $ref => $r, $class => $pack}__;
 
   @Method:
@@ -343,6 +455,8 @@ IFClsDef:
           Inline Perl code fragment string to replace by.
     @@Return:
       @@@PerlDef:
+        @@@@ForCheck: !pc|ForClass
+        @@@@@:
         my $node = $self->{<H::mn:node>};
         if ($node->{<H::pc:nodeType>} eq 'unparsed' or
             $node->{<H::pc:nodeType>} eq 'inunparsed') {
@@ -370,7 +484,7 @@ IFClsDef:
                     $node->{<H::pc:childNodes>}->[$cnoi] = $newnode;
                   } else {
                     my $cn;
-                    __CODE{ManakaiNode:getWeakReference::
+                    __CODE{ManakaiNode:getWeakReference||ManakaiDOM|Perl::
                       $object => $cno, $ref => $cn,
                       $class => {<ClassName::ManakaiPerlCodeFragment>},
                     }__;
@@ -380,7 +494,7 @@ IFClsDef:
                 }
               } else { ## Non-variable child
                 my $cn;
-                __CODE{ManakaiNode:getWeakReference::
+                __CODE{ManakaiNode:getWeakReference||ManakaiDOM|Perl::
                   $object => $cno, $ref => $cn,
                   $class => {<ClassName::ManakaiPerlCodeFragment>},
                 }__;
@@ -390,6 +504,61 @@ IFClsDef:
             }
           }__;
         }
+      @@@PerlDef:
+        @@@@ForCheck: pc|ForClass
+        @@@@@:
+          my $ln = $self-><AG::Node.localName>;
+          if ($ln eq 'unparsed' or
+              $ln eq 'inlineUnparsed') {
+            my $new_var = ref $newValue ? $newValue->stringify : ''.$newValue;
+            my $val = $self-><AG::Node.textContent>;
+            $val =~ s/\Q$originalVariable\E\b/$new_var/g;
+            $self-><AS::Node.textContent> ($val);
+          } elsif ($ln eq 'stringLiteral' or $ln eq 'atom' or
+                   $ln eq 'tokens') {
+            # 
+          } elsif ($self-><M::Node.hasChildNodes>) {
+            __DEEP{
+              my @child_nodes = @{$self-><AG::Node.childNodes>};
+              for my $child_node (@child_nodes) {
+                if (defined $child_node-><AG::Node.namespaceURI> and
+                    $child_node-><AG::Node.namespaceURI> eq <Q::pc:>) {
+                  if ($child_node-><AG::Node.localName> eq 'variable') {
+                    if (substr ($originalVariable, 0, 1) eq
+                          $child_node-><AG::PerlVariable.variableType> and
+                        not defined $child_node-><AG::PerlVariable.packageName> and
+                        substr ($originalVariable, 1) eq
+                          $child_node-><AG::PerlVariable.pcLocalName> and
+                        not defined $child_node-><AG::PerlVariable.hashKey>) {
+                      if (ref $newValue) {
+                        $self-><M::Node.replaceChild> ($child_node => $newValue);
+                      } else {  ## ISSUE: Is this correct?
+                        $child_node-><M::PerlCodeInlines.appendCode> ($newValue);
+                      }
+                    }
+                  } else {  ## Non-variable child
+                    $child_node-><M::PerlCode.replaceVariable>
+                                              ($originalVariable => $newValue);
+                  }
+                } else {
+                  # 
+                }
+              }
+            }__;
+          } # has child
+
+  @ResourceDef:
+    @@ForCheck: pc|ForClass
+    @@QName: addNameListAttr
+    @@rdf:type: DISPerl|BlockCode
+    @@PerlDef:
+      my %__mn = map {$_ => true}
+                 split /\s+/, $node-><M::Element.getAttributeNS>
+                                             (<Q::pc:>, $attrName);
+      $__mn{$newName} = true;
+      $node-><M::Element.setAttributeNS>
+                      (<Q::pc:>, 'pc:'.$attrName => join ' ', keys %__mn);
+
 
   @Method:
     @@Name: addUsePerlModuleName
@@ -398,14 +567,25 @@ IFClsDef:
       <Perl::use>d by this code fragment.
     @@Param:
       @@@Name: moduleName
-      @@@Type:
-        Perl:package-name::ManakaiDOM:all
+      @@@Type: DOMString
       @@@enDesc:
         The name of the module package that should be <Perl::use>d.
     @@Return:
       @@@PerlDef:
+        @@@@ForCheck: !pc|ForClass
+        @@@@@:
         $self->{<H::mn:node>}->{<H::pc:useModuleName>}
              ->{$moduleName} = true;
+      @@@PerlDef:
+        @@@@ForCheck: pc|ForClass
+        @@@@@:
+          __DEEP{
+            __CODE{addNameListAttr::
+              $node => {$self},
+              $attrName => 'useModuleName',
+              $newName => {$moduleName},
+            }__;
+          }__;
 
   @Method:
     @@Name: addUseCharClassName
@@ -414,20 +594,30 @@ IFClsDef:
       <Perl::use>d by this code fragment.
     @@Param:
       @@@Name: moduleName
-      @@@Type:
-        Perl:package-name::ManakaiDOM:all
+      @@@Type: DOMString
       @@@enDesc:
         The name of the module package that should be <Perl::use>d.
     @@Param:
       @@@Name: charClassName
-      @@@Type:
-        lang:Perl::ManakaiDOM:all
+      @@@Type: DOMString
       @@@enDesc:
         The name of the character class.
     @@Return:
       @@@PerlDef:
+        @@@@ForCheck: !pc|ForClass
+        @@@@@:
         $self->{<H::mn:node>}->{<H::pc:useCharClassName>}
              ->{$moduleName}->{$charClassName} = true;
+      @@@PerlDef:
+        @@@@ForCheck: pc|ForClass
+        @@@@@:
+          __DEEP{
+            __CODE{addNameListAttr::
+              $node => {$self},
+              $attrName => 'useCharClassName',
+              $newName => {$moduleName.'.'.$charClassName},
+            }__;
+          }__;
 
   @Method:
     @@Name: addRequirePerlModuleName
@@ -436,14 +626,25 @@ IFClsDef:
       <Perl::require>d by this code fragment.
     @@Param:
       @@@Name: moduleName
-      @@@Type:
-        Perl:package-name::ManakaiDOM:all
+      @@@Type: DOMString
       @@@enDesc:
         The name of the module package that should be <Perl::require>d.
     @@Return:
       @@@PerlDef:
+        @@@@ForCheck: !pc|ForClass
+        @@@@@:
         $self->{<H::mn:node>}->{<H::pc:requireModuleName>}
              ->{$moduleName} = true;
+      @@@PerlDef:
+        @@@@ForCheck: pc|ForClass
+        @@@@@:
+          __DEEP{
+            __CODE{addNameListAttr::
+              $node => {$self},
+              $attrName => 'requireModuleName',
+              $newName => {$moduleName},
+            }__;
+          }__;
 
   @Method:
     @@Name: addExceptionInterfacePackageName
@@ -451,14 +652,57 @@ IFClsDef:
       Adds a Perl exception interface into the list of Perl packages.
     @@Param:
       @@@Name: moduleName
-      @@@Type:
-        Perl:package-name::ManakaiDOM:all
+      @@@Type: DOMString
       @@@enDesc:
         The name of the interface package.
     @@Return:
       @@@PerlDef:
+        @@@@ForCheck: !pc|ForClass
+        @@@@@:
         $self->{<H::mn:node>}->{<H::pc:exceptionInterfaceName>}
              ->{$moduleName} = true;
+      @@@PerlDef:
+        @@@@ForCheck: pc|ForClass
+        @@@@@:
+          __DEEP{
+            __CODE{addNameListAttr::
+              $node => {$self},
+              $attrName => 'exceptionInterfaceName',
+              $newName => {$moduleName},
+            }__;
+          }__;
+
+  @ResourceDef:
+    @@ForCheck: pc|ForClass
+    @@QName: getNameListAttrR
+    @@rdf:type: DISPerl|BlockCode
+    @@PerlDef:
+      my @__nodes = ($node);
+      my %__result;
+      while (@__nodes) {
+        my $__cnode = shift @__nodes;
+        if ($__cnode-><AG::Node.nodeType> == <C::Node.ELEMENT_NODE> and
+            defined $__cnode-><AG::Node.namespaceURI> and
+            $__cnode-><AG::Node.namespaceURI> eq <Q::pc:>) {
+          for (split /\s+/, $__cnode-><M::Element.getAttributeNS>
+                               (<Q::pc:>, $attrName)) {
+            $__result{$_} = true;
+          }
+          push @__nodes, @{$__cnode-><AG::Node.childNodes>};
+        }
+      }
+      $result = [sort {$a cmp $b} keys %__result];
+  @ResourceDef:
+    @@ForCheck: pc|ForClass
+    @@QName: getNameListAttr
+    @@rdf:type: DISPerl|BlockCode
+    @@PerlDef:
+       my %__result;
+      for (split /\s+/,
+                 $node-><M::Element.getAttributeNS> (<Q::pc:>, $attrName)) {
+        $__result{$_} = true;
+      }
+      $result = [sort {$a cmp $b} keys %__result];
 
   @Method:
     @@Name: getUsePerlModuleNameList
@@ -466,13 +710,14 @@ IFClsDef:
       Returns a list of Perl modules names that is <Perl::use>d
       by this code fragment, including all descendant nodes. 
     @@Return:
-      @@@Type:
-        Perl:ARRAY::ManakaiDOM:all
+      @@@Type: DISPerl|ARRAY||ManakaiDOM|all
       @@@enDesc:
         A list of module names.  Note that the list is <EM::dead>; 
         any modification to it does not affect to the code fragment
         and vice versa.
       @@@PerlDef:
+        @@@@ForCheck: !pc|ForClass
+        @@@@@:
         my $list = {};
         my @node = ($self->{<H::mn:node>});
         while (my $node = shift @node) {
@@ -490,6 +735,16 @@ IFClsDef:
           }
         }
         $r = [grep {$list->{$_}} keys %$list];
+      @@@PerlDef:
+        @@@@ForCheck: pc|ForClass
+        @@@@@:
+          __DEEP{
+            __CODE{getNameListAttrR::
+              $node => {$self},
+              $attrName => 'useModuleName',
+              $result => {$r},
+            }__;
+          }__;
 
   @Method:
     @@Name: getUseCharClassNameList
@@ -497,13 +752,14 @@ IFClsDef:
       Returns a list of Perl character class names that is <Perl::use>d
       by this code fragment, including all descendant nodes. 
     @@Return:
-      @@@Type:
-        Perl:HASH::ManakaiDOM:all
+      @@@Type: DISPerl|HASH||ManakaiDOM|all
       @@@enDesc:
         A list of module names.  Note that the list is <EM::dead>; 
         any modification to it does not affect to the code fragment
         and vice versa.
       @@@PerlDef:
+        @@@@ForCheck: !pc|ForClass
+        @@@@@:
         my @node = ($self->{<H::mn:node>});
         while (my $node = shift @node) {
           next unless ref $node;
@@ -523,6 +779,21 @@ IFClsDef:
             push @node, (ref $n eq 'ARRAY' ? @$n : values %{$n || {}});
           }
         }
+      @@@PerlDef:
+        @@@@ForCheck: pc|ForClass
+        @@@@@:
+          my $mc;
+          __DEEP{
+            __CODE{getNameListAttrR::
+              $node => {$self},
+              $attrName => 'useCharClassName',
+              $result => {$mc},
+            }__;
+          }__;
+          for (@$mc) {
+            my ($m, $c) = split /\./, $_, 2;
+            $r->{$m}->{$c} = true;
+          }
 
   @Method:
     @@Name: getRequirePerlModuleNameList
@@ -530,13 +801,14 @@ IFClsDef:
       Returns a list of Perl modules names that is <Perl::require>d
       by this code fragment, including all descendant nodes. 
     @@Return:
-      @@@Type:
-        Perl:ARRAY::ManakaiDOM:all
+      @@@Type: DISPerl|ARRAY||ManakaiDOM|all
       @@@enDesc:
         A list of module names.  Note that the list is <EM::dead>; 
         any modification to it does not affect to the code fragment
         and vice versa.
       @@@PerlDef:
+        @@@@ForCheck: !pc|ForClass
+        @@@@@:
         my $list = {};
         my @node = ($self->{<H::mn:node>});
         while (my $node = shift @node) {
@@ -554,6 +826,16 @@ IFClsDef:
           }
         }
         $r = [grep {$list->{$_}} keys %$list];
+      @@@PerlDef:
+        @@@@ForCheck: pc|ForClass
+        @@@@@:
+          __DEEP{
+            __CODE{getNameListAttrR::
+              $node => {$self},
+              $attrName => 'requireModuleName',
+              $result => {$r},
+            }__;
+          }__;
 
   @Method:
     @@Name: getExceptionInterfacePackageNameList
@@ -561,13 +843,14 @@ IFClsDef:
       Returns a list of Perl exception interface package names 
       by this code fragment, including all descendant nodes. 
     @@Return:
-      @@@Type:
-        DISPerl:ARRAY::ManakaiDOM:all
+      @@@Type: DISPerl|ARRAY||ManakaiDOM|all
       @@@enDesc:
         A list of package names.  Note that the list is <EM::dead>; 
         any modification to it does not affect to the code fragment
         and vice versa.
       @@@PerlDef:
+        @@@@ForCheck: !pc|ForClass
+        @@@@@:
         my $list = {};
         my @node = ($self->{<H::mn:node>});
         while (my $node = shift @node) {
@@ -585,6 +868,16 @@ IFClsDef:
           }
         }
         $r = [grep {$list->{$_}} keys %$list];
+      @@@PerlDef:
+        @@@@ForCheck: pc|ForClass
+        @@@@@:
+          __DEEP{
+            __CODE{getNameListAttrR::
+              $node => {$self},
+              $attrName => 'exceptionInterfaceName',
+              $result => {$r},
+            }__;
+          }__;
 
   @Method:
     @@Name: disAddRequireURI
@@ -593,14 +886,25 @@ IFClsDef:
       resources of this code fragment.
     @@Param:
       @@@Name: uriArg
-      @@@Type:
-        DISLang:String::ManakaiDOM:all
+      @@@Type: DOMString
       @@@enDesc:
         The URI reference of the resource to add.
     @@Return:
       @@@PerlDef:
+        @@@@ForCheck: !pc|ForClass
+        @@@@@:
         $self->{<H::mn:node>}->{<H::pc:requireResourceURI>}
              ->{$uriArg} = true;
+      @@@PerlDef:
+        @@@@ForCheck: pc|ForClass
+        @@@@@:
+          __DEEP{
+            __CODE{addNameListAttr::
+              $node => {$self},
+              $attrName => 'requireResourceURI',
+              $newName => {$uriArg},
+            }__;
+          }__;
 
   @Method:
     @@Name: disGetRequireURIList
@@ -608,13 +912,14 @@ IFClsDef:
       Returns a list of <QUOTE::dis> resource URI references that is
       <Perl::require>d by this code fragment, including all descendant nodes. 
     @@Return:
-      @@@Type:
-        Perl:ARRAY::ManakaiDOM:all
+      @@@Type: DISPerl|ARRAY||ManakaiDOM|all
       @@@enDesc:
         A list of resource URI references.  Note that the list is <EM::dead>; 
         any modification to it does not affect to the code fragment
         and vice versa.
       @@@PerlDef:
+        @@@@ForCheck: !pc|ForClass
+        @@@@@:
         my $list = {};
         my @node = ($self->{<H::mn:node>});
         while (my $node = shift @node) {
@@ -632,6 +937,26 @@ IFClsDef:
           }
         }
         $r = [grep {$list->{$_}} keys %$list];
+      @@@PerlDef:
+        @@@@ForCheck: pc|ForClass
+        @@@@@:
+          __DEEP{
+            __CODE{getNameListAttrR::
+              $node => {$self},
+              $attrName => 'requireResourceURI',
+              $result => {$r},
+            }__;
+          }__;
+
+  @Method:
+    @@ForCheck: pc|ForClass
+    @@Operator: DISPerl|CloneMethod
+    @@Return:
+      @@@Type: PerlCode
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><M::Node.cloneNode> (true);
+        }__;
 ##PerlCode
 
 PropDef:
@@ -705,19 +1030,31 @@ PropDef:
   @enDesc:
     Node type. 
 
-IFClsDef:
+ElementTypeBinding:
+  @Name: ETQName
+  @ElementType:
+    dis:AppName
+  @ShadowContent:
+    @@ForCheck: s|ForML
+    @@ContentType: DISCore|QName
+
+IFClsETDef:
   @IFQName: PerlFile
   @ClsQName: ManakaiPerlFile
+  @CQName: ManakaiPCFile
+  @ETQName: pc|file
 
   @IFISA: PerlCode
 
   @IFISA: PerlCodeStatements
   @ClsISA: ManakaiPerlStatementContainer
+  @CISA: ManakaiPCCodeStatements
 
   @enDesc:
     Perl source code files.
 
   @IntMethod:
+    @@ForCheck: !pc|ForClass
     @@Name:newObject
     @@ManakaiDOM:isStatic:1
     @@Description:
@@ -759,16 +1096,16 @@ IFClsDef:
       Appends a new package scope block. 
     @@Param:
       @@@Name: packageName
-      @@@Type:
-        Perl:package-name::ManakaiDOM:all
+      @@@Type: DOMString
       @@@enDesc:
         The fully-qualified name of the package to create. 
     @@Return:
       @@@Type: PerlPackage
-      @@@caType: ManakaiPerlPackageScope
       @@@enDesc:
         The newly created package scope object. 
       @@@PerlDef:
+        @@@@ForCheck: !pc|ForClass
+        @@@@@:
         $r = <ClassM::ManakaiPerlPackageScope.newObject>;
         $r->{<H::pc:packageName>} = $packageName;
         $self->{<H::mn:node>}
@@ -776,9 +1113,18 @@ IFClsDef:
                             .importTree> ($r);
         push @{$self->{<H::mn:node>}->{<H::pc:childNodes>}}, $r;
         $r->{<H::pc:parent>} = $self->{<H::mn:node>};
-        __CODE{ManakaiNode:getNewReference::
+        __CODE{ManakaiNode:getNewReference||ManakaiDOM|Perl::
                  $object => $r, $ref => $r,
                  $class => {<ClassName::ManakaiPerlPackageScope>}}__;
+      @@@PerlDef:
+        @@@@ForCheck: pc|ForClass
+        @@@@@:
+          __DEEP{
+            $r = $self-><AG::Node.ownerDocument>-><M::Document.createElementNS>
+                                                          (<Q::pc:>, 'package');
+            $r-><AS::PerlPackage.packageName> ($packageName);
+            $self-><M::Node.appendChild> ($r);
+          }__;
 
   @Method:
     @@Name: appendPackage
@@ -787,7 +1133,6 @@ IFClsDef:
     @@Param:
       @@@Name: codeArg
       @@@Type: PerlPackage
-      @@@caType: ManakaiPerlPackageScope
       @@@enDesc:
         The package to append.
     @@Return:
@@ -797,6 +1142,8 @@ IFClsDef:
           An attempt is made to set a subroutine that is 
           already used elsewhere. 
       @@@PerlDef:
+        @@@@ForCheck: !pc|ForClass
+        @@@@@:
         my $packobj = $codeArg->{<H::mn:node>};
         if ($packobj->{<H::pc:parent>}) {
           __EXCEPTION{IN_USE_NODE_ERR::
@@ -809,57 +1156,19 @@ IFClsDef:
                             .importTree> ($packobj);
         push @{$self->{<H::mn:node>}->{<H::pc:childNodes>}}, $packobj;
         $packobj->{<H::pc:parent>} = $self->{<H::mn:node>};
-
-  @Method:
-    @@Name: getFirstPackage
-    @@enDesc:
-      Gets the first package scope block of a name. 
-    @@Param:
-      @@@Name: packageName
-      @@@@Type:
-        Perl:package-name::ManakaiDOM:all
-      @@@@enDesc:
-        The fully-qualified name of the package to get. 
-    @@NamedParam:
-      @@@Name: makeNewPackage
-      @@@Type:
-        DOMMain:boolean::ManakaiDOM:all
-      @@@enDesc:
-        Whether a new package scope object should be created if 
-        no package of <P::packageName> found. 
-      @@@TrueCase:
-        @@@@enDesc:
-          Makes a new object if not found. 
-      @@@FalseCase:
-        @@@@enDesc:
-          Don't make a new object. 
-    @@Return:
-      @@@Type: PerlPackage
-      @@@caType: ManakaiPerlPackageScope
-      @@@enDesc:
-        The first package scope object whose name is equal to 
-        <P::packageName>.
-      @@@nullCase:
-        @@@@enDesc:
-          There is no <P::packageName> package object and 
-          the <P::makeNewPackage> parameter is set to <DOM::false>. 
       @@@PerlDef:
-        for my $cn (@{$self->{<H::mn:node>}->{<H::pc:childNodes>}}) {
-          if ($cn->{<H::pc:nodeType>} eq 'package' and
-              $cn->{<H::pc:packageName>} eq $packageName) {
-            $r = $cn;
-            last;
+        @@@@ForCheck: pc|ForClass
+        @@@@@:
+          if ($codeArg-><AG::Node.parentNode>) {
+            __EXCEPTION{IN_USE_NODE_ERR::
+              pc:childNode => {$codeArg},
+              MDOMX:param-name => 'codeArg',
+            }__;
           }
-        }
-        if ($r) {
-          __CODE{ManakaiNode:getNewReference::
-                   $object => $r, $ref => $r,
-                   $class => {<ClassName::ManakaiPerlPackageScope>}}__;
-        } elsif ($makeNewPackage) {
           __DEEP{
-            $r = $self-><M::ManakaiPerlFile.appendNewPackage> ($packageName);
+            $self-><AG::Node.ownerDocument>-><M::Document.adoptNode> ($codeArg);
+            $self-><M::Node.appendChild> ($codeArg);
           }__;
-        }
 
   @Method:
     @@Name: getLastPackage
@@ -886,7 +1195,6 @@ IFClsDef:
           Don't make a new object. 
     @@Return:
       @@@Type: PerlPackage
-      @@@caType: ManakaiPerlPackageScope
       @@@enDesc:
         The last package scope object whose name is equal to 
         <P::packageName>.
@@ -895,6 +1203,8 @@ IFClsDef:
           There is no <P::packageName> package object and 
           the <P::makeNewPackage> parameter is set to <DOM::false>. 
       @@@PerlDef:
+        @@@@ForCheck: !pc|ForClass
+        @@@@@:
         for my $cn (reverse @{$self->{<H::mn:node>}
                                    ->{<H::pc:childNodes>}}) {
           if ($cn->{<H::pc:nodeType>} eq 'package' and
@@ -904,7 +1214,7 @@ IFClsDef:
           }
         }
         if ($r) {
-          __CODE{ManakaiNode:getNewReference::
+          __CODE{ManakaiNode:getNewReference||ManakaiDOM|Perl::
                    $object => $r, $ref => $r,
                    $class => {<ClassName::ManakaiPerlPackageScope>}}__;
         } elsif ($makeNewPackage) {
@@ -912,61 +1222,81 @@ IFClsDef:
             $r = $self-><M::ManakaiPerlFile.appendNewPackage> ($packageName);
           }__;
         }
+      @@@PerlDef:
+        @@@@ForCheck: pc|ForClass
+        @@@@@:
+          __DEEP{
+            for my $child (@{$self-><AG::Node.childNodes>}) {
+              if ($child-><AG::Node.nodeType> == <C::Node.ELEMENT_NODE> and
+                  defined $child-><AG::Node.namespaceURI> and
+                  $child-><AG::Node.namespaceURI> eq <Q::pc:> and
+                  $child-><AG::Node.localName> eq 'package') {
+                if ($child-><M::Element.getAttributeNS>
+                               (<Q::pc:>, 'packageName') eq $packageName) {
+                  $r = $child;
+                }
+              }
+            }
+            if (not $r and $makeNewPackage) {
+              $r = $self-><M::PerlFile.appendNewPackage> ($packageName);
+            }
+          }__;
 
-  @Attr:
+  @ATTR:
     @@Name: sourceFile
+    @@ATTRQName: pc|sourceFile
     @@enDesc:
       The file name of the source file from which this 
       Perl code is primary generated. 
+    @@ReflectCDATA:
     @@Get:
-      @@@Type:
-        DISLang:String::ManakaiDOM:all
       @@@disDef:
         @@@@GetProp: sourceFile
+        @@@@ForCheck: !pc|ForClass
     @@Set:
-      @@@Type:
-        DISLang:String::ManakaiDOM:all
       @@@disDef:
         @@@@SetProp: sourceFile
+        @@@@ForCheck: !pc|ForClass
 
-  @Attr:
+  @ATTR:
     @@Name: sourceModule
+    @@ATTRQName: pc|sourceModule
     @@enDesc:
       The name URI reference of the source module that this package defines.
+    @@ReflectCDATA:
     @@Get:
-      @@@Type:
-        DISLang:String::ManakaiDOM:all
       @@@disDef:
         @@@@GetProp: sourceModule
+        @@@@ForCheck: !pc|ForClass
     @@Set:
-      @@@Type:
-        DISLang:String::ManakaiDOM:all
       @@@disDef:
         @@@@SetProp: sourceModule
+        @@@@ForCheck: !pc|ForClass
 
-  @Attr:
+  @ATTR:
     @@Name: sourceFor
+    @@ATTRQName: pc|sourceFor
     @@enDesc:
       The URI reference of the source module <QUOTE::for> for which this 
       package is. 
+    @@ReflectCDATA:
     @@Get:
-      @@@Type:
-        DISLang:String::ManakaiDOM:all
       @@@disDef:
         @@@@GetProp: sourceFor
+        @@@@ForCheck: !pc|ForClass
     @@Set:
-      @@@Type:
-        DISLang:String::ManakaiDOM:all
       @@@disDef:
         @@@@SetProp: sourceFor
+        @@@@ForCheck: !pc|ForClass
 
   @ToStringMethod:
     @@Return:
-      @@@Type:
-        DISLang:String::ManakaiDOM:all
+      @@@Type: DOMString
       @@@enDesc:
         The Perl code generated. 
       @@@PerlDef:
+        @@@@ForCheck: !pc|ForClass
+        @@@@@:
         __DEEP{
           my $node = $self->{<H::mn:node>};
           ## -- Header
@@ -1029,13 +1359,81 @@ IFClsDef:
                   (q[License: <].$node->{<H::dis:License>}.qq[>\n]);
           $r .= qq<1;\n>;
         }__;
+      @@@PerlDef:
+        @@@@ForCheck: pc|ForClass
+        @@@@@:
+          __DEEP{
+            ## -- Header
+            $r = qq<#!/usr/bin/perl \n>;
+            $r .= <ClassM::ManakaiPerlCodeImplementation.perlComment>
+                    (q<This file is automatically generated>);
+            $r .= <ClassM::ManakaiPerlCodeImplementation.perlComment>
+                   (q<	at >.<ClassM::ManakaiPerlCodeImplementation
+                                             .rfc3339DateTime> (time).q<,>);
+            $r .= <ClassM::ManakaiPerlCodeImplementation.perlComment>
+                    (q<	from file ">.$self-><AG::PerlFile.sourceFile>.q<",>);
+            $r .= <ClassM::ManakaiPerlCodeImplementation.perlComment>
+                    (q[	module <].$self-><AG::PerlFile.sourceModule>.q[>,]);
+            $r .= <ClassM::ManakaiPerlCodeImplementation.perlComment>
+                    (q[	for <].$self-><AG::PerlFile.sourceFor>.q[>.]);
+            $r .= <ClassM::ManakaiPerlCodeImplementation.perlComment>
+                    (q<Don't edit by hand!>);
+            $r .= qq<use strict;\n>;
+            $self-><AS::PerlFile.currentPackage> ('main');
+            $self-><AS::PerlFile.currentChunkNumber> (0);
+
+            ## -- Requires
+            my $req = $self-><M::PerlCode.getRequirePerlModuleNameList>;
+            for my $pack (sort {$a cmp $b} @$req) {
+              $r .= qq<require $pack;\n>;
+            }
+
+            ## -- Packages and global objects
+            my $pack = {};
+            for my $child (@{$self-><AG::Node.childNodes>}) {
+              $r .= $child->stringify;
+              if ($child-><AG::Node.nodeType> == <C::Node.ELEMENT_NODE> and
+                  defined $child-><AG::Node.namespaceURI> and
+                  $child-><AG::Node.namespaceURI> eq <Q::pc:> and
+                  $child-><AG::Node.localName> eq 'package') {
+                for my $ipack (@{$child-><M::PerlPackage
+                                             .getImplementPackageNameList>}) {
+                  $pack->{$ipack} ||= true; # not defined
+                }
+                $pack->{$child-><AG::PerlPackage.packageName>} = []; # defined
+              }
+            }
+
+            ## -- Exception interface packages
+            for (sort {$a cmp $b} @{$self-><M::PerlCode
+                                     .getExceptionInterfacePackageNameList>}) {
+              next if ref $pack->{$_};
+              $pack->{$_} = [];
+              $r .= sprintf q<push @%s::ISA, 'Message::Util::Error' >.
+                            q<unless @%s::ISA;%s>, $_, $_, "\n";
+            }
+
+            ## -- Enables interface packages
+            my @packs = map {'$' . $_ . '::'}
+                        sort {$a cmp $b}
+                        grep {not ref $pack->{$_} and $pack->{$_}}
+                        keys %$pack;
+            $r .= q<for (>. join (', ', @packs) . qq<){}\n> if @packs;
+
+            ## -- Footer
+            $r .= <ClassM::ManakaiPerlCodeImplementation.perlComment>
+                    (q[License: <].$self-><AG::PerlFile.licenseURI>.qq[>\n]);
+            $r .= qq<1;\n>;
+          }__;
 
   @Attr:
     @@Name: currentPackage
     @@enDesc:
       The current Perl package (used in stringify method).
-    @@Type:
-      Perl:package-name::ManakaiDOM:all
+
+      {NOTE:: This attribute is not preserved by the <Perl::clone> operation.
+      }
+    @@Type: DOMString
     @@Get:
       @@@disDef:
         @@@@GetProp: currentPackage
@@ -1047,8 +1445,10 @@ IFClsDef:
     @@Name: currentChunkNumber
     @@enDesc:
       The current code chunk number (used in stringify method). 
-    @@Type:
-      DOMMain:unsigned-long::ManakaiDOM:all
+  
+      {NOTE:: This attribute is not preserved by the <Perl::clone> operation.
+      }
+    @@Type: idl|unsignedLong||ManakaiDOM|all
     @@Get:
       @@@disDef:
         @@@@GetProp: currentChunk
@@ -1062,27 +1462,28 @@ IFClsDef:
       Increments the current chunk number of this file 
       and returns it. 
     @@Return:
-      @@@Type:
-        DOMMain:unsigned-long::ManakaiDOM:all
+      @@@Type: idl|unsignedLong||ManakaiDOM|all
       @@@enDesc:
         The next chunk number.
       @@@PerlDef:
         $r = ++$self->{<H::mn:node>}->{<H::pc:currentChunk>};
   
-  @Attr:
+  @ATTR:
     @@Name: licenseURI
+    @@ATTRQName: dis|License
     @@enDesc:
       The license term URI reference for this code. 
-    @@Type:
-      DISLang:String::ManakaiDOM:all
+    @@ReflectCDATA:
     @@Get:
       @@@disDef:
         @@@@GetProp: 
           dis:License
+        @@@@ForCheck: !pc|ForClass
     @@Set:
       @@@disDef:
         @@@@SetProp:
           dis:License
+        @@@@ForCheck: !pc|ForClass
 ##PerlFile
 
 PropDef:
@@ -1115,31 +1516,130 @@ PropDef:
   @enDesc:
     The current code chunk (used for stringify). 
 
-IFClsDef:
+ElementTypeBinding:
+  @Name: ReflectCDATA
+  @ElementType:
+    dis:Type
+  @ShadowContent:
+    @@@: DOMString
+  @ShadowSibling:
+    @@actualType: CDATADOMString
+
+ResourceDef:
+  @QName: DOMString
+  @For: ManakaiDOM|Perl
+  @AliasFor: DOMMain|DOMString||ManakaiDOM|ManakaiDOMLatest
+
+ReflectTypeDef:
+  @QName: CDATADOMString
+  @enDesc:
+    <IF::DOMMain:DOMString> for DOM attributes reflecting
+    <SGML::CDATA> element attributes.
+  @rdfs:subClassOf: DOMString
+  @ResourceDef:
+    @@rdf:type: DOMMain|ReflectGet
+    @@enDesc:
+      The DOM attribute returns the current value of the element attribute
+      in a transparent, case-sensitive manner.
+      \
+      If the element attribute is absent, the default value, if any,
+      or an empty string is returned.
+    @@PerlCDef:
+      __DEEP{
+        $r = $self-><M::Element.getAttributeNS> ($NS_URI_NO_NULL, $LOCAL_NAME);
+      }__;
+  @ResourceDef:
+    @@QName: CDATADOMStringSet
+    @@rdf:type: DOMMain|ReflectSet
+    @@enDesc:
+      The corresponding element attribute is set to the given value,
+      in a transparent, case-sensitive manner.
+    @@ImplNote:
+      @@@lang:en
+      @@@@: 
+        What will happen if the <DOM::null> value is given?
+    @@PerlCDef:
+      __DEEP{
+        if (defined $given) {
+          $self-><M::Element.setAttributeNS> ($NS_URI_NO_NULL, $LOCAL_NAME
+                                              => $given);
+        } else {
+          $self-><M::Element.removeAttributeNS> ($NS_URI_NO_NULL, $LOCAL_NAME);
+        }
+      }__;
+
+ElementTypeBinding:
+  @Name: ReflectTypeDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|DataType
+    @@ForCheck: !ManakaiDOM|IDL
+    @@For: ManakaiDOM|DOM
+
+ElementTypeBinding:
+  @Name: ATTR
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@: s|Attribute
+      @@@ForCheck: s|ForML
+    @@rdf:type:
+      @@@@: DISLang|Attribute
+      @@@ForCheck: ManakaiDOM|ForClass
+    @@rdf:type:
+      @@@@: DISLang|Attribute
+      @@@ForCheck: ManakaiDOM|ForIF
+    @@DocAttr:
+      @@@@: ||+||s|ForML
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass
+    @@DocAttr:
+      @@@@: ||+||s|ForML
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForIF
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM
+
+ElementTypeBinding:
+  @Name: ATTRQName
+  @ElementType:
+    dis:AppName
+  @ShadowContent:
+    @@ForCheck: s|ForML
+    @@ContentType: DISCore|QName
+
+IFClsETDef:
   @IFQName: PerlPackage
   @ClsQName: ManakaiPerlPackageScope
+  @CQName: ManakaiPCPackage
+  @ETQName: pc|package
 
   @IFISA: PerlCode
 
   @IFISA: PerlCodeStatements
   @ClsISA: ManakaiPerlStatementContainer
+  @CISA: ManakaiPCCodeStatements
 
   @enDesc:
     A Perl lexical lines for which a <Perl::package> declaration
     in effect. 
 
-  @Attr:
+  @ATTR:
     @@Name: packageName
-    @@Type:
-      Perl:package-name::ManakaiDOM:all
+    @@ATTRQName: pc|packageName
+    @@ReflectCDATA:
     @@enDesc:
       The fully-qualified package name. 
     @@Get: 
       @@@disDef:
         @@@@GetProp: packageName
+        @@@@ForCheck: !pc|ForClass
+    @@Set:
+      @@@ForCheck: !pc|ForClassCompat
 
   @IntMethod:
-    @@ForCheck: ManakaiDOM|ForClass
+    @@ForCheck: ManakaiDOM|ForClass !pc|ForClass
     @@Name:newObject
     @@ManakaiDOM:isStatic:1
     @@Description:
@@ -1196,7 +1696,6 @@ IFClsDef:
         if it is not exist, or not. 
     @@Return:
       @@@Type: PerlSub
-      @@@caType: ManakaiPerlSub
       @@@enDesc:
         The subroutine object. 
       @@@nullCase:
@@ -1205,6 +1704,8 @@ IFClsDef:
           the <P::makeNewNode> parameter is set to <DOM::false> or
           the subroutine is defined as an alias. 
       @@@PerlDef:
+        @@@@ForCheck: !pc|ForClass
+        @@@@@:
         if ($self->{<H::mn:node>}->{<H::pc:sub>}->{$subName}) {
           $r = ref $self->{<H::mn:node>}->{<H::pc:sub>}->{$subName}
              ? $self->{<H::mn:node>}->{<H::pc:sub>}->{$subName} : null;
@@ -1218,10 +1719,35 @@ IFClsDef:
           $r->{<H::pc:localName>} = $subName;
         }
         if ($r) {
-          __CODE{ManakaiNode:getNewReference::
+          __CODE{ManakaiNode:getNewReference||ManakaiDOM|Perl::
                    $object => $r, $ref => $r,
                    $class => {<ClassName::ManakaiPerlSub>}}__;
         }
+      @@@PerlDef:
+        @@@@ForCheck: pc|ForClass
+        @@@@@:
+          __DEEP{
+            F: {
+              for my $child (@{$self-><AG::Node.childNodes>}) {
+                if ($child-><AG::Node.nodeType> == <C::Node.ELEMENT_NODE> and
+                    defined $child-><AG::Node.namespaceURI> and
+                    $child-><AG::Node.namespaceURI> eq <Q::pc:> and
+                    $child-><AG::Node.localName> eq 'sub') {
+                  if ($child-><M::PerlSub.hasPerlName> ($subName)) {
+                    $r = $child;
+                    last F;
+                  }
+                }
+              }
+              if ($makeNewNode) {
+                $r = $self-><AG::Node.ownerDocument>
+                          -><M::Document.createElementNS>
+                               (<Q::pc:>, 'sub');
+                $r-><M::PerlSub.addPerlName> ($subName);
+                $self-><M::Node.appendChild> ($r);
+              }
+            } # F
+          }__;
 
   @Method:
     @@Name: setSub
@@ -1235,7 +1761,7 @@ IFClsDef:
         The name of the subroutine. 
         \
         {NOTE:: The <P::subName> value must be equal to the 
-                <A::ManakaiPerlSub.localName> of the <P::subArg>.
+                <A::PerlSub.pcLocalName> of the <P::subArg>.
 
         }
     @@Param:
@@ -1251,6 +1777,8 @@ IFClsDef:
           An attempt is made to set a subroutine that is 
           already used elsewhere. 
       @@@PerlDef:
+        @@@@ForCheck: !pc|ForClass
+        @@@@@:
         my $ops = $self->{<H::mn:node>}->{<H::pc:sub>};
         if (ref $ops->{$subName}) {
           CORE::delete $ops->{<H::pc:parent>};
@@ -1269,9 +1797,38 @@ IFClsDef:
                          = $self->{<H::mn:node>};
 
   @Method:
+    @@ForCheck: !pc|ForClassCompat
+    @@Name: setSubNode
+    @@enDesc:
+      Sets a subrotine. 
+    @@Param:
+      @@@Name: subArg
+      @@@Type: PerlSub
+      @@@caType: ManakaiPerlSub
+      @@@enDesc:
+        The subroutine object.
+    @@Return:
+      @@@RaiseException:
+        @@@@@:IN_USE_NODE_ERR
+        @@@@enDesc:
+          An attempt is made to set a subroutine that is 
+          already used elsewhere. 
+      @@@PerlDef:
+          __DEEP{
+            if ($subArg-><AG::Node.parentNode>) {
+              __UNDEEP{__EXCEPTION{IN_USE_NODE_ERR::
+                pc:childNode => {$subArg},
+              }__}__;
+            }
+            $self-><AG::Node.ownerDocument>-><M::Document.adoptNode> ($subArg);
+            $self-><M::Node.appendChild> ($subArg);
+          }__;
+
+  @Method:
+    @@ForCheck: pc|ForClassCompat
     @@Name: getSubAliasName
     @@enDesc:
-      Gets the real name of a subroutine. 
+      Gets the secondary name of a subroutine. 
     @@Param:
       @@@Name: subName
       @@@Type:
@@ -1300,6 +1857,7 @@ IFClsDef:
         }
 
   @Method:
+    @@ForCheck: pc|ForClassCompat
     @@Name: setSubAliasName
     @@enDesc:
       Sets a subroutine name as an alias of another subroutine. 
@@ -1355,6 +1913,8 @@ IFClsDef:
           the specified operator is overloaded by specifying method name. 
       @@@UnknownOperatorException:
       @@@PerlDef:
+        @@@@ForCheck: !pc|ForClass
+        @@@@@:
         unless (<Code::operatorNameList>->{$opName}) {
           __EXCEPTION{UNSUPPORTED_OPERATOR_ERR::
             pc:operator => {$opName},
@@ -1374,12 +1934,44 @@ IFClsDef:
           $r->{<H::pc:parent>} = $self->{<H::mn:node>};
         }
         if ($r) {
-          __CODE{ManakaiNode:getNewReference::
+          __CODE{ManakaiNode:getNewReference||ManakaiDOM|Perl::
                    $object => $r, $ref => $r,
                    $class => {<ClassName::ManakaiPerlSub>}}__;
         }
+      @@@PerlDef:
+        @@@@ForCheck: pc|ForClass
+        @@@@@:
+          unless (<Code::operatorNameList>->{$opName}) {
+            __EXCEPTION{UNSUPPORTED_OPERATOR_ERR::
+              pc:operator => {$opName},
+              MDOMX:param-name => 'opName',
+            }__;
+          }
+          __DEEP{
+            F: {
+              for my $child (@{$self-><AG::Node.childNodes>}) {
+                if ($child-><AG::Node.nodeType> == <C::Node.ELEMENT_NODE> and
+                    defined $child-><AG::Node.namespaceURI> and
+                    $child-><AG::Node.namespaceURI> eq <Q::pc:> and
+                    $child-><AG::Node.localName> eq 'sub') {
+                  if ($child-><M::PerlSub.hasPerlOperator> ($opName)) {
+                    $r = $child;
+                    last F;
+                  }
+                }
+              }
+              if ($makeNewNode) {
+                $r = $self-><AG::Node.ownerDocument>
+                          -><M::Document.createElementNS>
+                               (<Q::pc:>, 'sub');
+                $r-><M::PerlSub.addPerlOperator> ($opName);
+                $self-><M::Node.appendChild> ($r);
+              }
+            } # F
+          }__;
 
   @Method:
+    @@ForCheck: pc|ForClassCompat
     @@Name: setOverloadSub
     @@enDesc:
       Sets an overloading subrotine. 
@@ -1428,6 +2020,7 @@ IFClsDef:
 
 
   @Method:
+    @@ForCheck: pc|ForClassCompat
     @@Name: getOverloadMethodName
     @@enDesc:
       Gets an overloading method name. 
@@ -1458,6 +2051,7 @@ IFClsDef:
         }
 
   @Method:
+    @@ForCheck: pc|ForClassCompat
     @@Name: setOverloadMethodName
     @@enDesc:
       Sets an overloading method name. 
@@ -1499,13 +2093,38 @@ IFClsDef:
       Adds a class package that this class inherits. 
     @@Param:
       @@@Name: packageName
-      @@@Type:
-        Perl:package-name::ManakaiDOM:all
+      @@@Type: DOMString
       @@@enDesc:
         The name of package to add. 
     @@Return:
       @@@PerlDef:
+        @@@@ForCheck: !pc|ForClass
+        @@@@@:
         push @{$self->{<H::mn:node>}->{<H::dis:ISA>}}, $packageName;
+      @@@PerlDef:
+        @@@@ForCheck: pc|ForClass
+        @@@@@:
+          __DEEP{
+            $self-><M::Element.setAttributeNS>
+              (<Q::pc:>, 'pc:extends' =>
+               join ' ', (split /\s+/, $self-><M::Element.getAttributeNS>
+                                           (<Q::pc:>, 'extends')), $packageName);
+          }__;
+
+  @Method:
+    @@ForCheck: !pc|ForClassCompat
+    @@Name: getISAPackageNameList
+    @@enDesc:
+      Returns a list of names of packages extended by the package.
+    @@Return:
+      @@@Type: DISPerl|ARRAY||ManakaiDOM|all
+      @@@enDesc:
+        An ordered snapshot list of superpackage names.
+      @@@PerlDef:
+        __DEEP{
+          $r = [split /\s+/, $self-><M::Element.getAttributeNS>
+                                (<Q::pc:>, 'extends')];
+        }__;
 
   @Method:
     @@Name: addImplementPackage
@@ -1513,21 +2132,51 @@ IFClsDef:
       Adds a interface package that this class implements. 
     @@Param:
       @@@Name: packageName
-      @@@Type:
-        Perl:package-name::ManakaiDOM:all
+      @@@Type: DOMString
       @@@enDesc:
         The name of package to add.
     @@Return:
       @@@PerlDef:
+        @@@@ForCheck: !pc|ForClass
+        @@@@@:
         $self->{<H::mn:node>}->{<H::dis:Implement>}->{$packageName} = true;
+      @@@PerlDef:
+        @@@@ForCheck: pc|ForClass
+        @@@@@:
+          __DEEP{
+            __CODE{addNameListAttr::
+              $node => {$self},
+              $attrName => 'implements',
+              $newName => {$packageName},
+            }__;
+          }__;
+
+  @Method:
+    @@ForCheck: !pc|ForClassCompat
+    @@Name: getImplementPackageNameList
+    @@enDesc:
+      Returns a list of names of packages implemented by the package.
+    @@Return:
+      @@@Type: DISPerl|ARRAY||ManakaiDOM|all
+      @@@enDesc:
+        An unordered snapshot list of interface packages.
+      @@@PerlDef:
+          __DEEP{
+            __CODE{getNameListAttr::
+              $node => {$self},
+              $attrName => 'implements',
+              $result => {$r},
+            }__;
+          }__;
 
   @ToStringMethod:
     @@Return:
-      @@@Type:
-        DISLang:String::ManakaiDOM:all
+      @@@Type: DOMString
       @@@enDesc:
         Perl code. 
       @@@PerlDef:
+        @@@@ForCheck: !pc|ForClass
+        @@@@@:
         my $file = $self-><AG::ManakaiPerlCodeFragment.parentNode>;
         my $node = $self->{<H::mn:node>};
 
@@ -1576,7 +2225,7 @@ IFClsDef:
           my $cno = $node->{<H::pc:sub>}->{$cnk};
           if (ref $cno) {
             my $cn;
-            __CODE{ManakaiNode:getWeakReference::
+            __CODE{ManakaiNode:getWeakReference||ManakaiDOM|Perl::
                      $object => $cno, $ref => $cn,
                      $class => {<ClassName::ManakaiPerlSub>}}__;
             $r .= $cn->stringify;
@@ -1591,7 +2240,7 @@ IFClsDef:
           my $cno = $node->{<H::dis2pm:operator>}->{$cnk};
           if (ref $cno) {
             my $cn;
-            __CODE{ManakaiNode:getWeakReference::
+            __CODE{ManakaiNode:getWeakReference||ManakaiDOM|Perl::
                      $object => $cno, $ref => $cn,
                      $class => {<ClassName::ManakaiPerlSub>}}__;
             $op .= <ClassM::ManakaiPerlCodeImplementation.perlLiteral> ($cnk)
@@ -1621,6 +2270,125 @@ IFClsDef:
                        keys %{$node->{<H::pc:export>}}]) . qq[);\n];
           $r .= q[use Exporter; push our @ISA, 'Exporter';] . qq[\n];
         }
+      @@@PerlDef:
+        @@@@ForCheck: pc|ForClass
+        @@@@@:
+          __DEEP{
+            my $file = $self-><AG::PerlCode.fileNode>;
+
+            ## Package name
+            my $pn = $self-><AG::PerlPackage.packageName>;
+            $r .= q<package > . $pn . ";\n";
+            $file-><AS::PerlFile.currentPackage> ($pn) if $file;
+
+            ## Package version
+            $r .= 'our $VERSION = '.
+                <ClassM::ManakaiPerlCodeImplementation.versionDateTime> (time).
+                ";\n";
+
+            ## Inheritance
+            my @isa = (@{$self-><M::PerlPackage.getISAPackageNameList>},
+                       sort {$a cmp $b} @{$self-><M::PerlPackage
+                                               .getImplementPackageNameList>});
+            if (@isa) {
+              $r .= 'push our @ISA, ' .
+                <ClassM::ManakaiPerlCodeImplementation.perlList> (\@isa) .
+                ";\n";
+            }
+
+            ## Use'ing modules
+            for my $pack (sort {$a cmp $b} @{$self-><M::PerlCode
+                                                 .getUsePerlModuleNameList>}) {
+              $r .= 'use ' . $pack . ";\n";
+            }
+
+            my $cls = $self-><M::PerlCode.getUseCharClassNameList>;
+            for my $pack (sort {$a cmp $b} keys %$cls) {
+              $r .= 'use ' . $pack . ' ' .
+                <ClassM::ManakaiPerlCodeImplementation.perlList>
+                   ([sort {$a cmp $b} grep {$cls->{$pack}->{$_}}
+                     keys %{$cls->{$pack}}]) . ";\n";
+            }
+
+            ## Package-scope objects
+            my $has_bool;
+            my $op = '';
+            for my $child (@{$self-><AG::Node.childNodes>}) {
+              if ($child-><AG::Node.nodeType> == <C::Node.ELEMENT_NODE> and
+                  defined $child-><AG::Node.namespaceURI> and
+                  $child-><AG::Node.namespaceURI> eq <Q::pc:>) {
+                my $ln = $child-><AG::Node.localName>;
+                if ($ln eq 'sub') {
+                  my $names = $child-><M::PerlSub.getPerlNameList>;
+                  my $ops = $child-><M::PerlSub.getPerlOperatorList>;
+                  if (@$names) {
+                    $r .= $child->stringify;
+                    if (@$names > 1) {
+                      $r .= sprintf q<*%s = \&%s;%s>,
+                                  $_, $names->[0], "\n" for @$names[1..$#$names];
+                    }
+                    for (@$ops) {
+                      $op .= sprintf q['%s' => '%s', %s],
+                                     $_ => $names->[0], "\n";
+                      $has_bool = true if $_ eq 'bool';
+                    }
+                  } else {
+                    my $v = $child->stringify;
+                    for (@$ops) {
+                      $op .= sprintf q['%s' => %s, %s], $_ => $v, "\n";
+                      $has_bool = true if $_ eq 'bool';
+                    }
+                  }
+                } else {
+                  $r .= $child->stringify;
+                }
+              } # pc:*
+            } # children 
+
+            if (length $op) {
+              $r .= "use overload \n";
+              $r .= "bool => sub () {1}, \n" unless $has_bool;
+              $r .= $op . "fallback => 1;\n";
+            }
+
+            ## -- Exports
+            my $xport = $self-><M::PerlPackage.getExportList>;
+            if (map {values %$_} values %$xport) {
+              $r .= q[our %EXPORT_TAG = (] . 
+                    <ClassM::ManakaiPerlCodeImplementation.perlList>
+                       ([map {$_ => [sort {$a cmp $b} keys %{$xport->{$_}}]}
+                         sort {$a cmp $b} grep {length}
+                         keys %$xport]) . qq[);\n];
+              $r .= q[our @EXPORT_OK = (] .
+                    <ClassM::ManakaiPerlCodeImplementation.perlList>
+                       ([map {sort {$a cmp $b} keys %{$xport->{$_}}}
+                         sort {$a cmp $b} keys %$xport]) . qq[);\n];
+              $r .= q[use Exporter; push our @ISA, 'Exporter';] . qq[\n];
+            }
+          }__;
+
+  @Method:
+    @@ForCheck: !pc|ForClassCompat
+    @@Name: getExportList
+    @@enDesc:
+      Returns a list of export tag and names.
+    @@Return:
+      @@@Type: DISPerl|HASH||ManakaiDOM|all
+      @@@enDesc:
+        Snapshot list of lists.
+      @@@PerlDef:
+          my $mc;
+          __DEEP{
+            __CODE{getNameListAttr::
+              $node => {$self},
+              $attrName => 'export',
+              $result => {$mc},
+            }__;
+          }__;
+          for (@$mc) {
+            my ($m, $c) = split /\./, $_, 2;
+            $r->{$m}->{$c} = true;
+          }
 
   @Method:
     @@Name: addExport
@@ -1628,8 +2396,7 @@ IFClsDef:
       Adds a name to the list of exported items (<Perl::@EXPORT_OK>).
     @@Param:
       @@@Name: exportTag
-      @@@Type:
-        lang:Perl::ManakaiDOM:all
+      @@@Type: DOMString
       @@@enDesc:
         The name of the tag (without <CHAR::COLON> prefix). 
         The <P::exportName> is added both to <Perl::@EXPORT_OK>
@@ -1639,14 +2406,25 @@ IFClsDef:
           The <P::exportName> is added only to the <Perl::@EXPORT_OK>.
     @@Param:
       @@@Name: exportName
-      @@@Type:
-        lang:Perl::ManakaiDOM:all
+      @@@Type: DOMString
       @@@enDesc:
         The name to be exported.
     @@Return:
       @@@PerlDef:
+        @@@@ForCheck: !pc|ForClass
+        @@@@@:
         $self->{<H::mn:node>}->{<H::pc:export>}
              ->{defined $exportTag ? $exportTag : ''}->{$exportName} = true;
+      @@@PerlDef:
+        @@@@ForCheck: pc|ForClass
+        @@@@@:
+          __DEEP{
+            __CODE{addNameListAttr::
+              $node => {$self},
+              $attrName => 'export',
+              $newName => {$exportTag.'.'.$exportName},
+            }__;
+          }__;
 ##PerlPackageScope
 
 PropDef:
@@ -1690,22 +2468,29 @@ ResourceDef:
                     nomethod 1
     ]}
 
-IFClsDef:
+IFClsETDef:
   @IFQName: PerlCodeStatements
   @ClsQName: ManakaiPerlStatementContainer
+  @CQName: ManakaiPCCodeStatements
+  @ETQName:
+    @@@: pc|statementContainer
+    @@ImplNote:
+      @@@lang:en
+      @@@@: Dummy.
 
   @IFISA: PerlCodeUnits
   @ClsISA: ManakaiPerlAnyContainer
+  @CISA: ManakaiPCCodeUnits
   @enDesc:
     A base class for node types that contains zero or more
     statements and/or blocks.
 
-  @Attr:
+  @ATTR:
     @@Name: sourceFile
+    @@ATTRQName: pc|sourceFile
     @@enDesc:
       The source file name of this fragment. 
-    @@Type:
-      DISLang:String::ManakaiDOM:all
+    @@ReflectCDATA:
     @@Get:
       @@@enDesc:
         Any string identifying the source. 
@@ -1713,56 +2498,64 @@ IFClsDef:
         @@@@enDesc: No source file name is set. 
       @@@disDef:
         @@@@GetProp: sourceFile
+        @@@@ForCheck: !pc|ForClass
     @@Set:
       @@@nullCase:
         @@@@enDesc: No (or unknown) source file. 
       @@@disDef:
         @@@@SetProp: sourceFile
+        @@@@ForCheck: !pc|ForClass
 
-  @Attr:
+  @ATTR:
     @@Name: sourceLine
+    @@ATTRQName: pc|sourceLine
     @@enDesc:
       Source file line number of the first line of this fragment. 
-    @@Type:
-      DOMMain:unsigned-long::ManakaiDOM:all
+    @@ReflectCDATA:
     @@Get:
       @@@disDef:
         @@@@GetProp: sourceLine
+        @@@@ForCheck: pc|ForClassCompat
     @@Set:
       @@@disDef:
         @@@@SetProp: sourceLine
+        @@@@ForCheck: pc|ForClassCompat
 
-  @Attr:
+  @ATTR:
     @@Name: currentSourceFile
+    @@ATTRQName: pc|currentSourceFile
     @@enDesc:
       The current source file name that is referred when 
       a code fragment is added. 
-    @@Type:
-      DISLang:String::ManakaiDOM:all
+    @@ReflectCDATA:
     @@Get:
       @@@nullCase:
         @@@@enDesc: No source file name is set. 
       @@@disDef:
         @@@@GetProp:currentSourceFile
+        @@@@ForCheck: pc|ForClassCompat
     @@Set:
       @@@nullCase:
         @@@@enDesc: No (or unknown) source file. 
       @@@disDef:
         @@@@SetProp:currentSourceFile
+        @@@@ForCheck: pc|ForClassCompat
 
-  @Attr:
+  @ATTR:
     @@Name: currentSourceLine
+    @@ATTRQName: pc|currentSourceLine
     @@enDesc:
       The current line number in source file that is referred when 
       a code fragment is added. 
-    @@Type:
-      DOMMain:unsigned-long::ManakaiDOM:all
+    @@ReflectCDATA:
     @@Get:
       @@@disDef:
         @@@@GetProp:currentSourceLine
+        @@@@ForCheck: pc|ForClassCompat
     @@Set:
       @@@disDef:
         @@@@SetProp:currentSourceLine
+        @@@@ForCheck: pc|ForClassCompat
 
   @Method:
     @@Name: appendCodeFragment
@@ -1786,6 +2579,8 @@ IFClsDef:
           An attempt is made to append a node that is 
           already used elsewhere. 
       @@@PerlDef:
+        @@@@ForCheck: !pc|ForClass
+        @@@@@:
         if ({
           unparsed => 1, if => 1, statement => 1, block => 1,
           blockcontainer => true,
@@ -1809,6 +2604,33 @@ IFClsDef:
             pc:childNode => {$codeArg},
           }__;
         }
+      @@@PerlDef:
+        @@@@ForCheck: pc|ForClass
+        @@@@@:
+          if ({
+            unparsed => 1, if => 1, statement => 1, block => 1,
+            blockContainer => true,
+            inlineUnparsed => 1, variable => 1, tokens => 1, atom => 1,
+            inlineContainer => 1, stringLiteral => 1, assignment => 1,
+          }->{$codeArg-><AG::Node.localName>}) {
+            if ($codeArg-><AG::Node.parentNode>) {
+              __EXCEPTION{IN_USE_NODE_ERR::
+                pc:childNode => {$codeArg},
+                MDOMX:param-name => 'codeArg',
+              }__;
+            }
+            __DEEP{
+              $self-><AG::Node.ownerDocument>
+                   -><M::Document.adoptNode> ($codeArg);
+              $self-><M::Node.appendChild> ($codeArg);
+            }__;
+          } else {
+            __EXCEPTION{BAD_CHILD_ERR::
+              pc:parentNode => {$self},
+              pc:childNode => {$codeArg},
+              MDOMX:param-name => 'codeArg',
+            }__;
+          }
 
   @Method:
     @@Name: appendCode
@@ -1816,16 +2638,16 @@ IFClsDef:
       Appends an unparsed Perl code fragment. 
     @@Param:
       @@@Name: codeArg
-      @@@Type: 
-        lang:Perl::ManakaiDOM:all
+      @@@Type: DOMString
       @@@enDesc:
         An unparsed Perl code fragment. 
     @@Return:
       @@@Type: PerlUnparsedCode
-      @@@caType: ManakaiPerlUnparsedCode
       @@@enDesc:
         The newly created Perl code object. 
       @@@PerlDef:
+        @@@@ForCheck: !pc|ForClass
+        @@@@@:
         $r = <ClassM::ManakaiPerlUnparsedCode.newObject>;
         my $node = $self->{<H::mn:node>};
         $r->{<H::pc:sourceFile>} = $node->{<H::pc:currentSourceFile>};
@@ -1836,10 +2658,25 @@ IFClsDef:
                  ::ManakaiDOM:Perl.importTree> ($r);
         push @{$node->{<H::pc:childNodes>}}, $r;
         $r->{<H::pc:parent>} = $node;
-        __CODE{ManakaiNode:getNewReference::
+        __CODE{ManakaiNode:getNewReference||ManakaiDOM|Perl::
           $object => $r, $ref => $r,
           $class =>{<ClassName::ManakaiPerlUnparsedCode>},
         }__;
+      @@@PerlDef:
+        @@@@ForCheck: pc|ForClass
+        @@@@@:
+          __DEEP{
+            $r = $self-><AG::Node.ownerDocument>-><M::Document.createElementNS>
+                                                      (<Q::pc:>, 'unparsed');
+            $r-><AS::Node.textContent> ($codeArg);
+            $r-><AS::PerlCodeStatements.sourceFile>
+               ($self-><AG::PerlCodeStatements.currentSourceFile>);
+            my $sl = $self-><AG::PerlCodeStatements.currentSourceLine>;
+            $r-><AS::PerlCodeStatements.sourceLine> ($sl);
+            $self-><AG::PerlCodeStatements.currentSourceLine>
+                      ($sl + ($codeArg =~ tr/\x0A/\x0A/));
+            $self-><M::Node.appendChild> ($r);
+          }__;
 
   @Method:
     @@Name: skipLines
@@ -1847,8 +2684,7 @@ IFClsDef:
       Skips lines in a code. 
     @@Param:
       @@@Name: codeArg
-      @@@Type: 
-        lang:Perl::ManakaiDOM:all
+      @@@Type: DOMString
       @@@enDesc:
         A code fragment, which is counted lines. 
     @@Return:
@@ -1862,25 +2698,28 @@ IFClsDef:
       A <Class::ManakaiPerlStatementContainer> object must have
       a property:
         <Q::pc:childNodes>.
+    @@ForCheck: pc|ForClassCompat
 
-  @Attr:
+  @ATTR:
     @@Name: label
+    @@ATTRQName: pc|label
     @@enDesc:
       Label for this block.
-    @@Type:
-      DISLang:String::ManakaiDOM:all
+    @@ReflectCDATA:
     @@Get:
       @@@nullCase:
         @@@@enDesc:
           No label.
       @@@disDef:
         @@@@GetProp:label
+        @@@@ForCheck: pc|ForClassCompat
     @@Set:
       @@@nullCase:
         @@@@enDesc:
           No label.
       @@@disDef:
         @@@@SetProp:label
+        @@@@ForCheck: pc|ForClassCompat
 
   @Method:
     @@Name: appendBlock
@@ -1888,10 +2727,11 @@ IFClsDef:
       Appends a Perl block code.
     @@Return:
       @@@Type: PerlBlock
-      @@@caType: ManakaiPerlBlock
       @@@enDesc:
         The newly created Perl code object. 
       @@@PerlDef:
+        @@@@ForCheck: !pc|ForClass
+        @@@@@:
         $r = <ClassM::ManakaiPerlBlock.newObject>;
         my $node = $self->{<H::mn:node>};
         $node-><M::ManakaiDOM:ManakaiDOMNodeObject
@@ -1899,11 +2739,19 @@ IFClsDef:
         push @{$node->{<H::pc:childNodes>}}, $r;
         $r->{<H::pc:parent>} = $node;
         if (defined wantarray) {
-          __CODE{ManakaiNode:getNewReference::
+          __CODE{ManakaiNode:getNewReference||ManakaiDOM|Perl::
             $object => $r, $ref => $r,
             $class =>{<ClassName::ManakaiPerlBlock>},
           }__;
         }
+      @@@PerlDef:
+        @@@@ForCheck: pc|ForClass
+        @@@@@:
+          __DEEP{
+            $r = $self-><AG::Node.ownerDocument>-><M::Document.createElementNS>
+                                                         (<Q::pc:>, 'block');
+            $self-><M::Node.appendChild> ($r);
+          }__;
 
   @Method:
     @@Name: appendStatement
@@ -1924,6 +2772,8 @@ IFClsDef:
       @@@enDesc:
         The newly created Perl code object. 
       @@@PerlDef:
+        @@@@ForCheck: !pc|ForClass
+        @@@@@:
         $r = <ClassM::ManakaiPerlStatement.newObject>;
         my $node = $self->{<H::mn:node>};
         $node-><M::ManakaiDOM:ManakaiDOMNodeObject
@@ -1931,7 +2781,7 @@ IFClsDef:
         push @{$node->{<H::pc:childNodes>}}, $r;
         $r->{<H::pc:parent>} = $node;
         if (defined wantarray or defined $codeArg) {
-          __CODE{ManakaiNode:getNewReference::
+          __CODE{ManakaiNode:getNewReference||ManakaiDOM|Perl::
             $object => $r, $ref => $r,
             $class =>{<ClassName::ManakaiPerlStatement>},
           }__;
@@ -1941,6 +2791,17 @@ IFClsDef:
             }__;
           }
         }
+      @@@PerlDef:
+        @@@@ForCheck: pc|ForClass
+        @@@@@:
+          __DEEP{
+            $r = $self-><AG::Node.ownerDocument>-><M::Document.createElementNS>
+                                                         (<Q::pc:>, 'statement');
+            if (defined $codeArg) {
+              $r-><M::PerlCodeUnits.appendBare> ($codeArg);
+            }
+            $self-><M::Node.appendChild> ($r);
+          }__;
 
   @Method:
     @@Name: appendNewIf
@@ -1949,13 +2810,11 @@ IFClsDef:
     @@Param:
       @@@Name: conditionArg
       @@@Type: PerlCode
-      @@@caType: ManakaiPerlCodeFragment
       @@@enDesc:
         Conditoon code fragment object.
     @@Param:
       @@@Name: trueArg
       @@@Type: PerlCode
-      @@@caType: ManakaiPerlCodeFragment
       @@@enDesc:
         A true code fragment object. 
       @@@nullCase:
@@ -1963,12 +2822,16 @@ IFClsDef:
     @@Param:
       @@@Name: falseArg
       @@@Type: PerlCode
-      @@@caType: ManakaiPerlCodeFragment
       @@@enDesc:
         A false code fragment object. 
       @@@nullCase:
         @@@@enDesc: No false code.
     @@Return:
+      @@@Type:
+        @@@@@: PerlIf
+        @@@@ForCheck: !pc|ForClassCompat
+      @@@enDesc:
+        The newly created element.
       @@@RaiseException:
         @@@@@:BAD_CHILD_ERR
         @@@@enDesc:
@@ -1980,6 +2843,8 @@ IFClsDef:
           An attempt is made to append a node that is 
           already used elsewhere. 
       @@@PerlDef:
+        @@@@ForCheck: !pc|ForClass
+        @@@@@:
         for my $arg ([conditionArg => $conditionArg]) {
           if ({
             atom => 1, bare => 1, incontainer => 1, assign => true,
@@ -2031,22 +2896,77 @@ IFClsDef:
         $self->{<H::mn:node>}-><M::MNodeObject.importTree> ($assign);
         $assign->{<H::pc:parent>} = $self->{<H::mn:node>};
         push @{$self->{<H::mn:node>}->{<H::pc:childNodes>}}, $assign;
-##PerlCodeStatements
+      @@@PerlDef:
+        @@@@ForCheck: pc|ForClass
+        @@@@@:
+          for my $arg ([conditionArg => $conditionArg]) {
+            if ({
+              atom => 1, tokens => 1, inlineContainer => 1, assignment => true,
+              inlineUnparsed => 1, variable => 1, stringLiteral => true,
+            }->{$arg->[1]-><AG::Node.localName>}) {
+              if ($arg->[1]-><AG::Node.parentNode>) {
+                __EXCEPTION{IN_USE_NODE_ERR::
+                  pc:childNode => {$arg->[1]},
+                  MDOMX:param-name => {$arg->[0]},
+                }__;
+              }
+            } else {
+              __EXCEPTION{BAD_CHILD_ERR::
+                pc:parentNode => {$self},
+                pc:childNode => {$arg->[1]},
+                MDOMX:param-name => {$arg->[0]},
+              }__;
+            }
+          } # c
 
-IFClsDef:
+          for my $arg ([trueArg => $trueArg],
+                       [falseArg => $falseArg]) {
+            next unless $arg->[1];
+            if ({
+                  blockContainer => true,
+                }->{$arg->[1]-><AG::Node.localName>}) {
+              if ($arg->[1]-><AG::Node.parentNode>) {
+                __EXCEPTION{IN_USE_NODE_ERR::
+                  pc:childNode => {$arg->[1]},
+                  MDOMX:param-name => {$arg->[0]},
+                }__;
+              }
+            } else {
+              __EXCEPTION{BAD_CHILD_ERR::
+                pc:parentNode => {$self},
+                pc:childNode => {$arg->[1]},
+                MDOMX:param-name => {$arg->[0]},
+              }__;
+            }
+          } # t/f
+
+          __DEEP{
+            $r = $self-><AG::Node.ownerDocument>-><M::Document.createElementNS>
+                                                   (<Q::pc:>, 'if');
+            $r-><AS::PerlIf.condition> ($conditionArg);
+            $r-><AS::PerlIf.trueCode> ($trueArg) if $trueArg;
+            $r-><AS::PerlIf.falseCode> ($falseArg) if $falseArg;
+            $self-><M::Node.appendChild> ($r);
+          }__;
+##PCIf
+
+IFClsETDef:
   @IFQName: PerlSub
   @ClsQName: ManakaiPerlSub
+  @CQName: ManakaiPCSub
+  @ETQName: pc|sub
 
   @IFISA: PerlCode
 
   @IFISA: PerlCodeStatements
   @ClsISA: ManakaiPerlStatementContainer
+  @CISA: ManakaiPCCodeStatements
 
   @enDesc:
     Perl subroutines. 
   
   @IntMethod:
-    @@ForCheck: ManakaiDOM|ForClass
+    @@ForCheck: ManakaiDOM|ForClass !pc|ForClass
     @@Name:newObject
     @@ManakaiDOM:isStatic:1
     @@Description:
@@ -2115,18 +3035,25 @@ IFClsDef:
           }
 
   @Attr:
-    @@Name: localName
+    @@Name: pcLocalName
     @@enDesc:
       The name of this subroutine. 
-    @@Type:
-      DISPerl:SubName::ManakaiDOM:all
+    @@Type: DOMString
     @@Get: 
       @@@nullCase:
         @@@@enDesc:
           This subroutine has no name. 
       @@@disDef:
         @@@@GetProp: localName
+        @@@@ForCheck: pc|ForClassCompat
+      @@@PerlDef:
+        @@@@ForCheck: pc|ForClass
+        @@@@@:
+          __DEEP{
+            $r = $self-><M::PerlSub.getPerlNameList>->[0];
+          }__;
     @@Set:
+      @@@ForCheck: pc|ForClassCompat
       @@@enDesc:
         Sets the name of this subroutine. 
         \
@@ -2141,32 +3068,163 @@ IFClsDef:
       @@@disDef:
         @@@@SetProp: localName
 
-  @Attr:
+  @Method:
+    @@ForCheck: !pc|ForClassCompat
+    @@Name: addPerlName
+    @@enDesc:
+      Adds a subroutine name.
+    @@Param:
+      @@@Name: subName
+      @@@Type: DOMString
+      @@@enDesc: The name to add.
+    @@Return:
+      @@@PerlDef:
+        __DEEP{
+          __CODE{addNameListAttr::
+            $node => {$self},
+            $attrName => 'localName',
+            $newName => {$subName},
+          }__;
+        }__;
+
+  @Method:
+    @@ForCheck: !pc|ForClassCompat
+    @@Name: getPerlNameList
+    @@enDesc:
+      Returns a list of names of the subroutine.
+    @@Return:
+      @@@Type: DISPerl|ARRAY||ManakaiDOM|all
+      @@@enDesc:
+        An unordered snapshot list of names.
+      @@@PerlDef:
+        __DEEP{
+          __CODE{getNameListAttr::
+            $node => {$self},
+            $attrName => 'localName',
+            $result => {$r},
+          }__;
+        }__;
+
+  @Method:
+    @@ForCheck: !pc|ForClassCompat
+    @@Name: hasPerlName
+    @@enDesc:
+      Returns whether the subroutine has a name or not.
+    @@Param:
+      @@@Name: subName
+      @@@Type: DOMString
+      @@@enDesc: The name.
+    @@Return:
+      @@@Type: idl|boolean||ManakaiDOM|all
+      @@@PerlDef:
+        __DEEP{
+          my $l;
+          __CODE{getNameListAttr::
+            $node => {$self},
+            $attrName => 'localName',
+            $result => {$l},
+          }__;
+          F: for (@$l) {
+            if ($_ eq $subName) {
+              $r = true;
+              last F;
+            }
+          }
+        }__;
+
+  @Method:
+    @@ForCheck: !pc|ForClassCompat
+    @@Name: addPerlOperator
+    @@enDesc:
+      Adds an operator overloaded by the method.
+    @@Param:
+      @@@Name: op
+      @@@Type: DOMString
+      @@@enDesc: The operator to add.
+    @@Return:
+      @@@PerlDef:
+        __DEEP{
+          __CODE{addNameListAttr::
+            $node => {$self},
+            $attrName => 'operator',
+            $newName => {$op},
+          }__;
+        }__;
+
+  @Method:
+    @@ForCheck: !pc|ForClassCompat
+    @@Name: getPerlOperatorList
+    @@enDesc:
+      Returns a list of operators of the subroutine.
+    @@Return:
+      @@@Type: DISPerl|ARRAY||ManakaiDOM|all
+      @@@enDesc:
+        An unordered snapshot list of operators.
+      @@@PerlDef:
+        __DEEP{
+          __CODE{getNameListAttr::
+            $node => {$self},
+            $attrName => 'operator',
+            $result => {$r},
+          }__;
+        }__;
+
+  @Method:
+    @@ForCheck: !pc|ForClassCompat
+    @@Name: hasPerlOperator
+    @@enDesc:
+      Returns whether the subroutine has an operator or not.
+    @@Param:
+      @@@Name: op
+      @@@Type: DOMString
+      @@@enDesc: The operator.
+    @@Return:
+      @@@Type: idl|boolean||ManakaiDOM|all
+      @@@PerlDef:
+        __DEEP{
+          my $l;
+          __CODE{getNameListAttr::
+            $node => {$self},
+            $attrName => 'operator',
+            $result => {$l},
+          }__;
+          F: for (@$l) {
+            if ($_ eq $op) {
+              $r = true;
+              last F;
+            }
+          }
+        }__;
+
+  @ATTR:
     @@Name: prototype
+    @@ATTRQName: pc|prototype
     @@enDesc:
       The prototype of this subroutine. 
-    @@Type:
-      DISPerl:SubPrototype::ManakaiDOM:all
+    @@ReflectCDATA:
     @@Get:
       @@@disDef:
         @@@@GetProp: prototype
+        @@@@ForCheck: pc|ForClassCompat
       @@@nullCase:
         @@@@enDesc:
           No prototype is set. 
     @@Set:
       @@@disDef:
         @@@@SetProp: prototype
+        @@@@ForCheck: pc|ForClassCompat
       @@@nullCase:
         @@@@enDesc:
           No prototype declaration. 
   
   @ToStringMethod:
     @@Return:
-      @@@Type:
-        DISLang:String::ManakaiDOM:all
+      @@@Type: DOMString
       @@@enDesc:
         Perl code. 
       @@@PerlDef:
+        @@@@ForCheck: !pc|ForClass
+        @@@@@:
         my $node = $self->{<H::mn:node>};
         $r = q<sub>;
         $r .= ' ' . $node->{<H::pc:localName>}
@@ -2179,18 +3237,40 @@ IFClsDef:
           $r .= $cn->stringify;
         }
         $r .= "}\n";
+      @@@PerlDef:
+        @@@@ForCheck: pc|ForClass
+        @@@@@:
+          __DEEP{
+            $r = q<sub>;
+            my $nm = $self-><M::PerlSub.getPerlNameList>;
+            $r .= q< > . $nm->[0] if @$nm;
+            my $pt = $self-><AG::PerlSub.prototype>;
+            $r .= q< (> . $pt . q<)> if length $pt;
+            $r .= qq< {\n>;
+            for my $child (@{$self-><AG::Node.childNodes>}) {
+              $r .= $child->stringify;
+            }
+            $r .= qq<}\n>;
+          }__;
 
   @NumValMethod:
     @@Return:
-      @@@Type:
-        DISIDL:AnyRealNumber::ManakaiDOM:all
+      @@@Type: idl|unsignedLong||ManakaiDOM|all
       @@@PerlDef:
+        @@@@ForCheck: !pc|ForClass
+        @@@@@:
         my $cno = $self->{<H::mn:node>}->{<H::pc:childNodes>}->[-1];
         if ($cno) {
           my $cn = <ClassM::ManakaiPerlCodeFragment.getNodeReference> ($cno);
           $r = 0 + $cn;
         }
-##PerlSub
+      @@@PerlDef:
+        @@@@ForCheck: pc|ForClass
+        @@@@@:
+          __DEEP{
+            $r = 0 + $self-><AG::Node.lastChild>;
+          }__;
+##PCSub
 
 XParamDef:
   @QName: parentNode
@@ -2202,18 +3282,21 @@ XParamDef:
   @enDesc:
     Child node. 
 
-IFClsDef:
+IFClsETDef:
   @IFQName: PerlUnparsedCode
   @ClsQName: ManakaiPerlUnparsedCode
+  @CQName: ManakaiPCUnparsedCode
+  @ETQName: pc|unparsed
 
   @IFISA: PerlCode
   @ClsISA: ManakaiPerlCodeFragment
+  @CISA: ManakaiPCCode
 
   @enDesc:
     Unparsed Perl code fragments. 
   
   @IntMethod:
-    @@ForCheck: ManakaiDOM|ForClass
+    @@ForCheck: ManakaiDOM|ForClass !pc|ForClass
     @@Name:newObject
     @@ManakaiDOM:isStatic:1
     @@Description:
@@ -2268,21 +3351,28 @@ IFClsDef:
     @@Name: code
     @@enDesc:
       Perl code. 
-    @@Type:
-      lang:Perl::ManakaiDOM:all
+    @@Type: DOMString
     @@Get:
       @@@disDef:
         @@@@GetProp: code
+        @@@@ForCheck: !pc|ForClass
+      @@@disDef:
+        @@@@DISPerl:cloneCode: DOMCore|ManakaiDOMNode.textContent.get
+        @@@@ForCheck: pc|ForClass
     @@Set:
       @@@disDef:
         @@@@SetProp: code
+        @@@@ForCheck: !pc|ForClass
+      @@@disDef:
+        @@@@DISPerl:cloneCode: DOMCore|ManakaiDOMNode.textContent.set
+        @@@@ForCheck: pc|ForClass
 
-  @Attr:
+  @ATTR:
     @@Name: sourceFile
+    @@ATTRQName: pc|sourceFile
     @@enDesc:
       The source file name of this fragment. 
-    @@Type:
-      DISLang:String::ManakaiDOM:all
+    @@ReflectCDATA:
     @@Get:
       @@@enDesc:
         Any string identifying the source. 
@@ -2290,32 +3380,37 @@ IFClsDef:
         @@@@enDesc: No source file name is set. 
       @@@disDef:
         @@@@GetProp: sourceFile
+        @@@@ForCheck: !pc|ForClass
     @@Set:
       @@@nullCase:
         @@@@enDesc: No (or unknown) source file. 
       @@@disDef:
         @@@@SetProp: sourceFile
+        @@@@ForCheck: !pc|ForClass
 
-  @Attr:
+  @ATTR:
     @@Name: sourceLine
+    @@ATTRQName: pc|sourceLine
     @@enDesc:
       Source file line number of the first line of this fragment. 
-    @@Type:
-      DOMMain:unsigned-long::ManakaiDOM:all
+    @@ReflectCDATA:
     @@Get:
       @@@disDef:
         @@@@GetProp: sourceLine
+        @@@@ForCheck: !pc|ForClass
     @@Set:
       @@@disDef:
         @@@@SetProp: sourceLine
+        @@@@ForCheck: !pc|ForClass
 
   @ToStringMethod:
     @@Return:
-      @@@Type:
-        DISLang:String::ManakaiDOM:all
+      @@@Type: DOMString
       @@@enDesc:
         Perl code. 
       @@@PerlDef:
+        @@@@ForCheck: !pc|ForClass
+        @@@@@:
         my $node = $self->{<H::mn:node>};
         __DEEP{
           my $file = $self-><AG::ManakaiPerlCodeFragment.fileNode>;
@@ -2329,20 +3424,40 @@ IFClsDef:
                         $file-><AG::ManakaiPerlFile.sourceFile>,
                         $file-><M::ManakaiPerlFile.getNextChunkNumber>);
         }__;
+      @@@PerlDef:
+        @@@@ForCheck: pc|ForClass
+        @@@@@:
+          __DEEP{
+            $r = $self-><AG::Node.textContent>;
+            my $file = $self-><AG::PerlCode.fileNode>;
+            my $src_file = $file ? $file-><AG::PerlFile.sourceFile> : '';
+            my $nxt_cnum = $file ? $file-><M::PerlFile.getNextChunkNumber> : 0;
+            $r = sprintf qq<\n#line %d "%s [u] (Chunk #%d)"\n%s>.
+                         qq<\n#line 1 "%s [/u] (Chunk #%d)"\n>,
+                         $self-><AG::PerlUnparsedCode.sourceLine> || 1,
+                         $self-><AG::PerlUnparsedCode.sourceFile> || $src_file,
+                         $file ? $file-><M::PerlFile.getNextChunkNumber> : 0,
+                         $self-><AG::Node.textContent>,
+                         $src_file,
+                         $file ? $file-><M::PerlFile.getNextChunkNumber> : 0;
+          }__;
 ##PerlUnparsedCode
 
-IFClsDef:
+IFClsETDef:
   @IFQName: PerlInlineUnparsedCode
   @ClsQName: ManakaiPerlInlineUnparsedCode
+  @CQName: ManakaiPCInlineUnparsedCode
+  @ETQName: pc|inlineUnparsed
 
   @IFISA: PerlCode
   @ClsISA: ManakaiPerlCodeFragment
+  @CISA: ManakaiPCCode
 
   @enDesc:
     Unparsed Perl inline code fragments. 
   
   @IntMethod:
-    @@ForCheck: ManakaiDOM|ForClass
+    @@ForCheck: ManakaiDOM|ForClass !pc|ForClass
     @@Name:newObject
     @@ManakaiDOM:isStatic:1
     @@Description:
@@ -2397,14 +3512,21 @@ IFClsDef:
     @@Name: code
     @@enDesc:
       Perl code. 
-    @@Type:
-      lang:Perl::ManakaiDOM:all
+    @@Type: DOMString
     @@Get:
       @@@disDef:
         @@@@GetProp: code
+        @@@@ForCheck: !pc|ForClass
+      @@@disDef:
+        @@@@DISPerl:cloneCode: DOMCore|ManakaiDOMNode.textContent.get
+        @@@@ForCheck: pc|ForClass
     @@Set:
       @@@disDef:
         @@@@SetProp: code
+        @@@@ForCheck: !pc|ForClass
+      @@@disDef:
+        @@@@DISPerl:cloneCode: DOMCore|ManakaiDOMNode.textContent.set
+        @@@@ForCheck: pc|ForClass
 
   @ToStringMethod:
     @@Return:
@@ -2413,22 +3535,33 @@ IFClsDef:
       @@@enDesc:
         Perl code. 
       @@@PerlDef:
+        @@@@ForCheck: !pc|ForClass
+        @@@@@:
         my $node = $self->{<H::mn:node>};
         $r = $node->{<H::pc:code>};
+      @@@PerlDef:
+        @@@@ForCheck: pc|ForClass
+        @@@@@:
+          __DEEP{
+            $r = $self-><AG::Node.textContent>;
+          }__;
 ##PerlInlineUnparsedCode
 
-IFClsDef:
+IFClsETDef:
   @IFQName: PerlStringLiteral
   @ClsQName: ManakaiPerlStringLiteral
+  @CQName: ManakaiPCPerlStringLiteral
+  @ETQName: pc|stringLiteral
 
   @IFISA: PerlCode
   @ClsISA: ManakaiPerlCodeFragment
+  @CISA: ManakaiPCCode
 
   @enDesc:
     Perl string literal.
   
   @IntMethod:
-    @@ForCheck: ManakaiDOM|ForClass
+    @@ForCheck: ManakaiDOM|ForClass !pc|ForClass
     @@Name:newObject
     @@ManakaiDOM:isStatic:1
     @@Description:
@@ -2483,51 +3616,75 @@ IFClsDef:
     @@Name: data
     @@enDesc:
       String data. 
-    @@Type:
-      DISLang:String::ManakaiDOM:all
+    @@Type: DOMString
     @@Get:
       @@@disDef:
-        @@@@GetProp: 
-          infoset:content
+        @@@@GetProp: infoset|content
+        @@@@ForCheck: !pc|ForClass
+      @@@disDef:
+        @@@@DISPerl:cloneCode: DOMCore|ManakaiDOMNode.textContent.get
+        @@@@ForCheck: pc|ForClass
     @@Set:
       @@@disDef:
-        @@@@SetProp: 
-          infoset:content
+        @@@@SetProp: infoset|content
+        @@@@ForCheck: !pc|ForClass
+      @@@disDef:
+        @@@@DISPerl:cloneCode: DOMCore|ManakaiDOMNode.textContent.set
+        @@@@ForCheck: pc|ForClass
 
   @NumValMethod:
     @@Return:
-      @@@Type:
-        DISIDL:AnyRealNumber::ManakaiDOM:all
+      @@@Type: idl|unsignedLong||ManakaiDOM|all
       @@@enDesc:
         Numeric value of the Perl code. 
       @@@PerlDef:
+        @@@@ForCheck: !pc|ForClass
+        @@@@@:
         $r = 0 + $self->{<H::mn:node>}->{<H::infoset:content>};
+      @@@PerlDef:
+        @@@@ForCheck: pc|ForClass
+        @@@@@:
+          __DEEP{
+            $r = 0 + $self-><AG::Node.textContent>;
+          }__;
 
   @ToStringMethod:
     @@Return:
-      @@@Type:
-        DISLang:String::ManakaiDOM:all
+      @@@Type: DOMString
       @@@enDesc:
         Perl code. 
       @@@PerlDef:
+        @@@@ForCheck: !pc|ForClass
+        @@@@@:
         my $node = $self->{<H::mn:node>};
         $r = $node->{<H::infoset:content>};
         $r =~ s/(['\\])/\\$1/g;
         $r = q<'> . $r . q<'>;
+      @@@PerlDef:
+        @@@@ForCheck: pc|ForClass
+        @@@@@:
+          __DEEP{
+            $r = $self-><AG::Node.textContent>;
+            $r =~ s/(['\\])/\\$1/g;
+            $r = q<'> . $r . q<'>;
+          }__;
 ##PerlStringLiteral
 
-IFClsDef:
+IFClsETDef:
   @IFQName: PerlTokens
   @ClsQName: ManakaiPerlBare
+  @CQName: ManakaiPCTokens
+  @ETQName: pc|tokens
 
   @IFISA: PerlCode
   @ClsISA: ManakaiPerlCodeFragment
+  @CISA: ManakaiPCCode
 
   @enDesc:
     Unparsed Perl inline code fragments. 
   
   @IntMethod:
-    @@ForCheck: ManakaiDOM|ForClass
+    @@ForCheck: ManakaiDOM|ForClass !pc|ForClass
     @@Name:newObject
     @@ManakaiDOM:isStatic:1
     @@Description:
@@ -2582,14 +3739,21 @@ IFClsDef:
     @@Name: code
     @@enDesc:
       Perl code. 
-    @@Type:
-      lang:Perl::ManakaiDOM:all
+    @@Type: DOMString
     @@Get:
       @@@disDef:
         @@@@GetProp: code
+        @@@@ForCheck: !pc|ForClass
+      @@@disDef:
+        @@@@DISPerl:cloneCode: DOMCore|ManakaiDOMNode.textContent.get
+        @@@@ForCheck: pc|ForClass
     @@Set:
       @@@disDef:
         @@@@SetProp: code
+        @@@@ForCheck: !pc|ForClass
+      @@@disDef:
+        @@@@DISPerl:cloneCode: DOMCore|ManakaiDOMNode.textContent.set
+        @@@@ForCheck: pc|ForClass
 
   @ToStringMethod:
     @@Return:
@@ -2598,23 +3762,34 @@ IFClsDef:
       @@@enDesc:
         Perl code. 
       @@@PerlDef:
+        @@@@ForCheck: !pc|ForClass
+        @@@@@:
         my $node = $self->{<H::mn:node>};
         $r = $node->{<H::pc:code>};
-##PerlBare
+      @@@PerlDef:
+        @@@@ForCheck: pc|ForClass
+        @@@@@:
+          __DEEP{
+            $r = $self-><AG::Node.textContent>;
+          }__;
+##PCTokens
 
-IFClsDef:
+IFClsETDef:
   @IFQName: PerlAtom
   @ClsQName: ManakaiPerlAtom
+  @CQName: ManakaiPCAtom
+  @ETQName: pc|atom
 
   @IFISA: PerlCode
 
   @ClsISA: ManakaiPerlBare
+  @CISA: ManakaiPCTokens
 
   @enDesc:
     Unparsed Perl atomic code fragments (such as numeric literal). 
   
   @IntMethod:
-    @@ForCheck: ManakaiDOM|ForClass
+    @@ForCheck: ManakaiDOM|ForClass !pc|ForClass
     @@Name:newObject
     @@ManakaiDOM:isStatic:1
     @@Description:
@@ -2667,30 +3842,47 @@ IFClsDef:
 
   @NumValMethod:
     @@Return:
-      @@@Type:
-        DISIDL:AnyRealNumber::ManakaiDOM:all
+      @@@Type: idl|unsignedLong||ManakaiDOM|all
       @@@enDesc:
         Numeric value of the Perl code. 
       @@@PerlDef:
+        @@@@ForCheck: !pc|ForClass
+        @@@@@:
         $r = 0 + $self->{<H::mn:node>}->{<H::pc:code>};
+      @@@PerlDef:
+        @@@@ForCheck: pc|ForClass
+        @@@@@:
+          __DEEP{
+            $r = 0 + $self-><AG::Node.textContent>;
+          }__;
 
   @ToStringMethod:
     @@Return:
-      @@@Type:
-        DISLang:String::ManakaiDOM:all
+      @@@Type: DOMString
       @@@enDesc:
         Perl code. 
       @@@PerlDef:
+        @@@@ForCheck: !pc|ForClass
+        @@@@@:
         my $node = $self->{<H::mn:node>};
         $r = $node->{<H::pc:code>};
+      @@@PerlDef:
+        @@@@ForCheck: pc|ForClass
+        @@@@@:
+          __DEEP{
+            $r = $self-><AG::Node.textContent>;
+          }__;
 ##PerlAtom
 
-IFClsDef:
+IFClsETDef:
   @IFQName: PerlVariable
   @ClsQName: ManakaiPerlVariable
+  @CQName: ManakaiPCVariable
+  @ETQName: pc|variable
 
   @IFISA: PerlCode
   @ClsISA: ManakaiPerlCodeFragment
+  @CISA: ManakaiPCCode
 
   @enDesc:
     Unparsed Perl variable. 
@@ -2701,7 +3893,7 @@ IFClsDef:
     }
   
   @IntMethod:
-    @@ForCheck: ManakaiDOM|ForClass
+    @@ForCheck: ManakaiDOM|ForClass !pc|ForClass
     @@Name:newObject
     @@ManakaiDOM:isStatic:1
     @@Description:
@@ -2755,26 +3947,28 @@ IFClsDef:
           $node->{<H::pc:requireModuleName>}
              = {%{$nodeObject->{<H::pc:requireModuleName>} || {}}};
 
-  @Attr:
+  @ATTR:
     @@Name: variableType
+    @@ATTRQName: pc|variableType
     @@enDesc:
       Perl variable type (<CODE::$>, <CODE::@>, <CODE::%>,
       <CODE::&> or empty string). 
-    @@Type:
-      lang:Perl::ManakaiDOM:all
+    @@ReflectCDATA:
     @@Get:
       @@@disDef:
         @@@@GetProp: variableType
+        @@@@ForCheck: pc|ForClassCompat
     @@Set:
       @@@disDef:
         @@@@SetProp: variableType
+        @@@@ForCheck: pc|ForClassCompat
 
-  @Attr:
+  @ATTR:
     @@Name: packageName
+    @@ATTRQName: pc|packageName
     @@enDesc:
       The name of the package to which this variable belongs.
-    @@Type:
-      Perl:package-name::ManakaiDOM:all
+    @@ReflectCDATA:
     @@Get:
       @@@nullCase:
         @@@@enDesc:
@@ -2782,6 +3976,7 @@ IFClsDef:
           does not belong to any package.
       @@@disDef:
         @@@@GetProp: packageName
+        @@@@ForCheck: pc|ForClassCompat
     @@Set:
       @@@nullCase:
         @@@@enDesc:
@@ -2789,46 +3984,57 @@ IFClsDef:
           does not belong to any package.
       @@@disDef:
         @@@@SetProp: packageName
+        @@@@ForCheck: pc|ForClassCompat
 
-  @Attr:
-    @@Name: localName
+  @ATTR:
+    @@Name:
+      @@@@: localName
+      @@@ForCheck: pc|ForClassCompat
+    @@Name: 
+      @@@@: pcLocalName
+      @@@ForCheck: !pc|ForClassCompat
+    @@ATTRQName: pc|localName
     @@enDesc:
       The local variable name.
-    @@Type:
-      lang:Perl::ManakaiDOM:all
+    @@ReflectCDATA:
     @@Get:
       @@@disDef:
         @@@@GetProp: localName
+        @@@@ForCheck: pc|ForClassCompat
     @@Set:
       @@@disDef:
         @@@@SetProp: localName
+        @@@@ForCheck: pc|ForClassCompat
 
-  @Attr:
+  @ATTR:
     @@Name: variableScope
+    @@ATTRQName: pc|variableScope
     @@enDesc:
       Scope modifier (<CODE::my> or <CODE::our> or <CODE::local>).
-    @@Type:
-      lang:Perl::ManakaiDOM:all
+    @@ReflectCDATA:
     @@Get:
       @@@nullCase:
         @@@@enDesc:
           This variable does not have scope modifier.
       @@@disDef:
         @@@@GetProp: variableScope
+        @@@@ForCheck: pc|ForClassCompat
     @@Set:
       @@@nullCase:
         @@@@enDesc:
           This variable does not have scope modifier.
       @@@disDef:
         @@@@SetProp: variableScope
+        @@@@ForCheck: pc|ForClassCompat
 
   @ToStringMethod:
     @@Return:
-      @@@Type:
-        DISLang:String::ManakaiDOM:all
+      @@@Type: DOMString
       @@@enDesc:
         Perl code. 
       @@@PerlDef:
+        @@@@ForCheck: !pc|ForClass
+        @@@@@:
         my $node = $self->{<H::mn:node>};
         if ($node->{<H::pc:variableScope>}) {
           $r = $node->{<H::pc:variableScope>} . ' ';
@@ -2843,9 +4049,26 @@ IFClsDef:
           $hashKey =~ s/(['\\])/\\$1/g;
           $r .= q<{'> . $hashKey . q<'}>;
         }
+      @@@PerlDef:
+        @@@@ForCheck: pc|ForClass
+        @@@@@:
+          __DEEP{
+            my $t = $self-><AG::PerlVariable.variableScope>;
+            $r .= $t . ' ' if length $t;
+            $r .= $self-><AG::PerlVariable.variableType>;
+            my $v = $self-><AG::PerlVariable.packageName>;
+            $r .= $v . '::' if length $v;
+            $r .= $self-><AG::PerlVariable.pcLocalName>;
+            $v = $self-><AG::PerlVariable.hashKey>;
+            if ($t eq '$' and length $v) {
+              $v =~ s/(['\\])/\\$1/g;
+              $r .= q<{'> . $v . q<'}>;
+            }
+          }__;
 
-  @Attr:
+  @ATTR:
     @@Name: hashKey
+    @@ATTRQName: pc|hashKey
     @@enDesc:
       The key for hash. 
       \
@@ -2853,20 +4076,21 @@ IFClsDef:
               version of the implementation.
       \
       }
-    @@Type:
-      DISLang:String::ManakaiDOM:all
+    @@ReflectCDATA:
     @@Get:
       @@@nullCase:
         @@@@enDesc:
           This variable is not for hash value access.
       @@@disDef:
         @@@@GetProp: hashKey
+        @@@@ForCheck: pc|ForClassCompat
     @@Set:
       @@@nullCase:
         @@@@enDesc:
           This variable is not for hash value access.
       @@@disDef:
         @@@@SetProp: hashKey
+        @@@@ForCheck: pc|ForClassCompat
 ##PerlVariable
 
 PropDef:
@@ -2887,8 +4111,10 @@ PropDef:
 IFClsDef:
   @IFQName: PerlCodeUnits
   @ClsQName: ManakaiPerlAnyContainer
+  @CQName: ManakaiPCCodeUnits
 
   @ClsISA: ManakaiPerlCodeFragment
+  @CISA: ManakaiPCCode
 
   @enDesc:
     A base class implemented by both inline container and
@@ -2898,11 +4124,18 @@ IFClsDef:
     @@Name: length
     @@enDesc:
       The number of child code fragments. 
-    @@Type:
-      DOMMain:unsigned-long::ManakaiDOM:all
+    @@Type: idl|unsignedLong||ManakaiDOM|all
     @@Get:
       @@@PerlDef:
+        @@@@ForCheck: !pc|ForClass
+        @@@@@:
         $r = @{$self->{<H::mn:node>}->{<H::pc:childNodes>}};
+      @@@PerlDef:
+        @@@@ForCheck: pc|ForClass
+        @@@@@:
+          __DEEP{
+            $r = @{$self-><AG::Node.childNodes>};
+          }__;
 
   @Method:
     @@Name: appendStringLiteral
@@ -2910,15 +4143,16 @@ IFClsDef:
       Appends a Perl string literal (<CODE::q>).
     @@Param:
       @@@Name: stringArg
-      @@@Type: 
-        DISLang:String::ManakaiDOM:all
+      @@@Type: DOMString
       @@@enDesc:
         A string.
     @@Return:
-      @@@Type: ManakaiPerlStringLiteral
+      @@@Type: PerlStringLiteral
       @@@enDesc:
         The newly created Perl string literal object. 
       @@@PerlDef:
+        @@@@ForCheck: !pc|ForClass
+        @@@@@:
         $r = <ClassM::ManakaiPerlStringLiteral.newObject>;
         my $node = $self->{<H::mn:node>};
         $r->{<H::infoset:content>} = $stringArg;
@@ -2927,12 +4161,20 @@ IFClsDef:
         push @{$node->{<H::pc:childNodes>}}, $r;
         $r->{<H::pc:parent>} = $node;
         if (defined wantarray) {
-          __CODE{ManakaiNode:getNewReference::
+          __CODE{ManakaiNode:getNewReference||ManakaiDOM|Perl::
             $object => $r, $ref => $r,
             $class =>{<ClassName::ManakaiPerlStringLiteral>},
           }__;
         }
-
+      @@@PerlDef:
+        @@@@ForCheck: pc|ForClass
+        @@@@@:
+          __DEEP{
+            $r = $self-><AG::Node.ownerDocument>-><M::Document.createElementNS>
+                                           (<Q::pc:>, 'stringLiteral');
+            $r-><AS::Node.textContent> ($stringArg);
+            $self-><M::Node.appendChild> ($r);
+          }__;
 
   @Method:
     @@Name: appendAtom
@@ -2940,15 +4182,16 @@ IFClsDef:
       Appends a Perl atomic code fragment.
     @@Param:
       @@@Name: codeArg
-      @@@Type: 
-        lang:Perl::ManakaiDOM:all
+      @@@Type: DOMString
       @@@enDesc:
         An atom.
     @@Return:
-      @@@Type: ManakaiPerlAtom
+      @@@Type: PerlAtom
       @@@enDesc:
         The newly created Perl code object. 
       @@@PerlDef:
+        @@@@ForCheck: !pc|ForClass
+        @@@@@:
         $r = <ClassM::ManakaiPerlAtom.newObject>;
         my $node = $self->{<H::mn:node>};
         $r->{<H::pc:code>} = $codeArg;
@@ -2957,12 +4200,20 @@ IFClsDef:
         push @{$node->{<H::pc:childNodes>}}, $r;
         $r->{<H::pc:parent>} = $node;
         if (defined wantarray) {
-          __CODE{ManakaiNode:getNewReference::
+          __CODE{ManakaiNode:getNewReference||ManakaiDOM|Perl::
             $object => $r, $ref => $r,
             $class =>{<ClassName::ManakaiPerlAtom>},
           }__;
         }
-
+      @@@PerlDef:
+        @@@@ForCheck: pc|ForClass
+        @@@@@:
+          __DEEP{
+            $r = $self-><AG::Node.ownerDocument>-><M::Document.createElementNS>
+                                                   (<Q::pc:>, 'atom');
+            $r-><AS::Node.textContent> ($codeArg);
+            $self-><M::Node.appendChild> ($r);
+          }__;
 
   @Method:
     @@Name: appendBare
@@ -2970,15 +4221,16 @@ IFClsDef:
       Appends a Perl bare code fragment.
     @@Param:
       @@@Name: codeArg
-      @@@Type: 
-        lang:Perl::ManakaiDOM:all
+      @@@Type: DOMString
       @@@enDesc:
         An bare code.
     @@Return:
-      @@@Type: ManakaiPerlBare
+      @@@Type: PerlBare
       @@@enDesc:
         The newly created Perl code object. 
       @@@PerlDef:
+        @@@@ForCheck: !pc|ForClass
+        @@@@@:
         $r = <ClassM::ManakaiPerlBare.newObject>;
         my $node = $self->{<H::mn:node>};
         $r->{<H::pc:code>} = $codeArg;
@@ -2987,11 +4239,20 @@ IFClsDef:
         push @{$node->{<H::pc:childNodes>}}, $r;
         $r->{<H::pc:parent>} = $node;
         if (defined wantarray) {
-          __CODE{ManakaiNode:getNewReference::
+          __CODE{ManakaiNode:getNewReference||ManakaiDOM|Perl::
             $object => $r, $ref => $r,
             $class =>{<ClassName::ManakaiPerlBare>},
           }__;
         }
+      @@@PerlDef:
+        @@@@ForCheck: pc|ForClass
+        @@@@@:
+          __DEEP{
+            $r = $self-><AG::Node.ownerDocument>-><M::Document.createElementNS>
+                                                   (<Q::pc:>, 'tokens');
+            $r-><AS::Node.textContent> ($codeArg);
+            $self-><M::Node.appendChild> ($r);
+          }__;
 
   @Method:
     @@Name: appendNewAssignment
@@ -2999,15 +4260,18 @@ IFClsDef:
       Appends a newly created <Class::ManakaiPerlAssign> object. 
     @@Param:
       @@@Name: leftArg
-      @@@Type: ManakaiPerlCodeFragment
+      @@@Type: PerlCode
       @@@enDesc:
         A left hand side code fragment object. 
     @@Param:
       @@@Name: rightArg
-      @@@Type: ManakaiPerlCodeFragment
+      @@@Type: PerlCode
       @@@enDesc:
         A right hand side code fragment object. 
     @@Return:
+      @@@Type: 
+        @@@@@: PerlAssignment
+        @@@@ForCheck: !pc|ForClassCompat
       @@@RaiseException:
         @@@@@:BAD_CHILD_ERR
         @@@@enDesc:
@@ -3019,6 +4283,8 @@ IFClsDef:
           An attempt is made to append a node that is 
           already used elsewhere. 
       @@@PerlDef:
+        @@@@ForCheck: !pc|ForClass
+        @@@@@:
         for my $arg ([leftArg => $leftArg], [rightArg => $rightArg]) {
           if ({
             atom => 1, bare => 1, incontainer => 1, assign => true,
@@ -3047,22 +4313,55 @@ IFClsDef:
         $self->{<H::mn:node>}-><M::MNodeObject.importTree> ($assign);
         $assign->{<H::pc:parent>} = $self->{<H::mn:node>};
         push @{$self->{<H::mn:node>}->{<H::pc:childNodes>}}, $assign;
-##PerlAnyContainer
+      @@@PerlDef:
+        @@@@ForCheck: pc|ForClass
+        @@@@@:
+          for my $arg ([leftArg => $leftArg], [rightArg => $rightArg]) {
+            if ({
+              atom => 1, tokens => 1, inlineContainer => 1, assignment => true,
+              inlineUnparsed => 1, variable => 1, stringLiteral => true,
+            }->{$arg->[1]-><AG::Node.localName>}) {
+              if ($arg->[1]-><AG::Node.parentNode>) {
+                __EXCEPTION{IN_USE_NODE_ERR::
+                  pc:childNode => {$arg->[1]},
+                  MDOMX:param-name => {$arg->[0]},
+                }__;
+              }
+            } else {
+              __EXCEPTION{BAD_CHILD_ERR::
+                pc:parentNode => {$self},
+                pc:childNode => {$arg->[1]},
+                MDOMX:param-name => {$arg->[0]},
+              }__;
+            }
+          } # left/right
 
-IFClsDef:
+          __DEEP{
+            $r = $self-><AG::Node.ownerDocument>-><M::Document.createElementNS>
+                                                (<Q::pc:>, 'assignment');
+            $r-><AS::PerlAssignment.leftCode> ($leftArg);
+            $r-><AS::PerlAssignment.rightCode> ($rightArg);
+            $self-><M::Node.appendChild> ($r);
+          }__;
+##PCAssignment
+
+IFClsETDef:
   @IFQName: PerlStatement
   @ClsQName: ManakaiPerlStatement
+  @CQName: ManakaiPCStatement
+  @ETQName: pc|statement
 
   @IFISA: PerlCode
 
   @IFISA: PerlCodeInlines
   @ClsISA: ManakaiPerlInlineContainer
+  @CISA: ManakaiPCCodeInlines
 
   @enDesc:
     Perl statements. 
   
   @IntMethod:
-    @@ForCheck: ManakaiDOM|ForClass
+    @@ForCheck: ManakaiDOM|ForClass !pc|ForClass
     @@Name:newObject
     @@ManakaiDOM:isStatic:1
     @@Description:
@@ -3126,8 +4425,7 @@ IFClsDef:
 
   @ToStringMethod:
     @@Return:
-      @@@Type:
-        DISLang:String::ManakaiDOM:all
+      @@@Type: DOMString
       @@@enDesc:
         Perl code. 
       @@@PerlDef:
@@ -3135,17 +4433,20 @@ IFClsDef:
         $r .= ";\n" if length $r;
 ##PerlStatement
 
-IFClsDef:
+IFClsETDef:
   @IFQName: PerlCodeInlines
   @ClsQName: ManakaiPerlInlineContainer
+  @CQName: ManakaiPCCodeInlines
+  @ETQName: pc|inlineContainer
 
   @ClsISA: ManakaiPerlAnyContainer
+  @CISA: ManakaiPCCodeUnits
 
   @enDesc:
     Unparsed Perl inline code block. 
   
   @IntMethod:
-    @@ForCheck: ManakaiDOM|ForClass
+    @@ForCheck: ManakaiDOM|ForClass !pc|ForClass
     @@Name:newObject
     @@ManakaiDOM:isStatic:1
     @@Description:
@@ -3210,11 +4511,10 @@ IFClsDef:
   @Method:
     @@Name: appendCodeFragment
     @@enDesc:
-      Appends a <Class::ManakaiPerlCodeFragment> object. 
+      Appends a <IF::PerlCode> object. 
     @@Param:
       @@@Name: codeArg
       @@@Type: PerlCode
-      @@@caType: ManakaiPerlCodeFragment
       @@@enDesc:
         A code fragment object. 
     @@Return:
@@ -3229,6 +4529,8 @@ IFClsDef:
           An attempt is made to append a node that is 
           already used elsewhere. 
       @@@PerlDef:
+        @@@@ForCheck: !pc|ForClass
+        @@@@@:
         if ({
           atom => 1, bare => 1, incontainer => 1, assign => true,
           inunparsed => 1, variable => 1, string => 1,
@@ -3250,6 +4552,29 @@ IFClsDef:
             pc:childNode => {$codeArg},
           }__;
         }
+      @@@PerlDef:
+        @@@@ForCheck: pc|ForClass
+        @@@@@:
+          if ({
+            atom => 1, tokens => 1, inlineContainer => 1, assignment => true,
+            inlineUnparsed => 1, variable => 1, stringLiteral => true,
+          }->{$codeArg-><AG::Node.localName>}) {
+            if ($codeArg-><AG::Node.parentNode>) {
+              __EXCEPTION{IN_USE_NODE_ERR::
+                pc:childNode => {$codeArg},
+              }__;
+            }
+            __DEEP{
+              $self-><AG::Node.ownerDocument>
+                   -><M::Document.adoptNode> ($codeArg);
+              $self-><M::Node.appendChild> ($codeArg);
+            }__;
+          } else {
+            __EXCEPTION{BAD_CHILD_ERR::
+              pc:parentNode => {$self},
+              pc:childNode => {$codeArg},
+            }__;
+          }
 
   @Method:
     @@Name: appendCode
@@ -3257,16 +4582,16 @@ IFClsDef:
       Appends an unparsed Perl code fragment. 
     @@Param:
       @@@Name: codeArg
-      @@@Type: 
-        lang:Perl::ManakaiDOM:all
+      @@@Type: DOMString
       @@@enDesc:
         An unparsed Perl code fragment. 
     @@Return:
       @@@Type: PerlInlineUnparsedCode
-      @@@caType: ManakaiPerlInlineUnparsedCode
       @@@enDesc:
         The newly created Perl code object. 
       @@@PerlDef:
+        @@@@ForCheck: !pc|ForClass
+        @@@@@:
         $r = <ClassM::ManakaiPerlInlineUnparsedCode.newObject>;
         my $node = $self->{<H::mn:node>};
         $r->{<H::pc:code>} = $codeArg;
@@ -3275,19 +4600,29 @@ IFClsDef:
         push @{$node->{<H::pc:childNodes>}}, $r;
         $r->{<H::pc:parent>} = $node;
         if (defined wantarray) {
-          __CODE{ManakaiNode:getNewReference::
+          __CODE{ManakaiNode:getNewReference||ManakaiDOM|Perl::
             $object => $r, $ref => $r,
             $class =>{<ClassName::ManakaiPerlInlineUnparsedCode>},
           }__;
         }
+      @@@PerlDef:
+        @@@@ForCheck: pc|ForClass
+        @@@@@:
+          __DEEP{
+            $r = $self-><AG::Node.ownerDocument>-><M::Document.createElementNS>
+                                                (<Q::pc:>, 'inlineUnparsed');
+            $r-><AS::Node.textContent> ($codeArg);
+            $self-><M::Node.appendChild> ($r);
+          }__;
 
   @ToStringMethod:
     @@Return:
-      @@@Type:
-        DISLang:String::ManakaiDOM:all
+      @@@Type: DOMString
       @@@enDesc:
         Perl code. 
       @@@PerlDef:
+        @@@@ForCheck: !pc|ForClass
+        @@@@@:
         for my $cno (@{$self->{<H::mn:node>}->{<H::pc:childNodes>}}) {
           my $cn = <ClassM::ManakaiPerlCodeFragment.getNodeReference> ($cno);
           if ($cno->{<H::pc:nodeType>} eq 'incontainer' and
@@ -3297,22 +4632,40 @@ IFClsDef:
             $r .= $cn->stringify;
           }
         }
-##PerlInlineContainer
+      @@@PerlDef:
+        @@@@ForCheck: pc|ForClass
+        @@@@@:
+          __DEEP{
+            my @child = @{$self-><AG::Node.childNodes>};
+            for my $child (@child) {
+              if ($child-><AG::Node.namespaceURI> eq <Q::pc:> and
+                  $child-><AG::Node.localName> eq 'inlineContainer' and
+                  1 == @child) {
+                $r .= '(' . $child->stringify . ')';
+              } else {
+                $r .= $child->stringify;
+              }
+            }
+          }__;
+##PCCodeInlines
 
-IFClsDef:
+IFClsETDef:
   @IFQName: PerlBlock
   @ClsQName: ManakaiPerlBlock
+  @CQName: ManakaiPCBlock
+  @ETQName: pc|block
 
   @IFISA: PerlCode
 
   @IFISA: PerlCodeStatements
   @ClsISA: ManakaiPerlStatementContainer
+  @CISA: ManakaiPCCodeStatements
 
   @enDesc:
     Perl block-level code block. 
   
   @IntMethod:
-    @@ForCheck: ManakaiDOM|ForClass
+    @@ForCheck: ManakaiDOM|ForClass !pc|ForClass
     @@Name:newObject
     @@ManakaiDOM:isStatic:1
     @@Description:
@@ -3382,16 +4735,17 @@ IFClsDef:
 
   @ToStringMethod:
     @@Return:
-      @@@Type:
-        DISLang:String::ManakaiDOM:all
+      @@@Type: DOMString
       @@@enDesc:
         Perl code. 
       @@@PerlDef:
+        @@@@ForCheck: !pc|ForClass
+        @@@@@:
         my $node = $self->{<H::mn:node>};
         if (@{$node->{<H::pc:childNodes>}} == 1 and
             $node->{<H::pc:childNodes>}->[0]->{<H::pc:nodeType>} eq 'block') {
           my $cn;
-          __CODE{ManakaiNode:getWeakReference::
+          __CODE{ManakaiNode:getWeakReference||ManakaiDOM|Perl::
                      $object => {$node->{<H::pc:childNodes>}->[0]},
                      $ref => $cn,
                      $class => {<ClassName::ManakaiPerlBlock>}}__;
@@ -3414,27 +4768,65 @@ IFClsDef:
                             $file-><AG::ManakaiPerlFile.sourceFile>,
                           $file-><M::ManakaiPerlFile.getNextChunkNumber>)
                . $r
-               . sprintf (qq<\n#line 1 "%s [/b] (Chunk #%d)"\n}\n>,
+               . sprintf (qq<\n#line 1 "%s [/b] (Chunk #%d)"\n;}\n>,
                           $file-><AG::ManakaiPerlFile.sourceFile>,
                           $file-><M::ManakaiPerlFile.getNextChunkNumber>)
               if length $r;
           }__;
         }
-##PerlBlock
+      @@@PerlDef:
+        @@@@ForCheck: pc|ForClass
+        @@@@@:
+          my @child = @{$self-><AG::Node.childNodes>};
+          if (@child == 1 and 
+              $child[0]-><AG::Node.localName> eq 'block') {
+            $r = $child[0]->stringify;
+          } elsif (@child == 1 and
+                   $child[0]-><AG::Node.localName> eq 'unparsed' and
+                   $child[0]-><AG::Node.textContent> =~ /^\s*$/) {
+            # 
+          } else {
+            for my $child (@child) {
+              if ($child-><AG::Node.localName> eq 'inlineContainer' and
+                  1 == @child) {
+                $r .= '(' . $child->stringify . ')';
+              } else {
+                $r .= $child->stringify;
+              }
+            }
 
-IFClsDef:
+            __DEEP{
+              my $file = $self-><AG::PerlCode.fileNode>;
+              my $sfile = $file ? $file-><AG::PerlFile.sourceFile> : '';
+              $r = sprintf qq<\n{\n#line %d "%s [b] (Chunk #%d)"\n%s>.
+                           qq<\n#line 1 "%s [/b] (Chunk #%d)"\n}\n>,
+                           $self-><AG::PerlCodeStatements.sourceLine> || 1,
+                           $self-><AG::PerlCodeStatements.sourceFile> || $sfile,
+                           $file ? $file-><M::PerlFile.getNextChunkNumber> : 0,
+                           $r,
+                           $sfile,
+                           $file ? $file-><M::PerlFile.getNextChunkNumber> : 0
+                if length $r;
+            }__;
+          }
+##PCBlock
+
+IFClsETDef:
   @IFQName: PerlCodeBlocks
   @ClsQName: ManakaiPerlBlockContainer
+  @CQName: ManakaiPCCodeBlocks
+  @ETQName: pc|blockContainer
 
   @IFISA: PerlCodeStatements
   @ClsISA: ManakaiPerlStatementContainer
+  @CISA: ManakaiPCCodeStatements
 
   @enDesc:
     Perl block-level code container whose content may or may
     not semantically be self-contained. 
   
   @IntMethod:
-    @@ForCheck: ManakaiDOM|ForClass
+    @@ForCheck: ManakaiDOM|ForClass !pc|ForClass
     @@Name:newObject
     @@ManakaiDOM:isStatic:1
     @@Description:
@@ -3504,18 +4896,19 @@ IFClsDef:
 
   @ToStringMethod:
     @@Return:
-      @@@Type:
-        DISLang:String::ManakaiDOM:all
+      @@@Type: DOMString
       @@@enDesc:
         Perl code. 
       @@@PerlDef:
+        @@@@ForCheck: !pc|ForClass
+        @@@@@:
         my $node = $self->{<H::mn:node>};
         if (@{$node->{<H::pc:childNodes>}} == 1 and
             {
               block => true, blockcontainer => true,
             }->{$node->{<H::pc:childNodes>}->[0]->{<H::pc:nodeType>}}) {
           my $cn;
-          __CODE{ManakaiNode:getWeakReference::
+          __CODE{ManakaiNode:getWeakReference||ManakaiDOM|Perl::
                      $object => {$node->{<H::pc:childNodes>}->[0]},
                      $ref => $cn,
                      $class => {<ClassName::ManakaiPerlBlock>}}__;
@@ -3543,20 +4936,55 @@ IFClsDef:
                           $file-><M::ManakaiPerlFile.getNextChunkNumber>);
           }__;
         }
-##PerlBlockContainer
+      @@@PerlDef:
+        @@@@ForCheck: pc|ForClass
+        @@@@@:
+          my @child = @{$self-><AG::Node.childNodes>};
+          if (@child == 1 and 
+              {
+                block => true, blockContainer => true,
+              }->{$child[0]-><AG::Node.localName>}) {
+            $r = $child[0]->stringify;
+          } else {
+            for my $child (@child) {
+              if ($child-><AG::Node.localName> eq 'inlineContainer' and
+                  1 == @child) {
+                $r .= '(' . $child->stringify . ')';
+              } else {
+                $r .= $child->stringify;
+              }
+            }
 
-IFClsDef:
+            __DEEP{
+              my $file = $self-><AG::PerlCode.fileNode>;
+              my $sfile = $file ? $file-><AG::PerlFile.sourceFile> : '';
+              $r = sprintf qq<\n#line %d "%s [bc] (Chunk #%d)"\n%s>.
+                           qq<\n#line 1 "%s [/bc] (Chunk #%d)"\n>,
+                           $self-><AG::PerlCodeStatements.sourceLine> || 1,
+                           $self-><AG::PerlCodeStatements.sourceFile> || $sfile,
+                           $file ? $file-><M::PerlFile.getNextChunkNumber> : 0,
+                           $r,
+                           $sfile,
+                           $file ? $file-><M::PerlFile.getNextChunkNumber> : 0;
+            }__;
+          }
+##PCCodeBlocks
+
+IFClsETDef:
   @IFQName: PerlAssignment
   @ClsQName: ManakaiPerlAssignment
+  @CQName: ManakaiPCAssignment
+  @ETQName: pc|assignment
 
   @IFISA: PerlCode
   @ClsISA: ManakaiPerlCodeFragment
+  @CISA: ManakaiPCCode
 
   @enDesc:
     Perl variable assignment.
   
   @IntMethod:
-    @@ForCheck: ManakaiDOM|ForClass
+    @@ForCheck: ManakaiDOM|ForClass !pc|ForClass
     @@Name:newObject
     @@ManakaiDOM:isStatic:1
     @@Description:
@@ -3619,29 +5047,122 @@ IFClsDef:
 
   @ToStringMethod:
     @@Return:
-      @@@Type:
-        DISLang:String::ManakaiDOM:all
+      @@@Type: DOMString
       @@@enDesc:
         Perl code. 
       @@@PerlDef:
+        @@@@ForCheck: !pc|ForClass
+        @@@@@:
         my $node = $self->{<H::mn:node>};
         $r = <ClassM::ManakaiPerlCodeFragment.getNodeReference>
                 ($node->{<H::pc:left>})->stringify . ' = ' .
              <ClassM::ManakaiPerlCodeFragment.getNodeReference>
                 ($node->{<H::pc:right>})->stringify;
+      @@@PerlDef:
+        @@@@ForCheck: pc|ForClass
+        @@@@@:
+          __DEEP{
+            $r = $self-><AG::PerlAssignment.leftCode>->stringify
+               . ' = '
+               . $self-><AG::PerlAssignment.rightCode>->stringify;
+          }__;
+
+  @Attr:
+    @@ForCheck: !pc|ForClassCompat
+    @@Name: leftCode
+    @@enDesc:
+      Left-hand expression.
+    @@Type: PerlCodeInlines
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc: Left-hand code not yet specified.
+      @@@PerlDef:
+        __DEEP{
+          F: for my $child (@{$self-><AG::Node.childNodes>}) {
+            if ($child-><AG::Node.namespaceURI> eq <Q::pc:> and
+                $child-><AG::Node.localName> eq 'left') {
+              $r = $child-><AG::Node.lastChild>;
+              last F;
+            }
+          }
+        }__;
+    @@Set:
+      @@@PerlDef:
+        __DEEP{
+          $self-><AG::Node.ownerDocument>-><M::Document.adoptNode> ($given);
+          F: {
+            for my $child (@{$self-><AG::Node.childNodes>}) {
+              if ($child-><AG::Node.namespaceURI> eq <Q::pc:> and
+                  $child-><AG::Node.localName> eq 'left') {
+                $child-><AS::Node.textContent> ('');
+                $child-><M::Node.appendChild> ($given);
+                last F;
+              }
+            }
+            my $node = $self-><AG::Node.ownerDocument>
+                            -><M::Document.createElementNS>
+                                   (<Q::pc:>, 'left');
+            $node-><M::Node.appendChild> ($given);
+            $self-><M::Node.appendChild> ($node);
+          }
+        }__;
+
+  @Attr:
+    @@ForCheck: !pc|ForClassCompat
+    @@Name: rightCode
+    @@enDesc:
+      Right-hand expression.
+    @@Type: PerlCodeInlines
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc: Right-hand code not yet specified.
+      @@@PerlDef:
+        __DEEP{
+          F: for my $child (@{$self-><AG::Node.childNodes>}) {
+            if ($child-><AG::Node.namespaceURI> eq <Q::pc:> and
+                $child-><AG::Node.localName> eq 'right') {
+              $r = $child-><AG::Node.lastChild>;
+              last F;
+            }
+          }
+        }__;
+    @@Set:
+      @@@PerlDef:
+        __DEEP{
+          $self-><AG::Node.ownerDocument>-><M::Document.adoptNode> ($given);
+          F: {
+            for my $child (@{$self-><AG::Node.childNodes>}) {
+              if ($child-><AG::Node.namespaceURI> eq <Q::pc:> and
+                  $child-><AG::Node.localName> eq 'right') {
+                $child-><AS::Node.textContent> ('');
+                $child-><M::Node.appendChild> ($given);
+                last F;
+              }
+            }
+            my $node = $self-><AG::Node.ownerDocument>
+                            -><M::Document.createElementNS>
+                                   (<Q::pc:>, 'right');
+            $node-><M::Node.appendChild> ($given);
+            $self-><M::Node.appendChild> ($node);
+          }
+        }__;
 ##PerlAssignment
 
-IFClsDef:
+IFClsETDef:
   @IFQName: PerlIf
   @ClsQName: ManakaiPerlIf
+  @CQName: ManakaiPCIf
+  @ETQName: pc|if
 
   @IFISA: PerlCode
   @ClsISA: ManakaiPerlCodeFragment
+  @CISA: ManakaiPCCode
 
   @enDesc:
     Perl variable assignment.
   
   @IntMethod:
+    @@ForCheck: !pc|ForClass
     @@Name:newObject
     @@ManakaiDOM:isStatic:1
     @@Description:
@@ -3708,11 +5229,12 @@ IFClsDef:
 
   @ToStringMethod:
     @@Return:
-      @@@Type:
-        DISLang:String::ManakaiDOM:all
+      @@@Type: DOMString
       @@@enDesc:
         Perl code. 
       @@@PerlDef:
+        @@@@ForCheck: !pc|ForClass
+        @@@@@:
         my $node = $self->{<H::mn:node>};
         $r = <ClassM::ManakaiPerlCodeFragment.getNodeReference>
                 ($node->{<H::pc:condition>})->stringify;
@@ -3730,6 +5252,146 @@ IFClsDef:
         } else {
           $r = q<unless (> . $r . q<) {> . $false_code . q<}>;
         }
+      @@@PerlDef:
+        @@@@ForCheck: pc|ForClass
+        @@@@@:
+          __DEEP{
+            my $tcode = $self-><AG::PerlIf.trueCode>;
+            my $fcode = $self-><AG::PerlIf.falseCode>;
+            my $ccode = $self-><AG::PerlIf.condition>;
+            if (defined $tcode) {
+              if (defined $fcode) {
+                $r = q<if (> . $ccode->stringify . q<) {> . $tcode->stringify .
+                     q<} else {> . $fcode->stringify . qq<}\n>;
+              } else {
+                $r = q<if (> . $ccode->strigify . q<) {> . $tcode->stringify .
+                     qq<}\n>;
+              }
+            } else {
+              $r = q<unless (> . $ccode->stringify . q<) {> . $fcode->stringify .
+                   qq<}\n>;
+            }
+          }__;
+
+  @Attr:
+    @@ForCheck: !pc|ForClassCompat
+    @@Name: condition
+    @@enDesc:
+      Condition expression.
+    @@Type: PerlCodeInlines
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc: Condition code not yet specified.
+      @@@PerlDef:
+        __DEEP{
+          F: for my $child (@{$self-><AG::Node.childNodes>}) {
+            if ($child-><AG::Node.namespaceURI> eq <Q::pc:> and
+                $child-><AG::Node.localName> eq 'condition') {
+              $r = $child-><AG::Node.lastChild>;
+              last F;
+            }
+          }
+        }__;
+    @@Set:
+      @@@PerlDef:
+        __DEEP{
+          $self-><AG::Node.ownerDocument>-><M::Document.adoptNode> ($given);
+          F: {
+            for my $child (@{$self-><AG::Node.childNodes>}) {
+              if ($child-><AG::Node.namespaceURI> eq <Q::pc:> and
+                  $child-><AG::Node.localName> eq 'condition') {
+                $child-><AS::Node.textContent> ('');
+                $child-><M::Node.appendChild> ($given);
+                last F;
+              }
+            }
+            my $node = $self-><AG::Node.ownerDocument>
+                            -><M::Document.createElementNS>
+                                   (<Q::pc:>, 'condition');
+            $node-><M::Node.appendChild> ($given);
+            $self-><M::Node.appendChild> ($node);
+          }
+        }__;
+
+  @Attr:
+    @@ForCheck: !pc|ForClassCompat
+    @@Name: trueCode
+    @@enDesc:
+      True-case code.
+    @@Type: PerlCodeBlocks
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc: True-case code not yet specified.
+      @@@PerlDef:
+        __DEEP{
+          F: for my $child (@{$self-><AG::Node.childNodes>}) {
+            if ($child-><AG::Node.namespaceURI> eq <Q::pc:> and
+                $child-><AG::Node.localName> eq 'tr'.'ue') {
+              $r = $child-><AG::Node.lastChild>;
+              last F;
+            }
+          }
+        }__;
+    @@Set:
+      @@@PerlDef:
+        __DEEP{
+          $self-><AG::Node.ownerDocument>-><M::Document.adoptNode> ($given);
+          F: {
+            for my $child (@{$self-><AG::Node.childNodes>}) {
+              if ($child-><AG::Node.namespaceURI> eq <Q::pc:> and
+                  $child-><AG::Node.localName> eq 'tr'.'ue') {
+                $child-><AS::Node.textContent> ('');
+                $child-><M::Node.appendChild> ($given);
+                last F;
+              }
+            }
+            my $node = $self-><AG::Node.ownerDocument>
+                            -><M::Document.createElementNS>
+                                   (<Q::pc:>, 'tr'.'ue');
+            $node-><M::Node.appendChild> ($given);
+            $self-><M::Node.appendChild> ($node);
+          }
+        }__;
+
+  @Attr:
+    @@ForCheck: !pc|ForClassCompat
+    @@Name: falseCode
+    @@enDesc:
+      False-case code.
+    @@Type: PerlCodeBlocks
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc: True-case code not yet specified.
+      @@@PerlDef:
+        __DEEP{
+          F: for my $child (@{$self-><AG::Node.childNodes>}) {
+            if ($child-><AG::Node.namespaceURI> eq <Q::pc:> and
+                $child-><AG::Node.localName> eq 'fal'.'se') {
+              $r = $child-><AG::Node.lastChild>;
+              last F;
+            }
+          }
+        }__;
+    @@Set:
+      @@@PerlDef:
+        __DEEP{
+          $self-><AG::Node.ownerDocument>-><M::Document.adoptNode> ($given);
+          F: {
+            for my $child (@{$self-><AG::Node.childNodes>}) {
+              if ($child-><AG::Node.namespaceURI> eq <Q::pc:> and
+                  $child-><AG::Node.localName> eq 'fal'.'se') {
+                $child-><AS::Node.textContent> ('');
+                $child-><M::Node.appendChild> ($given);
+                last F;
+              }
+            }
+            my $node = $self-><AG::Node.ownerDocument>
+                            -><M::Document.createElementNS>
+                                   (<Q::pc:>, 'fal'.'se');
+            $node-><M::Node.appendChild> ($given);
+            $self-><M::Node.appendChild> ($node);
+          }
+        }__;
 ##PerlIf
 
 PropDef:
@@ -3769,6 +5431,7 @@ ElementTypeBinding:
 IFClsDef:
   @IFQName: PCImplementation
   @ClsQName: ManakaiPerlCodeImplementation
+  @CQName: ManakaiPCImplementation
 
   @enDesc:
     The class that provides factory methods. 
@@ -3776,9 +5439,10 @@ IFClsDef:
   @ClsISA: DOMFeature|ManakaiMinimumImplementation||ManakaiDOM|ManakaiDOMLatest
   @ClsISA:
     dx:ManakaiDefaultExceptionHandler::ManakaiDOM:Perl
+  @CISA: DOMCore|ManakaiDOMImplementation||ManakaiDOM|ManakaiDOMLatest
+  @CISA: dx|ManakaiDefaultExceptionHandler||ManakaiDOM|Perl
 
-
-  @DOMMetaImpl:provideFeature: CoreFeature10
+  @f:provides: pc|CoreFeature10
 
   @Method:
     @@Name: createPerlFile
@@ -3786,13 +5450,21 @@ IFClsDef:
       Creates a Perl code file. 
     @@Return:
       @@@Type: PerlFile
-      @@@caType: ManakaiPerlFile
       @@@enDesc: A newly created Perl source file object. 
       @@@PerlDef:
+        @@@@ForCheck: !pc|ForClass
+        @@@@@:
         $r = <ClassM::ManakaiPerlFile.newObject>;
-        __CODE{ManakaiNode:getNewReference::
+        __CODE{ManakaiNode:getNewReference||ManakaiDOM|Perl::
                  $object => $r, $ref => $r,
                  $class => {<ClassName::ManakaiPerlFile>}}__;
+      @@@PerlDef:
+        @@@@ForCheck: pc|ForClass
+        @@@@@:
+          __DEEP{
+            $r = $self-><M::DOMImpl.createDocument> (<Q::pc:>, 'file')
+                      -><AG::Document.documentElement>;
+          }__;
 
   @Method:
     @@Name: createPerlPackage
@@ -3800,21 +5472,29 @@ IFClsDef:
       Creates a new package scope block. 
     @@Param:
       @@@Name: packageName
-      @@@Type:
-        Perl:package-name::ManakaiDOM:all
+      @@@Type: DOMString
       @@@enDesc:
         The fully-qualified name of the package to create. 
     @@Return:
       @@@Type: PerlPackage
-      @@@caType: ManakaiPerlPackageScope
       @@@enDesc:
         The newly created package scope object. 
       @@@PerlDef:
+        @@@@ForCheck: !pc|ForClass
+        @@@@@:
         $r = <ClassM::ManakaiPerlPackageScope.newObject>;
         $r->{<H::pc:packageName>} = $packageName;
-        __CODE{ManakaiNode:getNewReference::
+        __CODE{ManakaiNode:getNewReference||ManakaiDOM|Perl::
                  $object => $r, $ref => $r,
                  $class => {<ClassName::ManakaiPerlPackageScope>}}__;
+      @@@PerlDef:
+        @@@@ForCheck: pc|ForClass
+        @@@@@:
+          __DEEP{
+            $r = $self-><M::DOMImpl.createDocument>
+                      -><M::Document.createElementNS> (<Q::pc:>, 'package');
+            $r-><AS::PerlPackage.packageName> ($packageName);
+          }__;
 
   @IntMethod:
     @@ForCheck: ManakaiDOM|ForClass
@@ -3824,13 +5504,11 @@ IFClsDef:
       Generates a Perl comment string. 
     @@Param:
       @@@Name: str
-      @@@Type: 
-        DISLang:String::ManakaiDOM:all
+      @@@Type: DOMString
       @@@enDesc:
         A comment text. 
     @@Return:
-      @@@Type:
-        DISLang:String::ManakaiDOM:all
+      @@@Type: DOMString
       @@@enDesc:
         A Perl comment string.
       @@@PerlDef:
@@ -3848,13 +5526,11 @@ IFClsDef:
       Returns RFC 3339 <CODE::date-time> representation of a date. 
     @@Param:
       @@@Name: perlDate
-      @@@Type:
-        DOMMain:unsigned-long::ManakaiDOM:all
+      @@@Type: idl|unsignedLong||ManakaiDOM|all
       @@@enDesc:
         A Perl representation of date. 
     @@Return:
-      @@@Type:
-        DISLang:String::ManakaiDOM:all
+      @@@Type: DOMString
       @@@enDesc:
         RFC 3339 date string. 
       @@@PerlDef:
@@ -3870,13 +5546,11 @@ IFClsDef:
       Returns date for version. 
     @@Param:
       @@@Name: perlDate
-      @@@Type:
-        DOMMain:unsigned-long::ManakaiDOM:all
+      @@@Type: idl|unsignedLong||ManakaiDOM|all
       @@@enDesc:
         A Perl representation of date. 
     @@Return:
-      @@@Type:
-        DISLang:String::ManakaiDOM:all
+      @@@Type: DOMString
       @@@enDesc:
         A Perl number literal. 
       @@@PerlDef:
@@ -3890,13 +5564,11 @@ IFClsDef:
       Perl code representation. 
     @@Param:
       @@@Name: val
-      @@@Type: 
-        DOMMain:any::ManakaiDOM:all
+      @@@Type: DISPerl|Any||ManakaiDOM|all
       @@@enDesc:
         A Perl value. 
     @@Return:
-      @@@Type:
-        DISLang:String::ManakaiDOM:all
+      @@@Type: DOMString
       @@@enDesc:
         A Perl lexical representation of <P::val>. 
       @@@PerlDef:
@@ -3925,13 +5597,11 @@ IFClsDef:
       Perl code representation of a list. 
     @@Param:
       @@@Name: val
-      @@@Type: 
-        Perl:ARRAY::ManakaiDOM:all
+      @@@Type: DISPerl|ARRAY||ManakaiDOM|all
       @@@enDesc:
         A Perl array reference. 
     @@Return:
-      @@@Type:
-        DISLang:String::ManakaiDOM:all
+      @@@Type: DOMString
       @@@enDesc:
         A Perl lexical representation of <CODE::@$val>. 
       @@@PerlDef:
@@ -3943,11 +5613,10 @@ IFClsDef:
   @Method:
     @@Name: createPerlSub
     @@enDesc:
-      Creates a new <Class::ManakaiPerlSub> object. 
+      Creates a new <IF::PerlSub> object. 
     @@Param:
       @@@Name: subName
-      @@@Type:
-        DISLang:String::ManakaiDOM:all
+      @@@Type: DOMString
       @@@enDesc:
         The name of the subroutine to create.
       @@@nullCase:
@@ -3955,17 +5624,26 @@ IFClsDef:
           The subroutine created has no name. 
     @@Return:
       @@@Type: PerlSub
-      @@@caType: ManakaiPerlSub
       @@@enDesc: 
         Newly created Perl subroutine object. 
       @@@PerlDef:
+        @@@@ForCheck: !pc|ForClass
+        @@@@@:
         __DEEP{
           $r = <ClassM::ManakaiPerlSub.newObject>;
-          __CODE{ManakaiNode:getNewReference::
+          __CODE{ManakaiNode:getNewReference||ManakaiDOM|Perl::
                    $object => $r, $ref => $r,
                    $class => {<ClassName::ManakaiPerlSub>}}__;
-          $r-><AS::ManakaiPerlSub.localName> ($subName) if defined $subName;
+          $r-><AS::ManakaiPerlSub.pcLocalName> ($subName) if defined $subName;
         }__;
+      @@@PerlDef:
+        @@@@ForCheck: pc|ForClass
+        @@@@@:
+          __DEEP{
+            $r = $self-><M::DOMImpl.createDocument>
+                      -><M::Document.createElementNS> (<Q::pc:>, 'sub');
+            $r-><M::PerlSub.addPerlName> ($subName) if defined $subName;
+          }__;
 
   @Method:
     @@Name: createPerlUnparsedCode
@@ -3973,8 +5651,7 @@ IFClsDef:
       Creates a new <Class::ManakaiPerlUnparsedCode> object. 
     @@Param:
       @@@Name: codeArg
-      @@@Type:
-        lang:Perl::ManakaiDOM:all
+      @@@Type: DOMString
       @@@enDesc:
         The code fragment. 
       @@@nullCase:
@@ -3982,43 +5659,59 @@ IFClsDef:
           The fragment initially has no code. 
     @@Return:
       @@@Type: PerlUnparsedCode
-      @@@caType: ManakaiPerlUnparsedCode
       @@@enDesc: 
         Newly created Perl code object. 
       @@@PerlDef:
+        @@@@ForCheck: !pc|ForClass
+        @@@@@:
         __DEEP{
           $r = <ClassM::ManakaiPerlUnparsedCode.newObject>;
-          __CODE{ManakaiNode:getNewReference::
+          __CODE{ManakaiNode:getNewReference||ManakaiDOM|Perl::
                    $object => $r, $ref => $r,
                    $class => {<ClassName::ManakaiPerlUnparsedCode>}}__;
           $r-><AS::ManakaiPerlUnparsedCode.code> ($codeArg) if defined $codeArg;
         }__;
+      @@@PerlDef:
+        @@@@ForCheck: pc|ForClass
+        @@@@@:
+          __DEEP{
+            $r = $self-><M::DOMImpl.createDocument>
+                      -><M::Document.createElementNS> (<Q::pc:>, 'unparsed');
+            $r-><AS::Node.textContent> ($codeArg) if defined $codeArg;
+          }__;
 
   @Method:
     @@Name: createPerlInlineContainer
     @@enDesc:
-      Creates a new <Class::ManakaiPerlInlineContainer> object. 
+      Creates a new <IF::PerlInlineContainer> object. 
     @@Return:
       @@@Type: PerlCodeInlines
-      @@@caType: ManakaiPerlInlineContainer
       @@@enDesc: 
         Newly created Perl code object. 
       @@@PerlDef:
+        @@@@ForCheck: !pc|ForClass
+        @@@@@:
         __DEEP{
           $r = <ClassM::ManakaiPerlInlineContainer.newObject>;
-          __CODE{ManakaiNode:getNewReference::
+          __CODE{ManakaiNode:getNewReference||ManakaiDOM|Perl::
                    $object => $r, $ref => $r,
                    $class => {<ClassName::ManakaiPerlInlineContainer>}}__;
         }__;
+      @@@PerlDef:
+        @@@@ForCheck: pc|ForClass
+        @@@@@:
+          __DEEP{
+            $r = $self-><M::DOMImpl.createDocument>
+                  -><M::Document.createElementNS> (<Q::pc:>, 'inlineContainer');
+          }__;
 
   @Method:
     @@Name: createPerlInlineUnparsedCode
     @@enDesc:
-      Creates a new <Class::ManakaiPerlInlineUnparsedCode> object. 
+      Creates a new <IF::PerlInlineUnparsedCode> object. 
     @@Param:
       @@@Name: codeArg
-      @@@Type:
-        lang:Perl::ManakaiDOM:all
+      @@@Type: DOMString
       @@@enDesc:
         The code fragment. 
       @@@nullCase:
@@ -4026,98 +5719,130 @@ IFClsDef:
           The fragment initially has no code. 
     @@Return:
       @@@Type: PerlInlineUnparsedCode
-      @@@caType: ManakaiPerlInlineUnparsedCode
       @@@enDesc: 
         Newly created Perl code object. 
       @@@PerlDef:
+        @@@@ForCheck: !pc|ForClass
+        @@@@@:
         __DEEP{
           $r = <ClassM::ManakaiPerlInlineUnparsedCode.newObject>;
-          __CODE{ManakaiNode:getNewReference::
+          __CODE{ManakaiNode:getNewReference||ManakaiDOM|Perl::
                    $object => $r, $ref => $r,
                    $class => {<ClassName::ManakaiPerlInlineUnparsedCode>}}__;
           $r-><AS::ManakaiPerlInlineUnparsedCode.code> ($codeArg)
             if defined $codeArg;
         }__;
+      @@@PerlDef:
+        @@@@ForCheck: pc|ForClass
+        @@@@@:
+          __DEEP{
+            $r = $self-><M::DOMImpl.createDocument>
+                   -><M::Document.createElementNS> (<Q::pc:>, 'inlineUnparsed');
+            $r-><AS::Node.textContent> ($codeArg) if defined $codeArg;
+          }__;
 
   @Method:
     @@Name: createPerlBare
     @@enDesc:
-      Creates a new <Class::ManakaiPerlBare> object. 
+      Creates a new <IF::PerlTokens> object. 
     @@Param:
       @@@Name: codeArg
-      @@@Type:
-        lang:Perl::ManakaiDOM:all
+      @@@Type: DOMString
       @@@enDesc:
         The code fragment. 
     @@Return:
       @@@Type: PerlTokens
-      @@@caType: ManakaiPerlBare
       @@@enDesc: 
         Newly created Perl code object. 
       @@@PerlDef:
+        @@@@ForCheck: !pc|ForClass
+        @@@@@:
         __DEEP{
           $r = <ClassM::ManakaiPerlBare.newObject>;
-          __CODE{ManakaiNode:getNewReference::
+          __CODE{ManakaiNode:getNewReference||ManakaiDOM|Perl::
                    $object => $r, $ref => $r,
                    $class => {<ClassName::ManakaiPerlBare>}}__;
           $r-><AS::ManakaiPerlBare.code> ($codeArg);
         }__;
+      @@@PerlDef:
+        @@@@ForCheck: pc|ForClass
+        @@@@@:
+          __DEEP{
+            $r = $self-><M::DOMImpl.createDocument>
+                      -><M::Document.createElementNS> (<Q::pc:>, 'tokens');
+            $r-><AS::Node.textContent> ($codeArg) if defined $codeArg;
+          }__;
 
   @Method:
     @@Name: createPerlAtom
     @@enDesc:
-      Creates a new <Class::ManakaiPerlAtom> object. 
+      Creates a new <IF::PerlAtom> object. 
     @@Param:
       @@@Name: codeArg
-      @@@Type:
-        lang:Perl::ManakaiDOM:all
+      @@@Type: DOMString
       @@@enDesc:
         The code fragment. 
     @@Return:
       @@@Type: PerlAtom
-      @@@caType: ManakaiPerlAtom
       @@@enDesc: 
         Newly created Perl code object. 
       @@@PerlDef:
+        @@@@ForCheck: !pc|ForClass
+        @@@@@:
         __DEEP{
           $r = <ClassM::ManakaiPerlAtom.newObject>;
-          __CODE{ManakaiNode:getNewReference::
+          __CODE{ManakaiNode:getNewReference||ManakaiDOM|Perl::
                    $object => $r, $ref => $r,
                    $class => {<ClassName::ManakaiPerlAtom>}}__;
           $r-><AS::ManakaiPerlBare.code> ($codeArg);
         }__;
+      @@@PerlDef:
+        @@@@ForCheck: pc|ForClass
+        @@@@@:
+          __DEEP{
+            $r = $self-><M::DOMImpl.createDocument>
+                      -><M::Document.createElementNS> (<Q::pc:>, 'atom');
+            $r-><AS::Node.textContent> ($codeArg) if defined $codeArg;
+          }__;
 
   @Method:
     @@Name: createPerlStringLiteral
     @@enDesc:
-      Creates a new <Class::ManakaiPerlStringLiteral> object. 
+      Creates a new <IF::PerlStringLiteral> object. 
     @@Param:
       @@@Name: stringArg
-      @@@Type:
-        DISLang:String::ManakaiDOM:all
+      @@@Type: DOMString
       @@@enDesc: A string.
     @@Return:
       @@@Type: PerlStringLiteral
-      @@@caType: ManakaiPerlStringLiteral
       @@@enDesc: 
         Newly created Perl code object. 
       @@@PerlDef:
+        @@@@ForCheck: !pc|ForClass
+        @@@@@:
         __DEEP{
           $r = <ClassM::ManakaiPerlStringLiteral.newObject>;
-          __CODE{ManakaiNode:getNewReference::
+          __CODE{ManakaiNode:getNewReference||ManakaiDOM|Perl::
                    $object => $r, $ref => $r,
                    $class => {<ClassName::ManakaiPerlStringLiteral>}}__;
           $r-><AS::ManakaiPerlStringLiteral.data> ($stringArg);
         }__;
+      @@@PerlDef:
+        @@@@ForCheck: pc|ForClass
+        @@@@@:
+          __DEEP{
+            $r = $self-><M::DOMImpl.createDocument>
+                   -><M::Document.createElementNS> (<Q::pc:>, 'stringLiteral');
+            $r-><AS::Node.textContent> ($stringArg);
+          }__;
 
   @Method:
     @@Name: createPerlVariable
     @@enDesc:
-      Creates a new <Class::ManakaiPerlVariable> object. 
+      Creates a new <IF::PerlVariable> object. 
     @@Param:
       @@@Name: variableType
-      @@@Type:
-        DISLang:String::ManakaiDOM:all
+      @@@Type: DOMString
       @@@enDesc:
         Variable prefix.
       @@@nullCase:
@@ -4128,8 +5853,7 @@ IFClsDef:
           such as file handle.
     @@Param:
       @@@Name: packageName
-      @@@Type:
-        Perl:package-name::ManakaiDOM:all
+      @@@Type: DOMString
       @@@enDesc:
         Package name.
       @@@nullCase:
@@ -4138,21 +5862,21 @@ IFClsDef:
           lexical-scoped variable.
     @@Param:
       @@@Name: localName
-      @@@Type:
-        DISLang:String::ManakaiDOM:all
+      @@@Type: DOMString
       @@@enDesc:
         Variable name.  If both <P::variableType> and <P::packageName>
         is <DOM::null>, the <P::localName> value may be prefixed
         by any possible <P::variableType> value.
     @@Return:
       @@@Type: PerlVariable
-      @@@caType: ManakaiPerlVariable
       @@@enDesc: 
         Newly created Perl variable object. 
       @@@PerlDef:
+        @@@@ForCheck: !pc|ForClass
+        @@@@@:
         __DEEP{
           $r = <ClassM::ManakaiPerlVariable.newObject>;
-          __CODE{ManakaiNode:getNewReference::
+          __CODE{ManakaiNode:getNewReference||ManakaiDOM|Perl::
                    $object => $r, $ref => $r,
                    $class => {<ClassName::ManakaiPerlVariable>}}__;
           if (not $variableType and not $packageName and
@@ -4163,23 +5887,47 @@ IFClsDef:
           $r-><AS::ManakaiPerlVariable.packageName> ($packageName);
           $r-><AS::ManakaiPerlVariable.localName> ($localName);
         }__;
+      @@@PerlDef:
+        @@@@ForCheck: pc|ForClass
+        @@@@@:
+          __DEEP{
+            $r = $self-><M::DOMImpl.createDocument>
+                      -><M::Document.createElementNS> (<Q::pc:>, 'variable');
+            if (not $variableType and not $packageName and
+                $localName =~ s/^(\\?[\$\@%&*])//) {
+              $variableType = $1;
+            }
+            $r-><AS::PerlVariable.variableType> ($variableType)
+                                                  if defined $variableType;
+            $r-><AS::PerlVariable.packageName> ($packageName)
+                                                  if defined $packageName;
+            $r-><AS::PerlVariable.pcLocalName> ($localName);
+          }__;
 
   @Method:
     @@Name: createPerlBlock
     @@enDesc:
-      Creates a new <Class::ManakaiPerlBlock> object. 
+      Creates a new <IF::PerlBlock> object. 
     @@Return:
       @@@Type: PerlBlock
-      @@@caType: ManakaiPerlBlock
       @@@enDesc: 
         Newly created Perl code object. 
       @@@PerlDef:
+        @@@@ForCheck: !pc|ForClass
+        @@@@@:
         __DEEP{
           $r = <ClassM::ManakaiPerlBlock.newObject>;
-          __CODE{ManakaiNode:getNewReference::
+          __CODE{ManakaiNode:getNewReference||ManakaiDOM|Perl::
                    $object => $r, $ref => $r,
                    $class => {<ClassName::ManakaiPerlBlock>}}__;
         }__;
+      @@@PerlDef:
+        @@@@ForCheck: pc|ForClass
+        @@@@@:
+          __DEEP{
+            $r = $self-><M::DOMImpl.createDocument>
+                      -><M::Document.createElementNS> (<Q::pc:>, 'block');
+          }__;
 
   @Method:
     @@Name: createPerlBlockContainer
@@ -4187,16 +5935,24 @@ IFClsDef:
       Creates a new <Class::ManakaiPerlBlockContainer> object. 
     @@Return:
       @@@Type: PerlCodeBlocks
-      @@@caType: ManakaiPerlBlockContainer
       @@@enDesc: 
         Newly created Perl code object. 
       @@@PerlDef:
+        @@@@ForCheck: !pc|ForClass
+        @@@@@:
         __DEEP{
           $r = <ClassM::ManakaiPerlBlockContainer.newObject>;
-          __CODE{ManakaiNode:getNewReference::
+          __CODE{ManakaiNode:getNewReference||ManakaiDOM|Perl::
                    $object => $r, $ref => $r,
                    $class => {<ClassName::ManakaiPerlBlockContainer>}}__;
         }__;
+      @@@PerlDef:
+        @@@@ForCheck: pc|ForClass
+        @@@@@:
+          __DEEP{
+            $r = $self-><M::DOMImpl.createDocument>
+                    -><M::Document.createElementNS> (<Q::pc:>, 'blockContainer');
+          }__;
 
   @Method:
     @@Name: createPerlStatement
@@ -4204,8 +5960,7 @@ IFClsDef:
       Creates a new Perl statement.
     @@Param:
       @@@Name: codeArg
-      @@@Type:
-        lang:Perl::ManakaiDOM:all
+      @@@Type: DOMString
       @@@enDesc:
         A Perl statement without terminating <Perl::;>.
       @@@nullCase:
@@ -4213,12 +5968,13 @@ IFClsDef:
           No initial content.
     @@Return:
       @@@Type: PerlStatement
-      @@@caType: ManakaiPerlStatement
       @@@enDesc:
         The newly created Perl code object. 
       @@@PerlDef:
+        @@@@ForCheck: !pc|ForClass
+        @@@@@:
         $r = <ClassM::ManakaiPerlStatement.newObject>;
-        __CODE{ManakaiNode:getNewReference::
+        __CODE{ManakaiNode:getNewReference||ManakaiDOM|Perl::
           $object => $r, $ref => $r,
           $class =>{<ClassName::ManakaiPerlStatement>},
         }__;
@@ -4227,36 +5983,42 @@ IFClsDef:
             $r-><M::ManakaiPerlAnyContainer.appendBare> ($codeArg);
           }__;
         }
+      @@@PerlDef:
+        @@@@ForCheck: pc|ForClass
+        @@@@@:
+          __DEEP{
+            $r = $self-><M::DOMImpl.createDocument>
+                      -><M::Document.createElementNS> (<Q::pc:>, 'statement');
+            if (defined $codeArg) {
+              $r-><M::PerlCodeUnits.appendBare> ($codeArg);
+            }
+          }__;
 
   @Method:
     @@Name: createPerlIf
     @@enDesc:
-      Creates a <Class::ManakaiPerlIf> object. 
+      Creates a <IF::PerlIf> object. 
     @@Param:
       @@@Name: conditionArg
-      @@@Type: PerlCode
-      @@@caType: ManakaiPerlCodeFragment
+      @@@Type: PerlCodeInlines
       @@@enDesc:
         Conditoon code fragment object.
     @@Param:
       @@@Name: trueArg
-      @@@Type: PerlCode
-      @@@caType: ManakaiPerlCodeFragment
+      @@@Type: PerlCodeBlocks
       @@@enDesc:
         A true code fragment object. 
       @@@nullCase:
         @@@@enDesc: No true code.
     @@Param:
       @@@Name: falseArg
-      @@@Type: PerlCode
-      @@@caType: ManakaiPerlCodeFragment
+      @@@Type: PerlCodeBlocks
       @@@enDesc:
         A false code fragment object. 
       @@@nullCase:
         @@@@enDesc: No false code.
     @@Return:
       @@@Type: PerlIf
-      @@@caType: ManakaiPerlIf
       @@@RaiseException:
         @@@@@:BAD_CHILD_ERR
         @@@@enDesc:
@@ -4268,6 +6030,8 @@ IFClsDef:
           An attempt is made to append a node that is 
           already used elsewhere. 
       @@@PerlDef:
+        @@@@ForCheck: !pc|ForClass
+        @@@@@:
         for my $arg ([conditionArg => $conditionArg]) {
           if ({
             atom => 1, bare => 1, incontainer => 1, assign => true,
@@ -4321,11 +6085,63 @@ IFClsDef:
         $trueArg->{<H::mn:node>}->{<H::pc:parent>} = $assign if $trueArg;
         $falseArg->{<H::mn:node>}->{<H::pc:parent>} = $assign if $falseArg;
         if (defined wantarray) {
-          __CODE{ManakaiNode:getNewReference::
+          __CODE{ManakaiNode:getNewReference||ManakaiDOM|Perl::
             $object => $assign, $ref => $r,
             $class =>{<ClassName::ManakaiPerlIf>},
           }__;
         }
+      @@@PerlDef:
+        @@@@ForCheck: pc|ForClass
+        @@@@@:
+          for my $arg ([conditionArg => $conditionArg]) {
+            if ({
+              atom => 1, tokens => 1, inlineContainer => 1, assignment => true,
+              inlineUnparsed => 1, variable => 1, stringLiteral => true,
+            }->{$arg->[1]-><AG::Node.localName>}) {
+              if ($arg->[1]-><AG::Node.parentNode>) {
+                __EXCEPTION{IN_USE_NODE_ERR::
+                  pc:childNode => {$arg->[1]},
+                  MDOMX:param-name => {$arg->[0]},
+                }__;
+              }
+            } else {
+              __EXCEPTION{BAD_CHILD_ERR::
+                pc:parentNode => {$self},
+                pc:childNode => {$arg->[1]},
+                MDOMX:param-name => {$arg->[0]},
+              }__;
+            }
+          } # c
+
+          for my $arg ([trueArg => $trueArg],
+                       [falseArg => $falseArg]) {
+            next unless $arg->[1];
+            if ({
+                  blockContainer => true,
+                }->{$arg->[1]-><AG::Node.localName>}) {
+              if ($arg->[1]-><AG::Node.parentNode>) {
+                __EXCEPTION{IN_USE_NODE_ERR::
+                  pc:childNode => {$arg->[1]},
+                  MDOMX:param-name => {$arg->[0]},
+                }__;
+              }
+            } else {
+              __EXCEPTION{BAD_CHILD_ERR::
+                pc:parentNode => {$self},
+                pc:childNode => {$arg->[1]},
+                MDOMX:param-name => {$arg->[0]},
+              }__;
+            }
+          } # t/f
+
+          __DEEP{
+            $r = $self-><M::DOMImpl.createDocument>
+                      -><M::Document.createElementNS>
+                            (<Q::pc:>, 'if');
+            $r-><AS::PerlIf.condition> ($conditionArg) if $conditionArg;
+            $r-><AS::PerlIf.trueCode> ($trueArg) if $trueArg;
+            $r-><AS::PerlIf.falseCode> ($falseArg) if $falseArg;
+          }__;
 ##PCImplementation
 
 ResourceDef:
@@ -4390,6 +6206,26 @@ PropDef:
   @enDesc:
     Scoped names.
 
+ResourceDef:
+  @QName: DOMImpl
+  @AliasFor: DOMCore|DOMImplementation
+  @For: ManakaiDOM|DOM
+
+ResourceDef:
+  @QName: Node
+  @AliasFor: DOMCore|Node
+  @For: ManakaiDOM|DOM
+
+ResourceDef:
+  @QName: Element
+  @AliasFor: DOMCore|Element
+  @For: ManakaiDOM|DOM
+
+ResourceDef:
+  @QName: Document
+  @AliasFor: DOMCore|Document
+  @For: ManakaiDOM|DOM
+
 ## -- Exceptions
 
 ResourceDef:
@@ -4410,19 +6246,25 @@ ResourceDef:
     @@ForCheck: ManakaiDOM|ForClass
 
   @Implement:
-    @@@: ||ManakaiDOM|Perl||ManakaiDOM|ForIF
+    @@@: ||ManakaiDOM|ManakaiDOM|ManakaiDOM||ManakaiDOM|ForIF
     @@ContentType: DISCore|TFPQNames
     @@ForCheck: ManakaiDOM|ForClass
-  @dx:implementedBy: ||ManakaiDOM|Perl||ManakaiDOM|ForClass
+  @Implement:
+    @@@: ||ManakaiDOM|ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
+    @@ContentType: DISCore|TFPQNames
+    @@ForCheck: ManakaiDOM|ForClass
+  @dx:implementedBy: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForClass
 
-  @f:implements: CoreFeature10
+  @f:implements: pc|CoreFeature10
 
   @ISA:
     @@@: dx|Exception||ManakaiDOM|Perl
     @@ForCheck: ManakaiDOM|ForClass
 
   @IFQName: PCException
-  @ClsQName: ManakaiPerlCodeException
+  @QName:
+    @@@: ManakaiPCException
+    @@ForCheck: ManakaiDOM|ForClass
 
   @enDesc:
     Exceptions for the <Module::Util:PerlCode> module.
@@ -4545,8 +6387,7 @@ ElementTypeBinding:
     @@Operator:
       @@@@:
         DISPerl:AsStringMethod
-      @@@ContentType:
-        dis:TypeQName
+      @@@ContentType: DISCore|QName
     @@Description:
       @@@lang:en
       @@@@:
@@ -4582,7 +6423,7 @@ ElementTypeBinding:
         Returns the node object of a deep clone of a node object.
     @@ManakaiDOM:isStatic:1
     @@ManakaiDOM:isForInternal:1
-    @@ForCheck: ManakaiDOM|ForClass
+    @@ForCheck: ManakaiDOM|ForClass pc|ForClassCompat
     @@ResourceDef:
       @@@rdf:type:
         DISLang:MethodParameter
@@ -4594,6 +6435,7 @@ ElementTypeBinding:
         @@@@@: Node object to copy.
   @ShadowSibling:
     @@ResourceDef:
+      @@@ForCheck: pc|ForClassCompat
       @@@rdf:type:
         DISLang:Method
       @@@Operator:
@@ -4628,7 +6470,7 @@ ElementTypeBinding:
             $ro-><M::ManakaiDOM:ManakaiDOMNodeObject
                    ::ManakaiDOM:Perl.changeTreeID>
                                  (<Code::ManakaiDOM:generateUniqueID
-                                       ::ManakaiDOM:Perl>);
+                                       ||ManakaiDOM:Perl>);
             $r = <ClassM::ManakaiPerlCodeFragment.getNodeReference> ($ro);
 
 ElementTypeBinding:
