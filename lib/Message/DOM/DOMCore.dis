@@ -40,7 +40,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/10/12 14:45:56 $
+      $Date: 2005/10/13 08:16:34 $
     @@ContentType:
       dis:Date.RCS
 
@@ -10849,10 +10849,6 @@ NodeTypeDef:
       @@@ForCheck: ForSelect
       @@@ContentType:
         dis:TFQNames
-    @@rdf:type:
-      @@@@:
-        dis2pm:BlockCode
-      @@@ForCheck: ForSelect
 
     @@QName:
       @@@@: selectAttrNodeObjectForRemove
@@ -10862,10 +10858,8 @@ NodeTypeDef:
       @@@ForCheck: ForRemove
       @@@ContentType:
         dis:TFQNames
-    @@rdf:type:
-      @@@@:
-        dis2pm:BlockCode
-      @@@ForCheck: ForRemove
+
+    @@rdf:type: DISPerl|BlockCode
 
     @@Description:
       @@@lang:en
@@ -10883,18 +10877,15 @@ NodeTypeDef:
         @@@@lang:en
         @@@@@:
           The name of the attribute to select.
-    @@Return:
+    @@Param:
+      @@@Name: r
+      @@@Out: 1
       @@@Type: NodeStem
       @@@Description:
         @@@@lang:en
         @@@@@:
-          The <IF::ManakaiDOMNodeObject> object.
-      @@@InCase:
-        @@@@Value:
-          @@@@@is-null:1
-        @@@@Description:
-          @@@@@lang:en
-          @@@@@@: There is no such attribute.
+          The <IF::NodeStem> object.  If there is no attribute
+          node, then its value is left unchanged.
     @@PerlDef:
             my $attr = $self->{<H::mn:node>}->{<H::infoset:attributes>};
             if ($attr->{<Q::ManakaiDOM:noNS>}->{$name}) {
@@ -11539,12 +11530,12 @@ NodeTypeDef:
             @@@@@lang:en
             @@@@@@: There is no such attribute.
      @@PerlDef:
-            my $attr = $self->{<H::mn:node>}->{<H::infoset:attributes>};
-            $namespaceURI = <Q::null:> unless defined $namespaceURI;
-            $r = $attr->{$namespaceURI}->{$localName};
-            __FOR{ForRemove::
-              CORE::delete $attr->{$namespaceURI}->{$localName} if $r;
-            }__;
+       my $__attr = $self->{<H::mn:node>}->{<H::infoset:attributes>};
+       my $__nsuri = defined $namespaceURI ? \$namespaceURI : \<Q::null:>;
+       $r = $__attr->{$$__nsuri}->{$localName};
+       __FOR{ForRemove::
+         CORE::delete $__attr->{$$__nsuri}->{$localName} if $r;
+       }__;
     @@ImplNote:
       @@@lang:en
       @@@@:
@@ -11823,49 +11814,13 @@ NodeTypeDef:
               }__;
               ## TODO: Check prefix if nsuri
             }
-            my $r;
-            __CODE{selectAttrNodeObjectNS:: $localName => $localName}__;
-            my $node = $self->{<H::mn:node>};
-            if ($r) {
-              if ($r->{<H::DOMCore:read-only>}) {
-                __EXCEPTION{
-                  MDOMX:NOMOD_ATTR::
-                }__;
-              }
-              my @children = @{$r->{<H::infoset:children>}};
-              $r->{<H::infoset:children>} = [];
-              for (@children) {
-                CORE::delete $_->{<H::infoset:parent>};
-                $_-><M::NodeStem.orphanate>;
-              }
-            } else {
-              $r = <ClassM::ManakaiDOMAttr.newObject> ($node);
-              __CODE{mn|setXRefNode||ManakaiDOM|Perl::
-                $referrer => {$r},
-                $propName => {<H::DOMCore:ownerDocument>},
-                $referent => {$node->{<H::DOMCore:ownerDocument>}},
-              }__;
-              $r->{<H::infoset:prefix>} = $prefix;
-              __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
-                $result => {$r->{<H::infoset:namespaceName>}},
-                $given => $namespaceURI,
-              }__;
-              $r->{<H::infoset:localName>} = $localName;
-              $r->{<H::infoset:ownerElement>} = $node;
-              $node->{<H::infoset:attributes>}
-                   ->{defined $namespaceURI ? $namespaceURI : <Q::null:>}
-                   ->{$localName} = $r;
-            }
-            my $text = <ClassM::ManakaiDOMText.newObject> ($node);
-            __CODE{mn|setXRefNode||ManakaiDOM|Perl::
-              $referrer => {$text},
-              $propName => {<H::DOMCore:ownerDocument>},
-              $referent => {$self->{<H::mn:node>}->{<H::DOMCore:ownerDocument>}},
+            __CODE{setAttrValueNS::
+              $namespaceURI => $namespaceURI,
+              $prefix => $prefix,
+              $localName => $localName,
+              $element => $self,
+              $value => $value,
             }__;
-            $text->{<H::infoset:content>} = defined $value ? $value : '';
-            $text->{<H::infoset:parent>} = $r;
-            $r->{<H::infoset:children>} = [$text];
-            $r->{<H::infoset:specified>} = true;
         @@@disDef:
           @@@@ForCheck:
             !ManakaiDOM:DOMXMLFeature
@@ -11875,6 +11830,59 @@ NodeTypeDef:
        ManakaiDOM:DOM2
      @@Level[list]:  2
      @@SpecLevel:2
+
+  @ResourceDef:
+    @@QName: setAttrValueNS
+    @@rdf:type: DISPerl|BlockCode
+    @@ForCheck: ManakaiDOM|ForClass
+    @@PerlDef:
+      my $__r;
+      __CODE{selectAttrNodeObjectNS::
+        $namespaceURI => $namespaceURI,
+        $localName => $localName,
+        $r => $__r,
+      }__;
+      my $__node = $element->{<H::mn:node>};
+      if ($__r) {
+        if ($__r->{<H::DOMCore:read-only>}) {
+          __EXCEPTION{MDOMX:NOMOD_ATTR::
+          }__;
+        }
+        my @__children = @{$__r->{<H::infoset:children>}};
+        $__r->{<H::infoset:children>} = [];
+        for (@__children) {
+          CORE::delete $_->{<H::infoset:parent>};
+          $_-><M::NodeStem.orphanate>;
+        }
+      } else {
+        $__r = <ClassM::ManakaiDOMAttr.newObject> ($__node);
+        __CODE{mn|setXRefNode||ManakaiDOM|Perl::
+          $referrer => {$__r},
+          $propName => {<H::DOMCore:ownerDocument>},
+          $referent => {$__node->{<H::DOMCore:ownerDocument>}},
+        }__;
+        $__r->{<H::infoset:prefix>} = $prefix if defined $prefix;
+        __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
+          $result => {$__r->{<H::infoset:namespaceName>}},
+          $given => $namespaceURI,
+        }__;
+        $__r->{<H::infoset:localName>} = $localName;
+        $__r->{<H::infoset:ownerElement>} = $__node;
+        $__node->{<H::infoset:attributes>}
+               ->{defined $namespaceURI ? $namespaceURI : <Q::null:>}
+               ->{$localName} = $__r;
+      }
+      my $__text = <ClassM::ManakaiDOMText.newObject> ($__node);
+      __CODE{mn|setXRefNode||ManakaiDOM|Perl::
+        $referrer => {$__text},
+        $propName => {<H::DOMCore:ownerDocument>},
+        $referent => {$element->{<H::mn:node>}->{<H::DOMCore:ownerDocument>}},
+      }__;
+      $__text->{<H::infoset:content>} = defined $value ? $value : '';
+      $__text->{<H::infoset:parent>} = $__r;
+      $__r->{<H::infoset:children>} = [$__text];
+      $__r->{<H::infoset:specified>} = true;
+
   @Method:
      @@Name:  removeAttributeNS
      @@Description:

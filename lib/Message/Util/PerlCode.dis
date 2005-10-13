@@ -25,7 +25,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2005/10/12 14:46:06 $
+      $Date: 2005/10/13 08:16:41 $
     @@ContentType:
       dis:Date.RCS
   
@@ -944,9 +944,26 @@ ReflectTypeDef:
       If the element attribute is absent, the default value, if any,
       or an empty string is returned.
     @@PerlCDef:
-      __DEEP{
-        $r = $self-><M::Element.getAttributeNS> ($NS_URI_NO_NULL, $LOCAL_NAME);
+      my $attr_stem;
+      __CODE{DOMCore:selectAttrNodeObjectNS::
+        $namespaceURI => $NS_URI_NO_NULL,
+        $localName => $LOCAL_NAME,
+        $r => $attr_stem,
       }__;
+      if ($attr_stem) {
+        my $attr;
+        __CODE{ManakaiNode:getWeakReference||ManakaiDOM:Perl::
+          $object => $attr_stem,
+          $ref => $attr,
+          $class => {<ClassName::DOMCore:ManakaiDOMAttr>},
+        }__;
+        __CODE{DOMCore:getNodeTextContent::
+          $node => $attr,
+          $result => $r,
+        }__;
+      }
+      # else : default : empty string
+
   @ResourceDef:
     @@QName: CDATADOMStringSet
     @@rdf:type: DOMMain|ReflectSet
@@ -958,14 +975,20 @@ ReflectTypeDef:
       @@@@: 
         What will happen if the <DOM::null> value is given?
     @@PerlCDef:
-      __DEEP{
-        if (defined $given) {
-          $self-><M::Element.setAttributeNS> ($NS_URI_NO_NULL, $LOCAL_NAME
-                                              => $given);
-        } else {
+      if (defined $given) {
+        my $prefix;
+        __CODE{DOMCore:setAttrValueNS::
+          $namespaceURI => $NS_URI_NO_NULL,
+          $localName => $LOCAL_NAME,
+          $prefix => $prefix,
+          $element => $self,
+          $value => $given,
+        }__;
+      } else {
+        __DEEP{
           $self-><M::Element.removeAttributeNS> ($NS_URI_NO_NULL, $LOCAL_NAME);
-        }
-      }__;
+        }__;
+      }
 
 ElementTypeBinding:
   @Name: ReflectTypeDef

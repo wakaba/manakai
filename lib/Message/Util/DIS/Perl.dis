@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/10/12 00:31:14 $
+      $Date: 2005/10/13 08:16:44 $
     @@ContentType:
       dis:Date.RCS
   
@@ -403,12 +403,6 @@ IFClsDef:
       @@@PerlDef:
                                    ## NOTE: Method name is directly written
         $r = <Class::PLImplClass>->_new;
-#        __DEEP{
-#          $r = ($self-><AG::DIS|SWCFGNode.ownerDocument> or
-#                        $self)-><AG::DIS|SWCFGDoc.implementation>
-#                           -><M::DIS|DOMMinImpl.getFeature>
-#                                   (<Q::Util:PerlCode> => '1.0');
-#        }__;
 
   @Method:
     @@Name: plValueCodeFragment
@@ -1121,16 +1115,8 @@ IFClsDef:
           There is no implementation that implements 
           the <Feature::Util:PerlCode> feature, version <FeatureVer::1.0>. 
       @@@PerlDef:
-#          $r = $Message::DOM::ImplementationRegistry
-#                 ->get_implementation
-#                      ({<Q::Util:PerlCode> => '1.0'});
                                     ## NOTE: Method name directly written
           $r = <Class::PLImplClass>->_new;
-#          unless (defined $r) {
-#            __EXCEPTION{DIS|NO_PERL_CODE_IMPL_ERR::
-#              
-#            }__;
-#          }
 ##DVValuePerl
 
 ElementTypeBinding:
@@ -1671,25 +1657,8 @@ IFClsDef:
           There is no implementation that implements 
           the <Feature::Util:PerlCode> feature, version <FeatureVer::1.0>. 
       @@@PerlDef:
-#        if ($self->{src}) {
-#          __DEEP{
-#            $r = ($self->{src}-><AG::DIS|SWCFGNode.ownerDocument> or
-#                        $self->{src})-><AG::DIS|SWCFGDoc.implementation>
-#                           -><M::DIS|DOMMinImpl.getFeature>
-#                                   (<Q::Util:PerlCode> => '1.0');
-#          }__;
-#          unless (defined $r) {
-#            __EXCEPTION{DIS|NO_PERL_CODE_IMPL_ERR::
-#             
-#            }__;
-#          }
-#        } else {
-#          $r = $Message::DOM::ImplementationRegistry
-#                 ->get_implementation
-#                      ({<Q::Util:PerlCode> => '1.0'});
-#                                    ## NOTE: Method name directly written
-          $r = <Class::PLImplClass>->_new;
-#        }
+        $r = <Class::PLImplClass>->_new;
+                                   ## NOTE: Method name is directly written.
 ##DISAnyResourcePerl
 
 IFClsDef:
@@ -2371,16 +2340,16 @@ IFClsDef:
         } elsif ($self->isa (<ClassName::DIS|ManakaiDISModuleDefinition>)) {
           $r = true;
           C: for my $cls (@{$self-><M::DIS|DISModule.getResourceList>}) {
-            if ($cls-><M::DIS|DISResource.isTypeURI>
-                                      (<Q::ManakaiDOM:Class>)) {
-              unless ($cls-><M::DISResourcePerlModule
-                               .plIsFeatureImplemented>
+            if ($cls-><AG::DIS|DISAnyResource.ownerModule> eq $self and
+                $cls-><M::DIS|DISResource.isTypeURI> (<Q::DISLang:Class>)) {
+              unless ($cls-><M::dp|DISResourcePerlModule.plIsFeatureImplemented>
                                       ($featureResourceURI)) {
                 $r = false;
                 last C;
               }
             }                
-            ## NOTE: DISPerl:ScalarVariable's are always implemented
+            ## NOTE: |DISPerl:ScalarVariable|s and interfaces are
+            ##       always implemented
           }
           $self->{<H::DIS:isFeatureImplemented>}
                          ->{$featureResourceURI} = $r;
