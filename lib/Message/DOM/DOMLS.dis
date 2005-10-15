@@ -29,7 +29,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/10/08 12:05:57 $
+      $Date: 2005/10/15 15:28:07 $
     @@ContentType:
       dis:Date.RCS
 
@@ -1421,38 +1421,151 @@ IFCls3Def:
 
   @ResourceDef:
     @@rdf:type: DISLang|InputProcessor
-    @@ForCheck: ManakaiDOM|ManakaiDOM3
+    @@rdf:type: DISLang|OutputProcessor
     @@PerlCDef:
       if (ref $INPUT eq 'HASH') {
         $INPUT = bless $INPUT, <ClassName::DOMLS:ManakaiDOMLSInput>;
       }
 ##LSInput
 
-IFDef:
-  @Name:  LSResourceResolver
-  @Description:
-    @@lang:en
+IFCls3Def:
+  @IFQName: LSResourceResolver
+  @ClsQName: ManakaiDOMLSResourceResolver
+
+  @enDesc:
+    The <IF::LSResourceResolver> interface provides a way for
+    applications to redirect references to external resources.
+
+    An application needing to implement custom handling for external
+    resources can implement and register the implementation 
+    by setting the <err::resource-resolver> parameter
+    of <IF::DOMCore:DOMConfiguration> objects attached to
+    <IF::LSParser>, <IF::LSSerializer>, or <IF::DOMCore:Document>
+    that supports the <Feature::LS> feature.
+
+    The <IF::LSParser> will then allow the application to intercept 
+    any external entities.  Note that the top-level document entity 
+    is never passed to the resource resolver.
+
+    {NOTE:: The <IF::LSResourceResolver> interface is based
+            on the SAX2 <CODE::EntityResolver> interface.
+    }
+
+  @enDesc:
+    @@ddid:perl
+    @@For: ManakaiDOM|ManakaiDOM
     @@@:
-      Resolve references to external resources when parsing.
+      In manakai, a <IF::LSResourceResolver> <kwd:MUST> be dereferencable
+      as if it is a code reference (reference to a subroutine).
+      Invoking such a code is equivalent to invoking the 
+      <M::LSResourceResolver.resolveResource> method of the object.
+      The code <kwd:MAY> return a reference to hash that can be
+      interpreted as if a <IF::LSInput> (see description of 
+      <IF::LSInput>) instead of <IF::LSInput> object itself.
+
+      On the other hand, the <err::resource-resolver> parameter
+      also allows a code reference as if it is a <IF::LSResourceResolver>
+      object.
+
   @Method:
-     @@Name:  resolveResource
-     @@Param:
-        @@@Name:  type
-        @@@Type:  DOMString
-     @@Param:
-        @@@Name:  namespaceURI
-        @@@Type:  DOMString
-     @@Param:
-        @@@Name:  publicId
-        @@@Type:  DOMString
-     @@Param:
-        @@@Name:  systemId
-        @@@Type:  DOMString
-     @@Param:
-        @@@Name:  baseURI
-        @@@Type:  DOMString
-     @@Return:
-        @@@Type:  LSInput
+    @@Name: resolveResource
+    @@enDesc:
+      Resolves external resources.
+
+      The <IF::LSParser> will call this method before opening any
+      external resource, including the external DTD subset,  or
+      external entities referenced from the document.  Note that
+      the top-level document entity is not passed to the method.
+      Then the application may request that the <IF::LSParser> resolve
+      the external resource itself, that it use an alternative URI reference,
+      or that it use an entirely different input source.
+ 
+      An application can use this method to redirect external system
+      identifiers to secure and / or local URI, to look up public
+      identifiers in a catalog, or to read an entity from a database
+      or other input source.
+    @@Param:
+      @@@Name: type
+      @@@Type: DOMMain|DOMString
+      @@@dis:actualType: DOMMain|ManakaiDOMURI
+      @@@enDesc:
+        The type of the resource being resolved.
+      @@@InCase:
+        @@@@Value:
+          @@@@@@:
+            http://www.w3.org/TR/REC-xml
+          @@@@@ContentType: DISCore|URI
+        @@@@enDesc:
+          An XML 1.0 resoruce.
+      @@@InCase:
+        @@@@Value:
+          @@@@@@:
+            http://www.w3.org/2001/XMLSchema
+          @@@@@ContentType: DISCore|URI
+        @@@@enDesc:
+          An XML Schema 1.0 resource.
+      @@@enImplNote:
+        Other types of resources are outside of the scope of
+        DOM Level 3 LS spec and should recommend an absolute URI in
+        order to use this method. <SRC::DOM Level 3 LS>
+    @@Param:
+      @@@Name: namespaceURI
+      @@@Type: DOMMain|DOMString
+      @@@dis:actualType: DOMMain|ManakaiDOMNamespaceURI
+      @@@enDesc:
+        The namespace of the resource being resolved.
+        The target namespace of the schema when resolving 
+        an XML Schema resource.
+    @@Param:
+      @@@Name: publicId
+      @@@Type: DOMMain|DOMString
+      @@@dis:actualType: DOMMain|PublicID||ManakaiDOM|all
+      @@@enDesc:
+        The public identifier of the external entity being referenced.
+      @@@nullCase:
+        @@@@enDesc:
+          No public identifier was supplied or the resource is not
+          an entity.
+    @@Param:
+      @@@Name: systemId
+      @@@Type: DOMMain|DOMString
+      @@@dis:actualType: DOMMain|SystemID||ManakaiDOM|all
+      @@@enDesc:
+        The system identifier or RFC 2396 URI reference of the
+        external resource being referenced.
+      @@@nullCase:
+        @@@@enDesc:
+          No system identifier was supplied.
+    @@Param:
+      @@@Name: baseURI
+      @@@Type: DOMMain|DOMString
+      @@@dis:actualType: DOMMain|ManakaiDOMURI
+      @@@enDesc:
+        The absolute base URI of the resource being parsed.
+      @@@nullCase:
+        @@@@enDesc:
+          There is no base URI.
+    @@Return:
+      @@@Type: LSInput
+      @@@enDesc:
+        An <IF::LSInput> object describing the new input source.
+      @@@nullCase:
+        @@@@enDesc:
+          Requests that the parser open a regular URI connection
+          to the resource.
+      @@@PerlDef:
+        __DEEP{
+          $r = $self->($type, $namespaceURI, $publicId, $systemId, $baseURI);
+        }__;
+
+  @ResourceDef:
+    @@rdf:type: DISLang|InputProcessor
+    @@rdf:type: DISLang|OutputProcessor
+    @@PerlCDef:
+      if (ref $INPUT eq 'HASH') {
+        $INPUT = bless $INPUT, <ClassName::DOMLS:ManakaiDOMLSResourceResolver>;
+      }
+##LSResourceResolver
 
 IFDef:
   @Name:  LSParserFilter
@@ -2237,153 +2350,289 @@ ElementTypeBinding:
   @ShadowContent:
     @@ContentType: DISCore|Integer
 
-ImplNote:
-#ConfigParam:
-  @Description:
+
+ElementTypeBinding:
+  @Name: CParam
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@: DOMCore|DOMConfigurationParameter
+      @@@For: ManakaiDOM|DOM
+    @@rdf:type:
+      @@@@: DISCore|Property
+      @@@For: =ManakaiDOM|all
+    @@For: ManakaiDOM|DOM3
+    @@For: =ManakaiDOM|all
+
+ElementTypeBinding:
+  @Name: boolCParam
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@: DOMCore|DOMConfigurationParameter
+      @@@For: ManakaiDOM|DOM
+    @@rdf:type:
+      @@@@: DISCore|Property
+      @@@For: =ManakaiDOM|all
+    @@For: ManakaiDOM|DOM3
+    @@For: =ManakaiDOM|all
+    @@Type: idl|boolean||ManakaiDOM|all
+
+ElementTypeBinding:
+  @Name: TrueCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:InCase
+    @@Value:
+      @@@@: 1
+      @@@ContentType: DISCore|Boolean
+    @@Type:
+      DOMMain:boolean::ManakaiDOM:all
+
+ElementTypeBinding:
+  @Name: FalseCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:InCase
+    @@Value:
+      @@@@: 0
+      @@@ContentType: DISCore|Boolean
+    @@Type:
+      DOMMain:boolean::ManakaiDOM:all
+
+ElementTypeBinding:
+  @Name: boolValue
+  @ElementType:
+    dis:Value
+  @ShadowContent:
+    @@ContentType: DISCore|Boolean
+
+ElementTypeBinding:
+  @Name: cfgname
+  @ElementType:
+    DOMCore:domConfigurationParameterName
+  @ShadowContent:
+    @@ContentType: DISCore|String
+
+ElementTypeBinding:
+  @Name: enImplNote
+  @ElementType:
+    dis:ImplNote
+  @ShadowContent:
     @@lang:en
-    @@@:
-      Additional configuration parameters for <IF::DOMCore:DOMConfiguration> 
-      objects used with <IF::LSSerializer> objects.
 
-  @ImplNote:
-    @@lang:en
-    @@@:
-      Parameters defined in the DOM Level 3 Core specification 
-      is also available.
-  
-  @ImplNote:
-    @@lang:en
-    @@@:
-      <CP::canonical-form>: See <Module::MDOM:DOMCore>.
+boolCParam:
+  @QName: charset-overrides-xml-encoding
+  @cfgname: charset-overrides-xml-encoding
+  @IsSupportRequired:1
+  @DOMCore:targetType: DOMLS|LSParser
+  @TrueCase:
+    @@IsDefault:1
+    @@enImplNote:
+      [optional] (default) !
+    @@enDesc:
+      If a higher level protocol such as HTTP provides the character
+      encoding information on the input stream being processed, 
+      it will override any encoding specified in the XML declaration
+      of the XML document entity or the text declaration of an XML
+      parsed entity.
 
-  @Param:
-    @@Name:discard-default-content
-    @@Type:DOMMain|boolean||ManakaiDOM|all
-    @@InCase:
-      @@@Value:true
-      @@@IsSupportRequired:1
-      @@@IsDefault:1
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          Use the <A::DOMCore:Attr.specified> attribute to decide 
-          what XML attributes should be discarded.
-      @@@ImplNote:
-        @@@@lang:en
-        @@@@@:
-          DOM implementation might use whatever information 
-          available to the implementation (including XML Schema document 
-          or DTD) to determine what attributes and content to discard.
-      @@@SetParam:
-        @@@@Name:canonical-form
-        @@@@Type:DOMMain|boolean||ManakaiDOM|all
-        @@@@Value:false
-    @@InCase:
-      @@@Value:false
-      @@@IsSupportRequired:1
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          Keep all attributes and all content.
+      {NOTE:: Explicitly setting an encoding in the <IF::LSInput>
+              overrides any encoding information from the protocol.
+      }
+  @FalseCase:
+    @@IsSupportRequired:1
+    @@enDesc:
+      The parser ignores any character encoding information from
+      higher level protocols.
 
-  @Param:
-    @@Name:format-pretty-print
-    @@Type:DOMMain|boolean||ManakaiDOM|all
-    @@InCase:
-      @@@Value:true
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          Formatting the output by adding white spaces to 
-          produce a pretty-printed, intended, human-readable form. 
-          (The exact form is not specified.)
-          \
-          Pretty-printing changes the content of the document and 
-          may affect the validity of the document.
-      @@@ImplNote:
-        @@@@lang:en
-        @@@@@:
-          Validating implementations should preserve validity.
-      @@@SetParam:
-        @@@@Name:canonical-form
-        @@@@Type:DOMMain|boolean||ManakaiDOM|all
-        @@@@Value:false
-    @@InCase:
-      @@@Value:false
-      @@@IsSupportRequired:1
-      @@@IsDefault:1
-      @@@Description:
-        @@@@lang:en
-        @@@@@: Don't pretty-print the output.
+boolCParam:
+  @QName: disallow-doctype
+  @cfgname: disallow-doctype
+  @IsSupportRequired:1
+  @DOMCore:targetType: DOMLS|LSParser
+  @TrueCase:
+    @@enDesc:
+      Throws a fatal <err::doctype-not-allowed> error if a document
+      type node is found while parsing the document.
+  @FalseCase:
+    @@IsSupportRequired:1
+    @@IsDefault:1
+    @@enDesc:
+      Allows document type node in the document.
 
-  @Param:
-    @@Name:ignore-unknown-character-denormalizations
-    @@Type:DOMMain|boolean||ManakaiDOM|all
-    @@InCase:
-      @@@Value:true
-      @@@IsSupportRequired:1
-      @@@IsDefault:1
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          Report a <ERR::unknown-character-denormalization> <EM::warning> 
-          (not an error) when fully-normalizedness per XML 1.1 is 
-          being verified and a cgaracter is encountered for which 
-          the normalization properties cannot be determined and 
-          ignore any possible denormalizations caused by that character.
-    @@InCase:
-      @@@Value:false
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          Report a <ERR::unknown-character-denormalization> fatal error 
-          if the normalization properties cannot be determined.
+boolCParam:
+  @QName: ignore-unknown-character-denormalizations
+  @cfgname: ignore-unknown-character-denormalizations
+  @IsSupportRequired:1
+  @DOMCore:targetType: DOMLS|LSParser
+  @DOMCore:targetType: DOMLS|LSSerializer
+  @TrueCase:
+    @@IsSupportRequired:1
+    @@IsDefault:1
+    @@enDesc:
+      If, while verifying full normalization when XML 1.1 is supported,
+      the implementation encounters characters for which it cannot
+      determine the normalization properties, then the implementation
+      will ignore any possible denormalizations caused by these characters.
+      An <err::unknown-character-denormalization> warning is also
+      raised for <IF::LSSerializer>.
 
-  @ImplNote:
-    @@lang:en
-    @@@:
-      <CP::normalize-characters>: See <Module::MDOM:DOMCore>.
+      This parameter is ignored for XML 1.0 documents in
+      <IF::LSParser>.
+  @FalseCase:
+    @@enDesc:
+      Throws a fatal <err::unknown-character-denormalization> error
+      if a character is encountered for which the implementation
+      cannot determine the normalization properties.
 
-  @Param:
-    @@Name:xml-declaration
-    @@InCase:
-      @@@Value:true
-      @@@IsSupportRequired:1
-      @@@IsDefault:1
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          When <IF::DOMCore:Document>, <IF::DOMXML:Entity> or 
-          <IF::DOMCore:DocumentFragment> is 
-          serialized, the XML declaration or the text declaration 
-          should be included.
-      @@@ImplNote:
-        @@@@lang:en
-        @@@@@:
-          - <XA::version>:: <A::DOMCore:Document.xmlVersion> or <XML::1.0>.
-          \
-          - <XA::encoding>:: the output encoding.
-          \
-          - <XA::standalone>:: <A::DOMCore:Document.xmlStandalone>.
-      @@@SetParam:
-        @@@@Name:canonical-form
-        @@@@Type:DOMMain|boolean||ManakaiDOM|all
-        @@@@Value:false
-    @@InCase:
-      @@@Value:false
-      @@@IsSupportRequired:1
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          Do not include the XML declaration or text declaration. 
-      @@@ImplNote:
-        @@@@lang:en
-        @@@@@:
-          If <XA::version> would be other than <XML::1.0> or 
-          <XA::encoding> would be required, the <ERR::xml-declaration-needed> 
-          warning is reported. 
+CParam:
+  @QName: resource-resolver
+  @cfgname: resource-resolver
+  @DOMCore:nodeProp:
+    @@@: rresolver
+    @@For: =ManakaiDOM|all
+  @IsSupportRequired:1
+  @DOMCore:targetType: DOMCore|Document
+  @DOMCore:targetType: DOMLS|LSParser
+  @Type: DOMLS|LSResourceResolver
+  @enDesc:
+    A reference to a <IF::LSResourceResolver> object.
+    When an external resource such as XML external entity or
+    an XML Schema schema definition document is encountered,
+    the implementation will request that the <IF::LSResourceResolver>
+    referenced in this parameter resolvers the resource.
 
-  @Level:3
-  @SpecLevel:3
-##ConfigParam:LSSerializer
+    The resolution of the system identifiers associated with entities
+    is done using <A::DOMCore:Document.documentURI>.  However,
+    when the <Feature::LS> feature is supported, the
+    <M::DOMCore:Document.normalizeDocument> will invoke the resource resolver
+    if the parameter is set.  <SRC::DOM Level 3 Core>
+  @nullCase:
+    @@enDesc:
+      No resource resolver.
+  @Method:
+    @@rdf:type: DOMCore|DOMConfigurationParameterSetter
+    @@Param:
+      @@@Name: name
+      @@@Type: DOMMain|DOMString
+      @@@dis:actualType: DOMConfigurationParameterName
+      @@@enDesc: The parameter name.
+    @@Param:
+      @@@Name: value
+      @@@Type: DOMMain|DOMUserData
+      @@@dis:actualType: DOMMain|DOMString
+      @@@enDesc: The new value.
+    @@Return:
+      @@@Type: idl|void||ManakaiDOM|all
+      @@@PerlCDef:
+        $self->[1]->{<H::DOMLS:resource-resolver>} = $value;
 
+ElementTypeBinding:
+  @Name: nullCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:InCase
+    @@Value:
+      @@@is-null:1
+
+boolCParam:
+  @QName: supported-media-types-only
+  @cfgname: supported-media-types-only
+  @IsSupportRequired:1
+  @DOMCore:targetType: DOMLS|LSParser
+  @TrueCase:
+    @@enDesc:
+      Checkes that the media type of the parsed resource is a supported
+      media type.  If an unsupported media type is encountered, a fatal
+      <err::unsupported-media-type> error will be raised.  The media 
+      types defined in RFC 3023 must always be accepted.
+  @FalseCase:
+    @@IsSupportRequired:1
+    @@IsDefault:1
+    @@enDesc:
+      Accepts any media type.
+
+boolCParam:
+  @QName: discard-default-content
+  @cfgname: discard-default-content
+  @IsSupportRequired:1
+  @DOMCore:targetType: DOMLS|LSSerializer
+  @TrueCase:
+    @@IsSupportRequired:1
+    @@IsDefault:1
+    @@enDesc:
+      Discards default contents.
+      If the <A::Attr.specified> is <DOM::false>, the attribute should
+      be discarded.  Note that some implementation might use whatever
+      information available to the implementation, such as schema
+      definitions, to determine what attributes and content to discard.
+    @@SetParam:
+      @@@@: canonical-form
+      @@@boolValue:0
+  @FalseCase:
+    @@IsSupportRequired:1
+    @@enDesc:
+      Keeps all attributes and all contents.
+
+boolCParam:
+  @QName: format-pretty-print
+  @cfgname: format-pretty-print
+  @IsSupportRequired:1
+  @DOMCore:targetType: DOMLS|LSSerializer
+  @TrueCase:
+    @@enDesc:
+      Formats the output by adding white spaces to produce a 
+      pretty-printed, indented, human-readable form.  The 
+      exact form of the transformations is not specified.  Since
+      pretty-printing changes the content of the document and 
+      might affect the validity of the document, validating 
+      implementations should preserve validity.
+    @@SetParam:
+      @@@@: canonical-form
+      @@@boolValue:0
+  @FalseCase:
+    @@IsSupportRequired:1
+    @@IsDefault:1
+    @@enDesc:
+      Does not pretty-print the result.
+
+boolCParam:
+  @QName: xml-declaration
+  @cfgname: xml-declaration
+  @IsSupportRequired:1
+  @DOMCore:targetType: DOMLS|LSSerializer
+  @TrueCase:
+    @@IsSupportRequired:1
+    @@IsDefault:1
+    @@enDesc:
+      If a <IF::DOMCore:Document>, <IF::DOMCore:Element>, or 
+      <IF::DOMXML:Entity> node is serialized, the XML declaration
+      or text declaration should be included.
+
+      The <XA::version> is set to <A::DOMCore:Document.xmlVersion> if 
+      the document is a Level 3 document and its value is non-<DOM::null>,
+      otherwise to <XML::1.0>.
+    
+      The output <XA::encoding> is set to the output encoding
+      used to serialize (see <M::LSSerializer.write>).
+    @@SetParam:
+      @@@@: canonical-form
+      @@@boolValue:0
+  @FalseCase:
+    @@IsSupportRequired:1
+    @@enDesc:
+      Does not serialize the XML declaration or text declarations.
+      The implementation reports an <err::xml-declaration-needed>
+      warning if this will cause problems.
+
+enImplNote:
+  See also <Module::MDOM:DOMCore> for configuration parameters.

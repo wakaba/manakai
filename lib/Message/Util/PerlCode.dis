@@ -25,7 +25,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2005/10/13 08:16:41 $
+      $Date: 2005/10/15 15:28:11 $
     @@ContentType:
       dis:Date.RCS
   
@@ -1981,7 +1981,8 @@ IFClsETDef:
           __DEEP{
             $r = $self-><AG::Node.textContent>;
             my $file = $self-><AG::PerlCode.fileNode>;
-            my $src_file = $file ? $file-><AG::PerlFile.sourceFile> : '';
+            my $src_file = $file ? $file-><AG::PerlFile.sourceFile>
+                                 : $self->{<H::mn:node>}->{<H::mn:nodeID>};
             my $nxt_cnum = $file ? $file-><M::PerlFile.getNextChunkNumber> : 0;
             $r = sprintf qq<\n#line %d "%s [u] (Chunk #%d)"\n%s>.
                          qq<\n#line 1 "%s [/u] (Chunk #%d)"\n>,
@@ -2504,9 +2505,10 @@ IFClsETDef:
 
             __DEEP{
               my $file = $self-><AG::PerlCode.fileNode>;
-              my $sfile = $file ? $file-><AG::PerlFile.sourceFile> : '';
+              my $sfile = $file ? $file-><AG::PerlFile.sourceFile>
+                                : $self->{<H::mn:node>}->{<H::mn:nodeID>};
               $r = sprintf qq<\n{\n#line %d "%s [b] (Chunk #%d)"\n%s>.
-                           qq<\n#line 1 "%s [/b] (Chunk #%d)"\n}\n>,
+                           qq<\n#line 1 "%s [/b] (Chunk #%d)"\n;}\n>,
                            $self-><AG::PerlCodeStatements.sourceLine> || 1,
                            $self-><AG::PerlCodeStatements.sourceFile> || $sfile,
                            $file ? $file-><M::PerlFile.getNextChunkNumber> : 0,
@@ -2554,7 +2556,8 @@ IFClsETDef:
 
             __DEEP{
               my $file = $self-><AG::PerlCode.fileNode>;
-              my $sfile = $file ? $file-><AG::PerlFile.sourceFile> : '';
+              my $sfile = $file ? $file-><AG::PerlFile.sourceFile>
+                                : $self->{<H::mn:node>}->{<H::mn:nodeID>};
               $r = sprintf qq<\n#line %d "%s [bc] (Chunk #%d)"\n%s>.
                            qq<\n#line 1 "%s [/bc] (Chunk #%d)"\n>,
                            $self-><AG::PerlCodeStatements.sourceLine> || 1,
@@ -2991,6 +2994,8 @@ IFClsDef:
                    ([map {$_ => $val->{$_}} sort {$a cmp $b} keys %$val])
                . q<}>;
           }__;
+        } elsif (ref $val eq 'manakai::code') {
+          $r = $$val;
         } else {
           $val =~ s/(['\\])/\\$1/g;
           $r = q<'> . $val . q<'>;

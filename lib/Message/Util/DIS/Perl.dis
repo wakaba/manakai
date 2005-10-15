@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/10/13 08:16:44 $
+      $Date: 2005/10/15 15:28:12 $
     @@ContentType:
       dis:Date.RCS
   
@@ -54,8 +54,6 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--Perl--
   @DOMCore:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
-  @DOMException:
-    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#
   @DOMLS:
     http://suika.fam.cx/~wakaba/archive/2004/dom/ls#
   @DOMMain:
@@ -78,6 +76,8 @@ Namespace:
     urn:x-suika-fam-cx:markup:ietf:html:3:draft:00:
   @html5:
     http://www.w3.org/1999/xhtml
+  @idl:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/IDL#
   @ilang:
     urn:x-suika-fam-cx:lang:
   @infoset:
@@ -2208,10 +2208,7 @@ IFClsDef:
                                <Q::mn|subnode1>,
                                <Q::mn|subnode2>,
                                <Q::mn|origin0>,
-                               <Q::mn|xrefnode0>,
-                               <Q::mn|irefnode0>,
-                               <Q::mn|anydata1>,
-                               <Q::mn|anydata2>) {
+                               <Q::mn|xrefnode0>) {
                       $nrp{
                         $db-><M::DIS|DISDatabase.getResource> ($p)
                            -><M::DIS|DISResourceProp.getPropertyText>
@@ -2252,6 +2249,11 @@ IFClsDef:
                 }
               } elsif ($cls-><M::DIS|DISResource.isTypeURI>
                               (<Q::DISPerl:ScalarVariable>) and
+                       not $cls-><AG::DIS|DISResource.parentResource>) {
+                $r-><M::DIS|PLBlockCon.appendCodeFragment>
+                      ($cls-><AG::DISResourcePerl.plCodeFragment>);
+              } elsif ($cls-><M::DIS|DISResource.isTypeURI>
+                              (<Q::DOMCore:DOMConfigurationParameter>) and
                        not $cls-><AG::DIS|DISResource.parentResource>) {
                 $r-><M::DIS|PLBlockCon.appendCodeFragment>
                       ($cls-><AG::DISResourcePerl.plCodeFragment>);
@@ -2807,7 +2809,7 @@ IFClsDef:
                    $self-><M::DIS|DISResource.isTypeURI>
                                 (<Q::dis2pm:InlineCode>) or
                    $self-><M::DIS|DISResource.isTypeURI>
-                                (<Q::DISLang:InputProcessor>) or
+                                (<Q::DISCore:AnyDefContainer>) or
                    $self-><M::DIS|DISResource.isTypeURI>
                                 (<Q::DOMMain:ReflectGet>) or
                    $self-><M::DIS|DISResource.isTypeURI>
@@ -2988,15 +2990,23 @@ IFClsDef:
             
             ## Return value
             my $data_type;
+            my $data_type_value;
             try {
               $data_type = $ret-><AG::DIS|DISResource
                                      .disActualDataTypeResource>;
+              $data_type_value = $ret-><AG::DIS|DISResource
+                                     .disActualDataTypeValue>;
             } catch <IF::DIS|DISException> with {
               my $err = shift;
               if ($err->{<Q::MDOMX:subtype>} ne <Q::DIS|NO_DIS_TYPE_ERR>) {
                 $err->throw;
               }
             };
+            if ($data_type and $data_type-><M::DIS|DISResource.isSubsetOfURI>
+                                                        (<Q::idl:void>)) {
+              undef $data_type;
+              undef $data_type_value;
+            }
 
             if ($data_type) {
               my $def = $data_type-><M::DIS|DISResourceProp.getPropertyValue>
@@ -3038,10 +3048,10 @@ IFClsDef:
               $self->{<H::DIS:plDefined>} = true;
             } else {  ## Method code not defined
               my $cls = $self->{db}-><M::DIS|DISDatabase.getResource>
-                                              (<Q::DOMException:CoreException>,
+                                              (<Q::dx:CoreException>,
                                                for_arg => <Q::ManakaiDOM:Perl>);
               my $const = $self->{db}-><M::DIS|DISDatabase.getResource>
-                                          (<Q::DOMException:NOT_SUPPORTED_ERR>,
+                                          (<Q::dx:NOT_SUPPORTED_ERR>,
                                                for_arg => <Q::ManakaiDOM:Perl>);
               my $subtype = $self->{db}-><M::DIS|DISDatabase.getResource>
                                   (<Q::MDOMX:MDOM_IMPL_METHOD_NOT_IMPLEMENTED>,
@@ -3058,9 +3068,30 @@ IFClsDef:
             }
 
             if ($data_type) {
-              $r-><M::DIS|MPLSS.appendCodeFragment>
-                     ($plimpl-><M::DIS|MPLImpl.createPerlVariable>
-                                               ('$', null, 'r'));
+              my $rvar = $plimpl-><M::DIS|MPLImpl.createPerlVariable>
+                                               ('$', null, 'r');
+
+              ## Output processor
+              my $nin = $data_type_value-><M::dv|DVValue.getProperty>
+                                        (<Q::ManakaiDOM:noInputNormalize>);
+              my $op = $data_type-><M::DIS|DISResource.getChildResourceByType>
+                                        (<Q::DISLang:OutputProcessor>)
+                unless $nin and $nin-><AG::dv|DVValue.value>;
+              if ($op) {
+                my $opcode = $op-><AG::dp|DISResourcePerl.plCodeFragment>;
+                unless ($opcode) {
+                 __UNDEEP{__EXCEPTION{DIS|PERL_CODE_NOT_DEFINED_ERR::
+                    DIS:uri => {$op-><AG::DIS|DISAnyResource.uri>},
+                  }__}__;
+                }
+                $opcode = $opcode->clone;
+                $opcode-><M::DIS|MPLCodeFragment.replaceVariable>
+                                         ('$INPUT' => $rvar->clone);
+                $r-><M::DIS|MPLSS.appendCodeFragment> ($opcode);
+              }
+
+              ## Return value
+              $r-><M::DIS|MPLSS.appendCodeFragment> ($rvar);
             }
           } elsif ($self-><M::DIS|DISResource.isTypeURI>
                                 (<Q::DISLang:Attribute>)) {  
@@ -3173,10 +3204,10 @@ IFClsDef:
               $get->{<H::DIS:plDefined>} = true;
             } else {  ## Getter code not defined
               my $cls = $self->{db}-><M::DIS|DISDatabase.getResource>
-                                              (<Q::DOMException:CoreException>,
+                                              (<Q::dx:CoreException>,
                                                for_arg => <Q::ManakaiDOM:Perl>);
               my $const = $self->{db}-><M::DIS|DISDatabase.getResource>
-                                          (<Q::DOMException:NOT_SUPPORTED_ERR>,
+                                          (<Q::dx:NOT_SUPPORTED_ERR>,
                                                for_arg => <Q::ManakaiDOM:Perl>);
               my $subtype = $self->{db}-><M::DIS|DISDatabase.getResource>
                                     (<Q::MDOMX:MDOM_IMPL_ATTR_NOT_IMPLEMENTED>,
@@ -3276,10 +3307,10 @@ IFClsDef:
                 $set_code-><M::DIS|PLBlockCon.appendStatement>
                                               (q<my ($self) = @_>);
                 my $cls = $self->{db}-><M::DIS|DISDatabase.getResource>
-                                              (<Q::DOMException:CoreException>,
+                                              (<Q::dx:CoreException>,
                                                for_arg => <Q::ManakaiDOM:Perl>);
                 my $const = $self->{db}-><M::DIS|DISDatabase.getResource>
-                                          (<Q::DOMException:NOT_SUPPORTED_ERR>,
+                                          (<Q::dx:NOT_SUPPORTED_ERR>,
                                                for_arg => <Q::ManakaiDOM:Perl>);
                 my $subtype = $self->{db}-><M::DIS|DISDatabase.getResource>
                                     (<Q::MDOMX:MDOM_IMPL_ATTR_NOT_IMPLEMENTED>,
@@ -3298,13 +3329,13 @@ IFClsDef:
               $set_code-><M::DIS|PLBlockCon.appendStatement>
                                                        (q<my ($self) = @_>);
               my $cls = $self->{db}-><M::DIS|DISDatabase.getResource>
-                                              (<Q::DOMException:CoreException>,
+                                              (<Q::dx:CoreException>,
                                                for_arg => <Q::ManakaiDOM:Perl>);
               my $const = $self->{db}-><M::DIS|DISDatabase.getResource>
-                                (<Q::DOMException:NO_MODIFICATION_ALLOWED_ERR>,
+                                (<Q::dx:NO_MODIFICATION_ALLOWED_ERR>,
                                                for_arg => <Q::ManakaiDOM:Perl>);
               my $subtype = $self->{db}-><M::DIS|DISDatabase.getResource>
-                                    (<Q::DOMException:READ_ONLY_ATTRIBUTE_ERR>,
+                                    (<Q::dx:READ_ONLY_ATTRIBUTE_ERR>,
                                                for_arg => <Q::ManakaiDOM:Perl>);
               $_-><AS::DIS|DISAnyResource.isReferred>
                 ($self-><AG::DIS|DISAnyResource.uri>) for $cls, $const, $subtype;
@@ -3664,6 +3695,99 @@ IFClsDef:
                        } @const
                     }]));
               $r-><M::DIS|PLPack.setSubNode> ($err_def);
+            }
+
+          } elsif ($self-><M::DIS|DISAnyResource.isTypeURI>
+                                     (<Q::DOMCore:DOMConfigurationParameter>)) {
+            my $uri = $self-><AG::DIS|DISAnyResource.nameURI>;
+            my $plimpl = $self-><AG::DISAnyResourcePerl.plImplementation>;
+            my $db = $self-><AG::DIS|DISAnyResource.database>;
+            my $cfgname = <ClassM::PLImplClass.perlLiteral>
+                           (lc $self-><M::DIS|DISResourceProp.getPropertyText>
+                             (<Q::DOMCore:domConfigurationParameterName>, $uri));
+            my %prop;
+            for ([getter => <Q::DOMCore:DOMConfigurationParameterGetter>],
+                 [setter => <Q::DOMCore:DOMConfigurationParameterSetter>],
+                 [get_default =>
+                     <Q::DOMCore:DOMConfigurationParameterDefaultGetter>],
+                 [unsetter => <Q::DOMCore:DOMConfigurationParameterUnsetter>],
+                 [checker => <Q::DOMCore:DOMConfigurationParameterChecker>]) {
+              my $cres = $self-><M::DIS|DISResource.getChildResourceByType>
+                                  ($_->[1]);
+              if ($cres) {
+                $prop{$_->[0]}
+                  = bless \($cres-><AG::dp|DISResourcePerl.plCodeFragment>
+                                 ->stringify), 'manakai::code';
+              }
+            }
+            my $type = $self-><AG::DIS|DISResource.disActualDataTypeResource>;
+            if ($type-><M::DIS|DISResource.isSubsetOfURI> (<Q::idl:boolean>)) {
+              $prop{type} = 'boolean';
+              C: for my $c (@{$self-><M::DIS|DISResource
+                                        .getChildResourceListByType>
+                                               (<Q::ManakaiDOM:InCase>)}) {
+                my $v = $c-><M::DIS|DISResourceProp.getPropertyValue>
+                                               (<Q::dis:Value>);
+                next C unless $v;
+                my $support = $c-><M::DIS|DISResourceProp.getPropertyBoolean>
+                                               (<Q::DOMCore:isSupported>);
+                my $tf = $v-><AG::dv|DVValue.value> ? true : false;
+                $prop{vsupport}->[$tf] = true if $support;
+                if ($tf) {
+                  if ($c-><M::DIS|DISResourceProp.getPropertyBoolean>
+                                               (<Q::dis:IsDefault>)) {
+                    $prop{default} = true;
+                  }
+                }
+                SP: for (@{$c-><M::DIS|DISResourceProp.getPropertyValueList>
+                                 (<Q::dis:SetParam>)}) {
+                  next unless $_->isa (<IFName::dv|DVURIValue>);
+                  my $suri = $_-><AG::dv|DVURIValue.uri>;
+                  my $sres = $db-><M::DIS|DISDatabase.getResource> ($suri);
+                  my $v = $_-><M::dv|DVValue.getProperty> (<Q::dis:Value>);
+                  next SP unless $v;
+                  $prop{setparam}->[$tf]->{
+                    $sres-><M::DIS|DISResourceProp.getPropertyText>
+                               (<Q::DISPerl:propHashKey>, $suri)
+                  } = $v-><AG::dv|DVValue.value>;
+                } # SP
+              }
+            } elsif ($type-><M::DIS|DISResource.isSubsetOfURI>
+                                               (<Q::DISLang:String>)) {
+              $prop{type} = 'string';
+            } else {
+              $prop{type} = 'object';
+              $prop{otype} =$type-><AG::dp|DISResourcePerl.plFullyQualifiedName>;
+            }
+            my @target = sort { $a cmp $b } map {
+                           $_-><AG::dp|DISResourcePerl.plFullyQualifiedName>
+                         } @{
+                          $self-><M::DIS|DISResourceProp.getPropertyResourceList>
+                              (<Q::DOMCore:targetType>)
+                         };
+            my $target0 = <ClassM::PLImplClass.perlLiteral> ($target[0]);
+            $r = $plimpl-><M::DIS|MPLImpl.createPerlStatement>
+                   ('$Message::DOM::DOMCore::ManakaiDOMConfiguration{'.
+                    $target0 . '}->{' . $cfgname . '} = ' . 
+                    <ClassM::PLImplClass.perlLiteral> ({
+                      iname => $db-><M::DIS|DISDatabase.getResource> ($uri)
+                                  -><M::DIS|DISResourceProp.getPropertyText>
+                                        (<Q::DISPerl:propHashKey>, $uri),
+                      %prop,
+                    }));
+            if (@target > 1) {
+              my $c = $plimpl-><M::DIS|MPLImpl.createPerlBlockContainer>;
+              $c-><M::DIS|PLBlockCon.appendCodeFragment> ($r);
+              for my $target (@target[1..$#target]) {
+                $c-><M::DIS|PLBlockCon.appendCodeFragment>
+                  ($plimpl-><M::DIS|MPLImpl.createPerlStatement>
+                   ('$Message::DOM::DOMCore::ManakaiDOMConfiguration{'.
+                    <ClassM::PLImplClass.perlLiteral> ($target) .
+                    '}->{'. $cfgname .
+                    '} = $Message::DOM::DOMCore::ManakaiDOMConfiguration{' .
+                    $target0 . '}->{' . $cfgname . '}'));
+              }
+              $r = $c;
             }
 
           ## -- Unsupported types
@@ -4057,7 +4181,7 @@ IFClsDef:
 
 
                   my $cls = $self->{db}-><M::DIS|DISDatabase.getResource>
-                                   (<Q::DOMException:CoreException>);
+                                   (<Q::dx:CoreException>);
                   my $const = $self->{db}-><M::DIS|DISDatabase.getResource>
                                    (<Q::MDOMX:MDOM_DEBUG_BUG>);
                   my $subtype = $self->{db}-><M::DIS|DISDatabase.getResource>
@@ -4785,7 +4909,7 @@ IFClsDef:
             DIS:sourceNode => {$self->{src}},
             DIS:uri => {$xclass->{uri}},
             DIS:localName => {$xclass-><AG::DIS|DISAnyResource.localName>},
-            DIS:expectedType => {<Q::DOMException:AnyExceptionClass>},
+            DIS:expectedType => {<Q::dx:AnyExceptionClass>},
           }__;
         }
         $xclass-><AS::DIS|DISAnyResource.isReferred>

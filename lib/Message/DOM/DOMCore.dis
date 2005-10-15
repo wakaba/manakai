@@ -40,7 +40,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/10/13 08:16:34 $
+      $Date: 2005/10/15 15:28:05 $
     @@ContentType:
       dis:Date.RCS
 
@@ -49,37 +49,27 @@ Module:
   
   @Require:
     @@Module:
-      @@@Name: DOMMain
+      @@@QName: MDOM|DOMMain
     @@Module:
-      @@@Name: DOMXML
+      @@@QName: MDOM|DOMXML
     @@Module:
-      @@@Name: DOMCore
-      @@@WithFor:
-        ManakaiDOM:ManakaiDOM
+      @@@QName: MDOM|DOMCore
+      @@@WithFor: ManakaiDOM|ManakaiDOM
     @@Module:
-      @@@Name: DOMCore
-      @@@WithFor:
-        ManakaiDOM:ManakaiDOM1
-      @@@For:
-        !=ManakaiDOM:ManakaiDOM1
+      @@@QName: MDOM|DOMCore
+      @@@WithFor: ManakaiDOM|ManakaiDOM1
     @@Module:
-      @@@Name: DOMCore
-      @@@WithFor:
-        ManakaiDOM:ManakaiDOM2
-      @@@For:
-        !=ManakaiDOM:ManakaiDOM2
+      @@@QName: MDOM|DOMCore
+      @@@WithFor: ManakaiDOM|ManakaiDOM2
     @@Module:
-      @@@Name: DOMCore
-      @@@WithFor:
-        ManakaiDOM:ManakaiDOM3
-      @@@For:
-        !=ManakaiDOM:ManakaiDOM3
+      @@@QName: MDOM|DOMCore
+      @@@WithFor: ManakaiDOM|ManakaiDOM3
     @@Module:
-      @@@Name: DOMCore
-      @@@WithFor:
-        ManakaiDOM:ManakaiDOMLatest
-      @@@For:
-        !=ManakaiDOM:ManakaiDOMLatest
+      @@@QName: MDOM|DOMCore
+      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
+    @@Module:
+      @@@QName: MDOM|DOMLS
+      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
 
 Namespace:
   @dis:
@@ -112,6 +102,8 @@ Namespace:
     http://www.w3.org/2001/xml-events
   @f:
     http://suika.fam.cx/~wakaba/archive/2004/dom/feature#
+  @html5:
+    http://www.w3.org/1999/xhtml
   @idl:
     http://suika.fam.cx/~wakaba/archive/2004/dis/IDL#
   @f:
@@ -302,14 +294,6 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       dis2pm:BlockCode
-
-ElementTypeBinding:
-  @Name: ConfigParam
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DOMConfigParameterSet
 
 ElementTypeBinding:
   @Name: EventSet
@@ -558,14 +542,6 @@ ElementTypeBinding:
         DOM Level 2 implementations does not need to implement this member. 
         The DOM Level 2 Errata withdraws it and it requires HTML-only 
         DOM implementations throw a <X::DOMException.NOT_SUPPORTED_ERR>. 
-
-PropDef:
-  @QName: 
-    dis:CParam
-  @ImplNote:
-    @@lang:en
-    @@@:
-      Temporary - should be bound to ManakaiDOM:DOMConfigParameter
 
 ## -- Features
 
@@ -1296,6 +1272,7 @@ ResourceDef:
              The node that is attempted to clone.
        @@@SubTypeDef:
          @@@@QName: ADOPT_NODE_TYPE_NOT_SUPPORTED_ERR
+         @@@@For: ManakaiDOM|DOM3
          @@@@enDesc:
            The implementation does not support adopting of nodes
            of the type.
@@ -1308,6 +1285,46 @@ ResourceDef:
            @@@@@enDesc:
              The name of the parameter to which the node is
              specified directly or indirectly.
+       @@@SubTypeDef:
+         @@@@QName: NOT_RECOGNIZED_CONFIG_PARAM_ERR
+         @@@@For: ManakaiDOM|DOM3
+         @@@@enDesc:
+           The implementation does not recognize the parameter name.
+         @@@@XParam:
+           @@@@@@: MDOMX|param-name
+           @@@@@enDesc:
+             The name of the method parameter where the configuration
+             parameter name is specified.
+         @@@@XParam:
+           @@@@@@: DOMCore|domConfigurationParameterName
+           @@@@@enDesc:
+             The name of the configuration parameter.
+         @@@@enMufDef:
+           Parameter "%p (name => {<Q::DOMCore:domConfigurationParameterName>});"
+           is not supported
+       @@@SubTypeDef:
+         @@@@QName: NOT_SUPPORTED_CONFIG_VALUE_ERR
+         @@@@For: ManakaiDOM|DOM3
+         @@@@enDesc:
+           The implementation recognizes the parameter name but
+           it does not support the value.
+         @@@@XParam:
+           @@@@@@: MDOMX|param-name
+           @@@@@enDesc:
+             The name of the method parameter where the configuration
+             parameter value is specified.
+         @@@@XParam:
+           @@@@@@: DOMCore|domConfigurationParameterName
+           @@@@@enDesc:
+             The name of the configuration parameter.
+         @@@@XParam:
+           @@@@@@: DOMCore|domConfigurationParameterValue
+           @@@@@enDesc:
+             The value of the specified value.
+         @@@@enMufDef:
+           Parameter "%p (name => {<Q::DOMCore:domConfigurationParameterName>}
+           );": Value "%p (name => {<Q::DOMCore:domConfigurationParameterValue>}
+           );" is not supported
 
      @@XConst:
         @@@Name:  INUSE_ATTRIBUTE_ERR
@@ -1657,6 +1674,19 @@ ResourceDef:
           @@@@@:
             The type of an object is incompatible with the expected 
             type of the parameter associated to the object.
+       @@@SubTypeDef:
+         @@@@QName: INCOMPATIBLE_CONFIG_VALUE_ERR
+         @@@@enDesc:
+           The type of the specified value is incompatible 
+           with the type of the configuration parameter.
+         @@@@XParam:
+           @@@@@@: MDOMX|param-name
+           @@@@@enDesc:
+             The name of the method parameter where the value is specified.
+         @@@@XParam:
+           @@@@@@: DOMCore|domConfigurationParameterName
+           @@@@@enDesc:
+             The name of the configuration parameter.
 
 ElementTypeBinding:
   @Name: enImplNote
@@ -2114,9 +2144,11 @@ IFCls3Def:
 
   @enDesc:
     @@For: ManakaiDOM|ManakaiDOM
+    @@ddid:perl
     @@@:
-      In the manakai implementation, <IF::DOMStringList> can be 
-      dereferenced as if it is an array reference.
+      In the manakai implementation, a <IF::DOMStringList> object
+      can be dereferenced as if it is a reference to the array
+      containing all items in the list.
 
   @Method:
      @@Name:  item
@@ -13306,7 +13338,6 @@ NodeTypeDef:
             }
 ##Element
 
-
 ElementTypeBinding:
   @Name: TrueCase
   @ElementType:
@@ -14838,172 +14869,490 @@ ElementTypeBinding:
   @ShadowContent:
     @@For: ManakaiDOM|Perl
 
-IFDef:
-  @Name:  DOMConfiguration
-  @Description:
-    @@lang:en
+IFCls3Def:
+  @IFQName: DOMConfiguration
+  @ClsQName: ManakaiDOMConfiguration
+  @enDesc:
+    The <IF::DOMConfiguration> interface represents the configuration
+    of a document and maintains a table of recognized parameters.
+    Using the configuration, it is possible to change behavior 
+    of methods such as <M::Document.normalizeDocument>.
+
+  @enDesc:
+    @@ddid:es
+    @@For: ManakaiDOM|ECMAScript
     @@@:
-      The configuration of a document.  It maintains a table 
-      of recognized parameters.
-  @ImplNote:
-    @@lang:en
+      In addition of having <IF::DOMConfiguration> parameters exposed
+      to applications using methods in the interface,  those
+      parameters are also exposed as ECMAScript properties on
+      the <IF::DOMConfiguration> object.  The name of a parameter
+      is converted into a property name using a camel-case
+      convention: the <CHAR::HYPHEN-MINUS> character is removed and
+      the following character is being replaced by its uppercase
+      equivalent.
+
+  @enDesc:
+    @@ddid:perl
+    @@For: ManakaiDOM|ManakaiDOM
     @@@:
-      Parameters affect: <M::Document.normalizeDocument>, 
-      validation, <IF::DOMParser>, <IF::DOMSerializer>, etc.
-  @Level[list]:  3
-  @SpecLevel:3
-  @For:
-    =ManakaiDOM:ManakaiDOM
-  @For:
-    ManakaiDOM:DOM3
+      For manakai's Perl binding, a <IF::DOMConfiguration> object
+      can be dereferenced as if it is a reference to the hash
+      which consists of all pairs of parameter names and values.
+      In addition, applications can access values by hash keys
+      in camel-case convention as in ECMAScript binding.
+
+  @ResourceDef:
+    @@QName: DOMCore|getConfigObject
+    @@rdf:type: DISPerl|BlockCode
+    @@ForCheck: ManakaiDOM|ForClass
+    @@enDesc:
+      Creates a new instance of the <IF::DOMConfiguration> interface
+      based on a underlying object <P::$target> (e.g. a <IF::Document>).
+    @@PerlDef:
+      $result = bless [$target, $targetHash, $targetType],
+                      <ClassName::ManakaiDOMConfiguration>;
+
+  @IntMethod:
+    @@Operator:
+      @@@@: TIEHASH
+      @@@ContentType: DISPerl|Perl
+    @@ManakaiDOM:isStatic:1
+    @@rdf:type: DISPerl|Constructor
+    @@enDesc:
+      Returns a reference through which the <IF::DOMConfiguration>
+      object will be accessed.
+    @@Param:
+      @@@Name: domConfig
+      @@@Type: DOMConfiguration
+      @@@enDesc:
+        The <IF::DOMConfiguration> object tied to a hash.
+    @@Return:
+      $r = $domConfig;
+
   @Method:
-     @@Name:  setParameter
-     @@Description:
-       @@@lang:en
-       @@@@:
-         Set the value of a parameter.
-     @@Param:
-        @@@Name:  name
-        @@@Type:
-          DOMMain:DOMString
-        @@@Description:
-          @@@@lang:en
-          @@@@@: The name of the parameter to set.
-     @@Param:
-        @@@Name:  value
-        @@@Type:  
-          DOMMain:DOMUserData
-        @@@Description:
-          @@@@lang:en
-          @@@@@: 
-            The new value.  The object type must match the type 
-            defined by the definition of the parameter.
-        @@@InCase:
-          @@@@Value:
-            @@@@@is-null:1
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@: Unset the parameter.
-     @@Return:
-        @@@Exception:
-          @@@@Name: NOT_FOUND_ERR
-          @@@@Type: DOMException
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@: The parameter name is not recognized.
-        @@@Exception:
-          @@@@Name: NOT_SUPPORTED_ERR
-          @@@@Type: DOMException
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              The parameter name is recognized but the requested 
-              value cannot be set.
-        @@@Exception:
-          @@@@Name: TYPE_MISMATCH_ERR
-          @@@@Type: DOMException
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              The value type for this parameter name is 
-              incompatible with the expected value type.
+    @@Name: setParameter
+    @@enDesc:
+      Sets the value of a parameter.
+    @@Param:
+      @@@Name: name
+      @@@Type: DOMMain|DOMString
+      @@@dis:actualType: DOMConfigurationParameterName
+      @@@enDesc:
+        The name of the parameter to set.
+    @@Param:
+      @@@Name: value
+      @@@Type: DOMMain|DOMUserData
+      @@@enDesc:
+        The new value of the parameter.
+
+        While the type of the <P::value> parameter is defined as 
+        <TYPE::DOMMain|DOMUserData>, the object type must match
+        the type defined by the definition of the parameter.
+      @@@nullCase:
+        @@@@enDesc:
+          Unsets the parameter.
+    @@Return:
+      @@@raises:
+        @@@@@: NOT_RECOGNIZED_CONFIG_PARAM_ERR
+        @@@@enDesc:
+          The parameter <P::name> is not recognized.
+      @@@raises:
+        @@@@@: NOT_SUPPORTED_CONFIG_VALUE_ERR
+        @@@@enDesc:
+          The parameter <P::name> is recognized but the
+          requested <P::value> cannot be set.
+      @@@raises:
+        @@@@@: INCOMPATIBLE_CONFIG_VALUE_ERR
+        @@@@enDesc:
+          The <P::value> type for the parameter is 
+          incompatible with the expected value type.
+      @@@PerlDef:
+        my $p = $Message::DOM::DOMCore::ManakaiDOMConfiguration{$self->[2]}
+                ->{$name};
+        unless (defined $p) {
+          __EXCEPTION{NOT_RECOGNIZED_CONFIG_PARAM_ERR::
+            MDOMX:param-name => 'name',
+            DOMCore:domConfigurationParameterName => {$name},
+          }__;
+        }
+        if (defined $value) {
+          if (defined $p->{setter}) {
+            __DEEP{
+              $p->{setter}->($self, $name => $value);
+            }__;
+          } elsif ($p->{type} eq 'object') {
+            unless (UNIVERSAL::isa ($value, $p->{otype})) {
+              __EXCEPTION{INCOMPATIBLE_CONFIG_VALUE_ERR::
+                MDOMX:param-name => 'value',
+                DOMCore:domConfigurationParameterName => {$name},
+                DOMCore:domConfigurationParameterValue => {$value},
+              }__;
+            }
+            $self->[1]->{$p->{iname}} = $value;
+          } elsif ($p->{type} eq 'string') {
+            $self->[1]->{$p->{iname}} = '' . $value;
+          } else {  ## boolean
+            my $v = $value ? true : false;
+            unless ($p->{vsupport}->[$v]) {
+              __EXCEPTION{NOT_SUPPORTED_CONFIG_VALUE_ERR::
+                MDOMX:param-name => 'value',
+                DOMCore:domConfigurationParameterName => {$name},
+                DOMCore:domConfigurationParameterValue => {$value},
+              }__;
+            }
+            $self->[1]->{$p->{iname}} = $v;
+          }
+          for (keys %{$p->{setparam}}) {
+            $self->[1]->{$_} = $p->{setparam}->{$_};
+            ## NOTE: Setting setter-defined parameters are not supported.
+            ##       In addition, parameter value set here might not be
+            ##       supported by the implementation.
+          }
+        } else {
+          if (defined $p->{unsetter}) {
+            __DEEP{
+              $p->{unsetter}->($self, $name);
+            }__;
+          } elsif (defined $p->{setter}) {
+            __DEEP{
+              $p->{setter}->($self, $name => null);
+            }__;
+          } else {
+            CORE::delete $self->[1]->{$p->{iname}};
+          }
+        }
+
+  @IntMethod:
+    @@Operator:
+      @@@@: STORE
+      @@@ContentType: DISPerl|Perl
+    @@enDesc:
+      This method will be triggered every time an item in the tied
+      hash is set.
+    @@Param:
+      @@@Name: key
+      @@@Type: DOMString
+      @@@enDesc:
+        The key of the value to set.  It must be either a
+        parameter name or its camel-case variant in ECMAScript binding.
+    @@Param:
+      @@@Name: value
+      @@@Type: DOMMain|DOMUserData
+      @@@enDesc:
+        The value to put.
+      @@@nullCase:
+        @@@@enDesc:
+          The parameter value is unset.
+    @@Return:
+      @@@raises:
+        @@@@@: NOT_RECOGNIZED_CONFIG_PARAM_ERR
+        @@@@enDesc:
+          The <P::key> is not a recognizable parameter name.
+      @@@raises:
+        @@@@@: NOT_SUPPORTED_CONFIG_VALUE_ERR
+        @@@@enDesc:
+          The parameter <P::key> is recognized but the
+          requested <P::value> cannot be set.
+      @@@raises:
+        @@@@@: INCOMPATIBLE_CONFIG_VALUE_ERR
+        @@@@enDesc:
+          The <P::value> type for the parameter is
+          incompatible with the expected value type.
+      @@@PerlDef:
+        my $p = $Message::DOM::DOMCore::ManakaiDOMConfiguration{$self->[2]}
+                ->{lc $key};
+        __DEEP{
+          if (defined $p) {
+            $self-><M::DOMConfiguration.setParameter> ($key => $value);
+          } else {
+            $key =~ s/([A-Z])/'-'.lc $1/ge;
+            $self-><M::DOMConfiguration.setParameter> ($key => $value);
+          }
+        }__;
+
+  @IntMethod:
+    @@Operator:
+      @@@@: DELETE
+      @@@ContentType: DISPerl|Perl
+    @@enDesc:
+      This method will be triggered every time an item in the tied
+      hash is removed.  It unsets the parameter value to the default.
+    @@Param:
+      @@@Name: key
+      @@@Type: DOMString
+      @@@enDesc:
+        The key of the value to unset.  It must be either a
+        parameter name or its camel-case variant in ECMAScript binding.
+    @@Return:
+      @@@Type: DOMString
+      @@@raises:
+        @@@@@: NOT_RECOGNIZED_CONFIG_PARAM_ERR
+        @@@@enDesc:
+          The <P::key> is not a recognizable parameter name.
+      @@@PerlDef:
+        my $p = $Message::DOM::DOMCore::ManakaiDOMConfiguration{$self->[2]}
+                ->{lc $key};
+        __DEEP{
+          unless (defined $p) {
+            $key =~ s/([A-Z])/'-'.lc $1/ge;
+          }
+          if (defined wantarray) {
+            $r = $self-><M::DOMConfiguration.getParameter> ($key);
+          }
+          $self-><M::DOMConfiguration.setParameter> ($key => null);
+        }__;
+
+  @IntMethod:
+    @@Operator:
+      @@@@: CLEAR
+      @@@ContentType: DISPerl|Perl
+    @@enDesc:
+      This method will be triggered when the whole hash is to be cleared.
+      It resets all configurations.
+    @@Return:
+      @@@PerlDef:
+        __DEEP{
+          for (keys %{
+            $Message::DOM::DOMCore::ManakaiDOMConfiguration{$self->[2]}
+          }) {
+            $self-><M::DOMConfiguration.setParameter> ($_ => null);
+          }
+        }__;
+
   @Method:
-     @@Name:  getParameter
-     @@Description:
-       @@@lang:en
-       @@@@: Return the value of a parameter.
-     @@Param:
-        @@@Name:  name
-        @@@Type:  
-          DOMMain:DOMString
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            The name of the parameter.
-     @@Return:
-        @@@Type:  
-          DOMMain:DOMUserData
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            The current object associated with the specified 
-            parameter.
-        @@@InCase:
-          @@@@Value:
-            @@@@@is-null:1
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              Either no object has been associated or the parameter 
-              is not supported.
-        @@@Exception:
-          @@@@Name: NOT_FOUND_ERR
-          @@@@Type: DOMException
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              The parameter name is not recognized.
+    @@Name: getParameter
+    @@enDesc:
+      Returns the value of a parameter, if known.
+    @@Param:
+      @@@Name: name
+      @@@Type: DOMMain|DOMString
+      @@@dis:actualType: DOMConfigurationParameterName
+      @@@enDesc:
+        The name of the parameter.
+    @@Return:
+      @@@Type: DOMMain|DOMUserData
+      @@@enDesc:
+        The current object associated with the specified parameter.
+      @@@nullCase:
+        @@@@enDesc:
+          No object has been associated or the parameter
+          is not supported.
+      @@@raises:
+        @@@@@: NOT_RECOGNIZED_CONFIG_PARAM_ERR
+        @@@@enDesc:
+          The parameter <P::name> is not recognized.
+      @@@PerlDef:
+        my $p = $Message::DOM::DOMCore::ManakaiDOMConfiguration{$self->[2]}
+                ->{$name};
+        unless (defined $p) {
+          __EXCEPTION{NOT_RECOGNIZED_CONFIG_PARAM_ERR::
+            MDOMX:param-name => 'name',
+            DOMCore:domConfigurationParameterName => {$name},
+          }__;
+        }
+        __DEEP{
+          $r = defined $p->{getter} ? $p->{getter}->($self, $name) :
+               exists $self->[1]->{$p->{iname}} ? $self->[1]->{$p->{iname}} :
+               defined $p->{get_default} ? $p->{get_default}->($self, $name) :
+               $p->{default};
+        }__;
+
+  @IntMethod:
+    @@Operator:
+      @@@@: FETCH
+      @@@ContentType: DISPerl|Perl
+    @@enDesc:
+      This method will be triggered every time an item in the tied
+      hash is read.
+    @@Param:
+      @@@Name: key
+      @@@Type: DOMString
+      @@@enDesc:
+        The key of the value to fetch.  It must be either a
+        parameter name or its camel-case variant in ECMAScript binding.
+    @@Return:
+      @@@Type: DOMMain|DOMUserData
+      @@@enDesc:
+        The value <M::DOMConfiguration.getParameter> would return.
+      @@@raises:
+        @@@@@: NOT_RECOGNIZED_CONFIG_PARAM_ERR
+        @@@@enDesc:
+          The <P::key> is not a recognizable parameter name.
+      @@@PerlDef:
+        my $p = $Message::DOM::DOMCore::ManakaiDOMConfiguration{$self->[2]}
+                ->{lc $key};
+        __DEEP{
+          if (defined $p) {
+            $r = $self-><M::DOMConfiguration.getParameter> ($key);
+          } else {
+            $key =~ s/([A-Z])/'-'.lc $1/ge;
+            $r = $self-><M::DOMConfiguration.getParameter> ($key);
+          }
+        }__;
+
   @Method:
-     @@Name:  canSetParameter
-     @@Description:
-       @@@lang:en
-       @@@@:
-         Check if setting a parameter to a specific value is supported. 
-         The current value of the parameter itself is not changed.
-     @@Param:
-        @@@Name:  name
-        @@@Type:
-          DOMMain:DOMString
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            The name of the parameter to check.
-     @@Param:
-        @@@Name:  value
-        @@@Type:  
-          DOMMain:DOMUserData
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            An object to check.
-        @@@InCase:
-          @@@@Value:
-            @@@@@is-null:1
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@: 
-              \ <DOM::true> will be returned.
-     @@Return:
-        @@@Type:  DOMMain|boolean||ManakaiDOM|all
-        @@@InCase:
-          @@@@Value:true
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              The parameter could be successfully set to the 
-              specified value.
-        @@@InCase:
-          @@@@Value:false
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              The parameter is not recognized or the 
-              requested value is not supported.
+    @@Name: canSetParameter
+    @@enDesc:
+      Checks whether setting a parameter to a specific value is supported
+      or not.  The current value of the parameter itself is <EM::not> changed.
+    @@Param:
+      @@@Name: name
+      @@@Type: DOMMain|DOMString
+      @@@dis:actualType: DOMConfigurationParameterName
+      @@@enDesc:
+        The name of the parameter to check.
+    @@Param:
+      @@@Name: value
+      @@@Type: DOMMain|DOMUserData
+      @@@enDesc:
+        The object to set.
+      @@@nullCase:
+        @@@@enDesc:
+          <DOM::true> would be returned.
+    @@Return:
+      @@@Type: idl|boolean||ManakaiDOM|all
+      @@@TrueCase:
+        @@@@enDesc:
+          The parameter could not be successfully set to the specified
+          <P::value>.
+      @@@FalseCase:
+        @@@@enDesc:
+          The parameter is not recognized or the requested value is
+          not supported.
+      @@@PerlDef:
+        my $p = $Message::DOM::DOMCore::ManakaiDOMConfiguration{$self->[2]}
+                ->{$name};
+        if (defined $p) {  ## Recognized
+          if (defined $value) {
+            if (defined $p->{checker}) {
+              __DEEP{
+                $r = $p->{checker}->($self, $name => $value);
+              }__;
+            } elsif ($p->{type} eq 'object') {
+              $r = true if UNIVERSAL::isa ($value, $p->{otype});
+            } elsif ($p->{type} eq 'boolean') {
+              $r = $p->{vsupport}->[$value ? true : false];
+            } else { ## string
+              $r = true;
+            }
+          } else {
+            $r = true;
+          }
+        }
+
+  @IntMethod:
+    @@Operator:
+      @@@@: EXISTS
+      @@@ContentType: DISPerl|Perl
+    @@enDesc:
+      This method will be triggered when the user uses the
+      <Perl::exists> function on the hash.  It returns <DOM::true>
+      if the implementation recognizes the parameter name.
+    @@Param:
+      @@@Name: key
+      @@@Type: DOMString
+      @@@enDesc:
+        The key.  It must be either a
+        parameter name or its camel-case variant in ECMAScript binding.
+    @@Return:
+      @@@Type: idl|boolean||ManakaiDOM|all
+      @@@PerlDef:
+        my $p = $Message::DOM::DOMCore::ManakaiDOMConfiguration{$self->[2]}
+                ->{lc $key};
+        if (defined $Message::DOM::DOMCore::ManakaiDOMConfiguration{$self->[2]}
+                    ->{lc $key}) {
+          $r = true;
+        } else {
+          $key =~ s/([A-Z])/'-'.lc $1/ge;
+          $r = true
+            if $Message::DOM::DOMCore::ManakaiDOMConfiguration{$self->[2]}
+                    ->{$key};
+        }
+
   @Attr:
-     @@Name:  parameterNames
-     @@Description:
-       @@@lang:en
-       @@@@:
-         The list of the parameters supported by this 
-         <IF::DOMConfiguration> object and for which at least 
-         one value can be set by the DOM application.
-     @@ImplNote:
-       @@@lang:en
-       @@@@:
-         Parameternames defined outside the DOM Level 3 Core Specification 
-         also contained.
-     @@Get:
-        @@@Type:  DOMStringList
+    @@Name: parameterNames
+    @@enDesc:
+      The list of the parameters supported by the <IF::DOMConfiguration>
+      object and for which at least one value can be set by the application.
+ 
+      {NOTE:: This list can also contain parameter names defined
+              outside the W3C DOM specifications.
+      }
+    @@Get:
+      @@@Type: DOMStringList
+      @@@enDesc:
+        The list of parameter names.
+      @@@enDesc:
+        @@@@ddid:order
+        @@@@@:
+          The order of the parameter names are undefined.
+        @@@@ForCheck: ManakaiDOM|ManakaiDOM
+      @@@PerlDef:
+        $r = bless [
+          keys %{$Message::DOM::DOMCore::ManakaiDOMConfiguration{$self->[2]}}
+        ], <ClassName::ManakaiDOMStringList>;
+
+  @IntMethod:
+    @@Operator:
+      @@@@: FIRSTKEY
+      @@@ContentType: DISPerl|Perl
+    @@Return:
+      @@@Type: DOMString
+      @@@PerlDef:
+        my $a = keys %{
+          $Message::DOM::DOMCore::ManakaiDOMConfiguration{$self->[2]}
+        };  # reset
+        $r = each %{
+          $Message::DOM::DOMCore::ManakaiDOMConfiguration{$self->[2]}
+        };
+
+  @IntMethod:
+    @@Operator:
+      @@@@: NEXTKEY
+      @@@ContentType: DISPerl|Perl
+    @@Param:
+      @@@Name: lastKey
+      @@@Type: DOMString
+    @@Return:
+      @@@Type: DOMString
+      @@@PerlDef:
+        $r = each %{
+          $Message::DOM::DOMCore::ManakaiDOMConfiguration{$self->[2]}
+        };
+##DOMConfiguration
+
+ElementTypeBinding:
+  @Name: StringDataTypeDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|DataType
+    @@rdfs:subClassOf: DOMMain|DOMString
+    @@ForCheck: ManakaiDOM|ManakaiDOM !=ManakaiDOM|ManakaiDOM
+
+StringDataTypeDef:
+  @QName: DOMConfigurationParameterName
+  @FullName:
+    @@lang:en
+    @@@:
+      parameter name in <IF::DOMConfiguration>
+  @For: ManakaiDOM|DOM3
+  @enDesc:
+    The parameter names used by the <IF::DOMConfiguration> object.
+    They are case-insensitive.
+
+    To avoid possible conflicts, as a convention, names referring to
+    parameters defined outside the DOM specification should be
+    made unique.  Because parameters are exposed as properties in the
+    ECMAScript language binding, names are recommended to follow the
+    <CSECTION::5.16 Identifiers> or latest version of <CITE::The Unicode
+    Standard> with the addition of the character <CHAR::HYPHEN-MINUS>
+    but it is not enforced by the DOM implementation.
+    <SRC::DOM Level 3 Core>
+  @ResourceDef:
+    @@rdf:type: DISLang|InputProcessor
+    @@PerlDefC:
+      $INPUT = lc $INPUT;
 
 NodeTypeDef:
   @IFQName: DocumentFragment
@@ -17072,24 +17421,26 @@ NodeTypeDef:
         } # compatible class
 
   @Attr:
-     @@Name:  domConfig
-     @@Description:
-       @@@lang:en
-       @@@@: The configuration used when "normalizeDocument" is invoked.
-     @@Get:
-        @@@Type:  DOMConfiguration
-        @@@Description:
-          @@@@lang:en
-          @@@@@: The DOM configuration object.
-        @@@disDef:
-          @@@@GetProp:
-            DOMCore:domConfig
-     @@For:
-       ManakaiDOM:DOM3
-     @@Level[list]:  3
-     @@SpecLevel:3
-     @@For:
-       ManakaiDOM:DOM3
+    @@Name: domConfig
+    @@For: ManakaiDOM|DOM3
+    @@enDesc:
+      The configuration of the document.
+
+      {NOTE:: This configuration is used when e.g. the method
+              <M::Document.normalizeDocument> is invoked.
+      }
+
+    @@Get:
+      @@@Type: DOMConfiguration
+      @@@enDesc: The DOM configuration object.
+      @@@PerlDef:
+        __CODE{getConfigObject::
+          $target => $self,
+          $targetHash => {$self->{<H::mn:node>}},
+          $targetType => {<IFName::Document>},
+          $result => $r,
+        }__;
+
   @Method:
      @@Name:  normalizeDocument
      @@Description:
@@ -17474,6 +17825,7 @@ NodeTypeDef:
   @mn:origin0: infoset|parent
   @mn:subnode1: infoset|children
   @mn:subnode1: DOMViews|view
+  @mn:anydata0: DOMCore|error-handler
 
   @Method:
      @@Name:  getFeature
@@ -17557,15 +17909,6 @@ PropDef:
   @DOMCore:nodeProp: duri
 
 PropDef:
-  @QName: domConfig
-  @enDesc:
-    The DOM configuration object (<IF::DOMConfiguration>)
-    associated with the subject resource.
-  @rdfs:range:
-    DOMConfiguration
-  @DOMCore:nodeProp: cfg
-
-PropDef:
   @QName: strictErrorChecking
   @enDesc:
     <A::Document.strictErrorChecking>.
@@ -17610,685 +17953,1050 @@ PropDef:
         - <M::Document.createElementNS>.
         \
        }
-  @DOMCore:nodeProp: hf
+  @nodeProp: hf
 
-ConfigParam:
-  @ForCheck: !ManakaiDOM|all
+ElementTypeBinding:
+  @Name: cfgname
+  @ElementType:
+    DOMCore:domConfigurationParameterName
+  @ShadowContent:
+    @@ContentType: DISCore|String
 
-  @Description:
-    @@lang:en
-    @@@:
-      A parameter name used with the <IF::DOMConfiguration>.
-    \
-      Names are case-insensitive.  To avoid possible conflicts, 
-      names referring to parameters defined outside the DOM 
-      specification should be made unique.  Names are 
-      recommended to follow the Unicode identifier specification 
-      with the addition of the character <CHAR:HYPHEN-MINUS>.
-  @ImplNote:
-    @@lang:en
-    @@@:
-      DOM implementations must recognize all parameters 
-      and some parameter values defined in the DOM Level 3 Core Specification.
-    \
-      DOM parameters are similar to features and properties of SAX2.
-  @CParam:
-    @@Name: canonical-form
-    @@IsSupportRequired:1
-    @@Type: DOMMain|boolean||ManakaiDOM|all
-    @@InCase:
-      @@@Value: true
-      @@@Target:
-        @@@@TargetMethod:
-          Document::.normalizeDocument
-        @@@@Description:
-          @@@@@lang:en
-          @@@@@@:
-            Canonicalize the document accoding to the rules specified in 
-            the XML C14N Version 1.0 Specification.
-        \
-            This is limited to what can be represented in the DOM.  
-            For example, there is no way to specify the order of 
-            the attributes in the DOM.
-      @@@Target:
-        @@@@TargetModule:
-          DOMLS:LSSerializer::
-        @@@@Description:
-          @@@@@lang:en
-          @@@@@@:
-            Write the document according to the rules specified in 
-            the XML C14N Version 1.0 Specification.
-            \
-            Serializing an XML 1.1 document will generate a fatal error.
-        @@@@ImplNote:
-          @@@@@lang:en
-          @@@@@@:
-            Why error? Because c14n does not support XML 1.1?
-      ## From DOM Level 3 Core
-      @@@SetParam:
-        @@@@Name: entities
-        @@@@Type: DOMMain|boolean||ManakaiDOM|all
-        @@@@Value: false
-      @@@SetParam:
-        @@@@Name: normalize-characters
-        @@@@Type: DOMMain|boolean||ManakaiDOM|all
-        @@@@Value: false
-      @@@SetParam:
-        @@@@Name: cdata-sections
-        @@@@Type: DOMMain|boolean||ManakaiDOM|all
-        @@@@Value: false
-      @@@SetParam:
-        @@@@Name: namespaces
-        @@@@Type: DOMMain|boolean||ManakaiDOM|all
-        @@@@Value: true
-      @@@SetParam:
-        @@@@Name: namespace-declarations
-        @@@@Type: DOMMain|boolean||ManakaiDOM|all
-        @@@@Value: true
-      @@@SetParam:
-        @@@@Name: well-formed
-        @@@@Type: DOMMain|boolean||ManakaiDOM|all
-        @@@@Value: true
-      @@@SetParam:
-        @@@@Name: element-content-whitespace
-        @@@@Type: DOMMain|boolean||ManakaiDOM|all
-        @@@@Value: true
-      ## From DOM Level 3 LS
-      @@@SetParam:
-        @@@@Name:format-pretty-print
-        @@@@Type:DOMMain|boolean||ManakaiDOM|all
-        @@@@Value:false
-      @@@SetParam:
-        @@@@Name:discade-default-content
-        @@@@Type:DOMMain|boolean||ManakaiDOM|all
-        @@@@Value:false
-      @@@SetParam:
-        @@@@Name:xml-declaration
-        @@@@Type:DOMMain|boolean||ManakaiDOM|all
-        @@@@Value:false
-    @@InCase:
-      @@@Value: false
-      @@@IsSupportRequired:1
-      @@@IsDefault:1
-      @@@Description:
-        @@@@lang:en
-        @@@@@: Do not canonicalize the document or the output.
-  @CParam:
-    @@Name: cdata-sections
-    @@IsSupportRequired:1
-    @@Type:DOMMain|boolean||ManakaiDOM|all
-    @@InCase:
-      @@@Value: true
-      @@@IsSupportRequired:1
-      @@@IsDefault:1
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          Keep <IF::DOMXML:CDATASection> nodes in the document.
-      @@@SetParam:
-        @@@@Name: canonical-form
-        @@@@Type:DOMMain|boolean||ManakaiDOM|all
-        @@@@Value:false
-    @@InCase:
-      @@@Value: false
-      @@@IsSupportRequred:1
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          Transform <IF::DOMXML:CDATASection> nodes in the document into 
-          <IF::Text> nodes.  The new <IF::Text> node is then 
-          combined with any adjacent <IF::Text> node.
-  @CParam:
-    @@Name: check-character-normalization
-    @@IsSupportRequired
-    @@Type:DOMMain|boolean||ManakaiDOM|all
-    @@InCase:
-      @@@Value: true
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          Check whether the characters in the document are fully normalized 
-          as defined in Appendix B of the XML 1.1 Specification.  When 
-          a sequence of characters is encountered that fails 
-          normalization checking, an error with the 
-          <A::DOMError.type> equals to 
-          <DOM::check-character-normalization-failure> is issued.
-    @@InCase:
-      @@@Value: false
-      @@@IsSupportRequired:1
-      @@@IsDefault:1
-      @@@Description:
-        @@@@lang:en
-        @@@@@: Do not check whether characters are normalized.
-  @CParam:
-    @@Name: comments
-    @@IsSupportRequired:1
-    @@Type:DOMMain|boolean||ManakaiDOM|all
-    @@InCase:
-      @@@Value:true
-      @@@IsSupportRequired:1
-      @@@IsDefault:1
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          Keep <IF::Comment> nodes in the document.
-    @@InCase:
-      @@@Value:false
-      @@@IsSupportRequired:1
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-           Discard <IF::Comment> nodes in the document.
-  @CParam:
-    @@Name: datatype-normalization
-    @@IsSupportRequired:1
-    @@Type:DOMMain|boolean||ManakaiDOM|all
-    @@InCase:
-      @@@Value:true
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          Expose schema normalized values in the tree.
-        \
-          This parameter required to have <DOM::validate> parameter 
-          equals to <DOM::true>, or this parameter has no effect.
-        \
-          Note that the attribute value normalization as defined 
-          in the XML Specifications does not applied.  This 
-          parameter is only meant for schema languages other 
-          than the DTD.
-    @@InCase:
-      @@@Value:false
-      @@@IsSupportRequired:1
-      @@@IsDefault:0
-      @@@Description:
-        @@@@lang:en
-        @@@@@: Do not perform schema normalization on the tree.
-  @CParam:
-    @@Name: element-content-whitespace
-    @@IsSupportRequired:1
-    @@Type:DOMMain|boolean||ManakaiDOM|all
-    @@InCase:
-      @@@Value:true
-      @@@IsSupportRequired:1
-      @@@IsDefault:1
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          Keep all whitespaces in the document.
-    @@InCase:
-      @@@Value:false
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          Discard all <IF::Text> nodes that contain whitespaces 
-          in element content.
-      @@@ImplNote:
-        @@@@lang:en
-        @@@@@:
-          DOM implementations are expected to use the attribute 
-          <A::Text.isElementContentWhitespace> to determine 
-          whether a <IF::Text> node should be discarded.
-      @@@SetParam:
-        @@@@Name:canonical-form
-        @@@@Type:DOMMain|boolean||ManakaiDOM|all
-        @@@@Value:false
-  @CParam:
-    @@Name: entities
-    @@Type:DOMMain|boolean||ManakaiDOM|all
-    @@IsSupportRequired:1
-    @@InCase:
-      @@@Value:true
-      @@@IsSupportRequired:1
-      @@@IsDefault:1
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          Keep <IF::DOMXML:EntityReferences> nodes in the document.
-      @@@SetParam:
-        @@@@Name:canonical-form
-        @@@@Type:DOMMain|boolean||ManakaiDOM|all
-        @@@@Value:false
-    @@InCase:
-      @@@Value:false
-      @@@IsSupportRequired:1
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          Remove all <IF::DOMXML:EntityReference> nodes from the document, 
-          putting the entity expansions directly in their place. 
-          <IF::Text> nodes are normalized as defined in 
-          <M::Node.normalize>.  Only unexpanded entity references 
-          are kept in the document.
-      @@@ImplNote:
-        @@@@lang:en
-        @@@@@:
-          This parameter does not affect <IF::DOMXML:Entity> nodes.
-  @CParam:
-    @@Name: error-handler
-    @@Type: 
-      DOMCore:DOMErrorHandler
-    @@IsSupportRequired:1
-    @@Description:
-      @@@lang:en
+boolCParams:
+  @QName:
+    @@@: canonical-form
+    @@ForCheck: ForDocument
+  @QName:
+    @@@: DOMLS|canonical-form.parser
+    @@ForCheck: ForParser
+  @QName:
+    @@@: DOMLS|canonical-form
+    @@ForCheck: ForSerializer
+  @cfgname: canonical-form
+  @nodeProp:
+    @@@: canon
+    @@ForCheck: ForDocument
+  @IsSupportRequired:1
+  @resourceFor: ForDocument
+  @DOMCore:targetType:
+    @@@: DOMCore|Document
+    @@ForCheck: ForDocument
+  @resourceFor: ForParser
+  @DOMCore:targetType:
+    @@@: DOMLS|LSParser
+    @@ForCheck: ForParser
+  @resourceFor: ForSerializer
+  @DOMCore:targetType:
+    @@@: DOMLS|LSSerializer
+    @@ForCheck: ForSerializer
+  @TrueCase:
+    @@enDesc:
+      @@@ForCheck: ForDocumentOrParser
       @@@@:
-        If an error is encountered in the document, the DOM 
-        implementation will callback the <IF::DOMErrorHandler>. 
-      \
-        When called, <A::DOMError.relatedData> will contain 
-        the closest node to where the error occurred. 
-        If the implementation is unable to determine the node 
-        where the error occurs, <A::DOMError.relatedData> will 
-        contain the <IF::Document> node. 
-      \
-        Mutations to the document from within an error handler 
-        will result in implementation dependent behavior.
-    @@ImplNote:
-      @@@lang:en
+        Canonicalizes the document according to the rules specified in
+        the <CITE::XML Canonicalization Version 1.0> specification.
+
+        {NOTE:: The effect of this value is limited to what can be
+                represented in the DOM; in particular, there is no
+                way to specify the order of the attributes in the DOM.
+        }
+    @@enDesc:
+      @@@ForCheck: ForSerializer
       @@@@:
-        DOM implementations may provide a default <IF::DOMErrorHandler> 
-        object.  
-    @@ImplNote:
-      @@@lang:en
-      @@@@:
-        {P:: This parameter is used in:
-        \
-        {LI:: <M::Document.normalizeDocument>:: If errors occurs, such as an 
+        Writes the document according to the rule specified in
+        the <CITE::XML Canonicalization Version 1.0> specification.
+
+        Serializing an XML 1.1 document will generate a fatal error.
+
+    @@SetParam:
+      @@@@: entities
+      @@@boolValue:0
+    @@SetParam:
+      @@@@: normalize-characters
+      @@@boolValue:0
+    @@SetParam:
+      @@@@: cdata-sections
+      @@@boolValue:0
+    @@SetParam:
+      @@@@: namespaces
+      @@@boolValue:1
+    @@SetParam:
+      @@@@: namespace-declarations
+      @@@boolValue:1
+    @@SetParam:
+      @@@@: well-formed
+      @@@boolValue:1
+    @@SetParam:
+      @@@@: element-content-whitespace
+      @@@boolValue:1
+    @@SetParam:
+      @@@@: DOMLS|format-pretty-print
+      @@@boolValue:0
+      @@@ForCheck: ForSerializer
+    @@SetParam:
+      @@@@: DOMLS|discard-default-content
+      @@@boolValue:0
+      @@@ForCheck: ForSerializer
+    @@SetParam:
+      @@@@: DOMLS|xml-declaration
+      @@@boolValue:0
+      @@@ForCheck: ForSerializer
+  @FalseCase:
+    @@IsSupportRequired:1
+    @@IsDefault:1
+    @@enDesc:
+      Does not canonicalize the document.
+
+boolCParams:
+  @QName:
+    @@@: cdata-sections
+    @@ForCheck: ForDocument
+  @QName:
+    @@@: DOMLS|cdata-sections.parser
+    @@ForCheck: ForParser
+  @QName:
+    @@@: DOMLS|cdata-sections
+    @@ForCheck: ForSerializer
+  @cfgname: cdata-sections
+  @nodeProp:
+    @@@: pcdsect
+    @@ForCheck: ForDocument
+  @IsSupportRequired:1
+  @resourceFor: ForDocument
+  @DOMCore:targetType:
+    @@@: DOMCore|Document
+    @@ForCheck: ForDocument
+  @resourceFor: ForParser
+  @DOMCore:targetType:
+    @@@: DOMLS|LSParser
+    @@ForCheck: ForParser
+  @TrueCase:
+    @@IsSupportRequired:1
+    @@IsDefault:
+      @@@@:1
+      @@@ForCheck: ForDocument
+    @@enDesc:
+      Keeps <IF::DOMXML:CDATASection> nodes in the document.
+    @@SetParam:
+      @@@@: canonical-form
+      @@@boolValue:0
+  @FalseCase:
+    @@IsSupportRequired:1
+    @@IsDefault:
+      @@@@:1
+      @@@ForCheck: ForParser
+    @@enDesc:
+      Transforms <IF::DOMXML:CDATASection> nodes in the document
+      into <IF::Text> nodes.  The new <IF::Text> node is then
+      combined with any adjacent <IF::Text> node.
+
+boolCParam:
+  @QName: check-character-normalization
+  @cfgname: check-character-normalization
+  @nodeProp: charnormc
+  @IsSupportRequired:1
+  @DOMCore:targetType: DOMCore|Document
+  @DOMCore:targetType: DOMLS|LSParser
+  @DOMCore:targetType: DOMLS|LSSerializer
+  @TrueCase:
+    @@enDesc:
+      Checks if the characters in the document are fully normalized
+      <SRC::XML 1.1 Appendix B>.
+
+      When a sequence of characters is encountered that fails normalization
+      checking, an error with the <A::DOMError.type> equals to
+      <ERR::check-character-normalization-failure> is issued.
+  @FalseCase:
+    @@IsSupportRequired:1
+    @@IsDefault:1
+    @@enDesc:
+      Does not check if characters in document are normalized.
+
+boolCParam:
+  @QName: comments
+  @cfgname: comments
+  @nodeProp: pcom
+  @IsSupportRequired:1
+  @DOMCore:targetType: DOMCore|Document
+  @DOMCore:targetType: DOMLS|LSParser
+  @DOMCore:targetType: DOMLS|LSSerializer
+  @TrueCase:
+    @@IsSupportRequired:1
+    @@IsDefault:1
+    @@enDesc:
+      Keeps <IF::Comment> nodes in the document.
+  @FalseCase:
+    @@IsSupportRequired:1
+    @@enDesc:
+      Discards <IF::Comment> nodes in the document.
+
+boolCParam:
+  @QName: datatype-normalization
+  @cfgname: datatype-normalization
+  @nodeProp: tnorm
+  @IsSupportRequired:1
+  @DOMCore:targetType: DOMCore|Document
+  @DOMCore:targetType: DOMLS|LSParser
+  @DOMCore:targetType: DOMLS|LSSerializer
+  @TrueCase:
+    @@enDesc:
+      Exposes schema normalized values in the tree.
+
+      Since this parameter requires to have schema information,
+      the <cfg::validate> parameter will also be set to <DOM::true>.
+      Having this parameter activated when <cfg::validate> is <DOM::false>
+      has no effect and no schema normalization will happen.
+
+      {NOTE:: Since an XML document contains the result of the XML processing,
+              this parameter does not apply to attribute value
+              normalization <SRC::XML 1.0, XML 1.1> and is only
+              meant for schema languages other than DTD.
+      }
+    @@enImplNote:
+      So, tokenization-and-serialization based on <InfoProp::attribute type>
+      will not happen.
+    @@SetParam:
+      @@@@: validate
+      @@@boolValue:1
+  @FalseCase:
+    @@IsSupportRequired:1
+    @@IsDefault:1
+    @@enDesc:
+      Does not perform schema normalization on the tree.
+
+boolCParam:
+  @QName: element-content-whitespace
+  @cfgname: element-content-whitespace
+  @nodeProp: pecws
+  @DOMCore:targetType: DOMCore|Document
+  @DOMCore:targetType: DOMLS|LSParser
+  @DOMCore:targetType: DOMLS|LSSerializer
+  @IsSupportRequired:1
+  @TrueCase:
+    @@IsSupportRequired:1
+    @@IsDefault:1
+    @@enDesc:
+      Keeps all white space characters in the document.
+  @FalseCase:
+    @@enDesc:
+      Discards all <IF::Text> nodes that contain white space
+      in element content, i.e. whose <A::Text.isElementContentWhitespace>
+      is <DOM::true>.
+    @@SetParam:
+      @@@@: canonical-form
+      @@@boolValue:0
+
+boolCParams:
+  @QName:
+    @@@: entities
+    @@ForCheck: ForDocument
+  @QName:
+    @@@: DOMLS|entities.parser
+    @@ForCheck: ForParser
+  @QName:
+    @@@: DOMLS|entities
+    @@ForCheck: ForSerializer
+  @cfgname: entities
+  @nodeProp:
+    @@@: pent
+    @@ForCheck: ForDocument
+  @resourceFor: ForDocument
+  @DOMCore:targetType:
+    @@@: DOMCore|Document
+    @@ForCheck: ForDocument
+  @resourceFor: ForParser
+  @DOMCore:targetType:
+    @@@: DOMLS|LSParser
+    @@ForCheck: ForParser
+  @IsSupportRequired:1
+  @TrueCase:
+    @@IsSupportRequired:1
+    @@IsDefault:
+      @@@@:1
+      @@@ForCheck: ForDocument
+    @@enDesc:
+      Keeps <IF::DOMXML:EntityReference> nodes in the document.
+    @@SetParam:
+      @@@@: canonical-form
+      @@@boolValue:0
+  @FalseCase:
+    @@IsSupportRequired:1
+    @@IsDefault:
+      @@@@:1
+      @@@ForCheck: ForParser
+    @@enDesc:
+      Removes all <IF::DOMXML:EntityReference> nodes from the documents,
+      putting the entity expansions directly in their place.  <IF::Text>
+      nodes are normalized as defined in <M::Node.normalize>.
+      Only unexpanded entity references are kept in the document.
+
+      {NOTE:: This parameter does not affect <IF::DOMXML:Entity> nodes.
+      }
+
+CParam:
+  @QName: error-handler
+  @cfgname: error-handler
+  @nodeProp: onerr
+  @Type: DOMCore|DOMErrorHandler
+  @DOMCore:targetType: DOMCore|Document
+  @DOMCore:targetType: DOMLS|LSParser
+  @IsSupportRequired:1
+  @enDesc:
+    This parameter contains a <IF::DOMErrorHandler> object.  If
+    an error is encountered in the document, the implementation
+    will call back the <IF::DOMErrorHandler> registered to the
+    document using this parameter.
+
+    {NOTE:: The implementation may provide a default <IF::DOMErrorHandler>
+            object.
+    }
+
+    When a <IF::DOMErrorHandler> is called, the
+    <A::DOMError.relatedData> attribute will contain the closest
+    node to where the error occurred.  If the implementation is 
+    unable to determine the node where the error occurs, then
+    <A::DOMError.relatedData> will contain the <IF::Document> node.
+    Mutations to the document from within an error handler
+    will result in implementation dependent behavior.
+
+  @enImplNote:
+    {html5:p:: This parameter is used in:
+
+        - <M::Document.normalizeDocument>::: If errors occurs, such as an 
           attempt to update a read-only node or a <A::Node.nodeName> 
           contains an invalid character.  This method might report 
           fatal errors.
-        \
-        }
-        \
-        }
-  @CParam:
-    @@Name: infoset
+
+    }
+
+  @enImplNote:
+    {TODO:: Sets default handler.
+    }
+  @Method:
+    @@rdf:type: DOMCore|DOMConfigurationParameterSetter
+    @@Param:
+      @@@Name: name
+      @@@Type: DOMMain|DOMString
+      @@@dis:actualType: DOMConfigurationParameterName
+      @@@enDesc: The parameter name.
+    @@Param:
+      @@@Name: value
+      @@@Type: DOMMain|DOMUserData
+      @@@dis:actualType: DOMErrorHandler
+      @@@enDesc: The new value.
+    @@Return:
+      @@@PerlDefC:
+        $self->[1]->{<H::DOMCore:error-handler>} = $value;
+    @@enImplNote:
+      Implied input processor converts non-blessed code references
+      into a <IF::DOMErrorHandler> object.
+  @Method:
+    @@rdf:type: DOMCore|DOMConfigurationParameterChecker
+    @@Param:
+      @@@Name: name
+      @@@Type: DOMMain|DOMString
+      @@@dis:actualType: DOMConfigurationParameterName
+      @@@enDesc: The parameter name.
+    @@Param:
+      @@@Name: value
+      @@@Type: DOMMain|DOMUserData
+      @@@dis:actualType: DOMErrorHandler
+      @@@enDesc: The new value.
+    @@Return:
+      @@@Type: idl|boolean||ManakaiDOM|all
+      @@@PerlDefC:
+        $r = UNIVERSAL::isa ($value, <IFName::DOMErrorHandler>);
+    @@enImplNote:
+      Implied input processor converts non-blessed code references
+      into a <IF::DOMErrorHandler> object.
+
+boolCParam:
+  @QName: infoset
+  @cfgname: infoset
+  @IsSupportRequired:1
+  @DOMCore:targetType: DOMCore|Document
+  @DOMCore:targetType: DOMLS|LSParser
+  @DOMCore:targetType: DOMLS|LSSerializer
+  @TrueCase:
     @@IsSupportRequired:1
-    @@Type:DOMMain|boolean||ManakaiDOM|all
-    @@InCase:
-      @@@Value:true
-      @@@IsSupportRequired:1
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          Keep in the document information defined in the 
-          XML Infoset Specification.
-      @@@SetParam:
-        @@@@Name: validate-if-schema
-        @@@@Type: DOMMain|boolean||ManakaiDOM|all
-        @@@@Value:false
-      @@@SetParam:
-        @@@@Name: entities
-        @@@@Type:DOMMain|boolean||ManakaiDOM|all
-        @@@@Value:false
-      @@@SetParam:
-        @@@@Name:datatype-normalization
-        @@@@Type:DOMMain|boolean||ManakaiDOM|all
-        @@@@Value:false
-      @@@SetParam:
-        @@@@Name:cdata-sections
-        @@@@Type:DOMMain|boolean||ManakaiDOM|all
-        @@@@Value:false
-      @@@SetParam:
-        @@@@Name:namespace-declarations
-        @@@@Type:DOMMain|boolean||ManakaiDOM|all
-        @@@@Value:true
-      @@@SetParam:
-        @@@@Name:well-formed
-        @@@@Type:DOMMain|boolean||ManakaiDOM|all
-        @@@@Value:true
-      @@@SetParam:
-        @@@@Name:element-content-whitespace
-        @@@@Type:DOMMain|boolean||ManakaiDOM|all
-        @@@@Value:true
-      @@@SetParam:
-        @@@@Name:comments
-        @@@@Type:DOMMain|boolean||ManakaiDOM|all
-        @@@@Value:true
-      @@@SetParam:
-        @@@@Name:namespaces
-        @@@@Type:DOMMain|boolean||ManakaiDOM|all
-        @@@@Value:true
-      @@@ImplNote:
-        @@@@lang:en
-        @@@@@:
+    @@enDesc:
+      Keeps the information defined in the <CITE::XML Information Set>
+      in the document.
+    @@SetParam:
+      @@@@: validate-if-schema
+      @@@boolValue:0
+    @@SetParam:
+      @@@@: entities
+      @@@boolValue:0
+    @@SetParam:
+      @@@@: datatype-normalization
+      @@@boolValue:0
+    @@SetParam:
+      @@@@: cdata-sections
+      @@@boolValue:0
+    @@SetParam:
+      @@@@: namespace-declarations
+      @@@boolValue:1
+    @@SetParam:
+      @@@@: well-formed
+      @@@boolValue:1
+    @@SetParam:
+      @@@@: element-content-whitespace
+      @@@boolValue:1
+    @@SetParam:
+      @@@@: comments
+      @@@boolValue:1
+    @@SetParam:
+      @@@@: namespaces
+      @@@boolValue:1
+    @@enImplNote:
           <M::DOMConfiguration.getParameter> with this parameter 
           returns <DOM::true> iif <CODE::!<DOM::validate-if-schema> && 
           !<DOM::entities> && !<DOM::datatype-normalization> && 
           !<DOM::cdata-sections> && <DOM::namespace-declarations> && 
           <DOM::well-formed> && <DOM::element-content-whitespace> && 
           <DOM::comment> && <DOM::namespaces>>.
-    @@InCase:
-      @@@Value:false
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          Setting <DOM::infoset> to <DOM::false> has no effect.
-    @@Get:
-      @@@PerlDef:
-        @@@@@:
-          $r = !$cfg->{<Q::DOMCoreParam:validate-if-schema>} &&
-               !$cfg->{<Q::DOMCoreParam:entities>} &&
-               !$cfg->{<Q::DOMCoreParam:datatype-normalization>} &&
-               !$cfg->{<Q::DOMCoreParam:cdata-sections>} && 
-               $cfg->{<Q::DOMCoreParam:namespace-declarations>} &&
-               $cfg->{<Q::DOMCoreParam:well-formed>} &&
-               $cfg->{<Q::DOMCoreParam:element-content-whitespace>} &&
-               $cfg->{<Q::DOMCoreParam:comment>} && 
-               $cfg->{<Q::DOMCoreParam:namespaces>}
-             ? true : false;
-  @CParam:
-    @@Name: namespaces
-    @@Type:DOMMain|boolean||ManakaiDOM|all
+  @FalseCase:
+    @@enDesc:
+      Setting <cfg::infoset> parameter to <DOM::false> has no effect.
+  @Method:
+    @@rdf:type: DOMCore|DOMConfigurationParameterGetter
+    @@Param:
+      @@@Name: name
+      @@@Type: DOMMain|DOMString
+      @@@dis:actualType: DOMConfigurationParameterName
+      @@@enDesc: The name of the parameter.
+    @@Return:
+      @@@Type: idl|boolean||ManakaiDOM|all
+      @@@PerlDefC:
+        __DEEP{
+          $r = !$self-><M::DOMConfiguration.getParameter>
+                                               ('validate-if-schema') &&
+               !$self-><M::DOMConfiguration.getParameter>
+                                               ('entities') &&
+               !$self-><M::DOMConfiguration.getParameter>
+                                               ('datatype-normalization') &&
+               !$self-><M::DOMConfiguration.getParameter>
+                                               ('cdata-sections') && 
+                $self-><M::DOMConfiguration.getParameter>
+                                               ('namespace-declarations') &&
+                $self-><M::DOMConfiguration.getParameter>
+                                               ('well-formed') &&
+                $self-><M::DOMConfiguration.getParameter>
+                                               ('element-content-whitespace') &&
+                $self-><M::DOMConfiguration.getParameter>
+                                               ('comment') && 
+                $self-><M::DOMConfiguration.getParameter>
+                                               ('namespaces');
+        }__;
+  @Method:
+    @@rdf:type: DOMCore|DOMConfigurationParameterSetter
+    @@Param:
+      @@@Name: name
+      @@@Type: DOMMain|DOMString
+      @@@dis:actualType: DOMConfigurationParameterName
+      @@@enDesc: The parameter name.
+    @@Param:
+      @@@Name: value
+      @@@Type: DOMMain|DOMUserData
+      @@@dis:actualType: idl|boolean||ManakaiDOM|all
+      @@@enDesc: The new value.
+    @@Return:
+      @@@Type: idl|void||ManakaiDOM|all
+      @@@PerlDefC:
+        ## TODO: Warning
+##infoset
+
+boolCParam:
+  @QName: namespaces
+  @cfgname: namespaces
+  @nodeProp: nsaware
+  @IsSupportRequired:1
+  @DOMCore:targetType: DOMCore|Document
+  @DOMCore:targetType: DOMLS|LSParser
+  @DOMCore:targetType: DOMLS|LSSerializer
+  @TrueCase:
     @@IsSupportRequired:1
-    @@InCase:
-      @@@Value:true
-      @@@IsSupportRequired:1
-      @@@IsDefault:1
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          Perform the namespace normalization processing.
-    @@InCase:
-      @@@Value:false
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          Do not perform the namespace processing.
-      @@@SetParam:
-        @@@@Name:canonical-form
-        @@@@Type:DOMMain|boolean||ManakaiDOM|all
-        @@@@Value:false
-  @CParam:
-    @@Name: namespace-declarations
+    @@IsDefault:1
+    @@enDesc:
+      Performes the namespace processing as defined in the
+      <CSECTION::Namespace Normalization> section of
+      <CITE::DOM Level 3 Core> specification for <IF::DOMCore|Document>
+      or as defined in XML Namespaces 1.0 and XML Namespaces 1.1
+      for <IF::DOMLS|LSParser>.
+  @FalseCase:
+    @@enDesc:
+      Does not perform the namespace processing.
+
+      {NOTE:: The parameter <cfg::namespace-declarations> has no effect.
+      }
+    @@SetParam:
+      @@@@: canonical-form
+      @@@boolValue:0
+
+boolCParam:
+  @QName: namespace-declarations
+  @cfgname: namespace-declarations
+  @nodeProp: pnsattr
+  @IsSupportRequired:1
+  @DOMCore:targetType: DOMCore|Document
+  @DOMCore:targetType: DOMLS|LSParser
+  @DOMCore:targetType: DOMLS|LSSerializer
+  @enDesc:
+    {NOTE:: This parameter has no effect if the parameter <cfg::namespace>
+            is set to <DOM::false>.
+    }
+  @TrueCase:
     @@IsSupportRequired:1
-    @@Type:DOMMain|boolean||ManakaiDOM|all
-    @@InCase:
-      @@@Value:true
-      @@@IsSupportRequired:1
-      @@@IsDefault:1
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          Include namespace declaration attributes, specified or 
-          defaulted from the schema, in the document.
-    @@InCase:
-      @@@Value:false
-      @@@IsSupportRequired:1
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          Discade all namespace declaration attributes.  The namespace 
-          prefixes are retained.
-      @@@SetParam:
-        @@@@Name:canonical-form
-        @@@@Type:DOMMain|boolean||ManakaiDOM|all
-        @@@@Value:false
-  @CParam:
-    @@Name: normalize-characters
-    @@Type:DOMMain|boolean||ManakaiDOM|all
+    @@IsDefault:1
+    @@enDesc:
+      Includes namespace declaration attributes, specified or defaulted
+      from the schema definition, in the document.
+  @FalseCase:
     @@IsSupportRequired:1
-    @@InCase:
-      @@@Value:true
-      @@@Target:
-        @@@@TargetMethod:
-          Document::.normalizeDocument
-        @@@@IsDefault:0
-      @@@Target:
-        @@@@TargetModule:
-          DOMLS:LSSerializer::
-        @@@@IsDefault:1
-        @@@@ImplNote:
-          @@@@@lang:en
-          @@@@@@:
-            The default is <DOM::true> but fully-normalization is 
-            not required to be supported <SRC::DOM Level 3 LS>.
-      @@@Description:
-        @@@@lang:en
-        @@@@@: 
-          Fully normalize the characters in the document as defined in 
-          the Appendix B of the XML 1.1 Specification.
-      @@@SetParam:
-        @@@@Name:canonical-form
-        @@@@Type:DOMMain|boolean||ManakaiDOM|all
-        @@@@Value:false
-    @@InCase:
-      @@@Value:false
-      @@@IsSupportRequired:1
-      @@@Target:
-        @@@@TargetMethod:
-          Document::.normalizeDocument
-        @@@@IsDefault:1
-      @@@Target:
-        @@@@TargetModule:
-          DOMLS:LSSerializer::
-        @@@@IsDefault:0
-      @@@Description:
-        @@@@lang:en
-        @@@@@: Do not perform character normalization.
-  @CParam:
-    @@Name:schema-location
+    @@enDesc:
+      Discards all namespace declaration attributes.
+
+      {NOTE:: The namespace prefixes, i.e. <A::Node.prefix> values,
+              are retained.
+      }
+    @@SetParam:
+      @@@@: canonical-form
+      @@@boolValue:0
+
+boolCParams:
+  @QName:
+    @@@: normalize-characters
+    @@ForCheck: ForDocument
+  @QName:
+    @@@: DOMLS|normalize-characters.parser
+    @@ForCheck: ForParser
+  @QName:
+    @@@: DOMLS|normalize-characters
+    @@ForCheck: ForSerializer
+  @cfgname: normalize-characters
+  @nodeProp:
+    @@@: charnorm
+    @@ForCheck: ForDocument
+  @IsSupportRequired:1
+  @resourceFor: ForDocument
+  @DOMCore:targetType:
+    @@@: DOMCore|Document
+    @@ForCheck: ForDocument
+  @resourceFor: ForParser
+  @DOMCore:targetType:
+    @@@: DOMLS|LSParser
+    @@ForCheck: ForParser
+  @resourceFor: ForSerializer
+  @DOMCore:targetType:
+    @@@: DOMLS|LSSerializer
+    @@ForCheck: ForSerializer
+  @TrueCase:
+    @@IsDefault:
+      @@@@:1
+      @@@ForCheck: ForSerializer
+    @@IsSupportRequired:0
+    @@enDesc:
+      Fully normalizes characters in the document as defined
+      in appendix B of the XML 1.1 specification.
+    @@enImplNote:
+      Unlike in the Core, the default value for this parameter is <DOM::true>.
+      While implementations are not required to support fully normalizing
+      the characters according to appendix E of XML 1.1, this parameter
+      must be activated by default if supported.  <SRC::DOM Level 3 LS>
+    @@SetParam:
+      @@@@: canonical-form
+      @@@boolValue:0
+  @FalseCase:
+    @@IsSupportRequired:
+      @@@@:1
+      @@@ForCheck: ForDocumentOrParser
+    @@IsDefault:1
+    @@enDesc:
+      Does not perform character normalization.
+
+CParam:
+  @QName: schema-location
+  @cfgname: schema-location
+  @nodeProp: scloc
+  @IsSupportRequired:0
+  @Type: DOMMain|DOMString
+  @dis:actualType: DOMMain|DOMURIs
+  @DOMCore:targetType: DOMCore|Document
+  @DOMCore:targetType: DOMLS|LSParser
+  @enDesc:
+    The <cfg::schema-location> parameter value represents the
+    schemas against which validation should occur, i.e. the
+    current schema definitions.
+
+    The value is a <TYPE::DOMMain:DOMString> containing a list
+    of DOM URIs separated by white spaces (<CODE::S> in XML 1.0).
+
+    The types of schemas referenced in the list must match the type
+    specified with <cfg::schema-type>, otherwise the behavior of
+    an implementation is undefined.
+
+    The schemas specified using this paramter take precedence
+    to the schema information specified in the document itself.
+    For namespace aware schemas, if a schema specified using this
+    parameter and a schema specified in the document instance
+    in a schema document (e.g. using import mechanisms of
+    schema languages) share the same target namespace, then
+    the schema specified by the application using this parameter
+    will be used.  If two schemas specified using this parameter
+    share the same target namespace or both have no namespace, then
+    the behavior is implementation dependent.
+
+    This parameter is ignored unless the parameter <cfg::schema-type>
+    is set.
+
+    {NOTE:: It is strongly recommended in DOM Level 3 Core specification
+            that <A::Document.documentURI> will be set so that an implementation
+            can successfully resolve any external entities referenced.
+    }
+  @nullCase:
     @@IsSupportRequired:1
-    @@Type:
-      DOMMain:DOMString
-    @@InCase:
-      @@@Label:
-        @@@@lang:en
-        @@@@@: A list of DOM URIs, separated by whitespaces
-      @@@IsSupportRequired:0
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          The schemas against which validation should occur, i.e. 
-          the current schema.
-      \
-        The types of schemas must match the <DOM::schema-type>, 
-        otherwise the behaviour is undefined.
-      \
-        The schemas specified here take precedence to the schema 
-        specified in the document itself.  For namespace aware schema, 
-        if a schema specified using this parameter and a schema 
-        specified in the document instance in a schema document 
-        share the same <CODE::targetNamespace>, the schema specified 
-        by the DOM application will be used.  If two schemas 
-        specified by the application share the same 
-        <CODE::targetNamespace> or have no namespace, the behavior 
-        is implementation dependent.
-      \
-        This parameter is ignored unless the <DOM::schema-type> 
-        value is set.
-      @@@ImplNote:
-        @@@@lang:en
-        @@@@@:
-        Whitespace = <CODE::S> in the XML 1.0 Specification.
-      \
-        It is strongly recommended that the <A::Document.documentURI>, 
-        will be set so that an implementation can successfully resolve 
-        any external entities referred. 
-    @@InCase:
-      @@@Value:
-        @@@@@is-null:1
-      @@@Description:
-        @@@@lang:en
-        @@@@@: No location has been provided.
-  @CParam:
-    @@Name:schema-type
+    @@IsDefault:1
+    @@enDesc:
+      No schema location has been provided.
+    @@enImplNote:
+      Not specfied in spec but this is default and required, isn't is?
+  @Method:
+    @@rdf:type: DOMCore|DOMConfigurationParameterGetter
+    @@Param:
+      @@@Name: name
+      @@@Type: DOMMain|DOMString
+      @@@dis:actualType: DOMConfigurationParameterName
+      @@@enDesc: The name of the parameter.
+    @@Return:
+      @@@Type: DOMMain|DOMString
+      @@@dis:actualType:
+        @@@@@: DOMMain|DOMURIs
+        @@@@ManakaiDOM:noInputNormalize:1
+      @@@PerlDefC:
+        my $v = $self->[1]->{<H::DOMCore:schema-location>};
+        if (defined $v and @$v) {
+          $r = join ' ', @$v;
+        } else {
+          $r = null;
+        }
+  @Method:
+    @@rdf:type: DOMCore|DOMConfigurationParameterSetter
+    @@Param:
+      @@@Name: name
+      @@@Type: DOMMain|DOMString
+      @@@dis:actualType: DOMConfigurationParameterName
+      @@@enDesc: The parameter name.
+    @@Param:
+      @@@Name: value
+      @@@Type: DOMMain|DOMUserData
+      @@@dis:actualType: DOMMain|DOMString
+      @@@enDesc: The new value.
+    @@Return:
+      @@@Type: idl|void||ManakaiDOM|all
+      @@@PerlDefC:
+        $self->[1]->{<H::DOMCore:schema-location>} = $value;
+##schema-location
+
+CParam:
+  @QName: schema-type
+  @cfgname: schema-type
+  @nodeProp: sctype
+  @Type: DOMMain|DOMString
+  @dis:actualType: DOMMain|ManakaiDOMSchemaType
+  @IsSupportRequired:0
+  @DOMCore:targetType: DOMCore|Document
+  @DOMCore:targetType: DOMLS|LSParser
+  @enDesc:
+    The <cfg::schema-type> parameter value is a <TYPE::DOMMain|DOMString>
+    containing an absolute DOM URI.  It representsthe type of the
+    schema language used to validate the document against.
+
+    {NOTE:: No lexical checking is done on the absolute URI.
+    }
+
+  @nullCase:
+    @@enDesc:
+      No value is provided.
+
+      {NOTE:: The implementation may provide a default value
+              based on the schema languages supported and on
+              the schema language used at load time.
+      }
+
+boolCParam:
+  @QName: split-cdata-sections
+  @cfgname: split-cdata-sections
+  @nodeProp: splitcdsect
+  @IsSupportRequired:1
+  @DOMCore:targetType: DOMCore|Document
+  @DOMCore:targetType: DOMLS|LSParser
+  @DOMCore:targetType: DOMLS|LSSerializer
+  @TrueCase:
     @@IsSupportRequired:1
-    @@Type:
-      DOMMain:ManakaiDOMSchemaType
-    @@InCase:
-      @@@Label:
-        @@@@lang:en
-        @@@@@:
-          An absolute DOM URI
-      @@@IsSupportRequired:0
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          The type of the schema language used to validate a document against.
-        \
-          No lexical cheking is done on the absolute URI.
-        \
-          A default value may be provided by the DOM implementation, 
-          based on the schema languages supported and on the 
-          schema language used at load time.
-    @@InCase:
-      @@@Value:
-        @@@@is-null:1
-      @@@Description:
-        @@@@lang:en
-        @@@@@: No value is provided.
-  @CParam:
-    @@Name: split-cdata-sections
-    @@Type:DOMMain|boolean||ManakaiDOM|all
+    @@IsDefault:1
+    @@enDesc:
+      Splits <XML::CDATA> sections containing the <SGML::MSE> sequence,
+      i.e. <XML::]]<gt>>.
+
+      When a <XML::CDATA> section is split, a warning is issued with
+      a <A::DOMError.type> equals to <err::cdata-sections-splitted>
+      and <A::DOMError.relatedData> equals to the first
+      <IF::DOMXML:CDATASection> node in document order resulting 
+      from the split.
+    @@enImplNote:
+      What will be happen if a character that is unrepresentable
+      in the serialized charset occurres?
+  @FalseCase:
     @@IsSupportRequired:1
-    @@InCase:
-      @@@Value:true
-      @@@IsSupportRequired:1
-      @@@IsDefault:1
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          Split CDATA sections containing the <SGML::MSE> 
-          (<XML::]]<gt>>).
-        \
-          When CDATA section is split, a warning is issued with 
-          a <A::DOMError.type> equals to <DOM::cdata-sections-splitted> 
-          and <A::DOMError.relatedData> equals to the first 
-          <IF::DOMXML:CDATASection> node in document order.
-    @@InCase:
-      @@@Value:false
-      @@@IsSupportRequired:1
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          Signal an error if <IF::DOMXML:CDATASection> contains an 
-          unrepresentable character.
-  @CParam:
-    @@Name:validate
+    @@enDesc:
+      Signals an error if a <IF::DOMXML:CDATASection> containing an
+      unrepresentable character.
+
+boolCParam:
+  @QName: validate
+  @cfgname: validate
+  @nodeProp: val
+  @IsSupportRequired:1
+  @DOMCore:targetType: DOMCore|Document
+  @DOMCore:targetType: DOMLS|LSParser
+  @DOMCore:targetType: DOMLS|LSSerializer
+  @TrueCase:
+    @@enDesc:
+      Requires the validation against a schema of the document
+      as it is being normalized as defined by XML 1.0.
+
+      If validation errors are found or no schema was found, the
+      error handler is notified.
+
+      Schema normalized values will not be exposed according
+      to the schema in use unless the parameter <cfg::datatype-normalization>
+      is set to <DOM::true>.
+
+      {html5::p:: This parameter will make...
+ 
+        - Attribute nodes with <A::Attr.specified> equals to <DOM::false>;
+
+        - The value of the <A::Text.isElementContentWhitespace> attribute
+          for all <IF::Text> nodes;
+  
+        - The value of the <A::Attr.isId> attribute for all <IF::Attr> nodes; and
+
+        - The value of the <A::Element.schemaTypeInfo> or 
+          <A::Attr.schemaTypeInfo> attribute for all <IF::Element> and
+          <IF::Attr> nodes
+
+      ...being reevaluated.
+ 
+      }
+    @@SetParam:
+      @@@@: validate-if-schema
+      @@@boolValue:0
+  @FalseCase:
     @@IsSupportRequired:1
-    @@Type:DOMMain|boolean||ManakaiDOM|all
-    @@InCase:
-      @@@Value:true
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          Require the validation against a schema of the document 
-          as it is being normalized as defined by the XML 1.0 Specification. 
-        \
-          If validation errors are found or no schema was found, 
-          the error handler is notified.
-        \
-          Schema-normalized values will not exposed unless the 
-          parameter <DOM::datatype-normalization> is <DOM::true>.
-        \
-          Following attributes are revaluated:
-        \
-          - Attribute nodes with <A::Attr.specified> equals to <DOM::false>.
-        \
-          - The value of the attribute <A::Text.isElementContentWhitespace> 
-          for all <IF::Text> nodes.
-        \
-          - The value of the attribute <A::Attr.isId> for all <IF::Attr> nodes.
-        \
-          - The attributes <A::Element.schemaTypeInfo> and 
-          <A::Attr.schemaTypeInfo>.
-        \
-          DOM applications should consider setting the parameter 
-          <DOM::well-formed> to <DOM::true>.
-      @@@SetParam:
-        @@@@Name: validate-if-schema
-        @@@@Type:DOMMain|boolean||ManakaiDOM|all
-        @@@@Value: false
-    @@InCase:
-      @@@Value:false
-      @@@IsSupportRequired:1
-      @@@IsDefault:1
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          Do not accomplish schema processing, including internal subset 
-          processing.  Default attribute information are kept.
-        \
-          Note that validation might still happen in case 
-          <DOM::validate-if-schema> is <DOM::true>.
-  @CParam:
-    @@Name:validate-if-schema
-    @@Type:DOMMain|boolean||ManakaiDOM|all
+    @@IsDefault:1
+    @@enDesc:
+      Does not accomplish schema processing.  
+      Default attribute value information are kept.
+
+      For the <IF::DOMConfiguration> object of a <IF::Document> node,
+      it prevents the internal subset processing.  For the object
+      of a <IF::DOMLS|LSParser>, the internal subset processing
+      is always accomplished, even if the parameter is set to <DOM::false>.
+
+      {NOTE:: Validation might still happen if <cfg::validate-if-schema>
+              is set to <DOM::true>.
+      }
+
+boolCParam:
+  @QName: validate-if-schema
+  @cfgname: validate-if-schema
+  @nodeProp: vals
+  @IsSupportRequired:1
+  @DOMCore:targetType: DOMCore|Document
+  @DOMCore:targetType: DOMLS|LSParser
+  @DOMCore:targetType: DOMLS|LSSerializer
+  @TrueCase:
+    @@enDesc:
+      Enables validation only if a declaration for the document element
+      can be found in a schema (independently of where it is found,
+      i.e. XML Schema, DTD, or any other type or representation of schema).
+      
+      If validation is enabled, then this parameter has the same
+      effect as the parameter <cfg::validate> set to <DOM::true>.
+
+      For the <IF::DOMConfiguration> object of a <IF::Document> node,
+      it prevents the internal subset processing.  For the object
+      of a <IF::DOMLS|LSParser>, the internal subset processing
+      is always accomplished, even if the parameter is set to <DOM::false>.
+    @@SetParam:
+      @@@@: validate
+      @@@boolValue:0
+  @FalseCase:
     @@IsSupportRequired:1
-    @@InCase:
-      @@@Value:true
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          Enable validation only if a declaration for the document 
-          element can be found in a schema.  If validation is enabled, 
-          this parameter has the same behavior as the parameter 
-          <DOM::validate> set to <DOM::true>.
-      @@@SetParam:
-        @@@@Name:validate
-        @@@@Type:DOMMain|boolean||ManakaiDOM|all
-        @@@@Value:false
-    @@InCase:
-      @@@Value:false
-      @@@IsSupportRequired:1
-      @@@IsDefault:1
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          No schema processing should be performed if the document has 
-          a schema, including internal subset 
-          processing.  Default attribute information are kept.
-        \
-          Note that validation might still happen in case 
-          <DOM::validate> is <DOM::true>.
-  @CParam:
-    @@Name:well-formed
-    @@Type:DOMMain|boolean||ManakaiDOM|all
+    @@IsDefault:1
+    @@enDesc:
+      No schema processing should be performed if the document has
+      a schema, including internal subset processing.  Default attribute
+      information are kept.
+
+      {NOTE:: Validation would still happen if <cfg::validate> is <DOM::true>.
+      }
+
+boolCParam:
+  @QName: well-formed
+  @cfgname: well-formed
+  @nodeProp: wf
+  @IsSupportRequired:1
+  @DOMCore:targetType: DOMCore|Document
+  @DOMCore:targetType: DOMLS|LSParser
+  @DOMCore:targetType: DOMLS|LSSerializer
+  @TrueCase:
     @@IsSupportRequired:1
-    @@InCase:
-      @@@Value:true
-      @@@IsSupportRequired:1
-      @@@IsDefault:1
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          Check if all nodes are well-formed according to the XML 
-          version in use (<A::Document.xmlVersion>), i.e.:
-        \
-          - Check if the attribute <A::Node.nodeName> contains 
-          invalid characters according to its node type and generate 
-          a <IF::DOMError> of type <DOM::wf-invalid-character-in-node-name>, 
-          with a <DOM::SEVERITY_ERROR> severity, if necessary.
-        \
-          - Check if the text content inside <IF::Attr>, <IF::Element>, 
-          <IF::Comment>, <IF::Text> and <IF::DOMXML:CDATASection> nodes for 
-          invalid characters and generate a <IF::DOMError> of type 
-          <DOM::wf-invalid-character>, with a 
-          <DOM::SEVERITY_ERROR> severity, if necessary.
-        \
-          - Check if the data inside <IF::DOMXML:ProcessingInstruction> nodes 
-          for invalid characters and generate a <IF::DOMError> 
-          of type <DOM::wf-invalid-character>, with a
-          <DOM::SEVERITY_ERROR> severity, if necessary.
-    @@InCase:
-      @@@Value:false
-      @@@Description:
-        @@@@lang:en
-        @@@@@: Do not check for XML well-formedness.
-      @@@SetParam:
-        @@@@Name:canonical-form
-        @@@@Type:DOMMain|boolean||ManakaiDOM|all
-        @@@@Value:false
-##ConfigParam:Document
+    @@IsDefault:1
+    @@enDesc:
+      Checks whether all nodes are well-formed according to
+      the XML version in use in <A::Document.xmlVersion>.
+
+         - If the attribute <A::Node.nameName> contains an invalid
+           character according to its node type, the implementation
+           generates a <IF::DOMError> of type 
+           <err::wf-invalid-character-in-node-name>, with a
+           <C::DOMError.SEVERITY_ERROR> severity.
+
+         - If the text content inside <IF::Attr>, <IF::Element>,
+           <IF::Comment>, <IF::Text>, or <IF::DOMXML:CDATASection>
+           node contains an invalid character, the implementation
+           generates a <IF::DOMError> of type <err::wf-invalid-character>,
+           with a <C::DOMError.SEVERITY_ERROR> severity.
+
+         - If the data inside <IF::DOMXML:ProcessingInstruction> node
+           contains a invalid character, the implementation
+           generates a <IF::DOMError> of type <err::wf-invalid-character>
+           with a <C::DOMError.SEVERITY_ERROR> severity.
+  @FalseCase:
+    @@enDesc:
+      Does not check for XML well-formedness.  For <IF::DOMLS|LSParser>
+      this parameter cannot be set to <DOM::false>.
+    @@SetParam:
+      @@@@: canonical-form
+      @@@boolValue:0
+  @Method:
+    @@rdf:type: DOMCore|DOMConfigurationParameterSetter
+    @@Param:
+      @@@Name: name
+      @@@Type: DOMMain|DOMString
+      @@@dis:actualType: DOMConfigurationParameterName
+      @@@enDesc: The parameter name.
+    @@Param:
+      @@@Name: value
+      @@@Type: DOMMain|DOMUserData
+      @@@dis:actualType: DOMMain|DOMString
+      @@@enDesc: The new value.
+    @@Return:
+      @@@Type: idl|void||ManakaiDOM|all
+      @@@PerlDefC:
+        $self->[1]->{<H::DOMCore:well-formed>} = $value
+          unless $self->[2] eq <IFName::DOMLS:LSParser>;
+##well-formed
+
+enImplNote:
+  @@:
+    See <Module::MDOM:DOMLS> for <cfg::DOMLS:resource-resolver>
+    parameter, which can be used on <IF::DOMConfiguration> objects
+    attached to <IF::Document> nodes.
+  @For: ManakaiDOM|DOM3
+
+ResourceTypeDef:
+  @QName: DOMCore|DOMConfigurationParameter
+  @enDesc:
+    A parameter used on <IF::DOMConfiguration::ManakaiDOM|ManakaiDOM> objects.
+
+SPropDef:
+  @QName: DOMCore|domConfigurationParameterName
+  @enDesc:
+    A name of parameter used on methods pf <IF::DOMConfiguration::
+    ManakaiDOM|ManakaiDOM> interface.
+  @rdfs:domain: DOMCore|DOMConfigurationParameter
+  @dataType: DISCore|QName
+  @multipleProperties: DISCore|Single
+  @rdfs:subPropertyOf: dis|AppName
+  @rdf:type: ecore|Parameter
+
+ElementTypeBinding:
+  @Name: nodeProp
+  @ElementType:
+    DOMCore:nodeProp
+  @ShadowContent:
+    @@For: =ManakaiDOM|all
+
+XParamDef:
+  @QName: DOMCore|configurationParameterValue
+
+SPropDef:
+  @QName: dis|IsSupportRequired
+  @enDesc:
+    Whether a configuration parameter or its value must be 
+    supported or not.
+  @dataType: DISCore|Boolean
+  @multipleProperties: DISCore|Single
+
+SPropDef:
+  @QName: DOMCore|isSupported
+  @enDesc:
+    Whether a configuration parmeter or its value is supported or not.
+  @dataType: DISCore|Boolean
+  @multipleProperties: DISCore|Single
+
+SPropDef:
+  @QName: dis|IsDefault
+  @enDesc:
+    Whether the value is default or not.
+  @dataType: DISCore|Boolean
+  @multipleProperties: DISCore|Single
+  @rdfs:domain: ManakaiDOM|InCase
+
+SPropDef:
+  @QName: DOMCore|targetType
+  @enDesc:
+    The type of objects for which the configuration parameter is defined.
+  @dataType: DISCore|TFQNames
+  @multipleProperties: DISCore|UnorderedList
+  @rdfs:domain: DOMCore|DOMConfigurationParameter
+  @rdfs:range: DISLang|Interface
+
+SPropDef:
+  @QName: dis|SetParam
+  @enDesc:
+    The parameter affected by the setting of the value.
+  @dataType: DISCore|TFQNames
+  @multipleProperties: DISCore|UnorderedList
+  @rdfs:range: DOMCore|DOMConfigurationParameter
+
+ResourceTypeDef:
+  @QName: DOMCore|DOMConfigurationParameterGetter
+  @rdfs:subClassOf: DISLang|AnyMethod
+
+ResourceTypeDef:
+  @QName: DOMCore|DOMConfigurationParameterSetter
+  @rdfs:subClassOf: DISLang|AnyMethod
+
+ResourceTypeDef:
+  @QName: DOMCore|DOMConfigurationParameterUnsetter
+  @rdfs:subClassOf: DISLang|AnyMethod
+
+ResourceTypeDef:
+  @QName: DOMCore|DOMConfigurationParameterChecker
+  @rdfs:subClassOf: DISLang|AnyMethod
+
+ResourceTypeDef:
+  @QName: DOMCore|DOMConfigurationParameterDefaultGetter
+  @rdfs:subClassOf: DISLang|AnyMethod
+
+ElementTypeBinding:
+  @Name: ResourceTypeDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: rdfs|Class
+    @@rdfs:subClassOf: DISLang|AnyParameter
+
+ElementTypeBinding:
+  @Name: CParam
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@: DOMCore|DOMConfigurationParameter
+      @@@For: ManakaiDOM|DOM
+    @@rdf:type:
+      @@@@: DISCore|Property
+      @@@For: =ManakaiDOM|all
+    @@For: ManakaiDOM|DOM3
+    @@For: =ManakaiDOM|all
+
+ElementTypeBinding:
+  @Name: boolCParam
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@: DOMCore|DOMConfigurationParameter
+      @@@For: ManakaiDOM|DOM
+    @@rdf:type:
+      @@@@: DISCore|Property
+      @@@For: =ManakaiDOM|all
+    @@For: ManakaiDOM|DOM3
+    @@For: =ManakaiDOM|all
+    @@Type: idl|boolean||ManakaiDOM|all
+
+ElementTypeBinding:
+  @Name: boolCParams
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@: dis|MultipleResource
+      @@@ForCheck: !ForParser !ForSerializer !ForDocument
+    @@rdf:type:
+      @@@@: DOMCore|DOMConfigurationParameter
+      @@@ForCheck: ManakaiDOM|DOM ForDocumentOrParser
+    @@rdf:type:
+      @@@@: DOMCore|DOMConfigurationParameter
+      @@@ForCheck: ManakaiDOM|DOM ForSerializer
+    @@rdf:type:
+      @@@@: DISCore|Property
+      @@@ForCheck: =ManakaiDOM|all ForDocumentOrParser
+    @@rdf:type:
+      @@@@: DISCore|Property
+      @@@ForCheck: =ManakaiDOM|all ForSerializer
+    @@For: ManakaiDOM|DOM3
+    @@For: =ManakaiDOM|all
+    @@Type: idl|boolean||ManakaiDOM|all
+
+ForDef:
+  @QName: DOMCore|ForDocumentOrParser
+
+ForDef:
+  @QName: DOMCore|ForDocument
+  @ISA: DOMCore|ForDocumentOrParser
+
+ForDef:
+  @QName: DOMCore|ForParser
+  @ISA: DOMCore|ForDocumentOrParser
+
+ForDef:
+  @QName: DOMCore|ForSerializer
+
+ElementTypeBinding:
+  @Name: boolValue
+  @ElementType:
+    dis:Value
+  @ShadowContent:
+    @@ContentType: DISCore|Boolean
 
 ElementTypeBinding:
   @Name: PropDef
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      rdf:Property
+    @@rdf:type: rdf|Property
+    @@For: =ManakaiDOM|all
+
+ElementTypeBinding:
+  @Name: RPropDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISSource|ResourceProperty
+    @@For: =ManakaiDOM|all
+
+ElementTypeBinding:
+  @Name: SPropDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISSource|Property
     @@For: =ManakaiDOM|all
 
 PropDef:

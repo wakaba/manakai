@@ -1,3 +1,12 @@
+2005-10-14  Wakaba  <wakaba@suika.fam.cx>
+
+	* ManakaiNode.dis (anydata0): New property type.
+
+	* PerlCode.dis (stringify): Prints node id if file name 
+	is not available.
+	(perlLiteral): Prints as is if the value is blessed
+	with "manakai::code" package.
+
 2005-10-13  Wakaba  <wakaba@suika.fam.cx>
 
 	* PerlCode.dis (CDATADOMString): Changed to use code

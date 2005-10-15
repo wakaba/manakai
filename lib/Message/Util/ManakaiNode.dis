@@ -18,7 +18,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date:
-    $Date: 2005/10/12 14:46:06 $
+    $Date: 2005/10/15 15:28:11 $
   
   @Require:
     @@Module:
@@ -910,6 +910,13 @@ PropDef:
   @dataType: DISCore|QName
   @multipleProperties: DISCore|UnorderedList
   @mn:stemName: i
+
+PropDef:
+  @QName: mn|anydata0
+  @rdfs:subPropertyOf: mn|noderef
+  @dataType: DISCore|QName
+  @multipleProperties: DISCore|UnorderedList
+  @mn:stemName: a0
 
 PropDef:
   @QName: mn|anydata1

@@ -1,3 +1,23 @@
+2005-10-15  Wakaba  <wakaba@suika.fam.cx>
+
+	* DOMCore.dis (Require): References "DOMLS.dis" module.
+	(CParam): Definitions for LS module added.
+
+	* DOMLS.dis (ManakaiDOMLSInput): The input processor
+	is also an output processor now.
+	(ManakaiDOMLSResourceResolver): Implemented.
+	(CParam): Definitions updated.
+
+2005-10-14  Wakaba  <wakaba@suika.fam.cx>
+
+	* DOMCore.dis (NOT_RECOGNIZED_CONFIG_PARAM_ERR,
+	NOT_SUPPORTED_CONFIG_VALUE_ERR,
+	INCOMPATIBLE_CONFIG_VALUE_ERR): New error subcodes.
+	(DOMConfiguration): Implemented.
+	(CParam): Definitions updated.
+
+	* DOMMain.dis (DOMURIs): New data type.
+	
 2005-10-13  Wakaba  <wakaba@suika.fam.cx>
 
 	* DOMCore.dis (setAttrValueNS): New code.

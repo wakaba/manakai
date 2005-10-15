@@ -25,7 +25,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/10/12 00:30:57 $
+      $Date: 2005/10/15 15:28:07 $
     @@ContentType:
       dis:Date.RCS
   
@@ -723,8 +723,7 @@ ResourceDef:
   @idl:ecmascript: js|StringType
   @idl:perl: p|CharacterString
 
-  @rdfs:subClassOf:
-    DISLang:String
+  @rdfs:subClassOf: DISLang|String||ManakaiDOM|all
 
   @Description:
     @@lang:en
@@ -1040,8 +1039,7 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:DataType
+    @@rdf:type: DISLang|DataType
     @@rdfs:subClassOf: DOMString
     @@ForCheck:
       ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
@@ -1093,6 +1091,30 @@ StringDataTypeDef:
           {TODO:: I18n consideration
           \
           }
+
+StringDataTypeDef:
+  @QName: DOMMain|DOMURIs
+  @FullName:
+    @@lang:en
+    @@@: white space separeted list of DOM URIs
+  @enDesc:
+    A <TYPE::DOMMain:DOMURIs> is a <IF::DOMMain:DOMString>
+    containing a list of DOM URIs separated by white space
+    characters (<CODE::S> in XML 1.0).
+  @ResourceDef:
+    @@rdf:type: DISLang|InputProcessor
+    @@PerlDef:
+      if (defined $INPUT and not ref $INPUT) {
+        $INPUT = [split /[\x09\x0A\x0D\x20]+/, $INPUT];
+      }
+  @ResourceDef:
+    @@QName: DOMMain|stringifyDOMURIs
+    @@enDesc:
+      Generates a string representation of DOM URIs.
+    @@rdf:type: DISPerl|InlineCode
+    @@PerlDef:
+      (join ' ', @{$uris})
+##DOMURIs
 
 StringDataTypeDef:
   @QName: RFC2732URIReference
