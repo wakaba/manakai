@@ -40,7 +40,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/10/16 06:08:22 $
+      $Date: 2005/10/16 12:48:43 $
     @@ContentType:
       dis:Date.RCS
 
@@ -473,14 +473,6 @@ ElementTypeBinding:
       @@@For:
         ManakaiDOM:ManakaiDOM
     @@ForCheck: !ManakaiDOM|all
-
-ElementTypeBinding:
-  @Name: ErrName
-  @ElementType:
-    dis:AppName
-  @ShadowContent:
-    @@ContentType:
-      DOMCore:DOMErrorType
 
 ElementTypeBinding:
   @Name: XParam
@@ -14357,20 +14349,17 @@ IFCls3Def:
   @IFQName: DOMError
   @ClsQName: ManakaiDOMError
 
-  @rdf:type:
-    @@@:
-      DOMMain:ErrorClass
-    @@ForCheck:
-      ManakaiDOM:ForClass
-
-  @ClsISA:
-    @@@: ManakaiDOM|ManakaiDOMExceptionOrWarning||ManakaiDOM|Perl
-    @@ForCheck: ManakaiDOM|ForClass
+  @Implement: ecore|MUErrorInterface
+  @ClsISA: ecore|MUError||ManakaiDOM|Perl
   @ClsISA: ManakaiDOM|ManakaiDOMObject
 
-  @Description:
-    @@lang:en
-    @@@: Describes an error.
+  @enDesc:
+    The <IF::DOMError> interface describes an error.
+
+    {NOTE:: A <IF::DOMError> object might be reused by the implementation
+            across multiple calls on <M::DOMErrorHandler.handleError>
+            method.
+    }
 
   @ConstGroup:
     @@QName: ErrorSeverity
@@ -14378,234 +14367,234 @@ IFCls3Def:
     @@rdfs:subClassOf: idl|unsignedShort||ManakaiDOM|all
     @@Type: idl|unsignedShort||ManakaiDOM|all
 
-     @@Description:
-       @@@lang:en
-       @@@@: The severity of the error.
-     @@Const:
-        @@@Name:  SEVERITY_WARNING
-        @@@Value:  1
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            Warning.  It will not cause the processing stop unless 
-            <M::DOMErrorHandler.handleError> returns <DOM::false>.
-     @@Const:
-        @@@Name:  SEVERITY_ERROR
-        @@@Value:  2
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            Error.  It may not cause the processing to stop 
-            if the error can be recovered, unless 
-            <M::DOMErrorHandler.handleError> returns <DOM::false>.
-     @@Const:
-        @@@Name:  SEVERITY_FATAL_ERROR
-        @@@Value:  3
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            Fatal error.  It will cause the normal processing to stop.  
-            The return value of <M::DOMErrorHandler.handleError> is 
-            ignored unless the implementation chooses to continue, 
-            in which case the behavior becomes undefined.
-  @Attr:
-     @@Name:  severity
-     @@Description:
-       @@@lang:en
-       @@@@:
-         The severity of the error.
-     @@Get:
-        @@@Type:  
-          DOMMain:unsigned-short||ManakaiDOM|all
-        @@@actualType: ErrorSeverity
-        @@@PerlDef:
-          $r = $self->{<H::ecore:def>}->{<H::DOMCore:severity>};
-  @Attr:
-     @@Name:  message
-     @@Description:
-       @@@lang:en
-       @@@@:
-         An implementation specific string describing the error that occurred.
-     @@Get:
-        @@@Type:  
-          DOMMain:DOMString
-        @@@PerlDef:
-          @@@@@:
-            __DEEP{
-              $r = $self->text;
-            }__;
-          @@@@ImplNote:
-            @@@@@lang:en
-            @@@@@@:
-              This attribute getter returns the text returned from 
-              <Perl::Message::Util::Error>'s <Perl::text> method. 
-              \
-              {ISSUE:: It should be <Perl::stringify> instead? 
-                       Or, it should be localized.
-              \
-              }
-  @Attr:
-     @@Name:  type
-     @@Description:
-       @@@lang:en
-       @@@@:
-         A string indicating which related data is expected in 
-         "relatedData".
-       \
-         Implementators of DOM applications should refer to the 
-         specification of the error in order to find "type" and 
-         "relatedData" defiition if any.
-     @@ImplNote:
-       @@@lang:en
-       @@@@: "Document.normalizeDocument".
-     @@Get:
-        @@@Type:  
-          DOMMain:DOMString
-        @@@actualType:DOMErrorType
-        @@@PerlDef:
-          $r = $self->{<H::ecore:def>}->{<H::DOMCore:type>};
-  @Attr:
-     @@Name:  relatedException
-     @@Description:
-       @@@lang:en
-       @@@@: 
-         The related platform dependent exception if any. 
-         \
-         An example would be an <CODE::IOException> or 
-         <CODE::SecurityException> when using the <IF::DOMLS:LSParser>. 
-     @@Get:
-        @@@Type:  
-          DOMMain:DOMObject
-  @Attr:
-     @@Name:  relatedData
-     @@Description:
-       @@@lang:en
-       @@@@:
-         The related <A::DOMError.type> dependent data if any.
-     @@Get:
-        @@@Type:  
-          DOMMain:DOMObject
-  @Attr:
-     @@Name:  location
-     @@Description:
-       @@@lang:en
-       @@@@: The location of the error.
-     @@Get:
-        @@@Type:  DOMLocator
+    @@enDesc:
+      An integer indicating the severity of the error.
 
-  @ErrorSet:
-    @@QName:
-      @@@@:ManakaiDOMErrorCode
-      @@@ForCheck:
-        ManakaiDOM:ForClass
-    @@Description:
-      @@@lang:en
-      @@@@:
-        Errors that might be reported during the invocation of 
-        the <M::Document.normalizeDocument> method.  These errors 
-        might be reported during the invocation of other methods. 
-    
-    @@ErrorDef:
-      @@@QName: check-character-normalization-failure
-      @@@ErrName:check-character-normalization-failure
-      @@@Value:1
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          A string is encountered that fails normalization checking, 
-          while the parameter <CP::check-character-normalization> 
-          is set to <DOM::true>. 
-      @@@DOMCore:severity:Error
-      @@@DOMCore:relatedData:
-        @@@@Description:
-          @@@@@lang:en
-          @@@@@@:
-            The node in which the string that fails checking is. 
-          @@@@@ForCheck:
-            ManakaiDOM:ManakaiDOM
-      @@@ImplNote:
-        @@@@lang:en
-        @@@@@:
-          This error is also used by DOM Level 3 LS <IF::DOMLS:LSParser>. 
-    @@ErrorDef:
-      @@@QName:cdata-section-splitted
-      @@@ErrName:cdata-section-splitted
-      @@@Value:2
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          A character data section is split while <CP::split-cdata-sections> 
-          is set to <DOM::true>. 
-      @@@DOMCore:severity:Warning
-      @@@DOMCore:relatedData:
-        @@@@Type:
-          DOMXML:CDATASection
-        @@@@Description:
-          @@@@@lang:en
-          @@@@@@:
-            The first <IF::DOMXML:CDATASection> node in the document order 
-            resulting from the split. 
-    @@ErrorDef:
-      @@@QName:wf-invalid-character-in-node-name
-      @@@ErrName:wf-invalid-character-in-node-name
-      @@@DOMCore:severity:FatalError
-      @@@Value:3
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          A <A::Node.nodeName> contains an invalid character according 
-          to its node type. 
-      @@@ErrSubTypeDef:
-        @@@@QName:
-          ManakaiDOMCore:normalize-invalid-character
-        @@@@Description:
-          @@@@@lang:en
-          @@@@@@:
-            A <A::Node.nodeName> attribute contains an invalid character 
-            according to its node type while the parameter 
-            <CP::well-formed> is set to <DOM::true>. 
-        @@@@DOMCore:severity:Error
-      @@@ErrSubTypeDef:
-        @@@@QName:
-          ManakaiDOMLS:serialize-invalid-character
-        @@@@Description:
-          @@@@@lang:en
-          @@@@@@:
-            A character that cannot be represented in the output character 
-            encoding is encountered within markup but outside of attribute 
-            values. 
-        @@@@DOMCore:severity:FatalError
-    @@ErrorDef:
-      @@@QName:wf-invalid-character
-      @@@ErrName:wf-invalid-character
-      @@@Value:4
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          The text inside an <IF::Attr>, <IF::Element>, <IF::Comment>, 
-          <IF::Text> or <IF::DOMXML:CDATASection> node or the data 
-          inside a <IF::DOMXML:ProcessingInstruction> node contains an 
-          invalid character, while the parameter <CP::well-formed>
-          is set to <DOM::true>. 
-      @@@DOMCore:severity:Error
+    @@Const:
+      @@@QName: SEVERITY_WARNING
+      @@@intValue:1
+      @@@enDesc:
+        The severity is <EM::warning>.  A warning will not cause
+        the processing to stop, unless <M::DOMErrorHandler.handleError>
+        returns <DOM::false>.
+    @@Const:
+      @@@QName: SEVERITY_ERROR
+      @@@intValue:2
+      @@@enDesc:
+        The severity is <EM::error>.  An error might not cause
+        the processing to stop if the error can be recovered,
+        unless <M::DOMErrorHandler.handleError> returns <DOM::false>.
+    @@Const:
+      @@@QName: SEVERITY_FATAL_ERROR
+      @@@intValue:3
+      @@@enDesc:
+        The severity is <EM::fatal error>.  A fatal error will
+        cause the normal processing to stop.  The return value
+        of <M::DOMErrorHandler.handleError> is ignored unless 
+        the implementation chooses to continue, in which case
+        the behavior becomes undefined.
+
+  @Attr:
+    @@Name: severity
+    @@enDesc:
+      The severity of the error from <TYPE::ErrorSeverity>.
+    @@Get:
+      @@@Type: idl|unsignedShort||ManakaiDOM|all
+      @@@dis:actualType: ErrorSeverity
+      @@@PerlDef:
+        $r = $self->{<H::DOMCore:severity>};
+
+  @Attr:
+    @@Name: message
+    @@enDesc:
+      An implementation specific string describing the error that occurred.
+    @@enDesc:
+      @@@ddid: manakai
+      @@@ForCheck: ManakaiDOM|ManakaiDOM
+      @@@enDesc:
+        In manakai the <A::DOMError.message> is written in the
+        <LANG::i-default> language and is equals to the attribute
+        <A::ecore|Error||ManakaiDOM|Perl.text>.
+    @@Type: DOMMain|DOMString
+    @@Get:
+      @@@PerlDef:
+        goto &{$self->can ('text')};
+
+  @Attr:
+    @@Name: type
+    @@enDesc:
+      A string indicating which related data is expected in 
+      <A::DOMError.relatedData>.
+    @@Type: DOMMain|DOMString
+    @@dis:actualType: DOMErrorTypeName
+    @@Get:
+      @@@PerlDef:
+        $r = $self->{<H::ecore:type>};
+
+  @Attr:
+    @@Name: relatedException
+    @@enDesc:
+      The related platform dependent exception, if any.
+
+      An example would be an <CODE::IOException> or 
+      <CODE::SecurityException> when using the <IF::DOMLS:LSParser>. 
+    @@Get:
+      @@@nullCase:
+        @@@@ForCheck: ManakaiDOM|ManakaiDOM
+        @@@@enDesc:
+          No related exception.
+      @@@Type: DOMMain|DOMObject
+      @@@PerlDef:
+        $r = $self->{<H::DOMCore:relatedException>};
+
+  @Attr:
+    @@Name: relatedData
+    @@enDesc:
+      The related <A::DOMError.type> dependent data, if any.
+
+      The attribute will contain the closest node to where
+      the error occurred.  If the implementation is unable to
+      determine the node where the error occurs, it will
+      contain the <IF::Document> node.
+    @@Get:
+      @@@Type: DOMMain|DOMObject
+      @@@nullCase:
+        @@@@ForCheck: ManakaiDOM|ManakaiDOM
+        @@@@@: No related data.
+      @@@PerlDef:
+        $r = $self->{<H::DOMCore:relatedData>};
+
+  @Attr:
+    @@Name: location
+    @@enDesc:
+      The location of the error.
+    @@Type: DOMLocator
+    @@Get:
+      @@@PerlDef:
+        $r = $self->{<H::DOMCore:location>};
 ##DOMError
 
+SPropDef:
+  @QName: DOMCore|reports
+  @enDesc:
+    A method or attribute might report an error.
+  @rdfs:domain: DISCore|AnyDefContainer
+  @rdfs:range: DOMCore|DOMErrorType||ManakaiDOM|ManakaiDOM
+  @multipleProperties: DISCore|UnorderedList
+  @dataType: DISCore|TFQNames
+
+SPropDef:
+  @QName: severity
+  @Description:
+    @@lang:en
+    @@@: The severity of an error.
+  @dataType: DISCore|QName
+  @multipleProperties: DISCore|Single
+  @rdfs:range: DOMCore|ErrorSeverity||ManakaiDOM|ManakaiDOM
+  @ecore:propKey: sev
+
+SPropDef:
+  @QName: relatedData
+  @Description:
+    @@lang:en
+    @@@: A related data.
+  @multipleProperties: DISCore|Single
+  @rdfs:range: DOMMain|DOMObject||ManakaiDOM|ManakaiDOM
+  @ecore:propKey: rdata
+
+PropDef:
+  @QName: DOMCore|relatedException
+  @ecore:propKey: relx
+
+PropDef:
+  @QName: DOMCore|location
+  @ecore:propKey: loc
+
 ElementTypeBinding:
-  @Name: FormatDef
+  @Name: ErrDef
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type: DISCore|LexicalType
-    @@For: =ManakaiDOM|all
-    @@rdfs:subClassOf:
-      DISCore:String::ManakaiDOM:all
+    @@rdf:type: DOMCore|DOMErrorType
+    @@For: ManakaiDOM|DOM3
 
-FormatDef:
-  @QName:DOMErrorType
-  @Description:
-    @@lang:en
-    @@@:
-      Types of DOM errors, i.e. values for <AG::DOMError.type>. 
+ElementTypeBinding:
+  @Name: errname
+  @ElementType:
+    DOMCore:errorType
+  @ShadowContent:
+    @@ContentType: DISCore|String
+
+ResourceTypeDef:
+  @QName: DOMCore|DOMErrorType
+  @enDesc:
+    A <Q::DOMErrorType> is an error type for
+    <IF::DOMError||ManakaiDOM|ManakaiDOM>.
+
+StringDataTypeDef:
+  @QName: DOMCore|DOMErrorTypeName
+  @enDesc:
+    The name of an error.
+
+SPropDef:
+  @QName: DOMCore|errorType
+  @enDesc:
+    The error type name as in <A::DOMError||ManakaiDOM|ManakaiDOMLatest.type>.
+  @rdfs:domain: DOMCore|DOMErrorType
+  @rdfs:subPropertyOf: dis|AppName
+  @dataType: DISCore|QName
+  @multipleProperties: DISCore|Single
+
+ErrDef:
+  @QName: check-character-normalization-failure
+  @errname: check-character-normalization-failure
+  @enDesc:
+    If the <cfg::check-character-normalization> configuration parameter
+    is set to <DOM::true> and a sequence of characters is encountered
+    that fails normalization checking.  <SRC::DOM Level 3 Core>
+    <SRC::DOM Level 3 LS>
+  @DOMCore:severity: DOMCore|SEVERITY_ERROR
+
+ErrDef:
+  @QName: cdata-sections-splitted
+  @errname: cdata-sections-splitted
+  @enDesc:
+    If the <cfg::split-cdata-sections> configuration parameter
+    is set to <DOM::true> and a <XML::CDATA> section is split.
+  @DOMCore:severity: DOMCore|SEVERITY_WARNING
+  @DOMCore:relatedData:
+    @@enDesc:
+      The first <IF::DOMXML:CDATASection> node in document order
+      resulting from the split.
+
+ErrDef:
+  @QName: wf-invalid-character-in-node-name
+  @errname: wf-invalid-character-in-node-name
+  @enDesc:
+    If the <cfg::well-formed> configuration parameter is set to 
+    <DOM::true> and a <A::Node.nodeName> contains invalid character
+    according to its node type.
+
+    Or, in <IF::DOMLS|LSSerializer>, if a character that cannot 
+    be represented in the output character encoding is occurred
+    within markup.
+  @DOMCore:severity: DOMCore|SEVERITY_ERROR
+
+ErrDef:
+  @QName: wf-invalid-character
+  @errname: wf-invalid-character
+  @enDesc:
+    If the <cfg::well-formed> configuration parameter is set to
+    <DOM::true> and the text content inside <IF::Attr>, <IF::Element>,
+    <IF::Comment>, <IF::Text>, or <IF::DOMXML:CDATASection> node
+    or the data inside <IF::DOMXML:ProcessingINstruction> node contains
+    invalid characters.
+
+    Or, in <IF::DOMLS:LSSerializer>, if the <cfg::split-cdata-sections>
+    parameter is set to <DOM::false> and a <IF::DOMXML:CDATASection>
+    node contains characters that cannot be represented in the
+    specified output encoding.  This error is not recoverable.
+  @DOMCore:severity: DOMCore|SEVERITY_ERROR
 
 ResourceDef:
   @For: =ManakaiDOM|all
@@ -14638,21 +14627,9 @@ PropDef:
     <A::Document.xmlEncoding>
   @DOMCore:nodeProp: xcs
 
-PropDef:
-  @QName:
-    DOMCore:type
-  @Description:
-    @@lang:en
-    @@@:
-      The type of a DOM error. 
-  @rdfs:range:
-    DOMCore:DOMErrorType
-
 IFCls3Def:
   @IFQName: DOMErrorHandler
   @ClsQName: ManakaiDOMErrorHandler
-
-  @ClsISA: ManakaiDOM|ManakaiDOMObject
 
   @enDesc:
     The <IF::DOMErrorHandler> is a callback interface that the DOM
@@ -14661,7 +14638,7 @@ IFCls3Def:
     document).
 
     A <IF::DOMErrorHandler> object can be attached to a <IF::Document>
-    using the <CP::error-handler> parameter on the <A::Document.domConfig>
+    using the <cfg::error-handler> parameter on the <A::Document.domConfig>
     object.  DOM applications can create their own 
     <IF::DOMErrorHandler> objects to process reported errors.
 
@@ -14669,16 +14646,23 @@ IFCls3Def:
     the sequence and numbers of the errors passed to the error
     handler are implementation dependent <SRC::<CITE::DOM Level 3 Core>>.
 
+    Mutations to the document from within an error handler
+    will result in implementation dependent behavior.
+
   @enDesc:
-    @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
+    @@ddid: perl
+    @@ForCheck: ManakaiDOM|ManakaiDOM
     @@@:
-      In the manakai implementation, any Perl reference to
-      <Perl::CODE> can be used as if it implements the 
-      <IF::DOMErrorHandler> interface and its <M::DOMErrorHandler
-      .handleError> method is the <Perl::CODE> itself.
+      For manakai's Perl binding, any parameter that accepts
+      a <IF::DOMErrorHandler> would also accept a Perl code
+      reference (subroutine reference).  The code reference
+      will be blessed as a <IF::DOMErrorHandler> whose
+      <M::DOMErrorHandler.handleError> method call would
+      invoke the code.
 
   @ResourceDef:
     @@rdf:type: DISLang|InputProcessor
+    @@rdf:type: DISLang|OutputProcessor
     @@PerlDefC:
       $INPUT = bless $INPUT, __PACKAGE__ if ref $INPUT eq 'CODE';
     @@ImplNote:
@@ -14688,55 +14672,35 @@ IFCls3Def:
         because of <Perl::__PACKAGE__>. 
 
   @Method:
-     @@Name:  handleError
-     @@enDesc:
-       DOM implementation calls this method when an error occurs.
-     @@Param:
-        @@@Name:  error
-        @@@Type:  DOMError
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            The error object that describes the error.
-          \
-            This object may be reused by the DOM implementation 
-            across multiple calls to the method <M::DOMErrorHandler.handleError>.
-     @@Return:
-        @@@Type:  DOMMain|boolean||ManakaiDOM|all
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            Whether the processing should be continued.
-          \
-            Throwing an exception from this method is considered 
-            to be equivalent of returning "true".
-        @@@InCase:
-          @@@@Value: true
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              The processing may continue depending on <A::DOMError.severity>.
-        @@@InCase:
-          @@@@Value:false
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              The processing should be stopped when possible.
-        @@@PerlDef:
-          $r = $self->($error);
-  @IntMethod:
-    @@Name:createNOPHandler
-    @@ManakaiDOM:isStatic:1
-    @@Description:
-      @@@lang:en
-      @@@@:
-        Creates a no-op error handler, i.e. a <IF::DOMErrorHandler> 
-        with a <M::DOMErrorHandler.handleError> method that only 
-        returns <DOM::true>. 
+    @@Name: handleError
+    @@enDesc:
+      Handles an error.  DOM implementation calls when an
+      error occurs.
+    @@Param:
+      @@@Name: error
+      @@@Type: DOMError
+      @@@enDesc:
+        The error object that describes the error.
+        
+        {NOTE:: This object may be reused by the implementation across multiple
+                calls to the <M::DOMErrorHandler.handleError> method.
+        }
     @@Return:
-      @@@Type: ManakaiDOMErrorHandler
+      @@@Type: idl|boolean||ManakaiDOM|all
+      @@@enDesc:
+        Whether the processing should be continued or not.
+         
+        If an exception is thrown from the method, it is considered
+        to be equivalent of returning <DOM::true>.
+      @@@TrueCase:
+        @@@@enDesc:
+          The processing may continue depending on <A::DOMError.severity>.
+      @@@FalseCase:
+        @@@@enDesc:
+          The implementation should stop the current processing when
+          possible.
       @@@PerlDef:
-        $r = bless sub {return true}, ref $self ? ref $self : $self;
+        goto &$self;
 ##DOMErrorHandler
 
 IFDef:
@@ -17470,6 +17434,32 @@ NodeTypeDef:
          the <IF::DOMErrorHandler> object associated with the 
          <DOM::error-handler> parameter.
      @@Return:
+      @@@DOMCore:reports:
+        @@@@@: check-character-normalization-failure
+        @@@@enDesc:
+          If the <cfg::check-character-normalization> configuration
+          parameter is set to <DOM::true> and a sequence of characters
+          is encountered that fails normalization checking.
+      @@@DOMCore:reports:
+        @@@@@: cdata-sections-splitted
+        @@@@enDesc:
+          If the <cfg::split-cdata-sections> configuration parameter
+          is set to <DOM::true> and a <XML::CDATA> section
+          is split.
+      @@@DOMCore:reports:
+        @@@@@: wf-invalid-character-in-node-name
+        @@@@enDesc:
+          If the <cfg::well-formed> configuration parameter is set to 
+          <DOM::true> and a <A::Node.nodeName> contains invalid character
+          according to its node type.
+      @@@DOMCore:reports:
+        @@@@@: wf-invalid-character
+        @@@@enDesc:
+          If the <cfg::well-formed> configuration parameter is set to
+          <DOM::true> and the text content inside <IF::Attr>, <IF::Element>,
+          <IF::Comment>, <IF::Text>, or <IF::DOMXML:CDATASection> node
+          or the data inside <IF::DOMXML:ProcessingInstruction> node
+          contains invalid characters.
      @@Level[list]:  3
      @@SpecLevel:3
      @@For:
@@ -18275,9 +18265,19 @@ CParam:
 
     }
 
-  @enImplNote:
-    {TODO:: Sets default handler.
-    }
+  @Method:
+    @@rdf:type: DOMCore|DOMConfigurationParameterDefaultGetter
+    @@Param:
+      @@@Name: name
+      @@@Type: DOMMain|DOMString
+      @@@dis:actualType: DOMConfigurationParameterName
+      @@@enDesc: The parameter name.
+    @@Return:
+      @@@Type: DOMErrorHandler
+      @@@enDesc:
+        An error handler that simply returns <DOM::true>.
+      @@@PerlDefC:
+        $r = sub { true };
   @Method:
     @@rdf:type: DOMCore|DOMConfigurationParameterSetter
     @@Param:
@@ -18291,6 +18291,7 @@ CParam:
       @@@dis:actualType: DOMErrorHandler
       @@@enDesc: The new value.
     @@Return:
+      @@@Type: idl|void||ManakaiDOM|all
       @@@PerlDefC:
         $self->[1]->{<H::DOMCore:error-handler>} = $value;
     @@enImplNote:
@@ -19013,14 +19014,3 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type: DISSource|Property
     @@For: =ManakaiDOM|all
-
-PropDef:
-  @QName: severity
-  @Description:
-    @@lang:en
-    @@@: The severity of an error.
-PropDef:
-  @QName: relatedData
-  @Description:
-    @@lang:en
-    @@@: A related data.
