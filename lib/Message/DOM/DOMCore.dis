@@ -40,7 +40,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/10/15 15:28:05 $
+      $Date: 2005/10/16 06:08:22 $
     @@ContentType:
       dis:Date.RCS
 
@@ -14872,6 +14872,9 @@ ElementTypeBinding:
 IFCls3Def:
   @IFQName: DOMConfiguration
   @ClsQName: ManakaiDOMConfiguration
+  
+  @ClsISA: ManakaiDOM|ManakaiDOMObject
+
   @enDesc:
     The <IF::DOMConfiguration> interface represents the configuration
     of a document and maintains a table of recognized parameters.
@@ -15008,7 +15011,7 @@ IFCls3Def:
             ##       In addition, parameter value set here might not be
             ##       supported by the implementation.
           }
-        } else {
+        } else { # unset
           if (defined $p->{unsetter}) {
             __DEEP{
               $p->{unsetter}->($self, $name);
@@ -15019,6 +15022,9 @@ IFCls3Def:
             }__;
           } else {
             CORE::delete $self->[1]->{$p->{iname}};
+            for (keys %{$p->{setparam}}) {
+              $self->[1]->{$_} = $p->{setparam}->{$_};
+            }
           }
         }
 
@@ -18847,6 +18853,15 @@ SPropDef:
     Whether a configuration parmeter or its value is supported or not.
   @dataType: DISCore|Boolean
   @multipleProperties: DISCore|Single
+
+  @enImplNote:
+    {ISSUE:: Current implementation is not so good.
+             For example, it cannot represent the situation that
+             the implementation <html5:var::A> of <IF::DOMCore:Document
+             ::ManakaiDOM|ManakaiDOMLatest> supports a 
+             value while another implementation <html5:var::B>
+             of the interface does not support the value.
+    }
 
 SPropDef:
   @QName: dis|IsDefault

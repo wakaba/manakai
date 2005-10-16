@@ -25,7 +25,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2005/10/15 15:28:11 $
+      $Date: 2005/10/16 06:08:25 $
     @@ContentType:
       dis:Date.RCS
   
@@ -1979,19 +1979,24 @@ IFClsETDef:
         Perl code. 
       @@@PerlDef:
           __DEEP{
-            $r = $self-><AG::Node.textContent>;
+            $r = "\x0A" . $self-><AG::Node.textContent> . "\x0A";
             my $file = $self-><AG::PerlCode.fileNode>;
             my $src_file = $file ? $file-><AG::PerlFile.sourceFile>
                                  : $self->{<H::mn:node>}->{<H::mn:nodeID>};
-            my $nxt_cnum = $file ? $file-><M::PerlFile.getNextChunkNumber> : 0;
-            $r = sprintf qq<\n#line %d "%s [u] (Chunk #%d)"\n%s>.
-                         qq<\n#line 1 "%s [/u] (Chunk #%d)"\n>,
+            if ($self-><AG::Node.ownerDocument>
+                     -><AG::Document.domConfig>
+                     -><M::DOMCore:DOMConfiguration.getParameter>
+                          (<Q::pc:line>)) {
+              my $nxt_cnum = $file ? $file-><M::PerlFile.getNextChunkNumber> : 0;
+              $r = sprintf qq<\n#line %d "%s [u] (Chunk #%d)"%s>.
+                           qq<#line 1 "%s [/u] (Chunk #%d)"\n>,
                          $self-><AG::PerlUnparsedCode.sourceLine> || 1,
                          $self-><AG::PerlUnparsedCode.sourceFile> || $src_file,
                          $file ? $file-><M::PerlFile.getNextChunkNumber> : 0,
-                         $self-><AG::Node.textContent>,
+                         $r,
                          $src_file,
                          $file ? $file-><M::PerlFile.getNextChunkNumber> : 0;
+            }
           }__;
 ##PerlUnparsedCode
 
@@ -2488,12 +2493,13 @@ IFClsETDef:
           my @child = @{$self-><AG::Node.childNodes>};
           if (@child == 1 and 
               $child[0]-><AG::Node.localName> eq 'block') {
-            $r = $child[0]->stringify;
+            $r = "\x0A" . $child[0]->stringify . "\x0A";
           } elsif (@child == 1 and
                    $child[0]-><AG::Node.localName> eq 'unparsed' and
                    $child[0]-><AG::Node.textContent> =~ /^\s*$/) {
             # 
           } else {
+            $r = "\x0A";
             for my $child (@child) {
               if ($child-><AG::Node.localName> eq 'inlineContainer' and
                   1 == @child) {
@@ -2502,20 +2508,26 @@ IFClsETDef:
                 $r .= $child->stringify;
               }
             }
+            $r .= "\x0A";
 
             __DEEP{
-              my $file = $self-><AG::PerlCode.fileNode>;
-              my $sfile = $file ? $file-><AG::PerlFile.sourceFile>
-                                : $self->{<H::mn:node>}->{<H::mn:nodeID>};
-              $r = sprintf qq<\n{\n#line %d "%s [b] (Chunk #%d)"\n%s>.
-                           qq<\n#line 1 "%s [/b] (Chunk #%d)"\n;}\n>,
+              if ($self-><AG::Node.ownerDocument>
+                       -><AG::Document.domConfig>
+                       -><M::DOMCore:DOMConfiguration.getParameter>
+                            (<Q::pc:line>)) {
+                my $file = $self-><AG::PerlCode.fileNode>;
+                my $sfile = $file ? $file-><AG::PerlFile.sourceFile>
+                                  : $self->{<H::mn:node>}->{<H::mn:nodeID>};
+                $r = sprintf qq<\n{\n#line %d "%s [b] (Chunk #%d)"%s>.
+                             qq<#line 1 "%s [/b] (Chunk #%d)"\n;}\n>,
                            $self-><AG::PerlCodeStatements.sourceLine> || 1,
                            $self-><AG::PerlCodeStatements.sourceFile> || $sfile,
                            $file ? $file-><M::PerlFile.getNextChunkNumber> : 0,
                            $r,
                            $sfile,
                            $file ? $file-><M::PerlFile.getNextChunkNumber> : 0
-                if length $r;
+                  if 2 < length $r;
+              }
             }__;
           }
 ##PCBlock
@@ -2555,17 +2567,22 @@ IFClsETDef:
             }
 
             __DEEP{
-              my $file = $self-><AG::PerlCode.fileNode>;
-              my $sfile = $file ? $file-><AG::PerlFile.sourceFile>
-                                : $self->{<H::mn:node>}->{<H::mn:nodeID>};
-              $r = sprintf qq<\n#line %d "%s [bc] (Chunk #%d)"\n%s>.
-                           qq<\n#line 1 "%s [/bc] (Chunk #%d)"\n>,
+              if ($self-><AG::Node.ownerDocument>
+                       -><AG::Document.domConfig>
+                       -><M::DOMCore:DOMConfiguration.getParameter>
+                            (<Q::pc:line>)) {
+                my $file = $self-><AG::PerlCode.fileNode>;
+                my $sfile = $file ? $file-><AG::PerlFile.sourceFile>
+                                  : $self->{<H::mn:node>}->{<H::mn:nodeID>};
+                $r = sprintf qq<\n#line %d "%s [bc] (Chunk #%d)"\n%s>.
+                             qq<\n#line 1 "%s [/bc] (Chunk #%d)"\n>,
                            $self-><AG::PerlCodeStatements.sourceLine> || 1,
                            $self-><AG::PerlCodeStatements.sourceFile> || $sfile,
                            $file ? $file-><M::PerlFile.getNextChunkNumber> : 0,
                            $r,
                            $sfile,
                            $file ? $file-><M::PerlFile.getNextChunkNumber> : 0;
+              }
             }__;
           }
 ##PCCodeBlocks
@@ -2857,7 +2874,81 @@ PropDef:
 ElementTypeBinding:
   @Name: RaiseException
   @ElementType:
-    ManakaiDOM:raises
+    dx:raises
+
+## -- Configuration Parameters
+
+boolCParam:
+  @QName: pc|line
+  @nodeProp: pcline
+  @IsSupportRequired:1
+  @DOMCore:targetType: DOMCore|Document
+  @TrueCase:
+    @@DOMCore:isSupported:1
+    @@enDesc:
+      Inserts <Perl::#line> directives.
+  @FalseCase:
+    @@DOMCore:isSupported:1
+    @@IsSupportRequired:1
+    @@IsDefault:1
+      Does not insert any <Perl::#line> directive.
+
+CParam:
+  @QName: pc|split-resolver
+  @nodeProp: pcsres
+  @IsSupportRequired:1
+  @DOMCore:targetType: DOMCore|Document
+  @Type: DISPerl|CODE||ManakaiDOM|all
+  @enDesc:
+    Splits module file.  The parameter value <kwd:MUST> be
+    a Perl code reference.  The serializer would invoke
+    the code with arguments: a reserved parameter, a <IF::PerlFile>
+    whose serialization is being split, and a string
+    that identifies the split part.  The code is expected
+    to return a <IF::DOMLS:LSOutput> object to which the module part
+    is written.  Note that splitting serialized module file
+    does not affect to the <IF::PerlFile> tree.
+  @nullCase:
+    @@enDesc:
+      Does not split module file.
+
+ElementTypeBinding:
+  @Name: nodeProp
+  @ElementType:
+    DOMCore:nodeProp
+  @ShadowContent:
+    @@For: =ManakaiDOM|all
+
+ElementTypeBinding:
+  @Name: CParam
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@: DOMCore|DOMConfigurationParameter
+      @@@For: ManakaiDOM|DOM
+    @@rdf:type:
+      @@@@: DISCore|Property
+      @@@For: =ManakaiDOM|all
+    @@For: ManakaiDOM|DOM3
+    @@For: =ManakaiDOM|all
+
+ElementTypeBinding:
+  @Name: boolCParam
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@: DOMCore|DOMConfigurationParameter
+      @@@For: ManakaiDOM|DOM
+    @@rdf:type:
+      @@@@: DISCore|Property
+      @@@For: =ManakaiDOM|all
+    @@For: ManakaiDOM|DOM3
+    @@For: =ManakaiDOM|all
+    @@Type: idl|boolean||ManakaiDOM|all
+
+## -- Implementation
 
 IFClsDef:
   @IFQName: PCImplementation

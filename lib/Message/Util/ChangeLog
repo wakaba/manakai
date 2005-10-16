@@ -1,3 +1,10 @@
+2005-10-16  Wakaba  <wakaba@suika.fam.cx>
+
+	* PerlCode.dis (pc:line): New configuration parameter.
+	(stringify): Don't output "#line" directive
+	unless "pc:line" parameter is set to "true".
+	(pc:split-resolver): New configuration parameter.
+
 2005-10-14  Wakaba  <wakaba@suika.fam.cx>
 
 	* ManakaiNode.dis (anydata0): New property type.

@@ -32,6 +32,7 @@ use Message::Util::QName::Filter {
   dis => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis-->,
   ManakaiDOM => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#>,
   Markup => q<http://suika.fam.cx/~wakaba/archive/2005/manakai/Markup#>,
+  pc => q<http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/PerlCode#>,
   Util => q<http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/>,
 };
 
@@ -79,6 +80,11 @@ module file is generated.  This argument is I<required>.
 A platform-dependent file path to which the Perl module
 is written down.
 
+=item C<--output-line> / C<--nooutput-line> (default: C<--nooutput-line>)
+
+Whether C<#line> directives should be included to the generated
+Perl module files.
+
 =item --verbose / --noverbose (default)
 
 Whether a verbose message mode should be selected or not. 
@@ -105,6 +111,7 @@ GetOptions (
   'help' => \$Opt{help},
   'module-uri=s' => \$Opt{module_uri},
   'output-file-path=s' => \$Opt{output_file_name},
+  'output-line' => \$Opt{output_line},
   'search-path|I=s' => sub {
     shift;
     my @value = split /\s+/, shift;
@@ -233,6 +240,10 @@ for (@{$Opt{create_module}}) {
   defined $out_file_path
       ? (open $output, '>', $out_file_path or die "$0: $out_file_path: $!")
       : ($output = \*STDOUT);
+
+  if ($Opt{output_line}) {
+    $pl->owner_document->dom_config->set_parameter (ExpandedURI q<pc:line> => 1);
+  }
   
   status_msg_ sprintf qq<Writing Perl module %s...>,
                       defined $out_file_path
@@ -299,4 +310,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2005/10/12 00:30:54 $
+1; # $Date: 2005/10/16 06:08:22 $
