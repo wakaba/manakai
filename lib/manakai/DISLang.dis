@@ -13,7 +13,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/10/15 15:28:16 $
+      $Date: 2005/11/13 04:45:09 $
     @@ContentType:
       dis:Date.RCS
   
@@ -62,6 +62,23 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       rdf:Property
+
+ElementTypeBinding:
+  @Name: SPropDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: rdf|Property
+    @@rdf:type: DISSource|Property
+    @@rdf:type: DISSource|ResourceProperty
+
+ElementTypeBinding:
+  @Name: RPropDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: rdf|Property
+    @@rdf:type: DISSource|Property
 
 ElementTypeBinding:
   @Name: LexTypeDef
@@ -313,7 +330,7 @@ PropDef:
     @@@:
       Whether it is an input (data is passed from the caller
       to the callee) or not.
-  @dataType: dis|Boolean
+  @dataType: DISCore|Boolean
   @multipleProperties: DISCore|Single
   @rdfs:domain: DISLang|AnyParameter
 
@@ -325,15 +342,14 @@ PropDef:
     @@@:
       Whether it is an output (data is passed from the callee
       to the caller) or not.
-  @dataType: dis|Boolean
+  @dataType: DISCore|Boolean
   @multipleProperties: DISCore|Single
   @rdfs:domain: DISLang|AnyParameter
 
 PropDef:
   @QName:
     ManakaiDOM:isStatic
-  @dataType:
-    dis:Boolean
+  @dataType: DISCore|Boolean
   @Description:
     @@lang:en
     @@@:
@@ -345,7 +361,7 @@ PropDef:
       that a method is static does not means the method should not 
       be called via an object.  Inappropriateness of the use as an 
       object method should be indicated by other property.
-  @dataType: dis|Boolean
+  @dataType: DISCore|Boolean
   @multipleProperties: DISCore|Single
 
   @ImplNote:
@@ -451,6 +467,64 @@ DataTypeDef:
   @enFN: Any
   @enDesc:
     Any data type in programming languages.
+
+ResourceDef:
+  @QName: DISLang|Undefined
+  @enFN: Undefined
+  @enDesc:
+    The <Q::DISLang|Undefined> value means that no value
+    is explicitly specified.
+  @rdf:type: DISLang|Any
+
+ResourceDef:
+  @QName: DISLang|Null
+  @enFN: Null
+  @enDesc:
+    The <Q::DISLang|Null> value means that no other value 
+    is specified.
+
+      {NOTE:: While <Q::DISLang|Undefined> is used where 
+              no attempt is made to set a value, 
+              <Q::DISLang|Null> implies that a value that
+              is different from any other valid value in the data
+              type is set.
+      }
+  @rdf:type: DISLang|Any
+
+SPropDef:
+  @QName: dis|is-null
+  @rdf:type: DISSource|PropertyProperty
+  @enFN:
+    Is <Q::DISLang|Null>
+  @enDesc:
+    The <Q::dis|is-null> property represents whether the
+    value is <Q::DISLang|Null> or not.
+  @dataType: DISCore|Boolean
+  @multipleProperties: DISCore|Single
+  @DISSource:domainProperty: dis|Value
+
+DataTypeDef:
+  @QName: DISLang|Boolean
+  @enFN: Boolean
+  @enDesc:
+    The <Q::DISLang|Boolean> data type represents a Boolean
+    truth value, either <Q::DISLang|True> or <Q::DISLang|False>.
+  @rdfs:subClassOf: DISLang|Any
+  @subsetOf: DISLang|Any
+
+ResourceDef:
+  @QName: DISLang|True
+  @rdf:type: DISLang|Boolean
+  @enFN: Boolean true
+  @enDesc:
+    The <Q::DISLang|True> is a <Q::DISLang|Boolean> value of <QUOTE::true>.
+
+ResourceDef:
+  @QName: DISLang|False
+  @rdf:type: DISLang|Boolean
+  @enFN: Boolean false
+  @enDesc:
+    The <Q::DISLang|False> is a <Q::DISLang|Boolean> value of <QUOTE::false>.
 
 DataTypeDef:
   @QName: DISLang|String
@@ -633,8 +707,7 @@ TreeElementType:
     @@lang:en
     @@@:
       Property name.
-  @dataType:
-    dis:TypeQName
+  @dataType: DISCore|QName
   @rdfs:domain: 
     DISPerl:selectByProp
   @rdf:type:

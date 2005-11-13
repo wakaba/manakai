@@ -23,7 +23,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2005/10/12 14:46:02 $
+      $Date: 2005/11/13 04:45:05 $
     @@ContentType:
       dis:Date.RCS
   
@@ -1048,12 +1048,11 @@ IFClsDef:
     @@Description:
       @@@lang:en
       @@@@:
-        Converts a qualified name (<Q::dis:TypeQName>) to 
+        Converts a qualified name (<Q::DISCore:QName>) to 
         an expanded URI reference. 
     @@Param:
       @@@Name: qname
-      @@@Type:
-        dis:TypeQName::ManakaiDOM:all
+      @@@Type: DISCore|QName||ManakaiDOM|all
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -1095,12 +1094,11 @@ IFClsDef:
     @@Description:
       @@@lang:en
       @@@@:
-        Converts a qualified name (<Q::dis:TypeQName>) to 
+        Converts a qualified name (<Q::DISCore:QName>) to 
         a pair of namespace URI and local name. 
     @@Param:
       @@@Name: qname
-      @@@Type:
-        dis:TypeQName::ManakaiDOM:all
+      @@@Type: DISCore|QName||ManakaiDOM|all
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -1726,7 +1724,7 @@ IFClsDef:
   @Attr:
     @@Name: qnameValueURI
     @@enDesc:
-      The element value (written as <Q::dis:TypeQName>), as URI reference. 
+      The element value (written as <Q::DISCore:QName>), as URI reference. 
       \
       {NOTE:: What should be if list value?
       \
@@ -1751,7 +1749,7 @@ IFClsDef:
     @@Name: qnameValueLocalName
     @@enDesc:
       The local name part of the element value (assumed as 
-      written as <Q::dis:TypeQName>). 
+      written as <Q::DISCore:QName>). 
       \
       {NOTE:: What should be if list value?
       \
@@ -1777,7 +1775,7 @@ IFClsDef:
     @@Name: qnameValuePrefix
     @@enDesc:
       The prefix part of the element value (assumed as 
-      written as <Q::dis:TypeQName>). 
+      written as <Q::DISCore:QName>). 
       \
       {NOTE:: What should be if list value?
       \
@@ -1803,7 +1801,7 @@ IFClsDef:
     @@Name: qnameValueNamespaceURI
     @@enDesc:
       The namespace URI of the element value (assumed as written 
-      in <Q::dis:TypeQName>). 
+      in <Q::DISCore:QName>). 
       \
       {NOTE:: What should be if list value?
       \
@@ -2137,8 +2135,7 @@ IFClsDef:
 
   @Method:
     @@Operator:
-      @@@ContentType:
-        dis:TypeQName
+      @@@ContentType: DISCore|QName
       @@@@:
         DISPerl:CloneMethod
     @@Description:
@@ -4291,10 +4288,10 @@ IFClsDef:
                   my $new_value_type = $el-><M::DISElement.mediaTypeURI>(%mtopt);
 
                   if ($el-><M::DISElement.mediaTypeMatch>
-                      (<Q::dis:TypeQName>, $mtopt{default_media_type}, %mtopt)) {
+                      (<Q::DISCore:QName>, $mtopt{default_media_type}, %mtopt)) {
                     __CODE{dv|createValue::
                       $value => {null},
-                      $base_type => {$base_type = <Q::dis:TypeQName>},
+                      $base_type => {$base_type = <Q::DISCore:QName>},
                       $type => {$new_value_type},
                       $result => $new_value,
                       $name => {$prop_uri},
@@ -5107,7 +5104,7 @@ IFClsDef:
       @@@InCase:
         @@@@Value:
           @@@@@@: ManakaiDOM|all
-          @@@@@ContentType: dis|TypeQName
+          @@@@@ContentType: DISCore|QName
         @@@@enDesc:
           The attribute value is always <Q::ManakaiDOM|all> for a
           <QUOTE::for> resource.
@@ -5884,7 +5881,7 @@ IFClsDef:
                                .getPropertyResourceList>
                                   (<Q::DOMMain:implementFeature>,
                                    isa_recursive => true,
-                                   default_media_type => <Q::dis:TypeQName>)};
+                                   default_media_type => <Q::DISCore:QName>)};
         if (@f) {
           for my $f (@f) {
             if ($f-><M::ManakaiDISResourceDefinition.isSubsetOfURI>
@@ -6413,7 +6410,7 @@ IFClsDef:
         attribute specified. 
       @@@nullCase:
         @@@@enDesc:
-          Defaulted to <Q::dis:TypeQName>.
+          Defaulted to <Q::DISCore:QName>.
     @@Return:
       @@@Type: DIS|DISAnyResource
       @@@enDesc:
@@ -6491,7 +6488,7 @@ IFClsDef:
         attribute specified. 
       @@@nullCase:
         @@@@enDesc:
-          Defaulted to <Q::dis:TypeQName>.
+          Defaulted to <Q::DISCore:QName>.
     @@Return:
       @@@Type: ResourceList
       @@@enDesc:
@@ -7027,11 +7024,7 @@ ResourceDef:
         @@@@QName: UNABLE_TO_GET_MODULE_ERR
         @@@@enDesc:
           The implementation is unable to get the module source. 
-        @@@@Def:
-          @@@@@ContentType:
-            lang:muf
-          @@@@@lang:en
-          @@@@@@:
+        @@@@enMufDef:
             Unable to get the module source of <%p (name => {<Q::DIS:uri>});>
         @@@@XParam:
           @@@@@QName: uri
@@ -8048,7 +8041,7 @@ XParamDef:
 ElementTypeBinding:
   @Name: enMufDef
   @ElementType:
-    dis:Def
+    ecore:defaultMessage
   @ShadowContent:
     @@ContentType:
       lang:muf

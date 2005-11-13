@@ -7,7 +7,7 @@ Module:
 
   @DISCore:author: DISCore|Wakaba
   @Date:
-    $Date: 2005/10/02 23:35:34 $
+    $Date: 2005/11/13 04:45:09 $
   @License: license|Perl+MPL
   
   @DefaultFor: ManakaiDOM|all
@@ -186,7 +186,7 @@ ResourceDef:
     @@@:
       A <Q::dis:ResourceDef> element defines a resource.
 
-PropDef:
+SPropDef:
   @QName:
     dis:Name
   @Description:
@@ -216,7 +216,7 @@ PropDef:
   @dataType: DISCore|LocalName
   @multipleProperties: DISCore|Single
 
-PropDef:
+SPropDef:
   @QName:
     dis:QName
   @Description:
@@ -238,7 +238,7 @@ PropDef:
   @dataType: DISCore|QName
   @multipleProperties: DISCore|Single
 
-PropDef:
+SPropDef:
   @QName:
     dis:AliasFor
   @Description:
@@ -258,7 +258,7 @@ PropDef:
   @dataType: DISCore|TFQNames
   @multipleProperties: DISCore|Single
 
-PropDef:
+SPropDef:
   @QName:
     dis:aliasChild
   @Description:
@@ -288,7 +288,7 @@ ResourceDef:
     @@@:
       A set of resources defined by a <Q::dis:ResourceDef> element.
 
-PropDef:
+SPropDef:
   @QName:
     dis:resourceFor
   @rdfs:domain:
@@ -313,7 +313,7 @@ PropDef:
 
 ## -- Targets
 
-PropDef:
+SPropDef:
   @QName:
     dis:For
   @Description:
@@ -324,7 +324,7 @@ PropDef:
   @rdfs:domain: DISCore|AnyResource
   @multipleProperties: DISCore|UnorderedList
 
-PropDef:
+SPropDef:
   @QName:
     dis:ForCheck
   @Description:
@@ -350,6 +350,23 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: rdf|Property
+
+ElementTypeBinding:
+  @Name: RPropDef:
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: rdf|Property
+    @@rdf:type: DISSource|Property
+
+ElementTypeBinding:
+  @Name: SPropDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: rdf|Property
+    @@rdf:type: DISSource|Property
+    @@rdf:type: DISSource|ResourceProperty
 
 ElementTypeBinding:
   @Name: enDesc
@@ -409,3 +426,18 @@ ResourceTypeDef:
     which specifies a property value in the <QUOTE::dis> source.
   @rdfs:subClassOf: DISSource|Property
   @subsetOf: DISSource|Property
+
+SPropDef:
+  @QName: DISSource|domainProperty
+  @enFN: Domain
+  @enDesc:
+    If a <Q::DISSource|domainProperty> of a 
+    <Q::DISSource|PropertyProperty> <VAR::pp> is a property <VAR::q>,
+    then the <Q::dis|ElementType> of the <Q::sc|Element> 
+    that is the parent node of the <Q::sc|Element> that
+    describes the property <VAR::pp> <kwd:MUST> be <VAR::q>
+    or one of its subproperties.
+  @rdfs:domain: DISSource|PropertyProperty
+  @rdfs:range: DISSource|Property
+  @dataType: DISCore|QName
+  @multipleProperties: DISCore|UnorderedList

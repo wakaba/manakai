@@ -19,7 +19,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/10/05 11:51:15 $
+      $Date: 2005/11/13 04:45:09 $
     @@ContentType:
       dis:Date.RCS
   
@@ -568,15 +568,27 @@ LexTypeDef:
   @QName: DISCore|AnyString
   @enFN: Context-dependent string
   @enDesc:
-    String, i.e. unconstranted sequence of zero or more characters,
-    which might or might not depend on context such as namespace bindings.
+    A <Q::DISCore|AnyString> is a string, i.e. an ordered sequence
+    of zero or more characters which might or might not depend
+    on the context in which the string is evaluated.
 
 LexTypeDef:
   @QName: DISCore|String
   @enFN: String
   @enDesc:
-    String, i.e. unconstrainted sequence of zero or more characters,
-    which does not depend on context such as namespace bindings.
+    A <Q::DISCore|String> is a string, i.e. an ordered sequence
+    of zero or more characters which does not depend on
+    any formal contextual information such as <QUOTE::dis>
+    namespace bindings.
+
+      {NOTE:: Even a <Q::DISCore|String> might depend on any
+              context information that is not necessariliy 
+              interpretable by machines; for example,
+              a person who describes an object in <Q::DISCore|String>
+              might assume that any other person who reads 
+              the description knows what is the object described
+              by it.
+      }
   @rdfs:subClassOf: DISCore|AnyString
   @subsetOf: DISCore|AnyString
 
@@ -588,45 +600,26 @@ LexTypeDef:
   @QName: DISCore|Text
   @enFN: Text
   @enDesc:
-    Human readable plain-text.
+    A <Q::DISCore|Text> is a human readable plain text.
+    <DFN::Human readable> means that the text is written
+    in natural language or formal language that is intended
+    for human consumption and it is expected that human users
+    can be understood what is written in the text.
+
+      {NOTE:: Even <QUPTE::plain> text sometimes contains
+              a <QUOTE::preformatted> sequence of characters.
+      }
   @rdfs:subClassOf: DISCore|String
   @subsetOf: DISCore|String
 
 LexTypeDef:
-  @QName: DISCore|URI
-  @enFN: DOM URI
-  @enDesc:
-    URI-like string that identifies a resource <SRC::<CITE::DOM Level 3 Core>>.
-  @rdfs:subClassOf: DISCore|String
-  @subsetOf: DISCore|String
-
-LexTypeDef:
-  @QName: DISCore|TFURI
-  @enFN:
-    <Q::DISCore|TFQNames>-expanded URI
-  @Description:
-    @@lang:en
-    @@@:
-      <Q::dis:TFQNames>-expanded URI references. 
-  @rdfs:subClassOf: DISCore|URI
-  @subsetOf: DISCore|URI
-
-LexTypeDef:
-  @QName: DISCore|TFPURI
-  @enFN:
-    <Q::DISCore|TFPQNames>-expanded URI
-  @rdfs:subClassOf: DISCore|URI
-  @subsetOf: DISCore|URI
-
-LexTypeDef:
-  @QName: Boolean
+  @QName: DISCore|Boolean
   @enFN: Boolean
-  @Description:
-    @@lang:en
-    @@@: 
-      A boolean truth value, i.e. true or false. 
-      \
-      <Q::dis:Boolean> := "1" / "0"
+  @enDesc:
+    A <Q::DISCore|Boolean> is a Boolean truth value, either
+    <CODE::1> or <CODE::0>.  This lexical type is semantically
+    equals to <Q::DISLang|Boolean> and the values corresponding
+    to <Q::DISLang|True> and <Q::DISLang|False>.
   @rdfs:subClassOf: DISCore|String
   @subsetOf: DISCore|String
 
@@ -637,23 +630,24 @@ ResourceDef:
 LexTypeDef:
   @QName: DISCore|Tristate
   @enFN: Tristate
-  @Description:
-    @@lang:en
-    @@@:
-      A tristate value. 
-      \
-      <Q::Tristate> := "-1" / "0" / "1".
-      \
-      {NOTE:: What a <Q::Tristate> value means depends on the 
-              context where the value is used. 
-      \
-      }
+  @enDesc:
+    A <Q::DISCore|Tristate> value ranges either <CODE::-1>, <QUOTE::0>,
+    or <CODE::1>.  Although their semantics depends on the context 
+    where they are used, it is expected that they represents 
+    <Q::DISLang|False>, <Q::DISLang|Undefined>, and <Q::DISLang|True>
+    repspecitvely.
   @rdfs:subClassOf: DISCore|String
   @subsetOf: DISCore|String
 
 LexTypeDef:
   @QName: DISCore|Integer
   @enFN: Integer
+  @enDesc:
+    An <Q::DISCore|Integer> is a sequence of decimal digits,
+    i.e. a sequence of characters <CHAR::DIGIT ZERO>, 
+    <CHAR::DIGIT ONE>, ..., and <CHAR::DIGIT NINE>, 
+    optionally preceded by a <CHAR::PLUS SIGN> or <CHAR::HYPHEN-MINUS>.
+    They are interpreted as a decimal integer.
   @rdfs:subClassOf: DISCore|String
   @subsetOf: DISCore|String
 
@@ -672,13 +666,80 @@ LexTypeDef:
   @subsetOf: DISCore|String
 
 LexTypeDef:
+  @QName: DISCore|DISString
+  @enFN: 
+    <QUOTE::dis>-context-dependent string
+  @enDesc:
+    {P:: A <Q::DISCore|DISString> is a <Q::DISCore|AnyString>
+    that only depends on contextaul information provided
+    in <QUOTE::dis> object model, i.e.
+
+      - the set of namespace bindings (including prefixed namespaces
+        and default namespace),
+
+      - the base URI,
+
+      - the default resource name URI, and
+  
+      - the default resource <QUOTE::for> URI.
+
+    }
+  @subsetOf: DISCore|AnyString
+  @rdfs:subClassOf: DISCore|AnyString
+
+LexTypeDef:
+  @QName: DISCore|URI
+  @enFN: URI
+  @enDesc:
+    A <Q::DISCore|URI> is a URI-like string that identifies any resource.
+
+    A <Q::DISCore|URI> might be a relative reference; if so, 
+    it might be resolved against the base URI of the context.
+
+      {NOTE:: Typically <Q::DISCore|URI>s are not checked against
+              syntactical or other constraints defined in URI
+              standards.  In addition, relative references are
+              not resolved.
+      }
+  @rdfs:subClassOf: DISCore|DISString
+  @subsetOf: DISCore|DISString
+
+LexTypeDef:
+  @QName: DISCore|TFURI
+  @enFN:
+    <Q::DISCore|TFQNames>-expanded URI
+  @enDesc:
+    A <Q::DISCore|TFURI> is an absolute <Q::DISCore:URI> extracted
+    from a <Q::DISCore|TFQNames>.
+
+      {NOTE:: <Q::DISCore|TFURI>s and <Q::DISCore|TFQNames>s
+              have the one-to-one relationship.
+      }
+  @rdfs:subClassOf: DISCore|URI
+  @subsetOf: DISCore|URI
+
+LexTypeDef:
+  @QName: DISCore|TFPURI
+  @enFN:
+    <Q::DISCore|TFPQNames>-expanded URI
+  @enDesc:
+    A <Q::DISCore|TFPURI> is an absolute <Q::DISCore:URI> extracted
+    from a <Q::DISCore|TFPQNames>.
+
+      {NOTE:: <Q::DISCore|TFPURI>s and <Q::DISCore|TFPQNames>s
+              have the one-to-one relationship.
+      }
+  @rdfs:subClassOf: DISCore|URI
+  @subsetOf: DISCore|URI
+
+LexTypeDef:
   @QName: DISCore|NSString
   @enFN: Namespace-binding-dependent string
   @enDesc:
     String, i.e. unconstrainted sequence of zero or more characters,
     which depends on namespace bindings.
-  @rdfs:subClassOf: DISCore|AnyString
-  @subsetOf: DISCore|AnyString
+  @rdfs:subClassOf: DISCore|DISString
+  @subsetOf: DISCore|DISString
 
 LexTypeDef:
   @QName: DISCore|NCName
@@ -762,8 +823,8 @@ LexTypeDef:
     @@lang:en
     @@@:
       A pair of resource QName and optional <QUOTE::For> QName.
-  @rdfs:subClassOf: DISCore|NSString
-  @subsetOf: DISCore|NSString
+  @rdfs:subClassOf: DISCore|DISString
+  @subsetOf: DISCore|DISString
 
 ResourceDef:
   @QName: dis|TFQNames
@@ -785,8 +846,8 @@ LexTypeDef:
     @@@:
       A triplet of resource QName and optional <QUOTE::For> QName
       and zero or more <QUOTE::For+> QNames.
-  @rdfs:subClassOf: DISCore|NSString
-  @subsetOf: DISCore|NSString
+  @rdfs:subClassOf: DISCore|DISString
+  @subsetOf: DISCore|DISString
 
 ## -- Properties
 
@@ -795,6 +856,11 @@ ResourceTypeDef:
   @enFN: Property
   @rdfs:subClassOf: rdf|Property
   @subsetOf: rdf|Property
+  @ImplNote:
+    @@lang:en
+    @@@:
+      Should a <Q::rdf|Property> be a <Q::DISCore|Property>?
+      And vice versa?
 
 PropDef:
   @QName: stopISARecursive
@@ -892,20 +958,6 @@ SPropDef:
   @multipleProperties: DISCore|Single
   @rdfs:subPropertyOf: DISCore|definition
   @subsetOf: DISCore|definition
-
-CPropDef:
-  @QName: dis|is-null
-  @rdf:type: DISSource|PropertyProperty
-  @Description:
-    @@lang:en
-    @@@:
-      Whether the value is <DOM::null> or not.
-  @FullName:
-    @@lang:en
-    @@@:
-      Is <DOM::null> value
-  @dataType: DISCore|Boolean
-  @multipleProperties: DISCore|Single
 
 ResourceTypeDef:
   @QName: AnyDefContainer

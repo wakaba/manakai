@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/10/15 15:28:12 $
+      $Date: 2005/11/13 04:45:07 $
     @@ContentType:
       dis:Date.RCS
   
@@ -5066,7 +5066,7 @@ IFClsDef:
       @@@PerlDef:
         __DEEP{
           my $muf = $self-><M::DIS|DISResourceProp.getPropertyValue>
-                             (<Q::dis:Def>);
+                             (<Q::ecore:defaultMessage>);
           $muf = $muf->[0] if $muf;
           if ($muf) {
             $r = $muf-><AG::dv|DVValue.stringValue>;

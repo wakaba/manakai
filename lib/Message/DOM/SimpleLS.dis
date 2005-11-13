@@ -15,7 +15,7 @@ Module:
   @License: license|Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/10/06 10:53:36 $
+      $Date: 2005/11/13 04:45:05 $
     @@ContentType: dis|Date.RCS
 
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
@@ -411,7 +411,7 @@ IFClsXDef:
           $s =~ s/"/&quot;/g;
           return $s;
         };
-        while (my $src = shift @src) {
+        while (defined (my $src = shift @src)) {
           if (ref $src eq 'ARRAY') {
             pop @$nsbind;  ## End tag
           } elsif (ref $src) {

@@ -23,7 +23,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/10/15 15:28:15 $
+      $Date: 2005/11/13 04:45:09 $
     @@ContentType:
       dis:Date.RCS
   
@@ -424,7 +424,7 @@ ResourceDef:
   @Method:
     @@Operator:
       @@@@: ErrorDefMethod
-      @@@ContentType: dis|TypeQName
+      @@@ContentType: DISCore|QName
     @@enDesc:
       This method <kwd:MUST> be a contant function that returns
       a reference to the hash that contains the definitions 
@@ -446,6 +446,36 @@ ResourceTypeDef:
     A <Q::ecore:AnyErrorCode> is anything which identifies the kind
     of an error.  For example, the class that extends the 
     <Class::MUError::ManakaiDOM:Perl> class is an <Q::ecore:AnyErrorCode>.
+
+RPropDef:
+  @QName: ecore|message
+  @enDesc:
+    A template for error message.
+  @rdfs:domain: ecore|AnyErrorCode
+  @rdfs:subClassOf: dis|Def
+
+SPropDef:
+  @QName: ecore|defaultMessage
+  @enDesc:
+    A template for default error message.
+  
+      {NOTE:: Here, <QUOTE::default> implies that the message
+              is intended for application developers rather
+              than end users.
+      }
+  @rdfs:subPropertyOf: ecore|message
+  @multipleProperties: DISCore|OrderedList
+  @dataType: lang|muf
+
+ResourceDef:
+  @QName: lang|muf
+  @rdf:type: DISCore|LexicalType
+  @For: =ManakaiDOM|all
+  @rdfs:subClassOf: DISCore|NSString
+  @ImplNote:
+    @@lang:en
+    @@@:
+      Should be moved to some other module?
 
 ## -- Properties of error objects
 
@@ -652,6 +682,15 @@ ElementTypeBinding:
       rdf:Property
     @@rdf:type: DISSource|Property
     @@rdf:type: DISSource|ResourceProperty
+    @@For: =ManakaiDOM|all
+
+ElementTypeBinding:
+  @Name: RPropDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: rdf|Property
+    @@rdf:type: DISSource|Property
     @@For: =ManakaiDOM|all
 
 ## -- Error Class Instance
