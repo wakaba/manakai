@@ -1,0 +1,740 @@
+Module:
+  @QName: DIS|Test
+  @enFN:
+    <QUOTE::dis> Testing Module
+  @Namespace:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#Test/
+  
+  @enDesc:
+    The <Module::DIS|Test> module provides a set of interfaces
+    for test scripts generated from <QUOTE::dis> resource sets.
+
+  @DISCore:author: DISCore|Wakaba
+  @License: license|Perl+MPL
+  @Date:
+    @@@:
+      $Date: 2005/11/15 03:13:50 $
+    @@ContentType: dis|Date.RCS
+  
+  @Require:
+    @@Module:
+      @@@QName: DIS|common
+    @@Module:
+      @@@QName: DISlib|Test
+      @@@WithFor: ManakaiDOM|all
+    @@Module:
+      @@@QName: MDOM|DOMFeature
+      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
+    @@Module:
+      @@@WithFor: ManakaiDOM|ManakaiDOM
+    @@Module:
+      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
+
+  @DefaultFor: ManakaiDOM|ManakaiDOMLatest
+
+Namespace:
+  @DIS:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#
+  @dis:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
+  @DISlib:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/
+  @dtest:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#Test/
+  @dx:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#
+  @ecore:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/Core/
+  @Err:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/
+  @f:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/feature#
+  @html3:
+    urn:x-suika-fam-cx:markup:ietf:html:3:draft:00:
+  @html5:
+    http://www.w3.org/1999/xhtml
+  @idl:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/IDL#
+  @ilang:
+    urn:x-suika-fam-cx:lang:
+  @infoset:
+    http://www.w3.org/2001/04/infoset#
+  @kwd:
+    http://suika.fam.cx/~wakaba/archive/2005/rfc2119/
+  @lang:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
+  @license:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
+  @ManakaiDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
+  @MDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
+  @MDOMX:
+    http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
+  @mn:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/ManakaiNode#
+  @nl:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/NaturalLanguage#
+  @null:
+    http://suika.fam.cx/~wakaba/-temp/2003/09/27/null
+  @rdf:
+    http://www.w3.org/1999/02/22-rdf-syntax-ns#
+  @rdfs:
+    http://www.w3.org/2000/01/rdf-schema#
+  @s:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Markup#
+  @script:
+    http://suika.fam.cx/~wakaba/archive/2005/5/script#
+  @sw010:
+    urn:x-suika-fam-cx:markup:suikawiki:0:10:
+  @swcfg21:
+    http://suika.fam.cx/~wakaba/archive/2005/swcfg21#
+  @Util:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/
+  @xhtml1:
+    http://www.w3.org/1999/xhtml
+  @xhtml2:
+    http://www.w3.org/2002/06/xhtml2/
+  @xml:
+    http://www.w3.org/XML/1998/namespace
+  @xmlns:
+    http://www.w3.org/2000/xmlns/
+
+## -- Features
+
+ElementTypeBinding:
+  @Name: FeatureDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DOMFeature|Feature
+    @@For: ManakaiDOM|all
+
+ElementTypeBinding:
+  @Name: FeatureVerDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DOMFeature|Feature
+
+ElementTypeBinding:
+  @Name: featureQName
+  @ElementType:
+    DOMFeature:name
+  @ShadowContent:
+    @@ContentType: DISCore|QName
+
+FeatureDef:
+  @QName: DIS|Test
+  @FeatureVerDef:
+    @@QName: DIS|Test10
+    @@Version: 1.0
+    @@f:requires: f|min30
+    @@f:instanceOf: DIS|Test
+    @@enFN:
+      <QUOTE::dis> Testing Module, version 1.0
+
+ElementTypeBinding:
+  @Name: enDesc
+  @ElementType: 
+    dis:Description
+  @ShadowContent: 
+    @@lang:en
+
+ElementTypeBinding:
+  @Name: enFN
+  @ElementType:
+    dis:FullName
+  @ShadowContent:
+    @@lang:en
+
+ElementTypeBinding:
+  @Name: enImplNote
+  @ElementType:
+    dis:ImplNote
+  @ShadowContent:
+    @@lang:en
+
+ElementTypeBinding:
+  @Name: IFClsDef
+  @ElementType: 
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@: dis|MultipleResource
+      @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
+    @@resourceFor: ManakaiDOM|ForIF
+    @@resourceFor: ManakaiDOM|ForClass
+    @@For: ManakaiDOM|ManakaiDOM
+
+    @@rdf:type:
+      @@@@: DISLang|Interface
+      @@@ForCheck: ManakaiDOM|ForIF
+
+    @@rdf:type:
+      @@@@: DISLang|Class
+      @@@ForCheck: ManakaiDOM|ForClass
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOM||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
+
+    @@f:implements: DIS|Test10
+
+ElementTypeBinding:
+  @Name: IFQName
+  @ElementType:
+    dis:QName
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForIF
+
+ElementTypeBinding:
+  @Name: ClsQName
+  @ElementType:
+    dis:QName
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: IFISA
+  @ElementType:
+    dis:ISA
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForIF
+
+ElementTypeBinding:
+  @Name: ClsISA
+  @ElementType:
+    dis:ISA
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: Method
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|Method
+    @@For: !=ManakaiDOM|ManakaiDOM
+
+ElementTypeBinding:
+  @Name: Return
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|MethodReturn
+
+ElementTypeBinding:
+  @Name: Param
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|MethodParameter
+
+ElementTypeBinding:
+  @Name: Attr
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|Attribute
+    @@For: !=ManakaiDOM|ManakaiDOM
+
+ElementTypeBinding:
+  @Name: Get
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|AttributeGet
+
+ElementTypeBinding:
+  @Name: Set
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|AttributeSet
+
+## -- Implementation
+
+IFClsDef: 
+  @IFQName: DTImplementation
+  @ClsQName: ManakaiDTImplementation
+
+  @IFISA: f|MinimumImplementation
+  @ClsISA: f|ManakaiMinimumImplementation
+
+  @f:provides: DIS|Test10
+
+  @Method:
+    @@Name: createTestManager
+    @@enDesc:
+      Creates a <IF::DTManager> object.
+    @@Param:
+      @@@Name: totalNumber
+      @@@Type: unsignedLong
+      @@@enDesc:
+        The total number of tests.
+    @@Param:
+      @@@Name: outputFile
+      @@@Type: DISPerl|FileHandle
+      @@@enDesc:
+        The file handle to which reports are written.
+      @@@nullCase:
+        @@@@enDesc:
+          Defaulted to the standard output.
+    @@Return:
+      @@@Type: DTManager
+      @@@enDesc:
+        The newly created test manager.
+      @@@PerlDef:
+        $r = bless {<H::dtest|number> => $totalNumber,
+                    <H::dtest|currentNumber> => 0,
+                    <H::dtest|failedNumber> => 0,
+                    <H::dtest|output> => $outputFile || \*STDOUT},
+                   <ClassName::ManakaiDTManager>;
+        print {$r->{<H::dtest|output>}}
+                "1.." . $r->{<H::dtest|number>} . "\n";
+##DISImplementationTest
+
+PropDef:
+  @QName: dtest|uri
+  @enDesc:
+    A URI that identifies the test.
+  @dtest:key: i
+
+PropDef:
+  @QName: dtest|number
+  @enDesc:
+    The total number of tests.
+  @dtest:key: n
+
+PropDef:
+  @QName: dtest|currentNumber
+  @enDesc:
+    The current number of tests.
+  @dtest:key: c
+
+SPropDef:
+  @QName: dtest|key
+  @enDesc:
+    The key name of the property when it is used in 
+    <Class::DTManager::ManakaiDOM:ManakaiDOMLatest>.
+  @dataType: DISCore|String
+  @multipleProperties: DISCore|Single
+  @rdfs:domain: rdfs|Property
+  @rdfs:subPropertyOf: DISPerl|propHashKey
+
+IFClsDef:
+  @IFQName: DTManager
+  @ClsQName: ManakaiDTManager
+
+  @ClsISA: dx|ManakaiDefaultExceptionHandler||ManakaiDOM|Perl
+
+  @Attr:
+    @@Name: totalNumber
+    @@enDesc
+      The total number of tests.
+    @@Type: unsignedLong
+    @@Get:
+      @@@PerlDef:
+        $r = $self->{<H::dtest|number>};
+
+  @Attr:
+    @@Name: currentNumber
+    @@enDesc:
+      The number of tests that is already done.
+    @@Type: unsignedLong
+    @@Get:
+      @@@PerlDef:
+        $r = $self->{<H::dtest|currentNumber>};
+
+  @Attr:
+    @@Name: failedNumber
+    @@enDesc:
+      The number of tests that has failed.
+    @@Type: unsignedLong
+    @@Get:
+      @@@PerlDef:
+        $r = $self->{<H::dtest|failedNumber>};
+
+  @Attr:
+    @@Name: outputFile
+    @@enDesc:
+      The file handle to which reports are written.
+    @@Type: DISPerl|Filehandle
+    @@Get:
+      @@@PerlDef:
+        $r = $self->{<H::dtest|output>};
+
+  @Method:
+    @@Name: startNewTest
+    @@enDesc:
+      Starts a new test.
+    @@Param:
+      @@@Name: uri
+      @@@Type: DISString
+      @@@enDesc:
+        A URI that identifies the test.
+    @@Return:
+      @@@PerlDef:
+        if (not $self->{<H::dtest|ok>} and defined $self->{<H::dtest|uri>}) {
+          __DEEP{
+            $self-><M::DTManager.notOK>;
+          }__;
+        }
+        $self->{<H::dtest|currentNumber>}++;
+        $self->{<H::dtest|uri>} = $uri;
+
+  @Attr:
+    @@Name: uri
+    @@enDesc:
+      A URI that identifies the current test.
+    @@Type: DISString
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          Currently no test is done.
+      @@@PerlDef:
+        $r = $self->{<H::dtest|uri>};
+
+  @Method:
+    @@Name: ok
+    @@enDesc:
+      Records that the test has been passed.
+    @@Return:
+      @@@PerlDef:
+        print {$self->{<H::dtest|output>}}
+                "ok " . $self->{<H::dtest|currentNumber>} . "\n";
+        CORE::delete $self->{<H::dtest|uri>};
+
+  @Method:
+    @@Name: notOK
+    @@enDesc:
+      Records that the test has not been passed.
+    @@Return:
+      @@@PerlDef:
+        print {$self->{<H::dtest|output>}}
+                "not ok " . $self->{<H::dtest|currentNumber>} . "\n";
+        __CODE{printComment::
+          $test => $self,
+          $s => {
+            '<' . $self->{<H::dtest|uri>} . '>'
+          },
+        }__;
+        $self->{<H::dtest|failedNumber>}++;
+        CORE::delete $self->{<H::dtest|uri>};
+
+  @Method:
+    @@Name: assertNotNull
+    @@enDesc:
+      If the <P::actualValue> is <DOM::null> then the test fails.
+    @@NamedParam:
+      @@@Name: actualValue
+      @@@Type: DISPerl|Any
+      @@@enDesc: The actual value.
+    @@Return:
+      @@@AErr:
+      @@@PerlDef:
+        if (not defined $actualValue) {
+          __DEEP{
+            $self-><M::DTManager.notOK>;
+          }__;
+          __CODE{printComment::
+            $test => $self,
+            $s => {
+              'null value is occurred where a non-null value is expected'
+            },
+          }__;
+          __EXCEPTION{ASSERTION_ERR}__;
+        }
+
+  @Method:
+    @@Name: assertString
+    @@enDesc:
+      If the <P::actualValue> is not equal to the <P::expectedValue>
+      as a string, then fails.
+    @@NamedParam:
+      @@@Name: actualValue
+      @@@Type: DISPerl|StringValue
+      @@@enDesc: The actual value.
+    @@NamedParam:
+      @@@Name: expectedValue
+      @@@Type: DISPerl|StringValue
+      @@@enDesc: The expected value.
+    @@Return:
+      @@@AErr:
+      @@@PerlDef:
+        if (not defined $actualValue) {
+          __DEEP{
+            $self-><M::DTManager.notOK>;
+          }__;
+          __CODE{printComment::
+            $test => $self,
+            $s => {
+              'null value is occurred where a string value is expected'
+            },
+          }__;
+          __EXCEPTION{ASSERTION_ERR}__;
+        } elsif ($actualValue ne $expectedValue) {
+          __DEEP{
+            $self-><M::DTManager.notOK>;
+          }__;
+          my $aval;
+          my $xval;
+          __CODE{formatValue::
+            $input => $actualValue,
+            $output => $aval,
+          }__;
+          __CODE{formatValue::
+            $input => $expectedValue,
+            $output => $xval,
+          }__;
+          __CODE{printComment::
+            $test => $self,
+            $s => {
+              'Got ' . $aval . ' where ' . $xval . ' is expected'
+            },
+          }__;
+        }
+
+  @Method:
+    @@Operator:
+      @@@@: DESTROY
+      @@@ContentType: DISPerl|Perl
+    @@Return:
+      @@@PerlDef:
+        if (not $self->{<H::dtest|ok>} and defined $self->{<H::dtest|uri>}) {
+          __DEEP{
+            $self-><M::DTManager.notOK>;
+          }__;
+        }
+
+        if ($self->{<H::dtest|currentNumber>} < $self->{<H::dtest|number>}) {
+          __CODE{printComment::
+            $test => $self,
+            $s => {
+              sprintf "Looks like you planned %d tests but only ran %d.",
+                      $self->{<H::dtest|number>},
+                      $self->{<H::dtest|currentNumber>}
+            },
+          }__;
+        } elsif ($self->{<H::dtest|number>} <
+                 $self->{<H::dtest|currentNumber>}) {
+          __CODE{printComment::
+            $test => $self,
+            $s => {
+              sprintf "Looks like you planned %d tests but ran %d extra.",
+                      $self->{<H::dtest|number>},
+                      $self->{<H::dtest|currentNumber>}
+                        - $self->{<H::dtest|number>}
+            },
+          }__;
+        }
+        if ($self->{<H::dtest|failedNumber>}) {
+          __CODE{printComment::
+           $test => $self,
+           $s => {
+              sprintf "Looks like you failed %d tests of %d.",
+                      $self->{<H::dtest|failedNumber>},
+                      $self->{<H::dtest|number>}
+            },
+          }__;
+        } else {
+          __CODE{printComment::
+           $test => $self,
+           $s => {
+              sprintf "Looks like you passed %d tests.",
+                      $self->{<H::dtest|number>}
+            },
+          }__;
+        }
+
+  @ResourceDef:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@QName: printComment
+    @@rdf:type: DISPerl|BlockCode
+    @@enDesc:
+      Prints a comment to <Q::dtest|output>.
+    @@PerlDef:
+      my $__s = $s;
+      $__s =~ s/\n/\n## /g;
+      $__s =~ s/\n## $/\n/s;
+      $__s .= "\n" unless $__s =~ /\n$/;
+      $__s = q<## > . $__s;
+      print {$test->{<H::dtest|output>}} $__s;
+
+  @ResourceDef:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@QName: formatValue
+    @@rdf:type: DISPerl|BlockCode
+    @@enDesc:
+      Formats a value for error messages.
+    @@PerlDef:
+      $output = $input;
+      if (not defined $output) {
+        $output = '(undef)';
+      } elsif ($output eq '') {
+        $output = '(empty)';
+      } else {
+        $output =~ s{([\x00-\x09\x0B-\x1F\x7F-\xA0])}
+                    {sprintf '\\x{%04X}', ord $1}ge;
+        $output =~ s/\x0A/\x{000A}\n/g;
+        $output = "'" . $output . "'";
+      }
+##DTManager
+
+ElementTypeBinding:
+  @Name: NamedParam
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:MethodParameter
+    @@DISPerl:isNamedParameter:1
+
+ElementTypeBinding:
+  @Name: AErr
+  @ElementType:
+    dx:raises
+  @ShadowContent:
+    @@@: ASSERTION_ERR
+    @@Description:
+      @@@lang:en
+      @@@@:
+        If assetion fails.
+
+ResourceDef:
+  @QName: DISString
+  @AliasFor: DOMMain|DOMString
+  @For: ManakaiDOM|ManakaiDOM
+
+PropDef:
+  @QName: dtest|failedNumber
+  @enDesc:
+    The number of current failed tests.
+  @dtest:key: f
+
+PropDef:
+  @QName: dtest|output
+  @enDesc:
+    The file handle to which messages should be written.
+  @dtest:key: o
+
+ElementTypeBinding:
+  @Name: PerlDef
+  @ElementType:
+    dis:Def
+  @ShadowContent:
+    @@ContentType:
+      lang:Perl
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: InCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:InCase
+
+ElementTypeBinding:
+  @Name: nullCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:InCase
+    @@Value:
+      @@@is-null:1
+      @@@ContentType: DISCore|String
+
+ElementTypeBinding:
+  @Name: TrueCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:InCase
+    @@Value:
+      @@@@: 1
+      @@@ContentType: DISCore|Boolean
+    @@Type: idl|boolean||ManakaiDOM|all
+
+ElementTypeBinding:
+  @Name: FalseCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:InCase
+    @@Value:
+      @@@@: 0
+      @@@ContentType: DISCore|Boolean
+    @@Type: idl|boolean||ManakaiDOM|all
+
+IFClsDef:
+  @IFQName: DTException
+  @ClsQName: ManakaiDTException
+
+  @rdf:type:
+    @@@: dx|Interface
+    @@ForCheck: ManakaiDOM|ForIF
+
+  @rdf:type:
+    @@@: dx|Class
+    @@ForCheck: ManakaiDOM|ForClass
+
+  @ClsISA: dx|Exception||ManakaiDOM|Perl
+  @dx:implementedBy: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForClass
+
+  @ResourceDef:
+    @@QName: DTExceptionCode
+    @@ForCheck: ManakaiDOM|ForIF
+    @@rdf:type: DISLang|ConstGroup
+
+    @@enDesc:
+      Exception codes for <IF::DTException>. 
+
+    @@Type: idl|unsignedShort||ManakaiDOM|all
+    @@rdfs:subClassOf: idl|unsignedShort||ManakaiDOM|all
+
+    @@ResourceDef:
+      @@@QName: ASSERTION_ERR
+      @@@rdf:type: DISLang|Const
+      @@@Value:
+        @@@@@:10001
+        @@@@ContentType: DISCore|Integer
+      @@@enDesc:
+        An assertion failed.
+##DTException
+
+
+ElementTypeBinding:
+  @Name: PropDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: rdf|Property
+    @@For: =ManakaiDOM|all
+
+ElementTypeBinding:
+  @Name: RPropDef:
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: rdf|Property
+    @@rdf:type: DISSource|Property
+    @@For: =ManakaiDOM|all
+
+ElementTypeBinding:
+  @Name: SPropDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: rdf|Property
+    @@rdf:type: DISSource|Property
+    @@rdf:type: DISSource|ResourceProperty
+    @@For: =ManakaiDOM|all
