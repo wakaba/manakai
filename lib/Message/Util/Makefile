@@ -203,6 +203,10 @@ $(MANAKAI_LIB_DIR)manakai/all$(DAC_SUFFIX): dummy
 $(MANAKAI_LIB_DIR)Message/Markup/all$(DAC_SUFFIX): dummy
 	$(CD) $(MANAKAI_LIB_DIR)Message/Markup/ && $(MAKE) all$(DAC_SUFFIX)
 
+# $(DOM_CORE_DAC_FILE)
+$(MANAKAI_LIB_DIR)Message/DOM/core$(DAC_SUFFIX): dummy
+	$(CD) $(MANAKAI_LIB_DIR)Message/DOM/ && $(MAKE) core$(DAC_SUFFIX)
+
 dummy:
 
 clean:

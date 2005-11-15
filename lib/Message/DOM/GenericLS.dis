@@ -14,7 +14,7 @@ Module:
   @License: license|Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/23 18:24:57 $
+      $Date: 2005/11/15 14:18:23 $
     @@ContentType: dis|Date.RCS
 
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
@@ -30,12 +30,8 @@ Module:
 Namespace:
   @dis:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
-  @DOMCore:
-    http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
-  @DOMMain:
-    http://suika.fam.cx/~wakaba/archive/2004/dom/main#
-  @DOMMetaImpl:
-    http://suika.fam.cx/~wakaba/archive/2004/dom/meta#
+  @dx:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#
   @f:
     http://suika.fam.cx/~wakaba/archive/2004/dom/feature#
   @infoset:
@@ -44,56 +40,35 @@ Namespace:
      http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
   @license:
      http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
-  @LSEV:
-    http://www.w3.org/2002/DOMLS
   @ManakaiDOM:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
-  @ManakaiDOMCore:
-    http://suika.fam.cx/~wakaba/archive/2004/mdom-core#
-  @ManakaiDOMLS:
-    http://suika.fam.cx/~wakaba/archive/2004/mdom-ls#
-  @ManakaiDOMLS2003:
-    http://suika.fam.cx/~wakaba/archive/2004/9/27/mdom-old-ls#
   @MDOM:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
   @MDOMX:
     http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
-  @null:
-    http://suika.fam.cx/~wakaba/-temp/2003/09/27/null
-  @Perl:
-    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#Perl--
   @rdf:
     http://www.w3.org/1999/02/22-rdf-syntax-ns#
   @rdfs:
     http://www.w3.org/2000/01/rdf-schema#
-  @TreeCore: \
-  @undef:
-    http://suika.fam.cx/~wakaba/-temp/2003/09/27/undef
-  @xml:
-    http://www.w3.org/XML/1998/namespace
-  @xmlns:
-    http://www.w3.org/2000/xmlns/
+  @test:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Test#
 
 ## -- Features
 
 FeatureDef:
-  @QName: DOMLS|LSExtendedFeature
+  @QName: Generic
+  @featureQName: DOMLS|Generic
   @FeatureVerDef:
-    @@QName: DOMLS|LSExtendedFeature30
-    @@DOMMetaImpl:instanceFeatureOf: DOMLS|LSExtendedFeature
-    @@featureQName: DOMLS|LS
-    @@featureQName: ManakaiDOM|LS
+    @@QName: Generic30
+    @@f:instanceOf: Generic
     @@Version: 3.0
-    @@enDesc:
-      The <IF::DOMLS|DOMImplementationLSExtended
-             ::ManakaiDOM:ManakaiDOMLatest> interface.
 
 ElementTypeBinding:
   @Name: FeatureDef
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type: DOMFeature|Feature
+    @@rdf:type: f|Feature
     @@For: =ManakaiDOM|all
 
 ElementTypeBinding:
@@ -101,7 +76,7 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type: DOMFeature|Feature
+    @@rdf:type: f|Feature
 
 ElementTypeBinding:
   @Name: featureQName
@@ -124,7 +99,6 @@ ElementTypeBinding:
   @ShadowContent:
     @@ForCheck: ManakaiDOM|ForClass
 
-
 ElementTypeBinding:
   @Name: IFISA
   @ElementType:
@@ -140,7 +114,7 @@ ElementTypeBinding:
     @@ForCheck: ManakaiDOM|ForClass
 
 ElementTypeBinding:
-  @Name: IFClsXDef
+  @Name: IFClsDef
   @ElementType: 
     dis:ResourceDef
   @ShadowContent:
@@ -171,18 +145,8 @@ ElementTypeBinding:
       @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
 
     @@DOMMain:implementFeature:
-      @@@@: DOMLS|LSExtendedFeature30
+      @@@@: DOMLS|Generic30
       @@@For: ManakaiDOM|ManakaiDOMLatest
-
-ElementTypeBinding:
-  @Name: IFDef
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type: DISLang|Interface
-    @@For: =ManakaiDOM|ManakaiDOM
-    @@For: ManakaiDOM|ManakaiDOMLatest
-
 
 ElementTypeBinding:
   @Name: Method
@@ -211,7 +175,7 @@ ElementTypeBinding:
 ElementTypeBinding:
   @Name: RaiseException
   @ElementType:
-    ManakaiDOM:raises
+    dx:raises
 
 ElementTypeBinding:
   @Name: Return
@@ -250,7 +214,6 @@ ElementTypeBinding:
     @@rdf:type:
       ManakaiDOM:InCase
 
-
 ElementTypeBinding:
   @Name: PerlDef
   @ElementType:
@@ -260,46 +223,64 @@ ElementTypeBinding:
       lang:Perl
     @@ForCheck: ManakaiDOM|ForClass
 
+ElementTypeBinding:
+  @Name: Test
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: test|StandaloneTest
+
 ## -- Implementation
 
-IFClsXDef:
-  @IFQName: DOMLS|DOMImplementationLSExtended
-  @ClsQName: DOMLS|ManakaiDOMImplementationLSExtended
+IFClsDef:
+  @IFQName: GLSImplementation
+  @ClsQName: ManakaiGLSImplementation
 
-  @IFISA: DOMLS|DOMImplementationLS
-  @ClsISA: DOMLS|ManakaiDOMImplementationLS
-
-  @DOMMetaImpl:provideFeature: DOMLS|LSExtendedFeature30
+  @IFISA: f|MinimumImplementation
+  @ClsISA: f|ManakaiMinimumImplementation
 
   @enDesc:
-    The <IF::DOMLS|DOMImplementationLSExtended> interface provides
-    factory methods taking <TYPE::DOMFeatures|FeaturesString>
+    The <IF::GLSImplementation> interface provides
+    factory methods taking <TYPE::f|FeaturesString>
     as a parameter to specify desired features that should be
     implemented by parser or serializer.
 
-  @enDesc:
-    @@ForCheck: ManakaiDOM|ForIF
+  @ImplNote:
+    @@lang:en
     @@@:
-      It is expected that an instance of the <IF::DOMLS|DOMImplementationLSExtended>
-      interface can be obtained by using binding-specific casting
-      methods on an instance of the <IF::DOMCore|DOMImplementation>
-      interface or by using the <M::DOMCore|DOMImplementation.getFeature>
-      method with parameter values <Feature::DOMLS|LS> and
-      <FeatureVer::3.0> respectively.
+      There is also a JavaScript implementation:
+      <URI::http://suika.fam.cx/gate/cvs/www/cx/fam/suika/y2005/LS/Generic.js>.
+
+  @f:provides: Generic30
+  @Test:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@enDesc:
+      The implementation registry should know this class when the
+      module is loaded.
+    @@PerlDef:
+      I: {
+        for my $impl (@{$Message::DOM::ImplementationRegistry
+                              ->get_implementation_list
+                                  ({<Q::DOMLS:Generic> => '3.0'})}) {
+          if ($impl->isa (<ClassName::ManakaiGLSImplementation>)) {
+            last I;
+          }
+        }
+        $test->assert_never;
+      } # I
 
   @Method:
-    @@Name: createMLSParser
+    @@Name: createGLSParser
     @@enDesc:
-      Creates a parser.  It may or may not implement 
-      the <IF::LSParser> interface, may or may not support parsing
-      of XML entities and may or may not 
-      support generation of <IF::DOMCore:Node> objects.  In other word,
-      this method may create any object whose class 
-      has the semantics of some kind of <QUOTE::parsing>.
+      Creates a parser for some language(s).
+
+         {NOTE:: How the method to find parser classes and
+                 instantiate them is implementation dependent.
+         }
     @@Param:
       @@@Name: features
       @@@Type: DOMMain|DOMString
-      @@@actualType: DOMFeature|FeaturesString
+      @@@actualType: f|FeaturesString
       @@@enDesc:
         A list of features that must be supported by 
         the object returned.
@@ -314,8 +295,7 @@ IFClsXDef:
       @@@enDesc:
         The newly created parser object, which supports
         the features requested by the <P::features> parameter.
-      @@@RaiseException:
-        @@@@@: DOMCore|FEATURE_NOT_SUPPORTED_ERR
+      @@@nullCase:
         @@@@enDesc:
           No parser implementation found that supports 
           all of the requested features.
@@ -340,20 +320,27 @@ IFClsXDef:
               last CLS;    ## NOTE: Method name directly written
             } # CLS
 
+    @@Test:
+      @@@ForCheck: ManakaiDOM|ForClass
+      @@@PerlDef:
+        my $impl = <Class::ManakaiGLSImplementation>->_new;
+        my $v = $impl-><M::GLSImplementation.createGLSParser> ({
+            <Q::DOMLS:NoSuchFeature> => '1.0',
+        });
+        $test->assert_null ($v);
 
   @Method:
-    @@Name: createMLSSerializer
+    @@Name: createGLSSerializer
     @@enDesc:
-      Creates a serializer.  It may or may not implement 
-      the <IF::LSSerializer> interface, may or may not support serialization
-      of <IF::DOMCore:Node> objects and may or may not 
-      support serialization as XML entities.  In other word, 
-      this method may create any object whose class 
-      has the semantics of some kind of <QUOTE::serialization>.
+      Creates a serializer for some object model(s).
+
+         {NOTE:: How the method to find serializer classes and
+                 instantiate them implementation dependent.
+         }
     @@Param:
       @@@Name: features
       @@@Type: DOMMain|DOMString
-      @@@actualType: DOMFeature|FeaturesString
+      @@@actualType: f|FeaturesString
       @@@enDesc:
         A list of features that must be supported by 
         the object returned.
@@ -368,8 +355,7 @@ IFClsXDef:
       @@@enDesc:
         The newly created serializer object, which supports
         the features requested by the <P::features> parameter.
-      @@@RaiseException:
-        @@@@@: DOMCore|FEATURE_NOT_SUPPORTED_ERR
+      @@@nullCase:
         @@@@enDesc:
           No serializer implementation found that supports 
           all of the requested features.
@@ -393,7 +379,28 @@ IFClsXDef:
               $r = $class->new ($self, $features);
               last CLS;    ## NOTE: Method name directly written
             } # CLS
-##DOMImplementationLSExtended
+
+    @@Test:
+      @@@ForCheck: ManakaiDOM|ForClass
+      @@@PerlDef:
+        my $impl = <Class::ManakaiGLSImplementation>->_new;
+        my $v = $impl-><M::GLSImplementation.createGLSSerializer> ({
+            <Q::DOMLS:NoSuchFeature> => '1.0',
+        });
+        $test->assert_null ($v);
+##GLSImplementation
+
+
+ElementTypeBinding:
+  @Name: nullCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:InCase
+    @@Value:
+      @@@is-null:1
+      @@@ContentType: DISCore|String
 
 ElementTypeBinding:
   @Name: enDesc
@@ -417,16 +424,16 @@ ResourceDef:
   @For: =ManakaiDOM|all
   @enDesc:
     Classes playing this role are parsers and 
-    may be instantiated via the <M::DOMLS|ManakaiDOMImplementationLSExtended
-    .createMLSParser> method.
+    may be instantiated via the <M::ManakaiGLSImplementation
+    ||ManakaiDOM|ManakaiDOMLatest.createGLSParser> method.
 
 ## -- Serializers
 
 ResourceDef:
   @QName: DOMLS|SerializerRole
   @rdf:type: DISLang|Role
-  @ForCheck: ManakaiDOM|all
+  @For: =ManakaiDOM|all
   @enDesc:
     Classes playing this role are serializers and 
-    may be instantiated via the <M::DOMLS|ManakaiDOMImplementationLSExtended
-    .createMLSSerializer> method.
+    may be instantiated via the <M::ManakaiGLSImplementation
+    ||ManakaiDOM|ManakaiDOMLatest.createGLSSerializer> method.

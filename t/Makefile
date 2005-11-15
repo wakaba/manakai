@@ -7,6 +7,8 @@ DIS_SUFFIX = .dis
 DAC_SUFFIX = .dae
 DAEM_SUFFIX = .daem
 
+CD = cd
+MAKE = make
 MKDIR = mkdir -p
 
 RM = rm
@@ -41,6 +43,20 @@ DOMTS2PERL_PL = $(MANAKAI_BIN_DIR)domts2perl.pl
 DOMTS2PERL = $(PERL_) -I$(MANAKAI_BIN_DIR) $(DOMTS2PERL_PL)
 DOMTEST2PERL_PL = $(MANAKAI_BIN_DIR)domtest2perl.pl
 
+DAC2TEST_OPTIONS = 
+DAC2TEST_PL = $(MANAKAI_BIN_DIR)dac2test.pl
+DAC2TEST = $(PERL_) $(DAC2TEST_PL) $(DAC2TEST_OPTIONS) $(DIS_OPTIONS_ALL)
+
+DOM_FEATURE_DAC = $(MANAKAI_LIB_DIR)Message/DOM/feature$(DAC_SUFFIX)
+DOM_CORE_DAC = $(MANAKAI_LIB_DIR)Message/DOM/core$(DAC_SUFFIX)
+
+NS_MDOM = http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom\#ManakaiDOM.
+NS_MANAKAIDOM = http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom\#
+
+GENERATED_FILES = dom-feature.t dom-genericls.t
+
+all: $(GENERATED_FILES)
+
 dom1core-perl: $(DOMTS2PERL_PL)
 	$(MKDIR) $(DOMTEST_PERL_DIR)level1/core/
 	$(DOMTS2PERL) --test-directory="$(DOMTEST_TESTS_DIR)level1/core/" \
@@ -51,8 +67,20 @@ dom1core:
 	MANAKAI_DOMTEST_FILE_DIR=$(DOMTEST_TESTS_DIR)level1/core/files/ \
 	  $(PERL_TEST_) $(DOMTEST_PERL_DIR)level1/core/$(DOMTEST_FILE).pl
 
+dom-feature.t: $(DOM_FEATURE_DAC) $(DAC2TEST_PL)
+	$(DAC2TEST) $< --source-module="$(NS_MDOM)DOMFeature" > $@
+
+dom-genericls.t: $(DOM_CORE_DAC) $(DAC2TEST_PL)
+	$(DAC2TEST) $< --source-module="$(NS_MDOM)GenericLS" > $@
+
+$(DOM_FEATURE_DAC) $(DOM_CORE_DAC): $(MANAKAI_LIB_DIR)Message/DOM/%: always
+	$(CD) $(MANAKAI_LIB_DIR)Message/DOM/ && $(MAKE) $*
+
 clean: clean-dom1core-perl
+	$(RMALL) $(GENERATED_FILES)
 
 clean-dom1core-perl:
 	$(RMALL) $(DOMTEST_PERL_DIR)level1/core/*
 	$(RMALL) *~ .*~ *.BAK .*.BAK
+
+always:

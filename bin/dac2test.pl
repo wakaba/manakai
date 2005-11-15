@@ -237,6 +237,7 @@ for (@{$Opt{create_module}}) {
   my $pack = $pl->get_last_package ("Manakai::Test", make_new_package => 1);
   $pack->add_use_perl_module_name ("Message::Util::DIS::Test");
   $pack->add_use_perl_module_name ("Message::Util::Error");
+  $pack->add_require_perl_module_name ($mod->pl_fully_qualified_name);
 
   $pl->source_file ($mod->get_property_text (ExpandedURI q<DIS:sourceFile>, ""));
   $pl->source_module ($mod->name_uri);
@@ -359,4 +360,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2005/11/15 03:12:55 $
+1; # $Date: 2005/11/15 14:18:23 $

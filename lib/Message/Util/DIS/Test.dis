@@ -13,7 +13,7 @@ Module:
   @License: license|Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/11/15 03:13:50 $
+      $Date: 2005/11/15 14:18:24 $
     @@ContentType: dis|Date.RCS
   
   @Require:
@@ -428,6 +428,35 @@ IFClsDef:
         CORE::delete $self->{<H::dtest|uri>};
 
   @Method:
+    @@Name: assertNull
+    @@enDesc:
+      If the <P::actualValue> is not <DOM::null> then the test fails.
+    @@NamedParam:
+      @@@Name: actualValue
+      @@@Type: DISPerl|Any
+      @@@enDesc: The actual value.
+    @@Return:
+      @@@AErr:
+      @@@PerlDef:
+        if (defined $actualValue) {
+          __DEEP{
+            $self-><M::DTManager.notOK>;
+          }__;
+          my $v;
+          __CODE{formatValue::
+            $input => $actualValue,
+            $output => $v,
+          }__;
+          __CODE{printComment::
+            $test => $self,
+            $s => {
+              'non-null value ('.$v.') is occurred where null is expected'
+            },
+          }__;
+          __EXCEPTION{ASSERTION_ERR}__;
+        }
+
+  @Method:
     @@Name: assertNotNull
     @@enDesc:
       If the <P::actualValue> is <DOM::null> then the test fails.
@@ -498,6 +527,148 @@ IFClsDef:
               'Got ' . $aval . ' where ' . $xval . ' is expected'
             },
           }__;
+        }
+
+  @Method:
+    @@Name: assertEquals
+    @@enDesc:
+      If two values are not equal (i.e. if <Perl::<P::value1> eq <P::value2>>
+      is not <DOM::true>), then fails.
+    @@Param:
+      @@@Name: value1
+      @@@Type: DISPerl|Any
+      @@@enDesc: A value.
+    @@Param:
+      @@@Name: value2
+      @@@Type: DISPerl|Any
+      @@@enDesc: Another value.
+    @@Return:
+      @@@AErr:
+      @@@PerlDef:
+        if (not defined $value1 and not defined $value2) {
+          ## ok
+        } elsif (defined $value1 and defined $value2 and $value1 eq $value2) {
+          ## ok
+        } else {
+          __DEEP{
+            $self-><M::DTManager.notOK>;
+          }__;
+          my $v1;
+          my $v2;
+          __CODE{formatValue::
+            $input => $value1,
+            $output => $v1,
+          }__;
+          __CODE{formatValue::
+            $input => $value2,
+            $output => $v2,
+          }__;
+          __CODE{printComment::
+            $test => $self,
+            $s => {
+              'values ' . $v1 . ' and ' . $v2 . ' are not equal'
+            },
+          }__;
+          __EXCEPTION{ASSERTION_ERR}__;
+        }
+
+  @Method:
+    @@Name: assertNotEquals
+    @@enDesc:
+      If two values <EM::are> equal (i.e. if <Perl::<P::value1> eq <P::value2>>
+      is not <DOM::false>), then fails.
+    @@Param:
+      @@@Name: value1
+      @@@Type: DISPerl|Any
+      @@@enDesc: A value.
+    @@Param:
+      @@@Name: value2
+      @@@Type: DISPerl|Any
+      @@@enDesc: Another value.
+    @@Return:
+      @@@AErr:
+      @@@PerlDef:
+        if (not defined $value1 and defined $value2) {
+          ## ok
+        } elsif (defined $value1 and not defined $value2) {
+          ## ok
+        } elsif (not ($value1 eq $value2)) {
+          ## ok
+        } else {
+          __DEEP{
+            $self-><M::DTManager.notOK>;
+          }__;
+          my $v1;
+          my $v2;
+          __CODE{formatValue::
+            $input => $value1,
+            $output => $v1,
+          }__;
+          __CODE{formatValue::
+            $input => $value2,
+            $output => $v2,
+          }__;
+          __CODE{printComment::
+            $test => $self,
+            $s => {
+              'values are equal: ' . $v1
+            },
+          }__;
+          __EXCEPTION{ASSERTION_ERR}__;
+        }
+
+  @Method:
+    @@Name: assertException
+    @@enDesc:
+      If an exception is not thrown, then fails.
+
+        {NOTE:: If an exception other than one being test
+                is thrown in <P::code>, then it will be rethrown.
+        }
+    @@NamedParam:
+      @@@Name: code
+      @@@Type: DISPerl|CODE
+      @@@enDesc:
+        A code reference to be executed.  When executed, the <P::code>
+        would receive an argument: <VAR::$test>, the test manager object.
+    @@NamedParam:
+      @@@Name: exceptionSubtype
+      @@@Type: DISString
+      @@@enDesc:
+        The subtype of the exception that is expected to be thrown
+        within <P::code>.
+      @@@nullCase:
+        @@@@enDesc:
+          Whether any exception with a particular subcode is 
+          thrown or not is not tested.
+    @@Return:
+      @@@AErr:
+      @@@PerlDef:
+        my $passed;
+        try {
+          $code->($self);
+        } catch <IF::dx|Exception||ManakaiDOM|Perl> with {
+          my $err = shift;
+          my $err_subtype = $err-><AG::dx|Exception||ManakaiDOM|Perl.subtype>;
+          if (defined $err_subtype and defined $exceptionSubtype and
+              $err_subtype eq $exceptionSubtype) {
+            $passed = true;
+          } else {
+            $err-><M::ecore|Error||ManakaiDOM|Perl.throw>;
+          }
+        };
+        if (not $passed and defined $exceptionSubtype) {
+          __DEEP{
+            $self-><M::DTManager.notOK>;
+          }__;
+          __CODE{printComment::
+            $test => $self,
+            $s => {
+              'Exception of subtype <' . $exceptionSubtype .
+              '> is expected but not thrown'
+            },
+          }__;
+          __EXCEPTION{ASSERTION_ERR}__;
         }
 
   @Method:
@@ -574,6 +745,7 @@ IFClsDef:
       Formats a value for error messages.
     @@PerlDef:
       $output = $input;
+      my $__ref = ref $output;
       if (not defined $output) {
         $output = '(undef)';
       } elsif ($output eq '') {
@@ -584,6 +756,7 @@ IFClsDef:
         $output =~ s/\x0A/\x{000A}\n/g;
         $output = "'" . $output . "'";
       }
+      $output .= ' ['.$__ref.']' if length $__ref;
 ##DTManager
 
 ElementTypeBinding:

@@ -202,7 +202,7 @@ use Message::Util::DIS::DNLite;
 my $impl = $Message::DOM::ImplementationRegistry->get_implementation
                ({
                  ExpandedURI q<ManakaiDOM:Minimum> => '3.0',
-                 '+' . ExpandedURI q<DOMLS:LS> => '3.0',
+                 '+' . ExpandedURI q<DOMLS:Generic> => '3.0',
                  '+' . ExpandedURI q<DIS:Doc> => '2.0',
                  '+' . ExpandedURI q<DIS:DNLite> => '1.0',
                  ExpandedURI q<DIS:Dump> => '1.0',
@@ -1611,8 +1611,8 @@ status_msg q<done>;
   status_msg_ qq<Writing file ""...>;
 
   require Encode;
-  my $lsimpl = $impl->get_feature (ExpandedURI q<DOMLS:LS> => '3.0');
-  my $serializer = $lsimpl->create_mls_serializer
+  my $lsimpl = $impl->get_feature (ExpandedURI q<DOMLS:Generic> => '3.0');
+  my $serializer = $lsimpl->create_gls_serializer
                         ({ExpandedURI q<DOMLS:SerializeDocumentInstance> => ''});
   print STDOUT Encode::encode ('utf8', $serializer->write_to_string ($doc));
   close STDOUT;
@@ -1679,4 +1679,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2005/10/05 11:50:35 $
+1; # $Date: 2005/11/15 14:18:23 $

@@ -44,7 +44,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/11/15 03:12:55 $
+      $Date: 2005/11/15 14:18:23 $
     @@ContentType:
       dis:Date.RCS
   
@@ -2618,6 +2618,65 @@ minIFClsDef:
             $class => $self,
           }__;
           $node->{<H::ManakaiDOM:implID>} = $node->{<H::mn:nodeID>};
+
+  @Method:
+    @@Operator:
+      @@@@: eq
+      @@@ContentType: DISPerl|Perl
+    @@ForCheck: ManakaiDOM|Perl
+    @@ManakaiDOM:isForInternal:1
+    @@enDesc:
+      For Perl binding, the <Perl::eq> operation to a <IF::MinimumImplementation>
+      object <kwd:MUST> return <DOM::true> value if and only if
+      another operand is a <IF::MinimumImplementation> representing
+      the same implementation object and any methods defined in the
+      <IF::MinimumImplementation> interface would return the same result.
+      
+        {NOTE:: The <Perl::eq> operation for two different object
+                with different interfaces representing the same implementation
+                would return <DOM::true>.
+        }
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        {ISSUE:: Is this definition harmless?
+        }
+    @@Param:
+      @@@Name: obj
+      @@@Type: DISPerl|Any
+      @@@enDesc:
+        Another operand.
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@enDesc:
+          Another operand is <DOM::null> and the method would
+          return <DOM::false>.
+    @@Return:
+      @@@Type: idl|boolean||ManakaiDOM|all
+      @@@enDesc:
+        Whether the implementation and <P::obj> is the same or not.
+      @@@PerlDef:
+        if (UNIVERSAL::isa ($obj,
+                            <ClassName::mn:ManakaiNodeRef::ManakaiDOM:Perl>)) {
+          $r = ($obj->{<H::mn:node>}->{<H::mn:nodeID>}
+                  eq $self->{<H::mn:node>}->{<H::mn:nodeID>});
+        }
+    @@Test:
+      @@@ForCheck: ManakaiDOM|ForClass
+      @@@enDesc:
+        The same object would return <DOM::true>.
+      @@@PerlDef:
+        my $ia = <Class::ManakaiMinimumImplementation>->_new;
+        $test->assert_equals ($ia, $ia);
+    @@Test:
+      @@@ForCheck: ManakaiDOM|ForClass
+      @@@enDesc:
+        Two different implementations would return <DOM::false>.
+      @@@PerlDef:
+        my $ia = <Class::ManakaiMinimumImplementation>->_new;
+        my $ib = <Class::ManakaiMinimumImplementation>->_new;
+        $test->assert_not_equals ($ia, $ib);
 ##MinimumImplementation
 
 PropDef:

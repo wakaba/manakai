@@ -20,7 +20,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/11/13 04:45:09 $
+      $Date: 2005/11/15 14:18:24 $
     @@ContentType:
       dis:Date.RCS
   
@@ -580,6 +580,148 @@ ResourceDef:
   @enDesc:
     The <Class::dx|Exception> class is a basis for implementation
     of exceptions thrown in DOM compatible manner.
+
+  @Attr:
+    @@Name:text
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Returns a short plain-text message, written in the 
+        <CODE::i-default> language, that describes 
+        what is happened. 
+        \
+        {NOTE:: This attribute is also defined in the class 
+                <PerlModule::Message::Util::Error> and it is 
+                overridden here for the purpose of manakai 
+                exception and warning reporting. 
+        \
+        }
+        \
+        {NOTE:: This attribute only provides a mechanism for programer 
+                to know what is occuring; for reporting error to end 
+                user, DOM application should implement its own 
+                mechanism with localized message.
+        \
+        }
+    @@Get:
+      @@@Type:
+        DISLang:String::ManakaiDOM:all
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          An error message written in <CODE::i-default> language.
+      @@@PerlDef:
+          my $template;
+          if (defined $self->{<Q::MDOMX:subtype>} and
+              defined $self->{<H::ecore:def>}->{<Q::MDOMX:subtype>}
+                   ->{$self->{<Q::MDOMX:subtype>}}
+                   ->{<Q::MUError:description>}) {
+            $template = $self->{<H::ecore:def>}
+                   ->{<Q::MDOMX:subtype>}
+                   ->{$self->{<Q::MDOMX:subtype>}}
+                   ->{<Q::MUError:description>};
+          } elsif (defined $self->{<H::ecore:def>}
+                   ->{<Q::MUError:description>}) {
+            $template = $self->{<H::ecore:def>}
+                   ->{<Q::MUError:description>};
+          } else {
+            $template = $self->{<H::ecore:type>};
+          }
+          $r = $self->_FORMATTER_PACKAGE_->new
+                    ->replace ($template, param => $self);
+
+  @Method:
+    @@Operator:
+      @@@@:
+        DISPerl:AsStringMethod
+      @@@ContentType: DISCore|QName
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Generates a simple string that describes what kind of error 
+        has occured, written in the <CODE::i-default> language. 
+        \
+        {NOTE:: The <PerlModule::Message::Util::Error> module defines 
+                a generic definition of the method and it is overriden 
+                here for the purpose of manakai DOM's exception system. 
+        \
+        }
+    @@Return:
+      @@@Type:
+        DISLang:String::ManakaiDOM:all
+      @@@PerlDef:
+        $r = $self->SUPER::stringify;
+        if (defined $self->{<Q::MDOMX:class>}) {
+          if (defined $self->{<Q::MDOMX:method>}) {
+            $r = $self->{<Q::MDOMX:class>} . '->' .
+                 $self->{<Q::MDOMX:method>} . ': ' . $r;
+          } elsif (defined $self->{<Q::MDOMX:attr>}) {
+            $r = $self->{<Q::MDOMX:class>} . '->' .
+                 $self->{<Q::MDOMX:attr>} . ' (' .
+                 $self->{<Q::MDOMX:on>} . '): ' . $r;
+          } else {
+            $r = $self->{<Q::MDOMX:class>} . ': ' . $r;
+          }
+        }
+        if (defined $self->{<Q::MDOMX:param-name>}) {
+          $r = 'Parameter "' . $self->{<Q::MDOMX:param-name>} . '": ' . $r;
+        }
+
+  @Attr:
+    @@Name: code
+    @@enDesc:
+      A numeric exception code that identifies the kind of 
+      the error.  It should be equal to one of constant values
+      defined as members of the exception interface that the
+      object implements. 
+    @@Type: 
+      DOMMain:unsigned-short::ManakaiDOM:all
+    @@Get:
+      @@@PerlDef:
+        $r = $self->{<H::ecore:def>}->{<Q::DOMCore:code>};
+
+  @Attr:
+    @@Name: value
+    @@Operator:
+      @@@@: 0+
+      @@@ContentType: lang|Perl
+    @@enDesc:
+      A numeric exception code that identifies the kind of 
+      the error.
+
+      {NOTE:: This attribute always has the same value as 
+              <A::ManakaiDOM:ManakaiDOMExceptionOrWarning.code>.
+      }
+    @@Type: DOMMain|unsigned-short||ManakaiDOM|all
+    @@Get:
+      @@@PerlDef:
+        $r = $self->{<H::ecore:def>}->{<Q::DOMCore:code>};
+
+  @Attr:
+    @@Name: type
+    @@enDesc:
+      The type of the error, i.e. the local name of the constant
+      function whose value is the numeric exception code of the error.
+    @@Type: DISLang|String||ManakaiDOM|all
+    @@Get:
+      @@@PerlDef:
+        $r = $self->{-type};
+
+  @Attr:
+    @@Name: subtype
+    @@enDesc:
+      The subtype of the error.
+    @@Type: DISLang|String||ManakaiDOM|all
+    @@Get:
+      @@@enDesc:
+        A URI reference that identifies the subtype.
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@enDesc:
+          The error has no subtype information.
+      @@@PerlDef:
+        $r = $self->{<Q::MDOMX:subtype>};
 ##Exception
 
 ResourceDef:
