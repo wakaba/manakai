@@ -44,7 +44,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/10/09 13:57:12 $
+      $Date: 2005/11/15 03:12:55 $
     @@ContentType:
       dis:Date.RCS
   
@@ -145,6 +145,8 @@ Namespace:
     http://www.w3.org/1999/02/22-rdf-syntax-ns#
   @rdfs:
     http://www.w3.org/2000/01/rdf-schema#
+  @test:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Test#
   @ty:
     http://suika.fam.cx/~wakaba/archive/2005/7/tutorial#
   @Util:
@@ -707,12 +709,37 @@ StringDataTypeDef:
         not checked; bad input will produce bad output.
     @@PerlDef:
       my @out;
-      for my $fname (keys %{$IN}) {
-        for my $fver (keys %{$IN->{$fname}}) {
-          push @out, $fname . ' ' . $fver . ' ' if $IN->{$fname}->{$fver};
+      for my $fname (sort {$a cmp $b} keys %{$IN}) {
+        for my $fver (sort {$a cmp $b} keys %{$IN->{$fname}}) {
+          push @out, $fname;
+          push @out, $fver if length $fver;
         }
       }
       $OUT = join ' ', @out;
+
+    @@Test:
+      @@@PerlDef:
+        my $in = {
+          core => {"3.0" => true, "1.0" => true},
+          xml => {"" => true},
+        };
+        my $out;
+
+        __CODE{DOMMain|stringifyFeatures::
+          $IN => $in,
+          $OUT => $out,
+        }__;
+
+        $test->assert_string
+                 (actual_value => $out,
+                  expected_value => "core 1.0 core 3.0 xml");
+
+ElementTypeBinding:
+  @Name: Test
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: test|StandaloneTest
 
 ResourceDef:
   @QName: 

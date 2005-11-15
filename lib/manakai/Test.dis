@@ -1,0 +1,105 @@
+Module:
+  @QName: DIS|Test
+  @enFN:
+    <QUOTE::dis> Testing Module
+  @Namespace:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Test#
+
+  @DISCore:author: DISCore|Wakaba
+  @Date:
+    $Date: 2005/11/15 03:13:00 $
+  @License: license|Perl+MPL
+  
+  @DefaultFor: ManakaiDOM|all
+  @Require:
+    @@Module:
+      @@@QName: DIS|DISLang
+
+Namespace:
+  @DIS:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/
+  @dis:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
+  @DISCore:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Core#
+  @infoset:
+    http://www.w3.org/2001/04/infoset#
+  @is:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/XML#
+  @kwd:
+    http://suika.fam.cx/~wakaba/archive/2005/rfc2119/
+  @lang:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
+  @license:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
+  @ManakaiDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
+  @rdf:
+    http://www.w3.org/1999/02/22-rdf-syntax-ns#
+  @rdfs:
+    http://www.w3.org/2000/01/rdf-schema#
+  @test:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Test#
+
+## -- Test
+
+ResourceTypeDef:
+  @QName: test|Test
+  @enFN: Test
+
+## -- Standalone test
+
+ResourceTypeDef:
+  @QName: test|StandaloneTest
+  @enFN: Standalone test
+  @rdfs:subClassOf: DISCore|AnyDefContainer
+  @subsetOf: DISCore|AnyDefContainer
+  @rdfs:subClassOf: test|Test
+  @subsetOf: test|Test
+
+ElementTypeBinding:
+  @Name: ResourceTypeDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdfs:subClassOf: rdfs|Class
+    @@subsetOf: rdfs|Class
+    @@rdf:type: rdfs|Class
+
+ElementTypeBinding:
+  @Name: PropDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: rdf|Property
+
+ElementTypeBinding:
+  @Name: RPropDef:
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: rdf|Property
+    @@rdf:type: DISSource|Property
+
+ElementTypeBinding:
+  @Name: SPropDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: rdf|Property
+    @@rdf:type: DISSource|Property
+    @@rdf:type: DISSource|ResourceProperty
+
+ElementTypeBinding:
+  @Name: enDesc
+  @ElementType:
+    dis:Description
+  @ShadowContent:
+    @@lang:en
+
+ElementTypeBinding:
+  @Name: enFN
+  @ElementType:
+    dis:FullName
+  @ShadowContent:
+    @@lang:en

@@ -428,6 +428,7 @@ throw
 ;
 } else {
 ## TODO: Implement warning reporting
+warn ref $err;
   warn $err->stringify;
 }
 #line 1 "lib/Message/Util/Error/DOMException.dis [/u] (Chunk #170)"

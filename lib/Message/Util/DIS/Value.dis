@@ -18,7 +18,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/10/06 10:53:38 $
+      $Date: 2005/11/15 03:13:00 $
     @@ContentType:
       dis:Date.RCS
   
@@ -339,7 +339,7 @@ IFClsDef:
         my $class = <ClassName::ManakaiDVValue>;
         for ($baseType, $dataType) {
           $class = {
-            <Q::dis:TypeQName> => <ClassName::ManakaiDVQNameValue>,
+            <Q::DISCore:QName> => <ClassName::ManakaiDVQNameValue>,
             <Q::DISCore:URI> => <ClassName::ManakaiDVURIValue>,
             <Q::lang:Perl> => <ClassName::ManakaiDVNSValue>,
             <Q::lang:dis> => <ClassName::ManakaiDVSWCFGElement>,
@@ -393,7 +393,6 @@ IFClsDef:
         my $class = <ClassName::ManakaiDVValue>;
         for ($baseType, $dataType) {
           $class = {
-            <Q::dis:TypeQName> => <ClassName::ManakaiDVQNameValue>,
             <Q::DISCore:QName> => <ClassName::ManakaiDVQNameValue>,
             <Q::DISCore:URI> => <ClassName::ManakaiDVURIValue>,
             <Q::lang:Perl> => <ClassName::ManakaiDVNSValue>,
@@ -439,7 +438,6 @@ IFClsDef:
         my $class = <ClassName::ManakaiDVOrderedList>;
         for ($baseType, $dataType) {
           $class = {
-            <Q::dis:TypeQName> => <ClassName::ManakaiDVQNameOrderedList>,
             <Q::DISCore:QName> => <ClassName::ManakaiDVQNameOrderedList>,
             <Q::DISCore:URI> => <ClassName::ManakaiDVURIOrderedList>,
             <Q::lang:dis> => <ClassName::ManakaiDVSWCFGElementOrderedList>,
@@ -479,7 +477,6 @@ IFClsDef:
         my $class = <ClassName::ManakaiDVUnorderedList>;
         for ($baseType, $dataType) {
           $class = {
-            <Q::dis:TypeQName> => <ClassName::ManakaiDVQNameUnorderedList>,
             <Q::DISCore:QName> => <ClassName::ManakaiDVQNameUnorderedList>,
             <Q::DISCore:URI> => <ClassName::ManakaiDVURIUnorderedList>,
           }->{$_} || $class;

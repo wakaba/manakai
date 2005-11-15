@@ -56,9 +56,12 @@ DIS_CORE_DIS_FILES_DIS = DIS/Perl.dis DIS/Value.dis DIS/DNLite.dis
 DIS_CORE_DIS_FILES     = $(DIS_CORE_DIS_FILES_) $(DIS_CORE_DIS_FILES_DIS)
 DIS_DOC_DIS_FILES      = DIS/DISDoc.dis
 DIS_DUMP_DIS_FILES     = DIS/DISDump.dis
+DIS_TEST_DIS_FILES     = DIS/Test$(DIS_SUFFIX)
 PC_DIS_FILES           = PerlCode$(DIS_SUFFIX)
+UTIL_DIS_COMMON_DIS_FILE = DIS/common$(DIS_SUFFIX)
 DIS_FILES = $(UTIL_CORE_DIS_FILES) $(DIS_CORE_DIS_FILES) \
-  $(DIS_DOC_DIS_FILES) $(DIS_DUMP_DIS_FILES) $(PC_DIS_FILES)
+  $(DIS_DOC_DIS_FILES) $(DIS_DUMP_DIS_FILES) $(DIS_TEST_DIS_FILES) \
+  $(PC_DIS_FILES) $(UTIL_DIS_COMMON_DIS_FILE)
 
 GENERATED_FILES = \
   core$(DAC_SUFFIX)     ManakaiNode$(PM_SUFFIX) Error/DOMException$(PM_SUFFIX) \
@@ -67,8 +70,10 @@ GENERATED_FILES = \
                         DIS/Perl$(PM_SUFFIX) DIS/Value$(PM_SUFFIX) \
                         DIS/DNLite$(PM_SUFFIX) \
   disdoc$(DAC_SUFFIX)   DIS/DISDoc$(PM_SUFFIX) \
-  disdump$(DAC_SUFFIX)  DIS/DISDump$(PM_SUFFIX)
-GENERATED_DAC_FILES = core$(DAC_SUFFIX) discore$(DAC_SUFFIX) disdoc$(DAC_SUFFIX)
+  disdump$(DAC_SUFFIX)  DIS/DISDump$(PM_SUFFIX) \
+  distest$(DAC_SUFFIX)  DIS/Test$(PM_SUFFIX)
+GENERATED_DAC_FILES = core$(DAC_SUFFIX) discore$(DAC_SUFFIX) \
+  disdoc$(DAC_SUFFIX) disdump$(DAC_SUFFIX) distest$(DAC_SUFFIX)
 
 all: PerlCode$(PM_SUFFIX) .discore$(PM_SUFFIX) $(GENERATED_FILES)
 
@@ -80,14 +85,21 @@ core$(DAC_SUFFIX): $(CORE_DAC_FILE) $(UTIL_CORE_DIS_FILES) $(DAC_PL)
 pc$(DAC_SUFFIX): $(SWCFG_DAC_FILE) $(PC_DIS_FILES) $(DAC_PL)
 	$(DAC)$@ --input-db-file-name="$<" PerlCode$(DIS_SUFFIX)
 
-discore$(DAC_SUFFIX): pc$(DAC_SUFFIX) $(DIS_CORE_DIS_FILES) $(DAC_PL)
+discore$(DAC_SUFFIX): pc$(DAC_SUFFIX) $(DIS_CORE_DIS_FILES) $(DAC_PL) \
+  $(UTIL_DIS_COMMON_DIS_FILE)
 	$(DAC)$@ --input-db-file-name="$<" DIS/DNLite.dis
 
-disdoc$(DAC_SUFFIX): discore$(DAC_SUFFIX) $(DIS_DOC_DIS_FILES) $(DAC_PL)
+disdoc$(DAC_SUFFIX): discore$(DAC_SUFFIX) $(DIS_DOC_DIS_FILES) $(DAC_PL) \
+  $(UTIL_DIS_COMMON_DIS_FILE)
 	$(DAC)$@ --input-db-file-name="$<" DIS/DISDoc.dis
 
-disdump$(DAC_SUFFIX): $(DOM_CORE_DAC_FILE) $(DIS_DUMP_DIS_FILES) $(DAC_PL)
+disdump$(DAC_SUFFIX): $(DOM_CORE_DAC_FILE) $(DIS_DUMP_DIS_FILES) $(DAC_PL) \
+  $(UTIL_DIS_COMMON_DIS_FILE)
 	$(DAC)$@ --input-db-file-name="$<" DIS/DISDump.dis
+
+distest$(DAC_SUFFIX): $(DOM_CORE_DAC_FILE) $(DIS_TEST_DIS_FILES) $(DAC_PL) \
+  $(UTIL_DIS_COMMON_DIS_FILE)
+	$(DAC)$@ --input-db-file-name="$<" DIS/Test.dis
 
 ManakaiNode$(PM_SUFFIX): core$(DAC_SUFFIX) $(DAC2PM_PL)
 	$(DAC2PM) $< \
@@ -174,6 +186,12 @@ DIS/DISDoc$(PM_SUFFIX): disdoc$(DAC_SUFFIX) $(DAC2PM_PL)
 DIS/DISDump$(PM_SUFFIX): disdump$(DAC_SUFFIX) $(DAC2PM_PL)
 	$(DAC2PM) $< \
 	  --module-uri="$(NS_UTIL_DIS)DISDump" \
+	  --output-file-path="$@"
+	$(PERL_CHK) $@
+
+DIS/Test$(PM_SUFFIX): distest$(DAC_SUFFIX) $(DAC2PM_PL)
+	$(DAC2PM) $< \
+	  --module-uri="$(NS_UTIL_DIS)Test" \
 	  --output-file-path="$@"
 	$(PERL_CHK) $@
 

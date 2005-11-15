@@ -1,3 +1,20 @@
+2005-11-15  Wakaba  <wakaba@suika.fam.cx>
+
+	* Makefile: Rules to make |DIS/Test.pm| added. |DIS/common.dis| rules
+	added.
+
+	* DIS.dis (DIS:): Removed (moved to |DIS/common.dis|).
+
+2005-11-13  Wakaba  <wakaba@suika.fam.cx>
+
+	* PerlCode.dis (PCList, PCArrayRefLiteral, PCHashRefLiteral):
+	New interfaces.
+	(createPCLiteral, appendNewPCLiteral): New methods.
+	(PCDocument): New interface.
+	(factory methods): Namespace URI and local name of document
+	element arguments added to |createDocument| to obtain
+	an instance of |PCDocument|.
+
 2005-10-16  Wakaba  <wakaba@suika.fam.cx>
 
 	* PerlCode.dis (pc:line): New configuration parameter.

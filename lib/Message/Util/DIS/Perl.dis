@@ -19,11 +19,13 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/11/13 04:45:07 $
+      $Date: 2005/11/15 03:12:57 $
     @@ContentType:
       dis:Date.RCS
   
   @Require:
+    @@Module:
+      @@@QName: DIS|common
     @@Module:
       @@@QName: Util|DIS
       @@@WithFor: DIS|ForLatest
@@ -373,7 +375,7 @@ IFClsDef:
         }
 
         $r->{<H::dp|dbModuleResolver>} = $moduleResolver;
-##DISImplementationPerl
+##DISImplementationPer
 
 ## -- SWCFG nodes
 
@@ -3401,6 +3403,11 @@ IFClsDef:
                                          .plFullyQualifiedName>;
               if (defined $spack_name) {
                 $r-><M::DIS|PLPack.addISAPackage> ($spack_name);
+              } else {
+                __UNDEEP{__EXCEPTION{DIS|NO_PERL_PACKAGE_NAME_ERR::
+                  DIS:uri => {$scls-><AG::DIS|DISAnyResource.uri>},
+                  DIS:elementType => {<Q::dis:ISA>},
+                }__}__;
               }
               $self-><M::ManakaiDISResourcePerl.plAddRequireResource>
                                                   ($scls => $r);

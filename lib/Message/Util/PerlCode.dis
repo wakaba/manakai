@@ -25,7 +25,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2005/11/13 04:45:06 $
+      $Date: 2005/11/15 03:12:57 $
     @@ContentType:
       dis:Date.RCS
   
@@ -649,6 +649,9 @@ IFClsETDef:
   @IFQName: PerlFile
   @CQName: ManakaiPCFile
   @ETQName: pc|file
+  @QName:
+    @@@: pc|file
+    @@ForCheck: s|ForML
 
   @IFISA: PerlCode
 
@@ -1529,6 +1532,7 @@ IFClsETDef:
             blockContainer => true,
             inlineUnparsed => 1, variable => 1, tokens => 1, atom => 1,
             inlineContainer => 1, stringLiteral => 1, assignment => 1,
+            list => true, arrayRefLiteral => true, hashRefLiteral => true,
           }->{$codeArg-><AG::Node.localName>}) {
             if ($codeArg-><AG::Node.parentNode>) {
               __EXCEPTION{IN_USE_NODE_ERR::
@@ -1688,6 +1692,7 @@ IFClsETDef:
             if ({
               atom => 1, tokens => 1, inlineContainer => 1, assignment => true,
               inlineUnparsed => 1, variable => 1, stringLiteral => true,
+              list => true, arrayRefLiteral => true, hashRefLiteral => true,
             }->{$arg->[1]-><AG::Node.localName>}) {
               if ($arg->[1]-><AG::Node.parentNode>) {
                 __EXCEPTION{IN_USE_NODE_ERR::
@@ -2055,6 +2060,256 @@ IFClsETDef:
 ##PerlStringLiteral
 
 IFClsETDef:
+  @IFQName: PCList
+  @CQName: ManakaiPCList
+  @ETQName: pc|list
+
+  @IFISA: PerlCode
+  @CISA: ManakaiPerlCode
+
+  @enDesc:
+    A <IF::PCList> is a Perl list, i.e. <CHAR::COMMA> separated
+    list of values.
+
+  @Method:
+    @@Name: item
+    @@enDesc:
+      Returns the <P::index>th item in the list.
+    @@Param:
+      @@@Name: index
+      @@@Type: unsignedLong
+      @@@enDesc:
+        The ordinal index of the item.
+    @@Return:
+      @@@Type: PerlCodeInlines
+      @@@enDesc:
+        The <P::index>th item in the list.
+      @@@nullCase:
+        @@@@enDesc:
+          Either <P::index> is negative or the <P::index> is 
+          greater than the number of the items in the list.
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><AG::Node.childNodes>-><M::NodeList.item> ($index);
+        }__;
+
+  @Attr:
+    @@Name: length
+    @@enDesc:
+      The number of items in the list.
+    @@Type: unsignedLong
+    @@Get:
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><AG::Node.childNodes>-><AG::NodeList.length>;
+        }__;
+
+  @ToStringMethod:
+    @@Return:
+      @@@Type: DOMString
+      @@@enDesc:
+        Perl code. 
+      @@@PerlDef:
+        __DEEP{
+          my @r = map {$_->stringify} @{$self-><AG::Node.childNodes>};
+          $r = '(' . join (', ', @r) . ')';
+        }__;
+##PCList
+
+IFClsETDef:
+  @IFQName: PCArrayRefLiteral
+  @CQName: ManakaiPCArrayRefLiteral
+  @ETQName: pc|arrayRef
+
+  @IFISA: PerlCode
+  @CISA: ManakaiPerlCode
+
+  @enDesc:
+    A <IF::PCArrayRefLiteral> is a Perl array reference literal.
+
+  @Method:
+    @@Name: item
+    @@enDesc:
+      Returns the <P::index>th item in the list.
+    @@Param:
+      @@@Name: index
+      @@@Type: unsignedLong
+      @@@enDesc:
+        The ordinal index of the item.
+    @@Return:
+      @@@Type: PerlCodeInlines
+      @@@enDesc:
+        The <P::index>th item in the list.
+      @@@nullCase:
+        @@@@enDesc:
+          Either <P::index> is negative or the <P::index> is 
+          greater than the number of the items in the list.
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><AG::Node.childNodes>-><M::NodeList.item> ($index);
+        }__;
+
+  @Attr:
+    @@Name: length
+    @@enDesc:
+      The number of items in the list.
+    @@Type: unsignedLong
+    @@Get:
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><AG::Node.childNodes>-><AG::NodeList.length>;
+        }__;
+
+  @ToStringMethod:
+    @@Return:
+      @@@Type: DOMString
+      @@@enDesc:
+        Perl code. 
+      @@@PerlDef:
+        __DEEP{
+          my @r = map {$_->stringify} @{$self-><AG::Node.childNodes>};
+          $r = '[' . join (', ', @r) . ']';
+        }__;
+##PCArrayRefLiteral
+
+IFClsETDef:
+  @IFQName: PCHashRefLiteral
+  @CQName: ManakaiPCHashRefLiteral
+  @ETQName: pc|hashRef
+
+  @IFISA: PerlCode
+  @CISA: ManakaiPerlCode
+
+  @enDesc:
+    A <IF::PCHashRefLiteral> is a Perl hash reference literal.
+
+  @Method:
+    @@Name: key
+    @@enDesc:
+      Returns the <P::index>th key in the list.
+
+        {NOTE:: Although the order of key-value pairs is
+                preserved in the object, it is not preserved
+                in Perl source codes and in Perl language.
+        }
+    @@Param:
+      @@@Name: index
+      @@@Type: unsignedLong
+      @@@enDesc:
+        The ordinal index of the key.
+    @@Return:
+      @@@Type: PerlCodeInlines
+      @@@enDesc:
+        The <P::index>th key in the list.
+      @@@nullCase:
+        @@@@enDesc:
+          Either <P::index> is negative or the <P::index> is 
+          greater than the number of the keys in the list.
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><AG::Node.childNodes>-><M::NodeList.item> ($index * 2);
+        }__;
+
+  @Method:
+    @@Name: value
+    @@enDesc:
+      Returns the <P::index>th value in the list.
+
+        {NOTE:: Although the order of key-value pairs is
+                preserved in the object, it is not preserved
+                in Perl source codes and in Perl language.
+        }
+    @@Param:
+      @@@Name: index
+      @@@Type: unsignedLong
+      @@@enDesc:
+        The ordinal index of the value.
+    @@Return:
+      @@@Type: PerlCodeInlines
+      @@@enDesc:
+        The <P::index>th value in the list.
+      @@@nullCase:
+        @@@@enDesc:
+          Either <P::index> is negative or the <P::index> is 
+          greater than the number of the values in the list.
+
+            {NOTE:: <MATH::<A::PCHashRefLiteral.length> - 1>th
+                    value might not be found.
+            }
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><AG::Node.childNodes>-><M::NodeList.item> ($index * 2 + 1);
+        }__;
+
+  @Attr:
+    @@Name: length
+    @@enDesc:
+      The number of key-value pairs in the list.
+    @@Type: unsignedLong
+    @@Get:
+      @@@PerlDef:
+        __DEEP{
+          my $length = $self-><AG::Node.childNodes>-><AG::NodeList.length>;
+          $r = int ($length / 2) + ($length % 2);
+        }__;
+
+  @Method:
+    @@Name: setNamedItem
+    @@enDesc:
+      Set a named item.
+    @@Param:
+      @@@Name: key
+      @@@Type: DOMString
+      @@@enDesc:
+        The key.
+    @@Param:
+      @@@Name: value
+      @@@Type: PerlCodeInlines
+      @@@enDesc:
+        The value.
+    @@Return:
+      @@@PerlDef:
+        __DEEP{
+          my @children = @{$self-><AG::Node.childNodes>};
+          R: {
+            while (@children) {
+              my $ckey = shift @children;
+              my $cval = shift @children;
+              if ($ckey-><AG::Node.textContent> eq $key) {
+                $self-><M::Node.replaceChild> ($value, $cval);
+                last R;
+              }
+            }
+
+            $self-><M::Node.appendChild>
+              ($self-><AG::Node.ownerDocument>
+                    -><M::Document.createElementNS>
+                        (<Q::pc:>, 'stringLiteral'))
+                 -><AS::Node.textContent> ($key);
+            $self-><M::Node.appendChild> ($value);
+          } # R
+        }__;
+
+  @ToStringMethod:
+    @@Return:
+      @@@Type: DOMString
+      @@@enDesc:
+        Perl code. 
+      @@@PerlDef:
+        __DEEP{
+          my %r = map {$_->stringify} @{$self-><AG::Node.childNodes>};
+                  ## Different values with same key are not preserved.
+          $r = '{' . join (', ', map {$_ => $r{$_}}
+                                 sort {$a cmp $b} keys %r) . '}';
+        }__;
+##PCHashRefLiteral
+
+ResourceDef:
+  @QName: unsignedLong
+  @AliasFor: idl|unsignedLong||ManakaiDOM|all
+  @For: ManakaiDOM|DOM
+
+IFClsETDef:
   @IFQName: PerlTokens
   @CQName: ManakaiPCTokens
   @ETQName: pc|tokens
@@ -2260,6 +2515,25 @@ IFClsDef:
           }__;
 
   @Method:
+    @@Name: appendNewPCLiteral
+    @@enDesc:
+      Creates a <IF::PCLiteral> object and appends it to the node.
+    @@Param:
+      @@@Name: value
+      @@@Type: DISPerl|Any
+      @@@enDesc: The value.
+    @@Return:
+      @@@Type: PerlCode
+      @@@enDesc:
+        The newly created object.
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><AG::Node.ownerDocument>
+                    -><M::PCDocument.createPCLiteral> ($value);
+          $self-><M::Node.appendChild> ($r);
+        }__;
+
+  @Method:
     @@Name: appendAtom
     @@enDesc:
       Appends a Perl atomic code fragment.
@@ -2332,6 +2606,7 @@ IFClsDef:
             if ({
               atom => 1, tokens => 1, inlineContainer => 1, assignment => true,
               inlineUnparsed => 1, variable => 1, stringLiteral => true,
+              list => true, arrayRefLiteral => true, hashRefLiteral => true,
             }->{$arg->[1]-><AG::Node.localName>}) {
               if ($arg->[1]-><AG::Node.parentNode>) {
                 __EXCEPTION{IN_USE_NODE_ERR::
@@ -2387,7 +2662,7 @@ IFClsETDef:
   @CISA: ManakaiPCCodeUnits
 
   @enDesc:
-    Unparsed Perl inline code block.   
+    Perl inline code block.   
 
   @Method:
     @@Name: appendCodeFragment
@@ -2413,6 +2688,7 @@ IFClsETDef:
           if ({
             atom => 1, tokens => 1, inlineContainer => 1, assignment => true,
             inlineUnparsed => 1, variable => 1, stringLiteral => true,
+            list => true, arrayRefLiteral => true, hashRefLiteral => true,
           }->{$codeArg-><AG::Node.localName>}) {
             if ($codeArg-><AG::Node.parentNode>) {
               __EXCEPTION{IN_USE_NODE_ERR::
@@ -2527,6 +2803,8 @@ IFClsETDef:
                            $sfile,
                            $file ? $file-><M::PerlFile.getNextChunkNumber> : 0
                   if 2 < length $r;
+              } else {
+                $r = "\n{\n$r\n;}\n" if 2 < length $r;
               }
             }__;
           }
@@ -2948,6 +3226,69 @@ ElementTypeBinding:
     @@For: =ManakaiDOM|all
     @@Type: idl|boolean||ManakaiDOM|all
 
+## -- PCDocument
+
+IFClsDef:
+  @IFQName: PCDocument
+  @CQName: ManakaiPCDocument
+
+  @IFISA: Document
+  @CISA: DOMCore|ManakaiDOMDocument
+
+  @enDesc:
+    A <IF::PCDocument> is a <IF::Document> that represents a Perl code.
+
+  @s:rootElementType: pc|file
+
+  @Method:
+    @@Name: createPCLiteral
+    @@enDesc:
+      Creates a literal object.
+    @@Param:
+      @@@Name: value
+      @@@Type: DISPerl|Any
+      @@@enDesc:
+        The value.
+      @@@InCase:
+        @@@@Type: DISPerl|StringValue
+        @@@@enDesc:
+          A <IF::PerlStringLiteral> whose value is <P::value> is created.
+      @@@InCase:
+        @@@@Type: DISPerl|ARRAY
+        @@@@enDesc:
+          A <IF::PCArrayRefLiteral> is created.  If <P::value>
+          has items, then objects are recursively created.
+      @@@InCase:
+        @@@@Type: DISPerl|HASH
+        @@@@enDesc:
+          A <IF::PCHashRefLiteral> is created.  If <P::value>
+          has key-value pairs, then objects are recursively created.
+    @@Return:
+      @@@Type: PerlCode
+      @@@enDesc: The newly created value object.
+      @@@PerlDef:
+        __DEEP{
+          if (ref $value eq 'HASH' or ref $value eq 'ARRAY') {
+            $r = $self-><M::Document.createElementNS>
+                     (<Q::pc:>, ref $value eq 'HASH' ? 'hashRefLiteral'
+                                                     : 'arrayRefLiteral');
+            for my $v (ref $value eq 'HASH' ? %$value : @$value) {
+              my $vo;
+              if (UNIVERSAL::isa ($v, <IFName::PerlCode>)) {
+                $vo = $v;
+              } else {
+                $vo = $self-><M::PCDocument.createPCLiteral> ($v);
+              }
+              $r-><M::Node.appendChild> ($vo);
+            }
+          } else {
+            $r = $self-><M::Document.createElementNS>
+                   (<Q::pc:>, 'stringLiteral');
+            $r-><AS::Node.textContent> ($value);
+          }
+        }__;
+##PCDocument
+
 ## -- Implementation
 
 IFClsDef:
@@ -2990,7 +3331,7 @@ IFClsDef:
         The newly created package scope object. 
       @@@PerlDef:
           __DEEP{
-            $r = $self-><M::DOMImpl.createDocument>
+            $r = $self-><M::DOMImpl.createDocument> (<Q::pc:>, 'file')
                       -><M::Document.createElementNS> (<Q::pc:>, 'package');
             $r-><AS::PerlPackage.packageName> ($packageName);
           }__;
@@ -3129,7 +3470,7 @@ IFClsDef:
         Newly created Perl subroutine object. 
       @@@PerlDef:
           __DEEP{
-            $r = $self-><M::DOMImpl.createDocument>
+            $r = $self-><M::DOMImpl.createDocument> (<Q::pc:>, 'file')
                       -><M::Document.createElementNS> (<Q::pc:>, 'sub');
             $r-><M::PerlSub.addPerlName> ($subName) if defined $subName;
           }__;
@@ -3152,7 +3493,7 @@ IFClsDef:
         Newly created Perl code object. 
       @@@PerlDef:
           __DEEP{
-            $r = $self-><M::DOMImpl.createDocument>
+            $r = $self-><M::DOMImpl.createDocument> (<Q::pc:>, 'file')
                       -><M::Document.createElementNS> (<Q::pc:>, 'unparsed');
             $r-><AS::Node.textContent> ($codeArg) if defined $codeArg;
           }__;
@@ -3167,7 +3508,7 @@ IFClsDef:
         Newly created Perl code object. 
       @@@PerlDef:
           __DEEP{
-            $r = $self-><M::DOMImpl.createDocument>
+            $r = $self-><M::DOMImpl.createDocument> (<Q::pc:>, 'file')
                   -><M::Document.createElementNS> (<Q::pc:>, 'inlineContainer');
           }__;
 
@@ -3189,7 +3530,7 @@ IFClsDef:
         Newly created Perl code object. 
       @@@PerlDef:
           __DEEP{
-            $r = $self-><M::DOMImpl.createDocument>
+            $r = $self-><M::DOMImpl.createDocument> (<Q::pc:>, 'file')
                    -><M::Document.createElementNS> (<Q::pc:>, 'inlineUnparsed');
             $r-><AS::Node.textContent> ($codeArg) if defined $codeArg;
           }__;
@@ -3209,7 +3550,7 @@ IFClsDef:
         Newly created Perl code object. 
       @@@PerlDef:
           __DEEP{
-            $r = $self-><M::DOMImpl.createDocument>
+            $r = $self-><M::DOMImpl.createDocument> (<Q::pc:>, 'file')
                       -><M::Document.createElementNS> (<Q::pc:>, 'tokens');
             $r-><AS::Node.textContent> ($codeArg) if defined $codeArg;
           }__;
@@ -3229,7 +3570,7 @@ IFClsDef:
         Newly created Perl code object. 
       @@@PerlDef:
           __DEEP{
-            $r = $self-><M::DOMImpl.createDocument>
+            $r = $self-><M::DOMImpl.createDocument> (<Q::pc:>, 'file')
                       -><M::Document.createElementNS> (<Q::pc:>, 'atom');
             $r-><AS::Node.textContent> ($codeArg) if defined $codeArg;
           }__;
@@ -3248,7 +3589,7 @@ IFClsDef:
         Newly created Perl code object. 
       @@@PerlDef:
           __DEEP{
-            $r = $self-><M::DOMImpl.createDocument>
+            $r = $self-><M::DOMImpl.createDocument> (<Q::pc:>, 'file')
                    -><M::Document.createElementNS> (<Q::pc:>, 'stringLiteral');
             $r-><AS::Node.textContent> ($stringArg);
           }__;
@@ -3290,7 +3631,7 @@ IFClsDef:
         Newly created Perl variable object. 
       @@@PerlDef:
           __DEEP{
-            $r = $self-><M::DOMImpl.createDocument>
+            $r = $self-><M::DOMImpl.createDocument> (<Q::pc:>, 'file')
                       -><M::Document.createElementNS> (<Q::pc:>, 'variable');
             if (not $variableType and not $packageName and
                 $localName =~ s/^(\\?[\$\@%&*])//) {
@@ -3313,7 +3654,7 @@ IFClsDef:
         Newly created Perl code object. 
       @@@PerlDef:
           __DEEP{
-            $r = $self-><M::DOMImpl.createDocument>
+            $r = $self-><M::DOMImpl.createDocument> (<Q::pc:>, 'file')
                       -><M::Document.createElementNS> (<Q::pc:>, 'block');
           }__;
 
@@ -3327,7 +3668,7 @@ IFClsDef:
         Newly created Perl code object. 
       @@@PerlDef:
           __DEEP{
-            $r = $self-><M::DOMImpl.createDocument>
+            $r = $self-><M::DOMImpl.createDocument> (<Q::pc:>, 'file')
                     -><M::Document.createElementNS> (<Q::pc:>, 'blockContainer');
           }__;
 
@@ -3349,7 +3690,7 @@ IFClsDef:
         The newly created Perl code object. 
       @@@PerlDef:
           __DEEP{
-            $r = $self-><M::DOMImpl.createDocument>
+            $r = $self-><M::DOMImpl.createDocument> (<Q::pc:>, 'file')
                       -><M::Document.createElementNS> (<Q::pc:>, 'statement');
             if (defined $codeArg) {
               $r-><M::PerlCodeUnits.appendBare> ($codeArg);
@@ -3396,6 +3737,7 @@ IFClsDef:
             if ({
               atom => 1, tokens => 1, inlineContainer => 1, assignment => true,
               inlineUnparsed => 1, variable => 1, stringLiteral => true,
+              list => true, arrayRefLiteral => true, hashRefLiteral => true,
             }->{$arg->[1]-><AG::Node.localName>}) {
               if ($arg->[1]-><AG::Node.parentNode>) {
                 __EXCEPTION{IN_USE_NODE_ERR::
@@ -3434,7 +3776,7 @@ IFClsDef:
           } # t/f
 
           __DEEP{
-            $r = $self-><M::DOMImpl.createDocument>
+            $r = $self-><M::DOMImpl.createDocument> (<Q::pc:>, 'file')
                       -><M::Document.createElementNS>
                             (<Q::pc:>, 'if');
             $r-><AS::PerlIf.condition> ($conditionArg) if $conditionArg;
@@ -3446,6 +3788,11 @@ IFClsDef:
 ResourceDef:
   @QName: DOMImpl
   @AliasFor: DOMCore|DOMImplementation
+  @For: ManakaiDOM|DOM
+
+ResourceDef:
+  @QName: NodeList
+  @AliasFor: DOMCore|NodeList
   @For: ManakaiDOM|DOM
 
 ResourceDef:

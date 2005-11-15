@@ -40,7 +40,7 @@ CORE_DAC_FILE = $(MANAKAI_LIB_DIR)manakai/all$(DAC_SUFFIX)
 
 DIS_FILES = DISCore.dis DISLang.dis DISRDF.dis DISIDL.dis \
   DISPerl.dis XML.dis DISMarkup.dis NaturalLanguage.dis Document.dis \
-  DISSource.dis Java.dis
+  DISSource.dis Java.dis Test.dis
 
 GENERATED_FILES = all$(DAC_SUFFIX)
 
@@ -50,11 +50,12 @@ all$(DAC_SUFFIX): $(DIS_FILES) $(DAC_PL)
 	$(DAC).$@.1.tmp DISPerl.dis
 	$(DAC).$@.2.tmp --input-db-file-name=".$@.1.tmp" DISMarkup.dis
 	$(DAC).$@.3.tmp --input-db-file-name=".$@.2.tmp" DISIDL.dis
-	$(DAC)$@ --input-db-file-name=".$@.3.tmp" NaturalLanguage.dis
-	$(RM) .$@.1.tmp .$@.2.tmp .$@.3.tmp
+	$(DAC).$@.4.tmp --input-db-file-name=".$@.3.tmp" Test.dis
+	$(DAC)$@ --input-db-file-name=".$@.4.tmp" NaturalLanguage.dis
+	$(RM) .$@.1.tmp .$@.2.tmp .$@.3.tmp .$@.4.tmp
 
 clean:
 	$(RM) $(GENERATED_FILES) .*.tmp *~ .*~
 
-## $Date: 2005/10/03 13:20:22 $
+## $Date: 2005/11/15 03:13:00 $
 ## License: Public Domain.
