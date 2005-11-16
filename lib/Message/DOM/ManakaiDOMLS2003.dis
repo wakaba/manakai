@@ -29,7 +29,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2005/10/09 13:57:14 $
+      $Date: 2005/11/16 10:07:13 $
     @@ContentType:
       dis:Date.RCS
 
@@ -82,7 +82,8 @@ Namespace:
     http://www.w3.org/1999/02/22-rdf-syntax-ns#
   @rdfs:
     http://www.w3.org/2000/01/rdf-schema#
-  @TreeCore:\
+  @test:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Test#
   @xml:
     http://www.w3.org/XML/1998/namespace
   @xmlns:
@@ -362,6 +363,25 @@ ResourceDef:
 
          $r->flag (<H::DOMCore:domConfig> => $self->{<H::mn:node>}
                                                  ->{<H::DOMCore:domConfig>});
+    
+    @@Test:
+      @@@enDesc:
+        Ensures that the parser created by the method is keeping 
+        flags required by the parser.
+      @@@PerlDef:
+        my $impl = <Class::ManakaiDOMImplementationLS2003>->_new;
+        my $parser = $impl-><M::ManakaiDOMImplementationLS2003.createLSParser>
+                               (<C::DOMLS:DOMImplementationLS.MODE_SYNCHRONOUS>);
+        $test->assert_not_null ($parser);
+
+        my $parser_impl = $parser->flag (<H::DOMCore:implementation>);
+        $test->assert_equals ($parser_impl, $impl);
+
+        my $parser_implid = $parser->flag (<H::ManakaiDOM:implID>);
+        $test->assert_equals ($parser_implid, 
+                              $impl->{<H::mn:node>}->{<H::ManakaiDOM:implID>});
+
+        ## TODO: Add test for |domConfig|
 
   @Method:
      @@Name:  createLSInput
@@ -380,8 +400,21 @@ ResourceDef:
       @@ImplNote:
          @@@lang:en
          @@@@:
-           See also <M:DOMImplementationLS.createLSInput>.
+           See also <M::DOMLS:DOMImplementationLS.createLSInput>.
+
+    @@Test:
+      @@@PerlDef:
+        my $impl = <Class::ManakaiDOMImplementationLS2003>->_new;
+        my $input = $impl-><M::ManakaiDOMImplementationLS2003.createLSInput>;
+        $test->assert_not_null ($input);
 ##DOMImplementationLS2003
+
+ElementTypeBinding:
+  @Name: Test
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: test|StandaloneTest
 
 ResourceDef:
   @QName: NodeStem
@@ -439,7 +472,7 @@ ResourceDef:
         @@@Type:  
           DOMCore:DOMConfiguration
         @@@PerlDef:
-            $r = $self->option (<H::DOMCore:domConfig>);
+            $r = $self->flag (<H::DOMCore:domConfig>);
   @Method:
      @@Name:  parse
      @@Description:
@@ -505,7 +538,7 @@ ResourceDef:
            \## TODO: support of domConfig
 
            my $node = <ClassM::DOMCore:ManakaiDOMDocument.newObject>;
-           $node->{<Q::DOMCore:implementation>}
+           $node->{<H::DOMCore:implementation>}
                 = $self->flag (<H::DOMCore:implementation>);
            $node->{<H::ManakaiDOM:implID>}
                 = $self->flag (<H::ManakaiDOM:implID>);
@@ -539,6 +572,26 @@ ResourceDef:
              }__;
            }
            $r = <ClassM::DOMCore:ManakaiDOMNode.getNodeReference> ($node);
+    
+    @@Test:
+      @@@enDesc:
+        The implementation object of the parsed document must
+        be the same object as the implementation that creates
+        the parser.
+      @@@PerlDef:
+        my $impl = <Class::ManakaiDOMImplementationLS2003>->_new;
+        my $parser = $impl-><M::ManakaiDOMImplementationLS2003.createLSParser>
+                               (<C::DOMLS:DOMImplementationLS.MODE_SYNCHRONOUS>);
+        $test->assert_not_null ($parser);
+
+        my $input = $impl-><M::ManakaiDOMImplementationLS2003.createLSInput>;
+        $input-><AS::DOMLS:LSInput.stringData> ('<'.'element/>');
+        
+        my $doc = $parser-><M::ManakaiXMLParser2003.parse> ($input);
+        $test->assert_not_null ($doc);
+
+        my $doc_impl = $doc-><AG::DOMCore:Document.implementation>;
+        $test->assert_equals ($doc_impl, $impl);
 
   @IntMethod:
     @@Name: toDOMNode

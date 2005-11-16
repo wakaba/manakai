@@ -189,6 +189,8 @@ sub skip_rest (%) {
     print $MSG test_comment "Skip: planned - count = $n\n";
     print $MSG test_comment $opt{msg};
   }
+  end_of_test ();
+  exit;
 } # skip_rest
 
 =item plan $n
@@ -466,7 +468,7 @@ sub assertEqualsCollection ($$$) {
     die qq["@{[ref $ex]}": Unsupported expected collection type];
   }
   my $exl = @$ex;
-  my $acl = $ac->length;
+  my $acl = @$ac;
   if ($exl != $acl) {
     is_not_ok (id => $id,
                value => 'length = '.$acl,
@@ -475,7 +477,7 @@ sub assertEqualsCollection ($$$) {
   for my $exi (@$ex) {
     my $n = 0;
     for (my $i = 0; $i < $acl; $i++) {
-      my $aci = $ac->item ($i);
+      my $aci = $ac->[$i];
       $n++ if $aci eq $exi;
     }
     if ($n != 1) {
@@ -535,4 +537,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2005/10/06 10:53:39 $
+1; # $Date: 2005/11/16 10:07:15 $

@@ -13,7 +13,7 @@ Module:
   @License: license|Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/11/15 14:18:24 $
+      $Date: 2005/11/16 10:07:14 $
     @@ContentType: dis|Date.RCS
   
   @Require:
@@ -428,10 +428,68 @@ IFClsDef:
         CORE::delete $self->{<H::dtest|uri>};
 
   @Method:
+    @@Name: assertTrue
+    @@enDesc:
+      If the <P::actualValue> is not <DOM::true> then the test fails.
+    @@Param:
+      @@@Name: actualValue
+      @@@Type: DISPerl|Any
+      @@@enDesc: The actual value.
+    @@Return:
+      @@@AErr:
+      @@@PerlDef:
+        if (not $actualValue) {
+          __DEEP{
+            $self-><M::DTManager.notOK>;
+          }__;
+          my $v;
+          __CODE{formatValue::
+            $input => $actualValue,
+            $output => $v,
+          }__;
+          __CODE{printComment::
+            $test => $self,
+            $s => {
+              'non-tr'.'ue value ('.$v.') is occurred where tr'.'ue is expected'
+            },
+          }__;
+          __EXCEPTION{ASSERTION_ERR}__;
+        }
+
+  @Method:
+    @@Name: assertFalse
+    @@enDesc:
+      If the <P::actualValue> is not <DOM::false> then the test fails.
+    @@Param:
+      @@@Name: actualValue
+      @@@Type: DISPerl|Any
+      @@@enDesc: The actual value.
+    @@Return:
+      @@@AErr:
+      @@@PerlDef:
+        if ($actualValue) {
+          __DEEP{
+            $self-><M::DTManager.notOK>;
+          }__;
+          my $v;
+          __CODE{formatValue::
+            $input => $actualValue,
+            $output => $v,
+          }__;
+          __CODE{printComment::
+            $test => $self,
+            $s => {
+             'non-fal'.'se value ('.$v.') is occurred where fal'.'se is expected'
+            },
+          }__;
+          __EXCEPTION{ASSERTION_ERR}__;
+        }
+
+  @Method:
     @@Name: assertNull
     @@enDesc:
       If the <P::actualValue> is not <DOM::null> then the test fails.
-    @@NamedParam:
+    @@Param:
       @@@Name: actualValue
       @@@Type: DISPerl|Any
       @@@enDesc: The actual value.
@@ -450,7 +508,7 @@ IFClsDef:
           __CODE{printComment::
             $test => $self,
             $s => {
-              'non-null value ('.$v.') is occurred where null is expected'
+              'non-nu'.'ll value ('.$v.') is occurred where nu'.'ll is expected'
             },
           }__;
           __EXCEPTION{ASSERTION_ERR}__;
@@ -460,7 +518,7 @@ IFClsDef:
     @@Name: assertNotNull
     @@enDesc:
       If the <P::actualValue> is <DOM::null> then the test fails.
-    @@NamedParam:
+    @@Param:
       @@@Name: actualValue
       @@@Type: DISPerl|Any
       @@@enDesc: The actual value.
@@ -474,7 +532,7 @@ IFClsDef:
           __CODE{printComment::
             $test => $self,
             $s => {
-              'null value is occurred where a non-null value is expected'
+              'nu'.'ll value is occurred where a non-nu'.'ll value is expected'
             },
           }__;
           __EXCEPTION{ASSERTION_ERR}__;
@@ -670,6 +728,24 @@ IFClsDef:
           }__;
           __EXCEPTION{ASSERTION_ERR}__;
         }
+
+  @Method:
+    @@Name: assertNever
+    @@enDesc:
+      Always the test fails.
+    @@Return:
+      @@@AErr:
+      @@@PerlDef:
+        __DEEP{
+          $self-><M::DTManager.notOK>;
+        }__;
+        __CODE{printComment::
+          $test => $self,
+          $s => {
+            'An ungeneral event occurred'
+          },
+        }__;
+        __EXCEPTION{ASSERTION_ERR}__;
 
   @Method:
     @@Operator:

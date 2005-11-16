@@ -16,7 +16,7 @@ This module is part of manakai.
 
 package Message::Markup::XML::Parser;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.22 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.23 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Char::Class::XML qw!InXML_NameStartChar InXMLNameChar InXMLChar
                         InXML_deprecated_noncharacter InXML_unicode_xml_not_suitable!;
 require Message::Markup::XML;
@@ -664,7 +664,7 @@ sub _parse_start_tag ($$\$$;%) {
       my $defval = $defattr->{attr}->{$_}->get_attribute ('default_value');
       if ($defval) {
         my ($attr_pfx, $attr_lname) = $self->_ns_parse_qname ($_);
-        if ($attr_pfx eq 'xmlns') {
+        if (defined $attr_pfx and $attr_pfx eq 'xmlns') {
           $c->{ns_specified}->{$attr_lname} = 0;
           my $ns_name = $defval->inner_text;
           $opt{entMan}->check_ns_uri ($o, $attr_lname => $ns_name) if length $ns_name;
@@ -1076,7 +1076,7 @@ sub _parse_rpdata ($$\$$;%) {
             $c->append_new_node (type => '#reference', value => ord $_,
                                  namespace_uri => $NS{SGML}.'char:ref'.(defined $1 ? ':hex' : ''));
           }
-          $self->_clp ((defined $1 ? '___':'__').$1 => $o);
+          $self->_clp ((defined $1 ? '___'.$1:'__'.$2) => $o);
         } elsif ($t =~ s/^&($xml_re{Name});//) {
           my ($entity_ref, $eref) = ($1, '&'.$1.';');
           $r .= $entity_ref;
@@ -2012,4 +2012,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2004/10/31 12:29:53 $
+1; # $Date: 2005/11/16 10:07:13 $

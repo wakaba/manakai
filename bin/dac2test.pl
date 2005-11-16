@@ -271,6 +271,9 @@ for (@{$Opt{create_module}}) {
       $pack->append_code ('try {');
 
       my $test_pc = $res->pl_code_fragment;
+      if (not defined $test_pc) {
+        die "Perl test code not defined for <".$res->uri.">";
+      }
 
       $pack->append_code_fragment ($test_pc);
 
@@ -360,4 +363,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2005/11/15 14:18:23 $
+1; # $Date: 2005/11/16 10:07:11 $

@@ -13,7 +13,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/10/03 13:20:22 $
+      $Date: 2005/11/16 10:07:15 $
     @@ContentType:
       dis:Date.RCS
   
@@ -1004,10 +1004,11 @@ ResourceDef:
       if (defined $given) {
         if (ref $given eq 'SCALAR') {
           $result = $given;
+        } elsif (defined $Message::Util::ManakaiStringRef::Value{$given}) {
+          $result = $Message::Util::ManakaiStringRef::Value{$given};
         } else {
           require Scalar::Util;
-          $result = ($Message::Util::ManakaiStringRef::Value{$given}
-                     ||= \($given));
+          $result = $Message::Util::ManakaiStringRef::Value{$given} = \($given);
           Scalar::Util::weaken ($Message::Util::ManakaiStringRef::Value{$given});
         }
       } else {

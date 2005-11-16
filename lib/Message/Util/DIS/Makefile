@@ -1,7 +1,7 @@
 PM_FILES = Value.pm Perl.pm DNLite.pm \
-  DISDump.pm DISDoc.pm
+  DISDump.pm DISDoc.pm Test.pm
 DIS_PM_FILES = DIS/Value.pm DIS/Perl.pm DIS/DNLite.pm \
-  DIS/DISDump.pm DIS/DISDoc.pm
+  DIS/DISDump.pm DIS/DISDoc.pm DIS/Test.pm
 
 all: dummy
 	cd .. && make $(DIS_PM_FILES)
@@ -14,5 +14,5 @@ dummy:
 clean:
 	cd .. && make clean
 
-## $Date: 2005/09/25 14:53:05 $
+## $Date: 2005/11/16 10:07:14 $
 ## License: Public Domain.

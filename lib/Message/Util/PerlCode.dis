@@ -25,7 +25,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2005/11/15 03:12:57 $
+      $Date: 2005/11/16 10:07:13 $
     @@ContentType:
       dis:Date.RCS
   
@@ -71,6 +71,8 @@ Namespace:
     http://www.w3.org/2000/01/rdf-schema#
   @s:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Markup#
+  @test:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Test#
   @Util:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/
 
@@ -1903,6 +1905,20 @@ IFClsETDef:
       @@@nullCase:
         @@@@enDesc:
           No prototype declaration. 
+
+    @@Test:
+      @@@ForCheck: ManakaiDOM|ForClass
+      @@@enDesc:
+        Getting value after setting empty value must return an empty string.
+      @@@PerlDef:
+        my $impl = <Class::ManakaiPCImplementation>->_new;
+        my $sub = $impl-><M::PCImplementation.createPerlSub> ("sub_name");
+        $test->assert_not_null ($sub);
+        
+        $sub-><AS::PerlSub.prototype> ('');
+        $test->assert_string (actual_value => $sub-><AG::PerlSub.prototype>,
+                              expected_value => '');
+        $test->assert_true ($sub->stringify =~ /^sub sub_name \(\)/);
   
   @ToStringMethod:
     @@Return:
@@ -1914,8 +1930,9 @@ IFClsETDef:
             $r = q<sub>;
             my $nm = $self-><M::PerlSub.getPerlNameList>;
             $r .= q< > . $nm->[0] if @$nm;
-            my $pt = $self-><AG::PerlSub.prototype>;
-            $r .= q< (> . $pt . q<)> if length $pt;
+            if ($self-><M::Element.hasAttributeNS> (<Q::pc:>, 'prototype')) {
+              $r .= q< (> . $self-><AG::PerlSub.prototype> . q<)>;
+            }
             $r .= qq< {\n>;
             for my $child (@{$self-><AG::Node.childNodes>}) {
               $r .= $child->stringify;
@@ -1931,6 +1948,13 @@ IFClsETDef:
             $r = 0 + $self-><AG::Node.lastChild>;
           }__;
 ##PCSub
+
+ElementTypeBinding:
+  @Name: Test
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: test|StandaloneTest
 
 XParamDef:
   @QName: parentNode
@@ -2065,7 +2089,7 @@ IFClsETDef:
   @ETQName: pc|list
 
   @IFISA: PerlCode
-  @CISA: ManakaiPerlCode
+  @CISA: ManakaiPCCode
 
   @enDesc:
     A <IF::PCList> is a Perl list, i.e. <CHAR::COMMA> separated
@@ -2122,7 +2146,7 @@ IFClsETDef:
   @ETQName: pc|arrayRef
 
   @IFISA: PerlCode
-  @CISA: ManakaiPerlCode
+  @CISA: ManakaiPCCode
 
   @enDesc:
     A <IF::PCArrayRefLiteral> is a Perl array reference literal.
@@ -2178,7 +2202,7 @@ IFClsETDef:
   @ETQName: pc|hashRef
 
   @IFISA: PerlCode
-  @CISA: ManakaiPerlCode
+  @CISA: ManakaiPCCode
 
   @enDesc:
     A <IF::PCHashRefLiteral> is a Perl hash reference literal.

@@ -40,7 +40,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/11/13 04:45:03 $
+      $Date: 2005/11/16 10:07:11 $
     @@ContentType:
       dis:Date.RCS
 
@@ -4855,8 +4855,7 @@ IFCls1Def:
             @@@@@lang:en
             @@@@@@: This node does not have any child node.
         @@@PerlDef:
-            $r = @{$self->{<H::mn:node>}->{<H::infoset:children>}}
-                   ? true : false;
+            $r = (@{$self->{<H::mn:node>}->{<H::infoset:children>}||[]} > 0)
 
   @Method:
     @@Name: cloneNode
@@ -9685,7 +9684,7 @@ NodeTypeDef:
         @@@@Description:
           @@@@@lang:en
           @@@@@@: An attempt is made to break surrogate pair.
-      @@@ImplNote:
+      @@@PerlDef:
         __DEEP{
           my $offset32 = <ClassM::DOMMain:ManakaiDOMStringExtend.findOffset32>
                             ($offset);
@@ -9764,7 +9763,7 @@ NodeTypeDef:
         @@@@Description:
           @@@@@lang:en
           @@@@@@: An attempt is made to break surrogate pair.
-      @@@ImplNote:
+      @@@PerlDef:
         if ($self->{<H::mn:node>}->{<H::DOMCore:read-only>}) {
           __EXCEPTION{
             MDOMX:NOMOD_THIS::
@@ -9773,8 +9772,8 @@ NodeTypeDef:
         __DEEP{
           my $offset32 = <ClassM::DOMMain:ManakaiDOMStringExtend.findOffset32>
                             ($offset);
-          substring ($self->{<H::mn:node>}->{<H::infoset:content>},
-                     $offset32, 0) = $arg;
+          substr ($self->{<H::mn:node>}->{<H::infoset:content>},
+                  $offset32, 0) = $arg;
         }__;
   @Method:
      @@Name:  deleteData
@@ -9825,7 +9824,7 @@ NodeTypeDef:
           @@@@@lang:en
           @@@@@@: 
             An attempt is made to break surrogate pair.
-      @@@ImplNote:
+      @@@PerlDef:
         if ($self->{<H::mn:node>}->{<H::DOMCore:read-only>}) {
           __EXCEPTION{
             MDOMX:NOMOD_THIS::
@@ -9893,7 +9892,7 @@ NodeTypeDef:
         @@@@Description:
           @@@@@lang:en
           @@@@@@: An attempt is made to break surrogate pair.
-      @@@ImplNote:
+      @@@PerlDef:
         if ($self->{<H::mn:node>}->{<H::DOMCore:read-only>}) {
           __EXCEPTION{
             MDOMX:NOMOD_THIS::
@@ -13471,8 +13470,8 @@ IFCls1Def:
           try {
             my $offset32 = <ClassM::DOMMain:ManakaiDOMStringExtend
                                    .findOffset32> ($offset);
-            $after = substring ($$ds, $offset32);
-            substring ($$ds, $offset32) = '';
+            $after = substr ($$ds, $offset32);
+            substr ($$ds, $offset32) = '';
           ## TODO: Catch StringIndexOutOfBoundsException
           };
           my $newNode;
