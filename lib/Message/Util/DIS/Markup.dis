@@ -1,0 +1,249 @@
+Module:
+  @QName:
+    DIS:Markup
+  @FullName:
+    @@lang: en
+    @@@:
+      <QUOTE::dis> Markup Vocabulary Description Module
+  @Namespace:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#Markup/
+  
+  @Description:
+    @@lang:en
+    @@@:
+      This module provides vocabulary to describe markup vocabularies.
+
+  @Author:
+    @@FullName: Wakaba
+    @@Mail: w@suika.fam.cx
+  @License:
+    @@@:
+      license:Perl+MPL
+    @@Original:
+      @@@FullName:
+        manakai <CODE::lib/manakai/dis.pl>
+      @@@Year:2004
+      @@@Author:
+        @@@@FullName:Wakaba
+        @@@@Mail:w@suika.fam.cx
+  @Date:
+    @@@:
+      $Date: 2005/11/16 10:34:53 $
+    @@ContentType:
+      dis:Date.RCS
+  
+  @Require:
+    @@Module:
+      @@@QName: DISlib|DISMarkup
+      @@@WithFor: ManakaiDOM|all
+
+  @DefaultFor: ManakaiDOM|all
+
+Namespace:
+  @dd:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#DISDoc/
+  @ddel:
+    http://suika.fam.cx/~wakaba/archive/2005/disdoc#
+  @DIS:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#
+  @dis:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
+  @dis2pm:
+    http://suika.fam.cx/~wakaba/archive/2004/11/8/dis2pm#
+  @DISlib:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/
+  @disPerl:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--Perl--
+  @DOMCore:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
+  @DOMException:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#
+  @DOMLS:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/ls#
+  @DOMMain:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/main#
+  @html3:
+    urn:x-suika-fam-cx:markup:ietf:html:3:draft:00:
+  @html5:
+    http://www.w3.org/1999/xhtml
+  @ilang:
+    urn:x-suika-fam-cx:lang:
+  @infoset:
+    http://www.w3.org/2001/04/infoset#
+  @lang:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
+  @license:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
+  @ManakaiDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
+  @Markup:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Markup#
+  @MDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
+  @MDOMX:
+    http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
+  @nl:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/NaturalLanguage#
+  @owl:
+    http://www.w3.org/2002/07/owl#
+  @Perl:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#Perl--
+  @rdf:
+    http://www.w3.org/1999/02/22-rdf-syntax-ns#
+  @rdfs:
+    http://www.w3.org/2000/01/rdf-schema#
+  @s:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Markup#
+  @script:
+    http://suika.fam.cx/~wakaba/archive/2005/5/script#
+  @sw010:
+    urn:x-suika-fam-cx:markup:suikawiki:0:10:
+  @swcfg21:
+    http://suika.fam.cx/~wakaba/archive/2005/swcfg21#
+  @TreeCore:\
+  @Util:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/
+  @xhtml1:
+    http://www.w3.org/1999/xhtml
+  @xhtml2:
+    http://www.w3.org/2002/06/xhtml2/
+  @xml:
+    http://www.w3.org/XML/1998/namespace
+  @xmlns:
+    http://www.w3.org/2000/xmlns/
+  @xsi:
+    http://www.w3.org/2001/XMLSchema-instance
+
+## -- Vocabulary Types
+
+VocabTypeDef:
+  @QName: DocumentType
+  @instance: Document
+  @definedBy: DocumentTypeDefinition
+  @mayHave: ElementType
+
+VocabTypeDef:
+  @QName: ElementType
+  @instance: Element
+  @definedBy: ElementTypeDefinition
+  @mayHave: AttributeType
+  @mayHave: ContentType
+
+VocabTypeDef:
+  @QName: AttributeType
+  @instance: Attribute
+  @definedBy: AttributeTypeDefinition
+  @mayHave: SimpleContentType
+
+VocabTypeDef:
+  @QName: ContentType
+  @instance: Content
+  @definedBy: ContentTypeDefinition
+
+VocabTypeDef:
+  @QName: SimpleContentType
+  @rdfs:subClassOf: ContentType
+  @instance: SimpleContent
+  @definedBy: SimpleContentTypeDefinition
+
+## -- Vocabulary Definition Constructions
+
+VocabDefTypeDef:
+  @QName: DocumentTypeDefinition
+  @defines: DocumentType
+  @mayHave: DocumentTypeDefinitionModule
+  @mayHave: DocumentTypeDefinitionDriver
+
+VocabDefTypeDef:
+  @QName: DocumentTypeDefinitionModule
+  @mayHave: DocumentTypeDefinitionModule
+  @mayHave: ElementTypeDefinition
+  @mayHave: ElementTypeDefinitionAttributeAddition
+  @mayHave: ElementTypeDefinitionContentModification
+  @mayHave: AttributeTypeDefinition
+  @mayHave: AttributeTypeDefinitionSet
+  @mayHave: AttributeTypeDefinitionSetAddition
+  @mayHave: ContentTypeDefinition
+  @mayHave: ElementTypeClassDefinition
+  @mayHave: ElementTypeClassDefinitionAddition
+
+VocabDefTypeDef:
+  @QName: ElementTypeDefinition
+  @defines: ElementType
+  @mayHave: AttributeTypeDefinition
+  @mayHave: AttributeTypeDefinitionSet
+  @mayHave: ContentTypeDefinition
+
+VocabDefTypeDef:
+  @QName: ElementTypeDefinitionAttributeAddition
+  @mayHave: AttributeTypeDefinition
+  @mayHave: AttributeTypeDefinitionSet
+
+VocabDefTypeDef:
+  @QName: ElementTypeDefinitionContentModification
+  @mayHave: ContentTypeDefinition
+
+VocabDefTypeDef:
+  @QName: AttributeTypeDefinition
+  @defines: AttributeType
+  @mayHave: SimpleContentTypeDefinition
+
+VocabDefTypeDef:
+  @QName: AttributeTypeDefinitionSet
+  @mayHave: AttributeTypeDefinition
+  @mayHave: AttributeTypeDefinitionSet
+
+VocabDefTypeDef:
+  @QName: AttributeTypeDefinitionSetAddition
+  @mayHave: AttributeTypeDefinition
+  @mayHave: AttributeTypeDefinitionSet
+
+VocabDefTypeDef:
+  @QName: ContentTypeDefinition
+  @defines: ContentType
+
+VocabDefTypeDef:
+  @QName: SimpleContentTypeDefinition
+  @defines: SimpleContentType
+  @rdfs:subClassOf: ContentTypeDefinition
+
+VocabDefTypeDef:
+  @QName: ElementTypeClassDefinition
+  @mayHave: ElementTypeClassDefinition
+  @mayHave: ElementTypeDefinition
+
+VocabDefTypeDef:
+  @QName: ElementTypeClassDefinitionAddition
+  @mayHave: ElementTypeClassDefinition
+  @mayHave: ElementTypeDefinition
+
+VocabDefTypeDef:
+  @QName: DocumentTypeDefinitionDriver
+  @mayHave: DocumentTypeDefinitionModule
+
+@@@
+  
+
+## -- Markup Constructions
+
+VocabTypeInstanceDef:
+  @QName: Document
+  @instanceOf: DocumentType
+
+VocabTypeInstanceDef:
+  @QName: Element
+  @instanceOf: ElementType
+
+VocabTypeInstanceDef:
+  @QName: Attribute
+  @instanceOf: AttributeType
+
+VocabTypeInstanceDef:
+  @QName: Content
+  @instanceOf: ContentType
+
+PropDef:
+  @QName: instance
+
+PropDef:
+  @QName: instanceOf
