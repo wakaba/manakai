@@ -23,7 +23,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/11/13 04:45:09 $
+      $Date: 2005/11/17 10:14:25 $
     @@ContentType:
       dis:Date.RCS
   
@@ -42,20 +42,19 @@ Module:
       @@@QName: Err|Core
       @@@WithFor:
         ManakaiDOM:Perl
+    @@Module:
+      @@@QName: UtilMuf|Muf2003
+      @@@WithFor: ManakaiDOM|Perl
   @DefaultFor:
     ManakaiDOM:Perl
 
 Namespace:
   @dis:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
-  @dis2pm:
-    http://suika.fam.cx/~wakaba/archive/2004/11/8/dis2pm#
   @DISlib:
     http://suika.fam.cx/~wakaba/archive/2004/dis/
   @DISPerl:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Perl#
-  @DOMMain:
-    http://suika.fam.cx/~wakaba/archive/2004/dom/main#
   @Err:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/
   @ecore:
@@ -72,6 +71,8 @@ Namespace:
     http://www.w3.org/1999/02/22-rdf-syntax-ns#
   @rdfs:
     http://www.w3.org/2000/01/rdf-schema#
+  @UtilMuf:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Formatter/
 
 ResourceDef:
   @QName:
@@ -93,7 +94,6 @@ ElementTypeBinding:
     dis:Description
   @ShadowContent:
     @@lang:en
-
 
 ElementTypeBinding:
   @Name: IFQName
@@ -421,6 +421,8 @@ ResourceDef:
   @IFFileName: Message/Util/Error/module-interface
   @ClsFileName: Message/Util/Error/module-class
 
+  @ecore:textFormatter: MUErrorFormatter
+
   @Method:
     @@Operator:
       @@@@: ErrorDefMethod
@@ -439,6 +441,118 @@ ResourceDef:
         A hash value is also a hash reference which
         contains property name-value pairs.
 ##MUError
+
+ResourceDef:
+  @rdf:type:
+    @@@@: dis|MultipleResource
+    @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
+  @resourceFor: ManakaiDOM|ForClass
+
+  @ClsQName: MUErrorFormatter
+
+  @rdf:type:
+    @@@: DISLang|Class
+    @@ForCheck: ManakaiDOM|ForClass
+
+  @Implement: Muf2003|MUFTextFormatter
+  @ISA: Muf2003|ManakaiMUFTextFormatter
+  @For: ManakaiDOM|Perl
+
+  @ClsPackName: 
+    Message::Util::Error::formatter
+
+  @enDesc:
+    In addition to rules defined in <IF::Muf2003::MUFTextFormatter2003>, 
+    the formatter <Class::MUErrorFormatter> defines a few rules.
+
+  @RuleDef:
+    @@Name: name
+    @@enDesc:
+      The error type name, i.e. the value of <CODE::-type> parameter.
+
+  @RuleDef:
+    @@Name: p
+    @@enDesc:
+      The value of an error parameter.
+    @@RuleParam:
+      @@@Name: name
+      @@@dataType: DISCore|String
+      @@@enDesc:
+        The name of the error parameter.
+    @@RuleParam:
+      @@@Name: empty
+      @@@dataType: DISCore|String
+      @@@enDesc:
+        If the error parameter value is an empty string, then 
+        this rule parameter value is returned instead.
+      @@@nullCase:
+        @@@@enDesc:
+          A string <CODE::<lt>empty<gt>> is used.
+    @@RuleParam:
+      @@@Name: undef
+      @@@dataType: DISCore|String
+      @@@enDesc:
+        If the error parameter value is <DOM::null>, then
+        this rule parameter value is returned instead.
+      @@@nullCase:
+        @@@@enDesc:
+          A string <CODE::<lt>undef<gt>> is used.
+
+  @RuleDef:
+    @@Name: t
+    @@enDesc:
+      The value of an error parameter.
+
+        {NOTE:: This rule is obsolete in favor of <CODE::p>.
+    @@RuleParam:
+      @@@Name: name
+      @@@dataType: DISCore|String
+      @@@enDesc:
+        The name of the error parameter.
+    @@RuleParam:
+      @@@Name: empty
+      @@@dataType: DISCore|String
+      @@@enDesc:
+        If the error parameter value is an empty string, then 
+        this rule parameter value is returned instead.
+      @@@nullCase:
+        @@@@enDesc:
+          A string <CODE::<lt>empty<gt>> is used.
+    @@RuleParam:
+      @@@Name: undef
+      @@@dataType: DISCore|String
+      @@@enDesc:
+        If the error parameter value is <DOM::null>, then
+        this rule parameter value is returned instead.
+      @@@nullCase:
+        @@@@enDesc:
+          A string <CODE::<lt>undef<gt>> is used.
+##MUErrorFormatter
+
+ElementTypeBinding:
+  @Name: RuleDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@rdf:type: Muf2003|RuleDefClass
+
+ElementTypeBinding:
+  @Name: RuleParam
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: Muf2003|RuleParameter
+
+SPropDef:
+  @QName: ecore|textFormatter
+  @enDesc:
+    A <IF::Muf2003:MUFTextFormatter2003::ManakaiDOM:Perl> that 
+    is used to generate <A::Error::ManakaiDOM:Perl.text>.
+  @rdfs:domain: Err|MUFError
+  @rdfs:range: Muf2003|MUFTextFormatter2003||ManakaiDOM|Perl
+  @multipleProperties: DISCore|Single
+  @dataType: DISCore|TFQNames
 
 ResourceTypeDef:
   @QName: ecore|AnyErrorCode

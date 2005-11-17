@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/11/15 03:12:57 $
+      $Date: 2005/11/17 10:14:25 $
     @@ContentType:
       dis:Date.RCS
   
@@ -3396,11 +3396,8 @@ IFClsDef:
                                          .plFullyQualifiedName>);
             ## - Inheritance
             for my $scls (@{$self-><M::DIS|DISResourceProp
-                                         .getPropertyResourceList>
-                                    (<Q::dis:ISA>,
-                                     default_media_type => <Q::dis:TFQNames>)}) {
-              my $spack_name = $scls-><AG::DISResourcePerl
-                                         .plFullyQualifiedName>;
+                                     .getPropertyResourceList> (<Q::dis:ISA>)}) {
+              my $spack_name = $scls-><AG::DISResourcePerl.plFullyQualifiedName>;
               if (defined $spack_name) {
                 $r-><M::DIS|PLPack.addISAPackage> ($spack_name);
               } else {
@@ -3575,6 +3572,12 @@ IFClsDef:
                        } @const
                     }]));
               $r-><M::DIS|PLPack.setSubNode> ($err_def);
+            }
+            if ($self-><M::DIS|DISResource.isTypeURI> (<Q::Err:MUErrorClass>)) {
+              for (@{$self-><M::DIS|DISResource.getChildResourceListByType
+                               (<Q::Muf2003:RuleDefClass>)>}) {
+                ## TODO:
+              }
             }
 
           ## -- Global variables

@@ -28,6 +28,7 @@ NS_DIS        = http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS\#
 NS_UTIL       = http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/
 NS_UTIL_ERR   = http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/
 NS_UTIL_DIS   = http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS\#
+NS_UTIL_MUF   = http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Formatter/
 
 DIS_OPTIONS = 
 DIS_OPTIONS_ALL = $(DIS_OPTIONS) \
@@ -50,7 +51,8 @@ CORE_DAC_FILE = $(MANAKAI_LIB_DIR)manakai/all$(DAC_SUFFIX)
 DOM_CORE_DAC_FILE = $(MANAKAI_LIB_DIR)Message/DOM/core$(DAC_SUFFIX)
 SWCFG_DAC_FILE = $(MANAKAI_LIB_DIR)Message/Markup/all$(DAC_SUFFIX)
 
-UTIL_CORE_DIS_FILES    = ManakaiNode.dis Error/DOMException.dis Error/Core.dis
+UTIL_CORE_DIS_FILES    = ManakaiNode.dis Error/DOMException.dis Error/Core.dis \
+  Formatter/Muf2003$(DIS_SUFFIX)
 DIS_CORE_DIS_FILES_    = DIS$(DIS_SUFFIX)
 DIS_CORE_DIS_FILES_DIS = DIS/Perl.dis DIS/Value.dis DIS/DNLite.dis
 DIS_CORE_DIS_FILES     = $(DIS_CORE_DIS_FILES_) $(DIS_CORE_DIS_FILES_DIS)
