@@ -167,6 +167,7 @@ $(PC_DIS_FILES:$(DIS_SUFFIX)=$(PM_SUFFIX)): %$(PM_SUFFIX): \
 	  --create-perl-module="$(NS_MDOM)DOMFeature ../DOM/DOMFeature$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_MDOM)DOMMain    ../DOM/DOMMain$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_MDOM)DOMCore    ../DOM/DOMCore$(PM_SUFFIX)" \
+	  --create-perl-module="$(NS_MDOM)Tree       ../DOM/Tree$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_MDOM)DOMXML     ../DOM/DOMXML$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_MDOM)DOMLS      ../DOM/DOMLS$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_MDOM)GenericLS  ../DOM/GenericLS$(PM_SUFFIX)"
@@ -174,6 +175,7 @@ $(PC_DIS_FILES:$(DIS_SUFFIX)=$(PM_SUFFIX)): %$(PM_SUFFIX): \
 	$(PERL_CHK) ../DOM/DOMFeature$(PM_SUFFIX)
 	$(PERL_CHK) ../DOM/DOMMain$(PM_SUFFIX)
 	$(PERL_CHK) ../DOM/DOMCore$(PM_SUFFIX)
+	$(PERL_CHK) ../DOM/Tree$(PM_SUFFIX)
 	$(PERL_CHK) ../DOM/DOMXML$(PM_SUFFIX)
 	$(PERL_CHK) ../DOM/DOMLS$(PM_SUFFIX)
 	$(PERL_CHK) ../DOM/GenericLS$(PM_SUFFIX)

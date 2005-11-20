@@ -44,7 +44,7 @@ UTIL_CORE_DAC_FILE = $(MANAKAI_LIB_DIR)Message/Util/core$(DAC_SUFFIX)
 
 DOM_FEATURE_DIS_FILES = DOMFeature$(DIS_SUFFIX)
 DOM_CORE_DIS_FILES = DOMMain.dis DOMCore.dis DOMXML.dis \
-                     DOMLS.dis GenericLS.dis
+                     DOMLS.dis GenericLS.dis Tree$(DIS_SUFFIX)
 DOM_LS_DIS_FILES   = SimpleLS$(DIS_SUFFIX) ManakaiDOMLS2003$(DIS_SUFFIX)
 DOM_HTML_DIS_FILES = DOMHTML.dis DOMWebForms.dis
 DIS_FILES = $(DOM_FEATURE_DIS_FILES) $(DOM_CORE_DIS_FILES) \
@@ -54,7 +54,7 @@ GENERATED_FILES = \
   feature$(DAC_SUFFIX) DOMFeature$(PM_SUFFIX) \
   core$(DAC_SUFFIX)  DOMMain$(PM_SUFFIX) \
                      DOMCore$(PM_SUFFIX) DOMXML$(PM_SUFFIX) DOMLS$(PM_SUFFIX) \
-                     GenericLS$(PM_SUFFIX) \
+                     GenericLS$(PM_SUFFIX) Tree$(PM_SUFFIX) \
   ls$(DAC_SUFFIX)    SimpleLS$(PM_SUFFIX) ManakaiDOMLS2003$(PM_SUFFIX) \
   html$(DAC_SUFFIX)  DOMHTML$(PM_SUFFIX) DOMWebForms$(PM_SUFFIX)
 GENERATED_DAC_FILES = feature$(DAC_SUFFIX) \
@@ -94,12 +94,14 @@ $(DOM_CORE_DIS_FILES:.dis=$(PM_SUFFIX)): core$(DAC_SUFFIX) $(DAC2PM_PL)
 	  --create-perl-module="$(NS_MDOM)DOMFeature DOMFeature$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_MDOM)DOMMain    DOMMain$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_MDOM)DOMCore    DOMCore$(PM_SUFFIX)" \
+	  --create-perl-module="$(NS_MDOM)Tree       Tree$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_MDOM)DOMXML     DOMXML$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_MDOM)DOMLS      DOMLS$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_MDOM)GenericLS  GenericLS$(PM_SUFFIX)"
 	$(PERL_CHK) DOMFeature$(PM_SUFFIX)
 	$(PERL_CHK) DOMMain$(PM_SUFFIX)
 	$(PERL_CHK) DOMCore$(PM_SUFFIX)
+	$(PERL_CHK) Tree$(PM_SUFFIX)
 	$(PERL_CHK) DOMXML$(PM_SUFFIX)
 	$(PERL_CHK) DOMLS$(PM_SUFFIX)
 	$(PERL_CHK) GenericLS$(PM_SUFFIX)
@@ -145,5 +147,5 @@ clean:
 	$(RM) .*.tmp *~ .*~ *.BAK .*.BAK
 	$(RM) .core$(PM_SUFFIX) .ls$(PM_SUFFIX) .html$(PM_SUFFIX)
 
-## $Date: 2005/10/12 14:46:01 $
+## $Date: 2005/11/20 09:49:28 $
 ## License: Public Domain.

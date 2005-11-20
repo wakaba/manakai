@@ -53,13 +53,15 @@ DOM_LS_DAC = $(MANAKAI_LIB_DIR)Message/DOM/ls$(DAC_SUFFIX)
 DOM_DAC_FILES = $(DOM_FEATURE_DAC) $(DOM_CORE_DAC) $(DOM_LS_DAC)
 
 UTIL_PC_DAC = $(MANAKAI_LIB_DIR)Message/Util/pc$(DAC_SUFFIX)
+DIS_CORE_DAC = $(MANAKAI_LIB_DIR)Message/Util/discore$(DAC_SUFFIX)
 
 NS_MDOM = http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom\#ManakaiDOM.
 NS_MANAKAIDOM = http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom\#
 NS_UTIL = http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/
+NS_DIS  = http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS\#
 
 GENERATED_FILES = util-perlcode.t dom-feature.t dom-genericls.t \
-  dom-mdomls2003
+  dom-mdomls2003.t util-dis-dnlite.t
 
 all: $(GENERATED_FILES)
 
@@ -85,10 +87,13 @@ dom-mdomls2003.t: $(DOM_LS_DAC) $(DAC2TEST_PL)
 util-perlcode.t: $(UTIL_PC_DAC) $(DAC2TEST_PL)
 	$(DAC2TEST) $< --source-module="$(NS_UTIL)PerlCode" > $@
 
+util-dis-dnlite.t: $(DIS_CORE_DAC) $(DAC2TEST_PL)
+	$(DAC2TEST) $< --source-module="$(NS_DIS)DNLite" > $@
+
 $(DOM_DAC_FILES): $(MANAKAI_LIB_DIR)Message/DOM/%: always
 	$(CD) $(MANAKAI_LIB_DIR)Message/DOM/ && $(MAKE) $*
 
-$(UTIL_PC_DAC): $(MANAKAI_LIB_DIR)Message/Util/%: always
+$(UTIL_PC_DAC) $(DIS_CORE_DAC): $(MANAKAI_LIB_DIR)Message/Util/%: always
 	$(CD) $(MANAKAI_LIB_DIR)Message/Util/ && $(MAKE) $*
 
 clean: clean-dom1core-perl

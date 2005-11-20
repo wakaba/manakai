@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/11/17 10:14:25 $
+      $Date: 2005/11/20 09:49:32 $
     @@ContentType:
       dis:Date.RCS
   
@@ -3574,8 +3574,8 @@ IFClsDef:
               $r-><M::DIS|PLPack.setSubNode> ($err_def);
             }
             if ($self-><M::DIS|DISResource.isTypeURI> (<Q::Err:MUErrorClass>)) {
-              for (@{$self-><M::DIS|DISResource.getChildResourceListByType
-                               (<Q::Muf2003:RuleDefClass>)>}) {
+              for (@{$self-><M::DIS|DISResource.getChildResourceListByType>
+                               (<Q::Muf2003:RuleDefClass>)}) {
                 ## TODO:
               }
             }

@@ -13,7 +13,7 @@ Module:
   @License: license|Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/11/16 10:07:14 $
+      $Date: 2005/11/20 09:49:33 $
     @@ContentType: dis|Date.RCS
   
   @Require:
@@ -414,6 +414,7 @@ IFClsDef:
     @@Name: notOK
     @@enDesc:
       Records that the test has not been passed.
+    @@URIParam:
     @@Return:
       @@@PerlDef:
         print {$self->{<H::dtest|output>}}
@@ -421,7 +422,7 @@ IFClsDef:
         __CODE{printComment::
           $test => $self,
           $s => {
-            '<' . $self->{<H::dtest|uri>} . '>'
+            '<' . (defined $uri ? $uri : $self->{<H::dtest|uri>}) . '>'
           },
         }__;
         $self->{<H::dtest|failedNumber>}++;
@@ -435,12 +436,13 @@ IFClsDef:
       @@@Name: actualValue
       @@@Type: DISPerl|Any
       @@@enDesc: The actual value.
+    @@URIParam:
     @@Return:
       @@@AErr:
       @@@PerlDef:
         if (not $actualValue) {
           __DEEP{
-            $self-><M::DTManager.notOK>;
+            $self-><M::DTManager.notOK> (uri => $uri);
           }__;
           my $v;
           __CODE{formatValue::
@@ -843,6 +845,29 @@ ElementTypeBinding:
     @@rdf:type:
       DISLang:MethodParameter
     @@DISPerl:isNamedParameter:1
+
+ElementTypeBinding:
+  @Name: URIParam
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:MethodParameter
+    @@DISPerl:isNamedParameter:1
+    @@Name: uri
+    @@Type: DISString
+    @@Description:
+      @@@lang:en
+      @@@@:
+        A URI that identifies the subtest.
+    @@ResourceDef:
+      @@@rdf:type: ManakaiDOM|InCase
+      @@@Value:
+        @@@@is-null:1
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The subtest has no URI.
 
 ElementTypeBinding:
   @Name: AErr

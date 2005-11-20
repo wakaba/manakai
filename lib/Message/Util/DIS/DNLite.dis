@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/10/12 00:31:13 $
+      $Date: 2005/11/20 09:49:30 $
     @@ContentType:
       dis:Date.RCS
   
@@ -111,6 +111,8 @@ Namespace:
     urn:x-suika-fam-cx:markup:suikawiki:0:10:
   @swcfg21:
     http://suika.fam.cx/~wakaba/archive/2005/swcfg21#
+  @test:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Test#
   @Util:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/
   @xhtml1:
@@ -342,25 +344,44 @@ IFClsDef:
               push @{$result_parent->{for}}, my $pr = {};
               for my $q (grep {length $_}
                          split /\s+/, $source_node-><M::SNode.value>) {
-                my $p = '-';
-                $p = $1 if $q =~ s/^(!=?|=)//;
-                $pr->{my $uri = $source_node-><M::DIS|NSResolverDIS.qnameToURI>
-                                     ($q)} = $p;
+                my $p = '<=';
+                $p = $1 if $q =~ s/^(!(?:=|<=)?|=|<=)//;
+                $p = '!<=' if $p eq '!';
+                my $uri = $source_node-><M::DIS|NSResolverDIS.qnameToURI> ($q);
+                $pr->{$uri} = {
+                  '' => {$p => $p},
+                  '<=' => {$p => $p, '!<=' => 'X', '!=' => '<'},
+                  '!<=' => {'<=' => 'X', '!<=' => '!<=', '<' => 'X',
+                            '=' => 'X', '!=' => '!<='},
+                  '=' => {$p => 'X', '<=' => '=', '=' => '='},
+                  '!=' => {$p => $p, '<=' => '<', '=' => 'X'},
+                  'X' => {$p => 'X'},
+                }->{$pr->{$uri} or ''}->{$p};
                 $db-><M::DIS|DISDatabase.getFor> ($uri)
                    -><AS::DIS|DISAnyResource.isReferred> ($source_node);
               }
             } elsif ($xu eq <Q::dis:ForCheck>) {
               for my $q (grep {length $_}
                          split /\s+/, $source_node-><M::SNode.value>) {
-                my $p = '-';
-                $p = $1 if $q =~ s/^(!=?|=)//;
+                my $p = '<=';
+                $p = $1 if $q =~ s/^(!(?:=|<=)?|=|<=)//;
+                $p = '!<=' if $p eq '!';
                 my $uri = $source_node-><M::DIS|NSResolverDIS.qnameToURI> ($q);
+                ##       super(A)   A   sub(A)  B
+                ## <A                     v
+                ## <=A              v     v
+                ## !<=A     v                   v
+                ## =A               v
+                ## !=A      v             v     v
+                ## XA     
                 $result_parent->{forp}->{$uri} = {
                   '' => {$p => $p},
-                  '-' => {$p => $p},
-                  '!' => {'-' => '!', '!' => '!', '=' => '!', '!=' => '!='},
-                  '=' => {'-' => '=', '!' => '!', '=' => '=', '!=' => '!='},
-                  '!=' => {$p => '!='},
+                  '<=' => {$p => $p, '!<=' => 'X', '!=' => '<'},
+                  '!<=' => {'<=' => 'X', '!<=' => '!<=', '<' => 'X',
+                            '=' => 'X', '!=' => '!<='},
+                  '=' => {$p => 'X', '<=' => '=', '=' => '='},
+                  '!=' => {$p => $p, '<=' => '<', '=' => 'X'},
+                  'X' => {$p => 'X'},
                 }->{$result_parent->{forp}->{$uri} or ''}->{$p};
                 $db-><M::DIS|DISDatabase.getFor> ($uri)
                    -><AS::DIS|DISAnyResource.isReferred> ($source_node);
@@ -1237,14 +1258,23 @@ IFClsDef:
 
             FCs: for my $uri (keys %{$self->{forp}||{}}) {
               my $p = $self->{forp}->{$uri};
-              if ($p eq '-') {
+              if ($p eq '<=') {
                 for my $arg_res ($for_res, @{$forp_res}) {
                   if ($arg_res-><M::DIS|DISFor.isaURI> ($uri)) {
                     next FCs;
                   }
                 }
                 last FORMATCH;
-              } elsif ($p eq '!') {
+              } elsif ($p eq '<') {
+                my $for = $databaseArg-><M::DIS|DISDatabase.getFor> ($uri);
+                for my $arg_res ($for_res, @{$forp_res}) {
+                  if (not ($arg_res eq $for) and
+                      $arg_res-><M::DIS|DISFor.isaURI> ($uri)) {
+                    next FCs;
+                  }
+                }
+                last FORMATCH;
+              } elsif ($p eq '!<=') {
                 for my $arg_res ($for_res, @{$forp_res}) {
                   if ($arg_res-><M::DIS|DISFor.isaURI> ($uri)) {
                     last FORMATCH;
@@ -1272,12 +1302,19 @@ IFClsDef:
               my $ok = true;
               AFOR: for my $uri (keys %{$fors}) {
                 my $p = $fors->{$uri};
-                if ($p eq '-') {
+                if ($p eq '<=') {
                   unless ($for_res-><M::DIS|DISFor.isaURI> ($uri)) {
                     $ok = false;
                     last AFOR;
                   }
-                } elsif ($p eq '!') {
+                } elsif ($p eq '<') {
+                  my $for = $databaseArg-><M::DIS|DISDatabase.getFor> ($uri);
+                  unless (not ($for_res eq $for) and
+                          $for_res-><M::DIS|DISFor.isaURI> ($uri)) {
+                    $ok = false;
+                    last AFOR;
+                  }
+                } elsif ($p eq '!<=') {
                   if ($for_res-><M::DIS|DISFor.isaURI> ($uri)) {
                     $ok = false;
                     last AFOR;
@@ -1304,6 +1341,55 @@ IFClsDef:
             $r = @{$self->{for}||[]} ? false : true;
           }__;
         } # FORMATCH
+
+    @@Test:
+      @@@ForCheck: ManakaiDOM|ForClass
+      @@@PerlDef:
+        my $impl = <Class::DIS|ManakaiDISImplementation>->_new;
+        my $db = $impl-><M::DIS|DISImplementation.createDISDatabase>;
+
+        my $node = bless {}, <ClassName::ManakaiDNLElement>;
+
+        $node->{for} = [+{qw/a <=/}];
+
+        $test->assert_true ($node-><M::DNLElement.forMatch>
+                              ('a', [], database_arg => $db),
+                            uri => <Q::DNLElement.ForMatch.Test.Match>);
+
+        $test->assert_false ($node-><M::DNLElement.forMatch>
+                               (<Q::ManakaiDOM:all>, [], database_arg => $db),
+                             uri => <Q::DNLElement.ForMatch.Test.AllNoMatch>);
+
+        $test->assert_false ($node-><M::DNLElement.forMatch>
+                               ('b', [], database_arg => $db),
+                             uri => <Q::DNLElement.ForMatch.Test.NoMatch>);
+
+        $node->{for} = [+{}];
+
+        $test->assert_true ($node-><M::DNLElement.forMatch>
+                              (<Q::ManakaiDOM:all>, [], database_arg => $db),
+                           uri => <Q::DNLElement.ForMatch.Test.ImpliedAllMatch>);
+
+        $test->assert_true
+                ($node-><M::DNLElement.forMatch>
+                              ('a', [], database_arg => $db),
+                 uri => <Q::DNLElement.ForMatch.Test.ImpliedAllSuperMatch>);
+
+        $node->{for} = [+{a => '<=', b => '!<='}];
+
+        $test->assert_true
+                ($node-><M::DNLElement.forMatch>
+                              ('a', [], database_arg => $db),
+                 uri => <Q::DNLElement.ForMatch.Test.Match.A.!B>);
+
+        $test->assert_false
+                ($node-><M::DNLElement.forMatch>
+                              ('b', [], database_arg => $db),
+                 uri => <Q::DNLElement.ForMatch.Test.Match.A.No!B>);
+
+        $test->assert_false ($node-><M::DNLElement.forMatch>
+                              (<Q::ManakaiDOM:all>, [], database_arg => $db),
+                           uri => <Q::DNLElement.ForMatch.Test.NoMatch.NoA.!B>);
 
   @Method:
     @@Name: mediaTypeMatch
@@ -1448,6 +1534,12 @@ IFClsDef:
         $r = <Class::dp|PLImplClass>->_new;
 ##DNLElement
 
+ElementTypeBinding:
+  @Name: Test
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: test|StandaloneTest
 
 ElementTypeBinding:
   @Name: NamedParam

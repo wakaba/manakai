@@ -25,7 +25,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/11/16 10:07:13 $
+      $Date: 2005/11/20 09:49:27 $
     @@ContentType:
       dis:Date.RCS
   
@@ -87,16 +87,10 @@ Module:
 Namespace:
   @dis:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
-  @dis2pm:
-    http://suika.fam.cx/~wakaba/archive/2004/11/8/dis2pm#
   @DISlib:
     http://suika.fam.cx/~wakaba/archive/2004/dis/
-  @DOMEvents:
-    http://suika.fam.cx/~wakaba/archive/2004/dom/events#
   @DOMMain:
     http://suika.fam.cx/~wakaba/archive/2004/dom/main#
-  @DOMMetaImpl:
-    http://suika.fam.cx/~wakaba/archive/2004/dom/meta#
   @dx:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#
   @ecore:
@@ -135,7 +129,6 @@ Namespace:
     http://www.w3.org/1999/02/22-rdf-syntax-ns#
   @rdfs:
     http://www.w3.org/2000/01/rdf-schema#
-  @TreeCore:\
   @Util:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/
   @UtilError:
@@ -206,17 +199,6 @@ ElementTypeBinding:
     @@rdf:type:
       DISLang:TreeElementType
     @@For: =ManakaiDOM|all
-
-ResourceTypeDef:
-  @QName: ErrorClass
-  @FullName:
-    @@lang:en
-    @@@:
-      <IF::DOMCore:DOMError> class
-  @Description:
-    @@lang:en
-    @@@:
-      <IF::DOMError> type and its implementation pairs. 
 
 ElementTypeBinding:
   @Name: WarningDef
@@ -405,48 +387,6 @@ Const:
        The null value.  Note that <DOM::null> is different from 
        empty string and number zero.
 
-ResourceTypeDef:
-  @QName:
-    ManakaiDOM:DOMConfigParameter
-  @Description:
-    @@lang:en
-    @@@: A DOM configuration parameter.
-
-ResourceTypeDef:
-  @QName:
-    ManakaiDOM:DOMEvent
-  @Description:
-    @@lang:en
-    @@@: A DOM event definition.
-
-ResourceTypeDef:
-  @QName:
-    ManakaiDOM:DOMError
-  @Description:
-    @@lang:en
-    @@@: A DOM error definition.
-
-ResourceTypeDef:
-  @QName:
-    ManakaiDOM:DOMConfigParameterSet
-  @Description:
-    @@lang:en
-    @@@: A set of DOM configuration parameters.
-
-ResourceTypeDef:
-  @QName:
-    ManakaiDOM:DOMEventSet
-  @Description:
-    @@lang:en
-    @@@: A set of DOM event definitions.
-
-ResourceTypeDef:
-  @QName:
-    ManakaiDOM:DOMErrorSet
-  @Description:
-    @@lang:en
-    @@@: A set of DOM error definitions.
-
 PropDef:
   @QName:
     dis:NSVersion
@@ -519,8 +459,7 @@ ElementTypeBinding:
 ResourceDef:
   @QName: 
     DOMMain:docSupportsXMLFeature
-  @rdf:type:
-    dis2pm:InlineCode
+  @rdf:type: DISPerl|InlineCode
   @Description:
     @@lang:en
     @@@:
@@ -1076,8 +1015,7 @@ StringDataTypeDef:
 
   @ResourceDef:
     @@QName: isRelativeDOMURI
-    @@rdf:type:
-      dis2pm:InlineCode
+    @@rdf:type: DISPerl|InlineCode
     @@Description:
       @@@lang:en
       @@@@:
@@ -1331,8 +1269,7 @@ StringDataTypeDef:
       <CODE::Name> or not.
     @@PerlDef:
       ($INPUT =~ /\A\p{inxml:_NameStartChar10}\p{inxml:NameChar10}*\z/)
-    @@rdf:type:
-      dis2pm:InlineCode
+    @@rdf:type: DISPerl|InlineCode
     @@aliasChild:1
   
   @ResourceDef:
@@ -1342,14 +1279,12 @@ StringDataTypeDef:
       <CODE::Name> or not.
     @@PerlDef:
       ($INPUT =~ /\A\p{inxml:NameStartChar11}\p{inxml:NameChar11}*\z/)
-    @@rdf:type:
-      dis2pm:InlineCode
+    @@rdf:type: DISPerl|InlineCode
     @@aliasChild: 1
 
   @ResourceDef:
     @@QName: ensureXMLName
-    @@rdf:type: 
-      dis2pm:BlockCode
+    @@rdf:type: DISPerl|BlockCode
     @@Description:
       @@@lang:en
       @@@@: 
@@ -1401,8 +1336,7 @@ StringDataTypeDef:
 
   @ResourceDef:
     @@QName: testXML10NCName
-    @@rdf:type:
-      dis2pm:InlineCode
+    @@rdf:type: DISPerl|InlineCode
     @@aliasChild:1
     @@enDesc:
       Tests whether a scalar variable string is a valid XML Namespace
@@ -1412,8 +1346,7 @@ StringDataTypeDef:
 
   @ResourceDef:
     @@QName: testXML11NCName
-    @@rdf:type:
-      dis2pm:InlineCode
+    @@rdf:type: DISPerl|InlineCode
     @@aliasChild:1
     @@enDesc:
       Tests whether a scalar variable string is a valid XML Namespace
@@ -1430,8 +1363,7 @@ StringDataTypeDef:
 
   @ResourceDef:
     @@QName: ensureNamespacePrefix
-    @@rdf:type:
-      dis2pm:BlockCode
+    @@rdf:type: DISPerl|BlockCode
     @@Description:
       @@@lang:en
       @@@@: 
@@ -1513,8 +1445,7 @@ StringDataTypeDef:
 
   @ResourceDef:
     @@QName: ensureXMLQName
-    @@rdf:type: 
-      dis2pm:BlockCode
+    @@rdf:type: DISPerl|BlockCode
     @@Description:
       @@@lang:en
       @@@@:
@@ -1611,8 +1542,7 @@ StringDataTypeDef:
 
   @ResourceDef:
     @@QName: testXML10QName
-    @@rdf:type:
-      dis2pm:InlineCode
+    @@rdf:type: DISPerl|InlineCode
     @@enDesc:
       Tests whether a scalar variable string is a valid XML
       Namespace 1.0 qualified name or not.
@@ -1658,8 +1588,7 @@ StringDataTypeDef:
 
   @ResourceDef:
     @@QName: testXML11QName
-    @@rdf:type:
-      dis2pm:InlineCode
+    @@rdf:type: DISPerl|InlineCode
     @@enDesc:
       Tests whether a scalar variable string is a valid XML
       Namespace 1.1 qualified name or not.
@@ -1672,8 +1601,7 @@ StringDataTypeDef:
 
 ResourceDef:
   @QName: checkXMLNamesQName
-  @rdf:type:
-    dis2pm:BlockCode
+  @rdf:type: DISPerl|BlockCode
   @Description:
     @@lang:en
     @@@:
