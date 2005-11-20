@@ -40,7 +40,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/11/20 09:49:26 $
+      $Date: 2005/11/20 12:08:09 $
     @@ContentType:
       dis:Date.RCS
 
@@ -3116,19 +3116,46 @@ IFDef:
               the definition of this type, the schema language 
               is the XML DTD or no schama language is associated.
 
-IFDef:
-  @Name:  UserDataHandler
-  @Description:
-    @@lang:en
+IFCls3Def:
+  @IFQName: UserDataHandler
+  @ClsQName: ManakaiDOMUserDataHandler
+
+  @enDesc:
+    A <IF::UserDataHandler> is a handler that gets called when the
+    node the object is associated to is being cloned, imported,
+    or renamed.  It can be used by the application to implement various
+    behaviors regarding the user data associated to the DOM nodes.
+
+  @enDesc:
+    @@ForCheck: ManakaiDOM|Perl
+    @@ddid: perl
     @@@:
-      A handler to implement various behaviors regarding the 
-      data associated to the DOM nodes.
-  @Level[list]:  3
-  @SpecLevel:3
-  @For:
-    =ManakaiDOM:ManakaiDOM
-  @For:
-    ManakaiDOM:DOM3
+      For manakai's Perl binding, a <Perl::CODE> reference 
+      can be set as if it is a <IF::UserDataHandler> to any
+      method parameter whose type is defined as <IF::UserDataHandler>.
+      When the <M::UserDataHandler.handle> method would be invoked,
+      the <Perl::CODE> reference itself is executed as if it is a 
+      subroutine implementing the method.
+
+        {NOTE:: The DOM implementation might <Perl::bless> such 
+                <Perl::CODE> reference with appropriate class name
+                when the reference is given to a method.
+        }
+
+  @enDesc:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@ddid: class
+    @@@:
+      If a <Perl::CODE> reference is used as a <IF::UserDataHandler>,
+      the reference will be <Perl::bless>ed to the class
+      <Class::ManakaiDOMUserDataHandler>.
+
+  @ResourceDef:
+    @@rdf:type: DISLang|InputProcessor
+    @@rdf:type: DISLang|OutputProcessor
+    @@PerlDefC:
+      $INPUT = bless $INPUT, <ClassName::ManakaiDOMUserDataHandler>
+        if ref $INPUT eq 'CODE';
 
   @ConstGroup:
     @@QName:  OperationType
@@ -3136,125 +3163,100 @@ IFDef:
     @@rdfs:subClassOf: idl|unsignedShort||ManakaiDOM|all
     @@Type: idl|unsignedShort||ManakaiDOM|all
 
-     @@Description:
-       @@@lang:en
-       @@@@: The type of operation being performed on a node.
-     @@Const:
-        @@@Name:  NODE_CLONED
-        @@@Value:  1
-        @@@Description:
-          @@@@lang:en
-          @@@@@: The node is cloned.
-        @@@ImplNote:
-          @@@@lang:en
-          @@@@@: The node is cloned.
-        @@@ImplNote:
-          @@@@lang:en
-          @@@@@: "Node.cloneNode".
-     @@Const:
-        @@@Name:  NODE_IMPORTED
-        @@@Value:  2
-        @@@Description:
-          @@@@lang:en
-          @@@@@: The node is imported.
-        @@@ImplNote:
-          @@@@lang:en
-          @@@@@: "Document.importNode".
-     @@Const:
-        @@@Name:  NODE_DELETED
-        @@@Value:  3
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            The node is deleted.
-        @@@ImplNote:
-          @@@@lang:en
-          @@@@@:
-            This may not be supported or may not be reliable in certain 
-            environment, such as Java, where the DOM implementation 
-            has no real control over when objects are actually deleted.
-     @@Const:
-        @@@Name:  NODE_RENAMED
-        @@@Value:  4
-        @@@Description:
-          @@@@lang:en
-          @@@@@: The node is renamed.
-        @@@ImplNote:
-          @@@@lang:en
-          @@@@@: "Document.renameNode".
-     @@Const:
-        @@@Name:  NODE_ADOPTED
-        @@@Value:  5
-        @@@Description:
-          @@@@lang:en
-          @@@@@: The node is adopted.
-        @@@ImplNote:
-          @@@@lang:en
-          @@@@@: "Document.adoptNode".
+    @@enDesc:
+      An <Q::OperationType> value is an integer indicating the
+      type of operation being performed on a node.
+
+    @@Const:
+      @@@Name: NODE_CLONED
+      @@@intValue: 1
+      @@@enDesc:
+        The node is cloned.
+      @@@enImplNote:
+        <M::t|Node.cloneNode>.
+
+    @@Const:
+      @@@Name: NODE_IMPORTED
+      @@@intValue: 2
+      @@@enDesc:
+        The node is imported.
+      @@@enImplNote:
+        <M::t|Document.importNode>.
+
+    @@Const:
+      @@@Name: NODE_DELETED
+      @@@intValue: 3
+      @@@enDesc:
+        The node is deleted.
+      
+          {NOTE:: This may not be supported or may not be reliable
+                  in certain environments, such as Java, where
+                  the implementation has no real control over when
+                  objects are actually deleted.
+          }
+
+    @@Const:
+      @@@Name: NODE_RENAMED
+      @@@intValue: 4
+      @@@enDesc:
+        The node is renamed.
+      @@@enImplNote:
+        <M::t|Document.renameNode>.
+
+    @@Const:
+      @@@Name: NODE_ADOPTED
+      @@@intValue: 5
+      @@@enDesc:
+        The node is adopted to the document.
+      @@@enImplNote:
+        <M::t|Document.adoptNode>.
+
   @Method:
-     @@Name:  handle
-     @@Description:
-       @@@lang:en
-       @@@@:
-         Called whenever the node for which the handler is registered 
-         is imported or cloned.
-       \
-         DOM applications MUST NOT raise exceptions in a 
-         "UserDataHandler".  The effect of throwing exceptions 
-         from the handler is implementation dependent.
-     @@ImplNote:
-       @@@lang:en
-       @@@@:
-         The manakai DOM implementation does NOT warn when 
-         an exception is thrown.
-     @@Param:
-        @@@Name:  operation
-        @@@Type:  
-          DOMMain:unsigned-short||ManakaiDOM|all
-        @@@actualType: OperationType
-        @@@Description:
-          @@@@lang:en
-          @@@@@: The type of operation that is being performed on the node.
-     @@Param:
-        @@@Name:  key
-        @@@Type:  
-          DOMMain:DOMString
-        @@@Description:
-          @@@@lang:en
-          @@@@@: The key for which this handler is being called.
-     @@Param:
-        @@@Name:  data
-        @@@Type:  
-          DOMMain:DOMUserData
-        @@@Description:
-          @@@@lang:en
-          @@@@@: The data for which this handler is being called.
-     @@Param:
-        @@@Name:  src
-        @@@Type:  Node
-        @@@Description:
-          @@@@lang:en
-          @@@@@: 
-            The node being cloned, adopted, imported or renamed.
-        @@@InCase:
-          @@@@Value:
-            @@@@@is-null:1
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@: The node is being deleted.
-     @@Param:
-        @@@Name:  dst
-        @@@Type:  Node
-        @@@Description:
-          @@@@lang:en
-          @@@@@: The node newly created.
-        @@@InCase:
-          @@@@Value:
-            @@@@@is-null:1
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@: No node is newly created.
-      @@Return:
+    @@Name: handle
+    @@enDesc:
+      The <M::UserDataHandler.handle> method is called whenever
+      the node for which the handler is registered is imported or cloned.
+
+      DOM applications must not raise exceptions in a <IF::UserDataHandler>.
+      The effect of throwing exceptions from the handler is implementation
+      dependent.
+
+    @@Param:
+      @@@Name: operation
+      @@@Type: idl|unsignedShort||ManakaiDOM|all
+      @@@dis:actualType: OperationType
+      @@@enDesc:
+        The type of operation that is being performed on the node.
+    @@Param:
+      @@@Name: key
+      @@@Type: DOMMain|DOMString
+      @@@enDesc:
+        The key for which the handler is being called.
+    @@Param:
+      @@@Name: data
+      @@@Type: DOMMain|DOMUserData
+      @@@enDesc:
+        The data for which the handler is being called.
+    @@Param:
+      @@@Name: src
+      @@@Type: t|Node
+      @@@enDesc:
+        The node to which the <P::operation> is being performed.
+      @@@nullCase:
+        @@@@enDesc:
+          The handler is called when the node is being deleted.
+    @@Param:
+      @@@Name: dst
+      @@@Type: t|Node
+      @@@enDesc:
+        The node newly created.
+      @@@nullCase:
+        @@@@enDesc:
+          No node is newly created.
+    @@Return:
+      @@@PerlDef:
+        goto &$self;
+##UserDataHandler
 
 IFCls3Def:
   @IFQName: DOMError
@@ -3556,12 +3558,8 @@ IFCls3Def:
     @@rdf:type: DISLang|InputProcessor
     @@rdf:type: DISLang|OutputProcessor
     @@PerlDefC:
-      $INPUT = bless $INPUT, __PACKAGE__ if ref $INPUT eq 'CODE';
-    @@ImplNote:
-      @@@lang:en
-      @@@@:
-        Classes inheriting this class must redefine this normalizer 
-        because of <Perl::__PACKAGE__>. 
+      $INPUT = bless $INPUT, <ClassName::ManakaiDOMErrorHandler>
+        if ref $INPUT eq 'CODE';
 
   @Method:
     @@Name: handleError

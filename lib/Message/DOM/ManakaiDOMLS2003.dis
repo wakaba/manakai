@@ -29,7 +29,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2005/11/16 10:07:13 $
+      $Date: 2005/11/20 12:08:09 $
     @@ContentType:
       dis:Date.RCS
 
@@ -82,6 +82,8 @@ Namespace:
     http://www.w3.org/1999/02/22-rdf-syntax-ns#
   @rdfs:
     http://www.w3.org/2000/01/rdf-schema#
+  @t:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/tree#
   @test:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Test#
   @xml:
@@ -493,7 +495,7 @@ ResourceDef:
         @@@Type: 
           DOMCore:Document
         @@@actualType:
-          DOMCore:ManakaiDOMDocument
+          t:ManakaiDOMDocument
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -537,7 +539,7 @@ ResourceDef:
            \## TODO: error & uri handler
            \## TODO: support of domConfig
 
-           my $node = <ClassM::DOMCore:ManakaiDOMDocument.newObject>;
+           my $node = <ClassM::t:ManakaiDOMDocument.newObject>;
            $node->{<H::DOMCore:implementation>}
                 = $self->flag (<H::DOMCore:implementation>);
            $node->{<H::ManakaiDOM:implID>}
@@ -571,7 +573,7 @@ ResourceDef:
                MDOMX:values => {{node_type => $doc->node_type}},
              }__;
            }
-           $r = <ClassM::DOMCore:ManakaiDOMNode.getNodeReference> ($node);
+           $r = <ClassM::t:ManakaiDOMNode.getNodeReference> ($node);
     
     @@Test:
       @@@enDesc:
@@ -618,7 +620,7 @@ ResourceDef:
                                           SGML_GENERAL_ENTITY/;
 
              if ($src->node_type eq '#element') {
-               my $newNode = <ClassM::DOMCore:ManakaiDOMElement.newObject>;
+               my $newNode = <ClassM::t:ManakaiDOMElement.newObject>;
                $parent-><M::NodeStem.importTree> ($newNode);
                $newNode->{<H::DOMCore:ownerDocument>}
                  = $parent->{<H::DOMCore:ownerDocument>} || $parent;
@@ -642,7 +644,7 @@ ResourceDef:
                  $self-><M::ManakaiXMLParser2003.toDOMNode> ($_ => $newNode);
                }
                for my $prefix (keys %{$src->{ns}||{}}) {
-                 my $ns = <ClassM::DOMCore:ManakaiDOMAttr.newObject>;
+                 my $ns = <ClassM::t:ManakaiDOMAttr.newObject>;
                  $newNode-><M::NodeStem.importTree> ($ns);
                  $ns->{<H::DOMCore:ownerDocument>}
                    = $newNode->{<H::DOMCore:ownerDocument>};
@@ -659,7 +661,7 @@ ResourceDef:
                  if (defined $src->{ns}->{$prefix} and
                      length $src->{ns}->{$prefix} and 
                      $src->{ns}->{$prefix} ne NULL_URI) {
-                   my $text = <ClassM::DOMCore:ManakaiDOMText.newObject>;
+                   my $text = <ClassM::t:ManakaiDOMText.newObject>;
                    $ns-><M::NodeStem.importTree> ($text);
                    $text->{<H::DOMCore:ownerDocument>}
                      = $ns->{<H::DOMCore:ownerDocument>};
@@ -669,7 +671,7 @@ ResourceDef:
                  }
                }
              } elsif ($src->node_type eq '#attribute') {
-               my $newNode = <ClassM::DOMCore:ManakaiDOMAttr.newObject>;
+               my $newNode = <ClassM::t:ManakaiDOMAttr.newObject>;
                $parent-><M::NodeStem.importTree> ($newNode);
                $newNode->{<H::DOMCore:ownerDocument>}
                  = $parent->{<H::DOMCore:ownerDocument>};
@@ -697,7 +699,7 @@ ResourceDef:
                         ->{$newNode->{<H::infoset:localName>}} = $newNode;
                }
                if (defined $src->{value} and length $src->{value}) {
-                 my $text = <ClassM::DOMCore:ManakaiDOMText.newObject>;
+                 my $text = <ClassM::t:ManakaiDOMText.newObject>;
                  $newNode-><M::NodeStem.importTree> ($text);
                  $text->{<H::DOMCore:ownerDocument>}
                    = $newNode->{<H::DOMCore:ownerDocument>};
@@ -713,7 +715,7 @@ ResourceDef:
                if ($lc and $lc->{<H::DOMCore:nodeType>} eq <H::DOMCore:Text>) {
                  $lc->{<H::infoset:content>} .= $src->{value};
                } elsif (defined $src->{value} and length $src->{value}) {
-                 my $text = <ClassM::DOMCore:ManakaiDOMText.newObject>;
+                 my $text = <ClassM::t:ManakaiDOMText.newObject>;
                  $parent-><M::NodeStem.importTree> ($text);
                  $text->{<H::DOMCore:ownerDocument>}
                    = $parent->{<H::DOMCore:ownerDocument>};
@@ -723,7 +725,7 @@ ResourceDef:
                }
              } elsif ($src->node_type eq '#comment') {
                if (defined $src->{value} and length $src->{value}) {
-                 my $text = <ClassM::DOMCore:ManakaiDOMComment.newObject>;
+                 my $text = <ClassM::t:ManakaiDOMComment.newObject>;
                  $parent-><M::NodeStem.importTree> ($text);
                  $text->{<H::DOMCore:ownerDocument>}
                    = $parent->{<H::DOMCore:ownerDocument>} || $parent;
@@ -747,7 +749,7 @@ ResourceDef:
                  if ($lc and $lc->{<H::DOMCore:nodeType>} eq <H::DOMCore:Text>) {
                    $lc->{<H::infoset:content>} .= $val;
                  } else {
-                   my $text = <ClassM::DOMCore:ManakaiDOMText.newObject>;
+                   my $text = <ClassM::t:ManakaiDOMText.newObject>;
                    $parent-><M::NodeStem.importTree> ($text);
                    $text->{<H::DOMCore:ownerDocument>}
                      = $parent->{<H::DOMCore:ownerDocument>};
