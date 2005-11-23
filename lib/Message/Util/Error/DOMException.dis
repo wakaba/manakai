@@ -20,7 +20,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/11/15 14:18:24 $
+      $Date: 2005/11/23 11:21:41 $
     @@ContentType:
       dis:Date.RCS
   
@@ -651,20 +651,20 @@ ResourceDef:
         DISLang:String::ManakaiDOM:all
       @@@PerlDef:
         $r = $self->SUPER::stringify;
-        if (defined $self->{<Q::MDOMX:class>}) {
-          if (defined $self->{<Q::MDOMX:method>}) {
-            $r = $self->{<Q::MDOMX:class>} . '->' .
-                 $self->{<Q::MDOMX:method>} . ': ' . $r;
-          } elsif (defined $self->{<Q::MDOMX:attr>}) {
-            $r = $self->{<Q::MDOMX:class>} . '->' .
-                 $self->{<Q::MDOMX:attr>} . ' (' .
-                 $self->{<Q::MDOMX:on>} . '): ' . $r;
+        if (defined $self->{<H::MDOMX:class>}) {
+          my $cls = $self->{<H::MDOMX:class>};
+          $cls =~ s/\G.+?:://g;
+          if (defined $self->{<H::MDOMX:method>}) {
+            $r = $cls . '.' . $self->{<H::MDOMX:method>} . ': ' . $r;
+          } elsif (defined $self->{<H::MDOMX:attr>}) {
+            $r = $cls . '.' . $self->{<H::MDOMX:attr>} . ' (' .
+                 $self->{<H::MDOMX:on>} . '): ' . $r;
           } else {
-            $r = $self->{<Q::MDOMX:class>} . ': ' . $r;
+            $r = $cls . ': ' . $r;
           }
         }
-        if (defined $self->{<Q::MDOMX:param-name>}) {
-          $r = 'Parameter "' . $self->{<Q::MDOMX:param-name>} . '": ' . $r;
+        if (defined $self->{<H::MDOMX:param-name>}) {
+          $r = 'Parameter /' . $self->{<H::MDOMX:param-name>} . '/: ' . $r;
         }
 
   @Attr:

@@ -1,5 +1,14 @@
 2005-11-23  Wakaba  <wakaba@suika.fam.cx>
 
+	* Error.pm (new): Sets |-stacktrace_| property if debug
+	or verbose mode.
+	(stringify): Appends longer trace if debug or verbose mode.
+	($VERBOSE): New flag.
+
+	* DIS.dis: Bugs on error depth fixed.
+	
+2005-11-23  Wakaba  <wakaba@suika.fam.cx>
+
 	* DIS.dis (text): New attribute implementation.
 
 	* ManakaiNode.dis (destroyNodeStem): New method.

@@ -25,7 +25,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2005/11/23 07:58:09 $
+      $Date: 2005/11/23 11:21:09 $
     @@ContentType:
       dis:Date.RCS
   
@@ -652,6 +652,7 @@ IFClsDef:
             There is no child element found whose name is <P::name>. 
       @@@UndeclaredPrefixException:
       @@@PerlDef:
+        __DEEP{
         FIND: {
           my $node = $self->{<H::mn:node>};
           __CODE{expandETBinding:: $node => $node}__;
@@ -674,13 +675,12 @@ IFClsDef:
           }
           ## Not found
           if ($makeNewNode) {
-            __DEEP{
-              $r = ($self-><AG::SWCFGNode.ownerDocument> || $self)
+            $r = ($self-><AG::SWCFGNode.ownerDocument> || $self)
                         -><M::SWCFGDocument.createElementNS> (null, $localName);
-              $self-><M::SWCFGNode.appendNode> ($r);
-            }__;
+            $self-><M::SWCFGNode.appendNode> ($r);
           }
         } # FIND
+        }__;
 
   @Method:
     @@Name:getAttributeNS
@@ -1878,6 +1878,7 @@ IFClsDef:
         @@@@@:
           Node path string. 
       @@@PerlDef:
+      __DEEP{
         my $parent = $self-><AG::SWCFGNode.parentNode>;
         if ($parent) {
           $r = $parent-><M::SWCFGNode.nodePath> (%opt);
@@ -1908,6 +1909,7 @@ IFClsDef:
             msg => {qq<Node path = "$r" ... Oops! Node type: "$node_type">},
           }__;
         }
+      }__;
 
   @Method:
     @@Name:flag
@@ -3177,6 +3179,7 @@ IFClsDef:
     @@UndeclaredPrefixException:
     @@PerlDef:
       unless ($node->{<H::swcfg21:etExpanded>}) {
+      __DEEP{
         my $__qn;
         if ($node->{<H::swcfg21:namespaceExpanded>}) {
           $__qn = $self-><M::ManakaiSWCFGNode.getNodeReference> ($node)
@@ -3197,13 +3200,11 @@ IFClsDef:
           unless ($b->{namespaceExpanded}) {
             if ($b->{shadowLocalName} =~ s/^([^:]*)://) {
               my $__prefix = $1;
-              __DEEP{
-                $b->{shadowNamespaceURI}
+              $b->{shadowNamespaceURI}
                    = $self-><M::ManakaiSWCFGNode.getNodeReference> ($__od)
                            -><M::SWCFGNode.lookupNamespaceURI>
                                  ($__prefix, make_new_binding => false,
                                   raise_prefix_exception => true);
-              }__;
             }
             $b->{namespaceExpanded} = true;
           }
@@ -3222,6 +3223,7 @@ IFClsDef:
           }
         }
         $node->{<H::swcfg21:etExpanded>} = true;
+      }__;
       }
 
   @ResourceDef:
@@ -4209,11 +4211,13 @@ ResourceDef:
     @@Type: DISLang|String
     @@Get:
       @@@PerlDef:
-        $r = $self->SUPER::text;
-        if (defined $self->{<H::DIS:sourceNode>}) {
-          $r = 'Node ' . $self->{<H::DIS:sourceNode>}-><M::SWCFGNode.nodePath>
-                          . ': ' . $r;
-        }
+        __DEEP{
+          $r = $self->SUPER::text;
+          if (defined $self->{<H::DIS:sourceNode>}) {
+            $r = 'Node ' . $self->{<H::DIS:sourceNode>}-><M::SWCFGNode.nodePath>
+                            . ': ' . $r;
+          }
+        }__;
 ##SWCFGException
 
 ElementTypeBinding:

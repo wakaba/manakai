@@ -23,7 +23,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2005/11/23 07:58:20 $
+      $Date: 2005/11/23 11:21:20 $
     @@ContentType:
       dis:Date.RCS
   
@@ -3786,7 +3786,7 @@ IFClsDef:
         @@@@enDesc:
           The method is unable to resolve the reference. 
       @@@PerlDef:
-        $r = $self->(@_);
+        goto &$self;
 
   @ResourceDef:
     @@rdf:type: DISLang|InputProcessor
@@ -4100,6 +4100,7 @@ IFClsDef:
       @@@PerlDef:
         if (defined $given) {
           if (ref $given) {
+          __DEEP{
             if ($given->isa (<IFName::dv|DVValue>)) {
               $given = $given-><AG::dv|DVValue.sourceNodePath>;
             } else {
@@ -4107,6 +4108,7 @@ IFClsDef:
                        $given-><M::SWCFGNode.nodePath>
                           (key => [qw/QName Name type Type/]);
             }
+          }__;
           }
           $self->{<H::DIS|isReferred>} = $given;
         }

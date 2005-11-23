@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/11/20 09:49:30 $
+      $Date: 2005/11/23 11:21:40 $
     @@ContentType:
       dis:Date.RCS
   
@@ -410,16 +410,14 @@ IFClsDef:
               $a->{nodeID} = $source_node-><AG::SNode.nodeIDRef>
                 if ${$a->{uri}} eq <Q::dis:ResourceDef>;
               my $source_childs = $source_node-><AG::SNode.childNodes>;
-              __DEEP{
-                for (my $i = 0;
-                     $i < $source_childs-><AG::swcfg21:SWCFGChildNodeList
-                                             ::swcfg21:ForLatest.length>; $i++) {
-                  my $source_child = $source_childs
+              for (my $i = 0;
+                   $i < $source_childs-><AG::swcfg21:SWCFGChildNodeList
+                                           ::swcfg21:ForLatest.length>; $i++) {
+                my $source_child = $source_childs
                                      -><M::swcfg21:SWCFGChildNodeList
                                          ::swcfg21:ForLatest.item> ($i);
-                  $cn->($self, $db, $source_child => $a);
-                }
-              }__;
+                $cn->($self, $db, $source_child => $a);
+              }
               $np = $source_node-><AG::SEl.realQualifiedName>;
               CEL: for my $cel (@{$a->{child}||[]}) {
                 ET: for my $et (

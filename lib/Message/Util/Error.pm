@@ -15,10 +15,11 @@ This module is part of manakai.
 
 package Message::Util::Error;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.12 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error;
 push our @ISA, 'Error';
 our $DEBUG;
+our $VERBOSE;
 
 sub import {
   shift;
@@ -60,7 +61,18 @@ sub new ($;%) {
             || $class->___get_error_def ('UNKNOWN')
             or die qq(Error definition for "$opt{-type}" not found);
 #  local $Error::Depth = $Error::Depth + 1;
-  $class->SUPER::new (%opt);
+  my $err = $class->SUPER::new (%opt);
+  if ($Error::Debug or $DEBUG) {
+    require Carp;
+    #local $Carp::CarpLevel = $Error::Depth;
+    local $Carp::CarpLevel = 1;
+    $err->{-stacktrace_} = Carp::longmess ();
+  } elsif ($VERBOSE) {
+    require Carp;
+    local $Carp::CarpLevel = $Error::Depth - 1;
+    $err->{-stacktrace_} = Carp::longmess ();
+  }
+  return $err;
 }
 
 sub text {
@@ -72,8 +84,14 @@ sub text {
 sub stringify {
   my $self = shift;
   my $text = $self->text;
-  $text .= sprintf " at %s line %d.\n", $self->file, $self->line
-    unless $text =~ /\n$/s;
+  unless ($text =~ /\n$/s) {
+    if ($Error::Debug or $DEBUG or $VERBOSE) {
+      $text = defined $self->{-stacktrace_} ? $text . $self->{-stacktrace_}
+                                            : Carp::longmess ($text);
+    } else {
+      $text .= sprintf " at %s line %d.\n", $self->file, $self->line;
+    }
+  }
   $text;
 }
 
@@ -282,4 +300,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2005/10/08 12:05:59 $
+1; # $Date: 2005/11/23 11:21:39 $

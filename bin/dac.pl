@@ -68,6 +68,9 @@ $Opt{no_undef_check} = defined $Opt{no_undef_check}
 $Opt{dis_suffix} = '.dis' unless defined $Opt{dis_suffix};
 $Opt{daem_suffix} = '.daem' unless defined $Opt{daem_suffix};
 $Message::DOM::DOMFeature::DEBUG = 1 if $Opt{debug};
+require Error;
+$Error::Debug = 1 if $Opt{debug};
+$Message::Util::Error::VERBOSE = 1 if $Opt{verbose};
 
 sub status_msg ($) {
   my $s = shift;
