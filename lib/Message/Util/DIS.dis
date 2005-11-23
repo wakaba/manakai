@@ -23,7 +23,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2005/11/17 10:14:24 $
+      $Date: 2005/11/23 07:58:20 $
     @@ContentType:
       dis:Date.RCS
   
@@ -7579,7 +7579,29 @@ ResourceDef:
     @@lang:en
     @@@:
       ISSUE: Too many subtypes for a type!  New type should be added?
+
+  @Attr:
+    @@Name: text
+    @@enDesc:
+      The description of the error, in <LANG::i-default> language.
+    @@enImplNote:
+      See <A::dx|Exception.text> for super definition.
+    @@Type: DISLang|String
+    @@Get:
+      @@@PerlDef:
+        $r = $self->SUPER::text;
+        if (defined $self->{<H::DIS:sourceNode>}) {
+          $r = 'Node ' . $self->{<H::DIS:sourceNode>}-><M::SWCFGNode.nodePath>
+                          . ': ' . $r;
+        }
 ##DISException
+
+ElementTypeBinding:
+  @Name: enImplNote
+  @ElementType:
+    dis:ImplNote
+  @ShadowContent:
+    @@lang:en
 
 XParamDef:
   @QName: hashKeyName

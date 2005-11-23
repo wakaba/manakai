@@ -60,7 +60,7 @@ NS_MANAKAIDOM = http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom\#
 NS_UTIL = http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/
 NS_DIS  = http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS\#
 
-GENERATED_FILES = util-perlcode.t dom-feature.t dom-genericls.t \
+GENERATED_FILES = util-perlcode.t dom-feature.t dom-tree.t dom-genericls.t \
   dom-mdomls2003.t util-dis-dnlite.t
 
 all: $(GENERATED_FILES)
@@ -80,6 +80,9 @@ dom-feature.t: $(DOM_FEATURE_DAC) $(DAC2TEST_PL)
 
 dom-genericls.t: $(DOM_CORE_DAC) $(DAC2TEST_PL)
 	$(DAC2TEST) $< --source-module="$(NS_MDOM)GenericLS" > $@
+
+dom-tree.t: $(DOM_CORE_DAC) $(DAC2TEST_PL)
+	$(DAC2TEST) $< --source-module="$(NS_MDOM)Tree" > $@
 
 dom-mdomls2003.t: $(DOM_LS_DAC) $(DAC2TEST_PL)
 	$(DAC2TEST) $< --source-module="$(NS_MDOM)ManakaiDOMLS2003" > $@

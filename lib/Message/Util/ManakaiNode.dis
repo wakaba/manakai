@@ -18,7 +18,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date:
-    $Date: 2005/11/13 04:45:06 $
+    $Date: 2005/11/23 07:58:40 $
   
   @Require:
     @@Module:
@@ -431,6 +431,8 @@ ClassDef:
                 push @node, $node->{$p};
               }
 
+          $node-><M::NodeStem.destroyNodeStem>;
+
           for my $p (@{$nt->{<H::mn:xrefnode0>}||[]}) {
             if (defined $node->{$p} and 
                 ${$node->{$p}->{<H::mn:treeID>}||$tid} ne $$tid) {
@@ -457,6 +459,23 @@ ClassDef:
         \
         An <QUOTE::uninitialized> warning in this method might mean 
         some method puts an <Perl::undef> into a list of nodes. 
+
+  @IntMethod:
+    @@Name: destroyNodeStem
+    @@enDesc:
+      The <M::NodeStem.destryoNodeStem> method is called just before
+      the <IF::NodeStem> is being destructed.
+
+        {NOTE:: This method plays the role of <Perl::DESTROY>
+                special-purpose method in Perl.  Note that
+                when the <Perl::DESTROY> method is invoked, 
+                all data contained in the <IF::NodeStem> has 
+                already been removed while when this method
+                is invoked they are there yet.
+        }
+    @@Return:
+      @@@PerlDef:
+        ## No action by default
 
   @IntMethod:
     @@Name: importTree

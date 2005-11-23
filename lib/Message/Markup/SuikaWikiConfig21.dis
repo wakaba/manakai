@@ -25,7 +25,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2005/11/13 04:45:05 $
+      $Date: 2005/11/23 07:58:09 $
     @@ContentType:
       dis:Date.RCS
   
@@ -4199,12 +4199,34 @@ ResourceDef:
           @@@@@@:
             The implementation is unable to read and parse the 
             SuikaWikiConfig document. 
+
+  @Attr:
+    @@Name: text
+    @@enDesc:
+      The description of the error, in <LANG::i-default> language.
+    @@enImplNote:
+      See <A::dx|Exception.text> for super definition.
+    @@Type: DISLang|String
+    @@Get:
+      @@@PerlDef:
+        $r = $self->SUPER::text;
+        if (defined $self->{<H::DIS:sourceNode>}) {
+          $r = 'Node ' . $self->{<H::DIS:sourceNode>}-><M::SWCFGNode.nodePath>
+                          . ': ' . $r;
+        }
 ##SWCFGException
 
 ElementTypeBinding:
   @Name: enDesc
   @ElementType:
     dis:Description
+  @ShadowContent:
+    @@lang:en
+
+ElementTypeBinding:
+  @Name: enImplNote
+  @ElementType:
+    dis:ImplNote
   @ShadowContent:
     @@lang:en
 

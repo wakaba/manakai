@@ -12,7 +12,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2005/11/20 09:49:28 $
+    $Date: 2005/11/23 07:58:05 $
 
   @Require:
     @@Module:
@@ -105,6 +105,8 @@ Namespace:
     urn:x-suika-fam-cx:markup:suikawiki:0:10:
   @t:
     http://suika.fam.cx/~wakaba/archive/2004/dom/tree#
+  @test:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Test#
   @xhtml1:
     http://www.w3.org/1999/xhtml
   @xml:
@@ -177,6 +179,14 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type: DISLang|Method
     @@ForCheck: !=ManakaiDOM|ManakaiDOM
+
+ElementTypeBinding:
+  @Name: L3Method
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|Method
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|DOM3
 
 ElementTypeBinding:
   @Name: IntMethod
@@ -2090,7 +2100,7 @@ IFCls1Def:
         associated to the node is not carried over.  However,
         if any <IF::UserDataHandlers> has been specified along with
         the associated data, those handlers will be called with
-        the appropriate parameters before this methd returns.
+        the appropriate parameters before the method returns.
         <SRC::DOM Level 3>
 
       - If the node is an <IF::Element>, all attributes and their values,
@@ -2127,6 +2137,12 @@ IFCls1Def:
 
       - Cloning a node does not copy the event listeners attached to it.
         <SRC::DOM Level 2 Events> <SRC::DOM Level 3 Events>
+
+      {NOTE:: <IF::UserDataHandler>s are prohibitted to throw exceptions;
+              if a <IF::UserDataHandler> that is registered to the node
+              being cloned throws an exception, then the result of
+              the method is undefined.
+      }
 
      @@ImplNote:
        @@@lang:en
@@ -2171,12 +2187,13 @@ IFCls1Def:
              $strict_check = $od-><AG::Document.strictErrorChecking>;
              $od-><AS::Document.strictErrorChecking> (false);
            }__;
+           my @udh;
            my @node = ([$self]);
            while (@node) {
              my ($node, $parent) = @{shift @node};
              my $nt = $node-><AG::Node.nodeType>;
+             my $clone;
              if ($nt == <C::Node.ELEMENT_NODE>) {
-               my $clone;
                my $ln;
 
                __FOR{ManakaiDOM:DOM2::
@@ -2203,7 +2220,7 @@ IFCls1Def:
                  push @node, map {[$_, $clone]} @{$node-><AG::Node.childNodes>};
                }
              } elsif ($nt == <C::Node.TEXT_NODE>) {
-               my $clone = $od-><M::Document.createTextNode>
+               $clone = $od-><M::Document.createTextNode>
                                    ($node-><AG::CharacterData.data>);
                if ($parent) {
                  $parent-><M::Node.appendChild> ($clone);
@@ -2215,7 +2232,6 @@ IFCls1Def:
                    if $node-><AG::Text.isElementContentWhitespace>;
                }__;
              } elsif ($nt == <C::Node.ATTRIBUTE_NODE>) {
-               my $clone;
                my $ln;
                __FOR{ManakaiDOM:DOM2::
                  $ln = $node-><AG::Node.localName>;
@@ -2245,7 +2261,7 @@ IFCls1Def:
                }
                push @node, map {[$_, $clone]} @{$node-><AG::Node.childNodes>};
              } elsif ($nt == <C::Node.COMMENT_NODE>) {
-               my $clone = $od-><M::Document.createComment>
+               $clone = $od-><M::Document.createComment>
                                    ($node-><AG::CharacterData.data>);
                if ($parent) {
                  $parent-><M::Node.appendChild> ($clone);
@@ -2253,7 +2269,7 @@ IFCls1Def:
                  $r = $clone;
                }
              } elsif ($nt == <C::Node.CDATA_SECTION_NODE>) {
-               my $clone = $od-><M::Document.createTextNode>
+               $clone = $od-><M::Document.createTextNode>
                                    ($node-><AG::CharacterData.data>);
                if ($parent) {
                  $parent-><M::Node.appendChild> ($clone);
@@ -2261,7 +2277,7 @@ IFCls1Def:
                  $r = $clone;
                }
              } elsif ($nt == <C::Node.PROCESSING_INSTRUCTION_NODE>) {
-               my $clone = $od-><M::Document.createProcessingInstruction>
+               $clone = $od-><M::Document.createProcessingInstruction>
                               ($node-><AG::DOMXML:ProcessingInstruction.target>);
                $clone-><AS::DOMXML:ProcessingInstruction.data>
                               ($node-><AG::DOMXML:ProcessingInstruction.data>);
@@ -2271,7 +2287,7 @@ IFCls1Def:
                  $r = $clone;
                }
              } elsif ($nt == <C::Node.ENTITY_REFERENCE_NODE>) {
-               my $clone = $od-><M::Document.createEntityReference>
+               $clone = $od-><M::Document.createEntityReference>
                                     ($node-><AG::Node.nodeName>);
                if ($parent) {
                  $parent-><M::Node.appendChild> ($clone);
@@ -2279,7 +2295,7 @@ IFCls1Def:
                  $r = $clone;
                }
              } elsif ($nt == <C::Node.DOCUMENT_FRAGMENT_NODE>) {
-               my $clone = $od-><M::Document.createDocumentFragment>;
+               $clone = $od-><M::Document.createDocumentFragment>;
                $r = $clone;
                push @node, map {[$_, $clone]} @{$node-><AG::Node.childNodes>};
              } elsif ($nt == <C::Node.DOCUMENT_NODE>) {
@@ -2313,15 +2329,74 @@ IFCls1Def:
              } else {
                ## TODO: Assertion
              }
-           }
+
+             push @udh, [$node => $clone]
+               if $node->{<H::mn:node>}->{<H::t|userData>};
+           } # @node
            __FOR{ManakaiDOM:DOM3::
              $od-><AS::Document.strictErrorChecking> (true) if $strict_check;
+
+             ## Calling user data handlers if any
+             for my $sd (@udh) {
+               my $src = $sd->[0];
+               my $src_ud = $src->{<H::mn:node>}->{<H::t|userData>};
+               for my $key (keys %{$src_ud}) {
+                 my $dh = $src_ud->{$key}->[1];
+                 if ($dh) {
+                   $dh-><M::c|UserDataHandler.handle>
+                           (<C::c|UserDataHandler.NODE_CLONED>,
+                            $key, $src_ud->{$key}->[0], $src, $sd->[1]);
+                 }
+               }
+             }
            }__;
          }__;
 
         @@@enImplNote:
-          {TODO:: UserDataHandler support
-          }
+          When are <IF::UserDataHandler>s invoked?  After a node
+          is cloned?  Or, all nodes are cloned?  In any order?
+
+          Level 1 or 2 method does not invoke user data handlers
+          even if the node cloned is a Level 3 node in current implementation.
+
+    @@L3Test:
+      @@@QName: Node.CloneNode.UserDataHandler.Test
+      @@@PerlDef:
+        my $impl = <Class::c|ManakaiDOMImplementation>->_new;
+        my $doc = $impl-><M::c|DOMImplementation.createDocument>
+                              ('http://www.example/', 'ex');
+        my $node = $doc-><AG::Document.documentElement>;
+        my $node_id = $node->{<H::mn:node>}->{<H::mn:nodeID>};
+
+        my $udh_called = false;
+
+        my $clone_node_id;
+
+        $node-><M::Node.setUserData> ('key' => {}, sub {
+          my ($self, $op, $key, $data, $src, $dest) = @_;
+          $udh_called = true;
+
+          $test->assert_equals ($op, <C::c|UserDataHandler.NODE_CLONED>);
+          $test->assert_equals ($key, 'key');
+          $test->assert_equals (ref $data, 'HASH');
+          $test->assert_not_null ($src);
+          $test->assert_equals ($src-><AG::Node.localName>, 'ex');
+          $test->assert_equals
+                   ($src->{<H::mn:node>}->{<H::mn:nodeID>}, $node_id);
+          $test->assert_not_null ($dest);
+          $test->assert_equals ($dest-><AG::Node.localName>, 'ex');
+          $test->assert_not_equals
+                   ($dest->{<H::mn:node>}->{<H::mn:nodeID>}, $node_id);
+          $clone_node_id = $dest->{<H::mn:node>}->{<H::mn:nodeID>};
+        });
+
+        my $clone = $node-><M::Node.cloneNode>;
+
+        $test->assert_true ($udh_called);
+        $test->assert_equals ($clone_node_id,
+                              $clone->{<H::mn:node>}->{<H::mn:nodeID>});
+
+        $node-><M::Node.setUserData> ('key', null, null);
 
   @Method:
      @@Name:  normalize
@@ -2331,11 +2406,11 @@ IFCls1Def:
          Put all <IF::Text> nodes in the full depth of the sub-tree 
          underneath this <IF::Node>, including attribute nodes 
          attaced to the <IF::Element>, 
-         into a "normal" form where only structure separates 
+         into a <QUOTE::normal> form where only structures separate
          <IF::Text> nodes, i.e. there are neither adjacent <IF::Text> 
          nodes nor empty <IF::Text> nodes. <SRC::DOM 1, 2, 3>
        \
-         If the parameter <DOM::normalize-characters> of the 
+         If the parameter <cfg::normalize-characters> of the 
          <A::Document.domConfig> is <DOM::true>, the characters 
          of the <IF::Text> nodes will also be fully normalized. 
          <SRC::DOM 3>
@@ -3374,41 +3449,119 @@ IFCls1Def:
             @@@@@lang:en
             @@@@@@:
               Implemented by each inheriting classes.
-  @Method:
-     @@Name:  setUserData
-     @@Return:
-        @@@Type:  
-          DOMMain:DOMUserData
-     @@Param:
-        @@@Name:  key
-        @@@Type:  
-          DOMMain:DOMString
-     @@Param:
-        @@@Name:  data
-        @@@Type:  
-          DOMMain:DOMUserData
-     @@Param:
-        @@@Name:  handler
-        @@@Type:  UserDataHandler
-     @@L3:
-     @@Level[list]:  3
-     @@SpecLevel:3
-     @@For:
-       ManakaiDOM:DOM3
-  @Method:
-     @@Name:  getUserData
-     @@Return:
-        @@@Type: 
-          DOMMain:DOMUserData
-     @@Param:
-        @@@Name:  key
-        @@@Type:  
-          DOMMain:DOMString
-     @@L3:
-     @@Level[list]:  3
-     @@SpecLevel:3
-     @@For:
-       ManakaiDOM:DOM3
+
+  @L3Method:
+    @@Name: setUserData
+    @@enDesc:
+      Associates an object to a key on the node.  The object can later
+      be retrieved from the node by calling <M::Node.getUserData>
+      method with the same key.
+    @@enDesc:
+      @@@ForCheck: ManakaiDOM|Perl ManakaiDOM|ForClass
+      @@@ddid: pleak
+      @@@@:
+        {NOTE:: Application developers are advised to be careful
+                to include direct or indirect references to the node
+                itself as user data or in user data handlers.
+                They would result in memory leak problems unless
+                the circular references are removed later.
+                
+                It would be a good practive to eusure that every user data
+                registered to a node is later unregistered by setting
+                <DOM::null> as a data for the same key.
+        }
+    @@Param:
+      @@@Name: key
+      @@@Type: DOMMain|DOMString
+      @@@enDesc:
+        The key to associate the <P::data> to.
+    @@Param:
+      @@@Name: data
+      @@@Type: DOMMain|DOMUserData
+      @@@enDesc:
+        The object to associate to the given key.
+      @@@nullCase:
+        @@@@enDesc:
+          Removes any existing association to the <P::key>.
+    @@Param:
+      @@@Name: handler
+      @@@Type: c|UserDataHandler
+      @@@enDesc:
+        The handler to associate to the <P::key>.
+      @@@nullCase:
+        @@@@enDesc:
+          No handler is associated.
+    @@Return:
+      @@@Type: DOMMain|DOMUserData
+      @@@enDesc:
+        The object previously associated to the <P::key> on the node.
+      @@@nullCase:
+        @@@@enDesc:
+          No object was associated.
+      @@@PerlDef:
+        $r = $self->{<H::mn:node>}->{<H::t|userData>}->{$key}->[0];
+        if (defined $data) {
+          $self->{<H::mn:node>}->{<H::t|userData>}->{$key} = [$data, $handler];
+        } else {
+          CORE::delete $self->{<H::mn:node>}->{<H::t|userData>}->{$key};
+        }
+
+  @L3Method:
+    @@Name: getUserData
+    @@enDesc:
+      Retrieves the object associated to a key on the node.
+    @@Param:
+      @@@Name: key
+      @@@Type: DOMMain|DOMString
+      @@@enDesc:
+        The key the object is associated to.
+    @@Return:
+      @@@Type: DOMMain|DOMUserData
+      @@@enDesc:
+        The object associated to the given <P::key> on the node.
+      @@@nullCase:
+        @@@@enDesc:
+          No object is associated.
+      @@@PerlDef:
+        $r = $self->{<H::mn:node>}->{<H::t|userData>}->{$key}->[0];
+
+  @L3Test:
+    @@QName: GetSetUserDataTest
+    @@PerlDef:
+      my $impl = <Class::c|ManakaiDOMImplementation>->_new;
+      my $node = $impl-><M::c|DOMImplementation.createDocument>;
+
+      my $data = ['2'];
+      my $handler = sub { 1 };
+
+      $test->assert_null
+               ($node-><M::Node.setUserData> ('key1', $data, $handler),
+                uri => <Q::GetSetUserDataTest.InitialReturnNull>);
+
+      my $key1_data = $node-><M::Node.getUserData> ('key1');
+      $test->assert_not_null ($key1_data);
+      $test->assert_equals ($data->[0], $key1_data->[0]);
+      $test->assert_equals
+               ($handler, $node->{<H::mn:node>}->{<H::t|userData>}->{key1}->[1]);
+      $test->assert_true
+               ($node->{<H::mn:node>}->{<H::t|userData>}->{key1}->[1]
+                     ->isa (<IFName::c|UserDataHandler>));
+
+      my $data2 = ['4'];
+      
+      $test->assert_equals ($node-><M::Node.setUserData> ('key1', $data2, null),
+                            $data);
+      
+      $test->assert_equals ($node-><M::Node.getUserData> ('key1'), $data2);
+      $test->assert_null ($node->{<H::mn:node>}->{<H::t|userData>}->{key1}->[1]);
+
+      $node-><M::Node.setUserData> ('key1', null, $handler);
+      $test->assert_null ($node-><M::Node.getUserData> ('key1'));
+      $test->assert_null ($node->{<H::mn:node>}->{<H::t|userData>}->{key1}->[1]);
+
+      $node-><M::Node.setUserData> ('key1', null, null);
+      $test->assert_null ($node-><M::Node.getUserData> ('key1'));
+      $test->assert_null ($node->{<H::mn:node>}->{<H::t|userData>}->{key1}->[1]);
 
   @IntMethod:
     @@Name: newObject
@@ -3437,19 +3590,26 @@ IFCls1Def:
                                          ManakaiDOM|Perl.new> ($refClass),
                             <ClassName::ManakaiDOMCore:ManakaiDOMNodeObjectNode>;
         }
-       @@@ImplNote:
-         @@@@lang:en
-         @@@@@:
-           Other properties required to be a legal <IF::Node> object:
-           <Q::DOMCore:nodeType>.
-         \
-           Optional properties: <Q::infoset:localName>, <Q::infoset:prefix>,
+       @@@enImplNote:
+         {P::: <IF::Node> properties:
+
+             - <Q::DOMCore:nodeType> (required)
+
+             - <Q::infoset:localName> (required for Level 2 element or
+                                       attribute nodes)
+
+             - <Q::infoset:prefix> (for Level 2 element, attribute,
+                                    or doctype node)
+
+             - <Q::DOMCore:ownerDocument>
+
            <Q::DOMCore:ownerDocument> (required for an <IF::Node> whose 
            type is other than <IF::Document> and <IF::DOMXML:DocumentType>), 
            <Q::infoset:namespaceName>, <Q::DOMCore:name>,
            <Q::DOMCore:read-only>.
 
   @mn:anydata2: DOMEvents|eventListener
+  @mn:anydata2: t|userData
 
   @IntMethod:
     @@Name: getNodeReference
@@ -3780,6 +3940,15 @@ IFCls1Def:
             $class => $class,
           }__;
 ##Node
+
+PropDef:
+  @QName: t|userData
+  @enDesc:
+    A hash reference whose value is a reference to the array of 
+    data and its handler.
+  @rdfs:domain: Node
+  @rdfs:range: DISPerl|HASH
+  @DOMCore:nodeProp: ud
 
 PropDef:
   @QName: DOMCore|nodeRefClass
@@ -4941,6 +5110,54 @@ ClsDef:
         Normalization should be done after the merge of adjacent 
         text nodes, since the merge might change the status 
         of normalization. 
+
+  @L3Method:
+    @@Name: destroyNodeStem
+    @@ManakaiDOM:isForInternal: 1
+    @@enDesc:
+      Invokes the user data handlers, if any, before the node
+      is deleted.
+    @@Return:
+      @@@PerlDef:
+        __FOR{ManakaiDOM:DOM3::
+          __DEEP{
+            for my $key (keys %{$self->{<H::t|userData>}||{}}) {
+              my $dha = $self->{<H::t|userData>}->{$key};
+              if ($dha->[1]) {
+                $dha->[1]-><M::c|UserDataHandler.handle>
+                             (<C::c|UserDataHandler.NODE_DELETED>,
+                              $key, $dha->[0], null, null);
+              }
+            }
+          }__;
+        }__;
+
+    @@L3Test:
+      @@@QName: Node.Deleted.UserDataHandler
+      @@@PerlDef:
+        my $impl = <Class::c|ManakaiDOMImplementation>->_new;
+        my $doc = $impl-><M::c|DOMImplementation.createDocument>
+                              ('http://www.example/', 'ex');
+        my $node = $doc-><AG::Document.documentElement>;
+
+        my $udh_called = false;
+
+        $node-><M::Node.setUserData> ('key' => {}, sub {
+          my ($self, $op, $key, $data, $src, $dest) = @_;
+          $udh_called = true;
+
+          $test->assert_equals ($op, <C::c|UserDataHandler.NODE_DELETED>);
+          $test->assert_equals ($key, 'key');
+          $test->assert_equals (ref $data, 'HASH');
+          $test->assert_null ($src);
+          $test->assert_null ($dest);
+        });
+
+        undef $doc;
+        undef $node;
+
+        $test->assert_true ($udh_called);
+        
 ##ManakaiDOMNodeObjectNode
 
 ElementTypeBinding:
@@ -10609,6 +10826,21 @@ ElementTypeBinding:
   @ShadowContent:
     @@lang:en
 
+ElementTypeBinding:
+  @Name: Test
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: test|StandaloneTest
+
+ElementTypeBinding:
+  @Name: L3Test
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: test|StandaloneTest
+    @@ForCheck: ManakaiDOM|ManakaiDOM3 ManakaiDOM|ForClass
+
 ResourceDef:
   @QName: c|Text
   @AliasFor: Text
@@ -13080,9 +13312,8 @@ NodeTypeDef:
           @@@@SetProp:
             DOMCore:documentURI
 
-  @Method:
+  @L3Method:
     @@Name: adoptNode
-    @@For: ManakaiDOM|DOM3
     @@enDesc:
       Attempts to adopt a node from another document to this document.
       
@@ -13139,6 +13370,22 @@ NodeTypeDef:
               to the XML version in use.
       }    
 
+    @@enDesc:
+      @@@ddid: adopt
+      @@@enImplNote: Not in spec.
+      @@@:
+        If an adopted node has user data with handlers being registered,
+        those handlers are invoked after the adoption occurred,
+        with the <CODE::operation>
+        parameter set to <C::c|UserDataHandler.NODE_ADOPTED>,
+        <CODE::src> parameter set to the adopted node, and
+        the <CODE::dest> parameter set to <DOM::null>.
+
+          {NOTE:: User data handlers are disallowed to throw any
+                  exception; if they do, then the result of 
+                  the method is implementation dependent.
+          }
+
     @@Param:
       @@@Name:  source
       @@@Type:  Node
@@ -13152,6 +13399,9 @@ NodeTypeDef:
         @@@@enDesc:
           The adopting operation fails, such as when the <P::source>
           node comes from a different implementation.
+      @@@enImplNote:
+        What is returned if <P::source> belongs to the same node
+        as the node?
       @@@raises:
         @@@@@: c|ADOPT_NODE_TYPE_NOT_SUPPORTED_ERR
         @@@@enDesc:
@@ -13253,6 +13503,7 @@ NodeTypeDef:
               $oe-><M::Element.removeAttributeNode> ($source);
             }__;
           }
+
           if (${$self->{<H::mn:node>}->{<H::mn:treeID>}} ne
               ${$source->{<H::mn:node>}->{<H::mn:treeID>}}) {
             for my $n (map {$_->{<H::mn:node>}} @change_od) {
@@ -13266,8 +13517,71 @@ NodeTypeDef:
                 $referent => {$self->{<H::mn:node>}},
               }__;
             }
+
+            for my $src (@change_od) {
+              my $src_ud = $src->{<H::mn:node>}->{<H::t|userData>} || {};
+              for my $key (keys %{$src_ud}) {
+                my $dh = $src_ud->{$key}->[1];
+                if ($dh) {
+                  $dh-><M::c|UserDataHandler.handle>
+                           (<C::c|UserDataHandler.NODE_ADOPTED>,
+                            $key, $src_ud->{$key}->[0], $src, null);
+                }
+              }
+            }
           }
+          $r = $source;
         } # compatible class
+
+      @@@enImplNote:
+        The order in which handlers are invoked when multiple
+        nodes are adopted is undefined.  Called just after the adoption
+        or after all nodes are adopted is also unspecified.
+
+
+    @@L3Test:
+      @@@QName: Node.AdoptNode.UserDataHandler.Test
+      @@@PerlDef:
+        my $impl = <Class::c|ManakaiDOMImplementation>->_new;
+        my $doc = $impl-><M::c|DOMImplementation.createDocument>
+                              ('http://www.example/', 'ex');
+        my $node = $doc-><AG::Document.documentElement>;
+        my $node_id = $node->{<H::mn:node>}->{<H::mn:nodeID>};
+
+        $test->set_test_data (node => $node);
+          ## This registration prevents the user data handler
+          ## being called when a test fails so that the |$node|
+          ## is being destructed (|NODE_DELETED|).
+
+        my $doc2 = $impl-><M::c|DOMImplementation.createDocument>;
+
+        my $udh_called = false;
+        my $src_doc_id;
+
+        $node-><M::Node.setUserData> ('key' => {}, sub {
+          my ($self, $op, $key, $data, $src, $dest) = @_;
+          $udh_called = true;
+
+          $test->assert_equals ($op, <C::c|UserDataHandler.NODE_ADOPTED>);
+          $test->assert_equals ($key, 'key');
+          $test->assert_equals (ref $data, 'HASH');
+          $test->assert_not_null ($src);
+          $test->assert_equals ($src-><AG::Node.localName>, 'ex');
+          $test->assert_equals
+                   ($src->{<H::mn:node>}->{<H::mn:nodeID>}, $node_id);
+          $src_doc_id = $src-><AG::Node.ownerDocument>
+                            ->{<H::mn:node>}->{<H::mn:nodeID>};
+          $test->assert_null ($dest);
+        });
+
+        $node = $doc2-><M::Document.adoptNode> ($node);
+
+        $test->assert_true ($udh_called);
+        $test->assert_equals ($src_doc_id,
+                              $doc2->{<H::mn:node>}->{<H::mn:nodeID>});
+
+        $node-><M::Node.setUserData> ('key', null, null);
+        $test->set_test_data (node => null);
 
   @Attr:
     @@Name: domConfig
@@ -13343,132 +13657,150 @@ NodeTypeDef:
      @@SpecLevel:3
      @@For:
        ManakaiDOM:DOM3
-  @Method:
-     @@Name:  renameNode
-     @@Description:
-       @@@lang:en
-       @@@@:
-         Rename an <IF::Element> or <IF::Attr> node. 
-      \
-         When possible, this simply changes the name of the 
-         given node.  Otherwise, this creates a new node 
-         with the specified name and replaces the existing node 
-         with the new node.
-     @@DOMMain:isNamespaceAware:1
-     @@ImplNote:
-       @@@lang:en
-       @@@@:
-         Non-simple way:
-       \
-         = Create a node.
-       \
-         = Any registered event listener is registered on the new node. 
-       \
-         = Any user data is removed from the old node.
-       \
-         = The old node is removed from its parent if any.
-       \
-         = The children are moved to the new node.
-       \
-         = The specified attributes are moved to the new node.
-       \
-         = The new node is inserted at the position the old node 
-           used to have in its parent's child nodes list.
-       \
-         = The user data is attached to the new node.
-       \
-         Default attributes from the DTD are updated according to 
-         the new element type name.  The implementation may 
-         update from other schemas.
-       \ 
-         <IF::Attr> attached to an <IF::Element> is first removed from 
-         the <IF::Element>.  Then either modifying the existing node 
-         or creating a new node and put is back.
-       \
-         A user data event <DOM::NODE_RENAMED> is fired and if 
-         the implementation supports the <Feature::MutationNameEvents>, 
-         each mutation operation involved fires the appropriate event 
-         and in the end 
-         <Q::ev:DOMElementNameChanged> or <Q::ev:DOMAttributeNameChanged> 
-         is fired.
-     @@Param:
-        @@@Name:  n
-        @@@Type:  Node
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            The node to rename.
-     @@Param:
-        @@@Name:  namespaceURI
-        @@@Type:
-          ManakaiDOM:ManakaiDOMNamespaceURI
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            The new namespace URI.
-     @@Param:
-        @@@Name:  qualifiedName
-        @@@Type:  
-          DOMMain:DOMString
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            The new qualified name.
-     @@Return:
-        @@@Type:  Node
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            The renamed node.
-        @@@Exception:
-          @@@@Type:DOMException
-          @@@@Name:NOT_SUPPORTED_ERR
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              The type of the specified node is neither 
-              <IF::Element> nor <IF::Attr>, or the DOM implementation 
-              does not support the renaming of the document element.
-        @@@Exception:
-          @@@@Type:DOMException
-          @@@@Name:INVALID_CHARACTER_ERR
-          @@@@SubType:
-            @@@@@QName:
-              MDOMX:MDOM_BAD_NAME
-            @@@@@Description:
-              @@@@@@lang:en
-              @@@@@@@:
-                The <P::qualifiedName> is not an XML <XML::Name>.
-       @@@Exception:
-         @@@@Type:DOMException
-         @@@@Name:WRONG_DOCUMENT_ERR
-         @@@@Description:
-           @@@@@lang:en
-           @@@@@@:
-             The <P::n> was created from a different document.
-       @@@Exception:
-         @@@@Type:DOMException
-         @@@@Name:NAMESPACE_ERR
-         @@@@Description:
-           @@@@@lang:en
-           @@@@@@:
-             Either the <P::qualifiedName> is malformed, 
-             the <P::qualifiedName> has a prefix and the <P::namespaceURI> 
-             is <DOM::null>, the <P::qualifiedName> has a prefix that 
-             is <XML::xml> and the <P::namespaceURI> is different 
-             from <URI::http://www.w3.org/XML/1998/namespace>, 
-             the <P::n> is an attribute and <P::qualifiedName> or its 
-             prefix is <XML::xmlns> and the <P::namespaceURI> is 
-             different from <URI::http://www.w3.org/2000/xmlns/>.
-     @@ImplNote:
-       @@@lang:en
-       @@@@:
-         What should be happen if non-XML or non-namespace node 
-         is tried to rename?
-     @@Level[list]:  3
-     @@SpecLevel:3
-     @@For:
-       ManakaiDOM:DOM3
+  @L3Method:
+    @@Name: renameNode
+    @@enDesc:
+      Renames an <IF::Element> or <IF::Attr> node.
+
+      When possible, this simple changes the name of the
+      given node.  Otherwise, this creates a new node with the
+      specified name and replaces the existing node with the new node.
+
+      If the renamed node is an <IF::Element>, only the <A::Attr.specified>
+      attributes are moved; default attributes originated from the DTD
+      are updated according to the new element type name.  In addition,
+      the implementation may update default attributes from other schemas.
+
+        {NOTE:: Applications should use <M::Document.normalizeDocument>
+                to guarantee those attributes are up-to-date after
+                renaming.
+        }
+
+      If the renamed node is an <IF::Attr> attached to <IF::Element>, 
+      the node is first removed from the owner <IF::Element>'s attribute
+      map.  Then, once renamed, it is put back.
+
+      In addition, a user data event <C::c|UserDataHandler.NODE_RENAMED>
+      is fired if there are user data handlers registered to the node.
+      When the implementation supports the feature <Feature::MutationNameEvents>,
+      each mutation operation involved in the method fires the appropriate
+      event, and in the end the event <EV::ev|DOMElementNameChanged>
+      or <EV::ev|DOMAttributeNameChanged> is fired.
+
+    @@DOMMain:isNamespaceAware:1
+    @@enImplNote:
+      {P:: If simple changing is impossible:
+ 
+           = Creates a new node.
+ 
+           = Registers any registered event listener on the new node.
+
+           = Removes any user data attached to the old node.
+
+           = Removes the old node from its parent, if any.
+
+           = Moves the children of the old node to the new node.
+
+           = Inserts the new node at the position the old node used to have
+             in its parent's child node list if it has one.
+
+           = Attaches the user data that was attached to the old node.
+
+      }
+
+    @@Param:
+      @@@Name: n
+      @@@Type: Node
+      @@@enDesc:
+        The node to rename.
+    @@Param:
+      @@@Name: namespaceURI
+      @@@Type: DOMMain|DOMString
+      @@@dis:actualType: ManakaiDOM|ManakaiDOMNamespaceURI
+      @@@enDesc:
+        The new namespace URI.
+      @@@nullCase:
+        @@@@enDesc:
+          The new name does not belong to any namespace.
+    @@Param:
+      @@@Name: qualifiedName
+      @@@Type: DOMMain|DOMString
+      @@@enDesc:
+        The new qualified name.
+    @@Return:
+      @@@Type: Node
+      @@@enDesc:
+        The rename node.
+      @@@raises:
+        @@@@@: MDOMX|MDOM_IMPL_NOSUPPORT_XMLNS
+        @@@@enDesc:
+          If the DOM implementation does not support the <DOM::XML> feature
+          and the language exposed through the <IF::Document>
+          object does not support XML Namespaces.
+        @@@@For: !ManakaiDOM|DOMXMLFeature ManakaiDOM|ManakaiDOM
+      @@@raises:
+        @@@@@: c|RENAME_NODE_TYPE_NOT_SUPPORTED_ERR
+        @@@@enDesc:
+          If the type of the <P::n> is neither <C::Node.ELEMENT_NODE>
+          nor <C::Node.ATTRIBUTE_NODE>.
+        @@@@enDesc:
+          @@@@@ddid: nonns
+          @@@@@For: ManakaiDOM|ManakaiDOM
+          @@@@@@:
+            Or, if the <P::n> does not support namespace since
+            it is created by DOM Level 1 method or does not support
+            the <Feature::XML> feature.
+      @@@raises:
+        @@@@@: c|RENAME_DOCUMENT_ELEMENT_NOT_SUPPORTED_ERR
+        @@@@enDesc:
+          If the <P::n> is the document element and the implementation
+          does not support the renaming of the document element.
+      @@@raises:
+        @@@@@: MDOMX|MDOM_BAD_NAME
+        @@@@enDesc:
+          If the <P::qualifiedName> is not an XML <CODE::Name> according
+          to the XML version in use (<A::Document.xmlVersion>).
+      @@@raises:
+        @@@@@: c|MDOMX_EXTERNAL_NODE
+        @@@@enDesc:
+          If the <P::n> was created from a different document than
+          the document.
+      @@@raises:
+        @@@@@: MDOMX|MDOM_NS_MALFORMED_QNAME
+        @@@@enDesc:
+          If the <P::qualifiedName> is a malformed qualified name.
+      @@@raises:
+        @@@@@: MDOMX|MDOM_NS_PREFIX_WITH_NULL_URI
+        @@@@enDesc:
+          If the <P::qualifiedName> has a prefix and the 
+          <P::namespaceURI> is <DOM::null>.
+      @@@raises:
+        @@@@@: MDOMX|MDOM_NS_XML_WITH_OTHER_URI
+        @@@@enDesc:
+          If the <P::qualifiedName> has a prefix that is <XML::xml>
+          and the <P::namespaceURI> is different from 
+          <URI::http://www.w3.org/XML/1998/namespace>.
+      @@@raises:
+        @@@@@: MDOMX|MDOM_NS_XMLNSQ_WITH_OTHER_URI
+        @@@@enDesc:
+          If the <P::n> is an attribute node and the <P::qualifiedName> 
+          is <XA::xmlns> and the <P::namespaceURI> is different from
+          <URI::http://www.w3.org/2000/xmlns/>.
+      @@@raises:
+        @@@@@: MDOMX|MDOM_NS_XMLNS_WITH_OTHER_URI
+        @@@@enDesc:
+          If the <P::n> is an attribute node and the <P::qualifiedName>
+          has a prefix that is <XML::xmlns> and the <P::namespaceURI>
+          is different from <URI::http://www.w3.org/2000/xmlns/>.
+      @@@enImplNote:
+        These exception cases from DOM Level 3 spec do not cover all.
+      @@@enImplNote:
+        What would happen if a non-XML or non-namespace-aware node
+        is being renamed?
+      ## TODO: Implement for xmlfeature
+      @@@disDef:
+        @@@@ForCheck: !ManakaiDOM|DOMXMLFeature
+        @@@@DOMMain:raiseException: MDOMX|MDOM_IMPL_NOSUPPORT_XMLNS
   
   @ReAttr:
     @@Name:baseURI

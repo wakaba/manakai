@@ -40,7 +40,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/11/20 12:08:09 $
+      $Date: 2005/11/23 07:57:44 $
     @@ContentType:
       dis:Date.RCS
 
@@ -74,6 +74,8 @@ Module:
       @@@QName: MDOM|Tree
 
 Namespace:
+  @c:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
   @dis:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
   @DOMCore:
@@ -1132,6 +1134,35 @@ ResourceDef:
            @@@@@@: DOMCore|node
            @@@@@enDesc:
              The node that is attempted to adopt.
+         @@@@XParam:
+           @@@@@@: MDOMX|param-name
+           @@@@@enDesc:
+             The name of the parameter to which the node is
+             specified directly or indirectly.
+       @@@SubTypeDef:
+         @@@@QName: c|RENAME_NODE_TYPE_NOT_SUPPORTED_ERR
+         @@@@For: ManakaiDOM|DOM3
+         @@@@enDesc:
+           The implementation does not support renaming of nodes
+           of the type.
+         @@@@XParam:
+           @@@@@@: DOMCore|node
+           @@@@@enDesc:
+             The node that is attempted to rename.
+         @@@@XParam:
+           @@@@@@: MDOMX|param-name
+           @@@@@enDesc:
+             The name of the parameter to which the node is
+             specified directly or indirectly.
+       @@@SubTypeDef:
+         @@@@QName: c|RENAME_DOCUMENT_ELEMENT_NOT_SUPPORTED_ERR
+         @@@@For: ManakaiDOM|DOM3
+         @@@@enDesc:
+           The implementation does not support renaming of the document element.
+         @@@@XParam:
+           @@@@@@: DOMCore|node
+           @@@@@enDesc:
+             The node that is attempted to rename.
          @@@@XParam:
            @@@@@@: MDOMX|param-name
            @@@@@enDesc:
@@ -3141,6 +3172,9 @@ IFCls3Def:
                 <Perl::CODE> reference with appropriate class name
                 when the reference is given to a method.
         }
+
+      Any <IF::UserDataHandler> object <kwd:MUST> be <DOM::true>
+      when it is evaluated in Boolean context.
 
   @enDesc:
     @@ForCheck: ManakaiDOM|ForClass

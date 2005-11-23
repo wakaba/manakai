@@ -13,7 +13,7 @@ Module:
   @License: license|Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/11/20 09:49:33 $
+      $Date: 2005/11/23 07:59:19 $
     @@ContentType: dis|Date.RCS
   
   @Require:
@@ -387,6 +387,7 @@ IFClsDef:
         }
         $self->{<H::dtest|currentNumber>}++;
         $self->{<H::dtest|uri>} = $uri;
+        $self->{<H::dtest|testData>} = {};
 
   @Attr:
     @@Name: uri
@@ -835,7 +836,46 @@ IFClsDef:
         $output = "'" . $output . "'";
       }
       $output .= ' ['.$__ref.']' if length $__ref;
+
+  @Method:
+    @@Name: setTestData
+    @@enDesc:
+      Associates a data with the key on the test manager.
+
+        {NOTE:: Associations of keys and data are removed when
+                <M::DTManager.startNewTest> method is called.
+        }
+
+        {NOTE:: It is useful to register a value whose destructor
+                might invoke part of test code which should usually
+                not be executed on that timing in successful cases
+                but may be executed in failure cases so that the failure
+                report is made unappropriate.  (See user data handler
+                tests in the implementation of DOM Level 3 Core for example.)
+        }
+   @@Param:
+     @@@Name: key
+     @@@Type: DISString
+     @@@enDesc:
+       The key.  If there is already data for the <P::key>, then
+       its data is updated.
+   @@Param:
+     @@@Name: data
+     @@@Type: DISPerl|Any
+     @@@enDesc:
+       The data.
+     @@@nullCase:
+       @@@@enDesc: The association is removed.
+   @@Return:
+     @@@PerlDef:
+       $self->{<H::dtest|testData>}->{$key} = $data;
 ##DTManager
+
+PropDef:
+  @QName: dtest|testData
+  @enDesc:
+    Test data.
+  @dtest:key: d
 
 ElementTypeBinding:
   @Name: NamedParam
