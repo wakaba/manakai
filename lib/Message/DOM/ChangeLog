@@ -1,3 +1,18 @@
+2005-11-24  Wakaba  <wakaba@suika.fam.cx>
+
+	* DOMCore.dis (severity, type): Getters return value from
+	the definition of the current error (i.e. |-def| hash).
+	(___error_def): New method.
+	(errorType): |dis:dataType| changed to |DISCore:TFQNames|
+	to ease natural reference to constant value.
+	(error-handler.default): Prints the error message by |warn|.
+
+	* Tree.dis (nodeValue.set): Reimplemented so that it 
+	warns as setting has no effect.
+	(___report_error): New method.  (It had been only implemented
+	in superclass.)
+	(setting-node-value-no-effect): New error type.
+
 2005-11-23  Wakaba  <wakaba@suika.fam.cx>
 
 	* DOMCore.dis: Error codes added.

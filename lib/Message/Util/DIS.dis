@@ -23,7 +23,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2005/11/23 11:21:20 $
+      $Date: 2005/11/24 12:08:54 $
     @@ContentType:
       dis:Date.RCS
   
@@ -7592,6 +7592,9 @@ ResourceDef:
     @@Get:
       @@@PerlDef:
         $r = $self->SUPER::text;
+        if (defined $self->{<H::DIS:uri>}) {
+          $r = '<' . $self->{<H::DIS:uri>} . '>: ' . $r;
+        }
         if (defined $self->{<H::DIS:sourceNode>}) {
           $r = 'Node ' . $self->{<H::DIS:sourceNode>}-><M::SWCFGNode.nodePath>
                           . ': ' . $r;

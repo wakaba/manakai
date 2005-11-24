@@ -25,7 +25,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/11/20 09:49:27 $
+      $Date: 2005/11/24 12:08:49 $
     @@ContentType:
       dis:Date.RCS
   
@@ -508,14 +508,9 @@ ResourceDef:
   
   @ResourceDef:
     @@rdf:type: DISLang|Method
-    @@ForCheck:
-      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
+    @@ForCheck: ManakaiDOM|ManakaiDOM !=ManakaiDOM|ManakaiDOM
     @@ManakaiDOM:isForInternal: 1
-    @@Operator:
-      @@@@:
-        ManakaiDOM:MUErrorHandler
-      @@@ContentType:
-        dis:TypeQName
+    @@Operator: ManakaiDOM|MUErrorHandler
     @@Description:
       @@@lang:en
       @@@@:

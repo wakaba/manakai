@@ -40,7 +40,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/11/23 07:57:44 $
+      $Date: 2005/11/24 12:08:23 $
     @@ContentType:
       dis:Date.RCS
 
@@ -3349,7 +3349,7 @@ IFCls3Def:
       @@@Type: idl|unsignedShort||ManakaiDOM|all
       @@@dis:actualType: ErrorSeverity
       @@@PerlDef:
-        $r = $self->{<H::DOMCore:severity>};
+        $r = $self->{-def}->{<H::DOMCore:severity>};
 
   @Attr:
     @@Name: message
@@ -3376,7 +3376,7 @@ IFCls3Def:
     @@dis:actualType: DOMErrorTypeName
     @@Get:
       @@@PerlDef:
-        $r = $self->{<H::ecore:type>};
+        $r = $self->{-def}->{<H::DOMCore|errorType>};
 
   @Attr:
     @@Name: relatedException
@@ -3419,7 +3419,22 @@ IFCls3Def:
     @@Get:
       @@@PerlDef:
         $r = $self->{<H::DOMCore:location>};
+  
+  @IntAttr:
+    @@Operator: ecore|ErrorDefMethod
+    @@Get:
+      @@@Type: DISPerl|HASH
+      @@@PerlDef:
+        $r = \%Message::DOM::DOMCore::ManakaiDOMError::Def;
 ##DOMError
+
+ResourceDef:
+  @QName: c|ERROR
+  @For: =ManakaiDOM|all
+  @enDesc:
+    Reports a <IF::DOMError||ManakaiDOM|ManakaiDOM>.
+  @rdf:type: DISPerl|BlockElementType
+  @dataType: DISPerl|XWSpecification
 
 SPropDef:
   @QName: DOMCore|reports
@@ -3435,7 +3450,7 @@ SPropDef:
   @Description:
     @@lang:en
     @@@: The severity of an error.
-  @dataType: DISCore|QName
+  @dataType: DISCore|TFQNames
   @multipleProperties: DISCore|Single
   @rdfs:range: DOMCore|ErrorSeverity||ManakaiDOM|ManakaiDOM
   @ecore:propKey: sev
@@ -3491,6 +3506,7 @@ SPropDef:
   @rdfs:subPropertyOf: dis|AppName
   @dataType: DISCore|QName
   @multipleProperties: DISCore|Single
+  @ecore:propKey: t
 
 ErrDef:
   @QName: check-character-normalization-failure
@@ -3534,7 +3550,7 @@ ErrDef:
     If the <cfg::well-formed> configuration parameter is set to
     <DOM::true> and the text content inside <IF::Attr>, <IF::Element>,
     <IF::Comment>, <IF::Text>, or <IF::DOMXML:CDATASection> node
-    or the data inside <IF::DOMXML:ProcessingINstruction> node contains
+    or the data inside <IF::DOMXML:ProcessingInstruction> node contains
     invalid characters.
 
     Or, in <IF::DOMLS:LSSerializer>, if the <cfg::split-cdata-sections>
@@ -4608,7 +4624,11 @@ CParam:
       @@@enDesc:
         An error handler that simply returns <DOM::true>.
       @@@PerlDefC:
-        $r = sub { true };
+        $r = sub {
+          my (undef, $err) = @_;
+          CORE::warn $err;
+          return true;
+        };
   @Method:
     @@rdf:type: DOMCore|DOMConfigurationParameterSetter
     @@Param:
