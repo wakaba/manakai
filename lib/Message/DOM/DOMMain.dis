@@ -25,7 +25,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/11/24 12:08:49 $
+      $Date: 2005/11/24 15:05:48 $
     @@ContentType:
       dis:Date.RCS
   
@@ -199,20 +199,6 @@ ElementTypeBinding:
     @@rdf:type:
       DISLang:TreeElementType
     @@For: =ManakaiDOM|all
-
-ElementTypeBinding:
-  @Name: WarningDef
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:WarningClass
-    @@ISA: 
-      ManakaiDOM:ManakaiDOMWarning::ManakaiDOM:Perl
-    @@ISA:
-      ManakaiDOM:ManakaiDOMObject
-    @@ForCheck:
-      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
 
 ElementTypeBinding:
   @Name: SubTypeDef
@@ -532,8 +518,7 @@ ResourceDef:
         }
     @@Param:
       @@@Name:err
-      @@@Type: 
-        ManakaiDOM:ManakaiDOMExceptionOrWarning::ManakaiDOM:Perl
+      @@@Type: ecore|ErrorInterface||ManakaiDOM|Perl
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -547,13 +532,12 @@ ResourceDef:
           }
     @@Return:
       @@@PerlDef:
-          if ($err->isa (<ClassName::dx|Exception
-                                   ::ManakaiDOM:Perl>)) {
-            $err->throw;
+          if ($err->isa (<IFName::DOMCore|DOMError||ManakaiDOM|ManakaiDOM>)) {
+            CORE::warn $err;
           } else {
-            \## TODO: Implement warning reporting
-            warn $err->stringify;
+            $err-><M::ecore|ErrorInterface||ManakaiDOM|Perl.throw>;
           }
+##ManakaiDOMObject
 
 ## -- DOM Core Specification datatypes
 
@@ -1138,9 +1122,9 @@ StringDataTypeDef:
     @@rdf:type: DISLang|InputProcessor
     @@PerlDef:
       if (CORE::defined $INPUT and CORE::length $INPUT == 0) {
-        __WARNING{MDOMX:MDOM_NS_EMPTY_URI::
-          MDOMX:param-name => {$INPUT},
+        __DOMCore:ERROR{DOMMain|empty-namespace-uri::
         }__;
+
         __FOR{ManakaiDOM:DOM3::
           $INPUT = undef;
         }__;
@@ -1380,8 +1364,7 @@ StringDataTypeDef:
     @@PerlDef:
         __FOR{ManakaiDOM:DOM3::
           if (defined $INPUT and $INPUT eq '') {
-            __WARNING{DOMMain:MDOMX_EMPTY_NS_PREFIX::
-              MDOMX:param-name => '$INPUT_PARAM_NAME',
+            __DOMCore:ERROR{DOMMain|empty-namespace-prefix::
             }__;
           }
         }__;
@@ -1420,6 +1403,26 @@ StringDataTypeDef:
             }
           }__;
         }
+
+ErrDef:
+  @QName: DOMMain|empty-namespace-uri
+  @enDesc:
+    An empty string is used as a namespace URI.
+  @DOMCore:severity: DOMCore|SEVERITY_WARNING
+
+ErrDef:
+  @QName: DOMMain|empty-namespace-prefix
+  @enDesc:
+    An empty string is used as a namespace prefix.
+  @DOMCore:severity: DOMCore|SEVERITY_WARNING
+
+ElementTypeBinding:
+  @Name: ErrDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DOMCore|DOMErrorType
+    @@For: ManakaiDOM|DOM3
 
 StringDataTypeDef:
   @QName: ManakaiDOMXMLLocalName
@@ -1643,228 +1646,6 @@ ResourceDef:
         }__;
       }
     }
-
-## -- Manakai implementation-specific exception and warning
-
-ResourceDef:
-  @QName:
-    ManakaiDOM:ManakaiDOMImplementationException
-  @For: 
-    ManakaiDOM:ManakaiDOM
-
-  @rdf:type: dx|Class
-
-  @DISPerl:ISA: dx|Exception||ManakaiDOM|Perl
-  @DISPerl:ISA: ManakaiDOM|ManakaiDOMObject
-
-  @Description:
-    @@lang:en
-    @@@:
-      A set of manakai DOM implementation-dependent exceptions.
-
-  @ResourceDef:
-    @@QName: 
-      ManakaiDOM:ManakaiDOMImplementationExceptionCode
-    @@rdf:type:
-      ManakaiDOM:ConstGroup
-    @@rdfs:subClassOf:
-      DOMMain:unsigned-short::ManakaiDOM:all
-    @@aliasChild: 1
-    @@Type: unsigned-short||ManakaiDOM|all
-
-    @@XConst:
-      @@@QName: 
-        MDOMX:MDOM_DOMSTRING_INDEX_IN_SURROGATE_PAIR
-      @@@Value:
-        @@@@@: 2
-        @@@@ContentType: DISCore|Integer
-      @@@Description:
-        @@@@lang:en
-        @@@@@: 
-          An attempt to break surrogate pair, i.e. the first character of 
-          the range is the low-surrogate (the second 16-bit unit of the surrogate
-          pair) or the last character of the range is the high-surrogate 
-          (the first 16-bit unit of the surrogate pair).
-      @@@XParam:
-        @@@@QName:
-          MDOMX:param-name
-        @@@@Description:
-          @@@@@lang:en
-          @@@@@@: The parameter to which inappropriate value is specified.
-
-WarningDef:
-  @QName: 
-    ManakaiDOM:ManakaiDOMImplementationWarning
-
-  @Description:
-    @@lang:en
-    @@@:
-      Warnings for the implementation-dependent matters and 
-      <QUOTE::no effect> actions.
-
-  @ResourceDef:
-    @@QName: 
-      ManakaiDOM:ManakaiDOMImplementationWarningCode
-    @@rdf:type:
-      ManakaiDOM:ConstGroup
-    @@rdfs:subClassOf: 
-      DOMMain:unsigned-short||ManakaiDOM|all
-    @@Type: unsigned-short||ManakaiDOM|all
-    
-    @@XConst:
-      @@@QName: 
-        MDOMX:ATTR_SET_NO_EFFECT
-      @@@Value:
-        @@@@@: 0
-        @@@@ContentType: DISCore|Integer
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          Setting an attribute value has no effect by definition.
-      @@@SubTypeDef:
-        @@@@QName: MDOMX_NOEFFECT_SINCE_DOC_NOSUPPORT_XML
-        @@@@Description:
-          @@@@@lang:en
-          @@@@@@:
-            The action has no effect since a document does not 
-            support the <Feature::XML> feature. 
-      @@@SubTypeDef:
-        @@@@QName: MDOMX_NOEFFECT_SINCE_NODE_NOSUPPORT_XMLNS
-        @@@@Description:
-          @@@@@lang:en
-          @@@@@@:
-            The action has no effect since a node does not 
-            support XML Namespaces.
-
-    @@XConst:
-      @@@QName: 
-        MDOMX:MDOM_NEWCHILD_IS_REFCHILD
-      @@@Value:
-        @@@@@: 1
-        @@@@ContentType: DISCore|Integer
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          The node to be inserted is same as the reference node.
-      @@@XParam:
-        @@@@QName:
-          MDOMX:newChild-param-name
-        @@@@Description:
-          @@@@@lang:en
-          @@@@@@: The parameter name for "newChild" node.
-      @@@XParam:
-        @@@@QName:
-          MDOMX:refChild-param-name
-        @@@@Description:
-          @@@@@lang:en
-          @@@@@@: The parameter name for "refChild" node.
-
-    @@XConst:
-      @@@QName: 
-        MDOMX:MDOM_REPLACE_BY_ITSELF_NO_EFFECT
-      @@@Value:
-        @@@@@: 2
-        @@@@ContentType: DISCore|Integer
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          An attempt to replace a node by itself is made. 
-          It is no effect by definition.
-
-    @@XConst:
-      @@@QName: MDOMX_EMPTY_NS_PREFIX
-      @@@Value:
-        @@@@@: 3
-        @@@@ContentType: DISCore|Integer
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          An empty namespace prefix is specified; its result 
-          is implementation dependent <SRC::DOM Level 3>. 
-    
-    @@XConst:
-      @@@QName: 
-        MDOMX:MDOM_NS_EMPTY_URI
-      @@@Value:
-        @@@@@: 4
-        @@@@ContentType: DISCore|Integer
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          The DOM Level 2 Core Specification defines that even the empty 
-          string is treated as a real namespace URI.  The Errata for 
-          the DOM Level 2 Specifications says that it is an error and 
-          the way empty strings are treated is implementation dependent. 
-        @@@@For:
-          !ManakaiDOM:DOM3
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          An empty string namespace URI is coverted into <DOM::null> 
-          <SRC::DOM Level 3 Core>. 
-        @@@@For:
-          ManakaiDOM:DOM3
-      @@@XParam:
-        @@@@QName:
-          MDOMX:param-name
-        @@@@Description:
-          @@@@@lang:en
-          @@@@@@: The parameter to which inappropriate value is specified.
-
-    @@XConst:
-      @@@QName:
-        MDOMX:BAD_BASE_URI
-      @@@Value:
-        @@@@@: 5
-        @@@@ContentType: DISCore|Integer
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          Malformed base URI reference is specified.
-      @@@SubTypeDef:
-        @@@@QName:
-          MDOMX:NULL_BASE_URI
-        @@@@Description:
-          @@@@@lang:en
-          @@@@@@:
-            The specified base URI reference is <DOM::null>. 
-      @@@SubTypeDef:
-        @@@@QName:
-          MDOMX:RELATIVE_BASE_URI
-        @@@@Description:
-          @@@@@lang:en
-          @@@@@@:
-            The specified base URI reference is a relative URI reference.
-        @@@@XParam:
-          @@@@@QName:
-            infoset:baseURI
-          @@@@@Type:
-            ManakaiDOM:ManakaiDOMURI
-          @@@@@Description:
-            @@@@@@lang:en
-            @@@@@@@:
-              The specified relative base URI reference.
-
-    @@XConst:
-      @@@QName:
-        MDOMX:RELATIVE_URI
-      @@@Value:
-        @@@@@: 6
-        @@@@ContentType: DISCore|Integer
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          A relative URI reference is specified; the result is 
-          implementation dependent.
-      @@@XParam:
-        @@@@QName:
-          MDOMX:uri
-        @@@@Type:
-          ManakaiDOM:ManakaiDOMURI
-        @@@@Description:
-          @@@@@lang:en
-          @@@@@@:
-            The specified URI reference.
 
 ## -- Bootstrap DOMImplementationRegistry object
 

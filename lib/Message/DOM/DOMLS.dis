@@ -29,7 +29,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/10/16 12:48:45 $
+      $Date: 2005/11/24 15:05:48 $
     @@ContentType:
       dis:Date.RCS
 
@@ -1327,15 +1327,23 @@ IFCls3Def:
        @@@PerlDef:
          $r = $self->{base_uri};
      @@Set:
+       @@@DOMCore:reports:
+         @@@@@: DOMLS|null-base-uri
+         @@@@enDesc:
+           If the new value is <DOM::null>.
+         @@@@For: ManakaiDOM|ManakaiDOM
+       @@@DOMCore:reports:
+         @@@@@: DOMLS|relative-base-uri
+         @@@@enDesc:
+           If the new value is a relative reference.
+         @@@@For: ManakaiDOM|ManakaiDOM
        @@@PerlDef:
          if (not defined $given) {
-           __WARNING{
-             MDOMX:NULL_BASE_URI::
+           __DOMCore:ERROR{DOMLS|null-base-uri::
            }__;
          } elsif (<Code::DOMMain:isRelativeDOMURI:: $INPUT = $given>) {
-           __WARNING{
-             MDOMX:RELATIVE_BASE_URI::
-               infoset:baseURI => {$given},
+           __DOMCore:ERROR{DOMLS|relative-base-uri::
+             DOMCore:relatedData => {$given},
            }__;
          }
          $self->{base_uri} = $given;
@@ -1430,6 +1438,38 @@ IFCls3Def:
         $INPUT = bless $INPUT, <ClassName::DOMLS:ManakaiDOMLSInput>;
       }
 ##LSInput
+
+ErrDef:
+  @QName: DOMLS|relative-uri
+  @enDesc:
+    A relative reference is specified where its interpretation
+    is implementation dependent.
+  @DOMCore:severity: DOMCore|SEVERITY_WARNING
+  @DOMCore:relatedData:
+    @@enDesc: The specified URI.
+
+ErrDef:
+  @QName: DOMLS|relative-base-uri
+  @enDesc:
+    A relative reference is specified as the base URI where its interpretation
+    is implementation dependent.
+  @DOMCore:severity: DOMCore|SEVERITY_WARNING
+  @DOMCore:relatedData:
+    @@enDesc: The specified URI.
+
+ErrDef:
+  @QName: DOMLS|null-base-uri
+  @enDesc:
+    <DOM::null> is specified as the base URI.
+  @DOMCore:severity: DOMCore|SEVERITY_WARNING
+
+ElementTypeBinding:
+  @Name: ErrDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DOMCore|DOMErrorType
+    @@For: ManakaiDOM|DOM3
 
 IFCls3Def:
   @IFQName: LSResourceResolver
@@ -2066,11 +2106,15 @@ IFCls3Def:
             @@@@@lang:en
             @@@@@@:
               The behavior is implementation dependent.
+        @@@DOMCore:reports:
+          @@@@@: DOMLS|relative-uri
+          @@@@enDesc:
+            If the new value is a relative reference.
+          @@@@For: ManakaiDOM|ManakaiDOM
         @@@PerlDef:
           if (<Code::DOMMain:isRelativeDOMURI:: $INPUT = $given>) {
-            __WARNING{
-              MDOMX:RELATIVE_URI::
-                MDOMX:uri => {$given},
+            __DOMCore:ERROR{DOMLS|relative-uri::
+              DOMCore:relatedData => {$given},
             }__;
           }
           $self->{systemId} = $given;

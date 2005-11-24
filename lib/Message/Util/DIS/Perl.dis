@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/11/24 12:09:47 $
+      $Date: 2005/11/24 15:05:49 $
     @@ContentType:
       dis:Date.RCS
   
@@ -3984,7 +3984,6 @@ IFClsDef:
                 $r-><M::DIS|PLBlockCon.skipLines> ($source_code);
               } elsif ({
                 <Q::disPerl:EXCEPTION> => 1,
-                <Q::disPerl:WARNING> => 1,
               }->{$et}) {
                 $r-><M::DIS|PLBlockCon.skipLines> ($source_code);
                 if ($source_code =~ s/^((?:(?!::).)+)(?:::\s*)?//s) {

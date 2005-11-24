@@ -12,7 +12,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2005/11/24 12:08:49 $
+    $Date: 2005/11/24 15:05:49 $
 
   @Require:
     @@Module:
@@ -116,12 +116,6 @@ Namespace:
 
 ElementTypeBinding:
   @Name: Exception
-  @ElementType:
-    dis:ImplNote
-  @ShadowContent:
-    @@For: !ManakaiDOM|all
-ElementTypeBinding:
-  @Name: Warning
   @ElementType:
     dis:ImplNote
   @ShadowContent:
@@ -247,6 +241,22 @@ ElementTypeBinding:
     @@rdf:type: DISLang|Attribute
     @@ForCheck: ManakaiDOM|ForClass
     @@ManakaiDOM:isForInternal: 1
+
+ElementTypeBinding:
+  @Name: L2Attr
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|Attribute
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|DOM2
+
+ElementTypeBinding:
+  @Name: L3Attr
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|Attribute
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|DOM3
 
 ElementTypeBinding:
   @Name: ReAttr
@@ -731,6 +741,7 @@ IFCls1Def:
            In this case, <X::DOMException.NO_MODIFICATION_ALLOWED_ERR>
            exception is never thrown.  This is clarified by the 
            DOM Level 2 Core errata.
+         @@@@For: ManakaiDOM|ManakaiDOM
        @@@PerlDef:
          __DOMCore:ERROR{t|setting-node-value-no-effect::
               c|relatedData => {$self},
@@ -1175,6 +1186,14 @@ IFCls1Def:
               and the DOM implementation does not support the 
               removal from it, this error should also be raised.
           @@@@SpecLevel:3
+        @@@c:reports:
+          @@@@@: t|insert-before-itself
+          @@@@enDesc:
+            If the <P::newChild> node is same as the <P::refChild> node.
+            Then, the result is implementation dependent.
+
+            The manakai implementation only issues a warning in the case.
+          @@@@For: ManakaiDOM|ManakaiDOM
         @@@PerlDef:
             my $node;
             my $newNode;
@@ -1207,6 +1226,7 @@ IFCls1Def:
                 <H::DOMCore:DocumentFragmentNode>) {
        \       @newNode = @{$newNode->{<H::infoset:children>}};
             }
+            INSERTION: {
             if (@newNode) {
               my $parentNode = $newNode[0]->{<H::infoset:parent>};
 
@@ -1360,12 +1380,11 @@ IFCls1Def:
                          $newNode[0]->{<H::mn:nodeID>} eq
                          $refChild->{<H::mn:node>}->{<H::mn:nodeID>}) {
                   ## refChild is the same node as the newChild
-                  __WARNING{
-                    MDOMX:MDOM_NEWCHILD_IS_REFCHILD::
-                      MDOMX:newChild-param-name => 'newChild',
-                      MDOMX:refChild-param-name => 'refChild',
+                  __c:ERROR{t|insert-before-itself::
+                    c:relatedData => {$refChild},
                   }__;
                   ## And no action.
+                  last INSERTION;
                 } else {
                   ## refChild and newChild are siblings each other.
                   my $currentIndex;
@@ -1413,12 +1432,52 @@ IFCls1Def:
                 }
               }
             } # @newNode
+            } # INSERTION
             $r = $newChild;
+
+       @@@L3Test:
+         @@@@QName: Node.insertBefore.insert-before-itself.Test
+         @@@@PerlDef:
+           my $impl = <Class::c|ManakaiDOMImplementation>->_new;
+           my $doc = $impl-><M::c|DOMImplementation.createDocument>
+                              ('http://www.example/', 'ex');
+
+           my $eh_called = false;
+
+           my $del = $doc-><AG::Document.documentElement>;
+           my $el = $doc-><M::Document.createElementNS>
+                       ('http://www.example/', 'element');
+           $del-><M::Node.appendChild> ($el);
+
+           my $cfg = $doc-><AG::Document.domConfig>;
+           $cfg-><M::c|DOMConfiguration.setParameter> ('error-handler' => sub {
+             my (undef, $err) = @_;
+             $eh_called = true;
+             $test->assert_equals ($err-><AG::c|DOMError.severity>,
+                                   <C::c|DOMError.SEVERITY_WARNING>);
+             $test->assert_equals ($err-><AG::c|DOMError.type>,
+                                   <Q::t|insert-before-itself>);
+             $test->assert_equals ($err-><AG::c|DOMError.relatedData>, $el);
+             $test->assert_null ($err-><AG::c|DOMError.relatedException>);
+             $test->assert_null ($err-><AG::c|DOMError.location>);
+             $test->assert_not_null ($err-><AG::c|DOMError.message>);
+           });
+
+           $test->assert_false ($eh_called);
+           $del-><M::Node.insertBefore> ($el, $el);
+           $test->assert_true ($eh_called);
+
+           $test->assert_equals ($del-><AG::Node.firstChild>, $el);
+
+           $el = null;
+
      @@Level[list]:
         1
      @@SpecLevel[list]:
         1
         3
+
+
   @Method:
      @@Name:  replaceChild
      @@Description:
@@ -1509,6 +1568,16 @@ IFCls1Def:
               does not support the replacement of the "DocumentType" or 
               "Element" child.
           @@@@SpecLevel:3
+        @@@c:reports:
+          @@@@@: t|replace-by-itself
+          @@@@enDesc:
+            If the <P::newChild> node is same as the <P::oldChild> node.
+            Result of replacing of a node by itself is implementation
+            dependent.
+
+            In manakai, such operation has no effect other than the issue
+            of a warning.
+          @@@@For: ManakaiDOM|ManakaiDOM
         @@@PerlDef:
             my $node;
             my $newNode;
@@ -1535,11 +1604,13 @@ IFCls1Def:
                   MDOMX:param-name => 'newChild',
               }__;
             } # CHKDOC
+
             my @newNode = ($newNode);
             if ($newNode->{<H::DOMCore:nodeType>} eq
                 <H::DOMCore:DocumentFragmentNode>) {
        \       @newNode = @{$newNode->{<H::infoset:children>}};
             }
+            REPLACE: {
             if (@newNode) {
               my $parentNode = $newNode[0]->{<H::infoset:parent>};
 
@@ -1685,6 +1756,7 @@ IFCls1Def:
                   }__;
                 }
               } # REFCHILD
+
               if ($newNode[0]->{<H::infoset:parent>} and
                   $newNode[0]->{<H::infoset:parent>}->{<H::mn:nodeID>} eq
                   $node->{<H::mn:nodeID>}) {
@@ -1695,12 +1767,11 @@ IFCls1Def:
                 } elsif (ref $oldChild and
                          $newNode[0]->{<H::mn:nodeID>} eq
                          $oldChild->{<H::mn:node>}->{<H::mn:nodeID>}) {
-                  __WARNING{
-                    MDOMX:MDOM_NEWCHILD_IS_REFCHILD:: 
-                      MDOMX:newChild-param-name => 'newChild',
-                      MDOMX:refChild-param-name => 'oldChild',
+                  __c:ERROR{t|replace-by-itself::
+                    c:relatedData => {$oldChild},
                   }__;
                   ## And no action.
+                  last REPLACE;
                 } else {
                   my $currentIndex;
                   for my $i (0..$#{$node->{<H::infoset:children>}}) {
@@ -1749,7 +1820,45 @@ IFCls1Def:
                                     ->{<H::infoset:parent>};
               $oldChild->{<H::mn:node>}-><M::NodeStem.orphanate>;
             } # @newNode
+            } # REPLACE
             $r = $oldChild;
+
+       @@@L3Test:
+         @@@@QName: Node.replaceChild.replace-by-itself.Test
+         @@@@PerlDef:
+           my $impl = <Class::c|ManakaiDOMImplementation>->_new;
+           my $doc = $impl-><M::c|DOMImplementation.createDocument>
+                              ('http://www.example/', 'ex');
+
+           my $eh_called = false;
+
+           my $del = $doc-><AG::Document.documentElement>;
+           my $el = $doc-><M::Document.createElementNS>
+                       ('http://www.example/', 'element');
+           $del-><M::Node.appendChild> ($el);
+
+           my $cfg = $doc-><AG::Document.domConfig>;
+           $cfg-><M::c|DOMConfiguration.setParameter> ('error-handler' => sub {
+             my (undef, $err) = @_;
+             $eh_called = true;
+             $test->assert_equals ($err-><AG::c|DOMError.severity>,
+                                   <C::c|DOMError.SEVERITY_WARNING>);
+             $test->assert_equals ($err-><AG::c|DOMError.type>,
+                                   <Q::t|replace-by-itself>);
+             $test->assert_equals ($err-><AG::c|DOMError.relatedData>, $el);
+             $test->assert_null ($err-><AG::c|DOMError.relatedException>);
+             $test->assert_null ($err-><AG::c|DOMError.location>);
+             $test->assert_not_null ($err-><AG::c|DOMError.message>);
+           });
+
+           $test->assert_false ($eh_called);
+           $del-><M::Node.replaceChild> ($el, $el);
+           $test->assert_true ($eh_called);
+
+           $test->assert_equals ($del-><AG::Node.firstChild>, $el);
+
+           $el = null;
+
      @@Level[list]:
         1
         3
@@ -2575,7 +2684,8 @@ IFCls1Def:
      @@SpecLevel:2
      @@For:
        ManakaiDOM:DOM2
-  @Attr:
+
+  @L2Attr:
      @@Name:  prefix
      @@Description:
        @@@lang:en
@@ -2654,19 +2764,23 @@ IFCls1Def:
               "http://www.w3.org/2000/xmlns/", or if this node is 
               an attribute and the "qualifiedName" of this node is 
               "xmlns".
-        @@@Warning:
-          @@@@Type:
-            ManakaiDOM:ManakaiDOMImplementationWarning
-          @@@@Name: ATTR_SET_NO_EFFECT
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              Setting this attribute has no effect.
-        @@@PerlDef: \
-     @@Level[list]:  2
-     @@SpecLevel:2
-     @@For:
-       ManakaiDOM:DOM2
+        @@@c:reports:
+          @@@@@: t|setting-prefix-no-effect-because-of-document
+          @@@@enDesc:
+            If the the document does not support XML namespace
+            so that setting the attribute value has no effect.
+          @@@@For: ManakaiDOM|ManakaiDOM
+        @@@c:reports:
+          @@@@@: t|setting-prefix-no-effect-because-of-node
+          @@@@enDesc:
+            If the the node does not support XML namespace
+            so that setting the attribute value has no effect.
+          @@@@For: ManakaiDOM|ManakaiDOM
+        @@@PerlDef:
+          __c:ERROR{t|setting-prefix-no-effect-because-of-node::
+            c:relatedData => {$self},
+          }__;
+
   @Attr:
      @@Name:  localName
      @@Description:
@@ -4044,14 +4158,11 @@ IFCls1Def:
         @@@@For: !ManakaiDOM|DOM3
         @@@@@:
           if ($err->isa (<IFName::c|DOMError||ManakaiDOM|ManakaiDOM>)) {
-            __DEEP{
-              CORE::warn $err;
-            }__;
+            CORE::warn $err;
           } else {
             $err-><M::ecore|ErrorInterface||ManakaiDOM|Perl.throw>;
           }
 ##Node
-
 
 ElementTypeBinding:
   @Name: ErrDef
@@ -4064,9 +4175,57 @@ ElementTypeBinding:
 ErrDef:
   @QName: t|setting-node-value-no-effect
   @enDesc:
-    Setting the <A::Node.nodeValue> which is <DOM::null> by definition
-    has no effect.
+    An attempt is made to set the <A::Node.nodeValue> that is 
+    defined as <DOM::null>.  The operation has no effect.
   @c:severity: c|SEVERITY_WARNING
+  @c:relatedData:
+    @@enDesc:
+      The node whose node value is attempted to change.
+
+ErrDef:
+  @QName: t|insert-before-itself
+  @enDesc:
+    An attempt is made to insert a node before itself.
+    The result is implementation dependent; it has no effect
+    in manakai.
+  @c:severity: c|SEVERITY_WARNING
+  @c:relatedData:
+    @@enDesc:
+      The node attempted to insert.
+
+ErrDef:
+  @QName: t|replace-by-itself
+  @enDesc:
+    An attempt is made to replace a node by itself.
+    The result is implementation dependent; it has no effect
+    in manakai.
+  @c:severity: c|SEVERITY_WARNING
+  @c:relatedData:
+    @@enDesc:
+      The node attempted to replace.
+
+ErrDef:
+  @QName: t|setting-prefix-no-effect-because-of-node
+  @enDesc:
+    An attempt is made to set the <A::Node.prefix> that is 
+    defined as <DOM::null> since it is not an <IF::Element> or <IF::Attr>
+    node or since it is a DOM Level 1 (i.e. namespace unaware) node.
+    The operation has no effect.
+  @c:severity: c|SEVERITY_WARNING
+  @c:relatedData:
+    @@enDesc:
+      The node attempted to change its prefix.
+
+ErrDef:
+  @QName: t|setting-prefix-no-effect-because-of-document
+  @enDesc:
+    An attempt is made to set the <A::Node.prefix> that is 
+    defined as <DOM::null> since its owner document does
+    not support XML namespaces.  The operation has no effect.
+  @c:severity: c|SEVERITY_WARNING
+  @c:relatedData:
+    @@enDesc:
+      The node attempted to change its prefix.
 
 PropDef:
   @QName: t|userData
@@ -6491,12 +6650,19 @@ ResourceDef:
           @@@@ImplNote:
             @@@@@lang:en
             @@@@@@: This exception has added by the DOM Level 2 Errata.
+       @@@c:reports:
+         @@@@@: t|replace-by-itself
+         @@@@enDesc:
+           If the <P::arg> node is same as the node that is in the map.
+           Then, the method call has no effect.
+         @@@@enImplNote:
+           This case is clarified by DOM Level 2 errata.
+         @@@@For: ManakaiDOM|ManakaiDOM
        @@@PerlDef:
          @@@@ForCheck: c|ForAttrMap
          @@@@@:
-           __DEEP{
-             $self-><M::ManakaiDOMElement.setAttributeNode> ($arg);
-           }__;
+                                   ## NOTE: Method name is directly written
+           goto &{<Class::ManakaiDOMElement>->can ('set_attribute_node')};
      @@ImplNote:
        @@@lang:en
        @@@@:
@@ -6810,6 +6976,14 @@ ResourceDef:
              the language exposed through the "Document" does not 
              support XML Namespaces
            @@@@SpecLevel:2
+        @@@c:reports:
+          @@@@@: t|replace-by-itself
+          @@@@enDesc:
+            If the <P::arg> node is same as the current node in the map.
+            The method has no effect in this case.
+          @@@@enImplNote:
+            This case is clarified by DOM Level 2 errata.
+          @@@@For: ManakaiDOM|ManakaiDOM
        @@@PerlDef:
          @@@@ForCheck:
            c|ForAttrMap ManakaiDOM:DOMXMLFeature
@@ -6820,11 +6994,7 @@ ResourceDef:
               }__;
             }
             my $attrNode = $arg->{<H::mn:node>};
-            if ($attrNode->{<H::infoset:ownerElement>}) {
-              __EXCEPTION{DOMException.INUSE_ATTRIBUTE_ERR::
-                  MDOMX:param-name => 'arg',
-              }__;
-            } elsif ($attrNode->{<H::DOMCore:ownerDocument>}
+            if ($attrNode->{<H::DOMCore:ownerDocument>}
                               ->{<H::mn:nodeID>} ne
                      $self->{<H::mn:node>}->{<H::DOMCore:ownerDocument>}
                           ->{<H::mn:nodeID>}) {
@@ -6852,11 +7022,17 @@ ResourceDef:
               }__;
             }
 
-            if ($r->{<H::mn:nodeID>} eq $attrNode->{<H::mn:nodeID>}) {
-              __WARNING{
-                MDOMX:MDOM_REPLACE_BY_ITSELF_NO_EFFECT::
-              }__;
-              $r = $arg;
+            if ($attrNode->{<H::infoset:ownerElement>}) {
+              if ($r->{<H::mn:nodeID>} eq $attrNode->{<H::mn:nodeID>}) {
+                __c:ERROR{t|replace-by-itself::
+                  c:relatedData => {$arg},
+                }__;
+                $r = $arg;
+              } else {
+                __EXCEPTION{DOMException.INUSE_ATTRIBUTE_ERR::
+                  MDOMX:param-name => 'arg',
+                }__;
+              }
             } else {
               $attrNode->{<H::infoset:ownerElement>} = $self->{<H::mn:node>};
               if (defined $attrNode->{<H::infoset:localName>}) {
@@ -6891,6 +7067,46 @@ ResourceDef:
             !ManakaiDOM:DOMXMLFeature
           @@@@DOMMain:raiseException:
             MDOMX:MDOM_IMPL_NOSUPPORT_XMLNS
+
+       @@@L3Test:
+         @@@@QName: NamedNodeMap.Attr.setNamedItemNS.replace-by-itself.Test
+         @@@@ForCheck: c|ForAttrMap
+         @@@@PerlDef:
+           my $impl = <Class::c|ManakaiDOMImplementation>->_new;
+           my $doc = $impl-><M::c|DOMImplementation.createDocument>
+                              ('http://www.example/', 'ex');
+
+           my $eh_called = false;
+
+           my $del = $doc-><AG::Document.documentElement>;
+           $del-><M::Element.setAttributeNS> (null, 'attr' => 'value');
+
+           my $attr = $del-><M::Element.getAttributeNodeNS> (null, 'attr');
+
+           my $cfg = $doc-><AG::Document.domConfig>;
+           $cfg-><M::c|DOMConfiguration.setParameter> ('error-handler' => sub {
+             my (undef, $err) = @_;
+             $eh_called = true;
+             $test->assert_equals ($err-><AG::c|DOMError.severity>,
+                                   <C::c|DOMError.SEVERITY_WARNING>);
+             $test->assert_equals ($err-><AG::c|DOMError.type>,
+                                   <Q::t|replace-by-itself>);
+             $test->assert_equals ($err-><AG::c|DOMError.relatedData>, $attr);
+             $test->assert_null ($err-><AG::c|DOMError.relatedException>);
+             $test->assert_null ($err-><AG::c|DOMError.location>);
+             $test->assert_not_null ($err-><AG::c|DOMError.message>);
+           });
+
+           $test->assert_false ($eh_called);
+           $del-><AG::Node.attributes>
+               -><M::NamedNodeMap.setNamedItemNS> ($attr);
+           $test->assert_true ($eh_called);
+
+           $test->assert_equals ($del-><M::Element.getAttributeNodeNS>
+                                   (null, 'attr'), $attr);
+
+           $attr = null;
+
      @@DOMMain:implementFeature:
        @@@@: c|CoreFeature20
        @@@ForCheck:
@@ -8159,20 +8375,32 @@ NodeTypeDef:
               prefix is "xmlns" and the "namespaceURI" of this node 
               is different from "http://www.w3.org/2000/xmlns/", or 
               the "qualifiedName" of this node is "xmlns".
+        @@@c:reports:
+          @@@@@: t|setting-prefix-no-effect-because-of-document
+          @@@@enDesc:
+            If the the document does not support XML namespace
+            so that setting the attribute value has no effect.
+          @@@@For: ManakaiDOM|ManakaiDOM
+        @@@c:reports:
+          @@@@@: t|setting-prefix-no-effect-because-of-node
+          @@@@enDesc:
+            If the the node does not support XML namespace
+            so that setting the attribute value has no effect.
+          @@@@For: ManakaiDOM|ManakaiDOM
         @@@PerlDef:
             my $node = $self->{<H::mn:node>};
             my $docnode = $node->{<H::DOMCore:ownerDocument>};
             my $version = <Code::getDocumentXMLVersion:: $DOCOBJ = $docnode>;
             if (not defined $version) {
-              __WARNING{
-                MDOMX:MDOM_DOC_NOSUPPORT_XML::
+              __c:ERROR{t|setting-prefix-no-effect-because-of-document::
+                c:relatedData => {$self},
               }__;
             } elsif (not defined $node->{<H::infoset:localName>}) {
-              __WARNING{
-                MDOMX:MDOM_NODE_NOSUPPORT_XMLNS::
+              __c:ERROR{t|setting-prefix-no-effect-because-of-node::
+                c:relatedData => {$self},
               }__;
             } elsif ($node->{<H::DOMCore:read-only>}) {
-              __WARNING{
+              __EXCEPTION{
                 MDOMX:NOMOD_THIS::
               }__;
             } elsif (not defined $node->{<H::infoset:prefix>} and
@@ -8834,6 +9062,13 @@ NodeTypeDef:
              @@@@@@:
                The <P::newAttr> node is already used as an attribute 
                of another <IF::Element> object.
+        @@@c:reports:
+          @@@@@: t|replace-by-itself
+          @@@@enDesc:
+            If the <P::arg> node is same as the attribute node that
+            is attached to the element node.  Then, the method call is 
+            no effect.
+          @@@@For: ManakaiDOM|ManakaiDOM
          @@@PerlDef:
             if ($self->{<H::mn:node>}->{<H::DOMCore:read-only>}) {
               __EXCEPTION{
@@ -8841,11 +9076,7 @@ NodeTypeDef:
               }__;
             }
             my $attrNode = $newAttr->{<H::mn:node>};
-            if ($attrNode->{<H::infoset:ownerElement>}) {
-              __EXCEPTION{DOMException.INUSE_ATTRIBUTE_ERR::
-                  MDOMX:param-name => 'newAttr',
-              }__;
-            } elsif ($attrNode->{<H::DOMCore:ownerDocument>}
+            if ($attrNode->{<H::DOMCore:ownerDocument>}
                               ->{<H::mn:nodeID>} ne
                      $self->{<H::mn:node>}->{<H::DOMCore:ownerDocument>}
                           ->{<H::mn:nodeID>}) {
@@ -8865,12 +9096,18 @@ NodeTypeDef:
                      ->{$attrNode->{<H::DOMCore:name>}};
             }
 
-            if (defined $r and
-                $r->{<H::mn:nodeID>} eq $attrNode->{<H::mn:nodeID>}) {
-              __WARNING{
-                MDOMX:MDOM_REPLACE_BY_ITSELF_NO_EFFECT::
-              }__;
-              $r = $newAttr;
+            if ($attrNode->{<H::infoset:ownerElement>}) {
+              if (defined $r and
+                  $r->{<H::mn:nodeID>} eq $attrNode->{<H::mn:nodeID>}) {
+                __c:ERROR{t|replace-by-itself::
+                  c:relatedData => {$newAttr},
+                }__;
+                $r = $newAttr;
+              } else {
+                __EXCEPTION{DOMException.INUSE_ATTRIBUTE_ERR::
+                  MDOMX:param-name => 'newAttr',
+                }__;
+              }
             } else {
               $self->{<H::mn:node>}-><M::NodeStem.importTree> ($attrNode);
               $attrNode->{<H::infoset:ownerElement>} = $self->{<H::mn:node>};
@@ -8898,6 +9135,44 @@ NodeTypeDef:
             @@@@@@:
               It is unclear whether a node should be returned if 
               it is <QUOTE::replace>d by itself.
+
+       @@@L3Test:
+         @@@@QName: Element.setAttributeNode.replace-by-itself.Test
+         @@@@PerlDef:
+           my $impl = <Class::c|ManakaiDOMImplementation>->_new;
+           my $doc = $impl-><M::c|DOMImplementation.createDocument>
+                              ('http://www.example/', 'ex');
+
+           my $eh_called = false;
+
+           my $del = $doc-><AG::Document.documentElement>;
+           $del-><M::Element.setAttributeNS> (null, 'attr' => 'value');
+
+           my $attr = $del-><M::Element.getAttributeNodeNS> (null, 'attr');
+
+           my $cfg = $doc-><AG::Document.domConfig>;
+           $cfg-><M::c|DOMConfiguration.setParameter> ('error-handler' => sub {
+             my (undef, $err) = @_;
+             $eh_called = true;
+             $test->assert_equals ($err-><AG::c|DOMError.severity>,
+                                   <C::c|DOMError.SEVERITY_WARNING>);
+             $test->assert_equals ($err-><AG::c|DOMError.type>,
+                                   <Q::t|replace-by-itself>);
+             $test->assert_equals ($err-><AG::c|DOMError.relatedData>, $attr);
+             $test->assert_null ($err-><AG::c|DOMError.relatedException>);
+             $test->assert_null ($err-><AG::c|DOMError.location>);
+             $test->assert_not_null ($err-><AG::c|DOMError.message>);
+           });
+
+           $test->assert_false ($eh_called);
+           $del-><M::Element.setAttributeNode> ($attr);
+           $test->assert_true ($eh_called);
+
+           $test->assert_equals ($del-><M::Element.getAttributeNodeNS>
+                                   (null, 'attr'), $attr);
+
+           $attr = null;
+
     @@Level[list]:
        1
        2
@@ -9721,6 +9996,12 @@ NodeTypeDef:
                @@@@@@@:
                  The <P::newAttr> node does not support XML Namespace.
              @@@@@SpecLevel[list]:
+        @@@c:reports:
+          @@@@@: t|replace-by-itself
+          @@@@enDesc:
+            If the <P::newAttr> node is same as the node already attached
+            to the element.  Then, the method is no effect.
+          @@@@For: ManakaiDOM|ManakaiDOM
         @@@disDef:
           @@@@For: ManakaiDOM|DOMXMLFeature
           @@@@DISPerl:cloneCode: .setAttributeNode
@@ -10683,14 +10964,30 @@ NodeTypeDef:
               the specified prefix is "xml" and the "namespaceURI" 
               of this node is different from 
               "http://www.w3.org/XML/1998/namespace".
+        @@@c:reports:
+          @@@@@: t|setting-prefix-no-effect-because-of-document
+          @@@@enDesc:
+            If the the document does not support XML namespace
+            so that setting the attribute value has no effect.
+          @@@@For: ManakaiDOM|ManakaiDOM
+        @@@c:reports:
+          @@@@@: t|setting-prefix-no-effect-because-of-node
+          @@@@enDesc:
+            If the the node does not support XML namespace
+            so that setting the attribute value has no effect.
+          @@@@For: ManakaiDOM|ManakaiDOM
         @@@PerlDef:
             my $node = $self->{<H::mn:node>};
             my $docNode = $node->{<H::DOMCore:ownerDocument>};
             my $version = <Code::getDocumentXMLVersion:: $DOCOBJ = $docNode>;
             if (not defined $version) {
-              __WARNING{DOMMain:MDOMX_NOEFFECT_SINCE_DOC_NOSUPPORT_XML}__;
+              __c:ERROR{t|setting-prefix-no-effect-because-of-document::
+                c:relatedData => {$self},
+              }__;
             } elsif (not defined $node->{<H::infoset:localName>}) {
-              __WARNING{DOMMain:MDOMX_NOEFFECT_SINCE_NODE_NOSUPPORT_XMLNS}__;
+              __c:ERROR{t|setting-prefix-no-effect-because-of-node::
+                c:relatedData => {$self},
+              }__;
             } elsif ($node->{<H::DOMCore:read-only>}) {
               __EXCEPTION{MDOMX:NOMOD_THIS}__;
             } else {
@@ -14077,44 +14374,32 @@ NodeTypeDef:
           @@@@@@: The node is a "Document".
       @@@disDef:
         @@@@DISLang:constValue: Node.DOCUMENT_NODE
-  @ReAttr:
-     @@Name:  textContent
-     @@Description:
-       @@@lang:en
-       @@@@:
-         The text content of this node and its descendants.
-     @@Get:
-        @@@Type:  
-          DOMMain:DOMString
-        @@@Description:
-          @@@@lang:en
-          @@@@@: The text content of this node.
-        @@@InCase:
-          @@@@Value:
-            @@@@@is-null:1
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@: The text content is defined to be "null".
-        @@@PerlDef:
-          @@@@@: $r = null;
-     @@Set:
-        @@@Type:  
-          DOMMain:DOMString
-        @@@Description:
-          @@@@lang:en
-          @@@@@: Setting this attribute has no effect.
-        @@@Warning:
-          @@@@Type:
-            ManakaiDOM:ManakaiDOMImplementationWarning
-          @@@@Name: ATTR_SET_NO_EFFECT
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@: Setting this attribute has no effect.
-        @@@PerlDef: \
-     @@Level[list]: 3
-     @@SpecLevel:3
-     @@For:
-       ManakaiDOM:DOM3
+
+  @L3Attr:
+    @@Name: textContent
+    @@enDesc:
+      The text content of the node.
+    @@Type: DOMMain|DOMString
+    @@Get:
+      @@@enDesc:
+        The text content of the node.
+      @@@nullCase:
+        @@@@enDesc:
+          It is already defined as <DOM::null>.
+        @@@PerlDef: $r = null;
+    @@Set:
+      @@@Type: DOMMain|DOMString
+      @@@enDesc:
+        Setting the attribute value has no effect.
+      @@@c:reports:
+        @@@@@: c|setting-node-value-no-effect
+        @@@@enDesc:
+          Setting the attribute value has no effect, since the
+          node value is defined as <DOM::null>.
+        @@@@For: ManakaiDOM|ManakaiDOM
+      @@@disDef:
+        @@@@DISPerl:cloneCode: ManakaiDOMNode.nodeValue.set
+
   @IntMethod:
     @@Name: newObject
     @@Description:

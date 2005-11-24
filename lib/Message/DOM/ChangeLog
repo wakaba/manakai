@@ -1,5 +1,13 @@
 2005-11-24  Wakaba  <wakaba@suika.fam.cx>
 
+	* DOMMain.dis, DOMLS.dis, DOMXML.dis, Tree.dis: Old |__WARNING__|
+	blocks are replaced by |DOMError|-based |__DOMCore:ERROR__| blocks.
+
+	* DOMMain.dis (___report_error): Throws the error unkess
+	it is a |DOMCore:DOMError| object.
+	
+2005-11-24  Wakaba  <wakaba@suika.fam.cx>
+
 	* DOMCore.dis (severity, type): Getters return value from
 	the definition of the current error (i.e. |-def| hash).
 	(___error_def): New method.

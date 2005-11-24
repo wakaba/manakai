@@ -42,7 +42,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/11/20 09:49:28 $
+      $Date: 2005/11/24 15:05:48 $
     @@ContentType:
       dis:Date.RCS
 
@@ -54,6 +54,8 @@ Module:
       @@@QName: MDOM|DOMCore
 
 Namespace:
+  @c:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
   @dis:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
   @doc:
@@ -90,6 +92,8 @@ Namespace:
     http://www.w3.org/1999/02/22-rdf-syntax-ns#
   @rdfs:
     http://www.w3.org/2000/01/rdf-schema#
+  @t:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/tree#
 
 ElementTypeBinding:
   @Name: NodeTypeDef
@@ -191,13 +195,6 @@ ElementTypeBinding:
     @@rdf:type: DISLang|MethodParameter
 
 ElementTypeBinding:
-  @Name: Warning
-  @ElementType:
-    ManakaiDOM:alwaysWarns
-  @ShadowContent:
-    @@ForCheck: !ManakaiDOM|all
-
-ElementTypeBinding:
   @Name: Return
   @ElementType:
     dis:ResourceDef
@@ -211,6 +208,14 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type: DISLang|Attribute
     @@ForCheck: !=ManakaiDOM|ManakaiDOM
+
+ElementTypeBinding:
+  @Name: L3Attr
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|Attribute
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|DOM3
 
 ElementTypeBinding:
   @Name: IntAttr
@@ -1020,7 +1025,8 @@ NodeTypeDef:
       @@@disDef:
         @@@@DISLang:constValue:
           DOMCore:Node.DOCUMENT_TYPE_NODE
-  @ReAttr:
+
+  @L3Attr:
      @@Name:  textContent
      @@Description:
        @@@lang:en
@@ -1051,17 +1057,14 @@ NodeTypeDef:
         @@@Description:
           @@@@lang:en
           @@@@@: Setting this attribute has no effect.
-        @@@Warning:
-          @@@@Type:
-            ManakaiDOM:ManakaiDOMImplementationWarning
-          @@@@Name: ATTR_SET_NO_EFFECT
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@: Setting this attribute has no effect.
-        @@@PerlDef: \
-     @@Level[list]: 3
-     @@SpecLevel:3
-     @@L3:
+      @@@c:reports:
+        @@@@@: c|setting-node-value-no-effect
+        @@@@enDesc:
+          Setting the attribute value has no effect, since the
+          node value is defined as <DOM::null>.
+        @@@@For: ManakaiDOM|ManakaiDOM
+      @@@disDef:
+        @@@@DISPerl:cloneCode: t|ManakaiDOMNode.nodeValue.set
 
   @IntMethod:
     @@Name: newObject
@@ -1344,7 +1347,8 @@ NodeTypeDef:
       @@@disDef:
         @@@@DISLang:constValue: 
           DOMCore:Node.NOTATION_NODE
-  @ReAttr:
+
+  @L3Attr:
      @@Name:  textContent
      @@Description:
        @@@lang:en
@@ -1371,17 +1375,14 @@ NodeTypeDef:
         @@@Description:
           @@@@lang:en
           @@@@@: Setting this attribute has no effect.
-        @@@Warning:
-          @@@@Type:
-            ManakaiDOM:ManakaiDOMImplementationWarning
-          @@@@Name: ATTR_SET_NO_EFFECT
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@: Setting this attribute has no effect.
-        @@@PerlDef: \
-     @@Level[list]: 3
-     @@SpecLevel:3
-     @@L3:
+      @@@c:reports:
+        @@@@@: c|setting-node-value-no-effect
+        @@@@enDesc:
+          Setting the attribute value has no effect, since the
+          node value is defined as <DOM::null>.
+        @@@@For: ManakaiDOM|ManakaiDOM
+      @@@disDef:
+        @@@@DISPerl:cloneCode: t|ManakaiDOMNode.nodeValue.set
  
   @IntMethod:
     @@Name: newObject
