@@ -12,7 +12,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2005/11/24 15:05:49 $
+    $Date: 2005/11/25 06:18:40 $
 
   @Require:
     @@Module:
@@ -4088,38 +4088,26 @@ IFCls1Def:
           }__;
 
   @IntMethod:
+    @@For: ManakaiDOM|ManakaiDOM3
     @@Operator: ManakaiDOM|MUErrorHandler
     @@enDesc:
-        This method is a generic error handler; all manakai exceptions 
-        and warnings associated to an object are once reported to this method 
-        and then delivered to appropriate entities. 
-        \
-        If the error is an exception (such as <IF::DOMCore:DOMException> or 
-        <IF::ManakaiDOM:ManakaiDOMImplementationException>), it is 
-        simply thrown.  If the error is only a warning, it is reported 
-        via the <IF::DOMCore:DOMError> interface. 
-        \
-        See <PerlModule::Message::Util::Error> documentation for more 
-        information on the error reporting mechanism.
-        \
-        {NOTE:: This kind of methods are named as <Perl::___report_error> 
-                in the convention of <PerlModule::Message::Util::Error>. 
-        \
-        }
+      When a <IF::ecore|ErrorInterface||ManakaiDOM|Perl> is <Perl::report>ed
+      with an <Perl::-object> of <IF::Node>, then this method is invoked.
+      
+      The method calls the <cfg::error-handler> if the error is of 
+      <IF::c|DOMError>.  Otherwise, including the cases of <IF::c|DOMException>s,
+      the error is rethrown so that appropriate <Perl::catch> clause
+      can catch the error.
+    @@enImplNote:
+      For implementations which does not have the
+      <IF::c|DOMError||ManakaiDOM|ManakaiDOM3> interface, the method
+      is defined in the <Class::ManakaiDOM|ManakaiDOMObject> class
+      and it is not overridden here.
     @@Param:
       @@@Name: err
       @@@Type: ecore|ErrorInterface||ManakaiDOM|Perl
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          An exception object that describes what kind of error it is 
-          and how it should be recovered. 
-          \
-          {NOTE:: Exception objects in manakai implementation 
-                  inherit the class <PerlModule::Message::Util::Error>, 
-                  which in turn inherits <PerlModule::Error>.
-          \
-          }
+      @@@enDesc:
+        The reported error object.
     @@Return:
       @@@Type: DISPerl|Any
       @@@enDesc:
@@ -4132,8 +4120,6 @@ IFCls1Def:
         @@@@enDesc:
           No error handler.
       @@@PerlDef:
-        @@@@For: ManakaiDOM|DOM3
-        @@@@@:
           if ($err->isa (<IFName::c|DOMError||ManakaiDOM|ManakaiDOM>)) {
             __DEEP{
               A: {
@@ -4151,14 +4137,6 @@ IFCls1Def:
                 $r = $h-><M::c|DOMErrorHandler.handleError> ($err);
               } # A
             }__;
-          } else {
-            $err-><M::ecore|ErrorInterface||ManakaiDOM|Perl.throw>;
-          }
-      @@@PerlDef:
-        @@@@For: !ManakaiDOM|DOM3
-        @@@@@:
-          if ($err->isa (<IFName::c|DOMError||ManakaiDOM|ManakaiDOM>)) {
-            CORE::warn $err;
           } else {
             $err-><M::ecore|ErrorInterface||ManakaiDOM|Perl.throw>;
           }
@@ -6279,6 +6257,69 @@ ResourceDef:
       @@@enDesc: The newly created node list.
       @@@PerlDef:
         $r = bless [], $self;
+
+
+  @IntMethod:
+    @@ForCheck: ManakaiDOM|ManakaiDOM3
+    @@Operator: ManakaiDOM|MUErrorHandler
+    @@enDesc:
+      When a <IF::ecore|ErrorInterface||ManakaiDOM|Perl> is <Perl::report>ed
+      with an <Perl::-object> of <IF::NodeList>, then this method is invoked.
+      
+      The method calls the <cfg::error-handler> if the error is of 
+      <IF::c|DOMError>.  Otherwise, including the cases of <IF::c|DOMException>s,
+      the error is rethrown so that appropriate <Perl::catch> clause
+      can catch the error.
+    @@enImplNote:
+      For implementations which does not have the
+      <IF::c|DOMError||ManakaiDOM|ManakaiDOM3> interface, the method
+      is defined in the <Class::ManakaiDOM|ManakaiDOMObject> class
+      and it is not overridden here.
+    @@Param:
+      @@@Name: err
+      @@@Type: ecore|ErrorInterface||ManakaiDOM|Perl
+      @@@enDesc:
+        The reported error object.
+    @@Return:
+      @@@Type: DISPerl|Any
+      @@@enDesc:
+        If the <P::err> is a <IF::c|DOMError>, then the return value
+        of the error handler.
+
+           {NOTE:: If the error is thrown, the method never returns.
+           }
+      @@@nullCase:
+        @@@@enDesc:
+          No error handler.
+      @@@PerlDef:
+          if ($err->isa (<IFName::c|DOMError||ManakaiDOM|ManakaiDOM>)) {
+            __DEEP{
+              A: {
+                my $doco = $self->{<H::mn:node>}->{<H::DOMCore:ownerDocument>};
+                if (not defined $doco) {
+                  if ($self->{<H::mn:node>}->{<H::DOMCore:nodeType>}
+                        eq <Q::infoset:Document>) {
+                    $doco = $self->{<H::mn:node>};
+                  } else {  ## DocumentType node
+                    warn $err;
+                    last A;
+                  }
+                }
+                my $doc;
+                __CODE{mn:getWeakReference||ManakaiDOM:Perl::
+                  $object => $doco,
+                  $ref => $doc,
+                  $class => {<ClassName::ManakaiDOMDocument>},
+                }__;
+                my $cfg = $doc-><AG::Document.domConfig>;
+                my $h = $cfg-><M::c|DOMConfiguration.getParameter>
+                                 ('error-handler');
+                $r = $h-><M::c|DOMErrorHandler.handleError> ($err);
+              } # A
+            }__;
+          } else {
+            $err-><M::ecore|ErrorInterface||ManakaiDOM|Perl.throw>;
+          }
 ##NodeList
 
 ElementTypeBinding:
@@ -7300,6 +7341,58 @@ ResourceDef:
       @@@lang:en
       @@@@:
         See: <M::Node.isEqualNode>.
+
+  @IntMethod:
+    @@ForCheck: ManakaiDOM|ManakaiDOM3 c|ForAttrMap
+    @@Operator: ManakaiDOM|MUErrorHandler
+    @@enDesc:
+      When a <IF::ecore|ErrorInterface||ManakaiDOM|Perl> is <Perl::report>ed
+      with an <Perl::-object> of <IF::NamedNodeMap> that represents
+      a set of attributes, then this method is invoked.
+      
+      The method calls the <cfg::error-handler> if the error is of 
+      <IF::c|DOMError>.  Otherwise, including the cases of <IF::c|DOMException>s,
+      the error is rethrown so that appropriate <Perl::catch> clause
+      can catch the error.
+    @@enImplNote:
+      For implementations which does not have the
+      <IF::c|DOMError||ManakaiDOM|ManakaiDOM3> interface, the method
+      is defined in the <Class::ManakaiDOM|ManakaiDOMObject> class
+      and it is not overridden here.
+    @@Param:
+      @@@Name: err
+      @@@Type: ecore|ErrorInterface||ManakaiDOM|Perl
+      @@@enDesc:
+        The reported error object.
+    @@Return:
+      @@@Type: DISPerl|Any
+      @@@enDesc:
+        If the <P::err> is a <IF::c|DOMError>, then the return value
+        of the error handler.
+
+           {NOTE:: If the error is thrown, the method never returns.
+           }
+      @@@nullCase:
+        @@@@enDesc:
+          No error handler.
+      @@@PerlDef:
+          if ($err->isa (<IFName::c|DOMError||ManakaiDOM|ManakaiDOM>)) {
+            __DEEP{
+                my $doc;
+                __CODE{mn:getWeakReference||ManakaiDOM:Perl::
+                  $object => {$self->{<H::mn:node>}
+                                   ->{<H::DOMCore:ownerDocument>}},
+                  $ref => $doc,
+                  $class => {<ClassName::ManakaiDOMDocument>},
+                }__;
+                my $cfg = $doc-><AG::Document.domConfig>;
+                my $h = $cfg-><M::c|DOMConfiguration.getParameter>
+                                 ('error-handler');
+                $r = $h-><M::c|DOMErrorHandler.handleError> ($err);
+            }__;
+          } else {
+            $err-><M::ecore|ErrorInterface||ManakaiDOM|Perl.throw>;
+          }
 ##NamedNodeMap
 
 ## -- Specialized |Node| Interfaces
