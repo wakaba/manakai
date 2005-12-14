@@ -25,7 +25,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2005/11/16 10:07:13 $
+      $Date: 2005/12/14 11:57:13 $
     @@ContentType:
       dis:Date.RCS
   
@@ -1531,6 +1531,7 @@ IFClsETDef:
       @@@PerlDef:
           if ({
             unparsed => 1, if => 1, statement => 1, block => 1,
+            choose => true,
             blockContainer => true,
             inlineUnparsed => 1, variable => 1, tokens => 1, atom => 1,
             inlineContainer => 1, stringLiteral => 1, assignment => 1,
@@ -2346,10 +2347,7 @@ IFClsETDef:
 
   @ToStringMethod:
     @@Return:
-      @@@Type:
-        DISLang:String::ManakaiDOM:all
-      @@@enDesc:
-        Perl code. 
+      @@@Type: DOMString
       @@@PerlDef:
           __DEEP{
             $r = $self-><AG::Node.textContent>;
@@ -2600,6 +2598,26 @@ IFClsDef:
           }__;
 
   @Method:
+    @@Name: appendNewPCExpression
+    @@enDesc:
+      Appends a newly created <IF::PCExpression> node.
+    @@Param:
+      @@@Name: operatorArg
+      @@@Type: DOMString
+      @@@enDesc:
+        The operator of the expression.
+    @@Return:
+      @@@Type: PCExpression
+      @@@enDesc:
+        The newly created expression object.
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><AG::Node.ownerDocument>
+                    -><M::PCDocument.createPCExpression> ($operatorArg);
+          $self-><M::Node.appendChild> ($r);
+        }__;
+
+  @Method:
     @@Name: appendNewAssignment
     @@enDesc:
       Appends a newly created <Class::ManakaiPerlAssign> object. 
@@ -2654,7 +2672,35 @@ IFClsDef:
             $r-><AS::PerlAssignment.rightCode> ($rightArg);
             $self-><M::Node.appendChild> ($r);
           }__;
-##PCAssignment
+
+  @Method:
+    @@Name: appendNewPCFunctionCall
+    @@enDesc:
+      Appends a newly created <IF::PCFunctionCall> node.
+    @@Param:
+      @@@Name: packageArg
+      @@@Type: DOMString
+      @@@enDesc:
+        The package name of the function.
+      @@@nullCase:
+        @@@@enDesc: No package name.
+    @@Param:
+      @@@Name: localNameArg
+      @@@Type: DOMString
+      @@@enDesc:
+        The local part of the function name.
+    @@Return:
+      @@@Type: PCFunctionCall
+      @@@enDesc:
+        The newly created functin call object.
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><AG::Node.ownerDocument>
+                    -><M::PCDocument.createPCFunctionCall>
+                        ($packageArg, $localNameArg);
+          $self-><M::Node.appendChild> ($r);
+        }__;
+##PCCodeUnits
 
 IFClsETDef:
   @IFQName: PerlStatement
@@ -2790,11 +2836,13 @@ IFClsETDef:
       @@@enDesc:
         Perl code. 
       @@@PerlDef:
+        __DEEP{        
           my @child = @{$self-><AG::Node.childNodes>};
-          if (@child == 1 and 
+          my $label = $self-><AG::PerlCodeStatements.label>;
+          if (not $label and @child == 1 and 
               $child[0]-><AG::Node.localName> eq 'block') {
             $r = "\x0A" . $child[0]->stringify . "\x0A";
-          } elsif (@child == 1 and
+          } elsif (not $label and @child == 1 and
                    $child[0]-><AG::Node.localName> eq 'unparsed' and
                    $child[0]-><AG::Node.textContent> =~ /^\s*$/) {
             # 
@@ -2810,7 +2858,6 @@ IFClsETDef:
             }
             $r .= "\x0A";
 
-            __DEEP{
               if ($self-><AG::Node.ownerDocument>
                        -><AG::Document.domConfig>
                        -><M::DOMCore:DOMConfiguration.getParameter>
@@ -2830,8 +2877,10 @@ IFClsETDef:
               } else {
                 $r = "\n{\n$r\n;}\n" if 2 < length $r;
               }
-            }__;
-          }
+
+              $r = "\n" . $label . ':' . $r if $label;
+            }
+          }__;
 ##PCBlock
 
 IFClsETDef:
@@ -2888,6 +2937,83 @@ IFClsETDef:
             }__;
           }
 ##PCCodeBlocks
+
+IFClsETDef:
+  @IFQName: PCExpression
+  @CQName: ManakaiPCExpression
+  @ETQName: pc|expression
+
+  @IFISA: PerlCode
+  @IFISA: PerlCodeInlines
+  @CISA: ManakaiPCCodeInlines
+
+  @enDesc:
+    A <IF::PCExpression> object represents a sequence of one or more
+    expression fragments (operands) separated by the same operator.
+
+  @ATTR:
+    @@Name: operator
+    @@ATTRQName: pc|operator
+    @@enDesc:
+      The operator.
+    @@ReflectCDATA:
+    @@Get:
+    @@Set:
+ 
+  @Attr:
+    @@Name: operandNumber
+    @@enDesc:
+      The number of operands.
+    @@Type: idl|unsignedLong||ManakaiDOM|all
+    @@Get:
+      @@@PerlDef:
+        __DEEP{
+          $r = @{$self-><AG::Node.childNodes>};
+        }__;
+
+  @ToStringMethod:
+    @@Return:
+      @@@Type: DOMString
+      @@@PerlDef:
+        __DEEP{
+          my @r;
+          no warnings 'uninitialized';
+          A: for my $child (@{$self-><AG::Node.childNodes>}) {
+            next A unless $child-><AG::Node.nodeType> == <C::Node.ELEMENT_NODE>;
+            if ($child-><AG::Node.namespaceURI> eq <Q::pc:> and
+                $child-><AG::Node.localName> eq 'expression') {
+              push @r, [$child->stringify, $child];
+            }
+          }
+          if (@r > 1) {
+            my $op = $self-><AG::PCExpression.operator>;
+            for (@r) {
+              if ($_->[0] =~ /^\(/) {
+                $_ = $_->[0];
+              } elsif ((not {
+                '+' => {'+' => true, '-' => true, '*' => true},
+                '-' => {},
+                '*' => {'*' => true},
+                '/' => {},
+                '&&' => {'&&' => true},
+                '||' => {'||' => true},
+                'and' => {'and' => true},
+                'or' => {'or' => true},
+              }->{$op}->{$_->[1]-><AG::PCExpression.operator>}) and
+              $_->[1]-><AG::PCExpression.operandNumber> > 1) {
+                $_ = '(' . $_->[0] . ')';
+              } else {
+                $_ = $_->[0];
+              }
+            }
+            $r = '(' . join ($op, @r) . ')';
+          } elsif (@r) {
+            $r = $r[0]->[0];
+          } else {
+            $r = 'undef';
+          }
+        }__;
+##PCExpression
 
 IFClsETDef:
   @IFQName: PerlAssignment
@@ -2990,6 +3116,260 @@ IFClsETDef:
           }
         }__;
 ##PerlAssignment
+
+IFClsETDef:
+  @IFQName: PCChoose
+  @CQName: ManakaiPCChoose
+  @ETQName: pc|choose
+
+  @IFISA: PerlCode
+  @CISA: ManakaiPCCode
+
+  @enDesc:
+    A <IF::PCChoose> object, or a <Q::pc|choose> element, represents
+    a set of <Perl::if>, <Perl::elsif>, and <Perl::else> statements.
+
+  @Method:
+    @@Name: getWhen
+    @@enDesc:
+      Returns a <IF::PCWhen> by its ordinal index.
+    @@Param:
+      @@@Name: index
+      @@@Type: idl|unsignedLong||ManakaiDOM|all
+      @@@enDesc:
+        The ordinal index of the <Q::pc|when> element.
+    @@Return:
+      @@@Type: PCWhen
+      @@@enDesc:
+        The <P::index>th <Q::pc|when> object.
+      @@@nullCase:
+        @@@@enDesc:
+          There is no <P::index>th element.
+      @@@PerlDef:
+        __DEEP{
+          my $i = 0;
+          no warnings 'uninitialized';
+          A: for my $child (@{$self-><AG::Node.childNodes>}) {
+            if ($child-><AG::Node.nodeType> == <C::Node.ELEMENT_NODE> and
+                $child-><AG::Node.namespaceURI> eq <Q::pc:> and
+                $child-><AG::Node.localName> eq 'when' and
+                ++$i == $index) {
+              $r = $child;
+              last A;
+            }
+          }
+        }__;
+
+  @Method:
+    @@Name: appendNewPCWhen
+    @@enDesc:
+      Appends a new <Q::pc|when> element.
+    @@Return:
+      @@@Type: PCWhen
+      @@@enDesc:
+        The newly created <Q::pc|when> element.
+      @@@PerlDef:
+        __DEEP{
+          my $od = $self-><AG::Node.ownerDocument>;
+          $r = $od-><M::Document.createElementNS> (<Q::pc:>, 'when');
+          my $cond = $od-><M::Document.createElementNS>
+                              (<Q::pc:>, 'condition');
+          $r-><M::Node.appendChild> ($cond);
+          my $block = $od-><M::Document.createElementNS>
+                              (<Q::pc:>, 'block');
+          $r-><M::Node.appendChild> ($block);
+          $self-><M::Node.insertBefore> ($r, $self-><AG::PCChoose.otherwise>);
+        }__;
+
+  @Attr:
+    @@Name: otherwise
+    @@enDesc:
+      Returns the <IF::PCOtherwise> by its ordinal index.
+    @@Type: PCOtherwise
+    @@Get:
+      @@@enDesc:
+        The <Q::pc|otherwise> object.
+      @@@nullCase:
+        @@@@enDesc:
+          There is no <Q::pc|otherwise> element.
+      @@@PerlDef:
+        __CODE{getChildElementByType::
+          $namespaceURI => {<Q::pc:>},
+          $localName => {'otherwise'},
+          $parent => $self,
+          $result => $r,
+        }__;
+
+  @Method:
+    @@Name: appendNewPCOtherwise
+    @@enDesc:
+      Appends a new <Q::pc|otherwise> element.  If there is already the
+      <Q::pc|otherwise> element, then no element is created and
+      the element is returned.
+    @@Return:
+      @@@Type: PCOtherwise
+      @@@enDesc:
+        The <Q::pc|otherwise> element.
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><AG::PCChoose.otherwise>;
+          unless ($r) {
+            my $od = $self-><AG::Node.ownerDocument>;
+            $r = $od-><M::Document.createElementNS> (<Q::pc:>, 'otherwise');
+            my $block = $od-><M::Document.createElementNS>
+                              (<Q::pc:>, 'block');
+            $r-><M::Node.appendChild> ($block);
+            $self-><M::Node.appendChild> ($r);
+          }
+        }__;
+
+  @ToStringMethod:
+    @@Return:
+      @@@Type: DOMString
+      @@@PerlDef:
+        __DEEP{
+          S: for my $child (@{$self-><AG::Node.childNodes>}) {
+            next S unless $child-><AG::Node.nodeType> == <C::Node.ELEMENT_NODE>;
+            next S unless $child-><AG::Node.namespaceURI> eq <Q::pc:>;
+            my $ln = $child-><AG::Node.localName>;
+            if ($ln eq 'when') {
+              $r .= 'els' if length $r;
+              $r .= $child->stringify;
+            } elsif ($ln eq 'otherwise') {
+              $r .= $child->stringify;
+              last S;
+            }
+          } # S
+        }__;
+##PCChoose
+
+IFClsETDef:
+  @IFQName: PCWhen
+  @CQName: ManakaiPCWhen
+  @ETQName: pc|when
+  
+  @IFISA: PerlCode
+  @CISA: ManakaiPCCode
+
+  @enDesc:
+    A <IF::PCWhen> object, or a <Q::pc|when> element, represents an
+    <Perl::if> or <Perl::elsif> block.
+
+  @Attr:
+    @@Name: condition
+    @@enDesc:
+      The <P::PCCondition> object.
+    @@Type: PerlCodeInlines
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          There is no <Q::pc|condition> element.
+      @@@PerlDef:
+        __CODE{getChildElementByType::
+          $namespaceURI => {<Q::pc:>},
+          $localName => {'condition'},
+          $parent => $self,
+          $result => $r,
+        }__;
+
+  @Attr:
+    @@Name: block
+    @@enDesc:
+      The code block that is executed when the <A::PCWhen.condition> met.
+    @@Type: PerlBlock
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          There is no <Q::pc:block> child element.
+      @@@PerlDef:
+        __CODE{getChildElementByType::
+          $namespaceURI => {<Q::pc:>},
+          $localName => {'block'},
+          $parent => $self,
+          $result => $r,
+        }__;
+
+  @ToStringMethod:
+    @@Return:
+      @@@Type: DOMString
+      @@@PerlDef:
+        __DEEP{
+          $r = 'if (';
+          my $cond = $self-><AG::PCWhen.condition>;
+          if ($cond) {
+            $r .= $cond->stringify;
+          } else {
+            $r .= '0';
+          }
+          $r .= ') ';
+          my $block = $self-><AG::PCWhen.block>;
+          if ($block) {
+            $r .= $block->stringify;
+          } else {
+            $r .= "{ }\n";
+          }
+        }__;
+##PCWhen
+
+IFClsETDef:
+  @IFQName: PCOtherwise
+  @CQName: ManakaiPCOtherwise
+  @ETQName: pc|otherwise
+  
+  @IFISA: PerlCode
+  @CISA: ManakaiPCCode
+
+  @enDesc:
+    A <IF::PCOtherwise> object, or a <Q::pc|otherwise> element, represents an
+    <Perl::else> clause.
+
+  @Attr:
+    @@Name: block
+    @@enDesc:
+      The code block that is executed.
+    @@Type: PerlBlock
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          There is no <Q::pc:block> child element.
+      @@@PerlDef:
+        __CODE{getChildElementByType::
+          $namespaceURI => {<Q::pc:>},
+          $localName => {'block'},
+          $parent => $self,
+          $result => $r,
+        }__;
+
+  @ToStringMethod:
+    @@Return:
+      @@@Type: DOMString
+      @@@PerlDef:
+        __DEEP{
+          my $block = $self-><AG::PCOtherwise.block>;
+          if ($block) {
+            $r = 'else ' . $block->stringify;
+          }
+        }__;
+##PCOtherwise
+
+ResourceDef:
+  @For: ManakaiDOM|ManakaiDOM
+  @QName: getChildElementByType
+  @rdf:type: DISPerl|BlockCode
+  @enDesc:
+    Returns the first element of a type.
+  @PerlCDef:
+    __DEEP{
+      no warnings 'uninitialized';
+      A: for my $__child (@{$parent-><AG::Node.childNodes>}) {
+        if ($__child-><AG::Node.nodeType> == <C::Node.ELEMENT_NODE> and
+            $__child-><AG::Node.namespaceURI> eq $namespaceURI and
+            $__child-><AG::Node.localName> eq $localName) {
+          $result = $__child;
+          last A;
+        }
+      }
+    }__;
 
 IFClsETDef:
   @IFQName: PerlIf
@@ -3173,6 +3553,88 @@ PropDef:
   @enDesc:
     Perl statement / block label.
 
+
+IFClsETDef:
+  @IFQName: PCFunctionCall
+  @CQName: ManakaiPCFunctionCall
+  @ETQName: pc|call
+
+  @IFISA: PerlCode
+  @IFISA: PerlCodeInlines
+  @CISA: ManakaiPCCodeInlines
+
+  @enDesc:
+    A <IF::PCFunctionCall> object represents a function call or
+    function-like statement such as <Perl::next>.
+
+  @ATTR:
+    @@Name: variableType
+    @@ATTRQName: pc|variableType
+    @@enDesc:
+      The value of the attribute <kwd:MAY> be <Perl::&>,
+      which introduces a subroutine name.
+    @@ReflectCDATA:
+    @@Get:
+    @@Set:
+
+  @ATTR:
+    @@Name: packageName
+    @@ATTRQName: pc|packageName
+    @@enDesc:
+      The name of the package to which the subroutine belongs.
+    @@ReflectCDATA:
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          The object belongs to the current package or 
+          does not belong to any package.
+    @@Set:
+      @@@nullCase:
+        @@@@enDesc:
+          The object belongs to the current package or
+          does not belong to any package.
+
+  @ATTR:
+    @@Name: pcLocalName
+    @@ATTRQName: pc|localName
+    @@enDesc:
+      The local part of the subroutine name.
+    @@ReflectCDATA:
+    @@Get:
+    @@Set:
+
+  @ToStringMethod:
+    @@Return:
+      @@@Type: DOMString
+      @@@PerlDef:
+        __DEEP{
+          $r .= $self-><AG::PCFunctionCall.variableType>;
+          my $v = $self-><AG::PCFunctionCall.packageName>;
+          $r .= $v . '::' if length $v;
+          $r .= $self-><AG::PCFunctionCall.pcLocalName>;
+
+          my @arg;
+          no warnings 'uninitialized';
+          A: for my $child (@{$self-><AG::Node.childNodes>}) {
+            next A unless $child-><AG::Node.nodeType> == <C::Node.ELEMENT_NODE>;
+            push @arg, ''.$child;
+          }
+          my $arg = join ', ', @arg;
+          if ({
+                'die' => true,
+                'last' => true,
+                'next' => true,
+                'redo' => true,
+                'warn' => true,
+              }->{$r} or
+              $arg =~ /^\(/) {
+            $r .= ' ' . $arg;
+          } else {
+            $r .= ' (' . $arg . ')';
+          }
+        }__;
+##PCFunctionCall
+
 ElementTypeBinding:
   @Name: RaiseException
   @ElementType:
@@ -3310,6 +3772,65 @@ IFClsDef:
                    (<Q::pc:>, 'stringLiteral');
             $r-><AS::Node.textContent> ($value);
           }
+        }__;
+
+  @Method:
+    @@Name: createPCExpression
+    @@enDesc:
+      Creates a <Q::pc:expression> element node.
+    @@Param:
+      @@@Name: operator
+      @@@Type: DOMString
+      @@@enDesc:
+        The operator of the expression.
+    @@Return:
+      @@@Type: PCExpression
+      @@@enDesc:
+        The newly created expression object.
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><M::Document.createElementNS> (<Q::pc:>, 'choose');
+          $r-><AS::PCExpression.operator> ($operator);
+        }__;
+
+  @Method:
+    @@Name: createPCFunctionCall
+    @@enDesc:
+      Creates a <Q::pc:call> element node.
+    @@Param:
+      @@@Name: package
+      @@@Type: DOMString
+      @@@enDesc:
+        The package to which the function belongs.
+      @@@nullCase:
+        @@@@enDesc: No package name.
+    @@Param:
+      @@@Name: localName
+      @@@Type: DOMString
+      @@@enDesc:
+        The local part of the function name.
+    @@Return:
+      @@@Type: PCFunctionCall
+      @@@enDesc:
+        The newly created function object.
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><M::Document.createElementNS> (<Q::pc:>, 'call');
+          $r-><AS::PCFunctionCall.packageName> ($package) if defined $package;
+          $r-><AS::PCFunctionCall.pcLocalName> ($localName);
+        }__;
+
+  @Method:
+    @@Name: createPCChoose
+    @@enDesc:
+      Creates a <Q::pc:choose> element node.
+    @@Return:
+      @@@Type: PCChoose
+      @@@enDesc:
+        The newly created <Q::pc:choose> element.
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><M::Document.createElementNS> (<Q::pc:>, 'choose');
         }__;
 ##PCDocument
 
