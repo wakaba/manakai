@@ -25,7 +25,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2005/12/14 11:57:13 $
+      $Date: 2005/12/16 15:08:55 $
     @@ContentType:
       dis:Date.RCS
   
@@ -65,6 +65,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/ManakaiNode#
   @pc:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/PerlCode#
+  @pc2:
+    http://suika.fam.cx/~wakaba/archive/2005/12/pc/
   @rdf:
     http://www.w3.org/1999/02/22-rdf-syntax-ns#
   @rdfs:
@@ -1654,6 +1656,34 @@ IFClsETDef:
           }__;
 
   @Method:
+    @@Name: appendNewPCBlock
+    @@enDesc:
+      Creates a <Q::pc2:block> and appends it to the node.
+    @@Return:
+      @@@Type: PCBlock
+      @@@enDesc:
+        The newly created block element.
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><AG::Node.ownerDocument>-><M::PCDocument.createPCBlock>;
+          $self-><M::Node.appendChild> ($r);
+        }__;
+
+  @Method:
+    @@Name: appendNewPCChoose
+    @@enDesc:
+      Creates a <Q::pc:choose> and appends it to the node.
+    @@Return:
+      @@@Type: PCChoose
+      @@@enDesc:
+        The newly created choose element.
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><AG::Node.ownerDocument>-><M::PCDocument.createPCChoose>;
+          $self-><M::Node.appendChild> ($r);
+        }__;
+
+  @Method:
     @@Name: appendNewIf
     @@enDesc:
       Appends a newly created <Class::ManakaiPerlIf> object. 
@@ -2051,6 +2081,28 @@ IFClsETDef:
 ##PCInlineUnparsedCode
 
 IFClsETDef:
+  @IFQName: PCNumberLiteral
+  @CQName: ManakaiPCNumberLiteral
+  @ETQName: pc|numberLiteral
+ 
+  @IFISA: PerlCode
+  @CISA: ManakaiPCCode
+
+  @enDesc:
+    A <IF::PCNumberLiteral> object represents a Perl number literal.
+    The <A::Node.textContent> of a <IF::PCNumberLiteral> object
+    is a Perl source code representation of the number for the object.
+
+  @ToStringMethod:
+    @@Return:
+      @@@Type: DOMString
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><AG::Node.textContent>;
+        }__;
+##PCNumberLiteral
+
+IFClsETDef:
   @IFQName: PerlStringLiteral
   @CQName: ManakaiPCPerlStringLiteral
   @ETQName: pc|stringLiteral
@@ -2144,7 +2196,7 @@ IFClsETDef:
 IFClsETDef:
   @IFQName: PCArrayRefLiteral
   @CQName: ManakaiPCArrayRefLiteral
-  @ETQName: pc|arrayRef
+  @ETQName: pc|arrayRefLiteral
 
   @IFISA: PerlCode
   @CISA: ManakaiPCCode
@@ -2200,7 +2252,7 @@ IFClsETDef:
 IFClsETDef:
   @IFQName: PCHashRefLiteral
   @CQName: ManakaiPCHashRefLiteral
-  @ETQName: pc|hashRef
+  @ETQName: pc|hashRefLiteral
 
   @IFISA: PerlCode
   @CISA: ManakaiPCCode
@@ -2556,6 +2608,26 @@ IFClsDef:
         }__;
 
   @Method:
+    @@Name: appendNewPCNumberLiteral
+    @@enDesc:
+      Creates a <IF::PCNumberLiteral> object and appends it to the node.
+    @@Param:
+      @@@Name: value
+      @@@Type: DISPerl|NumberValue
+      @@@enDesc:
+        The value.
+    @@Return:
+      @@@Type: PCNumberLiteral
+      @@@enDesc:
+        The newly created node.
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><AG::Node.ownerDocument>
+                    -><M::PCDocument.createPCNumberLiteral> ($value);
+          $self-><M::Node.appendChild> ($r);
+        }__; 
+
+  @Method:
     @@Name: appendAtom
     @@enDesc:
       Appends a Perl atomic code fragment.
@@ -2596,6 +2668,63 @@ IFClsDef:
             $r-><AS::Node.textContent> ($codeArg);
             $self-><M::Node.appendChild> ($r);
           }__;
+
+  @Method:
+    @@Name: appendNewPCVariable
+    @@enDesc:
+      Creates a variable object and appends it to the children list of 
+      the node.
+    @@Param:
+      @@@Name: variableTypeArg
+      @@@Type: DOMString
+      @@@enDesc:
+        The variable type prefix such as <Perl::$>, if any, or an empty string.
+    @@Param:
+      @@@Name: packageNameArg
+      @@@Type: DOMString
+      @@@enDesc:
+        The name of the package to which the variable belongs.
+      @@@nullCase:
+        @@@@enDesc:
+          The variable does not belong to any package or belongs
+          to the current package.
+    @@Param:
+      @@@Name: localNameArg
+      @@@Type: DOMString
+      @@@enDesc:
+        The local part of the variable name.
+    @@Return:
+      @@@Type: PerlVariable
+      @@@enDesc:
+        The newly created variable object.
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><AG::Node.ownerDocument>
+                    -><M::PCDocument.createPCVariable>
+                        ($variableTypeArg, $packageNameArg, $localNameArg);
+          $self-><M::Node.appendChild> ($r);
+        }__;
+
+  @Method:
+    @@Name: appendNewPCDereference
+    @@enDesc:
+      Creates a <IF::PCDereference> object and appends it to the child
+      node list of the node.
+    @@Param:
+      @@@Name: variableTypeArg
+      @@@Type: DOMString
+      @@@enDesc:
+        The type of the referenced value, such as <Perl::$>.
+    @@Return:
+      @@@Type: PCDereference
+      @@@enDesc:
+        The newly created element node.
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><AG::Node.ownerDocument>
+                    -><M::PCDocument.createPCDereference> ($variableTypeArg);
+          $self-><M::Node.appendChild> ($r);
+        }__;
 
   @Method:
     @@Name: appendNewPCExpression
@@ -2672,6 +2801,20 @@ IFClsDef:
             $r-><AS::PerlAssignment.rightCode> ($rightArg);
             $self-><M::Node.appendChild> ($r);
           }__;
+
+  @Method:
+    @@Name: appendNewPCApply
+    @@enDesc:
+      Creates a <IF::PCApply> object and appends it to the children list
+      of the node.
+    @@Return:
+      @@@Type: PCApply
+      @@@enDesc: The newly created node.
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><AG::Node.ownerDocument>-><M::PCDocument.createPCApply>;
+          $self-><M::Node.appendChild> ($r);
+        }__;
 
   @Method:
     @@Name: appendNewPCFunctionCall
@@ -2820,7 +2963,7 @@ IFClsETDef:
 
 IFClsETDef:
   @IFQName: PerlBlock
-  @CQName: ManakaiPCBlock
+  @CQName: ManakaiPerlBlock
   @ETQName: pc|block
 
   @IFISA: PerlCode
@@ -2881,7 +3024,7 @@ IFClsETDef:
               $r = "\n" . $label . ':' . $r if $label;
             }
           }__;
-##PCBlock
+##PerlBlock
 
 IFClsETDef:
   @IFQName: PerlCodeBlocks
@@ -2939,6 +3082,164 @@ IFClsETDef:
 ##PCCodeBlocks
 
 IFClsETDef:
+  @IFQName: PCDereference
+  @CQName: ManakaiPCDereference
+  @ETQName: pc|dereference
+  
+  @IFISA: PerlCode
+  @IFISA: PerlCodeInlines
+  @CISA: ManakaiPCCodeInlines
+
+  @enDesc:
+    A <IF::PCDereference> object represents a dereference.
+
+  @ATTR:
+    @@Name: variableType
+    @@ATTRQName: pc|variableType
+    @@enDesc:
+      The type of the value, such as <Perl::$>.
+    @@ReflectCDATA:
+    @@Get:
+    @@Set:
+
+  @ToStringMethod:
+    @@Return:
+      @@@Type: DOMString
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><AG::PCDereference.variableType> . '{';
+          A: for my $child (@{$self-><AG::Node.childNodes>}) {
+            next A unless $child-><AG::Node.nodeType> == <C::Node.ELEMENT_NODE>;
+            $r .= $child;
+          }
+          $r .= '}';
+        }__;
+##PCDereference
+
+IFClsETDef:
+  @IFQName: PCApply
+  @CQName: ManakaiPCApply
+  @ETQName: pc|apply
+
+  @IFISA: PerlCode
+  @IFISA: PerlCodeInlines
+  @CISA: ManakaiPCCodeInlines
+
+  @enDesc:
+    A <IF::PCApply> object represents a function call.
+
+    The first child element must be an expression results in a function name
+    (such as bare function or operator name represented
+    as a <IF::PCVariable> object or an <IF::PCExpression> with
+    operator <Perl::-<gt>> whose last operand is a method name.
+    
+    The second child element, if any, is an expression intended to be
+    an argument for the function.  It is possible to specify more than
+    one arguments by <IF::PCExpression> with operator <Perl::,>.
+
+    The third child element, if any, is an expression that is put
+    into the indirect object slot.
+
+  @Attr:
+    @@Name: function
+    @@enDesc:
+      The function child element of the element.
+    @@Type: PerlCode
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc: There is no child element.
+      @@@PerlDef:
+        __DEEP{
+          A: for my $child (@{$self-><AG::Node.childNodes>}) {
+            next A unless $child-><AG::Node.nodeType> == <C::Node.ELEMENT_NODE>;
+            $r = $child;
+            last A;
+          }
+        }__;
+
+  @Attr:
+    @@Name: argument
+    @@enDesc:
+      The argument child element of the element.
+    @@Type: PerlCode
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc: There is no argument element.
+      @@@PerlDef:
+        __DEEP{
+          my $x;
+          A: for my $child (@{$self-><AG::Node.childNodes>}) {
+            next A unless $child-><AG::Node.nodeType> == <C::Node.ELEMENT_NODE>;
+            if ($x) {
+              $r = $child;
+              last A;
+            } else {
+              $x = true;
+            }
+          }
+        }__;
+
+  @Attr:
+    @@Name: indirect
+    @@enDesc:
+      The indirect object slot child element of the element.
+    @@Type: PerlCode
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc: There is no indirect object element.
+      @@@PerlDef:
+        __DEEP{
+          my $x = 0;
+          A: for my $child (@{$self-><AG::Node.childNodes>}) {
+            next A unless $child-><AG::Node.nodeType> == <C::Node.ELEMENT_NODE>;
+            if ($x++ == 2) {
+              $r = $child;
+              last A;
+            }
+          }
+        }__;
+
+
+  @ToStringMethod:
+    @@Return:
+      @@@Type: DOMString
+      @@@PerlDef:
+        __DEEP{
+          my $f;
+          my $arg;
+          my $obj;
+          no warnings 'uninitialized';
+          A: for my $child (@{$self-><AG::Node.childNodes>}) {
+            next A unless $child-><AG::Node.nodeType> == <C::Node.ELEMENT_NODE>;
+            if (not defined $f) {
+              $f = ''.$child;
+            } elsif (not defined $arg) {
+              $arg = ''.$child;
+            } else {
+              $obj = ''.$child;
+              last A;
+            }
+          }
+
+          $r = $f;
+          $r .= ' ' . $obj if defined $obj;
+
+          if ({
+                'die' => true,
+                'last' => true,
+                'next' => true,
+                'redo' => true,
+                'return' => true,
+                'warn' => true,
+              }->{$r}) {
+            $r .= ' ' . $arg;
+          } else {
+            $r .= ' (' . $arg . ')';
+          }
+        }__;
+##PCApply
+
+IFClsETDef:
   @IFQName: PCExpression
   @CQName: ManakaiPCExpression
   @ETQName: pc|expression
@@ -2980,17 +3281,26 @@ IFClsETDef:
           no warnings 'uninitialized';
           A: for my $child (@{$self-><AG::Node.childNodes>}) {
             next A unless $child-><AG::Node.nodeType> == <C::Node.ELEMENT_NODE>;
-            if ($child-><AG::Node.namespaceURI> eq <Q::pc:> and
-                $child-><AG::Node.localName> eq 'expression') {
-              push @r, [$child->stringify, $child];
-            }
+            my $xuri = $child-><AG::Node.namespaceURI>
+                     . $child-><AG::Node.localName>;
+            push @r, [$child.'', $child, $xuri];
           }
           if (@r > 1) {
             my $op = $self-><AG::PCExpression.operator>;
             for (@r) {
-              if ($_->[0] =~ /^\(/) {
-                $_ = $_->[0];
-              } elsif ((not {
+              if ($_->[2] ne <Q::pc:expression> and not {
+                <Q::pc:arrayRefLiteral> => true,
+                <Q::pc:atom> => true,
+                <Q::pc:dereference> => true,
+                <Q::pc:hashRefLiteral> => true,
+                <Q::pc:numberLiteral> => true,
+                <Q::pc:stringLiteral> => true,
+                <Q::pc:tokens> => true,
+                <Q::pc:variable> => true,
+              }->{$_->[2]}) {
+                $_ = '(' . $_->[0] . ')';
+              } elsif ($_->[2] eq <Q::pc:expression> and
+              (not {
                 '+' => {'+' => true, '-' => true, '*' => true},
                 '-' => {},
                 '*' => {'*' => true},
@@ -3006,7 +3316,14 @@ IFClsETDef:
                 $_ = $_->[0];
               }
             }
-            $r = '(' . join ($op, @r) . ')';
+            $op = ' '.$op unless {
+              ',' => true,
+              '->' => true,
+            }->{$op};
+            $op = $op.' ' unless {
+              '->' => true,
+            }->{$op};
+            $r = join $op, @r;
           } elsif (@r) {
             $r = $r[0]->[0];
           } else {
@@ -3118,6 +3435,89 @@ IFClsETDef:
 ##PerlAssignment
 
 IFClsETDef:
+  @IFQName: PCCondition
+  @CQName: ManakaiPCCondition
+  @ETQName: pc2|condition
+
+  @IFISA: PerlCode
+  @IFISA: PerlCodeInlines
+  @CISA: ManakaiPCCodeInlines
+
+  @enDesc:
+    A <IF::PCCondition> object represents a condition expression
+    part of an <Perl::if> or <Perl::while> statement.
+
+  @ToStringMethod:
+    @@Return:
+      @@@Type: DOMString
+      @@@PerlDef:
+        __DEEP{
+          A: for my $child (@{$self-><AG::Node.childNodes>}) {
+            next A unless $child-><AG::Node.nodeType> == <C::Node.ELEMENT_NODE>;
+            $r .= $child;
+          }
+        }__;
+##PCCondition
+
+IFClsETDef:
+  @IFQName: PCBlock
+  @CQName: ManakaiPCBlock
+  @ETQName: pc2|block
+
+  @IFISA: PerlCode
+  @IFISA: PerlCodeStatements
+  @CISA: ManakaiPCCodeStatements
+
+  @enDesc:
+    A <Q::PCBlock> object represents a Perl code block, i.e. 
+    a set of statements enclosed by <CHAR::{> and <CHAR::}> pair.
+
+  @ToStringMethod:
+    @@Return:
+      @@@Type: DOMString
+      @@@PerlDef:
+        __DEEP{        
+          my @child = @{$self-><AG::Node.childNodes>};
+          my $label = $self-><AG::PerlCodeStatements.label>;
+
+            $r = "\x0A";
+            for my $child (@child) {
+              if ($child-><AG::Node.localName> eq 'inlineContainer' and
+                  1 == @child) {
+                $r .= '(' . $child->stringify . ')';
+              } else {
+                $r .= $child->stringify;
+              }
+            }
+            $r .= "\x0A";
+            $r .= ';' unless @child;
+
+              if ($self-><AG::Node.ownerDocument>
+                       -><AG::Document.domConfig>
+                       -><M::DOMCore:DOMConfiguration.getParameter>
+                            (<Q::pc:line>)) {
+                my $file = $self-><AG::PerlCode.fileNode>;
+                my $sfile = $file ? $file-><AG::PerlFile.sourceFile>
+                                  : $self->{<H::mn:node>}->{<H::mn:nodeID>};
+                $r = sprintf qq<\n{\n#line %d "%s [b] (Chunk #%d)"%s>.
+                             qq<#line 1 "%s [/b] (Chunk #%d)"\n}\n>,
+                           $self-><AG::PerlCodeStatements.sourceLine> || 1,
+                           $self-><AG::PerlCodeStatements.sourceFile> || $sfile,
+                           $file ? $file-><M::PerlFile.getNextChunkNumber> : 0,
+                           $r,
+                           $sfile,
+                           $file ? $file-><M::PerlFile.getNextChunkNumber> : 0;
+              } else {
+                $r = "\n{\n$r\n}\n";
+              }
+
+              $r = "\n" . $label . ':' . $r . '# ' . $label . "\n"
+                if length $label;
+
+          }__;
+##PCBlock
+
+IFClsETDef:
   @IFQName: PCChoose
   @CQName: ManakaiPCChoose
   @ETQName: pc|choose
@@ -3173,10 +3573,10 @@ IFClsETDef:
           my $od = $self-><AG::Node.ownerDocument>;
           $r = $od-><M::Document.createElementNS> (<Q::pc:>, 'when');
           my $cond = $od-><M::Document.createElementNS>
-                              (<Q::pc:>, 'condition');
+                              (<Q::pc2:>, 'condition');
           $r-><M::Node.appendChild> ($cond);
           my $block = $od-><M::Document.createElementNS>
-                              (<Q::pc:>, 'block');
+                              (<Q::pc2:>, 'block');
           $r-><M::Node.appendChild> ($block);
           $self-><M::Node.insertBefore> ($r, $self-><AG::PCChoose.otherwise>);
         }__;
@@ -3217,7 +3617,7 @@ IFClsETDef:
             my $od = $self-><AG::Node.ownerDocument>;
             $r = $od-><M::Document.createElementNS> (<Q::pc:>, 'otherwise');
             my $block = $od-><M::Document.createElementNS>
-                              (<Q::pc:>, 'block');
+                              (<Q::pc2:>, 'block');
             $r-><M::Node.appendChild> ($block);
             $self-><M::Node.appendChild> ($r);
           }
@@ -3258,15 +3658,15 @@ IFClsETDef:
   @Attr:
     @@Name: condition
     @@enDesc:
-      The <P::PCCondition> object.
-    @@Type: PerlCodeInlines
+      The condition object.
+    @@Type: PCCondition
     @@Get:
       @@@nullCase:
         @@@@enDesc:
-          There is no <Q::pc|condition> element.
+          There is no condition element.
       @@@PerlDef:
         __CODE{getChildElementByType::
-          $namespaceURI => {<Q::pc:>},
+          $namespaceURI => {<Q::pc2:>},
           $localName => {'condition'},
           $parent => $self,
           $result => $r,
@@ -3276,14 +3676,14 @@ IFClsETDef:
     @@Name: block
     @@enDesc:
       The code block that is executed when the <A::PCWhen.condition> met.
-    @@Type: PerlBlock
+    @@Type: PCBlock
     @@Get:
       @@@nullCase:
         @@@@enDesc:
-          There is no <Q::pc:block> child element.
+          There is no <Q::pc2:block> child element.
       @@@PerlDef:
         __CODE{getChildElementByType::
-          $namespaceURI => {<Q::pc:>},
+          $namespaceURI => {<Q::pc2:>},
           $localName => {'block'},
           $parent => $self,
           $result => $r,
@@ -3327,14 +3727,14 @@ IFClsETDef:
     @@Name: block
     @@enDesc:
       The code block that is executed.
-    @@Type: PerlBlock
+    @@Type: PCBlock
     @@Get:
       @@@nullCase:
         @@@@enDesc:
-          There is no <Q::pc:block> child element.
+          There is no <Q::pc2:block> child element.
       @@@PerlDef:
         __CODE{getChildElementByType::
-          $namespaceURI => {<Q::pc:>},
+          $namespaceURI => {<Q::pc2:>},
           $localName => {'block'},
           $parent => $self,
           $result => $r,
@@ -3625,9 +4025,9 @@ IFClsETDef:
                 'last' => true,
                 'next' => true,
                 'redo' => true,
+                'return' => true,
                 'warn' => true,
-              }->{$r} or
-              $arg =~ /^\(/) {
+              }->{$r}) {
             $r .= ' ' . $arg;
           } else {
             $r .= ' (' . $arg . ')';
@@ -3775,6 +4175,93 @@ IFClsDef:
         }__;
 
   @Method:
+    @@Name: createPCNumberLiteral
+    @@enDesc:
+      Creates a number literal object.
+    @@Param:
+      @@@Name: value
+      @@@Type: DISPerl|NumberValue
+      @@@enDesc:
+        The value.
+    @@Return:
+      @@@Type: PCNumberValue
+      @@@enDesc: The newly created value object.
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><M::Document.createElementNS>
+                   (<Q::pc:>, 'numberLiteral');
+          $r-><AS::Node.textContent> ($value);
+        }__;
+
+  @Method:
+    @@Name: createPCVariable
+    @@enDesc:
+      Creates a new <IF::PerlVariable> object. 
+    @@Param:
+      @@@Name: variableType
+      @@@Type: DOMString
+      @@@enDesc:
+        Variable prefix.
+      @@@nullCase:
+        @@@@enDesc:
+          If the <P::packageName> is <DOM::null>, then 
+          the <P::variableType> is detected by the prefix of
+          <P::localName>.  Otherwise, it is an unprefixed variable
+          such as file handle.
+    @@Param:
+      @@@Name: packageName
+      @@@Type: DOMString
+      @@@enDesc:
+        Package name.
+      @@@nullCase:
+        @@@@enDesc:
+          The variable belongs to the current package or a 
+          lexical-scoped variable.
+    @@Param:
+      @@@Name: localName
+      @@@Type: DOMString
+      @@@enDesc:
+        Variable name.  If both <P::variableType> and <P::packageName>
+        is <DOM::null>, the <P::localName> value may be prefixed
+        by any possible <P::variableType> value.
+    @@Return:
+      @@@Type: PerlVariable
+      @@@enDesc: 
+        Newly created Perl variable object. 
+      @@@PerlDef:
+          __DEEP{
+            $r = $self-><M::Document.createElementNS> (<Q::pc:>, 'variable');
+            if (not $variableType and not $packageName and
+                $localName =~ s/^(\\?[\$\@%&*])//) {
+              $variableType = $1;
+            }
+            $r-><AS::PerlVariable.variableType> ($variableType)
+                                                  if defined $variableType;
+            $r-><AS::PerlVariable.packageName> ($packageName)
+                                                  if defined $packageName;
+            $r-><AS::PerlVariable.pcLocalName> ($localName);
+          }__;
+
+  @Method:
+    @@Name: createPCDereference
+    @@enDesc:
+      Creates a <IF::PCDereference> object.
+    @@Param:
+      @@@Name: variableType
+      @@@Type: DOMString
+      @@@enDesc:
+        The type of the referenced value, such as <Perl::$>.
+    @@Return:
+      @@@Type: PCDereference
+      @@@enDesc:
+        The newly created element node.
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><M::Document.createElementNS> (<Q::pc:>, 'dereference');
+          $r-><AS::PCDereference.variableType> ($variableType);
+        }__;
+
+  @Method:
     @@Name: createPCExpression
     @@enDesc:
       Creates a <Q::pc:expression> element node.
@@ -3789,14 +4276,26 @@ IFClsDef:
         The newly created expression object.
       @@@PerlDef:
         __DEEP{
-          $r = $self-><M::Document.createElementNS> (<Q::pc:>, 'choose');
+          $r = $self-><M::Document.createElementNS> (<Q::pc:>, 'expression');
           $r-><AS::PCExpression.operator> ($operator);
+        }__;
+
+  @Method:
+    @@Name: createPCApply
+    @@enDesc:
+      Creates a <Q::pc:apply> element node.
+    @@Return:
+      @@@Type: PCApply
+      @@@enDesc: The newly created element node.
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><M::Document.createElementNS> (<Q::pc:>, 'apply');
         }__;
 
   @Method:
     @@Name: createPCFunctionCall
     @@enDesc:
-      Creates a <Q::pc:call> element node.
+      Creates a function call element node.
     @@Param:
       @@@Name: package
       @@@Type: DOMString
@@ -3810,14 +4309,28 @@ IFClsDef:
       @@@enDesc:
         The local part of the function name.
     @@Return:
-      @@@Type: PCFunctionCall
+      @@@Type: PCApply
       @@@enDesc:
         The newly created function object.
       @@@PerlDef:
         __DEEP{
-          $r = $self-><M::Document.createElementNS> (<Q::pc:>, 'call');
-          $r-><AS::PCFunctionCall.packageName> ($package) if defined $package;
-          $r-><AS::PCFunctionCall.pcLocalName> ($localName);
+          $r = $self-><M::Document.createElementNS> (<Q::pc:>, 'apply');
+          my $func = $self-><M::PCDocument.createPCVariable>
+                              ('', $package, $localName);
+          $r-><M::Node.appendChild> ($func);
+        }__;
+
+  @Method:
+    @@Name: createPCBlock
+    @@enDesc:
+      Creates a <Q::pc2:block> element node.
+    @@Return:
+      @@@Type: PCBlock
+      @@@enDesc:
+        The newly created <Q::pc2:block> element.
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><M::Document.createElementNS> (<Q::pc2:>, 'block');
         }__;
 
   @Method:

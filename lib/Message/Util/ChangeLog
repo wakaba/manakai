@@ -1,3 +1,17 @@
+2005-12-16  Wakaba  <wakaba@suika.fam.cx>
+
+	* PerlCode.dis (PCNumberLiteral, PCDereference, PCApply): New interfaces.
+	(arrayRefLiteral, hashRefLiteral): Typos in element type names fixed.
+	(PCExpression.stringify): Outputs children other than expression.
+	Inserts space before and after operators if desired.
+
+2005-12-15  Wakaba  <wakaba@suika.fam.cx>
+
+	* PerlCode.dis (PCCondition, PCBlock): New interface.
+	(ManakaiPCBlock): Renamed as |ManakaiPerlCodeBlock| to
+	distingulish new |ManakaiPCBlock| class implementing new |PCBlock|
+	interface.
+
 2005-12-14  Wakaba  <wakaba@suika.fam.cx>
 
 	* PerlCode.dis (PCExpression, PCChoose, PCWhen, PCOtherwise): New
