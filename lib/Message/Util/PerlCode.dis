@@ -25,7 +25,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2005/12/16 15:08:55 $
+      $Date: 2005/12/17 11:58:52 $
     @@ContentType:
       dis:Date.RCS
   
@@ -1684,6 +1684,20 @@ IFClsETDef:
         }__;
 
   @Method:
+    @@Name: appendNewPCWhile
+    @@enDesc:
+      Creates a <Q::pc:while> and appends it to the node.
+    @@Return:
+      @@@Type: PCWhile
+      @@@enDesc:
+        The newly created while element.
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><AG::Node.ownerDocument>-><M::PCDocument.createPCWhile>;
+          $self-><M::Node.appendChild> ($r);
+        }__;
+
+  @Method:
     @@Name: appendNewIf
     @@enDesc:
       Appends a newly created <Class::ManakaiPerlIf> object. 
@@ -3289,6 +3303,7 @@ IFClsETDef:
             my $op = $self-><AG::PCExpression.operator>;
             for (@r) {
               if ($_->[2] ne <Q::pc:expression> and not {
+                <Q::pc:apply> => true,
                 <Q::pc:arrayRefLiteral> => true,
                 <Q::pc:atom> => true,
                 <Q::pc:dereference> => true,
@@ -3309,6 +3324,7 @@ IFClsETDef:
                 '||' => {'||' => true},
                 'and' => {'and' => true},
                 'or' => {'or' => true},
+                '=' => {'->' => true},
               }->{$op}->{$_->[1]-><AG::PCExpression.operator>}) and
               $_->[1]-><AG::PCExpression.operandNumber> > 1) {
                 $_ = '(' . $_->[0] . ')';
@@ -3516,6 +3532,95 @@ IFClsETDef:
 
           }__;
 ##PCBlock
+
+IFClsETDef:
+  @IFQName: PCWhile
+  @CQName: ManakaiPCWhile
+  @ETQName: pc|while
+  
+  @IFISA: PerlCode
+  @CISA: ManakaiPCCode
+
+  @enDesc:
+    A <IF::PCWhile> object represents a <Perl::while> statement.
+    It can contain two child elements: <Q::pc2|condition> and <Q::pc2|block>,
+    each represents the condition expression and the block of the <Perl::while>
+    statement.
+
+  @ATTR:
+    @@Name: label
+    @@ATTRQName: pc|label
+    @@enDesc:
+      Label for this block.
+    @@ReflectCDATA:
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          No label.
+    @@Set:
+      @@@nullCase:
+        @@@@enDesc:
+          No label.
+
+  @Attr:
+    @@Name: condition
+    @@enDesc:
+      The condition object.
+    @@Type: PCCondition
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          There is no condition element.
+      @@@PerlDef:
+        __CODE{getChildElementByType::
+          $namespaceURI => {<Q::pc2:>},
+          $localName => {'condition'},
+          $parent => $self,
+          $result => $r,
+        }__;
+
+  @Attr:
+    @@Name: block
+    @@enDesc:
+      The code block that is executed while the <A::PCWhile.condition> met.
+    @@Type: PCBlock
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          There is no <Q::pc2:block> child element.
+      @@@PerlDef:
+        __CODE{getChildElementByType::
+          $namespaceURI => {<Q::pc2:>},
+          $localName => {'block'},
+          $parent => $self,
+          $result => $r,
+        }__;
+
+  @ToStringMethod:
+    @@Return:
+      @@@Type: DOMString
+      @@@PerlDef:
+        __DEEP{
+          $r = 'while (';
+          my $cond = $self-><AG::PCWhile.condition>;
+          if ($cond) {
+            $r .= $cond->stringify;
+          } else {
+            $r .= '0';
+          }
+          $r .= ') ';
+          my $block = $self-><AG::PCWhile.block>;
+          if ($block) {
+            $r .= $block->stringify;
+          } else {
+            $r .= "{ }\n";
+          }
+
+          my $label = $self-><AG::PCWhile.label>;
+          $r = "\n" . $label . ': ' . $r . ' # ' . $label . "\n"
+            if length $label;
+        }__;
+##PCWhile
 
 IFClsETDef:
   @IFQName: PCChoose
@@ -4344,6 +4449,23 @@ IFClsDef:
       @@@PerlDef:
         __DEEP{
           $r = $self-><M::Document.createElementNS> (<Q::pc:>, 'choose');
+        }__;
+
+  @Method:
+    @@Name: createPCWhile
+    @@enDesc:
+      Creates a <Q::pc:while> element node.
+    @@Return:
+      @@@Type: PCWhile
+      @@@enDesc:
+        The newly created <Q::pc:while> element.
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><M::Document.createElementNS> (<Q::pc:>, 'while');
+          $r-><M::Node.appendChild>
+                ($self-><M::Document.createElementNS> (<Q::pc2:>, 'condition'));
+          $r-><M::Node.appendChild>
+                ($self-><M::Document.createElementNS> (<Q::pc2:>, 'block'));
         }__;
 ##PCDocument
 
