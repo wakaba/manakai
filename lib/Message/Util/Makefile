@@ -59,10 +59,12 @@ DIS_CORE_DIS_FILES     = $(DIS_CORE_DIS_FILES_) $(DIS_CORE_DIS_FILES_DIS)
 DIS_DOC_DIS_FILES      = DIS/DISDoc.dis
 DIS_DUMP_DIS_FILES     = DIS/DISDump.dis
 DIS_TEST_DIS_FILES     = DIS/Test$(DIS_SUFFIX)
+DIS_DPG_DIS_FILES      = DIS/DPG$(DIS_SUFFIX)
 PC_DIS_FILES           = PerlCode$(DIS_SUFFIX)
 UTIL_DIS_COMMON_DIS_FILE = DIS/common$(DIS_SUFFIX)
 DIS_FILES = $(UTIL_CORE_DIS_FILES) $(DIS_CORE_DIS_FILES) \
   $(DIS_DOC_DIS_FILES) $(DIS_DUMP_DIS_FILES) $(DIS_TEST_DIS_FILES) \
+  $(DIS_DPG_DIS_FILES) \
   $(PC_DIS_FILES) $(UTIL_DIS_COMMON_DIS_FILE)
 
 GENERATED_FILES = \
@@ -73,9 +75,11 @@ GENERATED_FILES = \
                         DIS/DNLite$(PM_SUFFIX) \
   disdoc$(DAC_SUFFIX)   DIS/DISDoc$(PM_SUFFIX) \
   disdump$(DAC_SUFFIX)  DIS/DISDump$(PM_SUFFIX) \
-  distest$(DAC_SUFFIX)  DIS/Test$(PM_SUFFIX)
+  distest$(DAC_SUFFIX)  DIS/Test$(PM_SUFFIX) \
+  dpg$(DAC_SUFFIX)      DIS/DPG$(PM_SUFFIX)
 GENERATED_DAC_FILES = core$(DAC_SUFFIX) discore$(DAC_SUFFIX) \
-  disdoc$(DAC_SUFFIX) disdump$(DAC_SUFFIX) distest$(DAC_SUFFIX)
+  disdoc$(DAC_SUFFIX) disdump$(DAC_SUFFIX) distest$(DAC_SUFFIX) \
+  dpg$(DAC_SUFFIX)
 
 all: PerlCode$(PM_SUFFIX) .discore$(PM_SUFFIX) $(GENERATED_FILES)
 
@@ -102,6 +106,10 @@ disdump$(DAC_SUFFIX): $(DOM_CORE_DAC_FILE) $(DIS_DUMP_DIS_FILES) $(DAC_PL) \
 distest$(DAC_SUFFIX): $(DOM_CORE_DAC_FILE) $(DIS_TEST_DIS_FILES) $(DAC_PL) \
   $(UTIL_DIS_COMMON_DIS_FILE)
 	$(DAC)$@ --input-db-file-name="$<" DIS/Test.dis
+
+dpg$(DAC_SUFFIX): discore$(DAC_SUFFIX) \
+  $(DIS_DPG_DIS_FILES) $(DAC_PL) $(UTIL_DIS_COMMON_DIS_FILE)
+	$(DAC)$@ --input-db-file-name="$<" DIS/DPG.dis
 
 ManakaiNode$(PM_SUFFIX): core$(DAC_SUFFIX) $(DAC2PM_PL)
 	$(DAC2PM) $< \
@@ -196,6 +204,12 @@ DIS/DISDump$(PM_SUFFIX): disdump$(DAC_SUFFIX) $(DAC2PM_PL)
 DIS/Test$(PM_SUFFIX): distest$(DAC_SUFFIX) $(DAC2PM_PL)
 	$(DAC2PM) $< \
 	  --module-uri="$(NS_UTIL_DIS)Test" \
+	  --output-file-path="$@"
+	$(PERL_CHK) $@
+
+DIS/DPG$(PM_SUFFIX): dpg$(DAC_SUFFIX) $(DAC2PM_PL)
+	$(DAC2PM) $< \
+	  --module-uri="$(NS_UTIL_DIS)DPG" \
 	  --output-file-path="$@"
 	$(PERL_CHK) $@
 

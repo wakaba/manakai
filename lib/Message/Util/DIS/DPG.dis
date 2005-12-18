@@ -1,0 +1,1488 @@
+Module:
+  @QName: DIS|DPG
+  @FullName:
+    @@lang: en
+    @@@:
+      <QUOTE::dis> DPG Module
+  @Namespace:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#DPG/
+  
+  @enDesc:
+    The <Module::DIS|DPG>, <QUOTE::dis> parser generator, is a compiler
+    generator implementation for the <QUOTE::dis> system.
+
+  @DISCore:author: DISCore|Wakaba
+  @License: license|Perl+MPL
+
+  @Date:
+    $Date: 2005/12/18 13:21:47 $
+  
+  @Require:
+    @@Module:
+      @@@QName: DIS|common
+    @@Module:
+      @@@QName: Util|PerlCode
+      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
+
+  @DefaultFor: ManakaiDOM|ManakaiDOMLatest
+
+Namespace:
+  @DIS:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#
+  @dis:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
+  @DISlib:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/
+  @dp:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#Perl/
+  @f:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/feature#
+  @html5:
+    http://www.w3.org/1999/xhtml
+  @idl:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/IDL#
+  @kwd:
+    http://suika.fam.cx/~wakaba/archive/2005/rfc2119/
+  @lang:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
+  @license:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
+  @ManakaiDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
+  @MDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
+  @MDOMX:
+    http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
+  @mn:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/ManakaiNode#
+  @pc:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/PerlCode#
+  @pg:
+    http://suika.fam.cx/~wakaba/archive/2005/11/pg/
+  @rdf:
+    http://www.w3.org/1999/02/22-rdf-syntax-ns#
+  @rdfs:
+    http://www.w3.org/2000/01/rdf-schema#
+  @s:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Markup#
+  @Util:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/
+
+## -- Features
+
+ElementTypeBinding:
+  @Name: FeatureDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: f|Feature
+    @@For: =ManakaiDOM|all
+
+ElementTypeBinding:
+  @Name: FeatureVerDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: f|Feature
+
+ElementTypeBinding:
+  @Name: featureQName
+  @ElementType:
+    f:name
+  @ShadowContent:
+    @@ContentType: DISCore|QName
+
+FeatureDef:
+  @QName: DIS|DPG
+  @FeatureVerDef:
+    @@QName: DIS|DPG10
+    @@Version: 1.0
+    @@f:instanceOf: DIS|DPG
+    @@f:requires: DOMXML|XMLFeature30
+    @@f:requires: pc|CoreFeature10
+    @@FullName:
+      @@@lang:en
+      @@@@:
+        DPG version 1.0
+
+ElementTypeBinding:
+  @Name: enDesc
+  @ElementType: 
+    dis:Description
+  @ShadowContent: 
+    @@lang:en
+
+ElementTypeBinding:
+  @Name: IFClsETDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@: dis|MultipleResource
+      @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass !s|ForML
+    @@resourceFor: ManakaiDOM|ForIF
+    @@resourceFor: ManakaiDOM|ForClass
+    @@resourceFor: s|ForML
+
+    @@rdf:type:
+      @@@@: DISLang|Interface
+      @@@ForCheck: ManakaiDOM|ForIF
+    @@s:elementType:
+      @@@@: ||+||s|ForML
+      @@@ForCheck: ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+
+    @@rdf:type:
+      @@@@: DISLang|Class
+      @@@ForCheck: ManakaiDOM|ForClass
+    @@Implement:
+      @@@@: ||+||ManakaiDOM|ForIF
+      @@@ForCheck: ManakaiDOM|ForClass
+      @@@ContentType: DISCore|TFPQNames
+    @@s:elementType:
+      @@@@: ||+||s|ForML
+      @@@ForCheck: ManakaiDOM|ForClass
+      @@@ContentType: DISCore|TFPQNames
+      @@@DISCore:stopISARecursive:1
+
+    @@rdf:type:
+      @@@@: s|ElementType
+      @@@ForCheck: s|ForML
+
+    @@f:implements: DIS|DPG10
+
+ElementTypeBinding:
+  @Name: IFClsDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@: dis|MultipleResource
+      @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
+    @@resourceFor: ManakaiDOM|ForIF
+    @@resourceFor: ManakaiDOM|ForClass
+
+    @@rdf:type:
+      @@@@: DISLang|Interface
+      @@@ForCheck: ManakaiDOM|ForIF
+
+    @@rdf:type:
+      @@@@: DISLang|Class
+      @@@ForCheck: ManakaiDOM|ForClass
+    @@Implement:
+      @@@@: ||+||ManakaiDOM|ForIF
+      @@@ForCheck: ManakaiDOM|ForClass
+      @@@ContentType: DISCore|TFPQNames
+
+    @@f:implements: DIS|DPG10
+
+    @@ForCheck: ManakaiDOM|ManakaiDOM
+
+ElementTypeBinding:
+  @Name: IFDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@: dis|MultipleResource
+      @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
+    @@resourceFor: ManakaiDOM|ForIF
+
+    @@rdf:type:
+      @@@@: DISLang|Interface
+      @@@ForCheck: ManakaiDOM|ForIF
+
+    @@ForCheck: ManakaiDOM|ManakaiDOM
+
+ElementTypeBinding:
+  @Name: IFQName
+  @ElementType:
+    dis:QName
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForIF
+
+ElementTypeBinding:
+  @Name: ClsQName
+  @ElementType:
+    dis:QName
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: ETQName
+  @ElementType:
+    dis:AppName
+  @ShadowContent:
+    @@ForCheck:
+      s:ForML
+    @@ContentType: DISCore|QName
+
+ElementTypeBinding:
+  @Name: ATTRQName
+  @ElementType:
+    dis:AppName
+  @ShadowContent:
+    @@ForCheck:
+      s:ForML
+    @@ContentType: DISCore|QName
+
+ElementTypeBinding:
+  @Name: IFISA
+  @ElementType:
+    dis:ISA
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForIF
+
+ElementTypeBinding:
+  @Name: ClsISA
+  @ElementType:
+    dis:ISA
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: Method
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|Method
+    @@For: !=ManakaiDOM|ManakaiDOM
+
+ElementTypeBinding:
+  @Name: Return
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|MethodReturn
+
+ElementTypeBinding:
+  @Name: Param
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|MethodParameter
+
+ElementTypeBinding:
+  @Name: plMName
+  @ElementType:
+    DISPerl:methodName
+
+ElementTypeBinding:
+  @Name: PerlDef
+  @ElementType:
+    dis:Def
+  @ShadowContent:
+    @@ContentType: lang|Perl
+
+ElementTypeBinding:
+  @Name: disDef
+  @ElementType:
+    dis:Def
+  @ShadowContent:
+    @@ContentType: lang|dis
+
+ElementTypeBinding:
+  @Name: PropDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: rdf|Property
+
+## -- The DPG Document Object Model
+
+IFClsDef:
+  @IFQName: DPGDocument
+  @ClsQName: ManakaiDPGDocument
+
+  @IFISA: Document
+  @ClsISA: DOMCore|ManakaiDOMDocument
+
+  @enDesc:
+    The <IF::DPGDocument> interface <kwd:MUST> be implemented by
+    <IF::Document> objects if the implementation supports the DPG object model.
+
+  @f:provides:
+    @@@: DIS|DPG10
+    @@f:through: DOMCore|ManakaiDOMImplementation
+
+  @s:rootElementType: RulesElementType
+##DPGDocument
+
+ResourceDef:
+  @For: ManakaiDOM|DOM
+  @QName: Node
+  @AliasFor: DOMCore|Node
+
+ResourceDef:
+  @For: ManakaiDOM|DOM
+  @QName: Document
+  @AliasFor: DOMCore|Document
+
+ResourceDef:
+  @For: ManakaiDOM|DOM
+  @QName: Element
+  @AliasFor: DOMCore|Element
+
+IFClsDef:
+  @IFQName: DPGElement
+  @ClsQName: ManakaiDPGElement
+
+  @IFISA: Element
+  @ClsISA: DOMCore|ManakaiDOMElement
+
+  @enDesc:
+    The <IF::DPGElement> interface <kwd:MUST> be implemented by
+    <IF::Element> objects whose namespace URI is <URI^^DISCore:QName::pg:>
+    if the implementation supports the DPG object model.
+
+##DPGElement
+
+IFClsDef:
+  @IFQName: DPGElementAttribute
+  @ClsQName: ManakaiDPGElementAttribute
+
+  @enDesc:
+    The <IF::DPGElementAttribute> interface is implemented by
+    objects whose element type allowes DPG attributes being specified.
+
+  @Method:
+    @@Name: dpgGetAttribute
+    @@enDesc:
+      Returns a DPG attribute value.
+    @@Param:
+      @@@Name: attrName
+      @@@Type: DOMString
+      @@@enDesc:
+        The name of the attribute.
+    @@Return:
+      @@@Type: DOMString
+      @@@enDesc:
+        The attribute value.
+
+          {NOTE:: If the DPG attribute element is invalid so that 
+                  its <XA::value> attribute is not specified, then
+                  what is the return value is undefined.
+          }
+      @@@nullCase:
+        @@@@enDesc:
+          The attribute is not specified.
+      @@@PerlDef:
+        __DEEP{
+          $r = null;
+          no warnings "uninitialized";
+          C: for my $child (@{$self-><AG::Node.childNodes>}) {
+            if ($child-><AG::Node.namespaceURI>.$child-><AG::Node.localName> eq
+                <Q::pg:attributeSpecification>) {
+              if ($child-><M::Element.getAttributeNS> (null, 'name') eq
+                  $attrName) {
+                $r = $child-><M::Element.getAttributeNS> (null, 'value');
+                last C;
+              }
+            }
+          }
+        }__;
+##DPGElementAttribute
+
+ElementTypeBinding:
+  @Name: nullCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: ManakaiDOM|InCase
+    @@Value:
+      @@@is-null:1
+
+ResourceDef:
+  @For: ManakaiDOM|DOM
+  @QName: DOMString
+  @AliasFor: DOMMain|DOMString
+
+IFClsETDef:
+  @IFQName: DPGRulesElement
+  @ClsQName: ManakaiDPGRulesElement
+  @ETQName: pg|rules
+  @QName:
+    @@@: RulesElementType
+    @@For: s|ForML
+
+  @IFISA: DPGElement
+  @ClsISA: ManakaiDPGElement
+
+  @enDesc:
+    The <XE::pg|rules> element type is used for the root element
+    of the DPG rule fragment.  It <kwd:MAY> contain zero or more
+    <XE::pg|rule> and / or <XE::pg|lexmode> child elements.
+
+  @Method:
+    @@Name: plCodeFragment
+    @@enDesc:
+      Generates a Perl code fragment from the subtree rooted by
+      the node.
+    @@Param:
+      @@@Name: codeDocument
+      @@@Type: pc|PCDocument
+      @@@enDesc:
+        A <IF::pc|PCDocument>.  The generated Perl code nodes will
+        belong to the document.
+    @@NamedParam:
+      @@@Name: disResource
+      @@@Type: dp|DISResourcePerl
+      @@@enDesc:
+        The <QUOTE::dis> resource object against which <Q::lang:Perl>
+        code fragments, if any, are evaluated and converted into Perl code.
+    @@NamedParam:
+      @@@Name: contextObject
+      @@@Type: DOMMain|DOMObject
+      @@@enDesc:
+        The context where various references, such as namespace prefixes
+        and relative URI references, are evaluated.  It <kwd:MUST> implement
+        the <IF::DIS|NSResolverDIS> interface if there are <Q::lang:Perl>
+        code fragments.
+    @@Return:
+      @@@Type: Node
+      @@@enDesc:
+        A set of elements generated from the rules.
+
+          {NOTE:: If the subtree contains one or more <XE::pg|embedStatement>
+                  element nodes whose content is invalid, then their
+                  evaluation processes might throw an exception.
+          }
+      @@@PerlDef:
+        __DEEP{
+          no warnings 'uninitialized';
+
+          $r = $codeDocument-><M::Document.createDocumentFragment>;
+
+          ## --- Range operations
+          
+            my $or_range = sub ($$) {
+    my ($r1, $r2) = @_;
+    my @r1 = @$r1;
+    my @r2 = @$r2;
+    my ($c1, $c2);
+    my $r = [];
+    while (@r1 or @r2 or $c1 or $c2) {
+      $c1 ||= shift @r1;
+      $c2 ||= shift @r2;
+      if (not $c1) {
+        push @$r, $c2, @r2;
+        undef $c2;
+ \      @r2 = ();
+      } elsif (not $c2) {
+        push @$r, $c1, @r1;
+        undef $c1;
+ \      @r1 = ();
+      } else {
+        ($c1, $c2) = ($c2, $c1) if $c1->[0] > $c2->[0];
+        if ($c1->[1] <= $c2->[0]) {
+          push @$r, $c1;
+          undef $c1;
+        } else {
+          $c2 = [$c1->[0], $c2->[1]];
+          undef $c1;
+        }
+      }
+    }
+    return $r;
+  };
+  
+  my $add_range = sub ($$;$) {
+    my ($range, $s, $e) = @_;
+    return $or_range->($range, [[$s, defined $e ? $e : $s]]);
+  };
+  
+  my $negate_range = sub ($) {
+    my $range = shift;
+    my $r = [];
+    push @$r, [0, $range->[0]->[0] - 1] if $range->[0]->[0] > 0;
+    for my $i (1..$#$range) {
+      push @$r, [$range->[$i - 1]->[1] + 1, $range->[$i]->[0] - 1];
+    }
+    push @$r, [$range->[$#$range]->[1] + 1, "Inf"] unless $range->[$#$range]->[1] eq "Inf";
+    return $r;
+  };
+  
+  my $and_minus_ranges = sub ($$) {
+    my (@ra, @rab, @rb);
+    my @rangea = @{$_[0]};
+    my @rangeb = @{$_[1]};
+    my $rangea;
+    my $rangeb;
+    while (@rangea or @rangeb or $rangea or $rangeb) {
+      $rangea ||= shift @rangea;
+      $rangeb ||= shift @rangeb;
+      if (not $rangea) {
+        push @rb, $rangeb, @rangeb;
+        last;
+      } elsif (not $rangeb) {
+        push @ra, $rangea, @rangea;
+        last;
+      } else {
+        if ($rangea->[0] < $rangeb->[0]) {
+          if ($rangea->[1] ne 'Inf' and
+              $rangea->[1] < $rangeb->[0]) { ## [a .. a] .. [b ..
+            push @ra, $rangea;
+            $rangea = undef;
+          } elsif ($rangea->[1] eq 'Inf') {
+            if ($rangeb->[1] eq 'Inf') {  ## [a .. [b ..
+              push @ra, [$rangea->[0], $rangeb->[0] - 1];
+              push @rab, $rangeb;
+              last;
+            } else {                      ## [a .. [b .. b] ..
+              push @ra, [$rangea->[0], $rangeb->[0] - 1];
+              push @rab, $rangeb;
+              $rangea = [$rangeb->[1] + 1, 'Inf'];
+              $rangeb = undef;
+            }
+          } else {                      
+            if ($rangeb->[1] eq 'Inf') {  ## [a .. [b .. a] ..
+              push @ra, [$rangea->[0], $rangeb->[0] - 1];
+              push @rab, [$rangeb->[0], $rangea->[1]];
+              $rangeb = [$rangea->[1] + 1, 'Inf'];
+              $rangea = undef;
+            } else {
+              if ($rangea->[1] < $rangeb->[1]) { ## [a .. [b .. a] .. b]
+                push @ra, [$rangea->[0], $rangeb->[0] - 1];
+                push @rab, [$rangeb->[0], $rangea->[1]];
+                $rangeb = [$rangea->[1] + 1, $rangeb->[1]];
+                $rangea = undef;
+              } elsif ($rangea->[1] > $rangeb->[1]) { ## [a .. [b .. b] .. a]
+                push @ra, [$rangea->[0], $rangeb->[0] - 1];
+                push @rab, $rangeb;
+                $rangea = [$rangeb->[1] + 1, $rangea->[1]];
+                $rangeb = undef;
+              } else {                            ## [a .. [b .. ab]]
+                push @ra, [$rangea->[0], $rangeb->[0] - 1];
+                push @rab, $rangeb;
+                $rangea = $rangeb = undef;
+              }
+            }
+          }
+        } elsif ($rangea->[0] > $rangeb->[0]) {
+          if ($rangeb->[1] ne 'Inf' and
+              $rangeb->[1] < $rangea->[0]) { ## [b .. b] .. [a ..
+            push @rb, $rangeb;
+            $rangeb = undef;
+          } elsif ($rangea->[1] eq 'Inf') {
+            if ($rangeb->[1] eq 'Inf') {  ## [b .. [a ..
+              push @rb, [$rangeb->[0], $rangea->[0] - 1];
+              push @rab, $rangea;
+              last;
+            } else {                      ## [b .. [a .. b] ..
+              push @rb, [$rangeb->[0], $rangea->[0] - 1];
+              push @rab, [$rangea->[0], $rangeb->[1]];
+              $rangea = [$rangeb->[1] + 1, 'Inf'];
+              $rangeb = undef;
+            }
+          } else {                      
+            if ($rangeb->[1] eq 'Inf') {  ## [b .. [a .. a] ..
+              push @rb, [$rangeb->[0], $rangea->[0] - 1, -7];
+              push @rab, $rangea;
+              $rangeb = [$rangea->[1] + 1, 'Inf'];
+              $rangea = undef;
+            } else {
+              if ($rangea->[1] < $rangeb->[1]) { ## [b .. [a .. a] .. b]
+                push @rb, [$rangeb->[0], $rangea->[0] - 1,-3];
+                push @rab, $rangea;
+                $rangeb = [$rangea->[1] + 1, $rangeb->[1]];
+                $rangea = undef;
+              } elsif ($rangea->[1] > $rangeb->[1]) { ## [b .. [a .. b] .. a]
+                push @rb, [$rangeb->[0], $rangea->[0] - 1,-4];
+                push @rab, [$rangea->[0], $rangeb->[1],-5];
+                $rangea = [$rangeb->[1] + 1, $rangea->[1]];
+                $rangeb = undef;
+              } else {                            ## [b .. [a .. ab]]
+                push @rb, [$rangeb->[0], $rangea->[0] - 1,-6];
+                push @rab, $rangea;
+                $rangea = $rangeb = undef;
+              }
+            }
+          }
+        } else {
+          if ($rangea->[1] eq 'Inf') {  
+            if ($rangeb->[1] eq 'Inf') {          ## [[ab ..
+              push @rab, $rangea;
+              last;
+            } else {                              ## [[ab .. b] ..
+              push @rab, $rangeb;
+              $rangea = [$rangeb->[1] + 1, 'Inf'];
+              $rangeb = undef;
+            }
+          } else {
+            if ($rangeb->[1] eq 'Inf') {          ## [[ab .. a] ..
+              push @rab, $rangea;
+              $rangeb = [$rangea->[1] + 1, 'Inf'];
+              $rangea = undef;
+            } else {
+              if ($rangea->[1] < $rangeb->[1]) {  ## [[ab .. a] .. b]
+                push @rab, $rangea;
+                $rangeb = [$rangea->[1] + 1, $rangeb->[1]];
+                $rangea = undef;
+              } elsif ($rangea->[1] > $rangeb->[1]) { ## [[ab .. b] .. a]
+                push @rab, $rangeb;
+                $rangea = [$rangeb->[1] + 1, $rangea->[1]];
+                $rangeb = undef;
+              } else {                            ## [[ab .. ab]]
+                push @rab, $rangea;
+                $rangea = $rangeb = undef;
+              }
+            }
+          }
+        }
+      }
+    }
+    return (\@ra, \@rab, \@rb);
+  };
+
+    
+          ## --- Tokenizer preparation
+            ## TODO: Multiple tokenizer support required
+
+          my $tokenizer = $codeDocument->create_perl_sub ('_shift_token');
+          $r-><M::Node.appendChild> ($tokenizer);
+          $tokenizer->prototype ('$');
+  my $tokenizer_param = $tokenizer->append_statement
+                                  ->append_new_pc_expression ('=');
+  $tokenizer_param->append_new_pc_variable ('$', undef, 'self')
+                  ->variable_scope ('my');
+  $tokenizer_param->append_new_pc_function_call (undef, 'shift');
+  my $if_stack = $tokenizer->append_new_pc_choose
+                           ->append_new_pc_when;
+  my $stack_array = $if_stack->condition->append_new_pc_dereference ('@');
+  for ($stack_array->append_new_pc_expression ('->')) {
+    $_->append_new_pc_variable ('$', undef, 'self');
+    $_->append_bare ('{token}');
+  }
+  $if_stack->block
+           ->append_statement
+           ->append_new_pc_function_call (undef, 'return')
+           ->append_new_pc_function_call (undef, 'shift')
+           ->append_child ($stack_array->clone_node (1));
+
+          ## --- For each child elements (rule or lexmode)...
+
+          my %rules;       # defined parser rules
+          my %root_rules;  # defined |standalone| parser rules
+
+          B: for my $cel (@{$self-><AG::Node.childNodes>}) {
+            my $xuri = $cel->namespace_uri . $cel->local_name;
+
+            ## -- Rule element - adds reference to hash
+            if ($xuri eq <Q::pg:rule>) {
+              my $name = $cel->get_attribute_ns (undef, 'name');
+              $rules{$name} = {source => $cel, param => []};
+              $root_rules{$name} = 1
+                if $cel-><M::DPGElementAttribute.dpgGetAttribute> ('standalone');
+      
+              ## Creates a list of parameters
+              C: for my $paramspec (@{$cel->child_nodes}) {
+                next C unless $paramspec->namespace_uri eq <Q::pg:>;
+                next C unless $paramspec->local_name eq 'parameterDeclaration';
+                push @{$rules{$name}->{param}},
+                     $paramspec->get_attribute_ns (undef, 'name');
+              }
+
+            ## -- Lexmode element - generate tokenizer
+            } elsif ($xuri eq <Q::pg:lexmode>) {
+              ## TODO: Multiple lexmode support
+    
+      my %token = ($;.'initial' => {
+        name => $;.'initial',
+        next_token => [],
+      });
+
+      my $copy_state = sub ($$) {
+        my ($original_name, $new_prefix) = @_;
+        my @copy = ($original_name.$;.'0');
+        my @cs;
+        while (@copy) {
+          my $cname = shift @copy;
+          next if $token{$new_prefix, $cname};
+          my $original = $token{$cname};
+          $token{$new_prefix, $cname} = my $new = {
+            name => $new_prefix.$;.$cname,
+            next_state => [],
+          };
+          for my $nxt (@{$original->{next_state}}) {
+            push @{$new->{next_state}}, [$nxt->[0], $new_prefix.$;.$nxt->[1]];
+            push @copy, $nxt->[1];
+          }
+          if ($original->{accept}) {
+            push @cs, $new;
+          }
+        } # @copy
+        return @cs;
+      }; # copy_state
+
+      for my $tel (grep {$_->node_type == $_->ELEMENT_NODE} @{$cel->child_nodes}) {
+        my $xuri = $tel->namespace_uri . $tel->local_name;
+        if ($xuri eq <Q::pg:lAssignmentStatement>) {
+          my $sname = $tel->get_attribute_ns (undef, 'name');
+          my $i = 0;
+          if ($token{$sname, $i}) {
+            die qq<"$sname" is already defined>;
+            ## TODO: exception
+          }
+          my $s0 = $token{$sname, $i} = {
+            name => $sname.$;.$i,
+            next_state => [],
+          };
+          my @current_state = ($s0);
+          my $ignore = $tel-><M::DPGElementAttribute.dpgGetAttribute> ('ignore');
+          my $value = $tel-><M::DPGElementAttribute.dpgGetAttribute> ('value');
+          for my $lel (grep {$_->node_type == $_->ELEMENT_NODE} @{$tel->child_nodes}) {
+            my $xuri = $lel->namespace_uri . $lel->local_name;
+            if ($xuri eq <Q::pg:charClass>) {
+              my $range = [];
+              for my $mel (grep {$_->node_type == $_->ELEMENT_NODE} @{$lel->child_nodes}) {
+                my $xuri = $mel->namespace_uri . $mel->local_name;
+                if ($xuri eq <Q::pg:string>) {
+                  $range = $add_range->($range, ord $mel->text_content);
+                } elsif ($xuri eq <Q::pg:charRange>) {
+                  $range = $add_range->($range, $mel->get_attribute_ns (undef, 'start'),
+                                                $mel->get_attribute_ns (undef, 'end'));
+                }
+              }
+              if ($lel->get_attribute_ns (undef, 'negative')) {
+                $range = $negate_range->($range);
+              }
+              
+              my $new_s = {
+                name => $sname.$;.(++$i),
+                next_state => [],
+              };
+              my $v = $lel->get_attribute_ns (undef, 'occurence');
+              if ($v eq 'zeromore') {
+                $token{$new_s->{name}} = $new_s;
+                push @{$new_s->{next_state}}, [$range, $new_s->{name}];
+                for my $s (@current_state) {
+                  push @{$s->{next_state}}, [$range, $new_s->{name}];
+                }
+                push @current_state, $new_s;
+              } elsif ($v eq 'zeroone') {
+                $token{$new_s->{name}} = $new_s;
+                for my $s (@current_state) {
+                  push @{$s->{next_state}}, [$range, $new_s->{name}];
+                }
+                push @current_state, $new_s;
+              } elsif ($v eq 'onemore') {
+                $token{$new_s->{name}} = $new_s;
+                push @{$new_s->{next_state}}, [$range, $new_s->{name}];
+                for my $s (@current_state) {
+                  push @{$s->{next_state}}, [$range, $new_s->{name}];
+                }
+   \            @current_state = ($new_s);
+              } else { # one
+                $token{$new_s->{name}} = $new_s;
+                for my $s (@current_state) {
+                  push @{$s->{next_state}}, [$range, $new_s->{name}];
+                }
+   \            @current_state = ($new_s);
+              }
+            } elsif ($xuri eq <Q::pg:lRuleRef>) {
+              my $rrulename = $lel->get_attribute_ns (undef, 'name');
+              if ($token{$rrulename, 0}) {
+                my @cs = $copy_state->($rrulename => $sname);
+                for my $s (@current_state) {
+                  push @{$s->{next_state}}, @{$token{$sname, $rrulename, 0}->{next_state}};
+                }
+   \            @current_state = @cs;
+              } else {
+                die "$rrulename is not defined";
+                ## TODO: exception
+              }
+            }
+          }
+          push @{$token{$;.'initial'}->{next_state}}, @{$s0->{next_state}};
+          for my $s (@current_state) {
+            $s->{accept} = $sname;
+            $s->{ignore} = $ignore if $ignore;
+            $s->{value} = $value if $value;
+          }
+        }
+      }
+
+      my %dfa;
+      my $make_dfa_state;
+      $make_dfa_state = sub (@) {
+        my (@src_name) = @_;
+        my @src = map {$token{$_}} @src_name;
+        my $next_state = [[[], [$;.'dummy']]];
+        
+        my @rsb = map {@{$_->{next_state}}} @src;
+        for my $rsb (@rsb) {
+          my $new_next_state = [];
+          RSA: for my $rsa (@$next_state) {
+            if (not $rsb) {
+              push @$new_next_state, $rsa if @{$rsa->[0]};
+              next RSA;
+            }
+            my ($ra, $rab, $rb) = $and_minus_ranges->($rsa->[0], $rsb->[0]);
+            push @$new_next_state, [$ra, $rsa->[1]] if @$ra;
+            push @$new_next_state, [$rab, [sort {$a cmp $b} @{$rsa->[1]}, $rsb->[1]]] if @$rab;
+            if (@$rb) {
+              $rsb = [$rb, $rsb->[1]];
+            } else {
+              $rsb = undef;
+            }
+          } # RSA
+          if ($rsb) {
+            push @$new_next_state, [$rsb->[0], [$rsb->[1]]];
+          }
+          $next_state = $new_next_state;
+        }
+        
+        my $state_name = join $;.$;, @src_name;
+        $dfa{$state_name} = {
+          name => $state_name,
+          next_state => @rsb ? $next_state : [],
+        };
+        
+        for (@src) {
+          if ($_->{accept}) {
+            $dfa{$state_name}->{accept} = $_->{accept};
+            $dfa{$state_name}->{value} = 1 if $_->{value};
+          }
+          $dfa{$state_name}->{ignore} = 1 if $_->{ignore};
+        }
+      };
+      my @req_state = ([$;.'initial']);
+      while (@req_state) {
+        my $req_state = shift @req_state;
+        my $req_state_name = join $;.$;, @$req_state;
+        next if $dfa{$req_state_name};
+        $make_dfa_state->(@$req_state);
+        for (@{$dfa{$req_state_name}->{next_state}}) {
+          push @req_state, $_->[1];
+        }
+      }
+      
+      my $escape_state_name = sub ($) {
+        my $s = shift;
+        $s =~ s/([\W_])/sprintf '_%08X', ord $1/ge;
+        $s =~ s/_0000001C/__/g;
+        return $s;
+      };
+      
+      for ($tokenizer->append_statement
+                     ->append_new_pc_expression ('=')) {
+        $_->append_new_pc_variable ('$', undef, 'ch')
+          ->variable_scope ('my');
+        $_->append_new_pc_number_literal (-2);
+      }
+      
+      my %ancestor_state;
+      my $state_to_code;
+      $state_to_code = sub ($$%) {
+        my ($parent, $state_name, %opt) = @_;
+        $ancestor_state{$state_name} = 1;
+        
+        my $state_block = $parent->append_new_pc_block;
+        my $estate_name = $escape_state_name->($state_name);
+        $state_block->label ('S'.$estate_name);
+        my $state_select;
+        
+        if ($opt{outermost}) {
+          $state_block->append_statement
+                      ->append_new_pc_variable ('@', undef, 'ch')
+                      ->variable_scope ('my');
+        }
+        
+        if (@{$dfa{$state_name}->{next_state}}) {
+          my $spush = $state_block->append_statement;
+          for ($spush->append_new_pc_function_call (undef, 'push')
+                     ->append_new_pc_expression (',')) {
+            $_->append_new_pc_variable ('@', undef, 'ch');
+            $_->append_new_pc_variable ('$', undef, 'ch');
+          }
+          $state_block->parent_node->insert_before ($spush, $state_block)
+            unless $opt{outermost};
+              ## NOTE: This statement must be placed before the named block;
+              ##       otherwise token value cannot be correctly returned
+              ##       when |redo|ne.  An exception is the outermost state.
+          
+          for my $as ($state_block->append_statement
+                                  ->append_new_pc_expression ('=')) {
+            $as->append_new_pc_variable ('$', undef, 'ch')
+               ->variable_scope ('my');
+            for ($as->append_new_pc_expression ('->')) {
+              $_->append_new_pc_variable ('$', undef, 'self');
+              $_->append_atom ('_shift_char');
+            }
+          }
+        
+          $state_select = $state_block->append_new_pc_choose;
+          for my $rs (@{$dfa{$state_name}->{next_state}}) {
+            my $when = $state_select->append_new_pc_when;
+          
+            my $cond = $when->condition;
+            my $cond_and = $cond->append_new_pc_expression ('or');
+            for my $range (@{$rs->[0]}) {
+              if ($range->[0] == $range->[1]) {
+                my $match = $cond_and->append_new_pc_expression ('==');
+                $match->append_new_pc_variable ('$', undef, 'ch');
+                $match->append_new_pc_number_literal ($range->[0]);
+              } else {
+                my $x_range = $cond_and->append_new_pc_expression ('and');
+                unless ($range->[0] == 0) {
+                  my $x_range_s = $x_range->append_new_pc_expression ('<=');
+                  $x_range_s->append_new_pc_number_literal ($range->[0]);
+                  $x_range_s->append_new_pc_variable ('$', undef, 'ch');
+                }
+                unless ($range->[1] eq 'Inf') {
+                  my $x_range_e = $x_range->append_new_pc_expression ('<=');
+                  $x_range_e->append_new_pc_variable ('$', undef, 'ch');
+                  $x_range_e->append_new_pc_number_literal ($range->[1]);
+                }
+              }
+            }
+          
+            my $when_block = $when->block;
+            my $next_state_name = join $;.$;, @{$rs->[1]};
+            if ($ancestor_state{$next_state_name}) {
+              $when_block->append_child ($spush->clone_node (1));
+              $when_block->append_statement
+                         ->append_new_pc_function_call (undef, 'redo')
+                         ->append_new_pc_variable
+                             ('', undef, 'S'.$escape_state_name->($next_state_name));
+            } else {
+              $state_to_code->($when_block, $next_state_name, outermost => 0);
+            }
+          } # for next_state
+        }
+
+        if ($dfa{$state_name}->{accept}) {
+          if ($state_select) {
+            for ($state_select->append_new_pc_otherwise->block) {
+              my $push_ap = $_->append_statement
+                              ->append_new_pc_function_call
+                                          (undef, 'unshift')
+                              ->append_new_pc_expression (',');
+              for ($push_ap->append_new_pc_dereference ('@')
+                           ->append_new_pc_expression ('->')) {
+                $_->append_new_pc_variable ('$', undef, 'self');
+                $_->append_bare ('{char}');
+              }
+              $push_ap->append_new_pc_variable ('$', undef, 'ch');
+              for ($_->append_statement->append_new_pc_expression ('=')) {
+                $_->append_new_pc_variable ('$', undef, 'ch');
+                $_->append_new_pc_number_literal (-2);
+              }
+            }
+          }
+          my $accept_code_parent = $state_block;
+          unless ($dfa{$state_name}->{ignore}) {
+            my %value;
+            if ($dfa{$state_name}->{value}) {
+              ## Removes dummy item
+              $accept_code_parent->append_statement
+                                 ->append_new_pc_function_call (undef, 'shift')
+                                 ->append_new_pc_variable ('@', undef, 'ch');
+              for ($accept_code_parent->append_statement
+                                      ->append_new_pc_expression ('=')) {
+                $_->append_new_pc_variable ('$', undef, 'token_val')
+                  ->variable_scope ('my');
+                $_->append_string_literal ('');
+              }
+              for ($accept_code_parent->append_new_pc_choose
+                                      ->append_new_pc_when) {
+                for ($_->condition->append_new_pc_expression ('>')) {
+                  $_->append_new_pc_variable ('$', undef, 'ch');
+                  $_->append_new_pc_number_literal (-1);
+                }
+                for ($_->block->append_statement
+                              ->append_new_pc_function_call (undef, 'push')
+                              ->append_new_pc_expression (',')) {
+                  $_->append_new_pc_variable ('@', undef, 'ch');
+                  $_->append_new_pc_variable ('$', undef, 'ch');
+                }
+              }
+              for ($accept_code_parent->append_new_pc_while) {
+                $_->condition->append_new_pc_variable ('@', undef, 'ch');
+                for ($_->block->append_statement
+                              ->append_new_pc_expression ('.=')) {
+                  $_->append_new_pc_variable ('$', undef, 'token_val');
+                  $_->append_new_pc_function_call (undef, 'chr')
+                    ->append_new_pc_function_call (undef, 'shift')
+                    ->append_new_pc_variable ('@', undef, 'ch');
+                }
+              }
+              $value{value} = $accept_code_parent->append_new_pc_variable
+                                                     ('$', undef, 'token_val');
+            }
+            $accept_code_parent->append_statement
+                       ->append_new_pc_function_call (undef, 'return')
+                       ->append_new_pc_literal ({
+                           type => $dfa{$state_name}->{accept},
+                           %value,
+                         });
+          } else {
+            $accept_code_parent->append_statement
+                       ->append_new_pc_function_call (undef, 'redo')
+                       ->append_new_pc_variable
+                           ('', undef, 'S'.$escape_state_name->($;.'initial'));
+          }
+        } elsif ($opt{outermost}) {
+          if ($state_select) {
+          for ($state_select->append_new_pc_when) {
+            for ($_->condition->append_new_pc_expression ('==')) {
+              $_->append_new_pc_variable ('$', undef, 'ch');
+              $_->append_new_pc_number_literal (-1);
+            }
+            $_->block->append_statement
+                     ->append_new_pc_function_call (undef, 'return')
+                     ->append_new_pc_literal ({
+                         type => '#EOF',
+                       });
+          }}
+          my $chr_ch = $codeDocument
+                         ->create_pc_function_call (undef, 'chr');
+          $chr_ch->append_new_pc_variable ('$', undef, 'ch');
+          $state_block->append_statement
+                      ->append_new_pc_function_call (undef, 'return')
+                      ->append_new_pc_literal ({
+                          type => '#INVALID',
+                          value => $chr_ch,
+                        });
+        } else {
+          my $push_ap = $state_block->append_statement
+                                    ->append_new_pc_function_call
+                                          (undef, 'unshift')
+                                    ->append_new_pc_expression (',');
+          for ($push_ap->append_new_pc_dereference ('@')
+                       ->append_new_pc_expression ('->')) {
+            $_->append_new_pc_variable ('$', undef, 'self');
+            $_->append_bare ('{char}');
+          }
+          $push_ap->append_new_pc_variable ('$', undef, 'ch');
+        }
+        
+        $ancestor_state{$state_name} = 0;
+      }; # $state_to_code
+              $state_to_code->($tokenizer, $;.'initial', outermost => 1);
+
+            } # xuri
+          } # B
+
+
+          ## --- Generates parser methods
+
+          # Template for 'get next token' statements
+  my $next_token_code = $codeDocument->create_pc_statement;
+  for ($next_token_code->append_new_pc_expression ('=')) {
+    $_->append_new_pc_variable ('$', undef, 'token');
+    for ($_->append_new_pc_expression ('->')) {
+      $_->append_new_pc_variable ('$', undef, 'self');
+      $_->append_bare ('_shift_token');
+    }
+  }
+
+          
+  my $block_id = 0;
+  my $rstatement_to_code;
+  my $rexpression_to_code;
+  $rstatement_to_code = sub ($$$) {
+    my ($parent, $statement, $next_token_required) = @_;
+    my $xuri = $statement->namespace_uri . $statement->local_name;
+    if ($xuri eq <Q::pg:matchStatement>) {
+      my $match_parent = $parent;
+      my $match_occur = $statement->get_attribute_ns (undef, 'occurence');
+      
+      
+      if ($match_occur eq 'onemore') {
+        $match_parent = $match_parent->append_new_pc_block;
+        for ($match_parent->append_statement->append_new_pc_expression ('=')) {
+          $_->append_new_pc_variable ('$', undef, 'has_content')
+            ->variable_scope ('my');
+          $_->append_new_pc_number_literal (0);
+        }
+      }
+      
+      my $match_block_id = 0;
+      if ($match_occur eq 'zeromore' or $match_occur eq 'onemore') {
+        $match_parent = $match_parent->append_new_pc_block;
+        $match_parent->label ('MATCH_' . ($match_block_id = ++$block_id));
+      }
+      
+      my $match_choose = $match_parent->append_new_pc_choose;
+      my $token_type_var = $codeDocument->create_pc_expression ('->');
+      $token_type_var->append_new_pc_variable ('$', undef, 'token');
+      $token_type_var->append_bare ('{type}');
+      my $has_sep;
+      C: for my $child (@{$statement->child_nodes}) {
+        next C unless $child->node_type == $child->ELEMENT_NODE;
+        my $xuri = $child->namespace_uri . $child->local_name;
+        if ($xuri eq <Q::pg:matchBlock>) {
+          my $token_name = $child->get_attribute_ns (undef, 'token');
+          my $is_sep = $self->_get_attr_value ($child, 'separator');
+          my $token_parent;
+          unless ($is_sep) {
+            for ($match_choose->append_new_pc_when) {
+              for ($_->condition->append_new_pc_expression ('eq')) {
+                $_->append_child ($token_type_var->clone_node (1));
+                $_->append_string_literal ($token_name);
+              }
+              $token_parent = $_->block;
+            }
+            if ($match_occur eq 'onemore') {
+              for ($token_parent->append_statement->append_new_pc_expression ('=')) {
+                $_->append_new_pc_variable ('$', undef, 'has_content');
+                $_->append_new_pc_number_literal (1);
+              }
+            }
+          } else { # separator
+            $has_sep = 1;
+            for ($match_parent->append_new_pc_choose) {
+              for ($_->append_new_pc_when) {
+                for ($_->condition->append_new_pc_expression ('eq')) {
+                  $_->append_child ($token_type_var->clone_node (1));
+                  $_->append_string_literal ($token_name);
+                }
+                $token_parent = $_->block;
+              }
+              for ($_->append_new_pc_otherwise->block) {
+                $_->append_statement
+                  ->append_new_pc_function_call (undef, 'last')
+                  ->append_new_pc_variable ('', undef, 'MATCH_'.$match_block_id);
+              }
+            }
+          }
+          
+          ## Child statements
+          $next_token_required = 1;
+          D: for my $child (@{$child->child_nodes}) {
+            next D unless $child->node_type == $child->ELEMENT_NODE;
+            $next_token_required = $rstatement_to_code->($token_parent, $child,
+                                                         $next_token_required);
+          }
+          
+          if ($next_token_required) {
+            $token_parent->append_child ($next_token_code->clone_node (1));
+            $next_token_required = 0;
+          }
+        }
+      } # pc:matchStatement children
+      
+      if (not $match_occur or $match_occur eq 'onemore') {
+        my $err_block = $match_choose->append_new_pc_otherwise->block;
+        if ($match_occur eq 'onemore') {
+          $err_block = $err_block->append_new_pc_choose->append_new_pc_when->block;
+          for ($err_block->parent_node->condition->append_new_pc_expression ('==')) {
+            $_->append_new_pc_variable ('$', undef, 'has_content');
+            $_->append_new_pc_number_literal (0);
+          }
+        }
+        ## TODO: Error reporting
+        $err_block->append_statement ('die');
+      }
+      
+      if (not $has_sep and ($match_occur eq 'zeromore' or $match_occur eq 'onemore')) {
+        for ($match_choose->append_new_pc_otherwise->block) {
+                
+          $_->append_statement
+                           ->append_new_pc_function_call (undef, 'last')
+                           ->append_new_pc_variable ('', undef, 'MATCH_'.$match_block_id);
+        }
+        $match_parent->append_statement
+                     ->append_new_pc_function_call (undef, 'redo')
+                     ->append_new_pc_variable ('', undef, 'MATCH_'.$match_block_id);
+      }
+    
+      return 0; # next_token_required == 0
+
+    } elsif ($xuri eq <Q::pg:embedStatement>) {
+      my $lang = $statement->get_attribute_ns (undef, 'type');
+      if ($lang eq 'lang:Perl') {## TODO: lang URI
+        ## TODO: preprocess and replacement
+        $parent->append_code ($statement->text_content);
+      } else {
+        die qq<Lexical content type <$lang> is not supported>;
+        ## TODO: exception
+      }
+
+    } elsif ($xuri eq <Q::pg:myStatement>) {
+      $parent->append_statement
+             ->append_new_pc_variable
+                 ('$', undef, $statement->get_attribute_ns (undef, 'name'))
+             ->variable_scope ('my');
+    
+    } elsif ($xuri eq <Q::pg:ruleRefStatement>) {
+      my $rule_name = $statement->get_attribute_ns (undef, 'name');
+      if ($rules{$rule_name}) {
+        if ($root_rules{$rule_name}) {
+          unless ($next_token_required) {
+            for ($parent->append_statement
+                        ->append_new_pc_function_call (undef, 'push')
+                        ->append_new_pc_expression (',')) {
+              for ($_->append_new_pc_dereference ('@')
+                     ->append_new_pc_expression ('->')) {
+                $_->append_new_pc_variable ('$', undef, 'self');
+                $_->append_bare ('{token}');
+              }
+              $_->append_new_pc_variable ('$', undef, 'token');
+            }
+          }
+       
+          
+          my $param_spec_list;
+          for ($parent->append_statement->append_new_pc_apply) {
+            for ($_->append_new_pc_expression ('->')) {
+              $_->append_new_pc_variable ('$', undef, 'self');
+              $_->append_bare ('_parse_' . $rule_name);
+            }
+            $param_spec_list = $_->append_new_pc_expression (',');
+          }
+          
+          my %param;
+          C: for my $child (@{$statement->child_nodes}) {
+            next C unless $child->node_type == $child->ELEMENT_NODE;
+            if ($child->namespace_uri . $child->local_name eq
+                <Q::pg:parameterSpecification>) {
+              $param{$child->get_attribute_ns (undef, 'name')} = $child;
+            }
+          }
+          
+          for my $param_name (@{$rules{$rule_name}->{param}}) {
+            if ($param{$param_name}) {
+              $rexpression_to_code->($param_spec_list, $param{$param_name});
+            } else {
+              $param_spec_list->append_atom ('undef');
+            }
+          }
+          
+          return 1; # next_token_required == 1
+        } else { # not a standalone rule
+          my $block;
+          unless ($rules{$rule_name}->{code}) {
+            $block = $rules{$rule_name}->{code} = $parent->append_new_pc_block;
+            
+            ## Child statements
+            C: for my $child (@{$rules{$rule_name}->{source}->child_nodes}) {
+              next C unless $child->node_type == $child->ELEMENT_NODE;
+              $next_token_required = $rstatement_to_code->($block, $child,
+                                                           $next_token_required);
+            }
+            $rules{$rule_name}->{code} = $block->clone_node (1);
+          } else {
+            $block = $parent->append_child ($rules{$rule_name}->{code}->clone_node (1));
+          }
+          
+          my %param;
+          C: for my $child (@{$statement->child_nodes}) {
+            next C unless $child->node_type == $child->ELEMENT_NODE;
+            if ($child->namespace_uri . $child->local_name eq
+                <Q::pg:parameterSpecification>) {
+              $param{$child->get_attribute_ns (undef, 'name')} = $child;
+            }
+          }
+          
+          my $block_first = $block->first_child;
+          for my $param_name (reverse @{$rules{$rule_name}->{param}}) {
+            $block_first = $block->insert_before
+                             ($codeDocument->create_pc_statement, $block_first);
+            for ($block_first->append_new_pc_expression ('=')) {
+              $_->append_new_pc_variable ('$', undef, $param_name)
+                ->variable_scope ('my');
+              if ($param{$param_name}) {
+                $rexpression_to_code->($_, $param{$param_name});
+              } else {
+                $_->append_atom ('undef');
+              }
+            }
+          }
+          
+          return $next_token_required;
+        }
+      } elsif ($rule_name eq 'builtin:nestedBlockAsText') {
+        my %param = (start_by_open => not $next_token_required,
+                     open => '{', close => '}');
+        
+        C: for my $child (@{$statement->child_nodes}) {
+          next C unless $child->node_type == $child->ELEMENT_NODE;
+          if ($child->namespace_uri . $child->local_name eq
+              <Q::pg:parameterSpecification>) {
+            $param{$child->get_attribute_ns (undef, 'name')} = $child;
+          }
+        }
+          
+        for ($parent->append_statement->append_new_pc_apply) {
+          for ($_->append_new_pc_expression ('->')) {
+            $_->append_new_pc_variable ('$', undef, 'self');
+            $_->append_bare ('_builtin_parse_nestedBlockAsText');
+          }
+          my $param_spec_list = $_->append_new_pc_expression (',');
+          for my $param_name (qw/doc parent open close start_by_open/) {
+            if (ref $param{$param_name}) {
+              $rexpression_to_code->($param_spec_list, $param{$param_name});
+            } else {
+              $param_spec_list->append_new_pc_literal ($param{$param_name});
+            }
+          }
+        }
+        
+        return 1; # $next_token_required == 1
+      } else {
+        die qq<Rule "$rule_name" is not defined>;
+        ## TODO: exception
+      }
+
+
+
+    } elsif ($xuri eq <Q::pg:assignmentStatement>) {
+      my $assign = $parent->append_statement->append_new_pc_expression ('=');
+      my $lvalue = $statement->first_child;
+      if ($lvalue->namespace_uri . $lvalue->local_name eq <Q::pg:memberRef>) {
+        my $context = $assign->append_new_pc_expression ('->');
+        C: for my $child (@{$lvalue->child_nodes}) {
+          my $xuri = $child->namespace_uri . $child->local_name;
+          if ($xuri eq <Q::pg:variable>) {
+            $context->append_new_pc_variable
+              ('$', undef, $child->get_attribute_ns (undef, 'name'));
+          } elsif ($xuri eq <Q::pg:member>) {
+            $context->append_bare ('{'.$child->get_attribute_ns (undef, 'name').'}');
+          }
+        }
+      }
+    
+    } elsif ($xuri eq <Q::pg:codeBlock>) {
+      D: for my $child (@{$statement->child_nodes}) {
+        next D unless $child->node_type == $child->ELEMENT_NODE;
+        my $xuri = $child->namespace_uri . $child->local_name;
+        if ($xuri eq <Q::pg:matchStatement>) {
+          if ($next_token_required) {
+            $parent->append_child ($next_token_code->clone_node (1));
+          }
+        }
+        $next_token_required = $rstatement_to_code->($parent, $child, $next_token_required);
+      }
+      return $next_token_required;
+    } else {
+      ## ISSUE: Can unsupported elements safely ignored?
+      return $next_token_required;
+    } # xuri
+  }; # rstatement_to_code
+
+
+  
+  $rexpression_to_code = sub ($$) {
+    my ($parent, $source_parent) = @_;
+    $parent = $parent->append_new_pc_expression (',');
+    C: for my $child (@{$source_parent->child_nodes}) {
+      next C unless $child->node_type == $child->ELEMENT_NODE;
+      my $xuri = $child->namespace_uri . $child->local_name;
+      if ($xuri eq <Q::pg:memberRef>) {
+        my $context = $parent->append_new_pc_expression ('->');
+        D: for my $child (@{$child->child_nodes}) {
+          next D unless $child->node_type == $child->ELEMENT_NODE;
+          my $xuri = $child->namespace_uri . $child->local_name;
+          if ($xuri eq <Q::pg:variable>) {
+            $context->append_new_pc_variable
+              ('$', undef, $child->get_attribute_ns (undef, 'name'));
+          } elsif ($xuri eq <Q::pg:member>) {
+            $context->append_bare ('{'.$child->get_attribute_ns (undef, 'name').'}');
+          }
+        }
+      } elsif ($xuri eq <Q::pg:string>) {
+        $parent->append_string_literal ($child->text_content);
+      }
+    }
+  }; # rexpression_to_code
+  
+  for my $rule_name (keys %root_rules) {
+    my $rule_sub = $codeDocument->create_perl_sub ('_parse_' . $rule_name);
+    $r-><M::Node.appendChild> ($rule_sub);
+    $rule_sub->prototype ('$');
+    for ($rule_sub->append_statement->append_new_pc_expression ('=')) {
+      $_->append_new_pc_variable ('$', undef, 'self')->variable_scope ('my');
+      $_->append_new_pc_function_call (undef, 'shift');
+    }
+    
+    $rule_sub->append_statement->append_new_pc_variable ('$', undef, 'token')
+                               ->variable_scope ('my');
+    
+    ## Child statements
+    my $next_token_required = 1;
+    C: for my $child (@{$rules{$rule_name}->{source}->child_nodes}) {
+      next C unless $child->node_type == $child->ELEMENT_NODE;
+      $next_token_required = $rstatement_to_code->($rule_sub, $child, $next_token_required);
+    }
+    
+    unless ($next_token_required) {
+      for ($rule_sub->append_statement
+                    ->append_new_pc_function_call (undef, 'push')
+                    ->append_new_pc_expression (',')) {
+        for ($_->append_new_pc_dereference ('@')
+               ->append_new_pc_expression ('->')) {
+          $_->append_new_pc_variable ('$', undef, 'self');
+          $_->append_bare ('{token}');
+        }
+        $_->append_new_pc_variable ('$', undef, 'token');
+      }
+    }
+          
+  } # for %root_rules
+
+        }__;
+##DPGRulesElement
+
+ElementTypeBinding:
+  @Name: NamedParam
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:MethodParameter
+    @@DISPerl:isNamedParameter:1
+
+IFClsETDef:
+  @IFQName: DPGRuleElement
+  @ClsQName: ManakaiDPGRuleElement
+  @ETQName: pg|rule
+
+  @IFISA: DPGElement
+  @ClsISA: ManakaiDPGElement
+
+  @IFISA: DPGElementAttribute
+  @ClsISA: ManakaiDPGElementAttribute
+
+##DPGRuleElement
+
+IFClsETDef:
+  @IFQName: DPGMatchBlockElement
+  @ClsQName: ManakaiDPGMatchBlockElement
+  @ETQName: pg|matchBlock
+
+  @IFISA: DPGElement
+  @ClsISA: ManakaiDPGElement
+  
+  @IFISA: DPGElementAttribute
+  @ClsISA: ManakaiDPGElementAttribute
+
+##DPGMatchBlockElement
+
+IFClsETDef:
+  @IFQName: DPGLexmodeElement
+  @ClsQName: ManakaiDPGLexmodeElement
+  @ETQName: pg|lexmode
+  
+  @IFISA: DPGElement
+  @ClsISA: ManakaiDPGElement
+
+  @IFISA: DPGElementAttribute
+  @ClsISA: ManakaiDPGElementAttribute
+
+##DPGLexmodeElement
+
+IFClsETDef:
+  @IFQName: DPGLAssignmentStatementElement
+  @ClsQName: ManakaiDPGLAssignmentStatementElement
+  @ETQName: pg|lassignmentStatement
+  
+  @IFISA: DPGElement
+  @ClsISA: ManakaiDPGElement
+
+  @IFISA: DPGElementAttribute
+  @ClsISA: ManakaiDPGElementAttribute
+
+##DPGLAssignmentStatementElement
+

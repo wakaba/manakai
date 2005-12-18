@@ -25,7 +25,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2005/12/17 11:58:52 $
+      $Date: 2005/12/18 13:21:47 $
     @@ContentType:
       dis:Date.RCS
   
@@ -3316,15 +3316,38 @@ IFClsETDef:
                 $_ = '(' . $_->[0] . ')';
               } elsif ($_->[2] eq <Q::pc:expression> and
               (not {
-                '+' => {'+' => true, '-' => true, '*' => true},
-                '-' => {},
-                '*' => {'*' => true},
-                '/' => {},
-                '&&' => {'&&' => true},
-                '||' => {'||' => true},
-                'and' => {'and' => true},
-                'or' => {'or' => true},
-                '=' => {'->' => true},
+                '**'  => {'->' => true},
+                '=~'  => {'->' => true},
+                '!~'  => {'->' => true},
+                '*'   => {'->' => true, '*' => true},
+                '/'   => {'->' => true},
+                '%'   => {'->' => true},
+                'x'   => {'->' => true},
+                '+'   => {'->' => true, '*' => true, '+' => true, '-' => true},
+                '-'   => {'->' => true, '*' => true},
+                '.'   => {'->' => true},
+                '<'   => {'->' => true},
+                '>'   => {'->' => true},
+                '<='  => {'->' => true},
+                '>='  => {'->' => true},
+                'lt'  => {'->' => true},
+                'gt'  => {'->' => true},
+                'le'  => {'->' => true},
+                'gr'  => {'->' => true},
+                '=='  => {'->' => true},
+                '!='  => {'->' => true},
+                '<=>' => {'->' => true},
+                'eq'  => {'->' => true},
+                'ne'  => {'->' => true},
+                'cmp' => {'->' => true},
+                '&&'  => {'->' => true, '&&' => true},
+                '||'  => {'->' => true, '||' => true},
+                '..'  => {'->' => true},
+                '='   => {'->' => true},
+                ','   => {'->' => true, ',' => true, '=>' => true},
+                '=>'  => {'->' => true, ',' => true, '=>' => true},
+                'and' => {'->' => true, 'and' => true},
+                'or'  => {'->' => true, 'or' => true},
               }->{$op}->{$_->[1]-><AG::PCExpression.operator>}) and
               $_->[1]-><AG::PCExpression.operandNumber> > 1) {
                 $_ = '(' . $_->[0] . ')';
@@ -3335,9 +3358,13 @@ IFClsETDef:
             $op = ' '.$op unless {
               ',' => true,
               '->' => true,
+              '..' => true,
+              '...' => true,
             }->{$op};
             $op = $op.' ' unless {
               '->' => true,
+              '..' => true,
+              '...' => true,
             }->{$op};
             $r = join $op, @r;
           } elsif (@r) {
@@ -4426,6 +4453,19 @@ IFClsDef:
         }__;
 
   @Method:
+    @@Name: createPCStatement
+    @@enDesc:
+      Creates a statement object.
+    @@Return:
+      @@@Type: PerlStatement
+      @@@enDesc:
+        The newly created statement element node.
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><M::Document.createElementNS> (<Q::pc:>, 'statement');
+        }__;      
+
+  @Method:
     @@Name: createPCBlock
     @@enDesc:
       Creates a <Q::pc2:block> element node.
@@ -4467,6 +4507,28 @@ IFClsDef:
           $r-><M::Node.appendChild>
                 ($self-><M::Document.createElementNS> (<Q::pc2:>, 'block'));
         }__;
+
+  @Method:
+    @@Name: createPerlSub
+    @@enDesc:
+      Creates a new <IF::PerlSub> object. 
+    @@Param:
+      @@@Name: subName
+      @@@Type: DOMString
+      @@@enDesc:
+        The name of the subroutine to create.
+      @@@nullCase:
+        @@@@enDesc:
+          The subroutine created has no name. 
+    @@Return:
+      @@@Type: PerlSub
+      @@@enDesc: 
+        Newly created Perl subroutine object. 
+      @@@PerlDef:
+          __DEEP{
+            $r = $self-><M::Document.createElementNS> (<Q::pc:>, 'sub');
+            $r-><M::PerlSub.addPerlName> ($subName) if defined $subName;
+          }__;
 ##PCDocument
 
 ## -- Implementation
