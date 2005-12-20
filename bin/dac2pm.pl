@@ -30,6 +30,7 @@ use strict;
 use Message::Util::QName::Filter {
   DIS => q<http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#>,
   dis => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis-->,
+  DOMLS => q<http://suika.fam.cx/~wakaba/archive/2004/dom/ls#>,
   ManakaiDOM => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#>,
   Markup => q<http://suika.fam.cx/~wakaba/archive/2005/manakai/Markup#>,
   pc => q<http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/PerlCode#>,
@@ -195,6 +196,7 @@ sub verbose_msg_ ($) {
 ## TODO: Assertion control
 
 use Message::Util::DIS::DNLite;
+use Message::DOM::GenericLS;
 
 my $start_time;
 BEGIN { $start_time = time }
@@ -204,6 +206,7 @@ my $impl = $Message::DOM::ImplementationRegistry->get_implementation
                  ExpandedURI q<ManakaiDOM:Minimum> => '3.0',
                  '+' . ExpandedURI q<DIS:Core> => '1.0',
                  '+' . ExpandedURI q<Util:PerlCode> => '1.0',
+                 '+' . ExpandedURI q<DOMLS:Generic> => '3.0',
                 });
 my $pc = $impl->get_feature (ExpandedURI q<Util:PerlCode> => '1.0');
 my $di = $impl->get_feature (ExpandedURI q<DIS:Core> => '1.0');
@@ -315,4 +318,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2005/11/23 11:21:09 $
+1; # $Date: 2005/12/20 12:16:49 $

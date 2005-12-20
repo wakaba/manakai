@@ -1,3 +1,16 @@
+2005-12-20  Wakaba  <wakaba@suika.fam.cx>
+
+	* Makefile: Definitions for |PERL_OPTIONS| family updated.
+
+	* DISPerl.dis (DISPerl:dpgDef): New property.
+
+2005-12-19  Wakaba  <wakaba@suika.fam.cx>
+
+	* DISPerl.dis (lang:dpg): New format.
+	(lang:Perl): Now it is a subclass of |DISCore:DISString|
+	rather than |DISCore:NSString| (since it depends on various
+	"dis" contexts not only namespaces).
+
 2005-11-17  Wakaba  <wakaba@suika.fam.cx>
 
 	* dis-catalog: |lib/Message/Util/Formatter/| directory added.

@@ -13,7 +13,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/11/16 10:07:15 $
+      $Date: 2005/12/20 12:16:52 $
     @@ContentType:
       dis:Date.RCS
   
@@ -948,7 +948,8 @@ LexTypeDef:
     lang:Perl
   @enFN:
     Perl 5 code with <QUOTE::dis> preprocessing instructions
-  @rdfs:subClassOf: DISCore|NSString
+  @rdfs:subClassOf: DISCore|DISString
+  @subsetOf: DISCore|DISString
 
 SPropDef:
   @QName: DISPerl|moduleSuffix
@@ -1971,3 +1972,23 @@ ElementTypeBinding:
     dis:Description
   @ShadowContent:
     @@lang:en
+
+## --- DPG Parser Generator Language (see also |lib/Message/Util/DIS/DPG.dis|)
+
+LexTypeDef:
+  @QName: lang|dpg
+  @enFN: DPG Textual Representation
+  @enDesc:
+    A string labeled as <Q::lang:dpg> is a textual representation
+    of DPG parser generation source.
+  @rdfs:subClassOf: DISCore|DISString
+  @subsetOf: DISCore|DISString
+
+SPropDef:
+  @QName: DISPerl|dpgDef
+  @enFN: DPG Definition
+  @rdfs:subClassOf: dis|Def
+  @subsetOf: dis|Def
+  @multipleProperties: DISCore|UnorderedList
+  @dataType: lang|dpg
+

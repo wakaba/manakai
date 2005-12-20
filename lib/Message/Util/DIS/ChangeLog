@@ -1,3 +1,32 @@
+2005-12-20  Wakaba  <wakaba@suika.fam.cx>
+
+	* DPG.dis (plCodeFragment): Output code to check lower bound
+	of range even if it is zero (U+0000) since an negative value
+	might occur to indicate end of file.  Code to generate |redo|
+	statement is missing.  Embed statement with type |lang:Perl|
+	support added.  Return value of |$next_token_required| was 
+	missing in some cases.  Ruleref cache now takes |$next_token_required|
+	values into acount.  Parameter (for parser subroutine) support
+	was missing.
+	(DPGParser.DISPerl:dpgDef): DPG definition for the DPG textual
+	syntax merged.
+
+	* Perl.dis: Now requires |DPG| module.
+	(plGeneratePerlModule): Obsolete property name
+	|DOMMetaImpl:providedThrough| changed into |f:through| so
+	that |f:through|s in "dis" modules now works.  In addition,
+	its default code was misplaced.  |DISPerl:dpgDef| attribute
+	is supported so that DPG code are converted into a set of
+	methods.
+
+	* Value.dis: DPG (|lang:dpg|) support added.
+
+2005-12-19  Wakaba  <wakaba@suika.fam.cx>
+
+	* DPG.dis (pg:lAssignmentStatement): Typo in element type name
+	fixed.
+	(DPGParser): New interface.
+	
 2005-12-18  Wakaba  <wakaba@suika.fam.cx>
 
 	* DPG.dis: New module.

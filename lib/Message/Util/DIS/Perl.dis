@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/11/24 15:05:49 $
+      $Date: 2005/12/20 12:16:51 $
     @@ContentType:
       dis:Date.RCS
   
@@ -34,6 +34,9 @@ Module:
       @@@WithFor: DIS|ForLatest
     @@Module:
       @@@QName: Util|PerlCode
+      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
+    @@Module:
+      @@@QName: DIS|DPG
       @@@WithFor: ManakaiDOM|ManakaiDOMLatest
 
   @DefaultFor: 
@@ -74,6 +77,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/Core/
   @Err:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/
+  @f:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/feature#
   @html3:
     urn:x-suika-fam-cx:markup:ietf:html:3:draft:00:
   @html5:
@@ -166,6 +171,7 @@ FeatureDef:
     @@Version: 1.0
     @@DOMMetaImpl:instanceFeatureOf: DIS|Perl
     @@DOMMain:requireFeature: DIS|CoreFeature10
+    @@f:requires: DOMLS|Generic30
     @@FullName:
       @@@lang:en
       @@@@:
@@ -1912,7 +1918,7 @@ IFClsDef:
                   my $fi = $self-><M::DISResourcePerlModule
                         .plIsFeatureImplemented> ($f->[0]->{uri}) ? true : false;
                   my $pt = $f->[1]-><M::dv|DVValue.getProperty>
-                                            (<Q::DOMMetaImpl:providedThrough>);
+                                            (<Q::f:through>);
                   if (UNIVERSAL::isa ($pt, <IFName::dv|DVURIValue>)) {
                     my $c = $pt-><M::dv|DVURIValue.getResource>
                               ($self-><AG::DIS|DISAnyResource.database>);
@@ -1928,16 +1934,16 @@ IFClsDef:
                           ('$Message::DOM::ImplFeature{q<' . $cp .
                            '>}->{q<' . $fname . '>}->{q<>} = 1');
                     }
-                  }
-                  ## No DOMMetaImpl:ProvidedThrough attribute
-                  for my $fname (@fname) {
-                    $r-><M::DIS|PLBlockCon.appendStatement>
-                        ('$Message::DOM::ImplFeature{q<' . $pack_name .
-                         '>}->{q<' .
-                         $fname . '>}->{q<' . $fver . '>} ||= '.$fi);
-                    $r-><M::DIS|PLBlockCon.appendStatement>
-                        ('$Message::DOM::ImplFeature{q<' . $pack_name .
-                         '>}->{q<' . $fname . '>}->{q<>} = 1');
+                  } else { # no "through" attribute
+                    for my $fname (@fname) {
+                      $r-><M::DIS|PLBlockCon.appendStatement>
+                          ('$Message::DOM::ImplFeature{q<' . $pack_name .
+                           '>}->{q<' .
+                           $fname . '>}->{q<' . $fver . '>} ||= '.$fi);
+                      $r-><M::DIS|PLBlockCon.appendStatement>
+                          ('$Message::DOM::ImplFeature{q<' . $pack_name .
+                           '>}->{q<' . $fname . '>}->{q<>} = 1');
+                    }
                   }
                 } # for
 
@@ -3578,6 +3584,33 @@ IFClsDef:
                                (<Q::Muf2003:RuleDefClass>)}) {
                 ## TODO:
               }
+            }
+
+            ## - Lexer and Parser
+            my $dpgparser;
+            for my $val (@{$self-><M::DIS|DISResourceProp.getPropertyValueList>
+                             (<Q::DISPerl:dpgDef>)}) {
+              $dpgparser ||= $plimpl-><M::f|GetFeature
+                                         ||ManakaiDOM|ManakaiDOMLatest
+                                         .getFeature>
+                                       (<Q::DOMLS:Generic> => '3.0')
+                                  -><M::GenericLS|GLSImplementation
+                                         ||ManakaiDOM|ManakaiDOMLatest
+                                                           .createGLSParser>
+                                       ({<Q::DIS|DPG> => '1.0'});
+              my $dpgdoc = $dpgparser-><M::DPG|DPGParser
+                                       ||ManakaiDOM|ManakaiDOMLatest.parseString>
+                              ($val-><AG::dv|DVValue.value>, $val);
+              
+              $r-><M::DOMCore|Node||ManakaiDOM|ManakaiDOMLatest.appendChild>
+                    ($dpgdoc-><AG::DOMCore|Document||ManakaiDOM|ManakaiDOMLatest
+                                 .documentElement>
+                            -><M::DPG|DPGRulesElement
+                                    ||ManakaiDOM|ManakaiDOMLatest.plCodeFragment>
+                              ($r-><AG::DOMCore|Node||ManakaiDOM|ManakaiDOMLatest
+                                  .ownerDocument>,
+                               dis_resource => $self,
+                               context_object => $val));
             }
 
           ## -- Global variables

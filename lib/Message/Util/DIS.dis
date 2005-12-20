@@ -23,7 +23,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2005/11/24 12:08:54 $
+      $Date: 2005/12/20 12:16:49 $
     @@ContentType:
       dis:Date.RCS
   
@@ -4360,6 +4360,9 @@ IFClsDef:
                                     %mtopt) or
                            $el-><M::DISElement.mediaTypeMatch>
                                      (<Q::lang:muf>, $mtopt{default_media_type},
+                                      %mtopt) or
+                           $el-><M::DISElement.mediaTypeMatch>
+                                     (<Q::lang:dpg>, $mtopt{default_media_type},
                                       %mtopt)) {
                     $el-><M::DISElement.preserveNodePath>;
                     __CODE{dv|createValueRef::
