@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/12/20 12:16:51 $
+      $Date: 2005/12/21 14:05:44 $
     @@ContentType:
       dis:Date.RCS
   
@@ -2257,18 +2257,14 @@ IFClsDef:
                                                    .plFullyQualifiedName>;
                   }
                 }
-              } elsif ($cls-><M::DIS|DISResource.isTypeURI>
-                              (<Q::DISPerl:ScalarVariable>) and
-                       not $cls-><AG::DIS|DISResource.parentResource>) {
-                $r-><M::DIS|PLBlockCon.appendCodeFragment>
-                      ($cls-><AG::DISResourcePerl.plCodeFragment>);
-              } elsif ($cls-><M::DIS|DISResource.isTypeURI>
-                              (<Q::DOMCore:DOMConfigurationParameter>) and
-                       not $cls-><AG::DIS|DISResource.parentResource>) {
-                $r-><M::DIS|PLBlockCon.appendCodeFragment>
-                      ($cls-><AG::DISResourcePerl.plCodeFragment>);
-              } elsif ($cls-><M::DIS|DISResource.isTypeURI>
-                              (<Q::DOMCore:DOMErrorType>) and
+              } elsif (($cls-><M::DIS|DISResource.isTypeURI>
+                              (<Q::DISPerl:ScalarVariable>) or
+                        $cls-><M::DIS|DISResource.isTypeURI>
+                              (<Q::DOMCore:DOMConfigurationParameter>) or
+                        $cls-><M::DIS|DISResource.isTypeURI>
+                           (<Q::DOMCore:DOMConfigurationParameterApplication>) or
+                        $cls-><M::DIS|DISResource.isTypeURI>
+                              (<Q::DOMCore:DOMErrorType>)) and
                        not $cls-><AG::DIS|DISResource.parentResource>) {
                 $r-><M::DIS|PLBlockCon.appendCodeFragment>
                       ($cls-><AG::DISResourcePerl.plCodeFragment>);
@@ -3729,12 +3725,26 @@ IFClsDef:
             }
 
           } elsif ($self-><M::DIS|DISAnyResource.isTypeURI>
-                                     (<Q::DOMCore:DOMConfigurationParameter>)) {
-            my $uri = $self-><AG::DIS|DISAnyResource.nameURI>;
+                                     (<Q::DOMCore:DOMConfigurationParameter>) or
+                   $self-><M::DIS|DISAnyResource.isTypeURI>
+                           (<Q::DOMCore:DOMConfigurationParameterApplication>)) {
+            my $cparam = $self;
+            if ($self-><M::DIS|DISAnyResource.isTypeURI>
+                           (<Q::DOMCore:DOMConfigurationParameterApplication>)) {
+              $cparam = $self-><M::DIS|DISResourceProp.getPropertyResource>
+                           (<Q::DOMCore:domConfigurationParameter>);
+              unless ($cparam) {
+                __UNDEEP{__EXCEPTION{DIS|RESOURCE_NOT_DEFINED_ERR::
+                  DIS:uri => {($cparam or $self)-><AG::DIS|DISAnyResource.uri>},
+                  DIS:expectedType => {<Q::DOMCore:DOMConfigurationParameter>},
+                }__}__;
+              }
+            }
+            my $uri = $cparam-><AG::DIS|DISAnyResource.nameURI>;
             my $plimpl = $self-><AG::DISAnyResourcePerl.plImplementation>;
             my $db = $self-><AG::DIS|DISAnyResource.database>;
             my $cfgname = <ClassM::PLImplClass.perlLiteral>
-                           (lc $self-><M::DIS|DISResourceProp.getPropertyText>
+                           (lc $cparam-><M::DIS|DISResourceProp.getPropertyText>
                              (<Q::DOMCore:domConfigurationParameterName>, $uri));
             my %prop;
             for ([getter => <Q::DOMCore:DOMConfigurationParameterGetter>],
@@ -3743,7 +3753,7 @@ IFClsDef:
                      <Q::DOMCore:DOMConfigurationParameterDefaultGetter>],
                  [unsetter => <Q::DOMCore:DOMConfigurationParameterUnsetter>],
                  [checker => <Q::DOMCore:DOMConfigurationParameterChecker>]) {
-              my $cres = $self-><M::DIS|DISResource.getChildResourceByType>
+              my $cres = $cparam-><M::DIS|DISResource.getChildResourceByType>
                                   ($_->[1]);
               if ($cres) {
                 $prop{$_->[0]}
@@ -3751,10 +3761,10 @@ IFClsDef:
                                  ->stringify), 'manakai::code';
               }
             }
-            my $type = $self-><AG::DIS|DISResource.disActualDataTypeResource>;
+            my $type = $cparam-><AG::DIS|DISResource.disActualDataTypeResource>;
             if ($type-><M::DIS|DISResource.isSubsetOfURI> (<Q::idl:boolean>)) {
               $prop{type} = 'boolean';
-              C: for my $c (@{$self-><M::DIS|DISResource
+              C: for my $c (@{$cparam-><M::DIS|DISResource
                                         .getChildResourceListByType>
                                                (<Q::ManakaiDOM:InCase>)}) {
                 my $v = $c-><M::DIS|DISResourceProp.getPropertyValue>
@@ -3793,6 +3803,7 @@ IFClsDef:
             my @target = sort { $a cmp $b } map {
                            $_-><AG::dp|DISResourcePerl.plFullyQualifiedName>
                          } @{
+                          # $self, not $cparam
                           $self-><M::DIS|DISResourceProp.getPropertyResourceList>
                               (<Q::DOMCore:targetType>)
                          };

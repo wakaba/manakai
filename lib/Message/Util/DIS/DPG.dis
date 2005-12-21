@@ -15,7 +15,7 @@ Module:
   @License: license|Perl+MPL
 
   @Date:
-    $Date: 2005/12/21 12:27:35 $
+    $Date: 2005/12/21 14:05:44 $
   
   @Require:
     @@Module:
@@ -35,6 +35,10 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dis/
   @dp:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#Perl/
+  @dx:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#
+  @ecore:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/Core/
   @f:
     http://suika.fam.cx/~wakaba/archive/2004/dom/feature#
   @html5:
@@ -1133,6 +1137,7 @@ IFClsETDef:
                 $_-><M::pc|PerlCodeUnits.appendStringLiteral>
                   ($child-><M::Element.getAttributeNS> (null, 'value'));
               }
+              $cond = $_;
             }
           }
           
@@ -1601,6 +1606,8 @@ IFClsDef:
   @IFQName: DPGParser
   @ClsQName: ManakaiDPGParser
 
+  @Implement: ecore|MUErrorTarget||ManakaiDOM|Perl
+
   @enDesc:
     A <IF::DPGParser> object parses a DPG source document and 
     converts it into a DOM tree representation.
@@ -1610,6 +1617,22 @@ IFClsDef:
     <Feature::DIS|DPG> version <FeatureVer::1.0>.
 
   @DISLang:role: DOMLS|ParserRole
+
+  @Attr:
+    @@Name: domConfig
+    @@enDesc:
+      The configuration of the parser.
+
+    @@Get:
+      @@@Type: DOMCore|DOMConfiguration
+      @@@enDesc: The DOM configuration object.
+      @@@PerlDef:
+        __CODE{DOMCore|getConfigObject::
+          $target => $self,
+          $targetHash => $self,
+          $targetType => {<IFName::DPGParser>},
+          $result => $r,
+        }__;
 
   @Method:
     @@ManakaiDOM:isForInternal:1
@@ -1747,26 +1770,66 @@ IFClsDef:
           }
         }__;
 
+  @Method:
+    @@ManakaiDOM:isForInternal: 1
+    @@Operator: ManakaiDOM|MUErrorHandler
+    @@enDesc:
+      When a <IF::ecore|ErrorInterface||ManakaiDOM|Perl> is <Perl::report>ed,
+      then this method is invoked.
+      
+      The method calls the <cfg::DOMCore|error-handler> if the error is of 
+      <IF::DOMCore|DOMError>.  Otherwise, the error is re-thrown so that
+      corresponding <Perl::catch> clause, if any, can catch the error.
+    @@Param:
+      @@@Name: err
+      @@@Type: ecore|ErrorInterface||ManakaiDOM|Perl
+      @@@enDesc:
+        The reported error object.
+    @@Return:
+      @@@Type: DISPerl|Any
+      @@@enDesc:
+        If the <P::err> is a <IF::DOMCore|DOMError>, then the return value
+        of the error handler.
+
+           {NOTE:: If the error is thrown, the method never returns.
+           }
+      @@@nullCase:
+        @@@@enDesc:
+          No error handler.
+      @@@PerlDef:
+        if ($err->isa (<IFName::DOMCore|DOMError||ManakaiDOM|ManakaiDOM>)) {
+          __DEEP{
+            A: {
+              my $cfg = $self-><AG::Document.domConfig>;
+              my $h = $cfg-><M::DOMCore|DOMConfiguration.getParameter>
+                               ('error-handler');
+              $r = $h-><M::DOMCore|DOMErrorHandler.handleError> ($err);
+            } # A
+          }__;
+        } else {
+          $err-><M::ecore|ErrorInterface||ManakaiDOM|Perl.throw>;
+        }
+
   @DISPerl:dpgDef:
 
     rule Rules ($impl) : standalone {
       my $doc : return;
-    my $docel;
-    lang:Perl {
-      $doc = $impl-><M::DOMCore|DOMImplementation.createDocument>
+      my $docel;
+      lang:Perl {
+        $doc = $impl-><M::DOMCore|DOMImplementation.createDocument>
                       (<Q::pg:>, 'rules');
-      $docel = $doc-><AG::Document.documentElement>;
-    }
+        $docel = $doc-><AG::Document.documentElement>;
+      }
     
-    ;; Rules := *rule
-    ~* (RULE) {
-      &_Rule ($doc => $doc, $parent => $docel);
-    } (lEXMODE) {
-      &_Lexmode ($doc => $doc, $parent => $docel);
-    }
+      ;; Rules := *(Rule / Lexmode)
+      ~* (RULE) {
+        &_Rule ($doc => $doc, $parent => $docel);
+      } (lEXMODE) {
+        &_Lexmode ($doc => $doc, $parent => $docel);
+      }
     
       ~ (#EOF) { }
-  } ;; Rules
+    } ;; Rules
   
   rule _Lexmode ($doc, $parent) {
     ;; Lexmode := LEXMODE NAME *AttributeSpecification LBRACE
@@ -2078,7 +2141,7 @@ IFClsDef:
       &Rvalue ($doc => $doc, $parent => $assign);
       
       ~ (SEMICOLON) { }
-    } (mY) {
+      } (mY) {
         ;; MyStatement := MY VARIABLE SEMICOLON
         ~ (VARIABLE) {
           my $my;
@@ -2199,8 +2262,60 @@ IFClsDef:
     mY := ['m'] ['y'];
     RULE := ['r'] ['u'] ['l'] ['e'];
     lEXMODE := ['l'] ['e'] ['x'] ['m'] ['o'] ['d'] ['e'];
-  } ;; lexmode
-
-    
-
+    } ;; lexmode
 ##DPGParser
+
+ElementTypeBinding:
+  @Name: Attr
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|Attribute
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM
+
+ElementTypeBinding:
+  @Name: Get
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|AttributeGet
+
+ElementTypeBinding:
+  @Name: Set
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|AttributeSet
+
+ElementTypeBinding:
+  @Name: CParam
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@: DOMCore|DOMConfigurationParameter
+      @@@For: ManakaiDOM|DOM
+    @@rdf:type:
+      @@@@: DISCore|Property
+      @@@For: =ManakaiDOM|all
+    @@For: ManakaiDOM|DOM3
+    @@For: =ManakaiDOM|all
+
+ElementTypeBinding:
+  @Name: CParamApp
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@: DOMCore|DOMConfigurationParameterApplication
+      @@@For: ManakaiDOM|DOM
+    @@rdf:type:
+      @@@@: DISCore|Property
+      @@@For: =ManakaiDOM|all
+    @@For: ManakaiDOM|DOM3
+    @@For: =ManakaiDOM|all
+
+CParamApp:
+  @DOMCore:domConfigurationParameter: DOMCore|error-handler
+  @DOMCore:targetType: DPGParser
+

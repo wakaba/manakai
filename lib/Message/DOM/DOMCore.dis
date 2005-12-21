@@ -40,7 +40,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/11/24 12:08:23 $
+      $Date: 2005/12/21 14:05:43 $
     @@ContentType:
       dis:Date.RCS
 
@@ -5169,6 +5169,22 @@ ResourceTypeDef:
   @QName: DOMCore|DOMConfigurationParameter
   @enDesc:
     A parameter used on <IF::DOMConfiguration::ManakaiDOM|ManakaiDOM> objects.
+
+ResourceTypeDef:
+  @QName: c|DOMConfigurationParameterApplication
+  @enDesc:
+    A copy of <Q::c|DOMConfigurationParameter> that only differs
+    <Q::c|targetType> property.
+
+SPropDef:
+  @QName: c|domConfigurationParameter
+  @enDesc:
+    A reference to <Q::c|DOMConfigurationParameter>.
+  @rdfs:domain: c|DOMConfigurationParameterApplication
+  @rdfs:range: c|DOMConfigurationParameter
+  @rdfs:subClassOf: DISCore|derivedFrom
+  @dataType: DISCore|TFQNames
+  @multipleProperties: DISCore|Single
 
 SPropDef:
   @QName: DOMCore|domConfigurationParameterName
