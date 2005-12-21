@@ -15,7 +15,7 @@ Module:
   @License: license|Perl+MPL
 
   @Date:
-    $Date: 2005/12/20 12:16:51 $
+    $Date: 2005/12/21 12:27:35 $
   
   @Require:
     @@Module:
@@ -1112,15 +1112,37 @@ IFClsETDef:
         my $xuri = $child->namespace_uri . $child->local_name;
         if ($xuri eq <Q::pg:matchBlock>) {
           my $token_name = $child->get_attribute_ns (undef, 'token');
+          if ($child-><M::Element.getAttributeNS> (null, 'isReservedToken')) {
+            $token_name = '#' . $token_name;
+          }
+
+          my $cond = $codeDocument-><M::pc|PCDocument.createPCExpression> ('eq');
+          $cond-><M::Node.appendChild>
+                   ($token_type_var-><M::Node.cloneNode> (true));
+          $cond-><M::pc|PerlCodeUnits.appendStringLiteral> ($token_name);
+          if ($child-><M::Element.getAttributeNS> (null, 'valueOperation') eq
+              '==') {
+            for ($codeDocument-><M::pc|PCDocument.createPCExpression> ('and')) {
+              $_-><M::Node.appendChild> ($cond);
+              for ($_-><M::pc|PerlCodeUnits.appendNewPCExpression> ('eq')) {
+                for ($_-><M::pc|PerlCodeUnits.appendNewPCExpression> ('->')) {
+                  $_-><M::pc|PerlCodeUnits.appendNewPCVariable>
+                    ('$', null, 'token');
+                  $_-><M::pc|PerlCodeUnits.appendBare> ('{value}');
+                }
+                $_-><M::pc|PerlCodeUnits.appendStringLiteral>
+                  ($child-><M::Element.getAttributeNS> (null, 'value'));
+              }
+            }
+          }
+          
           my $is_sep = $child-><M::DPGElementAttribute.dpgGetAttribute>
                                                     ('separator');
           my $token_parent;
           unless ($is_sep) {
             for ($match_choose->append_new_pc_when) {
-              for ($_->condition->append_new_pc_expression ('eq')) {
-                $_->append_child ($token_type_var->clone_node (1));
-                $_->append_string_literal ($token_name);
-              }
+              $_-><AG::pc|PCWhen.condition>
+                -><M::Node.appendChild> ($cond);
               $token_parent = $_->block;
             }
             if ($match_occur eq 'onemore') {
@@ -1133,10 +1155,8 @@ IFClsETDef:
             $has_sep = 1;
             for ($match_parent->append_new_pc_choose) {
               for ($_->append_new_pc_when) {
-                for ($_->condition->append_new_pc_expression ('eq')) {
-                  $_->append_child ($token_type_var->clone_node (1));
-                  $_->append_string_literal ($token_name);
-                }
+                $_-><AG::pc|PCWhen.condition>
+                  -><M::Node.appendChild> ($cond);
                 $token_parent = $_->block;
               }
               for ($_->append_new_pc_otherwise->block) {
@@ -1151,7 +1171,8 @@ IFClsETDef:
           $next_token_required = 1;
           D: for my $child (@{$child->child_nodes}) {
             next D unless $child->node_type == $child->ELEMENT_NODE;
-            $next_token_required = $rstatement_to_code->($token_parent, $child,
+            ($next_token_required, undef)
+              = $rstatement_to_code->($token_parent, $child,
                                                          $next_token_required);
           }
           
@@ -1197,7 +1218,7 @@ IFClsETDef:
                      ->append_new_pc_variable ('', undef, 'MATCH_'.$match_block_id);
       }
 
-      return 0; # next_token_required == 0
+              return 0; # next_token_required == 0
 
             } elsif ($xuri eq <Q::pg:embedStatement>) {
               my $lang = $statement->get_attribute_ns (undef, 'type');
@@ -1235,11 +1256,13 @@ IFClsETDef:
                 ## TODO: exception
               }
 
-    } elsif ($xuri eq <Q::pg:myStatement>) {
-      $parent->append_statement
-             ->append_new_pc_variable
-                 ('$', undef, $statement->get_attribute_ns (undef, 'name'))
-             ->variable_scope ('my');
+            } elsif ($xuri eq <Q::pg:myStatement>) {
+              my $name = $statement-><M::Element.getAttributeNS> (null, 'name');
+              $parent-><M::pc|PerlCodeStatements.appendStatement>
+                     -><M::pc|PerlCodeUnits.appendNewPCVariable>
+                         ('$', null, $name)
+                     -><AS::pc|PerlVariable.variableScope> ('my');
+
               return $next_token_required;
     
     } elsif ($xuri eq <Q::pg:ruleRefStatement>) {
@@ -1286,7 +1309,7 @@ IFClsETDef:
             }
           }
           
-          return 1; # next_token_required == 1
+                  return 1; # next_token_required == 1
         } else { # not a standalone rule
           my $block;
           unless ($rules{$rule_name}->{code}->[$next_token_required += 0]) {
@@ -1298,8 +1321,8 @@ IFClsETDef:
             ## Child statements
             C: for my $child (@{$rules{$rule_name}->{source}->child_nodes}) {
               next C unless $child->node_type == $child->ELEMENT_NODE;
-              $next_token_required = $rstatement_to_code->($block, $child,
-                                                           $next_token_required);
+              ($next_token_required, undef)
+                = $rstatement_to_code->($block, $child, $next_token_required);
             }
             $rules{$rule_name}->{code}->[$o_next_token_required]
               = [$block->clone_node (1), $next_token_required];
@@ -1335,8 +1358,8 @@ IFClsETDef:
             }
           }
           
-          return $next_token_required;
-        }
+                  return $next_token_required;
+                }
       } elsif ($rule_name eq 'builtin:nestedBlockAsText') {
         my %param = (start_by_open => not $next_token_required,
                      open => '{', close => '}');
@@ -1364,11 +1387,11 @@ IFClsETDef:
           }
         }
         
-        return 1; # $next_token_required == 1
-      } else {
-        die qq<Rule "$rule_name" is not defined>;
-        ## TODO: exception
-      }
+                return 1; # $next_token_required == 1
+              } else {
+                die qq<Rule "$rule_name" is not defined>;
+                ## TODO: exception
+              }
 
 
 
@@ -1389,7 +1412,8 @@ IFClsETDef:
       }
               return $next_token_required;
     
-    } elsif ($xuri eq <Q::pg:codeBlock>) {
+            } elsif ($xuri eq <Q::pg:codeBlock>) {
+              my $return;
       D: for my $child (@{$statement->child_nodes}) {
         next D unless $child->node_type == $child->ELEMENT_NODE;
         my $xuri = $child->namespace_uri . $child->local_name;
@@ -1398,15 +1422,22 @@ IFClsETDef:
             $parent->append_child ($next_token_code->clone_node (1));
             $next_token_required = false;
           }
-        }
-        $next_token_required = $rstatement_to_code->($parent, $child, $next_token_required);
-      }
-      return $next_token_required;
-    } else {
-      ## ISSUE: Can unsupported elements safely ignored?
-      return $next_token_required;
-    } # xuri
-  }; # rstatement_to_code
+                } elsif ($xuri eq <Q::pg:myStatement>) {
+                  if ($child-><M::DPGElementAttribute.dpgGetAttribute>
+                       ('return')) {
+                    $return = $child-><M::Element.getAttributeNS> (null, 'name');
+                  }
+                }
+                ($next_token_required, undef)
+                  = $rstatement_to_code->($parent, $child, $next_token_required);
+              }
+              return ($next_token_required, $return);
+
+            } else {
+              ## ISSUE: Can unsupported elements safely ignored?
+              return $next_token_required;
+            } # xuri
+          }; # rstatement_to_code
 
 
   
@@ -1446,6 +1477,7 @@ IFClsETDef:
                                ->variable_scope ('my');
     
     ## Child statements
+            my $return;
     my $next_token_required = 1;
     C: for my $child (@{$rules{$rule_name}->{source}->child_nodes}) {
       next C unless $child->node_type == $child->ELEMENT_NODE;
@@ -1455,9 +1487,11 @@ IFClsETDef:
                                     (null, 'name');
                 $proto .= '$';
               } else {
-                $next_token_required
+                my $rv;
+                ($next_token_required, $rv)
                   = $rstatement_to_code->($rule_sub, $child,
                                           $next_token_required);
+                $return ||= $rv;
               }
     }
 
@@ -1476,8 +1510,16 @@ IFClsETDef:
         $_->append_new_pc_variable ('$', undef, 'token');
       }
     }
+
+            if ($return) {
+              $rule_sub-><M::pc|PerlCodeStatements.appendStatement>
+                       -><M::pc|PerlCodeUnits.appendNewPCFunctionCall>
+                           (null, 'return')
+                       -><M::pc|PerlCodeUnits.appendNewPCVariable>
+                           ('$', null, $return);
+            }
           
-  } # for %root_rules
+          } # for %root_rules
 
         }__;
 ##DPGRulesElement
@@ -1516,6 +1558,18 @@ IFClsETDef:
   @ClsISA: ManakaiDPGElementAttribute
 
 ##DPGMatchBlockElement
+
+IFClsETDef:
+  @IFQName: DPGMyStatementElement
+  @ClsQName: ManakaiDPGMyStatementElement
+  @ETQName: pg|myStatement
+
+  @IFISA: DPGElement
+  @ClsISA: ManakaiDPGElement
+
+  @IFISA: DPGElementAttribute
+  @ClsISA: ManakaiDPGElementAttribute
+##DPGMyStatementElement
 
 IFClsETDef:
   @IFQName: DPGLexmodeElement
@@ -1695,8 +1749,8 @@ IFClsDef:
 
   @DISPerl:dpgDef:
 
-  rule Rules ($impl) : standalone {
-    my $doc; ;; : return
+    rule Rules ($impl) : standalone {
+      my $doc : return;
     my $docel;
     lang:Perl {
       $doc = $impl-><M::DOMCore|DOMImplementation.createDocument>
@@ -1711,7 +1765,7 @@ IFClsDef:
       &_Lexmode ($doc => $doc, $parent => $docel);
     }
     
-    ~ (EOF) { }
+      ~ (#EOF) { }
   } ;; Rules
   
   rule _Lexmode ($doc, $parent) {
@@ -1911,8 +1965,9 @@ IFClsDef:
     ;;            / RuleRefStatement / EmbedStatement
     
     ~* (MATCH) {
-      ;; MatchStatement := MATCH Occurence
-      ;;                   1*(LPAREN NAME RPAREN *AttributeSpecification CodeBlock)
+        ;; MatchStatement := MATCH Occurence
+        ;;                   1*(LPAREN [RNI] NAME [EQUALS STRING] RPAREN
+        ;;                      *AttributeSpecification CodeBlock)
       my $match;
       lang:Perl {
         $match = $doc-><M::Document.createElementNS> (<Q::pg:>, 'matchStatement');
@@ -1937,12 +1992,32 @@ IFClsDef:
             $match_block = $doc-><M::Document.createElementNS> (<Q::pg:>, 'matchBlock');
             $match-><M::Node.appendChild> ($match_block);
           }
-          ~ (NAME) {
-            lang:Perl ($name => $token.value) {
-              $match_block-><M::Element.setAttributeNS> (null, 'token', $name);
+            ~? (RNI) {
+              lang:Perl {
+                $match_block-><M::Element.setAttributeNS>
+                                   (null, 'isReservedToken' => '1');
+              }
             }
-          }
-          ~ (RPAREN) { }
+            ~ (NAME) {
+              lang:Perl ($name => $token.value) {
+                $match_block-><M::Element.setAttributeNS>
+                                   (null, 'token', $name);
+              }
+            }
+
+            ~? (EQUALS) {
+              ~ (STRING) {
+                lang:Perl ($value => $token.value) {
+                  $match_block-><M::Element.setAttributeNS>
+                                   (null, 'valueOperation', '==');
+                  $match_block-><M::Element.setAttributeNS>
+                                   (null, 'value',
+                                    substr ($value, 1, length ($value) - 2));
+                }
+              }
+            }
+
+            ~ (RPAREN) { }
           
           &AttributeSpecificationList ($doc => $doc, $parent => $match_block);
           
@@ -2004,16 +2079,19 @@ IFClsDef:
       
       ~ (SEMICOLON) { }
     } (mY) {
-      ;; MyStatement := MY VARIABLE SEMICOLON
-      ~ (VARIABLE) {
-        my $my;
-        lang:Perl ($name => $token.value) {
-          $my = $doc-><M::Document.createElementNS> (<Q::pg:>, 'myStatement');
-          $my-><M::Element.setAttributeNS> (null, 'name', substr ($name, 1));
-          $block-><M::Node.appendChild> ($my);
+        ;; MyStatement := MY VARIABLE SEMICOLON
+        ~ (VARIABLE) {
+          my $my;
+          lang:Perl ($name => $token.value) {
+            $my = $doc-><M::Document.createElementNS> (<Q::pg:>, 'myStatement');
+            $my-><M::Element.setAttributeNS> (null, 'name', substr ($name, 1));
+            $block-><M::Node.appendChild> ($my);
+          }
+
+          &AttributeSpecificationList ($doc => $doc, $parent => $my);
         }
-      }
-      ~ (SEMICOLON) { }
+
+        ~ (SEMICOLON) { }
     }
     
     ~ (RBRACE) { }
@@ -2111,6 +2189,12 @@ IFClsDef:
     MATCH := ['~'];
     DOT := ['.'];
     RANGE := ['.'] ['.'];
+
+      ;; Reserved name indicator
+      RNI := ['#'];
+
+      ;; Attribute value equals
+      EQUALS := ['='] ['='];
     
     mY := ['m'] ['y'];
     RULE := ['r'] ['u'] ['l'] ['e'];

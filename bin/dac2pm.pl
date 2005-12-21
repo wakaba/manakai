@@ -196,6 +196,7 @@ sub verbose_msg_ ($) {
 ## TODO: Assertion control
 
 use Message::Util::DIS::DNLite;
+use Message::Util::DIS::DPG;
 use Message::DOM::GenericLS;
 
 my $start_time;
@@ -318,4 +319,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2005/12/20 12:16:49 $
+1; # $Date: 2005/12/21 12:27:35 $

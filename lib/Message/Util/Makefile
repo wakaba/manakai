@@ -54,17 +54,16 @@ SWCFG_DAC_FILE = $(MANAKAI_LIB_DIR)Message/Markup/all$(DAC_SUFFIX)
 UTIL_CORE_DIS_FILES    = ManakaiNode.dis Error/DOMException.dis Error/Core.dis \
   Formatter/Muf2003$(DIS_SUFFIX)
 DIS_CORE_DIS_FILES_    = DIS$(DIS_SUFFIX)
-DIS_CORE_DIS_FILES_DIS = DIS/Perl.dis DIS/Value.dis DIS/DNLite.dis
+DIS_CORE_DIS_FILES_DIS = DIS/Perl.dis DIS/Value.dis DIS/DNLite.dis \
+  DIS/DPG$(DIS_SUFFIX)
 DIS_CORE_DIS_FILES     = $(DIS_CORE_DIS_FILES_) $(DIS_CORE_DIS_FILES_DIS)
 DIS_DOC_DIS_FILES      = DIS/DISDoc.dis
 DIS_DUMP_DIS_FILES     = DIS/DISDump.dis
 DIS_TEST_DIS_FILES     = DIS/Test$(DIS_SUFFIX)
-DIS_DPG_DIS_FILES      = DIS/DPG$(DIS_SUFFIX)
 PC_DIS_FILES           = PerlCode$(DIS_SUFFIX)
 UTIL_DIS_COMMON_DIS_FILE = DIS/common$(DIS_SUFFIX)
 DIS_FILES = $(UTIL_CORE_DIS_FILES) $(DIS_CORE_DIS_FILES) \
   $(DIS_DOC_DIS_FILES) $(DIS_DUMP_DIS_FILES) $(DIS_TEST_DIS_FILES) \
-  $(DIS_DPG_DIS_FILES) \
   $(PC_DIS_FILES) $(UTIL_DIS_COMMON_DIS_FILE)
 
 GENERATED_FILES = \
@@ -72,11 +71,10 @@ GENERATED_FILES = \
   pc$(DAC_SUFFIX)       PerlCode$(PM_SUFFIX) \
   discore$(DAC_SUFFIX)  DIS$(PM_SUFFIX) \
                         DIS/Perl$(PM_SUFFIX) DIS/Value$(PM_SUFFIX) \
-                        DIS/DNLite$(PM_SUFFIX) \
+                        DIS/DNLite$(PM_SUFFIX) DIS/DPG$(PM_SUFFIX) \
   disdoc$(DAC_SUFFIX)   DIS/DISDoc$(PM_SUFFIX) \
   disdump$(DAC_SUFFIX)  DIS/DISDump$(PM_SUFFIX) \
-  distest$(DAC_SUFFIX)  DIS/Test$(PM_SUFFIX) \
-  dpg$(DAC_SUFFIX)      DIS/DPG$(PM_SUFFIX)
+  distest$(DAC_SUFFIX)  DIS/Test$(PM_SUFFIX)
 GENERATED_DAC_FILES = core$(DAC_SUFFIX) discore$(DAC_SUFFIX) \
   disdoc$(DAC_SUFFIX) disdump$(DAC_SUFFIX) distest$(DAC_SUFFIX) \
   dpg$(DAC_SUFFIX)
@@ -106,10 +104,6 @@ disdump$(DAC_SUFFIX): $(DOM_CORE_DAC_FILE) $(DIS_DUMP_DIS_FILES) $(DAC_PL) \
 distest$(DAC_SUFFIX): $(DOM_CORE_DAC_FILE) $(DIS_TEST_DIS_FILES) $(DAC_PL) \
   $(UTIL_DIS_COMMON_DIS_FILE)
 	$(DAC)$@ --input-db-file-name="$<" DIS/Test.dis
-
-dpg$(DAC_SUFFIX): discore$(DAC_SUFFIX) \
-  $(DIS_DPG_DIS_FILES) $(DAC_PL) $(UTIL_DIS_COMMON_DIS_FILE)
-	$(DAC)$@ --input-db-file-name="$<" DIS/DPG.dis
 
 ManakaiNode$(PM_SUFFIX): core$(DAC_SUFFIX) $(DAC2PM_PL)
 	$(DAC2PM) $< \
@@ -142,11 +136,13 @@ $(DIS_CORE_DIS_FILES_DIS:.dis=$(PM_SUFFIX)): %$(PM_SUFFIX): \
 	  --create-perl-module="$(NS_UTIL)DIS       DIS$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_UTIL_DIS)Value DIS/Value$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_UTIL_DIS)Perl  DIS/Perl$(PM_SUFFIX)" \
+	  --create-perl-module="$(NS_UTIL_DIS)DPG   DIS/DPG$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_UTIL_DIS)DNLite DIS/DNLite$(PM_SUFFIX)"
 	$(PERL_CHK) DIS$(PM_SUFFIX)
 	$(PERL_CHK) DIS/Value$(PM_SUFFIX)
 	$(PERL_CHK) DIS/Perl$(PM_SUFFIX)
 	$(PERL_CHK) DIS/DNLite$(PM_SUFFIX)
+	$(PERL_CHK) DIS/DPG$(PM_SUFFIX)
 	$(TOUCH) $@
 
 $(PC_DIS_FILES:$(DIS_SUFFIX)=$(PM_SUFFIX)): %$(PM_SUFFIX): \
@@ -172,6 +168,7 @@ $(PC_DIS_FILES:$(DIS_SUFFIX)=$(PM_SUFFIX)): %$(PM_SUFFIX): \
 	$(PERL_CHK) DIS/DNLite$(PM_SUFFIX)
 	$(DAC2PM) $< \
 	  --create-perl-module="$(NS_UTIL)PerlCode   PerlCode$(PM_SUFFIX)" \
+	  --create-perl-module="$(NS_UTIL_DIS)DPG    DIS/DPG$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_MDOM)DOMFeature ../DOM/DOMFeature$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_MDOM)DOMMain    ../DOM/DOMMain$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_MDOM)DOMCore    ../DOM/DOMCore$(PM_SUFFIX)" \
@@ -180,6 +177,7 @@ $(PC_DIS_FILES:$(DIS_SUFFIX)=$(PM_SUFFIX)): %$(PM_SUFFIX): \
 	  --create-perl-module="$(NS_MDOM)DOMLS      ../DOM/DOMLS$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_MDOM)GenericLS  ../DOM/GenericLS$(PM_SUFFIX)"
 	$(PERL_CHK) PerlCode$(PM_SUFFIX)
+	$(PERL_CHK) DIS/DPG$(PM_SUFFIX)
 	$(PERL_CHK) ../DOM/DOMFeature$(PM_SUFFIX)
 	$(PERL_CHK) ../DOM/DOMMain$(PM_SUFFIX)
 	$(PERL_CHK) ../DOM/DOMCore$(PM_SUFFIX)
@@ -204,12 +202,6 @@ DIS/DISDump$(PM_SUFFIX): disdump$(DAC_SUFFIX) $(DAC2PM_PL)
 DIS/Test$(PM_SUFFIX): distest$(DAC_SUFFIX) $(DAC2PM_PL)
 	$(DAC2PM) $< \
 	  --module-uri="$(NS_UTIL_DIS)Test" \
-	  --output-file-path="$@"
-	$(PERL_CHK) $@
-
-DIS/DPG$(PM_SUFFIX): dpg$(DAC_SUFFIX) $(DAC2PM_PL)
-	$(DAC2PM) $< \
-	  --module-uri="$(NS_UTIL_DIS)DPG" \
 	  --output-file-path="$@"
 	$(PERL_CHK) $@
 
