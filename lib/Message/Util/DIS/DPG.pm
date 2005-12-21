@@ -1497,6 +1497,12 @@ append_child
 ;}
 }
 sub _shift_token ($) {
+  my $c = shift->__shift_token;
+  warn $c->{type}, "\t", $c->{value}, "\n";
+  $c;
+}
+
+sub __shift_token ($) {
 my $self = shift ();
 if (@{$self->{token}}) 
 {
