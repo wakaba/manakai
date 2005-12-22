@@ -15,7 +15,7 @@ Module:
   @License: license|Perl+MPL
 
   @Date:
-    $Date: 2005/12/21 14:05:44 $
+    $Date: 2005/12/22 00:40:55 $
   
   @Require:
     @@Module:
@@ -1822,9 +1822,9 @@ IFClsDef:
       }
     
       ;; Rules := *(Rule / Lexmode)
-      ~* (RULE) {
+      ~* (NAME == 'rule') {
         &_Rule ($doc => $doc, $parent => $docel);
-      } (lEXMODE) {
+      } (NAME == 'lexmode') {
         &_Lexmode ($doc => $doc, $parent => $docel);
       }
     
@@ -2086,6 +2086,22 @@ IFClsDef:
           
           &CodeBlock ($doc => $doc, $parent => $match_block);
         }
+
+      } (NAME == 'my') {
+        ;; MyStatement := MY VARIABLE SEMICOLON
+        ~ (VARIABLE) {
+          my $my;
+          lang:Perl ($name => $token.value) {
+            $my = $doc-><M::Document.createElementNS> (<Q::pg:>, 'myStatement');
+            $my-><M::Element.setAttributeNS> (null, 'name', substr ($name, 1));
+            $block-><M::Node.appendChild> ($my);
+          }
+
+          &AttributeSpecificationList ($doc => $doc, $parent => $my);
+        }
+
+        ~ (SEMICOLON) { }
+
     } (NAME) {
       ;; EmbedStatement := NAME [ParameterSpecificationList] ExternalBlock
       my $embed;
@@ -2141,20 +2157,7 @@ IFClsDef:
       &Rvalue ($doc => $doc, $parent => $assign);
       
       ~ (SEMICOLON) { }
-      } (mY) {
-        ;; MyStatement := MY VARIABLE SEMICOLON
-        ~ (VARIABLE) {
-          my $my;
-          lang:Perl ($name => $token.value) {
-            $my = $doc-><M::Document.createElementNS> (<Q::pg:>, 'myStatement');
-            $my-><M::Element.setAttributeNS> (null, 'name', substr ($name, 1));
-            $block-><M::Node.appendChild> ($my);
-          }
 
-          &AttributeSpecificationList ($doc => $doc, $parent => $my);
-        }
-
-        ~ (SEMICOLON) { }
     }
     
     ~ (RBRACE) { }
@@ -2258,10 +2261,6 @@ IFClsDef:
 
       ;; Attribute value equals
       EQUALS := ['='] ['='];
-    
-    mY := ['m'] ['y'];
-    RULE := ['r'] ['u'] ['l'] ['e'];
-    lEXMODE := ['l'] ['e'] ['x'] ['m'] ['o'] ['d'] ['e'];
     } ;; lexmode
 ##DPGParser
 
