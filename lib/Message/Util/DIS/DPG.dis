@@ -15,7 +15,7 @@ Module:
   @License: license|Perl+MPL
 
   @Date:
-    $Date: 2005/12/23 03:47:20 $
+    $Date: 2005/12/23 04:08:22 $
   
   @Require:
     @@Module:
@@ -638,248 +638,92 @@ IFClsETDef:
     return (\@ra, \@rab, \@rb);
   };
 
-    
-          ## --- Tokenizer preparation
-            ## TODO: Multiple tokenizer support required
+          ## --- State operations
 
-          my $tokenizer = $codeDocument->create_perl_sub ('_shift_token');
-          $r-><M::Node.appendChild> ($tokenizer);
-          $tokenizer->prototype ('$');
-  my $tokenizer_param = $tokenizer->append_statement
-                                  ->append_new_pc_expression ('=');
-  $tokenizer_param->append_new_pc_variable ('$', undef, 'self')
-                  ->variable_scope ('my');
-  $tokenizer_param->append_new_pc_function_call (undef, 'shift');
-  my $if_stack = $tokenizer->append_new_pc_choose
-                           ->append_new_pc_when;
-  my $stack_array = $if_stack->condition->append_new_pc_dereference ('@');
-  for ($stack_array->append_new_pc_expression ('->')) {
-    $_->append_new_pc_variable ('$', undef, 'self');
-    $_->append_bare ('{token}');
-  }
-  $if_stack->block
-           ->append_statement
-           ->append_new_pc_function_call (undef, 'return')
-           ->append_new_pc_function_call (undef, 'shift')
-           ->append_child ($stack_array->clone_node (1));
-
-          ## --- For each child elements (rule or lexmode)...
-
-          my %rules;       # defined parser rules
-          my %root_rules;  # defined |standalone| parser rules
-
-          B: for my $cel (@{$self-><AG::Node.childNodes>}) {
-            my $xuri = $cel->namespace_uri . $cel->local_name;
-
-            ## -- Rule element - adds reference to hash
-            if ($xuri eq <Q::pg:rule>) {
-              my $name = $cel->get_attribute_ns (undef, 'name');
-              $rules{$name} = {source => $cel, param => []};
-              $root_rules{$name} = 1
-                if $cel-><M::DPGElementAttribute.dpgGetAttribute> ('standalone');
-      
-              ## Creates a list of parameters
-              C: for my $paramspec (@{$cel->child_nodes}) {
-                next C unless $paramspec->namespace_uri eq <Q::pg:>;
-                next C unless $paramspec->local_name eq 'parameterDeclaration';
-                push @{$rules{$name}->{param}},
-                     $paramspec->get_attribute_ns (undef, 'name');
-              }
-
-            ## -- Lexmode element - generate tokenizer
-            } elsif ($xuri eq <Q::pg:lexmode>) {
-              ## TODO: Multiple lexmode support
-    
-      my %token = ($;.'initial' => {
-        name => $;.'initial',
-        next_token => [],
-      });
-
-      my $copy_state = sub ($$$) {
-        my ($token, $original_name, $new_prefix) = @_;
-        my @copy = ($original_name.$;.'0');
-        my @cs;
-        while (@copy) {
-          my $cname = shift @copy;
-          next if $token->{$new_prefix, $cname};
-          my $original = $token->{$cname};
-          $token->{$new_prefix, $cname} = my $new = {
-            name => $new_prefix.$;.$cname,
-            next_state => [],
-          };
-          for my $nxt (@{$original->{next_state}}) {
-            push @{$new->{next_state}}, [$nxt->[0], $new_prefix.$;.$nxt->[1]];
-            push @copy, $nxt->[1];
-          }
-          if ($original->{accept}) {
-            push @cs, $new;
-          }
-        } # @copy
-        return @cs;
-      }; # copy_state
-
-      for my $tel (grep {$_->node_type == $_->ELEMENT_NODE} @{$cel->child_nodes}) {
-        my $xuri = $tel->namespace_uri . $tel->local_name;
-        if ($xuri eq <Q::pg:lAssignmentStatement>) {
-          my $sname = $tel->get_attribute_ns (undef, 'name');
-          my $i = 0;
-          if ($token{$sname, $i}) {
-            die qq<"$sname" is already defined>;
-            ## TODO: exception
-          }
-          my $s0 = $token{$sname, $i} = {
-            name => $sname.$;.$i,
-            next_state => [],
-          };
-          my @current_state = ($s0);
-          my $ignore = $tel-><M::DPGElementAttribute.dpgGetAttribute> ('ignore');
-          my $value = $tel-><M::DPGElementAttribute.dpgGetAttribute> ('value');
-          for my $lel (grep {$_->node_type == $_->ELEMENT_NODE} @{$tel->child_nodes}) {
-            my $xuri = $lel->namespace_uri . $lel->local_name;
-            if ($xuri eq <Q::pg:charClass>) {
-              my $range = [];
-              for my $mel (grep {$_->node_type == $_->ELEMENT_NODE} @{$lel->child_nodes}) {
-                my $xuri = $mel->namespace_uri . $mel->local_name;
-                if ($xuri eq <Q::pg:string>) {
-                  $range = $add_range->($range, ord $mel->text_content);
-                } elsif ($xuri eq <Q::pg:charRange>) {
-                  $range = $add_range->($range, $mel->get_attribute_ns (undef, 'start'),
-                                                $mel->get_attribute_ns (undef, 'end'));
-                }
-              }
-              if ($lel->get_attribute_ns (undef, 'negative')) {
-                $range = $negate_range->($range);
-              }
-              
-              my $new_s = {
-                name => $sname.$;.(++$i),
+          ## Copy a set of states.  This is used to resolve
+          ## references in |lAssignmentStatement|.
+          my $copy_state = sub ($$$) {
+            my ($token, $original_name, $new_prefix) = @_;
+            my @copy = ($original_name.$;.'0');
+            my @cs;
+            while (@copy) {
+              my $cname = shift @copy;
+              next if $token->{$new_prefix, $cname};
+              my $original = $token->{$cname};
+              $token->{$new_prefix, $cname} = my $new = {
+                name => $new_prefix.$;.$cname,
                 next_state => [],
               };
-              my $v = $lel->get_attribute_ns (undef, 'occurence');
-              if ($v eq 'zeromore') {
-                $token{$new_s->{name}} = $new_s;
-                push @{$new_s->{next_state}}, [$range, $new_s->{name}];
-                for my $s (@current_state) {
-                  push @{$s->{next_state}}, [$range, $new_s->{name}];
-                }
-                push @current_state, $new_s;
-              } elsif ($v eq 'zeroone') {
-                $token{$new_s->{name}} = $new_s;
-                for my $s (@current_state) {
-                  push @{$s->{next_state}}, [$range, $new_s->{name}];
-                }
-                push @current_state, $new_s;
-              } elsif ($v eq 'onemore') {
-                $token{$new_s->{name}} = $new_s;
-                push @{$new_s->{next_state}}, [$range, $new_s->{name}];
-                for my $s (@current_state) {
-                  push @{$s->{next_state}}, [$range, $new_s->{name}];
-                }
-   \            @current_state = ($new_s);
-              } else { # one
-                $token{$new_s->{name}} = $new_s;
-                for my $s (@current_state) {
-                  push @{$s->{next_state}}, [$range, $new_s->{name}];
-                }
-   \            @current_state = ($new_s);
+              for my $nxt (@{$original->{next_state}}) {
+                push @{$new->{next_state}},
+                     [$nxt->[0], $new_prefix.$;.$nxt->[1]];
+                push @copy, $nxt->[1];
               }
-            } elsif ($xuri eq <Q::pg:lRuleRef>) {
-              my $rrulename = $lel->get_attribute_ns (undef, 'name');
-              if ($token{$rrulename, 0}) {
-                my @cs = $copy_state->(\%token, $rrulename => $sname);
-                for my $s (@current_state) {
-                  push @{$s->{next_state}}, @{$token{$sname, $rrulename, 0}->{next_state}};
-                }
-   \            @current_state = @cs;
-              } else {
-                die "$rrulename is not defined";
-                ## TODO: exception
+              if ($original->{accept}) {
+                push @cs, $new;
               }
-            }
-          }
-          push @{$token{$;.'initial'}->{next_state}}, @{$s0->{next_state}};
-          for my $s (@current_state) {
-            $s->{accept} = $sname;
-            $s->{ignore} = $ignore if $ignore;
-            $s->{value} = $value if $value;
-          }
-        }
-      }
+            } # @copy
+            return @cs;
+          }; # copy_state
 
-      my $make_dfa_state;
-      $make_dfa_state = sub ($@) {
-        my ($dfa, @src_name) = @_;
-        my @src = map {$token{$_}} @src_name;
-        my $next_state = [[[], [$;.'dummy']]];
+          ## Makes a DFA state from a set of NFA states
+          my $make_dfa_state = sub ($@) {
+            my ($token, $dfa, @src_name) = @_;
+            my @src = map {$token->{$_}} @src_name;
+            my $next_state = [[[], [$;.'dummy']]];
         
-        my @rsb = map {@{$_->{next_state}}} @src;
-        for my $rsb (@rsb) {
-          my $new_next_state = [];
-          RSA: for my $rsa (@$next_state) {
-            if (not $rsb) {
-              push @$new_next_state, $rsa if @{$rsa->[0]};
-              next RSA;
+            my @rsb = map {@{$_->{next_state}}} @src;
+            for my $rsb (@rsb) {
+              my $new_next_state = [];
+              RSA: for my $rsa (@$next_state) {
+                if (not $rsb) {
+                  push @$new_next_state, $rsa if @{$rsa->[0]};
+                  next RSA;
+                }
+                my ($ra, $rab, $rb) = $and_minus_ranges->($rsa->[0], $rsb->[0]);
+                push @$new_next_state, [$ra, $rsa->[1]] if @$ra;
+                push @$new_next_state, [$rab, [sort {$a cmp $b} @{$rsa->[1]}, $rsb->[1]]] if @$rab;
+                if (@$rb) {
+                  $rsb = [$rb, $rsb->[1]];
+                } else {
+                  $rsb = undef;
+                }
+              } # RSA
+              if ($rsb) {
+                push @$new_next_state, [$rsb->[0], [$rsb->[1]]];
+              }
+              $next_state = $new_next_state;
             }
-            my ($ra, $rab, $rb) = $and_minus_ranges->($rsa->[0], $rsb->[0]);
-            push @$new_next_state, [$ra, $rsa->[1]] if @$ra;
-            push @$new_next_state, [$rab, [sort {$a cmp $b} @{$rsa->[1]}, $rsb->[1]]] if @$rab;
-            if (@$rb) {
-              $rsb = [$rb, $rsb->[1]];
-            } else {
-              $rsb = undef;
+        
+            my $state_name = join $;.$;, @src_name;
+            $dfa->{$state_name} = {
+              name => $state_name,
+              next_state => @rsb ? $next_state : [],
+            };
+        
+            for (@src) {
+              if ($_->{accept}) {
+                $dfa->{$state_name}->{accept} = $_->{accept};
+                $dfa->{$state_name}->{value} = 1 if $_->{value};
+              }
+              $dfa->{$state_name}->{ignore} = 1 if $_->{ignore};
             }
-          } # RSA
-          if ($rsb) {
-            push @$new_next_state, [$rsb->[0], [$rsb->[1]]];
-          }
-          $next_state = $new_next_state;
-        }
-        
-        my $state_name = join $;.$;, @src_name;
-        $dfa->{$state_name} = {
-          name => $state_name,
-          next_state => @rsb ? $next_state : [],
-        };
-        
-        for (@src) {
-          if ($_->{accept}) {
-            $dfa->{$state_name}->{accept} = $_->{accept};
-            $dfa->{$state_name}->{value} = 1 if $_->{value};
-          }
-          $dfa->{$state_name}->{ignore} = 1 if $_->{ignore};
-        }
-      }; # make_dfa_state
-      my %dfa;
-      my @req_state = ([$;.'initial']);
-      while (@req_state) {
-        my $req_state = shift @req_state;
-        my $req_state_name = join $;.$;, @$req_state;
-        next if $dfa{$req_state_name};
-        $make_dfa_state->(\%dfa, @$req_state);
-        for (@{$dfa{$req_state_name}->{next_state}}) {
-          push @req_state, $_->[1];
-        }
-      }
+          }; # make_dfa_state
+
+          ## Converts an internal state name to a Perl name
+          my $escape_state_name = sub ($) {
+            my $s = shift;
+            $s =~ s/([\W_])/sprintf '_%08X', ord $1/ge;
+            $s =~ s/_0000001C/__/g;
+            return $s;
+          }; # escape_state_name
       
-      my $escape_state_name = sub ($) {
-        my $s = shift;
-        $s =~ s/([\W_])/sprintf '_%08X', ord $1/ge;
-        $s =~ s/_0000001C/__/g;
-        return $s;
-      };
-      
-      for ($tokenizer->append_statement
-                     ->append_new_pc_expression ('=')) {
-        $_->append_new_pc_variable ('$', undef, 'ch')
-          ->variable_scope ('my');
-        $_->append_new_pc_number_literal (-2);
-      }
-      
-      my %ancestor_state;
-      my $state_to_code;
-      $state_to_code = sub ($$$%) {
-        my ($dfa, $parent, $state_name, $factory, %opt) = @_;
-        $ancestor_state{$state_name} = 1;
+          ## Converts a DFA state into Perl lexer code
+          my %ancestor_state;
+          my $state_to_code;
+          $state_to_code = sub ($$$$%) {
+            my ($dfa, $parent, $state_name, $factory, %opt) = @_;
+            $ancestor_state{$state_name} = 1;
         
         my $state_block = $parent->append_new_pc_block;
         my $estate_name = $escape_state_name->($state_name);
@@ -1060,42 +904,230 @@ IFClsETDef:
           $push_ap->append_new_pc_variable ('$', undef, 'ch');
         }
         
-        $ancestor_state{$state_name} = 0;
-      }; # $state_to_code
+            $ancestor_state{$state_name} = 0;
+          }; # $state_to_code
+
+    
+          ## --- Tokenizer preparation
+            ## TODO: Multiple tokenizer support required
+
+          my $tokenizer = $codeDocument->create_perl_sub ('_shift_token');
+          $r-><M::Node.appendChild> ($tokenizer);
+          $tokenizer->prototype ('$');
+  my $tokenizer_param = $tokenizer->append_statement
+                                  ->append_new_pc_expression ('=');
+  $tokenizer_param->append_new_pc_variable ('$', undef, 'self')
+                  ->variable_scope ('my');
+  $tokenizer_param->append_new_pc_function_call (undef, 'shift');
+  my $if_stack = $tokenizer->append_new_pc_choose
+                           ->append_new_pc_when;
+  my $stack_array = $if_stack->condition->append_new_pc_dereference ('@');
+  for ($stack_array->append_new_pc_expression ('->')) {
+    $_->append_new_pc_variable ('$', undef, 'self');
+    $_->append_bare ('{token}');
+  }
+  $if_stack->block
+           ->append_statement
+           ->append_new_pc_function_call (undef, 'return')
+           ->append_new_pc_function_call (undef, 'shift')
+           ->append_child ($stack_array->clone_node (1));
+
+          ## --- For each child elements (rule or lexmode)...
+
+          my %rules;       # defined parser rules
+          my %root_rules;  # defined |standalone| parser rules
+
+          B: for my $cel (@{$self-><AG::Node.childNodes>}) {
+            my $xuri = $cel->namespace_uri . $cel->local_name;
+
+            ## -- Rule element - adds reference to hash
+            if ($xuri eq <Q::pg:rule>) {
+              my $name = $cel->get_attribute_ns (undef, 'name');
+              $rules{$name} = {source => $cel, param => []};
+              $root_rules{$name} = 1
+                if $cel-><M::DPGElementAttribute.dpgGetAttribute> ('standalone');
+      
+              ## Creates a list of parameters
+              C: for my $paramspec (@{$cel->child_nodes}) {
+                next C unless $paramspec->namespace_uri eq <Q::pg:>;
+                next C unless $paramspec->local_name eq 'parameterDeclaration';
+                push @{$rules{$name}->{param}},
+                     $paramspec->get_attribute_ns (undef, 'name');
+              }
+
+            ## -- Lexmode element - generate tokenizer
+            } elsif ($xuri eq <Q::pg:lexmode>) {
+              ## TODO: Multiple lexmode support
+    
+      my %token = ($;.'initial' => {
+        name => $;.'initial',
+        next_token => [],
+      });
+
+      for my $tel (grep {$_->node_type == $_->ELEMENT_NODE} @{$cel->child_nodes}) {
+        my $xuri = $tel->namespace_uri . $tel->local_name;
+        if ($xuri eq <Q::pg:lAssignmentStatement>) {
+          my $sname = $tel->get_attribute_ns (undef, 'name');
+          my $i = 0;
+          if ($token{$sname, $i}) {
+            die qq<"$sname" is already defined>;
+            ## TODO: exception
+          }
+          my $s0 = $token{$sname, $i} = {
+            name => $sname.$;.$i,
+            next_state => [],
+          };
+          my @current_state = ($s0);
+          my $ignore = $tel-><M::DPGElementAttribute.dpgGetAttribute> ('ignore');
+          my $value = $tel-><M::DPGElementAttribute.dpgGetAttribute> ('value');
+          for my $lel (grep {$_->node_type == $_->ELEMENT_NODE} @{$tel->child_nodes}) {
+            my $xuri = $lel->namespace_uri . $lel->local_name;
+            if ($xuri eq <Q::pg:charClass>) {
+              my $range = [];
+              for my $mel (grep {$_->node_type == $_->ELEMENT_NODE} @{$lel->child_nodes}) {
+                my $xuri = $mel->namespace_uri . $mel->local_name;
+                if ($xuri eq <Q::pg:string>) {
+                  $range = $add_range->($range, ord $mel->text_content);
+                } elsif ($xuri eq <Q::pg:charRange>) {
+                  $range = $add_range->($range, $mel->get_attribute_ns (undef, 'start'),
+                                                $mel->get_attribute_ns (undef, 'end'));
+                }
+              }
+              if ($lel->get_attribute_ns (undef, 'negative')) {
+                $range = $negate_range->($range);
+              }
+              
+              my $new_s = {
+                name => $sname.$;.(++$i),
+                next_state => [],
+              };
+              my $v = $lel->get_attribute_ns (undef, 'occurence');
+              if ($v eq 'zeromore') {
+                $token{$new_s->{name}} = $new_s;
+                push @{$new_s->{next_state}}, [$range, $new_s->{name}];
+                for my $s (@current_state) {
+                  push @{$s->{next_state}}, [$range, $new_s->{name}];
+                }
+                push @current_state, $new_s;
+              } elsif ($v eq 'zeroone') {
+                $token{$new_s->{name}} = $new_s;
+                for my $s (@current_state) {
+                  push @{$s->{next_state}}, [$range, $new_s->{name}];
+                }
+                push @current_state, $new_s;
+              } elsif ($v eq 'onemore') {
+                $token{$new_s->{name}} = $new_s;
+                push @{$new_s->{next_state}}, [$range, $new_s->{name}];
+                for my $s (@current_state) {
+                  push @{$s->{next_state}}, [$range, $new_s->{name}];
+                }
+   \            @current_state = ($new_s);
+              } else { # one
+                $token{$new_s->{name}} = $new_s;
+                for my $s (@current_state) {
+                  push @{$s->{next_state}}, [$range, $new_s->{name}];
+                }
+   \            @current_state = ($new_s);
+              }
+            } elsif ($xuri eq <Q::pg:lRuleRef>) {
+              my $rrulename = $lel->get_attribute_ns (undef, 'name');
+              if ($token{$rrulename, 0}) {
+                my @cs = $copy_state->(\%token, $rrulename => $sname);
+                for my $s (@current_state) {
+                  push @{$s->{next_state}}, @{$token{$sname, $rrulename, 0}->{next_state}};
+                }
+   \            @current_state = @cs;
+              } else {
+                die "$rrulename is not defined";
+                ## TODO: exception
+              }
+            }
+          }
+          push @{$token{$;.'initial'}->{next_state}}, @{$s0->{next_state}};
+          for my $s (@current_state) {
+            $s->{accept} = $sname;
+            $s->{ignore} = $ignore if $ignore;
+            $s->{value} = $value if $value;
+          }
+        }
+      }
+
+      my %dfa;
+      my @req_state = ([$;.'initial']);
+      while (@req_state) {
+        my $req_state = shift @req_state;
+        my $req_state_name = join $;.$;, @$req_state;
+        next if $dfa{$req_state_name};
+        $make_dfa_state->(\%token, \%dfa, @$req_state);
+        for (@{$dfa{$req_state_name}->{next_state}}) {
+          push @req_state, $_->[1];
+        }
+      }
+      
+      for ($tokenizer->append_statement
+                     ->append_new_pc_expression ('=')) {
+        $_->append_new_pc_variable ('$', undef, 'ch')
+          ->variable_scope ('my');
+        $_->append_new_pc_number_literal (-2);
+      }
+      
               $state_to_code->(\%dfa, $tokenizer, $;.'initial',
                                $codeDocument, outermost => 1);
-
-              $state_to_code = null;
             } # xuri
           } # B
 
 
+          $state_to_code = null;
+
 
           ## --- Generates parser methods
 
-          # Template for 'get next token' statements
-  my $next_token_code = $codeDocument->create_pc_statement;
-  for ($next_token_code->append_new_pc_expression ('=')) {
-    $_->append_new_pc_variable ('$', undef, 'token');
-    for ($_->append_new_pc_expression ('->')) {
-      $_->append_new_pc_variable ('$', undef, 'self');
-      $_->append_bare ('_shift_token');
-    }
-  }
+          ## Template for 'get next token' statements
+          my $next_token_code = $codeDocument->create_pc_statement;
+          for ($next_token_code->append_new_pc_expression ('=')) {
+            $_->append_new_pc_variable ('$', undef, 'token');
+            for ($_->append_new_pc_expression ('->')) {
+              $_->append_new_pc_variable ('$', undef, 'self');
+              $_->append_bare ('_shift_token');
+            }
+          }
 
-          
-  my $block_id = 0;
-  my $rstatement_to_code;
-  my $rexpression_to_code;
-  $rstatement_to_code = sub ($$$$$$) {
-    my ($parent, $statement, $next_token_required, $rules, $root_rules,
-        $factory) = @_;
-    my $xuri = $statement->namespace_uri . $statement->local_name;
-    if ($xuri eq <Q::pg:matchStatement>) {
-      my $match_parent = $parent;
-      my $match_occur = $statement->get_attribute_ns (undef, 'occurence');
-      
-      
+          ## Converts an expression in rule block into Perl expression
+          my $rexpression_to_code = sub ($$) {
+            my ($parent, $source_parent) = @_;
+    $parent = $parent->append_new_pc_expression (',');
+    C: for my $child (@{$source_parent->child_nodes}) {
+      next C unless $child->node_type == $child->ELEMENT_NODE;
+      my $xuri = $child->namespace_uri . $child->local_name;
+      if ($xuri eq <Q::pg:memberRef>) {
+        my $context = $parent->append_new_pc_expression ('->');
+        D: for my $child (@{$child->child_nodes}) {
+          next D unless $child->node_type == $child->ELEMENT_NODE;
+          my $xuri = $child->namespace_uri . $child->local_name;
+          if ($xuri eq <Q::pg:variable>) {
+            $context->append_new_pc_variable
+              ('$', undef, $child->get_attribute_ns (undef, 'name'));
+          } elsif ($xuri eq <Q::pg:member>) {
+            $context->append_bare ('{'.$child->get_attribute_ns (undef, 'name').'}');
+          }
+        }
+      } elsif ($xuri eq <Q::pg:string>) {
+        $parent->append_string_literal ($child->text_content);
+              }
+            }
+          }; # rexpression_to_code
+  
+          ## Converts a statement in rule block into Perl code
+          my $block_id = 0;
+          my $rstatement_to_code;
+          $rstatement_to_code = sub ($$$$$$) {
+            my ($parent, $statement, $next_token_required, $rules, $root_rules,
+                $factory) = @_;
+            my $xuri = $statement->namespace_uri . $statement->local_name;
+            if ($xuri eq <Q::pg:matchStatement>) {
+              my $match_parent = $parent;
+              my $match_occur = $statement-><M::Element.getAttributeNS>
+                                              (null, 'occurence');
       if ($match_occur eq 'onemore') {
         $match_parent = $match_parent->append_new_pc_block;
         for ($match_parent->append_statement->append_new_pc_expression ('=')) {
@@ -1453,32 +1485,7 @@ IFClsETDef:
             } # xuri
           }; # rstatement_to_code
 
-
-  
-  $rexpression_to_code = sub ($$) {
-    my ($parent, $source_parent) = @_;
-    $parent = $parent->append_new_pc_expression (',');
-    C: for my $child (@{$source_parent->child_nodes}) {
-      next C unless $child->node_type == $child->ELEMENT_NODE;
-      my $xuri = $child->namespace_uri . $child->local_name;
-      if ($xuri eq <Q::pg:memberRef>) {
-        my $context = $parent->append_new_pc_expression ('->');
-        D: for my $child (@{$child->child_nodes}) {
-          next D unless $child->node_type == $child->ELEMENT_NODE;
-          my $xuri = $child->namespace_uri . $child->local_name;
-          if ($xuri eq <Q::pg:variable>) {
-            $context->append_new_pc_variable
-              ('$', undef, $child->get_attribute_ns (undef, 'name'));
-          } elsif ($xuri eq <Q::pg:member>) {
-            $context->append_bare ('{'.$child->get_attribute_ns (undef, 'name').'}');
-          }
-        }
-      } elsif ($xuri eq <Q::pg:string>) {
-        $parent->append_string_literal ($child->text_content);
-      }
-    }
-  }; # rexpression_to_code
-  
+          ## -- Converts each |standalone| rules into Perl code
   for my $rule_name (keys %root_rules) {
     my $rule_sub = $codeDocument->create_perl_sub ('_parse_' . $rule_name);
     $r-><M::Node.appendChild> ($rule_sub);
