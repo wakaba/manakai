@@ -1,5 +1,15 @@
 2005-12-23  Wakaba  <wakaba@suika.fam.cx>
 
+	* DPG.dis: |token-error| implemented.  Embed statements
+	now accept attributes.
+	(DPGException): New exception.
+	(DPGEmbedStatementElement): New interface.
+	(parseString): May throw |PARSE_ERR| exception.
+	(token-error): Reports |DOMError| and then throw |DPGException|
+	with code |PARSE_ERR|.
+
+2005-12-23  Wakaba  <wakaba@suika.fam.cx>
+
 	* DPG.dis: External rule reference supported.  Variables
 	in |lAssignmentStatement| are supported; support
 	for |lRuleRef|s is removed.  Character class |anyChar| (|.|)

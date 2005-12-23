@@ -15,7 +15,7 @@ Module:
   @License: license|Perl+MPL
 
   @Date:
-    $Date: 2005/12/23 10:56:05 $
+    $Date: 2005/12/23 14:20:22 $
   
   @Require:
     @@Module:
@@ -937,6 +937,8 @@ IFClsETDef:
           my %rules;       # defined parser rules
           my %root_rules;  # defined |standalone| parser rules
           my %external_rules; # defined |external| parser rules
+          my %token_error;
+          my $default_token_error;
 
           B: for my $cel (@{$self-><AG::Node.childNodes>}) {
             my $xuri = $cel->namespace_uri . $cel->local_name;
@@ -960,6 +962,25 @@ IFClsETDef:
                 next C unless $paramspec->local_name eq 'parameterDeclaration';
                 push @{$rules{$name}->{param}},
                      $paramspec->get_attribute_ns (undef, 'name');
+              }
+
+            ## -- Token error element - error handling code
+            } elsif ($xuri eq <Q::pg:tokenError>) {
+              my $name = $cel-><M::Element.getAttributeNS> (null, 'name');
+              $token_error{$name} = {
+                source => $cel,
+                param => [],
+              };
+              if ($cel-><M::DPGElementAttribute.dpgGetAttribute> ('default')) {
+                $default_token_error = $name;
+              }
+      
+              ## Creates a list of parameters
+              C: for my $paramspec (@{$cel->child_nodes}) {
+                next C unless $paramspec->namespace_uri eq <Q::pg:>;
+                next C unless $paramspec->local_name eq 'parameterDeclaration';
+                push @{$token_error{$name}->{param}},
+                     $paramspec-><M::Element.getAttributeNS> (null, 'name');
               }
 
             ## -- Lexmode element - generate tokenizer
@@ -1131,6 +1152,22 @@ IFClsETDef:
             }
           }
 
+          ## Error handling code
+          unless ($default_token_error) {
+            $default_token_error = $;.'default-token-error';
+            my $root = $codeDocument-><M::pc|PCDocument.createPCStatement>;
+            for ($root-><M::pc|PerlCodeUnits.appendNewPCFunctionCall>
+                          (null, 'die')
+                      -><M::pc|PerlCodeUnits.appendNewPCExpression> ('->')) {
+              $_-><M::pc|PerlCodeUnits.appendNewPCVariable>
+                          ('$', null, 'token');
+              $_-><M::pc|PerlCodeUnits.appendBare> ('{type}');
+            }
+            $token_error{$default_token_error} = {
+              code => $root,
+            };
+          }
+
           ## Converts an expression in rule block into Perl expression
           my $rexpression_to_code = sub ($$) {
             my ($parent, $source_parent) = @_;
@@ -1284,9 +1321,56 @@ IFClsETDef:
             $_->append_new_pc_number_literal (0);
           }
         }
-        ## TODO: Error reporting
-        $err_block->append_statement ('die');
-      }
+  
+                  my $terr_name = $default_token_error;
+                  unless ($token_error{$terr_name}->{code}) {
+                    ## Child statements
+                    C: for my $child (@{$token_error{$terr_name}->{source}
+                                              -><AG::Node.childNodes>}) {
+                      next C unless $child-><AG::Node.nodeType> ==
+                                    <C::Node.ELEMENT_NODE>;
+                      $rstatement_to_code->($err_block, $child, true,
+                                            $rules, $root_rules, $factory);
+                    }
+                    $token_error{$terr_name}->{code}
+                      = $err_block-><M::Node.cloneNode> (true);
+                  } else {
+                    $err_block-><AG::Node.parentNode>
+                               -><M::Node.replaceChild>
+                       (my $teb = $token_error{$terr_name}->{code}
+                              -><M::Node.cloneNode> (true), $err_block);
+                    $err_block = $teb;
+                  }
+          
+                  my %param;
+                  C: for my $child (@{$statement-><AG::Node.childNodes>}) {
+                    if ($child-><AG::Node.namespaceURI> .
+                        $child-><AG::Node.localName> eq
+                        <Q::pg:parameterSpecification>) {
+                      $param{$child-><M::Element.getAttributeNS>
+                                       (null, 'name')} = $child;
+                    }
+                  }
+          
+                  my $block_first = $err_block-><AG::Node.firstChild>;
+                  for my $param_name (reverse @{$token_error{$terr_name}
+                                                      ->{param}}) {
+                    $block_first = $err_block-><M::Node.insertBefore>
+                             ($factory-><M::pc|PCDocument.createPCStatement>,
+                              $block_first);
+                    for ($block_first-><M::pc|PerlCodeUnits
+                                            .appendNewPCExpression> ('=')) {
+                      $_-><M::pc|PerlCodeUnits.appendNewPCVariable>
+                                ('$', null, $param_name)
+                        -><AS::pc|PerlVariable.variableScope> ('my');
+                      if ($param{$param_name}) {
+                        $rexpression_to_code->($_, $param{$param_name});
+                      } else {
+                        $_-><M::pc|PerlCodeUnits.appendAtom> ('undef');
+                      }
+                    }
+                  }
+              }
       
       if (not $has_sep and ($match_occur eq 'zeromore' or $match_occur eq 'onemore')) {
         for ($match_choose->append_new_pc_otherwise->block) {
@@ -1392,55 +1476,68 @@ IFClsETDef:
           }
           
                   return 1; # next_token_required == 1
-        } else { # not a standalone rule
-          my $block;
-          unless ($rules->{$rule_name}->{code}->[$next_token_required += 0]) {
-            $block = $parent->append_new_pc_block;
-            $rules->{$rule_name}->{code}->[$next_token_required]
-              = [$block, $next_token_required]; # prevent infinite loop
-            my $o_next_token_required = $next_token_required;
+                } else { # not a standalone rule
+                  my $block;
+                  unless ($rules->{$rule_name}->{code}
+                                ->[$next_token_required += 0]) {
+                    $block = $parent-><M::pc|PerlCodeStatements
+                                         .appendNewPCBlock>;
+                    $rules->{$rule_name}->{code}->[$next_token_required]
+                      = [$block, $next_token_required]; # prevent infinite loop
+                    my $o_next_token_required = $next_token_required;
             
-            ## Child statements
-            C: for my $child (@{$rules->{$rule_name}->{source}->child_nodes}) {
-              next C unless $child->node_type == $child->ELEMENT_NODE;
-              ($next_token_required, undef)
-                = $rstatement_to_code->($block, $child, $next_token_required,
-                                        $rules, $root_rules, $factory);
-            }
-            $rules->{$rule_name}->{code}->[$o_next_token_required]
-              = [$block->clone_node (1), $next_token_required];
-          } else {
-            $block = $parent->append_child
-                       ($rules->{$rule_name}->{code}->[$next_token_required]->[0]
-                                          ->clone_node (1));
-            $next_token_required
-              = $rules->{$rule_name}->{code}->[$next_token_required]->[1];
-          }
+                    ## Child statements
+                    C: for my $child (@{$rules->{$rule_name}->{source}
+                                              -><AG::Node.childNodes>}) {
+                      next C unless $child-><AG::Node.nodeType> ==
+                                    <C::Node.ELEMENT_NODE>;
+                      ($next_token_required, undef)
+                        = $rstatement_to_code->($block, $child,
+                                                $next_token_required,
+                                                $rules, $root_rules, $factory);
+                    }
+                    $rules->{$rule_name}->{code}->[$o_next_token_required]
+                      = [$block-><M::Node.cloneNode> (true),
+                         $next_token_required];
+                  } else {
+                    $block = $parent-><M::Node.appendChild>
+                       ($rules->{$rule_name}->{code}
+                              ->[$next_token_required]->[0]
+                              -><M::Node.cloneNode> (true));
+                    $next_token_required
+                      = $rules->{$rule_name}->{code}
+                              ->[$next_token_required]->[1];
+                  }
           
-          my %param;
-          C: for my $child (@{$statement->child_nodes}) {
-            next C unless $child->node_type == $child->ELEMENT_NODE;
-            if ($child->namespace_uri . $child->local_name eq
-                <Q::pg:parameterSpecification>) {
-              $param{$child->get_attribute_ns (undef, 'name')} = $child;
-            }
-          }
+                  my %param;
+                  C: for my $child (@{$statement-><AG::Node.childNodes>}) {
+                    if ($child-><AG::Node.namespaceURI> .
+                        $child-><AG::Node.localName> eq
+                        <Q::pg:parameterSpecification>) {
+                      $param{$child-><M::Element.getAttributeNS>
+                                       (null, 'name')} = $child;
+                    }
+                  }
           
-          my $block_first = $block->first_child;
-          for my $param_name (reverse @{$rules->{$rule_name}->{param}}) {
-            $block_first = $block->insert_before
-                             ($factory->create_pc_statement, $block_first);
-            for ($block_first->append_new_pc_expression ('=')) {
-              $_->append_new_pc_variable ('$', undef, $param_name)
-                ->variable_scope ('my');
-              if ($param{$param_name}) {
-                $rexpression_to_code->($_, $param{$param_name});
-              } else {
-                $_->append_atom ('undef');
-              }
-            }
-          }
-          
+                  my $block_first = $block-><AG::Node.firstChild>;
+                  for my $param_name (reverse @{$rules->{$rule_name}
+                                                      ->{param}}) {
+                    $block_first = $block-><M::Node.insertBefore>
+                             ($factory-><M::pc|PCDocument.createPCStatement>,
+                              $block_first);
+                    for ($block_first-><M::pc|PerlCodeUnits
+                                            .appendNewPCExpression> ('=')) {
+                      $_-><M::pc|PerlCodeUnits.appendNewPCVariable>
+                                ('$', null, $param_name)
+                        -><AS::pc|PerlVariable.variableScope> ('my');
+                      if ($param{$param_name}) {
+                        $rexpression_to_code->($_, $param{$param_name});
+                      } else {
+                        $_-><M::pc|PerlCodeUnits.appendAtom> ('undef');
+                      }
+                    }
+                  }
+            
                   return $next_token_required;
                 }
       } elsif ($rule_name eq 'builtin:nestedBlockAsText') {
@@ -1637,6 +1734,18 @@ IFClsETDef:
 ##DPGMyStatementElement
 
 IFClsETDef:
+  @IFQName: DPGEmbedStatementElement
+  @ClsQName: ManakaiDPGEmbedStatementElement
+  @ETQName: pg|embedStatement
+
+  @IFISA: DPGElement
+  @ClsISA: ManakaiDPGElement
+
+  @IFISA: DPGElementAttribute
+  @ClsISA: ManakaiDPGElementAttribute
+##DPGEmbedStatementElement
+
+IFClsETDef:
   @IFQName: DPGLexmodeElement
   @ClsQName: ManakaiDPGLexmodeElement
   @ETQName: pg|lexmode
@@ -1764,6 +1873,10 @@ IFClsDef:
       @@@Type: DPGDocument
       @@@enDesc:
         An XML representation of <P::sourceText>.
+      @@@dx:raises:
+        @@@@@: pg|PARSE_ERR
+        @@@@enDesc:
+          If the DPG document contains one or more error.
       @@@PerlDef:
         $self->{char} = [];
         $self->{token} = [];
@@ -1910,6 +2023,13 @@ IFClsDef:
       }
     
       ~ (#EOF) { }
+
+      lang:Perl {
+        if ($self->{has_error}) {
+          __EXCEPTION{pg|PARSE_ERR::
+          }__;
+        }
+      }
     } // Rules
   
     rule _Lexmode ($doc, $parent) {
@@ -2269,6 +2389,8 @@ IFClsDef:
       
         &ParameterSpecificationListOpt ($doc => $doc, $parent => $embed);
       
+        &AttributeSpecificationList ($doc => $doc, $parent => $embed);
+
         &EmbedBlock ($doc => $doc, $parent => $embed);
       } (RULEREF) {
         /*
@@ -2316,98 +2438,106 @@ IFClsDef:
       
       ~ (SEMICOLON) { }
 
-    }
+      }
     
-        ~ (RBRACE) { }
-      } // _CodeBlock
+      ~ (RBRACE) { }
+    } // _CodeBlock
 
-      /*
-        EmbedBlock := '{' *((<any character> - '{' / '}') / EmbedBlock) '}'
+    /*
+      EmbedBlock := '{' *((<any character> - '{' / '}') / EmbedBlock) '}'
 
           ISSUE: How escapes ('\' <any character>) should be parsed?
-      */
-      rule EmbedBlock ($doc, $parent)
-           : perl-name => 'embed_block' <external>;
+    */
+    rule EmbedBlock ($doc, $parent)
+           : perl-name => 'embed_block'
+           <external>;
     
-      // Lvalue := VARIABLE *(DOT NAME)
+    // Lvalue := VARIABLE *(DOT NAME)
   
     rule Rvalue ($doc, $parent) {
       /*
         Rvalue := STRING / VARIABLE *(DOT NAME)
       */
     
-    ~ (STRING) {
-      lang:Perl ($value => $token.value) {
-        my $str = $doc-><M::Document.createElementNS> (<Q::pg:>, 'string');
-        $str-><AS::Node.textContent> (substr ($value, 1, length ($value) - 2));
-        $parent-><M::Node.appendChild> ($str);
-      }
-    } (VARIABLE) {
-      my $memref;
-      lang:Perl ($name => $token.value) {
-        $memref = $doc-><M::Document.createElementNS> (<Q::pg:>, 'memberRef');
-        my $var = $doc-><M::Document.createElementNS> (<Q::pg:>, 'variable');
-        $var-><M::Element.setAttributeNS> (null, 'name', substr ($name, 1));
-        $memref-><M::Node.appendChild> ($var);
-        $parent-><M::Node.appendChild> ($memref);
-      }
-      
-      ~* (DOT) {
-        ~ (NAME) {
-          lang:Perl ($name => $token.value) {
-            my $mem = $doc-><M::Document.createElementNS> (<Q::pg:>, 'member');
-            $mem-><M::Element.setAttributeNS> (null, 'name', $name);
-            $memref-><M::Node.appendChild> ($mem);
-          }
+      ~ (STRING) {
+        lang:Perl ($value => $token.value) {
+          my $str = $doc-><M::Document.createElementNS> (<Q::pg:>, 'string');
+          $str-><AS::Node.textContent>
+                  (substr ($value, 1, length ($value) - 2));
+          $parent-><M::Node.appendChild> ($str);
         }
-      }
-    }
-      } // Rvalue
-
-      rule ParameterDeclarationListOpt ($doc, $parent) {
-        /*
-          ParameterDeclarationList := "(" [ParameterDeclaration
-                                           *(COMMA ParameterDeclaration)] ")"
-          ParameterDeclaration := VARIABLE
-        */
-        ~? (LPAREN) {
-          ~* (VARIABLE) {
-            lang:Perl ($name => $token.value) {
-              my $pel = $doc-><M::Document.createElementNS>
-                                (<Q::pg:>, 'parameterDeclaration');
-              $pel-><M::Element.setAttributeNS>
-                      (null, 'name', substr ($name, 1));
-              $parent-><M::Node.appendChild> ($pel);
-            }
-          } (COMMA) : separator {
-            //
-          }
-          ~ (RPAREN) { }
-        }
-      } // ParameterDeclarationListOpt
-
-      rule ParameterSpecificationListOpt ($doc, $parent) {
-        /*
-          ParameterSpecificationList := LPAREN [VARIABLE REPLACE Rvalue
-                                        *(COMMA Lvalue REPLACE Rvalue)] RPAREN
-        */
-    ~? (LPAREN) {
-      ~* (VARIABLE) {
-        my $param;
+      } (VARIABLE) {
+        my $memref;
         lang:Perl ($name => $token.value) {
-          $param = $doc-><M::Document.createElementNS> (<Q::pg:>, 'parameterSpecification');
-          $parent-><M::Node.appendChild> ($param);
-          $param-><M::Element.setAttributeNS> (null, 'name', substr ($name, 1));
+          $memref = $doc-><M::Document.createElementNS>
+                              (<Q::pg:>, 'memberRef');
+          my $var = $doc-><M::Document.createElementNS>
+                              (<Q::pg:>, 'variable');
+          $var-><M::Element.setAttributeNS>
+                    (null, 'name', substr ($name, 1));
+          $memref-><M::Node.appendChild> ($var);
+          $parent-><M::Node.appendChild> ($memref);
         }
         
-        ~ (REPLACE) { }
+        ~* (DOT) {
+          ~ (NAME) {
+            lang:Perl ($name => $token.value) {
+              my $mem = $doc-><M::Document.createElementNS>
+                                (<Q::pg:>, 'member');
+              $mem-><M::Element.setAttributeNS> (null, 'name', $name);
+              $memref-><M::Node.appendChild> ($mem);
+            }
+          }
+        }
+      }
+    } // Rvalue
+
+    rule ParameterDeclarationListOpt ($doc, $parent) {
+      /*
+        ParameterDeclarationList := "(" [ParameterDeclaration
+                                         *(COMMA ParameterDeclaration)] ")"
+        ParameterDeclaration := VARIABLE
+      */
+      ~? (LPAREN) {
+        ~* (VARIABLE) {
+          lang:Perl ($name => $token.value) {
+            my $pel = $doc-><M::Document.createElementNS>
+                              (<Q::pg:>, 'parameterDeclaration');
+            $pel-><M::Element.setAttributeNS>
+                    (null, 'name', substr ($name, 1));
+            $parent-><M::Node.appendChild> ($pel);
+          }
+        } (COMMA) : separator { }
+
+        ~ (RPAREN) { }
+      }
+    } // ParameterDeclarationListOpt
+
+    rule ParameterSpecificationListOpt ($doc, $parent) {
+      /*
+        ParameterSpecificationList := LPAREN [VARIABLE REPLACE Rvalue
+                                      *(COMMA Lvalue REPLACE Rvalue)] RPAREN
+      */
+
+      ~? (LPAREN) {
+        ~* (VARIABLE) {
+          my $param;
+          lang:Perl ($name => $token.value) {
+            $param = $doc-><M::Document.createElementNS>
+                             (<Q::pg:>, 'parameterSpecification');
+            $parent-><M::Node.appendChild> ($param);
+            $param-><M::Element.setAttributeNS>
+                      (null, 'name', substr ($name, 1));
+          }
+       
+          ~ (REPLACE) { }
         
-        &Rvalue ($doc => $doc, $parent => $param);
-      } (COMMA) : separator { }
+          &Rvalue ($doc => $doc, $parent => $param);
+        } (COMMA) : separator { }
       
-      ~ (RPAREN) { }
+        ~ (RPAREN) { }
+      }
     }
-  }
 
     rule _TokenError ($doc, $parent) {
       /*
@@ -2429,8 +2559,23 @@ IFClsDef:
 
       &AttributeSpecificationList ($doc => $doc, $parent => $el);
 
-      &_CodeBlock ($doc => $doc, $parent => $el);
+      ~ (LBRACE) {
+        &_CodeBlock ($doc => $doc, $parent => $el);
+      }
     } // _TokenError
+
+    token-error default : default {
+      lang:Perl ($token_name => $token.type) {
+        my $continue = __DOMCore:ERROR{pg|bad-token-error::
+          pg|token-type => {$token_name},
+        }__;
+        unless ($continue) {
+          __EXCEPTION{pg|PARSE_ERR::
+          }__;
+        }
+        $self->{has_error} = true;
+      }
+    } // token-error default
 
 
     lexmode default : initial {
@@ -2559,3 +2704,113 @@ CParamApp:
   @DOMCore:domConfigurationParameter: DOMCore|error-handler
   @DOMCore:targetType: DPGParser
 
+ElementTypeBinding:
+  @Name: ErrDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DOMCore|DOMErrorType
+    @@For: ManakaiDOM|DOM3
+
+ErrDef:
+  @QName: pg|bad-token-error
+  @enDesc:
+    The parser is encountered to a token whose type is not
+    allowed there.
+  @DOMCore:severity: DOMCore|SEVERITY_ERROR
+  @enMufDef:
+    Token "%p (name => {<Q::pg|token-type>});" is not allowed
+
+PropDef:
+  @QName: pg|token-type
+  @enDesc:
+    The type of the token occurred in the source.
+
+ElementTypeBinding:
+  @Name:enMufDef
+  @ElementType:
+    ecore:defaultMessage
+  @ShadowContent:
+    @@lang:en
+    @@ContentType:
+      lang:muf
+
+ResourceDef:
+  @rdf:type:
+    @@@: dis|MultipleResource
+    @@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
+  @resourceFor: ManakaiDOM|ForIF
+  @resourceFor:
+    @@@: ManakaiDOM|ForClass
+    @@ForCheck: ManakaiDOM|ManakaiDOM !=ManakaiDOM|ManakaiDOM
+  @For: ManakaiDOM|DOM3
+  @For: =ManakaiDOM|ManakaiDOM
+
+  @rdf:type:
+    @@@: dx|Interface
+    @@ForCheck: ManakaiDOM|ForIF
+
+  @rdf:type:
+    @@@: dx|Class
+    @@ForCheck: ManakaiDOM|ForClass
+
+  @Implement:
+    @@@: ||ManakaiDOM|ManakaiDOM||ManakaiDOM|ForIF
+    @@ContentType: DISCore|TFPQNames
+    @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
+  @Implement:
+    @@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
+    @@ContentType: DISCore|TFPQNames
+    @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
+  @dx:implementedBy:
+    @@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForClass
+    @@ForCheck: ManakaiDOM|ForIF ManakaiDOM|ManakaiDOMLatest
+
+  @f:implements:
+    @@@: DIS|DPG10
+    @@For: ManakaiDOM|DOM3
+
+  @DISPerl:ISA:
+    @@@: dx|Exception||ManakaiDOM|Perl
+    @@ForCheck: ManakaiDOM|ForClass
+
+  @IFQName: DPGException
+  @ClsQName: ManakaiDPGException
+
+  @enDesc:
+    A <IF::DPGParser> might throw a <IF::DPGException> if the processing is
+    stopped.  The processing can be stopped due to a <IF::DOMCore|DOMError>
+    with a <A::DOMCore|DOMError.severity> of 
+    <C::DOMCore|DOMError.SEVERITY_FATAL_ERROR> or a non-recovered
+    <C::DOMCore|DOMError.SEVERITY_ERROR>, or if 
+    <M::DOMCore|DOMErrorHandler.handleError> method returned <DOM::false>.
+
+  @Attr:
+    @@Name: code
+    @@Get:
+      @@@Type: idl|unsignedShort||ManakaiDOM|all
+      @@@dis:actualType: DPGExceptionCode
+    @@ForCheck: ManakaiDOM|ForIF
+
+  @ResourceDef:
+    @@rdf:type: DISLang|ConstGroup
+    @@ForCheck: ManakaiDOM|ForIF !=ManakaiDOM|ManakaiDOM
+
+    @@QName: DPGExceptionCode
+
+    @@rdfs:subClassOf: idl|unsignedShort||ManakaiDOM|all
+    @@Type: idl|unsignedShort||ManakaiDOM|all
+
+    @@enDesc:
+      An integer indicating the type of error generated.
+
+    @@ResourceDef:
+      @@@rdf:type: DISLang|Const
+      @@@QName: pg|PARSE_ERR
+      @@@Value:
+        @@@@@: 81
+        @@@@ContentType: DISCore|Integer
+      @@@enDesc:
+        An attempt was made to load a DPG document and
+        the processing has been stopped.
+##DPGException
