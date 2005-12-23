@@ -15,7 +15,7 @@ Module:
   @License: license|Perl+MPL
 
   @Date:
-    $Date: 2005/12/23 04:08:22 $
+    $Date: 2005/12/23 10:56:05 $
   
   @Require:
     @@Module:
@@ -936,6 +936,7 @@ IFClsETDef:
 
           my %rules;       # defined parser rules
           my %root_rules;  # defined |standalone| parser rules
+          my %external_rules; # defined |external| parser rules
 
           B: for my $cel (@{$self-><AG::Node.childNodes>}) {
             my $xuri = $cel->namespace_uri . $cel->local_name;
@@ -944,8 +945,14 @@ IFClsETDef:
             if ($xuri eq <Q::pg:rule>) {
               my $name = $cel->get_attribute_ns (undef, 'name');
               $rules{$name} = {source => $cel, param => []};
-              $root_rules{$name} = 1
-                if $cel-><M::DPGElementAttribute.dpgGetAttribute> ('standalone');
+              $external_rules{$name} = true
+                if $cel-><M::Element.getAttributeNS> (null, 'isExternal');
+              $root_rules{$name}
+                = $cel-><M::DPGElementAttribute.dpgGetAttribute> ('perl-name')
+                || $name
+                if $cel-><M::DPGElementAttribute.dpgGetAttribute>
+                           ('standalone') or
+                   $external_rules{$name};
       
               ## Creates a list of parameters
               C: for my $paramspec (@{$cel->child_nodes}) {
@@ -968,6 +975,9 @@ IFClsETDef:
         my $xuri = $tel->namespace_uri . $tel->local_name;
         if ($xuri eq <Q::pg:lAssignmentStatement>) {
           my $sname = $tel->get_attribute_ns (undef, 'name');
+          my $is_variable = $tel-><M::Element.getAttributeNS>
+                                    (null, 'isVariable');
+          $sname = '$' . $sname if $is_variable;
           my $i = 0;
           if ($token{$sname, $i}) {
             die qq<"$sname" is already defined>;
@@ -982,19 +992,23 @@ IFClsETDef:
           my $value = $tel-><M::DPGElementAttribute.dpgGetAttribute> ('value');
           for my $lel (grep {$_->node_type == $_->ELEMENT_NODE} @{$tel->child_nodes}) {
             my $xuri = $lel->namespace_uri . $lel->local_name;
-            if ($xuri eq <Q::pg:charClass>) {
+            if ($xuri eq <Q::pg:charClass> or $xuri eq <Q::pg:anyChar>) {
               my $range = [];
-              for my $mel (grep {$_->node_type == $_->ELEMENT_NODE} @{$lel->child_nodes}) {
-                my $xuri = $mel->namespace_uri . $mel->local_name;
-                if ($xuri eq <Q::pg:string>) {
-                  $range = $add_range->($range, ord $mel->text_content);
-                } elsif ($xuri eq <Q::pg:charRange>) {
-                  $range = $add_range->($range, $mel->get_attribute_ns (undef, 'start'),
+              if ($xuri eq <Q::pg:charClass>) {
+                for my $mel (grep {$_->node_type == $_->ELEMENT_NODE} @{$lel->child_nodes}) {
+                  my $xuri = $mel->namespace_uri . $mel->local_name;
+                  if ($xuri eq <Q::pg:string>) {
+                    $range = $add_range->($range, ord $mel->text_content);
+                  } elsif ($xuri eq <Q::pg:charRange>) {
+                    $range = $add_range->($range, $mel->get_attribute_ns (undef, 'start'),
                                                 $mel->get_attribute_ns (undef, 'end'));
+                  }
                 }
-              }
-              if ($lel->get_attribute_ns (undef, 'negative')) {
-                $range = $negate_range->($range);
+                if ($lel->get_attribute_ns (undef, 'negative')) {
+                  $range = $negate_range->($range);
+                }
+              } else { # pg:anyChar
+                $range = [0, 'Inf'];
               }
               
               my $new_s = {
@@ -1029,21 +1043,46 @@ IFClsETDef:
                 }
    \            @current_state = ($new_s);
               }
-            } elsif ($xuri eq <Q::pg:lRuleRef>) {
-              my $rrulename = $lel->get_attribute_ns (undef, 'name');
+            } elsif ($xuri eq <Q::pg:lVariableRef>) {
+              my $rrulename = '$'.$lel->get_attribute_ns (undef, 'name');
+              my @new_current_state;
               if ($token{$rrulename, 0}) {
-                my @cs = $copy_state->(\%token, $rrulename => $sname);
-                for my $s (@current_state) {
-                  push @{$s->{next_state}}, @{$token{$sname, $rrulename, 0}->{next_state}};
-                }
-   \            @current_state = @cs;
+   \            @new_current_state
+                  = $copy_state->(\%token, $rrulename => $sname.$;.(++$i));
               } else {
                 die "$rrulename is not defined";
                 ## TODO: exception
+              } 
+              my $v = $lel->get_attribute_ns (undef, 'occurence');
+              if ($v eq 'zeromore') {
+                for my $s (@current_state, @new_current_state) {
+                  push @{$s->{next_state}},
+   \                   @{$token{$sname, $i, $rrulename, 0}->{next_state}};
+                }
+                push @current_state, @new_current_state;
+              } elsif ($v eq 'zeroone') {
+                for my $s (@current_state) {
+                  push @{$s->{next_state}},
+   \                   @{$token{$sname, $i, $rrulename, 0}->{next_state}};
+                }
+                push @current_state, @new_current_state;
+              } elsif ($v eq 'onemore') {
+                for my $s (@current_state, @new_current_state) {
+                  push @{$s->{next_state}},
+   \                   @{$token{$sname, $i, $rrulename, 0}->{next_state}};
+                }
+   \            @current_state = @new_current_state;
+              } else { # one
+                for my $s (@current_state) {
+                  push @{$s->{next_state}},
+   \                   @{$token{$sname, $i, $rrulename, 0}->{next_state}};
+                }
+   \            @current_state = @new_current_state;
               }
-            }
-          }
-          push @{$token{$;.'initial'}->{next_state}}, @{$s0->{next_state}};
+            } # $xuri
+          } # $lel
+          push @{$token{$;.'initial'}->{next_state}}, @{$s0->{next_state}}
+            unless $is_variable;
           for my $s (@current_state) {
             $s->{accept} = $sname;
             $s->{ignore} = $ignore if $ignore;
@@ -1330,7 +1369,7 @@ IFClsETDef:
           for ($parent->append_statement->append_new_pc_apply) {
             for ($_->append_new_pc_expression ('->')) {
               $_->append_new_pc_variable ('$', undef, 'self');
-              $_->append_bare ('_parse_' . $rule_name);
+              $_->append_bare ('_parse_' . $root_rules->{$rule_name});
             }
             $param_spec_list = $_->append_new_pc_expression (',');
           }
@@ -1486,9 +1525,10 @@ IFClsETDef:
           }; # rstatement_to_code
 
           ## -- Converts each |standalone| rules into Perl code
-  for my $rule_name (keys %root_rules) {
-    my $rule_sub = $codeDocument->create_perl_sub ('_parse_' . $rule_name);
-    $r-><M::Node.appendChild> ($rule_sub);
+          for my $rule_name (grep {not $external_rules{$_}} keys %root_rules) {
+            my $rule_sub = $codeDocument-><M::pc|PCDocument.createPerlSub>
+                                      ('_parse_'.$root_rules{$rule_name});
+            $r-><M::Node.appendChild> ($rule_sub);
 
             my $params_s = $rule_sub->append_statement;
             my @params = ('$self');
@@ -1622,6 +1662,19 @@ IFClsETDef:
 
 ##DPGLAssignmentStatementElement
 
+IFClsETDef:
+  @IFQName: DPGTokenErrorElement
+  @ClsQName: ManakaiDPGTokenErrorElement
+  @ETQName: pg|tokenError
+  
+  @IFISA: DPGElement
+  @ClsISA: ManakaiDPGElement
+
+  @IFISA: DPGElementAttribute
+  @ClsISA: ManakaiDPGElementAttribute
+
+##DPGTokenErrorElement
+
 IFClsDef:
   @IFQName: DPGParser
   @ClsQName: ManakaiDPGParser
@@ -1746,7 +1799,7 @@ IFClsDef:
         }
 
   @Method:
-    @@Name: parseNestedBlockAsText
+    @@Name: parseEmbedBlock
     @@ManakaiDOM:isForInternal:1
     @@ForCheck: ManakaiDOM|ForClass
     @@enDesc:
@@ -1764,32 +1817,37 @@ IFClsDef:
         should be attached.
     @@Return:
       @@@PerlDef:
-        my $nest_count = 1; # already opened
-        my $s = '';
-        __DEEP{
-          C: while ((my $ch = $self-><M::ManakaiDPGParser.shiftChar>) > -1) {
-            if ($ch == 0x007B) {
-              $s .= '{'; # }
-              $nest_count++;
-            } elsif ($ch == 0x007D) {
-              if (--$nest_count == 0) {
-                last C;
-              } elsif ($nest_count < 0) {
-                $nest_count = 0;
+        my $token = $self->_shift_token;
+        if ($token->{type} eq 'LBRACE') {
+          my $nest_count = 1; # already opened
+          my $s = '';
+          __DEEP{
+            C: while ((my $ch = $self-><M::ManakaiDPGParser.shiftChar>) > -1) {
+              if ($ch == 0x007B) {
+                $s .= '{'; # }
+                $nest_count++;
+              } elsif ($ch == 0x007D) {
+                if (--$nest_count == 0) {
+                  last C;
+                } elsif ($nest_count < 0) {
+                  $nest_count = 0;
+                }
+                $s .= chr $ch;
+              } else {
+                $s .= chr $ch;
               }
-              $s .= chr $ch;
-            } else {
-              $s .= chr $ch;
             }
-          }
 
-          if (length $s) {
-            my $el = $doc-><M::Document.createElementNS>
+            if (length $s) {
+              my $el = $doc-><M::Document.createElementNS>
                         (<Q::pg:>, 'embedBlock');
-            $el-><AS::Node.textContent> ($s);
-            $parent-><M::Node.appendChild> ($el);
-          }
-        }__;
+              $el-><AS::Node.textContent> ($s);
+              $parent-><M::Node.appendChild> ($el);
+            }
+          }__;
+        } else {
+          unshift @{$self->{token}}, $token;
+        }
 
   @Method:
     @@ManakaiDOM:isForInternal: 1
@@ -1842,221 +1900,286 @@ IFClsDef:
         $docel = $doc-><AG::Document.documentElement>;
       }
     
-      ;; Rules := *(Rule / Lexmode)
+      // Rules := *(Rule / Lexmode / TokenError)
       ~* (NAME == 'rule') {
         &_Rule ($doc => $doc, $parent => $docel);
       } (NAME == 'lexmode') {
         &_Lexmode ($doc => $doc, $parent => $docel);
+      } (NAME == 'token-error') {
+        &_TokenError ($doc => $doc, $parent => $docel);
       }
     
       ~ (#EOF) { }
-    } ;; Rules
+    } // Rules
   
-  rule _Lexmode ($doc, $parent) {
-    ;; Lexmode := LEXMODE NAME *AttributeSpecification LBRACE
-    ;;            *LStatement RBRACE
+    rule _Lexmode ($doc, $parent) {
+      /*
+        Lexmode := 'lexmode' NAME *AttributeSpecification LBRACE
+                   *LStatement RBRACE
+      */
     
-    my $el;
-    lang:Perl {
-      $el = $doc-><M::Document.createElementNS> (<Q::pg:>, 'lexmode');
-      $parent-><M::Node.appendChild> ($el);
-    }
-    
-    ;; Lexmode name
-    ~ (NAME) {
-      lang:Perl ($name => $token.value) {
-        $el-><M::Element.setAttributeNS> (null, 'name', $name);
+      my $el;
+      lang:Perl {
+        $el = $doc-><M::Document.createElementNS> (<Q::pg:>, 'lexmode');
+        $parent-><M::Node.appendChild> ($el);
       }
-    }
     
-    &AttributeSpecificationList ($doc => $doc, $parent => $el);
-    
-    ~ (LBRACE) { }
-    
-    ;; LStatement := LAssignmentStatement;
-    ~* (NAME) {
-      ;; LAssignmentStatement := NAME *AttributeSpecification DEFINE
-      ;;                         1*(CharClass Occrence / NAME) SEMICOLON
-      my $lassign;
-      lang:Perl ($name => $token.value) {
-        $lassign = $doc-><M::Document.createElementNS> (<Q::pg:>, 'lAssignmentStatement');
-        $lassign-><M::Element.setAttributeNS> (null, 'name', $name);
-        $el-><M::Node.appendChild> ($lassign);
+      // Lexmode name
+      ~ (NAME) {
+        lang:Perl ($name => $token.value) {
+          $el-><M::Element.setAttributeNS> (null, 'name', $name);
+        }
       }
+    
+      &AttributeSpecificationList ($doc => $doc, $parent => $el);
       
-      &AttributeSpecificationList ($doc => $doc, $parent => $lassign);
+      ~ (LBRACE) { }
+    
+      /*
+        LStatement := LAssignmentStatement;
+        LAssignmentStatement := (NAME / VARIABLE) *AttributeSpecification
+                                DEFINE 1*LRValue SEMICOLON
+      */
+      ~* (NAME) {
+        my $lassign;
+        lang:Perl ($name => $token.value) {
+          $lassign = $doc-><M::Document.createElementNS>
+                             (<Q::pg:>, 'lAssignmentStatement');
+          $lassign-><M::Element.setAttributeNS> (null, 'name', $name);
+          $el-><M::Node.appendChild> ($lassign);
+        }
       
-      ~ (DEFINE) { }
+        &AttributeSpecificationList ($doc => $doc, $parent => $lassign);
       
+        ~ (DEFINE) { }
+
+        &LRValueList ($doc => $doc, $parent => $lassign);
+      
+        ~ (SEMICOLON) { }
+      } (VARIABLE) {
+        my $lassign;
+        lang:Perl ($name => $token.value) {
+          $lassign = $doc-><M::Document.createElementNS>
+                             (<Q::pg:>, 'lAssignmentStatement');
+          $lassign-><M::Element.setAttributeNS>
+                             (null, 'name', substr ($name, 1));
+          $lassign-><M::Element.setAttributeNS> (null, 'isVariable', '1');
+          $el-><M::Node.appendChild> ($lassign);
+        }
+      
+        &AttributeSpecificationList ($doc => $doc, $parent => $lassign);
+      
+        ~ (DEFINE) { }
+
+        &LRValueList ($doc => $doc, $parent => $lassign);
+      
+        ~ (SEMICOLON) { }
+      }
+    
+      ~ (RBRACE) { }
+    } // _Lexmode
+
+    rule LRValueList ($doc, $parent) {
+      /*
+        LRValue := CharClass [Occurence] /
+                   DOT [Occurence] /
+                   VARIABLE
+      */
+
       ~* (CLSOPEN) {
         my $cls;
         lang:Perl {
-          $cls = $doc-><M::Document.createElementNS> (<Q::pg:>, 'charClass');
+          $cls = $doc-><M::Document.createElementNS>
+                           (<Q::pg:>, 'charClass');
           $lassign-><M::Node.appendChild> ($cls);
         }
         &_CharClass ($doc => $doc, $parent => $cls);
       } (NCLSOPEN) {
         my $cls;
         lang:Perl {
-          $cls = $doc-><M::Document.createElementNS> (<Q::pg:>, 'charClass');
+          $cls = $doc-><M::Document.createElementNS>
+                           (<Q::pg:>, 'charClass');
           $cls-><M::Element.setAttributeNS> (null, 'negative', '1');
           $lassign-><M::Node.appendChild> ($cls);
         }
         &_CharClass ($doc => $doc, $parent => $cls);
-      } (NAME) {
+      } (DOT) {
+        my $cls;
+        lang:Perl {
+          $cls = $doc-><M::Document.createElementNS> (<Q::pg:>, 'anyChar');
+          $lassign-><M::Node.appendChild> ($cls);
+        }
+        &OccurenceOpt ($parent => $cls);
+      } (VARIABLE) {
+        my $lname;
         lang:Perl ($name => $token.value) {
-          my $lname = $doc-><M::Document.createElementNS> (<Q::pg:>, 'lRuleRef');
-          $lname-><M::Element.setAttributeNS> (null, 'name', $name);
+          $lname = $doc-><M::Document.createElementNS>
+                                (<Q::pg:>, 'lVariableRef');
+          $lname-><M::Element.setAttributeNS>
+                                (null, 'name', substr ($name, 1));
           $lassign-><M::Node.appendChild> ($lname);
         }
+        &OccurenceOpt ($parent => $lname);
       }
-      
-      ~ (SEMICOLON) { }
-    }
-    
-    ~ (RBRACE) { }
-  } ;; _Lexmode
+    } // LRValueList
   
-  rule _CharClass ($doc, $parent) {
-    ;; CharClass := (CLSOPEN / NCLSOPEN) 1*CharSpec CLSCLOSE
-    ;; CharSpec := STRING / CHAR [RANGE CHAR]
-    ~+ (STRING) {
-      lang:Perl ($value => $token.value) {
-        my $str = $doc-><M::Document.createElementNS> (<Q::pg:>, 'string');
-        $str-><AS::Node.textContent> (substr ($value, 1, length ($value) - 2));
-        $parent-><M::Node.appendChild> ($str);
-      }
-    } (CHAR) {
-      my $char;
-      lang:Perl ($value => $token.value) {
-        $char = $doc-><M::Document.createElementNS> (<Q::pg:>, 'charRange');
-        my $code = $value;
-        $code =~ s/^U\+/0x/;
-        $char-><M::Element.setAttributeNS> (null, 'start', hex $code);
-        $char-><M::Element.setAttributeNS> (null, 'end', hex $code);
-        $parent-><M::Node.appendChild> ($char);
-      }
-      ~? (RANGE) {
-        ~ (CHAR) {
-          lang:Perl ($value => $token.value) {
-            my $code = $value;
-            $code =~ s/^U\+/0x/;
-            $char-><M::Element.setAttributeNS> (null, 'end', hex $code);
+    rule _CharClass ($doc, $parent) {
+      /*
+        CharClass := (CLSOPEN / NCLSOPEN) 1*CharSpec CLSCLOSE
+        CharSpec := STRING / CHAR [RANGE CHAR]
+      */
+      ~+ (STRING) {
+        lang:Perl ($value => $token.value) {
+          my $str = $doc-><M::Document.createElementNS> (<Q::pg:>, 'string');
+          $str-><AS::Node.textContent>
+                  (substr ($value, 1, length ($value) - 2));
+          $parent-><M::Node.appendChild> ($str);
+        }
+      } (CHAR) {
+        my $char;
+        lang:Perl ($value => $token.value) {
+          $char = $doc-><M::Document.createElementNS> (<Q::pg:>, 'charRange');
+          my $code = $value;
+          $code =~ s/^U\+/0x/;
+          $char-><M::Element.setAttributeNS> (null, 'start', hex $code);
+          $char-><M::Element.setAttributeNS> (null, 'end', hex $code);
+          $parent-><M::Node.appendChild> ($char);
+        }
+        ~? (RANGE) {
+          ~ (CHAR) {
+            lang:Perl ($value => $token.value) {
+              my $code = $value;
+              $code =~ s/^U\+/0x/;
+              $char-><M::Element.setAttributeNS> (null, 'end', hex $code);
+            }
           }
         }
       }
-    }
     
-    ~ (CLSCLOSE) { }
+      ~ (CLSCLOSE) { }
     
-    
-    ~? (ZEROMORE) {
-      lang:Perl {
-        $parent-><M::Element.setAttributeNS> (null, 'occurence', 'zeromore');
-      }
-    } (ONEMORE) {
-      lang:Perl {
-        $parent-><M::Element.setAttributeNS> (null, 'occurence', 'onemore');
-      }
-    } (ZEROONE) {
-      lang:Perl {
-        $parent-><M::Element.setAttributeNS> (null, 'occurence', 'zeroone');
-      }
-    }
-  } ;; _CharClass
+      &OccurenceOpt ($parent => $parent);
+    } // _CharClass
   
-  
-  rule _Rule ($doc, $parent) {
-    ;; Rule := RULE NAME [ParameterDeclarationList] *AttributeSpecification
-    ;;         CodeBlock
-    
-    my $el;
-    lang:Perl {
-      $el = $doc-><M::Document.createElementNS> (<Q::pg:>, 'rule');
-      $parent-><M::Node.appendChild> ($el);
-    }
-    
-    ;; Rule name
-    ~ (NAME) {
-      lang:Perl ($name => $token.value) {
-        $el-><M::Element.setAttributeNS> (null, 'name', $name);
-      }
-    }
-    
-    ;; ParameterDeclarationList := "(" [ParameterDeclaration
-    ;;                                  *(COMMA ParameterDeclaration)] ")"
-    ;; ParameterDeclaration := VARIABLE
-    ~? (LPAREN) {
-      ~* (VARIABLE) {
-        lang:Perl ($name => $token.value) {
-          my $pel = $doc-><M::Document.createElementNS>
-                            (<Q::pg:>, 'parameterDeclaration');
-          $pel-><M::Element.setAttributeNS> (null, 'name', substr ($name, 1));
-          $el-><M::Node.appendChild> ($pel);
+    rule OccurenceOpt ($parent) {
+      /*
+        Occurence := ZEROMORE / ONEMORE / ZEROONE
+      */
+      ~? (ZEROMORE) {
+        lang:Perl {
+          $parent-><M::Element.setAttributeNS>
+                       (null, 'occurence', 'zeromore');
         }
-      } (COMMA) : separator {
-        ;;
+      } (ONEMORE) {
+        lang:Perl {
+          $parent-><M::Element.setAttributeNS>
+                       (null, 'occurence', 'onemore');
+        }
+      } (ZEROONE) {
+        lang:Perl {
+          $parent-><M::Element.setAttributeNS> 
+                       (null, 'occurence', 'zeroone');
+        }
       }
-      ~ (RPAREN) { }
-    }
-    
-    &AttributeSpecificationList ($doc => $doc, $parent => $el);
-    
-    &CodeBlock ($doc => $doc, $parent => $el);
-  } ;; _Rule
+    } // OccurenceOpt
   
-  rule AttributeSpecificationList ($doc, $parent) {
-    ;; AttributeSpecification := BooleanAttributeSpecification
-    ;; BooleanAttributeSpecification := COLON NAME Occurence
-    ~* (COLON) {
+    rule _Rule ($doc, $parent) {
+      /*
+        Rule := 'rule' NAME [ParameterDeclarationList] *AttributeSpecification
+                (CodeBlock / LANGLE 'external' RANGLE SEMICOLON)
+      */
+    
+      my $el;
+      lang:Perl {
+        $el = $doc-><M::Document.createElementNS> (<Q::pg:>, 'rule');
+        $parent-><M::Node.appendChild> ($el);
+      }
+    
+      // Rule name
       ~ (NAME) {
-        my $ael;
         lang:Perl ($name => $token.value) {
-          $ael = $doc-><M::Document.createElementNS>
-                            (<Q::pg:>, 'attributeSpecification');
-          $ael-><M::Element.setAttributeNS> (null, 'name', $name);
-          $ael-><M::Element.setAttributeNS> (null, 'value', '1');
-          $parent-><M::Node.appendChild> ($ael);
-        }
-        ~? (ZEROMORE) {
-          lang:Perl {
-            $ael-><M::Element.setAttributeNS> (null, 'occurence', 'zeromore');
-          }
-        } (ONEMORE) {
-          lang:Perl {
-            $ael-><M::Element.setAttributeNS> (null, 'occurence', 'onemore');
-          }
-        } (ZEROONE) {
-          lang:Perl {
-            $ael-><M::Element.setAttributeNS> (null, 'occurence', 'zeroone');
-          }
+          $el-><M::Element.setAttributeNS> (null, 'name', $name);
         }
       }
-    }
-  } ;; AttributeSpecificationList
+
+      &ParameterDeclarationListOpt ($doc => $doc, $parent => $el);    
+    
+      &AttributeSpecificationList ($doc => $doc, $parent => $el);
+    
+      ~ (LBRACE) {
+        &_CodeBlock ($doc => $doc, $parent => $el);
+      } (LANGLE) {
+        ~ (NAME == 'external') {
+          lang:Perl {
+            $el-><M::Element.setAttributeNS> (null, 'isExternal', '1');
+          }
+          ~ (RANGLE) { }
+          ~ (SEMICOLON) { }
+        }
+      }
+    } // _Rule
   
-  rule CodeBlock ($doc, $parent) : standalone {
-    ;; CodeBlock := LBRACE *Statement RBRACE
-    ~ (LBRACE) { }
-    
-    my $block;
-    lang:Perl {
-      $block = $doc-><M::Document.createElementNS> (<Q::pg:>, 'codeBlock');
-      $parent-><M::Node.appendChild> ($block);
-    }
-    
-    ;; Statement := MyStatement / AssignmentStatement / MatchStatement
-    ;;            / RuleRefStatement / EmbedStatement
-    
-    ~* (MATCH) {
-        ;; MatchStatement := MATCH Occurence
-        ;;                   1*(LPAREN [RNI] NAME [EQUALS STRING] RPAREN
-        ;;                      *AttributeSpecification CodeBlock)
-      my $match;
-      lang:Perl {
-        $match = $doc-><M::Document.createElementNS> (<Q::pg:>, 'matchStatement');
-        $block-><M::Node.appendChild> ($match);
+    rule AttributeSpecificationList ($doc, $parent) {
+      /*
+        AttributeSpecification := COLON NAME [Occurence] [REPLACE STRING]
+      */
+
+      ~* (COLON) {
+        // Attribute name
+        ~ (NAME) {
+          my $ael;
+          lang:Perl ($name => $token.value) {
+            $ael = $doc-><M::Document.createElementNS>
+                            (<Q::pg:>, 'attributeSpecification');
+            $ael-><M::Element.setAttributeNS> (null, 'name', $name);
+            $ael-><M::Element.setAttributeNS> (null, 'value', '1');
+            $parent-><M::Node.appendChild> ($ael);
+          }
+ 
+          &OccurenceOpt ($parent => $ael);
+
+          // String value
+          ~? (REPLACE) {
+            ~ (STRING) {
+              lang:Perl ($value => $token.value) {
+                $ael-><M::Element.setAttributeNS>
+                        (null, 'value',
+                         substr ($value, 1, length ($value) - 2));
+              }
+            }
+          }
+        }
       }
+    } // AttributeSpecificationList
+  
+    rule _CodeBlock ($doc, $parent) : standalone {
+      /*
+        CodeBlock := LBRACE *Statement RBRACE
+      */
+    
+      my $block;
+      lang:Perl {
+        $block = $doc-><M::Document.createElementNS> (<Q::pg:>, 'codeBlock');
+        $parent-><M::Node.appendChild> ($block);
+      }
+    
+      /*
+        Statement := MyStatement / AssignmentStatement / MatchStatement /
+                     RuleRefStatement / EmbedStatement
+      */
+    
+      ~* (MATCH) {
+        /*
+          MatchStatement := MATCH Occurence
+                            1*(LPAREN [RNI] NAME [EQUALS STRING] RPAREN
+                               *AttributeSpecification CodeBlock)
+        */
+        my $match;
+        lang:Perl {
+          $match = $doc-><M::Document.createElementNS>
+                           (<Q::pg:>, 'matchStatement');
+          $block-><M::Node.appendChild> ($match);
+        }
         ~? (ZEROMORE) {
           lang:Perl {
             $match-><M::Element.setAttributeNS> (null, 'occurence', 'zeromore');
@@ -2101,15 +2224,19 @@ IFClsDef:
               }
             }
 
-            ~ (RPAREN) { }
+          ~ (RPAREN) { }
           
           &AttributeSpecificationList ($doc => $doc, $parent => $match_block);
           
-          &CodeBlock ($doc => $doc, $parent => $match_block);
+          ~ (LBRACE) {
+            &_CodeBlock ($doc => $doc, $parent => $match_block);
+          }
         }
 
       } (NAME == 'my') {
-        ;; MyStatement := MY VARIABLE SEMICOLON
+        /*
+          MyStatement := MY VARIABLE SEMICOLON
+        */
         ~ (VARIABLE) {
           my $my;
           lang:Perl ($name => $token.value) {
@@ -2124,7 +2251,9 @@ IFClsDef:
         ~ (SEMICOLON) { }
 
       } (NAME) {
-        ;; EmbedStatement := NAME [ParameterSpecificationList] ExternalBlock
+        /*
+          EmbedStatement := NAME [ParameterSpecificationList] EmbedBlock
+        */
         my $embed;
         lang:Perl ($name => $token.value) {
           my ($prefix, $lname) = split /:/, $name;
@@ -2138,12 +2267,13 @@ IFClsDef:
           $block-><M::Node.appendChild> ($embed);
         }
       
-      &ParameterSpecificationListOpt ($doc => $doc, $parent => $embed);
+        &ParameterSpecificationListOpt ($doc => $doc, $parent => $embed);
       
-      &builtin:nestedBlockAsText ($doc => $doc, $parent => $embed,
-                                  $open => '{', $close => '}');
-    } (RULEREF) {
-      ;; RuleRefStatement := RULEREF [ParameterSpecificationList] SEMICOLON;
+        &EmbedBlock ($doc => $doc, $parent => $embed);
+      } (RULEREF) {
+        /*
+          RuleRefStatement := RULEREF [ParameterSpecificationList] SEMICOLON
+        */
       my $ruleref;
       lang:Perl ($name => $token.value) {
         $ruleref = $doc-><M::Document.createElementNS> (<Q::pg:>, 'ruleRefStatement');
@@ -2154,8 +2284,10 @@ IFClsDef:
       &ParameterSpecificationListOpt ($doc => $doc, $parent => $ruleref);
       
       ~ (SEMICOLON) { }
-    } (VARIABLE) {
-      ;; AssignmentStatement := Lvalue ASSIGN Rvalue;
+        } (VARIABLE) {
+          /*
+            AssignmentStatement := Lvalue ASSIGN Rvalue;
+          */
       my $assign;
       my $lvalue;
       lang:Perl ($name => $token.value) {
@@ -2186,13 +2318,23 @@ IFClsDef:
 
     }
     
-    ~ (RBRACE) { }
-  } ;; CodeBlock
+        ~ (RBRACE) { }
+      } // _CodeBlock
+
+      /*
+        EmbedBlock := '{' *((<any character> - '{' / '}') / EmbedBlock) '}'
+
+          ISSUE: How escapes ('\' <any character>) should be parsed?
+      */
+      rule EmbedBlock ($doc, $parent)
+           : perl-name => 'embed_block' <external>;
     
-    ;; Lvalue := VARIABLE *(DOT NAME)
+      // Lvalue := VARIABLE *(DOT NAME)
   
-  rule Rvalue ($doc, $parent) {
-    ;; Rvalue := STRING / VARIABLE *(DOT NAME)
+    rule Rvalue ($doc, $parent) {
+      /*
+        Rvalue := STRING / VARIABLE *(DOT NAME)
+      */
     
     ~ (STRING) {
       lang:Perl ($value => $token.value) {
@@ -2220,11 +2362,35 @@ IFClsDef:
         }
       }
     }
-  } ;; Rvalue
+      } // Rvalue
 
-  rule ParameterSpecificationListOpt ($doc, $parent) {
-    ;; ParameterSpecificationList := LPAREN [VARIABLE REPLACE Rvalue
-    ;;                                       *(COMMA Lvalue REPLACE Rvalue)] RPAREN
+      rule ParameterDeclarationListOpt ($doc, $parent) {
+        /*
+          ParameterDeclarationList := "(" [ParameterDeclaration
+                                           *(COMMA ParameterDeclaration)] ")"
+          ParameterDeclaration := VARIABLE
+        */
+        ~? (LPAREN) {
+          ~* (VARIABLE) {
+            lang:Perl ($name => $token.value) {
+              my $pel = $doc-><M::Document.createElementNS>
+                                (<Q::pg:>, 'parameterDeclaration');
+              $pel-><M::Element.setAttributeNS>
+                      (null, 'name', substr ($name, 1));
+              $parent-><M::Node.appendChild> ($pel);
+            }
+          } (COMMA) : separator {
+            //
+          }
+          ~ (RPAREN) { }
+        }
+      } // ParameterDeclarationListOpt
+
+      rule ParameterSpecificationListOpt ($doc, $parent) {
+        /*
+          ParameterSpecificationList := LPAREN [VARIABLE REPLACE Rvalue
+                                        *(COMMA Lvalue REPLACE Rvalue)] RPAREN
+        */
     ~? (LPAREN) {
       ~* (VARIABLE) {
         my $param;
@@ -2243,22 +2409,64 @@ IFClsDef:
     }
   }
 
+    rule _TokenError ($doc, $parent) {
+      /*
+        TokenError := 'token-error' NAME [ParameterDeclarationList]
+                      *AttributeSpecification CodeBlock
+      */
+
+      my $el;
+
+      ~ (NAME) {
+        lang:Perl ($name => $token.value) {
+          $el = $doc-><M::Document.createElementNS> (<Q::pg:>, 'tokenError');
+          $el-><M::Element.setAttributeNS> (null, 'name', $name);
+          $parent-><M::Node.appendChild> ($el);
+        }
+      }
+
+      &ParameterDeclarationListOpt ($doc => $doc, $parent => $el);
+
+      &AttributeSpecificationList ($doc => $doc, $parent => $el);
+
+      &_CodeBlock ($doc => $doc, $parent => $el);
+    } // _TokenError
+
 
     lexmode default : initial {
       WSP : ignore := [U+0009..U+000D U+0020]+;
       COMMENT : ignore := [';'] [';'] [^U+000A..U+000D]* [U+000A..U+000D]*;
-    
-    NAME : value := [U+0041..U+005A U+0061..U+007A '_' '-']
-                    [U+0030..U+0039 U+0041..U+005A U+0061..U+007A '_' '-' ':']*;
 
-    VARIABLE : value := ['$'] NAME;
-    RULEREF : value := ['&'] NAME;
+      /*
+        Comment : from |//| to the end of the line
+      */
+      CommentLine : ignore := ['/'] ['/'] [^U+000A..U+000D]*
+                                          [U+000A..U+000D]*;
+
+      /*
+        Comment : from |/*| to |*| |/|
+      */
+      $CommentPhrase0 := [^'/' '*'] [^'*']* ['*']+;
+      CommentPhrase : ignore := ['/'] ['*'] [^'*']* ['*']+
+                                $CommentPhrase0* ['/'];
+
+      /*
+        Name
+      */    
+      $name := [U+0041..U+005A U+0061..U+007A '_' '-']
+               [U+0030..U+0039 U+0041..U+005A U+0061..U+007A '_' '-' ':']*;
+      NAME : value := $name;
+
+      VARIABLE : value := ['$'] $name;
+      RULEREF : value := ['&'] $name;
     
-    CHAR : value := ['U' 'u'] ['+']
-                    [U+0030..U+0039 U+0041..U+0046 U+0061..U+0066]
-                    [U+0030..U+0039 U+0041..U+0046 U+0061..U+0066]
-                    [U+0030..U+0039 U+0041..U+0046 U+0061..U+0066]
-                    [U+0030..U+0039 U+0041..U+0046 U+0061..U+0066]+;
+
+      /*
+        Character code point
+      */
+      $hexdigit := [U+0030..U+0039 U+0041..U+0046 U+0061..U+0066];
+      CHAR : value := ['U' 'u'] ['+']
+                      $hexdigit $hexdigit $hexdigit $hexdigit+;
     
     STRING : value := [U+0027] [^U+0027 U+005C]* [U+0027];
     
@@ -2282,12 +2490,19 @@ IFClsDef:
     DOT := ['.'];
     RANGE := ['.'] ['.'];
 
-      ;; Reserved name indicator
+      /*
+        Reserved name indicator
+      */
       RNI := ['#'];
 
-      ;; Attribute value equals
+      /*
+        Attribute value equals
+      */
       EQUALS := ['='] ['='];
-    } ;; lexmode
+
+      LANGLE := ['<'];
+      RANGLE := ['>'];
+    } // lexmode
 ##DPGParser
 
 ElementTypeBinding:

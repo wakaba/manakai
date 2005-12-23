@@ -1,5 +1,16 @@
 2005-12-23  Wakaba  <wakaba@suika.fam.cx>
 
+	* DPG.dis: External rule reference supported.  Variables
+	in |lAssignmentStatement| are supported; support
+	for |lRuleRef|s is removed.  Character class |anyChar| (|.|)
+	is supported (but might be buggy in NFA -> DFA convertion).
+	|perl-name| attribute supported.  Comment line introducing
+	sequence is changed from |;;| to |//|.  Comment phrase (C++
+	style comment) is introduced.  New |token-error| block
+	is introduced (but not implemented yet).
+
+2005-12-23  Wakaba  <wakaba@suika.fam.cx>
+
 	* DPG.dis: Closures are modified not to "close" lexical
 	variable but to receive them as arguments.  Frees recursive
 	code references explicitly so that they don't lead a

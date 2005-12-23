@@ -40,7 +40,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/12/21 14:05:43 $
+      $Date: 2005/12/23 10:56:04 $
     @@ContentType:
       dis:Date.RCS
 
@@ -3643,128 +3643,115 @@ IFCls3Def:
         goto &$self;
 ##DOMErrorHandler
 
-IFDef:
-  @Name:  DOMLocator
-  @Level[list]:  3
-  @SpecLevel:3
-  @For:
-    ManakaiDOM:DOM3
-  @For:
-    =ManakaiDOM:ManakaiDOM
-  @Description:
-    @@lang:en
-    @@@: Describes a location.
+IFCls3Def:
+  @IFQName: DOMLocator
+  @ClsQName: ManakaiDOMLocator
+
+  @enDesc:
+    The <IF::DOMLocator> interface describes a location (e.g.
+    where an error occurred).
+
   @Attr:
-     @@Name:  lineNumber
-     @@Description:
-        @@@lang:en
-        @@@@: The line number to which this locator is pointing.
-     @@Get:
-        @@@Type:  
-          DOMMain:long::ManakaiDOM:all
-        @@@Description:
-          @@@@lang:en
-          @@@@@: The line number.
-        @@@InCase:
-          @@@@Value:-1
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@: There is no column number available.
-          @@@@ImplNote:
-            @@@@@lang:en
-            @@@@@@:
+    @@Name: lineNumber
+    @@enDesc:
+      The line number the locator is pointing to.
+    @@Type: idl|long||ManakaiDOM|all
+    @@Get:
+      @@@InCase:
+        @@@@intValue: -1
+        @@@@enDesc:
+          There is no line number available.
+      @@@enImplNote:
               <QUOTE::Column> in the DOM 3 Specification should be 
               <QUOTE::line>?  Or is this description correct?
+      @@@enImplNote:
+        @@@@ddid: origin
+        @@@@@: Zero-origin or one-origin?
+      @@@PerlDef:
+        $r = defined $self->{line_number} ? $self->{line_number} : -1;
+
   @Attr:
-     @@Name:  columnNumber
-     @@Description:
-       @@@lang:en
-       @@@@: The column number to which this locator is pointing.
-     @@Get:
-        @@@Type:  
-          DOMMain:long::ManakaiDOM:all
-        @@@Description:
-          @@@@lang:en
-          @@@@@: The column number.
-        @@@InCase:
-          @@@@Value:-1
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              There is no column number available.
+    @@Name: columnNumber
+    @@enDesc:
+      The column number the locator is pointing to.
+    @@Type: idl|long||ManakaiDOM|all
+    @@Get:
+      @@@InCase:
+        @@@@intValue: -1
+        @@@@enDesc:
+          There is no column number available.
+      @@@enImplNote:
+        @@@@ddid: origin
+        @@@@@: Zero-origin or one-origin?
+      @@@PerlDef:
+        $r = defined $self->{column_number} ? $self->{column_number} : -1;
+
   @Attr:
-     @@Name:  byteOffset
-     @@Description:
-       @@@lang:en
-       @@@@:
-         The byte offset into the input source to which this locator 
-         is pointing.
-     @@Get:
-        @@@Type:  
-          DOMMain:long::ManakaiDOM:all
-        @@@Description:
-          @@@@lang:en
-          @@@@@: The byte offset.
-        @@@InCase:
-          @@@@Value: -1
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@: There is no byte offset available.
+    @@Name: byteOffset
+    @@enDesc:
+      The byte ofset into the input source the locator is pointin to.
+    @@Type: idl|long||ManakaiDOM|all
+    @@Get:
+      @@@InCase:
+        @@@@intValue: -1
+        @@@@enDesc:
+          There is no byte offset available.
+      @@@PerlDef:
+        $r = defined $self->{byte_offset} ? $self->{byte_offset} : -1;
+
   @Attr:
-     @@Name:  utf16Offset
-     @@plMName: utf16_offset
-     @@Description:
-       @@@lang:en
-       @@@@:
-         The UTF-16 offset into the input source to which 
-         this locator is pointing.
-     @@Get:
-        @@@Type:  
-          DOMMain:long::ManakaiDOM:all
-        @@@Description:
-          @@@@lang:en
-          @@@@@: The UTF-16 offset.
-        @@@InCase:
-          @@@@Value:
-            @@@@@is-null:1
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@: There is no UTF-16 offset available.
+    @@Name: utf16_offset
+    @@plMName: utf16_offset
+    @@enDesc:
+      The UTF-16 offset into the input source the locator is pointing
+      to.
+    @@enImplNote:
+      The manakai binding has decided that the method name is 
+      <Perl::utf16_offset> rather than <Perl::utf_16_offset>,
+      since the later is ugly and there is <Perl::utf8> pragma in Perl.
+    @@Type: idl|long||ManakaiDOM|all
+    @@Get:
+      @@@InCase;
+        @@@@intValue: -1
+        @@@@enDesc:
+          There is no UTF-16 byte offset available.
+      @@@PerlDef:
+        $r = defined $self->{utf16_offset} ? $self->{utf16_offset} : -1;
+
   @Attr:
-     @@Name:  relatedNode
-     @@Description:
-       @@@lang:en
-       @@@@: The node to which this locator is pointing.
-     @@Get:
-        @@@Type:  Node
-        @@@Description:
-          @@@@lang:en
-          @@@@@: The node pointed.
-        @@@InCase:
-          @@@@Value:
-            @@@@@is-null:1
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@: There is no node available.
+    @@Name: relatedNode
+    @@enDesc:
+      The node the locator is pointing to.
+    @@Type: Node
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          The is no node available.
+      @@@PerlDef:
+        $r = $self->{related_node};
+
   @Attr:
-     @@Name:  uri
-     @@Description:
-       @@@lang:en
-       @@@@: The URI to which this locator is pointing.
-     @@Get:
-        @@@Type:
-          DOMMain:DOMString
-        @@@actualType:
-          ManakaiDOM:ManakaiDOMURI
-        @@@Description:
-          @@@@lang:en
-          @@@@@: The URI.
-        @@@InCase:
-          @@@@Value:
-            @@@@@is-null:1
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@: There is no URI is available.
+    @@Name: uri
+    @@enDesc:
+      The URI the locator is pointing to.
+    @@Type: DOMMain|DOMString
+    @@dis:actualType: ManakaiDOM|ManakaiDOMURI
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          No URI is available.
+      @@@enImplNote:
+        Is fragment identifier allowed?
+      @@@PerlDef:
+        $r = $self->{uri};
+
+  @ResourceDef:
+    @@rdf:type: DISLang|InputProcessor
+    @@rdf:type: DISLang|OutputProcessor
+    @@PerlDefC:
+      $INPUT = bless $INPUT, <ClassName::ManakaiDOMLocator>
+        if ref $INPUT eq 'HASH';
+##DOMLocator
 
 ElementTypeBinding:
   @Name: plMName
