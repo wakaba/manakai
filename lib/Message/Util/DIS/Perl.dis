@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/12/21 14:05:44 $
+      $Date: 2005/12/24 07:27:16 $
     @@ContentType:
       dis:Date.RCS
   
@@ -1852,7 +1852,9 @@ IFClsDef:
               $processed_class{$cls-><AG::DIS|DISAnyResource.uri>}
                 = true;
               if ($cls-><M::DIS|DISResource.isTypeURI>
-                              (<Q::ManakaiDOM:Class>)) {
+                              (<Q::DISLang:Class>) and
+                  not $cls-><M::DIS|DISResource.isTypeURI>
+                              (<Q::Muf2003:RuleDefClass>)) {
                 ## -- Subroutines and variables
                 my $pack = $cls-><AG::DISResourcePerl.plCodeFragment>;
                  $r-><M::DIS|PLFile.appendPackage> ($pack);
@@ -2498,6 +2500,17 @@ IFClsDef:
               }
             }
 
+          ## -- Class
+          } elsif ($self-><M::DIS|DISResource.isTypeURI>
+                                       (<Q::DISLang:AnyClass>)) {
+            $r = $self-><M::DIS|DISResourceProp.getPropertyText>
+                                (<Q::DISPerl:name>,
+                                 $self-><AG::DIS|DISAnyResource.localName>);
+            if (defined $r) {
+              $r = <ClassM::DIS|ManakaiDISImplementation
+                           .camelCaseToUnderscoreName> ($r);
+            }
+
           } else {  ## Other types
             $r = null;
           }
@@ -2523,12 +2536,7 @@ IFClsDef:
           my $nm = $self-><M::DIS|DISResourceProp.getPropertyText>
                                      (<Q::DISPerl:methodName>);
           if (defined $nm) {
-            if ($self-><M::DIS|DISResourceProp.getPropertyBoolean>
-                                (<Q::ManakaiDOM:isForInternal>)) {
-              push @$r, '_' . $nm;
-            } else {
-              push @$r, $nm;
-            }
+            push @$r, $nm;
             ## NOTE: No reserved name checks enforced in this case
           } elsif (defined (my $ln = $self-><AG::DIS|DISAnyResource
                                                                .localName>)) {
@@ -3122,6 +3130,8 @@ IFClsDef:
             my $plimpl = $self-><AG::DISAnyResourcePerl.plImplementation>;
             my $data_type = $get-><AG::DIS|DISResource
                                       .disActualDataTypeResource>;
+            my $data_type_value = $get-><AG::DIS|DISResource
+                                     .disActualDataTypeValue>;
             my $get_code = $plimpl-><M::DIS|MPLImpl.createPerlBlockContainer>;
             $get_code-><M::DIS|PLBlockCon.appendStatement> (q<my ($self) = @_>);
             my $code = $get-><AG::DISResourcePerl.plCodeFragment>;
@@ -3211,7 +3221,29 @@ IFClsDef:
               $get_code-><M::DIS|PLBlockCon.appendCodeFragment> ($code);
 
               ## Return value
-              $get_code-><M::DIS|PLBlockCon.appendStatement> (q<$r>);
+              my $rvar = $plimpl-><M::DIS|MPLImpl.createPerlVariable>
+                                               ('$', null, 'r');
+
+              ## Output processor
+              my $nin = $data_type_value-><M::dv|DVValue.getProperty>
+                                        (<Q::ManakaiDOM:noInputNormalize>);
+              my $op = $data_type-><M::DIS|DISResource.getChildResourceByType>
+                                        (<Q::DISLang:OutputProcessor>)
+                unless $nin and $nin-><AG::dv|DVValue.value>;
+              if ($op) {
+                my $opcode = $op-><AG::dp|DISResourcePerl.plCodeFragment>;
+                unless ($opcode) {
+                 __UNDEEP{__EXCEPTION{DIS|PERL_CODE_NOT_DEFINED_ERR::
+                    DIS:uri => {$op-><AG::DIS|DISAnyResource.uri>},
+                  }__}__;
+                }
+                $opcode = $opcode->clone;
+                $opcode-><M::DIS|MPLCodeFragment.replaceVariable>
+                                         ('$INPUT' => $rvar->clone);
+                $get_code-><M::DIS|MPLSS.appendCodeFragment> ($opcode);
+              }
+
+              $get_code-><M::DIS|PLBlockCon.appendStatement> ($rvar);
 
               $get->{<H::DIS:plDefined>} = true;
             } else {  ## Getter code not defined
@@ -3539,7 +3571,8 @@ IFClsDef:
             }
 
             ## - Error Descriptions
-            if ($self-><M::DIS|DISResource.isTypeURI> (<Q::Err:MUErrorClass>)) {
+            if ($self-><M::DIS|DISResource.isTypeURI>
+                 (<Q::Err:MUErrorClass>)) {
 
               ## DOM-style exception definitions
               if ($self-><M::DIS|DISResource.isTypeURI>
@@ -3575,13 +3608,42 @@ IFClsDef:
                 $r-><M::DIS|PLPack.setSubNode> ($err_def);
               } # dx:Class
 
-              ## Muf2003 formatting rule definitions for errors
-              for (@{$self-><M::DIS|DISResource.getChildResourceListByType>
-                               (<Q::Muf2003:RuleDefClass>)}) {
-                ## TODO:
+              my $tf = $self-><M::DIS|DISResourceProp.getPropertyResource>
+                                (<Q::ecore:textFormatter>);
+              if ($tf) {
+                my $fpc = $plimpl-><M::DIS|MPLImpl.createPerlSub>
+                                     ('_FORMATTER_PACKAGE_');
+                $fpc-><M::DIS|PLAnyCon.appendStringLiteral>
+                                     ($tf-><AG::dp|DISResourcePerl
+                                                .plFullyQualifiedName>);
+                $r-><M::DIS|PLPack.setSubNode> ($fpc);
               }
-            }
+            } # Err:MUErrorClass
 
+              my %rule;
+              ## Muf2003 formatting rule definitions for errors
+              for my $rc (@{$self-><M::DIS|DISResource
+                                      .getChildResourceListByType>
+                               (<Q::Muf2003:RuleDefClass>)}) {
+                my $rule_name = $rc-><AG::dp|DISResourcePerl.plName>;
+                my $rcls = $rule{$rule_name} = {};
+                for my $rm (@{$rc-><M::DIS|DISResource
+                                      .getChildResourceListByType>
+                               (<Q::DISLang|Method>)}) {
+                  my $c = $rm-><AG::dp|DISResourcePerl.plCodeFragment>;
+                  $rcls->{$rm-><AG::dp|DISResourcePerl.plName>} = $c;
+                  $c-><M::DIS|MPLSub.clearPerlName>;
+                }
+              }
+              if (%rule) {
+                my $rule_def = $plimpl-><M::DIS|MPLImpl.createPerlSub>
+                                          ('___rule_def');
+                $rule_def-><M::DIS|PLBlockCon.appendStatement>
+                         -><M::DIS|PLAnyCon.appendNewPCLiteral> (\%rule);
+                $r-><M::DIS|PLPack.setSubNode> ($rule_def);
+              }
+
+ 
             ## - Lexer and Parser
             my $dpgparser;
             for my $val (@{$self-><M::DIS|DISResourceProp.getPropertyValueList>
@@ -3835,6 +3897,7 @@ IFClsDef:
           } elsif ($self-><M::DIS|DISAnyResource.isTypeURI>
                                      (<Q::DOMCore:DOMErrorType>)) {
             my $plimpl = $self-><AG::DISAnyResourcePerl.plImplementation>;
+            my $db = $self-><AG::DIS|DISAnyResource.database>;
             my $sev = $self-><M::DIS|DISResourceProp.getPropertyResource>
                                 (<Q::DOMCore:severity>);
             if (not $sev or not $sev-><M::DIS|DISAnyResource.isTypeURI>
@@ -3843,6 +3906,13 @@ IFClsDef:
                 DIS:uri => {($sev or $self)-><AG::DIS|DISAnyResource.uri>},
                 DIS:expectedType => {<Q::DISLang:Const>},
               }__}__;
+            }
+            my $tf = $self-><M::DIS|DISResourceProp.getPropertyResource>
+                                (<Q::ecore:textFormatter>);
+            unless ($tf) {
+              $tf = $db-><M::DIS|DISDatabase.getResource>
+                           (<Q::ecore|MUErrorFormatter>,
+                            for_arg => <Q::ManakaiDOM|Perl>);
             }
             $r = $plimpl-><M::DIS|MPLImpl.createPerlStatement>
                    ('$Message::DOM::DOMCore::ManakaiDOMError::Def{'.
@@ -3858,6 +3928,8 @@ IFClsDef:
                                                   .plMufDescriptionText>,
                       <H::DOMCore:severity> => 0 + $sev-><AG::DISResourcePerl
                                                         .plCodeFragment>,
+                      <H::ecore:textFormatter> => $tf-><AG::dp|DISResourcePerl
+                                                      .plFullyQualifiedName>,
                     }));
 
           ## -- Unsupported types

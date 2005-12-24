@@ -25,7 +25,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2005/12/18 13:21:47 $
+      $Date: 2005/12/24 07:27:13 $
     @@ContentType:
       dis:Date.RCS
   
@@ -1876,6 +1876,16 @@ IFClsETDef:
         }__;
 
   @Method:
+    @@Name: clearPerlName
+    @@enDesc:
+      Removes all Perl name associated to the <IF::PerlSub>.
+    @@Return:
+      @@@PerlDef:
+        __DEEP{
+          $self-><M::Element.removeAttributeNS> (<Q::pc:>, 'localName');
+        }__;
+
+  @Method:
     @@Name: addPerlOperator
     @@enDesc:
       Adds an operator overloaded by the method.
@@ -1992,7 +2002,7 @@ IFClsETDef:
           __DEEP{
             $r = 0 + $self-><AG::Node.lastChild>;
           }__;
-##PCSub
+##PerlSub
 
 ElementTypeBinding:
   @Name: Test
@@ -4262,6 +4272,14 @@ IFClsDef:
     @@Name: createPCLiteral
     @@enDesc:
       Creates a literal object.
+
+        {NOTE:: If a member of <P::value> is a <IF::PerlCode> object,
+                then it is appended to the tree as is, except when
+                the object comes from different document than the
+                document, in which case the object is being adopted
+                to the document by <M::Document.adoptNode> method.
+                If that method fails, then the result is undefined.
+        }
     @@Param:
       @@@Name: value
       @@@Type: DISPerl|Any
@@ -4293,7 +4311,7 @@ IFClsDef:
             for my $v (ref $value eq 'HASH' ? %$value : @$value) {
               my $vo;
               if (UNIVERSAL::isa ($v, <IFName::PerlCode>)) {
-                $vo = $v;
+                $vo = $self-><M::Document.adoptNode> ($v);
               } else {
                 $vo = $self-><M::PCDocument.createPCLiteral> ($v);
               }

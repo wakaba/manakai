@@ -40,7 +40,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/12/23 10:56:04 $
+      $Date: 2005/12/24 07:27:12 $
     @@ContentType:
       dis:Date.RCS
 
@@ -3426,6 +3426,13 @@ IFCls3Def:
       @@@Type: DISPerl|HASH
       @@@PerlDef:
         $r = \%Message::DOM::DOMCore::ManakaiDOMError::Def;
+
+  @IntAttr:
+    @@DISPerl:methodName: _FORMATTER_PACKAGE_
+    @@Get:
+      @@@Type: DOMMain|DOMString
+      @@@PerlDef:
+        $r = $self->{<H::ecore|def>}->{<H::ecore|textFormatter>};
 ##DOMError
 
 ResourceDef:
@@ -3714,9 +3721,28 @@ IFCls3Def:
       @@@InCase;
         @@@@intValue: -1
         @@@@enDesc:
-          There is no UTF-16 byte offset available.
+          There is no UTF-16 offset available.
       @@@PerlDef:
         $r = defined $self->{utf16_offset} ? $self->{utf16_offset} : -1;
+
+  @Attr:
+    @@Name: utf32Offset
+    @@plMName: utf32_offset
+    @@enDesc:
+      The UTF-32 offset into the input source the locator is pointing
+      to.
+
+        {NOTE:: This attribute is a manakai extension.
+        }
+    @@For: ManakaiDOM|ManakaiDOM
+    @@Type: idl|long||ManakaiDOM|all
+    @@Get:
+      @@@InCase;
+        @@@@intValue: -1
+        @@@@enDesc:
+          There is no UTF-32 offset available.
+      @@@PerlDef:
+        $r = defined $self->{utf32_offset} ? $self->{utf32_offset} : -1;
 
   @Attr:
     @@Name: relatedNode

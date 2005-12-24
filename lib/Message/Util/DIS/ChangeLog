@@ -1,3 +1,19 @@
+2005-12-24  Wakaba  <wakaba@suika.fam.cx>
+
+	* Perl.dis (DISResourcePerl.plName): Implemented
+	for |DISLang:AnyClass| resources.
+	(DISResourcePerl.getPerlNameList): Don't prefix by |UNDERLINE|
+	if the name comes from |DISPerl:methodName| attribute
+	in case the method is for internal use.
+	(DISResourcePerl.plCodeFragment): Generates return
+	value convertion code from |DISLang:OutputProcessor| for
+	attribute getter.  |ecore:textFormatter| attribute is
+	implemented.  |Muf2003:RuleDefClass| is implemented.
+	
+	* DPG.dis (token-error): Packs error location 
+	information into the error object.
+	(DPGExceptionFormatter): New interface.
+
 2005-12-23  Wakaba  <wakaba@suika.fam.cx>
 
 	* DPG.dis: |token-error| implemented.  Embed statements

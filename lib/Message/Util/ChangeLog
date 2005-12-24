@@ -1,3 +1,12 @@
+2005-12-24  Wakaba  <wakaba@suika.fam.cx>
+
+	* PerlCode.dis (PerlSub.clearPerlName): New method.
+	(PCDocument.createPCLiteral): Adopts |PerlCode| node
+	if it is a foreign one.
+
+	* DIS.dis (underscoreNameToCamelCaseName): A |HYPHEN-MINUS|
+	character is replaced to |UNDERLINE| character.
+
 2005-12-21  Wakaba  <wakaba@suika.fam.cx>
 
 	* Makefile: |dpg.dae| rule merged into |discore.dae| rule.

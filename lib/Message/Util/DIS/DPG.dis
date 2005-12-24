@@ -15,7 +15,7 @@ Module:
   @License: license|Perl+MPL
 
   @Date:
-    $Date: 2005/12/23 14:20:22 $
+    $Date: 2005/12/24 07:27:14 $
   
   @Require:
     @@Module:
@@ -2565,9 +2565,14 @@ IFClsDef:
     } // _TokenError
 
     token-error default : default {
-      lang:Perl ($token_name => $token.type) {
+      lang:Perl {
+        my $location = {
+          utf32_offset => pos ($self->{source}),
+        };
         my $continue = __DOMCore:ERROR{pg|bad-token-error::
-          pg|token-type => {$token_name},
+          pg|error-token => {$token},
+          DOMCore|location => {$location},
+          pg|source-text => {\($self->{source})},
         }__;
         unless ($continue) {
           __EXCEPTION{pg|PARSE_ERR::
@@ -2711,6 +2716,7 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type: DOMCore|DOMErrorType
     @@For: ManakaiDOM|DOM3
+    @@ecore:textFormatter: ManakaiDPGExceptionFormatter
 
 ErrDef:
   @QName: pg|bad-token-error
@@ -2719,12 +2725,19 @@ ErrDef:
     allowed there.
   @DOMCore:severity: DOMCore|SEVERITY_ERROR
   @enMufDef:
-    Token "%p (name => {<Q::pg|token-type>});" is not allowed
+    Token |%dpg-error-token-type;|%dpg-error-token-value
+    (prefix => { (|}, suffix => {|)}); is not 
+    allowed %dpg-error-lines (prefix => {(|}, suffix => {|)});
 
 PropDef:
-  @QName: pg|token-type
+  @QName: pg|error-token
   @enDesc:
-    The type of the token occurred in the source.
+    The token where the parser found an error.
+
+PropDef:
+  @QName: pg|source-text
+  @enDesc:
+    A reference to the original source text, if available.
 
 ElementTypeBinding:
   @Name:enMufDef
@@ -2777,6 +2790,8 @@ ResourceDef:
   @IFQName: DPGException
   @ClsQName: ManakaiDPGException
 
+  @ecore:textFormatter: ManakaiDPGExceptionFormatter
+
   @enDesc:
     A <IF::DPGParser> might throw a <IF::DPGException> if the processing is
     stopped.  The processing can be stopped due to a <IF::DOMCore|DOMError>
@@ -2814,3 +2829,108 @@ ResourceDef:
         An attempt was made to load a DPG document and
         the processing has been stopped.
 ##DPGException
+
+IFClsDef:
+  @IFQName: DPGExceptionFormatter
+  @ClsQName: ManakaiDPGExceptionFormatter
+
+  @ClsISA: ecore|MUErrorFormatter||ManakaiDOM|Perl
+
+  @RuleDef:
+    @@Name: dpg-error-token-type
+    @@enDesc:
+      The type of the token the parser is encountered.
+
+    @@Method:
+      @@@Name: after
+      @@@Param:
+        @@@@Name: name
+        @@@@Type: DOMString
+        @@@@enDesc: The name of the method.
+      @@@Param:
+        @@@@Name: p
+        @@@@Type: DISPerl|HASH
+        @@@@enDesc: The set of the parameters to the method.
+      @@@Param:
+        @@@@Name: o
+        @@@@Type: DISPerl|HASH
+        @@@@enDesc: The option value.
+      @@@Return:
+        @@@@PerlDef:
+          $p->{-result} = $o->{<H::pg|error-token>}->{type}
+            if defined $o->{<H::pg|error-token>}->{type};
+
+  @RuleDef:
+    @@Name: dpg-error-token-value
+    @@enDesc:
+      The value of the token the parser is encountered, if any.
+
+    @@Method:
+      @@@Name: after
+      @@@Param:
+        @@@@Name: name
+        @@@@Type: DOMString
+        @@@@enDesc: The name of the method.
+      @@@Param:
+        @@@@Name: p
+        @@@@Type: DISPerl|HASH
+        @@@@enDesc: The set of the parameters to the method.
+      @@@Param:
+        @@@@Name: o
+        @@@@Type: DISPerl|HASH
+        @@@@enDesc: The option value.
+      @@@Return:
+        @@@@PerlDef:
+          $p->{-result} = $o->{<H::pg|error-token>}->{value}
+            if defined $o->{<H::pg|error-token>}->{value};
+
+  @RuleDef:
+    @@Name: dpg-error-lines
+    @@enDesc:
+      A copy of fragment of the source text that contains the line
+      where the error occurred, if available.
+    
+    @@Method:
+      @@@Name: after
+      @@@Param:
+        @@@@Name: name
+        @@@@Type: DOMString
+        @@@@enDesc: The name of the method.
+      @@@Param:
+        @@@@Name: p
+        @@@@Type: DISPerl|HASH
+        @@@@enDesc: The set of the parameters to the method.
+      @@@Param:
+        @@@@Name: o
+        @@@@Type: DISPerl|HASH
+        @@@@enDesc: The option value.
+      @@@Return:
+        @@@@PerlDef:
+          my $pos = $o-><AG::DOMCore|DOMError.location>
+                      -><AG::DOMCore|DOMLocator.utf32Offset>;
+          if ($pos > -1) {
+            my $src = $o->{<H::pg|source-text>};
+            my $start = $pos;
+            $start = rindex ($$src, "\x0A", $start - 1) for 0..2;
+            $start++;
+            my $end = $pos;
+            $end = index ($$src, "\x0A", $end + 1) for 0..2;
+            $end = length $$src if $end < 0;
+            $p->{-result} = substr $$src, $start, $end - $start;
+          }
+##DPGExceptionFormatter
+
+ElementTypeBinding:
+  @Name: RuleDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@rdf:type: Muf2003|RuleDefClass
+
+ElementTypeBinding:
+  @Name: RuleParam
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: Muf2003|RuleParameter
