@@ -10,7 +10,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2005/12/28 03:50:17 $
+    $Date: 2005/12/28 11:10:56 $
 
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
@@ -319,7 +319,7 @@ ClsDef:
       ?lexmode 'DocumentProlog';
       
       // *Misc
-      ~* (COMO) {
+      ~* (CDO) {
         &_CommentDeclaration_ ($doc => $doc, $parent => $doc);
 
         ~ (MDC) {
@@ -349,7 +349,7 @@ ClsDef:
       ?lexmode 'DocumentMisc';
       
       // *Misc
-      ~* (COMO) {
+      ~* (CDO) {
         &_CommentDeclaration_ ($doc => $doc, $parent => $doc);
 
         ~ (MDC) {
@@ -383,7 +383,7 @@ ClsDef:
       }
       
       // *Misc
-      ~* (COMO) {
+      ~* (CDO) {
         &_CommentDeclaration_ ($doc => $doc, $parent => $doc);
 
         ~ (MDC) {
@@ -529,12 +529,6 @@ ClsDef:
         } else {
           lang:Perl {
             $tdata = '';
-          }
-        }
-        
-        ~? (QUESTION) {
-          lang:Perl ($data => $token.value) {
-            $tdata .= $data;
           }
         }
         
@@ -971,19 +965,13 @@ ClsDef:
         
       my $cdata;
         
-      ~? (CData1) {
+      ~? (CData) {
         lang:Perl ($data => $token.value) {
           $cdata = $data;
         }
       } else {
         lang:Perl {
           $cdata = '';
-        }
-      }
-      
-      ~? (CData2) {
-        lang:Perl ($data => $token.value) {
-          $cdata .= $data;
         }
       }
       
@@ -1460,11 +1448,7 @@ ClsDef:
       /*
         Processing instruction target data
       */
-      $data0 := ['?']+ [^'>' '?'];
-      $data1 := $data0? [^ '?'];
-      DATA : value := $data1+;
-      
-      QUESTION : value := ['?']+;
+      ?default-token DATA : value;
     } // PIData
     
     /*
@@ -1473,11 +1457,6 @@ ClsDef:
     lexmode ElementContent
       : standalone
     {
-      /*
-        Character data and/or |MSE|
-      */
-      CharData : value := [^'<' '&']+;
-      
       /*
         Start tag open
       */
@@ -1518,6 +1497,19 @@ ClsDef:
         Processing instruction open
       */
       PIO := ['<'] ['?'];
+
+      /*
+        Markup section end
+      */
+      MSE := [']'] [']'] ['>'];
+
+      /*
+        Character data
+      */
+      /*
+        Character data and/or |MSE|
+      */
+      ?default-token CharData : value;
     } // ElementContent
     
     /*
@@ -1533,15 +1525,8 @@ ClsDef:
       
       /*
         Character data
-        
-        [^']']+
-        [']'] [^']']+;
-        [']'] [']']+ [^']' '>']+
       */
-      $cd0 := [']'] [']']+ [^']' '>']+;
-      $cd1 := $cd0* [']']? [^']']+;
-      CData1 : value := $cd1+;
-      CData2 : value := $cd0+;
+      ?default-token CData : value;
     } // CDATASectionContent
     
     lexmode EntityReference

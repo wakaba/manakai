@@ -15,7 +15,7 @@ Module:
   @License: license|Perl+MPL
 
   @Date:
-    $Date: 2005/12/28 03:50:18 $
+    $Date: 2005/12/28 11:10:56 $
   
   @Require:
     @@Module:
@@ -789,17 +789,26 @@ IFClsETDef:
             my ($dfa, $parent, $state_name, $factory, %opt) = @_;
             $ancestor_state{$state_name} = 1;
         
+            if ($opt{outermost} and defined $opt{default_token_name}) {
+              $parent-><M::pc|PerlCodeStatements.appendStatement>
+                     -><M::pc|PerlCodeUnits.appendNewPCVariable>
+                         ('@', null, 'dch')
+                     -><AS::pc|PerlVariable.variableScope> ('my');
+            }
+
         my $state_block = $parent->append_new_pc_block;
         my $estate_name = $escape_state_name->($state_name);
         $state_block->label ('S'.$estate_name);
         my $state_select;
         
-        if ($opt{outermost}) {
-          $state_block->append_statement
-                      ->append_new_pc_variable ('@', undef, 'ch')
-                      ->variable_scope ('my');
-        }
-        
+            if ($opt{outermost}) {
+              $state_block
+                 -><M::pc|PerlCodeStatements.appendStatement>
+                 -><M::pc|PerlCodeUnits.appendNewPCVariable>
+                     ('@', null, 'ch')
+                 -><AS::pc|PerlVariable.variableScope> ('my');
+            }
+
         if (@{$dfa->{$state_name}->{next_state}}) {
           my $spush = $state_block->append_statement;
           for ($spush->append_new_pc_function_call (undef, 'push')
@@ -856,8 +865,11 @@ IFClsETDef:
                          ->append_new_pc_variable
                              ('', undef, 'S'.$escape_state_name->($next_state_name));
             } else {
-              $state_to_code->($dfa, $when_block, $next_state_name, $factory,
-                               outermost => 0);
+                      __DEEP{
+                        $state_to_code
+                          ->($dfa, $when_block, $next_state_name, $factory,
+                             %opt, outermost => 0);
+                      }__;
             }
           } # for next_state
         }
@@ -926,25 +938,118 @@ IFClsETDef:
                           }
                 }
               }
-              for ($accept_code_parent->append_new_pc_while) {
-                $_->condition->append_new_pc_variable ('@', undef, 'ch');
-                for ($_->block->append_statement
-                              ->append_new_pc_expression ('.=')) {
-                  $_->append_new_pc_variable ('$', undef, 'token_val');
-                  $_->append_new_pc_function_call (undef, 'chr')
-                    ->append_new_pc_function_call (undef, 'shift')
-                    ->append_new_pc_variable ('@', undef, 'ch');
-                }
-              }
+                      for ($accept_code_parent
+                             -><M::pc|PerlCodeStatements.appendNewPCWhile>) {
+                        $_-><AG::pc|PCWhile.condition>
+                          -><M::pc|PerlCodeUnits.appendNewPCVariable>
+                              ('@', null, 'ch');
+                        for ($_-><AG::pc|PCWhile.block>
+                               -><M::pc|PerlCodeStatements.appendStatement>
+                               -><M::pc|PerlCodeUnits.appendNewPCExpression>
+                                   ('.=')) {
+                          $_-><M::pc|PerlCodeUnits.appendNewPCVariable>
+                                ('$', null, 'token_val');
+                          $_-><M::pc|PerlCodeUnits.appendNewPCFunctionCall>
+                                (null, 'chr')
+                            -><M::pc|PerlCodeUnits.appendNewPCFunctionCall>
+                                (null, 'shift')
+                            -><M::pc|PerlCodeUnits.appendNewPCVariable>
+                                ('@', null, 'ch');
+                        }
+                      }
               $value{value} = $accept_code_parent->append_new_pc_variable
                                                      ('$', undef, 'token_val');
-            }
-            $accept_code_parent->append_statement
-                       ->append_new_pc_function_call (undef, 'return')
-                       ->append_new_pc_literal ({
-                           type => $dfa->{$state_name}->{accept},
-                           %value,
-                         });
+                    }
+                    if (defined $opt{default_token_name}) {
+                      for ($accept_code_parent
+                             -><M::pc|PerlCodeStatements.appendNewPCChoose>) {
+                        for ($_-><M::pc|PCChoose.appendNewPCWhen>) {
+                          $_-><AG::pc|PCWhen.condition>
+                            -><M::pc|PerlCodeUnits.appendNewPCVariable>
+                                ('@', null, 'dch');
+                          for ($_-><AG::pc|PCWhen.block>) {
+                            for ($_-><M::pc|PerlCodeStatements.appendStatement>
+                                   -><M::pc|PerlCodeUnits
+                                           .appendNewPCFunctionCall>
+                                       (null, 'unshift')
+                                   -><M::pc|PerlCodeUnits
+                                           .appendNewPCExpression>
+                                       (',')) {
+                              for ($_-><M::pc|PerlCodeUnits
+                                             .appendNewPCDereference> ('@')
+                                     -><M::pc|PerlCodeUnits
+                                             .appendNewPCExpression> ('->')) {
+                                $_-><M::pc|PerlCodeUnits.appendNewPCVariable>
+                                      ('$', null, 'self');
+                                $_-><M::pc|PerlCodeUnits.appendBare>
+                                      ('{token}');
+                              }
+                              $_-><M::pc|PerlCodeUnits.appendNewPCLiteral> ({
+                                       type => $dfa->{$state_name}->{accept},
+                                       %value,
+                                     });
+                            }
+
+                            my $v
+                              = $factory-><M::pc|PCDocument.createPCVariable>
+                                            ('$', null, 'token_val');
+                            $_-><M::pc|PerlCodeStatements.appendStatement>
+                              -><M::Node.appendChild>
+                                  ($v-><M::Node.cloneNode> (true))
+                              -><AS::pc|PerlVariable.variableScope> ('my');
+                            for ($_-><M::pc|PerlCodeStatements
+                                           .appendNewPCWhile>) {
+                              $_-><AG::pc|PCWhile.condition>
+                                -><M::pc|PerlCodeUnits.appendNewPCVariable>
+                                    ('@', null, 'dch');
+                              for ($_-><AG::pc|PCWhile.block>
+                                     -><M::pc|PerlCodeStatements
+                                             .appendStatement>
+                                     -><M::pc|PerlCodeUnits
+                                             .appendNewPCExpression>
+                                         ('.=')) {
+                                $_-><M::Node.appendChild>
+                                      ($v-><M::Node.cloneNode> (true));
+                                $_-><M::pc|PerlCodeUnits
+                                          .appendNewPCFunctionCall>
+                                      (null, 'chr')
+                                  -><M::pc|PerlCodeUnits
+                                          .appendNewPCFunctionCall>
+                                      (null, 'shift')
+                                  -><M::pc|PerlCodeUnits.appendNewPCVariable>
+                                      ('@', null, 'dch');
+                              }
+                            }
+                            $_-><M::pc|PerlCodeStatements.appendStatement>
+                              -><M::pc|PerlCodeUnits.appendNewPCFunctionCall>
+                                  (null, 'return')
+                              -><M::pc|PerlCodeUnits.appendNewPCLiteral> ({
+                                    type => $opt{default_token_name},
+                                    value => $v,
+                                  });
+                          }
+                        }
+                        for ($_-><M::pc|PCChoose.appendNewPCOtherwise>
+                               -><AG::pc|PCOtherwise.block>) {
+                          $_-><M::pc|PerlCodeStatements.appendStatement>
+                            -><M::pc|PerlCodeUnits.appendNewPCFunctionCall>
+                                (null, 'return')
+                            -><M::pc|PerlCodeUnits.appendNewPCLiteral> ({
+                                   type => $dfa->{$state_name}->{accept},
+                                   %value,
+                                 });
+                        }
+                      }
+                    } else {
+                      $accept_code_parent
+                        -><M::pc|PerlCodeStatements.appendStatement>
+                        -><M::pc|PerlCodeUnits.appendNewPCFunctionCall>
+                            (null, 'return')
+                        -><M::pc|PerlCodeUnits.appendNewPCLiteral> ({
+                               type => $dfa->{$state_name}->{accept},
+                               %value,
+                             });
+                    }
           } else {
             $accept_code_parent->append_statement
                        ->append_new_pc_function_call (undef, 'redo')
@@ -958,21 +1063,117 @@ IFClsETDef:
               $_->append_new_pc_variable ('$', undef, 'ch');
               $_->append_new_pc_number_literal (-1);
             }
-            $_->block->append_statement
-                     ->append_new_pc_function_call (undef, 'return')
-                     ->append_new_pc_literal ({
-                         type => '#EOF',
-                       });
-          }}
-          my $chr_ch = $factory
-                         ->create_pc_function_call (undef, 'chr');
-          $chr_ch->append_new_pc_variable ('$', undef, 'ch');
-          $state_block->append_statement
-                      ->append_new_pc_function_call (undef, 'return')
-                      ->append_new_pc_literal ({
-                          type => '#INVALID',
-                          value => $chr_ch,
-                        });
+                      my $block = $_-><AG::pc|PCWhen.block>;
+                      if (defined $opt{default_token_name}) {
+                        for ($block
+                               -><M::pc|PerlCodeStatements.appendNewPCChoose>) {
+                          for ($_-><M::pc|PCChoose.appendNewPCWhen>) {
+                            $_-><AG::pc|PCWhen.condition>
+                              -><M::pc|PerlCodeUnits.appendNewPCVariable>
+                                  ('@', null, 'dch');
+                            for ($_-><AG::pc|PCWhen.block>) {
+                              for ($_-><M::pc|PerlCodeStatements.appendStatement>
+                                     -><M::pc|PerlCodeUnits
+                                             .appendNewPCFunctionCall>
+                                         (null, 'unshift')
+                                     -><M::pc|PerlCodeUnits
+                                             .appendNewPCExpression>
+                                         (',')) {
+                                for ($_-><M::pc|PerlCodeUnits
+                                               .appendNewPCDereference> ('@')
+                                       -><M::pc|PerlCodeUnits
+                                               .appendNewPCExpression> ('->')) {
+                                  $_-><M::pc|PerlCodeUnits.appendNewPCVariable>
+                                        ('$', null, 'self');
+                                  $_-><M::pc|PerlCodeUnits.appendBare>
+                                        ('{token}');
+                                }
+                                $_-><M::pc|PerlCodeUnits.appendNewPCLiteral> ({
+                                         type => '#EOF',
+                                       });
+                              }
+  
+                              my $v
+                                = $factory-><M::pc|PCDocument.createPCVariable>
+                                              ('$', null, 'token_val');
+                              $_-><M::pc|PerlCodeStatements.appendStatement>
+                                -><M::Node.appendChild>
+                                    ($v-><M::Node.cloneNode> (true))
+                                -><AS::pc|PerlVariable.variableScope> ('my');
+                              for ($_-><M::pc|PerlCodeStatements
+                                             .appendNewPCWhile>) {
+                                $_-><AG::pc|PCWhile.condition>
+                                  -><M::pc|PerlCodeUnits.appendNewPCVariable>
+                                      ('@', null, 'dch');
+                                for ($_-><AG::pc|PCWhile.block>
+                                       -><M::pc|PerlCodeStatements
+                                               .appendStatement>
+                                       -><M::pc|PerlCodeUnits
+                                               .appendNewPCExpression>
+                                           ('.=')) {
+                                  $_-><M::Node.appendChild>
+                                        ($v-><M::Node.cloneNode> (true));
+                                  $_-><M::pc|PerlCodeUnits
+                                            .appendNewPCFunctionCall>
+                                        (null, 'chr')
+                                    -><M::pc|PerlCodeUnits
+                                            .appendNewPCFunctionCall>
+                                        (null, 'shift')
+                                    -><M::pc|PerlCodeUnits.appendNewPCVariable>
+                                        ('@', null, 'dch');
+                                }
+                              }
+                              $_-><M::pc|PerlCodeStatements.appendStatement>
+                                -><M::pc|PerlCodeUnits.appendNewPCFunctionCall>
+                                    (null, 'return')
+                                -><M::pc|PerlCodeUnits.appendNewPCLiteral> ({
+                                      type => $opt{default_token_name},
+                                      value => $v,
+                                    });
+                            }
+                          }
+                        }
+                      } else {
+                        $block-><M::pc|PerlCodeStatements.appendStatement>
+                              -><M::pc|PerlCodeUnits.appendNewPCFunctionCall>
+                                  (null, 'return')
+                              -><M::pc|PerlCodeUnits.appendNewPCLiteral> ({
+                                    type => '#EOF',
+                                  });
+                      }
+                    }
+                  }
+                  if (defined $opt{default_token_name}) {
+                    for ($state_block
+                           -><M::pc|PerlCodeStatements.appendStatement>
+                           -><M::pc|PerlCodeUnits.appendNewPCFunctionCall>
+                                    (null, 'push')
+                           -><M::pc|PerlCodeUnits.appendNewPCExpression>
+                                    (',')) {
+                      $_-><M::pc|PerlCodeUnits.appendNewPCVariable>
+                            ('@', null, 'dch');
+                      $_-><M::pc|PerlCodeUnits.appendNewPCVariable>
+                            ('$', null, 'ch');
+                    }
+                    $state_block-><M::pc|PerlCodeStatements.appendStatement>
+                                -><M::pc|PerlCodeUnits.appendNewPCFunctionCall>
+                                    (null, 'redo')
+                                -><M::pc|PerlCodeUnits.appendNewPCVariable>
+                                    ('', null, 'S'.$estate_name);
+                  } else {
+                    my $chr_ch
+                      = $factory-><M::pc|PCDocument.createPCFunctionCall>
+                                    (null, 'chr');
+                    $chr_ch-><M::pc|PerlCodeUnits.appendNewPCVariable>
+                               ('$', null, 'ch');
+                    $state_block-><M::pc|PerlCodeStatements.appendStatement>
+                                -><M::pc|PerlCodeUnits.appendNewPCFunctionCall>
+                                    (null, 'return')
+                                -><M::pc|PerlCodeUnits.appendNewPCLiteral> ({
+                                      type => '#INVALID',
+                                      value => $chr_ch,
+                                    });
+                  }
         } else {
           my $push_ap = $state_block->append_statement
                                     ->append_new_pc_function_call
@@ -1081,6 +1282,7 @@ IFClsETDef:
                 = $cel-><M::DPGElementAttribute.dpgGetAttributeList>
                           ('extends');
 
+              my $default_token_name;
               my %token;
               $lexmodes{$name} = \%token;
               for my $rname (@$supermodes) {
@@ -1219,8 +1421,11 @@ IFClsETDef:
             $s->{ignore} = $ignore if $ignore;
             $s->{value} = $value if $value;
           }
-        }
-      }
+                } elsif ($xuri eq <Q::pg:lQDefaultTokenStatement>) {
+                  $default_token_name
+                    = $tel-><M::Element.getAttributeNS> (null, 'name');
+                } # xuri
+              }
 
               next B unless $cel-><M::DPGElementAttribute.dpgGetAttribute>
                                      ('standalone') or
@@ -1256,7 +1461,8 @@ IFClsETDef:
 
               __DEEP{
                 $state_to_code->(\%dfa, $scan_sub, $;.'initial',
-                                 $codeDocument, outermost => 1);
+                                 $codeDocument, outermost => 1,
+                                 default_token_name => $default_token_name);
               }__;
               $r-><M::Node.appendChild> ($scan_sub);
             } # xuri
@@ -1323,13 +1529,6 @@ IFClsETDef:
         }
       } elsif ($xuri eq <Q::pg:string>) {
         $parent->append_string_literal ($child->text_content);
-              } elsif ($xuri eq <Q::pg:qMatch>) {
-                $parent-><M::pc|PerlCodeUnits.appendAtom>
-                           ('MATCH_'.
-                            $match_block_ids->{
-                              $child-><M::Element.getAttributeNS>
-                                        (null, 'name')
-                            });
               } # xuri
             }
           }; # rexpression_to_code
@@ -2077,6 +2276,19 @@ IFClsETDef:
 ##DPGLAssignmentStatementElement
 
 IFClsETDef:
+  @IFQName: DPGLQDefaultTokenStatementElement
+  @ClsQName: ManakaiDPGLQDefaultTokenStatementElement
+  @ETQName: pg|lQDefaultTokenStatement
+  
+  @IFISA: DPGElement
+  @ClsISA: ManakaiDPGElement
+
+  @IFISA: DPGElementAttribute
+  @ClsISA: ManakaiDPGElementAttribute
+
+##DPGLQDefaultTokenStatementElement
+
+IFClsETDef:
   @IFQName: DPGTokenErrorElement
   @ClsQName: ManakaiDPGTokenErrorElement
   @ETQName: pg|tokenError
@@ -2362,7 +2574,7 @@ IFClsDef:
       ~ (LBRACE) { }
     
       /*
-        LStatement := LAssignmentStatement;
+        LStatement := LAssignmentStatement / LQDefaultTokenStatement
         LAssignmentStatement := (NAME / VARIABLE) *AttributeSpecification
                                 DEFINE 1*LRValue SEMICOLON
       */
@@ -2399,6 +2611,25 @@ IFClsDef:
 
         &LRValueList ($doc => $doc, $parent => $lassign);
       
+        ~ (SEMICOLON) { }
+      } (QKEYWORD == '?default-token') {
+        /*
+          LQDefaultTokenStatement := '?default-token' NAME
+                                     *AttributeSpecification SEMICOLON
+        */
+        
+        my $ldef;
+        ~ (NAME) {
+          lang:Perl ($name => $token.value) {
+            $ldef = $doc-><M::Document.createElementNS>
+                               (<Q::pg:>, 'lQDefaultTokenStatement');
+            $ldef-><M::Element.setAttributeNS> (null, 'name', $name);
+            $el-><M::Node.appendChild> ($ldef);
+          }
+        }
+      
+        &AttributeSpecificationList ($doc => $doc, $parent => $ldef);
+
         ~ (SEMICOLON) { }
       }
     
@@ -2852,7 +3083,7 @@ IFClsDef:
   
     rule Rvalue ($doc, $parent) {
       /*
-        Rvalue := STRING / VARIABLE *(DOT NAME) / '?match' NAME
+        Rvalue := STRING / VARIABLE *(DOT NAME)
       */
     
       ~ (STRING) {
@@ -2883,15 +3114,6 @@ IFClsDef:
               $mem-><M::Element.setAttributeNS> (null, 'name', $name);
               $memref-><M::Node.appendChild> ($mem);
             }
-          }
-        }
-      } (QKEYWORD == '?match') {
-        ~ (NAME) {
-          lang:Perl ($name => $token.value) {
-            my $var = $doc-><M::Document.createElementNS>
-                              (<Q::pg:>, 'qMatch');
-            $var-><M::Element.setAttributeNS> (null, 'name', $name);
-            $parent-><M::Node.appendChild> ($var);
           }
         }
       }
