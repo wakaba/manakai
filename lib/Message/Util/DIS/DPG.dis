@@ -15,7 +15,7 @@ Module:
   @License: license|Perl+MPL
 
   @Date:
-    $Date: 2005/12/24 07:27:14 $
+    $Date: 2005/12/28 03:50:18 $
   
   @Require:
     @@Module:
@@ -154,6 +154,8 @@ ElementTypeBinding:
       @@@ForCheck: s|ForML
 
     @@f:implements: DIS|DPG10
+
+    @@ForCheck: ManakaiDOM|ManakaiDOM
 
 ElementTypeBinding:
   @Name: IFClsDef
@@ -385,6 +387,39 @@ IFClsDef:
             }
           }
         }__;
+
+  @Method:
+    @@Name: dpgGetAttributeList
+    @@enDesc:
+      Returns a list of DPG attribute values.
+    @@Param:
+      @@@Name: attrName
+      @@@Type: DOMString
+      @@@enDesc:
+        The name of the attribute.
+    @@Return:
+      @@@Type: DISPerl|ARRAY||ManakaiDOM|all
+      @@@enDesc:
+        A reference to a snapshot list of the attribute values.
+
+          {NOTE:: If a DPG attribute element is invalid so that 
+                  its <XA::value> attribute is not specified, then
+                  what is the return value is undefined.
+          }
+      @@@PerlDef:
+        __DEEP{
+          no warnings "uninitialized";
+          C: for my $child (@{$self-><AG::Node.childNodes>}) {
+            if ($child-><AG::Node.namespaceURI>.$child-><AG::Node.localName> eq
+                <Q::pg:attributeSpecification>) {
+              if ($child-><M::Element.getAttributeNS> (null, 'name') eq
+                  $attrName) {
+                push @$r,
+                     $child-><M::Element.getAttributeNS> (null, 'value');
+              }
+            }
+          }
+        }__;
 ##DPGElementAttribute
 
 ElementTypeBinding:
@@ -451,6 +486,11 @@ IFClsETDef:
                   element nodes whose content is invalid, then their
                   evaluation processes might throw an exception.
           }
+      @@@dx:raises:
+        @@@@@: pg|VALIDITY_ERR
+        @@@@enDesc:
+          The source document is invalid so that one or more
+          error is reported and the process has been discontinued.
       @@@PerlDef:
         __DEEP{
           no warnings 'uninitialized';
@@ -478,7 +518,7 @@ IFClsETDef:
  \      @r1 = ();
       } else {
         ($c1, $c2) = ($c2, $c1) if $c1->[0] > $c2->[0];
-        if ($c1->[1] <= $c2->[0]) {
+        if ($c1->[1] < $c2->[0]) {
           push @$r, $c1;
           undef $c1;
         } else {
@@ -505,6 +545,20 @@ IFClsETDef:
     push @$r, [$range->[$#$range]->[1] + 1, "Inf"] unless $range->[$#$range]->[1] eq "Inf";
     return $r;
   };
+
+            my $merge_adjacent_range = sub ($) {
+              my $range = shift;
+              my $r = [];
+              push @$r, $range->[0] if @$range;
+              for my $i (1..$#$range) {
+                if ($r->[-1]->[1] + 1 == $range->[$i]->[0]) {
+                  $r->[-1] = [$r->[-1]->[0], $range->[$i]->[1]];
+                } else {
+                  push @$r, $range->[$i];
+                }
+              }
+              return $r;
+            }; # merge_adjacent_range
   
   my $and_minus_ranges = sub ($$) {
     my (@ra, @rab, @rb);
@@ -666,6 +720,12 @@ IFClsETDef:
             return @cs;
           }; # copy_state
 
+          my $array_uniq = sub ($) {
+            my $array = shift;
+            my %array = map {$_ => true} @$array;
+            return [keys %array];
+          }; # array_uniq
+
           ## Makes a DFA state from a set of NFA states
           my $make_dfa_state = sub ($@) {
             my ($token, $dfa, @src_name) = @_;
@@ -682,7 +742,11 @@ IFClsETDef:
                 }
                 my ($ra, $rab, $rb) = $and_minus_ranges->($rsa->[0], $rsb->[0]);
                 push @$new_next_state, [$ra, $rsa->[1]] if @$ra;
-                push @$new_next_state, [$rab, [sort {$a cmp $b} @{$rsa->[1]}, $rsb->[1]]] if @$rab;
+                push @$new_next_state,
+                     [$rab,
+                      $array_uniq->([sort {$a cmp $b} @{$rsa->[1]},
+                                                      $rsb->[1]]),
+                     ] if @$rab;
                 if (@$rb) {
                   $rsb = [$rb, $rsb->[1]];
                 } else {
@@ -840,8 +904,26 @@ IFClsETDef:
                 for ($_->block->append_statement
                               ->append_new_pc_function_call (undef, 'push')
                               ->append_new_pc_expression (',')) {
-                  $_->append_new_pc_variable ('@', undef, 'ch');
-                  $_->append_new_pc_variable ('$', undef, 'ch');
+                          if (@{$dfa->{$state_name}->{next_state}}) {
+                            for ($_
+                                 -><M::pc|PerlCodeUnits.appendNewPCDereference>
+                                    ('@')
+                                 -><M::pc|PerlCodeUnits.appendNewPCExpression>
+                                    ('->')) {
+                              $_-><M::pc|PerlCodeUnits.appendNewPCVariable>
+                                    ('$', null, 'self');
+                              $_-><M::pc|PerlCodeUnits.appendBare> ('{char}');
+                            }
+                            $_-><M::pc|PerlCodeUnits.appendNewPCFunctionCall>
+                                  (null, 'pop')
+                              -><M::pc|PerlCodeUnits.appendNewPCVariable>
+                                  ('@', null, 'ch');
+                          } else {
+                            $_-><M::pc|PerlCodeUnits.appendNewPCVariable>
+                                  ('@', null, 'ch');
+                            $_-><M::pc|PerlCodeUnits.appendNewPCVariable>
+                                  ('$', null, 'ch');
+                          }
                 }
               }
               for ($accept_code_parent->append_new_pc_while) {
@@ -908,11 +990,9 @@ IFClsETDef:
           }; # $state_to_code
 
     
-          ## --- Tokenizer preparation
-            ## TODO: Multiple tokenizer support required
-
-          my $tokenizer = $codeDocument->create_perl_sub ('_shift_token');
-          $r-><M::Node.appendChild> ($tokenizer);
+          ## --- Tokenizer method template
+          my $tokenizer
+            = $codeDocument-><M::pc|PCDocument.createPerlSub> (null);
           $tokenizer->prototype ('$');
   my $tokenizer_param = $tokenizer->append_statement
                                   ->append_new_pc_expression ('=');
@@ -933,7 +1013,9 @@ IFClsETDef:
            ->append_child ($stack_array->clone_node (1));
 
           ## --- For each child elements (rule or lexmode)...
-
+          my %lexmodes;    # defined tokenizers
+          my $initial_lexmode;
+          my $root_lexmode_number = 0;
           my %rules;       # defined parser rules
           my %root_rules;  # defined |standalone| parser rules
           my %external_rules; # defined |external| parser rules
@@ -954,6 +1036,8 @@ IFClsETDef:
                 || $name
                 if $cel-><M::DPGElementAttribute.dpgGetAttribute>
                            ('standalone') or
+                   $cel-><M::DPGElementAttribute.dpgGetAttribute>
+                           ('recursive') or
                    $external_rules{$name};
       
               ## Creates a list of parameters
@@ -985,12 +1069,37 @@ IFClsETDef:
 
             ## -- Lexmode element - generate tokenizer
             } elsif ($xuri eq <Q::pg:lexmode>) {
-              ## TODO: Multiple lexmode support
-    
-      my %token = ($;.'initial' => {
-        name => $;.'initial',
-        next_token => [],
-      });
+              my $name = $cel-><M::Element.getAttributeNS> (null, 'name');
+              if ($lexmodes{$name}) {
+                __UNDEEP{__DOMCore:ERROR{pg|unique-lexmode-name-error::
+                  pg|name => {$name},
+                  pg|element => {$cel},
+                }__}__;
+              }
+
+              my $supermodes
+                = $cel-><M::DPGElementAttribute.dpgGetAttributeList>
+                          ('extends');
+
+              my %token;
+              $lexmodes{$name} = \%token;
+              for my $rname (@$supermodes) {
+                unless ($lexmodes{$rname}) {
+                  __UNDEEP{__DOMCore:ERROR{pg|lexmode-not-defined-error::
+                    pg|name => {$rname},
+                    pg|element => {$cel},
+                  }__}__;
+                } else {
+                  %token = (%token, %{$lexmodes{$rname}});
+                }
+              }
+              $token{$;.'initial'} = {
+                name => $;.'initial',
+                next_state => [
+                  map {@{$lexmodes{$_}->{$;.'initial'}->{next_state}}
+                  } @$supermodes
+                ],
+              };
 
       for my $tel (grep {$_->node_type == $_->ELEMENT_NODE} @{$cel->child_nodes}) {
         my $xuri = $tel->namespace_uri . $tel->local_name;
@@ -1025,6 +1134,7 @@ IFClsETDef:
                                                 $mel->get_attribute_ns (undef, 'end'));
                   }
                 }
+                $range = $merge_adjacent_range->($range);
                 if ($lel->get_attribute_ns (undef, 'negative')) {
                   $range = $negate_range->($range);
                 }
@@ -1112,6 +1222,11 @@ IFClsETDef:
         }
       }
 
+              next B unless $cel-><M::DPGElementAttribute.dpgGetAttribute>
+                                     ('standalone') or
+                            $initial_lexmode eq $name;
+              $root_lexmode_number++;
+
       my %dfa;
       my @req_state = ([$;.'initial']);
       while (@req_state) {
@@ -1123,19 +1238,29 @@ IFClsETDef:
           push @req_state, $_->[1];
         }
       }
-      
-      for ($tokenizer->append_statement
+
+              my $scan_sub = $tokenizer-><M::Node.cloneNode> (true);
+              $scan_sub-><M::pc|PerlSub.addPerlName> ('_scan_'.$name);
+              for ($scan_sub-><M::pc|PerlCodeStatements.appendStatement>
                      ->append_new_pc_expression ('=')) {
         $_->append_new_pc_variable ('$', undef, 'ch')
           ->variable_scope ('my');
         $_->append_new_pc_number_literal (-2);
       }
       
-              $state_to_code->(\%dfa, $tokenizer, $;.'initial',
-                               $codeDocument, outermost => 1);
+              if ($cel-><M::DPGElementAttribute.dpgGetAttribute> ('initial')) {
+                $initial_lexmode = $scan_sub;
+              } else {
+                $initial_lexmode ||= $scan_sub;
+              }
+
+              __DEEP{
+                $state_to_code->(\%dfa, $scan_sub, $;.'initial',
+                                 $codeDocument, outermost => 1);
+              }__;
+              $r-><M::Node.appendChild> ($scan_sub);
             } # xuri
           } # B
-
 
           $state_to_code = null;
 
@@ -1148,7 +1273,15 @@ IFClsETDef:
             $_->append_new_pc_variable ('$', undef, 'token');
             for ($_->append_new_pc_expression ('->')) {
               $_->append_new_pc_variable ('$', undef, 'self');
-              $_->append_bare ('_shift_token');
+              if ($root_lexmode_number > 1) {
+                $_-><M::pc|PerlCodeUnits.appendBare> ('{scanner}');
+                $_-><M::pc|PerlCodeUnits.appendBare> ('($self)');
+              } elsif ($root_lexmode_number > 0) {
+                $_-><M::pc|PerlCodeUnits.appendBare>
+                      ($initial_lexmode-><AG::pc|PerlSub.pcLocalName>);
+              } else {
+                $_-><M::pc|PerlCodeUnits.appendBare> ('_shift_token');
+              }
             }
           }
 
@@ -1169,8 +1302,9 @@ IFClsETDef:
           }
 
           ## Converts an expression in rule block into Perl expression
-          my $rexpression_to_code = sub ($$) {
-            my ($parent, $source_parent) = @_;
+          my $match_block_ids = {};
+          my $rexpression_to_code = sub ($$;%) {
+            my ($parent, $source_parent, %opt) = @_;
     $parent = $parent->append_new_pc_expression (',');
     C: for my $child (@{$source_parent->child_nodes}) {
       next C unless $child->node_type == $child->ELEMENT_NODE;
@@ -1189,16 +1323,23 @@ IFClsETDef:
         }
       } elsif ($xuri eq <Q::pg:string>) {
         $parent->append_string_literal ($child->text_content);
-              }
+              } elsif ($xuri eq <Q::pg:qMatch>) {
+                $parent-><M::pc|PerlCodeUnits.appendAtom>
+                           ('MATCH_'.
+                            $match_block_ids->{
+                              $child-><M::Element.getAttributeNS>
+                                        (null, 'name')
+                            });
+              } # xuri
             }
           }; # rexpression_to_code
   
           ## Converts a statement in rule block into Perl code
           my $block_id = 0;
           my $rstatement_to_code;
-          $rstatement_to_code = sub ($$$$$$) {
+          $rstatement_to_code = sub ($$$$$$;%) {
             my ($parent, $statement, $next_token_required, $rules, $root_rules,
-                $factory) = @_;
+                $factory, %opt) = @_;
             my $xuri = $statement->namespace_uri . $statement->local_name;
             if ($xuri eq <Q::pg:matchStatement>) {
               my $match_parent = $parent;
@@ -1217,13 +1358,18 @@ IFClsETDef:
       if ($match_occur eq 'zeromore' or $match_occur eq 'onemore') {
         $match_parent = $match_parent->append_new_pc_block;
         $match_parent->label ('MATCH_' . ($match_block_id = ++$block_id));
+                my $bname
+                  = $statement
+                      -><M::DPGElementAttribute.dpgGetAttribute> ('name');
+                $match_block_ids->{$bname} = $match_block_id if $bname;
       }
       
       my $match_choose = $match_parent->append_new_pc_choose;
       my $token_type_var = $factory->create_pc_expression ('->');
       $token_type_var->append_new_pc_variable ('$', undef, 'token');
       $token_type_var->append_bare ('{type}');
-      my $has_sep;
+      my $has_sep;       ## There is a :separator block
+      my $has_sep_term;  ## There is a :separator:terminator? block
       C: for my $child (@{$statement->child_nodes}) {
         next C unless $child->node_type == $child->ELEMENT_NODE;
         my $xuri = $child->namespace_uri . $child->local_name;
@@ -1271,6 +1417,11 @@ IFClsETDef:
             }
           } else { # separator
             $has_sep = 1;
+                    if ($child-><M::DPGElementAttribute.dpgGetAttribute>
+                                                             ('terminator')) {
+                      ## BUG: |?| occurence not checked.
+                      $has_sep_term = true;
+                    }
             for ($match_parent->append_new_pc_choose) {
               for ($_->append_new_pc_when) {
                 $_-><AG::pc|PCWhen.condition>
@@ -1285,15 +1436,18 @@ IFClsETDef:
             }
           }
           
-          ## Child statements
-          $next_token_required = 1;
-          D: for my $child (@{$child->child_nodes}) {
-            next D unless $child->node_type == $child->ELEMENT_NODE;
-            ($next_token_required, undef)
-              = $rstatement_to_code->($token_parent, $child,
-                                      $next_token_required,
-                                      $rules, $root_rules, $factory);
-          }
+                  ## Child statements
+                  $next_token_required = 1;
+                  D: for my $child (@{$child-><AG::Node.childNodes>}) {
+                    next D unless $child-><AG::Node.nodeType> ==
+                                  <C::Node.ELEMENT_NODE>;
+                    __DEEP{
+                      ($next_token_required, undef)
+                        = $rstatement_to_code
+                            ->($token_parent, $child, $next_token_required,
+                               $rules, $root_rules, $factory, %opt);
+                    }__;
+                  }
           
           if ($next_token_required) {
             $token_parent->append_child ($next_token_code->clone_node (1));
@@ -1309,7 +1463,29 @@ IFClsETDef:
                                  ('', null, 'MATCH_'.$match_block_id);
           }
     
-        }
+        } elsif ($xuri eq <Q::pg:matchElseBlock>) {
+          my $token_parent
+            = $match_choose-><M::pc|PCChoose.appendNewPCOtherwise>
+                           -><AG::pc|PCOtherwise.block>;
+          
+          ## Child statements
+          $next_token_required = false;
+          D: for my $child (@{$child->child_nodes}) {
+            next D unless $child->node_type == $child->ELEMENT_NODE;
+            __DEEP{
+              ($next_token_required, undef)
+                = $rstatement_to_code
+                    ->($token_parent, $child, $next_token_required,
+                       $rules, $root_rules, $factory, %opt);
+            }__;
+            ## NOTE: |pg:matchElseBlock| should not contain
+            ##       any statement which affects on |next_token_required|
+            ##       status; its result is undefined.
+          }
+
+          ## NOTE: Interaction between |pg:matchElseBlock| and
+          ##       occurences other than |zeroone| is unknown.
+        } # $xuri
       } # pc:matchStatement children
       
       if (not $match_occur or $match_occur eq 'onemore') {
@@ -1321,7 +1497,14 @@ IFClsETDef:
             $_->append_new_pc_number_literal (0);
           }
         }
-  
+
+                if ($has_sep_term) { ## :separator :terminator?
+                  $err_block-><M::pc|PerlCodeStatements.appendStatement>
+                            -><M::pc|PerlCodeUnits.appendNewPCFunctionCall>
+                                (null, 'last')
+                            -><M::pc|PerlCodeUnits.appendNewPCVariable>
+                                ('', null, 'MATCH_'.$match_block_id);
+                } else {
                   my $terr_name = $default_token_error;
                   unless ($token_error{$terr_name}->{code}) {
                     ## Child statements
@@ -1329,8 +1512,11 @@ IFClsETDef:
                                               -><AG::Node.childNodes>}) {
                       next C unless $child-><AG::Node.nodeType> ==
                                     <C::Node.ELEMENT_NODE>;
-                      $rstatement_to_code->($err_block, $child, true,
-                                            $rules, $root_rules, $factory);
+                      __DEEP{
+                        $rstatement_to_code
+                          ->($err_block, $child, true,
+                             $rules, $root_rules, $factory, %opt);
+                      }__;
                     }
                     $token_error{$terr_name}->{code}
                       = $err_block-><M::Node.cloneNode> (true);
@@ -1370,14 +1556,17 @@ IFClsETDef:
                       }
                     }
                   }
+                } # no has_sep_term
               }
       
       if (not $has_sep and ($match_occur eq 'zeromore' or $match_occur eq 'onemore')) {
         for ($match_choose->append_new_pc_otherwise->block) {
                 
-          $_->append_statement
-                           ->append_new_pc_function_call (undef, 'last')
-                           ->append_new_pc_variable ('', undef, 'MATCH_'.$match_block_id);
+                         $_-><M::pc|PerlCodeStatements.appendStatement>
+                           -><M::pc|PerlCodeUnits.appendNewPCFunctionCall>
+                               (null, 'last')
+                           -><M::pc|PerlCodeUnits.appendNewPCVariable>
+                               ('', null, 'MATCH_'.$match_block_id);
         }
         $match_parent->append_statement
                      ->append_new_pc_function_call (undef, 'redo')
@@ -1403,14 +1592,19 @@ IFClsETDef:
                   }
                 }
 
-                my $plcode = $disResource-><M::dp|DISResourcePerl||DIS|ForLatest
+                my $plcode = $opt{dis_resource}
+                               -><M::dp|DISResourcePerl||DIS|ForLatest
                                                 .plPreprocessPerlCode>
-                                 ($source, namespace_context => $contextObject);
+                                 ($source,
+                                  namespace_context => $opt{ns_context});
 
                 my $dparent = $parent-><AG::Node.ownerDocument>
                                    -><M::pc|PCDocument.createPCExpression> (',');
                 for (keys %param) {
-                  $rexpression_to_code->($dparent, $param{$_});
+                  $rexpression_to_code
+                    ->($dparent, $param{$_},
+                       dis_resource => $opt{dis_resource},
+                       match_block_id => $opt{match_block_id});
                   $plcode-><M::pc|PerlCode.replaceVariable>
                     ('$'.$_ => $dparent-><AG::Node.lastChild>);
                 }
@@ -1435,18 +1629,26 @@ IFClsETDef:
       my $rule_name = $statement->get_attribute_ns (undef, 'name');
       if ($rules->{$rule_name}) {
         if ($root_rules->{$rule_name}) {
-          unless ($next_token_required) {
-            for ($parent->append_statement
-                        ->append_new_pc_function_call (undef, 'push')
-                        ->append_new_pc_expression (',')) {
-              for ($_->append_new_pc_dereference ('@')
-                     ->append_new_pc_expression ('->')) {
-                $_->append_new_pc_variable ('$', undef, 'self');
-                $_->append_bare ('{token}');
-              }
-              $_->append_new_pc_variable ('$', undef, 'token');
-            }
-          }
+                  if (not $next_token_required or
+                      $statement-><M::DPGElementAttribute.dpgGetAttribute>
+                                    ('unshift-current-token')) {
+                    for ($parent-><M::pc|PerlCodeStatements.appendStatement>
+                                -><M::pc|PerlCodeUnits.appendNewPCFunctionCall>
+                                    (null, 'unshift')
+                                -><M::pc|PerlCodeUnits.appendNewPCExpression>
+                                    (',')) {
+                      for ($_-><M::pc|PerlCodeUnits.appendNewPCDereference>
+                                 ('@')
+                             -><M::pc|PerlCodeUnits.appendNewPCExpression>
+                                 ('->')) {
+                        $_-><M::pc|PerlCodeUnits.appendNewPCVariable>
+                              ('$', null, 'self');
+                        $_-><M::pc|PerlCodeUnits.appendBare> ('{token}');
+                      }
+                      $_-><M::pc|PerlCodeUnits.appendNewPCVariable>
+                            ('$', null, 'token');
+                    }
+                  }
        
           
           my $param_spec_list;
@@ -1491,10 +1693,13 @@ IFClsETDef:
                                               -><AG::Node.childNodes>}) {
                       next C unless $child-><AG::Node.nodeType> ==
                                     <C::Node.ELEMENT_NODE>;
-                      ($next_token_required, undef)
-                        = $rstatement_to_code->($block, $child,
-                                                $next_token_required,
-                                                $rules, $root_rules, $factory);
+                      __DEEP{
+                        ($next_token_required, undef)
+                          = $rstatement_to_code
+                              ->($block, $child,
+                                 $next_token_required,
+                                 $rules, $root_rules, $factory, %opt);
+                      }__;
                     }
                     $rules->{$rule_name}->{code}->[$o_next_token_required]
                       = [$block-><M::Node.cloneNode> (true),
@@ -1540,39 +1745,47 @@ IFClsETDef:
             
                   return $next_token_required;
                 }
-      } elsif ($rule_name eq 'builtin:nestedBlockAsText') {
-        my %param = (start_by_open => not $next_token_required,
-                     open => '{', close => '}');
-        
-        C: for my $child (@{$statement->child_nodes}) {
-          next C unless $child->node_type == $child->ELEMENT_NODE;
-          if ($child->namespace_uri . $child->local_name eq
-              <Q::pg:parameterSpecification>) {
-            $param{$child->get_attribute_ns (undef, 'name')} = $child;
-          }
-        }
-          
-        for ($parent->append_statement->append_new_pc_apply) {
-          for ($_->append_new_pc_expression ('->')) {
-            $_->append_new_pc_variable ('$', undef, 'self');
-            $_->append_bare ('_parse_nested_block_as_text');
-          }
-          my $param_spec_list = $_->append_new_pc_expression (',');
-          for my $param_name (qw/doc parent open close start_by_open/) {
-            if (ref $param{$param_name}) {
-              $rexpression_to_code->($param_spec_list, $param{$param_name});
-            } else {
-              $param_spec_list->append_new_pc_literal ($param{$param_name});
-            }
-          }
-        }
-        
+
                 return 1; # $next_token_required == 1
               } else {
-                die qq<Rule "$rule_name" is not defined>;
-                ## TODO: exception
+                __UNDEEP{
+                  my $continue = __DOMCore:ERROR{pg|rule-not-defined-error::
+                    pg|name => {$rule_name},
+                    pg|element => {$statement},
+                  }__;
+                  unless ($continue) {
+                    __EXCEPTION{pg|VALIDITY_ERR::
+                      
+                    }__;
+                  }
+                }__;
               }
 
+            } elsif ($xuri eq <Q::pg:qLexmodeStatement>) {
+              for ($parent-><M::pc|PerlCodeStatements.appendStatement>
+                          -><M::pc|PerlCodeUnits.appendNewPCExpression>
+                              ('=')) {
+                for ($_-><M::pc|PerlCodeUnits.appendNewPCExpression>
+                           ('->')) {
+                  $_-><M::pc|PerlCodeUnits.appendNewPCVariable>
+                        ('$', null, 'self');
+                  $_-><M::pc|PerlCodeUnits.appendBare> ('{scanner}');
+                }
+                for ($_-><M::pc|PerlCodeUnits.appendNewPCApply>) {
+                  for ($_-><M::pc|PerlCodeUnits.appendNewPCExpression>
+                             ('->')) {
+                    $_-><M::pc|PerlCodeUnits.appendNewPCVariable>
+                          ('$', null, 'self');
+                    $_-><M::pc|PerlCodeUnits.appendBare> ('can');
+                  }
+                  $_-><M::pc|PerlCodeUnits.appendStringLiteral>
+                        ('_scan_'.
+                         $statement-><M::Element.getAttributeNS>
+                                       (null, 'name'));
+                }
+              }
+              return $next_token_required;
+                     ## ISSUE: Is this correct? Or 1?
 
 
     } elsif ($xuri eq <Q::pg:assignmentStatement>) {
@@ -1591,6 +1804,54 @@ IFClsETDef:
         }
       }
               return $next_token_required;
+
+            } elsif ($xuri eq <Q::pg:ifTrueStatement>) {
+              for ($parent-><M::pc|PerlCodeStatements.appendNewPCChoose>
+                          -><M::pc|PCChoose.appendNewPCWhen>) {
+                $_-><AG::pc|PCWhen.condition>
+                  -><M::pc|PerlCodeUnits.appendNewPCVariable>
+                      ('$', null, $statement-><M::Element.getAttributeNS>
+                                                (null, 'name'));
+                ## Child statements
+                my $parent = $_-><AG::pc|PCWhen.block>;
+                D: for my $child (@{$statement-><AG::Node.childNodes>}) {
+                  next D unless $child-><AG::Node.nodeType> ==
+                                <C::Node.ELEMENT_NODE>;
+                  __DEEP{
+                    ($next_token_required, undef)
+                        = $rstatement_to_code
+                            ->($parent, $child, $next_token_required,
+                               $rules, $root_rules, $factory, %opt);
+                  }__;
+                }
+              }
+              return $next_token_required; ## ISSUE: Correct?
+
+            } elsif ($xuri eq <Q::pg:returnStatement>) {
+              ## ISSUE: |return| variable does not work with return
+              ##        statements.
+              unless ($next_token_required) {
+                    for ($parent-><M::pc|PerlCodeStatements.appendStatement>
+                                -><M::pc|PerlCodeUnits.appendNewPCFunctionCall>
+                                    (null, 'unshift')
+                                -><M::pc|PerlCodeUnits.appendNewPCExpression>
+                                    (',')) {
+                      for ($_-><M::pc|PerlCodeUnits.appendNewPCDereference>
+                                 ('@')
+                             -><M::pc|PerlCodeUnits.appendNewPCExpression>
+                                 ('->')) {
+                        $_-><M::pc|PerlCodeUnits.appendNewPCVariable>
+                              ('$', null, 'self');
+                        $_-><M::pc|PerlCodeUnits.appendBare> ('{token}');
+                      }
+                      $_-><M::pc|PerlCodeUnits.appendNewPCVariable>
+                            ('$', null, 'token');
+                    }
+              }
+              $parent-><M::pc|PerlCodeStatements.appendStatement>
+                     -><M::pc|PerlCodeUnits.appendNewPCFunctionCall>
+                         (null, 'return');
+              return $next_token_required;
     
             } elsif ($xuri eq <Q::pg:codeBlock>) {
               my $return;
@@ -1608,10 +1869,13 @@ IFClsETDef:
                     $return = $child-><M::Element.getAttributeNS> (null, 'name');
                   }
                 }
-                ($next_token_required, undef)
-                  = $rstatement_to_code->($parent, $child,
-                                          $next_token_required,
-                                          $rules, $root_rules, $factory);
+                __DEEP{
+                  ($next_token_required, undef)
+                    = $rstatement_to_code
+                        ->($parent, $child,
+                           $next_token_required,
+                           $rules, $root_rules, $factory, %opt);
+                }__;
               }
               return ($next_token_required, $return);
 
@@ -1646,11 +1910,14 @@ IFClsETDef:
                 $proto .= '$';
               } else {
                 my $rv;
-                ($next_token_required, $rv)
-                  = $rstatement_to_code->($rule_sub, $child,
-                                          $next_token_required,
- \                                        \%rules, \%root_rules,
-                                          $codeDocument);
+                __DEEP{
+                  ($next_token_required, $rv)
+                    = $rstatement_to_code
+                        ->($rule_sub, $child,
+                           $next_token_required, \%rules, \%root_rules,
+                           $codeDocument, dis_resource => $disResource,
+                           ns_context => $contextObject);
+                }__;
                 $return ||= $rv;
               }
     }
@@ -1709,6 +1976,19 @@ IFClsETDef:
 ##DPGRuleElement
 
 IFClsETDef:
+  @IFQName: DPGMatchStatementElement
+  @ClsQName: ManakaiDPGMatchStatementElement
+  @ETQName: pg|matchStatement
+
+  @IFISA: DPGElement
+  @ClsISA: ManakaiDPGElement
+  
+  @IFISA: DPGElementAttribute
+  @ClsISA: ManakaiDPGElementAttribute
+
+##DPGMatchStatementElement
+
+IFClsETDef:
   @IFQName: DPGMatchBlockElement
   @ClsQName: ManakaiDPGMatchBlockElement
   @ETQName: pg|matchBlock
@@ -1720,6 +2000,19 @@ IFClsETDef:
   @ClsISA: ManakaiDPGElementAttribute
 
 ##DPGMatchBlockElement
+
+IFClsETDef:
+  @IFQName: DPGMatchElseBlockElement
+  @ClsQName: ManakaiDPGMatchElseBlockElement
+  @ETQName: pg|matchElseBlock
+
+  @IFISA: DPGElement
+  @ClsISA: ManakaiDPGElement
+  
+  @IFISA: DPGElementAttribute
+  @ClsISA: ManakaiDPGElementAttribute
+
+##DPGMatchElseBlockElement
 
 IFClsETDef:
   @IFQName: DPGMyStatementElement
@@ -1744,6 +2037,18 @@ IFClsETDef:
   @IFISA: DPGElementAttribute
   @ClsISA: ManakaiDPGElementAttribute
 ##DPGEmbedStatementElement
+
+IFClsETDef:
+  @IFQName: DPGRuleRefStatementElement
+  @ClsQName: ManakaiDPGRuleRefStatementElement
+  @ETQName: pg|ruleRefStatement
+
+  @IFISA: DPGElement
+  @ClsISA: ManakaiDPGElement
+
+  @IFISA: DPGElementAttribute
+  @ClsISA: ManakaiDPGElementAttribute
+##DPGRuleRefStatementElement
 
 IFClsETDef:
   @IFQName: DPGLexmodeElement
@@ -1930,7 +2235,7 @@ IFClsDef:
         should be attached.
     @@Return:
       @@@PerlDef:
-        my $token = $self->_shift_token;
+        my $token = $self->_scan_default;
         if ($token->{type} eq 'LBRACE') {
           my $nest_count = 1; # already opened
           my $s = '';
@@ -1992,7 +2297,7 @@ IFClsDef:
         if ($err->isa (<IFName::DOMCore|DOMError||ManakaiDOM|ManakaiDOM>)) {
           __DEEP{
             A: {
-              my $cfg = $self-><AG::Document.domConfig>;
+              my $cfg = $self-><AG::DPGParser.domConfig>;
               my $h = $cfg-><M::DOMCore|DOMConfiguration.getParameter>
                                ('error-handler');
               $r = $h-><M::DOMCore|DOMErrorHandler.handleError> ($err);
@@ -2010,6 +2315,7 @@ IFClsDef:
       lang:Perl {
         $doc = $impl-><M::DOMCore|DOMImplementation.createDocument>
                       (<Q::pg:>, 'rules');
+        $doc-><AS::Document.strictErrorChecking> (false);
         $docel = $doc-><AG::Document.documentElement>;
       }
     
@@ -2241,7 +2547,8 @@ IFClsDef:
   
     rule AttributeSpecificationList ($doc, $parent) {
       /*
-        AttributeSpecification := COLON NAME [Occurence] [REPLACE STRING]
+        AttributeSpecification := COLON NAME [Occurence]
+                                  [REPLACE (STRING / NAME)]
       */
 
       ~* (COLON) {
@@ -2266,6 +2573,11 @@ IFClsDef:
                         (null, 'value',
                          substr ($value, 1, length ($value) - 2));
               }
+            } (NAME) {
+              lang:Perl ($value => $token.value) {
+                $ael-><M::Element.setAttributeNS>
+                        (null, 'value', $value);
+              }
             }
           }
         }
@@ -2285,34 +2597,29 @@ IFClsDef:
     
       /*
         Statement := MyStatement / AssignmentStatement / MatchStatement /
-                     RuleRefStatement / EmbedStatement
+                     RuleRefStatement / EmbedStatement / QLexmodeStatement /
+                     IfTrueStatement / ReturnStatement
       */
     
       ~* (MATCH) {
         /*
-          MatchStatement := MATCH Occurence
+          MatchStatement := MATCH Occurence *AttributeSpecification
                             1*(LPAREN [RNI] NAME [EQUALS STRING] RPAREN
                                *AttributeSpecification CodeBlock)
         */
+
         my $match;
         lang:Perl {
           $match = $doc-><M::Document.createElementNS>
                            (<Q::pg:>, 'matchStatement');
           $block-><M::Node.appendChild> ($match);
         }
-        ~? (ZEROMORE) {
-          lang:Perl {
-            $match-><M::Element.setAttributeNS> (null, 'occurence', 'zeromore');
-          }
-        } (ONEMORE) {
-          lang:Perl {
-            $match-><M::Element.setAttributeNS> (null, 'occurence', 'onemore');
-          }
-        } (ZEROONE) {
-          lang:Perl {
-            $match-><M::Element.setAttributeNS> (null, 'occurence', 'zeroone');
-          }
-        }
+
+        &OccurenceOpt ($parent => $match);
+
+        &AttributeSpecificationList
+          ($doc => $doc, $parent => $match);
+
         ~+ (LPAREN) {
           my $match_block;
           lang:Perl {
@@ -2346,12 +2653,28 @@ IFClsDef:
 
           ~ (RPAREN) { }
           
-          &AttributeSpecificationList ($doc => $doc, $parent => $match_block);
+          &AttributeSpecificationList
+            ($doc => $doc, $parent => $match_block);
           
           ~ (LBRACE) {
             &_CodeBlock ($doc => $doc, $parent => $match_block);
           }
-        }
+        } // LPAREN
+
+        ~? (NAME == 'else') {
+          my $match_block;
+          lang:Perl {
+            $match_block = $doc-><M::Document.createElementNS>
+                                   (<Q::pg:>, 'matchElseBlock');
+            $match-><M::Node.appendChild> ($match_block);
+          }
+
+          &AttributeSpecificationList ($doc => $doc, $parent => $match_block);
+
+          ~ (LBRACE) {
+            &_CodeBlock ($doc => $doc, $parent => $match_block);
+          }
+        } // else
 
       } (NAME == 'my') {
         /*
@@ -2366,6 +2689,48 @@ IFClsDef:
           }
 
           &AttributeSpecificationList ($doc => $doc, $parent => $my);
+        }
+
+        ~ (SEMICOLON) { }
+
+      } (NAME == 'if-true') {
+        /*
+          IfTrueStatement := 'if-true' LPAREN VARIABLE RPAREN
+                             *AttributeSpecification CodeBlock
+        */
+
+        my $ift;
+        lang:Perl {
+          $ift = $doc-><M::Document.createElementNS>
+                            (<Q::pg:>, 'ifTrueStatement');
+          $block-><M::Node.appendChild> ($ift);
+        }
+        
+        ~ (LPAREN) {
+          ~ (VARIABLE) {
+            lang:Perl ($name => $token.value) {
+              $ift-><M::Element.setAttributeNS>
+                      (null, 'name', substr ($name, 1));
+            }
+          }
+          ~ (RPAREN) { }
+        }
+
+        &AttributeSpecificationList ($doc => $doc, $parent => $ift);
+
+        ~ (LBRACE) {
+          &_CodeBlock ($doc => $doc, $parent => $ift);
+        }
+
+      } (NAME == 'return') {
+        /*
+          ReturnStatement := 'return' SEMICOLON
+        */
+
+        lang:Perl {
+          my $ret = $doc-><M::Document.createElementNS>
+                            (<Q::pg:>, 'returnStatement');
+          $block-><M::Node.appendChild> ($ret);
         }
 
         ~ (SEMICOLON) { }
@@ -2392,9 +2757,11 @@ IFClsDef:
         &AttributeSpecificationList ($doc => $doc, $parent => $embed);
 
         &EmbedBlock ($doc => $doc, $parent => $embed);
+
       } (RULEREF) {
         /*
-          RuleRefStatement := RULEREF [ParameterSpecificationList] SEMICOLON
+          RuleRefStatement := RULEREF [ParameterSpecificationList]
+                              *AttributeSpecification SEMICOLON
         */
       my $ruleref;
       lang:Perl ($name => $token.value) {
@@ -2405,7 +2772,36 @@ IFClsDef:
       
       &ParameterSpecificationListOpt ($doc => $doc, $parent => $ruleref);
       
+        &AttributeSpecificationList ($doc => $doc, $parent => $ruleref);
+      
       ~ (SEMICOLON) { }
+
+        } (QKEYWORD == '?lexmode') {
+          /*
+            Changes current |lexmode|
+
+            QLexmodeStatement := '?lexmode' (NAME / STRING) SEMICOLON
+          */
+
+          ~ (NAME) {
+            lang:Perl ($mode => $token.value) {
+              my $lm = $doc-><M::Document.createElementNS>
+                         (<Q::pg:>, 'qLexmodeStatement');
+              $lm-><M::Element.setAttributeNS> (null, 'name', $mode);
+              $block-><M::Node.appendChild> ($lm);
+            }
+          } (STRING) {
+            lang:Perl ($mode => $token.value) {
+              my $lm = $doc-><M::Document.createElementNS>
+                         (<Q::pg:>, 'qLexmodeStatement');
+              $lm-><M::Element.setAttributeNS>
+                         (null, 'name',
+                          substr ($mode, 1, length ($mode) - 2));
+              $block-><M::Node.appendChild> ($lm);
+            }
+          }
+
+          ~ (SEMICOLON) { }
         } (VARIABLE) {
           /*
             AssignmentStatement := Lvalue ASSIGN Rvalue;
@@ -2456,7 +2852,7 @@ IFClsDef:
   
     rule Rvalue ($doc, $parent) {
       /*
-        Rvalue := STRING / VARIABLE *(DOT NAME)
+        Rvalue := STRING / VARIABLE *(DOT NAME) / '?match' NAME
       */
     
       ~ (STRING) {
@@ -2487,6 +2883,15 @@ IFClsDef:
               $mem-><M::Element.setAttributeNS> (null, 'name', $name);
               $memref-><M::Node.appendChild> ($mem);
             }
+          }
+        }
+      } (QKEYWORD == '?match') {
+        ~ (NAME) {
+          lang:Perl ($name => $token.value) {
+            my $var = $doc-><M::Document.createElementNS>
+                              (<Q::pg:>, 'qMatch');
+            $var-><M::Element.setAttributeNS> (null, 'name', $name);
+            $parent-><M::Node.appendChild> ($var);
           }
         }
       }
@@ -2583,7 +2988,7 @@ IFClsDef:
     } // token-error default
 
 
-    lexmode default : initial {
+    lexmode default : initial : standalone {
       WSP : ignore := [U+0009..U+000D U+0020]+;
       COMMENT : ignore := [';'] [';'] [^U+000A..U+000D]* [U+000A..U+000D]*;
 
@@ -2609,7 +3014,11 @@ IFClsDef:
 
       VARIABLE : value := ['$'] $name;
       RULEREF : value := ['&'] $name;
-    
+
+      /*
+        Q-keyword
+      */
+      QKEYWORD : value := ['?'] $name;
 
       /*
         Character code point
@@ -2729,6 +3138,33 @@ ErrDef:
     (prefix => { (|}, suffix => {|)}); is not 
     allowed %dpg-error-lines (prefix => {(|}, suffix => {|)});
 
+ErrDef:
+  @QName: pg|unique-lexmode-name-error
+  @enDesc:
+    A <CODE::lexmode> name <kwd:MUST-NOT> appear more than once in the
+    same DPG document.
+  @DOMCore:severity: DOMCore|SEVERITY_ERROR
+  @enMufDef:
+    |lexmode| |%p (name => {<Q::pg|name>});| is already defined
+
+ErrDef:
+  @QName: pg|rule-not-defined-error
+  @enDesc:
+    The referenced <CODE::rule> name <kwd:MUST> be defined
+    in the same DPG document.
+  @DOMCore:severity: DOMCore|SEVERITY_ERROR
+  @enMufDef:
+    |rule| |%p (name => {<Q::pg:name>});| is not defined
+
+ErrDef:
+  @QName: pg|lexmode-not-defined-error
+  @enDesc:
+    The referenced <CODE::lexmode> name <kwd:MUST> be defined
+    in the same DPG document.
+  @DOMCore:severity: DOMCore|SEVERITY_ERROR
+  @enMufDef:
+    |lexmode| |%p (name => {<Q::pg|name>});| is not defined
+
 PropDef:
   @QName: pg|error-token
   @enDesc:
@@ -2738,6 +3174,16 @@ PropDef:
   @QName: pg|source-text
   @enDesc:
     A reference to the original source text, if available.
+
+PropDef:
+  @QName: pg|name
+  @enDesc:
+    A name.
+
+PropDef:
+  @QName: pg|element
+  @enDesc:
+    An element.
 
 ElementTypeBinding:
   @Name:enMufDef
@@ -2828,6 +3274,15 @@ ResourceDef:
       @@@enDesc:
         An attempt was made to load a DPG document and
         the processing has been stopped.
+    @@ResourceDef:
+      @@@rdf:type: DISLang|Const
+      @@@QName: pg|VALIDITY_ERR
+      @@@Value:
+        @@@@@: 10083
+        @@@@ContentType: DISCore|Integer
+      @@@enDesc:
+        An attempt was made to process an invalid DPG document
+        and the processing has been stopped.
 ##DPGException
 
 IFClsDef:

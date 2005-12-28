@@ -1,3 +1,40 @@
+2005-12-28  Wakaba  <wakaba@suika.fam.cx>
+
+	* DPG.dis (plCodeFragment): Pushes |pop @ch| rather
+	than |$ch| if an acception clause follows to a code block
+	generated from a child match statement so that tokenizer
+	does do the correct thing.  Support for |builtin:nestedBlockAsText|
+	special rule is removed.  |pg:ifTrueStatement| is
+	supported.  |pg:returnStatement| is supported.
+
+2005-12-27  Wakaba  <wakaba@suika.fam.cx>
+
+	* DPG.dis (VALIDITY_ERR): New error code.
+	($merge_adjacent_range): New subfunction.  Adjacent character
+	ranges are now merged so that |if| conditions in
+	scanner methods are simplified.
+	($array_uniq): New subfunction.  Filters states so that
+	state number don't explode.
+	(plCodeFragment): Now a DPG parser can have more than
+	one tokenizer.  The |pg:qMatch| rvalue is supported.
+	(DPGMatchStatementElement): The match statement 
+	now accepts attributes.
+	(DPGRuleRefStatementElement): The ruleref statement
+	now accepts attributes.
+	(AttributeSpecificationList): The attribute specification
+	now accepts a |NAME| as an attribute value as well
+	as |STRING|s.
+	(CodeBlock): The |pg:qLexmodeStatement| is supported.
+	(lexmode.default): |QKEYWORD| token type is added.
+	(ErrDef): Errors |unique-lexmode-name-error|, |rule-not-defined-error|,
+	|lexmode-not-defined-error| and properties added.
+
+2005-12-25  Wakaba  <wakaba@suika.fam.cx>
+
+	* DPG.dis (dpgGetAttributeList): New method.
+	(plCodeFragment): |:terminator?| option for a match
+	block is supported.  |pg:matchElseBlock| is implemented.
+
 2005-12-24  Wakaba  <wakaba@suika.fam.cx>
 
 	* Perl.dis (DISResourcePerl.plName): Implemented

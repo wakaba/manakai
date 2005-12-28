@@ -46,9 +46,10 @@ DOM_FEATURE_DIS_FILES = DOMFeature$(DIS_SUFFIX)
 DOM_CORE_DIS_FILES = DOMMain.dis DOMCore.dis DOMXML.dis \
                      DOMLS.dis GenericLS.dis Tree$(DIS_SUFFIX)
 DOM_LS_DIS_FILES   = SimpleLS$(DIS_SUFFIX) ManakaiDOMLS2003$(DIS_SUFFIX)
+XP_DIS_FILES       = XMLParser$(DIS_SUFFIX)
 DOM_HTML_DIS_FILES = DOMHTML.dis DOMWebForms.dis
 DIS_FILES = $(DOM_FEATURE_DIS_FILES) $(DOM_CORE_DIS_FILES) \
-  $(DOM_LS_DIS_FILES) $(DOM_HTML_DIS_FILES)
+  $(DOM_LS_DIS_FILES) $(DOM_HTML_DIS_FILES) $(XP_DIS_FILES)
 
 GENERATED_FILES = \
   feature$(DAC_SUFFIX) DOMFeature$(PM_SUFFIX) \
@@ -56,11 +57,14 @@ GENERATED_FILES = \
                      DOMCore$(PM_SUFFIX) DOMXML$(PM_SUFFIX) DOMLS$(PM_SUFFIX) \
                      GenericLS$(PM_SUFFIX) Tree$(PM_SUFFIX) \
   ls$(DAC_SUFFIX)    SimpleLS$(PM_SUFFIX) ManakaiDOMLS2003$(PM_SUFFIX) \
+  xp$(DAC_SUFFIX)    XMLParser$(PM_SUFFIX) \
   html$(DAC_SUFFIX)  DOMHTML$(PM_SUFFIX) DOMWebForms$(PM_SUFFIX)
 GENERATED_DAC_FILES = feature$(DAC_SUFFIX) \
-  core$(DAC_SUFFIX) ls$(DAC_SUFFIX) html$(DAC_SUFFIX)
+  core$(DAC_SUFFIX) ls$(DAC_SUFFIX) html$(DAC_SUFFIX) xp$(DAC_SUFFIX)
 
-all: .core$(PM_SUFFIX) .ls$(PM_SUFFIX) .html$(PM_SUFFIX) $(GENERATED_DAC_FILES)
+all: .core$(PM_SUFFIX) .ls$(PM_SUFFIX) .html$(PM_SUFFIX) \
+  $(GENERATED_DAC_FILES) \
+  XMLParser$(PM_SUFFIX)
 
 feature$(DAC_SUFFIX): $(UTIL_CORE_DAC_FILE) $(DOM_FEATURE_DIS_FILES) $(DAC_PL)
 	$(DAC)$@ --input-db-file-name="$<" DOMFeature.dis
@@ -74,6 +78,9 @@ ls$(DAC_SUFFIX): core$(DAC_SUFFIX) $(DOM_LS_DIS_FILES) $(DAC_PL)
 	$(DAC)$@.tmp.1 --input-db-file-name="$<" SimpleLS.dis
 	$(DAC)$@ --input-db-file-name="$@.tmp.1" ManakaiDOMLS2003.dis
 	$(RM) $@.tmp.1
+
+xp$(DAC_SUFFIX): ls$(DAC_SUFFIX) $(XP_DIS_FILES) $(DAC_PL)
+	$(DAC)$@ --input-db-file-name="$<" XMLParser.dis
 
 html$(DAC_SUFFIX): core$(DAC_SUFFIX) $(DOM_HTML_DIS_FILES) $(DAC_PL)
 	$(DAC)$@ --input-db-file-name="$<" DOMHTML.dis
@@ -120,6 +127,11 @@ $(DOM_LS_DIS_FILES:$(DIS_SUFFIX)=$(PM_SUFFIX)): ls$(DAC_SUFFIX) $(DAC2PM_PL)
 	$(PERL_CHK) ManakaiDOMLS2003$(PM_SUFFIX)
 	$(TOUCH) $@
 
+$(XP_DIS_FILES:$(DIS_SUFFIX)=$(PM_SUFFIX)): xp$(DAC_SUFFIX) $(DAC2PM_PL)
+	$(DAC2PM) $< --module-uri="$(NS_MDOM)$(@:$(PM_SUFFIX)=)" \
+	  --output-file-path="$@"
+	$(PERL_CHK) $@
+
 $(DOM_HTML_DIS_FILES:.dis=$(PM_SUFFIX)): html$(DAC_SUFFIX) $(DAC2PM_PL)
 	$(DAC2PM) $< --module-uri="$(NS_MDOM)$(@:$(PM_SUFFIX)=)" > $@
 	$(PERL_CHK) $@
@@ -147,5 +159,5 @@ clean:
 	$(RM) .*.tmp *~ .*~ *.BAK .*.BAK
 	$(RM) .core$(PM_SUFFIX) .ls$(PM_SUFFIX) .html$(PM_SUFFIX)
 
-## $Date: 2005/11/20 09:49:28 $
+## $Date: 2005/12/28 03:50:17 $
 ## License: Public Domain.
