@@ -10,7 +10,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2005/12/28 11:10:56 $
+    $Date: 2005/12/29 10:21:42 $
 
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
@@ -164,6 +164,22 @@ ClsDef:
 
   @DISLang:role: DOMLS|ParserRole
 
+  @enDesc:
+    Note that the <Class::ManakaiXMLParser> reports any XML errors
+    (syntax errors and / or well-formedness constraint errors)
+    via the <IF::DOMCore:error-handler> registered to
+    the <A::DOMLS:LSParser.domConfig> object.  Each error has
+    its <A::DOMCore:DOMError.severity>, either <C::DOMCore:SEVERITY_ERROR>
+    or <C::DOMCore:SEVERITY_FATAL_ERROR>.  However, their semantics
+    are slight different from the ones of <QUOTE::error> and
+    <QUOTE::fatal error> in XML; in this implemenetation, 
+    <C::DOMCore:SEVERITY_ERROR> implies that the parsing process
+    can effectively be continued to detect more errors while
+    <C::DOMCore:SEVERITY_FATAL_ERROR> implies that the error
+    is serious so that the result document tree and any errors
+    might be far from the ones obtained when the error would not
+    be found.
+
   @Attr:
     @@Name: domConfig
     @@enDesc:
@@ -222,6 +238,11 @@ ClsDef:
         $self->{char} = [];
         $self->{token} = [];
         $self->{source} = $sourceText;
+        $self->{xml_version} = '1.0';
+        $self->{standalone} = false;
+          ## Well-formedness constraint Entity Declared takes effect?
+        $self->{line} = 1;
+        $self->{column} = 1;
 
         __DEEP{
           $r = $self->_parse_DocumentEntity
@@ -248,6 +269,57 @@ ClsDef:
 
           if (length $char) {
             $r = ord $char;
+            if ($r == 0x000A) {
+              $self->{line}++;
+              $self->{column} = 1;
+            } elsif ($r == 0x000D) {
+              my $next_char = substr ($self->{source},
+                                      pos ($self->{source}), 1);
+              if ($next_char eq "\x0A") {
+                pos ($self->{source})++;
+                $self->{column} = 1;
+              } elsif ($next_char eq "\x85") {
+                if ($self->{xml_version} eq '1.1') {
+                  pos ($self->{source})++; 
+                  $self->{column} = 1;
+                } else {
+                  $self->{column} = 0;
+                }
+              } else {
+                $self->{column} = 1;
+              }
+              $r = 0x000A;
+              $self->{line}++;
+            } elsif (
+              not ((0x0020 <= $r and $r <= 0x007E) or
+                   (0x00A0 <= $r and $r <= 0xD7FF) or
+                   (0xE000 <= $r and $r <= 0xFFFD) or
+                   (0x10000 <= $r and $r <= 0x10FFFF)) and
+              $r != 0x0009 and $r != 0x0085 and
+              not ($self->{xml_version} eq '1.0' and
+                   (0x007F <= $r and $r <= 0x009F))
+            ) {
+              my $location = {
+                utf32_offset => pos ($self->{source}),
+                line_number => $self->{line},
+                column_number => $self->{column},
+              };
+              my $continue = __DOMCore:ERROR{xp|wf-legal-literal-character::
+                DOMCore|location => {$location},
+                xp|character-number => {$r},
+              }__;
+              unless ($continue) {
+                __EXCEPTION{DOMLS|PARSE_ERR}__;
+              }
+              $self->{has_error} = true;
+              $self->{column}++;
+            } elsif ($r == 0x0085 or $r == 0x2028) {
+              $r = 0x000A if $self->{xml_version} eq '1.1';
+              $self->{line}++;
+              $self->{column} = 1;
+            } else {
+              $self->{column}++;
+            }
           } else {
             $r = -1;
           }
@@ -314,9 +386,17 @@ ClsDef:
       */
       ?lexmode 'DocumentStart';
       
-      &XMLDeclarationOpt ($doc => $doc);
-      
-      ?lexmode 'DocumentProlog';
+      ~? (XDO) {
+        &_XMLDeclaration_ ($doc => $doc);
+        
+        ~ (PIC) {
+          ?lexmode DocumentProlog;
+        } else {
+          ?lexmode DocumentProlog;
+        }
+      } else {
+        ?lexmode 'DocumentProlog';
+      }
       
       // *Misc
       ~* (CDO) {
@@ -343,10 +423,17 @@ ClsDef:
       ~? (MDO) {
         &_DocumentTypeDeclaration_ ($doc => $doc);
 
-        ~ (MDC) { }
+        ~ (MDC) {
+          ?lexmode DocumentMisc;
+        } else {
+          ?lexmode DocumentMisc;
+        }
+      } else {
+        lang:Perl {
+          $self->{standalone} = true;
+        }
+        ?lexmode DocumentMisc;
       }
-      
-      ?lexmode 'DocumentMisc';
       
       // *Misc
       ~* (CDO) {
@@ -425,25 +512,195 @@ ClsDef:
       NOTE: XML declaration is optional in XML 1.0
             while it is required in XML 1.1.
     */
+    rule _XMLDeclaration_ ($doc) {
+      ?lexmode XMLDeclaration;
 
-    rule XMLDeclarationOpt ($doc) {
-      ~? (XDO) {
-        &_XMLDeclaration ($doc => $doc);
-      }
-    } // XMLDeclarationOpt
+      ~ (S) { }
 
-    rule XMLDeclaration ($doc) {
-      ~ (XDO) {
-        &_XMLDeclaration ($doc => $doc);
-      }
-    } // XMLDeclaration
+      ~ (Name == 'version') {
+        ~? (S) { }
+        ~ (VI) { }
+        ~? (S) { }
+
+        my $ver;
+        my $bad_token;
+
+        ~ (LIT) {
+          ?lexmode AttributeValueLiteral;
+          
+          ~ (STRING) {
+            lang:Perl ($version => $token.value) {
+              $ver = $version;
+              $bad_token = $token;
+            }
+          }
     
-    rule _XMLDeclaration ($doc) {
-      ?lexmode 'TAG';
-      
-      // TODO: implement this
-      
-    } // _XMLDeclaration
+          ~ (LIT) {
+            ?lexmode XMLDeclaration;
+          }
+        } (LITA) {
+          ?lexmode AttributeValueLiteralA;
+          
+          ~ (STRING) {
+            lang:Perl ($version => $token.value) {
+              $ver = $version;
+              $bad_token = $token;
+            }
+          }
+    
+          ~ (LITA) {
+            ?lexmode XMLDeclaration;
+          }
+        }
+
+        lang:Perl : has-error {
+          unless ($ver eq '1.0' or $ver eq '1.1') {
+            my $location;
+            __CODE{xp|get-location-from-token::
+              $token => {$bad_token},
+              $result => {$location},
+            }__;
+            my $continue = __DOMCore:ERROR{xp|wf-unsupported-xml-version::
+              DOMCore|location => {$location},
+              xp|parent => {$doc},
+              infoset|version => {$ver},
+              xp|error-token => {$bad_token},
+            }__;
+            unless ($continue) {
+              __EXCEPTION{DOMLS|PARSE_ERR}__;
+            }
+            $self->{has_error} = true;
+          }
+          $doc-><AS::Document.xmlVersion> ($ver);
+          $self->{xml_version} = $ver;
+        }
+
+        ~? (S) { }
+      }
+
+      ~? (Name == 'encoding') {
+        ~? (S) { }
+        ~ (VI) { }
+        ~? (S) { }
+
+        my $ver;
+        my $bad_token;
+
+        ~ (LIT) {
+          ?lexmode AttributeValueLiteral;
+          
+          ~ (STRING) {
+            lang:Perl ($version => $token.value) {
+              $ver = $version;
+              $bad_token = $token;
+            }
+          }
+    
+          ~ (LIT) {
+            ?lexmode XMLDeclaration;
+          }
+        } (LITA) {
+          ?lexmode AttributeValueLiteralA;
+          
+          ~ (STRING) {
+            lang:Perl ($version => $token.value) {
+              $ver = $version;
+              $bad_token = $token;
+            }
+          }
+    
+          ~ (LITA) {
+            ?lexmode XMLDeclaration;
+          }
+        }
+
+        lang:Perl : has-error {
+          unless ($ver =~ /\A[A-Za-z][A-Za-z0-9._-]*\z/) {
+            my $location;
+            __CODE{xp|get-location-from-token::
+              $token => {$bad_token},
+              $result => {$location},
+            }__;
+            my $continue = __DOMCore:ERROR{xp|wf-malformed-enc-name::
+              DOMCore|location => {$location},
+              xp|parent => {$doc},
+              xp|name => {$ver},
+              xp|error-token => {$bad_token},
+            }__;
+            unless ($continue) {
+              __EXCEPTION{DOMLS|PARSE_ERR}__;
+            }
+            $self->{has_error} = true;
+          }
+          $doc-><AS::Document.xmlEncoding> ($ver);
+        }
+
+        ~? (S) { }
+      }
+
+      ~? (Name == 'standalone') {
+        ~? (S) { }
+        ~ (VI) { }
+        ~? (S) { }
+
+        my $ver;
+        my $bad_token;
+
+        ~ (LIT) {
+          ?lexmode AttributeValueLiteral;
+          
+          ~ (STRING) {
+            lang:Perl ($version => $token.value) {
+              $ver = $version;
+              $bad_token = $token;
+            }
+          }
+    
+          ~ (LIT) {
+            ?lexmode XMLDeclaration;
+          }
+        } (LITA) {
+          ?lexmode AttributeValueLiteralA;
+          
+          ~ (STRING) {
+            lang:Perl ($version => $token.value) {
+              $ver = $version;
+              $bad_token = $token;
+            }
+          }
+    
+          ~ (LITA) {
+            ?lexmode XMLDeclaration;
+          }
+        }
+
+        lang:Perl : has-error {
+          unless ($ver eq 'yes' or $ver eq 'no') {
+            my $location;
+            __CODE{xp|get-location-from-token::
+              $token => {$bad_token},
+              $result => {$location},
+            }__;
+            my $continue = __DOMCore:ERROR{xp|wf-malformed-xml-standalone::
+              DOMCore|location => {$location},
+              xp|parent => {$doc},
+              xp|name => {$ver},
+              xp|error-token => {$bad_token},
+            }__;
+            unless ($continue) {
+              __EXCEPTION{DOMLS|PARSE_ERR}__;
+            }
+            $self->{has_error} = true;
+          }
+          $doc-><AS::Document.xmlStandalone> ($ver);
+          $self->{standalone} = true if $ver eq 'yes';
+        }
+
+        ~? (S) { }
+      }
+
+      // ~ (PIC) { }
+    } // _XMLDeclaration_
     
     /*
       Document Type Declaration
@@ -462,6 +719,9 @@ ClsDef:
       
       // TODO: Implement this
       
+      // TODO: set $self->{standalone} true if only internal subset
+      //       with no param ref
+
       // ~ (MDC) { }
     } // _DocumentTypeDeclaration_
     
@@ -507,9 +767,23 @@ ClsDef:
       my $pi;
       
       ~ (Name) {
-        lang:Perl ($name => $token.value) {
+        lang:Perl ($name => $token.value) : has-error {
           if (lc $name eq 'xml') {
-            ## TODO: Well-formedness (syntax) error
+            my $location;
+            __CODE{xp|get-location-from-token::
+              $token => {$token},
+              $result => {$location},
+            }__;
+            my $continue = __DOMCore:ERROR{xp|wf-pi-target-is-xml::
+              xp|name => {$name},
+              DOMCore|location => {$location},
+              xp|parent => {$parent},
+            }__;
+            unless ($continue) {
+              __EXCEPTION{DOMLS|PARSE_ERR::
+              }__;
+            }
+            $self->{has_error} = true;
           }
           ## TODO: Namespace well-formedness
           $pi = $doc-><M::Document.createProcessingInstruction>
@@ -579,9 +853,6 @@ ClsDef:
       (CharData) {
         // Character data
         lang:Perl ($data => $token.value) {
-          if (index ($data, ']]>') > -1) {
-            ## TODO: Well-formedness (syntax) error
-          }
           $node-><M::Node.appendChild>
             ($doc-><M::Document.createTextNode> ($data));
         }
@@ -729,7 +1000,7 @@ ClsDef:
         my $is_docel;
         
         ~ (Name) {
-          lang:Perl ($name => $token.value) {
+          lang:Perl ($name => $token.value) : has-error {
             if ($name eq $type) {
               $type = pop @{$types};
               if ($type eq '') {
@@ -738,7 +1009,22 @@ ClsDef:
               $node = pop @{$nodes};
               $ns = pop @{$nses};
             } else {
-              ## TODO: Element type match well-formedness error
+              my $location;
+              __CODE{xp|get-location-from-token::
+                $token => $token,
+                $result => $location,
+              }__;
+              my $continue = __DOMCore:ERROR{xp|wf-element-type-match::
+                DOMCore:location => {$location},
+                xp|token => {$token},
+                xp|expected-element-type => {$type},
+                xp|actual-element-type => {$name},
+                xp|node => {$node},
+              }__;
+              unless ($continue) {
+                __EXCEPTION{DOMLS|PARSE_ERR}__;
+              }
+              $self->{has_error} = true;
             }
           }
         }
@@ -746,9 +1032,26 @@ ClsDef:
         ~? (S) { }
 
         if-true ($is_docel) {
-          lang:Perl {
+          lang:Perl : has-error {
             if (@{$types}) {
-              ## WF error
+              my $location;
+              __CODE{xp|get-location-from-token::
+                $token => $token,
+                $result => $location,
+              }__;
+              for my $type (reverse @{$types}) {
+                my $continue = __DOMCore:ERROR{xp|wf-no-end-tag::
+                  DOMCore:location => {$location},
+                  xp|token => {$token},
+                  xp|expected-element-type => {$type},
+                  xp|node => {$node},
+                }__;
+                unless ($continue) {
+                  __EXCEPTION{DOMLS|PARSE_ERR}__;
+                }
+                $node = shift @{$nodes};
+              }
+              $self->{has_error} = true;
             }
           }
           return;
@@ -812,6 +1115,8 @@ ClsDef:
           ?lexmode ElementContent;
         }
       }
+
+      ~ (#NONE) { }
     } // Element_
     
     rule AttributeSpecificationList ($doc, $attrs)
@@ -830,14 +1135,23 @@ ClsDef:
           $atqname = $name;
         }
         
-        ~? (S) { }
-        ~ (VI) { }
-        ~? (S) { }
-        
         my $vals;
         lang:Perl {
           if ($attrs->{$atqname}) {
-            ## TODO: Unique attr name well-formedness error
+            my $location;
+            __CODE{xp|get-location-from-token::
+              $token => $token,
+              $result => $location,
+            }__;
+            my $continue = __DOMCore:ERROR{xp|wf-unique-att-spec::
+              DOMCore:location => {$location},
+              xp|token => {$token},
+              xp|name => {$atqname},
+            }__;
+            unless ($continue) {
+              __EXCEPTION{DOMLS|PARSE_ERR}__;
+            }
+            $self->{has_error} = true;
           }
           
           $vals = $attrs->{$atqname} = {
@@ -846,6 +1160,10 @@ ClsDef:
             index => $i++,
           };
         }
+
+        ~? (S) { }
+        ~ (VI) { }
+        ~? (S) { }
         
         ~ (LIT) {
           &_AttributeValueSpecification_
@@ -988,9 +1306,36 @@ ClsDef:
       ?lexmode 'NumericCharacterReference';
       
       ~ (NUMBER) {
-        lang:Perl ($num => $token.value) {
-          ## TODO: [WFC: Lecal Character]
-          my $ncr = $doc-><M::Document.createTextNode>
+        lang:Perl ($num => $token.value) : has-error {
+          $num += 0;
+          unless (
+            ($self->{xml_version} eq '1.0' and
+              ((0x0020 <= $num and $num <= 0xD7FF) or
+               (0xE000 <= $num and $num <= 0xFFFD) or
+               (0x10000 <= $num and $num <= 0x10FFFF) or
+               $num == 0x9 or $num == 0xA or $num == 0xD)) or
+            ($self->{xml_version} eq '1.1' and
+              ((0x0001 <= $num and $num <= 0xD7FF) or
+               (0xE000 <= $num and $num <= 0xFFFD) or
+               (0x10000 <= $num and $num <= 0x10FFFF)))
+          ) {
+            my $location;
+            __CODE{xp|get-location-from-token::
+              $token => $token,
+              $result => $location,
+            }__;
+            my $continue = __DOMCore:ERROR{xp|wf-legal-character::
+              DOMCore:location => {$location},
+              xp|token => {$token},
+              xp|character-number => {$num},
+              xp|parent => {$parent},
+            }__;
+            unless ($continue) {
+              __EXCEPTION{DOMLS|PARSE_ERR}__;
+            }
+            $self->{has_error} = true;
+          }
+          my $ncr = $doc-><M::Document.createTextNode> (chr $num);
                             (chr (0+$num));
           $parent-><M::Node.appendChild> ($ncr);
         }
@@ -1003,8 +1348,34 @@ ClsDef:
       ?lexmode 'NumericCharacterReference';
       
       ~ (NUMBER) {
-        lang:Perl ($num => $token.value) {
-          ## TODO: [WFC: Lecal Character]
+        lang:Perl ($num => $token.value) : has-error {
+          $num += 0;
+          unless (
+            ($self->{xml_version} eq '1.0' and
+              ((0x0020 <= $num and $num <= 0xD7FF) or
+               (0xE000 <= $num and $num <= 0xFFFD) or
+               (0x10000 <= $num and $num <= 0x10FFFF) or
+               $num == 0x9 or $num == 0xA or $num == 0xD)) or
+            ($self->{xml_version} eq '1.1' and
+              ((0x0001 <= $num and $num <= 0xD7FF) or
+               (0xE000 <= $num and $num <= 0xFFFD) or
+               (0x10000 <= $num and $num <= 0x10FFFF)))
+          ) {
+            my $location;
+            __CODE{xp|get-location-from-token::
+              $token => $token,
+              $result => $location,
+            }__;
+            my $continue = __DOMCore:ERROR{xp|wf-legal-character::
+              DOMCore:location => {$location},
+              xp|token => {$token},
+              xp|character-number => {$num},
+            }__;
+            unless ($continue) {
+              __EXCEPTION{DOMLS|PARSE_ERR}__;
+            }
+            $self->{has_error} = true;
+          }
           my $ncr = $doc-><M::Document.createTextNode>
                             (my $char = chr (0+$num));
           push @{$vals->{nodes}}, $ncr;
@@ -1019,8 +1390,35 @@ ClsDef:
       ?lexmode 'HexadecimalCharacterReference';
       
       ~ (Hex) {
-        lang:Perl ($num => $token.value) {
-          ## TODO: [WFC: Lecal Character]
+        lang:Perl ($num => $token.value) : has-error {
+          $num += 0;
+          unless (
+            ($self->{xml_version} eq '1.0' and
+              ((0x0020 <= $num and $num <= 0xD7FF) or
+               (0xE000 <= $num and $num <= 0xFFFD) or
+               (0x10000 <= $num and $num <= 0x10FFFF) or
+               $num == 0x9 or $num == 0xA or $num == 0xD)) or
+            ($self->{xml_version} eq '1.1' and
+              ((0x0001 <= $num and $num <= 0xD7FF) or
+               (0xE000 <= $num and $num <= 0xFFFD) or
+               (0x10000 <= $num and $num <= 0x10FFFF)))
+          ) {
+            my $location;
+            __CODE{xp|get-location-from-token::
+              $token => $token,
+              $result => $location,
+            }__;
+            my $continue = __DOMCore:ERROR{xp|wf-legal-character::
+              DOMCore:location => {$location},
+              xp|token => {$token},
+              xp|character-number => {$num},
+              xp|parent => {$parent},
+            }__;
+            unless ($continue) {
+              __EXCEPTION{DOMLS|PARSE_ERR}__;
+            }
+            $self->{has_error} = true;
+          }
           my $ncr = $doc-><M::Document.createTextNode>
                       (chr hex $num);
           $parent-><M::Node.appendChild> ($ncr);
@@ -1030,12 +1428,38 @@ ClsDef:
       // ~ (REFC) { }
     } // _HexadecimalCharacterReference_
     
-    rule _HexadecimalCharacterReferenceV_ ($doc, $parent) {
+    rule _HexadecimalCharacterReferenceV_ ($doc, $vals) {
       ?lexmode 'HexadecimalCharacterReference';
       
       ~ (Hex) {
-        lang:Perl ($num => $token.value) {
-          ## TODO: [WFC: Lecal Character]
+        lang:Perl ($num => $token.value) : has-error {
+          $num += 0;
+          unless (
+            ($self->{xml_version} eq '1.0' and
+              ((0x0020 <= $num and $num <= 0xD7FF) or
+               (0xE000 <= $num and $num <= 0xFFFD) or
+               (0x10000 <= $num and $num <= 0x10FFFF) or
+               $num == 0x9 or $num == 0xA or $num == 0xD)) or
+            ($self->{xml_version} eq '1.1' and
+              ((0x0001 <= $num and $num <= 0xD7FF) or
+               (0xE000 <= $num and $num <= 0xFFFD) or
+               (0x10000 <= $num and $num <= 0x10FFFF)))
+          ) {
+            my $location;
+            __CODE{xp|get-location-from-token::
+              $token => $token,
+              $result => $location,
+            }__;
+            my $continue = __DOMCore:ERROR{xp|wf-legal-character::
+              DOMCore:location => {$location},
+              xp|token => {$token},
+              xp|character-number => {$num},
+            }__;
+            unless ($continue) {
+              __EXCEPTION{DOMLS|PARSE_ERR}__;
+            }
+            $self->{has_error} = true;
+          }
           my $ncr = $doc-><M::Document.createTextNode>
                       (my $char = chr hex $num);
           push @{$vals->{nodes}}, $ncr;
@@ -1571,6 +1995,29 @@ ClsDef:
       REFC := [';'];
     } // HexadecimalCharacterReference
     
+    lexmode XMLDeclaration
+      : standalone
+      : extends => 'Name'
+      : extends => 'S'
+    {
+      
+      /*
+        Value indicator
+      */
+      VI := ['='];
+      
+      /*
+        Literal open
+      */
+      LIT := ['"'];
+      LITA := [U+0027];
+      
+      /*
+        Processing instruction close
+      */
+      PIC := ['?'] ['>'];
+    } // XMLDeclaration
+    
     lexmode StartTag
       : standalone
       : extends => 'Name'
@@ -1621,7 +2068,7 @@ ClsDef:
       : extends => 'AttributeValueLiteral_'
     {
       LIT := ['"'];
-      STRING : value := [^'"' '&' '<'];
+      STRING : value := [^'"' '&' '<']+;
     } // AttributeValueLiteral
     
     lexmode AttributeValueLiteralA
@@ -1629,18 +2076,19 @@ ClsDef:
       : extends => 'AttributeValueLiteral_'
     {
       LIT := [U+0027];
-      STRING : value := [^U+0027 '&' '<'];
+      STRING : value := [^U+0027 '&' '<']+;
     } // AttributeValueLiteralA
     
     token-error default : default {
       lang:Perl {
-        my $location = {
-          utf32_offset => pos ($self->{source}),
-        };
-        my $continue = __DOMCore:ERROR{xp|bad-token-error::
+        my $location;
+        __CODE{xp|get-location-from-token::
+          $token => {$token},
+          $result => {$location},
+        }__;
+        my $continue = __DOMCore:ERROR{xp|wf-syntax-error::
           xp|error-token => {$token},
           DOMCore|location => {$location},
-          xp|source-text => {\($self->{source})},
         }__;
         unless ($continue) {
           __EXCEPTION{DOMLS|PARSE_ERR::
@@ -1651,6 +2099,16 @@ ClsDef:
     } // default
 ##ManakaiXMLParser
 
+ResourceDef:
+  @QName: xp|get-location-from-token
+  @rdf:type: DISPerl|BlockCode
+  @enDesc:
+    Creates a <IF::DOMCore:DOMLocator> object from a token.
+  @PerlDef:
+    $result = {
+      utf32_offset => pos ($self->{source}),
+    };
+  @For: ManakaiDOM|ManakaiDOM3
 
 ElementTypeBinding:
   @Name: RuleDef
@@ -1683,26 +2141,233 @@ ElementTypeBinding:
     @@For: ManakaiDOM|DOM3
     @@ecore:textFormatter: ManakaiXMLParserExceptionFormatter
 
-ErrDef:
-  @QName: xp|bad-token-error
+ElementTypeBinding:
+  @Name: WFErrDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DOMCore|DOMErrorType
+    @@For: ManakaiDOM|DOM3
+    @@ecore:textFormatter: ManakaiXMLParserExceptionFormatter
+
+WFErrDef:
+  @QName: xp|wf-syntax-error
   @enDesc:
-    The parser is encountered to a token whose type is not
-    allowed there.
+    The entity does not match to the production rule; it is not
+    well-formed.
+  @DOMCore:severity: DOMCore|SEVERITY_FATAL_ERROR
+  @enMufDef:
+    |%xp-error-token-type;|%xp-error-token-value
+    (prefix => { (|}, suffix => {|)}); is not 
+    allowed%xp-error-lines (prefix => { (|}, suffix => {|)});
+  @ecore:hasParameter:
+    @@@: xp|error-token
+    @@enDesc:
+      The token that is not allowed.
+
+WFErrDef:
+  @QName: xp|wf-pi-target-is-xml
+  @enDesc:
+    A processing instruction has its <CODE::PITarget> of
+    <XML::xml> (in any case) which is not allowed.
   @DOMCore:severity: DOMCore|SEVERITY_ERROR
   @enMufDef:
-    Token |%xp-error-token-type;|%xp-error-token-value
-    (prefix => { (|}, suffix => {|)}); is not 
-    allowed %xp-error-lines (prefix => {(|}, suffix => {|)});
+    Processing instruction target name cannot be |%p
+    (name => {<Q::xp|name>});|
+  @ecore:hasParameter:
+    @@@: xp|error-token
+    @@enDesc:
+      The token that contains the name.
+  @ecore:hasParameter:
+    @@@: xp|name
+    @@enDesc:
+      A string that is specified as target name of the
+      processing instruction.
+  @ecore:hasParameter: xp|parent
 
-PropDef:
+WFErrDef:
+  @QName: xp|wf-no-end-tag
+  @DOMCore:severity: DOMCore|SEVERITY_ERROR
+  @enDesc:
+    An end-tag is not found.
+  @enMufDef:
+    End-tag |</%p (name => {<Q::xp|expected-element-type>});>| is required
+  @ecore:hasParameter: xp|error-token
+  @ecore:hasParameter:
+    @@@: xp|node
+    @@enDesc:
+      The element node that is not closed.
+  @ecore:hasParameter:
+    @@@: xp|expected-element-type
+    @@enDesc:
+      The element type name of the element that is not closed.
+
+WFErrDef:
+  @QName: xp|wf-unsupported-xml-version
+  @DOMCore:severity: DOMCore|SEVERITY_ERROR
+  @enDesc:
+    The XML version specified in the version declaration is not supported.
+  @enMufDef:
+    XML version |%p (name => {<Q::infoset|version>});| is not supported
+  @ecore:hasParameter: xp|bad-token
+  @ecore:hasParameter:
+    @@@: xp|parent
+    @@enDesc:
+      The document node.
+  @ecore:hasParameter:
+    @@@: infoset|version
+    @@enDesc:
+      The specified XML version.
+
+WFErrDef:
+  @QName: xp|wf-malformed-enc-name
+  @DOMCore:severity: DOMCore|SEVERITY_ERROR
+  @enDesc:
+    An <XA::encoding> pseudo-attribute value does not match
+    to the procduction rule <CODE::EncName>.
+  @enMufDef:
+    Encoding name |%p (name => {<Q::xp|name>});| is not allowed
+  @ecore:hasParameter: xp|error-token
+  @ecore:hasParameter:
+    @@@: xp|parent
+    @@enDesc: The document node.
+  @ecore:hasParameter:
+    @@@: xp|name
+    @@enDesc:
+      The <XA::encoding> value.
+
+WFErrDef:
+  @QName: xp|wf-malformed-xml-standalone
+  @DOMCore:severity: DOMCore|SEVERITY_ERROR
+  @enDesc:
+    An <XA::standalone> pseudo-attribute value is neither <XML::yes>
+    or <XML::no>.
+  @enMufDef:
+    |standalone| pseudo-attribute value |%p (name => {<Q::xp|name>});|
+    is not allowed
+  @ecore:hasParameter: xp|error-token
+  @ecore:hasParameter:
+    @@@: xp|parent
+    @@enDesc: The document node.
+  @ecore:hasParameter:
+    @@@: xp|name
+    @@enDesc:
+      The <XA::standalone> value.
+
+WFErrDef:
+  @QName: xp|wf-legal-literal-character
+  @DOMCore:severity: DOMCore|SEVERITY_ERROR
+  @enDesc:
+    Each character in XML entity must match to the production
+    rule <CODE::Char - RestrictedChar>.
+  @enMufDef:
+    Character %character-code-point 
+    (v => {<Q::xp|character-number>}); is not allowed
+  @ecore:hasParameter:
+    @@@: xp|character-number
+    @@enDesc:
+      The code position of the character being referred.
+
+WFErrDef:
+  @QName: xp|wf-element-type-match
+  @DOMCore:severity: DOMCore|SEVERITY_FATAL_ERROR
+  @enDesc:
+    The <CODE::Name> in an element's end-tag must match the element type
+    in the start-tag.
+  @enMufDef:
+    End-tag |</%p (name => {<Q::xp|actual-element-type>});>| does
+    not match to start-tag |<%p (name => {<Q::xp|expected-element-type>});>|
+  @ecore:hasParameter: xp|error-token
+  @ecore:hasParameter:
+    @@@: xp|node
+    @@enDesc:
+      The current opening element node.
+  @ecore:hasParameter:
+    @@@: xp|expected-element-type
+    @@enDesc:
+      The element type name of the current element.
+  @ecore:hasParameter:
+    @@@: xp|actual-element-type
+    @@enDesc:
+      The <CODE::Name> occurs in the end-tag.
+
+WFErrDef:
+  @QName: xp|wf-unique-att-spec
+  @DOMCore:severity: DOMCore|SEVERITY_ERROR
+  @enDesc:
+    An attribute name <kwd:MUST-NOT> appear more than once in
+    the same start-tag or empty-element tag.
+  @enMufDef:
+    Attribute |%p (name => {<Q::xp|name>});| is specified more
+    than once in the same tag
+  @ecore:hasParameter: xp|error-token
+  @ecore:hasParameter:
+    @@@: xp|name
+    @@enDesc:
+      The name of the attribute.
+
+WFErrDef:
+  @QName: xp|wf-legal-character
+  @DOMCore:severity: DOMCore|SEVERITY_ERROR
+  @enDesc:
+    Characters referred to using character references <kwd:MUST>
+    match the production for <CODE::Char>.
+  @enMufDef:
+    Reference to character %character-code-point 
+    (v => {<Q::xp|character-number>}); is not allowed
+  @ecore:hasParameter: xp|error-token
+  @ecore:hasParameter:
+    @@@: xp|character-number
+    @@enDesc:
+      The code position of the character being referred.
+  @ecore:hasParameter:
+    @@@: xp|parent
+    @@enDesc:
+      The parent node in which the character reference has
+      occurred, if available.
+
+XWParam:
   @QName: xp|error-token
   @enDesc:
     The token where the parser found an error.
 
-PropDef:
-  @QName: xp|source-text
+XWParam:
+  @QName: xp|name
   @enDesc:
-    A reference to the original source text, if available.
+    A name.
+
+XWParam:
+  @QName: xp|parent
+  @enDesc:
+    The parent node in which the error occurs.
+
+XWParam:
+  @QName: xp|node
+  @enDesc:
+    The current node.
+
+XWParam:
+  @QName: xp|actual-element-type
+  @enDesc:
+    The actual element type name occured in the source.
+
+XWParam:
+  @QName: xp|expected-element-type
+  @enDesc:
+    The element type name expected.
+
+XWParam:
+  @QName: xp|character-number
+  @enDesc:
+    The character code position.
+
+ElementTypeBinding:
+  @Name: XWParam
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@For: =ManakaiDOM|all
+    @@rdf:type: ecore|Parameter
 
 ElementTypeBinding:
   @Name:enMufDef
@@ -1861,7 +2526,7 @@ ClsDef:
           my $pos = $o-><AG::DOMCore|DOMError.location>
                       -><AG::DOMCore|DOMLocator.utf32Offset>;
           if ($pos > -1) {
-            my $src = $o->{<H::xp|source-text>};
+            my $src = \($o->{<H::ecore|object>}->{source});
             my $start = $pos;
             $start = rindex ($$src, "\x0A", $start - 1) for 0..2;
             $start++;
@@ -1870,4 +2535,32 @@ ClsDef:
             $end = length $$src if $end < 0;
             $p->{-result} = substr $$src, $start, $end - $start;
           }
+
+  @RuleDef:
+    @@Name: character-code-point
+    @@enDesc:
+      The character code position, in <CODE::U+<VAR::HHHH>> notation.
+    
+    @@Method:
+      @@@Name: after
+      @@@Param:
+        @@@@Name: name
+        @@@@Type: DOMString
+        @@@@enDesc: The name of the method.
+      @@@Param:
+        @@@@Name: p
+        @@@@Type: DISPerl|HASH
+        @@@@enDesc: The set of the parameters to the method.
+      @@@Param:
+        @@@@Name: o
+        @@@@Type: DISPerl|HASH
+        @@@@enDesc: The option value.
+      @@@RuleParam:
+        @@@@Name: v
+        @@@@Type: DISPerl|Number
+        @@@@enDesc:
+          The name of the error parameter that contains the character code.
+      @@@Return:
+        @@@@PerlDef:
+          $p->{-result} = sprintf 'U+%04X', $o->{$p->{v}};
 ##XMLParserExceptionFormatter

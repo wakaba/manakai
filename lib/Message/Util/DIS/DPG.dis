@@ -15,7 +15,7 @@ Module:
   @License: license|Perl+MPL
 
   @Date:
-    $Date: 2005/12/28 11:10:56 $
+    $Date: 2005/12/29 10:21:42 $
   
   @Require:
     @@Module:
@@ -2968,7 +2968,8 @@ IFClsDef:
 
       } (NAME) {
         /*
-          EmbedStatement := NAME [ParameterSpecificationList] EmbedBlock
+          EmbedStatement := NAME [ParameterSpecificationList]
+                            *AttributeSpecification EmbedBlock
         */
         my $embed;
         lang:Perl ($name => $token.value) {
@@ -3354,7 +3355,7 @@ ErrDef:
   @enDesc:
     The parser is encountered to a token whose type is not
     allowed there.
-  @DOMCore:severity: DOMCore|SEVERITY_ERROR
+  @DOMCore:severity: DOMCore|SEVERITY_FATAL_ERROR
   @enMufDef:
     Token |%dpg-error-token-type;|%dpg-error-token-value
     (prefix => { (|}, suffix => {|)}); is not 

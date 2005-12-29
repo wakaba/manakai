@@ -40,7 +40,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/12/24 07:27:12 $
+      $Date: 2005/12/29 10:21:40 $
     @@ContentType:
       dis:Date.RCS
 
@@ -3367,6 +3367,24 @@ IFCls3Def:
       @@@PerlDef:
         goto &{$self->can ('text')};
 
+  @Method:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@Operator: DISPerl|AsStringMethod
+    @@Return:
+      @@@Type: DOMMain|DOMString
+      @@@PerlDef:
+        __DEEP{
+          my $loc = $self-><AG::DOMError.location>;
+          my $uri = $loc-><AG::DOMLocator.uri>;
+          my $l = $loc-><AG::DOMLocator.lineNumber>;
+          my $c = $loc-><AG::DOMLocator.columnNumber>;
+          $r .= '<' . $uri . '> ' if defined $uri;
+          $r .= 'Line ' . $l . ' ' if $l >= 0;
+          $r .= 'Column ' . $c . ' ' if $c >= 0;
+          $r .= ': ' if length $r;
+          $r .= $self->SUPER::stringify;
+        }__;
+
   @Attr:
     @@Name: type
     @@enDesc:
@@ -4635,12 +4653,15 @@ CParam:
     @@Return:
       @@@Type: DOMErrorHandler
       @@@enDesc:
-        An error handler that simply returns <DOM::true>.
+        An error handler that returns <DOM::true> (to advise the process
+        to continue) if and only if the <A::DOMError.severity>
+        is not <C::DOMError.SEVERITY_FATAL_ERROR>.
       @@@PerlDefC:
         $r = sub {
           my (undef, $err) = @_;
           CORE::warn $err;
-          return true;
+          return ($err-><AG::DOMError.severity> !=
+                  <C::DOMError.SEVERITY_FATAL_ERROR>);
         };
   @Method:
     @@rdf:type: DOMCore|DOMConfigurationParameterSetter

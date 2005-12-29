@@ -12,7 +12,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2005/11/25 06:18:40 $
+    $Date: 2005/12/29 10:21:41 $
 
   @Require:
     @@Module:
@@ -13571,7 +13571,8 @@ NodeTypeDef:
      @@SpecLevel:3
      @@For:
        ManakaiDOM:DOM3
-  @Attr:
+
+  @L3Attr:
      @@Name:  xmlEncoding
      @@Description:
        @@@lang:en
@@ -13583,9 +13584,8 @@ NodeTypeDef:
        @@@@:
          This attribute is NOT equal to the [character encoding scheme] 
          property of the document information item of the Infoset.
+    @@Type: DOMMain|DOMString
      @@Get:
-        @@@Type:  
-          DOMMain:DOMString
         @@@Description:
           @@@@lang:en
           @@@@@: The encoding.
@@ -13598,10 +13598,18 @@ NodeTypeDef:
         @@@disDef:
           @@@@GetProp:
             DOMCore:xmlEncoding
-     @@Level[list]:  3
-     @@SpecLevel:3
-     @@For:
-       ManakaiDOM:DOM3
+    @@Set:
+      @@@For: ManakaiDOM|ManakaiDOM
+      @@@enDesc:
+        The value of the encoding declaration.
+      @@@nullCase:
+        @@@@enDesc:
+          The encoding declaration is omitted.
+      @@@enImplNote:
+        This is a manakai extension.
+      @@@disDef:
+        @@@@SetProp: DOMCore|xmlEncoding
+
   @Attr:
      @@Name:  xmlStandalone
      @@Description:
