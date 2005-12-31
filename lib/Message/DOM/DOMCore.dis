@@ -40,7 +40,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/12/29 10:21:40 $
+      $Date: 2005/12/31 12:21:14 $
     @@ContentType:
       dis:Date.RCS
 
@@ -3436,7 +3436,7 @@ IFCls3Def:
     @@Type: DOMLocator
     @@Get:
       @@@PerlDef:
-        $r = $self->{<H::DOMCore:location>};
+        $r = $self->{<H::DOMCore:location>} || {};
   
   @IntAttr:
     @@Operator: ecore|ErrorDefMethod

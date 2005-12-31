@@ -10,7 +10,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2005/12/29 10:21:42 $
+    $Date: 2005/12/31 12:21:15 $
 
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
@@ -703,34 +703,11 @@ ClsDef:
     } // _XMLDeclaration_
     
     /*
-      Document Type Declaration
-    */
-    rule _DocumentTypeDeclaration_ ($doc) {
-      ?lexmode 'DocumentTypeDeclaration';
-      
-      ~ (Name == 'DOCTYPE') { }
-      
-      ~ (S) { }
-      
-      // Document type name
-      ~ (Name) {
-      
-      }
-      
-      // TODO: Implement this
-      
-      // TODO: set $self->{standalone} true if only internal subset
-      //       with no param ref
-
-      // ~ (MDC) { }
-    } // _DocumentTypeDeclaration_
-    
-    /*
       Comment Declaration
       
         Comment := '<!--' *(Char - '-' / '-' (Char - '-'))
                    '-->'  ;; [15]
-    */
+    */ 
     rule _CommentDeclaration_ ($doc, $parent) {
       ?lexmode 'CommentDeclaration';
       
@@ -753,8 +730,28 @@ ClsDef:
       }
       
       // ~ (MDC) { }
-    } // _CommentDeclaration_
-    
+    } // _CommentDeclaration
+_
+    rule _CommentDeclarationDTD ($doc) {
+      ?lexmode 'CommentDeclaration';
+      
+      ~? (STRING) {
+        //
+      }
+      
+      ~ (COM) {
+        ?lexmode MarkupDeclaration;
+      } else {
+        ?lexmode MarkupDeclaration;
+      }
+      
+      ~ (MDC) {
+        ?lexmode DTD;
+      } else {
+        ?lexmode DTD;
+      }
+    } // _CommentDeclarationDTD
+   
     /*
       Processing Instruction
       
@@ -818,6 +815,28 @@ ClsDef:
       
       // ~ (PIC) { }
     } // _ProcessingInstruction_
+
+    rule _ProcessingInstructionDTD ($doc) {
+      ?lexmode 'PIName';
+      
+      ~ (Name) {
+      
+      }
+      
+      ~ (S) {
+        ?lexmode 'PIData';
+        
+        ~? (DATA) {
+
+        }
+      }
+      
+      ~ (PIC) {
+        ?lexmode DTD;
+      } else {
+        ?lexmode DTD;
+      }
+    } // _ProcessingInstructionDTD
     
     /*
       Element content parsing mode
@@ -1336,7 +1355,6 @@ ClsDef:
             $self->{has_error} = true;
           }
           my $ncr = $doc-><M::Document.createTextNode> (chr $num);
-                            (chr (0+$num));
           $parent-><M::Node.appendChild> ($ncr);
         }
       }
@@ -1504,11 +1522,666 @@ ClsDef:
       // ~ (REFC) { }
     } // _GeneralEntityReferenceV_
 
+    /*
+      Document Type Declaration
+    */
+    rule _DocumentTypeDeclaration_ ($doc) {
+      ?lexmode MarkupDeclaration;
+      
+      ~ (Name == 'DOCTYPE') { }
+      
+      ~ (S) { }
+      
+      // Document type name
+      ~ (Name) {
+      
+      }
+
+      ~? (S) {
+        ~? (Name == 'PUBLIC') {
+          ~ (S) { }
+  
+          &PubidLiteral ($doc => $doc);
+  
+          ~ (S) { }
+  
+          &SystemLiteral ($doc => $doc);
+  
+          ~? (S) { }
+        } (Name == 'SYSTEM') {
+          ~ (S) { }
+  
+          &SystemLiteral ($doc => $doc);
+  
+          ~? (S) { }
+        }
+      }
+      
+      ~? (DSO) {
+        &InternalSubset ($doc => $doc);
+
+        ~ (DSC) {
+          ?lexmode MarkupDeclaration;
+        } else {
+          ?lexmode MarkupDeclaration;
+        }
+
+        ~? (S) { }
+      }
+      
+      // TODO: set $self->{standalone} true if only internal subset
+      //       with no param ref
+
+      // ~ (MDC) { }
+    } // _DocumentTypeDeclaration_
+
+    rule PubidLiteral ($doc) {
+      ~ (LIT) {
+        ?lexmode SystemLiteral;
+
+        ~? (STRING) {
+          // TODO: Charrange check & normalization is required
+
+        }
+
+        ~ (LIT) {
+          ?lexmode MarkupDeclaration;
+        } else {
+          ?lexmode MarkupDeclaration;
+        }
+      } (LITA) {
+        ?lexmode SystemLiteralA;
+
+        ~? (STRING) {
+          // TODO: Charrange check & normalization is required
+
+        }
+
+        ~ (LITA) {
+          ?lexmode MarkupDeclaration;
+        } else {
+          ?lexmode MarkupDeclaration;
+        }
+      }
+    } // PubidLiteral
+
+    rule SystemLiteral ($doc) {
+      ~ (LIT) {
+        ?lexmode SystemLiteral;
+        &_SystemLiteral ($doc => $doc);
+      } (LITA) {
+        ?lexmode SystemLiteralA;
+        &_SystemLiteral ($doc => $doc);
+      }
+    } // SystemLiteral
+
+    rule _SystemLiteral ($doc) {
+      ~? (STRING) {
+
+      }
+
+      ~ (LIT) {
+        ?lexmode MarkupDeclaration;
+      } (LITA) {
+        ?lexmode MarkupDeclaration;
+      } else {
+        ?lexmode MarkupDeclaration;
+      }
+    } // _SystemLiteral
+
+    /*
+      DTD Internal Subset
+      
+        intSubset := *(markupdecl / DeclSep)  ;; [28b]
+    */
+    rule InternalSubset ($doc) {
+      ?lexmode DTD;
+
+      ~* (MDO) {
+        ?lexmode MarkupDeclaration;
+
+        ~ (Name == 'ELEMENT') {
+          &_ElementDeclaration ($doc => $doc);
+        } (Name == 'ATTLIST') {
+          &_AttlistDeclaration ($doc => $doc);
+        } (Name == 'ENTITY') {
+          &_EntityDeclaration ($doc => $doc);
+        } (Name == 'NOTATION') {
+          &_NotationDeclaration ($doc => $doc);
+        }
+      } (S) {
+        //
+      } (CDO) {
+        &_CommentDeclarationDTD ($doc => $doc);
+      } (PIO) {
+        &_ProcessingInstructionDTD ($doc => $doc);
+      } (PERO) {
+        ?lexmode EntityReference;
+
+        ~ (Name) {
+
+        }
+
+        ~ (REFC) {
+          ?lexmode DTD;
+        } else {
+          ?lexmode DTD;
+        }
+      }
+    } // InternalSubset
+
+    rule _ElementDeclaration ($doc) {
+      // ~ (MDO) { }
+      // ?lexmode MarkupDeclaration
+      // ~ (Name == 'Element') { }
+
+      ~ (S) { }
+
+      ~ (Name) {
+
+      }
+
+      ?lexmode ElementDeclaration;
+
+      ~ (S) { }
+
+      // contentspec
+      ~ (MGO) {
+        &_ContentModel ($doc => $doc);
+      } (Name == 'EMPTY') {
+
+      } (Name == 'ANY') {
+
+      }
+
+      ~? (S) { }
+
+      ~ (MDC) {
+        ?lexmode DTD;
+      } else {
+        ?lexmode DTD;
+      }
+    } // _ElementDeclaration
+
+    rule _ContentModel ($doc) {
+      // ~ (MGO) { }
+      
+      ~? (S) { }
+
+      ~ (Name) {
+        // Element content model
+        &_ModelGroup ($doc => $doc)
+          : unshift-current-token;
+
+        ~? (OPT) {
+
+        } (REP) {
+
+        } (PLUS) {
+
+        }
+
+      } (MDO) {
+        &_ModelGroup ($doc => $doc)
+          : unshift-current-token;
+
+        ~? (OPT) {
+
+        } (REP) {
+
+        } (PLUS) {
+
+        }
+
+      } (PCDATA) {
+        // Mixed content declaration
+        ~? (S) { }
+
+        ~* (OR) {
+          ~? (S) { }
+
+          ~ (Name) {
+
+          }
+
+          ~? (S) { }
+        }
+
+        ~ (MGC) { }
+
+        ~? (REP) {
+      
+        } else {
+          // TODO: error if |Name|
+        }
+
+
+      }
+    } // _ContentModel
+
+    rule _ModelGroup ($doc)
+      : standalone
+      : recursive
+    {
+      // ~ (MGO) { }
+      // ~? (S) { }
+
+      &ContentParticle ($doc => $doc);
+
+      ~? (S) { }
+
+      ~? (OR) {
+        ~? (S) { }
+  
+        &ContentParticle ($doc => $doc);
+
+        ~? (S) { }
+
+        ~* (OR) {
+          ~? (S) { }
+
+          &ContentParticle ($doc => $doc);
+
+          ~? (S) { }
+        }
+
+      } (SEQ) {
+        ~? (S) { }
+  
+        &ContentParticle ($doc => $doc);
+
+        ~? (S) { }
+
+        ~* (SEQ) {
+          ~? (S) { }
+
+          &ContentParticle ($doc => $doc);
+
+          ~? (S) { }
+        }
+
+      }
+
+      ~ (MGC) { }
+    } // _ModelGroup
+    
+    rule ContentParticle ($doc) {
+      ~ (Name) {
+
+      } (MGO) {
+        ~? (S) { }
+   
+        &_ModelGroup ($doc => $doc);
+      }
+
+      ~? (OPT) {
+
+      } (REP) {
+
+      } (PLUS) {
+
+      }
+    } // ContentParticle
+
+    rule _AttlistDeclaration ($doc) {
+      // ~ (MDO) { }
+      // ~ (Name == 'ATTLIST') { }
+
+      ?lexmode AttlistDeclaration;
+
+      ~ (S) { }
+
+      ~ (Name) {
+
+      }
+  
+      ~? (S) { }
+
+      ~* (Name) {
+
+        ~ (S) { }
+        
+        // AttType
+        ~ (Name == 'NOTATION') {
+          ~ (S) { }
+
+          ~ (EGO) {
+            ~? (S) { }
+
+            ~ (Name) {
+
+              ~? (S) { }
+            } (OR) : separator {
+              ~? (S) { }
+            }
+
+            ~ (EGC) { }
+          }
+        } (Name) {
+          // TODO: check keyword
+        
+        } (EGO) {
+          ?lexmode Enumeration;
+
+          ~? (S) { }
+
+          ~ (Nmtoken) {
+
+            ~? (S) { }
+          } (OR) : separator {
+            ~? (S) { }
+          }
+
+          ~ (EGC) {
+            ?lexmode AttlistDeclaration;
+          } else {
+            ?lexmode AttlistDeclaration;
+          }
+
+        }
+
+        ~ (S) { }
+
+        // DefaultDecl
+        ~ (RNI) {
+          ~ (Name == 'REQUIRED') {
+
+          } (Name == 'IMPLIED') {
+
+          } (Name == 'FIXED') {
+            ~ (S) { }
+            
+            ~ (LIT) {
+              my $vals;
+              lang:Perl {
+                $vals = [];
+              }
+
+              &_AttributeValueSpecification_ ($doc => $doc, $vals => $vals);
+
+              ~ (LIT) {
+                ?lexmode AttlistDeclaration;
+              } else {
+                ?lexmode AttlistDeclaration;
+              }
+            } (LITA) {
+              my $vals;
+              lang:Perl {
+                $vals = [];
+              }
+
+              &_AttributeValueSpecificationA_ ($doc => $doc, $vals => $vals);
+
+              ~ (LIT) {
+                ?lexmode AttlistDeclaration;
+              } else {
+                ?lexmode AttlistDeclaration;
+              }
+            }
+          }
+
+        } (LIT) {
+          my $vals;
+          lang:Perl {
+            $vals = [];
+          }
+
+          &_AttributeValueSpecification_ ($doc => $doc, $vals => $vals);
+
+          ~ (LIT) {
+            ?lexmode AttlistDeclaration;
+          } else {
+            ?lexmode AttlistDeclaration;
+          }
+        } (LITA) {
+          my $vals;
+          lang:Perl {
+            $vals = [];
+          }
+
+          &_AttributeValueSpecificationA_ ($doc => $doc, $vals => $vals);
+
+          ~ (LITA) {
+            ?lexmode AttlistDeclaration;
+          } else {
+            ?lexmode AttlistDeclaration;
+          }
+        }
+
+      } (S) : separator : terminator? {
+        //
+      }
+
+      ~ (MDC) {
+        ?lexmode DTD;
+      } else {
+        ?lexmode DTD;
+      }
+    } // _AttlistDeclaration
+
+    rule _EntityDeclaration ($doc) {
+      // ~ (MDO) { }
+      // ~ (Name == ENTITY) { }
+
+      ~ (S) { }
+
+      ~? (PERO) {
+        ~ (S) { }
+      }
+
+      ~ (Name) {
+
+      } 
+
+      ~ (S) { }
+
+      ~ (LIT) {
+        &_EntityValue ($doc => $doc);
+      } (LITA) {
+        &_EntityValueA ($doc => $doc);
+      } (Name == 'PUBLIC') {
+        ~ (S) { }
+
+        &PubidLiteral ($doc => $doc);
+
+        ~ (S) { }
+
+        &SystemLiteral ($doc => $doc);
+      } (Name == 'SYSTEM') {
+        ~ (S) { }
+
+        &SystemLiteral ($doc => $doc);
+      }
+
+      ~? (S) {
+        ~? (Name == 'NDATA') {
+          // TODO: error if parameter entity
+
+          ~ (S) { }
+  
+          ~ (Name) {
+  
+          }
+
+          ~? (S) { }
+        }
+      }
+
+      ~ (MDC) {
+        ?lexmode DTD;
+      } else {
+        ?lexmode DTD;
+      }
+    } // _EntityDeclaration
+
+    rule _NotationDeclaration ($doc) {
+      // ~ (MDO) { }
+      // ~ (Name == NOTATION) { }
+
+      ~ (S) { }
+
+      ~ (Name) {
+
+      } 
+
+      ~ (S) { }
+
+      ~ (Name == 'PUBLIC') {
+        ~ (S) { }
+
+        &PubidLiteral ($doc => $doc);
+
+        ~? (S) {
+          ~? (LIT) {
+            ?lexmode SystemLiteral;
+            &_SystemLiteral ($doc => $doc);
+
+            ~? (S) { }
+          } (LITA) {
+            ?lexmode SystemLiteralA;
+            &_SystemLiteral ($doc => $doc);
+
+            ~? (S) { }
+          }
+        }
+      } (Name == 'SYSTEM') {
+        ~ (S) { }
+
+        &SystemLiteral ($doc => $doc);
+
+        ~? (S) { }
+      }
+
+      ~ (MDC) {
+        ?lexmode DTD;
+      } else {
+        ?lexmode DTD;
+      }
+    } // _NotationDeclaration
+ 
+    rule _EntityValue ($doc) {
+      ?lexmode EntityValue;
+
+      my $vals;
+      lang:Perl {
+        $vals = [];
+      }
+
+      ~* (STRING) {
+
+      } (PERO) {
+        ?lexmode EntityDeclaration;
+
+        ~ (Name) {
+
+        }
+
+        ~ (REFC) {
+          ?lexmode EntityValue;
+        } else {
+          ?lexmode EntityValue;
+        }
+      } (HCRO) {
+        &_HexadecimalCharacterReferenceV_
+          ($doc => $doc, $vals => $vals);
+
+        ~ (REFC) {
+          ?lexmode EntityValue;
+        } else {
+          ?lexmode EntityValue;
+        }
+      } (CRO) {
+        &_NumericCharacterReferenceV_
+          ($doc => $doc, $vals => $vals);
+
+        ~ (REFC) {
+          ?lexmode EntityValue;
+        } else {
+          ?lexmode EntityValue;
+        }
+      } (ERO) {
+        &_GeneralEntityReferenceV_
+          ($doc => $doc, $vals => $vals);
+
+        ~ (REFC) {
+          ?lexmode EntityValue;
+        } else {
+          ?lexmode EntityValue;
+        }
+      }
+
+      ~ (LIT) {
+        ?lexmode MarkupDeclaration;
+      } (LITA) {
+        ?lexmode MarkupDeclaration;
+      } else {
+        ?lexmode MarkupDeclaration;
+      }
+    } // _EntityValue
+
+    rule _EntityValueA ($doc) {
+      ?lexmode EntityValueA;
+
+      my $vals;
+      lang:Perl {
+        $vals = [];
+      }
+
+      ~* (STRING) {
+
+      } (PERO) {
+        ?lexmode EntityDeclaration;
+
+        ~ (Name) {
+
+        }
+
+        ~ (REFC) {
+          ?lexmode EntityValueA;
+        } else {
+          ?lexmode EntityValueA;
+        }
+      } (HCRO) {
+        &_HexadecimalCharacterReferenceV_
+          ($doc => $doc, $vals => $vals);
+
+        ~ (REFC) {
+          ?lexmode EntityValueA;
+        } else {
+          ?lexmode EntityValueA;
+        }
+      } (CRO) {
+        &_NumericCharacterReferenceV_
+          ($doc => $doc, $vals => $vals);
+
+        ~ (REFC) {
+          ?lexmode EntityValueA;
+        } else {
+          ?lexmode EntityValueA;
+        }
+      } (ERO) {
+        &_GeneralEntityReferenceV_
+          ($doc => $doc, $vals => $vals);
+
+        ~ (REFC) {
+          ?lexmode EntityValueA;
+        } else {
+          ?lexmode EntityValueA;
+        }
+      }
+
+      ~ (LITA) {
+        ?lexmode MarkupDeclaration;
+      } else {
+        ?lexmode MarkupDeclaration;
+      }
+    } // _EntityValueA
+
     
     /*
       XML Name
     */
-    lexmode Name {
+    lexmode NameChar {
       $NameStartChar10 := [
         '_' ':'
         // Letter
@@ -1713,8 +2386,19 @@ ClsDef:
         U+2070..U+218F U+2C00..U+2FEF U+3001..U+D7FF
         U+F900..U+FDCF U+FDF0..U+FFFD U+10000..U+EFFFF
       ];
+    } // NameChar
+
+    lexmode Name
+      : extends => 'NameChar'
+    {
       Name : value := $NameStartChar11 $NameChar11*;
     } // Name
+
+    lexmode Nmtoken
+      : extends => 'NameChar'
+    {
+      Nmtoken : value := $NameChar11*;
+    } // Nmtoken
     
     /*
       Space
@@ -1783,48 +2467,6 @@ ClsDef:
       */
       XDO := ['<'] ['?'] ['x'] ['m'] ['l'];
     } // DocumentStart
-    
-    /*
-      Markup declaration scanning mode
-      
-      This mode is used to recognize |MDC| that terminates
-      a comment declaration as well as the base |lexmode|
-      for e.g. document type declaration scanning mode.
-    */
-    lexmode MarkupDeclaration
-      : standalone
-      : extends => 'Name'
-    {
-      /*
-        Markup declaration close
-      */
-      MDC := ['>'];
-      
-      /*
-        Literal open
-      */
-      LIT := ['"'];
-      
-      /*
-        Alternative literal open
-      */
-      LITA := [U+0027];
-    } // MarkupDeclaration
-    
-    lexmode DocumentTypeDeclaration
-      : standalone
-      : extends => 'MarkupDeclaration'
-    {
-      /*
-        Declaration subset close
-      */
-      DSO := ['['];
-      
-      /*
-        Declaration subset close
-      */
-      DSC := [']'];
-    } // DocumentTypeDeclaration
     
     /*
       Comment declaration scanning mode
@@ -2075,9 +2717,194 @@ ClsDef:
       : standalone
       : extends => 'AttributeValueLiteral_'
     {
-      LIT := [U+0027];
+      LITA := [U+0027];
       STRING : value := [^U+0027 '&' '<']+;
     } // AttributeValueLiteralA
+
+    lexmode EntityValue_ {
+      PERO := ['%'];
+      ERO := ['&'];
+      CRO := ['&'] ['#'];
+      HCRO := ['&'] ['#'] ['x'];
+    } // EntityValue_
+    
+    lexmode EntityValue
+      : standalone
+      : extends => 'EntityValue_'
+    {
+      LIT := ['"'];
+      STRING : value := [^'"' '&' '%']+;
+    } // EntityValue
+    
+    lexmode EntityValueA
+      : standalone
+      : extends => 'EntityValue_'
+    {
+      LITA := [U+0027];
+      STRING : value := [^U+0027 '&' '%']+;
+    } // EntityValueA
+
+    lexmode SystemLiteral
+      : standalone
+    {
+      LIT := ['"'];
+      ?default-token STRING : value;
+    } // SystemLiteral
+
+    lexmode SystemLiteralA
+      : standalone
+    {
+      LITA := [U+0027];
+      ?default-token STRING : value;
+    } // SystemLiteralA
+
+    lexmode DTD
+      : standalone
+      : extends => 'S'
+    {
+      /*
+        Markup declaration open
+      */
+      MDO := ['<'] ['!'];
+
+      /*
+        Comment declaration open
+      */
+      CDO := ['<'] ['!'] ['-'] ['-'];
+
+      /*
+        Processing instruction open
+      */
+      PIO := ['<'] ['?'];
+
+      /*
+        Parameter entity reference open
+      */
+      PERO := ['%'];
+
+      /*
+        Declaration subset close
+      */
+      DSC := [']'];
+
+      /*
+        Contition section open
+      */
+      CSO := ['<'] ['!'] ['['];
+    } // DTD
+    
+    /*
+      Markup declaration scanning mode
+      
+      This mode is used to recognize |MDC| that terminates
+      a comment declaration as well as the base |lexmode|
+      for e.g. document type declaration scanning mode.
+    */
+    lexmode MarkupDeclaration
+      : standalone
+      : extends => 'Name'
+      : extends => 'S'
+    {
+      /*
+        Markup declaration close
+      */
+      MDC := ['>'];
+      
+      /*
+        Literal open
+      */
+      LIT := ['"'];
+      
+      /*
+        Alternative literal open
+      */
+      LITA := [U+0027];
+
+      /*
+        Parameter entity reference open
+      */
+      PERO := ['%'];
+    
+      /*
+        Declaration subset open
+      */
+      DSO := ['['];
+    } // MarkupDeclaration
+
+    lexmode ElementDeclaration
+      : standalone
+      : extends => 'MarkupDeclaration'
+    {
+      /*
+        Model group open
+      */
+      MGO := ['('];
+
+      /*
+        Model group close
+      */
+      MGC := [')'];
+
+      /*
+        Reserved name indicator
+      */
+      RNI := ['#'];
+
+      /*
+        Occurence indicators
+      */
+      OPT := ['?'];
+      REP := ['*'];
+      PLUS := ['+'];
+
+      /*
+        Connectors
+      */
+      OR := ['|'];
+      SEQ := [','];
+    } // ElementDeclaration
+
+    lexmode AttlistDeclaration
+      : standalone
+      : extends => 'MarkupDeclaration'
+    {
+      /*
+        Enumeration group open
+      */
+      EGO := ['('];
+
+      /*
+        Enumeration group close
+      */
+      EGC := [')'];
+
+      /*
+        Enumeration choice delimiter
+      */
+      OR := ['|'];
+
+      /*
+        Reserved name indicator
+      */
+      RNI := ['#'];
+    } // AttlistDeclaration
+
+    lexmode Enumeration
+      : standalone
+      : extends => 'Nmtoken'
+      : extends => 'S'
+    {
+      /*
+        Enumeration group close
+      */
+      EGC := [')'];
+
+      /*
+        Enumeration choice delimiter
+      */
+      OR := ['|'];
+    } // Enumeration
+
     
     token-error default : default {
       lang:Perl {
