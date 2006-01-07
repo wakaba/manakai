@@ -40,7 +40,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/01/07 12:30:49 $
+      $Date: 2006/01/07 13:16:58 $
     @@ContentType:
       dis:Date.RCS
 
@@ -2289,6 +2289,9 @@ IFCls3Def:
       delete $list->[2];
       $test->assert_false (exists $list->[2]);
       $test->assert_equals (0 + @$list, 2);
+
+      ## Don't invoke |DESTROY| method
+      bless $list, 'dummy';
 ##DOMStringList
 
 PropDef:

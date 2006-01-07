@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/01/07 12:30:56 $
+      $Date: 2006/01/07 13:16:59 $
     @@ContentType:
       dis:Date.RCS
   
@@ -1951,11 +1951,15 @@ IFClsDef:
 
                 my %ifeature;
                 my $ifpoint = 0;
-                for my $feature (@{$cls-><M::DIS|DISResourceProp
+                my %fdup; # Check dupulication
+                FI: for my $feature (@{$cls-><M::DIS|DISResourceProp
                           .getPropertyResourceList>
-                             (<Q::DOMMain:implementFeature>,
-                              isa_recursive => true,
-                              default_media_type => <Q::dis:TypeQName>)}) {
+                             (<Q::f:implements>,
+                              isa_recursive => true)}) {
+                  my $furi = $feature-><AG::DIS|DISAnyResource.uri>;
+                  next FI if $fdup{$furi};
+                  $fdup{$furi} = true;
+
                   my $fver = $feature-><M::DIS|DISResourceProp
                                         .getPropertyText>
                                         (<Q::dis:Version>, null);
@@ -1970,7 +1974,7 @@ IFClsDef:
                     $ifeature{$fname}->{$fver} = $fi;
                     $ifeature{$fname}->{''} = true;
                   }                  
-                }
+                } # FI
                 $r-><M::DIS|PLBlockCon.appendStatement>
                       ('$Message::DOM::ClassFeature{q<' . $pack_name .
                        '>} = ' . <ClassM::PLImplClass.perlLiteral> (\%ifeature));
@@ -2237,12 +2241,12 @@ IFClsDef:
                         $db-><M::DIS|DISDatabase.getResource> ($p)
                            -><M::DIS|DISResourceProp.getPropertyText>
                                   (<Q::mn:stemName>, $p)
-                      } = [map {
+                      } = [keys %{{map {
                         $_-><M::DIS|DISResourceProp.getPropertyText>
                                   (<Q::DISPerl:propHashKey>,
-                                   $_-><AG::DIS|DISAnyResource.uri>)
+                                   $_-><AG::DIS|DISAnyResource.uri>) => true,
                       } @{$cls-><M::DIS|DISResourceProp.getPropertyResourceList>
-                                  ($p, isa_recursive => true)}];
+                                  ($p, isa_recursive => true)}}}];
                     }
                     for (keys %nrp) {
                       CORE::delete $nrp{$_} unless @{$nrp{$_}};

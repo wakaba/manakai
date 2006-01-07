@@ -1,5 +1,12 @@
 2006-01-07  Wakaba  <wakaba@suika.fam.cx>
 
+	* Perl.dis (plCodeFragment): Checks dupulications in
+	implementing feature list (for score computation) and
+	in |ManakaiNode| property list.  (The later led
+	|NodeStem| objects that should not free'ed yet being free'ed.)
+
+2006-01-07  Wakaba  <wakaba@suika.fam.cx>
+
 	* Test.dis (id): New attribute.
 	(assertNumEquals, assertNumNotEquals): New methods.
 	(assertISA): New method.

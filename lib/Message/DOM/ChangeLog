@@ -1,5 +1,10 @@
 2006-01-07  Wakaba  <wakaba@suika.fam.cx>
 
+	* DOMCore.dis (Test): Don't invoke |DESTROY| method
+	because it does not work with dummy object used in the test code.
+
+2006-01-07  Wakaba  <wakaba@suika.fam.cx>
+
 	* DOMMain.dis (checkXMLNamesQName): Checks whether
 	namespace URI is defined for not being warned.
 
