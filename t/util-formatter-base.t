@@ -77,7 +77,7 @@ try {
   $f->replace (q(%invalid));
 } catch Message::Util::Formatter::Base::error with {
   my $err = shift;
-  OK $err->text, qq(Semicolon (";") expected at "%invalid"**here**"");
+  OK $err->text, qq(Semicolon (";") expected at "%invalid"**here**"<empty>");
 };
 
 try {

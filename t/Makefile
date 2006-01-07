@@ -61,6 +61,7 @@ NS_UTIL = http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/
 NS_DIS  = http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS\#
 
 GENERATED_FILES = util-perlcode.t dom-feature.t dom-tree.t dom-genericls.t \
+  dom-core.t dom-xdoctype.t \
   dom-mdomls2003.t util-dis-dnlite.t
 
 all: $(GENERATED_FILES)
@@ -75,6 +76,15 @@ dom1core:
 	MANAKAI_DOMTEST_FILE_DIR=$(DOMTEST_TESTS_DIR)level1/core/files/ \
 	  $(PERL_TEST_) $(DOMTEST_PERL_DIR)level1/core/$(DOMTEST_FILE).pl
 
+test-module-all: test-module-dom test-module-util
+
+test-module-dom: \
+  dom-feature.t \
+  dom-core.t dom-tree.t dom-xdoctype.t \
+  dom-genericls.t \
+  dom-mdomls2003.t
+	$(PERL_TEST_) dom-*.t
+
 dom-feature.t: $(DOM_FEATURE_DAC) $(DAC2TEST_PL)
 	$(DAC2TEST) $< --source-module="$(NS_MDOM)DOMFeature" > $@
 
@@ -84,8 +94,19 @@ dom-genericls.t: $(DOM_CORE_DAC) $(DAC2TEST_PL)
 dom-tree.t: $(DOM_CORE_DAC) $(DAC2TEST_PL)
 	$(DAC2TEST) $< --source-module="$(NS_MDOM)Tree" > $@
 
+dom-core.t: $(DOM_CORE_DAC) $(DAC2TEST_PL)
+	$(DAC2TEST) $< --source-module="$(NS_MDOM)DOMCore" > $@
+
+dom-xdoctype.t: $(DOM_CORE_DAC) $(DAC2TEST_PL)
+	$(DAC2TEST) $< --source-module="$(NS_MDOM)XDoctype" > $@
+
 dom-mdomls2003.t: $(DOM_LS_DAC) $(DAC2TEST_PL)
 	$(DAC2TEST) $< --source-module="$(NS_MDOM)ManakaiDOMLS2003" > $@
+
+test-module-util: \
+  util-perlcode.t \
+  util-dis-dnlite.t
+	$(PERL_TEST_) util-*.t
 
 util-perlcode.t: $(UTIL_PC_DAC) $(DAC2TEST_PL)
 	$(DAC2TEST) $< --source-module="$(NS_UTIL)PerlCode" > $@

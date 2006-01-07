@@ -1,6 +1,6 @@
 use Test;
 use Message::Util::ManakaiNode;
-plan tests => 28;
+plan tests => 20;
 
 my $node = Message::Util::ManakaiNode::ManakaiNodeStem->_new ('Test1');
 

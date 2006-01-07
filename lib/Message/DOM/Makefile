@@ -44,7 +44,8 @@ UTIL_CORE_DAC_FILE = $(MANAKAI_LIB_DIR)Message/Util/core$(DAC_SUFFIX)
 
 DOM_FEATURE_DIS_FILES = DOMFeature$(DIS_SUFFIX)
 DOM_CORE_DIS_FILES = DOMMain.dis DOMCore.dis DOMXML.dis \
-                     DOMLS.dis GenericLS.dis Tree$(DIS_SUFFIX)
+                     DOMLS.dis GenericLS.dis Tree$(DIS_SUFFIX) \
+                     XDoctype$(DIS_SUFFIX)
 DOM_LS_DIS_FILES   = SimpleLS$(DIS_SUFFIX) ManakaiDOMLS2003$(DIS_SUFFIX)
 XP_DIS_FILES       = XMLParser$(DIS_SUFFIX)
 DOM_HTML_DIS_FILES = DOMHTML.dis DOMWebForms.dis
@@ -56,6 +57,7 @@ GENERATED_FILES = \
   core$(DAC_SUFFIX)  DOMMain$(PM_SUFFIX) \
                      DOMCore$(PM_SUFFIX) DOMXML$(PM_SUFFIX) DOMLS$(PM_SUFFIX) \
                      GenericLS$(PM_SUFFIX) Tree$(PM_SUFFIX) \
+                     XDoctype$(PM_SUFFIX) \
   ls$(DAC_SUFFIX)    SimpleLS$(PM_SUFFIX) ManakaiDOMLS2003$(PM_SUFFIX) \
   xp$(DAC_SUFFIX)    XMLParser$(PM_SUFFIX) \
   html$(DAC_SUFFIX)  DOMHTML$(PM_SUFFIX) DOMWebForms$(PM_SUFFIX)
@@ -103,6 +105,7 @@ $(DOM_CORE_DIS_FILES:.dis=$(PM_SUFFIX)): core$(DAC_SUFFIX) $(DAC2PM_PL)
 	  --create-perl-module="$(NS_MDOM)DOMCore    DOMCore$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_MDOM)Tree       Tree$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_MDOM)DOMXML     DOMXML$(PM_SUFFIX)" \
+	  --create-perl-module="$(NS_MDOM)XDoctype   XDoctype$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_MDOM)DOMLS      DOMLS$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_MDOM)GenericLS  GenericLS$(PM_SUFFIX)"
 	$(PERL_CHK) DOMFeature$(PM_SUFFIX)
@@ -110,9 +113,11 @@ $(DOM_CORE_DIS_FILES:.dis=$(PM_SUFFIX)): core$(DAC_SUFFIX) $(DAC2PM_PL)
 	$(PERL_CHK) DOMCore$(PM_SUFFIX)
 	$(PERL_CHK) Tree$(PM_SUFFIX)
 	$(PERL_CHK) DOMXML$(PM_SUFFIX)
+	$(PERL_CHK) XDoctype$(PM_SUFFIX)
 	$(PERL_CHK) DOMLS$(PM_SUFFIX)
 	$(PERL_CHK) GenericLS$(PM_SUFFIX)
 	$(TOUCH) $@
+  ## NOTE: When you modify this rule, update |../Util/Makefile|, too.
 
 $(DOM_LS_DIS_FILES:$(DIS_SUFFIX)=$(PM_SUFFIX)): ls$(DAC_SUFFIX) $(DAC2PM_PL)
 	$(DAC2PM) $< --module-uri="$(NS_MDOM)$(@:$(PM_SUFFIX)=)" \
@@ -159,5 +164,5 @@ clean:
 	$(RM) .*.tmp *~ .*~ *.BAK .*.BAK
 	$(RM) .core$(PM_SUFFIX) .ls$(PM_SUFFIX) .html$(PM_SUFFIX)
 
-## $Date: 2005/12/28 03:50:17 $
+## $Date: 2006/01/07 12:30:53 $
 ## License: Public Domain.

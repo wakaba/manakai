@@ -12,7 +12,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2005/12/29 10:21:41 $
+    $Date: 2006/01/07 12:30:53 $
 
   @Require:
     @@Module:
@@ -26,6 +26,9 @@ Module:
     @@Module:
       @@@WithFor: ManakaiDOM|ManakaiDOM3
     @@Module:
+      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
+    @@Module:
+      @@@QName: MDOM|XDoctype
       @@@WithFor: ManakaiDOM|ManakaiDOMLatest
 
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
@@ -51,6 +54,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dom/meta#
   @DOMViews:
     http://suika.fam.cx/~wakaba/archive/2004/dom/views#
+  @d:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/xdt#
   @dx:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#
   @dxm:
@@ -694,6 +699,20 @@ IFCls1Def:
           @@@@lang:en
           @@@@@: 
             The node is a <IF::DOMXML:Notation>.
+
+    @@Const:
+      @@@Name: ELEMENT_TYPE_DEFINITION_NODE
+      @@@intValue: 81001
+      @@@enDesc:
+        The node is a <IF::d|ElementTypeDefinition>.
+      @@@For: ManakaiDOM|ManakaiDOMLatest
+    @@Const:
+      @@@Name: ATTRIBUTE_DEFINITION_NODE
+      @@@intValue: 81002
+      @@@enDesc:
+        The node is a <IF::d|AttributeDefinition>.
+      @@@For: ManakaiDOM|ManakaiDOMLatest
+
   @Attr:
      @@Name:  nodeName
      @@Description:
@@ -777,7 +796,8 @@ IFCls1Def:
              $test->assert_equals ($err-><AG::c|DOMError.relatedData>,
                                    $current_node);
              $test->assert_null ($err-><AG::c|DOMError.relatedException>);
-             $test->assert_null ($err-><AG::c|DOMError.location>);
+             $test->assert_isa ($err-><AG::c|DOMError.location>,
+                                <IFName::c|DOMLocator>);
              $test->assert_not_null ($err-><AG::c|DOMError.message>);
            });
 
@@ -1324,6 +1344,39 @@ IFCls1Def:
                     last CHKTYPE; # No problem
                   }
                 } # $node->{< Q::DOMCore:nodeType>}
+
+
+                __FOR{ManakaiDOM:ManakaiDOMLatest::
+                  if ($node->{<H::c|nodeType>} eq
+                      <H::infoset:DocumentTypeDeclaration>) {
+                    CHILDTYPE: {
+                      for my $newNode (@newNode) {
+                        unless ({
+                                  <H::infoset:ProcessingInstruction> => true,
+                                }->{$newNode->{<H::c|nodeType>}}) {
+                          last CHILDTYPE;
+                        }
+                      }
+                      last CHKTYPE; # No problem
+                    }
+                    ## NOTE: PI children of doctype is allowed
+                    ##       by manakai XDoctype module.
+                  } elsif ($node->{<H::c|nodeType>} eq
+                           <H::d|AttributeDefinitionNodeType>) {
+                    CHILDTYPE: {
+                      for my $newNode (@newNode) {
+                        unless ({
+                                  <H::c|TextNode> => 1,
+                                  <H::DOMXML:EntityReferenceNode> => 1,
+                                }->{$newNode->{<H::c|nodeType>}}) {
+                          last CHILDTYPE; # Error
+                        }
+                      }
+                      last CHKTYPE; # No problem
+                    }
+                  }
+                }__;
+
                 __EXCEPTION{
                   MDOMX:HIERARCHY_BAD_TYPE::
                     infoset:nodeType => {$newNode->{<H::infoset:nodeType>}},
@@ -1459,7 +1512,8 @@ IFCls1Def:
                                    <Q::t|insert-before-itself>);
              $test->assert_equals ($err-><AG::c|DOMError.relatedData>, $el);
              $test->assert_null ($err-><AG::c|DOMError.relatedException>);
-             $test->assert_null ($err-><AG::c|DOMError.location>);
+             $test->assert_isa ($err-><AG::c|DOMError.location>,
+                                <IFName::c|DOMLocator>);
              $test->assert_not_null ($err-><AG::c|DOMError.message>);
            });
 
@@ -1708,6 +1762,39 @@ IFCls1Def:
                     last CHKTYPE; # No problem
                   }
                 } # $node->{< Q::DOMCore:nodeType>}
+
+
+                __FOR{ManakaiDOM:ManakaiDOMLatest::
+                  if ($node->{<H::c|nodeType>} eq
+                      <H::infoset:DocumentTypeDeclaration>) {
+                    CHILDTYPE: {
+                      for my $newNode (@newNode) {
+                        unless ({
+                                  <H::infoset:ProcessingInstruction> => true,
+                                }->{$newNode->{<H::c|nodeType>}}) {
+                          last CHILDTYPE; # Error
+                        }
+                      }
+                      last CHKTYPE; # No problem
+                    }
+                    ## NOTE: PI children of doctype is allowed
+                    ##       by manakai XDoctype module.
+                  } elsif ($node->{<H::c|nodeType>} eq
+                           <H::d|AttributeDefinitionNodeType>) {
+                    CHILDTYPE: {
+                      for my $newNode (@newNode) {
+                        unless ({
+                                  <H::c|TextNode> => 1,
+                                  <H::DOMXML:EntityReferenceNode> => 1,
+                                }->{$newNode->{<H::c|nodeType>}}) {
+                          last CHILDTYPE; # Error
+                        }
+                      }
+                      last CHKTYPE; # No problem
+                    }
+                  }
+                }__;
+
                 __EXCEPTION{
                   MDOMX:HIERARCHY_BAD_TYPE::
                     infoset:nodeType => {$newNode->{<H::infoset:nodeType>}},
@@ -1847,7 +1934,8 @@ IFCls1Def:
                                    <Q::t|replace-by-itself>);
              $test->assert_equals ($err-><AG::c|DOMError.relatedData>, $el);
              $test->assert_null ($err-><AG::c|DOMError.relatedException>);
-             $test->assert_null ($err-><AG::c|DOMError.location>);
+             $test->assert_isa ($err-><AG::c|DOMError.location>,
+                                <IFName::c|DOMLocator>);
              $test->assert_not_null ($err-><AG::c|DOMError.message>);
            });
 
@@ -1858,6 +1946,10 @@ IFCls1Def:
            $test->assert_equals ($del-><AG::Node.firstChild>, $el);
 
            $el = null;
+
+      @@@enImplNote:
+        Test for doctype/child::pi and attrdef/(text | entref)
+        is included in <Module::MDOM|XDoctype> module.
 
      @@Level[list]:
         1
@@ -2150,6 +2242,38 @@ IFCls1Def:
                     last CHKTYPE; # No problem
                   }
                 } # $node->{< Q::DOMCore:nodeType>}
+
+                __FOR{ManakaiDOM:ManakaiDOMLatest::
+                  if ($node->{<H::c|nodeType>} eq
+                      <H::infoset:DocumentTypeDeclaration>) {
+                    CHILDTYPE: {
+                      for my $newNode (@newNode) {
+                        unless ({
+                                  <H::infoset:ProcessingInstruction> => true,
+                                }->{$newNode->{<H::c|nodeType>}}) {
+                          last CHILDTYPE; # Error
+                        }
+                      }
+                      last CHKTYPE; # No problem
+                    }
+                    ## NOTE: PI children of doctype is allowed
+                    ##       by manakai XDoctype module.
+                  } elsif ($node->{<H::c|nodeType>} eq
+                           <H::d|AttributeDefinitionNodeType>) {
+                    CHILDTYPE: {
+                      for my $newNode (@newNode) {
+                        unless ({
+                                  <H::c|TextNode> => 1,
+                                  <H::DOMXML:EntityReferenceNode> => 1,
+                                }->{$newNode->{<H::c|nodeType>}}) {
+                          last CHILDTYPE; # Error
+                        }
+                      }
+                      last CHKTYPE; # No problem
+                    }
+                  }
+                }__;
+
                 __EXCEPTION{
                   MDOMX:HIERARCHY_BAD_TYPE::
                     infoset:nodeType => {$newNode->{<H::infoset:nodeType>}},
@@ -3150,6 +3274,7 @@ IFCls1Def:
         $result = $__nodeobj->{<H::infoset:content>};
       } else {
         ## TODO: Namespace node not supported yet
+        ## TODO: XDoctype node types
         __ASSERT{DISPerl:invariant::
           msg => {qq{Node type: "$__nodeobj->{<H::DOMCore:nodeType>}"}}
         }__;
@@ -3183,6 +3308,7 @@ IFCls1Def:
               CORE::delete $__oc->{<H::infoset:parent>};
             }
             $__node->{<H::infoset:children>} = [];
+          if (defined $given and length $given) {
             my $__textNode = <ClassM::ManakaiDOMText.newObject> ($__node);
             __CODE{mn|setXRefNode||ManakaiDOM|Perl::
               $referrer => {$__textNode},
@@ -3192,6 +3318,7 @@ IFCls1Def:
             $__textNode->{<H::infoset:content>} = $given;
             $__textNode->{<H::infoset:parent>} = $__node;
             $__node->{<H::infoset:children>} = [$__textNode];
+          }
             for my $__oc (@__oldChild) {
               $__oc-><M::NodeStem.orphanate>;
             }
@@ -3545,6 +3672,9 @@ IFCls1Def:
     @@SpecLevel:3
     @@For:
       ManakaiDOM:DOM3
+    @@enImplNote:
+      {TODO:: <Module::MDOM:XDoctype> node types must be supported.
+      }
 
   @Method:
      @@Name:  getFeature
@@ -3773,6 +3903,16 @@ IFCls1Def:
       @@@Description:
         @@@@lang:en
         @@@@@: The node object referred to.
+    @@Param:
+      @@@Name: interface
+      @@@Type: DOMMain|DOMString
+      @@@enDesc:
+        The package name of the interface the return value
+        <kwd:MUST> implement in addition to the base interface
+        for the node type.
+      @@@nullCase:
+        @@@@enDesc:
+          No additional interface is required.
     @@Return:
       @@@Type: ManakaiDOMNode
       @@@Description:
@@ -3784,7 +3924,9 @@ IFCls1Def:
           my $nt = $object->{<H::DOMCore:nodeType>};
           my $class;
         UNKNOWN: {
-          if (defined $object->{<H::DOMCore:nodeRefClass>}) {
+          if (defined $object->{<H::DOMCore:nodeRefClass>} and
+              (not defined $interface or
+               $object->{<H::c|nodeRefClass>}->isa ($interface))) {
             $class = ${$object->{<H::DOMCore:nodeRefClass>}};
             last UNKNOWN;
           }
@@ -3807,7 +3949,9 @@ IFCls1Def:
               } keys %{
                 $Message::DOM::ManakaiDOMElement::CompatClassET{$$ns}->{$ln}
               }) {
-                if ($pack->isa (<IFName::Element>)) {
+                if ($pack->isa (<IFName::Element>) and
+                    (not defined $interface or
+                     $pack->isa ($interface))) {
                   $class = $pack;
                   last FIND;
                 }
@@ -3817,7 +3961,9 @@ IFCls1Def:
               } keys %{
                 $Message::DOM::ManakaiDOMElement::CompatClassET{$$ns}->{'*'}
               }) {
-                if ($pack->isa (<IFName::Element>)) {
+                if ($pack->isa (<IFName::Element>) and
+                    (not defined $interface or
+                     $pack->isa ($interface))) {
                   $class = $pack;
                   last FIND;
                 }
@@ -3825,8 +3971,10 @@ IFCls1Def:
             }
             for my $pack (sort {
               $Message::DOM::ClassPoint{$b} <=> $Message::DOM::ClassPoint{$a}
-            } keys %{$Message::DOM::ManakaiDOMElement::CompatClass}) {
-              if ($pack->isa (<IFName::Element>)) {
+            } keys %Message::DOM::ManakaiDOMElement::CompatClass) {
+              if ($pack->isa (<IFName::Element>) and
+                    (not defined $interface or
+                     $pack->isa ($interface))) {
                 $class = $pack;
                 last FIND;
               }
@@ -3836,8 +3984,10 @@ IFCls1Def:
             ## TODO: Find class by namespace URI and local name
             for my $pack (sort {
               $Message::DOM::ClassPoint{$b} <=> $Message::DOM::ClassPoint{$a}
-            } keys %{$Message::DOM::ManakaiDOMAttr::CompatClass}) {
-              if ($pack->isa (<IFName::Attr>)) {
+            } keys %Message::DOM::ManakaiDOMAttr::CompatClass) {
+              if ($pack->isa (<IFName::Attr>) and
+                    (not defined $interface or
+                     $pack->isa ($interface))) {
                 $class = $pack;
                 last FIND;
               }
@@ -3846,8 +3996,10 @@ IFCls1Def:
           } elsif ($nt eq <H::DOMCore:TextNode>) {
             for my $pack (sort {
               $Message::DOM::ClassPoint{$b} <=> $Message::DOM::ClassPoint{$a}
-            } keys %{$Message::DOM::ManakaiDOMText::CompatClass}) {
-              if ($pack->isa (<IFName::Text>)) {
+            } keys %Message::DOM::ManakaiDOMText::CompatClass) {
+              if ($pack->isa (<IFName::Text>) and
+                    (not defined $interface or
+                     $pack->isa ($interface))) {
                 $class = $pack;
                 last FIND;
               }
@@ -3856,8 +4008,10 @@ IFCls1Def:
           } elsif ($nt eq <H::infoset:Comment>) {
             for my $pack (sort {
               $Message::DOM::ClassPoint{$b} <=> $Message::DOM::ClassPoint{$a}
-            } keys %{$Message::DOM::ManakaiDOMComment::CompatClass}) {
-              if ($pack->isa (<IFName::Comment>)) {
+            } keys %Message::DOM::ManakaiDOMComment::CompatClass) {
+              if ($pack->isa (<IFName::Comment>) and
+                    (not defined $interface or
+                     $pack->isa ($interface))) {
                 $class = $pack;
                 last FIND;
               }
@@ -3885,7 +4039,9 @@ IFCls1Def:
                   } keys %{
                     $Message::DOM::ManakaiDOMDocument::CompatClassET{$$ns}->{$ln}
                   }) {
-                    if ($pack->isa (<IFName::Document>)) {
+                    if ($pack->isa (<IFName::Document>) and
+                        (not defined $interface or
+                         $pack->isa ($interface))) {
                       $class = $pack;
                       last FIND;
                     }
@@ -3896,7 +4052,9 @@ IFCls1Def:
                   } keys %{
                     $Message::DOM::ManakaiDOMDocument::CompatClassET{$$ns}->{'*'}
                   }) {
-                    if ($pack->isa (<IFName::Document>)) {
+                    if ($pack->isa (<IFName::Document>) and
+                        (not defined $interface or
+                         $pack->isa ($interface))) {
                       $class = $pack;
                       last FIND;
                     }
@@ -3920,7 +4078,9 @@ IFCls1Def:
                 $Message::DOM::ManakaiDOMDocument::CompatClassET{<Q::xhtml1:>}
                                                               ->{'*'}
               }) {
-                if ($pack->isa (<IFName::Document>)) {
+                if ($pack->isa (<IFName::Document>) and
+                    (not defined $interface or
+                     $pack->isa ($interface))) {
                   $class = $pack;
                   last FIND;
                 }
@@ -3929,8 +4089,10 @@ IFCls1Def:
 
             for my $pack (sort {
               $Message::DOM::ClassPoint{$b} <=> $Message::DOM::ClassPoint{$a}
-            } keys %{$Message::DOM::ManakaiDOMDocument::CompatClass}) {
-              if ($pack->isa (<IFName::Document>)) {
+            } keys %Message::DOM::ManakaiDOMDocument::CompatClass) {
+              if ($pack->isa (<IFName::Document>) and
+                  (not defined $interface or
+                   $pack->isa ($interface))) {
                 $class = $pack;
                 last FIND;
               }
@@ -3940,10 +4102,10 @@ IFCls1Def:
             ## TODO: Find class by namespace URI and local name
             for my $pack (sort {
               $Message::DOM::ClassPoint{$b} <=> $Message::DOM::ClassPoint{$a}
-            } keys %{
-              $Message::DOM::ManakaiDOMProcessingInstruction::CompatClass
-            }) {
-              if ($pack->isa (<IFName::DOMXML:ProcessingInstruction>)) {
+            } keys %Message::DOM::ManakaiDOMProcessingInstruction::CompatClass) {
+              if ($pack->isa (<IFName::DOMXML:ProcessingInstruction>) and
+                  (not defined $interface or
+                   $pack->isa ($interface))) {
                 $class = $pack;
                 last FIND;
               }
@@ -3952,8 +4114,10 @@ IFCls1Def:
           } elsif ($nt eq <H::DOMXML:CDATASectionNode>) {
             for my $pack (sort {
               $Message::DOM::ClassPoint{$b} <=> $Message::DOM::ClassPoint{$a}
-            } keys %{$Message::DOM::ManakaiDOMCDATASection::CompatClass}) {
-              if ($pack->isa (<IFName::DOMXML:CDATASection>)) {
+            } keys %Message::DOM::ManakaiDOMCDATASection::CompatClass) {
+              if ($pack->isa (<IFName::DOMXML:CDATASection>) and
+                  (not defined $interface or
+                   $pack->isa ($interface))) {
                 $class = $pack;
                 last FIND;
               }
@@ -3962,8 +4126,10 @@ IFCls1Def:
           } elsif ($nt eq <H::DOMXML:EntityReferenceNode>) {
             for my $pack (sort {
               $Message::DOM::ClassPoint{$b} <=> $Message::DOM::ClassPoint{$a}
-            } keys %{$Message::DOM::ManakaiDOMEntityReference::CompatClass}) {
-              if ($pack->isa (<IFName::DOMXML:EntityReference>)) {
+            } keys %Message::DOM::ManakaiDOMEntityReference::CompatClass) {
+              if ($pack->isa (<IFName::DOMXML:EntityReference>) and
+                  (not defined $interface or
+                   $pack->isa ($interface))) {
                 $class = $pack;
                 last FIND;
               }
@@ -3972,8 +4138,10 @@ IFCls1Def:
           } elsif ($nt eq <H::DOMCore:DocumentFragmentNode>) {
             for my $pack (sort {
               $Message::DOM::ClassPoint{$b} <=> $Message::DOM::ClassPoint{$a}
-            } keys %{$Message::DOM::ManakaiDOMDocumentFragment::CompatClass}) {
-              if ($pack->isa (<IFName::DocumentFragment>)) {
+            } keys %Message::DOM::ManakaiDOMDocumentFragment::CompatClass) {
+              if ($pack->isa (<IFName::DocumentFragment>) and
+                  (not defined $interface or
+                   $pack->isa ($interface))) {
                 $class = $pack;
                 last FIND;
               }
@@ -3982,8 +4150,10 @@ IFCls1Def:
           } elsif ($nt eq <H::infoset:DocumentTypeDeclaration>) {
             for my $pack (sort {
               $Message::DOM::ClassPoint{$b} <=> $Message::DOM::ClassPoint{$a}
-            } keys %{$Message::DOM::ManakaiDOMDocumentType::CompatClass}) {
-              if ($pack->isa (<IFName::DOMXML:DocumentType>)) {
+            } keys %Message::DOM::ManakaiDOMDocumentType::CompatClass) {
+              if ($pack->isa (<IFName::DOMXML:DocumentType>) and
+                  (not defined $interface or
+                   $pack->isa ($interface))) {
                 $class = $pack;
                 last FIND;
               }
@@ -3992,8 +4162,10 @@ IFCls1Def:
           } elsif ($nt eq <H::DOMXML:EntityNode>) {
             for my $pack (sort {
               $Message::DOM::ClassPoint{$b} <=> $Message::DOM::ClassPoint{$a}
-            } keys %{$Message::DOM::ManakaiDOMEntity::CompatClass}) {
-              if ($pack->isa (<IFName::DOMXML:Entity>)) {
+            } keys %Message::DOM::ManakaiDOMEntity::CompatClass) {
+              if ($pack->isa (<IFName::DOMXML:Entity>) and
+                  (not defined $interface or
+                   $pack->isa ($interface))) {
                 $class = $pack;
                 last FIND;
               }
@@ -4002,14 +4174,57 @@ IFCls1Def:
           } elsif ($nt eq <H::infoset:Notation>) {
             for my $pack (sort {
               $Message::DOM::ClassPoint{$b} <=> $Message::DOM::ClassPoint{$a}
-            } keys %{$Message::DOM::ManakaiDOMNotation::CompatClass}) {
-              if ($pack->isa (<IFName::DOMXML:Notation>)) {
+            } keys %Message::DOM::ManakaiDOMNotation::CompatClass) {
+              if ($pack->isa (<IFName::DOMXML:Notation>) and
+                  (not defined $interface or
+                   $pack->isa ($interface))) {
                 $class = $pack;
                 last FIND;
               }
             }
             $class = <ClassName::DOMXML:ManakaiDOMNotation>;
           ## TODO: Namespace
+
+          } elsif ($nt eq <H::d|ElementTypeDefinitionNodeType>) {
+            for my $pack (sort {
+              $Message::DOM::ClassPoint{$b} <=> $Message::DOM::ClassPoint{$a}
+            } keys %Message::DOM::ManakaiDOMElementTypeDefinition::CompatClass) {
+              if ($pack->isa (<IFName::d|ElementTypeDefinition>) and
+                  (not defined $interface or
+                   $pack->isa ($interface))) {
+                $class = $pack;
+                last FIND;
+              }
+            }
+            __FOR{ManakaiDOM:ManakaiDOMLatest::
+              $class = <ClassName::d|ManakaiDOMElementTypeDefinition>;
+            }__;
+            __FOR{!ManakaiDOM:ManakaiDOMLatest::
+              $class = <ClassName::d|ManakaiDOMElementTypeDefinition
+                                 ||ManakaiDOM|ManakaiDOMLatest>;
+            }__;
+            last FIND;
+
+          } elsif ($nt eq <H::d|AttributeDefinitionNodeType>) {
+            for my $pack (sort {
+              $Message::DOM::ClassPoint{$b} <=> $Message::DOM::ClassPoint{$a}
+            } keys %Message::DOM::ManakaiDOMAttributeDefinition::CompatClass) {
+              if ($pack->isa (<IFName::d|AttributeDefinition>) and
+                  (not defined $interface or
+                   $pack->isa ($interface))) {
+                $class = $pack;
+                last FIND;
+              }
+            }
+            __FOR{ManakaiDOM:ManakaiDOMLatest::
+              $class = <ClassName::d|ManakaiDOMAttributeDefinition>;
+            }__;
+            __FOR{!ManakaiDOM:ManakaiDOMLatest::
+              $class = <ClassName::d|ManakaiDOMAttributeDefinition
+                                 ||ManakaiDOM|ManakaiDOMLatest>;
+            }__;
+             last FIND;
+
           } else {
             __EXCEPTION{
               MDOMX:MDOM_DEBUG_BUG||ManakaiDOM:Perl::
@@ -4072,6 +4287,10 @@ IFCls1Def:
             $class = <ClassName::DOMXML:ManakaiDOMCDATASection>;
           } elsif ($nt eq <H::infoset:Notation>) {
             $class = <ClassName::DOMXML:ManakaiDOMNotation>;
+          } elsif ($nt eq <H::d|ElementTypeDefinitionNodeType>) {
+            $class = <ClassName::d|ManakaiDOMElementTypeDefinition>;
+          } elsif ($nt eq <H::d|AttributeDefinitionNodeType>) {
+            $class = <ClassName::d|ManakaiDOMAttributeDefinition>;
           } else {
             ## TODO: Use assertion
             __EXCEPTION{
@@ -4324,6 +4543,20 @@ RoleDef:
   @enDesc:
     Any class playing this role may be retrievable from 
     <M::Node.getFeature> method of a <IF::DOMXPath:Namespace> node. 
+
+RoleDef:
+  @QName: c|ElementTypeDefinitionRole
+  @enDesc:
+    Any class playing the <Q::c|ElementTypeDefinitionRole>
+    might be retrieved by <M::Node.getFeature> method of
+    an <IF::d|ElementTypeDefinition> node.
+
+RoleDef:
+  @QName: c|AttributeDefinitionRole
+  @enDesc:
+    Any class playing the <Q::c|AttributeDefinitionRole>
+    might be retrieved by <M::Node.getFeature> method of
+    an <IF::d|AttributeDefinition> node.
 
 RoleDef:
   @QName: c|AnyNodeRole
@@ -5172,6 +5405,28 @@ ClsDef:
                                                  $class = $nodeclass>,
                  <Code::getWeakRef:: $object = $node,
                                                  $class = $nodeclass>);
+  @IntMethodC:
+    @@Operator:
+      @@@@: eq
+      @@@ContentType: DISPerl|Perl
+    @@Param:
+      @@@Name: node
+      @@@Type: 
+        ManakaiDOMCore:ManakaiDOMNodeObjectNode
+      @@@Description:
+        @@@@lang:en
+        @@@@@: Another node object to compare.
+    @@Return:
+      @@@Type: idl|boolean||ManakaiDOM|all
+      @@@TrueCase:
+        @@@@enDesc:
+          Two nodes are the same object.
+      @@@FalseCase:
+        @@@@enDesc:
+          Two nodes are not the same object.
+      @@@PerlDefC:
+        $r = (ref $self eq ref $node and
+              $self->{<H::mn:nodeID>} eq $node->{<H::mn:nodeID>});
 
   @IntMethodC:
     @@Name:normalizeText
@@ -6243,8 +6498,12 @@ ResourceDef:
         since the <PerlModule::Tie::Array> also has its own empty destructor. 
     @@Return:
       @@@disDef:
+        @@@@ForCheck: !DOMCore|ForEmptyNodeList
         @@@@DISPerl:cloneCode:
           ManakaiNode|ManakaiNodeRef||ManakaiDOM|Perl.destroy
+      @@@PerlDef:
+        @@@@ForCheck: DOMCore|ForEmptyNodeList
+        @@@@@: \
 
   @Method:
     @@ForCheck: DOMCore|ForEmptyNodeList
@@ -7075,6 +7334,7 @@ ResourceDef:
                 }__;
               }
             } else {
+              $self->{<H::mn:node>}-><M::NodeStem.importTree> ($attrNode);
               $attrNode->{<H::infoset:ownerElement>} = $self->{<H::mn:node>};
               if (defined $attrNode->{<H::infoset:localName>}) {
                 $self->{<H::mn:node>}->{<H::infoset:attributes>}
@@ -7134,7 +7394,8 @@ ResourceDef:
                                    <Q::t|replace-by-itself>);
              $test->assert_equals ($err-><AG::c|DOMError.relatedData>, $attr);
              $test->assert_null ($err-><AG::c|DOMError.relatedException>);
-             $test->assert_null ($err-><AG::c|DOMError.location>);
+             $test->assert_isa ($err-><AG::c|DOMError.location>,
+                                <IFName::c|DOMLocator>);
              $test->assert_not_null ($err-><AG::c|DOMError.message>);
            });
 
@@ -9253,7 +9514,8 @@ NodeTypeDef:
                                    <Q::t|replace-by-itself>);
              $test->assert_equals ($err-><AG::c|DOMError.relatedData>, $attr);
              $test->assert_null ($err-><AG::c|DOMError.relatedException>);
-             $test->assert_null ($err-><AG::c|DOMError.location>);
+             $test->assert_isa ($err-><AG::c|DOMError.location>,
+                                <IFName::c|DOMLocator>);
              $test->assert_not_null ($err-><AG::c|DOMError.message>);
            });
 

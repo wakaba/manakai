@@ -1,3 +1,37 @@
+2006-01-07  Wakaba  <wakaba@suika.fam.cx>
+
+	* DOMMain.dis (checkXMLNamesQName): Checks whether
+	namespace URI is defined for not being warned.
+
+	* XDoctype.dis: New module.
+
+	* DOMCore.dis (DOMStringList): Test added.
+
+	* Makefile: |XDoctype.pm| added.
+
+	* Tree.dis (Require): Requires |XDoctype.dis|.
+	(ManakaiDOMNodeObjectNode.eq): Added.
+	(Test): |DOMError.location| must return a |DOMLocator|
+	object (it was incorrectly tested to return |null|).
+	(EmptyNodeList.DESTROY): Removed.
+
+2006-01-04  Wakaba  <wakaba@suika.fam.cx>
+
+	* Tree.dis (NodeType): |ELEMENT_TYPE_DEFINITION_NODE| and
+	|ATTRIBUTE_DEFINITION_NODE| node types added.
+	(appendChild, insertBefore, replaceChild): New
+	two node types added and processing instruction nodes
+	as document type definition node child is allowed
+	in |ManakaiDOM:ManakaiDOMLatest| mode.
+	(getNodeReference): New |interface| parameter 
+	to filter classes by interface is added.
+	(ElementTypeDefinitionRole): New role.
+	(AttributeDefinitionRole): New role.
+
+2006-01-02  Wakaba  <wakaba@suika.fam.cx>
+
+	* DOMCore.dis (DOMStringList): Reimplemented as tied array.
+
 2005-12-31  Wakaba  <wakaba@suika.fam.cx>
 
 	* DOMCore.dis (DOMError.location): Returns an empty |DOMLocator|

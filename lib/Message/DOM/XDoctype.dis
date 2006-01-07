@@ -1,0 +1,2380 @@
+Module:
+  @QName: MDOM|XDoctype
+  @Namespace:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/xdt#
+  
+  @FullName:
+    @@lang:en
+    @@@:
+      DOM XML Document Type Definition Module
+  @enDesc:
+    The <DFN::DOM XML Document Type Definition Module>,
+    a manakai extension module, provides a set of
+    interfaces via which applications can access
+    to document type definitions of XML documents,
+    including both read and write accesses.
+  
+  @DISCore:author: DISCore|Wakaba
+  @License: license|Perl+MPL
+  @Date:
+    $Date: 2006/01/07 12:30:54 $
+  
+  @DefaultFor: ManakaiDOM|ManakaiDOMLatest
+  
+  @Require:
+    @@QName: MDOM|DOMXML
+  
+Namespace:
+  @c:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
+  @d:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/xdt#
+  @dis:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
+  @dx:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#
+  @ecore:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/Core/
+  @f:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/feature#
+  @idl:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/IDL#
+  @infoset:
+     http://www.w3.org/2001/04/infoset#
+  @lang:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
+  @license:
+     http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
+  @LSEV:
+    http://www.w3.org/2002/DOMLS
+  @ManakaiDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
+  @ManakaiDOMLS:
+    http://suika.fam.cx/~wakaba/archive/2004/mdom-ls#
+  @MDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
+  @MDOMX:
+    http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
+  @mn:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/ManakaiNode#
+  @rdf:
+    http://www.w3.org/1999/02/22-rdf-syntax-ns#
+  @rdfs:
+    http://www.w3.org/2000/01/rdf-schema#
+  @t:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/tree#
+  @test:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Test#
+  @x:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/xml#
+  @xml:
+    http://www.w3.org/XML/1998/namespace
+  @xmlns:
+    http://www.w3.org/2000/xmlns/
+
+## -- Features
+
+ElementTypeBinding:
+  @Name: FeatureDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: f|Feature
+    @@For: =ManakaiDOM|all
+
+ElementTypeBinding:
+  @Name: FeatureVerDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: f|Feature
+
+ElementTypeBinding:
+  @Name: featureQName
+  @ElementType:
+    f:name
+  @ShadowContent:
+    @@ContentType: DISCore|QName
+
+FeatureDef:
+  @QName: d|Feature
+  @featureQName: ManakaiDOM|XDoctype
+  @FeatureVerDef:
+    @@QName: d|Feature30
+    @@f:instanceOf: d|Feature
+    @@Version: 3.0
+
+ElementTypeBinding:
+  @Name: IFClsXDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@: dis|MultipleResource
+      @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
+    @@resourceFor: ManakaiDOM|ForIF
+    @@resourceFor:
+      @@@@: ManakaiDOM|ForClass
+      @@@ForCheck: ManakaiDOM|ManakaiDOM !=ManakaiDOM|ManakaiDOM
+    @@For: ManakaiDOM|DOMLatest
+    @@For: =ManakaiDOM|ManakaiDOM
+
+    @@rdf:type:
+      @@@@: DISLang|Interface
+      @@@ForCheck: ManakaiDOM|ForIF
+
+    @@rdf:type:
+      @@@@: DISLang|Class
+      @@@ForCheck: ManakaiDOM|ForClass
+
+    @@Implement:
+      @@@@: ||+||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+
+ElementTypeBinding:
+  @Name: PropDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: rdf|Property
+    @@For: =ManakaiDOM|all
+
+ElementTypeBinding:
+  @Name: IFQName
+  @ElementType:
+    dis:QName
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForIF
+
+ElementTypeBinding:
+  @Name: ClsQName
+  @ElementType:
+    dis:QName
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: IFISA
+  @ElementType:
+    dis:ISA
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForIF
+
+ElementTypeBinding:
+  @Name: ClsISA
+  @ElementType:
+    dis:ISA
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: nullCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: ManakaiDOM|InCase
+    @@Value:
+      @@@is-null:1
+
+ElementTypeBinding:
+  @Name: InCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: ManakaiDOM|InCase
+
+ElementTypeBinding:
+  @Name: ShortConstGroup
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|ConstGroup
+    @@ForCheck: ManakaiDOM|ForIF !=ManakaiDOM|ManakaiDOM
+    @@Type: idl|unsignedShort||ManakaiDOM|all
+    @@rdfs:subClassOf: idl|unsignedShort||ManakaiDOM|all
+
+ElementTypeBinding:
+  @Name: Const
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|Const
+
+ElementTypeBinding:
+  @Name: NodeReadOnlyError
+  @ElementType:
+    dx:raises
+  @ShadowContent:
+    @@@: MDOMX|NOMOD_THIS
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The node is read-only.
+
+ResourceDef:
+  @QName: NodeReadOnlyError
+  @rdf:type: DISPerl|BlockCode
+  @For: ManakaiDOM|ManakaiDOM
+  @PerlCDef:
+    if ($self->{<H::mn:node>}->{<H::c|read-only>}) {
+      __EXCEPTION{MDOMX|NOMOD_THIS::
+      }__;
+    }
+
+ResourceDef:
+  @QName: d|getRef
+  @AliasFor: mn|getNewReference||ManakaiDOM|Perl
+  @For: ManakaiDOM|ManakaiDOM !=ManakaiDOM|ManakaiDOM
+
+ElementTypeBinding:
+  @Name: PerlDef
+  @ElementType:
+    dis:Def
+  @ShadowContent:
+    @@ContentType: lang|Perl
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: PerlCDef
+  @ElementType:
+    dis:Def
+  @ShadowContent:
+    @@ContentType: lang|Perl
+
+ElementTypeBinding:
+  @Name: disDef
+  @ElementType:
+    dis:Def
+  @ShadowContent:
+    @@ContentType: lang|dis
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: Method
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|Method
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM
+
+ElementTypeBinding:
+  @Name: IntMethod
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|Method
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM ManakaiDOM|ForClass
+    @@ManakaiDOM:isForInternal: 1
+
+
+ElementTypeBinding:
+  @Name: Param
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|MethodParameter
+
+
+ElementTypeBinding:
+  @Name: Return
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|MethodReturn
+
+ElementTypeBinding:
+  @Name: Attr
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|Attribute
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM
+
+
+ElementTypeBinding:
+  @Name: IntAttr
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|Attribute
+    @@ForCheck: ManakaiDOM|ForClass
+    @@ManakaiDOM:isForInternal: 1
+
+
+ElementTypeBinding:
+  @Name: Get
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|AttributeGet
+
+ElementTypeBinding:
+  @Name: Set
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|AttributeSet
+
+ElementTypeBinding:
+  @Name: Test
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: test|StandaloneTest
+    @@ForCheck: ManakaiDOM|ForClass
+
+IFClsXDef:
+  @IFQName: DocumentXDoctype
+  @ClsQName: ManakaiDOMDocumentXDoctype
+  
+  @ClsISA: c|ManakaiDOMDocument
+
+  @f:implements: d|Feature30
+  @f:provides:
+    @@@: d|Feature30
+    @@f:through: c|ManakaiDOMImplementation
+  
+  @enDesc:
+    The <IF::DocumentXDoctype> interface provides 
+    methods to create definition nodes.
+    
+    Objects implementing <IF::DocumentXDoctype>
+    interface <kwd:MUST> also implement the
+    <IF::t|Document> interface.
+
+  @ResourceDef:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@QName: newDocumentForTest
+    @@rdf:type: DISPerl|BlockCode
+    @@PerlDef:
+      my $__impl = <Class::c|ManakaiDOMImplementation>->_new;
+      $doc = $__impl-><M::c|DOMImplementation.createDocument>;
+      bless $doc, <ClassName::ManakaiDOMDocumentXDoctype>;
+
+  @Test:
+    @@PerlDef:
+      my $doc;
+      __CODE{newDocumentForTest}__;
+       
+      $test->assert_not_null ($doc);
+      $test->assert_isa ($doc, <IFName::DocumentXDoctype>);
+      $test->assert_isa ($doc, <IFName::Document>);
+      $test->assert_isa ($doc, <IFName::Node>);
+      $test->assert_isa ($doc, <ClassName::ManakaiDOM|ManakaiDOMObject>);
+
+      ## TODO: Add test for implemented features
+    
+  @Method:
+    @@Name: createDocumentTypeDefinition
+    @@enDesc:
+      Creates a <IF::DocumentTypeDefinition>.
+    @@DOMMain:isNamespaceUnaware: 1
+    @@Param:
+      @@@Name: nameArg
+      @@@Type: DOMString
+      @@@enDesc:
+        The document type name of the definition.
+    @@Return:
+      @@@Type: DocumentTypeDefinition
+      @@@dx:raises:
+        @@@@@: MDOMX|MDOM_BAD_NAME
+        @@@@enDesc:
+          The <P::nameArg> is not a legal <CODE::Name>
+          according to the XML version of the document.
+      @@@PerlDef:
+        my $doc = $self->{<H::mn:node>};
+        my $ver = <Code::t|getDocumentXMLVersion::
+                    $DOCOBJ = $doc>;
+        __CODE{DOMMain:ensureXMLName::
+          $INPUT => $nameArg,
+          $INPUT_PARAM_NAME => 'nameArg',
+          $XMLVERSION => $ver,
+        }__;
+        my $obj
+          = <ClassM::ManakaiDOMDocumentTypeDefinition.newObject>;
+        __CODE{mn|setXRefNode||ManakaiDOM|Perl::
+          $referrer => $obj,
+          $propName => {<H::c|ownerDocument>},
+          $referent => $doc,
+        }__;
+        $obj->{<H::c|name>} = $nameArg;
+        $r = <ClassM::t|ManakaiDOMNode.getNodeReference>
+               ($obj, <IFName::DocumentTypeDefinition>);
+
+    @@Test:
+      @@@QName:
+        ManakaiDocumentXDoctype.createDocumentTypeDefinition.success.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{newDocumentForTest}__;
+        my $dtd = $doc-><M::DocumentXDoctype.createDocumentTypeDefinition>
+                          ('abcdefg');
+        
+        $test->assert_not_null ($dtd);
+        $test->assert_equals ($dtd-><AG::t|Node.nodeType>,
+                              <C::t|Node.DOCUMENT_TYPE_NODE>); 
+        $test->assert_string (actual_value => $dtd-><AG::Node.nodeName>,
+                              expected_value => 'abcdefg'); 
+        $test->assert_isa ($dtd, <IFName::DocumentTypeDefinition>);
+    
+    @@Test:
+      @@@QName:
+        ManakaiDocumentXDoctype.createDocumentTypeDefinition.badname.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{newDocumentForTest}__;
+        $test->assert_exception
+                 (code => sub {
+                    my $dtd = $doc-><M::DocumentXDoctype
+                                         .createDocumentTypeDefinition>
+                                      ('0120');
+                  },
+                  exception_subtype => <Q::MDOMX|MDOM_BAD_NAME>);
+
+  @Method:
+    @@Name: createElementTypeDefinition
+    @@enDesc:
+      Creates an <IF::ElementTypeDefinition>.
+    @@DOMMain:isNamespaceUnaware: 1
+    @@Param:
+      @@@Name: nameArg
+      @@@Type: DOMString
+      @@@enDesc:
+        The element type name of the definition.
+    @@Return:
+      @@@Type: ElementTypeDefinition
+      @@@dx:raises:
+        @@@@@: MDOMX|MDOM_BAD_NAME
+        @@@@enDesc:
+          The <P::nameArg> is not a legal <CODE::Name>
+          according to the XML version of the document.
+      @@@PerlDef:
+        my $doc = $self->{<H::mn:node>};
+        my $ver = <Code::t|getDocumentXMLVersion::
+                    $DOCOBJ = $doc>;
+        __CODE{DOMMain:ensureXMLName::
+          $INPUT => $nameArg,
+          $INPUT_PARAM_NAME => 'nameArg',
+          $XMLVERSION => $ver,
+        }__;
+        my $obj
+          = <ClassM::ManakaiDOMElementTypeDefinition.newObject>;
+        __CODE{mn|setXRefNode||ManakaiDOM|Perl::
+          $referrer => $obj,
+          $propName => {<H::c|ownerDocument>},
+          $referent => $doc,
+        }__;
+        $obj->{<H::c|name>} = $nameArg;
+        $r = <ClassM::t|ManakaiDOMNode.getNodeReference> ($obj);
+
+    @@Test:
+      @@@QName:
+        ManakaiDocumentXDoctype.createElementTypeDefinition.success.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{newDocumentForTest}__;
+        my $dtd = $doc-><M::DocumentXDoctype.createElementTypeDefinition>
+                          ('abcdefg');
+        
+        $test->assert_not_null ($dtd);
+        $test->assert_equals ($dtd-><AG::t|Node.nodeType>,
+                              <C::t|Node.ELEMENT_TYPE_DEFINITION_NODE>); 
+        $test->assert_string (actual_value => $dtd-><AG::Node.nodeName>,
+                              expected_value => 'abcdefg'); 
+    
+    @@Test:
+      @@@QName:
+        ManakaiDocumentXDoctype.createElementTypeDefinition.badname.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{newDocumentForTest}__;
+        $test->assert_exception
+                 (code => sub {
+                    my $dtd = $doc-><M::DocumentXDoctype
+                                         .createElementTypeDefinition>
+                                      ('0120');
+                  },
+                  exception_subtype => <Q::MDOMX|MDOM_BAD_NAME>);
+    
+  @Method:
+    @@Name: createAttributeDefinition
+    @@enDesc:
+      Creates an <IF::AttributeDefinition>.
+    @@DOMMain:isNamespaceUnaware: 1
+    @@Param:
+      @@@Name: nameArg
+      @@@Type: DOMString
+      @@@enDesc:
+        The attribute name of the definition.
+    @@Return:
+      @@@Type: AttributeDefinition
+      @@@dx:raises:
+        @@@@@: MDOMX|MDOM_BAD_NAME
+        @@@@enDesc:
+          The <P::nameArg> is not a legal <CODE::Name>
+          according to the XML version of the document.
+      @@@PerlDef:
+        my $doc = $self->{<H::mn:node>};
+        my $ver = <Code::t|getDocumentXMLVersion::
+                    $DOCOBJ = $doc>;
+        __CODE{DOMMain:ensureXMLName::
+          $INPUT => $nameArg,
+          $INPUT_PARAM_NAME => 'nameArg',
+          $XMLVERSION => $ver,
+        }__;
+        my $obj = <ClassM::ManakaiDOMAttributeDefinition.newObject>;
+        __CODE{mn|setXRefNode||ManakaiDOM|Perl::
+          $referrer => $obj,
+          $propName => {<H::c|ownerDocument>},
+          $referent => $doc,
+        }__;
+        $obj->{<H::c|name>} = $nameArg;
+        $r = <ClassM::t|ManakaiDOMNode.getNodeReference> ($obj);
+
+    @@Test:
+      @@@QName:
+        ManakaiDocumentXDoctype.createAttributeDefinition.success.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{newDocumentForTest}__;
+        my $dtd = $doc-><M::DocumentXDoctype.createAttributeDefinition>
+                          ('abcdefg');
+        
+        $test->assert_not_null ($dtd);
+        $test->assert_equals ($dtd-><AG::t|Node.nodeType>,
+                              <C::t|Node.ATTRIBUTE_DEFINITION_NODE>); 
+        $test->assert_string (actual_value => $dtd-><AG::Node.nodeName>,
+                              expected_value => 'abcdefg'); 
+    
+    @@Test:
+      @@@QName:
+        ManakaiDocumentXDoctype.createAttributeDefinition.badname.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{newDocumentForTest}__;
+        $test->assert_exception
+                 (code => sub {
+                    my $dtd = $doc-><M::DocumentXDoctype
+                                         .createAttributeDefinition>
+                                      ('0120');
+                  },
+                  exception_subtype => <Q::MDOMX|MDOM_BAD_NAME>);
+##DocumentXDoctype
+
+ResourceDef:
+  @QName: NodeStem
+  @AliasFor: ManakaiNode|NodeStem||ManakaiDOM|Perl
+  @For: ManakaiDOM|ManakaiDOM !=ManakaiDOM|ManakaiDOM
+
+IFClsXDef:
+  @IFQName: DocumentTypeDefinition
+  @ClsQName: ManakaiDOMDocumentTypeDefinition
+  
+  @IFISA: t|Node
+#  @ClsISA: t|ManakaiDOMNode
+
+  @ClsISA: x|ManakaiDOMDocumentType
+  
+  @DISLang:role: c|DocumentTypeRole
+
+  @f:implements: d|Feature30
+  
+  @enDesc:
+    A <IF::DocumentTypeDefinition> node represents
+    a set of definitions for a document type.
+    
+    Objects implementing the <IF::DocumentTypeDefinition>
+    interface <kwd:MAY> also implement the <IF::x|DocumentType>
+    interface.  They need not implement duplicate 
+    members twice.
+    
+    In DOM levels 1, 2, and 3, a <IF::x|DocumentType> object
+    can never have child node.  A <IF::DocumentTypeDefinition>
+    node, however, <kwd:MAY> have <IF::x|ProcessingInstruction>
+    nodes, as <InfoProp::children> property of 
+    <InfoItem::processing instruction information item>.
+    
+    If a <IF::DocumentTypeDefinition> node is not associated
+    with any document yet, then its <A::t|Node.ownerDocument>
+    attribute value is <DOM::null>.  Otherwise, the
+    attribute contains the attribute to which the node
+    is associated.  Note that the
+    <M::DocumentXDoctype.createDocumentTypeDefinition>
+    method will assign the attribute to that document.
+
+  @enImplNote:
+    {ISSUE::
+      <M::t|ManakaiDOMNode.getNodeReference> might not return
+      a <IF::DocumentTypeDefinition> if a class with higher score
+      does not implement that interface.
+    }
+
+    In current manakai implementation, a <IF::DocumentTypeDefinition>
+    object <kwd:MUST> also implement the <IF::x|DocumentType>
+    interface (because of <M::t|ManakaiDOMNode.getNodeReference>
+    implementation).
+
+  @ResourceDef:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@QName: newDoctypeForTest
+    @@rdf:type: DISPerl|BlockCode
+    @@PerlDef:
+      my $doc;
+      __CODE{newDocumentForTest}__;
+      $dtd = $doc-><M::DocumentXDoctype.createDocumentTypeDefinition>
+                          ('dt1');
+
+  @Test:
+    @@QName: ManakaiDOMDTD.ownerDocument.test
+    @@PerlDef:
+      my $dtd;
+      __CODE{newDoctypeForTest}__;
+      $test->assert_not_null ($dtd);
+      $test->assert_isa ($dtd, <IFName::DocumentTypeDefinition>);
+      $test->assert_isa ($dtd, <IFName::x|DocumentType>);
+      $test->assert_isa ($dtd, <IFName::Node>);
+      $test->assert_isa ($dtd, <ClassName::ManakaiDOM|ManakaiDOMObject>);
+
+      my $od = $dtd-><AG::Node.ownerDocument>;
+      $test->assert_not_null ($od);
+      $test->assert_not_null
+               ($od-><M::Node.getFeature> (<Q::ManakaiDOM:XDoctype>, '3.0'));
+
+  @Test:
+    @@QName: ManakaiDOMDTD.appendChild.pi.test
+    @@PerlDef:
+      my $dtd;
+      __CODE{newDoctypeForTest}__;
+      
+      my $doc = $dtd-><AG::Node.ownerDocument>;
+      my $pi = $doc-><M::Document.createProcessingInstruction> ('pitarget');
+      
+      $dtd-><M::Node.appendChild> ($pi);
+
+      my $fc = $dtd-><AG::Node.firstChild>;
+      $test->assert_not_null ($fc);
+      $test->assert_equals ($pi, $fc);
+      $test->assert_string (actual_value => $pi-><AG::PI.target>,
+                            expected_value => 'pitarget');
+
+  @Attr:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@Name: nodeType
+    @@enDesc:
+      The type of the node.
+    @@Type: idl|unsignedShort||ManakaiDOM|all
+    @@dis:actualType: t|NodeType
+    @@Get:
+      @@@disDef:
+        @@@@DISLang:constValue: t|Node.DOCUMENT_TYPE_NODE
+    @@Test:
+      @@@PerlDef:
+        my $dtd;
+        __CODE{newDoctypeForTest}__;
+        $test->assert_num_equals
+                 (actual_value => $dtd-><AG::Node.nodeType>,
+                  expected_value => <C::Node.DOCUMENT_TYPE_NODE>);
+
+  @Attr:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@Name: nodeName
+    @@enDesc:
+      The document type name of the node.
+    @@Type: DOMString
+    @@Get:
+      @@@PerlDef:
+        if (defined $self->{<H::mn:node>}
+                         ->{<H::infoset:localName>}) {
+          if (defined $self->{<H::mn:node>}->{<H::infoset:prefix>}) {
+            $r = $self->{<H::mn:node>}->{<H::infoset:prefix>}
+               . ':'
+               . $self->{<H::mn:node>}->{<H::infoset:localName>};
+          } else {
+            $r = $self->{<H::mn:node>}->{<H::infoset:localName>};
+          }
+        } else {
+          $r = $self->{<H::mn:node>}->{<H::c|name>};
+        }
+    @@Test:
+      @@@PerlDef:
+        my $dtd;
+        __CODE{newDoctypeForTest}__;
+        $test->assert_equals
+                 ($dtd-><AG::Node.nodeName>, 'dt1');
+
+  @Attr:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@Name: localName
+    @@enDesc:
+      The local name of the document type name.
+      
+      If the node is created by namespace aware method
+      such as <M::c|DOMImplementation.createDocumentType>,
+      then this attribute contains a non-<DOM::null> value.
+      Otherwise, the attribute value is <DOM::null>.
+      
+        {NOTE:: This is a manakai extension.  In other
+                implementation, <A::t|Node.localName>
+                of a <IF::x|DocumentType> is always <DOM::null>.
+        }
+    @@Type: DOMString
+    @@DOMMain:isNamespaceAware: 1
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          If the node is namespace unaware.
+      @@@disDef:
+        @@@@GetProp: infoset|localName
+    @@Test:
+      @@@PerlDef:
+        my $dtd;
+        __CODE{newDoctypeForTest}__;
+        $test->assert_null ($dtd-><AG::Node.localName>);
+      
+  @Attr:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@Name: prefix
+    @@enDesc:
+      The namespace prefix of the document type name.
+      
+      If the node is created by a namespace aware method
+      such as <M::c|DOMImplementation.createDocumentType>,
+      then the node might have a namespace prefix.
+      Otherwise, it is always <DOM::null>.
+      
+        {NOTE:: This is a manakai extension; in other 
+                implementations, <A::t|Node.prefix> of
+                a <IF::x|DocumentType> node will be always 
+                <DOM::null>.
+        }
+    @@Type: DOMString
+    @@dis:actualType: DOMMain|ManakaiDOMNamespacePrefix
+    @@DOMMain:isNamespaceAware: 1
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          If the node is <EM::not> namespace aware, or
+          if the document type name belongs to the default
+          namespace.
+      @@@disDef:
+        @@@@GetProp: infoset|prefix
+    @@Set:
+      @@@enDesc:
+        If the node is <EM::not> namespace aware, then
+        setting the node has no effect, even if the node
+        is read-only.
+      @@@InCase:
+        @@@@Value:
+          @@@@@@: \
+          @@@@@ContentType: DISCore|String
+        @@@@enDesc:
+          The result is implementation dependent.
+      @@@nullCase:
+        @@@@enDesc:
+          The document type name has no prefix.
+      @@@dx:raises:
+        @@@@@: MDOMX|MDOM_BAD_NAME
+        @@@@enDesc:
+          If the new value is not a legal <CODE::Name>
+          according to the XML version of the document.
+        
+            {NOTE:: If the XML version of the document
+                    is not available, then it is validated
+                    against XML 1.1.
+            }
+      @@@NodeReadOnlyError:
+      @@@dx:raises:
+        @@@@@: MDOMX|MDOM_NS_BAD_NCNAME
+        @@@@enDesc:
+          If the new value is not a legal <CODE::NCName>
+          according to the XML version of the document.
+          
+            {NOTE:: If the XML version of the document
+                    is not available, then it is validated
+                    against XML 1.1.
+            }
+      @@@c:reports:
+        @@@@@: t|setting-prefix-no-effect-because-of-node
+        @@@@enDesc:
+          If the node is <EM::not> namespace aware so that
+          setting the attribute value has no effect.
+        @@@@For: ManakaiDOM|ManakaiDOM
+      @@@PerlDef:
+        if (defined $self->{<H::mn:node>}
+                         ->{<H::infoset:localName>}) {
+          __CODE{NodeReadOnlyError}__;
+          my $doc = $self->{<H::infoset:parent>};
+          my $ver = $doc
+                      ? (<Code::t|getDocumentXMLVersion::
+                           $DOCOBJ = $doc>)
+                      : '1.1';
+          __CODE{DOMMain:ensureNamespacePrefix::
+            $INPUT => $given,
+            $INPUT_PARAM_NAME => '',
+            $XMLVERSION => $ver,
+          }__;
+          $self->{<H::mn:node>}->{<H::infoset:prefix>} = $given;
+        }
+    @@Test:
+      @@@PerlDef:
+        my $dtd;
+        __CODE{newDoctypeForTest}__;
+        $test->assert_null ($dtd-><AG::Node.prefix>);
+        $dtd-><AS::Node.prefix> ('prefix');
+        $test->assert_null ($dtd-><AG::Node.prefix>);
+        $dtd-><AS::Node.prefix> ('0120444444');
+        $test->assert_null ($dtd-><AG::Node.prefix>);
+      
+  @enImplNote:
+    {TODO::
+      Implement <A::.elementTypes>, <A::.generalEntities>,
+      <A::.parameterEntities>, <A::.notations>.
+      
+      The class will also implement <IF::x|DocumentType>
+      members for compatibility.
+      
+      Implement get/set by name methods for general/parameter
+      entities and notations.
+      
+      Defines <M::t|Node.cloneNode>, <M::t|Node.importNode>,
+      <M::t|Node.adoptNode>, namespace methods, ...
+      
+      In particular, document position for processing
+      instruction children must be defined.
+
+      Test for namespace aware doctype
+    }
+
+  @Method:
+    @@Name: getElementTypeDefinitionNode
+    @@enDesc:
+      Returns the definition for an element type.
+    @@DOMMain:isNamespaceUnaware: 1
+    @@Param:
+      @@@Name: nameArg
+      @@@Type: DOMString
+      @@@enDesc:
+        The name of the element type.
+    @@Return:
+      @@@Type: ElementTypeDefinition
+      @@@enDesc:
+        The element type definition for <P::nameArg>.
+      @@@nullCase:
+        @@@@enDesc:
+          There is no definition for the element type <P::nameArg>.
+      @@@PerlDef:
+        my $n = $self->{<H::mn:node>}
+                     ->{<H::d|elementTypes>}
+                     ->{$nameArg};
+        if ($n) {
+          $r = <ClassM::t|ManakaiDOMNode.getNodeReference> ($n);
+        }
+    @@Test:
+      @@@PerlDef:
+        my $dtd;
+        __CODE{newDoctypeForTest}__;
+        $test->assert_null 
+                 ($dtd-><M::DocumentTypeDefinition
+                           .getElementTypeDefinitionNode> ('element'));
+
+  @Method:
+    @@Name: setElementTypeDefinitionNode
+    @@enDesc:
+      Sets an element type definition to the document type
+      definition.
+    @@Param:
+      @@@Name: defNode
+      @@@Type: ElementTypeDefinition
+      @@@enDesc:
+        The element type definition to set.  Its <A::t|Node.nodeName>
+        attribute is used to set the node.  If it is already
+        in use elsewhere, then it is first removed
+        from there and then attached to the document type.
+        If another element type definition with
+        same <A::t|Node.nodeName> is attached to this document
+        type definition, that association is removed.
+        
+        If <P::defNode> is already attached to this document
+        type definition, then this method has no effect.
+    @@Return:
+      @@@Type: ElementTypeDefinition
+      @@@enDesc:
+        If there is already another element type definition
+        with the same <A::t|Node.nodeName> as <P::defNode>,
+        then that definition node is returned.
+      @@@nullCase:
+        @@@@enDesc:
+          If there is no previous definition with the same
+          name, or the <P::defNode> is already attached
+          to the document type definition.
+      @@@NodeReadOnlyError:
+      @@@dx:raises:
+        @@@@@: c|OWNER_DEFINITION_READ_ONLY_ERR
+        @@@@enDesc:
+          The <A::ElementTypeDefinition.ownerDocumentTypeDefinition>
+          node is read-only.
+      @@@dx:raises:
+        @@@@@: c|DIFFERENT_DOCUMENT_ERR
+        @@@@enDesc:
+          The <P::defNode> node is created from different
+          document than the <A::c|Node.ownerDocument> of
+          the document type definition and the implementation
+          does not support such definition node
+          being attached to the document type definition.
+      @@@PerlDef:
+        __CODE{setDefinitionNode::
+          $defNode => $defNode,
+          $defNodeParamName => 'defNode',
+          $key => {<H::d|elementTypes>},
+        }__;
+    @@Test:
+      @@@PerlDef:
+        my $dtd;
+        __CODE{newDoctypeForTest}__;
+        $test->assert_null 
+                 ($dtd-><M::DocumentTypeDefinition
+                           .getElementTypeDefinitionNode> ('et1'));
+
+        my $et = $dtd-><AG::Node.ownerDocument>
+                     -><M::Node.getFeature> (<Q::ManakaiDOM|XDoctype>)
+                     -><M::DocumentXDoctype.createElementTypeDefinition>
+                         ('et1');
+
+        my $old1 = $dtd-><M::DocumentTypeDefinition
+                           .setElementTypeDefinitionNode> ($et);
+        $test->assert_null ($old1);
+
+        my $ret = $dtd-><M::DocumentTypeDefinition
+                           .getElementTypeDefinitionNode> ('et1');
+        $test->assert_equals ($et, $ret);
+        $test->assert_num_equals
+                 (actual_value => $ret-><AG::Node.nodeType>,
+                  expected_value => <C::Node.ELEMENT_TYPE_DEFINITION_NODE>);
+        $test->assert_equals
+                 ($et-><AG::ElementTypeDefinition.ownerDocumentTypeDefinition>,
+                  $dtd);
+
+        $test->id ('replace-same');
+
+        my $old2 = $dtd-><M::DocumentTypeDefinition
+                           .setElementTypeDefinitionNode> ($et);
+        $test->assert_null ($old2);
+
+        $test->id ('change-parent');
+
+        my $dtd2 = $dtd-><AG::Node.ownerDocument>
+                       -><M::Node.getFeature> (<Q::ManakaiDOM|XDoctype>)
+                       -><M::DocumentXDoctype.createDocumentTypeDefinition>
+                           ('dt2');
+    
+        my $old3 = $dtd2-><M::DocumentTypeDefinition
+                            .setElementTypeDefinitionNode> ($et);
+        $test->assert_null ($old3);
+        
+        $test->assert_equals
+                 ($et-><AG::ElementTypeDefinition.ownerDocumentTypeDefinition>,
+                  $dtd2);
+        $test->assert_null
+                 ($dtd-><M::DocumentTypeDefinition
+                             .getElementTypeDefinitionNode>
+                          ('et1'));
+  
+        $test->id ('rewrite');
+
+        my $et2 = $dtd-><AG::Node.ownerDocument>
+                      -><M::Node.getFeature> (<Q::ManakaiDOM|XDoctype>)
+                      -><M::DocumentXDoctype.createElementTypeDefinition>
+                          ('et1');
+        $test->assert_not_equals ($et, $et2);
+
+        my $old4 = $dtd2-><M::DocumentTypeDefinition
+                                .setElementTypeDefinitionNode> ($et2);
+        $test->assert_equals ($old4, $et);
+        $test->assert_equals
+                 ($et2-><AG::ElementTypeDefinition.ownerDocumentTypeDefinition>,
+                  $dtd2);
+
+    @@Test:
+      @@@PerlDef:
+        my $dtd;
+        __CODE{newDoctypeForTest}__;
+        my $et;
+        __CODE{newETForTest}__;
+
+        $test->assert_exception
+          (code => sub {
+            $dtd-><M::DocumentTypeDefinition
+                     .setElementTypeDefinitionNode> ($et);
+           },
+           exception_subtype => <Q::c|DIFFERENT_DOCUMENT_ERR>);
+  
+  @Method:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@ManakaiDOM:isForInternal: 1
+    @@Name: newObject
+    @@NewObjectRefNodeParam:
+    @@Return:
+      @@@Type: NodeStem
+      @@@PerlDef:
+        $r = <ClassM::t|ManakaiDOMNode.newObject> ($self, $refNode);
+        $r->{<H::c|nodeType>} = <H::infoset|DocumentTypeDeclaration>;
+        $r->{<H::d|elementTypes>} = {};
+        $r->{<H::d|generalEntities>} = {};
+        $r->{<H::d|parameterEntities>} = {};
+        $r->{<H::d|notations>} = {};
+        $r->{<H::infoset|children>} = [];
+    @@enImplNote:
+      Required properties:
+        <Q::c|nodeType>, <Q::c|ownerDocument>,
+        either <Q::c|name> or <Q::infoset|localName>,
+        <Q::d|elementTypes>, <Q::d|generalEntities>,
+        <Q::d|parameterEntities>, <Q::d|notations>,
+        <Q::infoset|children>,
+        <Q::c|implementation>, <Q::ManakaiDOM|implID>.
+      
+      Optional properties:
+        <Q::c|read-only>,
+        <Q::d|ownerDocument>,
+        <Q::infoset|prefix>,
+        <Q::infoset:publicIdentifier>,
+        <Q::infoset:systemIdentifier>.
+      
+      Since a <IF::x|DocumentType> might not be associated
+      with any <IF::c|Document>, the manakai implementation
+      holds a reference to the <IF::c|DOMImplementation>
+      by <Q::c|implementation> and <Q::ManakaiDOM|implID>
+      properties.
+      
+      DOM2 Core <M::c|DOMImplementation.createDocumentType>
+      method is namespace aware, so the manakai implementation
+      preserves the document type name by <Q::infoset|localName>
+      property with optional <Q::infoset|prefix> property.
+      Note that document type name never has namespace URI.
+      
+      <M::DocumentXDoctype.createDocumentTypeDefinition>
+      is <EM::not> namespace aware and the document type
+      name is kept by <Q::c|name> property.
+  @mn:xrefnode0: c|ownerDocument
+  @mn:subnode2: d|elementTypes
+  @mn:subnode2: d|generalEntities
+  @mn:subnode2: d|parameterEntities
+  @mn:subnode2: d|notations
+  @mn:subnode1: infoset|children
+  @mn:origin0: infoset|parent
+##DocumentTypeDefinition
+
+PropDef:
+  @QName: d|elementTypes
+
+PropDef:
+  @QName: d|generalEntities
+
+PropDef:
+  @QName: d|parameterEntities
+
+PropDef:
+  @QName: d|notations
+
+IFClsXDef:
+  @IFQName: ElementTypeDefinition
+  @ClsQName: ManakaiDOMElementTypeDefinition
+  
+  @IFISA: t|Node
+  @ClsISA: t|ManakaiDOMNode
+  
+  @DISLang:role: c|ElementTypeDefinitionRole
+
+  @f:implements: d|Feature30
+  
+  @enDesc:
+    An <IF::ElementTypeDefinition> node represents
+    the definition for an element type.
+    
+      {NOTE:: Although an <IF::ElementTypeDefinition>
+              can be constructed from an element
+              type declaration in XML DTD, the
+              <IF::ElementTypeDefinition> interface is
+              not intended to represent element
+              type declaration itself.
+      }
+
+  @ResourceDef:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@QName: newETForTest
+    @@rdf:type: DISPerl|BlockCode
+    @@PerlDef:
+      my $doc;
+      __CODE{newDocumentForTest}__;
+      $et = $doc-><M::DocumentXDoctype.createElementTypeDefinition>
+                          ('et1');
+
+  @Test:
+    @@PerlDef:
+      my $et;
+      __CODE{newETForTest}__;
+      $test->assert_not_null ($et);
+      my $od = $et-><AG::Node.ownerDocument>;
+      $test->assert_not_null ($od);
+      $test->assert_not_null
+               ($od-><M::Node.getFeature> (<Q::ManakaiDOM:XDoctype>, '3.0'));
+
+  @Attr:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@Name: nodeType
+    @@enDesc:
+      The type of the node.
+    @@Type: idl|unsignedShort||ManakaiDOM|all
+    @@dis:actualType: t|NodeType
+    @@Get:
+      @@@disDef:
+        @@@@DISLang:constValue:
+          t|Node.ELEMENT_TYPE_DEFINITION_NODE
+    @@Test:
+      @@@PerlDef:
+        my $et;
+        __CODE{newETForTest}__;
+        $test->assert_not_null ($et);
+        $test->assert_num_equals 
+                 (actual_value => $et-><AG::Node.nodeType>,
+                  expected_value => <C::Node.ELEMENT_TYPE_DEFINITION_NODE>);
+
+  @Attr:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@Name: nodeName
+    @@enDesc:
+      The element type name of the node.
+    @@DOMMain:isNamespaceUnaware: 1
+    @@Type: DOMString
+    @@Get:
+      @@@disDef:
+        @@@@GetProp: c|name
+    @@Test:
+      @@@PerlDef:
+        my $et;
+        __CODE{newETForTest}__;
+        $test->assert_not_null ($et);
+        $test->assert_equals 
+                 ($et-><AG::Node.nodeName> => 'et1');
+
+  @Attr:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@Name: nodeValue
+    @@enDesc:
+      Defined as <DOM::null>.
+    @@Type: DOMString
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc: Always.
+      @@@DefaultValue:
+        @@@@is-null: 1
+      @@@PerlDef:
+    @@Set:
+      @@@enDesc:
+        Setting the value has no effect.
+      @@@PerlDef:
+    @@Test:
+      @@@PerlDef:
+        my $et;
+        __CODE{newETForTest}__;
+        $test->assert_not_null ($et);
+        $test->assert_null ($et-><AG::Node.nodeValue>);
+        $et-><AS::Node.nodeValue> ('non-undef-value');
+        $test->assert_null ($et-><AG::Node.nodeValue>);
+
+  @Attr:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@Name: textContent
+    @@enDesc:
+      Defined as <DOM::null>.
+    @@Type: DOMString
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc: Always.
+      @@@DefaultValue:
+        @@@@is-null: 1
+      @@@PerlDef:
+    @@Set:
+      @@@enDesc:
+        Setting the value has no effect.
+      @@@PerlDef:
+    @@Test:
+      @@@PerlDef:
+        my $et;
+        __CODE{newETForTest}__;
+        $test->assert_not_null ($et);
+        $test->assert_null ($et-><AG::Node.textContent>);
+        $et-><AS::Node.textContent> ('non-undef-value');
+        $test->assert_null ($et-><AG::Node.textContent>);
+
+  @enImplNote:
+    {TODO:: Content model attributes are required.
+    }
+
+# This attribute will be implemented by a future version.
+#  @Attr:
+#    @@Name: attributeDefinitions
+#    @@enDesc:
+#      A live collection of the attribute definitions
+#      contained by the element definition.
+#    @@Type: NamedNodeMap
+#    @@Get:
+#      @@@PerlDef:
+#        __CODE{d|getRef::
+#          $object => {$self->{<H::mn:node>}},
+#          $ref => {$r},
+#          $class => {<ClassName::t|ManakaiDOMAttributeDefinitionMap>},
+#        }__;
+
+  @Attr:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@Name: childNodes
+    @@enDesc:
+      A list of nodes that contains all children of the node.
+    @@Get:
+      @@@Type: t|NodeList
+      @@@actualType: c|ManakaiDOMEmptyNodeList
+      @@@enDesc:
+        The node list that is always empty.
+      @@@PerlDef:
+        $r = <Class::c|ManakaiDOMEmptyNodeList>->new;
+    @@Test:
+      @@@PerlDef:
+        my $et;
+        __CODE{newETForTest}__;
+        my $cl = $et-><AG::Node.childNodes>;
+        $test->assert_not_null ($cl);
+        $test->assert_num_equals
+                 (actual_value => $cl-><AG::t|NodeList.length>,
+                  expected_value => 0);
+
+  @Method:
+    @@Name: getAttributeDefinitionNode
+    @@enDesc:
+      Returns the definition for an attribute.
+    @@DOMMain:isNamespaceUnaware: 1
+    @@Param:
+      @@@Name: nameArg
+      @@@Type: DOMString
+      @@@enDesc:
+        The name of the attribute.
+    @@Return:
+      @@@Type: AttributeDefinition
+      @@@enDesc:
+        The attribute definition for <P::nameArg>.
+      @@@nullCase:
+        @@@@enDesc:
+          There is no definition for the attribute <P::nameArg>.
+      @@@PerlDef:
+        my $n = $self->{<H::mn:node>}
+                     ->{<H::d|attributeDefinitions>}
+                     ->{$nameArg};
+        if ($n) {
+          $r = <ClassM::t|ManakaiDOMNode.getNodeReference> ($n);
+        }
+    @@Test:
+      @@@PerlDef:
+        my $et;
+        __CODE{newETForTest}__;
+        my $an = $et-><M::ElementTypeDefinition.getAttributeDefinitionNode>
+                        ('at1');
+        $test->assert_null ($an);
+
+  @Method:
+    @@Name: setAttributeDefinitionNode
+    @@enDesc:
+      Sets an attribute definition to the element
+      definition.
+    @@Param:
+      @@@Name: attrDef
+      @@@Type: AttributeDefinition
+      @@@enDesc:
+        The attribute definition to set.  Its <A::t|Node.nodeName>
+        attribute is used to set the node.  If it is already
+        in use for other element type, then it is first removed
+        from that element type and then attached to this
+        element type.  If another attribute definition with
+        same <A::t|Node.nodeName> is attached to this element
+        type definition, that association is removed.
+        
+        If <P::attrDef> is already attached to this element
+        type definition, then this method has no effect.
+    @@Return:
+      @@@Type: AttributeDefinition
+      @@@enDesc:
+        If there is already another attribute definition
+        with the same <A::t|Node.nodeName> as <P::attrDef>,
+        then that definition node is returned.
+      @@@nullCase:
+        @@@@enDesc:
+          If there is no previous definition with the same
+          name, or the <P::attrDef> is already attached
+          to the element type definition.
+      @@@NodeReadOnlyError:
+      @@@dx:raises:
+        @@@@@: c|OWNER_DEFINITION_READ_ONLY_ERR
+        @@@@enDesc:
+          The <A::AttributeDefinition.ownerElementTypeDefinition>
+          node is read-only.
+      @@@dx:raises:
+        @@@@@: c|DIFFERENT_DOCUMENT_ERR
+        @@@@enDesc:
+          The <P::attrDef> node is created from different
+          document than the <A::c|Node.ownerDocument> of
+          the element type definition and the implementation
+          does not support such attribute definition node
+          being attached to the element type definition.
+      @@@PerlDef:
+        __CODE{setDefinitionNodeAttr::
+          $defNode => $attrDef,
+          $defNodeParamName => 'attrDef',
+          $key => {<H::d|attributeDefinitions>},
+        }__;
+    @@Test:
+      @@@PerlDef:
+        my $et;
+        __CODE{newETForTest}__;
+        my $an = $et-><M::ElementTypeDefinition.getAttributeDefinitionNode>
+                        ('at1');
+        $test->assert_null ($an);
+
+        my $can = $et-><AG::Node.ownerDocument>
+                     -><M::Node.getFeature> (<Q::ManakaiDOM:XDoctype>)
+                     -><M::DocumentXDoctype.createAttributeDefinition> ('at1');
+        $et-><M::ElementTypeDefinition.setAttributeDefinitionNode> ($can);
+
+        my $an2 = $et-><M::ElementTypeDefinition.getAttributeDefinitionNode>
+                         ('at1');
+        $test->assert_not_null ($an2);
+        $test->assert_equals ($an2, $can);
+        $test->assert_string
+                 (actual_value => $an2-><AG::Node.nodeName>,
+                  expected_value => 'at1');
+  
+  @Attr:
+    @@Name: ownerDocumentTypeDefinition
+    @@enDesc:
+      The document type definition node to which
+      the definition is attached.
+    @@Type: DocumentTypeDefinition
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          The definition is not attached to any
+          document type.
+      @@@PerlDef:
+        $r = <ClassM::t|ManakaiDOMNode.getNodeReference>
+               ($self->{<H::mn:node>}->{<H::d|ownerDefinition>})
+          if $self->{<H::mn:node>}->{<H::d|ownerDefinition>};
+    @@Test:
+      @@@PerlDef:
+        my $et;
+        __CODE{newETForTest}__;
+ 
+        my $odt = $et-><AG::ElementTypeDefinition.ownerDocumentTypeDefinition>;
+        $test->assert_null ($odt);
+
+        my $dt = $et-><AG::Node.ownerDocument>
+                     -><M::Node.getFeature> (<Q::ManakaiDOM:XDoctype>)
+                     -><M::DocumentXDoctype.createDocumentTypeDefinition>
+                         ('dt1');
+        $test->assert_not_null ($dt);
+        $dt-><M::DocumentTypeDefinition.setElementTypeDefinitionNode> ($et);
+
+        my $odt2 = $et-><AG::ElementTypeDefinition
+                            .ownerDocumentTypeDefinition>;
+        $test->assert_not_null ($odt2);
+        $test->assert_isa ($odt2, <IFName::DocumentTypeDefinition>);
+        $test->assert_equals ($odt2, $dt);
+  
+  @Method:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@ManakaiDOM:isForInternal: 1
+    @@Name: newObject
+    @@NewObjectRefNodeParam:
+    @@Return:
+      @@@Type: NodeStem
+      @@@PerlDef:
+        $r = <ClassM::t|ManakaiDOMNode.newObject> ($self, $refNode);
+        $r->{<H::c|nodeType>} = <H::d|ElementTypeDefinitionNodeType>;
+        $r->{<H::d|attributeDefinitions>} = {};
+    @@enImplNote:
+      Required properties:
+        <Q::c|nodeType>, <Q::c|ownerDocument>,
+        <Q::c|name>,
+        <Q::d|attributeDefinitions>.
+      
+      Optional properties:
+        <Q::c|read-only>,
+        <Q::d|ownerDefinition>.
+  @mn:xrefnode0: c|ownerDocument
+  @mn:subnode2: d|attributeDefinitions
+  @mn:origin0: d|ownerDefinition
+##ElementTypeDefinition
+
+ForDef:
+  @QName: ForDT
+  @ISA: ManakaiDOM|ForClass
+
+ForDef:
+  @QName: ForAttr
+  @ISA: ManakaiDOM|ForClass
+
+ResourceDef:
+  @For: ManakaiDOM|ManakaiDOM
+  @rdf:type:
+    @@@: dis|MultipleResource
+    @@ForCheck: !ForDT !ForAttr
+  @resourceFor: ForDT
+  @resourceFor: ForAttr
+  
+  @rdf:type:
+    @@@: DISPerl|BlockCode
+    @@ForCheck: ManakaiDOM|ForClass
+  
+  @QName:
+    @@@: setDefinitionNode
+    @@ForCheck: ForDT
+  @QName:
+    @@@: setDefinitionNodeAttr
+    @@ForCheck: ForAttr
+  
+  @PerlDef:
+        my $__aname = $defNode-><AG::t|Node.nodeName>;
+        my $__n = $self->{<H::mn:node>}->{$key}->{$__aname};
+        SET: {
+          if ($__n and $__n eq $defNode->{<H::mn:node>}) {
+            last SET; # no effect
+          }
+          __CODE{NodeReadOnlyError}__;
+           unless ($defNode-><AG::t|Node.ownerDocument> eq
+                   $self-><AG::t|Node.ownerDocument>) {
+             __EXCEPTION{c|DIFFERENT_DOCUMENT_ERR::
+               MDOMX|param-name => {$defNodeParamName},
+               c|node => {$defNode},
+             }__;
+          }
+          my $__owner;
+          __FOR{!ForAttr::
+            $__owner = $defNode-><AG::ElementTypeDefinition
+                                     .ownerDocumentTypeDefinition>;
+          }__;
+          __FOR{ForAttr::
+            $__owner = $defNode-><AG::AttributeDefinition
+                                     .ownerElementTypeDefinition>;
+          }__;
+          if ($__owner) {
+            if ($__owner->{<H::mn:node>}->{<H::c|read-only>}) {
+              __EXCEPTION{c|OWNER_DEFINITION_READ_ONLY_ERR::
+                MDOMX|param-name => {$defNodeParamName},
+                c|node => {$__owner},
+              }__;
+            }
+            CORE::delete $__owner->{<H::mn:node>}
+                                 ->{$key}->{$__aname};
+          }
+          
+          if ($__n) {
+            if (defined wantarray) {
+              $r = <ClassM::t|ManakaiDOMNode.getNodeReference> ($__n);
+            }
+            CORE::delete $__n->{<H::d|ownerDefinition>};
+            $__n-><M::NodeStem.orphanate>;
+          }
+          
+          $self->{<H::mn:node>}-><M::NodeStem.importTree>
+                                   ($defNode->{<H::mn:node>});
+          $defNode->{<H::mn:node>}
+                  ->{<H::d|ownerDefinition>}
+            = $self->{<H::mn:node>};
+          $self->{<H::mn:node>}
+               ->{$key}->{$__aname} = $defNode->{<H::mn:node>};
+        } # SET
+##setDefinitionNode
+
+IFClsXDef:
+  @IFQName: AttributeDefinition
+  @ClsQName: ManakaiDOMAttributeDefinition
+  
+  @IFISA: t|Node
+  @ClsISA: t|ManakaiDOMNode
+  
+  @DISLang:role: c|AttributeRole
+
+  @f:implements: d|Feature30
+  
+  @enDesc:
+    An <IF::AttributeDefinition> attribute represents
+    the definition for an attribute.
+    
+    The child list of an <IF::AttributeDefinition>
+    represents the default value for the attribute.
+    It can contain the same types of nodes as
+    <IF::t|Attr> nodes.  It is ignored for the
+    purposes of e.g. default value suppliment and
+    serialization, if <A::AttributeDefinition.defaultType>
+    has values other than 
+    <C::AttributeDefinition.EXPLICIT_DEFAULT> or
+    <C::AttributeDefinition.FIXED_DEFAULT>.
+
+  @ResourceDef:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@QName: newATForTest
+    @@rdf:type: DISPerl|BlockCode
+    @@PerlDef:
+      my $doc;
+      __CODE{newDocumentForTest}__;
+      $at = $doc-><M::DocumentXDoctype.createAttributeDefinition>
+                          ('at1');
+
+  @Test:
+    @@PerlDef:
+      my $at;
+      __CODE{newATForTest}__;
+
+      $test->assert_not_null ($at);
+      $test->assert_isa ($at, <IFName::AttributeDefinition>);
+
+      my $od = $at-><AG::Node.ownerDocument>;
+      $test->assert_not_null ($od);
+      $test->assert_not_null ($od-><M::Node.getFeature>
+                                     (<Q::ManakaiDOM|XDoctype>));
+
+  @Attr:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@Name: nodeType
+    @@enDesc:
+      The type of the node.
+    @@Type: idl|unsignedShort||ManakaiDOM|all
+    @@dis:actualType: t|NodeType
+    @@Get:
+      @@@disDef:
+        @@@@DISLang:constValue: t|Node.ATTRIBUTE_DEFINITION_NODE
+    @@Test:
+      @@@PerlDef:
+        my $at;
+        __CODE{newATForTest}__;
+
+        $test->assert_num_equals
+                 (actual_value => $at-><AG::Node.nodeType>,
+                  expected_value => <C::Node.ATTRIBUTE_DEFINITION_NODE>);
+      
+  @Attr:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@Name: nodeName
+    @@enDesc:
+      The name of the attribute.
+    @@DOMMain:isNamespaceUnaware: 1
+    @@Type: DOMString
+    @@Get:
+      @@@disDef:
+        @@@@GetProp: c|name
+    @@Test:
+      @@@PerlDef:
+        my $at;
+        __CODE{newATForTest}__;
+
+        $test->assert_equals ($at-><AG::Node.nodeName>, 'at1');
+  
+  @Attr:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@Name: nodeValue
+    @@enDesc:
+      The normalized default value of the attribute.
+    @@Type: DOMString
+    @@Get:
+      @@@enDesc:
+        The concatenation of the text content of every
+        child node.  For <IF::t|Text> children, the
+        text content of a node is the <A::t|Node.textContent>
+        attribute value.  For <IF::x|EntityReference>
+        children, the text content of a node is the
+        <A::t|Node.textContent> attribute value with
+        any <CODE::U+0009>, <CODE::U+000A>, and
+        <CODE::U+000D> replaced by <CODE::U+0020>.
+        
+        If the <A::AttributeDefinition.declaredType>
+        of the node is different from 
+        <C::AttributeDefinition.UNKNOWN_ATTR> or
+        <C::AttributeDefinition,CDATA_ATTR>, the value
+        is further modified by discarding any leading
+        and trailing <CODE::U+0020> characters and
+        by replacing sequences of <CODE::U+0020> characters
+        by a single <CODE::U+0020> character.
+      @@@nullCase:
+        @@@@enDesc:
+          If the <A::AttributeDefinition.defaultType>
+          is different from <C::AttributeDefinition.FIXED_DEFAULT>
+          or <C::AttributeDefinition.EXPLICIT_DEFAULT>.
+      @@@PerlDef:
+        __DEEP{
+          my $dt = $self-><AG::AttributeDefinition.defaultType>;
+          if ($dt == <C::AttributeDefinition.EXPLICIT_DEFAULT> or
+              $dt == <C::AttributeDefinition.FIXED_DEFAULT>) {
+            for my $child (@{$self-><AG::t|Node.childNodes>}) {
+              if ($child-><AG::t|Node.nodeType> ==
+                  <C::t|Node.ENTITY_REFERENCE_NODE>) {
+                my $v = $child-><AG::t|Node.textContent>;
+                $v =~ s/[\x09\x0A\x0D]/ /;
+                $r .= $v;
+              } else {
+                $r .= $child-><AG::t|Node.textContent>;
+              }
+            } # childNodes
+            my $vt = $self-><AG::AttributeDefinition.declaredType>;
+            unless ($vt == <C::AttributeDefinition.UNKNOWN_ATTR> or
+                    $vt == <C::AttributeDefinition.CDATA_ATTR>) {
+              $r =~ s/\A\x20+//;
+              $r =~ s/\x20+\z//;
+              $r =~ s/\x20+/ /g;
+            }
+          } else {
+            $r = null;
+          }
+        }__;
+    @@Set:
+      @@@enDesc:
+        Any children are removed and if the new value
+        is not empty or <DOM::null>, replaced by a single
+        <IF::t|Text> node containgin the value the
+        attribute is set to.
+        
+        If the <A::AttributeDefinition.defaultType>
+        is different from <C::AttributeDefinition.FIXED_DEFAULT>
+        or <C::AttributeDefinition.EXPLICIT_DEFAULT>, however,
+        setting the attribute has no effect.
+      @@@NodeReadOnlyError:
+      @@@PerlDef:
+        __DEEP{
+          my $dt = $self-><AG::AttributeDefinition.defaultType>;
+          if ($dt == <C::AttributeDefinition.EXPLICIT_DEFAULT> or
+              $dt == <C::AttributeDefinition.FIXED_DEFAULT>) {
+            __UNDEEP{
+              __CODE{NodeReadOnlyError}__;
+            }__;
+            my @children = @{$self-><AG::t|Node.childNodes>};
+            for my $child (@children) {
+              $self-><M::t|Node.removeChild> ($child);
+            } # childNodes
+            if (defined $given and length $given) {
+              $self-><M::t|Node.appendChild>
+                ($self-><AG::t|Node.ownerDocument>
+                      -><M::t|Document.createTextNode>
+                          ($given));
+            }
+          }
+        }__;
+    @@Test:
+      @@@QName: 
+        ManakaiDOMAttributeDefinition.nodeValue.get.test
+      @@@PerlDef:
+        my $at;
+        __CODE{newATForTest}__;
+
+        $test->id ('get-empty-content');
+
+        $at-><AS::AttributeDefinition.defaultType>
+               (<C::AttributeDefinition.UNKNOWN_DEFAULT>);
+        $test->assert_null ($at-><AG::Node.nodeValue>);
+        $at-><AS::AttributeDefinition.defaultType>
+               (<C::AttributeDefinition.IMPLIED_DEFAULT>);
+        $test->assert_null ($at-><AG::Node.nodeValue>);
+        $at-><AS::AttributeDefinition.defaultType>
+               (<C::AttributeDefinition.REQUIRED_DEFAULT>);
+        $test->assert_null ($at-><AG::Node.nodeValue>);
+        $at-><AS::AttributeDefinition.defaultType>
+               (<C::AttributeDefinition.EXPLICIT_DEFAULT>);
+        $test->assert_string
+                 (actual_value => $at-><AG::Node.nodeValue>,
+                  expected_value => '');
+        $at-><AS::AttributeDefinition.defaultType>
+               (<C::AttributeDefinition.FIXED_DEFAULT>);
+        $test->assert_string
+                 (actual_value => $at-><AG::Node.nodeValue>,
+                  expected_value => '');
+
+        $test->id ('get-string-content');
+
+        my $doc = $at-><AG::Node.ownerDocument>;
+        $at-><M::Node.appendChild>
+               ($doc-><M::Document.createTextNode> ('  abcdefg'));
+
+        $at-><AS::AttributeDefinition.defaultType>
+               (<C::AttributeDefinition.UNKNOWN_DEFAULT>);
+        $test->assert_null ($at-><AG::Node.nodeValue>);
+        $at-><AS::AttributeDefinition.defaultType>
+               (<C::AttributeDefinition.IMPLIED_DEFAULT>);
+        $test->assert_null ($at-><AG::Node.nodeValue>);
+        $at-><AS::AttributeDefinition.defaultType>
+               (<C::AttributeDefinition.REQUIRED_DEFAULT>);
+        $test->assert_null ($at-><AG::Node.nodeValue>);
+        $at-><AS::AttributeDefinition.defaultType>
+               (<C::AttributeDefinition.EXPLICIT_DEFAULT>);
+        $test->assert_string
+                 (actual_value => $at-><AG::Node.nodeValue>,
+                  expected_value => '  abcdefg');
+        $at-><AS::AttributeDefinition.defaultType>
+               (<C::AttributeDefinition.FIXED_DEFAULT>);
+        $test->assert_string
+                 (actual_value => $at-><AG::Node.nodeValue>,
+                  expected_value => '  abcdefg');
+
+        $test->id ('multiple-text-nodes');
+  
+        $at-><M::Node.appendChild>
+               ($doc-><M::Document.createTextNode> ('ABCDEFG '));
+        $test->assert_string
+                 (actual_value => $at-><AG::Node.nodeValue>,
+                  expected_value => '  abcdefgABCDEFG ');
+
+        $test->id ('white-space');
+
+        $at-><M::Node.appendChild>
+               ($doc-><M::Document.createTextNode>
+                        ("\x20\x20,\x20\x09,\x20\x0A,\x20\x0D,  "));
+
+        $at-><AS::AttributeDefinition.declaredType>
+               (<C::AttributeDefinition.UNKNOWN_ATTR>);
+        $test->assert_string
+                 (actual_value => $at-><AG::Node.nodeValue>,
+                  expected_value => "  abcdefgABCDEFG   , \x09, \x0A, \x0D,  ");
+        $at-><AS::AttributeDefinition.declaredType>
+               (<C::AttributeDefinition.CDATA_ATTR>);
+        $test->assert_string
+                 (actual_value => $at-><AG::Node.nodeValue>,
+                  expected_value => "  abcdefgABCDEFG   , \x09, \x0A, \x0D,  ");
+        $at-><AS::AttributeDefinition.declaredType>
+               (<C::AttributeDefinition.ID_ATTR>);
+        $test->assert_string
+                 (actual_value => $at-><AG::Node.nodeValue>,
+                  expected_value => "abcdefgABCDEFG , \x09, \x0A, \x0D,");
+        $at-><AS::AttributeDefinition.declaredType>
+               (<C::AttributeDefinition.IDREF_ATTR>);
+        $test->assert_string
+                 (actual_value => $at-><AG::Node.nodeValue>,
+                  expected_value => "abcdefgABCDEFG , \x09, \x0A, \x0D,");
+          $at-><AS::AttributeDefinition.declaredType>
+               (<C::AttributeDefinition.IDREFS_ATTR>);
+        $test->assert_string
+                 (actual_value => $at-><AG::Node.nodeValue>,
+                  expected_value => "abcdefgABCDEFG , \x09, \x0A, \x0D,");
+        $at-><AS::AttributeDefinition.declaredType>
+               (<C::AttributeDefinition.ENTITY_ATTR>);
+        $test->assert_string
+                 (actual_value => $at-><AG::Node.nodeValue>,
+                  expected_value => "abcdefgABCDEFG , \x09, \x0A, \x0D,");
+        $at-><AS::AttributeDefinition.declaredType>
+               (<C::AttributeDefinition.ENTITIES_ATTR>);
+        $test->assert_string
+                 (actual_value => $at-><AG::Node.nodeValue>,
+                  expected_value => "abcdefgABCDEFG , \x09, \x0A, \x0D,");
+        $at-><AS::AttributeDefinition.declaredType>
+               (<C::AttributeDefinition.NMTOKEN_ATTR>);
+        $test->assert_string
+                 (actual_value => $at-><AG::Node.nodeValue>,
+                  expected_value => "abcdefgABCDEFG , \x09, \x0A, \x0D,");
+        $at-><AS::AttributeDefinition.declaredType>
+               (<C::AttributeDefinition.NMTOKENS_ATTR>);
+        $test->assert_string
+                 (actual_value => $at-><AG::Node.nodeValue>,
+                  expected_value => "abcdefgABCDEFG , \x09, \x0A, \x0D,");
+        $at-><AS::AttributeDefinition.declaredType>
+               (<C::AttributeDefinition.NOTATION_ATTR>);
+        $test->assert_string
+                 (actual_value => $at-><AG::Node.nodeValue>,
+                  expected_value => "abcdefgABCDEFG , \x09, \x0A, \x0D,");
+        $at-><AS::AttributeDefinition.declaredType>
+               (<C::AttributeDefinition.ENUMERATION_ATTR>);
+        $test->assert_string
+                 (actual_value => $at-><AG::Node.nodeValue>,
+                  expected_value => "abcdefgABCDEFG , \x09, \x0A, \x0D,");
+    @@Test:
+      @@@QName: 
+        ManakaiDOMAttributeDefinition.nodeValue.set.test
+      @@@PerlDef:
+        my $at;
+        __CODE{newATForTest}__;
+        my $doc = $at-><AG::Node.ownerDocument>;
+
+        $test->id ('set-no-effect');
+
+        $at-><M::Node.appendChild>
+               (my $t = $doc-><M::Document.createTextNode> ('abcdefg'));
+
+        $test->assert_not_null ($t-><AG::Node.parentNode>);
+
+        $at-><AS::AttributeDefinition.defaultType>
+               (<C::AttributeDefinition.UNKNOWN_DEFAULT>);
+        $at-><AS::Node.nodeValue> ('VWXYZ');
+        $test->assert_not_null ($t-><AG::Node.parentNode>);
+
+        $at-><AS::AttributeDefinition.defaultType>
+               (<C::AttributeDefinition.IMPLIED_DEFAULT>);
+        $at-><AS::Node.nodeValue> ('VWXYZ');
+        $test->assert_not_null ($t-><AG::Node.parentNode>);
+
+        $at-><AS::AttributeDefinition.defaultType>
+               (<C::AttributeDefinition.REQUIRED_DEFAULT>);
+        $at-><AS::Node.nodeValue> ('VWXYZ');
+        $test->assert_not_null ($t-><AG::Node.parentNode>);
+
+        $test->id ('set-value');
+
+        $at-><AS::AttributeDefinition.defaultType>
+               (<C::AttributeDefinition.EXPLICIT_DEFAULT>);
+        $at-><AS::Node.nodeValue> ('VWXYZ');
+        $test->assert_null ($t-><AG::Node.parentNode>);
+        $test->assert_string
+                 (actual_value => $at-><AG::Node.nodeValue>,
+                  expected_value => 'VWXYZ');
+
+        $at-><M::Node.appendChild> ($t);
+        $test->assert_not_null ($t-><AG::Node.parentNode>);
+
+        $at-><AS::AttributeDefinition.defaultType>
+               (<C::AttributeDefinition.FIXED_DEFAULT>);
+        $at-><AS::Node.nodeValue> ('VWXYZ');
+        $test->assert_null ($t-><AG::Node.parentNode>);
+        $test->assert_string
+                 (actual_value => $at-><AG::Node.nodeValue>,
+                  expected_value => 'VWXYZ');
+
+        $at-><AS::Node.nodeValue> ('');
+        $test->assert_false ($at-><M::Node.hasChildNodes>);
+        
+        $at-><M::Node.appendChild> ($t);
+
+        $at-><AS::Node.nodeValue> (null);
+        $test->assert_false ($at-><M::Node.hasChildNodes>);
+
+  @Attr:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@Name: textContent
+    @@enDesc:
+      The normalized default value of the attribute.
+    @@Type: DOMString
+    @@Get:
+      @@@enDesc:
+        The concatenation of the <A::t|Node.textContent>
+        of every child node.
+      @@@PerlDef:
+        __DEEP{
+          for my $child (@{$self-><AG::t|Node.childNodes>}) {
+            $r .= $child-><AG::t|Node.textContent>;
+          } # childNodes
+        }__;
+    @@Set:
+      @@@enDesc:
+        Setting on this attribute has the same effect
+        as <A::t|Node.nodeValue>.
+      @@@NodeReadOnlyError:
+      @@@disDef:
+        @@@@DISPerl:cloneCode:
+          ManakaiDOMAttributeDefinition.nodeValue.set
+    @@Test:
+      @@@QName: 
+        ManakaiDOMAttributeDefinition.textContent.get.test
+      @@@PerlDef:
+        my $at;
+        __CODE{newATForTest}__;
+
+        $test->id ('get-empty-content');
+
+        $test->assert_string
+                 (actual_value => $at-><AG::Node.textContent>,
+                  expected_value => '');
+
+        $test->id ('get-string-content');
+
+        my $doc = $at-><AG::Node.ownerDocument>;
+        $at-><M::Node.appendChild>
+               ($doc-><M::Document.createTextNode> ('  abcdefg'));
+
+        $test->assert_string
+                 (actual_value => $at-><AG::Node.textContent>,
+                  expected_value => '  abcdefg');
+
+        $test->id ('multiple-text-nodes');
+  
+        $at-><M::Node.appendChild>
+               ($doc-><M::Document.createTextNode> ('ABCDEFG '));
+        $test->assert_string
+                 (actual_value => $at-><AG::Node.textContent>,
+                  expected_value => '  abcdefgABCDEFG ');
+
+        $test->id ('white-space');
+
+        $at-><M::Node.appendChild>
+               ($doc-><M::Document.createTextNode>
+                        ("\x20\x20,\x20\x09,\x20\x0A,\x20\x0D,  "));
+
+        $at-><AS::AttributeDefinition.declaredType>
+               (<C::AttributeDefinition.CDATA_ATTR>);
+        $test->assert_string
+                 (actual_value => $at-><AG::Node.textContent>,
+                  expected_value => "  abcdefgABCDEFG   , \x09, \x0A, \x0D,  ");
+        $at-><AS::AttributeDefinition.declaredType>
+               (<C::AttributeDefinition.ID_ATTR>);
+        $test->assert_string
+                 (actual_value => $at-><AG::Node.textContent>,
+                  expected_value => "  abcdefgABCDEFG   , \x09, \x0A, \x0D,  ");
+    @@Test:
+      @@@QName: 
+        ManakaiDOMAttributeDefinition.textContent.set.test
+      @@@PerlDef:
+        my $at;
+        __CODE{newATForTest}__;
+        my $doc = $at-><AG::Node.ownerDocument>;
+
+        $test->id ('set-no-effect');
+
+        $at-><M::Node.appendChild>
+               (my $t = $doc-><M::Document.createTextNode> ('abcdefg'));
+
+        $test->assert_not_null ($t-><AG::Node.parentNode>);
+
+        $at-><AS::AttributeDefinition.defaultType>
+               (<C::AttributeDefinition.UNKNOWN_DEFAULT>);
+        $at-><AS::Node.textContent> ('VWXYZ');
+        $test->assert_not_null ($t-><AG::Node.parentNode>);
+
+        $test->id ('set-value');
+
+        $at-><AS::AttributeDefinition.defaultType>
+               (<C::AttributeDefinition.EXPLICIT_DEFAULT>);
+        $at-><AS::Node.textContent> ('VWXYZ');
+        $test->assert_null ($t-><AG::Node.parentNode>);
+        $test->assert_string
+                 (actual_value => $at-><AG::Node.textContent>,
+                  expected_value => 'VWXYZ');
+
+        $at-><AS::Node.textContent> ('');
+        $test->assert_false ($at-><M::Node.hasChildNodes>);
+        
+        $at-><M::Node.appendChild> ($t);
+
+        $at-><AS::Node.textContent> (null);
+        $test->assert_false ($at-><M::Node.hasChildNodes>);
+  
+  @Attr:
+    @@Name: ownerElementTypeDefinition
+    @@enDesc:
+      The element type definition for which
+      the attribute is defined.
+    @@Type: ElementTypeDefinition
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          If the attribute definition is not associated
+          with any element type.
+      @@@disDef:
+        @@@@GetPropNode: d|ownerDefinition
+    @@Test:
+      @@@QName: 
+        ManakaiDOMAttributeDefinition.ownerElementTypeDefinition.get.test
+      @@@PerlDef:
+        my $at;
+        __CODE{newATForTest}__;
+        my $doc = $at-><AG::Node.ownerDocument>
+                     -><M::Node.getFeature> (<Q::ManakaiDOM|XDoctype>);
+
+        $test->assert_null
+                 ($at-><AG::AttributeDefinition.ownerElementTypeDefinition>);
+
+        my $et = $doc-><M::DocumentXDoctype.createElementTypeDefinition>
+                         ('et1');
+        $et-><M::ElementTypeDefinition.setAttributeDefinitionNode> ($at);
+        
+        $test->assert_equals
+                 ($at-><AG::AttributeDefinition.ownerElementTypeDefinition>,
+                  $et);
+
+        $test->assert_isa
+                 ($at-><AG::AttributeDefinition.ownerElementTypeDefinition>,
+                  <IFName::ElementTypeDefinition>);
+  
+  @ShortConstGroup:
+    @@IFQName: DeclaredValueType
+    @@enDesc:
+      An integer that indicates the type of
+      attribute value.
+    
+    @@Const:
+      @@@Name: UNKNOWN_ATTR
+      @@@intValue: 0
+      @@@enDesc:
+        The attribute value type is unknown.
+    @@Const:
+      @@@Name: CDATA_ATTR
+      @@@intValue: 1
+      @@@enDesc:
+        The attribute value type is <XML::CDATA>.
+    @@Const:
+      @@@Name: ID_ATTR
+      @@@intValue: 2
+      @@@enDesc:
+        The attribute value type is <XML::ID>.
+    @@Const:
+      @@@Name: IDREF_ATTR
+      @@@intValue: 3
+      @@@enDesc:
+        The attribute value type is <XML::IDREF>.
+    @@Const:
+      @@@Name: IDREFS_ATTR
+      @@@intValue: 4
+      @@@enDesc:
+        The attribute value type is <XML::IDREFS>.
+    @@Const:
+      @@@Name: ENTITY_ATTR
+      @@@intValue: 5
+      @@@enDesc:
+        The attribute value type is <XML::ENTITY>;
+    @@Const:
+      @@@Name: ENTITIES_ATTR
+      @@@intValue: 6
+      @@@enDesc:
+        The attribute value type is <XML::ENTITIES>.
+    @@Const:
+      @@@Name: NMTOKEN_ATTR
+      @@@intValue: 7
+      @@@enDesc:
+        The attribute value type is <XML::NMTOKEN>.
+    @@Const:
+      @@@Name: NMTOKENS_ATTR
+      @@@intValue: 8
+      @@@enDesc:
+        The attribute value type is <XML::NMTOKENS>.
+    @@Const:
+      @@@Name: NOTATION_ATTR
+      @@@intValue: 9
+      @@@enDesc:
+        The attribute value is <XML::NOTATION> enumerated
+        type.
+    @@Const:
+      @@@Name: ENUMERATION_ATTR
+      @@@intValue: 10
+      @@@enDesc:
+        The attribute value is enumuration type.
+  
+  @Attr:
+    @@Name: declaredType
+    @@enDesc:
+      The type of attribute value.
+    @@Type: idl|unsignedShort||ManakaiDOM|all
+    @@dis:actualType: DeclaredValueType
+    @@Get:
+      @@@disDef:
+        @@@@GetProp: d|declaredType
+    @@Set:
+      @@@NodeReadOnlyError:
+      @@@disDef:
+        @@@@SetProp:
+          @@@@@@: d|declaredType
+          @@@@@CheckReadOnly: 1
+    @@Test:
+      @@@QName: 
+        ManakaiDOMAttributeDefinition.declaredType.test
+      @@@PerlDef:
+        my $at;
+        __CODE{newATForTest}__;
+
+        $test->assert_num_equals
+                 (actual_value => $at-><AG::AttributeDefinition.defaultType>,
+                  expected_value => <C::AttributeDefinition.UNKNOWN_ATTR>);
+
+        $at-><AS::AttributeDefinition.defaultType>
+               (<C::AttributeDefinition.ID_ATTR>);
+        $test->assert_num_equals
+                 (actual_value => $at-><AG::AttributeDefinition.defaultType>,
+                  expected_value => <C::AttributeDefinition.ID_ATTR>);
+
+  @ShortConstGroup:
+    @@IFQName: DefaultValueType
+    @@enDesc:
+      An integer indicating the type of default value.
+    
+    @@Const:
+      @@@Name: UNKNOWN_DEFAULT
+      @@@intValue: 0
+      @@@enDesc:
+        The default value is unknown.
+    @@Const:
+      @@@Name: FIXED_DEFAULT
+      @@@intValue: 1
+      @@@enDesc:
+        The default value is <XML::#FIXED>.
+    @@Const:
+      @@@Name: REQUIRED_DEFAULT
+      @@@intValue: 2
+      @@@enDesc:
+        An attribute specification is required
+        for the attribute.
+    @@Const:
+      @@@Name: IMPLIED_DEFAULT
+      @@@intValue: 3
+      @@@enDesc:
+        The default value is <XML::#IMPLIED>.
+    @@Const:
+      @@@Name: EXPLICIT_DEFAULT
+      @@@intValue: 4
+      @@@enDesc:
+        An explicit but not fixed default value
+        is provided.
+  
+  @Attr:
+    @@Name: defaultType
+    @@enDesc:
+      The type of attribute default value.
+    @@Type: idl|unsignedShort||ManakaiDOM|all
+    @@dis:actualType: DefaultValueType
+    @@Get:
+      @@@disDef:
+        @@@@GetProp: d|defaultType
+    @@Set:
+      @@@NodeReadOnlyError:
+      @@@disDef:
+        @@@@SetProp:
+          @@@@@@: d|defaultType
+          @@@@@CheckReadOnly: 1
+    @@Test:
+      @@@QName: 
+        ManakaiDOMAttributeDefinition.defaultType.test
+      @@@PerlDef:
+        my $at;
+        __CODE{newATForTest}__;
+
+        $test->assert_num_equals
+                 (actual_value => $at-><AG::AttributeDefinition.defaultType>,
+                  expected_value => <C::AttributeDefinition.UNKNOWN_DEFAULT>);
+
+        $at-><AS::AttributeDefinition.defaultType>
+               (<C::AttributeDefinition.EXPLICIT_DEFAULT>);
+        $test->assert_num_equals
+                 (actual_value => $at-><AG::AttributeDefinition.defaultType>,
+                  expected_value => <C::AttributeDefinition.EXPLICIT_DEFAULT>);
+
+  @Attr:
+    @@Name: allowedTokens
+    @@enDesc:
+      The live list of the allowed tokens for the
+      attribute.
+      
+      The list <kwd:MAY> be empty even if 
+      the <A::Attribute.declaredType> is 
+      <C::AttributeDefinition.NOTATION_ATTR> or
+      <C::AttributeDefinition.ENUMERATION_ATTR>.
+      Then, validation using this definition never
+      success.
+      
+      The list <kwd:MAY> be non-empty even if 
+      the <A::Attribute.declaredType> is different
+      from <C::AttributeDefinition.NOTATION_ATTR> or
+      <C::AttributeDefinition.ENUMERATION_ATTR>.  This
+      attribute is ignored for the purposes of
+      e,g, validation and serialization in such cases.
+      
+      The list <kwd:MAY> contain a string that does
+      not match to the production <CODE::Name> or
+      <CODE::Nmtoken>.
+      
+      The list <kwd:MAY> contain duplications.
+      
+      The result of processing using the attribute
+      definition, e.g. validation or serialization,
+      is implementation dependent unless otherwise specified
+      if one or more errors defined above is detected.
+      That is, implementations <kwd:MAY> ignore erroreous
+      value, <kwd:MAY> validate a value that is acutally
+      invalid, <kwd:MAY> report an error by <IF::c|DOMError>,
+      or <kwd:MAY> choose any other possible error
+      recovery method.  However, it <kwd:MUST> recover
+      from the error gracefully.  Note that the validation
+      of the attribute definition itself is not a case.
+      For example, dupulication of values must be
+      reported as a validity constraint violation by
+      validity checker for the attribute definition.
+    @@Type: c|DOMStringList
+    @@Get:
+      @@@PerlDef:
+        __CODE{d|getRef::
+          $object => {$self->{<H::mn:node>}},
+          $ref => {$r},
+          $class => {<ClassName::c|ManakaiDOMStringList>},
+        }__;
+        $r->{<H::c|key>} = <H::d|allowedTokens>;
+    @@Test:
+      @@@QName: 
+        ManakaiDOMAttributeDefinition.allowedTokens.get.test
+      @@@PerlDef:
+        my $at;
+        __CODE{newATForTest}__;
+
+        my $list = $at-><AG::AttributeDefinition.allowedTokens>;
+        $test->assert_not_null ($list);
+        $test->assert_isa ($list, <IFName::c|DOMStringList>);
+
+        $test->assert_num_equals
+                 (actual_value => 0 + @$list,
+                  expected_value => 0);
+      
+        push @$list, 'NMTOKEN1';
+        $test->assert_string
+                 (actual_value => $list->[0],
+                  expected_value => 'NMTOKEN1');
+        undef $list;
+
+        my $list2 = $at-><AG::AttributeDefinition.allowedTokens>;
+        $test->assert_string
+                 (actual_value => $list2->[0],
+                  expected_value => 'NMTOKEN1');
+
+  @Method:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@ManakaiDOM:isForInternal: 1
+    @@Name: newObject
+    @@NewObjectRefNodeParam:
+    @@Return:
+      @@@Type: NodeStem
+      @@@PerlDef:
+        $r = <ClassM::t|ManakaiDOMNode.newObject> ($self, $refNode);
+        $r->{<H::c|nodeType>} = <H::d|AttributeDefinitionNodeType>;
+        $r->{<H::d|declaredType>}
+          = <C::AttributeDefinition.UNKNOWN_ATTR>;
+        $r->{<H::d|allowedTokens>} = [];
+        $r->{<H::d|defaultType>}
+          = <C::AttributeDefinition.UNKNOWN_DEFAULT>;
+        $r->{<H::infoset:children>} = [];
+    @@enImplNote:
+      Required properties:
+        <Q::c|nodeType>, <Q::c|ownerDocument>,
+        <Q::c|name>, <Q::d|declaredType>, <Q::d|allowedTokens>,
+        <Q::d|defaultType>, <Q::infoset:children>.
+      
+      Optional properties:
+        <Q::c|read-only>,
+        <Q::d|ownerDefinition>.
+  @mn:xrefnode0: c|ownerDocument
+  @mn:origin0: d|ownerDefinition
+  @mn:subnode1: infoset|children
+##AttributeDefinition
+
+ResourceDef:
+  @For: =ManakaiDOM|all
+  @QName: d|ElementTypeDefinitionNodeType
+  @rdf:type: rdfs|Resource
+
+ResourceDef:
+  @For: =ManakaiDOM|all
+  @QName: d|AttributeDefinitionNodeType
+  @rdf:type: rdfs|Resource
+
+PropDef:
+  @QName: d|allowedTokens
+
+ElementTypeBinding:
+  @Name: intValue
+  @ElementType:
+    dis:Value
+  @ShadowContent:
+    @@ContentType: DISCore|Integer
+
+ElementTypeBinding:
+  @Name: NewObjectRefNodeParam
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@Name: refNode
+    @@Type: NodeStem
+    @@Description:
+      @@@lang:en
+      @@@@:
+        A node from the tree to which the new node will belong.
+    @@rdf:type: DISLang|MethodParameter
+    @@ResourceDef:
+      @@@rdf:type: ManakaiDOM|InCase
+      @@@Value:
+        @@@@is-null:1
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The node belongs to a new tree.
+
+ElementTypeBinding:
+  @Name: enImplNote
+  @ElementType:
+    dis:ImplNote
+  @ShadowContent:
+    @@lang:en
+
+ElementTypeBinding:
+  @Name: enDesc
+  @ElementType:
+    dis:Description
+  @ShadowContent:
+    @@lang:en
+
+enImplNote:
+  {TODO::
+    
+    - Define <M::t|Node.cloneNode>, <M::t|Node.adoptNode>,
+      <M::t|Node.importNode>, <M::t|Node.isEqualNode>,
+      <M::t|Node.compareDocumentPosition>,
+      namespace lookup methods
+      for the new node types.
+    
+    - Implement <M::t|Node.getFeature>, <M::t|Node.hasFeature>,
+      <M::f|GetFeature.hasFeature>.
+    
+  }
+
+ResourceDef:
+  @QName: DOMString
+  @AliasFor: DOMMain|DOMString
+  @For: ManakaiDOM|DOM
+
+PropDef:
+  @QName: d|ownerDefinition
+  @enDesc:
+    <A::ElementTypeDefinition.ownerDocumentTypeDefinition>,
+    <A::AttributeDefinition.ownerElementTypeDefinition>,
+    <A::EntityDefinition.ownerDocumentTypeDefinition>, or
+    <A::NotationDefinition.ownerDocumentTypeDefinition>.
+
+PropDef:
+  @QName: d|attributeDefinitions
+
+PropDef:
+  @QName: d|declaredType
+
+PropDef:
+  @QName: d|defaultType
+
+ResourceDef:
+  @QName: Node
+  @AliasFor: t|Node
+  @For: ManakaiDOM|DOM
+
+ResourceDef:
+  @QName: Document
+  @AliasFor: t|Document
+  @For: ManakaiDOM|DOM
+
+ResourceDef:
+  @QName: Element
+  @AliasFor: t|Element
+  @For: ManakaiDOM|DOM
+
+ResourceDef:
+  @QName: Attr
+  @AliasFor: t|Attr
+  @For: ManakaiDOM|DOM
+
+ResourceDef:
+  @QName: PI
+  @AliasFor: x|ProcessingInstruction
+  @For: ManakaiDOM|DOM
+
+ResourceDef:
+  @QName: EntRef
+  @AliasFor: x|EntityReference
+  @For: ManakaiDOM|DOM

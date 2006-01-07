@@ -40,7 +40,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/12/31 12:21:14 $
+      $Date: 2006/01/07 12:30:49 $
     @@ContentType:
       dis:Date.RCS
 
@@ -130,10 +130,20 @@ Namespace:
     http://www.w3.org/2000/01/rdf-schema#
   @t:
     http://suika.fam.cx/~wakaba/archive/2004/dom/tree#
+  @test:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Test#
   @xml:
     http://www.w3.org/XML/1998/namespace
   @xmlns:
     http://www.w3.org/2000/xmlns/
+
+ElementTypeBinding:
+  @Name: Test
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: test|StandaloneTest
+    @@ForCheck: ManakaiDOM|ForClass
 
 ElementTypeBinding:
   @Name: raises
@@ -376,6 +386,15 @@ ElementTypeBinding:
   @ShadowContent:
     @@ContentType:
       lang:Perl
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: disDef
+  @ElementType:
+    dis:Def
+  @ShadowContent:
+    @@ContentType:
+      lang:dis
     @@ForCheck: ManakaiDOM|ForClass
 
 ElementTypeBinding:
@@ -785,6 +804,18 @@ ResourceDef:
             @@@@@lang:en
             @@@@@@:
               A specified node was created from a different DOM implementation.
+      @@@SubTypeDef:
+        @@@@QName: c|DIFFERENT_DOCUMENT_ERR
+        @@@@enDesc:
+          A node is used in a different than the one that created it.
+        @@@@ecore:hasParameter: MDOMX|param-name
+        @@@@ecore:hasParameter:
+          @@@@@@: c|node
+          @@@@@enDesc:
+            A node that belongs to another document.
+      @@@enImplNote:
+        <X::DOMException.WRONG_DOCUMENT_ERR> is actually not mandated --
+        see www-dom discussion on December 2005.
      @@XConst:
         @@@Name:  INVALID_CHARACTER_ERR
         @@@Type:  
@@ -896,6 +927,24 @@ ResourceDef:
               This node is read-only so that it is impossible to edit. 
           @@@@enMufDef:
             This node is read-only
+        @@@@ecore:hasParameter: 
+          @@@@@@: c|node
+          @@@@@enDesc:
+            The read-only node.
+      @@@SubTypeDef:
+        @@@@QName: c|OWNER_DEFINITION_READ_ONLY_ERR
+        @@@@enDesc:
+          The owner definition node to which a node is attached
+          is read-only.
+        @@@@enMufDef:
+          The owner of the node is read-only
+        @@@@ecore:hasParameter: MDOMX|param-name
+      @@@SubTypeDef:
+        @@@@QName: c|LIST_READ_ONLY_ERR
+        @@@@enDesc:
+          The list is read-only.
+        @@@@enMufDef:
+          The list is read-only
      @@XConst:
         @@@Name:  NOT_FOUND_ERR
         @@@intValue:  8
@@ -1882,6 +1931,9 @@ IFCls3Def:
 
   @ClsISA: ManakaiDOM|ManakaiDOMObject
 
+  @AppISA:
+    Tie::Array
+
   @enDesc:
     Objects implementing the <IF::DOMStringList> interface are
     used to represent ordered collection of <TYPE::DOMMain|DOMString>
@@ -1902,8 +1954,37 @@ IFCls3Def:
       can be dereferenced as if it is a reference to the array
       containing all items in the list.
 
+  @enDesc:
+    @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
+    @@ddid:exists
+    @@@:
+      In the current implementation, each item value can be
+      <DOM::null> that is different from an empty string.  In
+      addition, an item can be <EM::not exist> state.
+
+      The <EM::not exist> state is different from <DOM::null>.
+      In various operations defined in DOM, however, it is
+      assumed that there is as if a <DOM::null> value for
+      each <EM::not exist> slot, if an item slot whose index
+      greater than it <EM::exists>.
+
+  @ResourceDef:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@QName: newDOMStringListForTest
+    @@rdf:type: DISPerl|BlockCode
+    @@PerlDef:
+      $list = bless {
+        <H::mn:node> => {
+          $key => [],
+        },
+        <H::c|key> => $key,
+      }, <ClassName::ManakaiDOMStringList>;
+
   @Method:
      @@Name:  item
+    @@Operator:
+      @@@@: FETCH
+      @@@ContentType: DISPerl|Perl
      @@Spec:
        @@@DOM3:
          http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#DOMStringList-item
@@ -1939,14 +2020,89 @@ IFCls3Def:
         @@@PerlDef:
           if (not defined $index or
               $index < 0 or
-              $index > $#$self) {
+              $index > $#{$self->{<H::mn:node>}->{$self->{<H::c|key>}}}) {
             $r = null;
           } else {
-            $r = $self->[$index];
+            $r = $self->{<H::mn:node>}->{$self->{<H::c|key>}}->[$index];
           }
+
+  @IntMethod:
+    @@Operator:
+      @@@@: STORE
+      @@@ContentType: DISPerl|Perl
+    @@Param:
+      @@@Name: index
+      @@@Type: idl|unsignedLong||ManakaiDOM|all
+    @@Param:
+      @@@Name: value
+      @@@Type: DOMString
+    @@Return:
+      @@@Type: DOMString
+      @@@enDesc:
+        The old value.
+      @@@nullCase:
+        @@@@enDesc:
+          No old value or <DOM::null> is the old value.
+      @@@dx:raises:
+        @@@@@: c|LIST_READ_ONLY_ERR
+        @@@@enDesc:
+          If the list is read-only.
+      @@@PerlDef:
+        if ($self->{<H::mn:node>}->{<H::c|read-only>}) {
+          __EXCEPTION{c|LIST_READ_ONLY_ERR::
+          }__;
+        }
+ 
+        my $array = $self->{<H::mn:node>}->{$self->{<H::c|key>}};
+        $r = $array->[$index] if defined wantarray;
+        $array->[$index] = $value;
+
+  @IntMethod:
+    @@Operator:
+      @@@@: DELETE
+      @@@ContentType: DISPerl|Perl
+    @@Param:
+      @@@Name: index
+      @@@Type: idl|unsignedLong||ManakaiDOM|all
+    @@Return:
+      @@@Type: DOMString
+      @@@enDesc:
+        The old value.
+      @@@nullCase:
+        @@@@enDesc:
+          No old value or <DOM::null> is the old value.
+      @@@dx:raises:
+        @@@@@: c|LIST_READ_ONLY_ERR
+        @@@@enDesc:
+          If the list is read-only.
+      @@@PerlDef:
+        if ($self->{<H::mn:node>}->{<H::c|read-only>}) {
+          __EXCEPTION{c|LIST_READ_ONLY_ERR::
+          }__;
+        }
+ 
+        my $array = $self->{<H::mn:node>}->{$self->{<H::c|key>}};
+        $r = $array->[$index] if defined wantarray;
+        CORE::delete $array->[$index];
+
+  @IntMethod:
+    @@Operator:
+      @@@@: EXISTS
+      @@@ContentType: DISPerl|Perl
+    @@Param:
+      @@@Name: index
+      @@@Type: idl|unsignedLong||ManakaiDOM|all
+    @@Return:
+      @@@Type: idl|boolean||ManakaiDOM|all
+      @@@PerlDef:
+        $r = CORE::exists $self->{<H::mn:node>}
+                               ->{$self->{<H::c|key>}}->[$index];
           
   @Attr:
      @@Name:  length
+    @@Operator:
+      @@@@: FETCHSIZE
+      @@@ContentType: DISPerl|Perl
      @@Spec:
        @@@DOM3:
          http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#DOMStringList-length
@@ -1962,7 +2118,8 @@ IFCls3Def:
           @@@@@: 
             The number of strings in this collection.
         @@@PerlDef:
-          $r = @$self;
+          $r = @{$self->{<H::mn:node>}->{$self->{<H::c|key>}}};
+
   @Method:
      @@Name:  contains
      @@Spec:
@@ -2000,7 +2157,7 @@ IFCls3Def:
         @@@PerlDef:
           CHK: {
             __DEEP{
-              for (@$self) {
+              for (@{$self->{<H::mn:node>}->{$self->{<H::c|key>}}}) {
                 if ($str eq $_) {
                   $r = true;
                   last CHK;
@@ -2008,7 +2165,136 @@ IFCls3Def:
               }
             }__;
           }
+
+  @IntMethod:
+    @@Operator:
+      @@@@: TIEARRAY
+      @@@ContentType: DISPerl|Perl
+    @@Param:
+      @@@Name: list
+      @@@Type: DOMStringList
+    @@Return:
+      @@@Type: DOMStringList
+      @@@PerlDef: $r = $list
+
+  @IntMethod:
+    @@Operator:
+      @@@@: @{}
+      @@@ContentType: DISPerl|Perl
+    @@Return:
+      @@@Type: DISPerl|ARRAY||ManakaiDOM|all
+      @@@PerlDef:
+        tie my @list, ref $self, $self;
+        $r = \@list;
+
+  @IntMethod:
+    @@Operator:
+      @@@@: DESTROY
+      @@@ContentType: DISPerl|Perl
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Redefines destructor for the class
+        <Class::ManakaiNode|ManakaiNodeRef||ManakaiDOM|Perl>,
+        since the <PerlModule::Tie::Array> also has its own empty destructor. 
+    @@Return:
+      @@@disDef:
+        @@@@DISPerl:cloneCode:
+          ManakaiNode|ManakaiNodeRef||ManakaiDOM|Perl.destroy
+
+  @Test:
+    @@QName: ManakaiDOMStringList.methods.test
+    @@PerlDef:
+      my $list;
+      __CODE{newDOMStringListForTest::
+        $key => 'a',
+      }__;
+
+      ## length (0)
+      $test->assert_equals (0 + @$list, 0);
+      $test->assert_equals ($list-><AG::DOMStringList.length>, 0);
+
+      ## PUSH
+      push @$list, 'String1';
+
+      ## length (1)
+      $test->assert_equals (0 + @$list, 1);
+      $test->assert_equals ($list-><AG::DOMStringList.length>, 1);
+
+      ## FETCH
+      $test->assert_string (actual_value => $list->[0],
+                            expected_value => 'String1');
+      $test->assert_string (actual_value => $list->{<H::mn:node>}->{a}->[0],
+                            expected_value => 'String1');
+
+      ## item
+      $test->assert_string (actual_value => $list-><M::DOMStringList.item> (0),
+                            expected_value => 'String1');
+
+      ## PUSH
+      push @$list, 'String2';
+
+      ## length (2)
+      $test->assert_equals (0 + @$list, 2);
+      $test->assert_equals ($list-><AG::DOMStringList.length>, 2);
+
+      ## FETCH
+      $test->assert_string (actual_value => $list->[1],
+                            expected_value => 'String2');
+      $test->assert_string (actual_value => $list->[0],
+                            expected_value => 'String1');
+    
+      ## EXISTS
+      $test->assert_true (exists $list->[0]);
+      $test->assert_true (exists $list->[1]);
+      $test->assert_false (exists $list->[2]);
+      $test->assert_false (exists $list->[3]);
+
+      ## DELETE
+      delete $list->[0];
+    
+      ## FETCHSIZE
+      $test->assert_equals (0 + @$list, 2);
+
+      ## EXISTS
+      $test->assert_false (exists $list->[0]);
+      $test->assert_true (exists $list->[1]);
+
+      ## FETCH
+      $test->assert_string (actual_value => $list->[1],
+                            expected_value => 'String2');
+  
+      ## STORE
+      $list->[0] = 'String3';
+
+      ## FETCH
+      $test->assert_string (actual_value => $list->[0],
+                            expected_value => 'String3');
+ 
+      ## STORE
+      $list->[1] = 'String4';
+      $test->assert_string (actual_value => $list->[1],
+                            expected_value => 'String4');
+      $list->[2] = 'String5';
+      $test->assert_string (actual_value => $list->[2],
+                            expected_value => 'String5');
+      $test->assert_equals (0 + @$list, 3);
+
+      ## contains
+      $test->assert_true ($list-><M::DOMStringList.contains> ('String4'));
+      $test->assert_true ($list-><M::DOMStringList.contains> ('String5'));
+      $test->assert_true ($list-><M::DOMStringList.contains> ('String3'));
+
+      ## DELETE
+      delete $list->[2];
+      $test->assert_false (exists $list->[2]);
+      $test->assert_equals (0 + @$list, 2);
 ##DOMStringList
+
+PropDef:
+  @QName: c|key
+  @enDesc:
+    Hash key for <IF::DOMStringList>.
 
 IFCls3Def:
   @IFQName: NameList

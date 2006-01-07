@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/12/24 07:27:16 $
+      $Date: 2006/01/07 12:30:56 $
     @@ContentType:
       dis:Date.RCS
   
@@ -2158,6 +2158,18 @@ IFClsDef:
                                 (<Q::DOMCore:NamespaceRole>)) {
                     $r-><M::DIS|PLBlockCon.appendStatement>
                           ('$Message::DOM::ManakaiDOMNamespace'.
+                           '::CompatClass{q<' . $pack_name . '>} = 1');
+                  }
+                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
+                                (<Q::DOMCore:ElementTypeDefinitionRole>)) {
+                    $r-><M::DIS|PLBlockCon.appendStatement>
+                          ('$Message::DOM::ManakaiDOMElementTypeDefinition'.
+                           '::CompatClass{q<' . $pack_name . '>} = 1');
+                  }
+                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
+                                (<Q::DOMCore:AttributeDefinitionRole>)) {
+                    $r-><M::DIS|PLBlockCon.appendStatement>
+                          ('$Message::DOM::ManakaiDOMAttributeDefinition'.
                            '::CompatClass{q<' . $pack_name . '>} = 1');
                   }
                   ## NOTE: DOMCore:AnyNodeRole is subset of  

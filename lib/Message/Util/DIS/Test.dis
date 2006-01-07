@@ -13,7 +13,7 @@ Module:
   @License: license|Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/11/23 07:59:19 $
+      $Date: 2006/01/07 12:30:57 $
     @@ContentType: dis|Date.RCS
   
   @Require:
@@ -306,6 +306,12 @@ PropDef:
   @dtest:key: i
 
 PropDef:
+  @QName: dtest|id
+  @enDesc:
+    A subtest identifier.
+  @dtest:key: s
+
+PropDef:
   @QName: dtest|number
   @enDesc:
     The total number of tests.
@@ -388,6 +394,7 @@ IFClsDef:
         $self->{<H::dtest|currentNumber>}++;
         $self->{<H::dtest|uri>} = $uri;
         $self->{<H::dtest|testData>} = {};
+        CORE::delete $self->{<H::dtest|id>};
 
   @Attr:
     @@Name: uri
@@ -400,6 +407,24 @@ IFClsDef:
           Currently no test is done.
       @@@PerlDef:
         $r = $self->{<H::dtest|uri>};
+
+  @Attr:
+    @@Name: id
+    @@enDesc:
+      An opaque string that identifies a subtest.
+    @@Type: DISString
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          No subtest identifier.
+      @@@PerlDef:
+        $r = $self->{<H::dtest|id>};
+    @@Set:
+      @@@nullCase:
+        @@@@enDesc:
+          Unset subtest identifier.
+      @@@PerlDef:
+        $self->{<H::dtest|id>} = $given;
 
   @Method:
     @@Name: ok
@@ -420,14 +445,20 @@ IFClsDef:
       @@@PerlDef:
         print {$self->{<H::dtest|output>}}
                 "not ok " . $self->{<H::dtest|currentNumber>} . "\n";
+        my $s = '<' .
+                (defined $uri ? $uri : $self->{<H::dtest|uri>});
+        if (defined $self->{<H::dtest|id>}) {
+          $s .= ($s =~ /#/) ? '.' : '#';
+          $s .= $self->{<H::dtest|id>};
+        }
+        $s .= '>';
         __CODE{printComment::
           $test => $self,
-          $s => {
-            '<' . (defined $uri ? $uri : $self->{<H::dtest|uri>}) . '>'
-          },
+          $s => $s,
         }__;
         $self->{<H::dtest|failedNumber>}++;
         CORE::delete $self->{<H::dtest|uri>};
+        CORE::delete $self->{<H::dtest|id>};
 
   @Method:
     @@Name: assertTrue
@@ -679,6 +710,121 @@ IFClsDef:
         }
 
   @Method:
+    @@Name: assertNumEquals
+    @@enDesc:
+      If two values are not equal (i.e. if
+      <Perl::<P::actualValue> == <P::expectedValue>>
+      is not <DOM::true>), then fails.
+    @@NamedParam:
+      @@@Name: actualValue
+      @@@Type: DISPerl|Any
+      @@@enDesc:
+        The value returned by the testing code.
+      @@@nullCase:
+        @@@@enDesc:
+          A <DOM::null> value is returned by the testing code.
+    @@NamedParam:
+      @@@Name: expectedValue
+      @@@Type: DISPerl|Any
+      @@@enDesc:
+        The expected value.
+    @@Return:
+      @@@AErr:
+      @@@PerlDef:
+        if (not defined $actualValue) {
+          __DEEP{
+            $self-><M::DTManager.notOK>;
+          }__;
+          __CODE{printComment::
+            $test => $self,
+            $s => {
+              'nu'.'ll value is occurred where a non-nu'.'ll value is expected'
+            },
+          }__;
+          __EXCEPTION{ASSERTION_ERR}__;
+        } elsif ($actualValue == $expectedValue) {
+          ## ok
+        } else {
+          __DEEP{
+            $self-><M::DTManager.notOK>;
+          }__;
+          my $v1;
+          my $v2;
+          __CODE{formatValue::
+            $input => $actualValue,
+            $output => $v1,
+          }__;
+          __CODE{formatValue::
+            $input => $expectedValue,
+            $output => $v2,
+          }__;
+          __CODE{printComment::
+            $test => $self,
+            $s => {
+              'value ' . $v1 . ' is not equal to expected value ' . $v2
+            },
+          }__;
+          __EXCEPTION{ASSERTION_ERR}__;
+        }
+
+  @Method:
+    @@Name: assertNumNotEquals
+    @@enDesc:
+      If two values are equal (i.e. if
+      <Perl::<P::actualValue> == <P::expectedValue>>
+      is <DOM::true>), then fails.
+    @@NamedParam:
+      @@@Name: actualValue
+      @@@Type: DISPerl|Any
+      @@@enDesc:
+        The value returned by the testing code.
+      @@@nullCase:
+        @@@@enDesc:
+          A <DOM::null> value is returned by the testing code.
+    @@NamedParam:
+      @@@Name: expectedValue
+      @@@Type: DISPerl|Any
+      @@@enDesc:
+        The expected value.
+    @@Return:
+      @@@AErr:
+      @@@PerlDef:
+        if (not defined $actualValue) {
+          __DEEP{
+            $self-><M::DTManager.notOK>;
+          }__;
+          __CODE{printComment::
+            $test => $self,
+            $s => {
+              'nu'.'ll value is occurred where a non-nu'.'ll value is expected'
+            },
+          }__;
+          __EXCEPTION{ASSERTION_ERR}__;
+        } elsif ($actualValue == $expectedValue) {
+          __DEEP{
+            $self-><M::DTManager.notOK>;
+          }__;
+          my $v1;
+          my $v2;
+          __CODE{formatValue::
+            $input => $actualValue,
+            $output => $v1,
+          }__;
+          __CODE{formatValue::
+            $input => $expectedValue,
+            $output => $v2,
+          }__;
+          __CODE{printComment::
+            $test => $self,
+            $s => {
+              'value ' . $v1 . ' is equal to value ' .
+              $v2 . ' (they must be different)'
+            },
+          }__;
+          __EXCEPTION{ASSERTION_ERR}__;
+        }
+
+  @Method:
     @@Name: assertException
     @@enDesc:
       If an exception is not thrown, then fails.
@@ -727,6 +873,63 @@ IFClsDef:
             $s => {
               'Exception of subtype <' . $exceptionSubtype .
               '> is expected but not thrown'
+            },
+          }__;
+          __EXCEPTION{ASSERTION_ERR}__;
+        }
+
+  @Method:
+    @@Name: assertISA
+    @@enDesc:
+      Unless an object <EM::is-a> package, it fails.
+    @@Param:
+      @@@Name: object
+      @@@Type: DISPerl|Any
+      @@@enDesc:
+        The object returned by the testing code.
+      @@@nullCase:
+        @@@@enDesc:
+          A <DOM::null> value is returned by the testing code.
+    @@Param:
+      @@@Name: package
+      @@@Type: DISPerl|String
+      @@@enDesc:
+        The expected package name.
+    @@Return:
+      @@@AErr:
+      @@@PerlDef:
+        if (not defined $object) {
+          __DEEP{
+            $self-><M::DTManager.notOK>;
+          }__;
+          __CODE{printComment::
+            $test => $self,
+            $s => {
+              'nu'.'ll value is occurred where a non-nu'.'ll value is expected'
+            },
+          }__;
+          __EXCEPTION{ASSERTION_ERR}__;
+        } elsif (UNIVERSAL::isa ($object, $package)) {
+          # ok
+        } else {
+          __DEEP{
+            $self-><M::DTManager.notOK>;
+          }__;
+          my $v1;
+          my $v2;
+          __CODE{formatValue::
+            $input => $object,
+            $output => $v1,
+          }__;
+          __CODE{formatValue::
+            $input => $package,
+            $output => $v2,
+          }__;
+          __CODE{printComment::
+            $test => $self,
+            $s => {
+              'object ' . $v1 . ' must be ' .
+              'an instance of package ' . $v2
             },
           }__;
           __EXCEPTION{ASSERTION_ERR}__;

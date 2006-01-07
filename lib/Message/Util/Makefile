@@ -174,6 +174,7 @@ $(PC_DIS_FILES:$(DIS_SUFFIX)=$(PM_SUFFIX)): %$(PM_SUFFIX): \
 	  --create-perl-module="$(NS_MDOM)DOMCore    ../DOM/DOMCore$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_MDOM)Tree       ../DOM/Tree$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_MDOM)DOMXML     ../DOM/DOMXML$(PM_SUFFIX)" \
+	  --create-perl-module="$(NS_MDOMXDoctype    ../DOM/XDoctype$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_MDOM)DOMLS      ../DOM/DOMLS$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_MDOM)GenericLS  ../DOM/GenericLS$(PM_SUFFIX)"
 	$(PERL_CHK) PerlCode$(PM_SUFFIX)
@@ -183,6 +184,7 @@ $(PC_DIS_FILES:$(DIS_SUFFIX)=$(PM_SUFFIX)): %$(PM_SUFFIX): \
 	$(PERL_CHK) ../DOM/DOMCore$(PM_SUFFIX)
 	$(PERL_CHK) ../DOM/Tree$(PM_SUFFIX)
 	$(PERL_CHK) ../DOM/DOMXML$(PM_SUFFIX)
+	$(PERL_CHK) ../DOM/XDoctype$(PM_SUFFIX)
 	$(PERL_CHK) ../DOM/DOMLS$(PM_SUFFIX)
 	$(PERL_CHK) ../DOM/GenericLS$(PM_SUFFIX)
 	$(TOUCH) $@

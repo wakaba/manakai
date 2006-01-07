@@ -25,7 +25,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/11/24 15:05:48 $
+      $Date: 2006/01/07 12:30:53 $
     @@ContentType:
       dis:Date.RCS
   
@@ -1636,7 +1636,9 @@ ResourceDef:
         __EXCEPTION{MDOMX:MDOM_NS_XMLNS_XMLNS}__;
       }
     } else { ## No prefix
-      if ($NSURI eq <Q::xml:>) {
+      if (not defined $NSURI) {
+        #
+      } elsif ($NSURI eq <Q::xml:>) {
         __EXCEPTION{MDOMX:MDOM_NS_OTHER_WITH_XML_URI::
           infoset:prefix => {undef},
         }__;
