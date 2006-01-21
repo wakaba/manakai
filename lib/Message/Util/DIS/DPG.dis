@@ -15,7 +15,7 @@ Module:
   @License: license|Perl+MPL
 
   @Date:
-    $Date: 2006/01/21 16:28:13 $
+    $Date: 2006/01/21 17:37:52 $
   
   @Require:
     @@Module:
@@ -1132,8 +1132,17 @@ IFClsETDef:
                                     });
                             }
                           }
+                          for ($_-><M::pc|PCChoose.appendNewPCOtherwise>
+                                 -><AG::pc|PCOtherwise.block>) {
+                            $_-><M::pc|PerlCodeStatements.appendStatement>
+                              -><M::pc|PerlCodeUnits.appendNewPCFunctionCall>
+                                  (null, 'return')
+                              -><M::pc|PerlCodeUnits.appendNewPCLiteral> ({
+                                    type => '#EOF',
+                                  });
+                          }
                         }
-                      } else {
+                      } else { # no default token
                         $block-><M::pc|PerlCodeStatements.appendStatement>
                               -><M::pc|PerlCodeUnits.appendNewPCFunctionCall>
                                   (null, 'return')

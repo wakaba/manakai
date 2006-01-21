@@ -25,7 +25,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2006/01/21 07:06:09 $
+      $Date: 2006/01/21 17:37:51 $
     @@ContentType:
       dis:Date.RCS
   
@@ -361,9 +361,9 @@ IFClsDef:
     @@QName: addNameListAttr
     @@rdf:type: DISPerl|BlockCode
     @@PerlDef:
+      my $__v = $node-><M::Element.getAttributeNS> (<Q::pc:>, $attrName);
       my %__mn = map {$_ => true}
-                 split /\s+/, $node-><M::Element.getAttributeNS>
-                                             (<Q::pc:>, $attrName);
+                 split /\s+/, defined $__v ? $__v : '';
       $__mn{$newName} = true;
       $node-><M::Element.setAttributeNS>
                       (<Q::pc:>, 'pc:'.$attrName => join ' ', keys %__mn);
@@ -465,8 +465,9 @@ IFClsDef:
         if ($__cnode-><AG::Node.nodeType> == <C::Node.ELEMENT_NODE> and
             defined $__cnode-><AG::Node.namespaceURI> and
             $__cnode-><AG::Node.namespaceURI> eq <Q::pc:>) {
-          for (split /\s+/, $__cnode-><M::Element.getAttributeNS>
-                               (<Q::pc:>, $attrName)) {
+          my $__v = $__cnode-><M::Element.getAttributeNS>
+                               (<Q::pc:>, $attrName);
+          for (split /\s+/, defined $__v ? $__v : '') {
             $__result{$_} = true;
           }
           push @__nodes, @{$__cnode-><AG::Node.childNodes>};
@@ -478,9 +479,9 @@ IFClsDef:
     @@QName: getNameListAttr
     @@rdf:type: DISPerl|BlockCode
     @@PerlDef:
-       my %__result;
-      for (split /\s+/,
-                 $node-><M::Element.getAttributeNS> (<Q::pc:>, $attrName)) {
+      my %__result;
+      my $__v = $node-><M::Element.getAttributeNS> (<Q::pc:>, $attrName);
+      for (split /\s+/, defined $__v ? $__v : '') {                 
         $__result{$_} = true;
       }
       $result = [sort {$a cmp $b} keys %__result];
@@ -750,8 +751,9 @@ IFClsETDef:
                   defined $child-><AG::Node.namespaceURI> and
                   $child-><AG::Node.namespaceURI> eq <Q::pc:> and
                   $child-><AG::Node.localName> eq 'package') {
-                if ($child-><M::Element.getAttributeNS>
-                               (<Q::pc:>, 'packageName') eq $packageName) {
+                my $v = $child-><M::Element.getAttributeNS>
+                               (<Q::pc:>, 'packageName');
+                if (defined $v and $v eq $packageName) {
                   $r = $child;
                 }
               }
@@ -1203,12 +1205,12 @@ IFClsETDef:
         The name of package to add. 
     @@Return:
       @@@PerlDef:
-          __DEEP{
-            $self-><M::Element.setAttributeNS>
+        __DEEP{
+          my $v = $self-><M::Element.getAttributeNS> (<Q::pc:>, 'extends');
+          $self-><M::Element.setAttributeNS>
               (<Q::pc:>, 'pc:extends' =>
-               join ' ', (split /\s+/, $self-><M::Element.getAttributeNS>
-                                           (<Q::pc:>, 'extends')), $packageName);
-          }__;
+               join ' ', (split /\s+/, defined $v ? $v : ''), $packageName);
+        }__;
 
   @Method:
     @@Name: getISAPackageNameList
@@ -1220,8 +1222,8 @@ IFClsETDef:
         An ordered snapshot list of superpackage names.
       @@@PerlDef:
         __DEEP{
-          $r = [split /\s+/, $self-><M::Element.getAttributeNS>
-                                (<Q::pc:>, 'extends')];
+          my $v = $self-><M::Element.getAttributeNS> (<Q::pc:>, 'extends');
+          $r = [split /\s+/, defined $v ? $v : ''];
         }__;
 
   @Method:

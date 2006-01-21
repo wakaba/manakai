@@ -10,7 +10,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/01/21 16:28:13 $
+    $Date: 2006/01/21 17:37:51 $
 
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
@@ -286,12 +286,14 @@ ClsDef:
         if (@{$self->{char}}) {
           $r = shift @{$self->{char}};
         } else {
+          no warnings 'substr';
+            ## substr outside length warnings at the end of the string
           GETCHAR: {
             my $char = substr (${$self->{entity}->[-1]->{reptxt}},
                                $self->{entity}->[-1]->{pos}, 1);
             $self->{entity}->[-1]->{pos}++;
 
-            if (length $char) {
+            if (defined $char and length $char) {
               $r = ord $char;
               if ($r == 0x000A) {
                 $self->{entity}->[-1]->{line}++;

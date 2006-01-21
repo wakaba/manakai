@@ -12,7 +12,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/01/07 12:30:53 $
+    $Date: 2006/01/21 17:37:51 $
 
   @Require:
     @@Module:
@@ -9146,7 +9146,14 @@ NodeTypeDef:
             }__;
             $r = $r-><AG::Node.textContent>;
           } else {
-            $r = '';
+            ## Web browser compatible behavior
+            __FOR{ManakaiDOM:DOMLatest::
+              $r = null;
+            }__;
+            ## DOM spec
+            __FOR{!ManakaiDOM:DOMLatest::
+              $r = '';
+            }__;
           }
   @Method:
      @@Name:  setAttribute
@@ -9825,6 +9832,15 @@ NodeTypeDef:
                 $class => {<ClassName::ManakaiDOMAttr>},
               }__;
               $r = $r-><AG::DOMCore:Node.textContent>;
+            } else {
+              ## Web browser compatible behavior
+              __FOR{ManakaiDOM:DOMLatest::
+                $r = null;
+              }__;
+              ## DOM spec
+              __FOR{!ManakaiDOM:DOMLatest::
+                $r = '';
+              }__;
             }
           @@@@For:
             ManakaiDOM:DOMXMLFeature
