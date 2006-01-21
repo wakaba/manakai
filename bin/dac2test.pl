@@ -30,6 +30,7 @@ use strict;
 use Message::Util::QName::Filter {
   DIS => q<http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#>,
   dis => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis-->,
+  DOMLS => q<http://suika.fam.cx/~wakaba/archive/2004/dom/ls#>,
   ManakaiDOM => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#>,
   Markup => q<http://suika.fam.cx/~wakaba/archive/2005/manakai/Markup#>,
   pc => q<http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/PerlCode#>,
@@ -193,18 +194,22 @@ sub verbose_msg_ ($) {
 }
 
 use Message::Util::DIS::DNLite;
+use Message::Util::DIS::Test;
+use Message::DOM::GenericLS;
 
 my $start_time;
 BEGIN { $start_time = time }
 
 my $impl = $Message::DOM::ImplementationRegistry->get_implementation
                ({
-                 ExpandedURI q<ManakaiDOM:Minimum> => '3.0',
+                 ExpandedURI q<DOMLS:Generic> => '3.0',
                  '+' . ExpandedURI q<DIS:Core> => '1.0',
                  '+' . ExpandedURI q<Util:PerlCode> => '1.0',
+                 '+' . ExpandedURI q<DIS:TDT> => '1.0',
                 });
 my $pc = $impl->get_feature (ExpandedURI q<Util:PerlCode> => '1.0');
 my $di = $impl->get_feature (ExpandedURI q<DIS:Core> => '1.0');
+my $tdt_parser;
 
   status_msg_ qq<Loading the database "$Opt{file_name}"...>;
   my $db = $di->pl_load_dis_database ($Opt{file_name}, sub ($$) {
@@ -267,26 +272,71 @@ for (@{$Opt{create_module}}) {
     $processed{$res->uri} = 1;
 
     if ($res->is_type_uri (ExpandedURI q<test:Test>)) {
-      $total_tests++;
-      $pack->append_code ('$test->start_new_test (');
-      $pack->append_new_pc_literal ($res->name_uri || $res->uri);
-      $pack->append_code (');');
+      if ($res->is_type_uri (ExpandedURI q<test:StandaloneTest>)) {
+        $total_tests++;
+        $pack->append_code ('$test->start_new_test (');
+        $pack->append_new_pc_literal ($res->name_uri || $res->uri);
+        $pack->append_code (');');
+        
+        $pack->append_code ('try {');
+        
+        my $test_pc = $res->pl_code_fragment;
+        if (not defined $test_pc) {
+          die "Perl test code not defined for <".$res->uri.">";
+        }
+        
+        $pack->append_code_fragment ($test_pc);
+        
+        $pack->append_code ('$test->ok;');
+        
+        $pack->append_code ('} catch Message::Util::IF::DTException with {
+          ##
+        };');
 
-      $pack->append_code ('try {');
+      } elsif ($res->is_type_uri (ExpandedURI q<test:ParserTestSet>)) {
+        my $block = $pack->append_new_pc_block;
+        my @test;
+        
+        for my $tres (@{$res->get_child_resource_list_by_type
+                                (ExpandedURI q<test:ParserTest>)}) {
+          $total_tests++;
+          push @test, my $ttest = {entity => {}};
+          $ttest->{uri} = $tres->uri;
+          for my $eres (@{$tres->get_child_resource_list_by_type
+                                   (ExpandedURI q<test:Entity>)}) {
+            my $tent = $ttest->{entity}->{$eres->uri} = {};
+            for (ExpandedURI q<test:uri>, ExpandedURI q<test:baseURI>,
+                 ExpandedURI q<test:value>) {
+              my $v = $eres->get_property_text ($_);
+              $tent->{$_} = $v if defined $v;
+            }
+            $ttest->{root_uri} = $eres->uri
+              if $eres->is_type_uri (ExpandedURI q<test:RootEntity>) or
+                 not defined $ttest->{root_uri};
+          }
+          my $tree_t = $tres->get_property_text (ExpandedURI q<test:domTree>); 
+          if (defined $tree_t) {
+            unless ($tdt_parser) {
+              $tdt_parser = $impl->create_gls_parser
+                                     ({
+                                       ExpandedURI q<DIS:TDT> => '1.0',
+                                      });
+            }
+            $ttest->{dom_tree} = $tdt_parser->parse_string ($tree_t);
+          }
+        }
 
-      my $test_pc = $res->pl_code_fragment;
-      if (not defined $test_pc) {
-        die "Perl test code not defined for <".$res->uri.">";
-      }
-
-      $pack->append_code_fragment ($test_pc);
-
-      $pack->append_code ('$test->ok;');
-
-      $pack->append_code ('} catch Message::Util::IF::DTException with {
-        ##
-      };');
-    }
+        for ($block->append_statement
+                   ->append_new_pc_expression ('=')) {
+          $_->append_new_pc_variable ('$', undef, 'TestData')
+            ->variable_scope ('my');
+          $_->append_new_pc_literal (\@test);
+        }
+        
+        $block->append_code_fragment ($res->pl_code_fragment);
+        
+      } # test resource type
+    } # test:Test
   }
   
   $num_statement->append_code (' (' . $total_tests . ')');
@@ -367,4 +417,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2005/11/23 11:21:09 $
+1; # $Date: 2006/01/21 07:06:09 $

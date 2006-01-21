@@ -50,7 +50,8 @@ DAC2TEST = $(PERL_) $(DAC2TEST_PL) $(DAC2TEST_OPTIONS) $(DIS_OPTIONS_ALL)
 DOM_FEATURE_DAC = $(MANAKAI_LIB_DIR)Message/DOM/feature$(DAC_SUFFIX)
 DOM_CORE_DAC = $(MANAKAI_LIB_DIR)Message/DOM/core$(DAC_SUFFIX)
 DOM_LS_DAC = $(MANAKAI_LIB_DIR)Message/DOM/ls$(DAC_SUFFIX)
-DOM_DAC_FILES = $(DOM_FEATURE_DAC) $(DOM_CORE_DAC) $(DOM_LS_DAC)
+DOM_XP_DAC = $(MANAKAI_LIB_DIR)Message/DOM/xp$(DAC_SUFFIX)
+DOM_DAC_FILES = $(DOM_FEATURE_DAC) $(DOM_CORE_DAC) $(DOM_LS_DAC) $(DOM_XP_DAC)
 
 UTIL_PC_DAC = $(MANAKAI_LIB_DIR)Message/Util/pc$(DAC_SUFFIX)
 DIS_CORE_DAC = $(MANAKAI_LIB_DIR)Message/Util/discore$(DAC_SUFFIX)
@@ -61,7 +62,7 @@ NS_UTIL = http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/
 NS_DIS  = http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS\#
 
 GENERATED_FILES = util-perlcode.t dom-feature.t dom-tree.t dom-genericls.t \
-  dom-core.t dom-xdoctype.t \
+  dom-core.t dom-xdoctype.t dom-xmlparser.t \
   dom-mdomls2003.t util-dis-dnlite.t
 
 all: $(GENERATED_FILES)
@@ -82,7 +83,7 @@ test-module-dom: \
   dom-feature.t \
   dom-core.t dom-tree.t dom-xdoctype.t \
   dom-genericls.t \
-  dom-mdomls2003.t
+  dom-mdomls2003.t dom-xmlparser.t
 	$(PERL_TEST_) dom-*.t
 
 dom-feature.t: $(DOM_FEATURE_DAC) $(DAC2TEST_PL)
@@ -102,6 +103,9 @@ dom-xdoctype.t: $(DOM_CORE_DAC) $(DAC2TEST_PL)
 
 dom-mdomls2003.t: $(DOM_LS_DAC) $(DAC2TEST_PL)
 	$(DAC2TEST) $< --source-module="$(NS_MDOM)ManakaiDOMLS2003" > $@
+
+dom-xmlparser.t: $(DOM_XP_DAC) $(DAC2TEST_PL)
+	$(DAC2TEST) $< --source-module="$(NS_MDOM)XMLParser" > $@
 
 test-module-util: \
   util-perlcode.t \

@@ -7,7 +7,7 @@ Module:
 
   @DISCore:author: DISCore|Wakaba
   @Date:
-    $Date: 2005/11/15 03:13:00 $
+    $Date: 2006/01/21 07:06:10 $
   @License: license|Perl+MPL
   
   @DefaultFor: ManakaiDOM|all
@@ -74,7 +74,7 @@ ElementTypeBinding:
     @@rdf:type: rdf|Property
 
 ElementTypeBinding:
-  @Name: RPropDef:
+  @Name: RPropDef
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
@@ -103,3 +103,105 @@ ElementTypeBinding:
     dis:FullName
   @ShadowContent:
     @@lang:en
+
+## -- Parser Test
+
+ResourceTypeDef:
+  @QName: test|ParserTestSet
+  @enFN: Parser test set
+  @rdfs:subClassOf: test|Test
+  @subsetOf: test|Test
+  @rdfs:subClassOf: DISCore|AnyDefContainer
+  @subsetOf: DISCore|AnyDefContainer
+
+ResourceTypeDef:
+  @QName: test|ParserTest
+  @enFN: Parser test
+  @rdfs:subClassOf: test|Test
+  @subsetOf: test|Test
+  @enDesc:
+    A set of source texts and expected results.
+
+RPropDef:
+  @QName: test|target
+  @enFN: Test target
+  @enDesc:
+    A string that identifies the target of the test.
+  @multipleProperties: DISCore|UnorderedList
+  @dataType: DISCore|String
+
+ResourceTypeDef:
+  @QName: test|Entity
+  @enFN: Entity
+  @enDesc:
+    An entity by which a test is executed.
+  @rdfs:subClassOf: DISCore|AnyValueContainer
+  @subsetOf: DISCore|AnyValueContainer
+
+ResourceTypeDef:
+  @QName: test|RootEntity
+  @enFN: Root entity
+  @enDesc:
+    The entity from which a test is started.
+  @rdfs:subClassOf: test|Entity
+  @subsetOf: test|Entity
+
+RPropDef:
+  @QName: test|uri
+  @enFN: Entity URI reference
+  @enDesc:
+    A URI reference of the entity.
+  @dataType: DISCore|URI
+  @multipleProperties: DISCore|UnorderedList
+
+RPropDef:
+  @QName: test|baseURI
+  @enFN: Entity base URI
+  @enDesc:
+    The base URI of the entity.
+
+      {ISSUE:: Should be restricted to an absolute URI?
+      }
+  @dataType: DISCore|URI
+  @multipleProperties: DISCore|Single
+
+RPropDef:
+  @QName: test|value
+  @enFN: Entity value
+  @dataType: test|EntityValueString
+  @multipleProperties: DISCore|Single
+
+ElementTypeBinding:
+  @Name: LexTypeDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISCore|LexicalType
+
+LexTypeDef:
+  @QName: test|EntityValueString
+  @enFN: Test entity value string
+  @enDesc:
+    A string, with <CODE::'$' 1*HEXDIGIT ';'> replaced by a
+    Perl character with that code and <CODE::$$> replaced by a
+    <CHAR::DOLLER SIGN>.
+  @rdfs:subClassOf: DISCore|String
+  @subsetOf: DISCore|String
+
+LexTypeDef:
+  @QName: lang|tdt
+  @enFN: TDT textual representation
+  @rdfs:subClassOf: DISCore|String
+  @subsetOf: DISCore|String
+  @ImplNote:
+    @@lang:en
+    @@@:
+      Its ABNF definition found in <FILE::../Message/Util/DIS/Test.dis>.
+
+RPropDef:
+  @QName: test|domTree
+  @enFN: Expected parsed DOM tree
+  @dataType: lang|tdt
+  @multipleProperties:
+    @@@: DISCore|UnorderedList
+    @@enDesc: OR list.

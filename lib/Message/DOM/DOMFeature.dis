@@ -44,7 +44,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/11/15 14:18:23 $
+      $Date: 2006/01/21 07:06:09 $
     @@ContentType:
       dis:Date.RCS
   
@@ -642,36 +642,67 @@ StringDataTypeDef:
 
   @InputProcessor:
     @@PerlDef:
+      __CODE{featuresParamToFeaturesHash::
+        $INPUT => $INPUT,
+        $RESULT => $INPUT,
+      }__;
+
+  @ResourceDef:
+    @@QName: featuresParamToFeaturesHash
+    @@rdf:type: DISPerl|BlockCode
+    @@enDesc:
+      Converts a value given as a <CODE::features> parameter (<Perl::$INPUT>)
+      into a features hash (<Perl::$RESULT>).
+    @@PerlDef:
       if (CORE::defined $INPUT) {
         if (CORE::ref ($INPUT) eq 'HASH') {
-          my $new = {};
-          for my $fname (keys %{$INPUT}) {
-            if (CORE::ref ($INPUT->{$fname}) eq 'HASH') {
-              my $lfname = lc $fname;
-              for my $fver (keys %{$INPUT->{$fname}}) {
-                $new->{$lfname}->{$fver} = $INPUT->{$fname}->{$fver};
+          my $__new = {};
+          for my $__fname (keys %{$INPUT}) {
+            if (CORE::ref ($INPUT->{$__fname}) eq 'HASH') {
+              my $__lfname = lc $__fname;
+              for my $__fver (keys %{$INPUT->{$__fname}}) {
+                $__new->{$__lfname}->{$__fver} = $INPUT->{$__fname}->{$__fver};
+              }
+            } elsif (CORE::ref ($INPUT->{$__fname}) eq 'ARRAY') {
+              my $__lfname = lc $__fname;
+              for my $__fver (@{$INPUT->{$__fname}}) {
+                $__new->{$__lfname}->{$__fver} = true;
               }
             } else {
-              $new->{lc $fname} = {(CORE::defined $INPUT->{$fname}
-                                      ? $INPUT->{$fname} : '') => 1};
+              $__new->{lc $__fname} = {(CORE::defined $INPUT->{$__fname}
+                                      ? $INPUT->{$__fname} : '') => true};
             }
           }
-          $INPUT = $new;
+          $RESULT = $__new;
         } else {
-          my @f = split /\s+/, $INPUT;
-          $INPUT = {};
-          while (@f) {
-            my $name = lc shift @f;
-            if (@f and $f[0] =~ /^[\d\.]+$/) {
-              $INPUT->{$name}->{shift @f} = 1;
+          my @__f = split /\s+/, $INPUT;
+          my $__new = {};
+          while (@__f) {
+            my $__name = lc shift @__f;
+            if (@__f and $__f[0] =~ /^[\d\.]+$/) {
+              $__new->{$__name}->{shift @__f} = 1;
             } else {
-              $INPUT->{$name}->{''} = 1;
+              $__new->{$__name}->{''} = 1;
             }
           }
+          $RESULT = $__new;
         }
       } else {
-        $INPUT = {};
+        $RESULT = {};
       }
+
+    @@Test:
+      @@@QName: featuresParamToFeaturesHash.featureVersionsAsArray.test
+      @@@PerlDef:
+        my $in = {feature1 => [qw/1.0 2.0/]};
+        my $out;
+
+        __CODE{featuresParamToFeaturesHash:: $INPUT => $in, $RESULT => $out}__;
+
+        $test->assert_not_null ($out);
+        $test->assert_not_null ($out->{feature1});
+        $test->assert_true ($out->{feature1}->{'1.0'});
+        $test->assert_true ($out->{feature1}->{'2.0'});
 
     @@ImplNote:
       @@@lang:en
@@ -696,8 +727,7 @@ StringDataTypeDef:
   @ResourceDef:
     @@QName:
       DOMMain:stringifyFeatures
-    @@rdf:type:
-      dis2pm:BlockCode
+    @@rdf:type: DISPerl|BlockCode
     @@Description:
       @@@lang:en
       @@@@:

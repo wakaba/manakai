@@ -25,7 +25,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2005/12/28 03:50:17 $
+      $Date: 2006/01/21 07:06:09 $
     @@ContentType:
       dis:Date.RCS
   
@@ -1335,7 +1335,9 @@ IFClsETDef:
                 } else {
                   $r .= $child->stringify;
                 }
-              } # pc:*
+              } elsif ($child-><AG::Node.nodeType> == <C::Node.ELEMENT_NODE>) {
+                $r .= $child;
+              }
             } # children 
 
             if (length $op) {

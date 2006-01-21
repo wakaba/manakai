@@ -10,7 +10,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2005/12/31 12:21:15 $
+    $Date: 2006/01/21 07:06:09 $
 
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
@@ -26,6 +26,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
   @DOMMain:
     http://suika.fam.cx/~wakaba/archive/2004/dom/main#
+  @dtest:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#Test/
   @dx:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#
   @ecore:
@@ -56,6 +58,8 @@ Namespace:
     http://www.w3.org/2000/01/rdf-schema#
   @t:
     http://suika.fam.cx/~wakaba/archive/2004/dom/tree#
+  @test:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Test#
   @xml:
     http://www.w3.org/XML/1998/namespace
   @xmlns:
@@ -2924,7 +2928,73 @@ _
         $self->{has_error} = true;
       }
     } // default
+
+  @XMLTests:
+    @@XMLTest:
+      @@@DEnt:
+        @@@@test:value:
+          <p></p>
+      @@@test:domTree:
+        document {
+          xml-version: '1.0';
+          element {
+            namespace-uri: null;
+            prefix: null;
+            local-name: 'p';
+            text-content: '';
+          }
+        }
+    @@PerlDef:
+      my $impl = $Message::DOM::ImplementationRegistry->get_implementation ({
+        'Core' => '3.0',
+        'XML' => '3.0',
+        'XMLVersion' => ['1.0', '1.1'],
+      });
+      my $parser = <Class::ManakaiXMLParser>->new ($impl);
+
+      for my $test_data (@$TestData) {
+        $test->start_new_test ($test_data->{uri});
+        my $doc_ent = $test_data->{entity}->{$test_data->{root_uri}};
+        my $doc = $parser->parse_string ($doc_ent->{<H::test:value>});
+        try {
+          $test->assert_dom_tree_equals
+                   (actual_value => $doc,
+                    expected_hash => $test_data->{dom_tree});
+          $test->ok;
+        } catch Message::Util::IF::DTException with { };
+      }
+      
 ##ManakaiXMLParser
+
+ElementTypeBinding:
+  @Name: XMLTests
+  @ElementType: 
+    dis:ResourceDef
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@rdf:type: test|ParserTestSet
+
+ElementTypeBinding:
+  @Name: XMLTest
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@rdf:type: test|ParserTest
+
+ElementTypeBinding:
+  @Name: DEnt
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: test|RootEntity
+
+ElementTypeBinding:
+  @Name: Ent
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: test|Entity
 
 ResourceDef:
   @QName: xp|get-location-from-token

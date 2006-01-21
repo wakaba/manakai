@@ -13,7 +13,7 @@ Module:
   @License: license|Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/01/07 12:30:57 $
+      $Date: 2006/01/21 07:06:10 $
     @@ContentType: dis|Date.RCS
   
   @Require:
@@ -89,6 +89,8 @@ Namespace:
     urn:x-suika-fam-cx:markup:suikawiki:0:10:
   @swcfg21:
     http://suika.fam.cx/~wakaba/archive/2005/swcfg21#
+  @test:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Test#
   @Util:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/
   @xhtml1:
@@ -954,6 +956,243 @@ IFClsDef:
         __EXCEPTION{ASSERTION_ERR}__;
 
   @Method:
+    @@Name: assertDOMTreeEquals
+    @@enDesc:
+      The test fails if the actual DOM subtree does not match
+      to expected tree structure.
+    @@NamedParam:
+      @@@Name: expectedHash
+      @@@Type: DISPerl|HASH||ManakaiDOM|all
+      @@@enDesc:
+        A Perl hash representation of TDT tree.
+    @@NamedParam:
+      @@@Name: actualValue
+      @@@Type: Node
+      @@@enDesc:
+        The root node of the subtree compared with <P::expectedHash>.
+    @@NamedParam:
+      @@@Name: nodePathString
+      @@@Type: DOMString
+      @@@enDesc:
+        A semi human readable string that describes the position
+        of the context where <P::actualValue> appeared.  It might
+        be used to report an error.
+      @@@nullCase:
+        @@@@enDesc: No context information available.
+    @@Return:
+      @@@AErr:
+      @@@PerlDef:
+        if (defined $nodePathString) {
+          $nodePathString .= '/';
+        } else {
+          $nodePathString = '';
+        }
+
+        if (not defined $actualValue) {
+          __DEEP{
+            $self-><M::DTManager.notOK>;
+          }__;
+          __CODE{printComment::
+            $test => $self,
+            $s => {
+              $nodePathString.': '.
+              'nu'.'ll value is occurred where a non-nu'.'ll value is expected'
+            },
+          }__;
+          __EXCEPTION{ASSERTION_ERR}__;
+        } elsif (not ref $actualValue) {
+          __DEEP{
+            $self-><M::DTManager.notOK>;
+          }__;
+          __CODE{printComment::
+            $test => $self,
+            $s => {
+              $nodePathString.': '.
+              'not a blessed reference (|'.$actualValue.'| (|'.
+              (ref $actualValue).'|)) where node is expected'
+            },
+          }__;
+          __EXCEPTION{ASSERTION_ERR}__;
+        }
+
+        if ($actualValue->can ('node_name')) {
+          $nodePathString .= $actualValue->node_name;
+        } else {
+          $nodePathString .= 'object ('.(ref $actualValue).')';
+        }
+        
+        for my $attr (keys %{$expectedHash}) {
+          if ($attr eq 'node_type') {
+            my $ant = $actualValue->node_type;
+            if ($ant != {
+              'document' => <C::Node.DOCUMENT_NODE>,
+              'document-fragment' => <C::Node.DOCUMENT_FRAGMENT_NODE>,
+              'element' => <C::Node.ELEMENT_NODE>,
+              'attribute' => <C::Node.ATTRIBUTE_NODE>,
+ ## TODO: Trun this line enable after namespace node is implemented
+ #             'namespace' => C::Node.NAMESPACE_NODE>,
+              'text' => <C::Node.TEXT_NODE>,
+              'cdata-section' => <C::Node.CDATA_SECTION_NODE>,
+              'comment' => <C::Node.COMMENT_NODE>,
+              'pi' => <C::Node.PROCESSING_INSTRUCTION_NODE>,
+              'document-type' => <C::Node.DOCUMENT_TYPE_NODE>,
+              'entity' => <C::Node.ENTITY_NODE>,
+              'entity-reference' => <C::Node.ENTITY_REFERENCE_NODE>,
+              'notation' => <C::Node.NOTATION_NODE>,
+              'element-type-definition' => <C::Node.ELEMENT_TYPE_DEFINITION_NODE>,
+              'attribute-definition' => <C::Node.ATTRIBUTE_DEFINITION_NODE>,
+            }->{$expectedHash->{$attr}}) {
+              __DEEP{
+                $self-><M::DTManager.notOK>;
+              }__;
+              __CODE{printComment::
+                $test => $self,
+                $s => {
+                  $nodePathString.': Its node type is '.$ant.' ('.
+                  $expectedHash->{$attr}.' is expected'
+                },
+              }__;
+              __EXCEPTION{ASSERTION_ERR}__;
+            }
+          } elsif ($attr eq 'child_nodes') {
+            my $acld = $actualValue->child_nodes;
+            my $xcld = $expectedHash->{$attr};
+            if (@$acld != @$xcld) {
+              __DEEP{
+                $self-><M::DTManager.notOK>;
+              }__;
+              __CODE{printComment::
+                $test => $self,
+                $s => {
+                  $nodePathString.': It has '.@$acld.' child nodes ('.@$xcld.
+                  ' expected'
+                },
+              }__;
+              __EXCEPTION{ASSERTION_ERR}__;
+            }
+            for (0..$#{$expectedHash->{$attr}}) {
+              __DEEP{
+                $self-><M::DTManager.assertDOMTreeEquals>
+                         (actual_value => $acld->[$_],
+                          expected_hash => $xcld->[$_],
+                          node_path_string => $nodePathString);
+              }__;
+            }
+
+ ## TODO: Implement these values
+          } elsif ($attr eq 'attributes') {
+
+          } elsif ($attr eq 'element_types') {
+
+          } elsif ($attr eq 'attribute_definitions') {
+
+          } elsif ($attr eq 'general_entities') {
+
+          } elsif ($attr eq 'notations') {
+
+          } elsif ($attr eq 'namespaces') {
+
+          } else {
+            my $aval;
+            my $amtd = $actualValue->can ($attr);
+            unless ($amtd) {
+              __DEEP{
+                $self-><M::DTManager.notOK>;
+              }__;
+              __CODE{printComment::
+                $test => $self,
+                $s => {
+                  $nodePathString.': Object (type |'.(ref $actualValue).
+                  '|) does not have attribute |'.$attr.'|'
+                },
+              }__;
+              __EXCEPTION{ASSERTION_ERR}__;
+            }
+
+            __DEEP{
+              $aval = $actualValue->$attr;
+            }__;
+
+            my $xval = $expectedHash->{$attr};
+
+            if ($xval->{type} eq 'nu'.'ll') {
+              if (defined $aval) {
+                __DEEP{
+                  $self-><M::DTManager.notOK>;
+                }__;
+                __CODE{printComment::
+                  $test => $self,
+                  $s => {
+                    $nodePathString.'->'.$attr.': Value is not nu'.'ll (|'.
+                    $aval.'| (type |'.(ref $aval).'|'
+                  },
+                }__;
+                __EXCEPTION{ASSERTION_ERR}__;
+              }
+            } else {
+              unless (defined $aval) {
+                __DEEP{
+                  $self-><M::DTManager.notOK>;
+                }__;
+                __CODE{printComment::
+                  $test => $self,
+                  $s => {
+                    $nodePathString.'->'.$attr.': Value is nu'.'ll (a '.
+                    $xval->{type}.' with value |'.$xval->{value}.'| is expected'
+                  },
+                }__;
+                __EXCEPTION{ASSERTION_ERR}__;
+              }
+              if ($xval->{type} eq 'boolean') {
+                if (($aval and not $xval->{value}) or
+                    (not $aval and $xval->{value})) {
+                  __DEEP{
+                    $self-><M::DTManager.notOK>;
+                  }__;
+                  __CODE{printComment::
+                    $test => $self,
+                    $s => {
+                      $nodePathString.'->'.$attr.': Value is not boolean '.
+                      $xval->{value}
+                    },
+                  }__;
+                  __EXCEPTION{ASSERTION_ERR}__;
+                }
+              } elsif ($xval->{type} eq 'number') {
+                unless ($aval == $xval->{value}) {
+                  __DEEP{
+                    $self-><M::DTManager.notOK>;
+                  }__;
+                  __CODE{printComment::
+                    $test => $self,
+                    $s => {
+                      $nodePathString.'->'.$attr.': Value is |'.$aval.'| (|'.
+                      $xval->{value}.'| is expected)'
+                    },
+                  }__;
+                  __EXCEPTION{ASSERTION_ERR}__;
+                }
+              } elsif ($xval->{type} eq 'string') {
+                unless ($aval eq $xval->{value}) {
+                  __DEEP{
+                    $self-><M::DTManager.notOK>;
+                  }__;
+                  __CODE{printComment::
+                    $test => $self,
+                    $s => {
+                      $nodePathString.'->'.$attr.': Value is |'.$aval.'|, type |'.
+                      (ref $aval).'| (|'.
+                      $xval->{value}.'| is expected)'
+                    },
+                  }__;
+                  __EXCEPTION{ASSERTION_ERR}__;
+                }
+              } # $aval->{type}
+            } # $aval->{type} undef
+          }
+        }
+
+  @Method:
     @@Operator:
       @@@@: DESTROY
       @@@ContentType: DISPerl|Perl
@@ -1128,6 +1367,11 @@ ResourceDef:
   @AliasFor: DOMMain|DOMString
   @For: ManakaiDOM|ManakaiDOM
 
+ResourceDef:
+  @QName: Node
+  @AliasFor: Tree|Node
+  @For: ManakaiDOM|ManakaiDOM
+
 PropDef:
   @QName: dtest|failedNumber
   @enDesc:
@@ -1219,6 +1463,16 @@ IFClsDef:
     @@rdfs:subClassOf: idl|unsignedShort||ManakaiDOM|all
 
     @@ResourceDef:
+      @@@rdf:type: DISLang|Const
+      @@@QName: test|PARSE_ERR
+      @@@Value:
+        @@@@@: 81
+        @@@@ContentType: DISCore|Integer
+      @@@enDesc:
+        An attempt was made to load a TDT document and
+        the processing has been stopped.
+
+    @@ResourceDef:
       @@@QName: ASSERTION_ERR
       @@@rdf:type: DISLang|Const
       @@@Value:
@@ -1255,3 +1509,514 @@ ElementTypeBinding:
     @@rdf:type: DISSource|Property
     @@rdf:type: DISSource|ResourceProperty
     @@For: =ManakaiDOM|all
+
+FeatureDef:
+  @QName: DIS|TDT
+  @FeatureVerDef:
+    @@QName: DIS|TDT10
+    @@Version: 1.0
+    @@f:instanceOf: DIS|TDT
+    @@enFN:
+      The <DFN::TDT> format, version 1.0
+
+IFClsDef:
+  @IFQName: TDTParser
+  @ClsQName: ManakaiTDTParser
+
+  @Implement: ecore|MUErrorTarget||ManakaiDOM|Perl
+
+  @DISLang:role: DOMLS|ParserRole
+
+  @f:implements: DIS|TDT10
+  @f:provides:
+    @@@: DIS|TDT10
+    @@f:through: DOMCore|ManakaiDOMImplementation
+
+  @enDesc:
+    A <IF::TDTParser> object parses a TDT source document and
+    returns it as an object.
+
+    A <IF::TDTParser> object can be retrieved by 
+    <M::GenericLS|GLSImplementation.createGLSParer>
+
+  @Attr:
+    @@Name: domConfig
+    @@enDesc:
+      The configuration of the parser.
+
+    @@Get:
+      @@@Type: DOMCore|DOMConfiguration
+      @@@enDesc: The DOM configuration object.
+      @@@PerlDef:
+        __CODE{DOMCore|getConfigObject::
+          $target => $self,
+          $targetHash => $self,
+          $targetType => {<IFName::TDTParser>},
+          $result => $r,
+        }__;
+
+  @Method:
+    @@ManakaiDOM:isForInternal:1
+    @@ForCheck: ManakaiDOM|ForClass
+    @@Operator: DISPerl|NewMethod
+    @@enDesc:
+      Creates a new instance of the object.
+    @@Param:
+      @@@Name: impl
+      @@@Type: DOMLS|GLSImplementation
+      @@@enDesc:
+        The implementation from which the parser is created.
+    @@Param:
+      @@@Name: features
+      @@@Type: DOMString
+      @@@dis:actualType: f|FeaturesString
+      @@@enDesc:
+        The set of features requested for the parser.
+    @@Return:
+      @@@Type: DOMMain|DOMObject
+      @@@enDesc:
+        The newly created parser.
+      @@@PerlDef:
+        $r = bless {
+          <H::DOMCore:implementation> => $impl,
+        }, $self;
+
+  @Method:
+    @@Name: parseString
+    @@enDesc:
+      Parses a string as TDT textual definition and converts it into
+      its object representation.
+    @@Param:
+      @@@Name: sourceText
+      @@@Type: DOMString
+      @@@enDesc:
+        The text to parse.
+    @@Return:
+      @@@Type: DISPerl|HASH
+      @@@enDesc:
+        An object representation of <P::sourceText>.
+      @@@dx:raises:
+        @@@@@: test|PARSE_ERR
+        @@@@enDesc:
+          If the TDT document contains one or more error.
+      @@@PerlDef:
+        $self->{char} = [];
+        $self->{token} = [];
+        $self->{source} = $sourceText;
+        __DEEP{
+          $r = $self->_parse_document;
+        }__;
+
+  @Method:
+    @@Name: shiftChar
+    @@ManakaiDOM:isForInternal:1
+    @@ForCheck: ManakaiDOM|ForClass
+    @@enDesc:
+      Returns the next character.
+    @@Return:
+      @@@Type: idl|long||ManakaiDOM|all
+      @@@enDesc:
+        The code position number of the next character, if any,
+        or <CODE::-2>.
+      @@@PerlDef:
+        if (@{$self->{char}}) {
+          $r = shift @{$self->{char}};
+        } else {
+          my $char = substr ($self->{source}, pos ($self->{source}), 1);
+          pos ($self->{source})++;
+
+          if (length $char) {
+            $r = ord $char;
+          } else {
+            $r = -1;
+          }
+        }
+
+  @Method:
+    @@ManakaiDOM:isForInternal: 1
+    @@Operator: ManakaiDOM|MUErrorHandler
+    @@enDesc:
+      When a <IF::ecore|ErrorInterface||ManakaiDOM|Perl> is <Perl::report>ed,
+      then this method is invoked.
+      
+      The method calls the <cfg::DOMCore|error-handler> if the error is of 
+      <IF::DOMCore|DOMError>.  Otherwise, the error is re-thrown so that
+      corresponding <Perl::catch> clause, if any, can catch the error.
+    @@Param:
+      @@@Name: err
+      @@@Type: ecore|ErrorInterface||ManakaiDOM|Perl
+      @@@enDesc:
+        The reported error object.
+    @@Return:
+      @@@Type: DISPerl|Any
+      @@@enDesc:
+        If the <P::err> is a <IF::DOMCore|DOMError>, then the return value
+        of the error handler.
+
+           {NOTE:: If the error is thrown, the method never returns.
+           }
+      @@@nullCase:
+        @@@@enDesc:
+          No error handler.
+      @@@PerlDef:
+        if ($err->isa (<IFName::DOMCore|DOMError||ManakaiDOM|ManakaiDOM>)) {
+          __DEEP{
+            A: {
+              my $cfg = $self-><AG::TDTParser.domConfig>;
+              my $h = $cfg-><M::DOMCore|DOMConfiguration.getParameter>
+                               ('error-handler');
+              $r = $h-><M::DOMCore|DOMErrorHandler.handleError> ($err);
+            } # A
+          }__;
+        } else {
+          $err-><M::ecore|ErrorInterface||ManakaiDOM|Perl.throw>;
+        }
+
+  @DISPerl:dpgDef:
+    lexmode default : initial : standalone {
+
+      /* Name */
+      $name-start-char := [U+0041..U+005A U+0061..U+007A];
+      $name-char       := [U+0041..U+005A U+0061..U+007A U+0030..U+0039 '-'];
+      NAME : value := $name-start-char $name-char*;
+
+      /* Block */
+      LBRACE := ['{'];
+      RBRACE := ['}'];
+      COLON := [':'];
+
+      /* String */
+      STRING : value := [U+0027] [^U+0027]* [U+0027];
+      $hexdigit := [U+0030..U+0039 U+0041..U+0046 U+0061..U+0066];
+      CHAR : value := ['U'] ['+'] $hexdigit $hexdigit $hexdigit $hexdigit
+                                  $hexdigit? $hexdigit?;
+
+      /* Number */
+      MINUS := ['-'];
+      DNUM : value := [U+0030..U+0039]+;
+      XNUM : value := ['0'] ['x']
+                      [U+0030..U+0039 U+0041..U+0046 U+0061..U+0066 '_']+;
+      BNUM : value := ['0'] ['b'] ['0' '1' '_']+;
+      
+      /* Ignored white space */
+      WSP : ignore := [U+0009..U+000D U+0020]+;
+
+      /* Ignored comment */
+      COMMENT1 : ignore := ['/'] ['/'] [^U+000A..U+000D]* [U+000A..U+000D]*;
+      $comment2 := [^'/' '*'] [^'*']* ['*']+;
+      COMMENT2 : ignore := ['/'] ['*'] [^'*']* ['*']+ $comment2* ['/'];
+
+    } // lexmode default
+
+    rule document : standalone : recursive {
+      /*
+        document := node;
+        node := node-type "{" *(node / attribute) "}"
+        node-type := 'document' / 'document-fragment' /
+                     'element' /
+                     'attribute' / 'namespace' /
+                     'text' / 'cdata-section' /
+                     'comment' /
+                     'pi' /
+                     'document-type' /
+                     'entity' / 'entity-reference' /
+                     'notation' /
+                     'element-type-definition' / 'attribute-definition'
+      */
+
+      my $node : return;
+      lang:Perl {
+        $node = {
+        };
+      }
+
+      ~ (NAME) {
+        lang:Perl ($v => $token.value) {
+          $node->{node_type} = $v;
+        }
+      }
+
+      ~ (LBRACE) { }
+
+      &_node ($node => $node);
+
+      ~ (EOF) { }
+    }
+
+    rule _node ($node) : standalone : recursive {
+      // ~ (NAME) { }
+      // ~ (LBRACE) { }
+
+      ~* (NAME) {
+        my $name;
+        lang:Perl ($v => $token.value) {
+          $name = $v;
+        }
+
+        ~ (COLON) {
+          &_attribute ($node => $node, $name => $name);
+        } (LBRACE) {
+          my $subnode;
+          lang:Perl {
+            $subnode = {
+              node_type => $name,
+            };
+            if ($name eq 'attribute') {
+              push @{$node->{attributes}||=[]}, $subnode;
+            } elsif ($name eq 'element-type-definition') {
+              push @{$node->{element_types}||=[]}, $subnode;
+            } elsif ($name eq 'attribute-definition') {
+              push @{$node->{attribute_definitions}||=[]}, $subnode;
+            } elsif ($name eq 'entity') {
+              push @{$node->{general_entities}||=[]}, $subnode;
+            } elsif ($name eq 'notation') {
+              push @{$node->{notations}||=[]}, $subnode;
+            } elsif ($name eq 'namespace') {
+              push @{$node->{namespaces}||=[]}, $subnode;
+            } else {
+              push @{$node->{child_nodes}||=[]}, $subnode;
+            }
+          }
+          &_node ($node => $subnode);
+        }
+      }
+
+      ~ (RBRACE) { }
+
+    } // _node
+
+    rule _attribute ($node, $name) {
+      /*
+        attribute := attribute-name ":" attribute-value ";"
+        attribute-name := name
+        attribute-value := 'null' / 'true' / 'false' / 1*(string / char) / number
+      */
+ 
+      // ~ (NAME) { }
+      // ~ (COLON) { }
+
+      lang:Perl {
+        $name =~ tr/-/_/;
+      }
+
+      ~ (NAME == 'null') {
+        lang:Perl {
+          $node->{$name} = {type => 'nu'.'ll'};
+        }
+      } (NAME == 'true') {
+        lang:Perl {
+          $node->{$name} = {type => 'boolean', value => 1};
+        }
+      } (NAME == 'false') {
+        lang:Perl {
+          $node->{$name} = {type => 'boolean', value => 0};
+        }
+      } (STRING) {
+        lang:Perl ($v => $token.value) {
+          $node->{$name} = {type => 'string',
+                            value => substr ($v, 1, length ($v) - 2)};
+        }
+
+        ~* (STRING) {
+          lang:Perl ($v => $token.value) {
+            $node->{$name}->{value} .= substr ($v, 1, length ($v) - 2);
+          }
+        } (CHAR) {
+          lang:Perl ($v => $token.value) {
+            $node->{$name}->{value} .= chr hex substr ($v, 2);
+          }
+        }
+      } (CHAR) {
+        lang:Perl ($v => $token.value) {
+          $node->{$name} = {type => 'string',
+                            value => chr hex substr ($v, 2)};
+        }
+
+        ~* (STRING) {
+          lang:Perl ($v => $token.value) {
+            $node->{$name}->{value} .= substr ($v, 1, length ($v) - 2);
+          }
+        } (CHAR) {
+          lang:Perl ($v => $token.value) {
+            $node->{$name}->{value} .= chr hex substr ($v, 2);
+          }
+        }
+      } (DNUM) {
+        lang:Perl ($v => $token.value) {
+          $node->{$name} = {type => 'number', value => 0+$v};
+        }
+      } (XNUM) {
+        lang:Perl ($v => $token.value) {
+          $node->{$name} = {type => 'number', value => hex $v};
+        }
+      } (BNUM) {
+        lang:Perl ($v => $token.value) {
+          $node->{$name} = {type => 'number', value => eval $v};
+        }
+      }
+
+      ~ (SEMICOLON) { }
+    } // _attribute
+##TDTParser
+
+IFClsDef:
+  @IFQName: DTExceptionFormatter
+  @ClsQName: ManakaiDTExceptionFormatter
+
+  @ClsISA: ecore|MUErrorFormatter||ManakaiDOM|Perl
+
+  @RuleDef:
+    @@Name: tdt-error-token-type
+    @@enDesc:
+      The type of the token the parser is encountered.
+
+    @@Method:
+      @@@Name: after
+      @@@Param:
+        @@@@Name: name
+        @@@@Type: DOMString
+        @@@@enDesc: The name of the method.
+      @@@Param:
+        @@@@Name: p
+        @@@@Type: DISPerl|HASH
+        @@@@enDesc: The set of the parameters to the method.
+      @@@Param:
+        @@@@Name: o
+        @@@@Type: DISPerl|HASH
+        @@@@enDesc: The option value.
+      @@@Return:
+        @@@@PerlDef:
+          $p->{-result} = $o->{<H::test|error-token>}->{type}
+            if defined $o->{<H::test|error-token>}->{type};
+
+  @RuleDef:
+    @@Name: tdt-error-token-value
+    @@enDesc:
+      The value of the token the parser is encountered, if any.
+
+    @@Method:
+      @@@Name: after
+      @@@Param:
+        @@@@Name: name
+        @@@@Type: DOMString
+        @@@@enDesc: The name of the method.
+      @@@Param:
+        @@@@Name: p
+        @@@@Type: DISPerl|HASH
+        @@@@enDesc: The set of the parameters to the method.
+      @@@Param:
+        @@@@Name: o
+        @@@@Type: DISPerl|HASH
+        @@@@enDesc: The option value.
+      @@@Return:
+        @@@@PerlDef:
+          $p->{-result} = $o->{<H::test|error-token>}->{value}
+            if defined $o->{<H::test|error-token>}->{value};
+
+  @RuleDef:
+    @@Name: tdt-error-lines
+    @@enDesc:
+      A copy of fragment of the source text that contains the line
+      where the error occurred, if available.
+    
+    @@Method:
+      @@@Name: after
+      @@@Param:
+        @@@@Name: name
+        @@@@Type: DOMString
+        @@@@enDesc: The name of the method.
+      @@@Param:
+        @@@@Name: p
+        @@@@Type: DISPerl|HASH
+        @@@@enDesc: The set of the parameters to the method.
+      @@@Param:
+        @@@@Name: o
+        @@@@Type: DISPerl|HASH
+        @@@@enDesc: The option value.
+      @@@Return:
+        @@@@PerlDef:
+          my $pos = $o-><AG::DOMCore|DOMError.location>
+                      -><AG::DOMCore|DOMLocator.utf32Offset>;
+          if ($pos > -1) {
+            my $src = $o->{<H::test|source-text>};
+            my $start = $pos;
+            $start = rindex ($$src, "\x0A", $start - 1) for 0..2;
+            $start++;
+            my $end = $pos;
+            $end = index ($$src, "\x0A", $end + 1) for 0..2;
+            $end = length $$src if $end < 0;
+            $p->{-result} = substr $$src, $start, $end - $start;
+          }
+##DPGExceptionFormatter
+
+ElementTypeBinding:
+  @Name: RuleDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@rdf:type: Muf2003|RuleDefClass
+
+ElementTypeBinding:
+  @Name: RuleParam
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: Muf2003|RuleParameter
+
+ElementTypeBinding:
+  @Name:enMufDef
+  @ElementType:
+    ecore:defaultMessage
+  @ShadowContent:
+    @@lang:en
+    @@ContentType:
+      lang:muf
+
+PropDef:
+  @QName: test|error-token
+  @enDesc:
+    The token where the parser found an error.
+
+PropDef:
+  @QName: test|source-text
+  @enDesc:
+    A reference to the original source text, if available.
+
+ElementTypeBinding:
+  @Name: CParamApp
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@: DOMCore|DOMConfigurationParameterApplication
+      @@@For: ManakaiDOM|DOM
+    @@rdf:type:
+      @@@@: DISCore|Property
+      @@@For: =ManakaiDOM|all
+    @@For: ManakaiDOM|DOM3
+    @@For: =ManakaiDOM|all
+
+CParamApp:
+  @DOMCore:domConfigurationParameter: DOMCore|error-handler
+  @DOMCore:targetType: TDTParser
+
+ElementTypeBinding:
+  @Name: ErrDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DOMCore|DOMErrorType
+    @@For: ManakaiDOM|DOM3
+    @@ecore:textFormatter: ManakaiDTExceptionFormatter
+
+ErrDef:
+  @QName: test|bad-token-error
+  @enDesc:
+    The parser is encountered to a token whose type is not
+    allowed there.
+  @DOMCore:severity: DOMCore|SEVERITY_FATAL_ERROR
+  @enMufDef:
+    Token |%tdt-error-token-type;|%tdt-error-token-value
+    (prefix => { (|}, suffix => {|)}); is not 
+    allowed %tdt-error-lines (prefix => {(|}, suffix => {|)});
