@@ -15,7 +15,7 @@ Module:
   @License: license|Perl+MPL
 
   @Date:
-    $Date: 2006/01/21 07:06:10 $
+    $Date: 2006/01/21 16:28:13 $
   
   @Require:
     @@Module:
@@ -1494,8 +1494,9 @@ IFClsETDef:
           ## Error handling code
           unless ($default_token_error) {
             $default_token_error = $;.'default-token-error';
-            my $root = $codeDocument-><M::pc|PCDocument.createPCStatement>;
-            for ($root-><M::pc|PerlCodeUnits.appendNewPCFunctionCall>
+            my $root = $codeDocument-><M::pc|PCDocument.createPCBlock>;
+            for ($root-><M::pc|PerlCodeStatements.appendStatement>
+                      -><M::pc|PerlCodeUnits.appendNewPCFunctionCall>
                           (null, 'die')
                       -><M::pc|PerlCodeUnits.appendNewPCExpression> ('->')) {
               $_-><M::pc|PerlCodeUnits.appendNewPCVariable>
@@ -1987,6 +1988,8 @@ IFClsETDef:
               return $next_token_required;
                      ## ISSUE: Is this correct? Or 1?
 
+            } elsif ($xuri eq <Q::pg:qRequiresNextTokenStatement>) {
+              return true;
 
     } elsif ($xuri eq <Q::pg:assignmentStatement>) {
       my $assign = $parent->append_statement->append_new_pc_expression ('=');
@@ -2127,7 +2130,7 @@ IFClsETDef:
   
     unless ($next_token_required) {
       for ($rule_sub->append_statement
-                    ->append_new_pc_function_call (undef, 'push')
+                    ->append_new_pc_function_call (undef, 'unshift')
                     ->append_new_pc_expression (',')) {
         for ($_->append_new_pc_dereference ('@')
                ->append_new_pc_expression ('->')) {
@@ -2830,6 +2833,7 @@ IFClsDef:
       /*
         Statement := MyStatement / AssignmentStatement / MatchStatement /
                      RuleRefStatement / EmbedStatement / QLexmodeStatement /
+                     QRequiresNextTokenStatement /
                      IfTrueStatement / ReturnStatement
       */
     
@@ -3035,6 +3039,22 @@ IFClsDef:
           }
 
           ~ (SEMICOLON) { }
+        
+        } (QKEYWORD == '?requires-next-token') {
+          /*
+            Turns |$next-token-requires| flag on.
+
+            QRequiresNextTokenStatement := '?requires-next-token' SEMICOLON
+          */
+
+          lang:Perl ($mode => $token.value) {
+            my $lm = $doc-><M::Document.createElementNS>
+                         (<Q::pg:>, 'qRequiresNextTokenStatement');
+            $block-><M::Node.appendChild> ($lm);
+          }
+
+          ~ (SEMICOLON) { }
+
         } (VARIABLE) {
           /*
             AssignmentStatement := Lvalue ASSIGN Rvalue;

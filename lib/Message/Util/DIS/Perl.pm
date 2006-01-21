@@ -2982,7 +2982,7 @@ append_code
 dis_get_require_uri_list
 }) {
     my $mod = $self->{db}->
-get_resource
+get_any_resource
  ($uri)
                    ->
 owner_module

@@ -333,7 +333,12 @@ for (@{$Opt{create_module}}) {
           $_->append_new_pc_literal (\@test);
         }
         
-        $block->append_code_fragment ($res->pl_code_fragment);
+        my $plc = $res->pl_code_fragment;
+        unless ($plc) {
+          die "Resource <".$res->uri."> does not have Perl test code";
+        }
+
+        $block->append_code_fragment ($plc);
         
       } # test resource type
     } # test:Test
@@ -417,4 +422,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2006/01/21 07:06:09 $
+1; # $Date: 2006/01/21 16:28:13 $

@@ -10,7 +10,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/01/21 07:06:09 $
+    $Date: 2006/01/21 16:28:13 $
 
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
@@ -18,8 +18,13 @@ Module:
     @@Module:
       @@@QName: MDOM|DOMLS
       @@@WithFor: ManakaiDOM|ManakaiDOMLatest
+    @@Module:
+      @@@QName: MDOM|XDoctype
+      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
 
 Namespace:
+  @d:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/xdt#
   @dis:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
   @DOMCore:
@@ -109,6 +114,11 @@ ResourceDef:
 ResourceDef:
   @QName: Document
   @AliasFor: t|Document
+  @For: ManakaiDOM|DOM
+
+ResourceDef:
+  @QName: DocumentXDoctype
+  @AliasFor: d|DocumentXDoctype
   @For: ManakaiDOM|DOM
 
 ElementTypeBinding:
@@ -241,12 +251,20 @@ ClsDef:
 
         $self->{char} = [];
         $self->{token} = [];
-        $self->{source} = $sourceText;
+        $self->{entity} = [{
+          reptxt => \$sourceText,
+          line => 1,
+          column => 1,
+          pos => 0,
+        }];
+        $self->{entity_char} = [];
+        $self->{entity_token} = [];
         $self->{xml_version} = '1.0';
         $self->{standalone} = false;
+        $self->{general_entity} = {};
+        $self->{param_entity} = {};
+        $self->{has_error} = false;
           ## Well-formedness constraint Entity Declared takes effect?
-        $self->{line} = 1;
-        $self->{column} = 1;
 
         __DEEP{
           $r = $self->_parse_DocumentEntity
@@ -263,70 +281,78 @@ ClsDef:
       @@@Type: idl|long||ManakaiDOM|all
       @@@enDesc:
         The code position number of the next character, if any,
-        or <CODE::-2>.
+        or <CODE::-1>.
       @@@PerlDef:
         if (@{$self->{char}}) {
           $r = shift @{$self->{char}};
         } else {
-          my $char = substr ($self->{source}, pos ($self->{source}), 1);
-          pos ($self->{source})++;
+          GETCHAR: {
+            my $char = substr (${$self->{entity}->[-1]->{reptxt}},
+                               $self->{entity}->[-1]->{pos}, 1);
+            $self->{entity}->[-1]->{pos}++;
 
-          if (length $char) {
-            $r = ord $char;
-            if ($r == 0x000A) {
-              $self->{line}++;
-              $self->{column} = 1;
-            } elsif ($r == 0x000D) {
-              my $next_char = substr ($self->{source},
-                                      pos ($self->{source}), 1);
-              if ($next_char eq "\x0A") {
-                pos ($self->{source})++;
-                $self->{column} = 1;
-              } elsif ($next_char eq "\x85") {
-                if ($self->{xml_version} eq '1.1') {
-                  pos ($self->{source})++; 
-                  $self->{column} = 1;
+            if (length $char) {
+              $r = ord $char;
+              if ($r == 0x000A) {
+                $self->{entity}->[-1]->{line}++;
+                $self->{entity}->[-1]->{column} = 1;
+              } elsif ($r == 0x000D) {
+                my $next_char = substr (${$self->{entity}->[-1]->{reptxt}},
+                                        $self->{entity}->[-1]->{pos}, 1);
+                if ($next_char eq "\x0A") {
+                  $self->{entity}->[-1]->{pos}++;
+                  $self->{entity}->[-1]->{column} = 1;
+                } elsif ($next_char eq "\x85") {
+                  if ($self->{xml_version} eq '1.1') {
+                    $self->{entity}->[-1]->{pos}++; 
+                    $self->{entity}->[-1]->{column} = 1;
+                  } else {
+                    $self->{entity}->[-1]->{column} = 0;
+                  }
                 } else {
-                  $self->{column} = 0;
+                  $self->{entity}->[-1]->{column} = 1;
                 }
+                $r = 0x000A;
+                $self->{entity}->[-1]->{line}++;
+              } elsif (
+                not ((0x0020 <= $r and $r <= 0x007E) or
+                     (0x00A0 <= $r and $r <= 0xD7FF) or
+                     (0xE000 <= $r and $r <= 0xFFFD) or
+                     (0x10000 <= $r and $r <= 0x10FFFF)) and
+                $r != 0x0009 and $r != 0x0085 and
+                not ($self->{xml_version} eq '1.0' and
+                     (0x007F <= $r and $r <= 0x009F))
+              ) {
+                my $location = {
+                  utf32_offset => $self->{entity}->[-1]->{pos},
+                  line_number => $self->{entity}->[-1]->{line},
+                  column_number => $self->{entity}->[-1]->{column},
+                };
+                my $continue = __DOMCore:ERROR{xp|wf-legal-literal-character::
+                  DOMCore|location => {$location},
+                  xp|character-number => {$r},
+                }__;
+                unless ($continue) {
+                  __EXCEPTION{DOMLS|PARSE_ERR}__;
+                }
+                $self->{has_error} = true;
+                $self->{entity}->[-1]->{column}++;
+              } elsif ($r == 0x0085 or $r == 0x2028) {
+                $r = 0x000A if $self->{xml_version} eq '1.1';
+                $self->{entity}->[-1]->{line}++;
+                $self->{entity}->[-1]->{column} = 1;
               } else {
-                $self->{column} = 1;
+                $self->{entity}->[-1]->{column}++;
               }
-              $r = 0x000A;
-              $self->{line}++;
-            } elsif (
-              not ((0x0020 <= $r and $r <= 0x007E) or
-                   (0x00A0 <= $r and $r <= 0xD7FF) or
-                   (0xE000 <= $r and $r <= 0xFFFD) or
-                   (0x10000 <= $r and $r <= 0x10FFFF)) and
-              $r != 0x0009 and $r != 0x0085 and
-              not ($self->{xml_version} eq '1.0' and
-                   (0x007F <= $r and $r <= 0x009F))
-            ) {
-              my $location = {
-                utf32_offset => pos ($self->{source}),
-                line_number => $self->{line},
-                column_number => $self->{column},
-              };
-              my $continue = __DOMCore:ERROR{xp|wf-legal-literal-character::
-                DOMCore|location => {$location},
-                xp|character-number => {$r},
-              }__;
-              unless ($continue) {
-                __EXCEPTION{DOMLS|PARSE_ERR}__;
-              }
-              $self->{has_error} = true;
-              $self->{column}++;
-            } elsif ($r == 0x0085 or $r == 0x2028) {
-              $r = 0x000A if $self->{xml_version} eq '1.1';
-              $self->{line}++;
-              $self->{column} = 1;
+#            } elsif (@{$self->{entity}} > 1) {
+#              pop @{$self->{entity}};
+#              redo GETCHAR;
+#              ## ISSUE: How cope with delimiter scanning & 
+#              ##        self-containedness constraints??
             } else {
-              $self->{column}++;
+              $r = -1;
             }
-          } else {
-            $r = -1;
-          }
+          } # GETCHAR
         }
 
   @Method:
@@ -814,25 +840,66 @@ _
       
       lang:Perl {
         $parent-><M::Node.appendChild> ($pi);
-        ## TODO: PIs in document type declaration subsets
       }
       
       // ~ (PIC) { }
     } // _ProcessingInstruction_
 
-    rule _ProcessingInstructionDTD ($doc) {
+    /*
+      Processing instruction in DTD
+    */
+    rule _ProcessingInstructionDTD ($doc, $doctype) {
       ?lexmode 'PIName';
+
+      my $pi;
       
       ~ (Name) {
-      
+        lang:Perl ($name => $token.value) : has-error {
+          if (lc $name eq 'xml') {
+            my $location;
+            __CODE{xp|get-location-from-token::
+              $token => {$token},
+              $result => {$location},
+            }__;
+            my $continue = __DOMCore:ERROR{xp|wf-pi-target-is-xml::
+              xp|name => {$name},
+              DOMCore|location => {$location},
+              xp|parent => {$doctype},
+            }__;
+            unless ($continue) {
+              __EXCEPTION{DOMLS|PARSE_ERR::
+              }__;
+            }
+            $self->{has_error} = true;
+          }
+          ## TODO: Namespace well-formedness
+          $pi = $doc-><M::Document.createProcessingInstruction>
+                        ($name);
+        }      
       }
       
       ~ (S) {
         ?lexmode 'PIData';
         
+        my $tdata;
+        
         ~? (DATA) {
-
+          lang:Perl ($data => $token.value) {
+            $tdata = $data;
+          }
+        } else {
+          lang:Perl {
+            $tdata = '';
+          }
         }
+        
+        lang:Perl {
+          $pi-><AS::Node.nodeValue> ($tdata);
+        }
+      }
+      
+      lang:Perl {
+        $doctype-><M::Node.appendChild> ($pi);
       }
       
       ~ (PIC) {
@@ -850,14 +917,14 @@ _
         content := (CharData / element / Reference / CDSect /
                     PI / Comment)     ;; [43]
     */
-    rule Element_ ($doc, $parent) : standalone {
+    rule Element_ ($doc, $parent, $ns) : standalone {
       ?lexmode 'ElementContent';
       
       my $node;  // Current "parent" node
       my $nodes; // Node stack (w/o $current_node)
       my $type;  // Current "parent" element type QName
       my $types; // Element type stack (w/o $current_type)
-      my $ns;    // Current in-scope namespace bindings
+    //my $ns;    // Current in-scope namespace bindings
       my $nses;  // Namespace binding stack (w/o $current_ns)
       
       lang:Perl {
@@ -865,7 +932,7 @@ _
         $nodes = [];
         $type = '';
         $types = [];
-        $ns = {
+        $ns ||= {
           xml => <Q::xml:>,
           xmlns => <Q::xmlns:>,
         };
@@ -1002,12 +1069,23 @@ _
               $node = $el;
             }
             ?lexmode ElementContent;
-          } (MTAGC) {
+          } (NESTC) {
+            my $is_docel;
             lang:Perl {
               $ns = pop @{$nses};
               $type = pop @{$types};
+              $is_docel = (@{$types} == 0);
             }
-            ?lexmode ElementContent;
+
+            if-true ($is_docel) {
+              return;
+            }
+
+            ~ (TAGC) {
+              ?lexmode ElementContent;
+            } else {
+              ?lexmode ElementContent;
+            }
           } else {
             ?lexmode ElementContent;
           }
@@ -1105,14 +1183,8 @@ _
           ?lexmode ElementContent;
         }
       } (ERO) {
-        &_GeneralEntityReference_
-          ($doc => $doc, $parent => $node);
-
-        ~ (REFC) {
-          ?lexmode 'ElementContent';
-        } else {
-          ?lexmode ElementContent;
-        }
+        &_GeneralEntityReferenceEC
+          ($doc => $doc, $parent => $node, $ns => $ns);
       } (CDO) {
         &_CommentDeclaration_ ($doc => $doc, $parent => $node);
 
@@ -1492,22 +1564,109 @@ _
       // ~ (REFC) { }
     } // _HexadecimalCharacterReferenceV_
     
-    rule _GeneralEntityReference_ ($doc, $parent) {
-      // TODO: Expansion
+    /*
+      General entity reference in element's content
+    */
+    rule _GeneralEntityReferenceEC ($doc, $parent, $ns)
+      : recursive
+    {
       ?lexmode 'EntityReference';
       
       ~ (Name) {
+        my $er;
         lang:Perl ($name => $token.value) {
           ## TODO: Namespace well-formedness
           ## TODO: Entity declared constraints
-          my $er = $doc-><M::Document.createEntityReference>
+          $er = $doc-><M::Document.createEntityReference>
                            ($name);
           $parent-><M::Node.appendChild> ($er);
+          push @{$self->{entity}}, <Code::getCopyOfEntityState::
+                                            $entity_type = 'general_entity',
+                                            $entity_name = $name>;
+          push @{$self->{entity_token}}, $self->{token};
+          $self->{token} = [];
+          push @{$self->{entity_char}}, $self->{char};
+          $self->{char} = [];
         }
+
+        ?lexmode ElementContent;
+        ~* (CharData) {
+          lang:Perl ($data => $token.value) {
+            $er-><M::Node.appendChild>
+              ($doc-><M::Document.createTextNode> ($data));
+          }
+        } (STAGO) {
+          &Element_ ($doc => $doc, $parent => $er, $ns => $ns)
+            : unshift-current-token;
+          ~ (TAGC) {
+            ?lexmode ElementContent;
+          } else {
+            ?lexmode ElementContent;
+          }
+        } (HCRO) {
+          &_HexadecimalCharacterReference_
+            ($doc => $doc, $parent => $er);
+
+          ~ (REFC) {
+            ?lexmode 'ElementContent';
+          } else {
+            ?lexmode ElementContent;
+          }
+        } (CRO) {
+          &_NumericCharacterReference_
+            ($doc => $doc, $parent => $er);
+
+          ~ (REFC) {
+            ?lexmode 'ElementContent';
+          } else {
+            ?lexmode ElementContent;
+          }
+        } (ERO) {
+          &_GeneralEntityReferenceEC
+            ($doc => $doc, $parent => $er, $ns => $ns);
+        } (CDO) {
+          &_CommentDeclaration_ ($doc => $doc, $parent => $er);
+
+          ~ (MDC) {
+            ?lexmode ElementContent;
+          } else {
+            ?lexmode ElementContent;
+          }
+        } (CDSO) {
+          &_CDATASection_ ($doc => $doc, $parent => $er);
+
+          ~ (MSE) {
+            ?lexmode 'ElementContent';
+          } else {
+            ?lexmode ElementContent;
+          }
+        } (PIO) {
+          &_ProcessingInstruction_ ($doc => $doc, $parent => $er);
+
+          ~ (PIC) {
+            ?lexmode 'ElementContent';
+          } else {
+            ?lexmode ElementContent;
+          }
+        }
+
+        ~ (#EOF) { }
+        lang:Perl {
+          $self->{token} = pop @{$self->{entity_token}};
+          $self->{char} = pop @{$self->{entity_char}};
+          pop @{$self->{entity}};
+        }
+
+        ?lexmode EntityReference;
+        ?requires-next-token;
       }
       
-      // ~ (REFC) { }
-    } // _GeneralEntityReference_
+      ~ (REFC) {
+        ?lexmode ElementContent;
+      } else {
+        ?lexmode ElementContent;
+      }
+    } // _GeneralEntityReferenceEC
     
     rule _GeneralEntityReferenceV_ ($doc, $vals) {
       // TODO: Expansion
@@ -1525,6 +1684,23 @@ _
       
       // ~ (REFC) { }
     } // _GeneralEntityReferenceV_
+    
+    /*
+      General entity reference in literal entity value
+    */
+    rule _GeneralEntityReferenceEV_ ($doc, $vals) {
+      ?lexmode 'EntityReference';
+      
+      ~ (Name) {
+        lang:Perl ($name => $token.value) {
+          ## TODO: Namespace well-formedness
+          ## TODO: Entity declared constraints
+          push @$vals, $name;
+        }
+      }
+      
+      // ~ (REFC) { }
+    } // _GeneralEntityReferenceEV_
 
     /*
       Document Type Declaration
@@ -1536,9 +1712,17 @@ _
       
       ~ (S) { }
       
+      my $node;
       // Document type name
+      my $name;
       ~ (Name) {
-      
+        lang:Perl ($v => $token.value) {
+          $name = $v;
+        }
+      }
+      lang:Perl {
+        $node = $doc-><M::DocumentXDoctype.createDocumentTypeDefinition> ($name);
+        $doc-><M::Node.appendChild> ($node);
       }
 
       ~? (S) {
@@ -1562,7 +1746,7 @@ _
       }
       
       ~? (DSO) {
-        &InternalSubset ($doc => $doc);
+        &InternalSubset ($doc => $doc, $doctype => $node);
 
         ~ (DSC) {
           ?lexmode MarkupDeclaration;
@@ -1638,7 +1822,7 @@ _
       
         intSubset := *(markupdecl / DeclSep)  ;; [28b]
     */
-    rule InternalSubset ($doc) {
+    rule InternalSubset ($doc, $doctype) {
       ?lexmode DTD;
 
       ~* (MDO) {
@@ -1658,7 +1842,7 @@ _
       } (CDO) {
         &_CommentDeclarationDTD ($doc => $doc);
       } (PIO) {
-        &_ProcessingInstructionDTD ($doc => $doc);
+        &_ProcessingInstructionDTD ($doc => $doc, $doctype => $doctype);
       } (PERO) {
         ?lexmode EntityReference;
 
@@ -1969,32 +2153,40 @@ _
 
       ~ (S) { }
 
+      my $decl;
+      lang:Perl { $decl = {}; }
+
       ~? (PERO) {
         ~ (S) { }
+        lang:Perl {
+          $decl->{is_param_entity} = true;
+        }
       }
 
       ~ (Name) {
-
+        lang:Perl ($v => $token.value) {
+          $decl->{name} = $v;
+        }
       } 
 
       ~ (S) { }
 
       ~ (LIT) {
-        &_EntityValue ($doc => $doc);
+        &_EntityValue ($doc => $doc, $decl => $decl);
       } (LITA) {
-        &_EntityValueA ($doc => $doc);
+        &_EntityValueA ($doc => $doc, $decl => $decl);
       } (Name == 'PUBLIC') {
         ~ (S) { }
 
-        &PubidLiteral ($doc => $doc);
+        &PubidLiteral ($doc => $doc, $decl => $decl);
 
         ~ (S) { }
 
-        &SystemLiteral ($doc => $doc);
+        &SystemLiteral ($doc => $doc, $decl => $decl);
       } (Name == 'SYSTEM') {
         ~ (S) { }
 
-        &SystemLiteral ($doc => $doc);
+        &SystemLiteral ($doc => $doc, $decl => $decl);
       }
 
       ~? (S) {
@@ -2004,10 +2196,22 @@ _
           ~ (S) { }
   
           ~ (Name) {
-  
+            lang:Perl ($v => $token.value) {
+              $decl->{notation} = $v;
+            }
           }
 
           ~? (S) { }
+        }
+      }
+
+      lang:Perl {
+        if ($self->{$decl->{is_param_entity} ? 'param_entity' : 'general_entity'}
+                 ->{$decl->{name}}) {
+          ## TODO: error
+        } else {
+          $self->{$decl->{is_param_entity} ? 'param_entity' : 'general_entity'}
+               ->{$decl->{name}} = $decl;
         }
       }
 
@@ -2063,18 +2267,24 @@ _
       }
     } // _NotationDeclaration
  
-    rule _EntityValue ($doc) {
+    rule _EntityValue ($doc, $decl) {
       ?lexmode EntityValue;
 
       my $vals;
+      my $reptxt;
       lang:Perl {
         $vals = [];
+        $reptxt = '';
       }
 
       ~* (STRING) {
-
+        lang:Perl ($v => $token.value) {
+          $reptxt .= $v;
+        }
       } (PERO) {
         ?lexmode EntityDeclaration;
+     
+        // TODO: Expand or wferror if internal subset
 
         ~ (Name) {
 
@@ -2089,6 +2299,11 @@ _
         &_HexadecimalCharacterReferenceV_
           ($doc => $doc, $vals => $vals);
 
+        lang:Perl {
+          $reptxt .= $vals->[0]-><AG::Node.textContent>;
+          $vals = [];
+        }
+
         ~ (REFC) {
           ?lexmode EntityValue;
         } else {
@@ -2097,6 +2312,11 @@ _
       } (CRO) {
         &_NumericCharacterReferenceV_
           ($doc => $doc, $vals => $vals);
+ 
+        lang:Perl {
+          $reptxt .= $vals->[0]-><AG::Node.textContent>;
+          $vals = [];
+        }
 
         ~ (REFC) {
           ?lexmode EntityValue;
@@ -2104,8 +2324,13 @@ _
           ?lexmode EntityValue;
         }
       } (ERO) {
-        &_GeneralEntityReferenceV_
+        &_GeneralEntityReferenceEV_
           ($doc => $doc, $vals => $vals);
+
+        lang:Perl {
+          $reptxt .= '&' . $vals->[0] . ';';
+          $vals = [];
+        }
 
         ~ (REFC) {
           ?lexmode EntityValue;
@@ -2121,21 +2346,30 @@ _
       } else {
         ?lexmode MarkupDeclaration;
       }
+
+      lang:Perl {
+        $decl->{reptxt} = \$reptxt;
+      }
     } // _EntityValue
 
-    rule _EntityValueA ($doc) {
+    rule _EntityValueA ($doc, $decl) {
       ?lexmode EntityValueA;
 
       my $vals;
+      my $reptxt;
       lang:Perl {
         $vals = [];
+        $reptxt = '';
       }
 
       ~* (STRING) {
-
+        lang:Perl ($v => $token.value) {
+          $reptxt .= $v;
+        }
       } (PERO) {
         ?lexmode EntityDeclaration;
 
+        // TODO: implement this
         ~ (Name) {
 
         }
@@ -2149,6 +2383,12 @@ _
         &_HexadecimalCharacterReferenceV_
           ($doc => $doc, $vals => $vals);
 
+        lang:Perl {
+          $reptxt .= $vals->[0]-><AG::Node.textContent>;
+          $vals = [];
+        }
+
+
         ~ (REFC) {
           ?lexmode EntityValueA;
         } else {
@@ -2158,14 +2398,24 @@ _
         &_NumericCharacterReferenceV_
           ($doc => $doc, $vals => $vals);
 
+        lang:Perl {
+          $reptxt .= $vals->[0]-><AG::Node.textContent>;
+          $vals = [];
+        }
+
         ~ (REFC) {
           ?lexmode EntityValueA;
         } else {
           ?lexmode EntityValueA;
         }
       } (ERO) {
-        &_GeneralEntityReferenceV_
+        &_GeneralEntityReferenceEV_
           ($doc => $doc, $vals => $vals);
+
+        lang:Perl {
+          $reptxt .= '&' . $vals->[0] . ';';
+          $vals = [];
+        }
 
         ~ (REFC) {
           ?lexmode EntityValueA;
@@ -2178,6 +2428,10 @@ _
         ?lexmode MarkupDeclaration;
       } else {
         ?lexmode MarkupDeclaration;
+      }
+
+      lang:Perl {
+        $decl->{reptxt} = \$reptxt;
       }
     } // _EntityValueA
 
@@ -2687,9 +2941,9 @@ _
       TAGC := ['>'];
       
       /*
-        Empty element tag close
+        Null end-tag enabled start-tag close
       */
-      MTAGC := ['/'] ['>'];
+      NESTC := ['/'];
     } // StartTag
     
     lexmode EndTag
@@ -2931,12 +3185,15 @@ _
 
   @XMLTests:
     @@XMLTest:
+      @@@QName: xp.only.docel.test
       @@@DEnt:
         @@@@test:value:
           <p></p>
       @@@test:domTree:
         document {
           xml-version: '1.0';
+          xml-encoding: null;
+          xml-standalone: false;
           element {
             namespace-uri: null;
             prefix: null;
@@ -2944,6 +3201,296 @@ _
             text-content: '';
           }
         }
+    @@XMLTest:
+      @@@QName: xp.only.docel.emptyelemtag.test
+      @@@DEnt:
+        @@@@test:value:
+          <p/>
+      @@@test:domTree:
+        document {
+          xml-version: '1.0';
+          xml-encoding: null;
+          xml-standalone: false;
+          element {
+            namespace-uri: null;
+            prefix: null;
+            local-name: 'p';
+            text-content: '';
+          }
+        }
+    
+    @@XMLTest:
+      @@@QName: xp.doctype.empty.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a>
+          <a></a>
+      @@@test:domTree:
+        document {
+          xml-version: '1.0';
+          xml-encoding: null;
+          xml-standalone: false;
+          document-type {
+            node-name: 'a';
+          }
+          element {
+            namespace-uri: null;
+            prefix: null;
+            local-name: 'a';
+            text-content: '';
+          }
+        }
+
+    @@XMLTest:
+      @@@QName: xp.doctype.intsubset.empty.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+
+          ]>
+          <a></a>
+      @@@test:domTree:
+        document {
+          xml-version: '1.0';
+          xml-encoding: null;
+          xml-standalone: false;
+          document-type {
+            node-name: 'a';
+          }
+          element {
+            namespace-uri: null;
+            prefix: null;
+            local-name: 'a';
+            text-content: '';
+          }
+        }
+
+    @@XMLTest:
+      @@@QName: xp.doctype.intsubset.pi.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+            <?pi  data ?>
+          ]>
+          <a></a>
+      @@@test:domTree:
+        document {
+          xml-version: '1.0';
+          xml-encoding: null;
+          xml-standalone: false;
+          document-type {
+            node-name: 'a';
+            pi {
+              target: 'pi';
+              data: 'data ';
+            }
+          }
+          element {
+            namespace-uri: null;
+            prefix: null;
+            local-name: 'a';
+            text-content: '';
+          }
+        }
+      @@@enImplNote:
+        A DOM PI node in doctype node is a manakai extension.
+
+
+    @@XMLTest:
+      @@@QName: xp.doctype.intsubset.entity.general.internal.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+            <!ENTITY entity "entity value">
+          ]>
+          <a></a>
+      @@@test:domTree:
+        document {
+          xml-version: '1.0';
+          xml-encoding: null;
+          xml-standalone: false;
+          document-type {
+            node-name: 'a';
+          }
+          element {
+            namespace-uri: null;
+            prefix: null;
+            local-name: 'a';
+            text-content: '';
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.doctype.intsubset.entity.parameter.internal.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+            <!ENTITY % entity "entity value">
+          ]>
+          <a></a>
+      @@@test:domTree:
+        document {
+          xml-version: '1.0';
+          xml-encoding: null;
+          xml-standalone: false;
+          document-type {
+            node-name: 'a';
+          }
+          element {
+            namespace-uri: null;
+            prefix: null;
+            local-name: 'a';
+            text-content: '';
+          }
+        }
+
+    @@XMLTest:
+      @@@QName: xp.doctype.internal.entity.root.element.text.only.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+            <!ENTITY entity "entity value">
+          ]>
+          <a>&entity;</a>
+      @@@test:domTree:
+        document {
+          xml-version: '1.0';
+          xml-encoding: null;
+          xml-standalone: false;
+          document-type {
+            node-name: 'a';
+          }
+          element {
+            namespace-uri: null;
+            prefix: null;
+            local-name: 'a';
+            general-entity-reference {
+              node-name: 'entity';
+              text {
+                data: 'entity value';
+              }
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.doctype.internal.entity.root.element.text.mult.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+            <!ENTITY entity "entity value">
+          ]>
+          <a>&entity; and &entity;</a>
+      @@@test:domTree:
+        document {
+          xml-version: '1.0';
+          xml-encoding: null;
+          xml-standalone: false;
+          document-type {
+            node-name: 'a';
+          }
+          element {
+            namespace-uri: null;
+            prefix: null;
+            local-name: 'a';
+            general-entity-reference {
+              node-name: 'entity';
+              text {
+                data: 'entity value';
+              }
+            }
+            text { data: ' and '; }
+            general-entity-reference {
+              node-name: 'entity';
+              text {
+                data: 'entity value';
+              }
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.doctype.internal.entity.root.element.text.element.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+            <!ENTITY entity "entity <p>value</p> with <e>element</e> ">
+          ]>
+          <a>&entity;</a>
+      @@@test:domTree:
+        document {
+          xml-version: '1.0';
+          xml-encoding: null;
+          xml-standalone: false;
+          document-type {
+            node-name: 'a';
+          }
+          element {
+            namespace-uri: null;
+            prefix: null;
+            local-name: 'a';
+            general-entity-reference {
+              node-name: 'entity';
+              text {
+                data: 'entity ';
+              }
+              element {
+                namespace-uri: null;
+                prefix: null;
+                local-name: 'p';
+                text {
+                  data: 'value';
+                }
+              }
+              text {
+                data: ' with ';
+              }
+              element {
+                namespace-uri: null;
+                prefix: null;
+                local-name: 'e';
+                text {
+                  data: 'element';
+                }
+              }
+              text {
+                data: ' ';
+              }
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.doctype.internal.entity.root.element.text.in.ent.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+            <!ENTITY entity1 "entity value">
+            <!ENTITY entity2 "e&entity1;n">
+          ]>
+          <a>&entity2;</a>
+      @@@test:domTree:
+        document {
+          xml-version: '1.0';
+          xml-encoding: null;
+          xml-standalone: false;
+          document-type {
+            node-name: 'a';
+          }
+          element {
+            namespace-uri: null;
+            prefix: null;
+            local-name: 'a';
+            general-entity-reference {
+              node-name: 'entity2';
+              text { data: 'e'; }
+              general-entity-reference {
+                node-name: 'entity1';
+                text {
+                  data: 'entity value';
+                }
+              }
+              text { data: 'n'; }
+            }
+          }
+        }
+
     @@PerlDef:
       my $impl = $Message::DOM::ImplementationRegistry->get_implementation ({
         'Core' => '3.0',
@@ -2963,7 +3510,14 @@ _
           $test->ok;
         } catch Message::Util::IF::DTException with { };
       }
-      
+
+  @ResourceDef:
+    @@QName: getCopyOfEntityState
+    @@rdf:type: DISPerl|InlineCode
+    @@ForCheck: ManakaiDOM|ForClass
+    @@PerlDef:
+      {%{$self->{$entity_type}->{$entity_name}},
+       line => 1, column => 1, pos => 0}
 ##ManakaiXMLParser
 
 ElementTypeBinding:
@@ -3003,7 +3557,7 @@ ResourceDef:
     Creates a <IF::DOMCore:DOMLocator> object from a token.
   @PerlDef:
     $result = {
-      utf32_offset => pos ($self->{source}),
+      utf32_offset => $self->{entity}->[-1]->{pos},
     };
   @For: ManakaiDOM|ManakaiDOM3
 
@@ -3423,7 +3977,7 @@ ClsDef:
           my $pos = $o-><AG::DOMCore|DOMError.location>
                       -><AG::DOMCore|DOMLocator.utf32Offset>;
           if ($pos > -1) {
-            my $src = \($o->{<H::ecore|object>}->{source});
+            my $src = $o->{<H::ecore|object>}->{entity}->[-1]->{reptxt};
             my $start = $pos;
             $start = rindex ($$src, "\x0A", $start - 1) for 0..2;
             $start++;

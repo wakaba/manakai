@@ -13,7 +13,7 @@ Module:
   @License: license|Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/01/21 07:06:10 $
+      $Date: 2006/01/21 16:28:14 $
     @@ContentType: dis|Date.RCS
   
   @Require:
@@ -1016,7 +1016,19 @@ IFClsDef:
         }
 
         if ($actualValue->can ('node_name')) {
-          $nodePathString .= $actualValue->node_name;
+          my $nt = $actualValue->can ('node_type') ? $actualValue->node_type : 0;
+          if ($nt == <C::Node.ELEMENT_NODE>) {
+            $nodePathString .= $actualValue->node_name;
+          } elsif ($nt == <C::Node.ATTRIBUTE_NODE>) {
+            $nodePathString .= '@' . $actualValue->node_name;
+          } else {
+            $nodePathString .= ({
+              <C::Node.DOCUMENT_TYPE_NODE> => 'doctype',
+              <C::Node.PROCESSING_INSTRUCTION_NODE> => 'pi',
+              <C::Node.ELEMENT_TYPE_DEFINITION_NODE> => 'element-type-def',
+              <C::Node.ATTRIBUTE_DEFINITION_NODE> => 'attr-def',
+            }->{$nt} or $nt) . ' (' . $actualValue->node_name . ')';
+          }
         } else {
           $nodePathString .= 'object ('.(ref $actualValue).')';
         }
@@ -1036,8 +1048,8 @@ IFClsDef:
               'comment' => <C::Node.COMMENT_NODE>,
               'pi' => <C::Node.PROCESSING_INSTRUCTION_NODE>,
               'document-type' => <C::Node.DOCUMENT_TYPE_NODE>,
-              'entity' => <C::Node.ENTITY_NODE>,
-              'entity-reference' => <C::Node.ENTITY_REFERENCE_NODE>,
+              'general-entity' => <C::Node.ENTITY_NODE>,
+              'general-entity-reference' => <C::Node.ENTITY_REFERENCE_NODE>,
               'notation' => <C::Node.NOTATION_NODE>,
               'element-type-definition' => <C::Node.ELEMENT_TYPE_DEFINITION_NODE>,
               'attribute-definition' => <C::Node.ATTRIBUTE_DEFINITION_NODE>,
@@ -1065,7 +1077,7 @@ IFClsDef:
                 $test => $self,
                 $s => {
                   $nodePathString.': It has '.@$acld.' child nodes ('.@$xcld.
-                  ' expected'
+                  ' expected)'
                 },
               }__;
               __EXCEPTION{ASSERTION_ERR}__;
@@ -1124,7 +1136,22 @@ IFClsDef:
                   $test => $self,
                   $s => {
                     $nodePathString.'->'.$attr.': Value is not nu'.'ll (|'.
-                    $aval.'| (type |'.(ref $aval).'|'
+                    $aval.'| (type |'.(ref $aval).'|)'
+                  },
+                }__;
+                __EXCEPTION{ASSERTION_ERR}__;
+              }
+            } elsif ($xval->{type} eq 'boolean') {
+              if (($aval and not $xval->{value}) or
+                  (not $aval and $xval->{value})) {
+                __DEEP{
+                  $self-><M::DTManager.notOK>;
+                }__;
+                __CODE{printComment::
+                  $test => $self,
+                  $s => {
+                    $nodePathString.'->'.$attr.': Value is not boolean '.
+                    $xval->{value}
                   },
                 }__;
                 __EXCEPTION{ASSERTION_ERR}__;
@@ -1138,27 +1165,12 @@ IFClsDef:
                   $test => $self,
                   $s => {
                     $nodePathString.'->'.$attr.': Value is nu'.'ll (a '.
-                    $xval->{type}.' with value |'.$xval->{value}.'| is expected'
+                    $xval->{type}.' with value |'.$xval->{value}.'| is expected)'
                   },
                 }__;
                 __EXCEPTION{ASSERTION_ERR}__;
               }
-              if ($xval->{type} eq 'boolean') {
-                if (($aval and not $xval->{value}) or
-                    (not $aval and $xval->{value})) {
-                  __DEEP{
-                    $self-><M::DTManager.notOK>;
-                  }__;
-                  __CODE{printComment::
-                    $test => $self,
-                    $s => {
-                      $nodePathString.'->'.$attr.': Value is not boolean '.
-                      $xval->{value}
-                    },
-                  }__;
-                  __EXCEPTION{ASSERTION_ERR}__;
-                }
-              } elsif ($xval->{type} eq 'number') {
+              if ($xval->{type} eq 'number') {
                 unless ($aval == $xval->{value}) {
                   __DEEP{
                     $self-><M::DTManager.notOK>;
@@ -1464,7 +1476,7 @@ IFClsDef:
 
     @@ResourceDef:
       @@@rdf:type: DISLang|Const
-      @@@QName: test|PARSE_ERR
+      @@@QName: dtest|PARSE_ERR
       @@@Value:
         @@@@@: 81
         @@@@ContentType: DISCore|Integer
@@ -1596,7 +1608,7 @@ IFClsDef:
       @@@enDesc:
         An object representation of <P::sourceText>.
       @@@dx:raises:
-        @@@@@: test|PARSE_ERR
+        @@@@@: dtest|PARSE_ERR
         @@@@enDesc:
           If the TDT document contains one or more error.
       @@@PerlDef:
@@ -1683,7 +1695,10 @@ IFClsDef:
       /* Block */
       LBRACE := ['{'];
       RBRACE := ['}'];
+
+      /* Declaration */
       COLON := [':'];
+      SEMICOLON := [';'];
 
       /* String */
       STRING : value := [U+0027] [^U+0027]* [U+0027];
@@ -1719,7 +1734,7 @@ IFClsDef:
                      'comment' /
                      'pi' /
                      'document-type' /
-                     'entity' / 'entity-reference' /
+                     'general-entity' / 'general-entity-reference' /
                      'notation' /
                      'element-type-definition' / 'attribute-definition'
       */
@@ -1740,7 +1755,7 @@ IFClsDef:
 
       &_node ($node => $node);
 
-      ~ (EOF) { }
+      ~ (#EOF) { }
     }
 
     rule _node ($node) : standalone : recursive {
@@ -1767,7 +1782,7 @@ IFClsDef:
               push @{$node->{element_types}||=[]}, $subnode;
             } elsif ($name eq 'attribute-definition') {
               push @{$node->{attribute_definitions}||=[]}, $subnode;
-            } elsif ($name eq 'entity') {
+            } elsif ($name eq 'general-entity') {
               push @{$node->{general_entities}||=[]}, $subnode;
             } elsif ($name eq 'notation') {
               push @{$node->{notations}||=[]}, $subnode;
@@ -1857,6 +1872,24 @@ IFClsDef:
 
       ~ (SEMICOLON) { }
     } // _attribute
+
+    token-error default : default {
+      lang:Perl {
+        my $location = {
+          utf32_offset => pos ($self->{source}),
+        };
+        my $continue = __DOMCore:ERROR{dtest|bad-token-error::
+          dtest|error-token => {$token},
+          DOMCore|location => {$location},
+          dtest|source-text => {\($self->{source})},
+        }__;
+        unless ($continue) {
+          __EXCEPTION{dtest|PARSE_ERR::
+          }__;
+        }
+        $self->{has_error} = true;
+      }
+    } // token-error default
 ##TDTParser
 
 IFClsDef:
@@ -1886,8 +1919,8 @@ IFClsDef:
         @@@@enDesc: The option value.
       @@@Return:
         @@@@PerlDef:
-          $p->{-result} = $o->{<H::test|error-token>}->{type}
-            if defined $o->{<H::test|error-token>}->{type};
+          $p->{-result} = $o->{<H::dtest|error-token>}->{type}
+            if defined $o->{<H::dtest|error-token>}->{type};
 
   @RuleDef:
     @@Name: tdt-error-token-value
@@ -1910,8 +1943,8 @@ IFClsDef:
         @@@@enDesc: The option value.
       @@@Return:
         @@@@PerlDef:
-          $p->{-result} = $o->{<H::test|error-token>}->{value}
-            if defined $o->{<H::test|error-token>}->{value};
+          $p->{-result} = $o->{<H::dtest|error-token>}->{value}
+            if defined $o->{<H::dtest|error-token>}->{value};
 
   @RuleDef:
     @@Name: tdt-error-lines
@@ -1938,7 +1971,7 @@ IFClsDef:
           my $pos = $o-><AG::DOMCore|DOMError.location>
                       -><AG::DOMCore|DOMLocator.utf32Offset>;
           if ($pos > -1) {
-            my $src = $o->{<H::test|source-text>};
+            my $src = $o->{<H::dtest|source-text>};
             my $start = $pos;
             $start = rindex ($$src, "\x0A", $start - 1) for 0..2;
             $start++;
@@ -1974,12 +2007,12 @@ ElementTypeBinding:
       lang:muf
 
 PropDef:
-  @QName: test|error-token
+  @QName: dtest|error-token
   @enDesc:
     The token where the parser found an error.
 
 PropDef:
-  @QName: test|source-text
+  @QName: dtest|source-text
   @enDesc:
     A reference to the original source text, if available.
 
@@ -2011,7 +2044,7 @@ ElementTypeBinding:
     @@ecore:textFormatter: ManakaiDTExceptionFormatter
 
 ErrDef:
-  @QName: test|bad-token-error
+  @QName: dtest|bad-token-error
   @enDesc:
     The parser is encountered to a token whose type is not
     allowed there.

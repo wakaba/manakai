@@ -42,7 +42,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/11/24 15:05:48 $
+      $Date: 2006/01/21 16:28:13 $
     @@ContentType:
       dis:Date.RCS
 
@@ -1165,9 +1165,13 @@ NodeTypeDef:
 
   @Attr:
     @@Name: childNodes
-    @@ForCheck: ManakaiDOM|ForClass
+    @@ForCheck: ManakaiDOM|ForClass !ManakaiDOM|ManakaiDOMLatest
     @@enDesc:
       A list of nodes that contains all children of the node.
+
+        {NOTE:: In DOM levels 1, 2, and 3, a <IF::DocumentType> never
+                has child nodes.
+        }
     @@Get:
       @@@Type: DOMCore|NodeList
       @@@actualType: DOMCore|ManakaiDOMEmptyNodeList

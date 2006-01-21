@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/01/07 13:16:59 $
+      $Date: 2006/01/21 16:28:13 $
     @@ContentType:
       dis:Date.RCS
   
@@ -2326,7 +2326,7 @@ IFClsDef:
           ## -- Require'ing external modules
           ## TODO: Custom module construction support
           for my $uri (@{$r-><M::DIS|MPLCodeFragment.disGetRequireURIList>}) {
-            my $mod = $self->{db}-><M::DIS|DISDatabase.getResource> ($uri)
+            my $mod = $self->{db}-><M::DIS|DISDatabase.getAnyResource> ($uri)
                            -><AG::DIS|DISAnyResource.ownerModule>;
             next unless $mod;
             my $pack = $mod-><AG::DISModulePerl.plFullyQualifiedName>;

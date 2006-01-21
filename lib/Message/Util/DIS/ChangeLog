@@ -1,3 +1,30 @@
+2006-01-22  Wakaba  <wakaba@suika.fam.cx>
+
+	* 
+
+2006-01-21  Wakaba  <wakaba@suika.fam.cx>
+
+	* Perl.dis (plGeneratePerlModuleFile): Use |getAnyResource| 
+	method instead of |getResource| method to obtain
+	resource from URI listed in |disGetRequiredModuleURI| 
+	in |PerlCode| objects.  This fix removes the problem
+	that some expected |require| statements were not generated.
+
+	* DPG.dis (plCodeFragment): Default |token-error| code was 
+	not generated.
+	(pg:qRequiresNextTokenStatement): New element type.
+
+	* Test.dis: Wrong namespace URI in some resource names are fixed.
+	(assertDOMTreeEquals): Adds node type
+	information to node path string in error messages.
+	Allows |false| value as a |null|.
+	(TDTParser): Node type |entity| and |entity-reference|
+	are changed to |general-entity| and |general-entity-reference|
+	respectively.
+	(lexmode default): Definition for the token |SEMICOLON|
+	was missing.
+	(token-error default): Added.
+
 2006-01-20  Wakaba  <wakaba@suika.fam.cx>
 
 	* DPG.dis (plCodeFragment): Sets |param| value of default
