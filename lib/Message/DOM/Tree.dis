@@ -12,7 +12,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/01/23 12:43:34 $
+    $Date: 2006/01/23 13:55:46 $
 
   @Require:
     @@Module:
@@ -7013,7 +7013,7 @@ ResourceDef:
         $test->id ('setNamedItem.et2.by.et2');
         my $r5 = $em-><M::NamedNodeMap.setNamedItem> ($et2);
         $test->assert_null ($r5);
-        $test->assert_equals ($em-><M::NamedNodeMap.getNamedItem>, $et2);
+        $test->assert_equals ($em-><M::NamedNodeMap.getNamedItem> ('et1'), $et2);
 
   @Method:
     @@Name: setNamedItem
@@ -7055,6 +7055,12 @@ ResourceDef:
         @@@@enDesc:
           If <P::arg> was created from a different document than
           the one that created the map.
+        @@@@enDesc:
+          @@@@@ddid: no-doc
+          @@@@@ForCheck: !c|ForAttrMap ManakaiDOM|ManakaiDOM
+          @@@@@@:
+            If the map is attached to a <IF::x|DocumentType> 
+            whose <A::Node.ownerDocument> is <DOM::null>.
       @@@dx:raises:
         @@@@@: c|NOMOD_NAMEDNODEMAP_ERR
         @@@@enDesc:
@@ -7109,8 +7115,11 @@ ResourceDef:
           if (<Code::doStrictErrorChecking:: $nodeRef = {$$$self}>) {
             unless (UNIVERSAL::isa ($arg,
                                     <IFName::mn|NodeRef||ManakaiDOM|Perl>) and
-                    ${$arg->{<H::mn:node>}->{<H::mn:treeID>}} eq
-                        ${$owner->{<H::mn:treeID>}}) {
+                    $arg->{<H::mn:node>}->{<H::c|ownerDocument>} and
+                    $owner->{<H::c|ownerDocument>} and
+                    $arg->{<H::mn:node>}->{<H::c|ownerDocument>}
+                        ->{<H::mn:nodeID>} eq
+                            $owner->{<H::c|ownerDocument>}->{<H::mn:nodeID>}) {
               __EXCEPTION{c|DIFFERENT_DOCUMENT_ERR::
               }__;
             }
@@ -7126,7 +7135,7 @@ ResourceDef:
               }__;
               ## NOTE: If equals to owner, then replace-by-itself error.
             }
-            if ($arg-><AG::Node.nodeType> == $expected_type) {
+            if ($arg-><AG::Node.nodeType> != $expected_type) {
               __EXCEPTION{MDOMX|HIERARCHY_BAD_TYPE::
                 c:nodeType => {$arg-><AG::Node.nodeType>},
                 MDOMX:param-name => 'arg',

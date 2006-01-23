@@ -1,3 +1,12 @@
+2006-01-23  Wakaba  <wakaba@suika.fam.cx>
+
+	* DOMCore.dis (Test): Missing argument added.
+	(setNamedItem): If |DocumentType| with no |ownerDocument|,
+	addition always fails with |WRONG_DOCUMENT_ERR|.  Some
+	error conditions were incorrect.
+
+	* .cvsignore: Dummy files added.
+
 2006-01-22  Wakaba  <wakaba@suika.fam.cx>
 
 	* DOMCore.dis (NO_NAMED_NODE_ERR, NO_NAMED_NODE_NS_ERR,
