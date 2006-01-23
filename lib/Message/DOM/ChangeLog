@@ -1,5 +1,18 @@
 2006-01-22  Wakaba  <wakaba@suika.fam.cx>
 
+	* DOMCore.dis (NO_NAMED_NODE_ERR, NO_NAMED_NODE_NS_ERR,
+	INUSE_DEFINITION_ERR, NO_NS_NAMEDNODEMAP_ERR): New error subtypes.
+
+	* DOMMain.dis (ensureXMLName): Checks definesness of |$XMLVERSION|
+	to avoid uninitialized value warning.
+
+	* Tree.dis (ManakaiDOMElementTypeDefMap, ManakaiDOMAttrDefMap): New
+	classes (work in progress).
+
+	* XDoctype.dis (elementTypes, attributeDefinitions): New attributes.
+
+2006-01-22  Wakaba  <wakaba@suika.fam.cx>
+
 	* Tree.dis (getAttribute): Returns |null| if there
 	is no attribute in |ManakaiDOM:DOMLatest| for compatibility
 	with Web browser implementations.

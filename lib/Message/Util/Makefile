@@ -53,6 +53,7 @@ SWCFG_DAC_FILE = $(MANAKAI_LIB_DIR)Message/Markup/all$(DAC_SUFFIX)
 
 UTIL_CORE_DIS_FILES    = ManakaiNode.dis Error/DOMException.dis Error/Core.dis \
   Formatter/Muf2003$(DIS_SUFFIX)
+UTIL_TEST_DIS_FILES    = ManakaiNodeTest$(DIS_SUFFIX)
 DIS_CORE_DIS_FILES_    = DIS$(DIS_SUFFIX)
 DIS_CORE_DIS_FILES_DIS = DIS/Perl.dis DIS/Value.dis DIS/DNLite.dis \
   DIS/DPG$(DIS_SUFFIX)
@@ -62,12 +63,14 @@ DIS_DUMP_DIS_FILES     = DIS/DISDump.dis
 DIS_TEST_DIS_FILES     = DIS/Test$(DIS_SUFFIX)
 PC_DIS_FILES           = PerlCode$(DIS_SUFFIX)
 UTIL_DIS_COMMON_DIS_FILE = DIS/common$(DIS_SUFFIX)
-DIS_FILES = $(UTIL_CORE_DIS_FILES) $(DIS_CORE_DIS_FILES) \
+DIS_FILES = $(UTIL_CORE_DIS_FILES) $(UTIL_TEST_DIS_FILES) \
+  $(DIS_CORE_DIS_FILES) \
   $(DIS_DOC_DIS_FILES) $(DIS_DUMP_DIS_FILES) $(DIS_TEST_DIS_FILES) \
   $(PC_DIS_FILES) $(UTIL_DIS_COMMON_DIS_FILE)
 
 GENERATED_FILES = \
   core$(DAC_SUFFIX)     ManakaiNode$(PM_SUFFIX) Error/DOMException$(PM_SUFFIX) \
+  coretest$(DAC_SUFFIX) ManakaiNodeTest$(PM_SUFFIX) \
   pc$(DAC_SUFFIX)       PerlCode$(PM_SUFFIX) \
   discore$(DAC_SUFFIX)  DIS$(PM_SUFFIX) \
                         DIS/Perl$(PM_SUFFIX) DIS/Value$(PM_SUFFIX) \
@@ -75,7 +78,8 @@ GENERATED_FILES = \
   disdoc$(DAC_SUFFIX)   DIS/DISDoc$(PM_SUFFIX) \
   disdump$(DAC_SUFFIX)  DIS/DISDump$(PM_SUFFIX) \
   distest$(DAC_SUFFIX)  DIS/Test$(PM_SUFFIX)
-GENERATED_DAC_FILES = core$(DAC_SUFFIX) discore$(DAC_SUFFIX) \
+GENERATED_DAC_FILES = core$(DAC_SUFFIX) coretest$(DAC_SUFFIX) \
+  discore$(DAC_SUFFIX) \
   disdoc$(DAC_SUFFIX) disdump$(DAC_SUFFIX) distest$(DAC_SUFFIX) \
   dpg$(DAC_SUFFIX)
 
@@ -85,6 +89,9 @@ core$(DAC_SUFFIX): $(CORE_DAC_FILE) $(UTIL_CORE_DIS_FILES) $(DAC_PL)
 	$(DAC)$@.1.tmp --input-db-file-name="$<" ManakaiNode.dis
 	$(DAC)$@ --input-db-file-name="$@.1.tmp" Error/DOMException.dis
 	$(RM) $@.1.tmp
+
+coretest$(DAC_SUFFIX): core$(DAC_SUFFIX) $(UTIL_TEST_DIS_FILES) $(DAC_PL)
+	$(DAC)$@ --input-db-file-name="$<" ManakaiNodeTest.dis
 
 pc$(DAC_SUFFIX): $(SWCFG_DAC_FILE) $(PC_DIS_FILES) $(DAC_PL)
 	$(DAC)$@ --input-db-file-name="$<" PerlCode$(DIS_SUFFIX)
@@ -114,6 +121,14 @@ ManakaiNode$(PM_SUFFIX): core$(DAC_SUFFIX) $(DAC2PM_PL)
 Error/DOMException$(PM_SUFFIX): core$(DAC_SUFFIX) $(DAC2PM_PL)
 	$(DAC2PM) $< \
 	  --module-uri="$(NS_UTIL_ERR)DOMException" \
+	  --output-file-path="$@"
+	$(PERL_CHK) $@
+
+$(UTIL_TEST_DIS_FILES:$(DIS_SUFFIX)=$(PM_SUFFIX)): \
+  %$(PM_SUFFIX): coretest$(DAC_SUFFIX) \
+  $(DAC2PM_PL)
+	$(DAC2PM) $< \
+	  --module-uri="$(NS_UTIL)$*" \
 	  --output-file-path="$@"
 	$(PERL_CHK) $@
 

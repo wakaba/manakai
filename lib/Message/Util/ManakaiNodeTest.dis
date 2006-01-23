@@ -1,0 +1,365 @@
+Module:
+  @QName: Util|ManakaiNodeTest
+  @FullName:
+    @@lang:en
+    @@@:
+      <Module::Util|ManakaiNode> Test Module
+
+  @Namespace:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/ManakaiNodeTest#
+
+  @DISCore:author: DISCore|Wakaba
+  @License: license|Perl+MPL
+  @Date:
+    $Date: 2006/01/23 12:43:35 $
+
+  @Require:
+    @@Module:
+      @@@QName: Util|ManakaiNode
+      @@@WithFor: ManakaiDOM|Perl
+
+  @DefaultFor:
+    ManakaiDOM:Perl
+
+Namespace:
+  @dis:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
+  @DISlib:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/
+  @kwd:
+    http://suika.fam.cx/~wakaba/archive/2005/rfc2119/
+  @lang:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
+  @license:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
+  @ManakaiDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
+  @mn:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/ManakaiNode#
+  @mnt:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/ManakaiNodeTest#
+  @rdf:
+    http://www.w3.org/1999/02/22-rdf-syntax-ns#
+  @rdfs:
+    http://www.w3.org/2000/01/rdf-schema#
+  @test:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Test#
+  @Util:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/
+
+ElementTypeBinding:
+  @Name: ClsDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@:
+        dis:MultipleResource
+      @@@ForCheck: !ManakaiDOM|ForClass !ManakaiDOM|ForIF
+    @@resourceFor: ManakaiDOM|ForClass
+    @@rdf:type:
+      @@@@: DISLang|Class
+      @@@ForCheck: ManakaiDOM|ForClass
+    @@ForCheck: ManakaiDOM|Perl
+
+ElementTypeBinding:
+  @Name: IntMethod
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:Method
+    @@ManakaiDOM:isForInternal:1
+
+ElementTypeBinding:
+  @Name: Method
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:Method
+
+ElementTypeBinding:
+  @Name: Return
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:MethodReturn
+
+ElementTypeBinding:
+  @Name: Param
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:MethodParameter
+
+ElementTypeBinding:
+  @Name: PerlDef
+  @ElementType:
+    dis:Def
+  @ShadowContent:
+    @@ContentType:
+      lang:Perl
+
+ElementTypeBinding:
+  @Name: enDesc
+  @ElementType:
+    dis:Description
+  @ShadowContent:
+    @@lang:en
+
+ElementTypeBinding:
+  @Name: Test
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: test|StandaloneTest
+
+ElementTypeBinding:
+  @Name: ClsQName
+  @ElementType:
+    dis:QName
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: ClsISA
+  @ElementType:
+    dis:ISA
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForClass
+
+PropDef:
+  @QName: mnt|parent
+
+PropDef:
+  @QName: mnt|children
+
+ElementTypeBinding:
+  @Name: PropDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: rdf|Property
+    @@For: =ManakaiDOM|all
+
+ClsDef:
+  @ClsQName: Node1
+
+  @ClsISA: mn|ManakaiNodeRef
+
+  @enDesc:
+    Simple tree pattern test.
+
+  @IntMethod:
+    @@Name: newStem
+    @@ManakaiDOM:isStatic: 1
+    @@Return:
+      @@@Type: mn|NodeStem
+      @@@PerlDef:
+        $r = <ClassM::mn|ManakaiNodeStem.new> (<ClassName::Node1>);
+  @mn:origin0: mnt|parent
+  @mn:subnode1: mnt|children
+
+  @IntMethod:
+    @@Name: getRef
+    @@ManakaiDOM:isStatic: 1
+    @@Param:
+      @@@Name: stem
+      @@@Type: mn|NodeStem
+    @@Return:
+      @@@Type: Node1
+      @@@PerlDef:
+        __CODE{mn|getNewReference::
+          $object => $stem,
+          $ref => $r,
+          $class => {<ClassName::Node1>},
+        }__;
+
+  @Test:
+    @@QName: Node1.test1
+    @@PerlDef:
+      $test->id ('get.stem');
+      my $stem = <ClassM::Node1.newStem>;
+      $test->assert_isa ($stem, <IFName::mn|NodeStem>);
+      $test->assert_not_null ($stem->{<H::mn:nodeID>});
+      $test->assert_num_equals
+               (actual_value => $stem->{<H::mn:rc>},
+                expected_value => 0);
+      $test->assert_isa ($stem->{<H::mn:groveReferenceCounter>}, 'SCALAR');
+      $test->assert_num_equals
+               (actual_value => ${$stem->{<H::mn:groveReferenceCounter>}},
+                expected_value => 0);
+
+      $test->id ('get.ref');
+      my $ref = <ClassM::Node1.getRef> ($stem);
+      $test->assert_isa ($ref, <IFName::mn|NodeRef>);
+      $test->assert_isa ($ref, <IFName::Node1>);
+      $test->assert_isa ($ref->{<H::mn:node>}, <IFName::mn|NodeStem>);
+      $test->assert_equals
+               ($ref->{<H::mn:node>}->{<H::mn:nodeID>},
+                $stem->{<H::mn:nodeID>});
+      $test->assert_num_equals
+               (actual_value => $stem->{<H::mn:rc>},
+                expected_value => 1);
+      $test->assert_isa ($stem->{<H::mn:groveReferenceCounter>}, 'SCALAR');
+      $test->assert_num_equals
+               (actual_value => ${$stem->{<H::mn:groveReferenceCounter>}},
+                expected_value => 1);
+
+##Node1
+
+ClsDef:
+  @ClsQName: Node2
+
+  @ClsISA: mn|ManakaiNodeRef
+
+  @enDesc:
+    Tree + ownwerDocument pattern test.
+
+  @IntMethod:
+    @@Name: newStem
+    @@ManakaiDOM:isStatic: 1
+    @@Return:
+      @@@Type: mn|NodeStem
+      @@@PerlDef:
+        $r = <ClassM::mn|ManakaiNodeStem.new> (<ClassName::Node2>);
+  @mn:origin0: mnt|parent
+  @mn:subnode1: mnt|children
+  @mn:xrefnode0: mnt|owner
+
+  @IntMethod:
+    @@Name: getRef
+    @@ManakaiDOM:isStatic: 1
+    @@Param:
+      @@@Name: stem
+      @@@Type: mn|NodeStem
+    @@Return:
+      @@@Type: Node2
+      @@@PerlDef:
+        __CODE{mn|getNewReference::
+          $object => $stem,
+          $ref => $r,
+          $class => {<ClassName::Node2>},
+        }__;
+##Node2
+
+ClsDef:
+  @ClsQName: Doc2
+
+  @ClsISA: Node2
+
+  @IntMethod:
+    @@Name: newStem
+    @@ManakaiDOM:isStatic: 1
+    @@Return:
+      @@@Type: mn|NodeStem
+      @@@PerlDef:
+        $r = <ClassM::mn|ManakaiNodeStem.new> (<ClassName::Doc2>);
+
+  @IntMethod:
+    @@Name: getRef
+    @@ManakaiDOM:isStatic: 1
+    @@Param:
+      @@@Name: stem
+      @@@Type: mn|NodeStem
+    @@Return:
+      @@@Type: Doc2
+      @@@PerlDef:
+        __CODE{mn|getNewReference::
+          $object => $stem,
+          $ref => $r,
+          $class => {<ClassName::Doc2>},
+        }__;
+
+  @IntMethod:
+    @@Name: newNodeStem
+    @@Return:
+      @@@Type: mn|NodeStem
+      @@@PerlDef:
+        $r = $self->{<H::mn:node>}-><M::mn|NodeStem.newNode> (<IFName::Node2>);
+    @@Test:
+      @@@QName: Doc2.newNodeStem.test
+      @@@PerlDef:
+        $test->id ('new.doc.stem');
+        my $stem = <ClassM::Doc2.newStem>;
+        $test->assert_isa ($stem, <IFName::mn|NodeStem>);
+        my $doc_tid = $stem->{<H::mn:treeID>};
+        my $doc = <ClassM::Doc2.getRef> ($stem);
+        
+        $test->id ('new.node.stem');
+        my $nstem = $doc-><M::Doc2.newNodeStem>;
+        $test->assert_isa ($nstem, <IFName::mn|NodeStem>);
+        my $node_tid = $nstem->{<H::mn:treeID>};
+
+        $test->id ('doc.node.tid.equals');
+        $test->assert_equals ($$doc_tid, $$node_tid);
+
+  @Method:
+    @@Name: createNode
+    @@Return:
+      @@@Type: Node2
+      @@@PerlDef:
+        my $stem = <ClassM::Doc2.newStem>;
+        __CODE{mn:setXRefNode::
+          $referrer => $stem,
+          $propName => {<H::mnt|owner>},
+          $referent => {$self->{<H::mn:node>}},
+        }__;
+        $r = <ClassM::Node2.getRef> ($stem);
+    @@Test:
+      @@@QName: Doc2.createNode.test
+      @@@PerlDef:
+        $test->id ('new.doc');
+        my $doc_stem = <ClassM::Doc2.newStem>;
+        my $doc = <ClassM::Doc2.getRef> ($doc_stem);
+        $test->assert_isa ($doc, <ClassName::Doc2>);
+        $test->assert_num_equals
+                 (actual_value => $doc_stem->{<H::mn:rc>},
+                  expected_value => 1);
+        $test->assert_num_equals
+                 (actual_value => ${$doc_stem->{<H::mn:groveReferenceCounter>}},
+                  expected_value => 1);
+        my $doc_tid = $doc_stem->{<H::mn:treeID>};
+
+        $test->id ('new.node');
+        my $node = $doc-><M::Doc2.createNode>;
+        $test->assert_isa ($node, <ClassName::Node2>);
+        my $node_stem = $node->{<H::mn:node>};
+        $test->assert_isa ($node_stem, <IFName::mn|NodeStem>);
+        $test->assert_num_equals
+                 (actual_value => $node_stem->{<H::mn:rc>},
+                  expected_value => 1);
+        $test->assert_num_equals
+                 (actual_value => ${$node_stem->{<H::mn:groveReferenceCounter>}},
+                  expected_value => 1);
+        my $node_tid = $node_stem->{<H::mn:treeID>};
+
+        $test->id ('doc.node.diff.tid');
+        $test->assert_not_equals ($$doc_tid, $$node_tid);
+
+        $test->id ('doc.rc');
+        $test->assert_num_equals
+                 (actual_value => $doc_stem->{<H::mn:rc>},
+                  expected_value => 2);
+        $test->assert_num_equals
+                 (actual_value => ${$doc_stem->{<H::mn:groveReferenceCounter>}},
+                  expected_value => 2);
+
+        $test->id ('node.owner');
+        $test->assert_equals ($node_stem->{<H::mnt|owner>}, $doc_stem);
+
+        $test->id ('doc.destroy');
+        undef $doc;
+        $test->assert_num_equals
+                 (actual_value => $doc_stem->{<H::mn:rc>},
+                  expected_value => 1);
+        $test->assert_num_equals
+                 (actual_value => ${$doc_stem->{<H::mn:groveReferenceCounter>}},
+                  expected_value => 1);
+##Doc2
+
+PropDef:
+  @QName: mnt|owner

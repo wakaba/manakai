@@ -6,6 +6,7 @@ MANAKAI_TEST_DIR = $(MANAKAI_ROOT_DIR)t/
 DIS_SUFFIX = .dis
 DAC_SUFFIX = .dae
 DAEM_SUFFIX = .daem
+PM_SUFFIX = .pm
 
 CD = cd
 MAKE = make
@@ -53,6 +54,8 @@ DOM_LS_DAC = $(MANAKAI_LIB_DIR)Message/DOM/ls$(DAC_SUFFIX)
 DOM_XP_DAC = $(MANAKAI_LIB_DIR)Message/DOM/xp$(DAC_SUFFIX)
 DOM_DAC_FILES = $(DOM_FEATURE_DAC) $(DOM_CORE_DAC) $(DOM_LS_DAC) $(DOM_XP_DAC)
 
+UTIL_TEST_DAC = $(MANAKAI_LIB_DIR)Message/Util/coretest$(DAC_SUFFIX)
+UTIL_MNTEST_PM = $(MANAKAI_LIB_DIR)Message/Util/ManakaiNodeTest$(PM_SUFFIX)
 UTIL_PC_DAC = $(MANAKAI_LIB_DIR)Message/Util/pc$(DAC_SUFFIX)
 DIS_CORE_DAC = $(MANAKAI_LIB_DIR)Message/Util/discore$(DAC_SUFFIX)
 
@@ -61,7 +64,9 @@ NS_MANAKAIDOM = http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom\#
 NS_UTIL = http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/
 NS_DIS  = http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS\#
 
-GENERATED_FILES = util-perlcode.t dom-feature.t dom-tree.t dom-genericls.t \
+GENERATED_FILES = \
+  util-mntest.t \
+  util-perlcode.t dom-feature.t dom-tree.t dom-genericls.t \
   dom-core.t dom-xdoctype.t dom-xmlparser.t \
   dom-mdomls2003.t util-dis-dnlite.t
 
@@ -108,9 +113,13 @@ dom-xmlparser.t: $(DOM_XP_DAC) $(DAC2TEST_PL)
 	$(DAC2TEST) $< --source-module="$(NS_MDOM)XMLParser" > $@
 
 test-module-util: \
+  util-mntest.t \
   util-perlcode.t \
   util-dis-dnlite.t
 	$(PERL_TEST_) util-*.t
+
+util-mntest.t: $(UTIL_TEST_DAC) $(UTIL_MNTEST_PM) $(DAC2TEST_PL)
+	$(DAC2TEST) $< --source-module="$(NS_UTIL)ManakaiNodeTest" > $@
 
 util-perlcode.t: $(UTIL_PC_DAC) $(DAC2TEST_PL)
 	$(DAC2TEST) $< --source-module="$(NS_UTIL)PerlCode" > $@
@@ -121,7 +130,8 @@ util-dis-dnlite.t: $(DIS_CORE_DAC) $(DAC2TEST_PL)
 $(DOM_DAC_FILES): $(MANAKAI_LIB_DIR)Message/DOM/%: always
 	$(CD) $(MANAKAI_LIB_DIR)Message/DOM/ && $(MAKE) $*
 
-$(UTIL_PC_DAC) $(DIS_CORE_DAC): $(MANAKAI_LIB_DIR)Message/Util/%: always
+$(UTIL_TEST_DAC) $(UTIL_MNTEST_PM) $(UTIL_PC_DAC) $(DIS_CORE_DAC): \
+  $(MANAKAI_LIB_DIR)Message/Util/%: always
 	$(CD) $(MANAKAI_LIB_DIR)Message/Util/ && $(MAKE) $*
 
 clean: clean-dom1core-perl

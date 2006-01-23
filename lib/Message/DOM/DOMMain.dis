@@ -25,7 +25,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/01/07 12:30:53 $
+      $Date: 2006/01/23 12:43:34 $
     @@ContentType:
       dis:Date.RCS
   
@@ -1282,7 +1282,7 @@ StringDataTypeDef:
           __FOR{ManakaiDOM:DOM3::
             if (((not defined $XMLVERSION or $XMLVERSION eq '1.0') and
                  not <Code::DOMMain:testXML10Name:: $INPUT = $INPUT>) or
-                ($XMLVERSION eq '1.1' and
+                (defined $XMLVERSION and $XMLVERSION eq '1.1' and
                  not <Code::DOMMain:testXML11Name:: $INPUT = $INPUT>)) {
               __EXCEPTION{MDOMX:MDOM_BAD_NAME::
                 DOMCore:name => {$INPUT},

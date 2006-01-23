@@ -415,11 +415,11 @@ L<bin/dac.pl> - The "dac" database generator.
 
 =head1 LICENSE
 
-Copyright 2004-2005 Wakaba <w@suika.fam.cx>.  All rights reserved.
+Copyright 2004-2006 Wakaba <w@suika.fam.cx>.  All rights reserved.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2006/01/21 16:28:13 $
+1; # $Date: 2006/01/23 12:43:33 $

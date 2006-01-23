@@ -40,7 +40,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/01/07 13:16:58 $
+      $Date: 2006/01/23 12:43:34 $
     @@ContentType:
       dis:Date.RCS
 
@@ -726,8 +726,7 @@ ResourceDef:
             @@@@@@:
               An attempt is made to insert a node whose type is not allowed.
           @@@@XParam:
-            @@@@@QName:
-              infoset:nodeType
+            @@@@@QName: c|nodeType
             @@@@@Type:
               ManakaiDOM:ManakaiDOMURI
             @@@@@Description:
@@ -970,6 +969,29 @@ ResourceDef:
              The specified node is not a child node of the target node. 
          @@@@enMufDef:
            The specified node is not a direct child of this node
+      @@@SubTypeDef:
+        @@@@QName: c|NO_NAMED_NODE_ERR
+        @@@@enDesc:
+          If there is no node with the specified name.
+        @@@@ecore:hasParameter: MDOMX|param-name
+        @@@@ecore:hasParameter:
+          @@@@@@: c|name
+          @@@@@enDesc:
+            The specified node name.
+      @@@SubTypeDef:
+        @@@@QName: c|NO_NAMED_NODE_NS_ERR
+        @@@@enDesc:
+          If there is no node with the specified name.
+        @@@@ecore:hasParameter: MDOMX|param-name
+        @@@@ecore:hasParameter:
+          @@@@@@: infoset|namespaceName
+          @@@@@enDesc:
+            The specified namespace URI.
+        @@@@ecore:hasParameter:
+          @@@@@@: infoset|localName
+          @@@@@enDesc:
+            The specified local name.
+        @@@@For: ManakaiDOM|DOM2
      @@XConst:
         @@@Name:  NOT_SUPPORTED_ERR
         @@@intValue:  9
@@ -1259,7 +1281,7 @@ ResourceDef:
            );" is not supported
 
      @@XConst:
-        @@@Name:  INUSE_ATTRIBUTE_ERR
+      @@@QName: c|INUSE_ATTRIBUTE_ERR
         @@@Type:  
           DOMMain:unsigned-short::ManakaiDOM:all
         @@@intValue:  10
@@ -1270,6 +1292,17 @@ ResourceDef:
             elsewhere.
        @@@enMufDef:
          The attribure node is already in use elsewhere
+      @@@SubTypeDef:
+        @@@@QName: c|INUSE_DEFINITION_ERR
+        @@@@enDesc:
+          If an attempt is made to add a definition that is already
+          in use elsewhere.
+        @@@@ecore:hasParameter: MDOMX|param-name
+        @@@@ecore:hasParameter:
+          @@@@@@: c|node
+          @@@@@enDesc:
+            The node that is in use.
+
      @@XConst:
         @@@Name:  INVALID_STATE_ERR
         @@@intValue:  11
@@ -1571,6 +1604,12 @@ ResourceDef:
               an HTML node. 
           @@@@For:
             ManakaiDOM:DOMHTMLFeature
+      @@@SubTypeDef:
+        @@@@QName: c|NO_NS_NAMEDNODEMAP_ERR
+        @@@@enDesc:
+          If an attempt is made to modify a <IF::t|NamedNodeMap>
+          via namespace-aware method and the map does not support
+          XML namespaces.
      @@XConst:
         @@@Name:  INVALID_ACCESS_ERR
         @@@intValue:  15

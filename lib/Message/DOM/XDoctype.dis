@@ -17,7 +17,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/01/07 12:30:54 $
+    $Date: 2006/01/23 12:43:35 $
   
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
   
@@ -825,11 +825,38 @@ IFClsXDef:
         $test->assert_null ($dtd-><AG::Node.prefix>);
         $dtd-><AS::Node.prefix> ('0120444444');
         $test->assert_null ($dtd-><AG::Node.prefix>);
+
+  @Attr:
+    @@Name: elementTypes
+    @@enDesc:
+      The live collection of the element types contained
+      in the document type definition.
+    @@Type: t|NamedNodeMap
+    @@Get:
+      @@@PerlDef:
+        __CODE{t|getElementTypeDefNodeMap::
+          $node => $self,
+          $map => $r,
+        }__;
+
+    @@Test:
+      @@@QName: dtd.elementTypes.test
+      @@@PerlDef:
+        my $dtd;
+        __CODE{newDoctypeForTest}__;
+
+        my $es = $dtd-><AG::DocumentTypeDefinition.elementTypes>;
+        $test->assert_isa ($es, <IFName::t|NamedNodeMap>);
       
   @enImplNote:
     {TODO::
-      Implement <A::.elementTypes>, <A::.generalEntities>,
+      Implement <A::.generalEntities>,
       <A::.parameterEntities>, <A::.notations>.
+
+      Test that:
+        $a = $dtd->element_types;
+        $b = $dtd->general_entities;
+        $a is still a element type defs col.
       
       The class will also implement <IF::x|DocumentType>
       members for compatibility.
@@ -1211,20 +1238,27 @@ IFClsXDef:
     {TODO:: Content model attributes are required.
     }
 
-# This attribute will be implemented by a future version.
-#  @Attr:
-#    @@Name: attributeDefinitions
-#    @@enDesc:
-#      A live collection of the attribute definitions
-#      contained by the element definition.
-#    @@Type: NamedNodeMap
-#    @@Get:
-#      @@@PerlDef:
-#        __CODE{d|getRef::
-#          $object => {$self->{<H::mn:node>}},
-#          $ref => {$r},
-#          $class => {<ClassName::t|ManakaiDOMAttributeDefinitionMap>},
-#        }__;
+  @Attr:
+    @@Name: attributeDefinitions
+    @@enDesc:
+      A live collection of the attribute definitions
+      contained by the element type definition.
+    @@Type: t|NamedNodeMap
+    @@Get:
+      @@@PerlDef:
+        __CODE{t|getAttrDefNodeMap::
+          $node => $self,
+          $map => $r,
+        }__;
+
+    @@Test:
+      @@@QName: elementTypeDef.attrDefs.test
+      @@@PerlDef:
+        my $et;
+        __CODE{newETForTest}__;
+
+        my $as = $et-><AG::ElementTypeDefinition.attributeDefinitions>;
+        $test->assert_isa ($as, <IFName::t|NamedNodeMap>);
 
   @Attr:
     @@ForCheck: ManakaiDOM|ForClass

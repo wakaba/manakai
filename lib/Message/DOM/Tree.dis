@@ -12,7 +12,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/01/21 17:37:51 $
+    $Date: 2006/01/23 12:43:34 $
 
   @Require:
     @@Module:
@@ -178,6 +178,14 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type: DISLang|Method
     @@ForCheck: !=ManakaiDOM|ManakaiDOM
+
+ElementTypeBinding:
+  @Name: L2Method
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|Method
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|DOM2
 
 ElementTypeBinding:
   @Name: L3Method
@@ -6635,6 +6643,18 @@ ForDef:
       For <ClassM::ManakaiDOMXML:ManakaiDOMNotations> class.
   @ISA: ManakaiDOM|ForClass
 
+ForDef:
+  @QName: t|ForETMap
+  @enDesc:
+    For element type definition list named node map class.
+  @ISA: ManakaiDOM|ForClass
+
+ForDef:
+  @QName: t|ForATMap
+  @enDesc:
+    For attribute definition list named node map class.
+  @ISA: ManakaiDOM|ForClass
+
 ResourceDef:
   @QName: c|NamedNodeMap
   @AliasFor: NamedNodeMap
@@ -6646,23 +6666,22 @@ ResourceDef:
       dis:MultipleResource
     @@ForCheck:
       !ManakaiDOM:ForIF !c|ForAttrMap !c|ForEntityMap !c|ForNotationMap
+      !t|ForETMap !t|ForATMap
   @ForCheck: ManakaiDOM|DOM
 
-  @resourceFor:
-    ManakaiDOM:ForIF
-  @IFQName: NamedNodeMap
+  @resourceFor: ManakaiDOM|ForIF
+  @IFQName: t|NamedNodeMap
   @rdf:type:
     @@@: DISLang|Interface
-    @@ForCheck:
-      ManakaiDOM:ForIF
+    @@ForCheck: ManakaiDOM|ForIF
 
-  @DOMMain:implementFeature:
+  @f:implements:
     @@@: c|CoreFeature10
     @@ForCheck: ManakaiDOM|DOM1
-  @DOMMain:implementFeature:
+  @f:implements:
     @@@: c|CoreFeature20
     @@ForCheck: ManakaiDOM|DOM2
-  @DOMMain:implementFeature:
+  @f:implements:
     @@@: c|CoreFeature30
     @@ForCheck: ManakaiDOM|DOM3
 
@@ -6674,17 +6693,10 @@ ResourceDef:
     @@@: 
       ManakaiDOMCore:ManakaiDOMAttributes
     @@ForCheck: c|ForAttrMap
-  @rdf:type:
-    @@@: DISLang|Class
-    @@ForCheck: c|ForAttrMap
   @ISA:
     @@@: ManakaiNode|ManakaiNodeRef||ManakaiDOM|Perl
     @@ForCheck:
       DOMCore:ForAttrMap
-  @ISA:
-    @@@:
-      ManakaiDOM:ManakaiDOMObject
-    @@ForCheck: c|ForAttrMap
 
   @resourceFor:
     @@@: c|ForEntityMap
@@ -6694,17 +6706,10 @@ ResourceDef:
     @@@: 
       ManakaiDOMXML:ManakaiDOMEntities
     @@ForCheck: c|ForEntityMap
-  @rdf:type:
-    @@@: DISLang|Class
-    @@ForCheck: c|ForEntityMap
   @ISA:
     @@@: ManakaiNode|ManakaiNodeRef||ManakaiDOM|Perl
     @@ForCheck:
       DOMCore:ForEntityMap
-  @ISA:
-    @@@:
-      ManakaiDOM:ManakaiDOMObject
-    @@ForCheck: c|ForEntityMap
 
   @DOMMain:implementFeature:
     @@@: 
@@ -6730,17 +6735,10 @@ ResourceDef:
     @@@: 
       ManakaiDOMXML:ManakaiDOMNotations
     @@ForCheck: c|ForNotationMap
-  @rdf:type:
-    @@@: DISLang|Class
-    @@ForCheck: c|ForNotationMap
   @ISA:
     @@@: ManakaiNode|ManakaiNodeRef||ManakaiDOM|Perl
     @@ForCheck:
       DOMCore:ForNotationMap
-  @ISA:
-    @@@:
-      ManakaiDOM:ManakaiDOMObject
-    @@ForCheck: c|ForNotationMap
 
   @DOMMain:implementFeature:
     @@@: 
@@ -6757,6 +6755,35 @@ ResourceDef:
       DOMXML:XMLFeature30
     @@ForCheck:
       c|ForNotationMap ManakaiDOM:DOM3
+
+  @resourceFor:
+    @@@: t|ForETMap
+    @@ForCheck: ManakaiDOM|ManakaiDOMLatest
+  @QName:
+    @@@: t|ManakaiDOMElementTypeDefMap
+    @@ForCheck: t|ForETMap
+ 
+  @f:implements:
+    @@@: d|Feature30
+    @@ForCheck: t|ForETMap ManakaiDOM|DOM3
+
+  @resourceFor:
+    @@@: t|ForATMap
+    @@ForCheck: ManakaiDOM|ManakaiDOMLatest
+  @QName:
+    @@@: t|ManakaiDOMAttrDefMap
+    @@ForCheck: t|ForATMap
+
+  @f:implements:
+    @@@: d|Feature30
+    @@ForCheck: t|ForATMap ManakaiDOM|DOM3
+
+  @rdf:type:
+    @@@: DISLang|Class
+    @@ForCheck: ManakaiDOM|ForClass
+  @ISA:
+    @@@: ManakaiDOM|ManakaiDOMObject
+    @@ForCheck: ManakaiDOM|ForClass
 
   @Implement:
     @@@: NamedNodeMap||ManakaiDOM|ManakaiDOM
@@ -6775,17 +6802,37 @@ ResourceDef:
     @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
 
   @enDesc:
-    Objects implementing the <IF::NamedNodeMap> interface are 
-    used to represent collections of nodes that can be
-    accessed by name.
+    An object implementing the <IF::NamedNodeMap> interface represents
+    a collection of nodes that can be accessed by name.  Unlike
+    <IF::NodeList>, a <IF::NamedNodeMap> object does not maintain
+    any particular order.  Nodes contained in a <IF::NamedNodeMap>
+    may also be accessed by an ordinal index, starting from
+    <CODE::0> (zero), but this is simply
+    to allow convenient enumeration of the contents of the collection.
 
-    <IF::NamedNodeMap>s do not maintain any particular order
-    of <IF::Node>s, which is different from <IF::NodeList>s.
-    Although <IF::Node>s in <IF::NamedNodeMap> may also be 
-    accessed by an ordinal index, starting from <CODE::0>, 
-    this is simply to allow convenient enumeration.
+    A <IF::NamedNodeMap> object is live.
 
-    <IF::NamedNodeMap>s are live.
+  @enImplNote:
+    @@ddid: order
+    @@@:
+      That is, node order is preserved as long as no change
+      is made to the collection?
+
+  @enImplNote:
+    @@ddid: usecases
+    @@@:
+      In DOM Core module, the only place where <IF::NamedNodeMap>
+      is returned is <A::Node.attributes> attribute.  In DOM XML module,
+      <A::x|DocumentType.entities> and <A::x|DocumentType.notations>
+      are also <IF::NamedNodeMap>s.
+
+      In manakai DOM <MDOM::XDoctype> module, 
+      <A::d|DocumentTypeDefinition.elementTypes>, 
+      <A::d|DocumentTypeDefinition.generalEntities>,
+      <A::d|DocumentTypeDefinition.parameterEntities>,
+      <A::d|DocumentTypeDefinition.notations>, and
+      <A::d|ElementTypeDefinition.attributeDefinitions> attributes
+      are <IF::NamedNodeMap>s.
 
   @enDesc:
     @@ForCheck: c|ForEntityMap
@@ -6797,24 +6844,6 @@ ResourceDef:
       {NOTE:: Parameter entities and dupulicating (so that ignored) 
               entity declarations are not part of the collection.
       }
-
-  @ImplNote:
-    @@lang:en
-    @@@:
-      This interface is used by the attribute "DocumentType.entities". 
-    @@ForCheck: c|ForEntityMap
-
-  @enDesc:
-    @@ForCheck: c|ForNotationMap
-    @@@:
-      The <Class::ManakaiDOMXML|ManakaiDOMNotations> class represents
-      a collection of notations declared in the DTD of the document.
-
-  @ImplNote:
-    @@lang:en
-    @@@:
-      This interface is used by the attribute "DocumentType.notations".
-    @@ForCheck: c|ForNotationMap
 
   @ImplNote:
     @@lang:en
@@ -6846,178 +6875,387 @@ ResourceDef:
       }
 
   @Method:
-     @@Name:  getNamedItem
-     @@Description:
-       @@@lang:en
-       @@@@: Retrieve a node specified by name.
-     @@NSVersion:.getNamedItemNS
-     @@Param:
-        @@@Name:  name
-        @@@Type:  
-          DOMMain:DOMString
-        @@@actualType:
-          @@@@@:
-            DOMMain:ManakaiDOMXMLName
-          @@@@ManakaiDOM:noInputNormalize:1
-        @@@Description:
-          @@@@lang:en
-          @@@@@: The "nodeName" of a node to retrieve.
-     @@Return:
-        @@@Type:  Node
-        @@@actualType:
-          @@@@@: ManakaiDOMAttr
-          @@@@ForCheck: c|ForAttrMap
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            A "Node" (of any type) with the specified "nodeName".
-        @@@InCase:
-          @@@@Value:
-            @@@@@is-null:1
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@: The "name" does not identify any node in this map.
+    @@Name: getNamedItem
+    @@enDesc:
+      Retrieves a node specified by name.
+    @@NSVersion: .getNamedItemNS
+    @@Param:
+      @@@Name: name
+      @@@Type: DOMString
+      @@@dis:actualType:
+        @@@@@: DOMMain|ManakaiDOMXMLName
+        @@@@ManakaiDOM:noInputNormalize: 1
+      @@@enDesc:
+        The <A::Node.nodeName> of a node to retrieve.
+    @@Return:
+      @@@Type: Node
+      @@@enDesc:
+        A <IF::Node> with the specified <P::name>.
+      @@@nullCase:
+        @@@@enDesc:
+          If the <P::name> does not identify any node in the map.
          @@@disDef:
            @@@@ForCheck: c|ForAttrMap
            @@@@DISPerl:cloneCode:
              ManakaiDOMElement.getAttributeNode
+      @@@PerlDef:
+        @@@@ForCheck: !c|ForAttrMap
+        @@@@@:
+          my $list;
+          __FOR{t:ForETMap::
+            $list = ($$$self)->{<H::mn:node>}->{<H::d|elementTypes>};
+          }__;
+          __FOR{t:ForATMap::
+            $list = ($$$self)->{<H::mn:node>}->{<H::d|attributeDefinitions>};
+          }__;
+          if (defined $list->{$name}) {
+            $r = <ClassM::ManakaiDOMNode.getNodeReference> ($list->{$name});
+          }
+
+    @@Test:
+      @@@ForCheck: c|ForAttrMap
+      @@@QName: AttrMap.getNamedItem.test
+      @@@PerlDef:
+        my $el;
+        __CODE{createElementForTest:: $el => $el}__;
+
+        my $map = $el-><AG::Node.attributes>;
+        $test->assert_isa ($map, <IFName::NamedNodeMap>);
+        
+        $test->id ('no.attr.node');
+        $test->assert_null ($map-><M::NamedNodeMap.getNamedItem> ('a1'));
+
+        $test->id ('dom1.attr.node');
+        $el-><M::Element.setAttribute> ('a1', 'value1');
+        my $a1 = $map-><M::NamedNodeMap.getNamedItem> ('a1');
+        $test->assert_isa ($a1, <IFName::Attr>);
+        $test->assert_num_equals
+                 (actual_value => $a1-><AG::Node.nodeType>,
+                  expected_value => <C::Node.ATTRIBUTE_NODE>);
+        $test->assert_equals ($a1-><AG::Node.nodeName>, 'a1');
+        $test->assert_equals ($a1-><AG::Node.nodeValue>, 'value1');
+        undef $a1;
+
+        $test->id ('dom1.attr.node.removed');
+        $el-><M::Element.removeAttribute> ('a1');
+        $test->assert_null ($map-><M::NamedNodeMap.getNamedItem> ('a1'));
+    @@Test:
+      @@@ForCheck: c|ForAttrMap ManakaiDOM|DOM2
+      @@@QName: AttrMap.getNamedItem.qname.test
+      @@@PerlDef:
+        my $el;
+        __CODE{createElementForTest:: $el => $el}__;
+
+        my $map = $el-><AG::Node.attributes>;
+        $test->assert_isa ($map, <IFName::NamedNodeMap>);
+        
+        $test->id ('dom2.attr.node');
+        $el-><M::Element.setAttributeNS> ('http://attr.example/', 'ns:a1', 'v1');
+        my $a1 = $map-><M::NamedNodeMap.getNamedItem> ('ns:a1');
+        $test->assert_isa ($a1, <IFName::Attr>);
+        $test->assert_num_equals
+                 (actual_value => $a1-><AG::Node.nodeType>,
+                  expected_value => <C::Node.ATTRIBUTE_NODE>);
+        $test->assert_equals ($a1-><AG::Node.nodeName>, 'ns:a1');
+        $test->assert_equals ($a1-><AG::Node.nodeValue>, 'v1');
+        undef $a1;
+        $test->assert_null ($map-><M::NamedNodeMap.getNamedItem> ('a1'));
+
+        $test->id ('dom2.attr.node.removed');
+        $el-><M::Element.removeAttributeNS> ('http://attr.example/', 'a1');
+        $test->assert_null ($map-><M::NamedNodeMap.getNamedItem> ('ns:a1'));
+
+    @@XDTest:
+      @@@ForCheck: t|ForETMap
+      @@@QName: etmap.getNamedItem.setNamedItem.test
+      @@@PerlDef:
+        my $dtd;
+        __CODE{d|newDoctypeForTest}__;
+        my $doc = $dtd-><AG::Node.ownerDocument>;
+
+        my $em = $dtd-><AG::d|DocumentTypeDefinition.elementTypes>;
+        $test->assert_isa ($em, <IFName::t|NamedNodeMap>);
+
+        $test->id ('getNamedItem.none');
+        $test->assert_null ($em-><M::NamedNodeMap.getNamedItem> ('et1'));
+
+        my $et1 = $doc-><M::d|DocumentXDoctype.createElementTypeDefinition>
+                          ('et1');
+        $test->assert_isa ($et1, <IFName::d|ElementTypeDefinition>);
+
+        $test->id ('setNamedItem.et1');
+        my $r1 = $em-><M::NamedNodeMap.setNamedItem> ($et1);
+        $test->assert_null ($r1);
+
+        $test->id ('getNamedItem.et1');
+        my $r2 = $em-><M::NamedNodeMap.getNamedItem> ('et1');
+        $test->assert_equals ($r2, $et1);
+        $test->assert_equals
+                 ($r2-><AG::d|ElementTypeDefinition.ownerDocumentTypeDefinition>,
+                  $dtd);
+        $test->assert_equals
+                 ($et1-><AG::d|ElementTypeDefinition.ownerDocumentTypeDefinition>,
+                  $dtd);
+
+        my $et2 = $doc-><M::d|DocumentXDoctype.createElementTypeDefinition>
+                          ('et1');
+        $test->assert_isa ($et2, <IFName::d|ElementTypeDefinition>);
+        $test->assert_not_equals ($et1, $et2);
+
+        $test->id ('setNamedItem.et2');
+        my $r3 = $em-><M::NamedNodeMap.setNamedItem> ($et2);
+        $test->assert_equals ($r3, $et1);
+
+        $test->id ('getNamedItem.et2');
+        my $r4 = $em-><M::NamedNodeMap.getNamedItem> ('et1');
+        $test->assert_equals ($r4, $et2);
+
+        $test->id ('setNamedItem.et2.by.et2');
+        my $r5 = $em-><M::NamedNodeMap.setNamedItem> ($et2);
+        $test->assert_null ($r5);
+        $test->assert_equals ($em-><M::NamedNodeMap.getNamedItem>, $et2);
+
   @Method:
-     @@Name:  setNamedItem
-     @@Description:
-       @@@lang:en
-       @@@@:
-         Add a node using its "nodeName" attribute.  If a node with 
-         that name is already present in this map, it is replaced 
-         by the new one.  Replacing a node by itself has no effect.
-     @@ImplNote:
-       @@@lang:en
-       @@@@: "Replacing ... no effect" is clarified by the DOM Level 2 Errata. 
-     @@NSVersion:.setNamedItemNS
-     @@Param:
-        @@@Name:  arg
-        @@@Type:  Node
-        @@@actualType:
-          @@@@@:ManakaiDOMAttr
-          @@@@ForCheck: c|ForAttrMap
-        @@@Description:
-          @@@@lang:en
-          @@@@@: A node to store in this map.
-     @@Return:
-        @@@Type:  Node
-        @@@actualType:
-          @@@@@:ManakaiDOMAttr
-          @@@@ForCheck: c|ForAttrMap
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            If the "arg" node replaces an existing node, the replaced node.
-        @@@InCase:
-          @@@@Value:
-            @@@@@is-null:1
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@: The "arg" node does not replace any node in the map.
-        @@@Exception:
-          @@@@Type: DOMException
-          @@@@Name: WRONG_DOCUMENT_ERR
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              The "arg" node was created from a different document.
-        @@@Exception:
-          @@@@Type: DOMException
-          @@@@Name: NO_MODIFICATION_ALLOWED_ERR
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@: This map is read-only.
-        @@@Exception:
-          @@@@Type: DOMException
-          @@@@Name: INUSE_ATTRIBUTE_ERR
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              The "arg" node is an "Attr" that is already an 
-              attribute of another "Element" object.
-        @@@Exception:
-          @@@@Type: DOMException
-          @@@@Name: HIERARCHY_REQUEST_ERR
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              An attempt is made to add a node that is unable to 
-              belong to this map.
-          @@@@SpecLevel:2
-          @@@@ImplNote:
-            @@@@@lang:en
-            @@@@@@: This exception has added by the DOM Level 2 Errata.
-       @@@c:reports:
-         @@@@@: t|replace-by-itself
-         @@@@enDesc:
-           If the <P::arg> node is same as the node that is in the map.
-           Then, the method call has no effect.
-         @@@@enImplNote:
-           This case is clarified by DOM Level 2 errata.
-         @@@@For: ManakaiDOM|ManakaiDOM
+    @@Name: setNamedItem
+    @@enDesc:
+      Adds a node using its <A::Node.nodeName> attribute.  If a node
+      with that name is already present in the map, it is replaced
+      by the new one.  Replacing a node by itself has no effect.
+
+      As the <A::Node.nodeName> is used to derive the name under which
+      the node is stored, multiple nodes the names would clash
+      cannot be stored.
+    @@enImplNote:
+      @@@ddid: repbyitself
+      @@@@:
+        <QUOTE::Replacing a node by itself has no effect> clause is 
+        clarified by DOM Level 2 errata.
+    @@NSVersion: .setNamedItemNS
+    @@Param:
+      @@@Name: arg
+      @@@Type: Node
+      @@@enDesc:
+        A node to store to the map.
+      @@@enImplNote:
+        The node will later be accessible using the value of <A::Node.nodeName>
+        attribute.
+    @@Return:
+      @@@Type: Node
+      @@@enDesc:
+        If <P::arg> replaces an existing node, the replaced <IF::Node>.
+      @@@nullCase:
+        @@@@enDesc:
+          No replacement occurred.
+        @@@@enImplNote:
+          What is returned if replace-by-itself?  It has no effect,
+          so it does no <QUOTE::replacement>, and <DOM::null>
+          should be returned?
+      @@@dx:raises:
+        @@@@@: c|DIFFERENT_DOCUMENT_ERR
+        @@@@enDesc:
+          If <P::arg> was created from a different document than
+          the one that created the map.
+      @@@dx:raises:
+        @@@@@: c|NOMOD_NAMEDNODEMAP_ERR
+        @@@@enDesc:
+          If the map is read-only.
+      @@@dx:raises:
+        @@@@@: c|INUSE_ATTRIBUTE_ERR
+        @@@@enDesc:
+          If <P::arg> is an <IF::Attr> that is already an attribute
+          of another <IF::Element>.
+        @@@@ForCheck: !t|ForETMap !t|ForATMap
+      @@@dx:raises:
+        @@@@@: c|INUSE_DEFINITION_ERR
+        @@@@enDesc:
+          If <P::arg> is a definition node that is already used
+          for another node.
+        @@@@ForCheck: !c|ForAttrMap
+      @@@dx:raises:
+        @@@@@: MDOMX|HIERARCHY_BAD_TYPE
+        @@@@enDesc:
+          If an attempt is made to add a node that is unable to
+          belong to the map.
+        @@@@enImplNote:
+          Added by DOM Level 2 errata.
+        @@@@For: ManakaiDOM|DOM2
+      @@@c:reports:
+        @@@@@: t|replace-by-itself
+        @@@@enDesc:
+          If the <P::arg> node is same as the node that is in the map.
+          Then, the method call has no effect.
+        @@@@enImplNote:
+          This case is clarified by DOM Level 2 errata.
+        @@@@For: ManakaiDOM|ManakaiDOM
        @@@PerlDef:
          @@@@ForCheck: c|ForAttrMap
          @@@@@:
                                    ## NOTE: Method name is directly written
            goto &{<Class::ManakaiDOMElement>->can ('set_attribute_node')};
-     @@ImplNote:
-       @@@lang:en
-       @@@@:
-         Is it possible to add the node that has namespace URI and local 
-         name?  If it is, can that node be retrieved via the "NS" methods? 
-         Is it possible to add the node that has "nodeName" crushing 
-         with existing "NS" node?
-         \
-              It is unclear whether the node should be returned if 
-              the node is <QUOTE::replaced> by itself.
+      @@@PerlDef:
+        @@@@ForCheck: !c|ForAttrMap
+        @@@@@:
+          my $owner = ($$$self)->{<H::mn:node>};
+          my $list;
+          my $expected_type;
+          __FOR{t:ForETMap::
+            $list = $owner->{<H::d|elementTypes>};
+            $expected_type = <C::Node.ELEMENT_TYPE_DEFINITION_NODE>;
+          }__;
+          __FOR{t:ForATMap::
+            $list = $owner->{<H::d|attributeDefinitions>};
+            $expected_type = <C::Node.ATTRIBUTE_DEFINITION_NODE>;
+          }__;
+          if (<Code::doStrictErrorChecking:: $nodeRef = {$$$self}>) {
+            unless (UNIVERSAL::isa ($arg,
+                                    <IFName::mn|NodeRef||ManakaiDOM|Perl>) and
+                    ${$arg->{<H::mn:node>}->{<H::mn:treeID>}} eq
+                        ${$owner->{<H::mn:treeID>}}) {
+              __EXCEPTION{c|DIFFERENT_DOCUMENT_ERR::
+              }__;
+            }
+            if ($owner->{<H::c|read-only>}) {
+              __EXCEPTION{c|NOMOD_NAMEDNODEMAP_ERR::
+              }__;
+            }
+            if ($arg->{<H::mn:node>}->{<H::d|ownerDefinition>} and
+                $arg->{<H::mn:node>}->{<H::d|ownerDefinition>} ne $owner) {
+              __EXCEPTION{c|INUSE_DEFINITION_ERR::
+                MDOMX:param-name => 'arg',
+                c:node => {$arg},
+              }__;
+              ## NOTE: If equals to owner, then replace-by-itself error.
+            }
+            if ($arg-><AG::Node.nodeType> == $expected_type) {
+              __EXCEPTION{MDOMX|HIERARCHY_BAD_TYPE::
+                c:nodeType => {$arg-><AG::Node.nodeType>},
+                MDOMX:param-name => 'arg',
+              }__;
+            }
+          } # strictErrorChecking
+          SET: {
+            my $name = $arg-><AG::Node.nodeName>;
+            if (defined $list->{$name}) {
+              my $old_stem = $list->{$name};
+              if ($old_stem eq $arg->{<H::mn:node>}) {
+                __c:ERROR{t|replace-by-itself::
+                  c:relatedData => {$arg},
+                }__;
+                # no return value
+                last SET;
+              } else {
+                $r = <ClassM::ManakaiDOMNode.getNodeReference> ($old_stem)
+                  if defined wantarray;
+                CORE::delete $list->{$name};
+                CORE::delete $old_stem->{<H::d|ownerDefinition>};
+                $old_stem-><M::NodeStem.orphanate>;
+              }
+            }
+            $owner-><M::NodeStem.importTree> ($arg->{<H::mn:node>});
+            $list->{$name} = $arg->{<H::mn:node>};
+            $arg->{<H::mn:node>}->{<H::d|ownerDefinition>} = $owner;
+          } # SET
+
+    @@enImplNote:
+      @@@ForCheck: !t|ForETMap
+      @@@ddid: nsattrnodename
+      @@@@:
+        {P:: If a <IF::NamedNodeMap> contains two nodes:
+            
+             - <A::Node.nodeName> equals to <CODE::ns1:ln>, and
+ 
+             - <A::Node.nodeName> equals to <CODE::ns2:ln>,
+               <A::Node.localName> equals to <CODE::ln>, and 
+               <A::Node.namespaceURI> equals to <URI::http://www.example/>,
+              
+             then what result is lead by an attempt to add a node
+             with <A::Node.nodeName> equals to <CODE::ns1:ln>,
+             <A::Node.localName> equals to <CODE::ln>, and
+             <A::Node.namespaceURI> equals to <URI::http://www.example/>?
+        }
+
+    @@Test:
+      @@@ForCheck: c|ForAttrMap
+      @@@QName: AttrMap.setNamedItem.dom1.test
+      @@@PerlDef:
+        my $doc;
+        my $el;
+        __CODE{createElementForTest:: $el => $el}__;
+
+        $doc = $el-><AG::Node.ownerDocument>;
+
+        my $map = $el-><AG::Node.attributes>;
+
+        $test->assert_null ($map-><M::NamedNodeMap.getNamedItem> ('a1'));
+
+        $test->id ('set.new.node');
+        my $a1 = $doc-><M::Document.createAttribute> ('a1');
+        $a1-><AS::Attr.value> ('value1');
+        $map-><M::NamedNodeMap.setNamedItem> ($a1);
+        my $a1r = $map-><M::NamedNodeMap.getNamedItem> ('a1');
+        $test->assert_isa ($a1r, <IFName::Attr>);
+        $test->assert_num_equals
+                 (actual_value => $a1r-><AG::Node.nodeType>,
+                  expected_value => <C::Node.ATTRIBUTE_NODE>);
+        $test->assert_equals ($a1r-><AG::Node.nodeName>, 'a1');
+        $test->assert_equals ($a1r-><AG::Node.nodeValue>, 'value1');
+        $test->assert_equals ($a1r, $a1);
+        $test->assert_equals ($el-><M::Element.getAttribute> ('a1'), 'value1');
+
+        $test->id ('replace.node');
+        my $a2 = $doc-><M::Document.createAttribute> ('a1');
+        $a2-><AS::Attr.value> ('value2');
+        $test->assert_not_equals ($a1, $a2);
+        my $ra1 = $map-><M::NamedNodeMap.setNamedItem> ($a2);
+        $test->assert_equals ($ra1, $a1);
+        my $a2r = $map-><M::NamedNodeMap.getNamedItem> ('a1');
+        $test->assert_equals ($a2r, $a2);
+        $test->assert_equals ($el-><M::Element.getAttribute> ('a1'), 'value2');
+     @@enImplNote:
+       {TODO:: Namespace aware test required
+       }
+
   @Method:
-     @@Name:  removeNamedItem
-     @@Description:
-        @@@lang:en
-        @@@@:
-          Remove a node specified by name.
-     @@NSVersion:.removeNamedItemNS
-     @@Param:
-        @@@Name:  name
-        @@@Type:  
-          DOMMain:DOMString
-        @@@Description:
-          @@@@lang:en
-          @@@@@: The "nodeName" of the node to remove.
-     @@Return:
-        @@@Type:  Node
-        @@@actualType:
-          @@@@ForCheck: c|ForAttrMap
-          @@@@@: ManakaiDOMAttr
-        @@@Description:
-          @@@@lang:en
-          @@@@@: The node removed from this map.
-        @@@Exception:
-          @@@@Type: DOMException
-          @@@@Name: NOT_FOUND_ERR
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@: There is no node named "name" in this map.
-          @@@@ImplNote:
-            @@@@@lang:en
-            @@@@@@:
-              The DOM Level 1 First Edition also said that if there 
-              is no node named "name", "null" is returned.  It has 
-              removed by the DOM Level 1 First Edition Errata.
-        @@@Exception:
-          @@@@Type: DOMException
-          @@@@Name: NO_MODIFICATION_ALLOWED_ERR
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@: This map is read-only.
-          @@@@SpecLevel:1
-          @@@@ImplNote:
-            @@@@@lang:en
-            @@@@@@:
-              This exception is added by the DOM Level 1 First Edition Errata.
+    @@Name: removeNamedItem
+    @@enDesc:
+      Removes a node specified by name.
+    @@enDesc:
+      @@@ddid: attr
+      @@@ForCheck: c|ForAttrMap
+      @@@enDesc:
+        If the removed attribute is known to have a default value,
+        an attribute immediately appears containing the default
+        value as well as the corresponding namespace URI, local name,
+        and prefix when applicable.
+    @@NSVersion: .removeNamedItemNS
+    @@Param:
+      @@@Name: name
+      @@@Type: DOMString
+      @@@dis:actualType: 
+        @@@@@: DOMMain|ManakaiDOMXMLName
+        @@@@ManakaiDOM:noInputNormalize: 1
+      @@@enDesc:
+        The <A::Node.nodeName> of the node to remove.
+    @@Return:
+      @@@Type: Node
+      @@@enDesc:
+        The node removed from the map.
+      @@@dx:raises:
+        @@@@@: c|NO_NAMED_NODE_ERR
+        @@@@enDesc:
+          If there is no node named as <P::name> in the map.
+      @@@dx:raises:
+        @@@@@: c|NOMOD_NAMEDNODEMAP_ERR
+        @@@@enDesc:
+          If the map is read-only.
+        @@@@enImplNote:
+          Added by DOM Level 1 (first edition) errata.
+      @@@enImplNote:
+        In DOM Level 1 Specification (first edition), it is defined that 
+        in case there is no node with <P::name> then <DOM::null> should be
+        returned while <X::c|NO_NAMED_NODE_ERR> exception is also specified.
+        The former is removed by DOM Level 1 (first edition) errata.
+
         @@@PerlDef:
           @@@@ForCheck: c|ForAttrMap
           @@@@@:
@@ -7045,35 +7283,24 @@ ResourceDef:
               This code is almost same as <M::Element.removeAttribute>. 
               This method returns an <IF::Attr> removed but that method 
               does not (<M::Element.removeAttributeNode> does).
+
   @Method:
-     @@Name:  item
-     @@Description:
-       @@@lang:en
-       @@@@: Return an item in the map.
-     @@Param:
-        @@@Name:  index
-        @@@Type:  
-          DOMMain:unsigned-long||ManakaiDOM|all
-        @@@Description:
-          @@@@lang:en
-          @@@@@: The index of the item into this map.
-     @@Return:
-        @@@Type:  Node
-        @@@actualType:
-          @@@@ForCheck: c|ForAttrMap
-          @@@@@:
-            DOMCore:ManakaiDOMAttr
-        @@@Description:
-          @@@@lang:en
-          @@@@@: The node at the "index"th position in the map.
-        @@@InCase:
-          @@@@Value:
-            @@@@@is-null:1
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@: 
-              The "index" is invalid, i.e. it is greater than or 
-              equal to the number of nodes in this map.
+    @@Name: item
+    @@enDesc:
+      Returns the <P::index>th item in the map.
+    @@Param:
+      @@@Name: index
+      @@@Type: idl|unsignedLong||ManakaiDOM|all
+      @@@enDesc:
+        The ordinal index of a node to retrieve.
+    @@Return:
+      @@@Type: Node
+      @@@enDesc:
+        The node at the <P::index>th position in the map.
+      @@@nullCase:
+        @@@@enDesc:
+          If <P::index> is greater than or equal to the number of nodes
+          in the map.
         @@@PerlDef:
           @@@@ForCheck: c|ForAttrMap
           @@@@@:
@@ -7092,18 +7319,13 @@ ResourceDef:
             if ($r) {
               $r = <ClassM::ManakaiDOMNode.getNodeReference> ($r);
             }
-    @@ImplNote:
-      @@@lang:en
-      @@@@:
-        Attribute order is not defined by the specifications.
+
   @Attr:
-     @@Name:  length
-     @@Description:
-       @@@lang:en
-       @@@@: The number of nodes in this map.
-     @@Get:
-        @@@Type:  
-          DOMMain:unsigned-long||ManakaiDOM|all
+    @@Name: length
+    @@enDesc:
+      The number of nodes in the map.
+    @@Type: idl|unsignedLong||ManakaiDOM|all
+    @@Get:
         @@@PerlDef:
           @@@@ForCheck: c|ForAttrMap
           @@@@@:
@@ -7111,63 +7333,48 @@ ResourceDef:
                                ->{<H::infoset:attributes>}}) {
               $r += keys %$_;
             }
-  @Method:
-     @@Name:  getNamedItemNS
-     @@Description:
-       @@@lang:en
-       @@@@:
-         Retrieve a node specified by local name and namespace URI.
-     @@NoNSVersion:.getNamedItem
-     @@Param:
-        @@@Name:  namespaceURI
-        @@@Type:
-          DOMMain:DOMString
-        @@@actualType:
-          ManakaiDOM:ManakaiDOMNamespaceURI
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            The namespace URI of the node to retrieve.
-        @@@InCase:
-          @@@@Value:
-            @@@@@is-null:1
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@: The node to retrieve has no namespace.
-     @@Param:
-        @@@Name:  localName
-        @@@Type:  
-          DOMMain:DOMString
-        @@@Description:
-          @@@@lang:en
-          @@@@@: The local name of the node to retrieve.
-     @@Return:
-        @@@Type:  Node
-        @@@actualType:
-          @@@@ForCheck: c|ForAttrMap
-          @@@@@:ManakaiDOMAttr
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            A "Node" (of any type) with the specified local name and 
-            namespace URI.
-        @@@InCase:
-          @@@@Value:
-            @@@@@is-null:1
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              The "namespaceURI" and "localName" does not identify 
-              any node in this map.
-        @@@Exception:
-          @@@@Type: DOMException
-          @@@@Name: NOT_SUPPORTED_ERR
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              The DOM implementation does not support the feature "XML" and 
-              the language exposed through the "Document" does not 
-              support XML Namespaces.
+
+  @L2Method:
+    @@Name: getNamedItemNS
+    @@enDesc:
+      Retrieves a node specified by local name and namespace URI.
+    @@NoNSVersion: .getNamedItem
+    @@XML2Feature:
+    @@Param:
+      @@@Name: namespaceURI
+      @@@Type: DOMString
+      @@@dis:actualType: ManakaiDOM|ManakaiDOMNamespaceURI
+      @@@enDesc:
+        The namespace URI of the node to retrieve.
+    @@Param:
+      @@@Name: localName
+      @@@Type: DOMString
+      @@@enDesc:
+        The local name of the node to retrieve.
+    @@Return:
+      @@@Type: Node
+      @@@enDesc:
+        The <IF::Node> with the specified <P::localName> and
+        <P::namespaceURI>.
+      @@@nullCase:
+        @@@@enDesc:
+          If the pair of <P::localName> and <P::namespaceURI>
+          does not identify any node in the map.
+        @@@@enDesc:
+          @@@@@ddid:nons
+          @@@@@ForCheck: !c|ForAttrMap ManakaiDOM|ManakaiDOM
+          @@@@@@:
+            If it is a <IF::NamedNodeMap> containing element type definitions,
+            attribute definitions, entities, or notations attached to
+            <IF::d|DocumentTypeDefinition> or <IF::d|ElementTypeDefinition>
+            nodes.
+      @@@dx:raises:
+        @@@@@: MDOMX|MDOM_IMPL_NOSUPPORT_XMLNS
+        @@@@enDesc:
+          If the implementation does not support the <Feature::XML> feature
+          and the language exposed through the <IF::Document> does
+          not support XML namespaces.
+
        @@@disDef:
          @@@@ForCheck:
            c|ForAttrMap ManakaiDOM:DOMXMLFeature
@@ -7178,113 +7385,86 @@ ResourceDef:
             !ManakaiDOM:DOMXMLFeature
           @@@@DOMMain:raiseException:
             MDOMX:MDOM_IMPL_NOSUPPORT_XMLNS
-     @@DOMMain:implementFeature:
-       @@@@: c|CoreFeature20
-       @@@ForCheck:
-         ManakaiDOM:DOM2
-     @@DOMMain:implementFeature:
-       @@@@: c|CoreFeature30
-       @@@ForCheck:
-         ManakaiDOM:DOM3
-     @@For:
-       ManakaiDOM:DOM2
-     @@Level[list]:  2
-     @@SpecLevel:2
-     @@ImplNote:
-       @@@lang:en
-       @@@@:
-         The DOM Level 2 Specification said that the HTML-only DOM 
-         implenentations do not need to implement this method. 
-         The DOM Level 2 Errata and the DOM Level 3 Specification 
-         says that the <X::DOMException.NOT_SUPPORTED_ERR> should be raised.
-  @Method:
-     @@Name:  setNamedItemNS
-     @@Description:
-       @@@lang:en
-       @@@@:
-         Add a node using its "namespaceURI" and "localName". 
-         If a node with that namespace URI and that local name 
-         is already present in this map, it is replaced by the new one. 
-         Replacing a node by itself has no effect.
-     @@ImplNote:
-       @@@lang:en
-       @@@@: "Replacing ... no effect" is clarified by the DOM Level 2 Errata. 
-     @@NoNSVersion:.setNamedItem
-     @@Param:
-        @@@Name:  arg
-        @@@Type:  Node
-        @@@actualType:
-          @@@@ForCheck: c|ForAttrMap
-          @@@@@:ManakaiDOMAttr
-        @@@Description:
-          @@@@lang:en
-          @@@@@: A node to store in this map.
-     @@Return:
-        @@@Type:  Node
-        @@@actualType:
-          @@@@ForCheck: c|ForAttrMap
-          @@@@@:ManakaiDOMAttr
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            If the "arg" node replaces an existing node, the replaced node.
-        @@@InCase:
-          @@@@Value:
-            @@@@@is-null:1
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@: The "arg" node replaces no existing node in this map.
-        @@@Exception:
-          @@@@Type: DOMException
-          @@@@Name: WRONG_DOCUMENT_ERR
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@: The "arg" node was created from a different document.
-        @@@Exception:
-          @@@@Type: DOMException
-          @@@@Name: NO_MODIFICATION_ALLOWED_ERR
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@: This map is read-only.
-        @@@Exception:
-          @@@@Type: DOMException
-          @@@@Name: INUSE_ATTRIBUTE_ERR
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              The "arg" node is an "Attr" that is already an 
-              attribute of another "Element" object.
-        @@@Exception:
-          @@@@Type: DOMException
-          @@@@Name: HIERARCHY_REQUEST_ERR
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              An attempt is made to add a node that is unable to 
-              belong to this map.
-          @@@@SpecLevel:2
-          @@@@ImplNote:
-            @@@@@lang:en
-            @@@@@@: This exception has added by the DOM Level 2 Errata.
-         @@@Exception:
-           @@@@Type: DOMException
-           @@@@Name: NOT_SUPPORTED_ERR
-           @@@@Description:
-             @@@@@lang:en
-             @@@@@@:
-             The DOM implementation does not support the feature "XML" and 
-             the language exposed through the "Document" does not 
-             support XML Namespaces
-           @@@@SpecLevel:2
-        @@@c:reports:
-          @@@@@: t|replace-by-itself
-          @@@@enDesc:
-            If the <P::arg> node is same as the current node in the map.
-            The method has no effect in this case.
-          @@@@enImplNote:
-            This case is clarified by DOM Level 2 errata.
-          @@@@For: ManakaiDOM|ManakaiDOM
-       @@@PerlDef:
+      @@@PerlDef:
+        @@@@@: \
+        @@@@ForCheck: !c|ForAttrMap
+
+  @L2Method:
+    @@Name: setNamedItemNS
+    @@enDesc:
+      Adds a node using its <A::Node.namespaceURI> and <A::Node.localName>.
+      If a node with that namespace URI and that local name is already
+      present in the map, it is replaced by the new one.  Replacing a
+      node by itself has no effect.
+    @@enImplNote:
+      @@@ddid: repbyitself
+      @@@@:
+        <QUOTE::Replacing a node by itself has no effect> clause
+        is clarified by DOM Level 2 errata.
+    @@NoNSVersion: .setNamedItem
+    @@XML2Feature:
+    @@Param:
+      @@@Name: arg
+      @@@Type: Node
+      @@@enDesc:
+        A node to store to the map.
+      @@@enImplNote:
+        The node will later be accessible using the value of 
+        its <A::Node.namespaceURI> and <A::Node.localName> attributes.
+    @@Return:
+      @@@Type: Node
+      @@@enDesc:
+        If the new <IF::Node> replaces an existing node, the replaced
+        <IF::Node>.
+      @@@nullCase:
+        @@@@enDesc:
+          If no replacement is occurred.
+      @@@dx:raises:
+        @@@@@: c|DIFFERENT_DOCUMENT_ERR
+        @@@@enDesc:
+          If <P::arg> was created from a different document than
+          the one that created the map.
+      @@@dx:raises:
+        @@@@@: c|NOMOD_NAMEDNODEMAP_ERR
+        @@@@enDesc:
+          If the map is read-only.
+      @@@dx:raises:
+        @@@@@: c|INUSE_ATTRIBUTE_ERR
+        @@@@enDesc:
+          If <P::arg> is an <IF::Attr> that is already an attribute
+          of another <IF::Element>.
+        @@@@ForCheck: !t|ForETMap !t|ForATMap
+      @@@dx:raises:
+        @@@@@: MDOMX|HIERARCHY_BAD_TYPE
+        @@@@enDesc:
+          If an attempt is made to add a node that is unable to
+          belong to the map.
+        @@@@enImplNote:
+          Added by DOM Level 2 errata.
+        @@@@For: ManakaiDOM|DOM2
+      @@@dx:raises:
+        @@@@@: MDOMX|MDOM_IMPL_NOSUPPORT_XMLNS
+        @@@@enDesc:
+          If the implementation does not support the <Feature::XML> feature
+          and the language exposed through the <IF::Document> does
+          not support XML namespaces.
+      @@@dx:raises:
+        @@@@ForCheck: !c|ForAttrMap ManakaiDOM|ManakaiDOM
+        @@@@@: c|NO_NS_NAMEDNODEMAP_ERR
+        @@@@enDesc:
+          If it is a <IF::NamedNodeMap> containing element type definitions,
+          attribute definitions, entities, or notations attached to
+          <IF::d|DocumentTypeDefinition> or <IF::d|ElementTypeDefinition>
+          nodes.  They does not support XML namespaces.
+      @@@c:reports:
+        @@@@@: t|replace-by-itself
+        @@@@enDesc:
+          If the <P::arg> node is same as the current node in the map.
+          The method has no effect in this case.
+        @@@@enImplNote:
+          This case is clarified by DOM Level 2 errata.
+        @@@@For: ManakaiDOM|ManakaiDOM
+     @@@PerlDef:
          @@@@ForCheck:
            c|ForAttrMap ManakaiDOM:DOMXMLFeature
          @@@@@:
@@ -7368,14 +7548,16 @@ ResourceDef:
             !ManakaiDOM:DOMXMLFeature
           @@@@DOMMain:raiseException:
             MDOMX:MDOM_IMPL_NOSUPPORT_XMLNS
+      @@@disDef:
+        @@@@ForCheck: !c|ForAttrMap ManakaiDOM|DOMXMLFeature
+        @@@@DOMMain:raiseException: c|NO_NS_NAMEDNODEMAP_ERR
 
        @@@L3Test:
          @@@@QName: NamedNodeMap.Attr.setNamedItemNS.replace-by-itself.Test
          @@@@ForCheck: c|ForAttrMap
          @@@@PerlDef:
-           my $impl = <Class::c|ManakaiDOMImplementation>->_new;
-           my $doc = $impl-><M::c|DOMImplementation.createDocument>
-                              ('http://www.example/', 'ex');
+           my $doc;
+           __CODE{createDocumentForTest:: $doc => $doc}__;
 
            my $eh_called = false;
 
@@ -7409,90 +7591,56 @@ ResourceDef:
 
            $attr = null;
 
-     @@DOMMain:implementFeature:
-       @@@@: c|CoreFeature20
-       @@@ForCheck:
-         ManakaiDOM:DOM2
-     @@DOMMain:implementFeature:
-       @@@@: c|CoreFeature30
-       @@@ForCheck:
-         ManakaiDOM:DOM3
-     @@ImplNote:
-       @@@lang:en
-       @@@@:
-         The DOM Level 2 Specification said that the HTML-only DOM 
-         implenentations do not need to implement this method. 
-         The DOM Level 2 Errata and the DOM Level 3 Specification 
-         says that the NOT_SUPPORTED_ERR should be raised.
-     @@Level[list]:  2
-     @@SpecLevel:2
-     @@For:
-       ManakaiDOM:DOM2
-  @Method:
-     @@Name:  removeNamedItemNS
-     @@Description:
-        @@@lang:en
-        @@@@:
-          Remove a node specified by local name and namespace URI.
-     @@ImplNote:
-       @@@lang:en
-       @@@@:
-         New non-"specified" attribute will be generated if the schema 
-         defines some default value for the attribute removed.
-     @@NoNSVersion:.removeNamedItem
-     @@Param:
-        @@@Name:  namespaceURI
-        @@@Type:
-          DOMMain:DOMString
-        @@@actualType:
-          ManakaiDOM:ManakaiDOMNamespaceURI
-        @@@Description:
-          @@@@lang:en
-          @@@@@: The namespace URI of the node to remove.
-        @@@InCase:
-          @@@@Value:
-            @@@@@is-null:1
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@: The node to remove has no namespace.
-     @@Param:
-        @@@Name:  localName
-        @@@Type: 
-          DOMMain:DOMString
-        @@@Description:
-          @@@@lang:en
-          @@@@@: The local name of the node to remove.
-     @@Return:
-        @@@Type:  Node
-        @@@actualType:
-          @@@@ForCheck: c|ForAttrMap
-          @@@@@:ManakaiDOMAttr
-        @@@Description:
-          @@@@lang:en
-          @@@@@: The node removed from this map.
-        @@@Exception:
-          @@@@Type: DOMException
-          @@@@Name: NOT_FOUND_ERR
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              There is no node with the specified "namespaceURI" and 
-              "localName" in the map.
-        @@@Exception:
-          @@@@Type: DOMException
-          @@@@Name: NO_MODIFICATION_ALLOWED_ERR
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@: This map is read-only.
-         @@@Exception:
-           @@@@Type: DOMException
-           @@@@Name: NOT_SUPPORTED_ERR
-           @@@@Description:
-             @@@@@lang:en
-             @@@@@@:
-             The DOM implementation does not support the feature "XML" and 
-             the language exposed through the "Document" does not 
-             support XML Namespaces
+  @L2Method:
+    @@Name: removeNamedItemNS
+    @@enDesc:
+      Removes a node specified by local name and namespace URI.
+    @@NoNSVersion: .removeNamedItem
+    @@enDesc:
+      @@@ddid: attr
+      @@@ForCheck: c|ForAttrMap
+      @@@@:
+        If the removed attribute is known to have a default value,
+        an attribute immediately appears containing the default value
+        as well as the corresponding namespace URI, local name, 
+        and prefix when applicable.
+    @@XML2Feature:
+    @@Param:
+      @@@Name: namespaceURI
+      @@@Type: DOMString
+      @@@dis:actualType: ManakaiDOM|ManakaiDOMNamespaceURI
+      @@@enDesc:
+        The namespace URI of the node to remove.
+    @@Param:
+      @@@Name: localName
+      @@@Type: DOMString
+      @@@enDesc:
+        The local name of the node to remove.
+    @@Return:
+      @@@Type: Node
+      @@@enDesc:
+        The node removed from the map.
+      @@@dx:raises:
+        @@@@@: c|NO_NAMED_NODE_NS_ERR
+        @@@@enDesc:
+          If there is no node with the specified <P::namespaceURI>
+          and <P::localName> in the map.
+
+          If it is a <IF::NamedNodeMap> containing element type definitions,
+          attribute definitions, entities, or notations attached to
+          <IF::d|DocumentTypeDefinition> or <IF::d|ElementTypeDefinition>
+          nodes.  They does not support XML namespaces.
+      @@@dx:raises:
+        @@@@@: c|NOMOD_NAMEDNODEMAP_ERR
+        @@@@enDesc:
+          If the map is read-only.
+      @@@dx:raises:
+        @@@@@: MDOMX|MDOM_IMPL_NOSUPPORT_XMLNS
+        @@@@enDesc:
+          If the implementation does not support the <Feature::XML> feature
+          and the language exposed through the <IF::Document> does
+          not support XML namespaces.
+
        @@@PerlDef:
          @@@@ForCheck:
            c|ForAttrMap ManakaiDOM:DOMXMLFeature
@@ -7518,35 +7666,25 @@ ResourceDef:
             !ManakaiDOM:DOMXMLFeature
           @@@@DOMMain:raiseException:
             MDOMX:MDOM_IMPL_NOSUPPORT_XMLNS
-     @@DOMMain:implementFeature:
-       @@@@: c|CoreFeature20
-       @@@ForCheck:
-         ManakaiDOM:DOM2
-     @@DOMMain:implementFeature:
-       @@@@: c|CoreFeature30
-       @@@ForCheck:
-         ManakaiDOM:DOM3
-     @@ImplNote:
-       @@@lang:en
-       @@@@:
-         The DOM Level 2 Specification said that the HTML-only DOM 
-         implenentations do not need to implement this method. 
-         The DOM Level 2 Errata and the DOM Level 3 Specification 
-         says that the NOT_SUPPORTED_ERR should be raised.
-     @@For:
-       ManakaiDOM:DOM2
-     @@Level[list]:  2
-     @@SpecLevel:2
+      @@@disDef:
+        @@@@ForCheck: !c|ForAttrMap ManakaiDOM|DOMXMLFeature
+        @@@@DOMMain:raiseException: c|NO_NAMED_NODE_NS_ERR
 
   @IntMethod:
     @@Name: isEqualNamedNodeMap
     @@ForCheck:
       !ManakaiDOM:ForIF
     @@Perlop: ==
-    @@Description:
-      @@@lang:en
-      @@@@:
-        Return whether two <IF::NamedNodeMap>s are equal.
+    @@enDesc:
+      Returns whether two <IF::NamedNodeMap>s are equals.
+   
+      Two <IF::NamedNodeMap>s are equal if they have the same
+      <A::NamedNodeMap.length> and for each node that exists in
+      one map there is a node that exists in the other map 
+      and is equal, although not necessarily at the same index.
+    @@enImplNote:
+      See also <M::Node.isEqualNode>.
+    
     @@Param:
       @@@Name:arg
       @@@Type:NamedNodeMap
@@ -7598,10 +7736,28 @@ ResourceDef:
             $r = true;
           }
         }__;
-    @@ImplNote:
-      @@@lang:en
-      @@@@:
-        See: <M::Node.isEqualNode>.
+      @@@PerlDef:
+        @@@@ForCheck: !c|ForAttrMap
+        @@@@@:
+          __DEEP{
+            my $length1 = $self-><AG::NamedNodeMap.length>;
+            my $length2 = $arg-><AG::NamedNodeMap.length>;
+            if ($length1 == $length2) {
+              CHK: {
+                for my $i (0..$length1-1) {
+                  my $node1 = $self-><M::NamedNodeMap.item> ($i);
+                  my $node2 = $arg-><M::NamedNodeMap.item> ($i);
+                  unless ($node1 == $node2) {
+                    last CHK;
+                  }
+                }
+                $r = true;
+              } # CHK
+            }
+          }__;
+        @@@@enImplNote:
+          In manakai, nodes in namespace unaware <IF::NamedNodeMap> are
+          ordered by their <A::Node.nodeName>.
 
   @IntMethod:
     @@ForCheck: ManakaiDOM|ManakaiDOM3 c|ForAttrMap
@@ -7654,7 +7810,52 @@ ResourceDef:
           } else {
             $err-><M::ecore|ErrorInterface||ManakaiDOM|Perl.throw>;
           }
+
+  @CODE:
+    @@ForCheck: t|ForETMap ManakaiDOM|ManakaiDOMLatest
+    @@QName: getElementTypeDefNodeMap
+    @@enDesc:
+      Creates an element type definition node map from a document
+      type definition node.
+    @@PerlDef:
+      $map = bless \\($node), <ClassName::t|ManakaiDOMElementTypeDefMap>;
+
+  @CODE:
+    @@ForCheck: t|ForATMap ManakaiDOM|ManakaiDOMLatest
+    @@QName: getAttrDefNodeMap
+    @@enDesc:
+      Creates an attribute definition node map from a document
+      type definition node.
+    @@PerlDef:
+      $map = bless \\($node), <ClassName::t|ManakaiDOMAttrDefMap>;
 ##NamedNodeMap
+
+ElementTypeBinding:
+  @Name: CODE
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISPerl|BlockCode
+    @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
+
+ResourceDef:
+  @QName: createDocumentForTest
+  @rdf:type: DISPerl|BlockCode
+  @For: ManakaiDOM|ManakaiDOM
+  @PerlDefC:
+    my $impl = <Class::c|ManakaiDOMImplementation>->_new;
+    $doc = $impl-><M::c|DOMImplementation.createDocument>
+                              ('http://www.example/', 'ex');
+
+ResourceDef:
+  @QName: createElementForTest
+  @rdf:type: DISPerl|BlockCode
+  @For: ManakaiDOM|ManakaiDOM
+  @PerlDefC:
+    my $doc;
+    __CODE{createDocumentForTest:: $doc => $doc}__;
+    $el = $doc-><M::Document.createElementNS>
+                  ('http://www.example.net/', 'ex:element');
 
 ## -- Specialized |Node| Interfaces
 
@@ -9247,7 +9448,7 @@ NodeTypeDef:
                 $_-><M::NodeStem.orphanate>;
               }
             } else {
-              my $docNode = $self->{<H::DOMCore:ownerDocument>};
+              my $docNode = $node->{<H::c|ownerDocument>};
               if (<Code::doStrictErrorChecking:: $nodeRef = $self>) {
                 my $version = <Code::getDocumentXMLVersion:: $DOCOBJ = $docNode>;
                 __CODE{DOMMain:ensureXMLName:: $INPUT => $name,
@@ -9260,7 +9461,7 @@ NodeTypeDef:
               __CODE{mn|setXRefNode||ManakaiDOM|Perl::
                 $referrer => {$r},
                 $propName => {<H::DOMCore:ownerDocument>},
-                $referent => {$node->{<H::DOMCore:ownerDocument>}},
+                $referent => {$docNode},
               }__;
               $node->{<H::infoset:attributes>}
                    ->{<Q::ManakaiDOM:noNS>}->{$name} = $r;
@@ -10094,6 +10295,7 @@ NodeTypeDef:
         }
       } else {
         $__r = <ClassM::ManakaiDOMAttr.newObject> ($__node);
+        $__r->{<H::infoset:ownerElement>} = $__node;
         __CODE{mn|setXRefNode||ManakaiDOM|Perl::
           $referrer => {$__r},
           $propName => {<H::DOMCore:ownerDocument>},
@@ -10105,7 +10307,6 @@ NodeTypeDef:
           $given => $namespaceURI,
         }__;
         $__r->{<H::infoset:localName>} = $localName;
-        $__r->{<H::infoset:ownerElement>} = $__node;
         $__node->{<H::infoset:attributes>}
                ->{defined $namespaceURI ? $namespaceURI : <Q::null:>}
                ->{$localName} = $__r;
@@ -10114,7 +10315,7 @@ NodeTypeDef:
       __CODE{mn|setXRefNode||ManakaiDOM|Perl::
         $referrer => {$__text},
         $propName => {<H::DOMCore:ownerDocument>},
-        $referent => {$element->{<H::mn:node>}->{<H::DOMCore:ownerDocument>}},
+        $referent => {$__node->{<H::DOMCore:ownerDocument>}},
       }__;
       $__text->{<H::infoset:content>} = defined $value ? $value : '';
       $__text->{<H::infoset:parent>} = $__r;
@@ -11635,6 +11836,14 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type: test|StandaloneTest
     @@ForCheck: ManakaiDOM|ManakaiDOM3 ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: XDTest
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: test|StandaloneTest
+    @@ForCheck: ManakaiDOM|ManakaiDOMLatest ManakaiDOM|ForClass
 
 ResourceDef:
   @QName: c|Text
