@@ -17,7 +17,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/01/23 12:43:35 $
+    $Date: 2006/01/25 12:21:49 $
   
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
   
@@ -937,10 +937,10 @@ IFClsXDef:
           to the document type definition.
       @@@NodeReadOnlyError:
       @@@dx:raises:
-        @@@@@: c|OWNER_DEFINITION_READ_ONLY_ERR
+        @@@@@: c|INUSE_DEFINITION_ERR
         @@@@enDesc:
-          The <A::ElementTypeDefinition.ownerDocumentTypeDefinition>
-          node is read-only.
+          If <A::ElementTypeDefinition.ownerDocumentTypeDefinition>
+          is not <DOM::null>.
       @@@dx:raises:
         @@@@@: c|DIFFERENT_DOCUMENT_ERR
         @@@@enDesc:
@@ -995,13 +995,15 @@ IFClsXDef:
                        -><M::DocumentXDoctype.createDocumentTypeDefinition>
                            ('dt2');
     
-        my $old3 = $dtd2-><M::DocumentTypeDefinition
+        my $old3 =
+        $test->assert_exception (code => sub {
+          $dtd2-><M::DocumentTypeDefinition
                             .setElementTypeDefinitionNode> ($et);
-        $test->assert_null ($old3);
+        }, exception_subtype => <Q::c|INUSE_DEFINITION_ERR>);
         
         $test->assert_equals
                  ($et-><AG::ElementTypeDefinition.ownerDocumentTypeDefinition>,
-                  $dtd2);
+                  $dtd);
         $test->assert_null
                  ($dtd-><M::DocumentTypeDefinition
                              .getElementTypeDefinitionNode>
@@ -1083,10 +1085,10 @@ IFClsXDef:
       is <EM::not> namespace aware and the document type
       name is kept by <Q::c|name> property.
   @mn:xrefnode0: c|ownerDocument
-  @mn:subnode2: d|elementTypes
-  @mn:subnode2: d|generalEntities
-  @mn:subnode2: d|parameterEntities
-  @mn:subnode2: d|notations
+  @mn:subnode1: d|elementTypes
+  @mn:subnode1: d|generalEntities
+  @mn:subnode1: d|parameterEntities
+  @mn:subnode1: d|notations
   @mn:subnode1: infoset|children
   @mn:origin0: infoset|parent
 ##DocumentTypeDefinition
@@ -1259,6 +1261,9 @@ IFClsXDef:
 
         my $as = $et-><AG::ElementTypeDefinition.attributeDefinitions>;
         $test->assert_isa ($as, <IFName::t|NamedNodeMap>);
+        $test->assert_num_equals
+                 (actual_value => $as-><AG::t|NamedNodeMap.length>,
+                  expected_value => 0);
 
   @Attr:
     @@ForCheck: ManakaiDOM|ForClass
@@ -1277,7 +1282,7 @@ IFClsXDef:
         my $et;
         __CODE{newETForTest}__;
         my $cl = $et-><AG::Node.childNodes>;
-        $test->assert_not_null ($cl);
+        $test->assert_isa ($cl, <IFName::t|NodeList>);
         $test->assert_num_equals
                  (actual_value => $cl-><AG::t|NodeList.length>,
                   expected_value => 0);
@@ -1346,10 +1351,10 @@ IFClsXDef:
           to the element type definition.
       @@@NodeReadOnlyError:
       @@@dx:raises:
-        @@@@@: c|OWNER_DEFINITION_READ_ONLY_ERR
+        @@@@@: c|INUSE_DEFINITION_ERR
         @@@@enDesc:
-          The <A::AttributeDefinition.ownerElementTypeDefinition>
-          node is read-only.
+          If <A::AttributeDefinition.ownerElementTypeDefinition>
+          is not <DOM::null>.
       @@@dx:raises:
         @@@@@: c|DIFFERENT_DOCUMENT_ERR
         @@@@enDesc:
@@ -1442,7 +1447,7 @@ IFClsXDef:
         <Q::c|read-only>,
         <Q::d|ownerDefinition>.
   @mn:xrefnode0: c|ownerDocument
-  @mn:subnode2: d|attributeDefinitions
+  @mn:subnode1: d|attributeDefinitions
   @mn:origin0: d|ownerDefinition
 ##ElementTypeDefinition
 
@@ -1498,14 +1503,10 @@ ResourceDef:
                                      .ownerElementTypeDefinition>;
           }__;
           if ($__owner) {
-            if ($__owner->{<H::mn:node>}->{<H::c|read-only>}) {
-              __EXCEPTION{c|OWNER_DEFINITION_READ_ONLY_ERR::
-                MDOMX|param-name => {$defNodeParamName},
-                c|node => {$__owner},
-              }__;
-            }
-            CORE::delete $__owner->{<H::mn:node>}
-                                 ->{$key}->{$__aname};
+            __EXCEPTION{c|INUSE_DEFINITION_ERR::
+              MDOMX|param-name => {$defNodeParamName},
+              c|node => {$defNode},
+            }__;
           }
           
           if ($__n) {

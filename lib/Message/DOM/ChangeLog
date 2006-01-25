@@ -1,3 +1,21 @@
+2006-01-25  Wakaba  <wakaba@suika.fam.cx>
+
+	* XDoctype.dis (setElementTypeDefinitionNode,
+	setAttributeDefinitionNode): Throws |c:INUSE_DEFINITION_ERR|
+	if the new node is already used for another definition.
+	(DocumentTypeDefinition, ElementTypeDefinition): Node
+	property name was incorrect.
+	(elementTypes, attributeDefinitions): Checks to
+	ensure the collection is empty added.
+
+	* Tree.dis: Property name typos fixed.
+	(setNamedItem, setAttributeNode): Don't return any node
+	if it replace itself.
+	(c:userDeterminedId): Missing definition added.
+
+	* DOMXML.dis (Notation): Missing property specification
+	of|c:ownerDocument| as |mn:xrefnode0| is added.
+
 2006-01-23  Wakaba  <wakaba@suika.fam.cx>
 
 	* DOMCore.dis (Test): Missing argument added.

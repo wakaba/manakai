@@ -11,6 +11,7 @@ PM_SUFFIX = .pm
 CD = cd
 MAKE = make
 MKDIR = mkdir -p
+ECHO = echo
 
 RM = rm
 RMALL = $(RM) -fv
@@ -97,14 +98,22 @@ dom-feature.t: $(DOM_FEATURE_DAC) $(DAC2TEST_PL)
 dom-genericls.t: $(DOM_CORE_DAC) $(DAC2TEST_PL)
 	$(DAC2TEST) $< --source-module="$(NS_MDOM)GenericLS" > $@
 
-dom-tree.t: $(DOM_CORE_DAC) $(DAC2TEST_PL)
-	$(DAC2TEST) $< --source-module="$(NS_MDOM)Tree" > $@
+dom-tree.t: $(DOM_CORE_DAC) $(DAC2TEST_PL) Makefile
+	$(ECHO) "require 'manakai/mndebug.pl';" > $@
+	$(ECHO) "manakai::mndebug::define_nodestem_destroy ();" >> $@
+	#$(ECHO) "manakai::mndebug::define_nodestem_destroy_all ();" >> $@
+	#$(ECHO) "manakai::mndebug::define_noderef_destroy_all ();" >> $@
+	$(DAC2TEST) $< --source-module="$(NS_MDOM)Tree" >> $@
 
 dom-core.t: $(DOM_CORE_DAC) $(DAC2TEST_PL)
 	$(DAC2TEST) $< --source-module="$(NS_MDOM)DOMCore" > $@
 
-dom-xdoctype.t: $(DOM_CORE_DAC) $(DAC2TEST_PL)
-	$(DAC2TEST) $< --source-module="$(NS_MDOM)XDoctype" > $@
+dom-xdoctype.t: $(DOM_CORE_DAC) $(DAC2TEST_PL) Makefile
+	$(ECHO) "require 'manakai/mndebug.pl';" > $@
+	$(ECHO) "manakai::mndebug::define_nodestem_destroy ();" >> $@
+	#$(ECHO) "manakai::mndebug::define_nodestem_destroy_all ();" >> $@
+	#$(ECHO) "manakai::mndebug::define_noderef_destroy_all ();" >> $@
+	$(DAC2TEST) $< --source-module="$(NS_MDOM)XDoctype" >> $@
 
 dom-mdomls2003.t: $(DOM_LS_DAC) $(DAC2TEST_PL)
 	$(DAC2TEST) $< --source-module="$(NS_MDOM)ManakaiDOMLS2003" > $@
@@ -118,8 +127,12 @@ test-module-util: \
   util-dis-dnlite.t
 	$(PERL_TEST_) util-*.t
 
-util-mntest.t: $(UTIL_TEST_DAC) $(UTIL_MNTEST_PM) $(DAC2TEST_PL)
-	$(DAC2TEST) $< --source-module="$(NS_UTIL)ManakaiNodeTest" > $@
+util-mntest.t: $(UTIL_TEST_DAC) $(UTIL_MNTEST_PM) $(DAC2TEST_PL) Makefile
+	$(ECHO) "require 'manakai/mndebug.pl';" > $@
+	$(ECHO) "manakai::mndebug::define_nodestem_destroy ();" >> $@
+	#$(ECHO) "manakai::mndebug::define_nodestem_destroy_all ();" >> $@
+	#$(ECHO) "manakai::mndebug::define_noderef_destroy_all ();" >> $@
+	$(DAC2TEST) $< --source-module="$(NS_UTIL)ManakaiNodeTest" >> $@
 
 util-perlcode.t: $(UTIL_PC_DAC) $(DAC2TEST_PL)
 	$(DAC2TEST) $< --source-module="$(NS_UTIL)PerlCode" > $@

@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/01/21 16:28:13 $
+      $Date: 2006/01/25 12:21:49 $
     @@ContentType:
       dis:Date.RCS
   
@@ -880,8 +880,8 @@ IFClsDef:
                                 node => $self);
               my $or = $r;
               $r = $plimpl-><M::DIS|MPLImpl.createPerlBlockContainer>;
-              $r-><M::DIS|PLBlockCon.appendCodeFragment> ($or);
               $r-><M::DIS|PLBlockCon.appendCodeFragment> ($q);
+              $r-><M::DIS|PLBlockCon.appendCodeFragment> ($or);
             } # Read-only checking
           } elsif ($et eq <Q::DOMMain:raiseException>) {
             my ($cls, $const, $subtype)
@@ -2420,6 +2420,11 @@ IFClsDef:
       }__;
 ##DISResourcePerlModule
 
+PropDef:
+  @QName: dp|plName
+  @enDesc:
+    <A::DISResourcePerl||DIS|ForLatest.plName>.
+
 IFClsDef:
   @IFQName: DISResourcePerl
   @ClsQName: ManakaiDISResourcePerl
@@ -2461,8 +2466,8 @@ IFClsDef:
           result in a reserved name. 
       @@@PerlDef:
         __DEEP{
-          if (exists $self->{<H::dis2pm:name>}) {
-            $r = $self->{<H::dis2pm:name>};
+          if (exists $self->{<H::dp|plName>}) {
+            $r = $self->{<H::dp|plName>};
           } elsif ($self-><M::DIS|DISResource.isTypeURI>
                               (<Q::DISLang:AnyMethod>)) {
             $r = $self-><M::dp|DISResourcePerl.getPerlNameList>->[0];
@@ -2530,7 +2535,7 @@ IFClsDef:
           } else {  ## Other types
             $r = null;
           }
-          $self->{<H::dis2pm:name>} = $r;
+          $self->{<H::dp|plName>} = $r;
         }__;
 
   @Method:
@@ -2669,8 +2674,8 @@ IFClsDef:
           The local name of this resource is not defined. 
       @@@PerlDef:
         __DEEP{
-          if (exists $self->{<H::pc:plFullyQualifiedName>}) {
-            $r = $self->{<H::pc:plFullyQualifiedName>};
+          if (exists $self->{<H::dp|plFullyQualifiedName>}) {
+            $r = $self->{<H::dp|plFullyQualifiedName>};
           } elsif ($self-><M::DIS|DISResource.isTypeURI>
                               (<Q::DISLang:AnyClass>) or
                    $self-><M::DIS|DISResource.isTypeURI>
@@ -2707,7 +2712,7 @@ IFClsDef:
           } else {
             $r = null;
           }
-          $self->{<H::pc:plFullyQualifiedName>} = $r;
+          $self->{<H::dp|plFullyQualifiedName>} = $r;
         }__;
 
   @Attr:
@@ -4601,7 +4606,8 @@ IFClsDef:
                   my $uri = $nsr-><M::DIS|NSResolverDIS.qnameToURI>
                                            ($source_code, node => $node);
                   my $prop_res = $db-><M::DIS|DISDatabase.getResource> ($uri);
-                  $prop_res-><AS::DIS|DISAnyResource.isReferred> ($node);
+                  $prop_res-><AS::DIS|DISAnyResource.isReferred>
+                                  ($node or $self-><AG::DIS|DISAnyResource.uri>);
                   my $pname = $prop_res-><M::DIS|DISResourceProp.getPropertyText>
                                            (<Q::DISPerl:propHashKey>, $uri);
                   $r-><M::DIS|PLAnyCon.appendStringLiteral> ($pname);

@@ -12,7 +12,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/01/23 13:55:46 $
+    $Date: 2006/01/25 12:21:48 $
 
   @Require:
     @@Module:
@@ -38,22 +38,12 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
   @dis:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
-  @dis2pm:
-    http://suika.fam.cx/~wakaba/archive/2004/11/8/dis2pm#
-  @disPerl:
-    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--Perl--
   @doc:
     http://suika.fam.cx/~wakaba/archive/2005/7/tutorial#
-  @DOMEvents:
-    http://suika.fam.cx/~wakaba/archive/2004/dom/events#
   @DOMLS:
     http://suika.fam.cx/~wakaba/archive/2004/dom/ls#
   @DOMMain:
     http://suika.fam.cx/~wakaba/archive/2004/dom/main#
-  @DOMMetaImpl:
-    http://suika.fam.cx/~wakaba/archive/2004/dom/meta#
-  @DOMViews:
-    http://suika.fam.cx/~wakaba/archive/2004/dom/views#
   @d:
     http://suika.fam.cx/~wakaba/archive/2004/dom/xdt#
   @dx:
@@ -84,12 +74,6 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
   @ManakaiDOMCore:
     http://suika.fam.cx/~wakaba/archive/2004/mdom-core#
-  @ManakaiDOMEvents:
-    http://suika.fam.cx/~wakaba/archive/2004/mdom-ev#
-  @ManakaiDOMHTML:
-    http://suika.fam.cx/~wakaba/archive/2004/mdom/html#
-  @ManakaiDOMLS:
-    http://suika.fam.cx/~wakaba/archive/2004/mdom-ls#
   @ManakaiDOMXML:
     http://suika.fam.cx/~wakaba/archive/2004/mdom-xml#
   @MDOM:
@@ -100,8 +84,6 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/ManakaiNode#
   @null:
     http://suika.fam.cx/~wakaba/-temp/2003/09/27/null
-  @perl:
-    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#Perl--
   @rdf:
     http://www.w3.org/1999/02/22-rdf-syntax-ns#
   @rdfs:
@@ -1387,7 +1369,7 @@ IFCls1Def:
 
                 __EXCEPTION{
                   MDOMX:HIERARCHY_BAD_TYPE::
-                    infoset:nodeType => {$newNode->{<H::infoset:nodeType>}},
+                    c|nodeType => {$newNode->{<H::c|nodeType>}},
                     MDOMX:param-name => 'newChild',
                 }__;
               } # CHKTYPE
@@ -1805,7 +1787,7 @@ IFCls1Def:
 
                 __EXCEPTION{
                   MDOMX:HIERARCHY_BAD_TYPE::
-                    infoset:nodeType => {$newNode->{<H::infoset:nodeType>}},
+                    c|nodeType => {$newNode->{<H::c|nodeType>}},
                     MDOMX:param-name => 'newChild',
                 }__;
               } # CHKTYPE
@@ -2284,7 +2266,7 @@ IFCls1Def:
 
                 __EXCEPTION{
                   MDOMX:HIERARCHY_BAD_TYPE::
-                    infoset:nodeType => {$newNode->{<H::infoset:nodeType>}},
+                    c|nodeType => {$newNode->{<H::c|nodeType>}},
                     MDOMX:param-name => 'newChild',
                 }__;
               } # CHKTYPE
@@ -3892,8 +3874,6 @@ IFCls1Def:
            type is other than <IF::Document> and <IF::DOMXML:DocumentType>), 
            <Q::infoset:namespaceName>, <Q::DOMCore:name>,
            <Q::DOMCore:read-only>.
-
-  @mn:anydata2: DOMEvents|eventListener
   @mn:anydata2: t|userData
 
   @IntMethod:
@@ -5021,9 +5001,9 @@ ClsDef:
               }
               # else false
             } elsif ($self->{<H::infoset:attributes>}
-                          ->{<H::infoset:xmlns:>}->{xmlns}) {
+                          ->{<Q::xmlns:>}->{xmlns}) {
               my $vo = $self->{<H::infoset:attributes>}
-                            ->{<H::infoset:xmlns:>}->{xmlns};
+                            ->{<Q::xmlns:>}->{xmlns};
               my $ac = <ClassName::ManakaiDOMAttr>;
               my $v = <Code::getWeakRef:: $object = $vo, $class = $ac>
                            -><AG::Attr.value>;
@@ -5243,8 +5223,7 @@ ClsDef:
         Return an element that met the given condition.
     @@Param:
       @@@Name:check
-      @@@Type:
-        perl:CODE::ManakaiDOM:all
+      @@@Type: DISPerl|CODE||ManakaiDOM|all
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -5255,8 +5234,7 @@ ClsDef:
           <DOM::false>.
     @@Param:
       @@@Name:index
-      @@@Type:
-        perl:SCALAR::ManakaiDOM:all
+      @@@Type: DISPerl|SCALAR||ManakaiDOM|all
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -5615,7 +5593,7 @@ ClsDef:
          }
 
          if ($self->{<H::DOMCore:nodeType>} eq <H::infoset:Attribute>) {
-           for (values %{$self->{<H::infoset:attribute>}}) {
+           for (values %{$self->{<H::infoset:attributes>}}) {
              for (values %$_) {
                $_-><M::ManakaiDOMCore:ManakaiDOMNodeObjectNode
                                        .normalizeText> ($fullyNormalize, true);
@@ -7342,6 +7320,16 @@ ResourceDef:
                                ->{<H::infoset:attributes>}}) {
               $r += keys %$_;
             }
+      @@@PerlDef:
+        @@@@ForCheck: t|ForETMap
+        @@@@@:
+          $r = @{[map {$_} values %{$$$self->{<H::mn:node>}
+                                           ->{<H::d|elementTypes>}}]};
+      @@@PerlDef:
+        @@@@ForCheck: t|ForATMap
+        @@@@@:
+          $r = @{[map {$_} values %{$$$self->{<H::mn:node>}
+                                           ->{<H::d|attributeDefinitions>}}]};
 
   @L2Method:
     @@Name: getNamedItemNS
@@ -7498,8 +7486,9 @@ ResourceDef:
               }__;
             }
 
+            my $current_stem;
             if (defined $attrNode->{<H::infoset:localName>}) {
-              $r = $self->{<H::mn:node>}->{<H::infoset:attributes>}
+              $current_stem = $self->{<H::mn:node>}->{<H::infoset:attributes>}
                      ->{defined $attrNode->{<H::infoset:namespaceName>}
                               ? ${$attrNode->{<H::infoset:namespaceName>}}
                               : <Q::null:>}
@@ -7512,11 +7501,13 @@ ResourceDef:
             }
 
             if ($attrNode->{<H::infoset:ownerElement>}) {
-              if ($r->{<H::mn:nodeID>} eq $attrNode->{<H::mn:nodeID>}) {
+              if (defined $current_stem and
+                  $current_stem->{<H::mn:nodeID>}
+                      eq $attrNode->{<H::mn:nodeID>}) {
                 __c:ERROR{t|replace-by-itself::
                   c:relatedData => {$arg},
                 }__;
-                $r = $arg;
+                ## No return value
               } else {
                 __EXCEPTION{DOMException.INUSE_ATTRIBUTE_ERR::
                   MDOMX:param-name => 'arg',
@@ -7536,12 +7527,11 @@ ResourceDef:
                      ->{<Q::ManakaiDOM:noNS>}
                      ->{$attrNode->{<H::DOMCore:name>}} = $attrNode;
               }
-              if ($r) {
-                my $obj = $r;
-                $r = <ClassM::ManakaiDOMNode.getNodeReference> ($obj)
+              if (defined $current_stem) {
+                $r = <ClassM::ManakaiDOMNode.getNodeReference> ($current_stem)
                   if defined wantarray;
-                CORE::delete $obj->{<H::infoset:parent>};
-                $obj-><M::NodeStem.orphanate>;
+                CORE::delete $current_stem->{<H::infoset:parent>};
+                $current_stem-><M::NodeStem.orphanate>;
               }
             }
           @@@@ImplNote:
@@ -9126,6 +9116,13 @@ NodeTypeDef:
             }
 ##Attr
 
+PropDef:
+  @QName: c|userDeterminedId
+  @enDesc:
+    Whether it is a user-determined ID attribute or not.
+  @Type: DISPerl|Boolean||ManakaiDOM|all
+  @rdfs:range: t|Attr
+
 ElementTypeBinding:
   @Name: NewObjectRefNodeParam
   @ElementType:
@@ -9655,25 +9652,29 @@ NodeTypeDef:
               }__;
             }
 
+            my $current_stem;
             if (defined $attrNode->{<H::infoset:localName>}) {
-              $r = $self->{<H::mn:node>}->{<H::infoset:attributes>}
-                     ->{defined $attrNode->{<H::infoset:namespaceName>}
+              $current_stem
+                  = $self->{<H::mn:node>}->{<H::infoset:attributes>}
+                         ->{defined $attrNode->{<H::infoset:namespaceName>}
                               ? ${$attrNode->{<H::infoset:namespaceName>}}
                               : <Q::null:>}
-                     ->{$attrNode->{<H::infoset:localName>}};
+                         ->{$attrNode->{<H::infoset:localName>}};
             } else {
-              $r = $self->{<H::mn:node>}->{<H::infoset:attributes>}
-                     ->{<Q::ManakaiDOM:noNS>}
-                     ->{$attrNode->{<H::DOMCore:name>}};
+              $current_stem
+                  = $self->{<H::mn:node>}->{<H::infoset:attributes>}
+                         ->{<Q::ManakaiDOM:noNS>}
+                         ->{$attrNode->{<H::DOMCore:name>}};
             }
 
             if ($attrNode->{<H::infoset:ownerElement>}) {
-              if (defined $r and
-                  $r->{<H::mn:nodeID>} eq $attrNode->{<H::mn:nodeID>}) {
+              if (defined $current_stem and
+                  $current_stem->{<H::mn:nodeID>}
+                      eq $attrNode->{<H::mn:nodeID>}) {
                 __c:ERROR{t|replace-by-itself::
                   c:relatedData => {$newAttr},
                 }__;
-                $r = $newAttr;
+                ## No return value
               } else {
                 __EXCEPTION{DOMException.INUSE_ATTRIBUTE_ERR::
                   MDOMX:param-name => 'newAttr',
@@ -9693,12 +9694,11 @@ NodeTypeDef:
                      ->{<Q::ManakaiDOM:noNS>}
                      ->{$attrNode->{<H::DOMCore:name>}} = $attrNode;
               }
-              if ($r) {
-                my $obj = $r;
-                $r = <ClassM::ManakaiDOMNode.getNodeReference> ($obj)
+              if (defined $current_stem) {
+                $r = <ClassM::ManakaiDOMNode.getNodeReference> ($current_stem)
                   if defined wantarray;
-                CORE::delete $obj->{<H::infoset:ownerElement>};
-                $obj-><M::NodeStem.orphanate>;
+                CORE::delete $current_stem->{<H::infoset:ownerElement>};
+                $current_stem-><M::NodeStem.orphanate>;
               }
             }
           @@@@ImplNote:
@@ -12482,7 +12482,6 @@ NodeTypeDef:
            <Q::DOMCore:read-only>.
 
   @mn:xrefnode0: DOMCore|ownerDocument
-  @mn:origin0: infoset|parent
   @mn:subnode1: infoset|children
   
   @ReMethod:
@@ -15035,12 +15034,10 @@ NodeTypeDef:
            <Q::infoset:characterEncodingScheme>, <Q::DOMCore:xmlEncoding>,
            <Q::infoset:standalone>, <Q::infoset:version>,
            <Q::DOMCore:documentURI>, <Q::DOMCore:strictErrorChecking>, 
-           <Q::infoset:children>, <Q::DOMViews:view>.
+           <Q::infoset:children>,
+           <Q::c|error-handler>.
 
-  @mn:xrefnode0: DOMCore|ownerDocument
-  @mn:origin0: infoset|parent
   @mn:subnode1: infoset|children
-  @mn:subnode1: DOMViews|view
   @mn:anydata0: DOMCore|error-handler
 
   @Method:

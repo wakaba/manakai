@@ -198,6 +198,57 @@ sub _print_nodestem ($$$) {
   print $out $indent, "}\n";
 } # _print_nodestem
 
+sub define_noderef_destroy_all () {
+  my $v = \&Message::Util::ManakaiNode::ManakaiNodeRef::DESTROY;
+  *Message::Util::ManakaiNode::ManakaiNodeRef::DESTROY = sub ($) {
+    my ($self) = @_;
+    warn sprintf 'NodeRef %s is unlinked%s', ref $self, "\n";
+    $v->(@_);
+  };
+} # define_noderef_destroy_all
+
+sub define_nodestem_destroy () {
+  require Carp;
+  *Message::Util::ManakaiNode::ManakaiNodeStem::DESTROY = sub ($) {
+    my $self = shift;
+    if ($self->{rc}) {
+      no warnings 'uninitialized';
+      warn sprintf 'NodeStem %s [%s] is not disposed (rc = %d, grc = %d)'."\n".
+                   '<%s>'."\n".'grove <%s>%s%s',
+                   ref $self,
+                   $self->{t},
+                   $self->{rc},
+                   ${$self->{grc} or \''},
+                   $self->{nid},
+                   ${$self->{tid} or \''},
+                   Carp::longmess (),
+                   "\n";
+    }
+  };
+} # define_nodestem_destroy
+
+sub define_nodestem_destroy_all () {
+  require Carp;
+  *Message::Util::ManakaiNode::ManakaiNodeStem::DESTROY = sub ($) {
+    my $self = shift;
+    if ($self->{rc}) {
+      no warnings 'uninitialized';
+      warn sprintf 'NodeStem %s [%s] is not disposed (rc = %d, grc = %d)'."\n".
+                   '<%s>'."\n".'grove <%s>%s%s',
+                   ref $self,
+                   $self->{t},
+                   $self->{rc},
+                   ${$self->{grc} or \''},
+                   $self->{nid},
+                   ${$self->{tid} or \''},
+                   Carp::longmess (),
+                   "\n";
+    } else {
+      warn sprintf 'NodeStem %s is unlinked%s', ref $self, "\n";
+    }
+  };
+} # define_nodestem_destroy_all
+
 =head1 SYNOPSIS
 
   require 'lib/manakai/mndebug.pl';
@@ -276,4 +327,4 @@ the terms of any one of the MPL, the GPL or the LGPL.
 
 =cut
 
-1; # $Date: 2006/01/23 12:43:36 $
+1; # $Date: 2006/01/25 12:21:51 $

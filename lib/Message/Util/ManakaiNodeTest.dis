@@ -11,7 +11,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/01/23 12:43:35 $
+    $Date: 2006/01/25 12:21:49 $
 
   @Require:
     @@Module:
@@ -160,8 +160,11 @@ ClsDef:
       @@@Type: mn|NodeStem
       @@@PerlDef:
         $r = <ClassM::mn|ManakaiNodeStem.new> (<ClassName::Node1>);
+        $r->{<H::mnt|children>} = [];
+        $r->{<H::mnt|attr>} = {};
   @mn:origin0: mnt|parent
   @mn:subnode1: mnt|children
+  @mn:subnode2: mnt|attr
 
   @IntMethod:
     @@Name: getRef
@@ -209,6 +212,137 @@ ClsDef:
                (actual_value => ${$stem->{<H::mn:groveReferenceCounter>}},
                 expected_value => 1);
 
+  @Method:
+    @@Name: append
+    @@Param:
+      @@@Name: newChild
+      @@@Type: Node1
+    @@Return:
+      @@@PerlDef:
+        $self->{<H::mn:node>}-><M::mn:NodeStem.importTree>
+                                 ($newChild->{<H::mn:node>});
+        push @{$self->{<H::mn:node>}->{<H::mnt:children>}},
+             $newChild->{<H::mn:node>};
+        $newChild->{<H::mn:node>}->{<H::mnt:parent>} = $self->{<H::mn:node>};
+        
+    @@Test:
+      @@@QName: Node1.append.test
+      @@@PerlDef:
+        $test->id ('node.1');
+        my $stem1 = <ClassM::Node1.newStem>;
+        my $ref1 = <ClassM::Node1.getRef> ($stem1);
+        $test->assert_num_equals
+                 (actual_value => $stem1->{<H::mn:rc>},
+                  expected_value => 1);
+        $test->assert_num_equals
+                 (actual_value => ${$stem1->{<H::mn:groveReferenceCounter>}},
+                  expected_value => 1);
+
+        $test->id ('node.2');
+        my $stem2 = <ClassM::Node1.newStem>;
+        my $ref2 = <ClassM::Node1.getRef> ($stem2);
+        $test->assert_num_equals
+                 (actual_value => $stem2->{<H::mn:rc>},
+                  expected_value => 1);
+        $test->assert_num_equals
+                 (actual_value => ${$stem2->{<H::mn:groveReferenceCounter>}},
+                  expected_value => 1);
+
+        $test->id ('diff.tid');
+        $test->assert_not_equals
+                 (${$stem1->{<H::mn:treeID>}},
+                  ${$stem2->{<H::mn:treeID>}});
+
+        $test->id ('append');
+        $ref1-><M::Node1.append> ($ref2);
+
+        $test->id ('appended.tid');
+        $test->assert_equals
+                 (${$stem1->{<H::mn:treeID>}},
+                  ${$stem2->{<H::mn:treeID>}});
+
+        $test->id ('appended.rc');
+        $test->assert_num_equals
+                 (actual_value => $stem1->{<H::mn:rc>},
+                  expected_value => 1);
+        $test->assert_num_equals
+                 (actual_value => ${$stem1->{<H::mn:groveReferenceCounter>}},
+                  expected_value => 2);
+        $test->assert_num_equals
+                 (actual_value => $stem2->{<H::mn:rc>},
+                  expected_value => 1);
+        $test->assert_num_equals
+                 (actual_value => ${$stem2->{<H::mn:groveReferenceCounter>}},
+                  expected_value => 2);
+
+  @Method:
+    @@Name: set
+    @@Param:
+      @@@Name: ns
+      @@@Type: DISPerl|String||ManakaiDOM|all
+    @@Param:
+      @@@Name: name
+      @@@Type: DISPerl|String||ManakaiDOM|all
+    @@Param:
+      @@@Name: newChild
+      @@@Type: Node1
+    @@Return:
+      @@@PerlDef:
+        $self->{<H::mn:node>}-><M::mn:NodeStem.importTree>
+                                 ($newChild->{<H::mn:node>});
+        $self->{<H::mn:node>}->{<H::mnt:attr>}->{$ns}->{$name}
+          = $newChild->{<H::mn:node>};
+        $newChild->{<H::mn:node>}->{<H::mnt:parent>} = $self->{<H::mn:node>};
+        
+    @@Test:
+      @@@QName: Node1.set.test
+      @@@PerlDef:
+        $test->id ('node.1');
+        my $stem1 = <ClassM::Node1.newStem>;
+        my $ref1 = <ClassM::Node1.getRef> ($stem1);
+        $test->assert_num_equals
+                 (actual_value => $stem1->{<H::mn:rc>},
+                  expected_value => 1);
+        $test->assert_num_equals
+                 (actual_value => ${$stem1->{<H::mn:groveReferenceCounter>}},
+                  expected_value => 1);
+
+        $test->id ('node.2');
+        my $stem2 = <ClassM::Node1.newStem>;
+        my $ref2 = <ClassM::Node1.getRef> ($stem2);
+        $test->assert_num_equals
+                 (actual_value => $stem2->{<H::mn:rc>},
+                  expected_value => 1);
+        $test->assert_num_equals
+                 (actual_value => ${$stem2->{<H::mn:groveReferenceCounter>}},
+                  expected_value => 1);
+
+        $test->id ('diff.tid');
+        $test->assert_not_equals
+                 (${$stem1->{<H::mn:treeID>}},
+                  ${$stem2->{<H::mn:treeID>}});
+
+        $test->id ('append');
+        $ref1-><M::Node1.set> ('uri', 'name', $ref2);
+
+        $test->id ('appended.tid');
+        $test->assert_equals
+                 (${$stem1->{<H::mn:treeID>}},
+                  ${$stem2->{<H::mn:treeID>}});
+
+        $test->id ('appended.rc');
+        $test->assert_num_equals
+                 (actual_value => $stem1->{<H::mn:rc>},
+                  expected_value => 1);
+        $test->assert_num_equals
+                 (actual_value => ${$stem1->{<H::mn:groveReferenceCounter>}},
+                  expected_value => 2);
+        $test->assert_num_equals
+                 (actual_value => $stem2->{<H::mn:rc>},
+                  expected_value => 1);
+        $test->assert_num_equals
+                 (actual_value => ${$stem2->{<H::mn:groveReferenceCounter>}},
+                  expected_value => 2);
 ##Node1
 
 ClsDef:
@@ -226,9 +360,12 @@ ClsDef:
       @@@Type: mn|NodeStem
       @@@PerlDef:
         $r = <ClassM::mn|ManakaiNodeStem.new> (<ClassName::Node2>);
+        $r->{<H::mnt|children>} = [];
+        $r->{<H::mnt|attr>} = {};
   @mn:origin0: mnt|parent
   @mn:subnode1: mnt|children
   @mn:xrefnode0: mnt|owner
+  @mn:subnode2: mnt|attr
 
   @IntMethod:
     @@Name: getRef
@@ -244,7 +381,380 @@ ClsDef:
           $ref => $r,
           $class => {<ClassName::Node2>},
         }__;
+
+  @Method:
+    @@Name: append
+    @@Param:
+      @@@Name: newChild
+      @@@Type: Node2
+    @@Return:
+      @@@PerlDef:
+        $self->{<H::mn:node>}-><M::mn:NodeStem.importTree>
+                                 ($newChild->{<H::mn:node>});
+        push @{$self->{<H::mn:node>}->{<H::mnt:children>}},
+             $newChild->{<H::mn:node>};
+        $newChild->{<H::mn:node>}->{<H::mnt:parent>} = $self->{<H::mn:node>};
+        
+    @@Test:
+      @@@QName: Node2.append.test.1
+      @@@PerlDef:
+        $test->id ('node.1');
+        my $stem1 = <ClassM::Doc2.newStem>;
+        my $ref1 = <ClassM::Doc2.getRef> ($stem1);
+        $test->assert_num_equals
+                 (actual_value => $stem1->{<H::mn:rc>},
+                  expected_value => 1);
+        $test->assert_num_equals
+                 (actual_value => ${$stem1->{<H::mn:groveReferenceCounter>}},
+                  expected_value => 1);
+
+        $test->id ('node.2');
+        my $ref2 = $ref1-><M::Doc2.createNode>;
+        my $stem2 = $ref2->{<H::mn:node>};
+        $test->assert_num_equals
+                 (actual_value => $stem2->{<H::mn:rc>},
+                  expected_value => 1);
+        $test->assert_num_equals
+                 (actual_value => ${$stem2->{<H::mn:groveReferenceCounter>}},
+                  expected_value => 1);
+
+        $test->id ('diff.tid');
+        $test->assert_not_equals
+                 (${$stem1->{<H::mn:treeID>}},
+                  ${$stem2->{<H::mn:treeID>}});
+        $test->assert_num_equals
+                 (actual_value => $stem1->{<H::mn:rc>},
+                  expected_value => 2);
+        $test->assert_num_equals
+                 (actual_value => ${$stem1->{<H::mn:groveReferenceCounter>}},
+                  expected_value => 2);
+
+        $test->id ('append');
+        $ref1-><M::Node2.append> ($ref2);
+
+        $test->id ('appended.tid');
+        $test->assert_equals
+                 (${$stem1->{<H::mn:treeID>}},
+                  ${$stem2->{<H::mn:treeID>}});
+
+        $test->id ('appended.rc');
+        $test->assert_num_equals
+                 (actual_value => $stem1->{<H::mn:rc>},
+                  expected_value => 1);
+        $test->assert_num_equals
+                 (actual_value => ${$stem1->{<H::mn:groveReferenceCounter>}},
+                  expected_value => 2);
+        $test->assert_num_equals
+                 (actual_value => $stem2->{<H::mn:rc>},
+                  expected_value => 1);
+        $test->assert_num_equals
+                 (actual_value => ${$stem2->{<H::mn:groveReferenceCounter>}},
+                  expected_value => 2);
+        
+    @@Test:
+      @@@QName: Node2.append.test.2
+      @@@PerlDef:
+        $test->id ('node.1');
+        my $stem1 = <ClassM::Doc2.newStem>;
+        my $ref1 = <ClassM::Doc2.getRef> ($stem1);
+        $test->assert_num_equals
+                 (actual_value => $stem1->{<H::mn:rc>},
+                  expected_value => 1);
+        $test->assert_num_equals
+                 (actual_value => ${$stem1->{<H::mn:groveReferenceCounter>}},
+                  expected_value => 1);
+
+        $test->id ('node.2');
+        my $ref2 = $ref1-><M::Doc2.createNode>;
+        my $stem2 = $ref2->{<H::mn:node>};
+        $test->assert_num_equals
+                 (actual_value => $stem2->{<H::mn:rc>},
+                  expected_value => 1);
+        $test->assert_num_equals
+                 (actual_value => ${$stem2->{<H::mn:groveReferenceCounter>}},
+                  expected_value => 1);
+
+        $test->id ('node.3');
+        my $ref3 = $ref1-><M::Doc2.createNode>;
+        my $stem3 = $ref3->{<H::mn:node>};
+        $test->assert_num_equals
+                 (actual_value => $stem3->{<H::mn:rc>},
+                  expected_value => 1);
+        $test->assert_num_equals
+                 (actual_value => ${$stem3->{<H::mn:groveReferenceCounter>}},
+                  expected_value => 1);
+
+        $test->id ('diff.tid');
+        $test->assert_not_equals
+                 (${$stem1->{<H::mn:treeID>}},
+                  ${$stem2->{<H::mn:treeID>}});
+        $test->assert_not_equals
+                 (${$stem2->{<H::mn:treeID>}},
+                  ${$stem3->{<H::mn:treeID>}});
+        $test->assert_not_equals
+                 (${$stem3->{<H::mn:treeID>}},
+                  ${$stem1->{<H::mn:treeID>}});
+        $test->assert_num_equals
+                 (actual_value => $stem1->{<H::mn:rc>},
+                  expected_value => 3);
+        $test->assert_num_equals
+                 (actual_value => ${$stem1->{<H::mn:groveReferenceCounter>}},
+                  expected_value => 3);
+
+        $test->id ('append');
+        $ref2-><M::Node2.append> ($ref3);
+
+        $test->id ('appended.tid');
+        $test->assert_not_equals
+                 (${$stem1->{<H::mn:treeID>}},
+                  ${$stem2->{<H::mn:treeID>}});
+        $test->assert_equals
+                 (${$stem2->{<H::mn:treeID>}},
+                  ${$stem3->{<H::mn:treeID>}});
+
+        $test->id ('appended.rc');
+        $test->assert_num_equals
+                 (actual_value => $stem1->{<H::mn:rc>},
+                  expected_value => 3);
+        $test->assert_num_equals
+                 (actual_value => ${$stem1->{<H::mn:groveReferenceCounter>}},
+                  expected_value => 3);
+        $test->assert_num_equals
+                 (actual_value => $stem2->{<H::mn:rc>},
+                  expected_value => 1);
+        $test->assert_num_equals
+                 (actual_value => ${$stem2->{<H::mn:groveReferenceCounter>}},
+                  expected_value => 2);
+        $test->assert_num_equals
+                 (actual_value => $stem3->{<H::mn:rc>},
+                  expected_value => 1);
+        $test->assert_num_equals
+                 (actual_value => ${$stem3->{<H::mn:groveReferenceCounter>}},
+                  expected_value => 2);
+
+        $test->id ('stem1.unlinked');
+        undef $ref1;
+        $test->assert_num_equals
+                 (actual_value => $stem1->{<H::mn:rc>},
+                  expected_value => 2);
+        $test->assert_num_equals
+                 (actual_value => ${$stem1->{<H::mn:groveReferenceCounter>}},
+                  expected_value => 2);
+
+        $test->id ('stem2.unlinked');
+        undef $ref2;
+        $test->assert_num_equals
+                 (actual_value => $stem1->{<H::mn:rc>},
+                  expected_value => 2);
+        $test->assert_num_equals
+                 (actual_value => ${$stem1->{<H::mn:groveReferenceCounter>}},
+                  expected_value => 2);
+        $test->assert_num_equals
+                 (actual_value => $stem2->{<H::mn:rc>},
+                  expected_value => 0);
+        $test->assert_num_equals
+                 (actual_value => ${$stem2->{<H::mn:groveReferenceCounter>}},
+                  expected_value => 1);
+        $test->assert_num_equals
+                 (actual_value => $stem3->{<H::mn:rc>},
+                  expected_value => 1);
+        $test->assert_num_equals
+                 (actual_value => ${$stem3->{<H::mn:groveReferenceCounter>}},
+                  expected_value => 1);
+
+        $test->id ('stem3.unlinked');
+        undef $ref3;
+        $test->assert_null ($stem1->{<H::mn:rc>});
+        $test->assert_null ($stem2->{<H::mn:rc>});
+        $test->assert_null ($stem3->{<H::mn:rc>});
+        $test->assert_null ($stem1->{<H::mn:groveReferenceCounter>});
+        $test->assert_null ($stem2->{<H::mn:groveReferenceCounter>});
+        $test->assert_null ($stem3->{<H::mn:groveReferenceCounter>});
+        
+    @@Test:
+      @@@QName: Node2.append.test.3
+      @@@PerlDef:
+        $test->id ('node.1');
+        my $stem1 = <ClassM::Doc2.newStem>;
+        my $ref1 = <ClassM::Doc2.getRef> ($stem1);
+        $test->assert_num_equals
+                 (actual_value => $stem1->{<H::mn:rc>},
+                  expected_value => 1);
+        $test->assert_num_equals
+                 (actual_value => ${$stem1->{<H::mn:groveReferenceCounter>}},
+                  expected_value => 1);
+
+        $test->id ('node.2');
+        my $ref2 = $ref1-><M::Doc2.createNode>;
+        my $stem2 = $ref2->{<H::mn:node>};
+        $test->assert_num_equals
+                 (actual_value => $stem2->{<H::mn:rc>},
+                  expected_value => 1);
+        $test->assert_num_equals
+                 (actual_value => ${$stem2->{<H::mn:groveReferenceCounter>}},
+                  expected_value => 1);
+
+        $test->id ('node.3');
+        my $ref3 = $ref1-><M::Doc2.createNode>;
+        my $stem3 = $ref3->{<H::mn:node>};
+        $test->assert_num_equals
+                 (actual_value => $stem3->{<H::mn:rc>},
+                  expected_value => 1);
+        $test->assert_num_equals
+                 (actual_value => ${$stem3->{<H::mn:groveReferenceCounter>}},
+                  expected_value => 1);
+
+        $test->id ('diff.tid');
+        $test->assert_not_equals
+                 (${$stem1->{<H::mn:treeID>}},
+                  ${$stem2->{<H::mn:treeID>}});
+        $test->assert_not_equals
+                 (${$stem2->{<H::mn:treeID>}},
+                  ${$stem3->{<H::mn:treeID>}});
+        $test->assert_not_equals
+                 (${$stem3->{<H::mn:treeID>}},
+                  ${$stem1->{<H::mn:treeID>}});
+        $test->assert_num_equals
+                 (actual_value => $stem1->{<H::mn:rc>},
+                  expected_value => 3);
+        $test->assert_num_equals
+                 (actual_value => ${$stem1->{<H::mn:groveReferenceCounter>}},
+                  expected_value => 3);
+
+        $test->id ('append');
+        $ref2-><M::Node2.append> ($ref3);
+
+        $test->id ('appended.tid');
+        $test->assert_not_equals
+                 (${$stem1->{<H::mn:treeID>}},
+                  ${$stem2->{<H::mn:treeID>}});
+        $test->assert_equals
+                 (${$stem2->{<H::mn:treeID>}},
+                  ${$stem3->{<H::mn:treeID>}});
+
+        $test->id ('appended.rc');
+        $test->assert_num_equals
+                 (actual_value => $stem1->{<H::mn:rc>},
+                  expected_value => 3);
+        $test->assert_num_equals
+                 (actual_value => ${$stem1->{<H::mn:groveReferenceCounter>}},
+                  expected_value => 3);
+        $test->assert_num_equals
+                 (actual_value => $stem2->{<H::mn:rc>},
+                  expected_value => 1);
+        $test->assert_num_equals
+                 (actual_value => ${$stem2->{<H::mn:groveReferenceCounter>}},
+                  expected_value => 2);
+        $test->assert_num_equals
+                 (actual_value => $stem3->{<H::mn:rc>},
+                  expected_value => 1);
+        $test->assert_num_equals
+                 (actual_value => ${$stem3->{<H::mn:groveReferenceCounter>}},
+                  expected_value => 2);
+
+  @Method:
+    @@Name: set
+    @@Param:
+      @@@Name: ns
+      @@@Type: DISPerl|String||ManakaiDOM|all
+    @@Param:
+      @@@Name: name
+      @@@Type: DISPerl|String||ManakaiDOM|all
+    @@Param:
+      @@@Name: newChild
+      @@@Type: Node2
+    @@Return:
+      @@@PerlDef:
+        $self->{<H::mn:node>}-><M::mn:NodeStem.importTree>
+                                 ($newChild->{<H::mn:node>});
+        $self->{<H::mn:node>}->{<H::mnt:attr>}->{$ns}->{$name}
+          = $newChild->{<H::mn:node>};
+        $newChild->{<H::mn:node>}->{<H::mnt:parent>} = $self->{<H::mn:node>};
+        
+    @@Test:
+      @@@QName: Node2.set.test.3
+      @@@PerlDef:
+        $test->id ('node.1');
+        my $stem1 = <ClassM::Doc2.newStem>;
+        my $ref1 = <ClassM::Doc2.getRef> ($stem1);
+        $test->assert_num_equals
+                 (actual_value => $stem1->{<H::mn:rc>},
+                  expected_value => 1);
+        $test->assert_num_equals
+                 (actual_value => ${$stem1->{<H::mn:groveReferenceCounter>}},
+                  expected_value => 1);
+
+        $test->id ('node.2');
+        my $ref2 = $ref1-><M::Doc2.createNode>;
+        my $stem2 = $ref2->{<H::mn:node>};
+        $test->assert_num_equals
+                 (actual_value => $stem2->{<H::mn:rc>},
+                  expected_value => 1);
+        $test->assert_num_equals
+                 (actual_value => ${$stem2->{<H::mn:groveReferenceCounter>}},
+                  expected_value => 1);
+
+        $test->id ('node.3');
+        my $ref3 = $ref1-><M::Doc2.createNode>;
+        my $stem3 = $ref3->{<H::mn:node>};
+        $test->assert_num_equals
+                 (actual_value => $stem3->{<H::mn:rc>},
+                  expected_value => 1);
+        $test->assert_num_equals
+                 (actual_value => ${$stem3->{<H::mn:groveReferenceCounter>}},
+                  expected_value => 1);
+
+        $test->id ('diff.tid');
+        $test->assert_not_equals
+                 (${$stem1->{<H::mn:treeID>}},
+                  ${$stem2->{<H::mn:treeID>}});
+        $test->assert_not_equals
+                 (${$stem2->{<H::mn:treeID>}},
+                  ${$stem3->{<H::mn:treeID>}});
+        $test->assert_not_equals
+                 (${$stem3->{<H::mn:treeID>}},
+                  ${$stem1->{<H::mn:treeID>}});
+        $test->assert_num_equals
+                 (actual_value => $stem1->{<H::mn:rc>},
+                  expected_value => 3);
+        $test->assert_num_equals
+                 (actual_value => ${$stem1->{<H::mn:groveReferenceCounter>}},
+                  expected_value => 3);
+
+        $test->id ('append');
+        $ref2-><M::Node2.set> ('uri', 'name', $ref3);
+
+        $test->id ('appended.tid');
+        $test->assert_not_equals
+                 (${$stem1->{<H::mn:treeID>}},
+                  ${$stem2->{<H::mn:treeID>}});
+        $test->assert_equals
+                 (${$stem2->{<H::mn:treeID>}},
+                  ${$stem3->{<H::mn:treeID>}});
+
+        $test->id ('appended.rc');
+        $test->assert_num_equals
+                 (actual_value => $stem1->{<H::mn:rc>},
+                  expected_value => 3);
+        $test->assert_num_equals
+                 (actual_value => ${$stem1->{<H::mn:groveReferenceCounter>}},
+                  expected_value => 3);
+        $test->assert_num_equals
+                 (actual_value => $stem2->{<H::mn:rc>},
+                  expected_value => 1);
+        $test->assert_num_equals
+                 (actual_value => ${$stem2->{<H::mn:groveReferenceCounter>}},
+                  expected_value => 2);
+        $test->assert_num_equals
+                 (actual_value => $stem3->{<H::mn:rc>},
+                  expected_value => 1);
+        $test->assert_num_equals
+                 (actual_value => ${$stem3->{<H::mn:groveReferenceCounter>}},
+                  expected_value => 2);
 ##Node2
+
+PropDef:
+  @QName: mnt|attr
 
 ClsDef:
   @ClsQName: Doc2
@@ -258,6 +768,8 @@ ClsDef:
       @@@Type: mn|NodeStem
       @@@PerlDef:
         $r = <ClassM::mn|ManakaiNodeStem.new> (<ClassName::Doc2>);
+        $r->{<H::mnt|children>} = [];
+        $r->{<H::mnt|attr>} = {};
 
   @IntMethod:
     @@Name: getRef
@@ -302,7 +814,7 @@ ClsDef:
     @@Return:
       @@@Type: Node2
       @@@PerlDef:
-        my $stem = <ClassM::Doc2.newStem>;
+        my $stem = <ClassM::Node2.newStem>;
         __CODE{mn:setXRefNode::
           $referrer => $stem,
           $propName => {<H::mnt|owner>},
