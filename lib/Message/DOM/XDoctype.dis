@@ -17,7 +17,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/01/25 12:21:49 $
+    $Date: 2006/01/26 08:21:03 $
   
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
   
@@ -995,7 +995,6 @@ IFClsXDef:
                        -><M::DocumentXDoctype.createDocumentTypeDefinition>
                            ('dt2');
     
-        my $old3 =
         $test->assert_exception (code => sub {
           $dtd2-><M::DocumentTypeDefinition
                             .setElementTypeDefinitionNode> ($et);
@@ -1004,10 +1003,11 @@ IFClsXDef:
         $test->assert_equals
                  ($et-><AG::ElementTypeDefinition.ownerDocumentTypeDefinition>,
                   $dtd);
-        $test->assert_null
+        $test->assert_equals
                  ($dtd-><M::DocumentTypeDefinition
                              .getElementTypeDefinitionNode>
-                          ('et1'));
+                          ('et1'),
+                  $et);
   
         $test->id ('rewrite');
 
@@ -1017,12 +1017,12 @@ IFClsXDef:
                           ('et1');
         $test->assert_not_equals ($et, $et2);
 
-        my $old4 = $dtd2-><M::DocumentTypeDefinition
+        my $old4 = $dtd-><M::DocumentTypeDefinition
                                 .setElementTypeDefinitionNode> ($et2);
         $test->assert_equals ($old4, $et);
         $test->assert_equals
                  ($et2-><AG::ElementTypeDefinition.ownerDocumentTypeDefinition>,
-                  $dtd2);
+                  $dtd);
 
     @@Test:
       @@@PerlDef:

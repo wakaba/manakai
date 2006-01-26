@@ -40,7 +40,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/01/23 12:43:34 $
+      $Date: 2006/01/26 08:21:03 $
     @@ContentType:
       dis:Date.RCS
 
@@ -3556,6 +3556,13 @@ IFCls3Def:
                   the implementation has no real control over when
                   objects are actually deleted.
           }
+      @@@enDesc:
+        @@@@ddid: manakai
+        @@@@For: ManakaiDOM|ManakaiDOM
+        @@@@@:
+          In manakai implementation, when a user data handler
+          with type <C::OperationType.NODE_DELETE> is invoked
+          is undefined, as when Perl's <Perl::DESTROY> method is invoked.
 
     @@Const:
       @@@Name: NODE_RENAMED

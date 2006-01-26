@@ -12,7 +12,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/01/25 12:21:48 $
+    $Date: 2006/01/26 08:21:03 $
 
   @Require:
     @@Module:
@@ -6763,6 +6763,17 @@ ResourceDef:
     @@@: ManakaiDOM|ManakaiDOMObject
     @@ForCheck: ManakaiDOM|ForClass
 
+  @AppISA:
+    @@@: 
+      Tie::Array
+    @@ContentType: DISPerl|Perl
+    @@ForCheck: t|ForETMap
+  @AppISA:
+    @@@: 
+      Tie::Array
+    @@ContentType: DISPerl|Perl
+    @@ForCheck: t|ForATMap
+
   @Implement:
     @@@: NamedNodeMap||ManakaiDOM|ManakaiDOM
     @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
@@ -6852,8 +6863,286 @@ ResourceDef:
       {TODO:: This is <EM::not> implemented yet!
       }
 
+  @IntMethod:
+    @@Perlop: %{}
+    @@enDesc:
+      In manakai's Perl binding, a <IF::NamedNodeMap> object can be
+      dereferenced as if it is a hash reference.  For example,
+      <Perl::$map-<lt>{name}> will return the same <IF::Node> as
+      <Perl::$map-<lt>get_named_item ('name')> would return.  However, it does
+      not currently support substitions to hash values (e.g. 
+      <Perl::$map-<lt>{name} = $node> does not work).
+    @@ForCheck: !c|ForAttrMap
+    @@enImplNote:
+      Future version should allow %{$attr_map}.
+      It should support namespace, by $map->{$ns, $ln} syntax.
+
+      Should $map->{$key} = $node be allowed?  What if 
+      $key differs from $node->node_name?
+    @@Return:
+      @@@Type: DISPerl|HASH||ManakaiDOM|all
+      @@@PerlDef:
+        tie my %list, ref $self, $self;
+        $r = \%list;
+
+    @@XDTest:
+      @@@ForCheck: t|ForETMap
+      @@@QName: ETMap.P{}.test
+      @@@PerlDef:
+        my $dtd;
+        __CODE{d|newDoctypeForTest}__;
+        my $doc = $dtd-><AG::Node.ownerDocument>;
+        my $em = $dtd-><AG::d|DocumentTypeDefinition.elementTypes>;
+
+        $test->id ('hash.scalar');
+        $test->assert_not_null (scalar %$em);
+
+        $test->id ('key.no');
+        $test->assert_null ($em->{et1});
+        $test->assert_null ($em->{et2});
+        $test->id ('exists.no');
+        $test->assert_false (exists $em->{et1});
+        $test->assert_false (exists $em->{et2});
+
+        $test->id ('setNamedItem');
+        my $et1 = $doc-><M::d|DocumentXDoctype.createElementTypeDefinition>
+                          ('et1');
+        $em-><M::NamedNodeMap.setNamedItem> ($et1);
+
+        $test->id ('key.et1');
+        my $v1 = $em->{et1};
+        $test->assert_equals ($v1, $et1);
+        $test->id ('exists.et1');
+        $test->assert_true (exists $em->{et1});
+        $test->id ('not.exists.et2');
+        $test->assert_false (exists $em->{et2});
+
+        $test->id ('keys');
+        my @keys = keys %$em;
+        $test->assert_num_equals
+                 (actual_value => 0 + @keys,
+                  expected_value => 1);
+        $test->assert_equals ($keys[0], 'et1');
+        
+        $test->id ('setNamedItem.2');
+        my $et2 = $doc-><M::d|DocumentXDoctype.createElementTypeDefinition>
+                          ('et2');
+        $em-><M::NamedNodeMap.setNamedItem> ($et2);
+
+        $test->id ('keys.2');
+        @keys = keys %$em;
+        $test->assert_num_equals
+                 (actual_value => 0 + @keys,
+                  expected_value => 2);
+        $test->assert_not_equals ($keys[0], $keys[1]);
+        $test->assert_true ($keys[0] eq 'et1' or $keys[0] eq 'et2');
+        $test->assert_true ($keys[1] eq 'et1' or $keys[1] eq 'et2');
+        
+        $test->id ('delete');
+        delete $em->{et1};
+        $test->assert_false (exists $em->{et1});
+        $test->assert_true (exists $em->{et2});
+
+        $test->id ('clear');
+        %$em = ();
+        $test->assert_num_equals
+                 (actual_value => 0 + keys %$em,
+                  expected_value => 0);
+
+    @@XDTest:
+      @@@ForCheck: t|ForATMap
+      @@@QName: ATMap.P{}.test
+      @@@PerlDef:
+        my $dtd;
+        __CODE{d|newDoctypeForTest}__;
+        my $doc = $dtd-><AG::Node.ownerDocument>;
+        my $etd = $doc-><M::d|DocumentXDoctype.createElementTypeDefinition>
+                          ('etd');
+        my $em = $etd-><AG::d|ElementTypeDefinition.attributeDefinitions>;
+        undef $dtd;
+
+        $test->id ('hash.scalar');
+        $test->assert_not_null (scalar %$em);
+
+        $test->id ('key.no');
+        $test->assert_null ($em->{et1});
+        $test->assert_null ($em->{et2});
+        $test->id ('exists.no');
+        $test->assert_false (exists $em->{et1});
+        $test->assert_false (exists $em->{et2});
+
+        $test->id ('setNamedItem');
+        my $et1 = $doc-><M::d|DocumentXDoctype.createAttributeDefinition>
+                          ('et1');
+        $em-><M::NamedNodeMap.setNamedItem> ($et1);
+
+        $test->id ('key.et1');
+        my $v1 = $em->{et1};
+        $test->assert_equals ($v1, $et1);
+        $test->id ('exists.et1');
+        $test->assert_true (exists $em->{et1});
+        $test->id ('not.exists.et2');
+        $test->assert_false (exists $em->{et2});
+
+        $test->id ('keys');
+        my @keys = keys %$em;
+        $test->assert_num_equals
+                 (actual_value => 0 + @keys,
+                  expected_value => 1);
+        $test->assert_equals ($keys[0], 'et1');
+        
+        $test->id ('setNamedItem.2');
+        my $et2 = $doc-><M::d|DocumentXDoctype.createAttributeDefinition>
+                          ('et2');
+        $em-><M::NamedNodeMap.setNamedItem> ($et2);
+
+        $test->id ('keys.2');
+        @keys = keys %$em;
+        $test->assert_num_equals
+                 (actual_value => 0 + @keys,
+                  expected_value => 2);
+        $test->assert_not_equals ($keys[0], $keys[1]);
+        $test->assert_true ($keys[0] eq 'et1' or $keys[0] eq 'et2');
+        $test->assert_true ($keys[1] eq 'et1' or $keys[1] eq 'et2');
+        
+        $test->id ('delete');
+        delete $em->{et1};
+        $test->assert_false (exists $em->{et1});
+        $test->assert_true (exists $em->{et2});
+
+        $test->id ('clear');
+        %$em = ();
+        $test->assert_num_equals
+                 (actual_value => 0 + keys %$em,
+                  expected_value => 0);
+
+  @IntMethod:
+    @@Perlop: @{}
+    @@enDesc:
+      In manakai's Perl binding, a <IF::NamedNodeMap> object can be
+      dereferenced as if it is an array reference.  For example,
+      <Perl::$map-<lt>[2]> will return the same <IF::Node> as
+      <Perl::$map-<lt>item (2)> would return.  However, it does
+      not support substitions to array items (e.g. <Perl::$map-<lt>[2] = $node>
+      does not work).
+    @@Return:
+      @@@Type: DISPerl|ARRAY||ManakaiDOM|all
+      @@@enImplNote:
+        {TODO:: For attribute map
+        }
+      @@@PerlDef:
+        @@@@ForCheck: t|ForETMap
+        @@@@@:
+          tie my @list, <ClassName::ManakaiDOMElementTypeDefMapArray>, $self;
+          $r = \@list;
+      @@@PerlDef:
+        @@@@ForCheck: t|ForATMap
+        @@@@@:
+          tie my @list, <ClassName::ManakaiDOMAttrDefMapArray>, $self;
+          $r = \@list;
+
+    @@XDTest:
+      @@@ForCheck: t|ForETMap
+      @@@QName: ETMap.@{}.test
+      @@@PerlDef:
+        my $dtd;
+        __CODE{d|newDoctypeForTest}__;
+        my $doc = $dtd-><AG::Node.ownerDocument>;
+        my $em = $dtd-><AG::d|DocumentTypeDefinition.elementTypes>;
+
+        $test->id ('length.0');
+        $test->assert_num_equals
+                 (actual_value => 0 + @$em,
+                  expected_value => 0);
+
+        $test->id ('fetch.0.no');
+        $test->assert_null ($em->[0]);
+        $test->id ('exists.0');
+        $test->assert_false (exists $em->[0]);
+        $test->id ('exists.-1');
+        $test->assert_false (exists $em->[-1]);
+
+        $test->id ('setNamedItem');
+        my $et1 = $doc-><M::d|DocumentXDoctype.createElementTypeDefinition>
+                          ('et1');
+        $em-><M::NamedNodeMap.setNamedItem> ($et1);
+
+        $test->id ('length.1');
+        $test->assert_num_equals
+                 (actual_value => 0 + @$em,
+                  expected_value => 1);
+
+        $test->id ('0.fetch.0');
+        $test->assert_equals ($em->[0], $et1);
+        $test->id ('0.fetch.-1');
+        $test->assert_equals ($em->[-1], $et1);
+        $test->id ('0.fetch.1.no');
+        $test->assert_null ($em->[1]);
+        $test->id ('0.exists.0');
+        $test->assert_true (exists $em->[0]);
+        $test->id ('0.exists.-1');
+        $test->assert_true (exists $em->[-1]);
+        $test->id ('0.exists.1.no');
+        $test->assert_false (exists $em->[1]);
+
+        $test->id ('delete.0');
+        delete $em->[0];
+        $test->assert_false (exists $em->[0]);
+
+    @@XDTest:
+      @@@ForCheck: t|ForATMap
+      @@@QName: ATMap.@{}.test
+      @@@PerlDef:
+        my $dtd;
+        __CODE{d|newDoctypeForTest}__;
+        my $doc = $dtd-><AG::Node.ownerDocument>;
+        my $etd = $doc-><M::d|DocumentXDoctype.createElementTypeDefinition>
+                          ('et1');
+        my $em = $etd-><AG::d|ElementTypeDefinition.attributeDefinitions>;
+        undef $dtd;
+
+        $test->id ('length.0');
+        $test->assert_num_equals
+                 (actual_value => 0 + @$em,
+                  expected_value => 0);
+
+        $test->id ('fetch.0.no');
+        $test->assert_null ($em->[0]);
+        $test->id ('exists.0');
+        $test->assert_false (exists $em->[0]);
+        $test->id ('exists.-1');
+        $test->assert_false (exists $em->[-1]);
+
+        $test->id ('setNamedItem');
+        my $et1 = $doc-><M::d|DocumentXDoctype.createAttributeDefinition>
+                          ('et1');
+        $em-><M::NamedNodeMap.setNamedItem> ($et1);
+
+        $test->id ('length.1');
+        $test->assert_num_equals
+                 (actual_value => 0 + @$em,
+                  expected_value => 1);
+
+        $test->id ('0.fetch.0');
+        $test->assert_equals ($em->[0], $et1);
+        $test->id ('0.fetch.-1');
+        $test->assert_equals ($em->[-1], $et1);
+        $test->id ('0.fetch.1.no');
+        $test->assert_null ($em->[1]);
+        $test->id ('0.exists.0');
+        $test->assert_true (exists $em->[0]);
+        $test->id ('0.exists.-1');
+        $test->assert_true (exists $em->[-1]);
+        $test->id ('0.exists.1.no');
+        $test->assert_false (exists $em->[1]);
+
+        $test->id ('delete.0');
+        delete $em->[0];
+        $test->assert_false (exists $em->[0]);
+
   @Method:
     @@Name: getNamedItem
+    @@Perlop: FETCH
     @@enDesc:
       Retrieves a node specified by name.
     @@NSVersion: .getNamedItemNS
@@ -6876,6 +7165,7 @@ ResourceDef:
            @@@@ForCheck: c|ForAttrMap
            @@@@DISPerl:cloneCode:
              ManakaiDOMElement.getAttributeNode
+
       @@@PerlDef:
         @@@@ForCheck: !c|ForAttrMap
         @@@@@:
@@ -7271,6 +7561,139 @@ ResourceDef:
               This method returns an <IF::Attr> removed but that method 
               does not (<M::Element.removeAttributeNode> does).
 
+      @@@PerlDef:
+        @@@@ForCheck: !c|ForAttrMap
+        @@@@@:
+          my $owner = ($$$self)->{<H::mn:node>};
+          my $list;
+          __FOR{t:ForETMap::
+            $list = $owner->{<H::d|elementTypes>};
+          }__;
+          __FOR{t:ForATMap::
+            $list = $owner->{<H::d|attributeDefinitions>};
+          }__;
+          if (<Code::doStrictErrorChecking:: $nodeRef = {$$$self}>) {
+            if ($owner->{<H::c|read-only>}) {
+              __EXCEPTION{c|NOMOD_NAMEDNODEMAP_ERR::
+              }__;
+            }
+          } # strictErrorChecking
+
+          if (defined $list->{$name}) {
+            my $old_stem = $list->{$name};
+            $r = <ClassM::ManakaiDOMNode.getNodeReference> ($old_stem)
+              if defined wantarray;
+            CORE::delete $list->{$name};
+            CORE::delete $old_stem->{<H::d|ownerDefinition>};
+            $old_stem-><M::NodeStem.orphanate>;
+          } else {
+            __EXCEPTION{c|NO_NAMED_NODE_ERR::
+              c|name => {$name},
+              MDOMX|param-name => 'name',
+            }__;
+          }
+
+    @@XDTest:
+      @@@QName: ETMap.removeNamedItem.test
+      @@@ForCheck: t|ForETMap
+      @@@PerlDef:
+        my $dtd;
+        __CODE{d|newDoctypeForTest}__;
+        my $doc = $dtd-><AG::Node.ownerDocument>;
+        my $em = $dtd-><AG::d|DocumentTypeDefinition.elementTypes>;
+        undef $dtd;
+
+        $test->id ('setNamedItem');
+        my $et1 = $doc-><M::d|DocumentXDoctype.createElementTypeDefinition>
+                          ('et1');
+        $em-><M::NamedNodeMap.setNamedItem> ($et1);
+        $test->assert_equals
+                 ($em-><M::NamedNodeMap.getNamedItem> ('et1'), $et1);
+
+        $test->id ('removeNamedItem.noremove');
+        $test->assert_exception (code => sub {
+          $em-><M::NamedNodeMap.removeNamedItem> ('et2');
+        }, exception_subtype => <Q::c|NO_NAMED_NODE_ERR>);
+
+        $test->id ('removeNamedItem.remove');
+        my $et3 = $em-><M::NamedNodeMap.removeNamedItem> ('et1');
+        $test->assert_equals ($et3, $et1);
+        $test->assert_null ($em-><M::NamedNodeMap.getNamedItem> ('et1'));
+
+        undef $em;
+
+    @@XDTest:
+      @@@QName: ATMap.removeNamedItem.test
+      @@@ForCheck: t|ForATMap
+      @@@PerlDef:
+        my $dtd;
+        __CODE{d|newDoctypeForTest}__;
+        my $doc = $dtd-><AG::Node.ownerDocument>;
+        my $etd = $doc-><M::d|DocumentXDoctype.createElementTypeDefinition>
+                          ('et1');
+        my $ad = $etd-><AG::d|ElementTypeDefinition.attributeDefinitions>;
+        undef $dtd;
+        undef $etd;
+
+        $test->id ('setNamedItem');
+        my $at1 = $doc-><M::d|DocumentXDoctype.createAttributeDefinition>
+                          ('at1');
+        $ad-><M::NamedNodeMap.setNamedItem> ($at1);
+        $test->assert_equals
+                 ($ad-><M::NamedNodeMap.getNamedItem> ('at1'), $at1);
+
+        $test->id ('removeNamedItem.noremove');
+        $test->assert_exception (code => sub {
+          $ad-><M::NamedNodeMap.removeNamedItem> ('at2');
+        }, exception_subtype => <Q::c|NO_NAMED_NODE_ERR>);
+
+        $test->id ('removeNamedItem.remove');
+        my $at3 = $ad-><M::NamedNodeMap.removeNamedItem> ('at1');
+        $test->assert_equals ($at3, $at1);
+        $test->assert_null ($ad-><M::NamedNodeMap.getNamedItem> ('at1'));
+
+        undef $ad;
+
+  @IntMethod:
+    @@Perlop: DELETE
+    @@enDesc:
+      Removes a node specified by name.
+    @@enDesc:
+      @@@ddid: attr
+      @@@ForCheck: c|ForAttrMap
+      @@@enDesc:
+        If the removed attribute is known to have a default value,
+        an attribute immediately appears containing the default
+        value as well as the corresponding namespace URI, local name,
+        and prefix when applicable.
+    @@Param:
+      @@@Name: key
+      @@@Type: DOMString
+      @@@enDesc:
+        The <A::Node.nodeName> of the node to remove.
+    @@Return:
+      @@@Type: Node
+      @@@enDesc:
+        The node removed from the map.
+      @@@enImplNote:
+        Is this return value OK?
+      @@@nullCase:
+        @@@@enDesc:
+          If there is no node named as <P::name> in the map.
+      @@@dx:raises:
+        @@@@@: c|NOMOD_NAMEDNODEMAP_ERR
+        @@@@enDesc:
+          If the map is read-only.
+      @@@PerlDef:
+        try {
+          $r = $self-><M::NamedNodeMap.removeNamedItem> ($key);
+        } catch <IF::c|DOMException> with {
+          my $err = shift;
+          unless ($err->subtype eq <Q::c|NO_NAMED_NODE_ERR>) {
+            $err->throw;
+          }
+        };
+
   @Method:
     @@Name: item
     @@enDesc:
@@ -7307,8 +7730,94 @@ ResourceDef:
               $r = <ClassM::ManakaiDOMNode.getNodeReference> ($r);
             }
 
+      @@@PerlDef:
+        @@@@ForCheck: !c|ForAttrMap
+        @@@@@:
+          my $list;
+          __FOR{t:ForETMap::
+            $list = ($$$self)->{<H::mn:node>}->{<H::d|elementTypes>};
+          }__;
+          __FOR{t:ForATMap::
+            $list = ($$$self)->{<H::mn:node>}->{<H::d|attributeDefinitions>};
+          }__;
+          my $key = $index >= 0 ? [sort {$a cmp $b} keys %$list]->[$index]
+                                : null;
+          if (defined $key and defined $list->{$key}) {
+            $r = <ClassM::ManakaiDOMNode.getNodeReference> ($list->{$key});
+          }
+    
+    @@XDTest:
+      @@@QName: ETMap.item.test
+      @@@ForCheck: t|ForETMap
+      @@@PerlDef:
+        my $dtd;
+        __CODE{d|newDoctypeForTest}__;
+        my $doc = $dtd-><AG::Node.ownerDocument>;
+        my $em = $dtd-><AG::d|DocumentTypeDefinition.elementTypes>;
+        
+        $test->id ('no.item');
+        $test->assert_null ($em-><M::NamedNodeMap.item> (-1));
+        $test->assert_null ($em-><M::NamedNodeMap.item> (0));
+        $test->assert_null ($em-><M::NamedNodeMap.item> (1));
+        $test->assert_null ($em-><M::NamedNodeMap.item> (2));
+
+        $test->id ('two.items');
+        my $et1 = $doc-><M::d|DocumentXDoctype.createElementTypeDefinition>
+                          ('et1');
+        $dtd-><M::d|DocumentTypeDefinition.setElementTypeDefinitionNode> ($et1);
+        my $et2 = $doc-><M::d|DocumentXDoctype.createElementTypeDefinition>
+                          ('et2');
+        $dtd-><M::d|DocumentTypeDefinition.setElementTypeDefinitionNode> ($et2);
+
+        $test->assert_null ($em-><M::NamedNodeMap.item> (-1));
+        $test->assert_null ($em-><M::NamedNodeMap.item> (2));
+        my $item0 = $em-><M::NamedNodeMap.item> (0);
+        my $item1 = $em-><M::NamedNodeMap.item> (1);
+        $test->assert_not_null ($item0);
+        $test->assert_not_null ($item1);
+        $test->assert_not_equals ($item0, $item1);
+        $test->assert_true ($et1 eq $item0 or $et2 eq $item0);
+        $test->assert_true ($et1 eq $item1 or $et2 eq $item1);
+    
+    @@XDTest:
+      @@@QName: ATMap.item.test
+      @@@ForCheck: t|ForATMap
+      @@@PerlDef:
+        my $dtd;
+        __CODE{d|newDoctypeForTest}__;
+        my $doc = $dtd-><AG::Node.ownerDocument>;
+        my $etd = $doc-><M::d|DocumentXDoctype.createElementTypeDefinition>
+                          ('et1');
+        my $ad = $etd-><AG::d|ElementTypeDefinition.attributeDefinitions>;
+        undef $dtd;
+        
+        $test->id ('no.item');
+        $test->assert_null ($ad-><M::NamedNodeMap.item> (-1));
+        $test->assert_null ($ad-><M::NamedNodeMap.item> (0));
+        $test->assert_null ($ad-><M::NamedNodeMap.item> (1));
+        $test->assert_null ($ad-><M::NamedNodeMap.item> (2));
+
+        $test->id ('two.items');
+        my $at1 = $doc-><M::d|DocumentXDoctype.createAttributeDefinition>
+                          ('at1');
+        $etd-><M::d|ElementTypeDefinition.setAttributeDefinitionNode> ($at1);
+        my $at2 = $doc-><M::d|DocumentXDoctype.createAttributeDefinition>
+                          ('at2');
+        $etd-><M::d|ElementTypeDefinition.setAttributeDefinitionNode> ($at2);
+
+        $test->assert_null ($ad-><M::NamedNodeMap.item> (-1));
+        $test->assert_null ($ad-><M::NamedNodeMap.item> (2));
+        my $item0 = $ad-><M::NamedNodeMap.item> (0);
+        my $item1 = $ad-><M::NamedNodeMap.item> (1);
+        $test->assert_not_null ($item0);
+        $test->assert_not_null ($item1);
+        $test->assert_not_equals ($item0, $item1);
+        $test->assert_true ($at1 eq $item0 or $at2 eq $item0);
+        $test->assert_true ($at1 eq $item1 or $at2 eq $item1);
+
   @Attr:
     @@Name: length
+    @@Perlop: FETCHSIZE
     @@enDesc:
       The number of nodes in the map.
     @@Type: idl|unsignedLong||ManakaiDOM|all
@@ -7330,6 +7839,172 @@ ResourceDef:
         @@@@@:
           $r = @{[map {$_} values %{$$$self->{<H::mn:node>}
                                            ->{<H::d|attributeDefinitions>}}]};
+    @@XDTest:
+      @@@QName: ETMap.length.test
+      @@@ForCheck: t|ForETMap
+      @@@PerlDef:
+        my $dtd;
+        __CODE{d|newDoctypeForTest}__;
+        my $doc = $dtd-><AG::Node.ownerDocument>;
+        my $et = $dtd-><AG::d|DocumentTypeDefinition.elementTypes>;
+
+        $test->id ('length.0');
+        $test->assert_num_equals
+                 (actual_value => $et-><AG::NamedNodeMap.length>,
+                  expected_value => 0);
+
+        $test->id ('length.1');
+        my $et1 = $doc-><M::d|DocumentXDoctype.createElementTypeDefinition>
+                          ('et1');
+        $dtd-><M::d|DocumentTypeDefinition.setElementTypeDefinitionNode> ($et1);
+        $test->assert_num_equals
+                 (actual_value => $et-><AG::NamedNodeMap.length>,
+                  expected_value => 1);
+
+        $test->id ('length.1');
+        my $et2 = $doc-><M::d|DocumentXDoctype.createElementTypeDefinition>
+                          ('et2');
+        $dtd-><M::d|DocumentTypeDefinition.setElementTypeDefinitionNode> ($et2);
+        $test->assert_num_equals
+                 (actual_value => $et-><AG::NamedNodeMap.length>,
+                  expected_value => 2);
+    @@XDTest:
+      @@@QName: ATMap.length.test
+      @@@ForCheck: t|ForATMap
+      @@@PerlDef:
+        my $dtd;
+        __CODE{d|newDoctypeForTest}__;
+        my $doc = $dtd-><AG::Node.ownerDocument>;
+        my $etd = $doc-><M::d|DocumentXDoctype.createElementTypeDefinition>
+                          ('et1');
+        my $at = $etd-><AG::d|ElementTypeDefinition.attributeDefinitions>;
+
+        $test->id ('length.0');
+        $test->assert_num_equals
+                 (actual_value => $at-><AG::NamedNodeMap.length>,
+                  expected_value => 0);
+
+        $test->id ('length.1');
+        my $at1 = $doc-><M::d|DocumentXDoctype.createAttributeDefinition>
+                          ('at1');
+        $etd-><M::d|ElementTypeDefinition.setAttributeDefinitionNode> ($at1);
+        $test->assert_num_equals
+                 (actual_value => $at-><AG::NamedNodeMap.length>,
+                  expected_value => 1);
+
+        $test->id ('length.2');
+        my $at2 = $doc-><M::d|DocumentXDoctype.createAttributeDefinition>
+                          ('at2');
+        $etd-><M::d|ElementTypeDefinition.setAttributeDefinitionNode> ($at2);
+        $test->assert_num_equals
+                 (actual_value => $at-><AG::NamedNodeMap.length>,
+                  expected_value => 2);
+
+  @IntMethod:
+    @@Perlop: STORESIZE
+    @@Param:
+      @@@Name: count
+      @@@Type: idl|unsignedLong||ManakaiDOM|all
+    @@Return:
+      @@@dx:raises:
+        @@@@@: c|NOMOD_NAMEDNODEMAP_ERR
+        @@@@enDesc:
+          If the map is read-only.
+      @@@PerlDef:
+        __DEEP{
+          my $length = $self-><AG::NamedNodeMap.length>;
+          if ($length > $count) {
+            for (my $i = $length; $i > $count; $i--) {
+              my $item = $self-><M::NamedNodeMap.item> ($i);
+              $self-><M::NamedNodeMap.removeNamedItem>
+                       ($item-><AG::Node.nodeName>);
+            }
+          }
+        }__;
+
+  @IntMethod:
+    @@Perlop: EXISTS
+    @@enDesc:
+      <Perl::EXISTS> for tied hash.
+    @@Param:
+      @@@Name: key
+      @@@Type: DOMString
+    @@Return:
+      @@@Type: idl|boolean||ManakaiDOM|all
+      @@@enImplNote:
+        {TODO:: For attribute map
+        }
+      @@@PerlDef:
+        @@@@ForCheck: t|ForETMap
+        @@@@@:
+          $r = exists (($$$self)->{<H::mn:node>}->{<H::d|elementTypes>}->{$key});
+      @@@PerlDef:
+        @@@@ForCheck: t|ForATMap
+        @@@@@:
+          $r = exists (($$$self)->{<H::mn:node>}
+                                ->{<H::d|attributeDefinitions>}->{$key});
+
+  @IntMethod:
+    @@Perlop: FIRSTKEY
+    @@enDesc:
+      <Perl::FIRSTKEY> for tied hash.
+    @@Return:
+      @@@Type: DOMString
+      @@@enImplNote:
+        {TODO:: For attribute map
+        }
+      @@@PerlDef:
+        @@@@ForCheck: t|ForETMap
+        @@@@@:
+          my $a = keys %{($$$self)->{<H::mn:node>}->{<H::d|elementTypes>}};
+            # reset
+          $r = each %{($$$self)->{<H::mn:node>}->{<H::d|elementTypes>}};
+      @@@PerlDef:
+        @@@@ForCheck: t|ForATMap
+        @@@@@:
+          my $a = keys %{($$$self)->{<H::mn:node>}
+                              ->{<H::d|attributeDefinitions>}}; # reset
+          $r = each %{($$$self)->{<H::mn:node>}->{<H::d|attributeDefinitions>}};
+
+  @IntMethod:
+    @@Perlop: NEXTKEY
+    @@enDesc:
+      <Perl::NEXTKEY> for tied hash.
+    @@Param:
+      @@@Name: lastkey
+      @@@Type: DOMString
+    @@Return:
+      @@@Type: DOMString
+      @@@enImplNote:
+        {TODO:: For attribute map
+        }
+      @@@PerlDef:
+        @@@@ForCheck: t|ForETMap
+        @@@@@:
+          $r = each %{($$$self)->{<H::mn:node>}->{<H::d|elementTypes>}};
+      @@@PerlDef:
+        @@@@ForCheck: t|ForATMap
+        @@@@@:
+          $r = each %{($$$self)->{<H::mn:node>}->{<H::d|attributeDefinitions>}};
+
+  @IntMethod:
+    @@Perlop: SCALAR
+    @@enDesc:
+      <Perl::SCALAR> for tied hash.
+    @@Return:
+      @@@Type: DOMString
+      @@@enImplNote:
+        {TODO:: For attribute map
+        }
+      @@@PerlDef:
+        @@@@ForCheck: t|ForETMap
+        @@@@@:
+          $r = scalar %{($$$self)->{<H::mn:node>}->{<H::d|elementTypes>}};
+      @@@PerlDef:
+        @@@@ForCheck: t|ForATMap
+        @@@@@:
+          $r = scalar %{($$$self)->{<H::mn:node>}
+                                 ->{<H::d|attributeDefinitions>}};
 
   @L2Method:
     @@Name: getNamedItemNS
@@ -7757,9 +8432,16 @@ ResourceDef:
         @@@@enImplNote:
           In manakai, nodes in namespace unaware <IF::NamedNodeMap> are
           ordered by their <A::Node.nodeName>.
+ 
+        @@@@enImplNote:
+          {TODO::
+            Add test for elementTypes and attributeDefinitions
+            (they requires == equality for element type definition
+             and attribute definition nodes being defined)
+          }
 
   @IntMethod:
-    @@ForCheck: ManakaiDOM|ManakaiDOM3 c|ForAttrMap
+    @@ForCheck: ManakaiDOM|ManakaiDOM3
     @@Operator: ManakaiDOM|MUErrorHandler
     @@enDesc:
       When a <IF::ecore|ErrorInterface||ManakaiDOM|Perl> is <Perl::report>ed
@@ -7792,6 +8474,8 @@ ResourceDef:
         @@@@enDesc:
           No error handler.
       @@@PerlDef:
+        @@@@ForCheck: c|ForAttrMap
+        @@@@@:
           if ($err->isa (<IFName::c|DOMError||ManakaiDOM|ManakaiDOM>)) {
             __DEEP{
                 my $doc;
@@ -7809,6 +8493,33 @@ ResourceDef:
           } else {
             $err-><M::ecore|ErrorInterface||ManakaiDOM|Perl.throw>;
           }
+      @@@PerlDef:
+        @@@@ForCheck: !c|ForAttrMap
+        @@@@@:
+          __DEEP{
+            ($$$self)->___report_error ($err);
+          }__;
+
+  @IntMethod:
+    @@Perlop: TIEARRAY
+    @@ManakaiDOM:isStatic:1
+    @@Param:
+      @@@Name: map
+      @@@Type: NamedNodeMap
+    @@Return:
+      @@@Type: NamedNodeMap
+      @@@PerlDef:
+        $r = bless \\($$$map), $self;
+
+  @IntMethod:
+    @@Perlop: TIEHASH
+    @@ManakaiDOM:isStatic:1
+    @@Param:
+      @@@Name: map
+      @@@Type: NamedNodeMap
+    @@Return:
+      @@@Type: NamedNodeMap
+      @@@PerlDef: $r = $map;
 
   @CODE:
     @@ForCheck: t|ForETMap ManakaiDOM|ManakaiDOMLatest
@@ -7828,6 +8539,115 @@ ResourceDef:
     @@PerlDef:
       $map = bless \\($node), <ClassName::t|ManakaiDOMAttrDefMap>;
 ##NamedNodeMap
+
+ResourceDef:
+  @rdf:type:
+    @@@: dis|MultipleResource
+    @@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
+  @ForCheck: ManakaiDOM|ManakaiDOM
+
+  @enDesc:
+    <IF::NamedNodeMap> implementation for tied array.
+
+  @rdf:type:
+    @@@: DISLang|Class
+    @@ForCheck: ManakaiDOM|ForClass
+
+  @resourceFor:
+    @@@: t|ForETMap
+    @@For: ManakaiDOM|ManakaiDOMLatest
+  @QName:
+    @@@: ManakaiDOMElementTypeDefMapArray
+    @@ForCheck: t|ForETMap
+  @ISA:
+    @@@: ManakaiDOMElementTypeDefMap
+    @@ForCheck: t|ForETMap
+
+  @resourceFor:
+    @@@: t|ForATMap
+    @@For: ManakaiDOM|ManakaiDOMLatest
+  @QName:
+    @@@: ManakaiDOMAttrDefMapArray
+    @@ForCheck: t|ForATMap
+  @ISA:
+    @@@: ManakaiDOMAttrDefMap
+    @@ForCheck: t|ForATMap
+
+  @AppISA:
+    Tie::Array
+
+  @IntMethod:
+    @@Perlop: FETCH
+    @@Param:
+      @@@Name: index
+      @@@Type: idl|unsignedLong
+    @@Return:
+      @@@Type: Node
+      @@@nullCase:
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><M::NamedNodeMap.item> ($index);
+        }__;
+
+  @IntMethod:
+    @@Perlop: EXISTS
+    @@enDesc:
+      <Perl::EXISTS> for tied array.
+    @@Param:
+      @@@Name: index
+      @@@Type: idl|unsignedLong||ManakaiDOM|all
+    @@Return:
+      @@@Type: idl|boolean||ManakaiDOM|all
+      @@@PerlDef:
+        __DEEP{
+          my $length = $self-><AG::NamedNodeMap.length>;
+          $r = ($index < $length);
+        }__;
+  
+  @enImplNote:
+    @@@ddid: perl.store
+    @@@@:
+      <Perl::STORE> is not implemented.
+
+  @IntMethod:
+    @@Perlop: DELETE
+    @@enDesc:
+      Removes a node specified by index.
+    @@enDesc:
+      @@@ddid: attr
+      @@@ForCheck: c|ForAttrMap
+      @@@enDesc:
+        If the removed attribute is known to have a default value,
+        an attribute immediately appears containing the default
+        value as well as the corresponding namespace URI, local name,
+        and prefix when applicable.
+    @@Param:
+      @@@Name: index
+      @@@Type: idl|unsignedLong||ManakaiDOM|all
+      @@@enDesc:
+        The ordinal index of the node to remove.
+    @@Return:
+      @@@Type: Node
+      @@@enDesc:
+        The node removed from the map.
+      @@@enImplNote:
+        Is this return value OK?
+      @@@nullCase:
+        @@@@enDesc:
+          If there is no node named as <P::name> in the map.
+      @@@dx:raises:
+        @@@@@: c|NOMOD_NAMEDNODEMAP_ERR
+        @@@@enDesc:
+          If the map is read-only.
+      @@@PerlDef:
+        __DEEP{
+          my $item = $self-><M::NamedNodeMap.item> ($index);
+          if ($item) {
+            $r = $self-><M::NamedNodeMap.removeNamedItem>
+                            ($item-><AG::Node.nodeName>);
+          }
+        }__;
+##NamedNodeMapArray
 
 ElementTypeBinding:
   @Name: CODE
