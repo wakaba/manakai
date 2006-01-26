@@ -40,7 +40,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/01/26 08:21:03 $
+      $Date: 2006/01/26 13:58:20 $
     @@ContentType:
       dis:Date.RCS
 
@@ -132,6 +132,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dom/tree#
   @test:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Test#
+  @x:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/xml#
   @xml:
     http://www.w3.org/XML/1998/namespace
   @xmlns:
@@ -1770,11 +1772,11 @@ ElementTypeBinding:
     @@For: =ManakaiDOM|ManakaiDOM
 
     @@rdf:type:
-      @@@@: ManakaiDOM|IF
+      @@@@: DISLang|Interface
       @@@ForCheck: ManakaiDOM|ForIF
 
     @@rdf:type:
-      @@@@: ManakaiDOM|Class
+      @@@@: DISLang|Class
       @@@ForCheck: ManakaiDOM|ForClass
     @@Implement:
       @@@@: ||ManakaiDOM|ManakaiDOM||ManakaiDOM|ForIF
@@ -1789,17 +1791,46 @@ ElementTypeBinding:
       @@@ContentType: DISCore|TFPQNames
       @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
 
-    @@DOMMain:implementFeature:
-      @@@@: CoreFeature30
+    @@f:implements:
+      @@@@: c|CoreFeature30
       @@@For: ManakaiDOM|DOM3
-    @@DOMMain:implementFeature:
-      @@@@: DOMXML|XMLFeature30
+    @@f:implements:
+      @@@@: x|XMLFeature30
       @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeature
-    @@DOMMain:implementFeature:
-      @@@@: DOMXML|XMLVersionFeature10
+    @@f:implements:
+      @@@@: x|XMLVersionFeature10
       @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeature
-    @@DOMMain:implementFeature:
-      @@@@: DOMXML|XMLVersionFeature11
+    @@f:implements:
+      @@@@: x|XMLVersionFeature11
+      @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeatureXML11
+
+ElementTypeBinding:
+  @Name: IF3Def
+  @ElementType: 
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@: dis|MultipleResource
+      @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
+    @@resourceFor: ManakaiDOM|ForIF
+    @@For: ManakaiDOM|DOM3
+    @@For: =ManakaiDOM|ManakaiDOM
+
+    @@rdf:type:
+      @@@@: DISLang|Interface
+      @@@ForCheck: ManakaiDOM|ForIF
+
+    @@f:implements:
+      @@@@: c|CoreFeature30
+      @@@For: ManakaiDOM|DOM3
+    @@f:implements:
+      @@@@: x|XMLFeature30
+      @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeature
+    @@f:implements:
+      @@@@: x|XMLVersionFeature10
+      @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeature
+    @@f:implements:
+      @@@@: x|XMLVersionFeature11
       @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeatureXML11
 
 ElementTypeBinding:
@@ -3222,258 +3253,284 @@ ElementTypeBinding:
   @ShadowContent:
     @@lang:en
 
-IFDef:
-  @Name: TypeInfo
-  @Description:
-    @@lang:en
+IF3Def:
+  @IFQName: c|TypeInfo
+  @enDesc:
+    The <IF::TypeInfo> interface represents a type referenced from
+    <IF::t|Element> or <IF::t|Attr> nodes, specified in the schemas
+    associated with the document.  The type is a pair of a namespace URI
+    and name properties, and depends on the document's schema.
+
+  @enDesc:
+    @@ddid: xml10-dtd
     @@@:
-      A type referenced from "Element" or "Attr" nodes, 
-      specified in the schemas associated with the document.
-    \
-      The type is a pair of namespace URI and name.  It depsnds 
-      on the schema language in use.
-  @ImplNote:
-    @@lang:en
+      {P:: If the document's schema is an XML 1.0 DTD:
+  
+        - If the type is referenced from an <IF::t|Attr> node and
+          there is a declaration for the attribute, 
+          <A::TypeInfo.typeNamespace> is 
+          <URI::http://www.w3.org/TR/REC-xml> and <A::TypeInfo.typeName>
+          is <InfoProp::attribute type> property value.
+
+        - If the type is referenced from an <IF::t|Attr> node and
+          there is no declaration for the attribute,
+          <A::TypeInfo.typeNamespace> and <A::TypeInfo.typeName>
+          are <DOM::null>.
+
+        - If the type is referenced from an <IF::Element> node,
+          <A::TypeInfo.typeNamespace> and <A::TypeInfo.typeName>
+          are <DOM::null>.
+
+      }
+  @enImplNote:
+    @@ddid: xml11-dtd
     @@@:
-      If the schema language is the XML Schema:
-     \
-      - If [validity] property exists and its value is 
-      "invalid" or "notKnown": ("typeNamespace", "typeName") = 
-      ({target namespace}, {name}) or ("null", "null").
-     \
-      NOTE: The XML Schema specification does not require 
-      exposing the declared type.  DOM implementation might choose 
-      not to provide type information if validity is not valid.
-     \
-      - If [validity] exists and its value is "valid":
-     \
-      -- If [member type definition] exists:
-     \
-      --- If {name} is not absent: ("typeNamespace", "typeName") = 
-      [member type definition].({target namespace}, {name}).
-     \
-      --- Otherwise: ("typeNamespace", "typeName") = 
-      (namespace, local name) of the corresponding anonymous type name.
-     \
-      -- If [type definition] exists:
-     \
-      --- If {name} is not absent: ("typeNamespace", "typeName") =
-      [type definition].({target namespace}, {name}).
-     \
-      --- Otherwise: ("typeNamespace", "typeName") =
-      (namespace, local name) of the corresponding anonymous type name.
-     \
-      -- If [member type definition anonymous] exists:
-     \
-      --- If false: ("typeNamespace", "typeName") =
-      ([member type definition namespace], [member type definition name]).
-     \
-      --- Otherwise: ("typeNamespace", "typeName") =
-      (namespace, local name) of the corresponding anonymous type name.
-     \
-      -- If [type definition anonymous] exists:
-     \
-      --- If false: ("typeNamespace", "typeName") =
-      ([type definition namespace], [type definition name]).
-     \
-      --- Otherwise: ("typeNamespace", "typeName") =
-      (namespace, local name) of the corresponding anonymous type name.
-     \
-      Other schema languages are outside of the scope of the W3C and 
-      should define how to represent their type systems using "TypeInfo".
-  @Level[list]:  3
-  @SpecLevel:3
-  @L3:
-  @For:
-    ManakaiDOM:DOM3
-  @For:
-    =ManakaiDOM:ManakaiDOM
+      XML 1.1 DTD??  Name character sets differ in XML 1.0 and 1.1
+      so namespace URI should be changed?
+  @enDesc:
+    @@ddid: xml-schema10
+    @@@:
+      {P:: If the document's schema is in XML Schema 1.0, the values
+           are computed from PSVI properties as:
+
+           - If <InfoProp::validity> property exists <EM::and> is
+             <CODE::valud> or <CODE::notKnown>::: <A::TypeInfo.typeNamespace>
+             is <XSCompProp::target namespace> and <A::TypeInfo.typeName>
+             is <XSCompProp::name> of the declared type if available,
+             or <DOM::null>.  Since XML Schema 1.0 does not require
+             exposing the declared type, DOM implementation might choose
+             not to provide type information if validity is not valid.
+
+           {LI:: If <InfoProp::validity> property exists and is <CODE::valid>:::
+
+              {OLI:: If <InfoProp::member type definition> exists:::
+
+                {OLI:: If <XSCompProp::name> is not absent:::
+                    <A::TypeInfo.typeNamespace> is <XSCompProp::target namespace>
+                    and <A::TypeInfo.typeName> is <XSCompProp::name>
+                    of the <InfoItem::member type definition>.
+                }
+
+                {OLI:: Otherwise::: <A::TypeInfo.typeNamespace> and
+                       <A::typeInfo.typeName> is the namespace and local
+                       name of the corresponding anonymous type name.
+                }
+
+              }
+
+              {OLI:: If <InfoProp::type definition> exists:::
+
+                {OLI:: If <XSCompProp::name> is not absent:::
+                    <A::TypeInfo.typeNamespace> is <XSCompProp::target namespace>
+                    and <A::TypeInfo.typeName> is <XSCompProp::name>
+                    of the <InfoItem::type definition>.
+                }
+
+                {OLI:: Otherwise::: <A::TypeInfo.typeNamespace> and
+                       <A::typeInfo.typeName> is the namespace and local
+                       name of the corresponding anonymous type name.
+                }
+
+              }
+
+              {OLI:: If <InfoProp::member type definition anonymous> exists:::
+
+                {OLI:: If it is false:::
+                    <A::TypeInfo.typeNamespace> is <InfoProp::member
+                    type definition namespace>
+                    and <A::TypeInfo.typeName> is <InfoProp::member
+                    type definition name>.
+                }
+
+                {OLI:: Otherwise::: <A::TypeInfo.typeNamespace> and
+                       <A::typeInfo.typeName> is the namespace and local
+                       name of the corresponding anonymous type name.
+                }
+
+              }
+
+              {OLI:: If <InfoProp::type definition anonymous> exists:::
+
+                {OLI:: If it is false:::
+                    <A::TypeInfo.typeNamespace> is <InfoProp::type
+                    definition namespace> and <A::TypeInfo.typeName>
+                    is <InfoProp::type definition name>.
+                }
+
+                {OLI:: Otherwise::: <A::TypeInfo.typeNamespace> and
+                       <A::typeInfo.typeName> is the namespace and local
+                       name of the corresponding anonymous type name.
+                }
+
+              }
+
+           }
+
+      }
+  @enImplNote:
+    @@ddid: other-lang
+    @@@:
+      Other schema languages are outside of the scope of the W3C.
+
   @Attr:
-     @@Name:  typeName
-     @@Description:
-       @@@lang:en
-       @@@@: The name of the type.
-     @@L3:
-     @@Get:
-        @@@Type:  
-          DOMMain:DOMString
-        @@@Description:
-          @@@@lang:en
-          @@@@@: The name of the type.
-        @@@InCase:
-          @@@@Value:
-            @@@@@is-null:1
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@: The name is unknown.
+    @@Name: typeName
+    @@enDesc:
+      The name of the type declared for the associated element or attribute.
+    @@Type: DOMString
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          If the type is unknown.
        
   @Attr:
-     @@Name:  typeNamespace
-     @@Description:
-       @@@lang:en
-       @@@@: The namespace of the type.
-     @@L3:
-     @@Get:
-        @@@Type:  
-          DOMMain:DOMString
-        @@@Description:
-          @@@@lang:en
-          @@@@@: The namespace of the type.
-        @@@InCase:
-          @@@@Value:
-            @@@@@is-null:1
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              Either the associated element or attribute does not have 
-              declaration or no namespace information is available.
-        @@@InCase:
-          @@@@Value:
-            http://www.w3.org/TR/REC-xml
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@: 
-              The schema language is the XML DTD and the node 
-              associated is an "Attr".
-            \
-              In this case, the "typeName" is the value of 
-              the [attribute type] property of the XML Infoset.
-     @@ImplNote:
-       @@@lang:en
-       @@@@: Is this namespace *URI*?
+    @@Name: typeNamespace
+    @@enDesc:
+      The namespace of the type declared for the associated element or
+      attribute.
+    @@Type: DOMString
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          If the type is unknown or if no namespace information is available.
+      @@@enImplNote:
+        Is it namespace <EM::URI>?
 
   @ConstGroup:
     @@QName: DerivationMethods
 
-     @@Description:
-       @@@lang:en
-       @@@@:
-         A set of possible types of derivation.
+    @@enDesc:
+      These are the available values for the <P::derivationMethod>
+      parameter of the <M::TypeInfo.isDerivedFrom> method.  It is
+      a set of possible types of derivation and the values represent
+      bit positions.  If a bit in the <P::derivationMethod> parameter
+      is set to <CODE::1>, the corresponding type if derivation will
+      be taken into account when evaluating the derivation between
+      the reference type definition and the other type definition.
+      When using the <M::TypeInfo.isDerivedFrom> method, combining
+      all of them in the <P::derivationMethod> parameter is equivalent
+      to invoking the method for each of them separately
+      and combining the results with the <CODE::or> boolean function.
+      DOM Level 3 Core specification only defines the type of
+      derivation for XML Schema.
+    @@enImplNote:
+      Any type derives from <Q::xsd:anyType>.  (Can any bit be used 
+      to test it?)
 
     @@rdfs:subClassOf: idl|unsignedLong||ManakaiDOM|all
     @@Type: idl|unsignedLong||ManakaiDOM|all
-     @@IsBitMask:1
-     @@ImplNote:
-       @@@lang:en
-       @@@@:
-         Any type derives from "xsd:anyType".
-     @@Const:
-        @@@Name:  DERIVATION_RESTRICTION
-        @@@Value:  0x00000001
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            The derivation by restriction.
-        @@@ImplNote:
-          @@@@lang:en
-          @@@@@:
-            Other type definition = reference type definition or 
-            reference type definition.{base type definition}. ... 
-            .{base type definition} = other type definition and 
-            all the derivation methods involved are restriction.
-          \
-            Any simple type derives from "xsd:anySimpleType" by restriction.
-     @@Const:
-        @@@Name:  DERIVATION_EXTENSION
-        @@@Value:  0x00000002
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            The derivation by extension.
-        @@@ImplNote:
-          @@@@lang:en
-          @@@@@:
-            Reference type definition.{base type definition}.
-            ... .{base type definition} = other type definition 
-            and at least one of the derivation methods 
-            involeved is an extension. 
-          \
-            Both types are complex types or both are simple types.
-     @@Const:
-        @@@Name:  DERIVATION_UNION
-        @@@Value:  0x00000004
-        @@@Description:
-          @@@@lang:en
-          @@@@@: The union.
-        @@@ImplNote:
-          @@@@lang:en
-          @@@@@:
-            Other type definition --derive[DERIVATION_RESTRICTION]--> T2 
-            or other type definition = T2,
-            T1 --derive[DERIVATION_RESTRICTION or DERIVATION_EXTENSION]--> 
-            reference type definition or T1 = reference type definition, 
-            T1.{variety} = union and T1.{member type definition} = T2.
-     @@Const:
-        @@@Name:  DERIVATION_LIST
-        @@@Value:  0x00000008
-        @@@Description:
-          @@@@lang:en
-          @@@@@: The list.
-        @@@ImplNote:
-          @@@@lang:en
-          @@@@@: 
-            Other type definition --derive[DERIVATION_RESTRICTION]--> T2 
-            or other type definition = T2,
-            T1 --derive[DERIVATION_RESTRICTION or DERIVATION_EXTENSION]--> 
-            reference type definition or T1 = reference type definition, 
-            T1.{variety} = list and T1.{item type definition} = T2.
+    @@IsBitMask:1
+
+    @@Const:
+      @@@Name: DERIVATION_RESTRICTION
+      @@@intValue: 1
+      @@@enDesc:
+        The derivation by <CODE::restriction>.
+
+        In XML Schema 1.0, the reference type definition is derived
+        from the other type definition if the other type definition
+        is the same as the reference type definition, or if the other
+        type definition can be reached recursively following the
+        <XSCompName::base type definition> property from the reference
+        type definition, and all the <CODE::derivation method>s involved
+        are <CODE::restriction>.
+
+        Note that any simple type derives from <Q::xsd:anySimpleType>
+        by restriction.
+    @@Const:
+      @@@Name: DERIVATION_EXTENSION
+      @@@intValue: 2
+      @@@enDesc:
+        The derivation by <CODE::extension>.
+
+        In XML Schema 1.0, the reference type definition
+        is derived by <CODE::extension> from the other type definition if
+        the other type definition can be reached recursively following
+        the <XSCompProp::base type definition> property from
+        the reference type definition, and at least one of the <CODE::derivation
+        method>s involved is an <CODE::extension>.
+    @@Const:
+      @@@Name: DERIVATION_UNION
+      @@@intValue: 4
+      @@@enDesc:
+        The derivation by <CODE::union>.
+
+        In XML Schema 1.0, the reference type definition is derived by
+        <CODE::union> from the other type definition if there exists two
+        type definitions <VAR::T1> and <VAR::T2> such that the reference
+        type definition is derived from <VAR::T1> by
+        <C::TypeInfo.DERIVATION_RESTRICTION> or
+        <C::TypeInfo.DERIVATION_EXTENSION>, <VAR::T2> is derived from
+        the other type definition by <C::TypeInfo.DERIVATION_RESTRICTION>,
+        <VAR::T1> has <XSCompProp::variety> <CODE::union>, and one of
+        the <XSCompProp::member type definition> is <VAR::T2>.
+        Note that <VAR::T1>
+        could be the same as the reference type definition, and
+        <VAR::T2> could be the same as the other type definition.
+    @@Const:
+      @@@Name: DERIVATION_LIST
+      @@@intValue: 8
+      @@@enDesc:
+        The derivation by <CODE::list>.
+   
+        In XML Schema 1.0, the reference type definition is derived by
+        <CODE::list> from the other type definition if there exists two type
+        definitions <VAR::T1> and <VAR::T2> such that the reference type
+        definition is derived from <VAR::T1> by
+        <C::TypeInfo.DERIVATION_RESTRICTION> or
+        <C::TypeInfo.DERIVATION_EXTENSION>, <VAR::T2> is derived from
+        the other type definition by <C::TypeInfo.DERIVATION_RESTRICTION>,
+        <VAR::T1> has <XSCompProp::variety> <CODE::list>, and <VAR::T2>
+        is the <XSCompProp::item type definition>.  Note that <VAR::T1>
+        could be the same as the reference type definition, and
+        <VAR::T2> could be the same as the other type definition.
+
   @Method:
-     @@Name:  isDerivedFrom
-     @@Description:
-       @@@lang:en
-       @@@@:
-         Return whether there is a derivation between the definition 
-         of this type and the other type definition.
-     @@Param:
-        @@@Name:  typeNamespaceArg
-        @@@Type:  
-          DOMMain:DOMString
-        @@@Description:
-          @@@@lang:en
-          @@@@@: The namespace of the other type definition.
-     @@Param:
-        @@@Name:  typeNameArg
-        @@@Type:  
-          DOMMain:DOMString
-        @@@Description:
-          @@@@lang:en
-          @@@@@: The name of the other type definition.
-     @@Param:
-        @@@Name:  derivationMethod
-        @@@Type:  
-          DOMMain:unsigned-long||ManakaiDOM|all
-        @@@actualType: DerivationMethods
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            The type of derivation and conditions applied between 
-            two types.
-     @@Return:
-        @@@Type:  DOMMain|boolean||ManakaiDOM|all
-        @@@InCase:
-          @@@@Value:true
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              The schema language is the XML Schema and 
-              the definition of this type is derived from the 
-              other type definition according to the derivation 
-              parameter.
-            \
-              If the "derivationMethod" is "0", the other 
-              type definition can be reached by recursing any 
-              combination of {base type definition}, 
-              {item type definition} or {member type definition} 
-              from the definition of this type.
-        @@@InCase:
-          @@@@Value:false
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              Either the schema language is the XML Schema and 
-              the other type definition is not derived from 
-              the definition of this type, the schema language 
-              is the XML DTD or no schama language is associated.
+    @@Name: isDerivedFrom
+    @@enDesc:
+      Returns whether there is a derivation between the type
+      (<DFN::the reference type definition>) and <DFN::the other type
+      definition>.
+    @@Param:
+      @@@Name: typeNamespaceArg
+      @@@Type: DOMString
+      @@@enDesc:
+        The namespace of the other type definition.
+      @@@enImplNote:
+        Can't it be <DOM::null>?
+    @@Param:
+      @@@Name: typeNameArg
+      @@@Type: DOMString
+      @@@enDesc:
+        The name of the other type definition.
+    @@Param:
+      @@@Name: derivationMethod
+      @@@Type: idl|unsignedLong||ManakaiDOM|all
+      @@@dis:actualType: DerivationMethods
+      @@@enDesc:
+        The type of derivation and conditions applied between two
+        types.
+    @@Return:
+      @@@Type: idl|boolean||ManakaiDOM|all
+      @@@TrueCase:
+        @@@@enDesc:
+          If the document's schema language is XML Schema and
+          the reference type definition is derived from the other
+          type definition according to the <P::derivationMethod> parameter.
+
+          If the document's schema language is XML Schema,
+          the value of the <P::derivationMethod> parameter is <CODE::0>,
+          and the other type definition can be reached by recursing any
+          combination of <XSCompProp::base type definition>, 
+          <XSCompProp::item type definition>, or <XSCompProp::member
+          type definitions> properties.
+      @@@FalseCase:
+        @@@@enDesc:
+          If the document's schema language is DTD or no schema
+          is associated with the document.
+
+          If the document's schema language is XML Schema and
+          it does not meet the condition to return <DOM::true>.
+##TypeInfo
 
 IFCls3Def:
   @IFQName: UserDataHandler

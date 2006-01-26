@@ -13,7 +13,7 @@ Module:
   @License: license|Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/01/21 16:28:14 $
+      $Date: 2006/01/26 13:58:20 $
     @@ContentType: dis|Date.RCS
   
   @Require:
@@ -1094,15 +1094,55 @@ IFClsDef:
  ## TODO: Implement these values
           } elsif ($attr eq 'attributes') {
 
-          } elsif ($attr eq 'element_types') {
-
-          } elsif ($attr eq 'attribute_definitions') {
+          } elsif ($attr eq 'element_types' or
+                   $attr eq 'attribute_definitions') {
+            unless ($actualValue->can ($attr)) {
+              __DEEP{
+                $self-><M::DTManager.notOK>;
+              }__;
+              __CODE{printComment::
+                $test => $self,
+                $s => {
+                  $nodePathString.': Object (type |'.(ref $actualValue).
+                  '|) does not have attribute |'.$attr.'|'
+                },
+              }__;
+              __EXCEPTION{ASSERTION_ERR}__;
+            }
+            my $ets = $actualValue->$attr;
+            my @akeys = sort {$a cmp $b} keys %$ets;
+            my @xkeys = sort {$a cmp $b}
+                        map {$_->{node_name}->{value}} @{$expectedHash->{$attr}};
+            if (@akeys != @xkeys) {
+              __DEEP{
+                $self-><M::DTManager.notOK>;
+              }__;
+              __CODE{printComment::
+                $test => $self,
+                $s => {
+                  $nodePathString.': It has '.@akeys.' child nodes ('.@xkeys.
+                  ' expected)'
+                },
+              }__;
+              __EXCEPTION{ASSERTION_ERR}__;
+            }
+            for my $xitem (@{$expectedHash->{$attr}}) {
+              __DEEP{
+                $self-><M::DTManager.assertDOMTreeEquals>
+                         (actual_value => $ets->{$xitem->{node_name}->{value}},
+                          expected_hash => $xitem,
+                          node_path_string => $nodePathString);
+              }__;              
+            }
 
           } elsif ($attr eq 'general_entities') {
+            ## TODO: Implement
 
           } elsif ($attr eq 'notations') {
+            ## TODO: Implement
 
           } elsif ($attr eq 'namespaces') {
+            ## TODO: Implement
 
           } else {
             my $aval;
@@ -1184,6 +1224,35 @@ IFClsDef:
                   }__;
                   __EXCEPTION{ASSERTION_ERR}__;
                 }
+              } elsif ($xval->{type} eq 'const') {
+                unless ($actualValue->can ($xval->{value})) {
+                  __DEEP{
+                    $self-><M::DTManager.notOK>;
+                  }__;
+                  __CODE{printComment::
+                    $test => $self,
+                    $s => {
+                      $nodePathString.': Object (type |'.(ref $actualValue).
+                      '|) does not have constant |'.$xval->{value}.'|'
+                    },
+                  }__;
+                  __EXCEPTION{ASSERTION_ERR}__;
+                }
+                my $m = $xval->{value};
+                unless ($aval == $actualValue->$m) {
+                  __DEEP{
+                    $self-><M::DTManager.notOK>;
+                  }__;
+                  __CODE{printComment::
+                    $test => $self,
+                    $s => {
+                      $nodePathString.'->'.$attr.': Value is |'.$aval.'| (|'.
+                      $xval->{value}.'|, i.e. |'.$actualValue->$m.
+                      '|, is expected)'
+                    },
+                  }__;
+                  __EXCEPTION{ASSERTION_ERR}__;
+                }
               } elsif ($xval->{type} eq 'string') {
                 unless ($aval eq $xval->{value}) {
                   __DEEP{
@@ -1199,6 +1268,52 @@ IFClsDef:
                   }__;
                   __EXCEPTION{ASSERTION_ERR}__;
                 }
+              } elsif ($xval->{type} eq 'DOMStringList') {
+                unless (UNIVERSAL::isa ($aval,
+                                        <IFName::DOMCore:DOMStringList>)) {
+                  __DEEP{
+                    $self-><M::DTManager.notOK>;
+                  }__;
+                  __CODE{printComment::
+                    $test => $self,
+                    $s => {
+                      $nodePathString.'->'.$attr.': Value is |'.$aval.
+                      '|, type |'.(ref $aval).'| (|DOMString| |'.
+                      (join '|, |', @{$xval->{value}}).'|) is expected)'
+                    },
+                  }__;
+                  __EXCEPTION{ASSERTION_ERR}__;
+                }
+                unless (@$aval == @{$xval->{value}}) {
+                  __DEEP{
+                    $self-><M::DTManager.notOK>;
+                  }__;
+                  __CODE{printComment::
+                    $test => $self,
+                    $s => {
+                      $nodePathString.'->'.$attr.': Value has '.@$aval.
+                     '| items (|'.@{$xval->{value}}.'| is expected)'
+                    },
+                  }__;
+                  __EXCEPTION{ASSERTION_ERR}__;
+                }
+                for my $i (0..$#$aval) {
+                  unless ($aval->[$i] eq $xval->{value}->[$i]) {
+                    __DEEP{
+                      $self-><M::DTManager.notOK>;
+                    }__;
+                    __CODE{printComment::
+                      $test => $self,
+                      $s => {
+                        $nodePathString.'->'.$attr.'->['.$i.']: Value is |'.
+                        $aval.'|, type |'.(ref $aval).'| (|'.
+                        $xval->{value}.'| is expected)'
+                      },
+                    }__;
+                    __EXCEPTION{ASSERTION_ERR}__;
+                  }
+                } # item
+
               } # $aval->{type}
             } # $aval->{type} undef
           }
@@ -1324,6 +1439,10 @@ IFClsDef:
      @@@PerlDef:
        $self->{<H::dtest|testData>}->{$key} = $data;
 ##DTManager
+
+PropDef:
+  @QName: dtest|ok
+  @dtest:key: ok
 
 PropDef:
   @QName: dtest|testData
@@ -1689,7 +1808,7 @@ IFClsDef:
 
       /* Name */
       $name-start-char := [U+0041..U+005A U+0061..U+007A];
-      $name-char       := [U+0041..U+005A U+0061..U+007A U+0030..U+0039 '-'];
+      $name-char       := [U+0041..U+005A U+0061..U+007A U+0030..U+0039 '-' '_'];
       NAME : value := $name-start-char $name-char*;
 
       /* Block */
@@ -1712,6 +1831,11 @@ IFClsDef:
       XNUM : value := ['0'] ['x']
                       [U+0030..U+0039 U+0041..U+0046 U+0061..U+0066 '_']+;
       BNUM : value := ['0'] ['b'] ['0' '1' '_']+;
+
+      /* Functional notation */
+      COMMA := [','];
+      LPAREN := ['('];
+      RPAREN := [')'];
       
       /* Ignored white space */
       WSP : ignore := [U+0009..U+000D U+0020]+;
@@ -1803,8 +1927,14 @@ IFClsDef:
     rule _attribute ($node, $name) {
       /*
         attribute := attribute-name ":" attribute-value ";"
-        attribute-name := name
-        attribute-value := 'null' / 'true' / 'false' / 1*(string / char) / number
+        attribute-name := NAME
+        attribute-value := 'null' / 'true' / 'false'
+                         / string
+                         / number
+                         / 'const' "(" NAME ")"
+                         / 'DOMStringList' "(" [string] *("," string) [","] ")"
+        string := 1*(STRING / CHAR)
+        number := DNUM / HNUM / BNUM
       */
  
       // ~ (NAME) { }
@@ -1868,6 +1998,53 @@ IFClsDef:
         lang:Perl ($v => $token.value) {
           $node->{$name} = {type => 'number', value => eval $v};
         }
+      } (NAME == 'const') {
+        ~ (LPAREN) { }
+
+        ~ (NAME) {
+          lang:Perl ($v => $token.value) {
+            $node->{$name} = {type => 'const', value => $v};
+          }
+        }
+
+        ~ (RPAREN) { }
+      } (NAME == 'DOMStringList') {
+        my $list;
+        lang:Perl {
+          $node->{$name} = {type => 'DOMStringList', value => ($list = [])};
+        }
+
+        ~ (LPAREN) { }
+
+        ~* (STRING) {
+          lang:Perl ($v => $token.value) {
+            push @$list, substr ($v, 1, length ($v) - 2);
+          }
+          ~* (STRING) {
+            lang:Perl ($v => $token.value) {
+              $list->[-1] .= substr ($v, 1, length ($v) - 2);
+            }
+          } (CHAR) {
+            lang:Perl ($v => $token.value) {
+              $list->[-1] .= chr hex substr ($v, 2);
+            }
+          }
+        } (CHAR) {
+          lang:Perl ($v => $token.value) {
+            push @$list, chr hex substr ($v, 2);
+          }
+          ~* (STRING) {
+            lang:Perl ($v => $token.value) {
+              $list->[-1] .= substr ($v, 1, length ($v) - 2);
+            }
+          } (CHAR) {
+            lang:Perl ($v => $token.value) {
+              $list->[-1] .= chr hex substr ($v, 2);
+            }
+          }
+        } (COMMA) : separator : terminator? { }
+
+        ~ (RPAREN) { }
       }
 
       ~ (SEMICOLON) { }

@@ -1,5 +1,16 @@
 2006-01-26  Wakaba  <wakaba@suika.fam.cx>
 
+	* XMLParser.dis (_AttlistDeclaration): Now it can generate
+	attribute definition nodes.
+
+	* XDoctype.dis: |UNKNOWN_ATTR| is renamed as |NO_TYPE_ATTR|
+	and another |UNKNOWN_ATTR| constant is introduced
+	for consistency with XML Infoset.
+
+	* DOMCore.dis (TypeInfo): Documentation updated.
+
+2006-01-26  Wakaba  <wakaba@suika.fam.cx>
+
 	* XDoctype.dis: A bug in test code fixed.
 
 	* Tree.dis (NamedNodeMap): Element type or attribute

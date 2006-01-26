@@ -17,7 +17,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/01/26 08:21:03 $
+    $Date: 2006/01/26 13:58:20 $
   
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
   
@@ -1630,7 +1630,8 @@ IFClsXDef:
         
         If the <A::AttributeDefinition.declaredType>
         of the node is different from 
-        <C::AttributeDefinition.UNKNOWN_ATTR> or
+        <C::AttributeDefinition.NO_TYPE_ATTR>,
+        <C::AttributeDefinition.UNKNOWN_ATTR>, or
         <C::AttributeDefinition,CDATA_ATTR>, the value
         is further modified by discarding any leading
         and trailing <CODE::U+0020> characters and
@@ -1657,7 +1658,8 @@ IFClsXDef:
               }
             } # childNodes
             my $vt = $self-><AG::AttributeDefinition.declaredType>;
-            unless ($vt == <C::AttributeDefinition.UNKNOWN_ATTR> or
+            unless ($vt == <C::AttributeDefinition.NO_TYPE_ATTR> or
+                    $vt == <C::AttributeDefinition.UNKNOWN_ATTR> or
                     $vt == <C::AttributeDefinition.CDATA_ATTR>) {
               $r =~ s/\A\x20+//;
               $r =~ s/\x20+\z//;
@@ -2035,10 +2037,10 @@ IFClsXDef:
       attribute value.
     
     @@Const:
-      @@@Name: UNKNOWN_ATTR
+      @@@Name: NO_TYPE_ATTR
       @@@intValue: 0
       @@@enDesc:
-        The attribute value type is unknown.
+        The attribute value type is <QUOTE::no value> (see XML Infoset).
     @@Const:
       @@@Name: CDATA_ATTR
       @@@intValue: 1
@@ -2090,6 +2092,13 @@ IFClsXDef:
       @@@intValue: 10
       @@@enDesc:
         The attribute value is enumuration type.
+    @@Const:
+      @@@Name: UNKNOWN_ATTR
+      @@@intValue: 11
+      @@@enDesc:
+        The attribute value is unknown, because no declaration
+        for the attribute has been read but not <InfoProp::all declareations
+        processed>.
   
   @Attr:
     @@Name: declaredType
@@ -2115,7 +2124,7 @@ IFClsXDef:
 
         $test->assert_num_equals
                  (actual_value => $at-><AG::AttributeDefinition.defaultType>,
-                  expected_value => <C::AttributeDefinition.UNKNOWN_ATTR>);
+                  expected_value => <C::AttributeDefinition.NO_TYPE_ATTR>);
 
         $at-><AS::AttributeDefinition.defaultType>
                (<C::AttributeDefinition.ID_ATTR>);
@@ -2274,7 +2283,7 @@ IFClsXDef:
         $r = <ClassM::t|ManakaiDOMNode.newObject> ($self, $refNode);
         $r->{<H::c|nodeType>} = <H::d|AttributeDefinitionNodeType>;
         $r->{<H::d|declaredType>}
-          = <C::AttributeDefinition.UNKNOWN_ATTR>;
+          = <C::AttributeDefinition.NO_TYPE_ATTR>;
         $r->{<H::d|allowedTokens>} = [];
         $r->{<H::d|defaultType>}
           = <C::AttributeDefinition.UNKNOWN_DEFAULT>;

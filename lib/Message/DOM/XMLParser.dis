@@ -10,7 +10,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/01/21 17:37:51 $
+    $Date: 2006/01/26 13:58:20 $
 
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
@@ -23,14 +23,12 @@ Module:
       @@@WithFor: ManakaiDOM|ManakaiDOMLatest
 
 Namespace:
+  @c:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
   @d:
     http://suika.fam.cx/~wakaba/archive/2004/dom/xdt#
   @dis:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
-  @DOMCore:
-    http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
-  @DOMMain:
-    http://suika.fam.cx/~wakaba/archive/2004/dom/main#
   @dtest:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#Test/
   @dx:
@@ -65,6 +63,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dom/tree#
   @test:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Test#
+  @x:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/xml#
   @xml:
     http://www.w3.org/XML/1998/namespace
   @xmlns:
@@ -119,6 +119,21 @@ ResourceDef:
 ResourceDef:
   @QName: DocumentXDoctype
   @AliasFor: d|DocumentXDoctype
+  @For: ManakaiDOM|DOM
+
+ResourceDef:
+  @QName: DTDef
+  @AliasFor: d|DocumentTypeDefinition
+  @For: ManakaiDOM|DOM
+
+ResourceDef:
+  @QName: ETDef
+  @AliasFor: d|ElementTypeDefinition
+  @For: ManakaiDOM|DOM
+
+ResourceDef:
+  @QName: ATDef
+  @AliasFor: d|AttributeDefinition
   @For: ManakaiDOM|DOM
 
 ElementTypeBinding:
@@ -1833,7 +1848,7 @@ _
         ~ (Name == 'ELEMENT') {
           &_ElementDeclaration ($doc => $doc);
         } (Name == 'ATTLIST') {
-          &_AttlistDeclaration ($doc => $doc);
+          &_AttlistDeclaration ($doc => $doc, $doctype => $doctype);
         } (Name == 'ENTITY') {
           &_EntityDeclaration ($doc => $doc);
         } (Name == 'NOTATION') {
@@ -2013,7 +2028,10 @@ _
       }
     } // ContentParticle
 
-    rule _AttlistDeclaration ($doc) {
+    /*
+      Attribute list declaration
+    */
+    rule _AttlistDeclaration ($doc, $doctype) {
       // ~ (MDO) { }
       // ~ (Name == 'ATTLIST') { }
 
@@ -2021,13 +2039,39 @@ _
 
       ~ (S) { }
 
+      my $name;
       ~ (Name) {
+        lang:Perl ($v => $token.value) {
+          $name = $v;
+        }
+      } else {
+        lang:Perl { $name = '#ILLEGAL' }
+      }
 
+      my $docxd;
+      my $et;
+      lang:Perl {
+        $et = $doctype-><M::DTDef.getElementTypeDefinitionNode> ($name);
+        unless ($et) {
+          $docxd = $doc-><M::Node.getFeature> (<Q::ManakaiDOM:XDoctype>, '3.0');
+          $et = $docxd-><M::DocumentXDoctype.createElementTypeDefinition>
+                          ($name);
+          $doctype-><M::DTDef.setElementTypeDefinitionNode> ($et)
+            unless $name eq '#ILLEGAL';
+        }
       }
   
       ~? (S) { }
 
       ~* (Name) {
+        my $at;
+        lang:Perl ($v => $token.value) {
+          $docxd ||= $doc-><M::Node.getFeature>
+                             (<Q::ManakaiDOM:XDoctype>, '3.0');
+          $at = $docxd-><M::DocumentXDoctype.createAttributeDefinition> ($v);
+          $et-><M::ETDef.setAttributeDefinitionNode> ($at)
+            unless exists $et-><AG::ETDef.attributeDefinitions>->{$v};
+        }
 
         ~ (S) { }
         
@@ -2035,10 +2079,19 @@ _
         ~ (Name == 'NOTATION') {
           ~ (S) { }
 
+          my $kwd;
+          lang:Perl {
+            $at-><AS::ATDef.declaredType> (<C::ATDef.NOTATION_ATTR>);
+            $kwd = $at-><AG::ATDef.allowedTokens>;
+          }
+
           ~ (EGO) {
             ~? (S) { }
 
-            ~ (Name) {
+            ~+ (Name) {
+              lang:Perl ($v => $token.value) {
+                push @$kwd, $v;
+              }
 
               ~? (S) { }
             } (OR) : separator {
@@ -2047,15 +2100,42 @@ _
 
             ~ (EGC) { }
           }
+
         } (Name) {
-          // TODO: check keyword
+          my $type;
+          lang:Perl ($v => $token.value) : has-error {
+            my $map = {
+              CDATA => <C::ATDef.CDATA_ATTR>,
+              ID => <C::ATDef.ID_ATTR>,
+              IDREF => <C::ATDef.IDREF_ATTR>,
+              IDREFS => <C::ATDef.IDREFS_ATTR>,
+              ENTITY => <C::ATDef.ENTITY_ATTR>,
+              ENTITIES => <C::ATDef.ENTITIES_ATTR>,
+              NMTOKEN => <C::ATDef.NMTOKEN_ATTR>,
+              NMTOKENS => <C::ATDef.NMTOKENS_ATTR>,
+            };
+            if ($map->{$v}) {
+              $at-><AS::ATDef.declaredType> ($map->{$v});
+            } else {
+              ## TODO: Exception
+            }
+          }
         
         } (EGO) {
           ?lexmode Enumeration;
 
           ~? (S) { }
 
-          ~ (Nmtoken) {
+          my $kwd;
+          lang:Perl {
+            $at-><AS::ATDef.declaredType> (<C::ATDef.ENUMERATION_ATTR>);
+            $kwd = $at-><AG::ATDef.allowedTokens>;
+          }
+
+          ~+ (Nmtoken) {
+            lang:Perl ($v => $token.value) {
+              push @$kwd, $v;
+            }
 
             ~? (S) { }
           } (OR) : separator {
@@ -2075,19 +2155,33 @@ _
         // DefaultDecl
         ~ (RNI) {
           ~ (Name == 'REQUIRED') {
-
+            lang:Perl {
+              $at-><AS::ATDef.defaultType> (<C::ATDef.REQUIRED_DEFAULT>);
+            }
           } (Name == 'IMPLIED') {
-
+            lang:Perl {
+              $at-><AS::ATDef.defaultType> (<C::ATDef.IMPLIED_DEFAULT>);
+            }
           } (Name == 'FIXED') {
             ~ (S) { }
+
+            lang:Perl {
+              $at-><AS::ATDef.defaultType> (<C::ATDef.FIXED_DEFAULT>);
+            }
             
             ~ (LIT) {
               my $vals;
               lang:Perl {
-                $vals = [];
+                $vals = {nodes => [], value => ''};
               }
 
               &_AttributeValueSpecification_ ($doc => $doc, $vals => $vals);
+
+              lang:Perl {
+                for (@{$vals->{nodes}}) {
+                  $at-><M::Node.appendChild> ($_);
+                }
+              }
 
               ~ (LIT) {
                 ?lexmode AttlistDeclaration;
@@ -2097,12 +2191,18 @@ _
             } (LITA) {
               my $vals;
               lang:Perl {
-                $vals = [];
+                $vals = {nodes => [], value => ''};
               }
 
               &_AttributeValueSpecificationA_ ($doc => $doc, $vals => $vals);
 
-              ~ (LIT) {
+              lang:Perl {
+                for (@{$vals->{nodes}}) {
+                  $at-><M::Node.appendChild> ($_);
+                }
+              }
+
+              ~ (LITA) {
                 ?lexmode AttlistDeclaration;
               } else {
                 ?lexmode AttlistDeclaration;
@@ -2113,10 +2213,17 @@ _
         } (LIT) {
           my $vals;
           lang:Perl {
-            $vals = [];
+            $at-><AS::ATDef.defaultType> (<C::ATDef.EXPLICIT_DEFAULT>);
+            $vals = {nodes => [], value => ''};
           }
 
           &_AttributeValueSpecification_ ($doc => $doc, $vals => $vals);
+
+          lang:Perl {
+            for (@{$vals->{nodes}}) {
+              $at-><M::Node.appendChild> ($_);
+            }
+          }
 
           ~ (LIT) {
             ?lexmode AttlistDeclaration;
@@ -2126,10 +2233,17 @@ _
         } (LITA) {
           my $vals;
           lang:Perl {
-            $vals = [];
+            $at-><AS::ATDef.defaultType> (<C::ATDef.EXPLICIT_DEFAULT>);
+            $vals = {nodes => [], value => ''};
           }
 
           &_AttributeValueSpecificationA_ ($doc => $doc, $vals => $vals);
+
+          lang:Perl {
+            for (@{$vals->{nodes}}) {
+              $at-><M::Node.appendChild> ($_);
+            }
+          }
 
           ~ (LITA) {
             ?lexmode AttlistDeclaration;
@@ -3490,6 +3604,233 @@ _
               }
               text { data: 'n'; }
             }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.doctype.internal.attr.empty.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+            <!ATTLIST a>
+          ]>
+          <a></a>
+      @@@test:domTree:
+        document {
+          xml-version: '1.0';
+          xml-encoding: null;
+          xml-standalone: false;
+          document-type {
+            node-name: 'a';
+            element-type-definition {
+              node-name: 'a';
+            }
+          }
+          element {
+            namespace-uri: null;
+            local-name: 'a';
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.doctype.internal.attr.cdata.implied.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+            <!ATTLIST a
+              at   CDATA    #IMPLIED
+            >
+          ]>
+          <a></a>
+      @@@test:domTree:
+        document {
+          xml-version: '1.0';
+          xml-encoding: null;
+          xml-standalone: false;
+          document-type {
+            node-name: 'a';
+            element-type-definition {
+              node-name: 'a';
+              attribute-definition {
+                node-name: 'at';
+                declared-type: const (CDATA_ATTR);
+                allowed-tokens: DOMStringList ();
+                default-type: const (IMPLIED_DEFAULT);
+                text-content: '';
+              }
+            }
+          }
+          element {
+            namespace-uri: null;
+            local-name: 'a';
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.doctype.internal.attr.types.implied.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+            <!ATTLIST a
+              at1   ID        #IMPLIED
+              at2   IDREF     #IMPLIED
+              at3   IDREFS    #IMPLIED
+              at4   ENTITY    #IMPLIED
+              at5   ENTITIES  #IMPLIED
+              at6   NMTOKEN   #IMPLIED
+              at7   NMTOKENS  #IMPLIED
+              at8   NOTATION  (n1 | n2|n3)  #IMPLIED
+              at9   (e1| e2| e3 ) #IMPLIED
+            >
+          ]>
+          <a></a>
+      @@@test:domTree:
+        document {
+          xml-version: '1.0';
+          xml-encoding: null;
+          xml-standalone: false;
+          document-type {
+            node-name: 'a';
+            element-type-definition {
+              node-name: 'a';
+              attribute-definition {
+                node-name: 'at1';
+                declared-type: const (ID_ATTR);
+                allowed-tokens: DOMStringList ();
+                default-type: const (IMPLIED_DEFAULT);
+                text-content: '';
+              }
+              attribute-definition {
+                node-name: 'at2';
+                declared-type: const (IDREF_ATTR);
+                allowed-tokens: DOMStringList ();
+                default-type: const (IMPLIED_DEFAULT);
+                text-content: '';
+              }
+              attribute-definition {
+                node-name: 'at3';
+                declared-type: const (IDREFS_ATTR);
+                allowed-tokens: DOMStringList ();
+                default-type: const (IMPLIED_DEFAULT);
+                text-content: '';
+              }
+              attribute-definition {
+                node-name: 'at4';
+                declared-type: const (ENTITY_ATTR);
+                allowed-tokens: DOMStringList ();
+                default-type: const (IMPLIED_DEFAULT);
+                text-content: '';
+              }
+              attribute-definition {
+                node-name: 'at5';
+                declared-type: const (ENTITIES_ATTR);
+                allowed-tokens: DOMStringList ();
+                default-type: const (IMPLIED_DEFAULT);
+                text-content: '';
+              }
+              attribute-definition {
+                node-name: 'at6';
+                declared-type: const (NMTOKEN_ATTR);
+                allowed-tokens: DOMStringList ();
+                default-type: const (IMPLIED_DEFAULT);
+                text-content: '';
+              }
+              attribute-definition {
+                node-name: 'at7';
+                declared-type: const (NMTOKENS_ATTR);
+                allowed-tokens: DOMStringList ();
+                default-type: const (IMPLIED_DEFAULT);
+                text-content: '';
+              }
+              attribute-definition {
+                node-name: 'at8';
+                declared-type: const (NOTATION_ATTR);
+                allowed-tokens: DOMStringList ('n1', 'n2', 'n3');
+                default-type: const (IMPLIED_DEFAULT);
+                text-content: '';
+              }
+              attribute-definition {
+                node-name: 'at9';
+                declared-type: const (ENUMERATION_ATTR);
+                allowed-tokens: DOMStringList ('e1', 'e2', 'e3');
+                default-type: const (IMPLIED_DEFAULT);
+                text-content: '';
+              }
+            }
+          }
+          element {
+            namespace-uri: null;
+            local-name: 'a';
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.doctype.internal.attr.cdata.defaults.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+            <!ATTLIST a
+              at1   CDATA    #IMPLIED
+              at2   CDATA    #REQUIRED
+              at3   CDATA    #FIXED     "value3"
+              at4   CDATA    "value4"
+              at5   CDATA    #FIXED     'value5'
+              at6   CDATA    'value6'
+            >
+          ]>
+          <a></a>
+      @@@test:domTree:
+        document {
+          xml-version: '1.0';
+          xml-encoding: null;
+          xml-standalone: false;
+          document-type {
+            node-name: 'a';
+            element-type-definition {
+              node-name: 'a';
+              attribute-definition {
+                node-name: 'at1';
+                declared-type: const (CDATA_ATTR);
+                allowed-tokens: DOMStringList ();
+                default-type: const (IMPLIED_DEFAULT);
+                text-content: '';
+              }
+              attribute-definition {
+                node-name: 'at2';
+                declared-type: const (CDATA_ATTR);
+                allowed-tokens: DOMStringList ();
+                default-type: const (REQUIRED_DEFAULT);
+                text-content: '';
+              }
+              attribute-definition {
+                node-name: 'at3';
+                declared-type: const (CDATA_ATTR);
+                allowed-tokens: DOMStringList ();
+                default-type: const (FIXED_DEFAULT);
+                text-content: 'value3';
+              }
+              attribute-definition {
+                node-name: 'at4';
+                declared-type: const (CDATA_ATTR);
+                allowed-tokens: DOMStringList ();
+                default-type: const (EXPLICIT_DEFAULT);
+                text-content: 'value4';
+              }
+              attribute-definition {
+                node-name: 'at5';
+                declared-type: const (CDATA_ATTR);
+                allowed-tokens: DOMStringList ();
+                default-type: const (FIXED_DEFAULT);
+                text-content: 'value5';
+              }
+              attribute-definition {
+                node-name: 'at6';
+                declared-type: const (CDATA_ATTR);
+                allowed-tokens: DOMStringList ();
+                default-type: const (EXPLICIT_DEFAULT);
+                text-content: 'value6';
+              }
+            }
+          }
+          element {
+            namespace-uri: null;
+            local-name: 'a';
           }
         }
 
