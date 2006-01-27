@@ -13,7 +13,7 @@ Module:
   @License: license|Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/01/26 13:58:20 $
+      $Date: 2006/01/27 16:24:37 $
     @@ContentType: dis|Date.RCS
   
   @Require:
@@ -1278,7 +1278,7 @@ IFClsDef:
                     $test => $self,
                     $s => {
                       $nodePathString.'->'.$attr.': Value is |'.$aval.
-                      '|, type |'.(ref $aval).'| (|DOMString| |'.
+                      '|, type |'.(ref $aval).'| (|DOMStringList| |'.
                       (join '|, |', @{$xval->{value}}).'|) is expected)'
                     },
                   }__;
@@ -1306,8 +1306,46 @@ IFClsDef:
                       $test => $self,
                       $s => {
                         $nodePathString.'->'.$attr.'->['.$i.']: Value is |'.
-                        $aval.'|, type |'.(ref $aval).'| (|'.
-                        $xval->{value}.'| is expected)'
+                        $aval->[$i].'|, type |'.(ref $aval).'| (|'.
+                        $xval->{value}->[$i].'| is expected)'
+                      },
+                    }__;
+                    __EXCEPTION{ASSERTION_ERR}__;
+                  }
+                } # item
+
+              } elsif ($xval->{type} eq 'TypeInfo') {
+                unless (UNIVERSAL::isa ($aval,
+                                        <IFName::DOMCore:TypeInfo>)) {
+                  __DEEP{
+                    $self-><M::DTManager.notOK>;
+                  }__;
+                  __CODE{printComment::
+                    $test => $self,
+                    $s => {
+                      $nodePathString.'->'.$attr.': Value is |'.$aval.
+                      '|, type |'.(ref $aval).'| (|TypeInfo| |'.
+                      (join '|, |', @{$xval->{value}}).'|) is expected)'
+                    },
+                  }__;
+                  __EXCEPTION{ASSERTION_ERR}__;
+                }
+                for (['type_namespace', 0], ['type_name', 1]) {
+                  my $m = $_->[0];
+                  my $av = $aval->$m;
+                  unless ((defined $av and defined $xval->{value}->[$_->[1]] and
+                           $av eq $xval->{value}->[$_->[1]]) or
+                          (not defined $av and
+                           not defined $xval->{value}->[$_->[1]])) {
+                    __DEEP{
+                      $self-><M::DTManager.notOK>;
+                    }__;
+                    __CODE{printComment::
+                      $test => $self,
+                      $s => {
+                        $nodePathString.'->'.$attr.'->'.$m.': Value is |'.
+                        $av.'|, type |'.(ref $av).'| (|'.
+                        $xval->{value}->[$_->[1]].'| is expected)'
                       },
                     }__;
                     __EXCEPTION{ASSERTION_ERR}__;
@@ -1933,6 +1971,8 @@ IFClsDef:
                          / number
                          / 'const' "(" NAME ")"
                          / 'DOMStringList' "(" [string] *("," string) [","] ")"
+                         / 'TypeInfo' "(" [string / 'null']
+                                          *("," (string / 'null')) [","] ")"
         string := 1*(STRING / CHAR)
         number := DNUM / HNUM / BNUM
       */
@@ -2041,6 +2081,47 @@ IFClsDef:
             lang:Perl ($v => $token.value) {
               $list->[-1] .= chr hex substr ($v, 2);
             }
+          }
+        } (COMMA) : separator : terminator? { }
+
+        ~ (RPAREN) { }
+      } (NAME == 'TypeInfo') {
+        my $list;
+        lang:Perl {
+          $node->{$name} = {type => 'TypeInfo', value => ($list = [])};
+        }
+
+        ~ (LPAREN) { }
+
+        ~* (STRING) {
+          lang:Perl ($v => $token.value) {
+            push @$list, substr ($v, 1, length ($v) - 2);
+          }
+          ~* (STRING) {
+            lang:Perl ($v => $token.value) {
+              $list->[-1] .= substr ($v, 1, length ($v) - 2);
+            }
+          } (CHAR) {
+            lang:Perl ($v => $token.value) {
+              $list->[-1] .= chr hex substr ($v, 2);
+            }
+          }
+        } (CHAR) {
+          lang:Perl ($v => $token.value) {
+            push @$list, chr hex substr ($v, 2);
+          }
+          ~* (STRING) {
+            lang:Perl ($v => $token.value) {
+              $list->[-1] .= substr ($v, 1, length ($v) - 2);
+            }
+          } (CHAR) {
+            lang:Perl ($v => $token.value) {
+              $list->[-1] .= chr hex substr ($v, 2);
+            }
+          }
+        } (NAME == 'null') {
+          lang:Perl {
+            push @$list, null;
           }
         } (COMMA) : separator : terminator? { }
 

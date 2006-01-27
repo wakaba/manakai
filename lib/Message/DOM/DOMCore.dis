@@ -40,7 +40,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/01/26 13:58:20 $
+      $Date: 2006/01/27 16:24:35 $
     @@ContentType:
       dis:Date.RCS
 
@@ -76,6 +76,8 @@ Module:
 Namespace:
   @c:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
+  @d:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/xdt#
   @dis:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
   @DOMCore:
@@ -136,6 +138,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dom/xml#
   @xml:
     http://www.w3.org/XML/1998/namespace
+  @xml-dtd:
+    http://www.w3.org/TR/REC-xml
   @xmlns:
     http://www.w3.org/2000/xmlns/
 
@@ -146,6 +150,14 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type: test|StandaloneTest
     @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: L3Test
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: test|StandaloneTest
+    @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|DOM3
 
 ElementTypeBinding:
   @Name: raises
@@ -3253,8 +3265,12 @@ ElementTypeBinding:
   @ShadowContent:
     @@lang:en
 
-IF3Def:
+IFCls3Def:
   @IFQName: c|TypeInfo
+  @ClsQName: c|ManakaiDOMDTDTypeInfo
+
+  @ClsISA: ManakaiDOM|ManakaiDOMObject
+
   @enDesc:
     The <IF::TypeInfo> interface represents a type referenced from
     <IF::t|Element> or <IF::t|Attr> nodes, specified in the schemas
@@ -3372,6 +3388,16 @@ IF3Def:
     @@@:
       Other schema languages are outside of the scope of the W3C.
 
+  @ResourceDef:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@QName: c|createDTDTypeInfo
+    @@enDesc:
+      Returns a <IF::TypeInfo> object for an XML DTD type.
+    @@rdf:type: DISPerl|BlockCode
+    @@PerlDef:
+      my $v = $type || 0;
+      $result = bless \$v, <ClassName::c|ManakaiDOMDTDTypeInfo>;
+
   @Attr:
     @@Name: typeName
     @@enDesc:
@@ -3381,6 +3407,19 @@ IF3Def:
       @@@nullCase:
         @@@@enDesc:
           If the type is unknown.
+      @@@PerlDef:
+        $r = {
+          <C::ATDef.CDATA_ATTR> => 'CDATA',
+          <C::ATDef.ID_ATTR> => 'ID',
+          <C::ATDef.IDREF_ATTR> => 'IDREF',
+          <C::ATDef.IDREFS_ATTR> => 'IDREFS',
+          <C::ATDef.ENTITY_ATTR> => 'ENTITY',
+          <C::ATDef.ENTITIES_ATTR> => 'ENTITIES',
+          <C::ATDef.NMTOKEN_ATTR> => 'NMTOKEN',
+          <C::ATDef.NMTOKENS_ATTR> => 'NMTOKENS',
+          <C::ATDef.NOTATION_ATTR> => 'NOTATION',
+          <C::ATDef.ENUMERATION_ATTR> => 'ENUMERATION',
+        }->{$$self};
        
   @Attr:
     @@Name: typeNamespace
@@ -3394,6 +3433,19 @@ IF3Def:
           If the type is unknown or if no namespace information is available.
       @@@enImplNote:
         Is it namespace <EM::URI>?
+      @@@PerlDef:
+        $r = <Q::xml-dtd:> if {
+          <C::ATDef.CDATA_ATTR> => true,
+          <C::ATDef.ID_ATTR> => true,
+          <C::ATDef.IDREF_ATTR> => true,
+          <C::ATDef.IDREFS_ATTR> => true,
+          <C::ATDef.ENTITY_ATTR> => true,
+          <C::ATDef.ENTITIES_ATTR> => true,
+          <C::ATDef.NMTOKEN_ATTR> => true,
+          <C::ATDef.NMTOKENS_ATTR> => true,
+          <C::ATDef.NOTATION_ATTR> => true,
+          <C::ATDef.ENUMERATION_ATTR> => true,
+        }->{$$self};
 
   @ConstGroup:
     @@QName: DerivationMethods
@@ -3530,7 +3582,108 @@ IF3Def:
 
           If the document's schema language is XML Schema and
           it does not meet the condition to return <DOM::true>.
+      @@@PerlDef:\
+        @@@@enImplNote:
+          <DOM::false>.
+
+  @IntMethod:
+    @@Operator:
+      @@@@: eq
+      @@@ContentType: DISPerl|Perl
+    @@enDesc:
+      For manakai's Perl binding, a <IF::TypeInfo> is equal (<Perl::eq>)
+      to another <IF::TypeInfo> if and only if their 
+      <A::TypeInfo.typeNamespace> and <A::TypeInfo.typeName> is literally
+      equals respectively.
+    @@Param:
+      @@@Name: t
+      @@@Type: TypeInfo
+    @@Return:
+      @@@Type: idl|boolean||ManakaiDOM|all
+      @@@PerlDef:
+        __DEEP{
+          if (UNIVERSAL::isa ($t, <IFName::TypeInfo>)) {
+            my $ln1 = $self-><AG::TypeInfo.typeName>;
+            my $ln2 = $t-><AG::TypeInfo.typeName>;
+            if ((defined $ln1 and defined $ln2 and $ln1 eq $ln2) or
+                (not defined $ln1 or not defined $ln2)) {
+              my $ns1 = $self-><AG::TypeInfo.typeNamespace>;
+              my $ns2 = $t-><AG::TypeInfo.typeNamespace>;
+              if ((defined $ns1 and defined $ns2 and $ns1 eq $ns2) or
+                  (not defined $ns1 and not defined $ns2)) {
+                $r = true;
+              }
+            }
+          }
+       }__;
+    @@L3Test:
+      @@@QName: DTDTypeInfo.==.test
+      @@@PerlDef:
+        $test->id ('cdata.cdata');
+        my $t1;
+        __CODE{c|createDTDTypeInfo::
+          $result => $t1,
+          $type => {<C::ATDef.CDATA_ATTR>},
+        }__;
+        my $t2;
+        __CODE{c|createDTDTypeInfo::
+          $result => $t2,
+          $type => {<C::ATDef.CDATA_ATTR>},
+        }__;
+        $test->assert_equals ($t1, $t2);
+
+        $test->id ('cdata.unknown');
+        __CODE{c|createDTDTypeInfo::
+          $result => $t2,
+          $type => {<C::ATDef.UNKNOWN_ATTR>},
+        }__;
+        $test->assert_not_equals ($t1, $t2);
+
+        $test->id ('cdata.no-type');
+        __CODE{c|createDTDTypeInfo::
+          $result => $t2,
+          $type => {<C::ATDef.NO_TYPE_ATTR>},
+        }__;
+        $test->assert_not_equals ($t1, $t2);
+
+        $test->id ('cdata.id');
+        __CODE{c|createDTDTypeInfo::
+          $result => $t2,
+          $type => {<C::ATDef.ID_ATTR>},
+        }__;
+        $test->assert_not_equals ($t1, $t2);
+
+        $test->id ('unknown.unknown');
+        __CODE{c|createDTDTypeInfo::
+          $result => $t1,
+          $type => {<C::ATDef.UNKNOWN_ATTR>},
+        }__;
+        __CODE{c|createDTDTypeInfo::
+          $result => $t2,
+          $type => {<C::ATDef.UNKNOWN_ATTR>},
+        }__;
+        $test->assert_equals ($t1, $t2);
+
+        $test->id ('unknown.no-type');
+        __CODE{c|createDTDTypeInfo::
+          $result => $t2,
+          $type => {<C::ATDef.NO_TYPE_ATTR>},
+        }__;
+        $test->assert_equals ($t1, $t2);
+
+        $test->id ('unknown.no-type-info');
+        $t2 = 100;
+        $test->assert_not_equals ($t1, $t2);
 ##TypeInfo
+
+ResourceDef:
+  @QName: ATDef
+  @For: ManakaiDOM|ManakaiDOMLatest
+  @AliasFor: d|AttributeDefinition
+ResourceDef:
+  @QName: ATDef
+  @For: ManakaiDOM|ManakaiDOM3 !ManakaiDOM|ManakaiDOMLatest
+  @AliasFor: d|AttributeDefinition||ManakaiDOM|ManakaiDOMLatest
 
 IFCls3Def:
   @IFQName: UserDataHandler

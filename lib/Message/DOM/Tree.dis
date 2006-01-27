@@ -12,7 +12,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/01/26 08:21:03 $
+    $Date: 2006/01/27 16:24:36 $
 
   @Require:
     @@Module:
@@ -40,10 +40,6 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
   @doc:
     http://suika.fam.cx/~wakaba/archive/2005/7/tutorial#
-  @DOMLS:
-    http://suika.fam.cx/~wakaba/archive/2004/dom/ls#
-  @DOMMain:
-    http://suika.fam.cx/~wakaba/archive/2004/dom/main#
   @d:
     http://suika.fam.cx/~wakaba/archive/2004/dom/xdt#
   @dx:
@@ -60,8 +56,6 @@ Namespace:
     http://www.w3.org/1999/xhtml
   @idl:
     http://suika.fam.cx/~wakaba/archive/2004/dis/IDL#
-  @f:
-    http://suika.fam.cx/~wakaba/archive/2004/dom/feature#
   @infoset:
     http://www.w3.org/2001/04/infoset#
   @kwd:
@@ -94,10 +88,14 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dom/tree#
   @test:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Test#
+  @x:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/xml#
   @xhtml1:
     http://www.w3.org/1999/xhtml
   @xml:
     http://www.w3.org/XML/1998/namespace
+  @xml-dtd:
+    http://www.w3.org/TR/REC-xml
   @xmlns:
     http://www.w3.org/2000/xmlns/
 
@@ -252,6 +250,9 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type: DISLang|Attribute
     @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|DOM3
+  ## Note that there are attributes introduced in DOM Level 3
+  ## but also defined for lower levels as internal attributes
+  ## for the purpose of internal use.
 
 ElementTypeBinding:
   @Name: ReAttr
@@ -7914,7 +7915,7 @@ ResourceDef:
         __DEEP{
           my $length = $self-><AG::NamedNodeMap.length>;
           if ($length > $count) {
-            for (my $i = $length; $i > $count; $i--) {
+            for (my $i = $length - 1; $i >= $count; $i--) {
               my $item = $self-><M::NamedNodeMap.item> ($i);
               $self-><M::NamedNodeMap.removeNamedItem>
                        ($item-><AG::Node.nodeName>);
@@ -9283,58 +9284,96 @@ NodeTypeDef:
         Specification does not address this case.
 ## TODO: Some mechanism required to turn the "specified" attribute "true" 
 ## when some node operation is done.
+
   @Attr:
-     @@Name:  value
-     @@Description:
-       @@@lang:en
-       @@@@: The value of this attribute.
-     @@Get:
-        @@@Type:  
-          DOMMain:DOMString
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            The attribute value as a string.
-        @@@disDef:
-          @@@@DISPerl:cloneCode: ManakaiDOMNode.textContent.get
-          @@@@ImplNote:
-            @@@@@lang:en
-            @@@@@@:
-              This definition might be updated when the new level 
-              of the DOM is introduced.
-        @@@ImplNote:
-          @@@@lang:en
-          @@@@@:
-            Although the specification says nothing, the Attr->value and 
-            Attr->textContent should have the same value by nature.
-     @@Set:
-        @@@Type:  
-          DOMMain:DOMString
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            Setting of this attribute creates a "Text" node with 
-            the value specified and replaces child nodes of this 
-            node with it.
-        @@@ImplNote:
-          @@@@lang:en
-          @@@@@:
-            The DOM implementation may normalize the value [DOM 3, SVG DOM].
-        @@@Exception:
-          @@@@Type: DOMException
-          @@@@Name: NO_MODIFICATION_ALLOWED_ERR
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@: This node is read-only.
-          @@@@SpecLevel:1
-          @@@@ImplNote:
-            @@@@@lang:en
-            @@@@@@:
-              This exception is added in the DOM Level 1 Errata and 
-              incorporated into the DOM Level 1 Second Edition.
-        @@@PerlDef:
-          __CODE{DOMCore:setNodeTextContent::
-                    $node => $self, $given => $given}__;
+    @@Name: value
+    @@enDesc:
+      The value of the attribute.
+    @@Type: DOMString
+    @@Get:
+      @@@enDesc:
+        @@@@ForCheck: ManakaiDOM|ManakaiDOM
+        @@@@@:
+          In the manakai implementation, it is the concatenation of
+          the <DFN::text content> of every child node.  For <IF::t|Text>
+          children, the text content of a node is the <A::t|Node.textContent>
+          attribute value.  For <IF::x|EntityReference>
+          children, the text content of a node is the
+          <A::t|Node.textContent> attribute value with
+          any <CODE::U+0009>, <CODE::U+000A>, and
+          <CODE::U+000D> replaced by <CODE::U+0020>.
+
+          If the <InfoProp::attribute type> of the node
+          (which might be accessible via <A::Attr.schemaTypeInfo>
+           if the schema language of the document is XML DTD) has
+          a valid value different from <CODE::no value>, <CODE::unknown>,
+          and <CODE::CDATA>, then the value
+          is further modified by discarding any leading
+          and trailing <CODE::U+0020> characters and
+          by replacing sequences of <CODE::U+0020> characters
+          by a single <CODE::U+0020> character.
+      @@@PerlDef:
+         __DEEP{
+            for my $child (@{$self-><AG::t|Node.childNodes>}) {
+              if ($child-><AG::t|Node.nodeType> ==
+                  <C::t|Node.ENTITY_REFERENCE_NODE>) {
+                my $v = $child-><AG::t|Node.textContent>;
+                $v =~ s/[\x09\x0A\x0D]/ /;
+                $r .= $v;
+              } else {
+                $r .= $child-><AG::t|Node.textContent>;
+              }
+            } # childNodes
+            my $vt = $self->{<H::mn:node>}->{<H::infoset:attributeType>};
+            unless (not defined $vt or
+                    $vt == <C::ATDef.NO_TYPE_ATTR> or
+                    $vt == <C::ATDef.UNKNOWN_ATTR> or
+                    $vt == <C::ATDef.CDATA_ATTR>) {
+              $r =~ s/\A\x20+//;
+              $r =~ s/\x20+\z//;
+              $r =~ s/\x20+/ /g;
+            }
+        }__;
+    @@Set:
+      @@@enDesc:
+        Creates a <IF::Text> node with the string.
+      @@@enDesc:
+        @@@@ddid: noval
+        @@@@For: ManakaiDOM|ManakaiDOM
+        @@@@@:
+          The exist child nodes, if any, are replaced by the new
+          <IF::Text> node.  If the new string is empty (i.e. its
+          length is zero), then no node is created and the child
+          node list is simply cleared.
+      @@@enDesc:
+        @@@@ddid: norm
+        @@@@@:
+          Some specialized implementations may do normalization automatically.
+          In such case, the value on retrieval may differ from the value
+          on setting.
+        @@@@For: ManakaiDOM|DOM3
+      @@@enImplNote:
+        Currenly type information does not affect on setting.
+        Should it do?
+      @@@dx:raises:
+        @@@@@: MDOMX|NOMOD_THIS
+        @@@@enDesc:
+          If the node is read-only.
+        @@@@enImplNote:
+          Added by DOM Level 1 (first edition) Errata and
+          incorporated into DOM Level 1 Second Edition, Level 2 and later.
+      @@@PerlDef:
+        __CODE{c|setNodeTextContent::
+               $node => $self, $given => $given}__;
+    @@enImplNote:
+      @@@ddid: value-attrs
+      @@@@:
+        <IF::Node.nodeValue> for <IF::Attr> and <IF::Attr.value> shares their
+        definition.  <IF::Node.textContent> does <EM::not>.
+
+        Manakai's <IF::Node.nodeValue> for <IF::ATDef> is also shares
+        the definition with <IF::Attr.value>.
+
   @Attr:
      @@Name:  ownerElement
      @@Description:
@@ -9361,28 +9400,87 @@ NodeTypeDef:
      @@SpecLevel:2
      @@For:
        ManakaiDOM:DOM2
-  @Attr:
-     @@Name:  schemaTypeInfo
-     @@Description:
-       @@@lang:en
-       @@@@:
-         The type information associated with this node.
-        \
-         Note that while this type information is guarantee 
-         to be correct after loading the validation, 
-         it may not be reliable if the node was moved.
-     @@Get:
-        @@@Type:  TypeInfo
-        @@@Description:
-          @@@@lang:en
-          @@@@@: The type information.
-     @@Level[list]:  3
-     @@SpecLevel:3
-     @@For:
-       ManakaiDOM:DOM3
 
+  @L3Attr:
+    @@Name: schemaTypeInfo
+    @@enDesc:
+      The type information associated with the attribute.
+
+      While the type information contained in the attribute is guarantee
+      to be correct after loading the document or validation,
+      it may not be reliable if the node was moved.
+    @@Type: c|TypeInfo
+    @@Get:
+      @@@PerlDef:
+        __CODE{c|createDTDTypeInfo::
+          $result => $r,
+          $type => {$self->{<H::mn:node>}->{<H::infoset:attributeType>}},
+        }__;
+    @@L3Test:
+      @@@QName: Attr.schemaTypeInfo.no-schema.test
+      @@@PerlDef:
+        my $el;
+        __CODE{createElementForTest:: $el => $el}__;
+        $el-><AG::Node.ownerDocument>
+           -><AG::Document.domConfig>
+           -><M::c|DOMConfiguration.setParameter>
+               ('schema-type' => q[http://dummy.example/]);
+        $el-><M::Element.setAttributeNS> (null, 'a', 'b');
+        my $attr = $el-><M::Element.getAttributeNodeNS> (null, 'a');
+
+        my $sti = $attr-><AG::Attr.schemaTypeInfo>;
+        $test->assert_isa ($sti, <IFName::c|TypeInfo>);
+        $test->assert_null ($sti-><AG::c|TypeInfo.typeName>);
+        $test->assert_null ($sti-><AG::c|TypeInfo.typeNamespace>);
+    @@L3Test:
+      @@@QName: Attr.schemaTypeInfo.dtd.test
+      @@@PerlDef:
+        my $el;
+        __CODE{createElementForTest:: $el => $el}__;
+        $el-><AG::Node.ownerDocument>
+           -><AG::Document.domConfig>
+           -><M::c|DOMConfiguration.setParameter>
+               ('schema-type' => <Q::xml-dtd:>);
+        $el-><M::Element.setAttributeNS> (null, 'a', 'b');
+        my $attr = $el-><M::Element.getAttributeNodeNS> (null, 'a');
+
+        my $sti = $attr-><AG::Attr.schemaTypeInfo>;
+        $test->assert_isa ($sti, <IFName::c|TypeInfo>);
+        $test->assert_null ($sti-><AG::c|TypeInfo.typeName>);
+        $test->assert_null ($sti-><AG::c|TypeInfo.typeNamespace>);
+    @@L3Test:
+      @@@QName: Attr.schemaTypeInfo.dtd.cdata.test
+      @@@PerlDef:
+        my $el;
+        __CODE{createElementForTest:: $el => $el}__;
+        $el-><AG::Node.ownerDocument>
+           -><AG::Document.domConfig>
+           -><M::c|DOMConfiguration.setParameter>
+               ('schema-type' => <Q::xml-dtd:>);
+        $el-><M::Element.setAttributeNS> (null, 'a', 'b');
+        my $attr = $el-><M::Element.getAttributeNodeNS> (null, 'a');
+        $attr->{<H::mn:node>}->{<H::infoset:attributeType>}
+          = <C::ATDef.CDATA_ATTR>;
+
+        my $sti = $attr-><AG::Attr.schemaTypeInfo>;
+        $test->assert_isa ($sti, <IFName::c|TypeInfo>);
+        $test->assert_equals ($sti-><AG::c|TypeInfo.typeName>, 'CDATA');
+        $test->assert_equals
+                 ($sti-><AG::c|TypeInfo.typeNamespace>, <Q::xml-dtd:>);
+
+  @CODE:
+    @@QName: setAttrType
+    @@enDesc:
+      Sets <Q::infoset:attributeType> attribute.
+    @@PerlDef:
+      $attr->{<H::mn:node>}->{<H::infoset:attributeType>} = $type;
+
+  #L3Attr:
   @Attr:
-     @@Name:  isId
+    @@Name: isId
+    @@ManakaiDOM:isForInternal:
+      @@@@: 1
+      @@@For: ManakaiDOM|ManakaiDOM !ManakaiDOM|DOM3
      @@Description:
        @@@lang:en
        @@@@:
@@ -9449,26 +9547,21 @@ NodeTypeDef:
             @@@@@lang:en
             @@@@@@:
               This attribute is not a ID attribute.
-        @@@PerlDef:
-          @@@@@:
-            $r = $self->{<H::mn:node>}->{<H::DOMCore:userDeterminedId>};
+      @@@PerlDef:
+        @@@@@:
+          if (defined $self->{<H::mn:node>}->{<H::infoset:attributeType>} and
+              $self->{<H::mn:node>}->{<H::infoset:attributeType>}
+                == <C::ATDef.ID_ATTR>) {
+            $r = true;
+          } elsif ($self->{<H::mn:node>}->{<H::c:userDeterminedId>}) {
+            $r = true;
+          }
           @@@@ImplNote:
             @@@@@lang:en
             @@@@@@:
               TODO: Support non-user-determined ID attributes.
-
-     @@Level[list]:  3
-     @@SpecLevel:3
-
-     @@For:
-       ManakaiDOM:DOM3
-     @@For:
-       ManakaiDOM:ManakaiDOM
-
-     @@ManakaiDOM:isForInternal:
-       @@@@:1
-       @@@ForCheck:
-         !ManakaiDOM:DOM3
+              Especially, application-determined ID such as html5:*/@id
+              and xml:id should be supported.
   
   @ReAttr:
      @@Name:  localName
@@ -9936,6 +10029,33 @@ NodeTypeDef:
             }
 ##Attr
 
+ResourceDef:
+  @QName: DTDef
+  @For: ManakaiDOM|ManakaiDOMLatest
+  @AliasFor: d|DocumentTypeDefinition
+ResourceDef:
+  @QName: DTDef
+  @For: ManakaiDOM|ManakaiDOM3 !ManakaiDOM|ManakaiDOMLatest
+  @AliasFor: d|DocumentTypeDefinition||ManakaiDOM|ManakaiDOMLatest
+
+ResourceDef:
+  @QName: ETDef
+  @For: ManakaiDOM|ManakaiDOMLatest
+  @AliasFor: d|ElementTypeDefinition
+ResourceDef:
+  @QName: ETDef
+  @For: ManakaiDOM|ManakaiDOM3 !ManakaiDOM|ManakaiDOMLatest
+  @AliasFor: d|ElementTypeDefinition||ManakaiDOM|ManakaiDOMLatest
+
+ResourceDef:
+  @QName: ATDef
+  @For: ManakaiDOM|ManakaiDOMLatest
+  @AliasFor: d|AttributeDefinition
+ResourceDef:
+  @QName: ATDef
+  @For: ManakaiDOM|ManakaiDOM3 !ManakaiDOM|ManakaiDOMLatest
+  @AliasFor: d|AttributeDefinition||ManakaiDOM|ManakaiDOMLatest
+
 PropDef:
   @QName: c|userDeterminedId
   @enDesc:
@@ -10261,7 +10381,7 @@ NodeTypeDef:
             my $r;
             __CODE{selectAttrNodeObject}__;
             my $node = $self->{<H::mn:node>};
-            if ($r) {
+            if ($r) {  ## There is already a node for the name
               if ($r->{<H::DOMCore:read-only>}) {
                 __EXCEPTION{
                   MDOMX:NOMOD_ATTR::
@@ -10273,7 +10393,7 @@ NodeTypeDef:
                 CORE::delete $_->{<H::infoset:parent>};
                 $_-><M::NodeStem.orphanate>;
               }
-            } else {
+            } else {   ## There is no attribute node for the name
               my $docNode = $node->{<H::c|ownerDocument>};
               if (<Code::doStrictErrorChecking:: $nodeRef = $self>) {
                 my $version = <Code::getDocumentXMLVersion:: $DOCOBJ = $docNode>;
@@ -10291,6 +10411,30 @@ NodeTypeDef:
               }__;
               $node->{<H::infoset:attributes>}
                    ->{<Q::ManakaiDOM:noNS>}->{$name} = $r;
+
+              ## Schema type information
+              if (defined $docNode->{<H::c|schema-type>} and
+                  $docNode->{<H::c|schema-type>} eq <Q::xml-dtd:>) {
+                __DEEP{
+                  my $doctype = $self-><AG::Node.ownerDocument>
+                                     -><AG::Document.doctype>;
+                  $doctype = $doctype-><M::Node.getFeature>
+                                         (<Q::ManakaiDOM:XDoctype> => '3.0')
+                    if $doctype;
+                  if ($doctype) {
+                    my $et = $doctype-><M::DTDef.getElementTypeDefinitionNode>
+                                         ($self-><AG::Node.nodeName>);
+                    if ($et) {
+                      my $at = $et-><M::ETDef.getAttributeDefinitionNode>
+                                      ($name);
+                      if ($at) {
+                        $r->{<H::infoset:attributeType>}
+                          = $at-><AG::ATDef.declaredType>;
+                      }
+                    }
+                  }
+                }__;
+              } # Schema language is XML DTD
             }
             my $text = <ClassM::ManakaiDOMText.newObject> ($node);
             $text->{<H::infoset:content>} = defined $value ? $value : '';
@@ -10303,6 +10447,10 @@ NodeTypeDef:
             $r->{<H::infoset:children>} = [$text];
             $r->{<H::infoset:specified>} = true;
      @@SpecLevel:1
+    @@enImplNote:
+      {ISSUE:: Should <XA::xml:id> attribute has type info?
+      }
+
   @Method:
      @@Name:  removeAttribute
      @@Description:
@@ -11111,7 +11259,7 @@ NodeTypeDef:
         $r => $__r,
       }__;
       my $__node = $element->{<H::mn:node>};
-      if ($__r) {
+      if ($__r) {  ## There is already a node for the attribute
         if ($__r->{<H::DOMCore:read-only>}) {
           __EXCEPTION{MDOMX:NOMOD_ATTR::
           }__;
@@ -11122,7 +11270,7 @@ NodeTypeDef:
           CORE::delete $_->{<H::infoset:parent>};
           $_-><M::NodeStem.orphanate>;
         }
-      } else {
+      } else {     ## There is no node for the attribute yet
         $__r = <ClassM::ManakaiDOMAttr.newObject> ($__node);
         $__r->{<H::infoset:ownerElement>} = $__node;
         __CODE{mn|setXRefNode||ManakaiDOM|Perl::
@@ -11139,6 +11287,34 @@ NodeTypeDef:
         $__node->{<H::infoset:attributes>}
                ->{defined $namespaceURI ? $namespaceURI : <Q::null:>}
                ->{$localName} = $__r;
+
+        ## Schema type information
+        if (defined $__node->{<H::c|ownerDocument>}->{<H::c|schema-type>}) {
+          my $schema_type = $__node->{<H::c|ownerDocument>}
+                                   ->{<H::c|schema-type>};
+          if ($schema_type eq <Q::xml-dtd:>) {
+            __DEEP{
+              my $__doctype = $element-><AG::Node.ownerDocument>
+                                      -><AG::Document.doctype>;
+              $__doctype = $__doctype-><M::Node.getFeature>
+                                         (<Q::ManakaiDOM:XDoctype> => '3.0')
+                if $__doctype;
+              if ($__doctype) {
+                my $__et = $__doctype-><M::DTDef.getElementTypeDefinitionNode>
+                                         ($element-><AG::Node.nodeName>);
+                if ($__et) {
+                  my $__at = $__et-><M::ETDef.getAttributeDefinitionNode>
+                                (defined $prefix ? $prefix.':'.$localName
+                                                 : $localName);
+                  if ($__at) {
+                    $__r->{<H::infoset:attributeType>}
+                            = $__at-><AG::ATDef.declaredType>;
+                  }
+                }
+              }
+            }__;
+          } # Schema language is XML DTD
+        }
       }
       my $__text = <ClassM::ManakaiDOMText.newObject> ($__node);
       __CODE{mn|setXRefNode||ManakaiDOM|Perl::
@@ -11701,25 +11877,53 @@ NodeTypeDef:
      @@SpecLevel:2
      @@For:
        ManakaiDOM:DOM2
-  @Attr:
-     @@Name:  schemaTypeInfo
-     @@Description:
-        @@@lang:en
-        @@@@: The type information associated with this element.
-     @@Get:
-        @@@Type:  TypeInfo
-        @@@Description:
-          @@@@lang:en
-          @@@@@: The type information.
-     @@L3:
-     @@Level[list]:  3
-     @@SpecLevel:3
-     @@For:
-       ManakaiDOM:DOM3
-     @@ImplNote:
-       @@@lang:en
-       @@@@:
-         TODO: More study required for the relationship to schemas.
+
+  @L3Attr:
+    @@Name: schemaTypeInfo
+    @@enDesc:
+      The type information associated with the element.
+    @@enImplNote:
+      Currently manakai does not support XML Schema, so it is 
+      always a no-type <IF::c|TypeInfo>.  It is expected that
+      a future version of the implementation will return an
+      element type definition node that also implement the
+      <IF::c|TypeInfo> interface when the schema language is XML DTD.
+    @@Type: c|TypeInfo
+    @@Get:
+      @@@PerlDef:
+        __CODE{c|createDTDTypeInfo::
+          $result => $r,
+          $type => {0},
+        }__;
+    @@L3Test:
+      @@@QName: Element.schemaTypeInfo.no-schema.test
+      @@@PerlDef:
+        my $el;
+        __CODE{createElementForTest:: $el => $el}__;
+        $el-><AG::Node.ownerDocument>
+           -><AG::Document.domConfig>
+           -><M::c|DOMConfiguration.setParameter>
+               ('schema-type' => q[http://dummy.example/]);
+
+        my $sti = $el-><AG::Element.schemaTypeInfo>;
+        $test->assert_isa ($sti, <IFName::c|TypeInfo>);
+        $test->assert_null ($sti-><AG::c|TypeInfo.typeName>);
+        $test->assert_null ($sti-><AG::c|TypeInfo.typeNamespace>);
+    @@L3Test:
+      @@@QName: Element.schemaTypeInfo.dtd.test
+      @@@PerlDef:
+        my $el;
+        __CODE{createElementForTest:: $el => $el}__;
+        $el-><AG::Node.ownerDocument>
+           -><AG::Document.domConfig>
+           -><M::c|DOMConfiguration.setParameter>
+               ('schema-type' => <Q::xml-dtd:>);
+
+        my $sti = $el-><AG::Element.schemaTypeInfo>;
+        $test->assert_isa ($sti, <IFName::c|TypeInfo>);
+        $test->assert_null ($sti-><AG::c|TypeInfo.typeName>);
+        $test->assert_null ($sti-><AG::c|TypeInfo.typeNamespace>);
+
   @Method:
      @@Name:  setIdAttribute
      @@Description:
@@ -12657,6 +12861,7 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: test|StandaloneTest
+    @@ForCheck: ManakaiDOM|ForClass
 
 ElementTypeBinding:
   @Name: L3Test
@@ -13498,51 +13703,119 @@ NodeTypeDef:
     }
 
   @Attr:
-     @@Name:  doctype
-     @@Description:
-       @@@lang:en
-       @@@@:
-         The "DocumentType" object associated with the "Document".
-       \
-         Note that even this attribute is defined as read-only, 
-         the direct manipulations of child nodes (by the method "insertBefore" 
-         for example) can change the document type.
-     @@Level[list]:
-       1
-       2
-       3
-     @@SpecLevel[list]:
-       1
-       3
-     @@Get:
-        @@@Type:  
-          DOMXML:DocumentType
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            The "DocumentType" object for the "Document".
-        @@@InCase:
-          @@@@Value: 
-            @@@@@is-null: 1
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              The document type declaration is omitted or it is an HTML 
-              document.
-            \
-              Note: If it is an HTML document, the "doctype" attribute is 
-              always "null" in DOM Level 1 and Level 2.  In DOM Level 3, 
-              a "DocumentType" object may be returned even if the document 
-              does not have explicit document type declaration.
-        @@@PerlDef:
-            for (@{$self->{<H::mn:node>}->{<H::infoset:children>}}) {
-              if ($_->{<H::DOMCore:nodeType>} eq <Q::DOMCore:DocumentType>) {
-                $r = <ClassM::ManakaiDOMNode.getNodeReference> ($_);
-                last;
-              } elsif ($_->{<H::DOMCore:nodeType>} eq <H::infoset:Element>) {
-                last;
+    @@Name: doctype
+    @@enDesc:
+      The document type declaration associated with the document.
+      It is the <IF::x|DocumentType> child of the node, if any.
+
+      For an XML document with a document type declaration,
+      this attribute contains the <IF::x|DocumentType> node.
+
+    @@enDesc:
+      @@@For: ManakaiDOM|DOM3
+      @@@ddid: html
+      @@@@:
+        For an HTML document, this attribute may contain
+        a <IF::x|DocumentType> node independently of the presence or
+        absence of document type declaration. 
+    @@enDesc:
+      @@@For: !ManakaiDOM|DOM3
+      @@@ddid: html
+      @@@@:
+        For an HTML document, the attribute value is always <DOM::null>.
+
+    @@enDesc:
+      @@@ddid: note
+      @@@@:
+        {NOTE:: Although this attribute itself is read-only, 
+                usual node modification methods on the <IF::Document>
+                node can alter the <IF::x|DocumentType> node.
+                However, while the implementation might instantiate different
+                types of <IF::Document> object supporting additional
+                feature than <Feature::Core>, based on the <IF::x|DocumentType>
+                specified at creation time, changing it afterward
+                is unlikely to result in a change of the feature supported
+                by the <IF::Document>.
+        }
+    @@enImplNote:
+      Introduced in DOM Level 1, modified in DOM Level 3.
+
+      {TODO:: HTML5 consideration.
+      }
+    @@Type: x|DocumentType
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          @@@@@For: ManakaiDOM|DOM3
+          @@@@@@:
+            If the document does not have a document type declaration,
+            or if it is an HTML document and the implementation does not
+            expose the document type declaration to the DOM.
+        @@@@enDesc:
+          @@@@@For: !ManakaiDOM|DOM3
+          @@@@@@:
+            If the document does not have a document type declaration,
+            or if it is an HTML document.
+      @@@PerlDef:
+        @@@@@:
+          __DEEP{
+            F: for my $child (@{$self-><AG::Node.childNodes>}) {
+              my $nt = $child-><AG::Node.nodeType>;
+              if ($nt == <C::Node.DOCUMENT_TYPE_NODE>) {
+                $r = $child;
+                last F;
+              } elsif ($nt == <C::Node.ELEMENT_NODE>) { # document element
+                last F;
               }
-            }
+            } # F
+          }__;
+        @@@@enImplNote:
+          Although the intention of the DOM specification is unclear,
+          the current manakai implementation <EM::does> return
+          a <IF::x|DocumentType> node, if any, even if DOM level
+          is less than (not equal to) 3.
+    @@Test:
+      @@@QName: Document.doctype.one-element-document.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{createDocumentForTest:: $doc => $doc}__;
+        $test->assert_null ($doc-><AG::Document.doctype>);
+    @@Test:
+      @@@QName: Document.doctype.empty-document.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{createDocumentForTest:: $doc => $doc}__;
+        $doc-><M::Node.removeChild> ($doc-><AG::Node.firstChild>);
+        $test->assert_null ($doc-><AG::Document.doctype>);
+    @@Test:
+      @@@QName: Document.doctype.doctype-element-document.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{createDocumentForTest:: $doc => $doc}__;
+        my $doctype = $doc-><AG::Document.implementation>
+                          -><M::c|DOMImplementation.createDocumentType> ('dt');
+        my $el = $doc-><AG::Node.firstChild>;
+        $doc-><M::Node.removeChild> ($el);
+        $doc-><M::Node.appendChild> ($doctype);
+        $doc-><M::Node.appendChild> ($el);
+
+        $test->assert_equals ($doc-><AG::Document.doctype>, $doctype);
+    @@Test:
+      @@@QName: Document.doctype.comment-doctype-element-document.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{createDocumentForTest:: $doc => $doc}__;
+        my $doctype = $doc-><AG::Document.implementation>
+                          -><M::c|DOMImplementation.createDocumentType> ('dt');
+        my $el = $doc-><AG::Node.firstChild>;
+        $doc-><M::Node.removeChild> ($el);
+        my $comment = $doc-><M::Document.createComment> ('');
+        $doc-><M::Node.appendChild> ($comment);
+        $doc-><M::Node.appendChild> ($doctype);
+        $doc-><M::Node.appendChild> ($el);
+
+        $test->assert_equals ($doc-><AG::Document.doctype>, $doctype);
+
   @Attr:
      @@Name:  implementation
      @@Description:
@@ -13554,35 +13827,54 @@ NodeTypeDef:
         @@@disDef:
           @@@@GetProp:
             DOMCore:implementation
+
   @Attr:
-     @@Name:  documentElement
-     @@Description:
-       @@@lang:en
-       @@@@: The child node that is the document element of the document.
-     @@Get:
-        @@@Type:  Element
-        @@@Description:
-          @@@@lang:en
-          @@@@@: The document element.
-        @@@InCase:
-          @@@@Value:
-            @@@@@is-null:1
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@: The document element not found.
-          @@@@ImplNote:
-            @@@@@lang:en
-            @@@@@@:
-              The DOM specifications don't mention this case but for example 
-              the DOMImplementation.createDocument (null, null, null) can 
-              create a Document that does not have the document element.
-        @@@PerlDef:
-            for (@{$self->{<H::mn:node>}->{<H::infoset:children>}}) {
-              if ($_->{<H::DOMCore:nodeType>} eq <H::infoset:Element>) {
-                $r = <ClassM::ManakaiDOMNode.getNodeReference> ($_);
-                last;
-              }
+    @@Name: documentElement
+    @@enDesc:
+      The document element of the document.
+    @@Get:
+      @@@Type: Element
+      @@@nullCase:
+        @@@@enDesc:
+          If the document has no element.
+        @@@@For: ManakaiDOM|ManakaiDOM
+      @@@PerlDef:
+        __DEEP{
+          F: for my $child (@{$self-><AG::Node.childNodes>}) {
+            if ($child-><AG::Node.nodeType> == <C::Node.ELEMENT_NODE>) {
+              $r = $child;
+              last F;
             }
+          } # F
+        }__;
+    @@Test:
+      @@@QName: Document.documentElement.one-element-document.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{createDocumentForTest:: $doc => $doc}__;
+        $test->assert_equals ($doc-><AG::Document.documentElement>,
+                              $doc-><AG::Node.firstChild>);
+    @@Test:
+      @@@QName: Document.documentElement.empty-document.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{createDocumentForTest:: $doc => $doc}__;
+        $doc-><M::Node.removeChild> ($doc-><AG::Node.firstChild>);
+        $test->assert_null ($doc-><AG::Document.documentElement>);
+    @@Test:
+      @@@QName: Document.documentElement.doctype-element-document.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{createDocumentForTest:: $doc => $doc}__;
+        my $doctype = $doc-><AG::Document.implementation>
+                          -><M::c|DOMImplementation.createDocumentType> ('dt');
+        my $el = $doc-><AG::Node.firstChild>;
+        $doc-><M::Node.removeChild> ($el);
+        $doc-><M::Node.appendChild> ($doctype);
+        $doc-><M::Node.appendChild> ($el);
+
+        $test->assert_equals ($doc-><AG::Document.documentElement>, $el);
+
   @Method:
      @@Name:  createElement
      @@Description:
@@ -13946,6 +14238,15 @@ NodeTypeDef:
             @@@@@@:
               TODO: The name should be case-normalized by the definition 
               of the markup language in use.
+        @@@@enImplNote:
+          @@@@@ddid: schema
+          @@@@@For: ManakaiDOM|ManakaiDOM
+          @@@@@@:
+            The created node does not have DTD type information,
+            since its element type is not known.
+
+            Should <XA::xml:id> attribute has type info?
+
   @Method:
      @@Name:  createEntityReference
      @@Description:

@@ -1,3 +1,24 @@
+2006-01-27  Wakaba  <wakaba@suika.fam.cx>
+
+	* DOMCore.dis (ManakaiDOMDTDTypeInfo): New class.
+
+	* Tree.dis (STORESIZE): Index bound bug fixed.
+	(Attr.value): Redefined to consist with |AttributeDefinition.nodeValue|.
+	(schemaTypeInfo): Implemented for XML DTD.
+	(isId): Returns |true| if [attribute type] is |ID|.
+	(setAttribute, setAttributeNS): Sets [attribute type]
+	of the newly created |Attr| node (if any) when attribute
+	definition is available.
+	(doctype, documentElement): Reimplemented with tests.
+
+	* XMLParser.dis: Sets [attribute type] information
+	to created |Attr| nodes.  Normalize namespace URIs
+	when such information are available (unlikely but legal).
+	(_HexadecimalCharacterReference): Number to character
+	convertion bug fixed.
+	(_DocumentTypeDeclaration): Sets |schema-type|
+	configuration parameter to XML DTD URI.
+
 2006-01-26  Wakaba  <wakaba@suika.fam.cx>
 
 	* XMLParser.dis (_AttlistDeclaration): Now it can generate
