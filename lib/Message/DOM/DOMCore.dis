@@ -40,7 +40,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/01/27 16:24:35 $
+      $Date: 2006/01/28 16:24:44 $
     @@ContentType:
       dis:Date.RCS
 
@@ -975,6 +975,11 @@ ResourceDef:
              to the target node. 
          @@@@enMufDef:
            The specified node is not an attribute of this node
+        @@@@ecore:hasParameter: MDOMX|param-name
+        @@@@ecore:hasParameter:
+          @@@@@@: c|node
+          @@@@@enDesc:
+            The attribute node.
        @@@SubTypeDef:
          @@@@QName: NOT_CHILD_ERR
          @@@@Description:
@@ -1000,11 +1005,15 @@ ResourceDef:
         @@@@ecore:hasParameter:
           @@@@@@: infoset|namespaceName
           @@@@@enDesc:
-            The specified namespace URI.
+            The specified namespace URI, possibly <DOM::null>.
         @@@@ecore:hasParameter:
           @@@@@@: infoset|localName
           @@@@@enDesc:
-            The specified local name.
+            The specified local name, if available.
+        @@@@ecore:hasParameter:
+          @@@@@@: c|name
+          @@@@@enDesc:
+            The specified name, if available.
         @@@@For: ManakaiDOM|DOM2
      @@XConst:
         @@@Name:  NOT_SUPPORTED_ERR
@@ -4049,6 +4058,7 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type: DOMCore|DOMErrorType
     @@For: ManakaiDOM|DOM3
+    @@ecore:textFormatter: ecore|MUErrorFormatter||ManakaiDOM|Perl
 
 ElementTypeBinding:
   @Name: errname

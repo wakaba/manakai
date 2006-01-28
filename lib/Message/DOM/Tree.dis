@@ -12,7 +12,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/01/27 16:24:36 $
+    $Date: 2006/01/28 16:24:45 $
 
   @Require:
     @@Module:
@@ -4357,6 +4357,7 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type: DOMCore|DOMErrorType
     @@For: ManakaiDOM|DOM3
+    @@ecore:textFormatter: ecore|MUErrorFormatter||ManakaiDOM|Perl
 
 ErrDef:
   @QName: t|setting-node-value-no-effect
@@ -6596,12 +6597,9 @@ ElementTypeBinding:
     @@For: ManakaiDOM|Perl
 
 ForDef:
-  @QName:
-    DOMCore:ForAttrMap
-  @Description:
-    @@lang:en
-    @@@:
-      For <ClassM::ManakaiDOMCore:ManakaiDOMAttributes> class.
+  @QName: t|ForAttrMap
+  @enDesc:
+    For element attributes named node map class.
   @ISA: ManakaiDOM|ForClass
 
 ForDef:
@@ -6643,9 +6641,7 @@ ResourceDef:
   @rdf:type:
     @@@:
       dis:MultipleResource
-    @@ForCheck:
-      !ManakaiDOM:ForIF !c|ForAttrMap !c|ForEntityMap !c|ForNotationMap
-      !t|ForETMap !t|ForATMap
+    @@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
   @ForCheck: ManakaiDOM|DOM
 
   @resourceFor: ManakaiDOM|ForIF
@@ -6663,19 +6659,6 @@ ResourceDef:
   @f:implements:
     @@@: c|CoreFeature30
     @@ForCheck: ManakaiDOM|DOM3
-
-  @resourceFor:
-    @@@: c|ForAttrMap
-    @@For:
-      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
-  @QName:
-    @@@: 
-      ManakaiDOMCore:ManakaiDOMAttributes
-    @@ForCheck: c|ForAttrMap
-  @ISA:
-    @@@: ManakaiNode|ManakaiNodeRef||ManakaiDOM|Perl
-    @@ForCheck:
-      DOMCore:ForAttrMap
 
   @resourceFor:
     @@@: c|ForEntityMap
@@ -6736,6 +6719,13 @@ ResourceDef:
       c|ForNotationMap ManakaiDOM:DOM3
 
   @resourceFor:
+    @@@: t|ForAttrMap
+    @@ForCheck: ManakaiDOM|ManakaiDOM1
+  @QName:
+    @@@: t|ManakaiDOMAttrMap
+    @@ForCheck: t|ForAttrMap
+
+  @resourceFor:
     @@@: t|ForETMap
     @@ForCheck: ManakaiDOM|ManakaiDOMLatest
   @QName:
@@ -6768,12 +6758,7 @@ ResourceDef:
     @@@: 
       Tie::Array
     @@ContentType: DISPerl|Perl
-    @@ForCheck: t|ForETMap
-  @AppISA:
-    @@@: 
-      Tie::Array
-    @@ContentType: DISPerl|Perl
-    @@ForCheck: t|ForATMap
+    @@ForCheck: ManakaiDOM|ForClass
 
   @Implement:
     @@@: NamedNodeMap||ManakaiDOM|ManakaiDOM
@@ -6873,10 +6858,10 @@ ResourceDef:
       <Perl::$map-<lt>get_named_item ('name')> would return.  However, it does
       not currently support substitions to hash values (e.g. 
       <Perl::$map-<lt>{name} = $node> does not work).
-    @@ForCheck: !c|ForAttrMap
     @@enImplNote:
-      Future version should allow %{$attr_map}.
-      It should support namespace, by $map->{$ns, $ln} syntax.
+      {TODO::
+        $map->{$ns, $ln} for attribute maps should be allowed.
+      }
 
       Should $map->{$key} = $node be allowed?  What if 
       $key differs from $node->node_name?
@@ -6886,9 +6871,71 @@ ResourceDef:
         tie my %list, ref $self, $self;
         $r = \%list;
 
+    @@Test:
+      @@@ForCheck: t|ForAttrMap
+      @@@QName: AttrMap.P.test
+      @@@PerlDef:
+        my $el;
+        __CODE{createElementForTest}__;
+        my $doc = $el-><AG::Node.ownerDocument>;
+        my $em = $el-><AG::Node.attributes>;
+
+        $test->id ('hash.scalar');
+        $test->assert_not_null (scalar %$em);
+
+        $test->id ('key.no');
+        $test->assert_null ($em->{et1});
+        $test->assert_null ($em->{et2});
+        $test->id ('exists.no');
+        $test->assert_false (exists $em->{et1});
+        $test->assert_false (exists $em->{et2});
+
+        $test->id ('setNamedItem');
+        my $et1 = $doc-><M::Document.createAttribute> ('et1');
+        $em-><M::NamedNodeMap.setNamedItem> ($et1);
+
+        $test->id ('key.et1');
+        my $v1 = $em->{et1};
+        $test->assert_equals ($v1, $et1);
+        $test->id ('exists.et1');
+        $test->assert_true (exists $em->{et1});
+        $test->id ('not.exists.et2');
+        $test->assert_false (exists $em->{et2});
+
+        $test->id ('keys');
+        my @keys = keys %$em;
+        $test->assert_num_equals
+                 (actual_value => 0 + @keys,
+                  expected_value => 1);
+        $test->assert_equals ($keys[0], 'et1');
+        
+        $test->id ('setNamedItem.2');
+        my $et2 = $doc-><M::Document.createAttribute> ('et2');
+        $em-><M::NamedNodeMap.setNamedItem> ($et2);
+
+        $test->id ('keys.2');
+        @keys = keys %$em;
+        $test->assert_num_equals
+                 (actual_value => 0 + @keys,
+                  expected_value => 2);
+        $test->assert_not_equals ($keys[0], $keys[1]);
+        $test->assert_true ($keys[0] eq 'et1' or $keys[0] eq 'et2');
+        $test->assert_true ($keys[1] eq 'et1' or $keys[1] eq 'et2');
+        
+        $test->id ('delete');
+        delete $em->{et1};
+        $test->assert_false (exists $em->{et1});
+        $test->assert_true (exists $em->{et2});
+
+        $test->id ('clear');
+        %$em = ();
+        $test->assert_num_equals
+                 (actual_value => 0 + keys %$em,
+                  expected_value => 0);
+
     @@XDTest:
       @@@ForCheck: t|ForETMap
-      @@@QName: ETMap.P{}.test
+      @@@QName: ETMap.P.test
       @@@PerlDef:
         my $dtd;
         __CODE{d|newDoctypeForTest}__;
@@ -6952,7 +6999,7 @@ ResourceDef:
 
     @@XDTest:
       @@@ForCheck: t|ForATMap
-      @@@QName: ATMap.P{}.test
+      @@@QName: ATMap.P.test
       @@@PerlDef:
         my $dtd;
         __CODE{d|newDoctypeForTest}__;
@@ -7028,9 +7075,11 @@ ResourceDef:
       does not work).
     @@Return:
       @@@Type: DISPerl|ARRAY||ManakaiDOM|all
-      @@@enImplNote:
-        {TODO:: For attribute map
-        }
+      @@@PerlDef:
+        @@@@ForCheck: t|ForAttrMap
+        @@@@@:
+          tie my @list, <ClassName::ManakaiDOMAttrMapArray>, $self;
+          $r = \@list;
       @@@PerlDef:
         @@@@ForCheck: t|ForETMap
         @@@@@:
@@ -7042,9 +7091,56 @@ ResourceDef:
           tie my @list, <ClassName::ManakaiDOMAttrDefMapArray>, $self;
           $r = \@list;
 
+    @@Test:
+      @@@ForCheck: t|ForAttrMap
+      @@@QName: AttrMap.@.test
+      @@@PerlDef:
+        my $el;
+        __CODE{createElementForTest}__;
+        my $doc = $el-><AG::Node.ownerDocument>;
+        my $em = $el-><AG::Node.attributes>;
+
+        $test->id ('length.0');
+        $test->assert_num_equals
+                 (actual_value => 0 + @$em,
+                  expected_value => 0);
+
+        $test->id ('fetch.0.no');
+        $test->assert_null ($em->[0]);
+        $test->id ('exists.0');
+        $test->assert_false (exists $em->[0]);
+        $test->id ('exists.-1');
+        $test->assert_false (exists $em->[-1]);
+
+        $test->id ('setNamedItem');
+        my $et1 = $doc-><M::Document.createAttribute> ('et1');
+        $em-><M::NamedNodeMap.setNamedItem> ($et1);
+
+        $test->id ('length.1');
+        $test->assert_num_equals
+                 (actual_value => 0 + @$em,
+                  expected_value => 1);
+
+        $test->id ('0.fetch.0');
+        $test->assert_equals ($em->[0], $et1);
+        $test->id ('0.fetch.-1');
+        $test->assert_equals ($em->[-1], $et1);
+        $test->id ('0.fetch.1.no');
+        $test->assert_null ($em->[1]);
+        $test->id ('0.exists.0');
+        $test->assert_true (exists $em->[0]);
+        $test->id ('0.exists.-1');
+        $test->assert_true (exists $em->[-1]);
+        $test->id ('0.exists.1.no');
+        $test->assert_false (exists $em->[1]);
+
+        $test->id ('delete.0');
+        delete $em->[0];
+        $test->assert_false (exists $em->[0]);
+
     @@XDTest:
       @@@ForCheck: t|ForETMap
-      @@@QName: ETMap.@{}.test
+      @@@QName: ETMap.@.test
       @@@PerlDef:
         my $dtd;
         __CODE{d|newDoctypeForTest}__;
@@ -7092,7 +7188,7 @@ ResourceDef:
 
     @@XDTest:
       @@@ForCheck: t|ForATMap
-      @@@QName: ATMap.@{}.test
+      @@@QName: ATMap.@.test
       @@@PerlDef:
         my $dtd;
         __CODE{d|newDoctypeForTest}__;
@@ -7162,13 +7258,14 @@ ResourceDef:
       @@@nullCase:
         @@@@enDesc:
           If the <P::name> does not identify any node in the map.
-         @@@disDef:
-           @@@@ForCheck: c|ForAttrMap
-           @@@@DISPerl:cloneCode:
-             ManakaiDOMElement.getAttributeNode
-
       @@@PerlDef:
-        @@@@ForCheck: !c|ForAttrMap
+        @@@@ForCheck: t|ForAttrMap
+        @@@@@:
+          __DEEP{
+            $r = ($$$self)-><M::Element.getAttributeNode> ($name);
+          }__;
+      @@@PerlDef:
+        @@@@ForCheck: !t|ForAttrMap
         @@@@@:
           my $list;
           __FOR{t:ForETMap::
@@ -7182,7 +7279,7 @@ ResourceDef:
           }
 
     @@Test:
-      @@@ForCheck: c|ForAttrMap
+      @@@ForCheck: t|ForAttrMap
       @@@QName: AttrMap.getNamedItem.test
       @@@PerlDef:
         my $el;
@@ -7209,7 +7306,7 @@ ResourceDef:
         $el-><M::Element.removeAttribute> ('a1');
         $test->assert_null ($map-><M::NamedNodeMap.getNamedItem> ('a1'));
     @@Test:
-      @@@ForCheck: c|ForAttrMap ManakaiDOM|DOM2
+      @@@ForCheck: t|ForAttrMap ManakaiDOM|DOM2
       @@@QName: AttrMap.getNamedItem.qname.test
       @@@PerlDef:
         my $el;
@@ -7233,6 +7330,54 @@ ResourceDef:
         $test->id ('dom2.attr.node.removed');
         $el-><M::Element.removeAttributeNS> ('http://attr.example/', 'a1');
         $test->assert_null ($map-><M::NamedNodeMap.getNamedItem> ('ns:a1'));
+
+    @@Test:
+      @@@ForCheck: t|ForAttrMap
+      @@@QName: AttrMap.getNamedItem.setNamedItem.test
+      @@@PerlDef:
+        my $el;
+        __CODE{createElementForTest}__;
+        my $doc = $el-><AG::Node.ownerDocument>;
+
+        my $em = $el-><AG::Node.attributes>;
+        $test->assert_isa ($em, <IFName::t|NamedNodeMap>);
+
+        $test->id ('getNamedItem.none');
+        $test->assert_null ($em-><M::NamedNodeMap.getNamedItem> ('et1'));
+
+        my $et1 = $doc-><M::Document.createAttribute>
+                          ('et1');
+        $test->assert_isa ($et1, <IFName::Attr>);
+
+        $test->id ('setNamedItem.et1');
+        my $r1 = $em-><M::NamedNodeMap.setNamedItem> ($et1);
+        $test->assert_null ($r1);
+
+        $test->id ('getNamedItem.et1');
+        my $r2 = $em-><M::NamedNodeMap.getNamedItem> ('et1');
+        $test->assert_equals ($r2, $et1);
+        $test->assert_equals
+                 ($r2-><AG::Attr.ownerElement>, $el);
+        $test->assert_equals
+                 ($et1-><AG::Attr.ownerElement>, $el);
+
+        my $et2 = $doc-><M::Document.createAttribute>
+                          ('et1');
+        $test->assert_isa ($et2, <IFName::Attr>);
+        $test->assert_not_equals ($et1, $et2);
+
+        $test->id ('setNamedItem.et2');
+        my $r3 = $em-><M::NamedNodeMap.setNamedItem> ($et2);
+        $test->assert_equals ($r3, $et1);
+
+        $test->id ('getNamedItem.et2');
+        my $r4 = $em-><M::NamedNodeMap.getNamedItem> ('et1');
+        $test->assert_equals ($r4, $et2);
+
+        $test->id ('setNamedItem.et2.by.et2');
+        my $r5 = $em-><M::NamedNodeMap.setNamedItem> ($et2);
+        $test->assert_null ($r5);
+        $test->assert_equals ($em-><M::NamedNodeMap.getNamedItem> ('et1'), $et2);
 
     @@XDTest:
       @@@ForCheck: t|ForETMap
@@ -7326,7 +7471,7 @@ ResourceDef:
           the one that created the map.
         @@@@enDesc:
           @@@@@ddid: no-doc
-          @@@@@ForCheck: !c|ForAttrMap ManakaiDOM|ManakaiDOM
+          @@@@@ForCheck: !t|ForAttrMap ManakaiDOM|ManakaiDOM
           @@@@@@:
             If the map is attached to a <IF::x|DocumentType> 
             whose <A::Node.ownerDocument> is <DOM::null>.
@@ -7334,6 +7479,10 @@ ResourceDef:
         @@@@@: c|NOMOD_NAMEDNODEMAP_ERR
         @@@@enDesc:
           If the map is read-only.
+      @@@dx:raises:
+        @@@@@: MDOMX|NOMOD_THIS
+        @@@@enDesc:
+          If the node to which the map is attached is read-only.
       @@@dx:raises:
         @@@@@: c|INUSE_ATTRIBUTE_ERR
         @@@@enDesc:
@@ -7345,7 +7494,7 @@ ResourceDef:
         @@@@enDesc:
           If <P::arg> is a definition node that is already used
           for another node.
-        @@@@ForCheck: !c|ForAttrMap
+        @@@@ForCheck: !t|ForAttrMap
       @@@dx:raises:
         @@@@@: MDOMX|HIERARCHY_BAD_TYPE
         @@@@enDesc:
@@ -7362,13 +7511,14 @@ ResourceDef:
         @@@@enImplNote:
           This case is clarified by DOM Level 2 errata.
         @@@@For: ManakaiDOM|ManakaiDOM
-       @@@PerlDef:
-         @@@@ForCheck: c|ForAttrMap
-         @@@@@:
-                                   ## NOTE: Method name is directly written
-           goto &{<Class::ManakaiDOMElement>->can ('set_attribute_node')};
       @@@PerlDef:
-        @@@@ForCheck: !c|ForAttrMap
+        @@@@ForCheck: t|ForAttrMap
+        @@@@@:
+          __DEEP{
+            $r = ($$$self)-><M::Element.setAttributeNode> ($arg);
+          }__;
+      @@@PerlDef:
+        @@@@ForCheck: !t|ForAttrMap
         @@@@@:
           my $owner = ($$$self)->{<H::mn:node>};
           my $list;
@@ -7453,7 +7603,7 @@ ResourceDef:
         }
 
     @@Test:
-      @@@ForCheck: c|ForAttrMap
+      @@@ForCheck: t|ForAttrMap
       @@@QName: AttrMap.setNamedItem.dom1.test
       @@@PerlDef:
         my $doc;
@@ -7499,7 +7649,7 @@ ResourceDef:
       Removes a node specified by name.
     @@enDesc:
       @@@ddid: attr
-      @@@ForCheck: c|ForAttrMap
+      @@@ForCheck: !t|ForETMap !t|ForATMap
       @@@enDesc:
         If the removed attribute is known to have a default value,
         an attribute immediately appears containing the default
@@ -7528,42 +7678,34 @@ ResourceDef:
           If the map is read-only.
         @@@@enImplNote:
           Added by DOM Level 1 (first edition) errata.
+      @@@dx:raises:
+        @@@@@: MDOMX|NOMOD_THIS
+        @@@@enDesc:
+          If the node to which the map is attached is read-only.
+        @@@@For: ManakaiDOM|ManakaiDOM
       @@@enImplNote:
         In DOM Level 1 Specification (first edition), it is defined that 
         in case there is no node with <P::name> then <DOM::null> should be
         returned while <X::c|NO_NAMED_NODE_ERR> exception is also specified.
         The former is removed by DOM Level 1 (first edition) errata.
-
-        @@@PerlDef:
-          @@@@ForCheck: c|ForAttrMap
-          @@@@@:
-            if ($self->{<H::mn:node>}->{<H::DOMCore:read-only>}) {
-              __EXCEPTION{
-                MDOMX:NOMOD_THIS::
-              }__;
-            }
-            my $obj;
-            __CODE{selectAttrNodeObjectForRemove:: $r => $obj}__;
-            if ($obj) {
-              $r = <ClassM::ManakaiDOMNode.getNodeReference> ($obj)
-                if defined wantarray;
-              CORE::delete $obj->{<H::infoset:ownerElement>};
-              $obj-><M::NodeStem.orphanate>;
-            } else {
-              __EXCEPTION{DOMException.NOT_FOUND_ERR::
-              }__;
-            }
-          @@@@ImplNote:
-            @@@@@lang:en
-            @@@@@@:
-              TODO: Default attribute
-            \
-              This code is almost same as <M::Element.removeAttribute>. 
-              This method returns an <IF::Attr> removed but that method 
-              does not (<M::Element.removeAttributeNode> does).
-
       @@@PerlDef:
-        @@@@ForCheck: !c|ForAttrMap
+        @@@@ForCheck: t|ForAttrMap
+        @@@@@:
+          my $el = $$$self;
+          __DEEP{ 
+            $r = $el-><M::Element.getAttributeNode> ($name);
+          }__;
+          unless ($r) {
+            __EXCEPTION{c|NO_NAMED_NODE_ERR::
+              c|name => {$name},
+              MDOMX|param-name => 'name',
+            }__;
+          }
+          __DEEP{
+            $r = $el-><M::Element.removeAttributeNode> ($r);
+          }__;
+      @@@PerlDef:
+        @@@@ForCheck: !t|ForAttrMap
         @@@@@:
           my $owner = ($$$self)->{<H::mn:node>};
           my $list;
@@ -7593,6 +7735,34 @@ ResourceDef:
               MDOMX|param-name => 'name',
             }__;
           }
+
+    @@Test:
+      @@@QName: AttrMap.removeNamedItem.test
+      @@@ForCheck: t|ForAttrMap
+      @@@PerlDef:
+        my $el;
+        __CODE{createElementForTest}__;
+        my $doc = $el-><AG::Node.ownerDocument>;
+        my $em = $el-><AG::Node.attributes>;
+        undef $el;
+
+        $test->id ('setNamedItem');
+        my $et1 = $doc-><M::Document.createAttribute> ('et1');
+        $em-><M::NamedNodeMap.setNamedItem> ($et1);
+        $test->assert_equals
+                 ($em-><M::NamedNodeMap.getNamedItem> ('et1'), $et1);
+
+        $test->id ('removeNamedItem.noremove');
+        $test->assert_exception (code => sub {
+          $em-><M::NamedNodeMap.removeNamedItem> ('et2');
+        }, exception_subtype => <Q::c|NO_NAMED_NODE_ERR>);
+
+        $test->id ('removeNamedItem.remove');
+        my $et3 = $em-><M::NamedNodeMap.removeNamedItem> ('et1');
+        $test->assert_equals ($et3, $et1);
+        $test->assert_null ($em-><M::NamedNodeMap.getNamedItem> ('et1'));
+
+        undef $em;
 
     @@XDTest:
       @@@QName: ETMap.removeNamedItem.test
@@ -7661,7 +7831,7 @@ ResourceDef:
       Removes a node specified by name.
     @@enDesc:
       @@@ddid: attr
-      @@@ForCheck: c|ForAttrMap
+      @@@ForCheck: t|ForAttrMap
       @@@enDesc:
         If the removed attribute is known to have a default value,
         an attribute immediately appears containing the default
@@ -7712,27 +7882,24 @@ ResourceDef:
         @@@@enDesc:
           If <P::index> is greater than or equal to the number of nodes
           in the map.
-        @@@PerlDef:
-          @@@@ForCheck: c|ForAttrMap
-          @@@@@:
+      @@@PerlDef:
+        @@@@ForCheck: t|ForAttrMap
+        @@@@@:
+          FIND: {
             my $i = 0;
-            FIND: for my $ns (sort keys %{$self->{<H::mn:node>}
-                                               ->{<H::infoset:attributes>}}) {
-              for my $ln (sort keys %{$self->{<H::mn:node>}
-                                           ->{<H::infoset:attributes>}->{$ns}}) {
+            my $attrs = ($$$self)->{<H::mn:node>}->{<H::infoset:attributes>};
+            for my $ns (sort {$a cmp $b} keys %{$attrs}) {
+              for my $ln (sort {$a cmp $b} keys %{$attrs->{$ns}}) {
                 if ($i++ == $index) {
-                  $r = $self->{<H::mn:node>}->{<H::infoset:attributes>}
-                            ->{$ns}->{$ln};
+                  $r = <ClassM::ManakaiDOMNode.getNodeReference>
+                         ($attrs->{$ns}->{$ln});
                   last FIND;
                 }
               }
             }
-            if ($r) {
-              $r = <ClassM::ManakaiDOMNode.getNodeReference> ($r);
-            }
-
+          } # FIND
       @@@PerlDef:
-        @@@@ForCheck: !c|ForAttrMap
+        @@@@ForCheck: !t|ForAttrMap
         @@@@@:
           my $list;
           __FOR{t:ForETMap::
@@ -7746,6 +7913,39 @@ ResourceDef:
           if (defined $key and defined $list->{$key}) {
             $r = <ClassM::ManakaiDOMNode.getNodeReference> ($list->{$key});
           }
+    
+    @@Test:
+      @@@QName: AttrMap.item.test
+      @@@ForCheck: t|ForAttrMap
+      @@@PerlDef:
+        my $el;
+        __CODE{createElementForTest}__;
+        my $doc = $el-><AG::Node.ownerDocument>;
+        my $em = $el-><AG::Node.attributes>;
+        
+        $test->id ('no.item');
+        $test->assert_null ($em-><M::NamedNodeMap.item> (-1));
+        $test->assert_null ($em-><M::NamedNodeMap.item> (0));
+        $test->assert_null ($em-><M::NamedNodeMap.item> (1));
+        $test->assert_null ($em-><M::NamedNodeMap.item> (2));
+
+        $test->id ('two.items');
+        my $et1 = $doc-><M::Document.createAttribute>
+                          ('et1');
+        $el-><M::Element.setAttributeNode> ($et1);
+        my $et2 = $doc-><M::Document.createAttribute>
+                          ('et2');
+        $el-><M::Element.setAttributeNode> ($et2);
+
+        $test->assert_null ($em-><M::NamedNodeMap.item> (-1));
+        $test->assert_null ($em-><M::NamedNodeMap.item> (2));
+        my $item0 = $em-><M::NamedNodeMap.item> (0);
+        my $item1 = $em-><M::NamedNodeMap.item> (1);
+        $test->assert_not_null ($item0);
+        $test->assert_not_null ($item1);
+        $test->assert_not_equals ($item0, $item1);
+        $test->assert_true ($et1 eq $item0 or $et2 eq $item0);
+        $test->assert_true ($et1 eq $item1 or $et2 eq $item1);
     
     @@XDTest:
       @@@QName: ETMap.item.test
@@ -7823,13 +8023,13 @@ ResourceDef:
       The number of nodes in the map.
     @@Type: idl|unsignedLong||ManakaiDOM|all
     @@Get:
-        @@@PerlDef:
-          @@@@ForCheck: c|ForAttrMap
-          @@@@@:
-            for (values %{$self->{<H::mn:node>}
-                               ->{<H::infoset:attributes>}}) {
-              $r += keys %$_;
-            }
+      @@@PerlDef:
+        @@@@ForCheck: t|ForAttrMap
+        @@@@@:
+          for my $l (values %{($$$self)->{<H::mn:node>}
+                                       ->{<H::infoset:attributes>}}) {
+            $r += grep {$l->{$_}} keys %$l;
+          }
       @@@PerlDef:
         @@@@ForCheck: t|ForETMap
         @@@@@:
@@ -7840,6 +8040,35 @@ ResourceDef:
         @@@@@:
           $r = @{[map {$_} values %{$$$self->{<H::mn:node>}
                                            ->{<H::d|attributeDefinitions>}}]};
+    @@Test:
+      @@@QName: AttrMap.length.test
+      @@@ForCheck: t|ForAttrMap
+      @@@PerlDef:
+        my $el;
+        __CODE{createElementForTest}__;
+        my $doc = $el-><AG::Node.ownerDocument>;
+        my $et = $el-><AG::Node.attributes>;
+
+        $test->id ('length.0');
+        $test->assert_num_equals
+                 (actual_value => $et-><AG::NamedNodeMap.length>,
+                  expected_value => 0);
+
+        $test->id ('length.1');
+        my $et1 = $doc-><M::Document.createAttribute>
+                          ('et1');
+        $el-><M::Element.setAttributeNode> ($et1);
+        $test->assert_num_equals
+                 (actual_value => $et-><AG::NamedNodeMap.length>,
+                  expected_value => 1);
+
+        $test->id ('length.1');
+        my $et2 = $doc-><M::Document.createAttribute>
+                          ('et2');
+        $el-><M::Element.setAttributeNode> ($et2);
+        $test->assert_num_equals
+                 (actual_value => $et-><AG::NamedNodeMap.length>,
+                  expected_value => 2);
     @@XDTest:
       @@@QName: ETMap.length.test
       @@@ForCheck: t|ForETMap
@@ -7932,9 +8161,12 @@ ResourceDef:
       @@@Type: DOMString
     @@Return:
       @@@Type: idl|boolean||ManakaiDOM|all
-      @@@enImplNote:
-        {TODO:: For attribute map
-        }
+      @@@PerlDef:
+        @@@@ForCheck: !t|ForETMap !t|ForATMap
+        @@@@@:
+          __DEEP{
+            $r = defined ($self-><M::NamedNodeMap.getNamedItem> ($key));
+          }__;
       @@@PerlDef:
         @@@@ForCheck: t|ForETMap
         @@@@@:
@@ -7951,9 +8183,14 @@ ResourceDef:
       <Perl::FIRSTKEY> for tied hash.
     @@Return:
       @@@Type: DOMString
-      @@@enImplNote:
-        {TODO:: For attribute map
-        }
+      @@@PerlDef:
+        @@@@ForCheck: t|ForAttrMap
+        @@@@@:
+          __DEEP{
+            my $node = $self-><M::NamedNodeMap.item> (0);
+            $r = $node ? $node-><AG::Node.nodeName> : null;
+            ($$$self)->{<H::mn:node>}->{<H::t|hashPosition>} = 1;
+          }__;
       @@@PerlDef:
         @@@@ForCheck: t|ForETMap
         @@@@@:
@@ -7976,9 +8213,14 @@ ResourceDef:
       @@@Type: DOMString
     @@Return:
       @@@Type: DOMString
-      @@@enImplNote:
-        {TODO:: For attribute map
-        }
+      @@@PerlDef:
+        @@@@ForCheck: t|ForAttrMap
+        @@@@@:
+          __DEEP{
+            my $i = ($$$self)->{<H::mn:node>}->{<H::t|hashPosition>}++;
+            my $node = $self-><M::NamedNodeMap.item> ($i);
+            $r = $node ? $node-><AG::Node.nodeName> : null;
+          }__;
       @@@PerlDef:
         @@@@ForCheck: t|ForETMap
         @@@@@:
@@ -7989,14 +8231,12 @@ ResourceDef:
           $r = each %{($$$self)->{<H::mn:node>}->{<H::d|attributeDefinitions>}};
 
   @IntMethod:
+    @@ForCheck: !t|ForAttrMap
     @@Perlop: SCALAR
     @@enDesc:
       <Perl::SCALAR> for tied hash.
     @@Return:
       @@@Type: DOMString
-      @@@enImplNote:
-        {TODO:: For attribute map
-        }
       @@@PerlDef:
         @@@@ForCheck: t|ForETMap
         @@@@@:
@@ -8035,7 +8275,7 @@ ResourceDef:
           does not identify any node in the map.
         @@@@enDesc:
           @@@@@ddid:nons
-          @@@@@ForCheck: !c|ForAttrMap ManakaiDOM|ManakaiDOM
+          @@@@@ForCheck: !t|ForAttrMap ManakaiDOM|ManakaiDOM
           @@@@@@:
             If it is a <IF::NamedNodeMap> containing element type definitions,
             attribute definitions, entities, or notations attached to
@@ -8047,20 +8287,41 @@ ResourceDef:
           If the implementation does not support the <Feature::XML> feature
           and the language exposed through the <IF::Document> does
           not support XML namespaces.
-
-       @@@disDef:
-         @@@@ForCheck:
-           c|ForAttrMap ManakaiDOM:DOMXMLFeature
-         @@@@DISPerl:cloneCode:
-           ManakaiDOMElement.getAttributeNodeNS
-        @@@disDef:
-          @@@@ForCheck:
-            !ManakaiDOM:DOMXMLFeature
-          @@@@DOMMain:raiseException:
-            MDOMX:MDOM_IMPL_NOSUPPORT_XMLNS
       @@@PerlDef:
+        @@@@ForCheck: t|ForAttrMap
+        @@@@@:
+          __DEEP{
+            $r = ($$$self)-><M::Element.getAttributeNodeNS>
+                              ($namespaceURI, $localName);
+          }__;
+      @@@PerlDef:
+        @@@@ForCheck: !t|ForAttrMap
         @@@@@: \
-        @@@@ForCheck: !c|ForAttrMap
+
+    @@L2Test:
+      @@@QName: AttrMap.getNamedItemNS.test
+      @@@ForCheck: t|ForAttrMap
+      @@@PerlDef:
+        my $el;
+        __CODE{createElementForTest:: $el => $el}__;
+        my $as = $el-><AG::Node.attributes>;
+
+        my $uri = 'http://www.example/';
+        my $ln = 'el1';
+        my $qn = 'p:el1';
+        my $value = 'value1';
+
+        $test->id ('get.no');
+        $test->assert_null ($as-><M::NamedNodeMap.getNamedItemNS> ($uri, $ln));
+   
+        $test->id ('set.text');
+        $el-><M::Element.setAttributeNS> ($uri, $qn => $value);
+
+        $test->id ('get.item');
+        my $item0 = $as-><M::NamedNodeMap.getNamedItemNS> ($uri, $ln);
+        $test->assert_isa ($item0, <IFName::Attr>);
+        $test->assert_equals ($item0-><AG::Attr.ownerElement>, $el);
+        $test->assert_equals ($item0-><AG::Attr.value>, $value);
 
   @L2Method:
     @@Name: setNamedItemNS
@@ -8102,6 +8363,11 @@ ResourceDef:
         @@@@enDesc:
           If the map is read-only.
       @@@dx:raises:
+        @@@@@: MDOMX|NOMOD_THIS
+        @@@@enDesc:
+          If the node to which the map is attached is read-only.
+        @@@@For: ManakaiDOM|ManakaiDOM
+      @@@dx:raises:
         @@@@@: c|INUSE_ATTRIBUTE_ERR
         @@@@enDesc:
           If <P::arg> is an <IF::Attr> that is already an attribute
@@ -8122,7 +8388,7 @@ ResourceDef:
           and the language exposed through the <IF::Document> does
           not support XML namespaces.
       @@@dx:raises:
-        @@@@ForCheck: !c|ForAttrMap ManakaiDOM|ManakaiDOM
+        @@@@ForCheck: !t|ForAttrMap ManakaiDOM|ManakaiDOM
         @@@@@: c|NO_NS_NAMEDNODEMAP_ERR
         @@@@enDesc:
           If it is a <IF::NamedNodeMap> containing element type definitions,
@@ -8137,100 +8403,57 @@ ResourceDef:
         @@@@enImplNote:
           This case is clarified by DOM Level 2 errata.
         @@@@For: ManakaiDOM|ManakaiDOM
-     @@@PerlDef:
-         @@@@ForCheck:
-           c|ForAttrMap ManakaiDOM:DOMXMLFeature
-         @@@@@:
-            if ($self->{<H::mn:node>}->{<H::DOMCore:read-only>}) {
-              __EXCEPTION{
-                MDOMX:NOMOD_THIS::
-              }__;
-            }
-            my $attrNode = $arg->{<H::mn:node>};
-            if ($attrNode->{<H::DOMCore:ownerDocument>}
-                              ->{<H::mn:nodeID>} ne
-                     $self->{<H::mn:node>}->{<H::DOMCore:ownerDocument>}
-                          ->{<H::mn:nodeID>}) {
-              __EXCEPTION{DOMException.WRONG_DOCUMENT_ERR::
-              }__;
-            } elsif ($attrNode->{<H::DOMCore:nodeType>} ne
-                     <H::infoset:Attribute>) {
-              __EXCEPTION{
-                MDOMX:HIERARCHY_BAD_TYPE::
-                  MDOMX:param-name => 'arg',
-                  DOMCore:nodeType => {$attrNode->{<H::DOMCore:nodeType>}},
-              }__;
-            }
-
-            my $current_stem;
-            if (defined $attrNode->{<H::infoset:localName>}) {
-              $current_stem = $self->{<H::mn:node>}->{<H::infoset:attributes>}
-                     ->{defined $attrNode->{<H::infoset:namespaceName>}
-                              ? ${$attrNode->{<H::infoset:namespaceName>}}
-                              : <Q::null:>}
-                     ->{$attrNode->{<H::infoset:localName>}};
-            } else {
-              __EXCEPTION{
-                MDOMX:MDOM_NODE_NOSUPPORT_XMLNS::
-                  MDOMX:param-name => 'arg',
-              }__;
-            }
-
-            if ($attrNode->{<H::infoset:ownerElement>}) {
-              if (defined $current_stem and
-                  $current_stem->{<H::mn:nodeID>}
-                      eq $attrNode->{<H::mn:nodeID>}) {
-                __c:ERROR{t|replace-by-itself::
-                  c:relatedData => {$arg},
-                }__;
-                ## No return value
-              } else {
-                __EXCEPTION{DOMException.INUSE_ATTRIBUTE_ERR::
-                  MDOMX:param-name => 'arg',
-                }__;
-              }
-            } else {
-              $self->{<H::mn:node>}-><M::NodeStem.importTree> ($attrNode);
-              $attrNode->{<H::infoset:ownerElement>} = $self->{<H::mn:node>};
-              if (defined $attrNode->{<H::infoset:localName>}) {
-                $self->{<H::mn:node>}->{<H::infoset:attributes>}
-                     ->{defined $attrNode->{<H::infoset:namespaceName>}
-                              ? ${$attrNode->{<H::infoset:namespaceName>}}
-                              : <Q::null:>}
-                     ->{$attrNode->{<H::infoset:localName>}} = $attrNode;
-              } else {
-                $self->{<H::mn:node>}->{<H::infoset:attributes>}
-                     ->{<Q::ManakaiDOM:noNS>}
-                     ->{$attrNode->{<H::DOMCore:name>}} = $attrNode;
-              }
-              if (defined $current_stem) {
-                $r = <ClassM::ManakaiDOMNode.getNodeReference> ($current_stem)
-                  if defined wantarray;
-                CORE::delete $current_stem->{<H::infoset:parent>};
-                $current_stem-><M::NodeStem.orphanate>;
-              }
-            }
-          @@@@ImplNote:
-            @@@@@lang:en
-            @@@@@@:
-              It is unclear whether the node should be returned if 
-              the node is <QUOTE::replaced> by itself.
-             \
-              This code is almost same as <M::Element.setAttributeNodeNS>
-              without some points.
-        @@@disDef:
-          @@@@ForCheck:
-            !ManakaiDOM:DOMXMLFeature
-          @@@@DOMMain:raiseException:
-            MDOMX:MDOM_IMPL_NOSUPPORT_XMLNS
+      @@@PerlDef:
+        @@@@ForCheck: t|ForAttrMap
+        @@@@@:
+          __DEEP{
+            $r = ($$$self)-><M::Element.setAttributeNodeNS> ($arg);
+          }__;
       @@@disDef:
-        @@@@ForCheck: !c|ForAttrMap ManakaiDOM|DOMXMLFeature
+        @@@@ForCheck: !t|ForAttrMap ManakaiDOM|DOMXMLFeature
         @@@@DOMMain:raiseException: c|NO_NS_NAMEDNODEMAP_ERR
+      @@@disDef:
+        @@@@ForCheck: !t|ForAttrMap !ManakaiDOM|DOMXMLFeature
+        @@@@DOMMain:raiseException: MDOMX|MDOM_IMPL_NOSUPPORT_XMLNS
 
-       @@@L3Test:
-         @@@@QName: NamedNodeMap.Attr.setNamedItemNS.replace-by-itself.Test
-         @@@@ForCheck: c|ForAttrMap
-         @@@@PerlDef:
+    @@L2Test:
+      @@@QName: AttrMap.setNamedItemNS.test
+      @@@ForCheck: t|ForAttrMap
+      @@@PerlDef:
+        my $el;
+        __CODE{createElementForTest:: $el => $el}__;
+        my $as = $el-><AG::Node.attributes>;
+        my $doc = $el-><AG::Node.ownerDocument>;
+
+        my $uri = 'http://www.example/';
+        my $ln = 'el1';
+        my $qn = 'p:el1';
+        my $value = 'value1';
+
+        $test->id ('get.no');
+        $test->assert_null ($as-><M::NamedNodeMap.getNamedItemNS> ($uri, $ln));
+
+        $test->id ('set.item');
+        my $item0 = $doc-><M::Document.createAttributeNS> ($uri, $qn);
+        $item0-><AS::Attr.value> ($value);
+        my $item2 = $as-><M::NamedNodeMap.setNamedItemNS> ($item0);
+        $test->assert_null ($item2);
+ 
+        my $item3 = $as-><M::NamedNodeMap.getNamedItemNS> ($uri, $ln);
+        $test->assert_equals ($item3, $item0);
+
+        $test->id ('set.item.4');
+        my $item4 = $doc-><M::Document.createAttributeNS> ($uri, $qn);
+        my $item5 = $as-><M::NamedNodeMap.setNamedItemNS> ($item4);
+        $test->assert_equals ($item5, $item0);
+        
+        my $item6 = $as-><M::NamedNodeMap.getNamedItemNS> ($uri, $ln);
+        $test->assert_equals ($item6, $item4);
+
+     @@L3Test:
+       @@@QName: NamedNodeMap.Attr.setNamedItemNS.replace-by-itself.Test
+       @@@ForCheck: t|ForAttrMap
+       @@@PerlDef:
            my $doc;
            __CODE{createDocumentForTest:: $doc => $doc}__;
 
@@ -8273,7 +8496,7 @@ ResourceDef:
     @@NoNSVersion: .removeNamedItem
     @@enDesc:
       @@@ddid: attr
-      @@@ForCheck: c|ForAttrMap
+      @@@ForCheck: !t|ForETMap !t|ForATMap
       @@@@:
         If the removed attribute is known to have a default value,
         an attribute immediately appears containing the default value
@@ -8315,40 +8538,33 @@ ResourceDef:
           If the implementation does not support the <Feature::XML> feature
           and the language exposed through the <IF::Document> does
           not support XML namespaces.
-
-       @@@PerlDef:
-         @@@@ForCheck:
-           c|ForAttrMap ManakaiDOM:DOMXMLFeature
-         @@@@@:
-            if ($self->{<H::mn:node>}->{<H::DOMCore:read-only>}) {
-              __EXCEPTION{
-                MDOMX:NOMOD_THIS::
-              }__;
-            }
-            __CODE{selectAttrNodeObjectForRemoveNS}__;
-            if ($r) {
-              my $obj = $r;
-              $r = <ClassM::ManakaiDOMNode.getNodeReference> ($obj)
-                  if defined wantarray;
-              CORE::delete $obj->{<H::infoset:ownerElement>};
-              $obj-><M::NodeStem.orphanate>;
-            } else {
-              __EXCEPTION{DOMException.NOT_FOUND_ERR::
-              }__;
-            }
-        @@@disDef:
-          @@@@ForCheck:
-            !ManakaiDOM:DOMXMLFeature
-          @@@@DOMMain:raiseException:
-            MDOMX:MDOM_IMPL_NOSUPPORT_XMLNS
+      @@@PerlDef:
+        @@@@ForCheck: t|ForAttrMap
+        @@@@@:
+          my $el = $$$self;
+          __DEEP{ 
+            $r = $el-><M::Element.getAttributeNodeNS>
+                        ($namespaceURI, $localName);
+          }__;
+          unless ($r) {
+            __EXCEPTION{c|NO_NAMED_NODE_NS_ERR::
+              infoset|namespaceName => {$namespaceURI},
+              c|name => {$localName},
+              infoset|localName => {$localName},
+              MDOMX|param-name => 'name',
+            }__;
+          }
+          __DEEP{
+            $r = $el-><M::Element.removeAttributeNode> ($r);
+          }__;
       @@@disDef:
-        @@@@ForCheck: !c|ForAttrMap ManakaiDOM|DOMXMLFeature
+        @@@@ForCheck: !t|ForAttrMap ManakaiDOM|DOMXMLFeature
         @@@@DOMMain:raiseException: c|NO_NAMED_NODE_NS_ERR
+      @@@disDef:
+        @@@@ForCheck: !t|ForAttrMap !ManakaiDOM|DOMXMLFeature
+        @@@@DOMMain:raiseException: MDOMX|MDOM_IMPL_NOSUPPORT_XMLNS
 
   @IntMethod:
-    @@Name: isEqualNamedNodeMap
-    @@ForCheck:
-      !ManakaiDOM:ForIF
     @@Perlop: ==
     @@enDesc:
       Returns whether two <IF::NamedNodeMap>s are equals.
@@ -8359,7 +8575,6 @@ ResourceDef:
       and is equal, although not necessarily at the same index.
     @@enImplNote:
       See also <M::Node.isEqualNode>.
-    
     @@Param:
       @@@Name:arg
       @@@Type:NamedNodeMap
@@ -8370,49 +8585,6 @@ ResourceDef:
     @@Return:
       @@@Type:DOMMain|boolean||ManakaiDOM|all
       @@@PerlDef:
-        @@@@ForCheck: c|ForAttrMap
-        @@@@@:
-        __DEEP{
-          EQ: {
-            last EQ unless $self-><AG::NamedNodeMap.length>
-                         != $arg-><AG::NamedNodeMap.length>;
-            my $attr = $self->{<H::mn:node>}->{<H::infoset:attributes>};
-            my $nc = <ClassName::ManakaiDOMNode>;
-            for (keys %{$attr->{<Q::ManakaiDOM:noNS>}}) {
-              my $a = $attr->{<Q::ManakaiDOM:noNS>}->{$_};
-              unless (<M::DOMCore:ManakaiDOMNode.isEqualNode>
-                         (<Code::ManakaiNode:getWeakRef||ManakaiDOM:Perl::
-                                  $object = $a, $class = $nc>,
-                          $arg-><M::NamedNodeMap.getNamedItem> ($_))) {
-                last EQ;
-              }
-            }
-            for (keys %{$attr->{<Q::null:>}}) {
-              my $a = $attr->{<Q::null:>}->{$_};
-              unless (<M::DOMCore:ManakaiDOMNode.isEqualNode>
-                         (<Code::ManakaiNode:getWeakRef||ManakaiDOM:Perl::
-                                  $object = $a, $class = $nc>,
-                          $arg-><M::NamedNodeMap.getNamedItemNS> (null, $_))) {
-                last EQ;
-              }
-            }
-            for my $ns (grep {$_ ne <Q::null> and $_ ne <Q::ManakaiDOM:noNS>}
-                        keys %{$attr}) {
-              for (keys %{$attr->{$ns}}) {
-                my $a = $attr->{$ns}->{$_};
-                unless (<M::DOMCore:ManakaiDOMNode.isEqualNode>
-                           (<Code::ManakaiNode:getWeakRef||ManakaiDOM:Perl::
-                                  $object = $a, $class = $nc>,
-                            $arg-><M::NamedNodeMap.getNamedItemNS> ($ns, $_))) {
-                  last EQ;
-                }
-              }
-            }
-            $r = true;
-          }
-        }__;
-      @@@PerlDef:
-        @@@@ForCheck: !c|ForAttrMap
         @@@@@:
           __DEEP{
             my $length1 = $self-><AG::NamedNodeMap.length>;
@@ -8475,28 +8647,6 @@ ResourceDef:
         @@@@enDesc:
           No error handler.
       @@@PerlDef:
-        @@@@ForCheck: c|ForAttrMap
-        @@@@@:
-          if ($err->isa (<IFName::c|DOMError||ManakaiDOM|ManakaiDOM>)) {
-            __DEEP{
-                my $doc;
-                __CODE{mn:getWeakReference||ManakaiDOM:Perl::
-                  $object => {$self->{<H::mn:node>}
-                                   ->{<H::DOMCore:ownerDocument>}},
-                  $ref => $doc,
-                  $class => {<ClassName::ManakaiDOMDocument>},
-                }__;
-                my $cfg = $doc-><AG::Document.domConfig>;
-                my $h = $cfg-><M::c|DOMConfiguration.getParameter>
-                                 ('error-handler');
-                $r = $h-><M::c|DOMErrorHandler.handleError> ($err);
-            }__;
-          } else {
-            $err-><M::ecore|ErrorInterface||ManakaiDOM|Perl.throw>;
-          }
-      @@@PerlDef:
-        @@@@ForCheck: !c|ForAttrMap
-        @@@@@:
           __DEEP{
             ($$$self)->___report_error ($err);
           }__;
@@ -8523,6 +8673,15 @@ ResourceDef:
       @@@PerlDef: $r = $map;
 
   @CODE:
+    @@ForCheck: t|ForAttrMap ManakaiDOM|ManakaiDOMLatest
+    @@QName: getAttrMap
+    @@enDesc:
+      Creates an attribute node map from an element node.
+    @@PerlDef:
+      $map = bless \\($node), <ClassName::t|ManakaiDOMAttrMap>;
+      $node->{<H::mn:node>}->{<H::t|hashPosition>} ||= -1;
+
+  @CODE:
     @@ForCheck: t|ForETMap ManakaiDOM|ManakaiDOMLatest
     @@QName: getElementTypeDefNodeMap
     @@enDesc:
@@ -8541,6 +8700,12 @@ ResourceDef:
       $map = bless \\($node), <ClassName::t|ManakaiDOMAttrDefMap>;
 ##NamedNodeMap
 
+PropDef:
+  @QName: t|hashPosition
+  @DOMCore:nodeProp: hpos
+  @enDesc:
+    Index for <Perl::each>.
+
 ResourceDef:
   @rdf:type:
     @@@: dis|MultipleResource
@@ -8553,6 +8718,16 @@ ResourceDef:
   @rdf:type:
     @@@: DISLang|Class
     @@ForCheck: ManakaiDOM|ForClass
+
+  @resourceFor:
+    @@@: t|ForAttrMap
+    @@For: ManakaiDOM|ManakaiDOMLatest
+  @QName:
+    @@@: ManakaiDOMAttrMapArray
+    @@ForCheck: t|ForAttrMap
+  @ISA:
+    @@@: ManakaiDOMAttrMap
+    @@ForCheck: t|ForAttrMap
 
   @resourceFor:
     @@@: t|ForETMap
@@ -8616,7 +8791,7 @@ ResourceDef:
       Removes a node specified by index.
     @@enDesc:
       @@@ddid: attr
-      @@@ForCheck: c|ForAttrMap
+      @@@ForCheck: t|ForAttrMap
       @@@enDesc:
         If the removed attribute is known to have a default value,
         an attribute immediately appears containing the default
@@ -8640,6 +8815,10 @@ ResourceDef:
         @@@@@: c|NOMOD_NAMEDNODEMAP_ERR
         @@@@enDesc:
           If the map is read-only.
+      @@@dx:raises:
+        @@@@@: MDOMX|NOMOD_THIS
+        @@@@enDesc:
+          If the node to which the map is attached is read-only.
       @@@PerlDef:
         __DEEP{
           my $item = $self-><M::NamedNodeMap.item> ($index);
@@ -8666,6 +8845,14 @@ ResourceDef:
     my $impl = <Class::c|ManakaiDOMImplementation>->_new;
     $doc = $impl-><M::c|DOMImplementation.createDocument>
                               ('http://www.example/', 'ex');
+
+ResourceDef:
+  @QName: createEmptyDocumentForTest
+  @rdf:type: DISPerl|BlockCode
+  @For: ManakaiDOM|ManakaiDOM
+  @PerlDefC:
+    my $impl = <Class::c|ManakaiDOMImplementation>->_new;
+    $doc = $impl-><M::c|DOMImplementation.createDocument>;
 
 ResourceDef:
   @QName: createElementForTest
@@ -9282,8 +9469,26 @@ NodeTypeDef:
         DOM Level 2 Specification says that if the "ownerElement" 
         is "null", "specified" is always "true".  The DOM Level 3 
         Specification does not address this case.
-## TODO: Some mechanism required to turn the "specified" attribute "true" 
-## when some node operation is done.
+
+        {ISSUE::
+          May <M::Element.removeAttributeNS>, for example, left
+          <A::Attr.specified> flag as is?
+        }
+    @@enImplNote:
+      @@@ddid: mutation 
+      @@@@:
+        {TODO::
+          If a node in subtree is modified, the <A::Attr.specified>
+          flag must be turned <DOM::true>.  Manakai implements this
+          behavior in some case, but not all, in particular
+          node operation methods such as <M::Node.appendChild> does not.
+
+          $another_node->append_child ($text_that_is_a_child_of_attr)
+          must change $text_that_is_a_child_of_attr->parent_node->specified.
+
+          Setting of any <QUOTE::reflected> attribute must change
+          the specified value.
+        }
 
   @Attr:
     @@Name: value
@@ -9684,7 +9889,7 @@ NodeTypeDef:
               the node is created with a DOM Level 1 methods.
         @@@PerlDef:
           $r = defined $self->{<H::mn:node>}->{<H::infoset:namespaceName>}
-             ? $self->{<H::mn:node>}->{<H::infoset:namespaceName>} : null;
+             ? ${$self->{<H::mn:node>}->{<H::infoset:namespaceName>}} : null;
      @@For:
        ManakaiDOM:DOM2
      @@Level[list]:  2
@@ -10207,51 +10412,66 @@ NodeTypeDef:
           The <IF::NodeStem> object.  If there is no attribute
           node, then its value is left unchanged.
     @@PerlDef:
-            my $attr = $self->{<H::mn:node>}->{<H::infoset:attributes>};
-            if ($attr->{<Q::ManakaiDOM:noNS>}->{$name}) {
-              $r = $attr->{<Q::ManakaiDOM:noNS>}->{$name};
-              __FOR{ForRemove::
-                CORE::delete $attr->{<Q::ManakaiDOM:noNS>}->{$name};
-              }__;
-            } elsif ($name eq 'xmlns') {
-              for my $a (keys %{$attr->{<Q::xmlns:>}||{}}) {
-                if ($attr->{<Q::xmlns:>}->{$a}->{<H::infoset:localName>}) {
-                  $r = $attr->{<Q::xmlns:>}->{$a};
-                  __FOR{ForRemove::
-                    CORE::delete $attr->{<Q::xmlns:>}->{$a};
-                  }__;
-                  last;
-               }
+      my $__attr = $self->{<H::mn:node>}->{<H::infoset:attributes>};
+
+      if ($__attr->{<Q::ManakaiDOM:noNS>}->{$name}) {
+        ## If there is a DOM Level 1 attribute whose |nodeName| equals to
+        ## the requested name, then the node is the answer.
+        __FOR{!ForRemove::
+          $r = $__attr->{<Q::ManakaiDOM:noNS>}->{$name};
+        }__;
+        __FOR{ForRemove::
+          $list = $__attr->{<Q::ManakaiDOM:noNS>};
+          $key = $name;
+        }__;
+
+      } else {
+        ## Otherwise, if an attribute's qualified name is equal to
+        ## the requested name, then the node is the answer.
+
+        ## Note that if there is a namespace ill-formed attribute,
+        ## the result is not the expected one.  For example,
+        ## if an |xmlns| attribute in the |http://www.w3.org/2000/xmlns/|
+        ## namespace has non-NULL |prefix|, a request to get |xmlns|
+        ## attribute will not return that node.
+
+        ## |sort|ing is required so that every |getAttribute|, |setAttribute|,
+        ## |hasAttribute|, |removeAttribute|, or any other namespace unaware
+        ## methods operates on the same node even if there is 
+        ## multiple nodes with the same qualified name.
+
+        NS: for my $__ns (sort {$a cmp $b} keys %$__attr) {
+          next NS if $__ns eq <Q::ManakaiDOM:noNS>;
+          for my $__ln (sort {$a cmp $b} keys %{$__attr->{$__ns}}) {
+            my $__stem = $__attr->{$__ns}->{$__ln};
+            if (defined $__stem->{<H::infoset:prefix>}) {
+              if ($__stem->{<H::infoset:prefix>}.':'.
+                  $__stem->{<H::infoset:localName>} eq $name) {
+                __FOR{!ForRemove::
+                  $r = $__stem;
+                }__;
+                __FOR{ForRemove::
+                  $list = $__attr->{$__ns};
+                  $key = $__ln;
+                }__;
+                last NS;
               }
-            } elsif ($name eq 'xmlns:xmlns') {
-              # 
-            } else {
-              for my $ns (keys %$attr) {
-                if ($ns eq <Q::ManakaiDOM:noNS>) {
-                  # 
-                } else {
-                  for my $a (keys %{$attr->{$ns}||{}}) {
-                    if (defined $attr->{$ns}->{$a}->{<H::infoset:prefix>} and
-                        $attr->{$ns}->{$a}->{<H::infoset:prefix>}.':'.
-                        $attr->{$ns}->{$a}->{<H::infoset:localName>} eq $name) {
-                      $r = $attr->{$ns}->{$a};
-                      __FOR{ForRemove::
-                        CORE::delete $attr->{$ns}->{$a};
-                      }__;
-                      last;
-                    } elsif (not defined $attr->{$ns}->{$a}
-                                              ->{<H::infoset:prefix>} and
-                         $attr->{$ns}->{$a}->{<H::infoset:localName>} eq $name) {
-                      $r = $attr->{$ns}->{$a};
-                      __FOR{ForRemove::
-                        CORE::delete $attr->{$ns}->{$a};
-                      }__;
-                      last;
-                    }
-                  }
-                }
+            } else { # no prefix
+              if ($__stem->{<H::infoset:localName>} eq $name) {
+                __FOR{!ForRemove::
+                  $r = $__stem;
+                }__;
+                __FOR{ForRemove::
+                  $list = $__attr->{$__ns};
+                  $key = $__ln;
+                }__;
+                last NS;
               }
             }
+          } # ln
+        } # NS
+      }
+
   @Method:
      @@Name:  getAttribute
      @@Description:
@@ -10475,34 +10695,216 @@ NodeTypeDef:
           @@@@@:
             The name of the attribute to remove.  If no attribute 
             with this <P::name> is found, this method has no effect.
-     @@Return:
-        @@@Exception:
-          @@@@Type:DOMException
-          @@@@Name:NO_MODIFICATION_ALLOWED_ERR
-          @@@@SubType:
-            @@@@@QName:
-              MDOMX:NOMOD_THIS
-            @@@@@Description:
-              @@@@@@lang:en
-              @@@@@@@:
-                This (<IF::Element>) node is read-only.
-        @@@PerlDef:
-          @@@@@:
-            if ($self->{<H::mn:node>}->{<H::DOMCore:read-only>}) {
-              __EXCEPTION{
-                MDOMX:NOMOD_THIS::
-              }__;
+    @@Return:
+      @@@dx:raises:
+        @@@@@: MDOMX|NOMOD_THIS
+        @@@@enDesc:
+          If the <IF::Element> node is read-only.
+      @@@PerlDef:
+        my $list;
+        my $key;
+        __CODE{selectAttrNodeObjectForRemove::
+          $self => $self,
+          $name => $name,
+          $list => $list,
+          $key => $key,
+        }__;
+        if ($list) { # there is an attribute node
+          if ($self->{<H::mn:node>}->{<H::c|read-only>}) {
+            __EXCEPTION{
+              MDOMX:NOMOD_THIS::
+            }__;
+          }
+
+          ## Remove the attribute node
+          my $stem = $list->{$key};
+          CORE::delete $list->{$key};
+          CORE::delete $stem->{<H::infoset:ownerElement>};
+          $stem-><M::NodeStem.orphanate>;
+
+          ## Default attribute
+          my $doc = $self-><AG::Node.ownerDocument>;
+          __CODE{t|generateDefaultAttribute::
+            $document => $doc,
+            $element_type => {$self-><AG::Node.nodeName>},
+            $element => $self,
+            $name => $name,
+          }__;
+        } # exists
+
+    @@Test:
+      @@@QName: Element.removeAttribute.test
+      @@@PerlDef:
+        my $el;
+        __CODE{createElementForTest:: $el => $el}__;
+
+        $test->id ('remove.no.attr');
+        $el-><M::Element.removeAttribute> ('at1');
+
+        $test->id ('set.attr');
+        $el-><M::Element.setAttribute> (at1 => 'value1');
+        my $v1 = $el-><M::Element.getAttribute> ('at1');
+        $test->assert_equals ($v1, 'value1');
+
+        $test->id ('remove.attr');
+        $el-><M::Element.removeAttribute> ('at1');
+        my $v2 = $el-><M::Element.getAttribute> ('at1');
+        $test->assert_true (not defined $v2 or $v2 eq '');
+    @@L2Test:
+      @@@ForCheck: ManakaiDOM|DOMXMLFeature
+      @@@QName: Element.removeAttribute.nsattr.test
+      @@@PerlDef:
+        my $el;
+        __CODE{createElementForTest:: $el => $el}__;
+
+        $test->id ('remove.no.attr');
+        $el-><M::Element.removeAttribute> ('ns1:at1');
+
+        $test->id ('set.attr.ns');
+        $el-><M::Element.setAttributeNS>
+               ('http://example./', 'ns1:at1' => 'value1');
+        my $v1 = $el-><M::Element.getAttributeNS> ('http://example./', 'at1');
+        $test->assert_equals ($v1, 'value1');
+
+        $test->id ('remove.attr');
+        $el-><M::Element.removeAttribute> ('ns1:at1');
+        my $v2 = $el-><M::Element.getAttributeNS> ('http://example./', 'at1');
+        undef $v2 if defined $v2 and $v2 eq '';
+        $test->assert_null ($v2);
+    @@L3Test:
+      @@@QName: Element.removeAttribute.defaultattr.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docd = $doc-><M::Node.getFeature> (<Q::ManakaiDOM:XDoctype>, '3.0');
+        my $dtd = $docd-><M::d|DocumentXDoctype.createDocumentTypeDefinition>
+                           ('doctype');
+          my $et = $docd-><M::d|DocumentXDoctype.createElementTypeDefinition>
+                             ('et1');
+            my $at = $docd-><M::d|DocumentXDoctype.createAttributeDefinition>
+                               ('dattr1');
+            $at-><AS::ATDef.defaultType> (<C::ATDef.EXPLICIT_DEFAULT>);
+            $at-><AS::Node.textContent> ('dattr1 default ');
+          $et-><M::ETDef.setAttributeDefinitionNode> ($at);
+        $dtd-><M::DTDef.setElementTypeDefinitionNode> ($et);
+        $doc-><M::Node.appendChild> ($dtd);
+
+        $test->id ('created.default.value');
+        my $el = $doc-><M::Document.createElement> ('et1');
+        $test->assert_equals ($el-><M::Element.getAttribute> ('dattr1'),
+                              'dattr1 default ');
+        $test->assert_false ($el-><M::Element.getAttributeNode> ('dattr1')
+                                -><AG::Attr.specified>);
+
+        $test->id ('set.attr');
+        $el-><M::Element.setAttribute> ('dattr1', 'non-default-value');
+        $test->assert_equals ($el-><M::Element.getAttribute> ('dattr1'),
+                              'non-default-value');
+        $test->assert_true ($el-><M::Element.getAttributeNode> ('dattr1')
+                               -><AG::Attr.specified>);
+
+        $test->id ('remove.attr');
+        $el-><M::Element.removeAttribute> ('dattr1');
+        $test->assert_equals ($el-><M::Element.getAttribute> ('dattr1'),
+                              'dattr1 default ');
+        $test->assert_false ($el-><M::Element.getAttributeNode> ('dattr1')
+                                -><AG::Attr.specified>);
+
+  @CODE:
+    @@QName: generateDefaultAttribute
+    @@PerlDef:
+      @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeature
+      @@@@:
+        __DEEP{
+          my $__doctype = $document-><AG::Document.doctype>;
+          $__doctype = $__doctype-><M::Node.getFeature>
+                                     (<Q::ManakaiDOM:XDoctype> => '3.0')
+            if $__doctype;
+          if ($__doctype) {
+            my $__et = $__doctype-><M::DTDef.getElementTypeDefinitionNode>
+                                     ($element_type);
+            if ($__et) {
+              local $document->{<H::mn:node>}
+                             ->{<H::c|strictErrorChecking>} = false;          
+              my $__at = $__et-><M::ETDef.getAttributeDefinitionNode> ($name);
+              if ($__at) {
+                my ($__an1, $__an2) = split /:/, $name;
+                ADD: {
+                  my $__attr;
+                  if (defined $__an2) {   ## prefixed attr
+                    my $__nsuri = $element-><M::Node.lookupNamespaceURI>
+                                              ($__an1);
+                    unless (defined $__nsuri) {
+                      ## TODO: Namespace well-formedness error
+                    }
+                    if ($element->{<H::mn:node>}->{<H::infoset:attributes>}
+                                ->{defined $__nsuri ? $__nsuri : <Q::null:>}
+                                ->{$__an2}) {
+                      ## TODO: Namespace well-formedness warning?
+                      last ADD;
+                    }
+                    $__attr = $document-><M::Document.createAttributeNS>
+                                           ($__nsuri, $name);
+                  } else {                ## local attr
+                    if ($name eq 'xmlns') {
+                      if ($element->{<H::mn:node>}->{<H::infoset:attributes>}
+                                  ->{<Q::xmlns:>}->{xmlns}) {
+                        ## TODO: Namespace well-formedness warning?
+                        last ADD;
+                      }
+                      $__attr = $document-><M::Document.createAttributeNS>
+                                             (<Q::xmlns:>, 'xmlns');
+                    } else {
+                      if ($element->{<H::mn:node>}->{<H::infoset:attributes>}
+                                  ->{<Q::null:>}->{$name}) {
+                        ## TODO: Namespace well-formedness warning?
+                        last ADD;
+                      }
+                      ## TODO: NCName error
+                      $__attr = $document-><M::Document.createAttributeNS>
+                                             (null, $name);
+                    }
+                  }
+                  for my $__at_child (@{$__at-><AG::Node.childNodes>}) {
+                    $__attr-><M::Node.appendChild>
+                               ($__at_child-><M::Node.cloneNode> (true));
+                  }
+                  $__attr->{<H::mn:node>}->{<H::infoset:attributeType>}
+                    = $__at-><AG::ATDef.declaredType>;
+                  $element-><M::Element.setAttributeNodeNS> ($__attr);
+                              ## This method change the |specified| flag
+                  $__attr->{<H::mn:node>}->{<H::infoset:specified>} = false;
+                } # ADD
+              }
             }
-            my $r;
-            __CODE{selectAttrNodeObjectForRemove}__;
-            if ($r) {
-              CORE::delete $r->{<H::infoset:ownerElement>};
-              $r-><M::NodeStem.orphanate>;
-            }
-          @@@@ImplNote:
-            @@@@@lang:en
-            @@@@@@:
-              TODO: Default attribute
+          }
+        }__;
+    @@enImplNote:
+      @@@ddid: downlevels
+      @@@@:
+        {TODO:: Implementation for level 1, 2, 3+ w/o XML required. 
+        }
+    @@enImplNote:
+      {ISSUE::
+        Given <XA::ns1:ln> attribute has a default value <CODE::value>
+        amd there is a <A::Attr.specified> attribute node <VAR::a1>
+        whose <A::Node.prefix> is <XML::ns1> and <A::Node.localName>
+        is <XML::ln>.  Then, <VAR::a1>'s <A::Node.prefix> is 
+        so modified that its value is now <XML::ns2>.  At this
+        time no default attribute is added <SRC::DOM Level 3 Core>.
+
+        Now we remove the <VAR::a1> node from its owner element.
+        Should the operation make a default attribute with
+        its <A::Node.nodeName> <XA::ns1:ln> be created?
+        
+        To do it, because of DTD's namespace unawareness, 
+        we must test any possible default attribute if
+        its local name matches to the removed attribute's local name,
+        i.e. <XML::ln>, and looking up its prefix by the
+        former owner element of the removed attribute and
+        it matches to the namespace URI of the removed attribute.
+      }
+
   @Method:
      @@Name:  getAttributeNode
      @@Description:
@@ -10573,31 +10975,25 @@ NodeTypeDef:
             @@@@@lang:en
             @@@@@@:
               No <IF::Attr> node was replaced.
-        @@@Exception:
-          @@@@Type:DOMException
-          @@@@Name:WRONG_DOCUMENT_ERR
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              The <P::newAttr> node was created from a different document.
-        @@@Exception:
-          @@@@Type:DOMException
-          @@@@Name:NO_MODIFICATION_ALLOWED_ERR
-          @@@@SubType:
-            @@@@@QName:
-              MDOMX:NOMOD_THIS
-            @@@@@Description:
-              @@@@@@lang:en
-              @@@@@@@: 
-                This (<IF::Element>) node is read-only.
-         @@@Exception:
-           @@@@Type:DOMException
-           @@@@Name:INUSE_ATTRIBUTE_ERR
-           @@@@Description:
-             @@@@@lang:en
-             @@@@@@:
-               The <P::newAttr> node is already used as an attribute 
-               of another <IF::Element> object.
+        @@@@enImplNote:
+          Although the spec is unclear, when a node is <QUOTE::replaced>
+          by itself, it is defined as <QUOTE::no effect>, no node
+          is actually replaced and the manakai implementation does
+          return <DOM::null>.
+      @@@dx:raises:
+        @@@@@: c|DIFFERENT_DOCUMENT_ERR
+        @@@@enDesc:
+          If <P::newAttr> was created from a different document
+          than the <A::Node.ownerDocument> of the element.
+      @@@dx:raises:
+        @@@@@: MDOMX|NOMOD_THIS
+        @@@@enDesc:
+          If the element is read-only.
+      @@@dx:raises:
+        @@@@@: c|INUSE_ATTRIBUTE_ERR
+        @@@@enDesc:
+          If the <P::newAttr> node is already used as an attribute
+          of another <IF::Element> node.
         @@@c:reports:
           @@@@@: t|replace-by-itself
           @@@@enDesc:
@@ -10605,79 +11001,109 @@ NodeTypeDef:
             is attached to the element node.  Then, the method call is 
             no effect.
           @@@@For: ManakaiDOM|ManakaiDOM
-         @@@PerlDef:
-            if ($self->{<H::mn:node>}->{<H::DOMCore:read-only>}) {
-              __EXCEPTION{
-                MDOMX:NOMOD_THIS::
-              }__;
-            }
-            my $attrNode = $newAttr->{<H::mn:node>};
-            if ($attrNode->{<H::DOMCore:ownerDocument>}
-                              ->{<H::mn:nodeID>} ne
-                     $self->{<H::mn:node>}->{<H::DOMCore:ownerDocument>}
-                          ->{<H::mn:nodeID>}) {
-              __EXCEPTION{DOMException.WRONG_DOCUMENT_ERR::
-              }__;
-            }
+      @@@PerlDef:
+        my $stem = $self->{<H::mn:node>};
+        my $a_stem = $newAttr->{<H::mn:node>};
+        my $strict = <Code::doStrictErrorChecking:: $nodeRef = $self>;
+        if ($strict and
+            not $stem->{<H::c|ownerDocument>}
+                    eq $a_stem->{<H::c|ownerDocument>}) {
+          __EXCEPTION{c|DIFFERENT_DOCUMENT_ERR::
+            MDOMX|param-name => 'newAttr',
+            c|node => {$newAttr},
+          }__;
+        }
 
-            my $current_stem;
-            if (defined $attrNode->{<H::infoset:localName>}) {
-              $current_stem
-                  = $self->{<H::mn:node>}->{<H::infoset:attributes>}
-                         ->{defined $attrNode->{<H::infoset:namespaceName>}
-                              ? ${$attrNode->{<H::infoset:namespaceName>}}
-                              : <Q::null:>}
-                         ->{$attrNode->{<H::infoset:localName>}};
-            } else {
-              $current_stem
-                  = $self->{<H::mn:node>}->{<H::infoset:attributes>}
-                         ->{<Q::ManakaiDOM:noNS>}
-                         ->{$attrNode->{<H::DOMCore:name>}};
-            }
+        my $c_a_stem; # current attribute node stem
+        my $nsuri;
+        my $ln;
+        if (defined $a_stem->{<H::infoset:localName>}) {
+          $nsuri = defined $a_stem->{<H::infoset:namespaceName>}
+                     ? $a_stem->{<H::infoset:namespaceName>}
+                     : \(<Q::null:>);
+          $ln = $a_stem->{<H::infoset:localName>};
+        } else { # DOM Level 1 node
+          $nsuri = \(<Q::ManakaiDOM:noNS>);
+          $ln = $a_stem->{<H::c|name>};
+        }
+        $c_a_stem = $stem->{<H::infoset:attributes>}->{$$nsuri}->{$ln};
 
-            if ($attrNode->{<H::infoset:ownerElement>}) {
-              if (defined $current_stem and
-                  $current_stem->{<H::mn:nodeID>}
-                      eq $attrNode->{<H::mn:nodeID>}) {
-                __c:ERROR{t|replace-by-itself::
-                  c:relatedData => {$newAttr},
-                }__;
-                ## No return value
-              } else {
-                __EXCEPTION{DOMException.INUSE_ATTRIBUTE_ERR::
-                  MDOMX:param-name => 'newAttr',
-                }__;
-              }
-            } else {
-              $self->{<H::mn:node>}-><M::NodeStem.importTree> ($attrNode);
-              $attrNode->{<H::infoset:ownerElement>} = $self->{<H::mn:node>};
-              if (defined $attrNode->{<H::infoset:localName>}) {
-                $self->{<H::mn:node>}->{<H::infoset:attributes>}
-                     ->{defined $attrNode->{<H::infoset:namespaceName>}
-                              ? ${$attrNode->{<H::infoset:namespaceName>}}
-                              : <Q::null:>}
-                     ->{$attrNode->{<H::infoset:localName>}} = $attrNode;
-              } else {
-                $self->{<H::mn:node>}->{<H::infoset:attributes>}
-                     ->{<Q::ManakaiDOM:noNS>}
-                     ->{$attrNode->{<H::DOMCore:name>}} = $attrNode;
-              }
-              if (defined $current_stem) {
-                $r = <ClassM::ManakaiDOMNode.getNodeReference> ($current_stem)
-                  if defined wantarray;
-                CORE::delete $current_stem->{<H::infoset:ownerElement>};
-                $current_stem-><M::NodeStem.orphanate>;
-              }
-            }
-          @@@@ImplNote:
-            @@@@@lang:en
-            @@@@@@:
-              It is unclear whether a node should be returned if 
-              it is <QUOTE::replace>d by itself.
+        if ($a_stem->{<H::infoset:ownerElement>}) {
+          if ($c_a_stem and $a_stem eq $c_a_stem) {
+            __c:ERROR{t|replace-by-itself::
+              c:relatedData => {$newAttr},
+            }__;
+            ## No return value
+          } else {
+            __EXCEPTION{c|INUSE_ATTRIBUTE_ERR::
+              MDOMX|param-name => 'newAttr',
+              c|node => {$newAttr},
+            }__;
+          }
+        } else { # not in use
+          if ($strict and $stem->{<H::c|read-only>}) {
+            __EXCEPTION{MDOMX|NOMOD_THIS::
+            }__;
+          }
+          
+          $stem-><M::NodeStem.importTree> ($a_stem);
+          $a_stem->{<H::infoset:ownerElement>} = $stem;
+          $stem->{<H::infoset:attributes>}->{$$nsuri}->{$ln} = $a_stem;
+       
+          $a_stem->{<H::infoset:specified>} = true;
 
-       @@@L3Test:
-         @@@@QName: Element.setAttributeNode.replace-by-itself.Test
-         @@@@PerlDef:
+          if ($c_a_stem) {
+            $r = <ClassM::ManakaiDOMNode.getNodeReference> ($c_a_stem)
+              if defined wantarray;
+            CORE::delete $c_a_stem->{<H::infoset:ownerElement>};
+            $c_a_stem-><M::NodeStem.orphanate>;
+          }
+        }
+
+    @@Test:
+      @@@QName: Element.setAttributeNode.test
+      @@@PerlDef:
+        my $el;
+        __CODE{createElementForTest:: $el => $el}__;
+        my $doc = $el-><AG::Node.ownerDocument>;
+
+        my $a1 = $doc-><M::Document.createAttribute> ('attr1');
+        $a1-><AS::Attr.value> ('value1');
+
+        $test->id ('set');
+        my $r1 = $el-><M::Element.setAttributeNode> ($a1);
+
+        $test->id ('no.replace.no.return');
+        $test->assert_null ($r1);
+
+        $test->id ('get.text');
+        $test->assert_equals ($el-><M::Element.getAttribute> ('attr1'),
+                              'value1');
+
+        $test->id ('get.return.setten');
+        my $r2 = $el-><M::Element.getAttributeNode> ('attr1');
+        $test->assert_equals ($r2, $a1);
+
+        $test->id ('owner');
+        $test->assert_equals ($a1-><AG::Attr.ownerElement>, $el);
+
+        $test->id ('specified');
+        $test->assert_true ($a1-><AG::Attr.specified>);
+
+        my $a2 = $doc-><M::Document.createAttribute> ('attr1');
+        
+        $test->id ('replace');
+        my $r3 = $el-><M::Element.setAttributeNode> ($a2);
+  
+        $test->id ('replaced.node.returned');
+        $test->assert_equals ($r3, $a1);
+
+        $test->id ('replaced.no.owner');
+        $test->assert_null ($a1-><AG::Attr.ownerElement>);
+
+    @@L3Test:
+      @@@QName: Element.setAttributeNode.replace-by-itself.Test
+      @@@PerlDef:
            my $impl = <Class::c|ManakaiDOMImplementation>->_new;
            my $doc = $impl-><M::c|DOMImplementation.createDocument>
                               ('http://www.example/', 'ex');
@@ -10713,11 +11139,6 @@ NodeTypeDef:
 
            $attr = null;
 
-    @@Level[list]:
-       1
-       2
-       3
-    @@SpecLevel:1
   @Method:
      @@Name:  removeAttributeNode
      @@Description:
@@ -10736,60 +11157,150 @@ NodeTypeDef:
           @@@@lang:en
           @@@@@: 
             The attribute node to remove from the attribute list.
-     @@Return:
-        @@@Type:  Attr
-        @@@actualType: ManakaiDOMAttr
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            The attribute node that was removed.
-        @@@Exception:
-          @@@@Type:DOMException
-          @@@@Name:NO_MODIFICATION_ALLOWED_ERR
-          @@@@SubType:
-            @@@@@QName:
-              MDOMX:NOMOD_THIS
-            @@@@@Description:
-              @@@@@@lang:en
-              @@@@@@@:
-                This (<IF::Element>) node is read-only.
-        @@@Exception:
-          @@@@Type:DOMException
-          @@@@Name:NOT_FOUND_ERR
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              The <P::oldAttr> node is not an attribute of this element.
-        @@@PerlDef:
-            my $node = $self->{<H::mn:node>};
-            if ($node->{<H::DOMCore:read-only>}) {
-              __EXCEPTION{
-                MDOMX:NOMOD_THIS::
-              }__;
+    @@Return:
+      @@@Type: Attr
+      @@@enDesc:
+        The removed attribute node.
+      @@@dx:raises:
+        @@@@@: MDOMX|NOMOD_THIS
+        @@@@enDesc:
+          If the element node is read-only.
+      @@@dx:raises:
+        @@@@@: c|NOT_ATTR_ERR
+        @@@@enDesc:
+          If the <P::oldAttr> node is not an attribute of the element.
+      @@@PerlDef:
+        my $stem = $self->{<H::mn:node>};
+        if (<Code::doStrictErrorChecking:: $nodeRef = $self>) {
+          if ($stem->{<H::c|read-only>}) {
+            __EXCEPTION{MDOMX:NOMOD_THIS::
+            }__;
+          }
+        }
+
+        my $a_stem = $oldAttr->{<H::mn:node>};
+        FIND: {
+          if (defined $a_stem->{<H::infoset:localName>}) {
+            my $list = $stem->{<H::infoset:attributes>}
+                            ->{defined $a_stem->{<H::infoset:namespaceName>}
+                                 ? ${$a_stem->{<H::infoset:namespaceName>}}
+                                 : <Q::null:>};
+            if ($list->{$a_stem->{<H::infoset:localName>}} and
+                $list->{$a_stem->{<H::infoset:localName>}} eq $a_stem) {
+              CORE::delete $list->{$a_stem->{<H::infoset:localName>}};
+              last FIND;
             }
-            $r = $oldAttr;
-            my $attrNode = $r->{<H::mn:node>};
-            FIND: {
-              my $attrID = $attrNode->{<H::mn:nodeID>};
-              for my $ns (keys %{$node->{<H::infoset:attributes>}}) {
-                for my $ln (keys %{$node->{<H::infoset:attributes>}->{$ns}}) {
-                  if ($attrID eq $node->{<H::infoset:attributes>}->{$ns}->{$ln}
-                                      ->{<H::mn:nodeID>}) {
-                    CORE::delete $node->{<H::infoset:attributes>}->{$ns}->{$ln};
-                    last FIND;
-                  }
-                }
-              }
-              __EXCEPTION{DOMException.NOT_FOUND_ERR::
-                  MDOMX:param-name => 'oldAttr',
-              }__;
+          } else { ## DOM Level 1 node
+            my $list = $stem->{<H::infoset:attributes>}->{<Q::ManakaiDOM:noNS>};
+            if ($list->{$a_stem->{<H::c|name>}} and
+                $list->{$a_stem->{<H::c|name>}} eq $a_stem) {
+              CORE::delete $list->{$a_stem->{<H::c|name>}};
+              last FIND;
             }
-            CORE::delete $attrNode->{<H::infoset:ownerElement>};
-            $attrNode-><M::NodeStem.orphanate>;
-          @@@@ImplNote:
-            @@@@@lang:en
-            @@@@@@:
-              TODO: Default attribute
+          }
+          __EXCEPTION{c|NOT_ATTR_ERR::
+            MDOMX:param-name => 'oldAttr',
+            c|node => {$oldAttr},
+          }__;
+        } # FIND
+
+        CORE::delete $a_stem->{<H::infoset:ownerElement>};
+        $a_stem-><M::NodeStem.orphanate>;
+        $r = $oldAttr if defined wantarray;
+      
+        ## Default attribute
+        my $doc = $self-><AG::Node.ownerDocument>;
+        my $name = $oldAttr-><AG::Node.nodeName>;
+        __CODE{t|generateDefaultAttribute::
+          $document => $doc,
+          $element_type => {$self-><AG::Node.nodeName>},
+          $element => $self,
+          $name => $name,
+        }__;
+
+    @@Test:
+      @@@QName: Element.removeAttributeNode.test
+      @@@PerlDef:
+        my $el;
+        __CODE{createElementForTest:: $el => $el}__;
+
+        $test->id ('remove.no.attr');
+        $el-><M::Element.removeAttribute> ('at1');
+
+        $test->id ('set.attr');
+        $el-><M::Element.setAttribute> (at1 => 'value1');
+        my $v1 = $el-><M::Element.getAttribute> ('at1');
+        $test->assert_equals ($v1, 'value1');
+
+        $test->id ('remove.attr');
+        my $a1 = $el-><M::Element.getAttributeNode> ('at1');
+        $el-><M::Element.removeAttributeNode> ($a1);
+        my $v2 = $el-><M::Element.getAttribute> ('at1');
+        $test->assert_true (not defined $v2 or $v2 eq '');
+        $test->assert_null ($a1-><AG::Attr.ownerElement>);
+    @@L2Test:
+      @@@ForCheck: ManakaiDOM|DOMXMLFeature
+      @@@QName: Element.removeAttributeNode.nsattr.test
+      @@@PerlDef:
+        my $el;
+        __CODE{createElementForTest:: $el => $el}__;
+
+        $test->id ('remove.no.attr');
+        $el-><M::Element.removeAttribute> ('ns1:at1');
+
+        $test->id ('set.attr.ns');
+        $el-><M::Element.setAttributeNS>
+               ('http://example./', 'ns1:at1' => 'value1');
+        my $v1 = $el-><M::Element.getAttributeNS> ('http://example./', 'at1');
+        $test->assert_equals ($v1, 'value1');
+
+        $test->id ('remove.attr');
+        my $a1 = $el-><M::Element.getAttributeNode> ('ns1:at1');
+        $el-><M::Element.removeAttributeNode> ($a1);
+        my $v2 = $el-><M::Element.getAttributeNS> ('http://example./', 'at1');
+        $test->assert_true (not defined $v2 or $v2 eq '');
+        $test->assert_null ($a1-><AG::Attr.ownerElement>);
+    @@L3Test:
+      @@@QName: Element.removeAttributeNode.defaultattr.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docd = $doc-><M::Node.getFeature> (<Q::ManakaiDOM:XDoctype>, '3.0');
+        my $dtd = $docd-><M::d|DocumentXDoctype.createDocumentTypeDefinition>
+                           ('doctype');
+          my $et = $docd-><M::d|DocumentXDoctype.createElementTypeDefinition>
+                             ('et1');
+            my $at = $docd-><M::d|DocumentXDoctype.createAttributeDefinition>
+                               ('dattr1');
+            $at-><AS::ATDef.defaultType> (<C::ATDef.EXPLICIT_DEFAULT>);
+            $at-><AS::Node.textContent> ('dattr1 default ');
+          $et-><M::ETDef.setAttributeDefinitionNode> ($at);
+        $dtd-><M::DTDef.setElementTypeDefinitionNode> ($et);
+        $doc-><M::Node.appendChild> ($dtd);
+
+        $test->id ('created.default.value');
+        my $el = $doc-><M::Document.createElement> ('et1');
+        $test->assert_equals ($el-><M::Element.getAttribute> ('dattr1'),
+                              'dattr1 default ');
+        $test->assert_false ($el-><M::Element.getAttributeNode> ('dattr1')
+                                -><AG::Attr.specified>);
+
+        $test->id ('set.attr');
+        $el-><M::Element.setAttribute> ('dattr1', 'non-default-value');
+        $test->assert_equals ($el-><M::Element.getAttribute> ('dattr1'),
+                              'non-default-value');
+        $test->assert_true ($el-><M::Element.getAttributeNode> ('dattr1')
+                               -><AG::Attr.specified>);
+
+        $test->id ('remove.attr');
+        my $a1 = $el-><M::Element.getAttributeNode> ('dattr1');
+        $el-><M::Element.removeAttributeNode> ($a1);
+        $test->assert_equals ($el-><M::Element.getAttribute> ('dattr1'),
+                              'dattr1 default ');
+        $test->assert_false ($el-><M::Element.getAttributeNode> ('dattr1')
+                                -><AG::Attr.specified>);
+        $test->assert_null ($a1-><AG::Attr.ownerElement>);
+
   @Method:
      @@Name:  getElementsByTagName
      @@Description:
@@ -10931,17 +11442,19 @@ NodeTypeDef:
           @@@@Description:
             @@@@@lang:en
             @@@@@@: There is no such attribute.
-     @@PerlDef:
-       my $__attr = $self->{<H::mn:node>}->{<H::infoset:attributes>};
-       my $__nsuri = defined $namespaceURI ? \$namespaceURI : \<Q::null:>;
-       $r = $__attr->{$$__nsuri}->{$localName};
-       __FOR{ForRemove::
-         CORE::delete $__attr->{$$__nsuri}->{$localName} if $r;
-       }__;
-    @@ImplNote:
-      @@@lang:en
+    @@PerlDef:
+      @@@ForCheck: !ForRemove
       @@@@:
-        The same method is defined in <IF::ManakaiDOMAttributes>.
+        $r = $self->{<H::mn:node>}->{<H::infoset:attributes>}
+                  ->{defined $namespaceURI ? $namespaceURI : <Q::null:>}
+                  ->{$localName};
+    @@PerlDef:
+      @@@ForCheck: ForRemove
+      @@@@:
+        $list = $element->{<H::mn:node>}->{<H::infoset:attributes>}
+                        ->{defined $namespaceURI ? $namespaceURI : <Q::null:>};
+        $list = null unless $list->{$localName};
+
   @Method:
      @@Name:  getAttributeNS
      @@Description:
@@ -11327,7 +11840,7 @@ NodeTypeDef:
       $__r->{<H::infoset:children>} = [$__text];
       $__r->{<H::infoset:specified>} = true;
 
-  @Method:
+  @L2Method:
      @@Name:  removeAttributeNS
      @@Description:
        @@@lang:en
@@ -11397,32 +11910,135 @@ NodeTypeDef:
           @@@@For:
             ManakaiDOM:DOMXMLFeature
           @@@@@:
-            if ($self->{<H::mn:node>}->{<H::DOMCore:read-only>}) {
+          my $list;
+          __CODE{selectAttrNodeObjectForRemoveNS::
+            $element => $self,
+            $namespaceURI => $namespaceURI,
+            $localName => $localName,
+            $list => $list,
+          }__;
+          if ($list) {
+            if ($self->{<H::mn:node>}->{<H::c|read-only>}) {
               __EXCEPTION{
                 MDOMX:NOMOD_THIS::
               }__;
             }
-            my $r;
-            __CODE{selectAttrNodeObjectForRemoveNS}__;
-            if ($r) {
-              CORE::delete $r->{<H::infoset:ownerElement>};
-              $r-><M::NodeStem.orphanate>;
-            }
+         
+            ## Removes the attribute node
+            my $stem = $list->{$localName};
+            my $pfx = $stem->{<H::infoset:prefix>};
+            CORE::delete $list->{$localName};
+            CORE::delete $stem->{<H::infoset:ownerElement>};
+            $stem-><M::NodeStem.orphanate>;
+
+            ## Default attribute
+            my $name = defined $pfx ? $pfx.':'.$localName : $localName;
+            my $doc = $self-><AG::Node.ownerDocument>;
+            __CODE{t|generateDefaultAttribute::
+              $document => $doc,
+              $element_type => {$self-><AG::Node.nodeName>},
+              $element => $self,
+              $name => $name,
+            }__;
+          } # exists
          @@@@ImplNote:
            @@@@@lang:en
            @@@@@@:
-             TODO: default attribute
-           \
              Almost same as <M::ManakaiDOMAttributes.removeNamedItemNS>.
         @@@disDef:
           @@@@ForCheck:
             !ManakaiDOM:DOMXMLFeature
           @@@@DOMMain:raiseException:
             MDOMX:MDOM_IMPL_NOSUPPORT_XMLNS
-     @@For:
-       ManakaiDOM:DOM2
-     @@Level[list]:  2
-     @@SpecLevel:2
+
+    @@Test:
+      @@@ForCheck: ManakaiDOM|DOMXMLFeature
+      @@@QName: Element.removeAttributeNS.test
+      @@@PerlDef:
+        my $el;
+        __CODE{createElementForTest:: $el => $el}__;
+
+        $test->id ('remove.no.attr');
+        $el-><M::Element.removeAttributeNS> (null, 'at1');
+
+        $test->id ('set.attr');
+        $el-><M::Element.setAttributeNS> (null, at1 => 'value1');
+        my $v1 = $el-><M::Element.getAttributeNS> (null, 'at1');
+        $test->assert_equals ($v1, 'value1');
+
+        $test->id ('remove.attr');
+        $el-><M::Element.removeAttributeNS> (null, 'at1');
+        my $v2 = $el-><M::Element.getAttributeNS> (null, 'at1');
+        $test->assert_true (not defined $v2 or $v2 eq '');
+    @@Test:
+      @@@ForCheck: ManakaiDOM|DOMXMLFeature
+      @@@QName: Element.removeAttributeNS.global.test
+      @@@PerlDef:
+        my $el;
+        __CODE{createElementForTest:: $el => $el}__;
+
+        my $uri = 'http://example.com/';
+        $test->id ('remove.no.attr');
+        $el-><M::Element.removeAttributeNS> ($uri, 'at1');
+
+        $test->id ('set.attr');
+        $el-><M::Element.setAttributeNS> ($uri, at1 => 'value1');
+        my $v1 = $el-><M::Element.getAttributeNS> ($uri, 'at1');
+        $test->assert_equals ($v1, 'value1');
+
+        $test->id ('remove.attr');
+        $el-><M::Element.removeAttributeNS> ($uri, 'at1');
+        my $v2 = $el-><M::Element.getAttributeNS> ($uri, 'at1');
+        $test->assert_true (not defined $v2 or $v2 eq '');
+    @@L3Test:
+      @@@ForCheck: ManakaiDOM|DOMXMLFeature
+      @@@QName: Element.removeAttributeNS.defaultattr.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{createEmptyDocumentForTest:: $doc => $doc}__;
+        my $uri = 'http://www.example.com/';
+        my $docd = $doc-><M::Node.getFeature> (<Q::ManakaiDOM:XDoctype>, '3.0');
+        my $dtd = $docd-><M::d|DocumentXDoctype.createDocumentTypeDefinition>
+                           ('doctype');
+          my $et = $docd-><M::d|DocumentXDoctype.createElementTypeDefinition>
+                             ('et1');
+            my $at = $docd-><M::d|DocumentXDoctype.createAttributeDefinition>
+                               ('ns1:dattr1');
+            $at-><AS::ATDef.defaultType> (<C::ATDef.EXPLICIT_DEFAULT>);
+            $at-><AS::Node.textContent> ('dattr1 default ');
+          $et-><M::ETDef.setAttributeDefinitionNode> ($at);
+            my $at2 = $docd-><M::d|DocumentXDoctype.createAttributeDefinition>
+                               ('xmlns:ns1');
+            $at2-><AS::ATDef.defaultType> (<C::ATDef.EXPLICIT_DEFAULT>);
+            $at2-><AS::Node.textContent> ($uri);
+          $et-><M::ETDef.setAttributeDefinitionNode> ($at2);
+        $dtd-><M::DTDef.setElementTypeDefinitionNode> ($et);
+        $doc-><M::Node.appendChild> ($dtd);
+
+        $test->id ('created.default.value');
+        my $el = $doc-><M::Document.createElementNS> ($uri, 'et1');
+        $test->assert_equals ($el-><M::Element.getAttributeNS> ($uri, 'dattr1'),
+                              'dattr1 default ');
+        $test->assert_false ($el-><M::Element.getAttributeNodeNS>
+                                    ($uri, 'dattr1')
+                                -><AG::Attr.specified>);
+
+        $test->id ('set.attr');
+        $el-><M::Element.setAttributeNS>
+               ($uri, 'ns1:dattr1', 'non-default-value');
+        $test->assert_equals ($el-><M::Element.getAttributeNS> ($uri, 'dattr1'),
+                              'non-default-value');
+        $test->assert_true ($el-><M::Element.getAttributeNodeNS> ($uri, 'dattr1')
+                               -><AG::Attr.specified>);
+
+        $test->id ('remove.attr');
+        $el-><M::Element.removeAttributeNS> ($uri, 'dattr1');
+        $test->assert_equals ($el-><M::Element.getAttributeNS> ($uri, 'dattr1'),
+                              'dattr1 default ');
+        $test->assert_false ($el-><M::Element.getAttributeNodeNS>
+                                    ($uri, 'dattr1')
+                                -><AG::Attr.specified>);
+
   @Method:
      @@Name:  getAttributeNodeNS
      @@Description:
@@ -12281,13 +12897,24 @@ NodeTypeDef:
         @@@@@:
           A <IF::NamedNodeMap> object.
       @@@PerlDef:
-        __CODE{getNodeRef::
-          $object => {$self->{<H::mn:node>}},
-          $ref => $r,
-          $class => {
-            <ClassName::ManakaiDOMCore:ManakaiDOMAttributes>
-          },
+        __CODE{t|getAttrMap::
+          $node => $self,
+          $map => $r,
         }__;
+    @@Test:
+      @@@QName: Element.attributes.test
+      @@@PerlDef:
+        my $el;
+        __CODE{createElementForTest}__;
+        
+        my $as = $el-><AG::Node.attributes>;
+        $test->assert_isa ($as, <IFName::NamedNodeMap>);
+
+        $el-><M::Element.setAttribute> (at1 => 'value');
+        $test->assert_equals 
+                 ($as-><M::NamedNodeMap.getNamedItem> ('at1'),
+                  $el-><M::Element.getAttributeNode> ('at1'));
+
   @ReAttr:
     @@Name:baseURI
     @@Description:
@@ -12862,6 +13489,14 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type: test|StandaloneTest
     @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: L2Test
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: test|StandaloneTest
+    @@ForCheck: ManakaiDOM|ManakaiDOM2 ManakaiDOM|ForClass
 
 ElementTypeBinding:
   @Name: L3Test
@@ -13927,12 +14562,238 @@ NodeTypeDef:
             }__;
             $node->{<H::DOMCore:name>} = $tagName;
             $r = <ClassM::ManakaiDOMNode.getNodeReference> ($node);
+
+        ## Default attributes
+        __CODE{t|exposeDefaultAttributes::
+          $document => $self,
+          $element => $r,
+          $element_type => $tagName,
+        }__;
+
           @@@@ImplNote:
             @@@@@lang:en
             @@@@@@:
               TODO: <P::tagName> should be normalized to uppercases if HTML.
-            \
-              TODO: Default attribute should be implemented.
+    @@enImplNote:
+      {ISSUE::
+        Should <P::tagName> be parsed as QName?
+      }
+
+      {ISSUE::
+        Should we define <M::Document.createElement> as an alias
+        of <M::Document.createElementNS> with its <P::namespaceURI>
+        parameter set to <DOM::null> and its <P::qualifiedName>
+        parameter set to <P::tagName>, without <P::qualifiedName>-is-no-a-qname
+        error?  (It is what web browsers do.)
+      }
+
+    @@Test:
+      @@@QName: Document.createElement.nodefaultattr.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{createDocumentForTest:: $doc => $doc}__;
+
+        my $el = $doc-><M::Document.createElement> ('et1');
+
+        $test->assert_num_equals
+                 (actual_value => $el-><AG::Node.attributes>
+                                     -><AG::NamedNodeMap.length>,
+                  expected_value => 0);
+    @@Test:
+      @@@QName: Document.createElement.defaultattr.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docd = $doc-><M::Node.getFeature> (<Q::ManakaiDOM:XDoctype>, '3.0');
+        my $dtd = $docd-><M::d|DocumentXDoctype.createDocumentTypeDefinition>
+                           ('doctype');
+          my $et = $docd-><M::d|DocumentXDoctype.createElementTypeDefinition>
+                             ('et1');
+            my $at = $docd-><M::d|DocumentXDoctype.createAttributeDefinition>
+                               ('dattr1');
+            $at-><AS::ATDef.defaultType> (<C::ATDef.EXPLICIT_DEFAULT>);
+            $at-><AS::Node.textContent> ('dattr1 default ');
+          $et-><M::ETDef.setAttributeDefinitionNode> ($at);
+        $dtd-><M::DTDef.setElementTypeDefinitionNode> ($et);
+        $doc-><M::Node.appendChild> ($dtd);
+
+        my $el = $doc-><M::Document.createElement> ('et1');
+
+        $test->id ('attributes.length');
+        $test->assert_num_equals
+                 (actual_value => $el-><AG::Node.attributes>
+                                     -><AG::NamedNodeMap.length>,
+                  expected_value => 1);
+        
+        $test->id ('has.attribute');
+        $test->assert_true ($el-><M::Element.hasAttribute> ('dattr1'));
+
+        $test->id ('get.attr.node');
+        my $an = $el-><M::Element.getAttributeNode> ('dattr1');
+        $test->assert_isa ($an, <IFName::Attr>);
+
+        $test->id ('attr.text.content');
+        $test->assert_equals ($an-><AG::Node.textContent>, 'dattr1 default ');
+        
+        $test->id ('attr.specified');
+        $test->assert_false ($an-><AG::Attr.specified>);
+    @@Test:
+      @@@QName: Document.createElement.defaultattr.typed.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docd = $doc-><M::Node.getFeature> (<Q::ManakaiDOM:XDoctype>, '3.0');
+        my $dtd = $docd-><M::d|DocumentXDoctype.createDocumentTypeDefinition>
+                           ('doctype');
+          my $et = $docd-><M::d|DocumentXDoctype.createElementTypeDefinition>
+                             ('et1');
+            my $at = $docd-><M::d|DocumentXDoctype.createAttributeDefinition>
+                               ('dattr1');
+            $at-><AS::ATDef.defaultType> (<C::ATDef.EXPLICIT_DEFAULT>);
+            $at-><AS::Node.textContent> ('dattr1 default ');
+            $at-><AS::ATDef.declaredType> (<C::ATDef.NMTOKENS_ATTR>);
+          $et-><M::ETDef.setAttributeDefinitionNode> ($at);
+        $dtd-><M::DTDef.setElementTypeDefinitionNode> ($et);
+        $doc-><M::Node.appendChild> ($dtd);
+
+        my $el = $doc-><M::Document.createElement> ('et1');
+
+        $test->id ('attributes.length');
+        $test->assert_num_equals
+                 (actual_value => $el-><AG::Node.attributes>
+                                     -><AG::NamedNodeMap.length>,
+                  expected_value => 1);
+        
+        $test->id ('has.attribute');
+        $test->assert_true ($el-><M::Element.hasAttribute> ('dattr1'));
+
+        $test->id ('get.attr.node');
+        my $an = $el-><M::Element.getAttributeNode> ('dattr1');
+        $test->assert_isa ($an, <IFName::Attr>);
+
+        $test->id ('attr.text.content');
+        $test->assert_equals ($an-><AG::Node.textContent>, 'dattr1 default ');
+        
+        $test->id ('attr.specified');
+        $test->assert_false ($an-><AG::Attr.specified>);
+
+        $test->id ('attr.type');
+        my $ti = $an-><AG::Attr.schemaTypeInfo>;
+        $test->assert_equals
+                 ($ti-><AG::c|TypeInfo.typeNamespace>, <Q::xml-dtd:>);
+        $test->assert_equals ($ti-><AG::c|TypeInfo.typeName>, 'NMTOKENS');
+
+  @CODE:
+    @@QName: t|exposeDefaultAttributes
+    @@PerlDef:
+      @@@For: ManakaiDOM|DOM2 ManakaiDOM|DOMXMLFeature
+      @@@@:
+      __DEEP{
+        my $__doctype = $document-><AG::Document.doctype>;
+        $__doctype = $__doctype-><M::Node.getFeature>
+                                   (<Q::ManakaiDOM:XDoctype> => '3.0')
+          if $__doctype;
+        if ($__doctype) {
+          my $__et = $__doctype-><M::DTDef.getElementTypeDefinitionNode>
+                                   ($element_type);
+          if ($__et) {
+            local $document->{<H::mn:node>}
+                           ->{<H::c|strictErrorChecking>} = false;
+            my %__gattr;
+            my %__has_attr;
+            my %__pfx_to_uri;
+            for my $__at (@{$__et-><AG::ETDef.attributeDefinitions>}) {
+              my $__at_default = $__at-><AG::ATDef.defaultType>;
+              if ($__at_default == <C::ATDef.EXPLICIT_DEFAULT> or
+                  $__at_default == <C::ATDef.FIXED_DEFAULT>) {
+                my ($__nn1, $__nn2) = split /:/, $__at-><AG::Node.nodeName>;
+                if (defined $__nn2) { # prefixed
+                  if ($__nn1 eq 'xmlns') {
+                    ## TODO: NCName check, prefix check and NSURI check
+                    my $__attr = $document-><M::Document.createAttributeNS>
+                                              (<Q::xmlns:>, $__nn1.':'.$__nn2);
+                    for my $__at_child (@{$__at-><AG::Node.childNodes>}) {
+                      $__attr-><M::Node.appendChild>
+                                 ($__at_child-><M::Node.cloneNode> (true));
+                    }
+                    $__attr->{<H::mn:node>}->{<H::infoset:attributeType>}
+                      = $__at-><AG::ATDef.declaredType>;
+                    my $__nsuri = $__attr-><AG::Attr.value>;
+                    ## TODO: Namespace well-formedness check (NSURI), v1.1 chk
+                    $__pfx_to_uri{$__nn2} = $__nsuri;
+                    $element-><M::Element.setAttributeNodeNS> ($__attr);
+                             ## This method changes |specified| flag
+                    $__attr->{<H::mn:node>}->{<H::infoset:specified>} = false;
+                    $__has_attr{<Q::xmlns:>}->{$__nn2} = true;
+                  } else {
+                    ## TODO: NCName check
+                    $__gattr{$__nn1}->{$__nn2} = $__at;
+                  }
+                } else {            # no prefixed
+                  my $__attr;
+                  if ($__nn1 eq 'xmlns') {
+                    $__attr = $document-><M::Document.createAttributeNS>
+                                              (<Q::xmlns:>, 'xmlns');
+                    $__has_attr{<Q::xmlns:>}->{xmlns} = true;
+                  } else {
+                    $__attr = $document-><M::Document.createAttributeNS>
+                                              (null, $__nn1);
+                    ## TODO: NCName check
+                  }
+                  for my $__at_child (@{$__at-><AG::Node.childNodes>}) {
+                    $__attr-><M::Node.appendChild>
+                               ($__at_child-><M::Node.cloneNode> (true));
+                  }
+                  $__attr->{<H::mn:node>}->{<H::infoset:attributeType>}
+                    = $__at-><AG::ATDef.declaredType>;
+                  ## TODO: Namespace well-formedness check (NSURI)
+                  $element-><M::Element.setAttributeNodeNS> ($__attr);
+                             ## This method changes |specified| flag
+                  $__attr->{<H::mn:node>}->{<H::infoset:specified>} = false;
+                }
+              }
+            } # attrdefs
+            for my $__pfx (keys %__gattr) {
+              my $__nsuri = $__pfx_to_uri{$__pfx};
+              unless (defined $__nsuri) {
+                ## TODO: Namespace well-formedness error
+              }
+              LN: for my $__ln (keys %{$__gattr{$__pfx}}) {
+                if ($__has_attr{defined $__nsuri ? $__nsuri : ''}->{$__ln}) {
+                  ## TODO: Namespace well-formedness error
+                  next LN;
+                }
+                ## TODO: NCName check, prefix check and NSURI check
+                my $__at = $__gattr{$__pfx}->{$__ln};
+                my $__attr = $document-><M::Document.createAttributeNS>
+                                          ($__nsuri, $__pfx.':'.$__ln);
+                for my $__at_child (@{$__at-><AG::Node.childNodes>}) {
+                  $__attr-><M::Node.appendChild>
+                             ($__at_child-><M::Node.cloneNode> (true));
+                }
+                $__attr->{<H::mn:node>}->{<H::infoset:attributeType>}
+                  = $__at-><AG::ATDef.declaredType>;
+                $element-><M::Element.setAttributeNodeNS> ($__attr);
+                             ## This method changes |specified| flag
+                $__attr->{<H::mn:node>}->{<H::infoset:specified>} = false;
+                $__has_attr{defined $__nsuri ? $__nsuri : ''}->{$__ln} = true;
+              }
+            }
+          }
+        }
+      }__;
+    @@enImplNote:
+      {TODO:: Implementation for non-namespace-aware version.
+      }
+    @@enImplNote:
+      @@@: webbrowsers
+        Firefox 1.5 and Opera 9 Preview 1 do not add default attributes
+        by <M::Document.createElement> and <M::Document.createElementNS>.
+        Opera does not support default attribute addition at 
+        parsing time in internal subset neither.
+        Firefox does support it but <A::Attr.specified> of the default
+        attributes are set to <DOM::true>.
+
   @Method:
      @@Name:  createDocumentFragment
      @@Description:
@@ -14524,7 +15385,8 @@ NodeTypeDef:
      @@SpecLevel:2
      @@For:
        ManakaiDOM:DOM2
-  @Method:
+
+  @L2Method:
      @@Name:  createElementNS
      @@Description:
        @@@lang:en
@@ -14707,22 +15569,118 @@ NodeTypeDef:
             $node->{<H::infoset:prefix>} = $prefix;
             $node->{<H::infoset:localName>} = $lname;
             $r = <ClassM::ManakaiDOMNode.getNodeReference> ($node);
-          @@@@ImplNote:
-            @@@@@lang:en
-            @@@@@@:
-              TODO: Default attribute should be implemented.
+
+        ## Default attributes
+        __CODE{t|exposeDefaultAttributes::
+          $document => $self,
+          $element => $r,
+          $element_type => $qualifiedName,
+        }__;
         @@@disDef:
           @@@@ForCheck:
             !ManakaiDOM:DOMXMLFeature
           @@@@DOMMain:raiseException:
             MDOMX:MDOM_IMPL_NOSUPPORT_XMLNS
-    @@L2:
-    @@SpecLevel:2
-    @@Level[list]:
-      2
-      3
-    @@For:
-      ManakaiDOM:DOM2
+
+    @@Test:
+      @@@ForCheck: ManakaiDOM|DOMXMLFeature
+      @@@QName: Document.createElementNS.nodefaultattr.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{createEmptyDocumentForTest:: $doc => $doc}__;
+
+        my $el = $doc-><M::Document.createElementNS> (null, 'et1');
+
+        $test->assert_num_equals
+                 (actual_value => $el-><AG::Node.attributes>
+                                     -><AG::NamedNodeMap.length>,
+                  expected_value => 0);
+    @@Test:
+      @@@ForCheck: ManakaiDOM|DOMXMLFeature
+      @@@QName: Document.createElementNS.defaultattr.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docd = $doc-><M::Node.getFeature> (<Q::ManakaiDOM:XDoctype>, '3.0');
+        my $dtd = $docd-><M::d|DocumentXDoctype.createDocumentTypeDefinition>
+                           ('doctype');
+          my $et = $docd-><M::d|DocumentXDoctype.createElementTypeDefinition>
+                             ('et1');
+            my $at = $docd-><M::d|DocumentXDoctype.createAttributeDefinition>
+                               ('dattr1');
+            $at-><AS::ATDef.defaultType> (<C::ATDef.EXPLICIT_DEFAULT>);
+            $at-><AS::Node.textContent> ('dattr1 default ');
+          $et-><M::ETDef.setAttributeDefinitionNode> ($at);
+        $dtd-><M::DTDef.setElementTypeDefinitionNode> ($et);
+        $doc-><M::Node.appendChild> ($dtd);
+
+        my $el = $doc-><M::Document.createElementNS> (null, 'et1');
+
+        $test->id ('attributes.length');
+        $test->assert_num_equals
+                 (actual_value => $el-><AG::Node.attributes>
+                                     -><AG::NamedNodeMap.length>,
+                  expected_value => 1);
+        
+        $test->id ('has.attribute');
+        $test->assert_true ($el-><M::Element.hasAttribute> ('dattr1'));
+
+        $test->id ('get.attr.node');
+        my $an = $el-><M::Element.getAttributeNode> ('dattr1');
+        $test->assert_isa ($an, <IFName::Attr>);
+
+        $test->id ('attr.text.content');
+        $test->assert_equals ($an-><AG::Node.textContent>, 'dattr1 default ');
+        
+        $test->id ('attr.specified');
+        $test->assert_false ($an-><AG::Attr.specified>);
+    @@Test:
+      @@@ForCheck: ManakaiDOM|DOMXMLFeature
+      @@@QName: Document.createElementNS.defaultattr.typed.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docd = $doc-><M::Node.getFeature> (<Q::ManakaiDOM:XDoctype>, '3.0');
+        my $dtd = $docd-><M::d|DocumentXDoctype.createDocumentTypeDefinition>
+                           ('doctype');
+          my $et = $docd-><M::d|DocumentXDoctype.createElementTypeDefinition>
+                             ('et1');
+            my $at = $docd-><M::d|DocumentXDoctype.createAttributeDefinition>
+                               ('dattr1');
+            $at-><AS::ATDef.defaultType> (<C::ATDef.EXPLICIT_DEFAULT>);
+            $at-><AS::Node.textContent> ('dattr1 default ');
+            $at-><AS::ATDef.declaredType> (<C::ATDef.NMTOKENS_ATTR>);
+          $et-><M::ETDef.setAttributeDefinitionNode> ($at);
+        $dtd-><M::DTDef.setElementTypeDefinitionNode> ($et);
+        $doc-><M::Node.appendChild> ($dtd);
+
+        my $el = $doc-><M::Document.createElementNS> (null, 'et1');
+
+        $test->id ('attributes.length');
+        $test->assert_num_equals
+                 (actual_value => $el-><AG::Node.attributes>
+                                     -><AG::NamedNodeMap.length>,
+                  expected_value => 1);
+        
+        $test->id ('has.attribute');
+        $test->assert_true ($el-><M::Element.hasAttribute> ('dattr1'));
+
+        $test->id ('get.attr.node');
+        my $an = $el-><M::Element.getAttributeNode> ('dattr1');
+        $test->assert_isa ($an, <IFName::Attr>);
+
+        $test->id ('attr.text.content');
+        $test->assert_equals ($an-><AG::Node.textContent>, 'dattr1 default ');
+        
+        $test->id ('attr.specified');
+        $test->assert_false ($an-><AG::Attr.specified>);
+
+        $test->id ('attr.type');
+        my $ti = $an-><AG::Attr.schemaTypeInfo>;
+        $test->assert_equals
+                 ($ti-><AG::c|TypeInfo.typeNamespace>, <Q::xml-dtd:>);
+        $test->assert_equals ($ti-><AG::c|TypeInfo.typeName>, 'NMTOKENS');
+
   @Method:
      @@Name:  createAttributeNS
      @@Description:

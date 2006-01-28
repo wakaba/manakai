@@ -1,3 +1,22 @@
+2006-01-28  Wakaba  <wakaba@suika.fam.cx>
+
+	* DOMCore.dis (ErrDef): Missing |ecore:textFormatter| property added.
+
+	* DOMMain.dis (ErrDef): Missing |ecore:textFormatter| property added.
+
+	* Tree.dis (ErrDef): Missing |ecore:textFormatter| property added.
+	(ManakaiDOMAttributes): Removed.
+	(ManakaiDOMAttrMap): New class.
+	(ManakaiDOMAttrMapArray): New class.
+	(namespaceURI): Bug to return a string representation
+	of a reference to the namespace URI string is fixed.
+	(selectAttrNodeObject, selectAttrNodeObjectNodeNS): Reimplemented.
+	(removeAttribute, removeAttributeNS): DTD default attributes
+	are supported.  Don't throw |NO_MODIFICATION_ALLOWED_ERR|
+	if there is no attribute node.
+	(createElement, createElementNS): DTD default attributes are supported.
+	(setAttributeNode): Reimplemented.
+
 2006-01-27  Wakaba  <wakaba@suika.fam.cx>
 
 	* DOMCore.dis (ManakaiDOMDTDTypeInfo): New class.

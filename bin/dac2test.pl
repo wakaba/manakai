@@ -291,6 +291,10 @@ for (@{$Opt{create_module}}) {
         
         $pack->append_code ('} catch Message::Util::IF::DTException with {
           ##
+        } otherwise {
+          my $err = shift;
+          warn $err;
+          $test->not_ok;
         };');
 
       } elsif ($res->is_type_uri (ExpandedURI q<test:ParserTestSet>)) {
@@ -422,4 +426,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2006/01/23 12:43:33 $
+1; # $Date: 2006/01/28 16:24:44 $
