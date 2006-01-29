@@ -25,7 +25,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2006/01/21 17:37:51 $
+      $Date: 2006/01/29 07:09:25 $
     @@ContentType:
       dis:Date.RCS
   
@@ -1600,8 +1600,11 @@ IFClsETDef:
         A code fragment, which is counted lines. 
     @@Return:
       @@@PerlDef:
-        $self->{<H::mn:node>}->{<H::pc:currentSourceLine>}
-                            += ($codeArg =~ tr/\x0A/\x0A/);
+        __DEEP{
+          $self-><AS::PerlCodeStatements.currentSourceLine>
+                   ($self-><AG::PerlCodeStatements.currentSourceLine>
+                        + ($codeArg =~ tr/\x0A/\x0A/));
+        }__;
 
   @ATTR:
     @@Name: label
@@ -1966,7 +1969,7 @@ IFClsETDef:
           No prototype declaration. 
 
     @@Test:
-      @@@ForCheck: ManakaiDOM|ForClass
+      @@@QName: PCSub.prototype.empty.test
       @@@enDesc:
         Getting value after setting empty value must return an empty string.
       @@@PerlDef:
@@ -2014,6 +2017,7 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: test|StandaloneTest
+    @@ForCheck: ManakaiDOM|ForClass
 
 XParamDef:
   @QName: parentNode
@@ -4374,12 +4378,36 @@ IFClsDef:
               }
               $r-><M::Node.appendChild> ($vo);
             }
-          } else {
+          } elsif (defined $value) {
             $r = $self-><M::Document.createElementNS>
                    (<Q::pc:>, 'stringLiteral');
             $r-><AS::Node.textContent> ($value);
+          } else {
+            $r = $self-><M::Document.createElementNS>
+                          (<Q::pc:>, 'atom');
+            $r-><AS::Node.textContent> ('undef');
           }
         }__;
+    @@Test:
+      @@@QName: PCDocument.createPCLiteral.undef.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{createPCDocumentForTest:: $doc => $doc}__;
+
+        $test->id ('undef.element');
+        my $e1 = $doc-><M::PCDocument.createPCLiteral> (null);
+        $test->assert_isa ($e1, <IFName::PerlAtom>);
+        $test->assert_equals ($e1-><AG::Node.textContent>, 'undef');
+
+        $test->id ('string.empty.element');
+        my $e2 = $doc-><M::PCDocument.createPCLiteral> ('');
+        $test->assert_isa ($e2, <IFName::PerlStringLiteral>);
+        $test->assert_equals ($e2-><AG::Node.textContent>, '');
+
+        $test->id ('string.zero.element');
+        my $e3 = $doc-><M::PCDocument.createPCLiteral> ('0');
+        $test->assert_isa ($e3, <IFName::PerlStringLiteral>);
+        $test->assert_equals ($e3-><AG::Node.textContent>, '0');
 
   @Method:
     @@Name: createPCNumberLiteral
@@ -4619,6 +4647,14 @@ IFClsDef:
             $r = $self-><M::Document.createElementNS> (<Q::pc:>, 'sub');
             $r-><M::PerlSub.addPerlName> ($subName) if defined $subName;
           }__;
+
+  @ResourceDef:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@QName: createPCDocumentForTest
+    @@rdf:type: DISPerl|BlockCode
+    @@PerlDef:
+      my $impl = <Class::ManakaiPCImplementation>->_new;
+      $doc = $impl-><M::DOMImpl.createDocument> (<Q::pc:>, 'file');
 ##PCDocument
 
 ## -- Implementation

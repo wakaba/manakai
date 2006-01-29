@@ -42,7 +42,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/01/25 12:21:48 $
+      $Date: 2006/01/29 07:09:24 $
     @@ContentType:
       dis:Date.RCS
 
@@ -56,6 +56,8 @@ Module:
 Namespace:
   @c:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
+  @d:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/xdt#
   @dis:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
   @doc:
@@ -70,6 +72,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dis/XML#
   @f:
     http://suika.fam.cx/~wakaba/archive/2004/dom/feature#
+  @idl:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/IDL#
   @infoset:
      http://www.w3.org/2001/04/infoset#
   @kwd:
@@ -94,6 +98,10 @@ Namespace:
     http://www.w3.org/2000/01/rdf-schema#
   @t:
     http://suika.fam.cx/~wakaba/archive/2004/dom/tree#
+  @test:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Test#
+  @x:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/xml#
 
 ElementTypeBinding:
   @Name: NodeTypeDef
@@ -218,6 +226,14 @@ ElementTypeBinding:
     @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|DOM3
 
 ElementTypeBinding:
+  @Name: LXAttr
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|Attribute
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|ManakaiDOMLatest
+
+ElementTypeBinding:
   @Name: IntAttr
   @ElementType:
     dis:ResourceDef
@@ -247,6 +263,14 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|AttributeSet
+
+ElementTypeBinding:
+  @Name: LXSet
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|AttributeSet
+    @@ForCheck: ManakaiDOM|ManakaiDOMLatest
 
 ElementTypeBinding:
   @Name: InCase
@@ -1504,12 +1528,53 @@ NodeTypeDef:
   @DISLang:role: 
     DOMCore:EntityRole
 
-  @Description:
-    @@lang:en
+  @enDesc:
+    An object implementing the <IF::Entity> interface represents
+    a known entity, either parsed or unparsed, in an XML document.
+
+     {NOTE:: The <IF::Entity> interface models the entity itself,
+             <EM::not> the entity declaration.
+     }
+
+    An <IF::Entity> node does not have any parent.
+
+  @enDesc:
+    @@ddid: ns
+    @@For: ManakaiDOM|DOM2
     @@@:
-      A general entity, not entity declaration, either parsed or unparsed, 
-      or either internal or external.
-    \
+      If the entity contains an unbound namespace prefix, the
+      <A::t|Node.namespaceURI> of the corresponding node in
+      the <IF::Entity> subtree is <DOM::null>.  The same is
+      true for an <IF::EntityReference> node that refers to such an
+      entity, when they are created using the
+      <M::t|Document.createEntityReference> method.
+  @enDesc:
+    @@ddid: edit
+    @@@:
+      DOM levels 3 or earlier do not support editing of <IF::Entity>
+      nodes.  <IF::Entity> nodes and all their descendants are read-only.
+  @enDesc:
+    @@ddid: editm
+    @@For: ManakaiDOM|ManakaiDOM
+    @@@:
+      In the manakai implementation, <IF::Entity> nodes and 
+      their descendants are <EM::not> read-only unless their
+      read-only flag is turned on at the time of creation
+      (or later).
+
+      Any modification to <IF::Entity> subtree or possible
+      removal of the <IF::Entity> node itself will cause
+      inconsistency between <IF::Entity> and <IF::EntityReference>
+      subtrees.  It should be fixed by <M::t|Document.normalizeDocument>
+      method if desired.
+  
+      Some change make a document invalid or even not well-formed.
+      For example, setting <A::Entity.notationName> attribute
+      might make a node unparsed entity and any reference to that 
+      entity is an error.  An external entity with its
+      <A::Entity.sustemId> set to <DOM::null> is unserializable.
+
+
       When the replacement text of the entity is available, 
       the child list of the <IF::Entity> node represents the structure 
       of that replacement value (assuming that the replacement text would be 
@@ -1522,134 +1587,113 @@ NodeTypeDef:
       all <IF::Entity> nodes and their descendants are read-only.
     \
       An <IF::Entity> node does not have any parent.
+
   @Attr:
-     @@Name:  publicId
-     @@Description:
-       @@@lang:en
-       @@@@: The public identifier associated with the entity.
-     @@Get:
-        @@@Type:  
-          DOMMain:DOMString
-        @@@Description:
-          @@@@lang:en
-          @@@@@: The public identifier.
-        @@@InCase:
-          @@@@Value:
-            @@@@@is-null:1
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@: The public identifier is not specified.
-        @@@disDef:
-          @@@@GetProp:
-            infoset:publicIdentifier
+    @@Name: publicId
+    @@enDesc:
+      The public identifier associated with the entity.
+    @@nullCase:
+      @@@enDesc:
+        If no public identifier is associated.
+    @@Type: DOMString
+    @@Get:
+      @@@disDef:
+        @@@@GetProp: infoset|publicIdentifier
+    @@LXSet:
+      @@@disDef:
+        @@@@SetProp:
+          @@@@@@: infoset|publicIdentifier
+          @@@@@CheckReadOnly: 1
+
   @Attr:
-     @@Name:  systemId
-     @@Description:
-        @@@lang:en
-        @@@@: The system identifier associated with the entity.
-     @@Get:
-        @@@Type:  
-          DOMMain:DOMString
-        @@@Description:
-          @@@@lang:en
-          @@@@@: The system identifier.
-        @@@InCase:
-          @@@@Value:
-            @@@@@is-null:1
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@: The system identifier is not specified.
-        @@@disDef:
-          @@@@GetProp:
-            infoset:systemIdentifier
+    @@Name: systemId
+    @@enDesc:
+      The system identifier associated with the entity.
+    @@Type: DOMString
+    @@nullCase:
+      @@@enDesc:
+        No system identifier is associated.
+    @@Get:
+      @@@disDef:
+        @@@@GetProp: infoset|systemIdentifier
+    @@LXSet:
+      @@@disDef:
+        @@@@SetProp:
+          @@@@@@: infoset|systemIdentifier
+          @@@@@CheckReadOnly: 1
+
   @Attr:
-     @@Name:  notationName
-     @@Description:
-       @@@lang:en
-       @@@@: The name of the notation for the entity.
-     @@Get:
-        @@@Type:  
-          DOMMain:DOMString
-        @@@Description:
-          @@@@lang:en
-          @@@@@: The notation name.
-        @@@InCase:
-          @@@@Value:
-            @@@@@is-null:1
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@: This entity is a parsed entity.
-        @@@disDef:
-          @@@@GetProp:
-            infoset:notationName
-  @Attr:
-     @@Name:  inputEncoding
-     @@Description:
-       @@@lang:en
-       @@@@: The encoding used for this entity at the time of parsing.
-     @@Get:
-        @@@Type:  
-          DOMMain:DOMString
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            The encoding used for this entity.
-        @@@InCase:
-          @@@@Value:
-            @@@@@is-null:1
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              Either the entity is from the internal subset or 
-              the input encoding is not known.
-          @@@@ImplNote:
-            @@@@@lang:en
-            @@@@@@:
-              Is it mean that even the internal entity declared in the external 
-              entity might have the input encoding!?
-         @@@disDef:
-           @@@@GetProp:
-             infoset:characterEncodingScheme
-     @@Level[list]:  3
-     @@SpecLevel:3
-     @@L3:
-  @Attr:
-     @@Name:  xmlEncoding
-     @@Description:
-       @@@lang:en
-       @@@@:
-         The encoding of this entity, as specified in the text declaration.
-     @@Get:
-        @@@Type:  
-          DOMMain:DOMString
-        @@@Description:
-          @@@@lang:en
-          @@@@@: The encoding name.
-        @@@InCase:
-          @@@@Value:
-            @@@@@is-null:1
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              This is not an external parsed entity.
-        @@@ImplNote:
-          @@@@lang:en
-          @@@@@: 
-            The encoding declaration is required if the text declaration 
-            is used, but the text declaration itself is not required. 
-        @@@disDef:
-          @@@@GetProp:
-            DOMCore:xmlEncoding
-     @@Level[list]:  3
-     @@SpecLevel:3
-     @@L3:
-  @Attr:
-     @@Name:  xmlVersion
-     @@Description:
-       @@@lang:en
-       @@@@:
-         The XML version number of this entity, as specified in the 
-         text declaration.
+    @@Name: notationName
+    @@enDesc:
+      The name of the notation for the entity.
+    @@Type: DOMString
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          If it is a parsed entity.
+      @@@disDef:
+        @@@@GetProp: infoset|notationName
+    @@LXSet:
+      @@@disDef:
+        @@@@SetProp:
+          @@@@@@: infoset|notationName
+          @@@@@CheckReadOnly: 1          
+
+  @L3Attr:
+    @@Name: inputEncoding
+    @@enDesc:
+      The encoding used for the entity at the time of parsing,
+      when it is an external parsed entity.
+    @@Type: DOMString
+    @@enImplNote:
+      What type of value?
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          @@@@@For: !ManakaiDOM|ManakaiDOM
+          @@@@@@:
+            If it is an entity from the internal subset or if the
+            encoding is not known.
+          @@@@@enImplNote:
+            This is not clear.
+        @@@@enDesc:
+          @@@@@For: ManakaiDOM|ManakaiDOM
+          @@@@@@:
+            If the entity is an internal entity or an unparsed entity,
+            or if the character encoding name of the entity is not known
+            to the DOM implementation.
+      @@@disDef:
+        @@@@GetProp: infoset|characterEncodingScheme
+
+  @L3Attr:
+    @@Name: xmlEncoding
+    @@enDesc:
+      The encoding of the entity specified in the text declaration.
+    @@nullCase:
+      @@@enDesc:
+        If it is an external parsed entity.
+    @@nullCase:
+      @@@For: ManakaiDOM|ManakaiDOM
+      @@@enDesc:
+        If there is no text declaration.
+    @@Type: DOMString
+    @@Get:
+      @@@disDef:
+        @@@@GetProp: c|xmlEncoding
+
+  @L3Attr:
+    @@Name: xmlVersion
+    @@enDesc:
+      The XML version of the entity specified in the text declaration.
+    @@nullCase:
+      @@@enDesc:
+        If it is not an exparsed entity.
+    @@nullCase:
+      @@@For: ManakaiDOM|ManakaiDOM
+      @@@enDesc:
+        If the entity has no text declaration.
+      @@@enImplNote:
+        Should any default value provided? Or <DOM::null>?
      @@ImplNote:
         @@@lang:en
         @@@@:
@@ -1657,39 +1701,22 @@ NodeTypeDef:
           other than those versioned as XML 1.0.  XML 1.1 document 
           can use both XML 1.0 and XML 1.1 entities, but both interpreted 
           as XML 1.1 entities.
-     @@Get:
-        @@@Type:  
-          DOMMain:DOMString
-        @@@Description:
-          @@@@lang:en
-          @@@@@: The version number.
-        @@@InCase:
-          @@@@Value:
-            @@@@@is-null:1
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@: 
-              This is not an external parsed entity.
-        @@@ImplNote:
-          @@@@lang:en
-          @@@@@:
-            The XML Specifications allows the text declaration omitted. 
-            Does the DOM implementation need to provide the default value? 
-            What's the default value?
-        @@@disDef:
-          @@@@GetProp:
-            infoset:version
-     @@Level[list]:  3
-     @@L3:
-     @@ImplNote:
-       @@@lang:en
-       @@@@:
-         Need consideration for the internal structure of the 
-         XML and text declarations.  See <A::DOMCore:Document.xmlEncoding> and 
-         <A::DOMCore:Document.xmlVersion> attributes defined in the 
-         <Module::MDOM:DOMCore> module.
+    @@Type: DOMString
+    @@Get:
+      @@@disDef:
+        @@@@GetProp: infoset|version
+    @@LXSet:
+      @@@disDef:
+        @@@@SetProp:
+          @@@@@@: infoset|version
+          @@@@@CheckReadOnly: 1
+      @@@enImplNote:
+        {ISSUE::
+          Should <X::c|DOMException.NOT_SUPPORTED_ERR> be thrown?
+        }
   
-  @ReAttr:
+  @L3Attr:
+    @@ForCheck: ManakaiDOM|ForClass
     @@Name: baseURI
     @@Description:
       @@@lang:en
@@ -1698,11 +1725,9 @@ NodeTypeDef:
         \
         For the <IF::Entity> node, it is the <InfosetP::declaration base URI> 
         of the <InfoItem::unparsed entity information item>.
+    @@Type: DOMString
+    @@dis:actualType: ManakaiDOM|ManakaiDOMURI
     @@Get:
-      @@@Type:
-        DOMMain:DOMString
-      @@@actualType:
-        ManakaiDOM:ManakaiDOMURI
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -1718,9 +1743,7 @@ NodeTypeDef:
       @@@disDef:
         @@@@GetProp:
           infoset:declarationBaseURI
-    @@SpecLevel:3
-    @@Level:3
-    @@L3:
+
   @ReMethod:
      @@Name:  lookupPrefix
      @@Description:
@@ -1764,22 +1787,19 @@ NodeTypeDef:
      @@Level[list]:  3
      @@SpecLevel:3
      @@L3:
-  @ReAttr:
+
+  @Attr:
+    @@ForCheck: ManakaiDOM|ForClass
     @@Name: nodeName
-    @@Description:
-      @@@lang:en
-      @@@@: The node name.
+    @@enDesc:
+      The name of the node.  For an <IF::Entity> node, the attribute
+      contains the name of the entity.
     @@DOMMain:isNamespaceUnaware:1
+    @@Type: DOMString
     @@Get:
-      @@@Type: 
-        DOMMain:DOMString
-      @@@Description:
-        @@@@lang:en
-        @@@@@: The entity name.
       @@@disDef:
-        @@@@GetProp:
-          DOMCore:name
-    @@Redefine: Node
+        @@@@GetProp: c|name
+
   @ReAttr:
     @@Name: nodeType
     @@Description:
@@ -1799,6 +1819,78 @@ NodeTypeDef:
       @@@disDef:
         @@@@DISLang:constValue:
           DOMCore:Node.ENTITY_NODE
+
+  @LXAttr:
+    @@Name: hasReplacementTree
+    @@enDesc:
+      Whether the structure of the replacement text is available
+      via the child list of the node or not.
+
+      When the replacement text of a general entity is available,
+      the corresponding <IF::Entity> node's child list represents
+      the structure of the replacement value.  Otherwise, the child
+      list is empty.
+
+        {NOTE::
+          When this attribute contains <DOM::false> value, then
+          the child list of the node, even if it is not empty, 
+          should be ignored for e.g. creation of an entity reference
+          subtree or serialization.
+        }
+    @@Type: idl|boolean||ManakaiDOM|all
+    @@Get:
+      @@@TrueCase:
+        @@@@enDesc:
+          If the entity is a general parsed entity and whose
+          replacement tree is available.
+      @@@FalseCase:
+        @@@@enDesc:
+          Otherwise.
+      @@@disDef:
+        @@@@GetProp: x|hasReplacementTree
+    @@Set:
+      @@@disDef:
+        @@@@SetProp:
+          @@@@@@: x|hasReplacementTree
+          @@@@@CheckReadOnly: 1
+      @@@enImplNote:
+        {ISSUE::
+           Should this modificataion be allowed?
+        }
+
+  @LXAttr:
+    @@Name: ownerDocumentTypeDefinition
+    @@enDesc:
+      The document type definition node to which the entity is attached.
+    @@Type: d|DocumentTypeDefinition
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          The entity is not attached to any document type.
+      @@@PerlDef:
+        $r = <ClassM::t|ManakaiDOMNode.getNodeReference>
+               ($self->{<H::mn:node>}->{<H::d|ownerDefinition>})
+          if $self->{<H::mn:node>}->{<H::d|ownerDefinition>};
+    @@LXTest:
+      @@@QName: Entity.ownerDTDef.test
+      @@@PerlDef:
+        my $et;
+        __CODE{d|newGeneralEntityForTest}__;
+ 
+        my $odt = $et-><AG::x|Entity.ownerDocumentTypeDefinition>;
+        $test->assert_null ($odt);
+
+        my $dt = $et-><AG::t|Node.ownerDocument>
+                     -><M::t|Node.getFeature> (<Q::ManakaiDOM:XDoctype>)
+                     -><M::d|DocumentXDoctype.createDocumentTypeDefinition>
+                         ('dt1');
+        $test->assert_not_null ($dt);
+        $dt-><M::d|DocumentTypeDefinition.setGeneralEntityNode> ($et);
+
+        my $odt2 = $et-><AG::x|Entity.ownerDocumentTypeDefinition>;
+        $test->assert_not_null ($odt2);
+        $test->assert_isa ($odt2, <IFName::d|DocumentTypeDefinition>);
+        $test->assert_equals ($odt2, $dt);
 
   @IntMethod:
     @@Name: newObject
@@ -1830,7 +1922,8 @@ NodeTypeDef:
          Other available properties: <Q::infoset:declarationBaseURI>, 
          <Q::DOMCore:read-only>,
          <Q::ManakaiDOM:isExpanded>, <Q::ManakaiDOM:isExternallyDeclared>, 
-         <Q::ManakaiDOM:isExternalEntity>.
+         <Q::x|hasReplacementTree>,
+         <Q::d|ownerDefinition>.
          \
          Other available properties (for external entity): 
          <Q::DOMCore:documentURI>, <Q::infoset:publicIdentifier>,
@@ -1841,6 +1934,7 @@ NodeTypeDef:
 
   @mn:xrefnode0: DOMCore|ownerDocument
   @mn:subnode1: infoset|children
+  @mn:origin0: d|ownerDefinition
 
   @Method:
      @@Name:  getFeature
@@ -1907,22 +2001,37 @@ NodeTypeDef:
                 }
               }
             }
-
-
-  @Attr:
-    @@Name: childNodes
-    @@ForCheck: ManakaiDOM|ForClass
-    @@enDesc:
-      A list of nodes that contains all children of the node.
-    @@Get:
-      @@@Type: DOMCore|NodeList
-      @@@actualType: DOMCore|ManakaiDOMEmptyNodeList
-      @@@enDesc:
-        Since <IF::DOMCore|CharacterData> nodes cannot have any child nodes,
-        the node list is always empty.
-      @@@PerlDef:
-        $r = <Class::DOMCore|ManakaiDOMEmptyNodeList>->new;
 ##Entity
+
+PropDef:
+  @QName: x|hasReplacementTree
+  @enDesc:
+    Whether an entity node has its replacement tree or not.
+  @DOMCore:nodeProp: rep
+
+ElementTypeBinding:
+  @Name: Test
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: test|StandaloneTest
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: L3Test
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: test|StandaloneTest
+    @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM3
+
+ElementTypeBinding:
+  @Name: LXTest
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: test|StandaloneTest
+    @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
 
 NodeTypeDef:
   @IFQName: EntityReference
@@ -1951,6 +2060,13 @@ NodeTypeDef:
       Note that <IF::EntityReference> nodes may cause normalization 
       problems when the normalization is performed after 
       entity references are expanded.
+
+        {NOTE:: An XML processor may choose to completely expand
+                entities before the structure model is passed to the
+                DOM implementation; in this case there will be
+                no <IF::EntityReference> nodes in the document tree.
+        }
+
   @ImplNote:
     @@lang:en
     @@@:
@@ -1967,6 +2083,21 @@ NodeTypeDef:
       evaluation of the children of the <IF::EntityReference>.
       For example, calling the <A::DOMCore:Node.childNodes>
       method might trigger the evaluation.
+
+  @LXAttr:
+    @@Name: isExpanded
+    @@enDesc:
+      Whether the reference is expanded so that its children list
+      represents a part of the document.
+    @@Type: idl|boolean||ManakaiDOM|all
+    @@Get:
+      @@@disDef:
+        @@@@GetProp: ManakaiDOM|isExpanded
+    @@enImplNote:
+      {ISSUE::
+        Should setter be provided?  Or, any node modification
+        should turn the flag on as <A::t|Attr.specified>?
+      }
   
   @ReAttr:
     @@Name: baseURI
@@ -2072,6 +2203,30 @@ NodeTypeDef:
   @mn:origin0: infoset|parent
   @mn:subnode1: infoset|children
 ##EntityReference
+
+ElementTypeBinding:
+  @Name: TrueCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:InCase
+    @@Value:
+      @@@@: 1
+      @@@ContentType: DISCore|Boolean
+    @@Type: idl|boolean||ManakaiDOM|all
+
+ElementTypeBinding:
+  @Name: FalseCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:InCase
+    @@Value:
+      @@@@: 0
+      @@@ContentType: DISCore|Boolean
+    @@Type: idl|boolean||ManakaiDOM|all
 
 NodeTypeDef:
   @IFQName: ProcessingInstruction

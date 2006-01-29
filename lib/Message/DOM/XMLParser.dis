@@ -10,7 +10,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/01/27 16:24:37 $
+    $Date: 2006/01/29 07:09:25 $
 
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
@@ -3918,6 +3918,26 @@ _
           element {
             namespace-uri: null;
             local-name: 'a';
+            attribute {
+              node-name: 'at3';
+              text-content: 'value3';
+              specified: false;
+            }
+            attribute {
+              node-name: 'at4';
+              text-content: 'value4';
+              specified: false;
+            }
+            attribute {
+              node-name: 'at5';
+              text-content: 'value5';
+              specified: false;
+            }
+            attribute {
+              node-name: 'at6';
+              text-content: 'value6';
+              specified: false;
+            }
           }
         }
 
@@ -3952,6 +3972,11 @@ _
           element {
             namespace-uri: null;
             local-name: 'a';
+            attribute {
+              node-name: 'at';
+              text-content: '  default ' U+000A 'value  ';
+              specified: false;
+            }
           }
         }
     @@XMLTest:
@@ -3985,6 +4010,11 @@ _
           element {
             namespace-uri: null;
             local-name: 'a';
+            attribute {
+              node-name: 'at';
+              text-content: '  default ' U+000A 'value  ';
+              specified: false;
+            }
           }
         }
 
@@ -4011,6 +4041,7 @@ _
                 data: '  at  value  ';
               }
               schema-type-info: TypeInfo (null, null);
+              specified: true;
             }
           }
         }
@@ -4042,6 +4073,7 @@ _
               }
               schema-type-info:
                 TypeInfo ('http://www.w3.org/TR/REC-xml', 'CDATA');
+              specified: true;
             }
           }
         }
@@ -4073,6 +4105,7 @@ _
               }
               schema-type-info:
                 TypeInfo ('http://www.w3.org/TR/REC-xml', 'NMTOKEN');
+              specified: true;
             }
           }
         }
@@ -4086,8 +4119,10 @@ _
         document {
           element {
             attribute {
+              node-name: 'at';
               value: '  at ' U+000A 'value  ';
               schema-type-info: TypeInfo (null, null);
+              specified: true;
             }
           }
         }
@@ -4102,6 +4137,7 @@ _
             attribute {
               value: '  at ' U+000D 'value  ';
               schema-type-info: TypeInfo (null, null);
+              specified: true;
             }
           }
         }
@@ -4114,8 +4150,79 @@ _
         document {
           element {
             attribute {
+              node-name: 'at';
               value: '  at ' U+0009 'value  ';
               schema-type-info: TypeInfo (null, null);
+              specified: true;
+            }
+          }
+        }
+
+    @@XMLTest:
+      @@@QName: xp.doctype.attr.specified.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+            <!ATTLIST a
+              at  CDATA  "default"
+            >
+          ]>
+          <a></a>
+      @@@test:domTree:
+        document {
+          document-type { }
+          element {
+            attribute {
+              node-name: 'at';
+              value: 'default';
+              specified: false;
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.doctype.attr.specified.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+            <!ATTLIST a
+              at  CDATA  "default"
+            >
+          ]>
+          <a at2="specified"></a>
+      @@@test:domTree:
+        document {
+          document-type { }
+          element {
+            attribute {
+              node-name: 'at';
+              value: 'default';
+              specified: false;
+            }
+            attribute {
+              node-name: 'at2';
+              value: 'specified';
+              specified: true;
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.doctype.attr.specified.3.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+            <!ATTLIST a
+              at  CDATA  "default"
+            >
+          ]>
+          <a at="specified"></a>
+      @@@test:domTree:
+        document {
+          document-type { }
+          element {
+            attribute {
+              node-name: 'at';
+              value: 'specified';
+              specified: true;
             }
           }
         }

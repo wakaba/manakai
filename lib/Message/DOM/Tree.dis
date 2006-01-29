@@ -12,7 +12,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/01/28 16:24:45 $
+    $Date: 2006/01/29 07:09:25 $
 
   @Require:
     @@Module:
@@ -6604,15 +6604,6 @@ ForDef:
 
 ForDef:
   @QName:
-    DOMCore:ForEntityMap
-  @Description:
-    @@lang:en
-    @@@:
-      For <ClassM::ManakaiDOMXML:ManakaiDOMEntities> class.
-  @ISA: ManakaiDOM|ForClass
-
-ForDef:
-  @QName:
     DOMCore:ForNotationMap
   @Description:
     @@lang:en
@@ -6630,6 +6621,12 @@ ForDef:
   @QName: t|ForATMap
   @enDesc:
     For attribute definition list named node map class.
+  @ISA: ManakaiDOM|ForClass
+
+ForDef:
+  @QName: t|ForEntityMap
+  @enDesc:
+    For entity list named node map class.
   @ISA: ManakaiDOM|ForClass
 
 ResourceDef:
@@ -6659,35 +6656,6 @@ ResourceDef:
   @f:implements:
     @@@: c|CoreFeature30
     @@ForCheck: ManakaiDOM|DOM3
-
-  @resourceFor:
-    @@@: c|ForEntityMap
-    @@For:
-      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
-  @QName:
-    @@@: 
-      ManakaiDOMXML:ManakaiDOMEntities
-    @@ForCheck: c|ForEntityMap
-  @ISA:
-    @@@: ManakaiNode|ManakaiNodeRef||ManakaiDOM|Perl
-    @@ForCheck:
-      DOMCore:ForEntityMap
-
-  @DOMMain:implementFeature:
-    @@@: 
-      DOMXML:XMLFeature10
-    @@ForCheck:
-      c|ForEntityMap ManakaiDOM:DOM1
-  @DOMMain:implementFeature:
-    @@@: 
-      DOMXML:XMLFeature20
-    @@ForCheck:
-      c|ForEntityMap ManakaiDOM:DOM2
-  @DOMMain:implementFeature:
-    @@@: 
-      DOMXML:XMLFeature30
-    @@ForCheck:
-      c|ForEntityMap ManakaiDOM:DOM3
 
   @resourceFor:
     @@@: c|ForNotationMap
@@ -6746,6 +6714,29 @@ ResourceDef:
   @f:implements:
     @@@: d|Feature30
     @@ForCheck: t|ForATMap ManakaiDOM|DOM3
+
+  @resourceFor:
+    @@@: t|ForEntityMap
+    @@ForCheck: ManakaiDOM|ManakaiDOM1 ManakaiDOM|DOMXMLFeature
+  @QName:
+    @@@: t|ManakaiDOMEntityMap
+    @@ForCheck: t|ForEntityMap
+
+  @f:implements:
+    @@@: x|XMLFeature10
+    @@ForCheck: t|ForEntityMap ManakaiDOM|DOM1
+  @f:implements:
+    @@@: x|XMLFeature20
+    @@ForCheck: t|ForEntityMap ManakaiDOM|DOM2
+  @f:implements:
+    @@@: x|XMLFeature30
+    @@ForCheck: t|ForEntityMap ManakaiDOM|DOM3
+  @f:implements:
+    @@@: x|XMLVersionFeature10
+    @@ForCheck: t|ForEntityMap ManakaiDOM|DOM3
+  @f:implements:
+    @@@: x|XMLVersionFeature11
+    @@ForCheck: t|ForEntityMap ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeatureXML11
 
   @rdf:type:
     @@@: DISLang|Class
@@ -6808,17 +6799,6 @@ ResourceDef:
       <A::d|DocumentTypeDefinition.notations>, and
       <A::d|ElementTypeDefinition.attributeDefinitions> attributes
       are <IF::NamedNodeMap>s.
-
-  @enDesc:
-    @@ForCheck: c|ForEntityMap
-    @@@:
-      The <Class::ManakaiDOMXML|ManakaiDOMEntities> class represents
-      a collection of the general entities, both external and internal
-      and both parsed and unparsed, declared in the DTD of the document.
-
-      {NOTE:: Parameter entities and dupulicating (so that ignored) 
-              entity declarations are not part of the collection.
-      }
 
   @ImplNote:
     @@lang:en
@@ -6911,6 +6891,70 @@ ResourceDef:
         
         $test->id ('setNamedItem.2');
         my $et2 = $doc-><M::Document.createAttribute> ('et2');
+        $em-><M::NamedNodeMap.setNamedItem> ($et2);
+
+        $test->id ('keys.2');
+        @keys = keys %$em;
+        $test->assert_num_equals
+                 (actual_value => 0 + @keys,
+                  expected_value => 2);
+        $test->assert_not_equals ($keys[0], $keys[1]);
+        $test->assert_true ($keys[0] eq 'et1' or $keys[0] eq 'et2');
+        $test->assert_true ($keys[1] eq 'et1' or $keys[1] eq 'et2');
+        
+        $test->id ('delete');
+        delete $em->{et1};
+        $test->assert_false (exists $em->{et1});
+        $test->assert_true (exists $em->{et2});
+
+        $test->id ('clear');
+        %$em = ();
+        $test->assert_num_equals
+                 (actual_value => 0 + keys %$em,
+                  expected_value => 0);
+
+    @@XDTest:
+      @@@ForCheck: t|ForEntityMap
+      @@@QName: EntityMap.P.test
+      @@@PerlDef:
+        my $dtd;
+        __CODE{d|newDoctypeForTest}__;
+        my $doc = $dtd-><AG::Node.ownerDocument>;
+        my $em = $dtd-><AG::d|DocumentTypeDefinition.generalEntities>;
+
+        $test->id ('hash.scalar');
+        $test->assert_not_null (scalar %$em);
+
+        $test->id ('key.no');
+        $test->assert_null ($em->{et1});
+        $test->assert_null ($em->{et2});
+        $test->id ('exists.no');
+        $test->assert_false (exists $em->{et1});
+        $test->assert_false (exists $em->{et2});
+
+        $test->id ('setNamedItem');
+        my $et1 = $doc-><M::d|DocumentXDoctype.createGeneralEntity>
+                          ('et1');
+        $em-><M::NamedNodeMap.setNamedItem> ($et1);
+
+        $test->id ('key.et1');
+        my $v1 = $em->{et1};
+        $test->assert_equals ($v1, $et1);
+        $test->id ('exists.et1');
+        $test->assert_true (exists $em->{et1});
+        $test->id ('not.exists.et2');
+        $test->assert_false (exists $em->{et2});
+
+        $test->id ('keys');
+        my @keys = keys %$em;
+        $test->assert_num_equals
+                 (actual_value => 0 + @keys,
+                  expected_value => 1);
+        $test->assert_equals ($keys[0], 'et1');
+        
+        $test->id ('setNamedItem.2');
+        my $et2 = $doc-><M::d|DocumentXDoctype.createGeneralEntity>
+                          ('et2');
         $em-><M::NamedNodeMap.setNamedItem> ($et2);
 
         $test->id ('keys.2');
@@ -7090,6 +7134,11 @@ ResourceDef:
         @@@@@:
           tie my @list, <ClassName::ManakaiDOMAttrDefMapArray>, $self;
           $r = \@list;
+      @@@PerlDef:
+        @@@@ForCheck: t|ForEntityMap
+        @@@@@:
+          tie my @list, <ClassName::ManakaiDOMEntityMapArray>, $self;
+          $r = \@list;
 
     @@Test:
       @@@ForCheck: t|ForAttrMap
@@ -7161,6 +7210,54 @@ ResourceDef:
 
         $test->id ('setNamedItem');
         my $et1 = $doc-><M::d|DocumentXDoctype.createElementTypeDefinition>
+                          ('et1');
+        $em-><M::NamedNodeMap.setNamedItem> ($et1);
+
+        $test->id ('length.1');
+        $test->assert_num_equals
+                 (actual_value => 0 + @$em,
+                  expected_value => 1);
+
+        $test->id ('0.fetch.0');
+        $test->assert_equals ($em->[0], $et1);
+        $test->id ('0.fetch.-1');
+        $test->assert_equals ($em->[-1], $et1);
+        $test->id ('0.fetch.1.no');
+        $test->assert_null ($em->[1]);
+        $test->id ('0.exists.0');
+        $test->assert_true (exists $em->[0]);
+        $test->id ('0.exists.-1');
+        $test->assert_true (exists $em->[-1]);
+        $test->id ('0.exists.1.no');
+        $test->assert_false (exists $em->[1]);
+
+        $test->id ('delete.0');
+        delete $em->[0];
+        $test->assert_false (exists $em->[0]);
+
+    @@XDTest:
+      @@@ForCheck: t|ForEntityMap
+      @@@QName: EntityMap.@.test
+      @@@PerlDef:
+        my $dtd;
+        __CODE{d|newDoctypeForTest}__;
+        my $doc = $dtd-><AG::Node.ownerDocument>;
+        my $em = $dtd-><AG::d|DocumentTypeDefinition.generalEntities>;
+
+        $test->id ('length.0');
+        $test->assert_num_equals
+                 (actual_value => 0 + @$em,
+                  expected_value => 0);
+
+        $test->id ('fetch.0.no');
+        $test->assert_null ($em->[0]);
+        $test->id ('exists.0');
+        $test->assert_false (exists $em->[0]);
+        $test->id ('exists.-1');
+        $test->assert_false (exists $em->[-1]);
+
+        $test->id ('setNamedItem');
+        my $et1 = $doc-><M::d|DocumentXDoctype.createGeneralEntity>
                           ('et1');
         $em-><M::NamedNodeMap.setNamedItem> ($et1);
 
@@ -7273,6 +7370,9 @@ ResourceDef:
           }__;
           __FOR{t:ForATMap::
             $list = ($$$self)->{<H::mn:node>}->{<H::d|attributeDefinitions>};
+          }__;
+          __FOR{t:ForEntityMap::
+            $list = ($$$self)->{<H::mn:node>}->{<H::d|generalEntities>};
           }__;
           if (defined $list->{$name}) {
             $r = <ClassM::ManakaiDOMNode.getNodeReference> ($list->{$name});
@@ -7429,6 +7529,56 @@ ResourceDef:
         $test->assert_null ($r5);
         $test->assert_equals ($em-><M::NamedNodeMap.getNamedItem> ('et1'), $et2);
 
+    @@XDTest:
+      @@@ForCheck: t|ForEntityMap
+      @@@QName: EntityMap.getNamedItem.setNamedItem.test
+      @@@PerlDef:
+        my $dtd;
+        __CODE{d|newDoctypeForTest}__;
+        my $doc = $dtd-><AG::Node.ownerDocument>;
+
+        my $em = $dtd-><AG::d|DocumentTypeDefinition.generalEntities>;
+        $test->assert_isa ($em, <IFName::t|NamedNodeMap>);
+
+        $test->id ('getNamedItem.none');
+        $test->assert_null ($em-><M::NamedNodeMap.getNamedItem> ('et1'));
+
+        my $et1 = $doc-><M::d|DocumentXDoctype.createGeneralEntity>
+                          ('et1');
+        $test->assert_isa ($et1, <IFName::x|Entity>);
+
+        $test->id ('setNamedItem.et1');
+        my $r1 = $em-><M::NamedNodeMap.setNamedItem> ($et1);
+        $test->assert_null ($r1);
+
+        $test->id ('getNamedItem.et1');
+        my $r2 = $em-><M::NamedNodeMap.getNamedItem> ('et1');
+        $test->assert_equals ($r2, $et1);
+        $test->assert_equals
+                 ($r2-><AG::x|Entity.ownerDocumentTypeDefinition>,
+                  $dtd);
+        $test->assert_equals
+                 ($et1-><AG::x|Entity.ownerDocumentTypeDefinition>,
+                  $dtd);
+
+        my $et2 = $doc-><M::d|DocumentXDoctype.createGeneralEntity>
+                          ('et1');
+        $test->assert_isa ($et2, <IFName::x|Entity>);
+        $test->assert_not_equals ($et1, $et2);
+
+        $test->id ('setNamedItem.et2');
+        my $r3 = $em-><M::NamedNodeMap.setNamedItem> ($et2);
+        $test->assert_equals ($r3, $et1);
+
+        $test->id ('getNamedItem.et2');
+        my $r4 = $em-><M::NamedNodeMap.getNamedItem> ('et1');
+        $test->assert_equals ($r4, $et2);
+
+        $test->id ('setNamedItem.et2.by.et2');
+        my $r5 = $em-><M::NamedNodeMap.setNamedItem> ($et2);
+        $test->assert_null ($r5);
+        $test->assert_equals ($em-><M::NamedNodeMap.getNamedItem> ('et1'), $et2);
+
   @Method:
     @@Name: setNamedItem
     @@enDesc:
@@ -7488,7 +7638,7 @@ ResourceDef:
         @@@@enDesc:
           If <P::arg> is an <IF::Attr> that is already an attribute
           of another <IF::Element>.
-        @@@@ForCheck: !t|ForETMap !t|ForATMap
+        @@@@ForCheck: !t|ForETMap !t|ForATMap !t|ForEntityMap
       @@@dx:raises:
         @@@@@: c|INUSE_DEFINITION_ERR
         @@@@enDesc:
@@ -7530,6 +7680,10 @@ ResourceDef:
           __FOR{t:ForATMap::
             $list = $owner->{<H::d|attributeDefinitions>};
             $expected_type = <C::Node.ATTRIBUTE_DEFINITION_NODE>;
+          }__;
+          __FOR{t:ForEntityMap::
+            $list = $owner->{<H::d|generalEntities>};
+            $expected_type = <C::Node.ENTITY_NODE>;
           }__;
           if (<Code::doStrictErrorChecking:: $nodeRef = {$$$self}>) {
             unless (UNIVERSAL::isa ($arg,
@@ -7649,7 +7803,7 @@ ResourceDef:
       Removes a node specified by name.
     @@enDesc:
       @@@ddid: attr
-      @@@ForCheck: !t|ForETMap !t|ForATMap
+      @@@ForCheck: !t|ForETMap !t|ForATMap !t|ForEntityMap
       @@@enDesc:
         If the removed attribute is known to have a default value,
         an attribute immediately appears containing the default
@@ -7714,6 +7868,9 @@ ResourceDef:
           }__;
           __FOR{t:ForATMap::
             $list = $owner->{<H::d|attributeDefinitions>};
+          }__;
+          __FOR{t:ForEntityMap::
+            $list = $owner->{<H::d|generalEntities>};
           }__;
           if (<Code::doStrictErrorChecking:: $nodeRef = {$$$self}>) {
             if ($owner->{<H::c|read-only>}) {
@@ -7825,6 +7982,35 @@ ResourceDef:
 
         undef $ad;
 
+    @@XDTest:
+      @@@QName: EntityMap.removeNamedItem.test
+      @@@ForCheck: t|ForEntityMap
+      @@@PerlDef:
+        my $dtd;
+        __CODE{d|newDoctypeForTest}__;
+        my $doc = $dtd-><AG::Node.ownerDocument>;
+        my $em = $dtd-><AG::d|DocumentTypeDefinition.generalEntities>;
+        undef $dtd;
+
+        $test->id ('setNamedItem');
+        my $et1 = $doc-><M::d|DocumentXDoctype.createGeneralEntity>
+                          ('et1');
+        $em-><M::NamedNodeMap.setNamedItem> ($et1);
+        $test->assert_equals
+                 ($em-><M::NamedNodeMap.getNamedItem> ('et1'), $et1);
+
+        $test->id ('removeNamedItem.noremove');
+        $test->assert_exception (code => sub {
+          $em-><M::NamedNodeMap.removeNamedItem> ('et2');
+        }, exception_subtype => <Q::c|NO_NAMED_NODE_ERR>);
+
+        $test->id ('removeNamedItem.remove');
+        my $et3 = $em-><M::NamedNodeMap.removeNamedItem> ('et1');
+        $test->assert_equals ($et3, $et1);
+        $test->assert_null ($em-><M::NamedNodeMap.getNamedItem> ('et1'));
+
+        undef $em;
+
   @IntMethod:
     @@Perlop: DELETE
     @@enDesc:
@@ -7907,6 +8093,9 @@ ResourceDef:
           }__;
           __FOR{t:ForATMap::
             $list = ($$$self)->{<H::mn:node>}->{<H::d|attributeDefinitions>};
+          }__;
+          __FOR{t:ForEntityMap::
+            $list = ($$$self)->{<H::mn:node>}->{<H::d|generalEntities>};
           }__;
           my $key = $index >= 0 ? [sort {$a cmp $b} keys %$list]->[$index]
                                 : null;
@@ -8015,6 +8204,39 @@ ResourceDef:
         $test->assert_not_equals ($item0, $item1);
         $test->assert_true ($at1 eq $item0 or $at2 eq $item0);
         $test->assert_true ($at1 eq $item1 or $at2 eq $item1);
+    
+    @@XDTest:
+      @@@QName: EntityMap.item.test
+      @@@ForCheck: t|ForEntityMap
+      @@@PerlDef:
+        my $dtd;
+        __CODE{d|newDoctypeForTest}__;
+        my $doc = $dtd-><AG::Node.ownerDocument>;
+        my $em = $dtd-><AG::d|DocumentTypeDefinition.generalEntities>;
+        
+        $test->id ('no.item');
+        $test->assert_null ($em-><M::NamedNodeMap.item> (-1));
+        $test->assert_null ($em-><M::NamedNodeMap.item> (0));
+        $test->assert_null ($em-><M::NamedNodeMap.item> (1));
+        $test->assert_null ($em-><M::NamedNodeMap.item> (2));
+
+        $test->id ('two.items');
+        my $et1 = $doc-><M::d|DocumentXDoctype.createGeneralEntity>
+                          ('et1');
+        $dtd-><M::d|DocumentTypeDefinition.setGeneralEntityNode> ($et1);
+        my $et2 = $doc-><M::d|DocumentXDoctype.createGeneralEntity>
+                          ('et2');
+        $dtd-><M::d|DocumentTypeDefinition.setGeneralEntityNode> ($et2);
+
+        $test->assert_null ($em-><M::NamedNodeMap.item> (-1));
+        $test->assert_null ($em-><M::NamedNodeMap.item> (2));
+        my $item0 = $em-><M::NamedNodeMap.item> (0);
+        my $item1 = $em-><M::NamedNodeMap.item> (1);
+        $test->assert_not_null ($item0);
+        $test->assert_not_null ($item1);
+        $test->assert_not_equals ($item0, $item1);
+        $test->assert_true ($et1 eq $item0 or $et2 eq $item0);
+        $test->assert_true ($et1 eq $item1 or $et2 eq $item1);
 
   @Attr:
     @@Name: length
@@ -8040,6 +8262,12 @@ ResourceDef:
         @@@@@:
           $r = @{[map {$_} values %{$$$self->{<H::mn:node>}
                                            ->{<H::d|attributeDefinitions>}}]};
+      @@@PerlDef:
+        @@@@ForCheck: t|ForEntityMap
+        @@@@@:
+          $r = @{[map {$_} values %{$$$self->{<H::mn:node>}
+                                           ->{<H::d|generalEntities>}}]};
+
     @@Test:
       @@@QName: AttrMap.length.test
       @@@ForCheck: t|ForAttrMap
@@ -8129,6 +8357,35 @@ ResourceDef:
         $test->assert_num_equals
                  (actual_value => $at-><AG::NamedNodeMap.length>,
                   expected_value => 2);
+    @@XDTest:
+      @@@QName: EntityMap.length.test
+      @@@ForCheck: t|ForEntityMap
+      @@@PerlDef:
+        my $dtd;
+        __CODE{d|newDoctypeForTest}__;
+        my $doc = $dtd-><AG::Node.ownerDocument>;
+        my $et = $dtd-><AG::d|DocumentTypeDefinition.generalEntities>;
+
+        $test->id ('length.0');
+        $test->assert_num_equals
+                 (actual_value => $et-><AG::NamedNodeMap.length>,
+                  expected_value => 0);
+
+        $test->id ('length.1');
+        my $et1 = $doc-><M::d|DocumentXDoctype.createGeneralEntity>
+                          ('et1');
+        $dtd-><M::d|DocumentTypeDefinition.setGeneralEntityNode> ($et1);
+        $test->assert_num_equals
+                 (actual_value => $et-><AG::NamedNodeMap.length>,
+                  expected_value => 1);
+
+        $test->id ('length.1');
+        my $et2 = $doc-><M::d|DocumentXDoctype.createGeneralEntity>
+                          ('et2');
+        $dtd-><M::d|DocumentTypeDefinition.setGeneralEntityNode> ($et2);
+        $test->assert_num_equals
+                 (actual_value => $et-><AG::NamedNodeMap.length>,
+                  expected_value => 2);
 
   @IntMethod:
     @@Perlop: STORESIZE
@@ -8162,7 +8419,7 @@ ResourceDef:
     @@Return:
       @@@Type: idl|boolean||ManakaiDOM|all
       @@@PerlDef:
-        @@@@ForCheck: !t|ForETMap !t|ForATMap
+        @@@@ForCheck: !t|ForETMap !t|ForATMap !t|ForEntityMap
         @@@@@:
           __DEEP{
             $r = defined ($self-><M::NamedNodeMap.getNamedItem> ($key));
@@ -8176,6 +8433,11 @@ ResourceDef:
         @@@@@:
           $r = exists (($$$self)->{<H::mn:node>}
                                 ->{<H::d|attributeDefinitions>}->{$key});
+      @@@PerlDef:
+        @@@@ForCheck: t|ForEntityMap
+        @@@@@:
+          $r = exists (($$$self)->{<H::mn:node>}
+                                ->{<H::d|generalEntities>}->{$key});
 
   @IntMethod:
     @@Perlop: FIRSTKEY
@@ -8203,6 +8465,12 @@ ResourceDef:
           my $a = keys %{($$$self)->{<H::mn:node>}
                               ->{<H::d|attributeDefinitions>}}; # reset
           $r = each %{($$$self)->{<H::mn:node>}->{<H::d|attributeDefinitions>}};
+      @@@PerlDef:
+        @@@@ForCheck: t|ForEntityMap
+        @@@@@:
+          my $a = keys %{($$$self)->{<H::mn:node>}->{<H::d|generalEntities>}};
+            # reset
+          $r = each %{($$$self)->{<H::mn:node>}->{<H::d|generalEntities>}};
 
   @IntMethod:
     @@Perlop: NEXTKEY
@@ -8229,6 +8497,10 @@ ResourceDef:
         @@@@ForCheck: t|ForATMap
         @@@@@:
           $r = each %{($$$self)->{<H::mn:node>}->{<H::d|attributeDefinitions>}};
+      @@@PerlDef:
+        @@@@ForCheck: t|ForEntityMap
+        @@@@@:
+          $r = each %{($$$self)->{<H::mn:node>}->{<H::d|generalEntities>}};
 
   @IntMethod:
     @@ForCheck: !t|ForAttrMap
@@ -8246,6 +8518,10 @@ ResourceDef:
         @@@@@:
           $r = scalar %{($$$self)->{<H::mn:node>}
                                  ->{<H::d|attributeDefinitions>}};
+      @@@PerlDef:
+        @@@@ForCheck: t|ForEntityMap
+        @@@@@:
+          $r = scalar %{($$$self)->{<H::mn:node>}->{<H::d|generalEntities>}};
 
   @L2Method:
     @@Name: getNamedItemNS
@@ -8496,7 +8772,7 @@ ResourceDef:
     @@NoNSVersion: .removeNamedItem
     @@enDesc:
       @@@ddid: attr
-      @@@ForCheck: !t|ForETMap !t|ForATMap
+      @@@ForCheck: !t|ForETMap !t|ForATMap !t|ForEntityMap
       @@@@:
         If the removed attribute is known to have a default value,
         an attribute immediately appears containing the default value
@@ -8698,6 +8974,15 @@ ResourceDef:
       type definition node.
     @@PerlDef:
       $map = bless \\($node), <ClassName::t|ManakaiDOMAttrDefMap>;
+
+  @CODE:
+    @@ForCheck: t|ForEntityMap ManakaiDOM|ManakaiDOMLatest
+    @@QName: getEntityNodeMap
+    @@enDesc:
+      Creates an entity node map from a document
+      type definition node.
+    @@PerlDef:
+      $map = bless \\($node), <ClassName::t|ManakaiDOMEntityMap>;
 ##NamedNodeMap
 
 PropDef:
@@ -8749,6 +9034,16 @@ ResourceDef:
     @@@: ManakaiDOMAttrDefMap
     @@ForCheck: t|ForATMap
 
+  @resourceFor:
+    @@@: t|ForEntityMap
+    @@For: ManakaiDOM|ManakaiDOMLatest
+  @QName:
+    @@@: ManakaiDOMEntityMapArray
+    @@ForCheck: t|ForEntityMap
+  @ISA:
+    @@@: ManakaiDOMEntityMap
+    @@ForCheck: t|ForEntityMap
+
   @AppISA:
     Tie::Array
 
@@ -8756,7 +9051,7 @@ ResourceDef:
     @@Perlop: FETCH
     @@Param:
       @@@Name: index
-      @@@Type: idl|unsignedLong
+      @@@Type: idl|unsignedLong||ManakaiDOM|all
     @@Return:
       @@@Type: Node
       @@@nullCase:
@@ -15109,64 +15404,44 @@ NodeTypeDef:
             Should <XA::xml:id> attribute has type info?
 
   @Method:
-     @@Name:  createEntityReference
-     @@Description:
-       @@@lang:en
-       @@@@:
-         Create an <IF::DOMXML:EntityReference> object.  If the entity referred 
-         is known, the child list of the <IF::DOMXML:EntityReference> is 
-         made the same as that of the corresponding <IF::DOMXML:Entity> node.
-       \
-         {NOTE:: If any descendant of the <IF::DOMXML:Entity> node has an 
-         unbound namespace prefix, the corresponding descendant of 
-         the <IF::DOMXML:EntityReference> node created is also unbound.
-         }
-     @@ImplNote:
-       @@@lang:en
-       @@@@:
-         In this NOTEd case, that node might have <Q::infoset:prefix> 
-         but will not have <Q::infoset:namespaceName>.
-     @@NSVersion:\
-     @@Param:
-        @@@Name:  name
-        @@@Type:  
-          DOMMain:DOMString
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            The name of the entity to refer.
-        @@@ImplNote:
-          @@@@lang:en
-          @@@@@:
-            This is an XML <CODE::Name>, not an XML Names <CODE::NCName>.
-     @@Return:
-        @@@Type:  
-          DOMXML:EntityReference
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            The new <IF::DOMXML:EntityReference> object.
-        @@@Exception:
-          @@@@Type:DOMException
-          @@@@Name:INVALID_CHARACTER_ERR
-          @@@@SubType:
-            @@@@@QName:
-              MDOMX:MDOM_BAD_NAME
-            @@@@@Description:
-              @@@@@@lang:en
-              @@@@@@@:
-                The <P::name> is not an XML <CODE::Name>.
-        @@@Exception:
-          @@@@Type:DOMException
-          @@@@Name:NOT_SUPPORTED_ERR
-          @@@@SubType:
-            @@@@@QName:
-              MDOMX:MDOM_DOC_NOSUPPORT_XML
-            @@@@@Description:
-              @@@@@@lang:en
-              @@@@@@@:
-                This document does not support the <Feature::XML> feature.
-        @@@PerlDef:
+    @@Name: createEntityReference
+    @@enDesc:
+      Creates an <IF::EntityReference> node.  In addition, if the
+      referenced entity is known, the child list of the <IF::EntityReference>
+      node is made the same as that of the corresponding <IF::x|Entity> node.
+    @@enDesc:
+      @@@ddid: ns
+      @@@For: ManakaiDOM|DOM2
+      @@@@:
+        Note that if any descendant of the <IF::x|Entity> node has
+        an unbound namespace prefix, the corresponding descendant of 
+        the created <IF::x|EntityReference> node is also unbound,
+        i.e. its <A::Node.namespaceURI> is <DOM::null>.
+    @@DOMMain:isNamespaceUnaware: 1
+    @@Param:
+      @@@Name: name
+      @@@Type: DOMString
+      @@@enDesc:
+        The name of the entity reference.
+
+          {NOTE:: Namespace well-formedness check is not performed.
+          }
+      @@@enImplNote:
+        <P::name> is <XML::lt> for example, then?
+    @@Return:
+      @@@Type: x|EntityReference
+      @@@enDesc:
+        The newly created <IF::x|EntityReference> node.
+      @@@dx:raises:
+        @@@@@: MDOMX|MDOM_BAD_NAME
+        @@@@enDesc:
+          If the <P::name> is not an XML <CODE::Name> according
+          to the XML version of the <IF::Document>.
+      @@@dx:raises:
+        @@@@@: MDOMX|MDOM_DOC_NOSUPPORT_XML
+        @@@@enDesc:
+          If it is an HTML document.
+      @@@PerlDef:
             my $docNode = $self->{<H::mn:node>};
             my $version = <Code::getDocumentXMLVersion::
                                     $DOCOBJ = $docNode>;
@@ -15185,18 +15460,128 @@ NodeTypeDef:
               $referent => {$docNode},
             }__;
             $node->{<H::DOMCore:name>} = $name;
-            #$node->{< Q::??:expanded>} = false;
             $r = <ClassM::ManakaiDOMNode.getNodeReference> ($node);
-          @@@@ImplNote:
-            @@@@@lang:en
-            @@@@@@:
-              TODO: Expand the reference.
-    @@L1:
-    @@SpecLevel:1
-    @@Level[list]:
-      1
-      2
-      3
+
+        ## Expansion
+        __DEEP{
+          my $__doctype = $self-><AG::Document.doctype>;
+          $__doctype = $__doctype-><M::Node.getFeature>
+                                     (<Q::ManakaiDOM:XDoctype> => '3.0')
+            if $__doctype;
+          if ($__doctype) {
+            my $__et = $__doctype-><M::DTDef.getGeneralEntityNode> ($name);
+            if ($__et) {
+              local $self->{<H::mn:node>}->{<H::c|strictErrorChecking>} = false;
+              my @node;
+              for my $c (@{$__et-><AG::Node.childNodes>}) {
+                my $clone = $c-><M::Node.cloneNode> (true);
+                $r-><M::Node.appendChild> ($clone);
+                push @node, $clone;
+              }
+              if ($self->{<H::mn:node>}
+                       ->{<H::ManakaiDOM|entity-reference-read-only>}) {
+                while (@node) {
+                  my $node = shift @node;
+                  $node->{<H::mn:node>}->{<H::c|read-only>} = true;
+                  push @node, @{$node-><AG::Node.childNodes>};
+                  push @node, values %{$node-><AG::Node.attributes> or {}};
+                }
+              }
+              $r->{<H::mn:node>}->{<H::ManakaiDOM:isExpanded>}
+                = $__et->{<H::mn:node>}->{<H::x|hasReplacementTree>};
+            }
+          }
+        }__;
+
+    @@XDTest:
+      @@@QName: Document.createER.nodef.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{createEmptyDocumentForTest:: $doc => $doc}__;
+
+        my $ent = $doc-><M::Document.createEntityReference> ('ent1');
+        $test->assert_isa ($ent, <IFName::x|EntityReference>);
+        
+        $test->id ('node.name');
+        $test->assert_equals ($ent-><AG::Node.nodeName>, 'ent1');
+
+        $test->id ('not.expanded');
+        $test->assert_false ($ent-><AG::x|EntityReference.isExpanded>);
+
+        $test->id ('empty');
+        $test->assert_false ($ent-><M::Node.hasChildNodes>);
+    @@XDTest:
+      @@@QName: Document.createER.hasdef.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docd = $doc-><M::Node.getFeature> (<Q::ManakaiDOM:XDoctype>, '3.0');
+        my $dtd = $docd-><M::d|DocumentXDoctype.createDocumentTypeDefinition>
+                           ('doctype');
+          my $et = $docd-><M::d|DocumentXDoctype.createGeneralEntity>
+                             ('ent1');
+          $et-><AS::Node.textContent> ('replacement text content');
+        $dtd-><M::DTDef.setGeneralEntityNode> ($et);
+        $doc-><M::Node.appendChild> ($dtd);
+
+        my $ent = $doc-><M::Document.createEntityReference> ('ent1');
+        $test->assert_isa ($ent, <IFName::x|EntityReference>);
+        
+        $test->id ('node.name');
+        $test->assert_equals ($ent-><AG::Node.nodeName>, 'ent1');
+
+        $test->id ('expanded');
+        $test->assert_true ($ent-><AG::x|EntityReference.isExpanded>);
+
+        $test->id ('not.empty');
+        $test->assert_true ($ent-><M::Node.hasChildNodes>);
+
+        $test->id ('text.content');
+        $test->assert_equals ($ent-><AG::Node.textContent>,
+                              'replacement text content');
+
+        $test->id ('is.read.only');
+        $test->assert_exception (code => sub {
+          $ent-><AS::Node.textContent> ('new value');
+        }, exception_subtype => <Q::MDOMX|NOMOD_THIS>);
+    @@XDTest:
+      @@@QName: Document.createER.hasdef.no-read-only.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docd = $doc-><M::Node.getFeature> (<Q::ManakaiDOM:XDoctype>, '3.0');
+        my $dtd = $docd-><M::d|DocumentXDoctype.createDocumentTypeDefinition>
+                           ('doctype');
+          my $et = $docd-><M::d|DocumentXDoctype.createGeneralEntity>
+                             ('ent1');
+          $et-><AS::Node.textContent> ('replacement text content');
+        $dtd-><M::DTDef.setGeneralEntityNode> ($et);
+        $doc-><M::Node.appendChild> ($dtd);
+        $doc-><AG::Document.domConfig>
+            -><M::c|DOMConfiguration.setParameter>
+                (<Q::ManakaiDOM|entity-reference-read-only> => false);
+
+        my $ent = $doc-><M::Document.createEntityReference> ('ent1');
+        $test->assert_isa ($ent, <IFName::x|EntityReference>);
+        
+        $test->id ('node.name');
+        $test->assert_equals ($ent-><AG::Node.nodeName>, 'ent1');
+
+        $test->id ('expanded');
+        $test->assert_true ($ent-><AG::x|EntityReference.isExpanded>);
+
+        $test->id ('not.empty');
+        $test->assert_true ($ent-><M::Node.hasChildNodes>);
+
+        $test->id ('text.content');
+        $test->assert_equals ($ent-><AG::Node.textContent>,
+                              'replacement text content');
+
+        $test->id ('is.not.read.only');
+        $ent-><AS::Node.textContent> ('new value');
+        $test->assert_equals ($ent-><AG::Node.textContent>,
+                              'new value');
+
   @Method:
      @@Name:  getElementsByTagName
      @@Description:
@@ -17187,6 +17572,80 @@ NodeTypeDef:
               }
             }
 ##Document
+
+ElementTypeBinding:
+  @Name: boolCParam
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@: c|DOMConfigurationParameter
+      @@@For: ManakaiDOM|DOM
+    @@rdf:type:
+      @@@@: DISCore|Property
+      @@@For: =ManakaiDOM|all
+    @@For: ManakaiDOM|ManakaiDOMLatest
+    @@For: =ManakaiDOM|all
+    @@Type: idl|boolean||ManakaiDOM|all
+
+ElementTypeBinding:
+  @Name: nodeProp
+  @ElementType: 
+    c:nodeProp
+  @ShadowContent:
+    @@For: =ManakaiDOM|all
+
+boolCParam:
+  @QName: ManakaiDOM|entity-reference-read-only
+  @nodeProp: etro
+  @c:targetType: t|Document
+  @TrueCase:
+    @@IsSupportRequired: 1
+    @@IsDefault: 1
+    @@enDesc:
+      <IF::x|EntityReference> nodes and its subtree created by
+      <IF::t|Document.createEntityReference> method or
+      any other method that clones them (with possible some modification
+      if desired) from <IF::x|Entity> nodes are read-only.
+
+      This is the DOM Level 3 (or earlier) conformant behavior.
+  @FalseCase:
+    @@enDesc:
+      <IF::x|EntityReference> nodes and its subtree created by
+      <IF::t|Document.createEntityReference> method or
+      any other method that clones them (with possible some modification
+      if desired) from <IF::x|Entity> nodes are <EM::not> read-only.
+  @L3Test:
+    @@QName: cfg.entity-reference-read-only.test
+    @@PerlDef:
+      my $doc;
+      __CODE{createEmptyDocumentForTest:: $doc => $doc}__;
+
+      my $cfg = $doc-><AG::Document.domConfig>;
+
+      $test->id ('default.true');
+      $test->assert_true ($cfg-><M::c|DOMConfiguration.getParameter>
+                                  (<Q::ManakaiDOM|entity-reference-read-only>));
+      
+      $test->id ('true.to.false');
+      $cfg-><M::c|DOMConfiguration.setParameter>
+              (<Q::ManakaiDOM|entity-reference-read-only> => false);
+      $test->assert_false ($cfg-><M::c|DOMConfiguration.getParameter>
+                                   (<Q::ManakaiDOM|entity-reference-read-only>));
+   
+      $test->id ('false.to.true');
+      $cfg-><M::c|DOMConfiguration.setParameter>
+              (<Q::ManakaiDOM|entity-reference-read-only> => true);
+      $test->assert_false ($cfg-><M::c|DOMConfiguration.getParameter>
+                                   (<Q::ManakaiDOM|entity-reference-read-only>));
+
+      $test->id ('reset');
+      $cfg-><M::c|DOMConfiguration.setParameter>
+              (<Q::ManakaiDOM|entity-reference-read-only> => false);
+      $cfg-><M::c|DOMConfiguration.setParameter>
+              (<Q::ManakaiDOM|entity-reference-read-only> => null);
+      $test->assert_true ($cfg-><M::c|DOMConfiguration.getParameter>
+                                  (<Q::ManakaiDOM|entity-reference-read-only>));
 
 PropDef:
   @QName: c|ownerDocument

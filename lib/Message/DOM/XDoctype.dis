@@ -17,7 +17,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/01/26 13:58:20 $
+    $Date: 2006/01/29 07:09:25 $
   
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
   
@@ -560,6 +560,69 @@ IFClsXDef:
                                       ('0120');
                   },
                   exception_subtype => <Q::MDOMX|MDOM_BAD_NAME>);
+    
+  @Method:
+    @@Name: createGeneralEntity
+    @@enDesc:
+      Creates a general <IF::x|Entity>.
+    @@DOMMain:isNamespaceUnaware: 1
+    @@Param:
+      @@@Name: nameArg
+      @@@Type: DOMString
+      @@@enDesc:
+        The attribute name of the definition.
+    @@Return:
+      @@@Type: x|Entity
+      @@@dx:raises:
+        @@@@@: MDOMX|MDOM_BAD_NAME
+        @@@@enDesc:
+          The <P::nameArg> is not a legal <CODE::Name>
+          according to the XML version of the document.
+      @@@PerlDef:
+        my $doc = $self->{<H::mn:node>};
+        my $ver = <Code::t|getDocumentXMLVersion::
+                    $DOCOBJ = $doc>;
+        __CODE{DOMMain:ensureXMLName::
+          $INPUT => $nameArg,
+          $INPUT_PARAM_NAME => 'nameArg',
+          $XMLVERSION => $ver,
+        }__;
+        my $obj = <ClassM::x|ManakaiDOMEntity.newObject>;
+        __CODE{mn|setXRefNode||ManakaiDOM|Perl::
+          $referrer => $obj,
+          $propName => {<H::c|ownerDocument>},
+          $referent => $doc,
+        }__;
+        $obj->{<H::c|name>} = $nameArg;
+        $r = <ClassM::t|ManakaiDOMNode.getNodeReference> ($obj);
+
+    @@Test:
+      @@@QName:
+        ManakaiDocumentXDoctype.createGeneralEntity.success.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{newDocumentForTest}__;
+        my $dtd = $doc-><M::DocumentXDoctype.createGeneralEntity>
+                          ('abcdefg');
+        
+        $test->assert_not_null ($dtd);
+        $test->assert_equals ($dtd-><AG::t|Node.nodeType>,
+                              <C::t|Node.ENTITY_NODE>); 
+        $test->assert_string (actual_value => $dtd-><AG::Node.nodeName>,
+                              expected_value => 'abcdefg'); 
+    
+    @@Test:
+      @@@QName:
+        ManakaiDocumentXDoctype.createGeneralEntity.badname.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{newDocumentForTest}__;
+        $test->assert_exception
+                 (code => sub {
+                    my $dtd = $doc-><M::DocumentXDoctype.createGeneralEntity>
+                                      ('0120');
+                  },
+                  exception_subtype => <Q::MDOMX|MDOM_BAD_NAME>);
 ##DocumentXDoctype
 
 ResourceDef:
@@ -847,10 +910,32 @@ IFClsXDef:
 
         my $es = $dtd-><AG::DocumentTypeDefinition.elementTypes>;
         $test->assert_isa ($es, <IFName::t|NamedNodeMap>);
+
+  @Attr:
+    @@Name: generalEntities
+    @@enDesc:
+      The live collection of the general entities contained
+      in the document type definition.
+    @@Type: t|NamedNodeMap
+    @@Get:
+      @@@PerlDef:
+        __CODE{t|getEntityNodeMap::
+          $node => $self,
+          $map => $r,
+        }__;
+
+    @@Test:
+      @@@QName: DocumentTypeDefinition.generalEntities.test
+      @@@PerlDef:
+        my $dtd;
+        __CODE{newDoctypeForTest}__;
+
+        my $es = $dtd-><AG::DocumentTypeDefinition.generalEntities>;
+        $test->assert_isa ($es, <IFName::t|NamedNodeMap>);
       
   @enImplNote:
     {TODO::
-      Implement <A::.generalEntities>,
+      Implement
       <A::.parameterEntities>, <A::.notations>.
 
       Test that:
@@ -1037,6 +1122,176 @@ IFClsXDef:
                      .setElementTypeDefinitionNode> ($et);
            },
            exception_subtype => <Q::c|DIFFERENT_DOCUMENT_ERR>);
+
+  @Method:
+    @@Name: getGeneralEntityNode
+    @@enDesc:
+      Returns the definition for a general entity.
+    @@DOMMain:isNamespaceUnaware: 1
+    @@Param:
+      @@@Name: nameArg
+      @@@Type: DOMString
+      @@@enDesc:
+        The name of the general entity.
+    @@Return:
+      @@@Type: x|Entity
+      @@@enDesc:
+        The general entity <P::nameArg>.
+      @@@nullCase:
+        @@@@enDesc:
+          There is no general entity <P::nameArg>.
+      @@@PerlDef:
+        my $n = $self->{<H::mn:node>}
+                     ->{<H::d|generalEntities>}
+                     ->{$nameArg};
+        if ($n) {
+          $r = <ClassM::t|ManakaiDOMNode.getNodeReference> ($n);
+        }
+    @@Test:
+      @@@QName: DocumentTypeDefinition.getGeneralEntityNode.test
+      @@@PerlDef:
+        my $dtd;
+        __CODE{newDoctypeForTest}__;
+        $test->assert_null 
+                 ($dtd-><M::DocumentTypeDefinition
+                           .getGeneralEntityNode> ('element'));
+
+  @Method:
+    @@Name: setGeneralEntityNode
+    @@enDesc:
+      Sets a general entity to the document type
+      definition.
+    @@Param:
+      @@@Name: defNode
+      @@@Type: x|Entity
+      @@@enDesc:
+        The general entity to set.  Its <A::t|Node.nodeName>
+        attribute is used to set the node.
+
+        If another general entity node with
+        same <A::t|Node.nodeName> is attached to this document
+        type definition, such association is removed.
+        
+        If <P::defNode> is already attached to this document
+        type definition, then this method has no effect.
+    @@Return:
+      @@@Type: x|Entity
+      @@@enDesc:
+        If there is already another general entity
+        with the same <A::t|Node.nodeName> as <P::defNode>,
+        then that node is returned.
+      @@@nullCase:
+        @@@@enDesc:
+          If there is no previous definition with the same
+          name, or the <P::defNode> is already attached
+          to the document type definition.
+      @@@NodeReadOnlyError:
+      @@@dx:raises:
+        @@@@@: c|INUSE_DEFINITION_ERR
+        @@@@enDesc:
+          If <A::x|Entity.ownerDocumentTypeDefinition>
+          is not <DOM::null>.
+      @@@dx:raises:
+        @@@@@: c|DIFFERENT_DOCUMENT_ERR
+        @@@@enDesc:
+          The <P::defNode> node is created from different
+          document than the <A::c|Node.ownerDocument> of
+          the document type definition and the implementation
+          does not support such definition node
+          being attached to the document type definition.
+      @@@PerlDef:
+        __CODE{setDefinitionNode::
+          $defNode => $defNode,
+          $defNodeParamName => 'defNode',
+          $key => {<H::d|generalEntities>},
+        }__;
+    @@Test:
+      @@@QName: DocumentTypeDefinition.setGeneralEntityNode.test
+      @@@PerlDef:
+        my $dtd;
+        __CODE{newDoctypeForTest}__;
+
+        $test->id ('initial.empty');
+        $test->assert_null 
+                 ($dtd-><M::DocumentTypeDefinition
+                           .getGeneralEntityNode> ('et1'));
+
+        my $et = $dtd-><AG::Node.ownerDocument>
+                     -><M::Node.getFeature> (<Q::ManakaiDOM|XDoctype>)
+                     -><M::DocumentXDoctype.createGeneralEntity>
+                         ('et1');
+
+        $test->id ('set');
+        my $old1 = $dtd-><M::DocumentTypeDefinition
+                           .setGeneralEntityNode> ($et);
+        $test->assert_null ($old1);
+
+        $test->id ('get');
+        my $ret = $dtd-><M::DocumentTypeDefinition
+                           .getGeneralEntityNode> ('et1');
+        $test->assert_equals ($et, $ret);
+        $test->assert_num_equals
+                 (actual_value => $ret-><AG::Node.nodeType>,
+                  expected_value => <C::Node.ENTITY_NODE>);
+        $test->assert_equals
+                 ($et-><AG::x|Entity.ownerDocumentTypeDefinition>,
+                  $dtd);
+
+        $test->id ('replace-same');
+        my $old2 = $dtd-><M::DocumentTypeDefinition
+                           .setGeneralEntityNode> ($et);
+        $test->assert_null ($old2);
+
+        $test->id ('change-parent');
+
+        my $dtd2 = $dtd-><AG::Node.ownerDocument>
+                       -><M::Node.getFeature> (<Q::ManakaiDOM|XDoctype>)
+                       -><M::DocumentXDoctype.createDocumentTypeDefinition>
+                           ('dt2');
+    
+        $test->assert_exception (code => sub {
+          $dtd2-><M::DocumentTypeDefinition
+                            .setGeneralEntityNode> ($et);
+        }, exception_subtype => <Q::c|INUSE_DEFINITION_ERR>);
+        
+        $test->assert_equals
+                 ($et-><AG::x|Entity.ownerDocumentTypeDefinition>,
+                  $dtd);
+        $test->assert_equals
+                 ($dtd-><M::DocumentTypeDefinition
+                             .getGeneralEntityNode>
+                          ('et1'),
+                  $et);
+  
+        $test->id ('rewrite');
+
+        my $et2 = $dtd-><AG::Node.ownerDocument>
+                      -><M::Node.getFeature> (<Q::ManakaiDOM|XDoctype>)
+                      -><M::DocumentXDoctype.createGeneralEntity>
+                          ('et1');
+        $test->assert_not_equals ($et, $et2);
+
+        my $old4 = $dtd-><M::DocumentTypeDefinition
+                                .setGeneralEntityNode> ($et2);
+        $test->assert_equals ($old4, $et);
+        $test->assert_equals
+                 ($et2-><AG::x|Entity.ownerDocumentTypeDefinition>,
+                  $dtd);
+
+    @@Test:
+      @@@QName: DocumentTypeDefinition.setGeneralEntityNode.DIFF_DOC_ERR.test
+      @@@PerlDef:
+        my $dtd;
+        __CODE{newDoctypeForTest}__;
+        my $et;
+        __CODE{newGeneralEntityForTest}__;
+
+        $test->assert_exception
+          (code => sub {
+            $dtd-><M::DocumentTypeDefinition
+                     .setGeneralEntityNode> ($et);
+           },
+           exception_subtype => <Q::c|DIFFERENT_DOCUMENT_ERR>);
   
   @Method:
     @@ForCheck: ManakaiDOM|ForClass
@@ -1136,6 +1391,16 @@ IFClsXDef:
       my $doc;
       __CODE{newDocumentForTest}__;
       $et = $doc-><M::DocumentXDoctype.createElementTypeDefinition>
+                          ('et1');
+
+  @ResourceDef:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@QName: newGeneralEntityForTest
+    @@rdf:type: DISPerl|BlockCode
+    @@PerlDef:
+      my $doc;
+      __CODE{newDocumentForTest}__;
+      $et = $doc-><M::DocumentXDoctype.createGeneralEntity>
                           ('et1');
 
   @Test:

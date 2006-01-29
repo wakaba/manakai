@@ -13,7 +13,7 @@ Module:
   @License: license|Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/01/27 16:24:37 $
+      $Date: 2006/01/29 07:09:26 $
     @@ContentType: dis|Date.RCS
   
   @Require:
@@ -1091,8 +1091,55 @@ IFClsDef:
               }__;
             }
 
- ## TODO: Implement these values
           } elsif ($attr eq 'attributes') {
+            unless ($actualValue->can ($attr)) {
+              __DEEP{
+                $self-><M::DTManager.notOK>;
+              }__;
+              __CODE{printComment::
+                $test => $self,
+                $s => {
+                  $nodePathString.': Object (type |'.(ref $actualValue).
+                  '|) does not have attribute |'.$attr.'|'
+                },
+              }__;
+              __EXCEPTION{ASSERTION_ERR}__;
+            }
+            my $attrs = $actualValue->$attr;
+            my @akeys = sort {$a cmp $b} keys %$attrs;
+            if (@akeys != @{$expectedHash->{$attr}}) {
+              __DEEP{
+                $self-><M::DTManager.notOK>;
+              }__;
+              __CODE{printComment::
+                $test => $self,
+                $s => {
+                  $nodePathString.': It has '.@akeys.
+                  ' child nodes ('.@{$expectedHash->{$attr}}.' expected)'
+                },
+              }__;
+              __EXCEPTION{ASSERTION_ERR}__;
+            }
+            for my $xitem (@{$expectedHash->{$attr}}) {
+              __DEEP{
+                if ($xitem->{local_name}) {
+                  $self-><M::DTManager.assertDOMTreeEquals>
+                         (actual_value =>
+                            $attrs->get_named_item_ns
+                                      ($xitem->{namespace_uri}
+                                         ? $xitem->{namespace_uri}->{value}
+                                         : null,
+                                       $xitem->{local_name}->{value}),
+                          expected_hash => $xitem,
+                          node_path_string => $nodePathString);
+                } elsif ($xitem->{node_name}) {
+                  $self-><M::DTManager.assertDOMTreeEquals>
+                         (actual_value => $attrs->{$xitem->{node_name}->{value}},
+                          expected_hash => $xitem,
+                          node_path_string => $nodePathString);
+                }
+              }__;              
+            }
 
           } elsif ($attr eq 'element_types' or
                    $attr eq 'attribute_definitions') {
@@ -1320,11 +1367,16 @@ IFClsDef:
                   __DEEP{
                     $self-><M::DTManager.notOK>;
                   }__;
+                  my $v;
+                  __CODE{formatValue::
+                    $input => $aval,
+                    $output => $v,
+                  }__;
                   __CODE{printComment::
                     $test => $self,
                     $s => {
-                      $nodePathString.'->'.$attr.': Value is |'.$aval.
-                      '|, type |'.(ref $aval).'| (|TypeInfo| |'.
+                      $nodePathString.'->'.$attr.': Value is '.$v.
+                      ' (|TypeInfo| |'.
                       (join '|, |', @{$xval->{value}}).'|) is expected)'
                     },
                   }__;
@@ -1340,12 +1392,21 @@ IFClsDef:
                     __DEEP{
                       $self-><M::DTManager.notOK>;
                     }__;
+                    my $v;
+                    __CODE{formatValue::
+                      $input => $av,
+                      $output => $v,
+                    }__;
+                    my $xv;
+                    __CODE{formatValue::
+                      $input => {$xval->{value}->[$_->[1]]},
+                      $output => $xv,
+                    }__;
                     __CODE{printComment::
                       $test => $self,
                       $s => {
-                        $nodePathString.'->'.$attr.'->'.$m.': Value is |'.
-                        $av.'|, type |'.(ref $av).'| (|'.
-                        $xval->{value}->[$_->[1]].'| is expected)'
+                        $nodePathString.'->'.$attr.'->'.$m.': Value is '.$v.
+                        ' ('.$xv.' is expected)'
                       },
                     }__;
                     __EXCEPTION{ASSERTION_ERR}__;

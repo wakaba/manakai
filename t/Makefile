@@ -67,9 +67,11 @@ NS_DIS  = http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS\#
 
 GENERATED_FILES = \
   util-mntest.t \
-  util-perlcode.t dom-feature.t dom-tree.t dom-genericls.t \
-  dom-core.t dom-xdoctype.t dom-xmlparser.t \
-  dom-mdomls2003.t util-dis-dnlite.t
+  dom-feature.t dom-genericls.t \
+  dom-core.t dom-tree.t dom-xml.t dom-xdoctype.t dom-xmlparser.t \
+  dom-mdomls2003.t \
+  util-dis-dnlite.t \
+  util-perlcode.t
 
 all: $(GENERATED_FILES)
 
@@ -87,7 +89,7 @@ test-module-all: test-module-dom test-module-util
 
 test-module-dom: \
   dom-feature.t \
-  dom-core.t dom-tree.t dom-xdoctype.t \
+  dom-core.t dom-tree.t dom-xml.t dom-xdoctype.t \
   dom-genericls.t \
   dom-mdomls2003.t dom-xmlparser.t
 	$(PERL_TEST_) dom-*.t
@@ -98,6 +100,9 @@ dom-feature.t: $(DOM_FEATURE_DAC) $(DAC2TEST_PL)
 dom-genericls.t: $(DOM_CORE_DAC) $(DAC2TEST_PL)
 	$(DAC2TEST) $< --source-module="$(NS_MDOM)GenericLS" > $@
 
+dom-core.t: $(DOM_CORE_DAC) $(DAC2TEST_PL)
+	$(DAC2TEST) $< --source-module="$(NS_MDOM)DOMCore" > $@
+
 dom-tree.t: $(DOM_CORE_DAC) $(DAC2TEST_PL) Makefile
 	$(ECHO) "require 'manakai/mndebug.pl';" > $@
 	$(ECHO) "manakai::mndebug::define_nodestem_destroy ();" >> $@
@@ -105,8 +110,12 @@ dom-tree.t: $(DOM_CORE_DAC) $(DAC2TEST_PL) Makefile
 	#$(ECHO) "manakai::mndebug::define_noderef_destroy_all ();" >> $@
 	$(DAC2TEST) $< --source-module="$(NS_MDOM)Tree" >> $@
 
-dom-core.t: $(DOM_CORE_DAC) $(DAC2TEST_PL)
-	$(DAC2TEST) $< --source-module="$(NS_MDOM)DOMCore" > $@
+dom-xml.t: $(DOM_CORE_DAC) $(DAC2TEST_PL) Makefile
+	$(ECHO) "require 'manakai/mndebug.pl';" > $@
+	$(ECHO) "manakai::mndebug::define_nodestem_destroy ();" >> $@
+	#$(ECHO) "manakai::mndebug::define_nodestem_destroy_all ();" >> $@
+	#$(ECHO) "manakai::mndebug::define_noderef_destroy_all ();" >> $@
+	$(DAC2TEST) $< --source-module="$(NS_MDOM)DOMXML" >> $@
 
 dom-xdoctype.t: $(DOM_CORE_DAC) $(DAC2TEST_PL) Makefile
 	$(ECHO) "require 'manakai/mndebug.pl';" > $@

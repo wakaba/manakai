@@ -1,3 +1,29 @@
+2006-01-29  Wakaba  <wakaba@suika.fam.cx>
+
+	* XMLParser.dis: Tests on default attributes and their |specified|
+	attribute are added.
+
+	* XDoctype.dis (createGeneralEntity): New method.
+	(generalEntities): New attribute.
+	(getGeneralEntityNode, setGeneralEntityNode): New methods.
+
+	* Tree.dis (ManakaiDOMEntities): Removed.
+	(ManakaiDOMEntityMap): New class.
+	(ManakaiDOM:entity-reference-read-only): New configuration parameter.
+	(createEntityReference): If there is a corresponding |Entity|
+	node in the document type definition, then copies its
+	subtree.
+
+	* DOMXML.dis (Entity): Documentation updated.
+	(publicId, systemId, notationName, xmlEncoding,
+	xmlVersion): These attributes are now settable
+	if |ManakaiDOM:ManakaiDOMLatest| mode.
+	(hasReplacementTree): New attribute for |ManakaiDOM:ManakaiDOMLatest|
+	mode.
+	(ownerDocumentTypeDefinition): New attribute
+	for |ManakaiDOM:ManakaiDOMLatest| mode.
+	(isExpanded): New attribute for |ManakaiDOM:ManakaiDOMLatest| mode.
+
 2006-01-28  Wakaba  <wakaba@suika.fam.cx>
 
 	* DOMCore.dis (ErrDef): Missing |ecore:textFormatter| property added.
