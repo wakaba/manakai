@@ -185,23 +185,21 @@ $(PC_DIS_FILES:$(DIS_SUFFIX)=$(PM_SUFFIX)): %$(PM_SUFFIX): \
 	  --create-perl-module="$(NS_UTIL)PerlCode   PerlCode$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_UTIL_DIS)DPG    DIS/DPG$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_MDOM)DOMFeature ../DOM/DOMFeature$(PM_SUFFIX)" \
+	  --create-perl-module="$(NS_MDOM)GenericLS  ../DOM/GenericLS$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_MDOM)DOMMain    ../DOM/DOMMain$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_MDOM)DOMCore    ../DOM/DOMCore$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_MDOM)Tree       ../DOM/Tree$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_MDOM)DOMXML     ../DOM/DOMXML$(PM_SUFFIX)" \
-	  --create-perl-module="$(NS_MDOMXDoctype    ../DOM/XDoctype$(PM_SUFFIX)" \
-	  --create-perl-module="$(NS_MDOM)DOMLS      ../DOM/DOMLS$(PM_SUFFIX)" \
-	  --create-perl-module="$(NS_MDOM)GenericLS  ../DOM/GenericLS$(PM_SUFFIX)"
+	  --create-perl-module="$(NS_MDOMXDoctype    ../DOM/XDoctype$(PM_SUFFIX)"
 	$(PERL_CHK) PerlCode$(PM_SUFFIX)
 	$(PERL_CHK) DIS/DPG$(PM_SUFFIX)
 	$(PERL_CHK) ../DOM/DOMFeature$(PM_SUFFIX)
+	$(PERL_CHK) ../DOM/GenericLS$(PM_SUFFIX)
 	$(PERL_CHK) ../DOM/DOMMain$(PM_SUFFIX)
 	$(PERL_CHK) ../DOM/DOMCore$(PM_SUFFIX)
 	$(PERL_CHK) ../DOM/Tree$(PM_SUFFIX)
 	$(PERL_CHK) ../DOM/DOMXML$(PM_SUFFIX)
 	$(PERL_CHK) ../DOM/XDoctype$(PM_SUFFIX)
-	$(PERL_CHK) ../DOM/DOMLS$(PM_SUFFIX)
-	$(PERL_CHK) ../DOM/GenericLS$(PM_SUFFIX)
 	$(TOUCH) $@
 
 DIS/DISDoc$(PM_SUFFIX): disdoc$(DAC_SUFFIX) $(DAC2PM_PL)

@@ -12,9 +12,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    @@@:
-      $Date: 2006/01/29 07:09:26 $
-    @@ContentType: dis|Date.RCS
+    $Date: 2006/01/29 13:59:00 $
   
   @Require:
     @@Module:
@@ -24,6 +22,9 @@ Module:
       @@@WithFor: ManakaiDOM|all
     @@Module:
       @@@QName: MDOM|DOMFeature
+      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
+    @@Module:
+      @@@QName: MDOM|GenericLS
       @@@WithFor: ManakaiDOM|ManakaiDOMLatest
     @@Module:
       @@@WithFor: ManakaiDOM|ManakaiDOM
@@ -45,20 +46,12 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#
   @ecore:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/Core/
-  @Err:
-    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/
   @f:
     http://suika.fam.cx/~wakaba/archive/2004/dom/feature#
-  @html3:
-    urn:x-suika-fam-cx:markup:ietf:html:3:draft:00:
-  @html5:
-    http://www.w3.org/1999/xhtml
+  @gls:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/gls#
   @idl:
     http://suika.fam.cx/~wakaba/archive/2004/dis/IDL#
-  @ilang:
-    urn:x-suika-fam-cx:lang:
-  @infoset:
-    http://www.w3.org/2001/04/infoset#
   @kwd:
     http://suika.fam.cx/~wakaba/archive/2005/rfc2119/
   @lang:
@@ -69,38 +62,14 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
   @MDOM:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
-  @MDOMX:
-    http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
-  @mn:
-    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/ManakaiNode#
-  @nl:
-    http://suika.fam.cx/~wakaba/archive/2004/dis/NaturalLanguage#
-  @null:
-    http://suika.fam.cx/~wakaba/-temp/2003/09/27/null
   @rdf:
     http://www.w3.org/1999/02/22-rdf-syntax-ns#
   @rdfs:
     http://www.w3.org/2000/01/rdf-schema#
-  @s:
-    http://suika.fam.cx/~wakaba/archive/2004/dis/Markup#
-  @script:
-    http://suika.fam.cx/~wakaba/archive/2005/5/script#
-  @sw010:
-    urn:x-suika-fam-cx:markup:suikawiki:0:10:
-  @swcfg21:
-    http://suika.fam.cx/~wakaba/archive/2005/swcfg21#
   @test:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Test#
   @Util:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/
-  @xhtml1:
-    http://www.w3.org/1999/xhtml
-  @xhtml2:
-    http://www.w3.org/2002/06/xhtml2/
-  @xml:
-    http://www.w3.org/XML/1998/namespace
-  @xmlns:
-    http://www.w3.org/2000/xmlns/
 
 ## -- Features
 
@@ -1755,7 +1724,7 @@ IFClsDef:
 
   @Implement: ecore|MUErrorTarget||ManakaiDOM|Perl
 
-  @DISLang:role: DOMLS|ParserRole
+  @DISLang:role: gls|ParserRole
 
   @f:implements: DIS|TDT10
   @f:provides:
@@ -1793,7 +1762,7 @@ IFClsDef:
       Creates a new instance of the object.
     @@Param:
       @@@Name: impl
-      @@@Type: DOMLS|GLSImplementation
+      @@@Type: gls|GLSImplementation
       @@@enDesc:
         The implementation from which the parser is created.
     @@Param:

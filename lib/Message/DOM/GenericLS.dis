@@ -13,29 +13,27 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    @@@:
-      $Date: 2005/11/15 14:18:23 $
-    @@ContentType: dis|Date.RCS
-
-  @DefaultFor: ManakaiDOM|ManakaiDOMLatest
+    $Date: 2006/01/29 13:58:54 $
 
   @Require:
     @@Module: 
       @@@QName: MDOM|DOMFeature
       @@@WithFor: ManakaiDOM|ManakaiDOMLatest
-    @@Module:
-      @@@QName: MDOM|GenericLS
-      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
+  @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
 Namespace:
   @dis:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
-  @dx:
-    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#
+  @DOMLS:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/ls#
   @f:
     http://suika.fam.cx/~wakaba/archive/2004/dom/feature#
-  @infoset:
-     http://www.w3.org/2001/04/infoset#
+  @fe:
+    http://suika.fam.cx/www/2006/feature/
+  @gls:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/gls#
+  @idl:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/IDL#
   @lang:
      http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
   @license:
@@ -44,8 +42,6 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
   @MDOM:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
-  @MDOMX:
-    http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
   @rdf:
     http://www.w3.org/1999/02/22-rdf-syntax-ns#
   @rdfs:
@@ -58,6 +54,7 @@ Namespace:
 FeatureDef:
   @QName: Generic
   @featureQName: DOMLS|Generic
+  @featureQName: fe|GenericLS
   @FeatureVerDef:
     @@QName: Generic30
     @@f:instanceOf: Generic
@@ -144,8 +141,8 @@ ElementTypeBinding:
       @@@ContentType: DISCore|TFPQNames
       @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
 
-    @@DOMMain:implementFeature:
-      @@@@: DOMLS|Generic30
+    @@f:implements:
+      @@@@: gls|Generic30
       @@@For: ManakaiDOM|ManakaiDOMLatest
 
 ElementTypeBinding:
@@ -171,11 +168,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|MethodParameter
-
-ElementTypeBinding:
-  @Name: RaiseException
-  @ElementType:
-    dx:raises
 
 ElementTypeBinding:
   @Name: Return
@@ -261,7 +253,7 @@ IFClsDef:
       I: {
         for my $impl (@{$Message::DOM::ImplementationRegistry
                               ->get_implementation_list
-                                  ({<Q::DOMLS:Generic> => '3.0'})}) {
+                                  ({<Q::fe:GenericLS> => '3.0'})}) {
           if ($impl->isa (<ClassName::ManakaiGLSImplementation>)) {
             last I;
           }
@@ -279,7 +271,7 @@ IFClsDef:
          }
     @@Param:
       @@@Name: features
-      @@@Type: DOMMain|DOMString
+      @@@Type: f|MIString
       @@@actualType: f|FeaturesString
       @@@enDesc:
         A list of features that must be supported by 
@@ -291,7 +283,7 @@ IFClsDef:
         \
         }
     @@Return:
-      @@@Type: DOMMain|DOMObject
+      @@@Type: idl|Object||ManakaiDOM|all
       @@@enDesc:
         The newly created parser object, which supports
         the features requested by the <P::features> parameter.
@@ -339,7 +331,7 @@ IFClsDef:
          }
     @@Param:
       @@@Name: features
-      @@@Type: DOMMain|DOMString
+      @@@Type: f|MIString
       @@@actualType: f|FeaturesString
       @@@enDesc:
         A list of features that must be supported by 
@@ -351,7 +343,7 @@ IFClsDef:
         \
         }
     @@Return:
-      @@@Type: DOMMain|DOMObject
+      @@@Type: idl|Object||ManakaiDOM|all
       @@@enDesc:
         The newly created serializer object, which supports
         the features requested by the <P::features> parameter.
@@ -390,7 +382,6 @@ IFClsDef:
         $test->assert_null ($v);
 ##GLSImplementation
 
-
 ElementTypeBinding:
   @Name: nullCase
   @ElementType:
@@ -419,7 +410,7 @@ ElementTypeBinding:
 ## -- Parsers
 
 ResourceDef:
-  @QName: DOMLS|ParserRole
+  @QName: gls|ParserRole
   @rdf:type: DISLang|Role
   @For: =ManakaiDOM|all
   @enDesc:
@@ -427,13 +418,23 @@ ResourceDef:
     may be instantiated via the <M::ManakaiGLSImplementation
     ||ManakaiDOM|ManakaiDOMLatest.createGLSParser> method.
 
+ResourceDef:
+  @For: =ManakaiDOM|all
+  @QName: DOMLS|ParserRole
+  @AliasFor: gls|ParserRole
+
 ## -- Serializers
 
 ResourceDef:
-  @QName: DOMLS|SerializerRole
+  @QName: gls|SerializerRole
   @rdf:type: DISLang|Role
   @For: =ManakaiDOM|all
   @enDesc:
     Classes playing this role are serializers and 
     may be instantiated via the <M::ManakaiGLSImplementation
     ||ManakaiDOM|ManakaiDOMLatest.createGLSSerializer> method.
+
+ResourceDef:
+  @QName: DOMLS|SerializerRole
+  @AliasFor: gls|SerializerRole
+  @For: =ManakaiDOM|all

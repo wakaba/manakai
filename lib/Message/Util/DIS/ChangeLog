@@ -1,5 +1,21 @@
 2006-01-29  Wakaba  <wakaba@suika.fam.cx>
 
+	* Perl.dis, DNLite.dis, Value.dis, Test.dis: Unused definitions removed.
+
+	* Test.dis, DPS.dis: References to old names in |MDOM:DOMLS| namespace
+	changed to ones in |MDOM:GenericLS| namespace.
+
+	* Perl.dis (plLoadDISDatabaseModule): Don't throw database
+	incosistency error for |ManakaiDOM:all|, which is always
+	in |DISDatabase|.
+	(plGeneratePerlModule): |c:DOMConfigurationParameterApplication|
+	with whose referenced configuration's type |idl:boolean|
+	may override "supported" flags and their cases' |dis:SetParam|
+	parameters.  (It enables |MDOM:DOMLS| configuration
+	parameters split from |MDOM:DOMCore| ones)
+
+2006-01-29  Wakaba  <wakaba@suika.fam.cx>
+
 	* Test.dis (assertDOMTreeEquals): |attributes| and |generalEntities|
 	are implemented.
 

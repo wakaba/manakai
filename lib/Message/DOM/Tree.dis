@@ -12,7 +12,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/01/29 07:09:25 $
+    $Date: 2006/01/29 13:58:54 $
 
   @Require:
     @@Module:
@@ -28,6 +28,8 @@ Module:
     @@Module:
       @@@WithFor: ManakaiDOM|ManakaiDOMLatest
     @@Module:
+      @@@QName: MDOM|DOMXML
+    @@Module:
       @@@QName: MDOM|XDoctype
       @@@WithFor: ManakaiDOM|ManakaiDOMLatest
 
@@ -36,12 +38,16 @@ Module:
 Namespace:
   @c:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
+  @cfg:
+    http://suika.fam.cx/www/2006/dom-config/
   @dis:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
   @doc:
     http://suika.fam.cx/~wakaba/archive/2005/7/tutorial#
   @d:
     http://suika.fam.cx/~wakaba/archive/2004/dom/xdt#
+  @DOMMain:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/main#
   @dx:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#
   @dxm:
@@ -753,7 +759,7 @@ IFCls1Def:
            DOM Level 2 Core errata.
          @@@@For: ManakaiDOM|ManakaiDOM
        @@@PerlDef:
-         __DOMCore:ERROR{t|setting-node-value-no-effect::
+         __c|ERROR{t|setting-node-value-no-effect::
               c|relatedData => {$self},
          }__;
 
@@ -1062,8 +1068,7 @@ IFCls1Def:
               a <IF::DOMXML:DocumentType> that has just been created 
               and not yet used in any document. 
         @@@disDef:
-          @@@@GetPropNode:
-            DOMCore:ownerDocument
+          @@@@GetPropNode: c|ownerDocument
      @@SpecLevel[list]:
         1
         2
@@ -4421,14 +4426,14 @@ PropDef:
     data and its handler.
   @rdfs:domain: Node
   @rdfs:range: DISPerl|HASH
-  @DOMCore:nodeProp: ud
+  @c:nodeProp: ud
 
 PropDef:
   @QName: DOMCore|nodeRefClass
   @enDesc:
     A fully qualified package name of the node reference class that is most
     <QUOTE::natural> for the node.
-  @DOMCore:nodeProp: cp
+  @c:nodeProp: cp
 
 PropDef:
   @QName: DOMCore|nodeProp
@@ -4444,7 +4449,7 @@ PropDef:
   @enDesc:
     Whether a node is read-only or not.
   @Type: DISPerl|Boolean
-  @DOMCore:nodeProp: ro
+  @c:nodeProp: ro
 
 ElementTypeBinding:
   @Name: RoleDef
@@ -4578,13 +4583,13 @@ PropDef:
   @enDesc:
     The type of the node, i.e. <A::Node||ManakaiDOM|ManakaiDOM.nodeType>.
   @Type: DISPerl|String
-  @DOMCore:nodeProp: nt
+  @c:nodeProp: nt
 
 PropDef:
   @QName: c|xmlEncoding
   @enDesc:
     <A::Document.xmlEncoding>
-  @DOMCore:nodeProp: xcs
+  @c:nodeProp: xcs
 
 ClsDef:
   @ClsQName: 
@@ -5676,7 +5681,7 @@ ElementTypeBinding:
 
 ForDef:
   @QName:
-    DOMCore:ForChildNodeList
+    c:ForChildNodeList
   @Description:
     @@lang:en
     @@@:
@@ -5685,7 +5690,7 @@ ForDef:
 
 ForDef:
   @QName:
-    DOMCore:ForGetNodeList
+    c:ForGetNodeList
   @Description:
     @@lang:en
     @@@:
@@ -5693,7 +5698,7 @@ ForDef:
   @ISA: ManakaiDOM|ForClass
 
 ForDef:
-  @QName: DOMCore|ForEmptyNodeList
+  @QName: c|ForEmptyNodeList
   @ISA: ManakaiDOM|ForClass
 
 ResourceDef:
@@ -5712,8 +5717,8 @@ ResourceDef:
     @@@:
       dis:MultipleResource
     @@ForCheck:
-      !ManakaiDOM:ForIF !DOMCore:ForChildNodeList !DOMCore:ForGetNodeList
-      !DOMCore|ForEmptyNodeList
+      !ManakaiDOM:ForIF !c|ForChildNodeList !c|ForGetNodeList
+      !c|ForEmptyNodeList
   @ForCheck: ManakaiDOM|DOM
 
   @resourceFor:
@@ -5735,29 +5740,24 @@ ResourceDef:
     @@ForCheck: ManakaiDOM|DOM3
 
   @resourceFor:
-    @@@:
-      DOMCore:ForChildNodeList
+    @@@: c|ForChildNodeList
     @@For:
       ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
   @QName:
     @@@:
       ManakaiDOMCore:ManakaiDOMChildNodeList
-    @@ForCheck:
-      DOMCore:ForChildNodeList
+    @@ForCheck: c|ForChildNodeList
   @rdf:type:
     @@@:
       ManakaiDOM:Class
-    @@ForCheck:
-      DOMCore:ForChildNodeList
+    @@ForCheck: c|ForChildNodeList
   @ISA:
     @@@: ManakaiNode|ManakaiNodeRef||ManakaiDOM|Perl
-    @@ForCheck:
-      DOMCore:ForChildNodeList
+    @@ForCheck: c|ForChildNodeList
   @ISA:
     @@@:
       ManakaiDOM:ManakaiDOMObject
-    @@ForCheck:
-      DOMCore:ForChildNodeList
+    @@ForCheck: c|ForChildNodeList
 
   @AppISA:
     @@ForCheck: c|ForChildNodeList
@@ -5778,8 +5778,7 @@ ResourceDef:
     @@ForCheck: c|ForGetNodeList
   @ISA:
     @@@: ManakaiNode|ManakaiNodeRef||ManakaiDOM|Perl
-    @@ForCheck:
-      DOMCore:ForGetNodeList
+    @@ForCheck: c|ForGetNodeList
   @ISA:
     @@@:
       ManakaiDOM:ManakaiDOMObject
@@ -5792,18 +5791,18 @@ ResourceDef:
       Tie::Array
 
   @resourceFor:
-    @@@: DOMCore|ForEmptyNodeList
+    @@@: c|ForEmptyNodeList
     @@ForCheck:
       ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
   @QName:
     @@@: DOMCore|ManakaiDOMEmptyNodeList
-    @@ForCheck: DOMCore|ForEmptyNodeList
+    @@ForCheck: c|ForEmptyNodeList
   @rdf:type:
     @@@: DISLang|Class
-    @@ForCheck: DOMCore|ForEmptyNodeList
+    @@ForCheck: c|ForEmptyNodeList
   @ISA:
     @@@: ManakaiDOM|ManakaiDOMObject
-    @@ForCheck: DOMCore|ForEmptyNodeList
+    @@ForCheck: c|ForEmptyNodeList
 
   @Implement:
     @@@: NodeList||ManakaiDOM|ManakaiDOM
@@ -5893,8 +5892,7 @@ ResourceDef:
               The "index" is invalid, i.e. it is greater than or 
               equal to the number of nodes in the list.
         @@@PerlDef:
-          @@@@ForCheck:
-            DOMCore:ForChildNodeList
+          @@@@ForCheck: c|ForChildNodeList
           @@@@@:
             $r = $self->{<H::mn:node>}->{<H::infoset:children>}->[$index];
             if (defined $r) {
@@ -5915,7 +5913,7 @@ ResourceDef:
            @@@@@@:
              TODO: Cache mechanism required.
       @@@PerlDef:
-        @@@@ForCheck: DOMCore|ForEmptyNodeList
+        @@@@ForCheck: c|ForEmptyNodeList
         @@@@@: \
 
   @IntMethod:
@@ -5969,13 +5967,13 @@ ResourceDef:
           @@@@@lang:en
           @@@@@@:
             A <IF::NodeList> is unable to be edited. 
-        @@@@ForCheck: DOMCore|ForEmptyNodeList
+        @@@@ForCheck: c|ForEmptyNodeList
       @@@disDef:
         @@@@DOMMain:raiseException: c|NOMOD_NODELIST_ERR
-        @@@@ForCheck: DOMCore|ForGetNodeList
+        @@@@ForCheck: c|ForGetNodeList
       @@@disDef:
         @@@@DOMMain:raiseException: c|NOMOD_NODELIST_ERR
-        @@@@ForCheck: DOMCore|ForEmptyNodeList
+        @@@@ForCheck: c|ForEmptyNodeList
       @@@Exception:
         @@@@ForCheck: c|ForChildNodeList
           @@@@Type: DOMException
@@ -6069,10 +6067,10 @@ ResourceDef:
           @@@@@@:
             A <IF::NodeList> returned by <M::Document.getElementsByTagNameNS> 
             or like is unable to be edited. 
-        @@@@ForCheck: !DOMCore|ForChildNodeList
+        @@@@ForCheck: !c|ForChildNodeList
       @@@disDef:
         @@@@DOMMain:raiseException: c|NOMOD_NODELIST_ERR
-        @@@@ForCheck: !DOMCore|ForChildNodeList
+        @@@@ForCheck: !c|ForChildNodeList
       @@@Exception:
         @@@@ForCheck: c|ForChildNodeList
           @@@@Type: DOMException
@@ -6135,7 +6133,7 @@ ResourceDef:
                              ($self->{<H::ManakaiDOMCore:nodeMatch>});
             $r = @$l;
       @@@PerlDef:
-        @@@@ForCheck: DOMCore|ForEmptyNodeList
+        @@@@ForCheck: c|ForEmptyNodeList
         @@@@@:\
 
   @IntMethod:
@@ -6203,11 +6201,11 @@ ResourceDef:
                                ($index) ? 1 : 0;
             }__;
        @@@PerlDef:
-         @@@@ForCheck: DOMCore|ForEmptyNodeList
+         @@@@ForCheck: c|ForEmptyNodeList
          @@@@@:\
   @IntMethod:
     @@Name: isEqualNodeList
-    @@ForCheck: !DOMCore|ForGetNodeList
+    @@ForCheck: !c|ForGetNodeList
     @@Perlop: ==
     @@Description:
       @@@lang:en
@@ -6248,14 +6246,14 @@ ResourceDef:
             $r = true;
           }
     @@PerlDef:
-      @@@ForCheck: DOMCore|ForEmptyNodeList
+      @@@ForCheck: c|ForEmptyNodeList
       @@@@:
         __DEEP{
           $r = ($arg-><AG::NodeList.length> == 0);
         }__;
 
   @IntMethod:
-    @@ForCheck: !DOMCore|ForEmptyNodeList
+    @@ForCheck: !c|ForEmptyNodeList
     @@Perlop:TIEARRAY
     @@ManakaiDOM:isStatic:1
     @@Description:
@@ -6301,10 +6299,10 @@ ResourceDef:
           @@@@@@:
             A <IF::NodeList> returned by <M::Document.getElementsByTagNameNS> 
             or like is unable to be edited. 
-        @@@@ForCheck: !DOMCore|ForChildNodeList
+        @@@@ForCheck: !c|ForChildNodeList
       @@@disDef:
         @@@@DOMMain:raiseException: c|NOMOD_NODELIST_ERR
-        @@@@ForCheck: !DOMCore|ForChildNodeList
+        @@@@ForCheck: !c|ForChildNodeList
       @@@Exception:
         @@@@ForCheck: c|ForChildNodeList
           @@@@Type: DOMException
@@ -6468,12 +6466,12 @@ ResourceDef:
     @@Return:
       @@@Type: DISPerl|ARRAY||ManakaiDOM|all
       @@@PerlDef:
-        @@@@ForCheck: !DOMCore|ForEmptyNodeList
+        @@@@ForCheck: !c|ForEmptyNodeList
         @@@@@:
           tie my @list, ref $self, $self;
           $r = \@list;
       @@@PerlDef:
-        @@@@ForCheck: DOMCore|ForEmptyNodeList
+        @@@@ForCheck: c|ForEmptyNodeList
         @@@@@: \
 
   @IntMethod:
@@ -6486,15 +6484,15 @@ ResourceDef:
         since the <PerlModule::Tie::Array> also has its own empty destructor. 
     @@Return:
       @@@disDef:
-        @@@@ForCheck: !DOMCore|ForEmptyNodeList
+        @@@@ForCheck: !c|ForEmptyNodeList
         @@@@DISPerl:cloneCode:
           ManakaiNode|ManakaiNodeRef||ManakaiDOM|Perl.destroy
       @@@PerlDef:
-        @@@@ForCheck: DOMCore|ForEmptyNodeList
+        @@@@ForCheck: c|ForEmptyNodeList
         @@@@@: \
 
   @Method:
-    @@ForCheck: DOMCore|ForEmptyNodeList
+    @@ForCheck: c|ForEmptyNodeList
     @@Operator: DISPerl|NewMethod
     @@enDesc:
       Creats a new instance of <Class::ManakaiDOMEmptyNodeList>.
@@ -6583,10 +6581,10 @@ ElementTypeBinding:
         @@@@@:
           A <IF::NodeList> returned by <M::Document.getElementsByTagNameNS> 
           or like is unable to be edited. 
-      @@@ForCheck: !DOMCore|ForEmptyNodeList
+      @@@ForCheck: !c|ForEmptyNodeList
     @@disDef:
       @@@DOMMain:raiseException: c|NOMOD_NODELIST_ERR
-      @@@ForCheck: !DOMCore|ForEmptyNodeList
+      @@@ForCheck: !c|ForEmptyNodeList
 
 ElementTypeBinding:
   @Name: Perlop
@@ -6603,8 +6601,7 @@ ForDef:
   @ISA: ManakaiDOM|ForClass
 
 ForDef:
-  @QName:
-    DOMCore:ForNotationMap
+  @QName: c|ForNotationMap
   @Description:
     @@lang:en
     @@@:
@@ -6667,8 +6664,7 @@ ResourceDef:
     @@ForCheck: c|ForNotationMap
   @ISA:
     @@@: ManakaiNode|ManakaiNodeRef||ManakaiDOM|Perl
-    @@ForCheck:
-      DOMCore:ForNotationMap
+    @@ForCheck: c|ForNotationMap
 
   @DOMMain:implementFeature:
     @@@: 
@@ -8987,7 +8983,7 @@ ResourceDef:
 
 PropDef:
   @QName: t|hashPosition
-  @DOMCore:nodeProp: hpos
+  @c:nodeProp: hpos
   @enDesc:
     Index for <Perl::each>.
 
@@ -9627,7 +9623,7 @@ NodeTypeDef:
     @@enDesc:
       A list of nodes that contains all children of the node.
     @@Get:
-      @@@Type: DOMCore|NodeList
+      @@@Type: c|NodeList
       @@@actualType: DOMCore|ManakaiDOMEmptyNodeList
       @@@enDesc:
         Since <IF::DOMCore|CharacterData> nodes cannot have any child nodes,
@@ -15479,13 +15475,14 @@ NodeTypeDef:
                 push @node, $clone;
               }
               if ($self->{<H::mn:node>}
-                       ->{<H::ManakaiDOM|entity-reference-read-only>}) {
+                       ->{<H::cfg|entity-reference-read-only>}) {
                 while (@node) {
                   my $node = shift @node;
                   $node->{<H::mn:node>}->{<H::c|read-only>} = true;
                   push @node, @{$node-><AG::Node.childNodes>};
                   push @node, values %{$node-><AG::Node.attributes> or {}};
                 }
+                $r->{<H::mn:node>}->{<H::c|read-only>} = true;
               }
               $r->{<H::mn:node>}->{<H::ManakaiDOM:isExpanded>}
                 = $__et->{<H::mn:node>}->{<H::x|hasReplacementTree>};
@@ -15521,6 +15518,7 @@ NodeTypeDef:
           my $et = $docd-><M::d|DocumentXDoctype.createGeneralEntity>
                              ('ent1');
           $et-><AS::Node.textContent> ('replacement text content');
+          $et-><AS::x|Entity.hasReplacementTree> (true);
         $dtd-><M::DTDef.setGeneralEntityNode> ($et);
         $doc-><M::Node.appendChild> ($dtd);
 
@@ -15555,11 +15553,12 @@ NodeTypeDef:
           my $et = $docd-><M::d|DocumentXDoctype.createGeneralEntity>
                              ('ent1');
           $et-><AS::Node.textContent> ('replacement text content');
+          $et-><AS::x|Entity.hasReplacementTree> (true);
         $dtd-><M::DTDef.setGeneralEntityNode> ($et);
         $doc-><M::Node.appendChild> ($dtd);
         $doc-><AG::Document.domConfig>
             -><M::c|DOMConfiguration.setParameter>
-                (<Q::ManakaiDOM|entity-reference-read-only> => false);
+                (<Q::cfg|entity-reference-read-only> => false);
 
         my $ent = $doc-><M::Document.createEntityReference> ('ent1');
         $test->assert_isa ($ent, <IFName::x|EntityReference>);
@@ -17111,25 +17110,25 @@ NodeTypeDef:
          the <IF::DOMErrorHandler> object associated with the 
          <DOM::error-handler> parameter.
      @@Return:
-      @@@DOMCore:reports:
+      @@@c:reports:
         @@@@@: c|check-character-normalization-failure
         @@@@enDesc:
           If the <cfg::c|check-character-normalization> configuration
           parameter is set to <DOM::true> and a sequence of characters
           is encountered that fails normalization checking.
-      @@@DOMCore:reports:
+      @@@c:reports:
         @@@@@: c|cdata-sections-splitted
         @@@@enDesc:
           If the <cfg::c|split-cdata-sections> configuration parameter
           is set to <DOM::true> and a <XML::CDATA> section
           is split.
-      @@@DOMCore:reports:
+      @@@c:reports:
         @@@@@: c|wf-invalid-character-in-node-name
         @@@@enDesc:
           If the <cfg::c|well-formed> configuration parameter is set to 
           <DOM::true> and a <A::Node.nodeName> contains invalid character
           according to its node type.
-      @@@DOMCore:reports:
+      @@@c:reports:
         @@@@@: c|wf-invalid-character
         @@@@enDesc:
           If the <cfg::c|well-formed> configuration parameter is set to
@@ -17487,6 +17486,7 @@ NodeTypeDef:
           $r->{<H::infoset:version>} = '1.0';
           $r->{<H::DOMCore:strictErrorChecking>} = true;
           $r->{<H::infoset:children>} = [];
+          $r->{<H::cfg|entity-reference-read-only>} = true;
        @@@ImplNote:
          @@@@lang:en
          @@@@@:
@@ -17499,7 +17499,8 @@ NodeTypeDef:
            <Q::infoset:standalone>, <Q::infoset:version>,
            <Q::DOMCore:documentURI>, <Q::DOMCore:strictErrorChecking>, 
            <Q::infoset:children>,
-           <Q::c|error-handler>.
+           <Q::c|error-handler>,
+           <Q::cfg|entity-reference-read-only>.
 
   @mn:subnode1: infoset|children
   @mn:anydata0: DOMCore|error-handler
@@ -17596,12 +17597,13 @@ ElementTypeBinding:
     @@For: =ManakaiDOM|all
 
 boolCParam:
-  @QName: ManakaiDOM|entity-reference-read-only
+  @QName: cfg|entity-reference-read-only
   @nodeProp: etro
   @c:targetType: t|Document
   @TrueCase:
     @@IsSupportRequired: 1
     @@IsDefault: 1
+    @@c:isSupported: 1
     @@enDesc:
       <IF::x|EntityReference> nodes and its subtree created by
       <IF::t|Document.createEntityReference> method or
@@ -17610,6 +17612,7 @@ boolCParam:
 
       This is the DOM Level 3 (or earlier) conformant behavior.
   @FalseCase:
+    @@c:isSupported: 1
     @@enDesc:
       <IF::x|EntityReference> nodes and its subtree created by
       <IF::t|Document.createEntityReference> method or
@@ -17625,45 +17628,45 @@ boolCParam:
 
       $test->id ('default.true');
       $test->assert_true ($cfg-><M::c|DOMConfiguration.getParameter>
-                                  (<Q::ManakaiDOM|entity-reference-read-only>));
+                                  (<Q::cfg|entity-reference-read-only>));
       
       $test->id ('true.to.false');
       $cfg-><M::c|DOMConfiguration.setParameter>
-              (<Q::ManakaiDOM|entity-reference-read-only> => false);
+              (<Q::cfg|entity-reference-read-only> => false);
       $test->assert_false ($cfg-><M::c|DOMConfiguration.getParameter>
-                                   (<Q::ManakaiDOM|entity-reference-read-only>));
+                                   (<Q::cfg|entity-reference-read-only>));
    
       $test->id ('false.to.true');
       $cfg-><M::c|DOMConfiguration.setParameter>
-              (<Q::ManakaiDOM|entity-reference-read-only> => true);
+              (<Q::cfg|entity-reference-read-only> => true);
       $test->assert_false ($cfg-><M::c|DOMConfiguration.getParameter>
-                                   (<Q::ManakaiDOM|entity-reference-read-only>));
+                                   (<Q::cfg|entity-reference-read-only>));
 
       $test->id ('reset');
       $cfg-><M::c|DOMConfiguration.setParameter>
-              (<Q::ManakaiDOM|entity-reference-read-only> => false);
+              (<Q::cfg|entity-reference-read-only> => false);
       $cfg-><M::c|DOMConfiguration.setParameter>
-              (<Q::ManakaiDOM|entity-reference-read-only> => null);
+              (<Q::cfg|entity-reference-read-only> => null);
       $test->assert_true ($cfg-><M::c|DOMConfiguration.getParameter>
-                                  (<Q::ManakaiDOM|entity-reference-read-only>));
+                                  (<Q::cfg|entity-reference-read-only>));
 
 PropDef:
   @QName: c|ownerDocument
   @enDesc:
     <A::Node.ownerDocument>.
-  @DOMCore:nodeProp: od
+  @c:nodeProp: od
 
 PropDef:
   @QName: c|documentURI
   @enDesc:
     <A::Document.documentURI>.
-  @DOMCore:nodeProp: duri
+  @c:nodeProp: duri
 
 PropDef:
   @QName: c|strictErrorChecking
   @enDesc:
     <A::Document.strictErrorChecking>.
-  @DOMCore:nodeProp: chk
+  @c:nodeProp: chk
 
 PropDef:
   @QName: c|name
@@ -17671,7 +17674,7 @@ PropDef:
     @@lang:en
     @@@:
       A name.
-  @DOMCore:nodeProp: xnm
+  @c:nodeProp: xnm
 
 ElementTypeBinding:
   @Name: PropDef

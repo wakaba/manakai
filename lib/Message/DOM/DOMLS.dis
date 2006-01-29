@@ -28,43 +28,35 @@ Module:
   @License:
      license:Perl+MPL
   @Date:
-    @@@:
-      $Date: 2005/12/28 03:50:17 $
-    @@ContentType:
-      dis:Date.RCS
-
-  @DefaultFor:
-    ManakaiDOM:ManakaiDOMLatest
+    $Date: 2006/01/29 13:58:54 $
 
   @Require:
     @@Module:
-      @@@QName: MDOM|DOMCore
+      @@@QName: MDOM|GenericLS
       @@@WithFor: ManakaiDOM|ManakaiDOMLatest
+    @@Module:
+      @@@QName: MDOM|DOMXML
 #     @@Module:
 #        @@@Name:  DOMEvents
 ## TODO: Implement these modules
 #     @@Module:
 #        @@@Name:  DOMTraversal
     @@Module:
-      @@@Name: DOMLS
       @@@WithFor:
         ManakaiDOM:ManakaiDOM
     @@Module:
-      @@@Name: DOMLS
       @@@WithFor:
         ManakaiDOM:ManakaiDOM3
     @@Module:
-      @@@Name: DOMLS
       @@@WithFor:
         ManakaiDOM:ManakaiDOMLatest
+  @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
 Namespace:
   @dis:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
-  @DOMCore:
+  @c:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
-  @DOMMain:
-    http://suika.fam.cx/~wakaba/archive/2004/dom/main#
   @dx:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#
   @ecore:
@@ -136,8 +128,7 @@ FeatureDef:
     @@Version:3.0
     @@QName: LSFeature30
     @@f:instanceOf: LSFeature
-    @@DOMMain:requireFeature: 
-      DOMCore:CoreFeature20
+    @@f:requires: c|CoreFeature20
     @@FullName:
       @@@lang:en
       @@@@:
@@ -150,7 +141,7 @@ FeatureDef:
     @@Version:3.0
     @@QName: LSAsyncFeature30
     @@f:instanceOf: LSAsyncFeature
-    @@DOMMain:requireFeature: LSFeature30
+    @@f:requires: LSFeature30
     @@FullName:
       @@@lang:en
       @@@@:
@@ -407,15 +398,6 @@ ImplNote:
     conforming implementations.
 
 ElementTypeBinding:
-  @Name: L3
-  @ElementType:
-    DOMMain:implementFeature
-  @ShadowContent:
-    @@@: LSFeature30
-    @@For:
-      ManakaiDOM:DOM3
-
-ElementTypeBinding:
   @Name: PerlDef
   @ElementType:
     dis:Def
@@ -566,7 +548,6 @@ ElementTypeBinding:
   @ShadowContent:
     @@ForCheck: ManakaiDOM|ForClass
 
-
 ElementTypeBinding:
   @Name: IFCls3Def
   @ElementType: 
@@ -602,10 +583,10 @@ ElementTypeBinding:
       @@@ContentType: DISCore|TFPQNames
       @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
 
-    @@DOMMain:implementFeature:
+    @@f:implements:
       @@@@: LSFeature30
       @@@For: ManakaiDOM|DOM3
-    @@DOMMain:implementFeature:
+    @@f:implements:
       @@@@: LSAsyncFeature30
       @@@For: ManakaiDOM|DOM3 ManakaiDOM|ForIF
 
@@ -723,7 +704,7 @@ IFCls3Def:
 
   @f:provides: LSFeature30
 
-  @DOMMain:implementFeature:
+  @f:implements:
     @@@@: LSAsyncFeature30
     @@@For: ManakaiDOM|DOM3
 
@@ -1143,7 +1124,7 @@ IFCls3Def:
 
   @ClsISA: ManakaiDOM|ManakaiDOMObject
 
-  @DOMMain:implementFeature: LSAsyncFeature30
+  @f:implements: LSAsyncFeature30
 
   @Description:
     @@lang:en
@@ -1327,12 +1308,12 @@ IFCls3Def:
        @@@PerlDef:
          $r = $self->{base_uri};
      @@Set:
-       @@@DOMCore:reports:
+       @@@c:reports:
          @@@@@: DOMLS|null-base-uri
          @@@@enDesc:
            If the new value is <DOM::null>.
          @@@@For: ManakaiDOM|ManakaiDOM
-       @@@DOMCore:reports:
+       @@@c:reports:
          @@@@@: DOMLS|relative-base-uri
          @@@@enDesc:
            If the new value is a relative reference.
@@ -1444,8 +1425,8 @@ ErrDef:
   @enDesc:
     A relative reference is specified where its interpretation
     is implementation dependent.
-  @DOMCore:severity: DOMCore|SEVERITY_WARNING
-  @DOMCore:relatedData:
+  @c:severity: DOMCore|SEVERITY_WARNING
+  @c:relatedData:
     @@enDesc: The specified URI.
 
 ErrDef:
@@ -1453,15 +1434,15 @@ ErrDef:
   @enDesc:
     A relative reference is specified as the base URI where its interpretation
     is implementation dependent.
-  @DOMCore:severity: DOMCore|SEVERITY_WARNING
-  @DOMCore:relatedData:
+  @c:severity: DOMCore|SEVERITY_WARNING
+  @c:relatedData:
     @@enDesc: The specified URI.
 
 ErrDef:
   @QName: DOMLS|null-base-uri
   @enDesc:
     <DOM::null> is specified as the base URI.
-  @DOMCore:severity: DOMCore|SEVERITY_WARNING
+  @c:severity: DOMCore|SEVERITY_WARNING
 
 ElementTypeBinding:
   @Name: ErrDef
@@ -2106,7 +2087,7 @@ IFCls3Def:
             @@@@@lang:en
             @@@@@@:
               The behavior is implementation dependent.
-        @@@DOMCore:reports:
+        @@@c:reports:
           @@@@@: DOMLS|relative-uri
           @@@@enDesc:
             If the new value is a relative reference.
@@ -2211,7 +2192,7 @@ ElementTypeBinding:
 ElementTypeBinding:
   @Name: errname
   @ElementType:
-    DOMCore:errorType
+    c:errorType
   @ShadowContent:
     @@ContentType: DISCore|String
 
@@ -2225,7 +2206,7 @@ ErrDef:
   @enDesc:
     If the configuration parameter <err::disallow-doctype> is set
     to <DOM::true> and a document type declaration is encountered.
-  @DOMCore:severity: DOMCore|SEVERITY_FATAL_ERROR
+  @c:severity: DOMCore|SEVERITY_FATAL_ERROR
   
 ErrDef:
   @QName: no-input-specified
@@ -2233,7 +2214,7 @@ ErrDef:
   @enDesc:
     When loading a document, no input is specified in the 
     <IF::LSInput> object.
-  @DOMCore:severity: DOMCore|SEVERITY_FATAL_ERROR
+  @c:severity: DOMCore|SEVERITY_FATAL_ERROR
 
 ErrDef:
   @QName: pi-base-uri-not-preserved
@@ -2241,7 +2222,7 @@ ErrDef:
   @enDesc:
     If a processing instruction is encountered in context 
     where the base URI of the processing instruction cannot be preserved.
-  @DOMCore:severity: DOMCore|SEVERITY_WARNING
+  @c:severity: DOMCore|SEVERITY_WARNING
 
 ErrDef:
   @QName: unbound-prefix-in-entity
@@ -2254,7 +2235,7 @@ ErrDef:
     This warning is implementation dependent and not enforced
     since some existing parsers may not recognize unbound namespace
     prefixes in the replacement text of entities.  <SRC::DOM Level 3 LS>
-  @DOMCore:severity: DOMCore|SEVERITY_WARNING
+  @c:severity: DOMCore|SEVERITY_WARNING
 
 ErrDef:
   @QName: unknown-character-denormalization
@@ -2264,7 +2245,7 @@ ErrDef:
     <cfg::ignore-unknown-character-denormalizations> is set to <DOM::false>
     and a character is encountered for which the processor cannot
     determine the normalization properties.
-  @DOMCore:severity: DOMCore|SEVERITY_FATAL_ERROR
+  @c:severity: DOMCore|SEVERITY_FATAL_ERROR
 
 ErrDef:
   @QName: unknown-character-denormalization.warning
@@ -2275,14 +2256,14 @@ ErrDef:
     and verifying full normalization of XML 1.1 is supported 
     and a character is encountered for which the processor cannot
     determine the normalization properties.
-  @DOMCore:severity: DOMCore|SEVERITY_WARNING
+  @c:severity: DOMCore|SEVERITY_WARNING
 
 ErrDef:
   @QName: unsupported-encoding
   @errname: unsupported-encoding
   @enDesc:
     If an unsupported encoding is encountered.
-  @DOMCore:severity: DOMCore|SEVERITY_FATAL_ERROR
+  @c:severity: DOMCore|SEVERITY_FATAL_ERROR
 
 ErrDef:
   @QName: unsupported-media-type
@@ -2290,12 +2271,12 @@ ErrDef:
   @enDesc:
     If the configuration parameter <cfg::supported-media-types-only>
     is set to <DOM::true> and an unsupported media type is encountered.
-  @DOMCore:severity: DOMCore|SEVERITY_FATAL_ERROR
+  @c:severity: DOMCore|SEVERITY_FATAL_ERROR
 
 ElementTypeBinding:
   @Name: ParseTimeErrors
   @ElementType:
-    DOMCore:reports
+    c:reports
   @ShadowContent:
     @@@: DOMCore|check-character-normalization-failure
     @@Description:
@@ -2306,28 +2287,28 @@ ElementTypeBinding:
         <DOM::true> and a string is encountered that fails normalization
         checking.
   @ShadowSibling:
-    @@DOMCore:reports:
+    @@c:reports:
       @@@@: doctype-not-allowed
       @@@Description:
         @@@@lang:en
         @@@@@:
           If the configuration parameter <err::disallow-doctype> is set
           to <DOM::true> and a document type declaration is encountered.
-    @@DOMCore:reports:
+    @@c:reports:
       @@@@: no-input-specified
       @@@Description:
         @@@@lang:en
         @@@@@:
           When loading a document, no input is specified in the 
           <IF::LSInput> object.
-    @@DOMCore:reports:
+    @@c:reports:
       @@@@: pi-base-uri-not-preserved
       @@@Description:
         @@@@lang:en
         @@@@@:
           If a processing instruction is encountered in context 
           where the base URI of the processing instruction cannot be preserved.
-    @@DOMCore:reports:
+    @@c:reports:
       @@@@: unbound-prefix-in-entity
       @@@Description:
         @@@@lang:en
@@ -2335,7 +2316,7 @@ ElementTypeBinding:
           The configuration parameter <cfg::DOMCore:namespaces> is 
           set to <DOM::true> and an unbound namespace prefix is
           encountered in the replacement text of an entity.
-    @@DOMCore:reports:
+    @@c:reports:
       @@@@: unknown-character-denormalization
       @@@Description:
         @@@@lang:en
@@ -2344,7 +2325,7 @@ ElementTypeBinding:
           <cfg::ignore-unknown-character-denormalizations> is set to <DOM::false>
           and a character is encountered for which the processor cannot
           determine the normalization properties.
-    @@DOMCore:reports:
+    @@c:reports:
       @@@@: unknown-character-denormalization.warning
       @@@Description:
         @@@@lang:en
@@ -2353,13 +2334,13 @@ ElementTypeBinding:
           <cfg::ignore-unknown-character-denormalizations> is set to <DOM::true>
           and a character is encountered for which the processor cannot
           determine the normalization properties.
-    @@DOMCore:reports:
+    @@c:reports:
       @@@@: unsupported-encoding
       @@@Description:
         @@@@lang:en
         @@@@@:
           If an unsupported encoding is encountered.
-    @@DOMCore:reports:
+    @@c:reports:
       @@@@: unsupported-media-type
       @@@Description:
         @@@@lang:en
@@ -2376,7 +2357,7 @@ ElementTypeBinding:
 ElementTypeBinding:
   @Name: SerializationErrors
   @ElementType:
-    DOMCore:reports
+    c:reports
   @ShadowContent:
     @@@: DOMCore|wf-invalid-character
     @@Description:
@@ -2387,20 +2368,20 @@ ElementTypeBinding:
         node contains characters that cannot be represented in the
         specified output encoding.  This error is not recoverable.
   @ShadowSibling:
-    @@DOMCore:reports:
+    @@c:reports:
       @@@@: DOMCore|wf-invalid-character-in-node-name
       @@@Description:
         @@@@lang:en
         @@@@@:
           Within markup a character is encountered that cannot be
           represented in the output encoding.
-    @@DOMCore:reports:
+    @@c:reports:
       @@@@: no-output-specified
       @@@Description:
         @@@@lang:en
         @@@@@:
           If no output is specified in <IF::LSOutput> when writing to it.
-    @@DOMCore:reports:
+    @@c:reports:
       @@@@: unbound-prefix-in-entity-reference
       @@@Description:
         @@@@lang:en
@@ -2409,13 +2390,13 @@ ElementTypeBinding:
           set to <DOM::true> and an entity whose replacement text contains
           unbound namespace prefixes is referenced in context where
           there are no bindings for the namespace prefixes.
-    @@DOMCore:reports:
+    @@c:reports:
       @@@@: unsupported-encoding
       @@@Description:
         @@@@lang:en
         @@@@@:
           If an unsupported encoding is encountered.
-    @@DOMCore:reports:
+    @@c:reports:
       @@@@: DOMLS|byte-order-mark-needed
       @@@Description:
         @@@@lang:en
@@ -2427,7 +2408,7 @@ ElementTypeBinding:
         In addition, implementations are expected to raise implementation
         specific errors and warnings for any other error and warning
         cases such as I/O error and so on.
-    @@DOMCore:reports:
+    @@c:reports:
       @@@@: DOMLS|canonical-form-not-xml10
       @@@Description:
         @@@@lang:en
@@ -2441,7 +2422,7 @@ ErrDef:
   @errname: no-output-specified
   @enDesc:
     If no output is specified in <IF::LSOutput> when writing to it.
-  @DOMCore:severity: DOMCore|SEVERITY_FATAL_ERROR
+  @c:severity: DOMCore|SEVERITY_FATAL_ERROR
 
 ErrDef:
   @QName: unbound-prefix-in-entity-reference
@@ -2451,7 +2432,7 @@ ErrDef:
     set to <DOM::true> and an entity whose replacement text contains
     unbound namespace prefixes is referenced in context where
     there are no bindings for the namespace prefixes.
-  @DOMCore:severity: DOMCore|SEVERITY_FATAL_ERROR
+  @c:severity: DOMCore|SEVERITY_FATAL_ERROR
 
 ErrDef:
   @QName: DOMLS|canonical-form-not-xml10
@@ -2461,14 +2442,14 @@ ErrDef:
     a non-XML 1.0 document.
   @enImplNote:
     This error is not given any name in DOM Level 3 LS.
-  @DOMCore:severity: DOMCore|SEVERITY_FATAL_ERROR
+  @c:severity: DOMCore|SEVERITY_FATAL_ERROR
 
 ErrDef:
   @QName: byte-order-mark-needed
   @errname: byte-order-mark-needed
   @enDesc:
     If the <CHAR::BYTE ORDER MARK> is not generated.
-  @DOMCore:severity: DOMCore|SEVERITY_WARNING
+  @c:severity: DOMCore|SEVERITY_WARNING
 
 ElementTypeBinding:
   @Name: intValue
@@ -2490,6 +2471,16 @@ ElementTypeBinding:
       @@@For: =ManakaiDOM|all
     @@For: ManakaiDOM|DOM3
     @@For: =ManakaiDOM|all
+
+ElementTypeBinding:
+  @Name: CParamApp
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@: c|DOMConfigurationParameterApplication
+      @@@For: ManakaiDOM|DOM
+    @@For: ManakaiDOM|DOM3
 
 ElementTypeBinding:
   @Name: boolCParam
@@ -2542,7 +2533,7 @@ ElementTypeBinding:
 ElementTypeBinding:
   @Name: cfgname
   @ElementType:
-    DOMCore:domConfigurationParameterName
+    c:domConfigurationParameterName
   @ShadowContent:
     @@ContentType: DISCore|String
 
@@ -2553,11 +2544,57 @@ ElementTypeBinding:
   @ShadowContent:
     @@lang:en
 
+ElementTypeBinding:
+  @Name: nodeProp
+  @ElementType:
+    DOMCore:nodeProp
+  @ShadowContent:
+    @@For: =ManakaiDOM|all
+
+CParamApp:
+  @QName: DOMLS|canonical-form.parser
+  @c:domConfigurationParameter: c|canonical-form
+  @c:targetType: DOMLS|LSParser
+
+CParamApp:
+  @QName: DOMLS|canonical-form
+  @c:domConfigurationParameter: c|canonical-form
+  @c:targetType: DOMLS|LSSerializer
+  @TrueCase:
+    @@enDesc:
+      Writes the document according to the rule specified in
+      the <CITE::XML Canonicalization Version 1.0> specification.
+
+      Serializing an XML 1.1 document will generate a fatal error.
+    @@SetParam:
+      @@@@: DOMLS|format-pretty-print
+      @@@boolValue:0
+    @@SetParam:
+      @@@@: DOMLS|discard-default-content
+      @@@boolValue:0
+    @@SetParam:
+      @@@@: DOMLS|xml-declaration
+      @@@boolValue:0
+
+CParamApp:
+  @QName: DOMLS|cdata-sections.parser
+  @c:domConfigurationParameter: c|cdata-sections
+  @c:targetType: c|LSParser
+  @TrueCase:
+    @@IsDefault: 0
+  @FalseCase:
+    @@IsDefault: 1
+
+CParamApp:
+  @QName: DOMLS|cdata-sections
+  @c:domConfigurationParameter: c|cdata-sections
+  @c:targetType: c|LSSerializer
+
 boolCParam:
   @QName: charset-overrides-xml-encoding
   @cfgname: charset-overrides-xml-encoding
   @IsSupportRequired:1
-  @DOMCore:targetType: DOMLS|LSParser
+  @c:targetType: DOMLS|LSParser
   @TrueCase:
     @@IsDefault:1
     @@enImplNote:
@@ -2578,11 +2615,29 @@ boolCParam:
       The parser ignores any character encoding information from
       higher level protocols.
 
+CParamApp:
+  @QName: check-character-normalization
+  @c:domConfigurationParameter: c|check-character-normalization
+  @c:targetType: DOMLS|LSParser
+  @c:targetType: DOMLS|LSSerializer
+
+CParamApp:
+  @QName: comments
+  @c:domConfigurationParameter: c|comments
+  @c:targetType: DOMLS|LSParser
+  @c:targetType: DOMLS|LSSerializer
+
+CParamApp:
+  @QName: datatype-normalization
+  @c:domConfigurationParameter: c|datatype-normalization
+  @c:targetType: DOMLS|LSParser
+  @c:targetType: DOMLS|LSSerializer
+
 boolCParam:
   @QName: disallow-doctype
   @cfgname: disallow-doctype
   @IsSupportRequired:1
-  @DOMCore:targetType: DOMLS|LSParser
+  @c:targetType: DOMLS|LSParser
   @TrueCase:
     @@enDesc:
       Throws a fatal <err::doctype-not-allowed> error if a document
@@ -2593,12 +2648,38 @@ boolCParam:
     @@enDesc:
       Allows document type node in the document.
 
+CParamApp:
+  @QName: element-content-whitespace
+  @c:domConfigurationParameter: c|element-content-whitespace
+  @c:targetType: DOMLS|LSParser
+  @c:targetType: DOMLS|LSSerializer
+
+CParamApp:
+  @QName: entities.parser
+  @c:domConfigurationParameter: c|entities
+  @c:targetType: DOMLS|LSParser
+  @TrueCase:
+    @@IsDefault: 0
+  @FalseCase:
+    @@IsDefault: 1
+
+CParamApp:
+  @QName: entities
+  @c:domConfigurationParameter: c|entities
+  @c:targetType: DOMLS|LSSerializer
+
+CParamApp:
+  @QName: error-handler
+  @c:domConfigurationParameter: c|error-handler
+  @c:targetType: DOMLS|LSParser
+  @c:targetType: DOMLS|LSSerializer
+
 boolCParam:
   @QName: ignore-unknown-character-denormalizations
   @cfgname: ignore-unknown-character-denormalizations
   @IsSupportRequired:1
-  @DOMCore:targetType: DOMLS|LSParser
-  @DOMCore:targetType: DOMLS|LSSerializer
+  @c:targetType: DOMLS|LSParser
+  @c:targetType: DOMLS|LSSerializer
   @TrueCase:
     @@IsSupportRequired:1
     @@IsDefault:1
@@ -2618,15 +2699,50 @@ boolCParam:
       if a character is encountered for which the implementation
       cannot determine the normalization properties.
 
+CParamApp:
+  @QName: infoset
+  @c:domConfigurationParameter: c|infoset
+  @c:targetType: DOMLS|LSParser
+  @c:targetType: DOMLS|LSSerializer
+
+CParamApp:
+  @QName: namespaces
+  @c:domConfigurationParameter: c|namespaces
+  @c:targetType: DOMLS|LSParser
+  @c:targetType: DOMLS|LSSerializer
+
+CParamApp:
+  @QName: namespace-declarations
+  @c:domConfigurationParameter: c|namespace-declarations
+  @c:targetType: DOMLS|LSParser
+  @c:targetType: DOMLS|LSSerializer
+
+CParamApp:
+  @QName: normalize-characters.parser
+  @c:domConfigurationParameter: c|normalize-characters
+  @c:targetType: DOMLS|LSParser
+
+CParamApp:
+  @QName: normalize-characters
+  @c:domConfigurationParameter: c|normalize-characters
+  @c:targetType: DOMLS|LSSerializer
+  @TrueCase:
+    @@IsDefault: 1
+    @@enImplNote:
+      Unlike in the Core, the default value for this parameter is <DOM::true>.
+      While implementations are not required to support fully normalizing
+      the characters according to appendix E of XML 1.1, this parameter
+      must be activated by default if supported.  <SRC::DOM Level 3 LS>
+  @FalseCase:
+    @@IsDefault: 0
+
 CParam:
   @QName: resource-resolver
   @cfgname: resource-resolver
-  @DOMCore:nodeProp:
-    @@@: rresolver
-    @@For: =ManakaiDOM|all
+  @nodeProp: rresolver
   @IsSupportRequired:1
-  @DOMCore:targetType: DOMCore|Document
-  @DOMCore:targetType: DOMLS|LSParser
+  @c:targetType: DOMCore|Document
+  @c:targetType: DOMLS|LSParser
   @Type: DOMLS|LSResourceResolver
   @enDesc:
     A reference to a <IF::LSResourceResolver> object.
@@ -2660,6 +2776,64 @@ CParam:
       @@@PerlCDef:
         $self->[1]->{<H::DOMLS:resource-resolver>} = $value;
 
+CParamApp:
+  @QName: schema-location
+  @c:domConfigurationParameter: c|schema-location
+  @c:targetType: DOMLS|LSParser
+  @c:targetType: DOMLS|LSSerializer
+
+CParamApp:
+  @QName: schema-type
+  @c:domConfigurationParameter: c|schema-type
+  @c:targetType: DOMLS|LSParser
+  @c:targetType: DOMLS|LSSerializer
+
+CParamApp:
+  @QName: split-cdata-sections
+  @c:domConfigurationParameter: c|split-cdata-sections
+  @c:targetType: DOMLS|LSParser
+  @c:targetType: DOMLS|LSSerializer
+
+CParamApp:
+  @QName: validate
+  @c:domConfigurationParameter: c|validate
+  @c:targetType: DOMLS|LSParser
+  @c:targetType: DOMLS|LSSerializer
+
+CParamApp:
+  @QName: validate-if-schema
+  @c:domConfigurationParameter: c|validate-if-schema
+  @c:targetType: DOMLS|LSParser
+  @c:targetType: DOMLS|LSSerializer
+
+CParamApp:
+  @QName: well-formed.parser
+  @c:domConfigurationParameter: c|well-formed
+  @c:targetType: DOMLS|LSSerializer
+  @FalseCase:
+    @@enDesc:
+      This parameter cannot be set to <DOM::false>.
+  @Method:
+    @@rdf:type: DOMCore|DOMConfigurationParameterSetter
+    @@Param:
+      @@@Name: name
+      @@@Type: DOMMain|DOMString
+      @@@dis:actualType: DOMConfigurationParameterName
+      @@@enDesc: The parameter name.
+    @@Param:
+      @@@Name: value
+      @@@Type: DOMMain|DOMUserData
+      @@@dis:actualType: DOMMain|DOMString
+      @@@enDesc: The new value.
+    @@Return:
+      @@@Type: idl|void||ManakaiDOM|all
+      @@@PerlCDef: \
+
+CParamApp:
+  @QName: well-formed
+  @c:domConfigurationParameter: c|well-formed
+  @c:targetType: DOMLS|LSSerializer
+
 ElementTypeBinding:
   @Name: nullCase
   @ElementType:
@@ -2674,7 +2848,7 @@ boolCParam:
   @QName: supported-media-types-only
   @cfgname: supported-media-types-only
   @IsSupportRequired:1
-  @DOMCore:targetType: DOMLS|LSParser
+  @c:targetType: DOMLS|LSParser
   @TrueCase:
     @@enDesc:
       Checkes that the media type of the parsed resource is a supported
@@ -2691,7 +2865,7 @@ boolCParam:
   @QName: discard-default-content
   @cfgname: discard-default-content
   @IsSupportRequired:1
-  @DOMCore:targetType: DOMLS|LSSerializer
+  @c:targetType: DOMLS|LSSerializer
   @TrueCase:
     @@IsSupportRequired:1
     @@IsDefault:1
@@ -2713,7 +2887,7 @@ boolCParam:
   @QName: format-pretty-print
   @cfgname: format-pretty-print
   @IsSupportRequired:1
-  @DOMCore:targetType: DOMLS|LSSerializer
+  @c:targetType: DOMLS|LSSerializer
   @TrueCase:
     @@enDesc:
       Formats the output by adding white spaces to produce a 
@@ -2735,7 +2909,7 @@ boolCParam:
   @QName: xml-declaration
   @cfgname: xml-declaration
   @IsSupportRequired:1
-  @DOMCore:targetType: DOMLS|LSSerializer
+  @c:targetType: DOMLS|LSSerializer
   @TrueCase:
     @@IsSupportRequired:1
     @@IsDefault:1

@@ -41,17 +41,15 @@ Module:
   @License:
      license:Perl+MPL
   @Date:
-    @@@:
-      $Date: 2006/01/29 07:09:24 $
-    @@ContentType:
-      dis:Date.RCS
-
-  @DefaultFor:
-    ManakaiDOM:ManakaiDOMLatest
+    $Date: 2006/01/29 13:58:54 $
   
   @Require:
     @@Module:
-      @@@QName: MDOM|DOMCore
+      @@@QName: MDOM|Tree
+    @@Module:
+      @@@QName: MDOM|XDoctype
+      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
+  @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
 Namespace:
   @c:
@@ -64,8 +62,6 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2005/7/tutorial#
   @DOMMain:
     http://suika.fam.cx/~wakaba/archive/2004/dom/main#
-  @DOMMetaImpl:
-    http://suika.fam.cx/~wakaba/archive/2004/dom/meta#
   @dx:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#
   @dxm:
@@ -119,18 +115,18 @@ ElementTypeBinding:
     @@For: =ManakaiDOM|ManakaiDOM
 
     @@rdf:type:
-      @@@@: ManakaiDOM|IF
+      @@@@: DISLang|Interface
       @@@ForCheck: ManakaiDOM|ForIF
 
     @@rdf:type:
-      @@@@: ManakaiDOM|Class
+      @@@@: DISLang|Class
       @@@ForCheck: ManakaiDOM|ForClass
 
     @@ISA:
-      @@@@: DOMCore|Node
+      @@@@: c|Node
       @@@ForCheck: ManakaiDOM|ForIF
     @@ISA:
-      @@@@:DOMCore| ManakaiDOMNode
+      @@@@: c|ManakaiDOMNode
       @@@ForCheck: ManakaiDOM|ForClass
 
     @@Implement:
@@ -154,19 +150,19 @@ ElementTypeBinding:
       @@@ContentType: DISCore|TFPQNames
       @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
 
-    @@DOMMain:implementFeature:
+    @@f:implements:
       @@@@: DOMXML|XMLFeature10
       @@@For: ManakaiDOM|DOM1 ManakaiDOM|DOMXMLFeature
-    @@DOMMain:implementFeature:
+    @@f:implements:
       @@@@: DOMXML|XMLFeature20
       @@@For: ManakaiDOM|DOM2 ManakaiDOM|DOMXMLFeature
-    @@DOMMain:implementFeature:
+    @@f:implements:
       @@@@: DOMXML|XMLFeature30
       @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeature
-    @@DOMMain:implementFeature:
+    @@f:implements:
       @@@@: DOMXML|XMLVersionFeature10
       @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeature
-    @@DOMMain:implementFeature:
+    @@f:implements:
       @@@@: DOMXML|XMLVersionFeature11
       @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeatureXML11
 
@@ -345,7 +341,7 @@ FeatureDef:
   @FeatureVerDef:
     @@Version: 1.0
     @@QName: XMLFeature10
-    @@DOMMetaImpl:instanceFeatureOf: XMLFeature
+    @@f:instanceOf: XMLFeature
     @@DOMMain:requireFeature:
       DOMCore:CoreFeature10
     @@Spec:
@@ -358,7 +354,7 @@ FeatureDef:
   @FeatureVerDef:
     @@Version: 2.0
     @@QName: XMLFeature20
-    @@DOMMetaImpl:extendFeature: XMLFeature10
+    @@f:extends: XMLFeature10
     @@DOMMain:requireFeature:
       DOMCore:CoreFeature20
     @@Spec:
@@ -371,7 +367,7 @@ FeatureDef:
   @FeatureVerDef:
     @@Version: 3.0
     @@QName: XMLFeature30
-    @@DOMMetaImpl:extendFeature: XMLFeature20
+    @@f:extends: XMLFeature20
     @@DOMMain:requireFeature:
       DOMCore:CoreFeature30
     @@DOMMain:requireFeature: XMLVersionFeature10
@@ -389,7 +385,7 @@ FeatureDef:
   @FeatureVerDef:
     @@Version: 1.0
     @@QName: XMLVersionFeature10
-    @@DOMMetaImpl:instanceFeatureOf: XMLVersionFeature
+    @@f:instanceOf: XMLVersionFeature
     @@Spec:
       @@@DOM3[list]:
         http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#Document3-version
@@ -400,7 +396,7 @@ FeatureDef:
   @FeatureVerDef:
     @@Version: 1.1
     @@QName: XMLVersionFeature11
-    @@DOMMetaImpl:instanceFeatureOf: XMLVersionFeature
+    @@f:instanceOf: XMLVersionFeature
     @@Spec:
       @@@DOM3[list]:
         http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#Document3-version
@@ -769,13 +765,13 @@ PropDef:
   @QName: ManakaiDOM|isExpanded
   @enDesc:
     Whether an entity reference is expanded or not.
-  @DOMCore:nodeProp: xp
+  @c:nodeProp: xp
 
 PropDef:
   @QName: ManakaiDOM|isExternalEntity
   @enDesc:
     Whether an entity is external entity or not.
-  @DOMCore:nodeProp: xe
+  @c:nodeProp: xe
 
 ElementTypeBinding:
   @Name: PropDef
@@ -873,22 +869,11 @@ NodeTypeDef:
      @@Get:
         @@@Type:
           DOMCore:NamedNodeMap
-        @@@actualType:
-          @@@@@:
-            ManakaiDOMXML:ManakaiDOMEntities
-          @@@@ForCheck: ManakaiDOM|ForClass
         @@@Description:
           @@@@lang:en
           @@@@@:
             A <IF::DOMCore|NamedNodeMap> containing <IF::Entity>s.
-      @@@PerlDef:
-        __CODE{DOMCore|getNodeRef::
-          $object => {$self->{<H::mn:node>}},
-          $ref => $r,
-          $class => {
-            <ClassName::ManakaiDOMXML:ManakaiDOMEntities>
-          },
-        }__;
+
   @Attr:
      @@Name:  notations
      @@Description:
@@ -898,22 +883,11 @@ NodeTypeDef:
      @@Get:
         @@@Type:
           DOMCore:NamedNodeMap
-        @@@actualType:
-          @@@@@:
-            ManakaiDOMXML:ManakaiDOMNotations
-          @@@@ForCheck: ManakaiDOM|ForClass
         @@@Description:
           @@@@lang:en
           @@@@@:
             A <IF::DOMCore|NamedNodeMap> containing <IF::Notation>s.
-      @@@PerlDef:
-        __CODE{DOMCore|getNodeRef::
-          $object => {$self->{<H::mn:node>}},
-          $ref => $r,
-          $class => {
-            <ClassName::ManakaiDOMXML:ManakaiDOMNotations>
-          },
-        }__;
+
   @Attr:
      @@Name:  publicId
      @@Description:
@@ -2007,7 +1981,7 @@ PropDef:
   @QName: x|hasReplacementTree
   @enDesc:
     Whether an entity node has its replacement tree or not.
-  @DOMCore:nodeProp: rep
+  @c:nodeProp: rep
 
 ElementTypeBinding:
   @Name: Test

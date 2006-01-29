@@ -1,5 +1,41 @@
 2006-01-29  Wakaba  <wakaba@suika.fam.cx>
 
+	* Tree.dis (ManakaiDOM:entity-reference-read-only): Configuration
+	parameter name changed to |cfg:entity-reference-read-only|.
+	(createEntityReference): Set |c:read-only| flag of
+	the created entity reference, too.
+
+	* DOMLS.dis (min): New canonical feature name |fe:Min| added.
+
+	* GenericLS.dis: Don't refer |DOMMain:DOMString|; use |f:MIString|
+	from |DOMFeature| module instead.  Use |idl:Object|
+	instead of |DOMMain:DOMObject| as well.
+	(Generic): New canonical feature name |fe:GenericLS| added.
+	(DOMLS:ParserRole, DOMLS:SerializerRole): Their
+	canonical name changed to |gls:ParserRole| and |gls:SerializerRole|
+	respectively.
+
+	* DOMXML.dis (entities, notations): Perl code removed.
+	It will be reimplemented using |DocumentTypeDefinition|
+	class from |XDoctype| module.
+
+	* DOMFeature.dis, DOMCore.dis, DOMMain.dis, DOMXML.dis,
+	Tree.dis, DOMLS.dis, GenericLS.dis, ManakaiDOMLS2003.dis,
+	SimpleLS.dis: Cleaned up unused definitions.
+
+	* DOMCore.dis, DOMLS.dis (CParam): Definitions
+	for LS module moved from |DOMCore| module to |DOMLS| module.
+	This change makes |DOMCore| to |DOMLS| dependency removed.
+
+	* .cvsignore (.html.pm, .ls.pm): Removed.
+
+	* Makefile (.html.pm, .ls.pm): Removed.
+	(feature.dae): Include |GenericLS| module.
+	(core.dae): Don't include |DOMLS| and |GenericLS| module.
+	(ls.dae): Include |DOMLS| module.
+
+2006-01-29  Wakaba  <wakaba@suika.fam.cx>
+
 	* XMLParser.dis: Tests on default attributes and their |specified|
 	attribute are added.
 

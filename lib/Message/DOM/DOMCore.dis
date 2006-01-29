@@ -40,7 +40,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/01/28 16:24:44 $
+      $Date: 2006/01/29 13:58:52 $
     @@ContentType:
       dis:Date.RCS
 
@@ -51,27 +51,20 @@ Module:
     @@Module:
       @@@QName: MDOM|DOMMain
     @@Module:
-      @@@QName: MDOM|DOMXML
-    @@Module:
-      @@@QName: MDOM|DOMCore
       @@@WithFor: ManakaiDOM|ManakaiDOM
     @@Module:
-      @@@QName: MDOM|DOMCore
       @@@WithFor: ManakaiDOM|ManakaiDOM1
     @@Module:
-      @@@QName: MDOM|DOMCore
       @@@WithFor: ManakaiDOM|ManakaiDOM2
     @@Module:
-      @@@QName: MDOM|DOMCore
       @@@WithFor: ManakaiDOM|ManakaiDOM3
     @@Module:
-      @@@QName: MDOM|DOMCore
-      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
-    @@Module:
-      @@@QName: MDOM|DOMLS
       @@@WithFor: ManakaiDOM|ManakaiDOMLatest
     @@Module:
       @@@QName: MDOM|Tree
+    @@Module:
+      @@@QName: MDOM|XDoctype
+      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
 
 Namespace:
   @c:
@@ -84,6 +77,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
   @DOMEvents:
     http://suika.fam.cx/~wakaba/archive/2004/dom/events#
+  @DOMLS:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/ls#
   @DOMMain:
     http://suika.fam.cx/~wakaba/archive/2004/dom/main#
   @DOMMetaImpl:
@@ -214,39 +209,7 @@ ElementTypeBinding:
         DOMXML:XMLVersionFeature11
       @@@For:
         ManakaiDOM:DOM3 ManakaiDOM:DOMXMLFeature
-ElementTypeBinding:
-  @Name: L2
-  @ElementType:
-    DOMMain:implementFeature
-  @ShadowContent:
-    @@@: CoreFeature20
-    @@For:
-      ManakaiDOM:DOM2
-  @ShadowSibling:
-    @@DOMMain:implementFeature:
-      @@@@: CoreFeature30
-      @@@For: 
-        ManakaiDOM:DOM3
-    @@DOMMain:implementFeature:
-      @@@@: 
-        DOMXML:XMLFeature20
-      @@@For:
-        ManakaiDOM:DOM2 ManakaiDOM:DOMXMLFeature
-    @@DOMMain:implementFeature:
-      @@@@: 
-        DOMXML:XMLFeature30
-      @@@For:
-        ManakaiDOM:DOM3 ManakaiDOM:DOMXMLFeature
-    @@DOMMain:implementFeature:
-      @@@@: 
-        DOMXML:XMLVersionFeature10
-      @@@For:
-        ManakaiDOM:DOM3 ManakaiDOM:DOMXMLFeature
-    @@DOMMain:implementFeature:
-      @@@@: 
-        DOMXML:XMLVersionFeature11
-      @@@For:
-        ManakaiDOM:DOM3 ManakaiDOM:DOMXMLFeature
+
 ElementTypeBinding:
   @Name: L3
   @ElementType:
@@ -387,11 +350,6 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type: dx|ErrorSubCode
     @@For: ManakaiDOM|ManakaiDOM
-
-ElementTypeBinding:
-  @Name: SubType
-  @ElementType:
-    dis:ImplNote
 
 ElementTypeBinding:
   @Name: PerlDef
@@ -1191,8 +1149,8 @@ ResourceDef:
           @@@@XParam: 
             @@@@@QName:
               DOMLS:mode
-            @@@@@Type:
-              DOMLS:DOMImplementationLSMode
+            @@@@@Type: idl|unsignedShort||ManakaiDOM|all
+            #  DOMLS:DOMImplementationLSMode
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@: The requested mode.
@@ -1826,35 +1784,6 @@ ElementTypeBinding:
       @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeatureXML11
 
 ElementTypeBinding:
-  @Name: IF3Def
-  @ElementType: 
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type:
-      @@@@: dis|MultipleResource
-      @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
-    @@resourceFor: ManakaiDOM|ForIF
-    @@For: ManakaiDOM|DOM3
-    @@For: =ManakaiDOM|ManakaiDOM
-
-    @@rdf:type:
-      @@@@: DISLang|Interface
-      @@@ForCheck: ManakaiDOM|ForIF
-
-    @@f:implements:
-      @@@@: c|CoreFeature30
-      @@@For: ManakaiDOM|DOM3
-    @@f:implements:
-      @@@@: x|XMLFeature30
-      @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeature
-    @@f:implements:
-      @@@@: x|XMLVersionFeature10
-      @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeature
-    @@f:implements:
-      @@@@: x|XMLVersionFeature11
-      @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeatureXML11
-
-ElementTypeBinding:
   @Name: IFQName
   @ElementType:
     dis:QName
@@ -1872,7 +1801,7 @@ IFCls3Def:
   @IFQName: DOMImplementationList
   @ClsQName: ManakaiDOMImplementationList
 
-  @ClsISA: DOMFeature|ManakaiImplementationList
+  @ClsISA: f|ManakaiImplementationList
   @ClsISA: ManakaiDOM|ManakaiDOMObject
 
   @enDesc:
@@ -1941,7 +1870,7 @@ IFCls3Def:
   @IFQName: DOMImplementationSource
   @ClsQName: ManakaiDOMImplementationSource
 
-  @ClsISA: DOMFeature|ManakaiImplementationSource
+  @ClsISA: f|ManakaiImplementationSource
   @ClsISA: ManakaiDOM|ManakaiDOMObject
 
   @enDesc:
@@ -4063,7 +3992,7 @@ ElementTypeBinding:
 ElementTypeBinding:
   @Name: errname
   @ElementType:
-    DOMCore:errorType
+    c:errorType
   @ShadowContent:
     @@ContentType: DISCore|String
 
@@ -4096,7 +4025,7 @@ ErrDef:
     is set to <DOM::true> and a sequence of characters is encountered
     that fails normalization checking.  <SRC::DOM Level 3 Core>
     <SRC::DOM Level 3 LS>
-  @DOMCore:severity: DOMCore|SEVERITY_ERROR
+  @c:severity: DOMCore|SEVERITY_ERROR
 
 ErrDef:
   @QName: cdata-sections-splitted
@@ -4104,8 +4033,8 @@ ErrDef:
   @enDesc:
     If the <cfg::split-cdata-sections> configuration parameter
     is set to <DOM::true> and a <XML::CDATA> section is split.
-  @DOMCore:severity: DOMCore|SEVERITY_WARNING
-  @DOMCore:relatedData:
+  @c:severity: DOMCore|SEVERITY_WARNING
+  @c:relatedData:
     @@enDesc:
       The first <IF::DOMXML:CDATASection> node in document order
       resulting from the split.
@@ -4121,7 +4050,7 @@ ErrDef:
     Or, in <IF::DOMLS|LSSerializer>, if a character that cannot 
     be represented in the output character encoding is occurred
     within markup.
-  @DOMCore:severity: DOMCore|SEVERITY_ERROR
+  @c:severity: DOMCore|SEVERITY_ERROR
 
 ErrDef:
   @QName: wf-invalid-character
@@ -4891,37 +4820,15 @@ ElementTypeBinding:
   @ShadowContent:
     @@ContentType: DISCore|String
 
-boolCParams:
-  @QName:
-    @@@: canonical-form
-    @@ForCheck: ForDocument
-  @QName:
-    @@@: DOMLS|canonical-form.parser
-    @@ForCheck: ForParser
-  @QName:
-    @@@: DOMLS|canonical-form
-    @@ForCheck: ForSerializer
+boolCParam:
+  @QName: canonical-form
   @cfgname: canonical-form
-  @nodeProp:
-    @@@: canon
-    @@ForCheck: ForDocument
+  @nodeProp: canon
   @IsSupportRequired:1
   @resourceFor: ForDocument
-  @DOMCore:targetType:
-    @@@: DOMCore|Document
-    @@ForCheck: ForDocument
-  @resourceFor: ForParser
-  @DOMCore:targetType:
-    @@@: DOMLS|LSParser
-    @@ForCheck: ForParser
-  @resourceFor: ForSerializer
-  @DOMCore:targetType:
-    @@@: DOMLS|LSSerializer
-    @@ForCheck: ForSerializer
+  @DOMCore:targetType: c|Document
   @TrueCase:
     @@enDesc:
-      @@@ForCheck: ForDocumentOrParser
-      @@@@:
         Canonicalizes the document according to the rules specified in
         the <CITE::XML Canonicalization Version 1.0> specification.
 
@@ -4929,13 +4836,6 @@ boolCParams:
                 represented in the DOM; in particular, there is no
                 way to specify the order of the attributes in the DOM.
         }
-    @@enDesc:
-      @@@ForCheck: ForSerializer
-      @@@@:
-        Writes the document according to the rule specified in
-        the <CITE::XML Canonicalization Version 1.0> specification.
-
-        Serializing an XML 1.1 document will generate a fatal error.
 
     @@SetParam:
       @@@@: entities
@@ -4958,52 +4858,21 @@ boolCParams:
     @@SetParam:
       @@@@: element-content-whitespace
       @@@boolValue:1
-    @@SetParam:
-      @@@@: DOMLS|format-pretty-print
-      @@@boolValue:0
-      @@@ForCheck: ForSerializer
-    @@SetParam:
-      @@@@: DOMLS|discard-default-content
-      @@@boolValue:0
-      @@@ForCheck: ForSerializer
-    @@SetParam:
-      @@@@: DOMLS|xml-declaration
-      @@@boolValue:0
-      @@@ForCheck: ForSerializer
   @FalseCase:
     @@IsSupportRequired:1
     @@IsDefault:1
     @@enDesc:
       Does not canonicalize the document.
 
-boolCParams:
-  @QName:
-    @@@: cdata-sections
-    @@ForCheck: ForDocument
-  @QName:
-    @@@: DOMLS|cdata-sections.parser
-    @@ForCheck: ForParser
-  @QName:
-    @@@: DOMLS|cdata-sections
-    @@ForCheck: ForSerializer
+boolCParam:
+  @QName: c|cdata-sections
   @cfgname: cdata-sections
-  @nodeProp:
-    @@@: pcdsect
-    @@ForCheck: ForDocument
+  @nodeProp: pcdsect
   @IsSupportRequired:1
-  @resourceFor: ForDocument
-  @DOMCore:targetType:
-    @@@: DOMCore|Document
-    @@ForCheck: ForDocument
-  @resourceFor: ForParser
-  @DOMCore:targetType:
-    @@@: DOMLS|LSParser
-    @@ForCheck: ForParser
+  @c:targetType: c|Document
   @TrueCase:
     @@IsSupportRequired:1
-    @@IsDefault:
-      @@@@:1
-      @@@ForCheck: ForDocument
+    @@IsDefault: 1
     @@enDesc:
       Keeps <IF::DOMXML:CDATASection> nodes in the document.
     @@SetParam:
@@ -5011,9 +4880,6 @@ boolCParams:
       @@@boolValue:0
   @FalseCase:
     @@IsSupportRequired:1
-    @@IsDefault:
-      @@@@:1
-      @@@ForCheck: ForParser
     @@enDesc:
       Transforms <IF::DOMXML:CDATASection> nodes in the document
       into <IF::Text> nodes.  The new <IF::Text> node is then
@@ -5025,8 +4891,6 @@ boolCParam:
   @nodeProp: charnormc
   @IsSupportRequired:1
   @DOMCore:targetType: DOMCore|Document
-  @DOMCore:targetType: DOMLS|LSParser
-  @DOMCore:targetType: DOMLS|LSSerializer
   @TrueCase:
     @@enDesc:
       Checks if the characters in the document are fully normalized
@@ -5047,8 +4911,6 @@ boolCParam:
   @nodeProp: pcom
   @IsSupportRequired:1
   @DOMCore:targetType: DOMCore|Document
-  @DOMCore:targetType: DOMLS|LSParser
-  @DOMCore:targetType: DOMLS|LSSerializer
   @TrueCase:
     @@IsSupportRequired:1
     @@IsDefault:1
@@ -5065,8 +4927,6 @@ boolCParam:
   @nodeProp: tnorm
   @IsSupportRequired:1
   @DOMCore:targetType: DOMCore|Document
-  @DOMCore:targetType: DOMLS|LSParser
-  @DOMCore:targetType: DOMLS|LSSerializer
   @TrueCase:
     @@enDesc:
       Exposes schema normalized values in the tree.
@@ -5098,8 +4958,6 @@ boolCParam:
   @cfgname: element-content-whitespace
   @nodeProp: pecws
   @DOMCore:targetType: DOMCore|Document
-  @DOMCore:targetType: DOMLS|LSParser
-  @DOMCore:targetType: DOMLS|LSSerializer
   @IsSupportRequired:1
   @TrueCase:
     @@IsSupportRequired:1
@@ -5115,34 +4973,15 @@ boolCParam:
       @@@@: canonical-form
       @@@boolValue:0
 
-boolCParams:
-  @QName:
-    @@@: entities
-    @@ForCheck: ForDocument
-  @QName:
-    @@@: DOMLS|entities.parser
-    @@ForCheck: ForParser
-  @QName:
-    @@@: DOMLS|entities
-    @@ForCheck: ForSerializer
+boolCParam:
+  @QName: c|entities
   @cfgname: entities
-  @nodeProp:
-    @@@: pent
-    @@ForCheck: ForDocument
-  @resourceFor: ForDocument
-  @DOMCore:targetType:
-    @@@: DOMCore|Document
-    @@ForCheck: ForDocument
-  @resourceFor: ForParser
-  @DOMCore:targetType:
-    @@@: DOMLS|LSParser
-    @@ForCheck: ForParser
+  @nodeProp: pent
+  @c:targetType: c|Document
   @IsSupportRequired:1
   @TrueCase:
     @@IsSupportRequired:1
-    @@IsDefault:
-      @@@@:1
-      @@@ForCheck: ForDocument
+    @@IsDefault: 1
     @@enDesc:
       Keeps <IF::DOMXML:EntityReference> nodes in the document.
     @@SetParam:
@@ -5150,9 +4989,6 @@ boolCParams:
       @@@boolValue:0
   @FalseCase:
     @@IsSupportRequired:1
-    @@IsDefault:
-      @@@@:1
-      @@@ForCheck: ForParser
     @@enDesc:
       Removes all <IF::DOMXML:EntityReference> nodes from the documents,
       putting the entity expansions directly in their place.  <IF::Text>
@@ -5168,7 +5004,6 @@ CParam:
   @nodeProp: onerr
   @Type: DOMCore|DOMErrorHandler
   @DOMCore:targetType: DOMCore|Document
-  @DOMCore:targetType: DOMLS|LSParser
   @IsSupportRequired:1
   @enDesc:
     This parameter contains a <IF::DOMErrorHandler> object.  If
@@ -5262,8 +5097,6 @@ boolCParam:
   @cfgname: infoset
   @IsSupportRequired:1
   @DOMCore:targetType: DOMCore|Document
-  @DOMCore:targetType: DOMLS|LSParser
-  @DOMCore:targetType: DOMLS|LSSerializer
   @TrueCase:
     @@IsSupportRequired:1
     @@enDesc:
@@ -5360,8 +5193,6 @@ boolCParam:
   @nodeProp: nsaware
   @IsSupportRequired:1
   @DOMCore:targetType: DOMCore|Document
-  @DOMCore:targetType: DOMLS|LSParser
-  @DOMCore:targetType: DOMLS|LSSerializer
   @TrueCase:
     @@IsSupportRequired:1
     @@IsDefault:1
@@ -5387,8 +5218,6 @@ boolCParam:
   @nodeProp: pnsattr
   @IsSupportRequired:1
   @DOMCore:targetType: DOMCore|Document
-  @DOMCore:targetType: DOMLS|LSParser
-  @DOMCore:targetType: DOMLS|LSSerializer
   @enDesc:
     {NOTE:: This parameter has no effect if the parameter <cfg::namespace>
             is set to <DOM::false>.
@@ -5411,53 +5240,22 @@ boolCParam:
       @@@@: canonical-form
       @@@boolValue:0
 
-boolCParams:
-  @QName:
-    @@@: normalize-characters
-    @@ForCheck: ForDocument
-  @QName:
-    @@@: DOMLS|normalize-characters.parser
-    @@ForCheck: ForParser
-  @QName:
-    @@@: DOMLS|normalize-characters
-    @@ForCheck: ForSerializer
+boolCParam:
+  @QName: c|normalize-characters
   @cfgname: normalize-characters
-  @nodeProp:
-    @@@: charnorm
-    @@ForCheck: ForDocument
+  @nodeProp: charnorm
   @IsSupportRequired:1
-  @resourceFor: ForDocument
-  @DOMCore:targetType:
-    @@@: DOMCore|Document
-    @@ForCheck: ForDocument
-  @resourceFor: ForParser
-  @DOMCore:targetType:
-    @@@: DOMLS|LSParser
-    @@ForCheck: ForParser
-  @resourceFor: ForSerializer
-  @DOMCore:targetType:
-    @@@: DOMLS|LSSerializer
-    @@ForCheck: ForSerializer
+  @c:targetType: c|Document
   @TrueCase:
-    @@IsDefault:
-      @@@@:1
-      @@@ForCheck: ForSerializer
     @@IsSupportRequired:0
     @@enDesc:
       Fully normalizes characters in the document as defined
       in appendix B of the XML 1.1 specification.
-    @@enImplNote:
-      Unlike in the Core, the default value for this parameter is <DOM::true>.
-      While implementations are not required to support fully normalizing
-      the characters according to appendix E of XML 1.1, this parameter
-      must be activated by default if supported.  <SRC::DOM Level 3 LS>
     @@SetParam:
       @@@@: canonical-form
       @@@boolValue:0
   @FalseCase:
-    @@IsSupportRequired:
-      @@@@:1
-      @@@ForCheck: ForDocumentOrParser
+    @@IsSupportRequired: 1
     @@IsDefault:1
     @@enDesc:
       Does not perform character normalization.
@@ -5470,7 +5268,6 @@ CParam:
   @Type: DOMMain|DOMString
   @dis:actualType: DOMMain|DOMURIs
   @DOMCore:targetType: DOMCore|Document
-  @DOMCore:targetType: DOMLS|LSParser
   @enDesc:
     The <cfg::schema-location> parameter value represents the
     schemas against which validation should occur, i.e. the
@@ -5553,7 +5350,6 @@ CParam:
   @dis:actualType: DOMMain|ManakaiDOMSchemaType
   @IsSupportRequired:0
   @DOMCore:targetType: DOMCore|Document
-  @DOMCore:targetType: DOMLS|LSParser
   @enDesc:
     The <cfg::schema-type> parameter value is a <TYPE::DOMMain|DOMString>
     containing an absolute DOM URI.  It representsthe type of the
@@ -5577,8 +5373,6 @@ boolCParam:
   @nodeProp: splitcdsect
   @IsSupportRequired:1
   @DOMCore:targetType: DOMCore|Document
-  @DOMCore:targetType: DOMLS|LSParser
-  @DOMCore:targetType: DOMLS|LSSerializer
   @TrueCase:
     @@IsSupportRequired:1
     @@IsDefault:1
@@ -5606,8 +5400,6 @@ boolCParam:
   @nodeProp: val
   @IsSupportRequired:1
   @DOMCore:targetType: DOMCore|Document
-  @DOMCore:targetType: DOMLS|LSParser
-  @DOMCore:targetType: DOMLS|LSSerializer
   @TrueCase:
     @@enDesc:
       Requires the validation against a schema of the document
@@ -5661,8 +5453,6 @@ boolCParam:
   @nodeProp: vals
   @IsSupportRequired:1
   @DOMCore:targetType: DOMCore|Document
-  @DOMCore:targetType: DOMLS|LSParser
-  @DOMCore:targetType: DOMLS|LSSerializer
   @TrueCase:
     @@enDesc:
       Enables validation only if a declaration for the document element
@@ -5696,8 +5486,6 @@ boolCParam:
   @nodeProp: wf
   @IsSupportRequired:1
   @DOMCore:targetType: DOMCore|Document
-  @DOMCore:targetType: DOMLS|LSParser
-  @DOMCore:targetType: DOMLS|LSSerializer
   @TrueCase:
     @@IsSupportRequired:1
     @@IsDefault:1
@@ -5723,28 +5511,10 @@ boolCParam:
            with a <C::DOMError.SEVERITY_ERROR> severity.
   @FalseCase:
     @@enDesc:
-      Does not check for XML well-formedness.  For <IF::DOMLS|LSParser>
-      this parameter cannot be set to <DOM::false>.
+      Does not check for XML well-formedness.
     @@SetParam:
       @@@@: canonical-form
       @@@boolValue:0
-  @Method:
-    @@rdf:type: DOMCore|DOMConfigurationParameterSetter
-    @@Param:
-      @@@Name: name
-      @@@Type: DOMMain|DOMString
-      @@@dis:actualType: DOMConfigurationParameterName
-      @@@enDesc: The parameter name.
-    @@Param:
-      @@@Name: value
-      @@@Type: DOMMain|DOMUserData
-      @@@dis:actualType: DOMMain|DOMString
-      @@@enDesc: The new value.
-    @@Return:
-      @@@Type: idl|void||ManakaiDOM|all
-      @@@PerlDefC:
-        $self->[1]->{<H::DOMCore:well-formed>} = $value
-          unless $self->[2] eq <IFName::DOMLS:LSParser>;
 ##well-formed
 
 enImplNote:

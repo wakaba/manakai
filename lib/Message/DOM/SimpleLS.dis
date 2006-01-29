@@ -14,31 +14,25 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    @@@:
-      $Date: 2005/11/13 04:45:05 $
-    @@ContentType: dis|Date.RCS
-
-  @DefaultFor: ManakaiDOM|ManakaiDOMLatest
+    $Date: 2006/01/29 13:58:54 $
 
   @Require:
     @@Module:
       @@@QName: MDOM|GenericLS
       @@@WithFor: ManakaiDOM|ManakaiDOMLatest
-    @@Module:
-      @@@QName: MDOM|SimpleLS
-      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
+  @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
 Namespace:
+  @c:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
   @dis:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
-  @DOMCore:
-    http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
-  @DOMMain:
-    http://suika.fam.cx/~wakaba/archive/2004/dom/main#
-  @DOMMetaImpl:
-    http://suika.fam.cx/~wakaba/archive/2004/dom/meta#
+  @DOMLS:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/ls#
   @f:
     http://suika.fam.cx/~wakaba/archive/2004/dom/feature#
+  @idl:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/IDL#
   @infoset:
      http://www.w3.org/2001/04/infoset#
   @lang:
@@ -82,7 +76,7 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type: DOMFeature|Feature
+    @@rdf:type: f|Feature
     @@For: =ManakaiDOM|all
 
 ElementTypeBinding:
@@ -90,7 +84,7 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type: DOMFeature|Feature
+    @@rdf:type: f|Feature
 
 ElementTypeBinding:
   @Name: featureQName
@@ -158,20 +152,6 @@ ElementTypeBinding:
       @@@ContentType: DISCore|TFPQNames
       @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
 
-    @@DOMMain:implementFeature:
-      @@@@: DOMLS|LSExtendedFeature30
-      @@@For: ManakaiDOM|ManakaiDOMLatest
-
-ElementTypeBinding:
-  @Name: IFDef
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type: DISLang|Interface
-    @@For: =ManakaiDOM|ManakaiDOM
-    @@For: ManakaiDOM|ManakaiDOMLatest
-
-
 ElementTypeBinding:
   @Name: Method
   @ElementType:
@@ -195,11 +175,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|MethodParameter
-
-ElementTypeBinding:
-  @Name: RaiseException
-  @ElementType:
-    ManakaiDOM:raises
 
 ElementTypeBinding:
   @Name: Return
@@ -367,7 +342,7 @@ IFClsXDef:
 
   @DISLang:role: DOMLS|SerializerRole
 
-  @DOMMain:implementFeature: DOMLS|SerializeDocumentInstance10
+  @f:implements: DOMLS|SerializeDocumentInstance10
 
   @Method:
     @@Operator:
@@ -664,5 +639,4 @@ PropDef:
   @enDesc:
     Whether the <CODE::EmptyElemTag> syntax should be used
     if the content of an element is empty or not.
-  @Type:
-    DOMMain:boolean::ManakaiDOM:all
+  @Type: idl|boolean||ManakaiDOM|all

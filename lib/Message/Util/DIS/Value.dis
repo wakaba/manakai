@@ -17,10 +17,7 @@ Module:
   @License:
     license:Perl+MPL
   @Date:
-    @@@:
-      $Date: 2005/12/20 12:16:52 $
-    @@ContentType:
-      dis:Date.RCS
+    $Date: 2006/01/29 13:59:00 $
   
   @Require:
     @@Module:
@@ -34,44 +31,20 @@ Module:
     DIS:ForLatest
 
 Namespace:
-  @dd:
-    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#DISDoc/
-  @ddel:
-    http://suika.fam.cx/~wakaba/archive/2005/disdoc#
   @DIS:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#
   @dis:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
-  @dis2pm:
-    http://suika.fam.cx/~wakaba/archive/2004/11/8/dis2pm#
-  @DISlib:
-    http://suika.fam.cx/~wakaba/archive/2004/dis/
-  @disPerl:
-    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--Perl--
-  @DOMCore:
-    http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
-  @DOMException:
-    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#
-  @DOMLS:
-    http://suika.fam.cx/~wakaba/archive/2004/dom/ls#
   @DOMMain:
     http://suika.fam.cx/~wakaba/archive/2004/dom/main#
-  @DOMMetaImpl:
-    http://suika.fam.cx/~wakaba/archive/2004/dom/meta#
   @dp:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#Perl/
-  @dump:
-    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#DISDump/
   @dx:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#
   @ecore:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/Core/
-  @html3:
-    urn:x-suika-fam-cx:markup:ietf:html:3:draft:00:
-  @html5:
-    http://www.w3.org/1999/xhtml
-  @ilang:
-    urn:x-suika-fam-cx:lang:
+  @f:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/feature#
   @infoset:
     http://www.w3.org/2001/04/infoset#
   @kwd:
@@ -88,32 +61,16 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
   @MDOMX:
     http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
-  @nl:
-    http://suika.fam.cx/~wakaba/archive/2004/dis/NaturalLanguage#
-  @owl:
-    http://www.w3.org/2002/07/owl#
-  @pl:
-    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#Perl--
   @rdf:
     http://www.w3.org/1999/02/22-rdf-syntax-ns#
   @rdfs:
     http://www.w3.org/2000/01/rdf-schema#
   @s:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Markup#
-  @script:
-    http://suika.fam.cx/~wakaba/archive/2005/5/script#
-  @sw010:
-    urn:x-suika-fam-cx:markup:suikawiki:0:10:
   @swcfg21:
     http://suika.fam.cx/~wakaba/archive/2005/swcfg21#
   @Util:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/
-  @xml:
-    http://www.w3.org/XML/1998/namespace
-  @xmlns:
-    http://www.w3.org/2000/xmlns/
-  @xsi:
-    http://www.w3.org/2001/XMLSchema-instance
 
 ## -- Features
 
@@ -122,7 +79,7 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type: DOMFeature|Feature
+    @@rdf:type: f|Feature
     @@For: =ManakaiDOM|all
 
 ElementTypeBinding:
@@ -130,12 +87,12 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type: DOMFeature|Feature
+    @@rdf:type: f|Feature
 
 ElementTypeBinding:
   @Name: featureQName
   @ElementType:
-    DOMFeature:name
+    f:name
   @ShadowContent:
     @@ContentType: DISCore|QName
 
@@ -144,8 +101,8 @@ FeatureDef:
   @FeatureVerDef:
     @@QName: DIS|Value10
     @@Version: 1.0
-    @@DOMMetaImpl:instanceFeatureOf: DIS|Value
-    @@DOMMain:requireFeature: DIS|CoreFeature10
+    @@f:instanceOf: DIS|Value
+    @@f:requires: DIS|CoreFeature10
     @@FullName:
       @@@lang:en
       @@@@:
@@ -199,7 +156,7 @@ ElementTypeBinding:
       @@@@: ManakaiDOM|IF
       @@@ForCheck: ManakaiDOM|ForIF
 
-    @@DOMMain:implementFeature: DIS|Value10
+    @@f:implements: DIS|Value10
 
     @@ForCheck: DIS|ForEmpty
 
@@ -217,7 +174,7 @@ ElementTypeBinding:
       @@@@: ManakaiDOM|Class
       @@@ForCheck: ManakaiDOM|ForClass
 
-    @@DOMMain:implementFeature: DIS|Value10
+    @@f:implements: DIS|Value10
 
 ElementTypeBinding:
   @Name: IFQName
@@ -297,7 +254,7 @@ IFClsDef:
   @IFQName: DISImplementationValue
   @ClsQName: ManakaiDISImplementationValue
 
-  @DOMMetaImpl:provideFeature: DIS|Value10
+  @f:provides: DIS|Value10
 
   @enDesc:
     The object implementing the <IF::DISImplementationValue>
@@ -370,7 +327,7 @@ IFClsDef:
         The canonical URI of the data type of the value.
     @@Param:
       @@@Name: valueRef
-      @@@Type: pl|SCALAR||ManakaiDOM|all
+      @@@Type: DISPerl|SCALAR||ManakaiDOM|all
       @@@enDesc:
         The value of the object.  It is equivalent to
         set a value to <A::DVValue.value> attribute of the value.
@@ -491,7 +448,7 @@ IFClsDef:
   @ResourceDef:
     @@ForCheck: ManakaiDOM|ForClass
     @@QName: createValue
-    @@rdf:type: dis2pm|BlockCode
+    @@rdf:type: DISPerl|BlockCode
     @@enDesc:
       Creates a value object whose type is URI.
     @@PerlDef:
@@ -504,7 +461,7 @@ IFClsDef:
   @ResourceDef:
     @@ForCheck: ManakaiDOM|ForClass
     @@QName: createValueRef
-    @@rdf:type: dis2pm|BlockCode
+    @@rdf:type: DISPerl|BlockCode
     @@enDesc:
       Creates a value object whose type is URI.
     @@PerlDef:
@@ -517,7 +474,7 @@ IFClsDef:
   @ResourceDef:
     @@ForCheck: ManakaiDOM|ForClass
     @@QName: createURI
-    @@rdf:type: dis2pm|BlockCode
+    @@rdf:type: DISPerl|BlockCode
     @@enDesc:
       Creates a value object whose type is URI.
     @@PerlDef:
@@ -559,10 +516,8 @@ IFClsDef:
 
   @ClsISA: dp|ManakaiDVValuePerl
 
-  @Implement:
-    DOMFeature|GetFeature||ManakaiDOM|ManakaiDOMLatest
-  @ClsISA:
-    DOMFeature|ManakaiHasFeatureByGetFeature||ManakaiDOM|ManakaiDOMLatest
+  @Implement: f|GetFeature||ManakaiDOM|ManakaiDOMLatest
+  @ClsISA: f|ManakaiHasFeatureByGetFeature||ManakaiDOM|ManakaiDOMLatest
 
   @ClsISA:
     dx:ManakaiDefaultExceptionHandler::ManakaiDOM:Perl
@@ -651,7 +606,7 @@ IFClsDef:
               the value via the reference unless it is
               known to safe.
       }
-    @@Type: pl|SCALAR||ManakaiDOM|all
+    @@Type: DISPerl|SCALAR||ManakaiDOM|all
     @@nullCase:
       @@@enDesc:
         The value is <DOM::null>.
@@ -692,7 +647,7 @@ IFClsDef:
     @@enDesc:
       Returns a tied array.
     @@Return:
-      @@@Type: pl|ARRAY||ManakaiDOM|all
+      @@@Type: DISPerl|ARRAY||ManakaiDOM|all
       @@@enDesc: A reference to the new tied array.
       @@@PerlDef:
         tie my @list, ref $self, $self;
@@ -725,7 +680,7 @@ IFClsDef:
     @@enDesc:
       Returns a tied hash.
     @@Return:
-      @@@Type: pl|HASH||ManakaiDOM|all
+      @@@Type: DISPerl|HASH||ManakaiDOM|all
       @@@enDesc: A reference to the new tied hash.
       @@@PerlDef:
         tie my %list, ref $self, $self;
@@ -861,7 +816,7 @@ IFClsDef:
      @@Param:
         @@@Name:  feature
         @@@Type: DISString
-        @@@actualType: DOMFeature|FeatureNameString||ManakaiDOM|ManakaiDOMLatest
+        @@@actualType: f|FeatureNameString||ManakaiDOM|ManakaiDOMLatest
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -869,8 +824,7 @@ IFClsDef:
      @@Param:
         @@@Name:  version
         @@@Type: DISString
-        @@@actualType:
-          DOMFeature|FeatureVersionString||ManakaiDOM|ManakaiDOMLatest
+        @@@actualType: f|FeatureVersionString||ManakaiDOM|ManakaiDOMLatest
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -941,7 +895,7 @@ IFClsDef:
 
   @Attr:
     @@Name: namespaceBindingList
-    @@Type: pl|HASH||ManakaiDOM|all
+    @@Type: DISPerl|HASH||ManakaiDOM|all
     @@enDesc:
       The <QUOTE::live> hash reference of namespace bindings.
     @@Get:
@@ -1018,7 +972,7 @@ IFClsDef:
 
   @Attr:
     @@Name: defaultNamespaceURIRef
-    @@Type: pl|SCALAR||ManakaiDOM|all
+    @@Type: DISPerl|SCALAR||ManakaiDOM|all
     @@Get:
       @@@PerlDef: $r = $$self->{defaultNS};
     @@Set:
@@ -1183,14 +1137,14 @@ IFClsDef:
     @@plOp: @{}
     @@ForCheck: ManakaiDOM|ForClass
     @@Return:
-      @@@Type: pl|ARRAY||ManakaiDOM|all
+      @@@Type: DISPerl|ARRAY||ManakaiDOM|all
       @@@PerlDef:
         $r = $$self->{array};
 
   @ResourceDef:
     @@ForCheck: ManakaiDOM|ForClass
     @@QName: createOrderedList
-    @@rdf:type: dis2pm|BlockCode
+    @@rdf:type: DISPerl|BlockCode
     @@enDesc:
       Creates a value object which is an ordered list.
     @@PerlDef:
@@ -1311,14 +1265,14 @@ IFClsDef:
     @@plOp: %{}
     @@ForCheck: ManakaiDOM|ForClass
     @@Return:
-      @@@Type: pl|HASH||ManakaiDOM|all
+      @@@Type: DISPerl|HASH||ManakaiDOM|all
       @@@PerlDef:
         $r = $$self->{hash};
 
   @ResourceDef:
     @@ForCheck: ManakaiDOM|ForClass
     @@QName: createUnorderedList
-    @@rdf:type: dis2pm|BlockCode
+    @@rdf:type: DISPerl|BlockCode
     @@enDesc:
       Creates a value object which is an unordered list.
     @@PerlDef:
@@ -1543,7 +1497,7 @@ ClsDef:
 
   @Attr:
     @@Name: namespaceBindingList
-    @@Type: pl|HASH||ManakaiDOM|all
+    @@Type: DISPerl|HASH||ManakaiDOM|all
     @@Get:
       @@@PerlDef:
         __DEEP{

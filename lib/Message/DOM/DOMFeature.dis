@@ -44,7 +44,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/01/21 07:06:09 $
+      $Date: 2006/01/29 13:58:53 $
     @@ContentType:
       dis:Date.RCS
   
@@ -68,15 +68,12 @@ Module:
       @@@WithFor:
         ManakaiDOM:Perl
     @@Module:
-      @@@QName: MDOM|DOMFeature
       @@@WithFor:
         ManakaiDOM:ManakaiDOM
     @@Module:
-      @@@QName: MDOM|DOMFeature
       @@@WithFor:
         ManakaiDOM:ManakaiDOM3
     @@Module:
-      @@@QName: MDOM|DOMFeature
       @@@WithFor:
         ManakaiDOM:ManakaiDOMLatest
   @DefaultFor:
@@ -87,8 +84,6 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dom/feature#spec.
   @dis:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
-  @dis2pm:
-    http://suika.fam.cx/~wakaba/archive/2004/11/8/dis2pm#
   @DISlib:
     http://suika.fam.cx/~wakaba/archive/2004/dis/
   @doc:
@@ -97,20 +92,16 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
   @DOMEvents:
     http://suika.fam.cx/~wakaba/archive/2004/dom/events#
-  @DOMFeature:
-    http://suika.fam.cx/~wakaba/archive/2004/dom/feature#
-  @DOMLS:
-    http://suika.fam.cx/~wakaba/archive/2004/dom/ls#
   @DOMMain:
     http://suika.fam.cx/~wakaba/archive/2004/dom/main#
   @DOMMetaImpl:
     http://suika.fam.cx/~wakaba/archive/2004/dom/meta#
-  @DOMXML:
-    http://suika.fam.cx/~wakaba/archive/2004/dom/xml#
   @dx:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#
   @f:
     http://suika.fam.cx/~wakaba/archive/2004/dom/feature#
+  @fe:
+    http://suika.fam.cx/www/2006/feature/
   @idl:
     http://suika.fam.cx/~wakaba/archive/2004/dis/IDL#
   @infoset:
@@ -135,12 +126,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
   @mn:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/ManakaiNode#
-  @owl:
-    http://www.w3.org/2002/07/owl#
   @p:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Perl#
-  @Perl:
-    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#Perl--
   @rdf:
     http://www.w3.org/1999/02/22-rdf-syntax-ns#
   @rdfs:
@@ -819,11 +806,11 @@ ElementTypeBinding:
     @@ContentType: DISCore|QName
 
 PropDef:
-  @QName: DOMFeature|name
+  @QName: f|name
   @FullName:
     @@lang:en
     @@@: Feature name
-  @rdfs:domain: DOMFeature|Feature
+  @rdfs:domain: f|Feature
   @dataType: DISCore|QName
   @multipleProperties: DISCore|UnorderedList
 
@@ -1195,6 +1182,7 @@ ElementTypeBinding:
 FeatureDef:
   @QName: min
   @FeatureVerDef:
+    @@featureQName: fe|Min
     @@featureQName: ManakaiDOM|Minimum
     @@Version: 3.0
     @@QName: min30
@@ -1202,7 +1190,7 @@ FeatureDef:
       @@@lang:en
       @@@@:
         Minimum DOM implementation, level 3.
-    @@DOMMetaImpl:instanceFeatureOf: min
+    @@f:instanceOf: min
 
 ElementTypeBinding:
   @Name: Doc
@@ -2438,8 +2426,7 @@ minIFClsDef:
 
 ResourceDef:
   @QName: makeClassISAList
-  @rdf:type:
-    dis2pm:BlockCode
+  @rdf:type: DISPerl|BlockCode
   @enDesc:
     Makes the list of <QUOTE::is-a> classes of a class.
   @PerlDef:
@@ -2488,7 +2475,7 @@ minIFClsDef:
 
   @DISLang:role: DOMMetaImpl|ManakaiDOMImplementationRole
 
-  @DOMMetaImpl:provideFeature: min30
+  @f:provides: min30
   
   @Method:
     @@Name:  hasFeature
@@ -2715,7 +2702,7 @@ PropDef:
     The identifier of an implementation.
   @Type: DISPerl|String
   @ManakaiNode:stemName: implid
-  @rdfs:domain: DOMFeature|MinimumImplementation||ManakaiDOM|ManakaiDOM
+  @rdfs:domain: f|MinimumImplementation||ManakaiDOM|ManakaiDOM
 
 ResourceDef:
   @QName: DOMMetaImpl|ManakaiDOMMinimumImplementation

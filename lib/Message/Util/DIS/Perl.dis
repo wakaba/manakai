@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/01/25 12:21:49 $
+      $Date: 2006/01/29 13:58:57 $
     @@ContentType:
       dis:Date.RCS
   
@@ -38,6 +38,9 @@ Module:
     @@Module:
       @@@QName: DIS|DPG
       @@@WithFor: ManakaiDOM|ManakaiDOMLatest
+    @@Module:
+      @@@QName: MDOM|GenericLS
+      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
 
   @DefaultFor: 
     DIS:ForLatest
@@ -51,16 +54,12 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#
   @dis:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
-  @dis2pm:
-    http://suika.fam.cx/~wakaba/archive/2004/11/8/dis2pm#
   @DISlib:
     http://suika.fam.cx/~wakaba/archive/2004/dis/
   @disPerl:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--Perl--
   @DOMCore:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
-  @DOMLS:
-    http://suika.fam.cx/~wakaba/archive/2004/dom/ls#
   @DOMMain:
     http://suika.fam.cx/~wakaba/archive/2004/dom/main#
   @DOMMetaImpl:
@@ -79,10 +78,10 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/
   @f:
     http://suika.fam.cx/~wakaba/archive/2004/dom/feature#
-  @html3:
-    urn:x-suika-fam-cx:markup:ietf:html:3:draft:00:
-  @html5:
-    http://www.w3.org/1999/xhtml
+  @fe:
+    http://suika.fam.cx/www/2006/feature/
+  @gls:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/gls#
   @idl:
     http://suika.fam.cx/~wakaba/archive/2004/dis/IDL#
   @ilang:
@@ -109,8 +108,6 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dis/NaturalLanguage#
   @null:
     http://suika.fam.cx/~wakaba/-temp/2003/09/27/null
-  @owl:
-    http://www.w3.org/2002/07/owl#
   @pc:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/PerlCode#
   @pl:
@@ -123,22 +120,10 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Markup#
   @script:
     http://suika.fam.cx/~wakaba/archive/2005/5/script#
-  @sw010:
-    urn:x-suika-fam-cx:markup:suikawiki:0:10:
   @swcfg21:
     http://suika.fam.cx/~wakaba/archive/2005/swcfg21#
   @Util:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/
-  @xhtml1:
-    http://www.w3.org/1999/xhtml
-  @xhtml2:
-    http://www.w3.org/2002/06/xhtml2/
-  @xml:
-    http://www.w3.org/XML/1998/namespace
-  @xmlns:
-    http://www.w3.org/2000/xmlns/
-  @xsi:
-    http://www.w3.org/2001/XMLSchema-instance
 
 ## -- Features
 
@@ -147,7 +132,7 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type: DOMFeature|Feature
+    @@rdf:type: f|Feature
     @@For: ManakaiDOM|all
 
 ElementTypeBinding:
@@ -155,12 +140,12 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type: DOMFeature|Feature
+    @@rdf:type: f|Feature
 
 ElementTypeBinding:
   @Name: featureQName
   @ElementType:
-    DOMFeature:name
+    f:name
   @ShadowContent:
     @@ContentType: DISCore|QName
 
@@ -169,9 +154,9 @@ FeatureDef:
   @FeatureVerDef:
     @@QName: DIS|Perl10
     @@Version: 1.0
-    @@DOMMetaImpl:instanceFeatureOf: DIS|Perl
-    @@DOMMain:requireFeature: DIS|CoreFeature10
-    @@f:requires: DOMLS|Generic30
+    @@f:instanceOf: DIS|Perl
+    @@f:requires: DIS|CoreFeature10
+    @@f:requires: gls|Generic30
     @@FullName:
       @@@lang:en
       @@@@:
@@ -207,7 +192,7 @@ ElementTypeBinding:
       @@@ForCheck: ManakaiDOM|ForClass
       @@@ContentType: DISCore|TFPQNames
 
-    @@DOMMain:implementFeature: DIS|Perl10
+    @@f:implements: DIS|Perl10
 
     @@ForCheck: DIS|ForEmpty
 
@@ -311,7 +296,7 @@ IFClsDef:
     The object implementing <IF::DISImplementationPerl> interface
     <kwd:MUST> also implement the <IF::DIS|DISImplementation> interface.
 
-  @DOMMetaImpl:provideFeature: DIS|Perl10
+  @f:provides: DIS|Perl10
 
   @Method:
     @@Name: plLoadDISDatabase
@@ -915,7 +900,7 @@ IFClsDef:
 
 ResourceDef:
   @QName: setDefaultValue
-  @rdf:type: dis2pm|BlockCode
+  @rdf:type: DISPerl|BlockCode
   @PerlDef:
     if ($data_type-><M::DIS|DISResource.isSubsetOfURI>
                                               (<Q::DISLang:String>)) {
@@ -1528,7 +1513,8 @@ IFClsDef:
             next S unless $res_uri eq $res-><AG::DIS|DISAnyResource.uri>;
             $res->{db} = $self;
             Scalar::Util::weaken ($res->{db});
-            if (defined $self->{forDef}->{$res_uri}) {
+            if (defined $self->{forDef}->{$res_uri} and
+                $res_uri ne <Q::ManakaiDOM:all>) {
               __UNDEEP{__EXCEPTION{DIS|RESOURCE_ALREADY_DEFINED_ERR::
                 DIS:uri => {$res_uri},
                 DIS:moduleURI => {$disModule-><AG::DIS|DISAnyResource.uri>},
@@ -1889,7 +1875,7 @@ IFClsDef:
                 ## -- Features
                 my %feature;
                 for my $v (@{$cls-><M::DIS|DISResourceProp.getPropertyValueList>
-                                      (<Q::DOMMetaImpl:provideFeature>)}) {
+                                      (<Q::f:provides>)}) {
                   my $f = $self-><AG::DIS|DISAnyResource.database>
                                -><M::DIS|DISDatabase.getResource>
                                      ($v->isa (<IFName::dv|DVURIValue>)
@@ -1898,12 +1884,12 @@ IFClsDef:
                   unless ($f-><AS::DIS|DISAnyResource.isDefined>) {
                     __UNDEEP{__EXCEPTION{DIS|RESOURCE_NOT_DEFINED_ERR::
                       DIS:uri => {$f-><AG::DIS|DISAnyResource.uri>},
-                      DIS:expectedType => {<Q::DOMMain:DOMFeature>},
+                      DIS:expectedType => {<Q::f:Feature>},
                     }__}__;
                   }
                   for my $s ($f, @{$f-><M::DIS|DISResourceProp
                                     .getPropertyResourceList>
-                                   (<Q::DOMMetaImpl:extendFeature>,
+                                   (<Q::f:extends>,
                                     recursive => true,
                                     default_media_type => <Q::dis:TypeQName>)}) {
                     $feature{$s-><AG::DIS|DISAnyResource.uri>}
@@ -2180,13 +2166,13 @@ IFClsDef:
                   ##       DOMCore:ElementRole and DOMCore:TextRole and ...
 
                   if ($role-><M::DIS|DISResource.isSubsetOfURI>
-                                (<Q::DOMLS:ParserRole>)) {
+                                (<Q::gls:ParserRole>)) {
                     $r-><M::DIS|PLBlockCon.appendStatement>
                           ('$Message::DOM::DOMLS::ParserClass{q<'.
                            $pack_name . '>} = 1');
                   }
                   if ($role-><M::DIS|DISResource.isSubsetOfURI>
-                                (<Q::DOMLS:SerializerRole>)) {
+                                (<Q::gls:SerializerRole>)) {
                     $r-><M::DIS|PLBlockCon.appendStatement>
                           ('$Message::DOM::DOMLS::SerializerClass{q<'.
                            $pack_name . '>} = 1');
@@ -2845,9 +2831,9 @@ IFClsDef:
                    $self-><M::DIS|DISResource.isTypeURI>
                                 (<Q::DISLang:AttributeSet>) or
                    $self-><M::DIS|DISResource.isTypeURI>
-                                (<Q::dis2pm:BlockCode>) or
+                                (<Q::DISPerl:BlockCode>) or
                    $self-><M::DIS|DISResource.isTypeURI>
-                                (<Q::dis2pm:InlineCode>) or
+                                (<Q::DISPerl:InlineCode>) or
                    $self-><M::DIS|DISResource.isTypeURI>
                                 (<Q::DISCore:AnyDefContainer>) or
                    $self-><M::DIS|DISResource.isTypeURI>
@@ -2859,7 +2845,7 @@ IFClsDef:
                                 (<Q::dis:Def>);
             $def = $def->[0] if $def;
             my $is_inline = $self-><M::DIS|DISResource.isTypeURI>
-                                (<Q::dis2pm:InlineCode>) ? true : false;
+                                (<Q::DISPerl:InlineCode>) ? true : false;
             unless ($def) {
               $r = null;
             } elsif ($def-><AG::dv|DVValue.dataType> eq <Q::lang:Perl>) {
@@ -3672,8 +3658,8 @@ IFClsDef:
               $dpgparser ||= $plimpl-><M::f|GetFeature
                                          ||ManakaiDOM|ManakaiDOMLatest
                                          .getFeature>
-                                       (<Q::DOMLS:Generic> => '3.0')
-                                  -><M::GenericLS|GLSImplementation
+                                       (<Q::fe:GenericLS> => '3.0')
+                                  -><M::gls|GLSImplementation
                                          ||ManakaiDOM|ManakaiDOMLatest
                                                            .createGLSParser>
                                        ({<Q::DIS|DPG> => '1.0'});
@@ -3847,34 +3833,38 @@ IFClsDef:
             my $type = $cparam-><AG::DIS|DISResource.disActualDataTypeResource>;
             if ($type-><M::DIS|DISResource.isSubsetOfURI> (<Q::idl:boolean>)) {
               $prop{type} = 'boolean';
-              C: for my $c (@{$cparam-><M::DIS|DISResource
-                                        .getChildResourceListByType>
-                                               (<Q::ManakaiDOM:InCase>)}) {
-                my $v = $c-><M::DIS|DISResourceProp.getPropertyValue>
-                                               (<Q::dis:Value>);
-                next C unless $v;
-                my $support = $c-><M::DIS|DISResourceProp.getPropertyBoolean>
-                                               (<Q::DOMCore:isSupported>);
-                my $tf = $v-><AG::dv|DVValue.value> ? true : false;
-                $prop{vsupport}->[$tf] = true if $support;
-                if ($tf) {
-                  if ($c-><M::DIS|DISResourceProp.getPropertyBoolean>
-                                               (<Q::dis:IsDefault>)) {
-                    $prop{default} = true;
+              my @csrc = ($cparam);
+              push @csrc, $self unless $cparam eq $self;
+              for (@csrc) {
+                C: for my $c (@{$self-><M::DIS|DISResource
+                                          .getChildResourceListByType>
+                                                 (<Q::ManakaiDOM:InCase>)}) {
+                  my $v = $c-><M::DIS|DISResourceProp.getPropertyValue>
+                                                 (<Q::dis:Value>);
+                  next C unless $v;
+                  my $support = $c-><M::DIS|DISResourceProp.getPropertyBoolean>
+                                                 (<Q::DOMCore:isSupported>);
+                  my $tf = $v-><AG::dv|DVValue.value> ? true : false;
+                  $prop{vsupport}->[$tf] = true if $support;
+                  if ($tf) {
+                    if ($c-><M::DIS|DISResourceProp.getPropertyBoolean>
+                                                 (<Q::dis:IsDefault>)) {
+                      $prop{default} = true;
+                    }
                   }
+                  SP: for (@{$c-><M::DIS|DISResourceProp.getPropertyValueList>
+                                   (<Q::dis:SetParam>)}) {
+                    next unless $_->isa (<IFName::dv|DVURIValue>);
+                    my $suri = $_-><AG::dv|DVURIValue.uri>;
+                    my $sres = $db-><M::DIS|DISDatabase.getResource> ($suri);
+                    my $v = $_-><M::dv|DVValue.getProperty> (<Q::dis:Value>);
+                    next SP unless $v;
+                    $prop{setparam}->[$tf]->{
+                      $sres-><M::DIS|DISResourceProp.getPropertyText>
+                                 (<Q::DISPerl:propHashKey>, $suri)
+                    } = $v-><AG::dv|DVValue.value>;
+                  } # SP
                 }
-                SP: for (@{$c-><M::DIS|DISResourceProp.getPropertyValueList>
-                                 (<Q::dis:SetParam>)}) {
-                  next unless $_->isa (<IFName::dv|DVURIValue>);
-                  my $suri = $_-><AG::dv|DVURIValue.uri>;
-                  my $sres = $db-><M::DIS|DISDatabase.getResource> ($suri);
-                  my $v = $_-><M::dv|DVValue.getProperty> (<Q::dis:Value>);
-                  next SP unless $v;
-                  $prop{setparam}->[$tf]->{
-                    $sres-><M::DIS|DISResourceProp.getPropertyText>
-                               (<Q::DISPerl:propHashKey>, $suri)
-                  } = $v-><AG::dv|DVValue.value>;
-                } # SP
               }
             } elsif ($type-><M::DIS|DISResource.isSubsetOfURI>
                                                (<Q::DISLang:String>)) {
@@ -4283,12 +4273,12 @@ IFClsDef:
                   $code-><AS::DIS|DISAnyResource.isReferred>
                                            ($self-><AG::DIS|DISAnyResource.uri>);
                   unless ($code-><M::DIS|DISResource.isTypeURI>
-                                           (<Q::dis2pm:BlockCode>)) {
+                                           (<Q::DISPerl:BlockCode>)) {
                     __UNDEEP{__EXCEPTION{DIS|RESOURCE_NOT_DEFINED_ERR::
                       DIS:uri => {$code_uri},
                       DIS:sourceNode => {$node},
                       DIS:sourceCode => {$source_code},
-                      DIS:expectedType => {<Q::dis2pm:BlockCode>},
+                      DIS:expectedType => {<Q::DISPerl:BlockCode>},
                     }__;}__;
                   }
                   my $pc = $code-><AG::DISResourcePerl
@@ -4753,12 +4743,12 @@ IFClsDef:
                   $code-><AS::DIS|DISAnyResource.isReferred>
                                          ($node || $self->{src} || $self->{uri});
                   unless ($code-><M::DIS|DISResource.isTypeURI>
-                                           (<Q::dis2pm:InlineCode>)) {
+                                           (<Q::DISPerl:InlineCode>)) {
                     __UNDEEP{__EXCEPTION{DIS|RESOURCE_NOT_DEFINED_ERR::
                       DIS:uri => {$code_uri},
                       DIS:sourceNode => {$node || $self->{src}},
                       DIS:sourceCode => {$source_code},
-                      DIS:expectedType => {<Q::dis2pm:InlineCode>},
+                      DIS:expectedType => {<Q::DISPerl:InlineCode>},
                     }__;}__;
                   }
                   my $pc = $code-><AG::DISResourcePerl

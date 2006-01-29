@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/11/23 11:21:40 $
+      $Date: 2006/01/29 13:58:57 $
     @@ContentType:
       dis:Date.RCS
   
@@ -43,22 +43,12 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#
   @dis:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
-  @dis2pm:
-    http://suika.fam.cx/~wakaba/archive/2004/11/8/dis2pm#
   @DISlib:
     http://suika.fam.cx/~wakaba/archive/2004/dis/
   @disPerl:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--Perl--
-  @DOMCore:
-    http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
-  @DOMException:
-    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#
-  @DOMLS:
-    http://suika.fam.cx/~wakaba/archive/2004/dom/ls#
   @DOMMain:
     http://suika.fam.cx/~wakaba/archive/2004/dom/main#
-  @DOMMetaImpl:
-    http://suika.fam.cx/~wakaba/archive/2004/dom/meta#
   @dp:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#Perl/
   @dv:
@@ -69,6 +59,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#DISDump/
   @ecore:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/Core/
+  @f:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/feature#
   @html3:
     urn:x-suika-fam-cx:markup:ietf:html:3:draft:00:
   @html5:
@@ -95,8 +87,6 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/ManakaiNode#
   @nl:
     http://suika.fam.cx/~wakaba/archive/2004/dis/NaturalLanguage#
-  @owl:
-    http://www.w3.org/2002/07/owl#
   @pl:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#Perl--
   @rdf:
@@ -115,16 +105,6 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Test#
   @Util:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/
-  @xhtml1:
-    http://www.w3.org/1999/xhtml
-  @xhtml2:
-    http://www.w3.org/2002/06/xhtml2/
-  @xml:
-    http://www.w3.org/XML/1998/namespace
-  @xmlns:
-    http://www.w3.org/2000/xmlns/
-  @xsi:
-    http://www.w3.org/2001/XMLSchema-instance
 
 ## -- Features
 
@@ -133,7 +113,7 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type: DOMFeature|Feature
+    @@rdf:type: f|Feature
     @@For: =ManakaiDOM|all
 
 ElementTypeBinding:
@@ -141,12 +121,12 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type: DOMFeature|Feature
+    @@rdf:type: f|Feature
 
 ElementTypeBinding:
   @Name: featureQName
   @ElementType:
-    DOMFeature:name
+    f:name
   @ShadowContent:
     @@ContentType: DISCore|QName
 
@@ -155,8 +135,8 @@ FeatureDef:
   @FeatureVerDef:
     @@QName: DIS|DNLite10
     @@Version: 1.0
-    @@DOMMetaImpl:instanceFeatureOf: DIS|DNLite
-    @@DOMMain:requireFeature: DIS|CoreFeature10
+    @@f:instanceOf: DIS|DNLite
+    @@f:requires: DIS|CoreFeature10
     @@FullName:
       @@@lang:en
       @@@@:
@@ -310,7 +290,7 @@ IFClsDef:
   @IFQName: DISImplementationDNLite
   @ClsQName: ManakaiDISImplementationDNLite
 
-  @DOMMetaImpl:provideFeature: DIS|DNLite10
+  @f:provides: DIS|DNLite10
   @ClsISA: DIS|ManakaiDISImplementation
 
   @enDesc:

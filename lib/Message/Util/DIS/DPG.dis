@@ -15,7 +15,7 @@ Module:
   @License: license|Perl+MPL
 
   @Date:
-    $Date: 2006/01/21 17:37:52 $
+    $Date: 2006/01/29 13:58:57 $
   
   @Require:
     @@Module:
@@ -41,6 +41,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/Core/
   @f:
     http://suika.fam.cx/~wakaba/archive/2004/dom/feature#
+  @gls:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/gls#
   @html5:
     http://www.w3.org/1999/xhtml
   @idl:
@@ -2328,7 +2330,7 @@ IFClsDef:
     method in the Generic Load and Save module with feature string
     <Feature::DIS|DPG> version <FeatureVer::1.0>.
 
-  @DISLang:role: DOMLS|ParserRole
+  @DISLang:role: gls|ParserRole
 
   @Attr:
     @@Name: domConfig
@@ -2354,7 +2356,7 @@ IFClsDef:
       Creates a new instance of the object.
     @@Param:
       @@@Name: impl
-      @@@Type: DOMLS|GLSImplementation
+      @@@Type: gls|GLSImplementation
       @@@enDesc:
         The implementation from which the parser is created.
     @@Param:

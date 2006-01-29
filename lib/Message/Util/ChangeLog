@@ -1,5 +1,13 @@
 2006-01-29  Wakaba  <wakaba@suika.fam.cx>
 
+	* Makefile: Updated to be consist with |../DOM/Makefile|.
+
+	* DIS.dis (parse): Parameter |input|'s type is 
+	changed from |DOMLS:LSInput| to |DISPerl:HASH| to
+	remove dependency on |MDOM:DOMLS| module.
+
+2006-01-29  Wakaba  <wakaba@suika.fam.cx>
+
 	* PerlCode.dis (skipLines): Its code was incorrect.
 	(createPCLiteral): Creates a |undef| keyword node
 	for an |undef| value.  Tests added.

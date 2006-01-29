@@ -88,16 +88,15 @@ dom1core:
 test-module-all: test-module-dom test-module-util
 
 test-module-dom: \
-  dom-feature.t \
+  dom-feature.t dom-genericls.t \
   dom-core.t dom-tree.t dom-xml.t dom-xdoctype.t \
-  dom-genericls.t \
   dom-mdomls2003.t dom-xmlparser.t
 	$(PERL_TEST_) dom-*.t
 
 dom-feature.t: $(DOM_FEATURE_DAC) $(DAC2TEST_PL)
 	$(DAC2TEST) $< --source-module="$(NS_MDOM)DOMFeature" > $@
 
-dom-genericls.t: $(DOM_CORE_DAC) $(DAC2TEST_PL)
+dom-genericls.t: $(DOM_FEATURE_DAC) $(DAC2TEST_PL)
 	$(DAC2TEST) $< --source-module="$(NS_MDOM)GenericLS" > $@
 
 dom-core.t: $(DOM_CORE_DAC) $(DAC2TEST_PL)

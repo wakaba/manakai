@@ -24,10 +24,7 @@ Module:
       @@@Year:2003
       @@@DISCore:author: DISCore|Wakaba
   @Date:
-    @@@:
-      $Date: 2005/11/23 11:21:09 $
-    @@ContentType:
-      dis:Date.RCS
+    $Date: 2006/01/29 13:58:55 $
   
   @Require:
     @@Module:
@@ -40,21 +37,15 @@ Module:
       @@@QName: UtilError|DOMException
       @@@WithFor: ManakaiDOM|Perl
     @@Module:
-      @@@QName: Markup|SuikaWikiConfig21
-      @@@WithFor: ManakaiDOM|all
-    @@Module:
-      @@@QName: Markup|SuikaWikiConfig21
       @@@WithFor: swcfg21|ForEmpty
     @@Module:
-      @@@QName: Markup|SuikaWikiConfig21
       @@@WithFor: swcfg21|ForLatest
     @@Module:
       @@@QName: MDOM|DOMFeature
       @@@WithFor: ManakaiDOM|ManakaiDOMLatest
     @@Module:
-      @@@QName: MDOM|DOMLS
+      @@@QName: MDOM|GenericLS
       @@@WithFor: ManakaiDOM|ManakaiDOMLatest
-
   @DefaultFor: swcfg21|ForLatest
 
 Namespace:
@@ -70,10 +61,6 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
   @DOMLS:
     http://suika.fam.cx/~wakaba/archive/2004/dom/ls#
-  @DOMMain:
-    http://suika.fam.cx/~wakaba/archive/2004/dom/main#
-  @DOMMetaImpl:
-    http://suika.fam.cx/~wakaba/archive/2004/dom/meta#
   @dx:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#
   @ecore:
@@ -100,10 +87,6 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
   @mn:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/ManakaiNode#
-  @owl:
-    http://www.w3.org/2002/07/owl#
-  @Perl:
-    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#Perl--
   @rdf:
     http://www.w3.org/1999/02/22-rdf-syntax-ns#
   @rdfs:
@@ -163,7 +146,7 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type: DOMFeature|Feature
+    @@rdf:type: f|Feature
     @@For: =ManakaiDOM|all
 
 ElementTypeBinding:
@@ -171,12 +154,12 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type: DOMFeature|Feature
+    @@rdf:type: f|Feature
 
 ElementTypeBinding:
   @Name: featureQName
   @ElementType:
-    DOMFeature:name
+    f:name
   @ShadowContent:
     @@ContentType: DISCore|QName
 
@@ -186,7 +169,7 @@ FeatureDef:
   @FeatureVerDef:
     @@QName: CoreFeature21
     @@Version: 2.1
-    @@DOMMetaImpl:instanceFeatureOf: CoreFeature
+    @@f:instanceOf: CoreFeature
     @@FullName:
       @@@lang:en
       @@@@:
@@ -228,11 +211,11 @@ ElementTypeBinding:
     @@For: =ForEmpty
 
     @@rdf:type:
-      @@@@: ManakaiDOM|IF
+      @@@@: DISLang|Interface
       @@@ForCheck: ManakaiDOM|ForIF
 
     @@rdf:type:
-      @@@@: ManakaiDOM|Class
+      @@@@: DISLang|Class
       @@@ForCheck: ManakaiDOM|ForClass
     @@Implement:
       @@@@: ||ForEmpty||ManakaiDOM|ForIF
@@ -243,7 +226,7 @@ ElementTypeBinding:
       @@@ContentType: DISCore|TFPQNames
       @@@ForCheck: ManakaiDOM|ForClass ForLatest
 
-    @@DOMMain:implementFeature:
+    @@f:implements:
       @@@@: CoreFeature21
       @@@For: ForLatest
 
@@ -279,8 +262,7 @@ IFClsDef:
         Appends a node to the list of children of this node. 
     @@Param:
       @@@Name:node
-      @@@Type:
-        DOMMain:Object::ManakaiDOM:all
+      @@@Type: idl|Object||ManakaiDOM|all
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -307,8 +289,7 @@ IFClsDef:
             is set to <DOM::true>.  Otherwise, an exception is raised. 
     @@NamedParam:
       @@@Name:nodeOrText
-      @@@Type:
-        DOMMain:boolean::ManakaiDOM:all
+      @@@Type: boolean
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -317,8 +298,7 @@ IFClsDef:
         @@@@Value:
           @@@@@:1
           @@@@ContentType: DISCore|Boolean
-        @@@@Type:
-          DOMMain:boolean::ManakaiDOM:all
+        @@@@Type: boolean
         @@@@Description:
           @@@@@lang:en
           @@@@@@:
@@ -328,8 +308,7 @@ IFClsDef:
         @@@@Value:
           @@@@@:0
           @@@@ContentType: DISCore|Boolean
-        @@@@Type:
-          DOMMain:boolean::ManakaiDOM:all
+        @@@@Type: boolean
         @@@@Description:
           @@@@@lang:en
           @@@@@@:
@@ -898,8 +877,7 @@ IFClsDef:
         given condition, if any. 
     @@Param:
       @@@Name:code
-      @@@Type:
-        Perl:CODE::ManakaiDOM:all
+      @@@Type: DISPerl|CODE||ManakaiDOM|all
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -912,8 +890,7 @@ IFClsDef:
           passed to the function. 
     @@NamedParam:
       @@@Name:makeNewNode
-      @@@Type:
-        Perl:CODE::ManakaiDOM:all
+      @@@Type: DISPerl|CODE||ManakaiDOM|all
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -1152,8 +1129,7 @@ IFClsDef:
         @@@@@:
           The local name of the element to remove.
     @@Return:
-      @@@Type:
-        DOMMain:boolean::ManakaiDOM:all
+      @@@Type: boolean
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -1203,8 +1179,7 @@ IFClsDef:
         @@@@@:
           The local name of the element to remove.
     @@Return:
-      @@@Type:
-        DOMMain:boolean::ManakaiDOM:all
+      @@@Type: boolean
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -1416,8 +1391,7 @@ IFClsDef:
 
   @Attr:
     @@Name:count
-    @@Type:
-      DOMMain:unsigned-long::ManakaiDOM:all
+    @@Type: unsignedLong
     @@Description:
       @@@lang:en
       @@@@:
@@ -1445,8 +1419,7 @@ IFClsDef:
 
   @Attr:
     @@Name:realCount
-    @@Type:
-      DOMMain:unsigned-long::ManakaiDOM:all
+    @@Type: unsignedLong
     @@Description:
       @@@lang:en
       @@@@:
@@ -1467,8 +1440,7 @@ IFClsDef:
     @@ModIn21:
     @@NamedParam:
       @@@Name:newValue
-      @@@Type:
-        DOMMain:any::ManakaiDOM:all
+      @@@Type: any
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -1516,8 +1488,7 @@ IFClsDef:
     @@NewIn21:
     @@NamedParam:
       @@@Name:newValue
-      @@@Type:
-        DOMMain:any::ManakaiDOM:all
+      @@@Type: any
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -1561,8 +1532,7 @@ IFClsDef:
     @@ModIn21:
     @@NamedParam:
       @@@Name:asArray
-      @@@Type:
-        DOMMain:boolean::ManakaiDOM:all
+      @@@Type: boolean
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -1572,8 +1542,7 @@ IFClsDef:
         @@@@Value:
           @@@@@@:1
           @@@@@ContentType: DISCore|Boolean
-        @@@@Type:
-          DOMMain:boolean::ManakaiDOM:all
+        @@@@Type: boolean
         @@@@Description:
           @@@@@lang:en
           @@@@@@:
@@ -1582,16 +1551,14 @@ IFClsDef:
         @@@@Value:
           @@@@@@:0
           @@@@@ContentType: DISCore|Boolean
-        @@@@Type:
-          DOMMain:boolean::ManakaiDOM:all
+        @@@@Type: boolean
         @@@@Description:
           @@@@@lang:en
           @@@@@@:
             The node value is returned as an array reference if and 
             only if the node value is a list value. 
     @@Return:
-      @@@Type:
-        DOMMain:any::ManakaiDOM:all
+      @@@Type: any
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -1626,8 +1593,7 @@ IFClsDef:
         A reference to the value of this node. 
     @@NewIn21:
     @@Get:
-      @@@Type:
-        Perl|SCALAR::ManakaiDOM:all
+      @@@Type: DISPerl|SCALAR||ManakaiDOM|all
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -1656,8 +1622,7 @@ IFClsDef:
 
   @Method:
     @@Operator:
-      @@@ContentType:
-        dis:TypeQName
+      @@@ContentType: DISCore|QName
       @@@@:
         DISPerl:AsStringMethod
     @@Description:
@@ -1681,8 +1646,7 @@ IFClsDef:
     @@ModIn21:
     @@NamedParam:
       @@@Name:outputHeader
-      @@@Type:
-        DOMMain:boolean::ManakaiDOM:all
+      @@@Type: boolean
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -1863,8 +1827,7 @@ IFClsDef:
         }
     @@NamedParam:
       @@@Name:key
-      @@@Type:
-        DOMMain:any::ManakaiDOM:all
+      @@@Type: any
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -1937,8 +1900,7 @@ IFClsDef:
           }
     @@Param:
       @@@Name:value
-      @@@Type:
-        DOMMain:any::ManakaiDOM:all
+      @@@Type: any
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -1952,8 +1914,7 @@ IFClsDef:
       @@@InCase:
         @@@@Value:
           @@@@@is-null:1
-        @@@@Type:
-          DOMMain:any::ManakaiDOM:all
+        @@@@Type: any
         @@@@Description:
           @@@@@lang:en
           @@@@@@:
@@ -1964,8 +1925,7 @@ IFClsDef:
             }
     @@DefaultParam:
     @@Return:
-      @@@Type:
-        DOMMain:any::ManakaiDOM:all
+      @@@Type: any
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -1973,8 +1933,7 @@ IFClsDef:
       @@@InCase:
         @@@@Value:
           @@@@@is-null:1
-        @@@@Type:
-          DOMMain:any::ManakaiDOM:all
+        @@@@Type: any
         @@@@Description:
           @@@@@lang:en
           @@@@@@:
@@ -2005,16 +1964,14 @@ IFClsDef:
         @@@@@: The option name. 
     @@Param:
       @@@Name:value
-      @@@Type:
-        DOMMain:any::ManakaiDOM:all
+      @@@Type: any
       @@@Description:
         @@@@lang:en
         @@@@@:The option value to set. 
       @@@InCase:
         @@@@Value:
           @@@@@is-null:1
-        @@@@Type:
-          DOMMain:any::ManakaiDOM:all
+        @@@@Type: any
         @@@@Description:
           @@@@@lang:en
           @@@@@@:
@@ -2024,16 +1981,14 @@ IFClsDef:
             \
             }
     @@Return:
-      @@@Type:
-        DOMMain:any::ManakaiDOM:all
+      @@@Type: any
       @@@Description:
         @@@@lang:en
         @@@@@:The (possibly new) value of the option. 
       @@@InCase:
         @@@@Value:
           @@@@@is-null:1
-        @@@@Type:
-          DOMMain:any::ManakaiDOM:all
+        @@@@Type: any
         @@@@Description:
           @@@@@lang:en
           @@@@@@:No value has set to the option. 
@@ -2045,8 +2000,7 @@ IFClsDef:
 
   @Method:
     @@Operator:
-      @@@ContentType:
-        dis:TypeQName
+      @@@ContentType: DISCore|QName
       @@@@:
         DISPerl:CloneMethod
     @@Description:
@@ -2228,8 +2182,7 @@ IFClsDef:
             The <DOM::null> namespace. 
     @@NamedParam:
       @@@Name: makeNewBinding
-      @@@Type: 
-        DOMMain:boolean::ManakaiDOM:all
+      @@@Type: boolean
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -2342,8 +2295,7 @@ IFClsDef:
           The namespace URI to look for. 
     @@NamedParam:
       @@@Name: makeNewBinding
-      @@@Type:
-        DOMMain:boolean::ManakaiDOM:all
+      @@@Type: boolean
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -2371,8 +2323,7 @@ IFClsDef:
             returns the <DOM::null> value. 
     @@NamedParam:
       @@@Name: raisePrefixException
-      @@@Type:
-        DOMMain:boolean::ManakaiDOM:all
+      @@@Type: boolean
       @@@enDesc:
         Whehter an exception should be thrown if <P::prefix>
         is not declared or not. 
@@ -2533,8 +2484,7 @@ IFClsDef:
           @@@@lang:en
           @@@@@: The node to test against.
      @@Return:
-        @@@Type:  
-          DOMMain:boolean::ManakaiDOM:all
+        @@@Type: boolean
         @@@InCase:
           @@@@Value:
             @@@@@@:1
@@ -2620,7 +2570,7 @@ IFClsDef:
       A reference to the node identifier.
     @@NewIn21:
     @@Get:
-      @@@Type: Perl|SCALAR||ManakaiDOM|all
+      @@@Type: DISPerl|SCALAR||ManakaiDOM|all
       @@@PerlDef:
         $r = \($self->{<H::mn:node>}->{<H::mn:nodeID>});
 ##SWCFGNode
@@ -2832,7 +2782,7 @@ IFClsDef:
                         ? $node->{<H::swcfg21:shadowNamespaceURI>}
                         : $node->{<H::swcfg21:namespaceURI>});
           my $ln = ($node->{<H::swcfg21:namespaceURI>} eq <Q::swcfg21:RealName>
-                        ? $node->{<H::swcfg21:shadowlocalName>}
+                        ? $node->{<H::swcfg21:shadowLocalName>}
                         : $node->{<H::swcfg21:localName>});
           if (not defined $defURI or
               $nsURI ne $defURI or
@@ -3044,8 +2994,7 @@ IFClsDef:
             the namespace as the <QUOTE::<DOM::null> namespace>. 
       @@@InCase:
         @@@@Value:
-          @@@@@ContentType:
-            dis:TypeQName
+          @@@@@ContentType: DISCore|QName
           @@@@@@:
             swcfg21:RealName
         @@@@Description:
@@ -3089,8 +3038,7 @@ IFClsDef:
             The node does not have the namespace URI. 
       @@@InCase:
         @@@@Value:
-          @@@@@ContentType:
-            dis:TypeQName
+          @@@@@ContentType: DISCore|QName
           @@@@@@:
             swcfg21:RealName
         @@@@Description:
@@ -3119,8 +3067,7 @@ IFClsDef:
             the namespace as the <QUOTE::<DOM::null> namespace>. 
       @@@InCase:
         @@@@Value:
-          @@@@@ContentType:
-            dis:TypeQName
+          @@@@@ContentType: DISCore|QName
           @@@@@@:
             swcfg21:RealName
         @@@@Description:
@@ -3440,8 +3387,7 @@ IFClsDef:
         Returns the text value of this node. 
     @@NamedParam:
       @@@Name:newValue
-      @@@Type:
-        DOMMain:any::ManakaiDOM:all
+      @@@Type: any
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -3472,8 +3418,7 @@ IFClsDef:
     @@NewIn21:
     @@NamedParam:
       @@@Name:newValue
-      @@@Type:
-        DOMMain:any::ManakaiDOM:all
+      @@@Type: any
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -3552,8 +3497,7 @@ IFClsDef:
 
   @Attr:
     @@Name: isShadowMaster
-    @@Type: 
-      DOMMain:boolean::ManakaiDOM:all
+    @@Type: boolean
     @@Description:
       @@@lang:en
       @@@@:
@@ -3615,6 +3559,18 @@ IFClsDef:
   @mn:origin0: swcfg21|shadowSiblingOf
 ##SWCFGDocumentFragment
 
+PropDef:
+  @QName: swcfg21|shadowParent
+
+PropDef:
+  @QName: swcfg21|shadowSiblingOf
+
+PropDef:
+  @QName: swcfg21|shadowLocalName
+
+PropDef:
+  @QName: swcfg21|shadowNamespaceURI
+
 IFClsDef:
   @IFQName: SWCFGChildNodeList
   @ClsQName: ManakaiSWCFGChildNodeList
@@ -3634,8 +3590,7 @@ IFClsDef:
 
   @Attr:
     @@Name:length
-    @@Type:
-      DOMMain:unsigned-long::ManakaiDOM:all
+    @@Type: unsignedLong
     @@Operator:
       @@@@:FETCHSIZE
       @@@ContentType:
@@ -3674,8 +3629,7 @@ IFClsDef:
     @@NewIn21:
     @@Param:
       @@@Name:index
-      @@@Type:
-        DOMMain:long::ManakaiDOM:all
+      @@@Type: idl|long||ManakaiDOM|all
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -3772,8 +3726,7 @@ IFClsDef:
         \
         }
     @@Return:
-      @@@Type:
-        Perl:ARRAY::ManakaiDOM:all
+      @@@Type: DISPerl|ARRAY||ManakaiDOM|all
       @@@PerlDef:
         tie my @list, ref $self, $self;
         $r = \@list;
@@ -3880,8 +3833,7 @@ PropDef:
     @@lang:en
     @@@:
       Whether the namespace URI has expanded or not. 
-  @Type:
-    DOMMain:boolean::ManakaiDOM:all
+  @Type: boolean
   @mn:stemName: nsx
 
 PropDef:
@@ -3890,8 +3842,7 @@ PropDef:
     @@lang:en
     @@@:
       Whether the element type binding has been expanded or not.
-  @Type:
-    DOMMain:boolean::ManakaiDOM:all
+  @Type: boolean
   @mn:stemName: etx
 
 PropDef:
@@ -3929,8 +3880,7 @@ PropDef:
     @@@:
       Whether a document fragment node is the root node of a 
       shadow master tree or not. 
-  @Type:
-    DOMMain:boolean::ManakaiDOM:all
+  @Type: boolean
   @rdfs:range: SWCFGDocumentFragment
   @mn:stemName: shadowmaster
 
@@ -3944,8 +3894,7 @@ PropDef:
 
 PropDef:
   @QName:flag
-  @Type:
-    Perl:HASH::ManakaiDOM:all
+  @Type: DISPerl|HASH||ManakaiDOM|all
   @Description:
     @@lang:en
     @@@:
@@ -3954,8 +3903,7 @@ PropDef:
 
 PropDef:
   @QName:option
-  @Type:
-    Perl:HASH::ManakaiDOM:all
+  @Type: DISPerl|HASH||ManakaiDOM|all
   @Description:
     @@lang:en
     @@@:
@@ -4293,7 +4241,23 @@ XPropDef:
 
 ResourceDef:
   @QName: SWCFGString
-  @AliasFor: DOMMain|DOMString||ManakaiDOM|ManakaiDOMLatest
+  @AliasFor: DISPerl|String||ManakaiDOM|all
+  @For: swcfg21|ForEmpty
+
+ResourceDef:
+  @QName: boolean
+  @AliasFor: idl|boolean||ManakaiDOM|all
+  @For: swcfg21|ForEmpty
+
+ResourceDef:
+  @QName: any
+  @AliasFor: idl|any||ManakaiDOM|all
+  @For: swcfg21|ForEmpty
+
+ResourceDef:
+  @QName: unsignedLong
+  @AliasFor: idl|unsignedLong||ManakaiDOM|all
+  @For: swcfg21|ForEmpty
 
 ElementTypeBinding:
   @Name: plCName
@@ -4325,8 +4289,7 @@ IFClsDef:
         Parses a SuikaWikiConfig document from a resource. 
     @@Param:
       @@@Name:input
-      @@@Type:
-        DOMLS:LSInput::ManakaiDOM:ManakaiDOMLatest
+      @@@Type: DISPerl|HASH||ManakaiDOM|all
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -4348,34 +4311,13 @@ IFClsDef:
       @@@PerlDef:
            my $text;
            ## 1. characterStream
-           if (defined (my $cs = $input-><AG::DOMLS:LSInput
-                              ::ManakaiDOM:ManakaiDOMLatest.characterStream>)) {
+           if (defined (my $cs = $input->{character_stream})) {
              local $/ = undef;
              $text = \ (readline $cs);
            }
-           ## 2. byteStream
-           elsif (defined (my $bs = $input-><AG::DOMLS:LSInput
-                              ::ManakaiDOM:ManakaiDOMLatest.byteStream>)) {
-             __EXCEPTION{
-               SWCFGException.NOT_SUPPORTED_ERR::
-                 MDOMX:param-name => 'input',
-             }__;
-           }
            ## 3. stringData
-           elsif (defined (my $sd = $input-><AG::DOMLS:LSInput
-                                   ::ManakaiDOM:ManakaiDOMLatest.stringData>)) {
-             $text = \$sd;
-           }
-           ## 4. systemId
-           ## 5. publicId
-           elsif (defined (my $sysId = $input-><AG::DOMLS:LSInput
-                                      ::ManakaiDOM:ManakaiDOMLatest.systemId>) or
-                  defined (my $pubId = $input-><AG::DOMLS:LSInput
-                                      ::ManakaiDOM:ManakaiDOMLatest.publicId>)) {
-             __EXCEPTION{
-               SWCFGException.NOT_SUPPORTED_ERR::
-                 MDOMX:param-name => 'input',
-             }__;
+           elsif (defined (my $sd = $input->{string_data})) {
+             $text = $sd;
            } else {
              ## TODO: no-input-specified DOM error
              __EXCEPTION{SWCFG_PARSE_ERR::
@@ -4687,7 +4629,7 @@ IFClsDef:
     @@ForCheck: ManakaiDOM|ForClass
     @@Operator: 
       @@@@: DISPerl|NewMethod
-      @@@ContentType: dis|TypeQName
+      @@@ContentType: DISCore|QName
     @@ForCheck: ManakaiDOM|ForClass
     @@enDesc:
       Creates a new instance of the <IF::SWCFGParser> interface
@@ -4700,26 +4642,26 @@ IFClsDef:
       }
     @@Param:
       @@@Name: impl
-      @@@Type: DOMFeature|MinimumImplementation||ManakaiDOM|ManakaiDOMLatest
+      @@@Type: f|MinimumImplementation||ManakaiDOM|ManakaiDOMLatest
       @@@enDesc:
-        An implementation object.  The <M::DOMFeature|GetFeature.getFeature>
+        An implementation object.  The <M::f|GetFeature.getFeature>
         method with parameter values <Feature::swcfg21|Core> and
         <FeatureVer::2.1> respectively <kwd:MUST> return
         an object implementing the <IF::SWCFGImplementation> interface.
     @@Param:
       @@@Name: features
       @@@Type: SWCFGString
-      @@@dis:actualType: DOMFeature|FeaturesString||ManakaiDOM|ManakaiDOMLatest
+      @@@dis:actualType: f|FeaturesString||ManakaiDOM|ManakaiDOMLatest
       @@@enDesc:
         A list of requested features.  In the current implementation
         this parameter is ignored.
     @@Return:
-      @@@Type: DOMMain|Object||ManakaiDOM|all
+      @@@Type: idl|Object||ManakaiDOM|all
       @@@actualType: ManakaiSWCFGParser
       @@@enDesc: The newly created parser object.
       @@@PerlDef:
         $r = bless {<H::DOMCore:implementation> =>
-                       $impl-><M::DOMFeature|GetFeature
+                       $impl-><M::f|GetFeature
                                 ||ManakaiDOM|ManakaiDOMLatest.getFeature>
                           (<Q::swcfg21:Core> => '2.1')},
                    $self;
@@ -4737,9 +4679,9 @@ IFClsDef:
   @IFQName: SWCFGImplementation
   @ClsQName: ManakaiSWCFGImplementation
 
-  @ClsISA: DOMFeature|ManakaiMinimumImplementation||ManakaiDOM|ManakaiDOMLatest
+  @ClsISA: f|ManakaiMinimumImplementation||ManakaiDOM|ManakaiDOMLatest
 
-  @DOMMetaImpl:provideFeature: CoreFeature21
+  @f:provides: CoreFeature21
 
   @Description:
     @@lang:en
@@ -4811,8 +4753,7 @@ IFClsDef:
     @@NewIn21:
     @@Param:
       @@@Name:versions
-      @@@Type:
-        DOMMain:any::ManakaiDOM:all
+      @@@Type: any
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -4852,8 +4793,7 @@ IFClsDef:
 
 TreeElementType:
   @QName: GetPropNode
-  @dataType:
-    dis:TypeQName
+  @dataType: DISCore|QName
   @rdfs:range:
     rdf:Property
   @Description:
@@ -4976,8 +4916,7 @@ ElementTypeBinding:
       DISLang:MethodParameter
     @@DISPerl:isNamedParameter:1
     @@Name:makeNewNode
-    @@Type:
-      DOMMain:boolean::ManakaiDOM:all
+    @@Type: boolean
     @@Description:
       @@@lang:en
       @@@@:
@@ -4988,8 +4927,7 @@ ElementTypeBinding:
       @@@Value:
         @@@@@:1
         @@@@ContentType: DISCore|Boolean
-      @@@Type:
-        DOMMain:boolean::ManakaiDOM:all
+      @@@Type: boolean
       @@@Description:
         @@@@lang:en
         @@@@@: A new node is created when no such node found. 
@@ -4999,8 +4937,7 @@ ElementTypeBinding:
       @@@Value:
         @@@@@:0
         @@@@ContentType: DISCore|Boolean
-      @@@Type:
-        DOMMain:boolean::ManakaiDOM:all
+      @@@Type: boolean
       @@@Description:
         @@@@lang:en
         @@@@@: A new node is not created even when no such node found. 
@@ -5014,8 +4951,7 @@ ElementTypeBinding:
       DISLang:MethodParameter
     @@DISPerl:isNamedParameter:1
     @@Name:default
-    @@Type:
-      DOMMain:any::ManakaiDOM:all
+    @@Type: any
     @@Description:
       @@@lang:en
       @@@@:
@@ -5024,8 +4960,7 @@ ElementTypeBinding:
     @@ResourceDef:
       @@@rdf:type:
         ManakaiDOM:InCase
-      @@@Type:
-        DOMMain:any::ManakaiDOM:all
+      @@@Type: any
       @@@Value:
         @@@@is-null:1
       @@@Description:
@@ -5041,8 +4976,7 @@ ElementTypeBinding:
       DISLang:MethodParameter
     @@DISPerl:isNamedParameter:1
     @@Name:defaultList
-    @@Type:
-      DOMMain:any::ManakaiDOM:all
+    @@Type: any
     @@Description:
       @@@lang:en
       @@@@:
@@ -5054,8 +4988,7 @@ ElementTypeBinding:
         ManakaiDOM:InCase
       @@@Value:
         @@@@is-null:1
-      @@@Type:
-        DOMMain:any::ManakaiDOM:all
+      @@@Type: any
       @@@Description:
         @@@@lang:en
         @@@@@: No default list value. 
