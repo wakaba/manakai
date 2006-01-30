@@ -1,3 +1,19 @@
+2006-01-30  Wakaba  <wakaba@suika.fam.cx>
+
+	* XDoctype.dis (d:Feature): New canonical feature
+	name |fe:XDoctype| is added.
+
+	* XMLParser.dis: Predefined general entity references
+	are implemented.  Creates |Entity| nodes from general entities
+	declared in internal subset.  |Entity| nodes created from internal
+	general parsed entities now have replacement tree.
+	Sets |cfg:entity-reference-read-only| flag off during
+	the tree generation.  Some parsing rules use |$self->{doc}|
+	rather than |$doc| parameter.  Similarly, |$self->{docx}| (document
+	node with |fe:XDoctype| feature) and |$self->{dtdef}| are
+	introduced.  General entity references in attribute value literal
+	are supported.
+
 2006-01-29  Wakaba  <wakaba@suika.fam.cx>
 
 	* Tree.dis (ManakaiDOM:entity-reference-read-only): Configuration

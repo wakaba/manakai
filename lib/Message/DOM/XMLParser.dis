@@ -10,7 +10,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/01/29 07:09:25 $
+    $Date: 2006/01/30 15:17:58 $
 
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
@@ -25,6 +25,8 @@ Module:
 Namespace:
   @c:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
+  @cfg:
+    http://suika.fam.cx/www/2006/dom-config/
   @d:
     http://suika.fam.cx/~wakaba/archive/2004/dom/xdt#
   @dis:
@@ -37,6 +39,10 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/Core/
   @f:
     http://suika.fam.cx/~wakaba/archive/2004/dom/feature#
+  @fe:
+    http://suika.fam.cx/www/2006/feature/
+  @gls:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/gls#
   @idl:
     http://suika.fam.cx/~wakaba/archive/2004/dis/IDL#
   @infoset:
@@ -55,6 +61,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
   @MDOMX:
     http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
+  @mn:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/ManakaiNode#
   @rdf:
     http://www.w3.org/1999/02/22-rdf-syntax-ns#
   @rdfs:
@@ -193,7 +201,7 @@ ClsDef:
     @@@: DOMLS|LSFeature30
     @@For: ManakaiDOM|DOM3
 
-  @DISLang:role: DOMLS|ParserRole
+  @DISLang:role: gls|ParserRole
 
   @enDesc:
     Note that the <Class::ManakaiXMLParser> reports any XML errors
@@ -235,7 +243,7 @@ ClsDef:
       Creates a new instance of the object.
     @@Param:
       @@@Name: impl
-      @@@Type: DOMLS|GLSImplementation
+      @@@Type: gls|GLSImplementation
       @@@enDesc:
         The implementation from which the parser is created.
     @@Param:
@@ -278,7 +286,13 @@ ClsDef:
         $self->{entity_token} = [];
         $self->{xml_version} = '1.0';
         $self->{standalone} = false;
-        $self->{general_entity} = {};
+        $self->{general_entity} = {
+          lt => {is_predefined => true},
+          gt => {is_predefined => true},
+          amp => {is_predefined => true},
+          quot => {is_predefined => true},
+          apos => {is_predefined => true},
+        };
         $self->{param_entity} = {};
         $self->{attr} = {};
           # $self->{attr}->{$element_type_name}->{$attr_name} = $attr_def
@@ -286,8 +300,38 @@ ClsDef:
           ## Well-formedness constraint Entity Declared takes effect?
 
         __DEEP{
-          $r = $self->_parse_DocumentEntity
-                        ($self->{<H::DOMCore:implementation>});
+          $r = $self->{<H::c|implementation>}-><M::DOMImpl.createDocument>;
+          $r-><AS::Document.strictErrorChecking> (false);
+          $self->{doc} = $r;
+          CORE::delete $self->{docx};
+          CORE::delete $self->{dtdef};
+          $self->{cfg} = $r-><AG::Document.domConfig>;
+          local $r->{<H::mn:node>}
+                  ->{<H::cfg|entity-reference-read-only>} = false;
+
+          ## Document entity -> |Document| node
+          $self->_parse_DocumentEntity;
+
+          ## Replacement tree for general |Entity| nodes
+          my @ent = values %{$self->{general_entities}};
+          if (@ent) {
+            for my $ent (@ent) {
+              if (exists $ent->{reptxt}) {
+                my $ent_name = $ent->{name};
+                $self->{entity} = [<Code::getCopyOfEntityState::
+                                              $entity_type = 'general_entity',
+                                              $entity_name = $ent_name>];
+                $self->{token} = [];
+                $self->{char} = [];
+                ## TODO: External entity support
+                $self->_parse_InternalGeneralParsedEntity ($ent->{node});
+                $ent->{node}-><AS::x|Entity.hasReplacementTree> (true);
+              }
+              ## TODO: Read-only if configuration (for all entities)
+            }
+          }
+
+          $r-><AS::Document.strictErrorChecking> (true);
         }__;
 
   @Method:
@@ -424,18 +468,16 @@ ClsDef:
         document := prolog element *Misc
                   - *Char RestrictedChar *Char  ;; [1]
     */
-    rule DocumentEntity ($impl) : standalone {
-      my $doc : return;
-    
-      lang:Perl {
-        $doc = $impl-><M::DOMImpl.createDocument>;
-        $doc-><AS::Document.strictErrorChecking> (false);
-      }
-    
+    rule DocumentEntity : standalone {
       /*
         prolog := XMLDecl? *Misc [doctypedecl *Misc]  ;; [22]
       */
       ?lexmode 'DocumentStart';
+
+      my $doc;
+      lang:Perl {
+        $doc = $self->{doc};
+      }
       
       ~? (XDO) {
         &_XMLDeclaration_ ($doc => $doc);
@@ -547,11 +589,31 @@ ClsDef:
           __EXCEPTION{DOMLS|PARSE_ERR::
           }__;
         }
-        
-        $doc-><AS::Document.strictErrorChecking> (true);
       }
     } // DocumentEntity
-  
+ 
+    /*
+      Internal General Parsed Entity
+ 
+        An internal general parsed entity is well-formed if its
+        replacement text matches the production labeled |content|.
+    */
+    rule InternalGeneralParsedEntity ($ent) : standalone {
+      ?lexmode ElementContent;
+
+      my $ns;
+      lang:Perl {
+        $ns = {
+          xml => <Q::xml:>,
+          xmlns => <Q::xmlns:>,
+        };
+      }
+
+      &content ($parent => $ent, $ns => $ns);
+
+      ~ (#EOF) { }
+    } // InternalGeneralParsedEntity
+ 
     /*
       XML Declaration
       
@@ -1312,6 +1374,79 @@ _
 
       ~ (#NONE) { }
     } // Element_
+
+    /*
+      content := [CharData]
+                 *((element / Reference / CDSect / PI / Comment) [CharData])
+    */
+    rule content ($parent, $ns) {
+      // ?lexmode ElementContent;
+ 
+      my $doc;
+      lang:Perl {
+        $doc = $self->{doc};
+      }
+
+      ~* (CharData) {
+        lang:Perl ($data => $token.value) {
+          $parent-><M::Node.appendChild>
+            ($self->{doc}-><M::Document.createTextNode> ($data));
+        }
+      } (STAGO) {
+          &Element_ ($doc => $doc, $parent => $parent, $ns => $ns)
+            : unshift-current-token;
+          ~ (TAGC) {
+            ?lexmode ElementContent;
+          } else {
+            ?lexmode ElementContent;
+          }
+        } (HCRO) {
+          &_HexadecimalCharacterReference_
+            ($doc => $doc, $parent => $parent);
+
+          ~ (REFC) {
+            ?lexmode 'ElementContent';
+          } else {
+            ?lexmode ElementContent;
+          }
+        } (CRO) {
+          &_NumericCharacterReference_
+            ($doc => $doc, $parent => $parent);
+
+          ~ (REFC) {
+            ?lexmode 'ElementContent';
+          } else {
+            ?lexmode ElementContent;
+          }
+        } (ERO) {
+          &_GeneralEntityReferenceEC
+            ($doc => $doc, $parent => $parent, $ns => $ns);
+        } (CDO) {
+          &_CommentDeclaration_ ($doc => $doc, $parent => $parent);
+
+          ~ (MDC) {
+            ?lexmode ElementContent;
+          } else {
+            ?lexmode ElementContent;
+          }
+        } (CDSO) {
+          &_CDATASection_ ($doc => $doc, $parent => $parent);
+
+          ~ (MSE) {
+            ?lexmode 'ElementContent';
+          } else {
+            ?lexmode ElementContent;
+          }
+        } (PIO) {
+          &_ProcessingInstruction_ ($doc => $doc, $parent => $parent);
+
+          ~ (PIC) {
+            ?lexmode 'ElementContent';
+          } else {
+            ?lexmode ElementContent;
+          }
+        }
+    } // content
     
     rule AttributeSpecificationList ($doc, $attrs)
       : standalone
@@ -1470,6 +1605,53 @@ _
     } // _AttributeValueSpecificationA_
     
     /*
+      Parsing replacement text of an entity referenced in
+      an attribute value specification.
+    */
+    rule AttributeValueLiteralE_ ($parent, $vals)
+      : recursive
+    {
+      // ?lexmode AttributeValueLiteralE;
+      
+      ~* (STRING) {
+        lang:Perl ($value => $token.value) {
+          $value =~ s/[\x09\x0A\x0D]/ /g;
+          my $text = $self->{doc}-><M::Document.createTextNode> ($value);
+          $parent-><M::Node.appendChild> ($text);
+          $vals->{value} .= $value;
+        }
+      } (HCRO) {
+        &_HexadecimalCharacterReferenceAE_
+          ($parent => $parent, $vals => $vals);
+
+        ~ (REFC) {
+          ?lexmode AttributeValueLiteralE;
+        } else {
+          ?lexmode AttributeValueLiteralE;
+        }
+      } (CRO) {
+        &_NumericCharacterReferenceAE_
+          ($parent => $parent, $vals => $vals);
+
+        ~ (REFC) {
+          ?lexmode AttributeValueLiteralE;
+        } else {
+          ?lexmode AttributeValueLiteralE;
+        }
+      } (ERO) {
+        &_GeneralEntityReferenceAE_ ($parent => $parent, $vals => $vals);
+
+        ~ (REFC) {
+          ?lexmode AttributeValueLiteralE;
+        } else {
+          ?lexmode AttributeValueLiteralE;
+        }
+      }
+      
+      // ~ (#EOF) { }
+    } // AttributeValueLiteralE_
+    
+    /*
       CDATA Section Content Parsing Mode
     */
     rule _CDATASection_ ($doc, $parent) {
@@ -1579,6 +1761,93 @@ _
       // ~ (REFC) { }
     } // _NumericCharacterReferenceV_
     
+    /*
+      Numeric character reference in the replacement text
+      of the entity referenced in an attribute value specification
+    */
+    rule _NumericCharacterReferenceAE_ ($parent, $vals)
+    {
+      ?lexmode NumericCharacterReference;
+      
+      ~ (NUMBER) {
+        lang:Perl ($num => $token.value) : has-error {
+          $num += 0;
+          unless (
+            ($self->{xml_version} eq '1.0' and
+              ((0x0020 <= $num and $num <= 0xD7FF) or
+               (0xE000 <= $num and $num <= 0xFFFD) or
+               (0x10000 <= $num and $num <= 0x10FFFF) or
+               $num == 0x9 or $num == 0xA or $num == 0xD)) or
+            ($self->{xml_version} eq '1.1' and
+              ((0x0001 <= $num and $num <= 0xD7FF) or
+               (0xE000 <= $num and $num <= 0xFFFD) or
+               (0x10000 <= $num and $num <= 0x10FFFF)))
+          ) {
+            my $location;
+            __CODE{xp|get-location-from-token::
+              $token => $token,
+              $result => $location,
+            }__;
+            my $continue = __DOMCore:ERROR{xp|wf-legal-character::
+              DOMCore:location => {$location},
+              xp|token => {$token},
+              xp|character-number => {$num},
+            }__;
+            unless ($continue) {
+              __EXCEPTION{DOMLS|PARSE_ERR}__;
+            }
+            $self->{has_error} = true;
+          }
+          my $ncr = $self->{doc}-><M::Document.createTextNode>
+                            (my $char = chr $num);
+          $parent-><M::Node.appendChild> ($ncr);
+          $vals->{value} .= $char;
+        }
+      }
+      
+      // ~ (REFC) { }
+    } // _NumericCharacterReferenceAE_
+    
+    rule _NumericCharacterReferenceEV_ ($vals)
+    {
+      ?lexmode 'NumericCharacterReference';
+      
+      ~ (NUMBER) {
+        lang:Perl ($num => $token.value) : has-error {
+          $num += 0;
+          unless (
+            ($self->{xml_version} eq '1.0' and
+              ((0x0020 <= $num and $num <= 0xD7FF) or
+               (0xE000 <= $num and $num <= 0xFFFD) or
+               (0x10000 <= $num and $num <= 0x10FFFF) or
+               $num == 0x9 or $num == 0xA or $num == 0xD)) or
+            ($self->{xml_version} eq '1.1' and
+              ((0x0001 <= $num and $num <= 0xD7FF) or
+               (0xE000 <= $num and $num <= 0xFFFD) or
+               (0x10000 <= $num and $num <= 0x10FFFF)))
+          ) {
+            my $location;
+            __CODE{xp|get-location-from-token::
+              $token => $token,
+              $result => $location,
+            }__;
+            my $continue = __DOMCore:ERROR{xp|wf-legal-character::
+              DOMCore:location => {$location},
+              xp|token => {$token},
+              xp|character-number => {$num},
+            }__;
+            unless ($continue) {
+              __EXCEPTION{DOMLS|PARSE_ERR}__;
+            }
+            $self->{has_error} = true;
+          }
+          push @{$vals}, chr $num;
+        }
+      }
+      
+      // ~ (REFC) { }
+    } // _NumericCharacterReferenceEV_
+    
     rule _HexadecimalCharacterReference_ ($doc, $parent) {
       ?lexmode 'HexadecimalCharacterReference';
       
@@ -1664,6 +1933,92 @@ _
     } // _HexadecimalCharacterReferenceV_
     
     /*
+      Hexadecimal character reference in the replacement text
+      of the entity referenced in an attribute value literal
+    */
+    rule _HexadecimalCharacterReferenceAE_ ($parent, $vals)
+    {
+      ?lexmode HexadecimalCharacterReference;
+      
+      ~ (Hex) {
+        lang:Perl ($v => $token.value) : has-error {
+          my $num = hex $v;
+          unless (
+            ($self->{xml_version} eq '1.0' and
+              ((0x0020 <= $num and $num <= 0xD7FF) or
+               (0xE000 <= $num and $num <= 0xFFFD) or
+               (0x10000 <= $num and $num <= 0x10FFFF) or
+               $num == 0x9 or $num == 0xA or $num == 0xD)) or
+            ($self->{xml_version} eq '1.1' and
+              ((0x0001 <= $num and $num <= 0xD7FF) or
+               (0xE000 <= $num and $num <= 0xFFFD) or
+               (0x10000 <= $num and $num <= 0x10FFFF)))
+          ) {
+            my $location;
+            __CODE{xp|get-location-from-token::
+              $token => $token,
+              $result => $location,
+            }__;
+            my $continue = __DOMCore:ERROR{xp|wf-legal-character::
+              DOMCore:location => {$location},
+              xp|token => {$token},
+              xp|character-number => {$num},
+            }__;
+            unless ($continue) {
+              __EXCEPTION{DOMLS|PARSE_ERR}__;
+            }
+            $self->{has_error} = true;
+          }
+          my $ncr = $self->{doc}-><M::Document.createTextNode>
+                      (my $char = chr $num);
+          $parent-><M::Node.appendChild> ($ncr);
+          $vals->{value} .= $char;
+        }
+      }
+      
+      // ~ (REFC) { }
+    } // _HexadecimalCharacterReferenceAE_
+    
+    rule _HexadecimalCharacterReferenceEV_ ($vals) {
+      ?lexmode HexadecimalCharacterReference;
+      
+      ~ (Hex) {
+        lang:Perl ($v => $token.value) : has-error {
+          my $num = hex $v;
+          unless (
+            ($self->{xml_version} eq '1.0' and
+              ((0x0020 <= $num and $num <= 0xD7FF) or
+               (0xE000 <= $num and $num <= 0xFFFD) or
+               (0x10000 <= $num and $num <= 0x10FFFF) or
+               $num == 0x9 or $num == 0xA or $num == 0xD)) or
+            ($self->{xml_version} eq '1.1' and
+              ((0x0001 <= $num and $num <= 0xD7FF) or
+               (0xE000 <= $num and $num <= 0xFFFD) or
+               (0x10000 <= $num and $num <= 0x10FFFF)))
+          ) {
+            my $location;
+            __CODE{xp|get-location-from-token::
+              $token => $token,
+              $result => $location,
+            }__;
+            my $continue = __DOMCore:ERROR{xp|wf-legal-character::
+              DOMCore:location => {$location},
+              xp|token => {$token},
+              xp|character-number => {$num},
+            }__;
+            unless ($continue) {
+              __EXCEPTION{DOMLS|PARSE_ERR}__;
+            }
+            $self->{has_error} = true;
+          }
+          push @{$vals}, chr $num;
+        }
+      }
+      
+      // ~ (REFC) { }
+    } // _HexadecimalCharacterReferenceEV_
+    
+    /*
       General entity reference in element's content
     */
     rule _GeneralEntityReferenceEC ($doc, $parent, $ns)
@@ -1671,7 +2026,32 @@ _
     {
       ?lexmode 'EntityReference';
       
-      ~ (Name) {
+      ~ (Name == 'lt') {
+        lang:Perl {
+          $parent-><M::Node.appendChild>
+                     ($self->{doc}-><M::Document.createTextNode> ('<'));
+        }
+      } (Name == 'gt') {
+        lang:Perl {
+          $parent-><M::Node.appendChild>
+                     ($self->{doc}-><M::Document.createTextNode> ('>'));
+        }
+      } (Name == 'amp') {
+        lang:Perl {
+          $parent-><M::Node.appendChild>
+                     ($self->{doc}-><M::Document.createTextNode> ('&'));
+        }
+      } (Name == 'quot') {
+        lang:Perl {
+          $parent-><M::Node.appendChild>
+                     ($self->{doc}-><M::Document.createTextNode> ('"'));
+        }
+      } (Name == 'apos') {
+        lang:Perl {
+          $parent-><M::Node.appendChild>
+                     ($self->{doc}-><M::Document.createTextNode> ("'"));
+        }
+      } (Name) {
         my $er;
         lang:Perl ($name => $token.value) {
           ## TODO: Namespace well-formedness
@@ -1689,72 +2069,15 @@ _
         }
 
         ?lexmode ElementContent;
-        ~* (CharData) {
-          lang:Perl ($data => $token.value) {
-            $er-><M::Node.appendChild>
-              ($doc-><M::Document.createTextNode> ($data));
-          }
-        } (STAGO) {
-          &Element_ ($doc => $doc, $parent => $er, $ns => $ns)
-            : unshift-current-token;
-          ~ (TAGC) {
-            ?lexmode ElementContent;
-          } else {
-            ?lexmode ElementContent;
-          }
-        } (HCRO) {
-          &_HexadecimalCharacterReference_
-            ($doc => $doc, $parent => $er);
-
-          ~ (REFC) {
-            ?lexmode 'ElementContent';
-          } else {
-            ?lexmode ElementContent;
-          }
-        } (CRO) {
-          &_NumericCharacterReference_
-            ($doc => $doc, $parent => $er);
-
-          ~ (REFC) {
-            ?lexmode 'ElementContent';
-          } else {
-            ?lexmode ElementContent;
-          }
-        } (ERO) {
-          &_GeneralEntityReferenceEC
-            ($doc => $doc, $parent => $er, $ns => $ns);
-        } (CDO) {
-          &_CommentDeclaration_ ($doc => $doc, $parent => $er);
-
-          ~ (MDC) {
-            ?lexmode ElementContent;
-          } else {
-            ?lexmode ElementContent;
-          }
-        } (CDSO) {
-          &_CDATASection_ ($doc => $doc, $parent => $er);
-
-          ~ (MSE) {
-            ?lexmode 'ElementContent';
-          } else {
-            ?lexmode ElementContent;
-          }
-        } (PIO) {
-          &_ProcessingInstruction_ ($doc => $doc, $parent => $er);
-
-          ~ (PIC) {
-            ?lexmode 'ElementContent';
-          } else {
-            ?lexmode ElementContent;
-          }
-        }
-
+        &content ($doc => $doc, $parent => $er, $ns => $ns);
         ~ (#EOF) { }
         lang:Perl {
           $self->{token} = pop @{$self->{entity_token}};
           $self->{char} = pop @{$self->{entity_char}};
           pop @{$self->{entity}};
         }
+
+        // TODO: Set read-only flag
 
         ?lexmode EntityReference;
         ?requires-next-token;
@@ -1767,27 +2090,154 @@ _
       }
     } // _GeneralEntityReferenceEC
     
-    rule _GeneralEntityReferenceV_ ($doc, $vals) {
-      // TODO: Expansion
-      ?lexmode 'EntityReference';
+    /*
+      General entity reference in an attribute value literal
+    */
+    rule _GeneralEntityReferenceV_ ($vals) {
+      ?lexmode EntityReference;
       
-      ~ (Name) {
+      ~ (Name == 'lt') {
+        lang:Perl {
+          push @{$vals->{nodes}}, $self->{doc}-><M::Document.createTextNode>
+                                                  ('<');
+          $vals->{value} .= '<';
+        }
+      } (Name == 'gt') {
+        lang:Perl {
+          push @{$vals->{nodes}}, $self->{doc}-><M::Document.createTextNode>
+                                                  ('>');
+          $vals->{value} .= '>';
+        }
+      } (Name == 'amp') {
+        lang:Perl {
+          push @{$vals->{nodes}}, $self->{doc}-><M::Document.createTextNode>
+                                                  ('&');
+          $vals->{value} .= '&';
+        }
+      } (Name == 'quot') {
+        lang:Perl {
+          push @{$vals->{nodes}}, $self->{doc}-><M::Document.createTextNode>
+                                                  ('"');
+          $vals->{value} .= '"';
+        }
+      } (Name == 'apos') {
+        lang:Perl {
+          push @{$vals->{nodes}}, $self->{doc}-><M::Document.createTextNode>
+                                                  ("'");
+          $vals->{value} .= "'";
+        }
+      } (Name) {
+        my $er;
         lang:Perl ($name => $token.value) {
           ## TODO: Namespace well-formedness
           ## TODO: Entity declared constraints
-          my $er = $doc-><M::Document.createEntityReference>
-                           ($name);
+          ## TODO: No external entity constraint
+          $er = $self->{doc}-><M::Document.createEntityReference> ($name);
           push @{$vals->{nodes}}, $er;
+          push @{$self->{entity}}, <Code::getCopyOfEntityState::
+                                            $entity_type = 'general_entity',
+                                            $entity_name = $name>;
+          push @{$self->{entity_token}}, $self->{token};
+          $self->{token} = [];
+          push @{$self->{entity_char}}, $self->{char};
+          $self->{char} = [];
         }
+
+        ?lexmode AttributeValueLiteralE;
+        &AttributeValueLiteralE_ ($parent => $er, $vals => $vals);       
+        ~ (#EOF) { }
+        lang:Perl {
+          $self->{token} = pop @{$self->{entity_token}};
+          $self->{char} = pop @{$self->{entity_char}};
+          pop @{$self->{entity}};
+        }
+
+        // TODO: Set read-only flag
+
+        ?lexmode EntityReference;
+        ?requires-next-token;
       }
       
       // ~ (REFC) { }
     } // _GeneralEntityReferenceV_
     
     /*
+      General entity reference in the replacement text
+      of the entity referenced in an attribute value literal
+    */
+    rule _GeneralEntityReferenceAE_ ($parent, $vals)
+    {
+      ?lexmode EntityReference;
+      
+      ~ (Name == 'lt') {
+        lang:Perl {
+          $parent-><M::Node.appendChild>
+                     ($self->{doc}-><M::Document.createTextNode> ('<'));
+          $vals->{value} .= '<';
+        }
+      } (Name == 'gt') {
+        lang:Perl {
+          $parent-><M::Node.appendChild>
+                     ($self->{doc}-><M::Document.createTextNode> ('>'));
+          $vals->{value} .= '>';
+        }
+      } (Name == 'amp') {
+        lang:Perl {
+          $parent-><M::Node.appendChild>
+                     ($self->{doc}-><M::Document.createTextNode> ('&'));
+          $vals->{value} .= '&';
+        }
+      } (Name == 'quot') {
+        lang:Perl {
+          $parent-><M::Node.appendChild>
+                     ($self->{doc}-><M::Document.createTextNode> ('"'));
+          $vals->{value} .= '"';
+        }
+      } (Name == 'apos') {
+        lang:Perl {
+          $parent-><M::Node.appendChild>
+                     ($self->{doc}-><M::Document.createTextNode> ("'"));
+          $vals->{value} .= "'";
+        }
+      } (Name) {
+        my $er;
+        lang:Perl ($name => $token.value) {
+          ## TODO: Namespace well-formedness
+          ## TODO: Entity declared constraints
+          ## TODO: No external entity constraint
+          $er = $self->{doc}-><M::Document.createEntityReference> ($name);
+          $parent-><M::Node.appendChild> ($er);
+          push @{$self->{entity}}, <Code::getCopyOfEntityState::
+                                            $entity_type = 'general_entity',
+                                            $entity_name = $name>;
+          push @{$self->{entity_token}}, $self->{token};
+          $self->{token} = [];
+          push @{$self->{entity_char}}, $self->{char};
+          $self->{char} = [];
+        }
+
+        ?lexmode AttributeValueLiteralE;
+        &AttributeValueLiteralE_ ($parent => $er, $vals => $vals);       
+        ~ (#EOF) { }
+        lang:Perl {
+          $self->{token} = pop @{$self->{entity_token}};
+          $self->{char} = pop @{$self->{entity_char}};
+          pop @{$self->{entity}};
+        }
+
+        // TODO: Set read-only flag
+
+        ?lexmode EntityReference;
+        ?requires-next-token;
+      }
+      
+      // ~ (REFC) { }
+    } // _GeneralEntityReferenceAE_
+    
+    /*
       General entity reference in literal entity value
     */
-    rule _GeneralEntityReferenceEV_ ($doc, $vals) {
+    rule _GeneralEntityReferenceEV_ ($vals) {
       ?lexmode 'EntityReference';
       
       ~ (Name) {
@@ -1797,6 +2247,8 @@ _
           push @$vals, $name;
         }
       }
+
+      // No expansion
       
       // ~ (REFC) { }
     } // _GeneralEntityReferenceEV_
@@ -1820,11 +2272,10 @@ _
         }
       }
       lang:Perl {
-        $node = $doc-><M::DocumentXDoctype.createDocumentTypeDefinition> ($name);
-        $doc-><M::Node.appendChild> ($node);
-        $doc-><AG::Document.domConfig>
-            -><M::c|DOMConfiguration.setParameter>
-                ('schema-type' => <Q::xml-dtd:>);
+        $self->{docx} = $self->{doc}
+                             -><M::Node.getFeature> (<Q::fe:XDoctype>, '3.0');
+        $node = $self->{docx}-><M::DocumentXDoctype.createDocumentTypeDefinition>
+                                 ($name);
       }
 
       ~? (S) {
@@ -1845,6 +2296,14 @@ _
   
           ~? (S) { }
         }
+      }
+      
+      lang:Perl {
+        $self->{dtdef} = $node;
+        $doc-><M::Node.appendChild> ($node);
+        $doc-><AG::Document.domConfig>
+            -><M::c|DOMConfiguration.setParameter>
+                ('schema-type' => <Q::xml-dtd:>);
       }
       
       ~? (DSO) {
@@ -2138,7 +2597,7 @@ _
       lang:Perl {
         $et = $doctype-><M::DTDef.getElementTypeDefinitionNode> ($name);
         unless ($et) {
-          $docxd = $doc-><M::Node.getFeature> (<Q::ManakaiDOM:XDoctype>, '3.0');
+          $docxd = $doc-><M::Node.getFeature> (<Q::fe:XDoctype>, '3.0');
           $et = $docxd-><M::DocumentXDoctype.createElementTypeDefinition>
                           ($name);
           $doctype-><M::DTDef.setElementTypeDefinitionNode> ($et)
@@ -2152,7 +2611,7 @@ _
         my $at;
         lang:Perl ($v => $token.value) {
           $docxd ||= $doc-><M::Node.getFeature>
-                             (<Q::ManakaiDOM:XDoctype>, '3.0');
+                             (<Q::fe:XDoctype>, '3.0');
           $at = $docxd-><M::DocumentXDoctype.createAttributeDefinition> ($v);
           unless (exists $et-><AG::ETDef.attributeDefinitions>->{$v}) {
             $et-><M::ETDef.setAttributeDefinitionNode> ($at);
@@ -2350,6 +2809,9 @@ _
       }
     } // _AttlistDeclaration
 
+    /*
+      Entity declaration
+    */
     rule _EntityDeclaration ($doc) {
       // ~ (MDO) { }
       // ~ (Name == ENTITY) { }
@@ -2357,7 +2819,7 @@ _
       ~ (S) { }
 
       my $decl;
-      lang:Perl { $decl = {}; }
+      lang:Perl { $decl = { name => '#ILLEGAL' }; }
 
       ~? (PERO) {
         ~ (S) { }
@@ -2371,6 +2833,12 @@ _
           $decl->{name} = $v;
         }
       } 
+
+      lang:Perl {
+        $decl->{node} = $self->{docx}-><M::DocumentXDoctype.createGeneralEntity>
+                                         ($decl->{name});
+        ## TODO: Parameter entity...
+      }
 
       ~ (S) { }
 
@@ -2401,6 +2869,7 @@ _
           ~ (Name) {
             lang:Perl ($v => $token.value) {
               $decl->{notation} = $v;
+              $decl->{node}-><AG::x|Entity.notationName> ($v);
             }
           }
 
@@ -2411,10 +2880,13 @@ _
       lang:Perl {
         if ($self->{$decl->{is_param_entity} ? 'param_entity' : 'general_entity'}
                  ->{$decl->{name}}) {
-          ## TODO: error
+          ## TODO: warning
+          ## TODO: predefined entity error check
         } else {
           $self->{$decl->{is_param_entity} ? 'param_entity' : 'general_entity'}
                ->{$decl->{name}} = $decl;
+          $self->{dtdef}-><M::DTDef.setGeneralEntityNode> ($decl->{node})
+            unless $decl->{is_param_entity};
         }
       }
 
@@ -2470,7 +2942,7 @@ _
       }
     } // _NotationDeclaration
  
-    rule _EntityValue ($doc, $decl) {
+    rule _EntityValue ($decl) {
       ?lexmode EntityValue;
 
       my $vals;
@@ -2499,12 +2971,10 @@ _
           ?lexmode EntityValue;
         }
       } (HCRO) {
-        &_HexadecimalCharacterReferenceV_
-          ($doc => $doc, $vals => $vals);
+        &_HexadecimalCharacterReferenceEV_ ($vals => $vals);
 
         lang:Perl {
-          $reptxt .= $vals->[0]-><AG::Node.textContent>;
-          $vals = [];
+          $reptxt .= $vals->[-1];
         }
 
         ~ (REFC) {
@@ -2513,12 +2983,10 @@ _
           ?lexmode EntityValue;
         }
       } (CRO) {
-        &_NumericCharacterReferenceV_
-          ($doc => $doc, $vals => $vals);
+        &_NumericCharacterReferenceEV_ ($vals => $vals);
  
         lang:Perl {
-          $reptxt .= $vals->[0]-><AG::Node.textContent>;
-          $vals = [];
+          $reptxt .= $vals->[-1];
         }
 
         ~ (REFC) {
@@ -2527,12 +2995,10 @@ _
           ?lexmode EntityValue;
         }
       } (ERO) {
-        &_GeneralEntityReferenceEV_
-          ($doc => $doc, $vals => $vals);
+        &_GeneralEntityReferenceEV_ ($vals => $vals);
 
         lang:Perl {
-          $reptxt .= '&' . $vals->[0] . ';';
-          $vals = [];
+          $reptxt .= '&' . $vals->[-1] . ';';
         }
 
         ~ (REFC) {
@@ -2555,7 +3021,7 @@ _
       }
     } // _EntityValue
 
-    rule _EntityValueA ($doc, $decl) {
+    rule _EntityValueA ($decl) {
       ?lexmode EntityValueA;
 
       my $vals;
@@ -2583,12 +3049,10 @@ _
           ?lexmode EntityValueA;
         }
       } (HCRO) {
-        &_HexadecimalCharacterReferenceV_
-          ($doc => $doc, $vals => $vals);
+        &_HexadecimalCharacterReferenceEV_ ($vals => $vals);
 
         lang:Perl {
-          $reptxt .= $vals->[0]-><AG::Node.textContent>;
-          $vals = [];
+          $reptxt .= $vals->[-1];
         }
 
 
@@ -2598,12 +3062,10 @@ _
           ?lexmode EntityValueA;
         }
       } (CRO) {
-        &_NumericCharacterReferenceV_
-          ($doc => $doc, $vals => $vals);
+        &_NumericCharacterReferenceEV_ ($vals => $vals);
 
         lang:Perl {
-          $reptxt .= $vals->[0]-><AG::Node.textContent>;
-          $vals = [];
+          $reptxt .= $vals->[-1];
         }
 
         ~ (REFC) {
@@ -2612,12 +3074,10 @@ _
           ?lexmode EntityValueA;
         }
       } (ERO) {
-        &_GeneralEntityReferenceEV_
-          ($doc => $doc, $vals => $vals);
+        &_GeneralEntityReferenceEV_ ($vals => $vals);
 
         lang:Perl {
-          $reptxt .= '&' . $vals->[0] . ';';
-          $vals = [];
+          $reptxt .= '&' . $vals->[-1] . ';';
         }
 
         ~ (REFC) {
@@ -3181,6 +3641,13 @@ _
       LITA := [U+0027];
       STRING : value := [^U+0027 '&' '<']+;
     } // AttributeValueLiteralA
+    
+    lexmode AttributeValueLiteralE
+      : standalone
+      : extends => 'AttributeValueLiteral_'
+    {
+      STRING : value := [^'&' '<']+;
+    } // AttributeValueLiteralE
 
     lexmode EntityValue_ {
       PERO := ['%'];
@@ -3514,6 +3981,11 @@ _
           xml-standalone: false;
           document-type {
             node-name: 'a';
+            general-entity {
+              node-name: 'entity';
+              text-content: 'entity value';
+              has-replacement-tree: true;
+            }
           }
           element {
             namespace-uri: null;
@@ -3561,6 +4033,11 @@ _
           xml-standalone: false;
           document-type {
             node-name: 'a';
+            general-entity {
+              node-name: 'entity';
+              text-content: 'entity value';
+              has-replacement-tree: true;
+            }
           }
           element {
             namespace-uri: null;
@@ -3589,6 +4066,11 @@ _
           xml-standalone: false;
           document-type {
             node-name: 'a';
+            general-entity {
+              node-name: 'entity';
+              text-content: 'entity value';
+              has-replacement-tree: true;
+            }
           }
           element {
             namespace-uri: null;
@@ -3624,6 +4106,20 @@ _
           xml-standalone: false;
           document-type {
             node-name: 'a';
+            general-entity {
+              node-name: 'entity';
+              has-replacement-tree: true;
+              text { data: 'entity '; }
+              element {
+                node-name: 'p';
+                text-content: 'value';
+              }
+              text { data: ' with '; }
+              element {
+                node-name: 'e';
+                text-content: 'element';
+              }
+            }
           }
           element {
             namespace-uri: null;
@@ -3675,6 +4171,20 @@ _
           xml-standalone: false;
           document-type {
             node-name: 'a';
+            general-entity {
+              node-name: 'entity1';
+              text-content: 'entity value';
+            }
+            general-entity {
+              node-name: 'entity2';
+              text { data: 'e'; }
+              general-entity-reference {
+                node-name: 'entity1';
+                text-content: 'entity value';
+                is-expanded: true;
+              }
+              text { data: 'n'; }
+            }
           }
           element {
             namespace-uri: null;
@@ -3693,6 +4203,104 @@ _
             }
           }
         }
+
+    @@XMLTest:
+      @@@QName: xp.doctype.entity.value.charref.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+            <!ENTITY entity1 "entity &#x21;value&#35;">
+            <!ENTITY entity2 '&#x21;value&#35;'>
+          ]>
+          <a></a>
+      @@@test:domTree:
+        document {
+          document-type {
+            general-entity {
+              node-name: 'entity1';
+              text-content: 'entity !value#';
+              has-replacement-tree: true;
+            }
+            general-entity {
+              node-name: 'entity2';
+              text-content: '!value#';
+              has-replacement-tree: true;
+            }
+          }
+          element { }
+        }
+
+    @@XMLTest:
+      @@@QName: xp.predefined.in.content.test
+      @@@DEnt:
+        @@@@test:value:
+          <a>_&lt;_&gt;_&quot;_&apos;_&amp;_</a>
+      @@@test:domTree:
+        document {
+          element {
+            text-content: '_<_>_"_' U+0027 '_&_';
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.predefined.in.attr.test
+      @@@DEnt:
+        @@@@test:value:
+          <a at="_&lt;_&gt;_&quot;_&apos;_&amp;_"></a>
+      @@@test:domTree:
+        document {
+          element {
+            attribute {
+              node-name: 'at';
+              text-content: '_<_>_"_' U+0027 '_&_';
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.predefined.in.content.in.entity.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+            <!ENTITY ent "_&lt;_&gt;_&quot;_&apos;_&amp;_">
+          ]>
+          <a>&ent;</a>
+      @@@test:domTree:
+        document {
+          document-type {
+            general-entity {
+              node-name: 'ent';
+              text-content: '_<_>_"_' U+0027 '_&_';
+            }
+          }
+          element {
+            text-content: '_<_>_"_' U+0027 '_&_';
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.predefined.decl.ignore.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+            <!ENTITY lt "&#x26;#x3C;">
+            <!ENTITY gt "&#x3E;">
+            <!ENTITY amp "&#x26;#x26;">
+            <!ENTITY quot "&#x22;">
+            <!ENTITY apos "&#x27;">
+            <!ENTITY other "other">
+          ]>
+          <a>_&lt;_&gt;_&quot;_&apos;_&amp;_&other;_</a>
+      @@@test:domTree:
+        document {
+          document-type {
+            general-entity {
+              node-name: 'other';
+              text-content: 'other';
+            }
+          }
+          element {
+            text-content: '_<_>_"_' U+0027 '_&_other_';
+          }
+        }
+
     @@XMLTest:
       @@@QName: xp.doctype.internal.attr.empty.test
       @@@DEnt:
@@ -4223,6 +4831,87 @@ _
               node-name: 'at';
               value: 'specified';
               specified: true;
+            }
+          }
+        }
+
+    @@XMLTest:
+      @@@QName: xp.attr.literal.charref.test
+      @@@DEnt:
+        @@@@test:value:
+          <a at1 = "value&#33;_&#x25;value"
+             at2 = 'value&#x25;_&#33;value'></a>
+      @@@test:domTree:
+        document {
+          element {
+            attribute {
+              node-name: 'at1';
+              text-content: 'value!_%value';
+            }
+            attribute {
+              node-name: 'at2';
+              text-content: 'value%_!value';
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.attr.literal.entref.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+            <!ENTITY ent "entity&#x26;#33;_&#x26;#x29;value">
+          ]>
+          <a at1 = "value&ent;value"
+             at2 = 'value&ent;value'></a>
+      @@@test:domTree:
+        document {
+          document-type {
+            general-entity {
+              node-name: 'ent';
+              text-content: 'entity!_)value';
+            }
+          }
+          element {
+            attribute {
+              node-name: 'at1';
+              text-content: 'valueentity!_)valuevalue';
+            }
+            attribute {
+              node-name: 'at2';
+              text-content: 'valueentity!_)valuevalue';
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.attr.literal.entref.nest.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+            <!ENTITY ent1 "entity&#x26;#33;_&#x26;#x29;value">
+            <!ENTITY ent2 "@&ent1;@">
+          ]>
+          <a at1 = "value&ent2;value"
+             at2 = 'value&ent2;value'></a>
+      @@@test:domTree:
+        document {
+          document-type {
+            general-entity {
+              node-name: 'ent1';
+              text-content: 'entity!_)value';
+            }
+            general-entity {
+              node-name: 'ent2';
+              text-content: '@entity!_)value@';
+            }
+          }
+          element {
+            attribute {
+              node-name: 'at1';
+              text-content: 'value@entity!_)value@value';
+            }
+            attribute {
+              node-name: 'at2';
+              text-content: 'value@entity!_)value@value';
             }
           }
         }

@@ -15,7 +15,7 @@ Module:
   @License: license|Perl+MPL
 
   @Date:
-    $Date: 2006/01/29 13:58:57 $
+    $Date: 2006/01/30 15:17:59 $
   
   @Require:
     @@Module:
@@ -1720,25 +1720,22 @@ IFClsETDef:
                   my $terr_name = $default_token_error;
                   unless ($token_error{$terr_name}->{code}) {
                     ## Child statements
+                    $token_error{$terr_name}->{code}
+                      = $factory-><M::pc|PCDocument.createPCBlock>;
                     C: for my $child (@{$token_error{$terr_name}->{source}
                                               -><AG::Node.childNodes>}) {
                       next C unless $child-><AG::Node.nodeType> ==
                                     <C::Node.ELEMENT_NODE>;
                       __DEEP{
                         $rstatement_to_code
-                          ->($err_block, $child, true,
+                          ->($token_error{$terr_name}->{code}, $child, true,
                              $rules, $root_rules, $factory, %opt);
                       }__;
                     }
-                    $token_error{$terr_name}->{code}
-                      = $err_block-><M::Node.cloneNode> (true);
-                  } else {
-                    $err_block-><AG::Node.parentNode>
-                               -><M::Node.replaceChild>
-                       (my $teb = $token_error{$terr_name}->{code}
-                              -><M::Node.cloneNode> (true), $err_block);
-                    $err_block = $teb;
                   }
+                  $err_block-><M::Node.appendChild>
+                                ($token_error{$terr_name}->{code}
+                                              -><M::Node.cloneNode> (true));
           
                   my %param;
                   C: for my $child (@{$statement-><AG::Node.childNodes>}) {
