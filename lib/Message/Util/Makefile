@@ -190,7 +190,7 @@ $(PC_DIS_FILES:$(DIS_SUFFIX)=$(PM_SUFFIX)): %$(PM_SUFFIX): \
 	  --create-perl-module="$(NS_MDOM)DOMCore    ../DOM/DOMCore$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_MDOM)Tree       ../DOM/Tree$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_MDOM)DOMXML     ../DOM/DOMXML$(PM_SUFFIX)" \
-	  --create-perl-module="$(NS_MDOMXDoctype    ../DOM/XDoctype$(PM_SUFFIX)"
+	  --create-perl-module="$(NS_MDOM)XDoctype   ../DOM/XDoctype$(PM_SUFFIX)"
 	$(PERL_CHK) PerlCode$(PM_SUFFIX)
 	$(PERL_CHK) DIS/DPG$(PM_SUFFIX)
 	$(PERL_CHK) ../DOM/DOMFeature$(PM_SUFFIX)
@@ -201,6 +201,8 @@ $(PC_DIS_FILES:$(DIS_SUFFIX)=$(PM_SUFFIX)): %$(PM_SUFFIX): \
 	$(PERL_CHK) ../DOM/DOMXML$(PM_SUFFIX)
 	$(PERL_CHK) ../DOM/XDoctype$(PM_SUFFIX)
 	$(TOUCH) $@
+	$(TOUCH) .discore$(PM_SUFFIX)
+	$(TOUCH) ../DOM/.core$(PM_SUFFIX)
 
 DIS/DISDoc$(PM_SUFFIX): disdoc$(DAC_SUFFIX) $(DAC2PM_PL)
 	$(DAC2PM) $< \

@@ -20,7 +20,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/11/23 11:21:41 $
+      $Date: 2006/01/30 00:57:54 $
     @@ContentType:
       dis:Date.RCS
   
@@ -48,8 +48,6 @@ Module:
 Namespace:
   @dis:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
-  @dis2pm:
-    http://suika.fam.cx/~wakaba/archive/2004/11/8/dis2pm#
   @DISlib:
     http://suika.fam.cx/~wakaba/archive/2004/dis/
   @disPerl:
@@ -76,9 +74,6 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
   @MDOMX:
     http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
-  @MUError:\
-  @Perl:
-    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#Perl--
   @rdf:
     http://www.w3.org/1999/02/22-rdf-syntax-ns#
   @rdfs:
@@ -457,18 +452,18 @@ ResourceDef:
           An error message written in <CODE::i-default> language.
       @@@PerlDef:
           my $template;
-          if (defined $self->{<Q::MDOMX:subtype>} and
-              defined $self->{<H::ecore:def>}->{<Q::MDOMX:subtype>}
-                   ->{$self->{<Q::MDOMX:subtype>}}
-                   ->{<Q::MUError:description>}) {
+          if (defined $self->{<H::MDOMX:subtype>} and
+              defined $self->{<H::ecore:def>}->{<H::MDOMX:subtype>}
+                   ->{$self->{<H::MDOMX:subtype>}}
+                   ->{<H::ecore:description>}) {
             $template = $self->{<H::ecore:def>}
-                   ->{<Q::MDOMX:subtype>}
-                   ->{$self->{<Q::MDOMX:subtype>}}
-                   ->{<Q::MUError:description>};
+                   ->{<H::MDOMX:subtype>}
+                   ->{$self->{<H::MDOMX:subtype>}}
+                   ->{<H::ecore:description>};
           } elsif (defined $self->{<H::ecore:def>}
-                   ->{<Q::MUError:description>}) {
+                   ->{<H::ecore:description>}) {
             $template = $self->{<H::ecore:def>}
-                   ->{<Q::MUError:description>};
+                   ->{<H::ecore:description>};
           } else {
             $template = $self->{<H::ecore:type>};
           }
@@ -550,7 +545,7 @@ ResourceDef:
     @@Type: DISLang|String||ManakaiDOM|all
     @@Get:
       @@@PerlDef:
-        $r = $self->{-type};
+        $r = $self->{<H::ecore:type>};
 
   @Attr:
     @@Name: subtype
@@ -566,8 +561,14 @@ ResourceDef:
         @@@@enDesc:
           The error has no subtype information.
       @@@PerlDef:
-        $r = $self->{<Q::MDOMX:subtype>};
+        $r = $self->{<H::MDOMX:subtype>};
 ##ManakaiDOMExceptionOrWarning
+
+XWParam:
+  @QName: MDOMX|subtype
+  @Type: DISPerl|String
+  @enDesc:
+    The subtype of the error.
 
 ResourceDef:
   @QName: dx|Exception
@@ -612,18 +613,18 @@ ResourceDef:
           An error message written in <CODE::i-default> language.
       @@@PerlDef:
           my $template;
-          if (defined $self->{<Q::MDOMX:subtype>} and
-              defined $self->{<H::ecore:def>}->{<Q::MDOMX:subtype>}
-                   ->{$self->{<Q::MDOMX:subtype>}}
-                   ->{<Q::MUError:description>}) {
+          if (defined $self->{<H::MDOMX:subtype>} and
+              defined $self->{<H::ecore:def>}->{<H::MDOMX:subtype>}
+                   ->{$self->{<H::MDOMX:subtype>}}
+                   ->{<H::ecore:description>}) {
             $template = $self->{<H::ecore:def>}
-                   ->{<Q::MDOMX:subtype>}
-                   ->{$self->{<Q::MDOMX:subtype>}}
-                   ->{<Q::MUError:description>};
+                   ->{<H::MDOMX:subtype>}
+                   ->{$self->{<H::MDOMX:subtype>}}
+                   ->{<H::ecore:description>};
           } elsif (defined $self->{<H::ecore:def>}
-                   ->{<Q::MUError:description>}) {
+                   ->{<H::ecore:description>}) {
             $template = $self->{<H::ecore:def>}
-                   ->{<Q::MUError:description>};
+                   ->{<H::ecore:description>};
           } else {
             $template = $self->{<H::ecore:type>};
           }
@@ -705,7 +706,7 @@ ResourceDef:
     @@Type: DISLang|String||ManakaiDOM|all
     @@Get:
       @@@PerlDef:
-        $r = $self->{-type};
+        $r = $self->{<H::ecore:type>};
 
   @Attr:
     @@Name: subtype
@@ -721,7 +722,7 @@ ResourceDef:
         @@@@enDesc:
           The error has no subtype information.
       @@@PerlDef:
-        $r = $self->{<Q::MDOMX:subtype>};
+        $r = $self->{<H::MDOMX:subtype>};
 ##Exception
 
 ResourceDef:
@@ -1031,13 +1032,31 @@ XWParam:
 XWParam:
   @QName:
     MDOMX:class
-  @Type:
-    Perl:package-name
+  @Type: DISPerl|String||ManakaiDOM|all
   @Description:
     @@lang:en
     @@@:
       The name of class in whose method or attribute an exception 
       or warning is thrown. 
+
+XWParam:
+  @QName: MDOMX|attr
+  @Type: DISPerl|String||ManakaiDOM|all
+  @enDesc:
+    The name of the attribute subroutine in whcih an exception is thrown.
+
+XWParam:
+  @QName: MDOMX|on
+  @Type: DISPerl|String||ManakaiDOM|all
+  @enDesc:
+    The type of the attribute operation in which an exception is thrown.
+    The value must be either <CODE::get> or <CODE::set>.
+
+XWParam:
+  @QName: MDOMX|method
+  @Type: DISPerl|String||ManakaiDOM|all
+  @enDesc:
+    The name of the method subroutine in which an exception is thrown.
 
 XWParam:
   @QName: 
