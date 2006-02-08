@@ -10,7 +10,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/02/08 08:18:29 $
+    $Date: 2006/02/08 09:49:58 $
 
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
@@ -354,9 +354,9 @@ ClsDef:
           GETCHAR: {
             my $char = substr (${$self->{entity}->[-1]->{reptxt}},
                                $self->{entity}->[-1]->{pos}, 1);
-            $self->{entity}->[-1]->{pos}++;
 
             if (defined $char and length $char) {
+              $self->{entity}->[-1]->{pos}++;
               $r = ord $char;
               if ($r == 0x000A) {
                 $self->{entity}->[-1]->{line}++;
@@ -366,19 +366,22 @@ ClsDef:
                                         $self->{entity}->[-1]->{pos}, 1);
                 if ($next_char eq "\x0A") {
                   $self->{entity}->[-1]->{pos}++;
+                  $self->{entity}->[-1]->{line}++;
                   $self->{entity}->[-1]->{column} = 1;
                 } elsif ($next_char eq "\x85") {
                   if ($self->{xml_version} eq '1.1') {
                     $self->{entity}->[-1]->{pos}++; 
+                    $self->{entity}->[-1]->{line}++;
                     $self->{entity}->[-1]->{column} = 1;
                   } else {
-                    $self->{entity}->[-1]->{column} = 0;
+                    $self->{entity}->[-1]->{column}++;
+                    ## Line number will be increased by next |shiftChar| call.
                   }
                 } else {
+                  $self->{entity}->[-1]->{line}++;
                   $self->{entity}->[-1]->{column} = 1;
                 }
                 $r = 0x000A;
-                $self->{entity}->[-1]->{line}++;
               } elsif (
                 not ((0x0020 <= $r and $r <= 0x007E) or
                      (0x00A0 <= $r and $r <= 0xD7FF) or
@@ -389,7 +392,7 @@ ClsDef:
                      (0x007F <= $r and $r <= 0x009F))
               ) {
                 my $location = {
-                  utf32_offset => $self->{entity}->[-1]->{pos},
+                  utf32_offset => $self->{entity}->[-1]->{pos} - 1,
                   line_number => $self->{entity}->[-1]->{line},
                   column_number => $self->{entity}->[-1]->{column},
                 };
@@ -404,16 +407,12 @@ ClsDef:
                 $self->{entity}->[-1]->{column}++;
               } elsif ($r == 0x0085 or $r == 0x2028) {
                 $r = 0x000A if $self->{xml_version} eq '1.1';
+                ## Even in XML 1.0 it increases the line number.
                 $self->{entity}->[-1]->{line}++;
                 $self->{entity}->[-1]->{column} = 1;
               } else {
                 $self->{entity}->[-1]->{column}++;
               }
-#            } elsif (@{$self->{entity}} > 1) {
-#              pop @{$self->{entity}};
-#              redo GETCHAR;
-#              ## ISSUE: How cope with delimiter scanning & 
-#              ##        self-containedness constraints??
             } else {
               $r = -1;
             }
@@ -805,8 +804,10 @@ ClsDef:
             }
             $self->{has_error} = true;
           }
-          $doc-><AS::Document.xmlStandalone> ($ver);
-          $self->{standalone} = true if $ver eq 'yes';
+          if ($ver eq 'yes') {
+            $doc-><AS::Document.xmlStandalone> (true);
+            $self->{standalone} = true;
+          }
         }
 
         ~? (S) { }
@@ -3863,7 +3864,7 @@ _
     @@XMLTest:
       @@@QName: xp.syntax.space.test
       @@@DEnt:
-        @@@@test:value: \  
+        @@@@test:value: \   
       @@@c:erred:
         <[[xp:wf-syntax-error]]> { (1, 4); }
     @@XMLTest:
@@ -3909,6 +3910,152 @@ _
             local-name: 'p';
             text-content: '';
           }
+        }
+
+    @@XMLTest:
+      @@@QName: xp.xmldecl.version.1.0.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0"?>
+          <p></p>
+      @@@test:domTree:
+        document {
+          xml-version: '1.0';
+          xml-encoding: null;
+          xml-standalone: false;
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.xmldecl.version.1.0.lita.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version='1.0'?>
+          <p></p>
+      @@@test:domTree:
+        document {
+          xml-version: '1.0';
+          xml-encoding: null;
+          xml-standalone: false;
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.xmldecl.version.1.0.s.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml  version  =  "1.0"  ?>
+          <p></p>
+      @@@test:domTree:
+        document {
+          xml-version: '1.0';
+          xml-encoding: null;
+          xml-standalone: false;
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.xmldecl.version.1.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.1"?>
+          <p></p>
+      @@@test:domTree:
+        document {
+          xml-version: '1.1';
+          xml-encoding: null;
+          xml-standalone: false;
+          element { }
+        }
+
+    @@XMLTest:
+      @@@QName: xp.xmldecl.version.1.0.encoding.usascii.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0" encoding="US-ascii"?>
+          <p></p>
+      @@@test:domTree:
+        document {
+          xml-version: '1.0';
+          xml-encoding: 'US-ascii';
+          xml-standalone: false;
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.xmldecl.version.1.0.encoding.usascii.lita.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0" encoding='US-ascii'?>
+          <p></p>
+      @@@test:domTree:
+        document {
+          xml-version: '1.0';
+          xml-encoding: 'US-ascii';
+          xml-standalone: false;
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.xmldecl.version.1.0.encoding.usascii.s.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0" encoding  = "US-ascii" ?>
+          <p></p>
+      @@@test:domTree:
+        document {
+          xml-version: '1.0';
+          xml-encoding: 'US-ascii';
+          xml-standalone: false;
+          element { }
+        }
+
+    @@XMLTest:
+      @@@QName: xp.xmldecl.version.1.0.encoding.usascii.standalone.yes.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0" encoding="us-ascii" standalone="yes"?>
+          <p></p>
+      @@@test:domTree:
+        document {
+          xml-version: '1.0';
+          xml-encoding: 'us-ascii';
+          xml-standalone: true;
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.xmldecl.version.1.0.encoding.usascii.standalone.no.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0" encoding="us-ascii" standalone="no"?>
+          <p></p>
+      @@@test:domTree:
+        document {
+          xml-version: '1.0';
+          xml-encoding: 'us-ascii';
+          xml-standalone: false;
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.xmldecl.version.1.0.encoding.usascii.standalone.yes.lita.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0" encoding="us-ascii" standalone='yes'?>
+          <p></p>
+      @@@test:domTree:
+        document {
+          xml-version: '1.0';
+          xml-encoding: 'us-ascii';
+          xml-standalone: true;
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.xmldecl.version.1.0.encoding.usascii.standalone.yes.s.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0" encoding="us-ascii"  standalone  = "yes"  ?>
+          <p></p>
+      @@@test:domTree:
+        document {
+          xml-version: '1.0';
+          xml-encoding: 'us-ascii';
+          xml-standalone: true;
+          element { }
         }
     
     @@XMLTest:
@@ -4975,7 +5122,7 @@ _
               if (@$_) {
                 $test->failure_comment
                          (@$_.' |DOMError|s of type |'.
-                          $_->[0]->{type}.'| are not reported');
+                          $_->[0]->{type}->{value}.'| are not reported');
                 $has_error = true;
               }
             }
@@ -4999,7 +5146,7 @@ _
             if (@$_) {
               $test->failure_comment
                        (@$_.' |DOMError|s of type |'.
-                        $_->[0]->{type}.'| are not reported');
+                        $_->[0]->{type}->{value}.'| are not reported');
               $has_error = true;
             }
           }
@@ -5054,6 +5201,8 @@ ResourceDef:
   @PerlDef:
     $result = {
       utf32_offset => $self->{entity}->[-1]->{pos},
+      line_number => $self->{entity}->[-1]->{line},
+      column_number => $self->{entity}->[-1]->{column},
     };
   @For: ManakaiDOM|ManakaiDOM3
 

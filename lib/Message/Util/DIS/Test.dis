@@ -12,7 +12,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/02/08 08:18:31 $
+    $Date: 2006/02/08 09:49:58 $
   
   @Require:
     @@Module:
@@ -1303,6 +1303,105 @@ IFClsDef:
           }
         }
 
+  @Method:
+    @@Name: assertDOMLocatorEquals
+    @@enDesc:
+      The test fails if the actual locator object does not match
+      to expected structure.
+    @@NamedParam:
+      @@@Name: expectedHash
+      @@@Type: DISPerl|HASH||ManakaiDOM|all
+      @@@enDesc:
+        A Perl hash representation of TDT's locator value.
+    @@NamedParam:
+      @@@Name: actualValue
+      @@@Type: ecore|ErrorInterface||ManakaiDOM|Perl
+      @@@enDesc:
+        The object to compare with <P::expectedHash>.
+    @@NamedParam:
+      @@@Name: nodePathString
+      @@@Type: DOMString
+      @@@enDesc:
+        A semi human readable string that describes the position
+        of the context where <P::actualValue> appeared.  It might
+        be used to report an error.
+      @@@nullCase:
+        @@@@enDesc: No context information available.
+    @@Return:
+      @@@AErr:
+      @@@PerlDef:
+        if (defined $nodePathString) {
+          $nodePathString .= '/';
+        } else {
+          $nodePathString = '';
+        }
+
+        if (not defined $actualValue) {
+          __DEEP{
+            $self-><M::DTManager.notOK>;
+          }__;
+          __CODE{printComment::
+            $test => $self,
+            $s => {
+              $nodePathString.': '.
+              'nu'.'ll value is occurred where a non-nu'.'ll value is expected'
+            },
+          }__;
+          __EXCEPTION{ASSERTION_ERR}__;
+        } elsif (not ref $actualValue) {
+          __DEEP{
+            $self-><M::DTManager.notOK>;
+          }__;
+          __CODE{printComment::
+            $test => $self,
+            $s => {
+              $nodePathString.': '.
+              'not a blessed reference (|'.$actualValue.'| (|'.
+              (ref $actualValue).'|)) where a |DOMLocator| is expected'
+            },
+          }__;
+          __EXCEPTION{ASSERTION_ERR}__;
+        }
+
+        $nodePathString .= 'locator ('.(ref $actualValue).')';
+        
+        for my $attr (keys %{$expectedHash}) {
+          if ($attr eq 'type') {
+            #
+          } else {
+            my $aval;
+            my $amtd = $actualValue->can ($attr);
+            unless ($amtd) {
+              __DEEP{
+                $self-><M::DTManager.notOK>;
+              }__;
+              __CODE{printComment::
+                $test => $self,
+                $s => {
+                  $nodePathString.': Object (type |'.(ref $actualValue).
+                  '|) does not have attribute |'.$attr.'|'
+                },
+              }__;
+              __EXCEPTION{ASSERTION_ERR}__;
+            }
+
+            __DEEP{
+              $aval = $actualValue->$attr;
+            }__;
+
+            my $xval = $expectedHash->{$attr};
+
+            __CODE{assertTypedValueEquals::
+              $self => $self,
+              $nodePathString => $nodePathString,
+              $attr => $attr,
+              $aval => $aval,
+              $xval => $xval,
+              $actualValue => $actualValue,
+            }__;
+          }
+        }
+
   @ResourceDef:
     @@QName: assertTypedValueEquals
     @@ForCheck: ManakaiDOM|ForClass
@@ -1508,6 +1607,15 @@ IFClsDef:
               __EXCEPTION{ASSERTION_ERR}__;
             }
           } # item
+        } elsif ($xval->{type} eq 'DOMLocator') {
+          __DEEP{
+            $self-><M::DTManager.assertDOMLocatorEquals>
+                         (actual_value => $aval,
+                          expected_hash => $xval,
+                          node_path_string => $nodePathString);
+          }__;
+        } else {
+          die "Value type |".$xval->{type}."| is not supported";
         } # aval->{type}
       } # aval->{type} undef
 
@@ -2136,7 +2244,7 @@ IFClsDef:
                      'element-type-definition' / 'attribute-definition'
         empty-declaration := ';'
 
-        @@TODO: |{ a; b }| should be allowed.
+        TODO: |{ a; b }| should be allowed.
       */
 
       my $node : return;

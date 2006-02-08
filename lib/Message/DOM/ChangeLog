@@ -1,5 +1,18 @@
 2006-02-08  Wakaba  <wakaba@suika.fam.cx>
 
+	* XMLParser.dis (shiftChar): Line and column number counting 
+	is fixed.  Although the DOM Level 3 Core specification
+	is unclear about whether the first number is zero or one,
+	in most programs the first line is "one" and
+	the first column is "one", manakai follows the practice.
+	(_XMLDeclaration): Don't set |xmlStandalone| value
+	if |standalone| pseudo-attribute value is |no|.  XML declaration
+	tests (successful cases) added.
+	(xp:get-location-from-token): Sets |lineNumber| and |columnNumber|
+	properties.
+
+2006-02-08  Wakaba  <wakaba@suika.fam.cx>
+
 	* XMLParser.dis (XMLTests): Tests for |c:erred| is supported.
 
 2006-02-06  Wakaba  <wakaba@suika.fam.cx>
