@@ -10,7 +10,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/01/30 15:17:58 $
+    $Date: 2006/02/08 08:18:29 $
 
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
@@ -3855,6 +3855,28 @@ _
 
   @XMLTests:
     @@XMLTest:
+      @@@QName: xp.syntax.empty.test
+      @@@DEnt:
+        @@@@test:value: \
+      @@@c:erred:
+        <[[xp:wf-syntax-error]]> { (1, 1); }
+    @@XMLTest:
+      @@@QName: xp.syntax.space.test
+      @@@DEnt:
+        @@@@test:value: \  
+      @@@c:erred:
+        <[[xp:wf-syntax-error]]> { (1, 4); }
+    @@XMLTest:
+      @@@QName: xp.syntax.newlines.test
+      @@@DEnt:
+        @@@@test:value:
+          \
+          \
+          \
+      @@@c:erred:
+        <[[xp:wf-syntax-error]]> { (3, 1); }
+
+    @@XMLTest:
       @@@QName: xp.only.docel.test
       @@@DEnt:
         @@@@test:value:
@@ -4927,13 +4949,62 @@ _
       for my $test_data (@$TestData) {
         $test->start_new_test ($test_data->{uri});
         my $doc_ent = $test_data->{entity}->{$test_data->{root_uri}};
-        my $doc = $parser->parse_string ($doc_ent->{<H::test:value>});
-        try {
-          $test->assert_dom_tree_equals
-                   (actual_value => $doc,
-                    expected_hash => $test_data->{dom_tree});
-          $test->ok;
-        } catch Message::Util::IF::DTException with { };
+
+        $parser->dom_config->set_parameter ('error-handler' => sub ($$) {
+          my (undef, $err) = @_;
+	  my $err_type = $err->type;
+	  if ($test_data->{dom_error}->{$err_type}) {
+            $test->assert_error_equals
+                     (actual_value => $err,
+                      expected_hash => pop @{$test_data->{dom_error}
+                                                       ->{$err_type}});
+          } else { # Uncatched error
+            warn $err;
+          }
+          return true; # continue as far as possible
+        });
+
+        if ($test_data->{dom_tree}) { # Successful test
+          try {
+            my $doc = $parser->parse_string ($doc_ent->{<H::test:value>});
+            $test->assert_dom_tree_equals
+                     (actual_value => $doc,
+                      expected_hash => $test_data->{dom_tree});
+            my $has_error;
+            for (values %{$test_data->{dom_error}||{}}) {
+              if (@$_) {
+                $test->failure_comment
+                         (@$_.' |DOMError|s of type |'.
+                          $_->[0]->{type}.'| are not reported');
+                $has_error = true;
+              }
+            }
+            $has_error ? $test->not_ok : $test->ok;
+          } catch Message::Util::IF::DTException with {
+            # 
+          } catch Message::DOM::IF::LSException with {
+            $test->assert_never;
+          };
+        } else {
+          try {
+            my $doc = $parser->parse_string ($doc_ent->{<H::test:value>});
+            $test->assert_never;
+          } catch Message::Util::IF::DTException with {
+            #
+          } catch Message::DOM::IF::LSException with {
+            #
+          };
+          my $has_error;
+          for (values %{$test_data->{dom_error}||{}}) {
+            if (@$_) {
+              $test->failure_comment
+                       (@$_.' |DOMError|s of type |'.
+                        $_->[0]->{type}.'| are not reported');
+              $has_error = true;
+            }
+          }
+          $has_error ? $test->not_ok : $test->ok;
+        }
       }
 
   @ResourceDef:

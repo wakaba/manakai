@@ -1,3 +1,26 @@
+2006-02-08  Wakaba  <wakaba@suika.fam.cx>
+
+	* Value.dis: |lang:tdterr| type support is added.
+
+	* Test.dis (failureComment): New method.
+	(TFQNames): New token type.
+	(rule node): It now accepts empty declaration.
+
+2006-02-07  Wakaba  <wakaba@suika.fam.cx>
+
+	* Test.dis (assertTypedValueEquals): New code fragment
+	extracted from |assertDOMTreeEquals| method.
+	(assertErrorEquals): New method.
+
+2006-02-06  Wakaba  <wakaba@suika.fam.cx>
+
+	* Test.dis (Require): Requires |Util:DIS| module.
+	(parseTDTErrorString): New method.
+	(URI, QName): New token types.
+	(rule tdterr): New parser rule.
+	(dtest:undeclared-namespace-prefix-error): New error.
+	(dtest:bad-error-resource-error): New error.
+
 2006-01-30  Wakaba  <wakaba@suika.fam.cx>
 
 	* DPG.dis (plCodeFragment): Code generated from |dpg:matchElseBlock|

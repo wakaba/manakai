@@ -7,7 +7,7 @@ Module:
 
   @DISCore:author: DISCore|Wakaba
   @Date:
-    $Date: 2006/01/21 07:06:10 $
+    $Date: 2006/02/08 08:18:31 $
   @License: license|Perl+MPL
   
   @DefaultFor: ManakaiDOM|all
@@ -197,6 +197,12 @@ LexTypeDef:
     @@lang:en
     @@@:
       Its ABNF definition found in <FILE::../Message/Util/DIS/Test.dis>.
+
+LexTypeDef:
+  @QName: lang|tdterr
+  @enFN: TDT Error Description textual representation
+  @rdfs:subClassOf: DISCore|String
+  @subsetOf: DISCore|DISString
 
 RPropDef:
   @QName: test|domTree

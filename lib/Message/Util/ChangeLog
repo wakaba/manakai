@@ -1,3 +1,22 @@
+2006-02-08  Wakaba  <wakaba@suika.fam.cx>
+
+	* PerlCode.dis (getNameListAttrR): Non-|pc:|-namespace elements
+	and their descendants were ignored.
+	(getNameListAttrRM): New variant derived from |getNameListAttrR|,
+	for |getUsePerlModuleNameList| and |getUseCharClassNameList|.
+	(getUsePerlModuleNameList, getUseCharClassNameList): Don't 
+	include |pc:package| and their descendants to the target.
+	(PerlFile.stringify): Outputs |use| statements
+	for Perl modules and character classes not part of any package,
+	if any.
+
+	* DIS.dis: |lang:tdterr|'s |DVNSValue| convertion is supported.
+
+2006-02-06  Wakaba  <wakaba@suika.fam.cx>
+
+	* DIS.dis (loadModule): Loads a "daem" submodule file
+	if exists.
+
 2006-01-30  Wakaba  <wakaba@suika.fam.cx>
 
 	* Makefile: Typo fixed.

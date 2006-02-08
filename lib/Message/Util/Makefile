@@ -108,7 +108,7 @@ disdump$(DAC_SUFFIX): $(DOM_CORE_DAC_FILE) $(DIS_DUMP_DIS_FILES) $(DAC_PL) \
   $(UTIL_DIS_COMMON_DIS_FILE)
 	$(DAC)$@ --input-db-file-name="$<" DIS/DISDump.dis
 
-distest$(DAC_SUFFIX): $(DOM_CORE_DAC_FILE) $(DIS_TEST_DIS_FILES) $(DAC_PL) \
+distest$(DAC_SUFFIX): discore$(DAC_SUFFIX) $(DIS_TEST_DIS_FILES) $(DAC_PL) \
   $(UTIL_DIS_COMMON_DIS_FILE)
 	$(DAC)$@ --input-db-file-name="$<" DIS/Test.dis
 

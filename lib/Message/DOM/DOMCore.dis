@@ -40,7 +40,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/01/29 13:58:52 $
+      $Date: 2006/02/08 08:18:29 $
     @@ContentType:
       dis:Date.RCS
 
@@ -3954,6 +3954,13 @@ SPropDef:
   @dataType: DISCore|TFQNames
 
 SPropDef:
+  @QName: c|erred
+  @enDesc:
+    An error should be reported in the test code.
+  @multipleProperties: DISCore|UnorderedList
+  @dataType: lang|tdterr
+
+SPropDef:
   @QName: severity
   @Description:
     @@lang:en
@@ -4001,6 +4008,7 @@ ResourceTypeDef:
   @enDesc:
     A <Q::DOMErrorType> is an error type for
     <IF::DOMError||ManakaiDOM|ManakaiDOM>.
+  @rdfs:subClassOf: ecore|AnyErrorCode
 
 StringDataTypeDef:
   @QName: DOMCore|DOMErrorTypeName

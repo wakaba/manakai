@@ -28,6 +28,7 @@ This script is part of manakai.
 
 use strict;
 use Message::Util::QName::Filter {
+  c => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#>,
   DIS => q<http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#>,
   dis => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis-->,
   DOMLS => q<http://suika.fam.cx/~wakaba/archive/2004/dom/ls#>,
@@ -301,6 +302,10 @@ for (@{$Opt{create_module}}) {
         my $block = $pack->append_new_pc_block;
         my @test;
         
+        $tdt_parser ||= $impl->create_gls_parser
+                                 ({
+                                   ExpandedURI q<DIS:TDT> => '1.0',
+                                  });
         for my $tres (@{$res->get_child_resource_list_by_type
                                 (ExpandedURI q<test:ParserTest>)}) {
           $total_tests++;
@@ -318,15 +323,19 @@ for (@{$Opt{create_module}}) {
               if $eres->is_type_uri (ExpandedURI q<test:RootEntity>) or
                  not defined $ttest->{root_uri};
           }
+
+          ## Result DOM tree
           my $tree_t = $tres->get_property_text (ExpandedURI q<test:domTree>); 
           if (defined $tree_t) {
-            unless ($tdt_parser) {
-              $tdt_parser = $impl->create_gls_parser
-                                     ({
-                                       ExpandedURI q<DIS:TDT> => '1.0',
-                                      });
-            }
             $ttest->{dom_tree} = $tdt_parser->parse_string ($tree_t);
+          }
+
+          ## Expected |DOMError|s
+          for (@{$tres->get_property_value_list (ExpandedURI q<c:erred>)}) {
+            my $err = $tdt_parser->parse_tdt_error_string
+                                     ($_->string_value, $db, $_,
+                                      undef, $tres->for_uri);
+            push @{$ttest->{dom_error}->{$err->{type}->{value}} ||= []}, $err;
           }
         }
 
@@ -426,4 +435,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2006/01/28 16:24:44 $
+1; # $Date: 2006/02/08 08:18:29 $

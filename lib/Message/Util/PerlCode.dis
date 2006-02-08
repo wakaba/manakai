@@ -25,7 +25,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2006/01/29 07:09:25 $
+      $Date: 2006/02/08 08:18:30 $
     @@ContentType:
       dis:Date.RCS
   
@@ -462,9 +462,44 @@ IFClsDef:
       my %__result;
       while (@__nodes) {
         my $__cnode = shift @__nodes;
-        if ($__cnode-><AG::Node.nodeType> == <C::Node.ELEMENT_NODE> and
-            defined $__cnode-><AG::Node.namespaceURI> and
-            $__cnode-><AG::Node.namespaceURI> eq <Q::pc:>) {
+        if ($__cnode-><AG::Node.nodeType> == <C::Node.ELEMENT_NODE>) {
+          my $__v = $__cnode-><M::Element.getAttributeNS>
+                               (<Q::pc:>, $attrName);
+          for (split /\s+/, defined $__v ? $__v : '') {
+            $__result{$_} = true;
+          }
+          push @__nodes, @{$__cnode-><AG::Node.childNodes>};
+        }
+      }
+      $result = [sort {$a cmp $b} keys %__result];
+  @ResourceDef:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@QName: getNameListAttrRM
+    @@rdf:type: DISPerl|BlockCode
+    @@enDesc:
+      Except <Q::pc:require> subtree.
+    @@PerlDef:
+      my @__nodes = ();
+      my %__result;
+      {
+        my $__cnode = $node;
+        if ($__cnode-><AG::Node.nodeType> == <C::Node.ELEMENT_NODE>) {
+          my $__v = $__cnode-><M::Element.getAttributeNS>
+                               (<Q::pc:>, $attrName);
+          for (split /\s+/, defined $__v ? $__v : '') {
+            $__result{$_} = true;
+          }
+          push @__nodes, @{$__cnode-><AG::Node.childNodes>};
+        }
+      }
+      N: while (@__nodes) {
+        my $__cnode = shift @__nodes;
+        if ($__cnode-><AG::Node.nodeType> == <C::Node.ELEMENT_NODE>) {
+          if (defined $__cnode-><AG::Node.namespaceURI> and
+              $__cnode-><AG::Node.namespaceURI> eq <Q::pc:> and
+              $__cnode-><AG::Node.localName> eq 'package') {
+            next N;
+          }
           my $__v = $__cnode-><M::Element.getAttributeNS>
                                (<Q::pc:>, $attrName);
           for (split /\s+/, defined $__v ? $__v : '') {
@@ -490,7 +525,8 @@ IFClsDef:
     @@Name: getUsePerlModuleNameList
     @@enDesc:
       Returns a list of Perl modules names that is <Perl::use>d
-      by this code fragment, including all descendant nodes. 
+      by this code fragment, including all descendant nodes
+      except <Q::pc:package> nodes and their descendant nodes. 
     @@Return:
       @@@Type: DISPerl|ARRAY||ManakaiDOM|all
       @@@enDesc:
@@ -499,7 +535,7 @@ IFClsDef:
         and vice versa.
       @@@PerlDef:
           __DEEP{
-            __CODE{getNameListAttrR::
+            __CODE{getNameListAttrRM::
               $node => {$self},
               $attrName => 'useModuleName',
               $result => {$r},
@@ -510,7 +546,8 @@ IFClsDef:
     @@Name: getUseCharClassNameList
     @@enDesc:
       Returns a list of Perl character class names that is <Perl::use>d
-      by this code fragment, including all descendant nodes. 
+      by this code fragment, including all descendant nodes
+      except <Q::pc:package> nodes and their descendant nodes. 
     @@Return:
       @@@Type: DISPerl|HASH||ManakaiDOM|all
       @@@enDesc:
@@ -520,7 +557,7 @@ IFClsDef:
       @@@PerlDef:
           my $mc;
           __DEEP{
-            __CODE{getNameListAttrR::
+            __CODE{getNameListAttrRM::
               $node => {$self},
               $attrName => 'useCharClassName',
               $result => {$mc},
@@ -818,10 +855,25 @@ IFClsETDef:
             $self-><AS::PerlFile.currentPackage> ('main');
             $self-><AS::PerlFile.currentChunkNumber> (0);
 
-            ## -- Requires
+            ## -- |require| Perl Modules
             my $req = $self-><M::PerlCode.getRequirePerlModuleNameList>;
             for my $pack (sort {$a cmp $b} @$req) {
               $r .= qq<require $pack;\n>;
+            }
+
+            ## -- |use| Perl Modules
+            for my $pack (sort {$a cmp $b} @{$self-><M::PerlCode
+                                                 .getUsePerlModuleNameList>}) {
+              $r .= 'use ' . $pack . ";\n";
+            }
+
+            ## -- |use| Character Classes
+            my $cls = $self-><M::PerlCode.getUseCharClassNameList>;
+            for my $pack (sort {$a cmp $b} keys %$cls) {
+              $r .= 'use ' . $pack . ' ' .
+                <ClassM::ManakaiPCImplementation.perlList>
+                   ([sort {$a cmp $b} grep {$cls->{$pack}->{$_}}
+                     keys %{$cls->{$pack}}]) . ";\n";
             }
 
             ## -- Packages and global objects
@@ -1291,12 +1343,13 @@ IFClsETDef:
                 ";\n";
             }
 
-            ## Use'ing modules
+            ## |use| Perl Modules
             for my $pack (sort {$a cmp $b} @{$self-><M::PerlCode
                                                  .getUsePerlModuleNameList>}) {
               $r .= 'use ' . $pack . ";\n";
             }
 
+            ## |use| Character Classes
             my $cls = $self-><M::PerlCode.getUseCharClassNameList>;
             for my $pack (sort {$a cmp $b} keys %$cls) {
               $r .= 'use ' . $pack . ' ' .

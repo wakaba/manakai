@@ -12,7 +12,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/01/29 13:59:00 $
+    $Date: 2006/02/08 08:18:31 $
   
   @Require:
     @@Module:
@@ -30,6 +30,9 @@ Module:
       @@@WithFor: ManakaiDOM|ManakaiDOM
     @@Module:
       @@@WithFor: ManakaiDOM|ManakaiDOMLatest
+    @@Module:
+      @@@QName: Util|DIS
+      @@@WithFor: DIS|ForLatest
 
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
@@ -1183,209 +1186,330 @@ IFClsDef:
 
             my $xval = $expectedHash->{$attr};
 
-            if ($xval->{type} eq 'nu'.'ll') {
-              if (defined $aval) {
-                __DEEP{
-                  $self-><M::DTManager.notOK>;
-                }__;
-                __CODE{printComment::
-                  $test => $self,
-                  $s => {
-                    $nodePathString.'->'.$attr.': Value is not nu'.'ll (|'.
-                    $aval.'| (type |'.(ref $aval).'|)'
-                  },
-                }__;
-                __EXCEPTION{ASSERTION_ERR}__;
-              }
-            } elsif ($xval->{type} eq 'boolean') {
-              if (($aval and not $xval->{value}) or
-                  (not $aval and $xval->{value})) {
-                __DEEP{
-                  $self-><M::DTManager.notOK>;
-                }__;
-                __CODE{printComment::
-                  $test => $self,
-                  $s => {
-                    $nodePathString.'->'.$attr.': Value is not boolean '.
-                    $xval->{value}
-                  },
-                }__;
-                __EXCEPTION{ASSERTION_ERR}__;
-              }
-            } else {
-              unless (defined $aval) {
-                __DEEP{
-                  $self-><M::DTManager.notOK>;
-                }__;
-                __CODE{printComment::
-                  $test => $self,
-                  $s => {
-                    $nodePathString.'->'.$attr.': Value is nu'.'ll (a '.
-                    $xval->{type}.' with value |'.$xval->{value}.'| is expected)'
-                  },
-                }__;
-                __EXCEPTION{ASSERTION_ERR}__;
-              }
-              if ($xval->{type} eq 'number') {
-                unless ($aval == $xval->{value}) {
-                  __DEEP{
-                    $self-><M::DTManager.notOK>;
-                  }__;
-                  __CODE{printComment::
-                    $test => $self,
-                    $s => {
-                      $nodePathString.'->'.$attr.': Value is |'.$aval.'| (|'.
-                      $xval->{value}.'| is expected)'
-                    },
-                  }__;
-                  __EXCEPTION{ASSERTION_ERR}__;
-                }
-              } elsif ($xval->{type} eq 'const') {
-                unless ($actualValue->can ($xval->{value})) {
-                  __DEEP{
-                    $self-><M::DTManager.notOK>;
-                  }__;
-                  __CODE{printComment::
-                    $test => $self,
-                    $s => {
-                      $nodePathString.': Object (type |'.(ref $actualValue).
-                      '|) does not have constant |'.$xval->{value}.'|'
-                    },
-                  }__;
-                  __EXCEPTION{ASSERTION_ERR}__;
-                }
-                my $m = $xval->{value};
-                unless ($aval == $actualValue->$m) {
-                  __DEEP{
-                    $self-><M::DTManager.notOK>;
-                  }__;
-                  __CODE{printComment::
-                    $test => $self,
-                    $s => {
-                      $nodePathString.'->'.$attr.': Value is |'.$aval.'| (|'.
-                      $xval->{value}.'|, i.e. |'.$actualValue->$m.
-                      '|, is expected)'
-                    },
-                  }__;
-                  __EXCEPTION{ASSERTION_ERR}__;
-                }
-              } elsif ($xval->{type} eq 'string') {
-                unless ($aval eq $xval->{value}) {
-                  __DEEP{
-                    $self-><M::DTManager.notOK>;
-                  }__;
-                  __CODE{printComment::
-                    $test => $self,
-                    $s => {
-                      $nodePathString.'->'.$attr.': Value is |'.$aval.'|, type |'.
-                      (ref $aval).'| (|'.
-                      $xval->{value}.'| is expected)'
-                    },
-                  }__;
-                  __EXCEPTION{ASSERTION_ERR}__;
-                }
-              } elsif ($xval->{type} eq 'DOMStringList') {
-                unless (UNIVERSAL::isa ($aval,
-                                        <IFName::DOMCore:DOMStringList>)) {
-                  __DEEP{
-                    $self-><M::DTManager.notOK>;
-                  }__;
-                  __CODE{printComment::
-                    $test => $self,
-                    $s => {
-                      $nodePathString.'->'.$attr.': Value is |'.$aval.
-                      '|, type |'.(ref $aval).'| (|DOMStringList| |'.
-                      (join '|, |', @{$xval->{value}}).'|) is expected)'
-                    },
-                  }__;
-                  __EXCEPTION{ASSERTION_ERR}__;
-                }
-                unless (@$aval == @{$xval->{value}}) {
-                  __DEEP{
-                    $self-><M::DTManager.notOK>;
-                  }__;
-                  __CODE{printComment::
-                    $test => $self,
-                    $s => {
-                      $nodePathString.'->'.$attr.': Value has '.@$aval.
-                     '| items (|'.@{$xval->{value}}.'| is expected)'
-                    },
-                  }__;
-                  __EXCEPTION{ASSERTION_ERR}__;
-                }
-                for my $i (0..$#$aval) {
-                  unless ($aval->[$i] eq $xval->{value}->[$i]) {
-                    __DEEP{
-                      $self-><M::DTManager.notOK>;
-                    }__;
-                    __CODE{printComment::
-                      $test => $self,
-                      $s => {
-                        $nodePathString.'->'.$attr.'->['.$i.']: Value is |'.
-                        $aval->[$i].'|, type |'.(ref $aval).'| (|'.
-                        $xval->{value}->[$i].'| is expected)'
-                      },
-                    }__;
-                    __EXCEPTION{ASSERTION_ERR}__;
-                  }
-                } # item
-
-              } elsif ($xval->{type} eq 'TypeInfo') {
-                unless (UNIVERSAL::isa ($aval,
-                                        <IFName::DOMCore:TypeInfo>)) {
-                  __DEEP{
-                    $self-><M::DTManager.notOK>;
-                  }__;
-                  my $v;
-                  __CODE{formatValue::
-                    $input => $aval,
-                    $output => $v,
-                  }__;
-                  __CODE{printComment::
-                    $test => $self,
-                    $s => {
-                      $nodePathString.'->'.$attr.': Value is '.$v.
-                      ' (|TypeInfo| |'.
-                      (join '|, |', @{$xval->{value}}).'|) is expected)'
-                    },
-                  }__;
-                  __EXCEPTION{ASSERTION_ERR}__;
-                }
-                for (['type_namespace', 0], ['type_name', 1]) {
-                  my $m = $_->[0];
-                  my $av = $aval->$m;
-                  unless ((defined $av and defined $xval->{value}->[$_->[1]] and
-                           $av eq $xval->{value}->[$_->[1]]) or
-                          (not defined $av and
-                           not defined $xval->{value}->[$_->[1]])) {
-                    __DEEP{
-                      $self-><M::DTManager.notOK>;
-                    }__;
-                    my $v;
-                    __CODE{formatValue::
-                      $input => $av,
-                      $output => $v,
-                    }__;
-                    my $xv;
-                    __CODE{formatValue::
-                      $input => {$xval->{value}->[$_->[1]]},
-                      $output => $xv,
-                    }__;
-                    __CODE{printComment::
-                      $test => $self,
-                      $s => {
-                        $nodePathString.'->'.$attr.'->'.$m.': Value is '.$v.
-                        ' ('.$xv.' is expected)'
-                      },
-                    }__;
-                    __EXCEPTION{ASSERTION_ERR}__;
-                  }
-                } # item
-
-              } # $aval->{type}
-            } # $aval->{type} undef
+            __CODE{assertTypedValueEquals::
+              $self => $self,
+              $nodePathString => $nodePathString,
+              $attr => $attr,
+              $aval => $aval,
+              $xval => $xval,
+              $actualValue => $actualValue,
+            }__;
           }
         }
+
+  @Method:
+    @@Name: assertErrorEquals
+    @@enDesc:
+      The test fails if the actual error object does not match
+      to expected tree structure.
+    @@NamedParam:
+      @@@Name: expectedHash
+      @@@Type: DISPerl|HASH||ManakaiDOM|all
+      @@@enDesc:
+        A Perl hash representation of TDT Error Description tree.
+    @@NamedParam:
+      @@@Name: actualValue
+      @@@Type: ecore|ErrorInterface||ManakaiDOM|Perl
+      @@@enDesc:
+        The object to compare with <P::expectedHash>.
+    @@NamedParam:
+      @@@Name: nodePathString
+      @@@Type: DOMString
+      @@@enDesc:
+        A semi human readable string that describes the position
+        of the context where <P::actualValue> appeared.  It might
+        be used to report an error.
+      @@@nullCase:
+        @@@@enDesc: No context information available.
+    @@Return:
+      @@@AErr:
+      @@@PerlDef:
+        if (defined $nodePathString) {
+          $nodePathString .= '/';
+        } else {
+          $nodePathString = '';
+        }
+
+        if (not defined $actualValue) {
+          __DEEP{
+            $self-><M::DTManager.notOK>;
+          }__;
+          __CODE{printComment::
+            $test => $self,
+            $s => {
+              $nodePathString.': '.
+              'nu'.'ll value is occurred where a non-nu'.'ll value is expected'
+            },
+          }__;
+          __EXCEPTION{ASSERTION_ERR}__;
+        } elsif (not ref $actualValue) {
+          __DEEP{
+            $self-><M::DTManager.notOK>;
+          }__;
+          __CODE{printComment::
+            $test => $self,
+            $s => {
+              $nodePathString.': '.
+              'not a blessed reference (|'.$actualValue.'| (|'.
+              (ref $actualValue).'|)) where an Error is expected'
+            },
+          }__;
+          __EXCEPTION{ASSERTION_ERR}__;
+        }
+
+        $nodePathString .= 'error ('.(ref $actualValue);
+        if ($actualValue->can ('type')) {
+          $nodePathString .= ', ' . $actualValue->type;
+          if ($actualValue->can ('subtype')) {
+            $nodePathString .= ', ' . $actualValue->subtype;
+          }
+        }
+        $nodePathString .= ')';
+        
+        for my $attr (keys %{$expectedHash}) {
+          if ($attr eq '_type') {
+            #
+          } else {
+            my $aval;
+            my $amtd = $actualValue->can ($attr);
+            unless ($amtd) {
+              __DEEP{
+                $self-><M::DTManager.notOK>;
+              }__;
+              __CODE{printComment::
+                $test => $self,
+                $s => {
+                  $nodePathString.': Object (type |'.(ref $actualValue).
+                  '|) does not have attribute |'.$attr.'|'
+                },
+              }__;
+              __EXCEPTION{ASSERTION_ERR}__;
+            }
+
+            __DEEP{
+              $aval = $actualValue->$attr;
+            }__;
+
+            my $xval = $expectedHash->{$attr};
+
+            __CODE{assertTypedValueEquals::
+              $self => $self,
+              $nodePathString => $nodePathString,
+              $attr => $attr,
+              $aval => $aval,
+              $xval => $xval,
+              $actualValue => $actualValue,
+            }__;
+          }
+        }
+
+  @ResourceDef:
+    @@QName: assertTypedValueEquals
+    @@ForCheck: ManakaiDOM|ForClass
+    @@rdf:type: DISPerl|BlockCode
+    @@enDesc:
+      $self, $nodePathString, $attr, $aval, $xval,
+      $actualValue
+    @@PerlDef:
+      if ($xval->{type} eq 'nu'.'ll') {
+        if (defined $aval) {
+          __DEEP{
+            $self-><M::DTManager.notOK>;
+          }__;
+          __CODE{printComment::
+            $test => $self,
+            $s => {
+              $nodePathString.'->'.$attr.': Value is not nu'.'ll (|'.
+              $aval.'| (type |'.(ref $aval).'|)'
+            },
+          }__;
+          __EXCEPTION{ASSERTION_ERR}__;
+        }
+      } elsif ($xval->{type} eq 'boolean') {
+        if (($aval and not $xval->{value}) or
+            (not $aval and $xval->{value})) {
+          __DEEP{
+            $self-><M::DTManager.notOK>;
+          }__;
+          __CODE{printComment::
+            $test => $self,
+            $s => {
+              $nodePathString.'->'.$attr.': Value is not boolean '.
+              $xval->{value}
+            },
+          }__;
+          __EXCEPTION{ASSERTION_ERR}__;
+        }
+      } else {
+        unless (defined $aval) {
+          __DEEP{
+            $self-><M::DTManager.notOK>;
+          }__;
+          __CODE{printComment::
+            $test => $self,
+            $s => {
+              $nodePathString.'->'.$attr.': Value is nu'.'ll (a '.
+              $xval->{type}.' with value |'.$xval->{value}.'| is expected)'
+            },
+          }__;
+          __EXCEPTION{ASSERTION_ERR}__;
+        }
+        if ($xval->{type} eq 'number') {
+          unless ($aval == $xval->{value}) {
+            __DEEP{
+              $self-><M::DTManager.notOK>;
+            }__;
+            __CODE{printComment::
+              $test => $self,
+              $s => {
+                $nodePathString.'->'.$attr.': Value is |'.$aval.'| (|'.
+                $xval->{value}.'| is expected)'
+              },
+            }__;
+            __EXCEPTION{ASSERTION_ERR}__;
+          }
+        } elsif ($xval->{type} eq 'const') {
+          unless ($actualValue->can ($xval->{value})) {
+            __DEEP{
+              $self-><M::DTManager.notOK>;
+            }__;
+            __CODE{printComment::
+              $test => $self,
+              $s => {
+                $nodePathString.': Object (type |'.(ref $actualValue).
+                '|) does not have constant |'.$xval->{value}.'|'
+              },
+            }__;
+            __EXCEPTION{ASSERTION_ERR}__;
+          }
+          my $__m = $xval->{value};
+          unless ($aval == $actualValue->$__m) {
+            __DEEP{
+              $self-><M::DTManager.notOK>;
+            }__;
+            __CODE{printComment::
+              $test => $self,
+              $s => {
+                $nodePathString.'->'.$attr.': Value is |'.$aval.'| (|'.
+                $xval->{value}.'|, i.e. |'.$actualValue->$__m.
+                '|, is expected)'
+              },
+            }__;
+            __EXCEPTION{ASSERTION_ERR}__;
+          }
+        } elsif ($xval->{type} eq 'string') {
+          unless ($aval eq $xval->{value}) {
+            __DEEP{
+              $self-><M::DTManager.notOK>;
+            }__;
+            __CODE{printComment::
+              $test => $self,
+              $s => {
+                $nodePathString.'->'.$attr.': Value is |'.$aval.'|, type |'.
+                (ref $aval).'| (|'.
+                $xval->{value}.'| is expected)'
+              },
+            }__;
+            __EXCEPTION{ASSERTION_ERR}__;
+          }
+        } elsif ($xval->{type} eq 'DOMStringList') {
+          unless (UNIVERSAL::isa ($aval,
+                                  <IFName::DOMCore:DOMStringList>)) {
+            __DEEP{
+              $self-><M::DTManager.notOK>;
+            }__;
+            __CODE{printComment::
+              $test => $self,
+              $s => {
+                $nodePathString.'->'.$attr.': Value is |'.$aval.
+                '|, type |'.(ref $aval).'| (|DOMStringList| |'.
+                (join '|, |', @{$xval->{value}}).'|) is expected)'
+              },
+            }__;
+            __EXCEPTION{ASSERTION_ERR}__;
+          }
+          unless (@$aval == @{$xval->{value}}) {
+            __DEEP{
+              $self-><M::DTManager.notOK>;
+            }__;
+            __CODE{printComment::
+              $test => $self,
+              $s => {
+                $nodePathString.'->'.$attr.': Value has '.@$aval.
+               '| items (|'.@{$xval->{value}}.'| is expected)'
+              },
+            }__;
+            __EXCEPTION{ASSERTION_ERR}__;
+          }
+          for my $__i (0..$#$aval) {
+            unless ($aval->[$__i] eq $xval->{value}->[$__i]) {
+              __DEEP{
+                $self-><M::DTManager.notOK>;
+              }__;
+              __CODE{printComment::
+                $test => $self,
+                $s => {
+                  $nodePathString.'->'.$attr.'->['.$__i.']: Value is |'.
+                  $aval->[$__i].'|, type |'.(ref $aval).'| (|'.
+                  $xval->{value}->[$__i].'| is expected)'
+                },
+              }__;
+              __EXCEPTION{ASSERTION_ERR}__;
+            }
+          } # item
+
+        } elsif ($xval->{type} eq 'TypeInfo') {
+          unless (UNIVERSAL::isa ($aval, <IFName::DOMCore:TypeInfo>)) {
+            __DEEP{
+              $self-><M::DTManager.notOK>;
+            }__;
+            my $__v;
+            __CODE{formatValue::
+              $input => $aval,
+              $output => $__v,
+            }__;
+            __CODE{printComment::
+              $test => $self,
+              $s => {
+                $nodePathString.'->'.$attr.': Value is '.$__v.
+                ' (|TypeInfo| |'.
+                (join '|, |', @{$xval->{value}}).'|) is expected)'
+              },
+            }__;
+            __EXCEPTION{ASSERTION_ERR}__;
+          }
+          for (['type_namespace', 0], ['type_name', 1]) {
+            my $__m = $_->[0];
+            my $__av = $aval->$__m;
+            unless ((defined $__av and defined $xval->{value}->[$_->[1]] and
+                     $__av eq $xval->{value}->[$_->[1]]) or
+                    (not defined $__av and
+                     not defined $xval->{value}->[$_->[1]])) {
+              __DEEP{
+                $self-><M::DTManager.notOK>;
+              }__;
+              my $__v;
+              __CODE{formatValue::
+                $input => $__av,
+                $output => $__v,
+              }__;
+              my $__xv;
+              __CODE{formatValue::
+                $input => {$xval->{value}->[$_->[1]]},
+                $output => $__xv,
+              }__;
+              __CODE{printComment::
+                $test => $self,
+                $s => {
+                  $nodePathString.'->'.$attr.'->'.$__m.': Value is '.$__v.
+                  ' ('.$__xv.' is expected)'
+                },
+              }__;
+              __EXCEPTION{ASSERTION_ERR}__;
+            }
+          } # item
+        } # aval->{type}
+      } # aval->{type} undef
 
   @Method:
     @@Operator:
@@ -1438,6 +1562,22 @@ IFClsDef:
             },
           }__;
         }
+
+  @Method:
+    @@Name: failureComment
+    @@enDesc:
+      Prints a comment that describes the failure.
+    @@Param:
+      @@@Name: s
+      @@@Type: DOMString
+      @@@enDesc:
+        A semi-human-readable text that describes the situation.
+    @@Return:
+      @@@PerlDef:
+        __CODE{printComment::
+          $s => $s,
+          $test => $self,
+        }__;
 
   @ResourceDef:
     @@ForCheck: ManakaiDOM|ForClass
@@ -1807,6 +1947,62 @@ IFClsDef:
         }__;
 
   @Method:
+    @@Name: parseTDTErrorString
+    @@enDesc:
+      Parses a string as TDT Error Description textual definition and
+      converts it into its object representation.
+    @@Param:
+      @@@Name: sourceText
+      @@@Type: DOMString
+      @@@enDesc:
+        The text to parse.
+    @@Param:
+      @@@Name: disDatabase
+      @@@Type: DIS|DISDatabase||DIS|ForLatest
+      @@@enDesc:
+        An <QUOTE::dis> database used to extract definition for errors.
+    @@Param:
+      @@@Name: nsResolver
+      @@@Type: DIS|NSResolverDIS||DIS|ForLatest
+      @@@enDesc:
+        An namespace resolver.
+    @@Param:
+      @@@Name: defaultTURI
+      @@@Type: DOMString
+      @@@enDesc:
+        The default <QUOTE::T> URI for <Q::DISCore:TFQNames>.
+      @@@nullCase:
+        @@@@enDesc:
+          <Q::DOMMain:any> is the default for historical reason.
+    @@Param:
+      @@@Name: defaultFURI
+      @@@Type: DOMString
+      @@@enDesc:
+        The default <QUOTE::F> URI for <Q::DISCore:TFQNames>.
+      @@@nullCase:
+        @@@@enDesc:
+          <Q::ManakaiDOM:all>.
+    @@Return:
+      @@@Type: DISPerl|HASH
+      @@@enDesc:
+        An object representation of <P::sourceText>.
+      @@@dx:raises:
+        @@@@@: dtest|PARSE_ERR
+        @@@@enDesc:
+          If the TDT document contains one or more error.
+      @@@PerlDef:
+        $self->{char} = [];
+        $self->{token} = [];
+        $self->{source} = $sourceText;
+        $self->{dis_database} = $disDatabase;
+        $self->{ns_resolver_dis} = $nsResolver;
+        $self->{default_t} = $defaultTURI;
+        $self->{default_f} = $defaultFURI;
+        __DEEP{
+          $r = $self->_parse_tdterr;
+        }__;
+
+  @Method:
     @@Name: shiftChar
     @@ManakaiDOM:isForInternal:1
     @@ForCheck: ManakaiDOM|ForClass
@@ -1904,6 +2100,12 @@ IFClsDef:
       COMMA := [','];
       LPAREN := ['('];
       RPAREN := [')'];
+
+      /* URI */
+      URI : value := ['<'] [^'<' '>' '[' ']'] [^'<' '>']* ['>'];
+      QName : value := ['<'] ['['] [^'<' '>' '[' ']']* [']'] ['>'];
+      TFQNames : value := ['<'] ['['] ['['] [^'<' '>' '[' ']']*
+                          [']'] [']'] ['>'];
       
       /* Ignored white space */
       WSP : ignore := [U+0009..U+000D U+0020]+;
@@ -1915,10 +2117,13 @@ IFClsDef:
 
     } // lexmode default
 
+    /*
+      A TDT Document (|lang:tdt|).
+    */
     rule document : standalone : recursive {
       /*
         document := node;
-        node := node-type "{" *(node / attribute) "}"
+        node := node-type "{" *(node / attribute / empty-declaration) "}"
         node-type := 'document' / 'document-fragment' /
                      'element' /
                      'attribute' / 'namespace' /
@@ -1929,6 +2134,9 @@ IFClsDef:
                      'general-entity' / 'general-entity-reference' /
                      'notation' /
                      'element-type-definition' / 'attribute-definition'
+        empty-declaration := ';'
+
+        @@TODO: |{ a; b }| should be allowed.
       */
 
       my $node : return;
@@ -1946,6 +2154,185 @@ IFClsDef:
       ~ (LBRACE) { }
 
       &_node ($node => $node);
+
+      ~ (#EOF) { }
+    } // document
+
+    /*
+      A TDT Error Description Document (|lang:tdterr|).
+
+        tdterr := any-err-type-qname "{" position *(attribute / empty-statement)
+                                     "}"
+        any-err-type-qname := QName ;; References a |ecore:AnyErrorCode|.
+        position := [QName / URI] ["(" number "," number ")"] ";"
+    */
+    rule tdterr : standalone {
+      my $err : return;
+
+      ~ (TFQNames) {
+        lang:Perl ($v => $token.value) : has-error {
+          my $disq = substr ($v, 3, length ($v) - 6);
+          my $erruri;
+          try {
+            $erruri = $self->{ns_resolver_dis}
+                           ->tfqnames_to_uri ($disq, $self->{default_t},
+                                                     $self->{default_f});
+          } catch Message::Util::Error with {
+            my $err = shift;
+            if ($err->can ('subtype') and
+                $err->subtype eq <Q::DIS:UNDECLARED_NS_PREFIX_ERR
+                                   ::SuikaWikiConfig21:ForLatest>) {
+              my $location = {
+                utf32_offset => pos ($self->{source}),
+              };
+              my $continue =
+              __DOMCore:ERROR{dtest|undeclared-namespace-prefix-error::
+                dtest|error-token => {$token},
+                DOMCore|location => {$location},
+                dtest|source-text => {\($self->{source})},
+                dtest|qname => {$disq},
+              }__;
+              unless ($continue) {
+                __EXCEPTION{dtest|PARSE_ERR::
+                }__;
+              }
+              $erruri = $disq;
+            } else {
+              $err->throw;
+            }
+          };
+          my $errres = $self->{dis_database}->get_resource ($erruri);
+          $errres->is_referred (true);
+          if ($errres->is_type_uri (<Q::dx|ErrorSubCode>)) {
+            $err->{subtype} = {
+              type => 'string',
+              value => $errres->name_uri,
+            };
+          } elsif ($errres->is_type_uri (<Q::dx|ErrorCode>)) {
+            $err->{type} = {
+              type => 'string',
+              value => $errres->local_name,
+            };
+          } elsif ($errres->is_type_uri (<Q::DOMCore|DOMErrorType>)) {
+            $err->{type} = {
+              type => 'string',
+              value => $errres->get_property_text
+                                  (<Q::DOMCore|errorType>, $errres->name_uri),
+            },
+          } else {
+            my $location = {
+              utf32_offset => pos ($self->{source}),
+            };
+            my $continue = __DOMCore:ERROR{dtest|bad-error-resource-error::
+              dtest|error-token => {$token},
+              DOMCore|location => {$location},
+              dtest|source-text => {\($self->{source})},
+              dtest|qname => {$disq},
+              dtest|relatedURI => {$erruri},
+              dtest|resource => {$errres},
+            }__;
+            unless ($continue) {
+              __EXCEPTION{dtest|PARSE_ERR::
+              }__;
+            }
+          }
+        }
+      }
+
+      ~ (LBRACE) { }
+
+      my $has_pos;
+
+      ~? (QName) {
+        lang:Perl ($v => $token.value) {
+          my $disq = substr ($v, 2, length ($v) - 4);
+          my $erruri;
+          try {
+            $erruri = $self->{ns_resolver_dis}->qname_to_uri ($disq);
+          } catch Message::Util::Error with {
+            my $err = shift;
+            if ($err->can ('subtype') and
+                $err->subtype eq <Q::DIS:UNDECLARED_NS_PREFIX_ERR
+                                   ::SuikaWikiConfig21:ForLatest>) {
+              my $location = {
+                utf32_offset => pos ($self->{source}),
+              };
+              my $continue =
+              __DOMCore:ERROR{dtest|undeclared-namespace-prefix-error::
+                dtest|error-token => {$token},
+                DOMCore|location => {$location},
+                dtest|source-text => {\($self->{source})},
+                dtest|qname => {$disq},
+              }__;
+              unless ($continue) {
+                __EXCEPTION{dtest|PARSE_ERR::
+                }__;
+              }
+              $erruri = $disq;
+            } else {
+              $err->throw;
+            }
+          };
+          $err->{location}->{type} = 'DOMLocator';
+          $err->{location}->{uri} = $erruri;
+          $has_pos = true;
+        }
+      } (URI) {
+        lang:Perl ($v => $token.vakue) {
+          $err->{location}->{type} = 'DOMLocator';
+          $err->{location}->{uri}
+            = {type => 'string', value => substr ($v, length ($v) - 2)};
+          $has_pos = true;
+        }
+      }
+
+      ~? (LPAREN) {
+        ~ (DNUM) {
+          lang:Perl ($v => $token.value) {
+            $err->{location}->{type} = 'DOMLocator';
+            $err->{location}->{line_number}
+              = {type => 'number', value => 0+$v};
+          }
+        } (XNUM) {
+          lang:Perl ($v => $token.value) {
+            $err->{location}->{type} = 'DOMLocator';
+            $err->{location}->{line_number}
+              = {type => 'number', value => hex $v};
+          }
+        } (BNUM) {
+          lang:Perl ($v => $token.value) {
+            $err->{location}->{type} = 'DOMLocator';
+            $err->{location}->{line_number}
+              = {type => 'number', value => eval $v};
+          }
+        }
+        ~ (COMMA) { }
+        ~ (DNUM) {
+          lang:Perl ($v => $token.value) {
+            $err->{location}->{column_number}
+              = {type => 'number', value => 0+$v};
+          }
+        } (XNUM) {
+          lang:Perl ($v => $token.value) {
+            $err->{location}->{column_number}
+              = {type => 'number', value => hex $v};
+          }
+        } (BNUM) {
+          lang:Perl ($v => $token.value) {
+            $err->{location}->{column_number}
+              = {type => 'number', value => eval $v};
+          }
+        }
+        ~ (RPAREN) { }
+
+        lang:Perl { $has_pos = true; }
+      }
+
+      if-true ($has_pos) {
+        ~ (SEMICOLON) { }
+      }
+
+      &_node ($node => $err);
 
       ~ (#EOF) { }
     }
@@ -1986,7 +2373,7 @@ IFClsDef:
           }
           &_node ($node => $subnode);
         }
-      }
+      } (SEMICOLON) { }
 
       ~ (RBRACE) { }
 
@@ -2304,6 +2691,21 @@ PropDef:
   @enDesc:
     A reference to the original source text, if available.
 
+PropDef:
+  @QName: dtest|relatedURI
+  @enDesc:
+    A related URI.
+
+PropDef:
+  @QName: dtest|resource
+  @enDesc:
+    A related <QUOTE::dis> resource.
+
+PropDef:
+  @QName: dtest|qname
+  @enDesc:
+    A related <QUOTE::dis> QName.
+
 ElementTypeBinding:
   @Name: CParamApp
   @ElementType:
@@ -2341,3 +2743,19 @@ ErrDef:
     Token |%tdt-error-token-type;|%tdt-error-token-value
     (prefix => { (|}, suffix => {|)}); is not 
     allowed %tdt-error-lines (prefix => {(|}, suffix => {|)});
+
+ErrDef:
+  @QName: dtest|undeclared-namespace-prefix-error
+  @enDesc:
+    The namespace prefix is not declared.
+  @DOMCore:severity: DOMCore|SEVERITY_ERROR
+  @enMufDef:
+    |%p (name => {<Q::dtest:qname>});|: Namespace prefix is not declared
+
+ErrDef:
+  @QName: dtest|bad-error-resource-error
+  @enDesc:
+    The type of an error resource is not supported.
+  @DOMCore:severity: DOMCore|SEVERITY_ERROR
+  @enMufDef:
+    <%p (name => {<Q::dtest:uri>});>: Not an error of supported error type

@@ -17,7 +17,7 @@ Module:
   @License:
     license:Perl+MPL
   @Date:
-    $Date: 2006/01/29 13:59:00 $
+    $Date: 2006/02/08 08:18:31 $
   
   @Require:
     @@Module:
@@ -304,6 +304,7 @@ IFClsDef:
             <Q::lang:dpg> => <ClassName::ManakaiDVNSValue>,
             <Q::lang:disdoc> => <ClassName::ManakaiDVNSValue>,
             <Q::lang:disdocInline> => <ClassName::ManakaiDVNSValue>,
+            <Q::lang:tdterr> => <ClassName::ManakaiDVNSValue>,
           }->{$_} || $class;
         }
         $r = bless \ {
@@ -359,6 +360,7 @@ IFClsDef:
             <Q::lang:dpg> => <ClassName::ManakaiDVNSValue>,
             <Q::lang:disdoc> => <ClassName::ManakaiDVNSValue>,
             <Q::lang:disdocInline> => <ClassName::ManakaiDVNSValue>,
+            <Q::lang:tdterr> => <ClassName::ManakaiDVNSValue>,
           }->{$_} || $class;
         }
         $r = bless \ {
@@ -405,6 +407,7 @@ IFClsDef:
             <Q::lang:dpg> => <ClassName::ManakaiDVNSOrderedList>,
             <Q::lang:disdoc> => <ClassName::ManakaiDVNSOrderedList>,
             <Q::lang:disdocInline> => <ClassName::ManakaiDVNSOrderedList>,
+            <Q::lang:tdterr> => <ClassName::ManakaiDVNSOrderedList>,
           }->{$_} || $class;
         }
         $r = bless \ {

@@ -23,7 +23,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2006/01/29 13:58:56 $
+      $Date: 2006/02/08 08:18:29 $
     @@ContentType:
       dis:Date.RCS
   
@@ -2848,7 +2848,11 @@ IFClsDef:
               $self-><M::DISDatabase.loadModule>
                             ($rdoc, $resolver, for_arg => <Q::ManakaiDOM:all>,
                              on_resource_read => $onResourceRead);
-            } # Unless "for all" loaded
+            } else { # if "for all" loaded
+              $rmod-><M::DIS|DISResourceProp.getPropertyBoolean>
+                       (<Q::dis:In>);
+              ## Dummy to ensure the module is loaded
+            }
 
             ## -- Loads Required Modules
             ##    NOTE:: "dis:For" is not allowed since "dis:ForDef" is not read
@@ -4363,6 +4367,10 @@ IFClsDef:
                                       %mtopt) or
                            $el-><M::DISElement.mediaTypeMatch>
                                      (<Q::lang:dpg>, $mtopt{default_media_type},
+                                      %mtopt) or
+                           $el-><M::DISElement.mediaTypeMatch>
+                                     (<Q::lang:tdterr>,
+                                      $mtopt{default_media_type},
                                       %mtopt)) {
                     $el-><M::DISElement.preserveNodePath>;
                     __CODE{dv|createValueRef::
