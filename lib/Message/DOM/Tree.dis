@@ -12,7 +12,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/01/29 13:58:54 $
+    $Date: 2006/02/08 16:37:35 $
 
   @Require:
     @@Module:
@@ -15278,16 +15278,11 @@ NodeTypeDef:
           @@@@lang:en
           @@@@@:
             The new <IF::DOMXML:ProcessingInstruction> object.
-        @@@Exception:
-          @@@@Type:DOMException
-          @@@@Name:INVALID_CHARACTER_ERR
-          @@@@SubType:
-            @@@@@QName:
-              MDOMX:MDOM_BAD_NAME
-            @@@@@Description:
-              @@@@@@lang:en
-              @@@@@@@:
-                The <P::name> is not an XML <CODE::Name>.
+      @@@dx:raises:
+        @@@@@: MDOMX|MDOM_BAD_NAME
+        @@@@enDesc:
+          If the <P::name> is not an XML <CODE::Name>.
+        @@@@UnlessStrictErrorChecking:
         @@@Exception:
           @@@@Type:DOMException
           @@@@Name:NOT_SUPPORTED_ERR
@@ -15307,9 +15302,11 @@ NodeTypeDef:
                 MDOMX:MDOM_DOC_NOSUPPORT_XML::
               }__;
             }
-            __CODE{DOMMain:ensureXMLName:: $INPUT => $target,
-                                           $INPUT_PARAM_NAME => 'target',
-                                           $XMLVERSION => $version}__;
+            if (<Code::doStrictErrorChecking:: $nodeRef = $self>) {
+              __CODE{DOMMain:ensureXMLName:: $INPUT => $target,
+                                             $INPUT_PARAM_NAME => 'target',
+                                             $XMLVERSION => $version}__;
+            }
             my $node = <ClassM::DOMXML:ManakaiDOMProcessingInstruction
                                                .newObject>;
             __CODE{mn|setXRefNode||ManakaiDOM|Perl::
@@ -16682,8 +16679,9 @@ NodeTypeDef:
         @@@PerlDef:
             my $node = $self->{<H::mn:node>};
             if (defined $node->{<H::DOMCore:hasFeature>}->{XML}) {
-              if ($given and
-                  ($given eq '1.0' or $given eq '1.1')) {
+              if (($given and
+                   ($given eq '1.0' or $given eq '1.1')) or
+                  (not <Code::doStrictErrorChecking:: $nodeRef = $self>)) {
                 $node->{<H::infoset:version>} = $given;
               } else {
                 __EXCEPTION{
@@ -17573,6 +17571,18 @@ NodeTypeDef:
               }
             }
 ##Document
+
+ElementTypeBinding:
+  @Name: UnlessStrictErrorChecking
+  @ElementType:
+    dis:Description
+  @ShadowContent:
+    @@ddid: unlessStrictErrorChecking
+    @@For: ManakaiDOM|ManakaiDOM3
+    @@@:
+      In manakai implementation, this exception is not thrown
+      when <A::Document.strictErrorChecking> attribute is set to
+      <DOM::false>.
 
 ElementTypeBinding:
   @Name: boolCParam

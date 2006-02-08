@@ -12,7 +12,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/02/08 09:49:58 $
+    $Date: 2006/02/08 16:37:36 $
   
   @Require:
     @@Module:
@@ -922,7 +922,7 @@ IFClsDef:
         __CODE{printComment::
           $test => $self,
           $s => {
-            'An ungeneral event occurred'
+            'A code that should have never been reached is executed'
           },
         }__;
         __EXCEPTION{ASSERTION_ERR}__;
@@ -1368,6 +1368,64 @@ IFClsDef:
         for my $attr (keys %{$expectedHash}) {
           if ($attr eq 'type') {
             #
+          } elsif ($attr eq '_line_column') {
+            for my $attr (qw/line_number column_number/) {
+              unless ($actualValue->can ($attr)) {
+                __DEEP{
+                  $self-><M::DTManager.notOK>;
+                }__;
+                __CODE{printComment::
+                  $test => $self,
+                  $s => {
+                    $nodePathString.': Object (type |'.(ref $actualValue).
+                    '|) does not have attribute |'.$attr.'|'
+                  },
+                }__;
+                __EXCEPTION{ASSERTION_ERR}__;
+              }
+              if ($actualValue->$attr == -1) {
+                __DEEP{
+                  $self-><M::DTManager.notOK>;
+                }__;
+                __CODE{printComment::
+                  $test => $self,
+                  $s => {
+                    $nodePathString.': |'.$attr.'| value is not available'
+                  },
+                }__;
+                __EXCEPTION{ASSERTION_ERR}__;
+              }
+            } # ->line_number & ->column_number check
+            
+            my $aline = $actualValue->line_number;
+            my $acol = $actualValue->column_number;
+            my $xval = $expectedHash->{_line_column};
+            unless (
+              $xval->{l1} <= $aline and $aline <= $xval->{l2} and
+              (
+               ($xval->{l1} == $aline and $xval->{l1} == $xval->{l2} and
+                $xval->{c1} <= $acol and $acol <= $xval->{c2}) or
+               ($xval->{l1} == $aline and $xval->{l1} != $xval->{l2} and
+                $xval->{c1} <= $acol) or
+               ($xval->{l2} == $aline and $xval->{l1} != $xval->{l2} and
+                $acol <= $xval->{c2}) or
+               ($xval->{l1} < $aline and $aline < $xval->{l2})
+              )
+            ) {
+              __DEEP{
+                $self-><M::DTManager.notOK>;
+              }__;
+              __CODE{printComment::
+                $test => $self,
+                $s => {
+                  $nodePathString.': Line and column ('.$aline.', '.
+                  $acol.') is not in the expected'.
+                  ' range ('.$xval->{l1}.', '.$xval->{c1}.')..('.
+                  $xval->{l2}.', '.$xval->{c2}.')'
+                },
+              }__;
+              __EXCEPTION{ASSERTION_ERR}__;
+            }
           } else {
             my $aval;
             my $amtd = $actualValue->can ($attr);
@@ -2050,6 +2108,7 @@ IFClsDef:
         $self->{char} = [];
         $self->{token} = [];
         $self->{source} = $sourceText;
+        $self->{location} = {};
         __DEEP{
           $r = $self->_parse_document;
         }__;
@@ -2106,6 +2165,7 @@ IFClsDef:
         $self->{ns_resolver_dis} = $nsResolver;
         $self->{default_t} = $defaultTURI;
         $self->{default_f} = $defaultFURI;
+        $self->{location} = {};
         __DEEP{
           $r = $self->_parse_tdterr;
         }__;
@@ -2209,6 +2269,9 @@ IFClsDef:
       LPAREN := ['('];
       RPAREN := [')'];
 
+      /* Range */
+      RANGE := ['.'] ['.'];
+
       /* URI */
       URI : value := ['<'] [^'<' '>' '[' ']'] [^'<' '>']* ['>'];
       QName : value := ['<'] ['['] [^'<' '>' '[' ']']* [']'] ['>'];
@@ -2272,7 +2335,8 @@ IFClsDef:
         tdterr := any-err-type-qname "{" position *(attribute / empty-statement)
                                      "}"
         any-err-type-qname := QName ;; References a |ecore:AnyErrorCode|.
-        position := [QName / URI] ["(" number "," number ")"] ";"
+        position := [QName / URI] ["(" number "," number ")"
+                                   [".." "(" number "," number ")"]] ";"
     */
     rule tdterr : standalone {
       my $err : return;
@@ -2398,40 +2462,69 @@ IFClsDef:
         ~ (DNUM) {
           lang:Perl ($v => $token.value) {
             $err->{location}->{type} = 'DOMLocator';
-            $err->{location}->{line_number}
-              = {type => 'number', value => 0+$v};
+            $err->{location}->{_line_column} = {l1 => 0+$v, l2 => 0+$v};
           }
         } (XNUM) {
           lang:Perl ($v => $token.value) {
             $err->{location}->{type} = 'DOMLocator';
-            $err->{location}->{line_number}
-              = {type => 'number', value => hex $v};
+            $err->{location}->{_line_column} = {l1 => hex $v, l2 => hex $v};
           }
         } (BNUM) {
           lang:Perl ($v => $token.value) {
             $err->{location}->{type} = 'DOMLocator';
-            $err->{location}->{line_number}
-              = {type => 'number', value => eval $v};
+            $err->{location}->{_line_column} = {l1 => eval $v, l2 => eval $v};
           }
         }
         ~ (COMMA) { }
         ~ (DNUM) {
           lang:Perl ($v => $token.value) {
-            $err->{location}->{column_number}
-              = {type => 'number', value => 0+$v};
+            $err->{location}->{_line_column}->{c1} =
+            $err->{location}->{_line_column}->{c2} = 0+ $v;
           }
         } (XNUM) {
           lang:Perl ($v => $token.value) {
-            $err->{location}->{column_number}
-              = {type => 'number', value => hex $v};
+            $err->{location}->{_line_column}->{c1} =
+            $err->{location}->{_line_column}->{c2} = hex $v;
           }
         } (BNUM) {
           lang:Perl ($v => $token.value) {
-            $err->{location}->{column_number}
-              = {type => 'number', value => eval $v};
+            $err->{location}->{_line_column}->{c1} =
+            $err->{location}->{_line_column}->{c2} = eval $v;
           }
         }
         ~ (RPAREN) { }
+
+        ~? (RANGE) {
+          ~ (LPAREN) { }
+          ~ (DNUM) {
+            lang:Perl ($v => $token.value) {
+              $err->{location}->{_line_column}->{l2} = 0+ $v;
+            }
+          } (XNUM) {
+            lang:Perl ($v => $token.value) {
+              $err->{location}->{_line_column}->{l2} = hex $v;
+            }
+          } (BNUM) {
+            lang:Perl ($v => $token.value) {
+              $err->{location}->{_line_column}->{l2} = eval $v;
+            }
+          }
+          ~ (COMMA) { }
+          ~ (DNUM) {
+            lang:Perl ($v => $token.value) {
+              $err->{location}->{_line_column}->{c2} = 0+ $v;
+            }
+          } (XNUM) {
+            lang:Perl ($v => $token.value) {
+              $err->{location}->{_line_column}->{c2} = hex $v;
+            }
+          } (BNUM) {
+            lang:Perl ($v => $token.value) {
+              $err->{location}->{_line_column}->{c2} = eval $v;
+            }
+          }
+          ~ (RPAREN) { }
+        }
 
         lang:Perl { $has_pos = true; }
       }

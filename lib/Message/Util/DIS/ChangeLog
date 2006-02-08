@@ -1,5 +1,19 @@
 2006-02-08  Wakaba  <wakaba@suika.fam.cx>
 
+	* DPG.dis (state_to_code): An |unshift|-overread-character
+	code was missing in case that an accept state has next state
+	but it does not result in acception.  Copy |$self->{location}|
+	at the beginning of the scanning of a token and |return|s
+	it as part of the token information.
+
+	* Test.dis (assertDOMLocatorEquals): New |_line_column|
+	type support is added.
+	(RANGE): New token type.
+	(tdterr): |position| syntax is extended to allow
+	range specification.
+	
+2006-02-08  Wakaba  <wakaba@suika.fam.cx>
+	
 	* Test.dis (assertDOMLocatorEquals): New method.
 	(assertTypedValueEquals): |DOMLocator| type support is added.
 	In addition, if it encounters an unknown type value,

@@ -15,7 +15,7 @@ Module:
   @License: license|Perl+MPL
 
   @Date:
-    $Date: 2006/01/30 15:17:59 $
+    $Date: 2006/02/08 16:37:36 $
   
   @Require:
     @@Module:
@@ -871,7 +871,29 @@ IFClsETDef:
                         $state_to_code
                           ->($dfa, $when_block, $next_state_name, $factory,
                              %opt, outermost => 0);
+                        ## "If match, then |return|s"
                       }__;
+                      
+                      if ($dfa->{$state_name}->{accept}) {
+                        ## "If doesn't match, then |unshift|s |ch|"
+                        for ($when_block
+                                 -><M::pc|PerlCodeStatements.appendStatement>
+                                 -><M::pc|PerlCodeUnits.appendNewPCFunctionCall>
+                                       (null, 'unshift')
+                                 -><M::pc|PerlCodeUnits.appendNewPCExpression>
+                                       (',')) {
+                          for ($_-><M::pc|PerlCodeUnits
+                                             .appendNewPCDereference> ('@')
+                                 -><M::pc|PerlCodeUnits
+                                             .appendNewPCExpression> ('->')) {
+                            $_-><M::pc|PerlCodeUnits.appendNewPCVariable>
+                                  ('$', null, 'self');
+                            $_-><M::pc|PerlCodeUnits.appendBare> ('{char}');
+                          }
+                          $_-><M::pc|PerlCodeUnits.appendNewPCVariable>
+                                    ('$', null, 'ch');
+                        }
+                      } # If this state is "accept"
             }
           } # for next_state
         }
@@ -1028,6 +1050,9 @@ IFClsETDef:
                               -><M::pc|PerlCodeUnits.appendNewPCLiteral> ({
                                     type => $opt{default_token_name},
                                     value => $v,
+                                    location => $factory
+                                            -><M::pc|PCDocument.createPCVariable>
+                                                ('$', null, 'location'),
                                   });
                           }
                         }
@@ -1038,6 +1063,9 @@ IFClsETDef:
                                 (null, 'return')
                             -><M::pc|PerlCodeUnits.appendNewPCLiteral> ({
                                    type => $dfa->{$state_name}->{accept},
+                                   location => $factory
+                                            -><M::pc|PCDocument.createPCVariable>
+                                                ('$', null, 'location'),
                                    %value,
                                  });
                         }
@@ -1049,6 +1077,9 @@ IFClsETDef:
                             (null, 'return')
                         -><M::pc|PerlCodeUnits.appendNewPCLiteral> ({
                                type => $dfa->{$state_name}->{accept},
+                               location => $factory
+                                            -><M::pc|PCDocument.createPCVariable>
+                                                ('$', null, 'location'),
                                %value,
                              });
                     }
@@ -1131,6 +1162,9 @@ IFClsETDef:
                                 -><M::pc|PerlCodeUnits.appendNewPCLiteral> ({
                                       type => $opt{default_token_name},
                                       value => $v,
+                                      location => $factory
+                                            -><M::pc|PCDocument.createPCVariable>
+                                                ('$', null, 'location'),
                                     });
                             }
                           }
@@ -1141,6 +1175,9 @@ IFClsETDef:
                                   (null, 'return')
                               -><M::pc|PerlCodeUnits.appendNewPCLiteral> ({
                                     type => '#EOF',
+                                    location => $factory
+                                            -><M::pc|PCDocument.createPCVariable>
+                                                ('$', null, 'location'),
                                   });
                           }
                         }
@@ -1150,6 +1187,9 @@ IFClsETDef:
                                   (null, 'return')
                               -><M::pc|PerlCodeUnits.appendNewPCLiteral> ({
                                     type => '#EOF',
+                                    location => $factory
+                                            -><M::pc|PCDocument.createPCVariable>
+                                                ('$', null, 'location'),
                                   });
                       }
                     }
@@ -1183,6 +1223,9 @@ IFClsETDef:
                                 -><M::pc|PerlCodeUnits.appendNewPCLiteral> ({
                                       type => '#INVALID',
                                       value => $chr_ch,
+                                      location => $factory
+                                            -><M::pc|PCDocument.createPCVariable>
+                                                ('$', null, 'location'),
                                     });
                   }
         } else {
@@ -1464,10 +1507,23 @@ IFClsETDef:
         $_->append_new_pc_number_literal (-2);
       }
       
+              ## Set the scanner as initial one if desired
               if ($cel-><M::DPGElementAttribute.dpgGetAttribute> ('initial')) {
                 $initial_lexmode = $scan_sub;
               } else {
                 $initial_lexmode ||= $scan_sub;
+              }
+
+              ## "Copies current location information"
+              for ($scan_sub-><M::pc|PerlCodeStatements.appendStatement>
+                            -><M::pc|PerlCodeUnits.appendNewPCExpression>
+                                ('=')) {
+                $_-><M::pc|PerlCodeUnits.appendNewPCVariable>
+                      ('$', null, 'location')
+                  -><AS::pc|PerlVariable.variableScope> ('my');
+                $_-><M::pc|PerlCodeUnits.appendBare>
+                      ('{%{$self->{location}},
+                         char_d => 0+@{$self->{char}}}');
               }
 
               __DEEP{
@@ -2411,6 +2467,7 @@ IFClsDef:
         $self->{token} = [];
         $self->{source} = $sourceText;
         $self->{nsresolver} = $namespaceContext;
+        $self->{location} = {};
         __DEEP{
           $r = $self->_parse_Rules ($self->{<H::DOMCore:implementation>});
         }__;

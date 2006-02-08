@@ -1,5 +1,29 @@
 2006-02-08  Wakaba  <wakaba@suika.fam.cx>
 
+	* Tree.dis (createProcessingInstruction): Don't
+	throw |MDOMX:MDOM_BAD_NAME| exception if |Document.strictErrorChecking|
+	is |false|.
+
+	* XMLParser.dis (parseString): Initializes |$self->{location}|.
+	It enables improved error position report.
+	(XDO): It now includes |S+| following target name |xml| as
+	part of the token.  (PI with target starting with |xml|
+	was unable to be placed at the beginning of the document entity.)
+	(_ProcessingInstruction, _ProcessingInstructionDTD): Creates
+	a processing instruction node with |#INVALID| node name
+	if target name is not given and recovered from the error.
+	(S): Variable |$s| added.
+	(XMLTests): Tests for XML declarations and processing
+	instructions are added.  Prints error type name if unexpected
+	error with severity of error or fatal error has been reported.
+	Catch unexpected exceptions thrown in parser (different
+	from |LSException|), prints its message, and invoke |$test->not_ok|
+	for the ease of testing.
+	(xp:get-location-from-token): Location values now take |$self->{char}|
+	stack into acount.
+	
+2006-02-08  Wakaba  <wakaba@suika.fam.cx>
+
 	* XMLParser.dis (shiftChar): Line and column number counting 
 	is fixed.  Although the DOM Level 3 Core specification
 	is unclear about whether the first number is zero or one,

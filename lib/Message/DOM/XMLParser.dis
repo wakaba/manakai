@@ -10,7 +10,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/02/08 09:49:58 $
+    $Date: 2006/02/08 16:37:35 $
 
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
@@ -282,6 +282,7 @@ ClsDef:
           column => 1,
           pos => 0,
         }];
+        $self->{location} = $self->{entity}->[-1];
         $self->{entity_char} = [];
         $self->{entity_token} = [];
         $self->{xml_version} = '1.0';
@@ -321,6 +322,7 @@ ClsDef:
                 $self->{entity} = [<Code::getCopyOfEntityState::
                                               $entity_type = 'general_entity',
                                               $entity_name = $ent_name>];
+                $self->{location} = $self->{entity}->[-1];
                 $self->{token} = [];
                 $self->{char} = [];
                 ## TODO: External entity support
@@ -627,7 +629,8 @@ ClsDef:
     rule _XMLDeclaration_ ($doc) {
       ?lexmode XMLDeclaration;
 
-      ~ (S) { }
+      // ~ (XDO) { }
+      // ~ (S) { }
 
       ~ (Name == 'version') {
         ~? (S) { }
@@ -900,9 +903,13 @@ _
           $pi = $doc-><M::Document.createProcessingInstruction>
                         ($name);
         }
+      } else {
+        lang:Perl {
+          $pi = $doc-><M::Document.createProcessingInstruction> ('#INVALID');
+        }
       }
       
-      ~ (S) {
+      ~? (S) {
         ?lexmode 'PIData';
         
         my $tdata;
@@ -960,9 +967,13 @@ _
           $pi = $doc-><M::Document.createProcessingInstruction>
                         ($name);
         }      
+      } else {
+        lang:Perl {
+          $pi = $doc-><M::Document.createProcessingInstruction> ('#INVALID');
+        }
       }
       
-      ~ (S) {
+      ~? (S) {
         ?lexmode 'PIData';
         
         my $tdata;
@@ -2063,6 +2074,7 @@ _
           push @{$self->{entity}}, <Code::getCopyOfEntityState::
                                             $entity_type = 'general_entity',
                                             $entity_name = $name>;
+          $self->{location} = $self->{entity}->[-1];
           push @{$self->{entity_token}}, $self->{token};
           $self->{token} = [];
           push @{$self->{entity_char}}, $self->{char};
@@ -2076,6 +2088,7 @@ _
           $self->{token} = pop @{$self->{entity_token}};
           $self->{char} = pop @{$self->{entity_char}};
           pop @{$self->{entity}};
+          $self->{location} = $self->{entity}->[-1];
         }
 
         // TODO: Set read-only flag
@@ -2138,6 +2151,7 @@ _
           push @{$self->{entity}}, <Code::getCopyOfEntityState::
                                             $entity_type = 'general_entity',
                                             $entity_name = $name>;
+          $self->{location} = $self->{entity}->[-1];
           push @{$self->{entity_token}}, $self->{token};
           $self->{token} = [];
           push @{$self->{entity_char}}, $self->{char};
@@ -2151,6 +2165,7 @@ _
           $self->{token} = pop @{$self->{entity_token}};
           $self->{char} = pop @{$self->{entity_char}};
           pop @{$self->{entity}};
+          $self->{location} = $self->{entity}->[-1];
         }
 
         // TODO: Set read-only flag
@@ -2211,6 +2226,7 @@ _
           push @{$self->{entity}}, <Code::getCopyOfEntityState::
                                             $entity_type = 'general_entity',
                                             $entity_name = $name>;
+          $self->{location} = $self->{entity}->[-1];
           push @{$self->{entity_token}}, $self->{token};
           $self->{token} = [];
           push @{$self->{entity_char}}, $self->{char};
@@ -2224,6 +2240,7 @@ _
           $self->{token} = pop @{$self->{entity_token}};
           $self->{char} = pop @{$self->{entity_char}};
           pop @{$self->{entity}};
+          $self->{location} = $self->{entity}->[-1];
         }
 
         // TODO: Set read-only flag
@@ -3323,10 +3340,11 @@ _
     } // Nmtoken
     
     /*
-      Space
+      S
     */
     lexmode S {
-      S := [U+0009 U+000A U+000D U+0020]+;
+      $s := [U+0009 U+000A U+000D U+0020];
+      S := $s+;
     } // S
     
     /*
@@ -3387,7 +3405,7 @@ _
       /*
         XML declaration
       */
-      XDO := ['<'] ['?'] ['x'] ['m'] ['l'];
+      XDO := ['<'] ['?'] ['x'] ['m'] ['l'] $s+;
     } // DocumentStart
     
     /*
@@ -4057,7 +4075,475 @@ _
           xml-standalone: true;
           element { }
         }
+    @@XMLTest:
+      @@@QName: xp.xmldecl.no.encoding.but.standalone.attr.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0" standalone="yes"?>
+          <p></p>
+      @@@test:domTree:
+        document {
+          xml-version: '1.0';
+          xml-encoding: null;
+          xml-standalone: true;
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.xmldecl.encoding.encname.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0" encoding="a-._01-"?>
+          <p></p>
+      @@@test:domTree:
+        document {
+          xml-version: '1.0';
+          xml-encoding: 'a-._01-';
+          xml-standalone: false;
+          element { }
+        }
+
+    @@XMLTest:
+      @@@QName: xp.xmldecl.no.s.no.attr.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml?>
+          <p></p>
+      @@@c:erred:
+        <[[xp:wf-pi-target-is-xml]]> { (1, 1)..(1, 5); }
+    @@XMLTest:
+      @@@QName: xp.xmldecl.s.no.attr.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml  ?>
+          <p></p>
+      @@@c:erred:
+        <[[xp:wf-syntax-error]]> { (1, 8)..(1, 9); }
+    @@XMLTest:
+      @@@QName: xp.xmldecl.unknown.attr.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml  unknown="value"?>
+          <p></p>
+      @@@c:erred:
+        <[[xp:wf-syntax-error]]> { (1, 8)..(1, 22); }
+    @@XMLTest:
+      @@@QName: xp.xmldecl.version.unknown.attr.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0" unknown="value"?>
+          <p></p>
+      @@@c:erred:
+        <[[xp:wf-syntax-error]]> { (1, 21)..(1, 35); }
+    @@XMLTest:
+      @@@QName: xp.xmldecl.version.encoding.unknown.attr.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0" encoding="us-ascii" unknown="value"?>
+          <p></p>
+      @@@c:erred:
+        <[[xp:wf-syntax-error]]> { (1, 41)..(1, 55); }
+    @@XMLTest:
+      @@@QName: xp.xmldecl.version.encoding.standalone.unknown.attr.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0" encoding="us-ascii" standalone="yes"
+          unknown="value"?>
+          <p></p>
+      @@@c:erred:
+        <[[xp:wf-syntax-error]]> { (2, 1)..(2, 15); }
+    @@XMLTest:
+      @@@QName: xp.xmldecl.no.version.but.encoding.attr.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml encoding="us-ascii"?>
+          <p></p>
+      @@@c:erred:
+        <[[xp:wf-syntax-error]]> { (1, 7)..(1, 25); }
+    @@XMLTest:
+      @@@QName: xp.xmldecl.no.version.but.standalone.attr.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml standalone="yes"?>
+          <p></p>
+      @@@c:erred:
+        <[[xp:wf-syntax-error]]> { (1, 7)..(1, 24); }
+    @@XMLTest:
+      @@@QName: xp.xmldecl.version.unsupported.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.2"?>
+          <p></p>
+      @@@c:erred:
+        <[[xp:wf-unsupported-xml-version]]> { (1, 7)..(1, 19); }
+    @@XMLTest:
+      @@@QName: xp.xmldecl.version.unsupported.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version=" 1.0 "?>
+          <p></p>
+      @@@c:erred:
+        <[[xp:wf-unsupported-xml-version]]> { (1, 7)..(1, 21); }
+    @@XMLTest:
+      @@@QName: xp.xmldecl.version.unsupported.3.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="01.00"?>
+          <p></p>
+      @@@c:erred:
+        <[[xp:wf-unsupported-xml-version]]> { (1, 7)..(1, 21); }
+    @@XMLTest:
+      @@@QName: xp.xmldecl.encoding.malformed.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0" encoding="0088"?>
+          <p></p>
+      @@@c:erred:
+        <[[xp:wf-malformed-enc-name]]> { (1, 21)..(1, 35); }
+    @@XMLTest:
+      @@@QName: xp.xmldecl.encoding.malformed.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0" encoding="D.V.D!"?>
+          <p></p>
+      @@@c:erred:
+        <[[xp:wf-malformed-enc-name]]> { (1, 21)..(1, 38); }
+    @@XMLTest:
+      @@@QName: xp.xmldecl.standalone.malformed.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0" standalone="true"?>
+          <p></p>
+      @@@c:erred:
+        <[[xp:wf-malformed-xml-standalone]]> { (1, 21)..(1, 38); }
+    @@XMLTest:
+      @@@QName: xp.xmldecl.standalone.malformed.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0" standalone="YES"?>
+          <p></p>
+      @@@c:erred:
+        <[[xp:wf-malformed-xml-standalone]]> { (1, 21)..(1, 37); }
+    @@XMLTest:
+      @@@QName: xp.xmldecl.standalone.malformed.3.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0" standalone="no  "?>
+          <p></p>
+      @@@c:erred:
+        <[[xp:wf-malformed-xml-standalone]]> { (1, 21)..(1, 38); }
     
+    @@XMLTest:
+      @@@QName: xp.no-xmldecl.xml...-pi.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xmldeclaration?>
+          <a></a>
+      @@@test:domTree:
+        document {
+          pi {
+            node-name: 'xmldeclaration';
+            node-value: '';
+          }
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.no-xmldecl.xml...-pi.after.document.element.test
+      @@@DEnt:
+        @@@@test:value:
+          <a></a>
+          <?xmldeclaration?>
+      @@@test:domTree:
+        document {
+          element { }
+          pi {
+            node-name: 'xmldeclaration';
+            node-value: '';
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.no-xmldecl.xml...-pi.in.document.element.test
+      @@@DEnt:
+        @@@@test:value:
+          <a>
+          <?xmldeclaration?>
+          </a>
+      @@@test:domTree:
+        document {
+          element {
+            text { }
+            pi {
+              node-name: 'xmldeclaration';
+              node-value: '';
+            }
+            text { }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.no-xmldecl.xml...-pi.in.doctype.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+          <?xmldeclaration?>
+          ]>
+          <a></a>
+      @@@test:domTree:
+        document {
+          document-type {
+            pi {
+              node-name: 'xmldeclaration';
+              node-value: '';
+            }
+          }
+          element { }
+        }
+
+    @@XMLTest:
+      @@@QName: xp.XMLdecl.test
+      @@@DEnt:
+        @@@@test:value:
+          <?XML version="1.0"?>
+          <p></p>
+      @@@c:erred:
+        <[[xp:wf-pi-target-is-xml]]> { (1, 1)..(1, 5); }
+    @@XMLTest:
+      @@@QName: xp.Xmldecl.test
+      @@@DEnt:
+        @@@@test:value:
+          <?Xml version="1.0"?>
+          <p></p>
+      @@@c:erred:
+        <[[xp:wf-pi-target-is-xml]]> { (1, 1)..(1, 5); }
+    @@XMLTest:
+      @@@QName: xp.xmldecl.after.document.element.empty.test
+      @@@DEnt:
+        @@@@test:value:
+          <p></p>
+          <?xml?>
+      @@@c:erred:
+        <[[xp:wf-pi-target-is-xml]]> { (2, 1)..(2, 5); }
+    @@XMLTest:
+      @@@QName: xp.xmldecl.after.document.element.test
+      @@@DEnt:
+        @@@@test:value:
+          <p></p>
+          <?xml version="1.0"?>
+      @@@c:erred:
+        <[[xp:wf-pi-target-is-xml]]> { (2, 1)..(2, 5); }
+    @@XMLTest:
+      @@@QName: xp.xmldecl.in.element.empty.test
+      @@@DEnt:
+        @@@@test:value:
+          <p>
+          <?xml?>
+          </p>
+      @@@c:erred:
+        <[[xp:wf-pi-target-is-xml]]> { (2, 1)..(2, 5); }
+    @@XMLTest:
+      @@@QName: xp.xmldecl.in.element.test
+      @@@DEnt:
+        @@@@test:value:
+          <p>
+          <?xml version="1.0"?>
+          </p>
+      @@@c:erred:
+        <[[xp:wf-pi-target-is-xml]]> { (2, 1)..(2, 5); }
+    @@XMLTest:
+      @@@QName: xp.xmldecl.after.comment.test
+      @@@DEnt:
+        @@@@test:value:
+          <!---->
+          <?xml version="1.0"?>
+          <p></p>
+      @@@c:erred:
+        <[[xp:wf-pi-target-is-xml]]> { (2, 1)..(2, 5); }
+    @@XMLTest:
+      @@@QName: xp.xmldecl.after.comment.empty.test
+      @@@DEnt:
+        @@@@test:value:
+          <!---->
+          <?xml?>
+          <p></p>
+      @@@c:erred:
+        <[[xp:wf-pi-target-is-xml]]> { (2, 1)..(2, 5); }
+    @@XMLTest:
+      @@@QName: xp.xmldecl.after.pi.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml-declaration?>
+          <?xml version="1.0"?>
+          <p></p>
+      @@@c:erred:
+        <[[xp:wf-pi-target-is-xml]]> { (2, 1)..(2, 5); }
+    @@XMLTest:
+      @@@QName: xp.xmldecl.after.pi.empty.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml-declaration?>
+          <?xml?>
+          <p></p>
+      @@@c:erred:
+        <[[xp:wf-pi-target-is-xml]]> { (2, 1)..(2, 5); }
+    @@XMLTest:
+      @@@QName: xp.xmldecl.after.doctype.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a>
+          <?xml version="1.0"?>
+          <p></p>
+      @@@c:erred:
+        <[[xp:wf-pi-target-is-xml]]> { (2, 1)..(2, 5); }
+    @@XMLTest:
+      @@@QName: xp.xmldecl.after.doctype.empty.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a>
+          <?xml?>
+          <p></p>
+      @@@c:erred:
+        <[[xp:wf-pi-target-is-xml]]> { (2, 1)..(2, 5); }
+    @@XMLTest:
+      @@@QName: xp.xmldecl.in.doctype.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+          <?xml version="1.0"?>
+          ]>
+          <p></p>
+      @@@c:erred:
+        <[[xp:wf-pi-target-is-xml]]> { (2, 1)..(2, 5); }
+    @@XMLTest:
+      @@@QName: xp.xmldecl.in.doctype.empty.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+          <?xml?>
+          ]>
+          <p></p>
+      @@@c:erred:
+        <[[xp:wf-pi-target-is-xml]]> { (2, 1)..(2, 5); }
+
+    @@XMLTest:
+      @@@QName: xp.pi.before.element.empty.test
+      @@@DEnt:
+        @@@@test:value:
+          <?target?>
+          <a></a>
+      @@@test:domTree:
+        document {
+          pi {
+            node-name: 'target';
+            node-value: '';
+          }
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.pi.before.element.s.test
+      @@@DEnt:
+        @@@@test:value:
+          <?target  ?>
+          <a></a>
+      @@@test:domTree:
+        document {
+          pi {
+            node-name: 'target';
+            node-value: '';
+          }
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.pi.before.element.string.test
+      @@@DEnt:
+        @@@@test:value:
+          <?target string?>
+          <a></a>
+      @@@test:domTree:
+        document {
+          pi {
+            node-name: 'target';
+            node-value: 'string';
+          }
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.pi.before.element.string.s.test
+      @@@DEnt:
+        @@@@test:value:
+          <?target string  ?>
+          <a></a>
+      @@@test:domTree:
+        document {
+          pi {
+            node-name: 'target';
+            node-value: 'string  ';
+          }
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.pi.before.element.gt.test
+      @@@DEnt:
+        @@@@test:value:
+          <?target string>string?>
+          <a></a>
+      @@@test:domTree:
+        document {
+          pi {
+            node-name: 'target';
+            node-value: 'string>string';
+          }
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.pi.doctype.empty.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+          <?target?>
+          ]>
+          <a></a>
+      @@@test:domTree:
+        document {
+          document-type {
+            pi {
+              node-name: 'target';
+              node-value: '';
+            }
+          }
+          element { }
+        }
+
+    @@XMLTest:
+      @@@QName: xp.pi.no.target.test
+      @@@DEnt:
+        @@@@test:value:
+          <??>
+          <p></p>
+      @@@c:erred:
+        <[[xp:wf-syntax-error]]> { (1, 3)..(1, 4); }
+    @@XMLTest:
+      @@@QName: xp.pi.no.target.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <?  ?>
+          <p></p>
+      @@@c:erred:
+        <[[xp:wf-syntax-error]]> { (1, 3)..(1, 4); }
+    @@XMLTest:
+      @@@QName: xp.pi.bad.target.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <?target!  ?>
+          <p></p>
+      @@@c:erred:
+        <[[xp:wf-syntax-error]]> { (1, 9)..(1, 9); }
+    @@XMLTest:
+      @@@QName: xp.pi.bad.target.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <?0target  ?>
+          <p></p>
+      @@@c:erred:
+        <[[xp:wf-syntax-error]]> { (1, 3)..(1, 3); }
+
     @@XMLTest:
       @@@QName: xp.doctype.empty.test
       @@@DEnt:
@@ -5096,6 +5582,7 @@ _
       for my $test_data (@$TestData) {
         $test->start_new_test ($test_data->{uri});
         my $doc_ent = $test_data->{entity}->{$test_data->{root_uri}};
+        my $not_ok;
 
         $parser->dom_config->set_parameter ('error-handler' => sub ($$) {
           my (undef, $err) = @_;
@@ -5107,6 +5594,10 @@ _
                                                        ->{$err_type}});
           } else { # Uncatched error
             warn $err;
+            unless ($err->severity == <C::c|DOMError.SEVERITY_WARNING>) {
+              $test->failure_comment ('Unexpected error |'.$err->type.'|');
+              $not_ok = true;
+            }
           }
           return true; # continue as far as possible
         });
@@ -5117,20 +5608,23 @@ _
             $test->assert_dom_tree_equals
                      (actual_value => $doc,
                       expected_hash => $test_data->{dom_tree});
-            my $has_error;
             for (values %{$test_data->{dom_error}||{}}) {
               if (@$_) {
                 $test->failure_comment
                          (@$_.' |DOMError|s of type |'.
                           $_->[0]->{type}->{value}.'| are not reported');
-                $has_error = true;
+                $not_ok = true;
               }
             }
-            $has_error ? $test->not_ok : $test->ok;
+            $not_ok ? $test->not_ok : $test->ok;
           } catch Message::Util::IF::DTException with {
             # 
           } catch Message::DOM::IF::LSException with {
-            $test->assert_never;
+            # not_ok
+          } otherwise {
+            my $err = shift;
+            warn $err;
+            $test->not_ok;
           };
         } else {
           try {
@@ -5140,17 +5634,20 @@ _
             #
           } catch Message::DOM::IF::LSException with {
             #
+          } otherwise {
+            my $err = shift;
+            warn $err;
+            $test->not_ok;
           };
-          my $has_error;
           for (values %{$test_data->{dom_error}||{}}) {
             if (@$_) {
               $test->failure_comment
                        (@$_.' |DOMError|s of type |'.
                         $_->[0]->{type}->{value}.'| are not reported');
-              $has_error = true;
+              $not_ok = true;
             }
           }
-          $has_error ? $test->not_ok : $test->ok;
+          $not_ok ? $test->not_ok : $test->ok;
         }
       }
 
@@ -5199,11 +5696,17 @@ ResourceDef:
   @enDesc:
     Creates a <IF::DOMCore:DOMLocator> object from a token.
   @PerlDef:
+    my $__d = $token->{type} ne '#EOF'
+                ? $token->{location}->{char_d}
+                : 0;
     $result = {
-      utf32_offset => $self->{entity}->[-1]->{pos},
-      line_number => $self->{entity}->[-1]->{line},
-      column_number => $self->{entity}->[-1]->{column},
+      utf32_offset => $token->{location}->{pos} - $__d,
+      line_number => $token->{location}->{line},
+      column_number => $token->{location}->{column} - $__d,
     };
+    $result->{utf32_offset} = 0 if $result->{utf32_offset} < 0;
+    $result->{column_number} = 0 if $result->{column_number} < 0;
+                            ## 0 or 1, which should be?
   @For: ManakaiDOM|ManakaiDOM3
 
 ElementTypeBinding:
