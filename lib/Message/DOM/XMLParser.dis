@@ -10,7 +10,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/02/08 16:37:35 $
+    $Date: 2006/02/09 10:23:19 $
 
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
@@ -848,9 +848,9 @@ ClsDef:
       
       // ~ (MDC) { }
     } // _CommentDeclaration
-_
-    rule _CommentDeclarationDTD ($doc) {
-      ?lexmode 'CommentDeclaration';
+
+    rule _CommentDeclarationDTD {
+      ?lexmode CommentDeclaration;
       
       ~? (STRING) {
         //
@@ -3422,8 +3422,7 @@ _
       /*
         Comment data
       */
-      $string := ['-']? [^'-'];
-      STRING : value := $string+;
+      ?default-token STRING : value;
     } // CommentDeclaration
     
     /*
@@ -3874,6 +3873,170 @@ _
 
   @XMLTests:
     @@XMLTest:
+      @@@QName: xp.char.xml10.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0"?>
+          <p>$u0009$u000A$u000D$u0020$uD7FF$uE000$uFFFD$U00010000$U0010FFFF</p>
+      @@@test:domTree:
+        document {
+          xml-version: '1.0';
+          element {
+            text-content: U+0009 U+000A U+000A U+0020 U+D7FF
+                          U+E000 U+FFFD U+10000 U+10FFFF;
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.char.xml11.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.1"?>
+          <p>$u0009$u000A$u000D$u0020$uD7FF$uE000$uFFFD$U00010000$U0010FFFF</p>
+      @@@test:domTree:
+        document {
+          xml-version: '1.1';
+          element {
+            text-content: U+0009 U+000A U+000A U+0020 U+D7FF
+                          U+E000 U+FFFD U+10000 U+10FFFF;
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.char.xml10.c0.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0"?>
+          <p>$u0000$u0001$u0002$u0003$u0004$u0005$u0006$u0007$u0008$u000B$
+          $u000C$u000E$u000F$u0010$u0011$u0012$u0013$u0014$u0015$u0016$
+          $u0017$u0018$u0019$u001A$u001B$u001C$u001D$u001E$u001F</p>
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 4); } /* U+0000 */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 5); } /* U+0001 */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 6); } /* U+0002 */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 7); } /* U+0003 */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 8); } /* U+0004 */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 9); } /* U+0005 */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 10); } /* U+0006 */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 11); } /* U+0007 */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 12); } /* U+0008 */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 13); } /* U+000B */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 14); } /* U+000C */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 15); } /* U+000E */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 16); } /* U+000F */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 17); } /* U+0010 */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 18); } /* U+0011 */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 19); } /* U+0012 */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 20); } /* U+0013 */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 21); } /* U+0014 */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 22); } /* U+0015 */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 23); } /* U+0016 */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 24); } /* U+0017 */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 25); } /* U+0018 */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 26); } /* U+0019 */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 27); } /* U+001A */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 28); } /* U+001B */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 29); } /* U+001C */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 30); } /* U+001D */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 31); } /* U+001E */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 32); } /* U+001F */
+    @@XMLTest:
+      @@@QName: xp.char.xml11.c0.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.1"?>
+          <p>$u0000$u0001$u0002$u0003$u0004$u0005$u0006$u0007$u0008$u000B$
+          $u000C$u000E$u000F$u0010$u0011$u0012$u0013$u0014$u0015$u0016$
+          $u0017$u0018$u0019$u001A$u001B$u001C$u001D$u001E$u001F</p>
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 4); } /* U+0000 */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 5); } /* U+0001 */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 6); } /* U+0002 */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 7); } /* U+0003 */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 8); } /* U+0004 */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 9); } /* U+0005 */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 10); } /* U+0006 */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 11); } /* U+0007 */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 12); } /* U+0008 */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 13); } /* U+000B */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 14); } /* U+000C */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 15); } /* U+000E */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 16); } /* U+000F */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 17); } /* U+0010 */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 18); } /* U+0011 */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 19); } /* U+0012 */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 20); } /* U+0013 */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 21); } /* U+0014 */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 22); } /* U+0015 */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 23); } /* U+0016 */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 24); } /* U+0017 */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 25); } /* U+0018 */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 26); } /* U+0019 */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 27); } /* U+001A */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 28); } /* U+001B */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 29); } /* U+001C */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 30); } /* U+001D */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 31); } /* U+001E */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 32); } /* U+001F */
+    @@XMLTest:
+      @@@QName: xp.char.xml10.c1.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0"?>
+          <p>$u007F$u0080$u0081$u0082$u0083$u0084$u0086$u0087$u0088$
+          $u0089$u008A$u008B$u008C$
+          $u008D$u008E$u008F$u0090$u0091$u0092$u0093$u0094$u0095$u0096$
+          $u0097$u0098$u0099$u009A$u009B$u009C$u009D$u009E$u009F$u0085</p>
+      @@@test:domTree:
+        document {
+          xml-version: '1.0';
+          element {
+            text-content: U+007F U+0080 U+0081 U+0082 U+0083 U+0084 U+0086
+                          U+0087 U+0088 U+0089 U+008A U+008B U+008C U+008D
+                          U+008E U+008F U+0090 U+0091 U+0092 U+0093 U+0094
+                          U+0095 U+0096 U+0097 U+0098 U+0099 U+009A U+009B
+                          U+009C U+009D U+009E U+009F U+0085;
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.char.xml11.c1.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.1"?>
+          <p>$u007F$u0080$u0081$u0082$u0083$u0084$u0086$u0087$u0088$
+          $u0089$u008A$u008B$u008C$
+          $u008D$u008E$u008F$u0090$u0091$u0092$u0093$u0094$u0095$u0096$
+          $u0097$u0098$u0099$u009A$u009B$u009C$u009D$u009E$u009F$u0085</p>
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 4); } /* U+007F */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 5); } /* U+0080 */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 6); } /* U+0081 */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 7); } /* U+0082 */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 8); } /* U+0083 */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 9); } /* U+0084 */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 10); } /* U+0086 */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 11); } /* U+0087 */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 12); } /* U+0088 */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 13); } /* U+0089 */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 14); } /* U+008A */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 15); } /* U+008B */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 16); } /* U+008C */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 17); } /* U+008D */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 18); } /* U+008E */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 19); } /* U+008F */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 20); } /* U+0090 */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 21); } /* U+0091 */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 22); } /* U+0092 */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 23); } /* U+0093 */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 24); } /* U+0094 */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 25); } /* U+0095 */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 26); } /* U+0096 */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 27); } /* U+0097 */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 28); } /* U+0098 */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 29); } /* U+0099 */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 30); } /* U+009A */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 31); } /* U+009B */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 32); } /* U+009C */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 33); } /* U+009D */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 34); } /* U+009E */
+      @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 35); } /* U+009F */
+
+    @@XMLTest:
       @@@QName: xp.syntax.empty.test
       @@@DEnt:
         @@@@test:value: \
@@ -3929,6 +4092,239 @@ _
             text-content: '';
           }
         }
+    @@XMLTest:
+      @@@QName: xp.root.s.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0"?>$u0020$u000D$u000A$u0009
+          <p></p>
+      @@@test:domTree:
+        document {
+          element { }
+        }
+
+    @@XMLTest:
+      @@@QName: xp.Name.1.test
+      @@@DEnt:
+        @@@@test:value: <name/>
+      @@@test:domTree:
+        document {
+          element {
+            node-name: 'name';
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.Name.2.test
+      @@@DEnt:
+        @@@@test:value: <name0/>
+      @@@test:domTree:
+        document {
+          element {
+            node-name: 'name0';
+          }
+        }
+    @@enImplNote:
+      @@@ddid: xml11name
+      @@@@:
+        {TODO:: XML 1.1 Name tests required
+        }
+
+    @@XMLTest:
+      @@@QName: xp.content.mse.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <p>]]></p>
+      @@@c:erred:
+        <[[xp|wf-syntax-error]]> { (1, 4)..(1, 6); }
+    @@XMLTest:
+      @@@QName: xp.content.mse.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <p>aaa]]>bbb</p>
+      @@@c:erred:
+        <[[xp|wf-syntax-error]]> { (1, 7)..(1, 9); }
+
+    @@XMLTest:
+      @@@QName: xp.root.comment.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <!--comment data-->
+          <p/>
+      @@@test:domTree:
+        document {
+          comment {
+            data: 'comment data';
+          }
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.root.comment.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <!---->
+          <p/>
+      @@@test:domTree:
+        document {
+          comment {
+            data: '';
+          }
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.root.after.pi.comment.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <?pi?>
+          <!--comment data-->
+          <p/>
+      @@@test:domTree:
+        document {
+          pi { }
+          comment {
+            data: 'comment data';
+          }
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.root.after.pi.comment.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <?pi?>
+          <!---->
+          <p/>
+      @@@test:domTree:
+        document {
+          pi { }
+          comment {
+            data: '';
+          }
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.root.after.element.comment.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <p/>
+          <!--comment data-->
+      @@@test:domTree:
+        document {
+          element { }
+          comment {
+            data: 'comment data';
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.root.after.element.comment.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <p/>
+          <!---->
+      @@@test:domTree:
+        document {
+          element { }
+          comment {
+            data: '';
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.doctype.intsubset.comment.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+          <!--comment data-->
+          ]>
+          <p/>
+      @@@test:domTree:
+        document {
+          document-type { }
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.doctype.intsubset.comment.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+          <!---->
+          ]>
+          <p/>
+      @@@test:domTree:
+        document {
+          document-type { }
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.doctype.intsubset.comment.3.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+          <?pi?>
+          <!---->
+          ]>
+          <p/>
+      @@@test:domTree:
+        document {
+          document-type {
+            pi { }
+          }
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.content.comment.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <p><!--comment data--></p>
+      @@@test:domTree:
+        document {
+          element {
+            comment {
+              data: 'comment data';
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.content.comment.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <p><!----></p>
+      @@@test:domTree:
+        document {
+          element {
+            comment {
+              data: '';
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.content.comment.3.test
+      @@@DEnt:
+        @@@@test:value:
+          <p>aaaaa<!---->bbbbb</p>
+      @@@test:domTree:
+        document {
+          element {
+            text {
+              data: 'aaaaa';
+            }
+            comment {
+              data: '';
+            }
+            text {
+              data: 'bbbbb';
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.content.comment.--.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <p><!--data--data--></p>
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (1, 12)..(1, 17); }
+    @@XMLTest:
+      @@@QName: xp.content.comment.---gt.test
+      @@@DEnt:
+        @@@@test:value:
+          <p><!--data---></p>
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (1, 12)..(1, 15); }
 
     @@XMLTest:
       @@@QName: xp.xmldecl.version.1.0.test
@@ -4545,6 +4941,114 @@ _
         <[[xp:wf-syntax-error]]> { (1, 3)..(1, 3); }
 
     @@XMLTest:
+      @@@QName: xp.cdatasection.empty.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <p><![CDATA[]]></p>
+      @@@test:domTree:
+        document {
+          element {
+            cdata-section {
+              data: '';
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.cdatasection.empty.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <p>aa<![CDATA[]]>bb</p>
+      @@@test:domTree:
+        document {
+          element {
+            text { data: 'aa'; }
+            cdata-section {
+              data: '';
+            }
+            text { data: 'bb'; }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.cdatasection.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <p><![CDATA[abcdefg]]></p>
+      @@@test:domTree:
+        document {
+          element {
+            cdata-section {
+              data: 'abcdefg';
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.cdatasection.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <p>aa<![CDATA[abcdefg]]>bb</p>
+      @@@test:domTree:
+        document {
+          element {
+            text { data: 'aa'; }
+            cdata-section {
+              data: 'abcdefg';
+            }
+            text { data: 'bb'; }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.cdatasection.ref.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <p><![CDATA[a&amp;&#x32;&#32;%abc;&def;]]&gt;b]]></p>
+      @@@test:domTree:
+        document {
+          element {
+            cdata-section {
+              data: 'a&amp;&#x32;&#32;%abc;&def;]]&gt;b';
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.cdatasection.in.general.entity.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE p [
+            <!ENTITY cdata "<![CDATA[text]]>">
+          ]>
+          <p>&cdata;</p>
+      @@@test:domTree:
+        document {
+          document-type {
+            general-entity {
+              node-name: 'cdata';
+              cdata-section {
+                data: 'text';
+              }
+            }
+          }
+          element {
+            general-entity-reference {
+              cdata-section {
+                data: 'text';
+              }
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.cdatasection.no.mse.test
+      @@@DEnt:
+        @@@@test:value:
+          <p><![CDATA[text</p>
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (1, 21); }
+    @@XMLTest:
+      @@@QName: xp.cdatasection.nest.test
+      @@@DEnt:
+        @@@@test:value:
+          <p><![CDATA[text01<![CDATA[txt2]]>text3]]></p>
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (1, 40)..(1, 42); }
+
+    @@XMLTest:
       @@@QName: xp.doctype.empty.test
       @@@DEnt:
         @@@@test:value:
@@ -4565,6 +5069,39 @@ _
             text-content: '';
           }
         }
+    @@XMLTest:
+      @@@QName: xp.doctype.empty.after.document.element.test
+      @@@DEnt:
+        @@@@test:value:
+          <a></a>
+          <!DOCTYPE a>
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (2, 1)..(2, 12); }
+    @@XMLTest:
+      @@@QName: xp.doctype.empty.in.element.test
+      @@@DEnt:
+        @@@@test:value:
+          <a>
+          <!DOCTYPE a>
+          </a>
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (2, 1)..(2, 12); }
+    @@XMLTest:
+      @@@QName: xp.doctype.empty.dup.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a>
+          <!DOCTYPE a>
+          <a></a>
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (2, 1)..(2, 12); }
+    @@XMLTest:
+      @@@QName: xp.doctype.empty.in.intsubset.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+          <!DOCTYPE a>
+          ]>
+          <a></a>
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (2, 1)..(2, 12); }
+        
 
     @@XMLTest:
       @@@QName: xp.doctype.intsubset.empty.test
@@ -5590,8 +6127,8 @@ _
 	  if ($test_data->{dom_error}->{$err_type}) {
             $test->assert_error_equals
                      (actual_value => $err,
-                      expected_hash => pop @{$test_data->{dom_error}
-                                                       ->{$err_type}});
+                      expected_hash => shift @{$test_data->{dom_error}
+                                                         ->{$err_type}});
           } else { # Uncatched error
             warn $err;
             unless ($err->severity == <C::c|DOMError.SEVERITY_WARNING>) {
@@ -5699,6 +6236,7 @@ ResourceDef:
     my $__d = $token->{type} ne '#EOF'
                 ? $token->{location}->{char_d}
                 : 0;
+    $__d -= $token->{location_d} if $token->{location_d};
     $result = {
       utf32_offset => $token->{location}->{pos} - $__d,
       line_number => $token->{location}->{line},

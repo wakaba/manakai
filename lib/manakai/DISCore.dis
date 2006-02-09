@@ -19,7 +19,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/11/13 04:45:09 $
+      $Date: 2006/02/09 10:23:21 $
     @@ContentType:
       dis:Date.RCS
   
@@ -595,6 +595,27 @@ LexTypeDef:
 ResourceDef:
   @QName: dis|String
   @AliasFor: DISCore|String
+
+LexTypeDef:
+  @QName: DISCore|UString
+  @enFN: String with $u-escapes
+  @enDesc:
+    A <Q::DISCore|UString> is a string that can be contain
+    <CODE::$u>-escapes.
+
+      u-escape := '$u' 4HEXDIGIT / '$U' 8HEXDIGIT
+
+    A <CODE::u-escape> is semantically equals to a character in Perl.
+
+      soft-line-break := '$' [U+000D] U+000A
+
+    Any <CODE::soft-line-break> is semantically ignored.
+
+    Any '$' at the end of a <Q::DISCore|UString> is semantically ignored.
+
+    Meaning of any other '$' is undefined.
+  @rdfs:subClassOf: DISCore|String
+  @subsetOf: DISCore|String
 
 LexTypeDef:
   @QName: DISCore|Text

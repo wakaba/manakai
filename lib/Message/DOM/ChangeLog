@@ -1,3 +1,16 @@
+2006-02-09  Wakaba  <wakaba@suika.fam.cx>
+
+	* XMLParser.dis (CommentDeclaration): |STRING| is now
+	defined as a |?default-token|.
+	(XMLTests): Tests for |Char - RestrictedChar| matchness,
+	comment declarations, cdata sections, and |MSE| in |content|
+	added.
+	(XMLTests/PerlDef): Bug fixed: |pop| -> |shift|.
+	(get-location-from-token): |$token->{location_d}| 
+	for |?default-token| column counting support added.
+
+	* DOMCore.dis (c:erred): It is now a |DISCore:OrderedList| property.
+
 2006-02-08  Wakaba  <wakaba@suika.fam.cx>
 
 	* Tree.dis (createProcessingInstruction): Don't

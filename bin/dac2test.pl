@@ -366,8 +366,10 @@ for (@{$Opt{create_module}}) {
       ? (open $output, '>', $out_file_path or die "$0: $out_file_path: $!")
       : ($output = \*STDOUT);
 
+  my $cfg = $pl->owner_document->dom_config;
+  $cfg->set_parameter (ExpandedURI q<pc:preserve-line-break> => 1);
   if ($Opt{output_line}) {
-    $pl->owner_document->dom_config->set_parameter (ExpandedURI q<pc:line> => 1);
+    $cfg->set_parameter (ExpandedURI q<pc:line> => 1);
   }
   
   status_msg_ sprintf qq<Writing Perl test script %s...>,
@@ -435,4 +437,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2006/02/08 08:18:29 $
+1; # $Date: 2006/02/09 10:23:19 $

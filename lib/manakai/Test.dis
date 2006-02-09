@@ -7,7 +7,7 @@ Module:
 
   @DISCore:author: DISCore|Wakaba
   @Date:
-    $Date: 2006/02/08 08:18:31 $
+    $Date: 2006/02/09 10:23:21 $
   @License: license|Perl+MPL
   
   @DefaultFor: ManakaiDOM|all
@@ -168,7 +168,7 @@ RPropDef:
 RPropDef:
   @QName: test|value
   @enFN: Entity value
-  @dataType: test|EntityValueString
+  @dataType: DISCore|UString
   @multipleProperties: DISCore|Single
 
 ElementTypeBinding:
@@ -177,16 +177,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISCore|LexicalType
-
-LexTypeDef:
-  @QName: test|EntityValueString
-  @enFN: Test entity value string
-  @enDesc:
-    A string, with <CODE::'$' 1*HEXDIGIT ';'> replaced by a
-    Perl character with that code and <CODE::$$> replaced by a
-    <CHAR::DOLLER SIGN>.
-  @rdfs:subClassOf: DISCore|String
-  @subsetOf: DISCore|String
 
 LexTypeDef:
   @QName: lang|tdt

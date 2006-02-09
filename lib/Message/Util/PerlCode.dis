@@ -25,7 +25,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2006/02/08 16:37:35 $
+      $Date: 2006/02/09 10:23:20 $
     @@ContentType:
       dis:Date.RCS
   
@@ -2072,6 +2072,13 @@ ElementTypeBinding:
     @@rdf:type: test|StandaloneTest
     @@ForCheck: ManakaiDOM|ForClass
 
+ElementTypeBinding:
+  @Name: TestC
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: test|StandaloneTest
+
 XParamDef:
   @QName: parentNode
   @enDesc:
@@ -2217,7 +2224,20 @@ IFClsETDef:
           __DEEP{
             $r = $self-><AG::Node.textContent>;
             $r =~ s/(['\\])/\\$1/g;
-            $r = q<'> . $r . q<'>;
+            $r =~ s/([^\x0A\x0D\x20-\x7E])/sprintf '\x{%X}', ord $1/ge;
+            if ($self-><AG::Node.ownerDocument>
+                     -><AG::Document.domConfig>
+                     -><M::DOMCore:DOMConfiguration.getParameter>
+                          (<Q::pc:preserve-line-break>)) {
+              $r =~ s/\x0D/\\x0D/gs;
+              $r =~ s/\x0A/\\x0A/gs;
+              $r =~ s/\@/\\\@/g;
+              $r =~ s/\$/\\\$/g;
+              $r =~ s/"/\\"/g;
+              $r = q<"> . $r . q<">;
+            } else {
+              $r = q<'> . $r . q<'>;
+            }
           }__;
 ##PerlStringLiteral
 
@@ -4311,7 +4331,95 @@ boolCParam:
     @@DOMCore:isSupported:1
     @@IsSupportRequired:1
     @@IsDefault:1
+    @@enDesc:
       Does not insert any <Perl::#line> directive.
+
+boolCParam:
+  @QName: pc|preserve-line-break
+  @nodeProp: plb
+  @DOMCore:targetType: DOMCore|Document
+  @IsSupportRequired:1
+  @TrueCase:
+    @@DOMCore:isSupported:1
+    @@enDesc:
+      When stringifying a <IF::PerlStringLiteral>, if it contains
+      <CODE::U+000A> and / or <CODE::U+000D> characters, then
+      they are escaped (e.g. <Perl::\x0A>).
+    @@TestC:
+      @@@QName: cfg.preserve-line-break.true.test
+      @@@PerlCDef:
+        my $doc;
+        __CODE{createPCDocumentForTest:: $doc => $doc}__;
+
+        my $cfg = $doc-><AG::Document.domConfig>;
+        $cfg-><M::CFG.setParameter> (<Q::pc|preserve-line-break> => true);
+        
+        $test->id ('crlf');
+        my $sl = $doc-><M::PCDocument.createPCLiteral> ("ab\x0D\x0Acd");
+        my $str = $sl->stringify;
+        $test->assert_equals ($str, q<"ab\x0D\x0Acd">);
+        
+        $test->id ('lf');
+        my $sl2 = $doc-><M::PCDocument.createPCLiteral> ("ab\x0Acd");
+        my $str2 = $sl2->stringify;
+        $test->assert_equals ($str2, q<"ab\x0Acd">);
+  @FalseCase:
+    @@DOMCore:isSupported:1
+    @@IsSupportRequired:1
+    @@IsDefault:1
+    @@enDesc:
+      Line break characters are stringified as is.
+    @@TestC:
+      @@@QName: cfg.preserve-line-break.false.test
+      @@@PerlCDef:
+        my $doc;
+        __CODE{createPCDocumentForTest:: $doc => $doc}__;
+
+        my $cfg = $doc-><AG::Document.domConfig>;
+        $cfg-><M::CFG.setParameter> (<Q::pc|preserve-line-break> => false);
+        
+        $test->id ('crlf');
+        my $sl = $doc-><M::PCDocument.createPCLiteral> ("ab\x0D\x0Acd");
+        my $str = $sl->stringify;
+        $test->assert_equals ($str, q<'ab>.qq<\x0D\x0A>.q<cd'>);
+        
+        $test->id ('lf');
+        my $sl2 = $doc-><M::PCDocument.createPCLiteral> ("ab\x0Acd");
+        my $str2 = $sl2->stringify;
+        $test->assert_equals ($str2, q<'ab>.qq<\x0A>.q<cd'>);
+  @TestC:
+    @@QName: cfg.preserve-line-break.set.test
+    @@PerlCDef:
+      my $doc;
+      __CODE{createPCDocumentForTest:: $doc => $doc}__;
+
+      my $cfg = $doc-><AG::Document.domConfig>;
+
+      $test->id ('default');
+      $test->assert_false ($cfg-><M::CFG.getParameter>
+                                   (<Q::pc|preserve-line-break>));
+
+      $test->id ('set.f.to.t');
+      $cfg-><M::CFG.setParameter> (<Q::pc|preserve-line-break> => true);
+      $test->assert_true ($cfg-><M::CFG.getParameter>
+                                   (<Q::pc|preserve-line-break>));
+
+      $test->id ('set.t.to.f');
+      $cfg-><M::CFG.setParameter> (<Q::pc|preserve-line-break> => false);
+      $test->assert_false ($cfg-><M::CFG.getParameter>
+                                   (<Q::pc|preserve-line-break>));
+
+      $cfg-><M::CFG.setParameter> (<Q::pc|preserve-line-break> => true);
+
+      $test->id ('reset');
+      $cfg-><M::CFG.setParameter> (<Q::pc|preserve-line-break> => null);
+      $test->assert_false ($cfg-><M::CFG.getParameter>
+                                   (<Q::pc|preserve-line-break>));
+
+ResourceDef:
+  @QName: CFG
+  @AliasFor: DOMCore|DOMConfiguration
+  @For: ManakaiDOM|DOM3
 
 CParam:
   @QName: pc|split-resolver

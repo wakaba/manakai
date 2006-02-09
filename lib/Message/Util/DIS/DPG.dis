@@ -15,7 +15,7 @@ Module:
   @License: license|Perl+MPL
 
   @Date:
-    $Date: 2006/02/08 16:37:36 $
+    $Date: 2006/02/09 10:23:20 $
   
   @Require:
     @@Module:
@@ -1008,9 +1008,19 @@ IFClsETDef:
                                 $_-><M::pc|PerlCodeUnits.appendBare>
                                       ('{token}');
                               }
+                              my $ld = $factory
+                                         -><M::pc|PCDocument.createPCExpression>
+                                             ('+');
+                              $ld-><M::pc|PerlCodeUnits.appendAtom> (0);
+                              $ld-><M::pc|PerlCodeUnits.appendNewPCVariable>
+                                     ('@', null, 'dch');
                               $_-><M::pc|PerlCodeUnits.appendNewPCLiteral> ({
                                        type => $dfa->{$state_name}->{accept},
                                        %value,
+                                       location => $factory
+                                            -><M::pc|PCDocument.createPCVariable>
+                                                ('$', null, 'location'),
+                                       location_d => $ld,
                                      });
                             }
 
@@ -1121,8 +1131,18 @@ IFClsETDef:
                                   $_-><M::pc|PerlCodeUnits.appendBare>
                                         ('{token}');
                                 }
+                                my $ld = $factory
+                                         -><M::pc|PCDocument.createPCExpression>
+                                             ('+');
+                                $ld-><M::pc|PerlCodeUnits.appendAtom> (0);
+                                $ld-><M::pc|PerlCodeUnits.appendNewPCVariable>
+                                     ('@', null, 'dch');
                                 $_-><M::pc|PerlCodeUnits.appendNewPCLiteral> ({
                                          type => '#EOF',
+                                         location => $factory
+                                            -><M::pc|PCDocument.createPCVariable>
+                                                ('$', null, 'location'),
+                                         location_d => $ld,
                                        });
                               }
   

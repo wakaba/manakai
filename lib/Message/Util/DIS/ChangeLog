@@ -1,3 +1,10 @@
+2006-02-09  Wakaba  <wakaba@suika.fam.cx>
+
+	* Test.dis (printComment): Escapes non-ASCII-printable characters.
+
+	* DPG.dis (state_to_code): Adds set-|$token->{location_d}|-code
+	to adjast column number when |@dch| is in use.
+
 2006-02-08  Wakaba  <wakaba@suika.fam.cx>
 
 	* DPG.dis (state_to_code): An |unshift|-overread-character

@@ -23,7 +23,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2006/02/08 08:18:29 $
+      $Date: 2006/02/09 10:23:19 $
     @@ContentType:
       dis:Date.RCS
   
@@ -4487,11 +4487,33 @@ IFClsDef:
                     }
                     __CODE{dv|createValue::
                       $value => $v,
-                      $base_type => {$base_type = <Q::DISCore:String>},
+                      $base_type => {$base_type = <Q::DISCore:Integer>},
                       $type => $new_value_type,
                       $result => $new_value,
                       $name => $prop_uri,
                     }__;
+                  } elsif ($el-><M::DISElement.mediaTypeMatch>
+                                     (<Q::DISCore:UString>,
+                                      $mtopt{default_media_type}, %mtopt)) {
+                    my $v = $el-><M::SWCFGNode.value>;
+                    $v =~ s/\$\x0D?\x0A//gs;
+                    $v =~ s/\$\z//;
+                    warn 'String |'.$el-><M::SWCFGNode.value>.'| contains '.
+                         'illegal |$| character' if $v =~ /\$(?![uU])/;
+                      ## TODO: Use error-handler
+                    $v =~ s{\$(u[0-9A-Fa-f]{4}|U[0-9A-Fa-f]{8})}{
+                      chr hex substr $1, 1
+                    }ge;
+                    __CODE{dv|createValue::
+                      $value => $v,
+                      $base_type => {$base_type = <Q::DISCore:String>},
+                      $type => {<Q::DISCore:String>},
+                      $result => $new_value,
+                      $name => $prop_uri,
+                    }__;
+                    ## NOTE: Since |type| is set to |DISCore:String|,
+                    ##       what subtype of |DISCore:UString| it was originally
+                    ##       is not preserved.
                   } else {
                     __CODE{dv|createValue::
                       $value => {$el-><M::SWCFGNode.value>},
