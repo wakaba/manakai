@@ -10,7 +10,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/02/09 10:23:19 $
+    $Date: 2006/02/10 08:10:26 $
 
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
@@ -372,10 +372,26 @@ ClsDef:
                   $self->{entity}->[-1]->{column} = 1;
                 } elsif ($next_char eq "\x85") {
                   if ($self->{xml_version} eq '1.1') {
+                    if ($self->{entity}->[-1]->{no_xml11_eol}) {
+                      my $location = {
+                        utf32_offset => $self->{entity}->[-1]->{pos} - 1,
+                        line_number => $self->{entity}->[-1]->{line},
+                        column_number => $self->{entity}->[-1]->{column},
+                      };
+                      my $continue = __DOMCore:ERROR{
+                      xp|fatal-xml11-end-of-line-in-xml-declaration::
+                        DOMCore|location => {$location},
+                        xp|character-number => {$r},
+                      }__;
+                      unless ($continue) {
+                        __EXCEPTION{DOMLS|PARSE_ERR}__;
+                      }
+                    } # no_xml11_eol
                     $self->{entity}->[-1]->{pos}++; 
                     $self->{entity}->[-1]->{line}++;
                     $self->{entity}->[-1]->{column} = 1;
                   } else {
+                    ## |no_xml11_eol| will be tested later.
                     $self->{entity}->[-1]->{column}++;
                     ## Line number will be increased by next |shiftChar| call.
                   }
@@ -408,6 +424,21 @@ ClsDef:
                 $self->{has_error} = true;
                 $self->{entity}->[-1]->{column}++;
               } elsif ($r == 0x0085 or $r == 0x2028) {
+                if ($self->{entity}->[-1]->{no_xml11_eol}) {
+                  my $location = {
+                    utf32_offset => $self->{entity}->[-1]->{pos} - 1,
+                    line_number => $self->{entity}->[-1]->{line},
+                    column_number => $self->{entity}->[-1]->{column},
+                  };
+                  my $continue = __DOMCore:ERROR{
+                  xp|fatal-xml11-end-of-line-in-xml-declaration::
+                    DOMCore|location => {$location},
+                    xp|character-number => {$r},
+                  }__;
+                  unless ($continue) {
+                    __EXCEPTION{DOMLS|PARSE_ERR}__;
+                  }
+                } # no_xml11_eol
                 $r = 0x000A if $self->{xml_version} eq '1.1';
                 ## Even in XML 1.0 it increases the line number.
                 $self->{entity}->[-1]->{line}++;
@@ -473,7 +504,7 @@ ClsDef:
       /*
         prolog := XMLDecl? *Misc [doctypedecl *Misc]  ;; [22]
       */
-      ?lexmode 'DocumentStart';
+      ?lexmode DocumentStart;
 
       my $doc;
       lang:Perl {
@@ -481,12 +512,47 @@ ClsDef:
       }
       
       ~? (XDO) {
-        &_XMLDeclaration_ ($doc => $doc);
-        
-        ~ (PIC) {
-          ?lexmode DocumentProlog;
+        ?lexmode XMLDeclarationOrPI;
+        lang:Perl {
+          $self->{entity}->[-1]->{no_xml11_eol} = true;
+        }
+        ~ (S) {        // XML declaration
+          &_XMLDeclaration_ ($doc => $doc);
+          ~ (PIC2) {
+            ?lexmode DocumentProlog;
+          } else {
+            ?lexmode DocumentProlog;
+          }
+        } (NameChar) {  // Processing instruction whose target begins with |xml|
+          my $target_token;
+          lang:Perl ($v => $token.value) {
+            $target_token = $token;
+            $target_token->{value} = 'xml'.$target_token->{value};
+            $self->{entity}->[-1]->{no_xml11_eol} = false;
+          }
+          ?lexmode PINmtoken;
+          ~? (Nmtoken) {
+            lang:Perl ($v => $token.value) {
+              $target_token->{value} .= $v;
+            }
+            ?lexmode PIName;
+          }
+          lang:Perl {
+            $target_token->{type} = 'Name';
+            $target_token->{location_d} += 3; # 'xml'
+            unshift @{$self->{token}}, $token;
+            $token = $target_token;
+          }
+          &_ProcessingInstruction_ ($doc => $doc, $parent => $doc);
+          ~ (PIC) {
+            ?lexmode DocumentProlog;
+          } else {
+            ?lexmode DocumentProlog;
+          }
         } else {
-          ?lexmode DocumentProlog;
+          lang:Perl {
+            $self->{entity}->[-1]->{no_xml11_eol} = false;
+          }
         }
       } else {
         ?lexmode 'DocumentProlog';
@@ -626,11 +692,13 @@ ClsDef:
       NOTE: XML declaration is optional in XML 1.0
             while it is required in XML 1.1.
     */
-    rule _XMLDeclaration_ ($doc) {
-      ?lexmode XMLDeclaration;
-
+    rule _XMLDeclaration_ {
       // ~ (XDO) { }
-      // ~ (S) { }
+      ?lexmode XMLDeclaration;
+      //lang:Perl {
+      //  $self->{entity}->[-1]->{no_xml11_eol} = true;
+      //}
+      //~ (S) { }
 
       ~ (Name == 'version') {
         ~? (S) { }
@@ -677,7 +745,7 @@ ClsDef:
             }__;
             my $continue = __DOMCore:ERROR{xp|wf-unsupported-xml-version::
               DOMCore|location => {$location},
-              xp|parent => {$doc},
+              xp|parent => {$self->{doc}},
               infoset|version => {$ver},
               xp|error-token => {$bad_token},
             }__;
@@ -686,7 +754,7 @@ ClsDef:
             }
             $self->{has_error} = true;
           }
-          $doc-><AS::Document.xmlVersion> ($ver);
+          $self->{doc}-><AS::Document.xmlVersion> ($ver);
           $self->{xml_version} = $ver;
         }
 
@@ -738,7 +806,7 @@ ClsDef:
             }__;
             my $continue = __DOMCore:ERROR{xp|wf-malformed-enc-name::
               DOMCore|location => {$location},
-              xp|parent => {$doc},
+              xp|parent => {$self->{doc}},
               xp|name => {$ver},
               xp|error-token => {$bad_token},
             }__;
@@ -747,7 +815,7 @@ ClsDef:
             }
             $self->{has_error} = true;
           }
-          $doc-><AS::Document.xmlEncoding> ($ver);
+          $self->{doc}-><AS::Document.xmlEncoding> ($ver);
         }
 
         ~? (S) { }
@@ -798,7 +866,7 @@ ClsDef:
             }__;
             my $continue = __DOMCore:ERROR{xp|wf-malformed-xml-standalone::
               DOMCore|location => {$location},
-              xp|parent => {$doc},
+              xp|parent => {$self->{doc}},
               xp|name => {$ver},
               xp|error-token => {$bad_token},
             }__;
@@ -808,7 +876,7 @@ ClsDef:
             $self->{has_error} = true;
           }
           if ($ver eq 'yes') {
-            $doc-><AS::Document.xmlStandalone> (true);
+            $self->{doc}-><AS::Document.xmlStandalone> (true);
             $self->{standalone} = true;
           }
         }
@@ -816,7 +884,17 @@ ClsDef:
         ~? (S) { }
       }
 
-      // ~ (PIC) { }
+      ~ (PIC1) {
+        lang:Perl {
+          $self->{entity}->[-1]->{no_xml11_eol} = false;
+        }
+      } else {
+        lang:Perl {
+          $self->{entity}->[-1]->{no_xml11_eol} = false;
+        }
+      }
+
+      // ~ (PIC2) { }
     } // _XMLDeclaration_
     
     /*
@@ -3393,19 +3471,18 @@ ClsDef:
       */
       MDO := ['<'] ['!'];
     } // DocumentProlog
-    
+
     /*
-      Document start scanning mode
+      Document Start Scanning Mode
     */
     lexmode DocumentStart
-      : initial
       : standalone
       : extends => 'DocumentProlog'
     {
       /*
         XML declaration
       */
-      XDO := ['<'] ['?'] ['x'] ['m'] ['l'] $s+;
+      XDO := ['<'] ['?'] ['x'] ['m'] ['l'];
     } // DocumentStart
     
     /*
@@ -3438,6 +3515,20 @@ ClsDef:
       */
       PIC := ['?'] ['>'];
     } // PIName
+    
+    /*
+      Processing instruction name and |S| scanning mode
+    */
+    lexmode PINmtoken
+      : standalone
+      : extends => 'Nmtoken'
+      : extends => 'S'
+    {
+      /*
+        Processing instruction close
+      */
+      PIC := ['?'] ['>'];
+    } // PINmtoken
     
     /*
       Processing instruction data scanning mode
@@ -3576,6 +3667,9 @@ ClsDef:
       REFC := [';'];
     } // HexadecimalCharacterReference
     
+    /*
+      The XML Declaration and Text Declaration Scanning Mode
+    */
     lexmode XMLDeclaration
       : standalone
       : extends => 'Name'
@@ -3595,9 +3689,32 @@ ClsDef:
       
       /*
         Processing instruction close
+
+          The |PIC|, i.e. |?>|, is split into two tokens |PIC1| and |PIC2|
+          in this scanning mode to set |no_xml11_eol| flag in the
+          |_XMLDeclaration_| |rule|.
       */
-      PIC := ['?'] ['>'];
+      PIC1 := ['?'];
+      PIC2 := ['>'];
     } // XMLDeclaration
+
+    /*
+      The XML Declaration or Processing Instruction Scanning Mode
+
+           '<?xml'               S                 ...
+        (DocumentStart) (XMLDeclarationOrPI) (XMLDeclaration)
+           '<?xml'              '1'                S                ...
+        (DocumentStart) (XMLDeclarationOrPI) (PINmtoken)(PIName) (PITarget)
+           '<?xml'              '-'         'stylesheet'    S       ...
+        (DocumentStart) (XMLDeclarationOrPI) (PINmtoken) (PIName) (PITarget)
+    */
+    lexmode XMLDeclarationOrPI
+      : standalone
+      : extends => 'NameChar'
+      : extends => 'S'
+    {
+      NameChar : value := $NameChar11;
+    } // XMLDeclarationOrPI
     
     lexmode StartTag
       : standalone
@@ -4505,7 +4622,7 @@ ClsDef:
           <?xml?>
           <p></p>
       @@@c:erred:
-        <[[xp:wf-pi-target-is-xml]]> { (1, 1)..(1, 5); }
+        <[[xp:wf-syntax-error]]> { (1, 1)..(1, 7); }
     @@XMLTest:
       @@@QName: xp.xmldecl.s.no.attr.test
       @@@DEnt:
@@ -4775,6 +4892,24 @@ ClsDef:
       @@@DEnt:
         @@@@test:value:
           <?xml-declaration?>
+          <?xml?>
+          <p></p>
+      @@@c:erred:
+        <[[xp:wf-pi-target-is-xml]]> { (2, 1)..(2, 5); }
+    @@XMLTest:
+      @@@QName: xp.xmldecl.after.pi.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <?declaration?>
+          <?xml version="1.0"?>
+          <p></p>
+      @@@c:erred:
+        <[[xp:wf-pi-target-is-xml]]> { (2, 1)..(2, 5); }
+    @@XMLTest:
+      @@@QName: xp.xmldecl.after.pi.empty.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <?declaration?>
           <?xml?>
           <p></p>
       @@@c:erred:
@@ -5101,10 +5236,64 @@ ClsDef:
           ]>
           <a></a>
       @@@c:erred: <[[xp|wf-syntax-error]]> { (2, 1)..(2, 12); }
-        
+    @@XMLTest:
+      @@@QName: xp.doctype.no.s.no.name.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE>
+          <a></a>
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (1, 10); }
+    @@XMLTest:
+      @@@QName: xp.doctype.no.name.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE >
+          <a></a>
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (1, 11); }
+    @@XMLTest:
+      @@@QName: xp.doctype.name.s.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE aa   >
+          <aa></aa>
+      @@@test:domTree:
+        document {
+          document-type {
+            node-name: 'aa';
+          }
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.doctype.no.mdc.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE aa
+          <aa></aa>
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (2, 1); }
 
     @@XMLTest:
-      @@@QName: xp.doctype.intsubset.empty.test
+      @@@QName: xp.doctype.intsubset.empty.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a []>
+          <a></a>
+      @@@test:domTree:
+        document {
+          xml-version: '1.0';
+          xml-encoding: null;
+          xml-standalone: false;
+          document-type {
+            node-name: 'a';
+          }
+          element {
+            namespace-uri: null;
+            prefix: null;
+            local-name: 'a';
+            text-content: '';
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.doctype.intsubset.empty.2.test
       @@@DEnt:
         @@@@test:value:
           <!DOCTYPE a [
@@ -5125,6 +5314,614 @@ ClsDef:
             local-name: 'a';
             text-content: '';
           }
+        }
+    @@XMLTest:
+      @@@QName: xp.doctype.intsubset.empty.3.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a[]>
+          <a></a>
+      @@@test:domTree:
+        document {
+          document-type {
+            node-name: 'a';
+          }
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.doctype.intsubset.empty.4.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a[]  >
+          <a></a>
+      @@@test:domTree:
+        document {
+          document-type {
+            node-name: 'a';
+          }
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.doctype.intsubset.no.dsc.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [>
+          <a></a>
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (1, 14); }
+    @@XMLTest:
+      @@@QName: xp.doctype.intsubset.no.dsc.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+          <a></a>
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (2, 1); }
+    @@XMLTest:
+      @@@QName: xp.doctype.intsubset.no.dsc.3.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (1, 14); }
+    @@XMLTest:
+      @@@QName: xp.doctype.intsubset.no.mdc.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a []
+          <a/>
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (2, 1); }
+    @@XMLTest:
+      @@@QName: xp.doctype.intsubset.no.mdc.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a []]>
+          <a/>
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (1, 15); }
+
+    @@XMLTest:
+      @@@QName: xp.endofline.1.0.crlf.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0"?>
+          <p>aaa$u000D$u000Abbb</p>
+      @@@test:domTree:
+        document {
+          xml-version: '1.0';
+          element {
+            text-content: 'aaa' U+000A 'bbb';
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.endofline.1.1.crlf.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.1"?>
+          <p>aaa$u000D$u000Abbb</p>
+      @@@test:domTree:
+        document {
+          xml-version: '1.1';
+          element {
+            text-content: 'aaa' U+000A 'bbb';
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.endofline.1.0.crnl.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0"?>
+          <p>aaa$u000D$u0085bbb</p>
+      @@@test:domTree:
+        document {
+          xml-version: '1.0';
+          element {
+            text-content: 'aaa' U+000A U+0085 'bbb';
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.endofline.1.1.crnl.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.1"?>
+          <p>aaa$u000D$u0085bbb</p>
+      @@@test:domTree:
+        document {
+          xml-version: '1.1';
+          element {
+            text-content: 'aaa' U+000A 'bbb';
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.endofline.1.0.nl.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0"?>
+          <p>aaa$u0085bbb</p>
+      @@@test:domTree:
+        document {
+          xml-version: '1.0';
+          element {
+            text-content: 'aaa' U+0085 'bbb';
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.endofline.1.1.nl.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.1"?>
+          <p>aaa$u0085bbb</p>
+      @@@test:domTree:
+        document {
+          xml-version: '1.1';
+          element {
+            text-content: 'aaa' U+000A 'bbb';
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.endofline.1.0.ls.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0"?>
+          <p>aaa$u2028bbb</p>
+      @@@test:domTree:
+        document {
+          xml-version: '1.0';
+          element {
+            text-content: 'aaa' U+2028 'bbb';
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.endofline.1.1.ls.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.1"?>
+          <p>aaa$u2028bbb</p>
+      @@@test:domTree:
+        document {
+          xml-version: '1.1';
+          element {
+            text-content: 'aaa' U+000A 'bbb';
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.endofline.1.0.cr.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0"?>
+          <p>aaa$u000Dbbb</p>
+      @@@test:domTree:
+        document {
+          xml-version: '1.0';
+          element {
+            text-content: 'aaa' U+000A 'bbb';
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.endofline.1.1.cr.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.1"?>
+          <p>aaa$u000Dbbb</p>
+      @@@test:domTree:
+        document {
+          xml-version: '1.1';
+          element {
+            text-content: 'aaa' U+000A 'bbb';
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.endofline.1.0.lf.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0"?>
+          <p>aaa$u000Abbb</p>
+      @@@test:domTree:
+        document {
+          xml-version: '1.0';
+          element {
+            text-content: 'aaa' U+000A 'bbb';
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.endofline.1.1.lf.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.1"?>
+          <p>aaa$u000Abbb</p>
+      @@@test:domTree:
+        document {
+          xml-version: '1.1';
+          element {
+            text-content: 'aaa' U+000A 'bbb';
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.xml10.endofline.nl.in.xmldecl.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml$u0085version="1.0"?>
+          <p/>
+      @@@c:erred:
+        <[[xp|fatal-xml11-end-of-line-in-xml-declaration]]> { (1, 6)..(2, 0); }
+      @@@c:erred: <[[xp|wf-syntax-error]]> { }
+    @@XMLTest:
+      @@@QName: xp.xml11.endofline.nl.in.xmldecl.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml$u0085version="1.1"?>
+          (err)<p/>
+      @@@c:erred:
+        <[[xp|fatal-xml11-end-of-line-in-xml-declaration]]> { (1, 6)..(2, 0); }
+      @@@c:erred: <[[xp|wf-syntax-error]]> { }
+    @@XMLTest:
+      @@@QName: xp.xml10.endofline.crnl.in.xmldecl.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml$u000D$u0085version="1.0"?>
+          <p/>
+      @@@c:erred:
+        <[[xp|fatal-xml11-end-of-line-in-xml-declaration]]> { (1, 6)..(2, 0); }
+      @@@c:erred: <[[xp|wf-syntax-error]]> { }
+    @@XMLTest:
+      @@@QName: xp.xml11.endofline.crnl.in.xmldecl.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml$u000D$u0085version="1.1"?>
+          (err)<p/>
+      @@@c:erred:
+        <[[xp|fatal-xml11-end-of-line-in-xml-declaration]]> { (1, 6)..(2, 0); }
+      @@@c:erred: <[[xp|wf-syntax-error]]> { }
+    @@XMLTest:
+      @@@QName: xp.xml10.endofline.ls.in.xmldecl.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml$u2028version="1.0"?>
+          <p/>
+      @@@c:erred:
+        <[[xp|fatal-xml11-end-of-line-in-xml-declaration]]> { (1, 6)..(2, 0); }
+      @@@c:erred: <[[xp|wf-syntax-error]]> { }
+    @@XMLTest:
+      @@@QName: xp.xml11.endofline.ls.in.xmldecl.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml$u2028version="1.1"?>
+          (err)<p/>
+      @@@c:erred:
+        <[[xp|fatal-xml11-end-of-line-in-xml-declaration]]> { (1, 6)..(2, 0); }
+      @@@c:erred: <[[xp|wf-syntax-error]]> { }
+    @@XMLTest:
+      @@@QName: xp.xml10.endofline.nl.in.xmldecl.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0"$u0085?>
+          <p/>
+      @@@c:erred:
+        <[[xp|fatal-xml11-end-of-line-in-xml-declaration]]> { (1, 20)..(2, 0); }
+      @@@c:erred: <[[xp|wf-syntax-error]]> { }
+    @@XMLTest:
+      @@@QName: xp.xml11.endofline.nl.in.xmldecl.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.1"$u0085?>
+          (err)<p/>
+      @@@c:erred:
+        <[[xp|fatal-xml11-end-of-line-in-xml-declaration]]> { (1, 20)..(2, 0); }
+      @@@c:erred: <[[xp|wf-syntax-error]]> { }
+    @@XMLTest:
+      @@@QName: xp.xml10.endofline.crnl.in.xmldecl.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0"$u000D$u0085?>
+          <p/>
+      @@@c:erred:
+        <[[xp|fatal-xml11-end-of-line-in-xml-declaration]]> { (1, 20)..(2, 0); }
+      @@@c:erred: <[[xp|wf-syntax-error]]> { }
+    @@XMLTest:
+      @@@QName: xp.xml11.endofline.crnl.in.xmldecl.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.1"$u000D$u0085?>
+          (err)<p/>
+      @@@c:erred:
+        <[[xp|fatal-xml11-end-of-line-in-xml-declaration]]> { (1, 20)..(2, 0); }
+      @@@c:erred: <[[xp|wf-syntax-error]]> { }
+    @@XMLTest:
+      @@@QName: xp.xml10.endofline.ls.in.xmldecl.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0"$u2028?>
+          <p/>
+      @@@c:erred:
+        <[[xp|fatal-xml11-end-of-line-in-xml-declaration]]> { (1, 20)..(2, 0); }
+      @@@c:erred: <[[xp|wf-syntax-error]]> { }
+    @@XMLTest:
+      @@@QName: xp.xml11.endofline.ls.in.xmldecl.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.1"$u2028?>
+          (err)<p/>
+      @@@c:erred:
+        <[[xp|fatal-xml11-end-of-line-in-xml-declaration]]> { (1, 20)..(2, 0); }
+      @@@c:erred: <[[xp|wf-syntax-error]]> { }
+    @@XMLTest:
+      @@@QName: xp.xml10.endofline.nl.in.xmldecl.3.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml $u0085version="1.0"?>
+          <p/>
+      @@@c:erred:
+        <[[xp|fatal-xml11-end-of-line-in-xml-declaration]]> { (1, 7)..(2, 0); }
+      @@@c:erred: <[[xp|wf-syntax-error]]> { }
+    @@XMLTest:
+      @@@QName: xp.xml11.endofline.nl.in.xmldecl.3.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml $u0085version="1.1"?>
+          (err)<p/>
+      @@@c:erred:
+        <[[xp|fatal-xml11-end-of-line-in-xml-declaration]]> { (1, 7)..(2, 0); }
+      @@@c:erred: <[[xp|wf-syntax-error]]> { }
+    @@XMLTest:
+      @@@QName: xp.xml10.endofline.crnl.in.xmldecl.3.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml $u000D$u0085version="1.0"?>
+          <p/>
+      @@@c:erred:
+        <[[xp|fatal-xml11-end-of-line-in-xml-declaration]]> { (1, 7)..(2, 0); }
+      @@@c:erred: <[[xp|wf-syntax-error]]> { }
+    @@XMLTest:
+      @@@QName: xp.xml11.endofline.crnl.in.xmldecl.3.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml $u000D$u0085version="1.1"?>
+          (err)<p/>
+      @@@c:erred:
+        <[[xp|fatal-xml11-end-of-line-in-xml-declaration]]> { (1, 7)..(2, 0); }
+      @@@c:erred: <[[xp|wf-syntax-error]]> { }
+    @@XMLTest:
+      @@@QName: xp.xml10.endofline.ls.in.xmldecl.3.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml $u2028version="1.0"?>
+          <p/>
+      @@@c:erred:
+        <[[xp|fatal-xml11-end-of-line-in-xml-declaration]]> { (1, 7)..(2, 0); }
+      @@@c:erred: <[[xp|wf-syntax-error]]> { }
+    @@XMLTest:
+      @@@QName: xp.xml11.endofline.ls.in.xmldecl.3.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml $u2028version="1.1"?>
+          (err)<p/>
+      @@@c:erred:
+        <[[xp|fatal-xml11-end-of-line-in-xml-declaration]]> { (1, 7)..(2, 0); }
+      @@@c:erred: <[[xp|wf-syntax-error]]> { }
+    @@XMLTest:
+      @@@QName: xp.xml10implied.endofline.nl.in.pi.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml-$u0085?>
+          <p/>
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (1, 7)..(2, 0); }
+    @@XMLTest:
+      @@@QName: xp.xml10.endofline.nl.in.pi.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0"?>
+          <?xml-$u0085?>
+          <p/>
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (2, 7)..(3, 0); }
+    @@XMLTest:
+      @@@QName: xp.xml11.endofline.nl.in.pi.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.1"?>
+          <?xml-$u0085?>
+          <p/>
+      @@@test:domTree:
+        document {
+          xml-version: '1.1';
+          pi {
+            node-name: 'xml-';
+            node-value: '';
+          }
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.xml10implied.endofline.crnl.in.pi.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml-$u000D$u0085?>
+          <p/>
+      @@@test:domTree:
+        document {
+          xml-version: '1.0';
+          pi {
+            node-name: 'xml-';
+            node-value: U+0085;
+          }
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.xml10.endofline.crnl.in.pi.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0"?>
+          <?xml-$u000D$u0085?>
+          <p/>
+      @@@test:domTree:
+        document {
+          xml-version: '1.0';
+          pi {
+            node-name: 'xml-';
+            node-value: U+0085;
+          }
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.xml11.endofline.crnl.in.pi.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.1"?>
+          <?xml-$u000D$u0085?>
+          <p/>
+      @@@test:domTree:
+        document {
+          xml-version: '1.1';
+          pi {
+            node-name: 'xml-';
+            node-value: '';
+          }
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.xml10implied.endofline.ls.in.pi.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml-$u2028?>
+          <p/>
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (1, 7)..(2, 0); }
+    @@XMLTest:
+      @@@QName: xp.xml10.endofline.ls.in.pi.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0"?>
+          <?xml-$u2028?>
+          <p/>
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (2, 7)..(3, 0); }
+    @@XMLTest:
+      @@@QName: xp.xml11.endofline.ls.in.pi.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.1"?>
+          <?xml-$u2028?>
+          <p/>
+      @@@test:domTree:
+        document {
+          xml-version: '1.1';
+          pi {
+            node-name: 'xml-';
+            node-value: '';
+          }
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.noxmldecl.pi.pi.test
+      @@@DEnt:
+        @@@@test:value:
+          <?noxml 1?><?noxml 2?><p/>
+      @@@test:domTree:
+        document {
+          xml-version: '1.0';
+          pi {
+            node-name: 'noxml';
+            node-value: '1';
+          }
+          pi {
+            node-name: 'noxml';
+            node-value: '2';
+          }
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.noxmldecl.pi.pi.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xmlno 1?><?xmlno 2?><p/>
+      @@@test:domTree:
+        document {
+          xml-version: '1.0';
+          pi {
+            node-name: 'xmlno';
+            node-value: '1';
+          }
+          pi {
+            node-name: 'xmlno';
+            node-value: '2';
+          }
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.noxmldecl.pi.pi.3.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xmln 1?><?xmln 2?><p/>
+      @@@test:domTree:
+        document {
+          xml-version: '1.0';
+          pi {
+            node-name: 'xmln';
+            node-value: '1';
+          }
+          pi {
+            node-name: 'xmln';
+            node-value: '2';
+          }
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.noxml.s.nl.test
+      @@@DEnt:
+        @@@@test:value:
+          $u0085<p/>
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (1, 1)..(2, 0); }
+    @@XMLTest:
+      @@@QName: xp.noxml.s.crnl.test
+      @@@DEnt:
+        @@@@test:value:
+          $u000D$u0085<p/>
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (1, 1)..(2, 0); }
+    @@XMLTest:
+      @@@QName: xp.noxml.s.ls.test
+      @@@DEnt:
+        @@@@test:value:
+          $u2028<p/>
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (1, 1)..(2, 0); }
+    @@XMLTest:
+      @@@QName: xp.xml10.decl.s.nl.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0"?>$u0085<p/>
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (1, 22)..(2, 0); }
+    @@XMLTest:
+      @@@QName: xp.xml10.decl.s.crnl.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0"?>$u000D$u0085<p/>
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (2, 0)..(3, 0); }
+    @@XMLTest:
+      @@@QName: xp.xml10.decl.s.ls.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0"?>$u2028<p/>
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (1, 22)..(2, 0); }
+    @@XMLTest:
+      @@@QName: xp.xml11.decl.s.nl.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.1"?>$u0085<p/>
+      @@@test:domTree:
+        document {
+          xml-version: '1.1';
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.xml11.decl.s.crnl.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.1"?>$u000D$u0085<p/>
+      @@@test:domTree:
+        document {
+          xml-version: '1.1';
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.xml11.decl.s.ls.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.1"?>$u2028<p/>
+      @@@test:domTree:
+        document {
+          xml-version: '1.1';
+          element { }
         }
 
     @@XMLTest:
@@ -6287,6 +7084,15 @@ ElementTypeBinding:
     @@For: ManakaiDOM|DOM3
     @@ecore:textFormatter: ManakaiXMLParserExceptionFormatter
 
+ElementTypeBinding:
+  @Name: FatalErrDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DOMCore|DOMErrorType
+    @@For: ManakaiDOM|DOM3
+    @@ecore:textFormatter: ManakaiXMLParserExceptionFormatter
+
 WFErrDef:
   @QName: xp|wf-syntax-error
   @enDesc:
@@ -6462,6 +7268,21 @@ WFErrDef:
     @@enDesc:
       The parent node in which the character reference has
       occurred, if available.
+
+FatalErrDef:
+  @QName: xp|fatal-xml11-end-of-line-in-xml-declaration
+  @DOMCore:severity: DOMCore|SEVERITY_ERROR
+  @enDesc:
+    An end-of-line character <CODE::U+0085> or <CODE::U+2028> is appeared
+    within an XML declaration or text declaration.
+  @enMufDef:
+    End-of-line character %character-code-point
+    (v => {<Q::xp|character-number>}); cannot be used within the
+    XML or text declaration
+  @ecore:hasParameter:
+    @@@: xp|character-number
+    @@enDesc:
+      The code position of the end-of-line character.
 
 XWParam:
   @QName: xp|error-token
