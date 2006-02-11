@@ -41,7 +41,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date:
-    $Date: 2006/02/11 05:05:45 $
+    $Date: 2006/02/11 13:41:48 $
   
   @Require:
     @@Module:
@@ -2008,6 +2008,47 @@ NodeTypeDef:
         $test->assert_isa ($odt2, <IFName::d|DocumentTypeDefinition>);
         $test->assert_equals ($odt2, $dt);
 
+  @LXAttr:
+    @@Name: isExternallyDeclared
+    @@enDesc:
+      Whether the entity is declared by an external markup declaration,
+      i.e. a markup declaration occuring in the external subset or
+      in a parameter entity.
+    @@Type: idl|boolean||ManakaiDOM|all
+    @@TrueCase:
+      @@@enDesc:
+        If the entity is declared by an external markup declaration.
+    @@FalseCase:
+      @@@enDesc:
+        If the entity is declared by a markup declaration in
+        the internal subset, or if the <IF::x|Entity> node
+        is created in memory.
+    @@Get:
+      @@@disDef:
+        @@@@GetProp: ManakaiDOM|isExternallyDeclared
+    @@Set:
+      @@@disDef:
+        @@@@SetProp:
+          @@@@@@: ManakaiDOM|isExternallyDeclared
+          @@@@@CheckReadOnly: 1
+
+    @@LXTest:
+      @@@QName: Entity.isExternallyDeclared.test
+      @@@PerlDef:
+        my $et;
+        __CODE{d|newGeneralEntityForTest}__;
+
+        $test->id ('default');
+        $test->assert_false ($et-><AG::Entity.isExternallyDeclared>);
+
+        $test->id ('set.true');
+        $et-><AS::Entity.isExternallyDeclared> (true);
+        $test->assert_true ($et-><AG::Entity.isExternallyDeclared>);
+
+        $test->id ('set.false');
+        $et-><AS::Entity.isExternallyDeclared> (false);
+        $test->assert_false ($et-><AG::Entity.isExternallyDeclared>);
+
   @IntMethod:
     @@Name: newObject
     @@Description:
@@ -2120,6 +2161,9 @@ NodeTypeDef:
 ##Entity
 
 PropDef:
+  @QName: ManakaiDOM|isExternallyDeclared
+
+PropDef:
   @QName: x|hasReplacementTree
   @enDesc:
     Whether an entity node has its replacement tree or not.
@@ -2209,10 +2253,14 @@ NodeTypeDef:
     @@Get:
       @@@disDef:
         @@@@GetProp: ManakaiDOM|isExpanded
+    @@Set:
+      @@@disDef:
+        @@@@SetProp:
+          @@@@@@: ManakaiDOM|isExpanded
+          @@@@@CheckReadOnly: 1
     @@enImplNote:
       {ISSUE::
-        Should setter be provided?  Or, any node modification
-        should turn the flag on as <A::t|Attr.specified>?
+        Should subtree modifications turn the flag like <A::t|Attr.specified>?
       }
   
   @ReAttr:

@@ -17,7 +17,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/02/11 05:05:46 $
+    $Date: 2006/02/11 13:41:48 $
   
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
   
@@ -742,24 +742,6 @@ IFClsXDef:
       $test->assert_equals ($pi, $fc);
       $test->assert_string (actual_value => $pi-><AG::PI.target>,
                             expected_value => 'pitarget');
-
-  @Attr:
-    @@ForCheck: ManakaiDOM|ForClass
-    @@Name: nodeType
-    @@enDesc:
-      The type of the node.
-    @@Type: idl|unsignedShort||ManakaiDOM|all
-    @@dis:actualType: t|NodeType
-    @@Get:
-      @@@disDef:
-        @@@@DISLang:constValue: t|Node.DOCUMENT_TYPE_NODE
-    @@Test:
-      @@@PerlDef:
-        my $dtd;
-        __CODE{newDoctypeForTest}__;
-        $test->assert_num_equals
-                 (actual_value => $dtd-><AG::Node.nodeType>,
-                  expected_value => <C::Node.DOCUMENT_TYPE_NODE>);
 
   @Attr:
     @@ForCheck: ManakaiDOM|ForClass

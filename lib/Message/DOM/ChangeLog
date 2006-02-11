@@ -1,5 +1,19 @@
 2006-02-11  Wakaba  <wakaba@suika.fam.cx>
 
+	* XMLParser.dis: |xp:wf-entity-declared| well-formedness
+	constaraint for entity references that appear in
+	content of elements is implemented.   Set |EntityReference.isExpanded|
+	attribute.
+	(getEmptyEntityState): New code.
+
+	* XDoctype.dis (DocumentTypeDefinition.nodeType): Duplicate
+	definition is removed.
+
+	* DOMXML.dis (Entity.isExternallyDeclared): New attribute.
+	(EntityReference.isExpanded): Setter is added.
+
+2006-02-11  Wakaba  <wakaba@suika.fam.cx>
+
 	* XMLParser.dis: |xp:wf-no-lt-in-attribute-values|
 	and |xp:wf-no-external-entity-references| well-formedness
 	constraints are implemented.

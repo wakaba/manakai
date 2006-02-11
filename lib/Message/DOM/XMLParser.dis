@@ -10,7 +10,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/02/11 07:57:23 $
+    $Date: 2006/02/11 13:41:48 $
 
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
@@ -287,6 +287,7 @@ ClsDef:
         $self->{entity_token} = [];
         $self->{xml_version} = '1.0';
         $self->{standalone} = false;
+        $self->{has_xref} = false;
         $self->{general_entity} = {
           lt => {is_predefined => true},
           gt => {is_predefined => true},
@@ -589,9 +590,6 @@ ClsDef:
           ?lexmode DocumentMisc;
         }
       } else {
-        lang:Perl {
-          $self->{standalone} = true;
-        }
         ?lexmode DocumentMisc;
       }
       
@@ -2139,15 +2137,55 @@ ClsDef:
         }
       } (Name) {
         my $er;
-        lang:Perl ($name => $token.value) {
+        lang:Perl ($name => $token.value) : has-error {
           ## TODO: Namespace well-formedness
-          ## TODO: Entity declared constraints
           $er = $doc-><M::Document.createEntityReference>
                            ($name);
           $parent-><M::Node.appendChild> ($er);
-          push @{$self->{entity}}, <Code::getCopyOfEntityState::
+
+          my $ent = $self->{general_entity}->{$name};
+          if (not $ent) {  # no entity declaration
+            if ($self->{standalone} or not $self->{has_xref}) { # WFC error
+              my $location;
+              __CODE{xp|get-location-from-token::
+                $token => {$token},
+                $result => {$location},
+              }__;
+              my $continue = __DOMCore:ERROR{xp|wf-entity-declared::
+                xp|error-token => {$token},
+                c|location => {$location},
+                xp|name => {$name},
+              }__;
+              unless ($continue) {
+                __EXCEPTION{DOMLS|PARSE_ERR}__;
+              }
+            }                 # Otherwise VC error
+            push @{$self->{entity}}, <Code::getEmptyEntityState>;
+
+          } else {         # there IS entity declaration
+            if (($self->{standalone} or not $self->{has_xref}) and
+                $ent->{is_externally_declared} and
+                not $self->{entity}->[-1]->{is_externally_declared}) {
+              my $location;
+              __CODE{xp|get-location-from-token::
+                $token => {$token},
+                $result => {$location},
+              }__;
+              my $continue = __DOMCore:ERROR{xp|wf-entity-declared::
+                xp|error-token => {$token},
+                c|location => {$location},
+                xp|name => {$name},
+              }__;
+              unless ($continue) {
+                __EXCEPTION{DOMLS|PARSE_ERR}__;
+              }
+            }          
+            $er-><AS::x|EntityReference.isExpanded>
+                   ($ent->{has_replacement_text});
+            push @{$self->{entity}}, <Code::getCopyOfEntityState::
                                             $entity_type = 'general_entity',
                                             $entity_name = $name>;
+          }
           $self->{location} = $self->{entity}->[-1];
           push @{$self->{entity_token}}, $self->{token};
           $self->{token} = [];
@@ -2221,7 +2259,10 @@ ClsDef:
           ## TODO: Entity declared constraints
           
           $er = $self->{doc}-><M::Document.createEntityReference> ($name);
+          my $ent = $self->{general_entity}->{$name};
           push @{$vals->{nodes}}, $er;
+          $er-><AS::x|EntityReference.isExpanded>
+                   ($ent->{has_replacement_text});
           push @{$self->{entity}}, <Code::getCopyOfEntityState::
                                             $entity_type = 'general_entity',
                                             $entity_name = $name>;
@@ -2313,7 +2354,10 @@ ClsDef:
           ## TODO: Entity declared constraints
 
           $er = $self->{doc}-><M::Document.createEntityReference> ($name);
+          my $ent = $self->{general_entity}->{$name};
           $parent-><M::Node.appendChild> ($er);
+          $er-><AS::x|EntityReference.isExpanded>
+                   ($ent->{has_replacement_text});
           push @{$self->{entity}}, <Code::getCopyOfEntityState::
                                             $entity_type = 'general_entity',
                                             $entity_name = $name>;
@@ -2419,12 +2463,20 @@ ClsDef:
           &SystemLiteral ($decl => $decl);
   
           ~? (S) { }
+
+          lang:Perl {
+            $self->{has_xref} = true;
+          }
         } (Name == 'SYSTEM') {
           ~ (S) { }
   
           &SystemLiteral ($decl => $decl);
   
           ~? (S) { }
+
+          lang:Perl {
+            $self->{has_xref} = true;
+          }
         }
       }
 
@@ -2447,9 +2499,6 @@ ClsDef:
 
         ~? (S) { }
       }
-      
-      // TODO: set $self->{standalone} true if only internal subset
-      //       with no param ref
 
       // ~ (MDC) { }
     } // _DocumentTypeDeclaration_
@@ -2584,6 +2633,10 @@ ClsDef:
         &_ProcessingInstructionDTD ($doc => $doc, $doctype => $doctype);
       } (PERO) {
         ?lexmode EntityReference;
+
+        lang:Perl {
+          $self->{has_xref} = true;
+        }
 
         ~ (Name) {
 
@@ -3006,6 +3059,13 @@ ClsDef:
         }
       }
 
+      /*
+        TODO: Set |$decl->{is_externally_declared}| flag
+              and |Entity.isExternallyDeclared| attribute
+              for entity declarations in external subset or
+              in parameter entity.
+      */
+
       ~ (Name) {
         lang:Perl ($v => $token.value) {
           $decl->{name} = $v;
@@ -3153,6 +3213,10 @@ ClsDef:
         }
       } (PERO) {
         ?lexmode EntityDeclaration;
+
+        lang:Perl {
+          $self->{has_xref} = true;
+        }
      
         // TODO: Expand or wferror if internal subset
 
@@ -3213,6 +3277,7 @@ ClsDef:
 
       lang:Perl {
         $decl->{reptxt} = \$reptxt;
+        $decl->{has_replacement_text} = true;
       }
     } // _EntityValue
 
@@ -3232,6 +3297,10 @@ ClsDef:
         }
       } (PERO) {
         ?lexmode EntityDeclaration;
+
+        lang:Perl {
+          $self->{has_xref} = true;
+        }
 
         // TODO: implement this
         ~ (Name) {
@@ -3290,6 +3359,7 @@ ClsDef:
 
       lang:Perl {
         $decl->{reptxt} = \$reptxt;
+        $decl->{has_replacement_text} = true;
       }
     } // _EntityValueA
 
@@ -5262,6 +5332,7 @@ ClsDef:
           }
           element {
             general-entity-reference {
+              is-expanded: true;
               cdata-section {
                 data: 'text';
               }
@@ -6991,6 +7062,7 @@ ClsDef:
               node-name: 'b';
               text { data: 'c'; }
               general-entity-reference {
+                is-expanded: true;
                 node-name: 'ent';
                 text-content: 'aa<bb';
               }
@@ -7019,6 +7091,7 @@ ClsDef:
               general-entity-reference {
                 node-name: 'ent';
                 text-content: 'aa<bb';
+                is-expanded: true;
               }
             }
           }
@@ -7032,7 +7105,9 @@ ClsDef:
                 general-entity-reference {
                   node-name: 'ent';
                   text-content: 'aa<bb';
+                  is-expanded: true;
                 }
+                is-expanded: true;
               }
             }
           }
@@ -7151,6 +7226,7 @@ ClsDef:
               text {
                 data: 'entity value';
               }
+              is-expanded: true;
             }
           }
         }
@@ -7184,6 +7260,7 @@ ClsDef:
               text {
                 data: 'entity value';
               }
+              is-expanded: true;
             }
             text { data: ' and '; }
             general-entity-reference {
@@ -7191,6 +7268,7 @@ ClsDef:
               text {
                 data: 'entity value';
               }
+              is-expanded: true;
             }
           }
         }
@@ -7230,6 +7308,7 @@ ClsDef:
             local-name: 'a';
             general-entity-reference {
               node-name: 'entity';
+              is-expanded: true;
               text {
                 data: 'entity ';
               }
@@ -7296,11 +7375,13 @@ ClsDef:
             general-entity-reference {
               node-name: 'entity2';
               text { data: 'e'; }
+              is-expanded: true;
               general-entity-reference {
                 node-name: 'entity1';
                 text {
                   data: 'entity value';
                 }
+                is-expanded: true;
               }
               text { data: 'n'; }
             }
@@ -8148,6 +8229,7 @@ ClsDef:
             general-entity-reference {
               node-name: 'ent';
               text-content: '!';
+              is-expanded: true;
             }
           }
         }
@@ -8166,6 +8248,7 @@ ClsDef:
             general-entity-reference {
               node-name: 'ent';
               text-content: 'aaaaa!bbbbb';
+              is-expanded: true;
             }
           }
         }
@@ -8187,7 +8270,9 @@ ClsDef:
               general-entity-reference {
                 node-name: 'ent';
                 text-content: '!';
+                is-expanded: true;
               }
+              is-expanded: true;
             }
           }
         }
@@ -8209,7 +8294,9 @@ ClsDef:
               general-entity-reference {
                 node-name: 'ent';
                 text-content: 'aa!bb';
+                is-expanded: true;
               }
+              is-expanded: true;
             }
           }
         }
@@ -8230,6 +8317,7 @@ ClsDef:
               general-entity-reference {
                 node-name: 'ent';
                 text-content: '!';
+                is-expanded: true;
               }
             }
           }
@@ -8251,6 +8339,7 @@ ClsDef:
               general-entity-reference {
                 node-name: 'ent';
                 text-content: 'aaaaa!bbbbb';
+                is-expanded: true;
               }
             }
           }
@@ -8272,9 +8361,11 @@ ClsDef:
               node-name: 'a';
               general-entity-reference {
                 node-name: 'ent2';
+                is-expanded: true;
                 general-entity-reference {
                   node-name: 'ent';
                   text-content: '!';
+                  is-expanded: true;
                 }
               }
             }
@@ -8297,9 +8388,11 @@ ClsDef:
               node-name: 'a';
               general-entity-reference {
                 node-name: 'ent2';
+                is-expanded: true;
                 general-entity-reference {
                   node-name: 'ent';
                   text-content: 'aa!bb';
+                  is-expanded: true;
                 }
               }
             }
@@ -8435,6 +8528,7 @@ ClsDef:
             general-entity-reference {
               node-name: 'ent';
               text-content: '!';
+              is-expanded: true;
             }
           }
         }
@@ -8453,6 +8547,7 @@ ClsDef:
             general-entity-reference {
               node-name: 'ent';
               text-content: 'aaaaa!bbbbb';
+              is-expanded: true;
             }
           }
         }
@@ -8471,9 +8566,11 @@ ClsDef:
           element {
             general-entity-reference {
               node-name: 'ent2';
+              is-expanded: true;
               general-entity-reference {
                 node-name: 'ent';
                 text-content: '!';
+                is-expanded: true;
               }
             }
           }
@@ -8493,8 +8590,10 @@ ClsDef:
           element {
             general-entity-reference {
               node-name: 'ent2';
+              is-expanded: true;
               general-entity-reference {
                 node-name: 'ent';
+                is-expanded: true;
                 text-content: 'aa!bb';
               }
             }
@@ -8516,6 +8615,7 @@ ClsDef:
               node-name: 'a';
               general-entity-reference {
                 node-name: 'ent';
+                is-expanded: true;
                 text-content: '!';
               }
             }
@@ -8537,6 +8637,7 @@ ClsDef:
               node-name: 'a';
               general-entity-reference {
                 node-name: 'ent';
+                is-expanded: true;
                 text-content: 'aaaaa!bbbbb';
               }
             }
@@ -8559,8 +8660,10 @@ ClsDef:
               node-name: 'a';
               general-entity-reference {
                 node-name: 'ent2';
+                is-expanded: true;
                 general-entity-reference {
                   node-name: 'ent';
+                  is-expanded: true;
                   text-content: '!';
                 }
               }
@@ -8584,8 +8687,10 @@ ClsDef:
               node-name: 'a';
               general-entity-reference {
                 node-name: 'ent2';
+                is-expanded: true;
                 general-entity-reference {
                   node-name: 'ent';
+                  is-expanded: true;
                   text-content: 'aa!bb';
                 }
               }
@@ -8661,6 +8766,309 @@ ClsDef:
             text-content: U+0001;
           }
         }
+
+    @@XMLTest:
+      @@@QName: xp.element.content.ger.entity.declared.nodtd.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <p>&entity;</p>
+      @@@c:erred: <[[xp|wf-entity-declared]]> { (1, 4)..(1, 11); }
+    @@XMLTest:
+      @@@QName: xp.element.content.ger.entity.declared.nodtd.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0" standalone="yes"?>
+          <p>&entity;</p>
+      @@@c:erred: <[[xp|wf-entity-declared]]> { (2, 4)..(2, 11); }
+    @@XMLTest:
+      @@@QName: xp.element.content.ger.entity.declared.nodtd.3.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0" standalone="no"?>
+          <p>&entity;</p>
+      @@@c:erred: <[[xp|wf-entity-declared]]> { (2, 4)..(2, 11); }
+    @@XMLTest:
+      @@@QName: xp.element.content.ger.entity.declared.nodtd.-1.test
+      @@@DEnt:
+        @@@@test:value:
+          <p>&lt;&gt;&amp;&quot;&apos;</p>
+      @@@test:domTree:
+        document {
+          element {
+            text-content: '<>&"' U+0027;
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.element.content.ger.entity.declared.nopref.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE p []>
+          <p>&entity;</p>
+      @@@c:erred: <[[xp|wf-entity-declared]]> { (2, 4)..(2, 11); }
+    @@XMLTest:
+      @@@QName: xp.element.content.ger.entity.declared.nopref.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE p [
+            <!ENTITY other "aa">
+            <!ENTITY % another "aa">
+          ]>
+          <p>&entity;</p>
+      @@@c:erred: <[[xp|wf-entity-declared]]> { (5, 4)..(5, 11); }
+    @@XMLTest:
+      @@@QName: xp.element.content.ger.entity.declared.nopref.3.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0" standalone="yes"?>
+          <!DOCTYPE p []>
+          <p>&entity;</p>
+      @@@c:erred: <[[xp|wf-entity-declared]]> { (3, 4)..(3, 11); }
+    @@XMLTest:
+      @@@QName: xp.element.content.ger.entity.declared.nopref.4.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0" standalone="no"?>
+          <!DOCTYPE p []>
+          <p>&entity;</p>
+      @@@c:erred: <[[xp|wf-entity-declared]]> { (3, 4)..(3, 11); }
+    @@XMLTest:
+      @@@QName: xp.element.content.ger.entity.declared.nopref.5.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0" standalone="yes"?>
+          <!DOCTYPE p [
+            <!ENTITY other "aa">
+            <!ENTITY % another "aa">
+          ]>
+          <p>&entity;</p>
+      @@@c:erred: <[[xp|wf-entity-declared]]> { (6, 4)..(6, 11); }
+    @@XMLTest:
+      @@@QName: xp.element.content.ger.entity.declared.nopref.6.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0" standalone="no"?>
+          <!DOCTYPE p [
+            <!ENTITY other "aa">
+            <!ENTITY % another "aa">
+          ]>
+          <p>&entity;</p>
+      @@@c:erred: <[[xp|wf-entity-declared]]> { (6, 4)..(6, 11); }
+    @@XMLTest:
+      @@@QName: xp.element.content.ger.entity.declared.nopref.-1.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE p [
+            <!ENTITY entity "value">
+          ]>
+          <p>&entity;</p>
+      @@@test:domTree:
+        document {
+          document-type {
+            general-entity {
+              node-name: 'entity';
+              text-content: 'value';
+            }
+          }
+          element {
+            general-entity {
+              node-name: 'entity';
+              text-content: 'value';
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.element.content.ger.entity.declared.nopref.-2.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE p [
+            <!ENTITY entity "value">
+            <!ENTITY another SYSTEM "another">
+          ]>
+          <p>&entity;</p>
+      @@@test:domTree:
+        document {
+          document-type {
+            general-entity {
+              node-name: 'entity';
+              text-content: 'value';
+            }
+          }
+          element {
+            general-entity {
+              node-name: 'entity';
+              text-content: 'value';
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.element.content.ger.entity.declared.standalone.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0" standalone="yes"?>
+          <p>&entity;</p>
+      @@@c:erred: <[[xp|wf-entity-declared]]> { (2, 4)..(2, 11); }
+    @@XMLTest:
+      @@@QName: xp.element.content.ger.entity.declared.standalone.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0" standalone="yes"?>
+          <!DOCTYPE p []>
+          <p>&entity;</p>
+      @@@c:erred: <[[xp|wf-entity-declared]]> { (3, 4)..(3, 11); }
+    @@XMLTest:
+      @@@QName: xp.element.content.ger.entity.declared.standalone.3.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0" standalone="yes"?>
+          <!DOCTYPE p [
+            <!ENTITY % para "<!-- -->">
+            %para;
+          ]>
+          <p>&entity;</p>
+      @@@c:erred: <[[xp|wf-entity-declared]]> { (6, 4)..(6, 11); }
+    @@XMLTest:
+      @@@QName: xp.element.content.ger.entity.declared.standalone.-1.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0" standalone="no"?>
+          <!DOCTYPE p [
+            <!ENTITY % para "<!-- -->">
+            %para;
+          ]>
+          <p>&entity;</p>
+      @@@test:domTree:
+        document {
+          document-type { }
+          element {
+            general-entity-reference {
+              is-expanded: false;
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.element.content.ger.entity.declared.standalone.-2.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE p [
+            <!ENTITY % para "<!-- -->">
+            %para;
+          ]>
+          <p>&entity;</p>
+      @@@test:domTree:
+        document {
+          document-type { }
+          element {
+            general-entity-reference {
+              is-expanded: false;
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.element.content.ger.entity.declared.standalone.4.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0" standalone="yes"?>
+          <!DOCTYPE p [
+            <!ENTITY % para SYSTEM "para">
+            %para;
+          ]>
+          <p>&entity;</p>
+      @@@c:erred: <[[xp|wf-entity-declared]]> { (6, 4)..(6, 11); }
+    @@XMLTest:
+      @@@QName: xp.element.content.ger.entity.declared.standalone.-3.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0" standalone="no"?>
+          <!DOCTYPE p [
+            <!ENTITY % para SYSTEM "para">
+            %para;
+          ]>
+          <p>&entity;</p>
+      @@@test:domTree:
+        document {
+          document-type { }
+          element {
+            general-entity-reference {
+              is-expanded: false;
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.element.content.ger.entity.declared.standalone.-4.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE p [
+            <!ENTITY % para SYSTEM "para">
+            %para;
+          ]>
+          <p>&entity;</p>
+      @@@test:domTree:
+        document {
+          document-type { }
+          element {
+            general-entity-reference {
+              is-expanded: false;
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.element.content.ger.entity.declared.standalone.5.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0" standalone="yes"?>
+          <!DOCTYPE p SYSTEM "dtd">
+          <p>&entity;</p>
+      @@@c:erred: <[[xp|wf-entity-declared]]> { (3, 4)..(3, 11); }
+    @@XMLTest:
+      @@@QName: xp.element.content.ger.entity.declared.standalone.-5.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0" standalone="no"?>
+          <!DOCTYPE p SYSTEM "dtd">
+          <p>&entity;</p>
+      @@@test:domTree:
+        document {
+          document-type { }
+          element {
+            general-entity-reference {
+              is-expanded: false;
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.element.content.ger.entity.declared.standalone.-6.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE p SYSTEM "dtd">
+          <p>&entity;</p>
+      @@@test:domTree:
+        document {
+          document-type { }
+          element {
+            general-entity-reference {
+              is-expanded: false;
+            }
+          }
+        }
+
+    @@enImplNote:
+      {TODO:: Entity declared WFC for
+        
+         - General entity references in attribute value literals in tags
+
+         - General entity references in attribute value literals in
+           attlist declarations
+
+         - General entity references in replacement texts referenced
+           in element contents
+
+         - General entity references in replacement texts referenced
+           in attribute value literals in tags
+
+         - General entity references in replacement texts referenced
+           in attribute value literals in attlist declarations
+
+      }
 
     @@PerlDef:
       my $impl = $Message::DOM::ImplementationRegistry->get_implementation ({
@@ -8740,6 +9148,14 @@ ClsDef:
           $not_ok ? $test->not_ok : $test->ok;
         }
       }
+
+  @ResourceDef:
+    @@QName: getEmptyEntityState
+    @@rdf:type: DISPerl|InlineCode
+    @@ForCheck: ManakaiDOM|ForClass
+    @@PerlDef:
+      {reptxt => \'', line => 1, column => 1, pos => 0,
+       is_externally_declared => true}
 
   @ResourceDef:
     @@QName: getCopyOfEntityState
@@ -9052,6 +9468,36 @@ WFErrDef:
     @@enDesc:
       The parent node in which the character reference has
       occurred, if available.
+
+WFErrDef:
+  @QName: xp|wf-entity-declared
+  @c:severity: c|SEVERITY_ERROR
+  @enDesc:
+    {P:: In a document
+
+       - without any DTD,
+
+       - with only an internal DTD subset that contains no parameter
+         entity references, or
+
+       - with <XML::standalone="yes">,
+
+    for an entity reference that does not occur within the external 
+    subset or a parameter entity, the <CODE::Name> given in the
+    entity reference <kwd:MUST> match the <CODE::Name> does not
+    occur within the external subset or a parameter entity,
+    except that five predefined character entities need not 
+    be declared.  The declaration of a general entity <kwd:MUST>
+    precede any reference to it which appears in a default value
+    in an attribute list declaration.
+  @enMufDef:
+    Entity |%p (name => {<Q::xp|name>});| must be declared
+    in the internal subset
+  @ecore:hasParameter: xp|error-token
+  @ecore:hasParameter:
+    @@@: xp|name
+    @@enDesc:
+      The name of the entity.
 
 FatalErrDef:
   @QName: xp|fatal-xml11-end-of-line-in-xml-declaration
