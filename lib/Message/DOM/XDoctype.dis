@@ -17,7 +17,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/01/30 15:17:58 $
+    $Date: 2006/02/11 05:05:46 $
   
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
   
@@ -109,6 +109,18 @@ FeatureDef:
     @@QName: d|Feature30
     @@f:instanceOf: d|Feature
     @@Version: 3.0
+
+FeatureDef:
+  @QName: d|DeclFeature
+  @featureQName: fe|XDoctypeDeclaration
+  @FeatureVerDef:
+    @@QName: d|DeclFeature30
+    @@f:instanceOf: d|DeclFeature
+    @@Version: 3.0
+    @@enImplNote:
+      {ISSUE::
+        Should it require <Q::d|Feature30>?
+      }
 
 ElementTypeBinding:
   @Name: IFClsXDef
@@ -640,10 +652,13 @@ IFClsXDef:
   @IFQName: DocumentTypeDefinition
   @ClsQName: ManakaiDOMDocumentTypeDefinition
   
-  @IFISA: t|Node
-#  @ClsISA: t|ManakaiDOMNode
+  @ClsISA: ManakaiDOMDocumentTypeDeclaration
+  @ClsISA: t|ManakaiDOMNode
 
-  @ClsISA: x|ManakaiDOMDocumentType
+  @Implement: x|DocumentType||ManakaiDOM|ManakaiDOM1
+  @Implement: x|DocumentType||ManakaiDOM|ManakaiDOM2
+  @Implement: x|DocumentType||ManakaiDOM|ManakaiDOM3
+  @Implement: x|DocumentType||ManakaiDOM|ManakaiDOMLatest
   
   @DISLang:role: c|DocumentTypeRole
 
@@ -655,8 +670,9 @@ IFClsXDef:
     
     Objects implementing the <IF::DocumentTypeDefinition>
     interface <kwd:MAY> also implement the <IF::x|DocumentType>
-    interface.  They need not implement duplicate 
-    members twice.
+    interface and / or the <IF::DocumentTypeDeclaration> interface.
+    Although some attributes are defined by two or three of these
+    interfaces, objects only have to implement them once.
     
     In DOM levels 1, 2, and 3, a <IF::x|DocumentType> object
     can never have child node.  A <IF::DocumentTypeDefinition>
@@ -938,6 +954,16 @@ IFClsXDef:
 
         my $es = $dtd-><AG::DocumentTypeDefinition.generalEntities>;
         $test->assert_isa ($es, <IFName::t|NamedNodeMap>);
+
+  @Attr:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@Name: entities
+      The live collection of the general entities contained
+      in the document type definition.
+    @@Type: t|NamedNodeMap
+    @@Get:
+      @@@disDef:
+        @@@@DISPerl:cloneCode: .generalEntities.get
       
   @enImplNote:
     {TODO::
@@ -949,10 +975,7 @@ IFClsXDef:
         $b = $dtd->general_entities;
         $a is still a element type defs col.
       
-      The class will also implement <IF::x|DocumentType>
-      members for compatibility.
-      
-      Implement get/set by name methods for general/parameter
+      Implement get/set by name methods for parameter
       entities and notations.
       
       Defines <M::t|Node.cloneNode>, <M::t|Node.importNode>,
@@ -961,7 +984,8 @@ IFClsXDef:
       In particular, document position for processing
       instruction children must be defined.
 
-      Test for namespace aware doctype
+      Test for namespace aware doctype (is namespace aware doctype
+      really required?)
     }
 
   @Method:
@@ -1298,7 +1322,237 @@ IFClsXDef:
                      .setGeneralEntityNode> ($et);
            },
            exception_subtype => <Q::c|DIFFERENT_DOCUMENT_ERR>);
+
+  @Method:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@Name: lookupPrefix
+    @@enDesc:
+      Looks up the namespace prefix associated to the given
+      namespace URI, starting from this node.
+    @@DOMMain:isNamespaceAware: 1
+    @@Param:
+      @@@Name: namespaceURI
+      @@@Type: DOMString
+      @@@dis:actualType: ManakaiDOM|ManakaiDOMNamespaceURI
+      @@@enDesc:
+        The namespace URI to look for.
+    @@Return:
+      @@@Type: DOMString
+      @@@enDesc:
+        An associated namespace prefix.
+      @@@nullCase:
+        @@@@enDesc:
+          No namespace prefix is found.  For <IF::x|DocumentType>
+          node the method always returns <DOM::null>.
+      @@@PerlDef: $r = null;
+
+    @@Test:
+      @@@QName: DTDef.lookupPrefix.test
+      @@@PerlDef:
+        my $dtd;
+        __CODE{newDoctypeForTest}__;
+
+        $test->assert_null ($dtd-><M::Node.lookupPrefix> ('abcdefg'));
   
+  @Method:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@Name: getFeature
+    @@enDesc:
+      Returns a specialized object that implements the specialized
+      interfaces of the specified feature and version.
+    @@Param:
+      @@@Name: feature
+      @@@Type: DOMString
+      @@@dis:actualType: f|FeatureNameString
+      @@@enDesc:
+        The feature name to request.
+      @@@InCase:
+        @@@@Label:
+          @@@@@lang:en
+          @@@@@@:
+            Feature name preceded by a <CHAR::PLUS SIGN>
+    @@Param:
+      @@@Name: version
+      @@@Type: DOMString
+      @@@dis:actualType: f|FeatureVersionString
+      @@@enDesc:
+        The feature version to request.
+      @@@nullCase:
+        @@@@enDesc:
+          No specific version is requested.
+    @@Return:
+      @@@Type: DOMMain|DOMObject
+      @@@enDesc:
+        An object implementing the specialized interface.
+        Note that the specialized object may or may nor
+        implement the <IF::t|Node> interface.
+      @@@nullCase:
+        @@@@enDesc:
+          There is no object available that implements the 
+          specialized interface.
+      @@@PerlDef:
+        $feature =~ s/^\+//;
+        if ($Message::DOM::ClassFeature{ref $self}->{$feature}->{$version}) {
+          ## This class
+          $r = $self;
+        } else {
+          ## Document type dependent classes
+            ## TODO:
+          ## Document type independent classes
+          CLASS: for my $class (grep {
+            $Message::DOM::ManakaiDOMDocumentType::CompatClass{$_}
+          } keys %Message::DOM::ManakaiDOMDocumentType::CompatClass) {
+            if ($Message::DOM::ClassFeature{$class}->{$feature}->{$version}) {
+              __CODE{DOMCore|getNodeRef::
+                $object => {$self->{<H::mn:node>}},
+                $ref => $r,
+                $class => $class,
+              }__;
+              last CLASS;
+            }
+          }
+        }
+
+    @@Test:
+      @@@QName: DTDef.getFeature.core.1.0.test
+      @@@PerlDef:
+        my $dtd;
+        __CODE{newDoctypeForTest}__;
+
+        my $obj = $dtd-><M::Node.getFeature> (Core => '1.0');
+        $test->assert_isa ($obj, <IFName::t|Node||ManakaiDOM|ManakaiDOM1>);
+    @@Test:
+      @@@QName: DTDef.getFeature.core.2.0.test
+      @@@PerlDef:
+        my $dtd;
+        __CODE{newDoctypeForTest}__;
+
+        my $obj = $dtd-><M::Node.getFeature> (Core => '2.0');
+        $test->assert_isa ($obj, <IFName::t|Node||ManakaiDOM|ManakaiDOM2>);
+    @@Test:
+      @@@QName: DTDef.getFeature.core.3.0.test
+      @@@PerlDef:
+        my $dtd;
+        __CODE{newDoctypeForTest}__;
+
+        my $obj = $dtd-><M::Node.getFeature> (Core => '3.0');
+        $test->assert_isa
+                 ($obj, <IFName::t|Node||ManakaiDOM|ManakaiDOM3>);
+    @@Test:
+      @@@QName: DTDef.getFeature.xml.1.0.test
+      @@@PerlDef:
+        my $dtd;
+        __CODE{newDoctypeForTest}__;
+
+        my $obj = $dtd-><M::Node.getFeature> (XML => '1.0');
+        $test->assert_isa
+                 ($obj, <IFName::x|DocumentType||ManakaiDOM|ManakaiDOM1>);
+    @@Test:
+      @@@QName: DTDef.getFeature.xml.2.0.test
+      @@@PerlDef:
+        my $dtd;
+        __CODE{newDoctypeForTest}__;
+
+        my $obj = $dtd-><M::Node.getFeature> (XML => '2.0');
+        $test->assert_isa
+                 ($obj, <IFName::x|DocumentType||ManakaiDOM|ManakaiDOM2>);
+    @@Test:
+      @@@QName: DTDef.getFeature.xml.3.0.test
+      @@@PerlDef:
+        my $dtd;
+        __CODE{newDoctypeForTest}__;
+
+        my $obj = $dtd-><M::Node.getFeature> (XML => '3.0');
+        $test->assert_isa
+                 ($obj, <IFName::x|DocumentType||ManakaiDOM|ManakaiDOM3>);
+    @@Test:
+      @@@QName: DTDef.getFeature.xdoctype.3.0.test
+      @@@PerlDef:
+        my $dtd;
+        __CODE{newDoctypeForTest}__;
+
+        my $obj = $dtd-><M::Node.getFeature> (<Q::fe|XDoctype> => '3.0');
+        $test->assert_isa ($obj, <IFName::d|DocumentTypeDefinition>);
+    @@Test:
+      @@@QName: DTDef.getFeature.xdoctypedecl.3.0.test
+      @@@PerlDef:
+        my $dtd;
+        __CODE{newDoctypeForTest}__;
+
+        my $obj = $dtd-><M::Node.getFeature>
+                          (<Q::fe|XDoctypeDeclaration> => '3.0');
+        $test->assert_isa ($obj, <IFName::d|DocumentTypeDeclaration>);
+
+  @Attr:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@Name: nodeType
+    @@enDesc:
+      The type of the node.
+    @@Type: idl|unsignedShort||ManakaiDOM|all
+    @@dis:actualType: t|NodeType
+    @@Get:
+      @@@InCase:
+        @@@@Label:
+          <C::t|Node.DOCUMENT_TYPE_NODE>
+        @@@@enDesc:
+          The node is a <IF::x|DocumentType>.
+      @@@disDef:
+        @@@@DISLang:constValue: t|Node.DOCUMENT_TYPE_NODE
+
+    @@Test:
+      @@@QName: DTDef.nodeType.get.test
+      @@@PerlDef:
+        my $dtd;
+        __CODE{newDoctypeForTest}__;
+
+        $test->assert_num_equals
+                 (actual_value => $dtd-><AG::Node.nodeType>,
+                  expected_value => <C::Node.DOCUMENT_TYPE_NODE>);
+
+  @Attr:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@Name: textContent
+    @@enDesc:
+      The text content of the node and its descendants.
+    @@Type: DOMString
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          The text content of the node is defined to be <DOM::null>.
+      @@@PerlDef: $r = null;
+    @@Set:
+      @@@enDesc:
+        Setting this attribute has no effect.
+      @@@c:reports:
+        @@@@@: c|setting-node-value-no-effect
+        @@@@enDesc:
+          Setting the attribute value has no effect, since the
+          node value is defined as <DOM::null>.
+        @@@@For: ManakaiDOM|ManakaiDOM
+      @@@disDef:
+        @@@@DISPerl:cloneCode: t|ManakaiDOMNode.nodeValue.set
+
+    @@Test:
+      @@@QName: DTDef.textContent.get.test
+      @@@PerlDef:
+        my $dtd;
+        __CODE{newDoctypeForTest}__;
+
+        $test->assert_null ($dtd-><AG::Node.textContent>);
+    @@Test:
+      @@@QName: DTDef.textContent.set.test
+      @@@PerlDef:
+        my $dtd;
+        __CODE{newDoctypeForTest}__;
+
+        $test->id ('set.non.null');
+        $dtd-><AS::Node.textContent> ('abcdefg');
+        $test->assert_null ($dtd-><AG::Node.textContent>);
+
+        $test->id ('set.null');
+        $dtd-><AS::Node.textContent> (null);
+        $test->assert_null ($dtd-><AG::Node.textContent>);
+
   @Method:
     @@ForCheck: ManakaiDOM|ForClass
     @@ManakaiDOM:isForInternal: 1
@@ -1323,10 +1577,12 @@ IFClsXDef:
         <Q::infoset|children>,
         <Q::c|implementation>, <Q::ManakaiDOM|implID>.
       
-      Optional properties:
+      Optional properties (common):
         <Q::c|read-only>,
         <Q::d|ownerDocument>,
-        <Q::infoset|prefix>,
+        <Q::infoset|prefix>.
+
+      Optional properties (declaration):
         <Q::infoset:publicIdentifier>,
         <Q::infoset:systemIdentifier>.
       
@@ -1353,6 +1609,217 @@ IFClsXDef:
   @mn:subnode1: infoset|children
   @mn:origin0: infoset|parent
 ##DocumentTypeDefinition
+
+IFClsXDef:
+  @IFQName: DocumentTypeDeclaration
+  @ClsQName: ManakaiDOMDocumentTypeDeclaration
+
+  # This class is inherited by |ManakaiDOMDocumentTypeDeclaration|
+
+  @f:implements: d|DeclFeature30
+  @f:provides:
+    @@@: d|DeclFeature30
+    @@f:through: c|ManakaiDOMImplementation
+
+  @enDesc:
+    An object implementing the <IF::DocumentTypeDeclaration>
+    interface represents a document type declaration contained
+    in an XML document or a <InfoItem::document type declaration
+    information item> in an XML infoset.
+
+    An object implementing the <IF::DocumentTypeDeclaration>
+    interface <kwd:MAY> also implement the <IF::DocumentTypeDefinition>
+    interface and / or the <IF::x|DocumentType> interface.
+
+  @ResourceDef:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@QName: newDTDeclForTest
+    @@AliasFor: newDoctypeForTest
+
+  @Attr:
+    @@Name: systemId
+    @@enDesc:
+      The system identifier of the external subset, as it appears
+      in the document type declaration, without any additional
+      percent-encoding or relative reference resolving
+      applied by the processor.
+    @@Type: DOMString
+    @@nullCase:
+      @@@enDesc:
+        If there is no system identifier specified.
+    @@Get:
+      @@@disDef:
+        @@@@GetProp: infoset|systemIdentifier
+    @@Set:
+      @@@enDesc:
+        Set the system identifier of the external subset.  No lexical
+        validation is done.
+
+        It does not lead any lexical or logical structure of the
+        document being changed.  In particular, no attempt to
+        load the external subset referenced by the new value
+        is made.
+
+          {NOTE:: Setting an invalid system identifier will make
+                  the declaration unserializable.  Setting
+                  a <DOM::null> system identifier to the declaration
+                  whose external subset <EM::does> have the
+                  public identifier will also make it unserializable.
+          }
+      @@@NodeReadOnlyError:
+      @@@disDef:
+        @@@@SetProp:
+          @@@@@@: infoset|systemIdentifier
+          @@@@@CheckReadOnly: 1
+
+    @@Test:
+      @@@QName: DTDef.systemId.test
+      @@@PerlDef:
+        my $dtd;
+        __CODE{newDTDeclForTest}__;
+
+        $test->id ('initial');
+        $test->assert_null ($dtd-><AG::DocumentTypeDeclaration.systemId>);
+
+        $test->id ('set');
+        $dtd-><AS::DocumentTypeDeclaration.systemId> ('sysId');
+        $test->assert_equals ($dtd-><AG::DocumentTypeDeclaration.systemId>,
+                              'sysId');
+
+        $test->id ('set.illegal');
+        $dtd-><AS::DocumentTypeDeclaration.systemId> (q<"sysId'>);
+        $test->assert_equals ($dtd-><AG::DocumentTypeDeclaration.systemId>,
+                              q<"sysId'>);
+
+        $test->id ('set.null');
+        $dtd-><AS::DocumentTypeDeclaration.systemId> (null);
+        $test->assert_null ($dtd-><AG::DocumentTypeDeclaration.systemId>);
+
+  @Attr:
+    @@Name: publicId
+    @@enDesc:
+      The public identifier of the external subset, normalized as described
+      in the XML specification.
+    @@Type: DOMString
+    @@nullCase:
+      @@@enDesc:
+        If there is no public identifier specified.
+    @@Get:
+      @@@disDef:
+        @@@@GetProp: infoset|publicIdentifier
+    @@Set:
+      @@@enDesc:
+        Set the given value to the attribute.  No normalization
+        or lexical validation is done.
+
+        It does not lead any lexical or logical structure of the
+        document being changed.  In particular, no attempt to
+        load the external subset referenced by the new value
+        is made.
+
+          {NOTE:: Setting an invalid public identifier or
+                  an unnormalized public identifier will make
+                  the declaration unserializable.  Setting
+                  a public identifier to the declaration
+                  whose external subset does not have any
+                  system identifier will also make it unserializable.
+          }
+      @@@NodeReadOnlyError:
+      @@@disDef:
+        @@@@SetProp:
+          @@@@@@: infoset|publicIdentifier
+          @@@@@CheckReadOnly: 1
+
+    @@Test:
+      @@@QName: DTDef.publicId.test
+      @@@PerlDef:
+        my $dtd;
+        __CODE{newDTDeclForTest}__;
+
+        $test->id ('initial');
+        $test->assert_null ($dtd-><AG::DocumentTypeDeclaration.publicId>);
+
+        $test->id ('set');
+        $dtd-><AS::DocumentTypeDeclaration.publicId> ('sysId');
+        $test->assert_equals ($dtd-><AG::DocumentTypeDeclaration.publicId>,
+                              'sysId');
+
+        $test->id ('set.illegal');
+        $dtd-><AS::DocumentTypeDeclaration.publicId> (q<"sysId'>);
+        $test->assert_equals ($dtd-><AG::DocumentTypeDeclaration.publicId>,
+                              q<"sysId'>);
+
+        $test->id ('set.null');
+        $dtd-><AS::DocumentTypeDeclaration.publicId> (null);
+        $test->assert_null ($dtd-><AG::DocumentTypeDeclaration.publicId>);
+
+  @Attr:
+    @@Name: name
+    @@enDesc:
+      The document type name.
+    @@Type: DOMString
+    @@dis:actualType: DOMMain|ManakaiDOMXMLName
+    @@DOMMain:isNamespaceUnaware: 1
+    @@Get:
+      @@@disDef:
+        @@@@DISPerl:cloneCode: d|ManakaiDOMDocumentTypeDefinition.nodeName.get
+
+    @@Test:
+      @@@QName: DTDef.name.get.test
+      @@@PerlDef:
+        my $dtd;
+        __CODE{newDTDeclForTest}__;
+
+        $test->id ('initial');
+        $test->assert_equals ($dtd-><AG::DocumentTypeDeclaration.name>, 'dt1');
+
+  @Attr:
+    @@Name: declarationBaseURI
+    @@enDesc:
+      The base URI of the document type declaration.
+
+      If the declaration implements the <IF::Node> interface 
+      and <A::Node.ownerDocument> is different from <DOM::null>,
+      then the base URI of the declaration is the base URI
+      of that document.
+    @@Type: DOMString
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          If the declaration has no owner document or if the
+          document has no base URI.
+      @@@PerlDef:
+        __DEEP{
+          my $od = $self-><AG::Node.ownerDocument>;
+          if ($od) {
+            $od = $od-><M::Node.getFeature> (<Q::fe|XDoctype> => '3.0');
+            $r = $od-><AG::Node.baseURI>;
+          } else {
+            $r = null;
+          }
+        }__;
+
+    @@Test:
+      @@@QName: DTDef.declarationBaseURI.get.test
+      @@@PerlDef:
+        my $dtd;
+        __CODE{newDTDeclForTest}__;
+
+        $test->assert_equals
+                 ($dtd-><AG::DocumentTypeDeclaration.declarationBaseURI>,
+                  $dtd-><AG::Node.ownerDocument>-><AG::Node.baseURI>);
+
+  @enImplNote:
+    @@ddid: todo
+    @@@:
+      {TODO::
+        Implement <A::x|DocumentType.internalSubset>.
+
+        External subset entity node?
+
+        Internal subset pseudo-entity node?
+      }
+##DocumentTypeDeclaration
 
 PropDef:
   @QName: d|elementTypes

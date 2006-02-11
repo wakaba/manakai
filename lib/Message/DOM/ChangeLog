@@ -1,3 +1,45 @@
+2006-02-11  Wakaba  <wakaba@suika.fam.cx>
+
+	* XMLParser.dis ($self->{has_error}): Removed.
+	(parseString): Don't throw |DOMLS:PARSE_ERR| if all fatal
+	errors (including well-formedness constraint errors) are
+	traped by the error handler.
+	(PubidLiteral, SystemLiteral): Set |publicId| or |systemId|
+	attribute of the node.  Reports an error if |publidLiteral|
+	contains a non-|pubidChar|.
+
+	* XDoctype.dis (d:DeclFeature30): New feature (|fe:XDoctypeDeclaration|
+	version |3.0|).
+	(ManakaiDOMDocumentTypeDefinition): The class no longer
+	inherits |x:ManakaiDOMDocumentType| class.  Instead,
+	it inherits |d:ManakaiDOMDocumentTypeDeclaration|
+	and |t:ManakaiDOMNOde| classes.  It still implements |x:DocumentType|
+	interface (except unimplemented |notations| and |internalSubset|
+	attributes).
+	(ManakaiDOMDocumentTypeDefinition.entities): New attribute
+	for compatibility with |x:DocumentType| interface.
+	(ManakaiDOMDocumentTypeDefinition.lookupPrefix): New method.
+	(ManakaiDOMDocumentTypeDefinition.getFeature): New method.
+	(ManakaiDOMDocumentTypeDefinition.nodeType,
+	ManakaiDOMDocumentTypeDefinition.textContent): New attributes.
+	(DocumentTypeDeclaration): New interface.
+
+	* Tree.dis (Node/@f:implements): Typos fixed.
+	(Node.MUErrorHandler): Missing |last A| statement is added.
+	(createDocumentType): Throws an exception if |qualifiedName|
+	is illegal.  Calls |DocumentTypeDefinition.newObject|
+	instead of obsolete |DocumentType.newObject|.
+
+	* DOMXML.dis (DocumentType.name, DocumentType.entities,
+	DocumentType.publicId, DocumentType.systemId,
+	DocumentType.lookupPrefix, DocumentType.getFeature): Now they are defined
+	as clones of similar attributes or methods
+	in |MDOM:XDoctype| module.
+	(DocumentType.newObject): Removed (use |DocumentTypeDefinition.newObject|
+	instead).
+	(DocumentType.childNodes): Removed (|Node.childNodes| definition
+	is used).
+
 2006-02-10  Wakaba  <wakaba@suika.fam.cx>
 
 	* XMLParser.dis (xp:fatal-xml11-end-of-line-in-xml-declaration): New

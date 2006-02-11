@@ -12,7 +12,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/02/08 16:37:35 $
+    $Date: 2006/02/11 05:05:45 $
 
   @Require:
     @@Module:
@@ -485,13 +485,13 @@ ElementTypeBinding:
       @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
 
     @@f:implements:
-      @@@@: DISLang|CoreFeature10
+      @@@@: c|CoreFeature10
       @@@For: ManakaiDOM|DOM1
     @@f:implements:
-      @@@@: DISLang|CoreFeature20
+      @@@@: c|CoreFeature20
       @@@For: ManakaiDOM|DOM2
     @@f:implements:
-      @@@@: DISLang|CoreFeature30
+      @@@@: c|CoreFeature30
       @@@For: ManakaiDOM|DOM3
     @@f:implements:
       @@@@: DOMXML|XMLFeature10
@@ -4342,6 +4342,7 @@ IFCls1Def:
                     $doc = $self;
                   } else {  ## DOCUMENT_TYPE_NODE
                     CORE::warn $err;
+                    last A;
                   }
                 }
                 my $cfg = $doc-><AG::Document.domConfig>;
@@ -10552,6 +10553,15 @@ ResourceDef:
   @For: ManakaiDOM|ManakaiDOM3 !ManakaiDOM|ManakaiDOMLatest
   @AliasFor: d|AttributeDefinition||ManakaiDOM|ManakaiDOMLatest
 
+ResourceDef:
+  @QName: DocXDoctype
+  @For: ManakaiDOM|ManakaiDOMLatest
+  @AliasFor: d|DocumentXDoctype
+ResourceDef:
+  @QName: DocXDoctype
+  @For: ManakaiDOM|ManakaiDOM3 !ManakaiDOM|ManakaiDOMLatest
+  @AliasFor: d|DocumentXDoctype||ManakaiDOM|ManakaiDOMLatest
+
 PropDef:
   @QName: c|userDeterminedId
   @enDesc:
@@ -13796,6 +13806,14 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type: test|StandaloneTest
     @@ForCheck: ManakaiDOM|ManakaiDOM3 ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: LXTest
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: test|StandaloneTest
+    @@ForCheck: ManakaiDOM|ManakaiDOMLatest ManakaiDOM|ForClass
 
 ElementTypeBinding:
   @Name: XDTest
@@ -17702,107 +17720,141 @@ ClsDef:
     two factory methods to create DOM <IF::Document> or
     <IF::DOMXML|DocumentType> defined in DOM Level 2 or higher.
 
-  @Method:
-     @@Name:  createDocumentType
-     @@Description:
-       @@@lang:en
-       @@@@:
-         Creates and returns an empty <IF::DOMXML:DocumentType> node.
-     @@DOMMain:isNamespaceAware:1
-     @@XML2Feature:
-     @@Param:
-        @@@Name:  qualifiedName
-        @@@Type:  
-          DOMMain:DOMString
-        @@@actualType:
-          @@@@@:
-            DOMMain:ManakaiDOMXML11QName
-          @@@@For: ManakaiDOM|ManakaiDOMLatest
-        @@@actualType:
-          @@@@@: DOMMain|ManakaiDOMXML10QName
-          @@@@For: !ManakaiDOM|ManakaiDOMLatest
-        @@@Description:
-          @@@@lang:en
-          @@@@@: The qualified name of the document type to be created.
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            {NOTE:: DOM levels 2 and 3 requires DOM implementations to 
-                    test whether a <P::qualifiedName> is a valid XML 1.0
-                    Name or not.  The manakai DOM implementation
-                    for the <QUOTE::latest> level tests against both XML 1.0 
-                    and XML 1.1; if it is invalid against XML 1.1, an exception 
-                    is thrown; otherwise, the node created is marked as 
-                    an XML 1.1 document type node.
-             \
+
+  @L2Method:
+    @@Name: createDocumentType
+    @@enDesc:
+      Creates an empty <IF::x|DocumentType> node.  No <IF::x|Entity>
+      or <IF::x|Notation> nodes are made available.  Entity reference
+      expansions and default attribute additions do not occur.
+    @@DOMMain:isNamespaceAware: 1
+    @@XML2Feature:
+    @@enDesc:
+      @@@ddid: manakai
+      @@@For: ManakaiDOM|ManakaiDOM
+      @@@@:
+        In manakai, the method <M::c|DOMImplementation.createDocumentType>
+        is <EM::deprecated>; use the method
+        <M::DocXDoctype.createDocumentTypeDefinition> instead.
+    @@Param:
+      @@@Name: qualifiedName
+      @@@Type: DOMString
+      @@@dis:actualType:
+        @@@@@: DOMMain|ManakaiDOMXML11QName
+        @@@@For: ManakaiDOM|ManakaiDOMLatest
+        @@@@ManakaiDOM:noInputNormalize: 1
+      @@@dis:actualType:
+        @@@@@: DOMMain|ManakaiDOMXML10QName
+        @@@@For: !ManakaiDOM|ManakaiDOMLatest
+        @@@@ManakaiDOM:noInputNormalize: 1
+      @@@enDesc:
+        The qualified name of the document type to be created.
+    @@Param:
+      @@@Name: publicId
+      @@@Type: DOMString
+      @@@enDesc:
+        The public identifier of the external subset.
+      @@@nullCase:
+        @@@@For: ManakaiDOM|ManakaiDOM
+        @@@@enDesc:
+          The external subset has no public identifier or
+          the document type has no external subset.
+    @@Param:
+      @@@Name: systemId
+      @@@Type: DOMString
+      @@@enDesc:
+        The system identifier of the external subset.
+      @@@nullCase:
+        @@@@For: ManakaiDOM|ManakaiDOM
+        @@@@enDesc:
+          The external subset has no system identifier or
+          the document type has no external subset.
+    @@enImplNote:
+      @@@ddid: badparam
+      @@@@:
+        Can <P::systemId> and / or <P::publicId> be <DOM::null>?
+
+        What should happen if <P::publicId> is non-<DOM::null>
+        and <P::systemId> is <DOM::null>?
+
+        What should happen if <P::publicId> or <P::systemId> 
+        is ill-formed?
+    @@Return:
+      @@@Type: x|DocumentType
+      @@@enDesc:
+        The newly created <IF::x|DocumentType> node with
+        <A::Node.ownerDocument> set to <DOM::null>.
+      @@@dx:raises:
+        @@@@@: MDOMX|MDOM_BAD_NAME
+        @@@@enDesc:
+          @@@@@For: ManakaiDOM|ManakaiDOMLatest
+          @@@@@@:
+            If the <P::qualifiedName> is not an XML 1.1 <CODE::Name>.
+        @@@@enDesc:
+          @@@@@For: !ManakaiDOM|ManakaiDOMLatest
+          @@@@@@:
+            If the <P::qualifiedName> is not an XML 1.0 <CODE::Name>.
+      @@@dx:raises:
+        @@@@@: MDOMX|MDOM_NS_MALFORMED_QNAME
+        @@@@enDesc:
+          If the <P::qualifiedName> is malformed.
+      @@@enImplNote:
+        @@@@ddid: strict
+        @@@@@:
+          The <A::Document.strictErrorChecking> attribute is
+          <EM::not> applied to these errors, since it has no
+          associated <IF::Document> node.
+      @@@dx:raises:
+        @@@@@: MDOMX|MDOM_IMPL_NOSUPPORT_XMLNS
+        @@@@enDesc:
+          This exception may be raised if the implementation does not support 
+          the feature <Feature::XML> and the language exposed through
+          the document does not support XML namespaces.
+        @@@@enImplNote:
+          <QUOTE::Document>?  What document?
+      @@@PerlDef:
+        @@@@ForCheck: ManakaiDOM|DOMXMLFeature
+        @@@@@:
+          ## Validate |qualifiedName| - don't use |InputProcessor|
+          ## since it refers |strictErrorChecking| attribute.
+          __FOR{ManakaiDOM:ManakaiDOMLatest::
+            unless (<Code::DOMMain:testXML11Name:: $INPUT = $qualifiedName>) {
+              __EXCEPTION{MDOMX:MDOM_BAD_NAME::
+                  DOMCore:name => {$qualifiedName},
+                  MDOMX:param-name => 'qualifiedName',
+                  infoset:version => '1.1',
+              }__;
             }
-          @@@@For:
-            ManakaiDOM:ManakaiDOMLatest
-     @@Param:
-        @@@Name:  publicId
-        @@@Type:  
-          DOMMain:DOMString
-        @@@Description:
-          @@@@lang:en
-          @@@@@: The external subset public identifier.
-     @@Param:
-        @@@Name:  systemId
-        @@@Type:  
-          DOMMain:DOMString
-        @@@Description:
-          @@@@lang:en
-          @@@@@: The external subset system identifier.
-     @@SpecLevel: 2
-     @@L2:
-     @@For:
-       ManakaiDOM:DOM2
-     @@Return:
-        @@@Type:  
-          DOMXML:DocumentType
-        @@@actualType:
-          DOMXML:ManakaiDOMDocumentType
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            A newly created <IF::DOMXML:DocumentType> node.
-        @@@ImplNote:
-          @@@@lang:en
-          @@@@@:
-            The <A::Node.ownerDocument> attribute is set to <DOM::null>.
-        @@@raises:
-          @@@@@: DOMException.INVALID_CHARACTER_ERR
-          @@@@enDesc:
-            @@@@@@:
-              The <P::qualifiedName> is not an XML 1.0 <CODE::Name>.
-            @@@@@For:
-              !ManakaiDOM:ManakaiDOMLatest
-          @@@@enDesc:
-            @@@@@@:
-              The <P::qualifiedName> is not an XML 1.1 <CODE::Name>.
-            @@@@@For:
-              ManakaiDOM:ManakaiDOMLatest
-        @@@raises:
-          @@@@@: MDOMX|MDOM_NS_MALFORMED_QNAME
-          @@@@enDesc:
-            The <P::qualifiedName> is malformed.
-        @@@raises:
-          @@@@@:
-            MDOMX:MDOM_IMPL_NOSUPPORT_XMLNS
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              The DOM implementation does not support the <DOM::XML> feature and 
-              the language exposed through the <IF::Document> does not support 
-              XML Namespaces.
-        @@@PerlDef:
-          @@@@ForCheck:
-            ManakaiDOM:DOMXMLFeature
-          @@@@@:
+            unless (<Code::DOMMain:testXML11QName:: $INPUT = $qualifiedName>) {
+              __EXCEPTION{MDOMX:MDOM_NS_MALFORMED_QNAME::
+                DOMCore:name => {$qualifiedName},
+                MDOMX:param-name => 'qualifiedName',
+                infoset:version => '1.1',
+              }__;
+            }
+          }__;
+          __FOR{!ManakaiDOM:ManakaiDOMLatest::
+            unless (<Code::DOMMain:testXML10Name:: $INPUT = $qualifiedName>) {
+              __EXCEPTION{MDOMX:MDOM_BAD_NAME::
+                  DOMCore:name => {$qualifiedName},
+                  MDOMX:param-name => 'qualifiedName',
+                  infoset:version => '1.0',
+              }__;
+            }
+            unless (<Code::DOMMain:testXML10QName:: $INPUT = $qualifiedName>) {
+              __EXCEPTION{MDOMX:MDOM_NS_MALFORMED_QNAME::
+                DOMCore:name => {$qualifiedName},
+                MDOMX:param-name => 'qualifiedName',
+                infoset:version => '1.0',
+              }__;
+            }
+          }__;
+
             my ($prefix, $lname) = split /:/, $qualifiedName, 2;
             if (not defined $lname) {
               ($prefix, $lname) = (null, $prefix);
             }
-            my $node = <ClassM::DOMXML:ManakaiDOMDocumentType.newObject>;
+            my $node = <ClassM::x|MDTDef.newObject>;
             $node->{<H::infoset:prefix>} = $prefix if defined $prefix;
             $node->{<H::infoset:localName>} = $lname;
             __FOR{ManakaiDOM:ManakaiDOMLatest::
@@ -17821,11 +17873,142 @@ ClsDef:
             $node->{<H::ManakaiDOM:implID>}
                         = $self->{<H::mn:node>}->{<H::ManakaiDOM:implID>};
             $r = <ClassM::ManakaiDOMNode.getNodeReference> ($node);
+        @@@@enImplNote:
+          {ISSUE::
+            Should <Q::c|read-only> flag set <DOM::true> for
+            DOM levels 2 or 3?
+          }
         @@@disDef:
           @@@@ForCheck:
             !ManakaiDOM:DOMXMLFeature
           @@@@DOMMain:raiseException:
             MDOMX:MDOM_IMPL_NOSUPPORT_XMLNS
+
+    @@L2Test:
+      @@@ForCheck: ManakaiDOM|DOMXMLFeature
+      @@@QName: DOMImplDoc.createDocumentType.ncname.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{createDOMImplForTest:: $impl => $impl}__;
+
+        $test->id ('create');
+        my $dtype = $impl-><M::c|DOMImplementation.createDocumentType> ('qname');
+        $test->assert_isa ($dtype, <IFName::x|DocumentType>);
+
+        $test->id ('nodeName');
+        $test->assert_equals ($dtype-><AG::Node.nodeName>, 'qname');
+    @@L2Test:
+      @@@ForCheck: ManakaiDOM|DOMXMLFeature
+      @@@QName: DOMImplDoc.createDocumentType.qname.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{createDOMImplForTest:: $impl => $impl}__;
+
+        $test->id ('create');
+        my $dtype = $impl-><M::c|DOMImplementation.createDocumentType>
+                             ('pfx:qname');
+        $test->assert_isa ($dtype, <IFName::x|DocumentType>);
+
+        $test->id ('nodeName');
+        $test->assert_equals ($dtype-><AG::Node.nodeName>, 'pfx:qname');
+    @@L2Test:
+      @@@ForCheck: ManakaiDOM|DOMXMLFeature
+      @@@QName: DOMImplDoc.createDocumentType.non.name11.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{createDOMImplForTest:: $impl => $impl}__;
+
+        $test->id ('create');
+        $test->assert_exception (code => sub {
+          $impl-><M::c|DOMImplementation.createDocumentType> ('12345');
+        }, exception_subtype => <Q::MDOMX|MDOM_BAD_NAME>);
+    @@L2Test:
+      @@@ForCheck: ManakaiDOM|DOMXMLFeature !ManakaiDOM|ManakaiDOMLatest
+      @@@QName: DOMImplDoc.createDocumentType.name11.non.name10.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{createDOMImplForTest:: $impl => $impl}__;
+
+        $test->id ('create');
+        $test->assert_exception (code => sub {
+          $impl-><M::c|DOMImplementation.createDocumentType>
+                   ("\x{3001}\x{3002}");
+                   ## A Name in XML 1.1 but not in XML 1.0.
+        }, exception_subtype => <Q::MDOMX|MDOM_BAD_NAME>);
+    @@LXTest:
+      @@@ForCheck: ManakaiDOM|DOMXMLFeature
+      @@@QName: DOMImplDoc.createDocumentType.name11.non.name10.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{createDOMImplForTest:: $impl => $impl}__;
+
+        $test->id ('create');
+        my $dtype = $impl-><M::c|DOMImplementation.createDocumentType>
+                             ("\x{3001}\x{3002}");
+                             ## A Name in XML 1.1 but not in XML 1.0.
+        $test->assert_isa ($dtype, <IFName::x|DocumentType>);
+
+        $test->id ('nodeName');
+        $test->assert_equals ($dtype-><AG::Node.nodeName>, "\x{3001}\x{3002}");
+    @@L2Test:
+      @@@ForCheck: ManakaiDOM|DOMXMLFeature
+      @@@QName: DOMImplDoc.createDocumentType.non.qname11.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{createDOMImplForTest:: $impl => $impl}__;
+
+        $test->id ('create');
+        $test->assert_exception (code => sub {
+          $impl-><M::c|DOMImplementation.createDocumentType> (':aa');
+        }, exception_subtype => <Q::MDOMX|MDOM_NS_MALFORMED_QNAME>);
+    @@L2Test:
+      @@@ForCheck: ManakaiDOM|DOMXMLFeature !ManakaiDOM|ManakaiDOMLatest
+      @@@QName: DOMImplDoc.createDocumentType.qname11.non.qname10.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{createDOMImplForTest:: $impl => $impl}__;
+
+        $test->id ('create');
+        $test->assert_exception (code => sub {
+          $impl-><M::c|DOMImplementation.createDocumentType>
+                   ("a:\x{3005}b");
+                    ## A QName in XMLNames 1.1 but not in XMLNames 1.0.
+        }, exception_subtype => <Q::MDOMX|MDOM_NS_MALFORMED_QNAME>);
+    @@LXTest:
+      @@@ForCheck: ManakaiDOM|DOMXMLFeature
+      @@@QName: DOMImplDoc.createDocumentType.qname11.non.qname10.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{createDOMImplForTest:: $impl => $impl}__;
+
+        $test->id ('create');
+        my $dtype = $impl-><M::c|DOMImplementation.createDocumentType>
+                             ("a:\x{3005}b");
+                             ## A QName in XMLNames 1.1 but not in XMLNames 1.0.
+        $test->assert_isa ($dtype, <IFName::x|DocumentType>);
+
+        $test->id ('nodeName');
+        $test->assert_equals ($dtype-><AG::Node.nodeName>, "a:\x{3005}b");
+    @@L2Test:
+      @@@ForCheck: ManakaiDOM|DOMXMLFeature
+      @@@QName: DOMImplDoc.createDocumentType.pubid.sysid.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{createDOMImplForTest:: $impl => $impl}__;
+
+        $test->id ('create');
+        my $dtype = $impl-><M::c|DOMImplementation.createDocumentType>
+                             ('qname', 'pubid', 'sysid');
+        $test->assert_isa ($dtype, <IFName::x|DocumentType>);
+
+        $test->id ('nodeName');
+        $test->assert_equals ($dtype-><AG::Node.nodeName>, 'qname');
+
+        $test->id ('publicId');
+        $test->assert_equals ($dtype-><AG::x|DocumentType.publicId>, 'pubid');
+
+        $test->id ('systemId');
+        $test->assert_equals ($dtype-><AG::x|DocumentType.systemId>, 'sysid');
 
   @Method:
      @@Name:  createDocument
@@ -18228,4 +18411,9 @@ ClsDef:
      @@L2:
      @@For:
        ManakaiDOM:DOM2
+
+  @CODE:
+    @@QName: createDOMImplForTest
+    @@PerlDef:
+      $impl = <ClassName::c|ManakaiDOMImplementation>->_new;
 ##DOMImplementationDocument

@@ -10,7 +10,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/02/10 08:10:26 $
+    $Date: 2006/02/11 05:05:46 $
 
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
@@ -297,7 +297,7 @@ ClsDef:
         $self->{param_entity} = {};
         $self->{attr} = {};
           # $self->{attr}->{$element_type_name}->{$attr_name} = $attr_def
-        $self->{has_error} = false;
+
           ## Well-formedness constraint Entity Declared takes effect?
 
         __DEEP{
@@ -306,6 +306,7 @@ ClsDef:
           $self->{doc} = $r;
           CORE::delete $self->{docx};
           CORE::delete $self->{dtdef};
+          CORE::delete $self->{dtdecl};
           $self->{cfg} = $r-><AG::Document.domConfig>;
           local $r->{<H::mn:node>}
                   ->{<H::cfg|entity-reference-read-only>} = false;
@@ -421,7 +422,6 @@ ClsDef:
                 unless ($continue) {
                   __EXCEPTION{DOMLS|PARSE_ERR}__;
                 }
-                $self->{has_error} = true;
                 $self->{entity}->[-1]->{column}++;
               } elsif ($r == 0x0085 or $r == 0x2028) {
                 if ($self->{entity}->[-1]->{no_xml11_eol}) {
@@ -650,13 +650,6 @@ ClsDef:
       }
       
       ~ (#EOF) { }
-
-      lang:Perl {
-        if ($self->{has_error}) {
-          __EXCEPTION{DOMLS|PARSE_ERR::
-          }__;
-        }
-      }
     } // DocumentEntity
  
     /*
@@ -752,7 +745,6 @@ ClsDef:
             unless ($continue) {
               __EXCEPTION{DOMLS|PARSE_ERR}__;
             }
-            $self->{has_error} = true;
           }
           $self->{doc}-><AS::Document.xmlVersion> ($ver);
           $self->{xml_version} = $ver;
@@ -813,7 +805,6 @@ ClsDef:
             unless ($continue) {
               __EXCEPTION{DOMLS|PARSE_ERR}__;
             }
-            $self->{has_error} = true;
           }
           $self->{doc}-><AS::Document.xmlEncoding> ($ver);
         }
@@ -873,7 +864,6 @@ ClsDef:
             unless ($continue) {
               __EXCEPTION{DOMLS|PARSE_ERR}__;
             }
-            $self->{has_error} = true;
           }
           if ($ver eq 'yes') {
             $self->{doc}-><AS::Document.xmlStandalone> (true);
@@ -975,7 +965,6 @@ ClsDef:
               __EXCEPTION{DOMLS|PARSE_ERR::
               }__;
             }
-            $self->{has_error} = true;
           }
           ## TODO: Namespace well-formedness
           $pi = $doc-><M::Document.createProcessingInstruction>
@@ -1039,7 +1028,6 @@ ClsDef:
               __EXCEPTION{DOMLS|PARSE_ERR::
               }__;
             }
-            $self->{has_error} = true;
           }
           ## TODO: Namespace well-formedness
           $pi = $doc-><M::Document.createProcessingInstruction>
@@ -1376,7 +1364,6 @@ ClsDef:
               unless ($continue) {
                 __EXCEPTION{DOMLS|PARSE_ERR}__;
               }
-              $self->{has_error} = true;
             }
           }
         }
@@ -1403,7 +1390,6 @@ ClsDef:
                 }
                 $node = shift @{$nodes};
               }
-              $self->{has_error} = true;
             }
           }
           return;
@@ -1570,7 +1556,6 @@ ClsDef:
             unless ($continue) {
               __EXCEPTION{DOMLS|PARSE_ERR}__;
             }
-            $self->{has_error} = true;
           }
           
           $vals = $attrs->{$atqname} = {
@@ -1799,7 +1784,6 @@ ClsDef:
             unless ($continue) {
               __EXCEPTION{DOMLS|PARSE_ERR}__;
             }
-            $self->{has_error} = true;
           }
           my $ncr = $doc-><M::Document.createTextNode> (chr $num);
           $parent-><M::Node.appendChild> ($ncr);
@@ -1839,7 +1823,6 @@ ClsDef:
             unless ($continue) {
               __EXCEPTION{DOMLS|PARSE_ERR}__;
             }
-            $self->{has_error} = true;
           }
           my $ncr = $doc-><M::Document.createTextNode>
                             (my $char = chr $num);
@@ -1886,7 +1869,6 @@ ClsDef:
             unless ($continue) {
               __EXCEPTION{DOMLS|PARSE_ERR}__;
             }
-            $self->{has_error} = true;
           }
           my $ncr = $self->{doc}-><M::Document.createTextNode>
                             (my $char = chr $num);
@@ -1929,7 +1911,6 @@ ClsDef:
             unless ($continue) {
               __EXCEPTION{DOMLS|PARSE_ERR}__;
             }
-            $self->{has_error} = true;
           }
           push @{$vals}, chr $num;
         }
@@ -1969,7 +1950,6 @@ ClsDef:
             unless ($continue) {
               __EXCEPTION{DOMLS|PARSE_ERR}__;
             }
-            $self->{has_error} = true;
           }
           my $ncr = $doc-><M::Document.createTextNode>
                       (chr $num);
@@ -2010,7 +1990,6 @@ ClsDef:
             unless ($continue) {
               __EXCEPTION{DOMLS|PARSE_ERR}__;
             }
-            $self->{has_error} = true;
           }
           my $ncr = $doc-><M::Document.createTextNode>
                       (my $char = chr $num);
@@ -2057,7 +2036,6 @@ ClsDef:
             unless ($continue) {
               __EXCEPTION{DOMLS|PARSE_ERR}__;
             }
-            $self->{has_error} = true;
           }
           my $ncr = $self->{doc}-><M::Document.createTextNode>
                       (my $char = chr $num);
@@ -2099,7 +2077,6 @@ ClsDef:
             unless ($continue) {
               __EXCEPTION{DOMLS|PARSE_ERR}__;
             }
-            $self->{has_error} = true;
           }
           push @{$vals}, chr $num;
         }
@@ -2359,7 +2336,6 @@ ClsDef:
       
       ~ (S) { }
       
-      my $node;
       // Document type name
       my $name;
       ~ (Name) {
@@ -2367,33 +2343,38 @@ ClsDef:
           $name = $v;
         }
       }
+
+      my $node;
+      my $decl;
       lang:Perl {
         $self->{docx} = $self->{doc}
                              -><M::Node.getFeature> (<Q::fe:XDoctype>, '3.0');
         $node = $self->{docx}-><M::DocumentXDoctype.createDocumentTypeDefinition>
                                  ($name);
+        $decl = $self->{dtdecl} = $node-><M::Node.getFeature>
+                                           (<Q::fe:XDoctypeDeclaration>, '3.0');
       }
 
       ~? (S) {
         ~? (Name == 'PUBLIC') {
           ~ (S) { }
   
-          &PubidLiteral ($doc => $doc);
+          &PubidLiteral ($decl => $decl);
   
           ~ (S) { }
   
-          &SystemLiteral ($doc => $doc);
+          &SystemLiteral ($decl => $decl);
   
           ~? (S) { }
         } (Name == 'SYSTEM') {
           ~ (S) { }
   
-          &SystemLiteral ($doc => $doc);
+          &SystemLiteral ($decl => $decl);
   
           ~? (S) { }
         }
       }
-      
+
       lang:Perl {
         $self->{dtdef} = $node;
         $doc-><M::Node.appendChild> ($node);
@@ -2420,13 +2401,20 @@ ClsDef:
       // ~ (MDC) { }
     } // _DocumentTypeDeclaration_
 
-    rule PubidLiteral ($doc) {
+    /*
+      Public Identifier Literal
+    */
+    rule PubidLiteral ($decl) {
+      my $pubid;
+      my $pubid_token;
       ~ (LIT) {
         ?lexmode SystemLiteral;
 
         ~? (STRING) {
-          // TODO: Charrange check & normalization is required
-
+          lang:Perl ($v => $token.value) {
+            $pubid = $v;
+            $pubid_token = $token;
+          }
         }
 
         ~ (LIT) {
@@ -2438,8 +2426,10 @@ ClsDef:
         ?lexmode SystemLiteralA;
 
         ~? (STRING) {
-          // TODO: Charrange check & normalization is required
-
+          lang:Perl ($v => $token.value) {
+            $pubid = $v;
+            $pubid_token = $token;
+          }
         }
 
         ~ (LITA) {
@@ -2448,21 +2438,60 @@ ClsDef:
           ?lexmode MarkupDeclaration;
         }
       }
+
+      if-true ($pubid_token) {
+        lang:Perl : has-error {
+          if ($pubid =~ m{[^\x20\x0D\x0Aa-zA-Z0-9'()+,./:=?;!*#\@\$_%-]}s) {
+            my $location;
+            __CODE{xp|get-location-from-token::
+              $token => {$pubid_token},
+              $result => {$location},
+            }__;
+                                  ## Should this be other (new) error type?
+            my $continue = __DOMCore:ERROR{xp|wf-syntax-error::
+              xp|error-token => {$token},
+              c|location => {$location},
+            }__;
+            unless ($continue) {
+              __EXCEPTION{DOMLS|PARSE_ERR::
+             }__;
+            }
+          }
+
+          ## NOTE: U+0009 is syntactically illegal.
+          $pubid =~ s/[\x09\x0A\x0D\x20]+//gs;
+          $pubid =~ s/\A\x20//s;
+          $pubid =~ s/\x20\z//s;
+                 ## NOTE: Bare attribute name is written.
+          $decl->public_id ($pubid);
+        }
+      }
     } // PubidLiteral
 
-    rule SystemLiteral ($doc) {
+    /*
+      System Identifier Literal
+    */
+    rule SystemLiteral ($decl) {
       ~ (LIT) {
         ?lexmode SystemLiteral;
-        &_SystemLiteral ($doc => $doc);
+        &_SystemLiteral ($decl => $decl);
       } (LITA) {
         ?lexmode SystemLiteralA;
-        &_SystemLiteral ($doc => $doc);
+        &_SystemLiteral ($decl => $decl);
       }
     } // SystemLiteral
 
-    rule _SystemLiteral ($doc) {
-      ~? (STRING) {
+    /*
+      System Identifier Literal Content
+    */
+    rule _SystemLiteral ($decl) {
+      // LIT or LITA
 
+      ~? (STRING) {
+        lang:Perl ($v => $token.value) {
+                 ## NOTE: Bare attribute name is written.
+          $decl->system_id ($v);
+        }
       }
 
       ~ (LIT) {
@@ -2945,15 +2974,15 @@ ClsDef:
       } (Name == 'PUBLIC') {
         ~ (S) { }
 
-        &PubidLiteral ($doc => $doc, $decl => $decl);
+        &PubidLiteral ($decl => $decl);
 
         ~ (S) { }
 
-        &SystemLiteral ($doc => $doc, $decl => $decl);
+        &SystemLiteral ($decl => $decl);
       } (Name == 'SYSTEM') {
         ~ (S) { }
 
-        &SystemLiteral ($doc => $doc, $decl => $decl);
+        &SystemLiteral ($decl => $decl);
       }
 
       ~? (S) {
@@ -3005,20 +3034,27 @@ ClsDef:
 
       ~ (S) { }
 
+      my $decl;
+      lang:Perl {
+        $decl = $self->{docx}-><M::DocumentXDoctype.createGeneralEntity>
+                                               ($decl->{name});
+           ## Temporary: to avoid error.
+      }
+
       ~ (Name == 'PUBLIC') {
         ~ (S) { }
 
-        &PubidLiteral ($doc => $doc);
+        &PubidLiteral ($decl => $decl);
 
         ~? (S) {
           ~? (LIT) {
             ?lexmode SystemLiteral;
-            &_SystemLiteral ($doc => $doc);
+            &_SystemLiteral ($decl => $decl);
 
             ~? (S) { }
           } (LITA) {
             ?lexmode SystemLiteralA;
-            &_SystemLiteral ($doc => $doc);
+            &_SystemLiteral ($decl => $decl);
 
             ~? (S) { }
           }
@@ -3026,7 +3062,7 @@ ClsDef:
       } (Name == 'SYSTEM') {
         ~ (S) { }
 
-        &SystemLiteral ($doc => $doc);
+        &SystemLiteral ($decl => $decl);
 
         ~? (S) { }
       }
@@ -3984,7 +4020,6 @@ ClsDef:
           __EXCEPTION{DOMLS|PARSE_ERR::
           }__;
         }
-        $self->{has_error} = true;
       }
     } // default
 
@@ -5196,6 +5231,8 @@ ClsDef:
           xml-standalone: false;
           document-type {
             node-name: 'a';
+            public-id: null;
+            system-id: null;
           }
           element {
             namespace-uri: null;
@@ -5260,6 +5297,8 @@ ClsDef:
         document {
           document-type {
             node-name: 'aa';
+            public-id: null;
+            system-id: null;
           }
           element { }
         }
@@ -5284,6 +5323,8 @@ ClsDef:
           xml-standalone: false;
           document-type {
             node-name: 'a';
+            public-id: null;
+            system-id: null;
           }
           element {
             namespace-uri: null;
@@ -5307,6 +5348,8 @@ ClsDef:
           xml-standalone: false;
           document-type {
             node-name: 'a';
+            public-id: null;
+            system-id: null;
           }
           element {
             namespace-uri: null;
@@ -5325,6 +5368,8 @@ ClsDef:
         document {
           document-type {
             node-name: 'a';
+            public-id: null;
+            system-id: null;
           }
           element { }
         }
@@ -5338,6 +5383,8 @@ ClsDef:
         document {
           document-type {
             node-name: 'a';
+            public-id: null;
+            system-id: null;
           }
           element { }
         }
@@ -5375,6 +5422,442 @@ ClsDef:
           <!DOCTYPE a []]>
           <a/>
       @@@c:erred: <[[xp|wf-syntax-error]]> { (1, 15); }
+    @@XMLTest:
+      @@@QName: xp.doctype.pubid.sysid.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a PUBLIC "pubid" "sysid">
+          <a/>
+      @@@test:domTree:
+        document {
+          document-type {
+            node-name: 'a';
+            public-id: 'pubid';
+            system-id: 'sysid';
+          }
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.doctype.pubid.sysid.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a PUBLIC 'pubid' "sysid">
+          <a/>
+      @@@test:domTree:
+        document {
+          document-type {
+            node-name: 'a';
+            public-id: 'pubid';
+            system-id: 'sysid';
+          }
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.doctype.pubid.sysid.3.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a PUBLIC "pubid" 'sysid'>
+          <a/>
+      @@@test:domTree:
+        document {
+          document-type {
+            node-name: 'a';
+            public-id: 'pubid';
+            system-id: 'sysid';
+          }
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.doctype.pubid.sysid.4.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a PUBLIC 'pubid' 'sysid'>
+          <a/>
+      @@@test:domTree:
+        document {
+          document-type {
+            node-name: 'a';
+            public-id: 'pubid';
+            system-id: 'sysid';
+          }
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.doctype.pubid.sysid.5.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a PUBLIC "pubid" "sysid"  >
+          <a/>
+      @@@test:domTree:
+        document {
+          document-type {
+            node-name: 'a';
+            public-id: 'pubid';
+            system-id: 'sysid';
+          }
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.doctype.pubid.sysid.6.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a PUBLIC 'pubid' 'sysid'  >
+          <a/>
+      @@@test:domTree:
+        document {
+          document-type {
+            node-name: 'a';
+            public-id: 'pubid';
+            system-id: 'sysid';
+          }
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.doctype.pubid.sysid.intsubset.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a PUBLIC "pubid" "sysid"[]>
+          <a/>
+      @@@test:domTree:
+        document {
+          document-type {
+            node-name: 'a';
+            public-id: 'pubid';
+            system-id: 'sysid';
+          }
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.doctype.pubid.sysid.intsubset.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a PUBLIC "pubid" "sysid"  []>
+          <a/>
+      @@@test:domTree:
+        document {
+          document-type {
+            node-name: 'a';
+            public-id: 'pubid';
+            system-id: 'sysid';
+          }
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.doctype.pubid.sysid.intsubset.3.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a PUBLIC 'pubid' 'sysid'[]>
+          <a/>
+      @@@test:domTree:
+        document {
+          document-type {
+            node-name: 'a';
+            public-id: 'pubid';
+            system-id: 'sysid';
+          }
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.doctype.pubid.sysid.intsubset.4.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a PUBLIC 'pubid' 'sysid'  []>
+          <a/>
+      @@@test:domTree:
+        document {
+          document-type {
+            node-name: 'a';
+            public-id: 'pubid';
+            system-id: 'sysid';
+          }
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.doctype.sysid.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a SYSTEM "sysid">
+          <a/>
+      @@@test:domTree:
+        document {
+          document-type {
+            node-name: 'a';
+            public-id: null;
+            system-id: 'sysid';
+          }
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.doctype.sysid.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a SYSTEM 'sysid'>
+          <a/>
+      @@@test:domTree:
+        document {
+          document-type {
+            node-name: 'a';
+            public-id: null;
+            system-id: 'sysid';
+          }
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.doctype.sysid.3.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a SYSTEM "sysid"  >
+          <a/>
+      @@@test:domTree:
+        document {
+          document-type {
+            node-name: 'a';
+            public-id: null;
+            system-id: 'sysid';
+          }
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.doctype.sysid.4.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a SYSTEM 'sysid'  >
+          <a/>
+      @@@test:domTree:
+        document {
+          document-type {
+            node-name: 'a';
+            public-id: null;
+            system-id: 'sysid';
+          }
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.doctype.sysid.intsubset.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a SYSTEM "sysid"[]>
+          <a/>
+      @@@test:domTree:
+        document {
+          document-type {
+            node-name: 'a';
+            public-id: null;
+            system-id: 'sysid';
+          }
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.doctype.sysid.intsubset.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a SYSTEM "sysid"  []>
+          <a/>
+      @@@test:domTree:
+        document {
+          document-type {
+            node-name: 'a';
+            public-id: null;
+            system-id: 'sysid';
+          }
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.doctype.sysid.intsubset.3.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a SYSTEM 'sysid'[]>
+          <a/>
+      @@@test:domTree:
+        document {
+          document-type {
+            node-name: 'a';
+            public-id: null;
+            system-id: 'sysid';
+          }
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.doctype.sysid.intsubset.4.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a SYSTEM 'sysid'   []>
+          <a/>
+      @@@test:domTree:
+        document {
+          document-type {
+            node-name: 'a';
+            public-id: null;
+            system-id: 'sysid';
+          }
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.doctype.public.stago.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a PUBLIC<a/>
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (1, 19); }
+    @@XMLTest:
+      @@@QName: xp.doctype.public.mdc.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a PUBLIC>
+          <a/>
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (1, 19); }
+    @@XMLTest:
+      @@@QName: xp.doctype.public.s.stago.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a PUBLIC <a/>
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (1, 20); }
+    @@XMLTest:
+      @@@QName: xp.doctype.public.s.mdc.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a PUBLIC >
+          <a/>
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (1, 20); }
+    @@XMLTest:
+      @@@QName: xp.doctype.public.lit.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a PUBLIC"p" "s">
+          <a/>
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (1, 19); }
+    @@XMLTest:
+      @@@QName: xp.doctype.public.lita.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a PUBLIC'p' "s">
+          <a/>
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (1, 19); }
+    @@XMLTest:
+      @@@QName: xp.doctype.pubid.lit.lita.unmatched.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a PUBLIC "p' "s">
+          <a/>
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (1, 25); }
+    @@XMLTest:
+      @@@QName: xp.doctype.pubid.lit.lita.unmatched.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a PUBLIC "p' 's'><a/>
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (1, 32); }
+    @@XMLTest:
+      @@@QName: xp.doctype.pubid.lita.lit.unmatched.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a PUBLIC 'p" "s"><a/>
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (1, 32); }
+    @@XMLTest:
+      @@@QName: xp.doctype.pubid.lita.lit.unmatched.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a PUBLIC 'p" 's'>
+          <a/>
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (1, 21)..(1, 25); }
+    @@XMLTest:
+      @@@QName: xp.doctype.public.s.lit.mdc.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a PUBLIC "><a/>
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (1, 26); }
+    @@XMLTest:
+      @@@QName: xp.doctype.public.s.lita.mdc.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a PUBLIC '><a/>
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (1, 26); }
+    @@XMLTest:
+      @@@QName: xp.doctype.public.lit.pubid.lit.mdc.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a PUBLIC "p">
+          <a/>
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (1, 23); }
+    @@XMLTest:
+      @@@QName: xp.doctype.public.lita.pubid.lita.mdc.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a PUBLIC 'p'>
+          <a/>
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (1, 23); }
+    @@XMLTest:
+      @@@QName: xp.doctype.public.lit.pubid.lit.s.mdc.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a PUBLIC "p" >
+          <a/>
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (1, 24); }
+    @@XMLTest:
+      @@@QName: xp.doctype.public.lita.pubid.lita.s.mdc.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a PUBLIC 'p' >
+          <a/>
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (1, 24); }
+    @@XMLTest:
+      @@@QName: xp.doctype.public.lit.pubid.lit.s.lit.mdc.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a PUBLIC "p" "><a/>
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (1, 30); }
+    @@XMLTest:
+      @@@QName: xp.doctype.public.lit.pubid.lit.s.lita.mdc.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a PUBLIC "p" '><a/>
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (1, 30); }
+    @@XMLTest:
+      @@@QName: xp.doctype.public.lita.pubid.lita.s.lit.mdc.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a PUBLIC 'p' "><a/>
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (1, 30); }
+    @@XMLTest:
+      @@@QName: xp.doctype.public.lita.pubid.lita.s.lita.mdc.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a PUBLIC 'p' '><a/>
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (1, 30); }
+    @@XMLTest:
+      @@@QName: xp.doctype.public.lit.pubid.lit.lit.lita.unmatched.mdc.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a PUBLIC "p" "s'><a/>
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (1, 32); }
+    @@XMLTest:
+      @@@QName: xp.doctype.public.lita.pubid.lita.lita.lit.unmatched.mdc.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a PUBLIC 'p' 's"><a/>
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (1, 32); }
+    @@XMLTest:
+      @@@QName: xp.doctype.pubid.sysid.stago.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a PUBLIC "p" "s"<a/>
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (1, 27); }
+    @@XMLTest:
+      @@@QName: xp.doctype.pubid.sysid.stago.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a PUBLIC "p" 's'<a/>
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (1, 27); }
+    @@XMLTest:
+      @@@QName: xp.doctype.pubid.sysid.stago.s.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a PUBLIC "p" "s" <a/>
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (1, 28); }
+    @@XMLTest:
+      @@@QName: xp.doctype.pubid.sysid.stago.s.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a PUBLIC "p" 's' <a/>
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (1, 28); }
 
     @@XMLTest:
       @@@QName: xp.endofline.1.0.crlf.test
@@ -6963,7 +7446,6 @@ ClsDef:
         } else {
           try {
             my $doc = $parser->parse_string ($doc_ent->{<H::test:value>});
-            $test->assert_never;
           } catch Message::Util::IF::DTException with {
             #
           } catch Message::DOM::IF::LSException with {
