@@ -1,5 +1,11 @@
 2006-02-11  Wakaba  <wakaba@suika.fam.cx>
 
+	* XMLParser.dis: |xp:wf-no-lt-in-attribute-values|
+	and |xp:wf-no-external-entity-references| well-formedness
+	constraints are implemented.
+
+2006-02-11  Wakaba  <wakaba@suika.fam.cx>
+
 	* XMLParser.dis ($self->{has_error}): Removed.
 	(parseString): Don't throw |DOMLS:PARSE_ERR| if all fatal
 	errors (including well-formedness constraint errors) are

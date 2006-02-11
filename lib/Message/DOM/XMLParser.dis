@@ -10,7 +10,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/02/11 05:05:46 $
+    $Date: 2006/02/11 07:57:23 $
 
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
@@ -1541,7 +1541,7 @@ ClsDef:
         }
         
         my $vals;
-        lang:Perl {
+        lang:Perl : has-error {
           if ($attrs->{$atqname}) {
             my $location;
             __CODE{xp|get-location-from-token::
@@ -1720,6 +1720,25 @@ ClsDef:
           ?lexmode AttributeValueLiteralE;
         } else {
           ?lexmode AttributeValueLiteralE;
+        }
+      } (#INVALID == '<') {
+        lang:Perl : has-error {
+          my $location;
+          __CODE{xp|get-location-from-token::
+            $token => $token,
+            $result => $location,
+          }__;
+          my $continue = __DOMCore:ERROR{xp|wf-no-lt-in-attribute-values::
+            c|location => {$location},
+            xp|token => {$token},
+          }__;
+          unless ($continue) {
+            __EXCEPTION{DOMLS|PARSE_ERR}__;
+          }
+
+          my $text = $self->{doc}-><M::Document.createTextNode> ('<');
+          $parent-><M::Node.appendChild> ($text);
+          $vals->{value} .= '<';
         }
       }
       
@@ -2197,10 +2216,10 @@ ClsDef:
         }
       } (Name) {
         my $er;
-        lang:Perl ($name => $token.value) {
+        lang:Perl ($name => $token.value) : has-error {
           ## TODO: Namespace well-formedness
           ## TODO: Entity declared constraints
-          ## TODO: No external entity constraint
+          
           $er = $self->{doc}-><M::Document.createEntityReference> ($name);
           push @{$vals->{nodes}}, $er;
           push @{$self->{entity}}, <Code::getCopyOfEntityState::
@@ -2211,6 +2230,23 @@ ClsDef:
           $self->{token} = [];
           push @{$self->{entity_char}}, $self->{char};
           $self->{char} = [];
+
+          if ($self->{entity}->[-1]->{is_external_entity}) {
+            my $location;
+            __CODE{xp|get-location-from-token::
+              $token => {$token},
+              $result => {$location},
+            }__;
+            my $continue = __DOMCore:ERROR{xp|wf-no-external-entity-references::
+              xp|error-token => {$token},
+              c|location => {$location},
+              xp|name => {$name},
+            }__;
+            unless ($continue) {
+              __EXCEPTION{DOMLS|PARSE_ERR::
+              }__;
+            }
+          } # if external entity
         }
 
         ?lexmode AttributeValueLiteralE;
@@ -2275,7 +2311,7 @@ ClsDef:
         lang:Perl ($name => $token.value) {
           ## TODO: Namespace well-formedness
           ## TODO: Entity declared constraints
-          ## TODO: No external entity constraint
+
           $er = $self->{doc}-><M::Document.createEntityReference> ($name);
           $parent-><M::Node.appendChild> ($er);
           push @{$self->{entity}}, <Code::getCopyOfEntityState::
@@ -2286,6 +2322,23 @@ ClsDef:
           $self->{token} = [];
           push @{$self->{entity_char}}, $self->{char};
           $self->{char} = [];
+
+          if ($self->{entity}->[-1]->{is_external_entity}) {
+            my $location;
+            __CODE{xp|get-location-from-token::
+              $token => {$token},
+              $result => {$location},
+            }__;
+            my $continue = __DOMCore:ERROR{xp|wf-no-external-entity-references::
+              xp|error-token => {$token},
+              c|location => {$location},
+              xp|name => {$name},
+            }__;
+            unless ($continue) {
+              __EXCEPTION{DOMLS|PARSE_ERR::
+              }__;
+            }
+          } # if external entity
         }
 
         ?lexmode AttributeValueLiteralE;
@@ -2944,7 +2997,7 @@ ClsDef:
       ~ (S) { }
 
       my $decl;
-      lang:Perl { $decl = { name => '#ILLEGAL' }; }
+      lang:Perl { $decl = { name => '#ILLEGAL', reptxt => \'' }; }
 
       ~? (PERO) {
         ~ (S) { }
@@ -2959,7 +3012,9 @@ ClsDef:
         }
       } 
 
+      my $node;
       lang:Perl {
+        $node =
         $decl->{node} = $self->{docx}-><M::DocumentXDoctype.createGeneralEntity>
                                          ($decl->{name});
         ## TODO: Parameter entity...
@@ -2974,15 +3029,23 @@ ClsDef:
       } (Name == 'PUBLIC') {
         ~ (S) { }
 
-        &PubidLiteral ($decl => $decl);
+        &PubidLiteral ($decl => $node);
 
         ~ (S) { }
 
-        &SystemLiteral ($decl => $decl);
+        &SystemLiteral ($decl => $node);
+
+        lang:Perl {
+          $decl->{is_external_entity} = true;
+        }
       } (Name == 'SYSTEM') {
         ~ (S) { }
 
-        &SystemLiteral ($decl => $decl);
+        &SystemLiteral ($decl => $node);
+
+        lang:Perl {
+          $decl->{is_external_entity} = true;
+        }
       }
 
       ~? (S) {
@@ -6408,6 +6471,574 @@ ClsDef:
         }
 
     @@XMLTest:
+      @@@QName: xp.element.type.match.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <p></pa>(err)
+      @@@c:erred: <[[xp|wf-element-type-match]]> { (1, 4)..(1, 8); }
+      @@@c:erred: <[[xp|wf-syntax-error]]> { }
+    @@XMLTest:
+      @@@QName: xp.element.type.match.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <p><pa></pa></pa>(err)
+      @@@c:erred: <[[xp|wf-element-type-match]]> { (1, 13)..(1, 17); }
+      @@@c:erred: <[[xp|wf-syntax-error]]> { }
+    @@XMLTest:
+      @@@QName: xp.element.type.match.3.test
+      @@@DEnt:
+        @@@@test:value:
+          <p><pa></p></p>(err)
+      @@@c:erred: <[[xp|wf-element-type-match]]> { (1, 8)..(1, 11); }
+      @@@c:erred: <[[xp|wf-syntax-error]]> { }
+    @@XMLTest:
+      @@@QName: xp.element.type.match.4.test
+      @@@DEnt:
+        @@@@test:value:
+          <a:p xmlns:a="about:1"></p>(err)
+      @@@c:erred: <[[xp|wf-element-type-match]]> { (1, 24)..(1, 27); }
+      @@@c:erred: <[[xp|wf-syntax-error]]> { }
+    @@XMLTest:
+      @@@QName: xp.element.type.match.5.test
+      @@@DEnt:
+        @@@@test:value:
+          <a:p xmlns:a="about:1" xmlns:b="about:1"></b:p>(err)
+      @@@c:erred: <[[xp|wf-element-type-match]]> { (1, 42)..(1, 47); }
+      @@@c:erred: <[[xp|wf-syntax-error]]> { }
+
+    @@XMLTest:
+      @@@QName: xp.stag.stago.name.etago.test
+      @@@DEnt:
+        @@@@test:value:
+          <a</a>
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (1, 3); }
+    @@XMLTest:
+      @@@QName: xp.stag.stago.name.s.etago.test
+      @@@DEnt:
+        @@@@test:value:
+          <a </a>
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (1, 4); }
+    @@XMLTest:
+      @@@QName: xp.stag.stago.name.s.attr.etago.test
+      @@@DEnt:
+        @@@@test:value:
+          <a a="b"</a>
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (1, 9); }
+    @@XMLTest:
+      @@@QName: xp.stag.stago.name.s.attr.s.attr.etago.test
+      @@@DEnt:
+        @@@@test:value:
+          <a a="b" c="d"</a>
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (1, 15); }
+    @@XMLTest:
+      @@@QName: xp.stag.stago.name.s.attr.s.etago.test
+      @@@DEnt:
+        @@@@test:value:
+          <a a="b" </a>
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (1, 10); }
+    @@XMLTest:
+      @@@QName: xp.stag.etag.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <root><a></a></root>
+      @@@test:domTree:
+        document {
+          element {
+            element {
+              node-name: 'a';
+            }
+          }
+        }	
+    @@XMLTest:
+      @@@QName: xp.stag.etag.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <root><ab></ab></root>
+      @@@test:domTree:
+        document {
+          element {
+            element {
+              node-name: 'ab';
+            }
+          }
+        }	
+    @@XMLTest:
+      @@@QName: xp.stag.etag.s.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <root><a  ></a  ></root>
+      @@@test:domTree:
+        document {
+          element {
+            element {
+              node-name: 'a';
+            }
+          }
+        }	
+    @@XMLTest:
+      @@@QName: xp.etag.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <root><a/></root>
+      @@@test:domTree:
+        document {
+          element {
+            element {
+              node-name: 'a';
+            }
+          }
+        }	
+    @@XMLTest:
+      @@@QName: xp.etag.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <root><a    /></root>
+      @@@test:domTree:
+        document {
+          element {
+            element {
+              node-name: 'a';
+            }
+          }
+        }	
+    @@XMLTest:
+      @@@QName: xp.stag.etag.attr.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <root><a at="v"></a></root>
+      @@@test:domTree:
+        document {
+          element {
+            element {
+              node-name: 'a';
+              attribute {
+                node-name: 'at';
+                value: 'v';
+              }
+            }
+          }
+        }	
+    @@XMLTest:
+      @@@QName: xp.stag.etag.attr.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <root><a at="v"  ></a></root>
+      @@@test:domTree:
+        document {
+          element {
+            element {
+              node-name: 'a';
+              attribute {
+                node-name: 'at';
+                value: 'v';
+              }
+            }
+          }
+        }	
+    @@XMLTest:
+      @@@QName: xp.stag.etag.attr.3.test
+      @@@DEnt:
+        @@@@test:value:
+          <root><a at     ="v"></a></root>
+      @@@test:domTree:
+        document {
+          element {
+            element {
+              node-name: 'a';
+              attribute {
+                node-name: 'at';
+                value: 'v';
+              }
+            }
+          }
+        }	
+    @@XMLTest:
+      @@@QName: xp.stag.etag.attr.4.test
+      @@@DEnt:
+        @@@@test:value:
+          <root><a at=   "v"></a></root>
+      @@@test:domTree:
+        document {
+          element {
+            element {
+              node-name: 'a';
+              attribute {
+                node-name: 'at';
+                value: 'v';
+              }
+            }
+          }
+        }	
+    @@XMLTest:
+      @@@QName: xp.stag.etag.attr.5.test
+      @@@DEnt:
+        @@@@test:value:
+          <root><a at='v'></a></root>
+      @@@test:domTree:
+        document {
+          element {
+            element {
+              node-name: 'a';
+              attribute {
+                node-name: 'at';
+                value: 'v';
+              }
+            }
+          }
+        }	
+    @@XMLTest:
+      @@@QName: xp.stag.etag.attr.6.test
+      @@@DEnt:
+        @@@@test:value:
+          <root><a at=   'v'  ></a></root>
+      @@@test:domTree:
+        document {
+          element {
+            element {
+              node-name: 'a';
+              attribute {
+                node-name: 'at';
+                value: 'v';
+              }
+            }
+          }
+        }	
+    @@XMLTest:
+      @@@QName: xp.stag.etag.attr.attr.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <root><a at="v"  tr="w"></a></root>
+      @@@test:domTree:
+        document {
+          element {
+            element {
+              node-name: 'a';
+              attribute {
+                node-name: 'at';
+                value: 'v';
+              }
+              attribute {
+                node-name: 'tr';
+                value: 'w';
+              }
+            }
+          }
+        }	
+    @@XMLTest:
+      @@@QName: xp.stag.etag.attr.attr.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <root><a tr="w" at="v"></a></root>
+      @@@test:domTree:
+        document {
+          element {
+            element {
+              node-name: 'a';
+              attribute {
+                node-name: 'at';
+                value: 'v';
+              }
+              attribute {
+                node-name: 'tr';
+                value: 'w';
+              }
+            }
+          }
+        }	
+    @@XMLTest:
+      @@@QName: xp.stag.etag.attr.no.s.attr.test
+      @@@DEnt:
+        @@@@test:value:
+          <root><a at="v"tr="w"></a></root>
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (1, 16)..(1, 17); }
+    @@XMLTest:
+      @@@QName: xp.etag.attr.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <root><a at="v" tr="w"></a b="c"></root>
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (1, 28); }
+    @@XMLTest:
+      @@@QName: xp.etag.no.etagc.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <root><a at="v" tr="w"></a</root>
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (1, 27)..(1, 28); }
+    @@XMLTest:
+      @@@QName: xp.etag.no.etagc.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <root><a at="v" tr="w"></a  </root>
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (1, 29)..(1, 30); }
+    @@XMLTest:
+      @@@QName: xp.mtag.attr.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <root><a  b="c"/></root>
+      @@@test:domTree:
+        document {
+          element {
+            element {
+              node-name: 'a';
+              attribute {
+                node-name: 'b';
+                value: 'c';
+              }
+            }
+          }
+        }	
+    @@XMLTest:
+      @@@QName: xp.mtag.attr.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <root><a  b="c"  /></root>
+      @@@test:domTree:
+        document {
+          element {
+            element {
+              node-name: 'a';
+              attribute {
+                node-name: 'b';
+                value: 'c';
+              }
+            }
+          }
+        }	
+    @@XMLTest:
+      @@@QName: xp.mtag.attr.3.test
+      @@@DEnt:
+        @@@@test:value:
+          <root><a  b='c'/></root>
+      @@@test:domTree:
+        document {
+          element {
+            element {
+              node-name: 'a';
+              attribute {
+                node-name: 'b';
+                value: 'c';
+              }
+            }
+          }
+        }	
+    @@XMLTest:
+      @@@QName: xp.mtag.attr.4.test
+      @@@DEnt:
+        @@@@test:value:
+          <root><a  b="c" d="e"/></root>
+      @@@test:domTree:
+        document {
+          element {
+            element {
+              node-name: 'a';
+              attribute {
+                node-name: 'b';
+                value: 'c';
+              }
+              attribute {
+                node-name: 'd';
+                value: 'e';
+              }
+            }
+          }
+        }	
+
+    @@XMLTest:
+      @@@QName: xp.attvalue.lt.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <a b="aa<dd"/>
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (1, 9); }
+    @@XMLTest:
+      @@@QName: xp.attvalue.lt.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <a b='aa<dd'/>
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (1, 9); }
+    @@XMLTest:
+      @@@QName: xp.attvalue.amp.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <a b="aa& dd"/>
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (1, 9)..(1, 12); }
+    @@XMLTest:
+      @@@QName: xp.attvalue.amp.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <a b='aa& dd'/>
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (1, 9)..(1, 12); }
+    @@XMLTest:
+      @@@QName: xp.attvalue.amp.3.test
+      @@@DEnt:
+        @@@@test:value:
+          <a b="aa&# dd"/>
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (1, 9)..(1, 13); }
+    @@XMLTest:
+      @@@QName: xp.attvalue.amp.4.test
+      @@@DEnt:
+        @@@@test:value:
+          <a b="aa&#x dd"/>
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (1, 9)..(1, 14); }
+
+    @@XMLTest:
+      @@@QName: xp.unique.att.spec.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <a b="c" b="d"/>
+      @@@c:erred: <[[xp|wf-unique-att-spec]]> { (1, 4)..(1, 14); }
+    @@XMLTest:
+      @@@QName: xp.unique.att.spec.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <a d:b="c" d:b="d" xmlns:d="about:2"/>
+      @@@c:erred: <[[xp|wf-unique-att-spec]]> { (1, 4)..(1, 18); }
+
+    @@XMLTest:
+      @@@QName: xp.no.external.entity.references.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+            <!ENTITY ent SYSTEM "something">
+          ]>
+          <a b="c&ent;"/>
+      @@@c:erred: <[[xp|wf-no-external-entity-references]]> { (4, 8)..(4, 12); }
+    @@XMLTest:
+      @@@QName: xp.no.external.entity.references.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+            <!NOTATION n SYSTEM "notation">
+            <!ENTITY ent SYSTEM "something" NDATA n>
+          ]>
+          <a b="c&ent;"/>
+      @@@c:erred: <[[xp|wf-no-external-entity-references]]> { (5, 8)..(5, 12); }
+    @@XMLTest:
+      @@@QName: xp.no.external.entity.references.3.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+            <!ENTITY ent SYSTEM "something">
+            <!ENTITY ent2 "ddd&ent;">
+          ]>
+          <a b="c&ent2;"/>
+      @@@c:erred: <[[xp|wf-no-external-entity-references]]> { (1, 4)..(1, 8); }
+    @@XMLTest:
+      @@@QName: xp.no.external.entity.references.4.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+            <!NOTATION n SYSTEM "notation">
+            <!ENTITY ent SYSTEM "something" NDATA n>
+            <!ENTITY ent2 "ddd&ent;">
+          ]>
+          <a b="c&ent2;"/>
+      @@@c:erred: <[[xp|wf-no-external-entity-references]]> { (1, 4)..(1, 8); }
+    @@XMLTest:
+      @@@QName: xp.no.lt.in.attr.value.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+          <!ENTITY ent "aa<bb">
+          ]>
+          <a b="c&ent;"/>
+      @@@c:erred: <[[xp|wf-no-lt-in-attribute-values]]> { (1, 3); }
+    @@XMLTest:
+      @@@QName: xp.no.lt.in.attr.value.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+          <!ENTITY ent "aa<bb">
+          <!ENTITY ent2 "ccc&ent;">
+          ]>
+          <a b="c&ent2;"/>
+      @@@c:erred: <[[xp|wf-no-lt-in-attribute-values]]> { (1, 3); }
+    @@XMLTest:
+      @@@QName: xp.no.lt.in.attr.value.3.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+          <!ENTITY ent "aa&#x3C;bb">
+          ]>
+          <a b="c&ent;"/>
+      @@@c:erred: <[[xp|wf-no-lt-in-attribute-values]]> { (1, 3); }
+    @@XMLTest:
+      @@@QName: xp.no.lt.in.attr.value.4.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+          <!ENTITY ent "aa&#x3C;bb">
+          <!ENTITY ent2 "ccc&ent;">
+          ]>
+          <a b="c&ent2;"/>
+      @@@c:erred: <[[xp|wf-no-lt-in-attribute-values]]> { (1, 3); }
+    @@XMLTest:
+      @@@QName: xp.ger.lt.in.attr.value.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+          <!ENTITY ent "aa&lt;bb">
+          ]>
+          <a b="c&ent;"/>
+      @@@test:domTree:
+        document {
+          document-type {
+            general-entity {
+              node-name: 'ent';
+              text-content: 'aa<bb';
+            }
+          }
+          element {
+            attribute {
+              node-name: 'b';
+              text { data: 'c'; }
+              general-entity-reference {
+                node-name: 'ent';
+                text-content: 'aa<bb';
+              }
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.ger.lt.in.attr.value.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+          <!ENTITY ent "aa&lt;bb">
+          <!ENTITY ent2 "ccc&ent;">
+          ]>
+          <a b="c&ent2;"/>
+      @@@test:domTree:
+        document {
+          document-type {
+            general-entity {
+              node-name: 'ent';
+              text-content: 'aa<bb';
+            }
+            general-entity {
+              node-name: 'ent2';
+              text { data: 'ccc'; }
+              general-entity-reference {
+                node-name: 'ent';
+                text-content: 'aa<bb';
+              }
+            }
+          }
+          element {
+            attribute {
+              node-name: 'b';
+              text { data: 'c'; }
+              general-entity-reference {
+                node-name: 'ent2';
+                text { data: 'ccc'; }
+                general-entity-reference {
+                  node-name: 'ent';
+                  text-content: 'aa<bb';
+                }
+              }
+            }
+          }
+        }
+
+    @@XMLTest:
       @@@QName: xp.doctype.intsubset.pi.test
       @@@DEnt:
         @@@@test:value:
@@ -7388,6 +8019,649 @@ ClsDef:
           }
         }
 
+    @@XMLTest:
+      @@@QName: xp.element.content.ncr.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <e>&#33;</e>
+      @@@test:domTree:
+        document {
+          element {
+            text-content: '!';
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.element.content.ncr.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <e>aaaa&#33;bbbb</e>
+      @@@test:domTree:
+        document {
+          element {
+            text-content: 'aaaa!bbbb';
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.attrval.ncr.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <e a="&#33;"/>
+      @@@test:domTree:
+        document {
+          element {
+            attribute {
+              node-name: 'a';
+              text-content: '!';
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.attrval.ncr.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <e a="aaaaa&#33;bbbbb"/>
+      @@@test:domTree:
+        document {
+          element {
+            attribute {
+              node-name: 'a';
+              text-content: 'aaaaa!bbbbb';
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.attrval.ncr.3.test
+      @@@DEnt:
+        @@@@test:value:
+          <e a='&#33;'/>
+      @@@test:domTree:
+        document {
+          element {
+            attribute {
+              node-name: 'a';
+              text-content: '!';
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.attrval.ncr.4.test
+      @@@DEnt:
+        @@@@test:value:
+          <e a='aaaaa&#33;bbbbb'/>
+      @@@test:domTree:
+        document {
+          element {
+            attribute {
+              node-name: 'a';
+              text-content: 'aaaaa!bbbbb';
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.entval.ncr.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE e [
+            <!ENTITY ent "&#33;">
+          ]>
+          <e/>
+      @@@test:domTree:
+        document {
+          document-type {
+            general-entity {
+              node-name: 'ent';
+              text-content: '!';
+            }
+          }
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.entval.ncr.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE e [
+            <!ENTITY ent "aaaaa&#33;bbbbb">
+          ]>
+          <e/>
+      @@@test:domTree:
+        document {
+          document-type {
+            general-entity {
+              node-name: 'ent';
+              text-content: 'aaaaa!bbbbb';
+            }
+          }
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.element.content.reptxt.ncr.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE e [
+            <!ENTITY ent "&#38;#33;">
+          ]>
+          <e>&ent;</e>
+      @@@test:domTree:
+        document {
+          document-type { }
+          element {
+            general-entity-reference {
+              node-name: 'ent';
+              text-content: '!';
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.element.content.reptxt.ncr.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE e [
+            <!ENTITY ent "aaaaa&#38;#33;bbbbb">
+          ]>
+          <e>&ent;</e>
+      @@@test:domTree:
+        document {
+          document-type { }
+          element {
+            general-entity-reference {
+              node-name: 'ent';
+              text-content: 'aaaaa!bbbbb';
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.element.content.reptxt.reptxt.ncr.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE e [
+            <!ENTITY ent "&#38;#33;">
+            <!ENTITY ent2 "&ent;">
+          ]>
+          <e>&ent2;</e>
+      @@@test:domTree:
+        document {
+          document-type { }
+          element {
+            general-entity-reference {
+              node-name: 'ent2';
+              general-entity-reference {
+                node-name: 'ent';
+                text-content: '!';
+              }
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.element.content.reptxt.reptxt.ncr.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE e [
+            <!ENTITY ent "aa&#38;#33;bb">
+            <!ENTITY ent2 "&ent;">
+          ]>
+          <e>&ent2;</e>
+      @@@test:domTree:
+        document {
+          document-type { }
+          element {
+            general-entity-reference {
+              node-name: 'ent2';
+              general-entity-reference {
+                node-name: 'ent';
+                text-content: 'aa!bb';
+              }
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.attval.reptxt.ncr.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE e [
+            <!ENTITY ent "&#38;#33;">
+          ]>
+          <e a="&ent;"/>
+      @@@test:domTree:
+        document {
+          document-type { }
+          element {
+            attribute {
+              node-name: 'a';
+              general-entity-reference {
+                node-name: 'ent';
+                text-content: '!';
+              }
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.attval.reptxt.ncr.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE e [
+            <!ENTITY ent "aaaaa&#38;#33;bbbbb">
+          ]>
+          <e a="&ent;"/>
+      @@@test:domTree:
+        document {
+          document-type { }
+          element {
+            attribute {
+              node-name: 'a';
+              general-entity-reference {
+                node-name: 'ent';
+                text-content: 'aaaaa!bbbbb';
+              }
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.attval.reptxt.reptxt.ncr.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE e [
+            <!ENTITY ent "&#38;#33;">
+            <!ENTITY ent2 "&ent;">
+          ]>
+          <e a="&ent2;"/>
+      @@@test:domTree:
+        document {
+          document-type { }
+          element {
+            attribute {
+              node-name: 'a';
+              general-entity-reference {
+                node-name: 'ent2';
+                general-entity-reference {
+                  node-name: 'ent';
+                  text-content: '!';
+                }
+              }
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.attval.reptxt.reptxt.ncr.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE e [
+            <!ENTITY ent "aa&#38;#33;bb">
+            <!ENTITY ent2 "&ent;">
+          ]>
+          <e a="&ent2;"/>
+      @@@test:domTree:
+        document {
+          document-type { }
+          element {
+            attribute {
+              node-name: 'a';
+              general-entity-reference {
+                node-name: 'ent2';
+                general-entity-reference {
+                  node-name: 'ent';
+                  text-content: 'aa!bb';
+                }
+              }
+            }
+          }
+        }
+
+    @@XMLTest:
+      @@@QName: xp.element.content.hcr.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <e>&#x21;</e>
+      @@@test:domTree:
+        document {
+          element {
+            text-content: '!';
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.element.content.hcr.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <e>aaaa&#x21;bbbb</e>
+      @@@test:domTree:
+        document {
+          element {
+            text-content: 'aaaa!bbbb';
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.attrval.hcr.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <e a="&#x21;"/>
+      @@@test:domTree:
+        document {
+          element {
+            attribute {
+              node-name: 'a';
+              text-content: '!';
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.attrval.hcr.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <e a="aaaaa&#x21;bbbbb"/>
+      @@@test:domTree:
+        document {
+          element {
+            attribute {
+              node-name: 'a';
+              text-content: 'aaaaa!bbbbb';
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.attrval.hcr.3.test
+      @@@DEnt:
+        @@@@test:value:
+          <e a='&#x21;'/>
+      @@@test:domTree:
+        document {
+          element {
+            attribute {
+              node-name: 'a';
+              text-content: '!';
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.attrval.hcr.4.test
+      @@@DEnt:
+        @@@@test:value:
+          <e a='aaaaa&#x21;bbbbb'/>
+      @@@test:domTree:
+        document {
+          element {
+            attribute {
+              node-name: 'a';
+              text-content: 'aaaaa!bbbbb';
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.entval.hcr.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE e [
+            <!ENTITY ent "&#x21;">
+          ]>
+          <e/>
+      @@@test:domTree:
+        document {
+          document-type {
+            general-entity {
+              node-name: 'ent';
+              text-content: '!';
+            }
+          }
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.entval.hcr.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE e [
+            <!ENTITY ent "aaaaa&#x21;bbbbb">
+          ]>
+          <e/>
+      @@@test:domTree:
+        document {
+          document-type {
+            general-entity {
+              node-name: 'ent';
+              text-content: 'aaaaa!bbbbb';
+            }
+          }
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.element.content.reptxt.hcr.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE e [
+            <!ENTITY ent "&#38;#x21;">
+          ]>
+          <e>&ent;</e>
+      @@@test:domTree:
+        document {
+          document-type { }
+          element {
+            general-entity-reference {
+              node-name: 'ent';
+              text-content: '!';
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.element.content.reptxt.hcr.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE e [
+            <!ENTITY ent "aaaaa&#38;#x21;bbbbb">
+          ]>
+          <e>&ent;</e>
+      @@@test:domTree:
+        document {
+          document-type { }
+          element {
+            general-entity-reference {
+              node-name: 'ent';
+              text-content: 'aaaaa!bbbbb';
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.element.content.reptxt.reptxt.hcr.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE e [
+            <!ENTITY ent "&#38;#x21;">
+            <!ENTITY ent2 "&ent;">
+          ]>
+          <e>&ent2;</e>
+      @@@test:domTree:
+        document {
+          document-type { }
+          element {
+            general-entity-reference {
+              node-name: 'ent2';
+              general-entity-reference {
+                node-name: 'ent';
+                text-content: '!';
+              }
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.element.content.reptxt.reptxt.hcr.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE e [
+            <!ENTITY ent "aa&#38;#x21;bb">
+            <!ENTITY ent2 "&ent;">
+          ]>
+          <e>&ent2;</e>
+      @@@test:domTree:
+        document {
+          document-type { }
+          element {
+            general-entity-reference {
+              node-name: 'ent2';
+              general-entity-reference {
+                node-name: 'ent';
+                text-content: 'aa!bb';
+              }
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.attval.reptxt.hcr.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE e [
+            <!ENTITY ent "&#38;#x21;">
+          ]>
+          <e a="&ent;"/>
+      @@@test:domTree:
+        document {
+          document-type { }
+          element {
+            attribute {
+              node-name: 'a';
+              general-entity-reference {
+                node-name: 'ent';
+                text-content: '!';
+              }
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.attval.reptxt.hcr.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE e [
+            <!ENTITY ent "aaaaa&#38;#x21;bbbbb">
+          ]>
+          <e a="&ent;"/>
+      @@@test:domTree:
+        document {
+          document-type { }
+          element {
+            attribute {
+              node-name: 'a';
+              general-entity-reference {
+                node-name: 'ent';
+                text-content: 'aaaaa!bbbbb';
+              }
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.attval.reptxt.reptxt.hcr.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE e [
+            <!ENTITY ent "&#38;#x21;">
+            <!ENTITY ent2 "&ent;">
+          ]>
+          <e a="&ent2;"/>
+      @@@test:domTree:
+        document {
+          document-type { }
+          element {
+            attribute {
+              node-name: 'a';
+              general-entity-reference {
+                node-name: 'ent2';
+                general-entity-reference {
+                  node-name: 'ent';
+                  text-content: '!';
+                }
+              }
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.attval.reptxt.reptxt.hcr.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE e [
+            <!ENTITY ent "aa&#38;#x21;bb">
+            <!ENTITY ent2 "&ent;">
+          ]>
+          <e a="&ent2;"/>
+      @@@test:domTree:
+        document {
+          document-type { }
+          element {
+            attribute {
+              node-name: 'a';
+              general-entity-reference {
+                node-name: 'ent2';
+                general-entity-reference {
+                  node-name: 'ent';
+                  text-content: 'aa!bb';
+                }
+              }
+            }
+          }
+        }
+
+    @@XMLTest:
+      @@@QName: xp.element.content.ncr.legal.char.1.0.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0"?>
+          <e>&#0;</e>
+      @@@c:erred: <[[xp|wf-legal-character]]> { (2, 4)..(2, 7); }
+    @@XMLTest:
+      @@@QName: xp.element.content.ncr.legal.char.1.1.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.1"?>
+          <e>&#0;</e>
+      @@@c:erred: <[[xp|wf-legal-character]]> { (2, 4)..(2, 7); }
+    @@XMLTest:
+      @@@QName: xp.element.content.ncr.legal.char.1.0.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0"?>
+          <e>&#1;</e>
+      @@@c:erred: <[[xp|wf-legal-character]]> { (2, 4)..(2, 7); }
+    @@XMLTest:
+      @@@QName: xp.element.content.ncr.legal.char.1.1.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.1"?>
+          <e>&#1;</e>
+      @@@test:domTree:
+        document {
+          xml-version: '1.1';
+          element {
+            text-content: U+0001;
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.element.content.hcr.legal.char.1.0.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0"?>
+          <e>&#x0;</e>
+      @@@c:erred: <[[xp|wf-legal-character]]> { (2, 4)..(2, 8); }
+    @@XMLTest:
+      @@@QName: xp.element.content.hcr.legal.char.1.1.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.1"?>
+          <e>&#x0;</e>
+      @@@c:erred: <[[xp|wf-legal-character]]> { (2, 4)..(2, 8); }
+    @@XMLTest:
+      @@@QName: xp.element.content.hcr.legal.char.1.0.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0"?>
+          <e>&#x1;</e>
+      @@@c:erred: <[[xp|wf-legal-character]]> { (2, 4)..(2, 8); }
+    @@XMLTest:
+      @@@QName: xp.element.content.hcr.legal.char.1.1.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.1"?>
+          <e>&#x1;</e>
+      @@@test:domTree:
+        document {
+          xml-version: '1.1';
+          element {
+            text-content: U+0001;
+          }
+        }
+
     @@PerlDef:
       my $impl = $Message::DOM::ImplementationRegistry->get_implementation ({
         'Core' => '3.0',
@@ -7730,6 +9004,34 @@ WFErrDef:
     @@@: xp|name
     @@enDesc:
       The name of the attribute.
+
+WFErrDef:
+  @QName: xp|wf-no-external-entity-references
+  @c:severity: c|SEVERITY_ERROR
+  @enDesc:
+    Attribute values <kwd:MUST-NOT> contain direct or indirect
+    entity references to external entities.
+  @enMufDef:
+    External entity |%p (name => {<Q::xp|name>});| is referenced
+    in an attribute value literal
+  @ecore:hasParameter: xp|error-token
+  @ecore:hasParameter:
+    @@@: xp|name
+    @@enDesc:
+      The name of the entity.
+
+WFErrDef:
+  @QName: xp|wf-no-lt-in-attribute-values
+  @c:severity: c|SEVERITY_ERROR
+  @enDesc:
+    The replacement text of any entity referred to directly or indirectly
+    in an attribute value literal <kwd:MUST-NOT> contain a
+    <CHAR::LESS-THAN SIGN>.
+  @enMufDef:
+    Entity replacement text cannot contain a
+    |LESS-THAN SIGN| since it is referenced from an attribute
+    value literal
+  @ecore:hasParameter: xp|error-token
 
 WFErrDef:
   @QName: xp|wf-legal-character
