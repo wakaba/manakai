@@ -12,7 +12,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/02/09 10:23:20 $
+    $Date: 2006/02/12 06:42:15 $
   
   @Require:
     @@Module:
@@ -1155,7 +1155,42 @@ IFClsDef:
             }
 
           } elsif ($attr eq 'general_entities') {
-            ## TODO: Implement
+            unless ($actualValue->can ($attr)) {
+              __DEEP{
+                $self-><M::DTManager.notOK>;
+              }__;
+              __CODE{printComment::
+                $test => $self,
+                $s => {
+                  $nodePathString.': Object (type |'.(ref $actualValue).
+                  '|) does not have attribute |'.$attr.'|'
+                },
+              }__;
+              __EXCEPTION{ASSERTION_ERR}__;
+            }
+            my $attrs = $actualValue->$attr;
+            my @akeys = sort {$a cmp $b} keys %$attrs;
+            if (@akeys != @{$expectedHash->{$attr}}) {
+              __DEEP{
+                $self-><M::DTManager.notOK>;
+              }__;
+              __CODE{printComment::
+                $test => $self,
+                $s => {
+                  $nodePathString.': It has '.@akeys.
+                  ' child nodes ('.@{$expectedHash->{$attr}}.' expected)'
+                },
+              }__;
+              __EXCEPTION{ASSERTION_ERR}__;
+            }
+            for my $xitem (@{$expectedHash->{$attr}}) {
+              __DEEP{
+                $self-><M::DTManager.assertDOMTreeEquals>
+                         (actual_value => $attrs->{$xitem->{node_name}->{value}},
+                          expected_hash => $xitem,
+                          node_path_string => $nodePathString);
+              }__;              
+            }
 
           } elsif ($attr eq 'notations') {
             ## TODO: Implement

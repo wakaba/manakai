@@ -1,3 +1,11 @@
+2006-02-12  Wakaba  <wakaba@suika.fam.cx>
+
+	* XMLParser.dis (parseString): General |Entity| replacement
+	tree is not constructed because of a typo.  Clears |EntityReference|
+	content before constructing |Entity| replacement tree.
+	The |xp:wf-entity-declared| well-formedness constraint
+	for entity references in attribute value literal is implemented.
+
 2006-02-11  Wakaba  <wakaba@suika.fam.cx>
 
 	* XMLParser.dis: |xp:wf-entity-declared| well-formedness
