@@ -12,7 +12,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/02/11 05:05:45 $
+    $Date: 2006/02/13 08:33:54 $
 
   @Require:
     @@Module:
@@ -2445,9 +2445,14 @@ IFCls1Def:
          __DEEP{
            my $od = $self-><AG::Node.ownerDocument>;
            my $strict_check;
+           my $cfg;
+           my $er_copy_asis;
            __FOR{ManakaiDOM:DOM3::
              $strict_check = $od-><AG::Document.strictErrorChecking>;
              $od-><AS::Document.strictErrorChecking> (false);
+             $cfg = $od-><AG::Document.domConfig>;
+             $er_copy_asis = $cfg-><M::c|DOMConfiguration.getParameter>
+                                     (<Q::cfg|clone-entity-reference-subtree>);
            }__;
            my @udh;
            my @node = ([$self]);
@@ -2551,6 +2556,29 @@ IFCls1Def:
              } elsif ($nt == <C::Node.ENTITY_REFERENCE_NODE>) {
                $clone = $od-><M::Document.createEntityReference>
                                     ($node-><AG::Node.nodeName>);
+               __FOR{ManakaiDOM:DOM3::
+                 if ($er_copy_asis) {
+                   local $clone->{<H::mn:node>}->{<H::c|read-only>} = false;
+                   $clone-><AS::Node.textContent> ('');
+                   my @ronode;
+                   for (@{$node-><AG::Node.childNodes>}) {
+                     push @ronode, $clone-><M::Node.appendChild>
+                                             ($_-><M::Node.cloneNode> (true));
+                   }
+                   if ($cfg-><M::c|DOMConfiguration.getParameter>
+                               (<Q::cfg|entity-reference-read-only>)) {
+                     while (@ronode) {
+                       my $ronode = shift @ronode;
+                       $ronode->{<H::mn:node>}->{<H::c|read-only>} = true;
+                       push @ronode, @{$ronode-><AG::Node.childNodes>};
+                       push @ronode, values %{$ronode-><AG::Node.attributes>
+                                                or {}};
+                     }
+                   }
+                   $clone->{<H::mn:node>}->{<H::ManakaiDOM|isExpanded>}
+                     = $node->{<H::mn:node>}->{<H::ManakaiDOM|isExpanded>};
+                 }
+               }__;
                if ($parent) {
                  $parent-><M::Node.appendChild> ($clone);
                } else {
@@ -2659,6 +2687,128 @@ IFCls1Def:
                               $clone->{<H::mn:node>}->{<H::mn:nodeID>});
 
         $node-><M::Node.setUserData> ('key', null, null);
+
+    @@XDTest:
+      @@@QName: EntityReference.cloneNode.clone-entity-reference-subtree.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docd = $doc-><M::Node.getFeature> (<Q::ManakaiDOM:XDoctype>, '3.0');
+        my $dtd = $docd-><M::d|DocumentXDoctype.createDocumentTypeDefinition>
+                           ('doctype');
+          my $et = $docd-><M::d|DocumentXDoctype.createGeneralEntity>
+                             ('ent1');
+          $et-><AS::Node.textContent> ('replacement text content');
+          $et-><AS::x|Entity.hasReplacementTree> (true);
+        $dtd-><M::DTDef.setGeneralEntityNode> ($et);
+        $doc-><M::Node.appendChild> ($dtd);
+        $doc-><AG::Document.domConfig>
+            -><M::c|DOMConfiguration.setParameter>
+                (<Q::cfg|entity-reference-read-only> => false);
+
+        $doc-><AG::Document.domConfig>
+            -><M::c|DOMConfiguration.setParameter>
+                (<Q::cfg|clone-entity-reference-subtree> => false);
+                # DOM 3 definition
+
+        $test->id ('original');
+        my $ent = $doc-><M::Document.createEntityReference> ('ent1');
+        $test->assert_isa ($ent, <IFName::x|EntityReference>);
+        $test->assert_equals ($ent-><AG::Node.textContent>,
+                              'replacement text content');
+        $test->assert_true ($ent-><AG::x|EntityReference.isExpanded>);
+
+        $test->id ('change');
+        $ent-><AS::Node.textContent> ('another text');
+        $test->assert_equals ($ent-><AG::Node.textContent>,
+                              'another text');
+
+        $test->id ('clone');
+        my $clone = $ent-><M::Node.cloneNode>;
+        $test->assert_isa ($clone, <IFName::x|EntityReference>);
+        $test->assert_equals ($clone-><AG::Node.textContent>,
+                              'replacement text content');
+        $test->assert_true ($clone-><AG::x|EntityReference.isExpanded>);
+    @@XDTest:
+      @@@QName: EntityReference.cloneNode.clone-entity-reference-subtree.2.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docd = $doc-><M::Node.getFeature> (<Q::ManakaiDOM:XDoctype>, '3.0');
+        my $dtd = $docd-><M::d|DocumentXDoctype.createDocumentTypeDefinition>
+                           ('doctype');
+          my $et = $docd-><M::d|DocumentXDoctype.createGeneralEntity>
+                             ('ent1');
+          $et-><AS::Node.textContent> ('replacement text content');
+          $et-><AS::x|Entity.hasReplacementTree> (true);
+        $dtd-><M::DTDef.setGeneralEntityNode> ($et);
+        $doc-><M::Node.appendChild> ($dtd);
+        $doc-><AG::Document.domConfig>
+            -><M::c|DOMConfiguration.setParameter>
+                (<Q::cfg|entity-reference-read-only> => false);
+
+        $doc-><AG::Document.domConfig>
+            -><M::c|DOMConfiguration.setParameter>
+                (<Q::cfg|clone-entity-reference-subtree> => true);
+
+        $test->id ('original');
+        my $ent = $doc-><M::Document.createEntityReference> ('ent1');
+        $test->assert_isa ($ent, <IFName::x|EntityReference>);
+        $test->assert_equals ($ent-><AG::Node.textContent>,
+                              'replacement text content');
+        $test->assert_true ($ent-><AG::x|EntityReference.isExpanded>);
+
+        $test->id ('change');
+        $ent-><AS::Node.textContent> ('another text');
+        $test->assert_equals ($ent-><AG::Node.textContent>,
+                              'another text');
+
+        $test->id ('clone');
+        my $clone = $ent-><M::Node.cloneNode>;
+        $test->assert_isa ($clone, <IFName::x|EntityReference>);
+        $test->assert_equals ($clone-><AG::Node.textContent>,
+                              'another text');
+        $test->assert_true ($clone-><AG::x|EntityReference.isExpanded>);
+    @@XDTest:
+      @@@QName: EntityReference.cloneNode.clone-entity-reference-subtree.3.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docd = $doc-><M::Node.getFeature> (<Q::ManakaiDOM:XDoctype>, '3.0');
+        my $dtd = $docd-><M::d|DocumentXDoctype.createDocumentTypeDefinition>
+                           ('doctype');
+          my $et = $docd-><M::d|DocumentXDoctype.createGeneralEntity>
+                             ('ent1');
+          $et-><AS::Node.textContent> ('replacement text content');
+          $et-><AS::x|Entity.hasReplacementTree> (true);
+        $dtd-><M::DTDef.setGeneralEntityNode> ($et);
+        $doc-><M::Node.appendChild> ($dtd);
+        $doc-><AG::Document.domConfig>
+            -><M::c|DOMConfiguration.setParameter>
+                (<Q::cfg|entity-reference-read-only> => false);
+
+        $doc-><AG::Document.domConfig>
+            -><M::c|DOMConfiguration.setParameter>
+                (<Q::cfg|clone-entity-reference-subtree> => true);
+
+        $test->id ('original');
+        my $ent = $doc-><M::Document.createEntityReference> ('ent1');
+        $test->assert_isa ($ent, <IFName::x|EntityReference>);
+        $test->assert_equals ($ent-><AG::Node.textContent>,
+                              'replacement text content');
+        $test->assert_true ($ent-><AG::x|EntityReference.isExpanded>);
+
+        $test->id ('change');
+        $ent-><AS::Node.textContent> ('');
+        $test->assert_equals ($ent-><AG::Node.textContent>, '');
+        $ent-><AS::x|EntityReference.isExpanded> (false);
+        $test->assert_false ($ent-><AG::x|EntityReference.isExpanded>);
+
+        $test->id ('clone');
+        my $clone = $ent-><M::Node.cloneNode>;
+        $test->assert_isa ($clone, <IFName::x|EntityReference>);
+        $test->assert_equals ($clone-><AG::Node.textContent>, '');
+        $test->assert_false ($clone-><AG::x|EntityReference.isExpanded>);
 
   @Method:
      @@Name:  normalize
@@ -11130,6 +11280,11 @@ NodeTypeDef:
               my $__at = $__et-><M::ETDef.getAttributeDefinitionNode> ($name);
               if ($__at) {
                 my ($__an1, $__an2) = split /:/, $name;
+                my $__cfg = $document-><AG::Document.domConfig>;
+                my $__copy_asis = $__cfg-><M::c|DOMConfiguration.getParameter>
+                                       (<Q::cfg|clone-entity-reference-subtree>);
+                $__cfg-><M::c|DOMConfiguration.setParameter>
+                          (<Q::cfg|clone-entity-reference-subtree> => true);
                 ADD: {
                   my $__attr;
                   if (defined $__an2) {   ## prefixed attr
@@ -11176,6 +11331,8 @@ NodeTypeDef:
                               ## This method change the |specified| flag
                   $__attr->{<H::mn:node>}->{<H::infoset:specified>} = false;
                 } # ADD
+                $__cfg-><M::c|DOMConfiguration.setParameter>
+                       (<Q::cfg|clone-entity-reference-subtree> => $__copy_asis);
               }
             }
           }
@@ -15011,6 +15168,11 @@ NodeTypeDef:
             my %__gattr;
             my %__has_attr;
             my %__pfx_to_uri;
+            my $__cfg = $document-><AG::Document.domConfig>;
+            my $__copy_asis = $__cfg-><M::c|DOMConfiguration.getParameter>
+                                       (<Q::cfg|clone-entity-reference-subtree>);
+            $__cfg-><M::c|DOMConfiguration.setParameter>
+                          (<Q::cfg|clone-entity-reference-subtree> => true);
             for my $__at (@{$__et-><AG::ETDef.attributeDefinitions>}) {
               my $__at_default = $__at-><AG::ATDef.defaultType>;
               if ($__at_default == <C::ATDef.EXPLICIT_DEFAULT> or
@@ -15086,8 +15248,10 @@ NodeTypeDef:
                              ## This method changes |specified| flag
                 $__attr->{<H::mn:node>}->{<H::infoset:specified>} = false;
                 $__has_attr{defined $__nsuri ? $__nsuri : ''}->{$__ln} = true;
-              }
-            }
+              } # LN
+            } # pfx
+            $__cfg-><M::c|DOMConfiguration.setParameter>
+                      (<Q::cfg|clone-entity-reference-subtree> => $__copy_asis);
           }
         }
       }__;
@@ -17516,7 +17680,8 @@ NodeTypeDef:
            <Q::DOMCore:documentURI>, <Q::DOMCore:strictErrorChecking>, 
            <Q::infoset:children>,
            <Q::c|error-handler>,
-           <Q::cfg|entity-reference-read-only>.
+           <Q::cfg|entity-reference-read-only>,
+           <Q::cfg|clone-entity-reference-subtree>.
 
   @mn:subnode1: infoset|children
   @mn:anydata0: DOMCore|error-handler
@@ -17677,6 +17842,72 @@ boolCParam:
               (<Q::cfg|entity-reference-read-only> => null);
       $test->assert_true ($cfg-><M::c|DOMConfiguration.getParameter>
                                   (<Q::cfg|entity-reference-read-only>));
+
+boolCParam:
+  @QName: cfg|clone-entity-reference-subtree
+  @nodeProp: cerst
+  @c:targetType: t|Document
+  @TrueCase:
+    @@c:isSupported: 1
+    @@enDesc:
+      When the method <M::Node.cloneNode> clones an <IF::x|EntityReference>
+      node, it just copies its child nodes as for <IF::Attr> nodes.
+      In addition, the flag that indicates whether the entity reference
+      is expanded or not is copied to the cloned node.
+
+      If the <cfg::cfg|entity-reference-read-only> configuration
+      parameter set to <DOM::true>, cloned subtree, including
+      the cloned <IF::x|EntityReference> node itself, is read-only.
+      Otherwise, they are not read-only.
+
+      Note that <M::Node.adoptNode> and <M::Node.importNode> methods
+      does not affect by this configuration parameter.
+    @@enImplNote:
+      {ISSUE::
+        Should <M::Node.adoptNode> do as <M::Node.cloneNode> would do?
+      }
+  @FalseCase:
+    @@IsSupportRequired: 1
+    @@IsDefault: 1
+    @@c:isSupported: 1
+    @@enDesc:
+      When the method <M::Node.cloneNode> clones an <IF::x|EntityReference>
+      node, it simply creates a new <IF::x|EntityReference> node
+      as if the method <M::Document.createEntityReference> with appropriate
+      node name parameter is invoked.
+
+      This is the DOM Level 3 (or earlier) conformant behavior.
+  @L3Test:
+    @@QName: cfg.clone-entity-reference-subtree.test
+    @@PerlDef:
+      my $doc;
+      __CODE{createEmptyDocumentForTest:: $doc => $doc}__;
+
+      my $cfg = $doc-><AG::Document.domConfig>;
+
+      $test->id ('default.false');
+      $test->assert_false ($cfg-><M::c|DOMConfiguration.getParameter>
+                                  (<Q::cfg|clone-entity-reference-subtree>));
+   
+      $test->id ('false.to.true');
+      $cfg-><M::c|DOMConfiguration.setParameter>
+              (<Q::cfg|clone-entity-reference-subtree> => true);
+      $test->assert_false ($cfg-><M::c|DOMConfiguration.getParameter>
+                                   (<Q::cfg|clone-entity-reference-subtree>));
+      
+      $test->id ('true.to.false');
+      $cfg-><M::c|DOMConfiguration.setParameter>
+              (<Q::cfg|clone-entity-reference-subtree> => false);
+      $test->assert_false ($cfg-><M::c|DOMConfiguration.getParameter>
+                                   (<Q::cfg|clone-entity-reference-subtree>));
+
+      $test->id ('reset');
+      $cfg-><M::c|DOMConfiguration.setParameter>
+              (<Q::cfg|clone-entity-reference-subtree> => true);
+      $cfg-><M::c|DOMConfiguration.setParameter>
+              (<Q::cfg|clone-entity-reference-subtree> => null);
+      $test->assert_false ($cfg-><M::c|DOMConfiguration.getParameter>
+                                  (<Q::cfg|clone-entity-reference-subtree>));
 
 PropDef:
   @QName: c|ownerDocument

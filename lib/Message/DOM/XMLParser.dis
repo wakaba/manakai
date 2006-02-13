@@ -10,7 +10,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/02/12 06:42:15 $
+    $Date: 2006/02/13 08:33:54 $
 
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
@@ -303,14 +303,30 @@ ClsDef:
 
         __DEEP{
           $r = $self->{<H::c|implementation>}-><M::DOMImpl.createDocument>;
-          $r-><AS::Document.strictErrorChecking> (false);
           $self->{doc} = $r;
+          $self->{doc_cfg} = $r-><AG::Document.domConfig>;
           CORE::delete $self->{docx};
           CORE::delete $self->{dtdef};
           CORE::delete $self->{dtdecl};
-          $self->{cfg} = $r-><AG::Document.domConfig>;
-          local $r->{<H::mn:node>}
-                  ->{<H::cfg|entity-reference-read-only>} = false;
+ 
+          $r-><AS::Document.strictErrorChecking> (false);
+            ## NOTE: Any checks such as |Name| validity done by
+            ##       methods on DOM nodes are disabled.  It might result
+            ##       in creating an ill-formed DOM tree when parser
+            ##       errors are traped by |error-handler|.
+          $self->{doc_cfg}-><M::c|DOMConfiguration.setParameter>
+                              (<Q::cfg|entity-reference-read-only> => false);
+            ## NOTE: Turn this configuration parameter off is required
+            ##       because entity reference subtree is created by
+            ##       the parser rather than |createEntityReference|'s
+            ##       cloning.  Parser's |cfg:entity-reference-read-only|
+            ##       configuration parameter controls whether generated
+            ##       subtree is then marked as read-only or not.
+          $self->{doc_cfg}-><M::c|DOMConfiguration.setParameter>
+                              (<Q::cfg|clone-entity-reference-subtree> => true);
+            ## NOTE: Turn this configuration parameter on makes 
+            ##       entity reference subtrees in attribute default values
+            ##       cloned as is into default attribute node subtrees.
 
           ## Document entity -> |Document| node
           $self->_parse_DocumentEntity;
@@ -329,10 +345,17 @@ ClsDef:
                 ## TODO: External entity support
                 $self->_parse_InternalGeneralParsedEntity ($ent->{node});
                 $ent->{node}-><AS::x|Entity.hasReplacementTree> (true);
+              ## ISSUE: Should errors detected by this phase result
+              ##        in |DOMLS:PARSE_ERR| exception thrown?
             }
               ## TODO: Read-only if configuration (for all entities)
           }
 
+          ## Turns flags to their default value
+          $self->{doc_cfg}-><M::c|DOMConfiguration.setParameter>
+                              (<Q::cfg|entity-reference-read-only> => null);
+          $self->{doc_cfg}-><M::c|DOMConfiguration.setParameter>
+                              (<Q::cfg|clone-entity-reference-subtree> => null);
           $r-><AS::Document.strictErrorChecking> (true);
         }__;
 
@@ -2261,7 +2284,6 @@ ClsDef:
         my $er;
         lang:Perl ($name => $token.value) : has-error {
           ## TODO: Namespace well-formedness
-          ## TODO: Entity declared constraints
           
           $er = $self->{doc}-><M::Document.createEntityReference> ($name);
           $er-><AS::Node.textContent> ('');
@@ -2538,10 +2560,11 @@ ClsDef:
 
       lang:Perl {
         $self->{dtdef} = $node;
-        $doc-><M::Node.appendChild> ($node);
-        $doc-><AG::Document.domConfig>
-            -><M::c|DOMConfiguration.setParameter>
-                ('schema-type' => <Q::xml-dtd:>);
+        $self->{doc}-><M::Node.appendChild> ($node);
+        $self->{doc_cfg}-><M::c|DOMConfiguration.setParameter>
+                            ('schema-type' => <Q::xml-dtd:>);
+        ## ISSUE: Should default schema language information be
+        ##        preserved by some other flag?
       }
       
       ~? (DSO) {
@@ -9865,11 +9888,547 @@ ClsDef:
           }
         }
 
+    @@XMLTest:
+      @@@QName: xp.attlist.attval.ger.entity.declared.nopref.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE p [
+          <!ATTLIST p a CDATA "&entity;">
+          ]>
+          <p/>
+      @@@c:erred: <[[xp|wf-entity-declared]]> { (2, 22)..(2, 29); }
+    @@XMLTest:
+      @@@QName: xp.attlist.attval.ger.entity.declared.nopref.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE p [
+            <!ENTITY other "aa">
+            <!ENTITY % another "aa">
+          <!ATTLIST p a CDATA "&entity;">
+          ]>
+          <p/>
+      @@@c:erred: <[[xp|wf-entity-declared]]> { (4, 22)..(4, 29); }
+    @@XMLTest:
+      @@@QName: xp.attlist.attval.ger.entity.declared.nopref.3.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0" standalone="yes"?>
+          <!DOCTYPE p [
+          <!ATTLIST p a CDATA "&entity;">
+          ]>
+          <p/>
+      @@@c:erred: <[[xp|wf-entity-declared]]> { (3, 22)..(3, 29); }
+    @@XMLTest:
+      @@@QName: xp.attlist.attval.ger.entity.declared.nopref.4.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0" standalone="no"?>
+          <!DOCTYPE p [
+          <!ATTLIST p a CDATA "&entity;">
+          ]>
+          <p/>
+      @@@c:erred: <[[xp|wf-entity-declared]]> { (3, 22)..(3, 29); }
+    @@XMLTest:
+      @@@QName: xp.attlist.attval.ger.entity.declared.nopref.5.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0" standalone="yes"?>
+          <!DOCTYPE p [
+            <!ENTITY other "aa">
+            <!ENTITY % another "aa">
+          <!ATTLIST p a CDATA "&entity;">
+          ]>
+          <p/>
+      @@@c:erred: <[[xp|wf-entity-declared]]> { (5, 22)..(5, 29); }
+    @@XMLTest:
+      @@@QName: xp.attlist.attval.ger.entity.declared.nopref.6.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0" standalone="no"?>
+          <!DOCTYPE p [
+            <!ENTITY other "aa">
+            <!ENTITY % another "aa">
+          <!ATTLIST p a CDATA "&entity;">
+          ]>
+          <p/>
+      @@@c:erred: <[[xp|wf-entity-declared]]> { (5, 22)..(5, 29); }
+    @@XMLTest:
+      @@@QName: xp.attlist.attval.ger.entity.declared.nopref.-1.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE p [
+            <!ENTITY entity "value">
+          <!ATTLIST p a CDATA "&entity;">
+          ]>
+          <p/>
+      @@@test:domTree:
+        document {
+          document-type {
+            general-entity {
+              node-name: 'entity';
+              text-content: 'value';
+            }
+            element-type-definition {
+              node-name: 'p';
+              attribute-definition {
+                node-name: 'a';
+                general-entity-reference {
+                  node-name: 'entity';
+                  is-expanded: true;
+                  text-content: 'value';
+                }
+              }
+            }
+          }
+          element {
+            attribute {
+              node-name: 'a';
+              specified: false;
+              general-entity-reference {
+                node-name: 'entity';
+                is-expanded: true;
+                text-content: 'value';
+              }
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.attlist.attval.ger.entity.declared.nopref.-1.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE p [
+          <!ATTLIST p a CDATA "&entity;">
+            <!ENTITY entity "value">
+          ]>
+          <p/>
+      @@@c:erred: <[[xp|wf-entity-declared]]> { (2, 22)..(2, 29); }
+    @@XMLTest:
+      @@@QName: xp.attlist.attval.ger.entity.declared.nopref.-2.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE p [
+            <!ENTITY entity "value">
+            <!ENTITY another SYSTEM "another">
+          <!ATTLIST p a CDATA "&entity;">
+          ]>
+          <p/>
+      @@@test:domTree:
+        document {
+          document-type {
+            element-type-definition {
+              node-name: 'p';
+              attribute-definition {
+                node-name: 'a';
+                general-entity-reference {
+                  node-name: 'entity';
+                  is-expanded: true;
+                  text-content: 'value';
+                }
+              }
+            }
+            general-entity {
+              node-name: 'entity';
+              text-content: 'value';
+              has-replacement-tree: true;
+            }
+            general-entity {
+              node-name: 'another';
+              public-id: null;
+              system-id: 'another';
+              has-replacement-tree: false;
+            }
+          }
+          element {
+            attribute {
+              node-name: 'a';
+              specified: false;
+              general-entity-reference {
+                node-name: 'entity';
+                is-expanded: true;
+                text-content: 'value';
+              }
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.attlist.attval.ger.entity.declared.nopref.-2.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE p [
+          <!ATTLIST p a CDATA "&entity;">
+            <!ENTITY entity "value">
+            <!ENTITY another SYSTEM "another">
+          ]>
+          <p/>
+      @@@c:erred: <[[xp|wf-entity-declared]]> { (2, 22)..(2, 29); }
+    @@XMLTest:
+      @@@QName: xp.attlist.attval.ger.entity.declared.standalone.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0" standalone="yes"?>
+          <!DOCTYPE p [
+          <!ATTLIST p a CDATA "&entity;">
+          ]>
+          <p/>
+      @@@c:erred: <[[xp|wf-entity-declared]]> { (3, 22)..(3, 29); }
+    @@XMLTest:
+      @@@QName: xp.attlist.attval.ger.entity.declared.standalone.3.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0" standalone="yes"?>
+          <!DOCTYPE p [
+          <!ATTLIST p a CDATA "&entity;">
+            <!ENTITY % para "<!-- -->">
+            %para;
+          ]>
+          <p/>
+      @@@c:erred: <[[xp|wf-entity-declared]]> { (3, 22)..(3, 29); }
+    @@XMLTest:
+      @@@QName: xp.attlist.attval.ger.entity.declared.standalone.3.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0" standalone="yes"?>
+          <!DOCTYPE p [
+            <!ENTITY % para "<!-- -->">
+            %para;
+          <!ATTLIST p a CDATA "&entity;">
+          ]>
+          <p/>
+      @@@c:erred: <[[xp|wf-entity-declared]]> { (5, 22)..(5, 29); }
+      @@@enImplNote:
+        The <XML::ATTLIST> declaration is processed since
+        it is a <XA::standalone> document.
+    @@XMLTest:
+      @@@QName: xp.attlist.attval.ger.entity.declared.standalone.-1.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0" standalone="no"?>
+          <!DOCTYPE p [
+          <!ATTLIST p a CDATA "&entity;">
+            <!ENTITY % para "<!-- -->">
+            %para;
+          ]>
+          <p/>
+      @@@c:erred: <[[xp|wf-entity-declared]]> { (3, 22)..(3, 29); }
+    @@XMLTest:
+      @@@QName: xp.attlist.attval.ger.entity.declared.standalone.-1.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0" standalone="no"?>
+          <!DOCTYPE p [
+            <!ATTLIST q b CDATA #IMPLIED>
+            <!ENTITY % para "<!-- -->">
+            %para;
+          <!ATTLIST p a CDATA "&entity;">
+          ]>
+          <p c="d"/>
+      @@@test:domTree:
+        document {
+          document-type {
+            element-type-definition {
+              node-name: 'q';
+              attribute-definition {
+                node-name: 'b';
+              }
+            }
+          }
+          element {
+            attribute {
+              node-name: 'c';
+              text-content: 'd';
+            }
+          }
+        }
+      @@@enImplNote:
+        The second <XML::ATTLIST> declaration is read but not processed
+        and its <XML::&entity;> general entity reference violates 
+        entity declared validty constraint rather than well-formedness
+        constraint.
+    @@XMLTest:
+      @@@QName: xp.attlist.attval.ger.entity.declared.standalone.-2.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE p [
+          <!ATTLIST p a CDATA "&entity;">
+            <!ENTITY % para "<!-- -->">
+            %para;
+          ]>
+          <p/>
+      @@@c:erred: <[[xp|wf-entity-declared]]> { (2, 22)..(2, 29); }
+    @@XMLTest:
+      @@@QName: xp.attlist.attval.ger.entity.declared.standalone.-2.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE p [
+            <!ATTLIST q b CDATA #IMPLIED>
+            <!ENTITY % para "<!-- -->">
+            %para;
+          <!ATTLIST p a CDATA "&entity;">
+          ]>
+          <p c="d"/>
+      @@@test:domTree:
+        document {
+          document-type {
+            element-type-definition {
+              node-name: 'q';
+              attribute-definition {
+                node-name: 'b';
+              }
+            }
+          }
+          element {
+            attribute {
+              node-name: 'c';
+              text-content: 'd';
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.attlist.attval.ger.entity.declared.standalone.4.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0" standalone="yes"?>
+          <!DOCTYPE p [
+          <!ATTLIST p a CDATA "&entity;">
+            <!ENTITY % para SYSTEM "p">
+            %para;
+          ]>
+          <p/>
+      @@@c:erred: <[[xp|wf-entity-declared]]> { (3, 22)..(3, 29); }
+    @@XMLTest:
+      @@@QName: xp.attlist.attval.ger.entity.declared.standalone.4.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0" standalone="yes"?>
+          <!DOCTYPE p [
+            <!ENTITY % para SYSTEM "p">
+            %para;
+          <!ATTLIST p a CDATA "&entity;">
+          ]>
+          <p/>
+      @@@c:erred: <[[xp|wf-entity-declared]]> { (5, 22)..(5, 29); }
+      @@@enImplNote:
+        The <XML::ATTLIST> declaration is processed since
+        it is a <XA::standalone> document.
+    @@XMLTest:
+      @@@QName: xp.attlist.attval.ger.entity.declared.standalone.-3.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0" standalone="no"?>
+          <!DOCTYPE p [
+          <!ATTLIST p a CDATA "&entity;">
+            <!ENTITY % para SYSTEM "p">
+            %para;
+          ]>
+          <p/>
+      @@@c:erred: <[[xp|wf-entity-declared]]> { (3, 22)..(3, 29); }
+      @@@enImplNote:
+        Is this well-formed?  It has a parameter entity reference,
+        therefore, it does not violates Entity Declared WFC, isn't it?
+
+        Note that Firefox 1.5 and Opera 9 TP1 reports that this document has a
+        fatal error (also note that they does not support unexpanded).
+
+        See also:
+        <URI::http://suika.fam.cx/gate/2005/sw/%E5%B1%9E%E6%80%A7%E5%80%A4%E8%A1%A8%E8%A8%98#anchor-8>
+    @@XMLTest:
+      @@@QName: xp.attlist.attval.ger.entity.declared.standalone.-3.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0" standalone="no"?>
+          <!DOCTYPE p [
+            <!ATTLIST q b CDATA #IMPLIED>
+            <!ENTITY % para SYSTEM "p">
+            %para;
+          <!ATTLIST p a CDATA "&entity;">
+          ]>
+          <p c="d"/>
+      @@@test:domTree:
+        document {
+          document-type {
+            element-type-definition {
+              node-name: 'q';
+              attribute-definition {
+                node-name: 'b';
+              }
+            }
+          }
+          element {
+            attribute {
+              node-name: 'c';
+              text-content: 'd';
+            }
+          }
+        }
+      @@@enImplNote:
+        The second <XML::ATTLIST> declaration is read but not processed
+        and its <XML::&entity;> general entity reference violates 
+        entity declared validty constraint rather than well-formedness
+        constraint.
+    @@XMLTest:
+      @@@QName: xp.attlist.attval.ger.entity.declared.standalone.-4.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE p [
+          <!ATTLIST p a CDATA "&entity;">
+            <!ENTITY % para SYSTEM "p">
+            %para;
+          ]>
+          <p/>
+      @@@c:erred: <[[xp|wf-entity-declared]]> { (2, 22)..(2, 29); }
+    @@XMLTest:
+      @@@QName: xp.attlist.attval.ger.entity.declared.standalone.-4.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE p [
+            <!ATTLIST q b CDATA #IMPLIED>
+            <!ENTITY % para SYSTEM "p">
+            %para;
+          <!ATTLIST p a CDATA "&entity;">
+          ]>
+          <p c="d"/>
+      @@@test:domTree:
+        document {
+          document-type {
+            element-type-definition {
+              node-name: 'q';
+              attribute-definition {
+                node-name: 'b';
+              }
+            }
+          }
+          element {
+            attribute {
+              node-name: 'c';
+              text-content: 'd';
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.attlist.attval.ger.entity.declared.standalone.5.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0" standalone="yes"?>
+          <!DOCTYPE p SYSTEM "dtd" [
+          <!ATTLIST p a CDATA "&entity;">
+          ]>
+          <p/>
+      @@@c:erred: <[[xp|wf-entity-declared]]> { (3, 22)..(3, 29); }
+      @@@enImplNote:
+        This document has an error - result is implementation dependent.
+    @@XMLTest:
+      @@@QName: xp.attlist.attval.ger.entity.declared.standalone.-5.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0" standalone="no"?>
+          <!DOCTYPE p SYSTEM "dtd" [
+          <!ATTLIST p a CDATA "&entity;">
+          ]>
+          <p/>
+      @@@test:domTree:
+        document {
+          document-type {
+            element-type-definition {
+              node-name: 'p';
+              attribute-definition {
+                node-name: 'a';
+                general-entity-reference {
+                  node-name: 'entity';
+                  is-expanded: false;
+                }
+              }
+            }
+          }
+          element {
+            attribute {
+              node-name: 'a';
+              specified: false;
+              general-entity-reference {
+                node-name: 'entity';
+                is-expanded: false;
+              }
+            }
+          }
+        }
+      @@@enImplNote:
+        This document has an error - result is implementation dependent.
+    @@XMLTest:
+      @@@QName: xp.attlist.attval.ger.entity.declared.standalone.-6.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE p SYSTEM "dtd" [
+          <!ATTLIST p a CDATA "&entity;">
+          ]>
+          <p/>
+      @@@test:domTree:
+        document {
+          document-type {
+            element-type-definition {
+              node-name: 'p';
+              attribute-definition {
+                node-name: 'a';
+                general-entity-reference {
+                  node-name: 'entity';
+                  is-expanded: false;
+                }
+              }
+            }
+          }
+          element {
+            attribute {
+              node-name: 'a';
+              specified: false;
+              general-entity-reference {
+                node-name: 'entity';
+                is-expanded: false;
+              }
+            }
+          }
+        }
+      @@@enImplNote:
+        This document has an error - result is implementation dependent.
+
+    @@XMLTest:
+      @@@QName: xp.attlist.dup.entity.declared.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE p [
+          <!ATTLIST p a CDATA "no-entity">
+          <!ATTLIST p a CDATA "&entity;">
+          ]>
+          <p/>
+      @@@c:erred: <[[xp|wf-entity-declared]]> { (3, 21)..(3, 29); }
+    @@XMLTest:
+      @@@QName: xp.attlist.dup.entity.declared.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE p [
+          <!ATTLIST p a CDATA "no-entity"
+                      a CDATA "&entity;">
+          ]>
+          <p/>
+      @@@c:erred: <[[xp|wf-entity-declared]]> { (3, 21)..(3, 29); }
+    @@XMLTest:
+      @@@QName: xp.attlist.unused.entity.declared.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE p [
+          <!ATTLIST q a CDATA "&entity;">
+          ]>
+          <p/>
+      @@@c:erred: <[[xp|wf-entity-declared]]> { (2, 21)..(2, 29); }
+    @@XMLTest:
+      @@@QName: xp.attlist.unused.entity.declared.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE p [
+          <!ATTLIST p a CDATA "&entity;">
+          ]>
+          <p a="bb"/>
+      @@@c:erred: <[[xp|wf-entity-declared]]> { (2, 21)..(2, 29); }
+
     @@enImplNote:
       {TODO:: Entity declared WFC for
-
-         - General entity references in attribute value literals in
-           attlist declarations
 
          - General entity references in replacement texts referenced
            in attribute value literals in tags

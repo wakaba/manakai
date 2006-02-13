@@ -1,3 +1,15 @@
+2006-02-13  Wakaba  <wakaba@suika.fam.cx>
+
+	* XMLParser.dis: Set |cfg:clone-entity-reference-subtree|
+	configuration parameter |true| during tree construction
+	to ensure default attribute value is cloned as is
+	including entity reference subtree.
+
+	* Tree.dis (cfg:clone-entity-reference-subtree): New configuration
+	parameter.
+	(Node.cloneNode): The |cfg:clone-entity-reference-subtree|
+	configuration parameter support is added.
+
 2006-02-12  Wakaba  <wakaba@suika.fam.cx>
 
 	* XMLParser.dis (parseString): General |Entity| replacement
