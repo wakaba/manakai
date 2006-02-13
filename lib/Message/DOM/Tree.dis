@@ -12,7 +12,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/02/13 08:33:54 $
+    $Date: 2006/02/13 17:03:21 $
 
   @Require:
     @@Module:
@@ -15617,6 +15617,8 @@ NodeTypeDef:
         @@@@enDesc:
           If it is an HTML document.
       @@@PerlDef:
+        our $CreateEntityReference_OpenEntity;
+          ## NOTE: Multithread unsafe
             my $docNode = $self->{<H::mn:node>};
             my $version = <Code::getDocumentXMLVersion::
                                     $DOCOBJ = $docNode>;
@@ -15639,10 +15641,12 @@ NodeTypeDef:
 
         ## Expansion
         __DEEP{
-          my $__doctype = $self-><AG::Document.doctype>;
-          $__doctype = $__doctype-><M::Node.getFeature>
+          unless ($CreateEntityReference_OpenEntity->{$name}) {
+            local $CreateEntityReference_OpenEntity->{$name} = true;
+            my $__doctype = $self-><AG::Document.doctype>;
+            $__doctype = $__doctype-><M::Node.getFeature>
                                      (<Q::ManakaiDOM:XDoctype> => '3.0')
-            if $__doctype;
+              if $__doctype;
           if ($__doctype) {
             my $__et = $__doctype-><M::DTDef.getGeneralEntityNode> ($name);
             if ($__et) {
@@ -15666,6 +15670,7 @@ NodeTypeDef:
               $r->{<H::mn:node>}->{<H::ManakaiDOM:isExpanded>}
                 = $__et->{<H::mn:node>}->{<H::x|hasReplacementTree>};
             }
+          }
           }
         }__;
 
@@ -15759,6 +15764,62 @@ NodeTypeDef:
         $ent-><AS::Node.textContent> ('new value');
         $test->assert_equals ($ent-><AG::Node.textContent>,
                               'new value');
+    @@XDTest:
+      @@@QName: Document.createER.hasdef.recursive.direct.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docd = $doc-><M::Node.getFeature> (<Q::ManakaiDOM:XDoctype>, '3.0');
+        my $dtd = $docd-><M::d|DocumentXDoctype.createDocumentTypeDefinition>
+                           ('doctype');
+          my $ent0 = $doc-><M::Document.createEntityReference> ('ent1');
+          $test->assert_false ($ent0-><AG::x|EntityReference.isExpanded>);
+          my $et = $docd-><M::d|DocumentXDoctype.createGeneralEntity>
+                             ('ent1');
+          $et-><M::Node.appendChild> ($ent0);
+          $et-><AS::x|Entity.hasReplacementTree> (true);
+        $dtd-><M::DTDef.setGeneralEntityNode> ($et);
+        $doc-><M::Node.appendChild> ($dtd);
+
+        $test->id ('create');
+        my $ent = $doc-><M::Document.createEntityReference> ('ent1');
+        $test->assert_isa ($ent, <IFName::x|EntityReference>);
+        $test->assert_true ($ent-><AG::x|EntityReference.isExpanded>);
+
+        $test->assert_not_null ($ent-><AG::Node.firstChild>);
+        $test->assert_false ($ent-><AG::Node.firstChild>
+                                 -><AG::x|EntityReference.isExpanded>);
+    @@XDTest:
+      @@@QName: Document.createER.hasdef.recursive.indirect.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docd = $doc-><M::Node.getFeature> (<Q::ManakaiDOM:XDoctype>, '3.0');
+        my $dtd = $docd-><M::d|DocumentXDoctype.createDocumentTypeDefinition>
+                           ('doctype');
+          my $ent0 = $doc-><M::Document.createEntityReference> ('ent2');
+          $test->assert_false ($ent0-><AG::x|EntityReference.isExpanded>);
+          my $et = $docd-><M::d|DocumentXDoctype.createGeneralEntity>
+                             ('ent1');
+          $et-><M::Node.appendChild> ($ent0);
+          $et-><AS::x|Entity.hasReplacementTree> (true);
+
+          my $ent0_2 = $doc-><M::Document.createEntityReference> ('ent1');
+          my $et_2 = $docd-><M::d|DocumentXDoctype.createGeneralEntity>
+                             ('ent2');
+          $et_2-><M::Node.appendChild> ($ent0_2);
+          $et_2-><AS::x|Entity.hasReplacementTree> (true);
+        $dtd-><M::DTDef.setGeneralEntityNode> ($et);
+        $doc-><M::Node.appendChild> ($dtd);
+
+        $test->id ('create');
+        my $ent = $doc-><M::Document.createEntityReference> ('ent1');
+        $test->assert_isa ($ent, <IFName::x|EntityReference>);
+        $test->assert_true ($ent-><AG::x|EntityReference.isExpanded>);
+
+        $test->assert_not_null ($ent-><AG::Node.firstChild>);
+        $test->assert_false ($ent-><AG::Node.firstChild>
+                                 -><AG::x|EntityReference.isExpanded>);
 
   @Method:
      @@Name:  getElementsByTagName

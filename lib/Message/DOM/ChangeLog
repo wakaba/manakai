@@ -1,3 +1,14 @@
+2006-02-14  Wakaba  <wakaba@suika.fam.cx>
+
+	* XMLParser.dis: The |xp:wf-parsed-entity| and the |xp:wf-no-recursion|
+	WFC errors are implemented.  Reports a |xp:wf-syntax-error|
+	if a parameter entity declaration contains |NDATA| keyword.
+	(setEmptyEntityState): Set |name| attribute.
+
+	* Tree.dis (createEntityReference): Don't enter into inifinite
+	loop even if entity replacement tree contains recursive
+	reference directly or indirectly.
+
 2006-02-13  Wakaba  <wakaba@suika.fam.cx>
 
 	* XMLParser.dis (_GeneralEntityReferenceAE): The |xp:wf-entity-declared|

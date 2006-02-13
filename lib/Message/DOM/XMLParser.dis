@@ -10,7 +10,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/02/13 10:42:15 $
+    $Date: 2006/02/13 17:03:22 $
 
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
@@ -342,6 +342,7 @@ ClsDef:
                 $self->{location} = $self->{entity}->[-1];
                 $self->{token} = [];
                 $self->{char} = [];
+                local $ent->{is_opened} = true;
                 ## TODO: External entity support
                 $self->_parse_InternalGeneralParsedEntity ($ent->{node});
                 $ent->{node}-><AS::x|Entity.hasReplacementTree> (true);
@@ -2187,7 +2188,8 @@ ClsDef:
                 __EXCEPTION{DOMLS|PARSE_ERR}__;
               }
             }                 # Otherwise VC error
-            push @{$self->{entity}}, <Code::getEmptyEntityState>;
+            push @{$self->{entity}}, <Code::getEmptyEntityState::
+                                              $name = $name>;
             $er-><AS::x|EntityReference.isExpanded> (false);
 
           } else {         # there IS entity declaration
@@ -2213,7 +2215,44 @@ ClsDef:
             push @{$self->{entity}}, <Code::getCopyOfEntityState::
                                             $entity_type = 'general_entity',
                                             $entity_name = $name>;
-          }
+
+            if (defined $ent->{notation}) {
+              my $location;
+              __CODE{xp|get-location-from-token::
+                $token => {$token},
+                $result => {$location},
+              }__;
+              my $continue = __c|ERROR{xp|wf-parsed-entity::
+                xp|error-token => {$token},
+                c|location => {$location},
+                xp|name => {$name},
+              }__;
+              unless ($continue) {  
+                __EXCEPTION{DOMLS|PARSE_ERR::
+                }__;
+              }
+            } # if unparsed entity
+            
+            if ($ent->{is_opened}) {
+              my $location;
+              __CODE{xp|get-location-from-token::
+                $token => {$token},
+                $result => {$location},
+              }__;
+              my $continue = __c|ERROR{xp|wf-no-recursion::
+                xp|error-token => {$token},
+                c|location => {$location},
+                xp|name => {$name},
+              }__;
+              unless ($continue) {  
+                __EXCEPTION{DOMLS|PARSE_ERR::
+                }__;
+              }
+              $self->{entity}->[-1]->{reptxt} = \'';
+              $er-><AS::x|EntityReference.isExpanded> (false);
+            } # recursive
+            $ent->{is_opened} = true;
+          } # entity declared
           $self->{location} = $self->{entity}->[-1];
           push @{$self->{entity_token}}, $self->{token};
           $self->{token} = [];
@@ -2225,6 +2264,9 @@ ClsDef:
         &content ($doc => $doc, $parent => $er, $ns => $ns);
         ~ (#EOF) { }
         lang:Perl {
+          $self->{general_entity}->{$self->{entity}->[-1]->{name}}
+               ->{is_opened} = false
+            if $self->{general_entity}->{$self->{entity}->[-1]->{name}};
           $self->{token} = pop @{$self->{entity_token}};
           $self->{char} = pop @{$self->{entity_char}};
           pop @{$self->{entity}};
@@ -2309,7 +2351,8 @@ ClsDef:
                 __EXCEPTION{DOMLS|PARSE_ERR}__;
               }
             }                 # Otherwise VC error
-            push @{$self->{entity}}, <Code::getEmptyEntityState>;
+            push @{$self->{entity}}, <Code::getEmptyEntityState::
+                                              $name = $name>;
             $er-><AS::x|EntityReference.isExpanded> (false);
 
           } else {         # there IS entity declaration
@@ -2346,6 +2389,7 @@ ClsDef:
                 __EXCEPTION{DOMLS|PARSE_ERR::
                 }__;
               }
+              ## NOTE: |xp:wf-parsed-entity| is not checked
             } # if external entity
 
             $er-><AS::x|EntityReference.isExpanded>
@@ -2353,6 +2397,26 @@ ClsDef:
             push @{$self->{entity}}, <Code::getCopyOfEntityState::
                                             $entity_type = 'general_entity',
                                             $entity_name = $name>;
+            
+            if ($ent->{is_opened}) {
+              my $location;
+              __CODE{xp|get-location-from-token::
+                $token => {$token},
+                $result => {$location},
+              }__;
+              my $continue = __c|ERROR{xp|wf-no-recursion::
+                xp|error-token => {$token},
+                c|location => {$location},
+                xp|name => {$name},
+              }__;
+              unless ($continue) {  
+                __EXCEPTION{DOMLS|PARSE_ERR::
+                }__;
+              }
+              $self->{entity}->[-1]->{reptxt} = \'';
+              $er-><AS::x|EntityReference.isExpanded> (false);
+            } # recursive
+            $ent->{is_opened} = true;
           }
           push @{$vals->{nodes}}, $er;
           $self->{location} = $self->{entity}->[-1];
@@ -2366,6 +2430,9 @@ ClsDef:
         &AttributeValueLiteralE_ ($parent => $er, $vals => $vals);       
         ~ (#EOF) { }
         lang:Perl {
+          $self->{general_entity}->{$self->{entity}->[-1]->{name}}
+               ->{is_opened} = false
+            if $self->{general_entity}->{$self->{entity}->[-1]->{name}};
           $self->{token} = pop @{$self->{entity_token}};
           $self->{char} = pop @{$self->{entity_char}};
           pop @{$self->{entity}};
@@ -2448,7 +2515,8 @@ ClsDef:
                 __EXCEPTION{DOMLS|PARSE_ERR}__;
               }
             }                 # Otherwise VC error
-            push @{$self->{entity}}, <Code::getEmptyEntityState>;
+            push @{$self->{entity}}, <Code::getEmptyEntityState::
+                                              $name = $name>;
             $er-><AS::x|EntityReference.isExpanded> (false);
 
           } else {         # there IS entity declaration
@@ -2485,6 +2553,7 @@ ClsDef:
                 __EXCEPTION{DOMLS|PARSE_ERR::
                 }__;
               }
+              ## NOTE: |xp:wf-parsed-entity| is not checked
             } # if external entity
 
             $er-><AS::x|EntityReference.isExpanded>
@@ -2492,6 +2561,26 @@ ClsDef:
             push @{$self->{entity}}, <Code::getCopyOfEntityState::
                                             $entity_type = 'general_entity',
                                             $entity_name = $name>;
+            
+            if ($ent->{is_opened}) {
+              my $location;
+              __CODE{xp|get-location-from-token::
+                $token => {$token},
+                $result => {$location},
+              }__;
+              my $continue = __c|ERROR{xp|wf-no-recursion::
+                xp|error-token => {$token},
+                c|location => {$location},
+                xp|name => {$name},
+              }__;
+              unless ($continue) {  
+                __EXCEPTION{DOMLS|PARSE_ERR::
+                }__;
+              }
+              $self->{entity}->[-1]->{reptxt} = \'';
+              $er-><AS::x|EntityReference.isExpanded> (false);
+            } # recursive
+            $ent->{is_opened} = true;
           }
           $parent-><M::Node.appendChild> ($er);
           $self->{location} = $self->{entity}->[-1];
@@ -2505,6 +2594,9 @@ ClsDef:
         &AttributeValueLiteralE_ ($parent => $er, $vals => $vals);       
         ~ (#EOF) { }
         lang:Perl {
+          $self->{general_entity}->{$self->{entity}->[-1]->{name}}
+               ->{is_opened} = false
+            if $self->{general_entity}->{$self->{entity}->[-1]->{name}};
           $self->{token} = pop @{$self->{entity_token}};
           $self->{char} = pop @{$self->{entity_char}};
           pop @{$self->{entity}};
@@ -2678,7 +2770,7 @@ ClsDef:
           }
 
           ## NOTE: U+0009 is syntactically illegal.
-          $pubid =~ s/[\x09\x0A\x0D\x20]+//gs;
+          $pubid =~ s/[\x09\x0A\x0D\x20]+/\x20/gs;
           $pubid =~ s/\A\x20//s;
           $pubid =~ s/\x20\z//s;
                  ## NOTE: Bare attribute name is written.
@@ -3166,13 +3258,14 @@ ClsDef:
 
       ~ (S) { }
 
+      my $is_param_entity;
       my $decl;
       lang:Perl { $decl = { name => '#ILLEGAL', reptxt => \'' }; }
 
       ~? (PERO) {
         ~ (S) { }
         lang:Perl {
-          $decl->{is_param_entity} = true;
+          $is_param_entity = $decl->{is_param_entity} = true;
         }
       }
 
@@ -3227,7 +3320,23 @@ ClsDef:
 
       ~? (S) {
         ~? (Name == 'NDATA') {
-          // TODO: error if parameter entity
+          if-true ($is_param_entity) {
+            lang:Perl : has-error {
+              my $location;
+              __CODE{xp|get-location-from-token::
+                $token => {$token},
+                $result => {$location},
+              }__;
+              my $continue = __DOMCore:ERROR{xp|wf-syntax-error::
+                xp|error-token => {$token},
+                c|location => {$location},
+              }__;
+              unless ($continue) {
+                __EXCEPTION{DOMLS|PARSE_ERR::
+                }__;
+              }
+            }
+          }
 
           ~ (S) { }
   
@@ -5449,6 +5558,7 @@ ClsDef:
           }
           element {
             general-entity-reference {
+              node-name: 'cdata';
               is-expanded: true;
               cdata-section {
                 data: 'text';
@@ -7120,6 +7230,7 @@ ClsDef:
           ]>
           <a b="c&ent2;"/>
       @@@c:erred: <[[xp|wf-no-external-entity-references]]> { (1, 4)..(1, 8); }
+      @@@c:erred: <[[xp|wf-parsed-entity]]> { }
     @@XMLTest:
       @@@QName: xp.no.lt.in.attr.value.1.test
       @@@DEnt:
@@ -9307,6 +9418,7 @@ ClsDef:
               node-name: 'c';
               general-entity-reference {
                 node-name: 'entity';
+                is-expanded: true;
                 text-content: 'value';
               }
             }
@@ -9320,8 +9432,10 @@ ClsDef:
           element {
             general-entity-reference {
               node-name: 'c';
+              is-expanded: true;
               general-entity-reference {
                 node-name: 'entity';
+                is-expanded: true;
                 text-content: 'value';
               }
             }
@@ -11355,6 +11469,278 @@ ClsDef:
 
       }
 
+    @@XMLTest:
+      @@@QName: xp.element.content.parsed.entity.reference.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE p [
+          <!NOTATION n SYSTEM "notation">
+          <!ENTITY ext SYSTEM "system" NDATA n>
+          ]>
+          <p>&ext;</p>
+      @@@c:erred: <[[xp|wf-parsed-entity]]> { (5, 4)..(5, 8); }
+    @@XMLTest:
+      @@@QName: xp.attval.parsed.entity.reference.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE p [
+          <!NOTATION n SYSTEM "notation">
+          <!ENTITY ext SYSTEM "system" NDATA n>
+          ]>
+          <p a="&ext;"/>
+#      @@@c:erred: <[[xp|wf-parsed-entity]]> { (5, 7)..(5, 11); }
+      @@@c:erred: <[[xp|wf-no-external-entity-references]]> { (5, 7)..(5, 11); }
+    @@XMLTest:
+      @@@QName: xp.element.content.reptxt.parsed.entity.reference.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE p [
+          <!NOTATION n SYSTEM "notation">
+          <!ENTITY ext SYSTEM "system" NDATA n>
+          <!ENTITY c "&#x26;ext;">
+          ]>
+          <p>&c;</p>
+      @@@c:erred: <[[xp|wf-parsed-entity]]> { (1, 1)..(1, 5); }
+    @@XMLTest:
+      @@@QName: xp.attval.reptxt.parsed.entity.reference.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE p [
+          <!NOTATION n SYSTEM "notation">
+          <!ENTITY ext SYSTEM "system" NDATA n>
+          <!ENTITY c "&#x26;ext;">
+          ]>
+          <p a="&c;"/>
+      @@@c:erred: <[[xp|wf-no-external-entity-references]]> { (1, 1)..(1, 5); }
+      @@@c:erred:
+        @@@@@: <[[xp|wf-parsed-entity]]> { }
+        @@@@enImplNote: During entity node construction.
+    @@XMLTest:
+      @@@QName: xp.element.content.entval.parsed.entity.reference.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE p [
+          <!NOTATION n SYSTEM "notation">
+          <!ENTITY ext SYSTEM "system" NDATA n>
+          <!ENTITY c "&ext;">
+          ]>
+          <p>&c;</p>
+      @@@c:erred: <[[xp|wf-parsed-entity]]> { }
+    @@XMLTest:
+      @@@QName: xp.attval.entval.parsed.entity.reference.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE p [
+          <!NOTATION n SYSTEM "notation">
+          <!ENTITY ext SYSTEM "system" NDATA n>
+          <!ENTITY c "&ext;">
+          ]>
+          <p a="&c;"/>
+      @@@c:erred: <[[xp|wf-no-external-entity-references]]> { }
+      @@@c:erred: <[[xp|wf-parsed-entity]]> { }
+
+    @@XMLTest:
+      @@@QName: xp.element.content.no.recursion.direct.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE p [
+          <!ENTITY c "&c;">
+          ]>
+          <p>&c;</p>
+      @@@c:erred: <[[xp|wf-no-recursion]]> { (1, 1)..(1, 3); }
+    @@XMLTest:
+      @@@QName: xp.element.content.no.recursion.indirect.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE p [
+          <!ENTITY d "&c;">
+          <!ENTITY c "&d;">
+          ]>
+          <p>&c;</p>
+      @@@c:erred: <[[xp|wf-no-recursion]]> { /* |d| */ (1, 1)..(1, 3); }
+    @@XMLTest:
+      @@@QName: xp.attval.no.recursion.direct.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE p [
+          <!ENTITY c "&c;">
+          ]>
+          <p a="&c;"/>
+      @@@c:erred: <[[xp|wf-no-recursion]]> { (1, 1)..(1, 3); }
+    @@XMLTest:
+      @@@QName: xp.attval.no.recursion.indirect.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE p [
+          <!ENTITY d "&c;">
+          <!ENTITY c "&d;">
+          ]>
+          <p a="&c;"/>
+      @@@c:erred: <[[xp|wf-no-recursion]]> { /* |d| */ (1, 1)..(1, 3); }
+    @@XMLTest:
+      @@@QName: xp.reptxt.element.content.no.recursion.direct.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE p [
+          <!ENTITY c "&c;">
+          <!ENTITY e "&#x26;c;">
+          ]>
+          <p>&e;</p>
+      @@@c:erred: <[[xp|wf-no-recursion]]> { /* |e| */ (1, 1)..(1, 3); }
+    @@XMLTest:
+      @@@QName: xp.reptxt.element.content.no.recursion.indirect.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE p [
+          <!ENTITY d "&c;">
+          <!ENTITY c "&d;">
+          <!ENTITY e "&#x26;c;">
+          ]>
+          <p>&e;</p>
+      @@@c:erred: <[[xp|wf-no-recursion]]> { /* |d| */ (1, 1)..(1, 3); }
+    @@XMLTest:
+      @@@QName: xp.reptxt.attval.no.recursion.direct.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE p [
+          <!ENTITY c "&c;">
+          <!ENTITY e "&#x26;c;">
+          ]>
+          <p a="&e;"/>
+      @@@c:erred: <[[xp|wf-no-recursion]]> { /* |e| */ (1, 1)..(1, 3); }
+    @@XMLTest:
+      @@@QName: xp.reptxt.attval.no.recursion.indirect.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE p [
+          <!ENTITY d "&c;">
+          <!ENTITY c "&d;">
+          <!ENTITY e "&#x26;c;">
+          ]>
+          <p a="&e;"/>
+      @@@c:erred: <[[xp|wf-no-recursion]]> { /* |d| */ (1, 1)..(1, 3); }
+
+    @@XMLTest:
+      @@@QName: xp.ENTITY.system.ndata.name.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+          <!NOTATION n SYSTEM "n">
+          <!ENTITY % e SYSTEM "sys" NDATA n>
+          ]><a/>
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (3, 26)..(3, 30); }
+    @@XMLTest:
+      @@@QName: xp.ENTITY.public.ndata.name.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+          <!NOTATION n SYSTEM "n">
+          <!ENTITY % e PUBLIC "pub" "sys" NDATA n>
+          ]><a/>
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (3, 33)..(3, 37); }
+    @@XMLTest:
+      @@@QName: xp.ENTITY.public.ndata.name.-1.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+          <!NOTATION n SYSTEM "n">
+          <!ENTITY % e PUBLIC "pub" "sys" >
+          ]><a/>
+      @@@test:domTree:
+        document { }
+
+    @@XMLTest:
+      @@@QName: xp.ENTITY.pubid.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+          <!ENTITY e PUBLIC "p" "s">
+          ]><a/>
+      @@@test:domTree:
+        document {
+          document-type {
+            general-entity {
+              node-name: 'e';
+              public-id: 'p';
+              system-id: 's';
+            }
+          }
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.ENTITY.pubid.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+          <!ENTITY e PUBLIC "  p  " "s">
+          ]><a/>
+      @@@test:domTree:
+        document {
+          document-type {
+            general-entity {
+              node-name: 'e';
+              public-id: 'p';
+              system-id: 's';
+            }
+          }
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.ENTITY.pubid.3.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+          <!ENTITY e PUBLIC "  p  $u000Aq$u000A " "s">
+          ]><a/>
+      @@@test:domTree:
+        document {
+          document-type {
+            general-entity {
+              node-name: 'e';
+              public-id: 'p q';
+              system-id: 's';
+            }
+          }
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.ENTITY.pubid.4.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+          <!ENTITY e PUBLIC "  p  $u000D$u000Aq" "s">
+          ]><a/>
+      @@@test:domTree:
+        document {
+          document-type {
+            general-entity {
+              node-name: 'e';
+              public-id: 'p q';
+              system-id: 's';
+            }
+          }
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.ENTITY.pubid.5.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.1"?>
+          <!DOCTYPE a [
+          <!ENTITY e PUBLIC "  p  $u0085$u000Aq" "s">
+          ]><a/>
+      @@@test:domTree:
+        document {
+          document-type {
+            general-entity {
+              node-name: 'e';
+              public-id: 'p q';
+              system-id: 's';
+            }
+          }
+          element { }
+        }
+
     @@PerlDef:
       my $impl = $Message::DOM::ImplementationRegistry->get_implementation ({
         'Core' => '3.0',
@@ -11440,7 +11826,7 @@ ClsDef:
     @@ForCheck: ManakaiDOM|ForClass
     @@PerlDef:
       {reptxt => \'', line => 1, column => 1, pos => 0,
-       is_externally_declared => true}
+       is_externally_declared => true, name => $name}
 
   @ResourceDef:
     @@QName: getCopyOfEntityState
@@ -11778,6 +12164,34 @@ WFErrDef:
   @enMufDef:
     Entity |%p (name => {<Q::xp|name>});| must be declared
     in the internal subset
+  @ecore:hasParameter: xp|error-token
+  @ecore:hasParameter:
+    @@@: xp|name
+    @@enDesc:
+      The name of the entity.
+
+WFErrDef:
+  @QName: xp|wf-parsed-entity
+  @c:severity: c|SEVERITY_ERROR
+  @enDesc:
+    An entity reference <kwd:MUST-NOT> contain the name of an
+    unparsed entity.
+  @enMufDef:
+    Entity |%p (name => {<Q::xp|name>});| is an unparsed entity
+  @ecore:hasParameter: xp|error-token
+  @ecore:hasParameter:
+    @@@: xp|name
+    @@enDesc:
+      The name of the entity.
+
+WFErrDef:
+  @QName: xp|wf-no-recursion
+  @c:severity: c|SEVERITY_ERROR
+  @enDesc:
+    A parsed entity <kwd:MUST-NOT> contain a recursive reference
+    to itself, either directly or indirectly.
+  @enMufDef:
+    Entity |%p (name => {<Q::xp|name>});| is recursively referenced
   @ecore:hasParameter: xp|error-token
   @ecore:hasParameter:
     @@@: xp|name
