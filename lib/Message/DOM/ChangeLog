@@ -1,5 +1,15 @@
 2006-02-15  Wakaba  <wakaba@suika.fam.cx>
 
+	* XMLParser.dis: Set |allDeclarationsProcessed| 
+	attribute of the |Document| node.  Don't process entity
+	and attribute definition list declarations after
+	unread parameter entity reference.  Warns if an attribute definition is 
+	ignored (|xp:warning-attribute-definition-ignored|).  Set
+	flags whether predefined entities are declared or not.
+	WFC error |xp:wf-pes-in-internal-subset| is implemented.
+
+2006-02-15  Wakaba  <wakaba@suika.fam.cx>
+
 	* XMLParser.dis: Issues |xp:error-internal-predefined-entity| error
 	if a predefined entity declaration references an external entity.
 	Issues |xp:error-malformed-predefined-entity| error if

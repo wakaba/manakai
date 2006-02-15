@@ -10,7 +10,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/02/15 13:36:21 $
+    $Date: 2006/02/15 15:36:16 $
 
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
@@ -298,8 +298,8 @@ ClsDef:
         $self->{param_entity} = {};
         $self->{attr} = {};
           # $self->{attr}->{$element_type_name}->{$attr_name} = $attr_def
-
-          ## Well-formedness constraint Entity Declared takes effect?
+        $self->{dont_process} = false;
+          ## Don't process |ENTITY| and |ATTLIST| declarations.
 
         __DEEP{
           $r = $self->{<H::c|implementation>}-><M::DOMImpl.createDocument>;
@@ -613,6 +613,11 @@ ClsDef:
         }
       } else {
         ?lexmode DocumentMisc;
+      }
+
+      lang:Perl {
+        $self->{doc}-><AS::Document.allDeclarationsProcessed> (true)
+          unless $self->{dont_process};
       }
       
       // *Misc
@@ -2666,6 +2671,7 @@ ClsDef:
                                            (<Q::fe:XDoctypeDeclaration>, '3.0');
       }
 
+      my $has_extid;
       ~? (S) {
         ~? (Name == 'PUBLIC') {
           ~ (S) { }
@@ -2680,6 +2686,7 @@ ClsDef:
 
           lang:Perl {
             $self->{has_xref} = true;
+            $has_extid = true;
           }
         } (Name == 'SYSTEM') {
           ~ (S) { }
@@ -2690,6 +2697,7 @@ ClsDef:
 
           lang:Perl {
             $self->{has_xref} = true;
+            $has_extid = true;
           }
         }
       }
@@ -2713,6 +2721,11 @@ ClsDef:
         }
 
         ~? (S) { }
+      }
+
+      // TODO: Read and process external subset if any.
+      lang:Perl {
+        $self->{dont_process} = true if $has_extid;
       }
 
       // ~ (MDC) { }
@@ -2851,6 +2864,7 @@ ClsDef:
 
         lang:Perl {
           $self->{has_xref} = true;
+          $self->{dont_process} = true;
         }
 
         ~ (Name) {
@@ -3055,11 +3069,42 @@ ClsDef:
 
       ~* (Name) {
         my $at;
-        lang:Perl ($v => $token.value) {
+        lang:Perl ($v => $token.value) : has-error {
           $docxd ||= $doc-><M::Node.getFeature>
                              (<Q::fe:XDoctype>, '3.0');
           $at = $docxd-><M::DocumentXDoctype.createAttributeDefinition> ($v);
-          unless (exists $et-><AG::ETDef.attributeDefinitions>->{$v}) {
+          if (exists $et-><AG::ETDef.attributeDefinitions>->{$v}) {
+            my $location;
+            __CODE{xp|get-location-from-token::
+              $token => {$token},
+              $result => {$location},
+            }__;
+            my $continue = __c|ERROR{xp|warning-attribute-definition-ignored::
+              xp|error-token => {$token},
+              c|location => {$location},
+              xp|name => {$v},
+            }__;
+            unless ($continue) {
+              __EXCEPTION{DOMLS|PARSE_ERR::
+              }__;
+            }            
+          } elsif ($self->{dont_process} and not $self->{standalone}) {
+            my $location;
+            __CODE{xp|get-location-from-token::
+              $token => {$token},
+              $result => {$location},
+            }__;
+            my $continue = __c|ERROR{
+            xp|warning-attribute-definition-not-processed::
+              xp|error-token => {$token},
+              c|location => {$location},
+              xp|name => {$v},
+            }__;
+            unless ($continue) {
+              __EXCEPTION{DOMLS|PARSE_ERR::
+              }__;
+            }            
+          } else {
             $et-><M::ETDef.setAttributeDefinitionNode> ($at);
             $self->{attr}->{$name}->{$v} = $at;
           }
@@ -3411,7 +3456,13 @@ ClsDef:
                 }__;
               }
             }
- ## TODO:
+            $self->{dtdecl}->{<H::mn:node>}->{{
+              lt => <H::d|hasLtDeclaration>,
+              gt => <H::d|hasGtDeclaration>,
+              amp => <H::d|hasAmpDeclaration>,
+              apos => <H::d|hasAposDeclaration>,
+              quot => <H::d|hasQuotDeclaration>,
+            }->{$decl->{name}}} = true;
           } else {  ## Dupulicating declaration
             my $location;
             __CODE{xp|get-location-from-token::
@@ -3428,6 +3479,22 @@ ClsDef:
               }__;
             }
           }
+        } elsif ($self->{dont_process} and not $self->{standalone}) {
+          ## TODO: |standalone| and parameter entities??
+          my $location;
+          __CODE{xp|get-location-from-token::
+            $token => {$token},
+            $result => {$location},
+          }__;
+          my $continue = __c|ERROR{xp|warning-entity-declaration-not-processed::
+            xp|error-token => {$token},
+            c|location => {$location},
+            xp|name => {$decl->{name}},
+          }__;
+          unless ($continue) {
+            __EXCEPTION{DOMLS|PARSE_ERR::
+            }__;
+          }            
         } else {
           $self->{$decl->{is_param_entity} ? 'param_entity' : 'general_entity'}
                ->{$decl->{name}} = $decl;
@@ -3510,16 +3577,34 @@ ClsDef:
           $reptxt .= $v;
         }
       } (PERO) {
-        ?lexmode EntityDeclaration;
+        ?lexmode EntityReference;
 
         lang:Perl {
           $self->{has_xref} = true;
+          $self->{dont_process} = true;
         }
      
         // TODO: Expand or wferror if internal subset
 
         ~ (Name) {
 
+          // Note that external subset and parameter entities are not supported
+          lang:Perl ($name => $token.value) : has-error {
+            my $location;
+            __CODE{xp|get-location-from-token::
+              $token => {$token},
+              $result => {$location},
+            }__;
+            my $continue = __c|ERROR{xp|wf-pes-in-internal-subset::
+              xp|error-token => {$token},
+              c|location => {$location},
+              xp|name => {$name},
+            }__;
+            unless ($continue) {
+              __EXCEPTION{DOMLS|PARSE_ERR::
+              }__;
+            }
+          }
         }
 
         ~ (REFC) {
@@ -3594,15 +3679,33 @@ ClsDef:
           $reptxt .= $v;
         }
       } (PERO) {
-        ?lexmode EntityDeclaration;
+        ?lexmode EntityReference;
 
         lang:Perl {
           $self->{has_xref} = true;
+          $self->{dont_process} = true;
         }
 
         // TODO: implement this
         ~ (Name) {
 
+          // Note that external subset and parameter entities are not supported
+          lang:Perl ($name => $token.value) : has-error {
+            my $location;
+            __CODE{xp|get-location-from-token::
+              $token => {$token},
+              $result => {$location},
+            }__;
+            my $continue = __c|ERROR{xp|wf-pes-in-internal-subset::
+              xp|error-token => {$token},
+              c|location => {$location},
+              xp|name => {$name},
+            }__;
+            unless ($continue) {
+              __EXCEPTION{DOMLS|PARSE_ERR::
+              }__;
+            }
+          }
         }
 
         ~ (REFC) {
@@ -11262,17 +11365,19 @@ ClsDef:
         @@@@test:value:
           <?xml version="1.0" standalone="no"?>
           <!DOCTYPE p [
-            <!ATTLIST q b CDATA #IMPLIED>
+            <!ATTLIST p b CDATA #IMPLIED>
             <!ENTITY % para "<!-- -->">
             %para;
           <!ATTLIST p a CDATA "&entity;">
           ]>
           <p c="d"/>
+      @@@c:erred:
+        <[[xp|warning-attribute-definition-not-processed]]> { (6, 13)..(6, 30); }
       @@@test:domTree:
         document {
           document-type {
             element-type-definition {
-              node-name: 'q';
+              node-name: 'p';
               attribute-definition {
                 node-name: 'b';
               }
@@ -11306,17 +11411,19 @@ ClsDef:
       @@@DEnt:
         @@@@test:value:
           <!DOCTYPE p [
-            <!ATTLIST q b CDATA #IMPLIED>
+            <!ATTLIST p b CDATA #IMPLIED>
             <!ENTITY % para "<!-- -->">
             %para;
           <!ATTLIST p a CDATA "&entity;">
           ]>
           <p c="d"/>
+      @@@c:erred:
+        <[[xp|warning-attribute-definition-not-processed]]> { (5, 13)..(5, 30); }
       @@@test:domTree:
         document {
           document-type {
             element-type-definition {
-              node-name: 'q';
+              node-name: 'p';
               attribute-definition {
                 node-name: 'b';
               }
@@ -11383,17 +11490,19 @@ ClsDef:
         @@@@test:value:
           <?xml version="1.0" standalone="no"?>
           <!DOCTYPE p [
-            <!ATTLIST q b CDATA #IMPLIED>
+            <!ATTLIST p b CDATA #IMPLIED>
             <!ENTITY % para SYSTEM "p">
             %para;
           <!ATTLIST p a CDATA "&entity;">
           ]>
           <p c="d"/>
+      @@@c:erred:
+        <[[xp|warning-attribute-definition-not-processed]]> { (6, 13)..(6, 30); }
       @@@test:domTree:
         document {
           document-type {
             element-type-definition {
-              node-name: 'q';
+              node-name: 'p';
               attribute-definition {
                 node-name: 'b';
               }
@@ -11427,17 +11536,19 @@ ClsDef:
       @@@DEnt:
         @@@@test:value:
           <!DOCTYPE p [
-            <!ATTLIST q b CDATA #IMPLIED>
+            <!ATTLIST p b CDATA #IMPLIED>
             <!ENTITY % para SYSTEM "p">
             %para;
           <!ATTLIST p a CDATA "&entity;">
           ]>
           <p c="d"/>
+      @@@c:erred:
+        <[[xp|warning-attribute-definition-not-processed]]> { (5, 13)..(5, 30); }
       @@@test:domTree:
         document {
           document-type {
             element-type-definition {
-              node-name: 'q';
+              node-name: 'p';
               attribute-definition {
                 node-name: 'b';
               }
@@ -12099,6 +12210,158 @@ ClsDef:
           }
         }
 
+    @@XMLTest:
+      @@@QName: xp.processed.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <a/>
+      @@@test:domTree:
+        document {
+          all-declarations-processed: true;
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.processed.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+          <!ENTITY e      "f">
+          <!ATTLIST a b NMTOKEN "  c  ">
+          ]><a>&e;</a>
+      @@@test:domTree:
+        document {
+          document-type {
+            general-entity {
+              node-name: 'e';
+            }
+            element-type-definition {
+              node-name: 'a';
+              attribute-definition {
+                node-name: 'b';
+              }
+            }
+          }
+          all-declarations-processed: true;
+          element {
+            attribute {
+              node-name: 'b';
+              node-value: 'c';
+            }
+            text-content: 'f';
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.processed.3.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+          <!ENTITY % p    SYSTEM "p">
+          %p;
+          <!ENTITY e      "f">
+          <!ATTLIST a b NMTOKEN "  c  ">
+          ]><a d="e">&e;</a>
+      @@@test:domTree:
+        document {
+          document-type { }
+          all-declarations-processed: false;
+          element {
+            attribute {
+              node-name: 'd';
+              node-value: 'e';
+            }
+            general-entity-reference {
+              node-name: 'e';
+              is-expanded: false;
+            }
+          }
+        }
+      @@@c:erred:
+        <[[xp|warning-entity-declaration-not-processed]]> { (4, 1)..(4, 20); }
+      @@@c:erred:
+        <[[xp|warning-attribute-definition-not-processed]]> { (5, 13)..(5, 31); }
+    @@XMLTest:
+      @@@QName: xp.processed.4.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.1" standalone="yes"?>
+          <!DOCTYPE a [
+          <!ENTITY % p    SYSTEM "p">
+          %p;
+          <!ENTITY e      "f">
+          <!ATTLIST a b NMTOKEN "  c  ">
+          ]><a>&e;</a>
+      @@@test:domTree:
+        document {
+          document-type {
+            general-entity {
+              node-name: 'e';
+            }
+            element-type-definition {
+              node-name: 'a';
+              attribute-definition {
+                node-name: 'b';
+              }
+            }
+          }
+          all-declarations-processed: false;
+          element {
+            attribute {
+              node-name: 'b';
+              node-value: 'c';
+            }
+            text-content: 'f';
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.processed.5.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a SYSTEM "p" [
+          <!ENTITY e      "f">
+          <!ATTLIST a b NMTOKEN "  c  ">
+          ]><a>&e;</a>
+      @@@test:domTree:
+        document {
+          document-type {
+            general-entity {
+              node-name: 'e';
+            }
+            element-type-definition {
+              node-name: 'a';
+              attribute-definition {
+                node-name: 'b';
+              }
+            }
+          }
+          all-declarations-processed: false;
+          element {
+            attribute {
+              node-name: 'b';
+              node-value: 'c';
+            }
+            text-content: 'f';
+          }
+        }
+
+    @@XMLTest:
+      @@@QName: xp.PEs.in.internal.subset.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+          <!ENTITY % p " ">
+          <!ENTITY % q "%q;">
+          ]><a/>
+      @@@c:erred: <[[xp|wf-pes-in-internal-subset]]> { (3, 15)..(3, 17); }
+    @@XMLTest:
+      @@@QName: xp.PEs.in.internal.subset.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+          <!ENTITY % p " ">
+          <!ENTITY % q '%q;'>
+          ]><a/>
+      @@@c:erred: <[[xp|wf-pes-in-internal-subset]]> { (3, 15)..(3, 17); }
+
     @@PerlDef:
       my $impl = $Message::DOM::ImplementationRegistry->get_implementation ({
         'Core' => '3.0',
@@ -12429,6 +12692,20 @@ WFErrDef:
       The code position of the character being referred.
 
 WFErrDef:
+  @QName: xp|wf-pes-in-internal-subset
+  @enDesc:
+    In the internal subset of the DTD, parameter entity references
+    <kwd:MUST-NOT> occur within markup declarations.
+  @enMufDef:
+    Parameter entity reference |%percent;%param (name => {<Q::xp|name>});;|
+    cannot occur within a markup declaration
+  @ecore:hasParameter: xp|error-token
+  @ecore:hasParameter:
+    @@@: xp|name
+    @@enDesc:
+      The name of the parameter entity.
+
+WFErrDef:
   @QName: xp|wf-element-type-match
   @enDesc:
     The <CODE::Name> in an element's end-tag must match the element type
@@ -12489,6 +12766,19 @@ WFErrDef:
     |LESS-THAN SIGN| since it is referenced from an attribute
     value literal
   @ecore:hasParameter: xp|error-token
+
+WarnDef:
+  @QName: xp|warning-attribute-definition-ignored
+  @enDesc:
+    An attribute definition is ignored because the same attribute
+    is declared before.
+  @enMufDef:
+    Attribute definition for |%p (name => {<Q::xp|name>});| is ignored
+  @ecore:hasParameter: xp|error-token
+  @ecore:hasParameter:
+    @@@: xp|name
+    @@enDesc:
+      The name of the attribute.
 
 WFErrDef:
   @QName: xp|wf-legal-character
@@ -12636,6 +12926,34 @@ VCErrDef:
     @@@: xp|name
     @@enDesc:
       The name of the notation.
+
+WarnDef:
+  @QName: xp|warning-entity-declaration-not-processed
+  @enDesc:
+    An entity declaration is not processed because there
+    is a reference to parameter entity before the declaration
+    and the entity is not read.
+  @enMufDef:
+    Entity declaration for |%p (name => {<Q::xp|name>});| is not processed
+  @ecore:hasParameter: xp|error-token
+  @ecore:hasParameter:
+    @@@: xp|name
+    @@enDesc:
+      The name of the entity.
+
+WarnDef:
+  @QName: xp|warning-attribute-definition-not-processed
+  @enDesc:
+    An attribute definition is not processed because there
+    is a reference to parameter entity before the declaration
+    and the entity is not read.
+  @enMufDef:
+    Attribute definition for |%p (name => {<Q::xp|name>});| is not processed
+  @ecore:hasParameter: xp|error-token
+  @ecore:hasParameter:
+    @@@: xp|name
+    @@enDesc:
+      The name of the attribute.
 
 XWParam:
   @QName: xp|replacement-text
