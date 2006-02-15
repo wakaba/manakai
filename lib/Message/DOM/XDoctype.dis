@@ -17,7 +17,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/02/11 13:41:48 $
+    $Date: 2006/02/15 13:36:21 $
   
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
   
@@ -387,6 +387,14 @@ IFClsXDef:
     @@Name: createDocumentTypeDefinition
     @@enDesc:
       Creates a <IF::DocumentTypeDefinition>.
+    @@enDesc:
+      @@@ddid: decl
+      @@@@:
+        If the implementation supports the <Feature::fe|XDoctypeDeclaration>
+        feature, the newly created object <kwd:MUST> also implement
+        the <IF::DocumentTypeDeclaration> interface.  In addition,
+        the object <kwd:MUST> contains general entity declarations
+        for five predefined entities specified in XML specifications.
     @@DOMMain:isNamespaceUnaware: 1
     @@Param:
       @@@Name: nameArg
@@ -417,6 +425,11 @@ IFClsXDef:
           $referent => $doc,
         }__;
         $obj->{<H::c|name>} = $nameArg;
+        $obj->{<H::d|hasLtDeclaration>} = true;
+        $obj->{<H::d|hasGtDeclaration>} = true;
+        $obj->{<H::d|hasAmpDeclaration>} = true;
+        $obj->{<H::d|hasAposDeclaration>} = true;
+        $obj->{<H::d|hasQuotDeclaration>} = true;
         $r = <ClassM::t|ManakaiDOMNode.getNodeReference>
                ($obj, <IFName::DocumentTypeDefinition>);
 
@@ -582,13 +595,13 @@ IFClsXDef:
   @Method:
     @@Name: createGeneralEntity
     @@enDesc:
-      Creates a general <IF::x|Entity>.
+      Creates a general <IF::x|Entity> node.
     @@DOMMain:isNamespaceUnaware: 1
     @@Param:
       @@@Name: nameArg
       @@@Type: DOMString
       @@@enDesc:
-        The attribute name of the definition.
+        The name of the general entity.
     @@Return:
       @@@Type: x|Entity
       @@@dx:raises:
@@ -638,6 +651,69 @@ IFClsXDef:
         $test->assert_exception
                  (code => sub {
                     my $dtd = $doc-><M::DocumentXDoctype.createGeneralEntity>
+                                      ('0120');
+                  },
+                  exception_subtype => <Q::MDOMX|MDOM_BAD_NAME>);
+    
+  @Method:
+    @@Name: createNotation
+    @@enDesc:
+      Creates a <IF::x|Notation> node.
+    @@DOMMain:isNamespaceUnaware: 1
+    @@Param:
+      @@@Name: nameArg
+      @@@Type: DOMString
+      @@@enDesc:
+        The name of the notation.
+    @@Return:
+      @@@Type: x|Entity
+      @@@dx:raises:
+        @@@@@: MDOMX|MDOM_BAD_NAME
+        @@@@enDesc:
+          The <P::nameArg> is not a legal <CODE::Name>
+          according to the XML version of the document.
+      @@@PerlDef:
+        my $doc = $self->{<H::mn:node>};
+        my $ver = <Code::t|getDocumentXMLVersion::
+                    $DOCOBJ = $doc>;
+        __CODE{DOMMain:ensureXMLName::
+          $INPUT => $nameArg,
+          $INPUT_PARAM_NAME => 'nameArg',
+          $XMLVERSION => $ver,
+        }__;
+        my $obj = <ClassM::x|ManakaiDOMNotation.newObject>;
+        __CODE{mn|setXRefNode||ManakaiDOM|Perl::
+          $referrer => $obj,
+          $propName => {<H::c|ownerDocument>},
+          $referent => $doc,
+        }__;
+        $obj->{<H::c|name>} = $nameArg;
+        $r = <ClassM::t|ManakaiDOMNode.getNodeReference> ($obj);
+
+    @@Test:
+      @@@QName:
+        ManakaiDocumentXDoctype.createNotation.success.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{newDocumentForTest}__;
+        my $dtd = $doc-><M::DocumentXDoctype.createNotation>
+                          ('abcdefg');
+        
+        $test->assert_isa ($dtd, <IFName::x|Notation>);
+        $test->assert_equals ($dtd-><AG::t|Node.nodeType>,
+                              <C::t|Node.NOTATION_NODE>); 
+        $test->assert_string (actual_value => $dtd-><AG::Node.nodeName>,
+                              expected_value => 'abcdefg'); 
+    
+    @@Test:
+      @@@QName:
+        ManakaiDocumentXDoctype.createNotation.badname.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{newDocumentForTest}__;
+        $test->assert_exception
+                 (code => sub {
+                    my $dtd = $doc-><M::DocumentXDoctype.createNotation>
                                       ('0120');
                   },
                   exception_subtype => <Q::MDOMX|MDOM_BAD_NAME>);
@@ -946,11 +1022,48 @@ IFClsXDef:
     @@Get:
       @@@disDef:
         @@@@DISPerl:cloneCode: .generalEntities.get
+
+  @Attr:
+    @@Name: notations
+    @@enDesc:
+      The live collection of the notations contained
+      in the document type definition.
+
+      Duplicate notation declarations, if any, in DTD are not
+      contained in the collection and only the first declaration
+      is made available as a <IF::x|Notation> node.
+
+        {NOTE::
+          This definition is based on one for the attribute
+          <A::x|DocumentType.notations> in DOM XML module.
+          Since duplication is violation to the Validity Constraint,
+          XML parsers might vary on how notations are notified to
+          the application.  In particular, <InfoProp::notations>
+          property of the <InfoItem::document information item>
+          in the XML Information Set defines that in case <EM::any>
+          notation is multiply declared then the property has no value.
+        }
+    @@Type: t|NamedNodeMap
+    @@Get:
+      @@@PerlDef:
+        __CODE{t|getNotationNodeMap::
+          $node => $self,
+          $map => $r,
+        }__;
+
+    @@Test:
+      @@@QName: DocumentTypeDefinition.notations.test
+      @@@PerlDef:
+        my $dtd;
+        __CODE{newDoctypeForTest}__;
+
+        my $es = $dtd-><AG::DocumentTypeDefinition.notations>;
+        $test->assert_isa ($es, <IFName::t|NamedNodeMap>);
       
   @enImplNote:
     {TODO::
       Implement
-      <A::.parameterEntities>, <A::.notations>.
+      <A::.parameterEntities>.
 
       Test that:
         $a = $dtd->element_types;
@@ -1306,6 +1419,176 @@ IFClsXDef:
            exception_subtype => <Q::c|DIFFERENT_DOCUMENT_ERR>);
 
   @Method:
+    @@Name: getNotationNode
+    @@enDesc:
+      Returns the definition for a notation.
+    @@DOMMain:isNamespaceUnaware: 1
+    @@Param:
+      @@@Name: nameArg
+      @@@Type: DOMString
+      @@@enDesc:
+        The name of the notation.
+    @@Return:
+      @@@Type: x|Notation
+      @@@enDesc:
+        The notation <P::nameArg>.
+      @@@nullCase:
+        @@@@enDesc:
+          There is no notation <P::nameArg>.
+      @@@PerlDef:
+        my $n = $self->{<H::mn:node>}
+                     ->{<H::d|notations>}
+                     ->{$nameArg};
+        if ($n) {
+          $r = <ClassM::t|ManakaiDOMNode.getNodeReference> ($n);
+        }
+    @@Test:
+      @@@QName: DocumentTypeDefinition.getNotationNode.test
+      @@@PerlDef:
+        my $dtd;
+        __CODE{newDoctypeForTest}__;
+        $test->assert_null 
+                 ($dtd-><M::DocumentTypeDefinition
+                           .getNotationNode> ('element'));
+
+  @Method:
+    @@Name: setNotationNode
+    @@enDesc:
+      Sets a notation to the document type
+      definition.
+    @@Param:
+      @@@Name: defNode
+      @@@Type: x|Notation
+      @@@enDesc:
+        The notation to set.  Its <A::t|Node.nodeName>
+        attribute is used to set the node.
+
+        If another notation node with
+        same <A::t|Node.nodeName> is attached to this document
+        type definition, such association is removed.
+        
+        If <P::defNode> is already attached to this document
+        type definition, then this method has no effect.
+    @@Return:
+      @@@Type: x|Notation
+      @@@enDesc:
+        If there is already another notation
+        with the same <A::t|Node.nodeName> as <P::defNode>,
+        then that node is returned.
+      @@@nullCase:
+        @@@@enDesc:
+          If there is no previous definition with the same
+          name, or the <P::defNode> is already attached
+          to the document type definition.
+      @@@NodeReadOnlyError:
+      @@@dx:raises:
+        @@@@@: c|INUSE_DEFINITION_ERR
+        @@@@enDesc:
+          If <A::x|Notation.ownerDocumentTypeDefinition>
+          is not <DOM::null>.
+      @@@dx:raises:
+        @@@@@: c|DIFFERENT_DOCUMENT_ERR
+        @@@@enDesc:
+          The <P::defNode> node is created from different
+          document than the <A::c|Node.ownerDocument> of
+          the document type definition and the implementation
+          does not support such definition node
+          being attached to the document type definition.
+      @@@PerlDef:
+        __CODE{setDefinitionNode::
+          $defNode => $defNode,
+          $defNodeParamName => 'defNode',
+          $key => {<H::d|notations>},
+        }__;
+    @@Test:
+      @@@QName: DocumentTypeDefinition.setNotationNode.test
+      @@@PerlDef:
+        my $dtd;
+        __CODE{newDoctypeForTest}__;
+
+        $test->id ('initial.empty');
+        $test->assert_null 
+                 ($dtd-><M::DocumentTypeDefinition
+                           .getNotationNode> ('et1'));
+
+        my $et = $dtd-><AG::Node.ownerDocument>
+                     -><M::Node.getFeature> (<Q::fe|XDoctype>)
+                     -><M::DocumentXDoctype.createNotation>
+                         ('et1');
+
+        $test->id ('set');
+        my $old1 = $dtd-><M::DocumentTypeDefinition
+                           .setNotationNode> ($et);
+        $test->assert_null ($old1);
+
+        $test->id ('get');
+        my $ret = $dtd-><M::DocumentTypeDefinition
+                           .getNotationNode> ('et1');
+        $test->assert_equals ($et, $ret);
+        $test->assert_num_equals
+                 (actual_value => $ret-><AG::Node.nodeType>,
+                  expected_value => <C::Node.NOTATION_NODE>);
+        $test->assert_equals
+                 ($et-><AG::x|Notation.ownerDocumentTypeDefinition>,
+                  $dtd);
+
+        $test->id ('replace-same');
+        my $old2 = $dtd-><M::DocumentTypeDefinition
+                           .setNotationNode> ($et);
+        $test->assert_null ($old2);
+
+        $test->id ('change-parent');
+
+        my $dtd2 = $dtd-><AG::Node.ownerDocument>
+                       -><M::Node.getFeature> (<Q::fe|XDoctype>)
+                       -><M::DocumentXDoctype.createDocumentTypeDefinition>
+                           ('dt2');
+    
+        $test->assert_exception (code => sub {
+          $dtd2-><M::DocumentTypeDefinition
+                            .setNotationNode> ($et);
+        }, exception_subtype => <Q::c|INUSE_DEFINITION_ERR>);
+        
+        $test->assert_equals
+                 ($et-><AG::x|Notation.ownerDocumentTypeDefinition>,
+                  $dtd);
+        $test->assert_equals
+                 ($dtd-><M::DocumentTypeDefinition
+                             .getNotationNode>
+                          ('et1'),
+                  $et);
+  
+        $test->id ('rewrite');
+
+        my $et2 = $dtd-><AG::Node.ownerDocument>
+                      -><M::Node.getFeature> (<Q::fe|XDoctype>)
+                      -><M::DocumentXDoctype.createNotation>
+                          ('et1');
+        $test->assert_not_equals ($et, $et2);
+
+        my $old4 = $dtd-><M::DocumentTypeDefinition
+                                .setNotationNode> ($et2);
+        $test->assert_equals ($old4, $et);
+        $test->assert_equals
+                 ($et2-><AG::x|Notation.ownerDocumentTypeDefinition>,
+                  $dtd);
+
+    @@Test:
+      @@@QName: DocumentTypeDefinition.setNotationNode.DIFF_DOC_ERR.test
+      @@@PerlDef:
+        my $dtd;
+        __CODE{newDoctypeForTest}__;
+        my $et;
+        __CODE{newNotationForTest}__;
+
+        $test->assert_exception
+          (code => sub {
+            $dtd-><M::DocumentTypeDefinition
+                     .setNotationNode> ($et);
+           },
+           exception_subtype => <Q::c|DIFFERENT_DOCUMENT_ERR>);
+
+  @Method:
     @@ForCheck: ManakaiDOM|ForClass
     @@Name: lookupPrefix
     @@enDesc:
@@ -1566,7 +1849,12 @@ IFClsXDef:
 
       Optional properties (declaration):
         <Q::infoset:publicIdentifier>,
-        <Q::infoset:systemIdentifier>.
+        <Q::infoset:systemIdentifier>,
+        <Q::d|hasLtDeclaration>,
+        <Q::d|hasGtDeclaration>,
+        <Q::d|hasAmpDeclaration>,
+        <Q::d|hasAposDeclaration>,
+        <Q::d|hasQuotDeclaration>.
       
       Since a <IF::x|DocumentType> might not be associated
       with any <IF::c|Document>, the manakai implementation
@@ -1591,6 +1879,25 @@ IFClsXDef:
   @mn:subnode1: infoset|children
   @mn:origin0: infoset|parent
 ##DocumentTypeDefinition
+
+PropDef:
+  @QName: d|hasLtDeclaration
+
+PropDef:
+  @QName: d|hasGtDeclaration
+
+PropDef:
+  @QName: d|hasAmpDeclaration
+
+PropDef:
+  @QName: d|hasAposDeclaration
+
+PropDef:
+  @QName: d|hasQuotDeclaration
+
+enImplNote:
+  Future version of this module might define a class for
+  entity declarations.  Then these five properties will be removed.
 
 IFClsXDef:
   @IFQName: DocumentTypeDeclaration
@@ -1857,6 +2164,16 @@ IFClsXDef:
       __CODE{newDocumentForTest}__;
       $et = $doc-><M::DocumentXDoctype.createGeneralEntity>
                           ('et1');
+
+  @ResourceDef:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@QName: newNotationForTest
+    @@rdf:type: DISPerl|BlockCode
+    @@PerlDef:
+      my $doc;
+      __CODE{newDocumentForTest}__;
+      $et = $doc-><M::DocumentXDoctype.createNotation>
+                          ('n1');
 
   @Test:
     @@PerlDef:

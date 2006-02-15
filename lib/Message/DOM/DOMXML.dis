@@ -41,7 +41,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date:
-    $Date: 2006/02/11 13:41:48 $
+    $Date: 2006/02/15 13:36:20 $
   
   @Require:
     @@Module:
@@ -68,6 +68,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dis/XML#
   @f:
     http://suika.fam.cx/~wakaba/archive/2004/dom/feature#
+  @fe:
+    http://suika.fam.cx/www/2006/feature/
   @idl:
     http://suika.fam.cx/~wakaba/archive/2004/dis/IDL#
   @infoset:
@@ -974,18 +976,30 @@ NodeTypeDef:
                   expected_value => 0);
 
   @Attr:
-     @@Name:  notations
-     @@Description:
-       @@@lang:en
-       @@@@:
-         A collection containing the notations declared in the DTD.
-     @@Get:
-        @@@Type:
-          DOMCore:NamedNodeMap
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            A <IF::DOMCore|NamedNodeMap> containing <IF::Notation>s.
+    @@Name: notations
+    @@enDesc:
+      A collection containing the notations declared in the DTD.
+
+        {NOTE:: Duplicating declarations are not contained in the collection.
+        }
+    @@Type: t|NamedNodeMap
+    @@Get:
+      @@@disDef:
+        @@@@DISPerl:cloneCode: MDTDef.notations.get
+
+    @@Test:
+      @@@QName: DocumentType.notations.get.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{t|createDOMImplForTest:: $impl => $impl}__;
+
+        my $dtype = $impl-><M::c|DOMImplementation.createDocumentType>
+                             ('type', 'pub', 'sys');
+        my $ent = $dtype-><AG::DocumentType.notations>;
+        $test->assert_isa ($ent, <IFName::t|NamedNodeMap>);
+        $test->assert_num_equals
+                 (actual_value => $ent-><AG::t|NamedNodeMap.length>,
+                  expected_value => 0);
 
   @L2Attr:
     @@Name: publicId
@@ -1329,56 +1343,91 @@ NodeTypeDef:
   @DISLang:role: 
     DOMCore:NotationRole
 
-  @Description:
-    @@lang:en
+  @enDesc:
+    The <IF::Notation> interface represents a notation declared in
+    the DTD.
+
+    In DOM levels 3 or earlier, <IF::Notation> nodes are always read-only.
+
+    A <IF::Notation> node does not have any parent.
+  @enDesc:
+    @@ddid: edit
+    @@For: ManakaiDOM|ManakaiDOMLatest
     @@@:
-      A notation declaration in the DTD or 
-      the <InfoItem::notation information item> in the XML Infoset.
-    \
-      DOM Levels 1 to 3 do not support editing <IF::Notation> nodes so that 
-      all <IF::Notation> nodes are read-only.
-    \
-      A <IF::Notation> node does not have any parent.
+      The manakai implementation allows modifications of <IF::Notaion> nodes
+      that are not read-only.
+
+      Note that a modification might make the document ill-formed.
+      For example, setting an illegal public identifier string
+      to the attribute <A::Notation.publicId> makes it impossible
+      to serialize the document into an XML document.
+
   @Attr:
-     @@Name:  publicId
-     @@Description:
-        @@@lang:en
-        @@@@: The public identifier of this notation.
-     @@Get:
-        @@@Type:  
-          DOMMain:DOMString
-        @@@Description:
-          @@@@lang:en
-          @@@@@: The public identifier.
-        @@@InCase:
-          @@@@Value:
-            @@@@@is-null:1
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@: The public identifier was not specified.
-        @@@disDef:
-          @@@@GetProp:
-            infoset:publicIdentifier
+    @@Name: publicId
+    @@enDesc:
+      The public identifier of the notation.
+    @@nullCase:
+      @@@enDesc:
+        If the public identifier is not specified.
+    @@Type: DOMString
+    @@Get:
+      @@@disDef:
+        @@@@GetProp: infoset|publicIdentifier
+    @@LXSet:
+      @@@disDef:
+        @@@@SetProp:
+          @@@@@@: infoset|publicIdentifier
+          @@@@@CheckReadOnly: 1
+    @@XDTest:
+      @@@QName: Notation.publicId.test
+      @@@PerlDef:
+        my $et;
+        __CODE{d|newNotationForTest:: $et => $et}__;
+        
+        $test->id ('default');
+        $test->assert_null ($et-><AG::Notation.publicId>);
+
+        $test->id ('set');
+        $et-><AS::Notation.publicId> ('string');
+        $test->assert_equals ($et-><AG::Notation.publicId>, 'string');
+
+        $test->id ('unset');
+        $et-><AS::Notation.publicId> (null);
+        $test->assert_null ($et-><AG::Notation.publicId>);
+
   @Attr:
-     @@Name:  systemId
-     @@Description:
-       @@@lang:en
-       @@@@: The system identifier of this notation.
-     @@Get:
-        @@@Type:  
-          DOMMain:DOMString
-        @@@Description:
-          @@@@lang:en
-          @@@@@: The system identifier.
-        @@@InCase:
-          @@@@Value:
-            @@@@@is-null:1
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@: The system identifier was not specified.
-        @@@disDef:
-          @@@@GetProp:
-            infoset:systemIdentifier
+    @@Name: systemId
+    @@enDesc:
+      The system identifier of the notation.  It might or might not
+      be an absolute URI.
+    @@nullCase:
+      @@@enDesc:
+        If the system identifier is not specified.
+    @@Type: DOMString
+    @@Get:
+      @@@disDef:
+        @@@@GetProp: infoset|systemIdentifier
+    @@LXSet:
+      @@@disDef:
+        @@@@SetProp: 
+          @@@@@@: infoset|systemIdentifier
+          @@@@@CheckReadOnly: 1
+    @@XDTest:
+      @@@QName: Notation.systemId.test
+      @@@PerlDef:
+        my $et;
+        __CODE{d|newNotationForTest:: $et => $et}__;
+        
+        $test->id ('default');
+        $test->assert_null ($et-><AG::Notation.systemId>);
+
+        $test->id ('set');
+        $et-><AS::Notation.systemId> ('string');
+        $test->assert_equals ($et-><AG::Notation.systemId>, 'string');
+
+        $test->id ('unset');
+        $et-><AS::Notation.systemId> (null);
+        $test->assert_null ($et-><AG::Notation.systemId>);
   
   @ReAttr:
     @@Name: baseURI
@@ -1455,23 +1504,25 @@ NodeTypeDef:
      @@Level[list]:  3
      @@SpecLevel:3
      @@L3:
-  @ReAttr:
+
+  @Attr:
+    @@ForCheck: ManakaiDOM|ForClass
     @@Name: nodeName
-    @@Description:
-      @@@lang:en
-      @@@@: The node name.
+    @@enDesc:
+      The declared name of the notation.
     @@DOMMain:isNamespaceUnaware:1
+    @@Type: DOMString
     @@Get:
-      @@@Type: 
-        DOMMain:DOMString
-      @@@actualType:
-        DOMMain:ManakaiDOMString
-      @@@Description:
-        @@@@lang:en
-        @@@@@: The notation name.
       @@@disDef:
-        @@@@GetProp:
-          DOMCore:name
+        @@@@GetProp: c|name
+    @@XDTest:
+      @@@QName: Notation.nodeName.test
+      @@@PerlDef:
+        my $et;
+        __CODE{d|newNotationForTest:: $et => $et}__;
+        
+        $test->assert_equals ($et-><AG::Node.nodeName>, 'n1');
+
   @ReAttr:
     @@Name: nodeType
     @@Description:
@@ -1489,8 +1540,16 @@ NodeTypeDef:
           @@@@@@:
             This node is a <IF::Notation>.
       @@@disDef:
-        @@@@DISLang:constValue: 
-          DOMCore:Node.NOTATION_NODE
+        @@@@DISLang:constValue: t|Node.NOTATION_NODE
+    @@XDTest:
+      @@@QName: Notation.nodeType.test
+      @@@PerlDef:
+        my $et;
+        __CODE{d|newNotationForTest:: $et => $et}__;
+        
+        $test->assert_num_equals
+                 (actual_value => $et-><AG::Node.nodeType>,
+                  expected_value => <C::t|Node.NOTATION_NODE>);
 
   @L3Attr:
      @@Name:  textContent
@@ -1527,6 +1586,40 @@ NodeTypeDef:
         @@@@For: ManakaiDOM|ManakaiDOM
       @@@disDef:
         @@@@DISPerl:cloneCode: t|ManakaiDOMNode.nodeValue.set
+
+  @LXAttr:
+    @@Name: ownerDocumentTypeDefinition
+    @@enDesc:
+      The document type definition node to which the notation is attached.
+    @@Type: d|DocumentTypeDefinition
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          The notation is not attached to any document type.
+      @@@PerlDef:
+        $r = <ClassM::t|ManakaiDOMNode.getNodeReference>
+               ($self->{<H::mn:node>}->{<H::d|ownerDefinition>})
+          if $self->{<H::mn:node>}->{<H::d|ownerDefinition>};
+    @@XDTest:
+      @@@QName: Notation.ownerDTDef.test
+      @@@PerlDef:
+        my $et;
+        __CODE{d|newNotationForTest}__;
+ 
+        my $odt = $et-><AG::x|Notation.ownerDocumentTypeDefinition>;
+        $test->assert_null ($odt);
+
+        my $dt = $et-><AG::t|Node.ownerDocument>
+                     -><M::t|Node.getFeature> (<Q::fe:XDoctype>)
+                     -><M::d|DocumentXDoctype.createDocumentTypeDefinition>
+                         ('dt1');
+        $test->assert_not_null ($dt);
+        $dt-><M::d|DocumentTypeDefinition.setNotationNode> ($et);
+
+        my $odt2 = $et-><AG::x|Entity.ownerDocumentTypeDefinition>;
+        $test->assert_not_null ($odt2);
+        $test->assert_isa ($odt2, <IFName::d|DocumentTypeDefinition>);
+        $test->assert_equals ($odt2, $dt);
  
   @IntMethod:
     @@Name: newObject
@@ -1552,8 +1645,9 @@ NodeTypeDef:
          \
          Other available properties: <Q::infoset:declarationBaseURI>, 
          <Q::infoset:publicIdentifier>, <Q::infoset:systemIdentifier>, 
-         <Q::DOMCore:read-only>.
+         <Q::DOMCore:read-only>, <Q::d|ownerDefinition>.
   @mn:xrefnode0: c|ownerDocument
+  @mn:origin0: d|ownerDefinition
 
   @Method:
      @@Name:  getFeature
@@ -1688,8 +1782,7 @@ NodeTypeDef:
       For example, setting <A::Entity.notationName> attribute
       might make a node unparsed entity and any reference to that 
       entity is an error.  An external entity with its
-      <A::Entity.sustemId> set to <DOM::null> is unserializable.
-
+      <A::Entity.systemId> set to <DOM::null> is unserializable.
 
       When the replacement text of the entity is available, 
       the child list of the <IF::Entity> node represents the structure 
@@ -1987,7 +2080,7 @@ NodeTypeDef:
         $r = <ClassM::t|ManakaiDOMNode.getNodeReference>
                ($self->{<H::mn:node>}->{<H::d|ownerDefinition>})
           if $self->{<H::mn:node>}->{<H::d|ownerDefinition>};
-    @@LXTest:
+    @@XDTest:
       @@@QName: Entity.ownerDTDef.test
       @@@PerlDef:
         my $et;
@@ -2032,7 +2125,7 @@ NodeTypeDef:
           @@@@@@: ManakaiDOM|isExternallyDeclared
           @@@@@CheckReadOnly: 1
 
-    @@LXTest:
+    @@XDTest:
       @@@QName: Entity.isExternallyDeclared.test
       @@@PerlDef:
         my $et;
@@ -2168,30 +2261,6 @@ PropDef:
   @enDesc:
     Whether an entity node has its replacement tree or not.
   @c:nodeProp: rep
-
-ElementTypeBinding:
-  @Name: Test
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type: test|StandaloneTest
-    @@ForCheck: ManakaiDOM|ForClass
-
-ElementTypeBinding:
-  @Name: L3Test
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type: test|StandaloneTest
-    @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM3
-
-ElementTypeBinding:
-  @Name: LXTest
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type: test|StandaloneTest
-    @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
 
 NodeTypeDef:
   @IFQName: EntityReference

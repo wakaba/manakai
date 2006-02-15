@@ -12,7 +12,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/02/13 17:03:21 $
+    $Date: 2006/02/15 13:36:20 $
 
   @Require:
     @@Module:
@@ -74,8 +74,6 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
   @ManakaiDOMCore:
     http://suika.fam.cx/~wakaba/archive/2004/mdom-core#
-  @ManakaiDOMXML:
-    http://suika.fam.cx/~wakaba/archive/2004/mdom-xml#
   @MDOM:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
   @MDOMX:
@@ -259,6 +257,14 @@ ElementTypeBinding:
   ## Note that there are attributes introduced in DOM Level 3
   ## but also defined for lower levels as internal attributes
   ## for the purpose of internal use.
+
+ElementTypeBinding:
+  @Name: LXAttr
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|Attribute
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|ManakaiDOMLatest
 
 ElementTypeBinding:
   @Name: ReAttr
@@ -6752,14 +6758,6 @@ ForDef:
   @ISA: ManakaiDOM|ForClass
 
 ForDef:
-  @QName: c|ForNotationMap
-  @Description:
-    @@lang:en
-    @@@:
-      For <ClassM::ManakaiDOMXML:ManakaiDOMNotations> class.
-  @ISA: ManakaiDOM|ForClass
-
-ForDef:
   @QName: t|ForETMap
   @enDesc:
     For element type definition list named node map class.
@@ -6775,6 +6773,12 @@ ForDef:
   @QName: t|ForEntityMap
   @enDesc:
     For entity list named node map class.
+  @ISA: ManakaiDOM|ForClass
+
+ForDef:
+  @QName: t|ForNotationMap
+  @enDesc:
+    For notation list named node map class.
   @ISA: ManakaiDOM|ForClass
 
 ResourceDef:
@@ -6804,34 +6808,6 @@ ResourceDef:
   @f:implements:
     @@@: c|CoreFeature30
     @@ForCheck: ManakaiDOM|DOM3
-
-  @resourceFor:
-    @@@: c|ForNotationMap
-    @@For:
-      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
-  @QName:
-    @@@: 
-      ManakaiDOMXML:ManakaiDOMNotations
-    @@ForCheck: c|ForNotationMap
-  @ISA:
-    @@@: ManakaiNode|ManakaiNodeRef||ManakaiDOM|Perl
-    @@ForCheck: c|ForNotationMap
-
-  @DOMMain:implementFeature:
-    @@@: 
-      DOMXML:XMLFeature10
-    @@ForCheck:
-      c|ForNotationMap ManakaiDOM:DOM1
-  @DOMMain:implementFeature:
-    @@@: 
-      DOMXML:XMLFeature20
-    @@ForCheck:
-      c|ForNotationMap ManakaiDOM:DOM2
-  @DOMMain:implementFeature:
-    @@@: 
-      DOMXML:XMLFeature30
-    @@ForCheck:
-      c|ForNotationMap ManakaiDOM:DOM3
 
   @resourceFor:
     @@@: t|ForAttrMap
@@ -6884,6 +6860,29 @@ ResourceDef:
   @f:implements:
     @@@: x|XMLVersionFeature11
     @@ForCheck: t|ForEntityMap ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeatureXML11
+
+  @resourceFor:
+    @@@: t|ForNotationMap
+    @@ForCheck: ManakaiDOM|ManakaiDOM1 ManakaiDOM|DOMXMLFeature
+  @QName:
+    @@@: t|ManakaiDOMNotationMap
+    @@ForCheck: t|ForNotationMap
+
+  @f:implements:
+    @@@: x|XMLFeature10
+    @@ForCheck: t|ForNotationMap ManakaiDOM|DOM1
+  @f:implements:
+    @@@: x|XMLFeature20
+    @@ForCheck: t|ForNotationMap ManakaiDOM|DOM2
+  @f:implements:
+    @@@: x|XMLFeature30
+    @@ForCheck: t|ForNotationMap ManakaiDOM|DOM3
+  @f:implements:
+    @@@: x|XMLVersionFeature10
+    @@ForCheck: t|ForNotationMap ManakaiDOM|DOM3
+  @f:implements:
+    @@@: x|XMLVersionFeature11
+    @@ForCheck: t|ForNotationMap ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeatureXML11
 
   @rdf:type:
     @@@: DISLang|Class
@@ -7125,6 +7124,70 @@ ResourceDef:
                   expected_value => 0);
 
     @@XDTest:
+      @@@ForCheck: t|ForNotationMap
+      @@@QName: NotationMap.P.test
+      @@@PerlDef:
+        my $dtd;
+        __CODE{d|newDoctypeForTest}__;
+        my $doc = $dtd-><AG::Node.ownerDocument>;
+        my $em = $dtd-><AG::d|DocumentTypeDefinition.notations>;
+
+        $test->id ('hash.scalar');
+        $test->assert_not_null (scalar %$em);
+
+        $test->id ('key.no');
+        $test->assert_null ($em->{et1});
+        $test->assert_null ($em->{et2});
+        $test->id ('exists.no');
+        $test->assert_false (exists $em->{et1});
+        $test->assert_false (exists $em->{et2});
+
+        $test->id ('setNamedItem');
+        my $et1 = $doc-><M::d|DocumentXDoctype.createNotation>
+                          ('et1');
+        $em-><M::NamedNodeMap.setNamedItem> ($et1);
+
+        $test->id ('key.et1');
+        my $v1 = $em->{et1};
+        $test->assert_equals ($v1, $et1);
+        $test->id ('exists.et1');
+        $test->assert_true (exists $em->{et1});
+        $test->id ('not.exists.et2');
+        $test->assert_false (exists $em->{et2});
+
+        $test->id ('keys');
+        my @keys = keys %$em;
+        $test->assert_num_equals
+                 (actual_value => 0 + @keys,
+                  expected_value => 1);
+        $test->assert_equals ($keys[0], 'et1');
+        
+        $test->id ('setNamedItem.2');
+        my $et2 = $doc-><M::d|DocumentXDoctype.createNotation>
+                          ('et2');
+        $em-><M::NamedNodeMap.setNamedItem> ($et2);
+
+        $test->id ('keys.2');
+        @keys = keys %$em;
+        $test->assert_num_equals
+                 (actual_value => 0 + @keys,
+                  expected_value => 2);
+        $test->assert_not_equals ($keys[0], $keys[1]);
+        $test->assert_true ($keys[0] eq 'et1' or $keys[0] eq 'et2');
+        $test->assert_true ($keys[1] eq 'et1' or $keys[1] eq 'et2');
+        
+        $test->id ('delete');
+        delete $em->{et1};
+        $test->assert_false (exists $em->{et1});
+        $test->assert_true (exists $em->{et2});
+
+        $test->id ('clear');
+        %$em = ();
+        $test->assert_num_equals
+                 (actual_value => 0 + keys %$em,
+                  expected_value => 0);
+
+    @@XDTest:
       @@@ForCheck: t|ForETMap
       @@@QName: ETMap.P.test
       @@@PerlDef:
@@ -7286,6 +7349,11 @@ ResourceDef:
         @@@@@:
           tie my @list, <ClassName::ManakaiDOMEntityMapArray>, $self;
           $r = \@list;
+      @@@PerlDef:
+        @@@@ForCheck: t|ForNotationMap
+        @@@@@:
+          tie my @list, <ClassName::ManakaiDOMNotationMapArray>, $self;
+          $r = \@list;
 
     @@Test:
       @@@ForCheck: t|ForAttrMap
@@ -7431,6 +7499,54 @@ ResourceDef:
         $test->assert_false (exists $em->[0]);
 
     @@XDTest:
+      @@@ForCheck: t|ForNotationMap
+      @@@QName: NotationMap.@.test
+      @@@PerlDef:
+        my $dtd;
+        __CODE{d|newDoctypeForTest}__;
+        my $doc = $dtd-><AG::Node.ownerDocument>;
+        my $em = $dtd-><AG::d|DocumentTypeDefinition.notations>;
+
+        $test->id ('length.0');
+        $test->assert_num_equals
+                 (actual_value => 0 + @$em,
+                  expected_value => 0);
+
+        $test->id ('fetch.0.no');
+        $test->assert_null ($em->[0]);
+        $test->id ('exists.0');
+        $test->assert_false (exists $em->[0]);
+        $test->id ('exists.-1');
+        $test->assert_false (exists $em->[-1]);
+
+        $test->id ('setNamedItem');
+        my $et1 = $doc-><M::d|DocumentXDoctype.createNotation>
+                          ('et1');
+        $em-><M::NamedNodeMap.setNamedItem> ($et1);
+
+        $test->id ('length.1');
+        $test->assert_num_equals
+                 (actual_value => 0 + @$em,
+                  expected_value => 1);
+
+        $test->id ('0.fetch.0');
+        $test->assert_equals ($em->[0], $et1);
+        $test->id ('0.fetch.-1');
+        $test->assert_equals ($em->[-1], $et1);
+        $test->id ('0.fetch.1.no');
+        $test->assert_null ($em->[1]);
+        $test->id ('0.exists.0');
+        $test->assert_true (exists $em->[0]);
+        $test->id ('0.exists.-1');
+        $test->assert_true (exists $em->[-1]);
+        $test->id ('0.exists.1.no');
+        $test->assert_false (exists $em->[1]);
+
+        $test->id ('delete.0');
+        delete $em->[0];
+        $test->assert_false (exists $em->[0]);
+
+    @@XDTest:
       @@@ForCheck: t|ForATMap
       @@@QName: ATMap.@.test
       @@@PerlDef:
@@ -7520,6 +7636,9 @@ ResourceDef:
           }__;
           __FOR{t:ForEntityMap::
             $list = ($$$self)->{<H::mn:node>}->{<H::d|generalEntities>};
+          }__;
+          __FOR{t:ForNotationMap::
+            $list = ($$$self)->{<H::mn:node>}->{<H::d|notations>};
           }__;
           if (defined $list->{$name}) {
             $r = <ClassM::ManakaiDOMNode.getNodeReference> ($list->{$name});
@@ -7726,6 +7845,56 @@ ResourceDef:
         $test->assert_null ($r5);
         $test->assert_equals ($em-><M::NamedNodeMap.getNamedItem> ('et1'), $et2);
 
+    @@XDTest:
+      @@@ForCheck: t|ForNotationMap
+      @@@QName: NotationMap.getNamedItem.setNamedItem.test
+      @@@PerlDef:
+        my $dtd;
+        __CODE{d|newDoctypeForTest}__;
+        my $doc = $dtd-><AG::Node.ownerDocument>;
+
+        my $em = $dtd-><AG::d|DocumentTypeDefinition.notations>;
+        $test->assert_isa ($em, <IFName::t|NamedNodeMap>);
+
+        $test->id ('getNamedItem.none');
+        $test->assert_null ($em-><M::NamedNodeMap.getNamedItem> ('et1'));
+
+        my $et1 = $doc-><M::d|DocumentXDoctype.createNotation>
+                          ('et1');
+        $test->assert_isa ($et1, <IFName::x|Notation>);
+
+        $test->id ('setNamedItem.et1');
+        my $r1 = $em-><M::NamedNodeMap.setNamedItem> ($et1);
+        $test->assert_null ($r1);
+
+        $test->id ('getNamedItem.et1');
+        my $r2 = $em-><M::NamedNodeMap.getNamedItem> ('et1');
+        $test->assert_equals ($r2, $et1);
+        $test->assert_equals
+                 ($r2-><AG::x|Notation.ownerDocumentTypeDefinition>,
+                  $dtd);
+        $test->assert_equals
+                 ($et1-><AG::x|Notation.ownerDocumentTypeDefinition>,
+                  $dtd);
+
+        my $et2 = $doc-><M::d|DocumentXDoctype.createNotation>
+                          ('et1');
+        $test->assert_isa ($et2, <IFName::x|Notation>);
+        $test->assert_not_equals ($et1, $et2);
+
+        $test->id ('setNamedItem.et2');
+        my $r3 = $em-><M::NamedNodeMap.setNamedItem> ($et2);
+        $test->assert_equals ($r3, $et1);
+
+        $test->id ('getNamedItem.et2');
+        my $r4 = $em-><M::NamedNodeMap.getNamedItem> ('et1');
+        $test->assert_equals ($r4, $et2);
+
+        $test->id ('setNamedItem.et2.by.et2');
+        my $r5 = $em-><M::NamedNodeMap.setNamedItem> ($et2);
+        $test->assert_null ($r5);
+        $test->assert_equals ($em-><M::NamedNodeMap.getNamedItem> ('et1'), $et2);
+
   @Method:
     @@Name: setNamedItem
     @@enDesc:
@@ -7785,7 +7954,7 @@ ResourceDef:
         @@@@enDesc:
           If <P::arg> is an <IF::Attr> that is already an attribute
           of another <IF::Element>.
-        @@@@ForCheck: !t|ForETMap !t|ForATMap !t|ForEntityMap
+        @@@@ForCheck: !t|ForETMap !t|ForATMap !t|ForEntityMap !t|ForNotationMap
       @@@dx:raises:
         @@@@@: c|INUSE_DEFINITION_ERR
         @@@@enDesc:
@@ -7831,6 +8000,10 @@ ResourceDef:
           __FOR{t:ForEntityMap::
             $list = $owner->{<H::d|generalEntities>};
             $expected_type = <C::Node.ENTITY_NODE>;
+          }__;
+          __FOR{t:ForNotationMap::
+            $list = $owner->{<H::d|notations>};
+            $expected_type = <C::Node.NOTATION_NODE>;
           }__;
           if (<Code::doStrictErrorChecking:: $nodeRef = {$$$self}>) {
             unless (UNIVERSAL::isa ($arg,
@@ -7950,7 +8123,7 @@ ResourceDef:
       Removes a node specified by name.
     @@enDesc:
       @@@ddid: attr
-      @@@ForCheck: !t|ForETMap !t|ForATMap !t|ForEntityMap
+      @@@ForCheck: !t|ForETMap !t|ForATMap !t|ForEntityMap !t|ForNotationMap
       @@@enDesc:
         If the removed attribute is known to have a default value,
         an attribute immediately appears containing the default
@@ -8018,6 +8191,9 @@ ResourceDef:
           }__;
           __FOR{t:ForEntityMap::
             $list = $owner->{<H::d|generalEntities>};
+          }__;
+          __FOR{t:ForNotationMap::
+            $list = $owner->{<H::d|notations>};
           }__;
           if (<Code::doStrictErrorChecking:: $nodeRef = {$$$self}>) {
             if ($owner->{<H::c|read-only>}) {
@@ -8158,6 +8334,35 @@ ResourceDef:
 
         undef $em;
 
+    @@XDTest:
+      @@@QName: NotationMap.removeNamedItem.test
+      @@@ForCheck: t|ForNotationMap
+      @@@PerlDef:
+        my $dtd;
+        __CODE{d|newDoctypeForTest}__;
+        my $doc = $dtd-><AG::Node.ownerDocument>;
+        my $em = $dtd-><AG::d|DocumentTypeDefinition.notations>;
+        undef $dtd;
+
+        $test->id ('setNamedItem');
+        my $et1 = $doc-><M::d|DocumentXDoctype.createNotation>
+                          ('et1');
+        $em-><M::NamedNodeMap.setNamedItem> ($et1);
+        $test->assert_equals
+                 ($em-><M::NamedNodeMap.getNamedItem> ('et1'), $et1);
+
+        $test->id ('removeNamedItem.noremove');
+        $test->assert_exception (code => sub {
+          $em-><M::NamedNodeMap.removeNamedItem> ('et2');
+        }, exception_subtype => <Q::c|NO_NAMED_NODE_ERR>);
+
+        $test->id ('removeNamedItem.remove');
+        my $et3 = $em-><M::NamedNodeMap.removeNamedItem> ('et1');
+        $test->assert_equals ($et3, $et1);
+        $test->assert_null ($em-><M::NamedNodeMap.getNamedItem> ('et1'));
+
+        undef $em;
+
   @IntMethod:
     @@Perlop: DELETE
     @@enDesc:
@@ -8243,6 +8448,9 @@ ResourceDef:
           }__;
           __FOR{t:ForEntityMap::
             $list = ($$$self)->{<H::mn:node>}->{<H::d|generalEntities>};
+          }__;
+          __FOR{t:ForNotationMap::
+            $list = ($$$self)->{<H::mn:node>}->{<H::d|notations>};
           }__;
           my $key = $index >= 0 ? [sort {$a cmp $b} keys %$list]->[$index]
                                 : null;
@@ -8384,6 +8592,39 @@ ResourceDef:
         $test->assert_not_equals ($item0, $item1);
         $test->assert_true ($et1 eq $item0 or $et2 eq $item0);
         $test->assert_true ($et1 eq $item1 or $et2 eq $item1);
+    
+    @@XDTest:
+      @@@QName: NotationMap.item.test
+      @@@ForCheck: t|ForNotationMap
+      @@@PerlDef:
+        my $dtd;
+        __CODE{d|newDoctypeForTest}__;
+        my $doc = $dtd-><AG::Node.ownerDocument>;
+        my $em = $dtd-><AG::d|DocumentTypeDefinition.notations>;
+        
+        $test->id ('no.item');
+        $test->assert_null ($em-><M::NamedNodeMap.item> (-1));
+        $test->assert_null ($em-><M::NamedNodeMap.item> (0));
+        $test->assert_null ($em-><M::NamedNodeMap.item> (1));
+        $test->assert_null ($em-><M::NamedNodeMap.item> (2));
+
+        $test->id ('two.items');
+        my $et1 = $doc-><M::d|DocumentXDoctype.createNotation>
+                          ('et1');
+        $dtd-><M::d|DocumentTypeDefinition.setNotationNode> ($et1);
+        my $et2 = $doc-><M::d|DocumentXDoctype.createNotation>
+                          ('et2');
+        $dtd-><M::d|DocumentTypeDefinition.setNotationNode> ($et2);
+
+        $test->assert_null ($em-><M::NamedNodeMap.item> (-1));
+        $test->assert_null ($em-><M::NamedNodeMap.item> (2));
+        my $item0 = $em-><M::NamedNodeMap.item> (0);
+        my $item1 = $em-><M::NamedNodeMap.item> (1);
+        $test->assert_not_null ($item0);
+        $test->assert_not_null ($item1);
+        $test->assert_not_equals ($item0, $item1);
+        $test->assert_true ($et1 eq $item0 or $et2 eq $item0);
+        $test->assert_true ($et1 eq $item1 or $et2 eq $item1);
 
   @Attr:
     @@Name: length
@@ -8414,6 +8655,11 @@ ResourceDef:
         @@@@@:
           $r = @{[map {$_} values %{$$$self->{<H::mn:node>}
                                            ->{<H::d|generalEntities>}}]};
+      @@@PerlDef:
+        @@@@ForCheck: t|ForNotationMap
+        @@@@@:
+          $r = @{[map {$_} values %{$$$self->{<H::mn:node>}
+                                           ->{<H::d|notations>}}]};
 
     @@Test:
       @@@QName: AttrMap.length.test
@@ -8533,6 +8779,35 @@ ResourceDef:
         $test->assert_num_equals
                  (actual_value => $et-><AG::NamedNodeMap.length>,
                   expected_value => 2);
+    @@XDTest:
+      @@@QName: NotationMap.length.test
+      @@@ForCheck: t|ForNotationMap
+      @@@PerlDef:
+        my $dtd;
+        __CODE{d|newDoctypeForTest}__;
+        my $doc = $dtd-><AG::Node.ownerDocument>;
+        my $et = $dtd-><AG::d|DocumentTypeDefinition.notations>;
+
+        $test->id ('length.0');
+        $test->assert_num_equals
+                 (actual_value => $et-><AG::NamedNodeMap.length>,
+                  expected_value => 0);
+
+        $test->id ('length.1');
+        my $et1 = $doc-><M::d|DocumentXDoctype.createNotation>
+                          ('et1');
+        $dtd-><M::d|DocumentTypeDefinition.setNotationNode> ($et1);
+        $test->assert_num_equals
+                 (actual_value => $et-><AG::NamedNodeMap.length>,
+                  expected_value => 1);
+
+        $test->id ('length.1');
+        my $et2 = $doc-><M::d|DocumentXDoctype.createNotation>
+                          ('et2');
+        $dtd-><M::d|DocumentTypeDefinition.setNotationNode> ($et2);
+        $test->assert_num_equals
+                 (actual_value => $et-><AG::NamedNodeMap.length>,
+                  expected_value => 2);
 
   @IntMethod:
     @@Perlop: STORESIZE
@@ -8566,7 +8841,7 @@ ResourceDef:
     @@Return:
       @@@Type: idl|boolean||ManakaiDOM|all
       @@@PerlDef:
-        @@@@ForCheck: !t|ForETMap !t|ForATMap !t|ForEntityMap
+        @@@@ForCheck: !t|ForETMap !t|ForATMap !t|ForEntityMap !t|ForNotationMap
         @@@@@:
           __DEEP{
             $r = defined ($self-><M::NamedNodeMap.getNamedItem> ($key));
@@ -8585,6 +8860,11 @@ ResourceDef:
         @@@@@:
           $r = exists (($$$self)->{<H::mn:node>}
                                 ->{<H::d|generalEntities>}->{$key});
+      @@@PerlDef:
+        @@@@ForCheck: t|ForNotationMap
+        @@@@@:
+          $r = exists (($$$self)->{<H::mn:node>}
+                                ->{<H::d|notations>}->{$key});
 
   @IntMethod:
     @@Perlop: FIRSTKEY
@@ -8618,6 +8898,12 @@ ResourceDef:
           my $a = keys %{($$$self)->{<H::mn:node>}->{<H::d|generalEntities>}};
             # reset
           $r = each %{($$$self)->{<H::mn:node>}->{<H::d|generalEntities>}};
+      @@@PerlDef:
+        @@@@ForCheck: t|ForNotationMap
+        @@@@@:
+          my $a = keys %{($$$self)->{<H::mn:node>}->{<H::d|notations>}};
+            # reset
+          $r = each %{($$$self)->{<H::mn:node>}->{<H::d|notations>}};
 
   @IntMethod:
     @@Perlop: NEXTKEY
@@ -8648,6 +8934,10 @@ ResourceDef:
         @@@@ForCheck: t|ForEntityMap
         @@@@@:
           $r = each %{($$$self)->{<H::mn:node>}->{<H::d|generalEntities>}};
+      @@@PerlDef:
+        @@@@ForCheck: t|ForNotationMap
+        @@@@@:
+          $r = each %{($$$self)->{<H::mn:node>}->{<H::d|notations>}};
 
   @IntMethod:
     @@ForCheck: !t|ForAttrMap
@@ -8669,6 +8959,10 @@ ResourceDef:
         @@@@ForCheck: t|ForEntityMap
         @@@@@:
           $r = scalar %{($$$self)->{<H::mn:node>}->{<H::d|generalEntities>}};
+      @@@PerlDef:
+        @@@@ForCheck: t|ForNotationMap
+        @@@@@:
+          $r = scalar %{($$$self)->{<H::mn:node>}->{<H::d|notations>}};
 
   @L2Method:
     @@Name: getNamedItemNS
@@ -8919,7 +9213,7 @@ ResourceDef:
     @@NoNSVersion: .removeNamedItem
     @@enDesc:
       @@@ddid: attr
-      @@@ForCheck: !t|ForETMap !t|ForATMap !t|ForEntityMap
+      @@@ForCheck: !t|ForETMap !t|ForATMap !t|ForEntityMap !t|ForNotationMap
       @@@@:
         If the removed attribute is known to have a default value,
         an attribute immediately appears containing the default value
@@ -9130,6 +9424,15 @@ ResourceDef:
       type definition node.
     @@PerlDef:
       $map = bless \\($node), <ClassName::t|ManakaiDOMEntityMap>;
+
+  @CODE:
+    @@ForCheck: t|ForNotationMap ManakaiDOM|ManakaiDOMLatest
+    @@QName: getNotationNodeMap
+    @@enDesc:
+      Creates a notation node map from a document
+      type definition node.
+    @@PerlDef:
+      $map = bless \\($node), <ClassName::t|ManakaiDOMNotationMap>;
 ##NamedNodeMap
 
 PropDef:
@@ -9190,6 +9493,16 @@ ResourceDef:
   @ISA:
     @@@: ManakaiDOMEntityMap
     @@ForCheck: t|ForEntityMap
+
+  @resourceFor:
+    @@@: t|ForNotationMap
+    @@For: ManakaiDOM|ManakaiDOMLatest
+  @QName:
+    @@@: ManakaiDOMNotationMapArray
+    @@ForCheck: t|ForNotationMap
+  @ISA:
+    @@@: ManakaiDOMNotationMap
+    @@ForCheck: t|ForNotationMap
 
   @AppISA:
     Tie::Array
@@ -17700,6 +18013,59 @@ NodeTypeDef:
       @@@disDef:
         @@@@DISPerl:cloneCode: ManakaiDOMNode.nodeValue.set
 
+  @LXAttr:
+    @@Name: allDeclarationsProcessed
+    @@enDesc:
+      Whether the XML processor has read the complete DTD when the
+      XML document is parsed.  This attribute corresponding to
+      the <InfoProp::all declarations processed> property of
+      the <InfoItem::document information item> in the XML Information Set.
+
+        {NOTE::
+          This attribute only exposes the information set property.
+          Its value does <EM::not> indicate whether the document
+          is <QUOTE::complete> or not, or valid or not.  In particular,
+          modifications to the DOM tree does not affect the
+          value of this attribute.
+        }
+    @@enImplNote:
+      {ISSUE::
+        Interaction between <M::Document.normalizeDocument> and this attribute
+      }
+    @@Type: idl|boolean||ManakaiDOM|all
+    @@TrueCase:
+      @@@enDesc:
+        The <InfoProp::all declarations processed> property is
+        true.
+    @@FalseCase:
+      @@@enDesc:
+        The <InfoProp::all declarations processed> property is <EM::not>
+        true.
+    @@Get:
+      @@@disDef:
+        @@@@GetProp: infoset|allDeclarationsProcessed
+    @@Set:
+      @@@disDef:
+        @@@@SetProp:
+          @@@@@@: infoset|allDeclarationsProcessed
+          @@@@@CheckReadOnly: 1
+    @@LXTest:
+      @@@QName: Document.allDeclarationsProcessed.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{createEmptyDocumentForTest:: $doc => $doc}__;
+
+        $test->id ('default');
+        $test->assert_false ($doc-><AG::Document.allDeclarationsProcessed>);
+
+        $test->id ('set.true');
+        $doc-><AS::Document.allDeclarationsProcessed> (true);
+        $test->assert_true ($doc-><AG::Document.allDeclarationsProcessed>);
+
+        $test->id ('set.false');
+        $doc-><AS::Document.allDeclarationsProcessed> (false);
+        $test->assert_false ($doc-><AG::Document.allDeclarationsProcessed>);
+
   @IntMethod:
     @@Name: newObject
     @@Description:
@@ -17742,7 +18108,8 @@ NodeTypeDef:
            <Q::infoset:children>,
            <Q::c|error-handler>,
            <Q::cfg|entity-reference-read-only>,
-           <Q::cfg|clone-entity-reference-subtree>.
+           <Q::cfg|clone-entity-reference-subtree>,
+           <Q::infoset|allDeclarationsProcessed>.
 
   @mn:subnode1: infoset|children
   @mn:anydata0: DOMCore|error-handler

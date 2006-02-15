@@ -10,7 +10,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/02/13 17:03:22 $
+    $Date: 2006/02/15 13:36:21 $
 
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
@@ -2613,7 +2613,7 @@ ClsDef:
     } // _GeneralEntityReferenceAE_
     
     /*
-      General entity reference in literal entity value
+      General Entity Reference in Literal Entity Value in Entity Declaration
     */
     rule _GeneralEntityReferenceEV_ ($vals) {
       ?lexmode 'EntityReference';
@@ -2621,9 +2621,15 @@ ClsDef:
       ~ (Name) {
         lang:Perl ($name => $token.value) {
           ## TODO: Namespace well-formedness
-          ## TODO: Entity declared constraints
           push @$vals, $name;
         }
+        /*
+          WFCs such as Entity Declared are not checked
+          <http://www.w3.org/TR/xml11/#bypass>
+
+          Note that violation to the Parsed Entity WFC is an error
+          rather than fatal error here.
+        */
       }
 
       // No expansion
@@ -3351,11 +3357,77 @@ ClsDef:
         }
       }
 
-      lang:Perl {
+      lang:Perl : has-error {
         if ($self->{$decl->{is_param_entity} ? 'param_entity' : 'general_entity'}
                  ->{$decl->{name}}) {
-          ## TODO: warning
-          ## TODO: predefined entity error check
+          ## Predefined entity
+          if (not $decl->{is_param_entity} and
+              {lt => true, gt => true, amp => true,
+               quot => true, apos => true}->{$decl->{name}}) {
+            if ($decl->{is_external_entity}) {
+              my $location;
+              __CODE{xp|get-location-from-token::
+                $token => {$token},
+                $result => {$location},
+              }__;
+              my $continue = __c|ERROR{xp|error-internal-predefined-entity::
+                xp|error-token => {$token},
+                c|location => {$location},
+                xp|name => {$decl->{name}},
+              }__;
+              unless ($continue) {
+                __EXCEPTION{DOMLS|PARSE_ERR::
+                }__;
+              }              
+            } elsif (
+              not ({gt => true, apos => true, quot => true}->{$decl->{name}} and
+                   ${$decl->{reptxt}} eq {
+                     gt => '>', apos => "'", quot => '"',
+                   }->{$decl->{name}}) and
+              not (${$decl->{reptxt}} =~ /\A&#0*@{[{
+                     lt => '60', gt => '62', amp => '38',
+                     apos => '39', quot => '34',
+                   }->{$decl->{name}}]};\z/) and
+              not (${$decl->{reptxt}} =~ /\A&#x0*(?:(?i)@{[{
+                     lt => '3C', gt => '3E', amp => '26',
+                     apos => '27', quot => '22',
+                   }->{$decl->{name}}]});\z/)
+            ) {
+              ## NOTE: See "SuikaWiki - Predefined Entities"
+              ##       "http://suika.fam.cx/gate/2005/sw/%E5%AE%9A%E7%BE%A9%E6%B8%88%E5%AE%9F%E4%BD%93".
+              my $location;
+              __CODE{xp|get-location-from-token::
+                $token => {$token},
+                $result => {$location},
+              }__;
+              my $continue = __c|ERROR{xp|error-malformed-predefined-entity::
+                xp|error-token => {$token},
+                c|location => {$location},
+                xp|name => {$decl->{name}},
+                xp|replacement-text => {${$decl->{reptxt}}},
+              }__;
+              unless ($continue) {
+                __EXCEPTION{DOMLS|PARSE_ERR::
+                }__;
+              }
+            }
+ ## TODO:
+          } else {  ## Dupulicating declaration
+            my $location;
+            __CODE{xp|get-location-from-token::
+              $token => {$token},
+              $result => {$location},
+            }__;
+            my $continue = __c|ERROR{xp|warning-entity-declaration-ignored::
+              xp|error-token => {$token},
+              c|location => {$location},
+              xp|name => {$decl->{name}},
+            }__;
+            unless ($continue) {
+              __EXCEPTION{DOMLS|PARSE_ERR::
+              }__;
+            }
+          }
         } else {
           $self->{$decl->{is_param_entity} ? 'param_entity' : 'general_entity'}
                ->{$decl->{name}} = $decl;
@@ -11741,6 +11813,292 @@ ClsDef:
           element { }
         }
 
+    @@XMLTest:
+      @@@QName: xp.ENTITY.ignored.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+          <!ENTITY e "a">
+          <!ENTITY e "b">
+          ]><a/>
+      @@@test:domTree:
+        document {
+          document-type {
+            general-entity {
+              node-name: 'e';
+              text-content: 'a';
+            }
+          }
+          element { }
+        }
+      @@@c:erred:
+        <[[xp|warning-entity-declaration-ignored]]> { (3, 1)..(3, 15); }
+    @@XMLTest:
+      @@@QName: xp.ENTITY.ignored.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+          <!ENTITY % e "a">
+          <!ENTITY % e "b">
+          ]><a/>
+      @@@test:domTree:
+        document { }
+      @@@c:erred:
+        <[[xp|warning-entity-declaration-ignored]]> { (3, 1)..(3, 17); }
+
+    @@XMLTest:
+      @@@QName: xp.ENTITY.predefined.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+          <!ENTITY lt     "&#38;#60;">
+          <!ENTITY gt     "&#62;">
+          <!ENTITY amp    "&#38;#38;">
+          <!ENTITY apos   "&#39;">
+          <!ENTITY quot   "&#34;">
+          <!ENTITY e      "f">
+          ]><a>&lt;&gt;&amp;&apos;&quot;</a>
+      @@@test:domTree:
+        document {
+          document-type {
+            general-entity {
+              node-name: 'e';
+              text-content: 'f';
+            }
+          }
+          element {
+            text-content: '<>&' U+0027 '"';
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.ENTITY.predefined.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+          <!ENTITY lt     "&#38;#60;">
+          <!ENTITY gt     "&#x26;#62;">
+          <!ENTITY amp    "&#38;#38;">
+          <!ENTITY apos   "&#x26;#39;">
+          <!ENTITY quot   "&#x26;#34;">
+          <!ENTITY e      "f">
+          ]><a>&lt;&gt;&amp;&apos;&quot;</a>
+      @@@test:domTree:
+        document {
+          document-type {
+            general-entity {
+              node-name: 'e';
+              text-content: 'f';
+            }
+          }
+          element {
+            text-content: '<>&' U+0027 '"';
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.ENTITY.predefined.3.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+          <!ENTITY lt     "&#60;">
+          <!ENTITY gt     "&#62;">
+          <!ENTITY amp    "&#38;">
+          <!ENTITY apos   "&#39;">
+          <!ENTITY quot   "&#34;">
+          <!ENTITY e      "f">
+          ]><a>&lt;&gt;&amp;&apos;&quot;</a>
+      @@@c:erred: <[[xp|error-malformed-predefined-entity]]> { (2, 1)..(2, 24); }
+      @@@c:erred: <[[xp|error-malformed-predefined-entity]]> { (4, 1)..(4, 24); }
+      @@@test:domTree:
+        document {
+          document-type {
+            general-entity {
+              node-name: 'e';
+              text-content: 'f';
+            }
+          }
+          element {
+            text-content: '<>&' U+0027 '"';
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.ENTITY.predefined.4.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+          <!ENTITY lt     "1">
+          <!ENTITY gt     "2">
+          <!ENTITY amp    "3">
+          <!ENTITY apos   "4">
+          <!ENTITY quot   "5">
+          <!ENTITY e      "f">
+          ]><a>&lt;&gt;&amp;&apos;&quot;</a>
+      @@@c:erred: <[[xp|error-malformed-predefined-entity]]> { (2, 1)..(2, 24); }
+      @@@c:erred: <[[xp|error-malformed-predefined-entity]]> { (3, 1)..(3, 24); }
+      @@@c:erred: <[[xp|error-malformed-predefined-entity]]> { (4, 1)..(4, 24); }
+      @@@c:erred: <[[xp|error-malformed-predefined-entity]]> { (5, 1)..(5, 24); }
+      @@@c:erred: <[[xp|error-malformed-predefined-entity]]> { (6, 1)..(6, 24); }
+      @@@test:domTree:
+        document {
+          document-type {
+            general-entity {
+              node-name: 'e';
+              text-content: 'f';
+            }
+          }
+          element {
+            text-content: '<>&' U+0027 '"';
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.ENTITY.predefined.5.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+          <!ENTITY lt     SYSTEM "1">
+          <!ENTITY gt     SYSTEM "2">
+          <!ENTITY amp    SYSTEM "3">
+          <!ENTITY apos   SYSTEM "4">
+          <!ENTITY quot   SYSTEM "5">
+          <!ENTITY e      "f">
+          ]><a>&lt;&gt;&amp;&apos;&quot;</a>
+      @@@c:erred: <[[xp|error-internal-predefined-entity]]> { (2, 1)..(2, 27); }
+      @@@c:erred: <[[xp|error-internal-predefined-entity]]> { (3, 1)..(3, 27); }
+      @@@c:erred: <[[xp|error-internal-predefined-entity]]> { (4, 1)..(4, 27); }
+      @@@c:erred: <[[xp|error-internal-predefined-entity]]> { (5, 1)..(5, 27); }
+      @@@c:erred: <[[xp|error-internal-predefined-entity]]> { (6, 1)..(6, 27); }
+      @@@test:domTree:
+        document {
+          document-type {
+            general-entity {
+              node-name: 'e';
+              text-content: 'f';
+            }
+          }
+          element {
+            text-content: '<>&' U+0027 '"';
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.ENTITY.predefined.6.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+          <!ENTITY % lt     SYSTEM "1">
+          <!ENTITY % gt     SYSTEM "2">
+          <!ENTITY % amp    SYSTEM "3">
+          <!ENTITY % apos   SYSTEM "4">
+          <!ENTITY % quot   SYSTEM "5">
+          <!ENTITY e      "f">
+          ]><a>&lt;&gt;&amp;&apos;&quot;</a>
+      @@@test:domTree:
+        document {
+          document-type {
+            general-entity {
+              node-name: 'e';
+              text-content: 'f';
+            }
+          }
+          element {
+            text-content: '<>&' U+0027 '"';
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.ENTITY.predefined.7.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+          <!ENTITY lt     "&#38;#x3C;">
+          <!ENTITY gt     "&#x3E;">
+          <!ENTITY amp    "&#38;#x26;">
+          <!ENTITY apos   "&#x27;">
+          <!ENTITY quot   "&#x22;">
+          <!ENTITY e      "f">
+          ]><a>&lt;&gt;&amp;&apos;&quot;</a>
+      @@@test:domTree:
+        document {
+          document-type {
+            general-entity {
+              node-name: 'e';
+              text-content: 'f';
+            }
+          }
+          element {
+            text-content: '<>&' U+0027 '"';
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.ENTITY.predefined.8.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+          <!ENTITY lt     "&#38;#x3c;">
+          <!ENTITY gt     "&#x3e;">
+          <!ENTITY amp    "&#38;#x26;">
+          <!ENTITY apos   "&#x27;">
+          <!ENTITY quot   "&#x22;">
+          <!ENTITY e      "f">
+          ]><a>&lt;&gt;&amp;&apos;&quot;</a>
+      @@@test:domTree:
+        document {
+          document-type {
+            general-entity {
+              node-name: 'e';
+              text-content: 'f';
+            }
+          }
+          element {
+            text-content: '<>&' U+0027 '"';
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.ENTITY.predefined.9.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+          <!ENTITY lt     "&#38;#x00003C;">
+          <!ENTITY gt     "&#x0003E;">
+          <!ENTITY amp    "&#38;#x026;">
+          <!ENTITY apos   "&#x000027;">
+          <!ENTITY quot   "&#x0022;">
+          <!ENTITY e      "f">
+          ]><a>&lt;&gt;&amp;&apos;&quot;</a>
+      @@@test:domTree:
+        document {
+          document-type {
+            general-entity {
+              node-name: 'e';
+              text-content: 'f';
+            }
+          }
+          element {
+            text-content: '<>&' U+0027 '"';
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.ENTITY.predefined.10.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+          <!ENTITY lt     "&#38;#00060;">
+          <!ENTITY gt     "&#062;">
+          <!ENTITY amp    "&#38;#000038;">
+          <!ENTITY apos   "&#0000039;">
+          <!ENTITY quot   "&#0034;">
+          <!ENTITY e      "f">
+          ]><a>&lt;&gt;&amp;&apos;&quot;</a>
+      @@@test:domTree:
+        document {
+          document-type {
+            general-entity {
+              node-name: 'e';
+              text-content: 'f';
+            }
+          }
+          element {
+            text-content: '<>&' U+0027 '"';
+          }
+        }
+
     @@PerlDef:
       my $impl = $Message::DOM::ImplementationRegistry->get_implementation ({
         'Core' => '3.0',
@@ -11910,15 +12268,6 @@ ElementTypeBinding:
     @@lang:en
 
 ElementTypeBinding:
-  @Name: ErrDef
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type: DOMCore|DOMErrorType
-    @@For: ManakaiDOM|DOM3
-    @@ecore:textFormatter: ManakaiXMLParserExceptionFormatter
-
-ElementTypeBinding:
   @Name: WFErrDef
   @ElementType:
     dis:ResourceDef
@@ -11926,6 +12275,7 @@ ElementTypeBinding:
     @@rdf:type: DOMCore|DOMErrorType
     @@For: ManakaiDOM|DOM3
     @@ecore:textFormatter: ManakaiXMLParserExceptionFormatter
+    @@c:severity: c|SEVERITY_FATAL_ERROR
 
 ElementTypeBinding:
   @Name: FatalErrDef
@@ -11935,13 +12285,43 @@ ElementTypeBinding:
     @@rdf:type: DOMCore|DOMErrorType
     @@For: ManakaiDOM|DOM3
     @@ecore:textFormatter: ManakaiXMLParserExceptionFormatter
+    @@c:severity: c|SEVERITY_FATAL_ERROR
+
+ElementTypeBinding:
+  @Name: VCErrDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: c|DOMErrorType
+    @@For: ManakaiDOM|DOM3
+    @@ecore:textFormatter: ManakaiXMLParserExceptionFormatter
+    @@c:severity: c|SEVERITY_ERROR
+
+ElementTypeBinding:
+  @Name: ErrDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: c|DOMErrorType
+    @@For: ManakaiDOM|DOM3
+    @@ecore:textFormatter: ManakaiXMLParserExceptionFormatter
+    @@c:severity: c|SEVERITY_ERROR
+
+ElementTypeBinding:
+  @Name: WarnDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: c|DOMErrorType
+    @@For: ManakaiDOM|DOM3
+    @@ecore:textFormatter: ManakaiXMLParserExceptionFormatter
+    @@c:severity: c|SEVERITY_WARNING
 
 WFErrDef:
   @QName: xp|wf-syntax-error
   @enDesc:
     The entity does not match to the production rule; it is not
     well-formed.
-  @DOMCore:severity: DOMCore|SEVERITY_FATAL_ERROR
   @enMufDef:
     |%xp-error-token-type;|%xp-error-token-value
     (prefix => { (|}, suffix => {|)}); is not 
@@ -11956,7 +12336,6 @@ WFErrDef:
   @enDesc:
     A processing instruction has its <CODE::PITarget> of
     <XML::xml> (in any case) which is not allowed.
-  @DOMCore:severity: DOMCore|SEVERITY_ERROR
   @enMufDef:
     Processing instruction target name cannot be |%p
     (name => {<Q::xp|name>});|
@@ -11973,7 +12352,6 @@ WFErrDef:
 
 WFErrDef:
   @QName: xp|wf-no-end-tag
-  @DOMCore:severity: DOMCore|SEVERITY_ERROR
   @enDesc:
     An end-tag is not found.
   @enMufDef:
@@ -11990,7 +12368,6 @@ WFErrDef:
 
 WFErrDef:
   @QName: xp|wf-unsupported-xml-version
-  @DOMCore:severity: DOMCore|SEVERITY_ERROR
   @enDesc:
     The XML version specified in the version declaration is not supported.
   @enMufDef:
@@ -12007,7 +12384,6 @@ WFErrDef:
 
 WFErrDef:
   @QName: xp|wf-malformed-enc-name
-  @DOMCore:severity: DOMCore|SEVERITY_ERROR
   @enDesc:
     An <XA::encoding> pseudo-attribute value does not match
     to the procduction rule <CODE::EncName>.
@@ -12024,7 +12400,6 @@ WFErrDef:
 
 WFErrDef:
   @QName: xp|wf-malformed-xml-standalone
-  @DOMCore:severity: DOMCore|SEVERITY_ERROR
   @enDesc:
     An <XA::standalone> pseudo-attribute value is neither <XML::yes>
     or <XML::no>.
@@ -12042,7 +12417,6 @@ WFErrDef:
 
 WFErrDef:
   @QName: xp|wf-legal-literal-character
-  @DOMCore:severity: DOMCore|SEVERITY_ERROR
   @enDesc:
     Each character in XML entity must match to the production
     rule <CODE::Char - RestrictedChar>.
@@ -12056,7 +12430,6 @@ WFErrDef:
 
 WFErrDef:
   @QName: xp|wf-element-type-match
-  @DOMCore:severity: DOMCore|SEVERITY_FATAL_ERROR
   @enDesc:
     The <CODE::Name> in an element's end-tag must match the element type
     in the start-tag.
@@ -12079,7 +12452,6 @@ WFErrDef:
 
 WFErrDef:
   @QName: xp|wf-unique-att-spec
-  @DOMCore:severity: DOMCore|SEVERITY_ERROR
   @enDesc:
     An attribute name <kwd:MUST-NOT> appear more than once in
     the same start-tag or empty-element tag.
@@ -12094,7 +12466,6 @@ WFErrDef:
 
 WFErrDef:
   @QName: xp|wf-no-external-entity-references
-  @c:severity: c|SEVERITY_ERROR
   @enDesc:
     Attribute values <kwd:MUST-NOT> contain direct or indirect
     entity references to external entities.
@@ -12109,7 +12480,6 @@ WFErrDef:
 
 WFErrDef:
   @QName: xp|wf-no-lt-in-attribute-values
-  @c:severity: c|SEVERITY_ERROR
   @enDesc:
     The replacement text of any entity referred to directly or indirectly
     in an attribute value literal <kwd:MUST-NOT> contain a
@@ -12122,7 +12492,6 @@ WFErrDef:
 
 WFErrDef:
   @QName: xp|wf-legal-character
-  @DOMCore:severity: DOMCore|SEVERITY_ERROR
   @enDesc:
     Characters referred to using character references <kwd:MUST>
     match the production for <CODE::Char>.
@@ -12142,7 +12511,6 @@ WFErrDef:
 
 WFErrDef:
   @QName: xp|wf-entity-declared
-  @c:severity: c|SEVERITY_ERROR
   @enDesc:
     {P:: In a document
 
@@ -12172,7 +12540,6 @@ WFErrDef:
 
 WFErrDef:
   @QName: xp|wf-parsed-entity
-  @c:severity: c|SEVERITY_ERROR
   @enDesc:
     An entity reference <kwd:MUST-NOT> contain the name of an
     unparsed entity.
@@ -12186,7 +12553,6 @@ WFErrDef:
 
 WFErrDef:
   @QName: xp|wf-no-recursion
-  @c:severity: c|SEVERITY_ERROR
   @enDesc:
     A parsed entity <kwd:MUST-NOT> contain a recursive reference
     to itself, either directly or indirectly.
@@ -12200,7 +12566,6 @@ WFErrDef:
 
 FatalErrDef:
   @QName: xp|fatal-xml11-end-of-line-in-xml-declaration
-  @DOMCore:severity: DOMCore|SEVERITY_ERROR
   @enDesc:
     An end-of-line character <CODE::U+0085> or <CODE::U+2028> is appeared
     within an XML declaration or text declaration.
@@ -12212,6 +12577,70 @@ FatalErrDef:
     @@@: xp|character-number
     @@enDesc:
       The code position of the end-of-line character.
+
+ErrDef:
+  @QName: xp|error-internal-predefined-entity
+  @enDesc:
+    A general entity declaration whose <CODE::Name> equals to one
+    of predefined entities <kwd:MUST> declare it as an internal entity.
+  @enMufDef:
+    Entity |%p (name => {<Q::xp|name>});| must be declared as an 
+    internal entity
+  @ecore:hasParameter: xp|error-token
+  @ecore:hasParameter:
+    @@@: xp|name
+    @@enDesc:
+      The name of the entity.
+
+ErrDef:
+  @QName: xp|error-malformed-predefined-entity
+  @enDesc:
+    A general entity declaration whose <CODE::Name> equals to one
+    of predefined entities <kwd:MUST> declare it as a data
+    character for the entity.
+  @enMufDef:
+    Entity declaration for |%p (name => {<Q::xp|name>});|
+    (replacement text |%p (name => {<Q::xp|replacement-text>});|) is malformed
+  @ecore:hasParameter: xp|error-token
+  @ecore:hasParameter:
+    @@@: xp|name
+    @@enDesc:
+      The name of the entity.
+  @ecore:hasParameter:
+    @@@: xp|replacement-text
+    @@enDesc:
+      The replacement text of the entity declaration.
+
+WarnDef:
+  @QName: xp|warning-entity-declaration-ignored
+  @enDesc:
+    An entity declaration is ignored because the same entity
+    is declared before.
+  @enMufDef:
+    Entity declaration for |%p (name => {<Q::xp|name>});| is ignored
+  @ecore:hasParameter: xp|error-token
+  @ecore:hasParameter:
+    @@@: xp|name
+    @@enDesc:
+      The name of the entity.
+
+VCErrDef:
+  @QName: xp|vc-unique-notation-name
+  @enDesc:
+    A <CODE::Name> <kwd:MUST-NOT> be declared in more than
+    one notation declaration.
+  @enMufDef:
+    Notation |%p (name => {<Q::xp|name>});| is already declared
+  @ecore:hasParameter: xp|error-token
+  @ecore:hasParameter:
+    @@@: xp|name
+    @@enDesc:
+      The name of the notation.
+
+XWParam:
+  @QName: xp|replacement-text
+  @enDesc:
+    The replacement text.
 
 XWParam:
   @QName: xp|error-token

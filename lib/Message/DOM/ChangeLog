@@ -1,3 +1,32 @@
+2006-02-15  Wakaba  <wakaba@suika.fam.cx>
+
+	* XMLParser.dis: Issues |xp:error-internal-predefined-entity| error
+	if a predefined entity declaration references an external entity.
+	Issues |xp:error-malformed-predefined-entity| error if
+	a predefined entity declaration defines different thing than
+	one as in XML specification.  
+	Issies |xp:warning-entity-declaration-ignored| warning if 
+	more than one entity declarations for an entity is found.
+	(WFErrDef): Now all well-formedness errors are marked
+	as |SEVERITY_FATAL_ERROR|.
+
+	* XDoctype.dis (DocumentXDoctype.createDocumentTypeDefinition): Creates
+	predefined entity declarations.
+	(DocumentXDoctype.createNotation): New method.
+	(DocumentTypeDefinition.notations): New attribute.
+	(DocumentTypeDefinition.getNotationNode): New method.
+	(DocumentTypeDefinition.setNotationNode): New method.
+	(newNotationForTest): New code fragment.
+
+	* Tree.dis (ManakaiDOMXML:ManakaiDOMNotations): Removed.
+	(c:ManakaiDOMNotationMap): New class.
+	(c:ManakaiDOMNotationMapArray): New class.
+	(Document.allDeclarationsProcessed): New attribute.
+
+	* DOMXML.dis (DocumentType.notations): Implemented.
+	(Notation): Revised.
+	(Notation.ownerDocumentTypeDefinition): New attribute.
+
 2006-02-14  Wakaba  <wakaba@suika.fam.cx>
 
 	* XMLParser.dis: The |xp:wf-parsed-entity| and the |xp:wf-no-recursion|
