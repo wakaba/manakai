@@ -1,3 +1,31 @@
+2006-02-17  Wakaba  <wakaba@suika.fam.cx>
+
+	* XMLParser.dis: Default attribute are now namespace aware.
+	(parseString): Don't output |Document| warnings
+	during tree construction to standard error output.
+
+2006-02-16  Wakaba  <wakaba@suika.fam.cx>
+
+	* XMLParser.dis: Name check for XML 1.0, XML Namespace 1.0, and
+	XML Namespace 1.1 is implemented.  Namespace well-formedness
+	error detection is implemented.  Generates |Notation| nodes
+	from notation declarations.
+	(checkNCName, checkQName): New code fragments.
+
+	* XDoctype.dis (DocumentXDoctype): Factory methods
+	don't check |MDOMX:MDOM_BAD_NAME| if |Document.strictErrorChecking|
+	is |false|.
+
+	* DOMCore.dis (wf-invalid-character-in-node-name,
+	wf-invalid-character): Removed (moved to |MDOM:Tree| module).
+
+	* Tree.dis '(wf-invalid-character-in-node-name,
+        wf-invalid-character): New errors (from |MDOM:DOMCore| module).
+	(Attr.specified): Setter added.
+	(cfg:dtd-default-attributes): New configuration parameter.
+	(Document.createEntityReference): Don't check |MDOMX:MDOM_BAD_NAME|
+	if |Document.strictErrorChecking| is |false|.
+
 2006-02-15  Wakaba  <wakaba@suika.fam.cx>
 
 	* XMLParser.dis: Set |allDeclarationsProcessed| 

@@ -40,7 +40,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/02/09 10:23:19 $
+      $Date: 2006/02/16 20:03:19 $
     @@ContentType:
       dis:Date.RCS
 
@@ -4046,35 +4046,6 @@ ErrDef:
     @@enDesc:
       The first <IF::DOMXML:CDATASection> node in document order
       resulting from the split.
-
-ErrDef:
-  @QName: wf-invalid-character-in-node-name
-  @errname: wf-invalid-character-in-node-name
-  @enDesc:
-    If the <cfg::well-formed> configuration parameter is set to 
-    <DOM::true> and a <A::Node.nodeName> contains invalid character
-    according to its node type.
-
-    Or, in <IF::DOMLS|LSSerializer>, if a character that cannot 
-    be represented in the output character encoding is occurred
-    within markup.
-  @c:severity: DOMCore|SEVERITY_ERROR
-
-ErrDef:
-  @QName: wf-invalid-character
-  @errname: wf-invalid-character
-  @enDesc:
-    If the <cfg::well-formed> configuration parameter is set to
-    <DOM::true> and the text content inside <IF::Attr>, <IF::Element>,
-    <IF::Comment>, <IF::Text>, or <IF::DOMXML:CDATASection> node
-    or the data inside <IF::DOMXML:ProcessingInstruction> node contains
-    invalid characters.
-
-    Or, in <IF::DOMLS:LSSerializer>, if the <cfg::split-cdata-sections>
-    parameter is set to <DOM::false> and a <IF::DOMXML:CDATASection>
-    node contains characters that cannot be represented in the
-    specified output encoding.  This error is not recoverable.
-  @DOMCore:severity: DOMCore|SEVERITY_ERROR
 
 ResourceDef:
   @For: =ManakaiDOM|all

@@ -10,7 +10,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/02/15 15:36:16 $
+    $Date: 2006/02/16 20:03:20 $
 
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
@@ -327,6 +327,19 @@ ClsDef:
             ## NOTE: Turn this configuration parameter on makes 
             ##       entity reference subtrees in attribute default values
             ##       cloned as is into default attribute node subtrees.
+          $self->{doc_cfg}-><M::c|DOMConfiguration.setParameter>
+                              (<Q::cfg|dtd-default-attributes> => false);
+            ## NOTE: Don't create DTD default attributes by
+            ##       |createElementNS| method.
+          $self->{doc_cfg}-><M::c|DOMConfiguration.setParameter>
+                              ('error-handler' => sub {
+                                 my (undef, $err) = @_;
+                                 return ($err-><AG::c|DOMError.severity> !=
+                                         <C::c|DOMError.SEVERITY_FATAL_ERROR>);
+                               })
+            unless $Message::DOM::XMLParser::DEBUG;
+            ## NOTE: The default error handler in manakai |wanr|s error
+            ##       description.
 
           ## Document entity -> |Document| node
           $self->_parse_DocumentEntity;
@@ -357,6 +370,10 @@ ClsDef:
                               (<Q::cfg|entity-reference-read-only> => null);
           $self->{doc_cfg}-><M::c|DOMConfiguration.setParameter>
                               (<Q::cfg|clone-entity-reference-subtree> => null);
+          $self->{doc_cfg}-><M::c|DOMConfiguration.setParameter>
+                              (<Q::cfg|dtd-default-attributes> => null);
+          $self->{doc_cfg}-><M::c|DOMConfiguration.setParameter>
+                              ('error-handler' => null);
           $r-><AS::Document.strictErrorChecking> (true);
         }__;
 
@@ -991,7 +1008,8 @@ ClsDef:
               }__;
             }
           }
-          ## TODO: Namespace well-formedness
+          __CODE{checkNCName:: $name => $name}__;
+          
           $pi = $doc-><M::Document.createProcessingInstruction>
                         ($name);
         }
@@ -1054,7 +1072,8 @@ ClsDef:
               }__;
             }
           }
-          ## TODO: Namespace well-formedness
+          __CODE{checkNCName:: $name => $name}__;
+          
           $pi = $doc-><M::Document.createProcessingInstruction>
                         ($name);
         }      
@@ -1139,7 +1158,8 @@ ClsDef:
         
         ~ (Name) {
           my $attrs;
-          lang:Perl ($name => $token.value) {
+          lang:Perl ($name => $token.value) : has-error {
+            __CODE{checkQName:: $name => $name}__;
             push @{$types}, $type;
             $type = $name;
             $attrs = {};
@@ -1171,6 +1191,22 @@ ClsDef:
           lang:Perl {
             push @{$nses}, $ns;
             $ns = {%$ns};
+
+            ## Default attributes
+            DA: for my $atqname (%{$self->{attr}->{$type}}) {
+              next DA unless $self->{attr}->{$type}->{$atqname};
+              next DA if exists $attrs->{$atqname}; # specified
+              my $dtype = $self->{attr}->{$type}->{$atqname}
+                               -><AG::ATDef.defaultType>;
+              next DA unless $dtype == <C::ATDef.EXPLICIT_DEFAULT> or
+                             $dtype == <C::ATDef.FIXED_DEFAULT>;
+              $attrs->{$atqname} = {is_default => true, nodes => []};
+              for (@{$self->{attr}->{$type}->{$atqname}
+                          -><AG::Node.childNodes>}) {
+                push @{$attrs->{$atqname}->{nodes}},
+                     $_-><M::Node.cloneNode> (true);
+              }
+            }
             
             my %gattr;
             my %lattr;
@@ -1178,25 +1214,12 @@ ClsDef:
               my ($pfx, $lname) = split /:/, $atqname;
               $attrs->{$atqname}->{def} = $self->{attr}->{$type}->{$atqname};
               if (defined $lname) {  ## Global attribute
-                ## TODO: Namespace well-formedness (lname is NCName)
                 if ($pfx eq 'xmlns') {
-                  my $nsuri = $attrs->{$atqname}->{value};
-                  if ($lname eq 'xml' and
-                      $nsuri ne <Q::xml:>) {
-                    ## TODO: error
-                  } elsif ($lname eq 'xmlns') {
-                    ## TODO: error
-                  }
-                  if ($nsuri eq '') {
-                    ## TODO: error in XML 1.0
-                  } elsif ($nsuri eq <Q::xml:> and
-                           $lname ne 'xml') {
-                    ## TODO: error
-                  } elsif ($nsuri eq <Q::xmlns:>) {
-                    ## TODO: error
-                  }
-                  $ns->{$lname} = $attrs->{$atqname}->{value};
-                  if ($attrs->{$atqname}->{def}) {
+                  my $nsuri = $attrs->{$atqname}->{is_default}
+                                ? $attrs->{$atqname}->{def}-><AG::Node.nodeValue>
+                                : $attrs->{$atqname}->{value};
+                  if (not $attrs->{$atqname}->{is_default} and
+                      $attrs->{$atqname}->{def}) {
                     my $dt = $attrs->{$atqname}->{def}-><AG::ATDef.declaredType>;
                     if ({
                       <C::ATDef.ID_ATTR> => true,
@@ -1210,26 +1233,107 @@ ClsDef:
                       <C::ATDef.ENUMERATION_ATTR> => true,
                     }->{$dt}) {
                       ## Tokenization (XML 1 3.3.3)
-                      for ($ns->{$lname}) {
+                      for ($nsuri) {
                         s/^\x20+//;
                         s/\x20+\z//;
                         s/\x20+/ /g;
                       }
                     }
                   }
-                  delete $ns->{$lname} unless length $ns->{$lname};
-                } elsif ($pfx eq '') {
-                  ## TODO: pfx is not NCName error
-                } else {
-                  if ($gattr{$pfx}->{$lname}) {
-                    ## TODO: Namespace well-formedness error
+                  if ($lname eq 'xml' and
+                      $nsuri ne <Q::xml:>) {
+                    my $location;
+                    __CODE{xp|get-location-from-token::
+                      $token => $token,
+                      $result => $location,
+                    }__;
+                    my $continue = __c|ERROR{xp|nsc-reserved-prefix-xml::
+                      c|location => {$location},
+                      xp|token => {$token},
+                      infoset|prefix => {$lname},
+                      infoset|namespaceName => {$nsuri},
+                    }__;
+                    unless ($continue) {
+                      __EXCEPTION{DOMLS|PARSE_ERR}__;
+                    }
+                  } elsif ($lname eq 'xmlns') {
+                    my $location;
+                    __CODE{xp|get-location-from-token::
+                      $token => $token,
+                      $result => $location,
+                    }__;
+                    my $continue = __c|ERROR{xp|nsc-reserved-prefix-xmlns::
+                      c|location => {$location},
+                      xp|token => {$token},
+                      infoset|prefix => {$lname},
+                      infoset|namespaceName => {$nsuri},
+                    }__;
+                    unless ($continue) {
+                      __EXCEPTION{DOMLS|PARSE_ERR}__;
+                    }
                   }
+                  if ($nsuri eq '') {
+                    if ($self->{xml_version} eq '1.0') {
+                      my $location;
+                      __CODE{xp|get-location-from-token::
+                        $token => $token,
+                        $result => $location,
+                      }__;
+                      my $continue = __c|ERROR{xp|nswf-empty-namespace-name::
+                        c|location => {$location},
+                        xp|token => {$token},
+                        infoset|namespaceName => {$nsuri},
+                        infoset|prefix => {$lname},
+                      }__;
+                      unless ($continue) {
+                        __EXCEPTION{DOMLS|PARSE_ERR}__;
+                      }
+                    }
+                  } elsif ($nsuri eq <Q::xml:> and
+                           $lname ne 'xml') {
+                    my $location;
+                    __CODE{xp|get-location-from-token::
+                      $token => $token,
+                      $result => $location,
+                    }__;
+                    my $continue = __c|ERROR{
+                    xp|nsc-reserved-namespace-name-xml::
+                      c|location => {$location},
+                      xp|token => {$token},
+                      infoset|prefix => {$lname},
+                      infoset|namespaceName => {$nsuri},
+                    }__;
+                    unless ($continue) {
+                      __EXCEPTION{DOMLS|PARSE_ERR}__;
+                    }
+                  } elsif ($nsuri eq <Q::xmlns:>) {
+                    my $location;
+                    __CODE{xp|get-location-from-token::
+                      $token => $token,
+                      $result => $location,
+                    }__;
+                    my $continue = __c|ERROR{
+                    xp|nsc-reserved-namespace-name-xmlns::
+                      c|location => {$location},
+                      xp|token => {$token},
+                      infoset|prefix => {$lname},
+                      infoset|namespaceName => {$nsuri},
+                    }__;
+                    unless ($continue) {
+                      __EXCEPTION{DOMLS|PARSE_ERR}__;
+                    }
+                  }
+                  $ns->{$lname} = $nsuri;
+                  delete $ns->{$lname} unless length $ns->{$lname};
                 }
                 $gattr{$pfx}->{$lname} = $attrs->{$atqname};
               } else {               ## Local attribute
                 if ($pfx eq 'xmlns') {
-                  $ns->{''} = $attrs->{xmlns}->{value};
-                  if ($attrs->{$atqname}->{def}) {
+                  $ns->{''} = $attrs->{xmlns}->{is_default}
+                                ? $attrs->{xmlns}->{def}-><AG::Node.nodeValue>
+                                : $attrs->{xmlns}->{value};
+                  if (not $attrs->{$atqname}->{is_default} and
+                      $attrs->{$atqname}->{def}) {
                     my $dt = $attrs->{$atqname}->{def}-><AG::ATDef.declaredType>;
                     if ({
                       <C::ATDef.ID_ATTR> => true,
@@ -1250,7 +1354,41 @@ ClsDef:
                       }
                     }
                   }
-                  delete $ns->{''} unless length $ns->{''};
+                  unless ($ns->{''}) {
+                    delete $ns->{''};
+                  } elsif ($ns->{''} eq <Q::xml:>) {
+                    my $location;
+                    __CODE{xp|get-location-from-token::
+                      $token => $token,
+                      $result => $location,
+                    }__;
+                    my $continue = __c|ERROR{
+                    xp|nsc-reserved-namespace-name-xml::
+                      c|location => {$location},
+                      xp|token => {$token},
+                      infoset|prefix => {null},
+                      infoset|namespaceName => {<Q::xml:>},
+                    }__;
+                    unless ($continue) {
+                      __EXCEPTION{DOMLS|PARSE_ERR}__;
+                    }
+                  } elsif ($ns->{''} eq <Q::xmlns:>) {
+                    my $location;
+                    __CODE{xp|get-location-from-token::
+                      $token => $token,
+                      $result => $location,
+                    }__;
+                    my $continue = __c|ERROR{
+                    xp|nsc-reserved-namespace-name-xmlns::
+                      c|location => {$location},
+                      xp|token => {$token},
+                      infoset|prefix => {null},
+                      infoset|namespaceName => {<Q::xmlns:>},
+                    }__;
+                    unless ($continue) {
+                      __EXCEPTION{DOMLS|PARSE_ERR}__;
+                    }
+                  }
                 } else {
                   $lattr{$pfx} = $attrs->{$atqname};
                 }
@@ -1259,15 +1397,24 @@ ClsDef:
             
             my ($pfx, $lname) = split /:/, $type;
             my $nsuri;
-            ## TODO: lname is NCName?
             if (defined $lname) {  ## Prefixed namespace
-              if ($pfx eq '') {
-                ## TODO: pfx is not NCName error
-              }
               if (defined $ns->{$pfx}) {
                 $nsuri = $ns->{$pfx};
               } else {
-                ## TODO: namespace ill-formed
+                my $location;
+                __CODE{xp|get-location-from-token::
+                  $token => $token,
+                  $result => $location,
+                }__;
+                my $continue = __c|ERROR{xp|nsc-prefix-declared::
+                  c|location => {$location},
+                  xp|token => {$token},
+                  infoset|prefix => {$pfx},
+                  xp|name => {$type},
+                }__;
+                unless ($continue) {
+                  __EXCEPTION{DOMLS|PARSE_ERR}__;
+                }
               }
             } else {               ## Default namespace
               $nsuri = $ns->{''};
@@ -1289,6 +1436,8 @@ ClsDef:
                 }__;
               }
               $el-><M::Element.setAttributeNodeNS> ($attr);
+              $attr-><AS::t|Attr.specified> (false)
+                if $attrs->{xmlns}->{is_default};
             }
             
             for my $lname (keys %lattr) {
@@ -1304,24 +1453,81 @@ ClsDef:
                 }__;
               }
               $el-><M::Element.setAttributeNodeNS> ($attr);
+              $attr-><AS::t|Attr.specified> (false)
+                if $attrs->{$lname}->{is_default};
             }
             
             for my $pfx (keys %gattr) {
-              for my $lname (keys %{$gattr{$pfx}}) {
-                my $attr = $doc-><M::Document.createAttributeNS>
-                                   ($ns->{$pfx}, $pfx.':'.$lname);
+              LN: for my $lname (keys %{$gattr{$pfx}}) {
+                my $name = $pfx.':'.$lname;
+                unless (defined $ns->{$pfx}) {
+                  my $location;
+                  __CODE{xp|get-location-from-token::
+                    $token => $token,
+                    $result => $location,
+                  }__;
+                  my $continue = __c|ERROR{xp|nsc-prefix-declared::
+                    c|location => {$location},
+                    xp|token => {$token},
+                    xp|name => {$name},
+                    infoset|prefix => {$pfx},
+                  }__;
+                  unless ($continue) {
+                    __EXCEPTION{DOMLS|PARSE_ERR}__;
+                  }
+                }
+                my $attr = $el-><M::Element.getAttributeNodeNS>
+                                  ($ns->{$pfx}, $lname);
+                if ($attr) {
+                  my $another_name = $attr-><AG::Node.nodeName>;
+                  if ($name ne $another_name) {
+                    my $location;
+                    __CODE{xp|get-location-from-token::
+                      $token => $token,
+                      $result => $location,
+                    }__;
+                    my $continue = __c|ERROR{
+                    xp|nswf-unique-att-spec-expanded-name::
+                      c|location => {$location},
+                      xp|token => {$token},
+                      xp|another-attribute-name => {$another_name},
+                      xp|name => {$name},
+                      infoset|namespaceName => {$ns->{$pfx}},
+                      infoset|localName => {$lname},
+                    }__;
+                    unless ($continue) {
+                      __EXCEPTION{DOMLS|PARSE_ERR}__;
+                    }
+                    unless ($attr-><AG::t|Attr.specified>) {
+                      ## It is a default attribute
+                      $attr = $doc-><M::Document.createAttributeNS>
+                                      ($ns->{$pfx}, $name);
+                    } else {
+                      ## It is a specified attribute
+                      next LN;
+                    }
+                  } else { ## There is default attribute
+                    $attr = $doc-><M::Document.createAttributeNS>
+                                    ($ns->{$pfx}, $name);                    
+                  }
+                } else {
+                  $attr = $doc-><M::Document.createAttributeNS>
+                                   ($ns->{$pfx}, $name);
+                }
                 for (@{$gattr{$pfx}->{$lname}->{nodes}}) {
                   $attr-><M::Node.appendChild> ($_);
                 }
-                if ($attrs->{$pfx}->{$lname}->{def}) {
+                if ($gattr{$pfx}->{$lname}->{def}) {
                   __CODE{t|setAttrType::
                     $attr => $attr,
-                    $type => {$attrs->{$pfx}->{$lname}
+                    $type => {$gattr{$pfx}->{$lname}
                                     ->{def}-><AG::ATDef.declaredType>},
                   }__;
                 }
                 $el-><M::Element.setAttributeNodeNS> ($attr);
-              }
+                $attr-><AS::t|Attr.specified> (false)
+                  if $gattr{$pfx}->{$lname}->{is_default};
+              } # PFX
             }
 
             $node-><M::Node.appendChild> ($el);            
@@ -1365,6 +1571,7 @@ ClsDef:
         my $is_docel;
         
         ~ (Name) {
+          // No NCName & QName check (it must match to start-tag)
           lang:Perl ($name => $token.value) : has-error {
             if ($name eq $type) {
               $type = pop @{$types};
@@ -1561,7 +1768,8 @@ ClsDef:
       
       ~* (Name) {
         my $atqname;
-        lang:Perl ($name => $token.value) {
+        lang:Perl ($name => $token.value) : has-error {
+          __CODE{checkQName:: $name => $name}__;
           $atqname = $name;
         }
         
@@ -2165,7 +2373,8 @@ ClsDef:
       } (Name) {
         my $er;
         lang:Perl ($name => $token.value) : has-error {
-          ## TODO: Namespace well-formedness
+          __CODE{checkNCName:: $name => $name}__;
+          
           $er = $doc-><M::Document.createEntityReference>
                            ($name);
           $er-><AS::Node.textContent> ('');
@@ -2330,7 +2539,7 @@ ClsDef:
       } (Name) {
         my $er;
         lang:Perl ($name => $token.value) : has-error {
-          ## TODO: Namespace well-formedness
+          __CODE{checkNCName:: $name => $name}__;
           
           $er = $self->{doc}-><M::Document.createEntityReference> ($name);
           $er-><AS::Node.textContent> ('');
@@ -2493,8 +2702,8 @@ ClsDef:
         }
       } (Name) {
         my $er;
-        lang:Perl ($name => $token.value) {
-          ## TODO: Namespace well-formedness
+        lang:Perl ($name => $token.value) : has-error {
+          __CODE{checkNCName:: $name => $name}__;
 
           $er = $self->{doc}-><M::Document.createEntityReference> ($name);
           $er-><AS::Node.textContent> ('');
@@ -2625,7 +2834,7 @@ ClsDef:
       
       ~ (Name) {
         lang:Perl ($name => $token.value) {
-          ## TODO: Namespace well-formedness
+          __CODE{checkNCName:: $name => $name}__;
           push @$vals, $name;
         }
         /*
@@ -2656,6 +2865,7 @@ ClsDef:
       my $name;
       ~ (Name) {
         lang:Perl ($v => $token.value) {
+          __CODE{checkQName:: $name => $v}__;
           $name = $v;
         }
       }
@@ -2868,6 +3078,7 @@ ClsDef:
         }
 
         ~ (Name) {
+          // TODO:             __CODE{checkNCName:: $name => $name}__;
 
         }
 
@@ -2887,6 +3098,7 @@ ClsDef:
       ~ (S) { }
 
       ~ (Name) {
+        // TODO:             __CODE{checkQName:: $name => $name}__;
 
       }
 
@@ -2950,6 +3162,7 @@ ClsDef:
           ~? (S) { }
 
           ~ (Name) {
+            // TODO: Name & QName check
 
           }
 
@@ -3016,6 +3229,7 @@ ClsDef:
     
     rule ContentParticle ($doc) {
       ~ (Name) {
+        // TODO: Name & QName check
 
       } (MGO) {
         ~? (S) { }
@@ -3046,6 +3260,7 @@ ClsDef:
       my $name;
       ~ (Name) {
         lang:Perl ($v => $token.value) {
+          __CODE{checkQName:: $name => $v}__;
           $name = $v;
         }
       } else {
@@ -3070,6 +3285,7 @@ ClsDef:
       ~* (Name) {
         my $at;
         lang:Perl ($v => $token.value) : has-error {
+          __CODE{checkQName:: $name => $v}__;
           $docxd ||= $doc-><M::Node.getFeature>
                              (<Q::fe:XDoctype>, '3.0');
           $at = $docxd-><M::DocumentXDoctype.createAttributeDefinition> ($v);
@@ -3126,7 +3342,8 @@ ClsDef:
             ~? (S) { }
 
             ~+ (Name) {
-              lang:Perl ($v => $token.value) {
+              lang:Perl ($v => $token.value) : has-error {
+                __CODE{checkNCName:: $name => $v}__;
                 push @$kwd, $v;
               }
 
@@ -3301,7 +3518,7 @@ ClsDef:
     } // _AttlistDeclaration
 
     /*
-      Entity declaration
+      Entity Declaration
     */
     rule _EntityDeclaration ($doc) {
       // ~ (MDO) { }
@@ -3329,6 +3546,7 @@ ClsDef:
 
       ~ (Name) {
         lang:Perl ($v => $token.value) {
+          __CODE{checkNCName:: $name => $v}__;
           $decl->{name} = $v;
         }
       } 
@@ -3392,7 +3610,8 @@ ClsDef:
           ~ (S) { }
   
           ~ (Name) {
-            lang:Perl ($v => $token.value) {
+            lang:Perl ($v => $token.value) : has-error {
+              __CODE{checkNCName:: $name => $v}__;
               $decl->{notation} = $v;
               $decl->{node}-><AG::x|Entity.notationName> ($v);
             }
@@ -3510,23 +3729,31 @@ ClsDef:
       }
     } // _EntityDeclaration
 
-    rule _NotationDeclaration ($doc) {
+    /*
+      Notation Declaration
+    */
+    rule _NotationDeclaration {
       // ~ (MDO) { }
       // ~ (Name == NOTATION) { }
 
       ~ (S) { }
 
+      my $name;
       ~ (Name) {
-
-      } 
+        lang:Perl ($v => $token.value) : has-error {
+          __CODE{checkNCName:: $name => $v}__;
+          $name = $v;
+        }
+      } else {
+        lang:Perl {
+          $name = '#INVALID';
+        }
+      }
 
       ~ (S) { }
 
-      my $decl;
       lang:Perl {
-        $decl = $self->{docx}-><M::DocumentXDoctype.createGeneralEntity>
-                                               ($decl->{name});
-           ## Temporary: to avoid error.
+        $decl = $self->{docx}-><M::DocumentXDoctype.createNotation> ($name);
       }
 
       ~ (Name == 'PUBLIC') {
@@ -3553,6 +3780,28 @@ ClsDef:
         &SystemLiteral ($decl => $decl);
 
         ~? (S) { }
+      }
+
+      lang:Perl : has-error {
+        if ($self->{dtdef}-><M::DTDef.getNotationNode> ($name)) {
+          ## Dupulication
+          my $location;
+          __CODE{xp|get-location-from-token::
+            $token => {$token},
+            $result => {$location},
+          }__;
+          my $continue = __c|ERROR{xp|vc-unique-notation-name::
+            xp|error-token => {$token},
+            c|location => {$location},
+            xp|name => {$name},
+          }__;
+          unless ($continue) {
+            __EXCEPTION{DOMLS|PARSE_ERR::
+            }__;
+          }
+        } else {
+          $self->{dtdef}-><M::DTDef.setNotationNode> ($decl);
+        }
       }
 
       ~ (MDC) {
@@ -3590,6 +3839,7 @@ ClsDef:
 
           // Note that external subset and parameter entities are not supported
           lang:Perl ($name => $token.value) : has-error {
+            __CODE{checkNCName:: $name => $name}__;
             my $location;
             __CODE{xp|get-location-from-token::
               $token => {$token},
@@ -3691,6 +3941,7 @@ ClsDef:
 
           // Note that external subset and parameter entities are not supported
           lang:Perl ($name => $token.value) : has-error {
+            __CODE{checkNCName:: $name => $name}__;
             my $location;
             __CODE{xp|get-location-from-token::
               $token => {$token},
@@ -4556,6 +4807,94 @@ ClsDef:
         }
       }
     } // default
+
+  @ResourceDef:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@QName: checkNCName
+    @@rdf:type: DISPerl|BlockCode
+    @@PerlDef:
+      if (($self->{xml_version} eq '1.0' and
+           not <Code::DOMMain|testXML10Name:: $INPUT = $name>) or
+          ($self->{xml_version} eq '1.1' and
+           not <Code::DOMMain|testXML11Name:: $INPUT = $name>)) {
+        my $__location;
+        __CODE{xp|get-location-from-token::
+          $token => {$token},
+          $result => {$__location},
+        }__;
+        my $__continue = __c|ERROR{xp|wf-invalid-character-in-node-name::
+          xp|error-token => {$token},
+          c|location => {$__location},
+          xp|name => {$name},
+          infoset|version => {$self->{xml_version}},
+        }__;
+        unless ($__continue) {
+          __EXCEPTION{DOMLS|PARSE_ERR::
+          }__;
+        }
+      } elsif (index ($name, ':') > -1) {
+        my $__location;
+        __CODE{xp|get-location-from-token::
+          $token => {$token},
+          $result => {$__location},
+        }__;
+        my $__continue = __c|ERROR{xp|nswf-legal-ncname::
+          xp|error-token => {$token},
+          c|location => {$__location},
+          xp|name => {$name},
+          infoset|version => {$self->{xml_version}},
+        }__;
+        unless ($__continue) {
+          __EXCEPTION{DOMLS|PARSE_ERR::
+          }__;
+        }            
+      }
+
+  @ResourceDef:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@QName: checkQName
+    @@rdf:type: DISPerl|BlockCode
+    @@PerlDef:
+      if (($self->{xml_version} eq '1.0' and
+           not <Code::DOMMain|testXML10Name:: $INPUT = $name>) or
+          ($self->{xml_version} eq '1.1' and
+           not <Code::DOMMain|testXML11Name:: $INPUT = $name>)) {
+        my $__location;
+        __CODE{xp|get-location-from-token::
+          $token => {$token},
+          $result => {$__location},
+        }__;
+        my $__continue = __c|ERROR{xp|wf-invalid-character-in-node-name::
+          xp|error-token => {$token},
+          c|location => {$__location},
+          xp|name => {$name},
+          infoset|version => {$self->{xml_version}},
+        }__;
+        unless ($__continue) {
+          __EXCEPTION{DOMLS|PARSE_ERR::
+          }__;
+        }
+      } elsif (($self->{xml_version} eq '1.0' and
+                not <Code::DOMMain|testXML10QName:: $INPUT = $name>) or
+               ($self->{xml_version} eq '1.1' and
+                not <Code::DOMMain|testXML11QName:: $INPUT = $name>)) {
+        my $__location;
+        __CODE{xp|get-location-from-token::
+          $token => {$token},
+          $result => {$__location},
+        }__;
+        my $__continue = __c|ERROR{xp|nswf-legal-qname::
+          xp|error-token => {$token},
+          c|location => {$__location},
+          xp|name => {$name},
+          infoset|version => {$self->{xml_version}},
+        }__;
+        unless ($__continue) {
+          __EXCEPTION{DOMLS|PARSE_ERR::
+          }__;
+        }            
+      }
+
 
   @XMLTests:
     @@XMLTest:
@@ -12349,7 +12688,7 @@ ClsDef:
         @@@@test:value:
           <!DOCTYPE a [
           <!ENTITY % p " ">
-          <!ENTITY % q "%q;">
+          <!ENTITY % q "%p;">
           ]><a/>
       @@@c:erred: <[[xp|wf-pes-in-internal-subset]]> { (3, 15)..(3, 17); }
     @@XMLTest:
@@ -12358,9 +12697,1594 @@ ClsDef:
         @@@@test:value:
           <!DOCTYPE a [
           <!ENTITY % p " ">
-          <!ENTITY % q '%q;'>
+          <!ENTITY % q '%p;'>
           ]><a/>
       @@@c:erred: <[[xp|wf-pes-in-internal-subset]]> { (3, 15)..(3, 17); }
+
+    @@XMLTest:
+      @@@QName: xp.name.pitarget.content.1.0.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0"?>
+          <p>
+          <?$u3001$u3002?>
+          </p>
+      @@@c:erred: <[[xp|wf-invalid-character-in-node-name]]> { (3, 3)..(3, 4); }
+    @@XMLTest:
+      @@@QName: xp.name.pitarget.content.1.1.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.1"?>
+          <p>$
+          <?$u3001$u3002?>$
+          </p>
+      @@@test:domTree:
+        document {
+          xml-version: '1.1';
+          element {
+            pi {
+              node-name: U+3001 U+3002;
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.name.pitarget.content.1.0.3.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0"?>
+          <p>
+          <?$u3005b?>
+          </p>
+      @@@c:erred: <[[xp|wf-invalid-character-in-node-name]]> { (3, 3)..(3, 4); }
+    @@XMLTest:
+      @@@QName: xp.name.pitarget.content.1.1.3.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.1"?>
+          <p>$
+          <?$u3005b?>$
+          </p>
+      @@@test:domTree:
+        document {
+          xml-version: '1.1';
+          element {
+            pi {
+              node-name: U+3005 'b';
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.name.pitarget.content.names.1.0.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0"?>
+          <p>
+          <?a:b?>
+          </p>
+      @@@c:erred: <[[xp|nswf-legal-ncname]]> { (3, 3)..(3, 5); }
+    @@XMLTest:
+      @@@QName: xp.name.pitarget.content.names.1.1.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.1"?>
+          <p>
+          <?a:b?>
+          </p>
+      @@@c:erred: <[[xp|nswf-legal-ncname]]> { (3, 3)..(3, 5); }
+    @@XMLTest:
+      @@@QName: xp.name.pitarget.intsubset.1.0.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0"?>
+          <!DOCTYPE p [
+          <?$u3001$u3002?>
+          ]><p/>
+      @@@c:erred: <[[xp|wf-invalid-character-in-node-name]]> { (3, 3)..(3, 4); }
+    @@XMLTest:
+      @@@QName: xp.name.pitarget.intsubset.1.1.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.1"?>
+          <!DOCTYPE p [
+          <?$u3001$u3002?>
+          ]><p/>
+      @@@test:domTree:
+        document {
+          xml-version: '1.1';
+          document-type {
+            pi {
+              node-name: U+3001 U+3002;
+            }
+          }
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.name.pitarget.intsubset.1.0.3.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0"?>
+          <!DOCTYPE p [
+          <?$u3005b?>
+          ]><p/>
+      @@@c:erred: <[[xp|wf-invalid-character-in-node-name]]> { (3, 3)..(3, 4); }
+    @@XMLTest:
+      @@@QName: xp.name.pitarget.intsubset.1.1.3.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.1"?>
+          <!DOCTYPE p [
+          <?$u3005b?>
+          ]><p/>
+      @@@test:domTree:
+        document {
+          xml-version: '1.1';
+          document-type {
+            pi {
+              node-name: U+3005 'b';
+            }
+          }
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.name.pitarget.intsubset.names.1.0.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0"?>
+          <!DOCTYPE p [
+          <?a:b?>
+          ]><p/>
+      @@@c:erred: <[[xp|nswf-legal-ncname]]> { (3, 3)..(3, 5); }
+    @@XMLTest:
+      @@@QName: xp.name.pitarget.intsubset.names.1.1.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.1"?>
+          <!DOCTYPE p [
+          <?a:b?>
+          ]><p/>
+      @@@c:erred: <[[xp|nswf-legal-ncname]]> { (3, 3)..(3, 5); }
+    @@XMLTest:
+      @@@QName: xp.name.doctypedecl.stag.etag.1.0.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0"?>
+          <!DOCTYPE $u3001$u3002>
+          <$u3001$u3002>
+          </$u3001$u3002>
+      @@@c:erred: <[[xp|wf-invalid-character-in-node-name]]>{ (2, 11)..(2, 12); }
+      @@@c:erred: <[[xp|wf-invalid-character-in-node-name]]>{ (3, 2)..(3, 3); }
+#      @@@c:erred: <[[xp|wf-invalid-character-in-node-name]]>{ (4, 3)..(4, 4); }
+    @@XMLTest:
+      @@@QName: xp.name.doctypedecl.stag.etag.1.1.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.1"?>
+          <!DOCTYPE $u3001$u3002>
+          <$u3001$u3002>
+          </$u3001$u3002>
+      @@@test:domTree:
+        document {
+          xml-version: '1.1';
+          document-type {
+            node-name: U+3001 U+3002;
+          }
+          element {
+            node-name: U+3001 U+3002;
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.name.doctypedecl.stag.etag.1.0.3.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0"?>
+          <!DOCTYPE $u3005b>
+          <$u3005b>
+          </$u3005b>
+      @@@c:erred: <[[xp|wf-invalid-character-in-node-name]]>{ (2, 11)..(2, 12); }
+      @@@c:erred: <[[xp|wf-invalid-character-in-node-name]]>{ (3, 2)..(3, 3); }
+#      @@@c:erred: <[[xp|wf-invalid-character-in-node-name]]>{ (4, 3)..(4, 4); }
+    @@XMLTest:
+      @@@QName: xp.name.doctype.decl.stag.etag.1.1.3.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.1"?>
+          <!DOCTYPE $u3005b>
+          <$u3005b>
+          </$u3005b>
+      @@@test:domTree:
+        document {
+          xml-version: '1.1';
+          document-type {
+            node-name: U+3005 'b';
+          }
+          element {
+            node-name: U+3005 'b';
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.name.doctypedecl.stag.etag.names.1.0.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0"?>
+          <!DOCTYPE a:b>
+          <a:b xmlns:a="http://a.example/">
+          </a:b>
+      @@@test:domTree:
+        document {
+          xml-version: '1.0';
+          document-type {
+            node-name: 'a:b';
+          }
+          element {
+            prefix: 'a';
+            local-name: 'b';
+            namespace-uri: 'http://a.example/';
+            attribute {
+              namespace-uri: 'http://www.w3.org/2000/xmlns/';
+              prefix: 'xmlns';
+              local-name: 'a';
+              value: 'http://a.example/';
+              specified: true;
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.name.doctypedecl.stag.etag.names.1.1.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.1"?>
+          <!DOCTYPE a:b>
+          <a:b xmlns:a="http://a.example/">
+          </a:b>
+      @@@test:domTree:
+        document {
+          xml-version: '1.1';
+          document-type {
+            node-name: 'a:b';
+          }
+          element {
+            prefix: 'a';
+            local-name: 'b';
+            namespace-uri: 'http://a.example/';
+            attribute {
+              namespace-uri: 'http://www.w3.org/2000/xmlns/';
+              prefix: 'xmlns';
+              local-name: 'a';
+              specified: true;
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.name.doctypedecl.stag.etag.names.1.0.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0"?>
+          <!DOCTYPE :ab>
+          <:ab>
+          </:ab>
+      @@@c:erred: <[[xp|nswf-legal-qname]]> { (2, 11)..(2, 13); }
+      @@@c:erred: <[[xp|nswf-legal-qname]]> { (3, 2)..(3, 4); }
+      @@@c:erred: <[[xp|nsc-prefix-declared]]> { /* prefix || */ }
+    @@XMLTest:
+      @@@QName: xp.name.doctypedecl.stag.etag.names.1.1.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.1"?>
+          <!DOCTYPE :ab>
+          <:ab>
+          </:ab>
+      @@@c:erred: <[[xp|nswf-legal-qname]]> { (2, 11)..(2, 13); }
+      @@@c:erred: <[[xp|nswf-legal-qname]]> { (3, 2)..(3, 4); }
+      @@@c:erred: <[[xp|nsc-prefix-declared]]> { /* prefix || */ }
+    @@XMLTest:
+      @@@QName: xp.name.doctypedecl.stag.etag.names.1.0.3.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0"?>
+          <!DOCTYPE a:$u3005>
+          <a:$u3005 xmlns:a="http://a.example/">
+          </a:$u3005>
+      @@@c:erred: <[[xp|nswf-legal-qname]]> { (2, 11)..(2, 13); }
+      @@@c:erred: <[[xp|nswf-legal-qname]]> { (3, 2)..(3, 4); }
+    @@XMLTest:
+      @@@QName: xp.name.doctypedecl.stag.etag.names.1.1.3.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.1"?>
+          <!DOCTYPE a:$u3005>
+          <a:$u3005 xmlns:a="http://a.example/">
+          </a:$u3005>
+      @@@test:domTree:
+        document {
+          xml-version: '1.1';
+          document-type {
+            node-name: 'a:' U+3005;
+          }
+          element {
+            prefix: 'a';
+            local-name: U+3005;
+            namespace-uri: 'http://a.example/';
+            attribute {
+              namespace-uri: 'http://www.w3.org/2000/xmlns/';
+              prefix: 'xmlns';
+              local-name: 'a';
+              value: 'http://a.example/';
+              specified: true;
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.name.doctypedecl.stag.etag.names.1.0.4.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0"?>
+          <!DOCTYPE a:b>
+          <a:b>
+          </a:b>
+      @@@c:erred: <[[xp|nsc-prefix-declared]]> { (3, 1)..(3, 5); }
+    @@XMLTest:
+      @@@QName: xp.name.doctypedecl.stag.etag.names.1.1.4.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.1"?>
+          <!DOCTYPE a:b>
+          <a:b>
+          </a:b>
+      @@@c:erred: <[[xp|nsc-prefix-declared]]> { (3, 1)..(3, 5); }
+    @@XMLTest:
+      @@@QName: xp.name.emptyelemtag.1.0.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0"?>
+          <$u3001$u3002/>
+      @@@c:erred: <[[xp|wf-invalid-character-in-node-name]]>{ (2, 2)..(2, 3); }
+    @@XMLTest:
+      @@@QName: xp.name.emptyelemtag.1.1.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.1"?>
+          <$u3001$u3002/>
+      @@@test:domTree:
+        document {
+          xml-version: '1.1';
+          element {
+            node-name: U+3001 U+3002;
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.name.emptyelemtag.1.0.3.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0"?>
+          <$u3005b/>
+      @@@c:erred: <[[xp|wf-invalid-character-in-node-name]]>{ (2, 2)..(2, 3); }
+    @@XMLTest:
+      @@@QName: xp.name.emptyelemtag.1.1.3.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.1"?>
+          <$u3005b/>
+      @@@test:domTree:
+        document {
+          xml-version: '1.1';
+          element {
+            node-name: U+3005 'b';
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.name.emptyelemtag.names.1.0.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0"?>
+          <a:b/>
+      @@@c:erred: <[[xp|nsc-prefix-declared]]>{ (2, 1)..(2, 6); }
+    @@XMLTest:
+      @@@QName: xp.name.emptyelemtag.names.1.1.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.1"?>
+          <a:b/>
+      @@@c:erred: <[[xp|nsc-prefix-declared]]>{ (2, 1)..(2, 6); }
+    @@XMLTest:
+      @@@QName: xp.name.attr.1.0.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0"?>
+          <a $u3001$u3002=""/>
+      @@@c:erred: <[[xp|wf-invalid-character-in-node-name]]>{ (2, 4)..(2, 5); }
+    @@XMLTest:
+      @@@QName: xp.name.attr.1.1.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.1"?>
+          <a $u3001$u3002=""/>
+      @@@test:domTree:
+        document {
+          xml-version: '1.1';
+          element {
+            attribute {
+              node-name: U+3001 U+3002;
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.name.attr.1.0.3.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0"?>
+          <a $u3005b=""/>
+      @@@c:erred: <[[xp|wf-invalid-character-in-node-name]]>{ (2, 4)..(2, 5); }
+    @@XMLTest:
+      @@@QName: xp.name.attr.1.1.3.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.1"?>
+          <a $u3005b=""/>
+      @@@test:domTree:
+        document {
+          xml-version: '1.1';
+          element {
+            attribute {
+              node-name: U+3005 'b';
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.name.attr.names.1.0.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0"?>
+          <a a:b=""/>
+      @@@c:erred: <[[xp|nsc-prefix-declared]]>{ (2, 1)..(2, 11); }
+    @@XMLTest:
+      @@@QName: xp.name.attr.names.1.1.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.1"?>
+          <a a:b=""/>
+      @@@c:erred: <[[xp|nsc-prefix-declared]]>{ (2, 1)..(2, 11); }
+    @@XMLTest:
+      @@@QName: xp.name.attr.names.1.0.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0"?>
+          <a :ab=""/>
+      @@@c:erred: <[[xp|nswf-legal-qname]]>{ (2, 4)..(2, 6); }
+      @@@c:erred: <[[xp|nsc-prefix-declared]]> { }
+    @@XMLTest:
+      @@@QName: xp.name.attr.names.1.1.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.1"?>
+          <a :ab=""/>
+      @@@c:erred: <[[xp|nswf-legal-qname]]>{ (2, 4)..(2, 6); }
+      @@@c:erred: <[[xp|nsc-prefix-declared]]> { }
+    @@XMLTest:
+      @@@QName: xp.name.attlist.1.0.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0"?>
+          <!DOCTYPE p [
+          <!NOTATION $u3001$u3002 SYSTEM "n">
+          <!ATTLIST $u3001$u3002
+          $u3001$u3002
+          NOTATION
+          ($u3001$u3002)
+          #IMPLIED>
+          ]><p/>
+      @@@c:erred: <[[xp|wf-invalid-character-in-node-name]]>{ (3, 12)..(3, 13); }
+      @@@c:erred: <[[xp|wf-invalid-character-in-node-name]]>{ (4, 11)..(4, 12); }
+      @@@c:erred: <[[xp|wf-invalid-character-in-node-name]]>{ (5, 1)..(5, 2); }
+      @@@c:erred: <[[xp|wf-invalid-character-in-node-name]]>{ (7, 2)..(7, 3); }
+    @@XMLTest:
+      @@@QName: xp.name.attlist.1.1.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.1"?>
+          <!DOCTYPE p [
+          <!NOTATION $u3001$u3002 SYSTEM "n">
+          <!ATTLIST $u3001$u3002
+          $u3001$u3002
+          NOTATION
+          ($u3001$u3002)
+          #IMPLIED>
+          ]><p/>
+      @@@test:domTree:
+        document {
+          xml-version: '1.1';
+          document-type {
+            notation {
+              node-name: U+3001 U+3002;
+            }
+            element-type-definition {
+              node-name: U+3001 U+3002;
+              attribute-definition {
+                node-name: U+3001 U+3002;
+                allowed-tokens: DOMStringList (U+3001 U+3002);
+              }
+            }
+          }
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.name.attlist.1.0.3.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0"?>
+          <!DOCTYPE p [
+          <!NOTATION $u3005b SYSTEM "n">
+          <!ATTLIST $u3005b
+          $u3005b
+          NOTATION
+          ($u3005b)
+          #IMPLIED>
+          ]><p/>
+      @@@c:erred: <[[xp|wf-invalid-character-in-node-name]]>{ (3, 12)..(3, 13); }
+      @@@c:erred: <[[xp|wf-invalid-character-in-node-name]]>{ (4, 11)..(4, 12); }
+      @@@c:erred: <[[xp|wf-invalid-character-in-node-name]]>{ (5, 1)..(5, 2); }
+      @@@c:erred: <[[xp|wf-invalid-character-in-node-name]]>{ (7, 2)..(7, 3); }
+    @@XMLTest:
+      @@@QName: xp.name.attlist.1.1.3.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.1"?>
+          <!DOCTYPE p [
+          <!NOTATION $u3005b SYSTEM "n">
+          <!ATTLIST $u3005b
+          $u3005b
+          NOTATION
+          ($u3005b)
+          #IMPLIED>
+          ]><p/>
+      @@@test:domTree:
+        document {
+          xml-version: '1.1';
+          document-type {
+            notation {
+              node-name: U+3005 'b';
+            }
+            element-type-definition {
+              node-name: U+3005 'b';
+              attribute-definition {
+                node-name: U+3005 'b';
+                allowed-tokens: DOMStringList (U+3005 'b');
+              }
+            }
+          }
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.name.attlist.names.1.0.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0"?>
+          <!DOCTYPE p [
+          <!NOTATION a:b SYSTEM "n">
+          <!ATTLIST a:b
+          a:b
+          NOTATION
+          (a:b)
+          #IMPLIED>
+          ]><p/>
+      @@@c:erred: <[[xp|nswf-legal-ncname]]>{ (3, 12)..(3, 14); }
+      @@@c:erred: <[[xp|nswf-legal-ncname]]>{ (7, 2)..(7, 4); }
+    @@XMLTest:
+      @@@QName: xp.name.attlist.names.1.1.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.1"?>
+          <!DOCTYPE p [
+          <!NOTATION a:b SYSTEM "n">
+          <!ATTLIST a:b
+          a:b
+          NOTATION
+          (a:b)
+          #IMPLIED>
+          ]><p/>
+      @@@c:erred: <[[xp|nswf-legal-ncname]]>{ (3, 12)..(3, 14); }
+      @@@c:erred: <[[xp|nswf-legal-ncname]]>{ (7, 2)..(7, 4); }
+    @@XMLTest:
+      @@@QName: xp.name.attlist.names.1.0.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0"?>
+          <!DOCTYPE p [
+          <!NOTATION :ab SYSTEM "n">
+          <!ATTLIST :ab
+          :ab
+          NOTATION
+          (:ab)
+          #IMPLIED>
+          ]><p/>
+      @@@c:erred: <[[xp|nswf-legal-ncname]]>{ (3, 12)..(3, 14); }
+      @@@c:erred: <[[xp|nswf-legal-qname]]>{ (4, 11)..(4, 13); }
+      @@@c:erred: <[[xp|nswf-legal-qname]]>{ (5, 1)..(5, 3); }
+      @@@c:erred: <[[xp|nswf-legal-ncname]]>{ (7, 2)..(7, 4); }
+    @@XMLTest:
+      @@@QName: xp.name.attlist.names.1.1.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.1"?>
+          <!DOCTYPE p [
+          <!NOTATION :ab SYSTEM "n">
+          <!ATTLIST :ab
+          :ab
+          NOTATION
+          (:ab)
+          #IMPLIED>
+          ]><p/>
+      @@@c:erred: <[[xp|nswf-legal-ncname]]>{ (3, 12)..(3, 14); }
+      @@@c:erred: <[[xp|nswf-legal-qname]]>{ (4, 11)..(4, 13); }
+      @@@c:erred: <[[xp|nswf-legal-qname]]>{ (5, 1)..(5, 3); }
+      @@@c:erred: <[[xp|nswf-legal-ncname]]>{ (7, 2)..(7, 4); }
+    @@XMLTest:
+      @@@QName: xp.name.gent.1.0.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0"?>
+          <!DOCTYPE p [
+          <!ENTITY $u3001$u3002 "n">
+          ]>
+          <p a="&$u3001$u3002;">
+          &$u3001$u3002;
+          </p>
+      @@@c:erred: <[[xp|wf-invalid-character-in-node-name]]>{ (3, 10)..(3, 11); }
+      @@@c:erred: <[[xp|wf-invalid-character-in-node-name]]>{ (5, 8)..(5, 9); }
+      @@@c:erred: <[[xp|wf-invalid-character-in-node-name]]>{ (6, 2)..(6, 3); }
+    @@XMLTest:
+      @@@QName: xp.name.ger.1.1.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.1"?>
+          <!DOCTYPE p [
+          <!ENTITY $u3001$u3002 "n">
+          ]>
+          <p a="&$u3001$u3002;">$
+          &$u3001$u3002;$
+          </p>
+      @@@test:domTree:
+        document {
+          xml-version: '1.1';
+          document-type {
+            general-entity {
+              node-name: U+3001 U+3002;
+            }
+          }
+          element {
+            attribute {
+              node-name: 'a';
+              general-entity-reference {
+                node-name: U+3001 U+3002;
+              }
+            }
+            general-entity-reference {
+              node-name: U+3001 U+3002;
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.name.ger.1.0.3.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0"?>
+          <!DOCTYPE p [
+          <!ENTITY $u3005b "n">
+          ]>
+          <p a="&$u3005b;">
+          &$u3005b;
+          </p>
+      @@@c:erred: <[[xp|wf-invalid-character-in-node-name]]>{ (3, 10)..(3, 11); }
+      @@@c:erred: <[[xp|wf-invalid-character-in-node-name]]>{ (5, 8)..(5, 9); }
+      @@@c:erred: <[[xp|wf-invalid-character-in-node-name]]>{ (6, 2)..(6, 3); }
+    @@XMLTest:
+      @@@QName: xp.name.ger.1.1.3.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.1"?>
+          <!DOCTYPE p [
+          <!ENTITY $u3005b "n">
+          ]>
+          <p a="&$u3005b;">$
+          &$u3005b;$
+          </p>
+      @@@test:domTree:
+        document {
+          xml-version: '1.1';
+          document-type {
+            general-entity {
+              node-name: U+3005 'b';
+            }
+          }
+          element {
+            attribute {
+              node-name: 'a';
+              general-entity-reference {
+                node-name: U+3005 'b';
+              }
+            }
+            general-entity-reference {
+              node-name: U+3005 'b';
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.name.ger.names.1.0.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0"?>
+          <!DOCTYPE p [
+          <!ENTITY a:b "n">
+          ]>
+          <p a="&a:b;">
+          &a:b;
+          </p>
+      @@@c:erred: <[[xp|nswf-legal-ncname]]>{ (3, 10)..(3, 12); }
+      @@@c:erred: <[[xp|nswf-legal-ncname]]>{ (5, 8)..(5, 10); }
+      @@@c:erred: <[[xp|nswf-legal-ncname]]>{ (6, 2)..(6, 4); }
+    @@XMLTest:
+      @@@QName: xp.name.ger.names.1.1.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.1"?>
+          <!DOCTYPE p [
+          <!ENTITY a:b "n">
+          ]>
+          <p a="&a:b;">
+          &a:b;
+          </p>
+      @@@c:erred: <[[xp|nswf-legal-ncname]]>{ (3, 10)..(3, 12); }
+      @@@c:erred: <[[xp|nswf-legal-ncname]]>{ (5, 8)..(5, 10); }
+      @@@c:erred: <[[xp|nswf-legal-ncname]]>{ (6, 2)..(6, 4); }
+    @@XMLTest:
+      @@@QName: xp.name.ndata.1.0.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0"?>
+          <!DOCTYPE p [
+          <!NOTATION $u3001$u3002 SYSTEM "n">
+          <!ENTITY e SYSTEM "s" NDATA $u3001$u3002>
+          ]><p/>
+      @@@c:erred: <[[xp|wf-invalid-character-in-node-name]]>{ (3, 12)..(3, 13); }
+      @@@c:erred: <[[xp|wf-invalid-character-in-node-name]]>{ (4, 29)..(4, 30); }
+    @@XMLTest:
+      @@@QName: xp.name.ndata.1.1.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.1"?>
+          <!DOCTYPE p [
+          <!NOTATION $u3001$u3002 SYSTEM "n">
+          <!ENTITY e SYSTEM "s" NDATA $u3001$u3002>
+          ]><p/>
+      @@@test:domTree:
+        document {
+          xml-version: '1.1';
+          document-type {
+            notation {
+              node-name: U+3001 U+3002;
+            }
+            general-entity {
+              node-name: 'e';
+              notation-name: U+3001 U+3002;
+            }
+          }
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.name.ndata.1.0.3.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0"?>
+          <!DOCTYPE p [
+          <!NOTATION $u3005b SYSTEM "n">
+          <!ENTITY e SYSTEM "s" NDATA $u3005b>
+          ]><p/>
+      @@@c:erred: <[[xp|wf-invalid-character-in-node-name]]>{ (3, 12)..(3, 13); }
+      @@@c:erred: <[[xp|wf-invalid-character-in-node-name]]>{ (4, 29)..(4, 30); }
+    @@XMLTest:
+      @@@QName: xp.name.ndata.1.1.3.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.1"?>
+          <!DOCTYPE p [
+          <!NOTATION $u3005b SYSTEM "n">
+          <!ENTITY e SYSTEM "s" NDATA $u3005b>
+          ]><p/>
+      @@@test:domTree:
+        document {
+          xml-version: '1.1';
+          document-type {
+            notation {
+              node-name: U+3005 'b';
+            }
+            general-entity {
+              node-name: 'e';
+              notation-name: U+3005 'b';
+            }
+          }
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.name.ndata.names.1.0.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0"?>
+          <!DOCTYPE p [
+          <!NOTATION a:b SYSTEM "n">
+          <!ENTITY e SYSTEM "s" NDATA a:b>
+          ]><p/>
+      @@@c:erred: <[[xp|nswf-legal-ncname]]>{ (3, 12)..(3, 14); }
+      @@@c:erred: <[[xp|nswf-legal-ncname]]>{ (4, 29)..(4, 31); }
+    @@XMLTest:
+      @@@QName: xp.name.ndata.names.1.1.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.1"?>
+          <!DOCTYPE p [
+          <!NOTATION a:b SYSTEM "n">
+          <!ENTITY e SYSTEM "s" NDATA a:b>
+          ]><p/>
+      @@@c:erred: <[[xp|nswf-legal-ncname]]>{ (3, 12)..(3, 14); }
+      @@@c:erred: <[[xp|nswf-legal-ncname]]>{ (4, 29)..(4, 31); }
+
+    @@enImplNote:
+      @@@ddid: wf-invalid-character-in-node-name
+      @@@@:
+        {ISSUE::
+          {P:: Tests required for:
+
+            - <CODE::Name> in element type declaration
+
+            - <CODE::Name> in model group
+
+            - <CODE::Name> in parameter entity declaration
+
+            - <CODE::Name> in parameter entity reference
+
+          }
+        }
+
+    @@XMLTest:
+      @@@QName: xp.NOTATION.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE p [
+          <!NOTATION n SYSTEM "m">
+          ]><p/>
+      @@@test:domTree:
+        document {
+          document-type {
+            notation {
+              node-name: 'n';
+              public-id: null;
+              system-id: 'm';
+            }
+          }
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.NOTATION.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE p [
+          <!NOTATION n PUBLIC "m">
+          ]><p/>
+      @@@test:domTree:
+        document {
+          document-type {
+            notation {
+              node-name: 'n';
+              system-id: null;
+              public-id: 'm';
+            }
+          }
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.NOTATION.3.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE p [
+          <!NOTATION n PUBLIC "m" "l">
+          ]><p/>
+      @@@test:domTree:
+        document {
+          document-type {
+            notation {
+              node-name: 'n';
+              public-id: 'm';
+              system-id: 'l';
+            }
+          }
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.NOTATION.4.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE p [
+          <!NOTATION n SYSTEM "m">
+          <!NOTATION n SYSTEM "l">
+          ]><p/>
+      @@@c:erred: <[[xp|vc-unique-notation-name]]> { (3, 1)..(3, 24); }
+      @@@test:domTree:
+        document {
+          document-type {
+            notation {
+              node-name: 'n';
+              system-id: 'm';
+            }
+          }
+          element { }
+        }
+
+    @@XMLTest:
+      @@@QName: xp.names.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <p xmlns="http://1.example/" a="b"/>
+      @@@test:domTree:
+        document {
+          element {
+            prefix: null;
+            local-name: 'p';
+            namespace-uri: 'http://1.example/';
+            attribute {
+              prefix: null;
+              local-name: 'xmlns';
+              namespace-uri: 'http://www.w3.org/2000/xmlns/';
+              specified: true;
+            }
+            attribute {
+              prefix: null;
+              local-name: 'a';
+              specified: true;
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.names.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <p xmlns:a="http://1.example/" a="b" a:a="c"/>
+      @@@test:domTree:
+        document {
+          element {
+            prefix: null;
+            local-name: 'p';
+            namespace-uri: null;
+            attribute {
+              prefix: 'xmlns';
+              local-name: 'a';
+              namespace-uri: 'http://www.w3.org/2000/xmlns/';
+              specified: true;
+            }
+            attribute {
+              prefix: null;
+              local-name: 'a';
+              specified: true;
+            }
+            attribute {
+              prefix: 'a';
+              local-name: 'a';
+              namespace-uri: 'http://1.example/';
+              specified: true;
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.names.3.test
+      @@@DEnt:
+        @@@@test:value:
+          <a:p xmlns:a="http://1.example/" a="b" a:a="c"/>
+      @@@test:domTree:
+        document {
+          element {
+            prefix: 'a';
+            local-name: 'p';
+            namespace-uri: 'http://1.example/';
+            attribute {
+              prefix: 'xmlns';
+              local-name: 'a';
+              namespace-uri: 'http://www.w3.org/2000/xmlns/';
+              specified: true;
+            }
+            attribute {
+              prefix: null;
+              local-name: 'a';
+              specified: true;
+            }
+            attribute {
+              prefix: 'a';
+              local-name: 'a';
+              namespace-uri: 'http://1.example/';
+              specified: true;
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.names.5.test
+      @@@DEnt:
+        @@@@test:value:
+          <p xmlns:a="http://1.example/">$
+          <a:q/>$
+          </p>
+      @@@test:domTree:
+        document {
+          element {
+            prefix: null;
+            local-name: 'p';
+            namespace-uri: null;
+            attribute {
+              prefix: 'xmlns';
+              local-name: 'a';
+              namespace-uri: 'http://www.w3.org/2000/xmlns/';
+              specified: true;
+            }
+            element {
+              prefix: 'a';
+              local-name: 'q';
+              namespace-uri: 'http://1.example/';
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.names.6.test
+      @@@DEnt:
+        @@@@test:value:
+          <p xmlns:a="http://1.example/">$
+          <q a:b="c"/>$
+          </p>
+      @@@test:domTree:
+        document {
+          element {
+            prefix: null;
+            local-name: 'p';
+            namespace-uri: null;
+            attribute {
+              prefix: 'xmlns';
+              local-name: 'a';
+              namespace-uri: 'http://www.w3.org/2000/xmlns/';
+              specified: true;
+            }
+            element {
+              prefix: null;
+              local-name: 'q';
+              namespace-uri: null;
+              attribute {
+                prefix: 'a';
+                local-name: 'b';
+                namespace-uri: 'http://1.example/';
+                specified: true;
+              }
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.names.7.test
+      @@@DEnt:
+        @@@@test:value:
+          <p xmlns:a="http://1.example/">$
+          <q a:b="c" xmlns:a="http://2.example/"/>$
+          </p>
+      @@@test:domTree:
+        document {
+          element {
+            prefix: null;
+            local-name: 'p';
+            namespace-uri: null;
+            attribute {
+              prefix: 'xmlns';
+              local-name: 'a';
+              namespace-uri: 'http://www.w3.org/2000/xmlns/';
+              specified: true;
+            }
+            element {
+              prefix: null;
+              local-name: 'q';
+              namespace-uri: null;
+              attribute {
+                prefix: 'a';
+                local-name: 'b';
+                namespace-uri: 'http://2.example/';
+                specified: true;
+              }
+              attribute {
+                prefix: 'xmlns';
+                local-name: 'a';
+                namespace-uri: 'http://www.w3.org/2000/xmlns/';
+                specified: true;
+              }
+            }
+          }
+        }
+
+    @@XMLTest:
+      @@@QName: xp.names.undeclare.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <p xmlns="http://1.example/">$
+          <q xmlns="">$
+          <r xmlns="http://2.example/"/>$
+          </q>$
+          </p>
+      @@@test:domTree:
+        document {
+          element {
+            prefix: null;
+            local-name: 'p';
+            namespace-uri: 'http://1.example/';
+            attribute {
+              prefix: null;
+              local-name: 'xmlns';
+              namespace-uri: 'http://www.w3.org/2000/xmlns/';
+              specified: true;
+            }
+            element {
+              prefix: null;
+              local-name: 'q';
+              namespace-uri: null;
+              attribute {
+                prefix: null;
+                local-name: 'xmlns';
+                namespace-uri: 'http://www.w3.org/2000/xmlns/';
+                specified: true;
+              }
+              element {
+                prefix: null;
+                local-name: 'r';
+                namespace-uri: 'http://2.example/';
+                attribute {
+                  prefix: null;
+                  local-name: 'xmlns';
+                  namespace-uri: 'http://www.w3.org/2000/xmlns/';
+                  specified: true;
+                }
+              }
+            }
+          }
+        }
+
+    @@XMLTest:
+      @@@QName: xp.names.undeclare.1.0.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0"?>
+          <a:p xmlns:a="http://1.example/">$
+          <q xmlns:a="">$
+          <a:r xmlns:a="http://2.example/"/>$
+          </q>$
+          </a:p>
+      @@@c:erred: <[[xp|nswf-empty-namespace-name]]> { (2, 34)..(2, 47); }
+    @@XMLTest:
+      @@@QName: xp.names.undeclare.1.1.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.1"?>
+          <a:p xmlns:a="http://1.example/">$
+          <q xmlns:a="">$
+          <a:r xmlns:a="http://2.example/"/>$
+          </q>$
+          </a:p>
+      @@@test:domTree:
+        document {
+          element {
+            prefix: 'a';
+            local-name: 'p';
+            namespace-uri: 'http://1.example/';
+            attribute {
+              prefix: 'xmlns';
+              local-name: 'a';
+              namespace-uri: 'http://www.w3.org/2000/xmlns/';
+              specified: true;
+            }
+            element {
+              prefix: null;
+              local-name: 'q';
+              namespace-uri: null;
+              attribute {
+                prefix: 'xmlns';
+                local-name: 'a';
+                namespace-uri: 'http://www.w3.org/2000/xmlns/';
+                specified: true;
+              }
+              element {
+                prefix: 'a';
+                local-name: 'r';
+                namespace-uri: 'http://2.example/';
+                attribute {
+                  prefix: 'xmlns';
+                  local-name: 'a';
+                  namespace-uri: 'http://www.w3.org/2000/xmlns/';
+                  specified: true;
+                }
+              }
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.names.undeclare.1.1.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.1"?>
+          <a:p xmlns:a="http://1.example/">$
+          <q xmlns:a="">$
+          <a:r/>$
+          </q>$
+          </a:p>
+      @@@c:erred: <[[xp|nsc-prefix-declared]]> { (2, 48)..(2, 53); }
+
+    @@XMLTest:
+      @@@QName: xp.names.xml.prefix.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <a xmlns:xml="http://www.w3.org/XML/1998/namespace"/>
+      @@@test:domTree:
+        document {
+          element {
+            attribute {
+              prefix: 'xmlns';
+              local-name: 'xml';
+              namespace-uri: 'http://www.w3.org/2000/xmlns/';
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.names.xml.prefix.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <a xmlns:xml="a"/>
+      @@@c:erred: <[[xp|nsc-reserved-prefix-xml]]> { (1, 1)..(1, 18); }
+    @@XMLTest:
+      @@@QName: xp.names.xml.prefix.3.test
+      @@@DEnt:
+        @@@@test:value:
+          <a xmlns:a="http://www.w3.org/XML/1998/namespace"
+          />
+      @@@c:erred: <[[xp|nsc-reserved-namespace-name-xml]]> { (1, 1)..(2, 2); }
+    @@XMLTest:
+      @@@QName: xp.names.xml.prefix.4.test
+      @@@DEnt:
+        @@@@test:value:
+          <a xml:lang="ja"/>
+      @@@test:domTree:
+        document {
+          element {
+            attribute {
+              prefix: 'xml';
+              local-name: 'lang';
+              namespace-uri: 'http://www.w3.org/XML/1998/namespace';
+            }
+          }
+        }
+
+    @@XMLTest:
+      @@@QName: xp.names.prefix.declared.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+          <!ATTLIST a
+          b:c CDATA "d"
+          >
+          ]>
+          <a/>
+      @@@c:erred: <[[xp|nsc-prefix-declared]]> { (6, 1)..(6, 4); }
+
+    @@XMLTest:
+      @@@QName: xp.names.xmlns.reserved.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <a xmlns:xmlns="http://www.w3.org/2000/xmlns/"
+          />
+      @@@c:erred: <[[xp|nsc-reserved-prefix-xmlns]]> { (1, 1)..(2, 2); }
+      @@@c:erred: <[[xp|nsc-reserved-namespace-name-xmlns]]> { (1, 1)..(2, 2); }
+    @@XMLTest:
+      @@@QName: xp.names.xmlns.reserved.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <a xmlns:xmlns="a"
+          />
+      @@@c:erred: <[[xp|nsc-reserved-prefix-xmlns]]> { (1, 1)..(2, 2); }
+    @@XMLTest:
+      @@@QName: xp.names.xmlns.reserved.3.test
+      @@@DEnt:
+        @@@@test:value:
+          <a xmlns:a="http://www.w3.org/2000/xmlns/"
+          />
+      @@@c:erred: <[[xp|nsc-reserved-namespace-name-xmlns]]> { (1, 1)..(2, 2); }
+
+    @@XMLTest:
+      @@@QName: xp.names.default.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+          <!ATTLIST a
+          xmlns CDATA "http://1.example/">
+          ]>
+          <a/>
+      @@@test:domTree:
+        document {
+          document-type {
+            element-type-definition {
+              node-name: 'a';
+              attribute-definition {
+                node-name: 'xmlns';
+                node-value: 'http://1.example/';
+              }
+            }
+          }
+          element {
+            prefix: null;
+            local-name: 'a';
+            namespace-uri: 'http://1.example/';
+            attribute {
+              prefix: null;
+              local-name: 'xmlns';
+              namespace-uri: 'http://www.w3.org/2000/xmlns/';
+              value: 'http://1.example/';
+              specified: false;
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.names.default.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+          <!ATTLIST a
+          xmlns CDATA "http://1.example/">
+          ]>
+          <a xmlns="http://2.example/"/>
+      @@@test:domTree:
+        document {
+          document-type {
+            element-type-definition {
+              node-name: 'a';
+              attribute-definition {
+                node-name: 'xmlns';
+                node-value: 'http://1.example/';
+              }
+            }
+          }
+          element {
+            prefix: null;
+            local-name: 'a';
+            namespace-uri: 'http://2.example/';
+            attribute {
+              prefix: null;
+              local-name: 'xmlns';
+              namespace-uri: 'http://www.w3.org/2000/xmlns/';
+              value: 'http://2.example/';
+              specified: true;
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.names.default.3.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE b:a [
+          <!ATTLIST b:a
+          xmlns:b CDATA "http://1.example/">
+          ]>
+          <b:a/>
+      @@@test:domTree:
+        document {
+          document-type {
+            element-type-definition {
+              node-name: 'b:a';
+              attribute-definition {
+                node-name: 'xmlns:b';
+                node-value: 'http://1.example/';
+              }
+            }
+          }
+          element {
+            prefix: 'b';
+            local-name: 'a';
+            namespace-uri: 'http://1.example/';
+            attribute {
+              prefix: 'xmlns';
+              local-name: 'b';
+              namespace-uri: 'http://www.w3.org/2000/xmlns/';
+              value: 'http://1.example/';
+              specified: false;
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.names.default.4.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE b:a [
+          <!ATTLIST b:a
+          xmlns:b CDATA "http://1.example/">
+          ]>
+          <b:a xmlns:b="http://2.example/"/>
+      @@@test:domTree:
+        document {
+          document-type {
+            element-type-definition {
+              node-name: 'b:a';
+              attribute-definition {
+                node-name: 'xmlns:b';
+                node-value: 'http://1.example/';
+              }
+            }
+          }
+          element {
+            prefix: 'b';
+            local-name: 'a';
+            namespace-uri: 'http://2.example/';
+            attribute {
+              prefix: 'xmlns';
+              local-name: 'b';
+              namespace-uri: 'http://www.w3.org/2000/xmlns/';
+              value: 'http://2.example/';
+              specified: true;
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.names.default.5.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+          <!ATTLIST a
+          xmlns:b CDATA "http://1.example/"
+          b:c CDATA "http://1.example/">
+          ]>
+          <a xmlns:b="http://2.example/"/>
+      @@@test:domTree:
+        document {
+          document-type {
+            element-type-definition {
+              node-name: 'a';
+              attribute-definition {
+                node-name: 'xmlns:b';
+                text-content: 'http://1.example/';
+              }
+              attribute-definition {
+                node-name: 'b:c';
+                text-content: 'http://1.example/';
+              }
+            }
+          }
+          element {
+            prefix: null;
+            local-name: 'a';
+            namespace-uri: null;
+            attribute {
+              prefix: 'xmlns';
+              local-name: 'b';
+              namespace-uri: 'http://www.w3.org/2000/xmlns/';
+              value: 'http://2.example/';
+              specified: true;
+            }
+            attribute {
+              prefix: 'b';
+              local-name: 'c';
+              namespace-uri: 'http://2.example/';
+              specified: false;
+            }
+          }
+        }
+
+    @@XMLTest:
+      @@@QName: xp.names.unique.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <a
+          xmlns:b="http://2.example/"
+          xmlns:c="http://2.example/"
+          b:d=""
+          c:d=""
+          />
+      @@@c:erred: <[[xp|nswf-unique-att-spec-expanded-name]]> { (1, 1)..(6, 2); }
+    @@XMLTest:
+      @@@QName: xp.names.unique.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+          <!ATTLIST a
+          c:d CDATA ""
+          >
+          ]>
+          <a
+          xmlns:b="http://2.example/"
+          xmlns:c="http://2.example/"
+          b:d=""
+          />
+      @@@c:erred: <[[xp|nswf-unique-att-spec-expanded-name]]> { (6, 1)..(10, 2);}
+    @@XMLTest:
+      @@@QName: xp.names.unique.3.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+          <!ATTLIST a
+          c:d CDATA "value1"
+          >
+          ]>
+          <a
+          xmlns:c="http://2.example/"
+          c:d="value2"
+          />
+      @@@test:domTree:
+        document {
+          document-type { }
+          element {
+            attribute {
+              prefix: 'xmlns';
+              local-name: 'c';
+              namespace-uri: 'http://www.w3.org/2000/xmlns/';
+              specified: true;
+            }
+            attribute {
+              prefix: 'c';
+              local-name: 'd';
+              namespace-uri: 'http://2.example/';
+              value: 'value2';
+              specified: true;
+            }
+          }
+        }
+
+    @@XMLTest:
+      @@@QName: xp.names.normalize.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+          <!ATTLIST a
+          xmlns NMTOKEN #IMPLIED
+          >
+          ]>
+          <a xmlns="  "/>
+      @@@test:domTree:
+        document {
+          document-type { }
+          element {
+            namespace-uri: null;
+            prefix: null;
+            local-name: 'a';
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.names.normalize.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+          <!ATTLIST a
+          xmlns NMTOKEN #IMPLIED
+          >
+          ]>
+          <a xmlns="  about:blank  "/>
+      @@@test:domTree:
+        document {
+          document-type { }
+          element {
+            namespace-uri: 'about:blank';
+            prefix: null;
+            local-name: 'a';
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.names.normalize.3.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a:a [
+          <!ATTLIST a:a
+          xmlns:a NMTOKEN #IMPLIED
+          >
+          ]>
+          <a:a xmlns:a=" about:blank  "/>
+      @@@test:domTree:
+        document {
+          document-type { }
+          element {
+            namespace-uri: 'about:blank';
+            prefix: 'a';
+            local-name: 'a';
+          }
+        }
 
     @@PerlDef:
       my $impl = $Message::DOM::ImplementationRegistry->get_implementation ({
@@ -12551,6 +14475,26 @@ ElementTypeBinding:
     @@c:severity: c|SEVERITY_FATAL_ERROR
 
 ElementTypeBinding:
+  @Name: NSFatalErrDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: c|DOMErrorType
+    @@For: ManakaiDOM|DOM3
+    @@ecore:textFormatter: ManakaiXMLParserExceptionFormatter
+    @@c:severity: c|SEVERITY_FATAL_ERROR
+
+ElementTypeBinding:
+  @Name: NSCErrDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: c|DOMErrorType
+    @@For: ManakaiDOM|DOM3
+    @@ecore:textFormatter: ManakaiXMLParserExceptionFormatter
+    @@c:severity: c|SEVERITY_FATAL_ERROR
+
+ElementTypeBinding:
   @Name: VCErrDef
   @ElementType:
     dis:ResourceDef
@@ -12690,6 +14634,40 @@ WFErrDef:
     @@@: xp|character-number
     @@enDesc:
       The code position of the character being referred.
+
+WFErrDef:
+  @QName: xp|wf-invalid-character-in-node-name
+  @c:errorType:
+    @@@: wf-invalid-character-in-node-name
+    @@ContentType: DISCore|String
+  @enDesc:
+    If a name contains a character that is not a name character
+    in the XML version in use, or if the first character of a name
+    is not a name start character in the XML version in use.
+
+      {NOTE::
+        When an invalid character is encountered in an entity
+        where a <CODE::Name> is expected, what type of error
+        is issued is implementation dependent: <Q::xp|wf-syntax-error>,
+        <Q::xp|wf-pi-target-is-xml> or other error might be reported.
+      }
+
+      {NOTE::
+        This error type is defined in DOM Level 3 Core and Load and Save
+        modules and redefined herein for the purpose of XML parser.
+      }
+  @enMufDef:
+    Character %character-code-point
+    (v => {<Q::xp|character-number>}); is not allowed in name
+  @ecore:hasParameter: xp|error-token
+  @ecore:hasParameter:
+    @@@: xp|character-number
+    @@enDesc:
+      The code position of the character being referred.
+  @ecore:hasParameter:
+    @@@: infoset|version
+    @@enDesc:
+      The version of XML in use.
 
 WFErrDef:
   @QName: xp|wf-pes-in-internal-subset
@@ -12954,6 +14932,194 @@ WarnDef:
     @@@: xp|name
     @@enDesc:
       The name of the attribute.
+
+NSFatalErrDef:
+  @QName: xp|nswf-legal-ncname
+  @enDesc:
+    <CODE::Name>s other than element type names and attribute names
+    <kwd:MUST> be <CODE::NCName>s.
+  @enMufDef:
+    <CODE::Name> |%p (name => {<Q::xp|name>});| is not an <CODE::NCName>
+  @ecore:hasParameter: xp|error-token
+  @ecore:hasParameter:
+    @@@: xp|name
+    @@enDesc:
+      The name.
+  @ecore:hasParameter:
+    @@@: infoset|version
+    @@enDesc:
+      The version of XML in use.
+
+NSFatalErrDef:
+  @QName: xp|nswf-legal-qname
+  @enDesc:
+    An element type name or an attribute name <kwd:MUST> be a
+    <CODE::QName>.
+  @enMufDef:
+    <CODE::Name> |%p (name => {<Q::xp|name>});| is not a <CODE::QName>
+  @ecore:hasParameter: xp|error-token
+  @ecore:hasParameter:
+    @@@: xp|name
+    @@enDesc:
+      The name.
+  @ecore:hasParameter:
+    @@@: infoset|version
+    @@enDesc:
+      The version of XML in use.
+
+NSCErrDef:
+  @QName: xp|nsc-reserved-prefix-xml
+  @enDesc:
+    The prefix <XML::xml> <kwd:MUST-NOT> be undeclared or bound
+    to any namespace name other than <URI::http://www.w3.org/XML/1998/namespace>.
+  @enMufDef:
+    Namespace prefix |xml| cannot be bound to namespace
+    name |%p (name => {<Q::infoset|namespaceName>});|
+  @ecore:hasParameter: xp|error-token
+  @ecore:hasParameter:
+    @@@: infoset|prefix
+    @@enDesc:
+      The namespace prefix.
+  @ecore:hasParameter:
+    @@@: infoset|namespaceName
+    @@enDesc:
+      The namespace name bound to or an empty string for undeclaring.
+
+NSCErrDef:
+  @QName: xp|nsc-reserved-namespace-name-xml
+  @enDesc:
+    Namespace prefixes other than <XML::xml> <kwd:MUST-NOT> be bound
+    to the namespace name <URI::http://www.w3.org/XML/1998/namespace>.
+  @enMufDef:
+    Namespace prefix |%p (name => {<Q::infoset|prefix>});| cannot be
+    bound to namespace name |http://www.w3.org/XML/1998/namespace|
+  @enImplNote:
+    The XMLNames spec does not prohibit the URI bound to
+    the default namespace (!)
+  @ecore:hasParameter: xp|error-token
+  @ecore:hasParameter:
+    @@@: infoset|prefix
+    @@enDesc:
+      The namespace prefix or <DOM::null> for default namespace.
+  @ecore:hasParameter:
+    @@@: infoset|namespaceName
+    @@enDesc:
+      The namespace name bound to.
+
+NSCErrDef:
+  @QName: xp|nsc-reserved-prefix-xmlns
+  @enDesc:
+    The prefix <XML::xmlns> <kwd:MUST-NOT> be declared or undeclared.
+  @enMufDef:
+    Namespace prefix |xmlns| cannot be declared or undeclared
+  @ecore:hasParameter: xp|error-token
+  @ecore:hasParameter:
+    @@@: infoset|prefix
+    @@enDesc:
+      The namespace prefix.
+  @ecore:hasParameter:
+    @@@: infoset|namespaceName
+    @@enDesc:
+      The namespace name bound to or an empty string for undeclaring.
+
+NSCErrDef:
+  @QName: xp|nsc-reserved-namespace-name-xmlns
+  @enDesc:
+    Namespace prefixes <kwd:MUST-NOT> be bound
+    to the namespace name <URI::http://www.w3.org/2000/xmlns/>.
+  @enMufDef:
+    Namespace prefix |%p (name => {<Q::infoset|prefix>});| cannot be
+    bound to namespace name |http://www.w3.org/2000/xmlns/|
+  @enImplNote:
+    The XMLNames spec does not prohibit the URI bound to
+    the default namespace (!)
+  @ecore:hasParameter: xp|error-token
+  @ecore:hasParameter:
+    @@@: infoset|prefix
+    @@enDesc:
+      The namespace prefix or <DOM::null> for default namespace.
+  @ecore:hasParameter:
+    @@@: infoset|namespaceName
+    @@enDesc:
+      The namespace name bound to.
+
+NSCErrDef:
+  @QName: xp|nsc-prefix-declared
+  @enDesc:
+    A namespace prefix other than <XML::xml> or <XML::xmlns>
+    <kwd:MUST> have been declared in a namespace declaration
+    attribute in either the start or empty element tag of the
+    element where the prefix is used or in an ancestor
+    element.  Furthermore, the attribute value in the innermost
+    such declaration <kwd:MUST-NOT> be an empty string.
+  @enMufDef:
+    Namespace prefix |%p (name => {<Q::infoset|prefix>});| in
+    qualified name |%p (name => {<Q::xp|name>});| is not declared
+  @ecore:hasParameter: xp|error-token
+  @ecore:hasParameter:
+    @@@: infoset|prefix
+    @@enDesc:
+      The namespace prefix.
+  @ecore:hasParameter:
+    @@@: xp|name
+    @@enDesc:
+      The qualified name.
+
+NSFatalErrDef:
+  @QName: xp|nswf-empty-namespace-name
+  @enDesc:
+    If the XML version of the document is 1.0 and the
+    normalized value of the prefixed namespace declaration attribute is empty.
+  @enMufDef:
+    Namespace |%p (name => {<Q::infoset|prefix>});| cannot be
+    undeclared in XML 1.0
+  @ecore:hasParameter: xp|error-token
+  @ecore:hasParameter:
+    @@@: infoset|prefix
+    @@enDesc:
+      The namespace prefix.
+  @ecore:hasParameter:
+    @@@: infoset|namespaceName
+    @@enDesc:
+      An empty string.
+
+NSFatalErrDef:
+  @QName: xp|nswf-unique-att-spec-expanded-name
+  @enDesc:
+    No element may have two attributes that have qualified name
+    with the same local part and with namespace prefixes
+    that have been bound to namespace names that are identical.
+  @enMufDef:
+    Attribute |%p (name => {<Q::infoset|localName>});| in
+    namespace |%p (name => {<Q::infoset|namespaceName>});| is
+    attached to the same element more than once (as
+    |%p (name => {<Q::xp|name>});| and
+    |%p (name => {<Q::xp|another-attribute-name>});|)
+  @enImplNote:
+    The XMLNames spec doesn't mention default attributes
+    for this constraint...
+  @ecore:hasParameter: xp|error-token
+  @ecore:hasParameter:
+    @@@: infoset|localName
+    @@enDesc:
+      The local part of the attribute.
+  @ecore:hasParameter:
+    @@@: infoset|namespaceName
+    @@enDesc:
+      The namespace URI of the attribute.
+  @ecore:hasParameter:
+    @@@: xp|name
+    @@enDesc:
+      The name, i.e. a qualified name consist of <Q::infoset:localName>
+      and <Q::infoset:namespaceName> parameter values.
+  @ecore:hasParameter:
+    @@@: xp|another-attribute-name
+    @@enDesc:
+      Another attribute qualified name expanded to the same expanded name
+      as <Q::xp|name>.
+
+XWParam:
+  @QName: xp|another-attribute-name
 
 XWParam:
   @QName: xp|replacement-text

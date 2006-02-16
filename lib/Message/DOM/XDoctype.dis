@@ -17,7 +17,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/02/15 13:36:21 $
+    $Date: 2006/02/16 20:03:20 $
   
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
   
@@ -408,15 +408,21 @@ IFClsXDef:
         @@@@enDesc:
           The <P::nameArg> is not a legal <CODE::Name>
           according to the XML version of the document.
+
+          If the <A::Document.strictErrorChecking> attribute is
+          set to <DOM::false>, the implementation is not
+          <kwd:REQUIRED> to throw this exception.
       @@@PerlDef:
         my $doc = $self->{<H::mn:node>};
-        my $ver = <Code::t|getDocumentXMLVersion::
-                    $DOCOBJ = $doc>;
-        __CODE{DOMMain:ensureXMLName::
-          $INPUT => $nameArg,
-          $INPUT_PARAM_NAME => 'nameArg',
-          $XMLVERSION => $ver,
-        }__;
+        if (<Code::t|doStrictErrorChecking:: $nodeRef = $self>) {
+          my $ver = <Code::t|getDocumentXMLVersion::
+                      $DOCOBJ = $doc>;
+          __CODE{DOMMain:ensureXMLName::
+            $INPUT => $nameArg,
+            $INPUT_PARAM_NAME => 'nameArg',
+            $XMLVERSION => $ver,
+          }__;
+        }
         my $obj
           = <ClassM::ManakaiDOMDocumentTypeDefinition.newObject>;
         __CODE{mn|setXRefNode||ManakaiDOM|Perl::
@@ -462,6 +468,18 @@ IFClsXDef:
                                       ('0120');
                   },
                   exception_subtype => <Q::MDOMX|MDOM_BAD_NAME>);
+    @@Test:
+      @@@QName:
+        ManakaiDocumentXDoctype.createDocumentTypeDefinition.badname.2.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{newDocumentForTest}__;
+        $doc-><AS::Document.strictErrorChecking> (false);
+        my $dtd = $doc-><M::DocumentXDoctype.createDocumentTypeDefinition>
+                          ('0120');
+        
+        $test->assert_string (actual_value => $dtd-><AG::Node.nodeName>,
+                              expected_value => '0120'); 
 
   @Method:
     @@Name: createElementTypeDefinition
@@ -480,15 +498,21 @@ IFClsXDef:
         @@@@enDesc:
           The <P::nameArg> is not a legal <CODE::Name>
           according to the XML version of the document.
+
+          If the <A::Document.strictErrorChecking> attribute is
+          set to <DOM::false>, the implementation is not
+          <kwd:REQUIRED> to throw this exception.
       @@@PerlDef:
         my $doc = $self->{<H::mn:node>};
-        my $ver = <Code::t|getDocumentXMLVersion::
-                    $DOCOBJ = $doc>;
-        __CODE{DOMMain:ensureXMLName::
-          $INPUT => $nameArg,
-          $INPUT_PARAM_NAME => 'nameArg',
-          $XMLVERSION => $ver,
-        }__;
+        if (<Code::t|doStrictErrorChecking:: $nodeRef = $self>) {
+          my $ver = <Code::t|getDocumentXMLVersion::
+                      $DOCOBJ = $doc>;
+          __CODE{DOMMain:ensureXMLName::
+            $INPUT => $nameArg,
+            $INPUT_PARAM_NAME => 'nameArg',
+            $XMLVERSION => $ver,
+          }__;
+        }
         my $obj
           = <ClassM::ManakaiDOMElementTypeDefinition.newObject>;
         __CODE{mn|setXRefNode||ManakaiDOM|Perl::
@@ -527,6 +551,18 @@ IFClsXDef:
                                       ('0120');
                   },
                   exception_subtype => <Q::MDOMX|MDOM_BAD_NAME>);
+    @@Test:
+      @@@QName:
+        ManakaiDocumentXDoctype.createElementTypeDefinition.badname.2.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{newDocumentForTest}__;
+        $doc-><AS::Document.strictErrorChecking> (false);
+        my $dtd = $doc-><M::DocumentXDoctype.createElementTypeDefinition>
+                          ('0120');
+        
+        $test->assert_string (actual_value => $dtd-><AG::Node.nodeName>,
+                              expected_value => '0120'); 
     
   @Method:
     @@Name: createAttributeDefinition
@@ -545,15 +581,21 @@ IFClsXDef:
         @@@@enDesc:
           The <P::nameArg> is not a legal <CODE::Name>
           according to the XML version of the document.
+
+          If the <A::Document.strictErrorChecking> attribute is
+          set to <DOM::false>, the implementation is not
+          <kwd:REQUIRED> to throw this exception.
       @@@PerlDef:
         my $doc = $self->{<H::mn:node>};
-        my $ver = <Code::t|getDocumentXMLVersion::
-                    $DOCOBJ = $doc>;
-        __CODE{DOMMain:ensureXMLName::
-          $INPUT => $nameArg,
-          $INPUT_PARAM_NAME => 'nameArg',
-          $XMLVERSION => $ver,
-        }__;
+        if (<Code::t|doStrictErrorChecking:: $nodeRef = $self>) {
+          my $ver = <Code::t|getDocumentXMLVersion::
+                      $DOCOBJ = $doc>;
+          __CODE{DOMMain:ensureXMLName::
+            $INPUT => $nameArg,
+            $INPUT_PARAM_NAME => 'nameArg',
+            $XMLVERSION => $ver,
+          }__;
+        }
         my $obj = <ClassM::ManakaiDOMAttributeDefinition.newObject>;
         __CODE{mn|setXRefNode||ManakaiDOM|Perl::
           $referrer => $obj,
@@ -591,6 +633,18 @@ IFClsXDef:
                                       ('0120');
                   },
                   exception_subtype => <Q::MDOMX|MDOM_BAD_NAME>);
+    @@Test:
+      @@@QName:
+        ManakaiDocumentXDoctype.createAttributeDefinition.badname.2.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{newDocumentForTest}__;
+        $doc-><AS::Document.strictErrorChecking> (false);
+        my $dtd = $doc-><M::DocumentXDoctype.createAttributeDefinition>
+                          ('0120');
+        
+        $test->assert_string (actual_value => $dtd-><AG::Node.nodeName>,
+                              expected_value => '0120'); 
     
   @Method:
     @@Name: createGeneralEntity
@@ -609,15 +663,21 @@ IFClsXDef:
         @@@@enDesc:
           The <P::nameArg> is not a legal <CODE::Name>
           according to the XML version of the document.
+
+          If the <A::Document.strictErrorChecking> attribute is
+          set to <DOM::false>, the implementation is not
+          <kwd:REQUIRED> to throw this exception.
       @@@PerlDef:
         my $doc = $self->{<H::mn:node>};
-        my $ver = <Code::t|getDocumentXMLVersion::
-                    $DOCOBJ = $doc>;
-        __CODE{DOMMain:ensureXMLName::
-          $INPUT => $nameArg,
-          $INPUT_PARAM_NAME => 'nameArg',
-          $XMLVERSION => $ver,
-        }__;
+        if (<Code::t|doStrictErrorChecking:: $nodeRef = $self>) {
+          my $ver = <Code::t|getDocumentXMLVersion::
+                      $DOCOBJ = $doc>;
+          __CODE{DOMMain:ensureXMLName::
+            $INPUT => $nameArg,
+            $INPUT_PARAM_NAME => 'nameArg',
+            $XMLVERSION => $ver,
+          }__;
+        }
         my $obj = <ClassM::x|ManakaiDOMEntity.newObject>;
         __CODE{mn|setXRefNode||ManakaiDOM|Perl::
           $referrer => $obj,
@@ -654,6 +714,21 @@ IFClsXDef:
                                       ('0120');
                   },
                   exception_subtype => <Q::MDOMX|MDOM_BAD_NAME>);
+    @@Test:
+      @@@QName:
+        ManakaiDocumentXDoctype.createGeneralEntity.badname.2.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{newDocumentForTest}__;
+        $doc-><AS::Document.strictErrorChecking> (false);
+        my $dtd = $doc-><M::DocumentXDoctype.createGeneralEntity>
+                          ('0120');
+        
+        $test->assert_isa ($dtd, <IFName::x|Entity>);
+        $test->assert_equals ($dtd-><AG::t|Node.nodeType>,
+                              <C::t|Node.ENTITY_NODE>); 
+        $test->assert_string (actual_value => $dtd-><AG::Node.nodeName>,
+                              expected_value => '0120'); 
     
   @Method:
     @@Name: createNotation
@@ -666,21 +741,27 @@ IFClsXDef:
       @@@enDesc:
         The name of the notation.
     @@Return:
-      @@@Type: x|Entity
+      @@@Type: x|Notation
       @@@dx:raises:
         @@@@@: MDOMX|MDOM_BAD_NAME
         @@@@enDesc:
           The <P::nameArg> is not a legal <CODE::Name>
           according to the XML version of the document.
+
+          If the <A::Document.strictErrorChecking> attribute is
+          set to <DOM::false>, the implementation is not
+          <kwd:REQUIRED> to throw this exception.
       @@@PerlDef:
         my $doc = $self->{<H::mn:node>};
-        my $ver = <Code::t|getDocumentXMLVersion::
-                    $DOCOBJ = $doc>;
-        __CODE{DOMMain:ensureXMLName::
-          $INPUT => $nameArg,
-          $INPUT_PARAM_NAME => 'nameArg',
-          $XMLVERSION => $ver,
-        }__;
+        if (<Code::t|doStrictErrorChecking:: $nodeRef = $self>) {
+          my $ver = <Code::t|getDocumentXMLVersion::
+                      $DOCOBJ = $doc>;
+          __CODE{DOMMain:ensureXMLName::
+            $INPUT => $nameArg,
+            $INPUT_PARAM_NAME => 'nameArg',
+            $XMLVERSION => $ver,
+          }__;
+        }
         my $obj = <ClassM::x|ManakaiDOMNotation.newObject>;
         __CODE{mn|setXRefNode||ManakaiDOM|Perl::
           $referrer => $obj,
@@ -717,6 +798,21 @@ IFClsXDef:
                                       ('0120');
                   },
                   exception_subtype => <Q::MDOMX|MDOM_BAD_NAME>);
+    @@Test:
+      @@@QName:
+        ManakaiDocumentXDoctype.createNotation.badname.2.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{newDocumentForTest}__;
+        $doc-><AS::Document.strictErrorChecking> (false);
+        my $dtd = $doc-><M::DocumentXDoctype.createNotation>
+                          ('0120');
+        
+        $test->assert_isa ($dtd, <IFName::x|Notation>);
+        $test->assert_equals ($dtd-><AG::t|Node.nodeType>,
+                              <C::t|Node.NOTATION_NODE>); 
+        $test->assert_string (actual_value => $dtd-><AG::Node.nodeName>,
+                              expected_value => '0120'); 
 ##DocumentXDoctype
 
 ResourceDef:
