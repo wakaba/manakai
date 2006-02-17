@@ -28,7 +28,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date:
-    $Date: 2006/01/29 13:58:54 $
+    $Date: 2006/02/17 15:06:33 $
 
   @Require:
     @@Module:
@@ -81,6 +81,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
   @MDOMX:
     http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
+  @mn:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/ManakaiNode#
   @rdf:
     http://www.w3.org/1999/02/22-rdf-syntax-ns#
   @rdfs:
@@ -1419,6 +1421,27 @@ IFCls3Def:
         $INPUT = bless $INPUT, <ClassName::DOMLS:ManakaiDOMLSInput>;
       }
 ##LSInput
+
+PropDef:
+  @QName: DOMLS|busy
+  @DOMLS:lsKey: busy
+
+PropDef:
+  @QName: DOMLS|lsKey
+  @enDesc:
+    The name of the property when it is used as an internal property
+    hash key for DOM LS objects.
+  @rdfs:subPropertyOf: mn|stemName
+  @dataType: DISCore|String
+  @multipleProperties: DISCore|Single
+
+ElementTypeBinding:
+  @Name: PropDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: rdf|Property
+    @@For: =ManakaiDOM|all
 
 ErrDef:
   @QName: DOMLS|relative-uri

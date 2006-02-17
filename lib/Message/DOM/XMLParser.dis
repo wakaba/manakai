@@ -10,7 +10,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/02/16 20:03:20 $
+    $Date: 2006/02/17 15:06:33 $
 
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
@@ -187,6 +187,30 @@ ElementTypeBinding:
     @@Value:
       @@@is-null:1
 
+ElementTypeBinding:
+  @Name: TrueCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:InCase
+    @@Value:
+      @@@@: 1
+      @@@ContentType: DISCore|Boolean
+    @@Type: idl|boolean||ManakaiDOM|all
+
+ElementTypeBinding:
+  @Name: FalseCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:InCase
+    @@Value:
+      @@@@: 0
+      @@@ContentType: DISCore|Boolean
+    @@Type: idl|boolean||ManakaiDOM|all
+
 ResourceDef:
   @QName: LSParser
   @AliasFor: DOMLS|LSParser
@@ -219,6 +243,55 @@ ClsDef:
     might be far from the ones obtained when the error would not
     be found.
 
+  @Test:
+    @@QName: Perl.open.utf8.strref.1.test
+    @@enDesc:
+      Does PerlIO works as intended?
+    @@PerlDef:
+      my $s = qq<\x{3001}\x0A\x{10001}>;
+      #open my $a, '<'.':utf8', \$s;
+      require IO::String;
+      my $a = IO::String->new ($s);
+      $test->assert_num_equals
+               (actual_value => ord getc $a,
+                expected_value => 0x3001);
+      $test->assert_num_equals
+               (actual_value => ord getc $a,
+                expected_value => 0x000A);
+      $test->assert_num_equals
+               (actual_value => ord getc $a,
+                expected_value => 0x10001);
+      $a->ungetc (0x10001);
+      $test->assert_num_equals
+               (actual_value => ord getc $a,
+                expected_value => 0x10001);
+      $test->assert_null (getc $a);
+      close $a;
+  @Test:
+    @@QName: Perl.open.8859.strref.2.test
+    @@enDesc:
+      Does PerlIO works as intended?
+    @@PerlDef:
+      my $s = qq<\x{0080}\x0A\x{00A9}>;
+      #open my $a, '<', \$s;
+      require IO::String;
+      my $a = IO::String->new ($s);
+      $test->assert_num_equals
+               (actual_value => ord getc $a,
+                expected_value => 0x0080);
+      $test->assert_num_equals
+               (actual_value => ord getc $a,
+                expected_value => 0x000A);
+      $test->assert_num_equals
+               (actual_value => ord getc $a,
+                expected_value => 0x00A9);
+      $a->ungetc (0x00A9);
+      $test->assert_num_equals
+               (actual_value => ord getc $a,
+                expected_value => 0x00A9);
+      $test->assert_null (getc $a);
+      close $a;
+
   @Attr:
     @@Name: domConfig
     @@enDesc:
@@ -231,9 +304,66 @@ ClsDef:
         __CODE{DOMCore|getConfigObject::
           $target => $self,
           $targetHash => $self,
-          $targetType => {<IFName::LSParser>},
+          $targetType => {<ClassName::xp|ManakaiXMLParser>},
           $result => $r,
         }__;
+
+  @Attr:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@Name: async
+    @@enDesc:
+      Whether the parser is asynchronous or not.
+    @@Type: idl|boolean||ManakaiDOM|all
+    @@Get:
+      @@@FalseCase:
+        @@@@enDesc:
+          The parser does not in asynchronous mode.
+      @@@PerlDef: \
+    @@Test:
+      @@@QName: XMLParser.async.test
+      @@@PerlDef:
+        my $xp;
+        __CODE{createParserForTest:: $xp => $xp}__;
+
+        $test->assert_false ($xp-><AG::DOMLS|LSParser.async>);
+
+  @Attr:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@Name: busy
+    @@enDesc:
+      Whether the parser is currently busy loading a document or not.
+    @@Type: idl|boolean||ManakaiDOM|all
+    @@Get:
+      @@@TrueCase:
+        @@@@enDesc:
+           The parser is currently busy.
+      @@@FalseCase:
+        @@@@enDesc:
+           The parser is not busy.
+      @@@PerlDef:
+        $r = $self->{<H::DOMLS|busy>};
+
+  @enImplNote:
+    @@ddid: abort
+    @@@:
+      {ISSUE::
+        LSParser.abort:
+
+          Is it required to support even in synchronous mode?
+      }
+
+      {TODO::
+          LSParser.filter
+      }
+
+  @ResourceDef:
+    @@QName: createParserForTest
+    @@ForCheck: ManakaiDOM|ForClass
+    @@rdf:type: DISPerl|BlockCode
+    @@PerlDef:
+      require Message::DOM::GenericLS;
+      $xp = <Class::ManakaiXMLParser>
+              ->new (<Class::gls|ManakaiGLSImplementation>->_new, '');
 
   @Method:
     @@ManakaiDOM:isForInternal:1
@@ -263,31 +393,115 @@ ClsDef:
         }, $self;
 
   @Method:
-    @@Name: parseString
-    @@enImplNote:
-      Non-standard - to be removed
+    @@Name: parseURI
+    @@enDesc:
+      Parses an XML document identified by a DOM URI.
 
+      It is equivalent to <M::.parse> method with its <P::input>
+      parameter set to a <IF::LSInput> object whose
+      <A::LSInput.systemId> set to <P::uri>.
     @@Param:
-      @@@Name: sourceText
+      @@@Name: uri
       @@@Type: DOMString
+      @@@enDesc:
+        The DOM URI of the XML document to be read.
     @@Return:
       @@@Type: Document
+      @@@enDesc:
+        The newly created and populated <IF::Document> node.
+      @@@dx:raises:
+        @@@@@: ManakaiDOMLS|MDOMLS_BUSY
+        @@@@enDesc:
+          If <A::LSParser.busy> is <DOM::true>.
+      @@@dx:raises:
+        @@@@@: DOMLS|PARSE_ERR
+        @@@@enDesc:
+          If the <IF::LSParser> was unable to load the document.
       @@@PerlDef:
+        __DEEP{
+          $r = $self-><M::LSParser.parse> ({system_id => $uri});
+        }__;          
+
+  @Method:
+    @@Name: parse
+    @@enDesc:
+      Parses an XML document from a resource identified
+      by a <IF::LSInput>.
+    @@Param:
+      @@@Name: input
+      @@@Type: LSInput
+      @@@enDesc:
+        The <IF::LSInput> from which the source of the document
+        is to be read.
+    @@Return:
+      @@@Type: Document
+      @@@enDesc:
+        The newly created and populated <IF::Document> node.
+      @@@dx:raises:
+        @@@@@: ManakaiDOMLS|MDOMLS_BUSY
+        @@@@enDesc:
+          If the <A::LSParser.busy> is <DOM::true>.
+      @@@dx:raises:
+        @@@@@: DOMLS|PARSE_ERR
+        @@@@enDesc:
+          If the <IF::LSParser> was unable to load the document.
+      @@@PerlDef:
+        if ($self->{<H::DOMLS|busy>}) {
+          __EXCEPTION{ManakaiDOMLS|MDOMLS_BUSY}__;
+        }
+        local $self->{<H::DOMLS|busy>} = true;
+
+        my $in;
+        __DEEP{
+          $self->{parser_cfg} = $self-><AG::LSParser.domConfig>;
+            ## Parser's |domConfig| object.
+          $self->{in_in} = $self->{parser_cfg}
+                                -><M::c|DOMConfiguration.getParameter>
+                                    (<Q::xp|ls-input-to-input-file>);
+          $in = $self->{in_in}-><M::ManakaiDOMLSInputToInputFile.resolveLSInput>
+                                  ($input,
+                                   $self->{parser_cfg}
+                                        -><M::c|DOMConfiguration.getParameter>
+                                            ('error-handler'));
+        }__;
+        unless (defined $in) {
+          __c|ERROR{DOMLS|no-input-specified::
+            MDOMX:param-name => 'input',
+          }__;
+          __CODE{ParseError}__;
+        }
+
+        require IO::Handle;
 
         $self->{char} = [];
         $self->{token} = [];
         $self->{entity} = [{
-          reptxt => \$sourceText,
+          fh => $in-><AG::ManakaiDOMInputFile.filehandle>,
+          base_uri => $in-><AG::ManakaiDOMInputFile.baseURI>,
+          doc_uri => $in-><AG::ManakaiDOMInputFile.documentURI>,
           line => 1,
           column => 1,
           pos => 0,
+          close_file => sub { $in-><M::ManakaiDOMInputFile.close> },
+          reptxt => \'',
+          is_external_entity => true,
         }];
+          ## Entity stack.
         $self->{location} = $self->{entity}->[-1];
+          ## Parsing location object as required by DPG.
+          ## It must always be equal to |{entity}->[-1]|.
         $self->{entity_char} = [];
+          ## Stack for |{char}| stacks analog to |{entity}| stack.
         $self->{entity_token} = [];
+          ## Stack for |{token}| stacks analog to |{entity}| stack.
         $self->{xml_version} = '1.0';
+          ## Document XML version: either |1.0| or |1.1|.
         $self->{standalone} = false;
+          ## True iff |standalone=yes| is explicitly specified.
         $self->{has_xref} = false;
+          ## There is an unread external entity.
+        $self->{dont_process} = false;
+          ## So, don't process |ENTITY| and |ATTLIST| declarations.
         $self->{general_entity} = {
           lt => {is_predefined => true},
           gt => {is_predefined => true},
@@ -295,19 +509,25 @@ ClsDef:
           quot => {is_predefined => true},
           apos => {is_predefined => true},
         };
+          ## Declared general entities.
         $self->{param_entity} = {};
+          ## Declared parameter entities.
         $self->{attr} = {};
           # $self->{attr}->{$element_type_name}->{$attr_name} = $attr_def
-        $self->{dont_process} = false;
-          ## Don't process |ENTITY| and |ATTLIST| declarations.
+          ## Declared attributes.
 
         __DEEP{
           $r = $self->{<H::c|implementation>}-><M::DOMImpl.createDocument>;
           $self->{doc} = $r;
-          $self->{doc_cfg} = $r-><AG::Document.domConfig>;
+            ## |Document| object.
           CORE::delete $self->{docx};
+            ## |DocumentXDoctype| object (if necessary).
+          $self->{doc_cfg} = $r-><AG::Document.domConfig>;
+            ## |Document|'s configuration.
           CORE::delete $self->{dtdef};
+            ## |DocumentTypeDefinition| object (if created).
           CORE::delete $self->{dtdecl};
+            ## |DocumentTypeDeclaration| object (if created).
  
           $r-><AS::Document.strictErrorChecking> (false);
             ## NOTE: Any checks such as |Name| validity done by
@@ -344,6 +564,11 @@ ClsDef:
           ## Document entity -> |Document| node
           $self->_parse_DocumentEntity;
 
+          for (@{$self->{entity}}) {
+            $_->{close_file}->();
+            ## NOTE: There should be only the document entity.
+          }
+
           ## Replacement tree for general |Entity| nodes
           my @ent = values %{$self->{general_entity}};
           for my $ent (@ent) {
@@ -359,6 +584,7 @@ ClsDef:
                 ## TODO: External entity support
                 $self->_parse_InternalGeneralParsedEntity ($ent->{node});
                 $ent->{node}-><AS::x|Entity.hasReplacementTree> (true);
+                $self->{entity}->[-1]->{close_file}->();
               ## ISSUE: Should errors detected by this phase result
               ##        in |DOMLS:PARSE_ERR| exception thrown?
             }
@@ -392,99 +618,127 @@ ClsDef:
         if (@{$self->{char}}) {
           $r = shift @{$self->{char}};
         } else {
-          no warnings 'substr';
-            ## substr outside length warnings at the end of the string
           GETCHAR: {
-            my $char = substr (${$self->{entity}->[-1]->{reptxt}},
-                               $self->{entity}->[-1]->{pos}, 1);
+            no warnings 'closed'; # getc() on closed filehandle warning
+            my $ent = $self->{entity}->[-1];
+            my $char = getc $ent->{fh};
 
             if (defined $char and length $char) {
-              $self->{entity}->[-1]->{pos}++;
+              $ent->{pos}++;
               $r = ord $char;
               if ($r == 0x000A) {
-                $self->{entity}->[-1]->{line}++;
-                $self->{entity}->[-1]->{column} = 1;
+                $ent->{line}++;
+                $ent->{column} = 1;
               } elsif ($r == 0x000D) {
-                my $next_char = substr (${$self->{entity}->[-1]->{reptxt}},
-                                        $self->{entity}->[-1]->{pos}, 1);
+                my $next_char = getc $ent->{fh};
                 if ($next_char eq "\x0A") {
-                  $self->{entity}->[-1]->{pos}++;
-                  $self->{entity}->[-1]->{line}++;
-                  $self->{entity}->[-1]->{column} = 1;
+                  if ($ent->{is_external_entity}) {
+                    $ent->{pos}++;
+                    $ent->{line}++;
+                    $ent->{column} = 1;
+                    $r = 0x000A; # ^ U+000D U+000A -> U+000A ^
+                  } else { # Internal entity
+                    $ent->{column}++;
+                    ## Line number will be increased by next |shiftChar|.
+                    $ent->{fh}->ungetc (0x000A);
+                    #$r = 0x000D; # ^ U+000D U+000A -> U+000D ^ U+000A
+                    # no change
+                  }
                 } elsif ($next_char eq "\x85") {
                   if ($self->{xml_version} eq '1.1') {
-                    if ($self->{entity}->[-1]->{no_xml11_eol}) {
-                      my $location = {
-                        utf32_offset => $self->{entity}->[-1]->{pos} - 1,
-                        line_number => $self->{entity}->[-1]->{line},
-                        column_number => $self->{entity}->[-1]->{column},
-                      };
-                      my $continue = __DOMCore:ERROR{
-                      xp|fatal-xml11-end-of-line-in-xml-declaration::
-                        DOMCore|location => {$location},
-                        xp|character-number => {$r},
-                      }__;
-                      unless ($continue) {
-                        __EXCEPTION{DOMLS|PARSE_ERR}__;
-                      }
-                    } # no_xml11_eol
-                    $self->{entity}->[-1]->{pos}++; 
-                    $self->{entity}->[-1]->{line}++;
-                    $self->{entity}->[-1]->{column} = 1;
-                  } else {
+                    if ($ent->{is_external_entity}) {
+                      if ($ent->{no_xml11_eol}) {
+                        my $location = {
+                          utf32_offset => $ent->{pos} - 1,
+                          line_number => $ent->{line},
+                          column_number => $ent->{column},
+                        };
+                        my $continue = __c|ERROR{
+                        xp|fatal-xml11-end-of-line-in-xml-declaration::
+                          c|location => {$location},
+                          xp|character-number => {$r},
+                        }__;
+                        unless ($continue) {
+                          __CODE{ParseError}__;
+                        }
+                      } # no_xml11_eol
+                      $ent->{pos}++; 
+                      $ent->{line}++;
+                      $ent->{column} = 1;
+                      $r = 0x000A; # ^ U+000D U+0085 -> U+000A ^
+                    } else { # internal entity
+                      $ent->{column}++;
+                      ## Line number will be increased by next |shiftChar|.
+                      $ent->{fh}->ungetc (0x0085);
+                      #$r = 0x000D; # ^ U+000D U+0085 -> U+000D ^ U+0085
+                      # no change
+                    }
+                  } else { # XML 1.0
                     ## |no_xml11_eol| will be tested later.
-                    $self->{entity}->[-1]->{column}++;
-                    ## Line number will be increased by next |shiftChar| call.
+                    $ent->{column}++;
+                    ## Line number will be increased by next |shiftChar|.
+                    $ent->{fh}->ungetc (0x0085);
+                    $r = 0x000A if $ent->{is_external_entity};
+                      # external: ^ U+000D U+0085 -> U+000A ^ U+0085
+                      # internal: ^ U+000D U+0085 -> U+000D ^ U+0085 (as is)
                   }
-                } else {
-                  $self->{entity}->[-1]->{line}++;
-                  $self->{entity}->[-1]->{column} = 1;
+                } else { # neither U+000A nor U+0085
+                  $ent->{line}++;
+                  $ent->{column} = 1;
+                  $ent->{fh}->ungetc (ord $next_char);
+                  $r = 0x000A if $ent->{is_external_entity};
+                    # external: ^ U+000D _ -> U+000A ^ _
+                    # internal: ^ U+000D _ -> U+000D ^ _ (as is)
                 }
-                $r = 0x000A;
+              } elsif ($r == 0x0085 or $r == 0x2028) {
+                if ($ent->{no_xml11_eol}) {
+                  my $location = {
+                    utf32_offset => $ent->{pos} - 1,
+                    line_number => $ent->{line},
+                    column_number => $ent->{column},
+                  };
+                  my $continue = __c|ERROR{
+                  xp|fatal-xml11-end-of-line-in-xml-declaration::
+                    c|location => {$location},
+                    xp|character-number => {$r},
+                  }__;
+                  unless ($continue) {
+                    __CODE{ParseError}__;
+                  }
+                } # no_xml11_eol
+                $r = 0x000A if $self->{xml_version} eq '1.1' and
+                               $ent->{is_external_entity};
+                ## Even in XML 1.0 it increases the line number.
+                $ent->{line}++;
+                $ent->{column} = 1;
               } elsif (
                 not ((0x0020 <= $r and $r <= 0x007E) or
                      (0x00A0 <= $r and $r <= 0xD7FF) or
                      (0xE000 <= $r and $r <= 0xFFFD) or
                      (0x10000 <= $r and $r <= 0x10FFFF)) and
-                $r != 0x0009 and $r != 0x0085 and
-                not ($self->{xml_version} eq '1.0' and
-                     (0x007F <= $r and $r <= 0x009F))
+                $r != 0x0009 and
+                not (($self->{xml_version} eq '1.0' or
+                      not $ent->{is_external_entity}) and
+                     (0x007F <= $r and $r <= 0x009F)) and
+                not ($self->{xml_version} eq '1.1' and
+                     not $ent->{is_external_entity} and
+                     0x0001 <= $r and $r <= 0x001F)
               ) {
                 my $location = {
-                  utf32_offset => $self->{entity}->[-1]->{pos} - 1,
-                  line_number => $self->{entity}->[-1]->{line},
-                  column_number => $self->{entity}->[-1]->{column},
+                  utf32_offset => $ent->{pos} - 1,
+                  line_number => $ent->{line},
+                  column_number => $ent->{column},
                 };
-                my $continue = __DOMCore:ERROR{xp|wf-legal-literal-character::
-                  DOMCore|location => {$location},
+                my $continue = __c|ERROR{xp|wf-legal-literal-character::
+                  c|location => {$location},
                   xp|character-number => {$r},
                 }__;
                 unless ($continue) {
-                  __EXCEPTION{DOMLS|PARSE_ERR}__;
+                  __CODE{ParseError}__;
                 }
-                $self->{entity}->[-1]->{column}++;
-              } elsif ($r == 0x0085 or $r == 0x2028) {
-                if ($self->{entity}->[-1]->{no_xml11_eol}) {
-                  my $location = {
-                    utf32_offset => $self->{entity}->[-1]->{pos} - 1,
-                    line_number => $self->{entity}->[-1]->{line},
-                    column_number => $self->{entity}->[-1]->{column},
-                  };
-                  my $continue = __DOMCore:ERROR{
-                  xp|fatal-xml11-end-of-line-in-xml-declaration::
-                    DOMCore|location => {$location},
-                    xp|character-number => {$r},
-                  }__;
-                  unless ($continue) {
-                    __EXCEPTION{DOMLS|PARSE_ERR}__;
-                  }
-                } # no_xml11_eol
-                $r = 0x000A if $self->{xml_version} eq '1.1';
-                ## Even in XML 1.0 it increases the line number.
-                $self->{entity}->[-1]->{line}++;
-                $self->{entity}->[-1]->{column} = 1;
-              } else {
-                $self->{entity}->[-1]->{column}++;
+                $ent->{column}++;
+              } else { # XML |Char|
+                $ent->{column}++;
               }
             } else {
               $r = -1;
@@ -785,7 +1039,7 @@ ClsDef:
               xp|error-token => {$bad_token},
             }__;
             unless ($continue) {
-              __EXCEPTION{DOMLS|PARSE_ERR}__;
+              __CODE{ParseError}__;
             }
           }
           $self->{doc}-><AS::Document.xmlVersion> ($ver);
@@ -845,7 +1099,7 @@ ClsDef:
               xp|error-token => {$bad_token},
             }__;
             unless ($continue) {
-              __EXCEPTION{DOMLS|PARSE_ERR}__;
+              __CODE{ParseError}__;
             }
           }
           $self->{doc}-><AS::Document.xmlEncoding> ($ver);
@@ -904,7 +1158,7 @@ ClsDef:
               xp|error-token => {$bad_token},
             }__;
             unless ($continue) {
-              __EXCEPTION{DOMLS|PARSE_ERR}__;
+              __CODE{ParseError}__;
             }
           }
           if ($ver eq 'yes') {
@@ -1004,8 +1258,7 @@ ClsDef:
               xp|parent => {$parent},
             }__;
             unless ($continue) {
-              __EXCEPTION{DOMLS|PARSE_ERR::
-              }__;
+              __CODE{ParseError}__;
             }
           }
           __CODE{checkNCName:: $name => $name}__;
@@ -1068,8 +1321,7 @@ ClsDef:
               xp|parent => {$doctype},
             }__;
             unless ($continue) {
-              __EXCEPTION{DOMLS|PARSE_ERR::
-              }__;
+              __CODE{ParseError}__;
             }
           }
           __CODE{checkNCName:: $name => $name}__;
@@ -1254,7 +1506,7 @@ ClsDef:
                       infoset|namespaceName => {$nsuri},
                     }__;
                     unless ($continue) {
-                      __EXCEPTION{DOMLS|PARSE_ERR}__;
+                      __CODE{ParseError}__;
                     }
                   } elsif ($lname eq 'xmlns') {
                     my $location;
@@ -1269,7 +1521,7 @@ ClsDef:
                       infoset|namespaceName => {$nsuri},
                     }__;
                     unless ($continue) {
-                      __EXCEPTION{DOMLS|PARSE_ERR}__;
+                      __CODE{ParseError}__;
                     }
                   }
                   if ($nsuri eq '') {
@@ -1286,7 +1538,7 @@ ClsDef:
                         infoset|prefix => {$lname},
                       }__;
                       unless ($continue) {
-                        __EXCEPTION{DOMLS|PARSE_ERR}__;
+                        __CODE{ParseError}__;
                       }
                     }
                   } elsif ($nsuri eq <Q::xml:> and
@@ -1304,7 +1556,7 @@ ClsDef:
                       infoset|namespaceName => {$nsuri},
                     }__;
                     unless ($continue) {
-                      __EXCEPTION{DOMLS|PARSE_ERR}__;
+                      __CODE{ParseError}__;
                     }
                   } elsif ($nsuri eq <Q::xmlns:>) {
                     my $location;
@@ -1320,7 +1572,7 @@ ClsDef:
                       infoset|namespaceName => {$nsuri},
                     }__;
                     unless ($continue) {
-                      __EXCEPTION{DOMLS|PARSE_ERR}__;
+                      __CODE{ParseError}__;
                     }
                   }
                   $ns->{$lname} = $nsuri;
@@ -1370,7 +1622,7 @@ ClsDef:
                       infoset|namespaceName => {<Q::xml:>},
                     }__;
                     unless ($continue) {
-                      __EXCEPTION{DOMLS|PARSE_ERR}__;
+                      __CODE{ParseError}__;
                     }
                   } elsif ($ns->{''} eq <Q::xmlns:>) {
                     my $location;
@@ -1386,7 +1638,7 @@ ClsDef:
                       infoset|namespaceName => {<Q::xmlns:>},
                     }__;
                     unless ($continue) {
-                      __EXCEPTION{DOMLS|PARSE_ERR}__;
+                      __CODE{ParseError}__;
                     }
                   }
                 } else {
@@ -1413,7 +1665,7 @@ ClsDef:
                   xp|name => {$type},
                 }__;
                 unless ($continue) {
-                  __EXCEPTION{DOMLS|PARSE_ERR}__;
+                  __CODE{ParseError}__;
                 }
               }
             } else {               ## Default namespace
@@ -1473,7 +1725,7 @@ ClsDef:
                     infoset|prefix => {$pfx},
                   }__;
                   unless ($continue) {
-                    __EXCEPTION{DOMLS|PARSE_ERR}__;
+                    __CODE{ParseError}__;
                   }
                 }
                 my $attr = $el-><M::Element.getAttributeNodeNS>
@@ -1496,7 +1748,7 @@ ClsDef:
                       infoset|localName => {$lname},
                     }__;
                     unless ($continue) {
-                      __EXCEPTION{DOMLS|PARSE_ERR}__;
+                      __CODE{ParseError}__;
                     }
                     unless ($attr-><AG::t|Attr.specified>) {
                       ## It is a default attribute
@@ -1594,7 +1846,7 @@ ClsDef:
                 xp|node => {$node},
               }__;
               unless ($continue) {
-                __EXCEPTION{DOMLS|PARSE_ERR}__;
+                __CODE{ParseError}__;
               }
             }
           }
@@ -1618,7 +1870,7 @@ ClsDef:
                   xp|node => {$node},
                 }__;
                 unless ($continue) {
-                  __EXCEPTION{DOMLS|PARSE_ERR}__;
+                  __CODE{ParseError}__;
                 }
                 $node = shift @{$nodes};
               }
@@ -1787,7 +2039,7 @@ ClsDef:
               xp|name => {$atqname},
             }__;
             unless ($continue) {
-              __EXCEPTION{DOMLS|PARSE_ERR}__;
+              __CODE{ParseError}__;
             }
           }
           
@@ -1966,7 +2218,7 @@ ClsDef:
             xp|token => {$token},
           }__;
           unless ($continue) {
-            __EXCEPTION{DOMLS|PARSE_ERR}__;
+            __CODE{ParseError}__;
           }
 
           my $text = $self->{doc}-><M::Document.createTextNode> ('<');
@@ -2034,7 +2286,7 @@ ClsDef:
               xp|parent => {$parent},
             }__;
             unless ($continue) {
-              __EXCEPTION{DOMLS|PARSE_ERR}__;
+              __CODE{ParseError}__;
             }
           }
           my $ncr = $doc-><M::Document.createTextNode> (chr $num);
@@ -2073,7 +2325,7 @@ ClsDef:
               xp|character-number => {$num},
             }__;
             unless ($continue) {
-              __EXCEPTION{DOMLS|PARSE_ERR}__;
+              __CODE{ParseError}__;
             }
           }
           my $ncr = $doc-><M::Document.createTextNode>
@@ -2119,7 +2371,7 @@ ClsDef:
               xp|character-number => {$num},
             }__;
             unless ($continue) {
-              __EXCEPTION{DOMLS|PARSE_ERR}__;
+              __CODE{ParseError}__;
             }
           }
           my $ncr = $self->{doc}-><M::Document.createTextNode>
@@ -2161,7 +2413,7 @@ ClsDef:
               xp|character-number => {$num},
             }__;
             unless ($continue) {
-              __EXCEPTION{DOMLS|PARSE_ERR}__;
+              __CODE{ParseError}__;
             }
           }
           push @{$vals}, chr $num;
@@ -2200,7 +2452,7 @@ ClsDef:
               xp|parent => {$parent},
             }__;
             unless ($continue) {
-              __EXCEPTION{DOMLS|PARSE_ERR}__;
+              __CODE{ParseError}__;
             }
           }
           my $ncr = $doc-><M::Document.createTextNode>
@@ -2240,7 +2492,7 @@ ClsDef:
               xp|character-number => {$num},
             }__;
             unless ($continue) {
-              __EXCEPTION{DOMLS|PARSE_ERR}__;
+              __CODE{ParseError}__;
             }
           }
           my $ncr = $doc-><M::Document.createTextNode>
@@ -2286,7 +2538,7 @@ ClsDef:
               xp|character-number => {$num},
             }__;
             unless ($continue) {
-              __EXCEPTION{DOMLS|PARSE_ERR}__;
+              __CODE{ParseError}__;
             }
           }
           my $ncr = $self->{doc}-><M::Document.createTextNode>
@@ -2327,7 +2579,7 @@ ClsDef:
               xp|character-number => {$num},
             }__;
             unless ($continue) {
-              __EXCEPTION{DOMLS|PARSE_ERR}__;
+              __CODE{ParseError}__;
             }
           }
           push @{$vals}, chr $num;
@@ -2399,7 +2651,7 @@ ClsDef:
                 xp|name => {$name},
               }__;
               unless ($continue) {
-                __EXCEPTION{DOMLS|PARSE_ERR}__;
+                __CODE{ParseError}__;
               }
             }                 # Otherwise VC error
             push @{$self->{entity}}, <Code::getEmptyEntityState::
@@ -2421,7 +2673,7 @@ ClsDef:
                 xp|name => {$name},
               }__;
               unless ($continue) {
-                __EXCEPTION{DOMLS|PARSE_ERR}__;
+                __CODE{ParseError}__;
               }
             }          
             $er-><AS::x|EntityReference.isExpanded>
@@ -2442,8 +2694,7 @@ ClsDef:
                 xp|name => {$name},
               }__;
               unless ($continue) {  
-                __EXCEPTION{DOMLS|PARSE_ERR::
-                }__;
+                __CODE{ParseError}__;
               }
             } # if unparsed entity
             
@@ -2459,10 +2710,10 @@ ClsDef:
                 xp|name => {$name},
               }__;
               unless ($continue) {  
-                __EXCEPTION{DOMLS|PARSE_ERR::
-                }__;
+                __CODE{ParseError}__;
               }
-              $self->{entity}->[-1]->{reptxt} = \'';
+              open my $empty, '<', \'';
+              $self->{entity}->[-1]->{fh} = $empty;
               $er-><AS::x|EntityReference.isExpanded> (false);
             } # recursive
             $ent->{is_opened} = true;
@@ -2483,7 +2734,7 @@ ClsDef:
             if $self->{general_entity}->{$self->{entity}->[-1]->{name}};
           $self->{token} = pop @{$self->{entity_token}};
           $self->{char} = pop @{$self->{entity_char}};
-          pop @{$self->{entity}};
+          pop (@{$self->{entity}})->{close_file}->();
           $self->{location} = $self->{entity}->[-1];
         }
 
@@ -2562,7 +2813,7 @@ ClsDef:
                 xp|name => {$name},
               }__;
               unless ($continue) {
-                __EXCEPTION{DOMLS|PARSE_ERR}__;
+                __CODE{ParseError}__;
               }
             }                 # Otherwise VC error
             push @{$self->{entity}}, <Code::getEmptyEntityState::
@@ -2584,7 +2835,7 @@ ClsDef:
                 xp|name => {$name},
               }__;
               unless ($continue) {
-                __EXCEPTION{DOMLS|PARSE_ERR}__;
+                __CODE{ParseError}__;
               }
             }          
 
@@ -2600,8 +2851,7 @@ ClsDef:
                 xp|name => {$name},
               }__;
               unless ($continue) {  
-                __EXCEPTION{DOMLS|PARSE_ERR::
-                }__;
+                __CODE{ParseError}__;
               }
               ## NOTE: |xp:wf-parsed-entity| is not checked
             } # if external entity
@@ -2624,10 +2874,10 @@ ClsDef:
                 xp|name => {$name},
               }__;
               unless ($continue) {  
-                __EXCEPTION{DOMLS|PARSE_ERR::
-                }__;
+                __CODE{ParseError}__;
               }
-              $self->{entity}->[-1]->{reptxt} = \'';
+              open my $empty, '<', \'';
+              $self->{entity}->[-1]->{fh} = $empty;
               $er-><AS::x|EntityReference.isExpanded> (false);
             } # recursive
             $ent->{is_opened} = true;
@@ -2649,7 +2899,7 @@ ClsDef:
             if $self->{general_entity}->{$self->{entity}->[-1]->{name}};
           $self->{token} = pop @{$self->{entity_token}};
           $self->{char} = pop @{$self->{entity_char}};
-          pop @{$self->{entity}};
+          pop (@{$self->{entity}})->{close_file}->();
           $self->{location} = $self->{entity}->[-1];
         }
 
@@ -2726,7 +2976,7 @@ ClsDef:
                 xp|name => {$name},
               }__;
               unless ($continue) {
-                __EXCEPTION{DOMLS|PARSE_ERR}__;
+                __CODE{ParseError}__;
               }
             }                 # Otherwise VC error
             push @{$self->{entity}}, <Code::getEmptyEntityState::
@@ -2748,7 +2998,7 @@ ClsDef:
                 xp|name => {$name},
               }__;
               unless ($continue) {
-                __EXCEPTION{DOMLS|PARSE_ERR}__;
+                __CODE{ParseError}__;
               }
             }          
 
@@ -2764,8 +3014,7 @@ ClsDef:
                 xp|name => {$name},
               }__;
               unless ($continue) {  
-                __EXCEPTION{DOMLS|PARSE_ERR::
-                }__;
+                __CODE{ParseError}__;
               }
               ## NOTE: |xp:wf-parsed-entity| is not checked
             } # if external entity
@@ -2788,10 +3037,10 @@ ClsDef:
                 xp|name => {$name},
               }__;
               unless ($continue) {  
-                __EXCEPTION{DOMLS|PARSE_ERR::
-                }__;
+                __CODE{ParseError}__;
               }
-              $self->{entity}->[-1]->{reptxt} = \'';
+              open my $empty, '<', \'';
+              $self->{entity}->[-1]->{fh} = $empty;
               $er-><AS::x|EntityReference.isExpanded> (false);
             } # recursive
             $ent->{is_opened} = true;
@@ -2813,7 +3062,7 @@ ClsDef:
             if $self->{general_entity}->{$self->{entity}->[-1]->{name}};
           $self->{token} = pop @{$self->{entity_token}};
           $self->{char} = pop @{$self->{entity_char}};
-          pop @{$self->{entity}};
+          pop (@{$self->{entity}})->{close_file}->();
           $self->{location} = $self->{entity}->[-1];
         }
 
@@ -2993,8 +3242,7 @@ ClsDef:
               c|location => {$location},
             }__;
             unless ($continue) {
-              __EXCEPTION{DOMLS|PARSE_ERR::
-             }__;
+              __CODE{ParseError}__;
             }
           }
 
@@ -3301,8 +3549,7 @@ ClsDef:
               xp|name => {$v},
             }__;
             unless ($continue) {
-              __EXCEPTION{DOMLS|PARSE_ERR::
-              }__;
+              __CODE{ParseError}__;
             }            
           } elsif ($self->{dont_process} and not $self->{standalone}) {
             my $location;
@@ -3317,8 +3564,7 @@ ClsDef:
               xp|name => {$v},
             }__;
             unless ($continue) {
-              __EXCEPTION{DOMLS|PARSE_ERR::
-              }__;
+              __CODE{ParseError}__;
             }            
           } else {
             $et-><M::ETDef.setAttributeDefinitionNode> ($at);
@@ -3528,7 +3774,15 @@ ClsDef:
 
       my $is_param_entity;
       my $decl;
-      lang:Perl { $decl = { name => '#ILLEGAL', reptxt => \'' }; }
+      lang:Perl {
+        $decl = {
+          name => '#ILLEGAL',
+          reptxt => \'',
+          is_external_entity => false,
+          document_uri => $self->{location}->{document_uri},
+          base_uri => $self->{location}->{base_uri},
+        };
+      }
 
       ~? (PERO) {
         ~ (S) { }
@@ -3601,8 +3855,7 @@ ClsDef:
                 c|location => {$location},
               }__;
               unless ($continue) {
-                __EXCEPTION{DOMLS|PARSE_ERR::
-                }__;
+                __CODE{ParseError}__;
               }
             }
           }
@@ -3640,8 +3893,7 @@ ClsDef:
                 xp|name => {$decl->{name}},
               }__;
               unless ($continue) {
-                __EXCEPTION{DOMLS|PARSE_ERR::
-                }__;
+                __CODE{ParseError}__;
               }              
             } elsif (
               not ({gt => true, apos => true, quot => true}->{$decl->{name}} and
@@ -3671,8 +3923,7 @@ ClsDef:
                 xp|replacement-text => {${$decl->{reptxt}}},
               }__;
               unless ($continue) {
-                __EXCEPTION{DOMLS|PARSE_ERR::
-                }__;
+                __CODE{ParseError}__;
               }
             }
             $self->{dtdecl}->{<H::mn:node>}->{{
@@ -3694,8 +3945,7 @@ ClsDef:
               xp|name => {$decl->{name}},
             }__;
             unless ($continue) {
-              __EXCEPTION{DOMLS|PARSE_ERR::
-              }__;
+              __CODE{ParseError}__;
             }
           }
         } elsif ($self->{dont_process} and not $self->{standalone}) {
@@ -3711,8 +3961,7 @@ ClsDef:
             xp|name => {$decl->{name}},
           }__;
           unless ($continue) {
-            __EXCEPTION{DOMLS|PARSE_ERR::
-            }__;
+            __CODE{ParseError}__;
           }            
         } else {
           $self->{$decl->{is_param_entity} ? 'param_entity' : 'general_entity'}
@@ -3796,8 +4045,7 @@ ClsDef:
             xp|name => {$name},
           }__;
           unless ($continue) {
-            __EXCEPTION{DOMLS|PARSE_ERR::
-            }__;
+            __CODE{ParseError}__;
           }
         } else {
           $self->{dtdef}-><M::DTDef.setNotationNode> ($decl);
@@ -3851,8 +4099,7 @@ ClsDef:
               xp|name => {$name},
             }__;
             unless ($continue) {
-              __EXCEPTION{DOMLS|PARSE_ERR::
-              }__;
+              __CODE{ParseError}__;
             }
           }
         }
@@ -3953,8 +4200,7 @@ ClsDef:
               xp|name => {$name},
             }__;
             unless ($continue) {
-              __EXCEPTION{DOMLS|PARSE_ERR::
-              }__;
+              __CODE{ParseError}__;
             }
           }
         }
@@ -4802,11 +5048,22 @@ ClsDef:
           DOMCore|location => {$location},
         }__;
         unless ($continue) {
-          __EXCEPTION{DOMLS|PARSE_ERR::
-          }__;
+          __CODE{ParseError}__;
         }
       }
     } // default
+
+  @ResourceDef:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@QName: ParseError
+    @@rdf:type: DISPerl|BlockCode
+    @@PerlDef:
+      __DEEP{
+        for (@{$self->{entity}}) {
+          $_->{close_file}->();
+        }
+      }__;
+      __EXCEPTION{DOMLS|PARSE_ERR}__;
 
   @ResourceDef:
     @@ForCheck: ManakaiDOM|ForClass
@@ -4829,8 +5086,7 @@ ClsDef:
           infoset|version => {$self->{xml_version}},
         }__;
         unless ($__continue) {
-          __EXCEPTION{DOMLS|PARSE_ERR::
-          }__;
+          __CODE{ParseError}__;
         }
       } elsif (index ($name, ':') > -1) {
         my $__location;
@@ -4845,8 +5101,7 @@ ClsDef:
           infoset|version => {$self->{xml_version}},
         }__;
         unless ($__continue) {
-          __EXCEPTION{DOMLS|PARSE_ERR::
-          }__;
+          __CODE{ParseError}__;
         }            
       }
 
@@ -4871,8 +5126,7 @@ ClsDef:
           infoset|version => {$self->{xml_version}},
         }__;
         unless ($__continue) {
-          __EXCEPTION{DOMLS|PARSE_ERR::
-          }__;
+          __CODE{ParseError}__;
         }
       } elsif (($self->{xml_version} eq '1.0' and
                 not <Code::DOMMain|testXML10QName:: $INPUT = $name>) or
@@ -4890,8 +5144,7 @@ ClsDef:
           infoset|version => {$self->{xml_version}},
         }__;
         unless ($__continue) {
-          __EXCEPTION{DOMLS|PARSE_ERR::
-          }__;
+          __CODE{ParseError}__;
         }            
       }
 
@@ -5060,6 +5313,59 @@ ClsDef:
       @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 33); } /* U+009D */
       @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 34); } /* U+009E */
       @@@c:erred: <[[xp|wf-legal-literal-character]]> { (2, 35); } /* U+009F */
+
+    @@XMLTest:
+      @@@QName: xp.c0.internal.entity.xml11.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.1"?>
+          <!DOCTYPE a [
+          <!ENTITY e "&#x01;&#x02;&#x03;&#x04;&#x05;&#x06;&#x07;$
+          &#x08;&#x09;&#x0A;&#x0B;&#x0C;&#x0D;&#x0E;&#x0F;$
+          &#x10;&#x11;&#x12;&#x13;&#x14;&#x15;&#x16;&#x17;$
+          &#x18;&#x19;&#x1A;&#x1B;&#x1C;&#x1D;&#x1E;&#x1F;">
+          ]><a/>
+      @@@test:domTree:
+        document {
+          document-type {
+            general-entity {
+              node-name: 'e';
+              text-content: U+0001 U+0002 U+0003 U+0004 U+0005
+                            U+0006 U+0007 U+0008 U+0009 U+000A U+000B
+                            U+000C U+000D U+000E U+000F
+                            U+0010 U+0011 U+0012 U+0013 U+0014 U+0015
+                            U+0016 U+0017 U+0018 U+0019 U+001A U+001B
+                            U+001C U+001D U+001E U+001F;
+            }
+          }
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.c1.internal.entity.xml11.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.1"?>
+          <!DOCTYPE a [
+          <!ENTITY e "&#x80;&#x81;&#x82;&#x83;&#x84;&#x85;&#x86;&#x87;$
+          &#x88;&#x89;&#x8A;&#x8B;&#x8C;&#x8D;&#x8E;&#x8F;$
+          &#x90;&#x91;&#x92;&#x93;&#x94;&#x95;&#x96;&#x97;$
+          &#x98;&#x99;&#x9A;&#x9B;&#x9C;&#x9D;&#x9E;&#x9F;&#x7F;">
+          ]><a/>
+      @@@test:domTree:
+        document {
+          document-type {
+            general-entity {
+              node-name: 'e';
+              text-content: U+0080 U+0081 U+0082 U+0083 U+0084 U+0085
+                            U+0086 U+0087 U+0088 U+0089 U+008A U+008B
+                            U+008C U+008D U+008E U+008F
+                            U+0090 U+0091 U+0092 U+0093 U+0094 U+0095
+                            U+0096 U+0097 U+0098 U+0099 U+009A U+009B
+                            U+009C U+009D U+009E U+009F U+007F;
+            }
+          }
+          element { }
+        }
 
     @@XMLTest:
       @@@QName: xp.syntax.empty.test
@@ -7161,6 +7467,56 @@ ClsDef:
           }
           element { }
         }
+    
+    @@XMLTest:
+      @@@QName: xp.xml10.endofline.internal.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0"?>
+          <!DOCTYPE a [
+          <!ENTITY e "&#x000D; &#x000A; &#x0085; &#x000D;&#x000A; $
+          &#x000D;&#x0085; &#x2028;">
+          ]><a>&e;</a>
+      @@@test:domTree:
+        document {
+          xml-version: '1.0';
+          document-type {
+            general-entity {
+              node-name: 'e';
+              text-content: U+000D ' ' U+000A ' ' U+0085 ' '
+                            U+000D U+000A ' ' U+000D U+0085 ' ' U+2028;
+            }
+          }
+          element {
+            text-content: U+000D ' ' U+000A ' ' U+0085 ' '
+                          U+000D U+000A ' ' U+000D U+0085 ' ' U+2028;
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.xml11.endofline.internal.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.1"?>
+          <!DOCTYPE a [
+          <!ENTITY e "&#x000D; &#x000A; &#x0085; &#x000D;&#x000A; $
+          &#x000D;&#x0085; &#x2028;">
+          ]><a>&e;</a>
+      @@@test:domTree:
+        document {
+          xml-version: '1.1';
+          document-type {
+            general-entity {
+              node-name: 'e';
+              text-content: U+000D ' ' U+000A ' ' U+0085 ' '
+                            U+000D U+000A ' ' U+000D U+0085 ' ' U+2028;
+            }
+          }
+          element {
+            text-content: U+000D ' ' U+000A ' ' U+0085 ' '
+                          U+000D U+000A ' ' U+000D U+0085 ' ' U+2028;
+          }
+        }
+
     @@XMLTest:
       @@@QName: xp.noxmldecl.pi.pi.test
       @@@DEnt:
@@ -12249,7 +12605,7 @@ ClsDef:
         @@@@test:value:
           <?xml version="1.1"?>
           <!DOCTYPE a [
-          <!ENTITY e PUBLIC "  p  $u0085$u000Aq" "s">
+          <!ENTITY e PUBLIC "  p  $u000D$u0085q" "s">
           ]><a/>
       @@@test:domTree:
         document {
@@ -14317,9 +14673,12 @@ ClsDef:
           return true; # continue as far as possible
         });
 
+        my $input = {string_data => \$doc_ent->{<Q::test:value>},
+                     system_id => $doc_ent->{<Q::test:uri>},
+                     base_uri => $doc_ent->{<Q::test:baseURI>}};
         if ($test_data->{dom_tree}) { # Successful test
           try {
-            my $doc = $parser->parse_string ($doc_ent->{<H::test:value>});
+            my $doc = $parser->parse ($input);
             $test->assert_dom_tree_equals
                      (actual_value => $doc,
                       expected_hash => $test_data->{dom_tree});
@@ -14343,7 +14702,7 @@ ClsDef:
           };
         } else {
           try {
-            my $doc = $parser->parse_string ($doc_ent->{<H::test:value>});
+            my $doc = $parser->parse ($input);
           } catch Message::Util::IF::DTException with {
             #
           } catch Message::DOM::IF::LSException with {
@@ -14371,7 +14730,12 @@ ClsDef:
     @@ForCheck: ManakaiDOM|ForClass
     @@PerlDef:
       {reptxt => \'', line => 1, column => 1, pos => 0,
-       is_externally_declared => true, name => $name}
+       is_externally_declared => true, name => $name,
+       fh => do { 
+               open my $empty, '<', \'';
+               $empty;
+             },
+       close_file => sub { }}
 
   @ResourceDef:
     @@QName: getCopyOfEntityState
@@ -14379,8 +14743,23 @@ ClsDef:
     @@ForCheck: ManakaiDOM|ForClass
     @@PerlDef:
       {%{$self->{$entity_type}->{$entity_name}},
-       line => 1, column => 1, pos => 0}
+       line => 1, column => 1, pos => 0,
+       fh => do {
+               require IO::String;
+               IO::String->new
+                            (${$self->{$entity_type}->{$entity_name}->{reptxt}});
+               ## TODO: External entities.
+             },
+       close_file => sub { }}
 ##ManakaiXMLParser
+
+ElementTypeBinding:
+  @Name: Test
+  @ElementType: 
+    dis:ResourceDef
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@rdf:type: test|StandaloneTest
 
 ElementTypeBinding:
   @Name: XMLTests
@@ -15183,6 +15562,16 @@ ResourceDef:
   @AliasFor: DOMCore|DOMImplementation
   @For: ManakaiDOM|DOM
 
+ResourceDef:
+  @QName: LSInput
+  @AliasFor: DOMLS|LSInput
+  @For: ManakaiDOM|DOM
+
+ResourceDef:
+  @QName: LSParser
+  @AliasFor: DOMLS|LSParser
+  @For: ManakaiDOM|DOM
+
 ElementTypeBinding:
   @Name: Attr
   @ElementType:
@@ -15236,6 +15625,13 @@ ElementTypeBinding:
 
 ElementTypeBinding:
   @Name: PerlDef
+  @ElementType:
+    dis:Def
+  @ShadowContent:
+    @@ContentType: lang|Perl
+
+ElementTypeBinding:
+  @Name: PerlDefC
   @ElementType:
     dis:Def
   @ShadowContent:
@@ -15325,8 +15721,8 @@ ClsDef:
         @@@@PerlDef:
           my $pos = $o-><AG::DOMCore|DOMError.location>
                       -><AG::DOMCore|DOMLocator.utf32Offset>;
-          if ($pos > -1) {
-            my $src = $o->{<H::ecore|object>}->{entity}->[-1]->{reptxt};
+          my $src = $o->{<H::ecore|object>}->{entity}->[-1]->{reptxt};
+          if (defined $src and $pos > -1) {
             my $start = $pos;
             $start = rindex ($$src, "\x0A", $start - 1) for 0..2;
             $start++;
@@ -15364,3 +15760,373 @@ ClsDef:
         @@@@PerlDef:
           $p->{-result} = sprintf 'U+%04X', $o->{$p->{v}};
 ##XMLParserExceptionFormatter
+
+ElementTypeBinding:
+  @Name: CParam
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@: c|DOMConfigurationParameter
+      @@@For: ManakaiDOM|DOM
+    @@rdf:type:
+      @@@@: DISCore|Property
+      @@@For: =ManakaiDOM|all
+    @@For: ManakaiDOM|DOM3
+    @@For: =ManakaiDOM|all
+
+ElementTypeBinding:
+  @Name: CParamApp
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@: c|DOMConfigurationParameterApplication
+      @@@For: ManakaiDOM|DOM
+    @@For: ManakaiDOM|DOM3
+
+CParamApp:
+  @QName: error-handler
+  @c:domConfigurationParameter: c|error-handler
+  @c:targetType: xp|ManakaiXMLParser
+
+CParam:
+  @QName: xp|ls-input-to-input-file
+  @DOMLS:lsKey:
+    @@@: i2i
+    @@For: =ManakaiDOM|all
+  @Type: ManakaiDOMLSInputToInputFile
+  @c:targetType: xp|ManakaiXMLParser
+  @IsSupportRequired: 1
+  @c:isSupported: 1
+  @enDesc:
+    An <IF::LSInput> to Perl filehandle converter.
+
+  @Method:
+    @@rdf:type: c|DOMConfigurationParameterDefaultGetter
+    @@Param:
+      @@@Name: name
+      @@@Type: DOMString
+      @@@dis:actualType: c|DOMConfigurationParameterName
+      @@@enDesc: The parameter name.
+    @@Return:
+      @@@Type: ManakaiDOMLSInputToInputFile
+      @@@enDesc:
+        The default resolver.
+      @@@PerlDefC:
+        $r = sub {
+          my ($self, $input, $errorHandler) = @_;
+          ## As defined in DOM Level 3 LS |LSInput| interface
+
+          my $r = {};
+
+          __DEEP{
+
+            FH: {
+              ## 1. |characterStream|
+              my $v = $input-><AG::LSInput.characterStream>;
+              if (defined $v) {
+                $r->{filehandle} = $v;
+                last FH;
+              }
+
+              ## 2. |byteStream|
+              $v = $input-><AG::LSInput.byteStream>;
+              if (defined $v) {
+                ## TODO: Support byte filehandle
+                  ## |encoding|
+                  ## TODO: How to guess?
+                return null;
+              }
+
+              ## 3. |stringData|
+              $v = $input-><AG::LSInput.stringData>;
+              if (defined $v) {
+                require IO::String;
+                $r->{filehandle} = IO::String->new ($v);
+                last FH;
+              }
+
+              ## 4. |systemId|
+                ## TODO:
+                  ## resolve relative URI
+                  ## open
+                  ## set document_uri
+              
+              ## 5. |publicId|
+              ##   The default resolver does not support only-|publicId| input.
+
+              return null;
+            } # FH
+
+            DURI: {
+              last DURI if defined $r->{document_uri};
+              
+              my $v = $input-><AG::LSInput.systemId>;
+              if (defined $v) {
+                $r->{document_uri} = $v;
+                last DURI;
+              }
+
+              ## TODO: pubid -> pubid URN -> document_uri
+            } # DURI
+
+            BURI: {
+              last BURI if defined $r->{base_uri};
+
+              my $v = $input-><AG::LSInput.baseURI>;
+              if (defined $v) {
+                $r->{base_uri} = $v;
+                last BURI;
+              }
+
+              if (defined $r->{document_uri}) {
+                $r->{base_uri} = $r->{document_uri};
+              }
+            } # BURI
+
+          }__;
+
+          ## ISSUE: Is |certifiedText| required by parsers?
+
+          return $r;
+        };
+  @Method:
+    @@rdf:type: c|DOMConfigurationParameterSetter
+    @@Param:
+      @@@Name: name
+      @@@Type: DOMString
+      @@@dis:actualType: c|DOMConfigurationParameterName
+      @@@enDesc: The parameter name.
+    @@Param:
+      @@@Name: value
+      @@@Type: DOMMain|DOMUserData
+      @@@dis:actualType: ManakaiDOMLSInputToInputFile
+      @@@enDesc: The new value.
+    @@Return:
+      @@@Type: idl|void||ManakaiDOM|all
+      @@@PerlDefC:
+        $self->[1]->{<H::xp|ls-input-to-input-file>} = $value;
+    @@enImplNote:
+      Implied input processor converts non-blessed code references
+      into a <Class::ManakaiDOMLSInputToInputFile> object.
+  @Method:
+    @@rdf:type: c|DOMConfigurationParameterChecker
+    @@Param:
+      @@@Name: name
+      @@@Type: DOMString
+      @@@dis:actualType: c|DOMConfigurationParameterName
+      @@@enDesc: The parameter name.
+    @@Param:
+      @@@Name: value
+      @@@Type: DOMMain|DOMUserData
+      #@@@dis:actualType: ManakaiDOMLSInputToInputFile
+      @@@enDesc: The new value.
+    @@Return:
+      @@@Type: idl|boolean||ManakaiDOM|all
+      @@@PerlDefC:
+        $r = UNIVERSAL::isa ($value, 'CODE') or
+             UNIVERSAL::isa ($value, <ClassName::ManakaiDOMLSInputToInputFile>);
+
+    @@Test:
+      @@@QName: cp.ls-input-to-input-file.test
+      @@@PerlDefC:
+        my $xp;
+        __CODE{createParserForTest:: $xp => $xp}__;
+        my $cfg = $xp-><AG::LSInput.domConfig>;
+
+        my $cp = <Q::xp|ls-input-to-input-file>;
+        
+        $test->id ('default');
+        my $default = $cfg-><M::c|DOMConfiguration.getParameter> ($cp);
+        $test->assert_isa ($default,
+                           <ClassName::ManakaiDOMLSInputToInputFile>);
+
+        $test->id ('set');
+        my $sub1 = sub { };
+        $cfg-><M::c|DOMConfiguration.setParameter> ($cp => $sub1);
+        my $sub2 = $cfg-><M::c|DOMConfiguration.getParameter> ($cp);
+        $test->assert_isa ($sub2, <ClassName::ManakaiDOMLSInputToInputFile>);
+        $test->assert_equals ($sub2, $sub1);
+
+        $test->id ('reset');
+        $cfg-><M::c|DOMConfiguration.setParameter> ($cp => null);
+        my $sub3 = $cfg-><M::c|DOMConfiguration.getParameter> ($cp);
+        $test->assert_isa ($sub3, <ClassName::ManakaiDOMLSInputToInputFile>);
+        $test->assert_equals ($sub3, $default);
+##ls-input-to-input-file
+
+ClsDef:
+  @ClsQName: ManakaiDOMLSInputToInputFile
+  @enDesc:
+    An <Class::ManakaiDOMLSInputToInputFile> object is used to covert 
+    a <IF::LSInput> object into a Perl filehandle.
+
+    {ISSUE::
+      In which module this class should be placed?
+
+      Better interface name?
+    }
+
+  @enDesc:
+    @@ddid: perl
+    @@ForCheck: ManakaiDOM|ManakaiDOM
+    @@@:
+      For Perl binding, any parameter that accepts
+      a <Class::ManakaiDOMLSInputToInputFile> would also accept a Perl code
+      reference (subroutine reference).  The code reference
+      will be blessed as a <Class::ManakaiDOMLSInputToInputFile> whose
+      <M::ManakaiDOMLSInputToInputFile.resolveLSInput> method invokes the code.
+
+  @ResourceDef:
+    @@rdf:type: DISLang|InputProcessor
+    @@rdf:type: DISLang|OutputProcessor
+    @@PerlDef:
+      $INPUT = bless $INPUT, <ClassName::ManakaiDOMLSInputToInputFile>
+        if ref $INPUT eq 'CODE';
+
+  @Method:
+    @@Name: resolveLSInput
+    @@enDesc:
+      Converts a <IF::LSInput> into a Perl filehandle.
+    @@Param:
+      @@@Name: input
+      @@@Type: LSInput
+      @@@enDesc:
+        The input.
+    @@Param:
+      @@@Name: errorHandler
+      @@@Type: c|DOMErrorHandler
+      @@@enDesc:
+        An error handler.  If the method encounters an error
+        or warning, it <kwd:MAY> notify it to application
+        via this handler.
+    @@Return:
+      @@@Type: ManakaiDOMInputFile
+      @@@enDesc:
+        A <Class::ManakaiDOMInputFile> object created from <P::input>.
+      @@@nullCase:
+        @@@@enDesc:
+          If the method was unable to resolve the <P::input>.
+
+          {ISSUE::
+            Should we allow the method to throw exceptions?
+          }
+      @@@PerlDef:
+        __DEEP{
+          $r = $self->($self, $input, $errorHandler);
+        }__;
+      @@@enImplNote:
+        Notet that the input / output processor for <CODE::$input>
+        and return value might or might not be inserted in
+        the <Perl::$self> code.
+##LSInputToInputFile
+
+ClsDef:
+  @ClsQName: ManakaiDOMInputFile
+  @enDesc:
+    A set of information on the input, including filehandle.
+
+  @enDesc:
+    @@ddid: perl
+    @@ForCheck: ManakaiDOM|ManakaiDOM
+    @@@:
+      For Perl binding, any parameter that accepts
+      a <Class::ManakaiDOMInputFile> would also accept a Perl hash reference.
+      If a hash reference is given to parameter that expects 
+      a <Class::ManakaiDOMInputFile> object, then it 
+      bless the hash with the class.
+
+      Each attributes defined
+      in the class is associated to the hash value with the
+      key equals to the attribut name.  Each method defined in
+      the class will invoke the code reference retrieved 
+      from the hash by the key equals to the method name.
+
+      If there is no value in the hash for an attribute,
+      then its value is <DOM::null>.
+
+  @ResourceDef:
+    @@rdf:type: DISLang|InputProcessor
+    @@rdf:type: DISLang|OutputProcessor
+    @@PerlDef:
+      $INPUT = bless $INPUT, <ClassName::ManakaiDOMInputFile>
+        if ref $INPUT eq 'HASH';
+
+  @Attr:
+    @@Name: filehandle
+    @@Type: DISPerl|filehandle||ManakaiDOM|all
+    @@enDesc:
+      The input filehandle.
+
+      It <kwd:MUST> be an <Perl::open>ed (and not <Perl::close>d)
+      filehandle.  Note that
+      it does not have to be associated with an actual file
+      in the local file system.
+
+      It <kwd:MUST> return a character (rather than byte) 
+      by <Perl::getc>.
+    @@Get:
+      @@@PerlDef: $r = $self->{filehandle};
+    @@Set:
+      @@@PerlDef: $self->{filehandle} = $given;
+
+  @Attr:
+    @@Name: baseURI
+    @@enDesc:
+      The base URI of the input.
+
+      It <kwd:MUST> be an absolute DOM URI or <DOM::null>.
+      Otherwise, the result is undefined.
+    @@Type: DOMString
+    @@nullCase:
+      @@@enDesc:
+        If the base URI is not available.
+    @@Get:
+      @@@PerlDef: $r = $self->{base_uri};
+    @@Set:
+      @@@PerlDef: $self->{base_uri} = $given;
+
+  @Attr:
+    @@Name: documentURI
+    @@enDesc:
+      The URI of the document.
+
+      It <kwd:MUST> be an absolute DOM URI or <DOM::null>.
+      Otherwise, the result is undefined.
+    @@Type: DOMString
+    @@nullCase:
+      @@@enDesc:
+        If the document URI is not available.
+    @@Get:
+      @@@PerlDef: $r = $self->{document_uri};
+    @@Set:
+      @@@PerlDef: $self->{document_uri} = $given;
+
+  @Method:
+    @@Name: close
+    @@enDesc:
+      Closes the file.
+
+      Since when the Perl's destructor is invoked is unreliable,
+      this method is explicitly called when the file is no longer
+      in use.
+
+      If the <Class::ManakaiDOMInputFile> is given as a hash
+      reference and whose value for <CODE::close> is not defined,
+      then the statement <Perl::close $filehandle> is done
+      (where <Perl::$filehandle> is the <A::ManakaiDOMInputFile.filehandle>
+      value).
+    @@Return:
+      @@@PerlDef:
+        __DEEP{
+          if ($self->{close}) {
+            $self->{close}->($self);
+          } else {
+            close $self->{filehandle};
+          }
+        }__;
+##ManakaiDOMInputFile
+
+
+

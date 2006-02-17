@@ -3325,9 +3325,9 @@ if (defined $object->{
 'cp'
 } and
     (not defined $interface or
-     $object->{
+     ${$object->{
 'cp'
-}->isa ($interface))) {
+}}->isa ($interface))) {
   $class = ${$object->{
 'cp'
 }};

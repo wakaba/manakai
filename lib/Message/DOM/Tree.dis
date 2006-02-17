@@ -12,7 +12,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/02/16 20:03:19 $
+    $Date: 2006/02/17 15:06:33 $
 
   @Require:
     @@Module:
@@ -4084,7 +4084,7 @@ IFCls1Def:
         UNKNOWN: {
           if (defined $object->{<H::DOMCore:nodeRefClass>} and
               (not defined $interface or
-               $object->{<H::c|nodeRefClass>}->isa ($interface))) {
+               ${$object->{<H::c|nodeRefClass>}}->isa ($interface))) {
             $class = ${$object->{<H::DOMCore:nodeRefClass>}};
             last UNKNOWN;
           }
