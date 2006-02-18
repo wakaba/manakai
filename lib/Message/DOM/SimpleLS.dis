@@ -14,7 +14,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/01/29 13:58:54 $
+    $Date: 2006/02/18 07:39:04 $
 
   @Require:
     @@Module:
@@ -226,34 +226,6 @@ ElementTypeBinding:
     dis:FullName
   @ShadowContent:
     @@lang:en
-
-## -- Parsers
-
-FeatureDef:
-  @QName: DOMLS|ParseString
-  @FeatureVerDef:
-    @@QName: DOMLS|ParseString10
-    @@f:requires: DOMXML|XMLVersionFeature10
-    @@f:version: 1.0
-    @@f:instanceOf: DOMLS|ParseString
-    @@enDesc:
-      A parser class that support the <Feature::DOMLS|ParserString>
-      feature version <FeatureVer::1.0> <kwd:MUST> provide a method
-      whose name is <DOM::parse>.  The method has at least one 
-      parameter whose type is <IF::DOMLS|LSInput||ManakaiDOM|ManakaiDOMLatest>
-      or its subset that at least has <A::DOMLS|LSInput||
-      ManakaiDOM|ManakaiDOM3.stringData> and <A::DOMLS|LSInput||
-      ManakaiDOM|ManakaiDOM3.baseURI> attributes.  The method
-      <kwd:MUST> be able to parse an XML document entity
-      in the <A::DOMLS|LSInput||ManakaiDOM|ManakaiDOM3.stringData>
-      attribute.  Although the parser does not have to
-      support full XML 1.0 entities, it <kwd:MUST> support a
-      reasonal subset of it.  Applications can request how much level
-      the parser supports the parsing of XML by specifying other features
-      when they obtains a parser. The method passes the parsed
-      document as a <IF::DOMCore|Document||ManakaiDOM|ManakaiDOM>
-      object by the way as the <M::DOMLS|LSParser
-      ||ManakaiDOM|ManakaiDOM3.parse> method would do.
 
 ## -- Serializers
 

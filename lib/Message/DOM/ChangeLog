@@ -1,3 +1,17 @@
+2006-02-18  Wakaba  <wakaba@suika.fam.cx>
+
+	* XMLParser.dis (ManakaiDOMXMLParser): Implements |DOMLS:ParseString10|
+	feature.
+
+	* DOMCore.dis (c:LSPARSER_NOT_FOUND_ERR): New exception type.
+
+	* DOMLS.dis (DOMLS:ParseString): New (moved from |SimpleLS.dis|).
+	(DOMImplementationLS.createLSParser): Implemented.
+	(DOMImplementationLS.createLSInput): Revised.
+	(LSInput): Note on relationship with |GenericLS| is added.
+
+	* SimpleLS.dis (DOMLS:ParseString): Removed (moved to |SimpleLS.dis|).
+
 2006-02-17  Wakaba  <wakaba@suika.fam.cx>
 
 	* XMLParser.dis (domConfig): New |targetType| of |xp:ManakaiDOMXMLParser|

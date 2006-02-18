@@ -40,7 +40,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/02/16 20:03:19 $
+      $Date: 2006/02/18 07:39:03 $
     @@ContentType:
       dis:Date.RCS
 
@@ -1260,6 +1260,23 @@ ResourceDef:
            Parameter "%p (name => {<Q::DOMCore:domConfigurationParameterName>}
            );": Value "%p (name => {<Q::DOMCore:domConfigurationParameterValue>}
            );" is not supported
+      @@@SubTypeDef:
+        @@@@For: ManakaiDOM|DOM3
+        @@@@QName: c|LSPARSER_NOT_FOUND_ERR
+        @@@@enDesc:
+          If the requested mode or schema type for the <IF::LSParser>
+          is not supported.
+        @@@@enMufDef:
+          XML parser with mode |%p (name => {<Q::c|parserMode>});|,
+          schema type |%p (name => {<Q::c|schemaType>});| not found
+        @@@@ecore:hasParameter:
+          @@@@@@: c|parserMode
+          @@@@@enDesc:
+            The requested parser mode.
+        @@@@ecore:hasParameter:
+          @@@@@@: c|schemaType
+          @@@@@enDesc:
+            The requested schema language.
 
      @@XConst:
       @@@QName: c|INUSE_ATTRIBUTE_ERR
@@ -1660,6 +1677,12 @@ XParamDef:
   @enDesc:
     The node with which an error occurred.
   @Type: DOMCore|Node||ManakaiDOM|ManakaiDOM
+
+XParamDef:
+  @QName: c|parserMode
+
+XParamDef:
+  @QName: c|schemaType
 
 PropDef:
   @QName: features

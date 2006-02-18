@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/01/29 13:58:57 $
+      $Date: 2006/02/18 07:39:07 $
     @@ContentType:
       dis:Date.RCS
   
@@ -1964,6 +1964,8 @@ IFClsDef:
                 $r-><M::DIS|PLBlockCon.appendStatement>
                       ('$Message::DOM::ClassFeature{q<' . $pack_name .
                        '>} = ' . <ClassM::PLImplClass.perlLiteral> (\%ifeature));
+
+                ## TODO: Features from implementing interfaces.
 
                 ## Score calculated from provided features
                 $r-><M::DIS|PLBlockCon.appendStatement>

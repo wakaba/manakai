@@ -10,7 +10,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/02/17 15:06:33 $
+    $Date: 2006/02/18 07:39:04 $
 
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
@@ -221,9 +221,15 @@ ClsDef:
   
   @Implement: DOMLS|LSParser
 
-  @f:implements:
-    @@@: DOMLS|LSFeature30
-    @@For: ManakaiDOM|DOM3
+  @f:implements: DOMLS|LSFeature30
+  @f:implements: DOMLS|ParseString10
+  @enImplNote:
+    @@ddid: dtdfeature
+    @@@:
+      {TODO::
+        Once DTD validation is implemented, add <Q::f:implements>
+        for XML-DTD-feature.
+      }
 
   @DISLang:role: gls|ParserRole
 
@@ -242,6 +248,80 @@ ClsDef:
     is serious so that the result document tree and any errors
     might be far from the ones obtained when the error would not
     be found.
+
+  @Test:
+    @@QName: GLSImpl.createGLSParser.LS.test
+    @@enDesc:
+      Since there is at least one implementation of the feature (i.e.
+      this class), the <M::gls|GLSImplementation.createGLSParser>
+      must not throw an exception.
+    @@PerlDef:
+      my $impl;
+      __CODE{DOMLS|createImplForTest:: $impl => $impl}__;
+      
+      my $p = $impl-><M::gls|GLSImplementation.createGLSParser>
+                       ({LS => '3.0'});
+
+      $test->assert_isa ($p, <IFName::LSParser>);
+  @Test:
+    @@QName: GLSImpl.createGLSParser.ParseXMLString.test
+    @@enDesc:
+      Since there is at least one implementation of the feature (i.e.
+      this class), the <M::gls|GLSImplementation.createGLSParser>
+      must not throw an exception.
+    @@PerlDef:
+      my $impl;
+      __CODE{DOMLS|createImplForTest:: $impl => $impl}__;
+      
+      my $p = $impl-><M::gls|GLSImplementation.createGLSParser>
+                       ({<Q::fe|ParseXMLString> => '1.0'});
+
+      $test->assert_not_null ($p);
+  @Test:
+    @@QName: GLSImpl.createGLSParser.LS.ParseXMLString.test
+    @@enDesc:
+      Since there is at least one implementation of the feature (i.e.
+      this class), the <M::gls|GLSImplementation.createGLSParser>
+      must not throw an exception.
+    @@PerlDef:
+      my $impl;
+      __CODE{DOMLS|createImplForTest:: $impl => $impl}__;
+      
+      my $p = $impl-><M::gls|GLSImplementation.createGLSParser>
+                       ({LS => '3.0', <Q::fe|ParseXMLString> => '1.0'});
+
+      $test->assert_isa ($p, <IFName::LSParser>);
+
+  @Test:
+    @@QName: DOMImplLS.createLSParser.1.test
+    @@enDesc:
+      Since there is at least one implementation of the feature (i.e.
+      this class), the <M::gls|GLSImplementation.createGLSParser>
+      must not throw an exception.
+    @@PerlDef:
+      my $impl;
+      __CODE{DOMLS|createImplForTest:: $impl => $impl}__;
+      
+      my $p = $impl-><M::DOMLS|DOMImplementationLS.createLSParser>
+                       (<C::DOMLS|DOMImplementationLS.MODE_SYNCHRONOUS>);
+      $test->assert_isa ($p, <IFName::LSParser>);
+  @enImplNote:
+    @@ddid: lsparsertext
+    @@@:
+      Future version should add test:
+    @@QName: DOMImplLS.createLSParser.2.test
+    @@enDesc:
+      Since there is at least one implementation of the feature (i.e.
+      this class), the <M::gls|GLSImplementation.createGLSParser>
+      must not throw an exception.
+    @@PerlDef:
+      my $impl;
+      __CODE{DOMLS|createImplForTest:: $impl => $impl}__;
+      
+      my $p = $impl-><M::DOMLS|DOMImplementationLS.createLSParser>
+                       (<C::DOMLS|DOMImplementationLS.MODE_SYNCHRONOUS>,
+                        <Q::xml-dtd:>);
+      $test->assert_isa ($p, <IFName::LSParser>);
 
   @Test:
     @@QName: Perl.open.utf8.strref.1.test

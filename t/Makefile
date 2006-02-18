@@ -68,7 +68,8 @@ NS_DIS  = http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS\#
 GENERATED_FILES = \
   util-mntest.t \
   dom-feature.t dom-genericls.t \
-  dom-core.t dom-tree.t dom-xml.t dom-xdoctype.t dom-xmlparser.t \
+  dom-core.t dom-tree.t dom-xml.t dom-xdoctype.t \
+  dom-ls.t dom-xmlparser.t \
   dom-mdomls2003.t \
   util-dis-dnlite.t \
   util-perlcode.t
@@ -90,7 +91,7 @@ test-module-all: test-module-dom test-module-util
 test-module-dom: \
   dom-feature.t dom-genericls.t \
   dom-core.t dom-tree.t dom-xml.t dom-xdoctype.t \
-  dom-mdomls2003.t dom-xmlparser.t
+  dom-ls.t dom-mdomls2003.t dom-xmlparser.t
 	$(PERL_TEST_) dom-*.t
 
 dom-feature.t: $(DOM_FEATURE_DAC) $(DAC2TEST_PL)
@@ -122,6 +123,9 @@ dom-xdoctype.t: $(DOM_CORE_DAC) $(DAC2TEST_PL) Makefile
 	#$(ECHO) "manakai::mndebug::define_nodestem_destroy_all ();" >> $@
 	#$(ECHO) "manakai::mndebug::define_noderef_destroy_all ();" >> $@
 	$(DAC2TEST) $< --source-module="$(NS_MDOM)XDoctype" >> $@
+
+dom-ls.t: $(DOM_LS_DAC) $(DAC2TEST_PL)
+	$(DAC2TEST) $< --source-module="$(NS_MDOM)DOMLS" > $@
 
 dom-mdomls2003.t: $(DOM_LS_DAC) $(DAC2TEST_PL)
 	$(DAC2TEST) $< --source-module="$(NS_MDOM)ManakaiDOMLS2003" > $@

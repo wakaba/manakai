@@ -28,7 +28,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date:
-    $Date: 2006/02/17 15:06:33 $
+    $Date: 2006/02/18 07:39:04 $
 
   @Require:
     @@Module:
@@ -63,6 +63,12 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/Core/
   @f:
     http://suika.fam.cx/~wakaba/archive/2004/dom/feature#
+  @fe:
+    http://suika.fam.cx/www/2006/feature/
+  @feschema:
+    http://suika.fam.cx/www/2006/schema/
+  @gls:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/gls#
   @idl:
     http://suika.fam.cx/~wakaba/archive/2004/dis/IDL#
   @infoset:
@@ -87,6 +93,8 @@ Namespace:
     http://www.w3.org/1999/02/22-rdf-syntax-ns#
   @rdfs:
     http://www.w3.org/2000/01/rdf-schema#
+  @test:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Test#
   @xml:
     http://www.w3.org/XML/1998/namespace
   @xmlns:
@@ -149,6 +157,36 @@ FeatureDef:
       @@@@:
         DOM Load and Save Module Fundamental Interfaces, Level 3 
         (asynchronous mode)
+
+## -- Parsers
+
+FeatureDef:
+  @QName: DOMLS|ParseString
+  @featureQName: fe|ParseXMLString
+  @featureQName: DOMLS|ParseString
+  @FeatureVerDef:
+    @@QName: DOMLS|ParseString10
+    @@f:requires: DOMXML|XMLVersionFeature10
+    @@f:version: 1.0
+    @@f:instanceOf: DOMLS|ParseString
+    @@enDesc:
+      A parser class that support the <Feature::DOMLS|ParserString>
+      feature version <FeatureVer::1.0> <kwd:MUST> provide a method
+      whose name is <DOM::parse>.  The method has at least one 
+      parameter whose type is <IF::DOMLS|LSInput||ManakaiDOM|ManakaiDOMLatest>
+      or its subset that at least has <A::DOMLS|LSInput||
+      ManakaiDOM|ManakaiDOM3.stringData> and <A::DOMLS|LSInput||
+      ManakaiDOM|ManakaiDOM3.baseURI> attributes.  The method
+      <kwd:MUST> be able to parse an XML document entity
+      in the <A::DOMLS|LSInput||ManakaiDOM|ManakaiDOM3.stringData>
+      attribute.  Although the parser does not have to
+      support full XML 1.0 entities, it <kwd:MUST> support a
+      reasonal subset of it.  Applications can request how much level
+      the parser supports the parsing of XML by specifying other features
+      when they obtains a parser. The method passes the parsed
+      document as a <IF::DOMCore|Document||ManakaiDOM|ManakaiDOM>
+      object by the way as the <M::DOMLS|LSParser
+      ||ManakaiDOM|ManakaiDOM3.parse> method would do.
 
 ## -- Basic Types
 
@@ -703,12 +741,9 @@ IFCls3Def:
   @ClsQName: ManakaiDOMImplementationLS
 
   @ClsISA: DOMCore|ManakaiDOMImplementation
+  @ClsISA: gls|ManakaiGLSImplementation
 
   @f:provides: LSFeature30
-
-  @f:implements:
-    @@@@: LSAsyncFeature30
-    @@@For: ManakaiDOM|DOM3
 
   @enDesc:
     The <IF::DOMImplementationLS> interface contains factory methods
@@ -748,68 +783,110 @@ IFCls3Def:
           @@@@lang:en
           @@@@@: 
             Create an asynchronous <IF::LSParser>.
+
   @Method:
-     @@Name:  createLSParser
-     @@Description:
-       @@@lang:en
-       @@@@:
-         Create a new parser object.
-     @@Param:
-        @@@Name:  mode
-        @@@Type: 
-          DOMMain:unsigned-short||ManakaiDOM|all
-        @@@actualType: DOMImplementationLSMode
-        @@@InCase:
-          @@@@Label:
+    @@Name: createLSParser
+    @@enDesc:
+      Creates a new <IF::LSParser>.
+    @@Param:
+      @@@Name: mode
+      @@@Type: idl|unsignedShort||ManakaiDOM|all
+      @@@dis:actualType: DOMImplementationLSMode
+      @@@enDesc:
+        The mode of the parser.
+      @@@InCase:
+        @@@@Label:
+          @@@@@lang:en
+          @@@@@@:
             <XC::MODE_SYNCHRONOUS>
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              The <IF::LSParser> created will operate in synchronous mode.
-        @@@InCase:
-          @@@@Label:
+        @@@@enDesc:
+          The <IF::LSParser> created will operate in synchronous mode.
+      @@@InCase:
+        @@@@Label:
+          @@@@@lang:en
+          @@@@@@:
             <XC::MODE_ASYNCHRONOUS>
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              The <IF::LSParser> created will operate in asynchronous mode.
-     @@Param:
-        @@@Name:  schemaType
-        @@@Type: 
-          DOMMain:DOMString
-        @@@actualType:
-          DOMMain:ManakaiDOMSchemaType
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            An absolute URI representing the type of the schema language 
-            used during the load of a <IF::DOMCore:Document> using the newly 
-            created <IF::LSParser>.
-        @@@InCase:
-          @@@@Value:
-            @@@@@is-null:1
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              The <IF::LSParser> will be free to use any schema found.
-     @@Return:
-        @@@Type:  LSParser
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            The newly created parser object.
-        @@@ImplNote:
-          @@@@lang:en
-          @@@@@:
-            By default, the parameter <DOM::error-handler> of the 
-            <A::LSParser.domConfig> is <DOM::null>.  However, 
-            the DOM implementation may provide a default error handler instead.
-        @@@ManakaiDOM:raises:
-          @@@@@: ManakaiDOMLS|MDOMLS_IMPL_NOSUPPORT_MODE
-          @@@@enDesc: The requested mode is not supported.
-        @@@ManakaiDOM:raises:
-          @@@@@: MDOMX|MDOM_IMPL_NOSUPPORT_SCHEMA
-          @@@@enDesc: The requested schema language is not supported.
+        @@@@enDesc:
+          The <IF::LSParser> created will operate in asynchronous mode.
+    @@Param:
+      @@@Name: schemaType
+      @@@Type: DOMString
+      @@@dis:actualType: DOMMain|ManakaiDOMSchemaType
+      @@@enDesc:
+        An absolute URI representing the type of the schema language
+        used during the load of a <IF::Document> using the newly
+        created <IF::LSParser>.
+
+          {NOTE::
+            No lexical checking is done on the absolute URI.
+          }
+      @@@nullCase:
+        @@@@enDesc:
+          Creates a <IF::LSParser> for any kind of schema types (i.e.
+          the <IF::LSParser> will be free to use any schema found).
+    @@Return:
+      @@@Type: LSParser
+      @@@enDesc:
+        The newly created <IF::LSParser> object.
+
+          {NOTE::
+            By default, the newly created <IF::LSParser> object does
+            not contain a <IF::c|DOMErrorHandler>, i.e. the
+            value of the <cfg::error-handler> configuration parameter
+            is <DOM::null>.
+
+            However, an implementation may provide a default error handler
+            at creation time.  In that case, the initial value of
+            the <cfg::error-handler> configuration parameter on the
+            newly created <IF::LSParser> object contains a reference
+            to the default error handler.
+          }
+      @@@dx:raises:
+        @@@@@@: c|LSPARSER_NOT_FOUND_ERR
+        @@@@@enDesc:
+          If the requested <P::mode> or <P::schemaType> is not supported.
+      @@@PerlDef:
+        __DEEP{
+          F: {
+            my %feature;
+            if ($mode == <C::DOMImplementationLS.MODE_SYNCHRONOUS>) {
+              $feature{LS} = '3.0';
+            } elsif ($mode == <C::DOMImplementationLS.MODE_ASYNCHRONOUS>) {
+              $feature{'LS-Async'} = '3.0';
+            } else {
+              last F;
+            }
+            if (defined $schemaType) {
+              $feature{<Q::feschema:>.$schemaType} = '';
+            }
+            $r = $self-><M::gls|GLSImplementation.createGLSParser>
+                          (\%feature);
+          } # F
+        }__;
+        unless ($r) {
+          __EXCEPTION{c|LSPARSER_NOT_FOUND_ERR::
+            c|parserMode => {$mode},
+            c|schemaType => {$schemaType},
+          }__;
+        }
+    @@Test:
+      @@@QName: DOMImplLS.createLSParser.bad.mode.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{createImplForTest:: $impl => $impl}__;
+        
+        $test->assert_exception (code => sub {
+          $impl-><M::DOMImplementationLS.createLSParser> (0);
+        }, exception_subtype => <Q::c|LSPARSER_NOT_FOUND_ERR>);
+    @@Test:
+      @@@QName: DOMImplLS.createLSParser.unknown.schema.type.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{createImplForTest:: $impl => $impl}__;
+        
+        $test->assert_exception (code => sub {
+          $impl-><M::DOMImplementationLS.createLSParser> (1, 'unknown');
+        }, exception_subtype => <Q::c|LSPARSER_NOT_FOUND_ERR>);
 
   @Method:
      @@Name:  createLSSerializer
@@ -823,25 +900,56 @@ IFCls3Def:
           @@@@lang:en
           @@@@@:
             The newly created serializer object.
+
   @Method:
-     @@Name:  createLSInput
-     @@Description:
-       @@@lang:en
-       @@@@:
-         Create a new empty input source object.
-     @@Return:
-        @@@Type:  LSInput
-        @@@actualType: ManakaiDOMLSInput
-        @@@Description:
-          @@@@lang:en
-          @@@@@: The newly created input object.
-        @@@PerlDef:
-          $r = <ClassM::ManakaiDOMLSInput.new>;
+    @@Name: createLSInput
+    @@enDesc:
+      Creates a new empty input source object where
+      attributes are <DOM::null> or <DOM::false>.
+    @@Return:
+      @@@Type: LSInput
+      @@@enDesc:
+        The newly created input object.
+      @@@PerlDef:
+        $r = {}; # Output processor will |bless| it.
+
+    @@Test:
+      @@@QName: DOMImplLS.createLSInput.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{createImplForTest:: $impl => $impl}__;
+
+        my $in = $impl-><M::DOMImplementationLS.createLSInput>;
+        $test->assert_isa ($in, <IFName::LSInput>);
+
+        $test->id ('characterStream');
+        $test->assert_null ($in-><AG::LSInput.characterStream>);
+
+        $test->id ('byteStream');
+        $test->assert_null ($in-><AG::LSInput.byteStream>);
+
+        $test->id ('stringData');
+        $test->assert_null ($in-><AG::LSInput.stringData>);
+
+        $test->id ('systemId');
+        $test->assert_null ($in-><AG::LSInput.systemId>);
+
+        $test->id ('publicId');
+        $test->assert_null ($in-><AG::LSInput.publicId>);
+
+        $test->id ('baseURI');
+        $test->assert_null ($in-><AG::LSInput.baseURI>);
+
+        $test->id ('encoding');
+        $test->assert_null ($in-><AG::LSInput.encoding>);
+
+        $test->id ('certifiedText');
+        $test->assert_false ($in-><AG::LSInput.certifiedText>);
+
   @Method:
-     @@Name:  createLSOutput
-     @@Description:
-       @@@lang:en
-       @@@@: Create a new empty output destination object.
+    @@Name: createLSOutput
+    @@enDesc:
+      Creates a new empty output destination object.
      @@Return:
         @@@Type:  LSOutput
         @@@actualType: ManakaiDOMLSOutput
@@ -850,7 +958,28 @@ IFCls3Def:
           @@@@@: The newly created output object.
        @@@PerlDef:
          $r = <ClassM::ManakaiDOMLSOutput.new>;
+
+  @CODE:
+    @@QName: createImplForTest
+    @@PerlDef:
+      $impl = <Class::ManakaiDOMImplementationLS>->_new;
 ##DOMImplementationLS
+
+ElementTypeBinding:
+  @Name: CODE
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISPerl|BlockCode
+    @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
+
+ElementTypeBinding:
+  @Name: Test
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: test|StandaloneTest
+    @@ForCheck: ManakaiDOM|ForClass
 
 ElementTypeBinding:
   @Name: enDesc
@@ -867,6 +996,8 @@ IFDef:
     ManakaiDOM:DOM3
 
   @DISLang:role: ParserRole
+
+  @f:implements: DOMLS|ParseString10
 
   @Description:
     @@lang:en
@@ -913,6 +1044,32 @@ IFDef:
                           The DOM implementation can choose not to 
                           dispatch at all. (<IF::LSProgressEvent>)
       }
+
+  @enDesc:
+    @@ddid: gls
+    @@For: ManakaiDOM|ManakaiDOM
+    @@@:
+      In manakai, an <IF::LSParser> object can be retrieved via the
+      <M::gls|GLSImplementation.createGLSParser> method, as well
+      as the <M::DOMImplementationLS.createLSParser> method.
+
+      In <IF::gls|GLSImplementation>, an <IF::LSParser> with
+      synchronous mode can be requested by the feature <Feature::LS>
+      version <FeatureVer::3.0> and an <IF::LSParser> with
+      asynchronous mode can be requested by the feature <Feature::LS-Async>
+      version <FeatureVer::3.0>.  Note that since the <Feature::LS-Async>
+      feature is built upon the <Feature::LS> feature, when 
+      an <IF::LSParser> is requested by both <Feature::LS> and
+      <Feature::LS-Async> features, then an asyncrhonous mode <IF::LSParser>
+      is returned.
+
+      Likewise, in <IF::gls|GLSImplementation>, the schema type
+      that would be specified in the <M::DOMImplementationLS.createLSParser>
+      method can be specified as features.  A schema type URI
+      <VAR::U> is represented as feature name
+      <URI::http://suika.fam.cx/www/2006/schema/<VAR::U>> (version
+      number is unnecessary).
+
   @Attr:
      @@Name:  domConfig
      @@Description:
