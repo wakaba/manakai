@@ -17,7 +17,7 @@ Module:
   @License:
     license:Perl+MPL
   @Date:
-    $Date: 2006/02/08 08:18:31 $
+    $Date: 2006/02/19 07:06:16 $
   
   @Require:
     @@Module:
@@ -1457,6 +1457,20 @@ IFClsDef:
             }
           }__;
         }
+
+  @Attr:
+    @@Name: revision
+    @@Type: DIS|RevisionNumber
+    @@enDesc:
+      The revision number of the referenced resource.
+    @@Get:
+      @@@PerlDef:
+        $r = defined $$self->{<H::DIS|revision>} 
+               ? $$self->{<H::DIS|revision>}
+               : 0;
+    @@Set:
+      @@@PerlDef:
+        $$self->{<H::DIS|revision>} = $given;
 ##DVURIValue
 
 ClsDef:

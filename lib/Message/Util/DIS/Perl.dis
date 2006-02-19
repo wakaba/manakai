@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/02/18 07:39:07 $
+      $Date: 2006/02/19 07:06:15 $
     @@ContentType:
       dis:Date.RCS
   
@@ -1328,8 +1328,9 @@ IFClsDef:
         my %temp_mod;
         __DEEP{
           for my $res (values %{$self->{resDef}}) {
-            if ($res-><AG::DIS|DISAnyResource.isDefined>) {
-              my $mod_urir = $res-><AG::DIS|DISAnyResource.ownerModuleURIRef>;
+            my $mod_urir = $res-><AG::DIS|DISAnyResource.ownerModuleURIRef>;
+            if (defined $mod_urir and
+                $res-><AG::DIS|DISAnyResource.isDefined>) {
               for my $res_uri (@{$res-><AG::DIS|DISAnyResource.uris>}) {
                 $self->{<H::DIS|resourceModuleMap>}->{$res_uri} = $mod_urir;
                 $mod_res{$$mod_urir}->{$res_uri} = $res;
@@ -1343,8 +1344,9 @@ IFClsDef:
           }
 
           for my $res (values %{$self->{forDef}}) {
-            if ($res-><AG::DIS|DISAnyResource.isDefined>) {
-              my $mod_urir = $res-><AG::DIS|DISAnyResource.ownerModuleURIRef>;
+            my $mod_urir = $res-><AG::DIS|DISAnyResource.ownerModuleURIRef>;
+            if (defined $mod_urir and
+                $res-><AG::DIS|DISAnyResource.isDefined>) {
               for my $res_uri (@{$res-><AG::DIS|DISAnyResource.uris>}) {
                 $self->{<H::DIS|resourceModuleMap>}->{$res_uri} = $mod_urir;
                 $mod_for{$$mod_urir}->{$res_uri} = $res;
@@ -1837,9 +1839,9 @@ IFClsDef:
                 not $processed_class{$cls-><AG::DIS|DISAnyResource.uri>}) {
               $processed_class{$cls-><AG::DIS|DISAnyResource.uri>}
                 = true;
-              if ($cls-><M::DIS|DISResource.isTypeURI>
+              if ($cls-><M::DIS|DISAnyResource.isTypeURI>
                               (<Q::DISLang:Class>) and
-                  not $cls-><M::DIS|DISResource.isTypeURI>
+                  not $cls-><M::DIS|DISAnyResource.isTypeURI>
                               (<Q::Muf2003:RuleDefClass>)) {
                 ## -- Subroutines and variables
                 my $pack = $cls-><AG::DISResourcePerl.plCodeFragment>;
@@ -1849,19 +1851,19 @@ IFClsDef:
 
                 ## -- Constants
                 for my $cr (@{$cls-><M::DIS|DISResource.getChildResourceList>}) {
-                  if ($cr-><M::DIS|DISResource.isTypeURI>
+                  if ($cr-><M::DIS|DISAnyResource.isTypeURI>
                                           (<Q::ManakaiDOM:Const>)) {
                     $thismod_pack-><M::DIS|PLPack.addExport>
                       (null,
                        my $nm = $cr-><AG::DISResourcePerl.plName>);
                     $const{$nm} = $cr-><AG::DISResourcePerl
                                            .plFullyQualifiedName>;
-                  } elsif ($cr-><M::DIS|DISResource.isTypeURI>
+                  } elsif ($cr-><M::DIS|DISAnyResource.isTypeURI>
                                           (<Q::ManakaiDOM:ConstGroup>)) {
                     my $tag = $cr-><AG::DISResourcePerl.plName>;
                     for my $gcr (@{$cr-><M::DIS|DISResource
                                                     .getChildResourceList>}) {
-                      if ($gcr-><M::DIS|DISResource.isTypeURI>
+                      if ($gcr-><M::DIS|DISAnyResource.isTypeURI>
                                           (<Q::ManakaiDOM:Const>)) {
                         $thismod_pack-><M::DIS|PLPack.addExport>
                           ($tag, my $nm = $gcr-><AG::DISResourcePerl.plName>);
@@ -2245,7 +2247,7 @@ IFClsDef:
                            <ClassM::PLImplClass.perlLiteral> (\%nrp));
                   }
                 }
-              } elsif ($cls-><M::DIS|DISResource.isTypeURI>
+              } elsif ($cls-><M::DIS|DISAnyResource.isTypeURI>
                               (<Q::DISLang:Interface>)) {
                 my $pack = $cls-><AG::DISResourcePerl.plCodeFragment>;
                 $r-><M::DIS|PLFile.appendPackage> ($pack);
@@ -2263,13 +2265,13 @@ IFClsDef:
                                                    .plFullyQualifiedName>;
                   }
                 }
-              } elsif (($cls-><M::DIS|DISResource.isTypeURI>
+              } elsif (($cls-><M::DIS|DISAnyResource.isTypeURI>
                               (<Q::DISPerl:ScalarVariable>) or
-                        $cls-><M::DIS|DISResource.isTypeURI>
+                        $cls-><M::DIS|DISAnyResource.isTypeURI>
                               (<Q::DOMCore:DOMConfigurationParameter>) or
-                        $cls-><M::DIS|DISResource.isTypeURI>
+                        $cls-><M::DIS|DISAnyResource.isTypeURI>
                            (<Q::DOMCore:DOMConfigurationParameterApplication>) or
-                        $cls-><M::DIS|DISResource.isTypeURI>
+                        $cls-><M::DIS|DISAnyResource.isTypeURI>
                               (<Q::DOMCore:DOMErrorType>)) and
                        not $cls-><AG::DIS|DISResource.parentResource>) {
                 $r-><M::DIS|PLBlockCon.appendCodeFragment>
@@ -2360,7 +2362,7 @@ IFClsDef:
           $r = true;
           C: for my $cls (@{$self-><M::DIS|DISModule.getResourceList>}) {
             if ($cls-><AG::DIS|DISAnyResource.ownerModule> eq $self and
-                $cls-><M::DIS|DISResource.isTypeURI> (<Q::DISLang:Class>)) {
+                $cls-><M::DIS|DISAnyResource.isTypeURI> (<Q::DISLang:Class>)) {
               unless ($cls-><M::dp|DISResourcePerlModule.plIsFeatureImplemented>
                                       ($featureResourceURI)) {
                 $r = false;
@@ -2376,11 +2378,11 @@ IFClsDef:
           ## TODO: Custom module definition
           if ($self-><M::DIS|DISResource.isFeatureProvided>
                               ($featureResourceURI)) {
-            if ($self-><M::DIS|DISResource.isTypeURI>
+            if ($self-><M::DIS|DISAnyResource.isTypeURI>
                               (<Q::DISLang:MethodReturn>) or
-                $self-><M::DIS|DISResource.isTypeURI>
+                $self-><M::DIS|DISAnyResource.isTypeURI>
                               (<Q::DISLang:AttributeGet>) or
-                $self-><M::DIS|DISResource.isTypeURI>
+                $self-><M::DIS|DISAnyResource.isTypeURI>
                               (<Q::DISLang:AttributeSet>)) {
               my $def = $self-><M::DIS|DISResourceProp.getPropertyValue>
                                 (<Q::dis:Def>);
@@ -2389,7 +2391,7 @@ IFClsDef:
               $r = true;
               C: for my $res (@{$self-><M::DIS|DISResource
                                                    .getChildResourceList>}) {
-                if ($res-><M::DIS|DISResource.isTypeURI>
+                if ($res-><M::DIS|DISAnyResource.isTypeURI>
                               (<Q::DISLang:AnyMethod>)) {
                   unless ($res-><M::DISResourcePerlModule
                                  .plIsFeatureImplemented>
@@ -2456,10 +2458,10 @@ IFClsDef:
         __DEEP{
           if (exists $self->{<H::dp|plName>}) {
             $r = $self->{<H::dp|plName>};
-          } elsif ($self-><M::DIS|DISResource.isTypeURI>
+          } elsif ($self-><M::DIS|DISAnyResource.isTypeURI>
                               (<Q::DISLang:AnyMethod>)) {
             $r = $self-><M::dp|DISResourcePerl.getPerlNameList>->[0];
-          } elsif ($self-><M::DIS|DISResource.isTypeURI>
+          } elsif ($self-><M::DIS|DISAnyResource.isTypeURI>
                               (<Q::ManakaiDOM:Const>)) {
             unless (defined $self-><AG::DIS|DISAnyResource.localName>) {
               __UNDEEP{
@@ -2482,7 +2484,7 @@ IFClsDef:
                 }__;
               }__;
             }
-          } elsif ($self-><M::DIS|DISResource.isTypeURI>
+          } elsif ($self-><M::DIS|DISAnyResource.isTypeURI>
                               (<Q::ManakaiDOM:ConstGroup>)) {
             $r = $self-><M::DIS|DISResourceProp.getPropertyText>
                               (<Q::DISPerl:exportTagName>,
@@ -2495,7 +2497,7 @@ IFClsDef:
             }
 
           ## -- Method parameter
-          } elsif ($self-><M::DIS|DISResource.isTypeURI>
+          } elsif ($self-><M::DIS|DISAnyResource.isTypeURI>
                                        (<Q::DISLang:MethodParameter>)) {
             $r = $self-><M::DIS|DISResourceProp.getPropertyText>
                                 (<Q::DISPerl:paramName>,
@@ -2510,7 +2512,7 @@ IFClsDef:
             }
 
           ## -- Class
-          } elsif ($self-><M::DIS|DISResource.isTypeURI>
+          } elsif ($self-><M::DIS|DISAnyResource.isTypeURI>
                                        (<Q::DISLang:AnyClass>)) {
             $r = $self-><M::DIS|DISResourceProp.getPropertyText>
                                 (<Q::DISPerl:name>,
@@ -2664,9 +2666,9 @@ IFClsDef:
         __DEEP{
           if (exists $self->{<H::dp|plFullyQualifiedName>}) {
             $r = $self->{<H::dp|plFullyQualifiedName>};
-          } elsif ($self-><M::DIS|DISResource.isTypeURI>
+          } elsif ($self-><M::DIS|DISAnyResource.isTypeURI>
                               (<Q::DISLang:AnyClass>) or
-                   $self-><M::DIS|DISResource.isTypeURI>
+                   $self-><M::DIS|DISAnyResource.isTypeURI>
                               (<Q::DISPerl:ScalarVariable>)) {
             $r = $self-><M::DIS|DISResourceProp.getPropertyText>
                               (<Q::DISPerl:packageName>);
@@ -2680,7 +2682,7 @@ IFClsDef:
                   }__;
                 }__;
               }
-              if ($self-><M::DIS|DISResource.isTypeURI>
+              if ($self-><M::DIS|DISAnyResource.isTypeURI>
                               (<Q::ManakaiDOM:IF>)) {
                 $r = $self-><AG::DIS|DISAnyResource.ownerModule>
                           -><AG::DISModulePerl.plInterfaceName>
@@ -2691,7 +2693,7 @@ IFClsDef:
                    . '::' . $self-><AG::DIS|DISAnyResource.localName>;
               }
             }
-          } elsif ($self-><M::DIS|DISResource.isTypeURI>
+          } elsif ($self-><M::DIS|DISAnyResource.isTypeURI>
                               (<Q::DISLang:Const>)) {
             $r = $self-><AG::DIS|DISResource.parentResource>
                       -><AG::DIS|DISResource.parentResource>
@@ -2826,27 +2828,27 @@ IFClsDef:
         __DEEP{
           if (exists $self->{<H::DIS|plCodeFragment>}) {
             $r = $self->{<H::DIS|plCodeFragment>};
-          } elsif ($self-><M::DIS|DISResource.isTypeURI>
+          } elsif ($self-><M::DIS|DISAnyResource.isTypeURI>
                                 (<Q::DISLang:MethodReturn>) or
-                   $self-><M::DIS|DISResource.isTypeURI>
+                   $self-><M::DIS|DISAnyResource.isTypeURI>
                                 (<Q::DISLang:AttributeGet>) or
-                   $self-><M::DIS|DISResource.isTypeURI>
+                   $self-><M::DIS|DISAnyResource.isTypeURI>
                                 (<Q::DISLang:AttributeSet>) or
-                   $self-><M::DIS|DISResource.isTypeURI>
+                   $self-><M::DIS|DISAnyResource.isTypeURI>
                                 (<Q::DISPerl:BlockCode>) or
-                   $self-><M::DIS|DISResource.isTypeURI>
+                   $self-><M::DIS|DISAnyResource.isTypeURI>
                                 (<Q::DISPerl:InlineCode>) or
-                   $self-><M::DIS|DISResource.isTypeURI>
+                   $self-><M::DIS|DISAnyResource.isTypeURI>
                                 (<Q::DISCore:AnyDefContainer>) or
-                   $self-><M::DIS|DISResource.isTypeURI>
+                   $self-><M::DIS|DISAnyResource.isTypeURI>
                                 (<Q::DOMMain:ReflectGet>) or
-                   $self-><M::DIS|DISResource.isTypeURI>
+                   $self-><M::DIS|DISAnyResource.isTypeURI>
                                 (<Q::DOMMain:ReflectSet>)) {
             $self->{<Q::DIS|plCodeFragment>} = null;  ## To avoid loop
             my $def = $self-><M::DIS|DISResourceProp.getPropertyValue>
                                 (<Q::dis:Def>);
             $def = $def->[0] if $def;
-            my $is_inline = $self-><M::DIS|DISResource.isTypeURI>
+            my $is_inline = $self-><M::DIS|DISAnyResource.isTypeURI>
                                 (<Q::DISPerl:InlineCode>) ? true : false;
             unless ($def) {
               $r = null;
@@ -2865,7 +2867,7 @@ IFClsDef:
                              .plPreprocessPerlCode>
                                    ($source_code,
                                     method_resource => 
-                                ($self-><M::DIS|DISResource
+                                ($self-><M::DIS|DISAnyResource
                                           .isTypeURI> (<Q::DISLang:MethodReturn>)
                                 ? $self-><AG::DIS|DISResource.parentResource>
                                 : null),
@@ -2889,7 +2891,7 @@ IFClsDef:
                 }__;
               }__;
             } # media type
-          } elsif ($self-><M::DIS|DISResource.isTypeURI>
+          } elsif ($self-><M::DIS|DISAnyResource.isTypeURI>
                                 (<Q::DISLang:Method>)) {
             $self->{<H::DIS|plCodeFragment>} = null;  ## To avoid loop
             my $ret = $self-><M::DIS|DISResource
@@ -2917,7 +2919,7 @@ IFClsDef:
             my $is_optional_param = false;
             my $is_named_param = false;
             for my $param (@$params) {
-              next unless $param-><M::DIS|DISResource.isTypeURI>
+              next unless $param-><M::DIS|DISAnyResource.isTypeURI>
                                         (<Q::DISLang:MethodParameter>);
               unless ($is_named_param) {
                 if ($param-><M::DIS|DISResourceProp.getPropertyBoolean>
@@ -3121,7 +3123,7 @@ IFClsDef:
               ## Return value
               $r-><M::DIS|MPLSS.appendCodeFragment> ($rvar);
             }
-          } elsif ($self-><M::DIS|DISResource.isTypeURI>
+          } elsif ($self-><M::DIS|DISAnyResource.isTypeURI>
                                 (<Q::DISLang:Attribute>)) {  
             $self->{<H::DIS|plCodeFragment>} = null;  ## To avoid loop
             my $get = $self-><M::DIS|DISResource
@@ -3414,7 +3416,7 @@ IFClsDef:
                       $set_code);
 
           ## -- Constants
-          } elsif ($self-><M::DIS|DISResource.isTypeURI>
+          } elsif ($self-><M::DIS|DISAnyResource.isTypeURI>
                               (<Q::ManakaiDOM:Const>)) {
             my $data_type = $self-><AG::DIS|DISResource
                                        .disActualDataTypeResource>;
@@ -3439,7 +3441,7 @@ IFClsDef:
             $r-><AS::DIS|MPLSub.prototype> ('');
 
           ## -- Classes
-          } elsif ($self-><M::DIS|DISResource.isTypeURI>
+          } elsif ($self-><M::DIS|DISAnyResource.isTypeURI>
                               (<Q::ManakaiDOM:Class>)) {
             my $plimpl = $self-><AG::DISAnyResourcePerl.plImplementation>;
             $r = $plimpl-><M::DIS|MPLImpl.createPerlPackage>
@@ -3492,11 +3494,11 @@ IFClsDef:
             my @cr = @{$self-><M::DIS|DISResource.getChildResourceList>};
             for my $cr (@cr) {
               ## - Subroutines
-              if ($cr-><M::DIS|DISResource.isTypeURI>
+              if ($cr-><M::DIS|DISAnyResource.isTypeURI>
                                     (<Q::DISLang:Method>) or
-                  $cr-><M::DIS|DISResource.isTypeURI>
+                  $cr-><M::DIS|DISAnyResource.isTypeURI>
                                     (<Q::DISLang:Attribute>)) {
-                my $is_attr = $cr-><M::DIS|DISResource.isTypeURI>
+                my $is_attr = $cr-><M::DIS|DISAnyResource.isTypeURI>
                                     (<Q::DISLang:Attribute>) ? true : false;
                 my $psub = $cr-><AG::DISResourcePerl.plCodeFragment>->clone;
                 for (@{$cr-><M::dp|DISResourcePerl.getPerlNameList>}) {
@@ -3507,10 +3509,10 @@ IFClsDef:
                 }
                 $r-><M::DIS|PLPack.setSubNode> ($psub);
               ## - Constant groups
-              } elsif ($cr-><M::DIS|DISResource.isTypeURI>
+              } elsif ($cr-><M::DIS|DISAnyResource.isTypeURI>
                                 (<Q::ManakaiDOM:ConstGroup>)) {
                 for my $gcr (@{$cr-><M::DIS|DISResource.getChildResourceList>}) {
-                  if ($gcr-><M::DIS|DISResource.isTypeURI>
+                  if ($gcr-><M::DIS|DISAnyResource.isTypeURI>
                                 (<Q::ManakaiDOM:Const>)) {
                     my $sub = $gcr-><AG::DISResourcePerl
                                         .plCodeFragment>;
@@ -3529,7 +3531,7 @@ IFClsDef:
                   }
                 }
               ## - Constants
-              } elsif ($cr-><M::DIS|DISResource.isTypeURI>
+              } elsif ($cr-><M::DIS|DISAnyResource.isTypeURI>
                                 (<Q::ManakaiDOM:Const>)) {
                 my $sub = $cr-><AG::DISResourcePerl.plCodeFragment>;
                 if ($r-><M::DIS|PLPack.getSub>
@@ -3544,7 +3546,7 @@ IFClsDef:
                 }
                 $r-><M::DIS|PLPack.setSubNode> ($sub);
               ## Package-scope variables
-              } elsif ($cr-><M::DIS|DISResource.isTypeURI>
+              } elsif ($cr-><M::DIS|DISAnyResource.isTypeURI>
                                 (<Q::DISPerl:ScalarVariable>)) {
                 my $varn = $cr-><AG::DISResourcePerl.plVariableName>;
                 my $var = $plimpl-><M::DIS|MPLImpl.createPerlVariable>
@@ -3580,7 +3582,7 @@ IFClsDef:
             }
 
             ## - Error Descriptions
-            if ($self-><M::DIS|DISResource.isTypeURI>
+            if ($self-><M::DIS|DISAnyResource.isTypeURI>
                  (<Q::Err:MUErrorClass>)) {
 
               ## DOM-style exception definitions

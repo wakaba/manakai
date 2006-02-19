@@ -71,7 +71,7 @@ GENERATED_FILES = \
   dom-core.t dom-tree.t dom-xml.t dom-xdoctype.t \
   dom-ls.t dom-xmlparser.t \
   dom-mdomls2003.t \
-  util-dis-dnlite.t \
+  util-dis.t util-dis-dnlite.t \
   util-perlcode.t
 
 all: $(GENERATED_FILES)
@@ -136,7 +136,7 @@ dom-xmlparser.t: $(DOM_XP_DAC) $(DAC2TEST_PL)
 test-module-util: \
   util-mntest.t \
   util-perlcode.t \
-  util-dis-dnlite.t
+  util-dis.t util-dis-dnlite.t
 	$(PERL_TEST_) util-*.t
 
 util-mntest.t: $(UTIL_TEST_DAC) $(UTIL_MNTEST_PM) $(DAC2TEST_PL) Makefile
@@ -148,6 +148,9 @@ util-mntest.t: $(UTIL_TEST_DAC) $(UTIL_MNTEST_PM) $(DAC2TEST_PL) Makefile
 
 util-perlcode.t: $(UTIL_PC_DAC) $(DAC2TEST_PL)
 	$(DAC2TEST) $< --source-module="$(NS_UTIL)PerlCode" > $@
+
+util-dis.t: $(DIS_CORE_DAC) $(DAC2TEST_PL)
+	$(DAC2TEST) $< --source-module="$(NS_UTIL)DIS" > $@
 
 util-dis-dnlite.t: $(DIS_CORE_DAC) $(DAC2TEST_PL)
 	$(DAC2TEST) $< --source-module="$(NS_DIS)DNLite" > $@

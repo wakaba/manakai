@@ -23,7 +23,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2006/02/09 10:23:19 $
+      $Date: 2006/02/19 07:06:14 $
     @@ContentType:
       dis:Date.RCS
   
@@ -98,6 +98,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Markup#
   @swcfg21:
     http://suika.fam.cx/~wakaba/archive/2005/swcfg21#
+  @test:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Test#
   @Util:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/
 
@@ -401,6 +403,7 @@ IFClsDef:
               uri => <Q::ManakaiDOM:all>,
               isa => {<Q::ManakaiDOM:all> => 1},
               revISA => {},
+              <H::revision> => 0,
             }, <ClassName::ManakaiDISForDefinition>),
           },
           resDef => {},
@@ -408,6 +411,22 @@ IFClsDef:
           seq => 0,
         }, <ClassName::ManakaiDISDatabase>;
         $r->{forDef}->{<Q::ManakaiDOM:all>}->{db} = $r;
+
+  @CODE:
+    @@QName: createDISDBForTest
+    @@PerlDef:
+      $db = <ClassM::ManakaiDISImplementation.createDISDatabase>;
+
+      my $any = $db-><M::DISDatabase.getResource> (<Q::DISCore|AnyResource>);
+
+      my $mod = $db-><M::DISDatabase.getResource> (<Q::DISCore|Module>);
+      $mod-><M::DISResource.addSuperResource> ($any);
+
+      my $for = $db-><M::DISDatabase.getResource> (<Q::DISCore|For>);
+      $for-><M::DISResource.addSuperResource> ($any);
+
+      my $res = $db-><M::DISDatabase.getResource> (<Q::DISCore|Resource>);
+      $res-><M::DISResource.addSuperResource> ($any);
 
   @Method:
     @@Name: tfurisToURI
@@ -563,6 +582,14 @@ IFClsDef:
 
   @DOMFeature:provides: CoreFeature10
 ##DISImplementation
+
+ElementTypeBinding:
+  @Name: CODE
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISPerl|BlockCode
+    @@ForCheck: ManakaiDOM|ForClass
 
 IFClsDef:
   @IFQName: DISParser
@@ -1968,7 +1995,7 @@ IFClsDef:
                         $self-><AG::DISNode.ownerDISDocument>
                              -><AG::DISDocument.disDatabase>)
                              -><M::DISDatabase.getResource> ($xn);
-            $r = $rdef-><M::DISResource.isTypeURI> (<Q::rdf:Property>);
+            $r = $rdef-><M::DISAnyResource.isTypeURI> (<Q::rdf:Property>);
           }
         }__;
 
@@ -2477,10 +2504,33 @@ IFClsDef:
                  db => $self,
                  for => <Q::ManakaiDOM:all>,
                  forp => [],
+                 <H::DIS|typeURI> => <Q::DISCore|Module>,
+                 <H::DIS|revision> => 0,
                }, <ClassName::ManakaiDISModuleDefinition>;
+          $r-><M::DISResourceProp.addPropertyURIUList>
+                (<Q::rdf:type>, <Q::DISCore|Module>); ## TODO: Remove
           require Scalar::Util;
           Scalar::Util::weaken ($r->{db});
         }
+
+    @@Test:
+      @@@QName: DISDB.getModule.test
+      @@@PerlDef:
+        my $db;
+        __CODE{createDISDBForTest:: $db => $db}__;
+
+        my $res = $db-><M::DISDatabase.getModule> ('about:1');
+
+        $test->id ('is.type.uri');
+        $test->assert_true ($res-><M::DISAnyResource.isTypeURI>
+                              (<Q::DISCore|Module>));
+        $test->assert_true ($res-><M::DISAnyResource.isTypeURI>
+                              (<Q::DISCore|AnyResource>));
+
+        $test->id ('revision');
+        $test->assert_num_equals
+                 (actual_value => $res-><AG::DISAnyResource.revision>,
+                  expected_value => 0);
 
   @Method:
     @@Name: getFor
@@ -2528,11 +2578,34 @@ IFClsDef:
                  isa => {<Q::ManakaiDOM:all> => true},
                  revISA => {},
                  db => $self,
+                 <H::DIS|typeURI> => <Q::DISCore|For>,
+                 <H::DIS|revision> => 0,
                }, <ClassName::ManakaiDISForDefinition>;
           $self->{forDef}->{<Q::ManakaiDOM:all>}->{revISA}->{$forURI} = true;
+          $r-><M::DISResourceProp.addPropertyURIUList>
+                (<Q::rdf:type>, <Q::DISCore|For>); ## TODO: Remove
           require Scalar::Util;
           Scalar::Util::weaken ($r->{db});
         }
+
+    @@Test:
+      @@@QName: DISDB.getFor.test
+      @@@PerlDef:
+        my $db;
+        __CODE{createDISDBForTest:: $db => $db}__;
+
+        my $res = $db-><M::DISDatabase.getFor> ('about:1');
+
+        $test->id ('is.type.uri');
+        $test->assert_true ($res-><M::DISAnyResource.isTypeURI>
+                                    (<Q::DISCore|For>));
+        $test->assert_true ($res-><M::DISAnyResource.isTypeURI>
+                                    (<Q::DISCore|AnyResource>));
+
+        $test->id ('revision');
+        $test->assert_num_equals
+                 (actual_value => $res-><AG::DISAnyResource.revision>,
+                  expected_value => 0);
 
   @Method:
     @@Name: getResource
@@ -2600,10 +2673,34 @@ IFClsDef:
                  for => <Q::ManakaiDOM:all>,
                  forp => [],
                  seq => -1,
+                 <H::DIS|typeURI> => <Q::DISCore|Resource>,
+                 <H::DIS|revision> => 0,
                }, <ClassName::ManakaiDISResourceDefinition>;
+          $r-><M::DISResourceProp.addPropertyURIUList>
+                (<Q::rdf:type>, <Q::DISCore|Resource>); ## TODO: Remove
           require Scalar::Util;
           Scalar::Util::weaken ($r->{db});
         }
+
+    @@Test:
+      @@@QName: DISDB.getResource.test
+      @@@PerlDef:
+        my $db;
+        __CODE{createDISDBForTest:: $db => $db}__;
+
+        my $res = $db-><M::DISDatabase.getResource> ('about:1');
+
+
+        $test->id ('is.type.uri');
+        $test->assert_true ($res-><M::DISAnyResource.isTypeURI>
+                                    (<Q::DISCore|Resource>));
+        $test->assert_true ($res-><M::DISAnyResource.isTypeURI>
+                                    (<Q::DISCore|AnyResource>));
+
+        $test->id ('revision');
+        $test->assert_num_equals
+                 (actual_value => $res-><AG::DISAnyResource.revision>,
+                  expected_value => 0);
 
   @Method:
     @@Name: getAnyResource
@@ -3218,6 +3315,7 @@ IFClsDef:
           $res->{<H::DIS|isDefined>} = true;
           $res->{seq} = $self->{seq}++;
           $res-><AS::DISAnyResource.sourceNodeIDRef> ($node_id);
+          __CODE{setRevision:: $resource => $res}__;
           
           ## -- Alias
           if ($al_node) {
@@ -3251,7 +3349,8 @@ IFClsDef:
               my $type_uri = $ce-><AG::DISElement.qnameValueURI>;
               my $type = $self-><M::DISDatabase.getResource> ($type_uri);
               $res-><M::DISResourceProp.addPropertyResourceUList>
-                                               (<Q::rdf:type>, $type);
+                                               (<Q::rdf:type>, $type); ## TODO: Remove
+              $res-><M::DISAnyResource.addTypeURI> ($type);
               $type-><AS::DISAnyResource.isReferred> ($ce);
               if ($type-><M::DISResource.isSubsetOfURI>
                                                (<Q::dis:MultipleResource>)) {
@@ -3471,8 +3570,7 @@ IFClsDef:
             $r->[2] = $self-><M::ManakaiDISDatabase.getResource>
                          ($contextNode-><M::NSResolverDIS.tfqnamesToURI>
                                           ($q1, null, $forArg, node => $node));
-            if ($r->[2]-><M::ManakaiDISResourceDefinition
-                      .isTypeURI> (<Q::dx:ErrorSubCode>)) {
+            if ($r->[2]-><M::DISAnyResource.isTypeURI> (<Q::dx:ErrorSubCode>)) {
               $r->[1] = $r->[2]-><AG::DIS|DISResource.parentResource>;
             } else {
               $r->[1] = $r->[2]; CORE::delete $r->[2];
@@ -3480,7 +3578,7 @@ IFClsDef:
           }
 
           if ($r->[2] and
-              not $r->[2]-><M::ManakaiDISResourceDefinition
+              not $r->[2]-><M::DISAnyResource
                       .isTypeURI> (<Q::dx:ErrorSubCode>)) {
             __UNDEEP{__EXCEPTION{RESOURCE_NOT_DEFINED_ERR::
               DIS:uri => {$r->[2]->{uri}},
@@ -3494,7 +3592,7 @@ IFClsDef:
             if $r->[2];
           
           if (not $r->[1] or
-              not $r->[1]-><M::ManakaiDISResourceDefinition
+              not $r->[1]-><M::DISAnyResource
                       .isTypeURI> (<Q::ManakaiDOM:Const>)) {
             __UNDEEP{__EXCEPTION{RESOURCE_NOT_DEFINED_ERR::
               DIS:uri => {($r->[1] ? $r->[1]-><AG::DIS|DISAnyResource.uri>
@@ -3514,7 +3612,7 @@ IFClsDef:
             $r->[0] = $cg-><AG::DIS|DISResource.parentResource> if $cg;
           }
           if (not $r->[0] or
-              not $r->[0]-><M::ManakaiDISResourceDefinition
+              not $r->[0]-><M::DISAnyResource
                     .isTypeURI> (<Q::dx:AnyExceptionAnyClass>)) {
             __UNDEEP{__EXCEPTION{RESOURCE_NOT_DEFINED_ERR::
               DIS:uri => {$r->[0]->{uri}},
@@ -4027,6 +4125,9 @@ IFClsDef:
     @@Get:
       @@@PerlDef:
         $r = $self->{<H::DIS|isDefined>};
+    @@Set:
+      @@@PerlDef:
+        $self->{<H::DIS|isDefined>} = $given;
 
   @Attr:
     @@Name: ownerModule
@@ -4042,7 +4143,7 @@ IFClsDef:
         @@@@enDesc:
           The resource is not part of any module since
           its definition is not read (i.e. <A::DISAnyResource.isDefined> is
-          <DOM::false>).
+          <DOM::false>) or since it is created in memory.
       @@@PerlDef:
         $r = $self->{db}
                   -><M::DISDatabase.getModule>
@@ -4057,7 +4158,8 @@ IFClsDef:
     @@nullCase:
       @@@enDesc:
         The resource does not belong to any module since the
-        resource definition is not read yet.
+        resource definition is not read yet or since
+        it is created in memory.
     @@Get:
       @@@PerlDef: 
         if (defined $self->{<H::DIS|definingModule>}) {
@@ -4072,7 +4174,8 @@ IFClsDef:
     @@nullCase:
       @@@enDesc:
         The resource does not belong to any module since the
-        resource definition is not read yet.
+        resource definition is not read yet or since
+        it is created in memory.
     @@Get:
       @@@PerlDef: 
         $r = $self->{<H::DIS|definingModule>};
@@ -4186,6 +4289,9 @@ IFClsDef:
         of this resource. 
       @@@PerlDef:
         $r = $self->{<H::DIS|isAnon>};
+    @@Set:
+      @@@PerlDef:
+        $self->{<H::DIS|isAnon>} = $given;
 
   @Attr:
     @@Name: sourceElement
@@ -4632,7 +4738,6 @@ IFClsDef:
         }__;
 
   @Method:
-    @@ForCheck: ManakaiDOM|ForIF
     @@Name: isTypeURI
     @@enDesc:
       Tests whether this resource is of a type or not. 
@@ -4650,7 +4755,233 @@ IFClsDef:
       @@@FalseCase:
         @@@@enDesc:
           This is not a <P::typeURI> resource. 
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><AG::DISAnyResource.typeResource>
+                    -><M::DISResource.isSubsetOfURI> ($typeURI);
+        }__;
+
+
+
+
+        unless ($r) {
+
+        if (not $self->{<Q::rdf:type>}) {
+          #
+        } elsif ($self->{<Q::rdf:type>}->{$typeURI}) {
+          $r = true;
+        } else {
+          __DEEP{
+            C: for my $t_type_uri (grep {$self->{<Q::rdf:type>}->{$_}}
+                                        keys %{$self->{<Q::rdf:type>}}) {
+              my $t_type = $self-><AG::DISAnyResource.database>
+                                -><M::DISDatabase.getResource> ($t_type_uri);
+              if ($t_type-><M::DISResource.isSubsetOfURI> ($typeURI)) {
+                $self-><M::DISResourceProp.addPropertyURIUList>
+                                            (<Q::rdf:type>, $typeURI);
+                $r = true;
+                last C;
+              }
+            }
+          }__;
+        }
+
+        }
+
+  @Attr:
+    @@Name: revision
+    @@enDesc:
+      The revision number of the resource.
+
+      {ISSUE::
+        Is it necessary for revision numbers to hold some
+        kind of globality?
+      }
+    @@Type: RevisionNumber
+    @@Get:
+      @@@PerlDef:
+        $r = $self->{<H::DIS|revision>};
+
+  @CODE:
+    @@QName: setRevision
+    @@enDesc:
+      Sets new revision number to a resource.
+    @@PerlDef:
+      $resource->{<H::DIS|revision>} = time;
+
+  @CODE:
+    @@QName: updateRevision
+    @@enDesc:
+      Updates revision number of a resource.
+   
+      {ISSUE::
+        How revision number should be increased?
+      }
+    @@PerlDef:
+      $resource->{<H::DIS|revision>}++;
+
+  @Method:
+    @@Name: getTypeURIList
+    @@enDesc:
+      Returns a snapshot list of resource type URIs of the resource.
+    @@Return:
+      @@@Type: URIList
+      @@@enDesc:
+        A snapshot list of URIs.
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><AG::DISAnyResource.typeResource>
+                    -><M::DISAnyResource.getSuperResourceURIList>;
+        }__;
+
+    @@Test:
+      @@@QName: DISAnyResource.getTypeURIList.test
+      @@@PerlDef:
+        my $db;
+        __CODE{createDISDBForTest:: $db => $db}__;
+
+        $test->id ('module');
+        my $mod1 = $db-><M::DISDatabase.getModule> ('about:module1');
+        my %lm1 = map {$_ => true} @{$mod1-><M::DISAnyResource.getTypeURIList>};
+
+        $test->assert_true ($lm1{<Q::DISCore|Module>});
+        $test->assert_true ($lm1{<Q::DISCore|AnyResource>});
+
+        $test->id ('for');
+        my $for1 = $db-><M::DISDatabase.getFor> ('about:for1');
+        my %lf1 = map {$_ => true} @{$for1-><M::DISAnyResource.getTypeURIList>};
+
+        $test->assert_true ($lf1{<Q::DISCore|For>});
+        $test->assert_true ($lf1{<Q::DISCore|AnyResource>});
+
+    @@Test:
+      @@@QName: DISAnyResource.resource.getTypeURIList.test
+      @@@PerlDef:
+        my $db;
+        __CODE{createDISDBForTest:: $db => $db}__;
+
+        $test->id ('resource');
+        my $res1 = $db-><M::DISDatabase.getResource> ('about:resource1');
+        my %lr1 = map {$_ => true} @{$res1-><M::DISAnyResource.getTypeURIList>};
+
+        $test->assert_true ($lr1{<Q::DISCore|Resource>});
+        $test->assert_true ($lr1{<Q::DISCore|AnyResource>});
+
+  @Method:
+    @@ForCheck: ManakaiDOM|ForIF
+    @@Name: getSuperResourceURIList
+    @@enDesc:
+      Returns a snapshot list of super-resources URIs of the resource,
+      including canonical and alias URIs of the resource itself.
+    @@Return:
+      @@@Type: URIList
+      @@@enDesc:
+        A snapshot list of URIs.
+
+  @Attr:
+    @@Name: typeResource
+    @@enDesc:
+      The most specific type of the resource.
+    @@Type: DISResource
+    @@Get:
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><AG::DISAnyResource.database>
+                    -><M::DISDatabase.getResource> ($self->{<H::DIS|typeURI>});
+        }__;
+
+  @Method:
+    @@Name: addTypeURI
+    @@enDesc:
+      Adds a URI to the list of types of the resource.
+    @@Param:
+      @@@Name: uri
+      @@@Type: AnyResourceURI
+      @@@enDesc:
+        A URI to add.
+    @@Return:
+      @@@PerlDef:
+        __DEEP{
+          my $current_type = $self-><AG::DISAnyResource.typeResource>;
+          unless ($current_type-><M::DISResource.isSubsetOfURI> ($uri)) {
+            my $db = $self-><AG::DISAnyResource.database>;
+            my $res = $db-><M::DISDatabase.getResource> ($uri);
+            my $current_uri = $self-><AG::DISAnyResource.uri>;
+            if ($res-><M::DISResource.isSubsetOfURI> ($current_uri)) {
+              $self->{<H::DIS|typeURI>} = $current_uri;
+            } else {
+              my $new_uri = <Code::ManakaiDOM|generateUniqueID||ManakaiDOM|Perl>;
+              my $new_res = $db-><M::DISDatabase.getResource> ($new_uri);
+              $new_res-><AS::DISAnyResource.isAnonymous> (true);
+              $new_res-><AS::DISAnyResource.isDefined> (true);
+              $new_res-><M::DISResource.addSuperResource> ($current_type);
+              $new_res-><M::DISResource.addSuperResource> ($res);
+              $self->{<H::DIS|typeURI>} = $new_uri;
+            }
+          }
+        }__;
+
+    @@Test:
+      @@@QName: DISAnyResource.addTypeURI.test
+      @@@PerlDef:
+        my $db;
+        __CODE{createDISDBForTest:: $db => $db}__;
+
+        my $res = $db-><M::DISDatabase.getResource> ('about:1');
+        my $res2 = $db-><M::DISDatabase.getResource> ('about:2');
+        $test->id ('initial.resource');
+        $test->assert_true
+                 ($res-><M::DISAnyResource.isTypeURI> (<Q::DISCore|Resource>));
+        $test->id ('initial.anyresource');
+        $test->assert_true
+                 ($res-><M::DISAnyResource.isTypeURI>
+                          (<Q::DISCore|AnyResource>));
+        $test->id ('initial.type1');
+        $test->assert_false
+                 ($res-><M::DISAnyResource.isTypeURI> ('about:type1'));
+
+        $res-><M::DISAnyResource.addTypeURI> ('about:type1');
+
+        $test->id ('added.resource');
+        $test->assert_true
+                 ($res-><M::DISAnyResource.isTypeURI> (<Q::DISCore|Resource>));
+        $test->id ('added.anyresource');
+        $test->assert_true
+                 ($res-><M::DISAnyResource.isTypeURI>
+                          (<Q::DISCore|AnyResource>));
+        $test->id ('added.type1');
+        $test->assert_true
+                 ($res-><M::DISAnyResource.isTypeURI> ('about:type1'));
+
+        $test->id ('added2.resource');
+        $test->assert_true
+                 ($res2-><M::DISAnyResource.isTypeURI>
+                           (<Q::DISCore|Resource>));
+        $test->id ('added2.anyresource');
+        $test->assert_true
+                 ($res2-><M::DISAnyResource.isTypeURI>
+                          (<Q::DISCore|AnyResource>));
+        $test->id ('added2.type1');
+        $test->assert_false
+                 ($res2-><M::DISAnyResource.isTypeURI> ('about:type1'));
 ##DISAnyResource
+
+URITypeDef:
+  @QName: AnyResourceURI
+  @enDesc:
+    A URI that identifies a <Q::DISCore|AnyResource>.
+
+DataTypeDef:
+  @QName: AnyResourceURIList
+  @enDesc:
+    A snapshot list of URIs that identify <Q::DISCore|AnyResource>s.
+  @rdfs:subClassOf: DISPerl|ARRAY
+
+PropDef:
+  @QName: DIS|typeURI
+  @enDesc:
+    The URI of the most specific type of the resource.
+  @DIS:key: tu
 
 IFClsDef:
   @IFQName: DISModule
@@ -4753,19 +5084,6 @@ IFClsDef:
             }
           }
 
-  @Attr:
-    @@Name: isAnonymous
-    @@enDesc:
-      Whether the resource has persistent name or not. 
-    @@Type: 
-      DOMMain:boolean::ManakaiDOM:all
-    @@ForCheck: ManakaiDOM|ForClass
-    @@Get:
-      @@@TrueCase:
-        @@@@enDesc:
-          A module <kwd:MUST> have a name.
-      @@@PerlDef: $r = false;
-
   @Method:
     @@Name: addResourceList
     @@ForCheck: ManakaiDOM|ForClass
@@ -4816,31 +5134,31 @@ IFClsDef:
           CORE::delete $self->{<H::DIS|defaultNamespaceURI>};
         }
 
-  @Method:
-    @@ForCheck: ManakaiDOM|ForClass
-    @@Name: isTypeURI
+  @CMethod:
+    @@Name: getSuperResourceURIList
     @@enDesc:
-      Tests whether this resource is of a type or not. 
-    @@Param:
-      @@@Name: typeURI
-      @@@Type: ResourceURI
-      @@@enDesc:
-        A type URI reference to test. 
+      Returns a snapshot list of super-resources URIs of the resource,
+      including canonical and alias URIs of the resource itself.
     @@Return:
-      @@@Type:
-        DOMMain:boolean::ManakaiDOM:all 
-      @@@TrueCase:
-        @@@@enDesc:
-          This is a <P::typeURI> resource. 
-      @@@FalseCase:
-        @@@@enDesc:
-          This is not a <P::typeURI> resource. 
+      @@@Type: URIList
+      @@@enDesc:
+        A snapshot list of URIs.
       @@@PerlDef:
-        __DEEP{
-          $r = $self-><AG::DIS|DISAnyResource.database>
-                    -><M::DIS|DISDatabase.getResource> (<Q::DISCore:Module>)
-                    -><M::DIS|DISAnyResource.isTypeURI> ($typeURI);
-        }__;
+        $r = [$self->{uri}];
+
+    @@Test:
+      @@@QName: DISModule.getSuperResourceURIList.test
+      @@@PerlDef:
+        my $db;
+        __CODE{createDISDBForTest:: $db => $db}__;
+
+        my $res = $db-><M::DISDatabase.getModule> ('about:1');
+
+        my %list = map {$_ => true} @{$res-><M::DISAnyResource
+                                               .getSuperResourceURIList>};
+
+        $test->assert_true ($list{'about:1'});
+        $test->assert_false ($list{'about:2'});
 ##DISModule
 
 ClsDef:
@@ -4889,19 +5207,6 @@ ClsDef:
           its definition is not read (<IF::DISModule.isDefined> is <DOM::false>).
       @@@PerlDef: $r = $self;
 
-  @Attr:
-    @@Name: isAnonymous
-    @@enDesc:
-      Whether the resource has persistent name or not. 
-    @@Type: 
-      DOMMain:boolean::ManakaiDOM:all
-    @@ForCheck: ManakaiDOM|ForClass
-    @@Get:
-      @@@TrueCase:
-        @@@@enDesc:
-          A module <kwd:MUST> have a name.
-      @@@PerlDef: $r = false;
-
   @Method:
     @@Operator:
       @@@@: AUTOLOAD
@@ -4943,32 +5248,6 @@ ClsDef:
       @@@PerlDef:
         $r = defined $self->{<H::DIS|defaultNamespaceURI>}
              ? ${$self->{<H::DIS|defaultNamespaceURI>}} : null;
-
-  @Method:
-    @@ForCheck: ManakaiDOM|ForClass
-    @@Name: isTypeURI
-    @@enDesc:
-      Tests whether this resource is of a type or not. 
-    @@Param:
-      @@@Name: typeURI
-      @@@Type: ResourceURI
-      @@@enDesc:
-        A type URI reference to test. 
-    @@Return:
-      @@@Type:
-        DOMMain:boolean::ManakaiDOM:all 
-      @@@TrueCase:
-        @@@@enDesc:
-          This is a <P::typeURI> resource. 
-      @@@FalseCase:
-        @@@@enDesc:
-          This is not a <P::typeURI> resource. 
-      @@@PerlDef:
-        __DEEP{
-          $r = $self-><AG::DIS|DISAnyResource.database>
-                    -><M::DIS|DISDatabase.getResource> (<Q::DISCore:Module>)
-                    -><M::DIS|DISAnyResource.isTypeURI> ($typeURI);
-        }__;
 ##DISModuleLite
 
 IFClsDef:
@@ -4976,6 +5255,7 @@ IFClsDef:
   @ClsQName: ManakaiDISForDefinition
 
   @ClsISA: dp|ManakaiDISAnyResourcePerl
+  @ClsISA: ManakaiDISPropertyAccessor
   @ClsISA: ManakaiDISAnyResource
   @ClsISA: ManakaiDISExceptionTarget
 
@@ -5103,19 +5383,6 @@ IFClsDef:
           }
 
   @Attr:
-    @@Name: isAnonymous
-    @@enDesc:
-      Whether the resource has persistent name or not. 
-    @@Type: 
-      DOMMain:boolean::ManakaiDOM:all
-    @@ForCheck: ManakaiDOM|ForClass
-    @@Get:
-      @@@TrueCase:
-        @@@@enDesc:
-          A <QUOTE::for> <kwd:MUST> have a name.
-      @@@PerlDef: $r = true;
-
-  @Attr:
     @@ForCheck: ManakaiDOM|ForClass
     @@Name: forURI
     @@Type: ForURI
@@ -5182,31 +5449,53 @@ IFClsDef:
         <A::DISAnyResource.uri> for <QUOTE::for> resources.
       @@@PerlDef: $r = $self->{uri};
 
-  @Method:
-    @@ForCheck: ManakaiDOM|ForClass
-    @@Name: isTypeURI
+  @CMethod:
+    @@Name: getSuperResourceURIList
     @@enDesc:
-      Tests whether this resource is of a type or not. 
-    @@Param:
-      @@@Name: typeURI
-      @@@Type: ResourceURI
-      @@@enDesc:
-        A type URI reference to test. 
+      Returns a snapshot list of super-resources URIs of the resource,
+      including canonical and alias URIs of the resource itself.
     @@Return:
-      @@@Type:
-        DOMMain:boolean::ManakaiDOM:all 
-      @@@TrueCase:
-        @@@@enDesc:
-          This is a <P::typeURI> resource. 
-      @@@FalseCase:
-        @@@@enDesc:
-          This is not a <P::typeURI> resource. 
+      @@@Type: URIList
+      @@@enDesc:
+        A snapshot list of URIs.
       @@@PerlDef:
-        __DEEP{
-          $r = $self-><AG::DIS|DISAnyResource.database>
-                    -><M::DIS|DISDatabase.getResource> (<Q::DISCore:For>)
-                    -><M::DIS|DISAnyResource.isTypeURI> ($typeURI);
-        }__;
+        $r = [
+               (grep {$self->{isa}->{$_}} keys %{$self->{isa}}),
+               (grep {$self->{aliasURI}->{$_}} keys %{$self->{aliasURI}}),
+               ($self->{uri}),
+             ];
+
+    @@Test:
+      @@@QName: DISFor.getSuperResourceURIList.test
+      @@@PerlDef:
+        my $db;
+        __CODE{createDISDBForTest:: $db => $db}__;
+
+        my $res1 = $db-><M::DISDatabase.getFor> ('about:1');
+
+        my %list1 = map {$_ => true} @{$res1-><M::DISAnyResource
+                                               .getSuperResourceURIList>};
+
+        $test->assert_true ($list1{'about:1'});
+        $test->assert_false ($list1{'about:2'});
+        $test->assert_true ($list1{<Q::ManakaiDOM:all>});
+
+        my $res2 = $db-><M::DISDatabase.getFor> ('about:2');
+        $res1-><M::DISFor.addISA> ($res2);
+
+        my %list1_2 = map {$_ => true} @{$res1-><M::DISAnyResource
+                                               .getSuperResourceURIList>};
+
+        $test->assert_true ($list1_2{'about:1'});
+        $test->assert_true ($list1_2{'about:2'});
+        $test->assert_true ($list1_2{<Q::ManakaiDOM:all>});
+
+        my %list2 = map {$_ => true} @{$res2-><M::DISAnyResource
+                                               .getSuperResourceURIList>};
+
+        $test->assert_false ($list2{'about:1'});
+        $test->assert_true ($list2{'about:2'});
+        $test->assert_true ($list2{<Q::ManakaiDOM:all>});
 ##DISFor
 
 PropDef:
@@ -5358,45 +5647,7 @@ IFClsDef:
             }
           }
         }__;
-
-  @Method:
-    @@Name: isTypeURI
-    @@enDesc:
-      Tests whether this resource is of a type or not. 
-    @@Param:
-      @@@Name: typeURI
-      @@@Type: ResourceURI
-      @@@enDesc:
-        A type URI reference to test. 
-    @@Return:
-      @@@Type:
-        DOMMain:boolean::ManakaiDOM:all 
-      @@@TrueCase:
-        @@@@enDesc:
-          This is a <P::typeURI> resource. 
-      @@@FalseCase:
-        @@@@enDesc:
-          This is not a <P::typeURI> resource. 
-      @@@PerlDef:
-        if (not $self->{<Q::rdf:type>}) {
-          #
-        } elsif ($self->{<Q::rdf:type>}->{$typeURI}) {
-          $r = true;
-        } else {
-          __DEEP{
-            C: for my $t_type_uri (grep {$self->{<Q::rdf:type>}->{$_}}
-                                        keys %{$self->{<Q::rdf:type>}}) {
-              my $t_type = $self-><AG::DISAnyResource.database>
-                                -><M::DISDatabase.getResource> ($t_type_uri);
-              if ($t_type-><M::DISResource.isSubsetOfURI> ($typeURI)) {
-                $self-><M::DISResourceProp.addPropertyURIUList>
-                                            (<Q::rdf:type>, $typeURI);
-                $r = true;
-                last C;
-              }
-            }
-          }__;
-        }
+    ## TODO: updateRevision
 
   @Attr:
     @@Name: disDataTypeResource
@@ -5663,7 +5914,7 @@ IFClsDef:
           my $db = $self-><AG::DIS|DISAnyResource.database>;
           C: for my $cr_uri (@{$self->{<H::DIS:childResource>}||[]}) {
             my $cr = $db-><M::DIS|DISDatabase.getResource> ($$cr_uri);
-            if ($cr-><M::DIS|DISResource.isTypeURI> ($typeURI)) {
+            if ($cr-><M::DIS|DISAnyResource.isTypeURI> ($typeURI)) {
               $r = $cr;
               last C;
             }
@@ -5687,7 +5938,7 @@ IFClsDef:
         __DEEP{
           my $db = $self-><AG::DIS|DISAnyResource.database>;
           $r = [grep {
-                  $_-><M::DIS|DISResource.isTypeURI> ($typeURI)
+                  $_-><M::DIS|DISAnyResource.isTypeURI> ($typeURI)
                 } map {
                   $db-><M::DIS|DISDatabase.getResource> ($$_)
                 } @{$self->{<H::DIS|childResource>}||[]}];
@@ -5725,7 +5976,7 @@ IFClsDef:
             my $cr = $db-><M::DIS|DISDatabase.getResource> ($$cr_uri);
             my $ln = $cr-><AG::DIS|DISAnyResource.localName>;
             if (defined $ln and $ln eq $localName and
-                $cr-><M::DIS|DISResource.isTypeURI> ($typeURI)) {
+                $cr-><M::DIS|DISAnyResource.isTypeURI> ($typeURI)) {
               $r = $cr;
               last C;
             }
@@ -5758,10 +6009,10 @@ IFClsDef:
             my $cr = $db-><M::DIS|DISDatabase.getResource> ($$cr_uri);
             my $ln = $cr-><AG::DIS|DISAnyResource.localName>;
             if ($ln and $ln eq $localName and
-                $cr-><M::DIS|DISResource.isTypeURI> (<Q::DISLang:Const>)) {
+                $cr-><M::DIS|DISAnyResource.isTypeURI> (<Q::DISLang:Const>)) {
               $r = $cr;
               last C;
-            } elsif ($cr-><M::DIS|DISResource.isTypeURI>
+            } elsif ($cr-><M::DIS|DISAnyResource.isTypeURI>
                                 (<Q::DISLang:ConstGroup>)) {
               push @constGroup, $cr;
             }
@@ -5852,7 +6103,7 @@ IFClsDef:
           my $res = $self;
           __DEEP{
             RES: {
-              if ($res-><M::ManakaiDISResourceDefinition.isTypeURI>
+              if ($res-><M::DISAnyResource.isTypeURI>
                              (<Q::ManakaiDOM:Class>)) {
                 $r = $res-><AG::DISAnyResource.sourceNodeID>;
               } else {
@@ -5978,7 +6229,7 @@ IFClsDef:
             ## TODO: instance feature
             my $pr = $self-><AG::DIS|DISResource.parentResource>;
             if ($pr) {
-              if ($pr-><M::DISResource.isTypeURI> (<Q::DOMFeature:Feature>) and
+              if ($pr-><M::DISAnyResource.isTypeURI> (<Q::DOMFeature:Feature>) and
                   not $pr-><AG::DISAnyResource.isAnonymous>) {
                 push @$r, @{$pr-><AG::DISResource.featureNameList>};
               }
@@ -6081,7 +6332,79 @@ IFClsDef:
             $r = <Q::DISCore|String>;
           }
         }__;
+
+  @CMethod:
+    @@Name: getSuperResourceURIList
+    @@enDesc:
+      Returns a snapshot list of super-resources URIs of the resource,
+      including canonical and alias URIs of the resource itself.
+    @@Return:
+      @@@Type: URIList
+      @@@enDesc:
+        A snapshot list of URIs.
+      @@@PerlDef:
+        $r = [
+               (grep {$self->{subOf}->{$_}} keys %{$self->{subOf}}),
+               (grep {$self->{aliasURI}->{$_}} keys %{$self->{aliasURI}}),
+             ];
+
+    @@Test:
+      @@@QName: DISResource.getSuperResourceURIList.test
+      @@@PerlDef:
+        my $db;
+        __CODE{createDISDBForTest:: $db => $db}__;
+
+        my $res1 = $db->get_resource ('about:test1');
+        my $res2 = $db->get_resource ('about:test2');
+        $res1->add_super_resource ($res2);
+
+        my %list1 = map {$_ => true} @{$res1->get_super_resource_uri_list};
+        $test->id ('res1.itself');
+        $test->assert_true ($list1{'about:test1'});
+        $test->id ('res1.res2');
+        $test->assert_true ($list1{'about:test2'});
+
+        my %list2 = map {$_ => true} @{$res2->get_super_resource_uri_list};
+        $test->id ('res2.itself');
+        $test->assert_true ($list2{'about:test2'});
+        $test->id ('res2.res1');
+        $test->assert_false ($list2{'about:test1'});
+
+  @Method:
+    @@ForCheck: ManakaiDOM|ForIF
+    @@Name: isTypeURI
+    @@enImplNote: For compatibility with old code.
 ##DISResource
+
+ResourceDef:
+  @QName: String
+  @AliasFor: DISLang|String||ManakaiDOM|all
+  @For: DIS|ForEmpty
+
+ResourceDef:
+  @QName: RevisionNumber
+  @AliasFor: idl|unsignedLong||ManakaiDOM|all
+  @For: DIS|ForEmpty
+  @enImplNote:
+    {ISSUE::
+      Should be <Q::idl|unsignedLongLong||ManakaiDOM|all>?
+    }
+
+PropDef:
+  @QName: DIS|revision
+  @DIS:key: r
+
+ElementTypeBinding:
+  @Name: Test
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: test|StandaloneTest
+    @@ForCheck: ManakaiDOM|ForClass
+
+DataTypeDef:
+  @QName: URIList
+  @rdfs:subClassOf: DISPerl|ARRAY||ManakaiDOM|all
 
 IFClsDef:
   @IFQName: DISResourceMV
@@ -6182,7 +6505,7 @@ IFClsDef:
               if defined $self->{<H::DIS:mvOwnerElementURI>};
           } else {
             $r = $self-><AG::DIS|DISResource.parentResource>;
-            undef $r unless $r-><M::DIS|DISResource
+            undef $r unless $r-><M::DIS|DISAnyResource
                                    .isTypeURI> (<Q::s:AnyOwnerElement>);
             $self->{<H::DIS:mvOwnerElementURI>} = $r->{uri} if $r;
           }
@@ -7757,6 +8080,15 @@ ElementTypeBinding:
     @@For: !=ForEmpty
 
 ElementTypeBinding:
+  @Name: CMethod
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:Method
+    @@ForCheck: !=ForEmpty ManakaiDOM|ForClass
+
+ElementTypeBinding:
   @Name: IntMethod
   @ElementType:
     dis:ResourceDef
@@ -7774,6 +8106,15 @@ ElementTypeBinding:
     @@rdf:type:
       DISLang:Attribute
     @@For: !=ForEmpty
+
+ElementTypeBinding:
+  @Name: CAttr
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      DISLang:Attribute
+    @@ForCheck: !=ForEmpty ManakaiDOM|ForClass
 
 ElementTypeBinding:
   @Name: Return

@@ -1,3 +1,20 @@
+2006-02-19  Wakaba  <wakaba@suika.fam.cx>
+
+	* DIS.dis (getResource, getFor, getModule): Set |DIS:typeURI|
+	property on creation of an object.
+	(isAnonymous): Setter is added.
+	(isTypeURI): Redefined using |typeResource| and |isSubsetOfURI|.
+	(getTypeURIList): New method.
+	(typeResource): New attribute.
+	(addTypeURI): New method.
+	(DISModule.isAnonymous, DISFor.isAnonymous): Removed.  Now |for|s
+	and modules as well as normal resources can be anonymous.
+	(getSuperResourceURIList): New method.
+
+2006-02-18  Wakaba  <wakaba@suika.fam.cx>
+
+	* DIS.dis (revision): New attribute.
+
 2006-02-09  Wakaba  <wakaba@suika.fam.cx>
 
 	* PerlCode.dis (PerlStringLiteral.stringify): |pc:preserve-line-break|
