@@ -25,7 +25,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/10/02 23:35:34 $
+      $Date: 2006/02/19 10:55:03 $
     @@ContentType:
       dis:Date.RCS
   
@@ -110,6 +110,12 @@ ResourceDef:
   @Description:
     @@lang:en
     @@@: A RDF class.
+  @subsetOf: DISCore|ResourceType
+  @rdfs:subClassOf: DISCore|ResourceType
+  @ImplNote:
+    @@lang:en
+    @@@:
+      Future version should remove this <Q::subsetOf> relationship.
 
 ResourceDef:
   @QName:

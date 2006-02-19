@@ -1,3 +1,16 @@
+2006-02-19  Wakaba  <wakaba@suika.fam.cx>
+
+	* DISSource.dis (dis:MultipleResource): It is now
+	a |DISCore:ResourceType|.
+
+	* DISRDF.dis (rdfs:Class): It is now a subset of |DISCore:ResourceType|.
+
+	* DISCore.dis (dis:ModuleSet): It should have been a 
+	subset of |DISCore:Resource|.
+	(DISCore:AnyType): It should have been a subset of |DISCore:Resource|.
+	(DISCore:ResourceType): New type.
+	(DISCore:resourceType): New property.
+
 2006-02-09  Wakaba  <wakaba@suika.fam.cx>
 
 	* DISCore.dis (DISCore:UString): New lextype.

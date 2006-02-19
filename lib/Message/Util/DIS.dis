@@ -23,7 +23,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2006/02/19 07:06:14 $
+      $Date: 2006/02/19 10:55:02 $
     @@ContentType:
       dis:Date.RCS
   
@@ -532,6 +532,17 @@ IFClsDef:
           }
           $uri = qq<tag:suika.fam.cx,2005-09:$__turi+$__furi>;
         }
+
+  @CODE:
+    @@QName: composeSubsetURI
+    @@PerlDef:
+      my $__uri1 = $input1;
+      my $__uri2 = $input2;
+      for my $__uri ($__uri1, $__uri2) {
+        $__uri =~ s{([^0-9A-Za-z!\$'()*,:;=?\@_./~-])}
+                   {sprintf '%%%02X', ord $1}ge;
+      }
+      $output = qq<tag:suika.fam.cx,2006-02:$__uri1+$__uri2>;
 
   @ImplNote:
     @@lang:en
@@ -2507,8 +2518,6 @@ IFClsDef:
                  <H::DIS|typeURI> => <Q::DISCore|Module>,
                  <H::DIS|revision> => 0,
                }, <ClassName::ManakaiDISModuleDefinition>;
-          $r-><M::DISResourceProp.addPropertyURIUList>
-                (<Q::rdf:type>, <Q::DISCore|Module>); ## TODO: Remove
           require Scalar::Util;
           Scalar::Util::weaken ($r->{db});
         }
@@ -2582,8 +2591,6 @@ IFClsDef:
                  <H::DIS|revision> => 0,
                }, <ClassName::ManakaiDISForDefinition>;
           $self->{forDef}->{<Q::ManakaiDOM:all>}->{revISA}->{$forURI} = true;
-          $r-><M::DISResourceProp.addPropertyURIUList>
-                (<Q::rdf:type>, <Q::DISCore|For>); ## TODO: Remove
           require Scalar::Util;
           Scalar::Util::weaken ($r->{db});
         }
@@ -2676,8 +2683,6 @@ IFClsDef:
                  <H::DIS|typeURI> => <Q::DISCore|Resource>,
                  <H::DIS|revision> => 0,
                }, <ClassName::ManakaiDISResourceDefinition>;
-          $r-><M::DISResourceProp.addPropertyURIUList>
-                (<Q::rdf:type>, <Q::DISCore|Resource>); ## TODO: Remove
           require Scalar::Util;
           Scalar::Util::weaken ($r->{db});
         }
@@ -3348,9 +3353,7 @@ IFClsDef:
               $has_type = true;
               my $type_uri = $ce-><AG::DISElement.qnameValueURI>;
               my $type = $self-><M::DISDatabase.getResource> ($type_uri);
-              $res-><M::DISResourceProp.addPropertyResourceUList>
-                                               (<Q::rdf:type>, $type); ## TODO: Remove
-              $res-><M::DISAnyResource.addTypeURI> ($type);
+              $res-><M::DISAnyResource.addTypeURI> ($type_uri);
               $type-><AS::DISAnyResource.isReferred> ($ce);
               if ($type-><M::DISResource.isSubsetOfURI>
                                                (<Q::dis:MultipleResource>)) {
@@ -4761,33 +4764,6 @@ IFClsDef:
                     -><M::DISResource.isSubsetOfURI> ($typeURI);
         }__;
 
-
-
-
-        unless ($r) {
-
-        if (not $self->{<Q::rdf:type>}) {
-          #
-        } elsif ($self->{<Q::rdf:type>}->{$typeURI}) {
-          $r = true;
-        } else {
-          __DEEP{
-            C: for my $t_type_uri (grep {$self->{<Q::rdf:type>}->{$_}}
-                                        keys %{$self->{<Q::rdf:type>}}) {
-              my $t_type = $self-><AG::DISAnyResource.database>
-                                -><M::DISDatabase.getResource> ($t_type_uri);
-              if ($t_type-><M::DISResource.isSubsetOfURI> ($typeURI)) {
-                $self-><M::DISResourceProp.addPropertyURIUList>
-                                            (<Q::rdf:type>, $typeURI);
-                $r = true;
-                last C;
-              }
-            }
-          }__;
-        }
-
-        }
-
   @Attr:
     @@Name: revision
     @@enDesc:
@@ -4906,16 +4882,21 @@ IFClsDef:
           unless ($current_type-><M::DISResource.isSubsetOfURI> ($uri)) {
             my $db = $self-><AG::DISAnyResource.database>;
             my $res = $db-><M::DISDatabase.getResource> ($uri);
-            my $current_uri = $self-><AG::DISAnyResource.uri>;
+            my $current_uri = $current_type-><AG::DISAnyResource.uri>;
             if ($res-><M::DISResource.isSubsetOfURI> ($current_uri)) {
-              $self->{<H::DIS|typeURI>} = $current_uri;
+              $self->{<H::DIS|typeURI>} = $uri;
             } else {
-              my $new_uri = <Code::ManakaiDOM|generateUniqueID||ManakaiDOM|Perl>;
+              my $new_uri;
+              __CODE{composeSubsetURI:: $input1 => $current_uri,
+                                        $input2 => $uri,
+                                        $output => $new_uri}__;
               my $new_res = $db-><M::DISDatabase.getResource> ($new_uri);
-              $new_res-><AS::DISAnyResource.isAnonymous> (true);
-              $new_res-><AS::DISAnyResource.isDefined> (true);
-              $new_res-><M::DISResource.addSuperResource> ($current_type);
-              $new_res-><M::DISResource.addSuperResource> ($res);
+              unless ($new_res-><AG::DISAnyResource.isDefined>) {
+                $new_res-><AS::DISAnyResource.isAnonymous> (true);
+                $new_res-><AS::DISAnyResource.isDefined> (true);
+                $new_res-><M::DISResource.addSuperResource> ($current_type);
+                $new_res-><M::DISResource.addSuperResource> ($res);
+              }
               $self->{<H::DIS|typeURI>} = $new_uri;
             }
           }

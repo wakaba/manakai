@@ -1,5 +1,13 @@
 2006-02-19  Wakaba  <wakaba@suika.fam.cx>
 
+	* DIS.dis (composeSubsetURI): New code fragment.
+	(getResource, getModule, getFor, loadResource): Old |rdf:type| settking
+	code is removed.
+	(isSubsetOfURI): Old compatibility code removed.
+	(addTypeURI): Bugs fixed.
+
+2006-02-19  Wakaba  <wakaba@suika.fam.cx>
+
 	* DIS.dis (getResource, getFor, getModule): Set |DIS:typeURI|
 	property on creation of an object.
 	(isAnonymous): Setter is added.

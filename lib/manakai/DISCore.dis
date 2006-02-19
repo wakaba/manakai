@@ -19,7 +19,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/02/09 10:23:21 $
+      $Date: 2006/02/19 10:55:03 $
     @@ContentType:
       dis:Date.RCS
   
@@ -154,10 +154,7 @@ ElementTypeBinding:
   @ElementType: 
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      rdfs:Class
-    @@ISA:
-      rdfs:Class
+    @@rdf:type: DISCore|ResourceType
 
 ElementTypeBinding:
   @Name: PropDef
@@ -246,6 +243,8 @@ ResourceTypeDef:
     @@@: A set of modules
   @rdfs:subClassOf: DISCore|AnyModule
   @subsetOf: DISCore|AnyModule
+  @rdfs:subClassOf: DISCore|Resource
+  @subsetOf: DISCore|Resource
 
 ResourceDef:
   @QName:
@@ -482,12 +481,9 @@ SPropDef:
 
 ResourceDef:
   @QName: AnyType
-  @rdf:type:
-    rdfs:Class
-  @subsetOf:
-    rdfs:Class
-  @rdfs:subClassOf:
-    rdfs:Class
+  @rdf:type: DISCore|ResourceType
+  @subsetOf: DISCore|Resource
+  @rdfs:subClassOf: DISCore|Resource
   @Description:
     @@lang:en
     @@@:
@@ -502,9 +498,25 @@ ResourceDef:
     The name of <QUOTE::abstract data type> was incorrect.
 
 ResourceDef:
+  @QName: DISCore|ResourceType
+  @enDesc:
+    A <Q::DISCore|ResourceType> is a type of <Q::DISCore|AnyResource>s.
+  @rdf:type: DISCore|ResourceType
+  @subsetOf: DISCore|AnyType
+  @rdfs:subClassOf: DISCore|AnyType
+
+SPropDef:
+  @QName: DISCore|resourceType
+  @enDesc:
+    A type of the resource.
+  @dataType: DISCore|QName
+  @multipleProperties: DISCore|UnorderedList
+  @rdfs:domain: DISCore|AnyResource
+  @rdfs:range: DISCore|ResourceType
+
+ResourceDef:
   @QName: LexicalType
-  @rdf:type:
-    rdfs:Class
+  @rdf:type: DISCore|ResourceType
   @subsetOf: AnyType
   @rdfs:subClassOf: AnyType
   @Description:
