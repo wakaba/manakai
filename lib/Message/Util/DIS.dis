@@ -23,7 +23,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2006/02/20 09:03:13 $
+      $Date: 2006/02/20 11:46:08 $
     @@ContentType:
       dis:Date.RCS
   
@@ -5083,15 +5083,18 @@ IFClsDef:
         }
         my $__db = $resource-><AG::DISAnyResource.database>;
         T1: for my $__t1_uri (keys %__methods) {
+          next T1 unless $__methods{$__t1_uri};
           my $__t1 = $__db-><M::DISDatabase.getResource> ($__t1_uri);
           T2: for my $__t2_uri (keys %__methods) {
             next T2 if $__t1_uri eq $__t2_uri;
             if ($__t1-><M::DISResource.isSubsetOfURI> ($__t2_uri)) {
               delete $__methods{$__t2_uri};
+              next T2;
             }
             if ($Message::Util::DIS::Method{$__t1_uri}->{$method_name}
                   eq $Message::Util::DIS::Method{$__t2_uri}->{$method_name}) {
               delete $__methods{$__t2_uri};
+              next T2;
             }
           }
         }
