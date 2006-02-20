@@ -1,3 +1,23 @@
+2006-02-20  Wakaba  <wakaba@suika.fam.cx>
+
+	* DIS.dis (isPropertyElement): The |DISCore:resourceType|
+	element type is now recognized as a property.  In addition,
+	element types that are a |DISSource:Property| are
+	properties.
+	(DIS:AnyMethod, DIS:Method, DIS:Attribute): New types.
+	(DIS:targetType): New property.
+	(DISModule, DISFor, DISResource, DISDatabase): These
+	classes no longer inherits |ManakaiDISExceptionTarget|.
+	(DISDatabase.loadResource): Reads |DISCore:resourceType| property
+	as well as |rdf:type| property.
+	(DISAnyResource.MUErrorHandler, DISDatabase.MUErrorHandler): New
+	methods.
+	(DISDatabase.domConfig): New attribute.
+	(error-handler): New configuration parameter.
+	(getMethodForType): New code fragment.
+	(DIS:more-than-one-methods-for-a-type): New error.
+	(ManakaiDISExceptionTarget): Removed.
+
 2006-02-19  Wakaba  <wakaba@suika.fam.cx>
 
 	* DIS.dis (composeSubsetURI): New code fragment.

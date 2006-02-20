@@ -1,3 +1,16 @@
+2006-02-20  Wakaba  <wakaba@suika.fam.cx>
+
+	* Perl.dis (plStore): Don't store |error-handler| configuration
+	parameter value.
+	(plGeneratePerlModule): The |DIS:AnyMethod| type support
+	is added.
+	(plName): Split by resource types.
+
+	* DNLite.dis (isPropertyElement): The |DISCore:resourceType|
+	element type is now recognized as a property.  In addition,
+	element types that are a |DISSource:Property| are
+	properties.
+
 2006-02-19  Wakaba  <wakaba@suika.fam.cx>
 
 	* Perl.dis (plStoreDISDatabase): Resources that

@@ -23,7 +23,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2006/02/19 10:55:02 $
+      $Date: 2006/02/20 09:03:13 $
     @@ContentType:
       dis:Date.RCS
   
@@ -50,6 +50,8 @@ Module:
   @DefaultFor: DIS|ForLatest
 
 Namespace:
+  @c:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
   @DIS:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#
   @dis:
@@ -1976,11 +1978,9 @@ IFClsDef:
     @@enDesc:
       Whether this element is a property or not. 
       \
-      {NOTE:: An element is a property if its element type is
-              <Q::rdf:type> or if its element type's <Q::rdf:type> 
-              property is <Q::rdf:Property> or is <Q::dis:subsetOf> 
-              <Q::rdf:Property>. 
-      \
+      {NOTE:: An element is a property if the resource whose
+              URI is equal to the element type name is a property,
+              i.e. whose type is <Q::DISSource|Property>.
       }
     @@NamedParam:
       @@@Name: databaseArg
@@ -1999,14 +1999,17 @@ IFClsDef:
       @@@PerlDef:
         __DEEP{
           my $xn = $self-><AG::SWCFGElement.expandedURI>;
-          if ($xn eq <Q::rdf:type>) {
+          if ($xn eq <Q::DISCore|resourceType> or $xn eq <Q::rdf:type>) {
             $r = true;
           } else {
             my $rdef = ($databaseArg or
                         $self-><AG::DISNode.ownerDISDocument>
                              -><AG::DISDocument.disDatabase>)
                              -><M::DISDatabase.getResource> ($xn);
-            $r = $rdef-><M::DISAnyResource.isTypeURI> (<Q::rdf:Property>);
+            $r = $rdef-><M::DISAnyResource.isTypeURI>
+                          (<Q::DISSource|Property>) ||
+                 $rdef-><M::DISAnyResource.isTypeURI> (<Q::rdf:Property>);
+                              ## TODO: Remove this.
           }
         }__;
 
@@ -2184,6 +2187,47 @@ PropDef:
   @QName: allNSBindings
   @enDesc:
     Collected set of namespace bindings for a node.
+
+ResourceTypeDef:
+  @QName: DIS|AnyMethod
+  @enDesc:
+    A method or attribute for particular resource types.
+  @subsetOf: DISLang|AnyMethod
+
+ResourceTypeDef:
+  @QName: DIS|Method
+  @enDesc:
+    A method for particular resource types.
+  @subsetOf: DISLang|Method
+  @subsetOf: DIS|AnyMethod
+
+ResourceTypeDef:
+  @QName: DIS|Attribute
+  @enDesc:
+    A attribute for particular resource types.
+  @subsetOf: DISLang|Attribute
+  @subsetOf: DIS|AnyMethod
+
+RPropDef:
+  @QName: DIS|targetType
+  @enDesc:
+    A resource type for which the method is applied.
+  @rdfs:range: DISCore|ResourceType
+  @rdfs:domain: DIS|Method
+  @dataType: DISCore|QName
+  @multipleProperties: DISCore|UnorderedList
+
+ResourceDef:
+  @QName: DISString
+  @AliasFor: DISLang|String||ManakaiDOM|all
+  @For: DIS|ForEmpty
+
+ElementTypeBinding:
+  @Name: ResourceTypeDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISCore|ResourceType
 
 IFClsDef:
   @IFQName: DISModuleElement
@@ -2470,7 +2514,6 @@ IFClsDef:
   @ClsQName: ManakaiDISDatabase
 
   @ClsISA: dp|ManakaiDISDatabasePerl
-  @ClsISA: ManakaiDISExceptionTarget
 
   @enDesc:
     Resource database created from <QUOTE::dis> source data. 
@@ -3348,8 +3391,11 @@ IFClsDef:
           my $has_type = $al_node;
           while (@ce0) {
             my $ce = shift @ce0;
-            if ($ce-><M::DISElement.elementTypeMatch> (<Q::rdf:type>,
+            if ($ce-><M::DISElement.elementTypeMatch>
+                       (<Q::DISCore|resourceType>, database_arg => $self) or
+                $ce-><M::DISElement.elementTypeMatch> (<Q::rdf:type>,
                                      database_arg => $self)) {
+                       ## TODO: Remove this.
               $has_type = true;
               my $type_uri = $ce-><AG::DISElement.qnameValueURI>;
               my $type = $self-><M::DISDatabase.getResource> ($type_uri);
@@ -3717,7 +3763,77 @@ IFClsDef:
       @@@PerlDef:
         $r = [keys %{$self->{<H::DIS|resourceModuleMap>}},
               map {$_-><AG::DIS|DISAnyResource.uri>} values %{$self->{modDef}}];
+
+  @IntMethod:
+    @@Operator: ManakaiDOM|MUErrorHandler
+    @@enDesc:
+      When a <IF::ecore|ErrorInterface||ManakaiDOM|Perl> is <Perl::report>ed
+      with an <Perl::-object> of <IF::Node>, then this method is invoked.
+      
+      The method calls the <cfg::error-handler> if the error is of 
+      <IF::c|DOMError>.  Otherwise, including the cases of
+      <IF::DOMCore|DOMException>s,
+      the error is rethrown so that appropriate <Perl::catch> clause
+      can catch the error.
+    @@enImplNote:
+      For implementations which does not have the
+      <IF::c|DOMError||ManakaiDOM|ManakaiDOM3> interface, the method
+      is defined in the <Class::ManakaiDOM|ManakaiDOMObject> class
+      and it is not overridden here.
+    @@Param:
+      @@@Name: err
+      @@@Type: ecore|ErrorInterface||ManakaiDOM|Perl
+      @@@enDesc:
+        The reported error object.
+    @@Return:
+      @@@Type: DISPerl|Any||ManakaiDOM|Perl
+      @@@enDesc:
+        If the <P::err> is a <IF::c|DOMError>, then the return value
+        of the error handler.
+
+           {NOTE:: If the error is thrown, the method never returns.
+           }
+      @@@nullCase:
+        @@@@enDesc:
+          No error handler.
+      @@@PerlDef:
+        if ($err->isa (<IFName::c|DOMError||ManakaiDOM|ManakaiDOM>)) {
+          __DEEP{
+            my $cfg = $self-><AG::DISDatabase.domConfig>;
+            my $h = $cfg-><M::DOMConfig.getParameter> ('error-handler');
+            $r = $h-><M::DOMCore|DOMErrorHandler.handleError> ($err);
+          }__;
+        } else {
+          $err-><M::ecore|ErrorInterface||ManakaiDOM|Perl.throw>;
+        }
+
+  @Attr:
+    @@Name: domConfig
+    @@enDesc:
+      The configuration of the document.
+    @@Get:
+      @@@Type: DOMConfig
+      @@@enDesc: The DOM configuration object.
+      @@@PerlDef:
+        __CODE{c|getConfigObject||ManakaiDOM|ManakaiDOMLatest::
+          $target => $self,
+          $targetHash => {$self},
+          $targetType => {<IFName::DISDatabase>},
+          $result => $r,
+        }__;
 ##DISDatabase
+
+CParamApp:
+  @c:domConfigurationParameter: c|error-handler||ManakaiDOM|ManakaiDOMLatest
+  @c:targetType: DISDatabase
+
+ElementTypeBinding:
+  @Name: CParamApp
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: c|DOMConfigurationParameterApplication
+    @@For: DIS|ForLatest
 
 PropDef:
   @QName: DIS|resourceModuleMap
@@ -4362,7 +4478,8 @@ IFClsDef:
                 <Q::dis:Name> => true,
                 <Q::dis:Namespace> => true,
                 <Q::dis:multipleProperties> => true,
-                <Q::rdf:type> => true,
+                <Q::DISCore|resourceType> => true,
+                <Q::rdf:type> => true, ## TODO: Remove this.
                 <Q::dis:QName> => true,
                 <Q::dis:Require> => true,
                 <Q::dis:resourceFor> => true,
@@ -4945,7 +5062,139 @@ IFClsDef:
         $test->id ('added2.type1');
         $test->assert_false
                  ($res2-><M::DISAnyResource.isTypeURI> ('about:type1'));
+
+  @CODE:
+    @@QName: getMethodForType
+    @@enDesc:
+      Returns a method for a particular resource type.
+ 
+      In: <Perl::$resource>, <Perl::$method_name>
+
+      Out: <Perl::$method>
+    @@PerlDef:
+      my $__type = $resource-><AG::DISAnyResource.typeResource>;
+      my $__type_uri = $__type-><AG::DISAnyResource.uri>;
+      $method = $Message::Util::DIS::Method{$__type_uri}->{$method_name};
+      unless ($method) {
+        my %__methods;
+        for (@{$__type-><M::DISAnyResource.getSuperResourceURIList>}) {
+          $__methods{$_} = $Message::Util::DIS::Method{$_}->{$method_name}
+            if $Message::Util::DIS::Method{$_}->{$method_name};
+        }
+        my $__db = $resource-><AG::DISAnyResource.database>;
+        T1: for my $__t1_uri (keys %__methods) {
+          my $__t1 = $__db-><M::DISDatabase.getResource> ($__t1_uri);
+          T2: for my $__t2_uri (keys %__methods) {
+            next T2 if $__t1_uri eq $__t2_uri;
+            if ($__t1-><M::DISResource.isSubsetOfURI> ($__t2_uri)) {
+              delete $__methods{$__t2_uri};
+            }
+            if ($Message::Util::DIS::Method{$__t1_uri}->{$method_name}
+                  eq $Message::Util::DIS::Method{$__t2_uri}->{$method_name}) {
+              delete $__methods{$__t2_uri};
+            }
+          }
+        }
+        if (keys %__methods > 1) {
+          __c|ERROR{DIS|more-than-one-methods-for-a-type::
+            DIS|uri => {$__type_uri},
+            DIS|method-name => {$method_name},
+            DIS|method-resource-types => {[keys %__methods]},
+          }__;
+        }
+        $Message::Util::DIS::Method{$__type_uri}->{$method_name} =
+        $method = $__methods{[keys %__methods]->[0]} if %__methods;
+      }
+
+  @IntMethod:
+    @@Operator: ManakaiDOM|MUErrorHandler
+    @@enDesc:
+      When a <IF::ecore|ErrorInterface||ManakaiDOM|Perl> is <Perl::report>ed
+      with an <Perl::-object> of <IF::Node>, then this method is invoked.
+      
+      The method calls the <cfg::error-handler> if the error is of 
+      <IF::c|DOMError>.  Otherwise, including the cases of <IF::c|DOMException>s,
+      the error is rethrown so that appropriate <Perl::catch> clause
+      can catch the error.
+    @@enImplNote:
+      For implementations which does not have the
+      <IF::c|DOMError||ManakaiDOM|ManakaiDOM3> interface, the method
+      is defined in the <Class::ManakaiDOM|ManakaiDOMObject> class
+      and it is not overridden here.
+    @@Param:
+      @@@Name: err
+      @@@Type: ecore|ErrorInterface||ManakaiDOM|Perl
+      @@@enDesc:
+        The reported error object.
+    @@Return:
+      @@@Type: DISPerl|Any||ManakaiDOM|Perl
+      @@@enDesc:
+        If the <P::err> is a <IF::c|DOMError>, then the return value
+        of the error handler.
+
+           {NOTE:: If the error is thrown, the method never returns.
+           }
+      @@@nullCase:
+        @@@@enDesc:
+          No error handler.
+      @@@PerlDef:
+        if ($err->isa (<IFName::c|DOMError||ManakaiDOM|ManakaiDOM>)) {
+          __DEEP{
+            my $cfg = $self-><AG::DISAnyResource.database>
+                           -><AG::DISDatabase.domConfig>;
+            my $h = $cfg-><M::DOMConfig.getParameter> ('error-handler');
+            $r = $h-><M::DOMCore|DOMErrorHandler.handleError> ($err);
+          }__;
+        } else {
+          $err-><M::ecore|ErrorInterface||ManakaiDOM|Perl.throw>;
+        }
 ##DISAnyResource
+
+ResourceDef:
+  @QName: DOMConfig
+  @AliasFor: DOMCore|DOMConfiguration||ManakaiDOM|ManakaiDOMLatest
+  @For: DIS|ForLatest
+
+ErrDef:
+  @QName: DIS|more-than-one-methods-for-a-type
+  @enDesc:
+    If more than one different method implementations are defined
+    for a resource type.
+  @enMufDef:
+    Method |%p (name => {<Q::DIS|method-name>});| for
+    resource <%p (name => {<Q::DIS|uri>});> has multiple definitions
+  @c:severity: DOMCore|SEVERITY_WARNING||ManakaiDOM|ManakaiDOMLatest
+  @ecore:hasParameter:
+    @@@: DIS|uri
+    @@enDesc:
+      A URI of the type.
+  @ecore:hasParameter:
+    @@@: DIS|method-name
+    @@enDesc:
+      The name of the method.
+  @ecore:hasParameter:
+    @@@: DIS|method-resource-types
+    @@enDesc:
+      The snapshot list of types for which methods are defined.
+
+XParamDef:
+  @QName: DIS|method-name
+  @enDesc:
+    The name of the method in question.
+
+XParamDef:
+  @QName: DIS|method-resource-types
+  @enDesc:
+    The snapshot list of types for which methods are defined.
+
+ElementTypeBinding:
+  @Name: ErrDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DOMCore|DOMErrorType
+    @@For: DIS|ForLatest
+    @@ecore:textFormatter: ecore|MUErrorFormatter||ManakaiDOM|Perl
 
 URITypeDef:
   @QName: AnyResourceURI
@@ -4969,7 +5218,6 @@ IFClsDef:
   @ClsQName: ManakaiDISModuleDefinition
 
   @ClsISA: ManakaiDISPropertyAccessor
-  @ClsISA: ManakaiDISExceptionTarget
   @ClsISA: ManakaiDISPerlModuleDefinition
   @ClsISA: dp|ManakaiDISModulePerl
   @ClsISA: dp|ManakaiDISAnyResourcePerl
@@ -5238,7 +5486,6 @@ IFClsDef:
   @ClsISA: dp|ManakaiDISAnyResourcePerl
   @ClsISA: ManakaiDISPropertyAccessor
   @ClsISA: ManakaiDISAnyResource
-  @ClsISA: ManakaiDISExceptionTarget
 
   @DISLang:role: ForRole
 
@@ -5494,7 +5741,6 @@ IFClsDef:
   @ClsISA: dp|ManakaiDISAnyResourcePerl
   @ClsISA: ManakaiDISPropertyAccessor
   @ClsISA: ManakaiDISAnyResource
-  @ClsISA: ManakaiDISExceptionTarget
 
   @DISLang:role: ResourceRole
 
@@ -8030,11 +8276,6 @@ ElementTypeBinding:
       @@@@:
         The source code in which an error has occurred. 
 
-ResourceDef:
-  @QName: ManakaiDISExceptionTarget
-  @AliasFor: dx|ManakaiDefaultExceptionHandler||ManakaiDOM|Perl
-  @For: DIS|ForEmpty
-
 ElementTypeBinding:
   @Name: plMName
   @ElementType:
@@ -8194,10 +8435,16 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      rdf:Property
-    @@For:
-      =ManakaiDOM|all
+    @@DISCore:resourceType: DISCore|Property
+    @@For: =ManakaiDOM|all
+
+ElementTypeBinding:
+  @Name: RPropDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISSource|ResourceProperty
+    @@For: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: MethodRedef

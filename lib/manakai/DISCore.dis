@@ -19,7 +19,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/02/19 10:55:03 $
+      $Date: 2006/02/20 09:03:18 $
     @@ContentType:
       dis:Date.RCS
   
@@ -154,31 +154,33 @@ ElementTypeBinding:
   @ElementType: 
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type: DISCore|ResourceType
+    @@DISCore:resourceType: DISCore|ResourceType
 
 ElementTypeBinding:
   @Name: PropDef
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      rdf:Property
+    @@DISCore:resourceType: DISCore|Property
 
 ElementTypeBinding:
   @Name: SPropDef
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type: rdf|Property
-    @@rdf:type: DISSource|Property
-    @@rdf:type: DISSource|ResourceProperty
+    @@DISCore:resourceType: DISSource|Property
+    @@DISCore:resourceType: DISSource|ResourceProperty
+  @ImplNote:
+    @@lang:en
+    @@@:
+      It is actualy <CODE::RPropDef>.
 
 ElementTypeBinding:
   @Name: CPropDef
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type: DISCore|Property
+    @@DISCore:resourceType: DISCore|Property
 
 ElementTypeBinding:
   @Name: dataType
@@ -249,8 +251,7 @@ ResourceTypeDef:
 ResourceDef:
   @QName:
     DIS:
-  @rdf:type:
-    dis:ModuleGroup
+  @DISCore:resourceType: dis|ModuleGroup
   @Description:
     @@lang:en
     @@@:
@@ -400,7 +401,7 @@ SPropDef:
     defines a superresource of the <Q::DISCore:For> defined
     by the <Q::dis:ForDef> element.  The <Q::dis:ISA> value
     <kwd:MUST> be a <Q::DISCore:ForQName>.
-  @rdf:type: DISCore|ElementType
+  @DISCore:resourceType: DISCore|ElementType
   @subsetOf: derivedFrom
   @rdfs:subPropertyOf:derivedFrom
   @dataType: DISCore|TFQNames
@@ -481,7 +482,7 @@ SPropDef:
 
 ResourceDef:
   @QName: AnyType
-  @rdf:type: DISCore|ResourceType
+  @DISCore:resourceType: DISCore|ResourceType
   @subsetOf: DISCore|Resource
   @rdfs:subClassOf: DISCore|Resource
   @Description:
@@ -501,7 +502,7 @@ ResourceDef:
   @QName: DISCore|ResourceType
   @enDesc:
     A <Q::DISCore|ResourceType> is a type of <Q::DISCore|AnyResource>s.
-  @rdf:type: DISCore|ResourceType
+  @DISCore:resourceType: DISCore|ResourceType
   @subsetOf: DISCore|AnyType
   @rdfs:subClassOf: DISCore|AnyType
 
@@ -516,7 +517,7 @@ SPropDef:
 
 ResourceDef:
   @QName: LexicalType
-  @rdf:type: DISCore|ResourceType
+  @DISCore:resourceType: DISCore|ResourceType
   @subsetOf: AnyType
   @rdfs:subClassOf: AnyType
   @Description:
@@ -544,8 +545,8 @@ PropDef:
   @QName:
     dis:ContentType
   @rdfs:range: LexicalType
-  @rdf:type: DISCore|ElementType
-  @rdf:type: DISSource|PropertyProperty
+  @DISCore:resourceType: DISCore|ElementType
+  @DISCore:resourceType: DISSource|PropertyProperty
   @dataType: DISCore|QName
   @Description:
     @@lang:en
@@ -574,7 +575,7 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type: DISCore|LexicalType
+    @@DISCore:resourceType: DISCore|LexicalType
 
 LexTypeDef:
   @QName: DISCore|AnyString
@@ -903,7 +904,7 @@ PropDef:
       Whether the <Q::dis:ISA>-recursive property search
       (i.e. <M::DIS:ManakaiDISPropertyAccessor.getPropertyResourceList>)
        should be stopped or not.
-  @rdf:type: DISSource|PropertyProperty
+  @DISCore:resourceType: DISSource|PropertyProperty
   @dataType: DISCore|Boolean
   @multipleProperties: DISCore|Single
 
@@ -931,7 +932,7 @@ ResourceDef:
       If multiple values are specified to a property, then
       they makes up an ordered collection of values in document
       order.
-  @rdf:type: DISCore|PropertyValueOrder
+  @DISCore:resourceType: DISCore|PropertyValueOrder
 
 ResourceDef:
   @QName: UnorderedList
@@ -940,7 +941,7 @@ ResourceDef:
     @@@:
       If multiple valus are specified to a property, then
       they makes up an unordered collection of values.
-  @rdf:type: DISCore|PropertyValueOrder
+  @DISCore:resourceType: DISCore|PropertyValueOrder
 
 ResourceDef:
   @QName: Single
@@ -949,7 +950,7 @@ ResourceDef:
     @@@:
       Only a value is allowed for the property; if there
       are more than one attributes in the source tree, it is an error.
-  @rdf:type: DISCore|PropertyValueOrder
+  @DISCore:resourceType: DISCore|PropertyValueOrder
 
 ## -- Definitions
 
@@ -1035,7 +1036,7 @@ SPropDef:
 CPropDef:
   @QName: alt
   @dataType: DISCore|TFQNames
-  @rdf:type: DISSource|PropertyProperty
+  @DISCore:resourceType: DISSource|PropertyProperty
   @Description:
     @@lang:en
     @@@:

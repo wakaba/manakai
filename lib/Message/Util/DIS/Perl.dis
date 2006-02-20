@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/02/19 07:06:15 $
+      $Date: 2006/02/20 09:03:17 $
     @@ContentType:
       dis:Date.RCS
   
@@ -1413,6 +1413,7 @@ IFClsDef:
           local $self->{resDef} = \%undefined_res;
           local $self->{forDef} = \%undefined_for;
           local $self->{modDef} = \%temp_mod;
+          local $self->{<H::DOMCore|error-handler>} = null;
           nstore $self, $fileName;
         }
 
@@ -2276,6 +2277,43 @@ IFClsDef:
                        not $cls-><AG::DIS|DISResource.parentResource>) {
                 $r-><M::DIS|PLBlockCon.appendCodeFragment>
                       ($cls-><AG::DISResourcePerl.plCodeFragment>);
+              } elsif ($cls-><M::DIS|DISAnyResource.isTypeURI>
+                               (<Q::DIS|AnyMethod>)) {
+                my $method_code = $cls-><AG::DISResourcePerl.plCodeFragment>;
+                my $method_names = $cls-><M::DIS|MPLSub.getPerlNameList>;
+                $method_code-><M::DIS|MPLSub.clearPerlName>;
+                my $type_uris = $cls-><M::DIS|DISResourceProp
+                                           .getPropertyTextList>
+                                        (<Q::DIS|targetType>);
+                my $method_name_0 = shift @$method_names;
+                my $type_uri_0 = shift @$type_uris;
+                my $st = $r-><M::DIS|PLBlockCon.appendStatement>;
+                $st-><M::DIS|PLBlockCon.appendCode>
+                       ('$Message::Util::DIS::Method{');
+                $st-><M::DIS|PLAnyCon.appendStringLiteral> ($type_uri_0);
+                $st-><M::DIS|PLBlockCon.appendCode> ('}->{');
+                $st-><M::DIS|PLAnyCon.appendStringLiteral> ($method_name_0);
+                $st-><M::DIS|PLBlockCon.appendCode> ('} = ');
+                $st-><AG::Node.ownerDocument>
+                   -><M::Document.adoptNode> ($method_code);
+                $st-><M::Node.appendChild> ($method_code);
+                for my $type_uri (@$type_uris) {
+                  for my $method_name (@$method_names) {
+                    my $st = $r-><M::DIS|PLBlockCon.appendStatement>;
+                    $st-><M::DIS|PLBlockCon.appendCode>
+                           ('$Message::Util::DIS::Method{');
+                    $st-><M::DIS|PLAnyCon.appendStringLiteral> ($type_uri);
+                    $st-><M::DIS|PLBlockCon.appendCode> ('}->{');
+                    $st-><M::DIS|PLAnyCon.appendStringLiteral> ($method_name);
+                    $st-><M::DIS|PLBlockCon.appendCode> ('} = ');
+                    $st-><M::DIS|PLBlockCon.appendCode>
+                           ('$Message::Util::DIS::Method{');
+                    $st-><M::DIS|PLAnyCon.appendStringLiteral> ($type_uri_0);
+                    $st-><M::DIS|PLBlockCon.appendCode> ('}->{');
+                    $st-><M::DIS|PLAnyCon.appendStringLiteral> ($method_name_0);
+                    $st-><M::DIS|PLBlockCon.appendCode> ('}');
+                  }
+                }
               }
             } # ownermodule and not alias
           } # Classes
@@ -2410,59 +2448,105 @@ IFClsDef:
       }__;
 ##DISResourcePerlModule
 
+ResourceDef:
+  @QName: Node
+  @AliasFor: Tree|Node||ManakaiDOM|ManakaiDOMLatest
+  @For: DIS|ForLatest
+
+ResourceDef:
+  @QName: Document
+  @AliasFor: Tree|Document||ManakaiDOM|ManakaiDOMLatest
+  @For: DIS|ForLatest
+
 PropDef:
   @QName: dp|plName
   @enDesc:
     <A::DISResourcePerl||DIS|ForLatest.plName>.
 
-IFClsDef:
-  @IFQName: DISResourcePerl
-  @ClsQName: ManakaiDISResourcePerl
+ElementTypeBinding:
+  @Name: TMethods
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType:
+      @@@@: dis|MultipleResource
+      @@@ForCheck: !ManakaiDOM|ForClass
+    @@resourceFor: ManakaiDOM|ForClass
+    @@DISCore:resourceType: DISCore|Resource
+    @@For: DIS|ForLatest
 
+ElementTypeBinding:
+  @Name: TMethod
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@DISCore:resourceType: DIS|Method
+
+ElementTypeBinding:
+  @Name: TAttr
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@DISCore:resourceType: DIS|Attribute
+
+TMethods:
   @enDesc:
-    The objects implementing the <IF::DISResourcePerl> interface
-    <kwd:MUST> also implement the <IF::DIS|DISResource> interface.
+    <Q::DISLang|AnyMethod>
 
-  @Attr:
+  @TAttr:
     @@Name: plName
     @@enDesc:
-      The Perl name of this resource. 
-    @@Get: 
-      @@@Type:
-        DISLang:String::ManakaiDOM:all
-      @@@enDesc:
-        - <Q::ManakaiDOM:Const>::: Constant function (local) name. 
-        \
-        - <Q::ManakaiDOM:ConstGroup>::: Export group name (without 
-                                        <CHAR::COLON> prefix).
-        \
         - <Q::DISLang:Attribute>::: Method name. 
         \
         - <Q::DISLang:Method>::: Method name. 
-      @@@nullCase:
-        @@@@enDesc:
-          Either the type of this resource is not listed above 
-          or this Perl constructure is anonymous. 
-      @@@RaiseException:
-        @@@@@: DIS|NO_LOCAL_NAME_ERR
-        @@@@enDesc:
-          The type of this resource is either 
-          <Q::ManakaiDOM:Const> or <Q::ManakaiDOM:ConstGroup> and 
-          the local name of this resource is not defined. 
-      @@@RaiseException:
-        @@@@@: DIS|RESERVED_PERL_METHOD_NAME_ERR
-        @@@@enDesc:
-          The Perl method name constructed from the source 
-          result in a reserved name. 
+    @@DIS:targetType: DISLang|AnyMethod
+    @@Get:
+      @@@Type: DISString
       @@@PerlDef:
         __DEEP{
-          if (exists $self->{<H::dp|plName>}) {
-            $r = $self->{<H::dp|plName>};
-          } elsif ($self-><M::DIS|DISAnyResource.isTypeURI>
-                              (<Q::DISLang:AnyMethod>)) {
-            $r = $self-><M::dp|DISResourcePerl.getPerlNameList>->[0];
-          } elsif ($self-><M::DIS|DISAnyResource.isTypeURI>
-                              (<Q::ManakaiDOM:Const>)) {
+          $r = $self-><M::dp|DISResourcePerl.getPerlNameList>->[0];
+        }__;
+##DISLang:AnyMethod
+
+TMethods:
+  @enDesc:
+    <Q::DISLang|MethodParameter>
+
+  @TAttr:
+    @@Name: plName
+    @@DIS:targetType: DISLang|MethodParameter
+    @@Get:
+      @@@Type: DISString
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><M::DIS|DISResourceProp.getPropertyText>
+                        (<Q::DISPerl:paramName>,
+                         $self-><AG::DIS|DISAnyResource.localName>);
+          if (defined $r) {
+            if ($self-><M::DIS|DISResourceProp.getPropertyBoolean>
+                         (<Q::DISPerl:isNamedParameter>, false)) {
+              $r = <ClassM::DIS|ManakaiDISImplementation.camelCaseToUnderscoreName>
+                                                       ($r);
+            }
+          }
+        }__;
+##DISLang:MethodParameter
+
+TMethods:
+  @enDesc:
+    <Q::DISLang|Const>
+
+  @TAttr:
+    @@Name: plName
+    @@DIS:targetType: DISLang|Const
+    @@enDesc:
+      Constant function (local) name. 
+    @@Get:
+      @@@Type: DISString
+      @@@PerlDef:
+        __DEEP{
             unless (defined $self-><AG::DIS|DISAnyResource.localName>) {
               __UNDEEP{
                 __EXCEPTION{DIS|NO_LOCAL_NAME_ERR::
@@ -2484,36 +2568,45 @@ IFClsDef:
                 }__;
               }__;
             }
-          } elsif ($self-><M::DIS|DISAnyResource.isTypeURI>
-                              (<Q::ManakaiDOM:ConstGroup>)) {
-            $r = $self-><M::DIS|DISResourceProp.getPropertyText>
-                              (<Q::DISPerl:exportTagName>,
-                               $self-><AG::DIS|DISAnyResource.localName>);
-            unless (defined $r) {
-              __UNDEEP{__EXCEPTION{DIS|NO_LOCAL_NAME_ERR::
-                DIS:uri => {$self->{uri}},
-                DIS:sourceNode => {$self->{src}},
-              }__}__;
-            }
+      }__;
+##DISLang:Const
 
-          ## -- Method parameter
-          } elsif ($self-><M::DIS|DISAnyResource.isTypeURI>
-                                       (<Q::DISLang:MethodParameter>)) {
-            $r = $self-><M::DIS|DISResourceProp.getPropertyText>
-                                (<Q::DISPerl:paramName>,
-                                 $self-><AG::DIS|DISAnyResource.localName>);
-            if (defined $r) {
-              if ($self-><M::DIS|DISResourceProp.getPropertyBoolean>
-                                 (<Q::DISPerl:isNamedParameter>, false)) {
-                $r = 
-                 <ClassM::DIS|ManakaiDISImplementation.camelCaseToUnderscoreName>
-                                                       ($r);
-              }
-            }
+TMethods:
+  @enDesc:
+    <Q::DISLang|ConstGroup>
 
-          ## -- Class
-          } elsif ($self-><M::DIS|DISAnyResource.isTypeURI>
-                                       (<Q::DISLang:AnyClass>)) {
+  @TAttr:
+    @@Name: plName
+    @@DIS:targetType: DISLang|ConstGroup
+    @@enDesc:
+      Export group name (without <CHAR::COLON> prefix).
+    @@Get:
+      @@@Type: DISString
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><M::DIS|DISResourceProp.getPropertyText>
+                         (<Q::DISPerl:exportTagName>,
+                          $self-><AG::anyres.localName>);
+        }__;
+        unless (defined $r) {
+          __EXCEPTION{DIS|NO_LOCAL_NAME_ERR::
+            DIS:uri => {$self-><AG::anyres.uri>},
+            DIS:sourceNode => {$self-><AG::anyres.sourceElement>},
+          }__;
+        }
+##DISLang:ConstGroup
+
+TMethods:
+  @enDesc:
+    <Q::DISLang|AnyClass>
+
+  @TAttr:
+    @@Name: plName
+    @@DIS:targetType: DISLang|AnyClass
+    @@Get:
+      @@@Type: DISString
+      @@@PerlDef:
+        __DEEP{
             $r = $self-><M::DIS|DISResourceProp.getPropertyText>
                                 (<Q::DISPerl:name>,
                                  $self-><AG::DIS|DISAnyResource.localName>);
@@ -2521,12 +2614,65 @@ IFClsDef:
               $r = <ClassM::DIS|ManakaiDISImplementation
                            .camelCaseToUnderscoreName> ($r);
             }
-
-          } else {  ## Other types
-            $r = null;
-          }
-          $self->{<H::dp|plName>} = $r;
         }__;
+##DISLang:AnyClass
+
+ResourceDef:
+  @QName: anyres
+  @AliasFor: DIS|DISAnyResource
+  @For: DIS|ForEmpty
+
+ElementTypeBinding:
+  @Name: CODE
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISPerl|BlockCode
+    @@ForCheck: ManakaiDOM|ForClass
+
+IFClsDef:
+  @IFQName: DISResourcePerl
+  @ClsQName: ManakaiDISResourcePerl
+
+  @enDesc:
+    The objects implementing the <IF::DISResourcePerl> interface
+    <kwd:MUST> also implement the <IF::DIS|DISResource> interface.
+
+  @Attr:
+    @@Name: plName
+    @@enDesc:
+      The Perl name of this resource. 
+    @@Get: 
+      @@@Type: DISString
+      @@@nullCase:
+        @@@@enDesc:
+          Either the type of this resource is not listed above 
+          or this Perl constructure is anonymous. 
+      @@@RaiseException:
+        @@@@@: DIS|NO_LOCAL_NAME_ERR
+        @@@@enDesc:
+          The type of this resource is either 
+          <Q::ManakaiDOM:Const> or <Q::ManakaiDOM:ConstGroup> and 
+          the local name of this resource is not defined. 
+      @@@RaiseException:
+        @@@@@: DIS|RESERVED_PERL_METHOD_NAME_ERR
+        @@@@enDesc:
+          The Perl method name constructed from the source 
+          result in a reserved name. 
+      @@@PerlDef:
+        my $method;
+        __CODE{DIS|getMethodForType::
+          $resource => $self,
+          $method_name => 'pl_name',
+          $method => $method,
+        }__;
+        if ($method) {
+          __DEEP{
+            $r = $method->(@_);
+          }__;
+        } else {
+          $r = null;
+        } 
 
   @Method:
     @@Name: getPerlNameList

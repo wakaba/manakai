@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/01/30 00:57:49 $
+      $Date: 2006/02/20 09:03:17 $
     @@ContentType:
       dis:Date.RCS
   
@@ -925,11 +925,9 @@ IFClsDef:
     @@enDesc:
       Whether this element is a property or not. 
       \
-      {NOTE:: An element is a property if its element type is
-              <Q::rdf:type> or if its element type's <Q::rdf:type> 
-              property is <Q::rdf:Property> or is <Q::dis:subsetOf> 
-              <Q::rdf:Property>. 
-      \
+      {NOTE:: An element is a property if the resource whose
+              URI is equal to the element type name is a property,
+              i.e. whose type is <Q::DISSource|Property>.
       }
     @@NamedParam:
       @@@Name: databaseArg
@@ -947,11 +945,14 @@ IFClsDef:
       @@@PerlDef:
         __DEEP{
           my $xn = $self-><AG::SEl.expandedURI>;
-          if ($xn eq <Q::rdf:type>) {
+          if ($xn eq <Q::DISCore|resourceType> or $xn eq <Q::rdf:type>) {
             $r = true;
           } else {
             my $rdef = $databaseArg-><M::DIS|DISDatabase.getResource> ($xn);
-            $r = $rdef-><M::DIS|DISResource.isTypeURI> (<Q::rdf:Property>);
+            $r = $rdef-><M::DIS|DISAnyResource.isTypeURI>
+                          (<Q::DISSource|Property>) ||
+                 $rdef-><M::DIS|DISResource.isAnyTypeURI> (<Q::rdf:Property>);
+                       ## TODO: Remove this.
           }
         }__;
 
