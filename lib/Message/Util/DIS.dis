@@ -23,7 +23,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2006/02/20 11:46:08 $
+      $Date: 2006/02/20 14:52:44 $
     @@ContentType:
       dis:Date.RCS
   
@@ -3801,7 +3801,8 @@ IFClsDef:
           __DEEP{
             my $cfg = $self-><AG::DISDatabase.domConfig>;
             my $h = $cfg-><M::DOMConfig.getParameter> ('error-handler');
-            $r = $h-><M::DOMCore|DOMErrorHandler.handleError> ($err);
+            $r = $h-><M::DOMCore|DOMErrorHandler||ManakaiDOM|ManakaiDOMLatest
+                        .handleError> ($err);
           }__;
         } else {
           $err-><M::ecore|ErrorInterface||ManakaiDOM|Perl.throw>;
@@ -5146,7 +5147,8 @@ IFClsDef:
             my $cfg = $self-><AG::DISAnyResource.database>
                            -><AG::DISDatabase.domConfig>;
             my $h = $cfg-><M::DOMConfig.getParameter> ('error-handler');
-            $r = $h-><M::DOMCore|DOMErrorHandler.handleError> ($err);
+            $r = $h-><M::DOMCore|DOMErrorHandler||ManakaiDOM|ManakaiDOMLatest
+                        .handleError> ($err);
           }__;
         } else {
           $err-><M::ecore|ErrorInterface||ManakaiDOM|Perl.throw>;

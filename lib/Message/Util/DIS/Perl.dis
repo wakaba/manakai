@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/02/20 11:46:08 $
+      $Date: 2006/02/20 14:52:44 $
     @@ContentType:
       dis:Date.RCS
   
@@ -1840,480 +1840,18 @@ IFClsDef:
                 not $processed_class{$cls-><AG::DIS|DISAnyResource.uri>}) {
               $processed_class{$cls-><AG::DIS|DISAnyResource.uri>}
                 = true;
+              
+              my $mcode = $cls-><M::DISResourcePerl.getPerlModuleMemberCode>
+                                  ($r-><AG::Node.ownerDocument>,
+                                   $thismod_pack, \%const);
+              if ($mcode) {
+                $r-><AG::Node.ownerDocument>
+                  -><M::Document.adoptNode> ($mcode);
+                $r-><M::Node.appendChild> ($mcode);
+              }
+
               if ($cls-><M::DIS|DISAnyResource.isTypeURI>
-                              (<Q::DISLang:Class>) and
-                  not $cls-><M::DIS|DISAnyResource.isTypeURI>
-                              (<Q::Muf2003:RuleDefClass>)) {
-                ## -- Subroutines and variables
-                my $pack = $cls-><AG::DISResourcePerl.plCodeFragment>;
-                 $r-><M::DIS|PLFile.appendPackage> ($pack);
-                my $pack_name = $cls-><AG::DISResourcePerl
-                                          .plFullyQualifiedName>;
-
-                ## -- Constants
-                for my $cr (@{$cls-><M::DIS|DISResource.getChildResourceList>}) {
-                  if ($cr-><M::DIS|DISAnyResource.isTypeURI>
-                                          (<Q::ManakaiDOM:Const>)) {
-                    $thismod_pack-><M::DIS|PLPack.addExport>
-                      (null,
-                       my $nm = $cr-><AG::DISResourcePerl.plName>);
-                    $const{$nm} = $cr-><AG::DISResourcePerl
-                                           .plFullyQualifiedName>;
-                  } elsif ($cr-><M::DIS|DISAnyResource.isTypeURI>
-                                          (<Q::ManakaiDOM:ConstGroup>)) {
-                    my $tag = $cr-><AG::DISResourcePerl.plName>;
-                    for my $gcr (@{$cr-><M::DIS|DISResource
-                                                    .getChildResourceList>}) {
-                      if ($gcr-><M::DIS|DISAnyResource.isTypeURI>
-                                          (<Q::ManakaiDOM:Const>)) {
-                        $thismod_pack-><M::DIS|PLPack.addExport>
-                          ($tag, my $nm = $gcr-><AG::DISResourcePerl.plName>);
-                        $const{$nm} = $gcr-><AG::DISResourcePerl
-                                                   .plFullyQualifiedName>;
-                      }
-                    }
-                  }
-                }
-
-                ## -- Features
-                my %feature;
-                for my $v (@{$cls-><M::DIS|DISResourceProp.getPropertyValueList>
-                                      (<Q::f:provides>)}) {
-                  my $f = $self-><AG::DIS|DISAnyResource.database>
-                               -><M::DIS|DISDatabase.getResource>
-                                     ($v->isa (<IFName::dv|DVURIValue>)
-                                         ? $v-><AG::dv|DVURIValue.uri>
-                                         : $v-><AG::dv|DVValue.value>);
-                  unless ($f-><AS::DIS|DISAnyResource.isDefined>) {
-                    __UNDEEP{__EXCEPTION{DIS|RESOURCE_NOT_DEFINED_ERR::
-                      DIS:uri => {$f-><AG::DIS|DISAnyResource.uri>},
-                      DIS:expectedType => {<Q::f:Feature>},
-                    }__}__;
-                  }
-                  for my $s ($f, @{$f-><M::DIS|DISResourceProp
-                                    .getPropertyResourceList>
-                                   (<Q::f:extends>,
-                                    recursive => true,
-                                    default_media_type => <Q::dis:TypeQName>)}) {
-                    $feature{$s-><AG::DIS|DISAnyResource.uri>}
-                         = [$s, $v];
-                  }
-                }
-                for my $f (values %feature) {
-                  my @fname = @{$f->[0]-><AG::DIS|DISResource
-                                        .featureNameList>};
-                  my $fver = $f->[0]-><M::DIS|DISResourceProp
-                                        .getPropertyText>
-                                        (<Q::dis:Version>, null);
-                  next unless defined $fver;
-                  my $fi = $self-><M::DISResourcePerlModule
-                        .plIsFeatureImplemented> ($f->[0]->{uri}) ? true : false;
-                  my $pt = $f->[1]-><M::dv|DVValue.getProperty>
-                                            (<Q::f:through>);
-                  if (UNIVERSAL::isa ($pt, <IFName::dv|DVURIValue>)) {
-                    my $c = $pt-><M::dv|DVURIValue.getResource>
-                              ($self-><AG::DIS|DISAnyResource.database>);
-                    $c-><AS::DIS|DISAnyResource.isReferred>
-                                    ($f->[0]-><AG::DIS|DISAnyResource.uri>);
-                    my $cp = $c-><AG::DISResourcePerl.plFullyQualifiedName>;
-                    for my $fname (@fname) {
-                      $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::DOM::ImplFeature{q<' . $cp .
-                           '>}->{q<' .
-                           $fname . '>}->{q<' . $fver . '>} ||= '.$fi);
-                      $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::DOM::ImplFeature{q<' . $cp .
-                           '>}->{q<' . $fname . '>}->{q<>} = 1');
-                    }
-                  } else { # no "through" attribute
-                    for my $fname (@fname) {
-                      $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::DOM::ImplFeature{q<' . $pack_name .
-                           '>}->{q<' .
-                           $fname . '>}->{q<' . $fver . '>} ||= '.$fi);
-                      $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::DOM::ImplFeature{q<' . $pack_name .
-                           '>}->{q<' . $fname . '>}->{q<>} = 1');
-                    }
-                  }
-                } # for
-
-                my %ifeature;
-                my $ifpoint = 0;
-                my %fdup; # Check dupulication
-                FI: for my $feature (@{$cls-><M::DIS|DISResourceProp
-                          .getPropertyResourceList>
-                             (<Q::f:implements>,
-                              isa_recursive => true)}) {
-                  my $furi = $feature-><AG::DIS|DISAnyResource.uri>;
-                  next FI if $fdup{$furi};
-                  $fdup{$furi} = true;
-
-                  my $fver = $feature-><M::DIS|DISResourceProp
-                                        .getPropertyText>
-                                        (<Q::dis:Version>, null);
-                  $ifpoint += $fver;
-                  my $fi = defined $fver
-                         ? $self-><M::DISResourcePerlModule
-                                     .plIsFeatureImplemented>
-                                           ($feature->{uri}) ? true : false
-                         : true;
-                  for my $fname (@{$feature-><AG::DIS|DISResource
-                                                 .featureNameList>}) {
-                    $ifeature{$fname}->{$fver} = $fi;
-                    $ifeature{$fname}->{''} = true;
-                  }                  
-                } # FI
-                $r-><M::DIS|PLBlockCon.appendStatement>
-                      ('$Message::DOM::ClassFeature{q<' . $pack_name .
-                       '>} = ' . <ClassM::PLImplClass.perlLiteral> (\%ifeature));
-
-                ## TODO: Features from implementing interfaces.
-
-                ## Score calculated from provided features
-                $r-><M::DIS|PLBlockCon.appendStatement>
-                        ('$Message::DOM::ClassPoint{q<' . $pack_name .
-                         '>} = ' . $ifpoint);
-
-                ## -- Roles
-                for my $role (@{$cls-><M::DIS|DISResourceProp
-                          .getPropertyResourceList>
-                             (<Q::DISLang:role>, isa_recursive => true,
-                              default_media_type => <Q::dis:TypeQName>)}) {
-                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
-    (<Q::DOMMetaImpl:ImplementationSourceForManakaiDOMImplementationRegistry>)) {
-                    $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::DOM::ManakaiDOMImplementationRegistry'.
-                           '::SourceClass{q<' . $pack_name . '>} = 1');
-                  }
-                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
-            (<Q::DOMMetaImpl:ImplementationForManakaiDOMImplementationSource>)) {
-                    $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::DOM::ManakaiDOMImplementationSource'.
-                           '::SourceClass{q<' . $pack_name . '>} = 1');
-                  }
-                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
-   (<Q::DOMMetaImpl:ImplementationCompatibleWithManakaiDOMMinimumImplementation>)
-                  ) {
-                    $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::DOM::ManakaiDOMImplementation'.
-                           '::CompatClass{q<' . $pack_name . '>} = 1');
-                  }
-                  
-                  ## Node
-                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
-                                (<Q::DOMCore:ElementRole>)) {
-                    my $for_specific_et;
-                    for my $et (@{$cls-><M::DIS|DISResourceProp
-                          .getPropertyResourceList>
-                             (<Q::s:elementType>, isa_recursive => true,
-                              default_media_type => <Q::dis:TFQNames>)}) {
-                      $for_specific_et = true;
-                      my $ln = $et-><AG::DIS|DISResourceMV
-                                        .mvLocalName>;
-                      $ln = '*' unless defined $ln;
-                      my $ns = $et-><AG::DIS|DISResourceMV
-                                        .mvNamespaceURI>;
-                      $ns = '' unless defined $ns;
-                        ## ISSUE: Is NULL-namespace should be allowed here?
-                      $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::DOM::ManakaiDOMElement' .
-                           '::CompatClassET{q<' . $ns . '>}->{q<' . $ln .
-                           '>}->{q<' . $pack_name . '>} = 1');
-                    }
-                    $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::DOM::ManakaiDOMElement'.
-                           '::CompatClass{q<' . $pack_name . '>} = 1')
-                      unless $for_specific_et;
-                  }
-                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
-                                (<Q::DOMCore:AttributeRole>)) {
-                    my $for_specific_attr;
-                    for my $at (@{$cls-><M::DIS|DISResourceProp
-                          .getPropertyResourceList>
-                             (<Q::dis:DocAttr>, isa_recursive => true,
-                              default_media_type => <Q::dis:TFQNames>)}) {
-                      $for_specific_attr = true;
-                      my $ln = $at-><AG::DIS|DISResourceMV
-                                        .mvLocalName>;
-                      $ln = '*' unless defined $ln;
-                      my $ns = $at-><AG::DIS|DISResourceMV
-                                        .mvNamespaceURI>;
-                      $ns = '' unless defined $ns;
-                      my $et = $at-><AG::DIS|DISResourceMV
-                                        .mvOwnerElementResource>;
-                      my $etns = '*';
-                      my $etln = '*';
-                      if ($et) {
-                        $etns = $et-><AG::DIS|DISResourceMV.mvLocalName>;
-                        $etln = '*' unless defined $etln;
-                        my $etns = $at-><AG::DIS|DISResourceMV
-                                          .mvNamespaceURI>;
-                        $etns = '' unless defined $etns;
-                          ## ISSUE: Should NULL-namespace be allowed here?
-                      }
-                      
-                      $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::DOM::ManakaiDOMElement' .
-                           '::CompatClassAttr{q<' . $etns . '>}->{q<' . $etln .
-                           '>}->{q<' . $ns . '>}->{q<' . $ln . '>}->{q<' .
-                           $pack_name . '>} = 1');
-                    }
-                    $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::DOM::ManakaiDOMAttr'.
-                           '::CompatClass{q<' . $pack_name . '>} = 1')
-                      unless $for_specific_attr;
-                  }
-                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
-                                (<Q::DOMCore:TextRole>)) {
-                    $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::DOM::ManakaiDOMText'.
-                           '::CompatClass{q<' . $pack_name . '>} = 1');
-                  }
-                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
-                                (<Q::DOMCore:CommentRole>)) {
-                    $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::DOM::ManakaiDOMComment'.
-                           '::CompatClass{q<' . $pack_name . '>} = 1');
-                  }
-                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
-                                (<Q::DOMCore:CDATASectionRole>)) {
-                    $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::DOM::ManakaiDOMCDATASection'.
-                           '::CompatClass{q<' . $pack_name . '>} = 1');
-                  }
-                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
-                                (<Q::DOMCore:ProcessingInstructionRole>)) {
-                    $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::DOM::ManakaiDOMProcessingInstruction'.
-                           '::CompatClass{q<' . $pack_name . '>} = 1');
-                    ## TODO: Target name dependent
-                  }
-                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
-                                (<Q::DOMCore:DocumentRole>)) {
-                    my $for_specific_et;
-                    for my $et (@{$cls-><M::DIS|DISResourceProp
-                          .getPropertyResourceList>
-                             (<Q::s:rootElementType>, isa_recursive => true,
-                              default_media_type => <Q::dis:TFQNames>)}) {
-                      $for_specific_et = true;
-                      my $ln = $et-><AG::DIS|DISResourceMV
-                                        .mvLocalName>;
-                      $ln = '*' unless defined $ln;
-                      my $ns = $et-><AG::DIS|DISResourceMV
-                                        .mvNamespaceURI>;
-                      $ns = '' unless defined $ns;
-                        ## ISSUE: Is NULL-namespace should be allowed here?
-                      $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::DOM::ManakaiDOMDocument' .
-                           '::CompatClassET{q<' . $ns . '>}->{q<' . $ln .
-                           '>}->{q<' . $pack_name . '>} = 1');
-                    }
-                    $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::DOM::ManakaiDOMDocument'.
-                           '::CompatClass{q<' . $pack_name . '>} = 1')
-                      unless $for_specific_et;
-                    ## TODO: by document type name and media type
-                  }
-                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
-                                (<Q::DOMCore:DocumentFragmentRole>)) {
-                    $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::DOM::ManakaiDOMDocumentFragment'.
-                           '::CompatClass{q<' . $pack_name . '>} = 1');
-                  }
-                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
-                                (<Q::DOMCore:DocumentTypeRole>)) {
-                    $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::DOM::ManakaiDOMDocumentType'.
-                           '::CompatClass{q<' . $pack_name . '>} = 1');
-                    ## TODO: Doctype name or public ID dependent
-                  }
-                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
-                                (<Q::DOMCore:EntityRole>)) {
-                    $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::DOM::ManakaiDOMEntity'.
-                           '::CompatClass{q<' . $pack_name . '>} = 1');
-                    ## TODO: Entity name or public ID dependent
-                  }
-                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
-                                (<Q::DOMCore:EntityReferenceRole>)) {
-                    $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::DOM::ManakaiDOMEntityReference'.
-                           '::CompatClass{q<' . $pack_name . '>} = 1');
-                    ## TODO: Entity name or public ID dependent
-                  }
-                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
-                                (<Q::DOMCore:NotationRole>)) {
-                    $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::DOM::ManakaiDOMNotation'.
-                           '::CompatClass{q<' . $pack_name . '>} = 1');
-                    ## TODO: Notation name or public ID dependent
-                  }
-                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
-                                (<Q::DOMCore:NamespaceRole>)) {
-                    $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::DOM::ManakaiDOMNamespace'.
-                           '::CompatClass{q<' . $pack_name . '>} = 1');
-                  }
-                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
-                                (<Q::DOMCore:ElementTypeDefinitionRole>)) {
-                    $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::DOM::ManakaiDOMElementTypeDefinition'.
-                           '::CompatClass{q<' . $pack_name . '>} = 1');
-                  }
-                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
-                                (<Q::DOMCore:AttributeDefinitionRole>)) {
-                    $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::DOM::ManakaiDOMAttributeDefinition'.
-                           '::CompatClass{q<' . $pack_name . '>} = 1');
-                  }
-                  ## NOTE: DOMCore:AnyNodeRole is subset of  
-                  ##       DOMCore:ElementRole and DOMCore:TextRole and ...
-
-                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
-                                (<Q::gls:ParserRole>)) {
-                    $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::DOM::DOMLS::ParserClass{q<'.
-                           $pack_name . '>} = 1');
-                  }
-                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
-                                (<Q::gls:SerializerRole>)) {
-                    $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::DOM::DOMLS::SerializerClass{q<'.
-                           $pack_name . '>} = 1');
-                  }
-
-                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
-                                (<Q::DIS:ModuleRole>)) {
-                    $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::Util::DIS::ManakaiDISModuleDefinition'.
-                           '::CompatClass{q<' . $pack_name . '>} = 1');
-                  }
-                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
-                                (<Q::DIS:ForRole>)) {
-                    $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::Util::DIS::ManakaiDISForDefinition'.
-                           '::CompatClass{q<' . $pack_name . '>} = 1');
-                  }
-                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
-                                (<Q::DIS:ResourceRole>)) {
-                    $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::Util::DIS::ManakaiDISResourceDefinition'.
-                           '::CompatClass{q<' . $pack_name . '>} = 1');
-                  }
-                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
-                                (<Q::DIS:ElementRole>)) {
-                    $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::Util::DIS::ManakaiDISElement'.
-                           '::CompatClass{q<' . $pack_name . '>} = 1');
-                  }
-                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
-                                (<Q::DIS:DatabaseRole>)) {
-                    $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::Util::DIS::ManakaiDISDatabase'.
-                           '::CompatClass{q<' . $pack_name . '>} = 1');
-                  }
-                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
-                                (<Q::dv|ValueRole>)) {
-                    $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::Util::DIS::Value::ManakaiDVValue'.
-                           '::CompatClass{q<' . $pack_name . '>} = 1');
-                  }
-                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
-                                (<Q::mn|NodeRefRole>)) {
-                    my %nrp;
-                    my $db = $self-><AG::DIS|DISAnyResource.database>;
-                    for my $p (<Q::mn|subnode0>,
-                               <Q::mn|subnode1>,
-                               <Q::mn|subnode2>,
-                               <Q::mn|origin0>,
-                               <Q::mn|xrefnode0>) {
-                      $nrp{
-                        $db-><M::DIS|DISDatabase.getResource> ($p)
-                           -><M::DIS|DISResourceProp.getPropertyText>
-                                  (<Q::mn:stemName>, $p)
-                      } = [keys %{{map {
-                        $_-><M::DIS|DISResourceProp.getPropertyText>
-                                  (<Q::DISPerl:propHashKey>,
-                                   $_-><AG::DIS|DISAnyResource.uri>) => true,
-                      } @{$cls-><M::DIS|DISResourceProp.getPropertyResourceList>
-                                  ($p, isa_recursive => true)}}}];
-                    }
-                    for (keys %nrp) {
-                      CORE::delete $nrp{$_} unless @{$nrp{$_}};
-                    }
-                    $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::Util::ManakaiNode::ManakaiNodeRef'.
-                           '::Prop{q<' . $pack_name . '>} = '.
-                           <ClassM::PLImplClass.perlLiteral> (\%nrp));
-                  }
-                }
-              } elsif ($cls-><M::DIS|DISAnyResource.isTypeURI>
                               (<Q::DISLang:Interface>)) {
-                my $pack = $cls-><AG::DISResourcePerl.plCodeFragment>;
-                $r-><M::DIS|PLFile.appendPackage> ($pack);
-
-                for my $cr (@{$cls-><M::DIS|DISResource
-                                 .getChildResourceListByType>
-                                          (<Q::DISLang:ConstGroup>)}) {
-                  my $tag = $cr-><AG::DISResourcePerl.plName>;
-                  for my $gcr (@{$cr-><M::DIS|DISResource
-                                                    .getChildResourceListByType>
-                                          (<Q::DISLang:Const>)}) {
-                    $thismod_pack-><M::DIS|PLPack.addExport>
-                          ($tag, my $nm = $gcr-><AG::DISResourcePerl.plName>);
-                    $const{$nm} = $gcr-><AG::DISResourcePerl
-                                                   .plFullyQualifiedName>;
-                  }
-                }
-              } elsif (($cls-><M::DIS|DISAnyResource.isTypeURI>
-                              (<Q::DISPerl:ScalarVariable>) or
-                        $cls-><M::DIS|DISAnyResource.isTypeURI>
-                              (<Q::DOMCore:DOMConfigurationParameter>) or
-                        $cls-><M::DIS|DISAnyResource.isTypeURI>
-                           (<Q::DOMCore:DOMConfigurationParameterApplication>) or
-                        $cls-><M::DIS|DISAnyResource.isTypeURI>
-                              (<Q::DOMCore:DOMErrorType>)) and
-                       not $cls-><AG::DIS|DISResource.parentResource>) {
-                $r-><M::DIS|PLBlockCon.appendCodeFragment>
-                      ($cls-><AG::DISResourcePerl.plCodeFragment>);
-              } elsif ($cls-><M::DIS|DISAnyResource.isTypeURI>
-                               (<Q::DIS|AnyMethod>)) {
-                my $method_code = $cls-><AG::DISResourcePerl.plCodeFragment>;
-                my $method_names = $cls-><M::DIS|MPLSub.getPerlNameList>;
-                $method_code-><M::DIS|MPLSub.clearPerlName>;
-                my $type_uris = $cls-><M::DIS|DISResourceProp
-                                           .getPropertyTextList>
-                                        (<Q::DIS|targetType>);
-                my $method_name_0 = shift @$method_names;
-                my $type_uri_0 = shift @$type_uris;
-                my $st = $r-><M::DIS|PLBlockCon.appendStatement>;
-                $st-><M::DIS|PLBlockCon.appendCode>
-                       ('$Message::Util::DIS::Method{');
-                $st-><M::DIS|PLAnyCon.appendStringLiteral> ($type_uri_0);
-                $st-><M::DIS|PLBlockCon.appendCode> ('}->{');
-                $st-><M::DIS|PLAnyCon.appendStringLiteral> ($method_name_0);
-                $st-><M::DIS|PLBlockCon.appendCode> ('} = ');
-                $st-><AG::Node.ownerDocument>
-                   -><M::Document.adoptNode> ($method_code);
-                $st-><M::Node.appendChild> ($method_code);
-                for my $type_uri (@$type_uris) {
-                  for my $method_name (@$method_names) {
-                    my $st = $r-><M::DIS|PLBlockCon.appendStatement>;
-                    $st-><M::DIS|PLBlockCon.appendCode>
-                           ('$Message::Util::DIS::Method{');
-                    $st-><M::DIS|PLAnyCon.appendStringLiteral> ($type_uri);
-                    $st-><M::DIS|PLBlockCon.appendCode> ('}->{');
-                    $st-><M::DIS|PLAnyCon.appendStringLiteral> ($method_name);
-                    $st-><M::DIS|PLBlockCon.appendCode> ('} = ');
-                    $st-><M::DIS|PLBlockCon.appendCode>
-                           ('$Message::Util::DIS::Method{');
-                    $st-><M::DIS|PLAnyCon.appendStringLiteral> ($type_uri_0);
-                    $st-><M::DIS|PLBlockCon.appendCode> ('}->{');
-                    $st-><M::DIS|PLAnyCon.appendStringLiteral> ($method_name_0);
-                    $st-><M::DIS|PLBlockCon.appendCode> ('}');
-                  }
-                }
               }
             } # ownermodule and not alias
           } # Classes
@@ -2824,6 +2362,46 @@ IFClsDef:
             $r = $self->{<H::DIS|plCodeFragment>} = null;
           } 
         }
+
+  @Method:
+    @@Name: getPerlModuleMemberCode
+    @@enDesc:
+      Generates a Perl code for the resource, for the use
+      within Perl module.
+    @@Param:
+      @@@Name: factory
+      @@@Type: PCDocument
+      @@@enDesc:
+        The document to which the newly created Perl code belongs.
+    @@Param:
+      @@@Name: thismod_pack
+      @@@Type: DIS|PLFile
+      @@@enDesc:
+        The package of the module.
+    @@Param:
+      @@@Name: const
+      @@@Type: DISPerl|HASH||ManakaiDOM|all
+    @@Return:
+      @@@Type: Node
+      @@@enDesc:
+        The generated code.
+      @@@nullCase:
+        @@@@enDesc:
+          If no code is defined for the type of the resource.
+      @@@PerlDef:
+        my $method;
+        __CODE{DIS|getMethodForType::
+          $resource => $self,
+          $method_name => 'get_perl_module_member_code',
+          $method => $method,
+        }__;
+        if ($method) {
+          __DEEP{
+            $r = $method->(@_);
+          }__;
+        } else {
+          $r = null;
+        } 
 
   @Attr:
     @@Name: plAdditionalISAPackages
@@ -4998,6 +4576,63 @@ TMethods:
 
 TMethods:
   @enDesc:
+    <Q::DIS|AnyMethod>
+
+  @TMethod:
+    @@Name: getPerlModuleMemberCode
+    @@DIS:targetType: DIS|AnyMethod
+    @@Param:
+      @@@Name: factory
+      @@@Type: PCDocument
+    @@Return:
+      @@@Type: Node
+      @@@PerlDef:
+        __DEEP{
+          $r = $factory-><M::Document.createDocumentFragment>;
+          my $method_code = $self-><AG::DISResourcePerl.plCodeFragment>;
+          my $method_names = $self-><M::DIS|MPLSub.getPerlNameList>;
+          $method_code-><M::DIS|MPLSub.clearPerlName>;
+          my $type_uris = $self-><M::DIS|DISResourceProp
+                                           .getPropertyTextList>
+                                        (<Q::DIS|targetType>);
+          my $method_name_0 = $method_names->[0];
+          my $type_uri_0 = $type_uris->[0];
+          my $st = $factory-><M::PCDocument.createPCStatement>;
+                $st-><M::DIS|PLBlockCon.appendCode>
+                       ('$Message::Util::DIS::Method{');
+                $st-><M::DIS|PLAnyCon.appendStringLiteral> ($type_uri_0);
+                $st-><M::DIS|PLBlockCon.appendCode> ('}->{');
+                $st-><M::DIS|PLAnyCon.appendStringLiteral> ($method_name_0);
+                $st-><M::DIS|PLBlockCon.appendCode> ('} = ');
+                $st-><AG::Node.ownerDocument>
+                   -><M::Document.adoptNode> ($method_code);
+                $st-><M::Node.appendChild> ($method_code);
+          $r-><M::Node.appendChild> ($st);
+          for my $type_uri (@$type_uris) {
+            M: for my $method_name (@$method_names) {
+              next M if $method_name eq $method_name_0 and
+                        $type_uri eq $type_uri_0;
+              my $st = $factory-><M::PCDocument.createPCStatement>;
+                    $st-><M::DIS|PLBlockCon.appendCode>
+                           ('$Message::Util::DIS::Method{');
+                    $st-><M::DIS|PLAnyCon.appendStringLiteral> ($type_uri);
+                    $st-><M::DIS|PLBlockCon.appendCode> ('}->{');
+                    $st-><M::DIS|PLAnyCon.appendStringLiteral> ($method_name);
+                    $st-><M::DIS|PLBlockCon.appendCode> ('} = ');
+                    $st-><M::DIS|PLBlockCon.appendCode>
+                           ('$Message::Util::DIS::Method{');
+                    $st-><M::DIS|PLAnyCon.appendStringLiteral> ($type_uri_0);
+                    $st-><M::DIS|PLBlockCon.appendCode> ('}->{');
+                    $st-><M::DIS|PLAnyCon.appendStringLiteral> ($method_name_0);
+                    $st-><M::DIS|PLBlockCon.appendCode> ('}');
+              $r-><M::Node.appendChild> ($st);
+            }
+          }
+        }__;
+##DIS:AnyMethod
+
+TMethods:
+  @enDesc:
     <Q::DISLang|MethodParameter>
 
   @TAttr:
@@ -5423,7 +5058,460 @@ TMethods:
                                context_object => $val));
             }
         }__;
+
+  @TMethod:
+    @@Name: getPerlModuleMemberCode
+    @@DIS:targetType: DISLang|Class
+    @@Param:
+      @@@Name: factory
+      @@@Type: PCDocument
+    @@Param:
+      @@@Name: thismod_pack
+      @@@Type: DIS|PLFile
+    @@Param:
+      @@@Name: const
+      @@@Type: DISPerl|HASH||ManakaiDOM|all
+    @@Return:
+      @@@Type: Node
+      @@@PerlDef:
+        __DEEP{
+          $r = $factory-><M::PCDocument.createPCBlock>;
+          my $cls = $self;
+
+          ## -- Subroutines and variables
+          my $pack = $cls-><AG::DISResourcePerl.plCodeFragment>;
+          $factory-><M::Document.adoptNode> ($pack);
+          $r-><M::Node.appendChild> ($pack);
+                my $pack_name = $cls-><AG::DISResourcePerl
+                                          .plFullyQualifiedName>;
+
+                ## -- Constants
+                for my $cr (@{$cls-><M::DIS|DISResource.getChildResourceList>}) {
+                  if ($cr-><M::DIS|DISAnyResource.isTypeURI>
+                                          (<Q::ManakaiDOM:Const>)) {
+                    $thismod_pack-><M::DIS|PLPack.addExport>
+                      (null,
+                       my $nm = $cr-><AG::DISResourcePerl.plName>);
+                    $const->{$nm} = $cr-><AG::DISResourcePerl
+                                           .plFullyQualifiedName>;
+                  } elsif ($cr-><M::DIS|DISAnyResource.isTypeURI>
+                                          (<Q::ManakaiDOM:ConstGroup>)) {
+                    my $tag = $cr-><AG::DISResourcePerl.plName>;
+                    for my $gcr (@{$cr-><M::DIS|DISResource
+                                                    .getChildResourceList>}) {
+                      if ($gcr-><M::DIS|DISAnyResource.isTypeURI>
+                                          (<Q::ManakaiDOM:Const>)) {
+                        $thismod_pack-><M::DIS|PLPack.addExport>
+                          ($tag, my $nm = $gcr-><AG::DISResourcePerl.plName>);
+                        $const->{$nm} = $gcr-><AG::DISResourcePerl
+                                                   .plFullyQualifiedName>;
+                      }
+                    }
+                  }
+                }
+
+                ## -- Features
+                my %feature;
+                for my $v (@{$cls-><M::DIS|DISResourceProp.getPropertyValueList>
+                                      (<Q::f:provides>)}) {
+                  my $f = $self-><AG::DIS|DISAnyResource.database>
+                               -><M::DIS|DISDatabase.getResource>
+                                     ($v->isa (<IFName::dv|DVURIValue>)
+                                         ? $v-><AG::dv|DVURIValue.uri>
+                                         : $v-><AG::dv|DVValue.value>);
+                  unless ($f-><AS::DIS|DISAnyResource.isDefined>) {
+                    __UNDEEP{__EXCEPTION{DIS|RESOURCE_NOT_DEFINED_ERR::
+                      DIS:uri => {$f-><AG::DIS|DISAnyResource.uri>},
+                      DIS:expectedType => {<Q::f:Feature>},
+                    }__}__;
+                  }
+                  for my $s ($f, @{$f-><M::DIS|DISResourceProp
+                                    .getPropertyResourceList>
+                                   (<Q::f:extends>,
+                                    recursive => true,
+                                    default_media_type => <Q::dis:TypeQName>)}) {
+                    $feature{$s-><AG::DIS|DISAnyResource.uri>}
+                         = [$s, $v];
+                  }
+                }
+                for my $f (values %feature) {
+                  my @fname = @{$f->[0]-><AG::DIS|DISResource
+                                        .featureNameList>};
+                  my $fver = $f->[0]-><M::DIS|DISResourceProp
+                                        .getPropertyText>
+                                        (<Q::dis:Version>, null);
+                  next unless defined $fver;
+                  my $fi = $self-><M::DISResourcePerlModule
+                        .plIsFeatureImplemented> ($f->[0]->{uri}) ? true : false;
+                  my $pt = $f->[1]-><M::dv|DVValue.getProperty>
+                                            (<Q::f:through>);
+                  if (UNIVERSAL::isa ($pt, <IFName::dv|DVURIValue>)) {
+                    my $c = $pt-><M::dv|DVURIValue.getResource>
+                              ($self-><AG::DIS|DISAnyResource.database>);
+                    $c-><AS::DIS|DISAnyResource.isReferred>
+                                    ($f->[0]-><AG::DIS|DISAnyResource.uri>);
+                    my $cp = $c-><AG::DISResourcePerl.plFullyQualifiedName>;
+                    for my $fname (@fname) {
+                      $r-><M::DIS|PLBlockCon.appendStatement>
+                          ('$Message::DOM::ImplFeature{q<' . $cp .
+                           '>}->{q<' .
+                           $fname . '>}->{q<' . $fver . '>} ||= '.$fi);
+                      $r-><M::DIS|PLBlockCon.appendStatement>
+                          ('$Message::DOM::ImplFeature{q<' . $cp .
+                           '>}->{q<' . $fname . '>}->{q<>} = 1');
+                    }
+                  } else { # no "through" attribute
+                    for my $fname (@fname) {
+                      $r-><M::DIS|PLBlockCon.appendStatement>
+                          ('$Message::DOM::ImplFeature{q<' . $pack_name .
+                           '>}->{q<' .
+                           $fname . '>}->{q<' . $fver . '>} ||= '.$fi);
+                      $r-><M::DIS|PLBlockCon.appendStatement>
+                          ('$Message::DOM::ImplFeature{q<' . $pack_name .
+                           '>}->{q<' . $fname . '>}->{q<>} = 1');
+                    }
+                  }
+                } # for
+
+                my %ifeature;
+                my $ifpoint = 0;
+                my %fdup; # Check dupulication
+                FI: for my $feature (@{$cls-><M::DIS|DISResourceProp
+                          .getPropertyResourceList>
+                             (<Q::f:implements>,
+                              isa_recursive => true)}) {
+                  my $furi = $feature-><AG::DIS|DISAnyResource.uri>;
+                  next FI if $fdup{$furi};
+                  $fdup{$furi} = true;
+
+                  my $fver = $feature-><M::DIS|DISResourceProp
+                                        .getPropertyText>
+                                        (<Q::dis:Version>, null);
+                  $ifpoint += $fver;
+                  my $fi = defined $fver
+                         ? $self-><M::DISResourcePerlModule
+                                     .plIsFeatureImplemented>
+                                           ($feature->{uri}) ? true : false
+                         : true;
+                  for my $fname (@{$feature-><AG::DIS|DISResource
+                                                 .featureNameList>}) {
+                    $ifeature{$fname}->{$fver} = $fi;
+                    $ifeature{$fname}->{''} = true;
+                  }                  
+                } # FI
+                $r-><M::DIS|PLBlockCon.appendStatement>
+                      ('$Message::DOM::ClassFeature{q<' . $pack_name .
+                       '>} = ' . <ClassM::PLImplClass.perlLiteral> (\%ifeature));
+
+                ## TODO: Features from implementing interfaces.
+
+                ## Score calculated from provided features
+                $r-><M::DIS|PLBlockCon.appendStatement>
+                        ('$Message::DOM::ClassPoint{q<' . $pack_name .
+                         '>} = ' . $ifpoint);
+
+                ## -- Roles
+                for my $role (@{$cls-><M::DIS|DISResourceProp
+                          .getPropertyResourceList>
+                             (<Q::DISLang:role>, isa_recursive => true,
+                              default_media_type => <Q::dis:TypeQName>)}) {
+                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
+    (<Q::DOMMetaImpl:ImplementationSourceForManakaiDOMImplementationRegistry>)) {
+                    $r-><M::DIS|PLBlockCon.appendStatement>
+                          ('$Message::DOM::ManakaiDOMImplementationRegistry'.
+                           '::SourceClass{q<' . $pack_name . '>} = 1');
+                  }
+                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
+            (<Q::DOMMetaImpl:ImplementationForManakaiDOMImplementationSource>)) {
+                    $r-><M::DIS|PLBlockCon.appendStatement>
+                          ('$Message::DOM::ManakaiDOMImplementationSource'.
+                           '::SourceClass{q<' . $pack_name . '>} = 1');
+                  }
+                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
+   (<Q::DOMMetaImpl:ImplementationCompatibleWithManakaiDOMMinimumImplementation>)
+                  ) {
+                    $r-><M::DIS|PLBlockCon.appendStatement>
+                          ('$Message::DOM::ManakaiDOMImplementation'.
+                           '::CompatClass{q<' . $pack_name . '>} = 1');
+                  }
+                  
+                  ## Node
+                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
+                                (<Q::DOMCore:ElementRole>)) {
+                    my $for_specific_et;
+                    for my $et (@{$cls-><M::DIS|DISResourceProp
+                          .getPropertyResourceList>
+                             (<Q::s:elementType>, isa_recursive => true,
+                              default_media_type => <Q::dis:TFQNames>)}) {
+                      $for_specific_et = true;
+                      my $ln = $et-><AG::DIS|DISResourceMV
+                                        .mvLocalName>;
+                      $ln = '*' unless defined $ln;
+                      my $ns = $et-><AG::DIS|DISResourceMV
+                                        .mvNamespaceURI>;
+                      $ns = '' unless defined $ns;
+                        ## ISSUE: Is NULL-namespace should be allowed here?
+                      $r-><M::DIS|PLBlockCon.appendStatement>
+                          ('$Message::DOM::ManakaiDOMElement' .
+                           '::CompatClassET{q<' . $ns . '>}->{q<' . $ln .
+                           '>}->{q<' . $pack_name . '>} = 1');
+                    }
+                    $r-><M::DIS|PLBlockCon.appendStatement>
+                          ('$Message::DOM::ManakaiDOMElement'.
+                           '::CompatClass{q<' . $pack_name . '>} = 1')
+                      unless $for_specific_et;
+                  }
+                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
+                                (<Q::DOMCore:AttributeRole>)) {
+                    my $for_specific_attr;
+                    for my $at (@{$cls-><M::DIS|DISResourceProp
+                          .getPropertyResourceList>
+                             (<Q::dis:DocAttr>, isa_recursive => true,
+                              default_media_type => <Q::dis:TFQNames>)}) {
+                      $for_specific_attr = true;
+                      my $ln = $at-><AG::DIS|DISResourceMV
+                                        .mvLocalName>;
+                      $ln = '*' unless defined $ln;
+                      my $ns = $at-><AG::DIS|DISResourceMV
+                                        .mvNamespaceURI>;
+                      $ns = '' unless defined $ns;
+                      my $et = $at-><AG::DIS|DISResourceMV
+                                        .mvOwnerElementResource>;
+                      my $etns = '*';
+                      my $etln = '*';
+                      if ($et) {
+                        $etns = $et-><AG::DIS|DISResourceMV.mvLocalName>;
+                        $etln = '*' unless defined $etln;
+                        my $etns = $at-><AG::DIS|DISResourceMV
+                                          .mvNamespaceURI>;
+                        $etns = '' unless defined $etns;
+                          ## ISSUE: Should NULL-namespace be allowed here?
+                      }
+                      
+                      $r-><M::DIS|PLBlockCon.appendStatement>
+                          ('$Message::DOM::ManakaiDOMElement' .
+                           '::CompatClassAttr{q<' . $etns . '>}->{q<' . $etln .
+                           '>}->{q<' . $ns . '>}->{q<' . $ln . '>}->{q<' .
+                           $pack_name . '>} = 1');
+                    }
+                    $r-><M::DIS|PLBlockCon.appendStatement>
+                          ('$Message::DOM::ManakaiDOMAttr'.
+                           '::CompatClass{q<' . $pack_name . '>} = 1')
+                      unless $for_specific_attr;
+                  }
+                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
+                                (<Q::DOMCore:TextRole>)) {
+                    $r-><M::DIS|PLBlockCon.appendStatement>
+                          ('$Message::DOM::ManakaiDOMText'.
+                           '::CompatClass{q<' . $pack_name . '>} = 1');
+                  }
+                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
+                                (<Q::DOMCore:CommentRole>)) {
+                    $r-><M::DIS|PLBlockCon.appendStatement>
+                          ('$Message::DOM::ManakaiDOMComment'.
+                           '::CompatClass{q<' . $pack_name . '>} = 1');
+                  }
+                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
+                                (<Q::DOMCore:CDATASectionRole>)) {
+                    $r-><M::DIS|PLBlockCon.appendStatement>
+                          ('$Message::DOM::ManakaiDOMCDATASection'.
+                           '::CompatClass{q<' . $pack_name . '>} = 1');
+                  }
+                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
+                                (<Q::DOMCore:ProcessingInstructionRole>)) {
+                    $r-><M::DIS|PLBlockCon.appendStatement>
+                          ('$Message::DOM::ManakaiDOMProcessingInstruction'.
+                           '::CompatClass{q<' . $pack_name . '>} = 1');
+                    ## TODO: Target name dependent
+                  }
+                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
+                                (<Q::DOMCore:DocumentRole>)) {
+                    my $for_specific_et;
+                    for my $et (@{$cls-><M::DIS|DISResourceProp
+                          .getPropertyResourceList>
+                             (<Q::s:rootElementType>, isa_recursive => true,
+                              default_media_type => <Q::dis:TFQNames>)}) {
+                      $for_specific_et = true;
+                      my $ln = $et-><AG::DIS|DISResourceMV
+                                        .mvLocalName>;
+                      $ln = '*' unless defined $ln;
+                      my $ns = $et-><AG::DIS|DISResourceMV
+                                        .mvNamespaceURI>;
+                      $ns = '' unless defined $ns;
+                        ## ISSUE: Is NULL-namespace should be allowed here?
+                      $r-><M::DIS|PLBlockCon.appendStatement>
+                          ('$Message::DOM::ManakaiDOMDocument' .
+                           '::CompatClassET{q<' . $ns . '>}->{q<' . $ln .
+                           '>}->{q<' . $pack_name . '>} = 1');
+                    }
+                    $r-><M::DIS|PLBlockCon.appendStatement>
+                          ('$Message::DOM::ManakaiDOMDocument'.
+                           '::CompatClass{q<' . $pack_name . '>} = 1')
+                      unless $for_specific_et;
+                    ## TODO: by document type name and media type
+                  }
+                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
+                                (<Q::DOMCore:DocumentFragmentRole>)) {
+                    $r-><M::DIS|PLBlockCon.appendStatement>
+                          ('$Message::DOM::ManakaiDOMDocumentFragment'.
+                           '::CompatClass{q<' . $pack_name . '>} = 1');
+                  }
+                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
+                                (<Q::DOMCore:DocumentTypeRole>)) {
+                    $r-><M::DIS|PLBlockCon.appendStatement>
+                          ('$Message::DOM::ManakaiDOMDocumentType'.
+                           '::CompatClass{q<' . $pack_name . '>} = 1');
+                    ## TODO: Doctype name or public ID dependent
+                  }
+                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
+                                (<Q::DOMCore:EntityRole>)) {
+                    $r-><M::DIS|PLBlockCon.appendStatement>
+                          ('$Message::DOM::ManakaiDOMEntity'.
+                           '::CompatClass{q<' . $pack_name . '>} = 1');
+                    ## TODO: Entity name or public ID dependent
+                  }
+                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
+                                (<Q::DOMCore:EntityReferenceRole>)) {
+                    $r-><M::DIS|PLBlockCon.appendStatement>
+                          ('$Message::DOM::ManakaiDOMEntityReference'.
+                           '::CompatClass{q<' . $pack_name . '>} = 1');
+                    ## TODO: Entity name or public ID dependent
+                  }
+                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
+                                (<Q::DOMCore:NotationRole>)) {
+                    $r-><M::DIS|PLBlockCon.appendStatement>
+                          ('$Message::DOM::ManakaiDOMNotation'.
+                           '::CompatClass{q<' . $pack_name . '>} = 1');
+                    ## TODO: Notation name or public ID dependent
+                  }
+                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
+                                (<Q::DOMCore:NamespaceRole>)) {
+                    $r-><M::DIS|PLBlockCon.appendStatement>
+                          ('$Message::DOM::ManakaiDOMNamespace'.
+                           '::CompatClass{q<' . $pack_name . '>} = 1');
+                  }
+                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
+                                (<Q::DOMCore:ElementTypeDefinitionRole>)) {
+                    $r-><M::DIS|PLBlockCon.appendStatement>
+                          ('$Message::DOM::ManakaiDOMElementTypeDefinition'.
+                           '::CompatClass{q<' . $pack_name . '>} = 1');
+                  }
+                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
+                                (<Q::DOMCore:AttributeDefinitionRole>)) {
+                    $r-><M::DIS|PLBlockCon.appendStatement>
+                          ('$Message::DOM::ManakaiDOMAttributeDefinition'.
+                           '::CompatClass{q<' . $pack_name . '>} = 1');
+                  }
+                  ## NOTE: DOMCore:AnyNodeRole is subset of  
+                  ##       DOMCore:ElementRole and DOMCore:TextRole and ...
+
+                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
+                                (<Q::gls:ParserRole>)) {
+                    $r-><M::DIS|PLBlockCon.appendStatement>
+                          ('$Message::DOM::DOMLS::ParserClass{q<'.
+                           $pack_name . '>} = 1');
+                  }
+                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
+                                (<Q::gls:SerializerRole>)) {
+                    $r-><M::DIS|PLBlockCon.appendStatement>
+                          ('$Message::DOM::DOMLS::SerializerClass{q<'.
+                           $pack_name . '>} = 1');
+                  }
+
+                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
+                                (<Q::DIS:ModuleRole>)) {
+                    $r-><M::DIS|PLBlockCon.appendStatement>
+                          ('$Message::Util::DIS::ManakaiDISModuleDefinition'.
+                           '::CompatClass{q<' . $pack_name . '>} = 1');
+                  }
+                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
+                                (<Q::DIS:ForRole>)) {
+                    $r-><M::DIS|PLBlockCon.appendStatement>
+                          ('$Message::Util::DIS::ManakaiDISForDefinition'.
+                           '::CompatClass{q<' . $pack_name . '>} = 1');
+                  }
+                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
+                                (<Q::DIS:ResourceRole>)) {
+                    $r-><M::DIS|PLBlockCon.appendStatement>
+                          ('$Message::Util::DIS::ManakaiDISResourceDefinition'.
+                           '::CompatClass{q<' . $pack_name . '>} = 1');
+                  }
+                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
+                                (<Q::DIS:ElementRole>)) {
+                    $r-><M::DIS|PLBlockCon.appendStatement>
+                          ('$Message::Util::DIS::ManakaiDISElement'.
+                           '::CompatClass{q<' . $pack_name . '>} = 1');
+                  }
+                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
+                                (<Q::DIS:DatabaseRole>)) {
+                    $r-><M::DIS|PLBlockCon.appendStatement>
+                          ('$Message::Util::DIS::ManakaiDISDatabase'.
+                           '::CompatClass{q<' . $pack_name . '>} = 1');
+                  }
+                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
+                                (<Q::dv|ValueRole>)) {
+                    $r-><M::DIS|PLBlockCon.appendStatement>
+                          ('$Message::Util::DIS::Value::ManakaiDVValue'.
+                           '::CompatClass{q<' . $pack_name . '>} = 1');
+                  }
+                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
+                                (<Q::mn|NodeRefRole>)) {
+                    my %nrp;
+                    my $db = $self-><AG::DIS|DISAnyResource.database>;
+                    for my $p (<Q::mn|subnode0>,
+                               <Q::mn|subnode1>,
+                               <Q::mn|subnode2>,
+                               <Q::mn|origin0>,
+                               <Q::mn|xrefnode0>) {
+                      $nrp{
+                        $db-><M::DIS|DISDatabase.getResource> ($p)
+                           -><M::DIS|DISResourceProp.getPropertyText>
+                                  (<Q::mn:stemName>, $p)
+                      } = [keys %{{map {
+                        $_-><M::DIS|DISResourceProp.getPropertyText>
+                                  (<Q::DISPerl:propHashKey>,
+                                   $_-><AG::DIS|DISAnyResource.uri>) => true,
+                      } @{$cls-><M::DIS|DISResourceProp.getPropertyResourceList>
+                                  ($p, isa_recursive => true)}}}];
+                    }
+                    for (keys %nrp) {
+                      CORE::delete $nrp{$_} unless @{$nrp{$_}};
+                    }
+                    $r-><M::DIS|PLBlockCon.appendStatement>
+                          ('$Message::Util::ManakaiNode::ManakaiNodeRef'.
+                           '::Prop{q<' . $pack_name . '>} = '.
+                           <ClassM::PLImplClass.perlLiteral> (\%nrp));
+                  }
+                }
+          
+          my $fragment = $factory-><M::Document.createDocumentFragment>;
+          my @children = @{$r-><AG::Node.childNodes>};
+          for (@children) {
+            $fragment-><M::Node.appendChild> ($_);
+          }
+          $r = $fragment;
+        }__;
 ##DISLang:Class
+
+TMethods:
+  @enDesc:
+    <Q::Muf2003:RuleDefClass>
+
+  @TMethod:
+    @@Name: getPerlModuleMemberCode
+    @@DIS:targetType: Muf2003|RuleDefClass
+    @@Param:
+      @@@Name: factory
+      @@@Type: PCDocument
+    @@Return:
+      @@@Type: Node
+      @@@PerlDef: \
+##Muf2003:RuleDefClass
+
+ResourceDef:
+  @QName: PCDocument
+  @AliasFor: pc|PCDocument||ManakaiDOM|ManakaiDOMLatest
+  @For: DIS|ForEmpty
 
 TMethods:
   @enDesc:
@@ -5528,7 +5616,57 @@ TMethods:
               $r-><M::DIS|PLPack.setSubNode> ($err_def);
             }
         }__;
+
+  @TMethod:
+    @@Name: getPerlModuleMemberCode
+    @@DIS:targetType: DISLang|Interface
+    @@Param:
+      @@@Name: factory
+      @@@Type: PCDocument
+    @@Param:
+      @@@Name: thismod_pack
+      @@@Type: DIS|PLFile
+    @@Param:
+      @@@Name: const
+      @@@Type: DISPerl|HASH||ManakaiDOM|all
+    @@Return:
+      @@@Type: Node
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><AG::DISResourcePerl.plCodeFragment>;
+          for my $cr (@{$self-><M::DIS|DISResource
+                                 .getChildResourceListByType>
+                                          (<Q::DISLang:ConstGroup>)}) {
+                  my $tag = $cr-><AG::DISResourcePerl.plName>;
+                  for my $gcr (@{$cr-><M::DIS|DISResource
+                                                    .getChildResourceListByType>
+                                          (<Q::DISLang:Const>)}) {
+                    $thismod_pack-><M::DIS|PLPack.addExport>
+                          ($tag, my $nm = $gcr-><AG::DISResourcePerl.plName>);
+                    $const->{$nm} = $gcr-><AG::DISResourcePerl
+                                                   .plFullyQualifiedName>;
+                  }
+                }
+        }__;
 ##DISLang:Interface
+
+TMethods:
+  @TMethod:
+    @@Name: getPerlModuleMemberCode
+    @@DIS:targetType: DISPerl|ScalarVariable
+    @@DIS:targetType: DOMCore|DOMConfigurationParameter
+    @@DIS:targetType: DOMCore|DOMConfigurationParameterApplication
+    @@DIS:targetType: DOMCore|DOMErrorType
+    @@Param:
+      @@@Name: factory
+      @@@Type: PCDocument
+    @@Return:
+      @@@Type: Node
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><AG::DISResourcePerl.plCodeFragment>
+            unless $self-><AG::DIS|DISResource.parentResource>;
+        }__;
 
 TMethods:
   @enDesc:
