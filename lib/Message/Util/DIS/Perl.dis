@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/02/20 14:52:44 $
+      $Date: 2006/02/21 05:43:48 $
     @@ContentType:
       dis:Date.RCS
   
@@ -919,6 +919,28 @@ ResourceDef:
     }
   @For: DIS|ForEmpty
 ##setDefaultValue
+
+ResourceDef:
+  @QName: setDefaultValueDoc
+  @rdf:type: DISPerl|BlockCode
+  @PerlDef:
+    if ($data_type-><M::DIS|DISResource.isSubsetOfURI>
+                                              (<Q::DISLang:String>)) {
+      $result = $doc-><M::PCDocument.createPCLiteral> ('');
+    } elsif ($data_type-><M::DIS|DISResource.isSubsetOfURI>
+                                              (<Q::idl|boolean>) or
+             $data_type-><M::DIS|DISResource.isSubsetOfURI>
+                                              (<Q::DISIDL:AnyRealNumber>)) {
+      $result = $doc-><M::PCDocument.createPCNumberLiteral> ('0');
+    } elsif ($data_type-><M::DIS|DISResource.isSubsetOfURI>
+                                              (<Q::DISPerl|ARRAY>)) {
+      $result = $doc-><M::PCDocument.createPCLiteral> ([]);
+    } elsif ($data_type-><M::DIS|DISResource.isSubsetOfURI>
+                                              (<Q::DISPerl|HASH>)) {
+      $result = $doc-><M::PCDocument.createPCLiteral> ({});
+    }
+  @For: DIS|ForEmpty
+##setDefaultValueDoc
 
 ResourceDef:
   @QName: DIS|MPLImpl
@@ -2375,7 +2397,7 @@ IFClsDef:
         The document to which the newly created Perl code belongs.
     @@Param:
       @@@Name: thismod_pack
-      @@@Type: DIS|PLFile
+      @@@Type: DIS|PLPack
       @@@enDesc:
         The package of the module.
     @@Param:
@@ -2393,6 +2415,41 @@ IFClsDef:
         __CODE{DIS|getMethodForType::
           $resource => $self,
           $method_name => 'get_perl_module_member_code',
+          $method => $method,
+        }__;
+        if ($method) {
+          __DEEP{
+            $r = $method->(@_);
+          }__;
+        } else {
+          $r = null;
+        } 
+
+  @Method:
+    @@Name: getPerlClassMemberCode
+    @@enDesc:
+      Generates a Perl code for the resource, for the use
+      within Perl class.
+    @@Param:
+      @@@Name: factory
+      @@@Type: PCDocument
+      @@@enDesc:
+        The document to which the newly created Perl code belongs.
+    @@Param:
+      @@@Name: const
+      @@@Type: DISPerl|ARRAY||ManakaiDOM|all
+    @@Return:
+      @@@Type: Node
+      @@@enDesc:
+        The generated code.
+      @@@nullCase:
+        @@@@enDesc:
+          If no code is defined for the type of the resource.
+      @@@PerlDef:
+        my $method;
+        __CODE{DIS|getMethodForType::
+          $resource => $self,
+          $method_name => 'get_perl_class_member_code',
           $method => $method,
         }__;
         if ($method) {
@@ -4017,6 +4074,26 @@ TMethods:
         __DEEP{
           $r = $self-><M::dp|DISResourcePerl.getPerlNameList>->[0];
         }__;
+
+  @TMethod:
+    @@Name: getPerlClassMemberCode
+    @@DIS:targetType: DISLang|AnyMethod
+    @@Param:
+      @@@Name: factory
+      @@@Type: PCDocument
+    @@Return:
+      @@@Type: Node
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><AG::DISResourcePerl.plCodeFragment>
+                    -><M::Node.cloneNode> (true);
+          for (@{$self-><M::dp|DISResourcePerl.getPerlNameList>}) {
+            $r-><M::DIS|MPLSub.addPerlName> ($_);
+          }
+          for (@{$self-><M::dp|DISResourcePerl.getPerlOperatorList>}) {
+            $r-><M::DIS|MPLSub.addPerlOperator> ($_);
+          }
+        }__;
 ##DISLang:AnyMethod
 
 TMethods:
@@ -4165,7 +4242,6 @@ TMethods:
             ## Return value
             my $data_type;
             my $data_type_value;
-            use Message::Util::Error;
             try {
               $data_type = $ret-><AG::DIS|DISResource
                                      .disActualDataTypeResource>;
@@ -4375,13 +4451,13 @@ TMethods:
                 }__;
               }
               my $rs = $plimpl-><M::DIS|MPLImpl.createPerlStatement>;
-              my $rvar = $plimpl-><M::DIS|MPLImpl.createPerlVariable>
+              my $rvar1 = $plimpl-><M::DIS|MPLImpl.createPerlVariable>
                                                ('$', null, 'r');
-              $rvar-><AS::PCVar.variableScope> ('my');
+              $rvar1-><AS::PCVar.variableScope> ('my');
               if ($def) {
-                $rs-><M::DIS|PLAnyCon.appendNewAssignment> ($rvar => $def);
+                $rs-><M::DIS|PLAnyCon.appendNewAssignment> ($rvar1 => $def);
               } else {
-                $rs-><M::DIS|PLInCon.appendCodeFragment> ($rvar);
+                $rs-><M::DIS|PLInCon.appendCodeFragment> ($rvar1);
               }
               $get_code-><M::DIS|PLBlockCon.appendCodeFragment> ($rs);
 
@@ -4584,11 +4660,13 @@ TMethods:
     @@Param:
       @@@Name: factory
       @@@Type: PCDocument
+    @@Param:
+      @@@Name: thismod_pack
+      @@@Type: DIS|PLPack
     @@Return:
       @@@Type: Node
       @@@PerlDef:
         __DEEP{
-          $r = $factory-><M::Document.createDocumentFragment>;
           my $method_code = $self-><AG::DISResourcePerl.plCodeFragment>;
           my $method_names = $self-><M::DIS|MPLSub.getPerlNameList>;
           $method_code-><M::DIS|MPLSub.clearPerlName>;
@@ -4607,7 +4685,7 @@ TMethods:
                 $st-><AG::Node.ownerDocument>
                    -><M::Document.adoptNode> ($method_code);
                 $st-><M::Node.appendChild> ($method_code);
-          $r-><M::Node.appendChild> ($st);
+          $thismod_pack-><M::Node.appendChild> ($st);
           for my $type_uri (@$type_uris) {
             M: for my $method_name (@$method_names) {
               next M if $method_name eq $method_name_0 and
@@ -4625,7 +4703,7 @@ TMethods:
                     $st-><M::DIS|PLBlockCon.appendCode> ('}->{');
                     $st-><M::DIS|PLAnyCon.appendStringLiteral> ($method_name_0);
                     $st-><M::DIS|PLBlockCon.appendCode> ('}');
-              $r-><M::Node.appendChild> ($st);
+              $thismod_pack-><M::Node.appendChild> ($st);
             }
           }
         }__;
@@ -4733,6 +4811,22 @@ TMethods:
             $r-><M::DIS|PLBlockCon.appendCodeFragment> ($value);
             $r-><AS::DIS|MPLSub.prototype> ('');
         }__;
+
+  @TMethod:
+    @@Name: getPerlClassMemberCode
+    @@DIS:targetType: DISLang|Const
+    @@Param:
+      @@@Name: factory
+      @@@Type: PCDocument
+    @@Param:
+      @@@Name: const
+      @@@Type: DISPerl|ARRAY||ManakaiDOM|all
+    @@Return:
+      @@@Type: Node
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><AG::DISResourcePerl.plCodeFragment>;
+        }__;
 ##DISLang:Const
 
 TMethods:
@@ -4758,6 +4852,29 @@ TMethods:
             DIS:sourceNode => {$self-><AG::anyres.sourceElement>},
           }__;
         }
+
+  @TMethod:
+    @@Name: getPerlClassMemberCode
+    @@DIS:targetType: DISLang|ConstGroup
+    @@Param:
+      @@@Name: factory
+      @@@Type: PCDocument
+    @@Param:
+      @@@Name: const
+      @@@Type: DISPerl|ARRAY||ManakaiDOM|all
+    @@Return:
+      @@@Type: Node
+      @@@PerlDef:
+        __DEEP{
+          $r = $factory-><M::Document.createDocumentFragment>;
+          for my $gcr (@{$self-><M::DIS|DISResource.getChildResourceList>}) {
+            if ($gcr-><M::DIS|DISAnyResource.isTypeURI> (<Q::DISLang|Const>)) {
+              my $sub = $gcr-><AG::DISResourcePerl.plCodeFragment>;
+              $r-><M::Node.appendChild> ($sub);
+              push @$const, $gcr;
+            }
+          }
+        }__;
 ##DISLang:ConstGroup
 
 TMethods:
@@ -4869,92 +4986,13 @@ TMethods:
             my @const;
             my @cr = @{$self-><M::DIS|DISResource.getChildResourceList>};
             for my $cr (@cr) {
-              ## - Subroutines
-              if ($cr-><M::DIS|DISAnyResource.isTypeURI>
-                                    (<Q::DISLang:Method>) or
-                  $cr-><M::DIS|DISAnyResource.isTypeURI>
-                                    (<Q::DISLang:Attribute>)) {
-                my $is_attr = $cr-><M::DIS|DISAnyResource.isTypeURI>
-                                    (<Q::DISLang:Attribute>) ? true : false;
-                my $psub = $cr-><AG::DISResourcePerl.plCodeFragment>->clone;
-                for (@{$cr-><M::dp|DISResourcePerl.getPerlNameList>}) {
-                  $psub-><M::DIS|MPLSub.addPerlName> ($_);
-                }
-                for (@{$cr-><M::dp|DISResourcePerl.getPerlOperatorList>}) {
-                  $psub-><M::DIS|MPLSub.addPerlOperator> ($_);
-                }
-                $r-><M::DIS|PLPack.setSubNode> ($psub);
-              ## - Constant groups
-              } elsif ($cr-><M::DIS|DISAnyResource.isTypeURI>
-                                (<Q::ManakaiDOM:ConstGroup>)) {
-                for my $gcr (@{$cr-><M::DIS|DISResource.getChildResourceList>}) {
-                  if ($gcr-><M::DIS|DISAnyResource.isTypeURI>
-                                (<Q::ManakaiDOM:Const>)) {
-                    my $sub = $gcr-><AG::DISResourcePerl
-                                        .plCodeFragment>;
-                    if ($r-><M::DIS|PLPack.getSub>
-                                          ($sub-><AG::DIS|MPLSub.pcLocalName>)) {
-                      __UNDEEP{__EXCEPTION{
-                          DIS|PERL_SUBROUTINE_ALREADY_DEFINED_ERR::
-                            pc:localName
-                                    => {$sub-><AG::DIS|MPLSub.pcLocalName>},
-                            DIS:uri => {$gcr->{uri}},
-                            DIS:sourceNode => {$gcr->{src}},
-                      }__}__;
-                    }
-                    $r-><M::DIS|PLPack.setSubNode> ($sub);
-                    push @const, $gcr;
-                  }
-                }
-              ## - Constants
-              } elsif ($cr-><M::DIS|DISAnyResource.isTypeURI>
-                                (<Q::ManakaiDOM:Const>)) {
-                my $sub = $cr-><AG::DISResourcePerl.plCodeFragment>;
-                if ($r-><M::DIS|PLPack.getSub>
-                               ($sub-><AG::DIS|MPLSub.pcLocalName>)) {
-                  __UNDEEP{__EXCEPTION{
-                          DIS|PERL_SUBROUTINE_ALREADY_DEFINED_ERR::
-                            pc:localName
-                                    => {$sub-><AG::DIS|MPLSub.pcLocalName>},
-                            DIS:uri => {$cr->{uri}},
-                            DIS:sourceNode => {$cr->{src}},
-                  }__}__;
-                }
-                $r-><M::DIS|PLPack.setSubNode> ($sub);
-              ## Package-scope variables
-              } elsif ($cr-><M::DIS|DISAnyResource.isTypeURI>
-                                (<Q::DISPerl:ScalarVariable>)) {
-                my $varn = $cr-><AG::DISResourcePerl.plVariableName>;
-                my $var = $plimpl-><M::DIS|MPLImpl.createPerlVariable>
-                                                       (null, null, $varn);
-                my $data_type = $cr-><AG::DIS|DISResource
-                                           .disActualDataTypeResource>;
-                my $value = $cr-><M::DIS|DISResourceProp.getPropertyValue>
-                                    (<Q::dis:DefaultValue>);
-                if ($value) {
-                  $value = $value-><M::DVValuePerl.plCodeFragment>
-                                    ($cr,
-                                     data_type_uri => $data_type
-                                          -><AG::DIS|DISAnyResource.uri>);
-                } else {
-                  __CODE{setDefaultValue::
-                    $result => $value,
-                    $data_type => $data_type,
-                    $plimpl => $plimpl,
-                  }__;
-                }
-                if ($cr-><M::DIS|DISResourceProp.getPropertyBoolean>
-                              (<Q::DISPerl:defaultValueHasSelfReference>)) {
-                  $r-><M::DIS|PLBlockCon.appendStatement>
-                    -><M::DIS|PLBlockCon.appendCodeFragment>
-                                                       (my $v = $var->clone);
-                  $v-><AS::PCVar.variableScope> ('our');
-                } else {
-                  $var-><AS::PCVar.variableScope> ('our');
-                }
-                $r-><M::DIS|PLBlockCon.appendStatement>
-                  -><M::DIS|PLAnyCon.appendNewAssignment> ($var => $value);
-              } # Type of child resources
+              my $mcode = $cr-><M::DISResourcePerl.getPerlClassMemberCode>
+                                  ($r-><AG::Node.ownerDocument>, \@const);
+              if ($mcode) {
+                $r-><AG::Node.ownerDocument>
+                  -><M::Document.adoptNode> ($mcode);
+                $r-><M::Node.appendChild> ($mcode);
+              }
             }
 
             ## - Error Descriptions
@@ -5067,7 +5105,7 @@ TMethods:
       @@@Type: PCDocument
     @@Param:
       @@@Name: thismod_pack
-      @@@Type: DIS|PLFile
+      @@@Type: DIS|PLPack
     @@Param:
       @@@Name: const
       @@@Type: DISPerl|HASH||ManakaiDOM|all
@@ -5625,7 +5663,7 @@ TMethods:
       @@@Type: PCDocument
     @@Param:
       @@@Name: thismod_pack
-      @@@Type: DIS|PLFile
+      @@@Type: DIS|PLPack
     @@Param:
       @@@Name: const
       @@@Type: DISPerl|HASH||ManakaiDOM|all
@@ -5660,12 +5698,18 @@ TMethods:
     @@Param:
       @@@Name: factory
       @@@Type: PCDocument
+    @@Param:
+      @@@Name: thismod_pack
+      @@@Type: DIS|PLPack
     @@Return:
       @@@Type: Node
       @@@PerlDef:
         __DEEP{
-          $r = $self-><AG::DISResourcePerl.plCodeFragment>
-            unless $self-><AG::DIS|DISResource.parentResource>;
+          unless ($self-><AG::DIS|DISResource.parentResource>) {
+            my $code = $self-><AG::DISResourcePerl.plCodeFragment>;
+            $factory-><M::Document.adoptNode> ($code);
+            $thismod_pack-><M::Node.appendChild> ($code);
+          }
         }__;
 
 TMethods:
@@ -5729,6 +5773,57 @@ TMethods:
             }
             $r = $plimpl-><M::DIS|MPLImpl.createPerlStatement>;
             $r-><M::DIS|PLAnyCon.appendNewAssignment> ($var => $value);
+        }__;
+
+  @TMethod:
+    @@Name: getPerlClassMemberCode
+    @@DIS:targetType: DISPerl|ScalarVariable
+    @@Param:
+      @@@Name: factory
+      @@@Type: PCDocument
+    @@Param:
+      @@@Name: const
+      @@@Type: DISPerl|ARRAY||ManakaiDOM|all
+    @@Return:
+      @@@Type: Node
+      @@@PerlDef:
+        __DEEP{
+          $r = $factory-><M::Document.createDocumentFragment>;
+          my $varn = $self-><AG::DISResourcePerl.plVariableName>;
+          my $var = $factory-><M::PCDocument.createPCVariable>
+                                (null, null, $varn);
+          my $data_type = $self-><AG::DIS|DISResource.disActualDataTypeResource>;
+          my $value = $self-><M::DIS|DISResourceProp.getPropertyValue>
+                                    (<Q::dis:DefaultValue>);
+          if ($value) {
+            $value = $value-><M::DVValuePerl.plCodeFragment>
+                                    ($self,
+                                     data_type_uri => $data_type
+                                          -><AG::DIS|DISAnyResource.uri>);
+            $factory-><M::Document.adoptNode> ($value);
+          } else {
+            __CODE{setDefaultValueDoc::
+              $result => $value,
+              $data_type => $data_type,
+              $doc => $factory,
+            }__;
+          }
+          if ($self-><M::DIS|DISResourceProp.getPropertyBoolean>
+                              (<Q::DISPerl:defaultValueHasSelfReference>)) {
+            my $v = $var-><M::Node.cloneNode>;
+            $v-><AS::PCVar.variableScope> ('our');
+            $r-><M::Node.appendChild>
+                  ($factory-><M::PCDocument.createPCStatement>)
+              -><M::Node.appendChild> ($v);
+          } else {
+            $var-><AS::PCVar.variableScope> ('our');
+          }
+          for ($r-><M::Node.appendChild>
+                     ($factory-><M::PCDocument.createPCStatement>)
+                 -><M::DIS|PLAnyCon.appendNewPCExpression> ('=')) {
+            $_-><M::Node.appendChild> ($var);
+            $_-><M::Node.appendChild> ($value);
+          }
         }__;
 ##DISPerl:ScalarVariable
 
