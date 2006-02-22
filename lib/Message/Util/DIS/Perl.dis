@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/02/21 05:43:48 $
+      $Date: 2006/02/22 11:22:08 $
     @@ContentType:
       dis:Date.RCS
   
@@ -911,10 +911,10 @@ ResourceDef:
                                               (<Q::DISIDL:AnyRealNumber>)) {
       $result = $plimpl-><M::DIS|MPLImpl.createPerlAtom> ('0');
     } elsif ($data_type-><M::DIS|DISResource.isSubsetOfURI>
-                                              (<Q::pl:ARRAY>)) {
+                                              (<Q::DISPerl|ARRAY>)) {
       $result = $plimpl-><M::DIS|MPLImpl.createPerlAtom> ('[]');
     } elsif ($data_type-><M::DIS|DISResource.isSubsetOfURI>
-                                              (<Q::pl:HASH>)) {
+                                              (<Q::DISPerl|HASH>)) {
       $result = $plimpl-><M::DIS|MPLImpl.createPerlAtom> ('{}');
     }
   @For: DIS|ForEmpty
@@ -2124,10 +2124,10 @@ IFClsDef:
       @@@PerlDef:
         __DEEP{
           ## Primary name
-          my $nm = $self-><M::DIS|DISResourceProp.getPropertyText>
+          my $nm = $self-><M::DIS|DISResourceProp.getPropertyTextList>
                                      (<Q::DISPerl:methodName>);
-          if (defined $nm) {
-            push @$r, $nm;
+          if (@$nm > 0) {
+            push @$r, @$nm;
             ## NOTE: No reserved name checks enforced in this case
           } elsif (defined (my $ln = $self-><AG::DIS|DISAnyResource
                                                                .localName>)) {
@@ -2235,19 +2235,23 @@ IFClsDef:
         @@@@enDesc:
           The local name of this resource is not defined. 
       @@@PerlDef:
-        my $method;
-        __CODE{DIS|getMethodForType::
-          $resource => $self,
-          $method_name => 'pl_fully_qualified_name',
-          $method => $method,
-        }__;
-        if ($method) {
-          __DEEP{
-            $r = $method->(@_);
-          }__;
+        if (exists $self->{<H::dp|plFullyQualifiedName>}) {
+          $r = $self->{<H::dp|plFullyQualifiedName>};
         } else {
-          $r = null;
-        } 
+          my $method;
+          __CODE{DIS|getMethodForType::
+            $resource => $self,
+            $method_name => 'pl_fully_qualified_name',
+            $method => $method,
+          }__;
+          if ($method) {
+            __DEEP{
+              $self->{<H::dp|plFullyQualifiedName>} = $r = $method->(@_);
+            }__;
+          } else {
+            $self->{<H::dp|plFullyQualifiedName>} = $r = null;
+         } 
+       }
 
   @Attr:
     @@Name: plVariableName
@@ -2435,9 +2439,6 @@ IFClsDef:
       @@@Type: PCDocument
       @@@enDesc:
         The document to which the newly created Perl code belongs.
-    @@Param:
-      @@@Name: const
-      @@@Type: DISPerl|ARRAY||ManakaiDOM|all
     @@Return:
       @@@Type: Node
       @@@enDesc:
@@ -2450,6 +2451,96 @@ IFClsDef:
         __CODE{DIS|getMethodForType::
           $resource => $self,
           $method_name => 'get_perl_class_member_code',
+          $method => $method,
+        }__;
+        if ($method) {
+          __DEEP{
+            $r = $method->(@_);
+          }__;
+        } else {
+          $r = null;
+        } 
+
+  @Method:
+    @@Name: getPerlErrorInterfaceMemberCode
+    @@enDesc:
+      Generates a Perl code for the resource, for the use
+      within Perl error interface.
+    @@Param:
+      @@@Name: factory
+      @@@Type: PCDocument
+      @@@enDesc:
+        The document to which the newly created Perl code belongs.
+    @@Return:
+      @@@Type: Node
+      @@@enDesc:
+        The generated code.
+      @@@nullCase:
+        @@@@enDesc:
+          If no code is defined for the type of the resource.
+      @@@PerlDef:
+        my $method;
+        __CODE{DIS|getMethodForType::
+          $resource => $self,
+          $method_name => 'get_perl_error_interface_member_code',
+          $method => $method,
+        }__;
+        if ($method) {
+          __DEEP{
+            $r = $method->(@_);
+          }__;
+        } else {
+          $r = null;
+        } 
+
+  @Method:
+    @@Name: getPerlDefinitionHashNamespace
+    @@enDesc:
+      Returns the Perl package name of the hash that should
+      contain the definition of the resource.
+    @@Return:
+      @@@Type: DISString
+      @@@enDesc:
+        The namespace of the hash.
+      @@@nullCase:
+        @@@@enDesc:
+          If no definition hash is defined for the resource.
+      @@@PerlDef:
+        my $method;
+        __CODE{DIS|getMethodForType::
+          $resource => $self,
+          $method_name => 'get_perl_definition_hash_namespace',
+          $method => $method,
+        }__;
+        if ($method) {
+          __DEEP{
+            $r = $method->(@_);
+          }__;
+        } else {
+          $r = null;
+        } 
+
+  @Method:
+    @@Name: getPerlErrorCodeName
+    @@enDesc:
+      Returns the name of the error code to which the resource belongs.
+    @@Param:
+      @@@Name: factory
+      @@@Type: PCDocument
+      @@@enDesc:
+        The document to which the newly created Perl code belongs.
+    @@Return:
+      @@@Type: DISString
+      @@@enDesc:
+        The error code name.
+      @@@nullCase:
+        @@@@enDesc:
+          If no error code name is defined.
+      @@@PerlDef:
+        my $method;
+        __CODE{DIS|getMethodForType::
+          $resource => $self,
+          $method_name => 'get_perl_error_code_name',
           $method => $method,
         }__;
         if ($method) {
@@ -4818,9 +4909,6 @@ TMethods:
     @@Param:
       @@@Name: factory
       @@@Type: PCDocument
-    @@Param:
-      @@@Name: const
-      @@@Type: DISPerl|ARRAY||ManakaiDOM|all
     @@Return:
       @@@Type: Node
       @@@PerlDef:
@@ -4828,6 +4916,118 @@ TMethods:
           $r = $self-><AG::DISResourcePerl.plCodeFragment>;
         }__;
 ##DISLang:Const
+
+TMethods:
+  @TMethod:
+    @@Name: getPerlDefinitionHashNamespace
+    @@DIS:targetType: dx|ErrorCode
+    @@DIS:targetType: dx|ErrorSubCode
+    @@Return:
+      @@@Type: DISString
+      @@@PerlDef:
+        __DEEP{
+          my $if = $self-><M::anyres.getErrorInterfaceResource>;
+          if ($if) {
+            $r = $if-><AG::DISResourcePerl.plFullyQualifiedName>;
+          } else {
+            $r = null;
+          }
+        }__;
+##dx:ErrorCode, dx:ErrorSubCode
+
+TMethods:
+  @TMethod:
+    @@Name: getPerlErrorInterfaceMemberCode
+    @@DIS:targetType: dx|ErrorCode
+    @@Param:
+      @@@Name: factory
+      @@@Type: PCDocument
+    @@Return:
+      @@@Type: Node
+      @@@PerlDef:
+        __DEEP{
+          $r = $factory-><M::Document.createDocumentFragment>;
+
+          ## Perl constant function
+          my $const = $self-><AG::DISResourcePerl.plCodeFragment>;
+          $factory-><M::Document.adoptNode> ($const);
+          $r-><M::Node.appendChild> ($const);
+
+          ## Error definition
+          my $def_st = $factory-><M::PCDocument.createPCStatement>;
+          for ($def_st-><M::DIS|PLAnyCon.appendNewPCExpression> ('=')) {
+            $_-><M::DIS|PLAnyCon.appendNewPCVariable>
+                  ('$',
+                   $self-><M::DISResourcePerl.getPerlDefinitionHashNamespace>,
+                   'ErrorDef')
+              -><AS::PCVar.hashKey> ($self-><AG::DISResourcePerl.plName>);
+            $_-><M::DIS|PLAnyCon.appendNewPCLiteral> ({
+              <H::DOMCore|code> => 0+$self-><AG::DISResourcePerl.plCodeFragment>,
+              <H::ecore|description> =>
+                $self-><M::ManakaiDISResourcePerl.plMufDescriptionText>,
+            });
+          }
+          $r-><M::Node.appendChild> ($def_st);
+
+          ## Error subcode definitions
+          for (@{$self-><M::DIS|DISResource.getChildResourceListByType>
+                          (<Q::dx|ErrorSubCode>)}) {
+            $r-><M::Node.appendChild>
+                  ($_-><M::DISResourcePerl.getPerlErrorInterfaceMemberCode>
+                         ($factory));
+          }
+        }__;
+##dx:ErrorCode
+
+TMethods:
+  @TMethod:
+    @@Name: getPerlErrorInterfaceMemberCode
+    @@DIS:targetType: dx|ErrorSubCode
+    @@Param:
+      @@@Name: factory
+      @@@Type: PCDocument
+    @@Return:
+      @@@Type: Node
+      @@@PerlDef:
+        __DEEP{
+          ## Error definition
+          $r = $factory-><M::PCDocument.createPCStatement>;
+          $r-><M::DIS|PLAnyCon.appendNewPCVariable>
+                ('$',
+                 $self-><M::DISResourcePerl.getPerlDefinitionHashNamespace>,
+                 'ErrorDef')
+            -><AS::PCVar.hashKey>
+                ($self-><M::DISResourcePerl.getPerlErrorCodeName>);
+          $r-><M::DIS|PLBlockCon.appendCode> ('->{');
+          $r-><M::DIS|PLAnyCon.appendStringLiteral> (<H::MDOMX|subtype>);
+          $r-><M::DIS|PLBlockCon.appendCode> ('}->{');
+          $r-><M::DIS|PLAnyCon.appendStringLiteral>
+                ($self-><AG::anyres.nameURI>);
+          $r-><M::DIS|PLBlockCon.appendCode> ('} = ');
+          $r-><M::DIS|PLAnyCon.appendNewPCLiteral> ({
+                  <H::ecore|description> =>
+                  $self-><M::ManakaiDISResourcePerl.plMufDescriptionText>,
+                });
+        }__;
+
+  @TMethod:
+    @@Name: getPerlErrorCodeName
+    @@DIS:targetType: dx|ErrorSubCode
+    @@Param:
+      @@@Name: factory
+      @@@Type: PCDocument
+    @@Return:
+      @@@Type: DISString
+      @@@PerlDef:
+        __DEEP{
+          my $code = $self-><M::anyres.getErrorCodeResource>;
+          if ($code) {
+            $r = $code-><AG::DISResourcePerl.plName>;
+          } else {
+            $r = null;
+          }
+        }__;
+##dx:ErrorSubCode
 
 TMethods:
   @enDesc:
@@ -4859,9 +5059,6 @@ TMethods:
     @@Param:
       @@@Name: factory
       @@@Type: PCDocument
-    @@Param:
-      @@@Name: const
-      @@@Type: DISPerl|ARRAY||ManakaiDOM|all
     @@Return:
       @@@Type: Node
       @@@PerlDef:
@@ -4869,10 +5066,37 @@ TMethods:
           $r = $factory-><M::Document.createDocumentFragment>;
           for my $gcr (@{$self-><M::DIS|DISResource.getChildResourceList>}) {
             if ($gcr-><M::DIS|DISAnyResource.isTypeURI> (<Q::DISLang|Const>)) {
-              my $sub = $gcr-><AG::DISResourcePerl.plCodeFragment>;
-              $r-><M::Node.appendChild> ($sub);
-              push @$const, $gcr;
+              if ($gcr-><M::anyres.isTypeURI> (<Q::dx|ErrorCode>)) {
+                $r-><M::Node.appendChild>
+                      ($_-><M::DISResourcePerl.getPerlErrorInterfaceMemberCode>
+                             ($factory));
+              } else {
+                my $sub = $gcr-><AG::DISResourcePerl.plCodeFragment>;
+                $factory-><M::Document.adoptNode> ($sub);
+                $r-><M::Node.appendChild> ($sub);
+              }
             }
+          }
+        }__;
+
+  @TMethod:
+    @@Name: getPerlErrorInterfaceMemberCode
+    @@DIS:targetType: DISLang|ConstGroup
+    @@Param:
+      @@@Name: factory
+      @@@Type: PCDocument
+    @@Return:
+      @@@Type: Node
+      @@@PerlDef:
+        __DEEP{
+          $r = $factory-><M::Document.createDocumentFragment>;
+
+          ## Error code definitions
+          for (@{$self-><M::DIS|DISResource.getChildResourceListByType>
+                          (<Q::dx|ErrorCode>)}) {
+            $r-><M::Node.appendChild>
+                  ($_-><M::DISResourcePerl.getPerlErrorInterfaceMemberCode>
+                         ($factory));
           }
         }__;
 ##DISLang:ConstGroup
@@ -4983,11 +5207,10 @@ TMethods:
             }
     
             ## - Class members
-            my @const;
             my @cr = @{$self-><M::DIS|DISResource.getChildResourceList>};
             for my $cr (@cr) {
               my $mcode = $cr-><M::DISResourcePerl.getPerlClassMemberCode>
-                                  ($r-><AG::Node.ownerDocument>, \@const);
+                                  ($r-><AG::Node.ownerDocument>);
               if ($mcode) {
                 $r-><AG::Node.ownerDocument>
                   -><M::Document.adoptNode> ($mcode);
@@ -4998,41 +5221,6 @@ TMethods:
             ## - Error Descriptions
             if ($self-><M::DIS|DISAnyResource.isTypeURI>
                  (<Q::Err:MUErrorClass>)) {
-
-              ## DOM-style exception definitions
-              if ($self-><M::DIS|DISResource.isTypeURI>
-                                            (<Q::dx:Class>) and @const) {
-                my $err_def = $plimpl-><M::DIS|MPLImpl.createPerlSub>
-                                            ('___error_def');
-                $err_def-><AS::DIS|MPLSub.prototype> ('');
-                $err_def-><M::DIS|PLBlockCon.appendCode>
-                   ($plimpl-><M::DIS|MPLImpl.perlList>
-                     ([{
-                       map {
-                         $_-><AG::DISResourcePerl.plName> => {
-                           <Q::DOMCore:code> => 0 + $_
-                             -><AG::DISResourcePerl.plCodeFragment>,
-                           description => $_
-                             -><M::ManakaiDISResourcePerl.plMufDescriptionText>,
-                           <Q::MDOMX:subtype> => {
-                             map {
-                               $_-><AG::DIS|DISAnyResource.nameURI>
-                               => {
-                                 description => $_
-                                   -><M::ManakaiDISResourcePerl
-                                         .plMufDescriptionText>,
-                               },
-                             } grep {
-                               $_-><M::DIS|DISResource.isTypeURI>
-                                    (<Q::dx:ErrorSubCode>)
-                             } @{$_-><M::DIS|DISResource.getChildResourceList>}
-                           },
-                         },
-                       } @const
-                    }]));
-                $r-><M::DIS|PLPack.setSubNode> ($err_def);
-              } # dx:Class
-
               my $tf = $self-><M::DIS|DISResourceProp.getPropertyResource>
                                 (<Q::ecore:textFormatter>);
               if ($tf) {
@@ -5589,70 +5777,36 @@ TMethods:
       @@@Type: DIS|MPLCodeFragment
       @@@PerlDef:
         __DEEP{
-            my $plimpl = $self-><AG::DISAnyResourcePerl.plImplementation>;
-            $r = $plimpl-><M::DIS|MPLImpl.createPerlPackage>
+          my $plimpl = $self-><AG::DISAnyResourcePerl.plImplementation>;
+          $r = $plimpl-><M::DIS|MPLImpl.createPerlPackage>
                               ($self-><AG::DISResourcePerl
                                          .plFullyQualifiedName>);
 
+          if ($self-><M::DIS|DISResource.isTypeURI> (<Q::dx:Interface>)) {
             ## - Inheritance
-            if ($self-><M::DIS|DISResource.isTypeURI> (<Q::dx:Interface>)) {
-              $r-><M::DIS|PLPack.addISAPackage> ('Message::Util::Error');
-              $r-><M::DIS|MPLCodeFragment.addRequirePerlModuleName>
-                                            ('Message::Util::Error');
-            }
+            $r-><M::DIS|PLPack.addISAPackage> ('Message::Util::Error');
+            $r-><M::DIS|MPLCodeFragment.addRequirePerlModuleName>
+                  ('Message::Util::Error');
 
-            ## - Constants
-            my @const;
-            for my $cr (@{$self-><M::DIS|DISResource.getChildResourceListByType>
-                                         (<Q::DISLang:ConstGroup>)}) {
-              for my $gcr (@{$cr-><M::DIS|DISResource.getChildResourceListByType>
-                                         (<Q::DISLang:Const>)}) {
-                my $sub = $gcr-><AG::DISResourcePerl.plCodeFragment>;
-                if ($r-><M::DIS|PLPack.getSub>
-                                          ($sub-><AG::DIS|MPLSub.pcLocalName>)) {
-                  __UNDEEP{__EXCEPTION{DIS|PERL_SUBROUTINE_ALREADY_DEFINED_ERR::
-                    pc:localName => {$sub-><AG::DIS|MPLSub.pcLocalName>},
-                    DIS:uri => {$gcr->{uri}},
-                    DIS:sourceNode => {$gcr->{src}},
-                  }__}__;
-                }
-                $r-><M::DIS|PLPack.setSubNode> ($sub);
-                push @const, $gcr;
-              }
-            }
+            ## - Error definition reference
+            $r-><M::DIS|PLInCon.appendCode>
+                  ("sub ___error_def () {\n".
+                   '  \%'.$self-><AG::DISResourcePerl.plFullyQualifiedName>.
+                   "::ErrorDef\n".
+                   "}\n");
+          }
 
-            ## - Error Descriptions
-            if ($self-><M::DIS|DISResource.isTypeURI> (<Q::dx:Interface>)) {
-              my $err_def = $plimpl-><M::DIS|MPLImpl.createPerlSub>
-                                            ('___error_def');
-              $err_def-><AS::DIS|MPLSub.prototype> ('');
-              $err_def-><M::DIS|PLBlockCon.appendCode>
-                 ($plimpl-><M::DIS|MPLImpl.perlList>
-                   ([{
-                       map {
-                         $_-><AG::DISResourcePerl.plName> => {
-                           <Q::DOMCore:code> => 0 + $_
-                             -><AG::DISResourcePerl.plCodeFragment>,
-                           description => $_
-                             -><M::ManakaiDISResourcePerl.plMufDescriptionText>,
-                           <Q::MDOMX:subtype> => {
-                             map {
-                               $_-><AG::DIS|DISAnyResource.nameURI>
-                               => {
-                                 description => $_
-                                   -><M::ManakaiDISResourcePerl
-                                         .plMufDescriptionText>,
-                               },
-                             } grep {
-                               $_-><M::DIS|DISResource.isTypeURI>
-                                    (<Q::dx:ErrorSubCode>)
-                             } @{$_-><M::DIS|DISResource.getChildResourceList>}
-                           },
-                         },
-                       } @const
-                    }]));
-              $r-><M::DIS|PLPack.setSubNode> ($err_def);
+          ## - Interface members
+          my @cr = @{$self-><M::DIS|DISResource.getChildResourceList>};
+          for my $cr (@cr) {
+            my $mcode = $cr-><M::DISResourcePerl.getPerlErrorInterfaceMemberCode>
+                              ($r-><AG::Node.ownerDocument>);
+            if ($mcode) {
+              $r-><AG::Node.ownerDocument>
+                -><M::Document.adoptNode> ($mcode);
+              $r-><M::Node.appendChild> ($mcode);
             }
+          }
         }__;
 
   @TMethod:
@@ -5781,9 +5935,6 @@ TMethods:
     @@Param:
       @@@Name: factory
       @@@Type: PCDocument
-    @@Param:
-      @@@Name: const
-      @@@Type: DISPerl|ARRAY||ManakaiDOM|all
     @@Return:
       @@@Type: Node
       @@@PerlDef:

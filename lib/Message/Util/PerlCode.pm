@@ -12502,7 +12502,7 @@ $t = $self->
 variable_scope
 ;
   $r .= $t . ' ' if length $t;
-  $r .= $self->
+  $r .= $t = $self->
 variable_type
 ;
   my $v = $self->

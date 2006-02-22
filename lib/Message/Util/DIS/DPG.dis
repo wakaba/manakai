@@ -15,7 +15,7 @@ Module:
   @License: license|Perl+MPL
 
   @Date:
-    $Date: 2006/02/10 08:10:26 $
+    $Date: 2006/02/22 11:22:08 $
   
   @Require:
     @@Module:
@@ -3598,8 +3598,8 @@ ResourceDef:
       An integer indicating the type of error generated.
 
     @@ResourceDef:
-      @@@rdf:type: DISLang|Const
       @@@QName: pg|PARSE_ERR
+      @@@DISCore:resourceType: dx|ErrorCode
       @@@Value:
         @@@@@: 81
         @@@@ContentType: DISCore|Integer
@@ -3607,8 +3607,8 @@ ResourceDef:
         An attempt was made to load a DPG document and
         the processing has been stopped.
     @@ResourceDef:
-      @@@rdf:type: DISLang|Const
       @@@QName: pg|VALIDITY_ERR
+      @@@DISCore:resourceType: dx|ErrorCode
       @@@Value:
         @@@@@: 10083
         @@@@ContentType: DISCore|Integer

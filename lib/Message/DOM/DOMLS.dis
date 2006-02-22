@@ -28,7 +28,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date:
-    $Date: 2006/02/18 07:39:04 $
+    $Date: 2006/02/22 11:22:05 $
 
   @Require:
     @@Module:
@@ -542,7 +542,7 @@ ResourceDef:
     @@enDesc:
       An integer indicating the type of error generated.
 
-     @@Const:
+     @@XConst:
        @@@QName: PARSE_ERR
         @@@intValue: 81
         @@@Description:
@@ -550,7 +550,7 @@ ResourceDef:
           @@@@@:
             An attempt was made to load a document or an XML fragment 
             using <IF::LSParser> and the processing has been stopped.
-     @@Const:
+     @@XConst:
       @@@QName: SERIALIZE_ERR
         @@@intValue:  82
         @@@Description:
@@ -721,7 +721,14 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type: dx|ErrorCode
+    @@DISCore:resourceType: DISLang|Const
+
+ElementTypeBinding:
+  @Name: XConst
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: dx|ErrorCode
 
 ElementTypeBinding:
   @Name: XParam

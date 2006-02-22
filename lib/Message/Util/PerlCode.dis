@@ -25,7 +25,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2006/02/09 10:23:20 $
+      $Date: 2006/02/22 11:22:08 $
     @@ContentType:
       dis:Date.RCS
   
@@ -2619,7 +2619,7 @@ IFClsETDef:
           __DEEP{
             my $t = $self-><AG::PerlVariable.variableScope>;
             $r .= $t . ' ' if length $t;
-            $r .= $self-><AG::PerlVariable.variableType>;
+            $r .= $t = $self-><AG::PerlVariable.variableType>;
             my $v = $self-><AG::PerlVariable.packageName>;
             $r .= $v . '::' if length $v;
             $r .= $self-><AG::PerlVariable.pcLocalName>;

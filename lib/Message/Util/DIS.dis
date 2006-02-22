@@ -23,7 +23,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2006/02/20 14:52:44 $
+      $Date: 2006/02/22 11:22:06 $
     @@ContentType:
       dis:Date.RCS
   
@@ -70,6 +70,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#
   @ecore:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/Core/
+  @Err:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/
   @f:
     http://suika.fam.cx/~wakaba/archive/2004/dom/feature#
   @idl:
@@ -5153,6 +5155,60 @@ IFClsDef:
         } else {
           $err-><M::ecore|ErrorInterface||ManakaiDOM|Perl.throw>;
         }
+
+  @Method:
+    @@Name: getErrorInterfaceResource
+    @@enDesc:
+      Returns the <Q::ecore|ErrorInterface> resource
+      to which the resource belongs.
+    @@Return:
+      @@@Type: DISAnyResource
+      @@@enDesc:
+        The interface resource.
+      @@@nullCase:
+        @@@@enDesc:
+          If no resource found.
+      @@@PerlDef:
+        my $method;
+        __CODE{DIS|getMethodForType::
+          $resource => $self,
+          $method_name => 'get_error_interface_resource',
+          $method => $method,
+        }__;
+        if ($method) {
+          __DEEP{
+            $r = $method->(@_);
+          }__;
+        } else {
+          $r = null;
+        } 
+
+  @Method:
+    @@Name: getErrorCodeResource
+    @@enDesc:
+      Returns the <Q::dx|ErrorCode> resource
+      to which the resource belongs.
+    @@Return:
+      @@@Type: DISAnyResource
+      @@@enDesc:
+        The interface resource.
+      @@@nullCase:
+        @@@@enDesc:
+          If no resource found.
+      @@@PerlDef:
+        my $method;
+        __CODE{DIS|getMethodForType::
+          $resource => $self,
+          $method_name => 'get_error_code_resource',
+          $method => $method,
+        }__;
+        if ($method) {
+          __DEEP{
+            $r = $method->(@_);
+          }__;
+        } else {
+          $r = null;
+        } 
 ##DISAnyResource
 
 ResourceDef:
@@ -7300,6 +7356,95 @@ IFClsDef:
           }
         }__;
 ##DISResourceProp
+
+
+ElementTypeBinding:
+  @Name: TMethods
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType:
+      @@@@: dis|MultipleResource
+      @@@ForCheck: !ManakaiDOM|ForClass
+    @@resourceFor: ManakaiDOM|ForClass
+    @@DISCore:resourceType: DISCore|Resource
+    @@For: DIS|ForLatest
+
+ElementTypeBinding:
+  @Name: TMethod
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@DISCore:resourceType: DIS|Method
+
+ElementTypeBinding:
+  @Name: TAttr
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@DISCore:resourceType: DIS|Attribute
+
+TMethods:
+  @TMethod:
+    @@Name: getErrorInterfaceResource
+    @@DIS:targetType: DISLang|ConstGroup
+    @@Return:
+      @@@Type: DISAnyResource
+      @@@PerlDef:
+        __DEEP{
+          my $parent = $self-><AG::DISResource.parentResource>;
+          if ($parent and
+              $parent-><M::DISAnyResource.isTypeURI> (<Q::Err|ErrorAny>)) {
+            $r = $parent;
+          }
+        }__;
+##DISLang:ConstGroup
+
+TMethods:
+  @TMethod:
+    @@Name: getErrorInterfaceResource
+    @@DIS:targetType: dx|ErrorCode
+    @@Return:
+      @@@Type: DISAnyResource
+      @@@PerlDef:
+        __DEEP{
+          my $parent = $self-><AG::DISResource.parentResource>;
+          if ($parent) {
+            $r = $parent-><M::DISAnyResource.getErrorInterfaceResource>;
+          }
+        }__;
+##dx:ErrorCode
+
+TMethods:
+  @TMethod:
+    @@Name: getErrorInterfaceResource
+    @@DIS:targetType: dx|ErrorSubCode
+    @@Return:
+      @@@Type: DISAnyResource
+      @@@PerlDef:
+        __DEEP{
+          my $parent = $self-><M::DISAnyResource.getErrorCodeResource>;
+          if ($parent) {
+            $r = $parent-><M::DISAnyResource.getErrorInterfaceResource>;
+          }
+        }__;
+
+  @TMethod:
+    @@Name: getErrorCodeResource
+    @@DIS:targetType: dx|ErrorSubCode
+    @@Return:
+      @@@Type: DISAnyResource
+      @@@PerlDef:
+        __DEEP{
+          my $parent = $self-><AG::DISResource.parentResource>;
+          if ($parent and $parent-><M::DISAnyResource.isTypeURI>
+                                     (<Q::dx|ErrorCode>)) {
+            $r = $parent;
+          }
+        }__;
+##dx:ErrorSubCode
 
 ElementTypeBinding:
   @Name: PropNameParam

@@ -1,3 +1,17 @@
+2006-02-22  Wakaba  <wakaba@suika.fam.cx>
+
+	* Perl.dis (getPerlNameList): The |DISPerl:methodName|
+	properties are not returned if it is specified more than once.
+	(plFullyQualifiedName): Cacheing is reintroduced.
+	(getPerlClassMemberCode): The |const| parameter is removed.
+	(getPerlErrorInterfaceMemberCode): New method.
+	(getPerlDefinitionHashNamespace): New method.
+	(getPerlErrorCodeName): New method.
+	(plCodeFragment): Error definition list is now generated
+	as a set of assignments rather than one large subroutine.
+
+	* DPG.dis, Test.dis: Error code constants are typed as so.
+
 2006-02-21  Wakaba  <wakaba@suika.fam.cx>
 
 	* Perl.dis (setDefaultValueDoc): New code fragment.

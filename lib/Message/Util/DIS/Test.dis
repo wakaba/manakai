@@ -12,7 +12,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/02/16 20:03:20 $
+    $Date: 2006/02/22 11:22:09 $
   
   @Require:
     @@Module:
@@ -2002,8 +2002,8 @@ IFClsDef:
     @@rdfs:subClassOf: idl|unsignedShort||ManakaiDOM|all
 
     @@ResourceDef:
-      @@@rdf:type: DISLang|Const
       @@@QName: dtest|PARSE_ERR
+      @@@DISCore:resourceType: dx|ErrorCode
       @@@Value:
         @@@@@: 81
         @@@@ContentType: DISCore|Integer
@@ -2013,7 +2013,7 @@ IFClsDef:
 
     @@ResourceDef:
       @@@QName: ASSERTION_ERR
-      @@@rdf:type: DISLang|Const
+      @@@DISCore:resourceType: dx|ErrorCode
       @@@Value:
         @@@@@:10001
         @@@@ContentType: DISCore|Integer

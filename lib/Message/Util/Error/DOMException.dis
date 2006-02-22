@@ -20,7 +20,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/02/08 08:18:31 $
+      $Date: 2006/02/22 11:22:09 $
     @@ContentType:
       dis:Date.RCS
   
@@ -46,14 +46,14 @@ Module:
     ManakaiDOM:Perl
 
 Namespace:
+  @c:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
   @dis:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
   @DISlib:
     http://suika.fam.cx/~wakaba/archive/2004/dis/
   @disPerl:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--Perl--
-  @DOMCore:
-    http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
   @DOMMain:
     http://suika.fam.cx/~wakaba/archive/2004/dom/main#
   @dx:
@@ -124,6 +124,13 @@ ElementTypeBinding:
   @Name: enDesc
   @ElementType:
     dis:Description
+  @ShadowContent:
+    @@lang:en
+
+ElementTypeBinding:
+  @Name: enImplNote
+  @ElementType:
+    dis:ImplNote
   @ShadowContent:
     @@lang:en
 
@@ -359,18 +366,32 @@ ElementTypeBinding:
 ## -- Exception classes
 
 XWParam:
+  @QName: c|code
+  @Type: idl|unsignedLong||ManakaiDOM|all
+  @enDesc:
+    Error code.
+  @enImplNote:
+    {TODO::
+       Change name to <Q::dx|code>.
+    }
+
+XWParam:
   @QName: MDOMX|subtype
   @Type: DISPerl|String
   @enDesc:
     The subtype of the error.
+  @enImplNote:
+    {TODO::
+       Change name to <Q::dx|subcode>.
+    }
 
 ResourceDef:
   @QName: dx|Exception
   @rdf:type: dx|Class
-  @ISA:
-    ManakaiDOM:ManakaiDOMExceptionOrWarning
-  @For:
-    ManakaiDOM:Perl
+
+  @ISA: ecore|MUError
+
+  @For: ManakaiDOM|Perl
 
   @enDesc:
     The <Class::dx|Exception> class is a basis for implementation
@@ -473,7 +494,7 @@ ResourceDef:
       DOMMain:unsigned-short::ManakaiDOM:all
     @@Get:
       @@@PerlDef:
-        $r = $self->{<H::ecore:def>}->{<Q::DOMCore:code>};
+        $r = $self->{<H::ecore:def>}->{<H::c|code>};
 
   @Attr:
     @@Name: value
@@ -490,7 +511,7 @@ ResourceDef:
     @@Type: DOMMain|unsigned-short||ManakaiDOM|all
     @@Get:
       @@@PerlDef:
-        $r = $self->{<H::ecore:def>}->{<Q::DOMCore:code>};
+        $r = $self->{<H::ecore:def>}->{<H::c|code>};
 
   @Attr:
     @@Name: type
@@ -879,10 +900,11 @@ ResourceDef:
         and warnings associated to an object are once reported to this method 
         and then delivered to appropriate entities. 
         \
-        If the error is an exception (such as <X::DOMCore:DOMException> or 
+        If the error is an exception (such as <X::c|DOMException
+        ||ManakaiDOM|ManakaiDOM> or 
         <X::ManakaiDOM:ManakaiDOMImplementationException>), it is 
         simply thrown.  If the error is only a warning, it is reported 
-        via the <IF::DOMCore:DOMError> interface. 
+        via the <IF::c|DOMError||ManakaiDOM|ManakaiDOM> interface. 
         \
         See <PerlModule::Message::Util::Error> documentation for more 
         information on the error reporting mechanism.
