@@ -23,7 +23,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2006/02/23 12:30:34 $
+      $Date: 2006/02/23 17:51:49 $
     @@ContentType:
       dis:Date.RCS
   
@@ -3276,6 +3276,7 @@ IFClsDef:
         $forpArg ||= [];
         __DEEP{
           ## -- Node names
+          my @res_uri;
 
           ## Unique resource identifier generated from node id
           my $node_id = $el-><AG::SWCFGNode.nodeIDRef>;
@@ -3305,8 +3306,11 @@ IFClsDef:
           ALD: {
           if ($qn_node) {
             my $qn_uri = $qn_node-><AG::ManakaiDISElement.qnameValueURI>;
-            $res = $self-><M::ManakaiDISDatabase.getResource>
-                                ($qn_uri, for_arg => $forArg);
+            my $qn_urif;
+            __CODE{tfurisToURI:: $turi => $qn_uri, $furi => $forArg,
+                                 $uri => $qn_urif}__;
+            push @res_uri, $qn_urif;
+            $res = $self-><M::DISDatabase.getResource> ($qn_urif);
             if ($res-><AG::DISAnyResource.isDefined>) {
               last ALD if defined $al_canon_uri and
                           $res->{aliasURI}->{$al_canon_uri};
@@ -3337,13 +3341,16 @@ IFClsDef:
               if ($parentResource) {
                 my $puri = $parentResource->{uri};
                 my $ru;
+                my $ruf;
                 my $ln = $n_node-><M::swcfg21:SWCFGNode
                                     ::swcfg21:ForLatest.value>;
                 __CODE{getChildResourceURI:: $parentURI => $puri,
                                              $localName => $ln,
                                              $result => $ru}__;
-                $res = $self-><M::ManakaiDISDatabase.getResource>
-                                    ($ru, for_arg => $forArg);
+                __CODE{tfurisToURI:: $turi => $ru, $furi => $forArg,
+                                     $uri => $ruf}__;
+                push @res_uri, $ruf;
+                $res = $self-><M::DISDatabase.getResource> ($ruf);
                 my $v = $n_node-><M::SWCFGNode.value>;
                 __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
                   $result => {$res->{localName}},
@@ -3355,8 +3362,11 @@ IFClsDef:
                 my $ns_uri = $mod-><AG::DISAnyResource.sourceElement>
                                  -><AG::DISModuleElement.definingNamespaceURI>;
                 my $qn_uri = $ns_uri . $ln;
-                $res = $self-><M::ManakaiDISDatabase.getResource>
-                                    ($qn_uri, for_arg => $forArg);
+                my $qn_urif;
+                __CODE{tfurisToURI:: $turi => $qn_uri, $furi => $forArg,
+                                     $uri => $qn_urif}__;
+                push @res_uri, $qn_urif;
+                $res = $self-><M::DISDatabase.getResource> ($qn_urif);
                 if ($res-><AG::DISAnyResource.isDefined>) {
                   last ALD if defined $al_canon_uri and
                               $res->{aliasURI}->{$al_canon_uri};
@@ -3379,6 +3389,7 @@ IFClsDef:
                 }__;
               }
             } else {
+              push @res_uri, $node_uri;
               $res = $self-><M::DISDatabase.getResource> ($node_uri);
               $res->{<H::DIS|isAnon>} = true;
             }
@@ -3390,12 +3401,12 @@ IFClsDef:
           $res->{forp} = $forpArg;
           $res->{src} = $el;
           $res->{<H::DIS|definingModule>} = \ ($mod->{uri});
-          $mod-><M::DIS|ManakaiDISModuleDefinition.addResourceList> ($res);
           $res-><AS::DIS|ManakaiDISResourceDefinition.parentResource>
             ($parentResource) if $parentResource;
           $res-><AS::DIS|ManakaiDISResourceDefinition.dynamicParentResource>
             ($dynParent) if $dynParent;
           unless ($res->{uri} eq $node_uri) {
+            push @res_uri, $node_uri;
             my $nu_res = $self-><M::DISDatabase.getResource> ($node_uri);
             $res-><M::DISResource.mergeAsAlias> ($nu_res);
           }
@@ -3403,6 +3414,7 @@ IFClsDef:
           $res->{seq} = $self->{seq}++;
           $res-><AS::DISAnyResource.sourceNodeIDRef> ($node_id);
           __CODE{setRevision:: $resource => $res}__;
+          $mod-><M::DISModule.addResourceURI> ($_) for @res_uri;
           
           ## -- Alias
           if ($al_node) {
@@ -3698,11 +3710,15 @@ IFClsDef:
           } # F
 
           ## -- Resources
-          my @res_list = @{$module-><M::DISModule.getResourceList>};
-          my %res_list = map {$_-><AG::DISAnyResource.uri> => true} @res_list;
-          for my $res (@res_list) {
-            my $uri = $res-><AG::DISAnyResource.uri>;
-            if ($res-><AG::DISAnyResource.ownerModule> eq $module) {
+          my @res_list = map {
+            [$_, $self-><M::DISDatabase.getResource> ($_)]
+          } @{$module-><M::DISModule.getResourceURIList>};
+          my %res_list = map {$_->[0] => true} @res_list;
+          for my $ur (@res_list) {
+            my $uri = $ur->[0];
+            my $res = $ur->[1];
+            my $owner = $res-><AG::DISAnyResource.ownerModule>;
+            if (defined $owner and $owner eq $module) {
               ## Non-alias
               my %alias;
               my %sub = %{$res->{supOf} or {}};
@@ -3737,13 +3753,13 @@ IFClsDef:
               delete $res->{aliasURI}->{$uri};
               delete $res->{subOf}->{$uri};
               delete $res->{supOf}->{$uri};
-              A: for (%{$res->{subOf} or {}}) {
+              A: for (keys %{$res->{subOf} or {}}) {
                 next A unless $res->{subOf}->{$_};
                 my $sres = $self-><M::DISDatabase.getResource> ($_);
                 next A unless $sres;
                 delete $sres->{supOf}->{$uri};
               }
-              A: for (%{$res->{supOf} or {}}) {
+              A: for (keys %{$res->{supOf} or {}}) {
                 next A unless $res->{supOf}->{$_};
                 my $sres = $self-><M::DISDatabase.getResource> ($_);
                 next A unless $sres;
@@ -5608,6 +5624,30 @@ IFClsDef:
           push @{$self->{<H::DIS|resource>}||=[]},
                map {\$_} @{$disResource-><AG::DIS|DISAnyResource.uris>};
         }__;
+
+  @Method:
+    @@Name: addResourceURI
+    @@enDesc:
+      Adds a resource URI to the list of resources belongs to the module.
+    @@Param:
+      @@@Name: uri
+      @@@Type: DISString
+      @@@enDesc:
+        The URI to add.
+    @@Return:
+      @@@PerlDef:
+        push @{$self->{<H::DIS|resource>}||=[]}, \$uri;
+
+  @Method:
+    @@Name: getResourceURIList
+    @@enDesc:
+      Returns the list of URIs of resources belongs to the module.
+    @@Return:
+      @@@Type: AnyResourceURIList
+      @@@enDesc:
+        The snapshot list of URIs.
+      @@@PerlDef:
+        $r = [map {$$_} @{$self->{<H::DIS|resource>} or []}];
 
   @Method:
     @@Name: getResourceList

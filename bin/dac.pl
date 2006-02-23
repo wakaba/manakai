@@ -151,6 +151,8 @@ if ($Opt{update}) {
       status_msg q<done>;
     }
   }
+  ## NOTE: Remove all |for|-variants of the module at the same time
+  ##       - otherwise, |DISCore:TFPQNames| links will break.
 }
 
 my $ResourceCount = 0;
