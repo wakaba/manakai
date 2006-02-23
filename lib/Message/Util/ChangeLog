@@ -1,3 +1,16 @@
+2006-02-23  Wakaba  <wakaba@suika.fam.cx>
+
+	* DIS.dis (loadResource, loadFor, loadModule): New |srinfo|
+	parameter is added.  Restores super-resource information
+	from |srinfo| if available.
+	(unloadModule): New method.
+	(getModuleResourceList): New method.
+	(addResourceList): Adds all alias names to the list.
+	(addForResource): New method analog to |addResourceList|.
+	(getForResourceList): New method analog to |getResourceList|.
+	(dx:Interface.getErrorInterfaceResource): New method
+	implementation.
+
 2006-02-22  Wakaba  <wakaba@suika.fam.cx>
 
 	* PerlCode.dis (PCVariable.stringify): The |hashKey| 

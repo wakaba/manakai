@@ -23,7 +23,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2006/02/22 11:22:06 $
+      $Date: 2006/02/23 12:30:34 $
     @@ContentType:
       dis:Date.RCS
   
@@ -2884,6 +2884,15 @@ IFClsDef:
       @@@nullCase:
         @@@@enDesc:
           No event handler is read.
+    @@NamedParam:
+      @@@Name: srinfo
+      @@@Type: DISPerl|HASH||ManakaiDOM|all
+      @@@enDesc:
+        A hash returned by <M::DISDatabase.unloadModule>, to
+        restore super-resource relationship.
+      @@@nullCase:
+        @@@@enDesc:
+          If it is not the updating.
     @@Return:
       @@@RaiseException:
         @@@@@: NO_MODULE_QNAME_ERR
@@ -2966,7 +2975,8 @@ IFClsDef:
               R: for my $el (@$root_elements) {
                 next R unless $el-><AG::SWCFGElement
                                           .expandedURI> eq <Q::dis:ForDef>;
-                $self-><M::DISDatabase.loadFor> ($mod, $el);
+                $self-><M::DISDatabase.loadFor>
+                         ($mod, $el, srinfo => $srinfo);
               }
             }
 
@@ -2994,7 +3004,8 @@ IFClsDef:
               }
               $self-><M::DISDatabase.loadModule>
                             ($rdoc, $resolver, for_arg => <Q::ManakaiDOM:all>,
-                             on_resource_read => $onResourceRead);
+                             on_resource_read => $onResourceRead,
+                             srinfo => $srinfo);
             } else { # if "for all" loaded
               $rmod-><M::DIS|DISResourceProp.getPropertyBoolean>
                        (<Q::dis:In>);
@@ -3054,7 +3065,8 @@ IFClsDef:
                 }
                 $self-><M::DISDatabase.loadModule>
                                        ($rdoc, $resolver, for_arg => $for,
-                                        on_resource_read => $onResourceRead);
+                                        on_resource_read => $onResourceRead,
+                                        srinfo => $srinfo);
               }
             } # Child Module elements
             
@@ -3067,7 +3079,8 @@ IFClsDef:
                 $self-><M::DISDatabase.loadResource>
                                          ($mod, null, null, $el,
                                           for_arg => $forArg,
-                                          on_resource_read => $onResourceRead);
+                                          on_resource_read => $onResourceRead,
+                                          srinfo => $srinfo);
               } else {
                 my $et = $el-><AG::SWCFGElement.expandedURI>;
                 if ({
@@ -3116,6 +3129,15 @@ IFClsDef:
       @@@Type: DISElement
       @@@enDesc:
         The source <QUOTE::dis> <Q::dis:ForDef> element object. 
+    @@NamedParam:
+      @@@Name: srinfo
+      @@@Type: DISPerl|HASH||ManakaiDOM|all
+      @@@enDesc:
+        A hash returned by <M::DISDatabase.unloadModule>, to
+        restore super-resource relationship.
+      @@@nullCase:
+        @@@@enDesc:
+          If it is not the updating.
     @@Return:
       @@@ForDefDupException:
       @@@ForDefNoQNameException:
@@ -3141,6 +3163,7 @@ IFClsDef:
             $for->{src} = $el;
             $for->{<H::DIS|isDefined>} = true;
             $for->{<H::DIS|definingModule>} = \ ($mod->{uri});
+            $mod-><M::DISModule.addForResource> ($for);
 
             for my $ce (@{$el-><M::ManakaiDISElement.disAllChildElements>}) {
               my $xn = $ce-><AG::SWCFGElement.expandedURI>;
@@ -3166,6 +3189,11 @@ IFClsDef:
                   }__;
                 }__;
               }
+            }
+
+            for (keys %{$srinfo->{for}->{$qn_uri}->{supOf} or {}}) {
+              my $subfor = $self-><M::DISDatabase.getFor> ($_);
+              $subfor-><M::DISFor.addISA> ($for);
             }
           } else {
             __UNDEEP{
@@ -3226,6 +3254,15 @@ IFClsDef:
       @@@nullCase:
         @@@@enDesc:
           No event handler is read.
+    @@NamedParam:
+      @@@Name: srinfo
+      @@@Type: DISPerl|HASH||ManakaiDOM|all
+      @@@enDesc:
+        A hash returned by <M::DISDatabase.unloadModule>, to
+        restore super-resource relationship.
+      @@@nullCase:
+        @@@@enDesc:
+          If it is not the updating.
     @@Return:
       @@@ResDefDupException:
       @@@ElementNotAllowedException:
@@ -3454,6 +3491,27 @@ IFClsDef:
             }__}__;
           }
 
+          my $srres = $srinfo->{resource}->{$res-><AG::DISAnyResource.uri>};
+          F: for my $auri (%{$srres->{aliasURI} or {}}) {
+            next F unless $srres->{aliasURI}->{$auri};
+            $res->{aliasURI}->{$auri} = true;
+            A: for (keys %{$res->{subOf} or {}}) {
+              next A unless $res->{subOf}->{$_};
+              my $s = $self-><M::DISDatabase.getResource> ($_);
+              $s->{supOf}->{$auri} = true;
+            }
+            A: for (keys %{$res->{supOf} or {}}) {
+              next A unless $res->{supOf}->{$_};
+              my $s = $self-><M::DISDatabase.getResource> ($_);
+              $s->{subOf}->{$auri} = true;
+            }
+          }
+          F: for my $suri (keys %{$srres->{supOf} or {}}) {
+            next F unless $srres->{supOf}->{$suri};
+            my $sres = $self-><M::DISDatabase.getResource> ($suri);
+            $sres-><M::DISResource.addSuperResource> ($res);
+          }
+
           ## -- Child resources
           unless ($is_multires) {
             for my $re (@cres) {
@@ -3461,7 +3519,8 @@ IFClsDef:
                 $self-><M::ManakaiDISDatabase.loadResource>
                                      ($mod, $res, $res, $re,
                                       for_arg => $forArg, forp_arg => $forpArg,
-                                      on_resource_read => $onResourceRead);
+                                      on_resource_read => $onResourceRead,
+                                      srinfo => $srinfo);
               } else {
                 my $ac = $re-><M::ManakaiDISElement.disGetAttribute>
                                     (<Q::dis:aliasChild>, for_arg => $forArg,
@@ -3471,7 +3530,8 @@ IFClsDef:
                   $self-><M::ManakaiDISDatabase.loadResource>
                                      ($mod, $res, $res, $re,
                                       for_arg => $forArg, forp_arg => $forpArg,
-                                      on_resource_read => $onResourceRead);
+                                      on_resource_read => $onResourceRead,
+                                      srinfo => $srinfo);
                 }
               }
             }
@@ -3490,7 +3550,8 @@ IFClsDef:
                                 ($mod, $parentResource, $res, $el,
                                  for_arg => $forArg,
                                  forp_arg => [@{$forpArg}, $for_uri],
-                                 on_resource_read => $onResourceRead);
+                                 on_resource_read => $onResourceRead,
+                                 srinfo => $srinfo);
               }
             }
           }
@@ -3561,6 +3622,152 @@ IFClsDef:
             }__;
           }
         }
+
+  @Method:
+    @@Name: unloadModule
+    @@enDesc:
+      Removes a module and resources defined in the module
+      from the database.
+    @@Param:
+      @@@Name: module
+      @@@Type: DISModule
+      @@@enDesc:
+        The module to remove.
+    @@NamedParam:
+      @@@Name: srinfo
+      @@@Type: DISPerl|HASH||ManakaiDOM|all
+      @@@enDesc:
+        A hash returned by <M::DISDatabase.unloadModule>, to
+        restore super-resource relationship later.  The hash
+        returned by the method is built based on this value.
+      @@@nullCase:
+        @@@@enDesc:
+          If it is not the updating.
+    @@Return:
+      @@@Type: DISPerl|HASH||ManakaiDOM|all
+      @@@enDesc:
+        {LI:: <CODE::resource> or <CODE::for>::: 
+
+           {LI:: <VAR::Resource URI>:::
+
+              {LI:: <CODE::supOf>:::
+
+                 - <VAR::Superset URI>::: A <DOM::true> value
+
+                 where <VAR::resource URI> is a URI of the resource
+                 (either canonical URI or an alias URI defined within
+                 the module) and <VAR::superset URI> is a URI
+                 from the list of superset URI of the resource minus
+                 the list of alias URIs (including the canonical URI)
+                 of the resource.
+
+              }
+
+              {LI:: <CODE::aliasURI>:::
+
+                    - <VAR::Alias URI>::: A <DOM::true> value
+
+                    where <VAR::alias URI> is an alias URI of the resource
+                    defined by other module.
+
+              }
+           }
+        }
+      @@@PerlDef:
+        __DEEP{
+          $r = $srinfo || {};
+
+          ## -- |For|s
+          F: for my $for (@{$module-><M::DISModule.getForResourceList>}) {
+            my $uri = $for-><AG::DISAnyResource.uri>;
+            A: for (%{$for->{ISA} or {}}) {
+              next A unless $for->{ISA}->{$_};
+              my $sfor = $self-><M::DISDatabase.getFor> ($_);
+              next A unless $sfor;
+              delete $sfor->{revISA}->{$uri};
+            }
+            A: for (%{$for->{revISA} or {}}) {
+              next A unless $for->{revISA}->{$_};
+              my $sfor = $self-><M::DISDatabase.getFor> ($_);
+              next A unless $sfor;
+              delete $sfor->{ISA}->{$uri};
+              $r->{for}->{$uri}->{supOf}->{$_} = true;
+            }
+            delete $self->{forDef}->{$uri};
+            delete $self->{<H::DIS|resourceModuleMap>}->{$uri};
+          } # F
+
+          ## -- Resources
+          my @res_list = @{$module-><M::DISModule.getResourceList>};
+          my %res_list = map {$_-><AG::DISAnyResource.uri> => true} @res_list;
+          for my $res (@res_list) {
+            my $uri = $res-><AG::DISAnyResource.uri>;
+            if ($res-><AG::DISAnyResource.ownerModule> eq $module) {
+              ## Non-alias
+              my %alias;
+              my %sub = %{$res->{supOf} or {}};
+              A: for (keys %{$res->{aliasURI} or {}}) {
+                next A unless $res->{aliasURI}->{$_};
+                $alias{$_} = true;
+                delete $sub{$_} if $res->{aliasURI}->{$_};
+                $r->{resource}->{$uri}->{supOf} = \%sub;
+                unless ($res_list{$_}) {
+                  ## Defined by other module
+                  $r->{resource}->{$uri}->{aliasURI}->{$_} = true;
+                }
+              }
+              A: for (keys %{$res->{subOf} or {}}) {
+                next A unless $res->{aliasURI}->{$_};
+                my $sres = $self-><M::DISDatabase.getResource> ($_);
+                next A unless $sres;
+                delete $res->{supOf}->{$_} for keys %alias;
+              }
+              A: for (keys %{$res->{supOf} or {}}) {
+                next A unless $res->{aliasURI}->{$_};
+                my $sres = $self-><M::DISDatabase.getResource> ($_);
+                next A unless $sres;
+                delete $res->{subOf}->{$_} for keys %alias;
+              }
+              A: for (keys %alias) {
+                delete $self->{resDef}->{$_};
+                delete $self->{<H::DIS|resourceModuleMap>}->{$_};
+              }
+            } else {
+              ## Alias
+              delete $res->{aliasURI}->{$uri};
+              delete $res->{subOf}->{$uri};
+              delete $res->{supOf}->{$uri};
+              A: for (%{$res->{subOf} or {}}) {
+                next A unless $res->{subOf}->{$_};
+                my $sres = $self-><M::DISDatabase.getResource> ($_);
+                next A unless $sres;
+                delete $sres->{supOf}->{$uri};
+              }
+              A: for (%{$res->{supOf} or {}}) {
+                next A unless $res->{supOf}->{$_};
+                my $sres = $self-><M::DISDatabase.getResource> ($_);
+                next A unless $sres;
+                delete $sres->{subOf}->{$uri};
+              }
+              delete $self->{resDef}->{$uri};
+              delete $self->{<H::DIS|resourceModuleMap>}->{$uri};
+            }
+          }
+
+          ## -- Keys
+          my $v = $module->{<H::dp|plHashKey>};
+          K: for my $scope (keys %{$v or {}}) {
+            L: for my $key (keys %{$v->{$scope} or {}}) {
+              next L unless $v->{$scope}->{$key};
+              delete $self->{<H::dp|plHashKey>}->{$scope}->{$key};
+            }
+          }
+
+          ## -- Module itself
+          for (@{$module-><AG::DISAnyResource.uris>}) {
+            delete $self->{modDef}->{$_};
+          }
+        }__;
         
   @Method:
     @@Name: xcrefToResource
@@ -3824,6 +4031,19 @@ IFClsDef:
           $targetType => {<IFName::DISDatabase>},
           $result => $r,
         }__;
+
+  @Method:
+    @@Name: getModuleResourceList
+    @@enDesc:
+      Returns a snapshot list of modules contained in the database.
+    @@Return:
+      @@@Type: ResourceList
+      @@@enDesc:
+        A snapshot list of the modules.
+      @@@PerlDef:
+        $r = [map {$self->{modDef}->{$_}}
+              grep {defined $self->{modDef}->{$_}}
+              keys %{$self->{modDef}}];
 ##DISDatabase
 
 CParamApp:
@@ -5376,7 +5596,6 @@ IFClsDef:
 
   @Method:
     @@Name: addResourceList
-    @@ForCheck: ManakaiDOM|ForClass
     @@enDesc:
       Adds a resource to the list of resources belongs to the module.
     @@Param:
@@ -5387,7 +5606,7 @@ IFClsDef:
       @@@PerlDef:
         __DEEP{
           push @{$self->{<H::DIS|resource>}||=[]},
-               $disResource-><AG::DIS|DISAnyResource.uriRef>;
+               map {\$_} @{$disResource-><AG::DIS|DISAnyResource.uris>};
         }__;
 
   @Method:
@@ -5404,6 +5623,39 @@ IFClsDef:
           $r = [map {
                   $db-><M::DIS|DISDatabase.getResource> ($$_)
                 } @{$self->{<H::DIS|resource>}}];
+        }__;
+
+  @Method:
+    @@Name: addForResource
+    @@enDesc:
+      Adds a <QUOTE::for> resource to the list of <QUOTE::for>
+      resources belongs to the module.
+    @@Param:
+      @@@Name: disResource
+      @@@Type: DISFor
+      @@@enDesc: The resource to add.
+    @@Return:
+      @@@PerlDef:
+        __DEEP{
+          push @{$self->{<H::DIS|forList>}||=[]},
+               $disResource-><AG::DISAnyResource.uriRef>;
+        }__;
+
+  @Method:
+    @@Name: getForResourceList
+    @@enDesc:
+      Returns the list of <QUOTE::for> resources belongs to the module.
+    @@Return:
+      @@@Type: ResourceList
+      @@@enDesc:
+        The current snapshot list of <QUOTE::for> resources,
+        which may or may not contains dupulications.
+      @@@PerlDef:
+        __DEEP{
+          my $db = $self-><AG::DIS|DISAnyResource.database>;
+          $r = [map {
+                  $db-><M::DIS|DISDatabase.getFor> ($$_)
+                } @{$self->{<H::DIS|forList>}}];
         }__;
 
   @Attr:
@@ -5450,6 +5702,12 @@ IFClsDef:
         $test->assert_true ($list{'about:1'});
         $test->assert_false ($list{'about:2'});
 ##DISModule
+
+PropDef:
+  @QName: DIS|forList
+  @enDesc:
+    A list of references to URIs of <QUOTE::for> resources
+    belongs to the module.
 
 ClsDef:
   @ClsQName: ManakaiDISModuleLite
@@ -7385,6 +7643,19 @@ ElementTypeBinding:
   @ShadowContent:
     @@ForCheck: ManakaiDOM|ForClass
     @@DISCore:resourceType: DIS|Attribute
+
+
+TMethods:
+  @TMethod:
+    @@Name: getErrorInterfaceResource
+    @@DIS:targetType: dx|Interface
+    @@Return:
+      @@@Type: DISAnyResource
+      @@@PerlDef:
+        __DEEP{
+          $r = $self;
+        }__;
+##dx:Interface
 
 TMethods:
   @TMethod:

@@ -57,6 +57,7 @@ GetOptions (
     ## NOTE: Future version might use file: URI instead of file path.
   },
   'undef-check!' => \$Opt{no_undef_check},
+  'update!' => \$Opt{update},
   'verbose!' => \$Opt{verbose},
 ) or pod2usage (2);
 pod2usage ({-exitval => 0, -verbose => 1}) if $Opt{help};
@@ -138,6 +139,20 @@ $for = $doc->module_element->default_for_uri unless length $for;
 $db->get_for ($for)->is_referred ($doc);
 status_msg qq<Loading module in file "$file_name" for <$for>...>;
 
+my $srinfo = {};
+if ($Opt{update}) {
+  my $mod_uri = $doc->module_element
+                    ->get_attribute_ns (ExpandedURI q<dis:>, 'QName')
+                    ->qname_value_uri;
+  for my $mod (@{$db->get_module_resource_list}) {
+    if ($mod_uri eq $mod->name_uri) {
+      status_msg_ qq[Removing module <$mod_uri> for <@{[$mod->for_uri]}>...];
+      $srinfo = $db->unload_module ($mod, srinfo => $srinfo);
+      status_msg q<done>;
+    }
+  }
+}
+
 my $ResourceCount = 0;
 $db->load_module ($doc, sub ($$$$$$) {
   my ($self, $db, $uri, $ns, $ln, $for) = @_;
@@ -164,7 +179,7 @@ $db->load_module ($doc, sub ($$$$$$) {
     status_msg_ " " if ($ResourceCount % (10 * 10)) == 0;
     status_msg '' if ($ResourceCount % (10 * 50)) == 0;
   }
-});
+}, srinfo => $srinfo);
 
 
 ## Removes reference from document to database

@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/02/22 11:22:08 $
+      $Date: 2006/02/23 12:30:35 $
     @@ContentType:
       dis:Date.RCS
   
@@ -1469,18 +1469,21 @@ IFClsDef:
           my $ks = $self-><M::DIS|DISDatabase.getResource> ($keyScope);
           $ks-><AS::DIS|DISAnyResource.isReferred> ($keyName);
           for my $ks_uri (keys %{$ks->{aliasURI}}, keys %{$ks->{subOf}}) {
-            if (defined $self->{<Q::dp|plHashKey>}->{$ks_uri} and
-                defined $self->{<Q::dp|plHashKey>}->{$ks_uri}->{$keyName}) {
+            if (defined $self->{<H::dp|plHashKey>}->{$ks_uri} and
+                defined $self->{<H::dp|plHashKey>}->{$ks_uri}->{$keyName}) {
               __UNDEEP{__EXCEPTION{DIS|PERL_HASH_KEY_ALREADY_DEFINED_ERR::
                 DIS:uri => {$disResource-><AG::DIS|DISAnyResource.uri>},
-                DIS:anotherURI => {$self->{<Q::dp|plHashKey>}
+                DIS:anotherURI => {$self->{<H::dp|plHashKey>}
                                         ->{$ks_uri}->{$keyName}},
                 DIS:hashKeyScope => {$ks_uri},
                 DIS:hashKeyName => {$keyName},
               }__}__;
             }
           }
-          $self->{<Q::dp|plHashKey>}->{$keyScope}->{$keyName}
+          $disResource-><AG::anyres.ownerModule>
+                      ->{<H::dp|plHashKey>}
+                      ->{$keyScope}->{$keyName} =
+          $self->{<H::dp|plHashKey>}->{$keyScope}->{$keyName}
             = $disResource-><AG::DIS|DISAnyResource.uri>;
         }__;
 
@@ -4991,10 +4994,11 @@ TMethods:
       @@@PerlDef:
         __DEEP{
           ## Error definition
+          my $errif = $self-><M::anyres.getErrorInterfaceResource>;
           $r = $factory-><M::PCDocument.createPCStatement>;
           $r-><M::DIS|PLAnyCon.appendNewPCVariable>
                 ('$',
-                 $self-><M::DISResourcePerl.getPerlDefinitionHashNamespace>,
+                 $errif-><M::DISResourcePerl.getPerlDefinitionHashNamespace>,
                  'ErrorDef')
             -><AS::PCVar.hashKey>
                 ($self-><M::DISResourcePerl.getPerlErrorCodeName>);
@@ -5008,6 +5012,8 @@ TMethods:
                   <H::ecore|description> =>
                   $self-><M::ManakaiDISResourcePerl.plMufDescriptionText>,
                 });
+          $self-><M::ManakaiDISResourcePerl.plAddRequireResource>
+                   ($errif => $r);
         }__;
 
   @TMethod:
@@ -5841,6 +5847,18 @@ TMethods:
                 }
         }__;
 ##DISLang:Interface
+
+TMethods:
+  @TMethod:
+    @@Name: getPerlDefinitionHashNamespace
+    @@DIS:targetType: dx|Interface
+    @@Return:
+      @@@Type: DISString
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><AG::DISResourcePerl.plFullyQualifiedName>;
+        }__;
+##dx:Interface
 
 TMethods:
   @TMethod:

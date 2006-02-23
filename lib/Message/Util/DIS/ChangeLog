@@ -1,3 +1,12 @@
+2006-02-23  Wakaba  <wakaba@suika.fam.cx>
+
+	* Perl.dis (plAddHashKey): Saves key information also to
+	the module for the provision to |unload|ing.
+	(dx:Interface.getPerlDefinitionHashNamespace): New method
+	implementation.
+	(getPerlClassMemberCode): Adds the module of the subcode resource to
+	the |require|ing module list.
+
 2006-02-22  Wakaba  <wakaba@suika.fam.cx>
 
 	* Perl.dis (getPerlNameList): The |DISPerl:methodName|
