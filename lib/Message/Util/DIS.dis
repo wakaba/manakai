@@ -23,7 +23,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2006/02/23 17:51:49 $
+      $Date: 2006/02/24 11:28:33 $
     @@ContentType:
       dis:Date.RCS
   
@@ -3048,6 +3048,7 @@ IFClsDef:
               }
               my $rmod = $self-><M::DISDatabase.getModule>
                                        ($nuri . $ln, for_arg => $for);
+              $mod-><M::DISModule.addReferringModuleURI> ($nuri.$ln);
               unless ($rmod-><AG::DISAnyResource.isDefined>) {
                 my $rdoc = $resolver-><M::DISModuleResolver.uriToDocument>
                                        ($self, $rmod-><AG::DISAnyResource.uri>,
@@ -5484,6 +5485,9 @@ XParamDef:
   @enDesc:
     The snapshot list of types for which methods are defined.
 
+XParamDef:
+  @QName: DIS|forURI
+
 ElementTypeBinding:
   @Name: ErrDef
   @ElementType:
@@ -5741,7 +5745,37 @@ IFClsDef:
 
         $test->assert_true ($list{'about:1'});
         $test->assert_false ($list{'about:2'});
+
+  @Method:
+    @@Name: getReferringModuleURIList
+    @@enDesc:
+      Reurns a snapshot list of the name URIs of modules referenced
+      from the module.
+    @@Return:
+      @@@Type: URIList
+      @@@enDesc:
+        The snapshot list of URIs.
+      @@@PerlDef:
+        $r = [grep {$self->{<H::DIS|referringModule>}->{$_}}
+              keys %{$self->{<H::DIS|referringModule>} or {}}];
+
+  @Method:
+    @@Name: addReferringModuleURI
+    @@enDesc:
+      Adds a URI to the list of modules referenced from the module.
+    @@Param:
+      @@@Name: uri
+      @@@Type: DISString
+      @@@enDesc:
+        The URI to add.
+    @@Return:
+      @@@PerlDef:
+        $self->{<H::DIS|referringModule>}->{$uri} = true;
 ##DISModule
+
+PropDef:
+  @QName: DIS|referringModule
+  @DIS:key: ref
 
 PropDef:
   @QName: DIS|forList

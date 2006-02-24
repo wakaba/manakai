@@ -1,5 +1,13 @@
 2006-02-24  Wakaba  <wakaba@suika.fam.cx>
 
+	* DIS.dis (loadModule): Adds name URIs of |Require|d
+	modules to the list of such modules.
+	(DIS:forURI): New property.
+	(getReferringModuleURIList, addReferringModuleURI): New methods.
+	(DIS:referringModule): New property.
+
+2006-02-24  Wakaba  <wakaba@suika.fam.cx>
+
 	* DIS.dis (loadResource): URI registration by |addResourceList|
 	was incorrect for aliases.
 	(unloadResource): It did not support resources with

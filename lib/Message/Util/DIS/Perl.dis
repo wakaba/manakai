@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/02/24 07:31:14 $
+      $Date: 2006/02/24 11:28:34 $
     @@ContentType:
       dis:Date.RCS
   
@@ -367,7 +367,12 @@ IFClsDef:
         }
 
         $r->{<H::dp|dbModuleResolver>} = $moduleResolver;
-##DISImplementationPer
+##DISImplementationPerl
+
+ResourceDef:
+  @QName: disdb
+  @AliasFor: DIS|DISDatabase
+  @For: DIS|ForEmpty
 
 ## -- SWCFG nodes
 
@@ -1582,7 +1587,295 @@ IFClsDef:
             }
           } # S
         }__;
+
+  @Method:
+    @@Name: plUpdateModule
+    @@enDesc:
+      Reads a definition from the source file.  If it and
+      other modules referenced from it is updated, then they
+      are synced with the source.
+    @@Param:
+      @@@Name: moduleURI
+      @@@Type: DISString
+      @@@enDesc:
+        The name URI of the module to update.
+    @@NamedParam:
+      @@@Name: getModuleIndexFileName
+      @@@Type: DISPerl|CODE||ManakaiDOM|all
+      @@@enDesc:
+        A code to convert a module URI into file name.
+ 
+        The first parameter is the database object.
+
+        The second parameter is the name URI of the module.
+
+        The code must return a string, which represents an
+        environment dependent file path name for the database
+        resource index file for the module given by the second
+        parameter.
+    @@NamedParam:
+      @@@Name: getModuleSourceDocumentFromURI
+      @@@Type: DISPerl|CODE||ManakaiDOM|all
+      @@@enDesc:
+        A code to obtain the <QUOTE::dis> document object
+        from the name URI of the module.
+      
+        The first parameter is the database object.
+
+        The second parameter is the name URI of the module.
+
+        The code must return a <QUOTE::dis> document object,
+        which contains the source document of the module
+        identified by the second parameter.  Even if no source
+        file is found, or if the source file is not a valid
+        source file, then the code must return a <QUOTE::dis>
+        document object, though its content is implementation
+        dependent.
+    @@NamedParam:
+      @@@Name: getModuleSourceDocumentFromResource
+      @@@Type: DISPerl|CODE||ManakaiDOM|all
+      @@@enDesc:
+        The <CODE::resolver> parameter to the <M::disdb.loadModule>
+        method.
+    @@NamedParam:
+      @@@Name: getModuleSourceRevision
+      @@@Type: DISPerl|CODE||ManakaiDOM|all
+      @@@enDesc:
+        A code to obtain the revision number of the module source
+        file.
+
+        The first parameter is the database object.
+
+        The second parameter is the name URI of the module.
+
+        The code must return a number, which represents the
+        revision number of the source file of the module
+        identified by the second parameter.  It will be compared
+        with <A::anyres.revision> attribute value of the current
+        module object in the database.  If there is no source
+        file for the module or it cannot obtain the revision number,
+        then the code must return a zero.  Otherwise, it must
+        return a positive number.
+    @@NamedParam:
+      @@@Name: getReferringModuleURIList
+      @@@Type: DISPerl|CODE||ManakaiDOM|all
+      @@@enDesc:
+        A code to return a list of URIs of modules referenced
+        from a module source file.
+
+        The first parameter is the database object.
+
+        The second parameter is the name URI of the module.
+
+        The code must return a reference to an array, which
+        contains name URIs that identify modules referenced
+        from the module source file identified by the second parameter.
+    @@NamedParam:
+      @@@Name: onResourceRead
+      @@@Type: DISPerl|CODE||ManakaiDOM|all
+      @@@enDesc:
+        The <CODE::onResourceRead> parameter to the
+        <M::disdb.loadModule> method.
+    @@Return:
+      @@@PerlDef:
+        __DEEP{
+          my $db = $self;
+
+          ## -- Creates a list of modules that must be updated
+          my $update_module = {};
+          my $target_module = {$moduleURI => true};
+          my $checked_module = {};
+          T: while (%$target_module) {
+            my $target_module_uri = [keys %$target_module]->[0];
+            delete $target_module->{$target_module_uri};
+            next T if $checked_module->{$target_module_uri};
+            $checked_module->{$target_module_uri} = true;
+
+            unless (defined $db->{modDef}->{$target_module_uri}) {
+              my $target_module_file_name
+                = $getModuleIndexFileName->($db, $target_module_uri);
+              $db-><M::DISDatabasePerl.plLoadDISDatabaseIndex>
+                       ($target_module_file_name);
+            }
+            my $target_module_resource = $db-><M::disdb.getModule>
+                                                  ($target_module_uri);
+            
+            my $source_revision
+              = $getModuleSourceRevision->($db, $target_module_uri);
+            my $target_module_revision
+              = $target_module_resource-><AG::anyres.revision>;
+            if ($source_revision > 0 and
+                ($source_revision > $target_module_revision or
+                 $target_module_revision == 0)) {
+              for (@{$getReferringModuleURIList->($db, $target_module_uri)}) {
+                $target_module->{$_} = true;
+              }
+              $update_module->{$target_module_uri} = true;
+            } else { # Source is not updated
+              for (@{$target_module_resource
+                       -><M::DIS|DISModule.getReferringModuleURIList>}) {
+                $target_module->{$_} = true;
+              }
+            }
+          } # T
+
+          ## Removes modules that need update
+          my @update_read;
+          my $srinfo = {};
+          for my $mod (@{$db-><M::disdb.getModuleResourceList>}) {
+            my $mod_uri = $mod-><AG::anyres.nameURI>;
+            if ($update_module->{$mod_uri}) {
+              my $mod_for = $mod-><AG::anyres.forURI>;
+              push @update_read, [$mod_uri, $mod_for];
+              __UNDEEP{__DOMCore:ERROR{dp|info-unload-module-start::
+                DIS|uri => {$mod_uri},
+                DIS|forURI => {$mod_for},
+              }__}__;
+              $srinfo = $db-><M::disdb.unloadModule> ($mod, srinfo => $srinfo);
+              __UNDEEP{__DOMCore:ERROR{dp|info-unload-module-end::
+                DIS|uri => {$mod_uri},
+                DIS|forURI => {$mod_for},
+              }__}__;
+            }
+          }
+
+          ## Reads updated sources
+          for (@update_read) {
+            $db-><M::disdb.loadModule>
+                   ($getModuleSourceDocumentFromURI->($db, $_->[0]),
+                    $getModuleSourceDocumentFromResource,
+                    for_arg => $_->[1], on_resource_read => $onResourceRead,
+                    srinfo => $srinfo);
+          }
+        }__;
+
+  @Method:
+    @@Name: plLoadDISDatabaseIndex
+    @@enDesc:
+      Loads a <QUOTE::dis> database index file and merge
+      it into the database.
+    @@Param:
+      @@@Name: fileName
+      @@@Type: DISString
+      @@@enDesc:
+        The environment dependent file path name of the database
+        index file.
+    @@Return:
+      @@@PerlDef:
+        use Storable qw/retrieve/;
+        local $Carp::CarpLevel = $Carp::CarpLevel + 1;
+        my $idb = retrieve $fileName;
+
+        require Scalar::Util;
+        F: for my $imod_uri (keys %{$idb->{modDef}}) {
+          my $imod = $idb->{modDef}->{$imod_uri};
+          next F unless $imod;
+          if (defined $self->{modDef}->{$imod_uri}) {
+            __DOMCore:ERROR{dp|error-module-is-already-in-database::
+              DIS|uri => {$imod_uri},
+            }__;
+          }
+          $self->{modDef}->{$imod_uri} = $imod;
+          $imod->{db} = $self;
+          Scalar::Util::weaken ($imod->{db});
+        }
+
+        F: for my $ires_uri (keys %{$idb->{<H::DIS|resourceModuleMap>}}) {
+          next F unless $idb->{<H::DIS|resourceModuleMap>}->{$ires_uri};
+          if (defined $self->{<H::DIS|resourceModuleMap>}->{$ires_uri}) {
+            __DOMCore:ERROR{dp|error-resource-is-already-in-database::
+              DIS|uri => {$ires_uri},
+            }__;
+          }
+          $self->{<H::DIS|resourceModuleMap>}->{$ires_uri}
+            = $idb->{<H::DIS|resourceModuleMap>}->{$ires_uri};
+        }
 ##DISDatabasePerl
+
+ElementTypeBinding:
+  @Name: ErrDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DOMCore|DOMErrorType
+    @@For: DIS|ForLatest
+    @@ecore:textFormatter: ecore|MUErrorFormatter||ManakaiDOM|Perl
+    @@DOMCore:severity: DOMCore|SEVERITY_ERROR||ManakaiDOM|ManakaiDOMLatest
+
+ElementTypeBinding:
+  @Name: InfoDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DOMCore|DOMErrorType
+    @@For: DIS|ForLatest
+    @@ecore:textFormatter: ecore|MUErrorFormatter||ManakaiDOM|Perl
+    @@DOMCore:severity: DOMCore|SEVERITY_WARNING||ManakaiDOM|ManakaiDOMLatest
+
+ErrDef:
+  @QName: dp|error-module-is-already-in-database
+  @enMufDef:
+    Module <%p (name => {<Q::DIS|uri>});> is already in database
+  @ecore:hasParameter:
+    @@@: DIS|uri
+    @@enDesc:
+      The URI of the module.
+
+ErrDef:
+  @QName: dp|error-resource-is-already-in-database
+  @enMufDef:
+    Resource <%p (name => {<Q::DIS|uri>});> is already in database
+  @ecore:hasParameter:
+    @@@: DIS|uri
+    @@enDesc:
+      The URI of the resource.
+
+ElementTypeBinding:
+  @Name: enMufDef
+  @ElementType:
+    ecore:defaultMessage
+  @ShadowContent:
+    @@ContentType:
+      lang:muf
+    @@lang:en
+
+InfoDef:
+  @QName: dp|info-unload-module-start
+  @enDesc:
+    Notifies that a module is being unloaded.
+  @ecore:hasParameter:
+    @@@: DIS|uri
+    @@enDesc:
+      The name URI of the module.
+  @ecore:hasParameter:
+    @@@: DIS|forURI
+    @@enDesc:
+      The <QUOTE::for> URI of the module.
+  @ecore:hasParameter:
+    @@@: DIS|resource
+    @@enDesc:
+      The module.
+  @enMufDef:
+    Removing module <%p (name => {<Q::DIS|uri>});> for
+    <%p (name => {<Q::DIS|forURI>});> from database...
+
+InfoDef:
+  @QName: dp|info-unload-module-end
+  @enDesc:
+    Notifies that a module has been unloaded.
+  @ecore:hasParameter:
+    @@@: DIS|uri
+    @@enDesc:
+      The name URI of the module.
+  @ecore:hasParameter:
+    @@@: DIS|forURI
+    @@enDesc:
+      The <QUOTE::for> URI of the module.
+  @ecore:hasParameter:
+    @@@: DIS|resource
+    @@enDesc:
+      The module.
+  @enMufDef: done
 
 ResourceDef:
   @QName: dp|ModuleIndexFile
