@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/02/23 12:30:35 $
+      $Date: 2006/02/24 07:31:14 $
     @@ContentType:
       dis:Date.RCS
   
@@ -362,6 +362,7 @@ IFClsDef:
         for my $def (values %{$r->{modDef}},
                      values %{$r->{forDef}},
                      values %{$r->{resDef}}) {
+          $def->{db} = $r;
           Scalar::Util::weaken ($def->{db});
         }
 
@@ -1344,59 +1345,55 @@ IFClsDef:
         ## Updates resource to module mapping
         my %mod_res;
         my %mod_for;
-        my %mod_mod;
-        my %undefined_res;
-        my %undefined_for;
-        my %temp_mod;
+        my %mod_mod;   ## Module objects with full properties
+        my %temp_mod;  ## Module objects for index
         __DEEP{
+          my $core_mod = $self-><M::DIS|DISDatabase.getModule>
+                                  (<Q::DISlib|DISCore>);
+            ## Loads the core module for resources does not belong
+            ## to any module.
+
           for my $res (values %{$self->{resDef}}) {
             my $mod_urir = $res-><AG::DIS|DISAnyResource.ownerModuleURIRef>;
-            if (defined $mod_urir and
-                $res-><AG::DIS|DISAnyResource.isDefined>) {
-              for my $res_uri (@{$res-><AG::DIS|DISAnyResource.uris>}) {
-                $self->{<H::DIS|resourceModuleMap>}->{$res_uri} = $mod_urir;
-                $mod_res{$$mod_urir}->{$res_uri} = $res;
-              }
-              CORE::delete $res->{db};
-            } else {  ## Not defined yet
-              for my $res_uri (@{$res-><AG::DIS|DISAnyResource.uris>}) {
-                $undefined_res{$res_uri} = $res;
-              }
+            unless (defined $mod_urir) {
+              $mod_urir = \<Q::DISlib|DISCore>;
             }
+            for my $res_uri (@{$res-><AG::DIS|DISAnyResource.uris>}) {
+              $self->{<H::DIS|resourceModuleMap>}->{$res_uri} = $mod_urir;
+              $mod_res{$$mod_urir}->{$res_uri} = $res;
+            }
+            CORE::delete $res->{db};
           }
 
           for my $res (values %{$self->{forDef}}) {
             my $mod_urir = $res-><AG::DIS|DISAnyResource.ownerModuleURIRef>;
-            if (defined $mod_urir and
-                $res-><AG::DIS|DISAnyResource.isDefined>) {
-              for my $res_uri (@{$res-><AG::DIS|DISAnyResource.uris>}) {
-                $self->{<H::DIS|resourceModuleMap>}->{$res_uri} = $mod_urir;
-                $mod_for{$$mod_urir}->{$res_uri} = $res;
-              }
-              CORE::delete $res->{db};
-            } else {  ## Not defined yet
-              for my $res_uri (@{$res-><AG::DIS|DISAnyResource.uris>}) {
-                $undefined_for{$res_uri} = $res;
-              }
+            unless (defined $mod_urir) {
+              $mod_urir = \<Q::DISlib|DISCore>;
             }
+            for my $res_uri (@{$res-><AG::DIS|DISAnyResource.uris>}) {
+              $self->{<H::DIS|resourceModuleMap>}->{$res_uri} = $mod_urir;
+              $mod_for{$$mod_urir}->{$res_uri} = $res;
+            }
+            CORE::delete $res->{db};
           }
 
           for my $res (values %{$self->{modDef}}) {
+            my $mod_uri = $res-><AG::anyres.uri>;
             if ($res-><AG::DIS|DISAnyResource.isDefined> and
                 not $res->isa (<ClassName::DIS|ManakaiDISModuleLite>)) {
-              $mod_mod{$res->{uri}} = $res;
+              $mod_mod{$mod_uri} = $res;
               CORE::delete $res->{db};
-              $temp_mod{$res->{uri}} = bless {},
+              $temp_mod{$mod_uri} = bless {},
                                        <ClassName::DIS|ManakaiDISModuleLite>;
               for ('uri', 'localName', 'namespaceURI', 'for', 'forp',
                    <H::DIS|isDefined>, <H::DIS|isReferred>,
-                   <H::DIS|sourceNodeID>, <H::DIS|defaultNamespaceURI>) {
-                $temp_mod{$res->{uri}}->{$_} = $res->{$_}
+                   <H::DIS|sourceNodeID>, <H::DIS|defaultNamespaceURI>,
+                   <H::dp|plHashKey>) {
+                $temp_mod{$mod_uri}->{$_} = $res->{$_}
                   if defined $res->{$_};
               }
-              $temp_mod{$res->{uri}}->{db} = $self;
             } else {
-              $temp_mod{$res->{uri}} = $res;
+              $temp_mod{$mod_uri} = $res;
             }
           }
         }__;
@@ -1406,13 +1403,29 @@ IFClsDef:
         __DEEP{
           for my $mod_uri (keys %{{%mod_res, %mod_for, %mod_mod}}) {
             my $mod_file_name = ($moduleResolver or sub ($$) {})
-              ->($self, $self-><M::DIS|DISDatabase.getModule> ($mod_uri));
-            $mod_file{$mod_file_name}->{resDef}->{$_} = $mod_res{$mod_uri}->{$_}
-              for keys %{$mod_res{$mod_uri}||{}};
-            $mod_file{$mod_file_name}->{forDef}->{$_} = $mod_for{$mod_uri}->{$_}
-              for keys %{$mod_for{$mod_uri}||{}};
-            $mod_file{$mod_file_name}->{modDef}->{$mod_uri} = $mod_mod{$mod_uri}
-              if $mod_mod{$mod_uri};
+              ->($self, $self-><M::DIS|DISDatabase.getModule> ($mod_uri),
+                 <Q::dp|ModuleResourceFile>);
+            my $mod_idx_file_name = ($moduleResolver or sub ($$) {})
+              ->($self, $self-><M::DIS|DISDatabase.getModule> ($mod_uri),
+                 <Q::dp|ModuleIndexFile>);
+            for (keys %{$mod_res{$mod_uri}||{}}) {
+              $mod_file{$mod_file_name}->{resDef}->{$_}
+                = $mod_res{$mod_uri}->{$_};
+              $mod_file{$mod_idx_file_name}->{<H::DIS|resourceModuleMap>}->{$_}
+                = \$mod_uri;
+            } 
+            for (keys %{$mod_for{$mod_uri}||{}}) {
+              $mod_file{$mod_file_name}->{forDef}->{$_}
+                = $mod_for{$mod_uri}->{$_};
+              $mod_file{$mod_idx_file_name}->{<H::DIS|resourceModuleMap>}->{$_}
+                = \$mod_uri;
+            }
+            if ($mod_mod{$mod_uri}) {
+              $mod_file{$mod_file_name}->{modDef}->{$mod_uri}
+                = $mod_mod{$mod_uri};
+              $mod_file{$mod_idx_file_name}->{modDef}->{$mod_uri}
+                = $temp_mod{$mod_uri};
+            }
           }
         }__;
 
@@ -1421,22 +1434,23 @@ IFClsDef:
           nstore $mod_file{$mod_file_name}, $mod_file_name;
         }
 
+        ## The main database
+        {
+          local $self->{<H::dp|dbModuleResolver>} = null;
+          local $self->{resDef} = {};
+          local $self->{forDef} = {};
+          local $self->{modDef} = \%temp_mod;
+          local $self->{<H::DOMCore|error-handler>} = null;
+          nstore $self, $fileName;
+        }
+
         require Scalar::Util;
-        for my $res (map {values %{$_->{forDef}||{}},
+        for my $res (values %temp_mod,
+                     map {values %{$_->{forDef}||{}},
                           values %{$_->{resDef}||{}},
                           values %{$_->{modDef}||{}}} values %mod_file) {
           $res->{db} = $self;
           Scalar::Util::weaken ($res->{db});
-        }
-
-        ## The main database
-        {
-          local $self->{<H::dp|dbModuleResolver>} = null;
-          local $self->{resDef} = \%undefined_res;
-          local $self->{forDef} = \%undefined_for;
-          local $self->{modDef} = \%temp_mod;
-          local $self->{<H::DOMCore|error-handler>} = null;
-          nstore $self, $fileName;
         }
 
   @Method:
@@ -1569,6 +1583,16 @@ IFClsDef:
           } # S
         }__;
 ##DISDatabasePerl
+
+ResourceDef:
+  @QName: dp|ModuleIndexFile
+  @DISCore:resourceType: DISCore|Resource
+  @For: =ManakaiDOM|all
+
+ResourceDef:
+  @QName: dp|ModuleResourceFile
+  @DISCore:resourceType: DISCore|Resource
+  @For: =ManakaiDOM|all
 
 PropDef:
   @QName: dp|dbModuleResolver

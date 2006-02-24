@@ -3,6 +3,7 @@ use strict;
 use Message::Util::QName::Filter {
   DIS => q<http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#>,
   dis => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis-->,
+  dp => q<http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#Perl/>,
   ManakaiDOM => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#>,
   swcfg21 => q<http://suika.fam.cx/~wakaba/archive/2005/swcfg21#>,
 };
@@ -15,6 +16,7 @@ GetOptions (
   'debug' => \$Opt{debug},
   'dis-file-suffix=s' => \$Opt{dis_suffix},
   'daem-file-suffix=s' => \$Opt{daem_suffix},
+  'dafx-file-suffix=s' => \$Opt{dafx_suffix},
   'for=s' => \$Opt{For},
   'help' => \$Opt{help},
   'input-db-file-name=s' => \$Opt{input_file_name},
@@ -67,7 +69,8 @@ pod2usage ({-exitval => 2, -verbose => 0}) unless $Opt{output_file_name};
 $Opt{no_undef_check} = defined $Opt{no_undef_check}
                          ? $Opt{no_undef_check} ? 0 : 1 : 0;
 $Opt{dis_suffix} = '.dis' unless defined $Opt{dis_suffix};
-$Opt{daem_suffix} = '.daem' unless defined $Opt{daem_suffix};
+$Opt{daem_suffix} = '.dafm' unless defined $Opt{daem_suffix};
+$Opt{dafx_suffix} = '.dafx' unless defined $Opt{dafx_suffix};
 $Message::DOM::DOMFeature::DEBUG = 1 if $Opt{debug};
 require Error;
 $Error::Debug = 1 if $Opt{debug};
@@ -112,13 +115,15 @@ my $db;
 if (defined $Opt{input_file_name}) {
   status_msg_ qq<Loading database "$Opt{input_file_name}"...>;
   $db = $impl->pl_load_dis_database ($Opt{input_file_name}, sub ($$) {
-    my ($db, $mod) = @_;
+    my ($db, $mod, $type) = @_;
     my $ns = $mod->namespace_uri;
     my $ln = $mod->local_name;
+    my $suffix = $type eq ExpandedURI q<dp:ModuleIndexFile>
+                   ? $Opt{dafx_suffix} : $Opt{daem_suffix};
     verbose_msg qq<Database module <$ns$ln> is requested>;
-    my $name = dac_search_file_path_stem ($ns, $ln, $Opt{daem_suffix});
+    my $name = dac_search_file_path_stem ($ns, $ln, $suffix);
     if (defined $name) {
-      return $name.$Opt{daem_suffix};
+      return $name.$suffix;
     } else {
       return undef;
     }
@@ -207,24 +212,28 @@ status_msg "done";
 
 status_msg_ qq<Writing file "$Opt{output_file_name}"...>;
 $db->pl_store ($Opt{output_file_name}, sub ($$) {
-  my ($db, $mod) = @_;
+  my ($db, $mod, $type) = @_;
   my $ns = $mod->namespace_uri;
   my $ln = $mod->local_name;
-  my $name = dac_search_file_path_stem ($ns, $ln, $Opt{daem_suffix});
+  my $suffix = $type eq ExpandedURI q<dp:ModuleIndexFile>
+                 ? $Opt{dafx_suffix} : $Opt{daem_suffix};
+  my $name = dac_search_file_path_stem ($ns, $ln, $suffix);
   if (defined $name) {
-    $name .= $Opt{daem_suffix};
+    $name .= $suffix;
   } elsif (defined ($name = dac_search_file_path_stem
                               ($ns, $ln, $Opt{dis_suffix}))) {
-    $name .= $Opt{daem_suffix};
+    $name .= $suffix;
   } else {
     $name = Cwd::abs_path
               (File::Spec->canonpath
                  (File::Spec->catfile
                     (defined $Opt{input_search_path}->{$ns}->[0]
                        ? $Opt{input_search_path}->{$ns}->[0] : '.',
-                     $ln.$Opt{daem_suffix})));
+                     $ln.$suffix)));
   }
-  verbose_msg qq<Database module <$ns$ln> is written to "$name">;
+  verbose_msg qq<Database >.
+              ($type eq <Q::dp|ModuleIndexFile> ? 'index' : 'module').
+              qq< <$ns$ln> is written to "$name">;
   return $name;
 });
 status_msg "done";

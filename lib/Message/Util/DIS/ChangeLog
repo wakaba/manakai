@@ -1,3 +1,11 @@
+2006-02-24  Wakaba  <wakaba@suika.fam.cx>
+
+	* Perl.dis (plStore): Stores unassociated resources
+	into the |DISlib:DISCore| database module.  Writes
+	to the database index (|dafx|) files.
+	(plDISLoadDatabase): Sets resources' |{db}| property (since
+	in new serialization format it might not be set).
+
 2006-02-23  Wakaba  <wakaba@suika.fam.cx>
 
 	* Perl.dis (plAddHashKey): Saves key information also to
