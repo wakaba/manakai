@@ -106,6 +106,7 @@ GetOptions (
   },
   'dis-file-suffix=s' => \$Opt{dis_suffix},
   'daem-file-suffix=s' => \$Opt{daem_suffix},
+  'dafx-file-suffix=s' => \$Opt{dummy1},
   'debug' => \$Opt{debug},
   'enable-assertion!' => \$Opt{outputAssertion},
   'for=s' => \$Opt{For},
@@ -312,11 +313,11 @@ L<bin/dac.pl> - The "dac" database generator.
 
 =head1 LICENSE
 
-Copyright 2004-2005 Wakaba <w@suika.fam.cx>.  All rights reserved.
+Copyright 2004-2006 Wakaba <w@suika.fam.cx>.  All rights reserved.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2005/12/21 12:27:35 $
+1; # $Date: 2006/02/25 16:49:55 $

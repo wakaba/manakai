@@ -6,6 +6,7 @@ MANAKAI_LIB_MANAKAI_DIR = $(MANAKAI_LIB_DIR)manakai/
 DIS_SUFFIX = .dis
 DAC_SUFFIX = .dae
 DAEM_SUFFIX = .daem
+DAFX_SUFFIX = .dafx
 PM_SUFFIX = .pm
 
 CD = cd
@@ -34,13 +35,18 @@ DIS_OPTIONS =
 DIS_OPTIONS_ALL = $(DIS_OPTIONS) \
       --search-path-catalog-file-name="$(MANAKAI_LIB_DIR)manakai/dis-catalog" \
       --dis-file-suffix="$(DIS_SUFFIX)" \
-      --daem-file-suffix="$(DAEM_SUFFIX)"
+      --daem-file-suffix="$(DAEM_SUFFIX)" \
+      --dafx-file-suffix="$(DAFX_SUFFIX)"
 
 DAC_OPTIONS =
 DAC_PL = $(MANAKAI_BIN_DIR)dac.pl
 DAC = $(PERL_) $(DAC_PL) $(DAC_OPTIONS) $(DIS_OPTIONS_ALL) \
       --db-base-directory-path="$(MANAKAI_ROOT_DIR)" \
       --output-file-name=
+
+DAF_OPTIONS =
+DAF_PL = $(MANAKAI_BIN_DIR)daf.pl
+DAF = $(PERL_) $(DAF_PL) $(DAF_OPTIONS) $(DIS_OPTIONS_ALL)
 
 DAC2PM_OPTIONS3 = --enable-assert
 DAC2PM_OPTIONS = $(DAC2PM_OPTIONS3)
@@ -84,6 +90,15 @@ GENERATED_DAC_FILES = core$(DAC_SUFFIX) coretest$(DAC_SUFFIX) \
   dpg$(DAC_SUFFIX)
 
 all: PerlCode$(PM_SUFFIX) .discore$(PM_SUFFIX) $(GENERATED_FILES)
+
+a.daf: 
+	$(DAF) --create-perl-module="$(NS_UTIL)ManakaiNode a.pm"
+b.daf: 
+	$(DAF) --create-perl-module="$(NS_UTIL_ERR)DOMException b.pm"
+c.daf: 
+	$(DAF) --create-perl-module="$(NS_MDOM)DOMFeature c.pm"
+d.daf: 
+	$(DAF) --create-perl-module="$(NS_UTIL)PerlCode d.pm"
 
 core$(DAC_SUFFIX): $(CORE_DAC_FILE) $(UTIL_CORE_DIS_FILES) $(DAC_PL)
 	$(DAC)$@.1.tmp --input-db-file-name="$<" ManakaiNode.dis

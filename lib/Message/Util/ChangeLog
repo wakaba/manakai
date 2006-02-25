@@ -1,3 +1,22 @@
+2006-02-26  Wakaba  <wakaba@suika.fam.cx>
+
+	* PerlCode.dis (Require): Missing reference to the |DISlib:DISMarkup|
+	module is added.
+
+2006-02-25  Wakaba  <wakaba@suika.fam.cx>
+
+	* DIS.dis (lookupNamespacePrefix): Resolves prefix by
+	namespace resolver if available.
+	(disNamespaceResolver): New attribute.
+	(loadModule): Sets |revision| attribute of the created module.
+	(ownerModuleRef): Setter is added.
+	(addTypeURI): Set |ownerModule| attribute if possible.
+	(ManakaiDISModuleLite): The class no longer inherits |DISAnyResource|
+	class and |ManakaiDefaultExceptionHandler| class.
+	(mergeAsAlias): New |noEqualityCheck| parameter is added.
+
+	* Makefile: New variables for |DAF| are added.
+
 2006-02-24  Wakaba  <wakaba@suika.fam.cx>
 
 	* DIS.dis (loadModule): Adds name URIs of |Require|d

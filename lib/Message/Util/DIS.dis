@@ -23,7 +23,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2006/02/24 11:28:33 $
+      $Date: 2006/02/25 16:49:56 $
     @@ContentType:
       dis:Date.RCS
   
@@ -921,6 +921,11 @@ IFClsDef:
         } else {
           ## From module list
           FIND: {
+            if ($od->{<H::mn:node>}->{<H::DIS|disNamespaceResolver>}) {
+              $r = $od->{<H::mn:node>}->{<H::DIS|disNamespaceResolver>}
+                      ->($prefix);
+              last FIND if defined $r;
+            }
             try {
               my $db = $od-><AG::DISDocument.disDatabase>;
               for my $mod_uri (keys %{$db->{modDef}}) {
@@ -2500,7 +2505,24 @@ IFClsDef:
           CORE::delete $self->{<H::mn:node>}->{<H::swcfg21:nsBinding>}
                             ->{$prefix};
         }
+
+  @Attr:
+    @@Name: disNamespaceResolver
+    @@enDesc:
+      A namespace resolver code that is called by
+      <M::swcfg21|SWCFGNode||swcfg21|ForLatest.lookupNamesopaceURI> method
+      when in-document namespace binding information is not sufficient.
+    @@Type: DISPerl|CODE||ManakaiDOM|Perl
+    @@Get:
+      @@@PerlDef:
+        $r = $self->{<H::mn:node>}->{<H::DIS|disNamespaceResolver>};
+    @@Set:
+      @@@PerlDef:
+        $self->{<H::mn:node>}->{<H::DIS|disNamespaceResolver>} = $given;
 ##DISDocument
+
+PropDef:
+  @QName: DIS|disNamespaceResolver
 
 PropDef:
   @QName: db
@@ -2967,6 +2989,7 @@ IFClsDef:
               $type => {<Q::DISCore:String>},
               $name => {<Q::DIS:sourceFile>},
             }__;
+            __CODE{setRevision:: $resource => $mod}__;
             
             ## -- Loads "for" definition
             my $root_elements
@@ -4538,6 +4561,9 @@ IFClsDef:
     @@Get:
       @@@PerlDef: 
         $r = $self->{<H::DIS|definingModule>};
+    @@Set:
+      @@@PerlDef:
+        $self->{<H::DIS|definingModule>} = $given;
 
   @Attr:
     @@Name: isReferred
@@ -5254,6 +5280,10 @@ IFClsDef:
                 $new_res-><M::DISResource.addSuperResource> ($current_type);
                 $new_res-><M::DISResource.addSuperResource> ($res);
               }
+              unless ($new_res-><AG::DISAnyResource.ownerModuleURIRef>) {
+                $new_res-><AS::DISAnyResource.ownerModuleURIRef>
+                            ($res-><AG::DISAnyResource.ownerModuleURIRef>);
+              }
               $self->{<H::DIS|typeURI>} = $new_uri;
             }
           }
@@ -5474,6 +5504,11 @@ ErrDef:
     @@@: DIS|method-resource-types
     @@enDesc:
       The snapshot list of types for which methods are defined.
+
+XParamDef:
+  @QName: DIS|fileName
+  @enDesc:
+    The name of the file.
 
 XParamDef:
   @QName: DIS|method-name
@@ -5786,9 +5821,6 @@ PropDef:
 ClsDef:
   @ClsQName: ManakaiDISModuleLite
 
-  @ClsISA: DIS|ManakaiDISAnyResource
-  @ClsISA: dx|ManakaiDefaultExceptionHandler||ManakaiDOM|Perl
- 
   @Implement: DOMMinImpl
   @Implement: DIS|DISResourceProp
   @Implement: dp|DISAnyResourcePerl
@@ -5803,6 +5835,37 @@ ClsDef:
     by reading additional properties from the <QUOTE::dis> database.
 
   @Attr:
+    @@Name: uri
+    @@Type: AnyURI
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The URI reference of the resource. 
+    @@Get:
+      @@@enDesc:
+        The representive URI reference of the resource.
+
+        {NOTE:: The URI might be non-persistent if the 
+                resource is not assigned a URI in <QUOTE::dis> source file,
+                in which case a URI is randomly-generated at the 
+                time of object generation.
+        }
+      @@@PerlDef:
+        $r = $self->{uri};
+
+  @Attr:
+    @@Name: uriRef
+    @@Type: DISPerl|SCALAR||ManakaiDOM|all
+    @@enDesc:
+      A reference to the URI of the resource.
+
+      {NOTE:: Applications <kwd:MUST-NOT> modify the referenced
+              value directly.
+      }
+    @@Get:
+      @@@PerlDef: $r = \ ($self->{uri});
+  
+  @Attr:
     @@ForCheck: ManakaiDOM|ForClass
     @@Name: uris
     @@Type:
@@ -5813,6 +5876,158 @@ ClsDef:
     @@Get:
       @@@PerlDef:
         $r = [$self->{uri}];
+
+  @Method:
+    @@Name: isSameResource
+    @@Operator:
+      @@@@:eq
+      @@@ContentType:
+        lang:Perl
+    @@enDesc:
+      Whether two resources are same or not.  Two resources are
+      same if and only if their <A::DISAnyResource.uri> are
+      equivalent as strings (i.e. in character-by-character based matching).
+    @@Param:
+      @@@Name: anotherResource
+      @@@Type: DISAnyResource
+      @@@enDesc:
+        Another resource object to compare.
+    @@Return:
+      @@@Type:
+        DOMMain:boolean::ManakaiDOM:all
+      @@@enDesc:
+        Whether two resources are same or not. 
+      @@@TrueCase:
+        @@@@enDesc: Two resources are same.
+      @@@FalseCase:
+        @@@@enDesc: Two resources are different.
+      @@@PerlDef:
+        if (UNIVERSAL::isa ($anotherResource,
+                            <ClassName::ManakaiDISAnyResource>)) {
+          $r = $self->{uri} eq $anotherResource->{uri};
+        }
+
+  @Attr:
+    @@Name: nameURI
+    @@Type: NameURI
+    @@enDesc:
+      The URI reference of this module, without 
+      <QUOTE::for> identifier. 
+    @@Get:
+      @@@enDesc:
+        The name URI of the resource.
+      @@@nullCase:
+        @@@@enDesc:
+          The resource has no name URI.
+
+          {NOTE:: A resource has no URI if and only if the resource
+                  has no local name.
+          }
+      @@@PerlDef:
+        if (defined $self->{localName}) {
+          $r = defined $self->{namespaceURI}
+             ? ${$self->{namespaceURI}} . ${$self->{localName}}
+             : ${$self->{localName}};
+        }
+
+  @Attr:
+    @@Name: localName
+    @@enDesc:
+      The local name of this module. 
+
+      {NOTE:: <QUOTE::for> resources has no local name.
+      }
+    @@Type:
+      DISCore:LocalName::ManakaiDOM:all
+    @@Get:
+      @@@PerlDef:
+        $r = defined $self->{localName} ? ${$self->{localName}} : null;
+
+  @Attr:
+    @@Name: namespaceURI
+    @@Type: AnyURI
+    @@enDesc:
+      The namespace URI of the name of this resource. 
+      
+      {NOTE:: <QUOTE::for> resources has no namespace URI.
+      }
+    @@Get:
+      @@@PerlDef:
+        $r = defined $self->{namespaceURI} ? ${$self->{namespaceURI}} : null;
+
+  @Attr:
+    @@Name: forURI
+    @@Type: ForURI
+    @@enDesc:
+      The <QUOTE::for> URI reference for which this module is defined. 
+    @@Get:
+      @@@PerlDef:
+        $r = defined $self->{for} ? ${$self->{for}} : null;
+
+  @Attr:
+    @@Name: forpURI
+    @@enDesc:
+      The <QUOTE::for+> URI references for which this resource is defined. 
+
+      {NOTE:: <QUOTE::for> resources has no <QUOTE::for+> URI.
+      }
+    @@Type: ForURIList
+    @@Get:
+      @@@enDesc:
+        List of <QUOTE::for> URI references.  Note that this list is
+        <QUOTE::dead>.
+      @@@PerlDef:
+        $r = [@{$self->{forp}}];
+
+  @Method:
+    @@Name: isForURI
+    @@enDesc:
+      Tests whether this resource is defined for a <QUOTE::for>
+      or <QUOTE::for+> URI reference or not.
+    @@Param:
+      @@@Name:forURI
+      @@@Type:ForURI
+      @@@enDesc:
+        A <QUOTE::for> URI reference to test.
+    @@Return:
+      @@@Type:
+        DOMMain:boolean::ManakaiDOM:all
+      @@@TrueCase:
+        @@@@enDesc:
+          This resource is for <P::forURI>.
+      @@@FalseCase:
+        @@@@enDesc:
+          This resource is not for <P::forURI>.
+      @@@PerlDef:
+        __DEEP{
+          C: for my $this_for_uri (${$self->{for}||\''}, @{$self->{forp}||[]}) {
+            if ($this_for_uri eq $forURI) { ## Shortcut
+              $r = true;
+              last C;
+            }
+            my $this_for = $self->{db}-><M::DIS|DISDatabase.getFor>
+                                               ($this_for_uri);
+            if ($this_for-><M::DIS|DISFor.isaURI> ($forURI)) {
+              $r = true;
+              last C;
+            }
+          }
+        }__;
+
+  @Attr:
+    @@Name: isDefined
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Whether this module is defined or not. 
+    @@Type:
+      DOMMain:boolean::ManakaiDOM:all
+    @@Get:
+      @@@PerlDef:
+        $r = $self->{<H::DIS|isDefined>};
+    @@Set:
+      @@@PerlDef:
+        $self->{<H::DIS|isDefined>} = $given;
 
   @Attr:
     @@ForCheck: ManakaiDOM|ForClass
@@ -5828,6 +6043,46 @@ ClsDef:
           The resource is not part of any module since
           its definition is not read (<IF::DISModule.isDefined> is <DOM::false>).
       @@@PerlDef: $r = $self;
+
+  @Attr:
+    @@Name: ownerModuleURI
+    @@enDesc:
+      A URI of the owner module of the resource.
+    @@Type: DIS|AnyURI
+    @@nullCase:
+      @@@enDesc:
+        The resource does not belong to any module since the
+        resource definition is not read yet or since
+        it is created in memory.
+    @@Get:
+      @@@PerlDef: 
+        $r = $self->{uri};
+
+  @Attr:
+    @@Name: ownerModuleURIRef
+    @@enDesc:
+      A reference to a URI of the owner module of the resource.
+    @@Type: DISPerl|SCALAR||ManakaiDOM|Perl
+    @@nullCase:
+      @@@enDesc:
+        The resource does not belong to any module since the
+        resource definition is not read yet or since
+        it is created in memory.
+    @@Get:
+      @@@PerlDef: 
+        $r = \ ($self->{uri});
+    @@Set:
+      @@@PerlDef: # no effect
+
+  @Attr:
+    @@Name: database
+    @@enDesc:
+      The <QUOTE::dis> database to which the resource belongs.
+    @@Type: DISDatabase
+    @@clsActualType: ManakaiDISDatabase
+    @@Get:
+      @@@PerlDef:
+        $r = $self->{db};
 
   @Method:
     @@Operator:
@@ -6227,13 +6482,18 @@ IFClsDef:
         \
         }
     @@NodeParam:
+    @@NamedParam:
+      @@@Name: noEqualityCheck
+      @@@Type: idl|boolean||ManakaiDOM|all
+      @@@enDesc:
+        Don't throw <X::MERGE_ITSELF_ERR> exception.
     @@Return:
       @@@RaiseException:
         @@@@@:MERGE_ITSELF_ERR
         @@@@@@enDesc:
           An attempt is made to merge this resource itself. 
       @@@PerlDef:
-        if ($self eq $aliasResource) {
+        if (not $noEqualityCheck and $self eq $aliasResource) {
           __EXCEPTION{MERGE_ITSELF_ERR::
             DIS:uri => {$self->{uri}},
             DIS:sourceNode => {$node},
@@ -6267,7 +6527,6 @@ IFClsDef:
             }
           }
         }__;
-    ## TODO: updateRevision
 
   @Attr:
     @@Name: disDataTypeResource

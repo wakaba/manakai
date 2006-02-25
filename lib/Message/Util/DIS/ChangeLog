@@ -1,3 +1,28 @@
+2006-02-26  Wakaba  <wakaba@suika.fam.cx>
+
+	* Perl.dis (plLoadDISDatabaseModule): Do nothing if the
+	module is already loaded.
+	(plUpdateModule): Parameter |moduleURI| is changed
+	to |modules| so that multiple modules can be updated once.
+	Don't try to read index file if it is not exist.
+
+2006-02-25  Wakaba  <wakaba@suika.fam.cx>
+
+	* DNLite.dis (convertDISDocumentToDNLDocument): New
+	|baseNamespaceBinding| parameter is added.
+
+	* Perl.dis (plLoadDISDatabase): Removes |c:error-handler|
+	property (it is |null| if specified).
+	(plStore): New |noMainDatabase| parameter is added.  Don't 
+	write resources that are not |isDefined|.  Copies |DIS:revision|
+	property of modules to database index file.
+	(plLoadDISDatabaseModule): Notify before and after
+	a file is read.  Don't throw |DIS:RESOURCE_ALREADY_DEFINED_ERR|
+	if the resource already in the database is not |isDefined|.
+	(plLoadDISDatabaseIndex): Notify before and after
+        a file is read.
+	(plDatabaseModuleResolver): New attribute accessor.
+
 2006-02-24  Wakaba  <wakaba@suika.fam.cx>
 
 	* Perl.dis (plUpdateModule): New method.

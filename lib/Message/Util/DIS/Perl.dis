@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/02/24 11:28:34 $
+      $Date: 2006/02/25 16:49:57 $
     @@ContentType:
       dis:Date.RCS
   
@@ -367,6 +367,8 @@ IFClsDef:
         }
 
         $r->{<H::dp|dbModuleResolver>} = $moduleResolver;
+        delete $r->{<H::DOMCore|error-handler>};
+          ## Remove |undef| value if exists.
 ##DISImplementationPerl
 
 ResourceDef:
@@ -1341,6 +1343,11 @@ IFClsDef:
       @@@enDesc:
         A reference to code which resolvers a module into
         a file name path, as in <M::DISDatabasePerl.plLoadDISDatabase>.
+    @@NamedParam:
+      @@@Name: noMainDatabase
+      @@@Type: idl|boolean||ManakaiDOM|all
+      @@@enDesc:
+        If <DOM::true>, the method doesn't write the main database file.
     @@Return:
       @@@SimpleException:
       @@@PerlDef:
@@ -1358,9 +1365,10 @@ IFClsDef:
             ## Loads the core module for resources does not belong
             ## to any module.
 
-          for my $res (values %{$self->{resDef}}) {
+          R: for my $res (values %{$self->{resDef}}) {
             my $mod_urir = $res-><AG::DIS|DISAnyResource.ownerModuleURIRef>;
             unless (defined $mod_urir) {
+              next R unless $res-><AG::anyres.isDefined>;
               $mod_urir = \<Q::DISlib|DISCore>;
             }
             for my $res_uri (@{$res-><AG::DIS|DISAnyResource.uris>}) {
@@ -1370,9 +1378,10 @@ IFClsDef:
             CORE::delete $res->{db};
           }
 
-          for my $res (values %{$self->{forDef}}) {
+          R: for my $res (values %{$self->{forDef}}) {
             my $mod_urir = $res-><AG::DIS|DISAnyResource.ownerModuleURIRef>;
             unless (defined $mod_urir) {
+              next R unless $res-><AG::anyres.isDefined>;
               $mod_urir = \<Q::DISlib|DISCore>;
             }
             for my $res_uri (@{$res-><AG::DIS|DISAnyResource.uris>}) {
@@ -1393,7 +1402,7 @@ IFClsDef:
               for ('uri', 'localName', 'namespaceURI', 'for', 'forp',
                    <H::DIS|isDefined>, <H::DIS|isReferred>,
                    <H::DIS|sourceNodeID>, <H::DIS|defaultNamespaceURI>,
-                   <H::dp|plHashKey>) {
+                   <H::dp|plHashKey>, <H::DIS|revision>) {
                 $temp_mod{$mod_uri}->{$_} = $res->{$_}
                   if defined $res->{$_};
               }
@@ -1440,7 +1449,7 @@ IFClsDef:
         }
 
         ## The main database
-        {
+        unless ($noMainDatabase) {
           local $self->{<H::dp|dbModuleResolver>} = null;
           local $self->{resDef} = {};
           local $self->{forDef} = {};
@@ -1522,71 +1531,86 @@ IFClsDef:
     @@SimpleException:
     @@Return:
       @@@PerlDef:
-        my $dbmod;
-        my $fileName;
-        __DEEP{
-          $fileName = ($self->{<H::dp|dbModuleResolver>} or sub () {})
-                         ->($self, $disModule);
-          use Storable qw/retrieve/;
-          {
-            local $Carp::CarpLevel = $Error::Level;
-            $dbmod = retrieve $fileName;
-          }
-
-          require Scalar::Util;        
-          S: for my $res_uri (keys %{$dbmod->{modDef}}) {
-            my $res = $dbmod->{modDef}->{$res_uri};
-            my $dres = $self->{modDef}->{$res_uri};
-
-            unless (defined $dres) {
-              $dres = $self->{modDef}->{$res_uri}
-                    = {db => $self};
-              Scalar::Util::weaken ($dres->{db});
-            } elsif (ref $dres ne <ClassName::DIS|ManakaiDISModuleLite>) {
-              __UNDEEP{__EXCEPTION{DIS|RESOURCE_ALREADY_DEFINED_ERR::
-                DIS:uri => {$res_uri},
-                DIS:moduleURI => {$disModule-><AG::DIS|DISAnyResource.uri>},
-              }__}__;
+        if ($disModule->isa (<ClassName::DIS|ManakaiDISModuleLite>)) {
+          my $dbmod;
+          my $fileName;
+          __DEEP{
+            $fileName = ($self->{<H::dp|dbModuleResolver>} or sub () {})
+                           ->($self, $disModule);
+            __UNDEEP{__DOMCore:ERROR{
+            dp|info-open-database-module-resource-start::
+              DIS|fileName => {$fileName},
+            }__}__;
+            use Storable qw/retrieve/;
+            {
+              local $Carp::CarpLevel = $Error::Level;
+              $dbmod = retrieve $fileName;
             }
-            for my $pn (keys %$res) {
-              $dres->{$pn} = $res->{$pn};
-            }
+            __UNDEEP{__DOMCore:ERROR{dp|info-open-database-module-resource-end::
+              DIS|fileName => {$fileName},
+            }__}__;
+  
+            require Scalar::Util;        
+            S: for my $res_uri (keys %{$dbmod->{modDef}}) {
+              my $res = $dbmod->{modDef}->{$res_uri};
+              my $dres = $self->{modDef}->{$res_uri};
+  
+              unless (defined $dres) {
+                $dres = $self->{modDef}->{$res_uri}
+                      = {db => $self};
+                Scalar::Util::weaken ($dres->{db});
+              } elsif (ref $dres ne <ClassName::DIS|ManakaiDISModuleLite>) {
+                __UNDEEP{__EXCEPTION{DIS|RESOURCE_ALREADY_DEFINED_ERR::
+                  DIS:uri => {$res_uri},
+                  DIS:moduleURI => {$disModule-><AG::DIS|DISAnyResource.uri>},
+                }__}__;
+              }
+              for my $pn (keys %$res) {
+                $dres->{$pn} = $res->{$pn};
+              }
+  
+              bless $dres, <ClassName::DIS|ManakaiDISModuleDefinition>;
+            } # S
 
-            bless $dres, <ClassName::DIS|ManakaiDISModuleDefinition>;
-          } # S
-
-          S: for my $res_uri (keys %{$dbmod->{forDef}}) {
-            my $res = $dbmod->{forDef}->{$res_uri};
-            next S unless $res_uri eq $res-><AG::DIS|DISAnyResource.uri>;
-            $res->{db} = $self;
-            Scalar::Util::weaken ($res->{db});
-            if (defined $self->{forDef}->{$res_uri} and
-                $res_uri ne <Q::ManakaiDOM:all>) {
-              __UNDEEP{__EXCEPTION{DIS|RESOURCE_ALREADY_DEFINED_ERR::
-                DIS:uri => {$res_uri},
-                DIS:moduleURI => {$disModule-><AG::DIS|DISAnyResource.uri>},
-              }__}__;
-            }
-            $self->{forDef}->{$res_uri} = $res;
-          } # S
-
-          S: for my $res_uri (keys %{$dbmod->{resDef}}) {
-            my $res = $dbmod->{resDef}->{$res_uri};
-            next S unless $res_uri eq $res-><AG::DIS|DISAnyResource.uri>;
-            $res->{db} = $self;
-            Scalar::Util::weaken ($res->{db});
-            if (defined $self->{resDef}->{$res_uri}) {
-              __UNDEEP{__EXCEPTION{DIS|RESOURCE_ALREADY_DEFINED_ERR::
-                DIS:uri => {$res_uri},
-                DIS:moduleURI => {$disModule-><AG::DIS|DISAnyResource.uri>},
-              }__}__;
-            }
-            for my $uri (grep {$res->{aliasURI}->{$_}}
-                         keys %{$res->{aliasURI}}) {
-              $self->{resDef}->{$uri} = $res;
-            }
-          } # S
-        }__;
+            S: for my $res_uri (keys %{$dbmod->{forDef}}) {
+              my $res = $dbmod->{forDef}->{$res_uri};
+              next S unless $res_uri eq $res-><AG::DIS|DISAnyResource.uri>;
+              $res->{db} = $self;
+              Scalar::Util::weaken ($res->{db});
+              if (defined $self->{forDef}->{$res_uri} and
+                  not ref $self->{forDef}->{$res_uri} eq 'HASH' and
+                      # There should be a bug...
+                  $self->{forDef}->{$res_uri}-><AG::anyres.isDefined>) {
+                __UNDEEP{__EXCEPTION{DIS|RESOURCE_ALREADY_DEFINED_ERR::
+                  DIS:uri => {$res_uri},
+                  DIS:moduleURI => {$disModule-><AG::DIS|DISAnyResource.uri>},
+                }__}__;
+              }
+              $self->{forDef}->{$res_uri} = $res;
+            } # S
+ 
+            S: for my $res_uri (keys %{$dbmod->{resDef}}) {
+              my $res = $dbmod->{resDef}->{$res_uri};
+              next S unless $res_uri eq $res-><AG::DIS|DISAnyResource.uri>;
+              $res->{db} = $self;
+              Scalar::Util::weaken ($res->{db});
+              if (defined $self->{resDef}->{$res_uri}) {
+                if ($self->{resDef}->{$res_uri}-><AG::anyres.isDefined>) {
+                  if ($res-><AG::anyres.isDefined>) {
+                    __UNDEEP{__EXCEPTION{DIS|RESOURCE_ALREADY_DEFINED_ERR::
+                      DIS:uri => {$res_uri},
+                      DIS:moduleURI => {$disModule-><AG::DIS|DISAnyResource.uri>},
+                    }__}__;
+                  }
+                }
+              }
+              for my $uri (grep {$res->{aliasURI}->{$_}}
+                           keys %{$res->{aliasURI}}) {
+                $self->{resDef}->{$uri} = $res;
+              }
+            } # S
+          }__;
+        } # not loaded
 
   @Method:
     @@Name: plUpdateModule
@@ -1595,10 +1619,10 @@ IFClsDef:
       other modules referenced from it is updated, then they
       are synced with the source.
     @@Param:
-      @@@Name: moduleURI
-      @@@Type: DISString
+      @@@Name: modules
+      @@@Type: DISPerl|ARRAY||ManakaiDOM|all
       @@@enDesc:
-        The name URI of the module to update.
+        A list of pairs of module name URI and <QUOTE::for> URI.
     @@NamedParam:
       @@@Name: getModuleIndexFileName
       @@@Type: DISPerl|CODE||ManakaiDOM|all
@@ -1683,8 +1707,9 @@ IFClsDef:
 
           ## -- Creates a list of modules that must be updated
           my $update_module = {};
-          my $target_module = {$moduleURI => true};
+          my $target_module = {map {$_->[0] => true} @$modules};
           my $checked_module = {};
+          my %update_read;
           T: while (%$target_module) {
             my $target_module_uri = [keys %$target_module]->[0];
             delete $target_module->{$target_module_uri};
@@ -1694,8 +1719,10 @@ IFClsDef:
             unless (defined $db->{modDef}->{$target_module_uri}) {
               my $target_module_file_name
                 = $getModuleIndexFileName->($db, $target_module_uri);
-              $db-><M::DISDatabasePerl.plLoadDISDatabaseIndex>
+              if (-f $target_module_file_name) {
+                $db-><M::DISDatabasePerl.plLoadDISDatabaseIndex>
                        ($target_module_file_name);
+              }
             }
             my $target_module_resource = $db-><M::disdb.getModule>
                                                   ($target_module_uri);
@@ -1711,6 +1738,7 @@ IFClsDef:
                 $target_module->{$_} = true;
               }
               $update_module->{$target_module_uri} = true;
+              $update_read{$target_module_uri}->{<Q::ManakaiDOM|all>} = true;
             } else { # Source is not updated
               for (@{$target_module_resource
                        -><M::DIS|DISModule.getReferringModuleURIList>}) {
@@ -1719,14 +1747,14 @@ IFClsDef:
             }
           } # T
 
+
           ## Removes modules that need update
-          my @update_read;
           my $srinfo = {};
           for my $mod (@{$db-><M::disdb.getModuleResourceList>}) {
             my $mod_uri = $mod-><AG::anyres.nameURI>;
             if ($update_module->{$mod_uri}) {
               my $mod_for = $mod-><AG::anyres.forURI>;
-              push @update_read, [$mod_uri, $mod_for];
+              $update_read{$mod_uri}->{$mod_for} = true;
               __UNDEEP{__DOMCore:ERROR{dp|info-unload-module-start::
                 DIS|uri => {$mod_uri},
                 DIS|forURI => {$mod_for},
@@ -1739,13 +1767,41 @@ IFClsDef:
             }
           }
 
+          for (@$modules) {
+            my ($mod_name, $mod_for) = @$_;
+            my $tfuri;
+            unless (defined $mod_for) {
+              $mod_for = <Q::ManakaiDOM|all>;
+              if (defined $db->{modDef}->{$mod_name}) {
+                $mod_for = $db-><M::disdb.getModule> ($mod_name)
+                              -><M::DIS|DISResourceProp.getPropertyText>
+                                  (<Q::dis|DefaultFor>, <Q::ManakaiDOM|all>);
+              } else {
+                my $mod_doc = $getModuleSourceDocumentFromURI
+                                ->($db, $mod_name, $mod_for);
+                my $mod_el = $mod_doc-><AG::DIS|DISDocument.moduleElement>;
+                if ($mod_el) {
+                  $mod_for = $mod_el-><AG::DIS|DISModuleElement.defaultForURI>;
+                }
+              }
+            }
+            __CODE{DIS|tfurisToURI:: $turi => $mod_name, $furi => $mod_for,
+                                     $uri => $tfuri}__;
+            unless (defined $db->{modDef}->{$tfuri}) {
+              $update_read{$mod_name}->{$mod_for} = true;
+            }
+          }
+
           ## Reads updated sources
-          for (@update_read) {
-            $db-><M::disdb.loadModule>
-                   ($getModuleSourceDocumentFromURI->($db, $_->[0]),
-                    $getModuleSourceDocumentFromResource,
-                    for_arg => $_->[1], on_resource_read => $onResourceRead,
-                    srinfo => $srinfo);
+          for my $mod_name (keys %update_read) {
+            for my $mod_for (keys %{$update_read{$mod_name}}) {
+              $db-><M::disdb.loadModule>
+                     ($getModuleSourceDocumentFromURI
+                        ->($db, $mod_name, $mod_for),
+                      $getModuleSourceDocumentFromResource,
+                      for_arg => $mod_for, on_resource_read => $onResourceRead,
+                      srinfo => $srinfo);
+            }
           }
         }__;
 
@@ -1764,13 +1820,20 @@ IFClsDef:
       @@@PerlDef:
         use Storable qw/retrieve/;
         local $Carp::CarpLevel = $Carp::CarpLevel + 1;
+        __DOMCore:ERROR{dp|info-open-database-module-index-start::
+          DIS|fileName => {$fileName},
+        }__;
         my $idb = retrieve $fileName;
+        __DOMCore:ERROR{dp|info-open-database-module-index-end::
+          DIS|fileName => {$fileName},
+        }__;
 
         require Scalar::Util;
         F: for my $imod_uri (keys %{$idb->{modDef}}) {
           my $imod = $idb->{modDef}->{$imod_uri};
           next F unless $imod;
           if (defined $self->{modDef}->{$imod_uri}) {
+            next F if $imod eq $self->{modDef}->{$imod_uri};
             __DOMCore:ERROR{dp|error-module-is-already-in-database::
               DIS|uri => {$imod_uri},
             }__;
@@ -1785,11 +1848,26 @@ IFClsDef:
           if (defined $self->{<H::DIS|resourceModuleMap>}->{$ires_uri}) {
             __DOMCore:ERROR{dp|error-resource-is-already-in-database::
               DIS|uri => {$ires_uri},
+              DIS|moduleURI => {${$self->{<H::DIS|resourceModuleMap>}
+                                       ->{$ires_uri}}},
             }__;
           }
           $self->{<H::DIS|resourceModuleMap>}->{$ires_uri}
             = $idb->{<H::DIS|resourceModuleMap>}->{$ires_uri};
         }
+
+  @Attr:
+    @@Name: plDatabaseModuleResolver
+    @@enDesc:
+      The database resource module file resolver.
+      See <M::DISImplementationPerl.plLoadDISDatabase>.
+    @@Type: DISPerl|CODE||ManakaiDOM|all
+    @@Get:
+      @@@PerlDef:
+        $r = $self->{<H::dp|dbModuleResolver>};
+    @@Set:
+      @@@PerlDef:
+        $self->{<H::dp|dbModuleResolver>} = $given;
 ##DISDatabasePerl
 
 ElementTypeBinding:
@@ -1824,11 +1902,16 @@ ErrDef:
 ErrDef:
   @QName: dp|error-resource-is-already-in-database
   @enMufDef:
-    Resource <%p (name => {<Q::DIS|uri>});> is already in database
+    Resource <%p (name => {<Q::DIS|uri>});> is already in 
+    module <%p (name => {<Q::DIS|moduleURI>});>
   @ecore:hasParameter:
     @@@: DIS|uri
     @@enDesc:
       The URI of the resource.
+  @ecore:hasParameter:
+    @@@: DIS|moduleURI
+    @@enDesc:
+      The URI of the module in which <Q::DIS|uri> is already defined.
 
 ElementTypeBinding:
   @Name: enMufDef
@@ -1838,6 +1921,48 @@ ElementTypeBinding:
     @@ContentType:
       lang:muf
     @@lang:en
+
+InfoDef:
+  @QName: dp|info-open-database-module-resource-start
+  @enDesc:
+    Notifies that a database module resource file is being opened.
+  @ecore:hasParameter:
+    @@@: DIS|fileName
+    @@enDesc:
+      The name of the database module resource file.
+  @enMufDef:
+    Opening database module "%p (name => {<Q::DIS|fileName>});"...
+
+InfoDef:
+  @QName: dp|info-open-database-module-resource-end
+  @enDesc:
+    Notifies that a database module resource file has been opened.
+  @ecore:hasParameter:
+    @@@: DIS|fileName
+    @@enDesc:
+      The name of the database module resource file.
+  @enMufDef: done
+
+InfoDef:
+  @QName: dp|info-open-database-module-index-start
+  @enDesc:
+    Notifies that a database module index file is being opened.
+  @ecore:hasParameter:
+    @@@: DIS|fileName
+    @@enDesc:
+      The name of the database module index file.
+  @enMufDef:
+    Opening database module index "%p (name => {<Q::DIS|fileName>});"...
+
+InfoDef:
+  @QName: dp|info-open-database-module-index-end
+  @enDesc:
+    Notifies that a database module index file has been opened.
+  @ecore:hasParameter:
+    @@@: DIS|fileName
+    @@enDesc:
+      The name of the database module index file.
+  @enMufDef: done
 
 InfoDef:
   @QName: dp|info-unload-module-start

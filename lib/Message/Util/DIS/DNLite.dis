@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/02/20 09:03:17 $
+      $Date: 2006/02/25 16:49:57 $
     @@ContentType:
       dis:Date.RCS
   
@@ -311,6 +311,14 @@ IFClsDef:
       @@@Name: databaseArg
       @@@Type: DIS|DISDatabase
       @@@nullCase:
+    @@NamedParam:
+      @@@Name: baseNamespaceBinding
+      @@@Type: DISPerl|HASH||ManakaiDOM|all
+      @@@enDesc:
+        A base set of namespace bindings.
+      @@@nullCase:
+        @@@@enDesc:
+          Empty.
     @@Return:
       @@@Type: DNLDocument
       @@@caType: ManakaiDNLDocument
@@ -421,8 +429,9 @@ IFClsDef:
         };
         __DEEP{
           $r = bless {
-            ns => $originalDocument->{<H::mn:node>}
-                                   ->{<H::swcfg21:nsBinding>},
+            ns => {%{$baseNamespaceBinding or {}},
+                   %{$originalDocument->{<H::mn:node>}
+                                   ->{<H::swcfg21:nsBinding>}}},
             defaultNS => \($originalDocument-><AG::DDoc.moduleElement>
                               -><AG::DIS|DISModuleElement.definingNamespaceURI>),
             fileName => $originalDocument->{<H::mn:node>}
@@ -951,7 +960,7 @@ IFClsDef:
             my $rdef = $databaseArg-><M::DIS|DISDatabase.getResource> ($xn);
             $r = $rdef-><M::DIS|DISAnyResource.isTypeURI>
                           (<Q::DISSource|Property>) ||
-                 $rdef-><M::DIS|DISResource.isAnyTypeURI> (<Q::rdf:Property>);
+                 $rdef-><M::DIS|DISAnyResource.isTypeURI> (<Q::rdf:Property>);
                        ## TODO: Remove this.
           }
         }__;

@@ -372,7 +372,7 @@ of the "dis" interpretation.
 
 =head1 LICENSE
 
-Copyright 2004-2005 Wakaba <w@suika.fam.cx>.  All rights reserved.
+Copyright 2004-2006 Wakaba <w@suika.fam.cx>.  All rights reserved.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
