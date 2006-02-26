@@ -1,5 +1,20 @@
 2006-02-26  Wakaba  <wakaba@suika.fam.cx>
 
+	* ManakaiNodeTest.dis (Require): Missing reference
+	to the |DISlib:Test| module is added.
+
+	* Makefile: Revised for new |daf| database format.
+
+	* DIS.dis (elementTypeMatch, isSubsetOfURI): The |srinfo|
+	parameter is added.
+	(getFor, getModule): Set reference rather than string
+	itself to the |{for}| property.
+	(loadResource): Passes |srinfo| parameter
+	to |isSubsetOfURI|-calling methods.
+	(mergeAsAlias): The |srinfo| parameter is added.
+
+2006-02-26  Wakaba  <wakaba@suika.fam.cx>
+
 	* PerlCode.dis (Require): Missing reference to the |DISlib:DISMarkup|
 	module is added.
 

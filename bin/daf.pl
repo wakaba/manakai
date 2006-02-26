@@ -1,12 +1,16 @@
 #!/usr/bin/perl -w 
 use strict;
 use Message::Util::QName::Filter {
+  c => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#>,
   DIS => q<http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#>,
   dis => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis-->,
+  DOMLS => q<http://suika.fam.cx/~wakaba/archive/2004/dom/ls#>,
   dp => q<http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#Perl/>,
   fe => q<http://suika.fam.cx/www/2006/feature/>,
   ManakaiDOM => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#>,
+  pc => q<http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/PerlCode#>,
   swcfg21 => q<http://suika.fam.cx/~wakaba/archive/2005/swcfg21#>,
+  test => q<http://suika.fam.cx/~wakaba/archive/2004/dis/Test#>,
   Util => q<http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/>,
 };
 
@@ -18,7 +22,13 @@ GetOptions (
   'create-perl-module=s' => sub {
     shift;
     my $i = [split /\s+/, shift, 3];
-    $i->[3] = 'pm';
+    $i->[3] = 'perl-pm';
+    push @{$Opt{create_module}}, $i;
+  },
+  'create-perl-test=s' => sub {
+    shift;
+    my $i = [split /\s+/, shift, 3];
+    $i->[3] = 'perl-t';
     push @{$Opt{create_module}}, $i;
   },
   'debug' => \$Opt{debug},
@@ -99,27 +109,37 @@ sub verbose_msg_ ($) {
   print STDERR $s if $Opt{verbose};
 }
 
+## ---- The MAIN Program
+
 my $start_time;
 BEGIN { $start_time = time }
 
 use Message::Util::DIS::DNLite;
 use Message::Util::PerlCode;
+use Message::Util::DIS::Test;
+use Message::DOM::GenericLS;
 
 my $limpl = $Message::DOM::ImplementationRegistry->get_implementation
                            ({ExpandedURI q<fe:Min> => '3.0',
                              '+' . ExpandedURI q<DIS:DNLite> => '1.0',
                              '+' . ExpandedURI q<DIS:Core> => '1.0',
                              '+' . ExpandedURI q<Util:PerlCode> => '1.0',
+                             '+' . ExpandedURI q<DIS:TDT> => '1.0',
                            });
 my $impl = $limpl->get_feature (ExpandedURI q<DIS:Core> => '1.0');
-my $parser = $impl->create_dis_parser;
-our $DNi = $impl->get_feature (ExpandedURI q<DIS:DNLite> => '1.0');
+my $pc = $impl->get_feature (ExpandedURI q<Util:PerlCode> => '1.0');
+my $di = $impl->get_feature (ExpandedURI q<DIS:Core> => '1.0');
+my $tdt_parser;
+
+## --- Loading and Updating the Database
 
 my $HasError;
 my $db = $impl->create_dis_database;
 $db->pl_database_module_resolver (\&daf_db_module_resolver);
 $db->dom_config->set_parameter ('error-handler' => \&daf_on_error);
 
+my $parser = $impl->create_dis_parser;
+my $DNi = $impl->get_feature (ExpandedURI q<DIS:DNLite> => '1.0');
 my %ModuleSourceDISDocument;
 my %ModuleSourceDNLDocument;
 my %ModuleNameNamespaceBinding = (
@@ -253,6 +273,12 @@ status_msg "done";
 
 daf_check_undefined ();
 
+undef $DNi;
+undef %ModuleSourceDNLDocument;
+exit $HasError if $HasError;
+
+## --- Creating Files
+
 for (@{$Opt{create_module}}) {
   my ($mod_uri, $out_file_path, $mod_for, $out_type) = @$_;
   unless (defined $mod_for) {
@@ -262,7 +288,7 @@ for (@{$Opt{create_module}}) {
   }
   my $mod = $db->get_module ($mod_uri, for_arg => $mod_for);
 
-  if ($out_type eq 'pm') {
+  if ($out_type eq 'perl-pm') {
     status_msg_ qq<Generating Perl module from <$mod_uri> for <$mod_for>...>;
     my $pl = $mod->pl_generate_perl_module_file;
     status_msg qq<done>;
@@ -279,18 +305,34 @@ for (@{$Opt{create_module}}) {
     print $output $pl->stringify;
     close $output;
     status_msg q<done>;
+  } elsif ($out_type eq 'perl-t') {
+    status_msg_ qq<Generating Perl test from <$mod_uri> for <$mod_for>...>;
+    my $pl = daf_generate_perl_test_file ($mod);
+    status_msg qq<done>;
+
+    my $output;
+    defined $out_file_path
+        ? (open $output, '>', $out_file_path or die "$0: $out_file_path: $!")
+          : ($output = \*STDOUT);
+
+    status_msg_ sprintf qq<Writing Perl test %s...>,
+                          defined $out_file_path
+                            ? q<">.$out_file_path.q<">
+                            : 'to stdout';
+    print $output $pl->stringify;
+    close $output;
+    status_msg q<done>;
   }
 }
 
 daf_check_undefined ();
 
+## --- The END
+
 status_msg_ "Closing the database...";
 $db->free;
 undef $db;
-undef %ModuleSourceDNLDocument;
 status_msg "done";
-
-undef $DNi;
 
 {
   use integer;
@@ -302,6 +344,8 @@ exit $HasError;
 END {
   $db->free if $db;
 }
+
+## ---- Subroutines
 
 sub daf_open_source_dis_document ($) {
   my ($module_uri) = @_;
@@ -530,6 +574,127 @@ sub daf_check_undefined () {
     print STDERR "done\n";
   }
 } # daf_check_undefined
+
+sub daf_generate_perl_test_file ($) {
+  my $mod = shift;
+  my $pl = $pc->create_perl_file;
+  my $pack = $pl->get_last_package ("Manakai::Test", make_new_package => 1);
+  $pack->add_use_perl_module_name ("Message::Util::DIS::Test");
+  $pack->add_use_perl_module_name ("Message::Util::Error");
+  $pack->add_require_perl_module_name ($mod->pl_fully_qualified_name);
+
+  $pl->source_file ($mod->get_property_text (ExpandedURI q<DIS:sourceFile>, ""));
+  $pl->source_module ($mod->name_uri);
+  $pl->source_for ($mod->for_uri);
+  $pl->license_uri ($mod->get_property_resource (ExpandedURI q<dis:License>)
+                        ->uri);
+
+  $pack->append_code
+    ($pc->create_perl_statement
+       ('my $impl = $Message::DOM::ImplementationRegistry->get_implementation ({
+           "http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#Test"
+             => "1.0",
+         })'));
+
+  $pack->append_code
+      (my $num_statement = $pc->create_perl_statement 
+                                  ('my $test = $impl->create_test_manager'));
+
+  my $total_tests = 0;
+  my %processed;
+  for my $res (@{$mod->get_resource_list}) {
+    next if $res->owner_module ne $mod or $processed{$res->uri};
+    $processed{$res->uri} = 1;
+
+    if ($res->is_type_uri (ExpandedURI q<test:Test>)) {
+      if ($res->is_type_uri (ExpandedURI q<test:StandaloneTest>)) {
+        $total_tests++;
+        $pack->append_code ('$test->start_new_test (');
+        $pack->append_new_pc_literal ($res->name_uri || $res->uri);
+        $pack->append_code (');');
+        
+        $pack->append_code ('try {');
+        
+        my $test_pc = $res->pl_code_fragment;
+        if (not defined $test_pc) {
+          die "Perl test code not defined for <".$res->uri.">";
+        }
+        
+        $pack->append_code_fragment ($test_pc);
+        
+        $pack->append_code ('$test->ok;');
+        
+        $pack->append_code ('} catch Message::Util::IF::DTException with {
+          ##
+        } otherwise {
+          my $err = shift;
+          warn $err;
+          $test->not_ok;
+        };');
+
+      } elsif ($res->is_type_uri (ExpandedURI q<test:ParserTestSet>)) {
+        my $block = $pack->append_new_pc_block;
+        my @test;
+        
+        $tdt_parser ||= $impl->create_gls_parser
+                                 ({
+                                   ExpandedURI q<DIS:TDT> => '1.0',
+                                  });
+        for my $tres (@{$res->get_child_resource_list_by_type
+                                (ExpandedURI q<test:ParserTest>)}) {
+          $total_tests++;
+          push @test, my $ttest = {entity => {}};
+          $ttest->{uri} = $tres->uri;
+          for my $eres (@{$tres->get_child_resource_list_by_type
+                                   (ExpandedURI q<test:Entity>)}) {
+            my $tent = $ttest->{entity}->{$eres->uri} = {};
+            for (ExpandedURI q<test:uri>, ExpandedURI q<test:baseURI>,
+                 ExpandedURI q<test:value>) {
+              my $v = $eres->get_property_text ($_);
+              $tent->{$_} = $v if defined $v;
+            }
+            $ttest->{root_uri} = $eres->uri
+              if $eres->is_type_uri (ExpandedURI q<test:RootEntity>) or
+                 not defined $ttest->{root_uri};
+          }
+
+          ## Result DOM tree
+          my $tree_t = $tres->get_property_text (ExpandedURI q<test:domTree>); 
+          if (defined $tree_t) {
+            $ttest->{dom_tree} = $tdt_parser->parse_string ($tree_t);
+          }
+
+          ## Expected |DOMError|s
+          for (@{$tres->get_property_value_list (ExpandedURI q<c:erred>)}) {
+            my $err = $tdt_parser->parse_tdt_error_string
+                                     ($_->string_value, $db, $_,
+                                      undef, $tres->for_uri);
+            push @{$ttest->{dom_error}->{$err->{type}->{value}} ||= []}, $err;
+          }
+        }
+
+        for ($block->append_statement
+                   ->append_new_pc_expression ('=')) {
+          $_->append_new_pc_variable ('$', undef, 'TestData')
+            ->variable_scope ('my');
+          $_->append_new_pc_literal (\@test);
+        }
+        
+        my $plc = $res->pl_code_fragment;
+        unless ($plc) {
+          die "Resource <".$res->uri."> does not have Perl test code";
+        }
+
+        $block->append_code_fragment ($plc);
+        
+      } # test resource type
+    } # test:Test
+  }
+  
+  $num_statement->append_code (' (' . $total_tests . ')');
+
+  return $pl;
+} # daf_generate_perl_test_file
 
 __END__
 

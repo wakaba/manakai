@@ -23,7 +23,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2006/02/25 16:49:56 $
+      $Date: 2006/02/26 06:42:56 $
     @@ContentType:
       dis:Date.RCS
   
@@ -1935,6 +1935,14 @@ IFClsDef:
       @@@Type: ResourceURI
       @@@enDesc:
         An element type name URI reference to test. 
+    @@NamedParam:
+      @@@Name: srinfo
+      @@@Type: DISPerl|HASH||ManakaiDOM|all
+      @@@enDesc:
+        The <CODE::srinfo> hash.
+      @@@nullCase:
+        @@@@enDesc:
+          No <CODE::srinfo>.
     @@Return:
       @@@Type:
         DOMMain:boolean::ManakaiDOM:all
@@ -1953,7 +1961,8 @@ IFClsDef:
           my $rdef = $self-><AG::ManakaiDISNode.ownerDISDocument>
                                    -><AG::ManakaiDISDocument.disDatabase>
                                    -><M::ManakaiDISDatabase.getResource> ($et);
-          $r = $rdef-><M::ManakaiDISResourceDefinition.isSubsetOfURI> ($etype);
+          $r = $rdef-><M::DISResource.isSubsetOfURI>
+                        ($etype, srinfo => $srinfo);
         }__;
 
   @Attr:
@@ -2580,13 +2589,16 @@ IFClsDef:
              = bless {
                  uri => $modURI,
                  db => $self,
-                 for => <Q::ManakaiDOM:all>,
                  forp => [],
                  <H::DIS|typeURI> => <Q::DISCore|Module>,
                  <H::DIS|revision> => 0,
                }, <ClassName::ManakaiDISModuleDefinition>;
           require Scalar::Util;
           Scalar::Util::weaken ($r->{db});
+          __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
+            $result => {$r->{for}},
+            $given => {<Q::ManakaiDOM|all>},
+          }__;
         }
 
     @@Test:
@@ -2744,7 +2756,6 @@ IFClsDef:
                  uri => $resURI,
                  aliasURI => {$resURI => true},
                  db => $self,
-                 for => <Q::ManakaiDOM:all>,
                  forp => [],
                  seq => -1,
                  <H::DIS|typeURI> => <Q::DISCore|Resource>,
@@ -2752,6 +2763,10 @@ IFClsDef:
                }, <ClassName::ManakaiDISResourceDefinition>;
           require Scalar::Util;
           Scalar::Util::weaken ($r->{db});
+          __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
+            $result => {$r->{for}},
+            $given => {<Q::ManakaiDOM|all>},
+          }__;
         }
 
     @@Test:
@@ -3217,7 +3232,11 @@ IFClsDef:
 
             for (keys %{$srinfo->{for}->{$qn_uri}->{supOf} or {}}) {
               my $subfor = $self-><M::DISDatabase.getFor> ($_);
-              $subfor-><M::DISFor.addISA> ($for);
+              $subfor-><M::DISFor.addISA> ($for, srinfo => $srinfo);
+            }
+            for (keys %{$srinfo->{for}->{$qn_uri}->{subOf} or {}}) {
+              my $supfor = $self-><M::DISDatabase.getFor> ($_);
+              $for-><M::DISFor.addISA> ($supfor, srinfo => $srinfo);
             }
           } else {
             __UNDEEP{
@@ -3467,9 +3486,11 @@ IFClsDef:
           while (@ce0) {
             my $ce = shift @ce0;
             if ($ce-><M::DISElement.elementTypeMatch>
-                       (<Q::DISCore|resourceType>, database_arg => $self) or
+                       (<Q::DISCore|resourceType>, database_arg => $self,
+                        srinfo => $srinfo) or
                 $ce-><M::DISElement.elementTypeMatch> (<Q::rdf:type>,
-                                     database_arg => $self)) {
+                                     database_arg => $self,
+                                     srinfo => $srinfo)) {
                        ## TODO: Remove this.
               $has_type = true;
               my $type_uri = $ce-><AG::DISElement.qnameValueURI>;
@@ -3477,23 +3498,26 @@ IFClsDef:
               $res-><M::DISAnyResource.addTypeURI> ($type_uri);
               $type-><AS::DISAnyResource.isReferred> ($ce);
               if ($type-><M::DISResource.isSubsetOfURI>
-                                               (<Q::dis:MultipleResource>)) {
+                                               (<Q::dis:MultipleResource>,
+                                                srinfo => $srinfo)) {
                 $is_multires = true;
               }
             } elsif ($ce-><M::DISElement.elementTypeMatch>
                                                    (<Q::dis:subsetOf>,
-                                         database_arg => $self)) {
+                                         database_arg => $self,
+                                         srinfo => $srinfo)) {
               my $sres = $self-><M::DISDatabase.getResource>
                                   ($ce-><M::DISElement.tfqnamesValueURI>
                                                     ($$node_id, $forArg,
                                     for_arg => $forArg, forp_arg => $forpArg,
                                     database_arg => $self));
-              $res-><M::DISResource.addSuperResource> ($sres);
+              $res-><M::DISResource.addSuperResource> ($sres, srinfo => $srinfo);
             } elsif ($ce-><AG::DISElement.isResourceElement>) {
               push @cres, $ce;
             } elsif ($ce-><M::DISElement.elementTypeMatch>
                                                   (<Q::dis:dataType>,
-                                         database_arg => $self)) {
+                                         database_arg => $self,
+                                         srinfo => $srinfo)) {
               my $uri = $ce-><AG::DISElement.qnameValueURI>;
               __CODE{dv:createURI::
                 $uri => $uri,
@@ -3503,8 +3527,9 @@ IFClsDef:
               my $type = $self-><M::DISDatabase.getResource> ($uri);
               $type-><AS::DISAnyResource.isReferred> ($ce);
             } elsif ($ce-><M::DISElement.elementTypeMatch>
-                                  (<Q::dis:multipleProperties>,
-                                         database_arg => $self)) {
+                            (<Q::dis:multipleProperties>,
+                             database_arg => $self,
+                             srinfo => $srinfo)) {
               my $uri = $ce-><AG::DISElement.qnameValueURI>;
               __CODE{dv:createURI::
                 $uri => $uri,
@@ -3545,7 +3570,12 @@ IFClsDef:
           F: for my $suri (keys %{$srres->{supOf} or {}}) {
             next F unless $srres->{supOf}->{$suri};
             my $sres = $self-><M::DISDatabase.getResource> ($suri);
-            $sres-><M::DISResource.addSuperResource> ($res);
+            $sres-><M::DISResource.addSuperResource> ($res, srinfo => $srinfo);
+          }
+          F: for my $suri (keys %{$srres->{subOf} or {}}) {
+            next F unless $srres->{subOf}->{$suri};
+            my $sres = $self-><M::DISDatabase.getResource> ($suri);
+            $res-><M::DISResource.addSuperResource> ($sres, srinfo => $srinfo);
           }
 
           ## -- Child resources
@@ -3578,7 +3608,8 @@ IFClsDef:
             for my $pe (@props) {
               if ($pe-><M::ManakaiDISElement.elementTypeMatch>
                                                (<Q::dis:resourceFor>,
-                                         database_arg => $self)) {
+                                         database_arg => $self,
+                                         srinfo => $srinfo)) {
                 my $for_uri = $pe-><AG::ManakaiDISElement.qnameValueURI>;
                 my $for = $self-><M::ManakaiDISDatabase.getFor> ($for_uri);
                 $for-><AS::DISAnyResource.isReferred> ($pe);
@@ -3615,9 +3646,10 @@ IFClsDef:
           There is an element whose element type is not supported.
       @@@PerlDef:
         __DEEP{
-          for my $fd (values %{$self->{modDef}},
-                      values %{$self->{forDef}},
-                      values %{$self->{resDef}}) {
+          F: for my $fd (values %{$self->{modDef}},
+                         values %{$self->{forDef}},
+                         values %{$self->{resDef}}) {
+            next F if $fd->isa (<ClassName::ManakaiDISModuleLite>);
             if ($fd-><AG::DISAnyResource.isDefined>) {
               $fd-><M::DISAnyResource.readProperties>
                 (on_resource_read => $onResourceRead);
@@ -3797,9 +3829,10 @@ IFClsDef:
           ## -- Keys
           my $v = $module->{<H::dp|plHashKey>};
           K: for my $scope (keys %{$v or {}}) {
+            my $ks = $self-><M::DISDatabase.getResource> ($scope);
             L: for my $key (keys %{$v->{$scope} or {}}) {
               next L unless $v->{$scope}->{$key};
-              delete $self->{<H::dp|plHashKey>}->{$scope}->{$key};
+              delete $ks->{<H::dp|plHashKey>}->{$key};
             }
           }
 
@@ -6426,6 +6459,14 @@ IFClsDef:
         @@@@lang:en
         @@@@@:
           Another resource URI reference to test. 
+    @@NamedParam:
+      @@@Name: srinfo
+      @@@Type: DISPerl|HASH||ManakaiDOM|all
+      @@@enDesc:
+        The <CODE::srinfo> hash.
+      @@@nullCase:
+        @@@@enDesc:
+          No <CODE::srinfo>.
     @@Return:
       @@@Type: 
         DOMMain:boolean::ManakaiDOM:all
@@ -6437,6 +6478,32 @@ IFClsDef:
           <P::superURI> is not a super-resource of this resource. 
       @@@PerlDef:
         $r = $self->{aliasURI}->{$superURI} || $self->{subOf}->{$superURI};
+        if (not $r and $srinfo) {
+          A: {
+            if ($srinfo->{resource}->{$superURI}) {
+              for my $this_uri (grep {$self->{aliasURI}->{$_}}
+                                keys %{$self->{aliasURI}}) {
+                if ($srinfo->{resource}->{$superURI}->{aliasURI}->{$this_uri}) {
+                  $r = true;
+                  last A;
+                }
+                if ($srinfo->{resource}->{$superURI}->{supOf}->{$this_uri}) {
+                  $r = true;
+                  last A;
+                }
+              }
+            }
+            for my $this_uri (grep {$self->{aliasURI}->{$_}}
+                              keys %{$self->{aliasURI}}) {
+              if ($srinfo->{resource}->{$this_uri}) {
+                if ($srinfo->{resource}->{$this_uri}->{aliasURI}->{$superURI}) {
+                  $r = true;
+                  last A;
+                }
+              }
+            }
+          } # A
+        }
 
   @Method:
     @@Name: addSuperResource
@@ -6449,6 +6516,14 @@ IFClsDef:
       @@@clsActualType: ManakaiDISResourceDefinition
       @@@enDesc:
         A <QUOTE::dis> resource definition object. 
+    @@NamedParam:
+      @@@Name: srinfo
+      @@@Type: DISPerl|HASH||ManakaiDOM|all
+      @@@enDesc:
+        The <CODE::srinfo> hash.
+      @@@nullCase:
+        @@@@enDesc:
+          No <CODE::srinfo>.
     @@Return:
       @@@PerlDef:
         my @from = ($self->{uri},
@@ -6460,8 +6535,10 @@ IFClsDef:
             for my $to (@to) {
               $self->{db}-><M::ManakaiDISDatabase.getResource>
                                       ($from)->{subOf}->{$to} = true;
+              $srinfo->{resource}->{$from}->{subOf}->{$to} = true;
               $self->{db}-><M::ManakaiDISDatabase.getResource>
                                       ($to)->{supOf}->{$from} = true;
+              $srinfo->{resource}->{$to}->{supOf}->{$from} = true;
             }
           }
         }__;
@@ -6487,6 +6564,14 @@ IFClsDef:
       @@@Type: idl|boolean||ManakaiDOM|all
       @@@enDesc:
         Don't throw <X::MERGE_ITSELF_ERR> exception.
+    @@NamedParam:
+      @@@Name: srinfo
+      @@@Type: DISPerl|HASH||ManakaiDOM|all
+      @@@enDesc:
+        The <CODE::srinfo> hash.
+      @@@nullCase:
+        @@@@enDesc:
+          No <CODE::srinfo>.
     @@Return:
       @@@RaiseException:
         @@@@@:MERGE_ITSELF_ERR
@@ -6495,7 +6580,7 @@ IFClsDef:
       @@@PerlDef:
         if (not $noEqualityCheck and $self eq $aliasResource) {
           __EXCEPTION{MERGE_ITSELF_ERR::
-            DIS:uri => {$self->{uri}},
+            DIS:uri => {$self-><AG::DISAnyResource.uri>},
             DIS:sourceNode => {$node},
           }__;
         }
@@ -6522,8 +6607,10 @@ IFClsDef:
             for my $to (@to) {
               $self->{db}-><M::ManakaiDISDatabase.getResource>
                                       ($from)->{subOf}->{$to} = true;
+              $srinfo->{resource}->{$from}->{subOf}->{$to} = true;
               $self->{db}-><M::ManakaiDISDatabase.getResource>
                                       ($to)->{supOf}->{$from} = true;
+              $srinfo->{resource}->{$to}->{supOf}->{$from} = true;
             }
           }
         }__;

@@ -3,8 +3,8 @@ MANAKAI_BIN_DIR = $(MANAKAI_ROOT_DIR)bin/
 MANAKAI_LIB_DIR = $(MANAKAI_ROOT_DIR)lib/
 
 DIS_SUFFIX = .dis
-DAC_SUFFIX = .dae
-DAEM_SUFFIX = .daem
+DAEM_SUFFIX = .dafm
+DAFX_SUFFIX = .dafx
 PM_SUFFIX = .pm
 
 CD = cd
@@ -27,20 +27,12 @@ DIS_OPTIONS =
 DIS_OPTIONS_ALL = $(DIS_OPTIONS) \
       --search-path-catalog-file-name="$(MANAKAI_LIB_DIR)manakai/dis-catalog" \
       --dis-file-suffix="$(DIS_SUFFIX)" \
-      --daem-file-suffix="$(DAEM_SUFFIX)"
+      --daem-file-suffix="$(DAEM_SUFFIX)" \
+      --dafx-file-suffix="$(DAFX_SUFFIX)"
 
-DAC_OPTIONS =
-DAC_PL = $(MANAKAI_BIN_DIR)dac.pl
-DAC = $(PERL_) $(DAC_PL) $(DAC_OPTIONS) $(DIS_OPTIONS_ALL) \
-      --db-base-directory-path="$(MANAKAI_ROOT_DIR)" \
-      --output-file-name=
-
-DAC2PM_OPTIONS3 = --enable-assert
-DAC2PM_OPTIONS = $(DAC2PM_OPTIONS3)
-DAC2PM_PL = $(MANAKAI_BIN_DIR)dac2pm.pl
-DAC2PM = $(PERL_) $(DAC2PM_PL) $(DAC2PM_OPTIONS) $(DIS_OPTIONS_ALL)
-
-UTIL_CORE_DAC_FILE = $(MANAKAI_LIB_DIR)Message/Util/core$(DAC_SUFFIX)
+DAF_OPTIONS =
+DAF_PL = $(MANAKAI_BIN_DIR)daf.pl
+DAF = $(PERL_) $(DAF_PL) $(DAF_OPTIONS) $(DIS_OPTIONS_ALL)
 
 DOM_FEATURE_DIS_FILES = DOMFeature$(DIS_SUFFIX) GenericLS$(DIS_SUFFIX)
 DOM_CORE_DIS_FILES = DOMMain.dis DOMCore.dis DOMXML.dis \
@@ -52,55 +44,28 @@ XP_DIS_FILES       = XMLParser$(DIS_SUFFIX)
 DOM_HTML_DIS_FILES = DOMHTML.dis DOMWebForms.dis
 DIS_FILES = $(DOM_FEATURE_DIS_FILES) $(DOM_CORE_DIS_FILES) \
   $(DOM_LS_DIS_FILES) $(DOM_HTML_DIS_FILES) $(XP_DIS_FILES)
+DOT_CORE_DIS_FILES = \
+  $(DOM_FEATURE_DIS_FILES) \
+  $(DOM_CORE_DIS_FILES)
 
-GENERATED_FILES = \
-  feature$(DAC_SUFFIX) DOMFeature$(PM_SUFFIX) GenericLS$(PM_SUFFIX) \
-  core$(DAC_SUFFIX)  DOMMain$(PM_SUFFIX) \
-                     DOMCore$(PM_SUFFIX) DOMXML$(PM_SUFFIX) \
-                     Tree$(PM_SUFFIX) \
-                     XDoctype$(PM_SUFFIX) \
-  ls$(DAC_SUFFIX)    SimpleLS$(PM_SUFFIX) ManakaiDOMLS2003$(PM_SUFFIX) \
-                     DOMLS$(PM_SUFFIX) \
-  xp$(DAC_SUFFIX)    XMLParser$(PM_SUFFIX) \
-  html$(DAC_SUFFIX)  DOMHTML$(PM_SUFFIX) DOMWebForms$(PM_SUFFIX)
-GENERATED_DAC_FILES = feature$(DAC_SUFFIX) \
-  core$(DAC_SUFFIX) ls$(DAC_SUFFIX) html$(DAC_SUFFIX) xp$(DAC_SUFFIX)
+PM_FILES = \
+  DOMFeature$(PM_SUFFIX) GenericLS$(PM_SUFFIX) \
+  DOMMain$(PM_SUFFIX) DOMCore$(PM_SUFFIX) Tree$(PM_SUFFIX) \
+  DOMXML$(PM_SUFFIX) XDoctype$(PM_SUFFIX) \
+  DOMLS$(PM_SUFFIX) XMLParser$(PM_SUFFIX) \
+  SimpleLS$(PM_SUFFIX) ManakaiDOMLS2003$(PM_SUFFIX) \
+  DOMHTML$(PM_SUFFIX) DOMWebForms$(PM_SUFFIX)
 
-all: .core$(PM_SUFFIX) .html$(PM_SUFFIX) \
-  $(GENERATED_DAC_FILES) \
-  XMLParser$(PM_SUFFIX)
+GENERATED_FILES = $(PM_FILES)
 
-feature$(DAC_SUFFIX): $(UTIL_CORE_DAC_FILE) $(DOM_FEATURE_DIS_FILES) $(DAC_PL)
-	$(DAC)$@ --input-db-file-name="$<" GenericLS.dis
+all: .core$(PM_SUFFIX) $(PM_FILES)
 
-core$(DAC_SUFFIX): feature$(DAC_SUFFIX) $(DOM_CORE_DIS_FILES) $(DAC_PL)
-	$(DAC)$@ --input-db-file-name="$<" XDoctype.dis
-
-ls$(DAC_SUFFIX): core$(DAC_SUFFIX) $(DOM_LS_DIS_FILES) $(DAC_PL)
-	$(DAC)$@.tmp.1 --input-db-file-name="$<" SimpleLS.dis
-	$(DAC)$@.tmp.2 --input-db-file-name="$@.tmp.1" ManakaiDOMLS2003.dis
-	$(DAC)$@ --input-db-file-name="$@.tmp.2" DOMLS.dis
-	$(RM) $@.tmp.1 $@.tmp.2
-
-xp$(DAC_SUFFIX): ls$(DAC_SUFFIX) $(XP_DIS_FILES) $(DAC_PL)
-	$(DAC)$@ --input-db-file-name="$<" XMLParser.dis
-
-html$(DAC_SUFFIX): core$(DAC_SUFFIX) $(DOM_HTML_DIS_FILES) $(DAC_PL)
-	$(DAC)$@ --input-db-file-name="$<" DOMHTML.dis
-
-$(DOM_FEATURE_DIS_FILES:$(DIS_SUFFIX)=$(PM_SUFFIX)): \
-  feature$(DAC_SUFFIX) $(DAC2PM_PL)
-	$(DAC2PM) $< --module-uri="$(NS_MDOM)$(@:$(PM_SUFFIX)=)" \
-	  --output-file-path="$@"
+$(PM_FILES): %$(PM_SUFFIX): %$(DIS_SUFFIX) $(DAF_PL)
+	$(DAF) --create-perl-module="$(NS_MDOM)$* $@"
 	$(PERL_CHK) $@
 
-$(DOM_CORE_DIS_FILES:.dis=$(PM_SUFFIX)): core$(DAC_SUFFIX) $(DAC2PM_PL)
-	$(DAC2PM) $< --module-uri="$(NS_MDOM)$(@:$(PM_SUFFIX)=)" \
-	  --output-file-path="$@"
-	$(PERL_CHK) $@
-
-.core$(PM_SUFFIX): core$(DAC_SUFFIX) $(DAC2PM_PL)
-	$(DAC2PM) $< \
+.core$(PM_SUFFIX): $(DOT_CORE_DIS_FILES) $(DAF_PL)
+	$(DAF) \
 	  --create-perl-module="$(NS_MDOM)DOMFeature DOMFeature$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_MDOM)GenericLS  GenericLS$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_MDOM)DOMMain    DOMMain$(PM_SUFFIX)" \
@@ -118,34 +83,10 @@ $(DOM_CORE_DIS_FILES:.dis=$(PM_SUFFIX)): core$(DAC_SUFFIX) $(DAC2PM_PL)
 	$(TOUCH) $@
   ## NOTE: When you modify this rule, update |../Util/Makefile|, too.
 
-$(DOM_LS_DIS_FILES:$(DIS_SUFFIX)=$(PM_SUFFIX)): ls$(DAC_SUFFIX) $(DAC2PM_PL)
-	$(DAC2PM) $< --module-uri="$(NS_MDOM)$(@:$(PM_SUFFIX)=)" \
-	  --output-file-path="$@"
-	$(PERL_CHK) $@
-
-$(XP_DIS_FILES:$(DIS_SUFFIX)=$(PM_SUFFIX)): xp$(DAC_SUFFIX) $(DAC2PM_PL)
-	$(DAC2PM) $< --module-uri="$(NS_MDOM)$(@:$(PM_SUFFIX)=)" \
-	  --output-file-path="$@"
-	$(PERL_CHK) $@
-
-$(DOM_HTML_DIS_FILES:.dis=$(PM_SUFFIX)): html$(DAC_SUFFIX) $(DAC2PM_PL)
-	$(DAC2PM) $< --module-uri="$(NS_MDOM)$(@:$(PM_SUFFIX)=)" > $@
-	$(PERL_CHK) $@
-
-feature-spec$(DAC_SUFFIX): feature$(DAC_SUFFIX) DOMFeature.dis $(DAC_PL)
-	$(DAC)$@ --input-db-file-name="$<" DOMFeature.dis \
-	  --for="$(NS_MANAKAIDOM)ForSpecLatest"
-
-# $(UTIL_CORE_DAC_FILE)
-$(MANAKAI_LIB_DIR)Message/Util/core$(DAC_SUFFIX): dummy
-	$(CD) $(MANAKAI_LIB_DIR)Message/Util/ && $(MAKE) core$(DAC_SUFFIX)
-
-dummy:
-
 clean:
 	$(RM) $(GENERATED_FILES)
 	$(RM) .*.tmp *~ .*~ *.BAK .*.BAK
 	$(RM) .core$(PM_SUFFIX)
 
-## $Date: 2006/01/29 13:58:54 $
+## $Date: 2006/02/26 06:42:56 $
 ## License: Public Domain.

@@ -3,8 +3,8 @@ MANAKAI_BIN_DIR = $(MANAKAI_ROOT_DIR)bin/
 MANAKAI_LIB_DIR = $(MANAKAI_ROOT_DIR)lib/
 
 DIS_SUFFIX = .dis
-DAC_SUFFIX = .dae
-DAEM_SUFFIX = .daem
+DAEM_SUFFIX = .dafm
+DAFX_SUFFIX = .dafx
 PM_SUFFIX = .pm
 
 CD = cd
@@ -25,41 +25,27 @@ DIS_OPTIONS =
 DIS_OPTIONS_ALL = $(DIS_OPTIONS) \
       --search-path-catalog-file-name="$(MANAKAI_LIB_DIR)manakai/dis-catalog" \
       --dis-file-suffix="$(DIS_SUFFIX)" \
-      --daem-file-suffix="$(DAEM_SUFFIX)"
+      --daem-file-suffix="$(DAEM_SUFFIX)" \
+      --dafx-file-suffix="$(DAFX_SUFFIX)"
 
-DAC_OPTIONS =
-DAC_PL = $(MANAKAI_BIN_DIR)dac.pl
-DAC = $(PERL_) $(DAC_PL) $(DAC_OPTIONS) $(DIS_OPTIONS_ALL) \
-      --db-base-directory-path="$(MANAKAI_ROOT_DIR)" \
-      --output-file-name=
-
-DAC2PM_OPTIONS3 = --enable-assert
-DAC2PM_OPTIONS = $(DAC2PM_OPTIONS3)
-DAC2PM_PL = $(MANAKAI_BIN_DIR)dac2pm.pl
-DAC2PM = $(PERL_) $(DAC2PM_PL) $(DAC2PM_OPTIONS) $(DIS_OPTIONS_ALL)
-
-DOM_CORE_DAC_FILE = $(MANAKAI_LIB_DIR)Message/DOM/core$(DAC_SUFFIX)
+DAF_OPTIONS =
+DAF_PL = $(MANAKAI_BIN_DIR)daf.pl
+DAF = $(PERL_) $(DAF_PL) $(DAF_OPTIONS) $(DIS_OPTIONS_ALL)
 
 DIS_FILES = SuikaWikiConfig21.dis
 
-GENERATED_FILES = all$(DAC_SUFFIX) SuikaWikiConfig21$(PM_SUFFIX)
+PM_FILES = SuikaWikiConfig21$(PM_SUFFIX)
+
+GENERATED_FILES = $(PM_FILES)
 
 all: $(GENERATED_FILES)
 
-all$(DAC_SUFFIX): $(DOM_CORE_DAC_FILE) $(DIS_FILES) $(DAC_PL)
-	$(DAC)$@ --input-db-file-name="$<" SuikaWikiConfig21.dis
-
-SuikaWikiConfig21$(PM_SUFFIX): all$(DAC_SUFFIX) $(DAC2PM_PL)
-	$(DAC2PM) $< \
-	  --module-uri="$(NS_MARKUP)SuikaWikiConfig21" \
-	  --output-file-path="$@"
+$(PM_FILES): %$(PM_SUFFIX): %$(DIS_SUFFIX) $(DAF_PL)
+	$(DAF) --create-perl-module="$(NS_MARKUP)$* $@"
 	$(PERL_CHK) $@
-
-# $(DOM_CORE_DAC_FILE)
-$(MANAKAI_LIB_DIR)Message/DOM/core$(DAC_SUFFIX): dummy
-	$(CD) $(MANAKAI_LIB_DIR)Message/DOM/ && $(MAKE) core$(DAC_SUFFIX)
-
-dummy:
 
 clean:
 	$(RM) $(GENERATED_FILES) .*.tmp *~ .*~
+
+## $Date: 2006/02/26 06:42:56 $
+## License: Public Domain.

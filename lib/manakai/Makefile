@@ -3,8 +3,8 @@ MANAKAI_BIN_DIR = $(MANAKAI_ROOT_DIR)bin/
 MANAKAI_LIB_DIR = $(MANAKAI_ROOT_DIR)lib/
 
 DIS_SUFFIX = .dis
-DAC_SUFFIX = .dae
-DAEM_SUFFIX = .daem
+DAEM_SUFFIX = .dafm
+DAFX_SUFFIX = .dafx
 
 CD = cd
 MAKE = make
@@ -20,42 +20,16 @@ PERL_CHK = $(PERLC) $(PERLC_OPTIONS_ALL)
 
 NS_DIS = http://suika.fam.cx/~wakaba/archive/2004/dis/
 
-DIS_OPTIONS = 
-DIS_OPTIONS_ALL = $(DIS_OPTIONS) \
-      --search-path-catalog-file-name="$(MANAKAI_LIB_DIR)manakai/dis-catalog" \
-      --dis-file-suffix="$(DIS_SUFFIX)" \
-      --daem-file-suffix="$(DAEM_SUFFIX)"
-
-DAC_PL = $(MANAKAI_BIN_DIR)dac.pl
-DAC = $(PERL_) $(DAC_PL) $(DIS_OPTIONS_ALL) \
-      --db-base-directory-path="$(MANAKAI_ROOT_DIR)" \
-      --output-file-name=
-
-DAC2PM_OPTIONS2 = --enable-assert
-DAC2PM_OPTIONS = $(DAC2PM_OPTIONS2)
-DAC2PM_PL = $(MANAKAI_BIN_DIR)dac2pm.pl
-DAC2PM = $(PERL_) $(DAC2PM_PL) $(DAC2PM_OPTIONS) $(DIS_OPTIONS_ALL)
-
-CORE_DAC_FILE = $(MANAKAI_LIB_DIR)manakai/all$(DAC_SUFFIX)
-
 DIS_FILES = DISCore.dis DISLang.dis DISRDF.dis DISIDL.dis \
   DISPerl.dis XML.dis DISMarkup.dis NaturalLanguage.dis Document.dis \
   DISSource.dis Java.dis Test.dis
 
-GENERATED_FILES = all$(DAC_SUFFIX)
+GENERATED_FILES = 
 
 all: $(GENERATED_FILES)
-
-all$(DAC_SUFFIX): $(DIS_FILES) $(DAC_PL)
-	$(DAC).$@.1.tmp DISPerl.dis
-	$(DAC).$@.2.tmp --input-db-file-name=".$@.1.tmp" DISMarkup.dis
-	$(DAC).$@.3.tmp --input-db-file-name=".$@.2.tmp" DISIDL.dis
-	$(DAC).$@.4.tmp --input-db-file-name=".$@.3.tmp" Test.dis
-	$(DAC)$@ --input-db-file-name=".$@.4.tmp" NaturalLanguage.dis
-	$(RM) .$@.1.tmp .$@.2.tmp .$@.3.tmp .$@.4.tmp
 
 clean:
 	$(RM) $(GENERATED_FILES) .*.tmp *~ .*~
 
-## $Date: 2005/12/20 12:16:52 $
+## $Date: 2006/02/26 06:42:58 $
 ## License: Public Domain.

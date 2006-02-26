@@ -1,5 +1,15 @@
 2006-02-26  Wakaba  <wakaba@suika.fam.cx>
 
+	* Perl.dis (addHashKey): Revised to register keys to
+	each key scope resource rather than database.
+
+	* DNLite.dis (elementTypeMatch): The |srinfo| parameter is added.
+
+	* DISDump.dis (Require): Missing reference to the |DISlib:DISMarkup|
+	module is added.
+
+2006-02-26  Wakaba  <wakaba@suika.fam.cx>
+
 	* Perl.dis (plLoadDISDatabaseModule): Do nothing if the
 	module is already loaded.
 	(plUpdateModule): Parameter |moduleURI| is changed

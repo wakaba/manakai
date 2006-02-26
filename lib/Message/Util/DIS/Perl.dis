@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/02/25 16:49:57 $
+      $Date: 2006/02/26 06:42:57 $
     @@ContentType:
       dis:Date.RCS
   
@@ -1496,23 +1496,22 @@ IFClsDef:
         __DEEP{
           my $ks = $self-><M::DIS|DISDatabase.getResource> ($keyScope);
           $ks-><AS::DIS|DISAnyResource.isReferred> ($keyName);
-          for my $ks_uri (keys %{$ks->{aliasURI}}, keys %{$ks->{subOf}}) {
-            if (defined $self->{<H::dp|plHashKey>}->{$ks_uri} and
-                defined $self->{<H::dp|plHashKey>}->{$ks_uri}->{$keyName}) {
+          for my $ks_uri (@{$ks-><M::anyres.getSuperResourceURIList>}) {
+            my $ks_r = $self-><M::disdb.getResource> ($ks_uri);
+            if ($ks_r->{<H::dp|plHashKey>}->{$keyName}) {
               __UNDEEP{__EXCEPTION{DIS|PERL_HASH_KEY_ALREADY_DEFINED_ERR::
                 DIS:uri => {$disResource-><AG::DIS|DISAnyResource.uri>},
-                DIS:anotherURI => {$self->{<H::dp|plHashKey>}
-                                        ->{$ks_uri}->{$keyName}},
+                DIS:anotherURI => {${$ks_r->{<H::dp|plHashKey>}->{$keyName}}},
                 DIS:hashKeyScope => {$ks_uri},
                 DIS:hashKeyName => {$keyName},
               }__}__;
             }
           }
+          $ks->{<H::dp|plHashKey>}->{$keyName} =
           $disResource-><AG::anyres.ownerModule>
                       ->{<H::dp|plHashKey>}
-                      ->{$keyScope}->{$keyName} =
-          $self->{<H::dp|plHashKey>}->{$keyScope}->{$keyName}
-            = $disResource-><AG::DIS|DISAnyResource.uri>;
+                      ->{$keyScope}->{$keyName}
+            = $disResource-><AG::anyres.uriRef>;
         }__;
 
   @Method:
