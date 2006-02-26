@@ -121,6 +121,7 @@ use Message::DOM::GenericLS;
 
 my $limpl = $Message::DOM::ImplementationRegistry->get_implementation
                            ({ExpandedURI q<fe:Min> => '3.0',
+                             ExpandedURI q<fe:GenericLS> => '3.0',
                              '+' . ExpandedURI q<DIS:DNLite> => '1.0',
                              '+' . ExpandedURI q<DIS:Core> => '1.0',
                              '+' . ExpandedURI q<Util:PerlCode> => '1.0',
@@ -309,6 +310,9 @@ for (@{$Opt{create_module}}) {
     status_msg_ qq<Generating Perl test from <$mod_uri> for <$mod_for>...>;
     my $pl = daf_generate_perl_test_file ($mod);
     status_msg qq<done>;
+
+    my $cfg = $pl->owner_document->dom_config;
+    $cfg->set_parameter (ExpandedURI q<pc:preserve-line-break> => 1);
 
     my $output;
     defined $out_file_path
@@ -636,7 +640,7 @@ sub daf_generate_perl_test_file ($) {
         my $block = $pack->append_new_pc_block;
         my @test;
         
-        $tdt_parser ||= $impl->create_gls_parser
+        $tdt_parser ||= $limpl->create_gls_parser
                                  ({
                                    ExpandedURI q<DIS:TDT> => '1.0',
                                   });

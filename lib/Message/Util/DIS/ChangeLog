@@ -1,5 +1,20 @@
 2006-02-26  Wakaba  <wakaba@suika.fam.cx>
 
+	* Perl.dis (plUpdate): Reads |dis:DefaultFor| property
+	from the source if it is not available from the module
+	in the database, i.e. the |readProperties| method
+	is not performed for the module.
+	(getPerlInterfaceMemberCode): Renamed
+	from |getPerlErrorInterfaceMemberCode|.
+	(DISLang:Const.getPerlInterfaceMemberCode): New
+	method implementation.  Constants defined in interfaces
+	were not reflected to the generated Perl module code
+	since the split of |plGeneratePerlModule| method.
+
+	* DPG.dis (Require): Reference to |DIS:Perl| module was missing.
+
+2006-02-26  Wakaba  <wakaba@suika.fam.cx>
+
 	* Perl.dis (addHashKey): Revised to register keys to
 	each key scope resource rather than database.
 

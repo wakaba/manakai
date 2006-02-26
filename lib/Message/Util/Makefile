@@ -11,6 +11,7 @@ PM_SUFFIX = .pm
 CD = cd
 MAKE = make
 RM = rm
+RMALL = $(RM) -fv
 PERL = perl
 PERL_OPTIONS =
 PERL_OPTIONS_ALL = $(PERL_OPTIONS) -I$(MANAKAI_LIB_DIR)
@@ -109,15 +110,17 @@ $(NS_UTIL_DIS_PM_FILES): %$(PM_SUFFIX): %$(DIS_SUFFIX) $(DAF_PL)
 	  --create-perl-module="$(NS_UTIL)DIS        DIS$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_UTIL_DIS)Value  DIS/Value$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_UTIL_DIS)Perl   DIS/Perl$(PM_SUFFIX)" \
+	  --create-perl-module="$(NS_UTIL_DIS)DPG    DIS/DPG$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_UTIL_DIS)DNLite DIS/DNLite$(PM_SUFFIX)"
 	$(PERL_CHK) ../Markup/SuikaWikiConfig21$(PM_SUFFIX)
 	$(PERL_CHK) DIS$(PM_SUFFIX)
 	$(PERL_CHK) DIS/Value$(PM_SUFFIX)
 	$(PERL_CHK) DIS/Perl$(PM_SUFFIX)
+	$(PERL_CHK) DIS/DPG$(PM_SUFFIX)
 	$(PERL_CHK) DIS/DNLite$(PM_SUFFIX)
+	$(TOUCH) .discore$(PM_SUFFIX)
 	$(DAF) \
 	  --create-perl-module="$(NS_UTIL)PerlCode   PerlCode$(PM_SUFFIX)" \
-	  --create-perl-module="$(NS_UTIL_DIS)DPG    DIS/DPG$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_MDOM)DOMFeature ../DOM/DOMFeature$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_MDOM)GenericLS  ../DOM/GenericLS$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_MDOM)DOMMain    ../DOM/DOMMain$(PM_SUFFIX)" \
@@ -126,7 +129,6 @@ $(NS_UTIL_DIS_PM_FILES): %$(PM_SUFFIX): %$(DIS_SUFFIX) $(DAF_PL)
 	  --create-perl-module="$(NS_MDOM)DOMXML     ../DOM/DOMXML$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_MDOM)XDoctype   ../DOM/XDoctype$(PM_SUFFIX)"
 	$(PERL_CHK) PerlCode$(PM_SUFFIX)
-	$(PERL_CHK) DIS/DPG$(PM_SUFFIX)
 	$(PERL_CHK) ../DOM/DOMFeature$(PM_SUFFIX)
 	$(PERL_CHK) ../DOM/GenericLS$(PM_SUFFIX)
 	$(PERL_CHK) ../DOM/DOMMain$(PM_SUFFIX)
@@ -135,12 +137,20 @@ $(NS_UTIL_DIS_PM_FILES): %$(PM_SUFFIX): %$(DIS_SUFFIX) $(DAF_PL)
 	$(PERL_CHK) ../DOM/DOMXML$(PM_SUFFIX)
 	$(PERL_CHK) ../DOM/XDoctype$(PM_SUFFIX)
 	$(TOUCH) $@
-	$(TOUCH) .discore$(PM_SUFFIX)
 	$(TOUCH) ../DOM/.core$(PM_SUFFIX)
 
 clean:
-	$(RM) $(GENERATED_FILES)
-	$(RM) .*.tmp .discore$(PM_SUFFIX) .discore-all$(PM_SUFFIX)
+	$(RMALL) $(GENERATED_FILES)
+	$(RMALL) .*.tmp *~ .*~ .discore$(PM_SUFFIX) .discore-all$(PM_SUFFIX)
+	$(RMALL) Error/*~ Error/.*~
+	$(RMALL) Formatter/*~ Formatter/.*~
+	$(RMALL) DIS/*~ DIS/.*~
 
-## $Date: 2006/02/26 06:42:57 $
+distclean: clean
+	$(RMALL) *$(DAEM_SUFFIX) *$(DAFX_SUFFIX)
+	$(RMALL) Error/*$(DAEM_SUFFIX) Error/*$(DAFX_SUFFIX)
+	$(RMALL) Formatter/*$(DAEM_SUFFIX) Formatter/*$(DAFX_SUFFIX)
+	$(RMALL) DIS/*$(DAEM_SUFFIX) DIS/*$(DAFX_SUFFIX)
+
+## $Date: 2006/02/26 14:32:43 $
 ## License: Public Domain.

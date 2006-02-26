@@ -10,6 +10,7 @@ PM_SUFFIX = .pm
 CD = cd
 MAKE = make
 RM = rm
+RMALL = $(RM) -fv
 PERL = perl
 PERL_OPTIONS = 
 PERL_OPTIONS_ALL = $(PERL_OPTIONS) -I$(MANAKAI_LIB_DIR)
@@ -45,7 +46,10 @@ $(PM_FILES): %$(PM_SUFFIX): %$(DIS_SUFFIX) $(DAF_PL)
 	$(PERL_CHK) $@
 
 clean:
-	$(RM) $(GENERATED_FILES) .*.tmp *~ .*~
+	$(RMALL) $(GENERATED_FILES) .*.tmp *~ .*~
 
-## $Date: 2006/02/26 06:42:56 $
+distclean: clean
+	$(RMALL) *$(DAEM_SUFFIX) *$(DAFX_SUFFIX)
+
+## $Date: 2006/02/26 14:32:40 $
 ## License: Public Domain.

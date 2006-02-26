@@ -1,5 +1,15 @@
 2006-02-26  Wakaba  <wakaba@suika.fam.cx>
 
+	* PerlCode.dis (PerlStringLiteral.stringify): If some character
+	are escaped, the string should have been quoted by |QUOTATION MARK|.
+
+	* Makefile (.discore-all.pm): The parameter for |DIS/DPG.dis|
+	module was misplaced.
+	(distclean): New rule.
+	(clean): Cleans subdirectories, too.
+
+2006-02-26  Wakaba  <wakaba@suika.fam.cx>
+
 	* ManakaiNodeTest.dis (Require): Missing reference
 	to the |DISlib:Test| module is added.
 

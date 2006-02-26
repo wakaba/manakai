@@ -1,6 +1,7 @@
 CD = cd
 MAKE = make
-RMV = rm -fv
+RM = rm
+RMALL = $(RM) -fv
 
 PM_SUFFIX = .pm
 
@@ -10,7 +11,7 @@ all:
 	$(CD) DOM && $(MAKE) all
 
 clean:
-	$(RMV) *.BAK .*.BAK *~ .*~
+	$(RMALL) *.BAK .*.BAK *~ .*~
 	$(CD) Body && $(MAKE) clean
 	$(CD) Field && $(MAKE) clean
 	$(CD) MIME && $(MAKE) clean
@@ -18,5 +19,14 @@ clean:
 	$(CD) Markup && $(MAKE) clean
 	$(CD) DOM && $(MAKE) clean
 
-## $Date: 2005/09/24 11:57:19 $
+distclean:
+	$(RMALL) *.BAK .*.BAK *~ .*~
+	$(CD) Body && $(MAKE) distclean
+	$(CD) Field && $(MAKE) distclean
+	$(CD) MIME && $(MAKE) distclean
+	$(CD) Util && $(MAKE) distclean
+	$(CD) Markup && $(MAKE) distclean
+	$(CD) DOM && $(MAKE) distclean
+
+## $Date: 2006/02/26 14:32:38 $
 ## License: Public Domain.

@@ -29,7 +29,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2006/01/29 13:58:54 $
+      $Date: 2006/02/26 14:32:39 $
     @@ContentType:
       dis:Date.RCS
 
@@ -361,8 +361,8 @@ ResourceDef:
          $r->flag (<H::ManakaiDOM:implID> => $self->{<H::mn:node>}
                                                  ->{<H::ManakaiDOM:implID>});
 
-         $r->flag (<H::DOMCore:domConfig> => $self->{<H::mn:node>}
-                                                 ->{<H::DOMCore:domConfig>});
+         $r->flag (<Q::DOMCore:domConfig> => $self->{<H::mn:node>}
+                                                 ->{<Q::DOMCore:domConfig>});
     
     @@Test:
       @@@enDesc:
@@ -472,7 +472,7 @@ ResourceDef:
         @@@Type:  
           DOMCore:DOMConfiguration
         @@@PerlDef:
-            $r = $self->flag (<H::DOMCore:domConfig>);
+            $r = $self->flag (<Q::DOMCore:domConfig>);
   @Method:
      @@Name:  parse
      @@Description:
@@ -555,7 +555,7 @@ ResourceDef:
                       = $src->get_attribute_value ('version', default => '1.0');
                  $node->{<H::DOMCore:xmlEncoding>}
                       = $src->get_attribute_value ('encoding');
-                 $node->{<H::infoset:xmlStandalone>}
+                 $node->{<H::infoset:standalone>}
                       = $src->get_attribute_value ('standalone');
                } elsif ({
                           '#pi' => 1, '#comment' => 1,
@@ -710,7 +710,7 @@ ResourceDef:
                }
              } elsif ($src->node_type eq '#text') {
                my $lc = $parent->{<H::infoset:children>}->[-1];
-               if ($lc and $lc->{<H::DOMCore:nodeType>} eq <H::DOMCore:Text>) {
+               if ($lc and $lc->{<H::DOMCore:nodeType>} eq <H::DOMCore:TextNode>) {
                  $lc->{<H::infoset:content>} .= $src->{value};
                } elsif (defined $src->{value} and length $src->{value}) {
                  my $text = <ClassM::t:ManakaiDOMText.newObject>;
@@ -744,7 +744,7 @@ ResourceDef:
                    $val = chr $src->{value};
                  }
                  my $lc = $parent->{<H::infoset:children>}->[-1];
-                 if ($lc and $lc->{<H::DOMCore:nodeType>} eq <H::DOMCore:Text>) {
+                 if ($lc and $lc->{<H::DOMCore:nodeType>} eq <H::DOMCore:TextNode>) {
                    $lc->{<H::infoset:content>} .= $val;
                  } else {
                    my $text = <ClassM::t:ManakaiDOMText.newObject>;
@@ -783,7 +783,7 @@ ResourceDef:
                $text->{<H::DOMCore:ownerDocument>}
                    = $parent->{<H::DOMCore:ownerDocument>} || $parent;
                $text->{<H::infoset:target>} = $src->{local_name};
-               $text->{<H::infoset:data>} = $src->inner_text;
+               $text->{<H::infoset:content>} = $src->inner_text;
                $text->{<H::infoset:parent>} = $parent;
                push @{$parent->{<H::infoset:children>}}, $text;
              } elsif ($src->node_type eq '#section') {

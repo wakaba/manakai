@@ -25,7 +25,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2006/02/25 16:49:56 $
+      $Date: 2006/02/26 14:32:43 $
     @@ContentType:
       dis:Date.RCS
   
@@ -2229,8 +2229,10 @@ IFClsETDef:
           __DEEP{
             $r = $self-><AG::Node.textContent>;
             $r =~ s/(['\\])/\\$1/g;
-            $r =~ s/([^\x0A\x0D\x20-\x7E])/sprintf '\x{%X}', ord $1/ge;
-            if ($self-><AG::Node.ownerDocument>
+            my $escaped = ($r =~ s{([^\x0A\x0D\x20-\x7E])}
+                                  {sprintf '\x{%X}', ord $1}ge);
+            if ($escaped or
+                $self-><AG::Node.ownerDocument>
                      -><AG::Document.domConfig>
                      -><M::DOMCore:DOMConfiguration.getParameter>
                           (<Q::pc:preserve-line-break>)) {

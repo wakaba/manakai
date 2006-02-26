@@ -10,6 +10,7 @@ PM_SUFFIX = .pm
 CD = cd
 MAKE = make
 RM = rm
+RMALL = $(RM) -fv
 PERL = perl
 PERL_OPTIONS =
 PERL_OPTIONS_ALL = $(PERL_OPTIONS) -I$(MANAKAI_LIB_DIR)
@@ -84,9 +85,12 @@ $(PM_FILES): %$(PM_SUFFIX): %$(DIS_SUFFIX) $(DAF_PL)
   ## NOTE: When you modify this rule, update |../Util/Makefile|, too.
 
 clean:
-	$(RM) $(GENERATED_FILES)
-	$(RM) .*.tmp *~ .*~ *.BAK .*.BAK
-	$(RM) .core$(PM_SUFFIX)
+	$(RMALL) $(GENERATED_FILES)
+	$(RMALL) .*.tmp *~ .*~ *.BAK .*.BAK
+	$(RMALL) .core$(PM_SUFFIX)
 
-## $Date: 2006/02/26 06:42:56 $
+distclean: clean
+	$(RMALL) *$(DAEM_SUFFIX) *$(DAFX_SUFFIX)
+
+## $Date: 2006/02/26 14:32:39 $
 ## License: Public Domain.

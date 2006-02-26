@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/02/26 06:42:57 $
+      $Date: 2006/02/26 14:32:44 $
     @@ContentType:
       dis:Date.RCS
   
@@ -1771,7 +1771,8 @@ IFClsDef:
             my $tfuri;
             unless (defined $mod_for) {
               $mod_for = <Q::ManakaiDOM|all>;
-              if (defined $db->{modDef}->{$mod_name}) {
+              if (defined $db->{modDef}->{$mod_name} and
+                  defined $db->{modDef}->{$mod_name}->{<Q::dis|DefaultFor>}) {
                 $mod_for = $db-><M::disdb.getModule> ($mod_name)
                               -><M::DIS|DISResourceProp.getPropertyText>
                                   (<Q::dis|DefaultFor>, <Q::ManakaiDOM|all>);
@@ -2906,10 +2907,10 @@ IFClsDef:
         } 
 
   @Method:
-    @@Name: getPerlErrorInterfaceMemberCode
+    @@Name: getPerlInterfaceMemberCode
     @@enDesc:
       Generates a Perl code for the resource, for the use
-      within Perl error interface.
+      within Perl interface.
     @@Param:
       @@@Name: factory
       @@@Type: PCDocument
@@ -2926,7 +2927,7 @@ IFClsDef:
         my $method;
         __CODE{DIS|getMethodForType::
           $resource => $self,
-          $method_name => 'get_perl_error_interface_member_code',
+          $method_name => 'get_perl_interface_member_code',
           $method => $method,
         }__;
         if ($method) {
@@ -5348,6 +5349,19 @@ TMethods:
         }__;
 
   @TMethod:
+    @@Name: getPerlInterfaceMemberCode
+    @@DIS:targetType: DISLang|Const
+    @@Param:
+      @@@Name: factory
+      @@@Type: PCDocument
+    @@Return:
+      @@@Type: Node
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><AG::DISResourcePerl.plCodeFragment>;
+        }__;
+
+  @TMethod:
     @@Name: getPerlClassMemberCode
     @@DIS:targetType: DISLang|Const
     @@Param:
@@ -5381,7 +5395,7 @@ TMethods:
 
 TMethods:
   @TMethod:
-    @@Name: getPerlErrorInterfaceMemberCode
+    @@Name: getPerlInterfaceMemberCode
     @@DIS:targetType: dx|ErrorCode
     @@Param:
       @@@Name: factory
@@ -5417,7 +5431,7 @@ TMethods:
           for (@{$self-><M::DIS|DISResource.getChildResourceListByType>
                           (<Q::dx|ErrorSubCode>)}) {
             $r-><M::Node.appendChild>
-                  ($_-><M::DISResourcePerl.getPerlErrorInterfaceMemberCode>
+                  ($_-><M::DISResourcePerl.getPerlInterfaceMemberCode>
                          ($factory));
           }
         }__;
@@ -5425,7 +5439,7 @@ TMethods:
 
 TMethods:
   @TMethod:
-    @@Name: getPerlErrorInterfaceMemberCode
+    @@Name: getPerlInterfaceMemberCode
     @@DIS:targetType: dx|ErrorSubCode
     @@Param:
       @@@Name: factory
@@ -5515,7 +5529,7 @@ TMethods:
             if ($gcr-><M::DIS|DISAnyResource.isTypeURI> (<Q::DISLang|Const>)) {
               if ($gcr-><M::anyres.isTypeURI> (<Q::dx|ErrorCode>)) {
                 $r-><M::Node.appendChild>
-                      ($_-><M::DISResourcePerl.getPerlErrorInterfaceMemberCode>
+                      ($_-><M::DISResourcePerl.getPerlInterfaceMemberCode>
                              ($factory));
               } else {
                 my $sub = $gcr-><AG::DISResourcePerl.plCodeFragment>;
@@ -5527,7 +5541,7 @@ TMethods:
         }__;
 
   @TMethod:
-    @@Name: getPerlErrorInterfaceMemberCode
+    @@Name: getPerlInterfaceMemberCode
     @@DIS:targetType: DISLang|ConstGroup
     @@Param:
       @@@Name: factory
@@ -5540,10 +5554,14 @@ TMethods:
 
           ## Error code definitions
           for (@{$self-><M::DIS|DISResource.getChildResourceListByType>
-                          (<Q::dx|ErrorCode>)}) {
-            $r-><M::Node.appendChild>
-                  ($_-><M::DISResourcePerl.getPerlErrorInterfaceMemberCode>
-                         ($factory));
+                          (<Q::DISLang|Const>)}) {
+            my $mcode = $_-><M::DISResourcePerl.getPerlInterfaceMemberCode>
+                              ($factory);
+            if ($mcode) {
+              $r-><AG::Node.ownerDocument>
+                -><M::Document.adoptNode> ($mcode);
+              $r-><M::Node.appendChild> ($mcode);
+            }
           }
         }__;
 ##DISLang:ConstGroup
@@ -5708,6 +5726,7 @@ TMethods:
             my $dpgparser;
             for my $val (@{$self-><M::DIS|DISResourceProp.getPropertyValueList>
                              (<Q::DISPerl:dpgDef>)}) {
+              require Message::Util::DIS::DPG;
               $dpgparser ||= $plimpl-><M::f|GetFeature
                                          ||ManakaiDOM|ManakaiDOMLatest
                                          .getFeature>
@@ -6246,7 +6265,7 @@ TMethods:
           ## - Interface members
           my @cr = @{$self-><M::DIS|DISResource.getChildResourceList>};
           for my $cr (@cr) {
-            my $mcode = $cr-><M::DISResourcePerl.getPerlErrorInterfaceMemberCode>
+            my $mcode = $cr-><M::DISResourcePerl.getPerlInterfaceMemberCode>
                               ($r-><AG::Node.ownerDocument>);
             if ($mcode) {
               $r-><AG::Node.ownerDocument>

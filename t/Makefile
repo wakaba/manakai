@@ -92,7 +92,7 @@ dom1core:
 test-module-all: test-module-dom test-module-util
 
 test-module-dom: $(NS_MDOM_PT_FILES)
-	$(PERL_TEST_) dom-*.t
+	$(PERL_TEST_) dom-*$(PT_SUFFIX)
 
 $(NS_MDOM_PT_FILES): dom-%$(PT_SUFFIX): \
   $(MANAKAI_LIB_DIR)Message/DOM/%$(DIS_SUFFIX) $(DAF_PL)
@@ -106,7 +106,7 @@ $(NS_MDOM_PT_FILES): dom-%$(PT_SUFFIX): \
 	$(PERL_CHK) $@
 
 test-module-util: $(NS_UTIL_PT_FILES) $(NS_UTIL_DIS_PT_FILES)
-	$(PERL_TEST_) util-*.t
+	$(PERL_TEST_) util-*$(PT_SUFFIX)
 
 $(NS_UTIL_PT_FILES): util-%$(PT_SUFFIX): \
   $(MANAKAI_LIB_DIR)Message/Util/%$(DIS_SUFFIX) $(DAF_PL)
@@ -138,5 +138,7 @@ clean: clean-dom1core-perl
 clean-dom1core-perl:
 	$(RMALL) $(DOMTEST_PERL_DIR)level1/core/*
 	$(RMALL) *~ .*~ *.BAK .*.BAK
+
+distclean: clean
 
 always:

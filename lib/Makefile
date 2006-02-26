@@ -4,6 +4,7 @@ MANAKAI_BIN_DIR  = $(MANAKAI_ROOT_DIR)bin/
 
 MKDIR = mkdir
 RM = rm
+RMALL = $(RM) -fv
 MAKE = make
 CD = cd
 CP = cp
@@ -14,9 +15,14 @@ all:
 	$(CD) $(MANAKAI_LIB_DIR)Message/ && $(MAKE) all
 
 clean:
-	$(RM) -fv *~ .*~ *.BAK .*.BAK
+	$(RMALL) *~ .*~ *.BAK .*.BAK
 	$(CD) $(MANAKAI_LIB_DIR)manakai/ && $(MAKE) clean
 	$(CD) $(MANAKAI_LIB_DIR)Message/ && $(MAKE) clean
 
-## $Date: 2005/09/22 14:25:46 $
+distclean:
+	$(RMALL) *~ .*~ *.BAK .*.BAK
+	$(CD) $(MANAKAI_LIB_DIR)manakai/ && $(MAKE) distclean
+	$(CD) $(MANAKAI_LIB_DIR)Message/ && $(MAKE) distclean
+
+## $Date: 2006/02/26 14:32:38 $
 ## License: Public Domain.
