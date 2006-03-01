@@ -10,10 +10,20 @@ Module:
     The <DFN::manakai URI Generic Module> provides a set of interfaces
     to extract components of URIs.
 
+  @enDesc:
+    @@ddid:src
+    @@For: ManakaiDOM|Perl
+    @@@:
+      Portions of the Perl implementation contained in the module
+      are derived from the example parser (April 7, 2004) available at
+      <URI::http://www.gbiv.com/protocols/uri/rev-2002/uri_test.pl>
+      that is placed in the Public Domain by Roy T. Fielding
+      and Day Software, Inc.
+
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/03/01 08:42:34 $
+    $Date: 2006/03/01 13:03:57 $
   
   @Require:
     @@Module:
@@ -437,7 +447,6 @@ IFClsDef:
 
   @Attr:
     @@Name: uriReference
-    @@Operator: DISPerl|AsStringMethod
     @@Operator:
       @@@: ""
       @@ContentType: DISPerl|Perl
@@ -490,6 +499,13 @@ IFClsDef:
                    ($uri1-><AG::URIReference.uriReference>,
                     q<about:>);
         }
+
+  @IntMethod:
+    @@Operator: DISPerl|AsStringMethod
+    @@Return:
+      @@@Type: String
+      @@@PerlDef:
+        $r = $$self;
 
     @@Test:
       @@@QName: URIRef.stringify.test
@@ -577,6 +593,8 @@ IFClsDef:
 
           = If <VAR::U> contains <CHAR::SOLIDUS>, <CHAR::QUESTION MARK>,
             and / or <CHAR::NUMBER SIGN>, then there is no scheme component.
+ 
+          = If <VAR::U> is empty, then there is no scheme component.
 
           = Otherwise, <VAR::U> is the scheme component.
         
@@ -600,7 +618,7 @@ IFClsDef:
         @@@@enDesc:
           If there is no scheme component.
       @@@PerlDef:
-        if ($$self =~ m!^([^/?#:]*):!) {
+        if ($$self =~ m!^([^/?#:]+):!) {
           $r = $1;
         } else {
           $r = null;
@@ -610,7 +628,8 @@ IFClsDef:
         Replaces the scheme component of the DOM URI by the new value.
         If the new value contains <CHAR::SOLIDUS>, <CHAR::QUESTION MARK>,
         <CHAR::NUMBER SIGN>, and / or <CHAR::COLON>, then
-        the result is undefined.
+        the result is undefined.  If the new value is empty,
+        then the result is undefined.
 
         If the original DOM URI has no scheme component, then
         the string obtained by concatenating the new scheme component
@@ -621,8 +640,8 @@ IFClsDef:
         and a <CHAR::COLON> following it are removed from the DOM URI.
       @@@PerlDef:
         if (defined $given) {
-          unless ($given =~ m![/?#:]!) {
-            unless ($$self =~ s!^[^/?#:]*:!$given:!) {
+          if (length $given and $given !~ m![/?#:]!) {
+            unless ($$self =~ s!^[^/?#:]+:!$given:!) {
               $$self = $given . ':' . $$self;
               __DEEP{
                 $self-><M::ManakaiURIReference.onSchemeChanged>;
@@ -630,7 +649,7 @@ IFClsDef:
             }
           }
         } else {
-          $$self =~ s!^[^/?#:]*:!!;
+          $$self =~ s!^[^/?#:]+:!!;
           __DEEP{
             $self-><M::ManakaiURIReference.onSchemeChanged>;
           }__;
@@ -655,6 +674,7 @@ IFClsDef:
           [q<%D9%82%D9%87%D9%88%D8%a9://coffee.example/>,
            '%D9%82%D9%87%D9%88%D8%a9',
            q<http://coffee.example/>, q<//coffee.example/>],
+          [q<:aa>, null, q<http::aa>, q<:aa>], # ilegal
         ) {
           $test->id ('get.'.$_->[0]);
           my $uri1 = $impl-><M::URIImplementation.createURIReference>
@@ -670,19 +690,12 @@ IFClsDef:
                    ($uri2-><AG::URIReference.uriReference>,
                     $_->[2]);
 
-          $test->id ('empty.'.$_->[0]);
-          my $uri3 = $impl-><M::URIImplementation.createURIReference> ($uri1);
-          $uri3-><AS::URIReference.uriScheme> ('');
-          $test->assert_equals
-                   ($uri3-><AG::URIReference.uriReference>,
-                    $_->[3]);
-
           $test->id ('reset.'.$_->[0]);
           my $uri4 = $impl-><M::URIImplementation.createURIReference> ($uri1);
           $uri4-><AS::URIReference.uriScheme> (null);
           $test->assert_equals
                    ($uri4-><AG::URIReference.uriReference>,
-                    $_->[4]);
+                    $_->[3]);
         }
 
   @Attr:
@@ -698,17 +711,15 @@ IFClsDef:
 
           = Copy the DOM URI to the variable <VAR::U>.
 
+          = Removes the scheme component and the <CHAR::COLON>
+            following it, if any, from <VAR::U>.
+
           = If <VAR::U> contains a <CHAR::NUMBER SIGN>,
             remove the character and any characters following it
             from <VAR::U>.
 
           = If <VAR::U> contains a <CHAR::QUESTION MARK>,
             remove the character and any characters following it
-            from <VAR::U>.
-
-          = If <VAR::U> contains a <CHAR::COLON> <EM::before>
-            any occurence of <CHAR::SOLIDUS>, then 
-            remove the <CHAR::COLON> and any characters preceding it
             from <VAR::U>.
 
           = If <VAR::U> begins with two <CHAR::SOLIDUS> characters,
@@ -748,11 +759,7 @@ IFClsDef:
         @@@@enDesc:
           If there is no authority component.
       @@@PerlDef:
-        my $v = $$self;
-        $v =~ s/#.*\z//s;
-        $v =~ s/\?.*\z//s;
-        $v =~ s!^[^:/]*:!!s;
-        if ($$self =~ m!^//([^/]*)!) {
+        if ($$self =~ m!^(?:[^:/?#]+:)?(?://([^/?#]*))?!) {
           $r = $1;
         } else {
           $r = null;
@@ -780,33 +787,19 @@ IFClsDef:
       @@@PerlDef:
         if (defined $given) {
           unless ($given =~ m![/?#]!) {
+            unless ($$self =~ s!^((?:[^:/?#]+:)?)(?://[^/?#]*)?!$1//$given!) {
+              $$self = '//' . $given;
+              __DEEP{
+                $self-><M::ManakaiURIReference.onAuthorityChanged>;
+              }__;
+            }
+          }
+        } else {
+          if ($$self =~ s!^((?:[^:/?#]+:)?)(?://[^/?#]*)?!$1!) {
             __DEEP{
-              my $v = '';
-              my $w = $self-><AG::URIReference.uriScheme>;
-              $v .= $w . ':' if defined $w;
-              $v .= '//' . $given;
-              $v .= $self-><AG::URIReference.uriPath>;
-              $w = $self-><AG::URIReference.uriQuery>;
-              $v .= '?' . $w if defined $w;
-              $w = $self-><AG::URIReference.uriFragment>;
-              $v .= '#' . $w if defined $w;
-              $$self = $v;
               $self-><M::ManakaiURIReference.onAuthorityChanged>;
             }__;
           }
-        } else {
-          __DEEP{
-            my $v = '';
-            my $w = $self-><AG::URIReference.uriScheme>;
-            $v .= $w . ':' if defined $w;
-            $v .= $self-><AG::URIReference.uriPath>;
-            $w = $self-><AG::URIReference.uriQuery>;
-            $v .= '?' . $w if defined $w;
-            $w = $self-><AG::URIReference.uriFragment>;
-            $v .= '#' . $w if defined $w;
-            $$self = $v;
-            $self-><M::ManakaiURIReference.onAuthorityChanged>;
-          }__;
         }
         
     @@Test:
@@ -822,7 +815,7 @@ IFClsDef:
            q<http:///>, q<http:/>],
           [q<//example/>, 'example', q<//example/>, q<///>, q</>],
           [q</a:b/>, null, q<//example/a:b/>, q<///a:b/>, q</a:b/>],
-          [q<?aa:b>, null, q<//example?aa:b>, q<//?a:b>, q<?aa:b>],
+          [q<?aa:b>, null, q<//example?aa:b>, q<//?aa:b>, q<?aa:b>],
           [q</aaaa#bb:cc>, null, q<//example/aaaa#bb:cc>,
            q<///aaaa#bb:cc>, q</aaaa#bb:cc>],
           [q<http://%D9%82%D9%87%D9%88%D8%A9/>,
@@ -964,6 +957,10 @@ IFClsDef:
               $auth =~ s/^[^\@\[\]]*\@//;
             }
             $self-><AS::URIReference.uriAuthority> ($auth);
+          } else {
+            if (defined $given and $given !~ /[\/#?\@\[\]]/) {
+              $self-><AS::URIReference.uriAuthority> ($given.'@');
+            }
           }
         }__;
         
@@ -983,7 +980,7 @@ IFClsDef:
           [q<//u@example/>, 'u', q<//user@example/>,
            q<//@example/>, q<//example/>],
           [q</a:b/>, null, q<//user@/a:b/>, q<//@/a:b/>, q</a:b/>],
-          [q<?aa:b>, null, q<//user@?aa:b>, q<//user@?a:b>, q<?aa:b>],
+          [q<?aa:b>, null, q<//user@?aa:b>, q<//@?aa:b>, q<?aa:b>],
           [q</aaaa#bb:cc>, null, q<//user@/aaaa#bb:cc>,
            q<//@/aaaa#bb:cc>, q</aaaa#bb:cc>],
           [q<http://%D9%82%D9%87%D9%88%D8%A9@example/>,
@@ -1127,7 +1124,7 @@ IFClsDef:
               $v .= $1;
             }
             $self-><AS::URIReference.uriAuthority> ($v);
-          } else {
+          } elsif ($given !~ /[\/\@:#?]/) {
             $self-><AS::URIReference.uriAuthority> ($given);
           }
         }__;
@@ -1145,7 +1142,7 @@ IFClsDef:
           [q<//example/>, 'example', q<//example/>, q<///>],
           [q<//u@example/>, 'example', q<//u@example/>, q<//u@/>],
           [q</a:b/>, null, q<//example/a:b/>, q<///a:b/>],
-          [q<?aa:b>, null, q<//example?aa:b>, q<//example?a:b>],
+          [q<?aa:b>, null, q<//example?aa:b>, q<//?aa:b>],
           [q</aaaa#bb:cc>, null, q<//example/aaaa#bb:cc>,
            q<///aaaa#bb:cc>],
           [q<http://%D9%82%D9%87%D9%88%D8%A9/>,
@@ -1275,6 +1272,10 @@ IFClsDef:
               $auth =~ s/:[0-9]*\z//;
             }
             $self-><AS::URIReference.uriAuthority> ($auth);
+          } else {
+            if (defined $given and $given =~ /\A[0-9]*\z/) {
+              $self-><AS::URIReference.uriAuthority> (':'.$given);
+            }
           }
         }__;
         
@@ -1294,15 +1295,9 @@ IFClsDef:
           [q<//u@example:3/>, '3', q<//u@example:2/>,
            q<//u@example:/>, q<//u@example/>],
           [q</a:b/>, null, q<//:2/a:b/>, q<//:/a:b/>, q</a:b/>],
-          [q<?aa:b>, null, q<//:2?aa:b>, q<//:?a:b>, q<?aa:b>],
+          [q<?aa:b>, null, q<//:2?aa:b>, q<//:?aa:b>, q<?aa:b>],
           [q</aaaa#bb:cc>, null, q<//:2/aaaa#bb:cc>,
            q<//:/aaaa#bb:cc>, q</aaaa#bb:cc>],
-          [q<http://example:%D9%82%D9%87%D9%88%D8%A9/>,
-           '%D9%82%D9%87%D9%88%D8%A9',
-           q<http://example:2/>, q<http://example:/>, q<http://example/>],
-          [q<http://example:%D9%82%D9%87%D9%88%D8%a9/>,
-           '%D9%82%D9%87%D9%88%D8%a9',
-           q<http://example:2/>, q<http://example:/>, q<http://example/>],
           ['about:', null, q<about://:2>, q<about://:>, q<about:>],
           ['http://a:b@c:3/', '3', q<http://a:b@c:2/>,
            q<http://a:b@c:/>, q<http://a:b@c/>],
@@ -1357,13 +1352,13 @@ IFClsDef:
           = If <VAR::U> contains a <CHAR::QUESTION MARK>, remove
             the character and any characters following it.
 
-          = If <VAR::U> contains a <CHAR::COLON> with no preceding
-            <CHAR::SOLIDUS> character, remove the <CHAR::COLON>
-            and any characters preceding it.
+          = If <VAR::U> contains the scheme component and
+            the <CHAR::COLON> character fllowing it, remove
+            them from <VAR::U>.
 
-          = If the first two characters are both <CHAR::SOLIDUS>,
-            remove those characters and any characters following it
-            <EM::before> the next occurence of <CHAR::SOLIDUS>, if any.
+          = If <VAR::U> contains the authority component and
+            the <CHAR::SOLIDUS> characters preceding it, remove
+            them from <VAR::U>.
 
           = Then, <VAR::U> is the path component.
         
@@ -1384,13 +1379,9 @@ IFClsDef:
           }
         }
       @@@PerlDef:
-        __DEEP{
-          my $r = $$self;
-          $r =~ s/#.*\z//s;
-          $r =~ s/\?.*\z//s;
-          $r =~ s!^[^:/]*:!!s;
-          $r =~ s!^//[^/]*!!s;
-        }__;
+        if ($$self =~ m!\A(?:[^:/?#]+:)?(?://[^/?#]*)?([^?#]*)!) {
+          $r = $1;
+        }
     @@Set:
       @@@enDesc:
         Replaces the path component of the DOM URI by the new value.
@@ -1409,22 +1400,13 @@ IFClsDef:
         If the new value contains <CHAR::QUESTION MARK> or
         <CHAR::NUMBER SIGN>, the result is undefined.
       @@@PerlDef:
-        __DEEP{
-          my $v = $$self;
-          my $new = '';
-          if ($v =~ s/(#.*)\z//s) {
-            $new = $1;
-          }
-          if ($v =~ s/(\?.*)\z//s) {
-            $new = $1 . $new;
-          }
-          $new = $given . $new;
-          if ($v =~ s!^((?:[^:/]*:)?(?://)?[^/]*)!!s) {
-            $new = $1 . $new;
-          }
-          $$self = $new;
-          $self-><M::ManakaiURIReference.onPathChanged>;
-        }__;
+        if ($given !~ /[?#]/ and
+            $$self =~ m!^((?:[^:/?#]+:)?(?://[^/?#]*)?)[^?#]*((?:\?[^#]*)?(?:#.*)?)!s) {
+          $$self = $1.$given.$2;
+          __DEEP{
+            $self-><M::ManakaiURIReference.onPathChanged>;
+          }__;
+        }
         
     @@Test:
       @@@QName: URIRef.uriPath.1.test
@@ -1435,9 +1417,9 @@ IFClsDef:
         for (
           [q<http://example/>, '/', q<http://example/path>, q<http://example>],
           [q<http://example/path>, '/path', q<http://example/path>,
-           q<http://example/>],
-          [q<//example/>, '/', q<//example/path>, q<//example/>],
-          [q<//example/path>, '/path', q<//example/path>, q<//example/>],
+           q<http://example>],
+          [q<//example/>, '/', q<//example/path>, q<//example>],
+          [q<//example/path>, '/path', q<//example/path>, q<//example>],
           [q</path?query>, '/path', q</path?query>, q<?query>],
           [q<?query>, '', q</path?query>, q<?query>],
           [q</aaaa#bb:cc>, '/aaaa', q</path#bb:cc>, q<#bb:cc>],
@@ -1450,8 +1432,8 @@ IFClsDef:
           ['about:', '', q<about:/path>, q<about:>],
           ['http://a:b@c:3/', '/', q<http://a:b@c:3/path>,
            q<http://a:b@c:3>],
-          ['http://a:b@[c@d:4]:3/', '/', q<http://a:b@c:3/path>,
-           q<http://a:b@c:3>],
+          ['http://a:b@[c@d:4]:3/', '/', q<http://a:b@[c@d:4]:3/path>,
+           q<http://a:b@[c@d:4]:3>],
         ) {
           $test->id ('get.'.$_->[0]);
           my $uri1 = $impl-><M::URIImplementation.createURIReference>
@@ -1523,15 +1505,11 @@ IFClsDef:
         @@@@enDesc:
           If there is no query component.
       @@@PerlDef:
-        __DEEP{
-          my $v = $$self;
-          $v =~ s/#.*\z//s;
-          if ($v =~ /\?(.*)\z/) {
-            $r = $1;
-          } else {
-            $r = null;
-          }
-        }__;
+        if ($$self =~ m!^(?:[^:/?#]+:)?(?://[^/?#]*)?[^?#]*(?:\?([^#]*))?!s) {
+          $r = $1;
+        } else {
+          $r = null;
+        }
     @@Set:
       @@@enDesc:
         Replaces the query component of the DOM URI by the new value.
@@ -1546,22 +1524,13 @@ IFClsDef:
         and a <CHAR::QUESTION MARK> character preceding it are removed
         from the DOM URI.
       @@@PerlDef:
-        __DEEP{
-          my $v = $$self;
-          my $f = '';
-          if ($v =~ s/(#.*)\z//s) {
-            $f = $v;
-          }
-          $v =~ s/\?.*\z//s;
-          if (defined $given) {
-            $v .= '?' . $given . $f;
-          } else {
-            $v .= $f;
-          }
-          $$self = $v;
-          $self-><M::ManakaiURIReference.onQueryChanged>;
-        }__;
-        
+        if ((not defined $given or $given !~ /#/) and
+            $$self =~ m!^((?:[^:/?#]+:)?(?://[^/?#]*)?[^?#]*)(?:\?[^#]*)?((?:#.*)?)!s) {
+          $$self = defined $given ? $1.'?'.$given.$2 : $1.$2;
+          __DEEP{
+            $self-><M::ManakaiURIReference.onQueryChanged>;
+          }__;
+        }
     @@Test:
       @@@QName: URIRef.uriQuery.1.test
       @@@PerlDef:
@@ -1664,14 +1633,11 @@ IFClsDef:
         @@@@enDesc:
           If there is no fragment component.
       @@@PerlDef:
-        __DEEP{
-          my $v = $$self;
-          if ($v =~ /#(.*)\z/) {
-            $r = $1;
-          } else {
-            $r = null;
-          }
-        }__;
+        if ($$self =~ m!^(?:[^:/?#]+:)?(?://[^/?#]*)?[^?#]*(?:\?[^#]*)?(?:#(.*))?!s) {
+          $r = $1;
+        } else {
+          $r = null;
+        }
     @@Set:
       @@@enDesc:
         Replaces the fragment component of the DOM URI by the new value.
@@ -1683,16 +1649,12 @@ IFClsDef:
         and a <CHAR::NUMBER SIGN> character preceding it are removed
         from the DOM URI.
       @@@PerlDef:
-        __DEEP{
-          my $v = $$self;
-          $v =~ s/#.*\z//s;
-          if (defined $given) {
-            $$self = $v . '#' . $given;
-          } else {
-            $$self = $v;
-          }
-          $self-><M::ManakaiURIReference.onFragmentChanged>;
-        }__;
+        if ($$self =~ m!^((?:[^:/?#]+:)?(?://[^/?#]*)?[^?#]*(?:\?[^#]*)?)(?:#.*)?!s) {
+          $$self = defined $given ? $1 . '#' . $given : $1;
+          __DEEP{
+            $self-><M::ManakaiURIReference.onFragmentChanged>;
+          }__;
+        }
         
     @@Test:
       @@@QName: URIRef.uriFragment.1.test
@@ -1717,7 +1679,7 @@ IFClsDef:
            q<http://example#fragment>, q<http://example#>, q<http://example>],
           [q<http://example#%D9%82%D9%87%D9%88%D8%a9/>,
            '%D9%82%D9%87%D9%88%D8%a9/',
-           q<http://example#fragment>, q<http://example#>, q<http://example#>],
+           q<http://example#fragment>, q<http://example#>, q<http://example>],
           ['about:', null, q<about:#fragment>, q<about:#>, q<about:>],
           ['about:a?b', null, q<about:a?b#fragment>, q<about:a?b#>,
            q<about:a?b>],
@@ -1807,7 +1769,9 @@ IFClsDef:
           If there is no <P::index>th path segment.
       @@@PerlDef:
         __DEEP{
-          $r = [split '/', $self-><AG::URIReference.uriPath>]->[$index];
+          $r = [split m!/!, $self-><AG::URIReference.uriPath>, -1]->[$index];
+          $r = '' if not defined $r and
+                     ($index == 0 or $index == -1); # If path is empty
         }__;
 
     @@Test:
@@ -1909,7 +1873,7 @@ IFClsDef:
     @@Return:
       @@@PerlDef:
         __DEEP{
-          my @p = split '/', $self-><AG::URIReference.uriPath>;
+          my @p = split m!/!, $self-><AG::URIReference.uriPath>, -1;
           if (defined $newValue) {
             $p[$index] = $newValue;
           } else {
@@ -1950,13 +1914,13 @@ IFClsDef:
         $uri1-><M::URIReference.setURIPathSegment> (3, null);
         $test->assert_equals
                  ($uri1-><AG::URIReference.uriReference>,
-                  q<http://foo.example/a/b>);
+                  q<http://foo.example/a/e>);
 
         $test->id (5);
         $uri1-><M::URIReference.setURIPathSegment> (1, null);
         $test->assert_equals
                  ($uri1-><AG::URIReference.uriReference>,
-                  q<http://foo.example/b>);
+                  q<http://foo.example/e>);
 
         $test->id (6);
         $uri1-><M::URIReference.setURIPathSegment> (-1, 'd');
@@ -2557,7 +2521,7 @@ IFClsDef:
       if ($in =~ s/(?:$ipv4|$h16)\z//o) {
         if ($in =~ /\A(?>$h16:){6}\z/o or
             $in =~ /\A::(?>$h16:){0,5}\z/o or
-            $in =~ /\A$h16::(?>$h16:){4}\z/o or
+            $in =~ /\A${h16}::(?>$h16:){4}\z/o or
             $in =~ /\A$h16(?::$h16)?::(?>$h16:){3}\z/o or
             $in =~ /\A$h16(?::$h16){0,2}::(?>$h16:){2}\z/o or
             $in =~ /\A$h16(?::$h16){0,3}::$h16:\z/o or
@@ -2690,7 +2654,8 @@ IFClsDef:
         The newly created <IF::URIReference> object.
       @@@PerlDef:
         __DEEP{
-          my $v = $$self;
+          require Encode;
+          my $v = Encode::encode ('utf8', $$self);
           $v =~ s{%([2-9A-Fa-f][0-9A-Fa-f])}
                  {
                    my $ch = hex $1;
@@ -2724,25 +2689,31 @@ IFClsDef:
                  }ge;
           $v =~ s{(
             [\xC2-\xDF][\x80-\xBF] |                          # UTF8-2
-            \xE0[\xA0-\xBF][\x80-\xBF] |
+            [\xE0][\xA0-\xBF][\x80-\xBF] |
             [\xE1-\xEC][\x80-\xBF][\x80-\xBF] |
-            \xED[\x80-\x9F][\x80-\xBF] |
+            [\xED][\x80-\x9F][\x80-\xBF] |
             [\xEE\xEF][\x80-\xBF][\x80-\xBF] |                # UTF8-3
-            \xF0[\x90-\xBF][\x80-\xBF][\x80-\xBF] |
+            [\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF] |
             [\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF] |
-            \xF4[\x80-\x8F][\x80-\xBF][\x80-\xBF]             # UTF8-4
+            [\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF] |           # UTF8-4
+            [\x80-\xFF]
           )}{
             my $c = $1;
-            require Encode;
-            my $ch = Encode::decode ('utf8', $c);
-            if ($ch =~ /^[\x{00A0}-\x{200D}\x{2010}-\x{2029}\x{202F}-\x{D7FF}\x{F900}-\x{FDCF}\x{FDF0}-\x{FFEF}\x{10000}-\x{1FFFD}\x{20000}-\x{2FFFD}\x{30000}-\x{3FFFD}\x{40000}-\x{4FFFD}\x{50000}-\x{5FFFD}\x{60000}-\x{6FFFD}\x{70000}-\x{7FFFD}\x{80000}-\x{8FFFD}\x{90000}-\x{9FFFD}\x{A0000}-\x{AFFFD}\x{B0000}-\x{BFFFD}\x{C0000}-\x{CFFFD}\x{D0000}-\x{DFFFD}\x{E1000}-\x{EFFFD}]/) {
+            if (length ($c) == 1) {
+              $c =~ s/(.)/sprintf '%%%02X', ord $1/ge;
               $c;
             } else {
-              $c =~ s/([\x80-\xFF])/sprintf '%%%02X', ord $1/ge;
-              $c;
+              my $ch = Encode::decode ('utf8', $c);
+              if ($ch =~ /^[\x{00A0}-\x{200D}\x{2010}-\x{2029}\x{202F}-\x{D7FF}\x{F900}-\x{FDCF}\x{FDF0}-\x{FFEF}\x{10000}-\x{1FFFD}\x{20000}-\x{2FFFD}\x{30000}-\x{3FFFD}\x{40000}-\x{4FFFD}\x{50000}-\x{5FFFD}\x{60000}-\x{6FFFD}\x{70000}-\x{7FFFD}\x{80000}-\x{8FFFD}\x{90000}-\x{9FFFD}\x{A0000}-\x{AFFFD}\x{B0000}-\x{BFFFD}\x{C0000}-\x{CFFFD}\x{D0000}-\x{DFFFD}\x{E1000}-\x{EFFFD}]/) {
+                $c;
+              } else {
+                $c =~ s/([\x80-\xFF])/sprintf '%%%02X', ord $1/ge;
+                $c;
+              }
             }
           }gex;
-          $v =~ s/([<>"{}|\\\^`\x00-\x20\x7E-\xFF])/sprintf '%%%02X', ord $1/ge;
+          $v =~ s/([<>"{}|\\\^`\x00-\x20\x7F])/sprintf '%%%02X', ord $1/ge;
+          $v = Encode::decode ('utf8', $v);
           $r = bless \$v, <ClassName::ManakaiURIReference>;
         }__;
 
@@ -3097,8 +3068,8 @@ IFClsDef:
           in                     => q<eXAMPLE://a/./b/../b/%63/%7bfoo%7d>,
           get_uri_reference      => q<eXAMPLE://a/./b/../b/%63/%7bfoo%7d>,
           get_uri_reference_3986 => q<eXAMPLE://a/./b/../b/%63/%7bfoo%7d>,
-          get_iri_reference      => q<eXAMPLE://a/./b/../b/%63/%7bfoo%7d>,
-          get_iri_reference_3987 => q<eXAMPLE://a/./b/../b/%63/%7bfoo%7d>,
+          get_iri_reference      => q<eXAMPLE://a/./b/../b/c/%7bfoo%7d>,
+          get_iri_reference_3987 => q<eXAMPLE://a/./b/../b/c/%7bfoo%7d>,
           is_uri_reference => true, is_iri_reference => true,
           is_uri_reference_3986 => true, is_iri_reference_3987 => true,
           is_uri => true, is_iri => true,
@@ -3317,7 +3288,8 @@ IFClsDef:
                            is_absolute_uri_3986 is_absolute_iri_3987
                            is_empty_reference/) {
           $test->id ($_->{in}.'.'.$method);
-          $test->assert_equals ($uri1->$method, $_->{$method});
+          my $tm = $_->{$method} ? 'assert_true' : 'assert_false';
+          $test->$tm ($uri1->$method);
         }
       }
 
@@ -3429,13 +3401,15 @@ IFClsDef:
       @@@PerlDef:
         __DEEP{
           ## -- Decomposition
-          my @ref;   # Reference
-          my @base;  # Base URI
+          my ($b_scheme, $b_auth, $b_path, $b_query, $b_frag);
+          my ($r_scheme, $r_auth, $r_path, $r_query, $r_frag);
 
-          if ($$self =~ m!\A(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?\z!) {
-            (@ref) = ($1, $2, $3, $4, $5);
+          if ($$self =~ m!\A(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?\z!s) {
+            ($r_scheme, $r_auth, $r_path, $r_query, $r_frag)
+              = ($1, $2, $3, $4, $5);
           } else { # unlikely happen
-            (@ref) = (null, null, '', null, null);
+            ($r_scheme, $r_auth, $r_path, $r_query, $r_frag)
+              = (null, null, '', null, null);
           }
           my $ba = ref $base eq 'SCALAR'
                      ? $base
@@ -3444,96 +3418,88 @@ IFClsDef:
                          : ref $base
                              ? \"$base"
                              : \$base;
-          if ($$ba =~ m!\A(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?\z!) {
-            (@base) = (defined $1 ? $1 : '', $2, $3, $4, $5);
+          if ($$ba =~ m!\A(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?\z!s) {
+            ($b_scheme, $b_auth, $b_path, $b_query, $b_frag)
+              = (defined $1 ? $1 : '', $2, $3, $4, $5);
           } else { # unlikely happen
-            (@base) = ('', null, '', null, null);
+            ($b_scheme, $b_auth, $b_path, $b_query, $b_frag)
+              = ('', null, '', null, null);
           }
 
           ## -- Merge
-          my $merge = sub ($$) {
-            my ($base, $ref) = @_;
-            if (defined $base->[1] and      # authority
-                length ($base->[2]) == 0) { # path
-              return "/" . $ref->[2];       # path
-            } else {
-              my $bp = $base->[2];          # path
-              $bp =~ s![^/]+\z!!g;
-              return $bp . $ref->[2];       # path
+          my $path_merge = sub ($$) {
+            my ($bpath, $rpath) = @_;
+            if ($bpath eq '') {
+              return '/'.$rpath;
             }
+            $bpath =~ s/[^\/]*\z//;
+            return $bpath . $rpath;
           }; # merge
 
           ## -- Removing Dot Segments
           my $remove_dot_segments = sub ($) {
-            my @input = split m!/!, shift;
-            my @output;
-            while (@input) {
-              if (@input > 1 and ($input[0] eq '.' or $input[0] eq '..')) {
-                shift @input;
-              } elsif ($input[0] eq '' and defined $input[1] and $input[1] eq '.') {
-                splice @input, 1, 1;
-              } elsif ($input[0] eq '' and defined $input[1] and $input[1] eq '..') {
-                splice @input, 1, 1;
-                pop @output;
-              } elsif (@input == 1 and ($input[0] eq '.' or $input[0] eq '..')) {
-                shift @input;
-              } elsif (@input == 1) {
-                push @output, shift @input;
-              } elsif ($input[0] eq '') {
-                push @output, splice @input, 1, 1;
-              } else {
-                push @output, shift @input;
+            local $_ = shift;
+            my $buf = '';
+            L: while (length $_) {
+              next L if s/^\.\.?\///;
+              next L if s/^\/\.(?:\/|\z)/\//;
+              if (s/^\/\.\.(\/|\z)/\//) {
+                $buf =~ s/\/?[^\/]*$//;
+                next L;
               }
+              last Z if s/^\.\.?\z//;
+              s/^(\/?[^\/]*)//;
+              $buf .= $1;
             }
-            return join '/', @output;
+            return $buf;
           }; # remove_dot_segments
 
-          ## -- Transform 
-          my @t; # Target URI
+          ## -- Transformation
+          my ($t_scheme, $t_auth, $t_path, $t_query, $t_frag);
 
-          if ($nonStrict and $ref[0] eq $base[0]) {
-            undef $ref[0];      # scheme
+          if ($nonStrict and $r_scheme eq $b_scheme) {
+            undef $r_scheme;
           }
 
-          if (defined $ref[0]) {
-            $t[0] = $ref[0];    # scheme
-            $t[1] = $ref[1];    # authority
-            $t[2] = $remove_dot_segments->($ref[2]); # path
-            $t[3] = $ref[3];    # query
-          } elsif (defined $ref[1]) {
-            $t[0] = $base[0];   # scheme
-            $t[1] = $ref[1];    # authority
-            $t[2] = $remove_dot_segments->($ref[2]); # path
-            $t[3] = $ref[3];    # query
-          } elsif ($ref[2] eq '') {
-            $t[0] = $base[0];   # scheme
-            $t[1] = $base[1];   # authority
-            $t[2] = $base[2];   # path
-            if (defined $ref[3]) {
-              $t[3] = $ref[3];  # query
-            } else {
-              $t[3] = $base[3]; # query
-            }
-          } elsif (substr ($ref[2], 0, 1) eq '/') {
-            $t[0] = $base[0];   # scheme
-            $t[1] = $base[1];   # authority
-            $t[2] = $remove_dot_segments->($ref[2]); # path
-            $t[3] = $ref[3];    # query
+          if (defined $r_scheme) {
+            $t_scheme = $r_scheme;
+            $t_auth   = $r_auth;
+            $t_path   = $remove_dot_segments->($r_path);
+            $t_query  = $r_query;
           } else {
-            $t[0] = $base[0];   # scheme
-            $t[1] = $base[1];   # authority
-            $t[2] = $remove_dot_segments->($merge->(\@base, \@ref)); # path
-            $t[3] = $ref[3];    # query
+            if (defined $r_auth) {
+              $t_auth  = $r_auth;
+              $t_path  = $remove_dot_segments->($r_path);
+              $t_query = $r_query;
+            } else {
+              if ($r_path =~ /\A\z/) {
+                $t_path = $b_path;
+                if (defined $r_query) {
+                  $t_query = $r_query;
+                } else {
+                  $t_query = $b_query;
+                }
+              } elsif ($r_path =~ /^\//) {
+                $t_path  = $remove_dot_segments->($r_path);
+                $t_query = $r_query;
+              } else {
+                $t_path  = $path_merge->($b_path, $r_path);
+                $t_path  = $remove_dot_segments->($t_path);
+                $t_query = $r_query;
+              }
+              $t_auth = $b_auth;
+            }
+            $t_scheme = $b_scheme;
           }
-          $t[4] = $ref[4];      # fragment
+          $t_frag = $r_frag;
 
           ## -- Recomposition
-          my $result  = ''                                 ;
-          $result .=        $t[0] . ':' if defined $t[0];  # scheme;
-          $result .= '//' . $t[1]       if defined $t[1];  # authority
-          $result .=        $t[2]                       ;  # path
-          $result .= '?'  . $t[3]       if defined $t[3];  # query
-          $result .= '#'  . $t[4]       if defined $t[4];  # fragment
+          my $result  = ''                                      ;
+          $result .=        $t_scheme . ':' if defined $t_scheme;
+          $result .= '//' . $t_auth         if defined $t_auth  ;
+          $result .=        $t_path                             ;
+          $result .= '?'  . $t_query        if defined $t_query ;
+          $result .= '#'  . $t_frag         if defined $t_frag  ;
 
           $r = bless \$result, <ClassName::ManakaiURIReference>;
         }__;
@@ -3572,6 +3538,7 @@ IFClsDef:
         __CODE{createURIImplForTest:: $impl => $impl}__;
 
         for (
+          ## From RFC 3986
           ["g:h"           =>  "g:h"],
           ["g"             =>  "http://a/b/c/g"],
           ["./g"           =>  "http://a/b/c/g"],
@@ -3614,6 +3581,10 @@ IFClsDef:
           ["g#s/./x"       =>  "http://a/b/c/g#s/./x"],
           ["g#s/../x"      =>  "http://a/b/c/g#s/../x"],
           ["http:g"        =>  "http:g"],
+          ## From "http://www.gbiv.com/protocols/uri/test/rel_examples1.html"
+          ["http:"         =>  "http:"],
+          ## From "http://www.w3.org/2004/04/uri-rel-test.html"
+          ["./g:h"         =>  "http://a/b/c/g:h"],
         ) {
           my $ref = $impl-><M::URIImplementation.createURIReference> ($_->[0]);
 
@@ -3642,14 +3613,23 @@ IFClsDef:
         my $impl;
         __CODE{createURIImplForTest:: $impl => $impl}__;
 
-        my $ref = $impl-><M::URIImplementation.createURIReference>
-                           ('http://a/b/c/d;p?q');
+        ## From "http://www.gbiv.com/protocols/uri/test/rel_examples1.html"
 
-        $test->id ('string');
+        $test->id (1);
+        my $ref = $impl-><M::URIImplementation.createURIReference>
+                           (q<http:g>);
         my $t1 = $ref-><M::URIReference.getAbsoluteReference>
-                         (q<http:g>);
+                         (q<http://a/b/c/d;p?q>, non_strict => true);
         $test->assert_equals ($t1-><AG::URIReference.uriReference>,
-                              q<http://a/b/c/g>, true);
+                              q<http://a/b/c/g>);
+
+        $test->id (2);
+        my $ref2 = $impl-><M::URIImplementation.createURIReference>
+                           (q<http:>);
+        my $t2 = $ref2-><M::URIReference.getAbsoluteReference>
+                         (q<http://a/b/c/d;p?q>, non_strict => true);
+        $test->assert_equals ($t2-><AG::URIReference.uriReference>,
+                              q<http://a/b/c/d;p?q>);
 
   @Method:
     @@Name: getAbsoluteReference3987
@@ -3853,7 +3833,14 @@ IFClsDef:
       @@@PerlDef:
         __DEEP{
           my @base;
-          if ("$base" =~ m!\A(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?\z!) {
+          my $ba = ref $base eq 'SCALAR'
+                     ? $base
+                     : ref $base eq <ClassName::ManakaiURIReference>
+                         ? $base
+                         : ref $base
+                             ? \"$base"
+                             : \$base;
+          if ($$ba =~ m!\A(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?\z!) {
             (@base) = (defined $1 ? $1 : '', $2, $3, $4, $5);
           } else { # unlikeley happen
             (@base) = ('', null, '', null, null);
@@ -3894,36 +3881,40 @@ IFClsDef:
                 $t[2] eq $base[2] and                            # path
                 ((not defined $t[3] and not defined $base[3]) or # query
                  (defined $t[3] and defined $base[3] and $t[3] eq $base[3]))) {
-              (@ref) = (null, null, null, null, $t[4]);
+              (@ref) = (null, null, '', null, $t[4]);
               last R;
             }
 
             ## Path
-            my @tpath = split m!/!, $t[2];
-            my @bpath = split m!/!, $base[2];
-            my $tp;
-            my $tp2;
+            my @tpath = split m!/!, $t[2], -1;
+            my @bpath = split m!/!, $base[2], -1;
+            if (@tpath < 1 or @bpath < 1) {  ## No |/|
+              (@ref) = @t;
+              last R;
+            }
+            my $bpl;
+
+            ## Removes common segments
             while (@tpath and @bpath and $tpath[0] eq $bpath[0]) {
-              $tp2 = $tp;
-              $tp = shift @tpath;
-              shift @bpath;
+              shift @tpath;
+              $bpl = shift @bpath;
             }
-            unless (@bpath) {
-              unshift @tpath, $tp;
-              ($tp2, $tp) = (null, $tp2);
-            }
-            unless (@tpath) {   ## Avoid empty path component for compatibility
-              if ($tp eq '') {
-                unshift @tpath, '.';
+
+            if (@tpath == 0) {
+              if (@bpath == 0) { ## Avoid empty path for backward compatibility
+                unshift @tpath, $bpl;
               } else {
-                unshift @tpath, $tp;
+                unshift @tpath, '..', $bpl;
               }
+            } elsif (@bpath == 0) {
+              unshift @tpath, $bpl;
             }
-            unshift @tpath, '..' x @bpath;
-            if (@tpath and ($tpath[0] =~ /:/ or
-                            $tpath[0] eq '')) {
-              unshift @tpath, '.';
-            } 
+
+            unshift @tpath, ('..') x (@bpath - 1) if @bpath > 1;
+
+            unshift @tpath, '.' if $tpath[0] eq '' or
+                                   $tpath[0] =~ /:/;
+
             (@ref) = (null, null, (join '/', @tpath), $t[3], $t[4]);
           } # R
 
@@ -3973,7 +3964,7 @@ IFClsDef:
         __CODE{createURIImplForTest:: $impl => $impl}__;
 
         for (
-          [q<http://www.example/>, q<http://www.example/>, q<.>],
+          [q<http://www.example/>, q<http://www.example/>, q<./>],
           [q<http://www.example/>, q<http://www2.example/>, q<http://www.example/>],
           [q<http://a/b/c/e/f>, q<http://a/b/c/e>, q<e/f>],
           [q<http://a/b/c/e>, q<http://a/b/c/e>, q<e>],
@@ -3981,16 +3972,19 @@ IFClsDef:
           [q<http://a/b/c/d>, q<http://a/b/c/e>, q<d>],
           [q<http://a/b/c/d/>, q<http://a/b/c/e>, q<d/>],
           [q<http://a/b/c>, q<http://a/b/c/e>, q<../c>],
-          [q<http://a/b/c/>, q<http://a/b/c/e>, q<../>],
-          [q<http://a/b>, q<http://a/b/c/e>, q<../../>],
+          [q<http://a/b/c/>, q<http://a/b/c/e>, q<./>],
+          [q<http://a/b/>, q<http://a/b/c/e>, q<../>],
+          [q<http://a/b>, q<http://a/b/c/e>, q<../../b>],
+          [q<http://a/>, q<http://a/b/c/e>, q<../../>],
+          [q<http://a>, q<http://a/b/c/e>, q<http://a>],
           [q<http://a/b/d/f>, q<http://a/b/c/e>, q<../d/f>],
           [q<about:blank>, q<http://a/>, q<about:blank>],
           [q<http://a/about:blank>, q<http://a/b>, q<./about:blank>],
-          [q<http://a//>, q<http://a/>, q<./>],
+          [q<http://a//>, q<http://a/>, q<.//>],
           [q<a>, q<http://a/b/>, q<a>],
           [q<http://a/b#a>, q<http://a/b#b>, q<#a>],
           [q<http://a/c#a>, q<http://a/b#a>, q<c#a>],
-          [q<http://a/b/?c>, q<http://a/b/>, q<?c>],
+          [q<http://a/b/?c>, q<http://a/b/>, q<./?c>],
         ) {
           $test->id ($_->[0].'.'.$_->[1]);
           my $ref = $impl-><M::URIImplementation.createURIReference> ($_->[0]);
@@ -4116,6 +4110,30 @@ IFClsDef:
       @@@PerlDef:
         my $v = $$self;
         $r = bless \$v, <ClassName::ManakaiURIReference>;
+
+    @@Test:
+      @@@QName: URIRef.clone.Test
+      @@@PerlDef:
+        my $impl;
+        __CODE{createURIImplForTest:: $impl => $impl}__;
+
+        my $ref = $impl-><M::URIImplementation.createURIReference> (q<a>);
+
+        $test->id ('cloneURIRef');
+        my $ref2 = $ref-><M::URIReference.cloneURIReference>;
+        $test->assert_equals ($ref2-><AG::URIReference.uriReference>, q<a>);
+
+        $test->id ('cloneURIRef.diff');
+        $ref2-><AS::URIReference.uriReference> (q<b>);
+        $test->assert_equals ($ref-><AG::URIReference.uriReference>, q<a>);
+
+        $test->id ('clone');
+        my $ref3 = $ref->clone;
+        $test->assert_equals ($ref3-><AG::URIReference.uriReference>, q<a>);
+
+        $test->id ('clone.diff');
+        $ref3-><AS::URIReference.uriReference> (q<b>);
+        $test->assert_equals ($ref-><AG::URIReference.uriReference>, q<a>);
 ##URIReference
 
 ResourceDef:
