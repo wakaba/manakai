@@ -55,6 +55,7 @@ DOMTEST2PERL_PL = $(MANAKAI_BIN_DIR)domtest2perl.pl
 
 NS_MDOM = http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom\#ManakaiDOM.
 NS_MANAKAIDOM = http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom\#
+NS_URI        = http://suika.fam.cx/~wakaba/archive/2005/manakai/URI/
 NS_UTIL       = http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/
 NS_UTIL_DIS   = http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS\#
 
@@ -64,6 +65,8 @@ NS_MDOM_PT_FILES = \
   dom-DOMXML$(PT_SUFFIX) dom-XDoctype$(PT_SUFFIX) \
   dom-DOMLS$(PT_SUFFIX) dom-XMLParser$(PT_SUFFIX) \
   dom-ManakaiDOMLS2003$(PT_SUFFIX)
+NS_URI_PT_FILES = \
+  uri-Generic$(PT_SUFFIX)
 NS_UTIL_PT_FILES = \
   util-ManakaiNodeTest$(PT_SUFFIX) \
   util-PerlCode$(PT_SUFFIX) \
@@ -73,6 +76,7 @@ NS_UTIL_DIS_PT_FILES = \
 
 PT_FILES = \
   $(NS_MDOM_PT_FILES) \
+  $(NS_URI_PT_FILES) \
   $(NS_UTIL_PT_FILES) $(NS_UTIL_DIS_PT_FILES)
 
 GENERATED_FILES = $(PT_FILES)
@@ -103,6 +107,14 @@ $(NS_MDOM_PT_FILES): dom-%$(PT_SUFFIX): \
 	#$(ECHO) "  manakai::mndebug::define_nodestem_destroy_all ();" >> $@
 	#$(ECHO) "  manakai::mndebug::define_noderef_destroy_all ();" >> $@
 	$(ECHO) "}" >> $@
+	$(PERL_CHK) $@
+
+test-module-uri: $(NS_URI_PT_FILES)
+	$(PERL_TEST_) uri-*$(PT_SUFFIX)
+
+$(NS_URI_PT_FILES): uri-%$(PT_SUFFIX): \
+  $(MANAKAI_LIB_DIR)Message/URI/%$(DIS_SUFFIX) $(DAF_PL)
+	$(DAF) --create-perl-test="$(NS_URI)$* $@"
 	$(PERL_CHK) $@
 
 test-module-util: $(NS_UTIL_PT_FILES) $(NS_UTIL_DIS_PT_FILES)

@@ -1,0 +1,4170 @@
+Module:
+  @QName: MURI|Generic
+  @FullName:
+    @@lang: en
+    @@@: Manakai URI Generic Module
+  @Namespace:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/URI/Generic/
+  
+  @enDesc:
+    The <DFN::manakai URI Generic Module> provides a set of interfaces
+    to extract components of URIs.
+
+  @DISCore:author: DISCore|Wakaba
+  @License: license|Perl+MPL
+  @Date:
+    $Date: 2006/03/01 08:42:34 $
+  
+  @Require:
+    @@Module:
+      @@@QName: MDOM|DOMFeature
+      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
+    @@Module:
+      @@@WithFor: ManakaiDOM|ManakaiDOM
+  @DefaultFor: ManakaiDOM|ManakaiDOMLatest
+
+Namespace:
+  @dis:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
+  @DISlib:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/
+  @dx:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#
+  @f:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/feature#
+  @fe:
+    http://suika.fam.cx/www/2006/feature/
+  @idl:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/IDL#
+  @kwd:
+    http://suika.fam.cx/~wakaba/archive/2005/rfc2119/
+  @lang:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
+  @license:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
+  @ManakaiDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
+  @MDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
+  @mn:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/ManakaiNode#
+  @MURI:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/URI/
+  @rdf:
+    http://www.w3.org/1999/02/22-rdf-syntax-ns#
+  @rdfs:
+    http://www.w3.org/2000/01/rdf-schema#
+  @test:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Test#
+
+ResourceDef:
+  @QName: MURI|
+  @rdf:type: dis|ModuleGroup
+  @FullName:
+    @@lang:en
+    @@@:
+      The manakai URI modules
+  @DISPerl:packageName:
+    Message::URI::
+  @DISPerl:interfacePackageName:
+    @@@:
+      Message::DOM::IFLatest::
+    @@For: ManakaiDOM|ManakaiDOMLatest
+  @DISPerl:interfacePackageName:
+    @@@:
+      Message::DOM::IF::
+    @@For: !ManakaiDOM|ManakaiDOMLatest
+
+## -- Features
+
+FeatureDef:
+  @QName: URIFeature
+  @featureQName: fe|URI
+  @FeatureVerDef:
+    @@QName: URIFeature40
+    @@f:instanceOf: URIFeature
+    @@Version: 4.0
+    @@enDesc:
+      The manakai DOM URI Module, version 4.0
+
+ElementTypeBinding:
+  @Name: FeatureDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: f|Feature
+    @@For: =ManakaiDOM|all
+
+ElementTypeBinding:
+  @Name: FeatureVerDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: f|Feature
+
+ElementTypeBinding:
+  @Name: featureQName
+  @ElementType:
+    f:name
+  @ShadowContent:
+    @@ContentType: DISCore|QName
+
+ElementTypeBinding:
+  @Name: IFQName
+  @ElementType:
+    dis:QName
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForIF
+
+ElementTypeBinding:
+  @Name: ClsQName
+  @ElementType:
+    dis:QName
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: IFISA
+  @ElementType:
+    dis:ISA
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForIF
+
+ElementTypeBinding:
+  @Name: ClsISA
+  @ElementType:
+    dis:ISA
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: IFClsDef
+  @ElementType: 
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@: dis|MultipleResource
+      @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
+    @@resourceFor: ManakaiDOM|ForIF
+    @@resourceFor:
+      @@@@: ManakaiDOM|ForClass
+      @@@ForCheck: ManakaiDOM|ManakaiDOM !=ManakaiDOM|ManakaiDOM
+    @@For: ManakaiDOM|ManakaiDOMLatest
+    @@For: =ManakaiDOM|ManakaiDOM
+
+    @@rdf:type:
+      @@@@: DISLang|Interface
+      @@@ForCheck: ManakaiDOM|ForIF
+
+    @@rdf:type:
+      @@@@: DISLang|Class
+      @@@ForCheck: ManakaiDOM|ForClass
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOM||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
+
+    @@f:implements:
+      @@@@: URIFeature40
+      @@@For: ManakaiDOM|ManakaiDOMLatest
+
+ElementTypeBinding:
+  @Name: Method
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|Method
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM
+
+ElementTypeBinding:
+  @Name: IntMethod
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|Method
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|ForClass
+    @@ManakaiDOM:isForInternal: 1
+
+ElementTypeBinding:
+  @Name: Param
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISLang|MethodParameter
+
+ElementTypeBinding:
+  @Name: NamedParam
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISLang|MethodParameter
+    @@DISPerl:isNamedParameter: 1
+
+ElementTypeBinding:
+  @Name: Return
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISLang|MethodReturn
+
+ElementTypeBinding:
+  @Name: Attr
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISLang|Attribute
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM
+
+ElementTypeBinding:
+  @Name: Get
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISLang|AttributeGet
+
+ElementTypeBinding:
+  @Name: Set
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISLang|AttributeSet
+
+ElementTypeBinding:
+  @Name: InCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: ManakaiDOM|InCase
+
+ElementTypeBinding:
+  @Name: PerlDef
+  @ElementType:
+    dis:Def
+  @ShadowContent:
+    @@ContentType:
+      lang:Perl
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: Test
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: test|StandaloneTest
+    @@ForCheck: ManakaiDOM|ForClass
+
+## -- Implementation
+
+IFClsDef:
+  @IFQName: URIImplementation
+  @ClsQName: ManakaiURIImplementation
+
+  @IFISA: f|MinimumImplementation
+  @ClsISA: f|ManakaiMinimumImplementation
+
+  @enDesc:
+    The <IF::URIImplementation> interface provides
+    factory methods to create <IF::URIReference> objects.
+
+  @f:provides: URIFeature40
+
+  @Test:
+    @@enDesc:
+      The implementation registry should know this class when the
+      module is loaded.
+    @@PerlDef:
+      I: {
+        for my $impl (@{$Message::DOM::ImplementationRegistry
+                              ->get_implementation_list
+                                  ({<Q::fe|URI> => '4.0'})}) {
+          if ($impl->isa (<IFName::URIImplementation>)) {
+            last I;
+          }
+        }
+        $test->assert_never;
+      } # I
+
+  @Method:
+    @@Name: createURIReference
+    @@enDesc:
+      Creates a <IF::URIReference> object with a DOM URI.
+    @@Param:
+      @@@Name: uri
+      @@@Type: String
+      @@@enDesc:
+        A DOM URI.
+      @@@InCase:
+        @@@@Type: String
+        @@@@enDesc:
+          A new <IF::URIReference> object with its
+          <A::URIReference.uriReference> set to the parameter value.
+      @@@InCase:
+        @@@@For: ManakaiDOM|Perl
+        @@@@Type: DISPerl|SCALAR||ManakaiDOM|all
+        @@@@enDesc:
+          A new <IF::URIReference> object with its
+          <A::URIReference.uriReference> set to the value referenced
+          by the parameter value.  Any modification to the <IF::URIReference>
+          object will change the value referenced by the parameter value.
+      @@@InCase:
+        @@@@Type: URIReference
+        @@@@enDesc:
+          The method <kwd:MUST> return a new <IF::URIReference>
+          object that would be returned by the method 
+          <M::URIReference.cloneURIReference> of the parameter value.
+    @@Return:
+      @@@Type: URIReference
+      @@@enDesc:
+        The newly created <IF::URIReference> object.
+      @@@PerlDef:
+        if (UNIVERSAL::isa ($uri, <IFName::URIReference>)) {
+          __DEEP{
+            $r = $uri-><M::URIReference.cloneURIReference>;
+          }__;
+        } elsif (ref $uri eq 'SCALAR') {
+          $r = bless $uri, <ClassName::ManakaiURIReference>;
+        } else {
+          my $v = "$uri";
+          $r = bless \$v, <ClassName::ManakaiURIReference>;
+        }
+
+    @@Test:
+      @@@QName: URIImpl.createURIRef.1.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{createURIImplForTest:: $impl => $impl}__;
+
+        my $value = 'http://example.com/';
+  
+        $test->id ('interface');
+        my $uri1 = $impl-><M::URIImplementation.createURIReference>
+                            ($value);
+        $test->assert_isa ($uri1, <IFName::URIReference>);
+
+        $test->id ('uriReference');
+        $test->assert_equals ($uri1-><AG::URIReference.uriReference>,
+                              'http://example.com/');
+ 
+        $test->id ('modification');
+        $uri1-><AS::URIReference.uriFragment> ('abcdefg');
+        $test->assert_equals ($value, 'http://example.com/');
+    @@Test:
+      @@@QName: URIImpl.createURIRef.2.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{createURIImplForTest:: $impl => $impl}__;
+ 
+        my $value = 'http://example.com/';
+ 
+        $test->id ('interface');
+        my $uri1 = $impl-><M::URIImplementation.createURIReference>
+                            (\$value);
+        $test->assert_isa ($uri1, <IFName::URIReference>);
+
+        $test->id ('uriReference');
+        $test->assert_equals ($uri1-><AG::URIReference.uriReference>,
+                              'http://example.com/');
+ 
+        $test->id ('modification');
+        $uri1-><AS::URIReference.uriFragment> ('abcdefg');
+        $test->assert_equals ($value, 'http://example.com/#abcdefg');
+    @@Test:
+      @@@QName: URIImpl.createURIRef.3.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{createURIImplForTest:: $impl => $impl}__;
+ 
+        my $value = $impl-><M::URIImplementation.createURIReference>
+                             ('http://example.com/');
+ 
+        $test->id ('interface');
+        my $uri1 = $impl-><M::URIImplementation.createURIReference>
+                            ($value);
+        $test->assert_isa ($uri1, <IFName::URIReference>);
+
+        $test->id ('uriReference');
+        $test->assert_equals ($uri1-><AG::URIReference.uriReference>,
+                              'http://example.com/');
+ 
+        $test->id ('modification');
+        $uri1-><AS::URIReference.uriFragment> ('abcdefg');
+        $test->assert_equals ($value-><AG::URIReference.uriReference>,
+                              'http://example.com/');
+
+  @CODE:
+    @@QName: createURIImplForTest
+    @@PerlDef:
+      $impl = <Class::ManakaiURIImplementation>->_new;
+##URIImplementation
+
+ElementTypeBinding:
+  @Name: CODE
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISPerl|BlockCode
+    @@ForCheck: ManakaiDOM|ForClass
+
+IFClsDef:
+  @IFQName: URIReference
+  @ClsQName: ManakaiURIReference
+
+  @enDesc:
+    A <IF::URIReference> object represents a DOM URI.
+
+    A <IF::URIReference> object <kwd:MAY> also implement
+    scheme-specific interfaces.
+
+      {NOTE::
+        Modifications to the object, via the <A::URIReference.uriScheme>
+        attribute for example, might or might not result in
+        mutations of the interfaces implemented by the object,
+        since dynamic rebinding of classes might not be supported
+        in the programming language or the DOM binding in use.
+        
+        If a method or attribute that is inappropriate for
+        the underlying DOM URI represented by the <IF::URIReference>
+        object is invoked, the result is undefined, unless
+        the specification of the interface defines any error
+        handling behavior.  However, implementators are advised
+        to make the method or attribute implementations torelant
+        and harmless as far as possible.
+      }
+
+  @Attr:
+    @@Name: uriReference
+    @@Operator: DISPerl|AsStringMethod
+    @@Operator:
+      @@@: ""
+      @@ContentType: DISPerl|Perl
+    @@enDesc:
+      A string representation of the DOM URI.
+    @@Type: String
+    @@Get:
+      @@@PerlDef:
+        $r = $$self;
+    @@Set:
+      @@@enDesc:
+        Sets the DOM URI, with no lexical or semantical check
+        and normalization performed.  Implementations <kwd:MUST>
+        allow and set the specified value even if it is not a 
+        legal RFC 3986 URI reference or RFC 3987 IRI reference.
+      @@@PerlDef:
+        $$self = $given;
+        __DEEP{
+          $self-><M::ManakaiURIReference.onSchemeChanged>;
+        }__;
+
+    @@Test:
+      @@@QName: URIRef.uriRef.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{createURIImplForTest:: $impl => $impl}__;
+
+        for (
+          [q<http://www.example/>],
+          [q<about:blank>],
+          [qq<\x{3001}\x{3002}>],
+          [q<%23>],
+        ) {
+          my $uri1 = $impl-><M::URIImplementation.createURIReference> ($_->[0]);
+          
+          $test->id ('get');
+          $test->assert_equals 
+                   ($uri1-><AG::URIReference.uriReference>,
+                    $_->[0]);
+
+          $test->id ('set.same');
+          $uri1-><AS::URIReference.uriReference> ($_->[0]);
+          $test->assert_equals 
+                   ($uri1-><AG::URIReference.uriReference>,
+                    $_->[0]);
+
+          $test->id ('set.diff');
+          $uri1-><AS::URIReference.uriReference> (q<about:>);
+          $test->assert_equals 
+                   ($uri1-><AG::URIReference.uriReference>,
+                    q<about:>);
+        }
+
+    @@Test:
+      @@@QName: URIRef.stringify.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{createURIImplForTest:: $impl => $impl}__;
+
+        $test->id ('method');
+        $test->assert_equals
+                 ($impl-><M::URIImplementation.createURIReference> (q<a>)
+                       ->stringify,
+                  q<a>);
+
+        $test->id ('str');
+        $test->assert_equals
+                 ($impl-><M::URIImplementation.createURIReference> (q<a>).'',
+                  q<a>);
+
+  @IntMethod:
+    @@Name: onSchemeChanged
+    @@enDesc:
+      This method is invoked when the scheme component 
+      of the DOM URI has been changed.  Other component might
+      also be changed.
+    @@Return:
+      @@@PerlDef:
+      @@@enImplNote:
+        {TODO::
+          Class re<Perl::bless>ing.
+        }
+
+  @IntMethod:
+    @@Name: onAuthorityChanged
+    @@enDesc:
+      This method is invoked when the authority component 
+      of the DOM URI has been changed.  Other component might
+      also be changed.
+    @@Return:
+      @@@PerlDef:
+
+  @IntMethod:
+    @@Name: onPathChanged
+    @@enDesc:
+      This method is invoked when the path component 
+      of the DOM URI has been changed.  Other component might
+      also be changed.
+    @@Return:
+      @@@PerlDef:
+
+  @IntMethod:
+    @@Name: onQueryChanged
+    @@enDesc:
+      This method is invoked when the query component 
+      of the DOM URI has been changed.  Other component might
+      also be changed.
+    @@Return:
+      @@@PerlDef:
+
+  @IntMethod:
+    @@Name: onFragmentChanged
+    @@enDesc:
+      This method is invoked when the fragment component 
+      of the DOM URI has been changed.  Other component might
+      also be changed.
+    @@Return:
+      @@@PerlDef:
+
+  @Attr:
+    @@Name: uriScheme
+    @@enDesc:
+      The scheme component of the DOM URI.
+    @@Type: String
+    @@Get:
+      @@@enDesc:
+        The scheme component of the DOM URI is returned.
+
+        {P:: The <DFN::scheme component> can be obtained by the algorithm:
+
+          = Copy the DOM URI to the variable <VAR::U>.
+
+          = If <VAR::U> does not contain any <CHAR::COLON>,
+            there is no scheme component.
+
+          = Remove <CHAR::COLON> and any characters following it from <VAR::U>.
+
+          = If <VAR::U> contains <CHAR::SOLIDUS>, <CHAR::QUESTION MARK>,
+            and / or <CHAR::NUMBER SIGN>, then there is no scheme component.
+
+          = Otherwise, <VAR::U> is the scheme component.
+        
+        }
+
+        {NOTE::
+          {P::
+            This algorithm is so designed that:
+          
+            - when it is performed on an RFC 3986 URI or RFC 3987 IRI,
+              the substring matching to the <ABNF::scheme> production
+              <SRC::RFC 3986 3.1> is returned as the scheme component.
+
+            - when it is performed on an RFC 3986 relative reference or
+              RFC 3987 relative IRI reference, it reports that
+              there is no scheme component.
+
+          }
+        }
+      @@@nullCase:
+        @@@@enDesc:
+          If there is no scheme component.
+      @@@PerlDef:
+        if ($$self =~ m!^([^/?#:]*):!) {
+          $r = $1;
+        } else {
+          $r = null;
+        }
+    @@Set:
+      @@@enDesc:
+        Replaces the scheme component of the DOM URI by the new value.
+        If the new value contains <CHAR::SOLIDUS>, <CHAR::QUESTION MARK>,
+        <CHAR::NUMBER SIGN>, and / or <CHAR::COLON>, then
+        the result is undefined.
+
+        If the original DOM URI has no scheme component, then
+        the string obtained by concatenating the new scheme component
+        value, <CHAR::COLON>, and the original DOM URI is set
+        as the new DOM URI.
+      @@@nullCase:
+        If there is the scheme component, the scheme component
+        and a <CHAR::COLON> following it are removed from the DOM URI.
+      @@@PerlDef:
+        if (defined $given) {
+          unless ($given =~ m![/?#:]!) {
+            unless ($$self =~ s!^[^/?#:]*:!$given:!) {
+              $$self = $given . ':' . $$self;
+              __DEEP{
+                $self-><M::ManakaiURIReference.onSchemeChanged>;
+              }__;
+            }
+          }
+        } else {
+          $$self =~ s!^[^/?#:]*:!!;
+          __DEEP{
+            $self-><M::ManakaiURIReference.onSchemeChanged>;
+          }__;
+        }
+        
+    @@Test:
+      @@@QName: URIRef.uriScheme.1.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{createURIImplForTest:: $impl => $impl}__;
+
+        for (
+          [q<http://example/>, 'http', q<http://example/>, q<//example/>],
+          [q<hTTp://example/>, 'hTTp', q<http://example/>, q<//example/>],
+          [q<//example/>, null, q<http://example/>, q<//example/>],
+          [q</a:b/>, null, q<http:/a:b/>, q</a:b/>],
+          [q<?aa:b>, null, q<http:?aa:b>, q<?aa:b>],
+          [q<aaaa#bb:cc>, null, q<http:aaaa#bb:cc>, q<aaaa#bb:cc>],
+          [q<%D9%82%D9%87%D9%88%D8%A9://coffee.example/>,
+           '%D9%82%D9%87%D9%88%D8%A9',
+           q<http://coffee.example/>, q<//coffee.example/>],
+          [q<%D9%82%D9%87%D9%88%D8%a9://coffee.example/>,
+           '%D9%82%D9%87%D9%88%D8%a9',
+           q<http://coffee.example/>, q<//coffee.example/>],
+        ) {
+          $test->id ('get.'.$_->[0]);
+          my $uri1 = $impl-><M::URIImplementation.createURIReference>
+                              ($_->[0]);
+          $test->assert_equals
+                   ($uri1-><AG::URIReference.uriScheme>,
+                    $_->[1]);
+
+          $test->id ('set.'.$_->[0]);
+          my $uri2 = $impl-><M::URIImplementation.createURIReference> ($uri1);
+          $uri2-><AS::URIReference.uriScheme> ('http');
+          $test->assert_equals
+                   ($uri2-><AG::URIReference.uriReference>,
+                    $_->[2]);
+
+          $test->id ('empty.'.$_->[0]);
+          my $uri3 = $impl-><M::URIImplementation.createURIReference> ($uri1);
+          $uri3-><AS::URIReference.uriScheme> ('');
+          $test->assert_equals
+                   ($uri3-><AG::URIReference.uriReference>,
+                    $_->[3]);
+
+          $test->id ('reset.'.$_->[0]);
+          my $uri4 = $impl-><M::URIImplementation.createURIReference> ($uri1);
+          $uri4-><AS::URIReference.uriScheme> (null);
+          $test->assert_equals
+                   ($uri4-><AG::URIReference.uriReference>,
+                    $_->[4]);
+        }
+
+  @Attr:
+    @@Name: uriAuthority
+    @@enDesc:
+      The authority component of the DOM URI.
+    @@Type: String
+    @@Get:
+      @@@enDesc:
+        The authority component of the DOM URI is returned.
+
+        {P:: The <DFN::authority component> can be obtained by the algorithm:
+
+          = Copy the DOM URI to the variable <VAR::U>.
+
+          = If <VAR::U> contains a <CHAR::NUMBER SIGN>,
+            remove the character and any characters following it
+            from <VAR::U>.
+
+          = If <VAR::U> contains a <CHAR::QUESTION MARK>,
+            remove the character and any characters following it
+            from <VAR::U>.
+
+          = If <VAR::U> contains a <CHAR::COLON> <EM::before>
+            any occurence of <CHAR::SOLIDUS>, then 
+            remove the <CHAR::COLON> and any characters preceding it
+            from <VAR::U>.
+
+          = If <VAR::U> begins with two <CHAR::SOLIDUS> characters,
+            remove them from <VAR::U>.  <EM::Otherwise>,
+            <VAR::U> has no authority component.
+
+          = Remove any <CHAR::SOLIDUS> and any characters following
+            it from <VAR::U>.
+
+          = Then, <VAR::U> is the authority component.
+        
+        }
+
+        {NOTE::
+          {P::
+            This algorithm is so designed that:
+          
+            - when it is performed on an RFC 3986 URI reference,
+              the substring matching to the <ABNF::authority> production
+              <SRC::RFC 3986 3.2>, if any, is returned as the authority
+              component.
+
+            - when it is performed on an RFC 3987 IRI reference,
+              the substring matching to the <ABNF::iauthority> production
+              <SRC::RFC 3987 2.2>, if any, is returned as the authority
+              component.
+
+            - when it is performed on an RFC 3986 relative reference or
+              RFC 3987 relative IRI reference that does <EM::not>
+              contains authority component as defined in
+              RFC 3986 or RFC 3987, it reports that
+              there is no authority component.
+
+          }
+        }
+      @@@nullCase:
+        @@@@enDesc:
+          If there is no authority component.
+      @@@PerlDef:
+        my $v = $$self;
+        $v =~ s/#.*\z//s;
+        $v =~ s/\?.*\z//s;
+        $v =~ s!^[^:/]*:!!s;
+        if ($$self =~ m!^//([^/]*)!) {
+          $r = $1;
+        } else {
+          $r = null;
+        }
+    @@Set:
+      @@@enDesc:
+        Replaces the authority component of the DOM URI by the new value.
+        If the new value contains <CHAR::SOLIDUS>, <CHAR::QUESTION MARK>,
+        and / or <CHAR::NUMBER SIGN>, then the result is undefined.
+        If the <A::URIReference.uriPath> is empty and
+        does not begin with a <CHAR::SOLIDUS>,
+        then result is undefined.
+
+        If the original DOM URI has no authority component, then
+        the string obtained by concatenating the scheme component
+        with following <CHAR::COLON> character of the original DOM URI
+        if any, two <CHAR::SOLIDUS> characters, the new authority
+        component value, and the path, query, and fragment
+        components of the original DOM URI, with their preceding
+        delimiters, if any, is set as the new DOM URI.
+      @@@nullCase:
+        If there is the authority component, the authority component
+        and two <CHAR::SOLIDUS> characters preceding it are removed
+        from the DOM URI.
+      @@@PerlDef:
+        if (defined $given) {
+          unless ($given =~ m![/?#]!) {
+            __DEEP{
+              my $v = '';
+              my $w = $self-><AG::URIReference.uriScheme>;
+              $v .= $w . ':' if defined $w;
+              $v .= '//' . $given;
+              $v .= $self-><AG::URIReference.uriPath>;
+              $w = $self-><AG::URIReference.uriQuery>;
+              $v .= '?' . $w if defined $w;
+              $w = $self-><AG::URIReference.uriFragment>;
+              $v .= '#' . $w if defined $w;
+              $$self = $v;
+              $self-><M::ManakaiURIReference.onAuthorityChanged>;
+            }__;
+          }
+        } else {
+          __DEEP{
+            my $v = '';
+            my $w = $self-><AG::URIReference.uriScheme>;
+            $v .= $w . ':' if defined $w;
+            $v .= $self-><AG::URIReference.uriPath>;
+            $w = $self-><AG::URIReference.uriQuery>;
+            $v .= '?' . $w if defined $w;
+            $w = $self-><AG::URIReference.uriFragment>;
+            $v .= '#' . $w if defined $w;
+            $$self = $v;
+            $self-><M::ManakaiURIReference.onAuthorityChanged>;
+          }__;
+        }
+        
+    @@Test:
+      @@@QName: URIRef.uriAuth.1.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{createURIImplForTest:: $impl => $impl}__;
+
+        for (
+          [q<http://example/>, 'example', q<http://example/>,
+           q<http:///>, q<http:/>],
+          [q<http://eXAmple/>, 'eXAmple', q<http://example/>,
+           q<http:///>, q<http:/>],
+          [q<//example/>, 'example', q<//example/>, q<///>, q</>],
+          [q</a:b/>, null, q<//example/a:b/>, q<///a:b/>, q</a:b/>],
+          [q<?aa:b>, null, q<//example?aa:b>, q<//?a:b>, q<?aa:b>],
+          [q</aaaa#bb:cc>, null, q<//example/aaaa#bb:cc>,
+           q<///aaaa#bb:cc>, q</aaaa#bb:cc>],
+          [q<http://%D9%82%D9%87%D9%88%D8%A9/>,
+           '%D9%82%D9%87%D9%88%D8%A9',
+           q<http://example/>, q<http:///>, q<http:/>],
+          [q<http://%D9%82%D9%87%D9%88%D8%a9/>,
+           '%D9%82%D9%87%D9%88%D8%a9',
+           q<http://example/>, q<http:///>, q<http:/>],
+          ['about:', null, q<about://example>, q<about://>, q<about:>],
+          ['http://a:b@c/', 'a:b@c', q<http://example/>,
+           q<http:///>, q<http:/>],
+        ) {
+          $test->id ('get.'.$_->[0]);
+          my $uri1 = $impl-><M::URIImplementation.createURIReference>
+                              ($_->[0]);
+          $test->assert_equals
+                   ($uri1-><AG::URIReference.uriAuthority>,
+                    $_->[1]);
+
+          $test->id ('set.'.$_->[0]);
+          my $uri2 = $impl-><M::URIImplementation.createURIReference> ($uri1);
+          $uri2-><AS::URIReference.uriAuthority> ('example');
+          $test->assert_equals
+                   ($uri2-><AG::URIReference.uriReference>,
+                    $_->[2]);
+
+          $test->id ('empty.'.$_->[0]);
+          my $uri3 = $impl-><M::URIImplementation.createURIReference> ($uri1);
+          $uri3-><AS::URIReference.uriAuthority> ('');
+          $test->assert_equals
+                   ($uri3-><AG::URIReference.uriReference>,
+                    $_->[3]);
+
+          $test->id ('reset.'.$_->[0]);
+          my $uri4 = $impl-><M::URIImplementation.createURIReference> ($uri1);
+          $uri4-><AS::URIReference.uriAuthority> (null);
+          $test->assert_equals
+                   ($uri4-><AG::URIReference.uriReference>,
+                    $_->[4]);
+        }
+
+  @Attr:
+    @@Name: uriUserinfo
+    @@enDesc:
+      The userinfo component of the DOM URI.
+    @@Type: String
+    @@Get:
+      @@@enDesc:
+        The userinfo component of the DOM URI is returned.
+
+        {P:: The <DFN::userinfo component> can be obtained by the algorithm:
+
+          = Set <A::URIReference.uriAuthority> value
+            to the variable <VAR::U>.
+
+          = If <VAR::U> is <DOM::null>, then there is no userinfo
+            component.
+
+          = If <VAR::U> contains a <CHAR::COMMERCIAL AT> preceded
+            by no <CHAR::LEFT SQUARE BRACKET>, <CHAR::RIGHT SQUARE BRACKET>,
+            or <CHAR::COLON> character,
+            remove the character and any characters following it
+            from <VAR::U>.  <EM::Otherwise>, there is no userinfo
+            component.
+
+          = Then, <VAR::U> is the userinfo component.
+        
+        }
+
+        {NOTE::
+          {P::
+            This algorithm is so designed that:
+          
+            - when it is performed on an RFC 3986 URI reference,
+              the substring matching to the <ABNF::userinfo> production
+              <SRC::RFC 3986 3.2.1>, if any, is returned as the userinfo
+              component.
+
+            - when it is performed on an RFC 3987 IRI reference,
+              the substring matching to the <ABNF::iuserinfo> production
+              <SRC::RFC 3987 2.2>, if any, is returned as the userinfo component.
+
+            - when it is performed on an RFC 3986 relative reference or
+              RFC 3987 relative IRI reference that does <EM::not>
+              contains userinfo component as defined in
+              RFC 3986 or RFC 3987, it reports that
+              there is no userinfo component.
+
+          }
+        }
+      @@@nullCase:
+        @@@@enDesc:
+          If there is no userinfo component.
+      @@@PerlDef:
+        __DEEP{
+          my $v = $self-><AG::URIReference.uriAuthority>;
+          if (defined $v and $v =~ /^([^@\[\]]*)\@/) {
+            $r = $1;
+          } else {
+            $r = null;
+          }
+        }__;
+    @@Set:
+      @@@enDesc:
+        Replaces the userinfo component of the DOM URI by the new value.
+        If the new value contains <CHAR::SOLIDUS>, <CHAR::QUESTION MARK>,
+        <CHAR::NUMBER SIGN>, <CHAR::LEFT SQUARE BRACKET>,
+        <CHAR::RIGHT SQUARE BRACKET>, and / or <CHAR::COMMERCIAL AT>,
+        then the result is undefined.
+
+        If there is the authority component but no userinfo component,
+        then the authority component is replaced by the
+        concatenation of the new userinfo value, a <CHAR::COMMERCIAL AT>, 
+        and the original authority component.
+
+        If there is no authority component, then
+        the string obtained by concatenating the scheme component
+        with following <CHAR::COLON> character of the original DOM URI
+        if any, two <CHAR::SOLIDUS> characters, the new userinfo
+        component value, a <CHAR::COMMERCIAL AT> character,
+        and the path, query, and fragment
+        components of the original DOM URI, with their preceding
+        delimiters, if any, is set as the new DOM URI.
+        If the <A::URIReference.uriPath> is empty and
+        does not begin with a <CHAR::SOLIDUS>, then result is undefined.
+      @@@nullCase:
+        If there is the userinfo component, the userinfo component
+        and a <CHAR::COMMERCIAL AT> characters following it are removed
+        from the DOM URI.
+      @@@PerlDef:
+        __DEEP{
+          my $auth = $self-><AG::URIReference.uriAuthority>;
+          if (defined $auth) {
+            if (defined $given) {
+              unless ($auth =~ s/^[^\@\[\]]*\@/$given\@/) {
+                $auth = $given . '@' . $auth;
+              }
+            } else {
+              $auth =~ s/^[^\@\[\]]*\@//;
+            }
+            $self-><AS::URIReference.uriAuthority> ($auth);
+          }
+        }__;
+        
+    @@Test:
+      @@@QName: URIRef.uriUserinfo.1.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{createURIImplForTest:: $impl => $impl}__;
+
+        for (
+          [q<http://example/>, null, q<http://user@example/>,
+           q<http://@example/>, q<http://example/>],
+          [q<http://User@example/>, 'User', q<http://user@example/>,
+           q<http://@example/>, q<http://example/>],
+          [q<//example/>, null, q<//user@example/>,
+           q<//@example/>, q<//example/>],
+          [q<//u@example/>, 'u', q<//user@example/>,
+           q<//@example/>, q<//example/>],
+          [q</a:b/>, null, q<//user@/a:b/>, q<//@/a:b/>, q</a:b/>],
+          [q<?aa:b>, null, q<//user@?aa:b>, q<//user@?a:b>, q<?aa:b>],
+          [q</aaaa#bb:cc>, null, q<//user@/aaaa#bb:cc>,
+           q<//@/aaaa#bb:cc>, q</aaaa#bb:cc>],
+          [q<http://%D9%82%D9%87%D9%88%D8%A9@example/>,
+           '%D9%82%D9%87%D9%88%D8%A9',
+           q<http://user@example/>, q<http://@example/>, q<http://example/>],
+          [q<http://%D9%82%D9%87%D9%88%D8%a9@example/>,
+           '%D9%82%D9%87%D9%88%D8%a9',
+           q<http://user@example/>, q<http://@example/>, q<http://example/>],
+          ['about:', null, q<about://user@>, q<about://@>, q<about:>],
+          ['http://a:b@c/', 'a:b', q<http://user@c/>,
+           q<http://@c/>, q<http://c/>],
+          ['http://[c@d]/', null, q<http://user@[c@d]/>,
+           q<http://@[c@d]/>, q<http://[c@d]/>],
+        ) {
+          $test->id ('get.'.$_->[0]);
+          my $uri1 = $impl-><M::URIImplementation.createURIReference>
+                              ($_->[0]);
+          $test->assert_equals
+                   ($uri1-><AG::URIReference.uriUserinfo>,
+                    $_->[1]);
+
+          $test->id ('set.'.$_->[0]);
+          my $uri2 = $impl-><M::URIImplementation.createURIReference> ($uri1);
+          $uri2-><AS::URIReference.uriUserinfo> ('user');
+          $test->assert_equals
+                   ($uri2-><AG::URIReference.uriReference>,
+                    $_->[2]);
+
+          $test->id ('empty.'.$_->[0]);
+          my $uri3 = $impl-><M::URIImplementation.createURIReference> ($uri1);
+          $uri3-><AS::URIReference.uriUserinfo> ('');
+          $test->assert_equals
+                   ($uri3-><AG::URIReference.uriReference>,
+                    $_->[3]);
+
+          $test->id ('reset.'.$_->[0]);
+          my $uri4 = $impl-><M::URIImplementation.createURIReference> ($uri1);
+          $uri4-><AS::URIReference.uriUserinfo> (null);
+          $test->assert_equals
+                   ($uri4-><AG::URIReference.uriReference>,
+                    $_->[4]);
+        }
+
+  @Attr:
+    @@Name: uriHost
+    @@enDesc:
+      The host component of the DOM URI.
+    @@Type: String
+    @@Get:
+      @@@enDesc:
+        The host component of the DOM URI is returned.
+
+        {P:: The <DFN::host component> can be obtained by the algorithm:
+
+          = Set <A::URIReference.uriAuthority> value
+            to the variable <VAR::U>.
+
+          = If <VAR::U> is <DOM::null>, then there is no host
+            component.
+
+          = If <VAR::U> contains a <CHAR::COMMERCIAL AT>,  
+            remove the character and any characters preceding it
+            from <VAR::U>.
+
+          = If <VAR::U> contains a <CHAR::COLON> followed by
+            zero or more digits (i.e. <CHAR::DIGIT ZERO>
+            to <CHAR::DIGIT NINE>), then remove the <CHAR::COLON>
+            and any characters following it.
+
+          = Then, <VAR::U> is the userinfo component.
+        
+        }
+
+        {NOTE::
+          {P::
+            This algorithm is so designed that:
+          
+            - when it is performed on an RFC 3986 URI reference,
+              the substring matching to the <ABNF::host> production
+              <SRC::RFC 3986 3.2.2> is returned as the host component.
+
+            - when it is performed on an RFC 3987 IRI reference,
+              the substring matching to the <ABNF::ihost> production
+              <SRC::RFC 3987 2.2> is returned as the host component.
+
+            - when it is performed on an RFC 3986 relative reference or
+              RFC 3987 relative IRI reference that does <EM::not>
+              contains host component as defined in
+              RFC 3986 or RFC 3987, it reports that
+              there is no host component.
+
+          }
+        }
+      @@@nullCase:
+        @@@@enDesc:
+          If there is no host component.
+
+          {NOTE::
+            If the <A::URIReference.uriAuthority> attribute contains
+            a non-<DOM::null> value, then <A::URIReference.uriHost> has
+            never been <DOM::null>.
+          }
+      @@@PerlDef:
+        __DEEP{
+          my $v = $self-><AG::URIReference.uriAuthority>;
+          if (defined $v) {
+            $v =~ s/^[^@\[\]]*\@//;
+            $v =~ s/:[0-9]*\z//;
+            $r = $v;
+          } else {
+            $r = null;
+          }
+        }__;
+    @@Set:
+      @@@enDesc:
+        Replaces the host component of the DOM URI by the new value.
+        If the new value contains <CHAR::SOLIDUS>, <CHAR::QUESTION MARK>,
+        <CHAR::NUMBER SIGN>, <CHAR::LEFT SQUARE BRACKET>,
+        <CHAR::RIGHT SQUARE BRACKET>, and / or <CHAR::COLON>,
+        then the result is undefined.
+
+        If there is no authority component, then
+        the string obtained by concatenating the scheme component
+        with following <CHAR::COLON> character of the original DOM URI
+        if any, two <CHAR::SOLIDUS> characters,
+        the new host component, and the path, query, and fragment
+        components of the original DOM URI, with their preceding
+        delimiters, if any, is set as the new DOM URI.
+        If the <A::URIReference.uriPath> is empty and
+        does not begin with a <CHAR::SOLIDUS>, then result is undefined.
+      @@@PerlDef:
+        __DEEP{
+          my $auth = $self-><AG::URIReference.uriAuthority>;
+          if (defined $auth) {
+            my $v = '';
+            if ($auth =~ /^([^\@\[\]]*\@)/) {
+              $v .= $1;
+            }
+            $v .= $given;
+            if ($auth =~ /(:[0-9]*)\z/) {
+              $v .= $1;
+            }
+            $self-><AS::URIReference.uriAuthority> ($v);
+          } else {
+            $self-><AS::URIReference.uriAuthority> ($given);
+          }
+        }__;
+        
+    @@Test:
+      @@@QName: URIRef.uriHost.1.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{createURIImplForTest:: $impl => $impl}__;
+
+        for (
+          [q<http://example/>, 'example', q<http://example/>, q<http:///>],
+          [q<http://User@example/>, 'example', q<http://User@example/>,
+           q<http://User@/>],
+          [q<//example/>, 'example', q<//example/>, q<///>],
+          [q<//u@example/>, 'example', q<//u@example/>, q<//u@/>],
+          [q</a:b/>, null, q<//example/a:b/>, q<///a:b/>],
+          [q<?aa:b>, null, q<//example?aa:b>, q<//example?a:b>],
+          [q</aaaa#bb:cc>, null, q<//example/aaaa#bb:cc>,
+           q<///aaaa#bb:cc>],
+          [q<http://%D9%82%D9%87%D9%88%D8%A9/>,
+           '%D9%82%D9%87%D9%88%D8%A9', q<http://example/>, q<http:///>],
+          [q<http://%D9%82%D9%87%D9%88%D8%a9/>,
+           '%D9%82%D9%87%D9%88%D8%a9', q<http://example/>, q<http:///>],
+          ['about:', null, q<about://example>, q<about://>],
+          ['http://a:b@c:3/', 'c', q<http://a:b@example:3/>,
+           q<http://a:b@:3/>],
+          ['http://a:b@[c@d:4]:3/', '[c@d:4]', q<http://a:b@example:3/>,
+           q<http://a:b@:3/>],
+        ) {
+          $test->id ('get.'.$_->[0]);
+          my $uri1 = $impl-><M::URIImplementation.createURIReference>
+                              ($_->[0]);
+          $test->assert_equals
+                   ($uri1-><AG::URIReference.uriHost>,
+                    $_->[1]);
+
+          $test->id ('set.'.$_->[0]);
+          my $uri2 = $impl-><M::URIImplementation.createURIReference> ($uri1);
+          $uri2-><AS::URIReference.uriHost> ('example');
+          $test->assert_equals
+                   ($uri2-><AG::URIReference.uriReference>,
+                    $_->[2]);
+
+          $test->id ('empty.'.$_->[0]);
+          my $uri3 = $impl-><M::URIImplementation.createURIReference> ($uri1);
+          $uri3-><AS::URIReference.uriHost> ('');
+          $test->assert_equals
+                   ($uri3-><AG::URIReference.uriReference>,
+                    $_->[3]);
+        }
+
+  @Attr:
+    @@Name: uriPort
+    @@enDesc:
+      The port component of the DOM URI.
+    @@Type: String
+    @@Get:
+      @@@enDesc:
+        The port component of the DOM URI is returned.
+
+        {P:: The <DFN::port component> can be obtained by the algorithm:
+
+          = Set <A::URIReference.uriAuthority> value
+            to the variable <VAR::U>.
+
+          = If <VAR::U> is <DOM::null>, then there is no port
+            component.
+
+          = If <VAR::U> contains a <CHAR::COLON> followed
+            by zero or more digits (<CHAR::DIGIT ZERO> to
+            <CHAR::DIGIT NINE>),
+            remove the character and any characters following it
+            from <VAR::U>.  <EM::Otherwise>, there is no port
+            component.
+
+          = Then, <VAR::U> is the port component.
+        
+        }
+
+        {NOTE::
+          {P::
+            This algorithm is so designed that:
+          
+            - when it is performed on an RFC 3986 URI reference
+              or RFC 3987 IRI reference,
+              the substring matching to the <ABNF::port> production
+              <SRC::RFC 3986 3.2.3>, if any, is returned as the port component.
+
+            - when it is performed on an RFC 3986 relative reference or
+              RFC 3987 relative IRI reference that does <EM::not>
+              contains port component as defined in
+              RFC 3986 or RFC 3987, it reports that
+              there is no port component.
+
+          }
+        }
+      @@@nullCase:
+        @@@@enDesc:
+          If there is no port component.
+      @@@PerlDef:
+        __DEEP{
+          my $v = $self-><AG::URIReference.uriAuthority>;
+          if (defined $v and $v =~ /:([0-9]*)\z/) {
+            $r = $1;
+          } else {
+            $r = null;
+          }
+        }__;
+    @@Set:
+      @@@enDesc:
+        Replaces the port component of the DOM URI by the new value.
+        If the new value contains characters other than
+        digits (<CHAR::DIGIT ZERO> to <CHAR::DIGIT NINE>),
+        then the result is undefined.
+
+        If there is the authority component but no port component,
+        then the authority component is replaced by the
+        concatenation of the original authority component,
+        a <CHAR::COLON>, and the new port value.
+
+        If there is no authority component, then
+        the string obtained by concatenating the scheme component
+        with following <CHAR::COLON> character of the original DOM URI
+        if any, two <CHAR::SOLIDUS> characters, a <CHAR::COLON>
+        character, the new port component value,
+        and the path, query, and fragment
+        components of the original DOM URI, with their preceding
+        delimiters, if any, is set as the new DOM URI.
+        If the <A::URIReference.uriPath> is empty and
+        does not begin with a <CHAR::SOLIDUS>, then result is undefined.
+      @@@nullCase:
+        If there is the port component, the port component
+        and a <CHAR::COLON> characters preceding it are removed
+        from the DOM URI.
+      @@@PerlDef:
+        __DEEP{
+          my $auth = $self-><AG::URIReference.uriAuthority>;
+          if (defined $auth) {
+            if (defined $given) {
+              unless ($auth =~ s/:[0-9]*\z/:$given/) {
+                $auth = $auth . ':' . $given;
+              }
+            } else {
+              $auth =~ s/:[0-9]*\z//;
+            }
+            $self-><AS::URIReference.uriAuthority> ($auth);
+          }
+        }__;
+        
+    @@Test:
+      @@@QName: URIRef.uriPort.1.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{createURIImplForTest:: $impl => $impl}__;
+
+        for (
+          [q<http://example/>, null, q<http://example:2/>,
+           q<http://example:/>, q<http://example/>],
+          [q<http://User@example:3/>, '3', q<http://User@example:2/>,
+           q<http://User@example:/>, q<http://User@example/>],
+          [q<//example/>, null, q<//example:2/>,
+           q<//example:/>, q<//example/>],
+          [q<//u@example:3/>, '3', q<//u@example:2/>,
+           q<//u@example:/>, q<//u@example/>],
+          [q</a:b/>, null, q<//:2/a:b/>, q<//:/a:b/>, q</a:b/>],
+          [q<?aa:b>, null, q<//:2?aa:b>, q<//:?a:b>, q<?aa:b>],
+          [q</aaaa#bb:cc>, null, q<//:2/aaaa#bb:cc>,
+           q<//:/aaaa#bb:cc>, q</aaaa#bb:cc>],
+          [q<http://example:%D9%82%D9%87%D9%88%D8%A9/>,
+           '%D9%82%D9%87%D9%88%D8%A9',
+           q<http://example:2/>, q<http://example:/>, q<http://example/>],
+          [q<http://example:%D9%82%D9%87%D9%88%D8%a9/>,
+           '%D9%82%D9%87%D9%88%D8%a9',
+           q<http://example:2/>, q<http://example:/>, q<http://example/>],
+          ['about:', null, q<about://:2>, q<about://:>, q<about:>],
+          ['http://a:b@c:3/', '3', q<http://a:b@c:2/>,
+           q<http://a:b@c:/>, q<http://a:b@c/>],
+          ['http://[c@d:3]/', null, q<http://[c@d:3]:2/>,
+           q<http://[c@d:3]:/>, q<http://[c@d:3]/>],
+        ) {
+          $test->id ('get.'.$_->[0]);
+          my $uri1 = $impl-><M::URIImplementation.createURIReference>
+                              ($_->[0]);
+          $test->assert_equals
+                   ($uri1-><AG::URIReference.uriPort>,
+                    $_->[1]);
+
+          $test->id ('set.'.$_->[0]);
+          my $uri2 = $impl-><M::URIImplementation.createURIReference> ($uri1);
+          $uri2-><AS::URIReference.uriPort> ('2');
+          $test->assert_equals
+                   ($uri2-><AG::URIReference.uriReference>,
+                    $_->[2]);
+
+          $test->id ('empty.'.$_->[0]);
+          my $uri3 = $impl-><M::URIImplementation.createURIReference> ($uri1);
+          $uri3-><AS::URIReference.uriPort> ('');
+          $test->assert_equals
+                   ($uri3-><AG::URIReference.uriReference>,
+                    $_->[3]);
+
+          $test->id ('reset.'.$_->[0]);
+          my $uri4 = $impl-><M::URIImplementation.createURIReference> ($uri1);
+          $uri4-><AS::URIReference.uriPort> (null);
+          $test->assert_equals
+                   ($uri4-><AG::URIReference.uriReference>,
+                    $_->[4]);
+        }
+
+  @Attr:
+    @@Name: uriPath
+    @@enDesc:
+      The path component of the DOM URI.
+    @@Type: String
+    @@Get:
+      @@@enDesc:
+        The path component of the DOM URI is returned.
+
+        {P:: The <DFN::path component> can be obtained by the algorithm:
+
+          = Copy the DOM URI to the variable <VAR::U>.
+
+          = If <VAR::U> contains a <CHAR::NUMBER SIGN>, remove
+            the character and any characters following it.
+
+          = If <VAR::U> contains a <CHAR::QUESTION MARK>, remove
+            the character and any characters following it.
+
+          = If <VAR::U> contains a <CHAR::COLON> with no preceding
+            <CHAR::SOLIDUS> character, remove the <CHAR::COLON>
+            and any characters preceding it.
+
+          = If the first two characters are both <CHAR::SOLIDUS>,
+            remove those characters and any characters following it
+            <EM::before> the next occurence of <CHAR::SOLIDUS>, if any.
+
+          = Then, <VAR::U> is the path component.
+        
+        }
+
+        {NOTE::
+          {P::
+            This algorithm is so designed that:
+          
+            - when it is performed on an RFC 3986 URI reference,
+              the substring matching to the <ABNF::path> production
+              <SRC::RFC 3986 3.3> is returned as the path component.
+
+            - when it is performed on an RFC 3987 IRI reference,
+              the substring matching to the <ABNF::ipath> production
+              <SRC::RFC 3987 2.2> is returned as the path component.
+
+          }
+        }
+      @@@PerlDef:
+        __DEEP{
+          my $r = $$self;
+          $r =~ s/#.*\z//s;
+          $r =~ s/\?.*\z//s;
+          $r =~ s!^[^:/]*:!!s;
+          $r =~ s!^//[^/]*!!s;
+        }__;
+    @@Set:
+      @@@enDesc:
+        Replaces the path component of the DOM URI by the new value.
+
+        If the DOM URI <EM::does> contain the authority component
+        and the new path value's first character, if any,
+        is <EM::different> from <CHAR::SOLIDUS>, the result is
+        undefined.
+
+        If the DOM URI does <EM::not> contains scheme and authority
+        components and the new path value contains <CHAR::COLON>
+        that is not preceded by <CHAR::SOLIDUS> or the first
+        two characters are both <CHAR::SOLIDUS>, the result is
+        undefined.
+
+        If the new value contains <CHAR::QUESTION MARK> or
+        <CHAR::NUMBER SIGN>, the result is undefined.
+      @@@PerlDef:
+        __DEEP{
+          my $v = $$self;
+          my $new = '';
+          if ($v =~ s/(#.*)\z//s) {
+            $new = $1;
+          }
+          if ($v =~ s/(\?.*)\z//s) {
+            $new = $1 . $new;
+          }
+          $new = $given . $new;
+          if ($v =~ s!^((?:[^:/]*:)?(?://)?[^/]*)!!s) {
+            $new = $1 . $new;
+          }
+          $$self = $new;
+          $self-><M::ManakaiURIReference.onPathChanged>;
+        }__;
+        
+    @@Test:
+      @@@QName: URIRef.uriPath.1.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{createURIImplForTest:: $impl => $impl}__;
+
+        for (
+          [q<http://example/>, '/', q<http://example/path>, q<http://example>],
+          [q<http://example/path>, '/path', q<http://example/path>,
+           q<http://example/>],
+          [q<//example/>, '/', q<//example/path>, q<//example/>],
+          [q<//example/path>, '/path', q<//example/path>, q<//example/>],
+          [q</path?query>, '/path', q</path?query>, q<?query>],
+          [q<?query>, '', q</path?query>, q<?query>],
+          [q</aaaa#bb:cc>, '/aaaa', q</path#bb:cc>, q<#bb:cc>],
+          [q<http://example/%D9%82%D9%87%D9%88%D8%A9/>,
+           '/%D9%82%D9%87%D9%88%D8%A9/', q<http://example/path>,
+           q<http://example>],
+          [q<http://example/%D9%82%D9%87%D9%88%D8%a9/>,
+           '/%D9%82%D9%87%D9%88%D8%a9/', q<http://example/path>,
+           q<http://example>],
+          ['about:', '', q<about:/path>, q<about:>],
+          ['http://a:b@c:3/', '/', q<http://a:b@c:3/path>,
+           q<http://a:b@c:3>],
+          ['http://a:b@[c@d:4]:3/', '/', q<http://a:b@c:3/path>,
+           q<http://a:b@c:3>],
+        ) {
+          $test->id ('get.'.$_->[0]);
+          my $uri1 = $impl-><M::URIImplementation.createURIReference>
+                              ($_->[0]);
+          $test->assert_equals
+                   ($uri1-><AG::URIReference.uriPath>,
+                    $_->[1]);
+
+          $test->id ('set.'.$_->[0]);
+          my $uri2 = $impl-><M::URIImplementation.createURIReference> ($uri1);
+          $uri2-><AS::URIReference.uriPath> ('/path');
+          $test->assert_equals
+                   ($uri2-><AG::URIReference.uriReference>,
+                    $_->[2]);
+
+          $test->id ('set.'.$_->[0]);
+          my $uri3 = $impl-><M::URIImplementation.createURIReference> ($uri1);
+          $uri3-><AS::URIReference.uriPath> ('');
+          $test->assert_equals
+                   ($uri3-><AG::URIReference.uriReference>,
+                    $_->[3]);
+        }
+
+  @Attr:
+    @@Name: uriQuery
+    @@enDesc:
+      The query component of the DOM URI.
+    @@Type: String
+    @@Get:
+      @@@enDesc:
+        The query component of the DOM URI is returned.
+
+        {P:: The <DFN::query component> can be obtained by the algorithm:
+
+          = Copy the DOM URI to the variable <VAR::U>.
+
+          = If <VAR::U> contains a <CHAR::NUMBER SIGN>,
+            remove it and any characters following it from <VAR::U>.
+
+          = If <VAR::U> contains a <CHAR::QUESTION MARK>,
+            remove it and any character preceding it from <VAR::U>.
+            <EM::Otherwise>, there is no query component.
+
+          = Then, <VAR::U> is the query component.
+        
+        }
+
+        {NOTE::
+          {P::
+            This algorithm is so designed that:
+          
+            - when it is performed on an RFC 3986 URI reference,
+              the substring matching to the <ABNF::query> production
+              <SRC::RFC 3986 3.4>, if any, is returned as the query component.
+          
+            - when it is performed on an RFC 3987 IRI reference,
+              the substring matching to the <ABNF::iquery> production
+              <SRC::RFC 3987 2.2>, if any, is returned as the query component.
+
+            - when it is performed on an RFC 3986 relative reference or
+              RFC 3987 relative IRI reference that does <EM::not>
+              contains query component as defined in
+              RFC 3986 or RFC 3987, it reports that
+              there is no query component.
+
+          }
+        }
+      @@@nullCase:
+        @@@@enDesc:
+          If there is no query component.
+      @@@PerlDef:
+        __DEEP{
+          my $v = $$self;
+          $v =~ s/#.*\z//s;
+          if ($v =~ /\?(.*)\z/) {
+            $r = $1;
+          } else {
+            $r = null;
+          }
+        }__;
+    @@Set:
+      @@@enDesc:
+        Replaces the query component of the DOM URI by the new value.
+        If the new value contains a <CHAR::NUMVER SIGN>,
+        then the result is undefined.
+
+        If there is no query component, a <CHAR::QUESTION MARK>
+        followed by the new value is inserted before the first
+        <CHAR::NUMBER SIGN>, if any, or at the end of the DOM URI.
+      @@@nullCase:
+        If there is the query component, the query component
+        and a <CHAR::QUESTION MARK> character preceding it are removed
+        from the DOM URI.
+      @@@PerlDef:
+        __DEEP{
+          my $v = $$self;
+          my $f = '';
+          if ($v =~ s/(#.*)\z//s) {
+            $f = $v;
+          }
+          $v =~ s/\?.*\z//s;
+          if (defined $given) {
+            $v .= '?' . $given . $f;
+          } else {
+            $v .= $f;
+          }
+          $$self = $v;
+          $self-><M::ManakaiURIReference.onQueryChanged>;
+        }__;
+        
+    @@Test:
+      @@@QName: URIRef.uriQuery.1.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{createURIImplForTest:: $impl => $impl}__;
+
+        for (
+          [q<http://example/>, null, q<http://example/?query>,
+           q<http://example/?>, q<http://example/>],
+          [q<//example/>, null, q<//example/?query>,
+           q<//example/?>, q<//example/>],
+          [q</a:b/>, null, q</a:b/?query>, q</a:b/?>, q</a:b/>],
+          [q<?aa:b>, 'aa:b', q<?query>, q<?>, q<>],
+          [q</aaaa#bb:cc>, null, q</aaaa?query#bb:cc>,
+           q</aaaa?#bb:cc>, q</aaaa#bb:cc>],
+          [q</aaaa?query#bb:cc>, 'query', q</aaaa?query#bb:cc>,
+           q</aaaa?#bb:cc>, q</aaaa#bb:cc>],
+          [q<http://example/?%D9%82%D9%87%D9%88%D8%A9/>,
+           '%D9%82%D9%87%D9%88%D8%A9/',
+           q<http://example/?query>, q<http://example/?>, q<http://example/>],
+          [q<http://example/?%D9%82%D9%87%D9%88%D8%a9/>,
+           '%D9%82%D9%87%D9%88%D8%a9/',
+           q<http://example/?query>, q<http://example/?>, q<http://example/>],
+          ['about:', null, q<about:?query>, q<about:?>, q<about:>],
+          ['about:a?b', 'b', q<about:a?query>, q<about:a?>, q<about:a>],
+          ['about:#a?b', null, q<about:?query#a?b>, q<about:?#a?b>,
+           q<about:#a?b>],
+        ) {
+          $test->id ('get.'.$_->[0]);
+          my $uri1 = $impl-><M::URIImplementation.createURIReference>
+                              ($_->[0]);
+          $test->assert_equals
+                   ($uri1-><AG::URIReference.uriQuery>,
+                    $_->[1]);
+
+          $test->id ('set.'.$_->[0]);
+          my $uri2 = $impl-><M::URIImplementation.createURIReference> ($uri1);
+          $uri2-><AS::URIReference.uriQuery> ('query');
+          $test->assert_equals
+                   ($uri2-><AG::URIReference.uriReference>,
+                    $_->[2]);
+
+          $test->id ('set.empty.'.$_->[0]);
+          my $uri3 = $impl-><M::URIImplementation.createURIReference> ($uri1);
+          $uri3-><AS::URIReference.uriQuery> ('');
+          $test->assert_equals
+                   ($uri3-><AG::URIReference.uriReference>,
+                    $_->[3]);
+
+          $test->id ('reset.'.$_->[0]);
+          my $uri4 = $impl-><M::URIImplementation.createURIReference> ($uri1);
+          $uri4-><AS::URIReference.uriQuery> (null);
+          $test->assert_equals
+                   ($uri4-><AG::URIReference.uriReference>,
+                    $_->[4]);
+        }
+
+  @Attr:
+    @@Name: uriFragment
+    @@enDesc:
+      The fragment component of the DOM URI.
+    @@Type: String
+    @@Get:
+      @@@enDesc:
+        The fragment component of the DOM URI is returned.
+
+        {P:: The <DFN::fragment component> can be obtained by the algorithm:
+
+          = Copy the DOM URI to the variable <VAR::U>.
+
+          = If <VAR::U> contains a <CHAR::NUMBER SIGN>,
+            remove it and any characters preceding it from <VAR::U>.
+            <EM::Otherwise>, there is no fragment component.
+
+          = Then, <VAR::U> contains the fragment component.
+        
+        }
+
+        {NOTE::
+          {P::
+            This algorithm is so designed that:
+          
+            - when it is performed on an RFC 3986 URI reference,
+              the substring matching to the <ABNF::fragment> production
+              <SRC::RFC 3986 3.5>, if any, is returned as the fragment component.
+          
+            - when it is performed on an RFC 3987 IRI reference,
+              the substring matching to the <ABNF::ifragment> production
+              <SRC::RFC 3987 2.2>, if any, is returned as the fragment component.
+
+            - when it is performed on an RFC 3986 relative reference or
+              RFC 3987 relative IRI reference that does <EM::not>
+              contains fragment component as defined in
+              RFC 3986 or RFC 3987, it reports that
+              there is no fragment component.
+
+          }
+        }
+      @@@nullCase:
+        @@@@enDesc:
+          If there is no fragment component.
+      @@@PerlDef:
+        __DEEP{
+          my $v = $$self;
+          if ($v =~ /#(.*)\z/) {
+            $r = $1;
+          } else {
+            $r = null;
+          }
+        }__;
+    @@Set:
+      @@@enDesc:
+        Replaces the fragment component of the DOM URI by the new value.
+
+        If there is no fragment component, a <CHAR::NUMBER SIGN>
+        followed by the new value is appended to the DOM URI.
+      @@@nullCase:
+        If there is the fragment component, the fragment component
+        and a <CHAR::NUMBER SIGN> character preceding it are removed
+        from the DOM URI.
+      @@@PerlDef:
+        __DEEP{
+          my $v = $$self;
+          $v =~ s/#.*\z//s;
+          if (defined $given) {
+            $$self = $v . '#' . $given;
+          } else {
+            $$self = $v;
+          }
+          $self-><M::ManakaiURIReference.onFragmentChanged>;
+        }__;
+        
+    @@Test:
+      @@@QName: URIRef.uriFragment.1.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{createURIImplForTest:: $impl => $impl}__;
+
+        for (
+          [q<http://example/>, null, q<http://example/#fragment>,
+           q<http://example/#>, q<http://example/>],
+          [q<//example/>, null, q<//example/#fragment>,
+           q<//example/#>, q<//example/>],
+          [q</a:b/>, null, q</a:b/#fragment>, q</a:b/#>, q</a:b/>],
+          [q<?aa:b>, null, q<?aa:b#fragment>, q<?aa:b#>, q<?aa:b>],
+          [q</aaaa#bb:cc>, 'bb:cc', q</aaaa#fragment>, q</aaaa#>, q</aaaa>],
+          [q</aaaa?q#bb:cc>, 'bb:cc', q</aaaa?q#fragment>, q</aaaa?q#>,
+           q</aaaa?q>],
+          [q</aaaa?q#bb?cc>, 'bb?cc', q</aaaa?q#fragment>, q</aaaa?q#>,
+           q</aaaa?q>],
+          [q<http://example#%D9%82%D9%87%D9%88%D8%A9/>,
+           '%D9%82%D9%87%D9%88%D8%A9/',
+           q<http://example#fragment>, q<http://example#>, q<http://example>],
+          [q<http://example#%D9%82%D9%87%D9%88%D8%a9/>,
+           '%D9%82%D9%87%D9%88%D8%a9/',
+           q<http://example#fragment>, q<http://example#>, q<http://example#>],
+          ['about:', null, q<about:#fragment>, q<about:#>, q<about:>],
+          ['about:a?b', null, q<about:a?b#fragment>, q<about:a?b#>,
+           q<about:a?b>],
+          ['about:#a?b', 'a?b', q<about:#fragment>, q<about:#>, q<about:>],
+        ) {
+          $test->id ('get.'.$_->[0]);
+          my $uri1 = $impl-><M::URIImplementation.createURIReference>
+                              ($_->[0]);
+          $test->assert_equals
+                   ($uri1-><AG::URIReference.uriFragment>,
+                    $_->[1]);
+
+          $test->id ('set.'.$_->[0]);
+          my $uri2 = $impl-><M::URIImplementation.createURIReference> ($uri1);
+          $uri2-><AS::URIReference.uriFragment> ('fragment');
+          $test->assert_equals
+                   ($uri2-><AG::URIReference.uriReference>,
+                    $_->[2]);
+
+          $test->id ('set.empty.'.$_->[0]);
+          my $uri3 = $impl-><M::URIImplementation.createURIReference> ($uri1);
+          $uri3-><AS::URIReference.uriFragment> ('');
+          $test->assert_equals
+                   ($uri3-><AG::URIReference.uriReference>,
+                    $_->[3]);
+
+          $test->id ('reset.'.$_->[0]);
+          my $uri4 = $impl-><M::URIImplementation.createURIReference> ($uri1);
+          $uri4-><AS::URIReference.uriFragment> (null);
+          $test->assert_equals
+                   ($uri4-><AG::URIReference.uriReference>,
+                    $_->[4]);
+        }
+
+  @Method:
+    @@Name: getURIPathSegment
+    @@enDesc:
+      Returns a path segment in the DOM URI.
+    @@Param:
+      @@@Name: index
+      @@@Type: idl|unsignedLong||ManakaiDOM|all
+      @@@enDesc:
+        The ordinal index of the path segment, starting from zero.
+      @@@enDesc:
+        @@@@For: ManakaiDOM|Perl
+        @@@@ddid: a
+        @@@@@:
+          For Perl binding, if the <P::index> is negative, then
+          the method <kwd:MUST> act as if <MATH::<VAR::N> - <P::index>>
+          (where <VAR::N> is the number of the path segments in
+          the DOM URI) is set to the <P::index> parameter, except
+          when <MATH::<VAR::N> - <P::index>> is negative, in that
+          case the result is undefined.  If the <P::index> is
+          greater than or equal to <VAR::N>, the method <kwd:MUST>
+          act as if <MATH::<VAR::N> - 1> is set to the <P::index>
+          parameter.  For example, if <P::index>
+          is set to <Perl::-1>, then the method replaces the last
+          path segment in the DOM URI.          
+    @@Return:
+      @@@Type: String
+      @@@enDesc:
+        The <P::index>th path segment in the DOM URI.
+
+        {P::
+           The <P::index>th <DFN::path segment> can be retrived
+           by:
+
+           = Copy <A::URIReference.uriPath> value to the variable
+             <VAR::U>.
+
+           = Insert a <CHAR::SOLIDUS> at the begining of <VAR::U>.
+             Insert a <CHAR::SOLIDUS> at the end of <VAR::U>.
+
+           = Remove <MATH::(<P::index> + 1)>th <CHAR::SOLIDUS>
+             and any character before it from <VAR::U>.  If there
+             is no such <CHAR::SOLIDUS>, there is no <P::index>th
+             path segment.
+
+           = Remove <CHAR::SOLIDUS> and any character following
+             it from <VAR::U>, if any.
+
+           = Then, the variable <VAR::U> contains the <P::index>th 
+             path segment.
+        }
+      @@@nullCase:
+        @@@@enDesc:
+          If there is no <P::index>th path segment.
+      @@@PerlDef:
+        __DEEP{
+          $r = [split '/', $self-><AG::URIReference.uriPath>]->[$index];
+        }__;
+
+    @@Test:
+      @@@QName: URIRef.getURIPathSegment.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{createURIImplForTest:: $impl => $impl}__;
+
+        for (
+          [q<http://www.example/1/3/4?b#c>, ['', '1', '3', '4']],
+          [q<http://www.example/1/2/>, ['', '1', '2', '']],
+          [q<http://www.example/>, ['', '']],
+          [q<http://www.example>, ['']],
+          [q<mailto:foo@example>, ['foo@example']],
+          [q<about:>, ['']],
+          [q<data:text/plain,abcdefg/ef>, ['text', 'plain,abcdefg', 'ef']],
+          [q<./a/c/..d/e/..>, ['.', 'a', 'c', '..d', 'e', '..']],
+          [q<a>, ['a']],
+          [q</a/b/>, ['', 'a', 'b', '']],
+          [q<//a/b/c>, ['', 'b', 'c']],
+          [q<?a>, ['']],
+        ) {
+          my $uri1 = $impl-><M::URIImplementation.createURIReference> ($_->[0]);
+          for my $i (0..@{$_->[1]}) { # 0..n-1+1
+            $test->id ($_->[0].'.'.$i);
+            $test->assert_equals
+                     ($uri1-><M::URIReference.getURIPathSegment> ($i),
+                      $_->[1]->[$i]);
+          }
+          for my $i (1..@{$_->[1]}) {
+            $test->id ($_->[0].'.-'.$i);
+            $test->assert_equals
+                     ($uri1-><M::URIReference.getURIPathSegment> (-$i),
+                      $_->[1]->[-$i]);
+          }
+        }
+
+  @Method:
+    @@Name: setURIPathSegment
+    @@enDesc:
+      Replaces or removes a path segment in the DOM URI.
+
+      If there is the <P::index>th path segment and the <P::newValue>
+      is not <DOM::null>, then replace the <P::index>th path 
+      segment by <P::newValue>.
+
+      If there is the <P::index>th path segment and the <P::newValue>
+      is <DOM::null>, then the <P::index>th path segment and 
+      a <CHAR::SOLIDUS> character following it, if any, are removed.
+
+      If there is no <P::index>th path segment, then the result
+      is undefined, except when <P::index> is equal to the
+      number of the segments, in that case a <CHAR::SOLIDUS> and 
+      the <P::newValue> is appended to the path component.
+
+        {ISSUE::
+          <CODE::INDEX_SIZE_ERR>?  No effect?
+        }
+
+      If the method would make the only path segment removed,
+      then it <kwd:MUST> make the path component an empty string.
+
+      If there is the authority component and the method would make
+      the first path segment non-empty string, if there is
+      no scheme component, there is no authority component,
+      and the method would make the first path segment containing
+      a <CHAR::COLON> character, or if there is no authority 
+      component and the method would make the first and the second
+      path segments empty strings, then the result is undefined.
+    @@Param:
+      @@@Name: index
+      @@@Type: idl|unsignedLong||ManakaiDOM|all
+      @@@enDesc:
+        The ordinal index of the path segment to replace.
+      @@@enDesc:
+        @@@@For: ManakaiDOM|Perl
+        @@@@ddid: a
+        @@@@@:
+          For Perl binding, if the <P::index> is negative, then
+          the method <kwd:MUST> act as if <MATH::<VAR::N> - <P::index>>
+          (where <VAR::N> is the number of the path segments in
+          the DOM URI) is set to the <P::index> parameter, except
+          when <MATH::<VAR::N> - <P::index>> is negative, in that
+          case the result is undefined.  If the <P::index> is
+          greater than <VAR::N>, the method <kwd:MUST>
+          extend the list by inserting zero-length segments so that 
+          the result path component has <MATH::<P::index> + 1> segments.
+          For example, if <P::index>
+          is set to <Perl::-1>, then the method replaces the last
+          path segment in the DOM URI.          
+    @@Param:
+      @@@Name: newValue
+      @@@Type: String
+      @@@enDesc:
+        The new path segment.
+      @@@nullCase:
+        @@@@enDesc:
+          Removes the <P::index>th path segment.
+    @@Return:
+      @@@PerlDef:
+        __DEEP{
+          my @p = split '/', $self-><AG::URIReference.uriPath>;
+          if (defined $newValue) {
+            $p[$index] = $newValue;
+          } else {
+            splice @p, $index, 1;
+          }
+          no warnings 'uninitialized';
+          $self-><AS::URIReference.uriPath> (join '/', @p);
+        }__;
+
+    @@Test:
+      @@@QName: URIRef.setURIPathSegment.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{createURIImplForTest:: $impl => $impl}__;
+
+        my $uri1 = $impl-><M::URIImplementation.createURIReference>
+                            (q<http://foo.example/a/b/c>);
+
+        $test->id (1);
+        $uri1-><M::URIReference.setURIPathSegment> (3, 'd');
+        $test->assert_equals
+                 ($uri1-><AG::URIReference.uriReference>,
+                  q<http://foo.example/a/b/d>);
+
+        $test->id (2);
+        $uri1-><M::URIReference.setURIPathSegment> (2, 'e');
+        $test->assert_equals
+                 ($uri1-><AG::URIReference.uriReference>,
+                  q<http://foo.example/a/e/d>);
+
+        $test->id (3);
+        $uri1-><M::URIReference.setURIPathSegment> (3, '');
+        $test->assert_equals
+                 ($uri1-><AG::URIReference.uriReference>,
+                  q<http://foo.example/a/e/>);
+
+        $test->id (4);
+        $uri1-><M::URIReference.setURIPathSegment> (3, null);
+        $test->assert_equals
+                 ($uri1-><AG::URIReference.uriReference>,
+                  q<http://foo.example/a/b>);
+
+        $test->id (5);
+        $uri1-><M::URIReference.setURIPathSegment> (1, null);
+        $test->assert_equals
+                 ($uri1-><AG::URIReference.uriReference>,
+                  q<http://foo.example/b>);
+
+        $test->id (6);
+        $uri1-><M::URIReference.setURIPathSegment> (-1, 'd');
+        $test->assert_equals
+                 ($uri1-><AG::URIReference.uriReference>,
+                  q<http://foo.example/d>);
+
+        $test->id (7);
+        $uri1-><M::URIReference.setURIPathSegment> (-1, null);
+        $test->assert_equals
+                 ($uri1-><AG::URIReference.uriReference>,
+                  q<http://foo.example>);
+
+        $test->id (8);
+        $uri1-><M::URIReference.setURIPathSegment> (0, null);
+        $test->assert_equals
+                 ($uri1-><AG::URIReference.uriReference>,
+                  q<http://foo.example>);
+
+        $test->id (9);
+        $uri1-><M::URIReference.setURIPathSegment> (1, 'd');
+        $test->assert_equals
+                 ($uri1-><AG::URIReference.uriReference>,
+                  q<http://foo.example/d>);
+
+        $test->id (10);
+        $uri1-><M::URIReference.setURIPathSegment> (3, 'd');
+        $test->assert_equals
+                 ($uri1-><AG::URIReference.uriReference>,
+                  q<http://foo.example/d//d>);
+
+  @Attr:
+    @@Name: isURI
+    @@enDesc:
+      Whether the DOM URI is a URI or not according to the latest
+      version of the URI specification.
+
+        {NOTE:: At the time of writing, RFC 3986 is the latest
+                version and the attribute must contain the value
+                same as <A::URIReference.isURI3986> attribute of
+                the same object.
+        }
+    @@Type: idl|boolean||ManakaiDOM|all
+    @@Get:
+      @@@TrueCase:
+        @@@@enDesc:
+          If it is a legal URI.
+      @@@FalseCase:
+        @@@@enDesc:
+          If it is not a legal URI.
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><AG::URIReference.isURI3986>;
+        }__;
+
+  @Attr:
+    @@Name: isURI3986
+    @@DISPerl:methodName: is_uri_3986
+    @@enDesc:
+      Whether the DOM URI is an RFC 3986 URI or not.
+
+        {NOTE::
+           Whether the URI is valid according to the scheme-specific
+           syntax is not checked.
+        }
+    @@Type: idl|boolean||ManakaiDOM|all
+    @@Get:
+      @@@TrueCase:
+        @@@@enDesc:
+          If the DOM URI matches to the production
+          rule <ABNF::URI> <SRC::RFC 3986 3>.
+      @@@FalseCase:
+        @@@@enDesc: Otherwise.
+      @@@PerlDef:
+        my $v = $$self;
+        V: {
+          ## -- Scheme
+          unless ($v =~ s/^[A-Za-z][A-Za-z0-9+.-]*://s) {
+            last V;
+          }
+
+          ## -- Fragment
+          if ($v =~ s/#(.*)\z//s) {
+            my $w = $1;
+            unless ($w =~ m{\A(?>[A-Za-z0-9._~!\$&'()*+,;=:\@/?-]|%[0-9A-Fa-f][0-9A-Fa-f])*\z}) {
+              last V;
+            }
+          }
+
+          ## -- Query
+          if ($v =~ s/\?(.*)\z//s) {
+            my $w = $1;
+            unless ($w =~ m{\A(?>[A-Za-z0-9._~!\$&'()*+,;=:\@/?-]|%[0-9A-Fa-f][0-9A-Fa-f])*\z}) {
+              last V;
+            }
+          }
+
+          ## -- Authority
+          if ($v =~ s!^//([^/]*)!!s) {
+            my $w = $1;
+            $w =~ s/^(?>[A-Za-z0-9._~!\$&'()*+,;=:-]|%[0-9A-Fa-f][0-9A-Fa-f])*\@//os;
+            $w =~ s/:[0-9]*\z//;
+            if ($w =~ /^\[(.*)\]\z/s) {
+              my $x = $1;
+              unless ($x =~ /\A[vV][0-9A-Fa-f]+\.[A-Za-z0-9._~!\$&'()*+,;=:-]+\z/) {
+                ## IPv6address
+                my $isv6;
+                __CODE{isIPv6address:: $in => $x, $out => $isv6}__;
+                last V unless $isv6;
+              }
+            } else {
+              unless ($w =~ /\A(?>[A-Za-z0-9._~!\$&'()*+,;=-]|%[0-9A-Fa-f][0-9A-Fa-f])*\z/) {
+                last V;
+              }
+            }
+          }
+    
+          ## -- Path
+          unless ($v =~ m{\A(?>[A-Za-z0-9._~!\$&'()*+,;=:\@/-]|%[0-9A-Fa-f][0-9A-Fa-f])*\z}s) {
+            last V;
+          }
+
+          $r = true;
+        } # V
+
+  @Attr:
+    @@Name: isRelativeReference
+    @@enDesc:
+      Whether the DOM URI is a relative reference or not according to the latest
+      version of the URI specification.
+
+        {NOTE:: At the time of writing, RFC 3986 is the latest
+                version and the attribute must contain the value
+                same as <A::URIReference.isRelativeReference3986> attribute of
+                the same object.
+        }
+    @@Type: idl|boolean||ManakaiDOM|all
+    @@Get:
+      @@@TrueCase:
+        @@@@enDesc:
+          If it is a legal relative reference.
+      @@@FalseCase:
+        @@@@enDesc:
+          If it is not a legal relative reference.
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><AG::URIReference.isRelativeReference3986>;
+        }__;
+
+  @Attr:
+    @@Name: isRelativeReference3986
+    @@DISPerl:methodName: is_relative_reference_3986
+    @@enDesc:
+      Whether the DOM URI is an RFC 3986 relative reference or not.
+    @@Type: idl|boolean||ManakaiDOM|all
+    @@Get:
+      @@@TrueCase:
+        @@@@enDesc:
+          If the DOM URI matches to the production
+          rule <ABNF::relative-ref> <SRC::RFC 3986 4.2>.
+      @@@FalseCase:
+        @@@@enDesc: Otherwise.
+      @@@PerlDef:
+        my $v = $$self;
+        V: {
+          ## -- No scheme
+          if ($v =~ s!^[^/?#]*:!!s) {
+            last V;
+          }
+
+          ## -- Fragment
+          if ($v =~ s/#(.*)\z//s) {
+            my $w = $1;
+            unless ($w =~ m{\A(?>[A-Za-z0-9._~!\$&'()*+,;=:\@/?-]|%[0-9A-Fa-f][0-9A-Fa-f])*\z}) {
+              last V;
+            }
+          }
+
+          ## -- Query
+          if ($v =~ s/\?(.*)\z//s) {
+            my $w = $1;
+            unless ($w =~ m{\A(?>[A-Za-z0-9._~!\$&'()*+,;=:\@/?-]|%[0-9A-Fa-f][0-9A-Fa-f])*\z}) {
+              last V;
+            }
+          }
+
+          ## -- Authority
+          if ($v =~ s!^//([^/]*)!!s) {
+            my $w = $1;
+            $w =~ s/^(?>[A-Za-z0-9._~!\$&'()*+,;=:-]|%[0-9A-Fa-f][0-9A-Fa-f])*\@//os;
+            $w =~ s/:[0-9]*\z//;
+            if ($w =~ /^\[(.*)\]\z/s) {
+              my $x = $1;
+              unless ($x =~ /\A[vV][0-9A-Fa-f]+\.[A-Za-z0-9._~!\$&'()*+,;=:-]+\z/) {
+                ## IPv6address
+                my $isv6;
+                __CODE{isIPv6address:: $in => $x, $out => $isv6}__;
+                last V unless $isv6;
+              }
+            } else {
+              unless ($w =~ /\A(?>[A-Za-z0-9._~!\$&'()*+,;=-]|%[0-9A-Fa-f][0-9A-Fa-f])*\z/) {
+                last V;
+              }
+            }
+          }
+    
+          ## -- Path
+          unless ($v =~ m{\A(?>[A-Za-z0-9._~!\$&'()*+,;=:\@/-]|%[0-9A-Fa-f][0-9A-Fa-f])*\z}s) {
+            last V;
+          }
+
+          $r = true;
+        } # V
+
+  @Attr:
+    @@Name: isURIReference
+    @@enDesc:
+      Whether the DOM URI is a URI reference or not according to the latest
+      version of the URI specification.
+
+        {NOTE:: At the time of writing, RFC 3986 is the latest
+                version and the attribute must contain the value
+                same as <A::URIReference.isURIReference3986> attribute of
+                the same object.
+        }
+    @@Type: idl|boolean||ManakaiDOM|all
+    @@Get:
+      @@@TrueCase:
+        @@@@enDesc:
+          If it is a legal URI reference.
+      @@@FalseCase:
+        @@@@enDesc:
+          If it is not a legal URI reference.
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><AG::URIReference.isURIReference3986>;
+        }__;
+
+  @Attr:
+    @@Name: isURIReference3986
+    @@DISPerl:methodName: is_uri_reference_3986
+    @@enDesc:
+      Whether the DOM URI is an RFC 3986 URI reference or not.
+    @@Type: idl|boolean||ManakaiDOM|all
+    @@Get:
+      @@@TrueCase:
+        @@@@enDesc:
+          If the DOM URI matches to the production
+          rule <ABNF::URI-reference> <SRC::RFC 3986 4.1>.
+      @@@FalseCase:
+        @@@@enDesc: Otherwise.
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><AG::URIReference.isURI3986> ||
+               $self-><AG::URIReference.isRelativeReference3986>;
+        }__;
+
+  @Attr:
+    @@Name: isAbsoluteURI
+    @@enDesc:
+      Whether the DOM URI is an absolute URI or not according to the latest
+      version of the URI specification.
+
+        {NOTE:: At the time of writing, RFC 3986 is the latest
+                version and the attribute must contain the value
+                same as <A::URIReference.isAbsoluteURI3986> attribute of
+                the same object.
+        }
+    @@Type: idl|boolean||ManakaiDOM|all
+    @@Get:
+      @@@TrueCase:
+        @@@@enDesc:
+          If it is a legal absolute URI.
+      @@@FalseCase:
+        @@@@enDesc:
+          If it is not a legal absolute URI.
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><AG::URIReference.isAbsoluteURI3986>;
+        }__;
+
+  @Attr:
+    @@Name: isAbsoluteURI3986
+    @@DISPerl:methodName: is_absolute_uri_3986
+    @@enDesc:
+      Whether the DOM URI is an RFC 3986 absolute URI or not.
+    @@Type: idl|boolean||ManakaiDOM|all
+    @@Get:
+      @@@TrueCase:
+        @@@@enDesc:
+          If the DOM URI matches to the production
+          rule <ABNF::absolute-URI> <SRC::RFC 3986 4.3>.
+      @@@FalseCase:
+        @@@@enDesc: Otherwise.
+      @@@PerlDef:
+        __DEEP{
+          $r = $$self !~ /#/ && $self-><AG::URIReference.isURI3986>;
+        }__;
+
+  @Attr:
+    @@Name: isEmptyReference
+    @@enDesc:
+      Whether the DOM URI is an empty string or not.
+    @@Type: idl|boolean||ManakaiDOM|all
+    @@Get:
+      @@@TrueCase:
+        @@@@enDesc:
+          If the DOM URI is an empty string.
+      @@@FalseCase:
+        @@@@enDesc:
+          Otherwise.
+      @@@PerlDef:
+        $r = ($$self eq '');
+
+  @Attr:
+    @@Name: isIRI
+    @@enDesc:
+      Whether the DOM URI is an IRI or not according to the latest
+      version of the IRI specification.
+
+        {NOTE:: At the time of writing, RFC 3987 is the latest
+                version and the attribute must contain the value
+                same as <A::URIReference.isIRI3987> attribute of
+                the same object.
+        }
+    @@Type: idl|boolean||ManakaiDOM|all
+    @@Get:
+      @@@TrueCase:
+        @@@@enDesc:
+          If it is a legal IRI.
+      @@@FalseCase:
+        @@@@enDesc:
+          If it is not a legal IRI.
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><AG::URIReference.isIRI3987>;
+        }__;
+
+  @Attr:
+    @@Name: isIRI3987
+    @@DISPerl:methodName: is_iri_3987
+    @@enDesc:
+      Whether the DOM URI is an RFC 3987 IRI or not.
+
+        {NOTE::
+           Whether the IRI is valid according to the scheme-specific
+           syntax is not checked.
+        }
+    @@Type: idl|boolean||ManakaiDOM|all
+    @@Get:
+      @@@TrueCase:
+        @@@@enDesc:
+          If the DOM URI matches to the production
+          rule <ABNF::IRI> <SRC::RFC 3987 2.2>.
+      @@@FalseCase:
+        @@@@enDesc: Otherwise.
+      @@@PerlDef:
+        my $v = $$self;
+        V: {
+          ## LRM, RLM, LRE, RLE, LRO, RLO, PDF
+          ## U+200E, U+200F, U+202A - U+202E
+          my $ucschar = q{\x{00A0}-\x{200D}\x{2010}-\x{2029}\x{202F}-\x{D7FF}\x{F900}-\x{FDCF}\x{FDF0}-\x{FFEF}\x{10000}-\x{1FFFD}\x{20000}-\x{2FFFD}\x{30000}-\x{3FFFD}\x{40000}-\x{4FFFD}\x{50000}-\x{5FFFD}\x{60000}-\x{6FFFD}\x{70000}-\x{7FFFD}\x{80000}-\x{8FFFD}\x{90000}-\x{9FFFD}\x{A0000}-\x{AFFFD}\x{B0000}-\x{BFFFD}\x{C0000}-\x{CFFFD}\x{D0000}-\x{DFFFD}\x{E1000}-\x{EFFFD}};
+
+          ## -- Scheme
+          unless ($v =~ s/^[A-Za-z][A-Za-z0-9+.-]*://s) {
+            last V;
+          }
+
+          ## -- Fragment
+          if ($v =~ s/#(.*)\z//s) {
+            my $w = $1;
+            unless ($w =~ m{\A(?>[A-Za-z0-9._~!\$&'()*+,;=:\@/?$ucschar-]|%[0-9A-Fa-f][0-9A-Fa-f])*\z}o) {
+              last V;
+            }
+          }
+
+          ## -- Query
+          if ($v =~ s/\?(.*)\z//s) {
+            my $w = $1;
+            unless ($w =~ m{\A(?>[A-Za-z0-9._~!\$&'()*+,;=:\@/?$ucschar\x{E000}-\x{F8FF}\x{F0000}-\x{FFFFD}\x{100000}-\x{10FFFD}-]|%[0-9A-Fa-f][0-9A-Fa-f])*\z}o) {
+              last V;
+            }
+          }
+
+          ## -- Authority
+          if ($v =~ s!^//([^/]*)!!s) {
+            my $w = $1;
+            $w =~ s/^(?>[A-Za-z0-9._~!\$&'()*+,;=:$ucschar-]|%[0-9A-Fa-f][0-9A-Fa-f])*\@//os;
+            $w =~ s/:[0-9]*\z//; 
+            if ($w =~ /^\[(.*)\]\z/s) {
+              my $x = $1;
+              unless ($x =~ /\A[vV][0-9A-Fa-f]+\.[A-Za-z0-9._~!\$&'()*+,;=:-]+\z/) {
+                ## IPv6address
+                my $isv6;
+                __CODE{isIPv6address:: $in => $x, $out => $isv6}__;
+                last V unless $isv6;
+              }
+            } else {
+              unless ($w =~ /\A(?>[A-Za-z0-9._~!\$&'()*+,;=$ucschar-]|%[0-9A-Fa-f][0-9A-Fa-f])*\z/o) {
+                last V;
+              }
+            }
+          }
+    
+          ## -- Path
+          unless ($v =~ m{\A(?>[A-Za-z0-9._~!\$&'()*+,;=:\@/$ucschar-]|%[0-9A-Fa-f][0-9A-Fa-f])*\z}os) {
+            last V;
+          }
+
+          $r = true;
+        } # V
+
+  @Attr:
+    @@Name: isRelativeIRIReference
+    @@enDesc:
+      Whether the DOM IRI is a relative IRI reference or not according
+      to the latest version of the IRI specification.
+
+        {NOTE:: At the time of writing, RFC 3987 is the latest
+                version and the attribute must contain the value
+                same as <A::URIReference.isRelativeIRIReference3987> attribute of
+                the same object.
+        }
+    @@Type: idl|boolean||ManakaiDOM|all
+    @@Get:
+      @@@TrueCase:
+        @@@@enDesc:
+          If it is a legal relative IRI reference.
+      @@@FalseCase:
+        @@@@enDesc:
+          If it is not a legal relative IRI reference.
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><AG::URIReference.isRelativeIRIReference3987>;
+        }__;
+
+  @Attr:
+    @@Name: isRelativeIRIReference3987
+    @@DISPerl:methodName: is_relative_iri_reference_3987
+    @@enDesc:
+      Whether the DOM URI is an RFC 3987 relative IRI reference or not.
+    @@Type: idl|boolean||ManakaiDOM|all
+    @@Get:
+      @@@TrueCase:
+        @@@@enDesc:
+          If the DOM URI matches to the production
+          rule <ABNF::irelative-ref> <SRC::RFC 3987 2.2, 4.1>.
+      @@@FalseCase:
+        @@@@enDesc: Otherwise.
+      @@@PerlDef:
+        my $v = $$self;
+        V: {
+          ## LRM, RLM, LRE, RLE, LRO, RLO, PDF
+          ## U+200E, U+200F, U+202A - U+202E
+          my $ucschar = q{\x{00A0}-\x{200D}\x{2010}-\x{2029}\x{202F}-\x{D7FF}\x{F900}-\x{FDCF}\x{FDF0}-\x{FFEF}\x{10000}-\x{1FFFD}\x{20000}-\x{2FFFD}\x{30000}-\x{3FFFD}\x{40000}-\x{4FFFD}\x{50000}-\x{5FFFD}\x{60000}-\x{6FFFD}\x{70000}-\x{7FFFD}\x{80000}-\x{8FFFD}\x{90000}-\x{9FFFD}\x{A0000}-\x{AFFFD}\x{B0000}-\x{BFFFD}\x{C0000}-\x{CFFFD}\x{D0000}-\x{DFFFD}\x{E1000}-\x{EFFFD}};
+
+          ## -- No scheme
+          if ($v =~ s!^[^/?#]*:!!s) {
+            last V;
+          }
+
+          ## -- Fragment
+          if ($v =~ s/#(.*)\z//s) {
+            my $w = $1;
+            unless ($w =~ m{\A(?>[A-Za-z0-9._~!\$&'()*+,;=:\@/?$ucschar-]|%[0-9A-Fa-f][0-9A-Fa-f])*\z}o) {
+              last V;
+            }
+          }
+
+          ## -- Query
+          if ($v =~ s/\?(.*)\z//s) {
+            my $w = $1;
+            unless ($w =~ m{\A(?>[A-Za-z0-9._~!\$&'()*+,;=:\@/?$ucschar\x{E000}-\x{F8FF}\x{F0000}-\x{FFFFD}\x{100000}-\x{10FFFD}-]|%[0-9A-Fa-f][0-9A-Fa-f])*\z}o) {
+              last V;
+            }
+          }
+
+          ## -- Authority
+          if ($v =~ s!^//([^/]*)!!s) {
+            my $w = $1;
+            $w =~ s/^(?>[A-Za-z0-9._~!\$&'()*+,;=:$ucschar-]|%[0-9A-Fa-f][0-9A-Fa-f])*\@//os;
+            $w =~ s/:[0-9]*\z//;
+            if ($w =~ /^\[(.*)\]\z/s) {
+              my $x = $1;
+              unless ($x =~ /\A[vV][0-9A-Fa-f]+\.[A-Za-z0-9._~!\$&'()*+,;=:-]+\z/) {
+                ## IPv6address
+                my $isv6;
+                __CODE{isIPv6address:: $in => $x, $out => $isv6}__;
+                last V unless $isv6;
+              }
+            } else {
+              unless ($w =~ /\A(?>[A-Za-z0-9._~!\$&'()*+,;=$ucschar-]|%[0-9A-Fa-f][0-9A-Fa-f])*\z/o) {
+                last V;
+              }
+            }
+          }
+    
+          ## -- Path
+          unless ($v =~ m{\A(?>[A-Za-z0-9._~!\$&'()*+,;=:\@/$ucschar-]|%[0-9A-Fa-f][0-9A-Fa-f])*\z}os) {
+            last V;
+          }
+
+          $r = true;
+        } # V
+
+  @Attr:
+    @@Name: isIRIReference
+    @@enDesc:
+      Whether the DOM URI is an IRI reference or not according to the latest
+      version of the IRI specification.
+
+        {NOTE:: At the time of writing, RFC 3987 is the latest
+                version and the attribute must contain the value
+                same as <A::URIReference.isIRIReference3987> attribute of
+                the same object.
+        }
+    @@Type: idl|boolean||ManakaiDOM|all
+    @@Get:
+      @@@TrueCase:
+        @@@@enDesc:
+          If it is a legal IRI reference.
+      @@@FalseCase:
+        @@@@enDesc:
+          If it is not a legal IRI reference.
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><AG::URIReference.isIRIReference3987>;
+        }__;
+
+  @Attr:
+    @@Name: isIRIReference3987
+    @@DISPerl:methodName: is_iri_reference_3987
+    @@enDesc:
+      Whether the DOM URI is an RFC 3987 IRI reference or not.
+    @@Type: idl|boolean||ManakaiDOM|all
+    @@Get:
+      @@@TrueCase:
+        @@@@enDesc:
+          If the DOM URI matches to the production
+          rule <ABNF::IRI-reference> <SRC::RFC 3987 2.2, 4.1>.
+      @@@FalseCase:
+        @@@@enDesc: Otherwise.
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><AG::URIReference.isIRI3987> ||
+               $self-><AG::URIReference.isRelativeIRIReference3987>;
+        }__;
+
+  @Attr:
+    @@Name: isAbsoluteIRI
+    @@enDesc:
+      Whether the DOM URI is an absolute IRI or not according to the latest
+      version of the IRI specification.
+
+        {NOTE:: At the time of writing, RFC 3987 is the latest
+                version and the attribute must contain the value
+                same as <A::URIReference.isAbsoluteIRI3987> attribute of
+                the same object.
+        }
+    @@Type: idl|boolean||ManakaiDOM|all
+    @@Get:
+      @@@TrueCase:
+        @@@@enDesc:
+          If it is a legal absolute IRI.
+      @@@FalseCase:
+        @@@@enDesc:
+          If it is not a legal absolute IRI.
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><AG::URIReference.isAbsoluteIRI3987>;
+        }__;
+
+  @Attr:
+    @@Name: isAbsoluteIRI3987
+    @@DISPerl:methodName: is_absolute_iri_3987
+    @@enDesc:
+      Whether the DOM URI is an RFC 3987 absolute IRI or not.
+    @@Type: idl|boolean||ManakaiDOM|all
+    @@Get:
+      @@@TrueCase:
+        @@@@enDesc:
+          If the DOM URI matches to the production
+          rule <ABNF::absolute-IRI> <SRC::RFC 3987 2.2, 4.1>.
+      @@@FalseCase:
+        @@@@enDesc: Otherwise.
+      @@@PerlDef:
+        __DEEP{
+          $r = $$self !~ /#/ && $self-><AG::URIReference.isIRI3987>;
+        }__;
+
+  @CODE:
+    @@QName: isIPv6address
+    @@enDesc:
+      <Perl::$in>, <Perl::$out>
+    @@PerlDef:
+      my $ipv4 = qr/(?>0|1[0-9]{0,2}|2(?>[0-4][0-9]?|5[0-5]?|[6-9])?|[3-9][0-9]?)(?>\.(?>0|1[0-9]{0,2}|2(?>[0-4][0-9]?|5[0-5]?|[6-9])?|[3-9][0-9]?)){3}/;
+      my $h16 = qr/[0-9A-Fa-f]{1,4}/;
+      if ($in =~ s/(?:$ipv4|$h16)\z//o) {
+        if ($in =~ /\A(?>$h16:){6}\z/o or
+            $in =~ /\A::(?>$h16:){0,5}\z/o or
+            $in =~ /\A$h16::(?>$h16:){4}\z/o or
+            $in =~ /\A$h16(?::$h16)?::(?>$h16:){3}\z/o or
+            $in =~ /\A$h16(?::$h16){0,2}::(?>$h16:){2}\z/o or
+            $in =~ /\A$h16(?::$h16){0,3}::$h16:\z/o or
+            $in =~ /\A$h16(?::$h16){0,4}::\z/o) {
+          $out = true;
+        }
+      } elsif ($in =~ s/$h16\z//o) {
+        if ($in eq '' or $in =~ /\A$h16(?>:$h16){0,5}\z/o) {
+          $out = true;
+        }
+      } elsif ($in =~ s/::\z//o) {
+        if ($in eq '' or $in =~ /\A$h16(?>:$h16){0,6}\z/o) {
+          $out = true;
+        }
+      }
+
+  @Method:
+    @@Name: getURIReference
+    @@enDesc:
+      Creates a clone of the DOM URI object, in which 
+      any character not allowed in URI references are percent-encoded
+      as per the latest version of the URI specification.
+
+        {NOTE:: At the time of writing, RFC 3986 is the latest
+                version and the method must return the same
+                result as <M::URIReference.getURIReference3986> method.
+        }
+    @@Return:
+      @@@Type: URIReference
+      @@@enDesc:
+        The newly created <IF::URIReference> object.
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><M::URIReference.getURIReference3986>;
+        }__;
+
+  @Method:
+    @@Name: getURIReference3986
+    @@DISPerl:methodName: get_uri_reference_3986
+    @@enDesc:
+      Creates a clone of the DOM URI object, in which 
+      any character not allowed in RFC 3986 URI references are percent-encoded.
+
+      {P:: The method <kwd:MUST> perform the algorithm specified
+      in the section 3.1 of the RFC 3987 on a copy of the DOM URI
+      contained by the object, as amended as:
+
+        {LI:: it <kwd:MUST-NOT> convert the authority component
+          using the IDNA rule.
+
+            {ISSUE::
+              Define a separate method to convert IDN to Punycoded name.
+            }
+        }
+
+        - it <kwd:MUST> also deal with the characters not allowed
+          in URIs in step 2 of the RFC 3987 algorithm.
+      }
+ 
+        {NOTE::
+          The result DOM URI might not be a conformant RFC 3986
+          URI reference.
+        }
+    @@Return:
+      @@@Type: URIReference
+      @@@enDesc:
+        The newly created <IF::URIReference> object.
+      @@@PerlDef:
+        __DEEP{
+          require Encode;
+          my $v = Encode::encode ('utf8', $$self);
+          $v =~ s/([<>"{}|\\\^`\x00-\x20\x7E-\xFF])/sprintf '%%%02X', ord $1/ge;
+          $r = bless \$v, <ClassName::ManakaiURIReference>;
+        }__;
+
+  @Method:
+    @@Name: getIRIReference
+    @@enDesc:
+      Creates a clone of the DOM URI object, in which percent-encodings
+      are decoded as far as possible
+      as per the latest version of the IRI specification.
+
+        {NOTE:: At the time of writing, RFC 3987 is the latest
+                version and the method must return the same
+                result as <M::URIReference.getIRIReference3987> method.
+        }
+    @@Return:
+      @@@Type: URIReference
+      @@@enDesc:
+        The newly created <IF::URIReference> object.
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><M::URIReference.getIRIReference3987>;
+        }__;
+
+  @Method:
+    @@Name: getIRIReference3987
+    @@DISPerl:methodName: get_iri_reference_3987
+    @@enDesc:
+      Creates a clone of the DOM URI object, in which 
+      percent-encodings are decoded as far as possible
+      as defined in RFC 3987 IRI references.
+
+      {P:: The method <kwd:MUST> perform a variant of the algorithm specified
+      in the section 3.2 of RFC 3987 on a copy of the DOM URI
+      contained by the object, as amended by replacing step 4 as:
+
+        {LI::
+           Re-percent-encode all octets produced in step 3 that in
+           UTF-8 represent characters that:
+
+             - are US-ASCII characters not allowed in RFC 3986 URI
+               references,
+
+             - are not contained in <ABNF::ucschar>
+               character range and are not US-ASCII printable characters, or
+
+             - are contained in the list of forbidden characters
+               in the section 4.1 of RFC 3987.
+        }
+      }
+ 
+        {NOTE::
+          The result DOM URI might not be a conformant RFC 3987
+          IRI reference.
+        }
+    @@Return:
+      @@@Type: URIReference
+      @@@enDesc:
+        The newly created <IF::URIReference> object.
+      @@@PerlDef:
+        __DEEP{
+          my $v = $$self;
+          $v =~ s{%([2-9A-Fa-f][0-9A-Fa-f])}
+                 {
+                   my $ch = hex $1;
+                   if ([
+                 # 0x0    0x1    0x2    0x3    0x4    0x5    0x6    0x7
+                 # 0x8    0x9    0xA    0xB    0xC    0xD    0xE    0xF
+                   true,  true,  true,  true,  true,  true,  true,  true, # 0x00
+                   true,  true,  true,  true,  true,  true,  true,  true, # 0x08
+                   true,  true,  true,  true,  true,  true,  true,  true, # 0x10
+                   true,  true,  true,  true,  true,  true,  true,  true, # 0x18
+                   true,  true,  true,  true,  true,  true,  true,  true, # 0x20
+                   true,  true,  true,  true,  true, false, false,  true, # 0x28
+                  false, false, false, false, false, false, false, false, # 0x30
+                  false, false,  true,  true,  true,  true,  true,  true, # 0x38
+                   true, false, false, false, false, false, false, false, # 0x40
+                  false, false, false, false, false, false, false, false, # 0x48
+                  false, false, false, false, false, false, false, false, # 0x50
+                  false, false, false,  true,  true,  true,  true, false, # 0x58
+                   true, false, false, false, false, false, false, false, # 0x60
+                  false, false, false, false, false, false, false, false, # 0x68
+                  false, false, false, false, false, false, false, false, # 0x70
+                  false, false, false,  true,  true,  true, false,  true, # 0x78
+                 # 0x0    0x1    0x2    0x3    0x4    0x5    0x6    0x7
+                 # 0x8    0x9    0xA    0xB    0xC    0xD    0xE    0xF
+                   ]->[$ch]) {
+                     # PERCENT SIGN, reserved, not-allowed in ASCII
+                     '%'.$1;
+                   } else {
+                     chr $ch;
+                   }
+                 }ge;
+          $v =~ s{(
+            [\xC2-\xDF][\x80-\xBF] |                          # UTF8-2
+            \xE0[\xA0-\xBF][\x80-\xBF] |
+            [\xE1-\xEC][\x80-\xBF][\x80-\xBF] |
+            \xED[\x80-\x9F][\x80-\xBF] |
+            [\xEE\xEF][\x80-\xBF][\x80-\xBF] |                # UTF8-3
+            \xF0[\x90-\xBF][\x80-\xBF][\x80-\xBF] |
+            [\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF] |
+            \xF4[\x80-\x8F][\x80-\xBF][\x80-\xBF]             # UTF8-4
+          )}{
+            my $c = $1;
+            require Encode;
+            my $ch = Encode::decode ('utf8', $c);
+            if ($ch =~ /^[\x{00A0}-\x{200D}\x{2010}-\x{2029}\x{202F}-\x{D7FF}\x{F900}-\x{FDCF}\x{FDF0}-\x{FFEF}\x{10000}-\x{1FFFD}\x{20000}-\x{2FFFD}\x{30000}-\x{3FFFD}\x{40000}-\x{4FFFD}\x{50000}-\x{5FFFD}\x{60000}-\x{6FFFD}\x{70000}-\x{7FFFD}\x{80000}-\x{8FFFD}\x{90000}-\x{9FFFD}\x{A0000}-\x{AFFFD}\x{B0000}-\x{BFFFD}\x{C0000}-\x{CFFFD}\x{D0000}-\x{DFFFD}\x{E1000}-\x{EFFFD}]/) {
+              $c;
+            } else {
+              $c =~ s/([\x80-\xFF])/sprintf '%%%02X', ord $1/ge;
+              $c;
+            }
+          }gex;
+          $v =~ s/([<>"{}|\\\^`\x00-\x20\x7E-\xFF])/sprintf '%%%02X', ord $1/ge;
+          $r = bless \$v, <ClassName::ManakaiURIReference>;
+        }__;
+
+  @Test:
+    @@QName: URIRef.validity.test
+    @@PerlDef:
+      my $impl;
+      __CODE{createURIImplForTest:: $impl => $impl}__;
+
+      for (
+        {
+          in                     => q<http://foo.example/>,
+          get_uri_reference      => q<http://foo.example/>,
+          get_uri_reference_3986 => q<http://foo.example/>,
+          get_iri_reference      => q<http://foo.example/>,
+          get_iri_reference_3987 => q<http://foo.example/>,
+          is_uri_reference => true, is_iri_reference => true,
+          is_uri_reference_3986 => true, is_iri_reference_3987 => true,
+          is_uri => true, is_iri => true,
+          is_uri_3986 => true, is_iri_3987 => true,
+          is_relative_reference => false, is_relative_iri_reference => false,
+          is_relative_reference_3986 => false,
+          is_relative_iri_reference_3987 => false,
+          is_absolute_uri => true, is_absolute_iri => true,
+          is_absolute_uri_3986 => true, is_absolute_iri_3987 => true,
+          is_empty_reference => false,
+        },
+        {
+          in                     => q<http://foo.example/#fragment>,
+          get_uri_reference      => q<http://foo.example/#fragment>,
+          get_uri_reference_3986 => q<http://foo.example/#fragment>,
+          get_iri_reference      => q<http://foo.example/#fragment>,
+          get_iri_reference_3987 => q<http://foo.example/#fragment>,
+          is_uri_reference => true, is_iri_reference => true,
+          is_uri_reference_3986 => true, is_iri_reference_3987 => true,
+          is_uri => true, is_iri => true,
+          is_uri_3986 => true, is_iri_3987 => true,
+          is_relative_reference => false, is_relative_iri_reference => false,
+          is_relative_reference_3986 => false,
+          is_relative_iri_reference_3987 => false,
+          is_absolute_uri => false, is_absolute_iri => false,
+          is_absolute_uri_3986 => false, is_absolute_iri_3987 => false,
+          is_empty_reference => false,
+        },
+        {
+          in                     => q<http://foo.example/">,
+          get_uri_reference      => q<http://foo.example/%22>,
+          get_uri_reference_3986 => q<http://foo.example/%22>,
+          get_iri_reference      => q<http://foo.example/%22>,
+          get_iri_reference_3987 => q<http://foo.example/%22>,
+          is_uri_reference => false, is_iri_reference => false,
+          is_uri_reference_3986 => false, is_iri_reference_3987 => false,
+          is_uri => false, is_iri => false,
+          is_uri_3986 => false, is_iri_3987 => false,
+          is_relative_reference => false, is_relative_iri_reference => false,
+          is_relative_reference_3986 => false,
+          is_relative_iri_reference_3987 => false,
+          is_absolute_uri => false, is_absolute_iri => false,
+          is_absolute_uri_3986 => false, is_absolute_iri_3987 => false,
+          is_empty_reference => false,
+        },
+        {
+          in                     => q<http://foo.example/[a]>,
+          get_uri_reference      => q<http://foo.example/[a]>,
+          get_uri_reference_3986 => q<http://foo.example/[a]>,
+          get_iri_reference      => q<http://foo.example/[a]>,
+          get_iri_reference_3987 => q<http://foo.example/[a]>,
+          is_uri_reference => false, is_iri_reference => false,
+          is_uri_reference_3986 => false, is_iri_reference_3987 => false,
+          is_uri => false, is_iri => false,
+          is_uri_3986 => false, is_iri_3987 => false,
+          is_relative_reference => false, is_relative_iri_reference => false,
+          is_relative_reference_3986 => false,
+          is_relative_iri_reference_3987 => false,
+          is_absolute_uri => false, is_absolute_iri => false,
+          is_absolute_uri_3986 => false, is_absolute_iri_3987 => false,
+          is_empty_reference => false,
+        },
+        {
+          in                     => q<http://[::]/>,
+          get_uri_reference      => q<http://[::]/>,
+          get_uri_reference_3986 => q<http://[::]/>,
+          get_iri_reference      => q<http://[::]/>,
+          get_iri_reference_3987 => q<http://[::]/>,
+          is_uri_reference => true, is_iri_reference => true,
+          is_uri_reference_3986 => true, is_iri_reference_3987 => true,
+          is_uri => true, is_iri => true,
+          is_uri_3986 => true, is_iri_3987 => true,
+          is_relative_reference => false, is_relative_iri_reference => false,
+          is_relative_reference_3986 => false,
+          is_relative_iri_reference_3987 => false,
+          is_absolute_uri => true, is_absolute_iri => true,
+          is_absolute_uri_3986 => true, is_absolute_iri_3987 => true,
+          is_empty_reference => false,
+        },
+        {
+          in                     => q<//foo.example/>,
+          get_uri_reference      => q<//foo.example/>,
+          get_uri_reference_3986 => q<//foo.example/>,
+          get_iri_reference      => q<//foo.example/>,
+          get_iri_reference_3987 => q<//foo.example/>,
+          is_uri_reference => true, is_iri_reference => true,
+          is_uri_reference_3986 => true, is_iri_reference_3987 => true,
+          is_uri => false, is_iri => false,
+          is_uri_3986 => false, is_iri_3987 => false,
+          is_relative_reference => true, is_relative_iri_reference => true,
+          is_relative_reference_3986 => true,
+          is_relative_iri_reference_3987 => true,
+          is_absolute_uri => false, is_absolute_iri => false,
+          is_absolute_uri_3986 => false, is_absolute_iri_3987 => false,
+          is_empty_reference => false,
+        },
+        {
+          in                     => q<>,
+          get_uri_reference      => q<>,
+          get_uri_reference_3986 => q<>,
+          get_iri_reference      => q<>,
+          get_iri_reference_3987 => q<>,
+          is_uri_reference => true, is_iri_reference => true,
+          is_uri_reference_3986 => true, is_iri_reference_3987 => true,
+          is_uri => false, is_iri => false,
+          is_uri_3986 => false, is_iri_3987 => false,
+          is_relative_reference => true, is_relative_iri_reference => true,
+          is_relative_reference_3986 => true,
+          is_relative_iri_reference_3987 => true,
+          is_absolute_uri => false, is_absolute_iri => false,
+          is_absolute_uri_3986 => false, is_absolute_iri_3987 => false,
+          is_empty_reference => true,
+        },
+        {
+          in                     => qq<http://foo.example/\x{4E00}>,
+          get_uri_reference      => qq<http://foo.example/%E4%B8%80>,
+          get_uri_reference_3986 => qq<http://foo.example/%E4%B8%80>,
+          get_iri_reference      => qq<http://foo.example/\x{4E00}>,
+          get_iri_reference_3987 => qq<http://foo.example/\x{4E00}>,
+          is_uri_reference => false, is_iri_reference => true,
+          is_uri_reference_3986 => false, is_iri_reference_3987 => true,
+          is_uri => false, is_iri => true,
+          is_uri_3986 => false, is_iri_3987 => true,
+          is_relative_reference => false, is_relative_iri_reference => false,
+          is_relative_reference_3986 => false,
+          is_relative_iri_reference_3987 => false,
+          is_absolute_uri => false, is_absolute_iri => true,
+          is_absolute_uri_3986 => false, is_absolute_iri_3987 => true,
+          is_empty_reference => false,
+        },
+        {
+          in                     => q<http://foo.example/%E4%B8%80>,
+          get_uri_reference      => q<http://foo.example/%E4%B8%80>,
+          get_uri_reference_3986 => q<http://foo.example/%E4%B8%80>,
+          get_iri_reference      => qq<http://foo.example/\x{4E00}>,
+          get_iri_reference_3987 => qq<http://foo.example/\x{4E00}>,
+          is_uri_reference => true, is_iri_reference => true,
+          is_uri_reference_3986 => true, is_iri_reference_3987 => true,
+          is_uri => true, is_iri => true,
+          is_uri_3986 => true, is_iri_3987 => true,
+          is_relative_reference => false, is_relative_iri_reference => false,
+          is_relative_reference_3986 => false,
+          is_relative_iri_reference_3987 => false,
+          is_absolute_uri => true, is_absolute_iri => true,
+          is_absolute_uri_3986 => true, is_absolute_iri_3987 => true,
+          is_empty_reference => false,
+        },
+        {
+          in                     => q<ftp://ftp.is.co.za/rfc/rfc1808.txt>,
+          get_uri_reference      => q<ftp://ftp.is.co.za/rfc/rfc1808.txt>,
+          get_uri_reference_3986 => q<ftp://ftp.is.co.za/rfc/rfc1808.txt>,
+          get_iri_reference      => q<ftp://ftp.is.co.za/rfc/rfc1808.txt>,
+          get_iri_reference_3987 => q<ftp://ftp.is.co.za/rfc/rfc1808.txt>,
+          is_uri_reference => true, is_iri_reference => true,
+          is_uri_reference_3986 => true, is_iri_reference_3987 => true,
+          is_uri => true, is_iri => true,
+          is_uri_3986 => true, is_iri_3987 => true,
+          is_relative_reference => false, is_relative_iri_reference => false,
+          is_relative_reference_3986 => false,
+          is_relative_iri_reference_3987 => false,
+          is_absolute_uri => true, is_absolute_iri => true,
+          is_absolute_uri_3986 => true, is_absolute_iri_3987 => true,
+          is_empty_reference => false,
+        },
+        {
+          in                     => q<http://www.ietf.org/rfc/rfc2396.txt>,
+          get_uri_reference      => q<http://www.ietf.org/rfc/rfc2396.txt>,
+          get_uri_reference_3986 => q<http://www.ietf.org/rfc/rfc2396.txt>,
+          get_iri_reference      => q<http://www.ietf.org/rfc/rfc2396.txt>,
+          get_iri_reference_3987 => q<http://www.ietf.org/rfc/rfc2396.txt>,
+          is_uri_reference => true, is_iri_reference => true,
+          is_uri_reference_3986 => true, is_iri_reference_3987 => true,
+          is_uri => true, is_iri => true,
+          is_uri_3986 => true, is_iri_3987 => true,
+          is_relative_reference => false, is_relative_iri_reference => false,
+          is_relative_reference_3986 => false,
+          is_relative_iri_reference_3987 => false,
+          is_absolute_uri => true, is_absolute_iri => true,
+          is_absolute_uri_3986 => true, is_absolute_iri_3987 => true,
+          is_empty_reference => false,
+        },
+        {
+          in                     => q<ldap://[2001:db8::7]/c=GB?objectClass?one>,
+          get_uri_reference      => q<ldap://[2001:db8::7]/c=GB?objectClass?one>,
+          get_uri_reference_3986 => q<ldap://[2001:db8::7]/c=GB?objectClass?one>,
+          get_iri_reference      => q<ldap://[2001:db8::7]/c=GB?objectClass?one>,
+          get_iri_reference_3987 => q<ldap://[2001:db8::7]/c=GB?objectClass?one>,
+          is_uri_reference => true, is_iri_reference => true,
+          is_uri_reference_3986 => true, is_iri_reference_3987 => true,
+          is_uri => true, is_iri => true,
+          is_uri_3986 => true, is_iri_3987 => true,
+          is_relative_reference => false, is_relative_iri_reference => false,
+          is_relative_reference_3986 => false,
+          is_relative_iri_reference_3987 => false,
+          is_absolute_uri => true, is_absolute_iri => true,
+          is_absolute_uri_3986 => true, is_absolute_iri_3987 => true,
+          is_empty_reference => false,
+        },
+        {
+          in                     => q<mailto:John.Doe@example.com>,
+          get_uri_reference      => q<mailto:John.Doe@example.com>,
+          get_uri_reference_3986 => q<mailto:John.Doe@example.com>,
+          get_iri_reference      => q<mailto:John.Doe@example.com>,
+          get_iri_reference_3987 => q<mailto:John.Doe@example.com>,
+          is_uri_reference => true, is_iri_reference => true,
+          is_uri_reference_3986 => true, is_iri_reference_3987 => true,
+          is_uri => true, is_iri => true,
+          is_uri_3986 => true, is_iri_3987 => true,
+          is_relative_reference => false, is_relative_iri_reference => false,
+          is_relative_reference_3986 => false,
+          is_relative_iri_reference_3987 => false,
+          is_absolute_uri => true, is_absolute_iri => true,
+          is_absolute_uri_3986 => true, is_absolute_iri_3987 => true,
+          is_empty_reference => false,
+        },
+        {
+          in                     => q<news:comp.infosystems.www.servers.unix>,
+          get_uri_reference      => q<news:comp.infosystems.www.servers.unix>,
+          get_uri_reference_3986 => q<news:comp.infosystems.www.servers.unix>,
+          get_iri_reference      => q<news:comp.infosystems.www.servers.unix>,
+          get_iri_reference_3987 => q<news:comp.infosystems.www.servers.unix>,
+          is_uri_reference => true, is_iri_reference => true,
+          is_uri_reference_3986 => true, is_iri_reference_3987 => true,
+          is_uri => true, is_iri => true,
+          is_uri_3986 => true, is_iri_3987 => true,
+          is_relative_reference => false, is_relative_iri_reference => false,
+          is_relative_reference_3986 => false,
+          is_relative_iri_reference_3987 => false,
+          is_absolute_uri => true, is_absolute_iri => true,
+          is_absolute_uri_3986 => true, is_absolute_iri_3987 => true,
+          is_empty_reference => false,
+        },
+        {
+          in                     => q<tel:+1-816-555-1212>,
+          get_uri_reference      => q<tel:+1-816-555-1212>,
+          get_uri_reference_3986 => q<tel:+1-816-555-1212>,
+          get_iri_reference      => q<tel:+1-816-555-1212>,
+          get_iri_reference_3987 => q<tel:+1-816-555-1212>,
+          is_uri_reference => true, is_iri_reference => true,
+          is_uri_reference_3986 => true, is_iri_reference_3987 => true,
+          is_uri => true, is_iri => true,
+          is_uri_3986 => true, is_iri_3987 => true,
+          is_relative_reference => false, is_relative_iri_reference => false,
+          is_relative_reference_3986 => false,
+          is_relative_iri_reference_3987 => false,
+          is_absolute_uri => true, is_absolute_iri => true,
+          is_absolute_uri_3986 => true, is_absolute_iri_3987 => true,
+          is_empty_reference => false,
+        },
+        {
+          in                     => q<urn:oasis:names:specification:docbook:dtd:xml:4.1.2>,
+          get_uri_reference      => q<urn:oasis:names:specification:docbook:dtd:xml:4.1.2>,
+          get_uri_reference_3986 => q<urn:oasis:names:specification:docbook:dtd:xml:4.1.2>,
+          get_iri_reference      => q<urn:oasis:names:specification:docbook:dtd:xml:4.1.2>,
+          get_iri_reference_3987 => q<urn:oasis:names:specification:docbook:dtd:xml:4.1.2>,
+          is_uri_reference => true, is_iri_reference => true,
+          is_uri_reference_3986 => true, is_iri_reference_3987 => true,
+          is_uri => true, is_iri => true,
+          is_uri_3986 => true, is_iri_3987 => true,
+          is_relative_reference => false, is_relative_iri_reference => false,
+          is_relative_reference_3986 => false,
+          is_relative_iri_reference_3987 => false,
+          is_absolute_uri => true, is_absolute_iri => true,
+          is_absolute_uri_3986 => true, is_absolute_iri_3987 => true,
+          is_empty_reference => false,
+        },
+        {
+          in                     => q<mid:a%b@foo.example>,
+          get_uri_reference      => q<mid:a%b@foo.example>,
+          get_uri_reference_3986 => q<mid:a%b@foo.example>,
+          get_iri_reference      => q<mid:a%b@foo.example>,
+          get_iri_reference_3987 => q<mid:a%b@foo.example>,
+          is_uri_reference => false, is_iri_reference => false,
+          is_uri_reference_3986 => false, is_iri_reference_3987 => false,
+          is_uri => false, is_iri => false,
+          is_uri_3986 => false, is_iri_3987 => false,
+          is_relative_reference => false, is_relative_iri_reference => false,
+          is_relative_reference_3986 => false,
+          is_relative_iri_reference_3987 => false,
+          is_absolute_uri => false, is_absolute_iri => false,
+          is_absolute_uri_3986 => false, is_absolute_iri_3987 => false,
+          is_empty_reference => false,
+        },
+        {
+          in                     => q<foo://example.com:8042/over/there?name=ferret#nose>,
+          get_uri_reference      => q<foo://example.com:8042/over/there?name=ferret#nose>,
+          get_uri_reference_3986 => q<foo://example.com:8042/over/there?name=ferret#nose>,
+          get_iri_reference      => q<foo://example.com:8042/over/there?name=ferret#nose>,
+          get_iri_reference_3987 => q<foo://example.com:8042/over/there?name=ferret#nose>,
+          is_uri_reference => true, is_iri_reference => true,
+          is_uri_reference_3986 => true, is_iri_reference_3987 => true,
+          is_uri => true, is_iri => true,
+          is_uri_3986 => true, is_iri_3987 => true,
+          is_relative_reference => false, is_relative_iri_reference => false,
+          is_relative_reference_3986 => false,
+          is_relative_iri_reference_3987 => false,
+          is_absolute_uri => false, is_absolute_iri => false,
+          is_absolute_uri_3986 => false, is_absolute_iri_3987 => false,
+          is_empty_reference => false,
+        },
+        {
+          in                     => q<www.w3.org/Addressing/>,
+          get_uri_reference      => q<www.w3.org/Addressing/>,
+          get_uri_reference_3986 => q<www.w3.org/Addressing/>,
+          get_iri_reference      => q<www.w3.org/Addressing/>,
+          get_iri_reference_3987 => q<www.w3.org/Addressing/>,
+          is_uri_reference => true, is_iri_reference => true,
+          is_uri_reference_3986 => true, is_iri_reference_3987 => true,
+          is_uri => false, is_iri => false,
+          is_uri_3986 => false, is_iri_3987 => false,
+          is_relative_reference => true, is_relative_iri_reference => true,
+          is_relative_reference_3986 => true,
+          is_relative_iri_reference_3987 => true,
+          is_absolute_uri => false, is_absolute_iri => false,
+          is_absolute_uri_3986 => false, is_absolute_iri_3987 => false,
+          is_empty_reference => false,
+        },
+        {
+          in                     => q<g;x=1/../y>,
+          get_uri_reference      => q<g;x=1/../y>,
+          get_uri_reference_3986 => q<g;x=1/../y>,
+          get_iri_reference      => q<g;x=1/../y>,
+          get_iri_reference_3987 => q<g;x=1/../y>,
+          is_uri_reference => true, is_iri_reference => true,
+          is_uri_reference_3986 => true, is_iri_reference_3987 => true,
+          is_uri => false, is_iri => false,
+          is_uri_3986 => false, is_iri_3987 => false,
+          is_relative_reference => true, is_relative_iri_reference => true,
+          is_relative_reference_3986 => true,
+          is_relative_iri_reference_3987 => true,
+          is_absolute_uri => false, is_absolute_iri => false,
+          is_absolute_uri_3986 => false, is_absolute_iri_3987 => false,
+          is_empty_reference => false,
+        },
+        {
+          in                     => q<eXAMPLE://a/./b/../b/%63/%7bfoo%7d>,
+          get_uri_reference      => q<eXAMPLE://a/./b/../b/%63/%7bfoo%7d>,
+          get_uri_reference_3986 => q<eXAMPLE://a/./b/../b/%63/%7bfoo%7d>,
+          get_iri_reference      => q<eXAMPLE://a/./b/../b/%63/%7bfoo%7d>,
+          get_iri_reference_3987 => q<eXAMPLE://a/./b/../b/%63/%7bfoo%7d>,
+          is_uri_reference => true, is_iri_reference => true,
+          is_uri_reference_3986 => true, is_iri_reference_3987 => true,
+          is_uri => true, is_iri => true,
+          is_uri_3986 => true, is_iri_3987 => true,
+          is_relative_reference => false, is_relative_iri_reference => false,
+          is_relative_reference_3986 => false,
+          is_relative_iri_reference_3987 => false,
+          is_absolute_uri => true, is_absolute_iri => true,
+          is_absolute_uri_3986 => true, is_absolute_iri_3987 => true,
+          is_empty_reference => false,
+        },
+        {
+          in                     => q<ftp://cnn.example.com&story=breaking_news@10.0.0.1/top_story.htm>,
+          get_uri_reference      => q<ftp://cnn.example.com&story=breaking_news@10.0.0.1/top_story.htm>,
+          get_uri_reference_3986 => q<ftp://cnn.example.com&story=breaking_news@10.0.0.1/top_story.htm>,
+          get_iri_reference      => q<ftp://cnn.example.com&story=breaking_news@10.0.0.1/top_story.htm>,
+          get_iri_reference_3987 => q<ftp://cnn.example.com&story=breaking_news@10.0.0.1/top_story.htm>,
+          is_uri_reference => true, is_iri_reference => true,
+          is_uri_reference_3986 => true, is_iri_reference_3987 => true,
+          is_uri => true, is_iri => true,
+          is_uri_3986 => true, is_iri_3987 => true,
+          is_relative_reference => false, is_relative_iri_reference => false,
+          is_relative_reference_3986 => false,
+          is_relative_iri_reference_3987 => false,
+          is_absolute_uri => true, is_absolute_iri => true,
+          is_absolute_uri_3986 => true, is_absolute_iri_3987 => true,
+          is_empty_reference => false,
+        },
+        {
+          in                     => qq<http://r\xE9sum\xE9.example.org>,
+          get_uri_reference      => qq<http://r%C3%A9sum%C3%A9.example.org>,
+          get_uri_reference_3986 => qq<http://r%C3%A9sum%C3%A9.example.org>,
+          get_iri_reference      => qq<http://r\xE9sum\xE9.example.org>,
+          get_iri_reference_3987 => qq<http://r\xE9sum\xE9.example.org>,
+          is_uri_reference => false, is_iri_reference => true,
+          is_uri_reference_3986 => false, is_iri_reference_3987 => true,
+          is_uri => false, is_iri => true,
+          is_uri_3986 => false, is_iri_3987 => true,
+          is_relative_reference => false, is_relative_iri_reference => false,
+          is_relative_reference_3986 => false,
+          is_relative_iri_reference_3987 => false,
+          is_absolute_uri => false, is_absolute_iri => true,
+          is_absolute_uri_3986 => false, is_absolute_iri_3987 => true,
+          is_empty_reference => false,
+        },
+        {
+          in                     => qq<http://r%C3%A9sum%C3%A9.example.org>,
+          get_uri_reference      => qq<http://r%C3%A9sum%C3%A9.example.org>,
+          get_uri_reference_3986 => qq<http://r%C3%A9sum%C3%A9.example.org>,
+          get_iri_reference      => qq<http://r\xE9sum\xE9.example.org>,
+          get_iri_reference_3987 => qq<http://r\xE9sum\xE9.example.org>,
+          is_uri_reference => true, is_iri_reference => true,
+          is_uri_reference_3986 => true, is_iri_reference_3987 => true,
+          is_uri => true, is_iri => true,
+          is_uri_3986 => true, is_iri_3987 => true,
+          is_relative_reference => false, is_relative_iri_reference => false,
+          is_relative_reference_3986 => false,
+          is_relative_iri_reference_3987 => false,
+          is_absolute_uri => true, is_absolute_iri => true,
+          is_absolute_uri_3986 => true, is_absolute_iri_3987 => true,
+          is_empty_reference => false,
+        },
+        {
+          in                     => qq<http://www.example.org/red%09ros\xE9#red>,
+          get_uri_reference      => qq<http://www.example.org/red%09ros%C3%A9#red>,
+          get_uri_reference_3986 => qq<http://www.example.org/red%09ros%C3%A9#red>,
+          get_iri_reference      => qq<http://www.example.org/red%09ros\xE9#red>,
+          get_iri_reference_3987 => qq<http://www.example.org/red%09ros\xE9#red>,
+          is_uri_reference => false, is_iri_reference => true,
+          is_uri_reference_3986 => false, is_iri_reference_3987 => true,
+          is_uri => false, is_iri => true,
+          is_uri_3986 => false, is_iri_3987 => true,
+          is_relative_reference => false, is_relative_iri_reference => false,
+          is_relative_reference_3986 => false,
+          is_relative_iri_reference_3987 => false,
+          is_absolute_uri => false, is_absolute_iri => false,
+          is_absolute_uri_3986 => false, is_absolute_iri_3987 => false,
+          is_empty_reference => false,
+        },
+        {
+          in                     => qq<http://www.example.org/red%09ros%c3%a9#red>,
+          get_uri_reference      => qq<http://www.example.org/red%09ros%c3%a9#red>,
+          get_uri_reference_3986 => qq<http://www.example.org/red%09ros%c3%a9#red>,
+          get_iri_reference      => qq<http://www.example.org/red%09ros\xE9#red>,
+          get_iri_reference_3987 => qq<http://www.example.org/red%09ros\xE9#red>,
+          is_uri_reference => true, is_iri_reference => true,
+          is_uri_reference_3986 => true, is_iri_reference_3987 => true,
+          is_uri => true, is_iri => true,
+          is_uri_3986 => true, is_iri_3987 => true,
+          is_relative_reference => false, is_relative_iri_reference => false,
+          is_relative_reference_3986 => false,
+          is_relative_iri_reference_3987 => false,
+          is_absolute_uri => false, is_absolute_iri => false,
+          is_absolute_uri_3986 => false, is_absolute_iri_3987 => false,
+          is_empty_reference => false,
+        },
+        {
+          in                     => qq<http://example.com/\x{10300}\x{10301}\x{10302}>,
+          get_uri_reference      => qq<http://example.com/%F0%90%8C%80%F0%90%8C%81%F0%90%8C%82>,
+          get_uri_reference_3986 => qq<http://example.com/%F0%90%8C%80%F0%90%8C%81%F0%90%8C%82>,
+          get_iri_reference      => qq<http://example.com/\x{10300}\x{10301}\x{10302}>,
+          get_iri_reference_3987 => qq<http://example.com/\x{10300}\x{10301}\x{10302}>,
+          is_uri_reference => false, is_iri_reference => true,
+          is_uri_reference_3986 => false, is_iri_reference_3987 => true,
+          is_uri => false, is_iri => true,
+          is_uri_3986 => false, is_iri_3987 => true,
+          is_relative_reference => false, is_relative_iri_reference => false,
+          is_relative_reference_3986 => false,
+          is_relative_iri_reference_3987 => false,
+          is_absolute_uri => false, is_absolute_iri => true,
+          is_absolute_uri_3986 => false, is_absolute_iri_3987 => true,
+          is_empty_reference => false,
+        },
+        {
+          in                     => qq<http://example.com/%F0%90%8C%80%F0%90%8C%81%F0%90%8C%82>,
+          get_uri_reference      => qq<http://example.com/%F0%90%8C%80%F0%90%8C%81%F0%90%8C%82>,
+          get_uri_reference_3986 => qq<http://example.com/%F0%90%8C%80%F0%90%8C%81%F0%90%8C%82>,
+          get_iri_reference      => qq<http://example.com/\x{10300}\x{10301}\x{10302}>,
+          get_iri_reference_3987 => qq<http://example.com/\x{10300}\x{10301}\x{10302}>,
+          is_uri_reference => true, is_iri_reference => true,
+          is_uri_reference_3986 => true, is_iri_reference_3987 => true,
+          is_uri => true, is_iri => true,
+          is_uri_3986 => true, is_iri_3987 => true,
+          is_relative_reference => false, is_relative_iri_reference => false,
+          is_relative_reference_3986 => false,
+          is_relative_iri_reference_3987 => false,
+          is_absolute_uri => true, is_absolute_iri => true,
+          is_absolute_uri_3986 => true, is_absolute_iri_3987 => true,
+          is_empty_reference => false,
+        },
+        {
+          in                     => qq<http://www.example.org/r%E9sum%E9.html>,
+          get_uri_reference      => qq<http://www.example.org/r%E9sum%E9.html>,
+          get_uri_reference_3986 => qq<http://www.example.org/r%E9sum%E9.html>,
+          get_iri_reference      => qq<http://www.example.org/r%E9sum%E9.html>,
+          get_iri_reference_3987 => qq<http://www.example.org/r%E9sum%E9.html>,
+          is_uri_reference => true, is_iri_reference => true,
+          is_uri_reference_3986 => true, is_iri_reference_3987 => true,
+          is_uri => true, is_iri => true,
+          is_uri_3986 => true, is_iri_3987 => true,
+          is_relative_reference => false, is_relative_iri_reference => false,
+          is_relative_reference_3986 => false,
+          is_relative_iri_reference_3987 => false,
+          is_absolute_uri => true, is_absolute_iri => true,
+          is_absolute_uri_3986 => true, is_absolute_iri_3987 => true,
+          is_empty_reference => false,
+        },
+        {
+          in                     => qq<http://www.example.org/r%E9sum%e9.html>,
+          get_uri_reference      => qq<http://www.example.org/r%E9sum%e9.html>,
+          get_uri_reference_3986 => qq<http://www.example.org/r%E9sum%e9.html>,
+          get_iri_reference      => qq<http://www.example.org/r%E9sum%E9.html>,
+          get_iri_reference_3987 => qq<http://www.example.org/r%E9sum%E9.html>,
+          is_uri_reference => true, is_iri_reference => true,
+          is_uri_reference_3986 => true, is_iri_reference_3987 => true,
+          is_uri => true, is_iri => true,
+          is_uri_3986 => true, is_iri_3987 => true,
+          is_relative_reference => false, is_relative_iri_reference => false,
+          is_relative_reference_3986 => false,
+          is_relative_iri_reference_3987 => false,
+          is_absolute_uri => true, is_absolute_iri => true,
+          is_absolute_uri_3986 => true, is_absolute_iri_3987 => true,
+          is_empty_reference => false,
+        },
+        {
+          in                     => qq<http://xn--99zt52a.example.org/%e2%80%ae>,
+          get_uri_reference      => qq<http://xn--99zt52a.example.org/%e2%80%ae>,
+          get_uri_reference_3986 => qq<http://xn--99zt52a.example.org/%e2%80%ae>,
+          get_iri_reference      => qq<http://xn--99zt52a.example.org/%E2%80%AE>,
+          get_iri_reference_3987 => qq<http://xn--99zt52a.example.org/%E2%80%AE>,
+          is_uri_reference => true, is_iri_reference => true,
+          is_uri_reference_3986 => true, is_iri_reference_3987 => true,
+          is_uri => true, is_iri => true,
+          is_uri_3986 => true, is_iri_3987 => true,
+          is_relative_reference => false, is_relative_iri_reference => false,
+          is_relative_reference_3986 => false,
+          is_relative_iri_reference_3987 => false,
+          is_absolute_uri => true, is_absolute_iri => true,
+          is_absolute_uri_3986 => true, is_absolute_iri_3987 => true,
+          is_empty_reference => false,
+        },
+        {
+          in                     => qq<http://example.org/%7Euser>,
+          get_uri_reference      => qq<http://example.org/%7Euser>,
+          get_uri_reference_3986 => qq<http://example.org/%7Euser>,
+          get_iri_reference      => qq<http://example.org/~user>,
+          get_iri_reference_3987 => qq<http://example.org/~user>,
+          is_uri_reference => true, is_iri_reference => true,
+          is_uri_reference_3986 => true, is_iri_reference_3987 => true,
+          is_uri => true, is_iri => true,
+          is_uri_3986 => true, is_iri_3987 => true,
+          is_relative_reference => false, is_relative_iri_reference => false,
+          is_relative_reference_3986 => false,
+          is_relative_iri_reference_3987 => false,
+          is_absolute_uri => true, is_absolute_iri => true,
+          is_absolute_uri_3986 => true, is_absolute_iri_3987 => true,
+          is_empty_reference => false,
+        },
+      ) {
+        my $uri1 = $impl-><M::URIImplementation.createURIReference> ($_->{in});
+ 
+        for my $method (qw/get_uri_reference get_uri_reference_3986
+                           get_iri_reference get_iri_reference_3987/) {
+          $test->id ($_->{in}.'.'.$method);
+          $test->assert_equals ($uri1->$method-><AG::URIReference.uriReference>,
+                                $_->{$method});
+        }
+ 
+        for my $method (qw/is_uri is_iri is_uri_3986 is_iri_3987
+                           is_uri_reference is_iri_reference
+                           is_uri_reference_3986 is_iri_reference_3987
+                           is_relative_reference is_relative_iri_reference
+                           is_relative_reference_3986
+                           is_relative_iri_reference_3987
+                           is_absolute_uri is_absolute_iri
+                           is_absolute_uri_3986 is_absolute_iri_3987
+                           is_empty_reference/) {
+          $test->id ($_->{in}.'.'.$method);
+          $test->assert_equals ($uri1->$method, $_->{$method});
+        }
+      }
+
+  @Method:
+    @@Name: getAbsoluteReference
+    @@enDesc:
+      Returns the target DOM URI for the DOM URI resolved as per
+      the latest version of the URI specification.
+
+        {NOTE::
+          At the time of writing, RFC 3986 is the latest version
+          of the URI specification.  RFC 3987 shares the same
+          resolution algorithm as RFC 3986.  The method must
+          return the same result as <M::URIReference.getAbsoluteReference3986>
+          or <M::URIReference.getAbsoluteReference3987> would do.
+        }
+    @@Param:
+      @@@Name: base
+      @@@Type: URIReference
+      @@@enDesc:
+        The base DOM URI against which the DOM URI is resolved.
+      @@@enDesc:
+        @@@@For: ManakaiDOM|Perl
+        @@@@ddid:perl
+        @@@@@:
+          For Perl binding, any value that can be specified
+          as the parameter to the <M::URIImplementation.createURIReference>
+          method can be set to the <P::base> parameter.
+    @@NamedParam:
+      @@@Name: nonStrict
+      @@@Type: idl|boolean||ManakaiDOM|all
+      @@@enDesc:
+        Whether the resolution is done in the strict mode or not.
+    @@Return:
+      @@@Type: URIReference
+      @@@enDesc:
+        The target DOM URI.
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><M::URIReference.getAbsoluteReference3986>
+                        ($base, non_strict => $nonStrict);
+        }__;
+
+  @Method:
+    @@Name: getAbsoluteReference3986
+    @@DISPerl:methodName: get_absolute_reference_3986
+    @@enDesc:
+      Returns the target DOM URI for the DOM URI resolved as per RFC 3986.
+
+      The resolution is done according to the algorithm shown in
+      RFC 3986 section 5.2 and a new <IF::URIReference>
+      object containing the result target DOM URI is returned by the method.
+
+      The method <kwd:MUST> parse DOM URIs into five components 
+      as described in the RFC 3986 algorithm by the definition 
+      of attributes <A::URIReference.uriScheme>, <A::URIReference.uriAuthority>,
+      <A::URIReference.uriPath>, <A::URIReference.uriQuery>, and
+      <A::URIReference.uriFragment>.  It is intended that for
+      conforming RFC 3986 URI references they returns the identical
+      set of components as described in RFC 3986.
+
+      The method <kwd:MUST-NOT> perform any normalization to DOM URIs
+      <SRC::RFC 3986 5.2.1>.  Applications can invoke appropriate
+      methods before or after the relative reference resolution if desired.
+    @@Param:
+      @@@Name: base
+      @@@Type: URIReference
+      @@@enDesc:
+        The base DOM URI against which the DOM URI is resolved.
+
+        If the scheme component of the <P::base> is missing, then
+        the result is undefined.
+      @@@enDesc:
+        @@@@For: ManakaiDOM|Perl
+        @@@@ddid:perl
+        @@@@@:
+          For Perl binding, any value that can be specified
+          as the parameter to the <M::URIImplementation.createURIReference>
+          method can be set to the <P::base> parameter.
+    @@NamedParam:
+      @@@Name: nonStrict
+      @@@Type: idl|boolean||ManakaiDOM|all
+      @@@enDesc:
+        Whether the resolution is done in the strict mode or not.
+      @@@TrueCase:
+        @@@@enDesc:
+          The <CODE::strict> flag in the algorithm in RFC 3986 section
+          5.2.2 is set to <EM::<DOM::false>>.
+      @@@TrueCase:
+        @@@@enDesc:
+          The <CODE::strict> flag in the algorithm in RFC 3986 section
+          5.2.2 is set to <EM::<DOM::true>>.
+    @@Return:
+      @@@Type: URIReference
+      @@@enDesc:
+        The target DOM URI.
+
+          {NOTE::
+            The result DOM URI might not be a conforming RFC 3986
+            URI if the original DOM URI is not a conforming RFC 3986
+            URI reference and / or the <P::base> DOM URI is not a
+            conforming URI.
+
+            The result DOM URI might not be a conforming RFC 3987
+            IRI if the original DOM URI is not a conforming RFC 3987
+            IRI reference and / or the <P::base> DOM URI is not a
+            conforming IRI.
+          }
+      @@@PerlDef:
+        __DEEP{
+          ## -- Decomposition
+          my @ref;   # Reference
+          my @base;  # Base URI
+
+          if ($$self =~ m!\A(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?\z!) {
+            (@ref) = ($1, $2, $3, $4, $5);
+          } else { # unlikely happen
+            (@ref) = (null, null, '', null, null);
+          }
+          my $ba = ref $base eq 'SCALAR'
+                     ? $base
+                     : ref $base eq <ClassName::ManakaiURIReference>
+                         ? $base
+                         : ref $base
+                             ? \"$base"
+                             : \$base;
+          if ($$ba =~ m!\A(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?\z!) {
+            (@base) = (defined $1 ? $1 : '', $2, $3, $4, $5);
+          } else { # unlikely happen
+            (@base) = ('', null, '', null, null);
+          }
+
+          ## -- Merge
+          my $merge = sub ($$) {
+            my ($base, $ref) = @_;
+            if (defined $base->[1] and      # authority
+                length ($base->[2]) == 0) { # path
+              return "/" . $ref->[2];       # path
+            } else {
+              my $bp = $base->[2];          # path
+              $bp =~ s![^/]+\z!!g;
+              return $bp . $ref->[2];       # path
+            }
+          }; # merge
+
+          ## -- Removing Dot Segments
+          my $remove_dot_segments = sub ($) {
+            my @input = split m!/!, shift;
+            my @output;
+            while (@input) {
+              if (@input > 1 and ($input[0] eq '.' or $input[0] eq '..')) {
+                shift @input;
+              } elsif ($input[0] eq '' and defined $input[1] and $input[1] eq '.') {
+                splice @input, 1, 1;
+              } elsif ($input[0] eq '' and defined $input[1] and $input[1] eq '..') {
+                splice @input, 1, 1;
+                pop @output;
+              } elsif (@input == 1 and ($input[0] eq '.' or $input[0] eq '..')) {
+                shift @input;
+              } elsif (@input == 1) {
+                push @output, shift @input;
+              } elsif ($input[0] eq '') {
+                push @output, splice @input, 1, 1;
+              } else {
+                push @output, shift @input;
+              }
+            }
+            return join '/', @output;
+          }; # remove_dot_segments
+
+          ## -- Transform 
+          my @t; # Target URI
+
+          if ($nonStrict and $ref[0] eq $base[0]) {
+            undef $ref[0];      # scheme
+          }
+
+          if (defined $ref[0]) {
+            $t[0] = $ref[0];    # scheme
+            $t[1] = $ref[1];    # authority
+            $t[2] = $remove_dot_segments->($ref[2]); # path
+            $t[3] = $ref[3];    # query
+          } elsif (defined $ref[1]) {
+            $t[0] = $base[0];   # scheme
+            $t[1] = $ref[1];    # authority
+            $t[2] = $remove_dot_segments->($ref[2]); # path
+            $t[3] = $ref[3];    # query
+          } elsif ($ref[2] eq '') {
+            $t[0] = $base[0];   # scheme
+            $t[1] = $base[1];   # authority
+            $t[2] = $base[2];   # path
+            if (defined $ref[3]) {
+              $t[3] = $ref[3];  # query
+            } else {
+              $t[3] = $base[3]; # query
+            }
+          } elsif (substr ($ref[2], 0, 1) eq '/') {
+            $t[0] = $base[0];   # scheme
+            $t[1] = $base[1];   # authority
+            $t[2] = $remove_dot_segments->($ref[2]); # path
+            $t[3] = $ref[3];    # query
+          } else {
+            $t[0] = $base[0];   # scheme
+            $t[1] = $base[1];   # authority
+            $t[2] = $remove_dot_segments->($merge->(\@base, \@ref)); # path
+            $t[3] = $ref[3];    # query
+          }
+          $t[4] = $ref[4];      # fragment
+
+          ## -- Recomposition
+          my $result  = ''                                 ;
+          $result .=        $t[0] . ':' if defined $t[0];  # scheme;
+          $result .= '//' . $t[1]       if defined $t[1];  # authority
+          $result .=        $t[2]                       ;  # path
+          $result .= '?'  . $t[3]       if defined $t[3];  # query
+          $result .= '#'  . $t[4]       if defined $t[4];  # fragment
+
+          $r = bless \$result, <ClassName::ManakaiURIReference>;
+        }__;
+
+    @@Test:
+      @@@QName: URIRef.getAbsRef.input.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{createURIImplForTest:: $impl => $impl}__;
+
+        my $ref = $impl-><M::URIImplementation.createURIReference> ('../foo');
+
+        $test->id ('string');
+        my $t1 = $ref-><M::URIReference.getAbsoluteReference>
+                         (q<http://foo.example/bar/baz>);
+        $test->assert_equals ($t1-><AG::URIReference.uriReference>,
+                              q<http://foo.example/foo>);
+
+        $test->id ('stringref');
+        my $t2 = $ref-><M::URIReference.getAbsoluteReference>
+                         (\q<http://foo.example/bar/baz>);
+        $test->assert_equals ($t2-><AG::URIReference.uriReference>,
+                              q<http://foo.example/foo>);
+
+        $test->id ('uriref');
+        my $t3 = $ref-><M::URIReference.getAbsoluteReference>
+                         ($impl-><M::URIImplementation.createURIReference>
+                                   (q<http://foo.example/bar/baz>));
+        $test->assert_equals ($t3-><AG::URIReference.uriReference>,
+                              q<http://foo.example/foo>);
+
+    @@Test:
+      @@@QName: URIRef.getAbsRef.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{createURIImplForTest:: $impl => $impl}__;
+
+        for (
+          ["g:h"           =>  "g:h"],
+          ["g"             =>  "http://a/b/c/g"],
+          ["./g"           =>  "http://a/b/c/g"],
+          ["g/"            =>  "http://a/b/c/g/"],
+          ["/g"            =>  "http://a/g"],
+          ["//g"           =>  "http://g"],
+          ["?y"            =>  "http://a/b/c/d;p?y"],
+          ["g?y"           =>  "http://a/b/c/g?y"],
+          ["#s"            =>  "http://a/b/c/d;p?q#s"],
+          ["g#s"           =>  "http://a/b/c/g#s"],
+          ["g?y#s"         =>  "http://a/b/c/g?y#s"],
+          [";x"            =>  "http://a/b/c/;x"],
+          ["g;x"           =>  "http://a/b/c/g;x"],
+          ["g;x?y#s"       =>  "http://a/b/c/g;x?y#s"],
+          [""              =>  "http://a/b/c/d;p?q"],
+          ["."             =>  "http://a/b/c/"],
+          ["./"            =>  "http://a/b/c/"],
+          [".."            =>  "http://a/b/"],
+          ["../"           =>  "http://a/b/"],
+          ["../g"          =>  "http://a/b/g"],
+          ["../.."         =>  "http://a/"],
+          ["../../"        =>  "http://a/"],
+          ["../../g"       =>  "http://a/g"],
+          ["../../../g"    =>  "http://a/g"],
+          ["../../../../g" =>  "http://a/g"],
+          ["/./g"          =>  "http://a/g"],
+          ["/../g"         =>  "http://a/g"],
+          ["g."            =>  "http://a/b/c/g."],
+          [".g"            =>  "http://a/b/c/.g"],
+          ["g.."           =>  "http://a/b/c/g.."],
+          ["..g"           =>  "http://a/b/c/..g"],
+          ["./../g"        =>  "http://a/b/g"],
+          ["./g/."         =>  "http://a/b/c/g/"],
+          ["g/./h"         =>  "http://a/b/c/g/h"],
+          ["g/../h"        =>  "http://a/b/c/h"],
+          ["g;x=1/./y"     =>  "http://a/b/c/g;x=1/y"],
+          ["g;x=1/../y"    =>  "http://a/b/c/y"],
+          ["g?y/./x"       =>  "http://a/b/c/g?y/./x"],
+          ["g?y/../x"      =>  "http://a/b/c/g?y/../x"],
+          ["g#s/./x"       =>  "http://a/b/c/g#s/./x"],
+          ["g#s/../x"      =>  "http://a/b/c/g#s/../x"],
+          ["http:g"        =>  "http:g"],
+        ) {
+          my $ref = $impl-><M::URIImplementation.createURIReference> ($_->[0]);
+
+          $test->id ($_->[0]);
+          my $t = $ref-><M::URIReference.getAbsoluteReference>
+                          (q<http://a/b/c/d;p?q>);
+          $test->assert_equals ($t-><AG::URIReference.uriReference>,
+                                $_->[1]);
+
+          $test->id ($_->[0].'.3986');
+          my $t1 = $ref-><M::URIReference.getAbsoluteReference3986>
+                           (q<http://a/b/c/d;p?q>);
+          $test->assert_equals ($t1-><AG::URIReference.uriReference>,
+                                $_->[1]);
+
+          $test->id ($_->[0].'.3987');
+          my $t2 = $ref-><M::URIReference.getAbsoluteReference3987>
+                           (q<http://a/b/c/d;p?q>);
+          $test->assert_equals ($t2-><AG::URIReference.uriReference>,
+                                $_->[1]);
+        }
+
+    @@Test:
+      @@@QName: URIRef.getAbsRef.nonStrict.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{createURIImplForTest:: $impl => $impl}__;
+
+        my $ref = $impl-><M::URIImplementation.createURIReference>
+                           ('http://a/b/c/d;p?q');
+
+        $test->id ('string');
+        my $t1 = $ref-><M::URIReference.getAbsoluteReference>
+                         (q<http:g>);
+        $test->assert_equals ($t1-><AG::URIReference.uriReference>,
+                              q<http://a/b/c/g>, true);
+
+  @Method:
+    @@Name: getAbsoluteReference3987
+    @@DISPerl:methodName: get_absolute_reference_3987
+    @@enDesc:
+      Returns the target DOM URI for the DOM URI resolved as per RFC 3987.
+      Since RFC 3987 references RFC 3986 for the resolution algorithm,
+      the method <kwd:MUST> act as <M::URIReference.getAbsoluteReference3986>
+      would do.
+    @@Param:
+      @@@Name: base
+      @@@Type: URIReference
+      @@@enDesc:
+        The base DOM URI against which the DOM URI is resolved.
+      @@@enDesc:
+        @@@@For: ManakaiDOM|Perl
+        @@@@ddid:perl
+        @@@@@:
+          For Perl binding, any value that can be specified
+          as the parameter to the <M::URIImplementation.createURIReference>
+          method can be set to the <P::base> parameter.
+    @@NamedParam:
+      @@@Name: nonStrict
+      @@@Type: idl|boolean||ManakaiDOM|all
+      @@@enDesc:
+        Whether the resolution is done in the strict mode or not.
+    @@Return:
+      @@@Type: URIReference
+      @@@enDesc:
+        The target DOM URI.
+
+          {NOTE::
+            The result DOM URI might not be a conforming RFC 3987
+            IRI if the original DOM URI is not a conforming RFC 3987
+            IRI reference and / or the <P::base> DOM URI is not a
+            conforming IRI.
+          }
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><M::URIReference.getAbsoluteReference3986>
+                        ($base, non_strict => $nonStrict);
+        }__;
+
+  @Method:
+    @@Name: isSameDocumentReference
+    @@enDesc:
+      Whether the DOM URI is a same-document reference or not as per
+      the latest version of the URI specification.
+
+        {NOTE::
+          At the time of writing, RFC 3986 is the latest version
+          of the URI specification and the method must return
+          the same result as the <M::URIReference.isSameDocumentReference>
+          would return.
+        }
+    @@Param:
+      @@@Name: base
+      @@@Type: URIReference
+      @@@enDesc:
+        The base DOM URI against which the sameness is tested.
+    @@Return:
+      @@@Type: idl|boolean||ManakaiDOM|all
+      @@@TrueCase:
+        @@@@enDesc:
+          The DOM URI is a same-document reference.
+      @@@FalseCase:
+        @@@@enDesc:
+          It is <EM::not> sure that the DOM URI is a same-document
+          reference.
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><M::URIReference.isSameDocumentReference3986> ($base);
+        }__;
+
+  @Method:
+    @@Name: isSameDocumentReference3986
+    @@DISPerl:methodName: is_same_document_reference_3986
+    @@enDesc:
+      Whether the DOM URI is a same-document reference or not as per
+      RFC 3986 section 4.4.
+    @@Param:
+      @@@Name: base
+      @@@Type: URIReference
+      @@@enDesc:
+        The base DOM URI against which the sameness is tested.
+        If it does not contain the scheme component, then the result
+        is undefined.
+      @@@enDesc:
+        @@@@For: ManakaiDOM|Perl
+        @@@@ddid:perl
+        @@@@@:
+          For Perl binding, any value that can be specified
+          as the parameter to the <M::URIImplementation.createURIReference>
+          method can be set to the <P::base> parameter.
+    @@NamedParam:
+      @@@Name: nonStrict
+      @@@Type: idl|boolean||ManakaiDOM|all
+      @@@enDesc:
+        Whether the resolution is done in the strict mode or not.
+    @@Return:
+      @@@Type: idl|boolean||ManakaiDOM|all
+      @@@TrueCase:
+        @@@@enDesc:
+          If the target DOM URI that the
+          <M::URIReference.getAbsoluteReference3986>
+          method with the same <P::base> parameter would return
+          shares the same substring without fragment components and
+          the <CHAR::NUMBER SIGN> preceding it if any with the <P::base>
+          DOM URI.
+      @@@FalseCase:
+        @@@@enDesc: Otherwise.
+      @@@PerlDef:
+        __DEEP{
+          if (substr ($$self, 0, 1) eq '#') {
+            $r = true;
+          } else {
+            my $target = $self-><M::URIReference.getAbsoluteReference3986>
+                                  ($base, non_strict => $nonStrict)
+                              -><AG::URIReference.uriReference>;
+            $target =~ s/#.*\z//;
+            my $ba = ref $base eq 'SCALAR'
+                       ? $$base
+                       : ref $base eq <ClassName::ManakaiURIReference>
+                           ? $$base
+                           : ref $base
+                               ? "$base"
+                               : $base;
+            $ba =~ s/#.*\z//;
+            $r = ($target eq $ba);
+          }
+        }__;
+
+    @@Test:
+      @@@QName: URIRef.isSameDocRef.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{createURIImplForTest:: $impl => $impl}__;
+
+        my $base = q<http://www/a/b/c#def>;
+
+        for (
+          [q<http://www.example/>, false],
+          [q<#fragment>, true],
+          [q<c#def>, true],
+          [q<http://www/a/b/c#def>, true],
+          [q</a/b/c/>, false],
+          [q<>, true],
+          [q<//www/a/b/c>, true],
+        ) {
+          my $ref = $impl-><M::URIImplementation.createURIReference> ($_->[0]);
+          my $method = $_->[1] ? 'assert_true' : 'assert_false';
+          $test->id ($_->[0]);
+          $test->$method
+                   ($ref-><M::URIReference.isSameDocumentReference> ($base));
+          $test->id ($_->[0].'.3986');
+          $test->$method
+                   ($ref-><M::URIReference.isSameDocumentReference3986>
+                            ($base));
+        }
+
+  @Method:
+    @@Name: getRelativeReference
+    @@enDesc:
+      Returns a DOM URI that references the same target URI
+      as the DOM URI according to the latest version of
+      the URI specification.  The method <kwd:SHOULD> return as simple
+      DOM URI as possible.
+
+      {P:: How it computes the relative reference
+      is implementation dependent.  However, it at least meets the conditions
+      below:
+
+        - If the DOM URI is a legal RFC 3986 URI reference, then
+          the result DOM URI <kwd:MUST> be a legal RFC 3986 URI reference
+          that references the target URI of the original URI.
+
+        - If the DOM URI is a legal RFC 3987 IRI, then
+          the result DOM URI <kwd:MUST> be a legal RFC 3987 IRI reference
+          that references either the a IRI
+          that is literally equivalent to the target IRI of the original IRI
+          when zero or more URI-to-IRI or IRI-to-URI convertion
+          <SRC::RFC 3987> is performed.
+      }
+
+      {ISSUE::
+        Should <CODE::getRelativeReference3986> be introduced?
+        Should <CODE::getRelativeIRIReference3987> 
+        and <CODE::getRelativeIRIReference> also be?
+      }
+    @@Param:
+      @@@Name: base
+      @@@Type: URIReference
+      @@@enDesc:
+        The base DOM URI when against which the result 
+        DOM URI is resolved then it must be the same DOM
+        URI as the target DOM URI of the DOM URI.
+    @@Return:
+      @@@Type: URIReference
+      @@@enDesc:
+        The result DOM URI.
+      @@@PerlDef:
+        __DEEP{
+          my @base;
+          if ("$base" =~ m!\A(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?\z!) {
+            (@base) = (defined $1 ? $1 : '', $2, $3, $4, $5);
+          } else { # unlikeley happen
+            (@base) = ('', null, '', null, null);
+          }
+          my @t;
+          my $t = $self-><M::URIReference.getAbsoluteReference> ($base);
+          if ("$t" =~ m!\A(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?\z!) {
+            (@t) = (defined $1 ? $1 : '', $2, $3, $4, $5);
+          } else { # unlikeley happen
+            (@t) = ('', null, '', null, null);
+          }
+
+          my @ref;
+          R: {
+            ## Scheme
+            if ($base[0] ne $t[0]) {
+              (@ref) = @t;
+              last R;
+            }
+
+            ## Authority
+            if (not defined $base[1] and not defined $t[1]) {
+              (@ref) = @t;
+              last R;
+            } elsif (not defined $t[1]) {
+              (@ref) = @t;
+              last R;
+            } elsif (not defined $base[1]) {
+              (@ref) = @t;
+              last R;
+            } elsif ($base[1] ne $t[1]) {
+              (@ref) = @t;
+              last R;
+            }
+            ## NOTE: Avoid uncommon references.
+
+            if (defined $t[4] and                                # fragment
+                $t[2] eq $base[2] and                            # path
+                ((not defined $t[3] and not defined $base[3]) or # query
+                 (defined $t[3] and defined $base[3] and $t[3] eq $base[3]))) {
+              (@ref) = (null, null, null, null, $t[4]);
+              last R;
+            }
+
+            ## Path
+            my @tpath = split m!/!, $t[2];
+            my @bpath = split m!/!, $base[2];
+            my $tp;
+            my $tp2;
+            while (@tpath and @bpath and $tpath[0] eq $bpath[0]) {
+              $tp2 = $tp;
+              $tp = shift @tpath;
+              shift @bpath;
+            }
+            unless (@bpath) {
+              unshift @tpath, $tp;
+              ($tp2, $tp) = (null, $tp2);
+            }
+            unless (@tpath) {   ## Avoid empty path component for compatibility
+              if ($tp eq '') {
+                unshift @tpath, '.';
+              } else {
+                unshift @tpath, $tp;
+              }
+            }
+            unshift @tpath, '..' x @bpath;
+            if (@tpath and ($tpath[0] =~ /:/ or
+                            $tpath[0] eq '')) {
+              unshift @tpath, '.';
+            } 
+            (@ref) = (null, null, (join '/', @tpath), $t[3], $t[4]);
+          } # R
+
+          ## -- Recomposition
+          my $result = ''                                   ;
+          $result .=        $ref[0] . ':' if defined $ref[0];  # scheme;
+          $result .= '//' . $ref[1]       if defined $ref[1];  # authority
+          $result .=        $ref[2]                         ;  # path
+          $result .= '?'  . $ref[3]       if defined $ref[3];  # query
+          $result .= '#'  . $ref[4]       if defined $ref[4];  # fragment
+
+          $r = bless \$result, <ClassName::ManakaiURIReference>;          
+        }__;
+
+    @@Test:
+      @@@QName: URIRef.getRelRef.input.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{createURIImplForTest:: $impl => $impl}__;
+
+        my $ref = $impl-><M::URIImplementation.createURIReference>
+                           (q<http://www.example/a>);
+        
+        $test->id ('string');
+        my $rel1 = $ref-><M::URIReference.getRelativeReference>
+                           (q<http://www.example/>);
+        $test->assert_equals ($rel1-><AG::URIReference.uriReference>,
+                              'a');
+        
+        $test->id ('stringref');
+        my $rel2 = $ref-><M::URIReference.getRelativeReference>
+                           (\q<http://www.example/>);
+        $test->assert_equals ($rel2-><AG::URIReference.uriReference>,
+                              'a');
+        
+        $test->id ('string');
+        my $rel3 = $ref-><M::URIReference.getRelativeReference>
+                           ($impl-><M::URIImplementation.createURIReference>
+                                     (q<http://www.example/>));
+        $test->assert_equals ($rel3-><AG::URIReference.uriReference>,
+                              'a');
+
+    @@Test:
+      @@@QName: URIRef.getRelRef.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{createURIImplForTest:: $impl => $impl}__;
+
+        for (
+          [q<http://www.example/>, q<http://www.example/>, q<.>],
+          [q<http://www.example/>, q<http://www2.example/>, q<http://www.example/>],
+          [q<http://a/b/c/e/f>, q<http://a/b/c/e>, q<e/f>],
+          [q<http://a/b/c/e>, q<http://a/b/c/e>, q<e>],
+          [q<http://a/b/c/e/>, q<http://a/b/c/e>, q<e/>],
+          [q<http://a/b/c/d>, q<http://a/b/c/e>, q<d>],
+          [q<http://a/b/c/d/>, q<http://a/b/c/e>, q<d/>],
+          [q<http://a/b/c>, q<http://a/b/c/e>, q<../c>],
+          [q<http://a/b/c/>, q<http://a/b/c/e>, q<../>],
+          [q<http://a/b>, q<http://a/b/c/e>, q<../../>],
+          [q<http://a/b/d/f>, q<http://a/b/c/e>, q<../d/f>],
+          [q<about:blank>, q<http://a/>, q<about:blank>],
+          [q<http://a/about:blank>, q<http://a/b>, q<./about:blank>],
+          [q<http://a//>, q<http://a/>, q<./>],
+          [q<a>, q<http://a/b/>, q<a>],
+          [q<http://a/b#a>, q<http://a/b#b>, q<#a>],
+          [q<http://a/c#a>, q<http://a/b#a>, q<c#a>],
+          [q<http://a/b/?c>, q<http://a/b/>, q<?c>],
+        ) {
+          $test->id ($_->[0].'.'.$_->[1]);
+          my $ref = $impl-><M::URIImplementation.createURIReference> ($_->[0]);
+          my $rel = $ref-><M::URIReference.getRelativeReference> ($_->[1]);
+          $test->assert_equals
+                   ($rel-><AG::URIReference.uriReference>,
+                    $_->[2]);
+        }
+
+  @enImplNote:
+    @@ddid: norm
+    @@@:
+      Normalization
+
+      [RFC 3986 6.2.2], [RFC 3987 5.3.2]
+      - Use uppercase letters for any hexadecimal digit
+        in percent-encodings [RFC 3986 2.1, 6.2.2.1, RFC 3987 5.3.2.1].
+      - Use lowercase letters in |scheme| and |host|
+        [RFC 3986 6.2.2.1, RFC 3987 5.3.2.1].
+      - Decode any percent-encoded unreserved characters
+        [RFC 3986 2.3, 6.2.2.2, RFC 3987 5.3.2.3].
+      - dot-segment [RFC 3986 6.2.2.3, RFC 3987 5.3.2.4].
+
+      In addition to |normalize|, scheme-specific normalization.
+      [RFC 3986 6.2.3, RFC 3987 5.3.3]
+
+      equivalence property URI
+
+  @enImplNote:
+    @@ddid: equiv
+    @@@:
+      Equivalence
+  
+      [RFC 3986 6, RFC 3987 5]
+
+      equivalence property URI
+
+  @IntMethod:
+    @@Operator:
+      @@@@: eq
+      @@@ContentType: DISPerl|Perl
+    @@enDesc:
+      For Perl binding, the <Perl::eq> operator <kwd:MUST> be
+      overloaded so that it returnjs equality as strings.
+    @@Param:
+      @@@Name: v
+      @@@Type: idl|any||ManakaiDOM|all
+      @@@enDesc:
+        Another value to compare.
+    @@Return:
+      @@@Type: idl|boolean||ManakaiDOM|all
+      @@@enDesc:
+        The equality.
+      @@@PerlDef:
+        if (defined $v) {
+          __DEEP{
+            $r = $v eq $$self;
+          }__;
+        }
+
+    @@Test:
+      @@@QName: URIRef.eq.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{createURIImplForTest:: $impl => $impl}__;
+
+        $test->id ('u=u');
+        $test->assert_equals
+                 ($impl-><M::URIImplementation.createURIReference> (q<a>),
+                  $impl-><M::URIImplementation.createURIReference> (q<a>));
+
+        $test->id ('u!=u');
+        $test->assert_not_equals
+                 ($impl-><M::URIImplementation.createURIReference> (q<a>),
+                  $impl-><M::URIImplementation.createURIReference> (q<b>));
+
+        $test->id ('u=s');
+        $test->assert_equals
+                 ($impl-><M::URIImplementation.createURIReference> (q<a>),
+                  q<a>);
+
+        $test->id ('u!=s');
+        $test->assert_not_equals
+                 ($impl-><M::URIImplementation.createURIReference> (q<a>),
+                  q<b>);
+
+        $test->id ('s=u');
+        $test->assert_equals
+                 (q<a>,
+                  $impl-><M::URIImplementation.createURIReference> (q<a>));
+
+        $test->id ('s!=u');
+        $test->assert_not_equals
+                 (q<b>,
+                  $impl-><M::URIImplementation.createURIReference> (q<a>));
+
+        $test->id ('u!=undef');
+        $test->assert_not_equals
+                 ($impl-><M::URIImplementation.createURIReference> (q<a>),
+                  null);
+
+        $test->id ('undef!=u');
+        $test->assert_not_equals
+                 (null,
+                  $impl-><M::URIImplementation.createURIReference> (q<a>));
+
+  @Method:
+    @@Name: cloneURIReference
+    @@Operator: DISPerl|CloneMethod
+    @@enDesc:
+      Creates a new independent <IF::URIReference> object with the same
+      <A::URIReference.uriReference> value.
+    @@enDesc:
+      @@@ddid: p
+      @@@For: ManakaiDOM|Perl
+      @@@@:
+        For Perl binding, the <Perl::clone> method <kwd:MUST>
+        act as the <M::URIReference.cloneURIReference> would do.
+    @@Return:
+      @@@Type: URIReference
+      @@@enDesc:
+        The newly created DOM URI object.
+      @@@PerlDef:
+        my $v = $$self;
+        $r = bless \$v, <ClassName::ManakaiURIReference>;
+##URIReference
+
+ResourceDef:
+  @QName: String
+  @AliasFor: f|MIString
+  @For: ManakaiDOM|ManakaiDOM
+
+ElementTypeBinding:
+  @Name: enDesc
+  @ElementType:
+    dis:Description
+  @ShadowContent:
+    @@lang:en
+
+ElementTypeBinding:
+  @Name: enImplNote
+  @ElementType:
+    dis:Description
+  @ShadowContent:
+    @@lang:en
+
+ElementTypeBinding:
+  @Name: nullCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: ManakaiDOM|InCase
+    @@Value:
+      @@@is-null:1
+      @@@ContentType: DISCore|String
+
+ElementTypeBinding:
+  @Name: TrueCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: ManakaiDOM|InCase
+    @@Value:
+      @@@@: 1
+      @@@ContentType: DISCore|Boolean
+    @@Type: idl|boolean||ManakaiDOM|all
+
+ElementTypeBinding:
+  @Name: FalseCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: ManakaiDOM|InCase
+    @@Value:
+      @@@@: 0
+      @@@ContentType: DISCore|Boolean
+    @@Type: idl|boolean||ManakaiDOM|all
