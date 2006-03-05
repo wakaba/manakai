@@ -10,7 +10,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/02/18 07:39:04 $
+    $Date: 2006/03/05 12:42:48 $
 
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
@@ -71,6 +71,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dom/tree#
   @test:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Test#
+  @urigen:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/URI/Generic/
   @x:
     http://suika.fam.cx/~wakaba/archive/2004/dom/xml#
   @xml:
@@ -638,8 +640,13 @@ ClsDef:
                                          <C::c|DOMError.SEVERITY_FATAL_ERROR>);
                                })
             unless $Message::DOM::XMLParser::DEBUG;
-            ## NOTE: The default error handler in manakai |wanr|s error
+            ## NOTE: The default error handler in manakai |warn|s error
             ##       description.
+
+          ## Document entity's URI and base URI
+          $r-><AS::Document.documentURI> ($self->{entity}->[0]->{doc_uri});
+          $r-><AS::Document.manakaiEntityBaseURI>
+                ($self->{entity}->[0]->{base_uri});
 
           ## Document entity -> |Document| node
           $self->_parse_DocumentEntity;
@@ -1408,6 +1415,8 @@ ClsDef:
           
           $pi = $doc-><M::Document.createProcessingInstruction>
                         ($name);
+          $pi-><AS::x|ProcessingInstruction.manakaiBaseURI>
+                 ($self->{location}->{base_uri});
         }      
       } else {
         lang:Perl {
@@ -3351,14 +3360,18 @@ ClsDef:
 
     /*
       System Identifier Literal Content
+
+        Used in document type declaration, entity declaration,
+        and notation declaration.
     */
     rule _SystemLiteral ($decl) {
       // LIT or LITA
 
       ~? (STRING) {
         lang:Perl ($v => $token.value) {
-                 ## NOTE: Bare attribute name is written.
-          $decl->system_id ($v);
+          $decl-><AS::x|Entity.systemId> ($v);
+          $decl-><AS::x|Entity.manakaiDeclarationBaseURI>
+                   ($self->{location}->{base_uri});
         }
       }
 
@@ -14722,6 +14735,159 @@ ClsDef:
           }
         }
 
+    @@XMLTest:
+      @@@QName: xp.no.baseuri.test
+      @@@DEnt:
+        @@@@test:value:
+          <p/>
+      @@@test:domTree:
+        document {
+          document-uri: null;
+          base-uri: null;
+          element {
+            node-name: 'p';
+            base-uri: null;
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.docuri.no.baseuri.test
+      @@@DEnt:
+        @@@@test:uri: 
+          http://www.example.com/
+        @@@@test:value:
+          <p/>
+      @@@test:domTree:
+        document {
+          document-uri: 'http://www.example.com/';
+          base-uri: 'http://www.example.com/';
+          element {
+            node-name: 'p';
+            base-uri: 'http://www.example.com/';
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.docuri.baseuri.test
+      @@@DEnt:
+        @@@@test:uri: 
+          http://www.example.com/
+        @@@@test:baseURI:
+          ftp://ftp.example.com/
+        @@@@test:value:
+          <p/>
+      @@@test:domTree:
+        document {
+          document-uri: 'http://www.example.com/';
+          base-uri: 'ftp://ftp.example.com/';
+          element {
+            node-name: 'p';
+            base-uri: 'ftp://ftp.example.com/';
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.doctype.baseuri.test
+      @@@DEnt:
+        @@@@test:uri: 
+          http://www.example.com/
+        @@@@test:baseURI:
+          ftp://ftp.example.com/
+        @@@@test:value:
+          <!DOCTYPE p SYSTEM "sys">
+          <p/>
+      @@@test:domTree:
+        document {
+          document-uri: 'http://www.example.com/';
+          base-uri: 'ftp://ftp.example.com/';
+          document-type {
+            system-id: 'sys';
+            manakai-declaration-base-uri: 'ftp://ftp.example.com/';
+          }
+          element {
+            node-name: 'p';
+            base-uri: 'ftp://ftp.example.com/';
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.entdecl.baseuri.test
+      @@@DEnt:
+        @@@@test:uri: 
+          http://www.example.com/
+        @@@@test:baseURI:
+          ftp://ftp.example.com/
+        @@@@test:value:
+          <!DOCTYPE p [
+            <!ENTITY ent SYSTEM "ent">
+          ]>
+          <p/>
+      @@@test:domTree:
+        document {
+          document-uri: 'http://www.example.com/';
+          base-uri: 'ftp://ftp.example.com/';
+          document-type {
+            general-entity {
+              node-name: 'ent';
+              manakai-declaration-base-uri: 'ftp://ftp.example.com/';
+            }
+          }
+          element {
+            node-name: 'p';
+            base-uri: 'ftp://ftp.example.com/';
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.notdecl.baseuri.test
+      @@@DEnt:
+        @@@@test:uri: 
+          http://www.example.com/
+        @@@@test:baseURI:
+          ftp://ftp.example.com/
+        @@@@test:value:
+          <!DOCTYPE p [
+            <!NOTATION not SYSTEM "not">
+          ]>
+          <p/>
+      @@@test:domTree:
+        document {
+          document-uri: 'http://www.example.com/';
+          base-uri: 'ftp://ftp.example.com/';
+          document-type {
+            notation {
+              node-name: 'not';
+              manakai-declaration-base-uri: 'ftp://ftp.example.com/';
+            }
+          }
+          element {
+            node-name: 'p';
+            base-uri: 'ftp://ftp.example.com/';
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.doctype.intsubset.pi.baseuri.test
+      @@@DEnt:
+        @@@@test:uri: 
+          http://www.example.com/
+        @@@@test:baseURI:
+          ftp://ftp.example.com/
+        @@@@test:value:
+          <!DOCTYPE p [
+            <?pi?>
+          ]>
+          <p/>
+      @@@test:domTree:
+        document {
+          document-uri: 'http://www.example.com/';
+          base-uri: 'ftp://ftp.example.com/';
+          document-type {
+            pi {
+              node-name: 'pi';
+              base-uri: 'ftp://ftp.example.com/';
+            }
+          }
+          element {
+            node-name: 'p';
+            base-uri: 'ftp://ftp.example.com/';
+          }
+        }
+
     @@PerlDef:
       my $impl = $Message::DOM::ImplementationRegistry->get_implementation ({
         'Core' => '3.0',
@@ -15944,7 +16110,17 @@ CParam:
               
               my $v = $input-><AG::LSInput.systemId>;
               if (defined $v) {
-                $r->{document_uri} = $v;
+                $r->{base_uri} = $input-><AG::LSInput.baseURI>
+                  unless defined $r->{base_uri};
+                if (defined $r->{base_uri}) {
+                  $r->{document_uri}
+                    = <ClassM::urigen|ManakaiURIReference.new> (\$v)
+                        -><M::urigen|URIReference.getAbsoluteReference>
+                            ($r->{base_uri})
+                        -><AG::urigen|URIReference.uriReference>;
+                } else {
+                  $r->{document_uri} = $v;
+                }
                 last DURI;
               }
 
@@ -16034,6 +16210,40 @@ CParam:
         my $sub3 = $cfg-><M::c|DOMConfiguration.getParameter> ($cp);
         $test->assert_isa ($sub3, <ClassName::ManakaiDOMLSInputToInputFile>);
         $test->assert_equals ($sub3, $default);
+
+    @@Test:
+      @@@QName: cp.ls-input-to-input-file.default.test
+      @@@PerlDefC:
+        my $xp;
+        __CODE{createParserForTest:: $xp => $xp}__;
+        my $cfg = $xp-><AG::LSInput.domConfig>;
+        my $cp = <Q::xp|ls-input-to-input-file>;
+        my $default = $cfg-><M::c|DOMConfiguration.getParameter> ($cp);
+
+        my $err = sub {}; # dummy error handler
+
+        my $cs = \*STDOUT; # dummy input
+ 
+        $test->id ('cs.sysid');
+        my $r1 = $default->resolve_ls_input ({
+                   character_stream => $cs,
+                   system_id => q<http://example.com/sysid>,
+                 }, $err);
+        $test->assert_equals
+                 ($r1->document_uri, q<http://example.com/sysid>);
+        $test->assert_equals
+                 ($r1->base_uri, q<http://example.com/sysid>);
+ 
+        $test->id ('cs.baseuri.sysid');
+        my $r1 = $default->resolve_ls_input ({
+                   character_stream => $cs,
+                   system_id => q<sysid>,
+                   base_uri => q<http://example.com/>,
+                 }, $err);
+        $test->assert_equals
+                 ($r1->document_uri, q<http://example.com/sysid>);
+        $test->assert_equals
+                 ($r1->base_uri, q<http://example.com/>);
 ##ls-input-to-input-file
 
 ClsDef:

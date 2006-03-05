@@ -1,5 +1,18 @@
 2006-03-05  Wakaba  <wakaba@suika.fam.cx>
 
+	* XMLParser.dis (parse): Sets |Document.documentURI|
+	and |Document.manakaiEntityBaseURI| attributes of the
+	document created.
+	(_ProcessingInstructionDTD): Sets the |manakaiBaseURI|
+	property of the created node.
+	(_SystemLiteral): Sets the |manakaiDeclarationBaseURI|
+	of the created node.
+	(ls-input-to-input-file.default): Sets the resolved
+	system identifier to the |documentURI| attribute if available.
+	Sets the |baseURI| attribute if available.
+
+2006-03-05  Wakaba  <wakaba@suika.fam.cx>
+
 	* XDoctype.dis (DocumentTypeDefinition.implementation): New attribute.
 	(Node.baseURI): New attribute implementations.
 	(declarationBaseURI): Setter is added.

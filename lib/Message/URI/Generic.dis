@@ -23,7 +23,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/03/01 13:03:57 $
+    $Date: 2006/03/05 12:42:48 $
   
   @Require:
     @@Module:
@@ -444,6 +444,66 @@ IFClsDef:
         to make the method or attribute implementations torelant
         and harmless as far as possible.
       }
+
+  @IntMethod:
+    @@Name: new
+    @@enDesc:
+      Creates a new <IF::URIReference> object.  For internal use.
+    @@Param:
+      @@@Name: uri
+      @@@Type: String
+      @@@enDesc:
+        The DOM URI.
+      @@@InCase:
+        @@@@Type: DISPerl|SCALAR||ManakaiDOM|all
+      @@@InCase:
+        @@@@Type: URIReference
+    @@Return:
+      @@@Type: URIReference
+      @@@PerlDef:
+        my $v;
+        if (ref $uri) {
+          if (UNIVERSAL::isa ($uri, <IFName::URIReference>)) {
+            my $w = $$uri;
+            $v = \$w;
+          } elsif (ref $uri eq 'SCALAR') {
+            $v = $uri;
+          } else {
+            $v = \$uri;
+          }
+        } else {
+          $v = \$uri;
+        }
+        $r = bless $v, <ClassName::ManakaiURIReference>;
+
+    @@Test:
+      @@@QName: URIRef.new.test
+      @@@PerlDef:
+        $test->id ('str');
+        my $u1 = <ClassM::ManakaiURIReference.new> (q<http://www.example/>);
+        $test->assert_isa ($u1, <IFName::URIReference>);
+        $test->assert_equals
+                 ($u1-><AG::URIReference.uriReference>, q<http://www.example/>);
+
+        $test->id ('strref');
+        my $u = q<http://www.example/>;
+        my $u2 = <ClassM::ManakaiURIReference.new> (\$u);
+        $test->assert_isa ($u2, <IFName::URIReference>);
+        $test->assert_equals
+                 ($u2-><AG::URIReference.uriReference>, q<http://www.example/>);
+
+        $test->id ('uri');
+        my $u3 = <ClassM::ManakaiURIReference.new> ($u1);
+        $test->assert_isa ($u3, <IFName::URIReference>);
+        $test->assert_equals
+                 ($u3-><AG::URIReference.uriReference>, q<http://www.example/>);
+        
+        $test->id ('uri.mod');
+        $u3-><AS::URIReference.uriScheme> ('ftp');
+        $test->assert_equals
+                 ($u1-><AG::URIReference.uriReference>, q<http://www.example/>);
+        $test->assert_equals
+                 ($u3-><AG::URIReference.uriReference>, q<ftp://www.example/>);
 
   @Attr:
     @@Name: uriReference
