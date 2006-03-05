@@ -17,7 +17,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/02/16 20:03:20 $
+    $Date: 2006/03/05 10:07:02 $
   
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
   
@@ -309,6 +309,13 @@ ElementTypeBinding:
     @@rdf:type: DISLang|Attribute
     @@ForCheck: !=ManakaiDOM|ManakaiDOM
 
+ElementTypeBinding:
+  @Name: CAttr
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISLang|Attribute
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|ForClass
 
 ElementTypeBinding:
   @Name: IntAttr
@@ -861,12 +868,6 @@ IFClsXDef:
     method will assign the attribute to that document.
 
   @enImplNote:
-    {ISSUE::
-      <M::t|ManakaiDOMNode.getNodeReference> might not return
-      a <IF::DocumentTypeDefinition> if a class with higher score
-      does not implement that interface.
-    }
-
     In current manakai implementation, a <IF::DocumentTypeDefinition>
     object <kwd:MUST> also implement the <IF::x|DocumentType>
     interface (because of <M::t|ManakaiDOMNode.getNodeReference>
@@ -1684,6 +1685,31 @@ IFClsXDef:
            },
            exception_subtype => <Q::c|DIFFERENT_DOCUMENT_ERR>);
 
+  @CAttr:
+    @@Name: implementation
+    @@enDesc:
+      The <IF::c|DOMImplementation> object to which the node belongs.
+
+      This attribute is a manakai extension.
+    @@Type: c|DOMImplementation
+    @@Get:
+      @@@PerlDef:
+        $r = $self->{<H::mn:node>}->{<H::c|implementation>};
+        unless ($r) {
+          __DEEP{
+            $r = $self-><AG::Node.ownerDocument>-><AG::Document.implementation>;
+          }__;
+        }
+
+    @@Test:
+      @@@QName: DTDef.impl.test
+      @@@PerlDef:
+        my $dtd;
+        __CODE{newDoctypeForTest}__;
+
+        $test->assert_isa ($dtd-><AG::DocumentTypeDefinition.implementation>,
+                           <IFName::c|DOMImplementation>);
+
   @Method:
     @@ForCheck: ManakaiDOM|ForClass
     @@Name: lookupPrefix
@@ -1914,6 +1940,24 @@ IFClsXDef:
         $dtd-><AS::Node.textContent> (null);
         $test->assert_null ($dtd-><AG::Node.textContent>);
 
+  @CAttr:
+    @@Name: baseURI
+    @@enDesc:
+      The base URI of the node, i.e. the base URI of the document.
+    @@Type: DOMString
+    @@dis:actualType: ManakaiDOM|ManakaiDOMURI
+    @@Get:
+      @@@enDesc:
+        The base DOM URI of the node.
+      @@@nullCase:
+        @@@@enDesc:
+          If no base DOM URI is available on the document or 
+          the node does not belong to any document.
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><AG::DocumentTypeDeclaration.declarationBaseURI>;
+        }__;
+
   @Method:
     @@ForCheck: ManakaiDOM|ForClass
     @@ManakaiDOM:isForInternal: 1
@@ -1935,13 +1979,13 @@ IFClsXDef:
         either <Q::c|name> or <Q::infoset|localName>,
         <Q::d|elementTypes>, <Q::d|generalEntities>,
         <Q::d|parameterEntities>, <Q::d|notations>,
-        <Q::infoset|children>,
-        <Q::c|implementation>, <Q::ManakaiDOM|implID>.
+        <Q::infoset|children>.
       
       Optional properties (common):
         <Q::c|read-only>,
         <Q::d|ownerDocument>,
         <Q::infoset|prefix>.
+        <Q::c|implementation>, <Q::ManakaiDOM|implID>.
 
       Optional properties (declaration):
         <Q::infoset:publicIdentifier>,
@@ -1953,10 +1997,12 @@ IFClsXDef:
         <Q::d|hasQuotDeclaration>.
       
       Since a <IF::x|DocumentType> might not be associated
-      with any <IF::c|Document>, the manakai implementation
-      holds a reference to the <IF::c|DOMImplementation>
-      by <Q::c|implementation> and <Q::ManakaiDOM|implID>
-      properties.
+      with any <IF::c|Document>, a <IF::x|DocumentType>
+      node created by the manakai DOM implementation contains
+      a reference to the <IF::c|DOMImplementation> object
+      in the <Q::c|implementation> property and the implementation
+      identifier in the <Q::ManakaiDOM|implID> at least as long as
+      the node does not have any owner document.
       
       DOM2 Core <M::c|DOMImplementation.createDocumentType>
       method is namespace aware, so the manakai implementation
@@ -2177,12 +2223,15 @@ IFClsXDef:
         __DEEP{
           my $od = $self-><AG::Node.ownerDocument>;
           if ($od) {
-            $od = $od-><M::Node.getFeature> (<Q::fe|XDoctype> => '3.0');
             $r = $od-><AG::Node.baseURI>;
           } else {
             $r = null;
           }
         }__;
+    @@Set:
+      @@@enDesc:
+        Setting this attribute has no effect.
+      @@@PerlDef:
 
     @@Test:
       @@@QName: DTDef.declarationBaseURI.get.test
@@ -2190,9 +2239,39 @@ IFClsXDef:
         my $dtd;
         __CODE{newDTDeclForTest}__;
 
+        $test->id ('initial');
+        $test->assert_null
+                 ($dtd-><AG::DocumentTypeDeclaration.declarationBaseURI>);
+
+        $test->id ('doc');
+        $dtd-><AG::Node.ownerDocument>-><AS::Document.documentURI>
+                                          (q<http://doc.test/>);
         $test->assert_equals
                  ($dtd-><AG::DocumentTypeDeclaration.declarationBaseURI>,
-                  $dtd-><AG::Node.ownerDocument>-><AG::Node.baseURI>);
+                  q<http://doc.test/>);
+
+  @Attr:
+    @@Name: manakaiDeclarationBaseURI
+    @@enDesc:
+      The base URI of the document type declaration corresponding
+      to the node, i.e. the base URI that is used to resolve
+      the system identifier of the declaration.
+    @@Type: DOMString
+    @@dis:actualType: ManakaiDOM|ManakaiDOMURI
+    @@Get:
+      @@@enDesc:
+        The <A::DocumentTypeDeclaration.declarationBaseURI> value.
+      @@@nullCase:
+        @@@@enDesc:
+          If <A::DocumentTypeDeclaration.declarationBaseURI> is <DOM::null>.
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><AG::DocumentTypeDeclaration.declarationBaseURI>;
+        }__;
+    @@Set:
+      @@@enDesc:
+        Setting this attribute has no effect.
+      @@@PerlDef:
 
   @enImplNote:
     @@ddid: todo
@@ -2558,7 +2637,42 @@ IFClsXDef:
         $test->assert_not_null ($odt2);
         $test->assert_isa ($odt2, <IFName::DocumentTypeDefinition>);
         $test->assert_equals ($odt2, $dt);
-  
+
+  @CAttr:
+    @@Name: baseURI
+    @@enDesc:
+      The base DOM URI of the node.  It <kwd:MUST> be the same
+      value as the <A::Node.baseURI> attribute value of the
+      <A::Node.ownerDocument> node of the node.
+    @@Type: DOMString
+    @@dis:actualType: ManakaiDOM|ManakaiDOMURI
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          If <A::Node.baseURI> of the <A::Node.ownerDocument> is
+          <DOM::null>.
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><AG::Node.ownerDocument>-><AG::Node.baseURI>;
+        }__;
+
+    @@Test:
+      @@@QName: ETDef.baseURI.test
+      @@@PerlDef:
+        my $et;
+        __CODE{newETForTest:: $et => $et}__;
+ 
+        my $doc = $et-><AG::Node.ownerDocument>;
+ 
+        $test->id ('initial');
+        $test->assert_null ($et-><AG::Node.baseURI>);
+
+        $test->id ('doc');
+        $doc-><AS::Document.documentURI> (q<http://doc.test/>);
+        $test->assert_equals
+                 ($et-><AG::Node.baseURI>,
+                  q<http://doc.test/>);
+ 
   @Method:
     @@ForCheck: ManakaiDOM|ForClass
     @@ManakaiDOM:isForInternal: 1
@@ -2610,6 +2724,17 @@ ResourceDef:
   @QName:
     @@@: setDefinitionNodeAttr
     @@ForCheck: ForAttr
+
+  @enImplNote:
+    Currently <IF::x|DocumentType> nodes with no <A::Node.ownerDocument>
+    are not allowed to contain any child or definition nodes.  It is
+    also possible to set <A::Node.ownerDocument> of the <IF::x|DocumentType>
+    when a node is appended or set to the slot in the <IF::x|DocumentType>.
+
+    Future version of manakai might support implicit adoptation of 
+    external nodes as Web browsers does.  In such an implementation
+    setting <IF::x|DocumentType>'s <A::Node.ownerDocument> would be
+    more desired than <X::c|DOMException.WRONG_DOCUMENT_ERR>.
   
   @PerlDef:
         my $__aname = $defNode-><AG::t|Node.nodeName>;
@@ -3361,7 +3486,7 @@ IFClsXDef:
       is implementation dependent unless otherwise specified
       if one or more errors defined above is detected.
       That is, implementations <kwd:MAY> ignore erroreous
-      value, <kwd:MAY> validate a value that is acutally
+      value, <kwd:MAY> validate a value that is actually
       invalid, <kwd:MAY> report an error by <IF::c|DOMError>,
       or <kwd:MAY> choose any other possible error
       recovery method.  However, it <kwd:MUST> recover
@@ -3404,6 +3529,41 @@ IFClsXDef:
         $test->assert_string
                  (actual_value => $list2->[0],
                   expected_value => 'NMTOKEN1');
+
+  @CAttr:
+    @@Name: baseURI
+    @@enDesc:
+      The base DOM URI of the node.  It <kwd:MUST> be the same
+      value as the <A::Node.baseURI> attribute value of the
+      <A::Node.ownerDocument> node of the node.
+    @@Type: DOMString
+    @@dis:actualType: ManakaiDOM|ManakaiDOMURI
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          If <A::Node.baseURI> of the <A::Node.ownerDocument> is
+          <DOM::null>.
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><AG::Node.ownerDocument>-><AG::Node.baseURI>;
+        }__;
+
+    @@Test:
+      @@@QName: ATDef.baseURI.test
+      @@@PerlDef:
+        my $et;
+        __CODE{newATForTest:: $at => $et}__;
+ 
+        my $doc = $et-><AG::Node.ownerDocument>;
+ 
+        $test->id ('initial');
+        $test->assert_null ($et-><AG::Node.baseURI>);
+
+        $test->id ('doc');
+        $doc-><AS::Document.documentURI> (q<http://doc.test/>);
+        $test->assert_equals
+                 ($et-><AG::Node.baseURI>,
+                  q<http://doc.test/>);
 
   @Method:
     @@ForCheck: ManakaiDOM|ForClass

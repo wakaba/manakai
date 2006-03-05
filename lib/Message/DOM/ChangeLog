@@ -1,3 +1,35 @@
+2006-03-05  Wakaba  <wakaba@suika.fam.cx>
+
+	* XDoctype.dis (DocumentTypeDefinition.implementation): New attribute.
+	(Node.baseURI): New attribute implementations.
+	(declarationBaseURI): Setter is added.
+	(manakaiDeclarationBaseURI): New attribute.
+
+	* Tree.dis (Require): A reference to the |MURI:Generic|
+	module is added.
+	(Node.baseURI): The implementation is revised.
+	(getNodeReference): Attribute node classes specialized
+	to attribute names are supported.
+	(contentBaseURI, htmlBaseURI): Removed.
+	(manakaiEntityBaseURI): New attribute.
+	(ManakaiDOMImplementationDocument): It now inherits
+	the |urigen:URIImplementation| class.
+
+	* DOMMain.dis (isRelativeDOMURI): The definition
+	of the URI scheme is synced with |Message::URI::Generic|'s
+	one.
+
+	* DOMXML.dis (Require): A reference to |DISlib:DISMarkup|
+	module is added.
+	(DocumentType.implementation): New attribute.
+	(Node.baseURI): Implementations are added.
+	(manakaiDeclarationBaseURI): New attributes.
+	(manakaiEntityBaseURI): New attributes.
+	(manakaiEntityURI): New attribute.
+	(manakaiExternal): New attribute.
+	(manakaiBaseURI): New attribute.
+	(ManakaiDOMXMLBaseAttr): New class.
+
 2006-02-26  Wakaba  <wakaba@suika.fam.cx>
 
 	* SimpleLS.dis (Require): Reference to the |MDOM:Tree|

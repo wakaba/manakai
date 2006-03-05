@@ -12,7 +12,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/02/18 07:39:04 $
+    $Date: 2006/03/05 10:07:02 $
 
   @Require:
     @@Module:
@@ -31,6 +31,9 @@ Module:
       @@@QName: MDOM|DOMXML
     @@Module:
       @@@QName: MDOM|XDoctype
+      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
+    @@Module:
+      @@@QName: MURI|Generic
       @@@WithFor: ManakaiDOM|ManakaiDOMLatest
 
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
@@ -82,6 +85,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
   @mn:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/ManakaiNode#
+  @MURI:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/URI/
   @null:
     http://suika.fam.cx/~wakaba/-temp/2003/09/27/null
   @rdf:
@@ -94,6 +99,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dom/tree#
   @test:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Test#
+  @urigen:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/URI/Generic/
   @x:
     http://suika.fam.cx/~wakaba/archive/2004/dom/xml#
   @xhtml1:
@@ -233,6 +240,14 @@ ElementTypeBinding:
     @@ForCheck: !=ManakaiDOM|ManakaiDOM
 
 ElementTypeBinding:
+  @Name: CAttr
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISLang|Attribute
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|ForClass
+
+ElementTypeBinding:
   @Name: IntAttr
   @ElementType:
     dis:ResourceDef
@@ -259,6 +274,14 @@ ElementTypeBinding:
   ## Note that there are attributes introduced in DOM Level 3
   ## but also defined for lower levels as internal attributes
   ## for the purpose of internal use.
+
+ElementTypeBinding:
+  @Name: CL3Attr
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|Attribute
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|DOM3 ManakaiDOM|ForClass
 
 ElementTypeBinding:
   @Name: LXAttr
@@ -3124,72 +3147,29 @@ IFCls1Def:
      @@SpecLevel:2
      @@For:
        ManakaiDOM:DOM2
-  @Attr:
-     @@Name:  baseURI
-     @@Description:
-       @@@lang:en
-       @@@@:
-         The base URI of this node.
-     @@Get:
-        @@@Type: 
-          DOMMain:DOMString
-        @@@actualType:
-          ManakaiDOM:ManakaiDOMURI
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            The absolute base URI.
-        @@@InCase:
-          @@@@Value:
-            @@@@@is-null:1
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              The DOM implementation was not able to obtain 
-              an absolute URI.
-        @@@PerlDef:
-            if ($self->{<H::mn:node>}->{<H::DOMCore:ownerDocument>} and
-                $self->{<H::mn:node>}->{<H::DOMCore:ownerDocument>}
-                     ->{<H::DOMCore:hasFeature>}->{HTML}) {
-              $r = $self->{<H::mn:node>}
-                     -><M::ManakaiDOMCore:ManakaiDOMNodeObjectNode.htmlBaseURI>;
-            } else {
-              $r = null;
-            }
-     @@ImplNote:
-       @@@lang:en
-       @@@@:
-         = If the <IF::Document> support the feature <Feature::HTML>,
-       \
-         == If there is a <HE::base> element with the <HA::href> attribute, 
-            the base URI is its value.
-       \
-         == Otherwise, the base URI is the value of <A::Document.documentURI>.
-       \
-         = Elsif the <IF::Document> support the feature <Feature::XML>, 
-           compute the base URI accoding to the XML Base Specification.
-     @@ImplNote:
-       @@@lang:en
-       @@@@:
-         The descriptions in the sections of Base URIs (DOM Level 3 Core 
-         1.3.4) and <A::Node.baseURI> (and some readings from XML Base 
-         and XML Infoset specifications) is insufficient to understand 
-         and implement this attribute.  The <sw010:csection::Infoset Mapping>, a 
-         normative appendix of the DOM Level 3 Core Specification, is 
-         useful for this purpose.
-     @@ImplNote:
-       @@@lang:en
-       @@@@:
-         The DOM Level 3 Specification does not address to 
-         <HA::codebase> attributes.
-     @@Level[list]:  3
-     @@SpecLevel:3
+
+  @L3Attr:
+    @@Name: baseURI
+    @@enDesc:
+      The base URI of the node.
+    @@Type: DOMString
+    @@dis:actualType: ManakaiDOM|ManakaiDOMURI
+    @@Get:
+      @@@enDesc:
+        The absolute base URI of the node.
+      @@@nullCase:
+        @@@@enDesc:
+          If the DOM implementation was unable to obtain the base absolute
+          URI.
+      @@@PerlDef:
+        $r = null;
+    @@enImplNote:
+      See <URI::http://suika.fam.cx/gate/2005/sw/baseURI>.
+
      @@Spec:
        @@@DOM3:
          http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#baseURIs-Considerations
-    @@For:
-      ManakaiDOM:DOM2
-
+    
   @ConstGroup:
     @@QName: DocumentPosition
 
@@ -4091,7 +4071,11 @@ IFCls1Def:
             last UNKNOWN;
           }
           FIND: {
+
+          ## -- Element Node
           if ($nt eq <H::infoset:Element>) {
+
+            ## Expanded name of the element node
             my $ns;
             my $ln;
             if (defined $object->{<H::infoset:localName>}) { ## Namespace-aware
@@ -4102,33 +4086,40 @@ IFCls1Def:
                             ->{<H::DOMCore:hasFeature>}->{HTML}) {
               $ns = \<Q::xhtml1:>;
               $ln = lc $object->{<H::DOMCore:name>};
+            } else {
+              $ns = \'';
+              $ln = $object->{<H::c|name>};
             }
-            if (defined $ln) {
-              for my $pack (sort {
-                $Message::DOM::ClassPoint{$b} <=> $Message::DOM::ClassPoint{$a}
-              } keys %{
-                $Message::DOM::ManakaiDOMElement::CompatClassET{$$ns}->{$ln}
-              }) {
-                if ($pack->isa (<IFName::Element>) and
-                    (not defined $interface or
-                     $pack->isa ($interface))) {
-                  $class = $pack;
-                  last FIND;
-                }
-              }
-              for my $pack (sort {
-                $Message::DOM::ClassPoint{$b} <=> $Message::DOM::ClassPoint{$a}
-              } keys %{
-                $Message::DOM::ManakaiDOMElement::CompatClassET{$$ns}->{'*'}
-              }) {
-                if ($pack->isa (<IFName::Element>) and
-                    (not defined $interface or
-                     $pack->isa ($interface))) {
-                  $class = $pack;
-                  last FIND;
-                }
+
+            ## Finds class from the namespace URI and local name
+            for my $pack (sort {
+              $Message::DOM::ClassPoint{$b} <=> $Message::DOM::ClassPoint{$a}
+            } keys %{
+              $Message::DOM::ManakaiDOMElement::CompatClassET{$$ns}->{$ln}
+            }) {
+              if ($pack->isa (<IFName::Element>) and
+                  (not defined $interface or
+                   $pack->isa ($interface))) {
+                $class = $pack;
+                last FIND;
               }
             }
+
+            ## Finds class from the namespace URI
+            for my $pack (sort {
+              $Message::DOM::ClassPoint{$b} <=> $Message::DOM::ClassPoint{$a}
+            } keys %{
+              $Message::DOM::ManakaiDOMElement::CompatClassET{$$ns}->{'*'}
+            }) {
+              if ($pack->isa (<IFName::Element>) and
+                  (not defined $interface or
+                   $pack->isa ($interface))) {
+                $class = $pack;
+                last FIND;
+              }
+            }
+
+            ## Finds class for any element type
             for my $pack (sort {
               $Message::DOM::ClassPoint{$b} <=> $Message::DOM::ClassPoint{$a}
             } keys %Message::DOM::ManakaiDOMElement::CompatClass) {
@@ -4140,8 +4131,71 @@ IFCls1Def:
               }
             }
             $class = <ClassName::ManakaiDOMElement>;
+
+          ## -- Attribute Node
           } elsif ($nt eq <H::infoset:Attribute>) {
-            ## TODO: Find class by namespace URI and local name
+
+            ## Expanded name of the attribute node itself
+            my $atns;
+            my $atln;
+            if (defined $object->{<H::infoset|localName>}) {
+              $atns = $object->{<H::infoset|namespaceName>};
+              $atns = \'' unless defined $atns;
+              $atln = $object->{<H::infoset|localName>};
+            } elsif ($object->{<H::c|hasFeature>}->{HTML}) {
+              $atns = \<Q::xhtml1:>;
+              $atln = lc $object->{<H::c|name>};
+            } else {
+              $atns = \'';
+              $atln = $object->{<H::c|name>};
+            }
+
+            ## Expanded name of the element node to which it is attached
+            my $etns = \'*';
+            my $etln = '*';
+            my $oe = $object->{<H::infoset|ownerElement>};
+            if (defined $oe) {
+              if (defined $oe->{<H::infoset|localName>}) {
+                $etns = $oe->{<H::infoset|namespaceName>};
+                $etns = \'' unless defined $etns;
+                $etln = $oe->{<H::infoset|localName>};
+              } elsif ($oe->{<H::c|hasFeature>}->{HTML}) {
+                $etns = \'';
+                $etln = lc $oe->{<H::c|name>};
+              } else {
+                $etns = \'';
+                $etln = $oe->{<H::c|name>};
+              }
+            }
+
+            ## Finds class from the namespace URIs and local names
+            for my $type (
+              [$etns, $etln, $atns, $atln],
+              [$etns, $etln, $atns, '*'],
+              [$etns, $etln, \'*',  '*'],
+              [$etns, '*',   $atns, $atln],
+              [$etns, '*',   $atns, '*'],
+              [$etns, '*',   \'*',  '*'],
+              [\'*',  '*',   $atns, $atln],
+              [\'*',  '*',   $atns, '*'],
+              [\'*',  '*',   \'*',  '*'],
+            ) {
+              for my $pack (sort {
+                $Message::DOM::ClassPoint{$b} <=> $Message::DOM::ClassPoint{$a}
+              } keys %{
+                $Message::DOM::ManakaiDOMElement::CompatClassAttr{${$type->[0]}}
+                    ->{$type->[1]}->{${$type->[2]}}->{$type->[3]}
+              }) {
+                if ($pack->isa (<IFName::Attr>) and
+                    (not defined $interface or
+                     $pack->isa ($interface))) {
+                  $class = $pack;
+                  last FIND;
+                }
+              }
+            }
+
+            ## Finds class for any attribute
             for my $pack (sort {
               $Message::DOM::ClassPoint{$b} <=> $Message::DOM::ClassPoint{$a}
             } keys %Message::DOM::ManakaiDOMAttr::CompatClass) {
@@ -4523,6 +4577,17 @@ IFCls1Def:
 ##Node
 
 ElementTypeBinding:
+  @Name: NodeReadOnlyError
+  @ElementType:
+    dx:raises
+  @ShadowContent:
+    @@@: MDOMX|NOMOD_THIS
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The node is read-only.
+
+ElementTypeBinding:
   @Name: ErrDef
   @ElementType:
     dis:ResourceDef
@@ -4805,265 +4870,6 @@ ClsDef:
       The extended internal interface for the "ManakaiDOMNodeObject" 
       object used as a "Node".
 
-  @IntMethodC:
-    @@Name: contentBaseURI
-    @@Description:
-      @@@lang:en
-      @@@@:
-        The base URI by which URI references in the content of 
-        this node should be resolved, as per the XML Base Specification.
-    @@Param:
-      @@@Name:useInfosetProperty
-      @@@Type:DOMMain|boolean||ManakaiDOM|all
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          Whether the <InfosetP::base URI> property of the XML Infoset, 
-          if any, should be used to compute the base URI.
-    @@Return:
-      @@@Type:
-        ManakaiDOM:ManakaiDOMURI
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          The base URI.
-      @@@InCase:
-        @@@@Value:
-          @@@@@is-null:1
-        @@@@Description:
-          @@@@@lang:en
-          @@@@@@:
-            The DOM implementation is unable to obtain an absolute URI.
-      @@@PerlDefC:
-          $r = null;
-          if ($useInfosetProperty and defined $self->{<H::infoset:baseURI>}) {
-            ## Note: In XML Infoset, infoset:Document, 
-            ##       infoset:Element and infoset:ProcessingInstruction
-            ##       allow infoset:baseURI.  In addition, 
-            ##       DOMCore:Entity and DOMCore:EntityReference
-            ##       may have it, if it is ManakaiDOM:isExternalEntity,
-            ##       in this implementation.
-            $r = $self->{<H::infoset:baseURI>};
-          } else {
-            if ($self->{<H::DOMCore:nodeType>} eq <H::infoset:Element>) {
-              if ($self->{<H::infoset:attributes>}
-                       ->{<Q::xml:>}->{'base'}) {
-                $r = $self->{<H::infoset:attributes>}
-                          ->{<Q::xml:>}->{'base'}
-                          -><M::ManakaiDOMCore:ManakaiDOMNodeObjectNode
-                                     .contentBaseURI> ($useInfosetProperty);
-              } elsif ($self->{<H::infoset:attributes>}
-                            ->{<Q::ManakaiDOM:noNS>}->{'xml:base'}) {
-                $r = $self->{<H::infoset:attributes>}
-                          ->{<Q::ManakaiDOM:noNS>}->{'xml:base'}
-                          -><M::ManakaiDOMCore:ManakaiDOMNodeObjectNode
-                                     .contentBaseURI> ($useInfosetProperty);
-              }
-              if (not defined $r and $self->{<H::infoset:parent>}) {
-                $r = $self->{<H::infoset:parent>}
-                          -><M::ManakaiDOMCore:ManakaiDOMNodeObjectNode
-                                     .contentBaseURI> ($useInfosetProperty);
-              }
-            } elsif ($self->{<H::DOMCore:nodeType>} eq <H::infoset:Attribute>) {
-              if ((defined $self->{<H::infoset:localName>} and
-                   $self->{<H::infoset:localName>} eq 'base' and
-                   defined $self->{<H::infoset:namespaceName>} and
-                   ${$self->{<H::infoset:namespaceName>}} eq <Q::xml:>) or
-                  (not defined $self->{<H::infoset:localName>} and
-                   $self->{<H::DOMCore:name>} eq 'xml:base')) {
-                my $attrcls = <ClassName::ManakaiDOMAttr>;
-                $r = <Code::getWeakRef:: $object = $self, $class = $attrcls>
-                          -><AG::Attr.value>;
-                if (defined $r and
-                    <Code::DOMMain:isRelativeDOMURI:: $INPUT = $r>) {
-                  if ($self->{<H::infoset:ownerElement>} and
-                      $self->{<H::infoset:ownerElement>}
-                           ->{<H::infoset:parent>}) {
-                    my $base = $self->{<H::infoset:ownerElement>}
-                                    ->{<H::infoset:parent>}
-                                    -><M::ManakaiDOMCore:ManakaiDOMNodeObjectNode
-                                            .contentBaseURI>
-                                                     ($useInfosetProperty);
-                    if (defined $base) {
-                      require URI;
-                      $r = URI->new_abs ($r, $base)->as_string;
-                    } else {
-                      $r = null;
-                    }
-                  } else {
-                    $r = null;
-                  }
-                }
-              } else { # not xml:base
-                if ($self->{<H::infoset:ownerElement>}) {
-                  $r = $self->{<H::infoset:ownerElement>}
-                            -><M::ManakaiDOMCore:ManakaiDOMNodeObjectNode
-                                    .contentBaseURI> ($useInfosetProperty);
-                }
-              }
-            } elsif ({
-                       <H::DOMCore:TextNode> => 1,
-                       <H::DOMXML:CDATASectionNode> => 1,
-                       <H::infoset:DocumentTypeDeclaration> => 1,
-                       <H::infoset:Comment> => 1,
-                       <H::infoset:ProcessingInstruction> => 1,
-                       <H::infoset:Notation> => 1, ## but does not have content
-                     }->{$self->{<H::DOMCore:nodeType>}}) {
-              if ($self->{<H::infoset:parent>}) {
-                $r = $self->{<H::infoset:parent>}
-                          -><M::ManakaiDOMCore:ManakaiDOMNodeObjectNode
-                                   .contentBaseURI> ($useInfosetProperty);
-              }
-            } elsif ($self->{<H::DOMCore:nodeType>} eq <H::infoset:Document>) {
-              ## 2. The base URI of the protocol entity
-                # infoset:baseURI
-              ## 3. The URI to retrieve the protocol entity
-              ## 4. The application defined base URI
-              if (defined $self->{<H::DOMCore:documentURI>} and
-                  not <Code::DOMMain:isRelativeDOMURI:: $INPUT = $r>) {
-                $r = $self->{<H::DOMCore:documentURI>};
-              }
-            } elsif ({
-                       <H::DOMXML:EntityNode> => 1,
-                       <H::DOMXML:EntityReferenceNode> => 1,
-                     }->{$self->{<H::DOMCore:nodeType>}}) {
-              if ($self->{<H::ManakaiDOM:isExpanded>}) {
-                if ($self->{<H::ManakaiDOM:isExternalEntity>}) {
-                  ## 2. The base URI of the protocol entity
-                    # infoset:baseURI
-                  ## 3. The URI to retrieve the protocol entity
-                  ## 4. The application defined base URI
-                  if (defined $self->{<H::DOMCore:documentURI>} and
-                      not <Code::DOMMain:isRelativeDOMURI:: $INPUT = $r>) {
-                    $r = $self->{<H::DOMCore:documentURI>};
-                  }
-                  ## Should infoset:systemIdentifier +
-                  ## infoset:declarationBaseURI also be used?
-                }
-              } else {
-                if ($self->{<H::infoset:parent>}) {
-                  $r = $self->{<H::infoset:parent>}
-                            -><M::ManakaiDOMCore:ManakaiDOMNodeObjectNode
-                                    .contentBaseURI> ($useInfosetProperty);
-                }
-              }
-            } else {
-              # DOMCore:DocumentFragment or 
-              # unknown node types
-            }
-          }
-    @@ImplNote:
-      @@@lang:en
-      @@@@:
-        This internal method assumes that the document is an XML 
-        document and the base URI is computed by the XML Base 
-        Specification.
-    @@ImplNote:
-      @@@lang:en
-      @@@@:
-        ISSUE: More study required for the base URI of document type- 
-        or entity-related node types.
-  @IntMethodC:
-    @@Name:htmlBaseURI
-    @@Description:
-      @@@lang:en
-      @@@@:
-        Return the base URI, as the document is an HTML document.
-    @@Return:
-      @@@Type:
-        ManakaiDOM:ManakaiDOMURI
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          An absolute URI.  Although the HTML 4 Specification 
-          refers the RFC 2396, the return value is a DOM URI 
-          (URI reference, IRI reference or some other identifier), 
-          if the source document is broken (see HTML 4 Appendix) or 
-          the base URI is provided from the source other than 
-          the content of the HTML document (ex. the DOM URI 
-          used to retrieve the document or the value of 
-          the <A::Document.documentURI>).
-      @@@InCase:
-        @@@@Value:
-          @@@@@is-null:1
-        @@@@Description:
-          @@@@@lang:en
-          @@@@@@:
-            The DOM implementation was not able to obtain an 
-            absolute URI.
-      @@@PerlDefC:
-          $r = null;
-          my $doc = $self->{<H::mn:node>}->{<H::DOMCore:ownerDocument>};
-          if ($doc and $doc->{<H::DOMCore:hasFeature>}->{HTML}) {
-            HTML: {
-              DOC: for (@{$doc->{<H::infoset:children>}}) {
-                if ($_->{<H::DOMCore:nodeType>} eq <H::infoset:Element> and
-                    (defined $_->{<H::infoset:localName>} and
-                     $_->{<H::infoset:localName>} eq 'html' and
-                     ((defined $_->{<H::infoset:namespaceName>} and
-                       ${$_->{<H::infoset:namespaceName>}} eq <Q::xhtml1:>) or
-                      not defined $_->{<H::infoset:namespaceName>})) or
-                    (not defined $_->{<H::infoset:localName>} and
-                     $_->{<H::DOMCore:name>} eq 'html')) {
-                  for (@{$_->{<H::infoset:children>}}) {
-                    if ($_->{<H::DOMCore:nodeType>} eq <H::infoset:Element> and
-                        (defined $_->{<H::infoset:localName>} and
-                         $_->{<H::infoset:localName>} eq 'head' and
-                         ((defined $_->{<H::infoset:namespaceName>} and
-                           ${$_->{<H::infoset:namespaceName>}} eq <Q::xhtml1:>) or
-                          not defined $_->{<H::infoset:namespaceName>})) or
-                        (not defined $_->{<H::infoset:localName>} and
-                         $_->{<H::DOMCore:name>} eq 'head')) {
-                      for (@{$_->{<H::infoset:children>}}) {
-                        if ($_->{<H::DOMCore:nodeType>} eq <H::infoset:Element> and
-                            (defined $_->{<H::infoset:localName>} and
-                             $_->{<H::infoset:localName>} eq 'base' and
-                             ((defined $_->{<H::infoset:namespaceName>} and
-                               ${$_->{<H::infoset:namespaceName>}} eq <Q::xhtml1:>) or
-                              not defined $_->{<H::infoset:namespaceName>})) or
-                            (not defined $_->{<H::infoset:localName>} and
-                             $_->{<H::DOMCore:name>} eq 'base')) {
-                          my $a = $_->{<H::infoset:attributes>}
-                                    ->{<Q::null:>}->{href} ||
-                                  $_->{<H::infoset:attributes>}
-                                    ->{<Q::ManakaiDOM:noNS>}->{href};
-                          if ($a) {
-                            my $ac = <ClassName::ManakaiDOMAttr>;
-                            $r = <Code::getWeakRef:: $object = $a, $class = $ac>
-                                      -><AG::Attr.value>;
-                            unless (<Code::DOMMain:isRelativeDOMURI::
-                                             $INPUT = $r>) {
-                              $r = null;
-                            } else {
-                              last HTML;
-                            }
-                          }
-                          last DOC;
-                        }
-                      }
-                      last DOC;
-                    }
-                  }
-                  last DOC;
-                }
-              } # DOC
-              if (defined $doc->{<H::infoset:baseURI>}) {
-                $r = $doc->{<H::infoset:baseURI>};
-                $r = null if <Code::DOMMain:isRelativeDOMURI:: $INPUT = $r>;
-              } elsif (defined $doc->{<H::DOMCore:documentURI>}) {
-                $r = $doc->{<H::DOMCore:documentURI>};
-                $r = null if <Code::DOMMain:isRelativeDOMURI:: $INPUT = $r>;
-              }
-            } # HTML
-          }
-       @@@@ImplNote:
-         @@@@@lang:en
-         @@@@@@:
-           TODO: <HA::codebase> attribute should be considered by option.
-       @@@@ImplNote:
-         @@@@@lang:en
-         @@@@@@:
-           ISSUE: How treat base URI of <IF::DOMXML:DocumentType>, ...
   @IntMethodC:
     @@Name:lookupNamespacePrefix
     @@Description:
@@ -10140,6 +9946,44 @@ NodeTypeDef:
         the node list is always empty.
       @@@PerlDef:
         $r = <Class::DOMCore|ManakaiDOMEmptyNodeList>->new;
+
+  @CL3Attr:
+    @@Name: baseURI
+    @@enDesc:
+      The base URI of the node.
+    @@Type: DOMString
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          If it is not available.
+      @@@PerlDef:
+        __DEEP{
+          my $pe = $self-><AG::Node.parentNode>;
+          W: {
+            while (defined $pe) {
+              my $nt = $pe-><AG::Node.nodeType>;
+              if ($nt == <C::Node.ELEMENT_NODE> or
+                  $nt == <C::Node.ATTRIBUTE_NODE> or
+                  $nt == <C::Node.DOCUMENT_NODE> or
+                  $nt == <C::Node.DOCUMENT_FRAGMENT_NODE> or
+                  $nt == <C::Node.ENTITY_NODE>) {
+                $r = $pe-><AG::Node.baseURI>;
+                last W;
+              } elsif ($nt == <C::Node.ENTITY_REFERENCE_NODE>) {
+                if ($pe-><AG::x|EntityReference.manakaiExternal>) {
+                  $r = $pe-><AG::x|EntityReference.manakaiEntityBaseURI>;
+                  last W;
+                }
+              }
+              $pe = $pe-><AG::Node.parentNode>;
+            }
+            if ($pe) {
+              $r = $pe-><AG::Node.baseURI>;
+            } else {
+              $r = $self-><AG::Node.ownerDocument>-><AG::Node.baseURI>;
+            }
+          } # W
+        }__;
 ##CharacterData
 
 ElementTypeBinding:
@@ -10952,6 +10796,54 @@ NodeTypeDef:
      @@SpecLevel:2
      @@For:
        ManakaiDOM:DOM2
+
+  @CL3Attr:
+    @@Name: baseURI
+    @@enDesc:
+      The base URI of the node.
+    @@Type: DOMString
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          If it is not available.
+      @@@PerlDef:
+        __DEEP{
+          my $oe = $self-><AG::Attr.ownerElement>;
+          if ($oe) {
+            $r = $oe-><AG::Node.baseURI>;
+          } else {
+            my $od = $self-><AG::Node.ownerDocument>;
+            $r = $od-><AG::Node.baseURI>;
+          }
+        }__;
+
+    @@L3Test:
+      @@@QName: Attr.baseURI.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{createDocumentForTest:: $doc => $doc}__;
+
+        my $attr = $doc-><M::Document.createAttributeNS> (null, 'attr');
+        
+        $test->id ('initial');
+        $test->assert_null ($attr-><AG::Node.baseURI>);
+
+        $doc-><AS::Document.documentURI> (q<http://www.example.com/>);
+        
+        $test->id ('doc');
+        $test->assert_equals
+                 ($attr-><AG::Node.baseURI>,
+                  q<http://www.example.com/>);
+
+        my $el = $doc-><M::Document.createElementNS> (null, 'element');
+        $el-><M::Element.setAttributeNS> (<Q::xml:>, 'xml:base',
+                                          q<http://www.example.org/>);
+        $el-><M::Element.setAttributeNodeNS> ($attr);
+
+        $test->id ('element');
+        $test->assert_equals
+                 ($attr-><AG::Node.baseURI>,
+                  q<http://www.example.org/>);
 
   @IntMethod:
     @@Name: newObject
@@ -13751,49 +13643,196 @@ NodeTypeDef:
                  ($as-><M::NamedNodeMap.getNamedItem> ('at1'),
                   $el-><M::Element.getAttributeNode> ('at1'));
 
-  @ReAttr:
-    @@Name:baseURI
-    @@Description:
-      @@@lang:en
-      @@@@:
-        The base URI of this element.
+  @LXAttr:
+    @@Name: manakaiBaseURI
+    @@enDesc:
+      The base URI of the element.
+    @@Type: DOMString
     @@Get:
-      @@@Type:
-        DOMMain:DOMString
-      @@@actualType:
-        ManakaiDOM:ManakaiDOMURI
-      @@@Description:
-        @@@@lang:en
-        @@@@@: The base URI.
-      @@@InCase:
-        @@@@Value:
-          @@@@@is-null:1
-        @@@@Description:
-          @@@@@lang:en
-          @@@@@@:
-            The DOM implementation is unable to obtain an absolute URI.
+      @@@enDesc:
+        The base DOM URI of the element, as defined by XML Base
+        specification, with the exception that if there is an explicit
+        base DOM URI is set to the element, then it takes precedence
+        to the <XA::xml:base> attribute.  If it is application-dependent in that
+        specification, the value of this attribute is implementation-dependent.
+      @@@nullCase:
+        @@@@enDesc:
+          If no base DOM URI is available.
       @@@PerlDef:
-          if ($self->{<H::mn:node>}->{<H::DOMCore:hasFeature>}->{HTML}) {
-            $r = $self->{<H::mn:node>}
-                      -><M::ManakaiDOMCore:ManakaiDOMNodeObjectNode
-                                   .htmlBaseURI>;
-          } else {
-            $r = $self->{<H::mn:node>}
-                      -><M::ManakaiDOMCore:ManakaiDOMNodeObjectNode
-                                   .contentBaseURI> (false);
-          }
-       @@@ImplNote:
-         @@@@lang:en
-         @@@@@:
-           If a document has both a <HE::base> element and 
-           an <XA::xml:base> attribute, or even in the case that 
-           an XHTML 1 document has an <XA::xml:base> attribute, 
-           its result is not defined by any W3C specification.
-    @@SpecLevel:3
-    @@Level[list]:3
-    @@For:
-      ManakaiDOM:DOM3
-    @@L3:
+        __DEEP{
+          $r = $self-><AG::Node.baseURI>;
+        }__;
+    @@Set:
+      @@@enDesc:
+        Sets the base DOM URI of the element.  It <kwd:MUST> be an
+        absolute DOM URI; however, no lexical checking is performed
+        on setting.  It is similar to the <InfoProp::base URI>
+        property in the XML Information Set and setting the attribute
+        value does not affect on the <XA::xml:base> attribute.
+      @@@nullCase:
+        @@@@enDesc:
+          The base DOM URI explicitly set to the element node, if any,
+          is removed.  Note that <XA::xml:base> attribute or any
+          other base DOM URI sources attached to other nodes are
+          not affected by setting the attribute value.
+      @@@NodeReadOnlyError:
+      @@@disDef:
+        @@@@SetProp:
+          @@@@@@: infoset|baseURI
+          @@@@@CheckReadOnly: 1
+
+  @CL3Attr:
+    @@Name: baseURI
+    @@enDesc:
+      The base URI of the node.
+    @@Type: DOMString
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          If it is not available.
+      @@@PerlDef:
+        if (defined $self->{<H::mn|node>}->{<H::infoset|baseURI>}) {
+          $r = $self->{<H::mn|node>}->{<H::infoset|baseURI>};
+        } else {
+          __DEEP{
+            my $xb = $self-><M::Element.getAttributeNodeNS> (<Q::xml:>, 'base');
+            if ($xb) {
+              $r = $xb-><AG::Attr.value>;
+              if (<Code::DOMMain:isRelativeDOMURI:: $INPUT = $r>) {
+                my $xbbase = $xb-><AG::Node.baseURI>;
+                $r = $self-><AG::Node.ownerDocument>
+                          -><AG::Document.implementation>
+                          -><M::urigen|URIImplementation.createURIReference>
+                              ($r)
+                          -><M::urigen|URIReference.getAbsoluteReference>
+                              ($xbbase)
+                          -><AG::urigen|URIReference.uriReference>
+                  if defined $xbbase;
+              }
+            } else {
+              my $pe = $self-><AG::Node.parentNode>;
+              W: {
+                while (defined $pe) {
+                  my $nt = $pe-><AG::Node.nodeType>;
+                  if ($nt == <C::Node.ELEMENT_NODE> or
+                      $nt == <C::Node.DOCUMENT_NODE> or
+                      $nt == <C::Node.DOCUMENT_FRAGMENT_NODE> or
+                      $nt == <C::Node.ENTITY_NODE>) {
+                    $r = $pe-><AG::Node.baseURI>;
+                    last W;
+                  } elsif ($nt == <C::Node.ENTITY_REFERENCE_NODE>) {
+                    if ($pe-><AG::x|EntityReference.manakaiExternal>) {
+                      $r = $pe-><AG::x|EntityReference.manakaiEntityBaseURI>;
+                      last W;
+                    }
+                  }
+                  $pe = $pe-><AG::Node.parentNode>;
+                }
+                if ($pe) {
+                  $r = $pe-><AG::Node.baseURI>;
+                } else {
+                  $r = $self-><AG::Node.ownerDocument>-><AG::Node.baseURI>;
+                }
+              } # W
+            }
+          }__;
+        }
+
+    @@LXTest:
+      @@@QName: Element.baseURI.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{createDocumentForTest:: $doc => $doc}__;
+
+        my $el = $doc-><M::Document.createElementNS> (null, 'el');
+
+        $test->id ('initial');
+        $test->assert_null ($el-><AG::Node.baseURI>);
+        $test->assert_null ($el-><AG::Element.manakaiBaseURI>);
+
+        $test->id ('doc');
+        $doc-><AS::Document.documentURI> (q<http://foo.example/>);
+        $test->assert_equals
+                 ($el-><AG::Node.baseURI>,
+                  q<http://foo.example/>);
+        $test->assert_equals
+                 ($el-><AG::Element.manakaiBaseURI>,
+                  q<http://foo.example/>);
+
+        $test->id ('xb.abs');
+        $el-><M::Element.setAttributeNS> (<Q::xml:>, 'xml:base',
+                                          q<http://www.example.com/>);
+        $test->assert_equals
+                 ($el-><AG::Node.baseURI>,
+                  q<http://www.example.com/>);
+        $test->assert_equals
+                 ($el-><AG::Element.manakaiBaseURI>,
+                  q<http://www.example.com/>);
+
+        $test->id ('xb.rel');
+        $el-><M::Element.setAttributeNS> (<Q::xml:>, 'xml:base',
+                                          q<bar>);
+        $test->assert_equals
+                 ($el-><AG::Node.baseURI>,
+                  q<http://foo.example/bar>);
+        $test->assert_equals
+                 ($el-><AG::Element.manakaiBaseURI>,
+                  q<http://foo.example/bar>);
+
+        $test->id ('mbu.set');
+        $el-><AS::Element.manakaiBaseURI> (q<http://baz.example/>);
+        $test->assert_equals
+                 ($el-><AG::Node.baseURI>,
+                  q<http://baz.example/>);
+        $test->assert_equals
+                 ($el-><AG::Element.manakaiBaseURI>,
+                  q<http://baz.example/>);
+
+        $test->id ('mbu.unset');
+        $el-><AS::Element.manakaiBaseURI> (null);
+        $test->assert_equals
+                 ($el-><AG::Node.baseURI>,
+                  q<http://foo.example/bar>);
+        $test->assert_equals
+                 ($el-><AG::Element.manakaiBaseURI>,
+                  q<http://foo.example/bar>);
+
+    @@LXTest:
+      @@@QName: Element.baseURI.2.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{t|createDocumentForTest:: $doc => $doc}__;
+
+        my $pi = $doc-><M::Document.createElementNS> (null, 'el');
+       
+        $test->id ('default');
+        $test->assert_null ($pi-><AG::Node.baseURI>);
+
+        $test->id ('doc');
+        $doc-><AS::Document.documentURI> (q<http://doc.test/>);
+        $test->assert_equals
+                 ($pi-><AG::Node.baseURI>,
+                  q<http://doc.test/>);
+
+        $test->id ('el');
+        my $el = $doc-><M::Document.createElementNS> (null, 'e');
+        $el-><M::Element.setAttributeNS> (<Q::xml:>, 'xml:base',
+                                          q<http://el.test/>);
+        $el-><M::Node.appendChild> ($pi);
+        $test->assert_equals
+                 ($pi-><AG::Node.baseURI>,
+                  q<http://el.test/>);
+
+        $test->id ('ent');
+        my $ent = $doc-><M::Document.createEntityReference> ('ent');
+        $ent-><AS::x|EntityReference.manakaiExternal> (true);
+        $ent-><AS::x|EntityReference.manakaiEntityBaseURI> (q<http://ent.test/>);
+        $el-><M::Node.appendChild> ($ent);
+        $ent-><M::Node.appendChild> ($pi);
+        $test->assert_equals
+                 ($pi-><AG::Node.baseURI>,
+                  q<http://ent.test/>);
+                  
   @ReAttr:
      @@Name:  localName
      @@Description:
@@ -14679,6 +14718,42 @@ IFCls1Def:
       @@@disDef:
         @@@@DISLang:constValue:Node.TEXT_NODE
 
+  @LXTest:
+    @@QName: Text.baseURI.test
+    @@PerlDef:
+        my $doc;
+        __CODE{t|createDocumentForTest:: $doc => $doc}__;
+
+        my $pi = $doc-><M::Document.createTextNode> ('text');
+       
+        $test->id ('default');
+        $test->assert_null ($pi-><AG::Node.baseURI>);
+
+        $test->id ('doc');
+        $doc-><AS::Document.documentURI> (q<http://doc.test/>);
+        $test->assert_equals
+                 ($pi-><AG::Node.baseURI>,
+                  q<http://doc.test/>);
+
+        $test->id ('el');
+        my $el = $doc-><M::Document.createElementNS> (null, 'e');
+        $el-><M::Element.setAttributeNS> (<Q::xml:>, 'xml:base',
+                                          q<http://el.test/>);
+        $el-><M::Node.appendChild> ($pi);
+        $test->assert_equals
+                 ($pi-><AG::Node.baseURI>,
+                  q<http://el.test/>);
+
+        $test->id ('ent');
+        my $ent = $doc-><M::Document.createEntityReference> ('ent');
+        $ent-><AS::x|EntityReference.manakaiExternal> (true);
+        $ent-><AS::x|EntityReference.manakaiEntityBaseURI> (q<http://ent.test/>);
+        $el-><M::Node.appendChild> ($ent);
+        $ent-><M::Node.appendChild> ($pi);
+        $test->assert_equals
+                 ($pi-><AG::Node.baseURI>,
+                  q<http://ent.test/>);
+
   @IntMethod:
     @@Name: newObject
     @@Description:
@@ -14839,6 +14914,42 @@ IFCls1Def:
       @@@disDef:
         @@@@DISLang:constValue: Node.COMMENT_NODE
 
+  @LXTest:
+    @@QName: Comment.baseURI.test
+    @@PerlDef:
+        my $doc;
+        __CODE{t|createDocumentForTest:: $doc => $doc}__;
+
+        my $pi = $doc-><M::Document.createComment> ('data');
+       
+        $test->id ('default');
+        $test->assert_null ($pi-><AG::Node.baseURI>);
+
+        $test->id ('doc');
+        $doc-><AS::Document.documentURI> (q<http://doc.test/>);
+        $test->assert_equals
+                 ($pi-><AG::Node.baseURI>,
+                  q<http://doc.test/>);
+
+        $test->id ('el');
+        my $el = $doc-><M::Document.createElementNS> (null, 'e');
+        $el-><M::Element.setAttributeNS> (<Q::xml:>, 'xml:base',
+                                          q<http://el.test/>);
+        $el-><M::Node.appendChild> ($pi);
+        $test->assert_equals
+                 ($pi-><AG::Node.baseURI>,
+                  q<http://el.test/>);
+
+        $test->id ('ent');
+        my $ent = $doc-><M::Document.createEntityReference> ('ent');
+        $ent-><AS::x|EntityReference.manakaiExternal> (true);
+        $ent-><AS::x|EntityReference.manakaiEntityBaseURI> (q<http://ent.test/>);
+        $el-><M::Node.appendChild> ($ent);
+        $ent-><M::Node.appendChild> ($pi);
+        $test->assert_equals
+                 ($pi-><AG::Node.baseURI>,
+                  q<http://ent.test/>);
+
   @IntMethod:
     @@Name: newObject
     @@Description:
@@ -14953,6 +15064,36 @@ NodeTypeDef:
     a <IF::DocumentFragment> node is treated <QUOTE::transparent> -- 
     it results in all the child nodes of the <IF::DocumentFragment>
     being moved to the child list of that <IF::Node>.
+
+  @CL3Attr:
+    @@Name: baseURI
+    @@enDesc:
+      The base URI of the node.
+    @@Type: DOMString
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          If it is not available.
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><AG::Node.ownerDocument>-><AG::Node.baseURI>;
+        }__;
+
+    @@L3Test:
+      @@@QName: DocumentFragment.baseURI.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{createDocumentForTest:: $doc => $doc}__;
+
+        my $df = $doc-><M::Document.createDocumentFragment>;
+ 
+        $test->id ('initial');
+        $test->assert_null ($df-><AG::Node.baseURI>);
+
+        $test->id ('doc.uri');
+        $doc-><AS::Document.manakaiEntityBaseURI> (q<ftp://suika.fam.cx/>);
+        $test->assert_equals ($df-><AG::Node.baseURI>,
+                              q<ftp://suika.fam.cx/>);
 
   @IntMethod:
     @@Name: newObject
@@ -15990,8 +16131,8 @@ NodeTypeDef:
   @Method:
     @@Name: createEntityReference
     @@enDesc:
-      Creates an <IF::EntityReference> node.  In addition, if the
-      referenced entity is known, the child list of the <IF::EntityReference>
+      Creates an <IF::x|EntityReference> node.  In addition, if the
+      referenced entity is known, the child list of the <IF::x|EntityReference>
       node is made the same as that of the corresponding <IF::x|Entity> node.
     @@enDesc:
       @@@ddid: ns
@@ -16325,8 +16466,8 @@ NodeTypeDef:
        @@@lang:en
        @@@@:
          Copied: <A::Node.nodeName>, <A::Node.nodeType>, <A::Node.prefix>, 
-         <A::Node.localName>, <A::Node.namespaceURI>, <A::Entity.publicId>, 
-         <A::Entity.systemId>, <A::Entity.notationName>, 
+         <A::Node.localName>, <A::Node.namespaceURI>, <A::x|Entity.publicId>, 
+         <A::x|Entity.systemId>, <A::x|Entity.notationName>, 
          <A::Notation.publicId>, <A::Notation.systemId>, 
          <A::ProcessingInstruction.target>, <A::ProcessingInstruction.data>, 
          <A::CharacterData.data>, <A::CharacterData.length>.
@@ -17967,46 +18108,6 @@ NodeTypeDef:
         @@@@ForCheck: !ManakaiDOM|DOMXMLFeature
         @@@@DOMMain:raiseException: MDOMX|MDOM_IMPL_NOSUPPORT_XMLNS
   
-  @ReAttr:
-    @@Name:baseURI
-    @@Description:
-      @@@lang:en
-      @@@@:
-        The base URI of this document.
-    @@Get:
-      @@@Type:
-        ManakaiDOM:ManakaiDOMURI
-      @@@Description:
-        @@@@lang:en
-        @@@@@: The base URI.
-      @@@InCase:
-        @@@@Value:
-          @@@@@is-null:1
-        @@@@Description:
-          @@@@@lang:en
-          @@@@@@:
-            The DOM implementation is unable to obtain an absolute URI.
-      @@@PerlDef:
-          if ($self->{<H::mn:node>}->{<H::DOMCore:hasFeature>}->{HTML}) {
-            $r = $self->{<H::mn:node>}
-                      -><M::ManakaiDOMCore:ManakaiDOMNodeObjectNode
-                                        .htmlBaseURI>;
-          } else {
-            $r = $self->{<H::mn:node>}
-                      -><M::ManakaiDOMCore:ManakaiDOMNodeObjectNode
-                                        .contentBaseURI> (false);
-          }
-       @@@ImplNote:
-         @@@@lang:en
-         @@@@@:
-           If a document has both a <HE::base> element and 
-           an <XA::xml:base> attribute, or even in the case that 
-           an XHTML 1 document has an <XA::xml:base> attribute, 
-           its result is not defined by any W3C specification.
-    @@SpecLevel:3
-    @@Level[list]:3
-    @@For:
-      ManakaiDOM:DOM3
   @ReMethod:
      @@Name:  lookupPrefix
      @@Description:
@@ -18193,6 +18294,110 @@ NodeTypeDef:
         $test->id ('set.false');
         $doc-><AS::Document.allDeclarationsProcessed> (false);
         $test->assert_false ($doc-><AG::Document.allDeclarationsProcessed>);
+
+  @LXAttr:
+    @@Name: manakaiEntityBaseURI
+    @@enDesc:
+      The base URI of the document entity.
+
+        {NOTE::
+          This attribute is a manakai extension.
+        }
+    @@Type: DOMString
+    @@Get:
+      @@@enDesc:
+        The base DOM URI of the document entity.  It is equal to
+        the <A::Node.baseURI> value if there is no <HE::base> element.
+      @@@nullCase:
+        @@@@enDesc:
+          If no base DOM URI is available.
+      @@@PerlDef:
+        if (defined $self->{<H::mn|node>}->{<H::infoset|baseURI>}) {
+          $r = $self->{<H::mn|node>}->{<H::infoset|baseURI>};
+        } else {
+          if (defined $self->{<H::mn|node>}->{<H::c|documentURI>}) {
+            $r = $self->{<H::mn|node>}->{<H::c|documentURI>};
+          } else {
+            $r = null;
+          }
+        }
+    @@Set:
+      @@@enDesc:
+        Sets the base DOM URI of the document entity.  It <kwd:MUST>
+        be an absolute DOM URI; however, no lexical checking is performed
+        on setting.
+      @@@nullCase:
+        @@@@enDesc:
+          The base DOM URI of the document entity, if available, is unset.
+          Note that it does not affect to <A::Document.documentURI>.
+      @@@NodeReadOnlyError:
+      @@@disDef:
+        @@@@SetProp:
+          @@@@@@: infoset|baseURI
+          @@@@@CheckReadOnly: 1
+
+  @CL3Attr:
+    @@Name: baseURI
+    @@enDesc:
+      The base URI of the node.
+    @@Type: DOMString
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          If it is not available.
+      @@@PerlDef:
+        if (defined $self->{<H::mn|node>}->{<H::infoset|baseURI>}) {
+          $r = $self->{<H::mn|node>}->{<H::infoset|baseURI>};
+        } else {
+          if (defined $self->{<H::mn|node>}->{<H::c|documentURI>}) {
+            $r = $self->{<H::mn|node>}->{<H::c|documentURI>};
+          } else {
+            $r = null;
+          }
+        }
+      @@@enImplNote:
+        {TODO::
+          HTML <HE::base> element support (awaiting until HTML5 clarification)
+        }
+
+    @@L3Test:
+      @@@QName: Document.baseURI.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{createDocumentForTest:: $doc => $doc}__;
+
+        $test->id ('initial');
+        $test->assert_null ($doc-><AG::Node.baseURI>);
+
+        $test->id ('docuri.set');
+        $doc-><AS::Document.documentURI> ('ftp://suika.fam.cx/');
+        $test->assert_equals ($doc-><AG::Node.baseURI>,
+                              q<ftp://suika.fam.cx/>);
+
+        $test->id ('docuri.reset');
+        $doc-><AS::Document.documentURI> (null);
+        $test->assert_null ($doc-><AG::Node.baseURI>);
+        $test->assert_null ($doc-><AG::Document.manakaiEntityBaseURI>);
+
+        $test->id ('mburi.set');
+        $doc-><AS::Document.manakaiEntityBaseURI> (q<https://suika.fam.cx/>);
+        $test->assert_equals ($doc-><AG::Node.baseURI>,
+                              q<https://suika.fam.cx/>);
+        $test->assert_equals ($doc-><AG::Document.manakaiEntityBaseURI>,
+                              q<https://suika.fam.cx/>);
+
+        $test->id ('mburi.reset');
+        $doc-><AS::Document.manakaiEntityBaseURI> (null);
+        $test->assert_null ($doc-><AG::Node.baseURI>);
+        $test->assert_null ($doc-><AG::Document.manakaiEntityBaseURI>);
+
+        $test->id ('docuri.mburi.set');
+        $doc-><AS::Document.documentURI> ('ftp://suika.fam.cx/');
+        $doc-><AS::Document.manakaiEntityBaseURI> (q<https://suika.fam.cx/>);
+        $test->assert_equals ($doc-><AG::Node.baseURI>,
+                              q<https://suika.fam.cx/>);
+        $test->assert_equals ($doc-><AG::Document.manakaiEntityBaseURI>,
+                              q<https://suika.fam.cx/>);
 
   @IntMethod:
     @@Name: newObject
@@ -18550,8 +18755,15 @@ ElementTypeBinding:
     @@rdf:type: rdf|Property
     @@For: =ManakaiDOM|all
 
+ResourceDef:
+  @QName: MURIImpl
+  @AliasFor: urigen|ManakaiURIImplementation||ManakaiDOM|ManakaiDOMLatest
+  @For: ManakaiDOM|ManakaiDOM
+
 ClsDef:
   @ClsQName: ManakaiDOMImplementationDocument
+
+  @ClsISA: MURIImpl
 
   @enDesc:
     The <Class::ManakaiDOMImplementationDocument> class implements

@@ -25,7 +25,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/02/18 07:39:04 $
+      $Date: 2006/03/05 10:07:01 $
     @@ContentType:
       dis:Date.RCS
   
@@ -988,12 +988,15 @@ StringDataTypeDef:
         Whether a string is a relative DOM URI or not. 
     @@PerlDef:
       @@@@:
-        ($INPUT !~ /\A[0-9A-Za-z+_.%-]+:/)
+        ($INPUT !~ m!\A[^:/?#]+:!)
       @@@ImplNote:
         @@@@lang:en
         @@@@@:
-          {TODO:: I18n consideration
-          \
+          {ISSUE::
+            Where a relative reference resolution is required,
+            we don't do it unless the reference has no scheme part.
+            However, it leads dot-segments in the reference
+            not cleaned up.  Is it good or bad?
           }
 
 StringDataTypeDef:

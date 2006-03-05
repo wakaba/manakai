@@ -23,7 +23,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2006/02/26 06:42:56 $
+      $Date: 2006/03/05 10:07:02 $
     @@ContentType:
       dis:Date.RCS
   
@@ -7471,7 +7471,7 @@ IFClsDef:
               if defined $self->{<H::DIS:mvOwnerElementURI>};
           } else {
             $r = $self-><AG::DIS|DISResource.parentResource>;
-            undef $r unless $r-><M::DIS|DISAnyResource
+            undef $r if $r and not $r-><M::DIS|DISAnyResource
                                    .isTypeURI> (<Q::s:AnyOwnerElement>);
             $self->{<H::DIS:mvOwnerElementURI>} = $r->{uri} if $r;
           }

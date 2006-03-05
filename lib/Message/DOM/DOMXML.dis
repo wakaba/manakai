@@ -41,7 +41,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date:
-    $Date: 2006/02/15 13:36:20 $
+    $Date: 2006/03/05 10:07:01 $
   
   @Require:
     @@Module:
@@ -49,6 +49,9 @@ Module:
     @@Module:
       @@@QName: MDOM|XDoctype
       @@@WithFor: ManakaiDOM|ManakaiDOMLatest
+    @@Module:
+      @@@QName: DISlib|DISMarkup
+      @@@WithFor: ManakaiDOM|all
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
 Namespace:
@@ -58,6 +61,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dom/xdt#
   @dis:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
+  @DISlib:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/
   @doc:
     http://suika.fam.cx/~wakaba/archive/2005/7/tutorial#
   @DOMMain:
@@ -88,18 +93,37 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/mdom-xml#
   @MDOM:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
+  @MDOMX:
+    http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
   @mn:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/ManakaiNode#
   @rdf:
     http://www.w3.org/1999/02/22-rdf-syntax-ns#
   @rdfs:
     http://www.w3.org/2000/01/rdf-schema#
+  @s:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Markup#
   @t:
     http://suika.fam.cx/~wakaba/archive/2004/dom/tree#
   @test:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Test#
+  @urigen:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/URI/Generic/
   @x:
     http://suika.fam.cx/~wakaba/archive/2004/dom/xml#
+  @xml:
+    http://www.w3.org/XML/1998/namespace
+
+ElementTypeBinding:
+  @Name: NodeReadOnlyError
+  @ElementType:
+    dx:raises
+  @ShadowContent:
+    @@@: MDOMX|NOMOD_THIS
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The node is read-only.
 
 ElementTypeBinding:
   @Name: NodeTypeDef
@@ -169,12 +193,37 @@ ElementTypeBinding:
       @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeatureXML11
 
 ElementTypeBinding:
+  @Name: ClsDef
+  @ElementType: 
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@: dis|MultipleResource
+      @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
+    @@resourceFor:
+      @@@@: ManakaiDOM|ForClass
+      @@@ForCheck: ManakaiDOM|ManakaiDOM !=ManakaiDOM|ManakaiDOM
+    @@For: ManakaiDOM|DOM1
+
+    @@DISCore:resourceType:
+      @@@@: DISLang|Class
+      @@@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
   @Name: Method
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|Method
     @@ForCheck: !=ManakaiDOM|ManakaiDOM
+
+ElementTypeBinding:
+  @Name: CMethod
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|Method
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|ForClass
 
 ElementTypeBinding:
   @Name: IntMethod
@@ -224,6 +273,14 @@ ElementTypeBinding:
     @@ForCheck: !=ManakaiDOM|ManakaiDOM
 
 ElementTypeBinding:
+  @Name: CAttr
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|Attribute
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|ForClass
+
+ElementTypeBinding:
   @Name: L2Attr
   @ElementType:
     dis:ResourceDef
@@ -238,6 +295,14 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type: DISLang|Attribute
     @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|DOM3
+
+ElementTypeBinding:
+  @Name: CL3Attr
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|Attribute
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|DOM3 ManakaiDOM|ForClass
 
 ElementTypeBinding:
   @Name: LXAttr
@@ -665,6 +730,42 @@ ResourceDef:
         @@@@DISLang:constValue:
           DOMCore:Node.CDATA_SECTION_NODE
 
+  @LXTest:
+    @@QName: CDATASection.baseURI.test
+    @@PerlDef:
+        my $doc;
+        __CODE{t|createDocumentForTest:: $doc => $doc}__;
+
+        my $pi = $doc-><M::Document.createCDATASection>;
+       
+        $test->id ('default');
+        $test->assert_null ($pi-><AG::Node.baseURI>);
+
+        $test->id ('doc');
+        $doc-><AS::Document.documentURI> (q<http://doc.test/>);
+        $test->assert_equals
+                 ($pi-><AG::Node.baseURI>,
+                  q<http://doc.test/>);
+
+        $test->id ('el');
+        my $el = $doc-><M::Document.createElementNS> (null, 'e');
+        $el-><M::Element.setAttributeNS> (<Q::xml:>, 'xml:base',
+                                          q<http://el.test/>);
+        $el-><M::Node.appendChild> ($pi);
+        $test->assert_equals
+                 ($pi-><AG::Node.baseURI>,
+                  q<http://el.test/>);
+
+        $test->id ('ent');
+        my $ent = $doc-><M::Document.createEntityReference> ('ent');
+        $ent-><AS::EntityReference.manakaiExternal> (true);
+        $ent-><AS::EntityReference.manakaiEntityBaseURI> (q<http://ent.test/>);
+        $el-><M::Node.appendChild> ($ent);
+        $ent-><M::Node.appendChild> ($pi);
+        $test->assert_equals
+                 ($pi-><AG::Node.baseURI>,
+                  q<http://ent.test/>);
+
   @IntMethod:
     @@Name: newObject
     @@Description:
@@ -1079,6 +1180,45 @@ NodeTypeDef:
      @@SpecLevel:2
      @@L2:
 
+  @LXAttr:
+    @@Name: implementation
+    @@enDesc:
+      The <IF::c|DOMImplementation> object to which the node belongs.
+
+      This attribute is a manakai extension.
+    @@Type: c|DOMImplementation
+    @@Get:
+      @@@disDef:
+        @@@@DISPerl:cloneCode: MDTDef.implementation.get
+    @@enImplNote:
+      {ISSUE::
+        If a level 2 implementation creates a document type node
+        whose class also implement level 3 document type interfaces,
+        its <A::DocumentType.implementation> attribute must return
+        a level 3 implementation object by definition.
+      }
+
+    @@Test:
+      @@@QName: Doctype.impl.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{t|createDOMImplForTest:: $impl => $impl}__;
+
+        my $dtype = $impl-><M::c|DOMImplementation.createDocumentType>
+                             ('type', 'pub', 'sys');
+
+        $test->id ('created');
+        $test->assert_isa (my $i2 = $dtype-><AG::DocumentType.implementation>,
+                           <IFName::c|DOMImplementation>);
+        $test->assert_equals ($i2, $impl);
+
+        $test->id ('appended');
+        my $doc = $impl-><M::c|DOMImplementation.createDocument>;
+        $doc-><M::Node.appendChild> ($dtype);
+        $test->assert_isa (my $i3 = $dtype-><AG::DocumentType.implementation>,
+                           <IFName::c|DOMImplementation>);
+        $test->assert_equals ($i3, $impl);
+
   @L3Method:
     @@ForCheck: ManakaiDOM|ForClass
     @@Name: lookupPrefix
@@ -1329,6 +1469,50 @@ NodeTypeDef:
 
         $test->assert_isa
                  ($obj, <IFName::x|DocumentType||ManakaiDOM|ManakaiDOM3>);
+
+  @CL3Attr:
+    @@Name: baseURI
+    @@enDesc:
+      The base URI of the node.
+    @@Type: DOMString
+    @@dis:actualType: ManakaiDOM|ManakaiDOMURI
+    @@Get:
+      @@@enDesc:
+        The base absolute DOM URI of the node.
+      @@@nullCase:
+        @@@@enDesc:
+          If the implementation was unable to obtain the base DOM URI
+          of the node.
+      @@@disDef:
+        @@@@DISPerl:cloneCode: MDTDef.baseURI.get
+
+    @@L3Test:
+      @@@ForCheck: !ManakaiDOM|all
+      @@@enImplNote:
+        {TODO::
+          Enable this test after appendchild(doctype) is really implemented
+        }
+      @@@QName: Doctype.baseURI.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{t|createDOMImplForTest:: $impl => $impl}__;
+
+        my $dtype = $impl-><M::c|DOMImplementation.createDocumentType>
+                             ('type', 'pub', 'sys');
+  
+        $test->id ('initial');
+        $test->assert_null ($dtype-><AG::Node.baseURI>);
+
+        my $doc = $impl-><M::c|DOMImplementation.createDocument>;
+        $doc-><M::Node.appendChild> ($dtype);
+        $doc-><AS::Document.documentURI> (q<http://doc.test/>);
+        $test->assert_equals ($dtype-><AG::Node.ownerDocument>,
+                              $doc);
+
+        $test->id ('doc');
+        $test->assert_equals
+                 ($dtype-><AG::Node.baseURI>,
+                  q<http://doc.test/>);
 ##DocumentType
 
 ResourceDef:
@@ -1429,38 +1613,142 @@ NodeTypeDef:
         $et-><AS::Notation.systemId> (null);
         $test->assert_null ($et-><AG::Notation.systemId>);
   
-  @ReAttr:
+  @CL3Attr:
     @@Name: baseURI
-    @@Description:
-      @@@lang:en
+    @@enDesc:
+      The base URI of the node.
+    @@enDesc:
+      @@@ddid: man
+      @@@For: ManakaiDOM|ManakaiDOM
       @@@@:
-        The base URI of this node.
-        \
-        For the <IF::Notation> node, it is the <InfosetP::declaration base URI> 
-        of the <InfoItem::notation information item>.
-    @@Type:
-      DOMMain:DOMString
-    @@actualType:
-      ManakaiDOM:ManakaiDOMURI
+        In manakai, it is always equal to the base DOM URI of 
+        the owner document node.
+    @@Type: DOMString
+    @@dis:actualType: ManakaiDOM|ManakaiDOMURI
     @@Get:
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          The absolute base DOM URI.
-      @@@InCase:
-        @@@@Value:
-          @@@@@is-null:1
-        @@@@Description:
-          @@@@@lang:en
-          @@@@@@:
-            The DOM implementation was not able to 
-            obtain an absolute URI.
+      @@@enDesc:
+        The absolute base DOM URI.
+      @@@nullCase:
+        @@@@enDesc:
+          If the DOM implementation was not able to obtain the absolute URI.
+      @@@PerlDef: 
+        __DEEP{
+          $r = $self-><AG::Node.ownerDocument>-><AG::Node.baseURI>;
+        }__;
+
+    @@XDTest:
+      @@@QName: Notation.baseURI.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{t|createDocumentForTest:: $doc => $doc}__;
+        my $dx = $doc-><M::t|Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $ent = $dx-><M::d|DocumentXDoctype.createNotation> ('ent');
+
+        $test->id ('initial');
+        $test->assert_null ($ent-><AG::Node.baseURI>);
+
+        $test->id ('doc');
+        $doc-><AS::Document.documentURI> (q<http://base.example/>);
+        $test->assert_equals
+                 ($ent-><AG::Node.baseURI>,
+                  q<http://base.example/>);
+
+        $test->id ('declburi');
+        $ent-><AS::Notation.manakaiDeclarationBaseURI> (q<http://www.example/>);
+        $test->assert_equals
+                 ($ent-><AG::Node.baseURI>,
+                  q<http://base.example/>); # shouldn't affect
+
+  @LXAttr:
+    @@Name: manakaiDeclarationBaseURI
+    @@enDesc:
+      The base DOM URI of the notation declaration by which the notation
+      is declared.
+
+        {NOTE::
+           This attribute is a manakai extension similar to
+           the <InfoProp::declaration base URI> property
+           of the XML Information Set.
+        }
+    @@Type: DOMString
+    @@dis:actualType: ManakaiDOM|ManakaiDOMURI
+    @@Get:
+      @@@enDesc:
+        The declaration base DOM URI.  If there is no explicit
+        base DOM URI information attached to the node, then
+        the base DOM URI of the node, i.e. <A::Node.baseURI>
+        is returned.
+      @@@nullCase:
+        @@@@enDesc:
+          If there is no explicit base URI information and
+          the <A::Node.baseURI> attribute contains <DOM::null>.
+      @@@PerlDef:
+        if (defined $self->{<H::mn|node>}->{<H::infoset|declarationBaseURI>}) {
+          $r = $self->{<H::mn|node>}->{<H::infoset|declarationBaseURI>};
+        } else {
+          __DEEP{
+            $r = $self-><AG::Node.baseURI>;
+          }__;
+        }
+    @@Set:
+      @@@enDesc:
+        The declaration base DOM URI.  It <kwd:MUST> be an absolute
+        DOM URI; however, no lexical checking is performed on 
+        the setting.  In addition, it does not change <A::Notation.systemId>
+        nor does the replacement subtree or any of entities or
+        notation attributes in the document.
+      @@@nullCase:
+        @@@@enDesc:
+          The declaration base DOM URI is unset.  It does
+          not affect to the base DOM URI of the node or document.
+      @@@NodeReadOnlyError:
       @@@disDef:
-        @@@@GetProp:
-          infoset:declarationBaseURI
-    @@SpecLevel:3
-    @@Level:3
-    @@L3:
+        @@@@SetProp:
+          @@@@@@: infoset|declarationBaseURI
+          @@@@@CheckReadOnly: 1
+
+    @@XDTest:
+      @@@QName: Notation.declBaseURI.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{t|createDocumentForTest:: $doc => $doc}__;
+        my $dx = $doc-><M::t|Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $ent = $dx-><M::d|DocumentXDoctype.createNotation> ('ent');
+
+        $test->id ('initial');
+        $test->assert_null ($ent-><AG::Notation.manakaiDeclarationBaseURI>);
+
+        $test->id ('doc');
+        $doc-><AS::Document.documentURI> (q<http://www.example/>);
+        $test->assert_equals 
+                 ($ent-><AG::Notation.manakaiDeclarationBaseURI>,
+                  q<http://www.example/>);
+        
+        $test->id ('set');
+        $ent-><AS::Notation.manakaiDeclarationBaseURI> (q<ftp://www.example/>);
+        $test->assert_equals
+                 ($ent-><AG::Notation.manakaiDeclarationBaseURI>,
+                  q<ftp://www.example/>);
+        $test->assert_equals
+                 ($ent-><AG::Node.baseURI>,
+                  q<http://www.example/>);
+
+        $test->id ('unset');
+        $ent-><AS::Notation.manakaiDeclarationBaseURI> (null);
+        $test->assert_equals
+                 ($ent-><AG::Notation.manakaiDeclarationBaseURI>,
+                  q<http://www.example/>);
+
+  @enImplNote:
+    @@ddid: entURi
+    @@@:
+      {ISSUE::
+        An attribute containing absolute system id (similar to
+        <A::Entity.manakaiEntityURI>) is necessary?
+      }
+
   @ReMethod:
      @@Name:  lookupPrefix
      @@Description:
@@ -1924,34 +2212,356 @@ NodeTypeDef:
           Should <X::c|DOMException.NOT_SUPPORTED_ERR> be thrown?
         }
   
-  @L3Attr:
-    @@ForCheck: ManakaiDOM|ForClass
+  @CL3Attr:
     @@Name: baseURI
-    @@Description:
-      @@@lang:en
+    @@enDesc:
+      The base URI of the node.
+    @@enDesc:
+      @@@ddid: man
+      @@@For: ManakaiDOM|ManakaiDOM
       @@@@:
-        The base URI of this node.
-        \
-        For the <IF::Entity> node, it is the <InfosetP::declaration base URI> 
-        of the <InfoItem::unparsed entity information item>.
+        In manakai, it is always equal to the base DOM URI of 
+        the owner document node.
     @@Type: DOMString
     @@dis:actualType: ManakaiDOM|ManakaiDOMURI
     @@Get:
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          The absolute base DOM URI.
-      @@@InCase:
-        @@@@Value:
-          @@@@@is-null:1
-        @@@@Description:
-          @@@@@lang:en
-          @@@@@@:
-            The DOM implementation was not able to 
-            obtain an absolute URI.
+      @@@enDesc:
+        The absolute base DOM URI.
+      @@@nullCase:
+        @@@@enDesc:
+          If the DOM implementation was not able to obtain the absolute URI.
+      @@@PerlDef: 
+        __DEEP{
+          $r = $self-><AG::Node.ownerDocument>-><AG::Node.baseURI>;
+        }__;
+
+    @@XDTest:
+      @@@QName: Entity.baseURI.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{t|createDocumentForTest:: $doc => $doc}__;
+        my $dx = $doc-><M::t|Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $ent = $dx-><M::d|DocumentXDoctype.createGeneralEntity> ('ent');
+
+        $test->id ('initial');
+        $test->assert_null ($ent-><AG::Node.baseURI>);
+
+        $test->id ('doc');
+        $doc-><AS::Document.documentURI> (q<http://base.example/>);
+        $test->assert_equals
+                 ($ent-><AG::Node.baseURI>,
+                  q<http://base.example/>);
+
+        $test->id ('entburi');
+        $ent-><AS::Entity.manakaiEntityBaseURI> (q<http://www.example.com/>);
+        $test->assert_equals
+                 ($ent-><AG::Node.baseURI>,
+                  q<http://base.example/>); # shouldn't affect
+
+        $test->id ('declburi');
+        $ent-><AS::Entity.manakaiDeclarationBaseURI> (q<http://www.example/>);
+        $test->assert_equals
+                 ($ent-><AG::Node.baseURI>,
+                  q<http://base.example/>); # shouldn't affect
+
+  @LXAttr:
+    @@Name: manakaiDeclarationBaseURI
+    @@enDesc:
+      The base DOM URI of the entity declaration by which the entity
+      is declared.
+
+        {NOTE::
+           This attribute is a manakai extension similar to
+           the <InfoProp::declaration base URI> property
+           of the XML Information Set.
+        }
+    @@Type: DOMString
+    @@dis:actualType: ManakaiDOM|ManakaiDOMURI
+    @@Get:
+      @@@enDesc:
+        The declaration base DOM URI.  If there is no explicit
+        base DOM URI information attached to the node, then
+        the base DOM URI of the node, i.e. <A::Node.baseURI>
+        is returned.
+      @@@nullCase:
+        @@@@enDesc:
+          If there is no explicit base URI information and
+          the <A::Node.baseURI> attribute contains <DOM::null>.
+      @@@PerlDef:
+        if (defined $self->{<H::mn|node>}->{<H::infoset|declarationBaseURI>}) {
+          $r = $self->{<H::mn|node>}->{<H::infoset|declarationBaseURI>};
+        } else {
+          __DEEP{
+            $r = $self-><AG::Node.baseURI>;
+          }__;
+        }
+    @@Set:
+      @@@enDesc:
+        The declaration base DOM URI.  It <kwd:MUST> be an absolute
+        DOM URI; however, no lexical checking is performed on 
+        the setting.  In addition, it does not change <A::Entity.systemId>
+        nor does the replacement subtree or any of entity reference
+        in the document.
+      @@@nullCase:
+        @@@@enDesc:
+          The declaration base DOM URI is unset.  It does
+          not affect to the base DOM URI of the node or entity.
+      @@@NodeReadOnlyError:
       @@@disDef:
-        @@@@GetProp:
-          infoset:declarationBaseURI
+        @@@@SetProp:
+          @@@@@@: infoset|declarationBaseURI
+          @@@@@CheckReadOnly: 1
+
+    @@XDTest:
+      @@@QName: Entity.declBaseURI.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{t|createDocumentForTest:: $doc => $doc}__;
+        my $dx = $doc-><M::t|Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $ent = $dx-><M::d|DocumentXDoctype.createGeneralEntity> ('ent');
+
+        $test->id ('initial');
+        $test->assert_null ($ent-><AG::Entity.manakaiDeclarationBaseURI>);
+
+        $test->id ('doc');
+        $doc-><AS::Document.documentURI> (q<http://www.example/>);
+        $test->assert_equals 
+                 ($ent-><AG::Entity.manakaiDeclarationBaseURI>,
+                  q<http://www.example/>);
+        
+        $test->id ('set');
+        $ent-><AS::Entity.manakaiDeclarationBaseURI> (q<ftp://www.example/>);
+        $test->assert_equals
+                 ($ent-><AG::Entity.manakaiDeclarationBaseURI>,
+                  q<ftp://www.example/>);
+        $test->assert_equals
+                 ($ent-><AG::Node.baseURI>,
+                  q<http://www.example/>);
+
+        $test->id ('unset');
+        $ent-><AS::Entity.manakaiDeclarationBaseURI> (null);
+        $test->assert_equals
+                 ($ent-><AG::Entity.manakaiDeclarationBaseURI>,
+                  q<http://www.example/>);
+
+  @LXAttr:
+    @@Name: manakaiEntityBaseURI
+    @@enDesc:
+      The base DOM URI of the entity.
+
+        {NOTE::
+           This attribute is a manakai extension.
+        }
+    @@Type: DOMString
+    @@dis:actualType: ManakaiDOM|ManakaiDOMURI
+    @@Get:
+      @@@enDesc:
+        The base DOM URI of the entity.
+
+          = If there is an explicit base DOM URI for the entity,
+            then return it.
+
+          = If <A::Entity.manakaiEntityURI> of the node contains a
+            non-<DOM::null> value, then return it.
+
+          = Otherwise, return <A::Node.baseURI> of the node.
+
+            {NOTE::
+              Therefore, the entity base URI for internal general
+              entities are same as one for the document.
+            }
+
+            {ISSUE::
+              Entity base URI for parameter entities
+            }
+      @@@nullCase:
+        @@@@enDesc:
+          If there is no explicit base URI or entity URI information and
+          the <A::Node.baseURI> attribute contains <DOM::null>.
+      @@@PerlDef:
+        if (defined $self->{<H::mn|node>}->{<H::x|entityBaseURI>}) {
+          $r = $self->{<H::mn|node>}->{<H::x|entityBaseURI>};
+        } else {
+          __DEEP{
+            $r = $self-><AG::Entity.manakaiEntityURI>;
+            $r = $self-><AG::Node.baseURI> unless defined $r;
+          }__;
+        }
+    @@Set:
+      @@@enDesc:
+        Sets the entity base DOM URI explicitly.  It <kwd:MUST> be an absolute
+        DOM URI; however, no lexical checking is performed on 
+        the setting.  In addition, it does not change <A::Entity.systemId>
+        nor does the replacement subtree (except that
+        the base URI of nodes in the replacement subtree might
+        be changed according to the new entity base URI) or any of
+        entity reference in the document.
+      @@@nullCase:
+        @@@@enDesc:
+          The entity base DOM URI is unset.  It does
+          not affect to the <A::Entity.systemId> or <A::Node.baseURI> of
+          the node or the document.
+      @@@NodeReadOnlyError:
+      @@@disDef:
+        @@@@SetProp:
+          @@@@@@: x|entityBaseURI
+          @@@@@CheckReadOnly: 1
+
+    @@XDTest:
+      @@@QName: Entity.entBaseURI.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{t|createDocumentForTest:: $doc => $doc}__;
+        my $dx = $doc-><M::t|Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $ent = $dx-><M::d|DocumentXDoctype.createGeneralEntity> ('ent');
+
+        $test->id ('initial');
+        $test->assert_null ($ent-><AG::Entity.manakaiEntityBaseURI>);
+
+        $test->id ('doc');
+        $doc-><AS::Document.documentURI> (q<http://www.example/>);
+        $test->assert_equals 
+                 ($ent-><AG::Entity.manakaiEntityBaseURI>,
+                  q<http://www.example/>);
+        
+        $test->id ('set');
+        $ent-><AS::Entity.manakaiEntityBaseURI> (q<ftp://www.example/>);
+        $test->assert_equals
+                 ($ent-><AG::Entity.manakaiEntityBaseURI>,
+                  q<ftp://www.example/>);
+        $test->assert_equals
+                 ($ent-><AG::Node.baseURI>,
+                  q<http://www.example/>);
+
+        $test->id ('unset');
+        $ent-><AS::Entity.manakaiEntityBaseURI> (null);
+        $test->assert_equals
+                 ($ent-><AG::Entity.manakaiEntityBaseURI>,
+                  q<http://www.example/>);
+
+        $test->id ('euri.set');
+        $ent-><AS::Entity.manakaiEntityURI> (q<https://www.example/>);
+        $test->assert_equals
+                 ($ent-><AG::Entity.manakaiEntityBaseURI>,
+                  q<https://www.example/>);
+        $test->assert_equals
+                 ($ent-><AG::Node.baseURI>,
+                  q<http://www.example/>);
+
+        $test->id ('euri.unset');
+        $ent-><AS::Entity.manakaiEntityURI> (null);
+        $test->assert_equals
+                 ($ent-><AG::Entity.manakaiEntityBaseURI>,
+                  q<http://www.example/>);
+
+  @LXAttr:
+    @@Name: manakaiEntityURI
+    @@enDesc:
+      The URI of the entity.
+
+        {NOTE::
+           It might or might not be equal to the <A::Entity.systemId>
+           or the absolute URI resolved from <A::Entity.systemId>
+           against <A::Entity.manakaiDeclarationBaseURI>.  In particular,
+           a catalog mechanism is used or a redirection is encountered during
+           the entity resolution phase of the parsing, the entity
+           URI is typically different from the system identifier.
+        }
+    @@Type: DOMString
+    @@dis:actualType: ManakaiDOM|ManakaiDOMURI
+    @@Get:
+      @@@enDesc:
+        The DOM URI of the entity.
+
+        If the DOM URI of the entity is explicitly set by application
+        or during the tree construction, then it is returned.
+
+        Otherwise and the <A::Entity.systemId> attribute contains
+        a non-<DOM::null> value, then its value, resolved against
+        the <A::Entity.manakaiDeclarationBaseURI> if necessary,
+        is returned.  If the <A::Entity.manakaiDeclarationBaseURI>
+        is <DOM::null>, then the result is implementation dependent.
+      @@@nullCase:
+        @@@@enDesc:
+          If the DOM URI of the entity is not found.  If the entity
+          is an internal entity and not modified since the tree construction,
+          the entity URI must be <DOM::null>.
+      @@@PerlDef:
+        if (defined $self->{<H::mn|node>}->{<H::x|entityURI>}) {
+          $r = $self->{<H::mn|node>}->{<H::x|entityURI>};
+        } else {
+          __DEEP{
+            $r = $self-><AG::Entity.systemId>;
+            if (defined $r) {
+              if (<Code::DOMMain:isRelativeDOMURI:: $INPUT = $r>) {
+                my $base = $self-><AG::Entity.manakaiDeclarationBaseURI>;
+                $r = $self-><AG::Node.ownerDocument>
+                          -><AG::Document.implementation>
+                          -><M::urigen|URIImplementation.createURIReference>
+                              ($r)
+                          -><M::urigen|URIReference.getAbsoluteReference>
+                              ($base)
+                          -><AG::urigen|URIReference.uriReference>
+                  if defined $base;
+              }
+            } else {
+              $r = null;
+            }
+          }__;
+        }
+    @@Set:
+      @@@enDesc:
+        Sets the entity DOM URI of the node.
+      @@@nullCase:
+        @@@@enDesc:
+          Removes explicitly set entity DOM URI for the node if any.
+          It does not affect on the base URI or the system identifier.
+      @@@NodeReadOnlyError:
+      @@@disDef:
+        @@@@SetProp:
+          @@@@@@: x|entityURI
+          @@@@@CheckReadOnly: 1
+
+    @@XDTest:
+      @@@QName: Entity.entURI.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{t|createDocumentForTest:: $doc => $doc}__;
+        my $dx = $doc-><M::t|Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $ent = $dx-><M::d|DocumentXDoctype.createGeneralEntity> ('ent');
+
+        $test->id ('initial');
+        $test->assert_null ($ent-><AG::Entity.manakaiEntityURI>);
+
+        $test->id ('doc');
+        $doc-><AS::Document.documentURI> (q<http://www.document.example/>);
+        $test->assert_null ($ent-><AG::Entity.manakaiEntityURI>);
+        
+        $test->id ('dburi');
+        $ent-><AS::Entity.manakaiDeclarationBaseURI> (q<http://decl.example/>);
+        $test->assert_null ($ent-><AG::Entity.manakaiEntityURI>);
+
+        $test->id ('sys');
+        $ent-><AS::Entity.systemId> (q<sysid>);
+        $test->assert_equals
+                 ($ent-><AG::Entity.manakaiEntityURI>,
+                  q<http://decl.example/sysid>);
+
+        $test->id ('set');
+        $ent-><AS::Entity.manakaiEntityURI> (q<http://enturi.example/>);
+        $test->assert_equals
+                 ($ent-><AG::Entity.manakaiEntityURI>,
+                  q<http://enturi.example/>);
+
+        $test->id ('unset');
+        $ent-><AS::Entity.manakaiEntityURI> (null);
+        $test->assert_equals
+                 ($ent-><AG::Entity.manakaiEntityURI>,
+                  q<http://decl.example/sysid>);
 
   @ReMethod:
      @@Name:  lookupPrefix
@@ -2180,7 +2790,7 @@ NodeTypeDef:
          <Q::infoset:systemIdentifier>, <Q::infoset:notationName>,
          <Q::infoset:version>, <Q::DOMCore:xmlEncoding>,
          <Q::infoset:characterEncodingScheme>,
-         <Q::infoset:baseURI>.
+         <Q::x|entityURI>, <Q::x|entityBaseURI>.
 
   @mn:xrefnode0: DOMCore|ownerDocument
   @mn:subnode1: infoset|children
@@ -2257,6 +2867,16 @@ PropDef:
   @QName: ManakaiDOM|isExternallyDeclared
 
 PropDef:
+  @QName: x|entityURI
+  @enDesc:
+    The DOM URI of the entity.
+
+PropDef:
+  @QName: x|entityBaseURI
+  @enDesc:
+    The base DOM URI of the entity.
+
+PropDef:
   @QName: x|hasReplacementTree
   @enDesc:
     Whether an entity node has its replacement tree or not.
@@ -2331,40 +2951,225 @@ NodeTypeDef:
       {ISSUE::
         Should subtree modifications turn the flag like <A::t|Attr.specified>?
       }
+
+      {TODO::
+        Rename to <A::Entity.manakaiExpanded>.
+      }
   
-  @ReAttr:
+  @CL3Attr:
     @@Name: baseURI
-    @@Description:
-      @@@lang:en
+    @@enDesc:
+      The base URI of the node.
+    @@enDesc:
+      @@@ddid: man
+      @@@For: ManakaiDOM|ManakaiDOM
       @@@@:
-        The base URI of this node.
-        \
-        For the <IF::EntityReference> node, it is the 
-        <InfosetP::declaration base URI> of the <InfoItem::unexpanded entity 
-        reference information item>.
+        In manakai, it is always equal to the base DOM URI of 
+        the parent element in the same external entity, if any, or
+        the external entity in which the node is contained.
+    @@Type: DOMString
+    @@dis:actualType: ManakaiDOM|ManakaiDOMURI
     @@Get:
-      @@@Type:
-        DOMMain:DOMString
-      @@@actualType:
-        ManakaiDOM:ManakaiDOMURI
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          The absolute base DOM URI.
-      @@@InCase:
-        @@@@Value:
-          @@@@@is-null:1
-        @@@@Description:
-          @@@@@lang:en
-          @@@@@@:
-            The DOM implementation was not able to 
-            obtain an absolute URI.
+      @@@enDesc:
+        The absolute base DOM URI.
+      @@@nullCase:
+        @@@@enDesc:
+          If the DOM implementation was not able to obtain the absolute URI.
       @@@disDef:
-        @@@@GetProp:
-          infoset:declarationBaseURI
-    @@SpecLevel:3
-    @@Level:3
-    @@L3:
+        @@@@DISPerl:cloneCode: t|ManakaiDOMCharacterData.baseURI.get
+
+    @@XDTest:
+      @@@QName: EntityRef.baseURI.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{t|createDocumentForTest:: $doc => $doc}__;
+
+        my $ent = $doc-><M::Document.createEntityReference> ('ent');
+
+        $test->id ('initial');
+        $test->assert_null ($ent-><AG::Node.baseURI>);
+
+        $test->id ('doc');
+        $doc-><AS::Document.documentURI> (q<http://base.example/>);
+        $test->assert_equals
+                 ($ent-><AG::Node.baseURI>,
+                  q<http://base.example/>);
+
+        $test->id ('entburi');
+        $ent-><AS::Entity.manakaiEntityBaseURI> (q<http://www.example.com/>);
+        $test->assert_equals
+                 ($ent-><AG::Node.baseURI>,
+                  q<http://base.example/>); # shouldn't affect
+
+        my $el = $doc-><M::Document.createElementNS> (null, 'el');
+        $el-><M::Element.setAttributeNS> (<Q::xml:>, 'xml:base',
+                                          q<http://el.test/>);
+
+        $test->id ('el');
+        $el-><M::Node.appendChild> ($ent);
+        $test->assert_equals
+                 ($ent-><AG::Node.baseURI>,
+                  q<http://el.test/>);
+
+        my $xent = $doc-><M::Document.createEntityReference> ('ext');
+        $xent-><AS::EntityReference.manakaiEntityBaseURI> (q<http://ent.test/>);
+        $xent-><AS::EntityReference.manakaiExternal> (true);
+        $el-><M::Node.appendChild> ($xent);
+        $xent-><M::Node.appendChild> ($ent);
+
+        $test->id ('ent');
+        $test->assert_equals
+                 ($ent-><AG::Node.baseURI>,
+                  q<http://ent.test/>);
+
+  @LXAttr:
+    @@Name: manakaiEntityBaseURI
+    @@enDesc:
+      The base DOM URI of the entity referenced by the entity reference.
+
+        {NOTE::
+           This attribute is a manakai extension.
+        }
+    @@Type: DOMString
+    @@dis:actualType: ManakaiDOM|ManakaiDOMURI
+    @@Get:
+      @@@enDesc:
+        The base DOM URI of the entity.
+
+          = If there is an explicit base DOM URI for the entity,
+            then return it.
+
+          = Otherwise, return <A::Node.baseURI> of the node.
+
+            {NOTE::
+              Therefore, the entity base URI for internal general
+              entities are same as one for the external or document entity
+              in which the entity is referenced.
+            }
+      @@@nullCase:
+        @@@@enDesc:
+          If there is no explicit base URI or entity URI information and
+          the <A::Node.baseURI> attribute contains <DOM::null>.
+      @@@PerlDef:
+        if (defined $self->{<H::mn|node>}->{<H::x|entityBaseURI>}) {
+          $r = $self->{<H::mn|node>}->{<H::x|entityBaseURI>};
+        } else {
+          __DEEP{
+            $r = $self-><AG::Node.baseURI>;
+          }__;
+        }
+    @@Set:
+      @@@enDesc:
+        Sets the entity base DOM URI explicitly.  It <kwd:MUST> be an absolute
+        DOM URI; however, no lexical checking is performed on 
+        the setting.  In addition, it does not change the
+        entity base URI of the <IF::Entity> node referenced by the node.
+      @@@nullCase:
+        @@@@enDesc:
+          The entity base DOM URI is unset.  It does
+          not affect to the entity base URI of the referenced <IF::Entity>
+          node or the <A::Node.baseURI> of the entity reference node.
+
+            {NOTE::
+               It removes the explicit entity base URI information
+               attached to the entity reference node entirely and
+               never restores the original entity base URI set during
+               the tree construction, if any.  To synchronize 
+               entity base URI with that of the <IF::Entity> node,
+               use <M::Document.normalizeDocument> method.
+            }
+      @@@NodeReadOnlyError:
+      @@@disDef:
+        @@@@SetProp:
+          @@@@@@: x|entityBaseURI
+          @@@@@CheckReadOnly: 1
+
+    @@XDTest:
+      @@@QName: EntityRef.entBaseURI.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{t|createDocumentForTest:: $doc => $doc}__;
+
+        my $ent = $doc-><M::Document.createEntityReference> ('ent');
+
+        $test->id ('initial');
+        $test->assert_null ($ent-><AG::EntityReference.manakaiEntityBaseURI>);
+
+        $test->id ('doc');
+        $doc-><AS::Document.documentURI> (q<http://www.example/>);
+        $test->assert_equals 
+                 ($ent-><AG::EntityReference.manakaiEntityBaseURI>,
+                  q<http://www.example/>);
+        
+        $test->id ('set');
+        $ent-><AS::EntityReference.manakaiEntityBaseURI> (q<ftp://www.example/>);
+        $test->assert_equals
+                 ($ent-><AG::EntityReference.manakaiEntityBaseURI>,
+                  q<ftp://www.example/>);
+        $test->assert_equals
+                 ($ent-><AG::Node.baseURI>,
+                  q<http://www.example/>);
+
+        $test->id ('unset');
+        $ent-><AS::EntityReference.manakaiEntityBaseURI> (null);
+        $test->assert_equals
+                 ($ent-><AG::Entity.manakaiEntityBaseURI>,
+                  q<http://www.example/>);
+
+  @LXAttr:
+    @@Name: manakaiExternal
+    @@enDesc:
+      Whether the entity referenced by the node is an external entity
+      or not.
+
+      {NOTE::
+        Setting this attribute might make a node inconsistent
+        with the <IF::Entity> node referenced by it.  Such
+        incosistence should be fixed by the method 
+        <M::Document.normalizeDocument> if necessary.
+      }
+    @@Type: idl|boolean||ManakaiDOM|all
+    @@TrueCase:
+      @@@enDesc:
+        The node is an external entity reference.
+    @@FalseCase:
+      @@@enDesc:
+        The node is <EM::not> an external entity reference.
+    @@Get:
+      @@@disDef:
+        @@@@GetProp: ManakaiDOM|isExternalEntity
+    @@Set:
+      @@@NodeReadOnlyError:
+      @@@disDef:
+        @@@@SetProp:
+          @@@@@@: ManakaiDOM|isExternalEntity
+          @@@@@CheckReadOnly: 1
+
+    @@enImplNote:
+      {ISSUE::
+        Default value?
+      }
+
+    @@LXTest:
+      @@@QName: EntRef.external.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{t|createDocumentForTest:: $doc => $doc}__;
+
+        my $ent = $doc-><M::Document.createEntityReference> ('ent');
+
+        $test->id ('set.false.1');
+        $ent-><AS::EntityReference.manakaiExternal> (false);
+        $test->assert_false ($ent-><AG::EntityReference.manakaiExternal>);
+
+        $test->id ('set.true');
+        $ent-><AS::EntityReference.manakaiExternal> (true);
+        $test->assert_true ($ent-><AG::EntityReference.manakaiExternal>);
+
+        $test->id ('set.false.2');
+        $ent-><AS::EntityReference.manakaiExternal> (false);
+        $test->assert_false ($ent-><AG::EntityReference.manakaiExternal>);
+
   @ReAttr:
     @@Name: nodeName
     @@Description:
@@ -2534,36 +3339,6 @@ NodeTypeDef:
             @@@@@CheckReadOnly:1
   
   @ReAttr:
-    @@Name: baseURI
-    @@Description:
-      @@@lang:en
-      @@@@:
-        The base URI of this node.
-    @@Get:
-      @@@Type:
-        DOMMain:DOMString
-      @@@actualType:
-        ManakaiDOM:ManakaiDOMURI
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          The absolute base DOM URI.
-      @@@InCase:
-        @@@@Value:
-          @@@@@is-null:1
-        @@@@Description:
-          @@@@@lang:en
-          @@@@@@:
-            The DOM implementation was not able to 
-            obtain an absolute URI.
-      @@@PerlDef:
-        $r = $self->{<H::mn:node>}
-                  -><M::ManakaiDOMCore:ManakaiDOMNodeObjectNode.contentBaseURI>
-                                                                      (false);
-    @@SpecLevel:3
-    @@Level:3
-    @@L3:
-  @ReAttr:
     @@Name: nodeName
     @@Description:
       @@@lang:en
@@ -2681,6 +3456,132 @@ NodeTypeDef:
      @@SpecLevel:3
      @@L3:
 
+  @CL3Attr:
+    @@Name: baseURI
+    @@enDesc:
+      The base URI of the node.
+    @@Type: DOMString
+    @@dis:actualType: ManakaiDOM|ManakaiDOMURI
+    @@Get:
+      @@@enDesc:
+        The absolute base DOM URI of the node.
+      @@@nullCase:
+        @@@@enDesc:
+          If the absolute base DOM URI is not available.
+      @@@PerlDef:
+        if (defined $self->{<H::mn|node>}->{<H::infoset|baseURI>}) {
+          $r = $self->{<H::mn|node>}->{<H::infoset|baseURI>};
+        } else {
+          __DEEP{
+            my $node = $self-><AG::Node.parentNode>;
+            W: {
+              while (defined $node) {
+                my $nt = $node-><AG::Node.nodeType>;
+                if ($nt == <C::Node.ELEMENT_NODE> or
+                    $nt == <C::Node.DOCUMENT_NODE> or
+                    $nt == <C::Node.DOCUMENT_FRAGMENT_NODE> or
+                    $nt == <C::Node.DOCUMENT_TYPE_NODE> or
+                    $nt == <C::Node.ENTITY_NODE>) {
+                  $r = $node-><AG::Node.baseURI>;
+                  last W;
+                } elsif ($nt == <C::Node.ENTITY_REFERENCE_NODE>) {
+                  if ($node-><AG::EntityReference.manakaiExternal>) {
+                    $r = $node-><AG::EntityReference.manakaiEntityBaseURI>;
+                    last W;
+                  }
+                }
+                $node = $node-><AG::Node.parentNode>;
+              }
+              if ($node) {
+                $r = $node-><AG::Node.baseURI>;
+              } else {
+                $r = $self-><AG::Node.ownerDocument>-><AG::Node.baseURI>;
+              }
+            } # W
+          }__;
+        }
+
+    @@LXTest:
+      @@@QName: PI.baseURI.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{t|createDocumentForTest:: $doc => $doc}__;
+
+        my $pi = $doc-><M::Document.createProcessingInstruction> ('i');
+       
+        $test->id ('default');
+        $test->assert_null ($pi-><AG::Node.baseURI>);
+
+        $test->id ('doc');
+        $doc-><AS::Document.documentURI> (q<http://doc.test/>);
+        $test->assert_equals
+                 ($pi-><AG::Node.baseURI>,
+                  q<http://doc.test/>);
+
+        $test->id ('el');
+        my $el = $doc-><M::Document.createElementNS> (null, 'e');
+        $el-><M::Element.setAttributeNS> (<Q::xml:>, 'xml:base',
+                                          q<http://el.test/>);
+        $el-><M::Node.appendChild> ($pi);
+        $test->assert_equals
+                 ($pi-><AG::Node.baseURI>,
+                  q<http://el.test/>);
+
+        $test->id ('ent');
+        my $ent = $doc-><M::Document.createEntityReference> ('ent');
+        $ent-><AS::EntityReference.manakaiExternal> (true);
+        $ent-><AS::EntityReference.manakaiEntityBaseURI> (q<http://ent.test/>);
+        $el-><M::Node.appendChild> ($ent);
+        $ent-><M::Node.appendChild> ($pi);
+        $test->assert_equals
+                 ($pi-><AG::Node.baseURI>,
+                  q<http://ent.test/>);
+
+        $test->id ('pi');
+        $pi-><AS::ProcessingInstruction.manakaiBaseURI> (q<http://pi.ent/>);
+        $test->assert_equals
+                 ($pi-><AG::Node.baseURI>,
+                  q<http://pi.ent/>);
+
+        $test->id ('pi.unset');
+        $pi-><AS::ProcessingInstruction.manakaiBaseURI> (null);
+        $test->assert_equals
+                 ($pi-><AG::Node.baseURI>,
+                  q<http://ent.test/>);
+
+  @LXAttr:
+    @@Name: manakaiBaseURI
+    @@enDesc:
+      The base DOM URI of the node.
+    @@Type: DOMString
+    @@dis:actualType: ManakaiDOM|ManakaiDOMURI
+    @@Get:
+      @@@enDesc:
+        Same as <A::Node.baseURI>.
+      @@@nullCase:
+        @@@@enDesc:
+          If no base URI is available.
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><AG::Node.baseURI>;
+        }__;
+    @@Set:
+      @@@enDesc:
+        Sets the base DOM URI of the node.  It <kwd:MUST> be an 
+        absolute DOM URI; however, no lexical checking is performed
+        on setting.  It is similar to the <InfoProp::base URI>
+        property in the XML Information Set.
+      @@@nullCase:
+        @@@@enDesc:
+          Removes the explicit value of the base DOM URI of the node.
+          It does not affect to the base URI of the entity or element
+          in which the node is contained.
+      @@@NodeReadOnlyError:
+      @@@disDef:
+        @@@@SetProp:
+          @@@@@@: infoset|baseURI
+          @@@@@CheckReadOnly: 1
+
   @IntMethod:
     @@Name: newObject
     @@Description:
@@ -2794,3 +3695,129 @@ NodeTypeDef:
       @@@PerlDef:
         $r = <Class::DOMCore|ManakaiDOMEmptyNodeList>->new;
 ##ProcessingInstruction
+
+ClsDef:
+  @ClsQName: ManakaiDOMXMLBaseAttr
+
+  @ClsISA: t|ManakaiDOMAttr
+
+  @DocAttr: XMLBaseAttr||ManakaiDOM|all
+
+  @enDesc:
+    A <Class::ManakaiDOMXMLBaseAttr> object represents
+    an <XA::xml:base> attribute node.
+    
+  @L2Test:
+    @@QName: createAttrNodeNS.xml-base.test
+    @@PerlDef:
+      my $doc;
+      __CODE{t|createDocumentForTest:: $doc => $doc}__;
+ 
+      my $xb = $doc-><M::Document.createAttributeNS> (<Q::xml:>, 'xml:base');
+      $test->assert_isa ($xb, <IFName::Attr>);
+      $test->assert_isa ($xb, <ClassName::ManakaiDOMXMLBaseAttr>);
+
+  @L2Test:
+    @@QName: setAttributeNS.xml-base.text
+    @@PerlDef:
+      my $doc;
+      __CODE{t|createDocumentForTest:: $doc => $doc}__;
+
+      my $el = $doc-><M::Document.createElementNS> (null, 'e');
+      $el-><M::Element.setAttributeNS> (<Q::xml:>, 'xml:base', 'about:');
+      my $at = $el-><M::Element.getAttributeNodeNS> (<Q::xml:>, 'base');
+      $test->assert_isa ($at, <IFName::Attr>);
+      $test->assert_isa ($at, <ClassName::ManakaiDOMXMLBaseAttr>);
+
+  @enImplNote:
+    @@ddid: nons
+    @@@:
+      {ISSUE::
+        The <XA::xml:lang> attribute that does not belong to any
+        namespace (namespace-unaware).
+      }      
+
+  @CL3Attr:
+    @@Name: baseURI
+    @@enDesc:
+      The base URI of the node.
+    @@Type: DOMString
+    @@Get:
+      @@@PerlDef:
+        __DEEP{
+          my $oe = $self-><AG::Attr.ownerElement>;
+          if ($oe) {
+            my $oep = $oe-><AG::Node.parentNode>;
+            if ($oep) {
+              $r = $oep-><AG::Node.baseURI>;
+            } else {
+              $r = $self-><AG::Node.ownerDocument>-><AG::Node.baseURI>;
+            }
+          } else {
+            $r = $self-><AG::Node.ownerDocument>-><AG::Node.baseURI>;
+          }
+        }__;
+  
+    @@L3Test:
+      @@@QName: XMLBase.baseURI.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{t|createDocumentForTest:: $doc => $doc}__;
+
+        my $attr = $doc-><M::Document.createAttributeNS>
+                           (<Q::xml:>, 'xml:base');
+        $attr-><AS::Attr.value> (q<http://attr.test/>);
+
+        $test->id ('initial');
+        $test->assert_null ($attr-><AG::Node.baseURI>);
+
+        $test->id ('doc');
+        $doc-><AS::Document.documentURI> (q<http://doc.test/>);
+        $test->assert_equals
+                 ($attr-><AG::Node.baseURI>,
+                  q<http://doc.test/>);
+
+        my $el = $doc-><M::Document.createElementNS> (null, 'e');
+       
+        $test->id ('el');
+        $el-><M::Element.setAttributeNodeNS> ($attr);
+        $test->assert_equals
+                 ($attr-><AG::Node.baseURI>,
+                  q<http://doc.test/>);
+
+        my $pel = $doc-><M::Document.createElementNS> (null, 'e');
+
+        $test->id ('pel');
+        $pel-><M::Element.setAttributeNS> (<Q::xml:>, 'xml:base',
+                                           q<http://pel.test/>);
+        $pel-><M::Node.appendChild> ($el);
+        $test->assert_equals
+                 ($attr-><AG::Node.baseURI>,
+                  q<http://pel.test/>);
+##XMLBaseAttr
+
+ResourceDef:
+  @QName: Document
+  @AliasFor: t|Document
+  @For: ManakaiDOM|ManakaiDOM
+
+ResourceDef:
+  @QName: Element
+  @AliasFor: t|Element
+  @For: ManakaiDOM|ManakaiDOM
+
+ResourceDef:
+  @QName: Attr
+  @AliasFor: t|Attr
+  @For: ManakaiDOM|ManakaiDOM
+
+ResourceDef:
+  @QName: XMLBaseAttr
+  @AppName:
+    @@@: xml|base
+    @@ContentType: DISCore|QName
+  @For: =ManakaiDOM|all
+  @DISCore:resourceType: s|Attribute
+  @enDesc:
+     The <XA::xml:base> attribute.
+

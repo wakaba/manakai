@@ -20,7 +20,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/02/22 11:22:09 $
+      $Date: 2006/03/05 10:07:05 $
     @@ContentType:
       dis:Date.RCS
   
@@ -541,16 +541,45 @@ ResourceDef:
 ##Exception
 
 ResourceDef:
-  @QName: dx|CoreException
-  @rdf:type: dx|Class
-  @ISA: dx|Exception
+  @DISCore:resourceType: 
+    @@@: dis|MultipleResource
+    @@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
+  @resourceFor: ManakaiDOM|ForIF
+  @resourceFor: ManakaiDOM|ForClass
+  @For: ManakaiDOM|Perl
+
+  @QName:
+    @@@: dx|ICoreException
+    @@ForCheck: ManakaiDOM|ForIF
+  @DISCore:resourceType:
+    @@@: dx|Interface
+    @@ForCheck: ManakaiDOM|ForIF
+  @dx:implementedBy:
+    @@@: ||+||ManakaiDOM|ForClass
+    @@ContentType: DISCore|TFPQNames
+    @@ForCheck: ManakaiDOM|ForIF
+  
+  @QName:
+    @@@: dx|CoreException
+    @@ForCheck: ManakaiDOM|ForClass
+  @DISCore:resourceType:
+    @@@: dx|Class
+    @@ForCheck: ManakaiDOM|ForClass
+  @Implement:
+    @@@: ||+||ManakaiDOM|ForIF
+    @@ContentType: DISCore|TFPQNames
+    @@ForCheck: ManakaiDOM|ForClass
+  @ISA:
+    @@@: dx|Exception
+    @@ForCheck: ManakaiDOM|ForClass
+
   @Description:
     @@lang:en
     @@@:
       Exceptions common to all manakai DOM-style modules. 
-  @For:
-    ManakaiDOM:Perl
+
   @ResourceDef:
+    @@ForCheck: ManakaiDOM|ForIF
     @@QName: dx|CoreExceptionCode
     @@rdf:type: DISLang|ConstGroup
     @@Type: idl|unsignedShort||ManakaiDOM|all
@@ -559,8 +588,7 @@ ResourceDef:
     @@ResourceDef:
       @@@QName: 
         MDOMX:MDOM_DEBUG_BUG
-      @@@rdf:type:
-        ManakaiDOM:Const
+      @@@DISCore:resourceType: dx|ErrorCode
       @@@Value:
         @@@@@: 3
         @@@@ContentType: DISCore|Integer
@@ -640,8 +668,7 @@ ResourceDef:
 
     @@ResourceDef:
       @@@QName: NO_MODIFICATION_ALLOWED_ERR
-      @@@rdf:type:
-        ManakaiDOM:Const
+      @@@DISCore:resourceType: dx|ErrorCode
       @@@Value:
         @@@@@:7
         @@@@ContentType: DISCore|Integer
@@ -660,8 +687,7 @@ ResourceDef:
   
     @@ResourceDef:
       @@@QName: NOT_SUPPORTED_ERR
-      @@@rdf:type:
-        ManakaiDOM:Const
+      @@@DISCore:resourceType: dx|ErrorCode
       @@@Value:
         @@@@@:9
         @@@@ContentType: DISCore|Integer

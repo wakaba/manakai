@@ -2236,7 +2236,7 @@ is_type_uri
         $r->
 append_child
 
-              ($_->
+              ($gcr->
 get_perl_interface_member_code
 
                      ($factory));

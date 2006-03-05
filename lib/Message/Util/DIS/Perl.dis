@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/02/26 14:32:44 $
+      $Date: 2006/03/05 10:07:03 $
     @@ContentType:
       dis:Date.RCS
   
@@ -5529,8 +5529,8 @@ TMethods:
             if ($gcr-><M::DIS|DISAnyResource.isTypeURI> (<Q::DISLang|Const>)) {
               if ($gcr-><M::anyres.isTypeURI> (<Q::dx|ErrorCode>)) {
                 $r-><M::Node.appendChild>
-                      ($_-><M::DISResourcePerl.getPerlInterfaceMemberCode>
-                             ($factory));
+                      ($gcr-><M::DISResourcePerl.getPerlInterfaceMemberCode>
+                               ($factory));
               } else {
                 my $sub = $gcr-><AG::DISResourcePerl.plCodeFragment>;
                 $factory-><M::Document.adoptNode> ($sub);
