@@ -1,3 +1,10 @@
+2006-03-06  Wakaba  <wakaba@suika.fam.cx>
+
+	* daf.pl (get_referring_module_uri_list): Don't 
+	invoke |daf_convert_dis_document_to_dnl_document| to prevent
+	prefix-not-defined error because the referred module is not
+	yet loaded.
+
 2006-02-26  Wakaba  <wakaba@suika.fam.cx>
 
 	* daf.pl: Request for |fe:GenericLS| feature was missing.

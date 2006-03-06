@@ -10,7 +10,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/03/05 12:42:48 $
+    $Date: 2006/03/06 07:32:52 $
 
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
@@ -634,6 +634,10 @@ ClsDef:
             ## NOTE: Don't create DTD default attributes by
             ##       |createElementNS| method.
           $self->{doc_cfg}-><M::c|DOMConfiguration.setParameter>
+                              (<Q::cfg|xml-id> => $self->{parser_cfg}
+                                  -><M::c|DOMConfiguration.getParameter>
+                                      (<Q::cfg|xml-id>));
+          $self->{doc_cfg}-><M::c|DOMConfiguration.setParameter>
                               ('error-handler' => sub {
                                  my (undef, $err) = @_;
                                  return ($err-><AG::c|DOMError.severity> !=
@@ -685,6 +689,8 @@ ClsDef:
                               (<Q::cfg|clone-entity-reference-subtree> => null);
           $self->{doc_cfg}-><M::c|DOMConfiguration.setParameter>
                               (<Q::cfg|dtd-default-attributes> => null);
+          $self->{doc_cfg}-><M::c|DOMConfiguration.setParameter>
+                              (<Q::cfg|xml-id> => null);
           $self->{doc_cfg}-><M::c|DOMConfiguration.setParameter>
                               ('error-handler' => null);
           $r-><AS::Document.strictErrorChecking> (true);
@@ -14888,6 +14894,94 @@ ClsDef:
           }
         }
 
+    @@XMLTest:
+      @@@QName: xp.xmlid.attr.test
+      @@@DEnt:
+        @@@@test:value:
+          <p xml:id="idv"/>
+      @@@test:domTree:
+        document {
+          element {
+            attribute {
+              node-name: 'xml:id';
+              value: 'idv';
+              schema-type-info: TypeInfo ('http://www.w3.org/TR/REC-xml',
+                                          'ID');
+              specified: true;
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.xmlid.attr.norm.test
+      @@@DEnt:
+        @@@@test:value:
+          <p xml:id=" $u000Aidv  "/>
+      @@@test:domTree:
+        document {
+          element {
+            attribute {
+              node-name: 'xml:id';
+              value: 'idv';
+              schema-type-info: TypeInfo ('http://www.w3.org/TR/REC-xml',
+                                          'ID');
+              specified: true;
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.xmlid.attrdef.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE p [
+            <!ATTLIST p xml:id ID #IMPLIED>
+          ]>
+          <p/>
+      @@@test:domTree:
+        document {
+          document-type {
+            element-type-definition {
+              node-name: 'p';
+              attribute-definition {
+                node-name: 'xml:id';
+                declared-type: const (ID_ATTR);
+                default-type: const (IMPLIED_DEFAULT);
+              }
+            }
+          }
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.xmlid.attrdef.defaultattr.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE p [
+            <!ATTLIST p xml:id ID "idv"><!-- invalid -->
+          ]>
+          <p/>
+      @@@test:domTree:
+        document {
+          document-type {
+            element-type-definition {
+              node-name: 'p';
+              attribute-definition {
+                node-name: 'xml:id';
+                declared-type: const (ID_ATTR);
+                default-type: const (EXPLICIT_DEFAULT);
+                node-value: 'idv';
+              }
+            }
+          }
+          element {
+            attribute {
+              node-name: 'xml:id';
+              schema-type-info: TypeInfo ('http://www.w3.org/TR/REC-xml',
+                                          'ID');
+              value: 'idv';
+              specified: false;
+            }
+          }
+        }
+
     @@PerlDef:
       my $impl = $Message::DOM::ImplementationRegistry->get_implementation ({
         'Core' => '3.0',
@@ -16030,6 +16124,11 @@ ElementTypeBinding:
       @@@@: c|DOMConfigurationParameterApplication
       @@@For: ManakaiDOM|DOM
     @@For: ManakaiDOM|DOM3
+
+CParamApp:
+  @QName: xml-id
+  @c:domConfigurationParameter: cfg|xml-id
+  @c:targetType: xp|ManakaiXMLParser
 
 CParamApp:
   @QName: error-handler

@@ -12,7 +12,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/03/05 10:07:02 $
+    $Date: 2006/03/06 07:32:51 $
 
   @Require:
     @@Module:
@@ -11354,6 +11354,15 @@ NodeTypeDef:
                    ->{<Q::ManakaiDOM:noNS>}->{$name} = $r;
 
               ## Schema type information
+              __DEEP{
+                if ($name eq 'xml:id' and
+                    $self-><AG::Node.ownerDocument>
+                         -><AG::Document.domConfig>
+                         -><M::c|DOMConfiguration.getParameter>
+                             (<Q::cfg|xml-id>)) {
+                  $r->{<H::infoset|attributeType>} = <C::ATDef.ID_ATTR>;
+                }
+              }__;
               if (defined $docNode->{<H::c|schema-type>} and
                   $docNode->{<H::c|schema-type>} eq <Q::xml-dtd:>) {
                 __DEEP{
@@ -11388,9 +11397,49 @@ NodeTypeDef:
             $r->{<H::infoset:children>} = [$text];
             $r->{<H::infoset:specified>} = true;
      @@SpecLevel:1
-    @@enImplNote:
-      {ISSUE:: Should <XA::xml:id> attribute has type info?
-      }
+
+    @@L3Test:
+      @@@QName: Element.setAttribute.xmlid.test
+      @@@PerlDef:
+        my $el;
+        __CODE{createElementForTest:: $el => $el}__;
+
+        my $cfg = $el-><AG::Node.ownerDocument>-><AG::Document.domConfig>;
+
+        $cfg-><M::c|DOMConfiguration.setParameter> (<Q::cfg|xml-id> => true);
+
+        $test->id ('id.xmlid');
+        $el-><M::Element.setAttribute> ('xml:id' => 'value');
+        my $sti = $el-><M::Element.getAttributeNode> ('xml:id')
+                     -><AG::Attr.schemaTypeInfo>;
+        $test->assert_equals ($sti-><AG::c|TypeInfo.typeName>, 'ID');
+        $test->assert_equals
+                 ($sti-><AG::c|TypeInfo.typeNamespace>, <Q::xml-dtd:>);
+
+        $test->id ('id.other');
+        $el-><M::Element.setAttribute> ('id' => 'value');
+        my $sti2 = $el-><M::Element.getAttributeNode> ('id')
+                      -><AG::Attr.schemaTypeInfo>;
+        $test->assert_null ($sti2-><AG::c|TypeInfo.typeName>);
+        $test->assert_null ($sti2-><AG::c|TypeInfo.typeNamespace>);
+
+        my $el2 = $el-><AG::Node.ownerDocument>
+                     -><M::Document.createElement> ('e');
+        $cfg-><M::c|DOMConfiguration.setParameter> (<Q::cfg|xml-id> => false);
+
+        $test->id ('noid.xmlid');
+        $el2-><M::Element.setAttribute> ('xml:id' => 'value');
+        my $sti3 = $el2-><M::Element.getAttributeNode> ('xml:id')
+                       -><AG::Attr.schemaTypeInfo>;
+        $test->assert_null ($sti3-><AG::c|TypeInfo.typeName>);
+        $test->assert_null ($sti3-><AG::c|TypeInfo.typeNamespace>);
+
+        $test->id ('noid.other');
+        $el2-><M::Element.setAttribute> ('id' => 'value');
+        my $sti4 = $el2-><M::Element.getAttributeNode> ('id')
+                       -><AG::Attr.schemaTypeInfo>;
+        $test->assert_null ($sti4-><AG::c|TypeInfo.typeName>);
+        $test->assert_null ($sti4-><AG::c|TypeInfo.typeNamespace>);
 
   @Method:
      @@Name:  removeAttribute
@@ -12483,6 +12532,49 @@ NodeTypeDef:
      @@Level[list]:  2
      @@SpecLevel:2
 
+    @@L3Test:
+      @@@QName: Element.setAttributeNS.xmlid.test
+      @@@PerlDef:
+        my $el;
+        __CODE{createElementForTest:: $el => $el}__;
+
+        my $cfg = $el-><AG::Node.ownerDocument>-><AG::Document.domConfig>;
+
+        $cfg-><M::c|DOMConfiguration.setParameter> (<Q::cfg|xml-id> => true);
+
+        $test->id ('id.xmlid');
+        $el-><M::Element.setAttributeNS> (<Q::xml:>, 'xml:id' => 'value');
+        my $sti = $el-><M::Element.getAttributeNodeNS> (<Q::xml:>, 'id')
+                     -><AG::Attr.schemaTypeInfo>;
+        $test->assert_equals ($sti-><AG::c|TypeInfo.typeName>, 'ID');
+        $test->assert_equals
+                 ($sti-><AG::c|TypeInfo.typeNamespace>, <Q::xml-dtd:>);
+
+        $test->id ('id.other');
+        $el-><M::Element.setAttributeNS> (null, 'id' => 'value');
+        my $sti2 = $el-><M::Element.getAttributeNodeNS> (null, 'id')
+                      -><AG::Attr.schemaTypeInfo>;
+        $test->assert_null ($sti2-><AG::c|TypeInfo.typeName>);
+        $test->assert_null ($sti2-><AG::c|TypeInfo.typeNamespace>);
+
+        my $el2 = $el-><AG::Node.ownerDocument>
+                     -><M::Document.createElementNS> (null, 'e');
+        $cfg-><M::c|DOMConfiguration.setParameter> (<Q::cfg|xml-id> => false);
+
+        $test->id ('noid.xmlid');
+        $el2-><M::Element.setAttributeNS> (<Q::xml:>, 'xml:id' => 'value');
+        my $sti3 = $el2-><M::Element.getAttributeNodeNS> (<Q::xml:>, 'id')
+                       -><AG::Attr.schemaTypeInfo>;
+        $test->assert_null ($sti3-><AG::c|TypeInfo.typeName>);
+        $test->assert_null ($sti3-><AG::c|TypeInfo.typeNamespace>);
+
+        $test->id ('noid.other');
+        $el2-><M::Element.setAttributeNS> (null, 'id' => 'value');
+        my $sti4 = $el2-><M::Element.getAttributeNodeNS> (null, 'id')
+                       -><AG::Attr.schemaTypeInfo>;
+        $test->assert_null ($sti4-><AG::c|TypeInfo.typeName>);
+        $test->assert_null ($sti4-><AG::c|TypeInfo.typeNamespace>);
+
   @ResourceDef:
     @@QName: c|setAttrValueNS
     @@AliasFor: setAttrValueNS
@@ -12530,6 +12622,17 @@ NodeTypeDef:
                ->{$localName} = $__r;
 
         ## Schema type information
+        __DEEP{
+          if (defined $namespaceURI and
+              $namespaceURI eq <Q::xml:> and
+              $localName eq 'id' and
+              $element-><AG::Node.ownerDocument>
+                      -><AG::Document.domConfig>
+                      -><M::c|DOMConfiguration.getParameter>
+                          (<Q::cfg|xml-id>)) {
+            $__r->{<H::infoset|attributeType>} = <C::ATDef.ID_ATTR>;
+          }
+        }__;
         if (defined $__node->{<H::c|ownerDocument>}->{<H::c|schema-type>}) {
           my $schema_type = $__node->{<H::c|ownerDocument>}
                                    ->{<H::c|schema-type>};
@@ -15806,10 +15909,15 @@ NodeTypeDef:
         }
       }__;
     @@enImplNote:
-      {TODO:: Implementation for DOM 1 and DOM 2 versions.
-      }
+      @@@ddid:todo
+      @@@@:
+        {TODO::
+          createAttributeNS does not allow creation of (null, 
+          name-contains-colon) namespace-ill-formed node.
+        }
     @@enImplNote:
-      @@@: webbrowsers
+      @@@ddid: webbrowsers
+      @@@@:
         Firefox 1.5 and Opera 9 Preview 1 do not add default attributes
         by <M::Document.createElement> and <M::Document.createElementNS>.
         Opera does not support default attribute addition at 
@@ -16114,6 +16222,18 @@ NodeTypeDef:
             }__;
             $node->{<H::DOMCore:name>} = $name;
             $r = <ClassM::ManakaiDOMNode.getNodeReference> ($node);
+
+        ## Attribute type information
+        if ($name eq 'xml:id') {
+          __DEEP{
+            if ($self-><AG::Document.domConfig>
+                     -><M::c|DOMConfiguration.getParameter> (<Q::cfg|xml-id>)) {
+              $r->{<H::mn:node>}->{<H::infoset:attributeType>}
+                = <C::ATDef.ID_ATTR>;
+            }
+          }__;
+        }
+
           @@@@ImplNote:
             @@@@@lang:en
             @@@@@@:
@@ -16126,7 +16246,50 @@ NodeTypeDef:
             The created node does not have DTD type information,
             since its element type is not known.
 
-            Should <XA::xml:id> attribute has type info?
+    @@L3Test:
+      @@@QName: Doc.createAttr.xmlid.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{createDocumentForTest:: $doc => $doc}__;
+
+        my $cfg = $doc-><AG::Document.domConfig>;
+        $doc-><AS::Document.strictErrorChecking> (false);
+
+        $test->id ('id.xmlid');
+        $cfg-><M::c|DOMConfiguration.setParameter> (<Q::cfg|xml-id> => true);
+        my $at1 = $doc-><M::Document.createAttribute> ('xml:id');
+        $test->assert_equals
+                 ($at1-><AG::Attr.schemaTypeInfo>-><AG::c|TypeInfo.typeName>,
+                  'ID');
+        $test->assert_equals
+                 ($at1-><AG::Attr.schemaTypeInfo>
+                      -><AG::c|TypeInfo.typeNamespace>,
+                  <Q::xml-dtd:>);
+
+        $test->id ('id.other');
+        my $at2 = $doc-><M::Document.createAttribute> ('id');
+        $test->assert_null
+                 ($at2-><AG::Attr.schemaTypeInfo>-><AG::c|TypeInfo.typeName>);
+        $test->assert_null
+                 ($at2-><AG::Attr.schemaTypeInfo>
+                      -><AG::c|TypeInfo.typeNamespace>);
+
+        $test->id ('noid.xmlid');
+        $cfg-><M::c|DOMConfiguration.setParameter> (<Q::cfg|xml-id> => false);
+        my $at3 = $doc-><M::Document.createAttribute> ('xml:id');
+        $test->assert_null
+                 ($at3-><AG::Attr.schemaTypeInfo>-><AG::c|TypeInfo.typeName>);
+        $test->assert_null
+                 ($at3-><AG::Attr.schemaTypeInfo>
+                      -><AG::c|TypeInfo.typeNamespace>);
+
+        $test->id ('noid.other');
+        my $at4 = $doc-><M::Document.createAttribute> ('id');
+        $test->assert_null
+                 ($at4-><AG::Attr.schemaTypeInfo>-><AG::c|TypeInfo.typeName>);
+        $test->assert_null
+                 ($at4-><AG::Attr.schemaTypeInfo>
+                      -><AG::c|TypeInfo.typeNamespace>);
 
   @Method:
     @@Name: createEntityReference
@@ -17066,6 +17229,18 @@ NodeTypeDef:
             $node->{<H::infoset:prefix>} = $prefix;
             $node->{<H::infoset:specified>} = true;
             $r = <ClassM::ManakaiDOMNode.getNodeReference> ($node);
+        
+        ## Attribute type information
+        if (defined $namespaceURI and $namespaceURI eq <Q::xml:> and
+            $lname eq 'id') {
+          __DEEP{
+            if ($self-><AG::Document.domConfig>
+                     -><M::c|DOMConfiguration.getParameter> (<Q::cfg|xml-id>)) {
+              $r->{<H::mn:node>}->{<H::infoset:attributeType>}
+                = <C::ATDef.ID_ATTR>;
+            }
+          }__;
+        }
         @@@disDef:
           @@@@ForCheck:
             !ManakaiDOM:DOMXMLFeature
@@ -17077,6 +17252,52 @@ NodeTypeDef:
       3
     @@For:
       ManakaiDOM:DOM2
+
+    @@L3Test:
+      @@@QName: Doc.createAttrNS.xmlid.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{createDocumentForTest:: $doc => $doc}__;
+
+        my $cfg = $doc-><AG::Document.domConfig>;
+        $doc-><AS::Document.strictErrorChecking> (false);
+
+        $test->id ('id.xmlid');
+        $cfg-><M::c|DOMConfiguration.setParameter> (<Q::cfg|xml-id> => true);
+        my $at1 = $doc-><M::Document.createAttributeNS> (<Q::xml:>, 'xml:id');
+        $test->assert_equals
+                 ($at1-><AG::Attr.schemaTypeInfo>-><AG::c|TypeInfo.typeName>,
+                  'ID');
+        $test->assert_equals
+                 ($at1-><AG::Attr.schemaTypeInfo>
+                      -><AG::c|TypeInfo.typeNamespace>,
+                  <Q::xml-dtd:>);
+
+        $test->id ('id.other');
+        my $at2 = $doc-><M::Document.createAttributeNS> (null, 'id');
+        $test->assert_null
+                 ($at2-><AG::Attr.schemaTypeInfo>-><AG::c|TypeInfo.typeName>);
+        $test->assert_null
+                 ($at2-><AG::Attr.schemaTypeInfo>
+                      -><AG::c|TypeInfo.typeNamespace>);
+
+        $test->id ('noid.xmlid');
+        $cfg-><M::c|DOMConfiguration.setParameter> (<Q::cfg|xml-id> => false);
+        my $at3 = $doc-><M::Document.createAttributeNS> (<Q::xml:>, 'xml:id');
+        $test->assert_null
+                 ($at3-><AG::Attr.schemaTypeInfo>-><AG::c|TypeInfo.typeName>);
+        $test->assert_null
+                 ($at3-><AG::Attr.schemaTypeInfo>
+                      -><AG::c|TypeInfo.typeNamespace>);
+
+        $test->id ('noid.other');
+        my $at4 = $doc-><M::Document.createAttributeNS> (null, 'id');
+        $test->assert_null
+                 ($at4-><AG::Attr.schemaTypeInfo>-><AG::c|TypeInfo.typeName>);
+        $test->assert_null
+                 ($at4-><AG::Attr.schemaTypeInfo>
+                      -><AG::c|TypeInfo.typeNamespace>);
+
   @Method:
      @@Name:  getElementsByTagNameNS
      @@Description:
@@ -18704,6 +18925,67 @@ boolCParam:
 
       my $cfg = $doc-><AG::Document.domConfig>;
       my $pname = <Q::cfg|dtd-default-attributes>;
+
+      $test->id ('default.true');
+      $test->assert_true ($cfg-><M::c|DOMConfiguration.getParameter> ($pname));
+      
+      $test->id ('true.to.false');
+      $cfg-><M::c|DOMConfiguration.setParameter> ($pname => false);
+      $test->assert_false ($cfg-><M::c|DOMConfiguration.getParameter> ($pname));
+   
+      $test->id ('false.to.true');
+      $cfg-><M::c|DOMConfiguration.setParameter> ($pname => true);
+      $test->assert_false ($cfg-><M::c|DOMConfiguration.getParameter> ($pname));
+
+      $test->id ('reset');
+      $cfg-><M::c|DOMConfiguration.setParameter> ($pname => false);
+      $cfg-><M::c|DOMConfiguration.setParameter> ($pname => null);
+      $test->assert_true ($cfg-><M::c|DOMConfiguration.getParameter> ($pname));
+
+boolCParam:
+  @QName: cfg|xml-id
+  @nodeProp: xmlid
+  @c:targetType: t|Document
+  @TrueCase:
+    @@IsSupportRequired: 1
+    @@IsDefault: 1
+    @@c:isSupported: 1
+    @@enDesc:
+      When an attribute node whose <A::Node.nodeName> is <XA::xml:id>
+      or whose <A::Node.localName> is <XA::id> and <A::Node.namespaceURI>
+      is <URI::http://www.w3.org/XML/1998/namespace> is created,
+      via <M::Document.createAttributeNS> for example, then
+      the node is typed as an identifier as defined in 
+      <CITE::xml:id Specification>.
+
+        {ISSUE::
+          Should be limited to DTD [attribute type]?  Or should XML Schema
+          or any other schema language's ID typing be also allowed?
+        }
+
+      If the <Feature::fe|XDoctype> feature is supported, newly
+      created attribute definition nodes are also typed as identifiers.
+
+      Note that if the attribute is typed as another type by schema
+      associated to the document, then that type information takes precedence.
+
+      {ISSUE::
+        normalizeDocument
+      }
+  @FalseCase:
+    @@c:isSupported: 1
+    @@enDesc:
+      Creation of <XA::xml:id> attribute or attribute definition nodes 
+      is done as for other attributes.
+
+  @L3Test:
+    @@QName: cfg.xml-id.test
+    @@PerlDef:
+      my $doc;
+      __CODE{createEmptyDocumentForTest:: $doc => $doc}__;
+
+      my $cfg = $doc-><AG::Document.domConfig>;
+      my $pname = <Q::cfg|xml-id>;
 
       $test->id ('default.true');
       $test->assert_true ($cfg-><M::c|DOMConfiguration.getParameter> ($pname));

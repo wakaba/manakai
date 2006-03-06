@@ -1,3 +1,18 @@
+2006-03-06  Wakaba  <wakaba@suika.fam.cx>
+
+	* DOMXML.dis (ManakaiDOMXMLIdAttr): New class.
+
+	* Tree.dis (createAttribute, createAttributeNS,
+	setAttribute, setAttributeNS): They now supports 
+	the |cfg:xml-id| configuration parameter.
+	(cfg:xml-id): New configuration parameter.
+
+	* XDoctype.dis (createAttributeDefinition): It now
+	supports the |cfg:xml-id| configuration parameter.
+
+	* XMLParser.dis (parse): It now supports
+	the |cfg:xml-id| configuration parameter.
+
 2006-03-05  Wakaba  <wakaba@suika.fam.cx>
 
 	* XMLParser.dis (parse): Sets |Document.documentURI|

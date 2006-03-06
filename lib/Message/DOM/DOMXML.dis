@@ -41,7 +41,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date:
-    $Date: 2006/03/05 10:07:01 $
+    $Date: 2006/03/06 07:32:51 $
   
   @Require:
     @@Module:
@@ -57,6 +57,8 @@ Module:
 Namespace:
   @c:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
+  @cfg:
+    http://suika.fam.cx/www/2006/dom-config/
   @d:
     http://suika.fam.cx/~wakaba/archive/2004/dom/xdt#
   @dis:
@@ -3701,7 +3703,7 @@ ClsDef:
 
   @ClsISA: t|ManakaiDOMAttr
 
-  @DocAttr: XMLBaseAttr||ManakaiDOM|all
+  @DocAttr: XMLBaseAttribute||ManakaiDOM|all
 
   @enDesc:
     A <Class::ManakaiDOMXMLBaseAttr> object represents
@@ -3796,6 +3798,146 @@ ClsDef:
                   q<http://pel.test/>);
 ##XMLBaseAttr
 
+ClsDef:
+  @ClsQName: ManakaiDOMXMLIdAttr
+
+  @ClsISA: t|ManakaiDOMAttr
+
+  @DocAttr: XMLIdAttribute||ManakaiDOM|all
+
+  @enDesc:
+    A <Class::ManakaiDOMXMLIdAttr> object represents
+    an <XA::xml:id> attribute node.
+    
+  @L2Test:
+    @@QName: createAttrNodeNS.xml-id.test
+    @@PerlDef:
+      my $doc;
+      __CODE{t|createDocumentForTest:: $doc => $doc}__;
+ 
+      my $xb = $doc-><M::Document.createAttributeNS> (<Q::xml:>, 'xml:id');
+      $test->assert_isa ($xb, <IFName::Attr>);
+      $test->assert_isa ($xb, <ClassName::ManakaiDOMXMLIdAttr>);
+
+  @L2Test:
+    @@QName: setAttributeNS.xml-id.text
+    @@PerlDef:
+      my $doc;
+      __CODE{t|createDocumentForTest:: $doc => $doc}__;
+
+      my $el = $doc-><M::Document.createElementNS> (null, 'e');
+      $el-><M::Element.setAttributeNS> (<Q::xml:>, 'xml:id', 'about:');
+      my $at = $el-><M::Element.getAttributeNodeNS> (<Q::xml:>, 'id');
+      $test->assert_isa ($at, <IFName::Attr>);
+      $test->assert_isa ($at, <ClassName::ManakaiDOMXMLIdAttr>);
+
+  @enImplNote:
+    @@ddid: nons
+    @@@:
+      {ISSUE::
+        The <XA::xml:id> attribute that does not belong to any
+        namespace (namespace-unaware).
+      }      
+
+  @CAttr:
+    @@Name: value
+    @@enDesc:
+      The <InfoProp::normalized value> of the attribute.
+    @@Type: DOMString
+    @@Get:
+      @@@PerlDef:
+        __DEEP{
+          $r = $self->SUPER::value;
+          if (defined $self->{<H::mn|node>}->{<H::infoset|attributeType>} and	
+              $self->{<H::mn|node>}->{<H::infoset|attributeType>}
+                  == <C::t|ATDef.ID_ATTR> and
+              $self-><AG::Node.ownerDocument>-><AG::Document.domConfig>
+                   -><M::c|DOMConfiguration.getParameter> (<Q::cfg|xml-id>)) {
+            $r =~ s/[\x09\x0A\x0D\x20]+/ /g;
+            $r =~ s/\A //;
+            $r =~ s/ \z//;
+          }
+        }__;
+    @@Set:
+      @@@PerlDef:
+        __DEEP{
+          $self->SUPER::value ($given);
+        }__;
+
+  @CAttr:
+    @@Name: nodeValue
+    @@enDesc:
+      The <InfoProp::normalized value> of the attribute.
+    @@Type: DOMString
+    @@Get:
+      @@@PerlDef:
+        __DEEP{
+          $r = $self->SUPER::value;
+          if (defined $self->{<H::mn|node>}->{<H::infoset|attributeType>} and	
+              $self->{<H::mn|node>}->{<H::infoset|attributeType>}
+                  == <C::t|ATDef.ID_ATTR> and
+              $self-><AG::Node.ownerDocument>-><AG::Document.domConfig>
+                   -><M::c|DOMConfiguration.getParameter> (<Q::cfg|xml-id>)) {
+            $r =~ s/[\x09\x0A\x0D\x20]+/ /g;
+            $r =~ s/\A //;
+            $r =~ s/ \z//;
+          }
+        }__;
+    @@Set:
+      @@@PerlDef:
+        __DEEP{
+          $self->SUPER::value ($given);
+        }__;
+
+  @Test:
+    @@QName: XMLIdAttr.value.test
+    @@PerlDef:
+      my $doc;
+      __CODE{t|createDocumentForTest:: $doc => $doc}__;
+
+      my $cfg = $doc-><AG::Document.domConfig>;
+
+      $cfg-><M::c|DOMConfiguration.setParameter> (<Q::cfg|xml-id> => true);
+
+      my $attr1 = $doc-><M::Document.createAttributeNS> (<Q::xml:>, 'xml:id');
+      $attr1-><AS::Node.textContent> (" ab\x09\x0A\x0D\x20cd ");
+ 
+      $test->id ('id.value');
+      $test->assert_equals
+               ($attr1-><AG::Attr.value>,
+                "ab cd");
+
+      $test->id ('id.nodeValue');
+      $test->assert_equals
+               ($attr1-><AG::Node.nodeValue>,
+                "ab cd");
+
+      $test->id ('id.textContent');
+      $test->assert_equals
+               ($attr1-><AG::Node.textContent>,
+                " ab\x09\x0A\x0D\x20cd ");
+
+      $cfg-><M::c|DOMConfiguration.setParameter> (<Q::cfg|xml-id> => false);
+
+      my $attr2 = $doc-><M::Document.createAttributeNS> (<Q::xml:>, 'xml:id');
+      $attr2-><AS::Node.textContent> (" ab\x09\x0A\x0D\x20cd ");
+ 
+      $test->id ('noid.value');
+      $test->assert_equals
+               ($attr2-><AG::Attr.value>,
+                " ab\x09\x0A\x0D\x20cd ");
+
+      $test->id ('noid.nodeValue');
+      $test->assert_equals
+               ($attr2-><AG::Node.nodeValue>,
+                " ab\x09\x0A\x0D\x20cd ");
+
+      $test->id ('noid.textContent');
+      $test->assert_equals
+               ($attr2-><AG::Node.textContent>,
+                " ab\x09\x0A\x0D\x20cd ");
+##XMLIdAttr
+
 ResourceDef:
   @QName: Document
   @AliasFor: t|Document
@@ -3812,7 +3954,7 @@ ResourceDef:
   @For: ManakaiDOM|ManakaiDOM
 
 ResourceDef:
-  @QName: XMLBaseAttr
+  @QName: XMLBaseAttribute
   @AppName:
     @@@: xml|base
     @@ContentType: DISCore|QName
@@ -3820,4 +3962,15 @@ ResourceDef:
   @DISCore:resourceType: s|Attribute
   @enDesc:
      The <XA::xml:base> attribute.
+
+
+ResourceDef:
+  @QName: XMLIdAttribute
+  @AppName:
+    @@@: xml|id
+    @@ContentType: DISCore|QName
+  @For: =ManakaiDOM|all
+  @DISCore:resourceType: s|Attribute
+  @enDesc:
+     The <XA::xml:id> attribute.
 

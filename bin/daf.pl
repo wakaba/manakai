@@ -210,7 +210,6 @@ get_referring_module_uri_list => sub {
     unless (defined $ModuleSourceDISDocument{$module_uri}) {
       daf_open_source_dis_document ($module_uri);
     }
-    daf_convert_dis_document_to_dnl_document ();
   }
   return daf_get_referring_module_uri_list ($module_uri);
 },

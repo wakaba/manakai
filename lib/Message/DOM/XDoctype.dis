@@ -17,7 +17,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/03/05 10:07:02 $
+    $Date: 2006/03/06 07:32:52 $
   
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
   
@@ -612,6 +612,15 @@ IFClsXDef:
         $obj->{<H::c|name>} = $nameArg;
         $r = <ClassM::t|ManakaiDOMNode.getNodeReference> ($obj);
 
+        __DEEP{
+          if ($nameArg eq 'xml:id' and
+              $self-><AG::Document.domConfig>
+                   -><M::c|DOMConfiguration.getParameter> (<Q::cfg|xml-id>)) {
+            $r-><AS::AttributeDefinition.declaredType>
+                  (<C::AttributeDefinition.ID_ATTR>);
+          }
+        }__;
+
     @@Test:
       @@@QName:
         ManakaiDocumentXDoctype.createAttributeDefinition.success.test
@@ -652,6 +661,32 @@ IFClsXDef:
         
         $test->assert_string (actual_value => $dtd-><AG::Node.nodeName>,
                               expected_value => '0120'); 
+
+    @@Test:
+      @@@QName: DocXDoctype.createAtDef.xmlid.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{newDocumentForTest}__;
+
+        my $cfg = $doc-><AG::Document.domConfig>;
+
+        $cfg-><M::c|DOMConfiguration.setParameter> (<Q::cfg|xml-id> => true);
+
+        $test->id ('id');
+        my $at = $doc-><M::DocumentXDoctype.createAttributeDefinition>
+                         ('xml:id');
+        $test->assert_num_equals
+                 (actual_value => $at-><AG::AttributeDefinition.declaredType>,
+                  expected_value => <C::AttributeDefinition.ID_ATTR>);
+        
+        $cfg-><M::c|DOMConfiguration.setParameter> (<Q::cfg|xml-id> => false);
+
+        $test->id ('nonid');
+        my $at2 = $doc-><M::DocumentXDoctype.createAttributeDefinition>
+                          ('xml:id');
+        $test->assert_num_equals
+                 (actual_value => $at2-><AG::AttributeDefinition.declaredType>,
+                  expected_value => <C::AttributeDefinition.NO_TYPE_ATTR>);
     
   @Method:
     @@Name: createGeneralEntity
