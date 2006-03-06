@@ -12,7 +12,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/03/06 10:19:33 $
+    $Date: 2006/03/06 13:46:08 $
 
   @Require:
     @@Module:
@@ -1129,134 +1129,130 @@ IFCls1Def:
          DOM Level 1 does not have <M::DOMImplementation.createDocumentType> 
          so that DOM Level 1 does not consider a <IF::DOMXML:DocumentType> 
          object without any owner <IF::Document>. 
-  @Method:
-     @@Name:  insertBefore
-     @@Description:
-       @@@lang:en
-       @@@@:
-         Inserts a node just before the existing child node. 
-     @@Param:
-        @@@Name:  newChild
-        @@@Type:  Node
-        @@@actualType: ManakaiDOMNode
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            A node to insert.  If the <P::newChild> is already 
-            used in any tree, it is first removed. 
-        @@@InCase:
-          @@@@Type: DocumentFragment
-          @@@@actualType: ManakaiDOMDocumentFragment
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              All the child nodes are inserted, in the same order, 
-              to the child list.  After the insertion, the child list 
-              of <P::newChild> is to be empty.
-          @@@@SpecLevel: 1
-     @@Param:
-        @@@Name:  refChild
-        @@@Type:  Node
-        @@@actualType: ManakaiDOMNode
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            The reference node before which the <P::refChild> 
-            (or its children) is inserted. 
-        @@@InCase:
-          @@@@Value:
-            @@@@@is-null:1
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              The <P::newChild> is inseted at the end of the list of children. 
-        @@@InCase:
-          @@@@Label:
-            @@@@@lang:en
-            @@@@@@:
-              <P::newChild> itself
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              The result is implementation dependent.
-            @@@@@For:
-              ManakaiDOM:DOM3
-     @@Return:
-        @@@Type:  Node
-        @@@actualType: ManakaiDOMNode
-        @@@Description:
-          @@@@lang:en
-          @@@@@: The node being inserted.
-        @@@ImplNote:
-          @@@@lang:en
-          @@@@@:
-            What should be returned when the "newChild" is a "DocumentFragment" 
-            is unclear.
-        @@@Exception:
-          @@@@Type: DOMException
-          @@@@Name: HIERARCHY_REQUEST_ERR
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@: 
-              Either this node is of a type that does not allow 
-              children of the type of the "newChild" node [DOM 1, 2, 3],
-              the node to insert is one of ancestors of this node 
-              [DOM 1, 2, 3], the node to insert is this node itself
-              [DOM 2 Errata, 3], or this node is of type "Document" 
-              and the attemption 
-              to insert a second "DocumentType" or "Element" node 
-              is made [DOM 3].
-          @@@@ImplNote:
-            @@@@@lang:en
-            @@@@@@: 
-              Special treatment required if it is a "DocumentFragment".
-              Whether the node is hierarchically valid must be 
-              ensured for each child nodes.
-            \
-              For example, the attemption to add more than one elements 
-              using "DocumentFragment" to the empty "Document" must 
-              be detected.
-        @@@Exception:
-          @@@@Type: DOMException
-          @@@@Name: WRONG_DOCUMENT_ERR
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              The "newChild" node was created from a different 
-              document.
-        @@@Exception:
-          @@@@Type: DOMException
-          @@@@Name: NO_MODIFICATION_ALLOWED_ERR
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              Either this node is read-only [DOM 1, 2, 3] or the parent of 
-              the node being inserted is read-only [DOM 1 SE, 2, 3].
-        @@@Exception:
-          @@@@Type: DOMException
-          @@@@Name: NOT_SUPPORTED_ERR
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              This node is of type "Document" and the DOM implementation 
-              does not support the insertion of a "DocumentType" or 
-              "Element" node.
-          @@@@ImplNote:
-            @@@@@lang:en
-            @@@@@@:
-              While the specification does not address, 
-              in case that the parent of the "newChild" is a "Document" 
-              and the DOM implementation does not support the 
-              removal from it, this error should also be raised.
-          @@@@SpecLevel:3
-        @@@c:reports:
-          @@@@@: t|insert-before-itself
-          @@@@enDesc:
-            If the <P::newChild> node is same as the <P::refChild> node.
-            Then, the result is implementation dependent.
 
-            The manakai implementation only issues a warning in the case.
-          @@@@For: ManakaiDOM|ManakaiDOM
+  @Method:
+    @@Name: insertBefore
+    @@enDesc:
+      Inserts a node before the existing child node of the node.
+
+      Inserting a node before itself is implementation dependent.
+    @@Param:
+      @@@Name: newChild
+      @@@Type: Node
+      @@@enDesc:
+        The node to insert.  If the <P::newChild> is already in 
+        the tree, it is first removed.
+      @@@InCase:
+        @@@@Type: DocumentFragment
+        @@@@enDesc:
+          All of children of the <P::newChild> node are inserted,
+          in the same order, before <P::refChild>.
+    @@Param:
+      @@@Name: refChild
+      @@@Type: Node
+      @@@enDesc:
+        The reference node, i.e. the node before which the new node
+        must be inserted.
+      @@@nullCase:
+        @@@@enDesc:
+          The <P::newChild> node is inserted at the end of the list
+          of children.
+    @@Return:
+      @@@Type: Node
+      @@@enDesc:
+        The node being inserted.
+      @@@enImplNote:
+        What is returned if <P::newChild> is a <IF::DocumentFragment>?
+        See also <M::Node.appendChild>'s return value.
+      @@@dx:raises:
+        @@@@@: MDOMX|HIERARCHY_BAD_TYPE
+        @@@@enDesc:
+          If the node is of a type that does not allow children of
+          the type of the <P::newChild> node.
+      @@@dx:raises:
+        @@@@@: MDOMX|HIERARCHY_ANCESTOR_OR_SELF
+        @@@@enDesc:
+          If the <P::newChild> node is one of the node's ancestor
+          <SRC::DOM 1, 2, 3> or the node itself <SRC::DOM 2 Errata, DOM 3>.
+      @@@dx:raises:
+        @@@@@: MDOMX|MDOM_SECOND_DOC_ELEMENT
+        @@@@enDesc:
+          If the node is of type <IF::Document> and an attempt
+          is made to append a second <IF::DocumentType> node
+          <SRC::DOM 3>.
+      @@@dx:raises:
+        @@@@@: MDOMX|MDOM_SECOND_DOCTYPE
+        @@@@enDesc:
+          If the node is of type <IF::Document> and an attempt
+          is made to append a second <IF::x|DocumentType> node
+          <SRC::DOM 3>.
+      @@@dx:raises:
+        @@@@@: c|HIERARCHY_WRONG_DOCTYPE_ERR
+        @@@@enDesc:
+          If the node is of type <IF::Document> and an attempt
+          is made to append a <IF::x|DocumentType> node after
+          an <IF::Element> node.
+        @@@@enImplNote:
+          Although such document type node is not prohibited
+          by DOM specification, Firefox 1.5 and Opera 9 TP1
+          throws an <X::c|DOMException.HIERARCHY_REQUEST_ERR>.
+      @@@dx:raises:
+        @@@@@: c|DIFFERENT_DOCUMENT_ERR
+        @@@@enDesc:
+          If the <P::newChild> node was created from a different
+          document than the one that created the node.
+        @@@@enImplNote:
+          The DOM specification ignores the fact that <IF::Document>s
+          and <IF::x|DocumentType>s are created from 
+          <IF::c|DOMImplementation> :-)
+      @@@dx:raises: 
+        @@@@@: MDOMX|NOMOD_THIS
+        @@@@enDesc:
+          If the node is read-only.
+      @@@dx:raises:
+        @@@@@: MDOMX|NOMOD_SRC_PARENT
+        @@@@enDesc:
+          If the previous parent of the <P::newChild> node is read-only
+          <SRC::DOM 1 SE, DOM 2, 3>.
+      @@@dx:raises:
+        @@@@@: c|NOT_CHILD_ERR
+        @@@@enDesc:
+          If the <P::refChild> node is not a child of the node.
+      @@@dx:raises:
+        @@@@@: t|REMOVE_DOCUMENT_TYPE_ERR
+        @@@@enDesc:
+          If the node is of type <IF::Document> and the DOM implementation
+          does not support the insertion of a <IF::x|DocumentType> child
+          <SRC::DOM 3>.
+        @@@@ForCheck: !ManakaiDOM|ForClass
+      @@@dx:raises:
+        @@@@@: t|REMOVE_DOCUMENT_ELEMENT_ERR
+        @@@@enDesc:
+          If the node is of type <IF::Document> and the DOM implementation
+          does not support the insertion of a <IF::x|Element> child
+          <SRC::DOM 3>.
+        @@@@ForCheck: !ManakaiDOM|ForClass
+      @@@dx:raises:
+        @@@@@: t|REMOVE_DOCUMENT_TYPE_ERR
+        @@@@enDesc:
+          If the <P::newChild> node is a child of the <IF::Document> node
+          and the DOM implementation does not support the removal
+          of the <IF::x|DocumentType> child.
+        @@@@ForCheck: !ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
+      @@@dx:raises:
+        @@@@@: t|REMOVE_DOCUMENT_ELEMENT_ERR
+        @@@@enDesc:
+          If the <P::newChild> node is a child of the <IF::Document> node
+          and the DOM implementation does not support the removal
+          of the <IF::Element> child.
+        @@@@ForCheck: !ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
+      @@@c:reports:
+        @@@@@: t|insert-before-itself
+        @@@@enDesc:
+          If the <P::newChild> node is same as the <P::refChild> node.
+          Then, the result is implementation dependent.
+        @@@@For: ManakaiDOM|ManakaiDOM
+
         @@@PerlDef:
             my $node;
             my $newNode;
@@ -4389,7 +4385,7 @@ IFCls1Def:
                 last FIND;
               }
             }
-            $class = <ClassName::DOMXML:ManakaiDOMDocumentType>;
+            $class = <ClassName::d|ManakaiDOMDocumentTypeDefinition>;
           } elsif ($nt eq <H::DOMXML:EntityNode>) {
             for my $pack (sort {
               $Message::DOM::ClassPoint{$b} <=> $Message::DOM::ClassPoint{$a}
@@ -10025,6 +10021,37 @@ NodeTypeDef:
           MDOMX|param-name => 'newChild',
           c|node => {$newChild},
         }__;
+
+  @CMethod:
+    @@Name: insertBefore
+    @@enDesc:
+      Inserts a node before the existing child node of the node.
+    @@Param:
+      @@@Name: newChild
+      @@@Type: Node
+      @@@enDesc:
+        The node to add.
+    @@Param:
+      @@@Name: refChild
+      @@@Type: Node
+      @@@enDesc:
+        The node before which the <P::newChild> node is inserted.
+      @@@nullCase:
+        @@@@enDesc:
+          The <P::newChild> node is inserted at the end.
+    @@Return:
+      @@@Type: Node
+      @@@enDesc:
+        The node added.
+      @@@dx:raises:
+        @@@@@: MDOMX|HIERARCHY_BAD_TYPE
+        @@@@enDesc:
+          The type of the node does not allow any children.
+      @@@PerlDef:
+        __EXCEPTION{MDOMX|HIERARCHY_BAD_TYPE::
+          MDOMX|param-name => 'newChild',
+          c|node => {$newChild},
+        }__;
 ##CharacterData
 
 ElementTypeBinding:
@@ -15019,9 +15046,14 @@ IFCls1Def:
         $docx-><M::d|DocumentXDoctype.createAttributeDefinition> ('at'),
         #test:nodeTypes
       ) {
-        $test->id ('type='.$node-><AG::Node.nodeType>);
+        $test->id ('appendChild.'.$node-><AG::Node.nodeType>);
         $test->assert_exception (code => sub {
           $text-><M::Node.appendChild> ($node);
+        }, exception_subtype => <Q::MDOMX|HIERARCHY_BAD_TYPE>);
+
+        $test->id ('insertBefore.'.$node-><AG::Node.nodeType>);
+        $test->assert_exception (code => sub {
+          $text-><M::Node.insertBefore> ($node);
         }, exception_subtype => <Q::MDOMX|HIERARCHY_BAD_TYPE>);
       }
 ##Text
@@ -15250,9 +15282,14 @@ IFCls1Def:
         $docx-><M::d|DocumentXDoctype.createAttributeDefinition> ('at'),
         #test:nodeTypes
       ) {
-        $test->id ('type='.$node-><AG::Node.nodeType>);
-        $test->assert_exception (code => sub {
+        $test->id ('appendChild.'.$node-><AG::Node.nodeType>);
+        $test->assert_exception (code => sub {  
           $comment-><M::Node.appendChild> ($node);
+        }, exception_subtype => <Q::MDOMX|HIERARCHY_BAD_TYPE>);
+
+        $test->id ('insertBefore.'.$node-><AG::Node.nodeType>);
+        $test->assert_exception (code => sub {  
+          $comment-><M::Node.insertBefore> ($node);
         }, exception_subtype => <Q::MDOMX|HIERARCHY_BAD_TYPE>);
       }
 ##Comment
@@ -19532,8 +19569,6 @@ ClsDef:
         @@@Name:  doctype
         @@@Type:  
           DOMXML:DocumentType
-        @@@actualType:
-          DOMXML:ManakaiDOMDocumentType
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -19697,7 +19732,7 @@ ClsDef:
 
             if ($doctype) {
               if (not UNIVERSAL::isa
-                        ($doctype, <ClassName::DOMXML:ManakaiDOMDocumentType>)) {
+                        ($doctype, <IFName::x|DocumentType>)) {
                 __EXCEPTION{c|MDOMX_EXTERNAL_NODE::
                   MDOMX:param-name => 'doctype',
                 }__;
@@ -19792,7 +19827,7 @@ ClsDef:
             $node->{<H::DOMCore:hasFeature>}->{HTML} = 1;
             if ($doctype) {
               if (not UNIVERSAL::isa
-                        ($doctype, <ClassName::DOMXML:ManakaiDOMDocumentType>)) {
+                        ($doctype, <ClassName::x|DocumentType>)) {
                 __EXCEPTION{c|MDOMX_EXTERNAL_NODE::
                   MDOMX:param-name => 'doctype',
                 }__;

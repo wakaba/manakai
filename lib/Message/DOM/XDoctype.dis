@@ -17,7 +17,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/03/06 12:17:27 $
+    $Date: 2006/03/06 13:46:09 $
   
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
   
@@ -2653,6 +2653,26 @@ IFClsXDef:
         }
 
     @@Test:
+      @@@QName: DTDef.appendChild.wrongdoc.2.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{t|createDOMImplForTest:: $impl => $impl}__;
+
+        my $dtype = $impl-><M::c|DOMImplementation.createDocumentType>
+                             ('type', 'pub', 'sys');
+
+        my $doc;
+        __CODE{t|createDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $node = $doc-><M::Document.createProcessingInstruction> ('pi');
+
+        $test->id ('type='.$node-><AG::Node.nodeType>);
+        $test->assert_exception (code => sub {
+          $dtype-><M::Node.appendChild> ($node);
+        }, exception_subtype => <Q::c|DIFFERENT_DOCUMENT_ERR>);
+
+    @@Test:
       @@@QName: DTDef.appendChild.readonly.1.test
       @@@PerlDef:
         my $doc;
@@ -3529,6 +3549,34 @@ IFClsXDef:
       @@@disDef:
         @@@@DISPerl:cloneCode: t|ManakaiDOMCharacterData.appendChild
 
+  @CMethod:
+    @@Name: insertBefore
+    @@enDesc:
+      Inserts a node before the existing child node of the node.
+    @@Param:
+      @@@Name: newChild
+      @@@Type: Node
+      @@@enDesc:
+        The node to add.
+    @@Param:
+      @@@Name: refChild
+      @@@Type: Node
+      @@@enDesc:
+        The node before which the <P::newChild> node is inserted.
+      @@@nullCase:
+        @@@@enDesc:
+          The <P::newChild> node is inserted at the end.
+    @@Return:
+      @@@Type: Node
+      @@@enDesc:
+        The node added.
+      @@@dx:raises:
+        @@@@@: MDOMX|HIERARCHY_BAD_TYPE
+        @@@@enDesc:
+          The type of the node does not allow any children.
+      @@@disDef:
+        @@@@DISPerl:cloneCode: t|ManakaiDOMCharacterData.insertBefore
+
     @@Test:
       @@@QName: ETDef.appendChild.test
       @@@PerlDef:
@@ -3559,9 +3607,14 @@ IFClsXDef:
           $docx-><M::d|DocumentXDoctype.createAttributeDefinition> ('at'),
           #test:nodeTypes
         ) {
-          $test->id ('type='.$node-><AG::Node.nodeType>);
+          $test->id ('appendChild.'.$node-><AG::Node.nodeType>);
           $test->assert_exception (code => sub {
             $comment-><M::Node.appendChild> ($node);
+          }, exception_subtype => <Q::MDOMX|HIERARCHY_BAD_TYPE>);
+
+          $test->id ('insertBefore.'.$node-><AG::Node.nodeType>);
+          $test->assert_exception (code => sub {
+            $comment-><M::Node.insertBefore> ($node);
           }, exception_subtype => <Q::MDOMX|HIERARCHY_BAD_TYPE>);
         }
 
