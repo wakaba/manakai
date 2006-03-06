@@ -17,7 +17,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/03/06 07:32:52 $
+    $Date: 2006/03/06 10:19:34 $
   
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
   
@@ -28,6 +28,8 @@ Module:
 Namespace:
   @c:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
+  @cfg:
+    http://suika.fam.cx/www/2006/dom-config/
   @d:
     http://suika.fam.cx/~wakaba/archive/2004/dom/xdt#
   @dis:
@@ -274,6 +276,14 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type: DISLang|Method
     @@ForCheck: !=ManakaiDOM|ManakaiDOM
+
+ElementTypeBinding:
+  @Name: CMethod
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|Method
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|ForClass
 
 ElementTypeBinding:
   @Name: IntMethod
@@ -1155,6 +1165,20 @@ IFClsXDef:
       @@@disDef:
         @@@@DISPerl:cloneCode: .generalEntities.get
 
+    @@Test:
+      @@@QName: DocumentType.entities.get.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{t|createDOMImplForTest:: $impl => $impl}__;
+
+        my $dtype = $impl-><M::c|DOMImplementation.createDocumentType>
+                             ('type', 'pub', 'sys');
+        my $ent = $dtype-><AG::x|DocumentType.entities>;
+        $test->assert_isa ($ent, <IFName::t|NamedNodeMap>);
+        $test->assert_num_equals
+                 (actual_value => $ent-><AG::t|NamedNodeMap.length>,
+                  expected_value => 0);
+
   @Attr:
     @@Name: notations
     @@enDesc:
@@ -1191,6 +1215,20 @@ IFClsXDef:
 
         my $es = $dtd-><AG::DocumentTypeDefinition.notations>;
         $test->assert_isa ($es, <IFName::t|NamedNodeMap>);
+
+    @@Test:
+      @@@QName: DocumentType.notations.get.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{t|createDOMImplForTest:: $impl => $impl}__;
+
+        my $dtype = $impl-><M::c|DOMImplementation.createDocumentType>
+                             ('type', 'pub', 'sys');
+        my $ent = $dtype-><AG::x|DocumentType.notations>;
+        $test->assert_isa ($ent, <IFName::t|NamedNodeMap>);
+        $test->assert_num_equals
+                 (actual_value => $ent-><AG::t|NamedNodeMap.length>,
+                  expected_value => 0);
       
   @enImplNote:
     {TODO::
@@ -1742,8 +1780,29 @@ IFClsXDef:
         my $dtd;
         __CODE{newDoctypeForTest}__;
 
-        $test->assert_isa ($dtd-><AG::DocumentTypeDefinition.implementation>,
+        $test->assert_isa ($dtd-><AG::x|DocumentType.implementation>,
                            <IFName::c|DOMImplementation>);
+
+    @@Test:
+      @@@QName: Doctype.impl.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{t|createDOMImplForTest:: $impl => $impl}__;
+
+        my $dtype = $impl-><M::c|DOMImplementation.createDocumentType>
+                             ('type', 'pub', 'sys');
+
+        $test->id ('created');
+        $test->assert_isa (my $i2 = $dtype-><AG::x|DocumentType.implementation>,
+                           <IFName::c|DOMImplementation>);
+        $test->assert_equals ($i2, $impl);
+
+        $test->id ('appended');
+        my $doc = $impl-><M::c|DOMImplementation.createDocument>;
+        $doc-><M::Node.appendChild> ($dtype);
+        $test->assert_isa (my $i3 = $dtype-><AG::x|DocumentType.implementation>,
+                           <IFName::c|DOMImplementation>);
+        $test->assert_equals ($i3, $impl);
 
   @Method:
     @@ForCheck: ManakaiDOM|ForClass
@@ -1775,6 +1834,16 @@ IFClsXDef:
         __CODE{newDoctypeForTest}__;
 
         $test->assert_null ($dtd-><M::Node.lookupPrefix> ('abcdefg'));
+
+    @@Test:
+      @@@QName: DocumentType.lookupPrefix.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{t|createDOMImplForTest:: $impl => $impl}__;
+
+        my $dtype = $impl-><M::c|DOMImplementation.createDocumentType>
+                             ('type', 'pub', 'sys');
+        $test->assert_null ($dtype-><M::Node.lookupPrefix> ('about:'));
   
   @Method:
     @@ForCheck: ManakaiDOM|ForClass
@@ -1905,6 +1974,82 @@ IFClsXDef:
                           (<Q::fe|XDoctypeDeclaration> => '3.0');
         $test->assert_isa ($obj, <IFName::d|DocumentTypeDeclaration>);
 
+    @@Test:
+      @@@QName: DocumentType.getFeature.core.1.0.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{t|createDOMImplForTest:: $impl => $impl}__;
+
+        my $dtype = $impl-><M::c|DOMImplementation.createDocumentType>
+                             ('type', 'pub', 'sys');
+        my $obj = $dtype-><M::Node.getFeature> (Core => '1.0');
+
+        $test->assert_isa ($obj, <IFName::t|Node||ManakaiDOM|ManakaiDOM1>);
+        $test->assert_isa
+                 ($obj, <IFName::x|DocumentType||ManakaiDOM|ManakaiDOM1>);
+    @@Test:
+      @@@QName: DocumentType.getFeature.core.2.0.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{t|createDOMImplForTest:: $impl => $impl}__;
+
+        my $dtype = $impl-><M::c|DOMImplementation.createDocumentType>
+                             ('type', 'pub', 'sys');
+        my $obj = $dtype-><M::Node.getFeature> (Core => '2.0');
+
+        $test->assert_isa ($obj, <IFName::t|Node||ManakaiDOM|ManakaiDOM2>);
+        $test->assert_isa
+                 ($obj, <IFName::x|DocumentType||ManakaiDOM|ManakaiDOM2>);
+    @@Test:
+      @@@QName: DocumentType.getFeature.core.3.0.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{t|createDOMImplForTest:: $impl => $impl}__;
+
+        my $dtype = $impl-><M::c|DOMImplementation.createDocumentType>
+                             ('type', 'pub', 'sys');
+        my $obj = $dtype-><M::Node.getFeature> (Core => '3.0');
+
+        $test->assert_isa ($obj, <IFName::t|Node||ManakaiDOM|ManakaiDOM3>);
+        $test->assert_isa
+                 ($obj, <IFName::x|DocumentType||ManakaiDOM|ManakaiDOM3>);
+    @@Test:
+      @@@QName: DocumentType.getFeature.xml.1.0.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{t|createDOMImplForTest:: $impl => $impl}__;
+
+        my $dtype = $impl-><M::c|DOMImplementation.createDocumentType>
+                             ('type', 'pub', 'sys');
+        my $obj = $dtype-><M::Node.getFeature> (XML => '1.0');
+
+        $test->assert_isa
+                 ($obj, <IFName::x|DocumentType||ManakaiDOM|ManakaiDOM1>);
+    @@Test:
+      @@@QName: DocumentType.getFeature.xml.2.0.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{t|createDOMImplForTest:: $impl => $impl}__;
+
+        my $dtype = $impl-><M::c|DOMImplementation.createDocumentType>
+                             ('type', 'pub', 'sys');
+        my $obj = $dtype-><M::Node.getFeature> (XML => '2.0');
+
+        $test->assert_isa
+                 ($obj, <IFName::x|DocumentType||ManakaiDOM|ManakaiDOM2>);
+    @@Test:
+      @@@QName: DocumentType.getFeature.xml.3.0.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{t|createDOMImplForTest:: $impl => $impl}__;
+
+        my $dtype = $impl-><M::c|DOMImplementation.createDocumentType>
+                             ('type', 'pub', 'sys');
+        my $obj = $dtype-><M::Node.getFeature> (XML => '3.0');
+
+        $test->assert_isa
+                 ($obj, <IFName::x|DocumentType||ManakaiDOM|ManakaiDOM3>);
+
   @Attr:
     @@ForCheck: ManakaiDOM|ForClass
     @@Name: nodeType
@@ -1992,6 +2137,34 @@ IFClsXDef:
         __DEEP{
           $r = $self-><AG::DocumentTypeDeclaration.declarationBaseURI>;
         }__;
+
+    @@Test:
+      @@@ForCheck: !ManakaiDOM|all
+      @@@enImplNote:
+        {TODO::
+          Enable this test after appendchild(doctype) is really implemented
+        }
+      @@@QName: Doctype.baseURI.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{t|createDOMImplForTest:: $impl => $impl}__;
+
+        my $dtype = $impl-><M::c|DOMImplementation.createDocumentType>
+                             ('type', 'pub', 'sys');
+  
+        $test->id ('initial');
+        $test->assert_null ($dtype-><AG::Node.baseURI>);
+
+        my $doc = $impl-><M::c|DOMImplementation.createDocument>;
+        $doc-><M::Node.appendChild> ($dtype);
+        $doc-><AS::Document.documentURI> (q<http://doc.test/>);
+        $test->assert_equals ($dtype-><AG::Node.ownerDocument>,
+                              $doc);
+
+        $test->id ('doc');
+        $test->assert_equals
+                 ($dtype-><AG::Node.baseURI>,
+                  q<http://doc.test/>);
 
   @Method:
     @@ForCheck: ManakaiDOM|ForClass
@@ -2161,6 +2334,16 @@ IFClsXDef:
         $dtd-><AS::DocumentTypeDeclaration.systemId> (null);
         $test->assert_null ($dtd-><AG::DocumentTypeDeclaration.systemId>);
 
+    @@Test:
+      @@@QName: DocumentType.systemId.get.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{t|createDOMImplForTest:: $impl => $impl}__;
+
+        my $dtype = $impl-><M::c|DOMImplementation.createDocumentType>
+                             ('type', 'pub', 'sys');
+        $test->assert_equals ($dtype-><AG::x|DocumentType.systemId>, 'sys');
+
   @Attr:
     @@Name: publicId
     @@enDesc:
@@ -2219,6 +2402,16 @@ IFClsXDef:
         $dtd-><AS::DocumentTypeDeclaration.publicId> (null);
         $test->assert_null ($dtd-><AG::DocumentTypeDeclaration.publicId>);
 
+    @@Test:
+      @@@QName: DocumentType.publicId.get.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{t|createDOMImplForTest:: $impl => $impl}__;
+
+        my $dtype = $impl-><M::c|DOMImplementation.createDocumentType>
+                             ('type', 'pub', 'sys');
+        $test->assert_equals ($dtype-><AG::x|DocumentType.publicId>, 'pub');
+
   @Attr:
     @@Name: name
     @@enDesc:
@@ -2238,6 +2431,16 @@ IFClsXDef:
 
         $test->id ('initial');
         $test->assert_equals ($dtd-><AG::DocumentTypeDeclaration.name>, 'dt1');
+
+    @@Test:
+      @@@QName: DocumentType.name.get.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{t|createDOMImplForTest:: $impl => $impl}__;
+
+        my $dtype = $impl-><M::c|DOMImplementation.createDocumentType>
+                             ('type', 'pub', 'sys');
+        $test->assert_equals ($dtype-><AG::x|DocumentType.name>, 'type');
 
   @Attr:
     @@Name: declarationBaseURI
@@ -2307,6 +2510,13 @@ IFClsXDef:
       @@@enDesc:
         Setting this attribute has no effect.
       @@@PerlDef:
+
+  @CAttr:
+    @@Name: internalSubset
+    @@Type: DOMString
+    @@Get:
+      @@@PerlDef:
+        $r = null;
 
   @enImplNote:
     @@ddid: todo
@@ -2415,6 +2625,18 @@ IFClsXDef:
                  (actual_value => $et-><AG::Node.nodeType>,
                   expected_value => <C::Node.ELEMENT_TYPE_DEFINITION_NODE>);
 
+    @@Test:
+      @@@QName: DocumentType.nodeType.get.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{t|createDOMImplForTest:: $impl => $impl}__;
+
+        my $dtype = $impl-><M::c|DOMImplementation.createDocumentType>
+                             ('type', 'pub', 'sys');
+        $test->assert_num_equals
+                 (actual_value => $dtype-><AG::Node.nodeType>,
+                  expected_value => <C::Node.DOCUMENT_TYPE_NODE>);
+
   @Attr:
     @@ForCheck: ManakaiDOM|ForClass
     @@Name: nodeName
@@ -2432,6 +2654,16 @@ IFClsXDef:
         $test->assert_not_null ($et);
         $test->assert_equals 
                  ($et-><AG::Node.nodeName> => 'et1');
+
+    @@Test:
+      @@@QName: DocumentType.nodeName.get.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{t|createDOMImplForTest:: $impl => $impl}__;
+
+        my $dtype = $impl-><M::c|DOMImplementation.createDocumentType>
+                             ('type', 'pub', 'sys');
+        $test->assert_equals ($dtype-><AG::Node.nodeName>, 'type');
 
   @Attr:
     @@ForCheck: ManakaiDOM|ForClass
@@ -2482,6 +2714,32 @@ IFClsXDef:
         $test->assert_null ($et-><AG::Node.textContent>);
         $et-><AS::Node.textContent> ('non-undef-value');
         $test->assert_null ($et-><AG::Node.textContent>);
+
+    @@Test:
+      @@@QName: DocumentType.textContent.get.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{t|createDOMImplForTest:: $impl => $impl}__;
+
+        my $dtype = $impl-><M::c|DOMImplementation.createDocumentType>
+                             ('type', 'pub', 'sys');
+        $test->assert_null ($dtype-><AG::Node.textContent>);
+    @@Test:
+      @@@QName: DocumentType.textContent.set.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{t|createDOMImplForTest:: $impl => $impl}__;
+
+        my $dtype = $impl-><M::c|DOMImplementation.createDocumentType>
+                             ('type', 'pub', 'sys');
+
+        $test->id ('set.non.null');
+        $dtype-><AS::Node.textContent> ('abcdefg');
+        $test->assert_null ($dtype-><AG::Node.textContent>);
+
+        $test->id ('set.null');
+        $dtype-><AS::Node.textContent> (null);
+        $test->assert_null ($dtype-><AG::Node.textContent>);
 
   @enImplNote:
     {TODO:: Content model attributes are required.
@@ -2708,6 +2966,63 @@ IFClsXDef:
                  ($et-><AG::Node.baseURI>,
                   q<http://doc.test/>);
  
+  @CMethod:
+    @@Name: appendChild
+    @@enDesc:
+      Adds a node to the end of the list of children of the node.
+      If that node is already in the tree, it is first removed.
+    @@Param:
+      @@@Name: newChild
+      @@@Type: Node
+      @@@enDesc:
+        The node to add.
+    @@Return:
+      @@@Type: Node
+      @@@enDesc:
+        The node added.
+      @@@dx:raises:
+        @@@@@: MDOMX|HIERARCHY_BAD_TYPE
+        @@@@enDesc:
+          The type of the node does not allow any children.
+      @@@disDef:
+        @@@@DISPerl:cloneCode: t|ManakaiDOMCharacterData.appendChild
+
+    @@Test:
+      @@@QName: ETDef.appendChild.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{t|createDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $comment = $docx-><M::DocumentXDoctype.createElementTypeDefinition>
+                               ('data');
+
+        for my $node (
+          $doc-><AG::Document.implementation>
+              -><M::c|DOMImplementation.createDocument>,
+          $doc-><M::Document.createDocumentFragment>,
+          $doc-><AG::Document.implementation>
+              -><M::c|DOMImplementation.createDocumentType> ('d'),
+          $docx-><M::d|DocumentXDoctype.createDocumentTypeDefinition> ('d'),
+          $doc-><M::Document.createEntityReference> ('ent'),
+          $doc-><M::Document.createElement> ('e'),
+          $doc-><M::Document.createAttribute> ('a'),
+          $doc-><M::Document.createProcessingInstruction> ('pi'),
+          $doc-><M::Document.createComment> ('c'),
+          $doc-><M::Document.createTextNode> ('t'),
+          $doc-><M::Document.createCDATASection> ('cs'),
+          $docx-><M::d|DocumentXDoctype.createGeneralEntity> ('ge'),
+          $docx-><M::d|DocumentXDoctype.createNotation> ('not'),
+          $docx-><M::d|DocumentXDoctype.createElementTypeDefinition> ('et'),
+          $docx-><M::d|DocumentXDoctype.createAttributeDefinition> ('at'),
+          #test:nodeTypes
+        ) {
+          $test->id ('type='.$node-><AG::Node.nodeType>);
+          $test->assert_exception (code => sub {
+            $comment-><M::Node.appendChild> ($node);
+          }, exception_subtype => <Q::MDOMX|HIERARCHY_BAD_TYPE>);
+        }
+
   @Method:
     @@ForCheck: ManakaiDOM|ForClass
     @@ManakaiDOM:isForInternal: 1

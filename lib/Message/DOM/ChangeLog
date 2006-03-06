@@ -1,5 +1,19 @@
 2006-03-06  Wakaba  <wakaba@suika.fam.cx>
 
+	* DOMCore.dis (HIERARCHY_WRONG_DOCTYPE_ERR): New error.
+	(REMOVE_DOCUMENT_ELEMENT_ERR): New error.
+	(REMOVE_DOCUMENT_TYPE_ERR): New error.
+
+	* DOMXML.dis (ManakaiDOMDocumentType): Removed.
+	(ProcessingInstruction.appendChild, CDATASection.appendChild,
+	Notation.appendChild): New method implementation.
+
+	* Tree.dis (CharacterData.appendChild): New method implementation.
+
+	* XDoctype.dis: Tests moved from |MDOM:DOMXML| module.
+
+2006-03-06  Wakaba  <wakaba@suika.fam.cx>
+
 	* DOMXML.dis (ManakaiDOMXMLIdAttr): New class.
 
 	* Tree.dis (createAttribute, createAttributeNS,

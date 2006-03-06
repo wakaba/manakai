@@ -12,7 +12,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/03/06 07:32:51 $
+    $Date: 2006/03/06 10:19:33 $
 
   @Require:
     @@Module:
@@ -171,6 +171,14 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type: DISLang|Method
     @@ForCheck: !=ManakaiDOM|ManakaiDOM
+
+ElementTypeBinding:
+  @Name: CMethod
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|Method
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|ForClass
 
 ElementTypeBinding:
   @Name: L2Method
@@ -2061,88 +2069,97 @@ IFCls1Def:
      @@SpecLevel:3
      @@For:
        ManakaiDOM:DOM3
+
   @Method:
-     @@Name:  appendChild
-     @@Description:
-       @@@lang:en
-       @@@@:
-         Add a node to the end of the list of children of this node.
-     @@Param:
-        @@@Name:  newChild
-        @@@Type:  Node
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            The node to add.  If it is already in the tree, 
-            it is first removed.
-        @@@InCase:
-          @@@@Type: DocumentFragment
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              The entire contents of the document fragment 
-              are moved into the child list of this node. 
-              The child list of the "newChild" is to be empty.
-     @@Return:
-        @@@Type:  Node
-        @@@Description:
-          @@@@lang:en
-          @@@@@: The node added.
-        @@@ImplNote:
-          @@@@lang:en
-          @@@@@:
-            What should be returned when the "newChild" node is a 
-            "DocumentFragment" is unclear.  Current implementation
-            returns the <P::newChild>, but returning <QUOTE::this>
-            might be better.
-        @@@Exception:
-          @@@@Type: DOMException
-          @@@@Name: HIERARCHY_REQUEST_ERR
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              Either this node is of a type that does not allow 
-              children of the type of the "newChild" node [DOM 1, 2, 3], 
-              the node to add is one of ancestors of this node [DOM 1, 2, 3],
-              the node to add is this node itself [DOM 2 Errata, 3] or 
-              this node is of type "Document" and the attemption 
-              to append a second "DocumentType" or "Element" node 
-              is made [DOM 3].
-          @@@@ImplNote:
-            @@@@@lang:en
-            @@@@@@:
-              Is this error raised if this node is of type "Document" and 
-              it has an "Element" node but no "DocumentType" node then 
-              the attemption to add a "DocumentType" is made?
-        @@@Exception:
-          @@@@Type: DOMException
-          @@@@Name: WRONG_DOCUMENT_ERR
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              The "newChild" node was created from a different document 
-              than the one that created this node.
-        @@@Exception:
-          @@@@Type: DOMException
-          @@@@Name: NO_MODIFICATION_ALLOWED_ERR
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              Either this node is read-only [DOM 1, 2, 3] or
-              the previous (current) parent 
-              of the "newChild" node is read-only [DOM 2 Errata, 3].
-        @@@Exception:
-          @@@@Type: DOMException
-          @@@@Name: NOT_SUPPORTED_ERR
-          @@@@Level: 3
-          @@@@SpecLevel:3
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              The "newChild" node is a child of the "Document" node and 
-              the DOM implementation does not support the removal of 
-              the "DocumentType" or "Element" child node from the 
-              "Document" node.
+    @@Name: appendChild
+    @@enDesc:
+      Adds a node to the end of the list of children of the node.
+      If that node is already in the tree, it is first removed.
+    @@Param:
+      @@@Name: newChild
+      @@@Type: Node
+      @@@enDesc:
+        The node to add.
+      @@@InCase:
+        @@@@Type: DocumentFragment
+        @@@@enDesc:
+          The entire contents of the document fragment are
+          moved into the child list of the node.
+    @@Return:
+      @@@Type: Node
+      @@@enDesc:
+        The node added.
+      @@@enImplNote:
+        The specification is unclear on what node should or should
+        not be returned if the <P::newChild> is a <IF::DocumentFragment>.
+
+        In Firefix 1.5, Opera 9 TP1, and WinIE 6 (Windows XP SP2),
+        the <IF::DocumentFragment> node is returned.
+      @@@dx:raises:
+        @@@@@: MDOMX|HIERARCHY_BAD_TYPE
+        @@@@enDesc:
+          If the node is of a type that does not allow children of
+          the type of the <P::newChild> node.
+      @@@dx:raises:
+        @@@@@: MDOMX|HIERARCHY_ANCESTOR_OR_SELF
+        @@@@enDesc:
+          If the <P::newChild> node is one of the node's ancestor
+          <SRC::DOM 1, 2, 3> or the node itself <SRC::DOM 2 Errata, DOM 3>.
+      @@@dx:raises:
+        @@@@@: MDOMX|MDOM_SECOND_DOC_ELEMENT
+        @@@@enDesc:
+          If the node is of type <IF::Document> and an attempt
+          is made to append a second <IF::DocumentType> node
+          <SRC::DOM 3>.
+      @@@dx:raises:
+        @@@@@: MDOMX|MDOM_SECOND_DOCTYPE
+        @@@@enDesc:
+          If the node is of type <IF::Document> and an attempt
+          is made to append a second <IF::x|DocumentType> node
+          <SRC::DOM 3>.
+      @@@dx:raises:
+        @@@@@: c|HIERARCHY_WRONG_DOCTYPE_ERR
+        @@@@enDesc:
+          If the node is of type <IF::Document> and an attempt
+          is made to append a <IF::x|DocumentType> node after
+          an <IF::Element> node.
+        @@@@enImplNote:
+          Although such document type node is not prohibited
+          by DOM specification, Firefox 1.5 and Opera 9 TP1
+          throws an <X::c|DOMException.HIERARCHY_REQUEST_ERR>.
+      @@@dx:raises:
+        @@@@@: c|DIFFERENT_DOCUMENT_ERR
+        @@@@enDesc:
+          If the <P::newChild> node was created from a different
+          document than the one that created the node.
+        @@@@enImplNote:
+          The DOM specification ignores the fact that <IF::Document>s
+          and <IF::x|DocumentType>s are created from 
+          <IF::c|DOMImplementation> :-)
+      @@@dx:raises: 
+        @@@@@: MDOMX|NOMOD_THIS
+        @@@@enDesc:
+          If the node is read-only.
+      @@@dx:raises:
+        @@@@@: MDOMX|NOMOD_SRC_PARENT
+        @@@@enDesc:
+          If the previous parent of the <P::newChild> node is read-only
+          <SRC::DOM 2 Errata, DOM 3>.
+      @@@dx:raises:
+        @@@@@: t|REMOVE_DOCUMENT_TYPE_ERR
+        @@@@enDesc:
+          If the <P::newChild> node is a child of the <IF::Document> node
+          and the DOM implementation does not support the removal
+          of the <IF::x|DocumentType> child <SRC::DOM 3>.
+        @@@@ForCheck: !ManakaiDOM|ForClass
+      @@@dx:raises:
+        @@@@@: t|REMOVE_DOCUMENT_ELEMENT_ERR
+        @@@@enDesc:
+          If the <P::newChild> node is a child of the <IF::Document> node
+          and the DOM implementation does not support the removal
+          of the <IF::Element> child <SRC::DOM 3>.
+        @@@@ForCheck: !ManakaiDOM|ForClass
+
         @@@PerlDef:
           @@@@@:
             my $node;
@@ -9984,6 +10001,30 @@ NodeTypeDef:
             }
           } # W
         }__;
+
+  @CMethod:
+    @@Name: appendChild
+    @@enDesc:
+      Adds a node to the end of the list of children of the node.
+      If that node is already in the tree, it is first removed.
+    @@Param:
+      @@@Name: newChild
+      @@@Type: Node
+      @@@enDesc:
+        The node to add.
+    @@Return:
+      @@@Type: Node
+      @@@enDesc:
+        The node added.
+      @@@dx:raises:
+        @@@@@: MDOMX|HIERARCHY_BAD_TYPE
+        @@@@enDesc:
+          The type of the node does not allow any children.
+      @@@PerlDef:
+        __EXCEPTION{MDOMX|HIERARCHY_BAD_TYPE::
+          MDOMX|param-name => 'newChild',
+          c|node => {$newChild},
+        }__;
 ##CharacterData
 
 ElementTypeBinding:
@@ -14948,6 +14989,41 @@ IFCls1Def:
                 }
               }
             }
+
+  @Test:
+    @@QName: Text.appendChild.test
+    @@PerlDef:
+      my $doc;
+      __CODE{t|createDocumentForTest:: $doc => $doc}__;
+      my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+      my $text = $doc-><M::Document.createTextNode> ('data');
+
+      for my $node (
+        $doc-><AG::Document.implementation>
+            -><M::c|DOMImplementation.createDocument>,
+        $doc-><M::Document.createDocumentFragment>,
+        $docx-><M::d|DocumentXDoctype.createDocumentTypeDefinition> ('d'),
+        $doc-><AG::Document.implementation>
+            -><M::c|DOMImplementation.createDocumentType> ('d'),
+        $doc-><M::Document.createEntityReference> ('ent'),
+        $doc-><M::Document.createElement> ('e'),
+        $doc-><M::Document.createAttribute> ('a'),
+        $doc-><M::Document.createProcessingInstruction> ('pi'),
+        $doc-><M::Document.createComment> ('c'),
+        $doc-><M::Document.createTextNode> ('t'),
+        $doc-><M::Document.createCDATASection> ('cs'),
+        $docx-><M::d|DocumentXDoctype.createGeneralEntity> ('ge'),
+        $docx-><M::d|DocumentXDoctype.createNotation> ('not'),
+        $docx-><M::d|DocumentXDoctype.createElementTypeDefinition> ('et'),
+        $docx-><M::d|DocumentXDoctype.createAttributeDefinition> ('at'),
+        #test:nodeTypes
+      ) {
+        $test->id ('type='.$node-><AG::Node.nodeType>);
+        $test->assert_exception (code => sub {
+          $text-><M::Node.appendChild> ($node);
+        }, exception_subtype => <Q::MDOMX|HIERARCHY_BAD_TYPE>);
+      }
 ##Text
 
 ResourceDef:
@@ -15144,6 +15220,41 @@ IFCls1Def:
                 }
               }
             }
+
+  @Test:
+    @@QName: Comment.appendChild.test
+    @@PerlDef:
+      my $doc;
+      __CODE{t|createDocumentForTest:: $doc => $doc}__;
+      my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+      my $comment = $doc-><M::Document.createComment> ('data');
+
+      for my $node (
+        $doc-><AG::Document.implementation>
+            -><M::c|DOMImplementation.createDocument>,
+        $doc-><M::Document.createDocumentFragment>,
+        $docx-><M::d|DocumentXDoctype.createDocumentTypeDefinition> ('d'),
+        $doc-><AG::Document.implementation>
+            -><M::c|DOMImplementation.createDocumentType> ('d'),
+        $doc-><M::Document.createEntityReference> ('ent'),
+        $doc-><M::Document.createElement> ('e'),
+        $doc-><M::Document.createAttribute> ('a'),
+        $doc-><M::Document.createProcessingInstruction> ('pi'),
+        $doc-><M::Document.createComment> ('c'),
+        $doc-><M::Document.createTextNode> ('t'),
+        $doc-><M::Document.createCDATASection> ('cs'),
+        $docx-><M::d|DocumentXDoctype.createGeneralEntity> ('ge'),
+        $docx-><M::d|DocumentXDoctype.createNotation> ('not'),
+        $docx-><M::d|DocumentXDoctype.createElementTypeDefinition> ('et'),
+        $docx-><M::d|DocumentXDoctype.createAttributeDefinition> ('at'),
+        #test:nodeTypes
+      ) {
+        $test->id ('type='.$node-><AG::Node.nodeType>);
+        $test->assert_exception (code => sub {
+          $comment-><M::Node.appendChild> ($node);
+        }, exception_subtype => <Q::MDOMX|HIERARCHY_BAD_TYPE>);
+      }
 ##Comment
 
 ResourceDef:

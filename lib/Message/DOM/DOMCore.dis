@@ -40,7 +40,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/02/18 07:39:03 $
+      $Date: 2006/03/06 10:19:33 $
     @@ContentType:
       dis:Date.RCS
 
@@ -704,15 +704,11 @@ ResourceDef:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@: The type of the node being tried to insert.
-          @@@@XParam:
-            @@@@@QName:
-              MDOMX:param-name
-            @@@@@Type:
-              DOMMain:DOMParameterName
-            @@@@@Description:
-              @@@@@@lang:en
-              @@@@@@@:
-                The name of the parameter that specifies the node.
+        @@@@XParamParamName:
+        @@@@ecore:hasParameter:
+          @@@@@@: c|node
+          @@@@@enDesc:
+            The node being tried to insert.
         @@@SubTypeDef:
           @@@@QName:
             ManakaiDOMHTML:MDOM_NOT_CAPTION
@@ -752,6 +748,16 @@ ResourceDef:
               @@@@@@lang:en
               @@@@@@@:
                 The name of the parameter the node is specified.
+      @@@SubTypeDef:
+        @@@@QName: HIERARCHY_WRONG_DOCTYPE_ERR
+        @@@@enDesc:
+          An attempt is made to insert a <IF::x|DocumentType>
+          node after the document element.
+        @@@@XParamParamName:
+        @@@@ecore:hasParameter:
+          @@@@@@: c|node
+          @@@@@enDesc:
+            The <IF::x|DocumentType> node.
      @@XConst:
         @@@Name:  WRONG_DOCUMENT_ERR
         @@@Type:  
@@ -1277,6 +1283,26 @@ ResourceDef:
           @@@@@@: c|schemaType
           @@@@@enDesc:
             The requested schema language.
+      @@@SubTypeDef:
+        @@@@QName: t|REMOVE_DOCUMENT_ELEMENT_ERR
+        @@@@enDesc:
+          An attempt is made to remove the document element
+          but it is not supported by the DOM implementation.
+        @@@@XParamParamName:
+        @@@@ecore:hasParameter:
+          @@@@@@: c|node
+          @@@@@enDesc:
+            The document element node.
+      @@@SubTypeDef:
+        @@@@QName: t|REMOVE_DOCUMENT_TYPE_ERR
+        @@@@enDesc:
+          An attempt is made to remove the document type node
+          but it is not supported by the DOM implementation.
+        @@@@XParamParamName:
+        @@@@ecore:hasParameter:
+          @@@@@@: c|node
+          @@@@@enDesc:
+            The document type node.
 
      @@XConst:
       @@@QName: c|INUSE_ATTRIBUTE_ERR
