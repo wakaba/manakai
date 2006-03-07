@@ -12,7 +12,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/03/06 13:46:08 $
+    $Date: 2006/03/07 10:30:31 $
 
   @Require:
     @@Module:
@@ -1570,107 +1570,124 @@ IFCls1Def:
         1
         3
 
-
   @Method:
-     @@Name:  replaceChild
-     @@Description:
-        @@@lang:en
-        @@@@:
-          Replace a child node with the other node.
-     @@Param:
-        @@@Name:  newChild
-        @@@Type:  Node
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            The new node to put in the child list.  If the "newChild" node 
-            is already in the tree, it is first removed.
-        @@@InCase:
-          @@@@Type: DocumentFragment
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              The "oldChild" node is replaced by all of the 
-              child nodes of the "newChild" node, in the same order. 
-              The child list of the "newChild" is to be empty. 
-              [DOM 1 SE, 2, 3]
-     @@Param:
-        @@@Name:  oldChild
-        @@@Type:  Node
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            The node being replaced in the child list.
-        @@@InCase:
-          @@@@Label: Same as the "newChild" node
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              Replacing a node with itself is implementation dependent.
-          @@@@SpecLevel: 3
-     @@Return:
-        @@@Type:  Node
-        @@@Description:
-          @@@@lang:en
-          @@@@@: The node replaced.
-        @@@Exception:
-          @@@@Type: DOMException
-          @@@@Name: HIERARCHY_REQUEST_ERR
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              Either this node is of a type that does not allow 
-              children of the type of the "newChild" node [DOM 1, 2, 3],
-              the node to put in is one of ancestors of this node 
-              [DOM 1, 2, 3], the node to put in is this node itself
-              [DOM 2 Errata, 3], or this 
-              node is of type "Document" and the result of the 
-              replacement would add a second "DocumentType" or "Element" node.
-          @@@@ImplNote:
-            @@@@@lang:en
-            @@@@@@:
-              Special treatment required for the "DocumentFragment" node.
-        @@@Exception:
-          @@@@Type: DOMException
-          @@@@Name: WRONG_DOCUMENT_ERR
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              The new node was created from a different document.
-        @@@Exception:
-          @@@@Type: DOMException
-          @@@@Name: NO_MODIFICATION_ALLOWED_ERR
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              Either this node is read-only [DOM 1, 2, 3] or the parent of the 
-              new node is read-only [DOM 1 SE, 2, 3].
-        @@@Exception:
-          @@@@Type: DOMException
-          @@@@Name: NOT_FOUND_ERR
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@: The "oldChild" node is not a child of this node.
-        @@@Exception:
-          @@@@Type: DOMException
-          @@@@Name: NOT_SUPPORTED_ERR
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              This node is of type "Document" and the DOM implementation 
-              does not support the replacement of the "DocumentType" or 
-              "Element" child.
-          @@@@SpecLevel:3
-        @@@c:reports:
-          @@@@@: t|replace-by-itself
-          @@@@enDesc:
-            If the <P::newChild> node is same as the <P::oldChild> node.
-            Result of replacing of a node by itself is implementation
-            dependent.
+    @@Name: replaceChild
+    @@enDesc:
+      Replaces a child node with another node.
 
-            In manakai, such operation has no effect other than the issue
-            of a warning.
-          @@@@For: ManakaiDOM|ManakaiDOM
+      Replacing a node with itself is implementation dependent <SRC::DOM3>.
+    @@Param:
+      @@@Name: newChild
+      @@@Type: Node
+      @@@enDesc:
+        The new node to put in the child list.
+
+        If the <P::newChild> node is already in the tree,
+        it is first removed.
+      @@@InCase:
+        @@@@Type: DocumentFragment
+        @@@@enDesc:
+          The <P::oldChild> node is replaced by all of the 
+          <IF::DocumentFragment> children, which are inserted
+          in the same order <SRC::DOM1 SE, DOM2, DOM3>.
+    @@Param:
+      @@@Name: oldChild
+      @@@Type: Node
+      @@@enDesc:
+        The node being replaced in the list.
+    @@Return:
+      @@@Type: Node
+      @@@enDesc:
+        The node replaced.
+      @@@dx:raises:
+        @@@@@: MDOMX|HIERARCHY_BAD_TYPE
+        @@@@enDesc:
+          If the node is of a type that does not allow children of
+          the type of the <P::newChild> node.
+      @@@dx:raises:
+        @@@@@: MDOMX|HIERARCHY_ANCESTOR_OR_SELF
+        @@@@enDesc:
+          If the <P::newChild> node is one of the node's ancestor
+          <SRC::DOM 1, 2, 3> or the node itself <SRC::DOM 2 Errata, DOM 3>.
+      @@@dx:raises:
+        @@@@@: MDOMX|MDOM_SECOND_DOC_ELEMENT
+        @@@@enDesc:
+          If the node is of type <IF::Document> and an attempt
+          is made to append a second <IF::DocumentType> node
+          <SRC::DOM 3>.
+      @@@dx:raises:
+        @@@@@: MDOMX|MDOM_SECOND_DOCTYPE
+        @@@@enDesc:
+          If the node is of type <IF::Document> and an attempt
+          is made to append a second <IF::x|DocumentType> node
+          <SRC::DOM 3>.
+      @@@dx:raises:
+        @@@@@: c|HIERARCHY_WRONG_DOCTYPE_ERR
+        @@@@enDesc:
+          If the node is of type <IF::Document> and an attempt
+          is made to append a <IF::x|DocumentType> node after
+          an <IF::Element> node.
+        @@@@enImplNote:
+          Although such document type node is not prohibited
+          by DOM specification, Firefox 1.5 and Opera 9 TP1
+          throws an <X::c|DOMException.HIERARCHY_REQUEST_ERR>.
+      @@@dx:raises:
+        @@@@@: c|DIFFERENT_DOCUMENT_ERR
+        @@@@enDesc:
+          If the <P::newChild> node was created from a different
+          document than the one that created the node.
+        @@@@enImplNote:
+          The DOM specification ignores the fact that <IF::Document>s
+          and <IF::x|DocumentType>s are created from 
+          <IF::c|DOMImplementation> :-)
+      @@@dx:raises: 
+        @@@@@: MDOMX|NOMOD_THIS
+        @@@@enDesc:
+          If the node is read-only.
+      @@@dx:raises:
+        @@@@@: MDOMX|NOMOD_SRC_PARENT
+        @@@@enDesc:
+          If the previous parent of the <P::newChild> node is read-only
+          <SRC::DOM1 SE, DOM2, DOM3>.
+      @@@dx:raises:
+        @@@@@: c|NOT_CHILD_ERR
+        @@@@enDesc:
+          If the <P::oldChild> node is not a child of the node.
+      @@@dx:raises:
+        @@@@@: t|REMOVE_DOCUMENT_TYPE_ERR
+        @@@@enDesc:
+          If the node is of type <IF::Document> and the DOM implementation
+          does not support the replacement of a <IF::x|DocumentType> child
+          <SRC::DOM 3>.
+        @@@@ForCheck: !ManakaiDOM|ForClass
+      @@@dx:raises:
+        @@@@@: t|REMOVE_DOCUMENT_ELEMENT_ERR
+        @@@@enDesc:
+          If the node is of type <IF::Document> and the DOM implementation
+          does not support the replacement of a <IF::x|Element> child
+          <SRC::DOM 3>.
+        @@@@ForCheck: !ManakaiDOM|ForClass
+      @@@dx:raises:
+        @@@@@: t|REMOVE_DOCUMENT_TYPE_ERR
+        @@@@enDesc:
+          If the <P::newChild> node is a child of the <IF::Document> node
+          and the DOM implementation does not support the removal
+          of the <IF::x|DocumentType> child.
+        @@@@ForCheck: !ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
+      @@@dx:raises:
+        @@@@@: t|REMOVE_DOCUMENT_ELEMENT_ERR
+        @@@@enDesc:
+          If the <P::newChild> node is a child of the <IF::Document> node
+          and the DOM implementation does not support the removal
+          of the <IF::Element> child.
+        @@@@ForCheck: !ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
+      @@@c:reports:
+        @@@@@: t|replaced-by-itself
+        @@@@enDesc:
+          If the <P::newChild> node is same as the <P::oldChild> node.
+          Then, the result is implementation dependent.
+        @@@@For: ManakaiDOM|ManakaiDOM
+
         @@@PerlDef:
             my $node;
             my $newNode;
@@ -4588,6 +4605,18 @@ IFCls1Def:
             $err-><M::ecore|ErrorInterface||ManakaiDOM|Perl.throw>;
           }
 ##Node
+
+ForDef:
+  @QName: t|ForAppendChild
+  @ISA: ManakaiDOM|ForClass
+
+ForDef:
+  @QName: t|ForInsertBefore
+  @ISA: ManakaiDOM|ForClass
+
+ForDef:
+  @QName: t|ForReplaceChild
+  @ISA: ManakaiDOM|ForClass
 
 ElementTypeBinding:
   @Name: NodeReadOnlyError
