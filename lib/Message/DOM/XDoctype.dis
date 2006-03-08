@@ -17,7 +17,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/03/07 10:30:32 $
+    $Date: 2006/03/08 11:43:07 $
   
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
   
@@ -2319,6 +2319,85 @@ IFClsXDef:
           }},
         }__;
 
+  @CMethod:
+    @@Name: replaceChild
+    @@enDesc:
+      Replaces a child node with another node.
+
+      Replacing a node with itself is implementation dependent <SRC::DOM3>.
+    @@Param:
+      @@@Name: newChild
+      @@@Type: Node
+      @@@enDesc:
+        The new node to put in the child list.
+
+        If the <P::newChild> node is already in the tree,
+        it is first removed.
+      @@@InCase:
+        @@@@Type: DocumentFragment
+        @@@@enDesc:
+          The <P::oldChild> node is replaced by all of the 
+          <IF::DocumentFragment> children, which are inserted
+          in the same order <SRC::DOM1 SE, DOM2, DOM3>.
+    @@Param:
+      @@@Name: oldChild
+      @@@Type: Node
+      @@@enDesc:
+        The node being replaced in the list.
+    @@Return:
+      @@@Type: Node
+      @@@enDesc:
+        The node replaced.
+      @@@dx:raises:
+        @@@@@: MDOMX|HIERARCHY_BAD_TYPE
+        @@@@enDesc:
+          If the node is of a type that does not allow children of
+          the type of the <P::newChild> node.
+      @@@dx:raises:
+        @@@@@: c|DIFFERENT_DOCUMENT_ERR
+        @@@@enDesc:
+          If the <P::newChild> node was created from a different
+          document than the one that created the node.
+        @@@@enImplNote:
+          The DOM specification ignores the fact that <IF::Document>s
+          and <IF::x|DocumentType>s are created from 
+          <IF::c|DOMImplementation> :-)
+      @@@dx:raises: 
+        @@@@@: MDOMX|NOMOD_THIS
+        @@@@enDesc:
+          If the node is read-only.
+      @@@dx:raises:
+        @@@@@: MDOMX|NOMOD_SRC_PARENT
+        @@@@enDesc:
+          If the previous parent of the <P::newChild> node is read-only
+          <SRC::DOM1 SE, DOM2, DOM3>.
+      @@@dx:raises:
+        @@@@@: c|NOT_CHILD_ERR
+        @@@@enDesc:
+          If the <P::oldChild> node is not a child of the node.
+      @@@c:reports:
+        @@@@@: t|replaced-by-itself
+        @@@@enDesc:
+          If the <P::newChild> node is same as the <P::oldChild> node.
+          Then, the result is implementation dependent.
+        @@@@For: ManakaiDOM|ManakaiDOM
+      @@@PerlDef:
+        my $self_od = $self-><AG::Node.ownerDocument>;
+        unless ($self_od) {
+          __EXCEPTION{c|DIFFERENT_DOCUMENT_ERR::
+            MDOMX|param-name => 'newChild',
+            c|node => {$newChild},
+          }__;
+        }
+        __CODE{t|replaceChildImpl1::
+          $self => $self, $self_od => $self_od,
+          $newChild => $newChild, $refChild => $oldChild,
+          $r => $r,
+          $allowedNodeTypes => {{
+            <C::Node.PROCESSING_INSTRUCTION_NODE> => true,
+          }},
+        }__;
+
     @@ResourceDef:
       @@@DISCore:resourceType:
         @@@@@: dis|MultipleResource
@@ -2342,7 +2421,8 @@ IFClsXDef:
       @@@DISCore:resourceType: DISPerl|BlockCode
 
       @@@enDesc:
-        <Perl::$self>, <Perl::$newChild>, <Perl::$refChild> (insertBefore),
+        <Perl::$self>, <Perl::$newChild>, <Perl::$refChild> (insertBefore
+        or replaceChild : <CODE::oldChild>),
         <Perl::$r>, <Perl::$allowedNodeTypes>, <Perl::$self_od>.
   
       @@@PerlDef:
@@ -2398,13 +2478,20 @@ IFClsXDef:
           }
 
           ## -- Insert at...
-          my $index = @{$self->{<H::mn|node>}->{<H::infoset|children>}};
-          __FOR{t:ForInsertBefore::
+          my $index = -1; # last
+          __FOR{!t:ForAppendChild:: # t:ForAppendChild & t:ForReplaceChild
             if (defined $refChild) {
               if ($refChild eq $newChild) {
-                __UNDEEP{__c|ERROR{t|insert-before-itself::
-                  c|relatedData => {$refChild},
-                }__}__;
+                __FOR{t:ForInsertBefore::
+                  __UNDEEP{__c|ERROR{t|insert-before-itself::
+                    c|relatedData => {$refChild},
+                  }__}__;
+                }__;
+                __FOR{t:ForReplaceChild::
+                  __UNDEEP{__c|ERROR{t|replace-by-itself::
+                    c|relatedData => {$refChild},
+                  }__}__;
+                }__;
               }
 
               my $cns = $self-><AG::Node.childNodes>;
@@ -2417,16 +2504,31 @@ IFClsXDef:
                     $index += $i;
                     last C;
                   } elsif ($cn eq $newChild) {
-                    $index = -1;
+                    $index = -1; # offset
                   }
                 }
+                __FOR{t:ForInsertBefore::
+                  __UNDEEP{__EXCEPTION{c|NOT_CHILD_ERR::
+                    MDOMX|param-name => 'refChild',
+                    c|node => {$refChild},
+                  }__}__;
+                }__;
+                __FOR{t:ForReplaceChild::
+                  __UNDEEP{__EXCEPTION{c|NOT_CHILD_ERR::
+                    MDOMX|param-name => 'oldChild',
+                    c|node => {$refChild},
+                  }__}__;
+                }__;
+              } # C
+            } else { # |oldChild| is not defined
+              __FOR{t:ForReplaceChild::
                 __UNDEEP{__EXCEPTION{c|NOT_CHILD_ERR::
-                  MDOMX|param-name => 'refChild',
+                  MDOMX|param-name => 'oldChild',
                   c|node => {$refChild},
                 }__}__;
-              } # C
+              }__;
             }
-          }__;
+          }__; # FOR !t:ForAppendChild
 
           ## -- Removes from parent
           if ($nc_parent) {
@@ -2453,11 +2555,33 @@ IFClsXDef:
             $ncs->{<H::infoset|parent>} = $self->{<H::mn|node>};
           }
 
-          ## -- Adds to children list
-          splice @{$self->{<H::mn|node>}->{<H::infoset|children>}},
-                 $index, 0, map {$_->{<H::mn|node>}} @new_child;
+          __FOR{t:ForAppendChild::
+            ## -- Adds to children list
+            push @{$self->{<H::mn|node>}->{<H::infoset|children>}},
+                 map {$_->{<H::mn|node>}} @new_child;
+            $r = $newChild;
+          }__;
 
-          $r = $newChild;
+          __FOR{t:ForInsertBefore::
+            ## -- Adds to children list
+            if ($index == -1) {
+              push @{$self->{<H::mn|node>}->{<H::infoset|children>}},
+                   map {$_->{<H::mn|node>}} @new_child;
+            } else {
+              splice @{$self->{<H::mn|node>}->{<H::infoset|children>}},
+                     $index, 0, map {$_->{<H::mn|node>}} @new_child;
+            }
+            $r = $newChild;
+          }__;
+
+          __FOR{t:ForReplaceChild::
+            ## -- Replaces the node
+            splice @{$self->{<H::mn|node>}->{<H::infoset|children>}},
+                   $index, 1, map {$_->{<H::mn|node>}} @new_child;
+            delete $refChild->{<H::mn|node>}->{<H::infoset|parent>};
+            $refChild->{<H::mn|node>}-><M::NodeStem.orphanate>;
+            $r = $refChild;
+          }__;
         }__;
 
     @@Test:
@@ -2786,6 +2910,65 @@ IFClsXDef:
 
         $test->id ('return');
         $test->assert_equals ($return, $piparent);
+    @@Test:
+      @@@QName: Doctype.replaceChild.documentfragment.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{t|createDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $docx-><M::DocumentXDoctype.createDocumentTypeDefinition>
+                           ('dt');
+        my $pi0 = $doc-><M::Document.createProcessingInstruction> ('pi0');
+        $dtd-><M::Node.appendChild> ($pi0);
+
+        my $piparent = $doc-><M::Document.createDocumentFragment>;
+        my $pi = $doc-><M::Document.createProcessingInstruction> ('pi');
+        $piparent-><M::Node.appendChild> ($pi);
+
+        my $return = $dtd-><M::Node.replaceChild> ($piparent, $pi0);
+
+        my $child = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('child.length');
+        $test->assert_num_equals
+                 (actual_value => 0+@$child,
+                  expected_value => 1);
+
+        my $item = $child-><M::t|NodeList.item> (0);
+
+        $test->id ('child.item.node');
+        $test->assert_isa ($item, <IFName::Node>);
+
+        $test->id ('child.item.pi');
+        $test->assert_isa ($item, <IFName::x|ProcessingInstruction>);
+
+        $test->id ('child.item.equals');
+        $test->assert_equals ($item, $pi);
+
+        $test->id ('treeid');
+        $test->assert_equals
+                 ($item->{<H::mn|node>}->{<H::mn|treeID>},
+                  $dtd->{<H::mn|node>}->{<H::mn|treeID>});
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi);
+
+        $test->id ('parent');
+        my $parent = $item-><AG::Node.parentNode>;
+        $test->assert_equals ($parent, $dtd);
+
+        $test->id ('former.parent.child');
+        my $piparentchild = $piparent-><AG::Node.childNodes>;
+        $test->assert_num_equals
+                 (actual_value => 0+@$piparentchild,
+                  expected_value => 0);
+
+        $test->id ('return');
+        $test->assert_equals ($return, $pi0);
 
     @@Test:
       @@@QName: Doctype.appendChild.documentfragment.2.test
@@ -2849,6 +3032,39 @@ IFClsXDef:
 
         $test->id ('return');
         $test->assert_equals ($return, $piparent);
+    @@Test:
+      @@@QName: Doctype.replaceChild.documentfragment.2.test
+      @@@enDesc:
+        Empty document fragment.
+      @@@PerlDef:
+        my $doc;
+        __CODE{t|createDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $docx-><M::DocumentXDoctype.createDocumentTypeDefinition>
+                           ('dt');
+        my $pi0 = $doc-><M::Document.createProcessingInstruction> ('pi0');
+        $dtd-><M::Node.appendChild> ($pi0);
+
+        my $piparent = $doc-><M::Document.createDocumentFragment>;
+
+        my $return = $dtd-><M::Node.replaceChild> ($piparent, $pi0);
+
+        my $child = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('child.length');
+        $test->assert_num_equals
+                 (actual_value => 0+@$child,
+                  expected_value => 0);
+
+        $test->id ('former.parent.child');
+        my $piparentchild = $piparent-><AG::Node.childNodes>;
+        $test->assert_num_equals
+                 (actual_value => 0+@$piparentchild,
+                  expected_value => 0);
+
+        $test->id ('return');
+        $test->assert_equals ($return, $pi0);
 
     @@Test:
       @@@QName: Doctype.appendChild.documentfragment.3.test
@@ -3032,6 +3248,99 @@ IFClsXDef:
 
         $test->id ('return');
         $test->assert_equals ($return, $piparent);
+    @@Test:
+      @@@QName: Doctype.replaceChild.documentfragment.3.test
+      @@@enDesc:
+        Three PIs in document fragment.
+      @@@PerlDef:
+        my $doc;
+        __CODE{t|createDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $docx-><M::DocumentXDoctype.createDocumentTypeDefinition>
+                           ('dt');
+        my $pi0 = $doc-><M::Document.createProcessingInstruction> ('pi0');
+        $dtd-><M::Node.appendChild> ($pi0);
+
+        my $piparent = $doc-><M::Document.createDocumentFragment>;
+        my $pi = $doc-><M::Document.createProcessingInstruction> ('pi');
+        my $pi2 = $doc-><M::Document.createProcessingInstruction> ('pi2');
+        my $pi3 = $doc-><M::Document.createProcessingInstruction> ('pi3');
+        $piparent-><M::Node.appendChild> ($pi);
+        $piparent-><M::Node.appendChild> ($pi2);
+        $piparent-><M::Node.appendChild> ($pi3);
+
+        my $return = $dtd-><M::Node.replaceChild> ($piparent, $pi0);
+
+        my $child = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('child.length');
+        $test->assert_num_equals
+                 (actual_value => 0+@$child,
+                  expected_value => 3);
+
+        my $item = $child-><M::t|NodeList.item> (0);
+        my $item2 = $child-><M::t|NodeList.item> (1);
+        my $item3 = $child-><M::t|NodeList.item> (2);
+
+        $test->id ('child.item.node');
+        $test->assert_isa ($item, <IFName::Node>);
+        $test->id ('child.item.node2');
+        $test->assert_isa ($item2, <IFName::Node>);
+        $test->id ('child.item.node3');
+        $test->assert_isa ($item3, <IFName::Node>);
+
+        $test->id ('child.item.pi');
+        $test->assert_isa ($item, <IFName::x|ProcessingInstruction>);
+        $test->id ('child.item.pi2');
+        $test->assert_isa ($item2, <IFName::x|ProcessingInstruction>);
+        $test->id ('child.item.pi3');
+        $test->assert_isa ($item3, <IFName::x|ProcessingInstruction>);
+
+        $test->id ('child.item.equals');
+        $test->assert_equals ($item, $pi);
+        $test->id ('child.item.equals2');
+        $test->assert_equals ($item2, $pi2);
+        $test->id ('child.item.equals3');
+        $test->assert_equals ($item3, $pi3);
+
+        $test->id ('treeid');
+        $test->assert_equals
+                 ($item->{<H::mn|node>}->{<H::mn|treeID>},
+                  $dtd->{<H::mn|node>}->{<H::mn|treeID>});
+        $test->id ('treeid2');
+        $test->assert_equals
+                 ($item2->{<H::mn|node>}->{<H::mn|treeID>},
+                  $dtd->{<H::mn|node>}->{<H::mn|treeID>});
+        $test->id ('treeid3');
+        $test->assert_equals
+                 ($item3->{<H::mn|node>}->{<H::mn|treeID>},
+                  $dtd->{<H::mn|node>}->{<H::mn|treeID>});
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi3);
+
+        $test->id ('parent');
+        my $parent = $item-><AG::Node.parentNode>;
+        $test->assert_equals ($parent, $dtd);
+        $test->id ('parent2');
+        my $parent2 = $item2-><AG::Node.parentNode>;
+        $test->assert_equals ($parent2, $dtd);
+        $test->id ('parent3');
+        my $parent3 = $item3-><AG::Node.parentNode>;
+        $test->assert_equals ($parent3, $dtd);
+
+        $test->id ('former.parent.child');
+        my $piparentchild = $piparent-><AG::Node.childNodes>;
+        $test->assert_num_equals
+                 (actual_value => 0+@$piparentchild,
+                  expected_value => 0);
+
+        $test->id ('return');
+        $test->assert_equals ($return, $pi0);
 
     @@Test:
       @@@QName: DTDef.appendChild.badtype.test
@@ -3042,6 +3351,8 @@ IFClsXDef:
 
         my $comment = $docx-><M::DocumentXDoctype.createDocumentTypeDefinition>
                                ('data');
+        my $pi0 = $doc-><M::Document.createProcessingInstruction> ('pi0');
+        $comment-><M::Node.appendChild> ($pi0);
 
         for my $node (
           $docx-><M::d|DocumentXDoctype.createDocumentTypeDefinition> ('d'),
@@ -3065,6 +3376,11 @@ IFClsXDef:
           $test->id ('insertBefore.'.$node-><AG::Node.nodeType>);
           $test->assert_exception (code => sub {
             $comment-><M::Node.insertBefore> ($node);
+          }, exception_subtype => <Q::MDOMX|HIERARCHY_BAD_TYPE>);
+
+          $test->id ('replaceChild.'.$node-><AG::Node.nodeType>);
+          $test->assert_exception (code => sub {
+            $comment-><M::Node.replaceChild> ($node, $pi0);
           }, exception_subtype => <Q::MDOMX|HIERARCHY_BAD_TYPE>);
         }
 
@@ -3103,6 +3419,8 @@ IFClsXDef:
 
         my $comment = $docx0-><M::DocumentXDoctype.createDocumentTypeDefinition>
                                 ('data');
+        my $pi0 = $doc0-><M::Document.createProcessingInstruction> ('pi0');
+        $comment-><M::Node.appendChild> ($pi0);
 
         for my $node (
           $doc-><M::Document.createProcessingInstruction> ('pi'),
@@ -3115,6 +3433,11 @@ IFClsXDef:
           $test->id ('insertBefore.'.$node-><AG::Node.nodeType>);
           $test->assert_exception (code => sub {
             $comment-><M::Node.insertBefore> ($node);
+          }, exception_subtype => <Q::c|DIFFERENT_DOCUMENT_ERR>);
+
+          $test->id ('replaceChild.'.$node-><AG::Node.nodeType>);
+          $test->assert_exception (code => sub {
+            $comment-><M::Node.replaceChild> ($node, $pi0);
           }, exception_subtype => <Q::c|DIFFERENT_DOCUMENT_ERR>);
         }
 
@@ -3143,6 +3466,13 @@ IFClsXDef:
           $dtype-><M::Node.insertBefore> ($node);
         }, exception_subtype => <Q::c|DIFFERENT_DOCUMENT_ERR>);
 
+        $test->id ('replaceChild.'.$node-><AG::Node.nodeType>);
+        my $pi0 = $doc-><M::Document.createProcessingInstruction> ('pi0');
+                     ## DocumentType with no ownerDocument cannot have children.
+        $test->assert_exception (code => sub {
+          $dtype-><M::Node.replaceChild> ($node, $pi0);
+        }, exception_subtype => <Q::c|DIFFERENT_DOCUMENT_ERR>);
+
     @@Test:
       @@@QName: DTDef.appendChild.readonly.1.test
       @@@PerlDef:
@@ -3152,6 +3482,8 @@ IFClsXDef:
 
         my $dtd = $docx-><M::DocumentXDoctype.createDocumentTypeDefinition>
                            ('d');
+        my $pi0 = $doc-><M::Document.createProcessingInstruction> ('pi0');
+        $dtd-><M::Node.appendChild> ($pi0);
         $dtd->{<H::mn|node>}->{<H::c|read-only>} = true;
 
         $test->id ('pi');
@@ -3164,6 +3496,11 @@ IFClsXDef:
         $test->id ('pi.insertBefore');
         $test->assert_exception (code => sub {
           $dtd-><M::Node.insertBefore> ($node);
+        }, exception_subtype => <Q::MDOMX|NOMOD_THIS>);
+
+        $test->id ('pi.replaceChild');
+        $test->assert_exception (code => sub {
+          $dtd-><M::Node.replaceChild> ($node, $pi0);
         }, exception_subtype => <Q::MDOMX|NOMOD_THIS>);
 
         $test->id ('fragment');
@@ -3179,6 +3516,11 @@ IFClsXDef:
           $dtd-><M::Node.insertBefore> ($node2);
         }, exception_subtype => <Q::MDOMX|NOMOD_THIS>);
 
+        $test->id ('fragment.replaceChild');
+        $test->assert_exception (code => sub {
+          $dtd-><M::Node.replaceChild> ($node2, $pi0);
+        }, exception_subtype => <Q::MDOMX|NOMOD_THIS>);
+
     @@Test:
       @@@QName: DTDef.appendChild.readonly.2.test
       @@@PerlDef:
@@ -3188,6 +3530,8 @@ IFClsXDef:
 
         my $dtd = $docx-><M::DocumentXDoctype.createDocumentTypeDefinition>
                            ('d');
+        my $pi0 = $doc-><M::Document.createProcessingInstruction> ('pi0');
+        $dtd-><M::Node.appendChild> ($pi0);
 
         $test->id ('pi');
         my $el = $doc-><M::Document.createElementNS> (null, 'e');
@@ -3204,6 +3548,11 @@ IFClsXDef:
           $dtd-><M::Node.insertBefore> ($node);
         }, exception_subtype => <Q::MDOMX|NOMOD_SRC_PARENT>);
 
+        $test->id ('pi.replaceChild');
+        $test->assert_exception (code => sub {
+          $dtd-><M::Node.replaceChild> ($node, $pi0);
+        }, exception_subtype => <Q::MDOMX|NOMOD_SRC_PARENT>);
+
         $test->id ('fragment');
         my $node2 = $doc-><M::Document.createDocumentFragment>;
         my $node3 = $doc-><M::Document.createProcessingInstruction> ('pi');
@@ -3217,6 +3566,11 @@ IFClsXDef:
         $test->id ('fragment.insertBefore');
         $test->assert_exception (code => sub {
           $dtd-><M::Node.insertBefore> ($node2);
+        }, exception_subtype => <Q::MDOMX|NOMOD_SRC_PARENT>);
+
+        $test->id ('fragment.replaceChild');
+        $test->assert_exception (code => sub {
+          $dtd-><M::Node.replaceChild> ($node2, $pi0);
         }, exception_subtype => <Q::MDOMX|NOMOD_SRC_PARENT>);
 
     @@Test:
@@ -3436,6 +3790,459 @@ IFClsXDef:
         $test->assert_num_equals
                  (actual_value => 0+@{$dtd-><AG::Node.childNodes>},
                   expected_value => 2);
+
+    @@Test:
+      @@@QName: DTDef.replaceChild.oldChild=newChild.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{t|createDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $docx-><M::DocumentXDoctype.createDocumentTypeDefinition>
+                           ('d');
+
+        my $pi1 = $doc-><M::Document.createProcessingInstruction> ('pi1');
+        $dtd-><M::Node.appendChild> ($pi1);
+
+        my $pi2 = $doc-><M::Document.createProcessingInstruction> ('pi2');
+        $dtd-><M::Node.appendChild> ($pi2);
+
+        # pi1, pi2
+
+        my $eh_called = false;
+        my $cfg = $doc-><AG::Document.domConfig>;
+        $cfg-><M::c|DOMConfiguration.setParameter> ('error-handler' => sub {
+          my (undef, $err) = @_;
+          $eh_called = true;
+          $test->assert_equals ($err-><AG::c|DOMError.severity>,
+                                <C::c|DOMError.SEVERITY_WARNING>);
+          $test->assert_equals ($err-><AG::c|DOMError.type>,
+                                <Q::t|replace-by-itself>);
+          $test->assert_equals ($err-><AG::c|DOMError.relatedData>, $pi2);
+          $test->assert_null ($err-><AG::c|DOMError.relatedException>);
+          $test->assert_isa ($err-><AG::c|DOMError.location>,
+                             <IFName::c|DOMLocator>);
+          $test->assert_not_null ($err-><AG::c|DOMError.message>);
+        });
+
+        $test->assert_false ($eh_called);
+        $dtd-><M::Node.replaceChild> ($pi2, $pi2);
+        $test->assert_true ($eh_called);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi1);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi2);
+
+        $test->id ('length');
+        $test->assert_num_equals
+                 (actual_value => 0+@{$dtd-><AG::Node.childNodes>},
+                  expected_value => 2);
+
+    @@Test:
+      @@@QName: DTDef.appendChild.sameparent.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{t|createDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $docx-><M::DocumentXDoctype.createDocumentTypeDefinition>
+                           ('d');
+
+        my $pi1 = $doc-><M::Document.createProcessingInstruction> ('pi1');
+        $dtd-><M::Node.appendChild> ($pi1);
+
+        my $pi2 = $doc-><M::Document.createProcessingInstruction> ('pi2');
+        $dtd-><M::Node.appendChild> ($pi2);
+
+        # pi1, pi2
+
+        my $return = $dtd-><M::Node.appendChild> ($pi1);
+
+        # pi2, pi1
+
+        $test->id ('return');
+        $test->assert_equals ($return, $pi1);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi2);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi1);
+
+        $test->id ('length');
+        $test->assert_num_equals
+                 (actual_value => 0+@{$dtd-><AG::Node.childNodes>},
+                  expected_value => 2);
+
+    @@Test:
+      @@@QName: DTDef.insertBefore.sameparent.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{t|createDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $docx-><M::DocumentXDoctype.createDocumentTypeDefinition>
+                           ('d');
+
+        my $pi1 = $doc-><M::Document.createProcessingInstruction> ('pi1');
+        $dtd-><M::Node.appendChild> ($pi1);
+
+        my $pi2 = $doc-><M::Document.createProcessingInstruction> ('pi2');
+        $dtd-><M::Node.appendChild> ($pi2);
+
+        # pi1, pi2
+
+        my $return = $dtd-><M::Node.insertBefore> ($pi1);
+
+        # pi2, pi1
+
+        $test->id ('return');
+        $test->assert_equals ($return, $pi1);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi2);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi1);
+
+        $test->id ('length');
+        $test->assert_num_equals
+                 (actual_value => 0+@{$dtd-><AG::Node.childNodes>},
+                  expected_value => 2);
+
+    @@Test:
+      @@@QName: DTDef.appendChild.sameparent.2.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{t|createDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $docx-><M::DocumentXDoctype.createDocumentTypeDefinition>
+                           ('d');
+
+        my $pi1 = $doc-><M::Document.createProcessingInstruction> ('pi1');
+        $dtd-><M::Node.appendChild> ($pi1);
+
+        my $pi2 = $doc-><M::Document.createProcessingInstruction> ('pi2');
+        $dtd-><M::Node.appendChild> ($pi2);
+
+        # pi1, pi2
+
+        my $return = $dtd-><M::Node.appendChild> ($pi2);
+
+        # pi1, pi2
+
+        $test->id ('return');
+        $test->assert_equals ($return, $pi2);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi1);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi2);
+
+        $test->id ('length');
+        $test->assert_num_equals
+                 (actual_value => 0+@{$dtd-><AG::Node.childNodes>},
+                  expected_value => 2);
+
+    @@Test:
+      @@@QName: DTDef.insertBefore.sameparent.2.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{t|createDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $docx-><M::DocumentXDoctype.createDocumentTypeDefinition>
+                           ('d');
+
+        my $pi1 = $doc-><M::Document.createProcessingInstruction> ('pi1');
+        $dtd-><M::Node.appendChild> ($pi1);
+
+        my $pi2 = $doc-><M::Document.createProcessingInstruction> ('pi2');
+        $dtd-><M::Node.appendChild> ($pi2);
+
+        # pi1, pi2
+
+        my $return = $dtd-><M::Node.insertBefore> ($pi2);
+
+        # pi1, pi2
+
+        $test->id ('return');
+        $test->assert_equals ($return, $pi2);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi1);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi2);
+
+        $test->id ('length');
+        $test->assert_num_equals
+                 (actual_value => 0+@{$dtd-><AG::Node.childNodes>},
+                  expected_value => 2);
+
+    @@Test:
+      @@@QName: DTDef.replaceChild.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{t|createDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $docx-><M::DocumentXDoctype.createDocumentTypeDefinition>
+                           ('d');
+
+        my $pi1 = $doc-><M::Document.createProcessingInstruction> ('pi1');
+        $dtd-><M::Node.appendChild> ($pi1);
+
+        my $pi2 = $doc-><M::Document.createProcessingInstruction> ('pi2');
+        $dtd-><M::Node.appendChild> ($pi2);
+
+        my $pi3 = $doc-><M::Document.createProcessingInstruction> ('pi3');
+        $dtd-><M::Node.appendChild> ($pi3);
+
+        # pi1, pi2, pi3
+
+        my $pi9 = $doc-><M::Document.createProcessingInstruction> ('pi9');
+        my $return = $dtd-><M::Node.replaceChild> ($pi9, $pi1);
+
+        # pi9, pi2, pi3
+
+        $test->id ('return.node');
+        $test->assert_isa ($return, <IFName::Node>);
+        $test->id ('return.pi');
+        $test->assert_isa ($return, <IFName::x|ProcessingInstruction>);
+        $test->id ('return');
+        $test->assert_equals ($return, $pi1);
+
+        my $c = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('length');
+        $test->assert_num_equals (actual_value => 0+@$c, expected_value => 3);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi9);
+
+        $test->id ('firstChild.nextSibling');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>
+                                  -><AG::Node.nextSibling>, $pi2);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi3);
+ 
+        $test->id ('parent');
+        $test->assert_equals ($pi9-><AG::Node.parentNode>, $dtd);
+
+        $test->id ('return.parent');
+        $test->assert_null ($pi1-><AG::Node.parentNode>);
+
+    @@Test:
+      @@@QName: DTDef.replaceChild.2.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{t|createDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $docx-><M::DocumentXDoctype.createDocumentTypeDefinition>
+                           ('d');
+
+        my $pi1 = $doc-><M::Document.createProcessingInstruction> ('pi1');
+        $dtd-><M::Node.appendChild> ($pi1);
+
+        my $pi2 = $doc-><M::Document.createProcessingInstruction> ('pi2');
+        $dtd-><M::Node.appendChild> ($pi2);
+
+        my $pi3 = $doc-><M::Document.createProcessingInstruction> ('pi3');
+        $dtd-><M::Node.appendChild> ($pi3);
+
+        # pi1, pi2, pi3
+
+        my $pi9 = $doc-><M::Document.createProcessingInstruction> ('pi9');
+        my $return = $dtd-><M::Node.replaceChild> ($pi9, $pi2);
+
+        # pi1, pi9, pi3
+
+        $test->id ('return.node');
+        $test->assert_isa ($return, <IFName::Node>);
+        $test->id ('return.pi');
+        $test->assert_isa ($return, <IFName::x|ProcessingInstruction>);
+        $test->id ('return');
+        $test->assert_equals ($return, $pi2);
+
+        my $c = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('length');
+        $test->assert_num_equals (actual_value => 0+@$c, expected_value => 3);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi1);
+
+        $test->id ('firstChild.nextSibling');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>
+                                  -><AG::Node.nextSibling>, $pi9);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi3);
+ 
+        $test->id ('parent');
+        $test->assert_equals ($pi9-><AG::Node.parentNode>, $dtd);
+
+        $test->id ('return.parent');
+        $test->assert_null ($pi2-><AG::Node.parentNode>);
+
+    @@Test:
+      @@@QName: DTDef.replaceChild.3.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{t|createDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $docx-><M::DocumentXDoctype.createDocumentTypeDefinition>
+                           ('d');
+
+        my $pi1 = $doc-><M::Document.createProcessingInstruction> ('pi1');
+        $dtd-><M::Node.appendChild> ($pi1);
+
+        my $pi2 = $doc-><M::Document.createProcessingInstruction> ('pi2');
+        $dtd-><M::Node.appendChild> ($pi2);
+
+        my $pi3 = $doc-><M::Document.createProcessingInstruction> ('pi3');
+        $dtd-><M::Node.appendChild> ($pi3);
+
+        # pi1, pi2, pi3
+
+        my $pi9 = $doc-><M::Document.createProcessingInstruction> ('pi9');
+        my $return = $dtd-><M::Node.replaceChild> ($pi9, $pi3);
+
+        # pi1, pi2, pi9
+
+        $test->id ('return.node');
+        $test->assert_isa ($return, <IFName::Node>);
+        $test->id ('return.pi');
+        $test->assert_isa ($return, <IFName::x|ProcessingInstruction>);
+        $test->id ('return');
+        $test->assert_equals ($return, $pi3);
+
+        my $c = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('length');
+        $test->assert_num_equals (actual_value => 0+@$c, expected_value => 3);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi1);
+
+        $test->id ('firstChild.nextSibling');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>
+                                  -><AG::Node.nextSibling>, $pi2);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi9);
+ 
+        $test->id ('parent');
+        $test->assert_equals ($pi9-><AG::Node.parentNode>, $dtd);
+
+        $test->id ('return.parent');
+        $test->assert_null ($pi3-><AG::Node.parentNode>);
+
+    @@Test:
+      @@@QName: DTDef.replaceChild.sameparent.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{t|createDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $docx-><M::DocumentXDoctype.createDocumentTypeDefinition>
+                           ('d');
+
+        my $pi1 = $doc-><M::Document.createProcessingInstruction> ('pi1');
+        $dtd-><M::Node.appendChild> ($pi1);
+
+        my $pi2 = $doc-><M::Document.createProcessingInstruction> ('pi2');
+        $dtd-><M::Node.appendChild> ($pi2);
+
+        my $pi3 = $doc-><M::Document.createProcessingInstruction> ('pi3');
+        $dtd-><M::Node.appendChild> ($pi3);
+
+        # pi1, pi2, pi3
+
+        my $return = $dtd-><M::Node.replaceChild> ($pi3, $pi1);
+
+        # pi3, pi2
+
+        $test->id ('return.node');
+        $test->assert_isa ($return, <IFName::Node>);
+        $test->id ('return.pi');
+        $test->assert_isa ($return, <IFName::x|ProcessingInstruction>);
+        $test->id ('return');
+        $test->assert_equals ($return, $pi1);
+
+        my $c = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('length');
+        $test->assert_num_equals (actual_value => 0+@$c, expected_value => 2);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi3);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi2);
+ 
+        $test->id ('parent');
+        $test->assert_equals ($pi3-><AG::Node.parentNode>, $dtd);
+
+        $test->id ('return.parent');
+        $test->assert_null ($pi1-><AG::Node.parentNode>);
+
+    @@Test:
+      @@@QName: DTDef.replaceChild.sameparent.2.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{t|createDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $docx-><M::DocumentXDoctype.createDocumentTypeDefinition>
+                           ('d');
+
+        my $pi1 = $doc-><M::Document.createProcessingInstruction> ('pi1');
+        $dtd-><M::Node.appendChild> ($pi1);
+
+        my $pi2 = $doc-><M::Document.createProcessingInstruction> ('pi2');
+        $dtd-><M::Node.appendChild> ($pi2);
+
+        my $pi3 = $doc-><M::Document.createProcessingInstruction> ('pi3');
+        $dtd-><M::Node.appendChild> ($pi3);
+
+        # pi1, pi2, pi3
+
+        my $return = $dtd-><M::Node.replaceChild> ($pi1, $pi3);
+
+        # pi2, pi1
+
+        $test->id ('return.node');
+        $test->assert_isa ($return, <IFName::Node>);
+        $test->id ('return.pi');
+        $test->assert_isa ($return, <IFName::x|ProcessingInstruction>);
+        $test->id ('return');
+        $test->assert_equals ($return, $pi3);
+
+        my $c = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('length');
+        $test->assert_num_equals (actual_value => 0+@$c, expected_value => 2);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi2);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi1);
+ 
+        $test->id ('parent');
+        $test->assert_equals ($pi1-><AG::Node.parentNode>, $dtd);
+
+        $test->id ('return.parent');
+        $test->assert_null ($pi3-><AG::Node.parentNode>);
 
   @Method:
     @@ForCheck: ManakaiDOM|ForClass
@@ -4286,6 +5093,31 @@ IFClsXDef:
       @@@disDef:
         @@@@DISPerl:cloneCode: t|ManakaiDOMCharacterData.insertBefore
 
+  @CMethod:
+    @@Name: replaceChild
+    @@enDesc:
+      Replaces a node by another node.
+    @@Param:
+      @@@Name: newChild
+      @@@Type: Node
+      @@@enDesc:
+        The node to add.
+    @@Param:
+      @@@Name: oldChild
+      @@@Type: Node
+      @@@enDesc:
+        The node to remove.
+    @@Return:
+      @@@Type: Node
+      @@@enDesc:
+        The node replaced.
+      @@@dx:raises:
+        @@@@@: MDOMX|HIERARCHY_BAD_TYPE
+        @@@@enDesc:
+          The type of the node does not allow any children.
+      @@@disDef:
+        @@@@DISPerl:cloneCode: t|ManakaiDOMCharacterData.replaceChild
+
     @@Test:
       @@@QName: ETDef.appendChild.test
       @@@PerlDef:
@@ -4295,6 +5127,7 @@ IFClsXDef:
 
         my $comment = $docx-><M::DocumentXDoctype.createElementTypeDefinition>
                                ('data');
+        my $node2 = $doc-><M::Document.createTextNode> ('2');
 
         for my $node (
           $doc-><AG::Document.implementation>
@@ -4324,6 +5157,11 @@ IFClsXDef:
           $test->id ('insertBefore.'.$node-><AG::Node.nodeType>);
           $test->assert_exception (code => sub {
             $comment-><M::Node.insertBefore> ($node);
+          }, exception_subtype => <Q::MDOMX|HIERARCHY_BAD_TYPE>);
+
+          $test->id ('replaceChild.'.$node-><AG::Node.nodeType>);
+          $test->assert_exception (code => sub {
+            $comment-><M::Node.replaceChild> ($node, $node2);
           }, exception_subtype => <Q::MDOMX|HIERARCHY_BAD_TYPE>);
         }
 

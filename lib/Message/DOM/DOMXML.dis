@@ -41,7 +41,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date:
-    $Date: 2006/03/06 13:46:08 $
+    $Date: 2006/03/08 11:43:06 $
   
   @Require:
     @@Module:
@@ -812,6 +812,7 @@ ResourceDef:
       my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
       my $comment = $doc-><M::Document.createCDATASection> ('data');
+      my $node2 = $doc-><M::Document.createCDATASection> ('data');
 
       for my $node (
         $doc-><AG::Document.implementation>
@@ -841,6 +842,11 @@ ResourceDef:
         $test->id ('insertBefore.'.$node-><AG::Node.nodeType>);
         $test->assert_exception (code => sub {
           $comment-><M::Node.insertBefore> ($node);
+        }, exception_subtype => <Q::MDOMX|HIERARCHY_BAD_TYPE>);
+
+        $test->id ('replaceChild.'.$node-><AG::Node.nodeType>);
+        $test->assert_exception (code => sub {
+          $comment-><M::Node.replaceChild> ($node, $node2);
         }, exception_subtype => <Q::MDOMX|HIERARCHY_BAD_TYPE>);
       }
 
@@ -1649,6 +1655,31 @@ NodeTypeDef:
       @@@disDef:
         @@@@DISPerl:cloneCode: t|ManakaiDOMCharacterData.insertBefore
 
+  @CMethod:
+    @@Name: replaceChild
+    @@enDesc:
+      Replaces a node by another node.
+    @@Param:
+      @@@Name: newChild
+      @@@Type: Node
+      @@@enDesc:
+        The node to add.
+    @@Param:
+      @@@Name: oldChild
+      @@@Type: Node
+      @@@enDesc:
+        The node to remove.
+    @@Return:
+      @@@Type: Node
+      @@@enDesc:
+        The node added.
+      @@@dx:raises:
+        @@@@@: MDOMX|HIERARCHY_BAD_TYPE
+        @@@@enDesc:
+          The type of the node does not allow any children.
+      @@@disDef:
+        @@@@DISPerl:cloneCode: t|ManakaiDOMCharacterData.replaceChild
+
     @@Test:
       @@@QName: Notation.appendChild.test
       @@@PerlDef:
@@ -1657,6 +1688,7 @@ NodeTypeDef:
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
         my $comment = $docx-><M::d|DocumentXDoctype.createNotation> ('data');
+        my $node2 = $docx-><M::d|DocumentXDoctype.createNotation> ('data');
 
         for my $node (
           $doc-><AG::Document.implementation>
@@ -1686,6 +1718,11 @@ NodeTypeDef:
           $test->id ('insertBefore.'.$node-><AG::Node.nodeType>);
           $test->assert_exception (code => sub {
             $comment-><M::Node.insertBefore> ($node);
+          }, exception_subtype => <Q::MDOMX|HIERARCHY_BAD_TYPE>);
+
+          $test->id ('replaceChild.'.$node-><AG::Node.nodeType>);
+          $test->assert_exception (code => sub {
+            $comment-><M::Node.replaceChild> ($node, $node2);
           }, exception_subtype => <Q::MDOMX|HIERARCHY_BAD_TYPE>);
         }
 
@@ -3411,6 +3448,31 @@ NodeTypeDef:
       @@@disDef:
         @@@@DISPerl:cloneCode: t|ManakaiDOMCharacterData.insertBefore
 
+  @CMethod:
+    @@Name: replaceChild
+    @@enDesc:
+      Replaces a node by another node.
+    @@Param:
+      @@@Name: newChild
+      @@@Type: Node
+      @@@enDesc:
+        The node to add.
+    @@Param:
+      @@@Name: oldChild
+      @@@Type: Node
+      @@@enDesc:
+        The node to remove.
+    @@Return:
+      @@@Type: Node
+      @@@enDesc:
+        The node added.
+      @@@dx:raises:
+        @@@@@: MDOMX|HIERARCHY_BAD_TYPE
+        @@@@enDesc:
+          The type of the node does not allow any children.
+      @@@disDef:
+        @@@@DISPerl:cloneCode: t|ManakaiDOMCharacterData.replaceChild
+
     @@Test:
       @@@QName: PI.appendChild.test
       @@@PerlDef:
@@ -3419,6 +3481,7 @@ NodeTypeDef:
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
         my $comment = $doc-><M::Document.createProcessingInstruction> ('data');
+        my $node2 = $doc-><M::Document.createProcessingInstruction> ('data');
 
         for my $node (
           $doc-><AG::Document.implementation>
@@ -3448,6 +3511,11 @@ NodeTypeDef:
           $test->id ('insertBefore.'.$node-><AG::Node.nodeType>);
           $test->assert_exception (code => sub {
             $comment-><M::Node.insertBefore> ($node);
+          }, exception_subtype => <Q::MDOMX|HIERARCHY_BAD_TYPE>);
+
+          $test->id ('replaceChild.'.$node-><AG::Node.nodeType>);
+          $test->assert_exception (code => sub {
+            $comment-><M::Node.replaceChild> ($node, $node2);
           }, exception_subtype => <Q::MDOMX|HIERARCHY_BAD_TYPE>);
         }
 

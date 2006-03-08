@@ -18,7 +18,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date:
-    $Date: 2005/11/23 07:58:40 $
+    $Date: 2006/03/08 11:43:07 $
   
   @Require:
     @@Module:
@@ -401,7 +401,7 @@ ClassDef:
     @@Return:
       @@@PerlDef:
         my @node = ($self);
-        my $tid = $self->{<H::mn:treeID>};
+        my $tid = $self->{<H::mn:treeID>} || \'';
         my %xrnode;
         NODES: while (@node) {
           my $node = shift @node;

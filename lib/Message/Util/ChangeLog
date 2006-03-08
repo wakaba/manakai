@@ -1,3 +1,9 @@
+2006-03-08  Wakaba  <wakaba@suika.fam.cx>
+
+	* ManakaiNode.dis (destroy): Don't cause |uninitialized value
+	as SCALAR reference| error even if the node is disposed
+	and it no longer has tree id.
+
 2006-03-05  Wakaba  <wakaba@suika.fam.cx>
 
 	* DIS.dis (mvOwnerElementResource): Allows an attribute

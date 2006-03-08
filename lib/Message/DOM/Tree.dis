@@ -12,7 +12,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/03/07 10:30:31 $
+    $Date: 2006/03/08 11:43:07 $
 
   @Require:
     @@Module:
@@ -10081,6 +10081,34 @@ NodeTypeDef:
           MDOMX|param-name => 'newChild',
           c|node => {$newChild},
         }__;
+
+  @CMethod:
+    @@Name: replaceChild
+    @@enDesc:
+      Replaces a node by another node.
+    @@Param:
+      @@@Name: newChild
+      @@@Type: Node
+      @@@enDesc:
+        The node to add.
+    @@Param:
+      @@@Name: oldChild
+      @@@Type: Node
+      @@@enDesc:
+        The node to remove.
+    @@Return:
+      @@@Type: Node
+      @@@enDesc:
+        The node replaced.
+      @@@dx:raises:
+        @@@@@: MDOMX|HIERARCHY_BAD_TYPE
+        @@@@enDesc:
+          The type of the node does not allow any children.
+      @@@PerlDef:
+        __EXCEPTION{MDOMX|HIERARCHY_BAD_TYPE::
+          MDOMX|param-name => 'newChild',
+          c|node => {$newChild},
+        }__;
 ##CharacterData
 
 ElementTypeBinding:
@@ -15054,6 +15082,7 @@ IFCls1Def:
       my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
       my $text = $doc-><M::Document.createTextNode> ('data');
+      my $node2 = $doc-><M::Document.createTextNode> ('2');
 
       for my $node (
         $doc-><AG::Document.implementation>
@@ -15083,6 +15112,11 @@ IFCls1Def:
         $test->id ('insertBefore.'.$node-><AG::Node.nodeType>);
         $test->assert_exception (code => sub {
           $text-><M::Node.insertBefore> ($node);
+        }, exception_subtype => <Q::MDOMX|HIERARCHY_BAD_TYPE>);
+
+        $test->id ('replaceChild.'.$node-><AG::Node.nodeType>);
+        $test->assert_exception (code => sub {
+          $text-><M::Node.replaceChild> ($node, $node2);
         }, exception_subtype => <Q::MDOMX|HIERARCHY_BAD_TYPE>);
       }
 ##Text
@@ -15290,6 +15324,7 @@ IFCls1Def:
       my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
       my $comment = $doc-><M::Document.createComment> ('data');
+      my $node2 = $doc-><M::Document.createComment> ('data');
 
       for my $node (
         $doc-><AG::Document.implementation>
@@ -15319,6 +15354,11 @@ IFCls1Def:
         $test->id ('insertBefore.'.$node-><AG::Node.nodeType>);
         $test->assert_exception (code => sub {  
           $comment-><M::Node.insertBefore> ($node);
+        }, exception_subtype => <Q::MDOMX|HIERARCHY_BAD_TYPE>);
+
+        $test->id ('replaceChild.'.$node-><AG::Node.nodeType>);
+        $test->assert_exception (code => sub {  
+          $comment-><M::Node.replaceChild> ($node, $node2);
         }, exception_subtype => <Q::MDOMX|HIERARCHY_BAD_TYPE>);
       }
 ##Comment
