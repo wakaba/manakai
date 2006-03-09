@@ -40,7 +40,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/03/06 10:19:33 $
+      $Date: 2006/03/09 13:44:16 $
     @@ContentType:
       dis:Date.RCS
 
@@ -752,12 +752,19 @@ ResourceDef:
         @@@@QName: HIERARCHY_WRONG_DOCTYPE_ERR
         @@@@enDesc:
           An attempt is made to insert a <IF::x|DocumentType>
-          node after the document element.
+          node after the document element  or an <IF::Element> node after
+          a <IF::x|DocumentType>.
         @@@@XParamParamName:
         @@@@ecore:hasParameter:
           @@@@@@: c|node
           @@@@@enDesc:
             The <IF::x|DocumentType> node.
+      @@@SubTypeDef:
+        @@@@QName: t|HIERARCHY_DOCUMENT_FRAGMENT_ITSELF_ERR
+        @@@@enDesc:
+          An attempt is made to insert a <IF::t|DocumentFragment>
+          node to itself.
+        @@@@XParamParamName:
      @@XConst:
         @@@Name:  WRONG_DOCUMENT_ERR
         @@@Type:  
