@@ -23,7 +23,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2006/03/05 10:07:02 $
+      $Date: 2006/03/10 10:52:04 $
     @@ContentType:
       dis:Date.RCS
   
@@ -3463,7 +3463,8 @@ IFClsDef:
           if ($al_node) {
             my $canon_res = $self-><M::DISDatabase.getResource> ($al_canon_uri);
             $canon_res-><AS::DISAnyResource.isReferred> ($al_node);
-            $canon_res-><M::DISResource.mergeAsAlias> ($res, node => $al_node);
+            $canon_res-><M::DISResource.mergeAsAlias>
+                          ($res, node => $al_node, no_equality_check => true);
             $res = $canon_res;
           }
           } # ALD
@@ -3553,9 +3554,10 @@ IFClsDef:
           }
 
           my $srres = $srinfo->{resource}->{$res-><AG::DISAnyResource.uri>};
-          F: for my $auri (%{$srres->{aliasURI} or {}}) {
+          F: for my $auri (keys %{$srres->{aliasURI} or {}}) {
             next F unless $srres->{aliasURI}->{$auri};
             $res->{aliasURI}->{$auri} = true;
+            $self->{resDef}->{$auri} = $res;
             A: for (keys %{$res->{subOf} or {}}) {
               next A unless $res->{subOf}->{$_};
               my $s = $self-><M::DISDatabase.getResource> ($_);

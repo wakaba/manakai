@@ -1,3 +1,16 @@
+2006-03-10  Wakaba  <wakaba@suika.fam.cx>
+
+	* PerlCode.dis (stringify): Inserts new line after |COMMA|s
+	in lists (hash literals and array literals --- "lists" theirselves
+	are excluded since they are usually not so long).
+
+	* DIS.dis (loadResource): Don't throw error
+	if an alias is alreadt defined for same URI.  Registers
+	aliases from |srinfo| to the database. By these
+	fixes aliases defined in another module from the canonical
+	resource name's module can live even after the canonical's 
+	module is updated.
+
 2006-03-08  Wakaba  <wakaba@suika.fam.cx>
 
 	* ManakaiNode.dis (destroy): Don't cause |uninitialized value

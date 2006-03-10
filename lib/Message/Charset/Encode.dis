@@ -1,0 +1,274 @@
+Module:
+  @QName: MCharset|Encode
+  @FullName:
+    @@lang: en
+    @@@: Manakai Charset Encode Module
+  @Namespace:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Charset/Encode/
+  
+  @enDesc:
+    The <DFN::manakai Charset Encode Module> is ...
+
+    {TODO::
+      This module is subject to change.
+    }
+
+  @DISCore:author: DISCore|Wakaba
+  @License: license|Perl+MPL
+  @Date:
+    $Date: 2006/03/10 10:52:02 $
+  
+  @Require:
+    @@Module:
+      @@@QName: MDOM|DOMFeature
+      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
+    @@Module:
+      @@@WithFor: ManakaiDOM|ManakaiDOM
+  @DefaultFor: ManakaiDOM|ManakaiDOMLatest
+
+Namespace:
+  @cv:
+    http://suika.fam.cx/www/2006/manakai/2006/charset/
+  @dis:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
+  @DISlib:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/
+  @dx:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#
+  @f:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/feature#
+  @fe:
+    http://suika.fam.cx/www/2006/feature/
+  @idl:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/IDL#
+  @kwd:
+    http://suika.fam.cx/~wakaba/archive/2005/rfc2119/
+  @lang:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
+  @license:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
+  @ManakaiDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
+  @MCharset:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Charset/
+  @MDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
+  @mn:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/ManakaiNode#
+  @rdf:
+    http://www.w3.org/1999/02/22-rdf-syntax-ns#
+  @rdfs:
+    http://www.w3.org/2000/01/rdf-schema#
+  @test:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Test#
+
+ResourceDef:
+  @QName: MCharset|
+  @rdf:type: dis|ModuleGroup
+  @FullName:
+    @@lang:en
+    @@@:
+      The manakai Charset modules
+  @DISPerl:packageName:
+    Message::Charset::
+  @DISPerl:interfacePackageName:
+    @@@:
+      Message::Charset::IFLatest::
+    @@For: ManakaiDOM|ManakaiDOMLatest
+  @DISPerl:interfacePackageName:
+    @@@:
+      Message::Charset::IF::
+    @@For: !ManakaiDOM|ManakaiDOMLatest
+
+## -- Features
+
+ElementTypeBinding:
+  @Name: FeatureDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: f|Feature
+    @@For: =ManakaiDOM|all
+
+ElementTypeBinding:
+  @Name: FeatureVerDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: f|Feature
+
+ElementTypeBinding:
+  @Name: featureQName
+  @ElementType:
+    f:name
+  @ShadowContent:
+    @@ContentType: DISCore|QName
+
+ElementTypeBinding:
+  @Name: IFQName
+  @ElementType:
+    dis:QName
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForIF
+
+ElementTypeBinding:
+  @Name: ClsQName
+  @ElementType:
+    dis:QName
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: IFISA
+  @ElementType:
+    dis:ISA
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForIF
+
+ElementTypeBinding:
+  @Name: ClsISA
+  @ElementType:
+    dis:ISA
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: IFClsDef
+  @ElementType: 
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@: dis|MultipleResource
+      @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
+    @@resourceFor: ManakaiDOM|ForIF
+    @@resourceFor:
+      @@@@: ManakaiDOM|ForClass
+      @@@ForCheck: ManakaiDOM|ManakaiDOM !=ManakaiDOM|ManakaiDOM
+    @@For: ManakaiDOM|ManakaiDOMLatest
+    @@For: =ManakaiDOM|ManakaiDOM
+
+    @@rdf:type:
+      @@@@: DISLang|Interface
+      @@@ForCheck: ManakaiDOM|ForIF
+
+    @@rdf:type:
+      @@@@: DISLang|Class
+      @@@ForCheck: ManakaiDOM|ForClass
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOM||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
+
+    @@f:implements:
+      @@@@: URIFeature40
+      @@@For: ManakaiDOM|ManakaiDOMLatest
+
+ElementTypeBinding:
+  @Name: Method
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|Method
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM
+
+ElementTypeBinding:
+  @Name: IntMethod
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|Method
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|ForClass
+    @@ManakaiDOM:isForInternal: 1
+
+ElementTypeBinding:
+  @Name: Param
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISLang|MethodParameter
+
+ElementTypeBinding:
+  @Name: NamedParam
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISLang|MethodParameter
+    @@DISPerl:isNamedParameter: 1
+
+ElementTypeBinding:
+  @Name: Return
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISLang|MethodReturn
+
+ElementTypeBinding:
+  @Name: Attr
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISLang|Attribute
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM
+
+ElementTypeBinding:
+  @Name: Get
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISLang|AttributeGet
+
+ElementTypeBinding:
+  @Name: Set
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISLang|AttributeSet
+
+ElementTypeBinding:
+  @Name: InCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: ManakaiDOM|InCase
+
+ElementTypeBinding:
+  @Name: PerlDef
+  @ElementType:
+    dis:Def
+  @ShadowContent:
+    @@ContentType:
+      lang:Perl
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: Test
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: test|StandaloneTest
+    @@ForCheck: ManakaiDOM|ForClass
+  
+ElementTypeBinding:
+  @Name: enDesc
+  @ElementType:
+    dis:Description
+  @ShadowContent:
+    @@lang:en
+
+ElementTypeBinding:
+  @Name: enImplNote
+  @ElementType:
+    dis:ImplNote
+  @ShadowContent:
+    @@lang:en
+
+ElementTypeBinding:
+  @Name: enFN
+  @ElementType:
+    dis:FullName
+  @ShadowContent:
+    @@lang:en

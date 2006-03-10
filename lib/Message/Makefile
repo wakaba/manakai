@@ -9,6 +9,8 @@ all:
 	$(CD) Util && $(MAKE) .discore-all$(PM_SUFFIX) all
 	$(CD) Markup && $(MAKE) all
 	$(CD) DOM && $(MAKE) all
+	$(CD) URI && $(MAKE) all
+	$(CD) Charset && $(MAKE) all
 
 clean:
 	$(RMALL) *.BAK .*.BAK *~ .*~
@@ -18,6 +20,8 @@ clean:
 	$(CD) Util && $(MAKE) clean
 	$(CD) Markup && $(MAKE) clean
 	$(CD) DOM && $(MAKE) clean
+	$(CD) URI && $(MAKE) clean
+	$(CD) Charset && $(MAKE) clean
 
 distclean:
 	$(RMALL) *.BAK .*.BAK *~ .*~
@@ -27,6 +31,8 @@ distclean:
 	$(CD) Util && $(MAKE) distclean
 	$(CD) Markup && $(MAKE) distclean
 	$(CD) DOM && $(MAKE) distclean
+	$(CD) URI && $(MAKE) distclean
+	$(CD) Charset && $(MAKE) distclean
 
-## $Date: 2006/02/26 14:32:38 $
+## $Date: 2006/03/10 10:52:02 $
 ## License: Public Domain.

@@ -41,7 +41,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date:
-    $Date: 2006/03/09 13:44:17 $
+    $Date: 2006/03/10 10:52:02 $
   
   @Require:
     @@Module:
@@ -850,6 +850,24 @@ ResourceDef:
         }, exception_subtype => <Q::MDOMX|HIERARCHY_BAD_TYPE>);
       }
 
+  @Test:
+    @@QName: CDATASection..=.1.test
+    @@PerlDef:
+      my $doc;
+      __CODE{t|createDocumentForTestDA:: $doc => $doc}__;
+
+      my $node = $doc-><M::Document.createCDATASection> ('');
+
+      $node-><M::Node.manakaiAppendText> ('aaaa');
+      $test->id ('1.class');
+      $test->assert_isa ($node, <IFName::CDATASection>);
+      $test->id ('1.value');
+      $test->assert_equals ($node-><AG::t|CharacterData.data>, 'aaaa');
+
+      $test->id (2);
+      $node-><M::Node.manakaiAppendText> ('bbbb');
+      $test->assert_equals ($node-><AG::t|CharacterData.data>, 'aaaabbbb');
+
   @IntMethod:
     @@Name: newObject
     @@Description:
@@ -1215,7 +1233,7 @@ NodeTypeIFDef:
 ResourceDef:
   @QName: Node
   @AliasFor: t|Node
-  @For: ManakaiDOM|DOM1
+  @For: ManakaiDOM|DOM
 
 NodeTypeDef:
   @IFQName: Notation
@@ -1725,6 +1743,21 @@ NodeTypeDef:
             $comment-><M::Node.replaceChild> ($node, $node2);
           }, exception_subtype => <Q::MDOMX|HIERARCHY_BAD_TYPE>);
         }
+
+  @Test:
+    @@QName: Notation..=.1.test
+    @@PerlDef:
+      my $doc;
+      __CODE{t|createDocumentForTestDA:: $doc => $doc}__;
+      my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+      my $node = $docx-><M::DocumentXDoctype.createNotation> ('d');
+
+      $node-><M::Node.manakaiAppendText> ('aaaa');
+      $test->id ('1.class');
+      $test->assert_isa ($node, <IFName::Notation>);
+      $test->id ('1.value');
+      $test->assert_null ($node-><AG::Node.textContent>);
 
   @IntMethod:
     @@Name: newObject
@@ -5158,6 +5191,66 @@ NodeTypeDef:
         $test->id ('return.parent');
         $test->assert_null ($pi3-><AG::Node.parentNode>);
 
+  @CMethod:
+    @@Name: manakaiAppendText
+    @@Param:
+      @@@Name: string
+      @@@Type: DOMString
+      @@@enDesc:
+        The string to append.
+      @@@InCase:
+        @@@@Type: DISPerl|SCALAR||ManakaiDOM|all
+        @@@@enDesc:
+          A copy of the string value referenced from the value
+          is appended.
+    @@Return:
+      @@@Type: Node
+      @@@enDesc:
+        The node itself.
+      @@@dx:raises:
+        @@@@@: MDOMX|NOMOD_THIS
+        @@@@enDesc:
+          If the node to insert the string or a <IF::Text> node
+          is read-only.
+      @@@disDef:
+        @@@@DISPerl:cloneCode: t|ManakaiDOMAttr.manakaiAppendText
+
+    @@Test:
+      @@@QName: Entity..=.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{t|createDocumentForTestER:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $node = $docx-><M::DocumentXDoctype.createGeneralEntity> ('node');
+
+        $node-><M::Node.manakaiAppendText> ('string');
+        $test->id ('1.class');
+        $test->assert_isa ($node, <IFName::Entity>);
+        $test->id ('1.value');
+        $test->assert_equals ($node-><AG::Node.textContent>, 'string');
+        $test->id ('1.length');
+        $test->assert_num_equals
+                 (expected_value => 1,
+                  actual_value => 0+@{$node-><AG::Node.childNodes>});
+
+        $test->id (2);
+        $node-><M::Node.manakaiAppendText> ('STRING');
+        $test->assert_equals ($node-><AG::Node.textContent>, 'stringSTRING');
+        $test->assert_num_equals
+                 (expected_value => 1,
+                  actual_value => 0+@{$node-><AG::Node.childNodes>});
+
+        $node-><M::Node.appendChild>
+                 ($doc-><M::Document.createEntityReference> ('er'));
+
+        $test->id (3);
+        $node-><M::Node.manakaiAppendText> ('text');
+        $test->assert_equals ($node-><AG::Node.textContent>, 'stringSTRINGtext');
+        $test->assert_num_equals
+                 (expected_value => 3,
+                  actual_value => 0+@{$node-><AG::Node.childNodes>});
+
   @IntMethod:
     @@Name: newObject
     @@Description:
@@ -8342,6 +8435,65 @@ NodeTypeDef:
           $dtd-><M::Node.replaceChild> ($el2, $dtd-><AG::Node.firstChild>);
         }, exception_subtype => <Q::MDOMX|HIERARCHY_ANCESTOR_OR_SELF>);
 
+  @CMethod:
+    @@Name: manakaiAppendText
+    @@Param:
+      @@@Name: string
+      @@@Type: DOMString
+      @@@enDesc:
+        The string to append.
+      @@@InCase:
+        @@@@Type: DISPerl|SCALAR||ManakaiDOM|all
+        @@@@enDesc:
+          A copy of the string value referenced from the value
+          is appended.
+    @@Return:
+      @@@Type: Node
+      @@@enDesc:
+        The node itself.
+      @@@dx:raises:
+        @@@@@: MDOMX|NOMOD_THIS
+        @@@@enDesc:
+          If the node to insert the string or a <IF::Text> node
+          is read-only.
+      @@@disDef:
+        @@@@DISPerl:cloneCode: t|ManakaiDOMAttr.manakaiAppendText
+
+    @@Test:
+      @@@QName: EntityRef..=.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{t|createDocumentForTestER:: $doc => $doc}__;
+
+        my $node = $doc-><M::Document.createEntityReference> ('node');
+
+        $node-><M::Node.manakaiAppendText> ('string');
+        $test->id ('1.class');
+        $test->assert_isa ($node, <IFName::EntityReference>);
+        $test->id ('1.value');
+        $test->assert_equals ($node-><AG::Node.textContent>, 'string');
+        $test->id ('1.length');
+        $test->assert_num_equals
+                 (expected_value => 1,
+                  actual_value => 0+@{$node-><AG::Node.childNodes>});
+
+        $test->id (2);
+        $node-><M::Node.manakaiAppendText> ('STRING');
+        $test->assert_equals ($node-><AG::Node.textContent>, 'stringSTRING');
+        $test->assert_num_equals
+                 (expected_value => 1,
+                  actual_value => 0+@{$node-><AG::Node.childNodes>});
+
+        $node-><M::Node.appendChild>
+                 ($doc-><M::Document.createEntityReference> ('er'));
+
+        $test->id (3);
+        $node-><M::Node.manakaiAppendText> ('text');
+        $test->assert_equals ($node-><AG::Node.textContent>, 'stringSTRINGtext');
+        $test->assert_num_equals
+                 (expected_value => 3,
+                  actual_value => 0+@{$node-><AG::Node.childNodes>});
+
   @IntMethod:
     @@Name: newObject
     @@Description:
@@ -8838,6 +8990,49 @@ NodeTypeDef:
             $comment-><M::Node.replaceChild> ($node, $node2);
           }, exception_subtype => <Q::MDOMX|HIERARCHY_BAD_TYPE>);
         }
+
+  @CMethod:
+    @@Name: manakaiAppendText
+    @@Param:
+      @@@Name: string
+      @@@Type: DOMString
+      @@@enDesc:
+        The string to append.
+      @@@InCase:
+        @@@@Type: DISPerl|SCALAR||ManakaiDOM|all
+        @@@@enDesc:
+          A copy of the string value referenced from the value
+          is appended.
+    @@Return:
+      @@@Type: Node
+      @@@enDesc:
+        The node itself.
+      @@@dx:raises:
+        @@@@@: MDOMX|NOMOD_THIS
+        @@@@enDesc:
+          If the node to insert the string or a <IF::Text> node
+          is read-only.
+      @@@disDef:
+        @@@@DISPerl:cloneCode: t|ManakaiDOMCharacterData.manakaiAppendText
+
+    @@Test:
+      @@@QName: PI..=.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{t|createDocumentForTestDA:: $doc => $doc}__;
+
+        my $node = $doc-><M::Document.createProcessingInstruction> ('d');
+
+        $node-><M::Node.manakaiAppendText> ('aaaa');
+        $test->id ('1.class');
+        $test->assert_isa ($node, <IFName::ProcessingInstruction>);
+        $test->id ('1.value');
+        $test->assert_equals ($node-><AG::ProcessingInstruction.data>, 'aaaa');
+
+        $test->id (2);
+        $node-><M::Node.manakaiAppendText> ('bbbb');
+        $test->assert_equals
+                 ($node-><AG::ProcessingInstruction.data>, 'aaaabbbb');
 
   @IntMethod:
     @@Name: newObject

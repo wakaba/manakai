@@ -10,7 +10,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/03/06 07:32:52 $
+    $Date: 2006/03/10 10:52:03 $
 
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
@@ -1495,8 +1495,7 @@ ClsDef:
       (CharData) {
         // Character data
         lang:Perl ($data => $token.value) {
-          $node-><M::Node.appendChild>
-            ($doc-><M::Document.createTextNode> ($data));
+          $node-><M::Node.manakaiAppendText> (\($data));
         }
       } (STAGO) {
         // Start tag or empty element tag
@@ -1774,7 +1773,12 @@ ClsDef:
               my $attr = $doc-><M::Document.createAttributeNS>
                                  (<Q::xmlns:>, 'xmlns');
               for (@{$attrs->{xmlns}->{nodes}}) {
-                $attr-><M::Node.appendChild> ($_);
+                if ($_-><AG::Node.nodeType> == <C::Node.TEXT_NODE>) {
+                  $attr-><M::Node.manakaiAppendText> 
+                           (\($_-><AG::Node.textContent>));
+                } else {
+                  $attr-><M::Node.appendChild> ($_);
+                }
               }
               if ($attrs->{xmlns}->{def}) {
                 __CODE{t|setAttrType::
@@ -1791,7 +1795,12 @@ ClsDef:
               my $attr = $doc-><M::Document.createAttributeNS>
                                  (null, $lname);
               for (@{$lattr{$lname}->{nodes}}) {
-                $attr-><M::Node.appendChild> ($_);
+                if ($_-><AG::Node.nodeType> == <C::Node.TEXT_NODE>) {
+                  $attr-><M::Node.manakaiAppendText>
+                           (\($_-><AG::Node.textContent>));
+                } else {
+                  $attr-><M::Node.appendChild> ($_);
+                }
               }
               if ($attrs->{$lname}->{def}) {
                 __CODE{t|setAttrType::
@@ -1862,7 +1871,12 @@ ClsDef:
                                    ($ns->{$pfx}, $name);
                 }
                 for (@{$gattr{$pfx}->{$lname}->{nodes}}) {
-                  $attr-><M::Node.appendChild> ($_);
+                  if ($_-><AG::Node.nodeType> == <C::Node.TEXT_NODE>) {
+                    $attr-><M::Node.manakaiAppendText>
+                             (\($_-><AG::Node.textContent>));
+                  } else {
+                    $attr-><M::Node.appendChild> ($_);
+                  }
                 }
                 if ($gattr{$pfx}->{$lname}->{def}) {
                   __CODE{t|setAttrType::
@@ -2044,8 +2058,7 @@ ClsDef:
 
       ~* (CharData) {
         lang:Perl ($data => $token.value) {
-          $parent-><M::Node.appendChild>
-            ($self->{doc}-><M::Document.createTextNode> ($data));
+          $parent-><M::Node.manakaiAppendText> (\($data));
         }
       } (STAGO) {
           &Element_ ($doc => $doc, $parent => $parent, $ns => $ns)
@@ -2056,8 +2069,7 @@ ClsDef:
             ?lexmode ElementContent;
           }
         } (HCRO) {
-          &_HexadecimalCharacterReference_
-            ($doc => $doc, $parent => $parent);
+          &_HexadecimalCharacterReference_ ($parent => $parent);
 
           ~ (REFC) {
             ?lexmode 'ElementContent';
@@ -2065,8 +2077,7 @@ ClsDef:
             ?lexmode ElementContent;
           }
         } (CRO) {
-          &_NumericCharacterReference_
-            ($doc => $doc, $parent => $parent);
+          &_NumericCharacterReference_ ($parent => $parent);
 
           ~ (REFC) {
             ?lexmode 'ElementContent';
@@ -2271,8 +2282,7 @@ ClsDef:
       ~* (STRING) {
         lang:Perl ($value => $token.value) {
           $value =~ s/[\x09\x0A\x0D]/ /g;
-          my $text = $self->{doc}-><M::Document.createTextNode> ($value);
-          $parent-><M::Node.appendChild> ($text);
+          $parent-><M::Node.manakaiAppendText> (\($value));
           $vals->{value} .= $value;
         }
       } (HCRO) {
@@ -2316,8 +2326,7 @@ ClsDef:
             __CODE{ParseError}__;
           }
 
-          my $text = $self->{doc}-><M::Document.createTextNode> ('<');
-          $parent-><M::Node.appendChild> ($text);
+          $parent-><M::Node.manakaiAppendText> ('<');
           $vals->{value} .= '<';
         }
       }
@@ -2352,7 +2361,7 @@ ClsDef:
       // ~ (MSE) { }
     } // _CDATASection_
     
-    rule _NumericCharacterReference_ ($doc, $parent) {
+    rule _NumericCharacterReference_ ($parent) {
       ?lexmode 'NumericCharacterReference';
       
       ~ (NUMBER) {
@@ -2384,8 +2393,7 @@ ClsDef:
               __CODE{ParseError}__;
             }
           }
-          my $ncr = $doc-><M::Document.createTextNode> (chr $num);
-          $parent-><M::Node.appendChild> ($ncr);
+          $parent-><M::Node.manakaiAppendText> (chr $num);
         }
       }
       
@@ -2469,9 +2477,8 @@ ClsDef:
               __CODE{ParseError}__;
             }
           }
-          my $ncr = $self->{doc}-><M::Document.createTextNode>
-                            (my $char = chr $num);
-          $parent-><M::Node.appendChild> ($ncr);
+          my $char = chr $num;
+          $parent-><M::Node.manakaiAppendText> (\$char);
           $vals->{value} .= $char;
         }
       }
@@ -2518,7 +2525,7 @@ ClsDef:
       // ~ (REFC) { }
     } // _NumericCharacterReferenceEV_
     
-    rule _HexadecimalCharacterReference_ ($doc, $parent) {
+    rule _HexadecimalCharacterReference_ ($parent) {
       ?lexmode 'HexadecimalCharacterReference';
       
       ~ (Hex) {
@@ -2550,9 +2557,7 @@ ClsDef:
               __CODE{ParseError}__;
             }
           }
-          my $ncr = $doc-><M::Document.createTextNode>
-                      (chr $num);
-          $parent-><M::Node.appendChild> ($ncr);
+          $parent-><M::Node.manakaiAppendText> (chr $num);
         }
       }
       
@@ -2636,9 +2641,8 @@ ClsDef:
               __CODE{ParseError}__;
             }
           }
-          my $ncr = $self->{doc}-><M::Document.createTextNode>
-                      (my $char = chr $num);
-          $parent-><M::Node.appendChild> ($ncr);
+          my $char = chr $num;
+          $parent-><M::Node.manakaiAppendText> (\$char);
           $vals->{value} .= $char;
         }
       }
@@ -2694,28 +2698,23 @@ ClsDef:
       
       ~ (Name == 'lt') {
         lang:Perl {
-          $parent-><M::Node.appendChild>
-                     ($self->{doc}-><M::Document.createTextNode> ('<'));
+          $parent-><M::Node.manakaiAppendText> ('<');
         }
       } (Name == 'gt') {
         lang:Perl {
-          $parent-><M::Node.appendChild>
-                     ($self->{doc}-><M::Document.createTextNode> ('>'));
+          $parent-><M::Node.manakaiAppendText> ('>');
         }
       } (Name == 'amp') {
         lang:Perl {
-          $parent-><M::Node.appendChild>
-                     ($self->{doc}-><M::Document.createTextNode> ('&'));
+          $parent-><M::Node.manakaiAppendText> ('&');
         }
       } (Name == 'quot') {
         lang:Perl {
-          $parent-><M::Node.appendChild>
-                     ($self->{doc}-><M::Document.createTextNode> ('"'));
+          $parent-><M::Node.manakaiAppendText> ('"');
         }
       } (Name == 'apos') {
         lang:Perl {
-          $parent-><M::Node.appendChild>
-                     ($self->{doc}-><M::Document.createTextNode> ("'"));
+          $parent-><M::Node.manakaiAppendText> ("'");
         }
       } (Name) {
         my $er;
@@ -3017,32 +3016,27 @@ ClsDef:
       
       ~ (Name == 'lt') {
         lang:Perl {
-          $parent-><M::Node.appendChild>
-                     ($self->{doc}-><M::Document.createTextNode> ('<'));
+          $parent-><M::Node.manakaiAppendText> ('<');
           $vals->{value} .= '<';
         }
       } (Name == 'gt') {
         lang:Perl {
-          $parent-><M::Node.appendChild>
-                     ($self->{doc}-><M::Document.createTextNode> ('>'));
+          $parent-><M::Node.manakaiAppendText> ('>');
           $vals->{value} .= '>';
         }
       } (Name == 'amp') {
         lang:Perl {
-          $parent-><M::Node.appendChild>
-                     ($self->{doc}-><M::Document.createTextNode> ('&'));
+          $parent-><M::Node.manakaiAppendText> ('&');
           $vals->{value} .= '&';
         }
       } (Name == 'quot') {
         lang:Perl {
-          $parent-><M::Node.appendChild>
-                     ($self->{doc}-><M::Document.createTextNode> ('"'));
+          $parent-><M::Node.manakaiAppendText> ('"');
           $vals->{value} .= '"';
         }
       } (Name == 'apos') {
         lang:Perl {
-          $parent-><M::Node.appendChild>
-                     ($self->{doc}-><M::Document.createTextNode> ("'"));
+          $parent-><M::Node.manakaiAppendText> ("'");
           $vals->{value} .= "'";
         }
       } (Name) {
@@ -9330,6 +9324,9 @@ ClsDef:
         document {
           element {
             text-content: 'aaaa!bbbb';
+            text {
+              text-content: 'aaaa!bbbb';
+            }
           }
         }
     @@XMLTest:
@@ -9357,6 +9354,9 @@ ClsDef:
             attribute {
               node-name: 'a';
               text-content: 'aaaaa!bbbbb';
+              text {
+                text-content: 'aaaaa!bbbbb';
+              }
             }
           }
         }
@@ -9505,6 +9505,9 @@ ClsDef:
                 node-name: 'ent';
                 text-content: 'aa!bb';
                 is-expanded: true;
+                text {
+                  text-content: 'aa!bb';
+                }
               }
               is-expanded: true;
             }
@@ -9550,6 +9553,9 @@ ClsDef:
                 node-name: 'ent';
                 text-content: 'aaaaa!bbbbb';
                 is-expanded: true;
+                text {
+                  text-content: 'aaaaa!bbbbb';
+                }
               }
             }
           }
@@ -9629,6 +9635,9 @@ ClsDef:
         document {
           element {
             text-content: 'aaaa!bbbb';
+            text {
+              text-content: 'aaaa!bbbb';
+            }
           }
         }
     @@XMLTest:
@@ -9656,6 +9665,9 @@ ClsDef:
             attribute {
               node-name: 'a';
               text-content: 'aaaaa!bbbbb';
+              text {
+                text-content: 'aaaaa!bbbbb';
+              }
             }
           }
         }
@@ -9719,6 +9731,9 @@ ClsDef:
             general-entity {
               node-name: 'ent';
               text-content: 'aaaaa!bbbbb';
+              text {
+                text-content: 'aaaaa!bbbbb';
+              }
             }
           }
           element { }
@@ -9849,6 +9864,9 @@ ClsDef:
                 node-name: 'ent';
                 is-expanded: true;
                 text-content: 'aaaaa!bbbbb';
+                text {
+                  text-content: 'aaaaa!bbbbb';
+                }
               }
             }
           }
@@ -15017,8 +15035,9 @@ ClsDef:
                      system_id => $doc_ent->{<Q::test:uri>},
                      base_uri => $doc_ent->{<Q::test:baseURI>}};
         if ($test_data->{dom_tree}) { # Successful test
+          my $doc;
           try {
-            my $doc = $parser->parse ($input);
+            $doc = $parser->parse ($input);
             $test->assert_dom_tree_equals
                      (actual_value => $doc,
                       expected_hash => $test_data->{dom_tree});
@@ -15031,8 +15050,10 @@ ClsDef:
               }
             }
             $not_ok ? $test->not_ok : $test->ok;
+            undef $doc;
           } catch Message::Util::IF::DTException with {
-            # 
+            require 'manakai/mndebug.pl';
+            manakai::mndebug::dump ($doc);
           } catch Message::DOM::IF::LSException with {
             # not_ok
           } otherwise {
@@ -15041,10 +15062,12 @@ ClsDef:
             $test->not_ok;
           };
         } else {
+          my $doc;
           try {
-            my $doc = $parser->parse ($input);
+            $doc = $parser->parse ($input);
           } catch Message::Util::IF::DTException with {
-            #
+            require 'manakai/mndebug.pl';
+            manakai::mndebug::dump ($doc);
           } catch Message::DOM::IF::LSException with {
             #
           } otherwise {
