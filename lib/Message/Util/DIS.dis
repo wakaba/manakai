@@ -23,7 +23,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2006/03/10 10:52:04 $
+      $Date: 2006/03/11 12:12:38 $
     @@ContentType:
       dis:Date.RCS
   
@@ -3359,7 +3359,7 @@ IFClsDef:
                           $res->{aliasURI}->{$al_canon_uri};
               __UNDEEP{
                 __EXCEPTION{RESOURCE_ALREADY_DEFINED_ERR::
-                  DIS:uri => {$qn_uri},
+                  DIS:uri => {$qn_urif},
                   DIS:sourceNode => {$qn_node},
                   DIS:anotherSourceNode => {$res->{src}},
                 }__;
@@ -3453,7 +3453,6 @@ IFClsDef:
             my $nu_res = $self-><M::DISDatabase.getResource> ($node_uri);
             $res-><M::DISResource.mergeAsAlias> ($nu_res);
           }
-          $res->{<H::DIS|isDefined>} = true;
           $res->{seq} = $self->{seq}++;
           $res-><AS::DISAnyResource.sourceNodeIDRef> ($node_id);
           __CODE{setRevision:: $resource => $res}__;
@@ -3466,7 +3465,9 @@ IFClsDef:
             $canon_res-><M::DISResource.mergeAsAlias>
                           ($res, node => $al_node, no_equality_check => true);
             $res = $canon_res;
-          }
+            } else {
+              $res->{<H::DIS|isDefined>} = true;
+            }
           } # ALD
 
           ## -- Registers as child

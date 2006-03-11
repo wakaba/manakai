@@ -4853,11 +4853,7 @@ get_resource
 merge_as_alias
  ($nu_res);
   }
-  $res->{
-'http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#isDefined'
-} = 
-1
-;
+
   $res->{seq} = $self->{seq}++;
   $res->
 source_node_id_ref
@@ -4894,7 +4890,12 @@ merge_as_alias
 1
 );
     $res = $canon_res;
-  }
+  } else {
+      $res->{
+'http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#isDefined'
+} = 
+1
+;}
   } # ALD
 
   ## -- Registers as child

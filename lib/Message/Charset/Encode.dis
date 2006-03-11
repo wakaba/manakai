@@ -16,7 +16,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/03/10 10:52:02 $
+    $Date: 2006/03/11 12:12:38 $
   
   @Require:
     @@Module:
@@ -24,11 +24,14 @@ Module:
       @@@WithFor: ManakaiDOM|ManakaiDOMLatest
     @@Module:
       @@@WithFor: ManakaiDOM|ManakaiDOM
+    @@Module:
+      @@@QName: DISlib|Charset
+      @@@WithFor: ManakaiDOM|all
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
 Namespace:
-  @cv:
-    http://suika.fam.cx/www/2006/manakai/2006/charset/
+  @cs:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Charset/
   @dis:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
   @DISlib:
@@ -39,6 +42,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dom/feature#
   @fe:
     http://suika.fam.cx/www/2006/feature/
+  @icharset:
+    urn:x-suika-fam-cx:charset:
   @idl:
     http://suika.fam.cx/~wakaba/archive/2004/dis/IDL#
   @kwd:
@@ -51,6 +56,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
   @MCharset:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Charset/
+  @mce:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Charset/Encode/
   @MDOM:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
   @mn:
@@ -61,6 +68,8 @@ Namespace:
     http://www.w3.org/2000/01/rdf-schema#
   @test:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Test#
+  @xml-auto-charset:
+    http://suika.fam.cx/www/2006/03/xml-entity/
 
 ResourceDef:
   @QName: MCharset|
@@ -81,6 +90,16 @@ ResourceDef:
     @@For: !ManakaiDOM|ManakaiDOMLatest
 
 ## -- Features
+
+FeatureDef:
+  @QName: MCEncodeFeature
+  @featureQName: fe|MCEncode
+  @FeatureVerDef:
+    @@QName: MCEncodeFeature10
+    @@f:instanceOf: MCEncodeFeature
+    @@Version: 1.0
+    @@enDesc:
+      The manakai Charset Encode Module, version 1.0
 
 ElementTypeBinding:
   @Name: FeatureDef
@@ -143,7 +162,7 @@ ElementTypeBinding:
     @@resourceFor: ManakaiDOM|ForIF
     @@resourceFor:
       @@@@: ManakaiDOM|ForClass
-      @@@ForCheck: ManakaiDOM|ManakaiDOM !=ManakaiDOM|ManakaiDOM
+      @@@ForCheck: ManakaiDOM|ManakaiDOMLatest !=ManakaiDOM|ManakaiDOM
     @@For: ManakaiDOM|ManakaiDOMLatest
     @@For: =ManakaiDOM|ManakaiDOM
 
@@ -164,7 +183,28 @@ ElementTypeBinding:
       @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
 
     @@f:implements:
-      @@@@: URIFeature40
+      @@@@: MCEncodeFeature10
+      @@@For: ManakaiDOM|ManakaiDOMLatest
+
+ElementTypeBinding:
+  @Name: ClsDef
+  @ElementType: 
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@: dis|MultipleResource
+      @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
+    @@resourceFor:
+      @@@@: ManakaiDOM|ForClass
+      @@@ForCheck: ManakaiDOM|ManakaiDOMLatest
+    @@For: ManakaiDOM|ManakaiDOMLatest
+
+    @@rdf:type:
+      @@@@: DISLang|Class
+      @@@ForCheck: ManakaiDOM|ForClass
+
+    @@f:implements:
+      @@@@: MCEncodeFeature10
       @@@For: ManakaiDOM|ManakaiDOMLatest
 
 ElementTypeBinding:
@@ -272,3 +312,586 @@ ElementTypeBinding:
     dis:FullName
   @ShadowContent:
     @@lang:en
+
+## -- Implementation
+
+IFClsDef:
+  @IFQName: MCEncodeImplementation
+  @ClsQName: ManakaiMCEncodeImplementation
+
+  @IFISA: f|MinimumImplementation
+  @ClsISA: f|ManakaiMinimumImplementation
+
+  @enDesc:
+    The <IF::MCEncodeImplementation> interface provides
+    factory methods to create <IF::MCEncodeHandle> objects.
+
+  @f:provides: MCEncodeFeature10
+
+  @Test:
+    @@enDesc:
+      The implementation registry should know this class when the
+      module is loaded.
+    @@PerlDef:
+      I: {
+        for my $impl (@{$Message::DOM::ImplementationRegistry
+                              ->get_implementation_list
+                                  ({<Q::fe|MCEncode> => '1.0'})}) {
+          if ($impl->isa (<IFName::MCEncodeImplementation>)) {
+            last I;
+          }
+        }
+        $test->assert_never;
+      } # I
+
+  @Method:
+    @@Name: createMCDecodeHandle
+    @@enDesc:
+      Creates an <IF::MCDecodeHandle> object.
+    @@Param:
+      @@@Name: charset
+      @@@Type: String
+      @@@enDesc:
+        The URI that identifies the charset
+        in which strings are written to the <P::byteStream>.
+    @@Param:
+      @@@Name: byteStream
+      @@@Type: DISPerl|Filehandle||ManakaiDOM|all
+      @@@enDesc:
+        A reference to the filehandle that contains the byte 
+        stream read by the <IF::MCDecodeHandle> object.
+    @@Return:
+      @@@Type: MCDecodeHandle
+      @@@enDesc:
+        The newly created filehandle object.
+      @@@nullCase:
+        @@@@enDesc:
+          If the implementation does not support <P::charset>.
+      @@@PerlDef:
+        my $csdef = $Message::Charset::Encode::CharsetDef->{$charset};
+        my $obj = {<H::mce|filehandle> => $byteStream,
+                   <H::mce|charset> => $charset,
+                   <H::mce|characterQueue> => [],
+                   <H::mce|byteBuffer> => '',
+                   <H::mce|onoctetstreamerror> => sub {}};
+        if ($csdef->{uri}->{<Q::xml-auto-charset:>} or
+            $charset eq <Q::xml-auto-charset:>) {
+          $r = bless $obj, <ClassName::ManakaiMCXMLDecodeHandle>;
+        } elsif ($csdef->{uri}->{<Q::cs|XML.utf-8>}) {
+
+        } elsif ($csdef->{uri}->{<Q::cs|XML.utf-16>}) {
+
+        } elsif ($csdef->{<H::cs|isBlockSafe>}) {
+          if (defined $csdef->{<H::cs|perlName>}->[0]) {
+            $obj->{<H::mce|perlEncodingName>} = $csdef->{<H::cs|perlName>}->[0];
+            $r = bless $obj, <ClassName::ManakaiMCDecodeHandle>;
+            require Encode;
+            undef $r unless Encode::find_encoding
+                              ($obj->{<H::mce|perlEncodingName>});
+          }
+        }
+
+    @@Test:
+      @@@QName: MCEncodeImpl.createMCDecodeHandle.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{createImplForTest:: $impl => $impl}__;
+
+        my $byte = 'a';
+        open my $fh, '>', \$byte;
+        my $efh = $impl-><M::MCEncodeImplementation.createMCDecodeHandle>
+                           (<Q::cs|Perl.utf8>, $fh);
+        
+        $test->id ('interface');
+        $test->assert_isa ($efh, <IFName::MCDecodeHandle>);
+
+    @@Test:
+      @@@QName: MCEncodeImpl.createMCXMLDecodeHandle.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{createImplForTest:: $impl => $impl}__;
+
+        my $byte = 'a';
+        open my $fh, '<', \$byte;
+        my $efh = $impl-><M::MCEncodeImplementation.createMCDecodeHandle>
+                           (<Q::xml-auto-charset:>, $fh);
+        
+        $test->id ('interface');
+        $test->assert_isa ($efh, <IFName::MCDecodeHandle>);
+
+        $test->id ('class');
+        $test->assert_isa ($efh, <ClassName::ManakaiMCXMLDecodeHandle>);
+
+  @Method:
+    @@Name: getURIFromCharsetName
+    @@enDesc:
+      Returns a DOM URI that identifies a charset.
+    @@Param:
+      @@@Name: domain
+      @@@Type: String
+      @@@enDesc:
+        A DOM URI that identifies the context in which the charset
+        name is used.
+    @@Param:
+      @@@Name: name
+      @@@Type: String
+      @@@enDesc:
+        The charset name to convert.
+    @@Return:
+      @@@Type: String
+      @@@enDesc:
+        A DOM URI that identifies <P::name>.
+      @@@nullCase:
+        @@@@enDesc:
+          The implementation was unable to resolve <P::name> to a URI.
+      @@@PerlDef:
+        $r = null;
+        if ({
+          <Q::cs|ietfName> => true,
+          <Q::cs|xmlName> => true,
+        }->{$domain}) {
+          U: for my $uri (keys %$Message::Charset::Encode::CharsetDef) {
+            for (@{$Message::Charset::Encode::CharsetDef->{$uri}->{$domain}
+                       or []}) {
+              if ($_ eq $name) {
+                $r = $uri;
+                last U;
+              }
+            }
+          }
+        }
+    
+  @Method:
+    @@Name: getCharsetNameFromURI
+    @@enDesc:
+      Returns a name for the charset identified by a DOM URI.
+    @@Param:
+      @@@Name: domain
+      @@@Type: String
+      @@@enDesc:
+        A DOM URI that identifies the context in which the charset
+        name is used.
+    @@Param:
+      @@@Name: uri
+      @@@Type: String
+      @@@enDesc:
+        A DOM URI of the charset.
+    @@Return:
+      @@@Type: String
+      @@@enDesc:
+        A charset name that identifies <P::uri>.
+      @@@nullCase:
+        @@@@enDesc:
+          The implementation was unable to find the charset name
+          for the <P::uri> that can be used in <P::domain> context.
+      @@@PerlDef:
+        if ({
+          <Q::cs|ietfName> => true,
+          <Q::cs|xmlName> => true,
+        }->{$domain}) {
+          $r = $Message::Charset::Encode::CharsetDef->{$uri}->{$domain}->[0];
+        } else {
+          $r = null;
+        }
+
+  @CODE:
+    @@QName: createImplForTest
+    @@PerlDef:
+      $impl = <Class::ManakaiMCEncodeImplementation>->_new;
+##MCEncodeImplementation
+
+ElementTypeBinding:
+  @Name: CODE
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISPerl|BlockCode
+    @@ForCheck: ManakaiDOM|ForClass
+
+IFClsDef:
+  @IFQName: MCDecodeHandle
+  @ClsQName: ManakaiMCDecodeHandle
+
+  @enDesc:
+    An <IF::MCDecodeHandle> provides the read access to a character
+    stream.
+
+  @enDesc:
+    @@ddid: cestype
+    @@ForCheck: ManakaiDOM|ForClass
+    @@@:
+      The class <Class::ManakaiMCDecodeHandle> can be used to
+      encapsulate a byte filehandle with <Perl::Encode> call
+      into a character filehandle-like object.
+
+      The encoding <kwd:MUST> be stateless and signatureless.  In addition,
+      its <Perl::Encode> implementation <kwd:MUST> support 
+      the <Perl::FB_QUIET> flag.
+
+  @Attr:
+    @@Name: charset
+    @@enDesc:
+      A URI that identifies the charset of the handle.
+    @@Type: String
+    @@Get:
+      @@@PerlDef:
+        $r = $self->{<H::mce|charset>};
+
+  @Attr:
+    @@Name: onoctetstreamerror
+    @@enDesc:
+      A callback function that is invoked when an illegal
+      octet sequence is encountered.
+
+      The function will be invoked with two arguments: the
+      <IF::MCDecodeHandle> object and a string that contains
+      the octet sequance.  It <kwd:MAY> throw an exception.
+
+      By default, it is an empty function.
+    @@Type: DISPerl|CODE||ManakaiDOM|all
+    @@Get:
+      @@@PerlDef:
+        $r = $self->{<H::mce|onoctetstreamerror>};
+    @@Set:
+      @@@PerlDef:
+        $self->{<H::mce|onoctetstreamerror>} = $given;
+ 
+    @@Test:
+      @@@QName: MCDecodeHandle.onoctetstreamerror.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{createImplForTest:: $impl => $impl}__;
+
+        my $byte = "a\xE3\x81\x82\x81a";
+        open my $fh, '<', \$byte;
+        my $efh = $impl-><M::MCEncodeImplementation.createMCDecodeHandle>
+                           (<Q::cs|Perl.utf8>, $fh);
+
+        $test->id ('default');
+        $test->assert_isa ($efh-><AG::MCDecodeHandle.onoctetstreamerror>,
+                           'CODE');
+
+        $test->id ('get.set');
+        my $sub1 = sub { return "2" };
+        $efh-><AS::MCDecodeHandle.onoctetstreamerror> ($sub1);
+        my $sub2 = $efh-><AG::MCDecodeHandle.onoctetstreamerror>;
+        $test->assert_equals ($sub2, $sub1);
+        $test->assert_equals ($sub2->(), "2");
+
+  @Method:
+    @@Name: getc
+    @@enDesc:
+      Returns the next character from the input.
+    @@Return:
+      @@@Type: String
+      @@@enDesc:
+        The next character.
+      @@@nullCase:
+        @@@@enDesc:
+          If at the end of the file, or if there was an error, in which
+          case <Perl::$!> is set.
+      @@@PerlDef:
+        if (@{$self->{<H::mce|characterQueue>}}) {
+          $r = shift @{$self->{<H::mce|characterQueue>}};
+        } else {
+          __DEEP{
+            my $error;
+            if ($self->{<H::mce|continue>}) {
+              if (read $self->{<H::mce|filehandle>},
+                       $self->{<H::mce|byteBuffer>}, 256,
+                       length $self->{<H::mce|byteBuffer>}) {
+                # 
+              } else {
+                $error = true;
+              }
+              $self->{<H::mce|continue>} = false;
+            } elsif (not length $self->{<H::mce|byteBuffer>}) {
+              read $self->{<H::mce|filehandle>},
+                   $self->{<H::mce|byteBuffer>}, 256,
+                   length $self->{<H::mce|byteBuffer>};
+            }
+
+            unless ($error) {
+              my $string = Encode::decode ($self->{<H::mce|perlEncodingName>},
+                                           $self->{<H::mce|byteBuffer>},
+                                           Encode::FB_QUIET ());
+              if (length $string) {
+                push @{$self->{<H::mce|characterQueue>}}, split //, $string;
+                $r = shift @{$self->{<H::mce|characterQueue>}};
+              } else {
+                $r = null;
+              }
+              if (length $self->{<H::mce|byteBuffer>}) {
+                $self->{<H::mce|continue>} = true;
+              }
+            } else { # error
+              $r = substr $self->{<H::mce|byteBuffer>}, 0, 1, '';
+              $self->{<H::mce|onoctetstreamerror>}->($self, $r);
+            }
+          }__;
+        }
+
+    @@Test:
+      @@@QName: MCDecodeHandle.getc.1.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{createImplForTest:: $impl => $impl}__;
+
+        my $byte = "a\xE3\x81\x82\x81a";
+        open my $fh, '<', \$byte;
+        my $efh = $impl-><M::MCEncodeImplementation.createMCDecodeHandle>
+                           (<Q::cs|Perl.utf8>, $fh);
+
+        my $error = null;
+        $efh-><AS::MCDecodeHandle.onoctetstreamerror> (sub {
+          $error = $_[1];
+        });
+
+        $test->id (1);
+        $test->assert_equals ($efh->getc, "a");
+        $test->id ('1.err');
+        $test->assert_null ($error);
+
+        $test->id (2);
+        $test->assert_equals ($efh->getc, "\x{3042}");
+        $test->id ('1.err');
+        $test->assert_null ($error);
+
+        $test->id (3);
+        $test->assert_equals ($efh->getc, "\x81");
+        $test->id ('1.err');
+        $test->assert_equals ($error, "\x81");
+        $error = null;
+
+        $test->id (4);
+        $test->assert_equals ($efh->getc, "a");
+        $test->id ('4.err');
+        $test->assert_null ($error);
+
+        $test->id ('eof');
+        $test->assert_null ($efh->getc);
+        $test->id ('eof.err');
+        $test->assert_null ($error);
+
+    @@Test:
+      @@@QName: MCDecodeHandle.getc.2.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{createImplForTest:: $impl => $impl}__;
+
+        my $byte = "a" x 256;
+        $byte .= "b" x 256;
+
+        open my $fh, '<', \$byte;
+        my $efh = $impl-><M::MCEncodeImplementation.createMCDecodeHandle>
+                           (<Q::cs|Perl.utf8>, $fh);
+
+        my $error = null;
+        $efh-><AS::MCDecodeHandle.onoctetstreamerror> (sub {
+          $error = $_[1];
+        });
+
+        for my $i (0..255) {
+          $test->id ("a.$i");
+          $test->assert_equals ($efh->getc, "a");
+          $test->id ("a.$i.err");
+          $test->assert_null ($error);
+        }
+
+        for my $i (0..255) {
+          $test->id ("b.$i");
+          $test->assert_equals ($efh->getc, "b");
+          $test->id ("b.$i.err");
+          $test->assert_null ($error);
+        }
+
+        $test->id ('eof');
+        $test->assert_null ($efh->getc);
+        $test->id ('eof.err');
+        $test->assert_null ($error);
+
+    @@Test:
+      @@@QName: MCDecodeHandle.getc.3.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{createImplForTest:: $impl => $impl}__;
+
+        my $byte = "a" x 255;
+        $byte .= "\xE3\x81\x82";
+        $byte .= "b" x 256;
+
+        open my $fh, '<', \$byte;
+        my $efh = $impl-><M::MCEncodeImplementation.createMCDecodeHandle>
+                           (<Q::cs|Perl.utf8>, $fh);
+
+        my $error = null;
+        $efh-><AS::MCDecodeHandle.onoctetstreamerror> (sub {
+          $error = $_[1];
+        });
+
+        for my $i (0..254) {
+          $test->id ("a.$i");
+          $test->assert_equals ($efh->getc, "a");
+          $test->id ("a.$i.err");
+          $test->assert_null ($error);
+        }
+
+        $test->id ("A");
+        $test->assert_equals ($efh->getc, "\x{3042}");
+        $test->id ("A.err");
+        $test->assert_null ($error);
+
+        for my $i (0..255) {
+          $test->id ("b.$i");
+          $test->assert_equals ($efh->getc, "b");
+          $test->id ("b.$i.err");
+          $test->assert_null ($error);
+        }
+
+        $test->id ('eof');
+        $test->assert_null ($efh->getc);
+        $test->id ('eof.err');
+        $test->assert_null ($error);
+
+    @@Test:
+      @@@QName: MCDecodeHandle.getc.4.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{createImplForTest:: $impl => $impl}__;
+
+        my $byte = "a" x 255;
+        $byte .= "\xE3";
+
+        open my $fh, '<', \$byte;
+        my $efh = $impl-><M::MCEncodeImplementation.createMCDecodeHandle>
+                           (<Q::cs|Perl.utf8>, $fh);
+
+        my $error = null;
+        $efh-><AS::MCDecodeHandle.onoctetstreamerror> (sub {
+          $error = $_[1];
+        });
+
+        for my $i (0..254) {
+          $test->id ("a.$i");
+          $test->assert_equals ($efh->getc, "a");
+          $test->id ("a.$i.err");
+          $test->assert_null ($error);
+        }
+
+        $test->id ("E3");
+        $test->assert_equals ($efh->getc, "\xE3");
+        $test->id ("E3.err");
+        $test->assert_equals ($error, "\xE3");
+        $error = null;
+        
+        $test->id ('eof');
+        $test->assert_null ($efh->getc);
+        $test->id ('eof.err');
+        $test->assert_null ($error);
+##MCDecodeHandle
+
+ClsDef:
+  @ClsQName: ManakaiMCXMLDecodeHandle
+
+  @ClsISA: ManakaiMCDecodeHandle
+
+  @enDesc:
+    The class <Class::ManakaiMCXMLDecodeHandle> can be used
+    to decode a byte stream that contains an XML external parsed 
+    (document, external general, external parameter, or 
+    external DTD subset) entity.
+
+##MCXMLDecodeHandle
+
+ResourceDef:
+  @QName: String
+  @AliasFor: f|MIString
+  @For: ManakaiDOM|ManakaiDOM
+
+PropDef:
+  @QName: mce|onoctetstreamerror
+  @mce:key: onerr
+
+PropDef:
+  @QName: mce|continue
+  @mce:key: cc
+  @enDesc:
+    Whether the <Q::mce|byteBuffer> contains octets that might
+    be part of characters.
+
+PropDef:
+  @QName: mce|charset
+  @mce:key: cs
+
+PropDef:
+  @QName: mce|perlEncodingName
+  @mce:key: enc
+
+PropDef:
+  @QName: mce|filehandle
+  @mce:key: fh
+
+RPropDef:
+  @QName: mce|key
+  @subsetOf: DISPerl|propHashKey
+
+PropDef:
+  @QName: mce|characterQueue
+  @mce:key: cq
+
+PropDef:
+  @QName: mce|byteBuffer
+  @mce:key: bb
+
+ElementTypeBinding: 
+  @Name: PropDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISCore|Property
+    @@ForCheck: =ManakaiDOM|all
+
+ElementTypeBinding: 
+  @Name: RPropDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISSource|ResourceProperty
+    @@ForCheck: =ManakaiDOM|all
+
+
+ElementTypeBinding:
+  @Name: nullCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: ManakaiDOM|InCase
+    @@Value:
+      @@@is-null:1
+      @@@ContentType: DISCore|String
+
+ElementTypeBinding:
+  @Name: TrueCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: ManakaiDOM|InCase
+    @@Value:
+      @@@@: 1
+      @@@ContentType: DISCore|Boolean
+    @@Type: idl|boolean||ManakaiDOM|all
+
+ElementTypeBinding:
+  @Name: FalseCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: ManakaiDOM|InCase
+    @@Value:
+      @@@@: 0
+      @@@ContentType: DISCore|Boolean
+    @@Type: idl|boolean||ManakaiDOM|all
+
+ResourceDef:
+  @DISCore:resourceType: cs|CharsetSet
+  @cs:moduleRef: DISlib|Charset

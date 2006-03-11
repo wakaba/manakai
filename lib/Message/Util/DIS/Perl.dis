@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/03/05 10:07:03 $
+      $Date: 2006/03/11 12:12:39 $
     @@ContentType:
       dis:Date.RCS
   
@@ -41,11 +41,16 @@ Module:
     @@Module:
       @@@QName: MDOM|GenericLS
       @@@WithFor: ManakaiDOM|ManakaiDOMLatest
+    @@Module:
+      @@@QName: DISlib|Charset
+      @@@WithFor: ManakaiDOM|all
 
   @DefaultFor: 
     DIS:ForLatest
 
 Namespace:
+  @cs:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Charset/
   @dd:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#DISDoc/
   @ddel:
@@ -6712,3 +6717,119 @@ TMethods:
                     }));
         }__;
 ##DOMCore:DOMErrorType
+
+TMethods:
+  @enDesc:
+    <Q::cs|CharsetSet>
+
+  @TMethod:
+    @@Name: getPerlModuleMemberCode
+    @@DIS:targetType: cs|CharsetSet
+    @@Param:
+      @@@Name: factory
+      @@@Type: PCDocument
+    @@Param:
+      @@@Name: thismod_pack
+      @@@Type: DIS|PLPack
+    @@Return:
+      @@@Type: Node
+      @@@PerlDef:
+        __DEEP{
+          my %done;
+          for my $v (@{$self-><M::DIS|DISResourceProp.getPropertyValueList>
+                                (<Q::cs|moduleRef>)}) {
+            my $mod = $v-><M::dv|DVURIValue.getResource>
+                            ($self-><AG::anyres.database>);
+            R: for my $res (@{$mod-><M::DIS|DISModule.getResourceList>}) {
+              next R unless $res-><M::anyres.isTypeURI> (<Q::cs|Charset>);
+              next R if $done{$res-><AG::anyres.uri>};
+              $done{$res-><AG::anyres.uri>} = true;
+              $res-><M::DISResourcePerl.getPerlModuleMemberCode>
+                      ($factory, $thismod_pack);
+            }
+          }
+        }__;
+##cs|CharsetSet
+
+TMethods:
+  @enDesc:
+    <Q::cs|Charset>
+
+  @TMethod:
+    @@Name: getPerlDefinitionHashNamespace
+    @@DIS:targetType: cs|Charset
+    @@Return:
+      @@@Type: DISString
+      @@@PerlDef:
+        $r = q<Message::Charset::Encode>;
+
+  @TMethod:
+    @@Name: getPerlModuleMemberCode
+    @@DIS:targetType: cs|Charset
+    @@Param:
+      @@@Name: factory
+      @@@Type: PCDocument
+    @@Param:
+      @@@Name: thismod_pack
+      @@@Type: DIS|PLPack
+    @@Return:
+      @@@Type: Node
+      @@@PerlDef:
+        __DEEP{
+          my $uris = [grep {$_ !~ /^tag:suika\.fam\.cx,2005-09/} @{
+                        $self-><AG::anyres.uris>
+                     }];
+          my $ns = $self-><M::DISResourcePerl.getPerlDefinitionHashNamespace>;
+
+          $r = $factory-><M::PCDocument.createPCStatement>;
+          $r-><M::DIS|PLAnyCon.appendNewPCVariable> ('$', $ns, 'CharsetDef');
+          $r-><M::DIS|PLBlockCon.appendCode> ('->{');
+          $r-><M::DIS|PLAnyCon.appendStringLiteral> ($uris->[0]);
+          $r-><M::DIS|PLBlockCon.appendCode> ('} = ');
+          for my $uri (@$uris[1..$#$uris]) {
+            $r-><M::DIS|PLAnyCon.appendNewPCVariable> ('$', $ns, 'CharsetDef');
+            $r-><M::DIS|PLBlockCon.appendCode> ('->{');
+            $r-><M::DIS|PLAnyCon.appendStringLiteral> ($uri);
+            $r-><M::DIS|PLBlockCon.appendCode> ('} = ');
+          }
+
+          my $prop = {
+            uri => {map {$_ => true} @$uris},
+            <H::cs|ietfName> =>
+                $self-><M::DIS|DISResourceProp.getPropertyTextList>
+                         (<Q::cs|ietfName>),
+            <H::cs|preferredMIMEName> =>
+                $self-><M::DIS|DISResourceProp.getPropertyText>
+                         (<Q::cs|preferredMIMEName>),
+            <H::cs|xmlName> =>
+                $self-><M::DIS|DISResourceProp.getPropertyTextList>
+                         (<Q::cs|xmlName>),
+            <H::cs|perlName> =>
+                $self-><M::DIS|DISResourceProp.getPropertyTextList>
+                         (<Q::cs|perlName>),
+            <H::cs|isBlockSafe> => $self-><M::anyres.isTypeURI>
+                                            (<Q::cs|BlockSafe>),
+          };
+
+          unless (defined $prop->{<H::cs|preferredMIMEName>}) {
+            $prop->{<H::cs|preferredMIMEName>}
+              = $self-><M::DIS|DISResourceProp.getPropertyText>
+                         (<Q::cs|ianaCanonicalName>,
+                          $prop->{<H::cs|ietfName>}->[0]);
+          }
+
+          for (keys %$prop) {
+            delete $prop->{$_} unless $prop->{$_};
+            delete $prop->{$_}
+              if ref $prop->{$_} eq 'ARRAY' and not @{$prop->{$_}};
+            delete $prop->{$_}
+              if ref $prop->{$_} eq 'HASH' and not %{$prop->{$_}};
+          }
+
+          if (1 < keys %$prop) { # |uri| + ...
+            $r-><M::DIS|PLAnyCon.appendNewPCLiteral> ($prop);
+            $thismod_pack-><M::Node.appendChild> ($r);
+          }
+          $r = null;
+        }__;
+##cs|Charset

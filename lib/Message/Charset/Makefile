@@ -43,7 +43,7 @@ GENERATED_FILES = $(PM_FILES)
 all: $(PM_FILES)
 
 $(PM_FILES): %$(PM_SUFFIX): %$(DIS_SUFFIX) $(DAF_PL)
-	$(DAF) --create-perl-module="$(NS_URI)$* $@"
+	$(DAF) --create-perl-module="$(NS_CHARSET)$* $@"
 	$(PERL_CHK) $@
 
 clean:
@@ -53,5 +53,5 @@ clean:
 distclean: clean
 	$(RMALL) *$(DAEM_SUFFIX) *$(DAFX_SUFFIX)
 
-## $Date: 2006/03/10 10:52:02 $
+## $Date: 2006/03/11 12:12:38 $
 ## License: Public Domain.

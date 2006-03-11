@@ -53,12 +53,15 @@ DOMTS2PERL_PL = $(MANAKAI_BIN_DIR)domts2perl.pl
 DOMTS2PERL = $(PERL_) -I$(MANAKAI_BIN_DIR) $(DOMTS2PERL_PL)
 DOMTEST2PERL_PL = $(MANAKAI_BIN_DIR)domtest2perl.pl
 
+NS_CHARSET    = http://suika.fam.cx/~wakaba/archive/2005/manakai/Charset/
 NS_MDOM = http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom\#ManakaiDOM.
 NS_MANAKAIDOM = http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom\#
 NS_URI        = http://suika.fam.cx/~wakaba/archive/2005/manakai/URI/
 NS_UTIL       = http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/
 NS_UTIL_DIS   = http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS\#
 
+NS_CHARSET_PT_FILES = \
+  charset-Encode$(PT_SUFFIX)
 NS_MDOM_PT_FILES = \
   dom-DOMFeature$(PT_SUFFIX) dom-GenericLS$(PT_SUFFIX) \
   dom-DOMCore$(PT_SUFFIX) dom-Tree$(PT_SUFFIX) \
@@ -93,7 +96,19 @@ dom1core:
 	MANAKAI_DOMTEST_FILE_DIR=$(DOMTEST_TESTS_DIR)level1/core/files/ \
 	  $(PERL_TEST_) $(DOMTEST_PERL_DIR)level1/core/$(DOMTEST_FILE).pl
 
-test-module-all: test-module-dom test-module-util
+test-module-all: \
+  test-module-charset \
+  test-module-dom \
+  test-module-uri \
+  test-module-util
+
+test-module-charset: $(NS_CHARSET_PT_FILES)
+	$(PERL_TEST_) charset-*$(PT_SUFFIX)
+
+$(NS_CHARSET_PT_FILES): charset-%$(PT_SUFFIX): \
+  $(MANAKAI_LIB_DIR)Message/Charset/%$(DIS_SUFFIX) $(DAF_PL)
+	$(DAF) --create-perl-test="$(NS_CHARSET)$* $@"
+	$(PERL_CHK) $@
 
 test-module-dom: $(NS_MDOM_PT_FILES)
 	$(PERL_TEST_) dom-*$(PT_SUFFIX)
