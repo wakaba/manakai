@@ -1,5 +1,11 @@
 2006-03-12  Wakaba  <wakaba@suika.fam.cx>
 
+	* Perl.dis (plAddHashKey): Don't throw exception
+	if already-defined-resource is same as the newly-registered-resource.
+	(getPerlModuleMemberCode): Sorts values by name.
+
+2006-03-12  Wakaba  <wakaba@suika.fam.cx>
+
 	* Perl.dis (getPerlModuleMemberCode): Write charset
 	category properties.
 
