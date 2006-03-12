@@ -23,7 +23,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2006/03/11 12:12:38 $
+      $Date: 2006/03/12 10:13:31 $
     @@ContentType:
       dis:Date.RCS
   
@@ -3497,7 +3497,8 @@ IFClsDef:
               $has_type = true;
               my $type_uri = $ce-><AG::DISElement.qnameValueURI>;
               my $type = $self-><M::DISDatabase.getResource> ($type_uri);
-              $res-><M::DISAnyResource.addTypeURI> ($type_uri);
+              $res-><M::DISAnyResource.addTypeURI> ($type_uri,
+                                                    srinfo => $srinfo);
               $type-><AS::DISAnyResource.isReferred> ($ce);
               if ($type-><M::DISResource.isSubsetOfURI>
                                                (<Q::dis:MultipleResource>,
@@ -5294,15 +5295,26 @@ IFClsDef:
       @@@Type: AnyResourceURI
       @@@enDesc:
         A URI to add.
+    @@NamedParam:
+      @@@Name: srinfo
+      @@@Type: DISPerl|HASH||ManakaiDOM|all
+      @@@enDesc:
+        A hash returned by <M::DISDatabase.unloadModule>, to
+        restore super-resource relationship.
+      @@@nullCase:
+        @@@@enDesc:
+          If it is not the updating.
     @@Return:
       @@@PerlDef:
         __DEEP{
           my $current_type = $self-><AG::DISAnyResource.typeResource>;
-          unless ($current_type-><M::DISResource.isSubsetOfURI> ($uri)) {
+          unless ($current_type-><M::DISResource.isSubsetOfURI>
+                                   ($uri, srinfo => $srinfo)) {
             my $db = $self-><AG::DISAnyResource.database>;
             my $res = $db-><M::DISDatabase.getResource> ($uri);
             my $current_uri = $current_type-><AG::DISAnyResource.uri>;
-            if ($res-><M::DISResource.isSubsetOfURI> ($current_uri)) {
+            if ($res-><M::DISResource.isSubsetOfURI>
+                        ($current_uri, srinfo => $srinfo)) {
               $self->{<H::DIS|typeURI>} = $uri;
             } else {
               my $new_uri;
@@ -5313,8 +5325,10 @@ IFClsDef:
               unless ($new_res-><AG::DISAnyResource.isDefined>) {
                 $new_res-><AS::DISAnyResource.isAnonymous> (true);
                 $new_res-><AS::DISAnyResource.isDefined> (true);
-                $new_res-><M::DISResource.addSuperResource> ($current_type);
-                $new_res-><M::DISResource.addSuperResource> ($res);
+                $new_res-><M::DISResource.addSuperResource>
+                            ($current_type, srinfo => $srinfo);
+                $new_res-><M::DISResource.addSuperResource>
+                            ($res, srinfo => $srinfo);
               }
               unless ($new_res-><AG::DISAnyResource.ownerModuleURIRef>) {
                 $new_res-><AS::DISAnyResource.ownerModuleURIRef>

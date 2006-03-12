@@ -16,7 +16,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/03/11 12:12:38 $
+    $Date: 2006/03/12 10:13:31 $
   
   @Require:
     @@Module:
@@ -360,6 +360,17 @@ IFClsDef:
       @@@enDesc:
         A reference to the filehandle that contains the byte 
         stream read by the <IF::MCDecodeHandle> object.
+    @@Param:
+      @@@Name: onerror
+      @@@Type: DISPerl|CODE||ManakaiDOM|all
+      @@@enDesc:
+        A subroutine that is called back when an error is encountered.
+        The <A::MCDecodeHandle.onerror> attribute of the
+        created object is set to this parameter value.
+      @@@nullCase:
+        @@@@enDesc:
+          The <A::MCDecodeHandle.onerror> attribute is set to
+          a do-nothing subroutine.
     @@Return:
       @@@Type: MCDecodeHandle
       @@@enDesc:
@@ -373,15 +384,369 @@ IFClsDef:
                    <H::mce|charset> => $charset,
                    <H::mce|characterQueue> => [],
                    <H::mce|byteBuffer> => '',
-                   <H::mce|onoctetstreamerror> => sub {}};
+                   <H::mce|onerror> => $onerror || sub {}};
         if ($csdef->{uri}->{<Q::xml-auto-charset:>} or
             $charset eq <Q::xml-auto-charset:>) {
-          $r = bless $obj, <ClassName::ManakaiMCXMLDecodeHandle>;
+          __DEEP{
+            my $b = '';
+            $csdef = $Message::Charset::Encode::CharsetDef
+                         ->{<Q::cs|Perl.utf-8>}; # UTF-8 with no BOM
+            $obj->{<H::mce|inputEncoding>} = 'utf-8';
+            if (read $obj->{<H::mce|filehandle>}, $b, 256) {
+              no warnings "substr";
+              no warnings "uninitialized";
+              if (substr ($b, 0, 1) eq "<") {
+                if (substr ($b, 1, 1) eq "?") { # ASCII8
+                  __CODE{XMLEntity.guess::
+                    $ascii => $b,
+                    $errorCondition => {
+                      not $csdef->{<H::cs|ASCII8>} or
+                      $csdef->{<H::cs|BOM.Required>}
+                    },
+                    $defaultURI => {<Q::cs|Perl.utf-8>},
+                    $defaultName => 'utf-8',
+                    $restoreBOM => {},
+                  }__;
+                  if (defined $csdef->{<H::cs|noBOMVariant>}) {
+                    $csdef = $Message::Charset::Encode::CharsetDef
+                               ->{$csdef->{<H::cs|noBOMVariant>}};
+                  }
+                } elsif (substr ($b, 1, 1) eq "\x00") {
+                  if (substr ($b, 2, 2) eq "?\x00") { # ASCII16LE
+                    my $c = $b; $c =~ tr/\x00//d;
+                    __CODE{XMLEntity.guess::
+                      $ascii => $c,
+                      $errorCondition => {
+                        not $csdef->{<H::cs|ASCII16>} or
+                        $csdef->{<H::cs|ASCII16BE>} or
+                        $csdef->{<H::cs|BOM.Required>}
+                      },
+                      $defaultURI => {<Q::cs|Perl.utf-8>},
+                      $defaultName => 'utf-8',
+                      $restoreBOM => {},
+                    }__;
+                    if (defined $csdef->{<H::cs|noBOMVariant16LE>}) {
+                      $csdef = $Message::Charset::Encode::CharsetDef
+                                 ->{$csdef->{<H::cs|noBOMVariant16LE>}};
+                    }
+                  } elsif (substr ($b, 2, 2) eq "\x00\x00") { # ASCII32Endian4321
+                    my $c = $b; $c =~ tr/\x00//d;
+                    __CODE{XMLEntity.guess::
+                      $ascii => $c,
+                      $errorCondition => {
+                        not $csdef->{<H::cs|ASCII32>} or
+                        $csdef->{<H::cs|ASCII32Endian1234>} or
+                        $csdef->{<H::cs|ASCII32Endian2143>} or
+                        $csdef->{<H::cs|ASCII32Endian3412>} or
+                        $csdef->{<H::cs|BOM.Required>}
+                      },
+                      $defaultURI => {<Q::cs|Perl.utf-8>},
+                      $defaultName => 'utf-8',
+                      $restoreBOM => {},
+                    }__;
+                    if (defined $csdef->{<H::cs|noBOMVariant32Endian4321>}) {
+                      $csdef = $Message::Charset::Encode::CharsetDef
+                                 ->{$csdef->{<H::cs|noBOMVariant32Endian4321>}};
+                    }
+                  }
+                }
+              } elsif (substr ($b, 0, 3) eq "\xEF\xBB\xBF") { # UTF8
+                $obj->{<H::mce|hasBOM>} = true;
+                substr ($b, 0, 3) = '';
+                my $c = $b;
+                __CODE{XMLEntity.guess::
+                  $ascii => $c,
+                  $errorCondition => {
+                    not $csdef->{<H::cs|UTF8EncodingScheme>} or
+                    not $csdef->{<H::cs|BOM.Allowed>}
+                  },
+                  $defaultURI => {<Q::cs|Perl.utf-8>},
+                  $defaultName => 'utf-8',
+                  $restoreBOM => {},
+                }__;
+                if (defined $csdef->{<H::cs|noBOMVariant>}) {
+                  $csdef = $Message::Charset::Encode::CharsetDef
+                             ->{$csdef->{<H::cs|noBOMVariant>}};
+                }
+              } elsif (substr ($b, 0, 2) eq "\x00<") {
+                if (substr ($b, 2, 2) eq "\x00?") { # ASCII16BE
+                  my $c = $b; $c =~ tr/\x00//d;
+                  __CODE{XMLEntity.guess::
+                    $ascii => $c,
+                    $errorCondition => {
+                      not $csdef->{<H::cs|ASCII16>} or
+                      $csdef->{<H::cs|ASCII16LE>} or
+                      $csdef->{<H::cs|BOM.Required>}
+                    },
+                    $defaultURI => {<Q::cs|Perl.utf-8>},
+                    $defaultName => 'utf-8',
+                    $restoreBOM => {},
+                  }__;
+                  if (defined $csdef->{<H::cs|noBOMVariant16BE>}) {
+                    $csdef = $Message::Charset::Encode::CharsetDef
+                               ->{$csdef->{<H::cs|noBOMVariant16BE>}};
+                  }
+                } elsif (substr ($b, 2, 2) eq "\x00\x00") { # ASCII32Endian3412
+                  my $c = $b; $c =~ tr/\x00//d;
+                  __CODE{XMLEntity.guess::
+                    $ascii => $c,
+                    $errorCondition => {
+                      not $csdef->{<H::cs|ASCII32>} or
+                      $csdef->{<H::cs|ASCII32Endian1234>} or
+                      $csdef->{<H::cs|ASCII32Endian2143>} or
+                      $csdef->{<H::cs|ASCII32Endian4321>} or
+                      $csdef->{<H::cs|BOM.Required>}
+                    },
+                    $defaultURI => {<Q::cs|Perl.utf-8>},
+                    $defaultName => 'utf-8',
+                    $restoreBOM => {},
+                  }__;
+                  if (defined $csdef->{<H::cs|noBOMVariant32Endian3412>}) {
+                    $csdef = $Message::Charset::Encode::CharsetDef
+                               ->{$csdef->{<H::cs|noBOMVariant32Endian3412>}};
+                  }
+                }
+              } elsif (substr ($b, 0, 2) eq "\xFE\xFF") {
+                if (substr ($b, 2, 2) eq "\x00<") { # ASCII16BE
+                  $obj->{<H::mce|hasBOM>} = true;
+                  substr ($b, 0, 2) = '';
+                  my $c = $b; $c =~ tr/\x00//d;
+                  __CODE{XMLEntity.guess::
+                    $ascii => $c,
+                    $errorCondition => {
+                      not $csdef->{<H::cs|ASCII16>} or
+                      $csdef->{<H::cs|ASCII16LE>} or
+                      not $csdef->{<H::cs|BOM.Allowed>}
+                    },
+                    $defaultURI => {<Q::cs|Perl.utf-16be>},
+                    $defaultName => 'utf-16',
+                    $restoreBOM => {},
+                  }__;
+                  if (defined $csdef->{<H::cs|noBOMVariant16BE>}) {
+                    $csdef = $Message::Charset::Encode::CharsetDef
+                               ->{$csdef->{<H::cs|noBOMVariant16BE>}};
+                  }
+                } elsif (substr ($b, 2, 2) eq "\x00\x00") { # ASCII32Endian3412
+                  $obj->{<H::mce|hasBOM>} = true;
+                  substr ($b, 0, 4) = '';
+                  my $c = $b; $c =~ tr/\x00//d;
+                  __CODE{XMLEntity.guess::
+                    $ascii => $c,
+                    $errorCondition => {
+                      not $csdef->{<H::cs|ASCII32>} or
+                      $csdef->{<H::cs|ASCII32Endian1234>} or
+                      $csdef->{<H::cs|ASCII32Endian2143>} or
+                      $csdef->{<H::cs|ASCII32Endian4321>} or
+                      not $csdef->{<H::cs|BOM.Allowed>}
+                    },
+                    $defaultURI => {<Q::cs|Perl.utf-16be>},
+                    $defaultName => 'utf-16',
+                    $restoreBOM => {
+                      $obj->{<H::mce|byteBuffer>} .= "\x00\x00";
+                    },
+                  }__;
+                  if (defined $csdef->{<H::cs|noBOMVariant32Endian3412>}) {
+                    $csdef = $Message::Charset::Encode::CharsetDef
+                               ->{$csdef->{<H::cs|noBOMVariant32Endian3412>}};
+                  }
+                } else {
+                  $csdef = $Message::Charset::Encode::CharsetDef
+                             ->{<Q::cs|Perl.utf-16be>};
+                  $obj->{<H::mce|inputEncoding>} = 'utf-16';
+                  substr ($b, 0, 2) = '';
+                  $obj->{<H::mce|hasBOM>} = true;
+                }
+              } elsif (substr ($b, 0, 2) eq "\xFF\xFE") {
+                if (substr ($b, 2, 2) eq "<\x00") { # ASCII16LE
+                  $obj->{<H::mce|hasBOM>} = true;
+                  substr ($b, 0, 2) = '';
+                  my $c = $b; $c =~ tr/\x00//d;
+                  __CODE{XMLEntity.guess::
+                    $ascii => $c,
+                    $errorCondition => {
+                      not $csdef->{<H::cs|ASCII16>} or
+                      $csdef->{<H::cs|ASCII16BE>} or
+                      not $csdef->{<H::cs|BOM.Allowed>}
+                    },
+                    $defaultURI => {<Q::cs|Perl.utf-16le>},
+                    $defaultName => 'utf-16',
+                    $restoreBOM => {},
+                  }__;
+                  if (defined $csdef->{<H::cs|noBOMVariant16LE>}) {
+                    $csdef = $Message::Charset::Encode::CharsetDef
+                               ->{$csdef->{<H::cs|noBOMVariant16LE>}};
+                  }
+                } elsif (substr ($b, 2, 2) eq "\x00\x00") { # ASCII32Endian4321
+                  $obj->{<H::mce|hasBOM>} = true;
+                  substr ($b, 0, 4) = '';
+                  my $c = $b; $c =~ tr/\x00//d;
+                  __CODE{XMLEntity.guess::
+                    $ascii => $c,
+                    $errorCondition => {
+                      not $csdef->{<H::cs|ASCII32>} or
+                      $csdef->{<H::cs|ASCII32Endian1234>} or
+                      $csdef->{<H::cs|ASCII32Endian2143>} or
+                      $csdef->{<H::cs|ASCII32Endian3412>} or
+                      not $csdef->{<H::cs|BOM.Allowed>}
+                    },
+                    $defaultURI => {<Q::cs|Perl.utf-16le>},
+                    $defaultName => 'utf-16',
+                    $restoreBOM => {
+                      $obj->{<H::mce|byteBuffer>} .= "\x00\x00";
+                    },
+                  }__;
+                  if (defined $csdef->{<H::cs|noBOMVariant32Endian4321>}) {
+                    $csdef = $Message::Charset::Encode::CharsetDef
+                               ->{$csdef->{<H::cs|noBOMVariant32Endian4321>}};
+                  }
+                } else {
+                  $csdef = $Message::Charset::Encode::CharsetDef
+                             ->{<Q::cs|Perl.utf-16le>};
+                  $obj->{<H::mce|inputEncoding>} = 'utf-16';
+                  substr ($b, 0, 2) = '';
+                  $obj->{<H::mce|hasBOM>} = true;
+                }
+              } elsif (substr ($b, 0, 2) eq "\x00\x00") {
+                if (substr ($b, 2, 2) eq "\x00<") { # ASCII32Endian1234
+                  my $c = $b; $c =~ tr/\x00//d;
+                  __CODE{XMLEntity.guess::
+                    $ascii => $c,
+                    $errorCondition => {
+                      not $csdef->{<H::cs|ASCII32>} or
+                      $csdef->{<H::cs|ASCII32Endian2143>} or
+                      $csdef->{<H::cs|ASCII32Endian3412>} or
+                      $csdef->{<H::cs|ASCII32Endian4321>} or
+                      $csdef->{<H::cs|BOM.Required>}
+                    },
+                    $defaultURI => {<Q::cs|Perl.utf-8>},
+                    $defaultName => 'utf-8',
+                    $restoreBOM => {},
+                  }__;
+                  if (defined $csdef->{<H::cs|noBOMVariant32Endian1234>}) {
+                    $csdef = $Message::Charset::Encode::CharsetDef
+                               ->{$csdef->{<H::cs|noBOMVariant32Endian1234>}};
+                  }
+                } elsif (substr ($b, 2, 2) eq "<\x00") { # ASCII32Endian2143
+                  my $c = $b; $c =~ tr/\x00//d;
+                  __CODE{XMLEntity.guess::
+                    $ascii => $c,
+                    $errorCondition => {
+                      not $csdef->{<H::cs|ASCII32>} or
+                      $csdef->{<H::cs|ASCII32Endian1234>} or
+                      $csdef->{<H::cs|ASCII32Endian3412>} or
+                      $csdef->{<H::cs|ASCII32Endian4321>} or
+                      $csdef->{<H::cs|BOM.Required>}
+                    },
+                    $defaultURI => {<Q::cs|Perl.utf-8>},
+                    $defaultName => 'utf-8',
+                    $restoreBOM => {},
+                  }__;
+                  if (defined $csdef->{<H::cs|noBOMVariant32Endian2143>}) {
+                    $csdef = $Message::Charset::Encode::CharsetDef
+                               ->{$csdef->{<H::cs|noBOMVariant32Endian2143>}};
+                  }
+                } elsif (substr ($b, 2, 2) eq "\xFE\xFF") { # ASCII32Endian1234
+                  $obj->{<H::mce|hasBOM>} = true;
+                  substr ($b, 0, 4) = '';
+                  my $c = $b; $c =~ tr/\x00//d;
+                  __CODE{XMLEntity.guess::
+                    $ascii => $c,
+                    $errorCondition => {
+                      not $csdef->{<H::cs|ASCII32>} or
+                      $csdef->{<H::cs|ASCII32Endian2143>} or
+                      $csdef->{<H::cs|ASCII32Endian3412>} or
+                      $csdef->{<H::cs|ASCII32Endian4321>} or
+                      $csdef->{<H::cs|BOM.Required>}
+                    },
+                    $defaultURI => {<Q::cs|Perl.utf-8>},
+                    $defaultName => 'utf-8',
+                    $restoreBOM => {
+                      $obj->{<H::mce|hasBOM>} = false;
+                      $obj->{<H::mce|byteBuffer>} .= "\x00\x00\xFE\xFF";
+                    },
+                  }__;
+                  if (defined $csdef->{<H::cs|noBOMVariant32Endian1234>}) {
+                    $csdef = $Message::Charset::Encode::CharsetDef
+                               ->{$csdef->{<H::cs|noBOMVariant32Endian1234>}};
+                  }
+                } elsif (substr ($b, 2, 2) eq "\xFF\xFE") { # ASCII32Endian2143
+                  $obj->{<H::mce|hasBOM>} = true;
+                  substr ($b, 0, 4) = '';
+                  my $c = $b; $c =~ tr/\x00//d;
+                  __CODE{XMLEntity.guess::
+                    $ascii => $c,
+                    $errorCondition => {
+                      not $csdef->{<H::cs|ASCII32>} or
+                      $csdef->{<H::cs|ASCII32Endian1234>} or
+                      $csdef->{<H::cs|ASCII32Endian3412>} or
+                      $csdef->{<H::cs|ASCII32Endian4321>} or
+                      $csdef->{<H::cs|BOM.Required>}
+                    },
+                    $defaultURI => {<Q::cs|Perl.utf-8>},
+                    $defaultName => 'utf-8',
+                    $restoreBOM => {
+                      $obj->{<H::mce|hasBOM>} = false;
+                      $obj->{<H::mce|byteBuffer>} .= "\x00\x00\xFF\xFE";
+                    },
+                  }__;
+                  if (defined $csdef->{<H::cs|noBOMVariant32Endian2143>}) {
+                    $csdef = $Message::Charset::Encode::CharsetDef
+                               ->{$csdef->{<H::cs|noBOMVariant32Endian2143>}};
+                  }
+                }
+              # \x4C\x6F\xA7\x94 EBCDIC
+              } # buffer
+              $obj->{<H::mce|byteBuffer>} .= $b;
+            } # read
+          }__;
         } elsif ($csdef->{uri}->{<Q::cs|XML.utf-8>}) {
-
+          ## BOM is optional.
+          __DEEP{
+            my $b = '';
+            if (read $obj->{<H::mce|filehandle>}, $b, 3) {
+              if ($b eq "\xEF\xBB\xBF") {
+                $obj->{<H::mce|hasBOM>} = true;
+              } else {
+                $obj->{<H::mce|byteBuffer>} .= $b;
+              }
+            }
+            $csdef = $Message::Charset::Encode::CharsetDef
+                         ->{<Q::cs|Perl.utf-8>}; # UTF-8 with no BOM
+          }__;
         } elsif ($csdef->{uri}->{<Q::cs|XML.utf-16>}) {
+          ## BOM is mandated.
+          __DEEP{
+            my $b = '';
+            if (read $obj->{<H::mce|filehandle>}, $b, 2) {
+              if ($b eq "\xFE\xFF") {
+                $obj->{<H::mce|hasBOM>} = true;
+                $csdef = $Message::Charset::Encode::CharsetDef
+                             ->{<Q::cs|Perl.utf-16be>}; # UTF-16BE with no BOM
+              } elsif ($b eq "\xFF\xFE") {
+                $obj->{<H::mce|hasBOM>} = true;
+                $csdef = $Message::Charset::Encode::CharsetDef
+                             ->{<Q::cs|Perl.utf-16le>}; # UTF-16LE with no BOM
+              } else {
+                $obj->{<H::mce|onerror>}
+                    ->($onerror, null, <Q::cs|no-bom-error>,
+                       charset_uri => $charset);
+                $obj->{<H::mce|hasBOM>} = false;
+                $obj->{<H::mce|byteBuffer>} .= $b;
+                $csdef = $Message::Charset::Encode::CharsetDef
+                             ->{<Q::cs|Perl.utf-16be>}; # UTF-16BE with no BOM
+              }
+            } else {
+              $obj->{<H::mce|onerror>}
+                  ->($onerror, null, <Q::cs|no-bom-error>,
+                     charset_uri => $charset);
+              $obj->{<H::mce|hasBOM>} = false;
+              $csdef = $Message::Charset::Encode::CharsetDef
+                           ->{<Q::cs|Perl.utf-16be>}; # UTF-16BE with no BOM
+            }
+          }__;
+        }
 
-        } elsif ($csdef->{<H::cs|isBlockSafe>}) {
+        if (not defined $r and $csdef->{<H::cs|isBlockSafe>}) {
           if (defined $csdef->{<H::cs|perlName>}->[0]) {
             $obj->{<H::mce|perlEncodingName>} = $csdef->{<H::cs|perlName>}->[0];
             $r = bless $obj, <ClassName::ManakaiMCDecodeHandle>;
@@ -389,6 +754,35 @@ IFClsDef:
             undef $r unless Encode::find_encoding
                               ($obj->{<H::mce|perlEncodingName>});
           }
+        }
+        unless (defined $r) {
+          __DEEP{
+            $obj->{<H::mce|onerror>}
+                ->($onerror, null, <Q::cs|charset-not-supported-error>,
+                   charset_uri => $charset);
+          }__;
+        }
+
+    @@CODE:
+      @@@QName: XMLEntity.guess
+      @@@PerlDef:
+        if ($ascii =~ /^<\?xml\s+(?:version\s*=\s*["'][^"']*["']\s*)?
+                        encoding\s*=\s*["']([^"']*)/x) {
+          $obj->{<H::mce|inputEncoding>} = lc $1;
+          my $__uri = $self-><M::MCEncodeImplementation.getURIFromCharsetName>
+                               (<Q::cs|xmlName>, $obj->{<H::mce|inputEncoding>});
+          $csdef = $Message::Charset::Encode::CharsetDef->{$__uri};
+          if ($errorCondition) {
+            $obj->{<H::mce|onerror>}
+                ->($obj->{<H::mce|onerror>}, null,
+                   <Q::cs|charset-name-mismatch-error>,
+                   charset_uri => $__uri,
+                   charset_name => $obj->{<H::mce|inputEncoding>});
+          }
+        } else {
+          $csdef = $Message::Charset::Encode::CharsetDef->{$defaultURI};
+          $obj->{<H::mce|inputEncoding>} = $defaultName;
+          $restoreBOM;
         }
 
     @@Test:
@@ -405,6 +799,9 @@ IFClsDef:
         $test->id ('interface');
         $test->assert_isa ($efh, <IFName::MCDecodeHandle>);
 
+        $test->id ('onerr');
+        $test->assert_isa ($efh-><AG::MCDecodeHandle.onerror>, 'CODE');
+
     @@Test:
       @@@QName: MCEncodeImpl.createMCXMLDecodeHandle.test
       @@@PerlDef:
@@ -419,8 +816,33 @@ IFClsDef:
         $test->id ('interface');
         $test->assert_isa ($efh, <IFName::MCDecodeHandle>);
 
-        $test->id ('class');
-        $test->assert_isa ($efh, <ClassName::ManakaiMCXMLDecodeHandle>);
+        $test->id ('onerr');
+        $test->assert_isa ($efh-><AG::MCDecodeHandle.onerror>, 'CODE');
+
+    @@Test:
+      @@@QName: MCEncodeImpl.createMCDecodeHandle.3.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{createImplForTest:: $impl => $impl}__;
+
+        my $errors = 0;
+
+        my $byte = 'a';
+        open my $fh, '>', \$byte;
+        my $efh = $impl-><M::MCEncodeImplementation.createMCDecodeHandle>
+                           (q<http://www.charset.example/>, $fh, sub {
+                             $errors++;
+                             $test->id ('errortype');
+                             $test->assert_equals
+                                      ($_[2],
+                                       <Q::cs|charset-not-supported-error>);
+                           });
+
+        $test->id ('errors');
+        $test->assert_num_equals (actual_value => $errors, expected_value => 1);
+
+        $test->id ('return');
+        $test->assert_null ($efh);
 
   @Method:
     @@Name: getURIFromCharsetName
@@ -445,20 +867,64 @@ IFClsDef:
         @@@@enDesc:
           The implementation was unable to resolve <P::name> to a URI.
       @@@PerlDef:
-        $r = null;
         if ({
           <Q::cs|ietfName> => true,
           <Q::cs|xmlName> => true,
         }->{$domain}) {
-          U: for my $uri (keys %$Message::Charset::Encode::CharsetDef) {
-            for (@{$Message::Charset::Encode::CharsetDef->{$uri}->{$domain}
-                       or []}) {
-              if ($_ eq $name) {
-                $r = $uri;
-                last U;
-              }
-            }
+          $name = lc $name;
+          if ($domain eq <Q::cs|ietfName>) {
+            $r = <Q::icharset|> . $name;
+          } elsif ($domain eq <Q::cs|xmlName>) {
+            $r = <Q::cs|XML.> . $name;
           }
+
+          unless ($Message::Charset::Encode::CharsetDef->{$r}) {
+            U: for my $uri (keys %$Message::Charset::Encode::CharsetDef) {
+              for (@{$Message::Charset::Encode::CharsetDef->{$uri}->{+{
+                     <Q::cs|ietfName> => <H::cs|ietfName>,
+                     <Q::cs|xmlName> => <H::cs|xmlName>,
+                   }->{$domain}} or []}) {
+                if ($_ eq $name) {
+                  $r = $uri;
+                  last U;
+                }
+              }
+            } # U
+          }
+        } else {
+          $r = null;
+        }
+
+    @@Test:
+      @@@QName: MCEncodeImpl.name2uri.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{createImplForTest:: $impl => $impl}__;
+
+        for (
+          [<Q::icharset|utf-8>, 'utf-8'],
+          [<Q::icharset|x-no-such-charset>, 'x-no-such-charset'],
+          [<Q::icharset|utf-8>, 'UTF-8'],
+          [<Q::icharset|utf-8>, 'uTf-8'],
+          [<Q::icharset|utf-16be>, 'utf-16be'],
+        ) {
+          $test->id ('ietfname2uri.'.$_->[1]);
+          my $iname = $impl-><M::MCEncodeImplementation.getURIFromCharsetName>
+                               (<Q::cs|ietfName>, $_->[1]);
+          $test->assert_equals ($iname, $_->[0]);
+        }
+
+        for (
+          [<Q::cs|XML.utf-8>, 'utf-8'],
+          [<Q::cs|XML.x-no-such-charset>, 'x-no-such-charset'],
+          [<Q::cs|XML.utf-8>, 'UTF-8'],
+          [<Q::cs|XML.utf-8>, 'uTf-8'],
+          [<Q::icharset|utf-16be>, 'utf-16be'],
+        ) {
+          $test->id ('xmlname2uri.'.$_->[1]);
+          my $iname = $impl-><M::MCEncodeImplementation.getURIFromCharsetName>
+                               (<Q::cs|xmlName>, $_->[1]);
+          $test->assert_equals ($iname, $_->[0]);
         }
     
   @Method:
@@ -489,9 +955,49 @@ IFClsDef:
           <Q::cs|ietfName> => true,
           <Q::cs|xmlName> => true,
         }->{$domain}) {
-          $r = $Message::Charset::Encode::CharsetDef->{$uri}->{$domain}->[0];
+          $r = $Message::Charset::Encode::CharsetDef->{$uri}->{+{
+                 <Q::cs|ietfName> => <H::cs|ietfName>,
+                 <Q::cs|xmlName> => <H::cs|xmlName>,
+               }->{$domain}}->[0];
+          unless (defined $r) {
+            if ($domain eq <Q::cs|ietfName> and
+                substr ($uri, 0, length <Q::icharset|>) eq <Q::icharset|>) {
+              $r = substr ($uri, length <Q::icharset|>);
+            } elsif ($domain eq <Q::cs|xmlName> and
+                substr ($uri, 0, length <Q::cs|XML.>) eq <Q::cs|XML.>) {
+              $r = substr ($uri, length <Q::cs|XML.>);
+            }
+          }
         } else {
           $r = null;
+        }
+
+    @@Test:
+      @@@QName: MCEncodeImpl.uri2name.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{createImplForTest:: $impl => $impl}__;
+
+        for (
+          [<Q::icharset|utf-8>, 'utf-8'],
+          [<Q::icharset|x-no-such-charset>, 'x-no-such-charset'],
+          [q<http://charset.example/>, null],
+        ) {
+          $test->id ('uri2ietfname.'.$_->[0]);
+          my $iname = $impl-><M::MCEncodeImplementation.getCharsetNameFromURI>
+                               (<Q::cs|ietfName>, $_->[0]);
+          $test->assert_equals ($iname, $_->[1]);
+        }
+
+        for (
+          [<Q::cs|XML.utf-8>, 'utf-8'],
+          [<Q::cs|XML.x-no-such-charset>, 'x-no-such-charset'],
+          [q<http://charset.example/>, null],
+        ) {
+          $test->id ('uri2xmlname.'.$_->[0]);
+          my $iname = $impl-><M::MCEncodeImplementation.getCharsetNameFromURI>
+                               (<Q::cs|xmlName>, $_->[0]);
+          $test->assert_equals ($iname, $_->[1]);
         }
 
   @CODE:
@@ -538,23 +1044,33 @@ IFClsDef:
         $r = $self->{<H::mce|charset>};
 
   @Attr:
-    @@Name: onoctetstreamerror
+    @@Name: onerror
     @@enDesc:
-      A callback function that is invoked when an illegal
-      octet sequence is encountered.
+      A callback function that is invoked when an error is encountered.
 
-      The function will be invoked with two arguments: the
-      <IF::MCDecodeHandle> object and a string that contains
-      the octet sequance.  It <kwd:MAY> throw an exception.
+      {P:: The function will be invoked with arguments:
 
-      By default, it is an empty function.
+        - <Perl::$self>::: The function itself.
+
+        - <Perl::$handle>::: The <IF::MCDecodeHandle> object.
+                             If the error is thrown during the
+                             construction of the object, it might
+                             be <DOM::null> instead.
+
+        - <Perl::$errorType>::: The DOM URI that identifies the category
+                                of the error.
+
+        - <Perl::%opt>::: Named parameters depending to the <Perl::$errorType>.
+
+        It <kwd:MAY> throw an exception.
+      }
     @@Type: DISPerl|CODE||ManakaiDOM|all
     @@Get:
       @@@PerlDef:
-        $r = $self->{<H::mce|onoctetstreamerror>};
+        $r = $self->{<H::mce|onerror>};
     @@Set:
       @@@PerlDef:
-        $self->{<H::mce|onoctetstreamerror>} = $given;
+        $self->{<H::mce|onerror>} = $given;
  
     @@Test:
       @@@QName: MCDecodeHandle.onoctetstreamerror.test
@@ -568,13 +1084,13 @@ IFClsDef:
                            (<Q::cs|Perl.utf8>, $fh);
 
         $test->id ('default');
-        $test->assert_isa ($efh-><AG::MCDecodeHandle.onoctetstreamerror>,
+        $test->assert_isa ($efh-><AG::MCDecodeHandle.onerror>,
                            'CODE');
 
         $test->id ('get.set');
         my $sub1 = sub { return "2" };
-        $efh-><AS::MCDecodeHandle.onoctetstreamerror> ($sub1);
-        my $sub2 = $efh-><AG::MCDecodeHandle.onoctetstreamerror>;
+        $efh-><AS::MCDecodeHandle.onerror> ($sub1);
+        my $sub2 = $efh-><AG::MCDecodeHandle.onerror>;
         $test->assert_equals ($sub2, $sub1);
         $test->assert_equals ($sub2->(), "2");
 
@@ -605,7 +1121,7 @@ IFClsDef:
                 $error = true;
               }
               $self->{<H::mce|continue>} = false;
-            } elsif (not length $self->{<H::mce|byteBuffer>}) {
+            } elsif (512 > length $self->{<H::mce|byteBuffer>}) {
               read $self->{<H::mce|filehandle>},
                    $self->{<H::mce|byteBuffer>}, 256,
                    length $self->{<H::mce|byteBuffer>};
@@ -618,15 +1134,23 @@ IFClsDef:
               if (length $string) {
                 push @{$self->{<H::mce|characterQueue>}}, split //, $string;
                 $r = shift @{$self->{<H::mce|characterQueue>}};
+                if (length $self->{<H::mce|byteBuffer>}) {
+                  $self->{<H::mce|continue>} = true;
+                }
               } else {
-                $r = null;
+                if (length $self->{<H::mce|byteBuffer>}) {
+                  $error = true;
+                } else {
+                  $r = null;
+                }
               }
-              if (length $self->{<H::mce|byteBuffer>}) {
-                $self->{<H::mce|continue>} = true;
-              }
-            } else { # error
+            }
+            if ($error) {
               $r = substr $self->{<H::mce|byteBuffer>}, 0, 1, '';
-              $self->{<H::mce|onoctetstreamerror>}->($self, $r);
+              $self->{<H::mce|onerror>}
+                   ->($self->{<H::mce|onerror>}, $self,
+                      <Q::cs|illegal-octets-error>,
+                      octets => \$r);
             }
           }__;
         }
@@ -643,8 +1167,9 @@ IFClsDef:
                            (<Q::cs|Perl.utf8>, $fh);
 
         my $error = null;
-        $efh-><AS::MCDecodeHandle.onoctetstreamerror> (sub {
-          $error = $_[1];
+        $efh-><AS::MCDecodeHandle.onerror> (sub {
+          my ($self, $efh, $type, %opt) = @_;
+          $error = ${$opt{octets}};
         });
 
         $test->id (1);
@@ -687,8 +1212,9 @@ IFClsDef:
                            (<Q::cs|Perl.utf8>, $fh);
 
         my $error = null;
-        $efh-><AS::MCDecodeHandle.onoctetstreamerror> (sub {
-          $error = $_[1];
+        $efh-><AS::MCDecodeHandle.onerror> (sub {
+          my ($self, $efh, $type, %opt) = @_;
+          $error = ${$opt{octets}};
         });
 
         for my $i (0..255) {
@@ -725,8 +1251,9 @@ IFClsDef:
                            (<Q::cs|Perl.utf8>, $fh);
 
         my $error = null;
-        $efh-><AS::MCDecodeHandle.onoctetstreamerror> (sub {
-          $error = $_[1];
+        $efh-><AS::MCDecodeHandle.onerror> (sub {
+          my ($self, $efh, $type, %opt) = @_;
+          $error = ${$opt{octets}};
         });
 
         for my $i (0..254) {
@@ -767,8 +1294,9 @@ IFClsDef:
                            (<Q::cs|Perl.utf8>, $fh);
 
         my $error = null;
-        $efh-><AS::MCDecodeHandle.onoctetstreamerror> (sub {
-          $error = $_[1];
+        $efh-><AS::MCDecodeHandle.onerror> (sub {
+          my ($self, $efh, $type, %opt) = @_;
+          $error = ${$opt{octets}};
         });
 
         for my $i (0..254) {
@@ -788,20 +1316,915 @@ IFClsDef:
         $test->assert_null ($efh->getc);
         $test->id ('eof.err');
         $test->assert_null ($error);
+
+  @Attr:
+    @@Name: inputEncoding
+    @@enDesc:
+      The name of the input charset.
+    @@Type: String
+    @@Get:
+      @@@enDesc:
+        If there is a string looks like encoding declaration,
+        then the value of it, in lowercase.  Otherwise and
+        there is the UTF-16 <CHAR::BOM>, then <CODE::utf-16>.
+        Otherwise, <CODE::utf-8>.
+      @@@nullCase:
+        @@@@enDesc:
+          If the charset is different from <Q::xml-auto-charset:>.
+      @@@PerlDef:
+        $r = $self->{<H::mce|inputEncoding>};
+
+  @Attr:
+    @@Name: hasBOM
+    @@enDesc:
+      Whether the decoder detected the <CHAR::BYTE ORDER MARK> or not.
+    @@Type: idl|boolean||ManakaiDOM|all
+    @@Get:
+      @@@TrueCase:
+        @@@@enDesc:
+          If there is the <CHAR::BOM>.
+      @@@FalseCase:
+        @@@@enDesc:
+          Either if there is no <CHAR::BOM>, the decoder not 
+          reached to the end of the <CHAR::BOM>, or 
+          the decoder implementation does not provide whether
+          there is the <CHAR::BOM> or not.
+      @@@PerlDef:
+        $r = $self->{<H::mce|hasBOM>};
+
+  @Test:
+    @@QName: MCDecodeHandle.utf-8-optional-bom.1.test
+    @@PerlDef:
+      my $impl;
+      __CODE{createImplForTest:: $impl => $impl}__;
+
+      my $byte = qq<\xEF\xBB\xBFabc>;
+
+      my $error;
+
+      open my $fh, '<', \$byte;
+      my $efh = $impl-><M::MCEncodeImplementation.createMCDecodeHandle>
+                         (<Q::cs|XML.utf-8>, $fh, sub { $error = true });
+
+      $test->id (1);
+      $test->assert_equals ($efh->getc, "a");
+
+      $test->id (2);
+      $test->assert_equals ($efh->getc, "b");
+
+      $test->id (3);
+      $test->assert_equals ($efh->getc, "c");
+
+      $test->id (4);
+      $test->assert_null ($efh->getc);
+
+      $test->id ('err');
+      $test->assert_false ($error);
+
+      $test->id ('bom');
+      $test->assert_true ($efh-><AG::MCDecodeHandle.hasBOM>);
+
+  @Test:
+    @@QName: MCDecodeHandle.utf-8-optional-bom.2.test
+    @@PerlDef:
+      my $impl;
+      __CODE{createImplForTest:: $impl => $impl}__;
+
+      my $byte = qq<abc>;
+
+      my $error;
+
+      open my $fh, '<', \$byte;
+      my $efh = $impl-><M::MCEncodeImplementation.createMCDecodeHandle>
+                         (<Q::cs|XML.utf-8>, $fh, sub { $error = true });
+
+      $test->id (1);
+      $test->assert_equals ($efh->getc, "a");
+
+      $test->id (2);
+      $test->assert_equals ($efh->getc, "b");
+
+      $test->id (3);
+      $test->assert_equals ($efh->getc, "c");
+
+      $test->id (4);
+      $test->assert_null ($efh->getc);
+
+      $test->id ('err');
+      $test->assert_false ($error);
+
+      $test->id ('bom');
+      $test->assert_false ($efh-><AG::MCDecodeHandle.hasBOM>);
+
+  @Test:
+    @@QName: MCDecodeHandle.utf-8-optional-bom.3.test
+    @@PerlDef:
+      my $impl;
+      __CODE{createImplForTest:: $impl => $impl}__;
+
+      my $byte = qq<\xEF\xBB\xBF\xEF\xBB\xBFabc>;
+
+      my $error;
+
+      open my $fh, '<', \$byte;
+      my $efh = $impl-><M::MCEncodeImplementation.createMCDecodeHandle>
+                         (<Q::cs|XML.utf-8>, $fh, sub { $error = true });
+
+      $test->id ('zwnbsp');
+      $test->assert_equals ($efh->getc, "\x{FEFF}");
+
+      $test->id (1);
+      $test->assert_equals ($efh->getc, "a");
+
+      $test->id (2);
+      $test->assert_equals ($efh->getc, "b");
+
+      $test->id (3);
+      $test->assert_equals ($efh->getc, "c");
+
+      $test->id (4);
+      $test->assert_null ($efh->getc);
+
+      $test->id ('err');
+      $test->assert_false ($error);
+
+      $test->id ('bom');
+      $test->assert_true ($efh-><AG::MCDecodeHandle.hasBOM>);
+
+  @Test:
+    @@QName: MCDecodeHandle.utf-8-optional-bom.4.test
+    @@PerlDef:
+      my $impl;
+      __CODE{createImplForTest:: $impl => $impl}__;
+
+      my $byte = qq<\xEF\xBB\xBF>;
+
+      my $error;
+
+      open my $fh, '<', \$byte;
+      my $efh = $impl-><M::MCEncodeImplementation.createMCDecodeHandle>
+                         (<Q::cs|XML.utf-8>, $fh, sub { $error = true });
+
+      $test->id (1);
+      $test->assert_null ($efh->getc);
+
+      $test->id ('err');
+      $test->assert_false ($error);
+
+      $test->id ('bom');
+      $test->assert_true ($efh-><AG::MCDecodeHandle.hasBOM>);
+
+  @Test:
+    @@QName: MCDecodeHandle.utf-8-optional-bom.5.test
+    @@PerlDef:
+      my $impl;
+      __CODE{createImplForTest:: $impl => $impl}__;
+
+      my $byte = qq<>;
+
+      my $error;
+
+      open my $fh, '<', \$byte;
+      my $efh = $impl-><M::MCEncodeImplementation.createMCDecodeHandle>
+                         (<Q::cs|XML.utf-8>, $fh, sub { $error = true });
+
+      $test->id (1);
+      $test->assert_null ($efh->getc);
+
+      $test->id ('err');
+      $test->assert_false ($error);
+
+      $test->id ('bom');
+      $test->assert_false ($efh-><AG::MCDecodeHandle.hasBOM>);
+
+  @Test:
+    @@QName: MCDecodeHandle.utf-8-optional-bom.6.test
+    @@PerlDef:
+      my $impl;
+      __CODE{createImplForTest:: $impl => $impl}__;
+
+      my $byte = qq<ab>;
+
+      my $error;
+
+      open my $fh, '<', \$byte;
+      my $efh = $impl-><M::MCEncodeImplementation.createMCDecodeHandle>
+                         (<Q::cs|XML.utf-8>, $fh, sub { $error = true });
+
+      $test->id (1);
+      $test->assert_equals ($efh->getc, "a");
+
+      $test->id (2);
+      $test->assert_equals ($efh->getc, "b");
+
+      $test->id (3);
+      $test->assert_null ($efh->getc);
+
+      $test->id ('err');
+      $test->assert_false ($error);
+
+      $test->id ('bom');
+      $test->assert_false ($efh-><AG::MCDecodeHandle.hasBOM>);
+
+  @Test:
+    @@QName: MCDecodeHandle.utf-8-optional-bom.7.test
+    @@PerlDef:
+      my $impl;
+      __CODE{createImplForTest:: $impl => $impl}__;
+
+      my $byte = qq<a>;
+
+      my $error;
+
+      open my $fh, '<', \$byte;
+      my $efh = $impl-><M::MCEncodeImplementation.createMCDecodeHandle>
+                         (<Q::cs|XML.utf-8>, $fh, sub { $error = true });
+
+      $test->id (1);
+      $test->assert_equals ($efh->getc, "a");
+
+      $test->id (2);
+      $test->assert_null ($efh->getc);
+
+      $test->id ('err');
+      $test->assert_false ($error);
+
+      $test->id ('bom');
+      $test->assert_false ($efh-><AG::MCDecodeHandle.hasBOM>);
+
+
+  @Test:
+    @@QName: MCDecodeHandle.utf-16-with-bom.1.test
+    @@PerlDef:
+      my $impl;
+      __CODE{createImplForTest:: $impl => $impl}__;
+
+      my $byte = qq<\xFE\xFF\x4E\x00\x00a>;
+
+      my $error;
+
+      open my $fh, '<', \$byte;
+      my $efh = $impl-><M::MCEncodeImplementation.createMCDecodeHandle>
+                         (<Q::cs|XML.utf-16>, $fh, sub { $error = true });
+
+      $test->id (1);
+      $test->assert_equals ($efh->getc, "\x{4E00}");
+
+      $test->id (2);
+      $test->assert_equals ($efh->getc, "a");
+
+      $test->id (3);
+      $test->assert_null ($efh->getc);
+
+      $test->id ('err');
+      $test->assert_false ($error);
+
+      $test->id ('bom');
+      $test->assert_true ($efh-><AG::MCDecodeHandle.hasBOM>);
+
+  @Test:
+    @@QName: MCDecodeHandle.utf-16-with-bom.2.test
+    @@PerlDef:
+      my $impl;
+      __CODE{createImplForTest:: $impl => $impl}__;
+
+      my $byte = qq<\xFF\xFE\x00\x4Ea\x00>;
+
+      my $error;
+
+      open my $fh, '<', \$byte;
+      my $efh = $impl-><M::MCEncodeImplementation.createMCDecodeHandle>
+                         (<Q::cs|XML.utf-16>, $fh, sub { $error = true });
+
+      $test->id (1);
+      $test->assert_equals ($efh->getc, "\x{4E00}");
+
+      $test->id (2);
+      $test->assert_equals ($efh->getc, "a");
+
+      $test->id (3);
+      $test->assert_null ($efh->getc);
+
+      $test->id ('err');
+      $test->assert_false ($error);
+
+      $test->id ('bom');
+      $test->assert_true ($efh-><AG::MCDecodeHandle.hasBOM>);
+
+  @Test:
+    @@QName: MCDecodeHandle.utf-16-with-bom.3.test
+    @@PerlDef:
+      my $impl;
+      __CODE{createImplForTest:: $impl => $impl}__;
+
+      my $byte = qq<\xFE\xFF\x00a>;
+
+      my $error;
+
+      open my $fh, '<', \$byte;
+      my $efh = $impl-><M::MCEncodeImplementation.createMCDecodeHandle>
+                         (<Q::cs|XML.utf-16>, $fh, sub { $error = true });
+
+      $test->id (1);
+      $test->assert_equals ($efh->getc, "a");
+
+      $test->id (2);
+      $test->assert_null ($efh->getc);
+
+      $test->id ('err');
+      $test->assert_false ($error);
+
+      $test->id ('bom');
+      $test->assert_true ($efh-><AG::MCDecodeHandle.hasBOM>);
+
+  @Test:
+    @@QName: MCDecodeHandle.utf-16-with-bom.4.test
+    @@PerlDef:
+      my $impl;
+      __CODE{createImplForTest:: $impl => $impl}__;
+
+      my $byte = qq<\xFF\xFEa\x00>;
+
+      my $error;
+
+      open my $fh, '<', \$byte;
+      my $efh = $impl-><M::MCEncodeImplementation.createMCDecodeHandle>
+                         (<Q::cs|XML.utf-16>, $fh, sub { $error = true });
+
+      $test->id (1);
+      $test->assert_equals ($efh->getc, "a");
+
+      $test->id (2);
+      $test->assert_null ($efh->getc);
+
+      $test->id ('err');
+      $test->assert_false ($error);
+
+      $test->id ('bom');
+      $test->assert_true ($efh-><AG::MCDecodeHandle.hasBOM>);
+
+  @Test:
+    @@QName: MCDecodeHandle.utf-16-with-bom.5.test
+    @@PerlDef:
+      my $impl;
+      __CODE{createImplForTest:: $impl => $impl}__;
+
+      my $byte = qq<\xFE\xFFa>;
+
+      my $error;
+
+      open my $fh, '<', \$byte;
+      my $efh = $impl-><M::MCEncodeImplementation.createMCDecodeHandle>
+                         (<Q::cs|XML.utf-16>, $fh, sub { $error = $_[2] });
+
+      $test->id ('0.error');
+      $test->assert_null ($error);
+
+      $test->id (1);
+      $test->assert_equals ($efh->getc, "a");
+      $test->id ('1.error');
+      $test->assert_equals ($error, <Q::cs|illegal-octets-error>);
+      $error = null;
+
+      $test->id (2);
+      $test->assert_null ($efh->getc);
+
+      $test->id ('err');
+      $test->assert_null ($error);
+
+      $test->id ('bom');
+      $test->assert_true ($efh-><AG::MCDecodeHandle.hasBOM>);
+
+  @Test:
+    @@QName: MCDecodeHandle.utf-16-with-bom.6.test
+    @@PerlDef:
+      my $impl;
+      __CODE{createImplForTest:: $impl => $impl}__;
+
+      my $byte = qq<\xFF\xFEa>;
+
+      my $error;
+
+      open my $fh, '<', \$byte;
+      my $efh = $impl-><M::MCEncodeImplementation.createMCDecodeHandle>
+                         (<Q::cs|XML.utf-16>, $fh, sub { $error = $_[2] });
+
+      $test->id ('0.error');
+      $test->assert_null ($error);
+
+      $test->id (1);
+      $test->assert_equals ($efh->getc, "a");
+      $test->id ('1.error');
+      $test->assert_equals ($error, <Q::cs|illegal-octets-error>);
+      $error = null;
+
+      $test->id (2);
+      $test->assert_null ($efh->getc);
+
+      $test->id ('err');
+      $test->assert_null ($error);
+
+      $test->id ('bom');
+      $test->assert_true ($efh-><AG::MCDecodeHandle.hasBOM>);
+
+  @Test:
+    @@QName: MCDecodeHandle.utf-16-with-bom.7.test
+    @@PerlDef:
+      my $impl;
+      __CODE{createImplForTest:: $impl => $impl}__;
+
+      my $byte = qq<\xFE\xFF>;
+
+      my $error;
+
+      open my $fh, '<', \$byte;
+      my $efh = $impl-><M::MCEncodeImplementation.createMCDecodeHandle>
+                         (<Q::cs|XML.utf-16>, $fh, sub { $error = $_[2] });
+
+      $test->id (1);
+      $test->assert_null ($efh->getc);
+
+      $test->id ('err');
+      $test->assert_null ($error);
+
+      $test->id ('bom');
+      $test->assert_true ($efh-><AG::MCDecodeHandle.hasBOM>);
+
+  @Test:
+    @@QName: MCDecodeHandle.utf-16-with-bom.8.test
+    @@PerlDef:
+      my $impl;
+      __CODE{createImplForTest:: $impl => $impl}__;
+
+      my $byte = qq<\xFF\xFE>;
+
+      my $error;
+
+      open my $fh, '<', \$byte;
+      my $efh = $impl-><M::MCEncodeImplementation.createMCDecodeHandle>
+                         (<Q::cs|XML.utf-16>, $fh, sub { $error = $_[2] });
+
+      $test->id (1);
+      $test->assert_null ($efh->getc);
+
+      $test->id ('err');
+      $test->assert_null ($error);
+
+      $test->id ('bom');
+      $test->assert_true ($efh-><AG::MCDecodeHandle.hasBOM>);
+
+  @Test:
+    @@QName: MCDecodeHandle.utf-16-with-bom.9.test
+    @@PerlDef:
+      my $impl;
+      __CODE{createImplForTest:: $impl => $impl}__;
+
+      my $byte = qq<\xFD\xFF>;
+
+      my $error;
+
+      open my $fh, '<', \$byte;
+      my $efh = $impl-><M::MCEncodeImplementation.createMCDecodeHandle>
+                         (<Q::cs|XML.utf-16>, $fh, sub { $error = $_[2] });
+
+      $test->id ('no.bom');
+      $test->assert_equals ($error, <Q::cs|no-bom-error>);
+      $error = null;
+
+      $test->id (1);
+      $test->assert_equals ($efh->getc, "\x{FDFF}");
+
+      $test->id (2);
+      $test->assert_null ($efh->getc);
+
+      $test->id ('err');
+      $test->assert_null ($error);
+
+      $test->id ('bom');
+      $test->assert_false ($efh-><AG::MCDecodeHandle.hasBOM>);
+
+  @Test:
+    @@QName: MCDecodeHandle.utf-16-with-bom.10.test
+    @@PerlDef:
+      my $impl;
+      __CODE{createImplForTest:: $impl => $impl}__;
+
+      my $byte = qq<\xFD>;
+
+      my $error;
+
+      open my $fh, '<', \$byte;
+      my $efh = $impl-><M::MCEncodeImplementation.createMCDecodeHandle>
+                         (<Q::cs|XML.utf-16>, $fh, sub { $error = $_[2] });
+
+      $test->id ('no.bom');
+      $test->assert_equals ($error, <Q::cs|no-bom-error>);
+      $error = null;
+
+      $test->id (1);
+      $test->assert_equals ($efh->getc, "\xFD");
+      $test->id ('1.error');
+      $test->assert_equals ($error, <Q::cs|illegal-octets-error>);
+      $error = null;
+
+      $test->id (2);
+      $test->assert_null ($efh->getc);
+
+      $test->id ('err');
+      $test->assert_null ($error);
+
+      $test->id ('bom');
+      $test->assert_false ($efh-><AG::MCDecodeHandle.hasBOM>);
+
+  @Test:
+    @@QName: MCDecodeHandle.utf-16-with-bom.11.test
+    @@PerlDef:
+      my $impl;
+      __CODE{createImplForTest:: $impl => $impl}__;
+
+      my $byte = qq<>;
+
+      my $error;
+
+      open my $fh, '<', \$byte;
+      my $efh = $impl-><M::MCEncodeImplementation.createMCDecodeHandle>
+                         (<Q::cs|XML.utf-16>, $fh, sub { $error = $_[2] });
+
+      $test->id ('no.bom');
+      $test->assert_equals ($error, <Q::cs|no-bom-error>);
+      $error = null;
+
+      $test->id (1);
+      $test->assert_null ($efh->getc);
+
+      $test->id ('err');
+      $test->assert_null ($error);
+
+      $test->id ('bom');
+      $test->assert_false ($efh-><AG::MCDecodeHandle.hasBOM>);
+
+  @Test:
+    @@QName: MCDecodeHandle.xml.1.test
+    @@PerlDef:
+      my $impl;
+      __CODE{createImplForTest:: $impl => $impl}__;
+
+      my @testdata = (
+        {
+          id => q<l=0>,
+          in => q<>,
+          out => [null],
+          name => 'utf-8', bom => false,
+        },
+        {
+          id => q<l=1>,
+          in => "a",
+          out => [null, "a", null],
+          name => 'utf-8', bom => false,
+        },
+        {
+          id => q<bom8.l=0>,
+          in => "\xEF\xBB\xBF",
+          out => [null],
+          name => 'utf-8', bom => true,
+        },
+        {
+          id => q<bom8.l=1>,
+          in => "\xEF\xBB\xBFa",
+          out => [null, "a", null],
+          name => 'utf-8', bom => true,
+        },
+        {
+          id => q<bom8.zwnbsp>,
+          in => "\xEF\xBB\xBF\xEF\xBB\xBF",
+          out => [null, "\x{FEFF}", null],
+          name => 'utf-8', bom => true,
+        },
+        {
+          id => q<bom16be.l=0>,
+          in => "\xFE\xFF",
+          out => [null],
+          name => 'utf-16', bom => true,
+        },
+        {
+          id => q<bom16le.l=0>,
+          in => "\xFF\xFE",
+          out => [null],
+          name => 'utf-16', bom => true,
+        },
+        {
+          id => q<bom16be.l=1>,
+          in => "\xFE\xFFa",
+          out => [null, "a", [<Q::cs|illegal-octets-error>]],
+          name => 'utf-16', bom => true,
+        },
+        {
+          id => q<bom16le.l=1>,
+          in => "\xFF\xFEa",
+          out => [null, "a", [<Q::cs|illegal-octets-error>]],
+          name => 'utf-16', bom => true,
+        },
+        {
+          id => q<bom16be.l=2>,
+          in => "\xFE\xFF\x4E\x00",
+          out => [null, "\x{4E00}", null],
+          name => 'utf-16', bom => true,
+        },
+        {
+          id => q<bom16le.l=2>,
+          in => "\xFF\xFE\x00\x4E",
+          out => [null, "\x{4E00}", null],
+          name => 'utf-16', bom => true,
+        },
+        {
+          id => q<bom16be.l=2lt>,
+          in => "\xFE\xFF\x00<",
+          out => [null, "<", null],
+          name => 'utf-16', bom => true,
+        },
+        {
+          id => q<bom16le.l=2lt>,
+          in => "\xFF\xFE<\x00",
+          out => [null, "<", null],
+          name => 'utf-16', bom => true,
+        },
+        {
+          id => q<bom16be.zwnbsp>,
+          in => "\xFE\xFF\xFE\xFF",
+          out => [null, "\x{FEFF}", null],
+          name => 'utf-16', bom => true,
+        },
+        {
+          id => q<bom16le.zwnbsp>,
+          in => "\xFF\xFE\xFF\xFE",
+          out => [null, "\x{FEFF}", null],
+          name => 'utf-16', bom => true,
+        },
+        {
+          id => q<bom32e3412.l=0>,
+          in => "\xFE\xFF\x00\x00",
+          out => [null, "\x00", null],
+          name => 'utf-16', bom => true,
+        },
+        {
+          id => q<bom32e4321.l=0>,
+          in => "\xFF\xFE\x00\x00",
+          out => [null, "\x00", null],
+          name => 'utf-16', bom => true,
+        },
+        {
+          id => q<bom16be.l=4ltq>,
+          in => "\xFE\xFF\x00<\x00?",
+          out => [null, "<", null, "?", null],
+          name => 'utf-16', bom => true,
+        },
+        {
+          id => q<bom16le.l=4ltq>,
+          in => "\xFF\xFE<\x00?\x00",
+          out => [null, "<", null, "?", null],
+          name => 'utf-16', bom => true,
+        },
+        {
+          id => q<bom16be.decl.1>,
+          in => qq[\xFE\xFF\x00<\x00?\x00x\x00m\x00l\x00 \x00v\x00e\x00r].
+                qq[\x00s\x00i\x00o\x00n\x00=\x00"\x001\x00.\x000\x00"].
+                qq[\x00 \x00e\x00n\x00c\x00o\x00d\x00i\x00n\x00g\x00=].
+                qq[\x00"\x00u\x00t\x00f\x00-\x001\x006\x00"\x00?\x00>],
+          out => [null, "<", null, "?", null, "x", null, "m", null, "l", null,
+                  " ", null, "v", null, "e", null, "r", null, "s", null,
+                  "i", null, "o", null, "n", null, "=", null, '"', null,
+                  "1", null, ".", null, "0", null, '"', null, " ", null,
+                  "e", null, "n", null, "c", null, "o", null, "d", null,
+                  "i", null, "n", null, "g", null, "=", null, '"', null,
+                  "u", null, "t", null, "f", null, "-", null, "1", null,
+                  "6", null, '"', null, "?", null, ">", null],
+          name => 'utf-16', bom => true,
+        },
+        {
+          id => q<bom16le.decl.1>,
+          in => qq[\xFF\xFE<\x00?\x00x\x00m\x00l\x00 \x00v\x00e\x00r].
+                qq[\x00s\x00i\x00o\x00n\x00=\x00"\x001\x00.\x000\x00"].
+                qq[\x00 \x00e\x00n\x00c\x00o\x00d\x00i\x00n\x00g\x00=].
+                qq[\x00"\x00u\x00t\x00f\x00-\x001\x006\x00"\x00?\x00>\x00],
+          out => [null, "<", null, "?", null, "x", null, "m", null, "l", null,
+                  " ", null, "v", null, "e", null, "r", null, "s", null,
+                  "i", null, "o", null, "n", null, "=", null, '"', null,
+                  "1", null, ".", null, "0", null, '"', null, " ", null,
+                  "e", null, "n", null, "c", null, "o", null, "d", null,
+                  "i", null, "n", null, "g", null, "=", null, '"', null,
+                  "u", null, "t", null, "f", null, "-", null, "1", null,
+                  "6", null, '"', null, "?", null, ">", null],
+          name => 'utf-16', bom => true,
+        },
+        {
+          id => q<utf16be.decl.1>,
+          in => qq[\x00<\x00?\x00x\x00m\x00l\x00 \x00v\x00e\x00r].
+                qq[\x00s\x00i\x00o\x00n\x00=\x00"\x001\x00.\x000\x00"].
+                qq[\x00 \x00e\x00n\x00c\x00o\x00d\x00i\x00n\x00g\x00=].
+                qq[\x00"\x00u\x00t\x00f\x00-\x001\x006\x00b\x00e\x00"\x00?\x00>],
+          out => [null, "<", null, "?", null, "x", null, "m", null, "l", null,
+                  " ", null, "v", null, "e", null, "r", null, "s", null,
+                  "i", null, "o", null, "n", null, "=", null, '"', null,
+                  "1", null, ".", null, "0", null, '"', null, " ", null,
+                  "e", null, "n", null, "c", null, "o", null, "d", null,
+                  "i", null, "n", null, "g", null, "=", null, '"', null,
+                  "u", null, "t", null, "f", null, "-", null, "1", null,
+                  "6", null, "b", null, "e", null, '"', null,
+                  "?", null, ">", null],
+          name => 'utf-16be', bom => false,
+        },
+        {
+          id => q<utf16le.decl.1>,
+          in => qq[<\x00?\x00x\x00m\x00l\x00 \x00v\x00e\x00r].
+                qq[\x00s\x00i\x00o\x00n\x00=\x00"\x001\x00.\x000\x00"].
+                qq[\x00 \x00e\x00n\x00c\x00o\x00d\x00i\x00n\x00g\x00=].
+                qq[\x00"\x00u\x00t\x00f\x00-\x001\x006\x00l\x00e\x00"].
+                qq[\x00?\x00>\x00],
+          out => [null, "<", null, "?", null, "x", null, "m", null, "l", null,
+                  " ", null, "v", null, "e", null, "r", null, "s", null,
+                  "i", null, "o", null, "n", null, "=", null, '"', null,
+                  "1", null, ".", null, "0", null, '"', null, " ", null,
+                  "e", null, "n", null, "c", null, "o", null, "d", null,
+                  "i", null, "n", null, "g", null, "=", null, '"', null,
+                  "u", null, "t", null, "f", null, "-", null, "1", null,
+                  "6", null, "l", null, "e", null, '"', null, "?", null,
+                  ">", null],
+          name => 'utf-16le', bom => false,
+        },
+        {
+          id => q<16be.decl.1>,
+          in => qq[\x00<\x00?\x00x\x00m\x00l\x00 \x00v\x00e\x00r].
+                qq[\x00s\x00i\x00o\x00n\x00=\x00"\x001\x00.\x000\x00"].
+                qq[\x00 \x00e\x00n\x00c\x00o\x00d\x00i\x00n\x00g\x00=].
+                qq[\x00"\x00u\x00t\x00f\x00-\x001\x006\x00"\x00?\x00>],
+          out => [[<Q::cs|charset-name-mismatch-error>],
+                  "<", null, "?", null, "x", null, "m", null, "l", null,
+                  " ", null, "v", null, "e", null, "r", null, "s", null,
+                  "i", null, "o", null, "n", null, "=", null, '"', null,
+                  "1", null, ".", null, "0", null, '"', null, " ", null,
+                  "e", null, "n", null, "c", null, "o", null, "d", null,
+                  "i", null, "n", null, "g", null, "=", null, '"', null,
+                  "u", null, "t", null, "f", null, "-", null, "1", null,
+                  "6", null, '"', null, "?", null, ">", null],
+          name => 'utf-16', bom => false,
+        },
+        {
+          id => q<16le.decl.1>,
+          in => qq[<\x00?\x00x\x00m\x00l\x00 \x00v\x00e\x00r].
+                qq[\x00s\x00i\x00o\x00n\x00=\x00"\x001\x00.\x000\x00"].
+                qq[\x00 \x00e\x00n\x00c\x00o\x00d\x00i\x00n\x00g\x00=].
+                qq[\x00"\x00u\x00t\x00f\x00-\x001\x006\x00"\x00?\x00>\x00],
+          out => [[<Q::cs|charset-name-mismatch-error>],
+                  "<", null, "?", null, "x", null, "m", null, "l", null,
+                  " ", null, "v", null, "e", null, "r", null, "s", null,
+                  "i", null, "o", null, "n", null, "=", null, '"', null,
+                  "1", null, ".", null, "0", null, '"', null, " ", null,
+                  "e", null, "n", null, "c", null, "o", null, "d", null,
+                  "i", null, "n", null, "g", null, "=", null, '"', null,
+                  "u", null, "t", null, "f", null, "-", null, "1", null,
+                  "6", null, '"', null, "?", null, ">", null],
+          name => 'utf-16', bom => false,
+        },
+        {
+          id => q<8.decl.1>,
+          in => qq[<?xml version="1.0" encoding="utf-8"?>],
+          out => [null, "<", null, "?", null, "x", null, "m", null, "l", null,
+                  " ", null, "v", null, "e", null, "r", null, "s", null,
+                  "i", null, "o", null, "n", null, "=", null, '"', null,
+                  "1", null, ".", null, "0", null, '"', null, " ", null,
+                  "e", null, "n", null, "c", null, "o", null, "d", null,
+                  "i", null, "n", null, "g", null, "=", null, '"', null,
+                  "u", null, "t", null, "f", null, "-", null, "8", null,
+                  '"', null, "?", null, ">", null],
+          name => 'utf-8', bom => false,
+        },
+        {
+          id => q<8.decl.2>,
+          in => qq[<?xml encoding="utf-8"?>],
+          out => [null, "<", null, "?", null, "x", null, "m", null, "l", null,
+                  " ", null,
+                  "e", null, "n", null, "c", null, "o", null, "d", null,
+                  "i", null, "n", null, "g", null, "=", null, '"', null,
+                  "u", null, "t", null, "f", null, "-", null, "8", null,
+                  '"', null, "?", null, ">", null],
+          name => 'utf-8', bom => false,
+        },
+        {
+          id => q<8.decl.3>,
+          in => qq[<?xml version="1.1" encoding="utf-8"?>],
+          out => [null, "<", null, "?", null, "x", null, "m", null, "l", null,
+                  " ", null, "v", null, "e", null, "r", null, "s", null,
+                  "i", null, "o", null, "n", null, "=", null, '"', null,
+                  "1", null, ".", null, "1", null, '"', null, " ", null,
+                  "e", null, "n", null, "c", null, "o", null, "d", null,
+                  "i", null, "n", null, "g", null, "=", null, '"', null,
+                  "u", null, "t", null, "f", null, "-", null, "8", null,
+                  '"', null, "?", null, ">", null],
+          name => 'utf-8', bom => false,
+        },
+        {
+          id => q<8.decl.4>,
+          in => qq[<?xml version="1.0"?>],
+          out => [null, "<", null, "?", null, "x", null, "m", null, "l", null,
+                  " ", null, "v", null, "e", null, "r", null, "s", null,
+                  "i", null, "o", null, "n", null, "=", null, '"', null,
+                  "1", null, ".", null, "0", null, '"', null, 
+                  "?", null, ">", null],
+          name => 'utf-8', bom => false,
+        },
+        {
+          id => q<bom8.decl.1>,
+          in => qq[\xEF\xBB\xBF<?xml encoding="utf-8"?>],
+          out => [null, "<", null, "?", null, "x", null, "m", null, "l", null,
+                  " ", null,
+                  "e", null, "n", null, "c", null, "o", null, "d", null,
+                  "i", null, "n", null, "g", null, "=", null, '"', null,
+                  "u", null, "t", null, "f", null, "-", null, "8", null,
+                  '"', null, "?", null, ">", null],
+          name => 'utf-8', bom => true,
+        },
+        {
+          id => q<us-ascii.decl.1>,
+          in => qq[<?xml encoding="us-ascii"?>],
+          out => [null, "<", null, "?", null, "x", null, "m", null, "l", null,
+                  " ", null,
+                  "e", null, "n", null, "c", null, "o", null, "d", null,
+                  "i", null, "n", null, "g", null, "=", null, '"', null,
+                  "u", null, "s", null, "-", null, "a", null, "s", null,
+                  "c", null, "i", null, "i", null,
+                  '"', null, "?", null, ">", null],
+          name => 'us-ascii', bom => false,
+        },
+        {
+          id => q<us-ascii.decl.2>,
+          in => qq[<?xml encoding="US-ascii"?>],
+          out => [null, "<", null, "?", null, "x", null, "m", null, "l", null,
+                  " ", null,
+                  "e", null, "n", null, "c", null, "o", null, "d", null,
+                  "i", null, "n", null, "g", null, "=", null, '"', null,
+                  "U", null, "S", null, "-", null, "a", null, "s", null,
+                  "c", null, "i", null, "i", null,
+                  '"', null, "?", null, ">", null],
+          name => 'us-ascii', bom => false,
+        },
+        {
+          id => q<us-ascii.decl.3>,
+          in => qq[<?xml encoding='us-ascii'?>],
+          out => [null, "<", null, "?", null, "x", null, "m", null, "l", null,
+                  " ", null,
+                  "e", null, "n", null, "c", null, "o", null, "d", null,
+                  "i", null, "n", null, "g", null, "=", null, "'", null,
+                  "u", null, "s", null, "-", null, "a", null, "s", null,
+                  "c", null, "i", null, "i", null,
+                  "'", null, "?", null, ">", null],
+          name => 'us-ascii', bom => false,
+        },
+      );
+
+      for my $testdata (@testdata) {
+        my $byte = $testdata->{in};
+        my $error;
+        my $i = 0;
+
+        open my $fh, '<', \$byte;
+        my $efh = $impl-><M::MCEncodeImplementation.createMCDecodeHandle>
+                           (<Q::xml-auto-charset:>, $fh, sub {
+                             my (null, null, $etype, %opt) = @_;
+                             $error = [$etype, \%opt];
+                           });
+
+        $test->id ("$testdata->{id}.bom");
+        my $tf = $testdata->{bom} ? 'assert_true' : 'assert_false';
+        $test->$tf ($efh-><AG::MCDecodeHandle.hasBOM>);
+
+        $test->id ("$testdata->{id}.name");
+        $test->assert_equals ($efh-><AG::MCDecodeHandle.inputEncoding>,
+                              $testdata->{name});
+
+        while (@{$testdata->{out}}) {
+          if ($i != 0) {
+            my $c = shift @{$testdata->{out}};
+            $test->id ("$testdata->{id}.$i");
+            $test->assert_equals ($efh->getc, $c);
+          }
+
+          my $v = shift @{$testdata->{out}};
+          $test->id ("$testdata->{id}.$i.error");
+          if (defined $v) {
+            $test->assert_not_null ($error);
+            $test->assert_equals ($error->[0], $v->[0]);
+          } else {
+            $test->assert_null ($error->[0]);
+          }
+          $error = null;
+          $i++;
+        }
+
+        $test->id ("$testdata->{id}.eof");
+        $test->assert_null ($efh->getc);
+        $test->assert_null ($error);
+      } # testdata
 ##MCDecodeHandle
-
-ClsDef:
-  @ClsQName: ManakaiMCXMLDecodeHandle
-
-  @ClsISA: ManakaiMCDecodeHandle
-
-  @enDesc:
-    The class <Class::ManakaiMCXMLDecodeHandle> can be used
-    to decode a byte stream that contains an XML external parsed 
-    (document, external general, external parameter, or 
-    external DTD subset) entity.
-
-##MCXMLDecodeHandle
 
 ResourceDef:
   @QName: String
@@ -809,8 +2232,16 @@ ResourceDef:
   @For: ManakaiDOM|ManakaiDOM
 
 PropDef:
-  @QName: mce|onoctetstreamerror
+  @QName: mce|onerror
   @mce:key: onerr
+
+PropDef:
+  @QName: mce|inputEncoding
+  @mce:key: ie
+
+PropDef:
+  @QName: mce|hasBOM
+  @mce:key: bom
 
 PropDef:
   @QName: mce|continue

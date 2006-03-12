@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/03/11 12:12:39 $
+      $Date: 2006/03/12 10:13:33 $
     @@ContentType:
       dis:Date.RCS
   
@@ -6809,6 +6809,51 @@ TMethods:
                          (<Q::cs|perlName>),
             <H::cs|isBlockSafe> => $self-><M::anyres.isTypeURI>
                                             (<Q::cs|BlockSafe>),
+            <H::cs|BOM.Required> => $self-><M::anyres.isTypeURI>
+                                            (<Q::cs|BOM.Required>),
+            <H::cs|BOM.Allowed> => $self-><M::anyres.isTypeURI>
+                                            (<Q::cs|BOM.Allowed>),
+            <H::cs|ASCII8> => $self-><M::anyres.isTypeURI>
+                                            (<Q::cs|ASCII8>),
+            <H::cs|ASCII16> => $self-><M::anyres.isTypeURI>
+                                            (<Q::cs|ASCII16>),
+            <H::cs|ASCII16BE> => $self-><M::anyres.isTypeURI>
+                                            (<Q::cs|ASCII16BE>),
+            <H::cs|ASCII16LE> => $self-><M::anyres.isTypeURI>
+                                            (<Q::cs|ASCII16LE>),
+            <H::cs|ASCII32> => $self-><M::anyres.isTypeURI>
+                                            (<Q::cs|ASCII32>),
+            <H::cs|ASCII32Endian1234> => $self-><M::anyres.isTypeURI>
+                                            (<Q::cs|ASCII32Endian1234>),
+            <H::cs|ASCII32Endian2143> => $self-><M::anyres.isTypeURI>
+                                            (<Q::cs|ASCII32Endian3243>),
+            <H::cs|ASCII32Endian3412> => $self-><M::anyres.isTypeURI>
+                                            (<Q::cs|ASCII32Endian3412>),
+            <H::cs|ASCII32Endian4321> => $self-><M::anyres.isTypeURI>
+                                            (<Q::cs|ASCII32Endian4321>),
+            <H::cs|UTF8EncodingScheme> => $self-><M::anyres.isTypeURI>
+                                            (<Q::cs|UTF8EncodingScheme>),
+            <H::cs|noBOMVariant> =>
+                $self-><M::DIS|DISResourceProp.getPropertyText>
+                         (<Q::cs|noBOMVariant>),
+            <H::cs|noBOMVariant16BE> =>
+                $self-><M::DIS|DISResourceProp.getPropertyText>
+                         (<Q::cs|noBOMVariant16BE>),
+            <H::cs|noBOMVariant16LE> =>
+                $self-><M::DIS|DISResourceProp.getPropertyText>
+                         (<Q::cs|noBOMVariant16LE>),
+            <H::cs|noBOMVariant32Endian1234> =>
+                $self-><M::DIS|DISResourceProp.getPropertyText>
+                         (<Q::cs|noBOMVariant32Endian1234>),
+            <H::cs|noBOMVariant32Endian2143> =>
+                $self-><M::DIS|DISResourceProp.getPropertyText>
+                         (<Q::cs|noBOMVariant32Endian3243>),
+            <H::cs|noBOMVariant32Endian3412> =>
+                $self-><M::DIS|DISResourceProp.getPropertyText>
+                         (<Q::cs|noBOMVariant32Endian3412>),
+            <H::cs|noBOMVariant32Endian4321> =>
+                $self-><M::DIS|DISResourceProp.getPropertyText>
+                         (<Q::cs|noBOMVariant32Endian4321>),
           };
 
           unless (defined $prop->{<H::cs|preferredMIMEName>}) {

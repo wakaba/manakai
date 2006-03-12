@@ -7,7 +7,7 @@ Module:
 
   @DISCore:author: DISCore|Wakaba
   @Date:
-    $Date: 2006/03/11 12:12:41 $
+    $Date: 2006/03/12 10:13:34 $
   @License: license|Perl+MPL
   
   @DefaultFor: ManakaiDOM|all
@@ -109,6 +109,7 @@ NamePropDef:
 NamePropDef:
   @QName: cs|ianaAliasName
   @enFN: IANA charset alias name
+  @subsetOf: cs|ianaName
 
 NamePropDef:
   @QName: cs|preferredMIMEName
@@ -264,6 +265,7 @@ CharsetCategoryDef:
   @enDesc:
     A <Q::cs|BOM.Allowed> is a <Q::cs|Charset> in which
     <CHAR::BOM> is defined.
+  @cs:key: boma
 
 CharsetCategoryDef:
   @QName: cs|BOM.Optional
@@ -273,6 +275,7 @@ CharsetCategoryDef:
     A <Q::cs|BOM.Optional> is a <Q::cs|Charset> in which
     <CHAR::BOM> is optional.
   @subsetOf: cs|BOM.Allowed
+  @cs:key: bomo
 
 CharsetCategoryDef:
   @QName: cs|BOM.Required
@@ -282,6 +285,7 @@ CharsetCategoryDef:
     A <Q::cs|BOM.Required> is a <Q::cs|Charset> in which
     <CHAR::BOM> is required.
   @subsetOf: cs|BOM.Allowed
+  @cs:key: bomr
 
 CharsetCategoryDef:
   @QName: cs|ASCIICompatible
@@ -296,54 +300,63 @@ CharsetCategoryDef:
   @enFN:
     ASCII compatible 7- or 8-bit charset
   @subsetOf: cs|ASCIICompatible
+  @cs:key: a8
 
 CharsetCategoryDef:
   @QName: cs|ASCII16
   @enFN:
     ASCII compatible 16-bit charset
   @subsetOf: cs|ASCIICompatible
+  @cs:key: a16
 
 CharsetCategoryDef:
   @QName: cs|ASCII16BE
   @enFN:
     ASCII compatible 16-bit big endian charset
   @subsetOf: cs|ASCII16
+  @cs:key: a16b
 
 CharsetCategoryDef:
   @QName: cs|ASCII16LE
   @enFN:
     ASCII compatible 16-bit little endian charset
   @subsetOf: cs|ASCII16
+  @cs:key: a16l
 
 CharsetCategoryDef:
   @QName: cs|ASCII32
   @enFN:
     ASCII compatible 32-bit charset
   @subsetOf: cs|ASCIICompatible
+  @cs:key: a32
 
 CharsetCategoryDef:
   @QName: cs|ASCII32Endian1234
   @enFN:
     ASCII compatible 32-bit big endian charset
   @subsetOf: cs|ASCII32
+  @cs:key: a32.1234
 
 CharsetCategoryDef:
   @QName: cs|ASCII32Endian2143
   @enFN:
     ASCII compatible 32-bit 2143-endian charset
   @subsetOf: cs|ASCII32
+  @cs:key: a32.2143
 
 CharsetCategoryDef:
   @QName: cs|ASCII32Endian3412
   @enFN:
     ASCII compatible 32-bit 3412-endian charset
   @subsetOf: cs|ASCII32
+  @cs:key: a32.3412
 
 CharsetCategoryDef:
   @QName: cs|ASCII32Endian4321
   @enFN:
     ASCII compatible 32-bit little endian charset
   @subsetOf: cs|ASCII32
+  @cs:key: a32.4321
 
 CharsetCategoryDef:
   @QName: cs|Stateful
@@ -369,7 +382,7 @@ PropDef:
 CharsetCategoryDef:
   @QName: cs|MBCS
   @enFN: multibyte stateless charset
-  @subsetOf: cs|Blocksafe
+  @subsetOf: cs|BlockSafe
 
 CharsetCategoryDef:
   @QName: cs|MBCS.1,2
@@ -386,6 +399,7 @@ CharsetCategoryDef:
   @enFN: UTF-8 encoding scheme
   @subsetOf: cs|ASCII8
   @subsetOf: cs|Stateless
+  @cs:key: u8family
 
 CharsetCategoryDef:
   @QName: cs|ISO2022EncodingScheme
@@ -397,7 +411,7 @@ CharsetCategoryDef:
   @enFN: EUC encoding scheme
   @subsetOf: cs|ISO2022EncodingScheme
   @subsetOf: cs|ASCII8
-  @subsetOf: cs|Blocksafe
+  @subsetOf: cs|BlockSafe
   @subsetOf: cs|MIMEText
 
 CharsetCategoryDef:
@@ -434,7 +448,6 @@ IANACharsetDef:
   @cs:perlAliasName: us-ascii
   @cs:perlAliasName: iso-646-us
   @DISCore:resourceType: cs|PerlEncoding
-  @DISCore:resourceType: cs|ASCII8
   @DISCore:resourceType: cs|ISO8859EncodingScheme
   @DISCore:resourceType: cs|UTF8EncodingScheme
   @DISCore:resourceType: cs|JunetEncodingScheme
@@ -488,6 +501,8 @@ XMLCharsetDef:
   @cs:xmlName: utf-8
   @DISCore:resourceType: cs|BOM.Optional
   @DISCore:resourceType: cs|UTF8EncodingScheme
+  @cs:noBOMVariant: cs|Perl.utf8
+  @enImplNote: noBOMv OK?
 
 IANACharsetDef:
   @QName: cs|UTF-8.RFC2279
@@ -501,11 +516,13 @@ IANACharsetDef:
   @DISCore:resourceType: cs|BOM.Optional
   @DISCore:resourceType: cs|UTF8EncodingScheme
   @DISCore:resourceType: cs|MIMEText
+  @cs:noBOMVariant: cs|Perl.utf8
+  @enImplNote: noBOMv OK?
 
 CharsetDef:
   @QName: cs|Perl.utf-8
   @enDesc:
-    Documented as Unicode, but actually 10646.
+    Unicode UTF-8.
   
     No BOM support.
   @cs:perlCanonicalName: utf-8
@@ -527,6 +544,7 @@ IANACharsetDef:
   @DISCore:resourceType: cs|BOM.Optional
   @DISCore:resourceType: cs|UTF8EncodingScheme
   @DISCore:resourceType: cs|MIMEText
+  @cs:noBOMVariant: cs|Perl.utf-8
 
 CharsetDef:
   @QName: cs|Perl.utf8
@@ -534,6 +552,8 @@ CharsetDef:
   @cs:perlCanonicalName: utf8
   @enDesc:
     See perldoc <Perl::Encode>.
+
+    It can encode > U+7FFFFFFF but cannot decode.
   @DISCore:resourceType: cs|PerlEncoding
   @DISCore:resourceType: cs|UTF8EncodingScheme
   @DISCore:resourceType: cs|MIMEText
@@ -548,6 +568,8 @@ XMLCharsetDef:
   @DISCore:resourceType: cs|BOM.Required
   @DISCore:resourceType: cs|ASCII16
   @DISCore:resourceType: cs|Stateless
+  @cs:noBOMVariant16BE: cs|Perl.utf-16be
+  @cs:noBOMVariant16LE: cs|Perl.utf-16le
 
 IANACharsetDef:
   @QName: icharset|utf-16
@@ -561,6 +583,58 @@ IANACharsetDef:
   @DISCore:resourceType: cs|BOM.Optional
   @DISCore:resourceType: cs|ASCII16
   @DISCore:resourceType: cs|Stateless
+  @cs:noBOMVariant16BE: cs|Perl.utf-16be
+  @cs:noBOMVariant16LE: cs|Perl.utf-16le
+
+IANACharsetDef:
+  @QName: icharset|utf-16be
+  @enDesc:
+    RFC 2781 UTF-16.
+
+    ISO/IEC 10646 (any version after Korean mess) character set.
+
+    ISO/IEC 10646 encoding scheme.
+  @cs:ianaCanonicalName: utf-16be
+  @DISCore:resourceType: cs|BOM.Optional
+  @DISCore:resourceType: cs|ASCII16BE
+  @DISCore:resourceType: cs|Stateless
+  @cs:noBOMVariant16BE: cs|Perl.utf-16be
+
+IANACharsetDef:
+  @QName: icharset|utf-16le
+  @enDesc:
+    RFC 2781 UTF-16.
+
+    ISO/IEC 10646 (any version after Korean mess) character set.
+
+    ISO/IEC 10646 encoding scheme.
+  @cs:ianaCanonicalName: utf-16le
+  @DISCore:resourceType: cs|BOM.Optional
+  @DISCore:resourceType: cs|ASCII16LE
+  @DISCore:resourceType: cs|Stateless
+  @cs:noBOMVariant16LE: cs|Perl.utf-16le
+
+CharsetDef:
+  @QName: cs|Perl.utf-16be
+  @enDesc:
+    Unicode UTF-16.
+
+    No BOM.
+  @cs:perlCanonicalName: utf-16be
+  @DISCore:resourceType: cs|PerlEncoding
+  @DISCore:resourceType: cs|ASCII16BE
+  @DISCore:resourceType: cs|BlockSafe
+
+CharsetDef:
+  @QName: cs|Perl.utf-16le
+  @enDesc:
+    Unicode UTF-16.
+
+    No BOM.
+  @cs:perlCanonicalName: utf-16le
+  @DISCore:resourceType: cs|PerlEncoding
+  @DISCore:resourceType: cs|ASCII16LE
+  @DISCore:resourceType: cs|BlockSafe
 
 IANAXMLCharsetDef:
   @QName: icharset|iso-10646-ucs-2
@@ -571,12 +645,36 @@ IANAXMLCharsetDef:
   @DISCore:resourceType: cs|BOM.Optional
   @DISCore:resourceType: cs|ASCII16
   @DISCore:resourceType: cs|Stateless
+  @cs:noBOMVariant16BE: cs|Perl.ucs-2be
+  @cs:noBOMVariant16LE: cs|Perl.ucs-2le
 
 ResourceDef:
   @QName: cs|XML.iso-10646-ucs-2
   @AliasFor: icharset|iso-10646-ucs-2
   @enImplNote:
     Unsure, but maybe they are same.
+
+CharsetDef:
+  @QName: cs|Perl.ucs-2be
+  @enDesc:
+    Unicode UCS-2.
+
+    No BOM.
+  @cs:perlCanonicalName: ucs-2be
+  @DISCore:resourceType: cs|PerlEncoding
+  @DISCore:resourceType: cs|ASCII16BE
+  @DISCore:resourceType: cs|BlockSafe
+
+CharsetDef:
+  @QName: cs|Perl.ucs-2le
+  @enDesc:
+    Unicode UCS-2.
+
+    No BOM.
+  @cs:perlCanonicalName: ucs-2le
+  @DISCore:resourceType: cs|PerlEncoding
+  @DISCore:resourceType: cs|ASCII16LE
+  @DISCore:resourceType: cs|BlockSafe
 
 IANAXMLCharsetDef:
   @QName: icharset|iso-10646-ucs-4
@@ -587,12 +685,39 @@ IANAXMLCharsetDef:
   @DISCore:resourceType: cs|BOM.Optional
   @DISCore:resourceType: cs|ASCII32
   @DISCore:resourceType: cs|Stateless
+  @cs:noBOMVariant32Endian1234: cs|Perl.utf-32be
+  @cs:noBOMVariant32Endian4321: cs|Perl.utf-32le
+  @enImplNote: noBOMv OK?
 
 ResourceDef:
   @QName: cs|XML.iso-10646-ucs-4
   @AliasFor: icharset|iso-10646-ucs-4
   @enImplNote:
     Unsure, but maybe they are same.
+
+CharsetDef:
+  @QName: cs|Perl.utf-32be
+  @enDesc:
+    Documented as Unicode UTF-32, actually no upper bound.
+
+    No BOM.
+  @cs:perlCanonicalName: utf-32be
+  @cs:perlAliasName: ucs-4be
+  @DISCore:resourceType: cs|PerlEncoding
+  @DISCore:resourceType: cs|ASCII32Endian1234
+  @DISCore:resourceType: cs|BlockSafe
+
+CharsetDef:
+  @QName: cs|Perl.utf-32le
+  @enDesc:
+    Documented as Unicode UTF-32, actually no upper bound.
+
+    No BOM.
+  @cs:perlCanonicalName: utf-32le
+  @cs:perlAliasName: ucs-4le
+  @DISCore:resourceType: cs|PerlEncoding
+  @DISCore:resourceType: cs|ASCII32Endian4321
+  @DISCore:resourceType: cs|BlockSafe
 
 CharsetCategoryDef:
   @QName: cs|EUC1EncodingScheme
@@ -840,3 +965,122 @@ RPropDef:
   @subsetOf: DISPerl|propHashKey
   @multipleProperties: DISCore|Single
   @dataType: DISCore|String
+
+ResourceTypeDef:
+  @QName: cs|ErrorCategory
+  @enFN: error category
+
+ElementTypeBinding:
+  @Name: ErrorDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: cs|ErrorCategory
+
+ErrorDef:
+  @QName: cs|charset-not-supported-error
+  @enDesc:
+    The charset is not supported.
+
+ErrorDef:
+  @QName: cs|illegal-octets-error
+  @enDesc:
+    A sequence of octets that is illegal in the charset is occurred.
+
+ErrorDef:
+  @QName: cs|no-bom-error
+  @enDesc:
+    <CHAR::BOM> is not found.
+
+ErrorDef:
+  @QName: cs|charset-name-mismatch-error
+  @enDesc:
+    The charset name does not match to the octet stream.
+
+RPropDef:
+  @QName: cs|noBOMVariant
+  @enDesc:
+    A variant charset that does not allow the <CHAR::BOM>.
+  @multipleProperties: DISCore|UnorderedList
+  @dataType: DISCore|QName
+  @rdfs:range: cs|Charset
+  @rdfs:domain: cs|Charset
+  @rdfs:domain: cs|BOM.Allowed
+
+RPropDef:
+  @QName: cs|noBOMVariant16BE
+  @enDesc:
+    A big endian variant charset that does not allow the <CHAR::BOM>.
+  @multipleProperties: DISCore|UnorderedList
+  @dataType: DISCore|QName
+  @rdfs:range: cs|Charset
+  @rdfs:range: cs|ASCII16BE
+  @rdfs:domain: cs|Charset
+  @rdfs:domain: cs|BOM.Allowed
+  @rdfs:domain: cs|ASCII16
+  @subsetOf: cs|noBOMVariant
+
+RPropDef:
+  @QName: cs|noBOMVariant16LE
+  @enDesc:
+    A little endian variant charset that does not allow the <CHAR::BOM>.
+  @multipleProperties: DISCore|UnorderedList
+  @dataType: DISCore|QName
+  @rdfs:range: cs|Charset
+  @rdfs:range: cs|ASCII16LE
+  @rdfs:domain: cs|Charset
+  @rdfs:domain: cs|BOM.Allowed
+  @rdfs:domain: cs|ASCII16
+  @subsetOf: cs|noBOMVariant
+
+RPropDef:
+  @QName: cs|noBOMVariant32Endian1234
+  @enDesc:
+    A big endian variant charset that does not allow the <CHAR::BOM>.
+  @multipleProperties: DISCore|UnorderedList
+  @dataType: DISCore|QName
+  @rdfs:range: cs|Charset
+  @rdfs:range: cs|ASCII32Endian1234
+  @rdfs:domain: cs|Charset
+  @rdfs:domain: cs|BOM.Allowed
+  @rdfs:domain: cs|ASCII32
+  @subsetOf: cs|noBOMVariant
+
+RPropDef:
+  @QName: cs|noBOMVariant32Endian2143
+  @enDesc:
+    A 2143-endian variant charset that does not allow the <CHAR::BOM>.
+  @multipleProperties: DISCore|UnorderedList
+  @dataType: DISCore|QName
+  @rdfs:range: cs|Charset
+  @rdfs:range: cs|ASCII32Endian2143
+  @rdfs:domain: cs|Charset
+  @rdfs:domain: cs|BOM.Allowed
+  @rdfs:domain: cs|ASCII32
+  @subsetOf: cs|noBOMVariant
+
+RPropDef:
+  @QName: cs|noBOMVariant32Endian3412
+  @enDesc:
+    A 3412-endian variant charset that does not allow the <CHAR::BOM>.
+  @multipleProperties: DISCore|UnorderedList
+  @dataType: DISCore|QName
+  @rdfs:range: cs|Charset
+  @rdfs:range: cs|ASCII32Endian3412
+  @rdfs:domain: cs|Charset
+  @rdfs:domain: cs|BOM.Allowed
+  @rdfs:domain: cs|ASCII32
+  @subsetOf: cs|noBOMVariant
+
+RPropDef:
+  @QName: cs|noBOMVariant32Endian4321
+  @enDesc:
+    A little endian variant charset that does not allow the <CHAR::BOM>.
+  @multipleProperties: DISCore|UnorderedList
+  @dataType: DISCore|QName
+  @rdfs:range: cs|Charset
+  @rdfs:range: cs|ASCII32Endian4321
+  @rdfs:domain: cs|Charset
+  @rdfs:domain: cs|BOM.Allowed
+  @rdfs:domain: cs|ASCII32
+  @subsetOf: cs|noBOMVariant

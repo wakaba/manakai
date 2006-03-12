@@ -116,16 +116,21 @@ BEGIN { $start_time = time }
 
 use Message::Util::DIS::DNLite;
 use Message::Util::PerlCode;
-use Message::Util::DIS::Test;
-use Message::DOM::GenericLS;
+
+my %feature;
+eval q{
+  use Message::Util::DIS::Test;
+  use Message::DOM::GenericLS;
+  $feature{ExpandedURI q<fe:GenericLS>} = '3.0';
+  $feature{'+' . ExpandedURI q<DIS:TDT>} = '1.0';
+};
 
 my $limpl = $Message::DOM::ImplementationRegistry->get_implementation
                            ({ExpandedURI q<fe:Min> => '3.0',
-                             ExpandedURI q<fe:GenericLS> => '3.0',
                              '+' . ExpandedURI q<DIS:DNLite> => '1.0',
                              '+' . ExpandedURI q<DIS:Core> => '1.0',
                              '+' . ExpandedURI q<Util:PerlCode> => '1.0',
-                             '+' . ExpandedURI q<DIS:TDT> => '1.0',
+                             %feature,
                            });
 my $impl = $limpl->get_feature (ExpandedURI q<DIS:Core> => '1.0');
 my $pc = $impl->get_feature (ExpandedURI q<Util:PerlCode> => '1.0');

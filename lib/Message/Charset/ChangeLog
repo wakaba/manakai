@@ -1,3 +1,15 @@
+2006-03-12  Wakaba  <wakaba@suika.fam.cx>
+
+	* Encode.dis (createMCDecodeHandle): New
+	parameter |onerror| is added.  Charsets |cs:XML.utf-8|, |cs:XML.utf-16|,
+	and |xml-auto-charset:| are implemented.  Throws an error
+	if the charset is not supported.
+	(getURIFromCharsetName, getCharsetNameFromURI): Algorithmic URIs are
+	supported.
+	(onerror): Removed from |onoctetstreamerror|.
+	(MCXMLDecodeHandle): Removed.
+	(inputEncoding, hasBOM): New attributes.
+
 2006-03-11  Wakaba  <wakaba@suika.fam.cx>
 
 	* Makefile: A typo is fixed.
