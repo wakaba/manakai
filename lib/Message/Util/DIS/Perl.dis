@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/03/12 11:29:57 $
+      $Date: 2006/03/12 14:16:55 $
     @@ContentType:
       dis:Date.RCS
   
@@ -5733,6 +5733,7 @@ TMethods:
             my $dpgparser;
             for my $val (@{$self-><M::DIS|DISResourceProp.getPropertyValueList>
                              (<Q::DISPerl:dpgDef>)}) {
+              require Message::DOM::GenericLS;
               require Message::Util::DIS::DPG;
               $dpgparser ||= $plimpl-><M::f|GetFeature
                                          ||ManakaiDOM|ManakaiDOMLatest

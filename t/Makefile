@@ -60,6 +60,9 @@ NS_URI        = http://suika.fam.cx/~wakaba/archive/2005/manakai/URI/
 NS_UTIL       = http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/
 NS_UTIL_DIS   = http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS\#
 
+TEST_PM_FILES = \
+  $(MANAKAI_LIB_DIR)Message/Util/DIS/Test$(PM_SUFFIX)
+
 NS_CHARSET_PT_FILES = \
   charset-Encode$(PT_SUFFIX)
 NS_MDOM_PT_FILES = \
@@ -102,7 +105,7 @@ test-module-all: \
   test-module-uri \
   test-module-util
 
-test-module-charset: $(NS_CHARSET_PT_FILES)
+test-module-charset: $(NS_CHARSET_PT_FILES) $(TEST_PM_FILES)
 	$(PERL_TEST_) charset-*$(PT_SUFFIX)
 
 $(NS_CHARSET_PT_FILES): charset-%$(PT_SUFFIX): \
@@ -110,7 +113,7 @@ $(NS_CHARSET_PT_FILES): charset-%$(PT_SUFFIX): \
 	$(DAF) --create-perl-test="$(NS_CHARSET)$* $@"
 	$(PERL_CHK) $@
 
-test-module-dom: $(NS_MDOM_PT_FILES)
+test-module-dom: $(NS_MDOM_PT_FILES) $(TEST_PM_FILES)
 	$(PERL_TEST_) dom-*$(PT_SUFFIX)
 
 $(NS_MDOM_PT_FILES): dom-%$(PT_SUFFIX): \
@@ -124,7 +127,7 @@ $(NS_MDOM_PT_FILES): dom-%$(PT_SUFFIX): \
 	$(ECHO) "}" >> $@
 	$(PERL_CHK) $@
 
-test-module-uri: $(NS_URI_PT_FILES)
+test-module-uri: $(NS_URI_PT_FILES) $(TEST_PM_FILES)
 	$(PERL_TEST_) uri-*$(PT_SUFFIX)
 
 $(NS_URI_PT_FILES): uri-%$(PT_SUFFIX): \
@@ -132,7 +135,7 @@ $(NS_URI_PT_FILES): uri-%$(PT_SUFFIX): \
 	$(DAF) --create-perl-test="$(NS_URI)$* $@"
 	$(PERL_CHK) $@
 
-test-module-util: $(NS_UTIL_PT_FILES) $(NS_UTIL_DIS_PT_FILES)
+test-module-util: $(NS_UTIL_PT_FILES) $(NS_UTIL_DIS_PT_FILES) $(TEST_PM_FILES)
 	$(PERL_TEST_) util-*$(PT_SUFFIX)
 
 $(NS_UTIL_PT_FILES): util-%$(PT_SUFFIX): \
@@ -158,6 +161,10 @@ $(NS_UTIL_DIS_PT_FILES): util-dis-%$(PT_SUFFIX): \
 
 $(UTIL_MNTEST_PM): $(MANAKAI_LIB_DIR)Message/Util/%: always
 	$(CD) $(MANAKAI_LIB_DIR)Message/Util/ && $(MAKE) $*
+
+$(MANAKAI_LIB_DIR)Message/Util/DIS/Test$(PM_SUFFIX): \
+  $(MANAKAI_LIB_DIR)Message/Util/DIS/Test$(DIS_SUFFIX)
+	$(CD) $(MANAKAI_LIB_DIR)Message/Util/ && $(MAKE) DIS/Test$(PM_SUFFIX)
 
 clean: clean-dom1core-perl
 	$(RMALL) $(GENERATED_FILES)

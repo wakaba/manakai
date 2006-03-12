@@ -7,7 +7,7 @@ Module:
 
   @DISCore:author: DISCore|Wakaba
   @Date:
-    $Date: 2006/02/19 10:55:03 $
+    $Date: 2006/03/12 14:16:56 $
   @License: license|Perl+MPL
   
   @DefaultFor: ManakaiDOM|all
@@ -256,25 +256,6 @@ SPropDef:
   @rdfs:domain: DISCore|Resource
   @rdfs:range: DISCore|Resource
   @dataType: DISCore|TFQNames
-  @multipleProperties: DISCore|Single
-
-SPropDef:
-  @QName:
-    dis:aliasChild
-  @Description:
-    @@lang:en
-    @@@:
-      A <QUOTE::dis> processing instruction whether the subject resource 
-      should be interpreted as a resource when the subject resource 
-      is described as an <Q::dis:aliasFor> another resource.  Any 
-      <Q::dis:ResourceDef> that is a child of alias <Q::dis:ResourceDef> 
-      is not processed when a <QUOTE::dis> file 
-      is compiled, unless <Q::dis:aliasChild> is <CODE::1>. 
-
-    (obsolete?)
-  @rdfs:domain:
-    dis:ResourceDef
-  @dataType: DISCore|Boolean
   @multipleProperties: DISCore|Single
 
 ## -- Pseudo Resource Type

@@ -23,7 +23,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2006/03/12 10:13:31 $
+      $Date: 2006/03/12 14:16:53 $
     @@ContentType:
       dis:Date.RCS
   
@@ -3583,27 +3583,13 @@ IFClsDef:
           }
 
           ## -- Child resources
-          unless ($is_multires) {
+          if (not $is_multires and not $al_node) {
             for my $re (@cres) {
-              unless ($al_node) {
-                $self-><M::ManakaiDISDatabase.loadResource>
+              $self-><M::ManakaiDISDatabase.loadResource>
                                      ($mod, $res, $res, $re,
                                       for_arg => $forArg, forp_arg => $forpArg,
                                       on_resource_read => $onResourceRead,
                                       srinfo => $srinfo);
-              } else {
-                my $ac = $re-><M::ManakaiDISElement.disGetAttribute>
-                                    (<Q::dis:aliasChild>, for_arg => $forArg,
-                                     forp_arg => $forpArg,
-                                     database_arg => $self);
-                if ($ac and $ac-><M::SWCFGNode.value>) {
-                  $self-><M::ManakaiDISDatabase.loadResource>
-                                     ($mod, $res, $res, $re,
-                                      for_arg => $forArg, forp_arg => $forpArg,
-                                      on_resource_read => $onResourceRead,
-                                      srinfo => $srinfo);
-                }
-              }
             }
           }
 

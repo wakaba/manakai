@@ -25,7 +25,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/03/05 10:07:01 $
+      $Date: 2006/03/12 14:16:53 $
     @@ContentType:
       dis:Date.RCS
   
@@ -1245,7 +1245,6 @@ StringDataTypeDef:
     @@PerlDef:
       ($INPUT =~ /\A\p{inxml:_NameStartChar10}\p{inxml:NameChar10}*\z/)
     @@rdf:type: DISPerl|InlineCode
-    @@aliasChild:1
   
   @ResourceDef:
     @@QName: testXML11Name
@@ -1255,7 +1254,6 @@ StringDataTypeDef:
     @@PerlDef:
       ($INPUT =~ /\A\p{inxml:NameStartChar11}\p{inxml:NameChar11}*\z/)
     @@rdf:type: DISPerl|InlineCode
-    @@aliasChild: 1
 
   @ResourceDef:
     @@QName: ensureXMLName
@@ -1312,7 +1310,6 @@ StringDataTypeDef:
   @ResourceDef:
     @@QName: testXML10NCName
     @@rdf:type: DISPerl|InlineCode
-    @@aliasChild:1
     @@enDesc:
       Tests whether a scalar variable string is a valid XML Namespace
       1.0 <CODE::NCName> or not.
@@ -1322,7 +1319,6 @@ StringDataTypeDef:
   @ResourceDef:
     @@QName: testXML11NCName
     @@rdf:type: DISPerl|InlineCode
-    @@aliasChild:1
     @@enDesc:
       Tests whether a scalar variable string is a valid XML Namespace
       1.1 <CODE::NCName> or not.
@@ -1446,7 +1442,6 @@ StringDataTypeDef:
       @@@@:
         Checks whether a string is a legal XML qualified name and if not 
         then raises an exception.
-    @@aliasChild:1
     @@PerlDef:
       @@@For:
         ManakaiDOM:DOM3
@@ -1541,7 +1536,6 @@ StringDataTypeDef:
     @@enDesc:
       Tests whether a scalar variable string is a valid XML
       Namespace 1.0 qualified name or not.
-    @@aliasChild:1
     @@PerlDef:
       ($INPUT =~ /\A\p{inxml:_NCNameStartChar10}\p{inxml:NCNameChar10
                   }*(?::\p{inxml:_NCNameStartChar10}\p{inxml:NCNameChar10}*)?\z/)
@@ -1587,11 +1581,9 @@ StringDataTypeDef:
     @@enDesc:
       Tests whether a scalar variable string is a valid XML
       Namespace 1.1 qualified name or not.
-    @@aliasChild:1
     @@PerlDef:
       ($INPUT =~ /\A\p{inxml:NCNameStartChar11}\p{inxml:NCNameChar11
                   }*(?::\p{inxml:NCNameStartChar11}\p{inxml:NCNameChar11}*)?\z/)
-
         
 
 ResourceDef:
