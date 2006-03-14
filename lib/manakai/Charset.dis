@@ -7,7 +7,7 @@ Module:
 
   @DISCore:author: DISCore|Wakaba
   @Date:
-    $Date: 2006/03/12 10:13:34 $
+    $Date: 2006/03/14 09:47:11 $
   @License: license|Perl+MPL
   
   @DefaultFor: ManakaiDOM|all
@@ -890,6 +890,8 @@ IANAXMLCharsetDef:
   @cs:preferredMIMEName: shift_jis
   @cs:ianaAliasName: ms_kanji
   @cs:ianaAliasName: csshiftjis
+  @cs:perlCanonicalName: shift-jis-1997
+  @DISCore:resourceType: cs|PerlEncoding
   @DISCore:resourceType: cs|ShiftEncodingScheme
   @DISCore:resourceType: cs|MBCS.1,2
 
@@ -915,25 +917,32 @@ CharsetCategoryDef:
   @subsetOf: cs|EUCEncodingScheme
   @subsetOf: cs|MBCS.1,2,3
 
-XMLCharsetDef:
-  @QName: cs|XML.euc-jp
-  @enFN:
-    JIS X 0208:1997-based EUC-JP
-  @enImplNote:
-    What is JIS X 0208:1997 EUC-JP?
-  @cs:xmlName: euc-jp
-  @DISCore:resourceType: cs|EUCEncodingScheme
-
-IANACharsetDef:
+IANAXMLCharsetDef:
   @QName: icharset|extended_unix_code_packed_format_for_japanese
-  @enFN: JIS X 0208-1990-based EUC-JP
+  @enFN: EUC-JP
+  @enDesc:
+    IANA <CODE::EUC-JP>: JIS X 0208-1990 based
+
+    XML <CODE::EUC-JP>: JIS X 0208:1997 based
+
+    They are (maybe) same as per JIS X 0221-1995 and JIS X 0208:1997
+    (and JIS X 0213:2000).
+  @cs:xmlName: euc-jp
   @cs:ianaCanonicalName: extended_unix_code_packed_format_for_japanese
   @cs:ianaAliasName: cseucpkdfmtjapanese
   @cs:ianaAliasName: euc-jp
   @cs:preferredMIMEName: euc-jp
+  @cs:perlCanonicalName: euc-jp-1997
+  @DISCore:resourceType: cs|PerlEncoding
   @DISCore:resourceType: cs|EUCEncodingScheme
-  @enImplNote:
-    Same as <Q::cs|XML.euc-jp>??
+
+ResourceDef:
+  @QName: cs|XML.euc-jp
+  @AliasFor: icharset|extended_unix_code_packed_format_for_japanese
+
+ResourceDef:
+  @QName: icharset|euc-jp
+  @AliasFor: icharset|extended_unix_code_packed_format_for_japanese
 
 CharsetDef:
   @QName: cs|Perl.euc-jp
@@ -996,6 +1005,11 @@ ErrorDef:
   @QName: cs|charset-name-mismatch-error
   @enDesc:
     The charset name does not match to the octet stream.
+
+ErrorDef:
+  @QName: cs|unassigned-code-point-error
+  @enDesc:
+    If an unassigned code point is occurred.
 
 RPropDef:
   @QName: cs|noBOMVariant

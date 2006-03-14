@@ -1,3 +1,13 @@
+2006-03-14  Wakaba  <wakaba@suika.fam.cx>
+
+	* Charset.dis (cs:XML.euc-jp): Now it is an alias
+	name of |icharset:euc-jp| since they are considered as same charset.
+	(cs:unassigned-code-point-error): New error.
+	(icharset:shift_jis, icharset:euc-jp): Perl encoding names are
+	added.  Note that those encodings are provided
+	by non-Perl-standard modules generated
+	from |../Message/Charset/Makefile|.
+
 2006-03-12  Wakaba  <wakaba@suika.fam.cx>
 
 	* DISSource.dis (dis:aliasChild): Removed.

@@ -145,7 +145,8 @@ gl-jis-1978.tbl: gl-jis-1983.tbl
 	$(ECHO) '#?o ucm:mb_cur_max="2"' >> $@
 	$(ECHO) '#?o license="Public Domain"' >> $@
 
-.euc-jp-1997-gr-left.tbr.tmp: $(TBR2TBL_PL)
+.euc-jp-1997-gr-left.tbr.tmp: $(GL_JIS_TBR_FILES) \
+  gl-iso-646-alphanumeric-fw.tbr $(TBR2TBL_PL)
 	$(ECHO) '#?PETBL/1.0 SOURCE' > $@.tmp
 	$(ECHO) '#?import src="gl-jisx0208-common.tbr" mode="standard,fullwidth,isoiec646irv,NOT-SIGN,LARGE-CIRCLE,nonhan-1983-add,han-1978-revised,han-1983-revised,han-1983-swapped,han-1983-add,han-1990-revised,han-1990-add"' >> $@.tmp
 	$(TBR2TBL) $@.tmp > $@
@@ -325,5 +326,5 @@ clean:
 distclean: clean
 	$(RMALL) *$(DAEM_SUFFIX) *$(DAFX_SUFFIX)
 
-## $Date: 2006/03/14 06:47:15 $
+## $Date: 2006/03/14 09:47:11 $
 ## License: Public Domain.
