@@ -16,7 +16,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/03/12 10:13:31 $
+    $Date: 2006/03/14 06:47:15 $
   
   @Require:
     @@Module:
@@ -1316,6 +1316,57 @@ IFClsDef:
         $test->assert_null ($efh->getc);
         $test->id ('eof.err');
         $test->assert_null ($error);
+
+  @Method:
+    @@Name: ungetc
+    @@enDesc:
+      Pushes a character with the given ordinal value back
+      onto the handle's input stream.  In <Perl::IO::Handle>
+      only one character of pushback per handle is guaranteed.
+    @@Param:
+      @@@Name: ord
+      @@@Type: idl|unsignedLong||ManakaiDOM|all
+      @@@enDesc:
+        The ordinal value of the character to push back.
+    @@Return:
+      @@@PerlDef:
+        unshift @{$self->{<H::mce|characterQueue>}}, chr $ord;
+    
+    @@Test:
+      @@@QName: MCDecodeHandle.ungetc.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{createImplForTest:: $impl => $impl}__;
+
+        my $byte = "a\x{4E00}b\x{4E11}";
+
+        open my $fh, '<', \$byte;
+        my $efh = $impl-><M::MCEncodeImplementation.createMCDecodeHandle>
+                           (<Q::cs|Perl.utf8>, $fh);
+
+        $test->id ('1.getc');
+        $test->assert_equals ($efh->getc, "a");
+
+        $test->id ('1.ungetc');
+        $efh->ungetc (ord "a");
+        $test->assert_equals ($efh->getc, "a");
+
+        $test->id ('2.getc');
+        $test->assert_equals ($efh->getc, "\x{4E00}");
+
+        $test->id ('2.ungetc');
+        $efh->ungetc (ord "\x{4E00}");
+        $test->assert_equals ($efh->getc, "\x{4E00}");
+
+        $test->id ('3.getc');
+        $test->assert_equals ($efh->getc, "b");
+
+        $test->id ('4.getc');
+        $test->assert_equals ($efh->getc, "\x{4E11}");
+
+        $test->id ('4.ungetc');
+        $efh->ungetc (ord "\x{4E11}");
+        $test->assert_equals ($efh->getc, "\x{4E11}");
 
   @Attr:
     @@Name: inputEncoding
