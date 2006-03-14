@@ -59,7 +59,7 @@ GL_JIS_TBR_FILES = gl-jisx0208-common.tbr gl-cjk-hiragana.tbr \
   gl-cjk-katakana.tbr gl-cjk-greek.tbr gl-cjk-cyrillic.tbr \
   gl-iso-646-alphanumeric.tbr gl-cjk-box-drawing.tbr
 GENERATED_TBR_FILES = euc-jp-1997.tbr shift-jis-1997.tbr \
-  gl-jis-1978.tbr gl-jis-1983.tbr gl-jis-1997.tbr
+  gl-jis-1978.tbr gl-jis-1983.tbr gl-jis-1997.tbr gl-jis-1997-swapped.tbr
 TBR_FILES = $(GL_JIS_TBR_FILES) $(GENERATED_TBR_FILES) \
   gl-iso-646-alphanumeric-fw.tbr gl-iso-646-symbol.tbr \
   gl-jisx0212-common.tbr jisx0208_1997.tbr
@@ -68,7 +68,8 @@ TBL_FILES = $(GENERATED_TBR_FILES:.tbr=.tbl)
 
 UCM_FILES = $(GENERATED_TBR_FILES:.tbr=.ucm)
 
-ENCODE_DIRECTORIES = GLJIS1978 GLJIS1983 GLJIS1997 EUCJP1997 ShiftJIS1997
+ENCODE_DIRECTORIES = \
+  GLJIS1978 GLJIS1983 GLJIS1997 GLJIS1997Swapped EUCJP1997 ShiftJIS1997
 
 GENERATED_FILES = $(PM_FILES)
 
@@ -88,7 +89,7 @@ jisx0208_1997.tbr $(GL_JIS_TBR_FILES) gl-iso-646-symbol.tbr \
   gl-iso-646-alphanumeric-fw.tbr gl-jisx0212-common.tbr:
 	$(WGET) -O $@ http://suika.fam.cx/gate/cvs/*checkout*/perl/lib/Encode/Table/$@
 
-gl-jis-1997.tbl: jisx0208_1997.tbr $(GL_JIS_TBR_FILES) \
+gl-jis-1997.tbr: jisx0208_1997.tbr $(GL_JIS_TBR_FILES) \
   gl-iso-646-symbol.tbr $(TBR2TBL_PL)
 	$(TBR2TBL) $< > $@
 	$(PERL_INPLACE) -e 'print unless /^#(?!\?PETBL)/' $@
@@ -97,7 +98,68 @@ gl-jis-1997.tbl: jisx0208_1997.tbr $(GL_JIS_TBR_FILES) \
 	$(ECHO) '#?o ucm:mb_cur_max="2"' >> $@
 	$(ECHO) '#?o license="Public Domain"' >> $@
 
-gl-jis-1983.tbl: gl-jis-1997.tbl
+gl-jis-1997-swapped.tbr: gl-jis-1997.tbr
+	$(CP) $< $@
+	$(PERL_INPLACE) -e 'print unless /^#(?!\?PETBL)/' $@
+	$(PERL_INPLACE) -e 'print unless /^0x(?:3033|724D|3229|7274|3342|695A|3349|5978|3376|635E|3443|5E75|3452|6B5D|375B|7074|395C|6268|3C49|6922|3F59|7057|4128|6C4D|445B|5464|4557|626A|456E|5B6D|4573|5E39|4676|6D6E|4768|6A24|4930|5B58|4B79|5056|4C79|692E|4F36|6446|3646|4B6A|4D5A|6076|742[1234])/' $@
+	$(ECHO) '0x3033	U+9C3A		# <cjk>' >> $@
+	$(ECHO) '0x724D	U+9BF5		# <cjk>' >> $@
+	$(ECHO) '0x3229	U+9DAF		# <cjk>' >> $@
+	$(ECHO) '0x7274	U+9D2C		# <cjk>' >> $@
+	$(ECHO) '0x3342	U+8823		# <cjk>' >> $@
+	$(ECHO) '0x695A	U+86CE		# <cjk>' >> $@
+	$(ECHO) '0x3349	U+652A		# <cjk>' >> $@
+	$(ECHO) '0x5978	U+64B9		# <cjk>' >> $@
+	$(ECHO) '0x3376	U+7AC8		# <cjk>' >> $@
+	$(ECHO) '0x635E	U+7AC3		# <cjk>' >> $@
+	$(ECHO) '0x3443	U+704C		# <cjk>' >> $@
+	$(ECHO) '0x5E75	U+6F45		# <cjk>' >> $@
+	$(ECHO) '0x3452	U+8AEB		# <cjk>' >> $@
+	$(ECHO) '0x6B5D	U+8ACC		# <cjk>' >> $@
+	$(ECHO) '0x375B	U+9838		# <cjk>' >> $@
+	$(ECHO) '0x7074	U+981A		# <cjk>' >> $@
+	$(ECHO) '0x395C	U+7926		# <cjk>' >> $@
+	$(ECHO) '0x6268	U+783F		# <cjk>' >> $@
+	$(ECHO) '0x3C49	U+8602		# <cjk>' >> $@
+	$(ECHO) '0x6922	U+854A		# <cjk>' >> $@
+	$(ECHO) '0x3F59	U+9771		# <cjk>' >> $@
+	$(ECHO) '0x7057	U+976D		# <cjk>' >> $@
+	$(ECHO) '0x4128	U+8CE4		# <cjk>' >> $@
+	$(ECHO) '0x6C4D	U+8CCE		# <cjk>' >> $@
+	$(ECHO) '0x445B	U+58FA		# <cjk>' >> $@
+	$(ECHO) '0x5464	U+58F7		# <cjk>' >> $@
+	$(ECHO) '0x4557	U+792A		# <cjk>' >> $@
+	$(ECHO) '0x626A	U+783A		# <cjk>' >> $@
+	$(ECHO) '0x456E	U+6AAE		# <cjk>' >> $@
+	$(ECHO) '0x5B6D	U+68BC		# <cjk>' >> $@
+	$(ECHO) '0x4573	U+6FE4		# <cjk>' >> $@
+	$(ECHO) '0x5E39	U+6D9B		# <cjk>' >> $@
+	$(ECHO) '0x4676	U+9087		# <cjk>' >> $@
+	$(ECHO) '0x6D6E	U+8FE9		# <cjk>' >> $@
+	$(ECHO) '0x4768	U+8805		# <cjk>' >> $@
+	$(ECHO) '0x6A24	U+877F		# <cjk>' >> $@
+	$(ECHO) '0x4930	U+6A9C		# <cjk>' >> $@
+	$(ECHO) '0x5B58	U+6867		# <cjk>' >> $@
+	$(ECHO) '0x4B79	U+5118		# <cjk>' >> $@
+	$(ECHO) '0x5056	U+4FAD		# <cjk>' >> $@
+	$(ECHO) '0x4C79	U+85EA		# <cjk>' >> $@
+	$(ECHO) '0x692E	U+85AE		# <cjk>' >> $@
+	$(ECHO) '0x4F36	U+7C60		# <cjk>' >> $@
+	$(ECHO) '0x6446	U+7BED		# <cjk>' >> $@
+	$(ECHO) '0x3646	U+582F		# <cjk>' >> $@
+	$(ECHO) '0x4B6A	U+69C7		# <cjk>' >> $@
+	$(ECHO) '0x4D5A	U+9059		# <cjk>' >> $@
+	$(ECHO) '0x6076	U+7464		# <cjk>' >> $@
+	$(ECHO) '0x7421	U+5C2D		# <cjk>' >> $@
+	$(ECHO) '0x7422	U+69D9		# <cjk>' >> $@
+	$(ECHO) '0x7423	U+9065		# <cjk>' >> $@
+	$(ECHO) '0x7424	U+7476		# <cjk>' >> $@
+	$(ECHO) '#?o name="gl-jis-1997-swapped"' >> $@
+	$(ECHO) '#?o <-ucs-substition="0x30FB"' >> $@
+	$(ECHO) '#?o ucm:mb_cur_max="2"' >> $@
+	$(ECHO) '#?o license="Public Domain"' >> $@
+
+gl-jis-1983.tbr: gl-jis-1997.tbr
 	$(CP) $< $@
 	$(PERL_INPLACE) -e 'print unless /^#(?!\?PETBL)/' $@
 	$(PERL_INPLACE) -e 'print unless /^0x742[56]/' $@
@@ -106,7 +168,7 @@ gl-jis-1983.tbl: gl-jis-1997.tbl
 	$(ECHO) '#?o ucm:mb_cur_max="2"' >> $@
 	$(ECHO) '#?o license="Public Domain"' >> $@
 
-gl-jis-1978.tbl: gl-jis-1983.tbl
+gl-jis-1978.tbr: gl-jis-1983.tbr
 	$(CP) $< $@
 	$(PERL_INPLACE) -e 'print unless /^#(?!\?PETBL)/' $@
 	$(PERL_INPLACE) -e 'print unless /^0x(?:2(?:2[3-7]|8)|3022|316B|322A|337A|3622|366D|3834|396D|3C48|3D2B|3E5[5F]|4066|415F|424D|433D|444F|453[6F]|4578|4642|4739|482E|4830|4B4B|4C4D|4D69|4F39|5A39|74)/' $@
@@ -289,11 +351,18 @@ euc-jp-1997.tbl: %.tbl: %.tbr \
 shift-jis-1997.tbl: %.tbl: %.tbr $(TBR2TBL_PL)
 	$(TBR2TBL) $< > $@
 
-gl-jis-1978.ucm gl-jis-1983.ucm gl-jis-1997.ucm \
-  euc-jp-1997.ucm shift-jis-1997.ucm: %.ucm: %.tbl $(TBL2UCM_PL)
+%.tbl: %.tbr $(TBR2TBL_PL)
+	$(TBR2TBL) $< > $@
+
+%.ucm: %.tbl $(TBL2UCM_PL)
 	$(TBL2UCM) $< > $@
 
 GLJIS1978 GLJIS1983 GLJIS1997: GLJIS%: gl-jis-%.ucm
+	$(MKDIR) -p $@
+	$(CD) $@ && $(ENC2XS) -M $@ ../$<
+	$(CD) $@ && $(PERL_) ./Makefile.PL
+	$(CD) $@ && $(MAKE)
+GLJIS1997Swapped: gl-jis-1997-swapped.ucm
 	$(MKDIR) -p $@
 	$(CD) $@ && $(ENC2XS) -M $@ ../$<
 	$(CD) $@ && $(PERL_) ./Makefile.PL
@@ -326,5 +395,5 @@ clean:
 distclean: clean
 	$(RMALL) *$(DAEM_SUFFIX) *$(DAFX_SUFFIX)
 
-## $Date: 2006/03/14 09:47:11 $
+## $Date: 2006/03/14 10:26:45 $
 ## License: Public Domain.
