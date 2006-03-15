@@ -1,3 +1,12 @@
+2006-03-15  Wakaba  <wakaba@suika.fam.cx>
+
+	* Value.dis (getPerlCode): New method.
+
+	* Perl.dis (plValueCodeFragment): Deprecated.
+	(getPerlCodeFromDVValue): New method.
+	(plCodeFragment): The implementation for |dis:SetParam|
+	properties was incorrect.
+
 2006-03-12  Wakaba  <wakaba@suika.fam.cx>
 
 	* Perl.dis (plAddHashKey): Don't throw exception

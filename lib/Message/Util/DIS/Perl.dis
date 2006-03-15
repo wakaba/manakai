@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/03/12 14:16:55 $
+      $Date: 2006/03/15 13:45:01 $
     @@ContentType:
       dis:Date.RCS
   
@@ -414,6 +414,11 @@ IFClsDef:
     @@Name: plValueCodeFragment
     @@enDesc:
       A Perl code fragment for value attribute.
+
+        {NOTE::
+          This method is <EM::deprecated>; use
+          <M::DISResourcePerl.getPerlCodeFromDVValue> instead.
+        }
     @@Param:
       @@@Name: attrURI
       @@@Type: DIS|AnyURI
@@ -2547,8 +2552,9 @@ IFClsDef:
           result in a reserved name. 
       @@@PerlDef:
         my $method;
+        my $tr = $self-><AG::anyres.typeResource>;
         __CODE{DIS|getMethodForType::
-          $resource => $self,
+          $type_resource => $tr,
           $method_name => 'pl_name',
           $method => $method,
         }__;
@@ -2691,8 +2697,9 @@ IFClsDef:
           $r = $self->{<H::dp|plFullyQualifiedName>};
         } else {
           my $method;
+          my $tr = $self-><AG::anyres.typeResource>;
           __CODE{DIS|getMethodForType::
-            $resource => $self,
+            $type_resource => $tr,
             $method_name => 'pl_fully_qualified_name',
             $method => $method,
           }__;
@@ -2829,8 +2836,9 @@ IFClsDef:
           $r = $self->{<H::DIS|plCodeFragment>};
         } else {
           my $method;
+          my $tr = $self-><AG::anyres.typeResource>;
           __CODE{DIS|getMethodForType::
-            $resource => $self,
+            $type_resource => $tr,
             $method_name => 'pl_code_fragment',
             $method => $method,
           }__;
@@ -2868,8 +2876,9 @@ IFClsDef:
           If no code is defined for the type of the resource.
       @@@PerlDef:
         my $method;
+        my $tr = $self-><AG::anyres.typeResource>; 
         __CODE{DIS|getMethodForType::
-          $resource => $self,
+          $type_resource => $tr,
           $method_name => 'get_perl_module_member_code',
           $method => $method,
         }__;
@@ -2900,8 +2909,9 @@ IFClsDef:
           If no code is defined for the type of the resource.
       @@@PerlDef:
         my $method;
+        my $tr = $self-><AG::anyres.typeResource>;
         __CODE{DIS|getMethodForType::
-          $resource => $self,
+          $type_resource => $tr,
           $method_name => 'get_perl_class_member_code',
           $method => $method,
         }__;
@@ -2932,8 +2942,9 @@ IFClsDef:
           If no code is defined for the type of the resource.
       @@@PerlDef:
         my $method;
+        my $tr = $self-><AG::anyres.typeResource>;
         __CODE{DIS|getMethodForType::
-          $resource => $self,
+          $type_resource => $tr,
           $method_name => 'get_perl_interface_member_code',
           $method => $method,
         }__;
@@ -2959,8 +2970,9 @@ IFClsDef:
           If no definition hash is defined for the resource.
       @@@PerlDef:
         my $method;
+        my $tr = $self-><AG::anyres.typeResource>;
         __CODE{DIS|getMethodForType::
-          $resource => $self,
+          $type_resource => $tr,
           $method_name => 'get_perl_definition_hash_namespace',
           $method => $method,
         }__;
@@ -2990,8 +3002,9 @@ IFClsDef:
           If no error code name is defined.
       @@@PerlDef:
         my $method;
+        my $tr = $self-><AG::anyres.typeResource>;
         __CODE{DIS|getMethodForType::
-          $resource => $self,
+          $type_resource => $tr,
           $method_name => 'get_perl_error_code_name',
           $method => $method,
         }__;
@@ -3048,6 +3061,48 @@ IFClsDef:
       @@@ContentType:
         lang:Perl
     @@DISPerl:defaultValueHasSelfReference:1
+
+  @Method:
+    @@Name: getPerlCodeFromDVValue
+    @@enDesc:
+      Converts a <Q::dv|DVValue> in the type and returns an equivalent
+      Perl code object.
+    @@Param:
+      @@@Name: factory
+      @@@Type: PCDocument
+      @@@enDesc:
+        The document to which the newly created Perl code belongs.
+    @@Param:
+      @@@Name: s
+      @@@Type: dv|DVValue
+      @@@enDesc:
+        The value to parse.
+      @@@nullCase:
+        @@@@enDesc:
+          If there is no value object.
+    @@Return:
+      @@@Type: DIS|MPLCodeFragment
+      @@@enDesc:
+        The perl code object.
+      @@@nullCase:
+        @@@@enDesc:
+          If the resource is not a type, if the <P::s> 
+          represents the <DOM::null> in the type, or
+          if <P::s> is <DOM::null> and it is not allowed in the type.
+      @@@PerlDef:
+        my $method;
+        __CODE{DIS|getMethodForType::
+          $type_resource => $self,
+          $method_name => 'get_perl_code_from_dv_value',
+          $method => $method,
+        }__;
+        if ($method) {
+          __DEEP{
+            $r = $method->(@_);
+          }__;
+        } else {
+          $r = null;
+        } 
 
   @Method:
     @@Name: plPreprocessPerlCode
@@ -6581,8 +6636,7 @@ TMethods:
             my $plimpl = $self-><AG::DISAnyResourcePerl.plImplementation>;
             my $db = $self-><AG::DIS|DISAnyResource.database>;
             my $cfgname = <ClassM::PLImplClass.perlLiteral>
-                           (lc $cparam-><M::DIS|DISResourceProp.getPropertyText>
-                             (<Q::DOMCore:domConfigurationParameterName>, $uri));
+                         ($cparam-><M::anyres.getDOMConfigurationParameterName>);
             my %prop;
             for ([getter => <Q::DOMCore:DOMConfigurationParameterGetter>],
                  [setter => <Q::DOMCore:DOMConfigurationParameterSetter>],
@@ -6625,11 +6679,14 @@ TMethods:
                     next unless $_->isa (<IFName::dv|DVURIValue>);
                     my $suri = $_-><AG::dv|DVURIValue.uri>;
                     my $sres = $db-><M::DIS|DISDatabase.getResource> ($suri);
+                    $sres = $db-><M::DIS|DISDatabase.getResource>
+                                   ($sres-><AG::anyres.nameURI>);
                     my $v = $_-><M::dv|DVValue.getProperty> (<Q::dis:Value>);
                     next SP unless $v;
                     $prop{setparam}->[$tf]->{
                       $sres-><M::DIS|DISResourceProp.getPropertyText>
-                                 (<Q::DISPerl:propHashKey>, $suri)
+                                 (<Q::DISPerl:propHashKey>,
+                                  $sres-><AG::anyres.uri>)
                     } = $v-><AG::dv|DVValue.value>;
                   } # SP
                 }
@@ -6886,3 +6943,81 @@ TMethods:
           $r = null;
         }__;
 ##cs|Charset
+
+TMethods:
+  @enDesc:
+    <Q::DISCore|String>
+
+  @TMethod:
+    @@Name: getPerlCodeFromDVValue
+    @@DIS:targetType: DISCore|String
+    @@Param:
+      @@@Name: factory
+      @@@Type: PCDocument
+    @@Param:
+      @@@Name: s
+      @@@Type: dv|DVValue
+      @@@nullCase:
+        @@@@enDesc:
+    @@Return:
+      @@@Type: DIS|MPLCodeFragment
+      @@@PerlDef:
+        $r = $factory-><M::PCDocument.createPCLiteral>
+                         (defined $s
+                            ? $s-><AG::dv|DVValue.isNull>
+                                ? null
+                                : $s-><AG::dv|DVValue.stringValue>
+                            : null);
+##DISCore|String
+
+TMethods:
+  @enDesc:
+    <Q::DISCore|Boolean>
+
+  @TMethod:
+    @@Name: getPerlCodeFromDVValue
+    @@DIS:targetType: DISCore|Boolean
+    @@Param:
+      @@@Name: factory
+      @@@Type: PCDocument
+    @@Param:
+      @@@Name: s
+      @@@Type: dv|DVValue
+      @@@nullCase:
+        @@@@enDesc:
+    @@Return:
+      @@@Type: DIS|MPLCodeFragment
+      @@@PerlDef:
+        $r = $factory-><M::PCDocument.createPCLiteral>
+                         (defined $s
+                            ? $s-><AG::dv|DVValue.isNull>
+                                ? null
+                                : $s-><AG::dv|DVValue.value> ? true : false
+                            : null);
+##DISCore|Boolean
+
+TMethods:
+  @enDesc:
+    <Q::DISCore|Integer>
+
+  @TMethod:
+    @@Name: getPerlCodeFromDVValue
+    @@DIS:targetType: DISCore|Integer
+    @@Param:
+      @@@Name: factory
+      @@@Type: PCDocument
+    @@Param:
+      @@@Name: s
+      @@@Type: dv|DVValue
+      @@@nullCase:
+        @@@@enDesc:
+    @@Return:
+      @@@Type: DIS|MPLCodeFragment
+      @@@PerlDef:
+        $r = $factory-><M::PCDocument.createPCLiteral>
+                         (defined $s
+                            ? $s-><AG::dv|DVValue.isNull>
+                                ? null
+                                : 0+$s-><AG::dv|DVValue.value>
+                            : null);
+##DISCore|Integer

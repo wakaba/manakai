@@ -1,3 +1,14 @@
+2006-03-15  Wakaba  <wakaba@suika.fam.cx>
+
+	* DOMCore.dis (c:DOMConfigurationParameter): Now it is
+	a |DISSource:ResourceProperty|.
+	(c:anyDOMConfigurationParameter): New property.
+	(CParam, boolCParam): Now they are all |dis:subsetOf|
+	the |c:anyDOMConfigurationParameter| property.
+	(ForDocument, ForParser, ForSerializer): Removed.
+
+	* DOMLS.dis, XMLParser.dis: Likewise.
+
 2006-03-12  Wakaba  <wakaba@suika.fam.cx>
 
 	* DOMMain.dis, Tree.dis: Unused |dis:aliasChild| properties

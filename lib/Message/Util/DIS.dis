@@ -23,7 +23,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2006/03/12 14:16:53 $
+      $Date: 2006/03/15 13:45:00 $
     @@ContentType:
       dis:Date.RCS
   
@@ -5374,20 +5374,19 @@ IFClsDef:
     @@enDesc:
       Returns a method for a particular resource type.
  
-      In: <Perl::$resource>, <Perl::$method_name>
+      In: <Perl::$type_resource>, <Perl::$method_name>
 
       Out: <Perl::$method>
     @@PerlDef:
-      my $__type = $resource-><AG::DISAnyResource.typeResource>;
-      my $__type_uri = $__type-><AG::DISAnyResource.uri>;
+      my $__type_uri = $type_resource-><AG::DISAnyResource.uri>;
       $method = $Message::Util::DIS::Method{$__type_uri}->{$method_name};
       unless ($method) {
         my %__methods;
-        for (@{$__type-><M::DISAnyResource.getSuperResourceURIList>}) {
+        for (@{$type_resource-><M::DISAnyResource.getSuperResourceURIList>}) {
           $__methods{$_} = $Message::Util::DIS::Method{$_}->{$method_name}
             if $Message::Util::DIS::Method{$_}->{$method_name};
         }
-        my $__db = $resource-><AG::DISAnyResource.database>;
+        my $__db = $type_resource-><AG::DISAnyResource.database>;
         T1: for my $__t1_uri (keys %__methods) {
           next T1 unless $__methods{$__t1_uri};
           my $__t1 = $__db-><M::DISDatabase.getResource> ($__t1_uri);
@@ -5473,8 +5472,9 @@ IFClsDef:
           If no resource found.
       @@@PerlDef:
         my $method;
+        my $tr = $self-><AG::DISAnyResource.typeResource>;
         __CODE{DIS|getMethodForType::
-          $resource => $self,
+          $type_resource => $tr,
           $method_name => 'get_error_interface_resource',
           $method => $method,
         }__;
@@ -5500,9 +5500,40 @@ IFClsDef:
           If no resource found.
       @@@PerlDef:
         my $method;
+        my $tr = $self-><AG::DISAnyResource.typeResource>;
         __CODE{DIS|getMethodForType::
-          $resource => $self,
+          $type_resource => $tr,
           $method_name => 'get_error_code_resource',
+          $method => $method,
+        }__;
+        if ($method) {
+          __DEEP{
+            $r = $method->(@_);
+          }__;
+        } else {
+          $r = null;
+        } 
+
+  @Method:
+    @@Name: getDOMConfigurationParameterName
+    @@enDesc:
+      Returns the name of the DOM configuration parameter represented
+      by the resource.
+    @@Return:
+      @@@Type: DISString
+      @@@enDesc:
+        The name.
+      @@@nullCase:
+        @@@@enDesc:
+          If it is not a DOM configuration parameter or
+          if it is an invalid configuration parameter and
+          it has no name.
+      @@@PerlDef:
+        my $method;
+        my $tr = $self-><AG::DISAnyResource.typeResource>;
+        __CODE{DIS|getMethodForType::
+          $type_resource => $tr,
+          $method_name => 'get_dom_configuration_parameter_name',
           $method => $method,
         }__;
         if ($method) {
@@ -8095,6 +8126,46 @@ TMethods:
           }
         }__;
 ##DISLang:ConstGroup
+
+TMethods:
+  @TMethod:
+    @@Name: getDOMConfigurationParameterName
+    @@DIS:targetType: DOMCore|DOMConfigurationParameter
+    @@Return:
+      @@@Type: DISString
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><M::DIS|DISResourceProp.getPropertyText>
+                        (<Q::DOMCore:domConfigurationParameterName>);
+          unless (defined $r) {
+            $r = $self-><AG::DISAnyResource.nameURI>;
+          }
+          $r = lc $r if defined $r;
+        }__;
+##DOMCore|DOMConfigurationParameter
+
+TMethods:
+  @TMethod:
+    @@Name: getDOMConfigurationParameterName
+    @@DIS:targetType: DOMCore|DOMConfigurationParameterApplication
+    @@Return:
+      @@@Type: DISString
+      @@@PerlDef:
+        __DEEP{
+          my $cp = $self-><M::DISResourceProp.getPropertyResource>
+                            (<Q::DOMCore:domConfigurationParameter>);
+          if (defined $cp) {
+            $r = $cp-><M::DIS|DISResourceProp.getPropertyText>
+                        (<Q::DOMCore:domConfigurationParameterName>);
+            unless (defined $r) {
+              $r = $cp-><AG::DISAnyResource.nameURI>;
+            }
+            $r = lc $r if defined $r;
+          } else {
+            $r = null; # error
+          }
+        }__;
+##DOMCore|DOMConfigurationParameterApplication
 
 TMethods:
   @TMethod:

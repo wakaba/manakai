@@ -40,7 +40,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/03/09 13:44:16 $
+      $Date: 2006/03/15 13:44:59 $
     @@ContentType:
       dis:Date.RCS
 
@@ -4860,7 +4860,6 @@ boolCParam:
   @cfgname: canonical-form
   @nodeProp: canon
   @IsSupportRequired:1
-  @resourceFor: ForDocument
   @DOMCore:targetType: c|Document
   @TrueCase:
     @@enDesc:
@@ -5563,12 +5562,14 @@ ResourceTypeDef:
   @QName: DOMCore|DOMConfigurationParameter
   @enDesc:
     A parameter used on <IF::DOMConfiguration::ManakaiDOM|ManakaiDOM> objects.
+  @DISCore:resourceType: DISSource|ResourceProperty
 
 ResourceTypeDef:
   @QName: c|DOMConfigurationParameterApplication
   @enDesc:
     A copy of <Q::c|DOMConfigurationParameter> that only differs
     <Q::c|targetType> property.
+  @DISCore:resourceType: DISSource|ResourceProperty
 
 SPropDef:
   @QName: c|domConfigurationParameter
@@ -5600,6 +5601,14 @@ ElementTypeBinding:
 
 XParamDef:
   @QName: DOMCore|configurationParameterValue
+
+PropDef:
+  @QName: c|anyDOMConfigurationParameter
+  @enDesc:
+    Any <Q::c|DOMConfigurationParameter>-associated property should be a
+    <Q::dis|subsetOf> <Q::c|anyDOMConfigurationParameter> to extract
+    configuration parameter property values from a dis resource
+    using standard property access API for dis resources.
 
 SPropDef:
   @QName: dis|IsSupportRequired
@@ -5687,10 +5696,13 @@ ElementTypeBinding:
       @@@@: DOMCore|DOMConfigurationParameter
       @@@For: ManakaiDOM|DOM
     @@rdf:type:
-      @@@@: DISCore|Property
+      @@@@: DISSource|ResourceProperty
       @@@For: =ManakaiDOM|all
     @@For: ManakaiDOM|DOM3
     @@For: =ManakaiDOM|all
+    @@subsetOf:
+      @@@@: c|anyDOMConfigurationParameter
+      @@@For: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: boolCParam
@@ -5701,49 +5713,14 @@ ElementTypeBinding:
       @@@@: DOMCore|DOMConfigurationParameter
       @@@For: ManakaiDOM|DOM
     @@rdf:type:
-      @@@@: DISCore|Property
+      @@@@: DISSource|ResourceProperty
       @@@For: =ManakaiDOM|all
     @@For: ManakaiDOM|DOM3
     @@For: =ManakaiDOM|all
     @@Type: idl|boolean||ManakaiDOM|all
-
-ElementTypeBinding:
-  @Name: boolCParams
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type:
-      @@@@: dis|MultipleResource
-      @@@ForCheck: !ForParser !ForSerializer !ForDocument
-    @@rdf:type:
-      @@@@: DOMCore|DOMConfigurationParameter
-      @@@ForCheck: ManakaiDOM|DOM ForDocumentOrParser
-    @@rdf:type:
-      @@@@: DOMCore|DOMConfigurationParameter
-      @@@ForCheck: ManakaiDOM|DOM ForSerializer
-    @@rdf:type:
-      @@@@: DISCore|Property
-      @@@ForCheck: =ManakaiDOM|all ForDocumentOrParser
-    @@rdf:type:
-      @@@@: DISCore|Property
-      @@@ForCheck: =ManakaiDOM|all ForSerializer
-    @@For: ManakaiDOM|DOM3
-    @@For: =ManakaiDOM|all
-    @@Type: idl|boolean||ManakaiDOM|all
-
-ForDef:
-  @QName: DOMCore|ForDocumentOrParser
-
-ForDef:
-  @QName: DOMCore|ForDocument
-  @ISA: DOMCore|ForDocumentOrParser
-
-ForDef:
-  @QName: DOMCore|ForParser
-  @ISA: DOMCore|ForDocumentOrParser
-
-ForDef:
-  @QName: DOMCore|ForSerializer
+    @@subsetOf:
+      @@@@: c|anyDOMConfigurationParameter
+      @@@For: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: boolValue

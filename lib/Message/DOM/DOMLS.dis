@@ -28,7 +28,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date:
-    $Date: 2006/02/22 11:22:05 $
+    $Date: 2006/03/15 13:45:00 $
 
   @Require:
     @@Module:
@@ -2654,10 +2654,13 @@ ElementTypeBinding:
       @@@@: DOMCore|DOMConfigurationParameter
       @@@For: ManakaiDOM|DOM
     @@rdf:type:
-      @@@@: DISCore|Property
+      @@@@: DISSource|ResourceProperty
       @@@For: =ManakaiDOM|all
     @@For: ManakaiDOM|DOM3
     @@For: =ManakaiDOM|all
+    @@subsetOf:
+      @@@@: c|anyDOMConfigurationParameter
+      @@@For: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: CParamApp
@@ -2678,11 +2681,14 @@ ElementTypeBinding:
       @@@@: DOMCore|DOMConfigurationParameter
       @@@For: ManakaiDOM|DOM
     @@rdf:type:
-      @@@@: DISCore|Property
+      @@@@: DISSource|ResourceProperty
       @@@For: =ManakaiDOM|all
     @@For: ManakaiDOM|DOM3
     @@For: =ManakaiDOM|all
     @@Type: idl|boolean||ManakaiDOM|all
+    @@subsetOf:
+      @@@@: c|anyDOMConfigurationParameter
+      @@@For: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: TrueCase

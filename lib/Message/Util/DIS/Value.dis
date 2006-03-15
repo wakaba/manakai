@@ -17,7 +17,7 @@ Module:
   @License:
     license:Perl+MPL
   @Date:
-    $Date: 2006/02/19 07:06:16 $
+    $Date: 2006/03/15 13:45:04 $
   
   @Require:
     @@Module:
@@ -640,6 +640,36 @@ IFClsDef:
         __DEEP{
           my $in = $self-><M::DVValue.getProperty> (<Q::dis:is-null>);
           $r = ($in and $in-><AG::DVValue.value>);
+        }__;
+
+  @Method:
+    @@Name: getPerlCode
+    @@enDesc:
+      Returns a Perl code representation of the value.
+    @@Param:
+      @@@Name: factory
+      @@@Type: dp|PCDocument
+      @@@enDesc:
+        The document to which the code belongs.
+    @@Param:
+      @@@Name: disResource
+      @@@Type: DIS|DISAnyResource
+      @@@enDesc:
+        The context resource.
+    @@Return:
+      @@@Type: DIS|MPLCodeFragment
+      @@@enDesc:
+        The code.
+      @@@nullCase:
+        @@@@enDesc:
+          If no Perl code is defined for the value.
+      @@@PerlDef:
+        __DEEP{
+          my $type = $disResource-><AG::DIS|DISAnyResource.database>
+                                 -><M::DIS|DISDatabase.getResource>
+                                     ($self-><AG::DVValue.dataType>);
+          $r = $type-><M::dp|DISResourcePerl.getPerlCodeFromValue>
+                        ($factory, $self);
         }__;
 
   @Method:
