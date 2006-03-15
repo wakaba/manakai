@@ -16,7 +16,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/03/14 09:47:11 $
+    $Date: 2006/03/15 10:58:51 $
   
   @Require:
     @@Module:
@@ -746,7 +746,25 @@ IFClsDef:
           }__;
         }
 
-        if (defined $csdef->{<H::cs|perlName>}->[0]) {
+        if ($csdef->{uri}->{<Q::cs|XML.iso-2022-jp>}) {
+          $obj->{<H::mce|State.2440>} = 'gl-jis-1997-swapped';
+          $obj->{<H::mce|State.2442>} = 'gl-jis-1997';
+          $obj->{<H::mce|state>} = <H::mce|State.2842>;
+          $r = bless $obj, <ClassName::ManakaiMCISO2022JPDecodeHandle>;
+          require Encode::GLJIS1997Swapped;
+          require Encode::GLJIS1997;
+          undef $r unless Encode::find_encoding ($obj->{<H::mce|State.2440>});
+          undef $r unless Encode::find_encoding ($obj->{<H::mce|State.2442>});
+        } elsif ($csdef->{uri}->{<Q::icharset|iso-2022-jp>}) {
+          $obj->{<H::mce|State.2440>} = 'gl-jis-1978';
+          $obj->{<H::mce|State.2442>} = 'gl-jis-1983';
+          $obj->{<H::mce|state>} = <H::mce|State.2842>;
+          $r = bless $obj, <ClassName::ManakaiMCISO2022JPDecodeHandle>;
+          require Encode::GLJIS1978;
+          require Encode::GLJIS1983;
+          undef $r unless Encode::find_encoding ($obj->{<H::mce|State.2440>});
+          undef $r unless Encode::find_encoding ($obj->{<H::mce|State.2442>});
+        } elsif (defined $csdef->{<H::cs|perlName>}->[0]) {
           if ($csdef->{uri}->{<Q::cs|XML.euc-jp>} or
               $csdef->{uri}->{<Q::icharset|euc-jp>}) {
             $obj->{<H::mce|perlEncodingName>} = $csdef->{<H::cs|perlName>}->[0];
@@ -895,6 +913,46 @@ IFClsDef:
         
         $test->id ('class');
         $test->assert_isa ($efh, <ClassName::ManakaiMCEUCJPDecodeHandle>);
+
+        $test->id ('onerr');
+        $test->assert_isa ($efh-><AG::MCDecodeHandle.onerror>, 'CODE');
+
+    @@Test:
+      @@@QName: MCEncodeImpl.createMCDecodeHandle.6.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{createImplForTest:: $impl => $impl}__;
+
+        my $byte = 'a';
+        open my $fh, '<', \$byte;
+        my $efh = $impl-><M::MCEncodeImplementation.createMCDecodeHandle>
+                           (<Q::cs|XML.iso-2022-jp>, $fh);
+        
+        $test->id ('interface');
+        $test->assert_isa ($efh, <IFName::MCDecodeHandle>);
+        
+        $test->id ('class');
+        $test->assert_isa ($efh, <ClassName::ManakaiMCISO2022JPDecodeHandle>);
+
+        $test->id ('onerr');
+        $test->assert_isa ($efh-><AG::MCDecodeHandle.onerror>, 'CODE');
+
+    @@Test:
+      @@@QName: MCEncodeImpl.createMCDecodeHandle.7.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{createImplForTest:: $impl => $impl}__;
+
+        my $byte = 'a';
+        open my $fh, '<', \$byte;
+        my $efh = $impl-><M::MCEncodeImplementation.createMCDecodeHandle>
+                           (<Q::icharset|iso-2022-jp>, $fh);
+        
+        $test->id ('interface');
+        $test->assert_isa ($efh, <IFName::MCDecodeHandle>);
+        
+        $test->id ('class');
+        $test->assert_isa ($efh, <ClassName::ManakaiMCISO2022JPDecodeHandle>);
 
         $test->id ('onerr');
         $test->assert_isa ($efh-><AG::MCDecodeHandle.onerror>, 'CODE');
@@ -3262,6 +3320,636 @@ ClsDef:
         $test->assert_null ($error);
       } # testdata
 ##MCShiftJISDecodeHandle
+
+ClsDef:
+  @ClsQName: ManakaiMCISO2022JPDecodeHandle
+
+  @ClsISA: ManakaiMCDecodeHandle
+
+  @Method:
+    @@Name: getc
+    @@enDesc:
+      Returns the next character from the input.
+    @@Return:
+      @@@Type: String
+      @@@enDesc:
+        The next character.
+      @@@nullCase:
+        @@@@enDesc:
+          If at the end of the file, or if there was an error, in which
+          case <Perl::$!> is set.
+      @@@PerlDef:
+        if (@{$self->{<H::mce|characterQueue>}}) {
+          $r = shift @{$self->{<H::mce|characterQueue>}};
+        } else {
+          __DEEP{
+            A: {
+              my $error;
+              if ($self->{<H::mce|continue>}) {
+                if (read $self->{<H::mce|filehandle>},
+                         $self->{<H::mce|byteBuffer>}, 256,
+                         length $self->{<H::mce|byteBuffer>}) {
+                  # 
+                } else {
+                  $error = true;
+                }
+                $self->{<H::mce|continue>} = false;
+              } elsif (512 > length $self->{<H::mce|byteBuffer>}) {
+                read $self->{<H::mce|filehandle>},
+                     $self->{<H::mce|byteBuffer>}, 256,
+                     length $self->{<H::mce|byteBuffer>};
+              }
+
+              unless ($error) {
+                if ($self->{<H::mce|byteBuffer>}
+                      =~ s/^\x1B(\x24[\x40\x42]|\x28[\x42\x4A])//) {
+                  $self->{<H::mce|state>} = {
+                    "\x24\x40" => <H::mce|State.2440>,
+                    "\x24\x42" => <H::mce|State.2442>,
+                    "\x28\x42" => <H::mce|State.2842>,
+                    "\x28\x4A" => <H::mce|State.284A>,
+                  }->{$1};
+                  redo A;
+                } elsif ($self->{<H::mce|state>} eq <H::mce|State.2842>) { # IRV
+                  if ($self->{<H::mce|byteBuffer>}
+                          =~ s/^([\x00-\x0D\x10-\x1A\x1C-\x7F]+)//) {
+                    push @{$self->{<H::mce|characterQueue>}}, split //, $1;
+                    $r = shift @{$self->{<H::mce|characterQueue>}};
+                  } else {
+                    if (length $self->{<H::mce|byteBuffer>}) {
+                      $error = true;
+                    } else {
+                      $r = null;
+                    }
+                  }
+                } elsif ($self->{<H::mce|state>} eq <H::mce|State.284A>) { # 0201
+                  if ($self->{<H::mce|byteBuffer>}
+                          =~ s/^([\x00-\x0D\x10-\x1A\x1C-\x7F]+)//) {
+                    my $v = $1;  $v =~ tr/\x5C\x7E/\xA5\x{203E}/;
+                    push @{$self->{<H::mce|characterQueue>}}, split //, $v;
+                    $r = shift @{$self->{<H::mce|characterQueue>}};
+                  } else {
+                    if (length $self->{<H::mce|byteBuffer>}) {
+                      $error = true;
+                    } else {
+                      $r = null;
+                      $self->{<H::mce|onerror>}
+                           ->($self->{<H::mce|onerror>}, $self, 
+                              <Q::cs|invalid-state-error>,
+                              state => $self->{<H::mce|state>});
+                    }
+                  }
+                } elsif ($self->{<H::mce|state>} eq <H::mce|State.2442>) { # 1983
+                  my $v = Encode::decode ($self->{<H::mce|State.2442>},
+                                          $self->{<H::mce|byteBuffer>},
+                                          Encode::FB_QUIET ());
+                  if (length $v) {
+                    push @{$self->{<H::mce|characterQueue>}}, split //, $v;
+                    $r = shift @{$self->{<H::mce|characterQueue>}};
+                  } else {
+                    if (length $self->{<H::mce|byteBuffer>}) {
+                      $error = true;
+                    } else {
+                      $r = null;
+                      $self->{<H::mce|onerror>}
+                           ->($self->{<H::mce|onerror>}, $self, 
+                              <Q::cs|invalid-state-error>,
+                              state => $self->{<H::mce|state>});
+                    }
+                  }
+                } elsif ($self->{<H::mce|state>} eq <H::mce|State.2440>) { # 1978
+                  my $v = Encode::decode ($self->{<H::mce|State.2440>},
+                                          $self->{<H::mce|byteBuffer>},
+                                          Encode::FB_QUIET ());
+                  if (length $v) {
+                    push @{$self->{<H::mce|characterQueue>}}, split //, $v;
+                    $r = shift @{$self->{<H::mce|characterQueue>}};
+                  } else {
+                    if (length $self->{<H::mce|byteBuffer>}) {
+                      $error = true;
+                    } else {
+                      $r = null;
+                      $self->{<H::mce|onerror>}
+                           ->($self->{<H::mce|onerror>}, $self, 
+                              <Q::cs|invalid-state-error>,
+                              state => $self->{<H::mce|state>});
+                    }
+                  }
+                } else {
+                  $error = true;
+                }
+              }
+              if ($error) {
+                $r = substr $self->{<H::mce|byteBuffer>}, 0, 1, '';
+                my $etype = <Q::cs|illegal-octets-error>;
+                if (($self->{<H::mce|state>} eq <H::mce|State.2442> or
+                     $self->{<H::mce|state>} eq <H::mce|State.2440>) and
+                    $r =~ /^[\x21-\x7E]/ and
+                    $self->{<H::mce|byteBuffer>} =~ s/^([\x21-\x7E])//) {
+                  $r .= $1;
+                  $etype = <Q::cs|unassigned-code-point-error>;
+                } elsif ($r eq "\x1B" and
+                         $self->{<H::mce|byteBuffer>} =~ s/^\(H//) { # Old 0201
+                  $r .= "(H";
+                  $self->{<H::mce|state>} = <H::mce|State.284A>;
+                }
+                $self->{<H::mce|onerror>}
+                     ->($self->{<H::mce|onerror>}, $self, $etype,
+                        octets => \$r);
+              }
+            } # A
+          }__;
+        }
+
+  @Test:
+    @@QName: MCISO2022JPDecodeHandle.1.test
+    @@PerlDef:
+      my $impl;
+      __CODE{createImplForTest:: $impl => $impl}__;
+
+      my @testdata = (
+        {
+          id => q<l=0>,
+          in => q<>,
+          out1 => [null],
+          out2 => [null],
+        },
+        {
+          id => q<l=1.00>,
+          in => qq<\x00>,
+          out1 => [null, "\x00", null],
+          out2 => [null, "\x00", null],
+        },
+        {
+          id => q<l=1.0d>,
+          in => qq<\x0D>,
+          out1 => [null, "\x0D", null],
+          out2 => [null, "\x0D", null],
+        }, # Error?
+        {
+          id => q<0A>,
+          in => qq<\x0A>,
+          out1 => [null, "\x0A", null],
+          out2 => [null, "\x0A", null],
+        }, # Error?
+        {
+          id => q<l=1.0e>,
+          in => qq<\x0E>,
+          out1 => [null, "\x0E", [<Q::cs|illegal-octets-error>]],
+          out2 => [null, "\x0E", [<Q::cs|illegal-octets-error>]],
+        },
+        {
+          id => q<l=1.0f>,
+          in => qq<\x0F>,
+          out1 => [null, "\x0F", [<Q::cs|illegal-octets-error>]],
+          out2 => [null, "\x0F", [<Q::cs|illegal-octets-error>]],
+        },
+        {
+          id => q<l=1.1b>,
+          in => qq<\x1B>,
+          out1 => [null, "\x1B", [<Q::cs|illegal-octets-error>]],
+          out2 => [null, "\x1B", [<Q::cs|illegal-octets-error>]],
+        },
+        {
+          id => q<l=1.a>,
+          in => q<a>,
+          out1 => [null, "a", null],
+          out2 => [null, "a", null],
+        },
+        {
+          id => q<l=1.20>,
+          in => qq<\x20>,
+          out1 => [null, "\x20", null],
+          out2 => [null, "\x20", null],
+        },
+        {
+          id => q<l=1.5C>,
+          in => qq<\x5C>,
+          out1 => [null, "\x5C", null],
+          out2 => [null, "\x5C", null],
+        },
+        {
+          id => q<l=1.7E>,
+          in => qq<\x7E>,
+          out1 => [null, "\x7E", null],
+          out2 => [null, "\x7E", null],
+        },
+        {
+          id => q<l=1.7F>,
+          in => qq<\x7F>,
+          out1 => [null, "\x7F", null],
+          out2 => [null, "\x7F", null],
+        },
+        {
+          id => q<l=1.80>,
+          in => qq<\x80>,
+          out1 => [null, "\x80", [<Q::cs|illegal-octets-error>]],
+          out2 => [null, "\x80", [<Q::cs|illegal-octets-error>]],
+        },
+        {
+          id => q<l=1.8c>,
+          in => qq<\x8C>,
+          out1 => [null, "\x8C", [<Q::cs|illegal-octets-error>]],
+          out2 => [null, "\x8C", [<Q::cs|illegal-octets-error>]],
+        },
+        {
+          id => q<l=1.8e>,
+          in => qq<\x8E>,
+          out1 => [null, "\x8E", [<Q::cs|illegal-octets-error>]],
+          out2 => [null, "\x8E", [<Q::cs|illegal-octets-error>]],
+        },
+        {
+          id => q<l=1.8f>,
+          in => qq<\x8F>,
+          out1 => [null, "\x8F", [<Q::cs|illegal-octets-error>]],
+          out2 => [null, "\x8F", [<Q::cs|illegal-octets-error>]],
+        },
+        {
+          id => q<l=1.a0>,
+          in => qq<\xA0>,
+          out1 => [null, "\xA0", [<Q::cs|illegal-octets-error>]],
+          out2 => [null, "\xA0", [<Q::cs|illegal-octets-error>]],
+        },
+        {
+          id => q<l=1.a1>,
+          in => qq<\xA1>,
+          out1 => [null, "\xA1", [<Q::cs|illegal-octets-error>]],
+          out2 => [null, "\xA1", [<Q::cs|illegal-octets-error>]],
+        },
+        {
+          id => q<l=1.a2>,
+          in => qq<\xA2>,
+          out1 => [null, "\xA2", [<Q::cs|illegal-octets-error>]],
+          out2 => [null, "\xA2", [<Q::cs|illegal-octets-error>]],
+        },
+        {
+          id => q<l=1.df>,
+          in => qq<\xdf>,
+          out1 => [null, "\xDF", [<Q::cs|illegal-octets-error>]],
+          out2 => [null, "\xDF", [<Q::cs|illegal-octets-error>]],
+        },
+        {
+          id => q<l=1.e0>,
+          in => qq<\xe0>,
+          out1 => [null, "\xE0", [<Q::cs|illegal-octets-error>]],
+          out2 => [null, "\xE0", [<Q::cs|illegal-octets-error>]],
+        },
+        {
+          id => q<l=1.ef>,
+          in => qq<\xEF>,
+          out1 => [null, "\xEF", [<Q::cs|illegal-octets-error>]],
+          out2 => [null, "\xEF", [<Q::cs|illegal-octets-error>]],
+        },
+        {
+          id => q<F0>,
+          in => qq<\xF0>,
+          out1 => [null, "\xF0", [<Q::cs|illegal-octets-error>]],
+          out2 => [null, "\xF0", [<Q::cs|illegal-octets-error>]],
+        },
+        {
+          id => q<l=1.fc>,
+          in => qq<\xFC>,
+          out1 => [null, "\xFC", [<Q::cs|illegal-octets-error>]],
+          out2 => [null, "\xFC", [<Q::cs|illegal-octets-error>]],
+        },
+        {
+          id => q<l=1.fd>,
+          in => qq<\xFD>,
+          out1 => [null, "\xFD", [<Q::cs|illegal-octets-error>]],
+          out2 => [null, "\xFD", [<Q::cs|illegal-octets-error>]],
+        },
+        {
+          id => q<l=1.fe>,
+          in => qq<\xFE>,
+          out1 => [null, "\xFE", [<Q::cs|illegal-octets-error>]],
+          out2 => [null, "\xFE", [<Q::cs|illegal-octets-error>]],
+        },
+        {
+          id => q<l=1.ff>,
+          in => qq<\xFF>,
+          out1 => [null, "\xFF", [<Q::cs|illegal-octets-error>]],
+          out2 => [null, "\xFF", [<Q::cs|illegal-octets-error>]],
+        },
+        {
+          id => q<l=2.0000>,
+          in => qq<\x00\x00>,
+          out1 => [null, "\x00", null, "\x00", null],
+          out2 => [null, "\x00", null, "\x00", null],
+        },
+        {
+          id => q<l=2.0D0A>,
+          in => qq<\x0D\x0A>,
+          out1 => [null, "\x0D", null, "\x0A", null],
+          out2 => [null, "\x0D", null, "\x0A", null],
+        },
+        {
+          id => q<l=2.1B1B>,
+          in => qq<\x1B\x1B>,
+          out1 => [null, "\x1B", [<Q::cs|illegal-octets-error>],
+                         "\x1B", [<Q::cs|illegal-octets-error>]],
+          out2 => [null, "\x1B", [<Q::cs|illegal-octets-error>],
+                         "\x1B", [<Q::cs|illegal-octets-error>]],
+        },
+        {
+          id => q<l=2.1B20>,
+          in => qq<\x1B\x20>,
+          out1 => [null, "\x1B", [<Q::cs|illegal-octets-error>], "\x20", null],
+          out2 => [null, "\x1B", [<Q::cs|illegal-octets-error>], "\x20", null],
+        },
+        {
+          id => q<l=2.1B24>,
+          in => qq<\x1B\x24>,
+          out1 => [null, "\x1B", [<Q::cs|illegal-octets-error>], "\x24", null],
+          out2 => [null, "\x1B", [<Q::cs|illegal-octets-error>], "\x24", null],
+        },
+        {
+          id => q<l=2.1B28>,
+          in => qq<\x1B\x28>,
+          out1 => [null, "\x1B", [<Q::cs|illegal-octets-error>], "\x28", null],
+          out2 => [null, "\x1B", [<Q::cs|illegal-octets-error>], "\x28", null],
+        },
+        {
+          id => q<l=2.2020>,
+          in => qq<\x20\x20>,
+          out1 => [null, "\x20", null, "\x20", null],
+          out2 => [null, "\x20", null, "\x20", null],
+        },
+        {
+          id => q<l=2.ab>,
+          in => qq<ab>,
+          out1 => [null, "a", null, "b", null],
+          out2 => [null, "a", null, "b", null],
+        },
+        {
+          id => q<8040>,
+          in => qq<\x80\x40>,
+          out1 => [null, "\x80", [<Q::cs|illegal-octets-error>],
+                         "\x40", null],
+          out2 => [null, "\x80", [<Q::cs|illegal-octets-error>],
+                         "\x40", null],
+        },
+        {
+          id => q<1B2440>,
+          in => qq<\x1B\x24\x40>,
+          out1 => [null],
+          out2 => [null],
+          eof_error => [<Q::cs|invalid-state-error>],
+        },
+        {
+          id => q<1B2442>,
+          in => qq<\x1B\x24\x42>,
+          out1 => [null],
+          out2 => [null],
+          eof_error => [<Q::cs|invalid-state-error>],
+        },
+        {
+          id => q<1B2840>,
+          in => qq<\x1B\x28\x40>,
+          out1 => [null, "\x1B", [<Q::cs|illegal-octets-error>], "(", null,
+                         "\x40", null],
+          out2 => [null, "\x1B", [<Q::cs|illegal-octets-error>], "(", null,
+                         "\x40", null],
+        },
+        {
+          id => q<1B2842>,
+          in => qq<\x1B\x28\x42>,
+          out1 => [null],
+          out2 => [null],
+        },
+        {
+          id => q<1B284A>,
+          in => qq<\x1B\x28\x4A>,
+          out1 => [null],
+          out2 => [null],
+          eof_error => [<Q::cs|invalid-state-error>],
+        },
+        {
+          id => q<1B$B1B(B>,
+          in => qq<\x1B\x24\x42\x1B\x28\x42>,
+          out1 => [null],
+          out2 => [null],
+        },
+        {
+          id => q<1B(B1B(B>,
+          in => qq<\x1B\x28\x42\x1B\x28\x42>,
+          out1 => [null],
+          out2 => [null],
+        },
+        {
+          id => q<1B(Ba1B(B>,
+          in => qq<\x1B\x28\x42a\x1B\x28\x42>,
+          out1 => [null, "a", null],
+          out2 => [null, "a", null],
+        },
+        {
+          id => q<1B(Ba1B(B1B(B>,
+          in => qq<\x1B\x28\x42a\x1B\x28\x42\x1B\x28\x42>,
+          out1 => [null, "a", null],
+          out2 => [null, "a", null],
+        },
+        {
+          id => q<1B$42!!1B2842>,
+          in => qq<\x1B\x24\x42!!\x1B\x28\x42>,
+          out1 => [null, "\x{3000}", null],
+          out2 => [null, "\x{3000}", null],
+        },
+        {
+          id => q<1B$4221211B284A>,
+          in => qq<\x1B\x24\x42!!\x1B\x28\x4A>,
+          out1 => [null, "\x{3000}", null],
+          out2 => [null, "\x{3000}", null],
+          eof_error => [<Q::cs|invalid-state-error>],
+        },
+        {
+          id => q<1B$4021211B2842>,
+          in => qq<\x1B\x24\x40!!\x1B\x28\x42>,
+          out1 => [null, "\x{3000}", null],
+          out2 => [null, "\x{3000}", null],
+        },
+        {
+          id => q<1B$402121211B2842>,
+          in => qq<\x1B\x24\x40!!!\x1B\x28\x42>,
+          out1 => [null, "\x{3000}", null, "!", [<Q::cs|illegal-octets-error>]],
+          out2 => [null, "\x{3000}", null, "!", [<Q::cs|illegal-octets-error>]],
+        },
+        {
+          id => q<1B$4021211B2442!!1B2842>,
+          in => qq<\x1B\x24\x40!!\x1B\x24\x42!!\x1B\x28\x42>,
+          out1 => [null, "\x{3000}", null, "\x{3000}", null],
+          out2 => [null, "\x{3000}", null, "\x{3000}", null],
+        },
+        {
+          id => q<1B$4021211B2440!!1B2842>,
+          in => qq<\x1B\x24\x40!!\x1B\x24\x40!!\x1B\x28\x42>,
+          out1 => [null, "\x{3000}", null, "\x{3000}", null],
+          out2 => [null, "\x{3000}", null, "\x{3000}", null],
+        },
+        {
+          id => q<1B$@!"1B(B\~|>,
+          in => qq<\x1B\x24\x40!"\x1B(B\\~|>,
+          out1 => [null, "\x{3001}", null, "\x5C", null,
+                         "\x7E", null, "|", null],
+          out2 => [null, "\x{3001}", null, "\x5C", null,
+                         "\x7E", null, "|", null],
+        },
+        {
+          id => q<1B$B!"1B(J\~|1B(B>,
+          in => qq<\x1B\x24\x42!"\x1B(J\\~|\x1B(B>,
+          out1 => [null, "\x{3001}", null, "\xA5", null,
+                         "\x{203E}", null, "|", null],
+          out2 => [null, "\x{3001}", null, "\xA5", null,
+                         "\x{203E}", null, "|", null],
+        },
+        {
+          id => q<78compat.3022(16-02)>,
+          in => qq<\x1B\$\@\x30\x22\x1B\$B\x30\x22\x1B(B>,
+          out1 => [null, "\x{555E}", null, "\x{5516}", null],
+          out2 => [null, "\x{5516}", null, "\x{5516}", null],
+        },
+        {
+          id => q<unassigned.2239>,
+          in => qq<\x1B\$\@\x22\x39\x1B\$B\x22\x39\x1B(B>,
+          out1 => [null, "\x22\x39", [<Q::cs|unassigned-code-point-error>],
+                         "\x22\x39", [<Q::cs|unassigned-code-point-error>]],
+          out2 => [null, "\x22\x39", [<Q::cs|unassigned-code-point-error>],
+                         "\x22\x39", [<Q::cs|unassigned-code-point-error>]],
+        },
+        {
+          id => q<83add.223A>,
+          in => qq<\x1B\$\@\x22\x3A\x1B\$B\x22\x3A\x1B(B>,
+          out1 => [null, "\x22\x3A", [<Q::cs|unassigned-code-point-error>],
+                         "\x{2208}", null],
+          out2 => [null, "\x{2208}", null, "\x{2208}", null],
+        },
+        {
+          id => q<83add.2840>,
+          in => qq<\x1B\$\@\x28\x40\x1B\$B\x28\x40\x1B(B>,
+          out1 => [null, "\x28\x40", [<Q::cs|unassigned-code-point-error>],
+                         "\x{2542}", null],
+          out2 => [null, "\x{2542}", null, "\x{2542}", null],
+        },
+        {
+          id => q<83add.7421>,
+          in => qq<\x1B\$\@\x74\x21\x1B\$B\x74\x21\x1B(B>,
+          out1 => [null, "\x74\x21", [<Q::cs|unassigned-code-point-error>],
+                         "\x{582F}", null],
+          out2 => [null, "\x{5C2D}", null, "\x{582F}", null],
+        },
+        {
+          id => q<83swap.3033>,
+          in => qq<\x1B\$\@\x30\x33\x1B\$B\x30\x33\x1B(B>,
+          out1 => [null, "\x{9C3A}", null, "\x{9BF5}", null],
+          out2 => [null, "\x{9C3A}", null, "\x{9BF5}", null],
+        },
+        {
+          id => q<83swap.724D>,
+          in => qq<\x1B\$\@\x72\x4D\x1B\$B\x72\x4D\x1B(B>,
+          out1 => [null, "\x{9BF5}", null, "\x{9C3A}", null],
+          out2 => [null, "\x{9BF5}", null, "\x{9C3A}", null],
+        },
+        {
+          id => q<90add.7425>,
+          in => qq<\x1B\$\@\x74\x25\x1B\$B\x74\x25\x1B(B>,
+          out1 => [null, "\x74\x25", [<Q::cs|unassigned-code-point-error>],
+                         "\x74\x25", [<Q::cs|unassigned-code-point-error>]],
+          out2 => [null, "\x{51DC}", null, "\x{51DC}", null],
+        },
+        {
+          id => q<90add.7426>,
+          in => qq<\x1B\$\@\x74\x26\x1B\$B\x74\x26\x1B(B>,
+          out1 => [null, "\x74\x26", [<Q::cs|unassigned-code-point-error>],
+                         "\x74\x26", [<Q::cs|unassigned-code-point-error>]],
+          out2 => [null, "\x{7199}", null, "\x{7199}", null],
+        },
+      );
+
+      for my $testdata (@testdata) {
+      for my $c (1..2) {
+        my $byte = $testdata->{in};
+        my $error;
+        my $i = 0;
+
+        open my $fh, '<', \$byte;
+        my $efh = $impl-><M::MCEncodeImplementation.createMCDecodeHandle>
+                           ([null, <Q::icharset|iso-2022-jp>,
+                             <Q::cs|XML.iso-2022-jp>]->[$c], $fh, sub {
+                             my (null, null, $etype, %opt) = @_;
+                             $error = [$etype, \%opt];
+                           });
+
+        while (@{$testdata->{"out$c"}}) {
+          if ($i != 0) {
+            my $c = shift @{$testdata->{"out$c"}};
+            $test->id ("$testdata->{id}.$i.$c");
+            $test->assert_equals ($efh->getc, $c);
+          }
+
+          my $v = shift @{$testdata->{"out$c"}};
+          $test->id ("$testdata->{id}.$i.error.$c");
+          if (defined $v) {
+            $test->assert_not_null ($error);
+            $test->assert_equals ($error->[0], $v->[0]);
+          } else {
+            $test->assert_null ($error->[0]);
+          }
+          $error = null;
+          $i++;
+        }
+
+        $test->id ("$testdata->{id}.eof.$c");
+        $test->assert_null ($efh->getc);
+
+        my $v = $testdata->{eof_error};
+        $test->id ("$testdata->{id}.$i.error.$c");
+        if (defined $v) {
+          $test->assert_not_null ($error);
+          $test->assert_equals ($error->[0], $v->[0]);
+        } else {
+          $test->assert_null ($error->[0]);
+        }
+        $error = null;
+      }} # testdata
+##MCISO2022JPDecodeHandle
+
+PropDef:
+  @QName: mce|state
+  @mce:key: s
+  @enDesc:
+    ISO-2022-JP state.
+
+ResourceDef:
+  @QName: mce|State.2440
+  @mce:key: s1
+  @enDesc:
+    ISO-2022-JP state: ESC 2/4 4/0.
+  @DISCore:resourceType: DISCore|Resource
+  @For: =ManakaiDOM|all
+  @DISCore:resourceType: DISCore|Property
+
+ResourceDef:
+  @QName: mce|State.2442
+  @mce:key: s2
+  @enDesc:
+    ISO-2022-JP state: ESC 2/4 4/2.
+  @DISCore:resourceType: DISCore|Resource
+  @For: =ManakaiDOM|all
+  @DISCore:resourceType: DISCore|Property
+
+ResourceDef:
+  @QName: mce|State.2842
+  @mce:key: s3
+  @enDesc:
+    ISO-2022-JP state: ESC 2/8 4/2.
+  @DISCore:resourceType: DISCore|Resource
+  @For: =ManakaiDOM|all
+
+ResourceDef:
+  @QName: mce|State.284A
+  @mce:key: s4
+  @enDesc:
+    ISO-2022-JP state: ESC 2/8 4/10.
+  @DISCore:resourceType: DISCore|Resource
+  @For: =ManakaiDOM|all
 
 ResourceDef:
   @QName: String

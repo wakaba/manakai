@@ -1,3 +1,12 @@
+2006-03-15  Wakaba  <wakaba@suika.fam.cx>
+
+	* Makefile (gl-jis-1978.tbr): 1983-swapped-pairs were not reversed.
+	(install): Rule |install-GLJIS1997Swapped| is added.
+
+	* Encode.dis (createMCDecodeHandle): Charset |iso-2022-jp|
+	is implemented.
+	(ManakaiMCISO2022JPDecodeHandle): New class.
+
 2006-03-14  Wakaba  <wakaba@suika.fam.cx>
 
 	* Makefile (GLJIS1997Swapped): New |Encode| module.

@@ -171,7 +171,56 @@ gl-jis-1983.tbr: gl-jis-1997.tbr
 gl-jis-1978.tbr: gl-jis-1983.tbr
 	$(CP) $< $@
 	$(PERL_INPLACE) -e 'print unless /^#(?!\?PETBL)/' $@
+	$(PERL_INPLACE) -e 'print unless /^0x(?:3033|724D|3229|7274|3342|695A|3349|5978|3376|635E|3443|5E75|3452|6B5D|375B|7074|395C|6268|3C49|6922|3F59|7057|4128|6C4D|445B|5464|4557|626A|456E|5B6D|4573|5E39|4676|6D6E|4768|6A24|4930|5B58|4B79|5056|4C79|692E|4F36|6446|3646|4B6A|4D5A|6076)/' $@
 	$(PERL_INPLACE) -e 'print unless /^0x(?:2(?:2[3-7]|8)|3022|316B|322A|337A|3622|366D|3834|396D|3C48|3D2B|3E5[5F]|4066|415F|424D|433D|444F|453[6F]|4578|4642|4739|482E|4830|4B4B|4C4D|4D69|4F39|5A39|74)/' $@
+	$(ECHO) '0x3033	U+9C3A		# <cjk>' >> $@
+	$(ECHO) '0x724D	U+9BF5		# <cjk>' >> $@
+	$(ECHO) '0x3229	U+9DAF		# <cjk>' >> $@
+	$(ECHO) '0x7274	U+9D2C		# <cjk>' >> $@
+	$(ECHO) '0x3342	U+8823		# <cjk>' >> $@
+	$(ECHO) '0x695A	U+86CE		# <cjk>' >> $@
+	$(ECHO) '0x3349	U+652A		# <cjk>' >> $@
+	$(ECHO) '0x5978	U+64B9		# <cjk>' >> $@
+	$(ECHO) '0x3376	U+7AC8		# <cjk>' >> $@
+	$(ECHO) '0x635E	U+7AC3		# <cjk>' >> $@
+	$(ECHO) '0x3443	U+704C		# <cjk>' >> $@
+	$(ECHO) '0x5E75	U+6F45		# <cjk>' >> $@
+	$(ECHO) '0x3452	U+8AEB		# <cjk>' >> $@
+	$(ECHO) '0x6B5D	U+8ACC		# <cjk>' >> $@
+	$(ECHO) '0x375B	U+9838		# <cjk>' >> $@
+	$(ECHO) '0x7074	U+981A		# <cjk>' >> $@
+	$(ECHO) '0x395C	U+7926		# <cjk>' >> $@
+	$(ECHO) '0x6268	U+783F		# <cjk>' >> $@
+	$(ECHO) '0x3C49	U+8602		# <cjk>' >> $@
+	$(ECHO) '0x6922	U+854A		# <cjk>' >> $@
+	$(ECHO) '0x3F59	U+9771		# <cjk>' >> $@
+	$(ECHO) '0x7057	U+976D		# <cjk>' >> $@
+	$(ECHO) '0x4128	U+8CE4		# <cjk>' >> $@
+	$(ECHO) '0x6C4D	U+8CCE		# <cjk>' >> $@
+	$(ECHO) '0x445B	U+58FA		# <cjk>' >> $@
+	$(ECHO) '0x5464	U+58F7		# <cjk>' >> $@
+	$(ECHO) '0x4557	U+792A		# <cjk>' >> $@
+	$(ECHO) '0x626A	U+783A		# <cjk>' >> $@
+	$(ECHO) '0x456E	U+6AAE		# <cjk>' >> $@
+	$(ECHO) '0x5B6D	U+68BC		# <cjk>' >> $@
+	$(ECHO) '0x4573	U+6FE4		# <cjk>' >> $@
+	$(ECHO) '0x5E39	U+6D9B		# <cjk>' >> $@
+	$(ECHO) '0x4676	U+9087		# <cjk>' >> $@
+	$(ECHO) '0x6D6E	U+8FE9		# <cjk>' >> $@
+	$(ECHO) '0x4768	U+8805		# <cjk>' >> $@
+	$(ECHO) '0x6A24	U+877F		# <cjk>' >> $@
+	$(ECHO) '0x4930	U+6A9C		# <cjk>' >> $@
+	$(ECHO) '0x5B58	U+6867		# <cjk>' >> $@
+	$(ECHO) '0x4B79	U+5118		# <cjk>' >> $@
+	$(ECHO) '0x5056	U+4FAD		# <cjk>' >> $@
+	$(ECHO) '0x4C79	U+85EA		# <cjk>' >> $@
+	$(ECHO) '0x692E	U+85AE		# <cjk>' >> $@
+	$(ECHO) '0x4F36	U+7C60		# <cjk>' >> $@
+	$(ECHO) '0x6446	U+7BED		# <cjk>' >> $@
+	$(ECHO) '0x3646	U+582F		# <cjk>' >> $@
+	$(ECHO) '0x4B6A	U+69C7		# <cjk>' >> $@
+	$(ECHO) '0x4D5A	U+9059		# <cjk>' >> $@
+	$(ECHO) '0x6076	U+7464		# <cjk>' >> $@
 	## 29 characters from JIS X 0208:1997 6.3.4
 	$(ECHO) '0x3022	U+555E		# <cjk>' >> $@
 	$(ECHO) '0x316B	U+7130		# <cjk>' >> $@
@@ -378,11 +427,12 @@ ShiftJIS1997: shift-jis-1997.ucm
 	$(CD) $@ && $(PERL_) ./Makefile.PL
 	$(CD) $@ && $(MAKE)
 
-install-GLJIS1978 install-GLJIS1983 install-GLJIS1997 \
+install-GLJIS1978 install-GLJIS1983 install-GLJIS1997 install-GLJIS1997Swapped \
   install-EUCJP1997 install-ShiftJIS1997: install-%: %
 	$(CD) $< && $(MAKE) install
 
 install: install-GLJIS1978 install-GLJIS1983 install-GLJIS1997 \
+  install-GLJIS1997Swapped \
   install-EUCJP1997 install-ShiftJIS1997
 
 clean:
@@ -395,5 +445,5 @@ clean:
 distclean: clean
 	$(RMALL) *$(DAEM_SUFFIX) *$(DAFX_SUFFIX)
 
-## $Date: 2006/03/14 10:26:45 $
+## $Date: 2006/03/15 10:58:51 $
 ## License: Public Domain.
