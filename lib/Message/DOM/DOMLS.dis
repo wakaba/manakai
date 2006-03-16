@@ -28,7 +28,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date:
-    $Date: 2006/03/15 13:45:00 $
+    $Date: 2006/03/16 08:52:32 $
 
   @Require:
     @@Module:
@@ -2661,6 +2661,9 @@ ElementTypeBinding:
     @@subsetOf:
       @@@@: c|anyDOMConfigurationParameter
       @@@For: =ManakaiDOM|all
+    @@multipleProperties:
+      @@@@: DISCore|Single
+      @@@For: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: CParamApp
@@ -2688,6 +2691,12 @@ ElementTypeBinding:
     @@Type: idl|boolean||ManakaiDOM|all
     @@subsetOf:
       @@@@: c|anyDOMConfigurationParameter
+      @@@For: =ManakaiDOM|all
+    @@multipleProperties:
+      @@@@: DISCore|Single
+      @@@For: =ManakaiDOM|all
+    @@dataType: 
+      @@@@: DISCore|Boolean
       @@@For: =ManakaiDOM|all
 
 ElementTypeBinding:

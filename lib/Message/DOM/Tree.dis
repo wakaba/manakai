@@ -12,7 +12,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/03/12 14:16:53 $
+    $Date: 2006/03/16 08:52:32 $
 
   @Require:
     @@Module:
@@ -2985,7 +2985,7 @@ IFCls1Def:
         $test->assert_isa ($ent, <IFName::x|EntityReference>);
         $test->assert_equals ($ent-><AG::Node.textContent>,
                               'replacement text content');
-        $test->assert_true ($ent-><AG::x|EntityReference.isExpanded>);
+        $test->assert_true ($ent-><AG::x|EntityReference.manakaiExpanded>);
 
         $test->id ('change');
         $ent-><AS::Node.textContent> ('another text');
@@ -2997,7 +2997,7 @@ IFCls1Def:
         $test->assert_isa ($clone, <IFName::x|EntityReference>);
         $test->assert_equals ($clone-><AG::Node.textContent>,
                               'replacement text content');
-        $test->assert_true ($clone-><AG::x|EntityReference.isExpanded>);
+        $test->assert_true ($clone-><AG::x|EntityReference.manakaiExpanded>);
     @@XDTest:
       @@@QName: EntityReference.cloneNode.clone-entity-reference-subtree.2.test
       @@@PerlDef:
@@ -3025,7 +3025,7 @@ IFCls1Def:
         $test->assert_isa ($ent, <IFName::x|EntityReference>);
         $test->assert_equals ($ent-><AG::Node.textContent>,
                               'replacement text content');
-        $test->assert_true ($ent-><AG::x|EntityReference.isExpanded>);
+        $test->assert_true ($ent-><AG::x|EntityReference.manakaiExpanded>);
 
         $test->id ('change');
         $ent-><AS::Node.textContent> ('another text');
@@ -3037,7 +3037,7 @@ IFCls1Def:
         $test->assert_isa ($clone, <IFName::x|EntityReference>);
         $test->assert_equals ($clone-><AG::Node.textContent>,
                               'another text');
-        $test->assert_true ($clone-><AG::x|EntityReference.isExpanded>);
+        $test->assert_true ($clone-><AG::x|EntityReference.manakaiExpanded>);
     @@XDTest:
       @@@QName: EntityReference.cloneNode.clone-entity-reference-subtree.3.test
       @@@PerlDef:
@@ -3065,19 +3065,19 @@ IFCls1Def:
         $test->assert_isa ($ent, <IFName::x|EntityReference>);
         $test->assert_equals ($ent-><AG::Node.textContent>,
                               'replacement text content');
-        $test->assert_true ($ent-><AG::x|EntityReference.isExpanded>);
+        $test->assert_true ($ent-><AG::x|EntityReference.manakaiExpanded>);
 
         $test->id ('change');
         $ent-><AS::Node.textContent> ('');
         $test->assert_equals ($ent-><AG::Node.textContent>, '');
-        $ent-><AS::x|EntityReference.isExpanded> (false);
-        $test->assert_false ($ent-><AG::x|EntityReference.isExpanded>);
+        $ent-><AS::x|EntityReference.manakaiExpanded> (false);
+        $test->assert_false ($ent-><AG::x|EntityReference.manakaiExpanded>);
 
         $test->id ('clone');
         my $clone = $ent-><M::Node.cloneNode>;
         $test->assert_isa ($clone, <IFName::x|EntityReference>);
         $test->assert_equals ($clone-><AG::Node.textContent>, '');
-        $test->assert_false ($clone-><AG::x|EntityReference.isExpanded>);
+        $test->assert_false ($clone-><AG::x|EntityReference.manakaiExpanded>);
 
   @Method:
      @@Name:  normalize
@@ -25525,7 +25525,7 @@ NodeTypeDef:
         $test->assert_equals ($ent-><AG::Node.nodeName>, 'ent1');
 
         $test->id ('not.expanded');
-        $test->assert_false ($ent-><AG::x|EntityReference.isExpanded>);
+        $test->assert_false ($ent-><AG::x|EntityReference.manakaiExpanded>);
 
         $test->id ('empty');
         $test->assert_false ($ent-><M::Node.hasChildNodes>);
@@ -25551,7 +25551,7 @@ NodeTypeDef:
         $test->assert_equals ($ent-><AG::Node.nodeName>, 'ent1');
 
         $test->id ('expanded');
-        $test->assert_true ($ent-><AG::x|EntityReference.isExpanded>);
+        $test->assert_true ($ent-><AG::x|EntityReference.manakaiExpanded>);
 
         $test->id ('not.empty');
         $test->assert_true ($ent-><M::Node.hasChildNodes>);
@@ -25589,7 +25589,7 @@ NodeTypeDef:
         $test->assert_equals ($ent-><AG::Node.nodeName>, 'ent1');
 
         $test->id ('expanded');
-        $test->assert_true ($ent-><AG::x|EntityReference.isExpanded>);
+        $test->assert_true ($ent-><AG::x|EntityReference.manakaiExpanded>);
 
         $test->id ('not.empty');
         $test->assert_true ($ent-><M::Node.hasChildNodes>);
@@ -25611,7 +25611,7 @@ NodeTypeDef:
         my $dtd = $docd-><M::d|DocumentXDoctype.createDocumentTypeDefinition>
                            ('doctype');
           my $ent0 = $doc-><M::Document.createEntityReference> ('ent1');
-          $test->assert_false ($ent0-><AG::x|EntityReference.isExpanded>);
+          $test->assert_false ($ent0-><AG::x|EntityReference.manakaiExpanded>);
           my $et = $docd-><M::d|DocumentXDoctype.createGeneralEntity>
                              ('ent1');
           $et-><M::Node.appendChild> ($ent0);
@@ -25622,11 +25622,11 @@ NodeTypeDef:
         $test->id ('create');
         my $ent = $doc-><M::Document.createEntityReference> ('ent1');
         $test->assert_isa ($ent, <IFName::x|EntityReference>);
-        $test->assert_true ($ent-><AG::x|EntityReference.isExpanded>);
+        $test->assert_true ($ent-><AG::x|EntityReference.manakaiExpanded>);
 
         $test->assert_not_null ($ent-><AG::Node.firstChild>);
         $test->assert_false ($ent-><AG::Node.firstChild>
-                                 -><AG::x|EntityReference.isExpanded>);
+                                 -><AG::x|EntityReference.manakaiExpanded>);
     @@XDTest:
       @@@QName: Document.createER.hasdef.recursive.indirect.test
       @@@PerlDef:
@@ -25636,7 +25636,7 @@ NodeTypeDef:
         my $dtd = $docd-><M::d|DocumentXDoctype.createDocumentTypeDefinition>
                            ('doctype');
           my $ent0 = $doc-><M::Document.createEntityReference> ('ent2');
-          $test->assert_false ($ent0-><AG::x|EntityReference.isExpanded>);
+          $test->assert_false ($ent0-><AG::x|EntityReference.manakaiExpanded>);
           my $et = $docd-><M::d|DocumentXDoctype.createGeneralEntity>
                              ('ent1');
           $et-><M::Node.appendChild> ($ent0);
@@ -25653,11 +25653,11 @@ NodeTypeDef:
         $test->id ('create');
         my $ent = $doc-><M::Document.createEntityReference> ('ent1');
         $test->assert_isa ($ent, <IFName::x|EntityReference>);
-        $test->assert_true ($ent-><AG::x|EntityReference.isExpanded>);
+        $test->assert_true ($ent-><AG::x|EntityReference.manakaiExpanded>);
 
         $test->assert_not_null ($ent-><AG::Node.firstChild>);
         $test->assert_false ($ent-><AG::Node.firstChild>
-                                 -><AG::x|EntityReference.isExpanded>);
+                                 -><AG::x|EntityReference.manakaiExpanded>);
 
   @Method:
      @@Name:  getElementsByTagName
@@ -31408,11 +31408,20 @@ ElementTypeBinding:
       @@@@: c|DOMConfigurationParameter
       @@@For: ManakaiDOM|DOM
     @@rdf:type:
-      @@@@: DISCore|Property
+      @@@@: DISSource|ResourceProperty
       @@@For: =ManakaiDOM|all
     @@For: ManakaiDOM|ManakaiDOMLatest
     @@For: =ManakaiDOM|all
     @@Type: idl|boolean||ManakaiDOM|all
+    @@subsetOf:
+      @@@@: c|anyDOMConfigurationParameter
+      @@@For: =ManakaiDOM|all
+    @@multipleProperties:
+      @@@@: DISCore|Single
+      @@@For: =ManakaiDOM|all
+    @@dataType: 
+      @@@@: DISCore|Boolean
+      @@@For: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: nodeProp

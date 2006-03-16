@@ -133,8 +133,6 @@ my $limpl = $Message::DOM::ImplementationRegistry->get_implementation
                              %feature,
                            });
 my $impl = $limpl->get_feature (ExpandedURI q<DIS:Core> => '1.0');
-my $pc = $impl->get_feature (ExpandedURI q<Util:PerlCode> => '1.0');
-my $di = $impl->get_feature (ExpandedURI q<DIS:Core> => '1.0');
 my $tdt_parser;
 
 ## --- Loading and Updating the Database
@@ -280,6 +278,8 @@ daf_check_undefined ();
 
 undef $DNi;
 undef %ModuleSourceDNLDocument;
+undef $limpl;
+undef $impl;
 exit $HasError if $HasError;
 
 ## --- Creating Files
@@ -585,6 +585,7 @@ sub daf_check_undefined () {
 
 sub daf_generate_perl_test_file ($) {
   my $mod = shift;
+  my $pc = $impl->get_feature (ExpandedURI q<Util:PerlCode> => '1.0');
   my $pl = $pc->create_perl_file;
   my $pack = $pl->get_last_package ("Manakai::Test", make_new_package => 1);
   $pack->add_use_perl_module_name ("Message::Util::DIS::Test");
@@ -664,6 +665,15 @@ sub daf_generate_perl_test_file ($) {
             $ttest->{root_uri} = $eres->uri
               if $eres->is_type_uri (ExpandedURI q<test:RootEntity>) or
                  not defined $ttest->{root_uri};
+          }
+
+          ## DOM configuration parameters
+          for my $v (@{$tres->get_property_value_list
+                              (ExpandedURI q<c:anyDOMConfigurationParameter>)}) {
+            my $cpuri = $v->name;
+            my $cp = $db->get_resource ($cpuri, for_arg => $tres->for_uri);
+            $ttest->{dom_config}->{$cp->get_dom_configuration_parameter_name}
+              = $v->get_perl_code ($block->owner_document, $tres);
           }
 
           ## Result DOM tree

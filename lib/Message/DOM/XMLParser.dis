@@ -10,7 +10,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/03/15 13:45:00 $
+    $Date: 2006/03/16 08:52:32 $
 
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
@@ -661,9 +661,11 @@ ClsDef:
           }
 
           ## Replacement tree for general |Entity| nodes
-          my @ent = values %{$self->{general_entity}};
-          for my $ent (@ent) {
-            if (exists $ent->{has_replacement_text}) {
+          if ($self->{parser_cfg}-><M::c|DOMConfiguration.getParameter>
+                                     (<Q::cfg|entity-replacement-tree>)) {
+            my @ent = values %{$self->{general_entity}};
+            for my $ent (@ent) {
+              if (exists $ent->{has_replacement_text}) {
                 my $ent_name = $ent->{name};
                 $self->{entity} = [<Code::getCopyOfEntityState::
                                               $entity_type = 'general_entity',
@@ -680,7 +682,8 @@ ClsDef:
               ##        in |DOMLS:PARSE_ERR| exception thrown?
             }
               ## TODO: Read-only if configuration (for all entities)
-          }
+            }
+          } # cfg|entity-replacement-tree
 
           ## Turns flags to their default value
           $self->{doc_cfg}-><M::c|DOMConfiguration.setParameter>
@@ -2750,7 +2753,7 @@ ClsDef:
             }                 # Otherwise VC error
             push @{$self->{entity}}, <Code::getEmptyEntityState::
                                               $name = $name>;
-            $er-><AS::x|EntityReference.isExpanded> (false);
+            $er-><AS::x|EntityReference.manakaiExpanded> (false);
 
           } else {         # there IS entity declaration
             if (($self->{standalone} or not $self->{has_xref}) and
@@ -2770,7 +2773,7 @@ ClsDef:
                 __CODE{ParseError}__;
               }
             }          
-            $er-><AS::x|EntityReference.isExpanded>
+            $er-><AS::x|EntityReference.manakaiExpanded>
                    ($ent->{has_replacement_text});
             push @{$self->{entity}}, <Code::getCopyOfEntityState::
                                             $entity_type = 'general_entity',
@@ -2808,7 +2811,7 @@ ClsDef:
               }
               open my $empty, '<', \'';
               $self->{entity}->[-1]->{fh} = $empty;
-              $er-><AS::x|EntityReference.isExpanded> (false);
+              $er-><AS::x|EntityReference.manakaiExpanded> (false);
             } # recursive
             $ent->{is_opened} = true;
           } # entity declared
@@ -2912,7 +2915,7 @@ ClsDef:
             }                 # Otherwise VC error
             push @{$self->{entity}}, <Code::getEmptyEntityState::
                                               $name = $name>;
-            $er-><AS::x|EntityReference.isExpanded> (false);
+            $er-><AS::x|EntityReference.manakaiExpanded> (false);
 
           } else {         # there IS entity declaration
             if (($self->{standalone} or not $self->{has_xref}) and
@@ -2950,7 +2953,7 @@ ClsDef:
               ## NOTE: |xp:wf-parsed-entity| is not checked
             } # if external entity
 
-            $er-><AS::x|EntityReference.isExpanded>
+            $er-><AS::x|EntityReference.manakaiExpanded>
                    ($ent->{has_replacement_text});
             push @{$self->{entity}}, <Code::getCopyOfEntityState::
                                             $entity_type = 'general_entity',
@@ -2972,7 +2975,7 @@ ClsDef:
               }
               open my $empty, '<', \'';
               $self->{entity}->[-1]->{fh} = $empty;
-              $er-><AS::x|EntityReference.isExpanded> (false);
+              $er-><AS::x|EntityReference.manakaiExpanded> (false);
             } # recursive
             $ent->{is_opened} = true;
           }
@@ -3070,7 +3073,7 @@ ClsDef:
             }                 # Otherwise VC error
             push @{$self->{entity}}, <Code::getEmptyEntityState::
                                               $name = $name>;
-            $er-><AS::x|EntityReference.isExpanded> (false);
+            $er-><AS::x|EntityReference.manakaiExpanded> (false);
 
           } else {         # there IS entity declaration
             if (($self->{standalone} or not $self->{has_xref}) and
@@ -3108,7 +3111,7 @@ ClsDef:
               ## NOTE: |xp:wf-parsed-entity| is not checked
             } # if external entity
 
-            $er-><AS::x|EntityReference.isExpanded>
+            $er-><AS::x|EntityReference.manakaiExpanded>
                    ($ent->{has_replacement_text});
             push @{$self->{entity}}, <Code::getCopyOfEntityState::
                                             $entity_type = 'general_entity',
@@ -3130,7 +3133,7 @@ ClsDef:
               }
               open my $empty, '<', \'';
               $self->{entity}->[-1]->{fh} = $empty;
-              $er-><AS::x|EntityReference.isExpanded> (false);
+              $er-><AS::x|EntityReference.manakaiExpanded> (false);
             } # recursive
             $ent->{is_opened} = true;
           }
@@ -5418,6 +5421,7 @@ ClsDef:
           &#x10;&#x11;&#x12;&#x13;&#x14;&#x15;&#x16;&#x17;$
           &#x18;&#x19;&#x1A;&#x1B;&#x1C;&#x1D;&#x1E;&#x1F;">
           ]><a/>
+      @@@cfg:entity-replacement-tree: 1
       @@@test:domTree:
         document {
           document-type {
@@ -5444,6 +5448,7 @@ ClsDef:
           &#x90;&#x91;&#x92;&#x93;&#x94;&#x95;&#x96;&#x97;$
           &#x98;&#x99;&#x9A;&#x9B;&#x9C;&#x9D;&#x9E;&#x9F;&#x7F;">
           ]><a/>
+      @@@cfg:entity-replacement-tree: 1
       @@@test:domTree:
         document {
           document-type {
@@ -6459,6 +6464,7 @@ ClsDef:
             <!ENTITY cdata "<![CDATA[text]]>">
           ]>
           <p>&cdata;</p>
+      @@@cfg:entity-replacement-tree: 1
       @@@test:domTree:
         document {
           document-type {
@@ -6472,7 +6478,7 @@ ClsDef:
           element {
             general-entity-reference {
               node-name: 'cdata';
-              is-expanded: true;
+              manakai-expanded: true;
               cdata-section {
                 data: 'text';
               }
@@ -7570,6 +7576,7 @@ ClsDef:
           <!ENTITY e "&#x000D; &#x000A; &#x0085; &#x000D;&#x000A; $
           &#x000D;&#x0085; &#x2028;">
           ]><a>&e;</a>
+      @@@cfg:entity-replacement-tree: 1
       @@@test:domTree:
         document {
           xml-version: '1.0';
@@ -7594,6 +7601,7 @@ ClsDef:
           <!ENTITY e "&#x000D; &#x000A; &#x0085; &#x000D;&#x000A; $
           &#x000D;&#x0085; &#x2028;">
           ]><a>&e;</a>
+      @@@cfg:entity-replacement-tree: 1
       @@@test:domTree:
         document {
           xml-version: '1.1';
@@ -8192,6 +8200,7 @@ ClsDef:
             <!ENTITY ent2 "ddd&ent;">
           ]>
           <a b="c&ent2;"/>
+      @@@cfg:entity-replacement-tree: 1
       @@@c:erred: <[[xp|wf-no-external-entity-references]]> { (1, 4)..(1, 8); }
       @@@c:erred: <[[xp|wf-parsed-entity]]> { }
     @@XMLTest:
@@ -8202,10 +8211,21 @@ ClsDef:
           <!ENTITY ent "aa<bb">
           ]>
           <a b="c&ent;"/>
+      @@@cfg:entity-replacement-tree: 1
       @@@c:erred: <[[xp|wf-no-lt-in-attribute-values]]> { (1, 3); }
       @@@c:erred:
         @@@@@: <[[xp|wf-syntax-error]]> { (1, 3)..(1, 6); }
         @@@@enImplNote: When entity node is created.
+    @@XMLTest:
+      @@@QName: xp.no.lt.in.attr.value.1.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE a [
+          <!ENTITY ent "aa<bb">
+          ]>
+          <a b="c&ent;"/>
+      @@@cfg:entity-replacement-tree: 0
+      @@@c:erred: <[[xp|wf-no-lt-in-attribute-values]]> { (1, 3); }
     @@XMLTest:
       @@@QName: xp.no.lt.in.attr.value.2.test
       @@@DEnt:
@@ -8215,6 +8235,7 @@ ClsDef:
           <!ENTITY ent2 "ccc&ent;">
           ]>
           <a b="c&ent2;"/>
+      @@@cfg:entity-replacement-tree: 1
       @@@c:erred: <[[xp|wf-no-lt-in-attribute-values]]> { (1, 3); }
       @@@c:erred:
         @@@@@: <[[xp|wf-syntax-error]]> { (1, 3)..(1, 6); }
@@ -8227,6 +8248,7 @@ ClsDef:
           <!ENTITY ent "aa&#x3C;bb">
           ]>
           <a b="c&ent;"/>
+      @@@cfg:entity-replacement-tree: 1
       @@@c:erred: <[[xp|wf-no-lt-in-attribute-values]]> { (1, 3); }
       @@@c:erred:
         @@@@@: <[[xp|wf-syntax-error]]> { (1, 3)..(1, 6); }
@@ -8240,6 +8262,7 @@ ClsDef:
           <!ENTITY ent2 "ccc&ent;">
           ]>
           <a b="c&ent2;"/>
+      @@@cfg:entity-replacement-tree: 1
       @@@c:erred: <[[xp|wf-no-lt-in-attribute-values]]> { (1, 3); }
       @@@c:erred:
         @@@@@: <[[xp|wf-syntax-error]]> { (1, 3)..(1, 6); }
@@ -8252,6 +8275,7 @@ ClsDef:
           <!ENTITY ent "aa&lt;bb">
           ]>
           <a b="c&ent;"/>
+      @@@cfg:entity-replacement-tree: 1
       @@@test:domTree:
         document {
           document-type {
@@ -8265,7 +8289,7 @@ ClsDef:
               node-name: 'b';
               text { data: 'c'; }
               general-entity-reference {
-                is-expanded: true;
+                manakai-expanded: true;
                 node-name: 'ent';
                 text-content: 'aa<bb';
               }
@@ -8281,6 +8305,7 @@ ClsDef:
           <!ENTITY ent2 "ccc&ent;">
           ]>
           <a b="c&ent2;"/>
+      @@@cfg:entity-replacement-tree: 1
       @@@test:domTree:
         document {
           document-type {
@@ -8294,7 +8319,7 @@ ClsDef:
               general-entity-reference {
                 node-name: 'ent';
                 text-content: 'aa<bb';
-                is-expanded: true;
+                manakai-expanded: true;
               }
             }
           }
@@ -8308,9 +8333,9 @@ ClsDef:
                 general-entity-reference {
                   node-name: 'ent';
                   text-content: 'aa<bb';
-                  is-expanded: true;
+                  manakai-expanded: true;
                 }
-                is-expanded: true;
+                manakai-expanded: true;
               }
             }
           }
@@ -8355,6 +8380,7 @@ ClsDef:
             <!ENTITY entity "entity value">
           ]>
           <a></a>
+      @@@cfg:entity-replacement-tree: 1
       @@@test:domTree:
         document {
           xml-version: '1.0';
@@ -8407,6 +8433,7 @@ ClsDef:
             <!ENTITY entity "entity value">
           ]>
           <a>&entity;</a>
+      @@@cfg:entity-replacement-tree: 1
       @@@test:domTree:
         document {
           xml-version: '1.0';
@@ -8429,7 +8456,7 @@ ClsDef:
               text {
                 data: 'entity value';
               }
-              is-expanded: true;
+              manakai-expanded: true;
             }
           }
         }
@@ -8441,6 +8468,7 @@ ClsDef:
             <!ENTITY entity "entity value">
           ]>
           <a>&entity; and &entity;</a>
+      @@@cfg:entity-replacement-tree: 1
       @@@test:domTree:
         document {
           xml-version: '1.0';
@@ -8463,7 +8491,7 @@ ClsDef:
               text {
                 data: 'entity value';
               }
-              is-expanded: true;
+              manakai-expanded: true;
             }
             text { data: ' and '; }
             general-entity-reference {
@@ -8471,7 +8499,7 @@ ClsDef:
               text {
                 data: 'entity value';
               }
-              is-expanded: true;
+              manakai-expanded: true;
             }
           }
         }
@@ -8483,6 +8511,7 @@ ClsDef:
             <!ENTITY entity "entity <p>value</p> with <e>element</e> ">
           ]>
           <a>&entity;</a>
+      @@@cfg:entity-replacement-tree: 1
       @@@test:domTree:
         document {
           xml-version: '1.0';
@@ -8512,7 +8541,7 @@ ClsDef:
             local-name: 'a';
             general-entity-reference {
               node-name: 'entity';
-              is-expanded: true;
+              manakai-expanded: true;
               text {
                 data: 'entity ';
               }
@@ -8550,6 +8579,7 @@ ClsDef:
             <!ENTITY entity2 "e&entity1;n">
           ]>
           <a>&entity2;</a>
+      @@@cfg:entity-replacement-tree: 1
       @@@test:domTree:
         document {
           xml-version: '1.0';
@@ -8567,7 +8597,7 @@ ClsDef:
               general-entity-reference {
                 node-name: 'entity1';
                 text-content: 'entity value';
-                is-expanded: true;
+                manakai-expanded: true;
               }
               text { data: 'n'; }
             }
@@ -8579,13 +8609,13 @@ ClsDef:
             general-entity-reference {
               node-name: 'entity2';
               text { data: 'e'; }
-              is-expanded: true;
+              manakai-expanded: true;
               general-entity-reference {
                 node-name: 'entity1';
                 text {
                   data: 'entity value';
                 }
-                is-expanded: true;
+                manakai-expanded: true;
               }
               text { data: 'n'; }
             }
@@ -8601,6 +8631,7 @@ ClsDef:
             <!ENTITY entity2 '&#x21;value&#35;'>
           ]>
           <a></a>
+      @@@cfg:entity-replacement-tree: 1
       @@@test:domTree:
         document {
           document-type {
@@ -8651,6 +8682,7 @@ ClsDef:
             <!ENTITY ent "_&lt;_&gt;_&quot;_&apos;_&amp;_">
           ]>
           <a>&ent;</a>
+      @@@cfg:entity-replacement-tree: 1
       @@@test:domTree:
         document {
           document-type {
@@ -8676,6 +8708,7 @@ ClsDef:
             <!ENTITY other "other">
           ]>
           <a>_&lt;_&gt;_&quot;_&apos;_&amp;_&other;_</a>
+      @@@cfg:entity-replacement-tree: 1
       @@@test:domTree:
         document {
           document-type {
@@ -9251,6 +9284,7 @@ ClsDef:
           ]>
           <a at1 = "value&ent;value"
              at2 = 'value&ent;value'></a>
+      @@@cfg:entity-replacement-tree: 1
       @@@test:domTree:
         document {
           document-type {
@@ -9280,6 +9314,7 @@ ClsDef:
           ]>
           <a at1 = "value&ent2;value"
              at2 = 'value&ent2;value'></a>
+      @@@cfg:entity-replacement-tree: 1
       @@@test:domTree:
         document {
           document-type {
@@ -9396,6 +9431,7 @@ ClsDef:
             <!ENTITY ent "&#33;">
           ]>
           <e/>
+      @@@cfg:entity-replacement-tree: 1
       @@@test:domTree:
         document {
           document-type {
@@ -9414,6 +9450,7 @@ ClsDef:
             <!ENTITY ent "aaaaa&#33;bbbbb">
           ]>
           <e/>
+      @@@cfg:entity-replacement-tree: 1
       @@@test:domTree:
         document {
           document-type {
@@ -9439,7 +9476,7 @@ ClsDef:
             general-entity-reference {
               node-name: 'ent';
               text-content: '!';
-              is-expanded: true;
+              manakai-expanded: true;
             }
           }
         }
@@ -9458,7 +9495,7 @@ ClsDef:
             general-entity-reference {
               node-name: 'ent';
               text-content: 'aaaaa!bbbbb';
-              is-expanded: true;
+              manakai-expanded: true;
             }
           }
         }
@@ -9480,9 +9517,9 @@ ClsDef:
               general-entity-reference {
                 node-name: 'ent';
                 text-content: '!';
-                is-expanded: true;
+                manakai-expanded: true;
               }
-              is-expanded: true;
+              manakai-expanded: true;
             }
           }
         }
@@ -9504,12 +9541,12 @@ ClsDef:
               general-entity-reference {
                 node-name: 'ent';
                 text-content: 'aa!bb';
-                is-expanded: true;
+                manakai-expanded: true;
                 text {
                   text-content: 'aa!bb';
                 }
               }
-              is-expanded: true;
+              manakai-expanded: true;
             }
           }
         }
@@ -9530,7 +9567,7 @@ ClsDef:
               general-entity-reference {
                 node-name: 'ent';
                 text-content: '!';
-                is-expanded: true;
+                manakai-expanded: true;
               }
             }
           }
@@ -9552,7 +9589,7 @@ ClsDef:
               general-entity-reference {
                 node-name: 'ent';
                 text-content: 'aaaaa!bbbbb';
-                is-expanded: true;
+                manakai-expanded: true;
                 text {
                   text-content: 'aaaaa!bbbbb';
                 }
@@ -9577,11 +9614,11 @@ ClsDef:
               node-name: 'a';
               general-entity-reference {
                 node-name: 'ent2';
-                is-expanded: true;
+                manakai-expanded: true;
                 general-entity-reference {
                   node-name: 'ent';
                   text-content: '!';
-                  is-expanded: true;
+                  manakai-expanded: true;
                 }
               }
             }
@@ -9604,11 +9641,11 @@ ClsDef:
               node-name: 'a';
               general-entity-reference {
                 node-name: 'ent2';
-                is-expanded: true;
+                manakai-expanded: true;
                 general-entity-reference {
                   node-name: 'ent';
                   text-content: 'aa!bb';
-                  is-expanded: true;
+                  manakai-expanded: true;
                 }
               }
             }
@@ -9707,6 +9744,7 @@ ClsDef:
             <!ENTITY ent "&#x21;">
           ]>
           <e/>
+      @@@cfg:entity-replacement-tree: 1
       @@@test:domTree:
         document {
           document-type {
@@ -9725,6 +9763,7 @@ ClsDef:
             <!ENTITY ent "aaaaa&#x21;bbbbb">
           ]>
           <e/>
+      @@@cfg:entity-replacement-tree: 1
       @@@test:domTree:
         document {
           document-type {
@@ -9753,7 +9792,7 @@ ClsDef:
             general-entity-reference {
               node-name: 'ent';
               text-content: '!';
-              is-expanded: true;
+              manakai-expanded: true;
             }
           }
         }
@@ -9772,7 +9811,7 @@ ClsDef:
             general-entity-reference {
               node-name: 'ent';
               text-content: 'aaaaa!bbbbb';
-              is-expanded: true;
+              manakai-expanded: true;
             }
           }
         }
@@ -9791,11 +9830,11 @@ ClsDef:
           element {
             general-entity-reference {
               node-name: 'ent2';
-              is-expanded: true;
+              manakai-expanded: true;
               general-entity-reference {
                 node-name: 'ent';
                 text-content: '!';
-                is-expanded: true;
+                manakai-expanded: true;
               }
             }
           }
@@ -9815,10 +9854,10 @@ ClsDef:
           element {
             general-entity-reference {
               node-name: 'ent2';
-              is-expanded: true;
+              manakai-expanded: true;
               general-entity-reference {
                 node-name: 'ent';
-                is-expanded: true;
+                manakai-expanded: true;
                 text-content: 'aa!bb';
               }
             }
@@ -9840,7 +9879,7 @@ ClsDef:
               node-name: 'a';
               general-entity-reference {
                 node-name: 'ent';
-                is-expanded: true;
+                manakai-expanded: true;
                 text-content: '!';
               }
             }
@@ -9862,7 +9901,7 @@ ClsDef:
               node-name: 'a';
               general-entity-reference {
                 node-name: 'ent';
-                is-expanded: true;
+                manakai-expanded: true;
                 text-content: 'aaaaa!bbbbb';
                 text {
                   text-content: 'aaaaa!bbbbb';
@@ -9888,10 +9927,10 @@ ClsDef:
               node-name: 'a';
               general-entity-reference {
                 node-name: 'ent2';
-                is-expanded: true;
+                manakai-expanded: true;
                 general-entity-reference {
                   node-name: 'ent';
-                  is-expanded: true;
+                  manakai-expanded: true;
                   text-content: '!';
                 }
               }
@@ -9915,10 +9954,10 @@ ClsDef:
               node-name: 'a';
               general-entity-reference {
                 node-name: 'ent2';
-                is-expanded: true;
+                manakai-expanded: true;
                 general-entity-reference {
                   node-name: 'ent';
-                  is-expanded: true;
+                  manakai-expanded: true;
                   text-content: 'aa!bb';
                 }
               }
@@ -10089,6 +10128,7 @@ ClsDef:
             <!ENTITY entity "value">
           ]>
           <p>&entity;</p>
+      @@@cfg:entity-replacement-tree: 1
       @@@test:domTree:
         document {
           document-type {
@@ -10100,7 +10140,7 @@ ClsDef:
           element {
             general-entity-reference {
               node-name: 'entity';
-              is-expanded: true;
+              manakai-expanded: true;
               text-content: 'value';
             }
           }
@@ -10114,6 +10154,7 @@ ClsDef:
             <!ENTITY another SYSTEM "another">
           ]>
           <p>&entity;</p>
+      @@@cfg:entity-replacement-tree: 1
       @@@test:domTree:
         document {
           document-type {
@@ -10130,7 +10171,7 @@ ClsDef:
           element {
             general-entity-reference {
               node-name: 'entity';
-              is-expanded: true;
+              manakai-expanded: true;
               text-content: 'value';
             }
           }
@@ -10176,7 +10217,7 @@ ClsDef:
           document-type { }
           element {
             general-entity-reference {
-              is-expanded: false;
+              manakai-expanded: false;
             }
           }
         }
@@ -10194,7 +10235,7 @@ ClsDef:
           document-type { }
           element {
             general-entity-reference {
-              is-expanded: false;
+              manakai-expanded: false;
             }
           }
         }
@@ -10224,7 +10265,7 @@ ClsDef:
           document-type { }
           element {
             general-entity-reference {
-              is-expanded: false;
+              manakai-expanded: false;
             }
           }
         }
@@ -10242,7 +10283,7 @@ ClsDef:
           document-type { }
           element {
             general-entity-reference {
-              is-expanded: false;
+              manakai-expanded: false;
             }
           }
         }
@@ -10266,7 +10307,7 @@ ClsDef:
           document-type { }
           element {
             general-entity-reference {
-              is-expanded: false;
+              manakai-expanded: false;
             }
           }
         }
@@ -10281,7 +10322,7 @@ ClsDef:
           document-type { }
           element {
             general-entity-reference {
-              is-expanded: false;
+              manakai-expanded: false;
             }
           }
         }
@@ -10359,6 +10400,7 @@ ClsDef:
           <!ENTITY c "&entity;">
           ]>
           <p>&c;</p>
+      @@@cfg:entity-replacement-tree: 1
       @@@test:domTree:
         document {
           document-type {
@@ -10394,6 +10436,7 @@ ClsDef:
           <!ENTITY c "&entity;">
           ]>
           <p>&c;</p>
+      @@@cfg:entity-replacement-tree: 1
       @@@test:domTree:
         document {
           document-type {
@@ -10405,7 +10448,7 @@ ClsDef:
               node-name: 'c';
               general-entity-reference {
                 node-name: 'entity';
-                is-expanded: true;
+                manakai-expanded: true;
                 text-content: 'value';
               }
             }
@@ -10419,10 +10462,10 @@ ClsDef:
           element {
             general-entity-reference {
               node-name: 'c';
-              is-expanded: true;
+              manakai-expanded: true;
               general-entity-reference {
                 node-name: 'entity';
-                is-expanded: true;
+                manakai-expanded: true;
                 text-content: 'value';
               }
             }
@@ -10461,6 +10504,7 @@ ClsDef:
             %para;
           ]>
           <p>&c;</p>
+      @@@cfg:entity-replacement-tree: 1
       @@@test:domTree:
         document {
           document-type {
@@ -10468,7 +10512,7 @@ ClsDef:
               node-name: 'c';
               general-entity-reference {
                 node-name: 'entity';
-                is-expanded: false;
+                manakai-expanded: false;
               }
             }
           }
@@ -10477,7 +10521,7 @@ ClsDef:
               node-name: 'c';
               general-entity-reference {
                 node-name: 'entity';
-                is-expanded: false;
+                manakai-expanded: false;
               }
             }
           }
@@ -10500,7 +10544,7 @@ ClsDef:
           element {
             general-entity-reference {
               node-name: 'c';
-              is-expanded: false;
+              manakai-expanded: false;
             }
           }
         }
@@ -10520,10 +10564,10 @@ ClsDef:
           element {
             general-entity-reference {
               node-name: 'c';
-              is-expanded: true;
+              manakai-expanded: true;
               general-entity-reference {
                 node-name: 'entity';
-                is-expanded: false;
+                manakai-expanded: false;
               }
             }
           }
@@ -10545,7 +10589,7 @@ ClsDef:
           element {
             general-entity-reference {
               node-name: 'c';
-              is-expanded: false;
+              manakai-expanded: false;
             }
           }
         }
@@ -10578,10 +10622,10 @@ ClsDef:
           element {
             general-entity-reference {
               node-name: 'c';
-              is-expanded: true;
+              manakai-expanded: true;
               general-entity-reference {
                 node-name: 'entity';
-                is-expanded: false;
+                manakai-expanded: false;
               }
             }
           }
@@ -10604,7 +10648,7 @@ ClsDef:
           element {
             general-entity-reference {
               node-name: 'c';
-              is-expanded: false;
+              manakai-expanded: false;
             }
           }
         }
@@ -10624,10 +10668,10 @@ ClsDef:
           element {
             general-entity-reference {
               node-name: 'c';
-              is-expanded: true;
+              manakai-expanded: true;
               general-entity-reference {
                 node-name: 'entity';
-                is-expanded: false;
+                manakai-expanded: false;
               }
             }
           }
@@ -10649,7 +10693,7 @@ ClsDef:
           element {
             general-entity-reference {
               node-name: 'c';
-              is-expanded: false;
+              manakai-expanded: false;
             }
           }
         }
@@ -10678,10 +10722,10 @@ ClsDef:
           element {
             general-entity-reference {
               node-name: 'c';
-              is-expanded: true;
+              manakai-expanded: true;
               general-entity-reference {
                 node-name: 'entity';
-                is-expanded: false;
+                manakai-expanded: false;
               }
             }
           }
@@ -10698,10 +10742,10 @@ ClsDef:
           element {
             general-entity-reference {
               node-name: 'c';
-              is-expanded: true;
+              manakai-expanded: true;
               general-entity-reference {
                 node-name: 'entity';
-                is-expanded: false;
+                manakai-expanded: false;
               }
             }
           }
@@ -10804,6 +10848,7 @@ ClsDef:
             <!ENTITY entity "value">
           ]>
           <p a="&entity;"/>
+      @@@cfg:entity-replacement-tree: 1
       @@@test:domTree:
         document {
           document-type {
@@ -10817,7 +10862,7 @@ ClsDef:
               node-name: 'a';
               general-entity-reference {
                 node-name: 'entity';
-                is-expanded: true;
+                manakai-expanded: true;
                 text-content: 'value';
               }
             }
@@ -10832,6 +10877,7 @@ ClsDef:
             <!ENTITY another SYSTEM "another">
           ]>
           <p a="&entity;"/>
+      @@@cfg:entity-replacement-tree: 1
       @@@test:domTree:
         document {
           document-type {
@@ -10852,7 +10898,7 @@ ClsDef:
               node-name: 'a';
               general-entity-reference {
                 node-name: 'entity';
-                is-expanded: true;
+                manakai-expanded: true;
                 text-content: 'value';
               }
             }
@@ -10901,7 +10947,7 @@ ClsDef:
             attribute {
               node-name: 'a';
               general-entity-reference {
-                is-expanded: false;
+                manakai-expanded: false;
               }
             }
           }
@@ -10922,7 +10968,7 @@ ClsDef:
             attribute {
               node-name: 'a';
               general-entity-reference {
-                is-expanded: false;
+                manakai-expanded: false;
               }
             }
           }
@@ -10955,7 +11001,7 @@ ClsDef:
             attribute {
               node-name: 'a';
               general-entity-reference {
-                is-expanded: false;
+                manakai-expanded: false;
               }
             }
           }
@@ -10976,7 +11022,7 @@ ClsDef:
             attribute {
               node-name: 'a';
               general-entity-reference {
-                is-expanded: false;
+                manakai-expanded: false;
               }
             }
           }
@@ -11003,7 +11049,7 @@ ClsDef:
             attribute {
               node-name: 'a';
               general-entity-reference {
-                is-expanded: false;
+                manakai-expanded: false;
               }
             }
           }
@@ -11021,7 +11067,7 @@ ClsDef:
             attribute {
               node-name: 'a';
               general-entity-reference {
-                is-expanded: false;
+                manakai-expanded: false;
               }
             }
           }
@@ -11100,6 +11146,7 @@ ClsDef:
           <!ENTITY c "&entity;">
           ]>
           <p a="&c;"/>
+      @@@cfg:entity-replacement-tree: 1
       @@@test:domTree:
         document {
           document-type {
@@ -11138,6 +11185,7 @@ ClsDef:
           <!ENTITY c "&entity;">
           ]>
           <p a="&c;"/>
+      @@@cfg:entity-replacement-tree: 1
       @@@test:domTree:
         document {
           document-type {
@@ -11205,6 +11253,7 @@ ClsDef:
             %para;
           ]>
           <p a="&c;"/>
+      @@@cfg:entity-replacement-tree: 1
       @@@test:domTree:
         document {
           document-type {
@@ -11212,7 +11261,7 @@ ClsDef:
               node-name: 'c';
               general-entity-reference {
                 node-name: 'entity';
-                is-expanded: false;
+                manakai-expanded: false;
               }
             }
           }
@@ -11223,7 +11272,7 @@ ClsDef:
                 node-name: 'c';
                 general-entity-reference {
                   node-name: 'entity';
-                  is-expanded: false;
+                  manakai-expanded: false;
                 }
               }
             }
@@ -11249,7 +11298,7 @@ ClsDef:
               node-name: 'a';
               general-entity-reference {
                 node-name: 'c';
-                is-expanded: false;
+                manakai-expanded: false;
               }
             }
           }
@@ -11272,10 +11321,10 @@ ClsDef:
               node-name: 'a';
               general-entity-reference {
                 node-name: 'c';
-                is-expanded: true;
+                manakai-expanded: true;
                 general-entity-reference {
                   node-name: 'entity';
-                  is-expanded: false;
+                  manakai-expanded: false;
                 }
               }
             }
@@ -11300,7 +11349,7 @@ ClsDef:
               node-name: 'a';
               general-entity-reference {
                 node-name: 'c';
-                is-expanded: false;
+                manakai-expanded: false;
               }
             }
           }
@@ -11336,10 +11385,10 @@ ClsDef:
               node-name: 'a';
               general-entity-reference {
                 node-name: 'c';
-                is-expanded: true;
+                manakai-expanded: true;
                 general-entity-reference {
                   node-name: 'entity';
-                  is-expanded: false;
+                  manakai-expanded: false;
                 }
               }
             }
@@ -11365,7 +11414,7 @@ ClsDef:
               node-name: 'a';
               general-entity-reference {
                 node-name: 'c';
-                is-expanded: false;
+                manakai-expanded: false;
               }
             }
           }
@@ -11388,10 +11437,10 @@ ClsDef:
               node-name: 'a';
               general-entity-reference {
                 node-name: 'c';
-                is-expanded: true;
+                manakai-expanded: true;
                 general-entity-reference {
                   node-name: 'entity';
-                  is-expanded: false;
+                  manakai-expanded: false;
                 }
               }
             }
@@ -11416,7 +11465,7 @@ ClsDef:
               node-name: 'a';
               general-entity-reference {
                 node-name: 'c';
-                is-expanded: false;
+                manakai-expanded: false;
               }
             }
           }
@@ -11448,10 +11497,10 @@ ClsDef:
               node-name: 'a';
               general-entity-reference {
                 node-name: 'c';
-                is-expanded: true;
+                manakai-expanded: true;
                 general-entity-reference {
                   node-name: 'entity';
-                  is-expanded: false;
+                  manakai-expanded: false;
                 }
               }
             }
@@ -11471,10 +11520,10 @@ ClsDef:
               node-name: 'a';
               general-entity-reference {
                 node-name: 'c';
-                is-expanded: true;
+                manakai-expanded: true;
                 general-entity-reference {
                   node-name: 'entity';
-                  is-expanded: false;
+                  manakai-expanded: false;
                 }
               }
             }
@@ -11600,6 +11649,7 @@ ClsDef:
           <!ATTLIST p a CDATA "&c;">
           ]>
           <p/>
+      @@@cfg:entity-replacement-tree: 1
       @@@test:domTree:
         document {
           document-type {
@@ -11611,7 +11661,7 @@ ClsDef:
               node-name: 'c';
               general-entity-reference {
                 node-name: 'entity';
-                is-expanded: true;
+                manakai-expanded: true;
                 text-content: 'value';
               }
             }
@@ -11621,10 +11671,10 @@ ClsDef:
                 node-name: 'a';
                 general-entity-reference {
                   node-name: 'c';
-                  is-expanded: true;
+                  manakai-expanded: true;
                   general-entity-reference {
                     node-name: 'entity';
-                    is-expanded: true;
+                    manakai-expanded: true;
                     text-content: 'value';
                   }
                 }
@@ -11656,6 +11706,7 @@ ClsDef:
           <!ATTLIST p a CDATA "&c;">
           ]>
           <p/>
+      @@@cfg:entity-replacement-tree: 1
       @@@test:domTree:
         document {
           document-type {
@@ -11682,10 +11733,10 @@ ClsDef:
                 node-name: 'a';
                 general-entity-reference {
                   node-name: 'c';
-                  is-expanded: true;
+                  manakai-expanded: true;
                   general-entity-reference {
                     node-name: 'entity';
-                    is-expanded: true;
+                    manakai-expanded: true;
                     text-content: 'value';
                   }
                 }
@@ -11913,10 +11964,10 @@ ClsDef:
               specified: false;
               general-entity-reference {
                 node-name: 'c';
-                is-expanded: true;
+                manakai-expanded: true;
                 general-entity-reference {
                   node-name: 'entity';
-                  is-expanded: false;
+                  manakai-expanded: false;
                 }
               }
             }
@@ -11939,10 +11990,10 @@ ClsDef:
               specified: false;
               general-entity-reference {
                 node-name: 'c';
-                is-expanded: true;
+                manakai-expanded: true;
                 general-entity-reference {
                   node-name: 'entity';
-                  is-expanded: false;
+                  manakai-expanded: false;
                 }
               }
             }
@@ -12022,6 +12073,7 @@ ClsDef:
           <!ATTLIST p a CDATA "&entity;">
           ]>
           <p/>
+      @@@cfg:entity-replacement-tree: 1
       @@@test:domTree:
         document {
           document-type {
@@ -12035,7 +12087,7 @@ ClsDef:
                 node-name: 'a';
                 general-entity-reference {
                   node-name: 'entity';
-                  is-expanded: true;
+                  manakai-expanded: true;
                   text-content: 'value';
                 }
               }
@@ -12047,7 +12099,7 @@ ClsDef:
               specified: false;
               general-entity-reference {
                 node-name: 'entity';
-                is-expanded: true;
+                manakai-expanded: true;
                 text-content: 'value';
               }
             }
@@ -12073,6 +12125,7 @@ ClsDef:
           <!ATTLIST p a CDATA "&entity;">
           ]>
           <p/>
+      @@@cfg:entity-replacement-tree: 1
       @@@test:domTree:
         document {
           document-type {
@@ -12082,7 +12135,7 @@ ClsDef:
                 node-name: 'a';
                 general-entity-reference {
                   node-name: 'entity';
-                  is-expanded: true;
+                  manakai-expanded: true;
                   text-content: 'value';
                 }
               }
@@ -12105,7 +12158,7 @@ ClsDef:
               specified: false;
               general-entity-reference {
                 node-name: 'entity';
-                is-expanded: true;
+                manakai-expanded: true;
                 text-content: 'value';
               }
             }
@@ -12403,7 +12456,7 @@ ClsDef:
                 node-name: 'a';
                 general-entity-reference {
                   node-name: 'entity';
-                  is-expanded: false;
+                  manakai-expanded: false;
                 }
               }
             }
@@ -12414,7 +12467,7 @@ ClsDef:
               specified: false;
               general-entity-reference {
                 node-name: 'entity';
-                is-expanded: false;
+                manakai-expanded: false;
               }
             }
           }
@@ -12438,7 +12491,7 @@ ClsDef:
                 node-name: 'a';
                 general-entity-reference {
                   node-name: 'entity';
-                  is-expanded: false;
+                  manakai-expanded: false;
                 }
               }
             }
@@ -12449,7 +12502,7 @@ ClsDef:
               specified: false;
               general-entity-reference {
                 node-name: 'entity';
-                is-expanded: false;
+                manakai-expanded: false;
               }
             }
           }
@@ -12506,6 +12559,19 @@ ClsDef:
           <!ENTITY c "&#x26;ext;">
           ]>
           <p a="&c;"/>
+      @@@cfg:entity-replacement-tree: 0
+      @@@c:erred: <[[xp|wf-no-external-entity-references]]> { (1, 1)..(1, 5); }
+    @@XMLTest:
+      @@@QName: xp.attval.reptxt.parsed.entity.reference.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE p [
+          <!NOTATION n SYSTEM "notation">
+          <!ENTITY ext SYSTEM "system" NDATA n>
+          <!ENTITY c "&#x26;ext;">
+          ]>
+          <p a="&c;"/>
+      @@@cfg:entity-replacement-tree: 1
       @@@c:erred: <[[xp|wf-no-external-entity-references]]> { (1, 1)..(1, 5); }
       @@@c:erred:
         @@@@@: <[[xp|wf-parsed-entity]]> { }
@@ -12531,6 +12597,19 @@ ClsDef:
           <!ENTITY c "&ext;">
           ]>
           <p a="&c;"/>
+      @@@cfg:entity-replacement-tree: 0
+      @@@c:erred: <[[xp|wf-no-external-entity-references]]> { }
+    @@XMLTest:
+      @@@QName: xp.attval.entval.parsed.entity.reference.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE p [
+          <!NOTATION n SYSTEM "notation">
+          <!ENTITY ext SYSTEM "system" NDATA n>
+          <!ENTITY c "&ext;">
+          ]>
+          <p a="&c;"/>
+      @@@cfg:entity-replacement-tree: 1
       @@@c:erred: <[[xp|wf-no-external-entity-references]]> { }
       @@@c:erred: <[[xp|wf-parsed-entity]]> { }
 
@@ -12744,6 +12823,7 @@ ClsDef:
           <!ENTITY e "a">
           <!ENTITY e "b">
           ]><a/>
+      @@@cfg:entity-replacement-tree: 1
       @@@test:domTree:
         document {
           document-type {
@@ -12781,6 +12861,7 @@ ClsDef:
           <!ENTITY quot   "&#34;">
           <!ENTITY e      "f">
           ]><a>&lt;&gt;&amp;&apos;&quot;</a>
+      @@@cfg:entity-replacement-tree: 1
       @@@test:domTree:
         document {
           document-type {
@@ -12805,6 +12886,7 @@ ClsDef:
           <!ENTITY quot   "&#x26;#34;">
           <!ENTITY e      "f">
           ]><a>&lt;&gt;&amp;&apos;&quot;</a>
+      @@@cfg:entity-replacement-tree: 1
       @@@test:domTree:
         document {
           document-type {
@@ -12829,6 +12911,7 @@ ClsDef:
           <!ENTITY quot   "&#34;">
           <!ENTITY e      "f">
           ]><a>&lt;&gt;&amp;&apos;&quot;</a>
+      @@@cfg:entity-replacement-tree: 1
       @@@c:erred: <[[xp|error-malformed-predefined-entity]]> { (2, 1)..(2, 24); }
       @@@c:erred: <[[xp|error-malformed-predefined-entity]]> { (4, 1)..(4, 24); }
       @@@test:domTree:
@@ -12855,6 +12938,7 @@ ClsDef:
           <!ENTITY quot   "5">
           <!ENTITY e      "f">
           ]><a>&lt;&gt;&amp;&apos;&quot;</a>
+      @@@cfg:entity-replacement-tree: 1
       @@@c:erred: <[[xp|error-malformed-predefined-entity]]> { (2, 1)..(2, 24); }
       @@@c:erred: <[[xp|error-malformed-predefined-entity]]> { (3, 1)..(3, 24); }
       @@@c:erred: <[[xp|error-malformed-predefined-entity]]> { (4, 1)..(4, 24); }
@@ -12884,6 +12968,7 @@ ClsDef:
           <!ENTITY quot   SYSTEM "5">
           <!ENTITY e      "f">
           ]><a>&lt;&gt;&amp;&apos;&quot;</a>
+      @@@cfg:entity-replacement-tree: 1
       @@@c:erred: <[[xp|error-internal-predefined-entity]]> { (2, 1)..(2, 27); }
       @@@c:erred: <[[xp|error-internal-predefined-entity]]> { (3, 1)..(3, 27); }
       @@@c:erred: <[[xp|error-internal-predefined-entity]]> { (4, 1)..(4, 27); }
@@ -12913,6 +12998,7 @@ ClsDef:
           <!ENTITY % quot   SYSTEM "5">
           <!ENTITY e      "f">
           ]><a>&lt;&gt;&amp;&apos;&quot;</a>
+      @@@cfg:entity-replacement-tree: 1
       @@@test:domTree:
         document {
           document-type {
@@ -12937,6 +13023,7 @@ ClsDef:
           <!ENTITY quot   "&#x22;">
           <!ENTITY e      "f">
           ]><a>&lt;&gt;&amp;&apos;&quot;</a>
+      @@@cfg:entity-replacement-tree: 1
       @@@test:domTree:
         document {
           document-type {
@@ -12961,6 +13048,7 @@ ClsDef:
           <!ENTITY quot   "&#x22;">
           <!ENTITY e      "f">
           ]><a>&lt;&gt;&amp;&apos;&quot;</a>
+      @@@cfg:entity-replacement-tree: 1
       @@@test:domTree:
         document {
           document-type {
@@ -12985,6 +13073,7 @@ ClsDef:
           <!ENTITY quot   "&#x0022;">
           <!ENTITY e      "f">
           ]><a>&lt;&gt;&amp;&apos;&quot;</a>
+      @@@cfg:entity-replacement-tree: 1
       @@@test:domTree:
         document {
           document-type {
@@ -13009,6 +13098,7 @@ ClsDef:
           <!ENTITY quot   "&#0034;">
           <!ENTITY e      "f">
           ]><a>&lt;&gt;&amp;&apos;&quot;</a>
+      @@@cfg:entity-replacement-tree: 1  
       @@@test:domTree:
         document {
           document-type {
@@ -13083,7 +13173,7 @@ ClsDef:
             }
             general-entity-reference {
               node-name: 'e';
-              is-expanded: false;
+              manakai-expanded: false;
             }
           }
         }
@@ -14917,6 +15007,7 @@ ClsDef:
       @@@DEnt:
         @@@@test:value:
           <p xml:id="idv"/>
+      @@@cfg:xml-id: 1
       @@@test:domTree:
         document {
           element {
@@ -14930,10 +15021,28 @@ ClsDef:
           }
         }
     @@XMLTest:
+      @@@QName: xp.xmlid.attr.disabled.test
+      @@@DEnt:
+        @@@@test:value:
+          <p xml:id="idv"/>
+      @@@cfg:xml-id: 0
+      @@@test:domTree:
+        document {
+          element {
+            attribute {
+              node-name: 'xml:id';
+              value: 'idv';
+              schema-type-info: TypeInfo (null, null);
+              specified: true;
+            }
+          }
+        }
+    @@XMLTest:
       @@@QName: xp.xmlid.attr.norm.test
       @@@DEnt:
         @@@@test:value:
           <p xml:id=" $u000Aidv  "/>
+      @@@cfg:xml-id: 1
       @@@test:domTree:
         document {
           element {
@@ -14942,6 +15051,23 @@ ClsDef:
               value: 'idv';
               schema-type-info: TypeInfo ('http://www.w3.org/TR/REC-xml',
                                           'ID');
+              specified: true;
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.xmlid.attr.norm.disabled.test
+      @@@DEnt:
+        @@@@test:value:
+          <p xml:id=" $u000Aidv  "/>
+      @@@cfg:xml-id: 0
+      @@@test:domTree:
+        document {
+          element {
+            attribute {
+              node-name: 'xml:id';
+              value: '  idv  ';
+              schema-type-info: TypeInfo (null, null);
               specified: true;
             }
           }
@@ -14954,6 +15080,30 @@ ClsDef:
             <!ATTLIST p xml:id ID #IMPLIED>
           ]>
           <p/>
+      @@@cfg:xml-id: 1
+      @@@test:domTree:
+        document {
+          document-type {
+            element-type-definition {
+              node-name: 'p';
+              attribute-definition {
+                node-name: 'xml:id';
+                declared-type: const (ID_ATTR);
+                default-type: const (IMPLIED_DEFAULT);
+              }
+            }
+          }
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.xmlid.attrdef.disabled.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE p [
+            <!ATTLIST p xml:id ID #IMPLIED>
+          ]>
+          <p/>
+      @@@cfg:xml-id: 0
       @@@test:domTree:
         document {
           document-type {
@@ -14976,6 +15126,39 @@ ClsDef:
             <!ATTLIST p xml:id ID "idv"><!-- invalid -->
           ]>
           <p/>
+      @@@cfg:xml-id: 1
+      @@@test:domTree:
+        document {
+          document-type {
+            element-type-definition {
+              node-name: 'p';
+              attribute-definition {
+                node-name: 'xml:id';
+                declared-type: const (ID_ATTR);
+                default-type: const (EXPLICIT_DEFAULT);
+                node-value: 'idv';
+              }
+            }
+          }
+          element {
+            attribute {
+              node-name: 'xml:id';
+              schema-type-info: TypeInfo ('http://www.w3.org/TR/REC-xml',
+                                          'ID');
+              value: 'idv';
+              specified: false;
+            }
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.xmlid.attrdef.defaultattr.disabled.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE p [
+            <!ATTLIST p xml:id ID "idv"><!-- invalid -->
+          ]>
+          <p/>
+      @@@cfg:xml-id: 0
       @@@test:domTree:
         document {
           document-type {
@@ -15000,20 +15183,57 @@ ClsDef:
           }
         }
 
+    @@XMLTest:
+      @@@QName: xp.general.entity.unused.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE p [
+            <!ENTITY mylt "<">
+          ]>
+          <p/>
+      @@@cfg:entity-replacement-tree: 0
+      @@@test:domTree:
+        document {
+          document-type {
+            general-entity {
+              node-name: 'mylt';
+            }
+          }
+          element { }
+        }
+    @@XMLTest:
+      @@@QName: xp.general.entity.unused.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE p [
+            <!ENTITY mylt "<">
+          ]>
+          <p/>
+      @@@cfg:entity-replacement-tree: 1
+      @@@c:erred: <[[xp|wf-syntax-error]]> { (1, 1)..(1, 2); }
+
     @@PerlDef:
       my $impl = $Message::DOM::ImplementationRegistry->get_implementation ({
         'Core' => '3.0',
         'XML' => '3.0',
         'XMLVersion' => ['1.0', '1.1'],
       });
-      my $parser = <Class::ManakaiXMLParser>->new ($impl);
 
       for my $test_data (@$TestData) {
+        my $parser = <Class::ManakaiXMLParser>->new ($impl);
+
         $test->start_new_test ($test_data->{uri});
         my $doc_ent = $test_data->{entity}->{$test_data->{root_uri}};
         my $not_ok;
 
-        $parser->dom_config->set_parameter ('error-handler' => sub ($$) {
+        ## -- DOM Configuration Parameters
+
+        my $pcfg = $parser->dom_config;
+        for (keys %{$test_data->{dom_config}}) {
+          $pcfg->set_parameter ($_ => $test_data->{dom_config}->{$_});
+        }
+
+        $pcfg->set_parameter ('error-handler' => sub ($$) {
           my (undef, $err) = @_;
 	  my $err_type = $err->type;
 	  if ($test_data->{dom_error}->{$err_type}) {
@@ -15031,9 +15251,14 @@ ClsDef:
           return true; # continue as far as possible
         });
 
+        ## -- Input Data
+
         my $input = {string_data => \$doc_ent->{<Q::test:value>},
                      system_id => $doc_ent->{<Q::test:uri>},
                      base_uri => $doc_ent->{<Q::test:baseURI>}};
+
+        ## -- Test and Result
+
         if ($test_data->{dom_tree}) { # Successful test
           my $doc;
           try {
@@ -16140,6 +16365,9 @@ ElementTypeBinding:
     @@subsetOf:
       @@@@: c|anyDOMConfigurationParameter
       @@@For: =ManakaiDOM|all
+    @@multipleProperties:
+      @@@@: DISCore|Single
+      @@@For: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: CParamApp
@@ -16151,15 +16379,98 @@ ElementTypeBinding:
       @@@For: ManakaiDOM|DOM
     @@For: ManakaiDOM|DOM3
 
+ElementTypeBinding:
+  @Name: boolCParam
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType:
+      @@@@: c|DOMConfigurationParameter
+      @@@For: ManakaiDOM|DOM
+    @@DISCore:resourceType:
+      @@@@: DISSource|ResourceProperty
+      @@@For: =ManakaiDOM|all
+    @@For: ManakaiDOM|DOM3
+    @@For: =ManakaiDOM|all
+    @@Type: idl|boolean||ManakaiDOM|all
+    @@subsetOf:
+      @@@@: c|anyDOMConfigurationParameter
+      @@@For: =ManakaiDOM|all
+    @@multipleProperties:
+      @@@@: DISCore|Single
+      @@@For: =ManakaiDOM|all
+    @@dataType: 
+      @@@@: DISCore|Boolean
+      @@@For: =ManakaiDOM|all
+
 CParamApp:
   @QName: xml-id
   @c:domConfigurationParameter: cfg|xml-id
   @c:targetType: xp|ManakaiXMLParser
+  @TrueCase:
+    @@c:isSupported: 1
+  @FalseCase:
+    @@c:isSupported: 1
 
 CParamApp:
   @QName: error-handler
   @c:domConfigurationParameter: c|error-handler
   @c:targetType: xp|ManakaiXMLParser
+
+boolCParam:
+  @QName: cfg|entity-replacement-tree
+  @DOMLS:lsKey:
+    @@@: erep
+    @@For: =ManakaiDOM|all
+  @Type: idl|boolean||ManakaiDOM|all
+  @c:targetType: xp|ManakaiXMLParser
+  @IsSupportRequired: 1
+  @c:isSupported: 1
+  @TrueCase:
+    @@c:isSupported: 1
+    @@enDesc:
+      The parser <kwd:MUST> cnstruct the replacement subtree of
+      a general parsed <IF::x|Entity> node if the replacement text
+      for the node is available.
+
+      If this value is set to the parameter, then a fatal error 
+      might be reported even if the entire document is well-formed
+      in case a general parsed entity has replacement text that is
+      not well-formed when evaluated as if it has been referenced
+      in the content of an element, except that undeclared namespace prefixes
+      do not result in namespace well-formedness error.
+  @FalseCase:
+    @@IsDefault: 1
+    @@c:isSupported: 1
+    @@IsSupportRequired: 1
+    @@enDesc:
+      The parser don't have to construct <IF::x|Entity> replacement
+      subtrees.
+
+  @Test:
+    @@QName: cfg.entity-replacement-tree.test
+    @@PerlDef:
+      my $xp;
+      __CODE{createParserForTest:: $xp => $xp}__;
+      my $cfg = $xp-><AG::LSInput.domConfig>;
+
+      my $pname = <Q::cfg|entity-replacement-tree>;
+
+      $test->id ('default.false');
+      $test->assert_false ($cfg-><M::c|DOMConfiguration.getParameter> ($pname));
+   
+      $test->id ('false.to.true');
+      $cfg-><M::c|DOMConfiguration.setParameter> ($pname => true);
+      $test->assert_false ($cfg-><M::c|DOMConfiguration.getParameter> ($pname));
+      
+      $test->id ('true.to.false');
+      $cfg-><M::c|DOMConfiguration.setParameter> ($pname => false);
+      $test->assert_false ($cfg-><M::c|DOMConfiguration.getParameter> ($pname));
+
+      $test->id ('reset');
+      $cfg-><M::c|DOMConfiguration.setParameter> ($pname => true);
+      $cfg-><M::c|DOMConfiguration.setParameter> ($pname => null);
+      $test->assert_false ($cfg-><M::c|DOMConfiguration.getParameter> ($pname));
 
 CParam:
   @QName: xp|ls-input-to-input-file

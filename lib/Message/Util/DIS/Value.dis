@@ -17,7 +17,7 @@ Module:
   @License:
     license:Perl+MPL
   @Date:
-    $Date: 2006/03/15 13:45:04 $
+    $Date: 2006/03/16 08:52:33 $
   
   @Require:
     @@Module:
@@ -668,7 +668,7 @@ IFClsDef:
           my $type = $disResource-><AG::DIS|DISAnyResource.database>
                                  -><M::DIS|DISDatabase.getResource>
                                      ($self-><AG::DVValue.dataType>);
-          $r = $type-><M::dp|DISResourcePerl.getPerlCodeFromValue>
+          $r = $type-><M::dp|DISResourcePerl.getPerlCodeFromDVValue>
                         ($factory, $self);
         }__;
 

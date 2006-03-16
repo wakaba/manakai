@@ -40,7 +40,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/03/15 13:44:59 $
+      $Date: 2006/03/16 08:52:31 $
     @@ContentType:
       dis:Date.RCS
 
@@ -5302,6 +5302,7 @@ CParam:
   @Type: DOMMain|DOMString
   @dis:actualType: DOMMain|DOMURIs
   @DOMCore:targetType: DOMCore|Document
+  @dataType: DISCore|String
   @enDesc:
     The <cfg::schema-location> parameter value represents the
     schemas against which validation should occur, i.e. the
@@ -5384,6 +5385,7 @@ CParam:
   @dis:actualType: DOMMain|ManakaiDOMSchemaType
   @IsSupportRequired:0
   @DOMCore:targetType: DOMCore|Document
+  @dataType: DISCore|QName
   @enDesc:
     The <cfg::schema-type> parameter value is a <TYPE::DOMMain|DOMString>
     containing an absolute DOM URI.  It representsthe type of the
@@ -5703,6 +5705,9 @@ ElementTypeBinding:
     @@subsetOf:
       @@@@: c|anyDOMConfigurationParameter
       @@@For: =ManakaiDOM|all
+    @@multipleProperties:
+      @@@@: DISCore|Single
+      @@@For: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: boolCParam
@@ -5720,6 +5725,12 @@ ElementTypeBinding:
     @@Type: idl|boolean||ManakaiDOM|all
     @@subsetOf:
       @@@@: c|anyDOMConfigurationParameter
+      @@@For: =ManakaiDOM|all
+    @@multipleProperties:
+      @@@@: DISCore|Single
+      @@@For: =ManakaiDOM|all
+    @@dataType: 
+      @@@@: DISCore|Boolean
       @@@For: =ManakaiDOM|all
 
 ElementTypeBinding:
