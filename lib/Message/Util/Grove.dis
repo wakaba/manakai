@@ -9,7 +9,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/03/17 08:06:21 $
+    $Date: 2006/03/17 10:51:30 $
 
   @Require:
     @@Module:
@@ -201,9 +201,12 @@ ClsDef:
     @@PerlDef:
       $stem = $class->___create_node_stem ($bag, {
         <H::mg|references> => 0,
-        <H::mg|nodeClass> => $class,
         <H::mg|nodeID> => \<Code::mg|generateUniqueID>,
       }, $opt);
+      __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
+        $result => {$stem->{<H::mg|nodeClass>}},
+        $given => {$class},
+      }__;
       $bag->{${$stem->{<H::mg|nodeID>}}} = $stem;
 
   @Code:
@@ -368,11 +371,22 @@ ClsDef:
     @@enDesc:
       Creates a new node reference for the node stem.
     @@PerlDef:
-      $ref = $stem->{<H::mg|nodeClass>}->___create_node_ref ({
+      $ref = ${$stem->{<H::mg|nodeClass>}}->___create_node_ref ({
         <H::mg|nodeIDReference> => $stem->{<H::mg|nodeID>},
         <H::mg|nodeBag> => $bag,
       }, $opt);
       $stem->{<H::mg|references>}++;
+
+  @CODE:
+    @@QName: mg|createNodeRefFromID
+    @@enDesc:
+      Creates a new node reference for the node stem.
+    @@PerlDef:
+      $ref = ${$bag->{$$stemid}->{<H::mg|nodeClass>}}->___create_node_ref ({
+        <H::mg|nodeIDReference> => $stemid,
+        <H::mg|nodeBag> => $bag,
+      }, $opt);
+      $bag->{$$stemid}->{<H::mg|references>}++;
 
   @ResourceDef:
     @@QName: mg|CreateNodeRefMethod
@@ -459,7 +473,7 @@ ClsDef:
             }
 
             my $clsprop = $Message::Util::Grove::ClassProp{
-                            $gtstem->{<H::mg|nodeClass>}
+                            ${$gtstem->{<H::mg|nodeClass>}}
                           };
 
             for my $key (@{$clsprop->{<H::mg|origin0>}}) {
@@ -499,6 +513,41 @@ ClsDef:
           push @target, @gwreferred;
         } # TARGET
         $bag->{<H::mg|mutations>} = [];
+
+  @CODE:
+    @@QName: mg|getNodeStemPropValue
+    @@enDesc:
+      Obtains a property value set to the node stem associated
+      to the node reference.
+    @@PerlDef:
+      $r = $ref->{<H::mg|nodeBag>}->{${$ref->{<H::mg|nodeIDReference>}}}
+               ->{$prop};
+
+  @CODE:
+    @@QName: mg|setNodeStemPropValue
+    @@enDesc:
+      Sets a property value to the node stem associated
+      to the node reference.
+    @@PerlDef:
+      $ref->{<H::mg|nodeBag>}->{${$ref->{<H::mg|nodeIDReference>}}}
+          ->{$prop} = $given;
+
+  @CODE:
+    @@QName: mg|getNodeStemProp0Node
+    @@enDesc:
+      Obtains a property value node reference set to the node stem associated
+      to the node reference.
+    @@PerlDef:
+      my $__v = $ref->{<H::mg|nodeBag>}->{${$ref->{<H::mg|nodeIDReference>}}}
+                    ->{$prop};
+      if (defined $__v) {
+        __CODE{mg|createNodeRefFromID||ManakaiDOM|all::
+          $bag => {$ref->{<H::mg|nodeBag>}},
+          $stemid => $__v,
+          $ref => $r,
+          $opt => {{}},
+        }__;
+      }
 ##NodeRef
 
 ## -- Reference Internal Properties
