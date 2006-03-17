@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/03/15 13:45:01 $
+      $Date: 2006/03/17 08:06:21 $
     @@ContentType:
       dis:Date.RCS
   
@@ -107,6 +107,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
   @MDOMX:
     http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
+  @mg:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Grove/
   @mn:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/ManakaiNode#
   @nl:
@@ -2637,6 +2639,8 @@ IFClsDef:
                        <Q::DISLang:HashGet> => 'FETCH',
                        <Q::DISLang:HashSet> => 'STORE',
                        <Q::DISLang:ToString> => 'stringify',
+                       <Q::mg|CreateNodeStemMethod> => '___create_node_stem',
+                       <Q::mg|CreateNodeRefMethod> => '___create_node_ref',
                      }->{$op_uri};
               push @$r, $nm if defined $nm;
             } else {
@@ -6235,6 +6239,36 @@ TMethods:
                     $r-><M::DIS|PLBlockCon.appendStatement>
                           ('$Message::Util::ManakaiNode::ManakaiNodeRef'.
                            '::Prop{q<' . $pack_name . '>} = '.
+                           <ClassM::PLImplClass.perlLiteral> (\%nrp));
+                  }
+                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
+                                (<Q::mg|NodeRefRole>)) {
+                    my %nrp;
+                    my $db = $self-><AG::DIS|DISAnyResource.database>;
+                    for my $p (<Q::mg|subnode0>,
+                               <Q::mg|subnode1a>,
+                               <Q::mg|subnode1h>,
+                               <Q::mg|subnode2hh>,
+                               <Q::mg|origin0>,
+                               <Q::mg|owner0>,
+                               <Q::mg|ownee1h>) {
+                      $nrp{
+                        $db-><M::DIS|DISDatabase.getResource> ($p)
+                           -><M::DIS|DISResourceProp.getPropertyText>
+                                  (<Q::mg|propertyTypeKey>, $p)
+                      } = [keys %{{map {
+                        $_-><M::DIS|DISResourceProp.getPropertyText>
+                                  (<Q::DISPerl|propHashKey>,
+                                   $_-><AG::DIS|DISAnyResource.uri>) => true,
+                      } @{$cls-><M::DIS|DISResourceProp.getPropertyResourceList>
+                                  ($p, isa_recursive => true)}}}];
+                    }
+                    for (keys %nrp) {
+                      CORE::delete $nrp{$_} unless @{$nrp{$_}};
+                    }
+                    $r-><M::DIS|PLBlockCon.appendStatement>
+                          ('$Message::Util::Grove::'.
+                           'ClassProp{q<' . $pack_name . '>} = '.
                            <ClassM::PLImplClass.perlLiteral> (\%nrp));
                   }
                 }

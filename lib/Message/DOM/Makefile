@@ -52,6 +52,7 @@ DOT_CORE_DIS_FILES = \
 PM_FILES = \
   DOMFeature$(PM_SUFFIX) GenericLS$(PM_SUFFIX) \
   DOMMain$(PM_SUFFIX) DOMCore$(PM_SUFFIX) Tree$(PM_SUFFIX) \
+  TreeCore$(PM_SUFFIX) \
   DOMXML$(PM_SUFFIX) XDoctype$(PM_SUFFIX) \
   DOMLS$(PM_SUFFIX) XMLParser$(PM_SUFFIX) \
   SimpleLS$(PM_SUFFIX) ManakaiDOMLS2003$(PM_SUFFIX) \
@@ -92,5 +93,5 @@ clean:
 distclean: clean
 	$(RMALL) *$(DAEM_SUFFIX) *$(DAFX_SUFFIX)
 
-## $Date: 2006/02/26 14:32:39 $
+## $Date: 2006/03/17 08:06:20 $
 ## License: Public Domain.

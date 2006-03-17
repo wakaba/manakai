@@ -1,0 +1,524 @@
+Module:
+  @QName: Util|Grove
+  @enFN:
+    Manakai Grove Module
+
+  @Namespace:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Grove/
+
+  @DISCore:author: DISCore|Wakaba
+  @License: license|Perl+MPL
+  @Date:
+    $Date: 2006/03/17 08:06:21 $
+
+  @Require:
+    @@Module:
+      @@@QName: DISlib|DISPerl
+  @DefaultFor: ManakaiDOM|all
+
+Namespace:
+  @dis:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
+  @DISlib:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/
+  @f:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/feature#
+  @fe:
+    http://suika.fam.cx/www/2006/feature/
+  @idl:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/IDL#
+  @kwd:
+    http://suika.fam.cx/~wakaba/archive/2005/rfc2119/
+  @lang:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
+  @license:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
+  @ManakaiDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
+  @mg:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Grove/
+  @test:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Test#
+  @Util:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/
+
+ElementTypeBinding:
+  @Name: ClsDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISLang|Class
+
+ElementTypeBinding:
+  @Name: CODE
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISPerl|BlockCode
+
+ElementTypeBinding:
+  @Name: Method
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISLang|Method
+
+ElementTypeBinding:
+  @Name: Param
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISLang|MethodParameter
+
+ElementTypeBinding:
+  @Name: Return
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISLang|MethodReturn
+
+ElementTypeBinding:
+  @Name: nullCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType:
+      ManakaiDOM:InCase
+    @@Value:
+      @@@is-null:1
+
+ElementTypeBinding:
+  @Name: PerlDef
+  @ElementType:
+    dis:Def
+  @ShadowContent:
+    @@ContentType:
+      lang:Perl
+
+ElementTypeBinding:
+  @Name: enDesc
+  @ElementType:
+    dis:Description
+  @ShadowContent:
+    @@lang:en
+
+ElementTypeBinding:
+  @Name: enImplNote
+  @ElementType:
+    dis:ImplNote
+  @ShadowContent:
+    @@lang:en
+
+ElementTypeBinding:
+  @Name: enFN
+  @ElementType:
+    dis:FullName
+  @ShadowContent:
+    @@lang:en
+
+ElementTypeBinding:
+  @Name: ClsQName
+  @ElementType:
+    dis:QName
+
+ElementTypeBinding:
+  @Name: Code
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISPerl|InlineCode
+
+ElementTypeBinding:
+  @Name: IntPropDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISCore|Property
+
+ElementTypeBinding:
+  @Name: RPropDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISSource|ResourceProperty
+
+ElementTypeBinding:
+  @Name: Test
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: test|StandaloneTest
+
+ResourceDef:
+  @QName: HASH
+  @AliasFor: DISPerl|HASH||ManakaiDOM|all
+
+## --------------------------------
+## --- Node Bag
+
+ClsDef:
+  @ClsQName: NodeBag
+
+  @CODE:
+    @@QName: mg|createNodeBag
+    @@enDesc:
+      Creates a new node bag.
+    @@PerlDef:
+      $bag = {
+        <H::mg|mutations> => [],
+      };
+##NodeBag
+
+## -- Bag Internal Properties
+
+RPropDef:
+  @QName: mg|nodeBagKey
+  @subsetOf: DISPerl|propHashKey
+  @multipleProperties: DISCore|Single
+  @dataType: DISCore|String
+
+IntPropDef:
+  @QName: mg|mutations
+  @mg:nodeBagKey: m
+  @enDesc:
+    The <Q::mg|mutations> property of a node bag contains
+    a reference to the array that contains references to
+    the node identifiers.  They should be identifiers 
+    of nodes that might be no longer referenced from anywhere
+    other than bag and when garbage collection procedure is 
+    invoked they are really no longer referenced or not.
+
+## --------------------------------
+## --- Node Stem
+
+ClsDef:
+  @ClsQName: NodeStem
+
+  @CODE:
+    @@QName: mg|createNodeStem
+    @@enDesc:
+      Creates a new node stem.
+    @@PerlDef:
+      $stem = $class->___create_node_stem ($bag, {
+        <H::mg|references> => 0,
+        <H::mg|nodeClass> => $class,
+        <H::mg|nodeID> => \<Code::mg|generateUniqueID>,
+      }, $opt);
+      $bag->{${$stem->{<H::mg|nodeID>}}} = $stem;
+
+  @Code:
+    @@QName: mg|generateUniqueID
+    @@PerlDef:
+      (
+        'tag:suika.fam.cx,2005-09:' . time . ':' . $$ . ':' .
+        ($Message::Util::ManakaiNode::UniqueIDR ||=
+          [qw/A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
+              a b c d e f g h i j k l m n o p q r s t u v w x y z
+              0 1 2 3 4 5 6 7 8 9/]->[rand 62] .
+          [qw/A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
+              a b c d e f g h i j k l m n o p q r s t u v w x y z
+              0 1 2 3 4 5 6 7 8 9/]->[rand 62] .
+          [qw/A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
+              a b c d e f g h i j k l m n o p q r s t u v w x y z
+              0 1 2 3 4 5 6 7 8 9/]->[rand 62] .
+          [qw/A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
+              a b c d e f g h i j k l m n o p q r s t u v w x y z
+              0 1 2 3 4 5 6 7 8 9/]->[rand 62] .
+          [qw/A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
+              a b c d e f g h i j k l m n o p q r s t u v w x y z
+              0 1 2 3 4 5 6 7 8 9/]->[rand 62]) .
+        (++$Message::Util::ManakaiNode::UniqueIDN)
+      )
+
+  @CODE:
+    @@QName: mg|setOwnerProp
+    @@enDesc:
+      Setting <Q::mg|owner0> and <Q::mg|ownee1h> property values.
+    @@PerlDef:
+      $ownee->{$owner0prop} = $ownerref->{<H::mg|nodeIDReference>};
+      $bag->{${$ownerref->{<H::mg|nodeIDReference>}}}
+          ->{$ownee1hprop}->{${$ownee->{<H::mg|nodeID>}}}
+        = $ownee->{<H::mg|nodeID>};
+##NodeStem
+
+
+## -- Stem Internal Property Types
+
+RPropDef:
+  @QName: mg|propertyTypeKey
+  @subsetOf: DISPerl|propHashKey
+
+PTPropDef:
+  @QName: mg|subnode0
+  @enDesc:
+    A subnode property.
+  @mg:propertyTypeKey: s0
+
+PTPropDef:
+  @QName: mg|subnode1a
+  @enDesc:
+    A subnode property containing an array reference.
+  @mg:propertyTypeKey: s1a
+
+PTPropDef:
+  @QName: mg|subnode1h
+  @enDesc:
+    A subnode property containing a hash reference.
+  @mg:propertyTypeKey: s1h
+
+PTPropDef:
+  @QName: mg|subnode2hh
+  @enDesc:
+    A subnode property containing a hash reference 
+    containing hash references.
+  @mg:propertyTypeKey: s2hh
+
+PTPropDef:
+  @QName: mg|origin0
+  @enDesc:
+    An origin property.
+  @mg:propertyTypeKey: o0
+
+PTPropDef:
+  @QName: mg|owner0
+  @enDesc:
+    An owner property.  It is <EM::not> traversed when garbage collection is
+    done.
+  @mg:propertyTypeKey: w0
+
+PTPropDef:
+  @QName: mg|ownee1h
+  @enDesc:
+    An ownee property.  It <EM::is> traversed when garvage collection is done.
+  @mg:propertyTypeKey: v1h
+
+ElementTypeBinding:
+  @Name: PTPropDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISSource|ResourceProperty
+    @@multipleProperties: DISCore|UnorderedList
+    @@dataType: DISCore|QName
+
+## -- Stem Internal Properties
+
+RPropDef:
+  @QName: mg|nodeStemKey
+  @subsetOf: DISPerl|propHashKey
+  @multipleProperties: DISCore|Single
+  @dataType: DISCore|String
+
+IntPropDef:
+  @QName: mg|references
+  @enDesc:
+    The number of the external references to the node.
+  @Type: DISPerl|Number
+  @mg:nodeStemKey: rc
+
+IntPropDef:
+  @QName: mg|nodeClass
+  @enDesc:
+    The Perl fully-qualified package name of the class
+    whose <CODE::___create_node_ref> method is invoked when
+    a reference to the node is instantiated.
+  @Type: DISPerl|String
+  @mg:nodeStemKey: cls
+
+IntPropDef:
+  @QName: mg|nodeID
+  @enDesc:
+    The hash key string by which the node stem object can
+    be retrieved from the node bag.
+  @Type: DISPerl|SCALAR
+  @mg:nodeStemKey: id
+
+
+## --------------------------------
+## --- Node Reference
+
+ClsDef:
+  @ClsQName: NodeRef
+
+  @ResourceDef:
+    @@QName: mg|NodeRefRole
+    @@DISCore:resourceType: DISLang|Role
+    @@enDesc:
+      Any class that is used as a node reference <kwd:MUST> set
+      its <Q::DISLang|role> property as <Q::mg|NodeRefRole>.
+
+  @ResourceDef:
+    @@QName: mg|CreateNodeStemMethod
+    @@DISCore:resourceType: DISPerl|CommonMethod
+    @@enDesc:
+      The method to create a node stem.
+
+      The method will invoked with four parameters: class name, node bag,
+      node stem prototype, and a reference to hash containing
+      optional parameters.  The method <kwd:MUST> return a node
+      stem object.  It <kwd:MAY> create and return the node
+      stem optionally by <Perl::bless>ing the node stem prototype
+      parameter with any appropriate class, or <kwd:MAY> create and
+      return the node stem object by its own way.   It
+      <kwd:MAY> use options contained by the third parameter 
+      to create the node stem object.
+
+  @CODE:
+    @@QName: mg|createNodeRef
+    @@enDesc:
+      Creates a new node reference for the node stem.
+    @@PerlDef:
+      $ref = $stem->{<H::mg|nodeClass>}->___create_node_ref ({
+        <H::mg|nodeIDReference> => $stem->{<H::mg|nodeID>},
+        <H::mg|nodeBag> => $bag,
+      }, $opt);
+      $stem->{<H::mg|references>}++;
+
+  @ResourceDef:
+    @@QName: mg|CreateNodeRefMethod
+    @@DISCore:resourceType: DISPerl|CommonMethod
+    @@enDesc:
+      The method to create a node reference to the node.
+
+      The method will invoked with three parameters: class name,
+      node reference prototype, and a reference to hash containing
+      optional parameters.  The method <kwd:MUST> return a node
+      reference object.  It <kwd:MAY> create and return the node
+      reference by <Perl::bless>ing the node reference prototype
+      parameter with any appropriate class, or <kwd:MAY> create and
+      return the node reference object by its own way.   It
+      <kwd:MAY> use options contained by the third parameter 
+      to create the node reference object.
+
+  @Code:
+    @@QName: mg|getNodeBag
+    @@enDesc:
+      Returns a node bag to which the node reference belongs.
+    @@PerlDef:
+      $ref->{<H::mg|nodeBag>}
+
+  @Method:
+    @@Name: destroy
+    @@Return:
+      @@@PerlDef:
+        my $id = $self->{<H::mg|nodeIDReference>};
+        my $bag = $self->{<H::mg|nodeBag>};
+        if (--$bag->{$$id}->{<H::mg|references>} < 1) {
+          push @{$bag->{<H::mg|mutations>}}, $id;
+          if (@{$bag->{<H::mg|mutations>}}
+                  > ($Message::Util::Grove::GCLatency or 0)) {
+            __CODE{mg|collectGarbage:: $ref => $self}__;
+          }
+        }
+
+  @CODE:
+    @@QName: mg|collectGarbage
+    @@enDesc:
+      Garbage collection.
+    @@Param:
+      @@@Name: ref
+      @@@Type: HASH
+      @@@enDesc:
+        The node reference object.
+    @@PerlDef:
+        my $bag = $ref->{<H::mg|nodeBag>};
+        my @target = @{$bag->{<H::mg|mutations>}};
+        my %done;
+        my %has_xref;
+        TARGET: while (@target) {
+          my $target = shift @target;
+
+          next TARGET if $has_xref{$$target} or $done{$$target};
+
+          unless (defined $bag->{$$target}) {
+            $done{$$target} = true;
+            next TARGET;
+          }
+
+          my @grove;
+          my @gtarget = ($target);
+          my @gwreferred;
+          GTARGET: while (@gtarget) {
+            my $gtarget = shift @gtarget;
+            my $gtstem = $bag->{$$gtarget};
+            unless (defined $gtstem) {
+              $done{$$gtarget} = true;
+              next GTARGET;
+            }
+
+            if ($has_xref{$$gtarget} or $gtstem->{<H::mg|references>}) {
+              $has_xref{$$gtarget} = true;
+              $has_xref{$$_} = true for @grove;
+              for (@gtarget) {
+                $has_xref{$$_} = defined $bag->{$$_};
+                $done{$$_} = true;
+              }
+              next TARGET;
+            } elsif ($done{$$gtarget}) {
+              next GTARGET;
+            }
+
+            my $clsprop = $Message::Util::Grove::ClassProp{
+                            $gtstem->{<H::mg|nodeClass>}
+                          };
+
+            for my $key (@{$clsprop->{<H::mg|origin0>}}) {
+              push @gtarget, $gtstem->{$key} if ref $gtstem->{$key};
+            }
+
+            A: for my $key ((@{$clsprop->{<H::mg|ownee1h>}}),
+                            (@{$clsprop->{<H::mg|subnode1h>}})) {
+              next A unless ref $gtstem->{$key};
+              push @gtarget, grep {ref $_} values %{$gtstem->{$key}};
+            }
+
+            A: for my $key (@{$clsprop->{<H::mg|subnode1a>}}) {
+              next A unless ref $gtstem->{$key};
+              push @gtarget, grep {ref $_} @{$gtstem->{$key}};
+            }
+
+            A: for my $key (@{$clsprop->{<H::mg|subnode2hh>}}) {
+              next A unless ref $gtstem->{$key};
+              B: for my $key2 (keys %{$gtstem->{$key}}) {
+                next B unless ref $gtstem->{$key}->{$key2};
+                push @gtarget, grep {ref $_} values %{$gtstem->{$key}->{$key2}};
+              }
+            }
+
+            for my $key (@{$clsprop->{<H::mg|owner0>}}) {
+              push @gwreferred, $gtstem->{$key} if ref $gtstem->{$key};
+            }
+
+            push @grove, $gtarget;
+          } # GTARGET
+
+          for (@grove) {
+            $done{$$_} = true;
+            delete $bag->{$$_};
+          }
+          push @target, @gwreferred;
+        } # TARGET
+        $bag->{<H::mg|mutations>} = [];
+##NodeRef
+
+## -- Reference Internal Properties
+
+RPropDef:
+  @QName: mg|nodeRefKey
+  @subsetOf: DISPerl|propHashKey
+  @multipleProperties: DISCore|Single
+  @dataType: DISCore|String
+
+IntPropDef:
+  @QName: mg|nodeIDReference
+  @enDesc:
+    The <Q::mg|nodeID> of the node referenced by the node reference object.
+  @Type: DISPerl|SCALAR
+  @mg:nodeRefKey: id
+
+IntPropDef:
+  @QName: mg|nodeBag
+  @enDesc:
+    The node bag object referenced by the node reference object.
+  @Type: DISPerl|Ref
+  @mg:nodeRefKey: b

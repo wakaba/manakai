@@ -278,8 +278,6 @@ daf_check_undefined ();
 
 undef $DNi;
 undef %ModuleSourceDNLDocument;
-undef $limpl;
-undef $impl;
 exit $HasError if $HasError;
 
 ## --- Creating Files
@@ -341,6 +339,9 @@ status_msg_ "Closing the database...";
 $db->free;
 undef $db;
 status_msg "done";
+
+undef $limpl;
+undef $impl;
 
 {
   use integer;
@@ -598,6 +599,23 @@ sub daf_generate_perl_test_file ($) {
   $pl->license_uri ($mod->get_property_resource (ExpandedURI q<dis:License>)
                         ->uri);
 
+  $pack->append_code ('
+    use Getopt::Long;
+    my %Skip;
+    GetOptions (
+      "Skip=s" => sub {
+        shift;
+        for (split /\s+/, shift) {
+          if (/^(\d+)-(\d+)$/) {
+            $Skip{$_} = 1 for $1..$2;
+          } else {
+            $Skip{$_} = 1;
+          }
+        }
+      },
+    );
+  ');
+
   $pack->append_code
     ($pc->create_perl_statement
        ('my $impl = $Message::DOM::ImplementationRegistry->get_implementation ({
@@ -617,10 +635,16 @@ sub daf_generate_perl_test_file ($) {
 
     if ($res->is_type_uri (ExpandedURI q<test:Test>)) {
       if ($res->is_type_uri (ExpandedURI q<test:StandaloneTest>)) {
-        $total_tests++;
+        my $test_num = ++$total_tests;
+        my $test_uri = $res->name_uri || $res->uri;
+
         $pack->append_code ('$test->start_new_test (');
-        $pack->append_new_pc_literal ($res->name_uri || $res->uri);
+        $pack->append_new_pc_literal ($test_uri);
         $pack->append_code (');');
+
+        $pack->append_code ('if (not $Skip{'.$test_num.'} and not $Skip{');
+        $pack->append_new_pc_literal ($test_uri);
+        $pack->append_code ('}) {');
         
         $pack->append_code ('try {');
         
@@ -640,6 +664,8 @@ sub daf_generate_perl_test_file ($) {
           warn $err;
           $test->not_ok;
         };');
+
+        $pack->append_code ('} else { warn "'.$test_num.' skipped\n" }');
 
       } elsif ($res->is_type_uri (ExpandedURI q<test:ParserTestSet>)) {
         my $block = $pack->append_new_pc_block;

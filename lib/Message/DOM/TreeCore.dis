@@ -1,0 +1,944 @@
+Module:
+  @QName: MDOM|TreeCore
+  @enFN:
+    DOM Tree Core Module
+  @enDesc:
+    The manakai DOM Tree Core Module implements a part of the W3C DOM
+    Core module related to tree structural model for HTML or XML documents.
+
+  @Namespace:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/TreeCore/
+
+  @DISCore:author: DISCore|Wakaba
+  @License: license|Perl+MPL
+  @Date:
+    $Date: 2006/03/17 08:06:21 $
+
+  @Require:
+    @@Module:
+      @@@QName: Util|Grove
+      @@@WithFor: ManakaiDOM|all
+    @@Module:
+      @@@QName: MDOM|DOMCore
+      @@@WithFor: ManakaiDOM|ForLatest
+ # DOMXML
+ # XDoctype
+    @@Module:
+      @@@QName: MURI|Generic
+      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
+    @@Module:
+      @@@WithFor: ManakaiDOM|ManakaiDOM
+    @@Module:
+      @@@WithFor: ManakaiDOM|ManakaiDOM1
+    @@Module:
+      @@@WithFor: ManakaiDOM|ManakaiDOM2
+    @@Module:
+      @@@WithFor: ManakaiDOM|ManakaiDOM3
+  @DefaultFor: ManakaiDOM|ManakaiDOMLatest
+
+Namespace:
+  @c:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
+  @cfg:
+    http://suika.fam.cx/www/2006/dom-config/
+  @dis:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
+  @doc:
+    http://suika.fam.cx/~wakaba/archive/2005/7/tutorial#
+  @d:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/xdt#
+  @DOMMain:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/main#
+  @dx:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#
+  @dxm:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/XML#
+  @ecore:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/Core/
+  @ev:
+    http://www.w3.org/2001/xml-events
+  @f:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/feature#
+  @fe:
+    http://suika.fam.cx/www/2006/feature/
+  @html5:
+    http://www.w3.org/1999/xhtml
+  @idl:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/IDL#
+  @infoset:
+    http://www.w3.org/2001/04/infoset#
+  @kwd:
+    http://suika.fam.cx/~wakaba/archive/2005/rfc2119/
+  @lang:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
+  @license:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
+  @ManakaiDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
+  @ManakaiDOMCore:
+    http://suika.fam.cx/~wakaba/archive/2004/mdom-core#
+  @MDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
+  @MDOMX:
+    http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
+  @mg:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Grove/
+  @mn:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/ManakaiNode#
+  @MURI:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/URI/
+  @null:
+    http://suika.fam.cx/~wakaba/-temp/2003/09/27/null
+  @rdf:
+    http://www.w3.org/1999/02/22-rdf-syntax-ns#
+  @rdfs:
+    http://www.w3.org/2000/01/rdf-schema#
+  @sw010:
+    urn:x-suika-fam-cx:markup:suikawiki:0:10:
+  @tc:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/TreeCore/
+  @test:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Test#
+  @urigen:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/URI/Generic/
+  @Util:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/
+  @x:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/xml#
+  @xhtml1:
+    http://www.w3.org/1999/xhtml
+  @xml:
+    http://www.w3.org/XML/1998/namespace
+  @xml-dtd:
+    http://www.w3.org/TR/REC-xml
+  @xmlns:
+    http://www.w3.org/2000/xmlns/
+
+ElementTypeBinding:
+  @Name: ClsDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType:
+      @@@@: dis|MultipleResource
+      @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
+    @@resourceFor:
+      @@@@: ManakaiDOM|ForClass
+    @@For: ManakaiDOM|ManakaiDOMLatest
+
+    @@DISCore:resourceType:
+      @@@@: DISLang|Class
+      @@@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: CODE
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISPerl|BlockCode
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: Method
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|Method
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM
+
+ElementTypeBinding:
+  @Name: CMethod
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|Method
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: L2Method
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|Method
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|DOM2
+
+ElementTypeBinding:
+  @Name: L3Method
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|Method
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|DOM3
+
+ElementTypeBinding:
+  @Name: IntMethod
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|Method
+    @@ForCheck:
+      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM ManakaiDOM|ForClass
+    @@ManakaiDOM:isForInternal: 1
+
+ElementTypeBinding:
+  @Name: Param
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|MethodParameter
+
+ElementTypeBinding:
+  @Name: Return
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|MethodReturn
+
+ElementTypeBinding:
+  @Name: Attr
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|Attribute
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM
+
+ElementTypeBinding:
+  @Name: CAttr
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISLang|Attribute
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: IntAttr
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|Attribute
+    @@ForCheck: ManakaiDOM|ForClass
+    @@ManakaiDOM:isForInternal: 1
+
+ElementTypeBinding:
+  @Name: L2Attr
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|Attribute
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|DOM2
+
+ElementTypeBinding:
+  @Name: L3Attr
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|Attribute
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|DOM3
+  ## Note that there are attributes introduced in DOM Level 3
+  ## but also defined for lower levels as internal attributes
+  ## for the purpose of internal use.
+
+ElementTypeBinding:
+  @Name: CL3Attr
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|Attribute
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|DOM3 ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: LXAttr
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|Attribute
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|ManakaiDOMLatest
+
+ElementTypeBinding:
+  @Name: Get
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|AttributeGet
+
+ElementTypeBinding:
+  @Name: Set
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|AttributeSet
+
+ElementTypeBinding:
+  @Name: LXSet
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|AttributeSet
+    @@ForCheck: ManakaiDOM|ManakaiDOMLatest
+
+ElementTypeBinding:
+  @Name: InCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:InCase
+
+ElementTypeBinding:
+  @Name: nullCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:InCase
+    @@Value:
+      @@@is-null:1
+
+ElementTypeBinding:
+  @Name: ConstGroup
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|ConstGroup
+    @@ForCheck: ManakaiDOM|ForIF !=ManakaiDOM|ManakaiDOM
+
+ElementTypeBinding:
+  @Name: Const
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|Const
+
+ElementTypeBinding:
+  @Name: PerlDef
+  @ElementType:
+    dis:Def
+  @ShadowContent:
+    @@ContentType:
+      lang:Perl
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: PerlDefC
+  @ElementType:
+    dis:Def
+  @ShadowContent:
+    @@ContentType:
+      lang:Perl
+
+ElementTypeBinding:
+  @Name: XML2Feature
+  @ElementType:
+    dis:ImplNote
+  @ShadowContent:
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        The <CITE::DOM Level 2 Core> specification said that HTML-only 
+        DOM Level 2 implementations does not need to implement this member. 
+        The DOM Level 2 Errata withdraws it and it requires HTML-only 
+        DOM implementations throw a <X::DOMException.NOT_SUPPORTED_ERR>. 
+
+ElementTypeBinding:
+  @Name: enImplNote
+  @ElementType:
+    dis:ImplNote
+  @ShadowContent:
+    @@lang:en
+
+ElementTypeBinding:
+  @Name: enFN
+  @ElementType:
+    dis:FullName
+  @ShadowContent:
+    @@lang:en
+
+ElementTypeBinding:
+  @Name: NodeTypeDef
+  @ElementType: 
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@: dis|MultipleResource
+      @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
+    @@resourceFor: ManakaiDOM|ForIF
+    @@resourceFor:
+      @@@@: ManakaiDOM|ForClass
+      @@@ForCheck: ManakaiDOM|ManakaiDOMLatest
+    @@For: ManakaiDOM|DOM1
+    @@For: =ManakaiDOM|ManakaiDOM
+
+    @@rdf:type:
+      @@@@: DISLang|Interface
+      @@@ForCheck: ManakaiDOM|ForIF
+
+    @@rdf:type:
+      @@@@: DISLang|Class
+      @@@ForCheck: ManakaiDOM|ForClass
+
+    @@ISA:
+      @@@@: Node
+      @@@ForCheck: ManakaiDOM|ForIF
+    @@ISA:
+      @@@@: ManakaiDOMNode
+      @@@ForCheck: ManakaiDOM|ForClass
+
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOM||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOM1||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM1
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOM2||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM2
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOM3||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM3
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
+
+    @@f:implements:
+      @@@@: DOMCore|CoreFeature10
+      @@@For: ManakaiDOM|DOM1
+    @@DOMMain:implementFeature:
+      @@@@: DOMCore|CoreFeature20
+      @@@For: ManakaiDOM|DOM2
+    @@DOMMain:implementFeature:
+      @@@@: DOMCore|CoreFeature30
+      @@@For: ManakaiDOM|DOM3
+    @@DOMMain:implementFeature:
+      @@@@: DOMXML|XMLFeature10
+      @@@For: ManakaiDOM|DOM1 ManakaiDOM|DOMXMLFeature
+    @@DOMMain:implementFeature:
+      @@@@: DOMXML|XMLFeature20
+      @@@For: ManakaiDOM|DOM2 ManakaiDOM|DOMXMLFeature
+    @@DOMMain:implementFeature:
+      @@@@: DOMXML|XMLFeature30
+      @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeature
+    @@DOMMain:implementFeature:
+      @@@@: DOMXML|XMLVersionFeature10
+      @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeature
+    @@DOMMain:implementFeature:
+      @@@@: DOMXML|XMLVersionFeature11
+      @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeatureXML11
+
+ElementTypeBinding:
+  @Name: IFCls1Def
+  @ElementType: 
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@: dis|MultipleResource
+      @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
+    @@resourceFor: ManakaiDOM|ForIF
+    @@resourceFor:
+      @@@@: ManakaiDOM|ForClass
+      @@@ForCheck: ManakaiDOM|ManakaiDOMLatest
+    @@For: ManakaiDOM|DOM1
+    @@For: =ManakaiDOM|ManakaiDOM
+
+    @@rdf:type:
+      @@@@: DISLang|Interface
+      @@@ForCheck: ManakaiDOM|ForIF
+
+    @@rdf:type:
+      @@@@: DISLang|Class
+      @@@ForCheck: ManakaiDOM|ForClass
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOM||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOM1||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM1
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOM2||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM2
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOM3||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM3
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
+
+    @@f:implements:
+      @@@@: c|CoreFeature10
+      @@@For: ManakaiDOM|DOM1
+    @@f:implements:
+      @@@@: c|CoreFeature20
+      @@@For: ManakaiDOM|DOM2
+    @@f:implements:
+      @@@@: c|CoreFeature30
+      @@@For: ManakaiDOM|DOM3
+    @@f:implements:
+      @@@@: DOMXML|XMLFeature10
+      @@@For: ManakaiDOM|DOM1 ManakaiDOM|DOMXMLFeature
+    @@f:implements:
+      @@@@: DOMXML|XMLFeature20
+      @@@For: ManakaiDOM|DOM2 ManakaiDOM|DOMXMLFeature
+    @@f:implements:
+      @@@@: DOMXML|XMLFeature30
+      @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeature
+    @@f:implements:
+      @@@@: DOMXML|XMLVersionFeature10
+      @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeature
+    @@f:implements:
+      @@@@: DOMXML|XMLVersionFeature11
+      @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeatureXML11
+
+ElementTypeBinding:
+  @Name: IFQName
+  @ElementType:
+    dis:QName
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForIF
+
+ElementTypeBinding:
+  @Name: ClsQName
+  @ElementType:
+    dis:QName
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: IFISA
+  @ElementType:
+    dis:ISA
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForIF
+
+ElementTypeBinding:
+  @Name: ClsISA
+  @ElementType:
+    dis:ISA
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: disDef
+  @ElementType:
+    dis:Def
+  @ShadowContent:
+    @@ContentType:
+      lang:dis
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: Code
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISPerl|InlineCode
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: IntPropDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISCore|Property
+    @@For: =ManakaiDOM|all
+
+ElementTypeBinding:
+  @Name: RPropDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISSource|ResourceProperty
+    @@For: =ManakaiDOM|all
+
+ElementTypeBinding:
+  @Name: Test
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: test|StandaloneTest
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: L2Test
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: test|StandaloneTest
+    @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|DOM2
+
+ElementTypeBinding:
+  @Name: L3Test
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: test|StandaloneTest
+    @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|DOM3
+
+ElementTypeBinding:
+  @Name: LXTest
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: test|StandaloneTest
+    @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
+
+ClsDef:
+  @ClsQName: ManakaiDOMImplementationTC
+
+  @Implement: c|DOMImplementation
+  @DISLang:role: mg|NodeRefRole
+
+  @enDesc:
+    The <Class::ManakaiDOMImplementationDocument> class implements
+    two factory methods to create DOM <IF::Document> or
+    <IF::DOMXML|DocumentType> defined in DOM Level 2 or higher.
+
+  @IntMethod:
+    @@Name: new
+    @@enDesc:
+      Creates a new instance of the implementation.
+    @@Return:
+      @@@Type: c|DOMImplementation
+      @@@enDesc:
+        The newly created implementation object.
+      @@@PerlDef:
+        my $bag;
+        __CODE{mg|createNodeBag||ManakaiDOM|all:: $bag => $bag}__;
+        my $stem;
+        __CODE{mg|createNodeStem||ManakaiDOM|all::
+          $bag => $bag,
+          $stem => $stem,
+          $class => {<ClassName::ManakaiDOMImplementationTC>},
+          $opt => {{}},
+        }__;
+        __CODE{mg|createNodeRef||ManakaiDOM|all::
+          $bag => $bag,
+          $stem => $stem,
+          $ref => $r,
+          $opt => {{}},
+        }__;
+
+    @@Test:
+      @@@QName: Impl.new.test
+      @@@PerlDef:
+        local $Message::DOM::TreeCore::GCLatency = 0;
+
+        my $impl = <ClassM::ManakaiDOMImplementationTC.new>;
+
+        my $bag = $impl->{<H::mg|nodeBag>};
+        my $id = $impl->{<H::mg|nodeIDReference>};
+        
+        $test->id ('interface');
+        $test->assert_isa ($impl, <IFName::c|DOMImplementation>);
+        
+        $test->id ('class');
+        $test->assert_isa ($impl, <ClassName::ManakaiDOMImplementationTC>);
+
+        undef $impl;
+
+        $test->id ('gc');
+        $test->assert_null ($bag->{$$id});
+
+  @IntMethod:
+    @@Operator:
+      @@@@: DESTROY
+      @@@ContentType: DISPerl|Perl
+    @@Return:
+      @@@disDef:
+        @@@@DISPerl:cloneCode: mg|NodeRef||ManakaiDOM|all.destroy
+
+  @CODE:
+    @@QName: tc|createImplForTest
+    @@PerlDef:
+      $impl = <ClassM::ManakaiDOMImplementationTC.new>;
+
+  @IntMethod:
+    @@Operator: mg|CreateNodeRefMethod
+    @@Param:
+      @@@Name: obj
+      @@@Type: HASH
+    @@Return:
+      @@@Type: c|DOMImplementation
+      @@@PerlDef:
+        $r = bless $obj, $self;
+
+  @IntMethod:
+    @@Operator: mg|CreateNodeStemMethod
+    @@Param:
+      @@@Name: bag
+      @@@Type: HASH
+    @@Param:
+      @@@Name: obj
+      @@@Type: HASH
+    @@Return:
+      @@@Type: HASH
+      @@@PerlDef:
+        $obj->{<H::tc|revImplementation>} = {};
+        $r = $obj;
+  @mg:ownee1h: tc|revImplementation
+
+  @Method:
+    @@Name: createDocument
+    @@Return:
+      @@@Type: Document
+      @@@PerlDef:
+        my $bag = <Code::mg|getNodeBag||ManakaiDOM|all:: $ref = $self>;
+        my $stem;
+        __CODE{mg|createNodeStem||ManakaiDOM|all::
+          $bag => $bag,
+          $stem => $stem,
+          $class => {<ClassName::ManakaiDOMDocument>},
+          $opt => {{
+            <H::tc|implementation> => $self,
+          }},
+        }__;
+        __CODE{mg|createNodeRef||ManakaiDOM|all::
+          $bag => $bag,
+          $stem => $stem,
+          $ref => $r,
+          $opt => {{
+          }},
+        }__;
+
+    @@Test:
+      @@@QName: Impl.createDoc.1.test
+      @@@PerlDef:
+        local $Message::DOM::TreeCore::GCLatency = 0;
+
+        my $impl = <ClassM::ManakaiDOMImplementationTC.new>;
+
+        my $bag = $impl->{<H::mg|nodeBag>};
+        my $id = $impl->{<H::mg|nodeIDReference>};
+
+        my $doc = $impl-><M::c|DOMImplementation.createDocument>;
+        
+        $test->id ('interface');
+        $test->assert_isa ($doc, <IFName::Document>);
+        
+        $test->id ('class');
+        $test->assert_isa ($doc, <ClassName::ManakaiDOMDocument>);
+
+        my $doc_id = $doc->{<H::mg|nodeIDReference>};
+
+        undef $impl;
+
+        $test->id ('gc.impl.1');
+        $test->assert_not_null ($bag->{$$id});
+
+        $test->id ('gc.doc.1');
+        $test->assert_not_null ($bag->{$$doc_id});
+
+        undef $doc;
+
+        $test->id ('gc.impl.2');
+        $test->assert_null ($bag->{$$id});
+
+        $test->id ('gc.doc.2');
+        $test->assert_null ($bag->{$$doc_id});
+    @@Test:
+      @@@QName: Impl.createDoc.2.test
+      @@@PerlDef:
+        local $Message::DOM::TreeCore::GCLatency = 0;
+
+        my $impl = <ClassM::ManakaiDOMImplementationTC.new>;
+
+        my $bag = $impl->{<H::mg|nodeBag>};
+        my $id = $impl->{<H::mg|nodeIDReference>};
+
+        my $doc = $impl-><M::c|DOMImplementation.createDocument>;
+        
+        $test->id ('interface');
+        $test->assert_isa ($doc, <IFName::Document>);
+        
+        $test->id ('class');
+        $test->assert_isa ($doc, <ClassName::ManakaiDOMDocument>);
+
+        my $doc_id = $doc->{<H::mg|nodeIDReference>};
+
+        undef $doc;
+
+        $test->id ('gc.impl.1');
+        $test->assert_not_null ($bag->{$$id});
+
+        $test->id ('gc.doc.1');
+        $test->assert_null ($bag->{$$doc_id});
+
+        undef $impl;
+
+        $test->id ('gc.impl.2');
+        $test->assert_null ($bag->{$$id});
+
+        $test->id ('gc.doc.2');
+        $test->assert_null ($bag->{$$doc_id});
+    @@Test:
+      @@@QName: Impl.createDoc.3.test
+      @@@PerlDef:
+        local $Message::DOM::TreeCore::GCLatency = 1;
+
+        my $impl = <ClassM::ManakaiDOMImplementationTC.new>;
+
+        my $bag = $impl->{<H::mg|nodeBag>};
+        my $id = $impl->{<H::mg|nodeIDReference>};
+
+        my $doc = $impl-><M::c|DOMImplementation.createDocument>;
+        
+        $test->id ('interface');
+        $test->assert_isa ($doc, <IFName::Document>);
+        
+        $test->id ('class');
+        $test->assert_isa ($doc, <ClassName::ManakaiDOMDocument>);
+
+        my $doc_id = $doc->{<H::mg|nodeIDReference>};
+
+        undef $doc;
+        undef $impl;
+
+        $test->id ('gc.impl.1');
+        $test->assert_null ($bag->{$$id});
+
+        $test->id ('gc.doc.1');
+        $test->assert_null ($bag->{$$doc_id});
+##DOMImplementationTC
+
+ResourceDef:
+  @QName: DOMString
+  @AliasFor: DOMMain|DOMString
+  @For: ManakaiDOM|DOM
+
+ResourceDef:
+  @QName: DOMImpl
+  @AliasFor: c|DOMImplementation
+  @For: ManakaiDOM|DOM
+
+ResourceDef:
+  @QName: boolean
+  @AliasFor: idl|boolean||ManakaiDOM|all
+
+ResourceDef:
+  @QName: unsignedLong
+  @AliasFor: idl|unsignedLong||ManakaiDOM|all
+
+ResourceDef:
+  @QName: HASH
+  @AliasFor: DISPerl|HASH||ManakaiDOM|all
+
+IFCls1Def:
+  @IFQName: Node
+  @ClsQName: ManakaiDOMNode
+
+  @DISLang:role: mg|NodeRefRole
+
+  @IntMethod:
+    @@Operator: mg|CreateNodeRefMethod
+    @@Param:
+      @@@Name: obj
+      @@@Type: HASH
+    @@Return:
+      @@@Type: Node
+      @@@PerlDef:
+        $r = bless $obj, $self;
+
+  @IntMethod:
+    @@Operator: mg|CreateNodeStemMethod
+    @@Param:
+      @@@Name: bag
+      @@@Type: HASH
+    @@Param:
+      @@@Name: obj
+      @@@Type: HASH
+    @@Param:
+      @@@Name: opt
+      @@@Type: HASH
+    @@Return:
+      @@@Type: HASH
+      @@@PerlDef:
+        __CODE{mg|setOwnerProp||ManakaiDOM|all::
+          $bag => $bag,
+          $ownerref => {$opt->{<H::tc|ownerDocument>}},
+          $ownee1hprop => {<H::tc|revOwnerDocument>},
+          $ownee => {$obj},
+          $owner0prop => {<H::tc|ownerDocument>},
+        }__;
+        $r = $obj;
+
+  @IntMethod:
+    @@Operator:
+      @@@@: DESTROY
+      @@@ContentType: DISPerl|Perl
+    @@Return:
+      @@@disDef:
+        @@@@DISPerl:cloneCode: mg|NodeRef||ManakaiDOM|all.destroy
+##Node
+
+NodeTypeDef:
+  @IFQName: Document
+  @ClsQName: ManakaiDOMDocument
+
+  @IntMethod:
+    @@Operator: mg|CreateNodeStemMethod
+    @@Param:
+      @@@Name: bag
+      @@@Type: HASH
+    @@Param:
+      @@@Name: obj
+      @@@Type: HASH
+    @@Param:
+      @@@Name: opt
+      @@@Type: HASH
+    @@Return:
+      @@@Type: HASH
+      @@@PerlDef:
+        $obj->{<H::infoset|children>} = [];
+        $obj->{<H::tc|revOwnerDocument>} = {};
+        $obj->{<H::infoset|version>} = '1.0';
+        __CODE{mg|setOwnerProp||ManakaiDOM|all::
+          $bag => $bag,
+          $ownerref => {$opt->{<H::tc|implementation>}},
+          $ownee1hprop => {<H::tc|revImplementation>},
+          $ownee => {$obj},
+          $owner0prop => {<H::tc|implementation>},
+        }__;
+        $r = $obj;
+  @mg:subnode1a: infoset|children
+  @mg:owner0: tc|implementation
+##Document
+
+IntPropDef:
+  @QName: tc|revImplementation
+  @enDesc:
+    Reversed <Q::tc|implementation>
+  @Type: HASH
+  @mg:nodeStemKey: ed
+
+IntPropDef:
+  @QName: tc|implementation
+  @enDesc:
+    Associated implementation
+  @Type: HASH
+  @mg:nodeStemKey: impl
+
+IntPropDef:
+  @QName: tc|ownerDocument
+  @mg:nodeStemKey: od
+
+IntPropDef:
+  @QName: tc|revOwnerDocument
+  @enDesc:
+    Reversed relationship for <Q::tc|ownerDocument>.
+  @Type: HASH
+  @mg:nodeStemKey: do
+
+ElementTypeBinding:
+  @Name: enDesc
+  @ElementType:
+    dis:Description
+  @ShadowContent:
+    @@lang:en
