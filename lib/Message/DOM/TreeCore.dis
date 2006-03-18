@@ -12,7 +12,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/03/17 10:51:30 $
+    $Date: 2006/03/18 05:57:48 $
 
   @Require:
     @@Module:
@@ -20,8 +20,10 @@ Module:
       @@@WithFor: ManakaiDOM|all
     @@Module:
       @@@QName: MDOM|DOMCore
-      @@@WithFor: ManakaiDOM|ForLatest
- # DOMXML
+      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
+    @@Module:
+      @@@QName: MDOM|XML
+      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
  # XDoctype
     @@Module:
       @@@QName: MURI|Generic
@@ -99,6 +101,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dom/tree#
   @tc:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/TreeCore/
+  @tx:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/XML/
   @test:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Test#
   @urigen:
@@ -1188,7 +1192,6 @@ IFCls1Def:
             c:relatedData => {$self},
           }__;
 
-
   @Attr:
      @@Name:  parentNode
      @@Description:
@@ -1291,6 +1294,32 @@ IFCls1Def:
           $r = ($other->{<H::mg|nodeIDReference>}
                     eq $self->{<H::mg|nodeIDReference>});
         }
+
+  @LXAttr:
+    @@Name: manakaiReadOnly
+    @@enDesc:
+      Whether the node is read-only or not.
+    @@Type: boolean
+    @@TrueCase:
+      @@@enDesc:
+        If the node is read-only.
+    @@FalseCase:
+      @@@enDesc:
+        If the node is <EM::not> read-only.
+    @@Get:
+      @@@PerlDef:
+        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
+          $r => $r,
+          $prop => {<H::c|read-only>},
+          $ref => $self,
+        }__;
+
+  @enImplNote:
+    @@ddid: setReadOnly
+    @@@:
+      {TODO::
+        Add <M::Node.manakaiSetReadOnly> (<P::deep>).
+      }
 ##Node
 
 ElementTypeBinding:
@@ -1430,6 +1459,15 @@ NodeTypeDef:
 
       $test->id ('diff');
       $test->assert_false ($doc-><M::Node.isSameNode> ($doc2));
+
+  @LXTest:
+    @@QName: Document.readOnly.test
+    @@PerlDef:
+      my $doc;
+      __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+      $test->id ('default');
+      $test->assert_false ($doc-><AG::Node.manakaiReadOnly>);
 
   @Method:
     @@Name: createElementNS
@@ -1789,6 +1827,348 @@ NodeTypeDef:
         $test->assert_null ($bag->{$$el_id});
 
         undef $impl;
+
+        $test->id ('gc.impl.3');
+        $test->assert_null ($bag->{$$id});
+
+        $test->id ('gc.doc.3');
+        $test->assert_null ($bag->{$$doc_id});
+
+        $test->id ('gc.el.3');
+        $test->assert_null ($bag->{$$el_id});
+
+  @Method:
+    @@Name: createAttributeNS
+    @@Param:
+      @@@Name: namespaceURI
+      @@@Type: DOMString
+      @@@dis:actualType: ManakaiDOM|ManakaiDOMNamespaceURI
+      @@@nullCase:
+    @@Param:
+      @@@Name: qualifiedName
+      @@@Type: DOMString
+    @@Return:
+      @@@Type: Attr
+      @@@PerlDef:
+        my ($prefix, $lname) = split /:/, $qualifiedName, 2;
+        ($prefix, $lname) = (null, $prefix) unless defined $lname;
+
+        my $bag = <Code::mg|getNodeBag||ManakaiDOM|all:: $ref = $self>;
+        my $stem;
+        __CODE{mg|createNodeStem||ManakaiDOM|all::
+          $bag => $bag,
+          $stem => $stem,
+          $class => {<ClassName::ManakaiDOMAttr>},
+          $opt => {{
+            <H::tc|ownerDocument> => $self,
+            <H::infoset|namespaceName> => \$namespaceURI,
+            <H::infoset|prefix> => \$prefix,
+            <H::infoset|localName> => \$lname,
+          }},
+        }__;
+        __CODE{mg|createNodeRef||ManakaiDOM|all::
+          $bag => $bag,
+          $stem => $stem,
+          $ref => $r,
+          $opt => {{
+          }},
+        }__;
+
+    @@Test:
+      @@@QName: Doc.createAttrNS.mg.1.test
+      @@@PerlDef:
+        local $Message::DOM::TreeCore::GCLatency = 0;
+
+        my $impl = <ClassM::ManakaiDOMImplementationTC.new>;
+
+        my $bag = $impl->{<H::mg|nodeBag>};
+        my $id = $impl->{<H::mg|nodeIDReference>};
+
+        my $doc = $impl-><M::c|DOMImplementation.createDocument>;
+
+        my $el = $doc-><M::Document.createAttributeNS> (null, 'e');
+        
+        $test->id ('interface');
+        $test->assert_isa ($el, <IFName::Attr>);
+        
+        $test->id ('class');
+        $test->assert_isa ($el, <ClassName::ManakaiDOMAttr>);
+
+        my $doc_id = $doc->{<H::mg|nodeIDReference>};
+        my $el_id = $el->{<H::mg|nodeIDReference>};
+
+        undef $impl;
+
+        $test->id ('gc.impl.1');
+        $test->assert_not_null ($bag->{$$id});
+
+        $test->id ('gc.doc.1');
+        $test->assert_not_null ($bag->{$$doc_id});
+
+        $test->id ('gc.el.1');
+        $test->assert_not_null ($bag->{$$el_id});
+
+        undef $doc;
+
+        $test->id ('gc.impl.2');
+        $test->assert_not_null ($bag->{$$id});
+
+        $test->id ('gc.doc.2');
+        $test->assert_not_null ($bag->{$$doc_id});
+
+        $test->id ('gc.el.2');
+        $test->assert_not_null ($bag->{$$el_id});
+
+        undef $el;
+
+        $test->id ('gc.impl.3');
+        $test->assert_null ($bag->{$$id});
+
+        $test->id ('gc.doc.3');
+        $test->assert_null ($bag->{$$doc_id});
+
+        $test->id ('gc.el.3');
+        $test->assert_null ($bag->{$$el_id});
+
+  @Method:
+    @@Name: createTextNode
+    @@Param:
+      @@@Name: data
+      @@@Type: DOMString
+    @@Return:
+      @@@Type: Text
+      @@@PerlDef:
+        my $bag = <Code::mg|getNodeBag||ManakaiDOM|all:: $ref = $self>;
+        my $stem;
+        __CODE{mg|createNodeStem||ManakaiDOM|all::
+          $bag => $bag,
+          $stem => $stem,
+          $class => {<ClassName::ManakaiDOMText>},
+          $opt => {{
+            <H::tc|ownerDocument> => $self,
+            <H::infoset|content> => \$data,
+          }},
+        }__;
+        __CODE{mg|createNodeRef||ManakaiDOM|all::
+          $bag => $bag,
+          $stem => $stem,
+          $ref => $r,
+          $opt => {{
+          }},
+        }__;
+
+    @@Test:
+      @@@QName: Doc.createTextNode.mg.1.test
+      @@@PerlDef:
+        local $Message::DOM::TreeCore::GCLatency = 0;
+
+        my $impl = <ClassM::ManakaiDOMImplementationTC.new>;
+
+        my $bag = $impl->{<H::mg|nodeBag>};
+        my $id = $impl->{<H::mg|nodeIDReference>};
+
+        my $doc = $impl-><M::c|DOMImplementation.createDocument>;
+
+        my $el = $doc-><M::Document.createTextNode> ('textdata');
+        
+        $test->id ('interface');
+        $test->assert_isa ($el, <IFName::Text>);
+        
+        $test->id ('class');
+        $test->assert_isa ($el, <ClassName::ManakaiDOMText>);
+
+        my $doc_id = $doc->{<H::mg|nodeIDReference>};
+        my $el_id = $el->{<H::mg|nodeIDReference>};
+
+        undef $impl;
+
+        $test->id ('gc.impl.1');
+        $test->assert_not_null ($bag->{$$id});
+
+        $test->id ('gc.doc.1');
+        $test->assert_not_null ($bag->{$$doc_id});
+
+        $test->id ('gc.el.1');
+        $test->assert_not_null ($bag->{$$el_id});
+
+        undef $doc;
+
+        $test->id ('gc.impl.2');
+        $test->assert_not_null ($bag->{$$id});
+
+        $test->id ('gc.doc.2');
+        $test->assert_not_null ($bag->{$$doc_id});
+
+        $test->id ('gc.el.2');
+        $test->assert_not_null ($bag->{$$el_id});
+
+        undef $el;
+
+        $test->id ('gc.impl.3');
+        $test->assert_null ($bag->{$$id});
+
+        $test->id ('gc.doc.3');
+        $test->assert_null ($bag->{$$doc_id});
+
+        $test->id ('gc.el.3');
+        $test->assert_null ($bag->{$$el_id});
+
+  @Method:
+    @@Name: createCDATASection
+    @@Param:
+      @@@Name: data
+      @@@Type: DOMString
+    @@Return:
+      @@@Type: Text
+      @@@PerlDef:
+        my $bag = <Code::mg|getNodeBag||ManakaiDOM|all:: $ref = $self>;
+        my $stem;
+        __CODE{mg|createNodeStem||ManakaiDOM|all::
+          $bag => $bag,
+          $stem => $stem,
+          $class => {<ClassName::tx|ManakaiDOMCDATASection>},
+          $opt => {{
+            <H::tc|ownerDocument> => $self,
+            <H::infoset|content> => \$data,
+          }},
+        }__;
+        __CODE{mg|createNodeRef||ManakaiDOM|all::
+          $bag => $bag,
+          $stem => $stem,
+          $ref => $r,
+          $opt => {{
+          }},
+        }__;
+
+    @@Test:
+      @@@QName: Doc.createCDATASection.mg.1.test
+      @@@PerlDef:
+        local $Message::DOM::TreeCore::GCLatency = 0;
+
+        my $impl = <ClassM::ManakaiDOMImplementationTC.new>;
+
+        my $bag = $impl->{<H::mg|nodeBag>};
+        my $id = $impl->{<H::mg|nodeIDReference>};
+
+        my $doc = $impl-><M::c|DOMImplementation.createDocument>;
+
+        my $el = $doc-><M::Document.createCDATASection> ('textdata');
+        
+        $test->id ('interface');
+        $test->assert_isa ($el, <IFName::tx|CDATASection>);
+        
+        $test->id ('class');
+        $test->assert_isa ($el, <ClassName::tx|ManakaiDOMCDATASection>);
+
+        my $doc_id = $doc->{<H::mg|nodeIDReference>};
+        my $el_id = $el->{<H::mg|nodeIDReference>};
+
+        undef $impl;
+
+        $test->id ('gc.impl.1');
+        $test->assert_not_null ($bag->{$$id});
+
+        $test->id ('gc.doc.1');
+        $test->assert_not_null ($bag->{$$doc_id});
+
+        $test->id ('gc.el.1');
+        $test->assert_not_null ($bag->{$$el_id});
+
+        undef $doc;
+
+        $test->id ('gc.impl.2');
+        $test->assert_not_null ($bag->{$$id});
+
+        $test->id ('gc.doc.2');
+        $test->assert_not_null ($bag->{$$doc_id});
+
+        $test->id ('gc.el.2');
+        $test->assert_not_null ($bag->{$$el_id});
+
+        undef $el;
+
+        $test->id ('gc.impl.3');
+        $test->assert_null ($bag->{$$id});
+
+        $test->id ('gc.doc.3');
+        $test->assert_null ($bag->{$$doc_id});
+
+        $test->id ('gc.el.3');
+        $test->assert_null ($bag->{$$el_id});
+
+  @Method:
+    @@Name: createComment
+    @@Param:
+      @@@Name: data
+      @@@Type: DOMString
+    @@Return:
+      @@@Type: Comment
+      @@@PerlDef:
+        my $bag = <Code::mg|getNodeBag||ManakaiDOM|all:: $ref = $self>;
+        my $stem;
+        __CODE{mg|createNodeStem||ManakaiDOM|all::
+          $bag => $bag,
+          $stem => $stem,
+          $class => {<ClassName::ManakaiDOMComment>},
+          $opt => {{
+            <H::tc|ownerDocument> => $self,
+            <H::infoset|content> => \$data,
+          }},
+        }__;
+        __CODE{mg|createNodeRef||ManakaiDOM|all::
+          $bag => $bag,
+          $stem => $stem,
+          $ref => $r,
+          $opt => {{
+          }},
+        }__;
+
+    @@Test:
+      @@@QName: Document.createComment.mg.1.test
+      @@@PerlDef:
+        local $Message::DOM::TreeCore::GCLatency = 0;
+
+        my $impl = <ClassM::ManakaiDOMImplementationTC.new>;
+
+        my $bag = $impl->{<H::mg|nodeBag>};
+        my $id = $impl->{<H::mg|nodeIDReference>};
+
+        my $doc = $impl-><M::c|DOMImplementation.createDocument>;
+
+        my $el = $doc-><M::Document.createComment> ('textdata');
+        
+        $test->id ('interface');
+        $test->assert_isa ($el, <IFName::Comment>);
+        
+        $test->id ('class');
+        $test->assert_isa ($el, <ClassName::ManakaiDOMComment>);
+
+        my $doc_id = $doc->{<H::mg|nodeIDReference>};
+        my $el_id = $el->{<H::mg|nodeIDReference>};
+
+        undef $impl;
+
+        $test->id ('gc.impl.1');
+        $test->assert_not_null ($bag->{$$id});
+
+        $test->id ('gc.doc.1');
+        $test->assert_not_null ($bag->{$$doc_id});
+
+        $test->id ('gc.el.1');
+        $test->assert_not_null ($bag->{$$el_id});
+
+        undef $doc;
+
+        $test->id ('gc.impl.2');
+        $test->assert_not_null ($bag->{$$id});
+
+        $test->id ('gc.doc.2');
+        $test->assert_not_null ($bag->{$$doc_id});
+
+        $test->id ('gc.el.2');
+        $test->assert_not_null ($bag->{$$el_id});
+
+        undef $el;
 
         $test->id ('gc.impl.3');
         $test->assert_null ($bag->{$$id});
@@ -2164,7 +2544,332 @@ NodeTypeDef:
       
       $test->id ('doc');
       $test->assert_false ($el-><M::Node.isSameNode> ($doc));
+
+  @LXTest:
+    @@QName: Element.readOnly.test
+    @@PerlDef:
+      my $doc;
+      __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+      my $el = $doc-><M::Document.createElementNS> (null, 'el');
+
+      $test->id ('default');
+      $test->assert_false ($el-><AG::Node.manakaiReadOnly>);
 ##Element
+
+NodeTypeDef:
+  @IFQName: Attr
+  @ClsQName: ManakaiDOMAttr
+  
+  @IntMethod:
+    @@Operator: mg|CreateNodeStemMethod
+    @@Param:
+      @@@Name: bag
+      @@@Type: HASH
+    @@Param:
+      @@@Name: obj
+      @@@Type: HASH
+    @@Param:
+      @@@Name: opt
+      @@@Type: HASH
+    @@Return:
+      @@@Type: HASH
+      @@@PerlDef:
+        $obj->{<H::infoset|children>} = [];
+        __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
+          $result => {$obj->{<H::infoset|namespaceName>}},
+          $given => {${$opt->{<H::infoset|namespaceName>}}},
+        }__;
+        __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
+          $result => {$obj->{<H::infoset|prefix>}},
+          $given => {${$opt->{<H::infoset|prefix>}}},
+        }__;
+        __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
+          $result => {$obj->{<H::infoset|localName>}},
+          $given => {${$opt->{<H::infoset|localName>}}},
+        }__;
+        __CODE{mg|setOwnerProp||ManakaiDOM|all::
+          $bag => $bag,
+          $ownerref => {$opt->{<H::tc|ownerDocument>}},
+          $ownee1hprop => {<H::tc|revOwnerDocument>},
+          $ownee => {$obj},
+          $owner0prop => {<H::tc|ownerDocument>},
+        }__;
+        $r = $obj;
+  @mg:subnode1a: infoset|children
+  @mg:owner0: tc|ownerDocument
+  @mg:origin0: infoset|ownerElement
+
+  @CODE:
+    @@QName: tc|createAttrForTest
+    @@PerlDef:
+      my $doc;
+      __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+      $attr = $doc-><M::Document.createAttributeNS>
+                      ('http://www.example.net/', 'ex:element');
+
+  @CAttr:
+    @@Name: nodeType
+    @@Type: unsignedShort
+    @@dis:actualType: NodeType
+    @@Get:
+      @@@disDef:
+        @@@@DISLang:constValue: Node.ATTRIBUTE_NODE
+
+    @@Test:
+      @@@QName: Attr.nodeType.test
+      @@@PerlDef:
+        my $attr;
+        __CODE{tc|createAttrForTest:: $attr => $attr}__;
+
+        $test->id ('nodeType');
+        $test->assert_num_equals
+                 (actual_value => $attr-><AG::Node.nodeType>,
+                  expected_value => <C::Node.ATTRIBUTE_NODE>);
+
+  @CL2Attr:
+     @@Name:  prefix
+     @@Description:
+       @@@lang:en
+       @@@@: The namespace prefix of this node.
+     @@DOMMain:isNamespaceAware:1
+     @@Get:
+        @@@Type:  
+          DOMMain:DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The namespace prefix.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              Either the namespace prefix is unspecified, the node 
+              is created with a DOM Level 1 method, or the type 
+              of the node is other than "ELEMENT_NODE" and 
+              "ATTRIBUTE_NODE".
+       @@@disDef:
+         @@@@DISPerl:cloneCode: ManakaiDOMElement.prefix.get
+     @@Set:
+        @@@Type:  
+          DOMMain:DOMString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The namespace prefix.
+            Note that setting this attribute has no effect if 
+            the namespace prefix is defined to be "null".
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The namespace prefix is unspecified.
+        @@@InCase:
+          @@@@Value: \
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: The result is implementation dependent.
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: INVALID_CHARACTER_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              The specified prefix contains an illegal character 
+              accoding to the XML version in use in the document.
+          @@@@ImplNote:
+            @@@@@lang:en
+            @@@@@@:
+              The DOM Level 2 Errata clarifies that the "illegal"ness 
+              is accoding to the XML 1.0 Specification.
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: NO_MODIFICATION_ALLOWED_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: This node is read-only.
+        @@@Exception:
+          @@@@Type: DOMException
+          @@@@Name: NAMESPACE_ERR
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@:
+              Either the specified prefix is malformed per the 
+              XML Namespace specification, non-"null" prefix is 
+              specified but the "namespaceURI" of this node is "null", 
+              the specified prefix is "xml" and the "namespaceURI" 
+              of this node is different from 
+              "http://www.w3.org/XML/1998/namespace", if this 
+              node is an attribute and the specified prefix is "xmlns" 
+              and the "namespaceURI" of this node is different from 
+              "http://www.w3.org/2000/xmlns/", or if this node is 
+              an attribute and the "qualifiedName" of this node is 
+              "xmlns".
+      @@@PerlDef:
+     ## TODO: Exceptions
+        my $v = defined $given ? \$given : null;
+        __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
+          $given => $v,
+          $prop => {<H::infoset|prefix>},
+          $ref => $self,
+        }__;
+
+    @@L2Test:
+      @@@QName: Attr.localName.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+        my $el = $doc-><M::Document.createAttributeNS>
+                         (null, 'el');
+
+        $test->id ('localName');
+        $test->assert_equals ($el-><AG::Node.localName>, 'el');
+
+        $test->id ('namespaceURI');
+        $test->assert_equals ($el-><AG::Node.namespaceURI>, null);
+
+        $test->id ('prefix');
+        $test->assert_equals ($el-><AG::Node.prefix>, null);
+
+        $test->id ('prefix.set');
+        $el-><AS::Node.prefix> ('pre');
+        $test->assert_equals ($el-><AG::Node.prefix>, 'pre');
+
+    @@L2Test:
+      @@@QName: Attr.localName.2.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+        my $el = $doc-><M::Document.createAttributeNS>
+                         ('http://www.ns.example/', 'p:el');
+
+        $test->id ('localName');
+        $test->assert_equals ($el-><AG::Node.localName>, 'el');
+
+        $test->id ('namespaceURI');
+        $test->assert_equals ($el-><AG::Node.namespaceURI>,
+                              'http://www.ns.example/');
+
+        $test->id ('prefix');
+        $test->assert_equals ($el-><AG::Node.prefix>, 'p');
+
+        $test->id ('prefix.set');
+        $el-><AS::Node.prefix> ('pre');
+        $test->assert_equals ($el-><AG::Node.prefix>, 'pre');
+
+  @Test:
+    @@QName: Attr.parentNode.1.test
+    @@PerlDef:
+      my $doc;
+      __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+      my $el = $doc-><M::Document.createAttributeNS>
+                       ('http://www.ns.example/', 'p:el');
+
+      $test->assert_null ($el-><AG::Node.parentNode>);
+
+  @Test:
+    @@QName: Attr.ownerDocument.test
+    @@PerlDef:
+      my $doc;
+      __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+      my $el = $doc-><M::Document.createAttributeNS>
+                       ('http://www.ns.example/', 'p:el');
+
+      $test->assert_equals ($el-><AG::Node.ownerDocument>, $doc);
+
+  @Test:
+    @@QName: Attr.isSameNode.1.test
+    @@PerlDef:
+      my $doc;
+      __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+      my $el = $doc-><M::Document.createAttributeNS>
+                       ('http://www.ns.example/', 'p:el');
+
+      my $el2 = $doc-><M::Document.createAttributeNS>
+                       ('http://www.ns.example/', 'p:el');
+      
+      $test->id ('same');
+      $test->assert_equals ($el, $el);
+      
+      $test->id ('diff');
+      $test->assert_not_equals ($el, $el2);
+      
+      $test->id ('doc');
+      $test->assert_not_equals ($el, $doc);
+  @Test:
+    @@QName: Attr.isSameNode.2.test
+    @@PerlDef:
+      my $doc;
+      __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+      my $el = $doc-><M::Document.createAttributeNS>
+                       ('http://www.ns.example/', 'p:el');
+
+      my $el2 = $doc-><M::Document.createAttributeNS>
+                       ('http://www.ns.example/', 'p:el');
+      
+      $test->id ('same');
+      $test->assert_true ($el-><M::Node.isSameNode> ($el));
+      
+      $test->id ('diff');
+      $test->assert_false ($el-><M::Node.isSameNode> ($el2));
+      
+      $test->id ('doc');
+      $test->assert_false ($el-><M::Node.isSameNode> ($doc));
+
+  @LXTest:
+    @@QName: Attr.readOnly.test
+    @@PerlDef:
+      my $doc;
+      __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+      my $el = $doc-><M::Document.createAttributeNS> (null, 'el');
+
+      $test->id ('default');
+      $test->assert_false ($el-><AG::Node.manakaiReadOnly>);
+
+  @L2Attr:
+     @@Name:  ownerElement
+     @@Description:
+       @@@lang:en
+       @@@@:
+         The element to which this attribute is attached.
+     @@Get:
+        @@@Type:  Element
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The "Element" node.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@Description:
+            @@@@@lang:en
+            @@@@@@: This attribute is not in use.
+      @@@PerlDef:
+        __CODE{mg|getNodeStemProp0Node||ManakaiDOM|all::
+          $r => $r,
+          $prop => {<H::infoset|ownerElement>},
+          $ref => $self,
+        }__;
+
+    @@L2Test:
+      @@@QName: Attr.ownerElement.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+ 
+        my $el = $doc-><M::Document.createAttributeNS> (null, 'el');
+
+        $test->id ('default');
+        $test->assert_null ($el-><AG::Attr.ownerElement>);
+##Attr
 
 ElementTypeBinding:
   @Name: intValue
@@ -2172,3 +2877,290 @@ ElementTypeBinding:
     dis:Value
   @ShadowContent:
     @@ContentType: DISCore|Integer
+
+ElementTypeBinding:
+  @Name: TrueCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType:
+      ManakaiDOM:InCase
+    @@Value:
+      @@@@: 1
+      @@@ContentType: DISCore|Boolean
+    @@Type: idl|boolean||ManakaiDOM|all
+
+ElementTypeBinding:
+  @Name: FalseCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType:
+      ManakaiDOM:InCase
+    @@Value:
+      @@@@: 0
+      @@@ContentType: DISCore|Boolean
+    @@Type: idl|boolean||ManakaiDOM|all
+
+NodeTypeDef:
+  @IFQName: CharacterData
+  @ClsQName: ManakaiDOMCharacterData
+
+  @IntMethod:
+    @@Operator: mg|CreateNodeStemMethod
+    @@Param:
+      @@@Name: bag
+      @@@Type: HASH
+    @@Param:
+      @@@Name: obj
+      @@@Type: HASH
+    @@Param:
+      @@@Name: opt
+      @@@Type: HASH
+    @@Return:
+      @@@Type: HASH
+      @@@PerlDef:
+        $obj->{<H::infoset|content>} = defined $opt->{<H::infoset|content>}
+                                         ? $opt->{<H::infoset|content>}
+                                         : '';
+        __CODE{mg|setOwnerProp||ManakaiDOM|all::
+          $bag => $bag,
+          $ownerref => {$opt->{<H::tc|ownerDocument>}},
+          $ownee1hprop => {<H::tc|revOwnerDocument>},
+          $ownee => {$obj},
+          $owner0prop => {<H::tc|ownerDocument>},
+        }__;
+        $r = $obj;
+  @mg:owner0: tc|ownerDocument
+  @mg:origin0: infoset|parent
+##CharacterData
+
+IFCls1Def:
+  @IFQName: Text
+  @ClsQName: ManakaiDOMText
+
+  @IFISA: CharacterData
+  @ClsISA: ManakaiDOMCharacterData
+
+  @CODE:
+    @@QName: tc|createTextForTest
+    @@PerlDef:
+      my $doc;
+      __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+      $text = $doc-><M::Document.createTextNode> ('text');
+
+  @CAttr:
+    @@Name: nodeType
+    @@Type: unsignedShort
+    @@dis:actualType: NodeType
+    @@Get:
+      @@@disDef:
+        @@@@DISLang:constValue: Node.TEXT_NODE
+
+    @@Test:
+      @@@QName: Text.nodeType.test
+      @@@PerlDef:
+        my $text;
+        __CODE{tc|createTextForTest:: $text => $text}__;
+
+        $test->id ('nodeType');
+        $test->assert_num_equals
+                 (actual_value => $text-><AG::Node.nodeType>,
+                  expected_value => <C::Node.TEXT_NODE>);
+
+  @L2Test:
+    @@QName: Text.localName.1.test
+    @@PerlDef:
+      my $doc;
+      __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+      my $el = $doc-><M::Document.createTextNode> ('text');
+
+      $test->id ('localName');
+      $test->assert_null ($el-><AG::Node.localName>);
+
+      $test->id ('namespaceURI');
+      $test->assert_null ($el-><AG::Node.namespaceURI>);
+
+      $test->id ('prefix');
+      $test->assert_null ($el-><AG::Node.prefix>);
+
+  @Test:
+    @@QName: Text.parentNode.1.test
+    @@PerlDef:
+      my $text;
+      __CODE{tc|createTextForTest:: $text => $text}__;
+
+      $test->assert_null ($text-><AG::Node.parentNode>);
+
+  @Test:
+    @@QName: Text.ownerDocument.test
+    @@PerlDef:
+      my $doc;
+      __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+      my $text = $doc-><M::Document.createTextNode> ('textdata');
+
+      $test->assert_equals ($text-><AG::Node.ownerDocument>, $doc);
+
+  @Test:
+    @@QName: Text.isSameNode.1.test
+    @@PerlDef:
+      my $doc;
+      __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+      my $el = $doc-><M::Document.createTextNode> ('a');
+
+      my $el2 = $doc-><M::Document.createTextNode> ('a');
+      
+      $test->id ('same');
+      $test->assert_equals ($el, $el);
+      
+      $test->id ('diff');
+      $test->assert_not_equals ($el, $el2);
+      
+      $test->id ('doc');
+      $test->assert_not_equals ($el, $doc);
+  @Test:
+    @@QName: Text.isSameNode.2.test
+    @@PerlDef:
+      my $doc;
+      __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+      my $el = $doc-><M::Document.createTextNode> ('a');
+
+      my $el2 = $doc-><M::Document.createTextNode> ('a');
+      
+      $test->id ('same');
+      $test->assert_true ($el-><M::Node.isSameNode> ($el));
+      
+      $test->id ('diff');
+      $test->assert_false ($el-><M::Node.isSameNode> ($el2));
+      
+      $test->id ('doc');
+      $test->assert_false ($el-><M::Node.isSameNode> ($doc));
+
+  @LXTest:
+    @@QName: Text.readOnly.test
+    @@PerlDef:
+      my $text;
+      __CODE{tc|createTextForTest:: $text => $text}__;
+
+      $test->id ('default');
+      $test->assert_false ($text-><AG::Node.manakaiReadOnly>);
+##Text
+
+IFCls1Def:
+  @IFQName: Comment
+  @ClsQName: ManakaiDOMComment
+
+  @IFISA: CharacterData
+  @ClsISA: ManakaiDOMCharacterData
+
+  @CODE:
+    @@QName: tc|createCommentForTest
+    @@PerlDef:
+      my $doc;
+      __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+      $text = $doc-><M::Document.createComment> ('text');
+
+  @CAttr:
+    @@Name: nodeType
+    @@Type: unsignedShort
+    @@dis:actualType: NodeType
+    @@Get:
+      @@@disDef:
+        @@@@DISLang:constValue: Node.COMMENT_NODE
+
+    @@Test:
+      @@@QName: Comment.nodeType.test
+      @@@PerlDef:
+        my $text;
+        __CODE{tc|createCommentForTest:: $text => $text}__;
+
+        $test->id ('nodeType');
+        $test->assert_num_equals
+                 (actual_value => $text-><AG::Node.nodeType>,
+                  expected_value => <C::Node.COMMENT_NODE>);
+
+  @L2Test:
+    @@QName: Comment.localName.1.test
+    @@PerlDef:
+      my $doc;
+      __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+      my $el = $doc-><M::Document.createComment> ('text');
+
+      $test->id ('localName');
+      $test->assert_null ($el-><AG::Node.localName>);
+
+      $test->id ('namespaceURI');
+      $test->assert_null ($el-><AG::Node.namespaceURI>);
+
+      $test->id ('prefix');
+      $test->assert_null ($el-><AG::Node.prefix>);
+
+  @Test:
+    @@QName: Comment.parentNode.1.test
+    @@PerlDef:
+      my $text;
+      __CODE{tc|createCommentForTest:: $text => $text}__;
+
+      $test->assert_null ($text-><AG::Node.parentNode>);
+
+  @Test:
+    @@QName: Comment.ownerDocument.test
+    @@PerlDef:
+      my $doc;
+      __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+      my $text = $doc-><M::Document.createComment> ('textdata');
+
+      $test->assert_equals ($text-><AG::Node.ownerDocument>, $doc);
+
+  @Test:
+    @@QName: Comment.isSameNode.1.test
+    @@PerlDef:
+      my $doc;
+      __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+      my $el = $doc-><M::Document.createComment> ('a');
+
+      my $el2 = $doc-><M::Document.createComment> ('a');
+      
+      $test->id ('same');
+      $test->assert_equals ($el, $el);
+      
+      $test->id ('diff');
+      $test->assert_not_equals ($el, $el2);
+      
+      $test->id ('doc');
+      $test->assert_not_equals ($el, $doc);
+  @Test:
+    @@QName: Comment.isSameNode.2.test
+    @@PerlDef:
+      my $doc;
+      __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+      my $el = $doc-><M::Document.createComment> ('a');
+
+      my $el2 = $doc-><M::Document.createComment> ('a');
+      
+      $test->id ('same');
+      $test->assert_true ($el-><M::Node.isSameNode> ($el));
+      
+      $test->id ('diff');
+      $test->assert_false ($el-><M::Node.isSameNode> ($el2));
+      
+      $test->id ('doc');
+      $test->assert_false ($el-><M::Node.isSameNode> ($doc));
+
+  @LXTest:
+    @@QName: Comment.readOnly.test
+    @@PerlDef:
+      my $text;
+      __CODE{tc|createCommentForTest:: $text => $text}__;
+
+      $test->id ('default');
+      $test->assert_false ($text-><AG::Node.manakaiReadOnly>);
+##Comment

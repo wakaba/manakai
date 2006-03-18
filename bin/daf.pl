@@ -481,7 +481,7 @@ sub daf_get_referring_module_uri_list ($) {
 sub dac_search_file_path_stem ($$$) {
   my ($ns, $ln, $suffix) = @_;
   require File::Spec;
-  for my $dir ('.', @{$Opt{input_search_path}->{$ns}||[]}) {
+  for my $dir (@{$Opt{input_search_path}->{$ns}||[]}) {
     my $name = Cwd::abs_path
         (File::Spec->canonpath
          (File::Spec->catfile ($dir, $ln)));
