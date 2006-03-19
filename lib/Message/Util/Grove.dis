@@ -9,7 +9,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/03/17 10:51:30 $
+    $Date: 2006/03/19 07:55:46 $
 
   @Require:
     @@Module:
@@ -382,11 +382,11 @@ ClsDef:
     @@enDesc:
       Creates a new node reference for the node stem.
     @@PerlDef:
-      $ref = ${$bag->{$$stemid}->{<H::mg|nodeClass>}}->___create_node_ref ({
+      $ref = ${$bag->{${$stemid}}->{<H::mg|nodeClass>}}->___create_node_ref ({
         <H::mg|nodeIDReference> => $stemid,
         <H::mg|nodeBag> => $bag,
       }, $opt);
-      $bag->{$$stemid}->{<H::mg|references>}++;
+      $bag->{${$stemid}}->{<H::mg|references>}++;
 
   @ResourceDef:
     @@QName: mg|CreateNodeRefMethod
@@ -407,9 +407,24 @@ ClsDef:
   @Code:
     @@QName: mg|getNodeBag
     @@enDesc:
-      Returns a node bag to which the node reference belongs.
+      Returns the node bag to which the node stem referenced by
+      a node reference belongs.
     @@PerlDef:
       $ref->{<H::mg|nodeBag>}
+
+  @Code:
+    @@QName: mg|getNodeID
+    @@enDesc:
+      Returns the identifier of the node referenced by a node reference.
+    @@PerlDef:
+      $ref->{<H::mg|nodeIDReference>}
+
+  @Code:
+    @@QName: mg|getNodeStem
+    @@enDesc:
+      Returns the node stem referenced by a node reference.
+    @@PerlDef:
+      $ref->{<H::mg|nodeBag>}->{${$ref->{<H::mg|nodeIDReference>}}}
 
   @Method:
     @@Name: destroy
@@ -449,11 +464,13 @@ ClsDef:
             next TARGET;
           }
 
-          my @grove;
+          my %grove;
           my @gtarget = ($target);
           my @gwreferred;
           GTARGET: while (@gtarget) {
             my $gtarget = shift @gtarget;
+            next GTARGET if $grove{$$gtarget};
+
             my $gtstem = $bag->{$$gtarget};
             unless (defined $gtstem) {
               $done{$$gtarget} = true;
@@ -462,7 +479,7 @@ ClsDef:
 
             if ($has_xref{$$gtarget} or $gtstem->{<H::mg|references>}) {
               $has_xref{$$gtarget} = true;
-              $has_xref{$$_} = true for @grove;
+              $has_xref{$_} = true for keys %grove;
               for (@gtarget) {
                 $has_xref{$$_} = defined $bag->{$$_};
                 $done{$$_} = true;
@@ -503,12 +520,12 @@ ClsDef:
               push @gwreferred, $gtstem->{$key} if ref $gtstem->{$key};
             }
 
-            push @grove, $gtarget;
+            $grove{$$gtarget} = true;
           } # GTARGET
 
-          for (@grove) {
-            $done{$$_} = true;
-            delete $bag->{$$_};
+          for (keys %grove) {
+            $done{$_} = true;
+            delete $bag->{$_};
           }
           push @target, @gwreferred;
         } # TARGET
@@ -522,6 +539,15 @@ ClsDef:
     @@PerlDef:
       $r = $ref->{<H::mg|nodeBag>}->{${$ref->{<H::mg|nodeIDReference>}}}
                ->{$prop};
+
+  @CODE:
+    @@QName: mg|getNodeStemPropValueRef
+    @@enDesc:
+      Obtains the reference to a property value set to the node stem associated
+      to the node reference.
+    @@PerlDef:
+      $r = \$ref->{<H::mg|nodeBag>}->{${$ref->{<H::mg|nodeIDReference>}}}
+                ->{$prop};
 
   @CODE:
     @@QName: mg|setNodeStemPropValue
@@ -548,6 +574,32 @@ ClsDef:
           $opt => {{}},
         }__;
       }
+
+  @CODE:
+    @@QName: mg|setNodeStemProp0Node
+    @@enDesc:
+      Sets a property value node to the node stem associated
+      to the node reference.
+    @@PerlDef:
+      $ref->{<H::mg|nodeBag>}->{${$ref->{<H::mg|nodeIDReference>}}}
+          ->{$prop} = $given->{<H::mg|nodeIDReference>};
+
+  @CODE:
+    @@QName: mg|deleteNodeStemPropValue
+    @@enDesc:
+      Deletes a property value node from the node stem associated
+      to the node reference.
+    @@PerlDef:
+      CORE::delete $ref->{<H::mg|nodeBag>}->{${$ref->{<H::mg|nodeIDReference>}}}
+                       ->{$prop};
+
+  @Code:
+    @@QName: mg|nodeIDMatch
+    @@enDesc:
+      Whether a node reference references the same node
+      as a reference to a node identifier.
+    @@PerlDef:
+      (${$noderef->{<H::mg|nodeIDReference>}} eq ${$nodeid})
 ##NodeRef
 
 ## -- Reference Internal Properties

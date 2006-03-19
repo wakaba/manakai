@@ -9,7 +9,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/03/18 05:57:48 $
+    $Date: 2006/03/19 07:55:46 $
 
   @Require:
     @@Module:
@@ -342,6 +342,13 @@ ElementTypeBinding:
         DOM implementations throw a <X::DOMException.NOT_SUPPORTED_ERR>. 
 
 ElementTypeBinding:
+  @Name: enDesc
+  @ElementType:
+    dis:Description
+  @ShadowContent:
+    @@lang:en
+
+ElementTypeBinding:
   @Name: enImplNote
   @ElementType:
     dis:ImplNote
@@ -574,6 +581,14 @@ ElementTypeBinding:
     @@DISCore:resourceType: test|StandaloneTest
     @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
 
+ElementTypeBinding:
+  @Name: XDTest
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: test|StandaloneTest
+    @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
+
 ResourceDef:
   @QName: DOMString
   @AliasFor: DOMMain|DOMString
@@ -650,6 +665,10 @@ IFCls1Def:
       $test->id ('prefix');
       $test->assert_null ($el-><AG::Node.prefix>);
 
+      $test->id ('prefix.set');
+      $el-><AS::Node.prefix> ('pre');
+      $test->assert_null ($el-><AG::Node.prefix>);
+
   @Test:
     @@QName: CDATASection.parentNode.1.test
     @@PerlDef:
@@ -713,6 +732,101 @@ IFCls1Def:
 
       $test->id ('default');
       $test->assert_false ($text-><AG::Node.manakaiReadOnly>);
+
+  @Test:
+    @@QName: CDATASection.childNodes.test
+    @@PerlDef:
+      my $text;
+      __CODE{tx|createCDATASectionForTest:: $text => $text}__;
+
+      $test->id ('interface');
+      my $cn = $text-><AG::Node.childNodes>;
+      $test->assert_isa ($cn, <IFName::tc|NodeList>);
+
+      $test->id ('length');
+      $test->assert_num_equals
+               (actual_value => $cn-><AG::tc|NodeList.length>,
+                expected_value => 0);
+
+      $test->id ('firstChild');
+      $test->assert_null ($text-><AG::Node.firstChild>);
+
+      $test->id ('lastChild');
+      $test->assert_null ($text-><AG::Node.lastChild>);
+
+  @CMethod:
+    @@Name: appendChild
+    @@enDesc:
+      Adds a node to the end of the list of children of the node.
+      If that node is already in the tree, it is first removed.
+    @@Param:
+      @@@Name: newChild
+      @@@Type: Node
+      @@@enDesc:
+        The node to add.
+    @@Return:
+      @@@Type: Node
+      @@@enDesc:
+        The node added.
+      @@@dx:raises:
+        @@@@@: MDOMX|HIERARCHY_BAD_TYPE
+        @@@@enDesc:
+          The type of the node does not allow any children.
+      @@@disDef:
+        @@@@DISPerl:cloneCode: tc|ManakaiDOMCharacterData.appendChild
+
+  @CMethod:
+    @@Name: insertBefore
+    @@enDesc:
+      Inserts a node before the existing child node of the node.
+    @@Param:
+      @@@Name: newChild
+      @@@Type: Node
+      @@@enDesc:
+        The node to add.
+    @@Param:
+      @@@Name: refChild
+      @@@Type: Node
+      @@@enDesc:
+        The node before which the <P::newChild> node is inserted.
+      @@@nullCase:
+        @@@@enDesc:
+          The <P::newChild> node is inserted at the end.
+    @@Return:
+      @@@Type: Node
+      @@@enDesc:
+        The node added.
+      @@@dx:raises:
+        @@@@@: MDOMX|HIERARCHY_BAD_TYPE
+        @@@@enDesc:
+          The type of the node does not allow any children.
+      @@@disDef:
+        @@@@DISPerl:cloneCode: tc|ManakaiDOMCharacterData.insertBefore
+
+  @CMethod:
+    @@Name: replaceChild
+    @@enDesc:
+      Replaces a node by another node.
+    @@Param:
+      @@@Name: newChild
+      @@@Type: Node
+      @@@enDesc:
+        The node to add.
+    @@Param:
+      @@@Name: oldChild
+      @@@Type: Node
+      @@@enDesc:
+        The node to remove.
+    @@Return:
+      @@@Type: Node
+      @@@enDesc:
+        The node added.
+      @@@dx:raises:
+        @@@@@: MDOMX|HIERARCHY_BAD_TYPE
+        @@@@enDesc:
+          The type of the node does not allow any children.
+      @@@disDef:
+        @@@@DISPerl:cloneCode: tc|ManakaiDOMCharacterData.replaceChild
 ##CDATASection
 
 ResourceDef:
@@ -724,3 +838,759 @@ ResourceDef:
   @QName: Document
   @AliasFor: tc|Document
   @For: ManakaiDOM|DOM
+
+enImplNote:
+  @ddid: dtd
+  @@:
+## TODO: DocumentType
+
+        {TODO::
+           For <IF::tx|DocumentType>.removeChild.
+        }
+
+
+Notation:
+  @For: !ManakaiDOM|all
+
+
+  @CAttr:
+    @@Name: childNodes
+    @@enDesc:
+      A list of nodes that contains all children of the node.
+    @@Get:
+      @@@Type: c|NodeList
+      @@@enDesc:
+        Since <IF::Notation> nodes cannot have child nodes,
+        the node list is always empty.
+      @@@disDef:
+        @@@@DISPerl:cloneCode: tc|ManakaiDOMCharacterData.childNodes.get
+
+    @@XDTest:
+      @@@QName: Notation.childNodes.test
+      @@@PerlDef:
+        my $not;
+        __CODE{tx|createNotationForTest:: $not => $not}__;
+
+        $test->id ('interface');
+        my $cn = $not-><AG::Node.childNodes>;
+        $test->assert_isa ($cn, <IFName::tc|NodeList>);
+
+        $test->id ('length');
+        $test->assert_num_equals
+                 (actual_value => $cn-><AG::tc|NodeList.length>,
+                  expected_value => 0);
+
+        $test->id ('firstChild');
+        $test->assert_null ($not-><AG::Node.firstChild>);
+
+        $test->id ('lastChild');
+        $test->assert_null ($not-><AG::Node.lastChild>);
+##Notation
+
+## TODO: Entity
+
+NodeTypeDef:
+  @IFQName: EntityReference
+  @ClsQName: ManakaiDOMEntityReference
+  
+  @IntMethod:
+    @@Operator: mg|CreateNodeStemMethod
+    @@Param:
+      @@@Name: bag
+      @@@Type: HASH
+    @@Param:
+      @@@Name: obj
+      @@@Type: HASH
+    @@Param:
+      @@@Name: opt
+      @@@Type: HASH
+    @@Return:
+      @@@Type: HASH
+      @@@PerlDef:
+        $obj->{<H::infoset|children>} = [];
+        __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
+          $result => {$obj->{<H::infoset|name>}},
+          $given => {${$opt->{<H::infoset|name>}}},
+        }__;
+        __CODE{mg|setOwnerProp||ManakaiDOM|all::
+          $bag => $bag,
+          $ownerref => {$opt->{<H::tc|ownerDocument>}},
+          $ownee1hprop => {<H::tc|revOwnerDocument>},
+          $ownee => {$obj},
+          $owner0prop => {<H::tc|ownerDocument>},
+        }__;
+        $r = $obj;
+  @mg:subnode1a: infoset|children
+  @mg:owner0: tc|ownerDocument
+  @mg:origin0: infoset|parent
+
+  @CODE:
+    @@QName: tx|createERForTest
+    @@PerlDef:
+      my $doc;
+      __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+      $er = $doc-><M::Document.createEntityReference> ('er');
+      # TODO: setReadOnly (1)
+  @CODE:
+    @@QName: tx|createROERForTest
+    @@PerlDef:
+      my $doc;
+      __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+      $er = $doc-><M::Document.createEntityReference> ('er');
+
+  @CAttr:
+    @@Name: nodeType
+    @@Type: unsignedShort
+    @@dis:actualType: tc|NodeType
+    @@Get:
+      @@@disDef:
+        @@@@DISLang:constValue: Node.ENTITY_REFERENCE_NODE
+
+    @@Test:
+      @@@QName: ER.nodeType.test
+      @@@PerlDef:
+        my $er;
+        __CODE{tx|createERForTest:: $er => $er}__;
+
+        $test->id ('nodeType');
+        $test->assert_num_equals
+                 (actual_value => $er-><AG::Node.nodeType>,
+                  expected_value => <C::Node.ENTITY_REFERENCE_NODE>);
+
+  @L2Test:
+    @@QName: ER.localName.1.test
+    @@PerlDef:
+      my $doc;
+      __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+      my $df = $doc-><M::Document.createEntityReference> ('entity');
+
+      $test->id ('localName');
+      $test->assert_null ($df-><AG::Node.localName>);
+
+      $test->id ('namespaceURI');
+      $test->assert_null ($df-><AG::Node.namespaceURI>);
+
+      $test->id ('prefix');
+      $test->assert_null ($df-><AG::Node.prefix>);
+
+      $test->id ('prefix.set');
+      $df-><AS::Node.prefix> ('pre');
+      $test->assert_null ($df-><AG::Node.prefix>);
+
+  @Test:
+    @@QName: ER.parentNode.1.test
+    @@PerlDef:
+      my $doc;
+      __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+      my $df = $doc-><M::Document.createEntityReference> ('entity');
+
+      $test->assert_null ($df-><AG::Node.parentNode>);
+
+  @Test:
+    @@QName: ER.ownerDocument.test
+    @@PerlDef:
+      my $doc;
+      __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+      my $el = $doc-><M::Document.createEntityReference> ('entity');
+
+      $test->assert_equals ($el-><AG::Node.ownerDocument>, $doc);
+
+  @Test:
+    @@QName: ER.isSameNode.1.test
+    @@PerlDef:
+      my $doc;
+      __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+      my $el = $doc-><M::Document.createEntityReference> ('entity');
+
+      my $el2 = $doc-><M::Document.createEntityReference> ('entity');
+      
+      $test->id ('same');
+      $test->assert_equals ($el, $el);
+      
+      $test->id ('diff');
+      $test->assert_not_equals ($el, $el2);
+      
+      $test->id ('doc');
+      $test->assert_not_equals ($el, $doc);
+  @Test:
+    @@QName: ER.isSameNode.2.test
+    @@PerlDef:
+      my $doc;
+      __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+      my $el = $doc-><M::Document.createEntityReference> ('entity');
+
+      my $el2 = $doc-><M::Document.createEntityReference> ('entity');
+      
+      $test->id ('same');
+      $test->assert_true ($el-><M::Node.isSameNode> ($el));
+      
+      $test->id ('diff');
+      $test->assert_false ($el-><M::Node.isSameNode> ($el2));
+      
+      $test->id ('doc');
+      $test->assert_false ($el-><M::Node.isSameNode> ($doc));
+
+  @LXTest:
+    @@QName: ER.readOnly.test
+    @@PerlDef:
+      my $doc;
+      __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+      my $el = $doc-><M::Document.createEntityReference> ('entity');
+
+      $test->id ('default');
+      $test->assert_false ($el-><AG::Node.manakaiReadOnly>);
+
+  @CMethod:
+    @@Name: appendChild
+    @@enDesc:
+      Adds a node to the end of the list of children of the node.
+      If that node is already in the tree, it is first removed.
+    @@Param:
+      @@@Name: newChild
+      @@@Type: Node
+      @@@enDesc:
+        The node to add.
+      @@@InCase:
+        @@@@Type: DocumentFragment
+        @@@@enDesc:
+          The entire contents of the document fragment are
+          moved into the child list of the node.
+    @@Return:
+      @@@Type: Node
+      @@@enDesc:
+        The node added.  If the <P::newChild> node is a <IF::DocumentFragment>
+        node, then the <P::newChild> node <kwd:MUST> be returned.
+      @@@dx:raises:
+        @@@@@: MDOMX|HIERARCHY_BAD_TYPE
+        @@@@enDesc:
+          If the node is of a type that does not allow children of
+          the type of the <P::newChild> node.
+ 
+          If the <A::Document.strictErrorChecking> is set to <DOM::false>,
+          this exception <kwd:MAY-NOT> be thrown.
+      @@@dx:raises:
+        @@@@@: MDOMX|HIERARCHY_ANCESTOR_OR_SELF
+        @@@@enDesc:
+          If the <P::newChild> node is one of the node's ancestor
+          <SRC::DOM 1, 2, 3> or the node itself <SRC::DOM 2 Errata, DOM 3>.
+      @@@dx:raises:
+        @@@@@: c|DIFFERENT_DOCUMENT_ERR
+        @@@@enDesc:
+          If the <P::newChild> node was created from a different
+          document than the one to which the node was created or
+          the node does not belong to any document.
+
+          If the <A::Document.strictErrorChecking> is set to <DOM::false>,
+          this exception <kwd:MAY-NOT> be thrown.
+      @@@dx:raises: 
+        @@@@@: MDOMX|NOMOD_THIS
+        @@@@enDesc:
+          If the node is read-only.
+
+          If the <A::Document.strictErrorChecking> is set to <DOM::false>,
+          this exception <kwd:MAY-NOT> be thrown.
+      @@@dx:raises:
+        @@@@@: MDOMX|NOMOD_SRC_PARENT
+        @@@@enDesc:
+          If the previous parent of the <P::newChild> node is read-only
+          <SRC::DOM 2 Errata, DOM 3>.
+
+          If the <A::Document.strictErrorChecking> is set to <DOM::false>,
+          this exception <kwd:MAY-NOT> be thrown.
+      @@@PerlDef:
+        my $self_od = $self-><AG::Node.ownerDocument>;
+        if ($self_od-><AG::Document.strictErrorChecking>) {
+          my $anode = $self;
+          while (defined $anode) {
+            if ($anode eq $newChild) {
+              __EXCEPTION{MDOMX|HIERARCHY_ANCESTOR_OR_SELF::
+                MDOMX|param-name => 'newChild',
+                c|node => {$newChild},
+              }__;
+            }
+            $anode = $anode-><AG::Node.parentNode>;
+          }
+        }
+        my $child_od = $newChild-><AG::Node.ownerDocument>;
+        my $child_nt = $newChild-><AG::Node.nodeType>;
+        __CODE{tc|appendChildImpl1::
+          $self => $self, $self_od => $self_od,
+          $newChild => $newChild, $child_od => $child_od, $child_nt => $child_nt,
+          $r => $r,
+          $allowedNodeTypes => {{
+            <C::Node.TEXT_NODE> => true,
+            <C::Node.ENTITY_REFERENCE_NODE> => true,
+            <C::Node.ELEMENT_NODE> => true,
+            <C::Node.CDATA_SECTION_NODE> => true,
+            <C::Node.PROCESSING_INSTRUCTION_NODE> => true,
+            <C::Node.COMMENT_NODE> => true,
+          }},
+        }__;
+
+  @CMethod:
+    @@Name: insertBefore
+    @@enDesc:
+      Inserts a node before the existing child node of the node.
+
+      Inserting a node before itself is implementation dependent.
+    @@Param:
+      @@@Name: newChild
+      @@@Type: Node
+      @@@enDesc:
+        The node to insert.  If the <P::newChild> is already in 
+        the tree, it is first removed.
+      @@@InCase:
+        @@@@Type: DocumentFragment
+        @@@@enDesc:
+          All of children of the <P::newChild> node are inserted,
+          in the same order, before <P::refChild>.
+    @@Param:
+      @@@Name: refChild
+      @@@Type: Node
+      @@@enDesc:
+        The reference node, i.e. the node before which the new node
+        must be inserted.
+      @@@nullCase:
+        @@@@enDesc:
+          The <P::newChild> node is inserted at the end of the list
+          of children.
+    @@Return:
+      @@@Type: Node
+      @@@enDesc:
+        The node being inserted.
+      @@@enImplNote:
+        What is returned if <P::newChild> is a <IF::DocumentFragment>?
+        See also <M::Node.appendChild>'s return value.
+      @@@dx:raises:
+        @@@@@: MDOMX|HIERARCHY_BAD_TYPE
+        @@@@enDesc:
+          If the node is of a type that does not allow children of
+          the type of the <P::newChild> node.
+      @@@dx:raises:
+        @@@@@: MDOMX|HIERARCHY_ANCESTOR_OR_SELF
+        @@@@enDesc:
+          If the <P::newChild> node is one of the node's ancestor
+          <SRC::DOM 1, 2, 3> or the node itself <SRC::DOM 2 Errata, DOM 3>.
+      @@@dx:raises:
+        @@@@@: c|DIFFERENT_DOCUMENT_ERR
+        @@@@enDesc:
+          If the <P::newChild> node was created from a different
+          document than the one that created the node.
+        @@@@enImplNote:
+          The DOM specification ignores the fact that <IF::Document>s
+          and <IF::x|DocumentType>s are created from 
+          <IF::c|DOMImplementation> :-)
+      @@@dx:raises: 
+        @@@@@: MDOMX|NOMOD_THIS
+        @@@@enDesc:
+          If the node is read-only.
+      @@@dx:raises:
+        @@@@@: MDOMX|NOMOD_SRC_PARENT
+        @@@@enDesc:
+          If the previous parent of the <P::newChild> node is read-only
+          <SRC::DOM 1 SE, DOM 2, 3>.
+      @@@dx:raises:
+        @@@@@: c|NOT_CHILD_ERR
+        @@@@enDesc:
+          If the <P::refChild> node is not a child of the node.
+      @@@c:reports:
+        @@@@@: t|insert-before-itself
+        @@@@enDesc:
+          If the <P::newChild> node is same as the <P::refChild> node.
+          Then, the result is implementation dependent.
+        @@@@For: ManakaiDOM|ManakaiDOM
+      @@@PerlDef:
+        my $self_od = $self-><AG::Node.ownerDocument>;
+        if ($self_od-><AG::Document.strictErrorChecking>) {
+          my $anode = $self;
+          while (defined $anode) {
+            if ($anode eq $newChild) {
+              __EXCEPTION{MDOMX|HIERARCHY_ANCESTOR_OR_SELF::
+                MDOMX|param-name => 'newChild',
+                c|node => {$newChild},
+              }__;
+            }
+            $anode = $anode-><AG::Node.parentNode>;
+          }
+        }
+        my $child_od = $newChild-><AG::Node.ownerDocument>;
+        my $child_nt = $newChild-><AG::Node.nodeType>;
+        __CODE{tc|insertBeforeImpl1::
+          $self => $self, $self_od => $self_od,
+          $newChild => $newChild, $refChild => $refChild,
+          $child_od => $child_od, $child_nt => $child_nt,
+          $r => $r,
+          $allowedNodeTypes => {{
+            <C::Node.TEXT_NODE> => true,
+            <C::Node.ENTITY_REFERENCE_NODE> => true,
+            <C::Node.ELEMENT_NODE> => true,
+            <C::Node.CDATA_SECTION_NODE> => true,
+            <C::Node.PROCESSING_INSTRUCTION_NODE> => true,
+            <C::Node.COMMENT_NODE> => true,
+          }},
+        }__;
+
+  @CMethod:
+    @@Name: replaceChild
+    @@enDesc:
+      Replaces a child node with another node.
+
+      Replacing a node with itself is implementation dependent <SRC::DOM3>.
+    @@Param:
+      @@@Name: newChild
+      @@@Type: Node
+      @@@enDesc:
+        The new node to put in the child list.
+
+        If the <P::newChild> node is already in the tree,
+        it is first removed.
+      @@@InCase:
+        @@@@Type: DocumentFragment
+        @@@@enDesc:
+          The <P::oldChild> node is replaced by all of the 
+          <IF::DocumentFragment> children, which are inserted
+          in the same order <SRC::DOM1 SE, DOM2, DOM3>.
+    @@Param:
+      @@@Name: oldChild
+      @@@Type: Node
+      @@@enDesc:
+        The node being replaced in the list.
+    @@Return:
+      @@@Type: Node
+      @@@enDesc:
+        The node replaced.
+      @@@dx:raises:
+        @@@@@: MDOMX|HIERARCHY_BAD_TYPE
+        @@@@enDesc:
+          If the node is of a type that does not allow children of
+          the type of the <P::newChild> node.
+      @@@dx:raises:
+        @@@@@: MDOMX|HIERARCHY_ANCESTOR_OR_SELF
+        @@@@enDesc:
+          If the <P::newChild> node is one of the node's ancestor
+          <SRC::DOM 1, 2, 3> or the node itself <SRC::DOM 2 Errata, DOM 3>.
+      @@@dx:raises:
+        @@@@@: c|DIFFERENT_DOCUMENT_ERR
+        @@@@enDesc:
+          If the <P::newChild> node was created from a different
+          document than the one that created the node.
+        @@@@enImplNote:
+          The DOM specification ignores the fact that <IF::Document>s
+          and <IF::x|DocumentType>s are created from 
+          <IF::c|DOMImplementation> :-)
+      @@@dx:raises: 
+        @@@@@: MDOMX|NOMOD_THIS
+        @@@@enDesc:
+          If the node is read-only.
+      @@@dx:raises:
+        @@@@@: MDOMX|NOMOD_SRC_PARENT
+        @@@@enDesc:
+          If the previous parent of the <P::newChild> node is read-only
+          <SRC::DOM1 SE, DOM2, DOM3>.
+      @@@dx:raises:
+        @@@@@: c|NOT_CHILD_ERR
+        @@@@enDesc:
+          If the <P::oldChild> node is not a child of the node.
+      @@@c:reports:
+        @@@@@: t|replaced-by-itself
+        @@@@enDesc:
+          If the <P::newChild> node is same as the <P::oldChild> node.
+          Then, the result is implementation dependent.
+        @@@@For: ManakaiDOM|ManakaiDOM
+      @@@PerlDef:
+        my $self_od = $self-><AG::Node.ownerDocument>;
+        if ($self_od-><AG::Document.strictErrorChecking>) {
+          my $anode = $self;
+          while (defined $anode) {
+            if ($anode eq $newChild) {
+              __EXCEPTION{MDOMX|HIERARCHY_ANCESTOR_OR_SELF::
+                MDOMX|param-name => 'newChild',
+                c|node => {$newChild},
+              }__;
+            }
+            $anode = $anode-><AG::Node.parentNode>;
+          }
+        }
+        my $child_od = $newChild-><AG::Node.ownerDocument>;
+        my $child_nt = $newChild-><AG::Node.nodeType>;
+        __CODE{tc|replaceChildImpl1::
+          $self => $self, $self_od => $self_od,
+          $newChild => $newChild, $refChild => $oldChild,
+          $child_od => $child_od, $child_nt => $child_nt,
+          $r => $r,
+          $allowedNodeTypes => {{
+            <C::Node.TEXT_NODE> => true,
+            <C::Node.ENTITY_REFERENCE_NODE> => true,
+            <C::Node.ELEMENT_NODE> => true,
+            <C::Node.CDATA_SECTION_NODE> => true,
+            <C::Node.PROCESSING_INSTRUCTION_NODE> => true,
+            <C::Node.COMMENT_NODE> => true,
+          }},
+        }__;
+##EntityReference
+
+NodeTypeDef:
+  @IFQName: ProcessingInstruction
+  @ClsQName: ManakaiDOMProcessingInstruction
+  
+  @IntMethod:
+    @@Operator: mg|CreateNodeStemMethod
+    @@Param:
+      @@@Name: bag
+      @@@Type: HASH
+    @@Param:
+      @@@Name: obj
+      @@@Type: HASH
+    @@Param:
+      @@@Name: opt
+      @@@Type: HASH
+    @@Return:
+      @@@Type: HASH
+      @@@PerlDef:
+        __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
+          $result => {$obj->{<H::infoset|target>}},
+          $given => {${$opt->{<H::infoset|target>}}},
+        }__;
+        __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
+          $result => {$obj->{<H::infoset|content>}},
+          $given => {${$opt->{<H::infoset|content>}}},
+        }__;
+        __CODE{mg|setOwnerProp||ManakaiDOM|all::
+          $bag => $bag,
+          $ownerref => {$opt->{<H::tc|ownerDocument>}},
+          $ownee1hprop => {<H::tc|revOwnerDocument>},
+          $ownee => {$obj},
+          $owner0prop => {<H::tc|ownerDocument>},
+        }__;
+        $r = $obj;
+  @mg:owner0: tc|ownerDocument
+  @mg:origin0: infoset|parent
+
+  @CODE:
+    @@QName: tx|createPIForTest
+    @@PerlDef:
+      my $doc;
+      __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+      $pi = $doc-><M::Document.createProcessingInstruction> ('pi', 'data');
+
+  @CAttr:
+    @@Name: nodeType
+    @@Type: unsignedShort
+    @@dis:actualType: tc|NodeType
+    @@Get:
+      @@@disDef:
+        @@@@DISLang:constValue: Node.PROCESSING_INSTRUCTION_NODE
+
+    @@Test:
+      @@@QName: PI.nodeType.test
+      @@@PerlDef:
+        my $pi;
+        __CODE{tx|createPIForTest:: $pi => $pi}__;
+
+        $test->id ('nodeType');
+        $test->assert_num_equals
+                 (actual_value => $pi-><AG::Node.nodeType>,
+                  expected_value => <C::Node.PROCESSING_INSTRUCTION_NODE>);
+
+  @L2Test:
+    @@QName: PI.localName.1.test
+    @@PerlDef:
+      my $doc;
+      __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+      my $df = $doc-><M::Document.createProcessingInstruction> ('pi', 'data');
+
+      $test->id ('localName');
+      $test->assert_null ($df-><AG::Node.localName>);
+
+      $test->id ('namespaceURI');
+      $test->assert_null ($df-><AG::Node.namespaceURI>);
+
+      $test->id ('prefix');
+      $test->assert_null ($df-><AG::Node.prefix>);
+
+      $test->id ('prefix.set');
+      $df-><AS::Node.prefix> ('pre');
+      $test->assert_null ($df-><AG::Node.prefix>);
+
+  @Test:
+    @@QName: PI.parentNode.1.test
+    @@PerlDef:
+      my $doc;
+      __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+      my $df = $doc-><M::Document.createProcessingInstruction> ('pi', 'data');
+
+      $test->assert_null ($df-><AG::Node.parentNode>);
+
+  @Test:
+    @@QName: PI.ownerDocument.test
+    @@PerlDef:
+      my $doc;
+      __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+      my $el = $doc-><M::Document.createProcessingInstruction> ('pi', 'data');
+
+      $test->assert_equals ($el-><AG::Node.ownerDocument>, $doc);
+
+  @Test:
+    @@QName: PI.isSameNode.1.test
+    @@PerlDef:
+      my $doc;
+      __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+      my $el = $doc-><M::Document.createProcessingInstruction> ('pi', 'data');
+
+      my $el2 = $doc-><M::Document.createProcessingInstruction> ('pi', 'data');
+      
+      $test->id ('same');
+      $test->assert_equals ($el, $el);
+      
+      $test->id ('diff');
+      $test->assert_not_equals ($el, $el2);
+      
+      $test->id ('doc');
+      $test->assert_not_equals ($el, $doc);
+  @Test:
+    @@QName: PI.isSameNode.2.test
+    @@PerlDef:
+      my $doc;
+      __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+      my $el = $doc-><M::Document.createProcessingInstruction> ('pi', 'data');
+
+      my $el2 = $doc-><M::Document.createProcessingInstruction> ('pi', 'data');
+      
+      $test->id ('same');
+      $test->assert_true ($el-><M::Node.isSameNode> ($el));
+      
+      $test->id ('diff');
+      $test->assert_false ($el-><M::Node.isSameNode> ($el2));
+      
+      $test->id ('doc');
+      $test->assert_false ($el-><M::Node.isSameNode> ($doc));
+
+  @LXTest:
+    @@QName: PI.readOnly.test
+    @@PerlDef:
+      my $doc;
+      __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+      my $el = $doc-><M::Document.createProcessingInstruction> ('pi', 'data');
+
+      $test->id ('default');
+      $test->assert_false ($el-><AG::Node.manakaiReadOnly>);
+
+  @CAttr:
+    @@Name: childNodes
+    @@enDesc:
+      A list of nodes that contains all children of the node.
+    @@Get:
+      @@@Type: c|NodeList
+      @@@enDesc:
+        Since <IF::ProcessingInstruction> nodes cannot have child nodes,
+        the node list is always empty.
+      @@@disDef:
+        @@@@DISPerl:cloneCode: tc|ManakaiDOMCharacterData.childNodes.get
+
+    @@Test:
+      @@@QName: PI.childNodes.test
+      @@@PerlDef:
+        my $pi;
+        __CODE{tx|createPIForTest:: $pi => $pi}__;
+
+        $test->id ('interface');
+        my $cn = $pi-><AG::Node.childNodes>;
+        $test->assert_isa ($cn, <IFName::tc|NodeList>);
+
+        $test->id ('length');
+        $test->assert_num_equals
+                 (actual_value => $cn-><AG::tc|NodeList.length>,
+                  expected_value => 0);
+
+        $test->id ('firstChild');
+        $test->assert_null ($pi-><AG::Node.firstChild>);
+
+        $test->id ('lastChild');
+        $test->assert_null ($pi-><AG::Node.lastChild>);
+
+  @CMethod:
+    @@Name: appendChild
+    @@enDesc:
+      Adds a node to the end of the list of children of the node.
+      If that node is already in the tree, it is first removed.
+    @@Param:
+      @@@Name: newChild
+      @@@Type: Node
+      @@@enDesc:
+        The node to add.
+    @@Return:
+      @@@Type: Node
+      @@@enDesc:
+        The node added.
+      @@@dx:raises:
+        @@@@@: MDOMX|HIERARCHY_BAD_TYPE
+        @@@@enDesc:
+          The type of the node does not allow any children.
+      @@@disDef:
+        @@@@DISPerl:cloneCode: tc|ManakaiDOMCharacterData.appendChild
+
+  @CMethod:
+    @@Name: insertBefore
+    @@enDesc:
+      Inserts a node before the existing child node of the node.
+    @@Param:
+      @@@Name: newChild
+      @@@Type: Node
+      @@@enDesc:
+        The node to add.
+    @@Param:
+      @@@Name: refChild
+      @@@Type: Node
+      @@@enDesc:
+        The node before which the <P::newChild> node is inserted.
+      @@@nullCase:
+        @@@@enDesc:
+          The <P::newChild> node is inserted at the end.
+    @@Return:
+      @@@Type: Node
+      @@@enDesc:
+        The node added.
+      @@@dx:raises:
+        @@@@@: MDOMX|HIERARCHY_BAD_TYPE
+        @@@@enDesc:
+          The type of the node does not allow any children.
+      @@@disDef:
+        @@@@DISPerl:cloneCode: t|ManakaiDOMCharacterData.insertBefore
+
+  @CMethod:
+    @@Name: replaceChild
+    @@enDesc:
+      Replaces a node by another node.
+    @@Param:
+      @@@Name: newChild
+      @@@Type: Node
+      @@@enDesc:
+        The node to add.
+    @@Param:
+      @@@Name: oldChild
+      @@@Type: Node
+      @@@enDesc:
+        The node to remove.
+    @@Return:
+      @@@Type: Node
+      @@@enDesc:
+        The node added.
+      @@@dx:raises:
+        @@@@@: MDOMX|HIERARCHY_BAD_TYPE
+        @@@@enDesc:
+          The type of the node does not allow any children.
+      @@@disDef:
+        @@@@DISPerl:cloneCode: tc|ManakaiDOMCharacterData.replaceChild
+##ProcessingInstruction
