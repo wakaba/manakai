@@ -12,7 +12,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/03/16 08:52:32 $
+    $Date: 2006/03/23 13:33:31 $
 
   @Require:
     @@Module:
@@ -31697,9 +31697,8 @@ boolCParam:
       preceding <IF::x|DocumentType> nodes in the <IF::Document>
       children list.
 
-        {ISSUE::
-          Should <A::Node.textContent> have a value?
-        }
+      It also changes how <A::Node.textContent> and
+      <A::Node.manakaiAppendText> do act.
   @L3Test:
     @@QName: cfg.strict-document-children.test
     @@PerlDef:

@@ -1,5 +1,20 @@
 2006-03-23  Wakaba  <wakaba@suika.fam.cx>
 
+	* Tree.dis (cfg:strict-document-children): The configuration
+	parameter must also affect on |manakaiAppendText|
+	and |textContent| on |Document| nodes.
+
+	* TreeCore.dis (Node.CreateNodeRefMethod): The |tc:nodeRefClass|
+	parameter changes the class to |bless|.
+	(Node): Most methods are reimplemented.  (Untested)
+	(CharacterData, Attr): Most methods and attributes are
+	reimplemented.  (Untested)
+
+	* XML.dis, XDoctype.dis: Most |Node| methods are 
+	reimplemented (untested).
+
+2006-03-23  Wakaba  <wakaba@suika.fam.cx>
+
 	* TreeCore.dis, XML.dis, XDoctype.dis (Node.textContent): Reimplemented
 	(untested).
 

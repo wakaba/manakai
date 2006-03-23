@@ -9,7 +9,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/03/23 03:05:44 $
+    $Date: 2006/03/23 13:33:32 $
 
   @Require:
     @@Module:
@@ -165,6 +165,14 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type: DISLang|Method
     @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|DOM3
+
+ElementTypeBinding:
+  @Name: CL3Method
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|Method
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|DOM3 ManakaiDOM|ForClass
 
 ElementTypeBinding:
   @Name: IntMethod
@@ -329,6 +337,17 @@ ElementTypeBinding:
   @ShadowContent:
     @@ContentType:
       lang:Perl
+
+ElementTypeBinding:
+  @Name: NodeReadOnlyError
+  @ElementType:
+    dx:raises
+  @ShadowContent:
+    @@@: MDOMX|NOMOD_THIS
+    @@Description:
+      @@@lang:en
+      @@@@:
+        The node is read-only.
 
 ElementTypeBinding:
   @Name: XML2Feature
@@ -778,6 +797,51 @@ IFCls1Def:
       @@@disDef:
         @@@@DISPerl:cloneCode: tc|ManakaiDOMCharacterData.replaceChild
 
+  @Test:
+    @@QName: CDATASection.appendChild.test
+    @@PerlDef:
+      my $doc;
+      __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+      my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+      my $comment = $doc-><M::Document.createCDATASection> ('data');
+      my $node2 = $doc-><M::Document.createCDATASection> ('data');
+
+      for my $node (<Code::tc|createNodesForTest+dt>) {
+        $test->id ('appendChild.'.$node-><AG::Node.nodeType>);
+        $test->assert_exception (code => sub {
+          $comment-><M::Node.appendChild> ($node);
+        }, exception_subtype => <Q::MDOMX|HIERARCHY_BAD_TYPE>);
+
+        $test->id ('insertBefore.'.$node-><AG::Node.nodeType>);
+        $test->assert_exception (code => sub {
+          $comment-><M::Node.insertBefore> ($node);
+        }, exception_subtype => <Q::MDOMX|HIERARCHY_BAD_TYPE>);
+
+        $test->id ('replaceChild.'.$node-><AG::Node.nodeType>);
+        $test->assert_exception (code => sub {
+          $comment-><M::Node.replaceChild> ($node, $node2);
+        }, exception_subtype => <Q::MDOMX|HIERARCHY_BAD_TYPE>);
+      }
+
+  @Test:
+    @@QName: CDATASection..=.1.test
+    @@PerlDef:
+      my $doc;
+      __CODE{tc|createDocumentForTestDA:: $doc => $doc}__;
+
+      my $node = $doc-><M::Document.createCDATASection> ('');
+
+      $node-><M::Node.manakaiAppendText> ('aaaa');
+      $test->id ('1.class');
+      $test->assert_isa ($node, <IFName::CDATASection>);
+      $test->id ('1.value');
+      $test->assert_equals ($node-><AG::t|CharacterData.data>, 'aaaa');
+
+      $test->id (2);
+      $node-><M::Node.manakaiAppendText> ('bbbb');
+      $test->assert_equals ($node-><AG::t|CharacterData.data>, 'aaaabbbb');
+
   @CAttr:
     @@Name: nodeName
     @@enDesc:
@@ -799,6 +863,53 @@ IFCls1Def:
 
         $test->assert_equals ($text-><AG::Node.nodeName>,
                               '#cdata-section');
+
+  @CL3Method:
+    @@Name: getFeature
+    @@enDesc:
+      Returns a specialized object that implements the specialized APIs.
+    @@Param:
+      @@@Name: feature
+      @@@Type: DOMString
+      @@@dis:actualType: f|FeatureNameString
+    @@Param:
+      @@@Name: version
+      @@@Type: DOMString
+      @@@dis:actualType: f|FeatureVersionString
+    @@Return:
+      @@@Type: DOMMain|DOMObject
+      @@@nullCase:
+      @@@PerlDef:
+        $feature =~ s/^\+//;
+        __CODE{f|getFeatureImpl::
+          $self => $self,
+          $feature => $feature, $version => $version, $r => $r,
+          $base_class => {<ClassName::ManakaiDOMCDATASection>},
+        }__;
+        unless (defined $r) {
+          __DEEP{
+            $r = $self->SUPER::get_feature ($feature, $version);
+          }__;
+        }
+
+    @@Test:
+      @@@QName: CDATASection.getFeature.test
+      @@@PerlDef:
+        my $node;
+        __CODE{tx|createCDATASectionForTest:: $text => $node}__;
+
+        for (
+          [Core => '1.0', <IFName::CDATASection||ManakaiDOM|ManakaiDOM1>],
+          [Core => '2.0', <IFName::CDATASection||ManakaiDOM|ManakaiDOM2>],
+          [Core => '3.0', <IFName::CDATASection||ManakaiDOM|ManakaiDOM3>],
+          [XML => '1.0', <IFName::CDATASection||ManakaiDOM|ManakaiDOM1>],
+          [XML => '2.0', <IFName::CDATASection||ManakaiDOM|ManakaiDOM2>],
+          [XML => '3.0', <IFName::CDATASection||ManakaiDOM|ManakaiDOM3>],
+        ) {
+          $test->id ($_->[0].'.'.$_->[1]);
+          my $sp = $node-><M::Node.getFeature> ($_->[0], $_->[1]);
+          $test->assert_isa ($sp, $_->[2]);
+        }
 ##CDATASection
 
 ResourceDef:
@@ -942,6 +1053,95 @@ NodeTypeDef:
           node value is defined as <DOM::null>.
       @@@disDef:
         @@@@DISPerl:cloneCode: tc|ManakaiDOMNode.nodeValue.set
+
+    @@Test:
+      @@@QName: Notation.appendChild.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $comment = $docx-><M::d|DocumentXDoctype.createNotation> ('data');
+        my $node2 = $docx-><M::d|DocumentXDoctype.createNotation> ('data');
+
+        for my $node (<Code::tc|createNodesForTest+dt>) {
+          $test->id ('appendChild.'.$node-><AG::Node.nodeType>);
+          $test->assert_exception (code => sub {
+            $comment-><M::Node.appendChild> ($node);
+          }, exception_subtype => <Q::MDOMX|HIERARCHY_BAD_TYPE>);
+
+          $test->id ('insertBefore.'.$node-><AG::Node.nodeType>);
+          $test->assert_exception (code => sub {
+            $comment-><M::Node.insertBefore> ($node);
+          }, exception_subtype => <Q::MDOMX|HIERARCHY_BAD_TYPE>);
+
+          $test->id ('replaceChild.'.$node-><AG::Node.nodeType>);
+          $test->assert_exception (code => sub {
+            $comment-><M::Node.replaceChild> ($node, $node2);
+          }, exception_subtype => <Q::MDOMX|HIERARCHY_BAD_TYPE>);
+        }
+
+  @Test:
+    @@QName: Notation..=.1.test
+    @@PerlDef:
+      my $doc;
+      __CODE{tc|createDocumentForTestDA:: $doc => $doc}__;
+      my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+      my $node = $docx-><M::DocumentXDoctype.createNotation> ('d');
+
+      $node-><M::Node.manakaiAppendText> ('aaaa');
+      $test->id ('1.class');
+      $test->assert_isa ($node, <IFName::Notation>);
+      $test->id ('1.value');
+      $test->assert_null ($node-><AG::Node.textContent>);
+
+  @CL3Method:
+    @@Name: getFeature
+    @@enDesc:
+      Returns a specialized object that implements the specialized APIs.
+    @@Param:
+      @@@Name: feature
+      @@@Type: DOMString
+      @@@dis:actualType: f|FeatureNameString
+    @@Param:
+      @@@Name: version
+      @@@Type: DOMString
+      @@@dis:actualType: f|FeatureVersionString
+    @@Return:
+      @@@Type: DOMMain|DOMObject
+      @@@nullCase:
+      @@@PerlDef:
+        $feature =~ s/^\+//;
+        __CODE{f|getFeatureImpl::
+          $self => $self,
+          $feature => $feature, $version => $version, $r => $r,
+          $base_class => {<ClassName::ManakaiDOMNotation>},
+        }__;
+        unless (defined $r) {
+          __DEEP{
+            $r = $self->SUPER::get_feature ($feature, $version);
+          }__;
+        }
+
+    @@Test:
+      @@@QName: Notation.getFeature.test
+      @@@PerlDef:
+        my $node;
+        __CODE{tx|createNotationForTest:: $not => $node}__;
+
+        for (
+          [Core => '1.0', <IFName::Notation||ManakaiDOM|ManakaiDOM1>],
+          [Core => '2.0', <IFName::Notation||ManakaiDOM|ManakaiDOM2>],
+          [Core => '3.0', <IFName::Notation||ManakaiDOM|ManakaiDOM3>],
+          [XML => '1.0', <IFName::Notation||ManakaiDOM|ManakaiDOM1>],
+          [XML => '2.0', <IFName::Notation||ManakaiDOM|ManakaiDOM2>],
+          [XML => '3.0', <IFName::Notation||ManakaiDOM|ManakaiDOM3>],
+        ) {
+          $test->id ($_->[0].'.'.$_->[1]);
+          my $sp = $node-><M::Node.getFeature> ($_->[0], $_->[1]);
+          $test->assert_isa ($sp, $_->[2]);
+        }
 ##Notation
 
 ResourceDef:
@@ -1034,6 +1234,2315 @@ NodeTypeDef:
         $test->assert_num_equals
                  (actual_value => $text-><AG::Node.nodeType>,
                   expected_value => <C::Node.ENTITY_NODE>);
+
+    @@Test:
+      @@@QName: Entity.appendChild.1.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('dt');
+        my $pi = $doc-><M::Document.createTextNode> ('pi');
+
+        my $return = $dtd-><M::Node.appendChild> ($pi);
+
+        my $child = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('child.length');
+        $test->assert_num_equals
+                 (actual_value => 0+@$child,
+                  expected_value => 1);
+
+        my $item = $child-><M::tc|NodeList.item> (0);
+
+        $test->id ('child.item.node');
+        $test->assert_isa ($item, <IFName::Node>);
+
+        $test->id ('child.item.pi');
+        $test->assert_isa ($item, <IFName::Text>);
+
+        $test->id ('child.item.equals');
+        $test->assert_equals ($item, $pi);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi);
+
+        $test->id ('parent');
+        my $parent = $item-><AG::Node.parentNode>;
+        $test->assert_equals ($parent, $dtd);
+
+        $test->id ('return');
+        $test->assert_equals ($return, $pi);
+    @@Test:
+      @@@QName: Entity.appendChild.1.2.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('dt');
+        my $pi = $doc-><M::Document.createEntityReference> ('pi');
+
+        my $return = $dtd-><M::Node.appendChild> ($pi);
+
+        my $child = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('child.length');
+        $test->assert_num_equals
+                 (actual_value => 0+@$child,
+                  expected_value => 1);
+
+        my $item = $child-><M::tc|NodeList.item> (0);
+
+        $test->id ('child.item.node');
+        $test->assert_isa ($item, <IFName::Node>);
+
+        $test->id ('child.item.pi');
+        $test->assert_isa ($item, <IFName::tx|EntityReference>);
+
+        $test->id ('child.item.equals');
+        $test->assert_equals ($item, $pi);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi);
+
+        $test->id ('parent');
+        my $parent = $item-><AG::Node.parentNode>;
+        $test->assert_equals ($parent, $dtd);
+
+        $test->id ('return');
+        $test->assert_equals ($return, $pi);
+    @@Test:
+      @@@QName: Entity.appendChild.1.3.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('dt');
+        my $pi = $doc-><M::Document.createElement> ('pi');
+
+        my $return = $dtd-><M::Node.appendChild> ($pi);
+
+        my $child = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('child.length');
+        $test->assert_num_equals
+                 (actual_value => 0+@$child,
+                  expected_value => 1);
+
+        my $item = $child-><M::tc|NodeList.item> (0);
+
+        $test->id ('child.item.node');
+        $test->assert_isa ($item, <IFName::Node>);
+
+        $test->id ('child.item.pi');
+        $test->assert_isa ($item, <IFName::tc|Element>);
+
+        $test->id ('child.item.equals');
+        $test->assert_equals ($item, $pi);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi);
+
+        $test->id ('parent');
+        my $parent = $item-><AG::Node.parentNode>;
+        $test->assert_equals ($parent, $dtd);
+
+        $test->id ('return');
+        $test->assert_equals ($return, $pi);
+    @@Test:
+      @@@QName: Entity.appendChild.1.4.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('dt');
+        my $pi = $doc-><M::Document.createProcessingInstruction> ('pi');
+
+        my $return = $dtd-><M::Node.appendChild> ($pi);
+
+        my $child = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('child.length');
+        $test->assert_num_equals
+                 (actual_value => 0+@$child,
+                  expected_value => 1);
+
+        my $item = $child-><M::tc|NodeList.item> (0);
+
+        $test->id ('child.item.node');
+        $test->assert_isa ($item, <IFName::Node>);
+
+        $test->id ('child.item.pi');
+        $test->assert_isa ($item, <IFName::tx|ProcessingInstruction>);
+
+        $test->id ('child.item.equals');
+        $test->assert_equals ($item, $pi);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi);
+
+        $test->id ('parent');
+        my $parent = $item-><AG::Node.parentNode>;
+        $test->assert_equals ($parent, $dtd);
+
+        $test->id ('return');
+        $test->assert_equals ($return, $pi);
+    @@Test:
+      @@@QName: Entity.appendChild.1.5.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('dt');
+        my $pi = $doc-><M::Document.createCDATASection> ('pi');
+
+        my $return = $dtd-><M::Node.appendChild> ($pi);
+
+        my $child = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('child.length');
+        $test->assert_num_equals
+                 (actual_value => 0+@$child,
+                  expected_value => 1);
+
+        my $item = $child-><M::tc|NodeList.item> (0);
+
+        $test->id ('child.item.node');
+        $test->assert_isa ($item, <IFName::Node>);
+
+        $test->id ('child.item.pi');
+        $test->assert_isa ($item, <IFName::tx|CDATASection>);
+
+        $test->id ('child.item.equals');
+        $test->assert_equals ($item, $pi);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi);
+
+        $test->id ('parent');
+        my $parent = $item-><AG::Node.parentNode>;
+        $test->assert_equals ($parent, $dtd);
+
+        $test->id ('return');
+        $test->assert_equals ($return, $pi);
+    @@Test:
+      @@@QName: Entity.appendChild.1.6.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('dt');
+        my $pi = $doc-><M::Document.createComment> ('pi');
+
+        my $return = $dtd-><M::Node.appendChild> ($pi);
+
+        my $child = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('child.length');
+        $test->assert_num_equals
+                 (actual_value => 0+@$child,
+                  expected_value => 1);
+
+        my $item = $child-><M::tc|NodeList.item> (0);
+
+        $test->id ('child.item.node');
+        $test->assert_isa ($item, <IFName::Node>);
+
+        $test->id ('child.item.pi');
+        $test->assert_isa ($item, <IFName::tc|Comment>);
+
+        $test->id ('child.item.equals');
+        $test->assert_equals ($item, $pi);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi);
+
+        $test->id ('parent');
+        my $parent = $item-><AG::Node.parentNode>;
+        $test->assert_equals ($parent, $dtd);
+
+        $test->id ('return');
+        $test->assert_equals ($return, $pi);
+    @@Test:
+      @@@QName: Entity.insertBefore.1.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('dt');
+        my $pi = $doc-><M::Document.createTextNode> ('pi');
+
+        my $return = $dtd-><M::Node.insertBefore> ($pi);
+
+        my $child = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('child.length');
+        $test->assert_num_equals
+                 (actual_value => 0+@$child,
+                  expected_value => 1);
+
+        my $item = $child-><M::tc|NodeList.item> (0);
+
+        $test->id ('child.item.node');
+        $test->assert_isa ($item, <IFName::Node>);
+
+        $test->id ('child.item.pi');
+        $test->assert_isa ($item, <IFName::Text>);
+
+        $test->id ('child.item.equals');
+        $test->assert_equals ($item, $pi);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi);
+
+        $test->id ('parent');
+        my $parent = $item-><AG::Node.parentNode>;
+        $test->assert_equals ($parent, $dtd);
+
+        $test->id ('return');
+        $test->assert_equals ($return, $pi);
+    @@Test:
+      @@@QName: Entity.insertBefore.1.2.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('dt');
+        my $pi = $doc-><M::Document.createEntityReference> ('pi');
+
+        my $return = $dtd-><M::Node.insertBefore> ($pi);
+
+        my $child = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('child.length');
+        $test->assert_num_equals
+                 (actual_value => 0+@$child,
+                  expected_value => 1);
+
+        my $item = $child-><M::tc|NodeList.item> (0);
+
+        $test->id ('child.item.node');
+        $test->assert_isa ($item, <IFName::Node>);
+
+        $test->id ('child.item.pi');
+        $test->assert_isa ($item, <IFName::tx|EntityReference>);
+
+        $test->id ('child.item.equals');
+        $test->assert_equals ($item, $pi);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi);
+
+        $test->id ('parent');
+        my $parent = $item-><AG::Node.parentNode>;
+        $test->assert_equals ($parent, $dtd);
+
+        $test->id ('return');
+        $test->assert_equals ($return, $pi);
+    @@Test:
+      @@@QName: Entity.insertBefore.1.3.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('dt');
+        my $pi = $doc-><M::Document.createElement> ('pi');
+
+        my $return = $dtd-><M::Node.insertBefore> ($pi);
+
+        my $child = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('child.length');
+        $test->assert_num_equals
+                 (actual_value => 0+@$child,
+                  expected_value => 1);
+
+        my $item = $child-><M::tc|NodeList.item> (0);
+
+        $test->id ('child.item.node');
+        $test->assert_isa ($item, <IFName::Node>);
+
+        $test->id ('child.item.pi');
+        $test->assert_isa ($item, <IFName::tc|Element>);
+
+        $test->id ('child.item.equals');
+        $test->assert_equals ($item, $pi);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi);
+
+        $test->id ('parent');
+        my $parent = $item-><AG::Node.parentNode>;
+        $test->assert_equals ($parent, $dtd);
+
+        $test->id ('return');
+        $test->assert_equals ($return, $pi);
+    @@Test:
+      @@@QName: Entity.insertBefore.1.4.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('dt');
+        my $pi = $doc-><M::Document.createProcessingInstruction> ('pi');
+
+        my $return = $dtd-><M::Node.insertBefore> ($pi);
+
+        my $child = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('child.length');
+        $test->assert_num_equals
+                 (actual_value => 0+@$child,
+                  expected_value => 1);
+
+        my $item = $child-><M::tc|NodeList.item> (0);
+
+        $test->id ('child.item.node');
+        $test->assert_isa ($item, <IFName::Node>);
+
+        $test->id ('child.item.pi');
+        $test->assert_isa ($item, <IFName::tx|ProcessingInstruction>);
+
+        $test->id ('child.item.equals');
+        $test->assert_equals ($item, $pi);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi);
+
+        $test->id ('parent');
+        my $parent = $item-><AG::Node.parentNode>;
+        $test->assert_equals ($parent, $dtd);
+
+        $test->id ('return');
+        $test->assert_equals ($return, $pi);
+    @@Test:
+      @@@QName: Entity.insertBefore.1.5.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('dt');
+        my $pi = $doc-><M::Document.createCDATASection> ('pi');
+
+        my $return = $dtd-><M::Node.insertBefore> ($pi);
+
+        my $child = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('child.length');
+        $test->assert_num_equals
+                 (actual_value => 0+@$child,
+                  expected_value => 1);
+
+        my $item = $child-><M::tc|NodeList.item> (0);
+
+        $test->id ('child.item.node');
+        $test->assert_isa ($item, <IFName::Node>);
+
+        $test->id ('child.item.pi');
+        $test->assert_isa ($item, <IFName::tx|CDATASection>);
+
+        $test->id ('child.item.equals');
+        $test->assert_equals ($item, $pi);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi);
+
+        $test->id ('parent');
+        my $parent = $item-><AG::Node.parentNode>;
+        $test->assert_equals ($parent, $dtd);
+
+        $test->id ('return');
+        $test->assert_equals ($return, $pi);
+    @@Test:
+      @@@QName: Entity.insertBefore.1.6.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('dt');
+        my $pi = $doc-><M::Document.createComment> ('pi');
+
+        my $return = $dtd-><M::Node.insertBefore> ($pi);
+
+        my $child = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('child.length');
+        $test->assert_num_equals
+                 (actual_value => 0+@$child,
+                  expected_value => 1);
+
+        my $item = $child-><M::tc|NodeList.item> (0);
+
+        $test->id ('child.item.node');
+        $test->assert_isa ($item, <IFName::Node>);
+
+        $test->id ('child.item.pi');
+        $test->assert_isa ($item, <IFName::tc|Comment>);
+
+        $test->id ('child.item.equals');
+        $test->assert_equals ($item, $pi);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi);
+
+        $test->id ('parent');
+        my $parent = $item-><AG::Node.parentNode>;
+        $test->assert_equals ($parent, $dtd);
+
+        $test->id ('return');
+        $test->assert_equals ($return, $pi);
+
+    @@Test:
+      @@@QName: Entity.appendChild.has.parent.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('dt');
+
+        my $piparent = $doc-><M::Document.createElementNS> (null, 'e');
+        my $pi = $doc-><M::Document.createTextNode> ('pi');
+        $piparent-><M::Node.appendChild> ($pi);
+
+        my $return = $dtd-><M::Node.appendChild> ($pi);
+
+        my $child = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('child.length');
+        $test->assert_num_equals
+                 (actual_value => 0+@$child,
+                  expected_value => 1);
+
+        my $item = $child-><M::tc|NodeList.item> (0);
+
+        $test->id ('child.item.node');
+        $test->assert_isa ($item, <IFName::Node>);
+
+        $test->id ('child.item.pi');
+        $test->assert_isa ($item, <IFName::Text>);
+
+        $test->id ('child.item.equals');
+        $test->assert_equals ($item, $pi);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi);
+
+        $test->id ('parent');
+        my $parent = $item-><AG::Node.parentNode>;
+        $test->assert_equals ($parent, $dtd);
+
+        $test->id ('former.parent.child');
+        my $piparentchild = $piparent-><AG::Node.childNodes>;
+        $test->assert_num_equals
+                 (actual_value => 0+@$piparentchild,
+                  expected_value => 0);
+
+        $test->id ('return');
+        $test->assert_equals ($return, $pi);
+    @@Test:
+      @@@QName: Entity.appendChild.has.parent.1.2.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('dt');
+
+        my $piparent = $doc-><M::Document.createElementNS> (null, 'e');
+        my $pi = $doc-><M::Document.createEntityReference> ('pi');
+        $piparent-><M::Node.appendChild> ($pi);
+
+        my $return = $dtd-><M::Node.appendChild> ($pi);
+
+        my $child = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('child.length');
+        $test->assert_num_equals
+                 (actual_value => 0+@$child,
+                  expected_value => 1);
+
+        my $item = $child-><M::tc|NodeList.item> (0);
+
+        $test->id ('child.item.node');
+        $test->assert_isa ($item, <IFName::Node>);
+
+        $test->id ('child.item.pi');
+        $test->assert_isa ($item, <IFName::tx|EntityReference>);
+
+        $test->id ('child.item.equals');
+        $test->assert_equals ($item, $pi);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi);
+
+        $test->id ('parent');
+        my $parent = $item-><AG::Node.parentNode>;
+        $test->assert_equals ($parent, $dtd);
+
+        $test->id ('former.parent.child');
+        my $piparentchild = $piparent-><AG::Node.childNodes>;
+        $test->assert_num_equals
+                 (actual_value => 0+@$piparentchild,
+                  expected_value => 0);
+
+        $test->id ('return');
+        $test->assert_equals ($return, $pi);
+    @@Test:
+      @@@QName: Entity.insertBefore.has.parent.1.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('dt');
+
+        my $piparent = $doc-><M::Document.createElementNS> (null, 'e');
+        my $pi = $doc-><M::Document.createTextNode> ('pi');
+        $piparent-><M::Node.appendChild> ($pi);
+
+        my $return = $dtd-><M::Node.insertBefore> ($pi);
+
+        my $child = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('child.length');
+        $test->assert_num_equals
+                 (actual_value => 0+@$child,
+                  expected_value => 1);
+
+        my $item = $child-><M::tc|NodeList.item> (0);
+
+        $test->id ('child.item.node');
+        $test->assert_isa ($item, <IFName::Node>);
+
+        $test->id ('child.item.pi');
+        $test->assert_isa ($item, <IFName::Text>);
+
+        $test->id ('child.item.equals');
+        $test->assert_equals ($item, $pi);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi);
+
+        $test->id ('parent');
+        my $parent = $item-><AG::Node.parentNode>;
+        $test->assert_equals ($parent, $dtd);
+
+        $test->id ('former.parent.child');
+        my $piparentchild = $piparent-><AG::Node.childNodes>;
+        $test->assert_num_equals
+                 (actual_value => 0+@$piparentchild,
+                  expected_value => 0);
+
+        $test->id ('return');
+        $test->assert_equals ($return, $pi);
+    @@Test:
+      @@@QName: Entity.insertBefore.has.parent.1.2.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('dt');
+
+        my $piparent = $doc-><M::Document.createElementNS> (null, 'e');
+        my $pi = $doc-><M::Document.createEntityReference> ('pi');
+        $piparent-><M::Node.appendChild> ($pi);
+
+        my $return = $dtd-><M::Node.insertBefore> ($pi);
+
+        my $child = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('child.length');
+        $test->assert_num_equals
+                 (actual_value => 0+@$child,
+                  expected_value => 1);
+
+        my $item = $child-><M::tc|NodeList.item> (0);
+
+        $test->id ('child.item.node');
+        $test->assert_isa ($item, <IFName::Node>);
+
+        $test->id ('child.item.pi');
+        $test->assert_isa ($item, <IFName::tx|EntityReference>);
+
+        $test->id ('child.item.equals');
+        $test->assert_equals ($item, $pi);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi);
+
+        $test->id ('parent');
+        my $parent = $item-><AG::Node.parentNode>;
+        $test->assert_equals ($parent, $dtd);
+
+        $test->id ('former.parent.child');
+        my $piparentchild = $piparent-><AG::Node.childNodes>;
+        $test->assert_num_equals
+                 (actual_value => 0+@$piparentchild,
+                  expected_value => 0);
+
+        $test->id ('return');
+        $test->assert_equals ($return, $pi);
+
+    @@Test:
+      @@@QName: Entity.appendChild.documentfragment.1.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('dt');
+
+        my $piparent = $doc-><M::Document.createDocumentFragment>;
+        my $pi = $doc-><M::Document.createTextNode> ('pi');
+        $piparent-><M::Node.appendChild> ($pi);
+
+        my $return = $dtd-><M::Node.appendChild> ($piparent);
+
+        my $child = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('child.length');
+        $test->assert_num_equals
+                 (actual_value => 0+@$child,
+                  expected_value => 1);
+
+        my $item = $child-><M::tc|NodeList.item> (0);
+
+        $test->id ('child.item.node');
+        $test->assert_isa ($item, <IFName::Node>);
+
+        $test->id ('child.item.pi');
+        $test->assert_isa ($item, <IFName::Text>);
+
+        $test->id ('child.item.equals');
+        $test->assert_equals ($item, $pi);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi);
+
+        $test->id ('parent');
+        my $parent = $item-><AG::Node.parentNode>;
+        $test->assert_equals ($parent, $dtd);
+
+        $test->id ('former.parent.child');
+        my $piparentchild = $piparent-><AG::Node.childNodes>;
+        $test->assert_num_equals
+                 (actual_value => 0+@$piparentchild,
+                  expected_value => 0);
+
+        $test->id ('return');
+        $test->assert_equals ($return, $piparent);
+    @@Test:
+      @@@QName: Entity.appendChild.documentfragment.1.2.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('dt');
+
+        my $piparent = $doc-><M::Document.createDocumentFragment>;
+        my $pi = $doc-><M::Document.createEntityReference> ('pi');
+        $piparent-><M::Node.appendChild> ($pi);
+
+        my $return = $dtd-><M::Node.appendChild> ($piparent);
+
+        my $child = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('child.length');
+        $test->assert_num_equals
+                 (actual_value => 0+@$child,
+                  expected_value => 1);
+
+        my $item = $child-><M::tc|NodeList.item> (0);
+
+        $test->id ('child.item.node');
+        $test->assert_isa ($item, <IFName::Node>);
+
+        $test->id ('child.item.pi');
+        $test->assert_isa ($item, <IFName::tx|EntityReference>);
+
+        $test->id ('child.item.equals');
+        $test->assert_equals ($item, $pi);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi);
+
+        $test->id ('parent');
+        my $parent = $item-><AG::Node.parentNode>;
+        $test->assert_equals ($parent, $dtd);
+
+        $test->id ('former.parent.child');
+        my $piparentchild = $piparent-><AG::Node.childNodes>;
+        $test->assert_num_equals
+                 (actual_value => 0+@$piparentchild,
+                  expected_value => 0);
+
+        $test->id ('return');
+        $test->assert_equals ($return, $piparent);
+    @@Test:
+      @@@QName: Entity.insertBefore.documentfragment.1.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('dt');
+
+        my $piparent = $doc-><M::Document.createDocumentFragment>;
+        my $pi = $doc-><M::Document.createTextNode> ('pi');
+        $piparent-><M::Node.appendChild> ($pi);
+
+        my $return = $dtd-><M::Node.insertBefore> ($piparent);
+
+        my $child = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('child.length');
+        $test->assert_num_equals
+                 (actual_value => 0+@$child,
+                  expected_value => 1);
+
+        my $item = $child-><M::tc|NodeList.item> (0);
+
+        $test->id ('child.item.node');
+        $test->assert_isa ($item, <IFName::Node>);
+
+        $test->id ('child.item.pi');
+        $test->assert_isa ($item, <IFName::Text>);
+
+        $test->id ('child.item.equals');
+        $test->assert_equals ($item, $pi);
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi);
+
+        $test->id ('parent');
+        my $parent = $item-><AG::Node.parentNode>;
+        $test->assert_equals ($parent, $dtd);
+
+        $test->id ('former.parent.child');
+        my $piparentchild = $piparent-><AG::Node.childNodes>;
+        $test->assert_num_equals
+                 (actual_value => 0+@$piparentchild,
+                  expected_value => 0);
+
+        $test->id ('return');
+        $test->assert_equals ($return, $piparent);
+    @@Test:
+      @@@QName: Entity.insertBefore.documentfragment.1.2.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('dt');
+
+        my $piparent = $doc-><M::Document.createDocumentFragment>;
+        my $pi = $doc-><M::Document.createEntityReference> ('pi');
+        $piparent-><M::Node.appendChild> ($pi);
+
+        my $return = $dtd-><M::Node.insertBefore> ($piparent);
+
+        my $child = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('child.length');
+        $test->assert_num_equals
+                 (actual_value => 0+@$child,
+                  expected_value => 1);
+
+        my $item = $child-><M::tc|NodeList.item> (0);
+
+        $test->id ('child.item.node');
+        $test->assert_isa ($item, <IFName::Node>);
+
+        $test->id ('child.item.pi');
+        $test->assert_isa ($item, <IFName::tx|EntityReference>);
+
+        $test->id ('child.item.equals');
+        $test->assert_equals ($item, $pi);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi);
+
+        $test->id ('parent');
+        my $parent = $item-><AG::Node.parentNode>;
+        $test->assert_equals ($parent, $dtd);
+
+        $test->id ('former.parent.child');
+        my $piparentchild = $piparent-><AG::Node.childNodes>;
+        $test->assert_num_equals
+                 (actual_value => 0+@$piparentchild,
+                  expected_value => 0);
+
+        $test->id ('return');
+        $test->assert_equals ($return, $piparent);
+    @@Test:
+      @@@QName: Entity.replaceChild.documentfragment.1.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('dt');
+        my $pi0 = $doc-><M::Document.createTextNode> ('pi0');
+        $dtd-><M::Node.appendChild> ($pi0);
+
+        my $piparent = $doc-><M::Document.createDocumentFragment>;
+        my $pi = $doc-><M::Document.createTextNode> ('pi');
+        $piparent-><M::Node.appendChild> ($pi);
+
+        my $return = $dtd-><M::Node.replaceChild> ($piparent, $pi0);
+
+        my $child = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('child.length');
+        $test->assert_num_equals
+                 (actual_value => 0+@$child,
+                  expected_value => 1);
+
+        my $item = $child-><M::tc|NodeList.item> (0);
+
+        $test->id ('child.item.node');
+        $test->assert_isa ($item, <IFName::Node>);
+
+        $test->id ('child.item.pi');
+        $test->assert_isa ($item, <IFName::Text>);
+
+        $test->id ('child.item.equals');
+        $test->assert_equals ($item, $pi);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi);
+
+        $test->id ('parent');
+        my $parent = $item-><AG::Node.parentNode>;
+        $test->assert_equals ($parent, $dtd);
+
+        $test->id ('former.parent.child');
+        my $piparentchild = $piparent-><AG::Node.childNodes>;
+        $test->assert_num_equals
+                 (actual_value => 0+@$piparentchild,
+                  expected_value => 0);
+
+        $test->id ('return');
+        $test->assert_equals ($return, $pi0);
+    @@Test:
+      @@@QName: Entity.replaceChild.documentfragment.1.2.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('dt');
+        my $pi0 = $doc-><M::Document.createTextNode> ('pi0');
+        $dtd-><M::Node.appendChild> ($pi0);
+
+        my $piparent = $doc-><M::Document.createDocumentFragment>;
+        my $pi = $doc-><M::Document.createEntityReference> ('pi');
+        $piparent-><M::Node.appendChild> ($pi);
+
+        my $return = $dtd-><M::Node.replaceChild> ($piparent, $pi0);
+
+        my $child = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('child.length');
+        $test->assert_num_equals
+                 (actual_value => 0+@$child,
+                  expected_value => 1);
+
+        my $item = $child-><M::tc|NodeList.item> (0);
+
+        $test->id ('child.item.node');
+        $test->assert_isa ($item, <IFName::Node>);
+
+        $test->id ('child.item.pi');
+        $test->assert_isa ($item, <IFName::tx|EntityReference>);
+
+        $test->id ('child.item.equals');
+        $test->assert_equals ($item, $pi);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi);
+
+        $test->id ('parent');
+        my $parent = $item-><AG::Node.parentNode>;
+        $test->assert_equals ($parent, $dtd);
+
+        $test->id ('former.parent.child');
+        my $piparentchild = $piparent-><AG::Node.childNodes>;
+        $test->assert_num_equals
+                 (actual_value => 0+@$piparentchild,
+                  expected_value => 0);
+
+        $test->id ('return');
+        $test->assert_equals ($return, $pi0);
+
+    @@Test:
+      @@@QName: Entity.appendChild.documentfragment.2.1.test
+      @@@enDesc:
+        Empty document fragment.
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('dt');
+
+        my $piparent = $doc-><M::Document.createDocumentFragment>;
+
+        my $return = $dtd-><M::Node.appendChild> ($piparent);
+
+        my $child = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('child.length');
+        $test->assert_num_equals
+                 (actual_value => 0+@$child,
+                  expected_value => 0);
+
+        $test->id ('former.parent.child');
+        my $piparentchild = $piparent-><AG::Node.childNodes>;
+        $test->assert_num_equals
+                 (actual_value => 0+@$piparentchild,
+                  expected_value => 0);
+
+        $test->id ('return');
+        $test->assert_equals ($return, $piparent);
+    @@Test:
+      @@@QName: Entity.insertBefore.documentfragment.2.test
+      @@@enDesc:
+        Empty document fragment.
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('dt');
+
+        my $piparent = $doc-><M::Document.createDocumentFragment>;
+
+        my $return = $dtd-><M::Node.insertBefore> ($piparent);
+
+        my $child = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('child.length');
+        $test->assert_num_equals
+                 (actual_value => 0+@$child,
+                  expected_value => 0);
+
+        $test->id ('former.parent.child');
+        my $piparentchild = $piparent-><AG::Node.childNodes>;
+        $test->assert_num_equals
+                 (actual_value => 0+@$piparentchild,
+                  expected_value => 0);
+
+        $test->id ('return');
+        $test->assert_equals ($return, $piparent);
+    @@Test:
+      @@@QName: Entity.replaceChild.documentfragment.2.test
+      @@@enDesc:
+        Empty document fragment.
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('dt');
+        my $pi0 = $doc-><M::Document.createTextNode> ('pi0');
+        $dtd-><M::Node.appendChild> ($pi0);
+
+        my $piparent = $doc-><M::Document.createDocumentFragment>;
+
+        my $return = $dtd-><M::Node.replaceChild> ($piparent, $pi0);
+
+        my $child = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('child.length');
+        $test->assert_num_equals
+                 (actual_value => 0+@$child,
+                  expected_value => 0);
+
+        $test->id ('former.parent.child');
+        my $piparentchild = $piparent-><AG::Node.childNodes>;
+        $test->assert_num_equals
+                 (actual_value => 0+@$piparentchild,
+                  expected_value => 0);
+
+        $test->id ('return');
+        $test->assert_equals ($return, $pi0);
+
+    @@Test:
+      @@@QName: Entity.appendChild.documentfragment.3.test
+      @@@enDesc:
+        Three PIs in document fragment.
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('dt');
+
+        my $piparent = $doc-><M::Document.createDocumentFragment>;
+        my $pi = $doc-><M::Document.createTextNode> ('pi');
+        my $pi2 = $doc-><M::Document.createEntityReference> ('pi2');
+        my $pi3 = $doc-><M::Document.createTextNode> ('pi3');
+        $piparent-><M::Node.appendChild> ($pi);
+        $piparent-><M::Node.appendChild> ($pi2);
+        $piparent-><M::Node.appendChild> ($pi3);
+
+        my $return = $dtd-><M::Node.appendChild> ($piparent);
+
+        my $child = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('child.length');
+        $test->assert_num_equals
+                 (actual_value => 0+@$child,
+                  expected_value => 3);
+
+        my $item = $child-><M::tc|NodeList.item> (0);
+        my $item2 = $child-><M::tc|NodeList.item> (1);
+        my $item3 = $child-><M::tc|NodeList.item> (2);
+
+        $test->id ('child.item.node');
+        $test->assert_isa ($item, <IFName::Node>);
+        $test->id ('child.item.node2');
+        $test->assert_isa ($item2, <IFName::Node>);
+        $test->id ('child.item.node3');
+        $test->assert_isa ($item3, <IFName::Node>);
+
+        $test->id ('child.item.pi');
+        $test->assert_isa ($item, <IFName::Text>);
+        $test->id ('child.item.pi2');
+        $test->assert_isa ($item2, <IFName::tx|EntityReference>);
+        $test->id ('child.item.pi3');
+        $test->assert_isa ($item3, <IFName::Text>);
+
+        $test->id ('child.item.equals');
+        $test->assert_equals ($item, $pi);
+        $test->id ('child.item.equals2');
+        $test->assert_equals ($item2, $pi2);
+        $test->id ('child.item.equals3');
+        $test->assert_equals ($item3, $pi3);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi3);
+
+        $test->id ('parent');
+        my $parent = $item-><AG::Node.parentNode>;
+        $test->assert_equals ($parent, $dtd);
+        $test->id ('parent2');
+        my $parent2 = $item2-><AG::Node.parentNode>;
+        $test->assert_equals ($parent2, $dtd);
+        $test->id ('parent3');
+        my $parent3 = $item3-><AG::Node.parentNode>;
+        $test->assert_equals ($parent3, $dtd);
+
+        $test->id ('former.parent.child');
+        my $piparentchild = $piparent-><AG::Node.childNodes>;
+        $test->assert_num_equals
+                 (actual_value => 0+@$piparentchild,
+                  expected_value => 0);
+
+        $test->id ('return');
+        $test->assert_equals ($return, $piparent);
+    @@Test:
+      @@@QName: Entity.insertBefore.documentfragment.3.test
+      @@@enDesc:
+        Three PIs in document fragment.
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('dt');
+
+        my $piparent = $doc-><M::Document.createDocumentFragment>;
+        my $pi = $doc-><M::Document.createTextNode> ('pi');
+        my $pi2 = $doc-><M::Document.createEntityReference> ('pi2');
+        my $pi3 = $doc-><M::Document.createTextNode> ('pi3');
+        $piparent-><M::Node.appendChild> ($pi);
+        $piparent-><M::Node.appendChild> ($pi2);
+        $piparent-><M::Node.appendChild> ($pi3);
+
+        my $return = $dtd-><M::Node.insertBefore> ($piparent);
+
+        my $child = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('child.length');
+        $test->assert_num_equals
+                 (actual_value => 0+@$child,
+                  expected_value => 3);
+
+        my $item = $child-><M::tc|NodeList.item> (0);
+        my $item2 = $child-><M::tc|NodeList.item> (1);
+        my $item3 = $child-><M::tc|NodeList.item> (2);
+
+        $test->id ('child.item.node');
+        $test->assert_isa ($item, <IFName::Node>);
+        $test->id ('child.item.node2');
+        $test->assert_isa ($item2, <IFName::Node>);
+        $test->id ('child.item.node3');
+        $test->assert_isa ($item3, <IFName::Node>);
+
+        $test->id ('child.item.pi');
+        $test->assert_isa ($item, <IFName::Text>);
+        $test->id ('child.item.pi2');
+        $test->assert_isa ($item2, <IFName::tx|EntityReference>);
+        $test->id ('child.item.pi3');
+        $test->assert_isa ($item3, <IFName::Text>);
+
+        $test->id ('child.item.equals');
+        $test->assert_equals ($item, $pi);
+        $test->id ('child.item.equals2');
+        $test->assert_equals ($item2, $pi2);
+        $test->id ('child.item.equals3');
+        $test->assert_equals ($item3, $pi3);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi3);
+
+        $test->id ('parent');
+        my $parent = $item-><AG::Node.parentNode>;
+        $test->assert_equals ($parent, $dtd);
+        $test->id ('parent2');
+        my $parent2 = $item2-><AG::Node.parentNode>;
+        $test->assert_equals ($parent2, $dtd);
+        $test->id ('parent3');
+        my $parent3 = $item3-><AG::Node.parentNode>;
+        $test->assert_equals ($parent3, $dtd);
+
+        $test->id ('former.parent.child');
+        my $piparentchild = $piparent-><AG::Node.childNodes>;
+        $test->assert_num_equals
+                 (actual_value => 0+@$piparentchild,
+                  expected_value => 0);
+
+        $test->id ('return');
+        $test->assert_equals ($return, $piparent);
+    @@Test:
+      @@@QName: Entity.replaceChild.documentfragment.3.test
+      @@@enDesc:
+        Three PIs in document fragment.
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('dt');
+        my $pi0 = $doc-><M::Document.createTextNode> ('pi0');
+        $dtd-><M::Node.appendChild> ($pi0);
+
+        my $piparent = $doc-><M::Document.createDocumentFragment>;
+        my $pi = $doc-><M::Document.createTextNode> ('pi');
+        my $pi2 = $doc-><M::Document.createEntityReference> ('pi2');
+        my $pi3 = $doc-><M::Document.createTextNode> ('pi3');
+        $piparent-><M::Node.appendChild> ($pi);
+        $piparent-><M::Node.appendChild> ($pi2);
+        $piparent-><M::Node.appendChild> ($pi3);
+
+        my $return = $dtd-><M::Node.replaceChild> ($piparent, $pi0);
+
+        my $child = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('child.length');
+        $test->assert_num_equals
+                 (actual_value => 0+@$child,
+                  expected_value => 3);
+
+        my $item = $child-><M::tc|NodeList.item> (0);
+        my $item2 = $child-><M::tc|NodeList.item> (1);
+        my $item3 = $child-><M::tc|NodeList.item> (2);
+
+        $test->id ('child.item.node');
+        $test->assert_isa ($item, <IFName::Node>);
+        $test->id ('child.item.node2');
+        $test->assert_isa ($item2, <IFName::Node>);
+        $test->id ('child.item.node3');
+        $test->assert_isa ($item3, <IFName::Node>);
+
+        $test->id ('child.item.pi');
+        $test->assert_isa ($item, <IFName::Text>);
+        $test->id ('child.item.pi2');
+        $test->assert_isa ($item2, <IFName::tx|EntityReference>);
+        $test->id ('child.item.pi3');
+        $test->assert_isa ($item3, <IFName::Text>);
+
+        $test->id ('child.item.equals');
+        $test->assert_equals ($item, $pi);
+        $test->id ('child.item.equals2');
+        $test->assert_equals ($item2, $pi2);
+        $test->id ('child.item.equals3');
+        $test->assert_equals ($item3, $pi3);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi3);
+
+        $test->id ('parent');
+        my $parent = $item-><AG::Node.parentNode>;
+        $test->assert_equals ($parent, $dtd);
+        $test->id ('parent2');
+        my $parent2 = $item2-><AG::Node.parentNode>;
+        $test->assert_equals ($parent2, $dtd);
+        $test->id ('parent3');
+        my $parent3 = $item3-><AG::Node.parentNode>;
+        $test->assert_equals ($parent3, $dtd);
+
+        $test->id ('former.parent.child');
+        my $piparentchild = $piparent-><AG::Node.childNodes>;
+        $test->assert_num_equals
+                 (actual_value => 0+@$piparentchild,
+                  expected_value => 0);
+
+        $test->id ('return');
+        $test->assert_equals ($return, $pi0);
+
+    @@Test:
+      @@@QName: Entity.appendChild.badtype.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $comment = $docx-><M::DocumentXDoctype.createGeneralEntity>
+                               ('data');
+        my $pi0 = $doc-><M::Document.createTextNode> ('pi0');
+        $comment-><M::Node.appendChild> ($pi0);
+
+        for my $node (
+          $docx-><M::d|DocumentXDoctype.createDocumentTypeDefinition> ('d'),
+          $doc-><M::Document.createAttribute> ('a'),
+          $docx-><M::d|DocumentXDoctype.createGeneralEntity> ('ge'),
+          $docx-><M::d|DocumentXDoctype.createNotation> ('not'),
+          $docx-><M::d|DocumentXDoctype.createElementTypeDefinition> ('et'),
+          $docx-><M::d|DocumentXDoctype.createAttributeDefinition> ('at'),
+          #test:nodeTypes
+        ) {
+          $test->id ('appendChild.'.$node-><AG::Node.nodeType>);
+          $test->assert_exception (code => sub {
+            $comment-><M::Node.appendChild> ($node);
+          }, exception_subtype => <Q::MDOMX|HIERARCHY_BAD_TYPE>);
+
+          $test->id ('insertBefore.'.$node-><AG::Node.nodeType>);
+          $test->assert_exception (code => sub {
+            $comment-><M::Node.insertBefore> ($node);
+          }, exception_subtype => <Q::MDOMX|HIERARCHY_BAD_TYPE>);
+
+          $test->id ('replaceChild.'.$node-><AG::Node.nodeType>);
+          $test->assert_exception (code => sub {
+            $comment-><M::Node.replaceChild> ($node, $pi0);
+          }, exception_subtype => <Q::MDOMX|HIERARCHY_BAD_TYPE>);
+        }
+
+    @@Test:
+      @@@QName: Entity.appendChild.wrongdoc.test
+      @@@PerlDef:
+        my $doc0;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc0}__;
+        my $docx0 = $doc0-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+        my $comment = $docx0-><M::DocumentXDoctype.createGeneralEntity>
+                                ('data');
+
+        for my $node (
+          $doc-><M::Document.createTextNode> ('pi'),
+          $doc-><M::Document.createEntityReference> ('e'),
+          $doc-><M::Document.createComment> ('c'),
+          $doc-><M::Document.createCDATASection> ('cs'),
+          $doc-><M::Document.createProcessingInstruction> ('pi'),
+          $doc-><M::Document.createElement> ('el'),
+        ) {
+          $test->id ('type='.$node-><AG::Node.nodeType>);
+          $test->assert_exception (code => sub {
+            $comment-><M::Node.appendChild> ($node);
+          }, exception_subtype => <Q::c|DIFFERENT_DOCUMENT_ERR>);
+        }
+    @@Test:
+      @@@QName: Entity.insertBefore.wrongdoc.test
+      @@@PerlDef:
+        my $doc0;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc0}__;
+        my $docx0 = $doc0-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+        my $comment = $docx0-><M::DocumentXDoctype.createGeneralEntity>
+                                ('data');
+        my $pi0 = $doc0-><M::Document.createTextNode> ('pi0');
+        $comment-><M::Node.appendChild> ($pi0);
+
+        for my $node (
+          $doc-><M::Document.createTextNode> ('pi'),
+          $doc-><M::Document.createEntityReference> ('ent'),
+          $doc-><M::Document.createComment> ('c'),
+          $doc-><M::Document.createCDATASection> ('cs'),
+          $doc-><M::Document.createProcessingInstruction> ('pi'),
+          $doc-><M::Document.createElement> ('el'),
+        ) {
+          $test->id ('appendChild.'.$node-><AG::Node.nodeType>);
+          $test->assert_exception (code => sub {
+            $comment-><M::Node.appendChild> ($node);
+          }, exception_subtype => <Q::c|DIFFERENT_DOCUMENT_ERR>);
+
+          $test->id ('insertBefore.'.$node-><AG::Node.nodeType>);
+          $test->assert_exception (code => sub {
+            $comment-><M::Node.insertBefore> ($node);
+          }, exception_subtype => <Q::c|DIFFERENT_DOCUMENT_ERR>);
+
+          $test->id ('replaceChild.'.$node-><AG::Node.nodeType>);
+          $test->assert_exception (code => sub {
+            $comment-><M::Node.replaceChild> ($node, $pi0);
+          }, exception_subtype => <Q::c|DIFFERENT_DOCUMENT_ERR>);
+        }
+
+    @@Test:
+      @@@QName: Entity.appendChild.readonly.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('d');
+        my $pi0 = $doc-><M::Document.createTextNode> ('pi0');
+        $dtd-><M::Node.appendChild> ($pi0);
+        $dtd-><M::Node.manakaiSetReadOnly> (true);
+
+        $test->id ('pi');
+        my $node = $doc-><M::Document.createTextNode> ('pi');
+
+        $test->assert_exception (code => sub {
+          $dtd-><M::Node.appendChild> ($node);
+        }, exception_subtype => <Q::MDOMX|NOMOD_THIS>);
+
+        $test->id ('pi.insertBefore');
+        $test->assert_exception (code => sub {
+          $dtd-><M::Node.insertBefore> ($node);
+        }, exception_subtype => <Q::MDOMX|NOMOD_THIS>);
+
+        $test->id ('pi.replaceChild');
+        $test->assert_exception (code => sub {
+          $dtd-><M::Node.replaceChild> ($node, $pi0);
+        }, exception_subtype => <Q::MDOMX|NOMOD_THIS>);
+
+        $test->id ('fragment');
+        my $node2 = $doc-><M::Document.createDocumentFragment>;
+        $node2-><M::Node.appendChild> ($node);
+
+        $test->assert_exception (code => sub {
+          $dtd-><M::Node.appendChild> ($node2);
+        }, exception_subtype => <Q::MDOMX|NOMOD_THIS>);
+
+        $test->id ('fragment.insertBefore');
+        $test->assert_exception (code => sub {
+          $dtd-><M::Node.insertBefore> ($node2);
+        }, exception_subtype => <Q::MDOMX|NOMOD_THIS>);
+
+        $test->id ('fragment.replaceChild');
+        $test->assert_exception (code => sub {
+          $dtd-><M::Node.replaceChild> ($node2, $pi0);
+        }, exception_subtype => <Q::MDOMX|NOMOD_THIS>);
+
+    @@Test:
+      @@@QName: Entity.appendChild.readonly.2.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('d');
+        my $pi0 = $doc-><M::Document.createTextNode> ('pi0');
+        $dtd-><M::Node.appendChild> ($pi0);
+
+        $test->id ('pi');
+        my $el = $doc-><M::Document.createElementNS> (null, 'e');
+        my $node = $doc-><M::Document.createTextNode> ('pi');
+        $el-><M::Node.appendChild> ($node);
+        $el-><M::Node.manakaiSetReadOnly> (true);
+
+        $test->assert_exception (code => sub {
+          $dtd-><M::Node.appendChild> ($node);
+        }, exception_subtype => <Q::MDOMX|NOMOD_SRC_PARENT>);
+
+        $test->id ('pi.insertBefore');
+        $test->assert_exception (code => sub {
+          $dtd-><M::Node.insertBefore> ($node);
+        }, exception_subtype => <Q::MDOMX|NOMOD_SRC_PARENT>);
+
+        $test->id ('pi.replaceChild');
+        $test->assert_exception (code => sub {
+          $dtd-><M::Node.replaceChild> ($node, $pi0);
+        }, exception_subtype => <Q::MDOMX|NOMOD_SRC_PARENT>);
+
+        $test->id ('fragment');
+        my $node2 = $doc-><M::Document.createDocumentFragment>;
+        my $node3 = $doc-><M::Document.createTextNode> ('pi');
+        $node2-><M::Node.appendChild> ($node3);
+        $node2-><M::Node.manakaiSetReadOnly> (true);
+
+        $test->assert_exception (code => sub {
+          $dtd-><M::Node.appendChild> ($node2);
+        }, exception_subtype => <Q::MDOMX|NOMOD_SRC_PARENT>);
+
+        $test->id ('fragment.insertBefore');
+        $test->assert_exception (code => sub {
+          $dtd-><M::Node.insertBefore> ($node2);
+        }, exception_subtype => <Q::MDOMX|NOMOD_SRC_PARENT>);
+
+        $test->id ('fragment.replaceChild');
+        $test->assert_exception (code => sub {
+          $dtd-><M::Node.replaceChild> ($node2, $pi0);
+        }, exception_subtype => <Q::MDOMX|NOMOD_SRC_PARENT>);
+
+    @@Test:
+      @@@QName: Entity.insertBefore.refChild.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('d');
+
+        my $pi1 = $doc-><M::Document.createTextNode> ('pi1');
+        $dtd-><M::Node.appendChild> ($pi1);
+
+        my $pi2 = $doc-><M::Document.createTextNode> ('pi2');
+        $dtd-><M::Node.insertBefore> ($pi2, $pi1);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi2);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi1);
+
+        $test->id ('length');
+        $test->assert_num_equals
+                 (actual_value => 0+@{$dtd-><AG::Node.childNodes>},
+                  expected_value => 2);
+
+    @@Test:
+      @@@QName: Entity.insertBefore.refChild.2.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('d');
+
+        my $pi1 = $doc-><M::Document.createTextNode> ('pi1');
+        $dtd-><M::Node.appendChild> ($pi1);
+
+        my $pi2 = $doc-><M::Document.createTextNode> ('pi2');
+        $dtd-><M::Node.appendChild> ($pi2);
+
+        my $pi3 = $doc-><M::Document.createTextNode> ('pi3');
+        $dtd-><M::Node.insertBefore> ($pi3, $pi2);
+
+        # pi1, pi3, pi2
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi1);
+
+        $test->id ('firstChild.nextSibling');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>
+                                  -><AG::Node.nextSibling>, $pi3);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi2);
+
+        $test->id ('length');
+        $test->assert_num_equals
+                 (actual_value => 0+@{$dtd-><AG::Node.childNodes>},
+                  expected_value => 3);
+
+    @@Test:
+      @@@QName: Entity.insertBefore.refChild.3.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('d');
+
+        my $pi1 = $doc-><M::Document.createTextNode> ('pi1');
+        $dtd-><M::Node.appendChild> ($pi1);
+
+        my $pi2 = $doc-><M::Document.createTextNode> ('pi2');
+        $dtd-><M::Node.appendChild> ($pi2);
+
+        my $pi3 = $doc-><M::Document.createTextNode> ('pi3');
+        $dtd-><M::Node.appendChild> ($pi3);
+
+        # pi1, pi2, pi3
+
+        $dtd-><M::Node.insertBefore> ($pi2, $pi1);
+ 
+        # pi2, pi1, pi3
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi2);
+
+        $test->id ('firstChild.nextSibling');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>
+                                  -><AG::Node.nextSibling>, $pi1);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi3);
+
+        $test->id ('length');
+        $test->assert_num_equals
+                 (actual_value => 0+@{$dtd-><AG::Node.childNodes>},
+                  expected_value => 3);
+
+    @@Test:
+      @@@QName: Entity.insertBefore.refChild.4.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('d');
+
+        my $pi1 = $doc-><M::Document.createTextNode> ('pi1');
+        $dtd-><M::Node.appendChild> ($pi1);
+
+        my $pi2 = $doc-><M::Document.createTextNode> ('pi2');
+        $dtd-><M::Node.appendChild> ($pi2);
+
+        my $pi3 = $doc-><M::Document.createTextNode> ('pi3');
+        $dtd-><M::Node.appendChild> ($pi3);
+
+        # pi1, pi2, pi3
+
+        $dtd-><M::Node.insertBefore> ($pi3, $pi1);
+ 
+        # pi3, pi1, pi2
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi3);
+
+        $test->id ('firstChild.nextSibling');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>
+                                  -><AG::Node.nextSibling>, $pi1);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi2);
+
+        $test->id ('length');
+        $test->assert_num_equals
+                 (actual_value => 0+@{$dtd-><AG::Node.childNodes>},
+                  expected_value => 3);
+
+    @@Test:
+      @@@QName: Entity.insertBefore.refChild.not_found_err.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('d');
+
+        my $pi1 = $doc-><M::Document.createTextNode> ('pi1');
+        $dtd-><M::Node.appendChild> ($pi1);
+
+        my $pi2 = $doc-><M::Document.createTextNode> ('pi2');
+        $dtd-><M::Node.appendChild> ($pi2);
+
+        my $pi3 = $doc-><M::Document.createTextNode> ('pi3');
+
+        my $pi4 = $doc-><M::Document.createTextNode> ('pi4');
+
+        # pi1, pi2
+
+        $test->assert_exception (code => sub {
+          $dtd-><M::Node.insertBefore> ($pi4, $pi3);
+        }, exception_subtype => <Q::c|NOT_CHILD_ERR>);
+
+    @@Test:
+      @@@QName: Entity.insertBefore.refChild=newChild.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('d');
+
+        my $pi1 = $doc-><M::Document.createTextNode> ('pi1');
+        $dtd-><M::Node.appendChild> ($pi1);
+
+        my $pi2 = $doc-><M::Document.createTextNode> ('pi2');
+        $dtd-><M::Node.appendChild> ($pi2);
+
+        # pi1, pi2
+
+        my $eh_called = false;
+        my $cfg = $doc-><AG::Document.domConfig>;
+        $cfg-><M::c|DOMConfiguration.setParameter> ('error-handler' => sub {
+          my (undef, $err) = @_;
+          $eh_called = true;
+          $test->assert_equals ($err-><AG::c|DOMError.severity>,
+                                <C::c|DOMError.SEVERITY_WARNING>);
+          $test->assert_equals ($err-><AG::c|DOMError.type>,
+                                <Q::t|insert-before-itself>);
+          $test->assert_equals ($err-><AG::c|DOMError.relatedData>, $pi2);
+          $test->assert_null ($err-><AG::c|DOMError.relatedException>);
+          $test->assert_isa ($err-><AG::c|DOMError.location>,
+                             <IFName::c|DOMLocator>);
+          $test->assert_not_null ($err-><AG::c|DOMError.message>);
+        });
+
+        $test->assert_false ($eh_called);
+        $dtd-><M::Node.insertBefore> ($pi2, $pi2);
+        $test->assert_true ($eh_called);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi1);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi2);
+
+        $test->id ('length');
+        $test->assert_num_equals
+                 (actual_value => 0+@{$dtd-><AG::Node.childNodes>},
+                  expected_value => 2);
+
+    @@Test:
+      @@@QName: Entity.replaceChild.oldChild=newChild.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('d');
+
+        my $pi1 = $doc-><M::Document.createTextNode> ('pi1');
+        $dtd-><M::Node.appendChild> ($pi1);
+
+        my $pi2 = $doc-><M::Document.createTextNode> ('pi2');
+        $dtd-><M::Node.appendChild> ($pi2);
+
+        # pi1, pi2
+
+        my $eh_called = false;
+        my $cfg = $doc-><AG::Document.domConfig>;
+        $cfg-><M::c|DOMConfiguration.setParameter> ('error-handler' => sub {
+          my (undef, $err) = @_;
+          $eh_called = true;
+          $test->assert_equals ($err-><AG::c|DOMError.severity>,
+                                <C::c|DOMError.SEVERITY_WARNING>);
+          $test->assert_equals ($err-><AG::c|DOMError.type>,
+                                <Q::t|replace-by-itself>);
+          $test->assert_equals ($err-><AG::c|DOMError.relatedData>, $pi2);
+          $test->assert_null ($err-><AG::c|DOMError.relatedException>);
+          $test->assert_isa ($err-><AG::c|DOMError.location>,
+                             <IFName::c|DOMLocator>);
+          $test->assert_not_null ($err-><AG::c|DOMError.message>);
+        });
+
+        $test->assert_false ($eh_called);
+        $dtd-><M::Node.replaceChild> ($pi2, $pi2);
+        $test->assert_true ($eh_called);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi1);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi2);
+
+        $test->id ('length');
+        $test->assert_num_equals
+                 (actual_value => 0+@{$dtd-><AG::Node.childNodes>},
+                  expected_value => 2);
+
+    @@Test:
+      @@@QName: Entity.appendChild.sameparent.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('d');
+
+        my $pi1 = $doc-><M::Document.createTextNode> ('pi1');
+        $dtd-><M::Node.appendChild> ($pi1);
+
+        my $pi2 = $doc-><M::Document.createTextNode> ('pi2');
+        $dtd-><M::Node.appendChild> ($pi2);
+
+        # pi1, pi2
+
+        my $return = $dtd-><M::Node.appendChild> ($pi1);
+
+        # pi2, pi1
+
+        $test->id ('return');
+        $test->assert_equals ($return, $pi1);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi2);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi1);
+
+        $test->id ('length');
+        $test->assert_num_equals
+                 (actual_value => 0+@{$dtd-><AG::Node.childNodes>},
+                  expected_value => 2);
+
+    @@Test:
+      @@@QName: Entity.insertBefore.sameparent.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('d');
+
+        my $pi1 = $doc-><M::Document.createTextNode> ('pi1');
+        $dtd-><M::Node.appendChild> ($pi1);
+
+        my $pi2 = $doc-><M::Document.createTextNode> ('pi2');
+        $dtd-><M::Node.appendChild> ($pi2);
+
+        # pi1, pi2
+
+        my $return = $dtd-><M::Node.insertBefore> ($pi1);
+
+        # pi2, pi1
+
+        $test->id ('return');
+        $test->assert_equals ($return, $pi1);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi2);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi1);
+
+        $test->id ('length');
+        $test->assert_num_equals
+                 (actual_value => 0+@{$dtd-><AG::Node.childNodes>},
+                  expected_value => 2);
+
+    @@Test:
+      @@@QName: Entity.appendChild.sameparent.2.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('d');
+
+        my $pi1 = $doc-><M::Document.createTextNode> ('pi1');
+        $dtd-><M::Node.appendChild> ($pi1);
+
+        my $pi2 = $doc-><M::Document.createTextNode> ('pi2');
+        $dtd-><M::Node.appendChild> ($pi2);
+
+        # pi1, pi2
+
+        my $return = $dtd-><M::Node.appendChild> ($pi2);
+
+        # pi1, pi2
+
+        $test->id ('return');
+        $test->assert_equals ($return, $pi2);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi1);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi2);
+
+        $test->id ('length');
+        $test->assert_num_equals
+                 (actual_value => 0+@{$dtd-><AG::Node.childNodes>},
+                  expected_value => 2);
+
+    @@Test:
+      @@@QName: Entity.insertBefore.sameparent.2.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('d');
+
+        my $pi1 = $doc-><M::Document.createTextNode> ('pi1');
+        $dtd-><M::Node.appendChild> ($pi1);
+
+        my $pi2 = $doc-><M::Document.createTextNode> ('pi2');
+        $dtd-><M::Node.appendChild> ($pi2);
+
+        # pi1, pi2
+
+        my $return = $dtd-><M::Node.insertBefore> ($pi2);
+
+        # pi1, pi2
+
+        $test->id ('return');
+        $test->assert_equals ($return, $pi2);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi1);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi2);
+
+        $test->id ('length');
+        $test->assert_num_equals
+                 (actual_value => 0+@{$dtd-><AG::Node.childNodes>},
+                  expected_value => 2);
+
+    @@Test:
+      @@@QName: Entity.replaceChild.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('d');
+
+        my $pi1 = $doc-><M::Document.createTextNode> ('pi1');
+        $dtd-><M::Node.appendChild> ($pi1);
+
+        my $pi2 = $doc-><M::Document.createTextNode> ('pi2');
+        $dtd-><M::Node.appendChild> ($pi2);
+
+        my $pi3 = $doc-><M::Document.createTextNode> ('pi3');
+        $dtd-><M::Node.appendChild> ($pi3);
+
+        # pi1, pi2, pi3
+
+        my $pi9 = $doc-><M::Document.createTextNode> ('pi9');
+        my $return = $dtd-><M::Node.replaceChild> ($pi9, $pi1);
+
+        # pi9, pi2, pi3
+
+        $test->id ('return.node');
+        $test->assert_isa ($return, <IFName::Node>);
+        $test->id ('return.pi');
+        $test->assert_isa ($return, <IFName::Text>);
+        $test->id ('return');
+        $test->assert_equals ($return, $pi1);
+
+        my $c = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('length');
+        $test->assert_num_equals (actual_value => 0+@$c, expected_value => 3);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi9);
+
+        $test->id ('firstChild.nextSibling');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>
+                                  -><AG::Node.nextSibling>, $pi2);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi3);
+ 
+        $test->id ('parent');
+        $test->assert_equals ($pi9-><AG::Node.parentNode>, $dtd);
+
+        $test->id ('return.parent');
+        $test->assert_null ($pi1-><AG::Node.parentNode>);
+
+    @@Test:
+      @@@QName: Entity.replaceChild.2.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('d');
+
+        my $pi1 = $doc-><M::Document.createTextNode> ('pi1');
+        $dtd-><M::Node.appendChild> ($pi1);
+
+        my $pi2 = $doc-><M::Document.createTextNode> ('pi2');
+        $dtd-><M::Node.appendChild> ($pi2);
+
+        my $pi3 = $doc-><M::Document.createTextNode> ('pi3');
+        $dtd-><M::Node.appendChild> ($pi3);
+
+        # pi1, pi2, pi3
+
+        my $pi9 = $doc-><M::Document.createTextNode> ('pi9');
+        my $return = $dtd-><M::Node.replaceChild> ($pi9, $pi2);
+
+        # pi1, pi9, pi3
+
+        $test->id ('return.node');
+        $test->assert_isa ($return, <IFName::Node>);
+        $test->id ('return.pi');
+        $test->assert_isa ($return, <IFName::Text>);
+        $test->id ('return');
+        $test->assert_equals ($return, $pi2);
+
+        my $c = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('length');
+        $test->assert_num_equals (actual_value => 0+@$c, expected_value => 3);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi1);
+
+        $test->id ('firstChild.nextSibling');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>
+                                  -><AG::Node.nextSibling>, $pi9);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi3);
+ 
+        $test->id ('parent');
+        $test->assert_equals ($pi9-><AG::Node.parentNode>, $dtd);
+
+        $test->id ('return.parent');
+        $test->assert_null ($pi2-><AG::Node.parentNode>);
+
+    @@Test:
+      @@@QName: Entity.replaceChild.3.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('d');
+
+        my $pi1 = $doc-><M::Document.createTextNode> ('pi1');
+        $dtd-><M::Node.appendChild> ($pi1);
+
+        my $pi2 = $doc-><M::Document.createTextNode> ('pi2');
+        $dtd-><M::Node.appendChild> ($pi2);
+
+        my $pi3 = $doc-><M::Document.createTextNode> ('pi3');
+        $dtd-><M::Node.appendChild> ($pi3);
+
+        # pi1, pi2, pi3
+
+        my $pi9 = $doc-><M::Document.createTextNode> ('pi9');
+        my $return = $dtd-><M::Node.replaceChild> ($pi9, $pi3);
+
+        # pi1, pi2, pi9
+
+        $test->id ('return.node');
+        $test->assert_isa ($return, <IFName::Node>);
+        $test->id ('return.pi');
+        $test->assert_isa ($return, <IFName::Text>);
+        $test->id ('return');
+        $test->assert_equals ($return, $pi3);
+
+        my $c = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('length');
+        $test->assert_num_equals (actual_value => 0+@$c, expected_value => 3);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi1);
+
+        $test->id ('firstChild.nextSibling');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>
+                                  -><AG::Node.nextSibling>, $pi2);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi9);
+ 
+        $test->id ('parent');
+        $test->assert_equals ($pi9-><AG::Node.parentNode>, $dtd);
+
+        $test->id ('return.parent');
+        $test->assert_null ($pi3-><AG::Node.parentNode>);
+
+    @@Test:
+      @@@QName: Entity.replaceChild.sameparent.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('d');
+
+        my $pi1 = $doc-><M::Document.createTextNode> ('pi1');
+        $dtd-><M::Node.appendChild> ($pi1);
+
+        my $pi2 = $doc-><M::Document.createTextNode> ('pi2');
+        $dtd-><M::Node.appendChild> ($pi2);
+
+        my $pi3 = $doc-><M::Document.createTextNode> ('pi3');
+        $dtd-><M::Node.appendChild> ($pi3);
+
+        # pi1, pi2, pi3
+
+        my $return = $dtd-><M::Node.replaceChild> ($pi3, $pi1);
+
+        # pi3, pi2
+
+        $test->id ('return.node');
+        $test->assert_isa ($return, <IFName::Node>);
+        $test->id ('return.pi');
+        $test->assert_isa ($return, <IFName::Text>);
+        $test->id ('return');
+        $test->assert_equals ($return, $pi1);
+
+        my $c = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('length');
+        $test->assert_num_equals (actual_value => 0+@$c, expected_value => 2);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi3);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi2);
+ 
+        $test->id ('parent');
+        $test->assert_equals ($pi3-><AG::Node.parentNode>, $dtd);
+
+        $test->id ('return.parent');
+        $test->assert_null ($pi1-><AG::Node.parentNode>);
+
+    @@Test:
+      @@@QName: Entity.replaceChild.sameparent.2.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('d');
+
+        my $pi1 = $doc-><M::Document.createTextNode> ('pi1');
+        $dtd-><M::Node.appendChild> ($pi1);
+
+        my $pi2 = $doc-><M::Document.createTextNode> ('pi2');
+        $dtd-><M::Node.appendChild> ($pi2);
+
+        my $pi3 = $doc-><M::Document.createTextNode> ('pi3');
+        $dtd-><M::Node.appendChild> ($pi3);
+
+        # pi1, pi2, pi3
+
+        my $return = $dtd-><M::Node.replaceChild> ($pi1, $pi3);
+
+        # pi2, pi1
+
+        $test->id ('return.node');
+        $test->assert_isa ($return, <IFName::Node>);
+        $test->id ('return.pi');
+        $test->assert_isa ($return, <IFName::Text>);
+        $test->id ('return');
+        $test->assert_equals ($return, $pi3);
+
+        my $c = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('length');
+        $test->assert_num_equals (actual_value => 0+@$c, expected_value => 2);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi2);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi1);
+ 
+        $test->id ('parent');
+        $test->assert_equals ($pi1-><AG::Node.parentNode>, $dtd);
+
+        $test->id ('return.parent');
+        $test->assert_null ($pi3-><AG::Node.parentNode>);
+
+  @CMethod:
+    @@Name: manakaiAppendText
+    @@Param:
+      @@@Name: string
+      @@@Type: DOMString
+      @@@enDesc:
+        The string to append.
+      @@@InCase:
+        @@@@Type: DISPerl|SCALAR||ManakaiDOM|all
+        @@@@enDesc:
+          A copy of the string value referenced from the value
+          is appended.
+    @@Return:
+      @@@Type: Node
+      @@@enDesc:
+        The node itself.
+      @@@dx:raises:
+        @@@@@: MDOMX|NOMOD_THIS
+        @@@@enDesc:
+          If the node to insert the string or a <IF::Text> node
+          is read-only.
+      @@@disDef:
+        @@@@DISPerl:cloneCode: tc|ManakaiDOMAttr.manakaiAppendText
+
+    @@Test:
+      @@@QName: Entity..=.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTestER:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $node = $docx-><M::DocumentXDoctype.createGeneralEntity> ('node');
+
+        $node-><M::Node.manakaiAppendText> ('string');
+        $test->id ('1.class');
+        $test->assert_isa ($node, <IFName::Entity>);
+        $test->id ('1.value');
+        $test->assert_equals ($node-><AG::Node.textContent>, 'string');
+        $test->id ('1.length');
+        $test->assert_num_equals
+                 (expected_value => 1,
+                  actual_value => 0+@{$node-><AG::Node.childNodes>});
+
+        $test->id (2);
+        $node-><M::Node.manakaiAppendText> ('STRING');
+        $test->assert_equals ($node-><AG::Node.textContent>, 'stringSTRING');
+        $test->assert_num_equals
+                 (expected_value => 1,
+                  actual_value => 0+@{$node-><AG::Node.childNodes>});
+
+        $node-><M::Node.appendChild>
+                 ($doc-><M::Document.createEntityReference> ('er'));
+
+        $test->id (3);
+        $node-><M::Node.manakaiAppendText> ('text');
+        $test->assert_equals ($node-><AG::Node.textContent>, 'stringSTRINGtext');
+        $test->assert_num_equals
+                 (expected_value => 3,
+                  actual_value => 0+@{$node-><AG::Node.childNodes>});
+
+  @CL3Method:
+    @@Name: getFeature
+    @@enDesc:
+      Returns a specialized object that implements the specialized APIs.
+    @@Param:
+      @@@Name: feature
+      @@@Type: DOMString
+      @@@dis:actualType: f|FeatureNameString
+    @@Param:
+      @@@Name: version
+      @@@Type: DOMString
+      @@@dis:actualType: f|FeatureVersionString
+    @@Return:
+      @@@Type: DOMMain|DOMObject
+      @@@nullCase:
+      @@@PerlDef:
+        $feature =~ s/^\+//;
+        __CODE{f|getFeatureImpl::
+          $self => $self,
+          $feature => $feature, $version => $version, $r => $r,
+          $base_class => {<ClassName::ManakaiDOMEntity>},
+        }__;
+        unless (defined $r) {
+          __DEEP{
+            $r = $self->SUPER::get_feature ($feature, $version);
+          }__;
+        }
+
+    @@Test:
+      @@@QName: Entity.getFeature.test
+      @@@PerlDef:
+        my $node;
+        __CODE{tx|createGEForTest:: $gent => $node}__;
+
+        for (
+          [Core => '1.0', <IFName::Entity||ManakaiDOM|ManakaiDOM1>],
+          [Core => '2.0', <IFName::Entity||ManakaiDOM|ManakaiDOM2>],
+          [Core => '3.0', <IFName::Entity||ManakaiDOM|ManakaiDOM3>],
+          [XML => '1.0', <IFName::Entity||ManakaiDOM|ManakaiDOM1>],
+          [XML => '2.0', <IFName::Entity||ManakaiDOM|ManakaiDOM2>],
+          [XML => '3.0', <IFName::Entity||ManakaiDOM|ManakaiDOM3>],
+        ) {
+          $test->id ($_->[0].'.'.$_->[1]);
+          my $sp = $node-><M::Node.getFeature> ($_->[0], $_->[1]);
+          $test->assert_isa ($sp, $_->[2]);
+        }
 ##Entity
 
 NodeTypeDef:
@@ -1450,6 +3959,2350 @@ NodeTypeDef:
           }},
         }__;
 
+    @@Test:
+      @@@QName: EntityRef.appendChild.1.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTestER:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        my $pi = $doc-><M::Document.createTextNode> ('pi');
+
+        my $return = $dtd-><M::Node.appendChild> ($pi);
+
+        my $child = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('child.length');
+        $test->assert_num_equals
+                 (actual_value => 0+@$child,
+                  expected_value => 1);
+
+        my $item = $child-><M::tc|NodeList.item> (0);
+
+        $test->id ('child.item.node');
+        $test->assert_isa ($item, <IFName::Node>);
+
+        $test->id ('child.item.pi');
+        $test->assert_isa ($item, <IFName::Text>);
+
+        $test->id ('child.item.equals');
+        $test->assert_equals ($item, $pi);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi);
+
+        $test->id ('parent');
+        my $parent = $item-><AG::Node.parentNode>;
+        $test->assert_equals ($parent, $dtd);
+
+        $test->id ('return');
+        $test->assert_equals ($return, $pi);
+    @@Test:
+      @@@QName: EntityRef.appendChild.1.2.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTestER:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        my $pi = $doc-><M::Document.createEntityReference> ('pi');
+
+        my $return = $dtd-><M::Node.appendChild> ($pi);
+
+        my $child = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('child.length');
+        $test->assert_num_equals
+                 (actual_value => 0+@$child,
+                  expected_value => 1);
+
+        my $item = $child-><M::tc|NodeList.item> (0);
+
+        $test->id ('child.item.node');
+        $test->assert_isa ($item, <IFName::Node>);
+
+        $test->id ('child.item.pi');
+        $test->assert_isa ($item, <IFName::tx|EntityReference>);
+
+        $test->id ('child.item.equals');
+        $test->assert_equals ($item, $pi);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi);
+
+        $test->id ('parent');
+        my $parent = $item-><AG::Node.parentNode>;
+        $test->assert_equals ($parent, $dtd);
+
+        $test->id ('return');
+        $test->assert_equals ($return, $pi);
+    @@Test:
+      @@@QName: EntityRef.appendChild.1.3.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTestER:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        my $pi = $doc-><M::Document.createElement> ('pi');
+
+        my $return = $dtd-><M::Node.appendChild> ($pi);
+
+        my $child = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('child.length');
+        $test->assert_num_equals
+                 (actual_value => 0+@$child,
+                  expected_value => 1);
+
+        my $item = $child-><M::tc|NodeList.item> (0);
+
+        $test->id ('child.item.node');
+        $test->assert_isa ($item, <IFName::Node>);
+
+        $test->id ('child.item.pi');
+        $test->assert_isa ($item, <IFName::tc|Element>);
+
+        $test->id ('child.item.equals');
+        $test->assert_equals ($item, $pi);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi);
+
+        $test->id ('parent');
+        my $parent = $item-><AG::Node.parentNode>;
+        $test->assert_equals ($parent, $dtd);
+
+        $test->id ('return');
+        $test->assert_equals ($return, $pi);
+    @@Test:
+      @@@QName: EntityRef.appendChild.1.4.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTestER:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        my $pi = $doc-><M::Document.createProcessingInstruction> ('pi');
+
+        my $return = $dtd-><M::Node.appendChild> ($pi);
+
+        my $child = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('child.length');
+        $test->assert_num_equals
+                 (actual_value => 0+@$child,
+                  expected_value => 1);
+
+        my $item = $child-><M::tc|NodeList.item> (0);
+
+        $test->id ('child.item.node');
+        $test->assert_isa ($item, <IFName::Node>);
+
+        $test->id ('child.item.pi');
+        $test->assert_isa ($item, <IFName::tx|ProcessingInstruction>);
+
+        $test->id ('child.item.equals');
+        $test->assert_equals ($item, $pi);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi);
+
+        $test->id ('parent');
+        my $parent = $item-><AG::Node.parentNode>;
+        $test->assert_equals ($parent, $dtd);
+
+        $test->id ('return');
+        $test->assert_equals ($return, $pi);
+    @@Test:
+      @@@QName: EntityRef.appendChild.1.5.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTestER:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        my $pi = $doc-><M::Document.createCDATASection> ('pi');
+
+        my $return = $dtd-><M::Node.appendChild> ($pi);
+
+        my $child = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('child.length');
+        $test->assert_num_equals
+                 (actual_value => 0+@$child,
+                  expected_value => 1);
+
+        my $item = $child-><M::tc|NodeList.item> (0);
+
+        $test->id ('child.item.node');
+        $test->assert_isa ($item, <IFName::Node>);
+
+        $test->id ('child.item.pi');
+        $test->assert_isa ($item, <IFName::tx|CDATASection>);
+
+        $test->id ('child.item.equals');
+        $test->assert_equals ($item, $pi);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi);
+
+        $test->id ('parent');
+        my $parent = $item-><AG::Node.parentNode>;
+        $test->assert_equals ($parent, $dtd);
+
+        $test->id ('return');
+        $test->assert_equals ($return, $pi);
+    @@Test:
+      @@@QName: EntityRef.appendChild.1.6.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTestER:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        my $pi = $doc-><M::Document.createComment> ('pi');
+
+        my $return = $dtd-><M::Node.appendChild> ($pi);
+
+        my $child = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('child.length');
+        $test->assert_num_equals
+                 (actual_value => 0+@$child,
+                  expected_value => 1);
+
+        my $item = $child-><M::tc|NodeList.item> (0);
+
+        $test->id ('child.item.node');
+        $test->assert_isa ($item, <IFName::Node>);
+
+        $test->id ('child.item.pi');
+        $test->assert_isa ($item, <IFName::tc|Comment>);
+
+        $test->id ('child.item.equals');
+        $test->assert_equals ($item, $pi);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi);
+
+        $test->id ('parent');
+        my $parent = $item-><AG::Node.parentNode>;
+        $test->assert_equals ($parent, $dtd);
+
+        $test->id ('return');
+        $test->assert_equals ($return, $pi);
+    @@Test:
+      @@@QName: EntityRef.insertBefore.1.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTestER:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        my $pi = $doc-><M::Document.createTextNode> ('pi');
+
+        my $return = $dtd-><M::Node.insertBefore> ($pi);
+
+        my $child = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('child.length');
+        $test->assert_num_equals
+                 (actual_value => 0+@$child,
+                  expected_value => 1);
+
+        my $item = $child-><M::tc|NodeList.item> (0);
+
+        $test->id ('child.item.node');
+        $test->assert_isa ($item, <IFName::Node>);
+
+        $test->id ('child.item.pi');
+        $test->assert_isa ($item, <IFName::Text>);
+
+        $test->id ('child.item.equals');
+        $test->assert_equals ($item, $pi);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi);
+
+        $test->id ('parent');
+        my $parent = $item-><AG::Node.parentNode>;
+        $test->assert_equals ($parent, $dtd);
+
+        $test->id ('return');
+        $test->assert_equals ($return, $pi);
+    @@Test:
+      @@@QName: EntityRef.insertBefore.1.2.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTestER:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        my $pi = $doc-><M::Document.createEntityReference> ('pi');
+
+        my $return = $dtd-><M::Node.insertBefore> ($pi);
+
+        my $child = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('child.length');
+        $test->assert_num_equals
+                 (actual_value => 0+@$child,
+                  expected_value => 1);
+
+        my $item = $child-><M::tc|NodeList.item> (0);
+
+        $test->id ('child.item.node');
+        $test->assert_isa ($item, <IFName::Node>);
+
+        $test->id ('child.item.pi');
+        $test->assert_isa ($item, <IFName::tx|EntityReference>);
+
+        $test->id ('child.item.equals');
+        $test->assert_equals ($item, $pi);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi);
+
+        $test->id ('parent');
+        my $parent = $item-><AG::Node.parentNode>;
+        $test->assert_equals ($parent, $dtd);
+
+        $test->id ('return');
+        $test->assert_equals ($return, $pi);
+    @@Test:
+      @@@QName: EntityRef.insertBefore.1.3.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTestER:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        my $pi = $doc-><M::Document.createElement> ('pi');
+
+        my $return = $dtd-><M::Node.insertBefore> ($pi);
+
+        my $child = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('child.length');
+        $test->assert_num_equals
+                 (actual_value => 0+@$child,
+                  expected_value => 1);
+
+        my $item = $child-><M::tc|NodeList.item> (0);
+
+        $test->id ('child.item.node');
+        $test->assert_isa ($item, <IFName::Node>);
+
+        $test->id ('child.item.pi');
+        $test->assert_isa ($item, <IFName::tc|Element>);
+
+        $test->id ('child.item.equals');
+        $test->assert_equals ($item, $pi);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi);
+
+        $test->id ('parent');
+        my $parent = $item-><AG::Node.parentNode>;
+        $test->assert_equals ($parent, $dtd);
+
+        $test->id ('return');
+        $test->assert_equals ($return, $pi);
+    @@Test:
+      @@@QName: EntityRef.insertBefore.1.4.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTestER:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        my $pi = $doc-><M::Document.createProcessingInstruction> ('pi');
+
+        my $return = $dtd-><M::Node.insertBefore> ($pi);
+
+        my $child = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('child.length');
+        $test->assert_num_equals
+                 (actual_value => 0+@$child,
+                  expected_value => 1);
+
+        my $item = $child-><M::tc|NodeList.item> (0);
+
+        $test->id ('child.item.node');
+        $test->assert_isa ($item, <IFName::Node>);
+
+        $test->id ('child.item.pi');
+        $test->assert_isa ($item, <IFName::tx|ProcessingInstruction>);
+
+        $test->id ('child.item.equals');
+        $test->assert_equals ($item, $pi);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi);
+
+        $test->id ('parent');
+        my $parent = $item-><AG::Node.parentNode>;
+        $test->assert_equals ($parent, $dtd);
+
+        $test->id ('return');
+        $test->assert_equals ($return, $pi);
+    @@Test:
+      @@@QName: EntityRef.insertBefore.1.5.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTestER:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        my $pi = $doc-><M::Document.createCDATASection> ('pi');
+
+        my $return = $dtd-><M::Node.insertBefore> ($pi);
+
+        my $child = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('child.length');
+        $test->assert_num_equals
+                 (actual_value => 0+@$child,
+                  expected_value => 1);
+
+        my $item = $child-><M::tc|NodeList.item> (0);
+
+        $test->id ('child.item.node');
+        $test->assert_isa ($item, <IFName::Node>);
+
+        $test->id ('child.item.pi');
+        $test->assert_isa ($item, <IFName::tx|CDATASection>);
+
+        $test->id ('child.item.equals');
+        $test->assert_equals ($item, $pi);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi);
+
+        $test->id ('parent');
+        my $parent = $item-><AG::Node.parentNode>;
+        $test->assert_equals ($parent, $dtd);
+
+        $test->id ('return');
+        $test->assert_equals ($return, $pi);
+    @@Test:
+      @@@QName: EntityRef.insertBefore.1.6.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTestER:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        my $pi = $doc-><M::Document.createComment> ('pi');
+
+        my $return = $dtd-><M::Node.insertBefore> ($pi);
+
+        my $child = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('child.length');
+        $test->assert_num_equals
+                 (actual_value => 0+@$child,
+                  expected_value => 1);
+
+        my $item = $child-><M::tc|NodeList.item> (0);
+
+        $test->id ('child.item.node');
+        $test->assert_isa ($item, <IFName::Node>);
+
+        $test->id ('child.item.pi');
+        $test->assert_isa ($item, <IFName::tc|Comment>);
+
+        $test->id ('child.item.equals');
+        $test->assert_equals ($item, $pi);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi);
+
+        $test->id ('parent');
+        my $parent = $item-><AG::Node.parentNode>;
+        $test->assert_equals ($parent, $dtd);
+
+        $test->id ('return');
+        $test->assert_equals ($return, $pi);
+
+    @@Test:
+      @@@QName: EntityRef.appendChild.has.parent.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTestER:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+
+        my $piparent = $doc-><M::Document.createElementNS> (null, 'e');
+        my $pi = $doc-><M::Document.createTextNode> ('pi');
+        $piparent-><M::Node.appendChild> ($pi);
+
+        my $return = $dtd-><M::Node.appendChild> ($pi);
+
+        my $child = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('child.length');
+        $test->assert_num_equals
+                 (actual_value => 0+@$child,
+                  expected_value => 1);
+
+        my $item = $child-><M::tc|NodeList.item> (0);
+
+        $test->id ('child.item.node');
+        $test->assert_isa ($item, <IFName::Node>);
+
+        $test->id ('child.item.pi');
+        $test->assert_isa ($item, <IFName::Text>);
+
+        $test->id ('child.item.equals');
+        $test->assert_equals ($item, $pi);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi);
+
+        $test->id ('parent');
+        my $parent = $item-><AG::Node.parentNode>;
+        $test->assert_equals ($parent, $dtd);
+
+        $test->id ('former.parent.child');
+        my $piparentchild = $piparent-><AG::Node.childNodes>;
+        $test->assert_num_equals
+                 (actual_value => 0+@$piparentchild,
+                  expected_value => 0);
+
+        $test->id ('return');
+        $test->assert_equals ($return, $pi);
+    @@Test:
+      @@@QName: EntityRef.appendChild.has.parent.1.2.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTestER:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+
+        my $piparent = $doc-><M::Document.createElementNS> (null, 'e');
+        my $pi = $doc-><M::Document.createEntityReference> ('pi');
+        $piparent-><M::Node.appendChild> ($pi);
+
+        my $return = $dtd-><M::Node.appendChild> ($pi);
+
+        my $child = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('child.length');
+        $test->assert_num_equals
+                 (actual_value => 0+@$child,
+                  expected_value => 1);
+
+        my $item = $child-><M::tc|NodeList.item> (0);
+
+        $test->id ('child.item.node');
+        $test->assert_isa ($item, <IFName::Node>);
+
+        $test->id ('child.item.pi');
+        $test->assert_isa ($item, <IFName::tx|EntityReference>);
+
+        $test->id ('child.item.equals');
+        $test->assert_equals ($item, $pi);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi);
+
+        $test->id ('parent');
+        my $parent = $item-><AG::Node.parentNode>;
+        $test->assert_equals ($parent, $dtd);
+
+        $test->id ('former.parent.child');
+        my $piparentchild = $piparent-><AG::Node.childNodes>;
+        $test->assert_num_equals
+                 (actual_value => 0+@$piparentchild,
+                  expected_value => 0);
+
+        $test->id ('return');
+        $test->assert_equals ($return, $pi);
+    @@Test:
+      @@@QName: EntityRef.insertBefore.has.parent.1.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTestER:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+
+        my $piparent = $doc-><M::Document.createElementNS> (null, 'e');
+        my $pi = $doc-><M::Document.createTextNode> ('pi');
+        $piparent-><M::Node.appendChild> ($pi);
+
+        my $return = $dtd-><M::Node.insertBefore> ($pi);
+
+        my $child = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('child.length');
+        $test->assert_num_equals
+                 (actual_value => 0+@$child,
+                  expected_value => 1);
+
+        my $item = $child-><M::tc|NodeList.item> (0);
+
+        $test->id ('child.item.node');
+        $test->assert_isa ($item, <IFName::Node>);
+
+        $test->id ('child.item.pi');
+        $test->assert_isa ($item, <IFName::Text>);
+
+        $test->id ('child.item.equals');
+        $test->assert_equals ($item, $pi);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi);
+
+        $test->id ('parent');
+        my $parent = $item-><AG::Node.parentNode>;
+        $test->assert_equals ($parent, $dtd);
+
+        $test->id ('former.parent.child');
+        my $piparentchild = $piparent-><AG::Node.childNodes>;
+        $test->assert_num_equals
+                 (actual_value => 0+@$piparentchild,
+                  expected_value => 0);
+
+        $test->id ('return');
+        $test->assert_equals ($return, $pi);
+    @@Test:
+      @@@QName: EntityRef.insertBefore.has.parent.1.2.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTestER:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+
+        my $piparent = $doc-><M::Document.createElementNS> (null, 'e');
+        my $pi = $doc-><M::Document.createEntityReference> ('pi');
+        $piparent-><M::Node.appendChild> ($pi);
+
+        my $return = $dtd-><M::Node.insertBefore> ($pi);
+
+        my $child = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('child.length');
+        $test->assert_num_equals
+                 (actual_value => 0+@$child,
+                  expected_value => 1);
+
+        my $item = $child-><M::tc|NodeList.item> (0);
+
+        $test->id ('child.item.node');
+        $test->assert_isa ($item, <IFName::Node>);
+
+        $test->id ('child.item.pi');
+        $test->assert_isa ($item, <IFName::tx|EntityReference>);
+
+        $test->id ('child.item.equals');
+        $test->assert_equals ($item, $pi);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi);
+
+        $test->id ('parent');
+        my $parent = $item-><AG::Node.parentNode>;
+        $test->assert_equals ($parent, $dtd);
+
+        $test->id ('former.parent.child');
+        my $piparentchild = $piparent-><AG::Node.childNodes>;
+        $test->assert_num_equals
+                 (actual_value => 0+@$piparentchild,
+                  expected_value => 0);
+
+        $test->id ('return');
+        $test->assert_equals ($return, $pi);
+
+    @@Test:
+      @@@QName: EntityRef.appendChild.documentfragment.1.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTestER:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+
+        my $piparent = $doc-><M::Document.createDocumentFragment>;
+        my $pi = $doc-><M::Document.createTextNode> ('pi');
+        $piparent-><M::Node.appendChild> ($pi);
+
+        my $return = $dtd-><M::Node.appendChild> ($piparent);
+
+        my $child = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('child.length');
+        $test->assert_num_equals
+                 (actual_value => 0+@$child,
+                  expected_value => 1);
+
+        my $item = $child-><M::tc|NodeList.item> (0);
+
+        $test->id ('child.item.node');
+        $test->assert_isa ($item, <IFName::Node>);
+
+        $test->id ('child.item.pi');
+        $test->assert_isa ($item, <IFName::Text>);
+
+        $test->id ('child.item.equals');
+        $test->assert_equals ($item, $pi);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi);
+
+        $test->id ('parent');
+        my $parent = $item-><AG::Node.parentNode>;
+        $test->assert_equals ($parent, $dtd);
+
+        $test->id ('former.parent.child');
+        my $piparentchild = $piparent-><AG::Node.childNodes>;
+        $test->assert_num_equals
+                 (actual_value => 0+@$piparentchild,
+                  expected_value => 0);
+
+        $test->id ('return');
+        $test->assert_equals ($return, $piparent);
+    @@Test:
+      @@@QName: EntityRef.appendChild.documentfragment.1.2.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTestER:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+
+        my $piparent = $doc-><M::Document.createDocumentFragment>;
+        my $pi = $doc-><M::Document.createEntityReference> ('pi');
+        $piparent-><M::Node.appendChild> ($pi);
+
+        my $return = $dtd-><M::Node.appendChild> ($piparent);
+
+        my $child = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('child.length');
+        $test->assert_num_equals
+                 (actual_value => 0+@$child,
+                  expected_value => 1);
+
+        my $item = $child-><M::tc|NodeList.item> (0);
+
+        $test->id ('child.item.node');
+        $test->assert_isa ($item, <IFName::Node>);
+
+        $test->id ('child.item.pi');
+        $test->assert_isa ($item, <IFName::tx|EntityReference>);
+
+        $test->id ('child.item.equals');
+        $test->assert_equals ($item, $pi);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi);
+
+        $test->id ('parent');
+        my $parent = $item-><AG::Node.parentNode>;
+        $test->assert_equals ($parent, $dtd);
+
+        $test->id ('former.parent.child');
+        my $piparentchild = $piparent-><AG::Node.childNodes>;
+        $test->assert_num_equals
+                 (actual_value => 0+@$piparentchild,
+                  expected_value => 0);
+
+        $test->id ('return');
+        $test->assert_equals ($return, $piparent);
+    @@Test:
+      @@@QName: EntityRef.insertBefore.documentfragment.1.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTestER:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+
+        my $piparent = $doc-><M::Document.createDocumentFragment>;
+        my $pi = $doc-><M::Document.createTextNode> ('pi');
+        $piparent-><M::Node.appendChild> ($pi);
+
+        my $return = $dtd-><M::Node.insertBefore> ($piparent);
+
+        my $child = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('child.length');
+        $test->assert_num_equals
+                 (actual_value => 0+@$child,
+                  expected_value => 1);
+
+        my $item = $child-><M::tc|NodeList.item> (0);
+
+        $test->id ('child.item.node');
+        $test->assert_isa ($item, <IFName::Node>);
+
+        $test->id ('child.item.pi');
+        $test->assert_isa ($item, <IFName::Text>);
+
+        $test->id ('child.item.equals');
+        $test->assert_equals ($item, $pi);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi);
+
+        $test->id ('parent');
+        my $parent = $item-><AG::Node.parentNode>;
+        $test->assert_equals ($parent, $dtd);
+
+        $test->id ('former.parent.child');
+        my $piparentchild = $piparent-><AG::Node.childNodes>;
+        $test->assert_num_equals
+                 (actual_value => 0+@$piparentchild,
+                  expected_value => 0);
+
+        $test->id ('return');
+        $test->assert_equals ($return, $piparent);
+    @@Test:
+      @@@QName: EntityRef.insertBefore.documentfragment.1.2.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTestER:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+
+        my $piparent = $doc-><M::Document.createDocumentFragment>;
+        my $pi = $doc-><M::Document.createEntityReference> ('pi');
+        $piparent-><M::Node.appendChild> ($pi);
+
+        my $return = $dtd-><M::Node.insertBefore> ($piparent);
+
+        my $child = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('child.length');
+        $test->assert_num_equals
+                 (actual_value => 0+@$child,
+                  expected_value => 1);
+
+        my $item = $child-><M::tc|NodeList.item> (0);
+
+        $test->id ('child.item.node');
+        $test->assert_isa ($item, <IFName::Node>);
+
+        $test->id ('child.item.pi');
+        $test->assert_isa ($item, <IFName::tx|EntityReference>);
+
+        $test->id ('child.item.equals');
+        $test->assert_equals ($item, $pi);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi);
+
+        $test->id ('parent');
+        my $parent = $item-><AG::Node.parentNode>;
+        $test->assert_equals ($parent, $dtd);
+
+        $test->id ('former.parent.child');
+        my $piparentchild = $piparent-><AG::Node.childNodes>;
+        $test->assert_num_equals
+                 (actual_value => 0+@$piparentchild,
+                  expected_value => 0);
+
+        $test->id ('return');
+        $test->assert_equals ($return, $piparent);
+    @@Test:
+      @@@QName: EntityRef.replaceChild.documentfragment.1.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTestER:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        my $pi0 = $doc-><M::Document.createTextNode> ('pi0');
+        $dtd-><M::Node.appendChild> ($pi0);
+
+        my $piparent = $doc-><M::Document.createDocumentFragment>;
+        my $pi = $doc-><M::Document.createTextNode> ('pi');
+        $piparent-><M::Node.appendChild> ($pi);
+
+        my $return = $dtd-><M::Node.replaceChild> ($piparent, $pi0);
+
+        my $child = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('child.length');
+        $test->assert_num_equals
+                 (actual_value => 0+@$child,
+                  expected_value => 1);
+
+        my $item = $child-><M::tc|NodeList.item> (0);
+
+        $test->id ('child.item.node');
+        $test->assert_isa ($item, <IFName::Node>);
+
+        $test->id ('child.item.pi');
+        $test->assert_isa ($item, <IFName::Text>);
+
+        $test->id ('child.item.equals');
+        $test->assert_equals ($item, $pi);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi);
+
+        $test->id ('parent');
+        my $parent = $item-><AG::Node.parentNode>;
+        $test->assert_equals ($parent, $dtd);
+
+        $test->id ('former.parent.child');
+        my $piparentchild = $piparent-><AG::Node.childNodes>;
+        $test->assert_num_equals
+                 (actual_value => 0+@$piparentchild,
+                  expected_value => 0);
+
+        $test->id ('return');
+        $test->assert_equals ($return, $pi0);
+    @@Test:
+      @@@QName: EntityRef.replaceChild.documentfragment.1.2.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTestER:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        my $pi0 = $doc-><M::Document.createTextNode> ('pi0');
+        $dtd-><M::Node.appendChild> ($pi0);
+
+        my $piparent = $doc-><M::Document.createDocumentFragment>;
+        my $pi = $doc-><M::Document.createEntityReference> ('pi');
+        $piparent-><M::Node.appendChild> ($pi);
+
+        my $return = $dtd-><M::Node.replaceChild> ($piparent, $pi0);
+
+        my $child = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('child.length');
+        $test->assert_num_equals
+                 (actual_value => 0+@$child,
+                  expected_value => 1);
+
+        my $item = $child-><M::tc|NodeList.item> (0);
+
+        $test->id ('child.item.node');
+        $test->assert_isa ($item, <IFName::Node>);
+
+        $test->id ('child.item.pi');
+        $test->assert_isa ($item, <IFName::tx|EntityReference>);
+
+        $test->id ('child.item.equals');
+        $test->assert_equals ($item, $pi);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi);
+
+        $test->id ('parent');
+        my $parent = $item-><AG::Node.parentNode>;
+        $test->assert_equals ($parent, $dtd);
+
+        $test->id ('former.parent.child');
+        my $piparentchild = $piparent-><AG::Node.childNodes>;
+        $test->assert_num_equals
+                 (actual_value => 0+@$piparentchild,
+                  expected_value => 0);
+
+        $test->id ('return');
+        $test->assert_equals ($return, $pi0);
+
+    @@Test:
+      @@@QName: EntityRef.appendChild.documentfragment.2.1.test
+      @@@enDesc:
+        Empty document fragment.
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTestER:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+
+        my $piparent = $doc-><M::Document.createDocumentFragment>;
+
+        my $return = $dtd-><M::Node.appendChild> ($piparent);
+
+        my $child = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('child.length');
+        $test->assert_num_equals
+                 (actual_value => 0+@$child,
+                  expected_value => 0);
+
+        $test->id ('former.parent.child');
+        my $piparentchild = $piparent-><AG::Node.childNodes>;
+        $test->assert_num_equals
+                 (actual_value => 0+@$piparentchild,
+                  expected_value => 0);
+
+        $test->id ('return');
+        $test->assert_equals ($return, $piparent);
+    @@Test:
+      @@@QName: EntityRef.insertBefore.documentfragment.2.test
+      @@@enDesc:
+        Empty document fragment.
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTestER:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+
+        my $piparent = $doc-><M::Document.createDocumentFragment>;
+
+        my $return = $dtd-><M::Node.insertBefore> ($piparent);
+
+        my $child = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('child.length');
+        $test->assert_num_equals
+                 (actual_value => 0+@$child,
+                  expected_value => 0);
+
+        $test->id ('former.parent.child');
+        my $piparentchild = $piparent-><AG::Node.childNodes>;
+        $test->assert_num_equals
+                 (actual_value => 0+@$piparentchild,
+                  expected_value => 0);
+
+        $test->id ('return');
+        $test->assert_equals ($return, $piparent);
+    @@Test:
+      @@@QName: EntityRef.replaceChild.documentfragment.2.test
+      @@@enDesc:
+        Empty document fragment.
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTestER:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        my $pi0 = $doc-><M::Document.createTextNode> ('pi0');
+        $dtd-><M::Node.appendChild> ($pi0);
+
+        my $piparent = $doc-><M::Document.createDocumentFragment>;
+
+        my $return = $dtd-><M::Node.replaceChild> ($piparent, $pi0);
+
+        my $child = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('child.length');
+        $test->assert_num_equals
+                 (actual_value => 0+@$child,
+                  expected_value => 0);
+
+        $test->id ('former.parent.child');
+        my $piparentchild = $piparent-><AG::Node.childNodes>;
+        $test->assert_num_equals
+                 (actual_value => 0+@$piparentchild,
+                  expected_value => 0);
+
+        $test->id ('return');
+        $test->assert_equals ($return, $pi0);
+
+    @@Test:
+      @@@QName: EntityRef.appendChild.documentfragment.3.test
+      @@@enDesc:
+        Three PIs in document fragment.
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTestER:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+
+        my $piparent = $doc-><M::Document.createDocumentFragment>;
+        my $pi = $doc-><M::Document.createTextNode> ('pi');
+        my $pi2 = $doc-><M::Document.createEntityReference> ('pi2');
+        my $pi3 = $doc-><M::Document.createTextNode> ('pi3');
+        $piparent-><M::Node.appendChild> ($pi);
+        $piparent-><M::Node.appendChild> ($pi2);
+        $piparent-><M::Node.appendChild> ($pi3);
+
+        my $return = $dtd-><M::Node.appendChild> ($piparent);
+
+        my $child = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('child.length');
+        $test->assert_num_equals
+                 (actual_value => 0+@$child,
+                  expected_value => 3);
+
+        my $item = $child-><M::tc|NodeList.item> (0);
+        my $item2 = $child-><M::tc|NodeList.item> (1);
+        my $item3 = $child-><M::tc|NodeList.item> (2);
+
+        $test->id ('child.item.node');
+        $test->assert_isa ($item, <IFName::Node>);
+        $test->id ('child.item.node2');
+        $test->assert_isa ($item2, <IFName::Node>);
+        $test->id ('child.item.node3');
+        $test->assert_isa ($item3, <IFName::Node>);
+
+        $test->id ('child.item.pi');
+        $test->assert_isa ($item, <IFName::Text>);
+        $test->id ('child.item.pi2');
+        $test->assert_isa ($item2, <IFName::tx|EntityReference>);
+        $test->id ('child.item.pi3');
+        $test->assert_isa ($item3, <IFName::Text>);
+
+        $test->id ('child.item.equals');
+        $test->assert_equals ($item, $pi);
+        $test->id ('child.item.equals2');
+        $test->assert_equals ($item2, $pi2);
+        $test->id ('child.item.equals3');
+        $test->assert_equals ($item3, $pi3);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi3);
+
+        $test->id ('parent');
+        my $parent = $item-><AG::Node.parentNode>;
+        $test->assert_equals ($parent, $dtd);
+        $test->id ('parent2');
+        my $parent2 = $item2-><AG::Node.parentNode>;
+        $test->assert_equals ($parent2, $dtd);
+        $test->id ('parent3');
+        my $parent3 = $item3-><AG::Node.parentNode>;
+        $test->assert_equals ($parent3, $dtd);
+
+        $test->id ('former.parent.child');
+        my $piparentchild = $piparent-><AG::Node.childNodes>;
+        $test->assert_num_equals
+                 (actual_value => 0+@$piparentchild,
+                  expected_value => 0);
+
+        $test->id ('return');
+        $test->assert_equals ($return, $piparent);
+    @@Test:
+      @@@QName: EntityRef.insertBefore.documentfragment.3.test
+      @@@enDesc:
+        Three PIs in document fragment.
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTestER:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+
+        my $piparent = $doc-><M::Document.createDocumentFragment>;
+        my $pi = $doc-><M::Document.createTextNode> ('pi');
+        my $pi2 = $doc-><M::Document.createEntityReference> ('pi2');
+        my $pi3 = $doc-><M::Document.createTextNode> ('pi3');
+        $piparent-><M::Node.appendChild> ($pi);
+        $piparent-><M::Node.appendChild> ($pi2);
+        $piparent-><M::Node.appendChild> ($pi3);
+
+        my $return = $dtd-><M::Node.insertBefore> ($piparent);
+
+        my $child = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('child.length');
+        $test->assert_num_equals
+                 (actual_value => 0+@$child,
+                  expected_value => 3);
+
+        my $item = $child-><M::tc|NodeList.item> (0);
+        my $item2 = $child-><M::tc|NodeList.item> (1);
+        my $item3 = $child-><M::tc|NodeList.item> (2);
+
+        $test->id ('child.item.node');
+        $test->assert_isa ($item, <IFName::Node>);
+        $test->id ('child.item.node2');
+        $test->assert_isa ($item2, <IFName::Node>);
+        $test->id ('child.item.node3');
+        $test->assert_isa ($item3, <IFName::Node>);
+
+        $test->id ('child.item.pi');
+        $test->assert_isa ($item, <IFName::Text>);
+        $test->id ('child.item.pi2');
+        $test->assert_isa ($item2, <IFName::tx|EntityReference>);
+        $test->id ('child.item.pi3');
+        $test->assert_isa ($item3, <IFName::Text>);
+
+        $test->id ('child.item.equals');
+        $test->assert_equals ($item, $pi);
+        $test->id ('child.item.equals2');
+        $test->assert_equals ($item2, $pi2);
+        $test->id ('child.item.equals3');
+        $test->assert_equals ($item3, $pi3);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi3);
+
+        $test->id ('parent');
+        my $parent = $item-><AG::Node.parentNode>;
+        $test->assert_equals ($parent, $dtd);
+        $test->id ('parent2');
+        my $parent2 = $item2-><AG::Node.parentNode>;
+        $test->assert_equals ($parent2, $dtd);
+        $test->id ('parent3');
+        my $parent3 = $item3-><AG::Node.parentNode>;
+        $test->assert_equals ($parent3, $dtd);
+
+        $test->id ('former.parent.child');
+        my $piparentchild = $piparent-><AG::Node.childNodes>;
+        $test->assert_num_equals
+                 (actual_value => 0+@$piparentchild,
+                  expected_value => 0);
+
+        $test->id ('return');
+        $test->assert_equals ($return, $piparent);
+    @@Test:
+      @@@QName: EntityRef.replaceChild.documentfragment.3.test
+      @@@enDesc:
+        Three PIs in document fragment.
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTestER:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        my $pi0 = $doc-><M::Document.createTextNode> ('pi0');
+        $dtd-><M::Node.appendChild> ($pi0);
+
+        my $piparent = $doc-><M::Document.createDocumentFragment>;
+        my $pi = $doc-><M::Document.createTextNode> ('pi');
+        my $pi2 = $doc-><M::Document.createEntityReference> ('pi2');
+        my $pi3 = $doc-><M::Document.createTextNode> ('pi3');
+        $piparent-><M::Node.appendChild> ($pi);
+        $piparent-><M::Node.appendChild> ($pi2);
+        $piparent-><M::Node.appendChild> ($pi3);
+
+        my $return = $dtd-><M::Node.replaceChild> ($piparent, $pi0);
+
+        my $child = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('child.length');
+        $test->assert_num_equals
+                 (actual_value => 0+@$child,
+                  expected_value => 3);
+
+        my $item = $child-><M::tc|NodeList.item> (0);
+        my $item2 = $child-><M::tc|NodeList.item> (1);
+        my $item3 = $child-><M::tc|NodeList.item> (2);
+
+        $test->id ('child.item.node');
+        $test->assert_isa ($item, <IFName::Node>);
+        $test->id ('child.item.node2');
+        $test->assert_isa ($item2, <IFName::Node>);
+        $test->id ('child.item.node3');
+        $test->assert_isa ($item3, <IFName::Node>);
+
+        $test->id ('child.item.pi');
+        $test->assert_isa ($item, <IFName::Text>);
+        $test->id ('child.item.pi2');
+        $test->assert_isa ($item2, <IFName::tx|EntityReference>);
+        $test->id ('child.item.pi3');
+        $test->assert_isa ($item3, <IFName::Text>);
+
+        $test->id ('child.item.equals');
+        $test->assert_equals ($item, $pi);
+        $test->id ('child.item.equals2');
+        $test->assert_equals ($item2, $pi2);
+        $test->id ('child.item.equals3');
+        $test->assert_equals ($item3, $pi3);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi3);
+
+        $test->id ('parent');
+        my $parent = $item-><AG::Node.parentNode>;
+        $test->assert_equals ($parent, $dtd);
+        $test->id ('parent2');
+        my $parent2 = $item2-><AG::Node.parentNode>;
+        $test->assert_equals ($parent2, $dtd);
+        $test->id ('parent3');
+        my $parent3 = $item3-><AG::Node.parentNode>;
+        $test->assert_equals ($parent3, $dtd);
+
+        $test->id ('former.parent.child');
+        my $piparentchild = $piparent-><AG::Node.childNodes>;
+        $test->assert_num_equals
+                 (actual_value => 0+@$piparentchild,
+                  expected_value => 0);
+
+        $test->id ('return');
+        $test->assert_equals ($return, $pi0);
+
+    @@Test:
+      @@@QName: EntityRef.appendChild.badtype.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTestER:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $comment = $doc-><M::Document.createEntityReference> ('dt');
+        my $pi0 = $doc-><M::Document.createTextNode> ('pi0');
+        $comment-><M::Node.appendChild> ($pi0);
+
+        for my $node (
+          $docx-><M::d|DocumentXDoctype.createDocumentTypeDefinition> ('d'),
+          $doc-><M::Document.createAttribute> ('a'),
+          $docx-><M::d|DocumentXDoctype.createGeneralEntity> ('ge'),
+          $docx-><M::d|DocumentXDoctype.createNotation> ('not'),
+          $docx-><M::d|DocumentXDoctype.createElementTypeDefinition> ('et'),
+          $docx-><M::d|DocumentXDoctype.createAttributeDefinition> ('at'),
+          #test:nodeTypes
+        ) {
+          $test->id ('appendChild.'.$node-><AG::Node.nodeType>);
+          $test->assert_exception (code => sub {
+            $comment-><M::Node.appendChild> ($node);
+          }, exception_subtype => <Q::MDOMX|HIERARCHY_BAD_TYPE>);
+
+          $test->id ('insertBefore.'.$node-><AG::Node.nodeType>);
+          $test->assert_exception (code => sub {
+            $comment-><M::Node.insertBefore> ($node);
+          }, exception_subtype => <Q::MDOMX|HIERARCHY_BAD_TYPE>);
+
+          $test->id ('replaceChild.'.$node-><AG::Node.nodeType>);
+          $test->assert_exception (code => sub {
+            $comment-><M::Node.replaceChild> ($node, $pi0);
+          }, exception_subtype => <Q::MDOMX|HIERARCHY_BAD_TYPE>);
+        }
+
+    @@Test:
+      @@@QName: EntityRef.appendChild.wrongdoc.test
+      @@@PerlDef:
+        my $doc0;
+        __CODE{tc|createEmptyDocumentForTestER:: $doc => $doc0}__;
+        my $docx0 = $doc0-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTestER:: $doc => $doc}__;
+
+        my $comment = $doc0-><M::Document.createEntityReference> ('dt');
+
+        for my $node (
+          $doc-><M::Document.createTextNode> ('pi'),
+          $doc-><M::Document.createEntityReference> ('e'),
+          $doc-><M::Document.createComment> ('c'),
+          $doc-><M::Document.createCDATASection> ('cs'),
+          $doc-><M::Document.createProcessingInstruction> ('pi'),
+          $doc-><M::Document.createElement> ('el'),
+        ) {
+          $test->id ('type='.$node-><AG::Node.nodeType>);
+          $test->assert_exception (code => sub {
+            $comment-><M::Node.appendChild> ($node);
+          }, exception_subtype => <Q::c|DIFFERENT_DOCUMENT_ERR>);
+        }
+    @@Test:
+      @@@QName: EntityRef.insertBefore.wrongdoc.test
+      @@@PerlDef:
+        my $doc0;
+        __CODE{tc|createEmptyDocumentForTestER:: $doc => $doc0}__;
+        my $docx0 = $doc0-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTestER:: $doc => $doc}__;
+
+        my $comment = $doc0-><M::Document.createEntityReference> ('dt');
+        my $pi0 = $doc0-><M::Document.createTextNode> ('pi0');
+        $comment-><M::Node.appendChild> ($pi0);
+
+        for my $node (
+          $doc-><M::Document.createTextNode> ('pi'),
+          $doc-><M::Document.createEntityReference> ('ent'),
+          $doc-><M::Document.createComment> ('c'),
+          $doc-><M::Document.createCDATASection> ('cs'),
+          $doc-><M::Document.createProcessingInstruction> ('pi'),
+          $doc-><M::Document.createElement> ('el'),
+        ) {
+          $test->id ('appendChild.'.$node-><AG::Node.nodeType>);
+          $test->assert_exception (code => sub {
+            $comment-><M::Node.appendChild> ($node);
+          }, exception_subtype => <Q::c|DIFFERENT_DOCUMENT_ERR>);
+
+          $test->id ('insertBefore.'.$node-><AG::Node.nodeType>);
+          $test->assert_exception (code => sub {
+            $comment-><M::Node.insertBefore> ($node);
+          }, exception_subtype => <Q::c|DIFFERENT_DOCUMENT_ERR>);
+
+          $test->id ('replaceChild.'.$node-><AG::Node.nodeType>);
+          $test->assert_exception (code => sub {
+            $comment-><M::Node.replaceChild> ($node, $pi0);
+          }, exception_subtype => <Q::c|DIFFERENT_DOCUMENT_ERR>);
+        }
+
+    @@Test:
+      @@@QName: EntityRef.appendChild.readonly.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTestER:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        my $pi0 = $doc-><M::Document.createTextNode> ('pi0');
+        $dtd-><M::Node.appendChild> ($pi0);
+        $dtd-><M::Node.manakaiSetReadOnly> (true);
+
+        $test->id ('pi');
+        my $node = $doc-><M::Document.createTextNode> ('pi');
+
+        $test->assert_exception (code => sub {
+          $dtd-><M::Node.appendChild> ($node);
+        }, exception_subtype => <Q::MDOMX|NOMOD_THIS>);
+
+        $test->id ('pi.insertBefore');
+        $test->assert_exception (code => sub {
+          $dtd-><M::Node.insertBefore> ($node);
+        }, exception_subtype => <Q::MDOMX|NOMOD_THIS>);
+
+        $test->id ('pi.replaceChild');
+        $test->assert_exception (code => sub {
+          $dtd-><M::Node.replaceChild> ($node, $pi0);
+        }, exception_subtype => <Q::MDOMX|NOMOD_THIS>);
+
+        $test->id ('fragment');
+        my $node2 = $doc-><M::Document.createDocumentFragment>;
+        $node2-><M::Node.appendChild> ($node);
+
+        $test->assert_exception (code => sub {
+          $dtd-><M::Node.appendChild> ($node2);
+        }, exception_subtype => <Q::MDOMX|NOMOD_THIS>);
+
+        $test->id ('fragment.insertBefore');
+        $test->assert_exception (code => sub {
+          $dtd-><M::Node.insertBefore> ($node2);
+        }, exception_subtype => <Q::MDOMX|NOMOD_THIS>);
+
+        $test->id ('fragment.replaceChild');
+        $test->assert_exception (code => sub {
+          $dtd-><M::Node.replaceChild> ($node2, $pi0);
+        }, exception_subtype => <Q::MDOMX|NOMOD_THIS>);
+
+    @@Test:
+      @@@QName: EntityRef.appendChild.readonly.2.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTestER:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        my $pi0 = $doc-><M::Document.createTextNode> ('pi0');
+        $dtd-><M::Node.appendChild> ($pi0);
+
+        $test->id ('pi');
+        my $el = $doc-><M::Document.createElementNS> (null, 'e');
+        my $node = $doc-><M::Document.createTextNode> ('pi');
+        $el-><M::Node.appendChild> ($node);
+        $el-><M::Node.manakaiSetReadOnly> (true);
+
+        $test->assert_exception (code => sub {
+          $dtd-><M::Node.appendChild> ($node);
+        }, exception_subtype => <Q::MDOMX|NOMOD_SRC_PARENT>);
+
+        $test->id ('pi.insertBefore');
+        $test->assert_exception (code => sub {
+          $dtd-><M::Node.insertBefore> ($node);
+        }, exception_subtype => <Q::MDOMX|NOMOD_SRC_PARENT>);
+
+        $test->id ('pi.replaceChild');
+        $test->assert_exception (code => sub {
+          $dtd-><M::Node.replaceChild> ($node, $pi0);
+        }, exception_subtype => <Q::MDOMX|NOMOD_SRC_PARENT>);
+
+        $test->id ('fragment');
+        my $node2 = $doc-><M::Document.createDocumentFragment>;
+        my $node3 = $doc-><M::Document.createTextNode> ('pi');
+        $node2-><M::Node.appendChild> ($node3);
+        $node2-><M::Node.manakaiSetReadOnly> (true);
+
+        $test->assert_exception (code => sub {
+          $dtd-><M::Node.appendChild> ($node2);
+        }, exception_subtype => <Q::MDOMX|NOMOD_SRC_PARENT>);
+
+        $test->id ('fragment.insertBefore');
+        $test->assert_exception (code => sub {
+          $dtd-><M::Node.insertBefore> ($node2);
+        }, exception_subtype => <Q::MDOMX|NOMOD_SRC_PARENT>);
+
+        $test->id ('fragment.replaceChild');
+        $test->assert_exception (code => sub {
+          $dtd-><M::Node.replaceChild> ($node2, $pi0);
+        }, exception_subtype => <Q::MDOMX|NOMOD_SRC_PARENT>);
+
+    @@Test:
+      @@@QName: EntityRef.insertBefore.refChild.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTestER:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+
+        my $pi1 = $doc-><M::Document.createTextNode> ('pi1');
+        $dtd-><M::Node.appendChild> ($pi1);
+
+        my $pi2 = $doc-><M::Document.createTextNode> ('pi2');
+        $dtd-><M::Node.insertBefore> ($pi2, $pi1);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi2);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi1);
+
+        $test->id ('length');
+        $test->assert_num_equals
+                 (actual_value => 0+@{$dtd-><AG::Node.childNodes>},
+                  expected_value => 2);
+
+    @@Test:
+      @@@QName: EntityRef.insertBefore.refChild.2.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTestER:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+
+        my $pi1 = $doc-><M::Document.createTextNode> ('pi1');
+        $dtd-><M::Node.appendChild> ($pi1);
+
+        my $pi2 = $doc-><M::Document.createTextNode> ('pi2');
+        $dtd-><M::Node.appendChild> ($pi2);
+
+        my $pi3 = $doc-><M::Document.createTextNode> ('pi3');
+        $dtd-><M::Node.insertBefore> ($pi3, $pi2);
+
+        # pi1, pi3, pi2
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi1);
+
+        $test->id ('firstChild.nextSibling');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>
+                                  -><AG::Node.nextSibling>, $pi3);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi2);
+
+        $test->id ('length');
+        $test->assert_num_equals
+                 (actual_value => 0+@{$dtd-><AG::Node.childNodes>},
+                  expected_value => 3);
+
+    @@Test:
+      @@@QName: EntityRef.insertBefore.refChild.3.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTestER:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+
+        my $pi1 = $doc-><M::Document.createTextNode> ('pi1');
+        $dtd-><M::Node.appendChild> ($pi1);
+
+        my $pi2 = $doc-><M::Document.createTextNode> ('pi2');
+        $dtd-><M::Node.appendChild> ($pi2);
+
+        my $pi3 = $doc-><M::Document.createTextNode> ('pi3');
+        $dtd-><M::Node.appendChild> ($pi3);
+
+        # pi1, pi2, pi3
+
+        $dtd-><M::Node.insertBefore> ($pi2, $pi1);
+ 
+        # pi2, pi1, pi3
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi2);
+
+        $test->id ('firstChild.nextSibling');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>
+                                  -><AG::Node.nextSibling>, $pi1);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi3);
+
+        $test->id ('length');
+        $test->assert_num_equals
+                 (actual_value => 0+@{$dtd-><AG::Node.childNodes>},
+                  expected_value => 3);
+
+    @@Test:
+      @@@QName: EntityRef.insertBefore.refChild.4.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTestER:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+
+        my $pi1 = $doc-><M::Document.createTextNode> ('pi1');
+        $dtd-><M::Node.appendChild> ($pi1);
+
+        my $pi2 = $doc-><M::Document.createTextNode> ('pi2');
+        $dtd-><M::Node.appendChild> ($pi2);
+
+        my $pi3 = $doc-><M::Document.createTextNode> ('pi3');
+        $dtd-><M::Node.appendChild> ($pi3);
+
+        # pi1, pi2, pi3
+
+        $dtd-><M::Node.insertBefore> ($pi3, $pi1);
+ 
+        # pi3, pi1, pi2
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi3);
+
+        $test->id ('firstChild.nextSibling');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>
+                                  -><AG::Node.nextSibling>, $pi1);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi2);
+
+        $test->id ('length');
+        $test->assert_num_equals
+                 (actual_value => 0+@{$dtd-><AG::Node.childNodes>},
+                  expected_value => 3);
+
+    @@Test:
+      @@@QName: EntityRef.insertBefore.refChild.not_found_err.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTestER:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+
+        my $pi1 = $doc-><M::Document.createTextNode> ('pi1');
+        $dtd-><M::Node.appendChild> ($pi1);
+
+        my $pi2 = $doc-><M::Document.createTextNode> ('pi2');
+        $dtd-><M::Node.appendChild> ($pi2);
+
+        my $pi3 = $doc-><M::Document.createTextNode> ('pi3');
+
+        my $pi4 = $doc-><M::Document.createTextNode> ('pi4');
+
+        # pi1, pi2
+
+        $test->assert_exception (code => sub {
+          $dtd-><M::Node.insertBefore> ($pi4, $pi3);
+        }, exception_subtype => <Q::c|NOT_CHILD_ERR>);
+
+    @@Test:
+      @@@QName: EntityRef.insertBefore.refChild=newChild.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTestER:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+
+        my $pi1 = $doc-><M::Document.createTextNode> ('pi1');
+        $dtd-><M::Node.appendChild> ($pi1);
+
+        my $pi2 = $doc-><M::Document.createTextNode> ('pi2');
+        $dtd-><M::Node.appendChild> ($pi2);
+
+        # pi1, pi2
+
+        my $eh_called = false;
+        my $cfg = $doc-><AG::Document.domConfig>;
+        $cfg-><M::c|DOMConfiguration.setParameter> ('error-handler' => sub {
+          my (undef, $err) = @_;
+          $eh_called = true;
+          $test->assert_equals ($err-><AG::c|DOMError.severity>,
+                                <C::c|DOMError.SEVERITY_WARNING>);
+          $test->assert_equals ($err-><AG::c|DOMError.type>,
+                                <Q::t|insert-before-itself>);
+          $test->assert_equals ($err-><AG::c|DOMError.relatedData>, $pi2);
+          $test->assert_null ($err-><AG::c|DOMError.relatedException>);
+          $test->assert_isa ($err-><AG::c|DOMError.location>,
+                             <IFName::c|DOMLocator>);
+          $test->assert_not_null ($err-><AG::c|DOMError.message>);
+        });
+
+        $test->assert_false ($eh_called);
+        $dtd-><M::Node.insertBefore> ($pi2, $pi2);
+        $test->assert_true ($eh_called);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi1);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi2);
+
+        $test->id ('length');
+        $test->assert_num_equals
+                 (actual_value => 0+@{$dtd-><AG::Node.childNodes>},
+                  expected_value => 2);
+
+    @@Test:
+      @@@QName: EntityRef.replaceChild.oldChild=newChild.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTestER:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+
+        my $pi1 = $doc-><M::Document.createTextNode> ('pi1');
+        $dtd-><M::Node.appendChild> ($pi1);
+
+        my $pi2 = $doc-><M::Document.createTextNode> ('pi2');
+        $dtd-><M::Node.appendChild> ($pi2);
+
+        # pi1, pi2
+
+        my $eh_called = false;
+        my $cfg = $doc-><AG::Document.domConfig>;
+        $cfg-><M::c|DOMConfiguration.setParameter> ('error-handler' => sub {
+          my (undef, $err) = @_;
+          $eh_called = true;
+          $test->assert_equals ($err-><AG::c|DOMError.severity>,
+                                <C::c|DOMError.SEVERITY_WARNING>);
+          $test->assert_equals ($err-><AG::c|DOMError.type>,
+                                <Q::t|replace-by-itself>);
+          $test->assert_equals ($err-><AG::c|DOMError.relatedData>, $pi2);
+          $test->assert_null ($err-><AG::c|DOMError.relatedException>);
+          $test->assert_isa ($err-><AG::c|DOMError.location>,
+                             <IFName::c|DOMLocator>);
+          $test->assert_not_null ($err-><AG::c|DOMError.message>);
+        });
+
+        $test->assert_false ($eh_called);
+        $dtd-><M::Node.replaceChild> ($pi2, $pi2);
+        $test->assert_true ($eh_called);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi1);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi2);
+
+        $test->id ('length');
+        $test->assert_num_equals
+                 (actual_value => 0+@{$dtd-><AG::Node.childNodes>},
+                  expected_value => 2);
+
+    @@Test:
+      @@@QName: EntityRef.appendChild.sameparent.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTestER:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+
+        my $pi1 = $doc-><M::Document.createTextNode> ('pi1');
+        $dtd-><M::Node.appendChild> ($pi1);
+
+        my $pi2 = $doc-><M::Document.createTextNode> ('pi2');
+        $dtd-><M::Node.appendChild> ($pi2);
+
+        # pi1, pi2
+
+        my $return = $dtd-><M::Node.appendChild> ($pi1);
+
+        # pi2, pi1
+
+        $test->id ('return');
+        $test->assert_equals ($return, $pi1);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi2);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi1);
+
+        $test->id ('length');
+        $test->assert_num_equals
+                 (actual_value => 0+@{$dtd-><AG::Node.childNodes>},
+                  expected_value => 2);
+
+    @@Test:
+      @@@QName: EntityRef.insertBefore.sameparent.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTestER:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+
+        my $pi1 = $doc-><M::Document.createTextNode> ('pi1');
+        $dtd-><M::Node.appendChild> ($pi1);
+
+        my $pi2 = $doc-><M::Document.createTextNode> ('pi2');
+        $dtd-><M::Node.appendChild> ($pi2);
+
+        # pi1, pi2
+
+        my $return = $dtd-><M::Node.insertBefore> ($pi1);
+
+        # pi2, pi1
+
+        $test->id ('return');
+        $test->assert_equals ($return, $pi1);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi2);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi1);
+
+        $test->id ('length');
+        $test->assert_num_equals
+                 (actual_value => 0+@{$dtd-><AG::Node.childNodes>},
+                  expected_value => 2);
+
+    @@Test:
+      @@@QName: EntityRef.appendChild.sameparent.2.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTestER:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+
+        my $pi1 = $doc-><M::Document.createTextNode> ('pi1');
+        $dtd-><M::Node.appendChild> ($pi1);
+
+        my $pi2 = $doc-><M::Document.createTextNode> ('pi2');
+        $dtd-><M::Node.appendChild> ($pi2);
+
+        # pi1, pi2
+
+        my $return = $dtd-><M::Node.appendChild> ($pi2);
+
+        # pi1, pi2
+
+        $test->id ('return');
+        $test->assert_equals ($return, $pi2);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi1);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi2);
+
+        $test->id ('length');
+        $test->assert_num_equals
+                 (actual_value => 0+@{$dtd-><AG::Node.childNodes>},
+                  expected_value => 2);
+
+    @@Test:
+      @@@QName: EntityRef.insertBefore.sameparent.2.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTestER:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+
+        my $pi1 = $doc-><M::Document.createTextNode> ('pi1');
+        $dtd-><M::Node.appendChild> ($pi1);
+
+        my $pi2 = $doc-><M::Document.createTextNode> ('pi2');
+        $dtd-><M::Node.appendChild> ($pi2);
+
+        # pi1, pi2
+
+        my $return = $dtd-><M::Node.insertBefore> ($pi2);
+
+        # pi1, pi2
+
+        $test->id ('return');
+        $test->assert_equals ($return, $pi2);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi1);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi2);
+
+        $test->id ('length');
+        $test->assert_num_equals
+                 (actual_value => 0+@{$dtd-><AG::Node.childNodes>},
+                  expected_value => 2);
+
+    @@Test:
+      @@@QName: EntityRef.replaceChild.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTestER:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+
+        my $pi1 = $doc-><M::Document.createTextNode> ('pi1');
+        $dtd-><M::Node.appendChild> ($pi1);
+
+        my $pi2 = $doc-><M::Document.createTextNode> ('pi2');
+        $dtd-><M::Node.appendChild> ($pi2);
+
+        my $pi3 = $doc-><M::Document.createTextNode> ('pi3');
+        $dtd-><M::Node.appendChild> ($pi3);
+
+        # pi1, pi2, pi3
+
+        my $pi9 = $doc-><M::Document.createTextNode> ('pi9');
+        my $return = $dtd-><M::Node.replaceChild> ($pi9, $pi1);
+
+        # pi9, pi2, pi3
+
+        $test->id ('return.node');
+        $test->assert_isa ($return, <IFName::Node>);
+        $test->id ('return.pi');
+        $test->assert_isa ($return, <IFName::Text>);
+        $test->id ('return');
+        $test->assert_equals ($return, $pi1);
+
+        my $c = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('length');
+        $test->assert_num_equals (actual_value => 0+@$c, expected_value => 3);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi9);
+
+        $test->id ('firstChild.nextSibling');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>
+                                  -><AG::Node.nextSibling>, $pi2);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi3);
+ 
+        $test->id ('parent');
+        $test->assert_equals ($pi9-><AG::Node.parentNode>, $dtd);
+
+        $test->id ('return.parent');
+        $test->assert_null ($pi1-><AG::Node.parentNode>);
+
+    @@Test:
+      @@@QName: EntityRef.replaceChild.2.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTestER:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+
+        my $pi1 = $doc-><M::Document.createTextNode> ('pi1');
+        $dtd-><M::Node.appendChild> ($pi1);
+
+        my $pi2 = $doc-><M::Document.createTextNode> ('pi2');
+        $dtd-><M::Node.appendChild> ($pi2);
+
+        my $pi3 = $doc-><M::Document.createTextNode> ('pi3');
+        $dtd-><M::Node.appendChild> ($pi3);
+
+        # pi1, pi2, pi3
+
+        my $pi9 = $doc-><M::Document.createTextNode> ('pi9');
+        my $return = $dtd-><M::Node.replaceChild> ($pi9, $pi2);
+
+        # pi1, pi9, pi3
+
+        $test->id ('return.node');
+        $test->assert_isa ($return, <IFName::Node>);
+        $test->id ('return.pi');
+        $test->assert_isa ($return, <IFName::Text>);
+        $test->id ('return');
+        $test->assert_equals ($return, $pi2);
+
+        my $c = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('length');
+        $test->assert_num_equals (actual_value => 0+@$c, expected_value => 3);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi1);
+
+        $test->id ('firstChild.nextSibling');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>
+                                  -><AG::Node.nextSibling>, $pi9);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi3);
+ 
+        $test->id ('parent');
+        $test->assert_equals ($pi9-><AG::Node.parentNode>, $dtd);
+
+        $test->id ('return.parent');
+        $test->assert_null ($pi2-><AG::Node.parentNode>);
+
+    @@Test:
+      @@@QName: EntityRef.replaceChild.3.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTestER:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+
+        my $pi1 = $doc-><M::Document.createTextNode> ('pi1');
+        $dtd-><M::Node.appendChild> ($pi1);
+
+        my $pi2 = $doc-><M::Document.createTextNode> ('pi2');
+        $dtd-><M::Node.appendChild> ($pi2);
+
+        my $pi3 = $doc-><M::Document.createTextNode> ('pi3');
+        $dtd-><M::Node.appendChild> ($pi3);
+
+        # pi1, pi2, pi3
+
+        my $pi9 = $doc-><M::Document.createTextNode> ('pi9');
+        my $return = $dtd-><M::Node.replaceChild> ($pi9, $pi3);
+
+        # pi1, pi2, pi9
+
+        $test->id ('return.node');
+        $test->assert_isa ($return, <IFName::Node>);
+        $test->id ('return.pi');
+        $test->assert_isa ($return, <IFName::Text>);
+        $test->id ('return');
+        $test->assert_equals ($return, $pi3);
+
+        my $c = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('length');
+        $test->assert_num_equals (actual_value => 0+@$c, expected_value => 3);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi1);
+
+        $test->id ('firstChild.nextSibling');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>
+                                  -><AG::Node.nextSibling>, $pi2);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi9);
+ 
+        $test->id ('parent');
+        $test->assert_equals ($pi9-><AG::Node.parentNode>, $dtd);
+
+        $test->id ('return.parent');
+        $test->assert_null ($pi3-><AG::Node.parentNode>);
+
+    @@Test:
+      @@@QName: EntityRef.replaceChild.sameparent.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTestER:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+
+        my $pi1 = $doc-><M::Document.createTextNode> ('pi1');
+        $dtd-><M::Node.appendChild> ($pi1);
+
+        my $pi2 = $doc-><M::Document.createTextNode> ('pi2');
+        $dtd-><M::Node.appendChild> ($pi2);
+
+        my $pi3 = $doc-><M::Document.createTextNode> ('pi3');
+        $dtd-><M::Node.appendChild> ($pi3);
+
+        # pi1, pi2, pi3
+
+        my $return = $dtd-><M::Node.replaceChild> ($pi3, $pi1);
+
+        # pi3, pi2
+
+        $test->id ('return.node');
+        $test->assert_isa ($return, <IFName::Node>);
+        $test->id ('return.pi');
+        $test->assert_isa ($return, <IFName::Text>);
+        $test->id ('return');
+        $test->assert_equals ($return, $pi1);
+
+        my $c = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('length');
+        $test->assert_num_equals (actual_value => 0+@$c, expected_value => 2);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi3);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi2);
+ 
+        $test->id ('parent');
+        $test->assert_equals ($pi3-><AG::Node.parentNode>, $dtd);
+
+        $test->id ('return.parent');
+        $test->assert_null ($pi1-><AG::Node.parentNode>);
+
+    @@Test:
+      @@@QName: EntityRef.replaceChild.sameparent.2.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTestER:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+
+        my $pi1 = $doc-><M::Document.createTextNode> ('pi1');
+        $dtd-><M::Node.appendChild> ($pi1);
+
+        my $pi2 = $doc-><M::Document.createTextNode> ('pi2');
+        $dtd-><M::Node.appendChild> ($pi2);
+
+        my $pi3 = $doc-><M::Document.createTextNode> ('pi3');
+        $dtd-><M::Node.appendChild> ($pi3);
+
+        # pi1, pi2, pi3
+
+        my $return = $dtd-><M::Node.replaceChild> ($pi1, $pi3);
+
+        # pi2, pi1
+
+        $test->id ('return.node');
+        $test->assert_isa ($return, <IFName::Node>);
+        $test->id ('return.pi');
+        $test->assert_isa ($return, <IFName::Text>);
+        $test->id ('return');
+        $test->assert_equals ($return, $pi3);
+
+        my $c = $dtd-><AG::Node.childNodes>;
+
+        $test->id ('length');
+        $test->assert_num_equals (actual_value => 0+@$c, expected_value => 2);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi2);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($dtd-><AG::Node.lastChild>, $pi1);
+ 
+        $test->id ('parent');
+        $test->assert_equals ($pi1-><AG::Node.parentNode>, $dtd);
+
+        $test->id ('return.parent');
+        $test->assert_null ($pi3-><AG::Node.parentNode>);
+
+    @@Test:
+      @@@QName: EntityRef.appendChild.ancestor.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTestER:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        $dtd-><M::Node.appendChild>
+                ($doc-><M::Document.createTextNode> ('text1'));
+
+        $test->id ('appendChild');
+        $test->assert_exception (code => sub {
+          $dtd-><M::Node.appendChild> ($dtd);
+        }, exception_subtype => <Q::MDOMX|HIERARCHY_ANCESTOR_OR_SELF>);
+
+        $test->id ('insertBefore');
+        $test->assert_exception (code => sub {
+          $dtd-><M::Node.insertBefore> ($dtd);
+        }, exception_subtype => <Q::MDOMX|HIERARCHY_ANCESTOR_OR_SELF>);
+
+        $test->id ('replaceChild');
+        $test->assert_exception (code => sub {
+          $dtd-><M::Node.replaceChild> ($dtd, $dtd-><AG::Node.firstChild>);
+        }, exception_subtype => <Q::MDOMX|HIERARCHY_ANCESTOR_OR_SELF>);
+
+    @@Test:
+      @@@QName: EntityRef.appendChild.ancestor.2.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTestER:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        $dtd-><M::Node.appendChild>
+                ($doc-><M::Document.createTextNode> ('text1'));
+        my $el = $doc-><M::Document.createElement> ('el');
+        $el-><M::Node.appendChild> ($dtd);
+
+        $test->id ('appendChild');
+        $test->assert_exception (code => sub {
+          $dtd-><M::Node.appendChild> ($el);
+        }, exception_subtype => <Q::MDOMX|HIERARCHY_ANCESTOR_OR_SELF>);
+
+        $test->id ('insertBefore');
+        $test->assert_exception (code => sub {
+          $dtd-><M::Node.insertBefore> ($el);
+        }, exception_subtype => <Q::MDOMX|HIERARCHY_ANCESTOR_OR_SELF>);
+
+        $test->id ('replaceChild');
+        $test->assert_exception (code => sub {
+          $dtd-><M::Node.replaceChild> ($el, $dtd-><AG::Node.firstChild>);
+        }, exception_subtype => <Q::MDOMX|HIERARCHY_ANCESTOR_OR_SELF>);
+
+    @@Test:
+      @@@QName: EntityRef.appendChild.ancestor.3.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTestER:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        $dtd-><M::Node.appendChild>
+                ($doc-><M::Document.createTextNode> ('text1'));
+        my $el = $doc-><M::Document.createElement> ('el');
+        $el-><M::Node.appendChild> ($dtd);
+        my $el2 = $doc-><M::Document.createElement> ('el');
+        $el2-><M::Node.appendChild> ($el);
+
+        $test->id ('appendChild');
+        $test->assert_exception (code => sub {
+          $dtd-><M::Node.appendChild> ($el2);
+        }, exception_subtype => <Q::MDOMX|HIERARCHY_ANCESTOR_OR_SELF>);
+
+        $test->id ('insertBefore');
+        $test->assert_exception (code => sub {
+          $dtd-><M::Node.insertBefore> ($el2);
+        }, exception_subtype => <Q::MDOMX|HIERARCHY_ANCESTOR_OR_SELF>);
+
+        $test->id ('replaceChild');
+        $test->assert_exception (code => sub {
+          $dtd-><M::Node.replaceChild> ($el2, $dtd-><AG::Node.firstChild>);
+        }, exception_subtype => <Q::MDOMX|HIERARCHY_ANCESTOR_OR_SELF>);
+
+  @CMethod:
+    @@Name: manakaiAppendText
+    @@Param:
+      @@@Name: string
+      @@@Type: DOMString
+      @@@enDesc:
+        The string to append.
+      @@@InCase:
+        @@@@Type: DISPerl|SCALAR||ManakaiDOM|all
+        @@@@enDesc:
+          A copy of the string value referenced from the value
+          is appended.
+    @@Return:
+      @@@Type: Node
+      @@@enDesc:
+        The node itself.
+      @@@dx:raises:
+        @@@@@: MDOMX|NOMOD_THIS
+        @@@@enDesc:
+          If the node to insert the string or a <IF::Text> node
+          is read-only.
+      @@@disDef:
+        @@@@DISPerl:cloneCode: tc|ManakaiDOMAttr.manakaiAppendText
+
+    @@Test:
+      @@@QName: EntityRef..=.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTestER:: $doc => $doc}__;
+
+        my $node = $doc-><M::Document.createEntityReference> ('node');
+
+        $node-><M::Node.manakaiAppendText> ('string');
+        $test->id ('1.class');
+        $test->assert_isa ($node, <IFName::EntityReference>);
+        $test->id ('1.value');
+        $test->assert_equals ($node-><AG::Node.textContent>, 'string');
+        $test->id ('1.length');
+        $test->assert_num_equals
+                 (expected_value => 1,
+                  actual_value => 0+@{$node-><AG::Node.childNodes>});
+
+        $test->id (2);
+        $node-><M::Node.manakaiAppendText> ('STRING');
+        $test->assert_equals ($node-><AG::Node.textContent>, 'stringSTRING');
+        $test->assert_num_equals
+                 (expected_value => 1,
+                  actual_value => 0+@{$node-><AG::Node.childNodes>});
+
+        $node-><M::Node.appendChild>
+                 ($doc-><M::Document.createEntityReference> ('er'));
+
+        $test->id (3);
+        $node-><M::Node.manakaiAppendText> ('text');
+        $test->assert_equals ($node-><AG::Node.textContent>, 'stringSTRINGtext');
+        $test->assert_num_equals
+                 (expected_value => 3,
+                  actual_value => 0+@{$node-><AG::Node.childNodes>});
+
+
   @CAttr:
     @@Name: nodeName
     @@enDesc:
@@ -1469,6 +6322,53 @@ NodeTypeDef:
         my $not = $doc-><M::Document.createEntityReference> ('notation1');
 
         $test->assert_equals ($not-><AG::Node.nodeName>, 'notation1');
+
+  @CL3Method:
+    @@Name: getFeature
+    @@enDesc:
+      Returns a specialized object that implements the specialized APIs.
+    @@Param:
+      @@@Name: feature
+      @@@Type: DOMString
+      @@@dis:actualType: f|FeatureNameString
+    @@Param:
+      @@@Name: version
+      @@@Type: DOMString
+      @@@dis:actualType: f|FeatureVersionString
+    @@Return:
+      @@@Type: DOMMain|DOMObject
+      @@@nullCase:
+      @@@PerlDef:
+        $feature =~ s/^\+//;
+        __CODE{f|getFeatureImpl::
+          $self => $self,
+          $feature => $feature, $version => $version, $r => $r,
+          $base_class => {<ClassName::ManakaiDOMEntityReference>},
+        }__;
+        unless (defined $r) {
+          __DEEP{
+            $r = $self->SUPER::get_feature ($feature, $version);
+          }__;
+        }
+
+    @@Test:
+      @@@QName: ER.getFeature.test
+      @@@PerlDef:
+        my $node;
+        __CODE{tx|createERForTest:: $er => $node}__;
+
+        for (
+          [Core => '1.0', <IFName::EntityReference||ManakaiDOM|ManakaiDOM1>],
+          [Core => '2.0', <IFName::EntityReference||ManakaiDOM|ManakaiDOM2>],
+          [Core => '3.0', <IFName::EntityReference||ManakaiDOM|ManakaiDOM3>],
+          [XML => '1.0', <IFName::EntityReference||ManakaiDOM|ManakaiDOM1>],
+          [XML => '2.0', <IFName::EntityReference||ManakaiDOM|ManakaiDOM2>],
+          [XML => '3.0', <IFName::EntityReference||ManakaiDOM|ManakaiDOM3>],
+        ) {
+          $test->id ($_->[0].'.'.$_->[1]);
+          my $sp = $node-><M::Node.getFeature> ($_->[0], $_->[1]);
+          $test->assert_isa ($sp, $_->[2]);
+        }
 ##EntityReference
 
 NodeTypeDef:
@@ -1681,6 +6581,72 @@ NodeTypeDef:
       @@@disDef:
         @@@@DISPerl:cloneCode: tc|ManakaiDOMCharacterData.replaceChild
 
+    @@Test:
+      @@@QName: PI.appendChild.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        my $comment = $doc-><M::Document.createProcessingInstruction> ('data');
+        my $node2 = $doc-><M::Document.createProcessingInstruction> ('data');
+
+        for my $node (<Code::tc|createNodesForTest+dt>) {
+          $test->id ('appendChild.'.$node-><AG::Node.nodeType>);
+          $test->assert_exception (code => sub {
+            $comment-><M::Node.appendChild> ($node);
+          }, exception_subtype => <Q::MDOMX|HIERARCHY_BAD_TYPE>);
+
+          $test->id ('insertBefore.'.$node-><AG::Node.nodeType>);
+          $test->assert_exception (code => sub {
+            $comment-><M::Node.insertBefore> ($node);
+          }, exception_subtype => <Q::MDOMX|HIERARCHY_BAD_TYPE>);
+
+          $test->id ('replaceChild.'.$node-><AG::Node.nodeType>);
+          $test->assert_exception (code => sub {
+            $comment-><M::Node.replaceChild> ($node, $node2);
+          }, exception_subtype => <Q::MDOMX|HIERARCHY_BAD_TYPE>);
+        }
+
+  @CMethod:
+    @@Name: manakaiAppendText
+    @@Param:
+      @@@Name: string
+      @@@Type: DOMString
+      @@@enDesc:
+        The string to append.
+      @@@InCase:
+        @@@@Type: DISPerl|SCALAR||ManakaiDOM|all
+        @@@@enDesc:
+          A copy of the string value referenced from the value
+          is appended.
+    @@Return:
+      @@@Type: Node
+      @@@enDesc:
+        The node itself.
+      @@@NodeReadOnlyError:
+      @@@disDef:
+        @@@@DISPerl:cloneCode: tc|ManakaiDOMCharacterData.manakaiAppendText
+
+    @@Test:
+      @@@QName: PI..=.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createDocumentForTestDA:: $doc => $doc}__;
+
+        my $node = $doc-><M::Document.createProcessingInstruction> ('d');
+
+        $node-><M::Node.manakaiAppendText> ('aaaa');
+        $test->id ('1.class');
+        $test->assert_isa ($node, <IFName::ProcessingInstruction>);
+        $test->id ('1.value');
+        $test->assert_equals ($node-><AG::ProcessingInstruction.data>, 'aaaa');
+
+        $test->id (2);
+        $node-><M::Node.manakaiAppendText> ('bbbb');
+        $test->assert_equals
+                 ($node-><AG::ProcessingInstruction.data>, 'aaaabbbb');
+
   @CAttr:
     @@Name: nodeName
     @@enDesc:
@@ -1727,7 +6693,7 @@ NodeTypeDef:
                    (defined $given ? $given : '');
         }__;
 
-  @CAttr:
+  @Attr:
     @@Name: target
     @@DOMMain:isNamespaceUnaware:1
     @@Type: DOMString
@@ -1754,6 +6720,53 @@ NodeTypeDef:
 
         $test->id ('target');
         $test->assert_equals ($not-><AG::ProcessingInstruction.target>, 'pi');
+
+  @CL3Method:
+    @@Name: getFeature
+    @@enDesc:
+      Returns a specialized object that implements the specialized APIs.
+    @@Param:
+      @@@Name: feature
+      @@@Type: DOMString
+      @@@dis:actualType: f|FeatureNameString
+    @@Param:
+      @@@Name: version
+      @@@Type: DOMString
+      @@@dis:actualType: f|FeatureVersionString
+    @@Return:
+      @@@Type: DOMMain|DOMObject
+      @@@nullCase:
+      @@@PerlDef:
+        $feature =~ s/^\+//;
+        __CODE{f|getFeatureImpl::
+          $self => $self,
+          $feature => $feature, $version => $version, $r => $r,
+          $base_class => {<ClassName::ManakaiDOMProcessingInstruction>},
+        }__;
+        unless (defined $r) {
+          __DEEP{
+            $r = $self->SUPER::get_feature ($feature, $version);
+          }__;
+        }
+
+    @@Test:
+      @@@QName: PI.getFeature.test
+      @@@PerlDef:
+        my $node;
+        __CODE{tx|createPIForTest:: $pi => $node}__;
+
+        for (
+          [Core => '1.0', <IFName::ProcessingInstruction||ManakaiDOM|ManakaiDOM1>],
+          [Core => '2.0', <IFName::ProcessingInstruction||ManakaiDOM|ManakaiDOM2>],
+          [Core => '3.0', <IFName::ProcessingInstruction||ManakaiDOM|ManakaiDOM3>],
+          [XML => '1.0', <IFName::ProcessingInstruction||ManakaiDOM|ManakaiDOM1>],
+          [XML => '2.0', <IFName::ProcessingInstruction||ManakaiDOM|ManakaiDOM2>],
+          [XML => '3.0', <IFName::ProcessingInstruction||ManakaiDOM|ManakaiDOM3>],
+        ) {
+          $test->id ($_->[0].'.'.$_->[1]);
+          my $sp = $node-><M::Node.getFeature> ($_->[0], $_->[1]);
+          $test->assert_isa ($sp, $_->[2]);
+        }
 
   @Attr:
     @@Name: data
