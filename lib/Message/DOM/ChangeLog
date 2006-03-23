@@ -1,3 +1,29 @@
+2006-03-23  Wakaba  <wakaba@suika.fam.cx>
+
+	* TreeCore.dis, XML.dis, XDoctype.dis (Node.textContent): Reimplemented
+	(untested).
+
+2006-03-22  Wakaba  <wakaba@suika.fam.cx>
+
+	* DOMCore.dis (DOMSTRING_SIZE_ERR): It now has
+	a qualified name.
+
+	* DOMMain.dis (ensureNamespacePrefix): Undefines
+	the prefix if it is an empty string.  (Note that
+	it is defined as implementation dependent in
+	DOM Level 3 Core specification).
+
+	* TreeCore.dis (Require): It now references the |MDOM:XDoctype|
+	module.
+	(Node): Attributes are reimplemented (untested).
+
+	* XML.dis (Require): It now references the |MDOMX:XDoctype|
+	module.
+	(Node): Attributes are reimplemented (untested).
+	(Entity, Notation): New interfaces.
+
+	* XDoctype.dis (Node): Attributes are reimplemented (untested).
+
 2006-03-19  Wakaba  <wakaba@suika.fam.cx>
 
 	* TreeCore.dis (childNodes, firstChild, lastChild,

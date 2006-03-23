@@ -17,7 +17,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/03/10 10:52:03 $
+    $Date: 2006/03/23 03:05:43 $
   
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
   
@@ -70,8 +70,12 @@ Namespace:
     http://www.w3.org/2000/01/rdf-schema#
   @t:
     http://suika.fam.cx/~wakaba/archive/2004/dom/tree#
+  @tc:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/TreeCore/
   @test:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Test#
+  @tx:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/XML/
   @x:
     http://suika.fam.cx/~wakaba/archive/2004/dom/xml#
   @xml:
@@ -865,6 +869,14 @@ IFClsXDef:
                               <C::t|Node.NOTATION_NODE>); 
         $test->assert_string (actual_value => $dtd-><AG::Node.nodeName>,
                               expected_value => '0120'); 
+
+  @CODE:
+    @@QName: d|createEmptyDocumentXForTest
+    @@PerlDef:
+      my $impl;
+      __CODE{tc|createImplForTest:: $impl => $impl}__;
+      my $doc = $impl-><M::c|DOMImplementation.createDocument>;
+      $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 ##DocumentXDoctype
 
 ResourceDef:
@@ -917,6 +929,65 @@ IFClsXDef:
     object <kwd:MUST> also implement the <IF::x|DocumentType>
     interface (because of <M::t|ManakaiDOMNode.getNodeReference>
     implementation).
+  
+  @IntMethod:
+    @@Operator: mg|CreateNodeStemMethod
+    @@Param:
+      @@@Name: bag
+      @@@Type: HASH
+    @@Param:
+      @@@Name: obj
+      @@@Type: HASH
+    @@Param:
+      @@@Name: opt
+      @@@Type: HASH
+    @@Return:
+      @@@Type: HASH
+      @@@PerlDef:
+        __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
+          $result => {$obj->{<H::infoset|name>}},
+          $given => {${$opt->{<H::infoset|name>}}},
+        }__;
+        if (defined $opt->{<H::tc|ownerDocument>}) {
+          __CODE{mg|setOwnerProp||ManakaiDOM|all::
+            $bag => $bag,
+            $ownerref => {$opt->{<H::tc|ownerDocument>}},
+            $ownee1hprop => {<H::tc|revOwnerDocument>},
+            $ownee => {$obj},
+            $owner0prop => {<H::tc|ownerDocument>},
+          }__;
+        }
+        $obj->{<H::infoset|content>} = [];
+        $obj->{<H::d|elementTypes>} = {};
+        $obj->{<H::d|generalEntities>} = {};
+        $obj->{<H::d|notations>} = {};
+        $r = $obj;
+  @mg:owner0: tc|ownerDocument
+  @mg:origin0: infoset|parent
+  @mg:subnode1a: infoset|content
+  @mg:subnode1h: d|elementTypes
+  @mg:subnode1h: d|generalEntities
+  @mg:subnode1h: d|notations
+
+  @CODE:
+    @@QName: d|createDTDefForTest
+    @@PerlDef:
+      my $docx;
+      __CODE{d|createEmptyDocumentXForTest:: $docx => $docx}__;
+      $dtdef = $docx-><M::DocumentX.createDocumentTypeDefinition> ('dtdef1');
+  @CODE:
+    @@QName: d|createDTForTest
+    @@PerlDef:
+      my $impl;
+      __CODE{tc|createImplForTest:: $impl => $impl}__;
+      $dt = $impl-><M::c|DOMImplementation.createDocumentType> ('dt1');
+      ## TODO: setReadOnly (0)
+  @CODE:
+    @@QName: d|createRODTForTest
+    @@PerlDef:
+      my $impl;
+      __CODE{tc|createImplForTest:: $impl => $impl}__;
+      $dt = $impl-><M::c|DOMImplementation.createDocumentType> ('dt1');
 
   @ResourceDef:
     @@ForCheck: ManakaiDOM|ForClass
@@ -927,22 +998,6 @@ IFClsXDef:
       __CODE{newDocumentForTest}__;
       $dtd = $doc-><M::DocumentXDoctype.createDocumentTypeDefinition>
                           ('dt1');
-
-  @Test:
-    @@QName: ManakaiDOMDTD.ownerDocument.test
-    @@PerlDef:
-      my $dtd;
-      __CODE{newDoctypeForTest}__;
-      $test->assert_not_null ($dtd);
-      $test->assert_isa ($dtd, <IFName::DocumentTypeDefinition>);
-      $test->assert_isa ($dtd, <IFName::x|DocumentType>);
-      $test->assert_isa ($dtd, <IFName::Node>);
-      $test->assert_isa ($dtd, <ClassName::ManakaiDOM|ManakaiDOMObject>);
-
-      my $od = $dtd-><AG::Node.ownerDocument>;
-      $test->assert_not_null ($od);
-      $test->assert_not_null
-               ($od-><M::Node.getFeature> (<Q::ManakaiDOM:XDoctype>, '3.0'));
 
   @Test:
     @@QName: ManakaiDOMDTD.appendChild.pi.test
@@ -961,155 +1016,36 @@ IFClsXDef:
       $test->assert_string (actual_value => $pi-><AG::PI.target>,
                             expected_value => 'pitarget');
 
-  @Attr:
-    @@ForCheck: ManakaiDOM|ForClass
+  @CAttr:
     @@Name: nodeName
     @@enDesc:
       The document type name of the node.
     @@Type: DOMString
     @@Get:
-      @@@PerlDef:
-        if (defined $self->{<H::mn:node>}
-                         ->{<H::infoset:localName>}) {
-          if (defined $self->{<H::mn:node>}->{<H::infoset:prefix>}) {
-            $r = $self->{<H::mn:node>}->{<H::infoset:prefix>}
-               . ':'
-               . $self->{<H::mn:node>}->{<H::infoset:localName>};
-          } else {
-            $r = $self->{<H::mn:node>}->{<H::infoset:localName>};
-          }
-        } else {
-          $r = $self->{<H::mn:node>}->{<H::c|name>};
-        }
-    @@Test:
-      @@@PerlDef:
-        my $dtd;
-        __CODE{newDoctypeForTest}__;
-        $test->assert_equals
-                 ($dtd-><AG::Node.nodeName>, 'dt1');
+      @@@disDef:
+        @@@@DISPerl:cloneCode: tx|ManakaiDOMNotation.nodeName.get
 
-  @Attr:
-    @@ForCheck: ManakaiDOM|ForClass
-    @@Name: localName
-    @@enDesc:
-      The local name of the document type name.
-      
-      If the node is created by namespace aware method
-      such as <M::c|DOMImplementation.createDocumentType>,
-      then this attribute contains a non-<DOM::null> value.
-      Otherwise, the attribute value is <DOM::null>.
-      
-        {NOTE:: This is a manakai extension.  In other
-                implementation, <A::t|Node.localName>
-                of a <IF::x|DocumentType> is always <DOM::null>.
-        }
-    @@Type: DOMString
-    @@DOMMain:isNamespaceAware: 1
-    @@Get:
-      @@@nullCase:
-        @@@@enDesc:
-          If the node is namespace unaware.
-      @@@disDef:
-        @@@@GetProp: infoset|localName
     @@Test:
+      @@@QName: DTDef.nodeName.1.test
       @@@PerlDef:
-        my $dtd;
-        __CODE{newDoctypeForTest}__;
-        $test->assert_null ($dtd-><AG::Node.localName>);
-      
-  @Attr:
-    @@ForCheck: ManakaiDOM|ForClass
-    @@Name: prefix
-    @@enDesc:
-      The namespace prefix of the document type name.
-      
-      If the node is created by a namespace aware method
-      such as <M::c|DOMImplementation.createDocumentType>,
-      then the node might have a namespace prefix.
-      Otherwise, it is always <DOM::null>.
-      
-        {NOTE:: This is a manakai extension; in other 
-                implementations, <A::t|Node.prefix> of
-                a <IF::x|DocumentType> node will be always 
-                <DOM::null>.
-        }
-    @@Type: DOMString
-    @@dis:actualType: DOMMain|ManakaiDOMNamespacePrefix
-    @@DOMMain:isNamespaceAware: 1
-    @@Get:
-      @@@nullCase:
-        @@@@enDesc:
-          If the node is <EM::not> namespace aware, or
-          if the document type name belongs to the default
-          namespace.
-      @@@disDef:
-        @@@@GetProp: infoset|prefix
-    @@Set:
-      @@@enDesc:
-        If the node is <EM::not> namespace aware, then
-        setting the node has no effect, even if the node
-        is read-only.
-      @@@InCase:
-        @@@@Value:
-          @@@@@@: \
-          @@@@@ContentType: DISCore|String
-        @@@@enDesc:
-          The result is implementation dependent.
-      @@@nullCase:
-        @@@@enDesc:
-          The document type name has no prefix.
-      @@@dx:raises:
-        @@@@@: MDOMX|MDOM_BAD_NAME
-        @@@@enDesc:
-          If the new value is not a legal <CODE::Name>
-          according to the XML version of the document.
-        
-            {NOTE:: If the XML version of the document
-                    is not available, then it is validated
-                    against XML 1.1.
-            }
-      @@@NodeReadOnlyError:
-      @@@dx:raises:
-        @@@@@: MDOMX|MDOM_NS_BAD_NCNAME
-        @@@@enDesc:
-          If the new value is not a legal <CODE::NCName>
-          according to the XML version of the document.
-          
-            {NOTE:: If the XML version of the document
-                    is not available, then it is validated
-                    against XML 1.1.
-            }
-      @@@c:reports:
-        @@@@@: t|setting-prefix-no-effect-because-of-node
-        @@@@enDesc:
-          If the node is <EM::not> namespace aware so that
-          setting the attribute value has no effect.
-        @@@@For: ManakaiDOM|ManakaiDOM
-      @@@PerlDef:
-        if (defined $self->{<H::mn:node>}
-                         ->{<H::infoset:localName>}) {
-          __CODE{NodeReadOnlyError}__;
-          my $doc = $self->{<H::infoset:parent>};
-          my $ver = $doc
-                      ? (<Code::t|getDocumentXMLVersion::
-                           $DOCOBJ = $doc>)
-                      : '1.1';
-          __CODE{DOMMain:ensureNamespacePrefix::
-            $INPUT => $given,
-            $INPUT_PARAM_NAME => '',
-            $XMLVERSION => $ver,
-          }__;
-          $self->{<H::mn:node>}->{<H::infoset:prefix>} = $given;
-        }
+        my $docx;
+        __CODE{d|createEmptyDocumentXForTest:: $docx => $docx}__;
+
+        my $dtd = $docx-><M::DocumentXDoctype.createDocumentTypeDefinition>
+                           ('dtdef1');
+
+        $test->assert_equals ($dtd-><AG::Node.nodeName>, 'dtdef1');
+
     @@Test:
+      @@@QName: DTDef.nodeName.2.test
       @@@PerlDef:
-        my $dtd;
-        __CODE{newDoctypeForTest}__;
-        $test->assert_null ($dtd-><AG::Node.prefix>);
-        $dtd-><AS::Node.prefix> ('prefix');
-        $test->assert_null ($dtd-><AG::Node.prefix>);
-        $dtd-><AS::Node.prefix> ('0120444444');
-        $test->assert_null ($dtd-><AG::Node.prefix>);
+        my $impl;
+        __CODE{tc|createImplForTest:: $impl => $impl}__;
+
+        my $dtd = $impl-><M::c|DOMImplementation.createDocumentType>
+                           ('dtdef1');
+
+        $test->assert_equals ($dtd-><AG::Node.nodeName>, 'dtdef1');
 
   @Attr:
     @@Name: elementTypes
@@ -2050,43 +1986,47 @@ IFClsXDef:
         $test->assert_isa
                  ($obj, <IFName::x|DocumentType||ManakaiDOM|ManakaiDOM3>);
 
-  @Attr:
-    @@ForCheck: ManakaiDOM|ForClass
+  @CAttr:
     @@Name: nodeType
-    @@enDesc:
-      The type of the node.
-    @@Type: idl|unsignedShort||ManakaiDOM|all
-    @@dis:actualType: t|NodeType
+    @@Type: unsignedShort
+    @@dis:actualType: tc|NodeType
     @@Get:
-      @@@InCase:
-        @@@@Label:
-          <C::t|Node.DOCUMENT_TYPE_NODE>
-        @@@@enDesc:
-          The node is a <IF::x|DocumentType>.
       @@@disDef:
-        @@@@DISLang:constValue: t|Node.DOCUMENT_TYPE_NODE
+        @@@@DISLang:constValue: Node.DOCUMENT_TYPE_NODE
 
     @@Test:
-      @@@QName: DTDef.nodeType.get.test
+      @@@QName: DTDef.nodeType.1.test
       @@@PerlDef:
-        my $dtd;
-        __CODE{newDoctypeForTest}__;
+        my $text;
+        __CODE{d|createDTDefForTest:: $dtdef => $text}__;
 
+        $test->id ('nodeType');
         $test->assert_num_equals
-                 (actual_value => $dtd-><AG::Node.nodeType>,
+                 (actual_value => $text-><AG::Node.nodeType>,
                   expected_value => <C::Node.DOCUMENT_TYPE_NODE>);
 
-  @Attr:
-    @@ForCheck: ManakaiDOM|ForClass
+    @@Test:
+      @@@QName: DTDef.nodeType.2.test
+      @@@PerlDef:
+        my $text;
+        __CODE{d|createDTForTest:: $dt => $text}__;
+
+        $test->id ('nodeType');
+        $test->assert_num_equals
+                 (actual_value => $text-><AG::Node.nodeType>,
+                  expected_value => <C::Node.DOCUMENT_TYPE_NODE>);
+
+  @CAttr:
     @@Name: textContent
     @@enDesc:
-      The text content of the node and its descendants.
+      The text content of the node.
     @@Type: DOMString
     @@Get:
       @@@nullCase:
         @@@@enDesc:
           The text content of the node is defined to be <DOM::null>.
-      @@@PerlDef: $r = null;
+      @@@disDef:
+        @@@@DISPerl:cloneCode: tx|ManakaiDOMNotation.textContent.get
     @@Set:
       @@@enDesc:
         Setting this attribute has no effect.
@@ -2097,28 +2037,7 @@ IFClsXDef:
           node value is defined as <DOM::null>.
         @@@@For: ManakaiDOM|ManakaiDOM
       @@@disDef:
-        @@@@DISPerl:cloneCode: t|ManakaiDOMNode.nodeValue.set
-
-    @@Test:
-      @@@QName: DTDef.textContent.get.test
-      @@@PerlDef:
-        my $dtd;
-        __CODE{newDoctypeForTest}__;
-
-        $test->assert_null ($dtd-><AG::Node.textContent>);
-    @@Test:
-      @@@QName: DTDef.textContent.set.test
-      @@@PerlDef:
-        my $dtd;
-        __CODE{newDoctypeForTest}__;
-
-        $test->id ('set.non.null');
-        $dtd-><AS::Node.textContent> ('abcdefg');
-        $test->assert_null ($dtd-><AG::Node.textContent>);
-
-        $test->id ('set.null');
-        $dtd-><AS::Node.textContent> (null);
-        $test->assert_null ($dtd-><AG::Node.textContent>);
+        @@@@DISPerl:cloneCode: tx|ManakaiDOMNotation.textContent.set
 
   @CAttr:
     @@Name: baseURI
@@ -4131,13 +4050,6 @@ IFClsXDef:
       <M::DocumentXDoctype.createDocumentTypeDefinition>
       is <EM::not> namespace aware and the document type
       name is kept by <Q::c|name> property.
-  @mn:xrefnode0: c|ownerDocument
-  @mn:subnode1: d|elementTypes
-  @mn:subnode1: d|generalEntities
-  @mn:subnode1: d|parameterEntities
-  @mn:subnode1: d|notations
-  @mn:subnode1: infoset|children
-  @mn:origin0: infoset|parent
 ##DocumentTypeDefinition
 
 PropDef:
@@ -4475,6 +4387,44 @@ IFClsXDef:
               type declaration itself.
       }
 
+  @IntMethod:
+    @@Operator: mg|CreateNodeStemMethod
+    @@Param:
+      @@@Name: bag
+      @@@Type: HASH
+    @@Param:
+      @@@Name: obj
+      @@@Type: HASH
+    @@Param:
+      @@@Name: opt
+      @@@Type: HASH
+    @@Return:
+      @@@Type: HASH
+      @@@PerlDef:
+        __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
+          $result => {$obj->{<H::infoset|name>}},
+          $given => {${$opt->{<H::infoset|name>}}},
+        }__;
+        __CODE{mg|setOwnerProp||ManakaiDOM|all::
+          $bag => $bag,
+          $ownerref => {$opt->{<H::tc|ownerDocument>}},
+          $ownee1hprop => {<H::tc|revOwnerDocument>},
+          $ownee => {$obj},
+          $owner0prop => {<H::tc|ownerDocument>},
+        }__;
+        $obj->{<H::d|attributeDefinitions>} = {};
+        $r = $obj;
+  @mg:owner0: tc|ownerDocument
+  @mg:origin0: d|ownerDefinition
+  @mg:subnode1h: d|attributeDefinitions
+
+  @CODE:
+    @@QName: d|createETDefForTest
+    @@PerlDef:
+      my $docx;
+      __CODE{d|createEmptyDocumentXForTest:: $docx => $docx}__;
+      $atdef = $docx-><M::DocumentXDoctype.createElementTypeDefinition> ('et');
+
   @ResourceDef:
     @@ForCheck: ManakaiDOM|ForClass
     @@QName: newETForTest
@@ -4547,8 +4497,7 @@ IFClsXDef:
                  (actual_value => $dtype-><AG::Node.nodeType>,
                   expected_value => <C::Node.DOCUMENT_TYPE_NODE>);
 
-  @Attr:
-    @@ForCheck: ManakaiDOM|ForClass
+  @CAttr:
     @@Name: nodeName
     @@enDesc:
       The element type name of the node.
@@ -4556,100 +4505,41 @@ IFClsXDef:
     @@Type: DOMString
     @@Get:
       @@@disDef:
-        @@@@GetProp: c|name
-    @@Test:
-      @@@PerlDef:
-        my $et;
-        __CODE{newETForTest}__;
-        $test->assert_not_null ($et);
-        $test->assert_equals 
-                 ($et-><AG::Node.nodeName> => 'et1');
+        @@@@DISPerl:cloneCode: tx|ManakaiDOMNotation.nodeName.get
 
     @@Test:
-      @@@QName: DocumentType.nodeName.get.test
+      @@@QName: ETDef.nodeName.test
       @@@PerlDef:
-        my $impl;
-        __CODE{t|createDOMImplForTest:: $impl => $impl}__;
+        my $docx;
+        __CODE{d|createEmptyDocumentXForTest:: $docx => $docx}__;
 
-        my $dtype = $impl-><M::c|DOMImplementation.createDocumentType>
-                             ('type', 'pub', 'sys');
-        $test->assert_equals ($dtype-><AG::Node.nodeName>, 'type');
+        my $et = $docx-><M::DocumentXDoctype.createElementTypeDefinition>
+                          ('et1');
 
-  @Attr:
-    @@ForCheck: ManakaiDOM|ForClass
-    @@Name: nodeValue
-    @@enDesc:
-      Defined as <DOM::null>.
-    @@Type: DOMString
-    @@Get:
-      @@@nullCase:
-        @@@@enDesc: Always.
-      @@@DefaultValue:
-        @@@@is-null: 1
-      @@@PerlDef:
-    @@Set:
-      @@@enDesc:
-        Setting the value has no effect.
-      @@@PerlDef:
-    @@Test:
-      @@@PerlDef:
-        my $et;
-        __CODE{newETForTest}__;
-        $test->assert_not_null ($et);
-        $test->assert_null ($et-><AG::Node.nodeValue>);
-        $et-><AS::Node.nodeValue> ('non-undef-value');
-        $test->assert_null ($et-><AG::Node.nodeValue>);
+        $test->assert_equals ($et-><AG::Node.nodeName>, 'et1');
 
-  @Attr:
-    @@ForCheck: ManakaiDOM|ForClass
+  @CAttr:
     @@Name: textContent
     @@enDesc:
-      Defined as <DOM::null>.
+      The text content of the node.
     @@Type: DOMString
     @@Get:
       @@@nullCase:
-        @@@@enDesc: Always.
-      @@@DefaultValue:
-        @@@@is-null: 1
-      @@@PerlDef:
+        @@@@enDesc:
+          The text content of the node is defined to be <DOM::null>.
+      @@@disDef:
+        @@@@DISPerl:cloneCode: tx|ManakaiDOMNotation.textContent.get
     @@Set:
       @@@enDesc:
-        Setting the value has no effect.
-      @@@PerlDef:
-    @@Test:
-      @@@PerlDef:
-        my $et;
-        __CODE{newETForTest}__;
-        $test->assert_not_null ($et);
-        $test->assert_null ($et-><AG::Node.textContent>);
-        $et-><AS::Node.textContent> ('non-undef-value');
-        $test->assert_null ($et-><AG::Node.textContent>);
-
-    @@Test:
-      @@@QName: DocumentType.textContent.get.test
-      @@@PerlDef:
-        my $impl;
-        __CODE{t|createDOMImplForTest:: $impl => $impl}__;
-
-        my $dtype = $impl-><M::c|DOMImplementation.createDocumentType>
-                             ('type', 'pub', 'sys');
-        $test->assert_null ($dtype-><AG::Node.textContent>);
-    @@Test:
-      @@@QName: DocumentType.textContent.set.test
-      @@@PerlDef:
-        my $impl;
-        __CODE{t|createDOMImplForTest:: $impl => $impl}__;
-
-        my $dtype = $impl-><M::c|DOMImplementation.createDocumentType>
-                             ('type', 'pub', 'sys');
-
-        $test->id ('set.non.null');
-        $dtype-><AS::Node.textContent> ('abcdefg');
-        $test->assert_null ($dtype-><AG::Node.textContent>);
-
-        $test->id ('set.null');
-        $dtype-><AS::Node.textContent> (null);
-        $test->assert_null ($dtype-><AG::Node.textContent>);
+        Setting this attribute has no effect.
+      @@@c:reports:
+        @@@@@: c|setting-node-value-no-effect
+        @@@@enDesc:
+          Setting the attribute value has no effect, since the
+          node value is defined as <DOM::null>.
+        @@@@For: ManakaiDOM|ManakaiDOM
+      @@@disDef:
+        @@@@DISPerl:cloneCode: tx|ManakaiDOMNotation.textContent.set
 
   @enImplNote:
     {TODO:: Content model attributes are required.
@@ -5149,6 +5039,42 @@ IFClsXDef:
     <C::AttributeDefinition.EXPLICIT_DEFAULT> or
     <C::AttributeDefinition.FIXED_DEFAULT>.
 
+  @IntMethod:
+    @@Operator: mg|CreateNodeStemMethod
+    @@Param:
+      @@@Name: bag
+      @@@Type: HASH
+    @@Param:
+      @@@Name: obj
+      @@@Type: HASH
+    @@Param:
+      @@@Name: opt
+      @@@Type: HASH
+    @@Return:
+      @@@Type: HASH
+      @@@PerlDef:
+        __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
+          $result => {$obj->{<H::infoset|name>}},
+          $given => {${$opt->{<H::infoset|name>}}},
+        }__;
+        __CODE{mg|setOwnerProp||ManakaiDOM|all::
+          $bag => $bag,
+          $ownerref => {$opt->{<H::tc|ownerDocument>}},
+          $ownee1hprop => {<H::tc|revOwnerDocument>},
+          $ownee => {$obj},
+          $owner0prop => {<H::tc|ownerDocument>},
+        }__;
+        $r = $obj;
+  @mg:owner0: tc|ownerDocument
+  @mg:origin0: d|ownerDefinition
+
+  @CODE:
+    @@QName: d|createATDefForTest
+    @@PerlDef:
+      my $docx;
+      __CODE{d|createEmptyDocumentXForTest:: $docx => $docx}__;
+      $atdef = $docx-><M::DocumentXDoctype.createAttributeDefinition> ('at');
+
   @ResourceDef:
     @@ForCheck: ManakaiDOM|ForClass
     @@QName: newATForTest
@@ -5191,8 +5117,7 @@ IFClsXDef:
                  (actual_value => $at-><AG::Node.nodeType>,
                   expected_value => <C::Node.ATTRIBUTE_DEFINITION_NODE>);
       
-  @Attr:
-    @@ForCheck: ManakaiDOM|ForClass
+  @CAttr:
     @@Name: nodeName
     @@enDesc:
       The name of the attribute.
@@ -5200,45 +5125,26 @@ IFClsXDef:
     @@Type: DOMString
     @@Get:
       @@@disDef:
-        @@@@GetProp: c|name
-    @@Test:
-      @@@PerlDef:
-        my $at;
-        __CODE{newATForTest}__;
+        @@@@DISPerl:cloneCode: tx|ManakaiDOMNotation.nodeName.get
 
-        $test->assert_equals ($at-><AG::Node.nodeName>, 'at1');
+    @@Test:
+      @@@QName: ATDef.nodeName.test
+      @@@PerlDef:
+        my $docx;
+        __CODE{d|createEmptyDocumentXForTest:: $docx => $docx}__;
+
+        my $et = $docx-><M::DocumentXDoctype.createAttributeDefinition>
+                          ('et1');
+
+        $test->assert_equals ($et-><AG::Node.nodeName>, 'et1');
   
-  @Attr:
-    @@ForCheck: ManakaiDOM|ForClass
+  @CAttr:
     @@Name: nodeValue
     @@enDesc:
       The normalized default value of the attribute.
     @@Type: DOMString
     @@Get:
-      @@@enDesc:
-        The concatenation of the text content of every
-        child node.  For <IF::t|Text> children, the
-        text content of a node is the <A::t|Node.textContent>
-        attribute value.  For <IF::x|EntityReference>
-        children, the text content of a node is the
-        <A::t|Node.textContent> attribute value with
-        any <CODE::U+0009>, <CODE::U+000A>, and
-        <CODE::U+000D> replaced by <CODE::U+0020>.
-        
-        If the <A::AttributeDefinition.declaredType>
-        of the node is different from 
-        <C::AttributeDefinition.NO_TYPE_ATTR>,
-        <C::AttributeDefinition.UNKNOWN_ATTR>, or
-        <C::AttributeDefinition,CDATA_ATTR>, the value
-        is further modified by discarding any leading
-        and trailing <CODE::U+0020> characters and
-        by replacing sequences of <CODE::U+0020> characters
-        by a single <CODE::U+0020> character.
       @@@nullCase:
-        @@@@enDesc:
-          If the <A::AttributeDefinition.defaultType>
-          is different from <C::AttributeDefinition.FIXED_DEFAULT>
-          or <C::AttributeDefinition.EXPLICIT_DEFAULT>.
       @@@PerlDef:
         __DEEP{
           my $dt = $self-><AG::AttributeDefinition.defaultType>;
@@ -5267,16 +5173,6 @@ IFClsXDef:
           }
         }__;
     @@Set:
-      @@@enDesc:
-        Any children are removed and if the new value
-        is not empty or <DOM::null>, replaced by a single
-        <IF::t|Text> node containgin the value the
-        attribute is set to.
-        
-        If the <A::AttributeDefinition.defaultType>
-        is different from <C::AttributeDefinition.FIXED_DEFAULT>
-        or <C::AttributeDefinition.EXPLICIT_DEFAULT>, however,
-        setting the attribute has no effect.
       @@@NodeReadOnlyError:
       @@@PerlDef:
         __DEEP{
@@ -5298,12 +5194,81 @@ IFClsXDef:
             }
           }
         }__;
+
     @@Test:
-      @@@QName: 
-        ManakaiDOMAttributeDefinition.nodeValue.get.test
+      @@@QName: ATDef.nodeValue.1.test
+      @@@PerlDef:
+        my $docX;
+        __CODE{d|createEmptyDocumentXForTest:: $docx => $docx}__;
+  
+        for my $dt (
+          <C::AttributeDefinition.EXPLICIT_DEFAULT>,
+          <C::AttributeDefinition.FIXED_DEFAULT>,
+        ) {
+          my $node = $docx-><M::DocumentXDoctype.createAttributeDefinition>
+                              ('attr');
+          $node-><AS::AttributeDefinition.defaultType> ($dt);
+
+          $test->id ($dt.'.nodeValue.get');
+          $test->assert_equals ($node-><AG::Node.nodeValue>, '');
+
+          $node-><M::Node.manakaiSetReadOnly> (false);
+
+          $node-><AS::Node.nodeValue> ('value1');
+
+          $test->id ($dt.'.nodeValue.set.nodeValue');
+          $test->assert_equals ($node-><AG::Node.nodeValue>, 'value1');
+
+          $node-><AS::Node.nodeValue> ('');
+
+          $test->id ($dt.'.nodeValue.empty.nodeValue');
+          $test->assert_equals ($node-><AG::Node.nodeValue>, '');
+
+          $node-><M::Node.manakaiSetReadOnly> (true);
+
+          $test->id ($dt.'.nodeValue.set.ro');
+          $test->assert_exception (code => sub {
+            $node-><AS::Node.nodeValue> ('value1');
+          }, exception_subtype => <Q::MDOMX|NOMOD_THIS>);
+          $test->assert_equals ($node-><AG::Node.nodeValue>, '');
+        }
+
+    @@Test:
+      @@@QName: ATDef.nodeValue.2.test
+      @@@PerlDef:
+        my $docX;
+        __CODE{d|createEmptyDocumentXForTest:: $docx => $docx}__;
+  
+        for my $dt (
+          <C::AttributeDefinition.UNKNOWN_DEFAULT>,
+          <C::AttributeDefinition.IMPLIED_DEFAULT>,
+          <C::AttributeDefinition.REQUIRED_DEFAULT>,
+        ) {
+          my $node = $docx-><M::DocumentXDoctype.createAttributeDefinition>
+                              ('attr');
+          $node-><AS::AttributeDefinition.defaultType> ($dt);
+
+          $test->id ($dt.'get');
+          $test->assert_null ($node-><AG::Node.nodeValue>);
+
+          $node-><M::Node.manakaiSetReadOnly> (false);
+
+          $test->id ($dt.'set');
+          $node-><AS::Node.nodeValue> ('node-value');
+          $test->assert_null ($node-><AG::Node.nodeValue>);
+
+          $node-><M::Node.manakaiSetReadOnly> (true);
+
+          $test->id ($dt.'roset');
+          $node-><AS::Node.nodeValue> ('node-value');
+          $test->assert_null ($node-><AG::Node.nodeValue>);
+        }
+
+    @@Test:
+      @@@QName: ATDef.nodeValue.get.1.test
       @@@PerlDef:
         my $at;
-        __CODE{newATForTest}__;
+        __CODE{d|createATDefForTest:: $atdef => $at}__;
 
         $test->id ('get-empty-content');
 
@@ -5423,11 +5388,10 @@ IFClsXDef:
                  (actual_value => $at-><AG::Node.nodeValue>,
                   expected_value => "abcdefgABCDEFG , \x09, \x0A, \x0D,");
     @@Test:
-      @@@QName: 
-        ManakaiDOMAttributeDefinition.nodeValue.set.test
+      @@@QName: ATDef.nodeValue.set.1.test
       @@@PerlDef:
         my $at;
-        __CODE{newATForTest}__;
+        __CODE{d|createATDefForTest:: $atdef => $at}__;
         my $doc = $at-><AG::Node.ownerDocument>;
 
         $test->id ('set-no-effect');
@@ -5481,36 +5445,11 @@ IFClsXDef:
         $at-><AS::Node.nodeValue> (null);
         $test->assert_false ($at-><M::Node.hasChildNodes>);
 
-  @Attr:
-    @@ForCheck: ManakaiDOM|ForClass
-    @@Name: textContent
-    @@enDesc:
-      The normalized default value of the attribute.
-    @@Type: DOMString
-    @@Get:
-      @@@enDesc:
-        The concatenation of the <A::t|Node.textContent>
-        of every child node.
-      @@@PerlDef:
-        __DEEP{
-          for my $child (@{$self-><AG::t|Node.childNodes>}) {
-            $r .= $child-><AG::t|Node.textContent>;
-          } # childNodes
-        }__;
-    @@Set:
-      @@@enDesc:
-        Setting on this attribute has the same effect
-        as <A::t|Node.nodeValue>.
-      @@@NodeReadOnlyError:
-      @@@disDef:
-        @@@@DISPerl:cloneCode:
-          ManakaiDOMAttributeDefinition.nodeValue.set
     @@Test:
-      @@@QName: 
-        ManakaiDOMAttributeDefinition.textContent.get.test
+      @@@QName: ATDef.textContent.get.test
       @@@PerlDef:
         my $at;
-        __CODE{newATForTest}__;
+        __CODE{d|createATDefForTest:: $atdef => $at}__;
 
         $test->id ('get-empty-content');
 
@@ -5553,11 +5492,10 @@ IFClsXDef:
                  (actual_value => $at-><AG::Node.textContent>,
                   expected_value => "  abcdefgABCDEFG   , \x09, \x0A, \x0D,  ");
     @@Test:
-      @@@QName: 
-        ManakaiDOMAttributeDefinition.textContent.set.test
+      @@@QName: ATDef.textContent.set.test
       @@@PerlDef:
         my $at;
-        __CODE{newATForTest}__;
+        __CODE{createATDefForTest:: $atdef => $at}__;
         my $doc = $at-><AG::Node.ownerDocument>;
 
         $test->id ('set-no-effect');

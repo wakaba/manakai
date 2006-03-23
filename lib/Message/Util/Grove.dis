@@ -9,7 +9,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/03/19 07:55:46 $
+    $Date: 2006/03/23 03:05:44 $
 
   @Require:
     @@Module:
@@ -550,6 +550,15 @@ ClsDef:
                 ->{$prop};
 
   @CODE:
+    @@QName: mg|get++NodeStemPropValue
+    @@enDesc:
+      Obtains a property value set to the node stem associated
+      to the node reference and then increments the value.
+    @@PerlDef:
+      $r = $ref->{<H::mg|nodeBag>}->{${$ref->{<H::mg|nodeIDReference>}}}
+               ->{$prop}++;
+
+  @CODE:
     @@QName: mg|setNodeStemPropValue
     @@enDesc:
       Sets a property value to the node stem associated
@@ -557,6 +566,15 @@ ClsDef:
     @@PerlDef:
       $ref->{<H::mg|nodeBag>}->{${$ref->{<H::mg|nodeIDReference>}}}
           ->{$prop} = $given;
+
+  @CODE:
+    @@QName: mg|orSetNodeStemPropValue
+    @@enDesc:
+      Sets a property value to the node stem associated
+      to the node reference by <Perl::||=> operator.
+    @@PerlDef:
+      $ref->{<H::mg|nodeBag>}->{${$ref->{<H::mg|nodeIDReference>}}}
+          ->{$prop} ||= $given;
 
   @CODE:
     @@QName: mg|getNodeStemProp0Node
