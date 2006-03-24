@@ -12,7 +12,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/03/24 12:33:11 $
+    $Date: 2006/03/24 15:43:54 $
 
   @Require:
     @@Module:
@@ -4023,6 +4023,25 @@ ElementTypeBinding:
 NodeTypeDef:
   @IFQName: Document
   @ClsQName: ManakaiDOMDocument
+
+  @enDesc:
+    A <IF::Document> object represents the entire HTML or XML document.
+    It is conceptually the root of the document tree and
+    provides the primary access to the docuement's data.
+
+    Since elements, text nodes, comments, processing instructions,
+    and so on cannot exist outside the context of a <IF::Document>,
+    the <IF::Document> interface also contains the factory methods
+    needed to create these objects.  The <IF::Node> objects
+    created have a <A::Node.ownerDocument> attribute which
+    associates them with the <IF::Document> within whose context
+    they were created.
+
+    {NOTE:: A <IF::DocumentType> node can be created by
+            <M::c|DOMImplementation.createDocumentType> method.
+            A <IF::Document> node can be created by 
+            <M::c|DOMImplementation.createDocument> method.
+    }
 
   @IntMethod:
     @@Operator: mg|CreateNodeStemMethod
@@ -8789,12 +8808,19 @@ NodeTypeDef:
         $test->assert_null ($bag->{$$el_id});
 
   @L3Attr:
-     @@Name:  strictErrorChecking
-     @@Description:
-       @@@lang:en
-       @@@@:
-         Whether error checking is enforced or not.
+    @@Name: strictErrorChecking
+    @@enDesc:
+      Whether error checking is enforced or not.
+
+      This attribute is <DOM::true> by default.
     @@Type: boolean
+    @@FalseCase:
+      @@@enDesc:
+        The implementation is free not to test every possible error
+        case normally defined on DOM operations and not raise any
+        <IF::c|DOMException> on DOM operations or report errors
+        while using <M::Document.normalizeDocument>.  In case of error,
+        the behavior is undefined.
     @@Get:
       @@@PerlDef:
         __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
@@ -8804,29 +8830,15 @@ NodeTypeDef:
         }__;
         $r = true unless defined $r;
     @@Set:
-        @@@Description:
-          @@@@lang:en
-          @@@@@: Whether error checking is enforced or not.
-        @@@InCase:
-          @@@@Value: false
-          @@@@@: 
-            The implementation is free to not every possible error 
-            case normally defined on DOM operations, and not raise any 
-            "DOMException" on DOM operations or report error 
-            while using method "normalizeDocument".  In case of error, 
-            the behavior is undefined.
       @@@PerlDef:
         __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
           $given => {$given ? true : false},
           $prop => {<H::c|strictErrorChecking>},
           $ref => $self,
         }__;
-     @@ImplNote:
-       @@@lang:en
-       @@@@: This attribute is "true" by default.
 
     @@L3Test:
-      @@@QName: Doc.strictErrorChecking.test
+      @@@QName: Document.strictErrorChecking.test
       @@@PerlDef:
         my $doc;
         __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
@@ -8861,7 +8873,8 @@ NodeTypeDef:
       @@@PerlDef:
         __CODE{c|getConfigObject::
           $target => $self,
-          $targetHash => {<Code::mg|getNodeStem||ManakaiDOM|all:: $ref = $self>},
+          $targetHash => {<Code::mg|getNodeStem||ManakaiDOM|all::
+                                     $ref = $self>},
           $targetType => {<IFName::Document>},
           $result => $r,
         }__;
@@ -8927,13 +8940,11 @@ NodeTypeDef:
         $test->assert_equals ($doc-><AG::Document.documentElement>, $el);
 
   @Attr:
-     @@Name:  implementation
-     @@Description:
-       @@@lang:en
-       @@@@:
-         The "DOMImplementation" object that handles the "Document".
-     @@Get:
-        @@@Type:  c|DOMImplementation
+    @@Name: implementation
+    @@enDesc:
+      The <IF::c|DOMImplmentation> object that handles the document.
+    @@Type: c|DOMImplementation
+    @@Get:
       @@@PerlDef:
         __CODE{mg|getNodeStemProp0Node||ManakaiDOM|all::
           $r => $r,
@@ -8941,85 +8952,422 @@ NodeTypeDef:
           $ref => $self,
         }__;
 
+    @@Test:
+      @@@QName: Document.implementation.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+        my $impl = $doc-><AG::Document.implementation>;
+        $test->assert_isa ($impl, <IFName::c|DOMImplementation>);
+
   @L3Attr:
-     @@Name:  xmlVersion
-     @@Description:
-       @@@lang:en
-       @@@@:
-         The version number of the document.
-      \
-         This attribute is corresponding to the version declaration in the 
-         XML declaration and [version] property of the document information 
-         item of the XML Infoset.
+    @@Name: xmlVersion
+    @@enDesc:
+      The XML version number of the document, as part of the XML
+      declaration.
     @@Type: DOMString
-     @@Get:
-        @@@InCase:
-          @@@@Value: 1.0
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              The XML version is specified as XML 1.0 or the XML document 
-              has no version declaration.
-        @@@InCase:
-          @@@@Value: 1.1
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@: The XML version is specified as XML 1.1.
-        @@@InCase:
-          @@@@Value:
-            @@@@@is-null:1
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@: The document does not support the "XML" feature.
+    @@InCase:
+      @@@Value: 
+        @@@@@: 1.0
+        @@@@ContentType: DISCore|String
+      @@@enDesc:
+        If the <XA::version> declaration is set to <XML::1.0> or
+        if there is no declaration and the document supports the
+        <Feature::XML> feature.
+    @@InCase:
+      @@@Value:
+        @@@@@: 1.1
+        @@@@ContentType: DISCore|String
+      @@@enDesc:
+        If the <XA::version> declaration is set to <XML::1.1>.  <SRC::manakai>
+    @@nullCase:
+      @@@enDesc:
+        If the document does not support the <Feature::XML> feature.
+    @@Get:
       @@@PerlDef:
         __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
           $r => $r,
           $prop => {<H::infoset|version>},
           $ref => $self,
         }__;
+        $r = '1.0' unless defined $r;
     @@Set:
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            The XML version number of the document.  Note that 
-            changing this attribute will affect methods that 
-            check for invalid characters in XML "Name"s.  DOM 
-            application should invoke the method "normalizeDocument" in 
-            order to check for invalid characters in the "Node"s that 
-            are already part of the document.
-        @@@Exception:
-          @@@@Type: DOMException
-          @@@@Name: NOT_SUPPORTED_ERR
+      @@@enDesc:
+        Changing this attribute will affect methods that checks
+        for invalid characters in XML <CODE::Name>s. 
+      @@@dx:raises:
+        @@@@@: MDOMX|MDOM_IMPL_NOSUPPORT_XMLVER
+        @@@@enDesc:
+          If the version is set to a value that is not supported by
+          the <IF::Document>.
+
+          A <IF::Document> that supports a version of the <Feature::XMLVersion>
+          feature must not raise a <C::c|DOMException.NOT_SUPPORTED_ERR>
+          exception for the same version number when setting this
+          attribute.
+      @@@iRaises:
+        @@@@@: MDOMX|MDOM_DOC_NOSUPPORT_XML
+        @@@@enDesc:
+          If the <IF::Document> does not support the <Feature::XML> feature.
+      @@@dx:raises:
+        @@@@@: MDOMX|NOMOD_THIS
+        @@@@enDesc:
+          If the node is read-only.  <SRC::manakai>
       @@@PerlDef:
-        my $current;
-        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-          $r => $current,
-          $prop => {<H::infoset|version>},
-          $ref => $self,
-        }__;
-        if (defined $current) {
-          if (defined $given and
-              ($given eq '1.0' or $given eq '1.1' or
-               not $self-><AG::Document.strictErrorChecking>)) {
-            __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
-              $given => $given,
-              $prop => {<H::infoset|version>},
-              $ref => $self,
-            }__;
-          } else {
-            __EXCEPTION{MDOMX|MDOM_IMPL_NOSUPPORT_XMLVER::
-              infoset|version => {$given},
-            }__;
-          }
+        __CODE{tc|NodeReadOnlyError:: $node => $node}__;
+        if (defined $given and
+            ($given eq '1.0' or $given eq '1.1' or
+             not $self-><AG::Document.strictErrorChecking>)) {
+          __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
+            $given => $given,
+            $prop => {<H::infoset|version>},
+            $ref => $self,
+          }__;
         } else {
-          __EXCEPTION{MDOMX|MDOM_DOC_NOSUPPORT_XML::
+          __EXCEPTION{MDOMX|MDOM_IMPL_NOSUPPORT_XMLVER::
+            infoset|version => {$given},
           }__;
         }
 
-  @Attr:
+    @@Test:
+      @@@QName: Document.xmlVersion.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+        $test->id ('initial');
+        $test->assert_equals ($doc-><AG::Document.xmlVersion>, '1.0');
+
+        $test->id ('set.1.1');
+        $doc-><AS::Document.xmlVersion> ('1.1');
+        $test->assert_equals ($doc-><AG::Document.xmlVersion>, '1.1');
+
+        $test->id ('set.1.0');
+        $doc-><AS::Document.xmlVersion> ('1.0');
+        $test->assert_equals ($doc-><AG::Document.xmlVersion>, '1.0');
+
+        $test->id ('set.1.2');
+        $test->assert_exception (code => sub {
+          $doc-><AS::Document.xmlVersion> ('1.1');
+        }, exception_subtype => <Q::MDOMX|MDOM_IMPL_NOSUPPORT_XMLVER>);
+
+  @L13Attr:
     @@Name: doctype
-    @@Type: Node
+    @@enDesc:
+      The document type declaration associated with the document.
+      It is the <IF::tx|DocumentType> child of the node, if any.
+
+      For an XML document with a document type declaration,
+      this attribute contains the <IF::tx|DocumentType> node.
+    @@enDesc:
+      @@@For: ManakaiDOM|DOM3
+      @@@ddid: html
+      @@@@:
+        For an HTML document, this attribute may contain
+        a <IF::tx|DocumentType> node independently of the presence or
+        absence of document type declaration. 
+    @@enDesc:
+      @@@For: !ManakaiDOM|DOM3
+      @@@ddid: html
+      @@@@:
+        For an HTML document, the attribute value is always <DOM::null>.
+
+    @@enDesc:
+      @@@ddid: note
+      @@@@:
+        {NOTE:: Although this attribute itself is read-only, 
+                usual node modification methods on the <IF::Document>
+                node can alter the <IF::tx|DocumentType> node.
+                However, while the implementation might instantiate different
+                types of <IF::Document> object supporting additional
+                feature than <Feature::Core>, based on the
+                <IF::tx|DocumentType> specified at creation time,
+                changing it afterward is unlikely to result in a
+                change of the feature supported by the <IF::Document>.
+        }
+    @@enImplNote:
+      {TODO:: HTML5 consideration.
+      }
+    @@Type: tx|DocumentType
     @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          @@@@@For: ManakaiDOM|DOM3
+          @@@@@@:
+            If the document does not have a document type declaration,
+            or if it is an HTML document and the implementation does not
+            expose the document type declaration to the DOM.
+        @@@@enDesc:
+          @@@@@For: !ManakaiDOM|DOM3
+          @@@@@@:
+            If the document does not have a document type declaration,
+            or if it is an HTML document.
+      @@@PerlDef:
+        @@@@@:
+          __DEEP{
+            F: for my $child (@{$self-><AG::Node.childNodes>}) {
+              my $nt = $child-><AG::Node.nodeType>;
+              if ($nt == <C::Node.DOCUMENT_TYPE_NODE>) {
+                $r = $child;
+                last F;
+              } elsif ($nt == <C::Node.ELEMENT_NODE>) { # document element
+                last F;
+              }
+            } # F
+          }__;
+        @@@@enImplNote:
+          Although the intention of the DOM specification is unclear,
+          the current manakai implementation <EM::does> return
+          a <IF::tx|DocumentType> node, if any, even if DOM level
+          is less than (not equal to) 3.
+    @@Test:
+      @@@QName: Document.doctype.one-element-document.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+        $test->assert_null ($doc-><AG::Document.doctype>);
+    @@Test:
+      @@@QName: Document.doctype.empty-document.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+        $test->assert_null ($doc-><AG::Document.doctype>);
+    @@Test:
+      @@@QName: Document.doctype.doctype-element-document.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+        my $doctype = $doc-><AG::Document.implementation>
+                          -><M::c|DOMImplementation.createDocumentType> ('dt');
+        my $el = $doc-><M::Document.createElementNS> (null, 'e');
+        $doc-><M::Node.appendChild> ($doctype);
+        $doc-><M::Node.appendChild> ($el);
+
+        $test->assert_equals ($doc-><AG::Document.doctype>, $doctype);
+    @@Test:
+      @@@QName: Document.doctype.comment-doctype-element-document.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+        my $doctype = $doc-><AG::Document.implementation>
+                          -><M::c|DOMImplementation.createDocumentType> ('dt');
+        my $el = $doc-><M::Document.createElementNS> (null, 'el');
+        my $comment = $doc-><M::Document.createComment> ('');
+        $doc-><M::Node.appendChild> ($comment);
+        $doc-><M::Node.appendChild> ($doctype);
+        $doc-><M::Node.appendChild> ($el);
+
+        $test->assert_equals ($doc-><AG::Document.doctype>, $doctype);
+
+  @L3Attr:
+    @@Name: documentURI
+    @@enDesc:
+      The location of the document.
+    @@nullCase:
+      @@@enDesc:
+        If undefined or if the <IF::Document> was created using
+        <M::c|DOMImplementation.createDocument>.
+    @@Type: DOMString
+    @@dis:actualType: ManakaiDOM|ManakaiDOMURI
+    @@Get:
+      @@@PerlDef:
+        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
+          $r => $r,
+          $prop => {<H::c|documentURI>},
+          $ref => $self,
+        }__;
+    @@Set:
+      @@@enDesc:
+        No lexical checking is performed when setting this attribute;
+        this could result in a <DOM::null> value return when using
+        <A::Node.baseURI>.
+      @@@NodeReadOnlyError:
+      @@@PerlDef:
+        __CODE{tc|NodeReadOnlyError:: $node => $self}__;
+        __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
+          $given => $given,
+          $prop => {<H::c|documentURI>},
+          $ref => $self,
+        }__;
+
+    @@Test:
+      @@@QName: Document.documentURI.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+        $test->id ('initial');
+        $test->assert_null ($doc-><AG::Document.documentURI>);
+
+        $test->id ('set');
+        $doc-><AS::Document.documentURI> ('about:');
+        $test->assert_equals ($doc-><AG::Document.documentURI>, 'about:');
+
+        $test->id ('relative.set');
+        $doc-><AS::Document.documentURI> ('path');
+        $test->assert_equals ($doc-><AG::Document.documentURI>, 'path');
+
+        $test->id ('reset');
+        $doc-><AS::Document.documentURI> (null);
+        $test->assert_null ($doc-><AG::Document.documentURI>);
+
+  @L3Attr:
+    @@Name: inputEncoding
+    @@enDesc:
+      The encoding used for the document at the time of the parsing.
+    @@Type: DOMString
+    @@enImplNote:
+      It is unclear what type of values are permitted. 
+      IANA-registered charset names? XML encoding declaration 
+      names?  Or, any names passed from the upper-level protocols?
+    @@nullCase:
+      @@@enDesc:
+        If it is not known, such as when the <IF::Document> was
+        created in memory.
+    @@Get:
+      @@@PerlDef:
+        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
+          $r => $r,
+          $prop => {<H::infoset|characterEncodingScheme>},
+          $ref => $self,
+        }__;
+    @@LXSet:
+      @@@enDesc:
+        Sets the attribute value.  No lexical checking is performed
+        on setting.
+      @@@NodeReadOnlyError:
+      @@@PerlDef:
+        __CODE{tc|NodeReadOnlyError:: $node => $self}__;
+        __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
+          $given => $given,
+          $prop => {<H::infoset|characterEncodingScheme>},
+          $ref => $self,
+        }__;
+
+    @@Test:
+      @@@QName: Document.inputEncoding.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+        $test->id ('initial');
+        $test->assert_null ($doc-><AG::Document.inputEncoding>);
+
+        $test->id ('set');
+        $doc-><AS::Document.inputEncoding> ('utf-8');
+        $test->assert_equals ($doc-><AG::Document.inputEncoding>, 'utf-8');
+
+        $test->id ('reset');
+        $doc-><AS::Document.inputEncoding> (null);
+        $test->assert_null ($doc-><AG::Document.inputEncoding>);
+
+  @L3Attr:
+    @@Name: xmlEncoding
+    @@enDesc:
+      The encoding of the document, as part of the XML declaration.
+    @@Type: DOMString
+    @@nullCase:
+      @@@enDesc:
+        If unspecified or if it is not known, such as when
+        the <IF::Document> was created in memory.
+    @@Get:
+      @@@PerlDef:
+        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
+          $r => $r,
+          $prop => {<H::c|xmlEncoding>},
+          $ref => $self,
+        }__;
+    @@LXSet:
+      @@@enDesc:
+        The value of the <XA::encoding> declaration.  No lexical
+        checking is performed on setting.
+      @@@nullCase:
+        @@@@enDesc:
+          The <XA::encoding> declaration is <EM::not> specified.
+      @@@NodeReadOnlyError:
+      @@@PerlDef:
+        __CODE{tc|NodeReadOnlyError:: $node => $self}__;
+        __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
+          $given => $given,
+          $prop => {<H::c|xmlEncoding>},
+          $ref => $self,
+        }__;
+
+    @@Test:
+      @@@QName: Document.xmlEncoding.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+        $test->id ('initial');
+        $test->assert_null ($doc-><AG::Document.xmlEncoding>);
+
+        $test->id ('set');
+        $doc-><AS::Document.xmlEncoding> ('utf-8');
+        $test->assert_equals ($doc-><AG::Document.xmlEncoding>, 'utf-8');
+
+        $test->id ('reset');
+        $doc-><AS::Document.xmlEncoding> (null);
+        $test->assert_null ($doc-><AG::Document.xmlEncoding>);
+
+  @L3Attr:
+    @@Name: xmlStandalone
+    @@enDesc:
+      Whether the document is standalone or not, as part of the
+      XML declaration.
+    @@Type: boolean
+    @@TrueCase:
+      @@@enDesc:
+        If the <XA::standalone> declaration is set to <XML::yes>.
+    @@FalseCase:
+      @@@enDesc:
+        If the <XA::standalone> declaration is set to <XML::no>
+        or is unspecified.
+    @@Get:
+      @@@PerlDef:
+        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
+          $r => $r,
+          $prop => {<H::infoset|standalone>},
+          $ref => $self,
+        }__;
+    @@Set:
+      @@@enDesc:
+        No verification is performed on the value when setting
+        this attribute.
+      @@@iRaises:
+        @@@@@: MDOMX|MDOM_DOC_NOSUPPORT_XML
+        @@@@enDesc:
+          If the document does not support the <Feature::XML> feature.
+      @@@dx:raises:
+        @@@@@: MDOMX|NOMOD_THIS
+        @@@@enDesc:
+          If the node is read-only.  <SRC::manakai>
+      @@@NodeReadOnlyError:
+      @@@PerlDef:
+        __CODE{tc|NodeReadOnlyError:: $node => $self}__;
+        __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
+          $given => $given,
+          $prop => {<H::infoset|standalone>},
+          $ref => $self,
+        }__;
+
+    @@Test:
+      @@@QName: Document.xmlStandalone.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+ 
+        $test->id ('initial');
+        $test->assert_false ($doc-><AG::Document.xmlStandalone>);
+
+        $test->id ('set.yes');
+        $doc-><AS::Document.xmlStandalone> (true);
+        $test->assert_true ($doc-><AG::Document.xmlStandalone>);
+
+        $test->id ('set.no');
+        $doc-><AS::Document.xmlStandalone> (false);
+        $test->assert_false ($doc-><AG::Document.xmlStandalone>);
 ##Document
 
 IntPropDef:
@@ -18618,6 +18966,46 @@ IFCls1Def:
   @IFISA: CharacterData
   @ClsISA: ManakaiDOMCharacterData
 
+  @enDesc:
+    A <IF::Text> object represents a textual content of an
+    <IF::Element> or <IF::Attr> (termed <DFN::character data>
+    in XML).  If there is no markup inside an element's content,
+    the text is contained in a single <IF::Text> object that
+    is the only child of the element.  If there is markup,
+    it is parsed into the information items (elements,
+    comments, and so on) that form the list of children of the element,
+    where sequences of character information items consist 
+    <IF::Text> nodes.
+
+    When a document is first made available via the DOM,
+    there is only one <IF::Text> node for each block
+    of text.  Applications may create adjacent <IF::Text> nodes
+    that represents the contents of a given element without any
+    intervening markup, but should be aware that there is no way
+    to represent the separations between these nodes in
+    XML or HTML, so they will not in general persisten between
+    DOM editing sessions.  The <M::Node.normalize> method
+    merges any such adjacent <IF::Text> nodes into a single
+    node for each block of text.
+
+    No lexical check or parsing is done on the content of a <IF::Text> node
+    and some characters must be escaped, depending on its position
+    in the document, during serialization using character or
+    general entity references.
+
+  @Description:
+    @@lang:en
+    @@@:
+      The textual content of an "Element" or "Attr".
+    \
+      When a document is first made available via the DOM, 
+      there is only one "Text" node for each block of text. 
+      DOM applications may create adjust "Text" nodes that 
+      represent the contents of a given node (but there is no 
+      way to represent the separation between these nodes in 
+      XML or HTML so they will not persist between DOM editing sessions 
+      in general).
+
   @CODE:
     @@QName: tc|createTextForTest
     @@PerlDef:
@@ -18747,6 +19135,24 @@ IFCls1Def:
         }, exception_subtype => <Q::MDOMX|HIERARCHY_BAD_TYPE>);
       }
 
+  @Test:
+    @@QName: Text..=.1.test
+    @@PerlDef:
+      my $doc;
+      __CODE{tc|createDocumentForTestDA:: $doc => $doc}__;
+
+      my $node = $doc-><M::Document.createTextNode> ('');
+
+      $node-><M::Node.manakaiAppendText> ('aaaa');
+      $test->id ('1.class');
+      $test->assert_isa ($node, <IFName::Text>);
+      $test->id ('1.value');
+      $test->assert_equals ($node-><AG::t|CharacterData.data>, 'aaaa');
+
+      $test->id (2);
+      $node-><M::Node.manakaiAppendText> ('bbbb');
+      $test->assert_equals ($node-><AG::t|CharacterData.data>, 'aaaabbbb');
+
   @CL3Method:
     @@Name: getFeature
     @@enDesc:
@@ -18795,35 +19201,206 @@ IFCls1Def:
         }
 
   @L3Attr:
-     @@Name:  isElementContentWhitespace
-     @@Description:
-       @@@lang:en
-       @@@@:
-         Whether this text node contains element content whitespaces.
-     @@Get:
-        @@@Type:  DOMMain|boolean||ManakaiDOM|all
-        @@@InCase:
-          @@@@Value:true
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@: This text node contains element content whitespaces.
-        @@@InCase:
-          @@@@Value:false
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              This text node contains element content whitespaces or 
-              no validation occurs so that it is unknown.
+    @@Name: isElementContentWhitespace
+    @@enDesc:
+      Whether the text node contains element content white spaces.
+
+      The text node is determined to contain white space in element
+      content during the load of the document or if validation occurs
+      while using <M::Document.normalizeDocument>.
+    @@enImplNote:
+      @@@ddid: ??
+      @@@@:
+        <IF::Text> with non-white-space-characters or with
+        no white space character?
+
+        <IF::CDATASection>?
+    @@Type: boolean
+    @@Get:
       @@@PerlDef:
         __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
           $r => $r,
           $prop => {<H::infoset|elementContentWhitespace>},
           $ref => $self,
         }__;
+    @@LXSet:
+      @@@enImplNote:
+        {TODO::
+          Clarification is necessary.
+        }
+      @@@NodeReadOnlyError:
+      @@@PerlDef:
+        __CODE{tc|NodeReadOnlyError:: $node => $self}__;
+        __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
+          $given => $given,
+          $prop => {<H::infoset|elementContentWhitespace>},
+          $ref => $self,
+        }__;
+
+    @@Test:
+      @@@QName: Text.isElementContentWhitespace.test
+      @@@PerlDef:
+        my $node;
+        __CODE{tc|createTextForTest:: $text => $node}__;
+        $node-><AS::Node.nodeValue> (' ');
+
+        $test->id ('default');
+        $test->assert_false ($node-><AG::Text.isElementContentWhitespace>);
+
+        $test->id ('set.true');
+        $node-><AS::Text.isElementContentWhitespace> (true);
+        $test->assert_true ($node-><AG::Text.isElementContentWhitespace>);
+
+        $test->id ('set.false');
+        $node-><AS::Text.isElementContentWhitespace> (true);
+        $test->assert_false ($node-><AG::Text.isElementContentWhitespace>);
+
+  @L3Attr:
+    @@Name: wholeText
+     @@Description:
+       @@@lang:en
+       @@@@:
+         All text of logically-adjacent text nodes.
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         The DOM Level 3 Core Specification is unclear about 
+         <IF::DOMXML:CDATASection>s.
+         They should also be included (c.f. the definition for 
+         <A::Text.replaceWholeText>).
+         \
+         What about unexpanded entity references?
+    @@Type: DOMString
+    @@Get:
+      @@@enImplNote:
+        {TODO::
+          Implement this.
+        }
+
+  @L3Method:
+    @@Name: replaceWholeText
+     @@Param:
+        @@@Name:  content
+        @@@Type:  
+          DOMMain:DOMString
+     @@Return:
+        @@@Type:  Text
     @@enImplNote:
-      {TODO::
-        Add setter.
+      {ISSUE::
+        isElementContentWhitespace
       }
+
+  @Method:
+    @@Name: splitText
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Break this node into two nodes.  After being split, 
+         this node will contain all the content up to the break point 
+         and a new node of the same type will contain all the content 
+         at and after the break point.
+      \
+         If the original node had a parent node, the new node is 
+         inserted as the next sibling of this node.
+
+      {ISSUE::
+         isElementContentWhitespace
+      }
+     @@Param:
+        @@@Name:  offset
+        @@@Type:  
+          DOMMain:unsigned-long||ManakaiDOM|all
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            The 16-bit unit offset at which to split.
+     @@Return:
+        @@@Type:  Text
+        @@@Description:
+          @@@@lang:en
+          @@@@@: The new node, of the same type as this node.
+       @@@raises:
+         @@@@@: DOMCore|NEGATIVE_INDEX_ERR
+         @@@@enDesc:
+           The <P::offset> is negative.
+       @@@raises:
+         @@@@@: DOMCore|OUT_OF_UPPER_BOUND_ERR
+         @@@@enDesc:
+           The <P::offset> is greater than the number of
+           16-bit units.
+       @@@raises:
+         @@@@@: MDOMX|NOMOD_THIS
+         @@@@enDesc:
+           The node is read-only.
+       @@@raises:
+         @@@@@: MDOMX|NOMOD_PARENT
+         @@@@enDesc:
+           The parent node is read-only.
+         @@@@For: ManakaiDOM|ManakaiDOM
+      @@@PerlDef:
+        @@@@@ForCheck: !ManakaiDOM|all
+        @@@@@enImplNote:
+          {TODO::
+            Implement this.
+          }
+        @@@@@@:
+          my $node = $self->{<H::mn:node>};
+          my $parentNode = $node->{<H::infoset:parent>};
+          if ($node->{<H::DOMCore:read-only>}) {
+            __EXCEPTION{
+              MDOMX:NOMOD_THIS::
+            }__;
+          } elsif ($parentNode and $parentNode->{<H::DOMCore:read-only>}) {
+            __EXCEPTION{
+              MDOMX:NOMOD_PARENT::
+            }__;
+          }
+          my $ds = \$node->{<H::infoset:content>};
+          my $after;
+          try {
+            my $offset32 = <ClassM::DOMMain:ManakaiDOMStringExtend
+                                   .findOffset32> ($offset);
+            $after = substr ($$ds, $offset32);
+            substr ($$ds, $offset32) = '';
+          ## TODO: Catch StringIndexOutOfBoundsException
+          };
+          my $newNode;
+          if ($node->{<H::DOMCore:nodeType>} eq <H::DOMCore:TextNode>) {
+            $newNode = <ClassM::ManakaiDOMText.newObject> ($node);
+          } elsif ($node->{<H::DOMCore:nodeType>} eq
+                   <H::DOMXML:CDATASectionNode>) {
+            $newNode = <ClassM::DOMXML:ManakaiDOMCDATASection.newObject> ($node);
+          } else {
+            __EXCEPTION{
+              MDOMX:MDOM_DEBUG_BUG||ManakaiDOM:Perl::
+                MDOMX:values => {+{
+                  <H::DOMCore:nodeType> => $node->{<H::DOMCore:nodeType>},
+                }},
+            }__;
+          }
+          $newNode->{<H::infoset:content>} = $after;
+          __CODE{mn|setXRefNode||ManakaiDOM|Perl::
+            $referrer => {$newNode},
+            $propName => {<H::DOMCore:ownerDocument>},
+            $referent => {$parentNode->{<H::DOMCore:ownerDocument>}},
+          }__;
+          if ($parentNode) {
+            $parentNode-><M::NodeStem.importTree> ($newNode);
+            A: for my $i (0..$#{$parentNode->{<H::infoset:children>}}) {
+              if ($parentNode->{<H::infoset:children>}->[$i]->{<H::mn:nodeID>} eq
+                  $node->{<H::mn:nodeID>}) {
+                splice @{$parentNode->{<H::infoset:children>}},
+                       $i + 1, 0, $newNode;
+                last A;
+              }
+            }
+            $newNode->{<H::infoset:parent>} = $parentNode;
+          }
+          __CODE{mn|setXRefNode||ManakaiDOM|Perl::
+            $referrer => {$newNode},
+            $propName => {<H::DOMCore:ownerDocument>},
+            $referent => {$node->{<H::DOMCore:ownerDocument>}},
+          }__;
 ##Text
 
 IFCls1Def:
@@ -18832,6 +19409,17 @@ IFCls1Def:
 
   @IFISA: CharacterData
   @ClsISA: ManakaiDOMCharacterData
+
+  @enDesc:
+    A <IF::Comment> object represents the content of a comment,
+    i.e. all the characters between the starting <XML::<!--> and
+    ending <XML::--<gt>> in XML.
+
+    No lexical check is done on the content of a <IF::Comment>
+    and it is therefore possible to have the character sequence
+    <CODE::--> in the content, which is illegal in a comment
+    per XML specification.  Such <IF::Comment> node cannot be
+    serialized in XML.
 
   @CODE:
     @@QName: tc|createCommentForTest
@@ -19032,6 +19620,29 @@ NodeTypeDef:
   @IFQName: DocumentFragment
   @ClsQName: ManakaiDOMDocumentFragment
   
+  @enDesc:
+    The <IF::DocumentFragment> interface is originally designed
+    as a <QUOTE::lightweight> or <QUOTE::minimum> <IF::Document> object.
+    It is useful to extract a portion of a document tree or to
+    create a new fragment of a document, for the purposes of e.g.
+    implementing a command like cut or rearranging a document
+    by moving fragments around.  While a <IF::Document> object could
+    fulfill this role, a <IF::Document> object can potentially
+    be a heavyweight object, depending on the undelying implementation.
+  
+    Furthrmore, various operations, such as inserting nodes as
+    cildren of another <IF::Node>, may take <IF::DocumentFragment>
+    nodes as arguments; this result in all the child nodes of the
+    <IF::DocumentFragment> node being moved to the child list
+    of that node.
+
+    The children of a <IF::DocumentFragment> node are zero or more
+    nodes representing the tops of any subtrees defining the
+    structure of the document.  A <IF::DocumentFragment> node
+    does not need to represent a well-formed XML document.  For
+    example, a <IF::DocumentFragment> node might have only one
+    child node and that child node could be a <IF::Text? node.
+
   @IntMethod:
     @@Operator: mg|CreateNodeStemMethod
     @@Param:
