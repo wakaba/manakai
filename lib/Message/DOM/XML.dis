@@ -9,7 +9,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/03/23 13:33:32 $
+    $Date: 2006/03/24 12:33:11 $
 
   @Require:
     @@Module:
@@ -6369,6 +6369,12 @@ NodeTypeDef:
           my $sp = $node-><M::Node.getFeature> ($_->[0], $_->[1]);
           $test->assert_isa ($sp, $_->[2]);
         }
+
+  @LXAttr:
+    @@Name: manakaiExpanded
+    @@Type: boolean
+    @@Get:
+    @@Set:
 ##EntityReference
 
 NodeTypeDef:

@@ -9,7 +9,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/03/23 03:05:44 $
+    $Date: 2006/03/24 12:33:11 $
 
   @Require:
     @@Module:
@@ -618,6 +618,20 @@ ClsDef:
       as a reference to a node identifier.
     @@PerlDef:
       (${$noderef->{<H::mg|nodeIDReference>}} eq ${$nodeid})
+
+  @CODE:
+    @@QName: mg|getNodeRefPropValue
+    @@enDesc:
+      Obtains a property value set to the node reference.
+    @@PerlDef:
+      $r = $ref->{$prop};
+
+  @CODE:
+    @@QName: mg|setNodeRefPropValue
+    @@enDesc:
+      Sets a property value set to the node reference.
+    @@PerlDef:
+      $ref->{$prop} = $given; 
 ##NodeRef
 
 ## -- Reference Internal Properties

@@ -25,7 +25,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/03/23 03:05:43 $
+      $Date: 2006/03/24 12:33:11 $
     @@ContentType:
       dis:Date.RCS
   
@@ -1444,10 +1444,7 @@ StringDataTypeDef:
         Checks whether a string is a legal XML qualified name and if not 
         then raises an exception.
     @@PerlDef:
-      @@@For:
-        ManakaiDOM:DOM3
-      @@@@:
-        if ($XMLVERSION eq '1.1') {
+      if (defined $XMLVERSION and $XMLVERSION eq '1.1') {
           unless (<Code::DOMMain:testXML11Name:: $INPUT = $INPUT>) {
             __EXCEPTION{
               MDOMX:MDOM_BAD_NAME::
@@ -1470,7 +1467,7 @@ StringDataTypeDef:
               MDOMX:MDOM_BAD_NAME::
                 DOMCore:name => {$INPUT},
                 MDOMX:param-name => '$INPUT_NAME',
-                infoset:version => '1.0',
+                infoset|version => {$XMLVERSION},
             }__;
           }
           unless (<Code::DOMMain:testXML10QName:: $INPUT = $INPUT>) {
@@ -1478,31 +1475,10 @@ StringDataTypeDef:
               MDOMX:MDOM_NS_MALFORMED_QNAME::
                 DOMCore:name => {$INPUT},
                 MDOMX:param-name => '$INPUT_NAME',
-                infoset:version => '1.0',
+                infoset|version => {$XMLVERSION},
             }__;
           }
         }
-     @@PerlDef:
-       @@@For:
-         ManakaiDOM:DOM2 !ManakaiDOM:DOM3
-       @@@@:
-          unless (<Code::DOMMain:testXML10Name:: $INPUT = $INPUT>) {
-            __EXCEPTION{
-              MDOMX:MDOM_BAD_NAME::
-                DOMCore:name => {$INPUT},
-                MDOMX:param-name => '$INPUT_NAME',
-                infoset:version => '1.0',
-            }__;
-          }
-          unless (<Code::DOMMain:testXML10QName:: $INPUT = $INPUT>) {
-            __EXCEPTION{
-              MDOMX:MDOM_NS_MALFORMED_QNAME::
-                DOMCore:name => {$INPUT},
-                MDOMX:param-name => '$INPUT_NAME',
-                infoset:version => '1.0',
-            }__;
-          }
-
 StringDataTypeDef:
   @QName: ManakaiDOMXML10QName
   @rdfs:subClassOf: ManakaiDOMXML10QName
@@ -1599,6 +1575,8 @@ ResourceDef:
               test whether the URI or the QName is itself valid or not.
       \
       }
+
+    For DOM Level 3 Core <A::tc|Element.setAttributeNS>.
   @PerlDef:
     if (defined $PREFIX) {
       if (not defined $NSURI) {
@@ -1621,17 +1599,10 @@ ResourceDef:
         __EXCEPTION{MDOMX:MDOM_NS_OTHER_WITH_XMLNS_URI::
           infoset:prefix => {$PREFIX},
         }__;
-      } elsif ($NSURI eq <Q::xmlns:> and $PREFIX eq 'xmlns' and
-               $LNAME eq 'xmlns') {
-        __EXCEPTION{MDOMX:MDOM_NS_XMLNS_XMLNS}__;
       }
     } else { ## No prefix
       if (not defined $NSURI) {
         #
-      } elsif ($NSURI eq <Q::xml:>) {
-        __EXCEPTION{MDOMX:MDOM_NS_OTHER_WITH_XML_URI::
-          infoset:prefix => {undef},
-        }__;
       } elsif ($NSURI eq <Q::xmlns:> and $LNAME ne 'xmlns') {
         __EXCEPTION{MDOMX:MDOM_NS_OTHER_WITH_XMLNS_URI::
           infoset:prefix => {undef},
