@@ -9,7 +9,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/03/24 12:33:11 $
+    $Date: 2006/03/25 12:24:49 $
 
   @Require:
     @@Module:
@@ -3543,6 +3543,11 @@ NodeTypeDef:
           my $sp = $node-><M::Node.getFeature> ($_->[0], $_->[1]);
           $test->assert_isa ($sp, $_->[2]);
         }
+
+  @Attr:
+    @@Name: manakaiHasReplacementTree
+    @@Type: boolean
+    @@Get:
 ##Entity
 
 NodeTypeDef:
