@@ -40,7 +40,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/03/23 03:05:43 $
+      $Date: 2006/03/28 00:59:50 $
     @@ContentType:
       dis:Date.RCS
 
@@ -62,6 +62,9 @@ Module:
       @@@WithFor: ManakaiDOM|ManakaiDOMLatest
     @@Module:
       @@@QName: MDOM|Tree
+    @@Module:
+      @@@QName: MDOM|TreeCore
+      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
     @@Module:
       @@@QName: MDOM|XDoctype
       @@@WithFor: ManakaiDOM|ManakaiDOMLatest
@@ -119,6 +122,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
   @MDOMX:
     http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
+  @mg:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Grove/
   @mn:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/ManakaiNode#
   @rdf:
@@ -127,8 +132,12 @@ Namespace:
     http://www.w3.org/2000/01/rdf-schema#
   @t:
     http://suika.fam.cx/~wakaba/archive/2004/dom/tree#
+  @tc:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/TreeCore/
   @test:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Test#
+  @tx:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/XML/
   @x:
     http://suika.fam.cx/~wakaba/archive/2004/dom/xml#
   @xml:
@@ -550,16 +559,16 @@ ResourceDef:
     @@For: ManakaiDOM|DOM3
 
   @f:implements:
-    @@@: DOMXML|XMLFeature10
+    @@@: tx|XMLFeature10
     @@For: ManakaiDOM|DOM1 ManakaiDOM|DOMXMLFeature
   @f:implements:
-    @@@: DOMXML|XMLFeature20
+    @@@: tx|XMLFeature20
     @@For: ManakaiDOM|DOM2 ManakaiDOM|DOMXMLFeature
   @f:implements:
-    @@@: DOMXML|XMLFeature30
+    @@@: tx|XMLFeature30
     @@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeature
   @f:implements:
-    @@@: DOMXML|XMLVersionFeature10
+    @@@: tx|XMLVersionFeature10
     @@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeature
   @f:implements:
     @@@: DOMXML|XMLVersionFeature11
@@ -1776,19 +1785,19 @@ ElementTypeBinding:
       @@@@: DISLang|CoreFeature30
       @@@For: ManakaiDOM|DOM3
     @@f:implements:
-      @@@@: DOMXML|XMLFeature10
+      @@@@: tx|XMLFeature10
       @@@For: ManakaiDOM|DOM1 ManakaiDOM|DOMXMLFeature
     @@f:implements:
-      @@@@: DOMXML|XMLFeature20
+      @@@@: tx|XMLFeature20
       @@@For: ManakaiDOM|DOM2 ManakaiDOM|DOMXMLFeature
     @@f:implements:
-      @@@@: DOMXML|XMLFeature30
+      @@@@: tx|XMLFeature30
       @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeature
     @@f:implements:
-      @@@@: DOMXML|XMLVersionFeature10
+      @@@@: tx|XMLVersionFeature10
       @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeature
     @@f:implements:
-      @@@@: DOMXML|XMLVersionFeature11
+      @@@@: tx|XMLVersionFeature11
       @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeatureXML11
 
 ElementTypeBinding:
@@ -2046,15 +2055,29 @@ IFCls3Def:
 
   @ResourceDef:
     @@ForCheck: ManakaiDOM|ForClass
+    @@QName: c|createNodeDOMStringList
+    @@enDesc:
+      <Perl::$node>, <Perl::$r>, <Perl::$key>.
+    @@DISCore:resourceType: DISPerl|BlockCode
+    @@PerlDef:
+      $r = bless \[$node, $key], <ClassName::ManakaiDOMStringList>;
+
+  @ResourceDef:
+    @@ForCheck: ManakaiDOM|ForClass
     @@QName: newDOMStringListForTest
     @@rdf:type: DISPerl|BlockCode
     @@PerlDef:
-      $list = bless {
-        <H::mn:node> => {
-          $key => [],
-        },
-        <H::c|key> => $key,
-      }, <ClassName::ManakaiDOMStringList>;
+      my $__pnode;
+      __CODE{tc|createImplForTest:: $impl => $__pnode}__;
+      __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
+        $given => {[]},
+        $prop => {$key},
+        $ref => $__pnode,
+      }__;
+      __CODE{c|createNodeDOMStringList::
+        $node => $__pnode, $r => $list,
+        $key => $key,
+      }__;
 
   @Method:
      @@Name:  item
@@ -2093,14 +2116,20 @@ IFCls3Def:
               Either the specified <P::index> is negative or greater 
               than or equal to the number of <TYPE::DOMMain:DOMString> 
               objects in this collection.
-        @@@PerlDef:
-          if (not defined $index or
-              $index < 0 or
-              $index > $#{$self->{<H::mn:node>}->{$self->{<H::c|key>}}}) {
-            $r = null;
-          } else {
-            $r = $self->{<H::mn:node>}->{$self->{<H::c|key>}}->[$index];
-          }
+      @@@PerlDef:
+        my $v;
+        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
+          $r => $v,
+          $prop => {$$self->[1]},
+          $ref => {$$self->[0]},
+        }__;
+        if (not defined $index or
+            $index < 0 or
+            $index > $#$v) {
+          $r = null;
+        } else {
+          $r = $v->[$index];
+        }
 
   @IntMethod:
     @@Operator:
@@ -2120,18 +2149,21 @@ IFCls3Def:
         @@@@enDesc:
           No old value or <DOM::null> is the old value.
       @@@dx:raises:
-        @@@@@: c|LIST_READ_ONLY_ERR
+        @@@@@: MDOMX|NOMOD_THIS
         @@@@enDesc:
           If the list is read-only.
       @@@PerlDef:
-        if ($self->{<H::mn:node>}->{<H::c|read-only>}) {
-          __EXCEPTION{c|LIST_READ_ONLY_ERR::
-          }__;
-        }
- 
-        my $array = $self->{<H::mn:node>}->{$self->{<H::c|key>}};
-        $r = $array->[$index] if defined wantarray;
-        $array->[$index] = $value;
+        __DEEP{  ## NOTE: Bare method name
+          $$self->[0]->_check_read_only;
+        }__;
+        my $v;
+        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
+          $r => $v,
+          $prop => {$$self->[1]},
+          $ref => {$$self->[0]},
+        }__;
+        $r = $v->[$index] if defined wantarray;
+        $v->[$index] = $value;
 
   @IntMethod:
     @@Operator:
@@ -2148,18 +2180,21 @@ IFCls3Def:
         @@@@enDesc:
           No old value or <DOM::null> is the old value.
       @@@dx:raises:
-        @@@@@: c|LIST_READ_ONLY_ERR
+        @@@@@: MDOMX|NOMOD_THIS
         @@@@enDesc:
           If the list is read-only.
       @@@PerlDef:
-        if ($self->{<H::mn:node>}->{<H::c|read-only>}) {
-          __EXCEPTION{c|LIST_READ_ONLY_ERR::
-          }__;
-        }
- 
-        my $array = $self->{<H::mn:node>}->{$self->{<H::c|key>}};
-        $r = $array->[$index] if defined wantarray;
-        CORE::delete $array->[$index];
+        __DEEP{  ## NOTE: Bare method name
+          $$self->[0]->_check_read_only;
+        }__;
+        my $v;
+        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
+          $r => $v,
+          $prop => {$$self->[1]},
+          $ref => {$$self->[0]},
+        }__;
+        $r = $v->[$index] if defined wantarray;
+        CORE::delete $v->[$index];
 
   @IntMethod:
     @@Operator:
@@ -2171,8 +2206,13 @@ IFCls3Def:
     @@Return:
       @@@Type: idl|boolean||ManakaiDOM|all
       @@@PerlDef:
-        $r = CORE::exists $self->{<H::mn:node>}
-                               ->{$self->{<H::c|key>}}->[$index];
+        my $v;
+        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
+          $r => $v,
+          $prop => {$$self->[1]},
+          $ref => {$$self->[0]},
+        }__;
+        $r = CORE::exists $v->[$index];
           
   @Attr:
      @@Name:  length
@@ -2193,8 +2233,14 @@ IFCls3Def:
           @@@@lang:en
           @@@@@: 
             The number of strings in this collection.
-        @@@PerlDef:
-          $r = @{$self->{<H::mn:node>}->{$self->{<H::c|key>}}};
+      @@@PerlDef:
+        my $v;
+        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
+          $r => $v,
+          $prop => {$$self->[1]},
+          $ref => {$$self->[0]},
+        }__;
+        $r = @$v;
 
   @Method:
      @@Name:  contains
@@ -2230,17 +2276,23 @@ IFCls3Def:
             @@@@@lang:en
             @@@@@@:  
               The <P::str> has not been found in this collection.
-        @@@PerlDef:
-          CHK: {
-            __DEEP{
-              for (@{$self->{<H::mn:node>}->{$self->{<H::c|key>}}}) {
-                if ($str eq $_) {
-                  $r = true;
-                  last CHK;
-                }
+      @@@PerlDef:
+        my $v;
+        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
+          $r => $v,
+          $prop => {$$self->[1]},
+          $ref => {$$self->[0]},
+        }__;
+        CHK: {
+          __DEEP{
+            for (@$v) {
+              if ($str eq $_) {
+                $r = true;
+                last CHK;
               }
-            }__;
-          }
+            }
+          }__;
+        } # CHK
 
   @IntMethod:
     @@Operator:
@@ -2369,11 +2421,6 @@ IFCls3Def:
       ## Don't invoke |DESTROY| method
       bless $list, 'dummy';
 ##DOMStringList
-
-PropDef:
-  @QName: c|key
-  @enDesc:
-    Hash key for <IF::DOMStringList>.
 
 IFCls3Def:
   @IFQName: NameList
@@ -2682,15 +2729,15 @@ IFCls1Def:
     @@ForCheck:
       ManakaiDOM:DOM3
   @DOMMetaImpl:provideFeature:
-    @@@: DOMXML|XMLFeature10
+    @@@: tx|XMLFeature10
     @@ForCheck:
       ManakaiDOM:DOM1 ManakaiDOM|DOMXMLFeature
   @DOMMetaImpl:provideFeature:
-    @@@: DOMXML|XMLFeature20
+    @@@: tx|XMLFeature20
     @@ForCheck:
       ManakaiDOM:DOM2 ManakaiDOM|DOMXMLFeature
   @DOMMetaImpl:provideFeature:
-    @@@: DOMXML|XMLFeature30
+    @@@: tx|XMLFeature30
     @@ForCheck:
       ManakaiDOM:DOM3 ManakaiDOM|DOMXMLFeature
   @DOMMetaImpl:provideFeature:

@@ -1,3 +1,29 @@
+2006-03-26  Wakaba  <wakaba@suika.fam.cx>
+
+	* DOMCore.dis (Require): Reference to the |MDOM:TreeCore|
+	module is added.
+	(DOMStringList): Reimplemented for new |d:AttributeDefinition|
+	implementation (untested).
+
+	* TreeCore.dis (baseURI): Reimplemented (untested).
+	(Roles): Definitions added.
+
+	* XDoctype.dis (Require): References to the |MDOM:TreeCore|
+	and |MDOM:XML| modules are added.  Reference to the |MDOM:Tree|
+	module is removed.
+	(DocumentXDoctype): Reimplemented (untested).
+	(DocumentTypeDefinition, DocumentTypeDeclaration):
+	Reimlemented (untested).
+	(ElementTypeDefinition, AttributeDefinition): Reimplemented (untested).
+
+	* XML.dis (FeatureDef): New features (definitions copied
+	from the |MDOM:DOMXML| module).
+	(DocumentType): New interface (definition copied from 
+	the |MDOM:DOMXML| module).
+	(CDATASection, Notation, Entity, EntityReference, ProcessingInstruction):
+	Reimplemented (untested).
+	(ManakaiDOMXMLBaseAttr, ManakaiDOMXMLIdAttr): Reimplemented (untested).
+
 2006-03-25  Wakaba  <wakaba@suika.fam.cx>
 
 	* TreeCore.dis (Document): Most methods are reimplemented (untested).

@@ -12,7 +12,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/03/25 12:24:49 $
+    $Date: 2006/03/28 00:59:50 $
 
   @Require:
     @@Module:
@@ -507,16 +507,16 @@ ElementTypeBinding:
       @@@@: DOMCore|CoreFeature30
       @@@For: ManakaiDOM|DOM3
     @@DOMMain:implementFeature:
-      @@@@: DOMXML|XMLFeature10
+      @@@@: tx|XMLFeature10
       @@@For: ManakaiDOM|DOM1 ManakaiDOM|DOMXMLFeature
     @@DOMMain:implementFeature:
-      @@@@: DOMXML|XMLFeature20
+      @@@@: tx|XMLFeature20
       @@@For: ManakaiDOM|DOM2 ManakaiDOM|DOMXMLFeature
     @@DOMMain:implementFeature:
-      @@@@: DOMXML|XMLFeature30
+      @@@@: tx|XMLFeature30
       @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeature
     @@DOMMain:implementFeature:
-      @@@@: DOMXML|XMLVersionFeature10
+      @@@@: tx|XMLVersionFeature10
       @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeature
     @@DOMMain:implementFeature:
       @@@@: DOMXML|XMLVersionFeature11
@@ -575,19 +575,19 @@ ElementTypeBinding:
       @@@@: c|CoreFeature30
       @@@For: ManakaiDOM|DOM3
     @@f:implements:
-      @@@@: DOMXML|XMLFeature10
+      @@@@: tx|XMLFeature10
       @@@For: ManakaiDOM|DOM1 ManakaiDOM|DOMXMLFeature
     @@f:implements:
-      @@@@: DOMXML|XMLFeature20
+      @@@@: tx|XMLFeature20
       @@@For: ManakaiDOM|DOM2 ManakaiDOM|DOMXMLFeature
     @@f:implements:
-      @@@@: DOMXML|XMLFeature30
+      @@@@: tx|XMLFeature30
       @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeature
     @@f:implements:
-      @@@@: DOMXML|XMLVersionFeature10
+      @@@@: tx|XMLVersionFeature10
       @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeature
     @@f:implements:
-      @@@@: DOMXML|XMLVersionFeature11
+      @@@@: tx|XMLVersionFeature11
       @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeatureXML11
 
 ElementTypeBinding:
@@ -2366,8 +2366,8 @@ IFCls1Def:
       a <IF::Node> object appends a string to the text content
       of the node.
 
-      If the node is a <IF::DocumentFragment>, <IF::x|EntityReference>, 
-      <IF::Element>, <IF::Attr>, <IF::x|Entity>, or
+      If the node is a <IF::DocumentFragment>, <IF::tx|EntityReference>, 
+      <IF::Element>, <IF::Attr>, <IF::tx|Entity>, or
       <IF::d|AttributeDefinition> node, then the string
       is appended to the end of the text content of the node.  That is,
       if the last child node, if any, is a <IF::Text>, then its 
@@ -3484,7 +3484,7 @@ IFCls1Def:
           my $et = $docd-><M::d|DocumentXDoctype.createGeneralEntity>
                              ('ent1');
           $et-><AS::Node.textContent> ('replacement text content');
-          $et-><AS::tx|Entity.manakaiHasReplacementTree> (true);
+          $et-><AS::tx|Entity.hasReplacementTree> (true);
         $dtd-><M::DTDef.setGeneralEntityNode> ($et);
         $doc-><M::Node.appendChild> ($dtd);
         $doc-><AG::Document.domConfig>
@@ -3525,7 +3525,7 @@ IFCls1Def:
           my $et = $docd-><M::d|DocumentXDoctype.createGeneralEntity>
                              ('ent1');
           $et-><AS::Node.textContent> ('replacement text content');
-          $et-><AS::tx|Entity.manakaiHasReplacementTree> (true);
+          $et-><AS::tx|Entity.hasReplacementTree> (true);
         $dtd-><M::DTDef.setGeneralEntityNode> ($et);
         $doc-><M::Node.appendChild> ($dtd);
         $doc-><AG::Document.domConfig>
@@ -3565,7 +3565,7 @@ IFCls1Def:
           my $et = $docd-><M::d|DocumentXDoctype.createGeneralEntity>
                              ('ent1');
           $et-><AS::Node.textContent> ('replacement text content');
-          $et-><AS::tx|Entity.manakaiHasReplacementTree> (true);
+          $et-><AS::tx|Entity.hasReplacementTree> (true);
         $dtd-><M::DTDef.setGeneralEntityNode> ($et);
         $doc-><M::Node.appendChild> ($dtd);
         $doc-><AG::Document.domConfig>
@@ -3995,13 +3995,168 @@ IFCls1Def:
   @Method:
     @@Name: lookupNamespaceURI
     @@Return:
+
+  @L3Attr:
+    @@Name: baseURI
+    @@enDesc:
+      The base URI of the node.
+    @@Type: DOMString
+    @@dis:actualType: ManakaiDOM|ManakaiDOMURI
+    @@Get:
+      @@@enDesc:
+        The absolute base URI of the node.
+      @@@nullCase:
+        @@@@enDesc:
+          If the DOM implementation was unable to obtain the base absolute
+          URI.
+      @@@PerlDef:
+        $r = null;
+    @@enImplNote:
+      See <URI::http://suika.fam.cx/gate/2005/sw/baseURI>.
+
+  @L3Method:
+    @@Name: compareDocumentPosition
+     @@Param:
+        @@@Name:  other
+        @@@Type:  Node
+     @@Return:
+        @@@Type:  
+          DOMMain:unsigned-short||ManakaiDOM|all
+        @@@actualType: DocumentPosition
+        @@@Exception[list]:  DOMException
 ##Node
+
+ElementTypeBinding:
+  @Name: RoleDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISLang|Role
+    @@ForCheck: =ManakaiDOM|all
+
+RoleDef:
+  @QName: tc|ElementRole
+  @enDesc:
+    Any class playing this role may be retrievable from 
+    <M::Node.getFeature> method of an <IF::Element> node. 
+
+RoleDef:
+  @QName: tc|AttributeRole
+  @enDesc:
+    Any class playing this role may be retrievable from 
+    <M::Node.getFeature> method of an <IF::Attr> node. 
+
+RoleDef:
+  @QName: tc|TextRole
+  @enDesc:
+    Any class playing this role may be retrievable from 
+    <M::Node.getFeature> method of an <IF::Text> node. 
+
+RoleDef:
+  @QName: tc|CommentRole
+  @enDesc:
+    Any class playing this role may be retrievable from 
+    <M::Node.getFeature> method of an <IF::Comment> node. 
+
+RoleDef:
+  @QName: tc|DocumentRole
+  @enDesc:
+    Any class playing this role may be retrievable from 
+    <M::Node.getFeature> method of an <IF::Document> node. 
+
+RoleDef:
+  @QName: tc|DocumentFragmentRole
+  @enDesc:
+    Any class playing this role may be retrievable from 
+    <M::Node.getFeature> method of an <IF::DocumentFragment> node. 
+
+RoleDef:
+  @QName: tc|DocumentTypeRole
+  @enDesc:
+    Any class playing this role may be retrievable from 
+    <M::Node.getFeature> method of an <IF::DOMXML:DocumentType> node. 
+
+RoleDef:
+  @QName: tc|EntityRole
+  @enDesc:
+    Any class playing this role may be retrievable from 
+    <M::Node.getFeature> method of an <IF::DOMXML:Entity> node. 
+
+RoleDef:
+  @QName: tc|EntityReferenceRole
+  @enDesc:
+    Any class playing this role may be retrievable from 
+    <M::Node.getFeature> method of an <IF::DOMXML:EntityReference> node. 
+
+RoleDef:
+  @QName: tc|ProcessingInstructionRole
+  @enDesc:
+    Any class playing this role may be retrievable from 
+    <M::Node.getFeature> method of an <IF::DOMXML:ProcessingInstruction> node. 
+
+RoleDef:
+  @QName: tc|NotationRole
+  @enDesc:
+    Any class playing this role may be retrievable from 
+    <M::Node.getFeature> method of a <IF::DOMXML:Notation> node. 
+
+RoleDef:
+  @QName: tc|CDATASectionRole
+  @enDesc:
+    Any class playing this role may be retrievable from 
+    <M::Node.getFeature> method of a <IF::DOMXML:CDATASection> node. 
+
+RoleDef:
+  @QName: tc|NamespaceRole
+  @enDesc:
+    Any class playing this role may be retrievable from 
+    <M::Node.getFeature> method of a <IF::DOMXPath:Namespace> node. 
+
+RoleDef:
+  @QName: tc|ElementTypeDefinitionRole
+  @enDesc:
+    Any class playing the <Q::tc|ElementTypeDefinitionRole>
+    might be retrieved by <M::Node.getFeature> method of
+    an <IF::d|ElementTypeDefinition> node.
+
+RoleDef:
+  @QName: tc|AttributeDefinitionRole
+  @enDesc:
+    Any class playing the <Q::tc|AttributeDefinitionRole>
+    might be retrieved by <M::Node.getFeature> method of
+    an <IF::d|AttributeDefinition> node.
+
+RoleDef:
+  @QName: tc|AnyNodeRole
+  @enDesc:
+    Any class playing this role may be retrievable from 
+    <M::Node.getFeature> method of a <IF::Node> node. 
+  @subsetOf: tc|ElementRole
+  @subsetOf: tc|AttributeRole
+  @subsetOf: tc|DocumentRole
+  @subsetOf: tc|DocumentFragmentRole
+  @subsetOf: tc|DocumentTypeRole
+  @subsetOf: tc|TextRole
+  @subsetOf: tc|CommentRole
+  @subsetOf: tc|EntityRole
+  @subsetOf: tc|EntityReferenceRole
+  @subsetOf: tc|NotationRole
+  @subsetOf: tc|ProcessingInstructionRole
+  @subsetOf: tc|CDATASectionRole
+  @subsetOf: tc|NamespaceRole
 
 IntPropDef:
   @QName: tc|nodeRefClass
-  @mg:nodeStemKey: nrcls
+  @tc:nodeStemKey: nrcls
   @enDesc:
     The Perl package name of the class of the node reference.
+
+RPropDef:
+  @QName: tc|nodeStemKey
+  @enDesc:
+    Hash key for <Class::ManakaiDOMNode||ManakaiDOM|ManakaiDOMLatest>
+    node stems.
+  @subsetOf: mg|nodeStemKey
 
 ForDef:
   @QName: tc|ForAppendChild
@@ -4032,6 +4187,8 @@ ElementTypeBinding:
 NodeTypeDef:
   @IFQName: Document
   @ClsQName: ManakaiDOMDocument
+
+  @DISLang:role: tc|DocumentRole
 
   @enDesc:
     A <IF::Document> object represents the entire HTML or XML document.
@@ -4080,6 +4237,37 @@ NodeTypeDef:
   @mg:subnode1a: infoset|children
   @mg:ownee1h: tc|revOwnerDocument
   @mg:owner0: tc|implementation
+
+  @enImplNote:
+    @@ddid: props
+    @@@:
+      {P:: Required internal properties:
+
+        - <Q::tc|revOwnerDocument>, <Q::tc|implementation>.
+
+        - <Q::infoset|children>.
+
+        - <Q::infoset|version>.
+
+      }
+
+      {P:: Optional internal properties:
+
+        - <Q::c|xmlEncoding>,
+          <Q::infoset|characterEncodingScheme>, <Q::infoset|standalone>,
+          <Q::infoset|allDeclarationsProcessed>.
+
+        - <Q::c|documentURI>, <Q::infoset|baseURI>.
+
+        - <Q::c|read-only>, <Q::c|strictErrorChecking>.
+
+        - <Q::cfg|entity-reference-read-only>,
+          <Q::cfg|xml-id>, <Q::c|error-handler>,
+          <Q::cfg|clone-entity-reference-subtree>.
+
+        - <Q::t|userData>.
+
+      }
 
   @CODE:
     @@QName: tc|createEmptyDocumentForTest
@@ -7960,13 +8148,16 @@ NodeTypeDef:
           according to the XML version in use specified in the
           <A::Document.xmlVersion> attribute.
       @@@PerlDef:
-        my $version = $self-><AG::Document.xmlVersion>;
-        __CODE{DOMMain|ensureXMLName::
-          $INPUT => $tagName, $INPUT_PARAM_NAME => 'tagName',
-          $XMLVERSION => $version,
-        }__;
+        my $strict = $self-><AG::Document.strictErrorChecking>;
+        if ($strict) {
+          my $version = $self-><AG::Document.xmlVersion>;
+          __CODE{DOMMain|ensureXMLName::
+            $INPUT => $tagName, $INPUT_PARAM_NAME => 'tagName',
+            $XMLVERSION => $version,
+          }__;
+        }
         __DEEP{
-          my $strict = $self-><AG::Document.strictErrorChecking>;
+          $self-><AS::Document.strictErrorChecking> (false);
           $r = $self-><M::Document.createElementNS> (null, [null, $tagName]);
           $self-><AS::Document.strictErrorChecking> ($strict);
         }__;
@@ -8857,10 +9048,8 @@ NodeTypeDef:
                       $__attr-><M::Node.appendChild>
                                  ($__at_child-><M::Node.cloneNode> (true));
                     }
-                    __CODE{tc|setAttrType::
-                      $ref => $__attr,
-                      $type => {$__at-><AG::ATDef.declaredType>},
-                    }__;
+                    $__attr-><AS::Attr.manakaiAttributeType>
+                               ($__at-><AG::ATDef.declaredType>);
                     my $__nsuri = $__attr-><AG::Attr.value>;
                     ## TODO: Namespace well-formedness check (NSURI), v1.1 chk
                     $__pfx_to_uri{$__nn2} = $__nsuri;
@@ -8887,10 +9076,8 @@ NodeTypeDef:
                     $__attr-><M::Node.appendChild>
                                ($__at_child-><M::Node.cloneNode> (true));
                   }
-                  __CODE{tc|setAttrType::
-                    $ref => $__attr,
-                    $type => {$__at-><AG::ATDef.declaredType>},
-                  }__;
+                  $__attr-><AS::Attr.manakaiAttributeType>
+                             ($__at-><AG::ATDef.declaredType>);
                   ## TODO: Namespace well-formedness check (NSURI)
                   $element-><M::Element.setAttributeNodeNS> ($__attr);
                              ## This method changes |specified| flag
@@ -8916,10 +9103,8 @@ NodeTypeDef:
                   $__attr-><M::Node.appendChild>
                              ($__at_child-><M::Node.cloneNode> (true));
                 }
-                __CODE{tc|setAttrType::
-                  $ref => $__attr,
-                  $type => {$__at-><AG::ATDef.declaredType>},
-                }__;
+                $__attr-><AS::Attr.manakaiAttributeType>
+                           ($__at-><AG::ATDef.declaredType>);
                 $element-><M::Element.setAttributeNodeNS> ($__attr);
                              ## This method changes |specified| flag
                 $__attr-><AS::Attr.specified> (false);
@@ -8984,13 +9169,16 @@ NodeTypeDef:
           according to the XML version in use specified in
           the <A::Document.xmlVersion> attribute.
       @@@PerlDef:
-        my $version = $self-><AG::Document.xmlVersion>;
-        __CODE{DOMMain|ensureXMLName::
-          $INPUT => $name, $INPUT_PARAM_NAME => 'name',
-          $XMLVERSION => $version,
-        }__;
+        my $strict = $self-><AG::Document.strictErrorChecking>;
+        if ($strict) {
+          my $version = $self-><AG::Document.xmlVersion>;
+          __CODE{DOMMain|ensureXMLName::
+            $INPUT => $name, $INPUT_PARAM_NAME => 'name',
+            $XMLVERSION => $version,
+          }__;
+        }
         __DEEP{
-          my $strict = $self-><AG::Document.strictErrorChecking>;
+          $self-><AS::Document.strictErrorChecking> (false);
           $r = $self-><M::Document.createAttributeNS> (null, [null, $name]);
           $self-><AS::Document.strictErrorChecking> ($strict);
         }__;
@@ -9286,10 +9474,7 @@ NodeTypeDef:
             if ($self-><AG::Document.domConfig>
                      -><M::c|DOMConfiguration.getParameter>
                          (<Q::cfg|xml-id>)) {
-              __CODE{tc|setAttrType::
-                $ref => $r,
-                $type => {<C::ATDef.ID_ATTR>},
-              }__;
+              $r-><AS::Attr.manakaiAttributeType> (<C::ATDef.ID_ATTR>);
             }
           }__;
         }
@@ -9998,15 +10183,16 @@ NodeTypeDef:
                 push @node, $clone;
               }
               $r-><AS::tx|EntityReference.manakaiExpanded>
-                    ($__et-><AG::tx|Entity.manakaiHasReplacementTree>);
-              if ($self-><AG::Document.domConfig>
-                       -><M::c|DOMConfiguration.setParameter>
-                           (<Q::cfg|entity-reference-read-only>)) {
-                $r-><M::Node.manakaiSetReadOnly> (true, true);
-              }
+                    ($__et-><AG::tx|Entity.hasReplacementTree>);
               $self-><AS::Document.strictErrorChecking> ($orig_strict);
             } # entity
           } # doctype
+
+          if ($self-><AG::Document.domConfig>
+                   -><M::c|DOMConfiguration.setParameter>
+                       (<Q::cfg|entity-reference-read-only>)) {
+            $r-><M::Node.manakaiSetReadOnly> (true, true);
+          }
         }__;
 
     @@Test:
@@ -10081,6 +10267,9 @@ NodeTypeDef:
 
         $test->id ('empty');
         $test->assert_false ($ent-><M::Node.hasChildNodes>);
+
+        $test->id ('readonly');
+        $test->assert_false ($ent-><AG::Node.manakaiReadOnly>);
     @@XDTest:
       @@@QName: Document.createER.hasdef.test
       @@@PerlDef:
@@ -10092,7 +10281,7 @@ NodeTypeDef:
           my $et = $docd-><M::d|DocumentXDoctype.createGeneralEntity>
                              ('ent1');
           $et-><AS::Node.textContent> ('replacement text content');
-          $et-><AS::x|Entity.manakaiHasReplacementTree> (true);
+          $et-><AS::x|Entity.hasReplacementTree> (true);
         $dtd-><M::DTDef.setGeneralEntityNode> ($et);
         $doc-><M::Node.appendChild> ($dtd);
 
@@ -10127,7 +10316,7 @@ NodeTypeDef:
           my $et = $docd-><M::d|DocumentXDoctype.createGeneralEntity>
                              ('ent1');
           $et-><AS::Node.textContent> ('replacement text content');
-          $et-><AS::tx|Entity.manakaiHasReplacementTree> (true);
+          $et-><AS::tx|Entity.hasReplacementTree> (true);
         $dtd-><M::DTDef.setGeneralEntityNode> ($et);
         $doc-><M::Node.appendChild> ($dtd);
         $doc-><AG::Document.domConfig>
@@ -10167,7 +10356,7 @@ NodeTypeDef:
           my $et = $docd-><M::d|DocumentXDoctype.createGeneralEntity>
                              ('ent1');
           $et-><M::Node.appendChild> ($ent0);
-          $et-><AS::tx|Entity.manakaiHasReplacementTree> (true);
+          $et-><AS::tx|Entity.hasReplacementTree> (true);
         $dtd-><M::DTDef.setGeneralEntityNode> ($et);
         $doc-><M::Node.appendChild> ($dtd);
 
@@ -10192,13 +10381,13 @@ NodeTypeDef:
           my $et = $docd-><M::d|DocumentXDoctype.createGeneralEntity>
                              ('ent1');
           $et-><M::Node.appendChild> ($ent0);
-          $et-><AS::tx|Entity.manakaiHasReplacementTree> (true);
+          $et-><AS::tx|Entity.hasReplacementTree> (true);
 
           my $ent0_2 = $doc-><M::Document.createEntityReference> ('ent1');
           my $et_2 = $docd-><M::d|DocumentXDoctype.createGeneralEntity>
                              ('ent2');
           $et_2-><M::Node.appendChild> ($ent0_2);
-          $et_2-><AS::tx|Entity.manakaiHasReplacementTree> (true);
+          $et_2-><AS::tx|Entity.hasReplacementTree> (true);
         $dtd-><M::DTDef.setGeneralEntityNode> ($et);
         $doc-><M::Node.appendChild> ($dtd);
 
@@ -10794,6 +10983,9 @@ NodeTypeDef:
       @@@enDesc:
         Sets the attribute value.  No lexical checking is performed
         on setting.
+      @@@nullCase:
+        @@@@enDesc:
+          Sets <DOM::null> as the attribute value.
       @@@NodeReadOnlyError:
       @@@PerlDef:
         __CODE{tc|NodeReadOnlyError:: $node => $self}__;
@@ -11791,25 +11983,25 @@ IntPropDef:
   @enDesc:
     Reversed <Q::tc|implementation>
   @Type: HASH
-  @mg:nodeStemKey: ed
+  @tc:nodeStemKey: ed
 
 IntPropDef:
   @QName: tc|implementation
   @enDesc:
     Associated implementation
   @Type: HASH
-  @mg:nodeStemKey: impl
+  @tc:nodeStemKey: impl
 
 IntPropDef:
   @QName: tc|ownerDocument
-  @mg:nodeStemKey: od
+  @tc:nodeStemKey: od
 
 IntPropDef:
   @QName: tc|revOwnerDocument
   @enDesc:
     Reversed relationship for <Q::tc|ownerDocument>.
   @Type: HASH
-  @mg:nodeStemKey: do
+  @tc:nodeStemKey: do
 
 ElementTypeBinding:
   @Name: enDesc
@@ -11821,6 +12013,8 @@ ElementTypeBinding:
 NodeTypeDef:
   @IFQName: Element
   @ClsQName: ManakaiDOMElement
+
+  @DISLang:role: tc|ElementRole
 
   @enDesc:
     An <IF::Element> object represents an element in a document.
@@ -15046,6 +15240,222 @@ NodeTypeDef:
           $test->assert_isa ($sp, $_->[2]);
         }
 
+  @CL3Attr:
+    @@Name: baseURI
+    @@enDesc:
+      The base URI of the node.
+    @@Type: DOMString
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          If it is not available.
+      @@@PerlDef:
+        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
+          $r => $r,
+          $prop => {<H::infoset|baseURI>},
+          $ref => $self,
+        }__;
+        unless (defined $r) {
+          __DEEP{
+            my $xb = $self-><M::Element.getAttributeNodeNS>
+                              (<Q::xml:>, 'base');
+            unless (defined $xb) {
+              $xb = $self-><M::Element.getAttributeNodeNS>
+                             (null, [null, 'xml:base']);
+            }
+            if ($xb) {
+              $r = $xb-><AG::Attr.value>;
+              if (<Code::DOMMain|isRelativeDOMURI:: $INPUT = $r>) {
+                my $xbbase = $xb-><AG::Node.baseURI>;
+                $r = $self-><AG::Node.ownerDocument>
+                          -><AG::Document.implementation>
+                          -><M::urigen|URIImplementation.createURIReference>
+                              ($r)
+                          -><M::urigen|URIReference.getAbsoluteReference>
+                              ($xbbase)
+                          -><AG::urigen|URIReference.uriReference>
+                  if defined $xbbase;
+              }
+            } else {
+              my $pe = $self-><AG::Node.parentNode>;
+              W: {
+                while (defined $pe) {
+                  my $nt = $pe-><AG::Node.nodeType>;
+                  if ($nt == <C::Node.ELEMENT_NODE> or
+                      $nt == <C::Node.DOCUMENT_NODE> or
+                      $nt == <C::Node.DOCUMENT_FRAGMENT_NODE> or
+                      $nt == <C::Node.ENTITY_NODE>) {
+                    $r = $pe-><AG::Node.baseURI>;
+                    last W;
+                  } elsif ($nt == <C::Node.ENTITY_REFERENCE_NODE>) {
+                    if ($pe-><AG::tx|EntityReference.manakaiExternal>) {
+                      $r = $pe-><AG::tx|EntityReference.manakaiEntityBaseURI>;
+                      last W;
+                    }
+                  }
+                  $pe = $pe-><AG::Node.parentNode>;
+                }
+                if ($pe) {
+                  $r = $pe-><AG::Node.baseURI>;
+                } else {
+                  $r = $self-><AG::Node.ownerDocument>-><AG::Node.baseURI>;
+                }
+              } # W
+            }
+          }__;
+        }
+
+    @@LXTest:
+      @@@QName: Element.baseURI.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+        my $el = $doc-><M::Document.createElementNS> (null, 'el');
+
+        $test->id ('initial');
+        $test->assert_null ($el-><AG::Node.baseURI>);
+        $test->assert_null ($el-><AG::Element.manakaiBaseURI>);
+
+        $test->id ('doc');
+        $doc-><AS::Document.documentURI> (q<http://foo.example/>);
+        $test->assert_equals
+                 ($el-><AG::Node.baseURI>,
+                  q<http://foo.example/>);
+        $test->assert_equals
+                 ($el-><AG::Element.manakaiBaseURI>,
+                  q<http://foo.example/>);
+
+        $test->id ('xb.abs');
+        $el-><M::Element.setAttributeNS> (<Q::xml:>, 'xml:base',
+                                          q<http://www.example.com/>);
+        $test->assert_equals
+                 ($el-><AG::Node.baseURI>,
+                  q<http://www.example.com/>);
+        $test->assert_equals
+                 ($el-><AG::Element.manakaiBaseURI>,
+                  q<http://www.example.com/>);
+
+        $test->id ('xb.rel');
+        $el-><M::Element.setAttributeNS> (<Q::xml:>, 'xml:base',
+                                          q<bar>);
+        $test->assert_equals
+                 ($el-><AG::Node.baseURI>,
+                  q<http://foo.example/bar>);
+        $test->assert_equals
+                 ($el-><AG::Element.manakaiBaseURI>,
+                  q<http://foo.example/bar>);
+
+        $test->id ('mbu.set');
+        $el-><AS::Element.manakaiBaseURI> (q<http://baz.example/>);
+        $test->assert_equals
+                 ($el-><AG::Node.baseURI>,
+                  q<http://baz.example/>);
+        $test->assert_equals
+                 ($el-><AG::Element.manakaiBaseURI>,
+                  q<http://baz.example/>);
+
+        $test->id ('mbu.unset');
+        $el-><AS::Element.manakaiBaseURI> (null);
+        $test->assert_equals
+                 ($el-><AG::Node.baseURI>,
+                  q<http://foo.example/bar>);
+        $test->assert_equals
+                 ($el-><AG::Element.manakaiBaseURI>,
+                  q<http://foo.example/bar>);
+    @@LXTest:
+      @@@QName: Element.baseURI.1.nons.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+        my $el = $doc-><M::Document.createElementNS> (null, 'el');
+
+        $test->id ('initial');
+        $test->assert_null ($el-><AG::Node.baseURI>);
+        $test->assert_null ($el-><AG::Element.manakaiBaseURI>);
+
+        $test->id ('doc');
+        $doc-><AS::Document.documentURI> (q<http://foo.example/>);
+        $test->assert_equals
+                 ($el-><AG::Node.baseURI>,
+                  q<http://foo.example/>);
+        $test->assert_equals
+                 ($el-><AG::Element.manakaiBaseURI>,
+                  q<http://foo.example/>);
+
+        $test->id ('xb.abs');
+        $el-><M::Element.setAttribute> ('xml:base',
+                                        q<http://www.example.com/>);
+        $test->assert_equals
+                 ($el-><AG::Node.baseURI>,
+                  q<http://www.example.com/>);
+        $test->assert_equals
+                 ($el-><AG::Element.manakaiBaseURI>,
+                  q<http://www.example.com/>);
+
+        $test->id ('xb.rel');
+        $el-><M::Element.setAttribute> ('xml:base', q<bar>);
+        $test->assert_equals
+                 ($el-><AG::Node.baseURI>,
+                  q<http://foo.example/bar>);
+        $test->assert_equals
+                 ($el-><AG::Element.manakaiBaseURI>,
+                  q<http://foo.example/bar>);
+
+        $test->id ('mbu.set');
+        $el-><AS::Element.manakaiBaseURI> (q<http://baz.example/>);
+        $test->assert_equals
+                 ($el-><AG::Node.baseURI>,
+                  q<http://baz.example/>);
+        $test->assert_equals
+                 ($el-><AG::Element.manakaiBaseURI>,
+                  q<http://baz.example/>);
+
+        $test->id ('mbu.unset');
+        $el-><AS::Element.manakaiBaseURI> (null);
+        $test->assert_equals
+                 ($el-><AG::Node.baseURI>,
+                  q<http://foo.example/bar>);
+        $test->assert_equals
+                 ($el-><AG::Element.manakaiBaseURI>,
+                  q<http://foo.example/bar>);
+    @@LXTest:
+      @@@QName: Element.baseURI.2.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+        my $pi = $doc-><M::Document.createElementNS> (null, 'el');
+       
+        $test->id ('default');
+        $test->assert_null ($pi-><AG::Node.baseURI>);
+
+        $test->id ('doc');
+        $doc-><AS::Document.documentURI> (q<http://doc.test/>);
+        $test->assert_equals
+                 ($pi-><AG::Node.baseURI>,
+                  q<http://doc.test/>);
+
+        $test->id ('el');
+        my $el = $doc-><M::Document.createElementNS> (null, 'e');
+        $el-><M::Element.setAttributeNS> (<Q::xml:>, 'xml:base',
+                                          q<http://el.test/>);
+        $el-><M::Node.appendChild> ($pi);
+        $test->assert_equals
+                 ($pi-><AG::Node.baseURI>,
+                  q<http://el.test/>);
+
+        $test->id ('ent');
+        my $ent = $doc-><M::Document.createEntityReference> ('ent');
+        $ent-><AS::tx|EntityReference.manakaiExternal> (true);
+        $ent-><AS::tx|EntityReference.manakaiEntityBaseURI> (q<http://ent.test/>);
+        $el-><M::Node.appendChild> ($ent);
+        $ent-><M::Node.appendChild> ($pi);
+        $test->assert_equals
+                 ($pi-><AG::Node.baseURI>,
+                  q<http://ent.test/>);
+
   @ResourceDef:
     @@ForCheck:
       ManakaiDOM:ManakaiDOM ManakaiDOM:ForClass
@@ -17233,10 +17643,8 @@ NodeTypeDef:
                   $__attr-><M::Node.appendChild>
                              ($__at_child-><M::Node.cloneNode> (true));
                 }
-                __CODE{tc|setAttrType::
-                  $ref => $__attr,
-                  $type => {$__at-><AG::ATDef.declaredType>},
-                }__;
+                $__attr-><AS::Attr.manakaiAttributeType>
+                           ($__at-><AG::ATDef.declaredType>);
                 $element-><M::Element.setAttributeNodeNS> ($__attr);
                               ## This method change the |specified| flag
                 $__attr-><AS::Attr.specified> (false);
@@ -17676,6 +18084,8 @@ ForDef:
 NodeTypeDef:
   @IFQName: Attr
   @ClsQName: ManakaiDOMAttr
+
+  @DISLang:role: tc|AttrRole
   
   @enDesc:
     An <IF::Attr> object represents an attribute that can be attached
@@ -20495,6 +20905,54 @@ NodeTypeDef:
           $test->assert_isa ($sp, $_->[2]);
         }
 
+  @CL3Attr:
+    @@Name: baseURI
+    @@enDesc:
+      The base URI of the node.
+    @@Type: DOMString
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          If it is not available.
+      @@@PerlDef:
+        __DEEP{
+          my $oe = $self-><AG::Attr.ownerElement>;
+          if ($oe) {
+            $r = $oe-><AG::Node.baseURI>;
+          } else {
+            my $od = $self-><AG::Node.ownerDocument>;
+            $r = $od-><AG::Node.baseURI>;
+          }
+        }__;
+
+    @@L3Test:
+      @@@QName: Attr.baseURI.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+        my $attr = $doc-><M::Document.createAttributeNS> (null, 'attr');
+        
+        $test->id ('initial');
+        $test->assert_null ($attr-><AG::Node.baseURI>);
+
+        $doc-><AS::Document.documentURI> (q<http://www.example.com/>);
+        
+        $test->id ('doc');
+        $test->assert_equals
+                 ($attr-><AG::Node.baseURI>,
+                  q<http://www.example.com/>);
+
+        my $el = $doc-><M::Document.createElementNS> (null, 'element');
+        $el-><M::Element.setAttributeNS> (<Q::xml:>, 'xml:base',
+                                          q<http://www.example.org/>);
+        $el-><M::Element.setAttributeNodeNS> ($attr);
+
+        $test->id ('element');
+        $test->assert_equals
+                 ($attr-><AG::Node.baseURI>,
+                  q<http://www.example.org/>);
+
   @L2Attr:
     @@Name: ownerElement
     @@enDesc:
@@ -20914,17 +21372,6 @@ NodeTypeDef:
         $test->assert_equals
                  ($sti-><AG::c|TypeInfo.typeNamespace>, <Q::xml-dtd:>);
 
-  @CODE:
-    @@QName: tc|setAttrType
-    @@enDesc:
-      Sets <Q::infoset:attributeType> attribute.
-    @@PerlDef:
-      __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
-        $given => $type,
-        $prop => {<H::infoset|attributeType>},
-        $ref => $attr,
-      }__;
-
   @L3Attr:
     @@Name: isId
      @@Description:
@@ -21040,12 +21487,35 @@ NodeTypeDef:
               Especially, application-determined ID such as html5:*/@id
               and xml:id should be supported.
 
-  @enImplNote:
-    @@ddid: todo
-    @@@:
-      {TODO::
-         DTD [attribute type] setter is necessary.
-      }
+  @LXAttr:
+    @@Name: manakaiAttributeType
+    @@enDesc:
+      Sets the declared type of the attribute.
+
+        {NOTE::
+          This DOM attribute is equivalent to the <InfoProp::attribute type>
+          property for the attribute information items in XML
+          Information Set.
+        }
+    @@Type: unsignedShort
+    @@dis:actualType: d|DeclaredValueType
+    @@Get:
+      @@@PerlDef:
+        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
+          $r => $r,
+          $prop => {<H::infoset|attributeType>},
+          $ref => $self,
+        }__;
+        $r = <C::ATDef.NO_VALUE_ATTR> unless defined $r;
+    @@Set:
+      @@@NodeReadOnlyError:
+      @@@PerlDef:
+        __CODE{tc|NodeReadOnlyError:: $node => $self}__;
+        __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
+          $given => $given,
+          $prop => {<H::infoset|attributeType>},
+          $ref => $self,
+        }__;
 ##Attr
 
 ElementTypeBinding:
@@ -21312,6 +21782,44 @@ NodeTypeDef:
       @@@disDef:
         @@@@DISPerl:cloneCode: .data.set
 
+  @CL3Attr:
+    @@Name: baseURI
+    @@enDesc:
+      The base URI of the node.
+    @@Type: DOMString
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          If it is not available.
+      @@@PerlDef:
+        __DEEP{
+          my $pe = $self-><AG::Node.parentNode>;
+          W: {
+            while (defined $pe) {
+              my $nt = $pe-><AG::Node.nodeType>;
+              if ($nt == <C::Node.ELEMENT_NODE> or
+                  $nt == <C::Node.ATTRIBUTE_NODE> or
+                  $nt == <C::Node.DOCUMENT_NODE> or
+                  $nt == <C::Node.DOCUMENT_FRAGMENT_NODE> or
+                  $nt == <C::Node.ENTITY_NODE>) {
+                $r = $pe-><AG::Node.baseURI>;
+                last W;
+              } elsif ($nt == <C::Node.ENTITY_REFERENCE_NODE>) {
+                if ($pe-><AG::x|EntityReference.manakaiExternal>) {
+                  $r = $pe-><AG::x|EntityReference.manakaiEntityBaseURI>;
+                  last W;
+                }
+              }
+              $pe = $pe-><AG::Node.parentNode>;
+            }
+            if ($pe) {
+              $r = $pe-><AG::Node.baseURI>;
+            } else {
+              $r = $self-><AG::Node.ownerDocument>-><AG::Node.baseURI>;
+            }
+          } # W
+        }__;
+
   @Attr:
     @@Name: data
     @@enDesc:
@@ -21496,6 +22004,8 @@ IFCls1Def:
 
   @IFISA: CharacterData
   @ClsISA: ManakaiDOMCharacterData
+  
+  @DISLang:role: tc|TextRole
 
   @enDesc:
     A <IF::Text> object represents a textual content of an
@@ -21524,18 +22034,24 @@ IFCls1Def:
     in the document, during serialization using character or
     general entity references.
 
-  @Description:
-    @@lang:en
+  @enImplNote:
+    @@ddid: props
     @@@:
-      The textual content of an "Element" or "Attr".
-    \
-      When a document is first made available via the DOM, 
-      there is only one "Text" node for each block of text. 
-      DOM applications may create adjust "Text" nodes that 
-      represent the contents of a given node (but there is no 
-      way to represent the separation between these nodes in 
-      XML or HTML so they will not persist between DOM editing sessions 
-      in general).
+      {P:: Required internal properties:
+
+        - <Q::tc|ownerDocument>.
+
+        - <Q::infoset|content>.
+
+      }
+
+      {P:: Optional internal properties:
+
+        - <Q::infoset|parent>.
+
+        - <Q::c|read-only>.
+
+      }
 
   @CODE:
     @@QName: tc|createTextForTest
@@ -21730,6 +22246,42 @@ IFCls1Def:
           my $sp = $node-><M::Node.getFeature> ($_->[0], $_->[1]);
           $test->assert_isa ($sp, $_->[2]);
         }
+
+  @LXTest:
+    @@QName: Text.baseURI.test
+    @@PerlDef:
+      my $doc;
+      __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+        my $pi = $doc-><M::Document.createTextNode> ('text');
+       
+        $test->id ('default');
+        $test->assert_null ($pi-><AG::Node.baseURI>);
+
+        $test->id ('doc');
+        $doc-><AS::Document.documentURI> (q<http://doc.test/>);
+        $test->assert_equals
+                 ($pi-><AG::Node.baseURI>,
+                  q<http://doc.test/>);
+
+        $test->id ('el');
+        my $el = $doc-><M::Document.createElementNS> (null, 'e');
+        $el-><M::Element.setAttributeNS> (<Q::xml:>, 'xml:base',
+                                          q<http://el.test/>);
+        $el-><M::Node.appendChild> ($pi);
+        $test->assert_equals
+                 ($pi-><AG::Node.baseURI>,
+                  q<http://el.test/>);
+
+        $test->id ('ent');
+        my $ent = $doc-><M::Document.createEntityReference> ('ent');
+        $ent-><AS::x|EntityReference.manakaiExternal> (true);
+        $ent-><AS::x|EntityReference.manakaiEntityBaseURI> (q<http://ent.test/>);
+        $el-><M::Node.appendChild> ($ent);
+        $ent-><M::Node.appendChild> ($pi);
+        $test->assert_equals
+                 ($pi-><AG::Node.baseURI>,
+                  q<http://ent.test/>);
 
   @L3Attr:
     @@Name: isElementContentWhitespace
@@ -21941,6 +22493,8 @@ IFCls1Def:
   @IFISA: CharacterData
   @ClsISA: ManakaiDOMCharacterData
 
+  @DISLang:role: tc|CommentRole
+
   @enDesc:
     A <IF::Comment> object represents the content of a comment,
     i.e. all the characters between the starting <XML::<!--> and
@@ -21951,6 +22505,25 @@ IFCls1Def:
     <CODE::--> in the content, which is illegal in a comment
     per XML specification.  Such <IF::Comment> node cannot be
     serialized in XML.
+
+  @enImplNote:
+    @@ddid: props
+    @@@:
+      {P:: Required internal properties:
+
+        - <Q::tc|ownerDocument>.
+
+        - <Q::infoset|content>.
+
+      }
+
+      {P:: Optional internal properties:
+
+        - <Q::infoset|parent>.
+
+        - <Q::c|read-only>.
+
+      }
 
   @CODE:
     @@QName: tc|createCommentForTest
@@ -22145,11 +22718,49 @@ IFCls1Def:
           my $sp = $node-><M::Node.getFeature> ($_->[0], $_->[1]);
           $test->assert_isa ($sp, $_->[2]);
         }
+
+  @LXTest:
+    @@QName: Comment.baseURI.test
+    @@PerlDef:
+      my $doc;
+      __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+        my $pi = $doc-><M::Document.createComment> ('data');
+       
+        $test->id ('default');
+        $test->assert_null ($pi-><AG::Node.baseURI>);
+
+        $test->id ('doc');
+        $doc-><AS::Document.documentURI> (q<http://doc.test/>);
+        $test->assert_equals
+                 ($pi-><AG::Node.baseURI>,
+                  q<http://doc.test/>);
+
+        $test->id ('el');
+        my $el = $doc-><M::Document.createElementNS> (null, 'e');
+        $el-><M::Element.setAttributeNS> (<Q::xml:>, 'xml:base',
+                                          q<http://el.test/>);
+        $el-><M::Node.appendChild> ($pi);
+        $test->assert_equals
+                 ($pi-><AG::Node.baseURI>,
+                  q<http://el.test/>);
+
+        $test->id ('ent');
+        my $ent = $doc-><M::Document.createEntityReference> ('ent');
+        $ent-><AS::x|EntityReference.manakaiExternal> (true);
+        $ent-><AS::x|EntityReference.manakaiEntityBaseURI> (q<http://ent.test/>);
+        $el-><M::Node.appendChild> ($ent);
+        $ent-><M::Node.appendChild> ($pi);
+        $test->assert_equals
+                 ($pi-><AG::Node.baseURI>,
+                  q<http://ent.test/>);
 ##Comment
 
 NodeTypeDef:
   @IFQName: DocumentFragment
   @ClsQName: ManakaiDOMDocumentFragment
+
+  @DISLang:role: tc|DocumentFragmentRole
   
   @enDesc:
     The <IF::DocumentFragment> interface is originally designed
@@ -22199,6 +22810,23 @@ NodeTypeDef:
         $r = $obj;
   @mg:subnode1a: infoset|children
   @mg:owner0: tc|ownerDocument
+  @enImplNote:
+    @@ddid: props
+    @@@:
+      {P:: Required internal properties:
+
+        - <Q::tc|ownerDocument>.
+
+        - <Q::infoset|children>.
+
+      }
+
+      {P:: Optional internal properties:
+
+        - <Q::c|read-only>.
+
+      }
+
 
   @CODE:
     @@QName: tc|createDFForTest
@@ -26578,19 +27206,19 @@ ResourceDef:
     @@ForCheck: tc|ForEntityMap
 
   @f:implements:
-    @@@: x|XMLFeature10
+    @@@: tx|XMLFeature10
     @@ForCheck: tc|ForEntityMap ManakaiDOM|DOM1
   @f:implements:
-    @@@: x|XMLFeature20
+    @@@: tx|XMLFeature20
     @@ForCheck: tc|ForEntityMap ManakaiDOM|DOM2
   @f:implements:
-    @@@: x|XMLFeature30
+    @@@: tx|XMLFeature30
     @@ForCheck: tc|ForEntityMap ManakaiDOM|DOM3
   @f:implements:
-    @@@: x|XMLVersionFeature10
+    @@@: tx|XMLVersionFeature10
     @@ForCheck: tc|ForEntityMap ManakaiDOM|DOM3
   @f:implements:
-    @@@: x|XMLVersionFeature11
+    @@@: tx|XMLVersionFeature11
     @@ForCheck: tc|ForEntityMap ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeatureXML11
 
   @resourceFor:
@@ -26601,19 +27229,19 @@ ResourceDef:
     @@ForCheck: tc|ForNotationMap
 
   @f:implements:
-    @@@: x|XMLFeature10
+    @@@: tx|XMLFeature10
     @@ForCheck: tc|ForNotationMap ManakaiDOM|DOM1
   @f:implements:
-    @@@: x|XMLFeature20
+    @@@: tx|XMLFeature20
     @@ForCheck: tc|ForNotationMap ManakaiDOM|DOM2
   @f:implements:
-    @@@: x|XMLFeature30
+    @@@: tx|XMLFeature30
     @@ForCheck: tc|ForNotationMap ManakaiDOM|DOM3
   @f:implements:
-    @@@: x|XMLVersionFeature10
+    @@@: tx|XMLVersionFeature10
     @@ForCheck: tc|ForNotationMap ManakaiDOM|DOM3
   @f:implements:
-    @@@: x|XMLVersionFeature11
+    @@@: tx|XMLVersionFeature11
     @@ForCheck: tc|ForNotationMap ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeatureXML11
 
   @DISCore:resourceType:
@@ -29387,7 +30015,7 @@ ResourceDef:
 
 IntPropDef:
   @QName: tc|hashPosition
-  @mg:nodeStemKey: hpos
+  @tc:nodeStemKey: hpos
   @enDesc:
     Index for <Perl::each>.
 

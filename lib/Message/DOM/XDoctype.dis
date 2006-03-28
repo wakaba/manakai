@@ -17,13 +17,14 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/03/23 13:33:32 $
-  
-  @DefaultFor: ManakaiDOM|ManakaiDOMLatest
+    $Date: 2006/03/28 00:59:50 $
   
   @Require:
     @@Module:
-      @@@QName: MDOM|DOMXML
+      @@@QName: MDOM|TreeCore
+    @@Module:
+      @@@QName: MDOM|XML
+  @DefaultFor: ManakaiDOM|ManakaiDOMLatest
   
 Namespace:
   @c:
@@ -237,21 +238,6 @@ ElementTypeBinding:
       @@@@:
         The node is read-only.
 
-ResourceDef:
-  @QName: NodeReadOnlyError
-  @rdf:type: DISPerl|BlockCode
-  @For: ManakaiDOM|ManakaiDOM
-  @PerlCDef:
-    if ($self->{<H::mn:node>}->{<H::c|read-only>}) {
-      __EXCEPTION{MDOMX|NOMOD_THIS::
-      }__;
-    }
-
-ResourceDef:
-  @QName: d|getRef
-  @AliasFor: mn|getNewReference||ManakaiDOM|Perl
-  @For: ManakaiDOM|ManakaiDOM !=ManakaiDOM|ManakaiDOM
-
 ElementTypeBinding:
   @Name: PerlDef
   @ElementType:
@@ -317,7 +303,6 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type: DISLang|MethodParameter
 
-
 ElementTypeBinding:
   @Name: Return
   @ElementType:
@@ -350,7 +335,6 @@ ElementTypeBinding:
     @@ForCheck: ManakaiDOM|ForClass
     @@ManakaiDOM:isForInternal: 1
 
-
 ElementTypeBinding:
   @Name: Get
   @ElementType:
@@ -377,7 +361,7 @@ IFClsXDef:
   @IFQName: DocumentXDoctype
   @ClsQName: ManakaiDOMDocumentXDoctype
   
-  @ClsISA: c|ManakaiDOMDocument
+  @ClsISA: tc|ManakaiDOMDocument
 
   @f:implements: d|Feature30
   @f:provides:
@@ -392,37 +376,51 @@ IFClsXDef:
     interface <kwd:MUST> also implement the
     <IF::Document> interface.
 
-  @ResourceDef:
-    @@ForCheck: ManakaiDOM|ForClass
-    @@QName: newDocumentForTest
-    @@rdf:type: DISPerl|BlockCode
+  @CODE:
+    @@QName: d|createEmptyDocumentXForTest
     @@PerlDef:
-      my $__impl = <Class::c|ManakaiDOMImplementation>->_new;
-      $doc = $__impl-><M::c|DOMImplementation.createDocument>;
-      bless $doc, <ClassName::ManakaiDOMDocumentXDoctype>;
+      my $impl;
+      __CODE{tc|createImplForTest:: $impl => $impl}__;
+      my $doc = $impl-><M::c|DOMImplementation.createDocument>;
+      $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
   @Test:
+    @@QName: DocumentXDoctype.interfaces.test
     @@PerlDef:
       my $doc;
-      __CODE{newDocumentForTest}__;
+      __CODE{d|createEmptyDocumentXForTest:: $docx => $doc}__;
        
-      $test->assert_not_null ($doc);
       $test->assert_isa ($doc, <IFName::DocumentXDoctype>);
       $test->assert_isa ($doc, <IFName::Document>);
       $test->assert_isa ($doc, <IFName::Node>);
-      $test->assert_isa ($doc, <ClassName::ManakaiDOM|ManakaiDOMObject>);
-
-      ## TODO: Add test for implemented features
 
   @Test:
-    @@QName: DocX.getFeature.test
+    @@QName: Document.getFeature.xdoctype.test
     @@PerlDef:
       my $node;
       __CODE{tc|createEmptyDocumentForTest:: $doc => $node}__;
 
         for (
-          [<Q::fe|XDoctype> => '3.0', <IFName::DocumentTypeDefinition||ManakaiDOM|ManakaiDOMLatest>],
-          [<Q::fe|XDoctypeDeclaration> => '3.0', <IFName::DocumentTypeDeclaration||ManakaiDOM|ManakaiDOMLatest>],
+          [<Q::fe|XDoctype> => '3.0',
+           <IFName::DocumentTypeDefinition||ManakaiDOM|ManakaiDOMLatest>],
+          [<Q::fe|XDoctypeDeclaration> => '3.0',
+           <IFName::DocumentTypeDeclaration||ManakaiDOM|ManakaiDOMLatest>],
+        ) {
+          $test->id ($_->[0].'.'.$_->[1]);
+          my $sp = $node-><M::Node.getFeature> ($_->[0], $_->[1]);
+          $test->assert_isa ($sp, $_->[2]);
+        }
+  @Test:
+    @@QName: DocumentX.getFeature.xdoctype.test
+    @@PerlDef:
+      my $node;
+      __CODE{d|createEmptyDocumentXForTest:: $docx => $node}__;
+
+        for (
+          [<Q::fe|XDoctype> => '3.0',
+           <IFName::DocumentTypeDefinition||ManakaiDOM|ManakaiDOMLatest>],
+          [<Q::fe|XDoctypeDeclaration> => '3.0',
+           <IFName::DocumentTypeDeclaration||ManakaiDOM|ManakaiDOMLatest>],
         ) {
           $test->id ($_->[0].'.'.$_->[1]);
           my $sp = $node-><M::Node.getFeature> ($_->[0], $_->[1]);
@@ -432,65 +430,124 @@ IFClsXDef:
   @Method:
     @@Name: createDocumentTypeDefinition
     @@enDesc:
-      Creates a <IF::DocumentTypeDefinition>.
+      Creates a <IF::DocumentTypeDefinition> node of the
+      given name.
     @@enDesc:
       @@@ddid: decl
       @@@@:
         If the implementation supports the <Feature::fe|XDoctypeDeclaration>
         feature, the newly created object <kwd:MUST> also implement
         the <IF::DocumentTypeDeclaration> interface.  In addition,
-        the object <kwd:MUST> contains general entity declarations
-        for five predefined entities specified in XML specifications.
+        the object <kwd:MUST> contain general entity declarations
+        for five predefined entities as specified in XML specifications.
     @@DOMMain:isNamespaceUnaware: 1
     @@Param:
-      @@@Name: nameArg
+      @@@Name: name
       @@@Type: DOMString
       @@@enDesc:
-        The document type name of the definition.
+        The document type name of the node to create.
     @@Return:
       @@@Type: DocumentTypeDefinition
+        {P:: The newly created <IF::DocumentTypeDefinition> node with:
+        
+          - <A::Node.nodeName>::: <P::name>.
+
+          - <A::Node.ownerDocument>::: The <IF::Document>.
+
+          - <A::Node.parentNode>::: <DOM::null>.
+
+          - <A::Node.childNodes>::: An empty <IF::tc|NodeList>.
+
+          - <A::DocumentTypeDefinition.elementTypes>:::
+                An empty <IF::tc|NamedNodeMap>.
+
+          - <A::DocumentTypeDefinition.generalEntities>:::
+                An empty <IF::tc|NamedNodeMap>.
+
+          - <A::DocumentTypeDefinition.notations>:::
+                An empty <IF::tc|NamedNodeMap>.
+ 
+          - <A::DocumentTypeDeclaration.publicId>::: <DOM::null>.
+
+          - <A::DocumentTypeDeclaration.systemId>::: <DOM::null>.
+
+          - <A::tx|DocumentType.internalSubset>::: <DOM::null>.
+
+          - <A::Node.manakaiReadOnly>::: <DOM::false>.
+
+        }
       @@@dx:raises:
         @@@@@: MDOMX|MDOM_BAD_NAME
         @@@@enDesc:
-          The <P::nameArg> is not a legal <CODE::Name>
-          according to the XML version of the document.
+          The <P::name> is not an XML <CODE::Name> according to
+          the XML version in use specified in the 
+          <A::Document.xmlVersion> attribute.
+
+          Note that the <P::name> don't have to be a namespace
+          qualified name.
 
           If the <A::Document.strictErrorChecking> attribute is
-          set to <DOM::false>, the implementation is not
+          set to <DOM::false>, the implementation is <EM::not>
           <kwd:REQUIRED> to throw this exception.
       @@@PerlDef:
-        my $doc = $self->{<H::mn:node>};
-        if (<Code::t|doStrictErrorChecking:: $nodeRef = $self>) {
-          my $ver = <Code::t|getDocumentXMLVersion::
-                      $DOCOBJ = $doc>;
-          __CODE{DOMMain:ensureXMLName::
-            $INPUT => $nameArg,
-            $INPUT_PARAM_NAME => 'nameArg',
-            $XMLVERSION => $ver,
+        if ($self-><AG::Document.strictErrorChecking>) {
+          my $version = $self-><AG::Document.xmlVersion>;
+          __CODE{DOMMain|ensureXMLName::
+            $INPUT => $name, $INPUT_PARAM_NAME => 'name',
+            $XMLVERSION => $version,
           }__;
         }
-        my $obj
-          = <ClassM::ManakaiDOMDocumentTypeDefinition.newObject>;
-        __CODE{mn|setXRefNode||ManakaiDOM|Perl::
-          $referrer => $obj,
-          $propName => {<H::c|ownerDocument>},
-          $referent => $doc,
+
+        my $bag = <Code::mg|getNodeBag||ManakaiDOM|all:: $ref = $self>;
+        my $stem;
+        __CODE{mg|createNodeStem||ManakaiDOM|all::
+          $bag => $bag,
+          $stem => $stem,
+          $class => {<ClassName::ManakaiDOMDocumentTypeDefinition>},
+          $opt => {{
+            <H::infoset|name> => \$name,
+            <H::tc|ownerDocument> => $self,
+          }},
         }__;
-        $obj->{<H::c|name>} = $nameArg;
-        $obj->{<H::d|hasLtDeclaration>} = true;
-        $obj->{<H::d|hasGtDeclaration>} = true;
-        $obj->{<H::d|hasAmpDeclaration>} = true;
-        $obj->{<H::d|hasAposDeclaration>} = true;
-        $obj->{<H::d|hasQuotDeclaration>} = true;
-        $r = <ClassM::t|ManakaiDOMNode.getNodeReference>
-               ($obj, <IFName::DocumentTypeDefinition>);
+        __CODE{mg|createNodeRef||ManakaiDOM|all::
+          $bag => $bag,
+          $stem => $stem,
+          $ref => $r,
+          $opt => {{
+          }},
+        }__;
+        __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
+          $given => {true},
+          $prop => {<H::d|hasLtDeclaration>},
+          $ref => $self,
+        }__;
+        __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
+          $given => {true},
+          $prop => {<H::d|hasGtDeclaration>},
+          $ref => $self,
+        }__;
+        __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
+          $given => {true},
+          $prop => {<H::d|hasAmpDeclaration>},
+          $ref => $self,
+        }__;
+        __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
+          $given => {true},
+          $prop => {<H::d|hasAposDeclaration>},
+          $ref => $self,
+        }__;
+        __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
+          $given => {true},
+          $prop => {<H::d|hasQuotDeclaration>},
+          $ref => $self,
+        }__;
 
     @@Test:
       @@@QName:
         ManakaiDocumentXDoctype.createDocumentTypeDefinition.success.test
       @@@PerlDef:
         my $doc;
-        __CODE{newDocumentForTest}__;
+        __CODE{d|createEmptyDocumentXForTest:: $docx => $doc}__;
         my $dtd = $doc-><M::DocumentXDoctype.createDocumentTypeDefinition>
                           ('abcdefg');
         
@@ -506,7 +563,7 @@ IFClsXDef:
         ManakaiDocumentXDoctype.createDocumentTypeDefinition.badname.test
       @@@PerlDef:
         my $doc;
-        __CODE{newDocumentForTest}__;
+        __CODE{d|createEmptyDocumentXForTest:: $docx => $doc}__;
         $test->assert_exception
                  (code => sub {
                     my $dtd = $doc-><M::DocumentXDoctype
@@ -519,7 +576,7 @@ IFClsXDef:
         ManakaiDocumentXDoctype.createDocumentTypeDefinition.badname.2.test
       @@@PerlDef:
         my $doc;
-        __CODE{newDocumentForTest}__;
+        __CODE{d|createEmptyDocumentXForTest:: $docx => $doc}__;
         $doc-><AS::Document.strictErrorChecking> (false);
         my $dtd = $doc-><M::DocumentXDoctype.createDocumentTypeDefinition>
                           ('0120');
@@ -530,51 +587,79 @@ IFClsXDef:
   @Method:
     @@Name: createElementTypeDefinition
     @@enDesc:
-      Creates an <IF::ElementTypeDefinition>.
+      Creates an <IF::ElementTypeDefinition> with the given
+      element type name.
     @@DOMMain:isNamespaceUnaware: 1
     @@Param:
-      @@@Name: nameArg
+      @@@Name: name
       @@@Type: DOMString
       @@@enDesc:
-        The element type name of the definition.
+        The element type name of the node to create.
     @@Return:
       @@@Type: ElementTypeDefinition
+      @@@enDesc:
+        {P:: The newly created <IF::ElementTypeDefinition> node with:
+        
+          - <A::Node.nodeName>::: <P::name>.
+
+          - <A::Node.ownerDocument>::: The <IF::Document>.
+
+          - <A::ElementTypeDefinition.ownerDocumentTypeDefinition>:::
+                <DOM::null>.
+
+          - <A::ElementTypeDefinition.attributeDefinitions>:::
+                An empty <IF::tc|NamedNodeMap>.
+
+          - <A::Node.manakaiReadOnly>::: <DOM::false>.
+
+        }
       @@@dx:raises:
         @@@@@: MDOMX|MDOM_BAD_NAME
         @@@@enDesc:
-          The <P::nameArg> is not a legal <CODE::Name>
-          according to the XML version of the document.
+          The <P::name> is not an XML <CODE::Name> according to
+          the XML version in use specified in the 
+          <A::Document.xmlVersion> attribute.
+
+          Note that the <P::name> don't have to be a namespace
+          qualified name.
 
           If the <A::Document.strictErrorChecking> attribute is
-          set to <DOM::false>, the implementation is not
+          set to <DOM::false>, the implementation is <EM::not>
           <kwd:REQUIRED> to throw this exception.
       @@@PerlDef:
-        my $doc = $self->{<H::mn:node>};
-        if (<Code::t|doStrictErrorChecking:: $nodeRef = $self>) {
-          my $ver = <Code::t|getDocumentXMLVersion::
-                      $DOCOBJ = $doc>;
-          __CODE{DOMMain:ensureXMLName::
-            $INPUT => $nameArg,
-            $INPUT_PARAM_NAME => 'nameArg',
-            $XMLVERSION => $ver,
+        if ($self-><AG::Document.strictErrorChecking>) {
+          my $version = $self-><AG::Document.xmlVersion>;
+          __CODE{DOMMain|ensureXMLName::
+            $INPUT => $name, $INPUT_PARAM_NAME => 'name',
+            $XMLVERSION => $version,
           }__;
         }
-        my $obj
-          = <ClassM::ManakaiDOMElementTypeDefinition.newObject>;
-        __CODE{mn|setXRefNode||ManakaiDOM|Perl::
-          $referrer => $obj,
-          $propName => {<H::c|ownerDocument>},
-          $referent => $doc,
+
+        my $bag = <Code::mg|getNodeBag||ManakaiDOM|all:: $ref = $self>;
+        my $stem;
+        __CODE{mg|createNodeStem||ManakaiDOM|all::
+          $bag => $bag,
+          $stem => $stem,
+          $class => {<ClassName::ManakaiDOMElementTypeDefinition>},
+          $opt => {{
+            <H::infoset|name> => \$name,
+            <H::tc|ownerDocument> => $self,
+          }},
         }__;
-        $obj->{<H::c|name>} = $nameArg;
-        $r = <ClassM::t|ManakaiDOMNode.getNodeReference> ($obj);
+        __CODE{mg|createNodeRef||ManakaiDOM|all::
+          $bag => $bag,
+          $stem => $stem,
+          $ref => $r,
+          $opt => {{
+          }},
+        }__;
 
     @@Test:
       @@@QName:
         ManakaiDocumentXDoctype.createElementTypeDefinition.success.test
       @@@PerlDef:
         my $doc;
-        __CODE{newDocumentForTest}__;
+        __CODE{d|createEmptyDocumentXForTest:: $docx => $doc}__;
         my $dtd = $doc-><M::DocumentXDoctype.createElementTypeDefinition>
                           ('abcdefg');
         
@@ -589,7 +674,7 @@ IFClsXDef:
         ManakaiDocumentXDoctype.createElementTypeDefinition.badname.test
       @@@PerlDef:
         my $doc;
-        __CODE{newDocumentForTest}__;
+        __CODE{d|createEmptyDocumentXForTest:: $docx => $doc}__;
         $test->assert_exception
                  (code => sub {
                     my $dtd = $doc-><M::DocumentXDoctype
@@ -602,7 +687,7 @@ IFClsXDef:
         ManakaiDocumentXDoctype.createElementTypeDefinition.badname.2.test
       @@@PerlDef:
         my $doc;
-        __CODE{newDocumentForTest}__;
+        __CODE{d|createEmptyDocumentXForTest:: $docx => $doc}__;
         $doc-><AS::Document.strictErrorChecking> (false);
         my $dtd = $doc-><M::DocumentXDoctype.createElementTypeDefinition>
                           ('0120');
@@ -613,46 +698,89 @@ IFClsXDef:
   @Method:
     @@Name: createAttributeDefinition
     @@enDesc:
-      Creates an <IF::AttributeDefinition>.
+      Creates an <IF::AttributeDefinition> with the given name.
     @@DOMMain:isNamespaceUnaware: 1
     @@Param:
-      @@@Name: nameArg
+      @@@Name: name
       @@@Type: DOMString
       @@@enDesc:
-        The attribute name of the definition.
+        The attribute name of the node to create.
     @@Return:
       @@@Type: AttributeDefinition
+      @@@enDesc:
+        {P:: The newly created <IF::AttributeDefinition> node with:
+        
+          - <A::Node.nodeName>::: <P::name>.
+
+          - <A::Node.ownerDocument>::: The <IF::Document>.
+
+          - <A::AttributeDefinition.ownerElementTypeDefinition>:::
+                <DOM::null>.
+
+          {LI:: <A::AttributeDefinition.declaredType>:::
+                <C::AttributeDefinition.NO_TYPE_ATTR>.
+
+                However, if the <cfg::cfg|xml-id> configuration
+                parameter is set to <DOM::true> and the <P::name>
+                is <XA::xml:id>, then the attribute is set to
+                <C::AttributeDefinition.ID_ATTR>.
+
+          }
+
+          - <A::AttributeDefinition.defaultType>:::
+                <C::AttributeDefinition.UNKNOWN_DEFAULT>.
+
+          - <A::AttributeDefinition.allowedTokens>:::
+                An empty <IF::c|DOMStringList>.
+
+          - <A::Node.childNodes>::: An empty <IF::tc|NodeList>.
+
+          - <A::Node.manakaiReadOnly>::: <DOM::false>.
+
+        }
       @@@dx:raises:
         @@@@@: MDOMX|MDOM_BAD_NAME
         @@@@enDesc:
-          The <P::nameArg> is not a legal <CODE::Name>
-          according to the XML version of the document.
+          The <P::name> is not an XML <CODE::Name> according to
+          the XML version in use specified in the 
+          <A::Document.xmlVersion> attribute.
+
+          Note that the <P::name> don't have to be a namespace
+          qualified name.
 
           If the <A::Document.strictErrorChecking> attribute is
-          set to <DOM::false>, the implementation is not
+          set to <DOM::false>, the implementation is <EM::not>
           <kwd:REQUIRED> to throw this exception.
       @@@PerlDef:
-        my $doc = $self->{<H::mn:node>};
-        if (<Code::t|doStrictErrorChecking:: $nodeRef = $self>) {
-          my $ver = <Code::t|getDocumentXMLVersion::
-                      $DOCOBJ = $doc>;
-          __CODE{DOMMain:ensureXMLName::
-            $INPUT => $nameArg,
-            $INPUT_PARAM_NAME => 'nameArg',
-            $XMLVERSION => $ver,
+        if ($self-><AG::Document.strictErrorChecking>) {
+          my $version = $self-><AG::Document.xmlVersion>;
+          __CODE{DOMMain|ensureXMLName::
+            $INPUT => $name, $INPUT_PARAM_NAME => 'name',
+            $XMLVERSION => $version,
           }__;
         }
-        my $obj = <ClassM::ManakaiDOMAttributeDefinition.newObject>;
-        __CODE{mn|setXRefNode||ManakaiDOM|Perl::
-          $referrer => $obj,
-          $propName => {<H::c|ownerDocument>},
-          $referent => $doc,
+
+        my $bag = <Code::mg|getNodeBag||ManakaiDOM|all:: $ref = $self>;
+        my $stem;
+        __CODE{mg|createNodeStem||ManakaiDOM|all::
+          $bag => $bag,
+          $stem => $stem,
+          $class => {<ClassName::ManakaiDOMAttributeDefinition>},
+          $opt => {{
+            <H::infoset|name> => \$name,
+            <H::tc|ownerDocument> => $self,
+          }},
         }__;
-        $obj->{<H::c|name>} = $nameArg;
-        $r = <ClassM::t|ManakaiDOMNode.getNodeReference> ($obj);
+        __CODE{mg|createNodeRef||ManakaiDOM|all::
+          $bag => $bag,
+          $stem => $stem,
+          $ref => $r,
+          $opt => {{
+          }},
+        }__;
 
         __DEEP{
-          if ($nameArg eq 'xml:id' and
+          if ($name eq 'xml:id' and
               $self-><AG::Document.domConfig>
                    -><M::c|DOMConfiguration.getParameter> (<Q::cfg|xml-id>)) {
             $r-><AS::AttributeDefinition.declaredType>
@@ -665,7 +793,7 @@ IFClsXDef:
         ManakaiDocumentXDoctype.createAttributeDefinition.success.test
       @@@PerlDef:
         my $doc;
-        __CODE{newDocumentForTest}__;
+        __CODE{d|createEmptyDocumentXForTest:: $docx => $doc}__;
         my $dtd = $doc-><M::DocumentXDoctype.createAttributeDefinition>
                           ('abcdefg');
         
@@ -680,7 +808,7 @@ IFClsXDef:
         ManakaiDocumentXDoctype.createAttributeDefinition.badname.test
       @@@PerlDef:
         my $doc;
-        __CODE{newDocumentForTest}__;
+        __CODE{d|createEmptyDocumentXForTest:: $docx => $doc}__;
         $test->assert_exception
                  (code => sub {
                     my $dtd = $doc-><M::DocumentXDoctype
@@ -693,7 +821,7 @@ IFClsXDef:
         ManakaiDocumentXDoctype.createAttributeDefinition.badname.2.test
       @@@PerlDef:
         my $doc;
-        __CODE{newDocumentForTest}__;
+        __CODE{d|createEmptyDocumentXForTest:: $docx => $doc}__;
         $doc-><AS::Document.strictErrorChecking> (false);
         my $dtd = $doc-><M::DocumentXDoctype.createAttributeDefinition>
                           ('0120');
@@ -705,7 +833,7 @@ IFClsXDef:
       @@@QName: DocXDoctype.createAtDef.xmlid.test
       @@@PerlDef:
         my $doc;
-        __CODE{newDocumentForTest}__;
+        __CODE{d|createEmptyDocumentXForTest:: $docx => $doc}__;
 
         my $cfg = $doc-><AG::Document.domConfig>;
 
@@ -730,50 +858,97 @@ IFClsXDef:
   @Method:
     @@Name: createGeneralEntity
     @@enDesc:
-      Creates a general <IF::tx|Entity> node.
+      Creates an <IF::tx|Entity> node, which represents
+      a general entity, with the given name.
     @@DOMMain:isNamespaceUnaware: 1
     @@Param:
-      @@@Name: nameArg
+      @@@Name: name
       @@@Type: DOMString
       @@@enDesc:
-        The name of the general entity.
+        The name of the general entity node to create.
     @@Return:
       @@@Type: tx|Entity
+      @@@enDesc:
+        {P:: The newly created <IF::tx|Entity> node with:
+        
+          - <A::Node.nodeName>::: <P::name>.
+
+          - <A::Node.ownerDocument>::: The <IF::Document>.
+
+          - <A::tx|Entity.ownerDocumentTypeDefinition>::: <DOM::null>.
+
+          - <A::Node.childNodes>::: An empty <IF::tc|NodeList>.
+
+          - <A::tx|Entity.manakaiHasReplacementTree>::: <DOM::false>.
+
+          - <A::tx|Entity.publicId>::: <DOM::null>.
+
+          - <A::tx|Entity.systemId>::: <DOM::null>.
+
+          - <A::tx|Entity.notationName>::: <DOM::null>.
+
+          - <A::tx|Entity.manakaiDeclarationBaseURI>::: No explicit
+                value is set.
+
+          - <A::tx|Entity.manakaiEntityURI>::: No explicit value is set.
+
+          - <A::tx|Entity.manakaiEntityBaseURI>::: No explicit value
+                is set.
+
+          - <A::Node.manakaiReadOnly>::: <DOM::false>.
+
+        }
       @@@dx:raises:
         @@@@@: MDOMX|MDOM_BAD_NAME
         @@@@enDesc:
-          The <P::nameArg> is not a legal <CODE::Name>
-          according to the XML version of the document.
+          The <P::name> is not an XML <CODE::Name> according to
+          the XML version in use specified in the 
+          <A::Document.xmlVersion> attribute.
+
+          Note that the <P::name> don't have to be a namespace
+          qualified name.
+
+          Note also that it is not an error for the <P::name>
+          to match to the name of one of predefined general
+          parsed entities in XML or HTML.
 
           If the <A::Document.strictErrorChecking> attribute is
-          set to <DOM::false>, the implementation is not
+          set to <DOM::false>, the implementation is <EM::not>
           <kwd:REQUIRED> to throw this exception.
       @@@PerlDef:
-        my $doc = $self->{<H::mn:node>};
-        if (<Code::t|doStrictErrorChecking:: $nodeRef = $self>) {
-          my $ver = <Code::t|getDocumentXMLVersion::
-                      $DOCOBJ = $doc>;
-          __CODE{DOMMain:ensureXMLName::
-            $INPUT => $nameArg,
-            $INPUT_PARAM_NAME => 'nameArg',
-            $XMLVERSION => $ver,
+        if ($self-><AG::Document.strictErrorChecking>) {
+          my $version = $self-><AG::Document.xmlVersion>;
+          __CODE{DOMMain|ensureXMLName::
+            $INPUT => $name, $INPUT_PARAM_NAME => 'name',
+            $XMLVERSION => $version,
           }__;
         }
-        my $obj = <ClassM::x|ManakaiDOMEntity.newObject>;
-        __CODE{mn|setXRefNode||ManakaiDOM|Perl::
-          $referrer => $obj,
-          $propName => {<H::c|ownerDocument>},
-          $referent => $doc,
+
+        my $bag = <Code::mg|getNodeBag||ManakaiDOM|all:: $ref = $self>;
+        my $stem;
+        __CODE{mg|createNodeStem||ManakaiDOM|all::
+          $bag => $bag,
+          $stem => $stem,
+          $class => {<ClassName::tx|ManakaiDOMEntity>},
+          $opt => {{
+            <H::infoset|name> => \$name,
+            <H::tc|ownerDocument> => $self,
+          }},
         }__;
-        $obj->{<H::c|name>} = $nameArg;
-        $r = <ClassM::t|ManakaiDOMNode.getNodeReference> ($obj);
+        __CODE{mg|createNodeRef||ManakaiDOM|all::
+          $bag => $bag,
+          $stem => $stem,
+          $ref => $r,
+          $opt => {{
+          }},
+        }__;
 
     @@Test:
       @@@QName:
         ManakaiDocumentXDoctype.createGeneralEntity.success.test
       @@@PerlDef:
         my $doc;
-        __CODE{newDocumentForTest}__;
+        __CODE{d|createEmptyDocumentXForTest:: $docx => $doc}__;
         my $dtd = $doc-><M::DocumentXDoctype.createGeneralEntity>
                           ('abcdefg');
         
@@ -788,7 +963,7 @@ IFClsXDef:
         ManakaiDocumentXDoctype.createGeneralEntity.badname.test
       @@@PerlDef:
         my $doc;
-        __CODE{newDocumentForTest}__;
+        __CODE{d|createEmptyDocumentXForTest:: $docx => $doc}__;
         $test->assert_exception
                  (code => sub {
                     my $dtd = $doc-><M::DocumentXDoctype.createGeneralEntity>
@@ -800,7 +975,7 @@ IFClsXDef:
         ManakaiDocumentXDoctype.createGeneralEntity.badname.2.test
       @@@PerlDef:
         my $doc;
-        __CODE{newDocumentForTest}__;
+        __CODE{d|createEmptyDocumentXForTest:: $docx => $doc}__;
         $doc-><AS::Document.strictErrorChecking> (false);
         my $dtd = $doc-><M::DocumentXDoctype.createGeneralEntity>
                           ('0120');
@@ -814,50 +989,81 @@ IFClsXDef:
   @Method:
     @@Name: createNotation
     @@enDesc:
-      Creates a <IF::tx|Notation> node.
+      Creates a <IF::tx|Notation> node with the given name.
     @@DOMMain:isNamespaceUnaware: 1
     @@Param:
-      @@@Name: nameArg
+      @@@Name: name
       @@@Type: DOMString
       @@@enDesc:
-        The name of the notation.
+        The name of the notation node to create.
     @@Return:
       @@@Type: tx|Notation
+      @@@enDesc:
+        {P:: The newly created <IF::tx|Notation> node with:
+        
+          - <A::Node.nodeName>::: <P::name>.
+
+          - <A::Node.ownerDocument>::: The <IF::Document>.
+
+          - <A::tx|Notation.ownerDocumentTypeDefinition>::: <DOM::null>.
+
+          - <A::tx|Notation.publicId>::: <DOM::null>.
+
+          - <A::tx|Notation.systemId>::: <DOM::null>.
+
+          - <A::tx|Notation.manakaiDeclarationBaseURI>::: No explicit
+                value is set.
+
+          - <A::Node.manakaiReadOnly>::: <DOM::false>.
+
+        }
       @@@dx:raises:
         @@@@@: MDOMX|MDOM_BAD_NAME
         @@@@enDesc:
-          The <P::nameArg> is not a legal <CODE::Name>
-          according to the XML version of the document.
+          The <P::name> is not an XML <CODE::Name> according to
+          the XML version in use specified in the 
+          <A::Document.xmlVersion> attribute.
+
+          Note that the <P::name> don't have to be a namespace
+          qualified name.
 
           If the <A::Document.strictErrorChecking> attribute is
-          set to <DOM::false>, the implementation is not
+          set to <DOM::false>, the implementation is <EM::not>
           <kwd:REQUIRED> to throw this exception.
       @@@PerlDef:
-        my $doc = $self->{<H::mn:node>};
-        if (<Code::t|doStrictErrorChecking:: $nodeRef = $self>) {
-          my $ver = <Code::t|getDocumentXMLVersion::
-                      $DOCOBJ = $doc>;
-          __CODE{DOMMain:ensureXMLName::
-            $INPUT => $nameArg,
-            $INPUT_PARAM_NAME => 'nameArg',
-            $XMLVERSION => $ver,
+        if ($self-><AG::Document.strictErrorChecking>) {
+          my $version = $self-><AG::Document.xmlVersion>;
+          __CODE{DOMMain|ensureXMLName::
+            $INPUT => $name, $INPUT_PARAM_NAME => 'name',
+            $XMLVERSION => $version,
           }__;
         }
-        my $obj = <ClassM::x|ManakaiDOMNotation.newObject>;
-        __CODE{mn|setXRefNode||ManakaiDOM|Perl::
-          $referrer => $obj,
-          $propName => {<H::c|ownerDocument>},
-          $referent => $doc,
+
+        my $bag = <Code::mg|getNodeBag||ManakaiDOM|all:: $ref = $self>;
+        my $stem;
+        __CODE{mg|createNodeStem||ManakaiDOM|all::
+          $bag => $bag,
+          $stem => $stem,
+          $class => {<ClassName::tx|ManakaiDOMNotation>},
+          $opt => {{
+            <H::infoset|name> => \$name,
+            <H::tc|ownerDocument> => $self,
+          }},
         }__;
-        $obj->{<H::c|name>} = $nameArg;
-        $r = <ClassM::t|ManakaiDOMNode.getNodeReference> ($obj);
+        __CODE{mg|createNodeRef||ManakaiDOM|all::
+          $bag => $bag,
+          $stem => $stem,
+          $ref => $r,
+          $opt => {{
+          }},
+        }__;
 
     @@Test:
       @@@QName:
         ManakaiDocumentXDoctype.createNotation.success.test
       @@@PerlDef:
         my $doc;
-        __CODE{newDocumentForTest}__;
+        __CODE{d|createEmptyDocumentXForTest:: $docx => $doc}__;
         my $dtd = $doc-><M::DocumentXDoctype.createNotation>
                           ('abcdefg');
         
@@ -872,7 +1078,7 @@ IFClsXDef:
         ManakaiDocumentXDoctype.createNotation.badname.test
       @@@PerlDef:
         my $doc;
-        __CODE{newDocumentForTest}__;
+        __CODE{d|createEmptyDocumentXForTest:: $docx => $doc}__;
         $test->assert_exception
                  (code => sub {
                     my $dtd = $doc-><M::DocumentXDoctype.createNotation>
@@ -884,7 +1090,7 @@ IFClsXDef:
         ManakaiDocumentXDoctype.createNotation.badname.2.test
       @@@PerlDef:
         my $doc;
-        __CODE{newDocumentForTest}__;
+        __CODE{d|createEmptyDocumentXForTest:: $docx => $doc}__;
         $doc-><AS::Document.strictErrorChecking> (false);
         my $dtd = $doc-><M::DocumentXDoctype.createNotation>
                           ('0120');
@@ -894,20 +1100,7 @@ IFClsXDef:
                               <C::Node.NOTATION_NODE>); 
         $test->assert_string (actual_value => $dtd-><AG::Node.nodeName>,
                               expected_value => '0120'); 
-
-  @CODE:
-    @@QName: d|createEmptyDocumentXForTest
-    @@PerlDef:
-      my $impl;
-      __CODE{tc|createImplForTest:: $impl => $impl}__;
-      my $doc = $impl-><M::c|DOMImplementation.createDocument>;
-      $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 ##DocumentXDoctype
-
-ResourceDef:
-  @QName: NodeStem
-  @AliasFor: ManakaiNode|NodeStem||ManakaiDOM|Perl
-  @For: ManakaiDOM|ManakaiDOM !=ManakaiDOM|ManakaiDOM
 
 IFClsXDef:
   @IFQName: DocumentTypeDefinition
@@ -921,7 +1114,7 @@ IFClsXDef:
   @Implement: tx|DocumentType||ManakaiDOM|ManakaiDOM3
   @Implement: tx|DocumentType||ManakaiDOM|ManakaiDOMLatest
   
-  @DISLang:role: c|DocumentTypeRole
+  @DISLang:role: tc|DocumentTypeRole
 
   @f:implements: d|Feature30
   
@@ -933,13 +1126,15 @@ IFClsXDef:
     interface <kwd:MAY> also implement the <IF::tx|DocumentType>
     interface and / or the <IF::DocumentTypeDeclaration> interface.
     Although some attributes are defined by two or three of these
-    interfaces, objects only have to implement them once.
+    interfaces, objects implementing these interfaces have to
+    implement them only once respectively.
     
     In DOM levels 1, 2, and 3, a <IF::tx|DocumentType> object
     can never have child node.  A <IF::DocumentTypeDefinition>
     node, however, <kwd:MAY> have <IF::tx|ProcessingInstruction>
-    nodes, as <InfoProp::children> property of 
-    <InfoItem::processing instruction information item>.
+    child nodes, as in <InfoProp::children> property of 
+    <InfoItem::processing instruction information item> in
+    XML Information Set.
     
     If a <IF::DocumentTypeDefinition> node is not associated
     with any document yet, then its <A::Node.ownerDocument>
@@ -947,13 +1142,8 @@ IFClsXDef:
     attribute contains the attribute to which the node
     is associated.  Note that the
     <M::DocumentXDoctype.createDocumentTypeDefinition>
-    method will assign the attribute to that document.
-
-  @enImplNote:
-    In current manakai implementation, a <IF::DocumentTypeDefinition>
-    object <kwd:MUST> also implement the <IF::tx|DocumentType>
-    interface (because of <M::t|ManakaiDOMNode.getNodeReference>
-    implementation).
+    method will set the document to the <A::Node.ownerDocument>
+    attribute.
   
   @IntMethod:
     @@Operator: mg|CreateNodeStemMethod
@@ -994,6 +1184,34 @@ IFClsXDef:
   @mg:subnode1h: d|generalEntities
   @mg:subnode1h: d|notations
 
+  @enImplNote:
+    {P:: Required internal properties::
+
+      - <Q::infoset|name>.
+
+      - <Q::d|elementTypes>, <Q::d|generalEntities>, <Q::d|notations>,
+        <Q::infoset|children>.
+
+    }
+
+    {P:: Optional internal properties::
+
+      - <Q::tc|ownerDocument> (required if the node
+        contains one or more nodes).
+
+      - <Q::tc|implementation> (required if <Q::tc|ownerDocument>
+        is <DOM::null>).
+
+      - <Q::infoset|publicIdentifier>, <Q::infoset|systemIdentifier>.
+
+      - <Q::d|hasLtDeclaration>, <Q::d|hasGtDeclaration>,
+        <Q::d|hasAmpDeclaration>, <Q::d|hasAposDeclaration>,
+        <Q::d|hasQuotDeclaration>.
+
+      - <Q::c|read-only>.
+
+    }
+
   @CODE:
     @@QName: d|createDTDefForTest
     @@PerlDef:
@@ -1014,32 +1232,6 @@ IFClsXDef:
       __CODE{tc|createImplForTest:: $impl => $impl}__;
       $dt = $impl-><M::c|DOMImplementation.createDocumentType> ('dt1');
 
-  @ResourceDef:
-    @@ForCheck: ManakaiDOM|ForClass
-    @@QName: newDoctypeForTest
-    @@rdf:type: DISPerl|BlockCode
-    @@PerlDef:
-      my $doc;
-      __CODE{newDocumentForTest}__;
-      $dtd = $doc-><M::DocumentXDoctype.createDocumentTypeDefinition>
-                          ('dt1');
-
-  @Test:
-    @@QName: ManakaiDOMDTD.appendChild.pi.test
-    @@PerlDef:
-      my $dtd;
-      __CODE{newDoctypeForTest}__;
-      
-      my $doc = $dtd-><AG::Node.ownerDocument>;
-      my $pi = $doc-><M::Document.createProcessingInstruction> ('pitarget');
-      
-      $dtd-><M::Node.appendChild> ($pi);
-
-      my $fc = $dtd-><AG::Node.firstChild>;
-      $test->assert_not_null ($fc);
-      $test->assert_equals ($pi, $fc);
-      $test->assert_string (actual_value => $pi-><AG::PI.target>,
-                            expected_value => 'pitarget');
 
   @CAttr:
     @@Name: nodeName
@@ -1071,699 +1263,6 @@ IFClsXDef:
                            ('dtdef1');
 
         $test->assert_equals ($dtd-><AG::Node.nodeName>, 'dtdef1');
-
-  @Attr:
-    @@Name: elementTypes
-    @@enDesc:
-      The live collection of the element types contained
-      in the document type definition.
-    @@Type: tc|NamedNodeMap
-    @@Get:
-      @@@PerlDef:
-        __CODE{tc|getElementTypeDefNodeMap::
-          $node => $self,
-          $map => $r,
-        }__;
-
-    @@Test:
-      @@@QName: dtd.elementTypes.test
-      @@@PerlDef:
-        my $dtd;
-        __CODE{newDoctypeForTest}__;
-
-        my $es = $dtd-><AG::DocumentTypeDefinition.elementTypes>;
-        $test->assert_isa ($es, <IFName::tc|NamedNodeMap>);
-
-  @Attr:
-    @@Name: generalEntities
-    @@enDesc:
-      The live collection of the general entities contained
-      in the document type definition.
-    @@Type: tc|NamedNodeMap
-    @@Get:
-      @@@PerlDef:
-        __CODE{tc|getEntityNodeMap::
-          $node => $self,
-          $map => $r,
-        }__;
-
-    @@Test:
-      @@@QName: DocumentTypeDefinition.generalEntities.test
-      @@@PerlDef:
-        my $dtd;
-        __CODE{newDoctypeForTest}__;
-
-        my $es = $dtd-><AG::DocumentTypeDefinition.generalEntities>;
-        $test->assert_isa ($es, <IFName::tc|NamedNodeMap>);
-
-  @Attr:
-    @@ForCheck: ManakaiDOM|ForClass
-    @@Name: entities
-      The live collection of the general entities contained
-      in the document type definition.
-    @@Type: tc|NamedNodeMap
-    @@Get:
-      @@@disDef:
-        @@@@DISPerl:cloneCode: .generalEntities.get
-
-    @@Test:
-      @@@QName: DocumentType.entities.get.test
-      @@@PerlDef:
-        my $impl;
-        __CODE{t|createDOMImplForTest:: $impl => $impl}__;
-
-        my $dtype = $impl-><M::c|DOMImplementation.createDocumentType>
-                             ('type', 'pub', 'sys');
-        my $ent = $dtype-><AG::tx|DocumentType.entities>;
-        $test->assert_isa ($ent, <IFName::tc|NamedNodeMap>);
-        $test->assert_num_equals
-                 (actual_value => $ent-><AG::tc|NamedNodeMap.length>,
-                  expected_value => 0);
-
-  @Attr:
-    @@Name: notations
-    @@enDesc:
-      The live collection of the notations contained
-      in the document type definition.
-
-      Duplicate notation declarations, if any, in DTD are not
-      contained in the collection and only the first declaration
-      is made available as a <IF::tx|Notation> node.
-
-        {NOTE::
-          This definition is based on one for the attribute
-          <A::tx|DocumentType.notations> in DOM XML module.
-          Since duplication is violation to the Validity Constraint,
-          XML parsers might vary on how notations are notified to
-          the application.  In particular, <InfoProp::notations>
-          property of the <InfoItem::document information item>
-          in the XML Information Set defines that in case <EM::any>
-          notation is multiply declared then the property has no value.
-        }
-    @@Type: tc|NamedNodeMap
-    @@Get:
-      @@@PerlDef:
-        __CODE{tc|getNotationNodeMap::
-          $node => $self,
-          $map => $r,
-        }__;
-
-    @@Test:
-      @@@QName: DocumentTypeDefinition.notations.test
-      @@@PerlDef:
-        my $dtd;
-        __CODE{newDoctypeForTest}__;
-
-        my $es = $dtd-><AG::DocumentTypeDefinition.notations>;
-        $test->assert_isa ($es, <IFName::tc|NamedNodeMap>);
-
-    @@Test:
-      @@@QName: DocumentType.notations.get.test
-      @@@PerlDef:
-        my $impl;
-        __CODE{t|createDOMImplForTest:: $impl => $impl}__;
-
-        my $dtype = $impl-><M::c|DOMImplementation.createDocumentType>
-                             ('type', 'pub', 'sys');
-        my $ent = $dtype-><AG::tx|DocumentType.notations>;
-        $test->assert_isa ($ent, <IFName::tc|NamedNodeMap>);
-        $test->assert_num_equals
-                 (actual_value => $ent-><AG::tc|NamedNodeMap.length>,
-                  expected_value => 0);
-      
-  @enImplNote:
-    {TODO::
-      Implement
-      <A::.parameterEntities>.
-
-      Test that:
-        $a = $dtd->element_types;
-        $b = $dtd->general_entities;
-        $a is still a element type defs col.
-      
-      Implement get/set by name methods for parameter
-      entities and notations.
-      
-      Defines <M::Node.cloneNode>, <M::Node.importNode>,
-      <M::Node.adoptNode>, namespace methods, ...
-      
-      In particular, document position for processing
-      instruction children must be defined.
-
-      Test for namespace aware doctype (is namespace aware doctype
-      really required?)
-    }
-
-  @Method:
-    @@Name: getElementTypeDefinitionNode
-    @@enDesc:
-      Returns the definition for an element type.
-    @@DOMMain:isNamespaceUnaware: 1
-    @@Param:
-      @@@Name: nameArg
-      @@@Type: DOMString
-      @@@enDesc:
-        The name of the element type.
-    @@Return:
-      @@@Type: ElementTypeDefinition
-      @@@enDesc:
-        The element type definition for <P::nameArg>.
-      @@@nullCase:
-        @@@@enDesc:
-          There is no definition for the element type <P::nameArg>.
-      @@@PerlDef:
-        my $n = $self->{<H::mn:node>}
-                     ->{<H::d|elementTypes>}
-                     ->{$nameArg};
-        if ($n) {
-          $r = <ClassM::t|ManakaiDOMNode.getNodeReference> ($n);
-        }
-    @@Test:
-      @@@PerlDef:
-        my $dtd;
-        __CODE{newDoctypeForTest}__;
-        $test->assert_null 
-                 ($dtd-><M::DocumentTypeDefinition
-                           .getElementTypeDefinitionNode> ('element'));
-
-  @Method:
-    @@Name: setElementTypeDefinitionNode
-    @@enDesc:
-      Sets an element type definition to the document type
-      definition.
-    @@Param:
-      @@@Name: defNode
-      @@@Type: ElementTypeDefinition
-      @@@enDesc:
-        The element type definition to set.  Its <A::Node.nodeName>
-        attribute is used to set the node.  If it is already
-        in use elsewhere, then it is first removed
-        from there and then attached to the document type.
-        If another element type definition with
-        same <A::Node.nodeName> is attached to this document
-        type definition, that association is removed.
-        
-        If <P::defNode> is already attached to this document
-        type definition, then this method has no effect.
-    @@Return:
-      @@@Type: ElementTypeDefinition
-      @@@enDesc:
-        If there is already another element type definition
-        with the same <A::Node.nodeName> as <P::defNode>,
-        then that definition node is returned.
-      @@@nullCase:
-        @@@@enDesc:
-          If there is no previous definition with the same
-          name, or the <P::defNode> is already attached
-          to the document type definition.
-      @@@NodeReadOnlyError:
-      @@@dx:raises:
-        @@@@@: c|INUSE_DEFINITION_ERR
-        @@@@enDesc:
-          If <A::ElementTypeDefinition.ownerDocumentTypeDefinition>
-          is not <DOM::null>.
-      @@@dx:raises:
-        @@@@@: c|DIFFERENT_DOCUMENT_ERR
-        @@@@enDesc:
-          The <P::defNode> node is created from different
-          document than the <A::c|Node.ownerDocument> of
-          the document type definition and the implementation
-          does not support such definition node
-          being attached to the document type definition.
-      @@@PerlDef:
-        __CODE{setDefinitionNode::
-          $defNode => $defNode,
-          $defNodeParamName => 'defNode',
-          $key => {<H::d|elementTypes>},
-        }__;
-    @@Test:
-      @@@PerlDef:
-        my $dtd;
-        __CODE{newDoctypeForTest}__;
-        $test->assert_null 
-                 ($dtd-><M::DocumentTypeDefinition
-                           .getElementTypeDefinitionNode> ('et1'));
-
-        my $et = $dtd-><AG::Node.ownerDocument>
-                     -><M::Node.getFeature> (<Q::ManakaiDOM|XDoctype>)
-                     -><M::DocumentXDoctype.createElementTypeDefinition>
-                         ('et1');
-
-        my $old1 = $dtd-><M::DocumentTypeDefinition
-                           .setElementTypeDefinitionNode> ($et);
-        $test->assert_null ($old1);
-
-        my $ret = $dtd-><M::DocumentTypeDefinition
-                           .getElementTypeDefinitionNode> ('et1');
-        $test->assert_equals ($et, $ret);
-        $test->assert_num_equals
-                 (actual_value => $ret-><AG::Node.nodeType>,
-                  expected_value => <C::Node.ELEMENT_TYPE_DEFINITION_NODE>);
-        $test->assert_equals
-                 ($et-><AG::ElementTypeDefinition.ownerDocumentTypeDefinition>,
-                  $dtd);
-
-        $test->id ('replace-same');
-
-        my $old2 = $dtd-><M::DocumentTypeDefinition
-                           .setElementTypeDefinitionNode> ($et);
-        $test->assert_null ($old2);
-
-        $test->id ('change-parent');
-
-        my $dtd2 = $dtd-><AG::Node.ownerDocument>
-                       -><M::Node.getFeature> (<Q::ManakaiDOM|XDoctype>)
-                       -><M::DocumentXDoctype.createDocumentTypeDefinition>
-                           ('dt2');
-    
-        $test->assert_exception (code => sub {
-          $dtd2-><M::DocumentTypeDefinition
-                            .setElementTypeDefinitionNode> ($et);
-        }, exception_subtype => <Q::c|INUSE_DEFINITION_ERR>);
-        
-        $test->assert_equals
-                 ($et-><AG::ElementTypeDefinition.ownerDocumentTypeDefinition>,
-                  $dtd);
-        $test->assert_equals
-                 ($dtd-><M::DocumentTypeDefinition
-                             .getElementTypeDefinitionNode>
-                          ('et1'),
-                  $et);
-  
-        $test->id ('rewrite');
-
-        my $et2 = $dtd-><AG::Node.ownerDocument>
-                      -><M::Node.getFeature> (<Q::ManakaiDOM|XDoctype>)
-                      -><M::DocumentXDoctype.createElementTypeDefinition>
-                          ('et1');
-        $test->assert_not_equals ($et, $et2);
-
-        my $old4 = $dtd-><M::DocumentTypeDefinition
-                                .setElementTypeDefinitionNode> ($et2);
-        $test->assert_equals ($old4, $et);
-        $test->assert_equals
-                 ($et2-><AG::ElementTypeDefinition.ownerDocumentTypeDefinition>,
-                  $dtd);
-
-    @@Test:
-      @@@PerlDef:
-        my $dtd;
-        __CODE{newDoctypeForTest}__;
-        my $et;
-        __CODE{newETForTest}__;
-
-        $test->assert_exception
-          (code => sub {
-            $dtd-><M::DocumentTypeDefinition
-                     .setElementTypeDefinitionNode> ($et);
-           },
-           exception_subtype => <Q::c|DIFFERENT_DOCUMENT_ERR>);
-
-  @Method:
-    @@Name: getGeneralEntityNode
-    @@enDesc:
-      Returns the definition for a general entity.
-    @@DOMMain:isNamespaceUnaware: 1
-    @@Param:
-      @@@Name: nameArg
-      @@@Type: DOMString
-      @@@enDesc:
-        The name of the general entity.
-    @@Return:
-      @@@Type: tx|Entity
-      @@@enDesc:
-        The general entity <P::nameArg>.
-      @@@nullCase:
-        @@@@enDesc:
-          There is no general entity <P::nameArg>.
-      @@@PerlDef:
-        my $n = $self->{<H::mn:node>}
-                     ->{<H::d|generalEntities>}
-                     ->{$nameArg};
-        if ($n) {
-          $r = <ClassM::t|ManakaiDOMNode.getNodeReference> ($n);
-        }
-    @@Test:
-      @@@QName: DocumentTypeDefinition.getGeneralEntityNode.test
-      @@@PerlDef:
-        my $dtd;
-        __CODE{newDoctypeForTest}__;
-        $test->assert_null 
-                 ($dtd-><M::DocumentTypeDefinition
-                           .getGeneralEntityNode> ('element'));
-
-  @Method:
-    @@Name: setGeneralEntityNode
-    @@enDesc:
-      Sets a general entity to the document type
-      definition.
-    @@Param:
-      @@@Name: defNode
-      @@@Type: tx|Entity
-      @@@enDesc:
-        The general entity to set.  Its <A::Node.nodeName>
-        attribute is used to set the node.
-
-        If another general entity node with
-        same <A::Node.nodeName> is attached to this document
-        type definition, such association is removed.
-        
-        If <P::defNode> is already attached to this document
-        type definition, then this method has no effect.
-    @@Return:
-      @@@Type: tx|Entity
-      @@@enDesc:
-        If there is already another general entity
-        with the same <A::Node.nodeName> as <P::defNode>,
-        then that node is returned.
-      @@@nullCase:
-        @@@@enDesc:
-          If there is no previous definition with the same
-          name, or the <P::defNode> is already attached
-          to the document type definition.
-      @@@NodeReadOnlyError:
-      @@@dx:raises:
-        @@@@@: c|INUSE_DEFINITION_ERR
-        @@@@enDesc:
-          If <A::tx|Entity.ownerDocumentTypeDefinition>
-          is not <DOM::null>.
-      @@@dx:raises:
-        @@@@@: c|DIFFERENT_DOCUMENT_ERR
-        @@@@enDesc:
-          The <P::defNode> node is created from different
-          document than the <A::c|Node.ownerDocument> of
-          the document type definition and the implementation
-          does not support such definition node
-          being attached to the document type definition.
-      @@@PerlDef:
-        __CODE{setDefinitionNode::
-          $defNode => $defNode,
-          $defNodeParamName => 'defNode',
-          $key => {<H::d|generalEntities>},
-        }__;
-    @@Test:
-      @@@QName: DocumentTypeDefinition.setGeneralEntityNode.test
-      @@@PerlDef:
-        my $dtd;
-        __CODE{newDoctypeForTest}__;
-
-        $test->id ('initial.empty');
-        $test->assert_null 
-                 ($dtd-><M::DocumentTypeDefinition
-                           .getGeneralEntityNode> ('et1'));
-
-        my $et = $dtd-><AG::Node.ownerDocument>
-                     -><M::Node.getFeature> (<Q::ManakaiDOM|XDoctype>)
-                     -><M::DocumentXDoctype.createGeneralEntity>
-                         ('et1');
-
-        $test->id ('set');
-        my $old1 = $dtd-><M::DocumentTypeDefinition
-                           .setGeneralEntityNode> ($et);
-        $test->assert_null ($old1);
-
-        $test->id ('get');
-        my $ret = $dtd-><M::DocumentTypeDefinition
-                           .getGeneralEntityNode> ('et1');
-        $test->assert_equals ($et, $ret);
-        $test->assert_num_equals
-                 (actual_value => $ret-><AG::Node.nodeType>,
-                  expected_value => <C::Node.ENTITY_NODE>);
-        $test->assert_equals
-                 ($et-><AG::tx|Entity.ownerDocumentTypeDefinition>,
-                  $dtd);
-
-        $test->id ('replace-same');
-        my $old2 = $dtd-><M::DocumentTypeDefinition
-                           .setGeneralEntityNode> ($et);
-        $test->assert_null ($old2);
-
-        $test->id ('change-parent');
-
-        my $dtd2 = $dtd-><AG::Node.ownerDocument>
-                       -><M::Node.getFeature> (<Q::ManakaiDOM|XDoctype>)
-                       -><M::DocumentXDoctype.createDocumentTypeDefinition>
-                           ('dt2');
-    
-        $test->assert_exception (code => sub {
-          $dtd2-><M::DocumentTypeDefinition
-                            .setGeneralEntityNode> ($et);
-        }, exception_subtype => <Q::c|INUSE_DEFINITION_ERR>);
-        
-        $test->assert_equals
-                 ($et-><AG::tx|Entity.ownerDocumentTypeDefinition>,
-                  $dtd);
-        $test->assert_equals
-                 ($dtd-><M::DocumentTypeDefinition
-                             .getGeneralEntityNode>
-                          ('et1'),
-                  $et);
-  
-        $test->id ('rewrite');
-
-        my $et2 = $dtd-><AG::Node.ownerDocument>
-                      -><M::Node.getFeature> (<Q::ManakaiDOM|XDoctype>)
-                      -><M::DocumentXDoctype.createGeneralEntity>
-                          ('et1');
-        $test->assert_not_equals ($et, $et2);
-
-        my $old4 = $dtd-><M::DocumentTypeDefinition
-                                .setGeneralEntityNode> ($et2);
-        $test->assert_equals ($old4, $et);
-        $test->assert_equals
-                 ($et2-><AG::tx|Entity.ownerDocumentTypeDefinition>,
-                  $dtd);
-
-    @@Test:
-      @@@QName: DocumentTypeDefinition.setGeneralEntityNode.DIFF_DOC_ERR.test
-      @@@PerlDef:
-        my $dtd;
-        __CODE{newDoctypeForTest}__;
-        my $et;
-        __CODE{newGeneralEntityForTest}__;
-
-        $test->assert_exception
-          (code => sub {
-            $dtd-><M::DocumentTypeDefinition
-                     .setGeneralEntityNode> ($et);
-           },
-           exception_subtype => <Q::c|DIFFERENT_DOCUMENT_ERR>);
-
-  @Method:
-    @@Name: getNotationNode
-    @@enDesc:
-      Returns the definition for a notation.
-    @@DOMMain:isNamespaceUnaware: 1
-    @@Param:
-      @@@Name: nameArg
-      @@@Type: DOMString
-      @@@enDesc:
-        The name of the notation.
-    @@Return:
-      @@@Type: tx|Notation
-      @@@enDesc:
-        The notation <P::nameArg>.
-      @@@nullCase:
-        @@@@enDesc:
-          There is no notation <P::nameArg>.
-      @@@PerlDef:
-        my $n = $self->{<H::mn:node>}
-                     ->{<H::d|notations>}
-                     ->{$nameArg};
-        if ($n) {
-          $r = <ClassM::t|ManakaiDOMNode.getNodeReference> ($n);
-        }
-    @@Test:
-      @@@QName: DocumentTypeDefinition.getNotationNode.test
-      @@@PerlDef:
-        my $dtd;
-        __CODE{newDoctypeForTest}__;
-        $test->assert_null 
-                 ($dtd-><M::DocumentTypeDefinition
-                           .getNotationNode> ('element'));
-
-  @Method:
-    @@Name: setNotationNode
-    @@enDesc:
-      Sets a notation to the document type
-      definition.
-    @@Param:
-      @@@Name: defNode
-      @@@Type: tx|Notation
-      @@@enDesc:
-        The notation to set.  Its <A::Node.nodeName>
-        attribute is used to set the node.
-
-        If another notation node with
-        same <A::Node.nodeName> is attached to this document
-        type definition, such association is removed.
-        
-        If <P::defNode> is already attached to this document
-        type definition, then this method has no effect.
-    @@Return:
-      @@@Type: tx|Notation
-      @@@enDesc:
-        If there is already another notation
-        with the same <A::Node.nodeName> as <P::defNode>,
-        then that node is returned.
-      @@@nullCase:
-        @@@@enDesc:
-          If there is no previous definition with the same
-          name, or the <P::defNode> is already attached
-          to the document type definition.
-      @@@NodeReadOnlyError:
-      @@@dx:raises:
-        @@@@@: c|INUSE_DEFINITION_ERR
-        @@@@enDesc:
-          If <A::tx|Notation.ownerDocumentTypeDefinition>
-          is not <DOM::null>.
-      @@@dx:raises:
-        @@@@@: c|DIFFERENT_DOCUMENT_ERR
-        @@@@enDesc:
-          The <P::defNode> node is created from different
-          document than the <A::c|Node.ownerDocument> of
-          the document type definition and the implementation
-          does not support such definition node
-          being attached to the document type definition.
-      @@@PerlDef:
-        __CODE{setDefinitionNode::
-          $defNode => $defNode,
-          $defNodeParamName => 'defNode',
-          $key => {<H::d|notations>},
-        }__;
-    @@Test:
-      @@@QName: DocumentTypeDefinition.setNotationNode.test
-      @@@PerlDef:
-        my $dtd;
-        __CODE{newDoctypeForTest}__;
-
-        $test->id ('initial.empty');
-        $test->assert_null 
-                 ($dtd-><M::DocumentTypeDefinition
-                           .getNotationNode> ('et1'));
-
-        my $et = $dtd-><AG::Node.ownerDocument>
-                     -><M::Node.getFeature> (<Q::fe|XDoctype>)
-                     -><M::DocumentXDoctype.createNotation>
-                         ('et1');
-
-        $test->id ('set');
-        my $old1 = $dtd-><M::DocumentTypeDefinition
-                           .setNotationNode> ($et);
-        $test->assert_null ($old1);
-
-        $test->id ('get');
-        my $ret = $dtd-><M::DocumentTypeDefinition
-                           .getNotationNode> ('et1');
-        $test->assert_equals ($et, $ret);
-        $test->assert_num_equals
-                 (actual_value => $ret-><AG::Node.nodeType>,
-                  expected_value => <C::Node.NOTATION_NODE>);
-        $test->assert_equals
-                 ($et-><AG::tx|Notation.ownerDocumentTypeDefinition>,
-                  $dtd);
-
-        $test->id ('replace-same');
-        my $old2 = $dtd-><M::DocumentTypeDefinition
-                           .setNotationNode> ($et);
-        $test->assert_null ($old2);
-
-        $test->id ('change-parent');
-
-        my $dtd2 = $dtd-><AG::Node.ownerDocument>
-                       -><M::Node.getFeature> (<Q::fe|XDoctype>)
-                       -><M::DocumentXDoctype.createDocumentTypeDefinition>
-                           ('dt2');
-    
-        $test->assert_exception (code => sub {
-          $dtd2-><M::DocumentTypeDefinition
-                            .setNotationNode> ($et);
-        }, exception_subtype => <Q::c|INUSE_DEFINITION_ERR>);
-        
-        $test->assert_equals
-                 ($et-><AG::tx|Notation.ownerDocumentTypeDefinition>,
-                  $dtd);
-        $test->assert_equals
-                 ($dtd-><M::DocumentTypeDefinition
-                             .getNotationNode>
-                          ('et1'),
-                  $et);
-  
-        $test->id ('rewrite');
-
-        my $et2 = $dtd-><AG::Node.ownerDocument>
-                      -><M::Node.getFeature> (<Q::fe|XDoctype>)
-                      -><M::DocumentXDoctype.createNotation>
-                          ('et1');
-        $test->assert_not_equals ($et, $et2);
-
-        my $old4 = $dtd-><M::DocumentTypeDefinition
-                                .setNotationNode> ($et2);
-        $test->assert_equals ($old4, $et);
-        $test->assert_equals
-                 ($et2-><AG::tx|Notation.ownerDocumentTypeDefinition>,
-                  $dtd);
-
-    @@Test:
-      @@@QName: DocumentTypeDefinition.setNotationNode.DIFF_DOC_ERR.test
-      @@@PerlDef:
-        my $dtd;
-        __CODE{newDoctypeForTest}__;
-        my $et;
-        __CODE{newNotationForTest}__;
-
-        $test->assert_exception
-          (code => sub {
-            $dtd-><M::DocumentTypeDefinition
-                     .setNotationNode> ($et);
-           },
-           exception_subtype => <Q::c|DIFFERENT_DOCUMENT_ERR>);
-
-  @CAttr:
-    @@Name: implementation
-    @@enDesc:
-      The <IF::c|DOMImplementation> object to which the node belongs.
-
-      This attribute is a manakai extension.
-    @@Type: c|DOMImplementation
-    @@Get:
-      @@@PerlDef:
-        $r = $self->{<H::mn:node>}->{<H::c|implementation>};
-        unless ($r) {
-          __DEEP{
-            $r = $self-><AG::Node.ownerDocument>-><AG::Document.implementation>;
-          }__;
-        }
-
-    @@Test:
-      @@@QName: DTDef.impl.test
-      @@@PerlDef:
-        my $dtd;
-        __CODE{newDoctypeForTest}__;
-
-        $test->assert_isa ($dtd-><AG::tx|DocumentType.implementation>,
-                           <IFName::c|DOMImplementation>);
-
-    @@Test:
-      @@@QName: Doctype.impl.test
-      @@@PerlDef:
-        my $impl;
-        __CODE{t|createDOMImplForTest:: $impl => $impl}__;
-
-        my $dtype = $impl-><M::c|DOMImplementation.createDocumentType>
-                             ('type', 'pub', 'sys');
-
-        $test->id ('created');
-        $test->assert_isa (my $i2 = $dtype-><AG::tx|DocumentType.implementation>,
-                           <IFName::c|DOMImplementation>);
-        $test->assert_equals ($i2, $impl);
-
-        $test->id ('appended');
-        my $doc = $impl-><M::c|DOMImplementation.createDocument>;
-        $doc-><M::Node.appendChild> ($dtype);
-        $test->assert_isa (my $i3 = $dtype-><AG::tx|DocumentType.implementation>,
-                           <IFName::c|DOMImplementation>);
-        $test->assert_equals ($i3, $impl);
 
   @Method:
     @@ForCheck: ManakaiDOM|ForClass
@@ -2171,11 +1670,6 @@ IFClsXDef:
         $test->id ('child.item.equals');
         $test->assert_equals ($item, $pi);
 
-        $test->id ('treeid');
-        $test->assert_equals
-                 ($item->{<H::mn|node>}->{<H::mn|treeID>},
-                  $dtd->{<H::mn|node>}->{<H::mn|treeID>});
-
         $test->id ('firstChild');
         $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
 
@@ -2218,11 +1712,6 @@ IFClsXDef:
 
         $test->id ('child.item.equals');
         $test->assert_equals ($item, $pi);
-
-        $test->id ('treeid');
-        $test->assert_equals
-                 ($item->{<H::mn|node>}->{<H::mn|treeID>},
-                  $dtd->{<H::mn|node>}->{<H::mn|treeID>});
 
         $test->id ('firstChild');
         $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
@@ -2270,12 +1759,6 @@ IFClsXDef:
 
         $test->id ('child.item.equals');
         $test->assert_equals ($item, $pi);
-
-        $test->id ('treeid');
-        $test->assert_equals
-                 ($item->{<H::mn|node>}->{<H::mn|treeID>},
-                  $dtd->{<H::mn|node>}->{<H::mn|treeID>});
-
         $test->id ('firstChild');
         $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
 
@@ -2327,11 +1810,6 @@ IFClsXDef:
 
         $test->id ('child.item.equals');
         $test->assert_equals ($item, $pi);
-
-        $test->id ('treeid');
-        $test->assert_equals
-                 ($item->{<H::mn|node>}->{<H::mn|treeID>},
-                  $dtd->{<H::mn|node>}->{<H::mn|treeID>});
 
         $test->id ('firstChild');
         $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
@@ -2386,11 +1864,6 @@ IFClsXDef:
         $test->id ('child.item.equals');
         $test->assert_equals ($item, $pi);
 
-        $test->id ('treeid');
-        $test->assert_equals
-                 ($item->{<H::mn|node>}->{<H::mn|treeID>},
-                  $dtd->{<H::mn|node>}->{<H::mn|treeID>});
-
         $test->id ('firstChild');
         $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
 
@@ -2442,11 +1915,6 @@ IFClsXDef:
 
         $test->id ('child.item.equals');
         $test->assert_equals ($item, $pi);
-
-        $test->id ('treeid');
-        $test->assert_equals
-                 ($item->{<H::mn|node>}->{<H::mn|treeID>},
-                  $dtd->{<H::mn|node>}->{<H::mn|treeID>});
 
         $test->id ('firstChild');
         $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
@@ -2502,11 +1970,6 @@ IFClsXDef:
         $test->id ('child.item.equals');
         $test->assert_equals ($item, $pi);
 
-        $test->id ('treeid');
-        $test->assert_equals
-                 ($item->{<H::mn|node>}->{<H::mn|treeID>},
-                  $dtd->{<H::mn|node>}->{<H::mn|treeID>});
-
         $test->id ('firstChild');
         $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
 
@@ -2526,6 +1989,22 @@ IFClsXDef:
         $test->id ('return');
         $test->assert_equals ($return, $pi0);
 
+  @Test:
+    @@QName: ManakaiDOMDTD.appendChild.pi.test
+    @@PerlDef:
+      my $dtd;
+      __CODE{newDoctypeForTest}__;
+      
+      my $doc = $dtd-><AG::Node.ownerDocument>;
+      my $pi = $doc-><M::Document.createProcessingInstruction> ('pitarget');
+      
+      $dtd-><M::Node.appendChild> ($pi);
+
+      my $fc = $dtd-><AG::Node.firstChild>;
+      $test->assert_not_null ($fc);
+      $test->assert_equals ($pi, $fc);
+      $test->assert_string (actual_value => $pi-><AG::PI.target>,
+                            expected_value => 'pitarget');
     @@Test:
       @@@QName: Doctype.appendChild.documentfragment.2.test
       @@@enDesc:
@@ -2676,19 +2155,6 @@ IFClsXDef:
         $test->id ('child.item.equals3');
         $test->assert_equals ($item3, $pi3);
 
-        $test->id ('treeid');
-        $test->assert_equals
-                 ($item->{<H::mn|node>}->{<H::mn|treeID>},
-                  $dtd->{<H::mn|node>}->{<H::mn|treeID>});
-        $test->id ('treeid2');
-        $test->assert_equals
-                 ($item2->{<H::mn|node>}->{<H::mn|treeID>},
-                  $dtd->{<H::mn|node>}->{<H::mn|treeID>});
-        $test->id ('treeid3');
-        $test->assert_equals
-                 ($item3->{<H::mn|node>}->{<H::mn|treeID>},
-                  $dtd->{<H::mn|node>}->{<H::mn|treeID>});
-
         $test->id ('firstChild');
         $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
 
@@ -2766,19 +2232,6 @@ IFClsXDef:
         $test->assert_equals ($item2, $pi2);
         $test->id ('child.item.equals3');
         $test->assert_equals ($item3, $pi3);
-
-        $test->id ('treeid');
-        $test->assert_equals
-                 ($item->{<H::mn|node>}->{<H::mn|treeID>},
-                  $dtd->{<H::mn|node>}->{<H::mn|treeID>});
-        $test->id ('treeid2');
-        $test->assert_equals
-                 ($item2->{<H::mn|node>}->{<H::mn|treeID>},
-                  $dtd->{<H::mn|node>}->{<H::mn|treeID>});
-        $test->id ('treeid3');
-        $test->assert_equals
-                 ($item3->{<H::mn|node>}->{<H::mn|treeID>},
-                  $dtd->{<H::mn|node>}->{<H::mn|treeID>});
 
         $test->id ('firstChild');
         $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
@@ -2859,19 +2312,6 @@ IFClsXDef:
         $test->assert_equals ($item2, $pi2);
         $test->id ('child.item.equals3');
         $test->assert_equals ($item3, $pi3);
-
-        $test->id ('treeid');
-        $test->assert_equals
-                 ($item->{<H::mn|node>}->{<H::mn|treeID>},
-                  $dtd->{<H::mn|node>}->{<H::mn|treeID>});
-        $test->id ('treeid2');
-        $test->assert_equals
-                 ($item2->{<H::mn|node>}->{<H::mn|treeID>},
-                  $dtd->{<H::mn|node>}->{<H::mn|treeID>});
-        $test->id ('treeid3');
-        $test->assert_equals
-                 ($item3->{<H::mn|node>}->{<H::mn|treeID>},
-                  $dtd->{<H::mn|node>}->{<H::mn|treeID>});
 
         $test->id ('firstChild');
         $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
@@ -3040,7 +2480,7 @@ IFClsXDef:
                            ('d');
         my $pi0 = $doc-><M::Document.createProcessingInstruction> ('pi0');
         $dtd-><M::Node.appendChild> ($pi0);
-        $dtd->{<H::mn|node>}->{<H::c|read-only>} = true;
+        $dtd-><M::Node.manakaiSetReadOnly> (true);
 
         $test->id ('pi');
         my $node = $doc-><M::Document.createProcessingInstruction> ('pi');
@@ -3093,7 +2533,7 @@ IFClsXDef:
         my $el = $doc-><M::Document.createElementNS> (null, 'e');
         my $node = $doc-><M::Document.createProcessingInstruction> ('pi');
         $el-><M::Node.appendChild> ($node);
-        $el->{<H::mn|node>}->{<H::c|read-only>} = true;
+        $el-><M::Node.manakaiSetReadOnly> (true);
 
         $test->assert_exception (code => sub {
           $dtd-><M::Node.appendChild> ($node);
@@ -3113,7 +2553,7 @@ IFClsXDef:
         my $node2 = $doc-><M::Document.createDocumentFragment>;
         my $node3 = $doc-><M::Document.createProcessingInstruction> ('pi');
         $node2-><M::Node.appendChild> ($node3);
-        $node2->{<H::mn|node>}->{<H::c|read-only>} = true;
+        $node2-><M::Node.manakaiSetReadOnly> (true);
 
         $test->assert_exception (code => sub {
           $dtd-><M::Node.appendChild> ($node2);
@@ -3815,62 +3255,6 @@ IFClsXDef:
       $test->id ('1.value');
       $test->assert_null ($node-><AG::Node.textContent>);
 
-  @Method:
-    @@ForCheck: ManakaiDOM|ForClass
-    @@ManakaiDOM:isForInternal: 1
-    @@Name: newObject
-    @@NewObjectRefNodeParam:
-    @@Return:
-      @@@Type: NodeStem
-      @@@PerlDef:
-        $r = <ClassM::t|ManakaiDOMNode.newObject> ($self, $refNode);
-        $r->{<H::c|nodeType>} = <H::infoset|DocumentTypeDeclaration>;
-        $r->{<H::d|elementTypes>} = {};
-        $r->{<H::d|generalEntities>} = {};
-        $r->{<H::d|parameterEntities>} = {};
-        $r->{<H::d|notations>} = {};
-        $r->{<H::infoset|children>} = [];
-    @@enImplNote:
-      Required properties:
-        <Q::c|nodeType>, <Q::c|ownerDocument>,
-        either <Q::c|name> or <Q::infoset|localName>,
-        <Q::d|elementTypes>, <Q::d|generalEntities>,
-        <Q::d|parameterEntities>, <Q::d|notations>,
-        <Q::infoset|children>.
-      
-      Optional properties (common):
-        <Q::c|read-only>,
-        <Q::d|ownerDocument>,
-        <Q::infoset|prefix>.
-        <Q::c|implementation>, <Q::ManakaiDOM|implID>.
-
-      Optional properties (declaration):
-        <Q::infoset:publicIdentifier>,
-        <Q::infoset:systemIdentifier>,
-        <Q::d|hasLtDeclaration>,
-        <Q::d|hasGtDeclaration>,
-        <Q::d|hasAmpDeclaration>,
-        <Q::d|hasAposDeclaration>,
-        <Q::d|hasQuotDeclaration>.
-      
-      Since a <IF::tx|DocumentType> might not be associated
-      with any <IF::c|Document>, a <IF::tx|DocumentType>
-      node created by the manakai DOM implementation contains
-      a reference to the <IF::c|DOMImplementation> object
-      in the <Q::c|implementation> property and the implementation
-      identifier in the <Q::ManakaiDOM|implID> at least as long as
-      the node does not have any owner document.
-      
-      DOM2 Core <M::c|DOMImplementation.createDocumentType>
-      method is namespace aware, so the manakai implementation
-      preserves the document type name by <Q::infoset|localName>
-      property with optional <Q::infoset|prefix> property.
-      Note that document type name never has namespace URI.
-      
-      <M::DocumentXDoctype.createDocumentTypeDefinition>
-      is <EM::not> namespace aware and the document type
-      name is kept by <Q::c|name> property.
-
   @CMethod:
     @@Name: getFeature
     @@enDesc:
@@ -3965,15 +3349,902 @@ IFClsXDef:
       @@@Type: Node
     @@Return:
       @@@Type: Node
+      @@@NodeReadOnlyError:
       @@@dx:raises:
         @@@@@: c|NOT_CHILD_ERR
         @@@@enDesc:
           If the <P::oldChild> is not a child of the node.
       @@@PerlDef:
-        __EXCEPTION{c|NOT_CHILD_ERR::
-          MDOMX|param-name => 'oldChild',
-          c|node => {$oldChild},
+        my $od = $self-><AG::Node.ownerDocument>;
+        if ((not defined $od or
+             $od-><AG::Document.strictErrorChecking>) and
+            $self-><AG::Node.manakaiReadOnly>) {
+          __EXCEPTION{MDOMX|NOMOD_THIS::
+          }__;
+        }
+        __CODE{tc|removeChildImpl}__;
+
+    @@Test:
+      @@@QName: DTDef.removeChild.1.test
+      @@@PerlDef:
+        my $node;
+        __CODE{d|createDTDefForTest:: $dtdef => $node}__;
+
+        my $doc = $node-><AG::Node.ownerDocument>;
+
+        my $c1 = $doc-><M::Document.createProcessingInstruction> ('e', '');
+        $node-><M::Node.appendChild> ($c1);
+
+        my $c2 = $doc-><M::Document.createProcessingInstruction> ('f', '');
+        $node-><M::Node.appendChild> ($c2);
+
+        my $c3 = $doc-><M::Document.createProcessingInstruction> ('g', '');
+        $node-><M::Node.appendChild> ($c3);
+
+        my $return = $node-><M::Node.removeChild> ($c1);
+
+        $test->id ('return');
+        $test->assert_equals ($return, $c1);
+
+        $test->id ('parentNode');
+        $test->assert_null ($c1-><AG::Node.parentNode>);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($doc-><AG::Node.firstChild>, $c2);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($doc-><AG::Node.lastChild>, $c3);
+
+        $test->id ('length');
+        $test->assert_num_equals
+                 (actual_value => 0+@{$doc-><AG::Node.childNodes>},
+                  expected_value => 2);
+    @@Test:
+      @@@QName: DTDef.removeChild.2.test
+      @@@PerlDef:
+        my $node;
+        __CODE{d|createDTDefForTest:: $dtdef => $node}__;
+
+        my $doc = $node-><AG::Node.ownerDocument>;
+
+        my $c1 = $doc-><M::Document.createProcessingInstruction> ('e', '');
+        $node-><M::Node.appendChild> ($c1);
+
+        my $c2 = $doc-><M::Document.createProcessingInstruction> ('f', '');
+        $node-><M::Node.appendChild> ($c2);
+
+        my $c3 = $doc-><M::Document.createProcessingInstruction> ('g', '');
+        $node-><M::Node.appendChild> ($c3);
+
+        my $return = $node-><M::Node.removeChild> ($c2);
+
+        $test->id ('return');
+        $test->assert_equals ($return, $c2);
+
+        $test->id ('parentNode');
+        $test->assert_null ($c1-><AG::Node.parentNode>);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($doc-><AG::Node.firstChild>, $c1);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($doc-><AG::Node.lastChild>, $c3);
+
+        $test->id ('length');
+        $test->assert_num_equals
+                 (actual_value => 0+@{$doc-><AG::Node.childNodes>},
+                  expected_value => 2);
+    @@Test:
+      @@@QName: DTDef.removeChild.3.test
+      @@@PerlDef:
+        my $node;
+        __CODE{d|createDTDefForTest:: $dtdef => $node}__;
+
+        my $doc = $node-><AG::Node.ownerDocument>;
+
+        my $c1 = $doc-><M::Document.createProcessingInstruction> ('e', '');
+        $node-><M::Node.appendChild> ($c1);
+
+        my $c2 = $doc-><M::Document.createProcessingInstruction> ('f', '');
+        $node-><M::Node.appendChild> ($c2);
+
+        my $c3 = $doc-><M::Document.createProcessingInstruction> ('g', '');
+        $node-><M::Node.appendChild> ($c3);
+
+        my $return = $node-><M::Node.removeChild> ($c3);
+
+        $test->id ('return');
+        $test->assert_equals ($return, $c3);
+
+        $test->id ('parentNode');
+        $test->assert_null ($c1-><AG::Node.parentNode>);
+
+        $test->id ('firstChild');
+        $test->assert_equals ($doc-><AG::Node.firstChild>, $c1);
+
+        $test->id ('lastChild');
+        $test->assert_equals ($doc-><AG::Node.lastChild>, $c2);
+
+        $test->id ('length');
+        $test->assert_num_equals
+                 (actual_value => 0+@{$doc-><AG::Node.childNodes>},
+                  expected_value => 2);
+    @@Test:
+      @@@QName: DTDef.removeChild.4.test
+      @@@PerlDef:
+        my $node;
+        __CODE{d|createDTDefForTest:: $dtdef => $node}__;
+
+        my $doc = $node-><AG::Node.ownerDocument>;
+
+        my $c1 = $doc-><M::Document.createProcessingInstruction> ('e', '');
+        $node-><M::Node.appendChild> ($c1);
+
+        my $return = $node-><M::Node.removeChild> ($c1);
+
+        $test->id ('return');
+        $test->assert_equals ($return, $c1);
+
+        $test->id ('parentNode');
+        $test->assert_null ($c1-><AG::Node.parentNode>);
+
+        $test->id ('firstChild');
+        $test->assert_null ($doc-><AG::Node.firstChild>);
+
+        $test->id ('lastChild');
+        $test->assert_null ($doc-><AG::Node.lastChild>);
+
+        $test->id ('length');
+        $test->assert_num_equals
+                 (actual_value => 0+@{$doc-><AG::Node.childNodes>},
+                  expected_value => 0);
+
+  @Attr:
+    @@Name: elementTypes
+    @@enDesc:
+      A live <IF::tc|NamedNodeMap> that contains all 
+      element types in the document type definition.
+
+      What are contained in this collection depends on how
+      the document type definition node is created.  If the
+      node is created as the result of parsing of an XML
+      document, it <kwd:MUST> contain all element types
+      whose element type and / or attribute definition list
+      declaration are encountered and provided to the DOM
+      implementation from the XML processor.  Note that
+      the XML processor might not provide part or entire of
+      such information depending on the processor configuration.
+      If more than one declarations for an element type or for
+      an attribute is available at the time of definition node
+      construction, then declarations other than the first ones
+      <kwd:MUST> be discarded.
+    @@Type: tc|NamedNodeMap
+    @@Get:
+      @@@PerlDef:
+        __CODE{tc|getElementTypeDefNodeMap::
+          $node => $self,
+          $map => $r,
         }__;
+
+    @@Test:
+      @@@QName: dtd.elementTypes.test
+      @@@PerlDef:
+        my $dtd;
+        __CODE{d|createDTDefForTest:: $dtdef => $dtd}__;
+
+        my $es = $dtd-><AG::DocumentTypeDefinition.elementTypes>;
+        $test->assert_isa ($es, <IFName::tc|NamedNodeMap>);
+
+  @Attr:
+    @@Name: generalEntities
+    @@enDesc:
+      A live <IF::tc|NamedNodeMap> that contains all 
+      general entities in the document type definition.
+
+      All entities declared in the document type definition
+      contained in or referenced from the document entity
+      might not be exposed through this collection, depending
+      on the information provided from the XML processor to
+      the DOM implementation.  In particular, it might not
+      contain any entity if entity references are expanded
+      at the parse time.  An implementation <kwd:MUST-NOT>
+      expose <IF::Entity> nodes whose <A::Node.localName>
+      are equal to ones of five predefined general entities in XML
+      through the collection as the result of parsing of an XML
+      document that has no error.  Duplicate entity declarations
+      are also discarded.
+    @@Type: tc|NamedNodeMap
+    @@Get:
+      @@@PerlDef:
+        __CODE{tc|getEntityNodeMap::
+          $node => $self,
+          $map => $r,
+        }__;
+
+    @@Test:
+      @@@QName: DocumentTypeDefinition.generalEntities.test
+      @@@PerlDef:
+        my $dtd;
+        __CODE{d|createDTDefForTest:: $dtdef => $dtd}__;
+
+        my $es = $dtd-><AG::DocumentTypeDefinition.generalEntities>;
+        $test->assert_isa ($es, <IFName::tc|NamedNodeMap>);
+
+  @CAttr:
+    @@Name: entities
+    @@Type: tc|NamedNodeMap
+    @@Get:
+      @@@disDef:
+        @@@@DISPerl:cloneCode: .generalEntities.get
+
+    @@Test:
+      @@@QName: DocumentType.entities.get.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{tc|createImplForTest:: $impl => $impl}__;
+
+        my $dtype = $impl-><M::c|DOMImplementation.createDocumentType>
+                             ('type', 'pub', 'sys');
+        my $ent = $dtype-><AG::tx|DocumentType.entities>;
+        $test->assert_isa ($ent, <IFName::tc|NamedNodeMap>);
+        $test->assert_num_equals
+                 (actual_value => $ent-><AG::tc|NamedNodeMap.length>,
+                  expected_value => 0);
+
+  @Attr:
+    @@Name: notations
+    @@enDesc:
+      A live <IF::tc|NamedNodeMap> that contains all 
+      general entities in the document type definition.
+
+      Duplicate notation declarations, if any, in DTD are not
+      contained in the collection and only the first declaration
+      is made available as a <IF::tx|Notation> node.
+
+        {NOTE::
+          This definition is based on one for the attribute
+          <A::tx|DocumentType.notations> in DOM XML module.
+          Since duplication is violation to the Validity Constraint,
+          XML parsers might vary on how notations are notified to
+          the application.  In particular, <InfoProp::notations>
+          property of the <InfoItem::document information item>
+          in the XML Information Set defines that in case <EM::any>
+          notation is multiply declared then the property has no value.
+        }
+    @@Type: tc|NamedNodeMap
+    @@Get:
+      @@@PerlDef:
+        __CODE{tc|getNotationNodeMap::
+          $node => $self,
+          $map => $r,
+        }__;
+
+    @@Test:
+      @@@QName: DocumentTypeDefinition.notations.test
+      @@@PerlDef:
+        my $dtd;
+        __CODE{d|createDTDefForTest:: $dtdef => $dtd}__;
+
+        my $es = $dtd-><AG::DocumentTypeDefinition.notations>;
+        $test->assert_isa ($es, <IFName::tc|NamedNodeMap>);
+
+    @@Test:
+      @@@QName: DocumentType.notations.get.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{tc|createImplForTest:: $impl => $impl}__;
+
+        my $dtype = $impl-><M::c|DOMImplementation.createDocumentType>
+                             ('type', 'pub', 'sys');
+        my $ent = $dtype-><AG::tx|DocumentType.notations>;
+        $test->assert_isa ($ent, <IFName::tc|NamedNodeMap>);
+        $test->assert_num_equals
+                 (actual_value => $ent-><AG::tc|NamedNodeMap.length>,
+                  expected_value => 0);
+      
+  @enImplNote:
+    {TODO::
+      Implement
+      <A::.parameterEntities>.
+
+      Test that:
+        $a = $dtd->element_types;
+        $b = $dtd->general_entities;
+        $a is still a element type defs col.
+      
+      Implement get/set by name methods for parameter
+      entities.
+      
+      Defines <M::Node.cloneNode>, <M::Node.importNode>,
+      <M::Node.adoptNode>, namespace methods, ...
+      
+      In particular, document position for processing
+      instruction children must be defined.
+    }
+
+  @Method:
+    @@Name: getElementTypeDefinitionNode
+    @@enDesc:
+      Returns the definition for an element type.
+    @@DOMMain:isNamespaceUnaware: 1
+    @@Param:
+      @@@Name: nameArg
+      @@@Type: DOMString
+      @@@enDesc:
+        The name of the element type.
+    @@Return:
+      @@@Type: ElementTypeDefinition
+      @@@enDesc:
+        The element type definition for <P::nameArg>.
+      @@@nullCase:
+        @@@@enDesc:
+          There is no definition for the element type <P::nameArg>.
+      @@@PerlDef:
+        my $v;
+        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
+          $r => $v,
+          $prop => {<H::d|elementTypes>},
+          $ref => $self,
+        }__;
+        if (defined $v->{$nameArg}) {
+          __CODE{mg|createNodeRefFromID||ManakaiDOM|all::
+            $bag => {<Code::mg|getNodeBag||ManakaiDOM|all:: $ref = $self>},
+            $stemid => {$v->{$nameArg}},
+            $ref => $r,
+            $opt => {{}},
+          }__;
+        }
+
+    @@Test:
+      @@@PerlDef:
+        my $dtd;
+        __CODE{d|createDTDefForTest:: $dtdef => $dtd}__;
+        $test->assert_null 
+                 ($dtd-><M::DocumentTypeDefinition
+                           .getElementTypeDefinitionNode> ('element'));
+
+  @Method:
+    @@Name: setElementTypeDefinitionNode
+    @@enDesc:
+      Sets an element type definition to the document type
+      definition.
+    @@Param:
+      @@@Name: defNode
+      @@@Type: ElementTypeDefinition
+      @@@enDesc:
+        The element type definition to set.  Its <A::Node.nodeName>
+        attribute is used to set the node.  If it is already
+        in use elsewhere, then it is first removed
+        from there and then attached to the document type.
+        If another element type definition with
+        same <A::Node.nodeName> is attached to this document
+        type definition, that association is removed.
+        
+        If <P::defNode> is already attached to this document
+        type definition, then this method has no effect.
+    @@Return:
+      @@@Type: ElementTypeDefinition
+      @@@enDesc:
+        If there is already another element type definition
+        with the same <A::Node.nodeName> as <P::defNode>,
+        then that definition node is returned.
+      @@@nullCase:
+        @@@@enDesc:
+          If there is no previous definition with the same
+          name, or the <P::defNode> is already attached
+          to the document type definition.
+      @@@NodeReadOnlyError:
+      @@@dx:raises:
+        @@@@@: c|INUSE_DEFINITION_ERR
+        @@@@enDesc:
+          If <A::ElementTypeDefinition.ownerDocumentTypeDefinition>
+          is not <DOM::null>.
+      @@@dx:raises:
+        @@@@@: c|DIFFERENT_DOCUMENT_ERR
+        @@@@enDesc:
+          The <P::defNode> node is created from different
+          document than the <A::c|Node.ownerDocument> of
+          the document type definition and the implementation
+          does not support such definition node
+          being attached to the document type definition.
+      @@@PerlDef:
+        __CODE{setDefinitionNode::
+          $defNode => $defNode,
+          $defNodeParamName => 'defNode',
+          $key => {<H::d|elementTypes>},
+        }__;
+
+    @@Test:
+      @@@QName: DTDef.setETDefNode.test
+      @@@PerlDef:
+        my $dtd;
+        __CODE{d|createDTDefForTest:: $dtdef => $dtd}__;
+        $test->assert_null 
+                 ($dtd-><M::DocumentTypeDefinition
+                           .getElementTypeDefinitionNode> ('et1'));
+
+        my $et = $dtd-><AG::Node.ownerDocument>
+                     -><M::Node.getFeature> (<Q::fe|XDoctype>)
+                     -><M::DocumentXDoctype.createElementTypeDefinition>
+                         ('et1');
+
+        my $old1 = $dtd-><M::DocumentTypeDefinition
+                           .setElementTypeDefinitionNode> ($et);
+        $test->assert_null ($old1);
+
+        my $ret = $dtd-><M::DocumentTypeDefinition
+                           .getElementTypeDefinitionNode> ('et1');
+        $test->assert_equals ($et, $ret);
+        $test->assert_num_equals
+                 (actual_value => $ret-><AG::Node.nodeType>,
+                  expected_value => <C::Node.ELEMENT_TYPE_DEFINITION_NODE>);
+        $test->assert_equals
+                 ($et-><AG::ElementTypeDefinition.ownerDocumentTypeDefinition>,
+                  $dtd);
+
+        $test->id ('replace-same');
+
+        my $old2 = $dtd-><M::DocumentTypeDefinition
+                           .setElementTypeDefinitionNode> ($et);
+        $test->assert_null ($old2);
+
+        $test->id ('change-parent');
+
+        my $dtd2 = $dtd-><AG::Node.ownerDocument>
+                       -><M::Node.getFeature> (<Q::ManakaiDOM|XDoctype>)
+                       -><M::DocumentXDoctype.createDocumentTypeDefinition>
+                           ('dt2');
+    
+        $test->assert_exception (code => sub {
+          $dtd2-><M::DocumentTypeDefinition
+                            .setElementTypeDefinitionNode> ($et);
+        }, exception_subtype => <Q::c|INUSE_DEFINITION_ERR>);
+        
+        $test->assert_equals
+                 ($et-><AG::ElementTypeDefinition.ownerDocumentTypeDefinition>,
+                  $dtd);
+        $test->assert_equals
+                 ($dtd-><M::DocumentTypeDefinition
+                             .getElementTypeDefinitionNode>
+                          ('et1'),
+                  $et);
+  
+        $test->id ('rewrite');
+
+        my $et2 = $dtd-><AG::Node.ownerDocument>
+                      -><M::Node.getFeature> (<Q::ManakaiDOM|XDoctype>)
+                      -><M::DocumentXDoctype.createElementTypeDefinition>
+                          ('et1');
+        $test->assert_not_equals ($et, $et2);
+
+        my $old4 = $dtd-><M::DocumentTypeDefinition
+                                .setElementTypeDefinitionNode> ($et2);
+        $test->assert_equals ($old4, $et);
+        $test->assert_equals
+                 ($et2-><AG::ElementTypeDefinition.ownerDocumentTypeDefinition>,
+                  $dtd);
+
+    @@Test:
+      @@@PerlDef:
+        my $dtd;
+        __CODE{d|createDTDefForTest:: $dtdef => $dtd}__;
+        my $et;
+        __CODE{d|createETDefForTest:: $etdef => $et}__;
+
+        $test->assert_exception
+          (code => sub {
+            $dtd-><M::DocumentTypeDefinition
+                     .setElementTypeDefinitionNode> ($et);
+           },
+           exception_subtype => <Q::c|DIFFERENT_DOCUMENT_ERR>);
+
+  @Method:
+    @@Name: getGeneralEntityNode
+    @@enDesc:
+      Returns the definition for a general entity.
+    @@DOMMain:isNamespaceUnaware: 1
+    @@Param:
+      @@@Name: nameArg
+      @@@Type: DOMString
+      @@@enDesc:
+        The name of the general entity.
+    @@Return:
+      @@@Type: tx|Entity
+      @@@enDesc:
+        The general entity whose name is <P::nameArg>.
+      @@@nullCase:
+        @@@@enDesc:
+          There is no general entity <P::nameArg>.
+      @@@PerlDef:
+        my $v;
+        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
+          $r => $v,
+          $prop => {<H::d|generalEntities>},
+          $ref => $self,
+        }__;
+        if (defined $v->{$nameArg}) {
+          __CODE{mg|createNodeRefFromID||ManakaiDOM|all::
+            $bag => {<Code::mg|getNodeBag||ManakaiDOM|all:: $ref = $self>},
+            $stemid => {$v->{$nameArg}},
+            $ref => $r,
+            $opt => {{}},
+          }__;
+        }
+       
+    @@Test:
+      @@@QName: DocumentTypeDefinition.getGeneralEntityNode.test
+      @@@PerlDef:
+        my $dtd;
+        __CODE{d|createDTDefForTest:: $dtdef => $dtd}__;
+        $test->assert_null 
+                 ($dtd-><M::DocumentTypeDefinition
+                           .getGeneralEntityNode> ('element'));
+
+  @Method:
+    @@Name: setGeneralEntityNode
+    @@enDesc:
+      Sets a general entity to the document type
+      definition.
+    @@Param:
+      @@@Name: defNode
+      @@@Type: tx|Entity
+      @@@enDesc:
+        The general entity to set.  Its <A::Node.nodeName>
+        attribute is used to set the node.
+
+        If another general entity node with
+        same <A::Node.nodeName> is attached to this document
+        type definition, such association is removed.
+        
+        If <P::defNode> is already attached to this document
+        type definition, then this method has no effect.
+    @@Return:
+      @@@Type: tx|Entity
+      @@@enDesc:
+        If there is already another general entity
+        with the same <A::Node.nodeName> as <P::defNode>,
+        then that node is returned.
+      @@@nullCase:
+        @@@@enDesc:
+          If there is no previous definition with the same
+          name, or the <P::defNode> is already attached
+          to the document type definition.
+      @@@NodeReadOnlyError:
+      @@@dx:raises:
+        @@@@@: c|INUSE_DEFINITION_ERR
+        @@@@enDesc:
+          If <A::tx|Entity.ownerDocumentTypeDefinition>
+          is not <DOM::null>.
+      @@@dx:raises:
+        @@@@@: c|DIFFERENT_DOCUMENT_ERR
+        @@@@enDesc:
+          The <P::defNode> node is created from different
+          document than the <A::c|Node.ownerDocument> of
+          the document type definition and the implementation
+          does not support such definition node
+          being attached to the document type definition.
+      @@@PerlDef:
+        __CODE{setDefinitionNode::
+          $defNode => $defNode,
+          $defNodeParamName => 'defNode',
+          $key => {<H::d|generalEntities>},
+        }__;
+    @@Test:
+      @@@QName: DocumentTypeDefinition.setGeneralEntityNode.test
+      @@@PerlDef:
+        my $dtd;
+        __CODE{d|createDTDefForTest:: $dtdef => $dtd}__;
+
+        $test->id ('initial.empty');
+        $test->assert_null 
+                 ($dtd-><M::DocumentTypeDefinition
+                           .getGeneralEntityNode> ('et1'));
+
+        my $et = $dtd-><AG::Node.ownerDocument>
+                     -><M::Node.getFeature> (<Q::ManakaiDOM|XDoctype>)
+                     -><M::DocumentXDoctype.createGeneralEntity>
+                         ('et1');
+
+        $test->id ('set');
+        my $old1 = $dtd-><M::DocumentTypeDefinition
+                           .setGeneralEntityNode> ($et);
+        $test->assert_null ($old1);
+
+        $test->id ('get');
+        my $ret = $dtd-><M::DocumentTypeDefinition
+                           .getGeneralEntityNode> ('et1');
+        $test->assert_equals ($et, $ret);
+        $test->assert_num_equals
+                 (actual_value => $ret-><AG::Node.nodeType>,
+                  expected_value => <C::Node.ENTITY_NODE>);
+        $test->assert_equals
+                 ($et-><AG::tx|Entity.ownerDocumentTypeDefinition>,
+                  $dtd);
+
+        $test->id ('replace-same');
+        my $old2 = $dtd-><M::DocumentTypeDefinition
+                           .setGeneralEntityNode> ($et);
+        $test->assert_null ($old2);
+
+        $test->id ('change-parent');
+
+        my $dtd2 = $dtd-><AG::Node.ownerDocument>
+                       -><M::Node.getFeature> (<Q::ManakaiDOM|XDoctype>)
+                       -><M::DocumentXDoctype.createDocumentTypeDefinition>
+                           ('dt2');
+    
+        $test->assert_exception (code => sub {
+          $dtd2-><M::DocumentTypeDefinition
+                            .setGeneralEntityNode> ($et);
+        }, exception_subtype => <Q::c|INUSE_DEFINITION_ERR>);
+        
+        $test->assert_equals
+                 ($et-><AG::tx|Entity.ownerDocumentTypeDefinition>,
+                  $dtd);
+        $test->assert_equals
+                 ($dtd-><M::DocumentTypeDefinition
+                             .getGeneralEntityNode>
+                          ('et1'),
+                  $et);
+  
+        $test->id ('rewrite');
+
+        my $et2 = $dtd-><AG::Node.ownerDocument>
+                      -><M::Node.getFeature> (<Q::ManakaiDOM|XDoctype>)
+                      -><M::DocumentXDoctype.createGeneralEntity>
+                          ('et1');
+        $test->assert_not_equals ($et, $et2);
+
+        my $old4 = $dtd-><M::DocumentTypeDefinition
+                                .setGeneralEntityNode> ($et2);
+        $test->assert_equals ($old4, $et);
+        $test->assert_equals
+                 ($et2-><AG::tx|Entity.ownerDocumentTypeDefinition>,
+                  $dtd);
+
+    @@Test:
+      @@@QName: DocumentTypeDefinition.setGeneralEntityNode.DIFF_DOC_ERR.test
+      @@@PerlDef:
+        my $dtd;
+        __CODE{d|createDTDefForTest:: $dtdef => $dtd}__;
+        my $et;
+        __CODE{tx|createGEForTest:: $gent => $et}__;
+
+        $test->assert_exception
+          (code => sub {
+            $dtd-><M::DocumentTypeDefinition
+                     .setGeneralEntityNode> ($et);
+           },
+           exception_subtype => <Q::c|DIFFERENT_DOCUMENT_ERR>);
+
+  @Method:
+    @@Name: getNotationNode
+    @@enDesc:
+      Returns the definition for a notation.
+    @@DOMMain:isNamespaceUnaware: 1
+    @@Param:
+      @@@Name: nameArg
+      @@@Type: DOMString
+      @@@enDesc:
+        The name of the notation.
+    @@Return:
+      @@@Type: tx|Notation
+      @@@enDesc:
+        The notation <P::nameArg>.
+      @@@nullCase:
+        @@@@enDesc:
+          There is no notation <P::nameArg>.
+      @@@PerlDef:
+        my $v;
+        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
+          $r => $v,
+          $prop => {<H::d|notations>},
+          $ref => $self,
+        }__;
+        if (defined $v->{$nameArg}) {
+          __CODE{mg|createNodeRefFromID||ManakaiDOM|all::
+            $bag => {<Code::mg|getNodeBag||ManakaiDOM|all:: $ref = $self>},
+            $stemid => {$v->{$nameArg}},
+            $ref => $r,
+            $opt => {{}},
+          }__;
+        }
+    @@Test:
+      @@@QName: DocumentTypeDefinition.getNotationNode.test
+      @@@PerlDef:
+        my $dtd;
+        __CODE{d|createDTDefForTest:: $dtdef => $dtd}__;
+        $test->assert_null 
+                 ($dtd-><M::DocumentTypeDefinition
+                           .getNotationNode> ('element'));
+
+  @Method:
+    @@Name: setNotationNode
+    @@enDesc:
+      Sets a notation to the document type
+      definition.
+    @@Param:
+      @@@Name: defNode
+      @@@Type: tx|Notation
+      @@@enDesc:
+        The notation to set.  Its <A::Node.nodeName>
+        attribute is used to set the node.
+
+        If another notation node with
+        same <A::Node.nodeName> is attached to this document
+        type definition, such association is removed.
+        
+        If <P::defNode> is already attached to this document
+        type definition, then this method has no effect.
+    @@Return:
+      @@@Type: tx|Notation
+      @@@enDesc:
+        If there is already another notation
+        with the same <A::Node.nodeName> as <P::defNode>,
+        then that node is returned.
+      @@@nullCase:
+        @@@@enDesc:
+          If there is no previous definition with the same
+          name, or the <P::defNode> is already attached
+          to the document type definition.
+      @@@NodeReadOnlyError:
+      @@@dx:raises:
+        @@@@@: c|INUSE_DEFINITION_ERR
+        @@@@enDesc:
+          If <A::tx|Notation.ownerDocumentTypeDefinition>
+          is not <DOM::null>.
+      @@@dx:raises:
+        @@@@@: c|DIFFERENT_DOCUMENT_ERR
+        @@@@enDesc:
+          The <P::defNode> node is created from different
+          document than the <A::c|Node.ownerDocument> of
+          the document type definition and the implementation
+          does not support such definition node
+          being attached to the document type definition.
+      @@@PerlDef:
+        __CODE{setDefinitionNode::
+          $defNode => $defNode,
+          $defNodeParamName => 'defNode',
+          $key => {<H::d|notations>},
+        }__;
+    @@Test:
+      @@@QName: DocumentTypeDefinition.setNotationNode.test
+      @@@PerlDef:
+        my $dtd;
+        __CODE{d|createDTDefForTest:: $dtdef => $dtd}__;
+
+        $test->id ('initial.empty');
+        $test->assert_null 
+                 ($dtd-><M::DocumentTypeDefinition
+                           .getNotationNode> ('et1'));
+
+        my $et = $dtd-><AG::Node.ownerDocument>
+                     -><M::Node.getFeature> (<Q::fe|XDoctype>)
+                     -><M::DocumentXDoctype.createNotation>
+                         ('et1');
+
+        $test->id ('set');
+        my $old1 = $dtd-><M::DocumentTypeDefinition
+                           .setNotationNode> ($et);
+        $test->assert_null ($old1);
+
+        $test->id ('get');
+        my $ret = $dtd-><M::DocumentTypeDefinition
+                           .getNotationNode> ('et1');
+        $test->assert_equals ($et, $ret);
+        $test->assert_num_equals
+                 (actual_value => $ret-><AG::Node.nodeType>,
+                  expected_value => <C::Node.NOTATION_NODE>);
+        $test->assert_equals
+                 ($et-><AG::tx|Notation.ownerDocumentTypeDefinition>,
+                  $dtd);
+
+        $test->id ('replace-same');
+        my $old2 = $dtd-><M::DocumentTypeDefinition
+                           .setNotationNode> ($et);
+        $test->assert_null ($old2);
+
+        $test->id ('change-parent');
+
+        my $dtd2 = $dtd-><AG::Node.ownerDocument>
+                       -><M::Node.getFeature> (<Q::fe|XDoctype>)
+                       -><M::DocumentXDoctype.createDocumentTypeDefinition>
+                           ('dt2');
+    
+        $test->assert_exception (code => sub {
+          $dtd2-><M::DocumentTypeDefinition
+                            .setNotationNode> ($et);
+        }, exception_subtype => <Q::c|INUSE_DEFINITION_ERR>);
+        
+        $test->assert_equals
+                 ($et-><AG::tx|Notation.ownerDocumentTypeDefinition>,
+                  $dtd);
+        $test->assert_equals
+                 ($dtd-><M::DocumentTypeDefinition
+                             .getNotationNode>
+                          ('et1'),
+                  $et);
+  
+        $test->id ('rewrite');
+
+        my $et2 = $dtd-><AG::Node.ownerDocument>
+                      -><M::Node.getFeature> (<Q::fe|XDoctype>)
+                      -><M::DocumentXDoctype.createNotation>
+                          ('et1');
+        $test->assert_not_equals ($et, $et2);
+
+        my $old4 = $dtd-><M::DocumentTypeDefinition
+                                .setNotationNode> ($et2);
+        $test->assert_equals ($old4, $et);
+        $test->assert_equals
+                 ($et2-><AG::tx|Notation.ownerDocumentTypeDefinition>,
+                  $dtd);
+
+    @@Test:
+      @@@QName: DocumentTypeDefinition.setNotationNode.DIFF_DOC_ERR.test
+      @@@PerlDef:
+        my $dtd;
+        __CODE{d|createDTDefForTest:: $dtdef => $dtd}__;
+        my $et;
+        __CODE{d|createNotationForTest:: $not => $et}__;
+
+        $test->assert_exception
+          (code => sub {
+            $dtd-><M::DocumentTypeDefinition
+                     .setNotationNode> ($et);
+           },
+           exception_subtype => <Q::c|DIFFERENT_DOCUMENT_ERR>);
+
+  @CAttr:
+    @@Name: implementation
+    @@enDesc:
+      The <IF::c|DOMImplementation> object to which the node belongs.
+
+      This attribute is a manakai extension.
+    @@Type: c|DOMImplementation
+    @@Get:
+      @@@PerlDef:
+        __CODE{mg|getNodeStemProp0Node||ManakaiDOM|all::
+          $r => $r,
+          $prop => {<H::tc|implementation>},
+          $ref => $self,
+        }__;
+        unless ($r) {
+          __DEEP{
+            $r = $self-><AG::Node.ownerDocument>
+                      -><AG::Document.implementation>;
+          }__;
+        }
+
+    @@Test:
+      @@@QName: DTDef.impl.test
+      @@@PerlDef:
+        my $dtd;
+        __CODE{d|createDTDefForTest:: $dtdef => $dtd}__;
+
+        $test->assert_isa ($dtd-><AG::tx|DocumentType.implementation>,
+                           <IFName::c|DOMImplementation>);
+
+    @@Test:
+      @@@QName: Doctype.impl.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{tc|createImplForTest:: $impl => $impl}__;
+
+        my $dtype = $impl-><M::c|DOMImplementation.createDocumentType>
+                             ('type', 'pub', 'sys');
+
+        $test->id ('created');
+        $test->assert_isa (my $i2 = $dtype-><AG::tx|DocumentType.implementation>,
+                           <IFName::c|DOMImplementation>);
+        $test->assert_equals ($i2, $impl);
+
+        $test->id ('appended');
+        my $doc = $impl-><M::c|DOMImplementation.createDocument>;
+        $doc-><M::Node.appendChild> ($dtype);
+        $test->assert_isa (my $i3 = $dtype-><AG::tx|DocumentType.implementation>,
+                           <IFName::c|DOMImplementation>);
+        $test->assert_equals ($i3, $impl);
 ##DocumentTypeDefinition
 
 PropDef:
@@ -4016,11 +4287,6 @@ IFClsXDef:
     interface <kwd:MAY> also implement the <IF::DocumentTypeDefinition>
     interface and / or the <IF::tx|DocumentType> interface.
 
-  @ResourceDef:
-    @@ForCheck: ManakaiDOM|ForClass
-    @@QName: newDTDeclForTest
-    @@AliasFor: newDoctypeForTest
-
   @Attr:
     @@Name: systemId
     @@enDesc:
@@ -4033,8 +4299,12 @@ IFClsXDef:
       @@@enDesc:
         If there is no system identifier specified.
     @@Get:
-      @@@disDef:
-        @@@@GetProp: infoset|systemIdentifier
+      @@@PerlDef:
+        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
+          $r => $r,
+          $prop => {<H::infoset|systemIdentifier>},
+          $ref => $self,
+        }__;
     @@Set:
       @@@enDesc:
         Set the system identifier of the external subset.  No lexical
@@ -4052,16 +4322,19 @@ IFClsXDef:
                   public identifier will also make it unserializable.
           }
       @@@NodeReadOnlyError:
-      @@@disDef:
-        @@@@SetProp:
-          @@@@@@: infoset|systemIdentifier
-          @@@@@CheckReadOnly: 1
+      @@@PerlDef:
+        __CODE{tc|NodeReadOnlyError:: $node => $self}__;
+        __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
+          $given => $given,
+          $prop => {<H::infoset|systemIdentifier>},
+          $ref => $self,
+        }__;
 
     @@Test:
       @@@QName: DTDef.systemId.test
       @@@PerlDef:
         my $dtd;
-        __CODE{newDTDeclForTest}__;
+        __CODE{d|createDTDefForTest:: $dtdef => $dtd}__;
 
         $test->id ('initial');
         $test->assert_null ($dtd-><AG::DocumentTypeDeclaration.systemId>);
@@ -4084,7 +4357,7 @@ IFClsXDef:
       @@@QName: DocumentType.systemId.get.test
       @@@PerlDef:
         my $impl;
-        __CODE{t|createDOMImplForTest:: $impl => $impl}__;
+        __CODE{tc|createImplForTest:: $impl => $impl}__;
 
         my $dtype = $impl-><M::c|DOMImplementation.createDocumentType>
                              ('type', 'pub', 'sys');
@@ -4100,8 +4373,12 @@ IFClsXDef:
       @@@enDesc:
         If there is no public identifier specified.
     @@Get:
-      @@@disDef:
-        @@@@GetProp: infoset|publicIdentifier
+      @@@PerlDef:
+        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
+          $r => $r,
+          $prop => {<H::infoset|publicIdentifier>},
+          $ref => $self,
+        }__;
     @@Set:
       @@@enDesc:
         Set the given value to the attribute.  No normalization
@@ -4120,16 +4397,19 @@ IFClsXDef:
                   system identifier will also make it unserializable.
           }
       @@@NodeReadOnlyError:
-      @@@disDef:
-        @@@@SetProp:
-          @@@@@@: infoset|publicIdentifier
-          @@@@@CheckReadOnly: 1
+      @@@PerlDef:
+        __CODE{tc|NodeReadOnlyError:: $node => $self}__;
+        __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
+          $given => $given,
+          $prop => {<H::infoset|publicIdentifier>},
+          $ref => $self,
+        }__;
 
     @@Test:
       @@@QName: DTDef.publicId.test
       @@@PerlDef:
         my $dtd;
-        __CODE{newDTDeclForTest}__;
+        __CODE{d|createDTDefForTest:: $dtdef => $dtd}__;
 
         $test->id ('initial');
         $test->assert_null ($dtd-><AG::DocumentTypeDeclaration.publicId>);
@@ -4152,7 +4432,7 @@ IFClsXDef:
       @@@QName: DocumentType.publicId.get.test
       @@@PerlDef:
         my $impl;
-        __CODE{t|createDOMImplForTest:: $impl => $impl}__;
+        __CODE{tc|createImplForTest:: $impl => $impl}__;
 
         my $dtype = $impl-><M::c|DOMImplementation.createDocumentType>
                              ('type', 'pub', 'sys');
@@ -4173,7 +4453,7 @@ IFClsXDef:
       @@@QName: DTDef.name.get.test
       @@@PerlDef:
         my $dtd;
-        __CODE{newDTDeclForTest}__;
+        __CODE{d|createDTDefForTest:: $dtdef => $dtd}__;
 
         $test->id ('initial');
         $test->assert_equals ($dtd-><AG::DocumentTypeDeclaration.name>, 'dt1');
@@ -4182,7 +4462,7 @@ IFClsXDef:
       @@@QName: DocumentType.name.get.test
       @@@PerlDef:
         my $impl;
-        __CODE{t|createDOMImplForTest:: $impl => $impl}__;
+        __CODE{tc|createImplForTest:: $impl => $impl}__;
 
         my $dtype = $impl-><M::c|DOMImplementation.createDocumentType>
                              ('type', 'pub', 'sys');
@@ -4215,13 +4495,14 @@ IFClsXDef:
     @@Set:
       @@@enDesc:
         Setting this attribute has no effect.
+      @@@nullCase:
       @@@PerlDef:
 
     @@Test:
       @@@QName: DTDef.declarationBaseURI.get.test
       @@@PerlDef:
         my $dtd;
-        __CODE{newDTDeclForTest}__;
+        __CODE{d|createDTDefForTest:: $dtdef => $dtd}__;
 
         $test->id ('initial');
         $test->assert_null
@@ -4255,6 +4536,7 @@ IFClsXDef:
     @@Set:
       @@@enDesc:
         Setting this attribute has no effect.
+      @@@nullCase:
       @@@PerlDef:
 
   @CAttr:
@@ -4295,7 +4577,7 @@ IFClsXDef:
   @IFISA: tc|Node
   @ClsISA: tc|ManakaiDOMNode
   
-  @DISLang:role: c|ElementTypeDefinitionRole
+  @DISLang:role: tc|ElementTypeDefinitionRole
 
   @f:implements: d|Feature30
   
@@ -4342,52 +4624,35 @@ IFClsXDef:
   @mg:origin0: d|ownerDefinition
   @mg:subnode1h: d|attributeDefinitions
 
+  @enImplNote:
+    @@ddid: props
+    @@@:
+      {P:: Required internal properties:
+
+        - <Q::tc|ownerDocument>.
+
+        - <Q::infoset|name>.
+
+        - <Q::d|attributeDefinitions>.
+
+      }
+
+      {P:: Optional internal properties:
+
+        - <Q::d|ownerDefinitions>.
+
+        - <Q::c|read-only>.
+   
+        - <Q::c|userData>.
+
+      }
+
   @CODE:
     @@QName: d|createETDefForTest
     @@PerlDef:
       my $docx;
       __CODE{d|createEmptyDocumentXForTest:: $docx => $docx}__;
       $atdef = $docx-><M::DocumentXDoctype.createElementTypeDefinition> ('et');
-
-  @ResourceDef:
-    @@ForCheck: ManakaiDOM|ForClass
-    @@QName: newETForTest
-    @@rdf:type: DISPerl|BlockCode
-    @@PerlDef:
-      my $doc;
-      __CODE{newDocumentForTest}__;
-      $et = $doc-><M::DocumentXDoctype.createElementTypeDefinition>
-                          ('et1');
-
-  @ResourceDef:
-    @@ForCheck: ManakaiDOM|ForClass
-    @@QName: newGeneralEntityForTest
-    @@rdf:type: DISPerl|BlockCode
-    @@PerlDef:
-      my $doc;
-      __CODE{newDocumentForTest}__;
-      $et = $doc-><M::DocumentXDoctype.createGeneralEntity>
-                          ('et1');
-
-  @ResourceDef:
-    @@ForCheck: ManakaiDOM|ForClass
-    @@QName: newNotationForTest
-    @@rdf:type: DISPerl|BlockCode
-    @@PerlDef:
-      my $doc;
-      __CODE{newDocumentForTest}__;
-      $et = $doc-><M::DocumentXDoctype.createNotation>
-                          ('n1');
-
-  @Test:
-    @@PerlDef:
-      my $et;
-      __CODE{newETForTest}__;
-      $test->assert_not_null ($et);
-      my $od = $et-><AG::Node.ownerDocument>;
-      $test->assert_not_null ($od);
-      $test->assert_not_null
-               ($od-><M::Node.getFeature> (<Q::ManakaiDOM:XDoctype>, '3.0'));
 
   @Attr:
     @@ForCheck: ManakaiDOM|ForClass
@@ -4402,7 +4667,7 @@ IFClsXDef:
     @@Test:
       @@@PerlDef:
         my $et;
-        __CODE{newETForTest}__;
+        __CODE{d|createETDefForTest:: $etdef => $et}__;
         $test->assert_not_null ($et);
         $test->assert_num_equals 
                  (actual_value => $et-><AG::Node.nodeType>,
@@ -4412,7 +4677,7 @@ IFClsXDef:
       @@@QName: DocumentType.nodeType.get.test
       @@@PerlDef:
         my $impl;
-        __CODE{t|createDOMImplForTest:: $impl => $impl}__;
+        __CODE{tc|createImplForTest:: $impl => $impl}__;
 
         my $dtype = $impl-><M::c|DOMImplementation.createDocumentType>
                              ('type', 'pub', 'sys');
@@ -4464,195 +4729,16 @@ IFClsXDef:
       @@@disDef:
         @@@@DISPerl:cloneCode: tx|ManakaiDOMNotation.textContent.set
 
-  @enImplNote:
-    {TODO:: Content model attributes are required.
-    }
-
-  @Attr:
-    @@Name: attributeDefinitions
-    @@enDesc:
-      A live collection of the attribute definitions
-      contained by the element type definition.
-    @@Type: tc|NamedNodeMap
-    @@Get:
-      @@@PerlDef:
-        __CODE{tc|getAttrDefNodeMap::
-          $node => $self,
-          $map => $r,
-        }__;
-
-    @@Test:
-      @@@QName: elementTypeDef.attrDefs.test
-      @@@PerlDef:
-        my $et;
-        __CODE{newETForTest}__;
-
-        my $as = $et-><AG::ElementTypeDefinition.attributeDefinitions>;
-        $test->assert_isa ($as, <IFName::tc|NamedNodeMap>);
-        $test->assert_num_equals
-                 (actual_value => $as-><AG::tc|NamedNodeMap.length>,
-                  expected_value => 0);
-
-  @Attr:
-    @@ForCheck: ManakaiDOM|ForClass
+  @CAttr:
     @@Name: childNodes
     @@enDesc:
       A list of nodes that contains all children of the node.
     @@Get:
       @@@Type: tc|NodeList
-      @@@actualType: c|ManakaiDOMEmptyNodeList
       @@@enDesc:
         The node list that is always empty.
-      @@@PerlDef:
-        $r = <Class::c|ManakaiDOMEmptyNodeList>->new;
-    @@Test:
-      @@@PerlDef:
-        my $et;
-        __CODE{newETForTest}__;
-        my $cl = $et-><AG::Node.childNodes>;
-        $test->assert_isa ($cl, <IFName::tc|NodeList>);
-        $test->assert_num_equals
-                 (actual_value => $cl-><AG::tc|NodeList.length>,
-                  expected_value => 0);
-
-  @Method:
-    @@Name: getAttributeDefinitionNode
-    @@enDesc:
-      Returns the definition for an attribute.
-    @@DOMMain:isNamespaceUnaware: 1
-    @@Param:
-      @@@Name: nameArg
-      @@@Type: DOMString
-      @@@enDesc:
-        The name of the attribute.
-    @@Return:
-      @@@Type: AttributeDefinition
-      @@@enDesc:
-        The attribute definition for <P::nameArg>.
-      @@@nullCase:
-        @@@@enDesc:
-          There is no definition for the attribute <P::nameArg>.
-      @@@PerlDef:
-        my $n = $self->{<H::mn:node>}
-                     ->{<H::d|attributeDefinitions>}
-                     ->{$nameArg};
-        if ($n) {
-          $r = <ClassM::t|ManakaiDOMNode.getNodeReference> ($n);
-        }
-    @@Test:
-      @@@PerlDef:
-        my $et;
-        __CODE{newETForTest}__;
-        my $an = $et-><M::ElementTypeDefinition.getAttributeDefinitionNode>
-                        ('at1');
-        $test->assert_null ($an);
-
-  @Method:
-    @@Name: setAttributeDefinitionNode
-    @@enDesc:
-      Sets an attribute definition to the element
-      definition.
-    @@Param:
-      @@@Name: attrDef
-      @@@Type: AttributeDefinition
-      @@@enDesc:
-        The attribute definition to set.  Its <A::Node.nodeName>
-        attribute is used to set the node.  If it is already
-        in use for other element type, then it is first removed
-        from that element type and then attached to this
-        element type.  If another attribute definition with
-        same <A::Node.nodeName> is attached to this element
-        type definition, that association is removed.
-        
-        If <P::attrDef> is already attached to this element
-        type definition, then this method has no effect.
-    @@Return:
-      @@@Type: AttributeDefinition
-      @@@enDesc:
-        If there is already another attribute definition
-        with the same <A::Node.nodeName> as <P::attrDef>,
-        then that definition node is returned.
-      @@@nullCase:
-        @@@@enDesc:
-          If there is no previous definition with the same
-          name, or the <P::attrDef> is already attached
-          to the element type definition.
-      @@@NodeReadOnlyError:
-      @@@dx:raises:
-        @@@@@: c|INUSE_DEFINITION_ERR
-        @@@@enDesc:
-          If <A::AttributeDefinition.ownerElementTypeDefinition>
-          is not <DOM::null>.
-      @@@dx:raises:
-        @@@@@: c|DIFFERENT_DOCUMENT_ERR
-        @@@@enDesc:
-          The <P::attrDef> node is created from different
-          document than the <A::c|Node.ownerDocument> of
-          the element type definition and the implementation
-          does not support such attribute definition node
-          being attached to the element type definition.
-      @@@PerlDef:
-        __CODE{setDefinitionNodeAttr::
-          $defNode => $attrDef,
-          $defNodeParamName => 'attrDef',
-          $key => {<H::d|attributeDefinitions>},
-        }__;
-    @@Test:
-      @@@PerlDef:
-        my $et;
-        __CODE{newETForTest}__;
-        my $an = $et-><M::ElementTypeDefinition.getAttributeDefinitionNode>
-                        ('at1');
-        $test->assert_null ($an);
-
-        my $can = $et-><AG::Node.ownerDocument>
-                     -><M::Node.getFeature> (<Q::ManakaiDOM:XDoctype>)
-                     -><M::DocumentXDoctype.createAttributeDefinition> ('at1');
-        $et-><M::ElementTypeDefinition.setAttributeDefinitionNode> ($can);
-
-        my $an2 = $et-><M::ElementTypeDefinition.getAttributeDefinitionNode>
-                         ('at1');
-        $test->assert_not_null ($an2);
-        $test->assert_equals ($an2, $can);
-        $test->assert_string
-                 (actual_value => $an2-><AG::Node.nodeName>,
-                  expected_value => 'at1');
-  
-  @Attr:
-    @@Name: ownerDocumentTypeDefinition
-    @@enDesc:
-      The document type definition node to which
-      the definition is attached.
-    @@Type: DocumentTypeDefinition
-    @@Get:
-      @@@nullCase:
-        @@@@enDesc:
-          The definition is not attached to any
-          document type.
-      @@@PerlDef:
-        $r = <ClassM::t|ManakaiDOMNode.getNodeReference>
-               ($self->{<H::mn:node>}->{<H::d|ownerDefinition>})
-          if $self->{<H::mn:node>}->{<H::d|ownerDefinition>};
-    @@Test:
-      @@@PerlDef:
-        my $et;
-        __CODE{newETForTest}__;
- 
-        my $odt = $et-><AG::ElementTypeDefinition.ownerDocumentTypeDefinition>;
-        $test->assert_null ($odt);
-
-        my $dt = $et-><AG::Node.ownerDocument>
-                     -><M::Node.getFeature> (<Q::ManakaiDOM:XDoctype>)
-                     -><M::DocumentXDoctype.createDocumentTypeDefinition>
-                         ('dt1');
-        $test->assert_not_null ($dt);
-        $dt-><M::DocumentTypeDefinition.setElementTypeDefinitionNode> ($et);
-
-        my $odt2 = $et-><AG::ElementTypeDefinition
-                            .ownerDocumentTypeDefinition>;
-        $test->assert_not_null ($odt2);
-        $test->assert_isa ($odt2, <IFName::DocumentTypeDefinition>);
-        $test->assert_equals ($odt2, $dt);
+      @@@disDef:
+        @@@@DISPerl:cloneCode: tc|ManakaiDOMCharacterData.childNodes.get
 
   @CAttr:
     @@Name: baseURI
@@ -4676,7 +4762,7 @@ IFClsXDef:
       @@@QName: ETDef.baseURI.test
       @@@PerlDef:
         my $et;
-        __CODE{newETForTest:: $et => $et}__;
+        __CODE{d|createETDefForTest:: $etdef => $et}__;
  
         my $doc = $et-><AG::Node.ownerDocument>;
  
@@ -4825,30 +4911,6 @@ IFClsXDef:
       $test->id ('1.value');
       $test->assert_null ($node-><AG::Node.textContent>);
 
-  @Method:
-    @@ForCheck: ManakaiDOM|ForClass
-    @@ManakaiDOM:isForInternal: 1
-    @@Name: newObject
-    @@NewObjectRefNodeParam:
-    @@Return:
-      @@@Type: NodeStem
-      @@@PerlDef:
-        $r = <ClassM::t|ManakaiDOMNode.newObject> ($self, $refNode);
-        $r->{<H::c|nodeType>} = <H::d|ElementTypeDefinitionNodeType>;
-        $r->{<H::d|attributeDefinitions>} = {};
-    @@enImplNote:
-      Required properties:
-        <Q::c|nodeType>, <Q::c|ownerDocument>,
-        <Q::c|name>,
-        <Q::d|attributeDefinitions>.
-      
-      Optional properties:
-        <Q::c|read-only>,
-        <Q::d|ownerDefinition>.
-  @mn:xrefnode0: c|ownerDocument
-  @mn:subnode1: d|attributeDefinitions
-  @mn:origin0: d|ownerDefinition
-
   @CMethod:
     @@Name: getFeature
     @@enDesc:
@@ -4896,6 +4958,186 @@ IFClsXDef:
           my $sp = $node-><M::Node.getFeature> ($_->[0], $_->[1]);
           $test->assert_isa ($sp, $_->[2]);
         }
+
+  @enImplNote:
+    {TODO:: Content model attributes are required.
+    }
+
+  @Attr:
+    @@Name: attributeDefinitions
+    @@enDesc:
+      A live <IF::tc|NamedNodeMap> that contains all
+      general entities in the document type definition.
+
+      Duplicate attribute definitions in attribute
+      definition list declarations are discarded.
+    @@Type: tc|NamedNodeMap
+    @@Get:
+      @@@PerlDef:
+        __CODE{tc|getAttrDefNodeMap::
+          $node => $self,
+          $map => $r,
+        }__;
+
+    @@Test:
+      @@@QName: elementTypeDef.attrDefs.test
+      @@@PerlDef:
+        my $et;
+        __CODE{d|createETDefForTest:: $etdef => $et}__;
+
+        my $as = $et-><AG::ElementTypeDefinition.attributeDefinitions>;
+        $test->assert_isa ($as, <IFName::tc|NamedNodeMap>);
+        $test->assert_num_equals
+                 (actual_value => $as-><AG::tc|NamedNodeMap.length>,
+                  expected_value => 0);
+
+  @Method:
+    @@Name: getAttributeDefinitionNode
+    @@enDesc:
+      Returns the definition for an attribute.
+    @@DOMMain:isNamespaceUnaware: 1
+    @@Param:
+      @@@Name: nameArg
+      @@@Type: DOMString
+      @@@enDesc:
+        The name of the attribute.
+    @@Return:
+      @@@Type: AttributeDefinition
+      @@@enDesc:
+        The attribute definition for <P::nameArg>.
+      @@@nullCase:
+        @@@@enDesc:
+          There is no definition for the attribute <P::nameArg>.
+      @@@PerlDef:
+        my $v;
+        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
+          $r => $v,
+          $prop => {<H::d|attributeDefinitions>},
+          $ref => $self,
+        }__;
+        if (defined $v->{$nameArg}) {
+          __CODE{mg|createNodeRefFromID||ManakaiDOM|all::
+            $bag => {<Code::mg|getNodeBag||ManakaiDOM|all:: $ref = $self>},
+            $stemid => {$v->{$nameArg}},
+            $ref => $r,
+            $opt => {{}},
+          }__;
+        }
+
+    @@Test:
+      @@@PerlDef:
+        my $et;
+        __CODE{d|createETDefForTest:: $etdef => $et}__;
+        my $an = $et-><M::ElementTypeDefinition.getAttributeDefinitionNode>
+                        ('at1');
+        $test->assert_null ($an);
+
+  @Method:
+    @@Name: setAttributeDefinitionNode
+    @@enDesc:
+      Sets an attribute definition to the element
+      definition.
+    @@Param:
+      @@@Name: attrDef
+      @@@Type: AttributeDefinition
+      @@@enDesc:
+        The attribute definition to set.  Its <A::Node.nodeName>
+        attribute is used to set the node.  If it is already
+        in use for other element type, then it is first removed
+        from that element type and then attached to this
+        element type.  If another attribute definition with
+        same <A::Node.nodeName> is attached to this element
+        type definition, that association is removed.
+        
+        If <P::attrDef> is already attached to this element
+        type definition, then this method has no effect.
+    @@Return:
+      @@@Type: AttributeDefinition
+      @@@enDesc:
+        If there is already another attribute definition
+        with the same <A::Node.nodeName> as <P::attrDef>,
+        then that definition node is returned.
+      @@@nullCase:
+        @@@@enDesc:
+          If there is no previous definition with the same
+          name, or the <P::attrDef> is already attached
+          to the element type definition.
+      @@@NodeReadOnlyError:
+      @@@dx:raises:
+        @@@@@: c|INUSE_DEFINITION_ERR
+        @@@@enDesc:
+          If <A::AttributeDefinition.ownerElementTypeDefinition>
+          is not <DOM::null>.
+      @@@dx:raises:
+        @@@@@: c|DIFFERENT_DOCUMENT_ERR
+        @@@@enDesc:
+          The <P::attrDef> node is created from different
+          document than the <A::c|Node.ownerDocument> of
+          the element type definition and the implementation
+          does not support such attribute definition node
+          being attached to the element type definition.
+      @@@PerlDef:
+        __CODE{setDefinitionNodeAttr::
+          $defNode => $attrDef,
+          $defNodeParamName => 'attrDef',
+          $key => {<H::d|attributeDefinitions>},
+        }__;
+    @@Test:
+      @@@PerlDef:
+        my $et;
+        __CODE{d|createETDefForTest:: $etdef => $et}__;
+        my $an = $et-><M::ElementTypeDefinition.getAttributeDefinitionNode>
+                        ('at1');
+        $test->assert_null ($an);
+
+        my $can = $et-><AG::Node.ownerDocument>
+                     -><M::Node.getFeature> (<Q::fe|XDoctype>)
+                     -><M::DocumentXDoctype.createAttributeDefinition> ('at1');
+        $et-><M::ElementTypeDefinition.setAttributeDefinitionNode> ($can);
+
+        my $an2 = $et-><M::ElementTypeDefinition.getAttributeDefinitionNode>
+                         ('at1');
+        $test->assert_not_null ($an2);
+        $test->assert_equals ($an2, $can);
+        $test->assert_string
+                 (actual_value => $an2-><AG::Node.nodeName>,
+                  expected_value => 'at1');
+  
+  @Attr:
+    @@Name: ownerDocumentTypeDefinition
+    @@enDesc:
+      The document type definition node to which
+      the definition is attached.
+    @@Type: DocumentTypeDefinition
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          The definition is not attached to any
+          document type.
+      @@@disDef:
+        @@@@DISPerl:cloneCode:
+          tx|ManakaiDOMNotation.ownerDocumentTypeDefinition.get
+
+    @@Test:
+      @@@PerlDef:
+        my $et;
+        __CODE{d|createETDefForTest:: $etdef => $et}__;
+ 
+        my $odt = $et-><AG::ElementTypeDefinition.ownerDocumentTypeDefinition>;
+        $test->assert_null ($odt);
+
+        my $dt = $et-><AG::Node.ownerDocument>
+                     -><M::Node.getFeature> (<Q::ManakaiDOM:XDoctype>)
+                     -><M::DocumentXDoctype.createDocumentTypeDefinition>
+                         ('dt1');
+        $test->assert_not_null ($dt);
+        $dt-><M::DocumentTypeDefinition.setElementTypeDefinitionNode> ($et);
+
+        my $odt2 = $et-><AG::ElementTypeDefinition
+                            .ownerDocumentTypeDefinition>;
+        $test->assert_not_null ($odt2);
+        $test->assert_isa ($odt2, <IFName::DocumentTypeDefinition>);
+        $test->assert_equals ($odt2, $dt);
 ##ElementTypeDefinition
 
 ForDef:
@@ -4937,52 +5179,65 @@ ResourceDef:
     more desired than <X::c|DOMException.WRONG_DOCUMENT_ERR>.
   
   @PerlDef:
-        my $__aname = $defNode-><AG::Node.nodeName>;
-        my $__n = $self->{<H::mn:node>}->{$key}->{$__aname};
-        SET: {
-          if ($__n and $__n eq $defNode->{<H::mn:node>}) {
-            last SET; # no effect
-          }
-          __CODE{NodeReadOnlyError}__;
-           unless ($defNode-><AG::Node.ownerDocument> eq
-                   $self-><AG::Node.ownerDocument>) {
-             __EXCEPTION{c|DIFFERENT_DOCUMENT_ERR::
-               MDOMX|param-name => {$defNodeParamName},
-               c|node => {$defNode},
-             }__;
-          }
-          my $__owner;
-          __FOR{!ForAttr::
-            $__owner = $defNode-><AG::ElementTypeDefinition
-                                     .ownerDocumentTypeDefinition>;
-          }__;
-          __FOR{ForAttr::
-            $__owner = $defNode-><AG::AttributeDefinition
-                                     .ownerElementTypeDefinition>;
-          }__;
-          if ($__owner) {
-            __EXCEPTION{c|INUSE_DEFINITION_ERR::
-              MDOMX|param-name => {$defNodeParamName},
-              c|node => {$defNode},
-            }__;
-          }
+    my $__aname = $defNode-><AG::Node.nodeName>;
+    my $__list;
+    __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
+      $r => $__list,
+      $prop => $key,
+      $ref => $self,
+    }__;
+    my $__current_node;
+    if (defined $__list->{$__aname}) {
+      __CODE{mg|createNodeRefFromID||ManakaiDOM|all::
+        $bag => {<Code::mg|getNodeBag||ManakaiDOM|all:: $ref = $self>},
+        $stemid => {$__list->{$__aname}},
+        $ref => $__current_node,
+        $opt => {{}},
+      }__;
+    }
+    SET: {
+      if (defined $__current_node and $__current_node eq $defNode) {
+        last SET; # no effect
+      }
+      __CODE{tc|NodeReadOnlyError:: $node => $self}__;
+      unless ($defNode-><AG::Node.ownerDocument>
+                  eq $self-><AG::Node.ownerDocument>) {
+        __EXCEPTION{c|DIFFERENT_DOCUMENT_ERR::
+          MDOMX|param-name => {$defNodeParamName},
+          c|node => {$defNode},
+        }__;
+      }
+      my $__owner;
+      __FOR{!ForAttr::
+        $__owner = $defNode-><AG::ElementTypeDefinition
+                                 .ownerDocumentTypeDefinition>;
+      }__;
+      __FOR{ForAttr::
+        $__owner = $defNode-><AG::AttributeDefinition
+                                 .ownerElementTypeDefinition>;
+      }__;
+      if ($__owner) {
+        __EXCEPTION{c|INUSE_DEFINITION_ERR::
+          MDOMX|param-name => {$defNodeParamName},
+          c|node => {$defNode},
+        }__;
+      }
           
-          if ($__n) {
-            if (defined wantarray) {
-              $r = <ClassM::t|ManakaiDOMNode.getNodeReference> ($__n);
-            }
-            CORE::delete $__n->{<H::d|ownerDefinition>};
-            $__n-><M::NodeStem.orphanate>;
-          }
-          
-          $self->{<H::mn:node>}-><M::NodeStem.importTree>
-                                   ($defNode->{<H::mn:node>});
-          $defNode->{<H::mn:node>}
-                  ->{<H::d|ownerDefinition>}
-            = $self->{<H::mn:node>};
-          $self->{<H::mn:node>}
-               ->{$key}->{$__aname} = $defNode->{<H::mn:node>};
-        } # SET
+      if (defined $__current_node) {
+        __CODE{mg|deleteNodeStemPropValue||ManakaiDOM|all::
+          $prop => {<H::d|ownerDefinition>},
+          $ref => $__current_node,
+        }__;
+      }
+
+      $__list->{$__aname} = <Code::mg|getNodeID||ManakaiDOM|all::
+                                       $ref = $defNode>;
+      __CODE{mg|setNodeStemProp0Node||ManakaiDOM|all::
+        $prop => {<H::d|ownerDefinition>},
+        $ref => $defNode,
+        $given => $self,
+      }__;
+    } # SET
 ##setDefinitionNode
 
 IFClsXDef:
@@ -4992,7 +5247,7 @@ IFClsXDef:
   @IFISA: tc|Node
   @ClsISA: tc|ManakaiDOMNode
   
-  @DISLang:role: c|AttributeRole
+  @DISLang:role: tc|AttributeRole
 
   @f:implements: d|Feature30
   
@@ -5037,9 +5292,35 @@ IFClsXDef:
           $ownee => {$obj},
           $owner0prop => {<H::tc|ownerDocument>},
         }__;
+        $obj->{<H::infoset|children>} = [];
+        $obj->{<H::d|allowedTokens>} = [];
         $r = $obj;
   @mg:owner0: tc|ownerDocument
   @mg:origin0: d|ownerDefinition
+  @mg:subnode1a: infoset|children
+
+  @enImplNote:
+    @@ddid: props
+    @@@:
+      {P:: Required internal properties:
+
+        - <Q::tc|ownerDocument>.
+
+        - <Q::infoset|name>.
+
+        - <Q::d|declaredType>, <Q::d|defaultType>.
+
+        - <Q::infoset|children>, <Q::d|allowedTokens>.
+
+      }
+      
+      {P:: Optional internal properties:
+
+        - <Q::d|ownerDefinition>.
+
+        - <Q::c|read-only>.
+
+      }
 
   @CODE:
     @@QName: d|createATDefForTest
@@ -5048,31 +5329,7 @@ IFClsXDef:
       __CODE{d|createEmptyDocumentXForTest:: $docx => $docx}__;
       $atdef = $docx-><M::DocumentXDoctype.createAttributeDefinition> ('at');
 
-  @ResourceDef:
-    @@ForCheck: ManakaiDOM|ForClass
-    @@QName: newATForTest
-    @@rdf:type: DISPerl|BlockCode
-    @@PerlDef:
-      my $doc;
-      __CODE{newDocumentForTest}__;
-      $at = $doc-><M::DocumentXDoctype.createAttributeDefinition>
-                          ('at1');
-
-  @Test:
-    @@PerlDef:
-      my $at;
-      __CODE{newATForTest}__;
-
-      $test->assert_not_null ($at);
-      $test->assert_isa ($at, <IFName::AttributeDefinition>);
-
-      my $od = $at-><AG::Node.ownerDocument>;
-      $test->assert_not_null ($od);
-      $test->assert_not_null ($od-><M::Node.getFeature>
-                                     (<Q::ManakaiDOM|XDoctype>));
-
-  @Attr:
-    @@ForCheck: ManakaiDOM|ForClass
+  @CAttr:
     @@Name: nodeType
     @@enDesc:
       The type of the node.
@@ -5081,10 +5338,12 @@ IFClsXDef:
     @@Get:
       @@@disDef:
         @@@@DISLang:constValue: Node.ATTRIBUTE_DEFINITION_NODE
+
     @@Test:
+      @@@QName: ATDef.nodeType.test
       @@@PerlDef:
         my $at;
-        __CODE{newATForTest}__;
+        __CODE{d|createATDefForTest:: $atdef => $at}__;
 
         $test->assert_num_equals
                  (actual_value => $at-><AG::Node.nodeType>,
@@ -5153,7 +5412,7 @@ IFClsXDef:
           if ($dt == <C::AttributeDefinition.EXPLICIT_DEFAULT> or
               $dt == <C::AttributeDefinition.FIXED_DEFAULT>) {
             __UNDEEP{
-              __CODE{NodeReadOnlyError}__;
+              __CODE{tc|NodeReadOnlyError:: $node => $self}__;
             }__;
             my @children = @{$self-><AG::Node.childNodes>};
             for my $child (@children) {
@@ -5500,285 +5759,6 @@ IFClsXDef:
 
         $at-><AS::Node.textContent> (null);
         $test->assert_false ($at-><M::Node.hasChildNodes>);
-  
-  @Attr:
-    @@Name: ownerElementTypeDefinition
-    @@enDesc:
-      The element type definition for which
-      the attribute is defined.
-    @@Type: ElementTypeDefinition
-    @@Get:
-      @@@nullCase:
-        @@@@enDesc:
-          If the attribute definition is not associated
-          with any element type.
-      @@@disDef:
-        @@@@GetPropNode: d|ownerDefinition
-    @@Test:
-      @@@QName: 
-        ManakaiDOMAttributeDefinition.ownerElementTypeDefinition.get.test
-      @@@PerlDef:
-        my $at;
-        __CODE{newATForTest}__;
-        my $doc = $at-><AG::Node.ownerDocument>
-                     -><M::Node.getFeature> (<Q::ManakaiDOM|XDoctype>);
-
-        $test->assert_null
-                 ($at-><AG::AttributeDefinition.ownerElementTypeDefinition>);
-
-        my $et = $doc-><M::DocumentXDoctype.createElementTypeDefinition>
-                         ('et1');
-        $et-><M::ElementTypeDefinition.setAttributeDefinitionNode> ($at);
-        
-        $test->assert_equals
-                 ($at-><AG::AttributeDefinition.ownerElementTypeDefinition>,
-                  $et);
-
-        $test->assert_isa
-                 ($at-><AG::AttributeDefinition.ownerElementTypeDefinition>,
-                  <IFName::ElementTypeDefinition>);
-  
-  @ShortConstGroup:
-    @@IFQName: DeclaredValueType
-    @@enDesc:
-      An integer that indicates the type of
-      attribute value.
-    
-    @@Const:
-      @@@Name: NO_TYPE_ATTR
-      @@@intValue: 0
-      @@@enDesc:
-        The attribute value type is <QUOTE::no value> (see XML Infoset).
-    @@Const:
-      @@@Name: CDATA_ATTR
-      @@@intValue: 1
-      @@@enDesc:
-        The attribute value type is <XML::CDATA>.
-    @@Const:
-      @@@Name: ID_ATTR
-      @@@intValue: 2
-      @@@enDesc:
-        The attribute value type is <XML::ID>.
-    @@Const:
-      @@@Name: IDREF_ATTR
-      @@@intValue: 3
-      @@@enDesc:
-        The attribute value type is <XML::IDREF>.
-    @@Const:
-      @@@Name: IDREFS_ATTR
-      @@@intValue: 4
-      @@@enDesc:
-        The attribute value type is <XML::IDREFS>.
-    @@Const:
-      @@@Name: ENTITY_ATTR
-      @@@intValue: 5
-      @@@enDesc:
-        The attribute value type is <XML::ENTITY>;
-    @@Const:
-      @@@Name: ENTITIES_ATTR
-      @@@intValue: 6
-      @@@enDesc:
-        The attribute value type is <XML::ENTITIES>.
-    @@Const:
-      @@@Name: NMTOKEN_ATTR
-      @@@intValue: 7
-      @@@enDesc:
-        The attribute value type is <XML::NMTOKEN>.
-    @@Const:
-      @@@Name: NMTOKENS_ATTR
-      @@@intValue: 8
-      @@@enDesc:
-        The attribute value type is <XML::NMTOKENS>.
-    @@Const:
-      @@@Name: NOTATION_ATTR
-      @@@intValue: 9
-      @@@enDesc:
-        The attribute value is <XML::NOTATION> enumerated
-        type.
-    @@Const:
-      @@@Name: ENUMERATION_ATTR
-      @@@intValue: 10
-      @@@enDesc:
-        The attribute value is enumuration type.
-    @@Const:
-      @@@Name: UNKNOWN_ATTR
-      @@@intValue: 11
-      @@@enDesc:
-        The attribute value is unknown, because no declaration
-        for the attribute has been read but not <InfoProp::all declareations
-        processed>.
-  
-  @Attr:
-    @@Name: declaredType
-    @@enDesc:
-      The type of attribute value.
-    @@Type: idl|unsignedShort||ManakaiDOM|all
-    @@dis:actualType: DeclaredValueType
-    @@Get:
-      @@@disDef:
-        @@@@GetProp: d|declaredType
-    @@Set:
-      @@@NodeReadOnlyError:
-      @@@disDef:
-        @@@@SetProp:
-          @@@@@@: d|declaredType
-          @@@@@CheckReadOnly: 1
-    @@Test:
-      @@@QName: 
-        ManakaiDOMAttributeDefinition.declaredType.test
-      @@@PerlDef:
-        my $at;
-        __CODE{newATForTest}__;
-
-        $test->assert_num_equals
-                 (actual_value => $at-><AG::AttributeDefinition.defaultType>,
-                  expected_value => <C::AttributeDefinition.NO_TYPE_ATTR>);
-
-        $at-><AS::AttributeDefinition.defaultType>
-               (<C::AttributeDefinition.ID_ATTR>);
-        $test->assert_num_equals
-                 (actual_value => $at-><AG::AttributeDefinition.defaultType>,
-                  expected_value => <C::AttributeDefinition.ID_ATTR>);
-
-  @ShortConstGroup:
-    @@IFQName: DefaultValueType
-    @@enDesc:
-      An integer indicating the type of default value.
-    
-    @@Const:
-      @@@Name: UNKNOWN_DEFAULT
-      @@@intValue: 0
-      @@@enDesc:
-        The default value is unknown.
-    @@Const:
-      @@@Name: FIXED_DEFAULT
-      @@@intValue: 1
-      @@@enDesc:
-        The default value is <XML::#FIXED>.
-    @@Const:
-      @@@Name: REQUIRED_DEFAULT
-      @@@intValue: 2
-      @@@enDesc:
-        An attribute specification is required
-        for the attribute.
-    @@Const:
-      @@@Name: IMPLIED_DEFAULT
-      @@@intValue: 3
-      @@@enDesc:
-        The default value is <XML::#IMPLIED>.
-    @@Const:
-      @@@Name: EXPLICIT_DEFAULT
-      @@@intValue: 4
-      @@@enDesc:
-        An explicit but not fixed default value
-        is provided.
-  
-  @Attr:
-    @@Name: defaultType
-    @@enDesc:
-      The type of attribute default value.
-    @@Type: idl|unsignedShort||ManakaiDOM|all
-    @@dis:actualType: DefaultValueType
-    @@Get:
-      @@@disDef:
-        @@@@GetProp: d|defaultType
-    @@Set:
-      @@@NodeReadOnlyError:
-      @@@disDef:
-        @@@@SetProp:
-          @@@@@@: d|defaultType
-          @@@@@CheckReadOnly: 1
-    @@Test:
-      @@@QName: 
-        ManakaiDOMAttributeDefinition.defaultType.test
-      @@@PerlDef:
-        my $at;
-        __CODE{newATForTest}__;
-
-        $test->assert_num_equals
-                 (actual_value => $at-><AG::AttributeDefinition.defaultType>,
-                  expected_value => <C::AttributeDefinition.UNKNOWN_DEFAULT>);
-
-        $at-><AS::AttributeDefinition.defaultType>
-               (<C::AttributeDefinition.EXPLICIT_DEFAULT>);
-        $test->assert_num_equals
-                 (actual_value => $at-><AG::AttributeDefinition.defaultType>,
-                  expected_value => <C::AttributeDefinition.EXPLICIT_DEFAULT>);
-
-  @Attr:
-    @@Name: allowedTokens
-    @@enDesc:
-      The live list of the allowed tokens for the
-      attribute.
-      
-      The list <kwd:MAY> be empty even if 
-      the <A::Attribute.declaredType> is 
-      <C::AttributeDefinition.NOTATION_ATTR> or
-      <C::AttributeDefinition.ENUMERATION_ATTR>.
-      Then, validation using this definition never
-      success.
-      
-      The list <kwd:MAY> be non-empty even if 
-      the <A::Attribute.declaredType> is different
-      from <C::AttributeDefinition.NOTATION_ATTR> or
-      <C::AttributeDefinition.ENUMERATION_ATTR>.  This
-      attribute is ignored for the purposes of
-      e,g, validation and serialization in such cases.
-      
-      The list <kwd:MAY> contain a string that does
-      not match to the production <CODE::Name> or
-      <CODE::Nmtoken>.
-      
-      The list <kwd:MAY> contain duplications.
-      
-      The result of processing using the attribute
-      definition, e.g. validation or serialization,
-      is implementation dependent unless otherwise specified
-      if one or more errors defined above is detected.
-      That is, implementations <kwd:MAY> ignore erroreous
-      value, <kwd:MAY> validate a value that is actually
-      invalid, <kwd:MAY> report an error by <IF::c|DOMError>,
-      or <kwd:MAY> choose any other possible error
-      recovery method.  However, it <kwd:MUST> recover
-      from the error gracefully.  Note that the validation
-      of the attribute definition itself is not a case.
-      For example, dupulication of values must be
-      reported as a validity constraint violation by
-      validity checker for the attribute definition.
-    @@Type: c|DOMStringList
-    @@Get:
-      @@@PerlDef:
-        __CODE{d|getRef::
-          $object => {$self->{<H::mn:node>}},
-          $ref => {$r},
-          $class => {<ClassName::c|ManakaiDOMStringList>},
-        }__;
-        $r->{<H::c|key>} = <H::d|allowedTokens>;
-    @@Test:
-      @@@QName: 
-        ManakaiDOMAttributeDefinition.allowedTokens.get.test
-      @@@PerlDef:
-        my $at;
-        __CODE{newATForTest}__;
-
-        my $list = $at-><AG::AttributeDefinition.allowedTokens>;
-        $test->assert_not_null ($list);
-        $test->assert_isa ($list, <IFName::c|DOMStringList>);
-
-        $test->assert_num_equals
-                 (actual_value => 0 + @$list,
-                  expected_value => 0);
-      
-        push @$list, 'NMTOKEN1';
-        $test->assert_string
-                 (actual_value => $list->[0],
-                  expected_value => 'NMTOKEN1');
-        undef $list;
-
-        my $list2 = $at-><AG::AttributeDefinition.allowedTokens>;
-        $test->assert_string
-                 (actual_value => $list2->[0],
-                  expected_value => 'NMTOKEN1');
 
   @CAttr:
     @@Name: baseURI
@@ -5802,7 +5782,7 @@ IFClsXDef:
       @@@QName: ATDef.baseURI.test
       @@@PerlDef:
         my $et;
-        __CODE{newATForTest:: $at => $et}__;
+        __CODE{d|createATDefForTest:: $atdef => $et}__;
  
         my $doc = $et-><AG::Node.ownerDocument>;
  
@@ -6070,11 +6050,6 @@ IFClsXDef:
         $test->id ('child.item.equals');
         $test->assert_equals ($item, $pi);
 
-        $test->id ('treeid');
-        $test->assert_equals
-                 ($item->{<H::mn|node>}->{<H::mn|treeID>},
-                  $dtd->{<H::mn|node>}->{<H::mn|treeID>});
-
         $test->id ('firstChild');
         $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
 
@@ -6116,11 +6091,6 @@ IFClsXDef:
 
         $test->id ('child.item.equals');
         $test->assert_equals ($item, $pi);
-
-        $test->id ('treeid');
-        $test->assert_equals
-                 ($item->{<H::mn|node>}->{<H::mn|treeID>},
-                  $dtd->{<H::mn|node>}->{<H::mn|treeID>});
 
         $test->id ('firstChild');
         $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
@@ -6164,11 +6134,6 @@ IFClsXDef:
         $test->id ('child.item.equals');
         $test->assert_equals ($item, $pi);
 
-        $test->id ('treeid');
-        $test->assert_equals
-                 ($item->{<H::mn|node>}->{<H::mn|treeID>},
-                  $dtd->{<H::mn|node>}->{<H::mn|treeID>});
-
         $test->id ('firstChild');
         $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
 
@@ -6210,11 +6175,6 @@ IFClsXDef:
 
         $test->id ('child.item.equals');
         $test->assert_equals ($item, $pi);
-
-        $test->id ('treeid');
-        $test->assert_equals
-                 ($item->{<H::mn|node>}->{<H::mn|treeID>},
-                  $dtd->{<H::mn|node>}->{<H::mn|treeID>});
 
         $test->id ('firstChild');
         $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
@@ -6261,11 +6221,6 @@ IFClsXDef:
 
         $test->id ('child.item.equals');
         $test->assert_equals ($item, $pi);
-
-        $test->id ('treeid');
-        $test->assert_equals
-                 ($item->{<H::mn|node>}->{<H::mn|treeID>},
-                  $dtd->{<H::mn|node>}->{<H::mn|treeID>});
 
         $test->id ('firstChild');
         $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
@@ -6318,11 +6273,6 @@ IFClsXDef:
         $test->id ('child.item.equals');
         $test->assert_equals ($item, $pi);
 
-        $test->id ('treeid');
-        $test->assert_equals
-                 ($item->{<H::mn|node>}->{<H::mn|treeID>},
-                  $dtd->{<H::mn|node>}->{<H::mn|treeID>});
-
         $test->id ('firstChild');
         $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
 
@@ -6374,11 +6324,6 @@ IFClsXDef:
         $test->id ('child.item.equals');
         $test->assert_equals ($item, $pi);
 
-        $test->id ('treeid');
-        $test->assert_equals
-                 ($item->{<H::mn|node>}->{<H::mn|treeID>},
-                  $dtd->{<H::mn|node>}->{<H::mn|treeID>});
-
         $test->id ('firstChild');
         $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
 
@@ -6429,11 +6374,6 @@ IFClsXDef:
 
         $test->id ('child.item.equals');
         $test->assert_equals ($item, $pi);
-
-        $test->id ('treeid');
-        $test->assert_equals
-                 ($item->{<H::mn|node>}->{<H::mn|treeID>},
-                  $dtd->{<H::mn|node>}->{<H::mn|treeID>});
 
         $test->id ('firstChild');
         $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
@@ -6487,11 +6427,6 @@ IFClsXDef:
         $test->id ('child.item.equals');
         $test->assert_equals ($item, $pi);
 
-        $test->id ('treeid');
-        $test->assert_equals
-                 ($item->{<H::mn|node>}->{<H::mn|treeID>},
-                  $dtd->{<H::mn|node>}->{<H::mn|treeID>});
-
         $test->id ('firstChild');
         $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
 
@@ -6542,11 +6477,6 @@ IFClsXDef:
 
         $test->id ('child.item.equals');
         $test->assert_equals ($item, $pi);
-
-        $test->id ('treeid');
-        $test->assert_equals
-                 ($item->{<H::mn|node>}->{<H::mn|treeID>},
-                  $dtd->{<H::mn|node>}->{<H::mn|treeID>});
 
         $test->id ('firstChild');
         $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
@@ -6599,11 +6529,6 @@ IFClsXDef:
         $test->id ('child.item.equals');
         $test->assert_equals ($item, $pi);
 
-        $test->id ('treeid');
-        $test->assert_equals
-                 ($item->{<H::mn|node>}->{<H::mn|treeID>},
-                  $dtd->{<H::mn|node>}->{<H::mn|treeID>});
-
         $test->id ('firstChild');
         $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
 
@@ -6654,11 +6579,6 @@ IFClsXDef:
 
         $test->id ('child.item.equals');
         $test->assert_equals ($item, $pi);
-
-        $test->id ('treeid');
-        $test->assert_equals
-                 ($item->{<H::mn|node>}->{<H::mn|treeID>},
-                  $dtd->{<H::mn|node>}->{<H::mn|treeID>});
 
         $test->id ('firstChild');
         $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
@@ -6713,11 +6633,6 @@ IFClsXDef:
         $test->id ('child.item.equals');
         $test->assert_equals ($item, $pi);
 
-        $test->id ('treeid');
-        $test->assert_equals
-                 ($item->{<H::mn|node>}->{<H::mn|treeID>},
-                  $dtd->{<H::mn|node>}->{<H::mn|treeID>});
-
         $test->id ('firstChild');
         $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
 
@@ -6770,11 +6685,6 @@ IFClsXDef:
 
         $test->id ('child.item.equals');
         $test->assert_equals ($item, $pi);
-
-        $test->id ('treeid');
-        $test->assert_equals
-                 ($item->{<H::mn|node>}->{<H::mn|treeID>},
-                  $dtd->{<H::mn|node>}->{<H::mn|treeID>});
 
         $test->id ('firstChild');
         $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
@@ -6941,19 +6851,6 @@ IFClsXDef:
         $test->id ('child.item.equals3');
         $test->assert_equals ($item3, $pi3);
 
-        $test->id ('treeid');
-        $test->assert_equals
-                 ($item->{<H::mn|node>}->{<H::mn|treeID>},
-                  $dtd->{<H::mn|node>}->{<H::mn|treeID>});
-        $test->id ('treeid2');
-        $test->assert_equals
-                 ($item2->{<H::mn|node>}->{<H::mn|treeID>},
-                  $dtd->{<H::mn|node>}->{<H::mn|treeID>});
-        $test->id ('treeid3');
-        $test->assert_equals
-                 ($item3->{<H::mn|node>}->{<H::mn|treeID>},
-                  $dtd->{<H::mn|node>}->{<H::mn|treeID>});
-
         $test->id ('firstChild');
         $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
 
@@ -7030,19 +6927,6 @@ IFClsXDef:
         $test->assert_equals ($item2, $pi2);
         $test->id ('child.item.equals3');
         $test->assert_equals ($item3, $pi3);
-
-        $test->id ('treeid');
-        $test->assert_equals
-                 ($item->{<H::mn|node>}->{<H::mn|treeID>},
-                  $dtd->{<H::mn|node>}->{<H::mn|treeID>});
-        $test->id ('treeid2');
-        $test->assert_equals
-                 ($item2->{<H::mn|node>}->{<H::mn|treeID>},
-                  $dtd->{<H::mn|node>}->{<H::mn|treeID>});
-        $test->id ('treeid3');
-        $test->assert_equals
-                 ($item3->{<H::mn|node>}->{<H::mn|treeID>},
-                  $dtd->{<H::mn|node>}->{<H::mn|treeID>});
 
         $test->id ('firstChild');
         $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
@@ -7122,19 +7006,6 @@ IFClsXDef:
         $test->assert_equals ($item2, $pi2);
         $test->id ('child.item.equals3');
         $test->assert_equals ($item3, $pi3);
-
-        $test->id ('treeid');
-        $test->assert_equals
-                 ($item->{<H::mn|node>}->{<H::mn|treeID>},
-                  $dtd->{<H::mn|node>}->{<H::mn|treeID>});
-        $test->id ('treeid2');
-        $test->assert_equals
-                 ($item2->{<H::mn|node>}->{<H::mn|treeID>},
-                  $dtd->{<H::mn|node>}->{<H::mn|treeID>});
-        $test->id ('treeid3');
-        $test->assert_equals
-                 ($item3->{<H::mn|node>}->{<H::mn|treeID>},
-                  $dtd->{<H::mn|node>}->{<H::mn|treeID>});
 
         $test->id ('firstChild');
         $test->assert_equals ($dtd-><AG::Node.firstChild>, $pi);
@@ -7269,7 +7140,7 @@ IFClsXDef:
         my $dtd = $docx-><M::DocumentXDoctype.createAttributeDefinition> ('d');
         my $pi0 = $doc-><M::Document.createTextNode> ('pi0');
         $dtd-><M::Node.appendChild> ($pi0);
-        $dtd->{<H::mn|node>}->{<H::c|read-only>} = true;
+        $dtd-><M::Node.manakaiReadOnly> (true);
 
         $test->id ('pi');
         my $node = $doc-><M::Document.createTextNode> ('pi');
@@ -7321,7 +7192,7 @@ IFClsXDef:
         my $el = $doc-><M::Document.createElementNS> (null, 'e');
         my $node = $doc-><M::Document.createTextNode> ('pi');
         $el-><M::Node.appendChild> ($node);
-        $el->{<H::mn|node>}->{<H::c|read-only>} = true;
+        $el-><M::Node.manakaiReadOnly> (true);
 
         $test->assert_exception (code => sub {
           $dtd-><M::Node.appendChild> ($node);
@@ -7341,7 +7212,7 @@ IFClsXDef:
         my $node2 = $doc-><M::Document.createDocumentFragment>;
         my $node3 = $doc-><M::Document.createTextNode> ('pi');
         $node2-><M::Node.appendChild> ($node3);
-        $node2->{<H::mn|node>}->{<H::c|read-only>} = true;
+        $node2-><M::Node.manakaiReadOnly> (true);
 
         $test->assert_exception (code => sub {
           $dtd-><M::Node.appendChild> ($node2);
@@ -8073,31 +7944,6 @@ IFClsXDef:
                  (expected_value => 3,
                   actual_value => 0+@{$node-><AG::Node.childNodes>});
 
-  @Method:
-    @@ForCheck: ManakaiDOM|ForClass
-    @@ManakaiDOM:isForInternal: 1
-    @@Name: newObject
-    @@NewObjectRefNodeParam:
-    @@Return:
-      @@@Type: NodeStem
-      @@@PerlDef:
-        $r = <ClassM::t|ManakaiDOMNode.newObject> ($self, $refNode);
-        $r->{<H::c|nodeType>} = <H::d|AttributeDefinitionNodeType>;
-        $r->{<H::d|allowedTokens>} = [];
-        $r->{<H::infoset:children>} = [];
-    @@enImplNote:
-      Required properties:
-        <Q::c|nodeType>, <Q::c|ownerDocument>,
-        <Q::c|name>, <Q::d|declaredType>, <Q::d|allowedTokens>,
-        <Q::d|defaultType>, <Q::infoset:children>.
-      
-      Optional properties:
-        <Q::c|read-only>,
-        <Q::d|ownerDefinition>.
-  @mn:xrefnode0: c|ownerDocument
-  @mn:origin0: d|ownerDefinition
-  @mn:subnode1: infoset|children
-
   @CMethod:
     @@Name: getFeature
     @@enDesc:
@@ -8145,17 +7991,331 @@ IFClsXDef:
           my $sp = $node-><M::Node.getFeature> ($_->[0], $_->[1]);
           $test->assert_isa ($sp, $_->[2]);
         }
+  
+  @Attr:
+    @@Name: ownerElementTypeDefinition
+    @@enDesc:
+      The element type definition for which
+      the attribute is defined.
+    @@Type: ElementTypeDefinition
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          If the attribute definition is not associated
+          with any element type.
+      @@@disDef:
+        @@@@DISPerl:cloneCode: 
+          tx|ManakaiDOMNotation.ownerDocumentTypeDefinition.get
+
+    @@Test:
+      @@@QName: 
+        ManakaiDOMAttributeDefinition.ownerElementTypeDefinition.get.test
+      @@@PerlDef:
+        my $at;
+        __CODE{d|createATDefForTest:: $atdef => $at}__;
+        my $doc = $at-><AG::Node.ownerDocument>
+                     -><M::Node.getFeature> (<Q::ManakaiDOM|XDoctype>);
+
+        $test->assert_null
+                 ($at-><AG::AttributeDefinition.ownerElementTypeDefinition>);
+
+        my $et = $doc-><M::DocumentXDoctype.createElementTypeDefinition>
+                         ('et1');
+        $et-><M::ElementTypeDefinition.setAttributeDefinitionNode> ($at);
+        
+        $test->assert_equals
+                 ($at-><AG::AttributeDefinition.ownerElementTypeDefinition>,
+                  $et);
+
+        $test->assert_isa
+                 ($at-><AG::AttributeDefinition.ownerElementTypeDefinition>,
+                  <IFName::ElementTypeDefinition>);
+  
+  @ShortConstGroup:
+    @@IFQName: DeclaredValueType
+    @@enDesc:
+      An integer that indicates the type of
+      attribute value.
+    
+    @@Const:
+      @@@Name: NO_TYPE_ATTR
+      @@@intValue: 0
+      @@@enDesc:
+        The attribute value type is <QUOTE::no value> (see XML Infoset).
+
+        If no attribute type information is provided, or
+        if the source of that information does not distingulish
+        <QUOTE::no value> and <QUOTE::unknown>, then the
+        <C::AttributeDefinition.NO_TYPE_ATTR> value <kwd:MUST> be used.
+    @@Const:
+      @@@Name: CDATA_ATTR
+      @@@intValue: 1
+      @@@enDesc:
+        The attribute value type is <XML::CDATA>.
+
+        If the source of the attribute type information does not
+        distingulish <QUOTE::no value> and / or <QUOTE::unknown>
+        and <XML::CDATA>, then the <C::AttributeDefinition.CDATA_ATTR>
+        value <kwd:MUST> be used.
+    @@Const:
+      @@@Name: ID_ATTR
+      @@@intValue: 2
+      @@@enDesc:
+        The attribute value type is <XML::ID>.
+    @@Const:
+      @@@Name: IDREF_ATTR
+      @@@intValue: 3
+      @@@enDesc:
+        The attribute value type is <XML::IDREF>.
+    @@Const:
+      @@@Name: IDREFS_ATTR
+      @@@intValue: 4
+      @@@enDesc:
+        The attribute value type is <XML::IDREFS>.
+    @@Const:
+      @@@Name: ENTITY_ATTR
+      @@@intValue: 5
+      @@@enDesc:
+        The attribute value type is <XML::ENTITY>;
+    @@Const:
+      @@@Name: ENTITIES_ATTR
+      @@@intValue: 6
+      @@@enDesc:
+        The attribute value type is <XML::ENTITIES>.
+    @@Const:
+      @@@Name: NMTOKEN_ATTR
+      @@@intValue: 7
+      @@@enDesc:
+        The attribute value type is <XML::NMTOKEN>.
+    @@Const:
+      @@@Name: NMTOKENS_ATTR
+      @@@intValue: 8
+      @@@enDesc:
+        The attribute value type is <XML::NMTOKENS>.
+    @@Const:
+      @@@Name: NOTATION_ATTR
+      @@@intValue: 9
+      @@@enDesc:
+        The attribute value is <XML::NOTATION> enumerated
+        type.
+    @@Const:
+      @@@Name: ENUMERATION_ATTR
+      @@@intValue: 10
+      @@@enDesc:
+        The attribute value is enumuration type.
+    @@Const:
+      @@@Name: UNKNOWN_ATTR
+      @@@intValue: 11
+      @@@enDesc:
+        The attribute value is unknown, because no declaration
+        for the attribute has been read but not <InfoProp::all declareations
+        processed>.
+  
+  @Attr:
+    @@Name: declaredType
+    @@enDesc:
+      The type of attribute value.
+    @@Type: idl|unsignedShort||ManakaiDOM|all
+    @@dis:actualType: DeclaredValueType
+    @@Get:
+      @@@PerlDef:
+        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
+          $r => $r,
+          $prop => {<H::d|declaredType>},
+          $ref => $self,
+        }__;
+    @@Set:
+      @@@NodeReadOnlyError:
+      @@@PerlDef:
+        __CODE{tc|NodeReadOnlyError:: $node => $self}__;
+        __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
+          $given => $given,
+          $prop => {<H::d|declaredType>},
+          $ref => $self,
+        }__;
+
+    @@Test:
+      @@@QName: 
+        ManakaiDOMAttributeDefinition.declaredType.test
+      @@@PerlDef:
+        my $at;
+        __CODE{d|createATDefForTest:: $atdef => $at}__;
+
+        $test->assert_num_equals
+                 (actual_value => $at-><AG::AttributeDefinition.defaultType>,
+                  expected_value => <C::AttributeDefinition.NO_TYPE_ATTR>);
+
+        $at-><AS::AttributeDefinition.defaultType>
+               (<C::AttributeDefinition.ID_ATTR>);
+        $test->assert_num_equals
+                 (actual_value => $at-><AG::AttributeDefinition.defaultType>,
+                  expected_value => <C::AttributeDefinition.ID_ATTR>);
+
+  @ShortConstGroup:
+    @@IFQName: DefaultValueType
+    @@enDesc:
+      An integer indicating the type of default value.
+    
+    @@Const:
+      @@@Name: UNKNOWN_DEFAULT
+      @@@intValue: 0
+      @@@enDesc:
+        The default value is unknown.
+    @@Const:
+      @@@Name: FIXED_DEFAULT
+      @@@intValue: 1
+      @@@enDesc:
+        The default value is <XML::#FIXED>.
+    @@Const:
+      @@@Name: REQUIRED_DEFAULT
+      @@@intValue: 2
+      @@@enDesc:
+        An attribute specification is required
+        for the attribute.
+    @@Const:
+      @@@Name: IMPLIED_DEFAULT
+      @@@intValue: 3
+      @@@enDesc:
+        The default value is <XML::#IMPLIED>.
+
+        If the source of the attribute default value type does
+        not distingulish the <XML::#IMPLIED> default and
+        unknown default, then the <C::AttributeDefinition.IMPLIED_DEFAULT>
+        value <kwd:MUST> be used.
+    @@Const:
+      @@@Name: EXPLICIT_DEFAULT
+      @@@intValue: 4
+      @@@enDesc:
+        An explicit but not fixed default value
+        is provided.
+  
+  @Attr:
+    @@Name: defaultType
+    @@enDesc:
+      The type of attribute default value.
+    @@Type: idl|unsignedShort||ManakaiDOM|all
+    @@dis:actualType: DefaultValueType
+    @@Get:
+      @@@PerlDef:
+        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
+          $r => $r,
+          $prop => {<H::d|defaultType>},
+          $ref => $self,
+        }__;
+    @@Set:
+      @@@NodeReadOnlyError:
+      @@@PerlDef:
+        __CODE{tc|NodeReadOnlyError:: $node => $self}__;
+        __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
+          $given => $given,
+          $prop => {<H::d|defaultType>},
+          $ref => $self,
+        }__;
+
+    @@Test:
+      @@@QName: 
+        ManakaiDOMAttributeDefinition.defaultType.test
+      @@@PerlDef:
+        my $at;
+        __CODE{d|createATDefForTest:: $atdef => $at}__;
+
+        $test->assert_num_equals
+                 (actual_value => $at-><AG::AttributeDefinition.defaultType>,
+                  expected_value => <C::AttributeDefinition.UNKNOWN_DEFAULT>);
+
+        $at-><AS::AttributeDefinition.defaultType>
+               (<C::AttributeDefinition.EXPLICIT_DEFAULT>);
+        $test->assert_num_equals
+                 (actual_value => $at-><AG::AttributeDefinition.defaultType>,
+                  expected_value => <C::AttributeDefinition.EXPLICIT_DEFAULT>);
+
+  @Attr:
+    @@Name: allowedTokens
+    @@enDesc:
+      The live list of the allowed tokens for the
+      attribute.
+      
+      The list <kwd:MAY> be empty even if 
+      the <A::Attribute.declaredType> is 
+      <C::AttributeDefinition.NOTATION_ATTR> or
+      <C::AttributeDefinition.ENUMERATION_ATTR>.
+      Then, validation using this definition never
+      success.
+      
+      The list <kwd:MAY> be non-empty even if 
+      the <A::Attribute.declaredType> is different
+      from <C::AttributeDefinition.NOTATION_ATTR> or
+      <C::AttributeDefinition.ENUMERATION_ATTR>.  This
+      attribute is ignored for the purposes of
+      e,g, validation and serialization in such cases.
+      
+      The list <kwd:MAY> contain a string that does
+      not match to the production <CODE::Name> or
+      <CODE::Nmtoken>.
+      
+      The list <kwd:MAY> contain duplications.
+      
+      The result of processing using the attribute
+      definition, e.g. validation or serialization,
+      is implementation dependent unless otherwise specified
+      if one or more errors defined above is detected.
+      That is, implementations <kwd:MAY> ignore erroreous
+      value, <kwd:MAY> validate a value that is actually
+      invalid, <kwd:MAY> report an error by <IF::c|DOMError>,
+      or <kwd:MAY> choose any other possible error
+      recovery method.  However, it <kwd:MUST> recover
+      from the error gracefully.  Note that the validation
+      of the attribute definition itself is not a case.
+      For example, dupulication of values must be
+      reported as a validity constraint violation by
+      validity checker for the attribute definition.
+    @@Type: c|DOMStringList
+    @@Get:
+      @@@PerlDef:
+        __CODE{c|createNodeDOMStringList::
+          $node => $self, $r => $r,
+          $key => {<H::d|allowedTokens>},
+        }__;
+
+    @@Test:
+      @@@QName: 
+        ManakaiDOMAttributeDefinition.allowedTokens.get.test
+      @@@PerlDef:
+        my $at;
+        __CODE{d|createATDefForTest:: $atdef => $at}__;
+
+        my $list = $at-><AG::AttributeDefinition.allowedTokens>;
+        $test->assert_not_null ($list);
+        $test->assert_isa ($list, <IFName::c|DOMStringList>);
+
+        $test->assert_num_equals
+                 (actual_value => 0 + @$list,
+                  expected_value => 0);
+      
+        push @$list, 'NMTOKEN1';
+        $test->assert_string
+                 (actual_value => $list->[0],
+                  expected_value => 'NMTOKEN1');
+        undef $list;
+
+        my $list2 = $at-><AG::AttributeDefinition.allowedTokens>;
+        $test->assert_string
+                 (actual_value => $list2->[0],
+                  expected_value => 'NMTOKEN1');
+
+  @IntMethod:
+    @@Name: checkReadOnly
+    @@enDesc:
+      Throws an exception if the node is read-only.
+
+        {NOTE::
+          This method is provided for <IF::c|DOMStringList>.
+        }
+    @@Return:
+      @@@NodeReadOnlyError:
+      @@@PerlDef:
+        __CODE{tc|NodeReadOnlyError:: $node => $self}__;
 ##AttributeDefinition
-
-ResourceDef:
-  @For: =ManakaiDOM|all
-  @QName: d|ElementTypeDefinitionNodeType
-  @rdf:type: rdfs|Resource
-
-ResourceDef:
-  @For: =ManakaiDOM|all
-  @QName: d|AttributeDefinitionNodeType
-  @rdf:type: rdfs|Resource
 
 PropDef:
   @QName: d|allowedTokens
@@ -8166,27 +8326,6 @@ ElementTypeBinding:
     dis:Value
   @ShadowContent:
     @@ContentType: DISCore|Integer
-
-ElementTypeBinding:
-  @Name: NewObjectRefNodeParam
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@Name: refNode
-    @@Type: NodeStem
-    @@Description:
-      @@@lang:en
-      @@@@:
-        A node from the tree to which the new node will belong.
-    @@rdf:type: DISLang|MethodParameter
-    @@ResourceDef:
-      @@@rdf:type: ManakaiDOM|InCase
-      @@@Value:
-        @@@@is-null:1
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          The node belongs to a new tree.
 
 ElementTypeBinding:
   @Name: enImplNote
@@ -8271,9 +8410,4 @@ ResourceDef:
 ResourceDef:
   @QName: PI
   @AliasFor: tx|ProcessingInstruction
-  @For: ManakaiDOM|DOM
-
-ResourceDef:
-  @QName: EntRef
-  @AliasFor: tx|EntityReference
   @For: ManakaiDOM|DOM
