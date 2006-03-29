@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/03/17 08:06:21 $
+      $Date: 2006/03/29 15:43:43 $
     @@ContentType:
       dis:Date.RCS
   
@@ -129,6 +129,10 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2005/5/script#
   @swcfg21:
     http://suika.fam.cx/~wakaba/archive/2005/swcfg21#
+  @tc:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/TreeCore/
+  @tx:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/XML/
   @Util:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/
 
@@ -5934,7 +5938,7 @@ TMethods:
 
                 my %ifeature;
                 my $ifpoint = 0;
-                my %fdup; # Check dupulication
+                my %fdup; # Check duplications
                 FI: for my $feature (@{$cls-><M::DIS|DISResourceProp
                           .getPropertyResourceList>
                              (<Q::f:implements>,
@@ -5947,19 +5951,15 @@ TMethods:
                                         .getPropertyText>
                                         (<Q::dis:Version>, null);
                   $ifpoint += $fver;
-                  my $fi = defined $fver
-                         ? $self-><M::DISResourcePerlModule
-                                     .plIsFeatureImplemented>
-                                           ($feature->{uri}) ? true : false
-                         : true;
                   for my $fname (@{$feature-><AG::DIS|DISResource
                                                  .featureNameList>}) {
-                    $ifeature{$fname}->{$fver} = $fi;
+                    $ifeature{$fname}->{$fver} = true;
                     $ifeature{$fname}->{''} = true;
                   }                  
                 } # FI
                 $r-><M::DIS|PLBlockCon.appendStatement>
-                      ('$Message::DOM::ClassFeature{q<' . $pack_name .
+                      ('$Message::DOM::DOMFeature::ClassInfo'.
+                       '->{has_feature}->{q<' . $pack_name .
                        '>} = ' . <ClassM::PLImplClass.perlLiteral> (\%ifeature));
 
                 ## TODO: Features from implementing interfaces.
@@ -5996,7 +5996,7 @@ TMethods:
                   
                   ## Node
                   if ($role-><M::DIS|DISResource.isSubsetOfURI>
-                                (<Q::DOMCore:ElementRole>)) {
+                                (<Q::tc|ElementRole>)) {
                     my $for_specific_et;
                     for my $et (@{$cls-><M::DIS|DISResourceProp
                           .getPropertyResourceList>
@@ -6011,17 +6011,19 @@ TMethods:
                       $ns = '' unless defined $ns;
                         ## ISSUE: Is NULL-namespace should be allowed here?
                       $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::DOM::ManakaiDOMElement' .
-                           '::CompatClassET{q<' . $ns . '>}->{q<' . $ln .
-                           '>}->{q<' . $pack_name . '>} = 1');
+                          ('$Message::DOM::DOMFeature::ClassInfo->{' .
+                           'q<Message::DOM::TreeCore::ManakaiDOMElement>'.
+                           '}->{compat_class_by_type}->{q<' . $ns .
+                           '>}->{q<' . $ln . '>}->{q<' . $pack_name . '>} = 1');
                     }
                     $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::DOM::ManakaiDOMElement'.
-                           '::CompatClass{q<' . $pack_name . '>} = 1')
+                          ('$Message::DOM::DOMFeature::ClassInfo->{'.
+                           'q<Message::DOM::TreeCore::ManakaiDOMElement>'.
+                           '}->{compat_class}->{q<' . $pack_name . '>} = 1')
                       unless $for_specific_et;
                   }
                   if ($role-><M::DIS|DISResource.isSubsetOfURI>
-                                (<Q::DOMCore:AttributeRole>)) {
+                                (<Q::tc|AttributeRole>)) {
                     my $for_specific_attr;
                     for my $at (@{$cls-><M::DIS|DISResourceProp
                           .getPropertyResourceList>
@@ -6048,43 +6050,50 @@ TMethods:
                       }
                       
                       $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::DOM::ManakaiDOMElement' .
-                           '::CompatClassAttr{q<' . $etns . '>}->{q<' . $etln .
+                          ('$Message::DOM::DOMFeature::ClassInfo->{' .
+                           'q<Message::DOM::TreeCore::ManakaiDOMAttr>'.
+                           '}->{compat_class_by_type}->{q<' . $etns .
+                           '>}->{q<' . $etln .
                            '>}->{q<' . $ns . '>}->{q<' . $ln . '>}->{q<' .
                            $pack_name . '>} = 1');
                     }
                     $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::DOM::ManakaiDOMAttr'.
-                           '::CompatClass{q<' . $pack_name . '>} = 1')
+                          ('$Message::DOM::DOMFeature::ClassInfo->{'.
+                           'q<Message::DOM::TreeCore::ManakaiDOMAttr>'.
+                           '}->{compat_class}->{q<' . $pack_name . '>} = 1')
                       unless $for_specific_attr;
                   }
                   if ($role-><M::DIS|DISResource.isSubsetOfURI>
-                                (<Q::DOMCore:TextRole>)) {
+                                (<Q::tc|TextRole>)) {
                     $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::DOM::ManakaiDOMText'.
-                           '::CompatClass{q<' . $pack_name . '>} = 1');
+                          ('$Message::DOM::DOMFeature::ClassInfo->{'.
+                           'q<Message::DOM::TreeCore::ManakaiDOMText>'.
+                           '}->{compat_class}->{q<' . $pack_name . '>} = 1');
                   }
                   if ($role-><M::DIS|DISResource.isSubsetOfURI>
-                                (<Q::DOMCore:CommentRole>)) {
+                                (<Q::tc|CommentRole>)) {
                     $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::DOM::ManakaiDOMComment'.
-                           '::CompatClass{q<' . $pack_name . '>} = 1');
+                          ('$Message::DOM::DOMFeature::ClassInfo->{'.
+                           'q<Message::DOM::TreeCore::ManakaiDOMComment>'.
+                           '}->{compat_class}->{q<' . $pack_name . '>} = 1');
                   }
                   if ($role-><M::DIS|DISResource.isSubsetOfURI>
-                                (<Q::DOMCore:CDATASectionRole>)) {
+                                (<Q::tc|CDATASectionRole>)) {
                     $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::DOM::ManakaiDOMCDATASection'.
-                           '::CompatClass{q<' . $pack_name . '>} = 1');
+                          ('$Message::DOM::DOMFeature::ClassInfo->{'.
+                           'q<Message::DOM::XML::ManakaiDOMCDATASection>'.
+                           '}->{compat_class}->{q<' . $pack_name . '>} = 1');
                   }
                   if ($role-><M::DIS|DISResource.isSubsetOfURI>
-                                (<Q::DOMCore:ProcessingInstructionRole>)) {
+                                (<Q::tc|ProcessingInstructionRole>)) {
                     $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::DOM::ManakaiDOMProcessingInstruction'.
-                           '::CompatClass{q<' . $pack_name . '>} = 1');
+                        ('$Message::DOM::DOMFeature::ClassInfo->{'.
+                         'q<Message::DOM::XML::ManakaiDOMProcessingInstruction>'.
+                         '}->{compat_class}->{q<' . $pack_name . '>} = 1');
                     ## TODO: Target name dependent
                   }
                   if ($role-><M::DIS|DISResource.isSubsetOfURI>
-                                (<Q::DOMCore:DocumentRole>)) {
+                                (<Q::tc|DocumentRole>)) {
                     my $for_specific_et;
                     for my $et (@{$cls-><M::DIS|DISResourceProp
                           .getPropertyResourceList>
@@ -6099,67 +6108,80 @@ TMethods:
                       $ns = '' unless defined $ns;
                         ## ISSUE: Is NULL-namespace should be allowed here?
                       $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::DOM::ManakaiDOMDocument' .
-                           '::CompatClassET{q<' . $ns . '>}->{q<' . $ln .
-                           '>}->{q<' . $pack_name . '>} = 1');
+                          ('$Message::DOM::DOMFeature::ClassInfo->{' .
+                           'q<Message::DOM::TreeCore::ManakaiDOMDocument>'.
+                           '}->{compat_class_by_type}->{q<' . $ns .
+                           '>}->{q<' . $ln . '>}->{q<' . $pack_name . '>} = 1');
                     }
                     $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::DOM::ManakaiDOMDocument'.
-                           '::CompatClass{q<' . $pack_name . '>} = 1')
+                          ('$Message::DOM::DOMFeature::ClassInfo->{'.
+                           'q<Message::DOM::TreeCore::ManakaiDOMDocument>'.
+                           '}->{compat_class}->{q<' . $pack_name . '>} = 1')
                       unless $for_specific_et;
                     ## TODO: by document type name and media type
                   }
                   if ($role-><M::DIS|DISResource.isSubsetOfURI>
-                                (<Q::DOMCore:DocumentFragmentRole>)) {
+                                (<Q::tc|DocumentFragmentRole>)) {
                     $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::DOM::ManakaiDOMDocumentFragment'.
-                           '::CompatClass{q<' . $pack_name . '>} = 1');
+                        ('$Message::DOM::DOMFeature::ClassInfo->{'.
+                         'q<Message::DOM::TreeCore::ManakaiDOMDocumentFragment>'.
+                         '}->{compat_class}->{q<' . $pack_name . '>} = 1');
                   }
                   if ($role-><M::DIS|DISResource.isSubsetOfURI>
-                                (<Q::DOMCore:DocumentTypeRole>)) {
+                                (<Q::tc|DocumentTypeRole>)) {
                     $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::DOM::ManakaiDOMDocumentType'.
-                           '::CompatClass{q<' . $pack_name . '>} = 1');
+                          ('$Message::DOM::DOMFeature::ClassInfo->{'.
+                           'q<Message::DOM::XDoctype::'.
+                           'ManakaiDOMDocumentTypeDefinition>'.
+                           '}->{compat_class}->{q<' . $pack_name . '>} = 1');
                     ## TODO: Doctype name or public ID dependent
                   }
                   if ($role-><M::DIS|DISResource.isSubsetOfURI>
-                                (<Q::DOMCore:EntityRole>)) {
+                                (<Q::tc|EntityRole>)) {
                     $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::DOM::ManakaiDOMEntity'.
-                           '::CompatClass{q<' . $pack_name . '>} = 1');
+                          ('$Message::DOM::DOMFeature::ClassInfo->{'.
+                           'q<Message::DOM::XML::ManakaiDOMEntity>'.
+                           '}->{compat_class}->{q<' . $pack_name . '>} = 1');
                     ## TODO: Entity name or public ID dependent
                   }
                   if ($role-><M::DIS|DISResource.isSubsetOfURI>
-                                (<Q::DOMCore:EntityReferenceRole>)) {
+                                (<Q::tc|EntityReferenceRole>)) {
                     $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::DOM::ManakaiDOMEntityReference'.
-                           '::CompatClass{q<' . $pack_name . '>} = 1');
+                          ('$Message::DOM::DOMFeature::ClassInfo->{'.
+                           'q<Message::DOM::XML::ManakaiDOMEntityReference>'.
+                           '}->{compat_class}->{q<' . $pack_name . '>} = 1');
                     ## TODO: Entity name or public ID dependent
                   }
                   if ($role-><M::DIS|DISResource.isSubsetOfURI>
-                                (<Q::DOMCore:NotationRole>)) {
+                                (<Q::tc|NotationRole>)) {
                     $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::DOM::ManakaiDOMNotation'.
-                           '::CompatClass{q<' . $pack_name . '>} = 1');
+                          ('$Message::DOM::DOMFeature::ClassInfo->{'.
+                           'q<Message::DOM::XML::ManakaiDOMNotation>'.
+                           '}->{compat_class}->{q<' . $pack_name . '>} = 1');
                     ## TODO: Notation name or public ID dependent
                   }
                   if ($role-><M::DIS|DISResource.isSubsetOfURI>
-                                (<Q::DOMCore:NamespaceRole>)) {
+                                (<Q::tc|NamespaceRole>)) {
                     $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::DOM::ManakaiDOMNamespace'.
-                           '::CompatClass{q<' . $pack_name . '>} = 1');
+                          ('$Message::DOM::DOMFeature::ClassInfo->{'.
+                           'q<Message::DOM::XPath::ManakaiDOMXPathNamespace>'.
+                           '}->{compat_class}->{q<' . $pack_name . '>} = 1');
                   }
                   if ($role-><M::DIS|DISResource.isSubsetOfURI>
                                 (<Q::DOMCore:ElementTypeDefinitionRole>)) {
                     $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::DOM::ManakaiDOMElementTypeDefinition'.
-                           '::CompatClass{q<' . $pack_name . '>} = 1');
+                          ('$Message::DOM::DOMFeature::ClassInfo->{'.
+                           'q<Message::DOM::XDoctype::'.
+                           'ManakaiDOMElementTypeDefinition>'.
+                           '}->{compat_class}->{q<' . $pack_name . '>} = 1');
                   }
                   if ($role-><M::DIS|DISResource.isSubsetOfURI>
                                 (<Q::DOMCore:AttributeDefinitionRole>)) {
                     $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::DOM::ManakaiDOMAttributeDefinition'.
-                           '::CompatClass{q<' . $pack_name . '>} = 1');
+                          ('$Message::DOM::DOMFeature::ClassInfo->{'.
+                           'q<Message::DOM::XDoctype::'.
+                           'ManakaiDOMAttributeDefinition>'.
+                           '}->{compat_class}->{q<' . $pack_name . '>} = 1');
                   }
                   ## NOTE: DOMCore:AnyNodeRole is subset of  
                   ##       DOMCore:ElementRole and DOMCore:TextRole and ...

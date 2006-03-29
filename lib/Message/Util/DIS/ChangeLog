@@ -1,3 +1,11 @@
+2006-03-29  Wakaba  <wakaba@suika.fam.cx>
+
+	* Perl.dis (plGeneratePerlModule): Don't call |plIsFeatureImplemented|
+	to create feature list; query on feature is now always |true| 
+	even if it is only partially implemented; in fact the
+	method did not work as intended because of bugs.  Support
+	for old |Node|-related |Role|s are replaced by new ones.
+
 2006-03-17  Wakaba  <wakaba@suika.fam.cx>
 
 	* Perl.dis (method name): New methods from |Util:Grove|

@@ -1,3 +1,30 @@
+2006-03-29  Wakaba  <wakaba@suika.fam.cx>
+
+	* DOMCore.dis: Namespace prefixes are changed to new ones.
+
+	* TreeCore.dis (createDocument, createDocumentType): Reimplemented (but
+	untested).
+	(___report_error): Reimplemented (untested).
+	(manakaiSetReadOnly): New method.
+	(Attr.___create_node_ref): New method (untested).
+	(Document.getFeature): |require|s the |MDOM:XML| Perl module.
+	(createEntityReference, cloneNode): Support for 
+	the |cfg:entity-reference-read-only| configuration
+	parameter is removed; newly created entity references
+	are always read-only and use the |manakaiSetReadOnly| method
+	if desired.
+	(Element.manakaiBaseURI): Reimplemented (untested).
+
+	* XDoctype.dis (createGeneralEntity, createNotation): |require|s
+	the |MDOM:XML| Perl module.
+	(DocumentTypeDefinition.___create_node_stem): Sets 
+	the |tc:implementation| internal property if its value
+	is provided.  The |infoset:content| internal property name
+	was incorrect.
+	(DocumentTypeDefinition, ElementTypeDefinition): |MUST|s on
+	read-only |NodeList| and |DOMStringList| are added
+	for clarification.
+
 2006-03-26  Wakaba  <wakaba@suika.fam.cx>
 
 	* DOMCore.dis (Require): Reference to the |MDOM:TreeCore|

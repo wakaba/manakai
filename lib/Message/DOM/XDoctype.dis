@@ -17,7 +17,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/03/28 00:59:50 $
+    $Date: 2006/03/29 15:43:42 $
   
   @Require:
     @@Module:
@@ -215,10 +215,10 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type: DISLang|ConstGroup
+    @@DISCore:resourceType: DISLang|ConstGroup
     @@ForCheck: ManakaiDOM|ForIF !=ManakaiDOM|ManakaiDOM
     @@Type: idl|unsignedShort||ManakaiDOM|all
-    @@rdfs:subClassOf: idl|unsignedShort||ManakaiDOM|all
+    @@subsetOf: idl|unsignedShort||ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: Const
@@ -382,7 +382,7 @@ IFClsXDef:
       my $impl;
       __CODE{tc|createImplForTest:: $impl => $impl}__;
       my $doc = $impl-><M::c|DOMImplementation.createDocument>;
-      $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+      $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>, '3.0');
 
   @Test:
     @@QName: DocumentXDoctype.interfaces.test
@@ -916,6 +916,8 @@ IFClsXDef:
           set to <DOM::false>, the implementation is <EM::not>
           <kwd:REQUIRED> to throw this exception.
       @@@PerlDef:
+        require Message::DOM::XML;
+
         if ($self-><AG::Document.strictErrorChecking>) {
           my $version = $self-><AG::Document.xmlVersion>;
           __CODE{DOMMain|ensureXMLName::
@@ -1031,6 +1033,8 @@ IFClsXDef:
           set to <DOM::false>, the implementation is <EM::not>
           <kwd:REQUIRED> to throw this exception.
       @@@PerlDef:
+        require Message::DOM::XML;
+
         if ($self-><AG::Document.strictErrorChecking>) {
           my $version = $self-><AG::Document.xmlVersion>;
           __CODE{DOMMain|ensureXMLName::
@@ -1171,15 +1175,25 @@ IFClsXDef:
             $ownee => {$obj},
             $owner0prop => {<H::tc|ownerDocument>},
           }__;
+        } elsif (defined $opt->{<H::tc|implementation>}) {
+          __CODE{mg|setOwnerProp||ManakaiDOM|all::
+            $bag => $bag,
+            $ownerref => {$opt->{<H::tc|implementation>}},
+            $ownee1hprop => {<H::tc|revImplementation>},
+            $ownee => {$obj},
+            $owner0prop => {<H::tc|implementation>},
+          }__;
+        } else {
+          ## TODO: Assertion
         }
-        $obj->{<H::infoset|content>} = [];
+        $obj->{<H::infoset|children>} = [];
         $obj->{<H::d|elementTypes>} = {};
         $obj->{<H::d|generalEntities>} = {};
         $obj->{<H::d|notations>} = {};
         $r = $obj;
   @mg:owner0: tc|ownerDocument
   @mg:origin0: infoset|parent
-  @mg:subnode1a: infoset|content
+  @mg:subnode1a: infoset|children
   @mg:subnode1h: d|elementTypes
   @mg:subnode1h: d|generalEntities
   @mg:subnode1h: d|notations
@@ -1217,7 +1231,8 @@ IFClsXDef:
     @@PerlDef:
       my $docx;
       __CODE{d|createEmptyDocumentXForTest:: $docx => $docx}__;
-      $dtdef = $docx-><M::DocumentX.createDocumentTypeDefinition> ('dtdef1');
+      $dtdef = $docx-><M::DocumentXDoctype.createDocumentTypeDefinition>
+                        ('dtdef1');
   @CODE:
     @@QName: d|createDTForTest
     @@PerlDef:
@@ -3520,6 +3535,11 @@ IFClsXDef:
       <kwd:MUST> be discarded.
     @@Type: tc|NamedNodeMap
     @@Get:
+      @@@enDesc:
+        The returned collection <kwd:MUST> be read-only if and 
+        only if the node is read-only.  Note that since
+        the collection is live, a change of the read-only flag
+        of the node immediately affects to the collection.
       @@@PerlDef:
         __CODE{tc|getElementTypeDefNodeMap::
           $node => $self,
@@ -3555,6 +3575,11 @@ IFClsXDef:
       are also discarded.
     @@Type: tc|NamedNodeMap
     @@Get:
+      @@@enDesc:
+        The returned collection <kwd:MUST> be read-only if and 
+        only if the node is read-only.  Note that since
+        the collection is live, a change of the read-only flag
+        of the node immediately affects to the collection.
       @@@PerlDef:
         __CODE{tc|getEntityNodeMap::
           $node => $self,
@@ -3613,6 +3638,11 @@ IFClsXDef:
         }
     @@Type: tc|NamedNodeMap
     @@Get:
+      @@@enDesc:
+        The returned collection <kwd:MUST> be read-only if and 
+        only if the node is read-only.  Note that since
+        the collection is live, a change of the read-only flag
+        of the node immediately affects to the collection.
       @@@PerlDef:
         __CODE{tc|getNotationNodeMap::
           $node => $self,
@@ -4973,6 +5003,11 @@ IFClsXDef:
       definition list declarations are discarded.
     @@Type: tc|NamedNodeMap
     @@Get:
+      @@@enDesc:
+        The returned collection <kwd:MUST> be read-only if and 
+        only if the node is read-only.  Note that since
+        the collection is live, a change of the read-only flag
+        of the node immediately affects to the collection.
       @@@PerlDef:
         __CODE{tc|getAttrDefNodeMap::
           $node => $self,
@@ -8271,6 +8306,11 @@ IFClsXDef:
       validity checker for the attribute definition.
     @@Type: c|DOMStringList
     @@Get:
+      @@@enDesc:
+        The returned list <kwd:MUST> be read-only if and 
+        only if the node is read-only.  Note that since
+        the list is live, a change of the read-only flag
+        of the node immediately affects to the list.
       @@@PerlDef:
         __CODE{c|createNodeDOMStringList::
           $node => $self, $r => $r,

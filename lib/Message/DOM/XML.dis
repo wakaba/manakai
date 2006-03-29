@@ -18,7 +18,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/03/28 00:59:50 $
+    $Date: 2006/03/29 15:43:42 $
 
   @Require:
     @@Module:
@@ -318,21 +318,6 @@ ElementTypeBinding:
       @@@is-null:1
 
 ElementTypeBinding:
-  @Name: ConstGroup
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type: DISLang|ConstGroup
-    @@ForCheck: ManakaiDOM|ForIF !=ManakaiDOM|ManakaiDOM
-
-ElementTypeBinding:
-  @Name: Const
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type: DISLang|Const
-
-ElementTypeBinding:
   @Name: PerlDef
   @ElementType:
     dis:Def
@@ -340,14 +325,6 @@ ElementTypeBinding:
     @@ContentType:
       lang:Perl
     @@ForCheck: ManakaiDOM|ForClass
-
-ElementTypeBinding:
-  @Name: PerlDefC
-  @ElementType:
-    dis:Def
-  @ShadowContent:
-    @@ContentType:
-      lang:Perl
 
 ElementTypeBinding:
   @Name: NodeReadOnlyError
@@ -1195,6 +1172,21 @@ ResourceDef:
 ResourceDef:
   @QName: Document
   @AliasFor: tc|Document
+  @For: ManakaiDOM|DOM
+
+ResourceDef:
+  @QName: Element
+  @AliasFor: tc|Element
+  @For: ManakaiDOM|DOM
+
+ResourceDef:
+  @QName: Attr
+  @AliasFor: tc|Attr
+  @For: ManakaiDOM|DOM
+
+ResourceDef:
+  @QName: Text
+  @AliasFor: tc|Text
   @For: ManakaiDOM|DOM
 
 NodeTypeIFDef:
@@ -5381,7 +5373,7 @@ NodeTypeDef:
     @@Return:
       @@@Type: Node
       @@@enDesc:
-        The node added.  If the <P::newChild> node is a <IF::DocumentFragment>
+        The node added.  If the <P::newChild> node is a <IF::tc|DocumentFragment>
         node, then the <P::newChild> node <kwd:MUST> be returned.
       @@@dx:raises:
         @@@@@: MDOMX|HIERARCHY_BAD_TYPE
@@ -5482,7 +5474,7 @@ NodeTypeDef:
       @@@enDesc:
         The node being inserted.
       @@@enImplNote:
-        What is returned if <P::newChild> is a <IF::DocumentFragment>?
+        What is returned if <P::newChild> is a <IF::tc|DocumentFragment>?
         See also <M::Node.appendChild>'s return value.
       @@@dx:raises:
         @@@@@: MDOMX|HIERARCHY_BAD_TYPE
@@ -5571,7 +5563,7 @@ NodeTypeDef:
         @@@@Type: DocumentFragment
         @@@@enDesc:
           The <P::oldChild> node is replaced by all of the 
-          <IF::DocumentFragment> children, which are inserted
+          <IF::tc|DocumentFragment> children, which are inserted
           in the same order <SRC::DOM1 SE, DOM2, DOM3>.
     @@Param:
       @@@Name: oldChild
@@ -5659,6 +5651,7 @@ NodeTypeDef:
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
         my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        $dtd-><M::Node.manakaiSetReadOnly> (false, true);
         my $pi = $doc-><M::Document.createTextNode> ('pi');
 
         my $return = $dtd-><M::Node.appendChild> ($pi);
@@ -5701,6 +5694,7 @@ NodeTypeDef:
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
         my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        $dtd-><M::Node.manakaiSetReadOnly> (false, true);
         my $pi = $doc-><M::Document.createEntityReference> ('pi');
 
         my $return = $dtd-><M::Node.appendChild> ($pi);
@@ -5743,6 +5737,7 @@ NodeTypeDef:
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
         my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        $dtd-><M::Node.manakaiSetReadOnly> (false, true);
         my $pi = $doc-><M::Document.createElement> ('pi');
 
         my $return = $dtd-><M::Node.appendChild> ($pi);
@@ -5785,6 +5780,7 @@ NodeTypeDef:
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
         my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        $dtd-><M::Node.manakaiSetReadOnly> (false, true);
         my $pi = $doc-><M::Document.createProcessingInstruction> ('pi');
 
         my $return = $dtd-><M::Node.appendChild> ($pi);
@@ -5827,6 +5823,7 @@ NodeTypeDef:
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
         my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        $dtd-><M::Node.manakaiSetReadOnly> (false, true);
         my $pi = $doc-><M::Document.createCDATASection> ('pi');
 
         my $return = $dtd-><M::Node.appendChild> ($pi);
@@ -5869,6 +5866,7 @@ NodeTypeDef:
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
         my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        $dtd-><M::Node.manakaiSetReadOnly> (false, true);
         my $pi = $doc-><M::Document.createComment> ('pi');
 
         my $return = $dtd-><M::Node.appendChild> ($pi);
@@ -5911,6 +5909,7 @@ NodeTypeDef:
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
         my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        $dtd-><M::Node.manakaiSetReadOnly> (false, true);
         my $pi = $doc-><M::Document.createTextNode> ('pi');
 
         my $return = $dtd-><M::Node.insertBefore> ($pi);
@@ -5953,6 +5952,7 @@ NodeTypeDef:
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
         my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        $dtd-><M::Node.manakaiSetReadOnly> (false, true);
         my $pi = $doc-><M::Document.createEntityReference> ('pi');
 
         my $return = $dtd-><M::Node.insertBefore> ($pi);
@@ -5995,6 +5995,7 @@ NodeTypeDef:
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
         my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        $dtd-><M::Node.manakaiSetReadOnly> (false, true);
         my $pi = $doc-><M::Document.createElement> ('pi');
 
         my $return = $dtd-><M::Node.insertBefore> ($pi);
@@ -6037,6 +6038,7 @@ NodeTypeDef:
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
         my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        $dtd-><M::Node.manakaiSetReadOnly> (false, true);
         my $pi = $doc-><M::Document.createProcessingInstruction> ('pi');
 
         my $return = $dtd-><M::Node.insertBefore> ($pi);
@@ -6079,6 +6081,7 @@ NodeTypeDef:
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
         my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        $dtd-><M::Node.manakaiSetReadOnly> (false, true);
         my $pi = $doc-><M::Document.createCDATASection> ('pi');
 
         my $return = $dtd-><M::Node.insertBefore> ($pi);
@@ -6121,6 +6124,7 @@ NodeTypeDef:
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
         my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        $dtd-><M::Node.manakaiSetReadOnly> (false, true);
         my $pi = $doc-><M::Document.createComment> ('pi');
 
         my $return = $dtd-><M::Node.insertBefore> ($pi);
@@ -6164,6 +6168,7 @@ NodeTypeDef:
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
         my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        $dtd-><M::Node.manakaiSetReadOnly> (false, true);
 
         my $piparent = $doc-><M::Document.createElementNS> (null, 'e');
         my $pi = $doc-><M::Document.createTextNode> ('pi');
@@ -6215,6 +6220,7 @@ NodeTypeDef:
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
         my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        $dtd-><M::Node.manakaiSetReadOnly> (false, true);
 
         my $piparent = $doc-><M::Document.createElementNS> (null, 'e');
         my $pi = $doc-><M::Document.createEntityReference> ('pi');
@@ -6266,6 +6272,7 @@ NodeTypeDef:
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
         my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        $dtd-><M::Node.manakaiSetReadOnly> (false, true);
 
         my $piparent = $doc-><M::Document.createElementNS> (null, 'e');
         my $pi = $doc-><M::Document.createTextNode> ('pi');
@@ -6317,6 +6324,7 @@ NodeTypeDef:
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
         my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        $dtd-><M::Node.manakaiSetReadOnly> (false, true);
 
         my $piparent = $doc-><M::Document.createElementNS> (null, 'e');
         my $pi = $doc-><M::Document.createEntityReference> ('pi');
@@ -6369,6 +6377,7 @@ NodeTypeDef:
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
         my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        $dtd-><M::Node.manakaiSetReadOnly> (false, true);
 
         my $piparent = $doc-><M::Document.createDocumentFragment>;
         my $pi = $doc-><M::Document.createTextNode> ('pi');
@@ -6420,6 +6429,7 @@ NodeTypeDef:
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
         my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        $dtd-><M::Node.manakaiSetReadOnly> (false, true);
 
         my $piparent = $doc-><M::Document.createDocumentFragment>;
         my $pi = $doc-><M::Document.createEntityReference> ('pi');
@@ -6471,6 +6481,7 @@ NodeTypeDef:
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
         my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        $dtd-><M::Node.manakaiSetReadOnly> (false, true);
 
         my $piparent = $doc-><M::Document.createDocumentFragment>;
         my $pi = $doc-><M::Document.createTextNode> ('pi');
@@ -6522,6 +6533,7 @@ NodeTypeDef:
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
         my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        $dtd-><M::Node.manakaiSetReadOnly> (false, true);
 
         my $piparent = $doc-><M::Document.createDocumentFragment>;
         my $pi = $doc-><M::Document.createEntityReference> ('pi');
@@ -6573,6 +6585,7 @@ NodeTypeDef:
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
         my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        $dtd-><M::Node.manakaiSetReadOnly> (false, true);
         my $pi0 = $doc-><M::Document.createTextNode> ('pi0');
         $dtd-><M::Node.appendChild> ($pi0);
 
@@ -6626,6 +6639,7 @@ NodeTypeDef:
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
         my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        $dtd-><M::Node.manakaiSetReadOnly> (false, true);
         my $pi0 = $doc-><M::Document.createTextNode> ('pi0');
         $dtd-><M::Node.appendChild> ($pi0);
 
@@ -6682,6 +6696,7 @@ NodeTypeDef:
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
         my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        $dtd-><M::Node.manakaiSetReadOnly> (false, true);
 
         my $piparent = $doc-><M::Document.createDocumentFragment>;
 
@@ -6712,6 +6727,7 @@ NodeTypeDef:
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
         my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        $dtd-><M::Node.manakaiSetReadOnly> (false, true);
 
         my $piparent = $doc-><M::Document.createDocumentFragment>;
 
@@ -6742,6 +6758,7 @@ NodeTypeDef:
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
         my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        $dtd-><M::Node.manakaiSetReadOnly> (false, true);
         my $pi0 = $doc-><M::Document.createTextNode> ('pi0');
         $dtd-><M::Node.appendChild> ($pi0);
 
@@ -6775,6 +6792,7 @@ NodeTypeDef:
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
         my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        $dtd-><M::Node.manakaiSetReadOnly> (false, true);
 
         my $piparent = $doc-><M::Document.createDocumentFragment>;
         my $pi = $doc-><M::Document.createTextNode> ('pi');
@@ -6852,6 +6870,7 @@ NodeTypeDef:
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
         my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        $dtd-><M::Node.manakaiSetReadOnly> (false, true);
 
         my $piparent = $doc-><M::Document.createDocumentFragment>;
         my $pi = $doc-><M::Document.createTextNode> ('pi');
@@ -6929,6 +6948,7 @@ NodeTypeDef:
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
         my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        $dtd-><M::Node.manakaiSetReadOnly> (false, true);
         my $pi0 = $doc-><M::Document.createTextNode> ('pi0');
         $dtd-><M::Node.appendChild> ($pi0);
 
@@ -7007,6 +7027,7 @@ NodeTypeDef:
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
         my $comment = $doc-><M::Document.createEntityReference> ('dt');
+        $comment-><M::Node.manakaiSetReadOnly> (false, true);
         my $pi0 = $doc-><M::Document.createTextNode> ('pi0');
         $comment-><M::Node.appendChild> ($pi0);
 
@@ -7046,6 +7067,7 @@ NodeTypeDef:
         __CODE{tc|createEmptyDocumentForTestER:: $doc => $doc}__;
 
         my $comment = $doc0-><M::Document.createEntityReference> ('dt');
+        $comment-><M::Node.manakaiSetReadOnly> (false, true);
 
         for my $node (
           $doc-><M::Document.createTextNode> ('pi'),
@@ -7071,6 +7093,7 @@ NodeTypeDef:
         __CODE{tc|createEmptyDocumentForTestER:: $doc => $doc}__;
 
         my $comment = $doc0-><M::Document.createEntityReference> ('dt');
+        $comment-><M::Node.manakaiSetReadOnly> (false, true);
         my $pi0 = $doc0-><M::Document.createTextNode> ('pi0');
         $comment-><M::Node.appendChild> ($pi0);
 
@@ -7106,6 +7129,7 @@ NodeTypeDef:
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
         my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        $dtd-><M::Node.manakaiSetReadOnly> (false, true);
         my $pi0 = $doc-><M::Document.createTextNode> ('pi0');
         $dtd-><M::Node.appendChild> ($pi0);
         $dtd-><M::Node.manakaiSetReadOnly> (true);
@@ -7153,6 +7177,7 @@ NodeTypeDef:
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
         my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        $dtd-><M::Node.manakaiSetReadOnly> (false, true);
         my $pi0 = $doc-><M::Document.createTextNode> ('pi0');
         $dtd-><M::Node.appendChild> ($pi0);
 
@@ -7204,6 +7229,7 @@ NodeTypeDef:
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
         my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        $dtd-><M::Node.manakaiSetReadOnly> (false, true);
 
         my $pi1 = $doc-><M::Document.createTextNode> ('pi1');
         $dtd-><M::Node.appendChild> ($pi1);
@@ -7230,6 +7256,7 @@ NodeTypeDef:
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
         my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        $dtd-><M::Node.manakaiSetReadOnly> (false, true);
 
         my $pi1 = $doc-><M::Document.createTextNode> ('pi1');
         $dtd-><M::Node.appendChild> ($pi1);
@@ -7265,6 +7292,7 @@ NodeTypeDef:
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
         my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        $dtd-><M::Node.manakaiSetReadOnly> (false, true);
 
         my $pi1 = $doc-><M::Document.createTextNode> ('pi1');
         $dtd-><M::Node.appendChild> ($pi1);
@@ -7304,6 +7332,7 @@ NodeTypeDef:
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
         my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        $dtd-><M::Node.manakaiSetReadOnly> (false, true);
 
         my $pi1 = $doc-><M::Document.createTextNode> ('pi1');
         $dtd-><M::Node.appendChild> ($pi1);
@@ -7343,6 +7372,7 @@ NodeTypeDef:
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
         my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        $dtd-><M::Node.manakaiSetReadOnly> (false, true);
 
         my $pi1 = $doc-><M::Document.createTextNode> ('pi1');
         $dtd-><M::Node.appendChild> ($pi1);
@@ -7368,6 +7398,7 @@ NodeTypeDef:
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
         my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        $dtd-><M::Node.manakaiSetReadOnly> (false, true);
 
         my $pi1 = $doc-><M::Document.createTextNode> ('pi1');
         $dtd-><M::Node.appendChild> ($pi1);
@@ -7416,6 +7447,7 @@ NodeTypeDef:
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
         my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        $dtd-><M::Node.manakaiSetReadOnly> (false, true);
 
         my $pi1 = $doc-><M::Document.createTextNode> ('pi1');
         $dtd-><M::Node.appendChild> ($pi1);
@@ -7464,6 +7496,7 @@ NodeTypeDef:
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
         my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        $dtd-><M::Node.manakaiSetReadOnly> (false, true);
 
         my $pi1 = $doc-><M::Document.createTextNode> ('pi1');
         $dtd-><M::Node.appendChild> ($pi1);
@@ -7499,6 +7532,7 @@ NodeTypeDef:
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
         my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        $dtd-><M::Node.manakaiSetReadOnly> (false, true);
 
         my $pi1 = $doc-><M::Document.createTextNode> ('pi1');
         $dtd-><M::Node.appendChild> ($pi1);
@@ -7534,6 +7568,7 @@ NodeTypeDef:
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
         my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        $dtd-><M::Node.manakaiSetReadOnly> (false, true);
 
         my $pi1 = $doc-><M::Document.createTextNode> ('pi1');
         $dtd-><M::Node.appendChild> ($pi1);
@@ -7569,6 +7604,7 @@ NodeTypeDef:
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
         my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        $dtd-><M::Node.manakaiSetReadOnly> (false, true);
 
         my $pi1 = $doc-><M::Document.createTextNode> ('pi1');
         $dtd-><M::Node.appendChild> ($pi1);
@@ -7604,6 +7640,7 @@ NodeTypeDef:
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
         my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        $dtd-><M::Node.manakaiSetReadOnly> (false, true);
 
         my $pi1 = $doc-><M::Document.createTextNode> ('pi1');
         $dtd-><M::Node.appendChild> ($pi1);
@@ -7657,6 +7694,7 @@ NodeTypeDef:
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
         my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        $dtd-><M::Node.manakaiSetReadOnly> (false, true);
 
         my $pi1 = $doc-><M::Document.createTextNode> ('pi1');
         $dtd-><M::Node.appendChild> ($pi1);
@@ -7710,6 +7748,7 @@ NodeTypeDef:
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
         my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        $dtd-><M::Node.manakaiSetReadOnly> (false, true);
 
         my $pi1 = $doc-><M::Document.createTextNode> ('pi1');
         $dtd-><M::Node.appendChild> ($pi1);
@@ -7763,6 +7802,7 @@ NodeTypeDef:
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
         my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        $dtd-><M::Node.manakaiSetReadOnly> (false, true);
 
         my $pi1 = $doc-><M::Document.createTextNode> ('pi1');
         $dtd-><M::Node.appendChild> ($pi1);
@@ -7811,6 +7851,7 @@ NodeTypeDef:
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
         my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        $dtd-><M::Node.manakaiSetReadOnly> (false, true);
 
         my $pi1 = $doc-><M::Document.createTextNode> ('pi1');
         $dtd-><M::Node.appendChild> ($pi1);
@@ -7859,6 +7900,7 @@ NodeTypeDef:
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
         my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        $dtd-><M::Node.manakaiSetReadOnly> (false, true);
         $dtd-><M::Node.appendChild>
                 ($doc-><M::Document.createTextNode> ('text1'));
 
@@ -7885,6 +7927,7 @@ NodeTypeDef:
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
         my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        $dtd-><M::Node.manakaiSetReadOnly> (false, true);
         $dtd-><M::Node.appendChild>
                 ($doc-><M::Document.createTextNode> ('text1'));
         my $el = $doc-><M::Document.createElement> ('el');
@@ -7913,6 +7956,7 @@ NodeTypeDef:
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
         my $dtd = $doc-><M::Document.createEntityReference> ('dt');
+        $dtd-><M::Node.manakaiSetReadOnly> (false, true);
         $dtd-><M::Node.appendChild>
                 ($doc-><M::Document.createTextNode> ('text1'));
         my $el = $doc-><M::Document.createElement> ('el');
@@ -7966,6 +8010,7 @@ NodeTypeDef:
         __CODE{tc|createEmptyDocumentForTestER:: $doc => $doc}__;
 
         my $node = $doc-><M::Document.createEntityReference> ('node');
+        $node-><M::Node.manakaiSetReadOnly> (false, true);
 
         $node-><M::Node.manakaiAppendText> ('string');
         $test->id ('1.class');
@@ -8117,6 +8162,7 @@ NodeTypeDef:
                   q<http://el.test/>);
 
         my $xent = $doc-><M::Document.createEntityReference> ('ext');
+        $xent-><M::Node.manakaiSetReadOnly> (false, true);
         $xent-><AS::EntityReference.manakaiEntityBaseURI> (q<http://ent.test/>);
         $xent-><AS::EntityReference.manakaiExternal> (true);
         $el-><M::Node.appendChild> ($xent);
@@ -8877,6 +8923,7 @@ NodeTypeDef:
     @@enImplNote:
       Difference between <XML::<lt>?target?<gt>> and <XML::<lt>?target ?<gt>>
       are not preserved in DOM <SRC::manakai>.
+    @@Type: DOMString
     @@Get:
       @@@PerlDef:
         __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
@@ -8941,10 +8988,10 @@ NodeTypeDef:
           $node-><AS::Node.textContent> ('value3');
 
           $test->id ('textContent.set.nodeValue');
-          $test->assert_equals ($node-><AG::Node.nodeValue>, 'value1');
+          $test->assert_equals ($node-><AG::Node.nodeValue>, 'value3');
 
           $test->id ('textContent.set.textContent');
-          $test->assert_equals ($node-><AG::Node.textContent>, 'value1');
+          $test->assert_equals ($node-><AG::Node.textContent>, 'value3');
 
           $test->id ('textContent.set.data');
           $test->assert_equals ($node-><AG::ProcessingInstruction.data>,

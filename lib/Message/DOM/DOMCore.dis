@@ -40,7 +40,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/03/28 00:59:50 $
+      $Date: 2006/03/29 15:43:41 $
     @@ContentType:
       dis:Date.RCS
 
@@ -760,18 +760,18 @@ ResourceDef:
       @@@SubTypeDef:
         @@@@QName: HIERARCHY_WRONG_DOCTYPE_ERR
         @@@@enDesc:
-          An attempt is made to insert a <IF::x|DocumentType>
-          node after the document element  or an <IF::Element> node after
-          a <IF::x|DocumentType>.
+          An attempt is made to insert a <IF::tx|DocumentType>
+          node after the document element  or an <IF::tc|Element> node after
+          a <IF::tx|DocumentType>.
         @@@@XParamParamName:
         @@@@ecore:hasParameter:
           @@@@@@: c|node
           @@@@@enDesc:
-            The <IF::x|DocumentType> node.
+            The <IF::tx|DocumentType> node.
       @@@SubTypeDef:
         @@@@QName: t|HIERARCHY_DOCUMENT_FRAGMENT_ITSELF_ERR
         @@@@enDesc:
-          An attempt is made to insert a <IF::t|DocumentFragment>
+          An attempt is made to insert a <IF::tc|DocumentFragment>
           node to itself.
         @@@@XParamParamName:
      @@XConst:
@@ -843,6 +843,9 @@ ResourceDef:
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@: The version of XML.
+      @@@enImplNote:
+        <CITE::Definition of malformed qualfied names>
+        <URI::http://lists.w3.org/Archives/Public/www-dom/2001JanMar/thread.html#75>
      @@XConst:
         @@@Name:  NO_DATA_ALLOWED_ERR
         @@@intValue:  6
@@ -1647,9 +1650,14 @@ ResourceDef:
       @@@SubTypeDef:
         @@@@QName: c|NO_NS_NAMEDNODEMAP_ERR
         @@@@enDesc:
-          If an attempt is made to modify a <IF::t|NamedNodeMap>
+          If an attempt is made to modify a <IF::tc|NamedNodeMap>
           via namespace-aware method and the map does not support
           XML namespaces.
+      @@@SubTypeDef:
+        @@@@QName: c|NSURI_WHERE_NO_XML_FEATURE_ERR
+        @@@@enDesc:
+          If a namespace URI is specified but the implementation
+          does not support the <Feature::XML> feature.
      @@XConst:
         @@@Name:  INVALID_ACCESS_ERR
         @@@intValue:  15
@@ -1839,13 +1847,13 @@ ElementTypeBinding:
       @@@@: c|CoreFeature30
       @@@For: ManakaiDOM|DOM3
     @@f:implements:
-      @@@@: x|XMLFeature30
+      @@@@: tx|XMLFeature30
       @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeature
     @@f:implements:
-      @@@@: x|XMLVersionFeature10
+      @@@@: tx|XMLVersionFeature10
       @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeature
     @@f:implements:
-      @@@@: x|XMLVersionFeature11
+      @@@@: tx|XMLVersionFeature11
       @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeatureXML11
 
 ElementTypeBinding:
@@ -2700,7 +2708,7 @@ IFCls1Def:
     of any particular instance of the document object model.
 
   @ClsISA:
-    @@@: t|ManakaiDOMImplementationDocument
+    @@@: tc|ManakaiDOMImplementationTC
     @@For: ManakaiDOM|ManakaiDOM2
 
   @ClsISA:
@@ -3314,7 +3322,7 @@ IFCls3Def:
 
   @enDesc:
     The <IF::TypeInfo> interface represents a type referenced from
-    <IF::t|Element> or <IF::t|Attr> nodes, specified in the schemas
+    <IF::tc|Element> or <IF::tc|Attr> nodes, specified in the schemas
     associated with the document.  The type is a pair of a namespace URI
     and name properties, and depends on the document's schema.
 
@@ -3323,13 +3331,13 @@ IFCls3Def:
     @@@:
       {P:: If the document's schema is an XML 1.0 DTD:
   
-        - If the type is referenced from an <IF::t|Attr> node and
+        - If the type is referenced from an <IF::tc|Attr> node and
           there is a declaration for the attribute, 
           <A::TypeInfo.typeNamespace> is 
           <URI::http://www.w3.org/TR/REC-xml> and <A::TypeInfo.typeName>
           is <InfoProp::attribute type> property value.
 
-        - If the type is referenced from an <IF::t|Attr> node and
+        - If the type is referenced from an <IF::tc|Attr> node and
           there is no declaration for the attribute,
           <A::TypeInfo.typeNamespace> and <A::TypeInfo.typeName>
           are <DOM::null>.
@@ -3786,7 +3794,7 @@ IFCls3Def:
       @@@enDesc:
         The node is cloned.
       @@@enImplNote:
-        <M::t|Node.cloneNode>.
+        <M::tc|Node.cloneNode>.
 
     @@Const:
       @@@Name: NODE_IMPORTED
@@ -3794,7 +3802,7 @@ IFCls3Def:
       @@@enDesc:
         The node is imported.
       @@@enImplNote:
-        <M::t|Document.importNode>.
+        <M::tc|Document.importNode>.
 
     @@Const:
       @@@Name: NODE_DELETED
@@ -3821,7 +3829,7 @@ IFCls3Def:
       @@@enDesc:
         The node is renamed.
       @@@enImplNote:
-        <M::t|Document.renameNode>.
+        <M::tc|Document.renameNode>.
 
     @@Const:
       @@@Name: NODE_ADOPTED
@@ -3829,7 +3837,7 @@ IFCls3Def:
       @@@enDesc:
         The node is adopted to the document.
       @@@enImplNote:
-        <M::t|Document.adoptNode>.
+        <M::tc|Document.adoptNode>.
 
   @Method:
     @@Name: handle
@@ -3859,7 +3867,7 @@ IFCls3Def:
         The data for which the handler is being called.
     @@Param:
       @@@Name: src
-      @@@Type: t|Node
+      @@@Type: tc|Node
       @@@enDesc:
         The node to which the <P::operation> is being performed.
       @@@nullCase:
@@ -3867,7 +3875,7 @@ IFCls3Def:
           The handler is called when the node is being deleted.
     @@Param:
       @@@Name: dst
-      @@@Type: t|Node
+      @@@Type: tc|Node
       @@@enDesc:
         The node newly created.
       @@@nullCase:
@@ -4907,7 +4915,7 @@ boolCParam:
   @cfgname: canonical-form
   @nodeProp: canon
   @IsSupportRequired:1
-  @DOMCore:targetType: c|Document
+  @DOMCore:targetType: tc|Document
   @TrueCase:
     @@enDesc:
         Canonicalizes the document according to the rules specified in
@@ -4950,7 +4958,7 @@ boolCParam:
   @cfgname: cdata-sections
   @nodeProp: pcdsect
   @IsSupportRequired:1
-  @c:targetType: c|Document
+  @c:targetType: tc|Document
   @TrueCase:
     @@IsSupportRequired:1
     @@IsDefault: 1
@@ -4971,7 +4979,7 @@ boolCParam:
   @cfgname: check-character-normalization
   @nodeProp: charnormc
   @IsSupportRequired:1
-  @DOMCore:targetType: DOMCore|Document
+  @DOMCore:targetType: tc|Document
   @TrueCase:
     @@enDesc:
       Checks if the characters in the document are fully normalized
@@ -4991,7 +4999,7 @@ boolCParam:
   @cfgname: comments
   @nodeProp: pcom
   @IsSupportRequired:1
-  @DOMCore:targetType: DOMCore|Document
+  @DOMCore:targetType: tc|Document
   @TrueCase:
     @@IsSupportRequired:1
     @@IsDefault:1
@@ -5007,7 +5015,7 @@ boolCParam:
   @cfgname: datatype-normalization
   @nodeProp: tnorm
   @IsSupportRequired:1
-  @DOMCore:targetType: DOMCore|Document
+  @DOMCore:targetType: tc|Document
   @TrueCase:
     @@enDesc:
       Exposes schema normalized values in the tree.
@@ -5038,7 +5046,7 @@ boolCParam:
   @QName: element-content-whitespace
   @cfgname: element-content-whitespace
   @nodeProp: pecws
-  @DOMCore:targetType: DOMCore|Document
+  @DOMCore:targetType: tc|Document
   @IsSupportRequired:1
   @TrueCase:
     @@IsSupportRequired:1
@@ -5058,7 +5066,7 @@ boolCParam:
   @QName: c|entities
   @cfgname: entities
   @nodeProp: pent
-  @c:targetType: c|Document
+  @c:targetType: tc|Document
   @IsSupportRequired:1
   @TrueCase:
     @@IsSupportRequired:1
@@ -5084,7 +5092,7 @@ CParam:
   @cfgname: error-handler
   @nodeProp: onerr
   @Type: DOMCore|DOMErrorHandler
-  @DOMCore:targetType: DOMCore|Document
+  @DOMCore:targetType: tc|Document
   @IsSupportRequired:1
   @enDesc:
     This parameter contains a <IF::DOMErrorHandler> object.  If
@@ -5177,7 +5185,7 @@ boolCParam:
   @QName: infoset
   @cfgname: infoset
   @IsSupportRequired:1
-  @DOMCore:targetType: DOMCore|Document
+  @DOMCore:targetType: tc|Document
   @TrueCase:
     @@IsSupportRequired:1
     @@enDesc:
@@ -5273,7 +5281,7 @@ boolCParam:
   @cfgname: namespaces
   @nodeProp: nsaware
   @IsSupportRequired:1
-  @DOMCore:targetType: DOMCore|Document
+  @DOMCore:targetType: tc|Document
   @TrueCase:
     @@IsSupportRequired:1
     @@IsDefault:1
@@ -5298,7 +5306,7 @@ boolCParam:
   @cfgname: namespace-declarations
   @nodeProp: pnsattr
   @IsSupportRequired:1
-  @DOMCore:targetType: DOMCore|Document
+  @DOMCore:targetType: tc|Document
   @enDesc:
     {NOTE:: This parameter has no effect if the parameter <cfg::namespace>
             is set to <DOM::false>.
@@ -5326,7 +5334,7 @@ boolCParam:
   @cfgname: normalize-characters
   @nodeProp: charnorm
   @IsSupportRequired:1
-  @c:targetType: c|Document
+  @c:targetType: tc|Document
   @TrueCase:
     @@IsSupportRequired:0
     @@enDesc:
@@ -5348,7 +5356,7 @@ CParam:
   @IsSupportRequired:0
   @Type: DOMMain|DOMString
   @dis:actualType: DOMMain|DOMURIs
-  @DOMCore:targetType: DOMCore|Document
+  @DOMCore:targetType: tc|Document
   @dataType: DISCore|String
   @enDesc:
     The <cfg::schema-location> parameter value represents the
@@ -5431,7 +5439,7 @@ CParam:
   @Type: DOMMain|DOMString
   @dis:actualType: DOMMain|ManakaiDOMSchemaType
   @IsSupportRequired:0
-  @DOMCore:targetType: DOMCore|Document
+  @DOMCore:targetType: tc|Document
   @dataType: DISCore|QName
   @enDesc:
     The <cfg::schema-type> parameter value is a <TYPE::DOMMain|DOMString>
@@ -5455,7 +5463,7 @@ boolCParam:
   @cfgname: split-cdata-sections
   @nodeProp: splitcdsect
   @IsSupportRequired:1
-  @DOMCore:targetType: DOMCore|Document
+  @DOMCore:targetType: tc|Document
   @TrueCase:
     @@IsSupportRequired:1
     @@IsDefault:1
@@ -5482,7 +5490,7 @@ boolCParam:
   @cfgname: validate
   @nodeProp: val
   @IsSupportRequired:1
-  @DOMCore:targetType: DOMCore|Document
+  @DOMCore:targetType: tc|Document
   @TrueCase:
     @@enDesc:
       Requires the validation against a schema of the document
@@ -5535,7 +5543,7 @@ boolCParam:
   @cfgname: validate-if-schema
   @nodeProp: vals
   @IsSupportRequired:1
-  @DOMCore:targetType: DOMCore|Document
+  @DOMCore:targetType: tc|Document
   @TrueCase:
     @@enDesc:
       Enables validation only if a declaration for the document element
@@ -5568,7 +5576,7 @@ boolCParam:
   @cfgname: well-formed
   @nodeProp: wf
   @IsSupportRequired:1
-  @DOMCore:targetType: DOMCore|Document
+  @DOMCore:targetType: tc|Document
   @TrueCase:
     @@IsSupportRequired:1
     @@IsDefault:1
