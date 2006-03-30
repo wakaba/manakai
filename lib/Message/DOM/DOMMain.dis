@@ -21,13 +21,9 @@ Module:
       various DOM implementations.
 
   @DISCore:author: DISCore|Wakaba
-  @License:
-     license:Perl+MPL
+  @License: license|Perl+MPL
   @Date:
-    @@@:
-      $Date: 2006/03/24 12:33:11 $
-    @@ContentType:
-      dis:Date.RCS
+    $Date: 2006/03/30 16:01:43 $
   
   @Require:
     @@Module:
@@ -64,16 +60,13 @@ Module:
       @@@WithFor:
         ManakaiDOM:ManakaiDOMLatest
     @@Module:
-      @@@Name: DOMCore
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          The DOM Core module.  Note that <Module::MDOM:DOMCore> module in turn
-          requires this (<Module::MDOM:DOMMain>) module.
-  @DefaultFor:
-    ManakaiDOM:ManakaiDOMLatest
+      @@@QName: MDOM|DOMCore
+      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
+  @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
 Namespace:
+  @c:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
   @dis:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
   @DISlib:
@@ -137,7 +130,7 @@ ResourceDef:
     @@lang:en
     @@@:
       The manakai DOM modules
-  @DISPerl:packageName:
+  @p:packageName:
     @@@:
       Message::DOM::
     @@For: ManakaiDOM|ManakaiDOM
@@ -147,11 +140,11 @@ ResourceDef:
     @@ManakaiDOM:moduleSuffix:
       @@@@: Level1
       @@@For: ManakaiDOM|ManakaiDOM1 !ManakaiDOM|ManakaiDOM2
-  @DISPerl:interfacePackageName:
+  @p:interfacePackageName:
     @@@:
       Message::DOM::IFLevel2::
     @@For: ManakaiDOM|ManakaiDOM2 !ManakaiDOM|ManakaiDOM3
-  @DISPerl:interfacePackageName:
+  @p:interfacePackageName:
     @@@:
       Message::DOM::IFLevel1::
     @@For: ManakaiDOM|ManakaiDOM1 !ManakaiDOM|ManakaiDOM2
@@ -432,7 +425,7 @@ ElementTypeBinding:
 ResourceDef:
   @QName: 
     DOMMain:docSupportsXMLFeature
-  @rdf:type: DISPerl|InlineCode
+  @rdf:type: p|InlineCode
   @Description:
     @@lang:en
     @@@:
@@ -933,7 +926,7 @@ ResourceDef:
 ElementTypeBinding:
   @Name: plMName
   @ElementType:
-    DISPerl:methodName
+    p:methodName
   @ShadowContent:
     @@For: ManakaiDOM|Perl
 
@@ -981,7 +974,7 @@ StringDataTypeDef:
 
   @ResourceDef:
     @@QName: isRelativeDOMURI
-    @@rdf:type: DISPerl|InlineCode
+    @@rdf:type: p|InlineCode
     @@Description:
       @@@lang:en
       @@@@:
@@ -1018,7 +1011,7 @@ StringDataTypeDef:
     @@QName: DOMMain|stringifyDOMURIs
     @@enDesc:
       Generates a string representation of DOM URIs.
-    @@rdf:type: DISPerl|InlineCode
+    @@rdf:type: p|InlineCode
     @@PerlDef:
       (join ' ', @{$uris})
 ##DOMURIs
@@ -1244,7 +1237,7 @@ StringDataTypeDef:
       <CODE::Name> or not.
     @@PerlDef:
       ($INPUT =~ /\A\p{inxml:_NameStartChar10}\p{inxml:NameChar10}*\z/)
-    @@rdf:type: DISPerl|InlineCode
+    @@rdf:type: p|InlineCode
   
   @ResourceDef:
     @@QName: testXML11Name
@@ -1253,11 +1246,11 @@ StringDataTypeDef:
       <CODE::Name> or not.
     @@PerlDef:
       ($INPUT =~ /\A\p{inxml:NameStartChar11}\p{inxml:NameChar11}*\z/)
-    @@rdf:type: DISPerl|InlineCode
+    @@rdf:type: p|InlineCode
 
   @ResourceDef:
     @@QName: ensureXMLName
-    @@rdf:type: DISPerl|BlockCode
+    @@rdf:type: p|BlockCode
     @@Description:
       @@@lang:en
       @@@@: 
@@ -1309,7 +1302,7 @@ StringDataTypeDef:
 
   @ResourceDef:
     @@QName: testXML10NCName
-    @@rdf:type: DISPerl|InlineCode
+    @@rdf:type: p|InlineCode
     @@enDesc:
       Tests whether a scalar variable string is a valid XML Namespace
       1.0 <CODE::NCName> or not.
@@ -1318,7 +1311,7 @@ StringDataTypeDef:
 
   @ResourceDef:
     @@QName: testXML11NCName
-    @@rdf:type: DISPerl|InlineCode
+    @@rdf:type: p|InlineCode
     @@enDesc:
       Tests whether a scalar variable string is a valid XML Namespace
       1.1 <CODE::NCName> or not.
@@ -1334,7 +1327,7 @@ StringDataTypeDef:
 
   @ResourceDef:
     @@QName: ensureNamespacePrefix
-    @@rdf:type: DISPerl|BlockCode
+    @@rdf:type: p|BlockCode
     @@Description:
       @@@lang:en
       @@@@: 
@@ -1354,48 +1347,29 @@ StringDataTypeDef:
       @@@For:
         ManakaiDOM:DOM3
     @@PerlDef:
-        __FOR{ManakaiDOM:DOM3::
-          if (defined $INPUT and $INPUT eq '') {
-            __DOMCore:ERROR{DOMMain|empty-namespace-prefix::
-            }__;
-            undef $INPUT;
-          }
+      if (defined $INPUT and $INPUT eq '') {
+        __c|ERROR{DOMMain|empty-namespace-prefix::
         }__;
-        if (defined $INPUT) {
-          __FOR{ManakaiDOM:DOM3::
-            if (($XMLVERSION eq '1.0' and
-                 not <Code::DOMMain:testXML10Name:: $INPUT = $INPUT>) or
-                ($XMLVERSION eq '1.1' and
-                 not <Code::DOMMain:testXML11Name:: $INPUT = $INPUT>)) {
-              __EXCEPTION{MDOMX:MDOM_BAD_NAME::
-                DOMCore:name => {$INPUT},
-                MDOMX:param-name => '$INPUT_PARAM_NAME',
-                infoset:version => {$XMLVERSION},
-              }__;
-            } elsif (index ($INPUT, ':') > -1) {
-              __EXCEPTION{MDOMX:MDOM_NS_BAD_NCNAME::
-                infoset:name => {$INPUT},
-                MDOMX:param-name => '$INPUT_PARAM_NAME',
-                infoset:version => {$XMLVERSION},
-              }__;
-            }
+        undef $INPUT;
+      }
+      if (defined $INPUT) {
+        if (($XMLVERSION eq '1.0' and
+             not <Code::DOMMain|testXML10Name:: $INPUT = $INPUT>) or
+            ($XMLVERSION eq '1.1' and
+             not <Code::DOMMain|testXML11Name:: $INPUT = $INPUT>)) {
+          __EXCEPTION{MDOMX|MDOM_BAD_NAME::
+            infoset|name => {$INPUT},
+            MDOMX|param-name => '$INPUT_PARAM_NAME',
+            infoset|version => {$XMLVERSION},
           }__;
-          __FOR{ManakaiDOM:DOM2 !ManakaiDOM:DOM3::
-            unless (<Code::DOMMain:testXML10Name:: $INPUT = $INPUT>) {
-              __EXCEPTION{MDOMX:MDOM_BAD_NAME::
-                DOMCore:name => {$INPUT},
-                MDOMX:param-name => '$INPUT_PARAM_NAME',
-                infoset:version => '1.0',
-              }__;
-            } elsif (index ($INPUT, ':') > -1) {
-              __EXCEPTION{MDOMX:MDOM_NS_BAD_NCNAME::
-                infoset:name => {$INPUT},
-                MDOMX:param-name => '$INPUT_PARAM_NAME',
-                infoset:version => '1.0',
-              }__;
-            }
+        } elsif (index ($INPUT, ':') > -1) {
+          __EXCEPTION{MDOMX|MDOM_NS_BAD_NCNAME::
+            infoset|name => {$INPUT},
+            MDOMX|param-name => '$INPUT_PARAM_NAME',
+            infoset|version => {$XMLVERSION},
           }__;
         }
+      } # has prefix
 
 ErrDef:
   @QName: DOMMain|empty-namespace-uri
@@ -1437,7 +1411,7 @@ StringDataTypeDef:
 
   @ResourceDef:
     @@QName: ensureXMLQName
-    @@rdf:type: DISPerl|BlockCode
+    @@rdf:type: p|BlockCode
     @@Description:
       @@@lang:en
       @@@@:
@@ -1509,7 +1483,7 @@ StringDataTypeDef:
 
   @ResourceDef:
     @@QName: testXML10QName
-    @@rdf:type: DISPerl|InlineCode
+    @@rdf:type: p|InlineCode
     @@enDesc:
       Tests whether a scalar variable string is a valid XML
       Namespace 1.0 qualified name or not.
@@ -1554,7 +1528,7 @@ StringDataTypeDef:
 
   @ResourceDef:
     @@QName: testXML11QName
-    @@rdf:type: DISPerl|InlineCode
+    @@rdf:type: p|InlineCode
     @@enDesc:
       Tests whether a scalar variable string is a valid XML
       Namespace 1.1 qualified name or not.
@@ -1565,7 +1539,7 @@ StringDataTypeDef:
 
 ResourceDef:
   @QName: checkXMLNamesQName
-  @rdf:type: DISPerl|BlockCode
+  @rdf:type: p|BlockCode
   @Description:
     @@lang:en
     @@@:
@@ -1580,8 +1554,8 @@ ResourceDef:
   @PerlDef:
     if (defined $PREFIX) {
       if (not defined $NSURI) {
-        __EXCEPTION{MDOMX:MDOM_NS_PREFIX_WITH_NULL_URI::
-          infoset:prefix => {$PREFIX},
+        __EXCEPTION{MDOMX|MDOM_NS_PREFIX_WITH_NULL_URI::
+          infoset|prefix => {$PREFIX},
         }__;
       } elsif ($PREFIX eq 'xml' and $NSURI ne <Q::xml:>) {
         __EXCEPTION{MDOMX:MDOM_NS_XML_WITH_OTHER_URI::
@@ -1616,8 +1590,8 @@ ResourceDef:
   @QName: 
     DOMMain:ManakaiDOMImplementationRegistryVar
   @rdf:type:
-    DISPerl:ScalarVariable
-  @DISPerl:variableName:
+    p:ScalarVariable
+  @p:variableName:
     Message::DOM::DOMImplementationRegistry
   @DefaultValue:
     @@@:
@@ -1685,7 +1659,7 @@ ResourceDef:
       @@@Def:
         @@@@ContentType:
           lang:dis
-        @@@@DISPerl:cloneCode:
+        @@@@p:cloneCode:
           DOMFeature|ImplementationRegistry.getDOMImplementation
 
   @Method:

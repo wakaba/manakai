@@ -17,7 +17,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/03/29 15:43:42 $
+    $Date: 2006/03/30 16:01:44 $
   
   @Require:
     @@Module:
@@ -39,8 +39,6 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dom/main#
   @dx:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#
-  @ecore:
-    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/Core/
   @f:
     http://suika.fam.cx/~wakaba/archive/2004/dom/feature#
   @fe:
@@ -48,25 +46,19 @@ Namespace:
   @idl:
     http://suika.fam.cx/~wakaba/archive/2004/dis/IDL#
   @infoset:
-     http://www.w3.org/2001/04/infoset#
+    http://www.w3.org/2001/04/infoset#
   @lang:
-     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
   @license:
-     http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
-  @LSEV:
-    http://www.w3.org/2002/DOMLS
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
   @ManakaiDOM:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
-  @ManakaiDOMLS:
-    http://suika.fam.cx/~wakaba/archive/2004/mdom-ls#
   @MDOM:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
   @MDOMX:
     http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
   @mg:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Grove/
-  @mn:
-    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/ManakaiNode#
   @rdf:
     http://www.w3.org/1999/02/22-rdf-syntax-ns#
   @rdfs:
@@ -79,12 +71,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Test#
   @tx:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/XML/
-  @x:
-    http://suika.fam.cx/~wakaba/archive/2004/dom/xml#
   @xml:
     http://www.w3.org/XML/1998/namespace
-  @xmlns:
-    http://www.w3.org/2000/xmlns/
 
 ## -- Features
 
@@ -379,10 +367,10 @@ IFClsXDef:
   @CODE:
     @@QName: d|createEmptyDocumentXForTest
     @@PerlDef:
-      my $impl;
-      __CODE{tc|createImplForTest:: $impl => $impl}__;
-      my $doc = $impl-><M::c|DOMImplementation.createDocument>;
-      $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>, '3.0');
+      my $__impl;
+      __CODE{tc|createImplForTest:: $impl => $__impl}__;
+      my $__doc = $__impl-><M::c|DOMImplementation.createDocument>;
+      $docx = $__doc-><M::Node.getFeature> (<Q::fe|XDoctype>, '3.0');
 
   @Test:
     @@QName: DocumentXDoctype.interfaces.test
@@ -390,8 +378,13 @@ IFClsXDef:
       my $doc;
       __CODE{d|createEmptyDocumentXForTest:: $docx => $doc}__;
        
+      $test->id ('DocumentXDoctype');
       $test->assert_isa ($doc, <IFName::DocumentXDoctype>);
+
+      $test->id ('Document');
       $test->assert_isa ($doc, <IFName::Document>);
+
+      $test->id ('Node');
       $test->assert_isa ($doc, <IFName::Node>);
 
   @Test:
@@ -402,9 +395,7 @@ IFClsXDef:
 
         for (
           [<Q::fe|XDoctype> => '3.0',
-           <IFName::DocumentTypeDefinition||ManakaiDOM|ManakaiDOMLatest>],
-          [<Q::fe|XDoctypeDeclaration> => '3.0',
-           <IFName::DocumentTypeDeclaration||ManakaiDOM|ManakaiDOMLatest>],
+           <IFName::DocumentXDoctype||ManakaiDOM|ManakaiDOMLatest>],
         ) {
           $test->id ($_->[0].'.'.$_->[1]);
           my $sp = $node-><M::Node.getFeature> ($_->[0], $_->[1]);
@@ -418,9 +409,7 @@ IFClsXDef:
 
         for (
           [<Q::fe|XDoctype> => '3.0',
-           <IFName::DocumentTypeDefinition||ManakaiDOM|ManakaiDOMLatest>],
-          [<Q::fe|XDoctypeDeclaration> => '3.0',
-           <IFName::DocumentTypeDeclaration||ManakaiDOM|ManakaiDOMLatest>],
+           <IFName::DocumentXDoctype||ManakaiDOM|ManakaiDOMLatest>],
         ) {
           $test->id ($_->[0].'.'.$_->[1]);
           my $sp = $node-><M::Node.getFeature> ($_->[0], $_->[1]);
@@ -1175,13 +1164,13 @@ IFClsXDef:
             $ownee => {$obj},
             $owner0prop => {<H::tc|ownerDocument>},
           }__;
-        } elsif (defined $opt->{<H::tc|implementation>}) {
+        } elsif (defined $opt->{<H::f|implementation>}) {
           __CODE{mg|setOwnerProp||ManakaiDOM|all::
             $bag => $bag,
-            $ownerref => {$opt->{<H::tc|implementation>}},
-            $ownee1hprop => {<H::tc|revImplementation>},
+            $ownerref => {$opt->{<H::f|implementation>}},
+            $ownee1hprop => {<H::f|revImplementation>},
             $ownee => {$obj},
-            $owner0prop => {<H::tc|implementation>},
+            $owner0prop => {<H::f|implementation>},
           }__;
         } else {
           ## TODO: Assertion
@@ -1213,7 +1202,7 @@ IFClsXDef:
       - <Q::tc|ownerDocument> (required if the node
         contains one or more nodes).
 
-      - <Q::tc|implementation> (required if <Q::tc|ownerDocument>
+      - <Q::f|implementation> (required if <Q::tc|ownerDocument>
         is <DOM::null>).
 
       - <Q::infoset|publicIdentifier>, <Q::infoset|systemIdentifier>.
@@ -1229,24 +1218,23 @@ IFClsXDef:
   @CODE:
     @@QName: d|createDTDefForTest
     @@PerlDef:
-      my $docx;
-      __CODE{d|createEmptyDocumentXForTest:: $docx => $docx}__;
-      $dtdef = $docx-><M::DocumentXDoctype.createDocumentTypeDefinition>
+      my $__docx;
+      __CODE{d|createEmptyDocumentXForTest:: $docx => $__docx}__;
+      $dtdef = $__docx-><M::DocumentXDoctype.createDocumentTypeDefinition>
                         ('dtdef1');
   @CODE:
     @@QName: d|createDTForTest
     @@PerlDef:
-      my $impl;
-      __CODE{tc|createImplForTest:: $impl => $impl}__;
-      $dt = $impl-><M::c|DOMImplementation.createDocumentType> ('dt1');
-      ## TODO: setReadOnly (0)
+      my $__impl;
+      __CODE{tc|createImplForTest:: $impl => $__impl}__;
+      $dt = $__impl-><M::c|DOMImplementation.createDocumentType> ('dt1');
+      $dt-><M::Node.manakaiSetReadOnly> (false, true);
   @CODE:
     @@QName: d|createRODTForTest
     @@PerlDef:
-      my $impl;
-      __CODE{tc|createImplForTest:: $impl => $impl}__;
-      $dt = $impl-><M::c|DOMImplementation.createDocumentType> ('dt1');
-
+      my $__impl;
+      __CODE{tc|createImplForTest:: $impl => $__impl}__;
+      $dt = $__impl-><M::c|DOMImplementation.createDocumentType> ('dt1');
 
   @CAttr:
     @@Name: nodeName
@@ -1306,7 +1294,7 @@ IFClsXDef:
       @@@QName: DTDef.lookupPrefix.test
       @@@PerlDef:
         my $dtd;
-        __CODE{newDoctypeForTest}__;
+        __CODE{d|createDTDefForTest:: $dtdef => $dtd}__;
 
         $test->assert_null ($dtd-><M::Node.lookupPrefix> ('abcdefg'));
 
@@ -1314,7 +1302,7 @@ IFClsXDef:
       @@@QName: DocumentType.lookupPrefix.test
       @@@PerlDef:
         my $impl;
-        __CODE{t|createDOMImplForTest:: $impl => $impl}__;
+        __CODE{tc|createImplForTest:: $impl => $impl}__;
 
         my $dtype = $impl-><M::c|DOMImplementation.createDocumentType>
                              ('type', 'pub', 'sys');
@@ -1395,7 +1383,7 @@ IFClsXDef:
       @@@QName: Doctype.baseURI.test
       @@@PerlDef:
         my $impl;
-        __CODE{t|createDOMImplForTest:: $impl => $impl}__;
+        __CODE{tc|createImplForTest:: $impl => $impl}__;
 
         my $dtype = $impl-><M::c|DOMImplementation.createDocumentType>
                              ('type', 'pub', 'sys');
@@ -2008,7 +1996,7 @@ IFClsXDef:
     @@QName: ManakaiDOMDTD.appendChild.pi.test
     @@PerlDef:
       my $dtd;
-      __CODE{newDoctypeForTest}__;
+      __CODE{d|createDTDefForTest:: $dtdef => $dtd}__;
       
       my $doc = $dtd-><AG::Node.ownerDocument>;
       my $pi = $doc-><M::Document.createProcessingInstruction> ('pitarget');
@@ -2456,7 +2444,7 @@ IFClsXDef:
       @@@QName: DTDef.appendChild.wrongdoc.2.test
       @@@PerlDef:
         my $impl;
-        __CODE{t|createDOMImplForTest:: $impl => $impl}__;
+        __CODE{tc|createImplForTest:: $impl => $impl}__;
 
         my $dtype = $impl-><M::c|DOMImplementation.createDocumentType>
                              ('type', 'pub', 'sys');
@@ -3331,8 +3319,8 @@ IFClsXDef:
         my $impl;
         __CODE{tc|createImplForTest:: $impl => $impl}__;
 
-        my $dtype = $impl-><M::c|DOMImplementation.createDocumentType>
-                             ('type', 'pub', 'sys');
+        my $node = $impl-><M::c|DOMImplementation.createDocumentType>
+                            ('type', 'pub', 'sys');
 
         for (
           [Core => '1.0', <IFName::tx|DocumentType||ManakaiDOM|ManakaiDOM1>],
@@ -3405,14 +3393,14 @@ IFClsXDef:
         $test->assert_null ($c1-><AG::Node.parentNode>);
 
         $test->id ('firstChild');
-        $test->assert_equals ($doc-><AG::Node.firstChild>, $c2);
+        $test->assert_equals ($node-><AG::Node.firstChild>, $c2);
 
         $test->id ('lastChild');
-        $test->assert_equals ($doc-><AG::Node.lastChild>, $c3);
+        $test->assert_equals ($node-><AG::Node.lastChild>, $c3);
 
         $test->id ('length');
         $test->assert_num_equals
-                 (actual_value => 0+@{$doc-><AG::Node.childNodes>},
+                 (actual_value => 0+@{$node-><AG::Node.childNodes>},
                   expected_value => 2);
     @@Test:
       @@@QName: DTDef.removeChild.2.test
@@ -3437,17 +3425,17 @@ IFClsXDef:
         $test->assert_equals ($return, $c2);
 
         $test->id ('parentNode');
-        $test->assert_null ($c1-><AG::Node.parentNode>);
+        $test->assert_null ($c2-><AG::Node.parentNode>);
 
         $test->id ('firstChild');
-        $test->assert_equals ($doc-><AG::Node.firstChild>, $c1);
+        $test->assert_equals ($node-><AG::Node.firstChild>, $c1);
 
         $test->id ('lastChild');
-        $test->assert_equals ($doc-><AG::Node.lastChild>, $c3);
+        $test->assert_equals ($node-><AG::Node.lastChild>, $c3);
 
         $test->id ('length');
         $test->assert_num_equals
-                 (actual_value => 0+@{$doc-><AG::Node.childNodes>},
+                 (actual_value => 0+@{$node-><AG::Node.childNodes>},
                   expected_value => 2);
     @@Test:
       @@@QName: DTDef.removeChild.3.test
@@ -3472,17 +3460,17 @@ IFClsXDef:
         $test->assert_equals ($return, $c3);
 
         $test->id ('parentNode');
-        $test->assert_null ($c1-><AG::Node.parentNode>);
+        $test->assert_null ($c3-><AG::Node.parentNode>);
 
         $test->id ('firstChild');
-        $test->assert_equals ($doc-><AG::Node.firstChild>, $c1);
+        $test->assert_equals ($node-><AG::Node.firstChild>, $c1);
 
         $test->id ('lastChild');
-        $test->assert_equals ($doc-><AG::Node.lastChild>, $c2);
+        $test->assert_equals ($node-><AG::Node.lastChild>, $c2);
 
         $test->id ('length');
         $test->assert_num_equals
-                 (actual_value => 0+@{$doc-><AG::Node.childNodes>},
+                 (actual_value => 0+@{$node-><AG::Node.childNodes>},
                   expected_value => 2);
     @@Test:
       @@@QName: DTDef.removeChild.4.test
@@ -3504,14 +3492,14 @@ IFClsXDef:
         $test->assert_null ($c1-><AG::Node.parentNode>);
 
         $test->id ('firstChild');
-        $test->assert_null ($doc-><AG::Node.firstChild>);
+        $test->assert_null ($node-><AG::Node.firstChild>);
 
         $test->id ('lastChild');
-        $test->assert_null ($doc-><AG::Node.lastChild>);
+        $test->assert_null ($node-><AG::Node.lastChild>);
 
         $test->id ('length');
         $test->assert_num_equals
-                 (actual_value => 0+@{$doc-><AG::Node.childNodes>},
+                 (actual_value => 0+@{$node-><AG::Node.childNodes>},
                   expected_value => 0);
 
   @Attr:
@@ -3782,6 +3770,7 @@ IFClsXDef:
           $defNode => $defNode,
           $defNodeParamName => 'defNode',
           $key => {<H::d|elementTypes>},
+          $self => $self, $r => $r,
         }__;
 
     @@Test:
@@ -3958,6 +3947,7 @@ IFClsXDef:
           $defNode => $defNode,
           $defNodeParamName => 'defNode',
           $key => {<H::d|generalEntities>},
+          $self => $self, $r => $r,
         }__;
     @@Test:
       @@@QName: DocumentTypeDefinition.setGeneralEntityNode.test
@@ -4017,17 +4007,20 @@ IFClsXDef:
                           ('et1'),
                   $et);
   
-        $test->id ('rewrite');
-
         my $et2 = $dtd-><AG::Node.ownerDocument>
-                      -><M::Node.getFeature> (<Q::ManakaiDOM|XDoctype>)
+                      -><M::Node.getFeature> (<Q::fe|XDoctype>)
                       -><M::DocumentXDoctype.createGeneralEntity>
                           ('et1');
+        $test->id ('new.ge.node');
         $test->assert_not_equals ($et, $et2);
 
         my $old4 = $dtd-><M::DocumentTypeDefinition
                                 .setGeneralEntityNode> ($et2);
+        $test->id ('old.ge.node');
         $test->assert_equals ($old4, $et);
+        $test->id ('old.ge.node.owner');
+        $test->assert_null ($et-><AG::tx|Entity.ownerDocumentTypeDefinition>);
+        $test->id ('new.ge.node.owner');
         $test->assert_equals
                  ($et2-><AG::tx|Entity.ownerDocumentTypeDefinition>,
                   $dtd);
@@ -4136,6 +4129,7 @@ IFClsXDef:
           $defNode => $defNode,
           $defNodeParamName => 'defNode',
           $key => {<H::d|notations>},
+          $self => $self, $r => $r,
         }__;
     @@Test:
       @@@QName: DocumentTypeDefinition.setNotationNode.test
@@ -4195,17 +4189,21 @@ IFClsXDef:
                           ('et1'),
                   $et);
   
-        $test->id ('rewrite');
-
         my $et2 = $dtd-><AG::Node.ownerDocument>
                       -><M::Node.getFeature> (<Q::fe|XDoctype>)
                       -><M::DocumentXDoctype.createNotation>
                           ('et1');
+        $test->id ('new.notation.different');
         $test->assert_not_equals ($et, $et2);
 
         my $old4 = $dtd-><M::DocumentTypeDefinition
                                 .setNotationNode> ($et2);
+        $test->id ('old.notation.node');
         $test->assert_equals ($old4, $et);
+        $test->id ('old.notation.node.ownerDTDef');
+        $test->assert_null
+                 ($et-><AG::tx|Notation.ownerDocumentTypeDefinition>);
+        $test->id ('new.notation.node.ownerDTDef');
         $test->assert_equals
                  ($et2-><AG::tx|Notation.ownerDocumentTypeDefinition>,
                   $dtd);
@@ -4216,7 +4214,7 @@ IFClsXDef:
         my $dtd;
         __CODE{d|createDTDefForTest:: $dtdef => $dtd}__;
         my $et;
-        __CODE{d|createNotationForTest:: $not => $et}__;
+        __CODE{tx|createNotationForTest:: $not => $et}__;
 
         $test->assert_exception
           (code => sub {
@@ -4236,7 +4234,7 @@ IFClsXDef:
       @@@PerlDef:
         __CODE{mg|getNodeStemProp0Node||ManakaiDOM|all::
           $r => $r,
-          $prop => {<H::tc|implementation>},
+          $prop => {<H::f|implementation>},
           $ref => $self,
         }__;
         unless ($r) {
@@ -4482,8 +4480,11 @@ IFClsXDef:
     @@Test:
       @@@QName: DTDef.name.get.test
       @@@PerlDef:
-        my $dtd;
-        __CODE{d|createDTDefForTest:: $dtdef => $dtd}__;
+        my $docx;
+        __CODE{d|createEmptyDocumentXForTest:: $docx => $docx}__;
+
+        my $dtd = $docx-><M::DocumentXDoctype.createDocumentTypeDefinition>
+                           ('dt1');
 
         $test->id ('initial');
         $test->assert_equals ($dtd-><AG::DocumentTypeDeclaration.name>, 'dt1');
@@ -4680,9 +4681,9 @@ IFClsXDef:
   @CODE:
     @@QName: d|createETDefForTest
     @@PerlDef:
-      my $docx;
-      __CODE{d|createEmptyDocumentXForTest:: $docx => $docx}__;
-      $atdef = $docx-><M::DocumentXDoctype.createElementTypeDefinition> ('et');
+      my $__docx;
+      __CODE{d|createEmptyDocumentXForTest:: $docx => $__docx}__;
+      $etdef = $__docx-><M::DocumentXDoctype.createElementTypeDefinition> ('et');
 
   @Attr:
     @@ForCheck: ManakaiDOM|ForClass
@@ -5116,6 +5117,7 @@ IFClsXDef:
           $defNode => $attrDef,
           $defNodeParamName => 'attrDef',
           $key => {<H::d|attributeDefinitions>},
+          $self => $self, $r => $r,
         }__;
     @@Test:
       @@@PerlDef:
@@ -5221,17 +5223,17 @@ ResourceDef:
       $prop => $key,
       $ref => $self,
     }__;
-    my $__current_node;
     if (defined $__list->{$__aname}) {
       __CODE{mg|createNodeRefFromID||ManakaiDOM|all::
         $bag => {<Code::mg|getNodeBag||ManakaiDOM|all:: $ref = $self>},
         $stemid => {$__list->{$__aname}},
-        $ref => $__current_node,
+        $ref => $r,
         $opt => {{}},
       }__;
     }
     SET: {
-      if (defined $__current_node and $__current_node eq $defNode) {
+      if (defined $r and $r eq $defNode) {
+        undef $r;
         last SET; # no effect
       }
       __CODE{tc|NodeReadOnlyError:: $node => $self}__;
@@ -5258,10 +5260,10 @@ ResourceDef:
         }__;
       }
           
-      if (defined $__current_node) {
+      if (defined $r) {
         __CODE{mg|deleteNodeStemPropValue||ManakaiDOM|all::
           $prop => {<H::d|ownerDefinition>},
-          $ref => $__current_node,
+          $ref => $r,
         }__;
       }
 
@@ -5282,7 +5284,7 @@ IFClsXDef:
   @IFISA: tc|Node
   @ClsISA: tc|ManakaiDOMNode
   
-  @DISLang:role: tc|AttributeRole
+  @DISLang:role: tc|AttributeDefinitionRole
 
   @f:implements: d|Feature30
   
@@ -5360,9 +5362,9 @@ IFClsXDef:
   @CODE:
     @@QName: d|createATDefForTest
     @@PerlDef:
-      my $docx;
-      __CODE{d|createEmptyDocumentXForTest:: $docx => $docx}__;
-      $atdef = $docx-><M::DocumentXDoctype.createAttributeDefinition> ('at');
+      my $__docx;
+      __CODE{d|createEmptyDocumentXForTest:: $docx => $__docx}__;
+      $atdef = $__docx-><M::DocumentXDoctype.createAttributeDefinition> ('at');
 
   @CAttr:
     @@Name: nodeType
@@ -5465,7 +5467,7 @@ IFClsXDef:
     @@Test:
       @@@QName: ATDef.nodeValue.1.test
       @@@PerlDef:
-        my $docX;
+        my $docx;
         __CODE{d|createEmptyDocumentXForTest:: $docx => $docx}__;
   
         for my $dt (
@@ -5503,7 +5505,7 @@ IFClsXDef:
     @@Test:
       @@@QName: ATDef.nodeValue.2.test
       @@@PerlDef:
-        my $docX;
+        my $docx;
         __CODE{d|createEmptyDocumentXForTest:: $docx => $docx}__;
   
         for my $dt (
@@ -5772,10 +5774,11 @@ IFClsXDef:
 
         $test->assert_not_null ($t-><AG::Node.parentNode>);
 
+        $test->id ('textContent.set.previous.parentNode');
         $at-><AS::AttributeDefinition.defaultType>
                (<C::AttributeDefinition.UNKNOWN_DEFAULT>);
         $at-><AS::Node.textContent> ('VWXYZ');
-        $test->assert_not_null ($t-><AG::Node.parentNode>);
+        $test->assert_null ($t-><AG::Node.parentNode>);
 
         $test->id ('set-value');
 
@@ -7175,7 +7178,7 @@ IFClsXDef:
         my $dtd = $docx-><M::DocumentXDoctype.createAttributeDefinition> ('d');
         my $pi0 = $doc-><M::Document.createTextNode> ('pi0');
         $dtd-><M::Node.appendChild> ($pi0);
-        $dtd-><M::Node.manakaiReadOnly> (true);
+        $dtd-><M::Node.manakaiSetReadOnly> (true, true);
 
         $test->id ('pi');
         my $node = $doc-><M::Document.createTextNode> ('pi');
@@ -7227,7 +7230,7 @@ IFClsXDef:
         my $el = $doc-><M::Document.createElementNS> (null, 'e');
         my $node = $doc-><M::Document.createTextNode> ('pi');
         $el-><M::Node.appendChild> ($node);
-        $el-><M::Node.manakaiReadOnly> (true);
+        $el-><M::Node.manakaiSetReadOnly> (true, true);
 
         $test->assert_exception (code => sub {
           $dtd-><M::Node.appendChild> ($node);
@@ -7247,7 +7250,7 @@ IFClsXDef:
         my $node2 = $doc-><M::Document.createDocumentFragment>;
         my $node3 = $doc-><M::Document.createTextNode> ('pi');
         $node2-><M::Node.appendChild> ($node3);
-        $node2-><M::Node.manakaiReadOnly> (true);
+        $node2-><M::Node.manakaiSetReadOnly> (true, true);
 
         $test->assert_exception (code => sub {
           $dtd-><M::Node.appendChild> ($node2);
@@ -8384,13 +8387,13 @@ ElementTypeBinding:
 enImplNote:
   {TODO::
     
-    - Define <M::t|Node.cloneNode>, <M::t|Node.adoptNode>,
-      <M::t|Node.importNode>, <M::t|Node.isEqualNode>,
-      <M::t|Node.compareDocumentPosition>,
+    - Define <M::Node.cloneNode>, <M::Node.adoptNode>,
+      <M::Node.importNode>, <M::Node.isEqualNode>,
+      <M::Node.compareDocumentPosition>,
       namespace lookup methods
       for the new node types.
     
-    - Implement <M::t|Node.getFeature>, <M::t|Node.hasFeature>,
+    - Implement <M::Node.getFeature>, <M::Node.hasFeature>,
       <M::f|GetFeature.hasFeature>.
     
   }

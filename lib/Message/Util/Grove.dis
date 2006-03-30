@@ -9,7 +9,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/03/24 12:33:11 $
+    $Date: 2006/03/30 16:01:45 $
 
   @Require:
     @@Module:
@@ -242,6 +242,31 @@ ClsDef:
       $bag->{${$ownerref->{<H::mg|nodeIDReference>}}}
           ->{$ownee1hprop}->{${$ownee->{<H::mg|nodeID>}}}
         = $ownee->{<H::mg|nodeID>};
+
+  @CODE:
+    @@QName: mg|setOwnerPropRR
+    @@enDesc:
+      Setting <Q::mg|owner0> and <Q::mg|ownee1h> property values
+      (node reference to node reference).
+    @@PerlDef:
+      $bag->{${$owneeref->{<H::mg|nodeIDReference>}}}->{$owner0prop}
+        = $ownerref->{<H::mg|nodeIDReference>};
+      $bag->{${$ownerref->{<H::mg|nodeIDReference>}}}
+          ->{$ownee1hprop}->{${$owneeref->{<H::mg|nodeIDReference>}}}
+        = $owneeref->{<H::mg|nodeIDReference>};
+
+  @CODE:
+    @@QName: mg|deleteOwnerProp
+    @@enDesc:
+      Deletes <Q::mg|owner0> and <Q::mg|ownee1h> property values.
+    @@PerlDef:
+      CORE::delete $bag->{${$bag->{${$owneeref->{<H::mg|nodeIDReference>}}}
+                                ->{$owner0prop} or \''}}
+                       ->{$ownee1hprop};
+      push @{$bag->{<H::mg|mutations>}},
+           $bag->{${$owneeref->{<H::mg|nodeIDReference>}}}->{$owner0prop};
+      CORE::delete $bag->{${$owneeref->{<H::mg|nodeIDReference>}}}
+                       ->{$owner0prop};
 ##NodeStem
 
 
@@ -387,6 +412,18 @@ ClsDef:
         <H::mg|nodeBag> => $bag,
       }, $opt);
       $bag->{${$stemid}}->{<H::mg|references>}++;
+
+  @Code:
+    @@QName: mg|createNodeRefHashFromID
+    @@enDesc:
+      Creates a node reference hash, which is a hash reference
+      that can be handled as if it were a node reference,
+      from a node bag by its node identifier.
+    @@PerlDef:
+      {
+        <H::mg|nodeIDReference> => $stemid,
+        <H::mg|nodeBag> => $bag,
+      }
 
   @ResourceDef:
     @@QName: mg|CreateNodeRefMethod
@@ -655,3 +692,11 @@ IntPropDef:
     The node bag object referenced by the node reference object.
   @Type: DISPerl|Ref
   @mg:nodeRefKey: b
+
+## -- Other Property Names for Options
+
+IntPropDef:
+  @QName: mg|nodeRefClass
+  @mg:nodeStemKey: nrcls
+  @enDesc:
+    The Perl package name of the class of the node reference.

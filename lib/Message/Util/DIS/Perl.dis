@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/03/29 15:43:43 $
+      $Date: 2006/03/30 16:01:45 $
     @@ContentType:
       dis:Date.RCS
   
@@ -5959,8 +5959,8 @@ TMethods:
                 } # FI
                 $r-><M::DIS|PLBlockCon.appendStatement>
                       ('$Message::DOM::DOMFeature::ClassInfo'.
-                       '->{has_feature}->{q<' . $pack_name .
-                       '>} = ' . <ClassM::PLImplClass.perlLiteral> (\%ifeature));
+                       '->{q<' . $pack_name . '>}->{has_feature}' .
+                       ' = ' . <ClassM::PLImplClass.perlLiteral> (\%ifeature));
 
                 ## TODO: Features from implementing interfaces.
 
@@ -5987,11 +5987,12 @@ TMethods:
                            '::SourceClass{q<' . $pack_name . '>} = 1');
                   }
                   if ($role-><M::DIS|DISResource.isSubsetOfURI>
-   (<Q::DOMMetaImpl:ImplementationCompatibleWithManakaiDOMMinimumImplementation>)
-                  ) {
+                               (<Q::f|ManakaiMinimumImplementationCompatible>)) {
                     $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::DOM::ManakaiDOMImplementation'.
-                           '::CompatClass{q<' . $pack_name . '>} = 1');
+                          ('$Message::DOM::DOMFeature::ClassInfo->{'.
+                           'q<Message::DOM::DOMFeature::'.
+                           'ManakaiMinimumImplementation>'.
+                           '}->{compat_class}->{q<' . $pack_name . '>} = 1');
                   }
                   
                   ## Node
@@ -6168,7 +6169,7 @@ TMethods:
                            '}->{compat_class}->{q<' . $pack_name . '>} = 1');
                   }
                   if ($role-><M::DIS|DISResource.isSubsetOfURI>
-                                (<Q::DOMCore:ElementTypeDefinitionRole>)) {
+                                (<Q::tc|ElementTypeDefinitionRole>)) {
                     $r-><M::DIS|PLBlockCon.appendStatement>
                           ('$Message::DOM::DOMFeature::ClassInfo->{'.
                            'q<Message::DOM::XDoctype::'.
@@ -6176,7 +6177,7 @@ TMethods:
                            '}->{compat_class}->{q<' . $pack_name . '>} = 1');
                   }
                   if ($role-><M::DIS|DISResource.isSubsetOfURI>
-                                (<Q::DOMCore:AttributeDefinitionRole>)) {
+                                (<Q::tc|AttributeDefinitionRole>)) {
                     $r-><M::DIS|PLBlockCon.appendStatement>
                           ('$Message::DOM::DOMFeature::ClassInfo->{'.
                            'q<Message::DOM::XDoctype::'.

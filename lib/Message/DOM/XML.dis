@@ -18,7 +18,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/03/29 15:43:42 $
+    $Date: 2006/03/30 16:01:45 $
 
   @Require:
     @@Module:
@@ -35,6 +35,9 @@ Module:
       @@@WithFor: ManakaiDOM|ManakaiDOM2
     @@Module:
       @@@WithFor: ManakaiDOM|ManakaiDOM3
+    @@Module:
+      @@@QName: DISlib|DISMarkup
+      @@@WithFor: ManakaiDOM|all
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
 Namespace:
@@ -42,28 +45,20 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
   @cfg:
     http://suika.fam.cx/www/2006/dom-config/
-  @dis:
-    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
-  @doc:
-    http://suika.fam.cx/~wakaba/archive/2005/7/tutorial#
   @d:
     http://suika.fam.cx/~wakaba/archive/2004/dom/xdt#
+  @dis:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
+  @DISlib:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/
   @DOMMain:
     http://suika.fam.cx/~wakaba/archive/2004/dom/main#
   @dx:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#
-  @dxm:
-    http://suika.fam.cx/~wakaba/archive/2004/dis/XML#
-  @ecore:
-    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/Core/
-  @ev:
-    http://www.w3.org/2001/xml-events
   @f:
     http://suika.fam.cx/~wakaba/archive/2004/dom/feature#
   @fe:
     http://suika.fam.cx/www/2006/feature/
-  @html5:
-    http://www.w3.org/1999/xhtml
   @idl:
     http://suika.fam.cx/~wakaba/archive/2004/dis/IDL#
   @infoset:
@@ -76,24 +71,14 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
   @ManakaiDOM:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
-  @ManakaiDOMCore:
-    http://suika.fam.cx/~wakaba/archive/2004/mdom-core#
   @MDOM:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
   @MDOMX:
     http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
   @mg:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Grove/
-  @mn:
-    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/ManakaiNode#
-  @MURI:
-    http://suika.fam.cx/~wakaba/archive/2005/manakai/URI/
-  @null:
-    http://suika.fam.cx/~wakaba/-temp/2003/09/27/null
   @rdf:
     http://www.w3.org/1999/02/22-rdf-syntax-ns#
-  @rdfs:
-    http://www.w3.org/2000/01/rdf-schema#
   @s:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Markup#
   @sw010:
@@ -110,16 +95,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/URI/Generic/
   @Util:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/
-  @x:
-    http://suika.fam.cx/~wakaba/archive/2004/dom/xml#
-  @xhtml1:
-    http://www.w3.org/1999/xhtml
   @xml:
     http://www.w3.org/XML/1998/namespace
-  @xml-dtd:
-    http://www.w3.org/TR/REC-xml
-  @xmlns:
-    http://www.w3.org/2000/xmlns/
 
 ElementTypeBinding:
   @Name: ClsDef
@@ -432,10 +409,10 @@ ElementTypeBinding:
       @@@@: tx|XMLFeature30
       @@@For: ManakaiDOM|DOM3
     @@f:implements:
-      @@@@: DOMXML|XMLVersionFeature10
+      @@@@: tx|XMLVersionFeature10
       @@@For: ManakaiDOM|DOM3
     @@f:implements:
-      @@@@: DOMXML|XMLVersionFeature11
+      @@@@: tx|XMLVersionFeature11
       @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeatureXML11
 
 ElementTypeBinding:
@@ -782,6 +759,11 @@ ResourceDef:
   @QName: HASH
   @AliasFor: DISPerl|HASH||ManakaiDOM|all
 
+ResourceDef:
+  @QName: ATDef
+  @AliasFor: d|AttributeDefinition
+  @For: ManakaiDOM|ManakaiDOMLatest
+
 IntPropDef:
   @QName: tx|entityURI
   @enDesc:
@@ -862,9 +844,9 @@ IFCls1Def:
   @CODE:
     @@QName: tx|createCDATASectionForTest
     @@PerlDef:
-      my $doc;
-      __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
-      $text = $doc-><M::Document.createCDATASection> ('text');
+      my $__doc;
+      __CODE{tc|createEmptyDocumentForTest:: $doc => $__doc}__;
+      $text = $__doc-><M::Document.createCDATASection> ('text');
 
   @CAttr:
     @@Name: nodeType
@@ -1052,11 +1034,11 @@ IFCls1Def:
       $test->id ('1.class');
       $test->assert_isa ($node, <IFName::CDATASection>);
       $test->id ('1.value');
-      $test->assert_equals ($node-><AG::t|CharacterData.data>, 'aaaa');
+      $test->assert_equals ($node-><AG::tc|CharacterData.data>, 'aaaa');
 
       $test->id (2);
       $node-><M::Node.manakaiAppendText> ('bbbb');
-      $test->assert_equals ($node-><AG::t|CharacterData.data>, 'aaaabbbb');
+      $test->assert_equals ($node-><AG::tc|CharacterData.data>, 'aaaabbbb');
 
   @CAttr:
     @@Name: nodeName
@@ -1155,6 +1137,7 @@ IFCls1Def:
 
         $test->id ('ent');
         my $ent = $doc-><M::Document.createEntityReference> ('ent');
+        $ent-><M::Node.manakaiSetReadOnly> (false, true);
         $ent-><AS::EntityReference.manakaiExternal> (true);
         $ent-><AS::EntityReference.manakaiEntityBaseURI> (q<http://ent.test/>);
         $el-><M::Node.appendChild> ($ent);
@@ -1400,16 +1383,16 @@ NodeTypeDef:
   @CODE:
     @@QName: tx|createNotationForTest
     @@PerlDef:
-      my $docx;
-      __CODE{d|createEmptyDocumentXForTest:: $docx => $docx}__;
-      $not = $docx-><M::DocumentX.createNotation> ('not');
-      # TODO: setReadOnly (1)
+      my $__docx;
+      __CODE{d|createEmptyDocumentXForTest:: $docx => $__docx}__;
+      $not = $__docx-><M::DocumentX.createNotation> ('not');
   @CODE:
     @@QName: tx|createRONotationForTest
     @@PerlDef:
       my $docx;
       __CODE{d|createEmptyDocumentXForTest:: $docx => $docx}__;
       $not = $docx-><M::DocumentX.createNotation> ('not');
+      $not-><M::Node.manakaiSetReadOnly> (true, true);
 
   @CAttr:
     @@Name: childNodes
@@ -1487,6 +1470,80 @@ NodeTypeDef:
       @@@disDef:
         @@@@DISPerl:cloneCode: tc|ManakaiDOMNode.nodeValue.set
 
+  @CMethod:
+    @@Name: appendChild
+    @@enDesc:
+      Adds a node to the end of the list of children of the node.
+      If that node is already in the tree, it is first removed.
+    @@Param:
+      @@@Name: newChild
+      @@@Type: Node
+      @@@enDesc:
+        The node to add.
+    @@Return:
+      @@@Type: Node
+      @@@enDesc:
+        The node added.
+      @@@dx:raises:
+        @@@@@: MDOMX|HIERARCHY_BAD_TYPE
+        @@@@enDesc:
+          The type of the node does not allow any children.
+      @@@disDef:
+        @@@@DISPerl:cloneCode: tc|ManakaiDOMCharacterData.appendChild
+
+  @CMethod:
+    @@Name: insertBefore
+    @@enDesc:
+      Inserts a node before the existing child node of the node.
+    @@Param:
+      @@@Name: newChild
+      @@@Type: Node
+      @@@enDesc:
+        The node to add.
+    @@Param:
+      @@@Name: refChild
+      @@@Type: Node
+      @@@enDesc:
+        The node before which the <P::newChild> node is inserted.
+      @@@nullCase:
+        @@@@enDesc:
+          The <P::newChild> node is inserted at the end.
+    @@Return:
+      @@@Type: Node
+      @@@enDesc:
+        The node added.
+      @@@dx:raises:
+        @@@@@: MDOMX|HIERARCHY_BAD_TYPE
+        @@@@enDesc:
+          The type of the node does not allow any children.
+      @@@disDef:
+        @@@@DISPerl:cloneCode: tc|ManakaiDOMCharacterData.insertBefore
+
+  @CMethod:
+    @@Name: replaceChild
+    @@enDesc:
+      Replaces a node by another node.
+    @@Param:
+      @@@Name: newChild
+      @@@Type: Node
+      @@@enDesc:
+        The node to add.
+    @@Param:
+      @@@Name: oldChild
+      @@@Type: Node
+      @@@enDesc:
+        The node to remove.
+    @@Return:
+      @@@Type: Node
+      @@@enDesc:
+        The node added.
+      @@@dx:raises:
+        @@@@@: MDOMX|HIERARCHY_BAD_TYPE
+        @@@@enDesc:
+          The type of the node does not allow any children.
+      @@@disDef:
+        @@@@DISPerl:cloneCode: tc|ManakaiDOMCharacterData.replaceChild
+
     @@Test:
       @@@QName: Notation.appendChild.test
       @@@PerlDef:
@@ -1494,8 +1551,8 @@ NodeTypeDef:
         __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
-        my $comment = $docx-><M::d|DocumentXDoctype.createNotation> ('data');
-        my $node2 = $docx-><M::d|DocumentXDoctype.createNotation> ('data');
+        my $comment = $docx-><M::DocumentX.createNotation> ('data');
+        my $node2 = $docx-><M::DocumentX.createNotation> ('data');
 
         for my $node (<Code::tc|createNodesForTest+dt>) {
           $test->id ('appendChild.'.$node-><AG::Node.nodeType>);
@@ -1521,7 +1578,7 @@ NodeTypeDef:
       __CODE{tc|createDocumentForTestDA:: $doc => $doc}__;
       my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
-      my $node = $docx-><M::DocumentXDoctype.createNotation> ('d');
+      my $node = $docx-><M::DocumentX.createNotation> ('d');
 
       $node-><M::Node.manakaiAppendText> ('aaaa');
       $test->id ('1.class');
@@ -1701,9 +1758,9 @@ NodeTypeDef:
       @@@PerlDef:
         my $doc;
         __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
-        my $dx = $doc-><M::t|Node.getFeature> (<Q::fe|XDoctype>);
+        my $dx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
-        my $ent = $dx-><M::d|DocumentXDoctype.createNotation> ('ent');
+        my $ent = $dx-><M::DocumentX.createNotation> ('ent');
 
         $test->id ('initial');
         $test->assert_null ($ent-><AG::Node.baseURI>);
@@ -1779,9 +1836,9 @@ NodeTypeDef:
       @@@PerlDef:
         my $doc;
         __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
-        my $dx = $doc-><M::t|Node.getFeature> (<Q::fe|XDoctype>);
+        my $dx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
-        my $ent = $dx-><M::d|DocumentXDoctype.createNotation> ('ent');
+        my $ent = $dx-><M::DocumentX.createNotation> ('ent');
 
         $test->id ('initial');
         $test->assert_null ($ent-><AG::Notation.manakaiDeclarationBaseURI>);
@@ -1842,9 +1899,9 @@ NodeTypeDef:
         my $odt = $et-><AG::Notation.ownerDocumentTypeDefinition>;
         $test->assert_null ($odt);
 
-        my $dt = $et-><AG::t|Node.ownerDocument>
-                     -><M::t|Node.getFeature> (<Q::fe|XDoctype>)
-                     -><M::d|DocumentXDoctype.createDocumentTypeDefinition>
+        my $dt = $et-><AG::Node.ownerDocument>
+                     -><M::Node.getFeature> (<Q::fe|XDoctype>)
+                     -><M::DocumentX.createDocumentTypeDefinition>
                          ('dt1');
         $test->assert_not_null ($dt);
         $dt-><M::d|DocumentTypeDefinition.setNotationNode> ($et);
@@ -1980,16 +2037,16 @@ NodeTypeDef:
   @CODE:
     @@QName: tx|createGEForTest
     @@PerlDef:
-      my $docx;
-      __CODE{d|createEmptyDocumentXForTest:: $docx => $docx}__;
-      $gent = $docx-><M::DocumentX.createGeneralEntity> ('gent');
-      # TODO: setReadOnly (1)
+      my $__docx;
+      __CODE{d|createEmptyDocumentXForTest:: $docx => $__docx}__;
+      $gent = $__docx-><M::DocumentX.createGeneralEntity> ('gent');
   @CODE:
     @@QName: tx|createROGEForTest
     @@PerlDef:
       my $docx;
       __CODE{d|createEmptyDocumentXForTest:: $docx => $docx}__;
       $gent = $docx-><M::DocumentX.createGeneralEntity> ('gent');
+      $gent-><M::Node.manakaiSetReadOnly> (true, true);
 
   @CAttr:
     @@Name: nodeName
@@ -2029,6 +2086,209 @@ NodeTypeDef:
         $test->assert_num_equals
                  (actual_value => $text-><AG::Node.nodeType>,
                   expected_value => <C::Node.ENTITY_NODE>);
+  
+  @CMethod:
+    @@Name: appendChild
+    @@enDesc:
+      Adds a node to the end of the list of children of the node.
+      If that node is already in the tree, it is first removed.
+    @@Param:
+      @@@Name: newChild
+      @@@Type: Node
+      @@@enDesc:
+        The node to add.
+      @@@InCase:
+        @@@@Type: tc|DocumentFragment
+        @@@@enDesc:
+          The entire contents of the document fragment are
+          moved into the child list of the node.
+    @@Return:
+      @@@Type: Node
+      @@@enDesc:
+        The node added.  If the <P::newChild> node is a <IF::tc|DocumentFragment>
+        node, then the <P::newChild> node <kwd:MUST> be returned.
+      @@@dx:raises:
+        @@@@@: MDOMX|HIERARCHY_BAD_TYPE
+        @@@@enDesc:
+          If the node is of a type that does not allow children of
+          the type of the <P::newChild> node.
+ 
+          If the <A::Document.strictErrorChecking> is set to <DOM::false>,
+          this exception <kwd:MAY-NOT> be thrown.
+      @@@dx:raises:
+        @@@@@: MDOMX|HIERARCHY_ANCESTOR_OR_SELF
+        @@@@enDesc:
+          If the <P::newChild> node is one of the node's ancestor
+          <SRC::DOM 1, 2, 3> or the node itself <SRC::DOM 2 Errata, DOM 3>.
+      @@@dx:raises:
+        @@@@@: c|DIFFERENT_DOCUMENT_ERR
+        @@@@enDesc:
+          If the <P::newChild> node was created from a different
+          document than the one to which the node was created or
+          the node does not belong to any document.
+
+          If the <A::Document.strictErrorChecking> is set to <DOM::false>,
+          this exception <kwd:MAY-NOT> be thrown.
+      @@@dx:raises: 
+        @@@@@: MDOMX|NOMOD_THIS
+        @@@@enDesc:
+          If the node is read-only.
+
+          If the <A::Document.strictErrorChecking> is set to <DOM::false>,
+          this exception <kwd:MAY-NOT> be thrown.
+      @@@dx:raises:
+        @@@@@: MDOMX|NOMOD_SRC_PARENT
+        @@@@enDesc:
+          If the previous parent of the <P::newChild> node is read-only
+          <SRC::DOM 2 Errata, DOM 3>.
+
+          If the <A::Document.strictErrorChecking> is set to <DOM::false>,
+          this exception <kwd:MAY-NOT> be thrown.
+      @@@disDef:
+        @@@@DISPerl:cloneCode: tc|ManakaiDOMElement.appendChild
+
+  @CMethod:
+    @@Name: insertBefore
+    @@enDesc:
+      Inserts a node before the existing child node of the node.
+
+      Inserting a node before itself is implementation dependent.
+    @@Param:
+      @@@Name: newChild
+      @@@Type: Node
+      @@@enDesc:
+        The node to insert.  If the <P::newChild> is already in 
+        the tree, it is first removed.
+      @@@InCase:
+        @@@@Type: tc|DocumentFragment
+        @@@@enDesc:
+          All of children of the <P::newChild> node are inserted,
+          in the same order, before <P::refChild>.
+    @@Param:
+      @@@Name: refChild
+      @@@Type: Node
+      @@@enDesc:
+        The reference node, i.e. the node before which the new node
+        must be inserted.
+      @@@nullCase:
+        @@@@enDesc:
+          The <P::newChild> node is inserted at the end of the list
+          of children.
+    @@Return:
+      @@@Type: Node
+      @@@enDesc:
+        The node being inserted.
+      @@@enImplNote:
+        What is returned if <P::newChild> is a <IF::tc|DocumentFragment>?
+        See also <M::Node.appendChild>'s return value.
+      @@@dx:raises:
+        @@@@@: MDOMX|HIERARCHY_BAD_TYPE
+        @@@@enDesc:
+          If the node is of a type that does not allow children of
+          the type of the <P::newChild> node.
+      @@@dx:raises:
+        @@@@@: MDOMX|HIERARCHY_ANCESTOR_OR_SELF
+        @@@@enDesc:
+          If the <P::newChild> node is one of the node's ancestor
+          <SRC::DOM 1, 2, 3> or the node itself <SRC::DOM 2 Errata, DOM 3>.
+      @@@dx:raises:
+        @@@@@: c|DIFFERENT_DOCUMENT_ERR
+        @@@@enDesc:
+          If the <P::newChild> node was created from a different
+          document than the one that created the node.
+        @@@@enImplNote:
+          The DOM specification ignores the fact that <IF::Document>s
+          and <IF::tx|DocumentType>s are created from 
+          <IF::c|DOMImplementation> :-)
+      @@@dx:raises: 
+        @@@@@: MDOMX|NOMOD_THIS
+        @@@@enDesc:
+          If the node is read-only.
+      @@@dx:raises:
+        @@@@@: MDOMX|NOMOD_SRC_PARENT
+        @@@@enDesc:
+          If the previous parent of the <P::newChild> node is read-only
+          <SRC::DOM 1 SE, DOM 2, 3>.
+      @@@dx:raises:
+        @@@@@: c|NOT_CHILD_ERR
+        @@@@enDesc:
+          If the <P::refChild> node is not a child of the node.
+      @@@c:reports:
+        @@@@@: t|insert-before-itself
+        @@@@enDesc:
+          If the <P::newChild> node is same as the <P::refChild> node.
+          Then, the result is implementation dependent.
+      @@@disDef:
+        @@@@DISPerl:cloneCode: tc|ManakaiDOMElement.insertBefore
+
+  @CMethod:
+    @@Name: replaceChild
+    @@enDesc:
+      Replaces a child node with another node.
+
+      Replacing a node with itself is implementation dependent <SRC::DOM3>.
+    @@Param:
+      @@@Name: newChild
+      @@@Type: Node
+      @@@enDesc:
+        The new node to put in the child list.
+
+        If the <P::newChild> node is already in the tree,
+        it is first removed.
+      @@@InCase:
+        @@@@Type: tc|DocumentFragment
+        @@@@enDesc:
+          The <P::oldChild> node is replaced by all of the 
+          <IF::DocumentFragment> children, which are inserted
+          in the same order <SRC::DOM1 SE, DOM2, DOM3>.
+    @@Param:
+      @@@Name: oldChild
+      @@@Type: Node
+      @@@enDesc:
+        The node being replaced in the list.
+    @@Return:
+      @@@Type: Node
+      @@@enDesc:
+        The node replaced.
+      @@@dx:raises:
+        @@@@@: MDOMX|HIERARCHY_BAD_TYPE
+        @@@@enDesc:
+          If the node is of a type that does not allow children of
+          the type of the <P::newChild> node.
+      @@@dx:raises:
+        @@@@@: MDOMX|HIERARCHY_ANCESTOR_OR_SELF
+        @@@@enDesc:
+          If the <P::newChild> node is one of the node's ancestor
+          <SRC::DOM 1, 2, 3> or the node itself <SRC::DOM 2 Errata, DOM 3>.
+      @@@dx:raises:
+        @@@@@: c|DIFFERENT_DOCUMENT_ERR
+        @@@@enDesc:
+          If the <P::newChild> node was created from a different
+          document than the one that created the node.
+        @@@@enImplNote:
+          The DOM specification ignores the fact that <IF::Document>s
+          and <IF::tx|DocumentType>s are created from 
+          <IF::c|DOMImplementation> :-)
+      @@@dx:raises: 
+        @@@@@: MDOMX|NOMOD_THIS
+        @@@@enDesc:
+          If the node is read-only.
+      @@@dx:raises:
+        @@@@@: MDOMX|NOMOD_SRC_PARENT
+        @@@@enDesc:
+          If the previous parent of the <P::newChild> node is read-only
+          <SRC::DOM1 SE, DOM2, DOM3>.
+      @@@dx:raises:
+        @@@@@: c|NOT_CHILD_ERR
+        @@@@enDesc:
+          If the <P::oldChild> node is not a child of the node.
+      @@@c:reports:
+        @@@@@: t|replaced-by-itself
+        @@@@enDesc:
+          If the <P::newChild> node is same as the <P::oldChild> node.
+          Then, the result is implementation dependent.
+      @@@disDef:
+        @@@@DISPerl:cloneCode: tc|ManakaiDOMElement.replaceChild
 
     @@Test:
       @@@QName: Entity.appendChild.1.1.test
@@ -2037,7 +2297,7 @@ NodeTypeDef:
         __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
-        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('dt');
+        my $dtd = $docx-><M::DocumentX.createGeneralEntity> ('dt');
         my $pi = $doc-><M::Document.createTextNode> ('pi');
 
         my $return = $dtd-><M::Node.appendChild> ($pi);
@@ -2079,7 +2339,7 @@ NodeTypeDef:
         __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
-        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('dt');
+        my $dtd = $docx-><M::DocumentX.createGeneralEntity> ('dt');
         my $pi = $doc-><M::Document.createEntityReference> ('pi');
 
         my $return = $dtd-><M::Node.appendChild> ($pi);
@@ -2121,7 +2381,7 @@ NodeTypeDef:
         __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
-        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('dt');
+        my $dtd = $docx-><M::DocumentX.createGeneralEntity> ('dt');
         my $pi = $doc-><M::Document.createElement> ('pi');
 
         my $return = $dtd-><M::Node.appendChild> ($pi);
@@ -2163,7 +2423,7 @@ NodeTypeDef:
         __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
-        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('dt');
+        my $dtd = $docx-><M::DocumentX.createGeneralEntity> ('dt');
         my $pi = $doc-><M::Document.createProcessingInstruction> ('pi');
 
         my $return = $dtd-><M::Node.appendChild> ($pi);
@@ -2205,7 +2465,7 @@ NodeTypeDef:
         __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
-        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('dt');
+        my $dtd = $docx-><M::DocumentX.createGeneralEntity> ('dt');
         my $pi = $doc-><M::Document.createCDATASection> ('pi');
 
         my $return = $dtd-><M::Node.appendChild> ($pi);
@@ -2247,7 +2507,7 @@ NodeTypeDef:
         __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
-        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('dt');
+        my $dtd = $docx-><M::DocumentX.createGeneralEntity> ('dt');
         my $pi = $doc-><M::Document.createComment> ('pi');
 
         my $return = $dtd-><M::Node.appendChild> ($pi);
@@ -2289,7 +2549,7 @@ NodeTypeDef:
         __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
-        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('dt');
+        my $dtd = $docx-><M::DocumentX.createGeneralEntity> ('dt');
         my $pi = $doc-><M::Document.createTextNode> ('pi');
 
         my $return = $dtd-><M::Node.insertBefore> ($pi);
@@ -2331,7 +2591,7 @@ NodeTypeDef:
         __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
-        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('dt');
+        my $dtd = $docx-><M::DocumentX.createGeneralEntity> ('dt');
         my $pi = $doc-><M::Document.createEntityReference> ('pi');
 
         my $return = $dtd-><M::Node.insertBefore> ($pi);
@@ -2373,7 +2633,7 @@ NodeTypeDef:
         __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
-        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('dt');
+        my $dtd = $docx-><M::DocumentX.createGeneralEntity> ('dt');
         my $pi = $doc-><M::Document.createElement> ('pi');
 
         my $return = $dtd-><M::Node.insertBefore> ($pi);
@@ -2415,7 +2675,7 @@ NodeTypeDef:
         __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
-        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('dt');
+        my $dtd = $docx-><M::DocumentX.createGeneralEntity> ('dt');
         my $pi = $doc-><M::Document.createProcessingInstruction> ('pi');
 
         my $return = $dtd-><M::Node.insertBefore> ($pi);
@@ -2457,7 +2717,7 @@ NodeTypeDef:
         __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
-        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('dt');
+        my $dtd = $docx-><M::DocumentX.createGeneralEntity> ('dt');
         my $pi = $doc-><M::Document.createCDATASection> ('pi');
 
         my $return = $dtd-><M::Node.insertBefore> ($pi);
@@ -2499,7 +2759,7 @@ NodeTypeDef:
         __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
-        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('dt');
+        my $dtd = $docx-><M::DocumentX.createGeneralEntity> ('dt');
         my $pi = $doc-><M::Document.createComment> ('pi');
 
         my $return = $dtd-><M::Node.insertBefore> ($pi);
@@ -2542,7 +2802,7 @@ NodeTypeDef:
         __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
-        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('dt');
+        my $dtd = $docx-><M::DocumentX.createGeneralEntity> ('dt');
 
         my $piparent = $doc-><M::Document.createElementNS> (null, 'e');
         my $pi = $doc-><M::Document.createTextNode> ('pi');
@@ -2593,7 +2853,7 @@ NodeTypeDef:
         __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
-        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('dt');
+        my $dtd = $docx-><M::DocumentX.createGeneralEntity> ('dt');
 
         my $piparent = $doc-><M::Document.createElementNS> (null, 'e');
         my $pi = $doc-><M::Document.createEntityReference> ('pi');
@@ -2644,7 +2904,7 @@ NodeTypeDef:
         __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
-        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('dt');
+        my $dtd = $docx-><M::DocumentX.createGeneralEntity> ('dt');
 
         my $piparent = $doc-><M::Document.createElementNS> (null, 'e');
         my $pi = $doc-><M::Document.createTextNode> ('pi');
@@ -2695,7 +2955,7 @@ NodeTypeDef:
         __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
-        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('dt');
+        my $dtd = $docx-><M::DocumentX.createGeneralEntity> ('dt');
 
         my $piparent = $doc-><M::Document.createElementNS> (null, 'e');
         my $pi = $doc-><M::Document.createEntityReference> ('pi');
@@ -2747,7 +3007,7 @@ NodeTypeDef:
         __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
-        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('dt');
+        my $dtd = $docx-><M::DocumentX.createGeneralEntity> ('dt');
 
         my $piparent = $doc-><M::Document.createDocumentFragment>;
         my $pi = $doc-><M::Document.createTextNode> ('pi');
@@ -2798,7 +3058,7 @@ NodeTypeDef:
         __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
-        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('dt');
+        my $dtd = $docx-><M::DocumentX.createGeneralEntity> ('dt');
 
         my $piparent = $doc-><M::Document.createDocumentFragment>;
         my $pi = $doc-><M::Document.createEntityReference> ('pi');
@@ -2849,7 +3109,7 @@ NodeTypeDef:
         __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
-        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('dt');
+        my $dtd = $docx-><M::DocumentX.createGeneralEntity> ('dt');
 
         my $piparent = $doc-><M::Document.createDocumentFragment>;
         my $pi = $doc-><M::Document.createTextNode> ('pi');
@@ -2899,7 +3159,7 @@ NodeTypeDef:
         __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
-        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('dt');
+        my $dtd = $docx-><M::DocumentX.createGeneralEntity> ('dt');
 
         my $piparent = $doc-><M::Document.createDocumentFragment>;
         my $pi = $doc-><M::Document.createEntityReference> ('pi');
@@ -2950,7 +3210,7 @@ NodeTypeDef:
         __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
-        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('dt');
+        my $dtd = $docx-><M::DocumentX.createGeneralEntity> ('dt');
         my $pi0 = $doc-><M::Document.createTextNode> ('pi0');
         $dtd-><M::Node.appendChild> ($pi0);
 
@@ -3003,7 +3263,7 @@ NodeTypeDef:
         __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
-        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('dt');
+        my $dtd = $docx-><M::DocumentX.createGeneralEntity> ('dt');
         my $pi0 = $doc-><M::Document.createTextNode> ('pi0');
         $dtd-><M::Node.appendChild> ($pi0);
 
@@ -3059,7 +3319,7 @@ NodeTypeDef:
         __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
-        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('dt');
+        my $dtd = $docx-><M::DocumentX.createGeneralEntity> ('dt');
 
         my $piparent = $doc-><M::Document.createDocumentFragment>;
 
@@ -3089,7 +3349,7 @@ NodeTypeDef:
         __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
-        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('dt');
+        my $dtd = $docx-><M::DocumentX.createGeneralEntity> ('dt');
 
         my $piparent = $doc-><M::Document.createDocumentFragment>;
 
@@ -3119,7 +3379,7 @@ NodeTypeDef:
         __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
-        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('dt');
+        my $dtd = $docx-><M::DocumentX.createGeneralEntity> ('dt');
         my $pi0 = $doc-><M::Document.createTextNode> ('pi0');
         $dtd-><M::Node.appendChild> ($pi0);
 
@@ -3152,7 +3412,7 @@ NodeTypeDef:
         __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
-        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('dt');
+        my $dtd = $docx-><M::DocumentX.createGeneralEntity> ('dt');
 
         my $piparent = $doc-><M::Document.createDocumentFragment>;
         my $pi = $doc-><M::Document.createTextNode> ('pi');
@@ -3229,7 +3489,7 @@ NodeTypeDef:
         __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
-        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('dt');
+        my $dtd = $docx-><M::DocumentX.createGeneralEntity> ('dt');
 
         my $piparent = $doc-><M::Document.createDocumentFragment>;
         my $pi = $doc-><M::Document.createTextNode> ('pi');
@@ -3306,7 +3566,7 @@ NodeTypeDef:
         __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
-        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('dt');
+        my $dtd = $docx-><M::DocumentX.createGeneralEntity> ('dt');
         my $pi0 = $doc-><M::Document.createTextNode> ('pi0');
         $dtd-><M::Node.appendChild> ($pi0);
 
@@ -3384,18 +3644,18 @@ NodeTypeDef:
         __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
-        my $comment = $docx-><M::DocumentXDoctype.createGeneralEntity>
+        my $comment = $docx-><M::DocumentX.createGeneralEntity>
                                ('data');
         my $pi0 = $doc-><M::Document.createTextNode> ('pi0');
         $comment-><M::Node.appendChild> ($pi0);
 
         for my $node (
-          $docx-><M::d|DocumentXDoctype.createDocumentTypeDefinition> ('d'),
+          $docx-><M::DocumentX.createDocumentTypeDefinition> ('d'),
           $doc-><M::Document.createAttribute> ('a'),
-          $docx-><M::d|DocumentXDoctype.createGeneralEntity> ('ge'),
-          $docx-><M::d|DocumentXDoctype.createNotation> ('not'),
-          $docx-><M::d|DocumentXDoctype.createElementTypeDefinition> ('et'),
-          $docx-><M::d|DocumentXDoctype.createAttributeDefinition> ('at'),
+          $docx-><M::DocumentX.createGeneralEntity> ('ge'),
+          $docx-><M::DocumentX.createNotation> ('not'),
+          $docx-><M::DocumentX.createElementTypeDefinition> ('et'),
+          $docx-><M::DocumentX.createAttributeDefinition> ('at'),
           #test:nodeTypes
         ) {
           $test->id ('appendChild.'.$node-><AG::Node.nodeType>);
@@ -3424,7 +3684,7 @@ NodeTypeDef:
         my $doc;
         __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
 
-        my $comment = $docx0-><M::DocumentXDoctype.createGeneralEntity>
+        my $comment = $docx0-><M::DocumentX.createGeneralEntity>
                                 ('data');
 
         for my $node (
@@ -3450,7 +3710,7 @@ NodeTypeDef:
         my $doc;
         __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
 
-        my $comment = $docx0-><M::DocumentXDoctype.createGeneralEntity>
+        my $comment = $docx0-><M::DocumentX.createGeneralEntity>
                                 ('data');
         my $pi0 = $doc0-><M::Document.createTextNode> ('pi0');
         $comment-><M::Node.appendChild> ($pi0);
@@ -3486,7 +3746,7 @@ NodeTypeDef:
         __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
-        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('d');
+        my $dtd = $docx-><M::DocumentX.createGeneralEntity> ('d');
         my $pi0 = $doc-><M::Document.createTextNode> ('pi0');
         $dtd-><M::Node.appendChild> ($pi0);
         $dtd-><M::Node.manakaiSetReadOnly> (true);
@@ -3533,7 +3793,7 @@ NodeTypeDef:
         __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
-        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('d');
+        my $dtd = $docx-><M::DocumentX.createGeneralEntity> ('d');
         my $pi0 = $doc-><M::Document.createTextNode> ('pi0');
         $dtd-><M::Node.appendChild> ($pi0);
 
@@ -3584,7 +3844,7 @@ NodeTypeDef:
         __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
-        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('d');
+        my $dtd = $docx-><M::DocumentX.createGeneralEntity> ('d');
 
         my $pi1 = $doc-><M::Document.createTextNode> ('pi1');
         $dtd-><M::Node.appendChild> ($pi1);
@@ -3610,7 +3870,7 @@ NodeTypeDef:
         __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
-        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('d');
+        my $dtd = $docx-><M::DocumentX.createGeneralEntity> ('d');
 
         my $pi1 = $doc-><M::Document.createTextNode> ('pi1');
         $dtd-><M::Node.appendChild> ($pi1);
@@ -3645,7 +3905,7 @@ NodeTypeDef:
         __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
-        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('d');
+        my $dtd = $docx-><M::DocumentX.createGeneralEntity> ('d');
 
         my $pi1 = $doc-><M::Document.createTextNode> ('pi1');
         $dtd-><M::Node.appendChild> ($pi1);
@@ -3684,7 +3944,7 @@ NodeTypeDef:
         __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
-        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('d');
+        my $dtd = $docx-><M::DocumentX.createGeneralEntity> ('d');
 
         my $pi1 = $doc-><M::Document.createTextNode> ('pi1');
         $dtd-><M::Node.appendChild> ($pi1);
@@ -3723,7 +3983,7 @@ NodeTypeDef:
         __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
-        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('d');
+        my $dtd = $docx-><M::DocumentX.createGeneralEntity> ('d');
 
         my $pi1 = $doc-><M::Document.createTextNode> ('pi1');
         $dtd-><M::Node.appendChild> ($pi1);
@@ -3748,7 +4008,7 @@ NodeTypeDef:
         __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
-        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('d');
+        my $dtd = $docx-><M::DocumentX.createGeneralEntity> ('d');
 
         my $pi1 = $doc-><M::Document.createTextNode> ('pi1');
         $dtd-><M::Node.appendChild> ($pi1);
@@ -3796,7 +4056,7 @@ NodeTypeDef:
         __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
-        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('d');
+        my $dtd = $docx-><M::DocumentX.createGeneralEntity> ('d');
 
         my $pi1 = $doc-><M::Document.createTextNode> ('pi1');
         $dtd-><M::Node.appendChild> ($pi1);
@@ -3844,7 +4104,7 @@ NodeTypeDef:
         __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
-        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('d');
+        my $dtd = $docx-><M::DocumentX.createGeneralEntity> ('d');
 
         my $pi1 = $doc-><M::Document.createTextNode> ('pi1');
         $dtd-><M::Node.appendChild> ($pi1);
@@ -3879,7 +4139,7 @@ NodeTypeDef:
         __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
-        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('d');
+        my $dtd = $docx-><M::DocumentX.createGeneralEntity> ('d');
 
         my $pi1 = $doc-><M::Document.createTextNode> ('pi1');
         $dtd-><M::Node.appendChild> ($pi1);
@@ -3914,7 +4174,7 @@ NodeTypeDef:
         __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
-        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('d');
+        my $dtd = $docx-><M::DocumentX.createGeneralEntity> ('d');
 
         my $pi1 = $doc-><M::Document.createTextNode> ('pi1');
         $dtd-><M::Node.appendChild> ($pi1);
@@ -3949,7 +4209,7 @@ NodeTypeDef:
         __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
-        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('d');
+        my $dtd = $docx-><M::DocumentX.createGeneralEntity> ('d');
 
         my $pi1 = $doc-><M::Document.createTextNode> ('pi1');
         $dtd-><M::Node.appendChild> ($pi1);
@@ -3984,7 +4244,7 @@ NodeTypeDef:
         __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
-        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('d');
+        my $dtd = $docx-><M::DocumentX.createGeneralEntity> ('d');
 
         my $pi1 = $doc-><M::Document.createTextNode> ('pi1');
         $dtd-><M::Node.appendChild> ($pi1);
@@ -4037,7 +4297,7 @@ NodeTypeDef:
         __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
-        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('d');
+        my $dtd = $docx-><M::DocumentX.createGeneralEntity> ('d');
 
         my $pi1 = $doc-><M::Document.createTextNode> ('pi1');
         $dtd-><M::Node.appendChild> ($pi1);
@@ -4090,7 +4350,7 @@ NodeTypeDef:
         __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
-        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('d');
+        my $dtd = $docx-><M::DocumentX.createGeneralEntity> ('d');
 
         my $pi1 = $doc-><M::Document.createTextNode> ('pi1');
         $dtd-><M::Node.appendChild> ($pi1);
@@ -4143,7 +4403,7 @@ NodeTypeDef:
         __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
-        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('d');
+        my $dtd = $docx-><M::DocumentX.createGeneralEntity> ('d');
 
         my $pi1 = $doc-><M::Document.createTextNode> ('pi1');
         $dtd-><M::Node.appendChild> ($pi1);
@@ -4191,7 +4451,7 @@ NodeTypeDef:
         __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
-        my $dtd = $docx-><M::DocumentXDoctype.createGeneralEntity> ('d');
+        my $dtd = $docx-><M::DocumentX.createGeneralEntity> ('d');
 
         my $pi1 = $doc-><M::Document.createTextNode> ('pi1');
         $dtd-><M::Node.appendChild> ($pi1);
@@ -4263,7 +4523,7 @@ NodeTypeDef:
         __CODE{tc|createEmptyDocumentForTestER:: $doc => $doc}__;
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
-        my $node = $docx-><M::DocumentXDoctype.createGeneralEntity> ('node');
+        my $node = $docx-><M::DocumentX.createGeneralEntity> ('node');
 
         $node-><M::Node.manakaiAppendText> ('string');
         $test->id ('1.class');
@@ -4369,7 +4629,7 @@ NodeTypeDef:
         __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
         my $dx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
-        my $ent = $dx-><M::d|DocumentXDoctype.createGeneralEntity> ('ent');
+        my $ent = $dx-><M::DocumentX.createGeneralEntity> ('ent');
 
         $test->id ('initial');
         $test->assert_null ($ent-><AG::Node.baseURI>);
@@ -4772,7 +5032,7 @@ NodeTypeDef:
         __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
         my $dx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
-        my $ent = $dx-><M::d|DocumentXDoctype.createGeneralEntity> ('ent');
+        my $ent = $dx-><M::DocumentX.createGeneralEntity> ('ent');
 
         $test->id ('initial');
         $test->assert_null ($ent-><AG::Entity.manakaiDeclarationBaseURI>);
@@ -4835,7 +5095,7 @@ NodeTypeDef:
       @@@PerlDef:
         __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
           $r => $r,
-          $prop => {<H::x|entityBaseURI>},
+          $prop => {<H::tx|entityBaseURI>},
           $ref => {$self},
         }__;
         unless (defined $r) {
@@ -4863,7 +5123,7 @@ NodeTypeDef:
         __CODE{tc|NodeReadOnlyError:: $node => $self}__;
         __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
           $given => $given,
-          $prop => {<H::x|entityBaseURI>},
+          $prop => {<H::tx|entityBaseURI>},
           $ref => $self,
         }__;
 
@@ -4874,7 +5134,7 @@ NodeTypeDef:
         __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
         my $dx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
-        my $ent = $dx-><M::d|DocumentXDoctype.createGeneralEntity> ('ent');
+        my $ent = $dx-><M::DocumentX.createGeneralEntity> ('ent');
 
         $test->id ('initial');
         $test->assert_null ($ent-><AG::Entity.manakaiEntityBaseURI>);
@@ -4996,7 +5256,7 @@ NodeTypeDef:
         __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
         my $dx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
-        my $ent = $dx-><M::d|DocumentXDoctype.createGeneralEntity> ('ent');
+        my $ent = $dx-><M::DocumentX.createGeneralEntity> ('ent');
 
         $test->id ('initial');
         $test->assert_null ($ent-><AG::Entity.manakaiEntityURI>);
@@ -5093,7 +5353,7 @@ NodeTypeDef:
 
         my $dt = $et-><AG::Node.ownerDocument>
                      -><M::Node.getFeature> (<Q::fe|XDoctype>)
-                     -><M::d|DocumentXDoctype.createDocumentTypeDefinition>
+                     -><M::DocumentX.createDocumentTypeDefinition>
                          ('dt1');
         $test->assert_not_null ($dt);
         $dt-><M::d|DocumentTypeDefinition.setGeneralEntityNode> ($et);
@@ -5116,7 +5376,7 @@ NodeTypeDef:
     @@FalseCase:
       @@@enDesc:
         If the entity is declared by a markup declaration in
-        the internal subset, or if the <IF::x|Entity> node
+        the internal subset, or if the <IF::Entity> node
         is created in memory.
     @@Get:
       @@@PerlDef:
@@ -5267,16 +5527,16 @@ NodeTypeDef:
   @CODE:
     @@QName: tx|createERForTest
     @@PerlDef:
-      my $doc;
-      __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
-      $er = $doc-><M::Document.createEntityReference> ('er');
-      # TODO: setReadOnly (1)
+      my $__doc;
+      __CODE{tc|createEmptyDocumentForTest:: $doc => $__doc}__;
+      $er = $__doc-><M::Document.createEntityReference> ('er');
+      $er-><M::Node.manakaiSetReadOnly> (false, true);
   @CODE:
     @@QName: tx|createROERForTest
     @@PerlDef:
-      my $doc;
-      __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
-      $er = $doc-><M::Document.createEntityReference> ('er');
+      my $__doc;
+      __CODE{tc|createEmptyDocumentForTest:: $doc => $__doc}__;
+      $er = $__doc-><M::Document.createEntityReference> ('er');
 
   @CAttr:
     @@Name: nodeType
@@ -5353,7 +5613,7 @@ NodeTypeDef:
       my $el = $doc-><M::Document.createEntityReference> ('entity');
 
       $test->id ('default');
-      $test->assert_false ($el-><AG::Node.manakaiReadOnly>);
+      $test->assert_true ($el-><AG::Node.manakaiReadOnly>);
 
   @CMethod:
     @@Name: appendChild
@@ -5366,7 +5626,7 @@ NodeTypeDef:
       @@@enDesc:
         The node to add.
       @@@InCase:
-        @@@@Type: DocumentFragment
+        @@@@Type: tc|DocumentFragment
         @@@@enDesc:
           The entire contents of the document fragment are
           moved into the child list of the node.
@@ -5412,35 +5672,8 @@ NodeTypeDef:
 
           If the <A::Document.strictErrorChecking> is set to <DOM::false>,
           this exception <kwd:MAY-NOT> be thrown.
-      @@@PerlDef:
-        my $self_od = $self-><AG::Node.ownerDocument>;
-        if ($self_od-><AG::Document.strictErrorChecking>) {
-          my $anode = $self;
-          while (defined $anode) {
-            if ($anode eq $newChild) {
-              __EXCEPTION{MDOMX|HIERARCHY_ANCESTOR_OR_SELF::
-                MDOMX|param-name => 'newChild',
-                c|node => {$newChild},
-              }__;
-            }
-            $anode = $anode-><AG::Node.parentNode>;
-          }
-        }
-        my $child_od = $newChild-><AG::Node.ownerDocument>;
-        my $child_nt = $newChild-><AG::Node.nodeType>;
-        __CODE{tc|appendChildImpl1::
-          $self => $self, $self_od => $self_od,
-          $newChild => $newChild, $child_od => $child_od, $child_nt => $child_nt,
-          $r => $r,
-          $allowedNodeTypes => {{
-            <C::Node.TEXT_NODE> => true,
-            <C::Node.ENTITY_REFERENCE_NODE> => true,
-            <C::Node.ELEMENT_NODE> => true,
-            <C::Node.CDATA_SECTION_NODE> => true,
-            <C::Node.PROCESSING_INSTRUCTION_NODE> => true,
-            <C::Node.COMMENT_NODE> => true,
-          }},
-        }__;
+      @@@disDef:
+        @@@@DISPerl:cloneCode: ManakaiDOMEntity.appendChild
 
   @CMethod:
     @@Name: insertBefore
@@ -5455,7 +5688,7 @@ NodeTypeDef:
         The node to insert.  If the <P::newChild> is already in 
         the tree, it is first removed.
       @@@InCase:
-        @@@@Type: DocumentFragment
+        @@@@Type: tc|DocumentFragment
         @@@@enDesc:
           All of children of the <P::newChild> node are inserted,
           in the same order, before <P::refChild>.
@@ -5493,7 +5726,7 @@ NodeTypeDef:
           document than the one that created the node.
         @@@@enImplNote:
           The DOM specification ignores the fact that <IF::Document>s
-          and <IF::x|DocumentType>s are created from 
+          and <IF::DocumentType>s are created from 
           <IF::c|DOMImplementation> :-)
       @@@dx:raises: 
         @@@@@: MDOMX|NOMOD_THIS
@@ -5513,37 +5746,8 @@ NodeTypeDef:
         @@@@enDesc:
           If the <P::newChild> node is same as the <P::refChild> node.
           Then, the result is implementation dependent.
-        @@@@For: ManakaiDOM|ManakaiDOM
-      @@@PerlDef:
-        my $self_od = $self-><AG::Node.ownerDocument>;
-        if ($self_od-><AG::Document.strictErrorChecking>) {
-          my $anode = $self;
-          while (defined $anode) {
-            if ($anode eq $newChild) {
-              __EXCEPTION{MDOMX|HIERARCHY_ANCESTOR_OR_SELF::
-                MDOMX|param-name => 'newChild',
-                c|node => {$newChild},
-              }__;
-            }
-            $anode = $anode-><AG::Node.parentNode>;
-          }
-        }
-        my $child_od = $newChild-><AG::Node.ownerDocument>;
-        my $child_nt = $newChild-><AG::Node.nodeType>;
-        __CODE{tc|insertBeforeImpl1::
-          $self => $self, $self_od => $self_od,
-          $newChild => $newChild, $refChild => $refChild,
-          $child_od => $child_od, $child_nt => $child_nt,
-          $r => $r,
-          $allowedNodeTypes => {{
-            <C::Node.TEXT_NODE> => true,
-            <C::Node.ENTITY_REFERENCE_NODE> => true,
-            <C::Node.ELEMENT_NODE> => true,
-            <C::Node.CDATA_SECTION_NODE> => true,
-            <C::Node.PROCESSING_INSTRUCTION_NODE> => true,
-            <C::Node.COMMENT_NODE> => true,
-          }},
-        }__;
+      @@@disDef:
+        @@@@DISPerl:cloneCode: ManakaiDOMEntity.insertBefore
 
   @CMethod:
     @@Name: replaceChild
@@ -5560,7 +5764,7 @@ NodeTypeDef:
         If the <P::newChild> node is already in the tree,
         it is first removed.
       @@@InCase:
-        @@@@Type: DocumentFragment
+        @@@@Type: tc|DocumentFragment
         @@@@enDesc:
           The <P::oldChild> node is replaced by all of the 
           <IF::tc|DocumentFragment> children, which are inserted
@@ -5591,7 +5795,7 @@ NodeTypeDef:
           document than the one that created the node.
         @@@@enImplNote:
           The DOM specification ignores the fact that <IF::Document>s
-          and <IF::x|DocumentType>s are created from 
+          and <IF::DocumentType>s are created from 
           <IF::c|DOMImplementation> :-)
       @@@dx:raises: 
         @@@@@: MDOMX|NOMOD_THIS
@@ -5611,37 +5815,8 @@ NodeTypeDef:
         @@@@enDesc:
           If the <P::newChild> node is same as the <P::oldChild> node.
           Then, the result is implementation dependent.
-        @@@@For: ManakaiDOM|ManakaiDOM
-      @@@PerlDef:
-        my $self_od = $self-><AG::Node.ownerDocument>;
-        if ($self_od-><AG::Document.strictErrorChecking>) {
-          my $anode = $self;
-          while (defined $anode) {
-            if ($anode eq $newChild) {
-              __EXCEPTION{MDOMX|HIERARCHY_ANCESTOR_OR_SELF::
-                MDOMX|param-name => 'newChild',
-                c|node => {$newChild},
-              }__;
-            }
-            $anode = $anode-><AG::Node.parentNode>;
-          }
-        }
-        my $child_od = $newChild-><AG::Node.ownerDocument>;
-        my $child_nt = $newChild-><AG::Node.nodeType>;
-        __CODE{tc|replaceChildImpl1::
-          $self => $self, $self_od => $self_od,
-          $newChild => $newChild, $refChild => $oldChild,
-          $child_od => $child_od, $child_nt => $child_nt,
-          $r => $r,
-          $allowedNodeTypes => {{
-            <C::Node.TEXT_NODE> => true,
-            <C::Node.ENTITY_REFERENCE_NODE> => true,
-            <C::Node.ELEMENT_NODE> => true,
-            <C::Node.CDATA_SECTION_NODE> => true,
-            <C::Node.PROCESSING_INSTRUCTION_NODE> => true,
-            <C::Node.COMMENT_NODE> => true,
-          }},
-        }__;
+      @@@disDef:
+        @@@@DISPerl:cloneCode: ManakaiDOMEntity.replaceChild
 
     @@Test:
       @@@QName: EntityRef.appendChild.1.1.test
@@ -7032,12 +7207,12 @@ NodeTypeDef:
         $comment-><M::Node.appendChild> ($pi0);
 
         for my $node (
-          $docx-><M::d|DocumentXDoctype.createDocumentTypeDefinition> ('d'),
+          $docx-><M::DocumentX.createDocumentTypeDefinition> ('d'),
           $doc-><M::Document.createAttribute> ('a'),
-          $docx-><M::d|DocumentXDoctype.createGeneralEntity> ('ge'),
-          $docx-><M::d|DocumentXDoctype.createNotation> ('not'),
-          $docx-><M::d|DocumentXDoctype.createElementTypeDefinition> ('et'),
-          $docx-><M::d|DocumentXDoctype.createAttributeDefinition> ('at'),
+          $docx-><M::DocumentX.createGeneralEntity> ('ge'),
+          $docx-><M::DocumentX.createNotation> ('not'),
+          $docx-><M::DocumentX.createElementTypeDefinition> ('et'),
+          $docx-><M::DocumentX.createAttributeDefinition> ('at'),
           #test:nodeTypes
         ) {
           $test->id ('appendChild.'.$node-><AG::Node.nodeType>);
@@ -8135,6 +8310,7 @@ NodeTypeDef:
         __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
 
         my $ent = $doc-><M::Document.createEntityReference> ('ent');
+        $ent-><M::Node.manakaiSetReadOnly> (false, true);
 
         $test->id ('initial');
         $test->assert_null ($ent-><AG::Node.baseURI>);
@@ -8207,15 +8383,15 @@ NodeTypeDef:
         __CODE{tx|createERForTest:: $er => $node}__;
 
         $test->id ('set.false.1');
-        $node-><AS::EntityReference.manakaiExpanded>;
+        $node-><AS::EntityReference.manakaiExpanded> (false);
         $test->assert_false ($node-><AG::EntityReference.manakaiExpanded>);
 
         $test->id ('set.true');
-        $node-><AS::EntityReference.manakaiExpanded>;
+        $node-><AS::EntityReference.manakaiExpanded> (true);
         $test->assert_true ($node-><AG::EntityReference.manakaiExpanded>);
 
         $test->id ('set.false.2');
-        $node-><AS::EntityReference.manakaiExpanded>;
+        $node-><AS::EntityReference.manakaiExpanded> (false);
         $test->assert_false ($node-><AG::EntityReference.manakaiExpanded>);
 
   @LXAttr:
@@ -8293,6 +8469,7 @@ NodeTypeDef:
         __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
 
         my $ent = $doc-><M::Document.createEntityReference> ('ent');
+        $ent-><M::Node.manakaiSetReadOnly> (false, true);
 
         $test->id ('initial');
         $test->assert_null ($ent-><AG::EntityReference.manakaiEntityBaseURI>);
@@ -8365,6 +8542,7 @@ NodeTypeDef:
         __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
 
         my $ent = $doc-><M::Document.createEntityReference> ('ent');
+        $ent-><M::Node.manakaiSetReadOnly> (false, true);
 
         $test->id ('set.false.1');
         $ent-><AS::EntityReference.manakaiExternal> (false);
@@ -8421,7 +8599,7 @@ NodeTypeDef:
           $result => {$obj->{<H::infoset|target>}},
           $given => {${$opt->{<H::infoset|target>}}},
         }__;
-        $obj->{<H::infoset|content>} = ${$opt->{<H::infoset|content>}};
+        $obj->{<H::infoset|content>} = $opt->{<H::infoset|content>};
         __CODE{mg|setOwnerProp||ManakaiDOM|all::
           $bag => $bag,
           $ownerref => {$opt->{<H::tc|ownerDocument>}},
@@ -8462,9 +8640,9 @@ NodeTypeDef:
   @CODE:
     @@QName: tx|createPIForTest
     @@PerlDef:
-      my $doc;
-      __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
-      $pi = $doc-><M::Document.createProcessingInstruction> ('pi', 'data');
+      my $__doc;
+      __CODE{tc|createEmptyDocumentForTest:: $doc => $__doc}__;
+      $pi = $__doc-><M::Document.createProcessingInstruction> ('pi', 'data');
 
   @CAttr:
     @@Name: nodeType
@@ -8602,7 +8780,7 @@ NodeTypeDef:
         @@@@enDesc:
           The type of the node does not allow any children.
       @@@disDef:
-        @@@@DISPerl:cloneCode: t|ManakaiDOMCharacterData.insertBefore
+        @@@@DISPerl:cloneCode: tc|ManakaiDOMCharacterData.insertBefore
 
   @CMethod:
     @@Name: replaceChild
@@ -8840,7 +9018,7 @@ NodeTypeDef:
       @@@QName: PI.baseURI.test
       @@@PerlDef:
         my $doc;
-        __CODE{t|createDocumentForTest:: $doc => $doc}__;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
 
         my $pi = $doc-><M::Document.createProcessingInstruction> ('i');
        
@@ -8864,6 +9042,7 @@ NodeTypeDef:
 
         $test->id ('ent');
         my $ent = $doc-><M::Document.createEntityReference> ('ent');
+        $ent-><M::Node.manakaiSetReadOnly> (false, true);
         $ent-><AS::EntityReference.manakaiExternal> (true);
         $ent-><AS::EntityReference.manakaiEntityBaseURI> (q<http://ent.test/>);
         $el-><M::Node.appendChild> ($ent);
@@ -8909,10 +9088,10 @@ NodeTypeDef:
         my $pi = $doc-><M::Document.createProcessingInstruction> ('pi');
 
         $test->id ('nodeName');
-        $test->assert_equals ($not-><AG::Node.nodeName>, 'pi');
+        $test->assert_equals ($pi-><AG::Node.nodeName>, 'pi');
 
         $test->id ('target');
-        $test->assert_equals ($not-><AG::ProcessingInstruction.target>, 'pi');
+        $test->assert_equals ($pi-><AG::ProcessingInstruction.target>, 'pi');
 
   @Attr:
     @@Name: data
@@ -8926,17 +9105,19 @@ NodeTypeDef:
     @@Type: DOMString
     @@Get:
       @@@PerlDef:
+        my $v;
         __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-          $r => $r,
+          $r => $v,
           $prop => {<H::infoset|content>},
           $ref => {$self},
         }__;
+        $r = $$v;
     @@Set:
       @@@NodeReadOnlyError:
       @@@PerlDef:
         __CODE{tc|NodeReadOnlyError:: $node => $self}__;
         __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
-          $given => $given,
+          $given => {\$given},
           $prop => {<H::infoset|content>},
           $ref => $self,
         }__;
@@ -8995,7 +9176,7 @@ NodeTypeDef:
 
           $test->id ('textContent.set.data');
           $test->assert_equals ($node-><AG::ProcessingInstruction.data>,
-                                'value1');
+                                'value3');
 
           $node-><AS::Node.textContent> ('');
 
@@ -9104,9 +9285,10 @@ NodeTypeDef:
 ClsDef:
   @ClsQName: ManakaiDOMXMLBaseAttr
 
-  @ClsISA: t|ManakaiDOMAttr
+  @ClsISA: tc|ManakaiDOMAttr
 
   @DocAttr: XMLBaseAttribute||ManakaiDOM|all
+  @DocAttr: XMLBaseAttributeNS||ManakaiDOM|all
 
   @enDesc:
     A <Class::ManakaiDOMXMLBaseAttr> object represents
@@ -9204,9 +9386,10 @@ ClsDef:
 ClsDef:
   @ClsQName: ManakaiDOMXMLIdAttr
 
-  @ClsISA: t|ManakaiDOMAttr
+  @ClsISA: tc|ManakaiDOMAttr
 
   @DocAttr: XMLIdAttribute||ManakaiDOM|all
+  @DocAttr: XMLIdAttributeNS||ManakaiDOM|all
 
   @enDesc:
     A <Class::ManakaiDOMXMLIdAttr> object represents
@@ -9252,7 +9435,7 @@ ClsDef:
         __DEEP{
           $r = $self->SUPER::value;
           if ($self-><AG::Attr.manakaiAttributeType>
-                  == <C::t|ATDef.ID_ATTR> and
+                  == <C::ATDef.ID_ATTR> and
               $self-><AG::Node.ownerDocument>-><AG::Document.domConfig>
                    -><M::c|DOMConfiguration.getParameter> (<Q::cfg|xml-id>)) {
             $r =~ s/[\x09\x0A\x0D\x20]+/ /g;
@@ -9332,6 +9515,17 @@ ClsDef:
 ResourceDef:
   @QName: XMLBaseAttribute
   @AppName:
+    @@@:
+      xml:base
+    @@ContentType: DISCore|String
+  @For: =ManakaiDOM|all
+  @DISCore:resourceType: s|Attribute
+  @enDesc:
+     The <XA::xml:base> attribute.
+
+ResourceDef:
+  @QName: XMLBaseAttributeNS
+  @AppName:
     @@@: xml|base
     @@ContentType: DISCore|QName
   @For: =ManakaiDOM|all
@@ -9341,6 +9535,17 @@ ResourceDef:
 
 ResourceDef:
   @QName: XMLIdAttribute
+  @AppName:
+    @@@:
+      xml:id
+    @@ContentType: DISCore|String
+  @For: =ManakaiDOM|all
+  @DISCore:resourceType: s|Attribute
+  @enDesc:
+     The <XA::xml:id> attribute.
+
+ResourceDef:
+  @QName: XMLIdAttributeNS
   @AppName:
     @@@: xml|id
     @@ContentType: DISCore|QName

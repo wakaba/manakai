@@ -1,3 +1,81 @@
+2006-03-30  Wakaba  <wakaba@suika.fam.cx>
+
+	* DOMCore.dis (Require): A reference to the |MURI:Generic|
+	module is added.
+	(ManakaiDOMStringList.DESTROY): Removed (no longer necessary).
+	(ManakaiDOMImplementation): It now inherits
+	the |urigen:ManakaiURIImplementation| class and
+	implements the |ecore:MUErrorTarget| interface.  It no
+	longer inherits the |ManakaiDOM:ManakaiDOMObject| class.
+	(ManakaiDOMImplementation.___report_error): New method.
+
+	* DOMFeature.dis (Require): It now references the |Util:Grove|
+	module instead of |Util:ManakaiNode| module.
+	(DOMMetaImpl:ManakaiDOMImplementationRole): Removed.
+	(f:ManakaiMinimumImplementationCompatible): New role.
+	(ManakaiMinimumImplementation): Now it is built
+	on the new |Util:Grove| module rather than the |Util:ManakaiNode|
+	module.
+	(f:getFeatureImpl): Moved from the |MDOM:TreeCore| module.
+	(c:implementation): Removed.
+	(f:implementation, f:revImplementation): New properties.
+
+	* DOMMain.dis (checkNamespacePrefix): DOM2 codes are removed.
+
+	* Tree.dis (cfg:clone-entity-reference-subtree,
+	cfg:dtd-default-attributes, cfg:xml-id,
+	cfg:strict-document-children): Removed (moved
+	to the |MDOM:TreeCore| module).
+
+	* TreeCore.dis (Require): The reference to the |MURI:Generic|
+	module is removed.
+	(ManakaiDOMImplementationTC): Some members are removed
+	since they are incorporated to the |c:ManakaiDOMImplementation|
+	or the |f:ManakaiMinimumImplementation|.
+	(tc:nodeRefClass): Removed (moved to the |Util:Grove| module).
+	(replaceChildImpl1): A typo on the removing the parent node
+	of the old child node is fixed.
+	(f:getFeatureImpl): Removed (moved to the |MDOM:DOMFeature|
+	module).
+	(tc:implementation, tc:revImplementation): Removed (moved
+	to the |MDOM:DOMFeature| module).
+	(Document.appendChild, insertBefore, replaceChild): Sets
+	the |ownerDocument| attribute of the |tx:DocumentType| nodes.
+	(Attr.prefix, Element.prefix): Don't raise "uninitialized"
+	when the new value is |null|.
+	(Attr.___create_node_ref): Attribute name and
+	owner element type specific classes are supported (it
+	was partially implemented but was incorrect).
+	(ManakaiDOMGetElementsNodeList.item): Don't return
+	a node if the |index| is negative.
+	(setNamedItem): Various typos are fixed.
+	(removeNamedItem): The node was not removed orz
+	(cfg:clone-entity-reference-subtree,
+	cfg:dtd-default-attributes, cfg:xml-id,
+	cfg:strict-document-children): Definitions are moved
+	from the |MDOM:Tree| module.  Note that the tests for default
+	attributes still fail.
+	(ErrDef, IntPropDef): Moved from the |MDOM:Tree| module.
+	(Attr): Role name was incorrect.
+
+	* XDoctype.dis (setDefinitionNode): Return value was
+	not set.
+	(AttributeDefinition): Role name was incorrect.
+
+	* XML.dis (Require): A reference to the |DISlib:DISMarkup|
+	module is added.
+	(Notation.appendChild, insertBefore, replaceChild): New method
+	implementations.
+	(Entity.appendChild, insertBefore, replaceChild): New method
+	implementations.
+	(EntityReference.appendChild, insertBefore, replaceChild): Now
+	they are defined as copies of ones in the |Entity| class.
+	(XMLBaseAttribute, XMLIdAttribute): Now they are
+	namespace unaware attributes.
+	(XMLBaseAttributeNS, XMLIdAttributeNS): New attributes.
+	(ManakaiDOMXMLBaseAttr, ManakaiDOMXMLIdAttr): References
+	to namespace aware attributes are added.
+
 2006-03-29  Wakaba  <wakaba@suika.fam.cx>
 
 	* DOMCore.dis: Namespace prefixes are changed to new ones.

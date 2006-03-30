@@ -23,7 +23,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2006/03/15 13:45:00 $
+      $Date: 2006/03/30 16:01:45 $
     @@ContentType:
       dis:Date.RCS
   
@@ -7431,6 +7431,8 @@ IFClsDef:
           if (UNIVERSAL::isa ($self->{<Q::dis|AppName>},
                               <IFName::dv|DVQNameValue>)) {
             $r = $self->{<Q::dis|AppName>}-><AG::dv|DVQNameValue.localName>;
+          } elsif (defined $self->{<Q::dis|AppName>}) {
+            $r = $self->{<Q::dis|AppName>}-><AG::dv|DVValue.stringValue>;
           } else {
             $r = $self-><AG::DIS|DISAnyResource.localName>;
           }
@@ -7480,6 +7482,8 @@ IFClsDef:
           if (UNIVERSAL::isa ($self->{<Q::dis|AppName>},
                               <IFName::dv|DVQNameValue>)) {
             $r = $self->{<Q::dis|AppName>}-><AG::dv|DVQNameValue.namespaceURI>;
+          } elsif (defined $self->{<Q::dis|AppName>}) {
+            $r = null;
           } else {
             $r = $self-><AG::DIS|DISAnyResource.namespaceURI>;
           }

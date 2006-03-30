@@ -40,16 +40,14 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/03/29 15:43:41 $
+      $Date: 2006/03/30 16:01:42 $
     @@ContentType:
       dis:Date.RCS
 
-  @DefaultFor:
-    ManakaiDOM:ManakaiDOMLatest
-  
   @Require:
     @@Module:
       @@@QName: MDOM|DOMMain
+      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
     @@Module:
       @@@WithFor: ManakaiDOM|ManakaiDOM
     @@Module:
@@ -61,13 +59,15 @@ Module:
     @@Module:
       @@@WithFor: ManakaiDOM|ManakaiDOMLatest
     @@Module:
-      @@@QName: MDOM|Tree
-    @@Module:
       @@@QName: MDOM|TreeCore
       @@@WithFor: ManakaiDOM|ManakaiDOMLatest
     @@Module:
       @@@QName: MDOM|XDoctype
       @@@WithFor: ManakaiDOM|ManakaiDOMLatest
+    @@Module:
+      @@@QName: MURI|Generic
+      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
+  @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
 Namespace:
   @c:
@@ -94,6 +94,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/Core/
   @f:
     http://suika.fam.cx/~wakaba/archive/2004/dom/feature#
+  @fe:
+    http://suika.fam.cx/www/2006/feature/
   @html5:
     http://www.w3.org/1999/xhtml
   @idl:
@@ -124,8 +126,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
   @mg:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Grove/
-  @mn:
-    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/ManakaiNode#
+  @MURI:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/URI/
   @rdf:
     http://www.w3.org/1999/02/22-rdf-syntax-ns#
   @rdfs:
@@ -138,8 +140,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Test#
   @tx:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/XML/
-  @x:
-    http://suika.fam.cx/~wakaba/archive/2004/dom/xml#
+  @urigen:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/URI/Generic/
   @xml:
     http://www.w3.org/XML/1998/namespace
   @xml-dtd:
@@ -169,6 +171,13 @@ ElementTypeBinding:
     dx:raises
 
 ElementTypeBinding:
+  @Name: iRaises
+  @ElementType:
+    dx:raises
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForIF
+
+ElementTypeBinding:
   @Name: IFDef
   @ElementType:
     dis:ResourceDef
@@ -177,80 +186,20 @@ ElementTypeBinding:
       ManakaiDOM:IF
 
 ElementTypeBinding:
-  @Name: L1
-  @ElementType:
-    DOMMain:implementFeature
-  @ShadowContent:
-    @@@: CoreFeature10
-    @@For:
-      ManakaiDOM:DOM1
-  @ShadowSibling:
-    @@DOMMain:implementFeature:
-      @@@@: CoreFeature20
-      @@@For: 
-        ManakaiDOM:DOM2
-    @@DOMMain:implementFeature:
-      @@@@: CoreFeature30
-      @@@For: 
-        ManakaiDOM:DOM3
-    @@DOMMain:implementFeature:
-      @@@@: 
-        DOMXML:XMLFeature10
-      @@@For:
-        ManakaiDOM:DOM1 ManakaiDOM:DOMXMLFeature
-    @@DOMMain:implementFeature:
-      @@@@: 
-        DOMXML:XMLFeature20
-      @@@For:
-        ManakaiDOM:DOM2 ManakaiDOM:DOMXMLFeature
-    @@DOMMain:implementFeature:
-      @@@@: 
-        DOMXML:XMLFeature30
-      @@@For:
-        ManakaiDOM:DOM3 ManakaiDOM:DOMXMLFeature
-    @@DOMMain:implementFeature:
-      @@@@: 
-        DOMXML:XMLVersionFeature10
-      @@@For:
-        ManakaiDOM:DOM3 ManakaiDOM:DOMXMLFeature
-    @@DOMMain:implementFeature:
-      @@@@: 
-        DOMXML:XMLVersionFeature11
-      @@@For:
-        ManakaiDOM:DOM3 ManakaiDOM:DOMXMLFeature
-
-ElementTypeBinding:
-  @Name: L3
-  @ElementType:
-    DOMMain:implementFeature
-  @ShadowContent:
-    @@@: CoreFeature30
-    @@For:
-      ManakaiDOM:DOM3
-  @ShadowSibling:
-    @@DOMMain:implementFeature:
-      @@@@: 
-        DOMXML:XMLFeature30
-      @@@For:
-        ManakaiDOM:DOM3 ManakaiDOM:DOMXMLFeature
-    @@DOMMain:implementFeature:
-      @@@@: 
-        DOMXML:XMLVersionFeature10
-      @@@For:
-        ManakaiDOM:DOM3 ManakaiDOM:DOMXMLFeature
-    @@DOMMain:implementFeature:
-      @@@@: 
-        DOMXML:XMLVersionFeature11
-      @@@For:
-        ManakaiDOM:DOM3 ManakaiDOM:DOMXMLFeature
-
-ElementTypeBinding:
   @Name: Method
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type: DISLang|Method
+    @@DISCore:resourceType: DISLang|Method
     @@ForCheck: !=ManakaiDOM|ManakaiDOM
+
+ElementTypeBinding:
+  @Name: IL2Method
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISLang|Method
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|ForIF ManakaiDOM|DOM2
 
 ElementTypeBinding:
   @Name: IntMethod
@@ -571,7 +520,7 @@ ResourceDef:
     @@@: tx|XMLVersionFeature10
     @@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeature
   @f:implements:
-    @@@: DOMXML|XMLVersionFeature11
+    @@@: tx|XMLVersionFeature11
     @@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeatureXML11
 
   @ISA:
@@ -1566,6 +1515,9 @@ ResourceDef:
             @@@@@@:
               The namespace prefix is specified but the namespace URI 
               is <DOM::null>.
+        @@@@enMufDef:
+          Namespace prefix "%p (name => {<Q::infoset|prefix>});"
+          cannot be specified for null namespace
           @@@@XParam:
             @@@@@QName:
               infoset:prefix
@@ -2022,8 +1974,6 @@ IFCls3Def:
   @IFQName: DOMStringList
   @ClsQName: ManakaiDOMStringList
 
-  @ClsISA: ManakaiDOM|ManakaiDOMObject
-
   @AppISA:
     Tie::Array
 
@@ -2075,15 +2025,20 @@ IFCls3Def:
     @@QName: newDOMStringListForTest
     @@rdf:type: DISPerl|BlockCode
     @@PerlDef:
-      my $__pnode;
-      __CODE{tc|createImplForTest:: $impl => $__pnode}__;
+      require Message::DOM::XDoctype;
+      my $__impl;
+      __CODE{tc|createImplForTest:: $impl => $__impl}__;
+      my $__doc = $__impl-><M::DOMImplementation.createDocument>;
+      my $__docx = $__doc-><M::DOMImplementation.getFeature> (<Q::fe|XDoctype>);
+      my $__at = $__docx-><M::d|DocumentXDoctype.createAttributeDefinition>
+                            ('at1');
       __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
         $given => {[]},
         $prop => {$key},
-        $ref => $__pnode,
+        $ref => $__at,
       }__;
       __CODE{c|createNodeDOMStringList::
-        $node => $__pnode, $r => $list,
+        $node => $__at, $r => $list,
         $key => $key,
       }__;
 
@@ -2323,21 +2278,6 @@ IFCls3Def:
         tie my @list, ref $self, $self;
         $r = \@list;
 
-  @IntMethod:
-    @@Operator:
-      @@@@: DESTROY
-      @@@ContentType: DISPerl|Perl
-    @@Description:
-      @@@lang:en
-      @@@@:
-        Redefines destructor for the class
-        <Class::ManakaiNode|ManakaiNodeRef||ManakaiDOM|Perl>,
-        since the <PerlModule::Tie::Array> also has its own empty destructor. 
-    @@Return:
-      @@@disDef:
-        @@@@DISPerl:cloneCode:
-          ManakaiNode|ManakaiNodeRef||ManakaiDOM|Perl.destroy
-
   @Test:
     @@QName: ManakaiDOMStringList.methods.test
     @@PerlDef:
@@ -2359,8 +2299,6 @@ IFCls3Def:
 
       ## FETCH
       $test->assert_string (actual_value => $list->[0],
-                            expected_value => 'String1');
-      $test->assert_string (actual_value => $list->{<H::mn:node>}->{a}->[0],
                             expected_value => 'String1');
 
       ## item
@@ -2702,60 +2640,103 @@ IFCls1Def:
   @IFQName: DOMImplementation
   @ClsQName: ManakaiDOMImplementation
 
+  @ClsISA: tc|ManakaiDOMImplementationTC
+  @ClsISA: urigen|ManakaiURIImplementation
+  @Implement: ecore|MUErrorTarget||ManakaiDOM|Perl
+
   @enDesc:
     The <IF::DOMImplementation> interface provides a number
     of methods for performing operations that are independent
     of any particular instance of the document object model.
 
-  @ClsISA:
-    @@@: tc|ManakaiDOMImplementationTC
-    @@For: ManakaiDOM|ManakaiDOM2
-
-  @ClsISA:
-    @@@: f|ManakaiMinimumImplementation
-    @@For: ManakaiDOM|ManakaiDOM3
-  @ClsISA:
-    @@@: f|ManakaiMinimumImplementation||ManakaiDOM|ManakaiDOMLatest
-    @@For: !ManakaiDOM|ManakaiDOM3
-
-  @ClsISA: ManakaiDOM|ManakaiDOMObject
-
-  @DISLang:role:
-    @@@:
-      DOMMetaImpl:ManakaiDOMImplementationRole
-
-  @DOMMetaImpl:provideFeature:
+  @f:provides:
     @@@: CoreFeature10
     @@ForCheck:
       ManakaiDOM:DOM1
-  @DOMMetaImpl:provideFeature:
+  @f:provides:
     @@@: CoreFeature20
     @@ForCheck:
       ManakaiDOM:DOM2
-  @DOMMetaImpl:provideFeature:
+  @f:provides:
     @@@: CoreFeature30
     @@ForCheck:
       ManakaiDOM:DOM3
-  @DOMMetaImpl:provideFeature:
+  @f:provides:
     @@@: tx|XMLFeature10
     @@ForCheck:
       ManakaiDOM:DOM1 ManakaiDOM|DOMXMLFeature
-  @DOMMetaImpl:provideFeature:
+  @f:provides:
     @@@: tx|XMLFeature20
     @@ForCheck:
       ManakaiDOM:DOM2 ManakaiDOM|DOMXMLFeature
-  @DOMMetaImpl:provideFeature:
+  @f:provides:
     @@@: tx|XMLFeature30
     @@ForCheck:
       ManakaiDOM:DOM3 ManakaiDOM|DOMXMLFeature
-  @DOMMetaImpl:provideFeature:
-    @@@: DOMXML|XMLVersionFeature10
+  @f:provides:
+    @@@: tx|XMLVersionFeature10
     @@ForCheck:
       ManakaiDOM:DOM3 ManakaiDOM|DOMXMLFeature
-  @DOMMetaImpl:provideFeature:
-    @@@: DOMXML|XMLVersionFeature11
+  @f:provides:
+    @@@: tx|XMLVersionFeature11
     @@ForCheck:
       ManakaiDOM:DOM3 ManakaiDOM|DOMXMLFeatureXML11
+
+  @Test:
+    @@QName: DOMImplementation.from.ImplementationList.test
+    @@PerlDef:
+      for my $features (
+        {Core => '1.0'}, {XML => '1.0'}, {Core => '1.0', XML => '1.0'},
+        {Core => '2.0'}, {XML => '2.0'}, {Core => '2.0', XML => '2.0'},
+        {Core => '3.0'}, {XML => '3.0'}, {Core => '3.0', XML => '3.0'},
+        {XMLVersion => '1.0'}, {XMLVersion => '1.1'},
+      ) {
+        $test->id (join ',', %$features);
+        my $list = $Message::DOM::ImplementationRegistry
+                     ->get_implementation_list ($features);
+        A: {
+          for my $impl (@$list) {
+            if ($impl->isa (<ClassName::ManakaiDOMImplementation>)) {
+              last A;
+            }
+          }
+        } # A
+      } # features
+
+  @Test:
+    @@QName: DOMImplementation.class.test
+    @@PerlDef:
+      my $impl = <Class::ManakaiDOMImplementation>->_new;
+
+      $test->id ('DOMImplementation');
+      $test->assert_isa ($impl, <IFName::DOMImplementation>);
+
+      $test->id ('MinimumImplementation');
+      $test->assert_isa ($impl, <IFName::f|MinimumImplementation>);
+
+      $test->id ('MUErrorTarget');
+      $test->assert_isa ($impl, <IFName::ecore|MUErrorTarget||ManakaiDOM|Perl>);
+
+      $test->id ('URIImplementation');
+      $test->assert_isa ($impl, <IFName::urigen|URIImplementation>);
+
+      $test->id ('hasFeature');
+      $test->assert_true ($impl->can ('has_feature'));
+
+      $test->id ('getFeature');
+      $test->assert_true ($impl->can ('get_feature'));
+
+      $test->id ('create_document');
+      $test->assert_true ($impl->can ('create_document'));
+
+      $test->id ('create_document_type');
+      $test->assert_true ($impl->can ('create_document_type'));
+
+      $test->id ('___report_error');
+      $test->assert_true ($impl->can ('___report_error'));
+
+      $test->id ('create_uri_reference');
+      $test->assert_true ($impl->can ('create_uri_reference'));
 
   @Method:
     @@ForCheck: !ManakaiDOM|ForClass
@@ -2765,7 +2746,6 @@ IFCls1Def:
        @@@@:
          Tests whether this DOM implementation supports a specific 
          feature and version or not.
-     @@L1:
      @@Param:
         @@@Name:  feature
         @@@Type:
@@ -2893,302 +2873,202 @@ IFCls1Def:
             @@@@@lang:en
             @@@@@@: The feature is not implemented.
 
-  @Method:
-    @@ForCheck: !ManakaiDOM|ForClass
-     @@Name:  createDocumentType
-     @@Description:
-       @@@lang:en
-       @@@@:
-         Creates and returns an empty <IF::DOMXML:DocumentType> node.
-     @@DOMMain:isNamespaceAware:1
-     @@XML2Feature:
-     @@Param:
-        @@@Name:  qualifiedName
-        @@@Type:  
-          DOMMain:DOMString
-        @@@actualType:
-          @@@@@:
-            DOMMain:ManakaiDOMXML11QName
-          @@@@For: ManakaiDOM|ManakaiDOMLatest
-        @@@actualType:
-          @@@@@: DOMMain|ManakaiDOMXML10QName
-          @@@@For: !ManakaiDOM|ManakaiDOMLatest
-        @@@Description:
-          @@@@lang:en
-          @@@@@: The qualified name of the document type to be created.
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            {NOTE:: DOM levels 2 and 3 requires DOM implementations to 
-                    test whether a <P::qualifiedName> is a valid XML 1.0
-                    Name or not.  The manakai DOM implementation
-                    for the <QUOTE::latest> level tests against both XML 1.0 
-                    and XML 1.1; if it is invalid against XML 1.1, an exception 
-                    is thrown; otherwise, the node created is marked as 
-                    an XML 1.1 document type node.
-             \
-            }
-          @@@@For:
-            ManakaiDOM:ManakaiDOMLatest
-     @@Param:
-        @@@Name:  publicId
-        @@@Type:  
-          DOMMain:DOMString
-        @@@Description:
-          @@@@lang:en
-          @@@@@: The external subset public identifier.
-     @@Param:
-        @@@Name:  systemId
-        @@@Type:  
-          DOMMain:DOMString
-        @@@Description:
-          @@@@lang:en
-          @@@@@: The external subset system identifier.
-     @@For:
-       ManakaiDOM:DOM2
-     @@Return:
-        @@@Type:  
-          DOMXML:DocumentType
-        @@@actualType:
-          DOMXML:ManakaiDOMDocumentType
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            A newly created <IF::DOMXML:DocumentType> node.
-        @@@ImplNote:
-          @@@@lang:en
-          @@@@@:
-            The <A::Node.ownerDocument> attribute is set to <DOM::null>.
-        @@@raises:
-          @@@@@: DOMException.INVALID_CHARACTER_ERR
-          @@@@enDesc:
-            @@@@@@:
-              The <P::qualifiedName> is not an XML 1.0 <CODE::Name>.
-            @@@@@For:
-              !ManakaiDOM:ManakaiDOMLatest
-          @@@@enDesc:
-            @@@@@@:
-              The <P::qualifiedName> is not an XML 1.1 <CODE::Name>.
-            @@@@@For:
-              ManakaiDOM:ManakaiDOMLatest
-        @@@raises:
-          @@@@@: MDOMX|MDOM_NS_MALFORMED_QNAME
-          @@@@enDesc:
-            The <P::qualifiedName> is malformed.
-        @@@raises:
-          @@@@@:
-            MDOMX:MDOM_IMPL_NOSUPPORT_XMLNS
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              The DOM implementation does not support the <DOM::XML> feature and 
-              the language exposed through the <IF::Document> does not support 
-              XML Namespaces.
+  @IL2Method:
+    @@Name: createDocumentType
+    @@enDesc:
+      Creates an empty <IF::tx|DocumentType> node.  Entity
+      declarations and notations are not made available.
+      Entity reference expansions and default attribute additions do
+      not occur.
+    @@DOMMain:isNamespaceAware: 1
+    @@XML2Feature:
+    @@enDesc:
+      @@@ddid: manakai
+      @@@For: ManakaiDOM|ManakaiDOM
+      @@@@:
+        In manakai, the method <M::c|DOMImplementation.createDocumentType>
+        is <EM::deprecated>; use the method
+        <M::tc|DocumentX.createDocumentTypeDefinition> instead.
+    @@Param:
+      @@@Name: qualifiedName
+      @@@Type: DOMString
+      @@@enDesc:
+        The XML Namespaces 1.0 <SRC::DOM2, DOM3> qualified name of
+        the document type to be created.
+    @@Param:
+      @@@Name: publicId
+      @@@Type: DOMString
+      @@@enDesc:
+        The public identifier of the external subset.
+      @@@nullCase:
+        @@@@enDesc:
+          The external subset has no public identifier or
+          the document type has no external subset.  <SRC::manakai>
+    @@Param:
+      @@@Name: systemId
+      @@@Type: DOMString
+      @@@enDesc:
+        The system identifier of the external subset.
+      @@@nullCase:
+        @@@@enDesc:
+          The external subset has no system identifier or
+          the document type has no external subset.  <SRC::manakai>
+    @@enImplNote:
+      @@@ddid: badparam
+      @@@@:
+        Can <P::systemId> and / or <P::publicId> be <DOM::null>?
 
-  @Method:
-    @@ForCheck: !ManakaiDOM|ForClass
-     @@Name:  createDocument
-     @@Description:
-       @@@lang:en
-       @@@@:
-         Creates a new <IF::Document> object, with a document element.
-     @@Description:
-       @@@lang:en
-       @@@@:
-         {NOTE:: Either if the <P::doctype> is an XML 1.1 node 
-                 or if the <P::qualifiedName> is a valid XML Namespace 1.1 
-                 QName but is not a valid XML Namespace 1.0 QName,
-                 then the XML version of the document to be created 
-                 is <XML::1.1>; otherwise, it is <XML::1.0>.
-          \
-          }
-       @@@For:
-         ManakaiDOM:ManakaiDOMLatest
-     @@Description:
-       @@@lang:en
-       @@@@:
-         The manakai <M::DOMImplementation.createDocument> method always 
-         creates an XML <IF::Document>, i.e. a <IF::Document> that supports 
-         the <Feature::XML> feature. 
-       @@@For:
-         ManakaiDOM:ManakaiDOM
-     @@XML2Feature:
-     @@ImplNote:
-       @@@lang:en
-       @@@@:
-         In DOM Level 1, there is no standardized way to create 
-         a <IF::Document> object. 
-     @@DOMMain:isNamespaceAware:1
-     @@Param:
-        @@@Name:  namespaceURI
-        @@@Type:
-          DOMMain:DOMString
-        @@@actualType:
-          ManakaiDOM:ManakaiDOMNamespaceURI
-        @@@Description:
-          @@@@lang:en
-          @@@@@: 
-            The namespace URI of the document element to create.
-        @@@InCase:
-          @@@@Value:
-            @@@@@is-null:1
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@: 
-              The document element to create has no namespace.
-     @@Param:
-        @@@Name:  qualifiedName
-        @@@Type:  
-          DOMMain:DOMString
-        @@@actualType:
-          @@@@@:
-            DOMMain:ManakaiDOMXML11QName
-          @@@@ForCheck:
-            ManakaiDOM:ManakaiDOMLatest
-          @@@@ManakaiDOM:noInputNormalize:1
-        @@@actualType:
-          @@@@@:
-            DOMMain:ManakaiDOMXML10QName
-          @@@@ForCheck:
-            ManakaiDOM:ManakaiDOMLatest
-          @@@@ManakaiDOM:noInputNormalize:1
-        @@@Description:
-          @@@@lang:en
-          @@@@@: The qualified name of the document element to create.
-        @@@InCase:
-          @@@@Value:
-            @@@@@is-null:1
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@: Document element is not created.
-     @@Param:
-        @@@Name:  doctype
-        @@@Type:  
-          DOMXML:DocumentType
-        @@@actualType:
-          DOMXML:ManakaiDOMDocumentType
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            The document type of the document to create.
-        @@@InCase:
-          @@@@Value:
-            @@@@@is-null:1
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              The document to create does not have any <IF::DOMXML:DocumentType> 
-              node. 
-        @@@ImplNote:
-          @@@@lang:en
-          @@@@@:
-            The <A::Node.ownerDocument> of the <P::doctype> is set to 
-            the document being created. 
-     @@Return:
-        @@@Type:  Document
-        @@@actualType: ManakaiDOMDocument
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            A newly created <IF::Document> object. 
-            \
-            {NOTE:: The object returned by this method may be a 
-                    specialized <IF::Document> object based on the 
-                    <P::doctype> given.  For example, a <IF::Document> 
-                    object might also implement the <IF::DOMHTML:HTMLDocument> 
-                    interface. 
-            \
-            }
-        @@@raises:
-          @@@@@: DOMException.INVALID_CHARACTER_ERR
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              The specified qualified name is not an XML 1.0 <CODE::Name>.
-            @@@@@For:
-              !ManakaiDOM:ManakaiDOMLatest
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              The specified qualified name is not an XML 1.1 <CODE::Name>.
-            @@@@@For:
-              ManakaiDOM:ManakaiDOMLatest
-          @@@@ImplNote:
-            @@@@@lang:en
-            @@@@@@:
-              The <CITE::DOM Level 2 Core> specification does not
-              explicitly defines the version of the XML for 
-              <CODE::Name>s, but the definition for
-              <X::DOMException.INVALID_CHARACTER_ERR> references
-              the <CITE::XML 1.0> specification.
+        What should happen if <P::publicId> is non-<DOM::null>
+        and <P::systemId> is <DOM::null>?
 
-              The <CITE::DOM Level 3 Core> specification references
-              the <CITE::XML 1.0> specification for the <CODE::Name>
-              definition.
-        @@@raises:
-          @@@@@: DOMException.NAMESPACE_ERR
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              Either the "qualifiedName" is malformed, the "qualifiedName" 
-              has a prefix and the "namespaceURI" is "null", the 
-              "qualifiedName" is "null" and the "namespaceURI" is 
-              different from "null", the "qualifiedName" has 
-              a prefix that is "xml" and the "namespaceURI" is 
-              different from "http://www.w3.org/XML/1998/namespace" or
-              the DOM implementation does not support the "XML" feature 
-              but a non-null "namespaceURI" is provided.
-         @@@ImplNote:
-           @@@@lang:en
-           @@@@@:
-              In addition, it is possible to raise an exception 
-              either if the "qualifiedName" has a prefix that is 
-              "xmlns" and the "namespaceURI" is different from 
-              "http://www.w3.org/2000/xmlns/", if the "namespaceURI" 
-              is "http://www.w3.org/XML/1998/namespace" and the 
-              "qualifiedName" has a prefix is different from "xml" or 
-              if the "namespaceURI" is "http://www.w3.org/2000/xmlns/" 
-              and the "qualifiedName" has a prefix is different from "xmlns".
-              But this DOM implementation only report a warning on 
-              these cases since the specification does not mention 
-              to raise any exception.
-        @@@raises:
-          @@@@@: MDOMX_DOCTYPE_ALREADY_USED
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              The <P::doctype> has already been used with a different 
-              document.
-        @@@raises:
-          @@@@@: MDOMX_EXTERNAL_NODE
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              The <P::doctype> was created from a different DOM implementation.
-        @@@raises:
-          @@@@@:
-            MDOMX:MDOM_IMPL_NOSUPPORT_XMLNS
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              The DOM implementation does not support the <DOM::XML> feature and 
-              the language exposed through the <IF::Document> does not support 
-              XML Namespaces.
-            @@@@@ImplNote:
-              @@@@@@lang:en
-              @@@@@@@:
-                DOM Level 2 Core described that this method creates 
-                a <QUOTE::XML <IF::Document> object> and that 
-                HTML-only implementations need not implement it. 
-                DOM Level 2 Errata and DOM Level 3 Core describes that 
-                such implementations should return a 
-                <X::DOMException.NOT_SUPPORTED_ERR>.  In addition, 
-                DOM Level 3 Core specifies this method to create 
-                a <QUOTE::DOM <IF::Document> object>. Note also that 
-                DOM Level 3 Core explicitly allows non-<Feature::XML> 
-                document node to be created.
-     @@For:
-       ManakaiDOM:DOM2
+        What should happen if <P::publicId> or <P::systemId> 
+        is ill-formed?
+    @@Return:
+      @@@Type: tx|DocumentType
+      @@@enDesc:
+        The newly created <IF::tx|DocumentType> node with
+        <A::Node.ownerDocument> set to <DOM::null>.
+      @@@dx:raises:
+        @@@@@: MDOMX|MDOM_BAD_NAME
+        @@@@enDesc:
+          If the <P::qualifiedName> is not an XML 1.0 <CODE::Name>
+          <SRC::DOM3>.
+      @@@dx:raises:
+        @@@@@: MDOMX|MDOM_NS_MALFORMED_QNAME
+        @@@@enDesc:
+          If the <P::qualifiedName> is malformed.
+      @@@enImplNote:
+        @@@@ddid: strict
+        @@@@@:
+          The <A::tc|Document.strictErrorChecking> attribute is
+          <EM::not> applied to these errors, since it has no
+          associated <IF::tc|Document> node.
+      @@@iRaises:
+        @@@@@: MDOMX|MDOM_IMPL_NOSUPPORT_XMLNS
+        @@@@enDesc:
+          This exception may be raised if the implementation does not support 
+          the feature <Feature::XML> and the language exposed through
+          the document does not support XML namespaces.
+        @@@@enImplNote:
+          <QUOTE::tc|Document>?  What document?
+
+  @IL2Method:
+    @@Name: createDocument
+    @@enDesc:
+      Creates a DOM <IF::tc|Document> object of the specified type
+      with its document type.
+    @@DOMMain:isNamespaceAware: 1
+    @@XML2Feature:
+    @@Param:
+      @@@Name: namespaceURI
+      @@@Type: DOMString
+      @@@dis:actualType: ManakaiDOM|ManakaiDOMNamespaceURI
+      @@@enDesc:
+        The namespace URI of the document element.
+      @@@nullCase:
+    @@Param:
+      @@@Name: qualifiedName
+      @@@Type: DOMString
+      @@@enDesc:
+        The XML Namespaces 1.0 <SRC::DOM2, DOM3> qualified
+        name of the document element.
+      @@@InCase:
+        @@@@Type: ARRAY
+        @@@@enDesc:
+          A reference to the array that contains the namespace
+          prefix (zeroth item) and the local name (first item)
+          of the attribute.  The namespace prefix <kwd:MAY>
+          be <DOM::null> to indicate that the qualified name
+          contains no <CHAR::COLON> character.
+      @@@nullCase:
+        <SRC::DOM3>
+    @@Param:
+      @@@Name: doctype
+      @@@Type: tx|DocumentType
+      @@@enDesc:
+        The type of the document to create.
+
+        The <IF::tc|Node.ownerDocument> attribute of the <P::doctype>
+        node is set to the document being created.
+      @@@nullCase:
+    @@Return:
+      @@@Type: tc|Document
+      @@@enDesc:
+        The newly created <IF::tc|Document> object with its
+        document element.
+
+        If the <P::namespaceURI>, <P::qualifiedName>, and
+        <P::doctype> are <DOM::null>, the returned <IF::tc|Document>
+        is empty with no document element.  <SRC::DOM3>
+
+        Based on the <IF::tx|DocumentType> given to create the document, 
+        the implementation may instantiate specialized <IF::Document>
+        object that support additional features than
+        the <Feature::Core>.  On the other hand, setting the
+        <IF::tx|DocumentType> after the document was created
+        makes this very unlikely to happen.  <SRC::DOM3>
+      @@@dx:raises:
+        @@@@@: MDOMX|MDOM_BAD_NAME
+        @@@@enDesc:
+          If the specified qualified name is not an XML 1.0 <SRC::DOM3>
+          <CODE::Name>.
+      @@@dx:raises:
+        @@@@@: MDOMX|MDOM_NS_MALFORMED_QNAME
+        @@@@enDesc:
+          If the <P::qualifiedName> is malformed.
+      @@@dx:raises:
+        @@@@@: MDOMX|MDOM_NS_PREFIX_WITH_NULL_URI
+        @@@@enDesc:
+          If the <P::qualifiedName> has a prefix and the
+          <P::namespaceURI> is <DOM::null>.
+      @@@dx:raises:
+        @@@@@: MDOMX|MDOM_NS_NULL_QNAME_WITH_NON_NULL_URI
+        @@@@enDesc:
+          If the <P::qualifiedName> is <DOM::null> and
+          the <P::namespaceURI> is different from <DOM::null>.  <SRC::DOM3>
+      @@@dx:raises:
+        @@@@@: MDOMX|MDOM_NS_XML_WITH_OTHER_URI
+        @@@@enDesc:
+          If the <P::qualifiedName> has a prefix that is <XML::xml> and
+          the <P::namespaceURI> is different
+          from <URI::http://www.w3.org/XML/1998/namespace>.
+      @@@dx:raises:
+        @@@@@: MDOMX|MDOM_NS_XMLNS_WITH_OTHER_URI
+        @@@@enDesc:
+          If the <P::qualifiedName> has a prefix that is <XML::xmlns>
+          and the <P::namespaceURI> is different from
+          <URI::http://www.w3.org/2000/xmlns/>.  <SRC::manakai>
+      @@@dx:raises:
+        @@@@@: MDOMX|MDOM_NS_XMLNSQ_WITH_OTHER_URI
+        @@@@enDesc:
+          If the <P::qualifiedName> is <XE::xmlns> and
+          the <P::namespaceURI> is different from 
+          <URI::http://www.w3.org/2000/xmlns/>.  <SRC::manakai>
+      @@@dx:raises:
+        @@@@@: MDOMX|MDOM_NS_OTHER_WITH_XMLNS_URI
+        @@@@enDesc:
+          If the <P::namespaceURI> is <URI::http://www.w3.org/2000/xmlns/>
+          and neither the <P::qualifiedName> nor its prefix is
+          <XML::xmlns>.  <SRC::manakai>
+      @@@iRaises:
+        @@@@@: c|NSURI_WHERE_NO_XML_FEATURE_ERR
+        @@@@enDesc:
+          If the implementation does not support the <Feature::XML>
+          feature but the <P::namespaceURI> is different from <DOM::null>.
+          <SRC::DOM3>
+      @@@dx:raises:
+        @@@@@: c|DIFFERENT_DOCUMENT_ERR
+        @@@@enDesc:
+          If the <P::doctype> has already been used with a different document
+          or was created from a different implementation.
+      @@@iRaises:
+        @@@@@: MDOMX|MDOM_IMPL_NOSUPPORT_XMLNS
+        @@@@enDesc:
+          If the implementation does not support the <Feature::XML>
+          feature and the language exposed through the <IF::tc|Document>
+          does not support XML namespaces.
+        @@@@enImplNote:
+          What <IF::tc|Document>?  The created one?
         
   @Method:
     @@ForCheck: !ManakaiDOM|ForClass
@@ -3230,7 +3110,6 @@ IFCls1Def:
             A feature version number to request.
      @@SpecLevel:3
      @@Level[list]:  3
-     @@L3:
      @@For:
        ManakaiDOM:DOM3
      @@Return:
@@ -3263,6 +3142,39 @@ IFCls1Def:
           @@@@@: 
             There is no object available that implements interfaces 
             associated with the <P::feature> and <P::version>. 
+
+  @IntMethod:
+    @@Operator: ManakaiDOM|MUErrorHandler
+    @@enDesc:
+      When a <IF::ecore|ErrorInterface||ManakaiDOM|Perl> is <Perl::report>ed,
+      then this method is invoked.
+      
+      The method calls the <cfg::error-handler> if the error is of 
+      <IF::c|DOMError>.  Otherwise, including the cases of <IF::c|DOMException>s,
+      the error is rethrown so that appropriate <Perl::catch> clause
+      can catch the error.
+    @@Param:
+      @@@Name: err
+      @@@Type: ecore|ErrorInterface||ManakaiDOM|Perl
+      @@@enDesc:
+        The reported error object.
+    @@Return:
+      @@@Type: DISPerl|Any
+      @@@enDesc:
+        If the <P::err> is a <IF::c|DOMError>, then the return value
+        of the error handler.
+
+           {NOTE:: If the error is thrown, the method never returns.
+           }
+      @@@nullCase:
+        @@@@enDesc:
+          No error handler.
+      @@@PerlDef:
+        if ($err->isa (<IFName::c|DOMError||ManakaiDOM|ManakaiDOM>)) {
+          CORE::warn $err;
+        } else {
+          $err-><M::ecore|ErrorInterface||ManakaiDOM|Perl.throw>;
+        }
 ##DOMImplementation
 
 PropDef:
@@ -4155,7 +4067,7 @@ ErrDef:
   @c:severity: DOMCore|SEVERITY_WARNING
   @c:relatedData:
     @@enDesc:
-      The first <IF::DOMXML:CDATASection> node in document order
+      The first <IF::tx|CDATASection> node in document order
       resulting from the split.
 
 ResourceDef:
@@ -4963,14 +4875,14 @@ boolCParam:
     @@IsSupportRequired:1
     @@IsDefault: 1
     @@enDesc:
-      Keeps <IF::DOMXML:CDATASection> nodes in the document.
+      Keeps <IF::tx|CDATASection> nodes in the document.
     @@SetParam:
       @@@@: canonical-form
       @@@boolValue:0
   @FalseCase:
     @@IsSupportRequired:1
     @@enDesc:
-      Transforms <IF::DOMXML:CDATASection> nodes in the document
+      Transforms <IF::tx|CDATASection> nodes in the document
       into <IF::Text> nodes.  The new <IF::Text> node is then
       combined with any adjacent <IF::Text> node.
 
@@ -5072,19 +4984,19 @@ boolCParam:
     @@IsSupportRequired:1
     @@IsDefault: 1
     @@enDesc:
-      Keeps <IF::DOMXML:EntityReference> nodes in the document.
+      Keeps <IF::tx|EntityReference> nodes in the document.
     @@SetParam:
       @@@@: canonical-form
       @@@boolValue:0
   @FalseCase:
     @@IsSupportRequired:1
     @@enDesc:
-      Removes all <IF::DOMXML:EntityReference> nodes from the documents,
+      Removes all <IF::tx|EntityReference> nodes from the documents,
       putting the entity expansions directly in their place.  <IF::Text>
       nodes are normalized as defined in <M::Node.normalize>.
       Only unexpanded entity references are kept in the document.
 
-      {NOTE:: This parameter does not affect <IF::DOMXML:Entity> nodes.
+      {NOTE:: This parameter does not affect <IF::tx|Entity> nodes.
       }
 
 CParam:
@@ -5474,7 +5386,7 @@ boolCParam:
       When a <XML::CDATA> section is split, a warning is issued with
       a <A::DOMError.type> equals to <err::cdata-sections-splitted>
       and <A::DOMError.relatedData> equals to the first
-      <IF::DOMXML:CDATASection> node in document order resulting 
+      <IF::tx|CDATASection> node in document order resulting 
       from the split.
     @@enImplNote:
       What will be happen if a character that is unrepresentable
@@ -5482,7 +5394,7 @@ boolCParam:
   @FalseCase:
     @@IsSupportRequired:1
     @@enDesc:
-      Signals an error if a <IF::DOMXML:CDATASection> containing an
+      Signals an error if a <IF::tx|CDATASection> containing an
       unrepresentable character.
 
 boolCParam:
@@ -5591,12 +5503,12 @@ boolCParam:
            <C::DOMError.SEVERITY_ERROR> severity.
 
          - If the text content inside <IF::Attr>, <IF::Element>,
-           <IF::Comment>, <IF::Text>, or <IF::DOMXML:CDATASection>
+           <IF::Comment>, <IF::Text>, or <IF::tx|CDATASection>
            node contains an invalid character, the implementation
            generates a <IF::DOMError> of type <err::wf-invalid-character>,
            with a <C::DOMError.SEVERITY_ERROR> severity.
 
-         - If the data inside <IF::DOMXML:ProcessingInstruction> node
+         - If the data inside <IF::tx|ProcessingInstruction> node
            contains a invalid character, the implementation
            generates a <IF::DOMError> of type <err::wf-invalid-character>
            with a <C::DOMError.SEVERITY_ERROR> severity.
@@ -5652,7 +5564,7 @@ SPropDef:
 ElementTypeBinding:
   @Name: nodeProp
   @ElementType:
-    DOMCore:nodeProp
+    tc:nodeStemKey
   @ShadowContent:
     @@For: =ManakaiDOM|all
 
