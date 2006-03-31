@@ -1,3 +1,30 @@
+2006-03-31  Wakaba  <wakaba@suika.fam.cx>
+
+	* DOMCore.dis (DOMStringList.==): New overloaded operator.
+
+	* DOMFeature.dis (ManakaiHasFeatureByGetFeature): The
+	class did not implement the |GetFeature| interface.
+	(hasFeature): The |+| prefix was not taken into account.
+
+	* TreeCore.dis (Node): The class now inherits
+	the |ManakaiHasFeatureByGetFeature| class.  It now
+	implements the |f:GetFeature| and |ecore:MUErrorTarget|
+	interfaces.
+	(CreateNodeRefMethod): The |mg:nodeRefInterfaces| option
+	is supported.
+	(lookupNamespaceURI, lookupPrefix, isDefaultNamespace): Reimplemented.
+	(manakaiParentElement): New attribute.
+
+	* XDoctype.dis (d:Feature): Old feature name |ManakaiDOM:XDoctype|
+	is removed.
+	(lookupPrefix): Old method implementation is removed.
+
+	* XML.dis (CDATASection): The |mg:NodeRefRole| was
+	missing because of the |DISCore:stopISARecursive| property.
+
+	* TreeCore.dis, XML.dis, XDoctype.dis, DOMCore.dis, DOMFeature.dis:
+	They now pass all tests included in those modules!
+
 2006-03-30  Wakaba  <wakaba@suika.fam.cx>
 
 	* DOMCore.dis (Require): A reference to the |MURI:Generic|

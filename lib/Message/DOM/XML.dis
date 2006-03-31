@@ -18,7 +18,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/03/30 16:01:45 $
+    $Date: 2006/03/31 12:15:40 $
 
   @Require:
     @@Module:
@@ -760,6 +760,11 @@ ResourceDef:
   @AliasFor: DISPerl|HASH||ManakaiDOM|all
 
 ResourceDef:
+  @QName: DTDef
+  @AliasFor: d|DocumentTypeDefinition
+  @For: ManakaiDOM|ManakaiDOMLatest
+
+ResourceDef:
   @QName: ATDef
   @AliasFor: d|AttributeDefinition
   @For: ManakaiDOM|ManakaiDOMLatest
@@ -807,6 +812,7 @@ IFCls1Def:
   @IFISA: tc|Text
   @ClsISA: tc|ManakaiDOMText
 
+  @DISLang:role: mg|NodeRefRole
   @DISLang:role:
     @@@: tc|CDATASectionRole
     @@DISCore:stopISARecursive: 1
@@ -847,6 +853,28 @@ IFCls1Def:
       my $__doc;
       __CODE{tc|createEmptyDocumentForTest:: $doc => $__doc}__;
       $text = $__doc-><M::Document.createCDATASection> ('text');
+
+  @Test:
+    @@QName: CDATASection.interfaces.test
+    @@PerlDef:
+      my $text;
+      __CODE{tx|createCDATASectionForTest:: $text => $text}__;
+
+      $test->id ('CDATASection');
+      $test->assert_isa ($text, <IFName::CDATASection>);
+
+      $test->id ('Text');
+      $test->assert_isa ($text, <IFName::Text>);
+
+      $test->id ('CharacterData');
+      $test->assert_isa ($text, <IFName::tc|CharacterData>);
+
+      $test->id ('Node');
+      $test->assert_isa ($text, <IFName::Node>);
+
+      $test->id ('GetFeature');
+      $test->assert_isa ($text, <IFName::f|GetFeature>);
+
 
   @CAttr:
     @@Name: nodeType
@@ -1888,6 +1916,13 @@ NodeTypeDef:
           $r => $r,
           $prop => {<H::d|ownerDefinition>},
           $ref => $self,
+          $opt => {{
+            <H::mg|nodeRefInterfaces> => [
+              <IFName::DTDef>,
+              <IFName::d|DocumentTypeDeclaration>,
+              <IFName::DocumentType>,
+            ],
+          }},
         }__;
 
     @@XDTest:

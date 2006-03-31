@@ -44,7 +44,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/03/30 16:01:43 $
+      $Date: 2006/03/31 12:15:38 $
     @@ContentType:
       dis:Date.RCS
   
@@ -2735,7 +2735,7 @@ minIFClsDef:
                 $stemid => {<Code::mg|getNodeID||ManakaiDOM|all:: $ref = $self>},
                 $ref => $r,
                 $opt => {{
-                  <H::mg|nodeRefClass> => $__class,
+                  <H::mg|nodeRefClass> => \$__class,
                 }},
               }__;
               last CLASS;
@@ -2751,7 +2751,7 @@ minIFClsDef:
                                            $ref = $self>},
                     $ref => $r,
                     $opt => {{
-                      <H::mg|nodeRefClass> => $cls,
+                      <H::mg|nodeRefClass> => \$cls,
                     }},
                   }__;
                   last CLASS;
@@ -2868,6 +2868,8 @@ ResourceDef:
     @@ForCheck: ManakaiDOM|ForClass
   @ClsQName: ManakaiHasFeatureByGetFeature
 
+  @Implement: GetFeature
+
   @enDesc:
     The <IF::GetFeature> interface provides the <M::.hasFeature>
     and <M::.getFeature> methods to test or to retrieve an object with
@@ -2884,6 +2886,17 @@ ResourceDef:
       method can claim that it is implementing the <IF::GetFeature>
       interface by inheriting the <Class::ManakaiHasFeatureByGetFeauture>
       class.
+
+  @Test:
+    @@QName: HasFeatureByGetFeature.interfaces.test
+    @@PerlDef:
+      my $hfgf = <ClassName::ManakaiHasFeatureByGetFeature>;
+
+      $test->id ('GetFeature');
+      $test->assert_isa ($hfgf, <IFName::GetFeature>);
+
+      $test->id ('GetFeature.hasFeature');
+      $test->assert_true ($hfgf->can ('has_feature'));
 
   @Method:
     @@Name:  hasFeature
@@ -2937,8 +2950,12 @@ ResourceDef:
           @@@@@@: The feature is not implemented.
         @@@PerlCDef:
           __DEEP{
-            $r = defined $self-><M::GetFeature.getFeature> ($feature, $version)
-                 ? true : false;
+            my $gf = $self-><M::GetFeature.getFeature> ($feature, $version);
+            if ($feature =~ /^\+/) {
+              $r = defined $gf;
+            } else {
+              $r = ref $gf eq ref $self;
+            }
           }__;
 
   @Method:
@@ -3026,7 +3043,7 @@ ResourceDef:
               $stemid => {<Code::mg|getNodeID||ManakaiDOM|all:: $ref = $self>},
               $ref => $r,
               $opt => {{
-                <H::mg|nodeRefClass> => $__class,
+                <H::mg|nodeRefClass> => \$__class,
               }},
             }__;
             last CLASS;

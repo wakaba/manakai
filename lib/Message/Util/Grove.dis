@@ -9,7 +9,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/03/30 16:01:45 $
+    $Date: 2006/03/31 12:15:40 $
 
   @Require:
     @@Module:
@@ -626,7 +626,7 @@ ClsDef:
           $bag => {$ref->{<H::mg|nodeBag>}},
           $stemid => $__v,
           $ref => $r,
-          $opt => {{}},
+          $opt => $opt,
         }__;
       }
 
@@ -700,3 +700,11 @@ IntPropDef:
   @mg:nodeStemKey: nrcls
   @enDesc:
     The Perl package name of the class of the node reference.
+
+IntPropDef:
+  @QName: mg|nodeRefInterfaces
+  @mg:nodeStemKey: nrifs
+  @enDesc:
+    A reference to the array that contains the Perl
+    package names of the interfaces that the node reference
+    should implement.

@@ -17,7 +17,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/03/30 16:01:44 $
+    $Date: 2006/03/31 12:15:39 $
   
   @Require:
     @@Module:
@@ -101,7 +101,6 @@ ElementTypeBinding:
 FeatureDef:
   @QName: d|Feature
   @featureQName: fe|XDoctype
-  @featureQName: ManakaiDOM|XDoctype
   @FeatureVerDef:
     @@QName: d|Feature30
     @@f:instanceOf: d|Feature
@@ -1266,47 +1265,6 @@ IFClsXDef:
                            ('dtdef1');
 
         $test->assert_equals ($dtd-><AG::Node.nodeName>, 'dtdef1');
-
-  @Method:
-    @@ForCheck: ManakaiDOM|ForClass
-    @@Name: lookupPrefix
-    @@enDesc:
-      Looks up the namespace prefix associated to the given
-      namespace URI, starting from this node.
-    @@DOMMain:isNamespaceAware: 1
-    @@Param:
-      @@@Name: namespaceURI
-      @@@Type: DOMString
-      @@@dis:actualType: ManakaiDOM|ManakaiDOMNamespaceURI
-      @@@enDesc:
-        The namespace URI to look for.
-    @@Return:
-      @@@Type: DOMString
-      @@@enDesc:
-        An associated namespace prefix.
-      @@@nullCase:
-        @@@@enDesc:
-          No namespace prefix is found.  For <IF::tx|DocumentType>
-          node the method always returns <DOM::null>.
-      @@@PerlDef: $r = null;
-
-    @@Test:
-      @@@QName: DTDef.lookupPrefix.test
-      @@@PerlDef:
-        my $dtd;
-        __CODE{d|createDTDefForTest:: $dtdef => $dtd}__;
-
-        $test->assert_null ($dtd-><M::Node.lookupPrefix> ('abcdefg'));
-
-    @@Test:
-      @@@QName: DocumentType.lookupPrefix.test
-      @@@PerlDef:
-        my $impl;
-        __CODE{tc|createImplForTest:: $impl => $impl}__;
-
-        my $dtype = $impl-><M::c|DOMImplementation.createDocumentType>
-                             ('type', 'pub', 'sys');
-        $test->assert_null ($dtype-><M::Node.lookupPrefix> ('about:'));
 
   @CAttr:
     @@Name: nodeType
@@ -3709,7 +3667,9 @@ IFClsXDef:
             $bag => {<Code::mg|getNodeBag||ManakaiDOM|all:: $ref = $self>},
             $stemid => {$v->{$nameArg}},
             $ref => $r,
-            $opt => {{}},
+            $opt => {{
+               <H::mg|nodeRefInterfaces> => [<IFName::ElementTypeDefinition>],
+            }},
           }__;
         }
 
@@ -3810,7 +3770,7 @@ IFClsXDef:
         $test->id ('change-parent');
 
         my $dtd2 = $dtd-><AG::Node.ownerDocument>
-                       -><M::Node.getFeature> (<Q::ManakaiDOM|XDoctype>)
+                       -><M::Node.getFeature> (<Q::fe|XDoctype>)
                        -><M::DocumentXDoctype.createDocumentTypeDefinition>
                            ('dt2');
     
@@ -3831,7 +3791,7 @@ IFClsXDef:
         $test->id ('rewrite');
 
         my $et2 = $dtd-><AG::Node.ownerDocument>
-                      -><M::Node.getFeature> (<Q::ManakaiDOM|XDoctype>)
+                      -><M::Node.getFeature> (<Q::fe|XDoctype>)
                       -><M::DocumentXDoctype.createElementTypeDefinition>
                           ('et1');
         $test->assert_not_equals ($et, $et2);
@@ -3886,7 +3846,9 @@ IFClsXDef:
             $bag => {<Code::mg|getNodeBag||ManakaiDOM|all:: $ref = $self>},
             $stemid => {$v->{$nameArg}},
             $ref => $r,
-            $opt => {{}},
+            $opt => {{
+               <H::mg|nodeRefInterfaces> => [<IFName::tx|Entity>],
+            }},
           }__;
         }
        
@@ -3961,7 +3923,7 @@ IFClsXDef:
                            .getGeneralEntityNode> ('et1'));
 
         my $et = $dtd-><AG::Node.ownerDocument>
-                     -><M::Node.getFeature> (<Q::ManakaiDOM|XDoctype>)
+                     -><M::Node.getFeature> (<Q::fe|XDoctype>)
                      -><M::DocumentXDoctype.createGeneralEntity>
                          ('et1');
 
@@ -3989,7 +3951,7 @@ IFClsXDef:
         $test->id ('change-parent');
 
         my $dtd2 = $dtd-><AG::Node.ownerDocument>
-                       -><M::Node.getFeature> (<Q::ManakaiDOM|XDoctype>)
+                       -><M::Node.getFeature> (<Q::fe|XDoctype>)
                        -><M::DocumentXDoctype.createDocumentTypeDefinition>
                            ('dt2');
     
@@ -4069,7 +4031,9 @@ IFClsXDef:
             $bag => {<Code::mg|getNodeBag||ManakaiDOM|all:: $ref = $self>},
             $stemid => {$v->{$nameArg}},
             $ref => $r,
-            $opt => {{}},
+            $opt => {{
+               <H::mg|nodeRefInterfaces> => [<IFName::tx|Notation>],
+            }},
           }__;
         }
     @@Test:
@@ -4236,6 +4200,9 @@ IFClsXDef:
           $r => $r,
           $prop => {<H::f|implementation>},
           $ref => $self,
+          $opt => {{
+            <H::mg|nodeRefInterfaces> => [<IFName::c|DOMImplementation>],
+          }},
         }__;
         unless ($r) {
           __DEEP{
@@ -5056,7 +5023,9 @@ IFClsXDef:
             $bag => {<Code::mg|getNodeBag||ManakaiDOM|all:: $ref = $self>},
             $stemid => {$v->{$nameArg}},
             $ref => $r,
-            $opt => {{}},
+            $opt => {{
+               <H::mg|nodeRefInterfaces> => [<IFName::AttributeDefinition>],
+            }},
           }__;
         }
 
@@ -5164,7 +5133,7 @@ IFClsXDef:
         $test->assert_null ($odt);
 
         my $dt = $et-><AG::Node.ownerDocument>
-                     -><M::Node.getFeature> (<Q::ManakaiDOM:XDoctype>)
+                     -><M::Node.getFeature> (<Q::fe|XDoctype>)
                      -><M::DocumentXDoctype.createDocumentTypeDefinition>
                          ('dt1');
         $test->assert_not_null ($dt);
@@ -5228,7 +5197,9 @@ ResourceDef:
         $bag => {<Code::mg|getNodeBag||ManakaiDOM|all:: $ref = $self>},
         $stemid => {$__list->{$__aname}},
         $ref => $r,
-        $opt => {{}},
+        $opt => {{
+           <H::mg|nodeRefInterfaces> => [<IFName::Node>],
+        }},
       }__;
     }
     SET: {
@@ -8052,7 +8023,7 @@ IFClsXDef:
         my $at;
         __CODE{d|createATDefForTest:: $atdef => $at}__;
         my $doc = $at-><AG::Node.ownerDocument>
-                     -><M::Node.getFeature> (<Q::ManakaiDOM|XDoctype>);
+                     -><M::Node.getFeature> (<Q::fe|XDoctype>);
 
         $test->assert_null
                  ($at-><AG::AttributeDefinition.ownerElementTypeDefinition>);
@@ -8390,7 +8361,6 @@ enImplNote:
     - Define <M::Node.cloneNode>, <M::Node.adoptNode>,
       <M::Node.importNode>, <M::Node.isEqualNode>,
       <M::Node.compareDocumentPosition>,
-      namespace lookup methods
       for the new node types.
     
     - Implement <M::Node.getFeature>, <M::Node.hasFeature>,

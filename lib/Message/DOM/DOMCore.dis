@@ -40,7 +40,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/03/30 16:01:42 $
+      $Date: 2006/03/31 12:15:37 $
     @@ContentType:
       dis:Date.RCS
 
@@ -2366,6 +2366,94 @@ IFCls3Def:
 
       ## Don't invoke |DESTROY| method
       bless $list, 'dummy';
+
+  @IntMethod:
+    @@Operator:
+      @@@@: ==
+      @@@ContentType: DISPerl|Perl
+    @@enImplNote:
+      Order insignificant equality for <A::tc|ATDef.allowedTokens>.
+
+      See <M::tc|Node.isEqualNode>.
+
+      {ISSUE::
+        Is order significant equality necessary for other applications?
+      }
+
+      {ISSUE::
+        Should a Perl array reference be allowed as <P::arg>?
+      }
+    @@Param:
+      @@@Name: arg
+      @@@Type: DOMStringList
+    @@Return:
+      @@@Type: boolean
+      @@@PerlDef:
+        EQ: {
+          last EQ
+              unless UNIVERSAL::isa
+                         ($arg, <IFName::DOMStringList||ManakaiDOM|ManakaiDOM>);
+          my @v1 = @$self;
+          my @v2 = @$arg;
+          last EQ unless @v1 == @v2;
+          no warnings 'uninitialized';
+          (@v1) = sort {$a cmp $b} @v1;
+          (@v2) = sort {$a cmp $b} @v2;
+          for my $i (0..$#v1) {
+            if (defined $v1[$i] and defined $v2[$i]) {
+              last EQ unless $v1[$i] eq $v2[$i];
+            } elsif (defined $v1[$i] or defined $v2[$i]) {
+              last EQ;
+            }
+          }
+          $r = true;
+        } # EQ
+
+    @@Test:
+      @@@QName: DOMStringList.==.test
+      @@@PerlDef:
+        my $list1;
+        __CODE{newDOMStringListForTest::
+          $key => 'a',
+          $list => $list1,
+        }__;
+        my $list2;
+        __CODE{newDOMStringListForTest::
+          $key => 'a',
+          $list => $list2,
+        }__;
+
+        $test->id ('empty');
+        $test->assert_num_equals
+                 (expected_value => $list1, actual_value => $list2);
+
+        $test->id ('empty.string');
+        push @$list1, '';
+        push @$list2, '';
+        $test->assert_num_equals
+                 (expected_value => $list1, actual_value => $list2);
+
+        $test->id ('two.strings');
+        push @$list1, 'str';
+        push @$list2, 'str';
+        $test->assert_num_equals
+                 (expected_value => $list1, actual_value => $list2);
+
+        $test->id ('two.three.strings.diff');
+        push @$list1, 'a';
+        $test->assert_num_not_equals
+                 (expected_value => $list1, actual_value => $list2);
+
+        $test->id ('three.strings.diff');
+        push @$list2, 'b';
+        $test->assert_num_not_equals
+                 (expected_value => $list1, actual_value => $list2);
+
+        $test->id ('four.strings.equal');
+        push @$list1, 'b';
+        push @$list2, 'a';
+        $test->assert_num_equals
+                 (expected_value => $list1, actual_value => $list2);
 ##DOMStringList
 
 IFCls3Def:

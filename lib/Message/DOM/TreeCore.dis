@@ -12,7 +12,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/03/30 16:01:44 $
+    $Date: 2006/03/31 12:15:38 $
 
   @Require:
     @@Module:
@@ -140,6 +140,15 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type: DISLang|Method
     @@ForCheck: !=ManakaiDOM|ManakaiDOM
+
+ElementTypeBinding:
+  @Name: L12Method
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|Method
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM
+  ## Modified in DOM Level 2
 
 ElementTypeBinding:
   @Name: L13Method
@@ -376,7 +385,7 @@ ElementTypeBinding:
     @@DISCore:resourceType: DISLang|Const
 
 ElementTypeBinding:
-  @Name: mConst
+  @Name: LXConst
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
@@ -1241,7 +1250,24 @@ IFCls1Def:
   @IFQName: Node
   @ClsQName: ManakaiDOMNode
 
-  @DISLang:role: mg|NodeRefRole
+  @ClsISA: f|ManakaiHasFeatureByGetFeature
+  @Implement: ecore|MUErrorTarget||ManakaiDOM|Perl
+  @DISLang:role:
+    @@@: mg|NodeRefRole
+    @@enImplNote:
+      If it is necessary to add a role, then add to
+      the <IF::tx|CDATASection>, too.
+
+  @enDesc:
+    The <IF::Node> interface is the primary datatype for the entire 
+    document object model.  It represents a single node in the 
+    document tree.
+
+    The <IF::Node> interface is not implemented alone; the <IF::Node>
+    objects are expected to implement one or more additional
+    interfaces according to its node type.  For example, a node
+    whose <A::Node.nodeType> equals to <C::Node.ELEMENT_NODE>
+    would also implement the <IF::Element> interface.
 
   @IntMethod:
     @@Operator: mg|CreateNodeRefMethod
@@ -1254,7 +1280,20 @@ IFCls1Def:
     @@Return:
       @@@Type: Node
       @@@PerlDef:
-        $r = bless $obj, ($opt->{<H::mg|nodeRefClass>} or $self);
+        my $class;
+        CLS: {
+          if (defined $opt->{<H::mg|nodeRefClass>}) {
+            $class = $opt->{<H::mg|nodeRefClass>};
+            IFCHK: {
+              for (@{$opt->{<H::mg|nodeRefInterfaces>} or []}) {
+                last IFCHK unless $$class->isa ($_);
+              }
+              last CLS;
+            } # IFCHK
+          }
+          $class = \$self;
+        } # CLS
+        $r = bless $obj, $$class;
 
   @IntMethod:
     @@Operator: mg|CreateNodeStemMethod
@@ -1356,6 +1395,25 @@ IFCls1Def:
           $doc-><M::Document.createProcessingInstruction> ('pi'),
           $doc-><M::Document.createTextNode> ('text'),
           #test:nodeTypes
+
+  @Test:
+    @@QName: Node.interfaces.test
+    @@PerlDef:
+      my $doc;
+      __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+      my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+      for my $node (<Code::tc|createNodesForTest>) {
+        $test->id ($node-><AG::Node.nodeName>.'.Node');
+        $test->assert_isa ($node, <IFName::Node>);
+
+        $test->id ($node-><AG::Node.nodeName>.'.MUErrorTarget');
+        $test->assert_isa
+                 ($node, <IFName::ecore|MUErrorTarget||ManakaiDOM|Perl>);
+
+        $test->id ($node-><AG::Node.nodeName>.'.GetFeature');
+        $test->assert_isa ($node, <IFName::f|GetFeature>);
+      }
 
   @IntMethod:
     @@Operator:
@@ -1486,12 +1544,12 @@ IFCls1Def:
       @@@enDesc:
         The node is a <IF::tx|Notation>.
 
-    @@mConst:
+    @@LXConst:
       @@@Name: ELEMENT_TYPE_DEFINITION_NODE
       @@@intValue: 81001
       @@@enDesc:
         The node is an <IF::d|ElementTypeDefinition>.
-    @@mConst:
+    @@LXConst:
       @@@Name: ATTRIBUTE_DEFINITION_NODE
       @@@intValue: 81002
       @@@enDesc:
@@ -1728,6 +1786,9 @@ IFCls1Def:
           $r => $r,
           $prop => {<H::infoset|parent>},
           $ref => $self,
+          $opt => {{
+            <H::mg|nodeRefInterfaces> => [<IFName::Node>],
+          }},
         }__;
 
     @@XDTest:
@@ -1760,6 +1821,9 @@ IFCls1Def:
           $r => $r,
           $prop => {<H::tc|ownerDocument>},
           $ref => $self,
+          $opt => {{
+            <H::mg|nodeRefInterfaces> => [<IFName::Document>],
+          }},
         }__;
 
     @@Test:
@@ -2120,7 +2184,9 @@ IFCls1Def:
             $bag => {<Code::mg|getNodeBag||ManakaiDOM|all:: $ref = $self>},
             $stemid => {$v->[0]},
             $ref => $r,
-            $opt => {{}},
+            $opt => {{
+              <H::mg|nodeRefInterfaces> => [<IFName::Node>],
+            }},
           }__;
         }
 
@@ -2160,7 +2226,9 @@ IFCls1Def:
             $bag => {<Code::mg|getNodeBag||ManakaiDOM|all:: $ref = $self>},
             $stemid => {$v->[-1]},
             $ref => $r,
-            $opt => {{}},
+            $opt => {{
+              <H::mg|nodeRefInterfaces> => [<IFName::Node>],
+            }},
           }__;
         }
 
@@ -4185,40 +4253,81 @@ IFCls1Def:
         }__;
 
     @@Test:
-      @@@QName: Node.getFeature.1.test
+      @@@QName: Node.getFeature.hasFeature.1.test
       @@@PerlDef:
         my $doc;
         __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
 
+        no warnings 'uninitialized';
         for my $node (<Code::tc|createNodesForTest+dt>) {
-          $test->id ($node-><AG::Node.nodeType>.'.core.1.0');
-          my $core1 = $node-><M::Node.getFeature> (Core => '1.0');
-          $test->assert_isa ($core1, <IFName::Node||ManakaiDOM|ManakaiDOM1>);
+          for my $f (
+            [Core => '1.0', <IFName::Node||ManakaiDOM|ManakaiDOM1>],
+            [Core => '2.0', <IFName::Node||ManakaiDOM|ManakaiDOM2>],
+            [Core => '3.0', <IFName::Node||ManakaiDOM|ManakaiDOM3>],
+            [Core => '', <IFName::Node||ManakaiDOM|ManakaiDOM>],
+            [Core => null, <IFName::Node||ManakaiDOM|ManakaiDOM>],
+            [XML => '1.0', <IFName::Node||ManakaiDOM|ManakaiDOM1>],
+            [XML => '2.0', <IFName::Node||ManakaiDOM|ManakaiDOM2>],
+            [XML => '3.0', <IFName::Node||ManakaiDOM|ManakaiDOM3>],
+            [XML => '', <IFName::Node||ManakaiDOM|ManakaiDOM>],
+            [XML => null, <IFName::Node||ManakaiDOM|ManakaiDOM>],
+            [XMLVersion => '1.0', <IFName::Node||ManakaiDOM|ManakaiDOM3>],
+            [XMLVersion => '1.1', <IFName::Node||ManakaiDOM|ManakaiDOM3>],
+            [XMLVersion => '', <IFName::Node||ManakaiDOM|ManakaiDOM>],
+            [XMLVersion => null, <IFName::Node||ManakaiDOM|ManakaiDOM>],
+            ['-unknown-feature', '3.0', false],
+            ['-unknown-feature', '', false],
+            ['-unknown-feature', null, false],
+          ) {
+            $test->id ($node-><AG::Node.nodeName>.'.get.'.$f->[0].'.'.$f->[1]);
+            my $gf = $node-><M::Node.getFeature> ($f->[0], $f->[1]);
+            if ($f->[2]) {
+              $test->assert_isa ($gf, $f->[2]);
+            } else {
+              $test->assert_null ($gf);
+            }
 
-          $test->id ($node-><AG::Node.nodeType>.'.core.2.0');
-          my $core2 = $node-><M::Node.getFeature> (Core => '2.0');
-          $test->assert_isa ($core2, <IFName::Node||ManakaiDOM|ManakaiDOM2>);
+            $test->id ($node-><AG::Node.nodeName>.'.get.+'.$f->[0].'.'.$f->[1]);
+            my $gfp = $node-><M::Node.getFeature> ('+'.$f->[0], $f->[1]);
+            if ($f->[2]) {
+              $test->assert_isa ($gfp, $f->[2]);
+            } else {
+              $test->assert_null ($gfp);
+            }
 
-          $test->id ($node-><AG::Node.nodeType>.'.core.3.0');
-          my $core3 = $node-><M::Node.getFeature> (Core => '3.0');
-          $test->assert_isa ($core3, <IFName::Node||ManakaiDOM|ManakaiDOM3>);
+            $test->id ($node-><AG::Node.nodeName>.'.has.'.$f->[0].'.'.$f->[1]);
+            my $hf = $node-><M::f|GetFeature.hasFeature> ($f->[0], $f->[1]);
+            if ($f->[2]) {
+              $test->assert_true ($hf);
+            } else {
+              $test->assert_false ($hf);
+            }
 
-          $test->id ($node-><AG::Node.nodeType>.'.xml.1.0');
-          my $xml1 = $node-><M::Node.getFeature> (XML => '1.0');
-          $test->assert_isa ($xml1, <IFName::Node||ManakaiDOM|ManakaiDOM1>);
+            $test->id ($node-><AG::Node.nodeName>.'.has.+'.$f->[0].'.'.$f->[1]);
+            my $hfp = $node-><M::f|GetFeature.hasFeature> ('+'.$f->[0], $f->[1]);
+            if ($f->[2]) {
+              $test->assert_true ($hfp);
+            } else {
+              $test->assert_false ($hfp);
+            }
 
-          $test->id ($node-><AG::Node.nodeType>.'.xml.2.0');
-          my $xml2 = $node-><M::Node.getFeature> (XML => '2.0');
-          $test->assert_isa ($xml2, <IFName::Node||ManakaiDOM|ManakaiDOM2>);
+            $test->id ($node-><AG::Node.nodeName>.'.is.'.$f->[0].'.'.$f->[1]);
+            my $if = $node-><M::Node.isSupported> ($f->[0], $f->[1]);
+            if ($f->[2]) {
+              $test->assert_true ($if);
+            } else {
+              $test->assert_false ($if);
+            }
 
-          $test->id ($node-><AG::Node.nodeType>.'.xml.3.0');
-          my $xml3 = $node-><M::Node.getFeature> (XML => '3.0');
-          $test->assert_isa ($xml3, <IFName::Node||ManakaiDOM|ManakaiDOM3>);
-
-          $test->id ($node-><AG::Node.nodeType>.'.unknown');
-          my $unk = $node-><M::Node.getFeature> ('-unknown-feature' => '3.0');
-          $test->assert_null ($unk);
+            $test->id ($node-><AG::Node.nodeName>.'.is.+'.$f->[0].'.'.$f->[1]);
+            my $ifp = $node-><M::Node.isSupported> ('+'.$f->[0], $f->[1]);
+            if ($f->[2]) {
+              $test->assert_true ($ifp);
+            } else {
+              $test->assert_false ($ifp);
+            }
+          }
         }
 
   @L3Method:
@@ -4474,10 +4583,6 @@ IFCls1Def:
         $doc-><M::Node.removeChild> ($doc-><AG::Node.firstChild>);
         $test->assert_false ($doc-><M::Node.hasChildNodes>);
 
-  @Method:
-    @@Name: lookupNamespaceURI
-    @@Return:
-
   @L3Attr:
     @@Name: baseURI
     @@enDesc:
@@ -4508,8 +4613,1094 @@ IFCls1Def:
         @@@Exception[list]:  DOMException
 
   @L3Method:
-    @@Name: lookupPrefix
+    @@Name: lookupNamespaceURI
+    @@enDesc:
+      Looks up the namespace URI associated to the given prefix,
+      starting from the node.  This method ignores DOM Level 1 nodes.
+    @@DOMMain:isNamespaceAware: 1
+    @@Param:
+      @@@Name: prefix
+      @@@Type: DOMString
+      @@@enDesc:
+        The prefix to look for.
+      @@@nullCase:
+        @@@@enDesc:
+          The default namespace URI, if any, is returned.
     @@Return:
+      @@@Type: DOMString
+      @@@dis:actualType: ManakaiDOM|ManakaiDOMNamespaceURI
+      @@@enDesc:
+        The associated namespace URI.
+
+        {LI:: <IF::Element>::: 
+
+           = If the namespace of the element is not <DOM::null> 
+             and the prefix of the element is equal to the <P::prefix>
+             (note that it could be <DOM::null>), then return
+             the namespace of the element.
+
+           {OLI:: If the element has attributes, for each
+                  DOM Level 2 valid local namespace declaration attributes
+                  of the element,
+
+                  {SpecIssue::
+                    What is the <QUOTE::DOM Level 2 valid local namespace
+                    declaration attributes>?
+                  }
+
+                  {OLI:: If the prefix of the attribute is <XML::xmlns>
+                         and the local name of the attribute is equal
+                         to the <P::prefix>,
+
+                    = If the value of the attribute is not empty,
+                      return the value of the attribute.
+
+                    = Otherwise, return unknown (<DOM::null>).
+
+                  }
+
+                  {OLI:: If the local name of the attribute is <XML::xmlns>
+                         and the <P::prefix> is <DOM::null>, 
+
+                    = If the value of the attribute is not empty,
+                      return the value of the attribute.
+
+                    = Otherwise, return unknown (<DOM::null>).
+
+                  }
+
+           }
+
+           = If the element has an ancestor element, then
+             the return value is same as that of the 
+             <M::Node.lookupNamespaceURI> method on the ancestor
+             element with the same parameter.
+
+           = Otherwise, return <DOM::null>.
+
+        }
+
+        {LI:: <IF::Document>::: Same as the return value
+                  of the <M::Node.lookupNamespaceURI> method
+                  on the <A::Document.documentElement> of the node.
+
+                  {SpecIssue::
+                    If there is no document element, then?
+                  }
+
+        }
+
+        {LI:: <IF::tx|Entity>, <IF::tx|Notation>, <IF::tx|DocumentType>,
+              <IF::DocumentFragment> <SRC::DOM3>, <IF::ETDef>, and
+              <IF::ATDef> <SRC::manakai>:::  <DOM::null>.
+
+              {ISSUE::
+                Should for <IF::ETDef>s return something different?
+                If so, for <IF::ATDef>s should return what for its owner
+                definition does.
+              }
+        }
+
+        {LI:: <IF::Attr>:::
+
+           = If the attribute has the owner element, then
+             the return value is same as that of the 
+             <M::Node.lookupNamespaceURI> method on the owner element
+             with the same parameter.
+
+           = Otherwise, return unknown (<DOM::null>).
+        }
+
+        {LI:: Otherwise::
+
+           = If the node has an ancestor element, then
+             the return value is same as that of the
+             <M::Node.lookupNamespaceURI> method on the ancestor
+             element with the same parameter.
+
+           = Otherwise, return unknown (<DOM::null>).
+        }
+      @@@nullCase:
+        @@@@enDesc:
+          If no namespace URI is found.
+      @@@PerlDef:
+        __DEEP{
+          $prefix = null if defined $prefix and $prefix eq '';
+              # implementation dependent
+          my $nt = $self-><AG::Node.nodeType>;
+          if ($nt == <C::Node.ELEMENT_NODE>) {
+            my $el = $self;
+            EL: {
+              my $elns = $el-><AG::Node.namespaceURI>;
+              if (defined $elns) {
+                my $elpfx = $el-><AG::Node.prefix>;
+                if ((not defined $prefix and not defined $elpfx) or
+                    (defined $prefix and defined $elpfx and $prefix eq $elpfx)) {
+                  $r = $elns;
+                  last EL;
+                }
+              }
+              AT: for my $attr (@{$el-><AG::Node.attributes>}) {
+                my $attrns = $attr-><AG::Node.namespaceURI>;
+                next AT if not defined $attrns or $attrns ne <Q::xmlns:>;
+                my $attrpfx = $attr-><AG::Node.prefix>;
+                if (not defined $prefix) {
+                  my $attrln = $attr-><AG::Node.localName>;
+                  if ($attrln eq 'xmlns') {
+                    my $attrval = $attr-><AG::Attr.value>;
+                    $r = length $attrval ? $attrval : null;
+                    last EL;
+                  }
+                } elsif (defined $prefix and
+                         defined $attrpfx and $attrpfx eq 'xmlns') {
+                  my $attrln = $attr-><AG::Node.localName>;
+                  if ($attrln eq $prefix) {
+                    my $attrval = $attr-><AG::Attr.value>;
+                    $r = length $attrval ? $attrval : null;
+                    last EL;
+                  }
+                }
+              } # AT
+              $el = $el-><AG::Node.manakaiParentElement>;
+              redo EL if defined $el;
+              $r = null;
+            } # EL;
+          } else {
+            my $el = $nt == <C::Node.DOCUMENT_NODE>
+                       ? $self-><AG::Document.documentElement> :
+                     $nt == <C::Node.ATTRIBUTE_NODE>
+                       ? $self-><AG::Attr.ownerElement> :
+                     $self-><AG::Node.manakaiParentElement>;
+            if (defined $el) {
+              $r = $el-><M::Node.lookupNamespaceURI> ($prefix);
+            } else {
+              $r = null;
+            }
+          }
+        }__;
+
+    @@Test:
+      @@@QName: Node.lookupNamespaceURI.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+  
+        for my $node (<Code::tc|createNodesForTest+dt>) {
+          $test->id ($node-><AG::Node.nodeName>.'.1');
+          $test->assert_null ($node-><M::Node.lookupNamespaceURI> ('ns1'));
+
+          $test->id ($node-><AG::Node.nodeName>.'.xml');
+          $test->assert_null ($node-><M::Node.lookupNamespaceURI> ('xml'));
+
+          $test->id ($node-><AG::Node.nodeName>.'.xmlns');
+          $test->assert_null ($node-><M::Node.lookupNamespaceURI> ('xmlns'));
+
+          $test->id ($node-><AG::Node.nodeName>.'.null');
+          $test->assert_null ($node-><M::Node.lookupNamespaceURI> (null));
+
+          $test->id ($node-><AG::Node.nodeName>.'.empty');
+          $test->assert_null ($node-><M::Node.lookupNamespaceURI> (''));
+        }
+    @@Test:
+      @@@QName: Node.lookupNamespaceURI.2.test
+      @@@enDesc:
+        Namespace declared as the prefix of the element itself.
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+        my $el = $doc-><M::Document.createElementNS> ('about:', 'el');
+
+        $test->id ('not.defined');
+        $test->assert_null ($el-><M::Node.lookupNamespaceURI> ('ns1'));
+
+        $test->id ('element.prefix');
+        $el-><AS::Node.prefix> ('ns1');
+        $test->assert_equals ($el-><M::Node.lookupNamespaceURI> ('ns1'),
+                              'about:');
+
+        $test->id ('element.xmlns');
+        $el-><M::Element.setAttributeNS> (<Q::xmlns:>, 'xmlns:ns1', 'DAV:');
+        $test->assert_equals ($el-><M::Node.lookupNamespaceURI> ('ns1'),
+                              'about:');
+    @@Test:
+      @@@QName: Node.lookupNamespaceURI.3.test
+      @@@enDesc:
+        Namespace declared as the attribute of the element itself.
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+        my $el = $doc-><M::Document.createElementNS> ('about:', 'el');
+
+        $test->id ('not.defined');
+        $test->assert_null ($el-><M::Node.lookupNamespaceURI> ('ns1'));
+
+        $test->id ('element.xmlns');
+        $el-><M::Element.setAttributeNS> (<Q::xmlns:>, 'xmlns:ns1', 'DAV:');
+        $test->assert_equals ($el-><M::Node.lookupNamespaceURI> ('ns1'),
+                              'DAV:');
+
+  @L3Method:
+    @@Name: lookupPrefix
+    @@enDesc:
+      Looks up the prefix associated to the given namespace URI,
+      starting from the node.  This method ignores DOM
+      Level 1 nodes and all default namespace declarations.
+
+        {NOTE::
+           To look up the default namespace, use the
+           <M::Node.isDefaultNamespace> method instead.
+        }
+    @@DOMMain:isNamespaceAware: 1
+    @@Param:
+      @@@Name: namespaceURI
+      @@@Type: DOMString
+      @@@dis:actualType: ManakaiDOM|ManakaiDOMNamespaceURI
+      @@@enDesc:
+        The namespace URI to look for.
+      @@@nullCase:
+        @@@@enDesc:
+          <DOM::null> is returned.
+    @@Return:
+      @@@Type: DOMString
+      @@@enDesc:
+        An associated namespace prefix.
+
+        If more than one prefix are associated to the
+        namespace URI, the returned namespace prefix is 
+        implementation dependent.
+
+        {P:: What this method will return is defined by the algorithm
+             <DFN::<CODE::lookupNamespace>>:
+        
+          = If the <P::namespaceURI> is <DOM::null> or an empty
+            string, then return <DOM::null>.
+
+          = If the node is an <IF::Element>, then the return value
+            is defined by the algorithm <CODE::lookupNamespacePrefix>
+            with both <CODE::element> and <CODE::originalElement> parameters
+            set to the node.
+
+          {OLI::
+            If the node is a <IF::Document>, then the return value
+            is defined by the algorithm <CODE::lookupNamespacePrefix>
+            with its <CODE::element> parameter set to the
+            <A::Document.documentElement> of the node.
+
+              {SpecIssue::
+                - If <A::Document.documentElement> is <DOM::null>, then?
+
+                - What is the <CODE::originalElement>?
+              }
+          }
+
+          {LI:: If the node is an <IF::tx|Entity>, <IF::tx|Notation>,
+                <IF::DocumentFragment>, <IF::tx|DocumentType> <SRC::DOM3>,
+                <IF::ETDef>, or <IF::ATDef> <SRC::manakai>, then
+                return <DOM::null>.
+
+                {ISSUE::
+                  Are <IF::ETDef>s should return something different?
+                  If so, <IF::ATDef>s should return its owner 
+                  definition does.
+                }
+          }
+
+          {OLI:: If the node is an <IF::Attr>,
+
+            {OLI:: If the node has an <A::Attr.ownerElement>, then
+                   the return value is defined by the algorithm
+                   <CODE::lookupNamespacePrefix> with its <CODE::element>
+                   parameter set to the <A::Attr.ownerElement> of the node.
+ 
+                   {SpecIssue::
+                     What is the <CODE::originalElement>?
+                   }
+
+            }
+
+            = Otherwise, return <DOM::null>.
+
+          }
+
+          {OLI:: If the node has an ancestor <IF::Element>, then
+                 the return value is defined by the algorithm
+                 <CODE::lookupNamespacePrefix> with its <CODE::element>
+                 parameter set to the ancestor element.
+
+                 {SpecIssue::
+                   What is the <CODE::originalElement>?
+                 }
+          }
+
+          = Otherwise, return <DOM::null>.
+
+        }
+
+        {P:: The algorithm <DFN::<CODE::lookupNamespacePrefix>> is defined
+             as:
+
+           = If the <CODE::element> has a namespace,
+             the <CODE::element>'s namespace is equal to <P::namespaceURI>,
+             the <CODE::element> has a prefix, and
+             the <M::Node.lookupNamespaceURI> method on the
+             <CODE::originalElement> with its parameter set
+             to the prefix of the <CODE::element> returns
+             the <P::namespaceURI>, then return the prefix
+             of the <CODE::element>.
+ 
+           {OLI:: If the <CODE::element> has attributes, for each
+                  DOM Level 2 valid local namespace declaration
+                  attribute of the <CODE::element>, 
+         
+                    {SpecIssue::
+                      What is the <QUOTE::DOM Level 2 valid local
+                      namespace declaration attributes>?
+                    }
+
+                  = If the prefix of the attribute is <XML::xmlns>,
+                    the value of the attribute is equal to the
+                    <P::namespaceURI>, and the <M::Node.lookupNamespaceURI>
+                    method on the <CODE::originalElement> with its
+                    parameter set to the local name of the attribute
+                    returns the <P::namespaceURI>, then return
+                    the local name of the attribute.  Exit the algorithm.
+           }
+
+           = If the <CODE::element> has an ancestor element,
+             then the return value is defined by the algorithm
+             <CODE::lookupNamespacePrefix> with the <CODE::element>
+             parameter set to the ancestor element and the
+             <CODE::originalElement> parameter set to the current
+             <CODE::originalElement> value.
+
+           = Otherwise, return <DOM::null>.
+        }
+      @@@nullCase:
+        @@@@enDesc:
+          If no prefix is found.
+      @@@PerlDef:
+        unless (defined $namespaceURI) {
+          $r = null;
+        } else {
+          __DEEP{
+            my $nt = $self-><AG::Node.nodeType>;
+            if ($nt == <C::Node.ELEMENT_NODE>) {
+              my $el = $self;
+              EL: {
+                my $elns = $el-><AG::Node.namespaceURI>;
+                if (defined $elns and $elns eq $namespaceURI) {
+                  my $elpfx = $el-><AG::Node.prefix>;
+                  if (defined $elpfx) {
+                    my $oelpfx = $self-><M::Node.lookupNamespaceURI> ($elpfx);
+                    if (defined $oelpfx and $oelpfx eq $elpfx) {
+                      $r = $elpfx;
+                      last EL;
+                    }
+                  }
+                }
+                AT: for my $attr (@{$el-><AG::Node.attributes>}) {
+                  my $attrpfx = $attr-><AG::Node.prefix>;
+                  next AT if not defined $attrpfx or $attrpfx ne 'xmlns';
+                  my $attrns = $attr-><AG::Node.namespaceURI>;
+                  next AT if not defined $attrns or $attrns ne <Q::xmlns:>;
+                  my $attrln = $attr-><AG::Node.localName>;
+                  my $oelpfx = $self-><M::Node.lookupNamespaceURI> ($attrln);
+                  next AT unless defined $oelpfx;
+                  if ($oelpfx eq $attrln) {
+                    $r = $attrln;
+                    last EL;
+                  }
+                }
+                $el = $el-><AG::Node.manakaiParentElement>;
+                redo EL if defined $el;
+                $r = null;
+              } # EL
+            } else {
+              my $el = $nt == <C::Node.DOCUMENT_NODE>
+                         ? $self-><AG::Document.documentElement> :
+                       $nt == <C::Node.ATTRIBUTE_NODE>
+                         ? $self-><AG::Attr.ownerElement> :
+                       $self-><AG::Node.manakaiParentElement>;
+              if (defined $el) {
+                $r = $el-><M::Node.lookupPrefix> ($namespaceURI);
+              } else { 
+                $r = null;
+              }
+            }
+          }__;
+        }
+
+    @@Test:
+      @@@QName: Node.lookupPrefix.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        $doc-><AG::Document.domConfig>
+            -><M::c|DOMConfiguration.setParameter> ('error-handler' => sub { });
+          # No warnings
+  
+        for my $node (<Code::tc|createNodesForTest+dt>) {
+          $test->id ($node-><AG::Node.nodeName>.'.1');
+          $test->assert_null ($node-><M::Node.lookupPrefix>
+                                       ('http://www.w3.org/1999/xhtml'));
+
+          $test->id ($node-><AG::Node.nodeName>.'.xml');
+          $test->assert_null ($node-><M::Node.lookupPrefix> (<Q::xml:>));
+
+          $test->id ($node-><AG::Node.nodeName>.'.xmlns');
+          $test->assert_null ($node-><M::Node.lookupPrefix> (<Q::xmlns:>));
+
+          $test->id ($node-><AG::Node.nodeName>.'.null');
+          $test->assert_null ($node-><M::Node.lookupPrefix> (null));
+
+          $test->id ($node-><AG::Node.nodeName>.'.empty');
+          $test->assert_null ($node-><M::Node.lookupPrefix> (''));
+        }
+
+  @L3Method:
+    @@Name: isDefaultNamespace
+    @@enDesc:
+      Checks whether the specified namespace URI is the default
+      namespace or not.  This method ignores DOM Level 1 nodes.
+    @@DOMMain:isNamespaceAware: 1
+    @@Param:
+      @@@Name: namespaceURI
+      @@@Type: DOMString
+      @@@dis:actualType: ManakaiDOM|ManakaiDOMNamespaceURI
+      @@@enDesc:
+        The namespace URI to look for.
+      @@@enImplNote:
+        {SpecIssue::
+          Is <DOM::null> or an empty string allowed?
+        }
+    @@Return:
+      @@@Type: boolean
+      @@@enDesc:
+        {LI:: <IF::Element>:::
+
+           = If the <IF::Element> has no prefix, return
+             whether the namespace of the <IF::Element> is
+             equal to the <P::namespaceURI>.
+
+           {OLI:: If the <IF::Element> has a valid DOM Level 2
+                  default namespace declaration, i.e. an attribute
+                  whose <A::Node.localName> is <XA::xmlns>,
+                  return whether the value of the atribute
+                  is equal to the <P::namespaceURI> or not.
+
+                  {SpecIssue:: Are <DOM::null> and empty string
+                    allowed as <P::namespaceURI>?
+                  }
+           }
+
+           = If the <IF::Element> has an ancestor <IF::Element>,
+             the return value is same as that of the
+             <M::Node.isDefaultNamespace> method on the
+             ancestor element with the same parameter.
+
+           = Otherwise, return unknown (<DOM::false>).
+
+        }
+
+        {LI:: <IF::Document>::: Same as the return value
+                  of the <M::Node.isDefaultNamespace> method
+                  on the document element of the node with 
+                  the same parameter.
+
+                  {SpecIssue:: If no document element, then?
+                  }
+        }
+
+        {LI:: <IF::tx|Entity>, <IF::tx|Notation>, <IF::tx|DocumentType>,
+              <IF::DocumentFragment> <SRC::DOM3>, <IF::ETDef>, and
+              <IF::ATDef> <SRC::manakai>::: Unknown (<DOM::false>).
+
+                  {ISSUE::
+                    Should attriute definition be checked for 
+                    <IF::ETDef>?  If so, also for <IF::ATDef>.
+                  }
+        }
+
+        {LI:: <IF::Attr>::: 
+
+          = If the <IF::Attr> has an owner <IF::Element>, the return
+            value is that of the <M::Node.isDefaultNamespace>
+            method on that owner <IF::Element> with the same parameter.
+
+          = Otherwise, return unknown (<DOM::false>).
+
+        }
+
+        {LI:: Otherwise:::
+
+          = If the <IF::Node> has an ancestor <IF::Element>, the return
+            value is that of the <M::Node.isDefaultNamespace>
+            method on that ancestor <IF::Element> with the same parameter.
+
+          = Otherwise, return unknown (<DOM::false>).
+
+        }
+      @@@TrueCase:
+        @@@@enDesc:
+          If the specified <P::namespaceURI> is the default namespace.
+      @@@FalseCase:
+        @@@@enDesc:
+          Otherwise.
+      @@@PerlDef:
+        __DEEP{
+          my $nt = $self-><AG::Node.nodeType>;
+          if ($nt == <C::Node.ELEMENT_NODE>) {
+            my $el = $self;
+            EL: {
+              my $elpfx = $el-><AG::Node.prefix>;
+              unless (defined $elpfx) {
+                my $elns = $el-><AG::Node.namespaceURI>;
+                if (defined $namespaceURI and defined $elns) {
+                  $r = ($namespaceURI eq $elns);
+                } else {
+                  $r = not (defined $namespaceURI or defined $elns);
+                }
+                last EL;
+              }
+              my $xmlns = $el-><M::Element.getAttributeNS>
+                                 (<Q::xmlns:>, 'xmlns');
+              if (defined $xmlns) {
+                if (defined $namespaceURI) {
+                  $r = ($namespaceURI eq $xmlns);
+                } else {
+                  $r = ($xmlns eq '');
+                }
+                last EL;
+              }
+              $el = $el-><AG::Node.manakaiParentElement>;
+              redo EL if defined $el;
+              $r = null;
+            } # EL;
+          } else {
+            my $el = $nt == <C::Node.DOCUMENT_NODE>
+                       ? $self-><AG::Document.documentElement> :
+                     $nt == <C::Node.ATTRIBUTE_NODE>
+                       ? $self-><AG::Attr.ownerElement> :
+                     $self-><AG::Node.manakaiParentElement>;
+            if (defined $el) {
+              $r = $el-><M::Node.isDefaultNamespace> ($namespaceURI);
+            } else {
+              $r = null;
+            }
+          }
+        }__;
+
+    @@Test:
+      @@@QName: Node.isDefaultNamespace.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        $doc-><AG::Document.domConfig>
+            -><M::c|DOMConfiguration.setParameter> ('error-handler' => sub { });
+          # No warnings
+  
+        for my $node (
+          <Code::tc|createNodesForTest-el-attr>,
+          $doc-><M::Document.createAttributeNS> (null, 'attr1'),
+        ) {
+          $test->id ($node-><AG::Node.nodeName>.'.1');
+          $test->assert_false ($node-><M::Node.isDefaultNamespace> ('about:'));
+
+          $test->id ($node-><AG::Node.nodeName>.'.xml');
+          $test->assert_false ($node-><M::Node.isDefaultNamespace> (<Q::xml:>));
+
+          $test->id ($node-><AG::Node.nodeName>.'.xmlns');
+          $test->assert_false
+                   ($node-><M::Node.isDefaultNamespace> (<Q::xmlns:>));
+
+          $test->id ($node-><AG::Node.nodeName>.'.null');
+          $test->assert_false ($node-><M::Node.isDefaultNamespace> (null));
+
+          $test->id ($node-><AG::Node.nodeName>.'.empty');
+          $test->assert_false ($node-><M::Node.isDefaultNamespace> (''));
+        }
+    @@Test:
+      @@@QName: Node.isDefaultNamespace.2.test
+      @@@enDesc:
+        Namespace declared as the namespace URI of the element itself.
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+        my $el = $doc-><M::Document.createElementNS> ('about:', 'el');
+
+        $test->id ('element.default');
+        $test->assert_true ($el-><M::Node.isDefaultNamespace> ('about:'));
+
+        $test->id ('element.prefix');
+        $el-><AS::Node.prefix> ('ns1');
+        $test->assert_false ($el-><M::Node.isDefaultNamespace> ('about:'));
+
+        $test->id ('element.xmlns');
+        $el-><M::Element.setAttributeNS> (<Q::xmlns:>, 'xmlns', 'DAV:');
+        $test->assert_false ($el-><M::Node.isDefaultNamespace> ('about:'));
+
+        $test->id ('element.xmlns.empty');
+        $el-><M::Element.setAttributeNS> (<Q::xmlns:>, 'xmlns', '');
+        $test->assert_false ($el-><M::Node.isDefaultNamespace> ('about:'));
+    @@Test:
+      @@@QName: Node.isDefaultNamespace.3.test
+      @@@enDesc:
+        Namespace declared as the attribute of the element itself.
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+        my $el = $doc-><M::Document.createElementNS> ('about:', 'p:el');
+
+        $test->id ('not.defined');
+        $test->assert_false ($el-><M::Node.isDefaultNamespace> ('about:'));
+
+        $test->id ('element.xmlns');
+        $el-><M::Element.setAttributeNS> (<Q::xmlns:>, 'xmlns', 'about:');
+        $test->assert_true ($el-><M::Node.isDefaultNamespace> ('about:'));
+
+        $test->id ('element.xmlns.empty');
+        $el-><M::Element.setAttributeNS> (<Q::xmlns:>, 'xmlns', '');
+        $test->assert_false ($el-><M::Node.isDefaultNamespace> ('about:'));
+    @@Test:
+      @@@QName: Node.isDefaultNamespace.4.test
+      @@@enDesc:
+        The null default namespace on an element.
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+        $doc-><AG::Document.domConfig>
+            -><M::c|DOMConfiguration.setParameter> ('error-handler' => sub { });
+          # No warnings
+
+        my $el = $doc-><M::Document.createElementNS> ('about:', 'p:el');
+
+        $test->id ('not.defined.null');
+        $test->assert_false ($el-><M::Node.isDefaultNamespace> (null));
+        $test->id ('not.defined.empty');
+        $test->assert_false ($el-><M::Node.isDefaultNamespace> (''));
+          ## Strange result!
+
+        $el-><M::Element.setAttributeNS> (<Q::xmlns:>, 'xmlns', 'DAV:');
+        $test->id ('xmlns.null');
+        $test->assert_false ($el-><M::Node.isDefaultNamespace> (null));
+        $test->id ('xmlns.empty');
+        $test->assert_false ($el-><M::Node.isDefaultNamespace> (''));
+
+        $el-><M::Element.setAttributeNS> (<Q::xmlns:>, 'xmlns', '');
+        $test->id ('xmlns.empty.null');
+        $test->assert_true ($el-><M::Node.isDefaultNamespace> (null));
+        $test->id ('xmlns.empty.empty');
+        $test->assert_true ($el-><M::Node.isDefaultNamespace> (''));
+
+  @LXAttr:
+    @@Name: manakaiParentElement
+    @@enDesc:
+      The parent element of the node.
+    @@Type: Element
+    @@Get:
+      @@@enDesc:
+        = If the <A::Node.parentNode> of the node is <DOM::null>,
+          return <DOM::null>.
+
+        = Otherwise, if the <A::Node.parentNode> is an <IF::Element>,
+          return it.
+
+        = Otherwise, return the <A::Node.manakaiParentElement>
+          of the <A::Node.parentNode> of the node.  It might be <DOM::null>.
+
+            {ISSUE::
+              Should owner element be returned for <IF::Attr>?
+            }
+      @@@nullCase:
+        @@@@enDesc:
+          If the node has no parent element.
+      @@@PerlDef:
+        my $n = $self-><AG::Node.parentNode>;
+        N: while (defined $n) {
+          if ($n-><AG::Node.nodeType> == <C::Node.ELEMENT_NODE>) {
+            $r = $n;
+            last N;
+          } else {
+            $n = $n-><AG::Node.parentNode>;
+          }
+        } # N
+
+    @@Test:
+      @@@QName: Node.manakaiParentElement.1.test
+      @@@PerlDef:
+        my $el;
+        __CODE{tc|createElementForTest:: $el => $el}__;
+
+        my $doc = $el-><AG::Node.ownerDocument>;
+
+        $test->id ('no.parent');
+        $test->assert_null ($el-><AG::Node.manakaiParentElement>);
+
+        my $el2 = $doc-><M::Document.createElement> ('el2');
+        $el-><M::Node.appendChild> ($el2);
+
+        $test->id ('parent.element');
+        $test->assert_equals ($el2-><AG::Node.manakaiParentElement>, $el);
+
+        my $er1 = $doc-><M::Document.createEntityReference> ('er1');
+        $er1-><M::Node.manakaiSetReadOnly> (false, true);
+        $el-><M::Node.appendChild> ($er1);
+        $er1-><M::Node.appendChild> ($el2);
+
+        $test->id ('grandparent.element');
+        $test->assert_equals ($el2-><AG::Node.manakaiParentElement>, $el);
+
+  @L12Method:
+    @@Name: normalize
+
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Put all <IF::Text> nodes in the full depth of the sub-tree 
+         underneath this <IF::Node>, including attribute nodes 
+         attaced to the <IF::Element>, 
+         into a <QUOTE::normal> form where only structures separate
+         <IF::Text> nodes, i.e. there are neither adjacent <IF::Text> 
+         nodes nor empty <IF::Text> nodes. <SRC::DOM 1, 2, 3>
+       \
+         If the parameter <cfg::normalize-characters> of the 
+         <A::Document.domConfig> is <DOM::true>, the characters 
+         of the <IF::Text> nodes will also be fully normalized. 
+         <SRC::DOM 3>
+
+    Adjacent <IF::tx|CDATASection> nodes are not merged.
+    <SRC::DOM1, DOM2, DOM3>
+
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         The spec does not say to normalize nodes other than 
+         <IF::Text> (such as <IF::tx|CDATASection>, 
+         <IF::Comment> and so on).
+     @@Return:
+      @@@dx:raises:
+         @@@@@:
+           MDOMX:NOMOD_THIS
+         @@@@Description:
+           @@@@@lang:en
+           @@@@@@:
+             This node is read-only. 
+         @@@@For:
+           ManakaiDOM:ManakaiDOM
+      @@@dx:raises:
+         @@@@@: c|NOMOD_DESCENDANT_ERR
+         @@@@Description:
+           @@@@@lang:en
+           @@@@@@:
+             One of descendant (or attribute) is read-only. 
+         @@@@For:
+           ManakaiDOM:ManakaiDOM
+     @@ImplNote:
+       @@@lang:en
+       @@@@:
+         This method was defined in the "Element" interface in the DOM 
+         Level 1, but has beem moved to the "Node" interface in the 
+         DOM Level 2.
+
+  @L2Method:
+    @@Name: isSupported
+    @@enDesc:
+      Tests whether the DOM implementation implements a
+      specific feature and the feature is supported by the node.
+    @@Param:
+      @@@Name: feature
+      @@@Type: DOMString
+      @@@dis:actualType: f|FeatureNameString
+      @@@enDesc:
+        The name of the feature to test.
+      @@@InCase:
+        @@@@Label:
+          @@@@@lang:en
+          @@@@@@:
+            Feature name preceded by a <CHAR::PLUS SIGN>
+        @@@@enDesc:
+          The feature may not be directly castable.  <SRC::DOM3>
+    @@Param:
+      @@@Name: version
+      @@@Type: DOMString
+      @@@dis:actualType: f|FeatureVersionString
+      @@@enDesc:
+        The version number of the feature to test.
+      @@@nullCase:
+        @@@@enDesc:
+          Don't specify a particular version for the <P::feature>.
+          <SRC::DOM3>
+      @@@InCase:
+        @@@@Value:
+          @@@@@@: \
+          @@@@@ContentType: DISCore|String
+        @@@@enDesc:
+          Don't specify a particular version for the <P::feature>.
+          <SRC::DOM3>
+      @@@enImplNote:
+        Don't specify a particular version if the parameter
+        is not specified. <SRC::DOM2>
+    @@Return:
+      @@@Type: boolean
+      @@@TrueCase:
+        @@@@enDesc:
+          If the specified feature is supported on the node.
+      @@@FalseCase:
+        @@@@enDesc:
+          Otherwise.
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><M::f|GetFeature.hasFeature> ($feature, $version);
+        }__;
+
+  @L3Method:
+    @@Name: isEqualNode
+    @@Perlop: ==
+    @@enDesc:
+      Tests whether two nodes are equal.  This method tests
+      for equality of nodes, not sameness which can be
+      tested with <M::Node.isSameNode>.
+
+      {P:: Two nodes are equal if and only if:
+
+        - The two nodes are of the same type.
+
+        - String attributes <A::Node.nodeName>, <A::Node.localName>,
+          <A::Node.namespaceURI>, <A::Node.prefix>, and
+          <A::Node.value> are equal, i.e. they are both <DOM::null>
+          or they have the same length and are character for
+          character identical.
+
+        - The <A::Node.attributes> <IF::NamedNodeMap>s are equal,
+          i.e. they are both <DOM::null>, or they have the
+          same length and for each node that exists in one
+          map there is a node that exists in the other map
+          and is equal, although not necessarily at the same index.
+          <SRC::DOM3>  In addition, if they are not <DOM::null>,
+          the number of the items that are equal to a string in one list
+          is equal to the number of such items in the other list.
+          <SRC::manakai>
+
+        {LI:: The <A::Node.childNodes> <IF::NodeList>s are equal, i.e.
+              they are both <DOM::null>, or they have the same
+              length and contain equal nodes at the same index.
+
+              {SpecIssue:: It can never <DOM::null> by definition.
+              }
+        }
+
+        - If they are <IF::tx|DocumentType>s, the string
+          attributes <A::tx|DocumentType.publicId>, 
+          <A::tx|DocumentType.systemId>, and
+          <A::tx|DocumentType.internalSubset> are equal.
+
+        - If they are <IF::tx|DocumentType>s, the <A::tx|DocumentType.entities>
+          <IF::NamedNodeMap>s are equal.
+
+        - If they are <IF::tx|DocumentType>s, the <A::tx|DocumentType.notations>
+          <IF::NamedNodeMap>s are equal.
+
+        - If they are <IF::tx|DocumentType>s and at least one of them
+          has the <Feature::fe|XDoctype> feature, their <A::DTDef.elementTypes>
+          <IF::NamedNodeMap>s are equal, i.e. they both has the
+          <Feature::fe|XDoctype> feature and their <A::DTDef.elementTypes>
+          are equal (as defined for <A::Node.attributes> except 
+          that they cannot be <DOM::null>), or the <A::DTDef.elementTypes>
+          of the node that has the <Feature::fe|XDoctype> feature
+          is empty (i.e. its <A::NamedNodeMap.length> is zero).
+          <SRC::manakai>
+          
+        - If they are <IF::ETDef>s, their <A::ETDef.attributeDefinitions>
+          <IF::NamedNodeMap>s are equal (as defined for 
+          <A::Node.attributes> except that they cannot be <DOM::null>).
+          <SRC::manakai>
+
+        - If they are <IF::ATDef>s, the numeric attributes
+          <A::ATDef.declaredType> and <A::ATDef.defaultType> are equal.
+          <SRC::manakai>
+
+        - If they are <IF::ATDef>s, the <A::ATDef.allowedToken>
+          <IF::c|DOMStringList>s are equal, i.e. they have
+          the same <A::c|DOMStringList.length> and for each string
+          that exists in one list there is a string that
+          exists in the other list and is equal, although
+          not necessarily at the same index.  In addition, 
+          the number of the items that are equal to a string in one list
+          is equal to the number of such items in the other list.
+      }
+
+        {NOTE::
+          As a general rule, anything not mentioned in the description
+          above is not significant in consideration of equality checking.
+          Note that future versions of the DOM specification
+          may take into account more attributes and implementations
+          conform to the DOM specification are expected to be
+          updated accordingly.
+        }
+    @@Param:
+      @@@Name: arg
+      @@@Type: Node
+      @@@enDesc:
+        The node to compare equality with.
+    @@Return:
+      @@@Type: boolean
+      @@@TrueCase:
+        @@@@enDesc:
+          If the nodes are equal.
+      @@@FalseCase:
+        @@@@enDesc:
+          Otherwise.
+      @@@PerlDef:
+        __DEEP{
+          EQ: {
+            last EQ unless UNIVERSAL::isa
+                             ($arg, <IFName::Node||ManakaiDOM|ManakaiDOM>);
+            my $nt = $self-><AG::Node.nodeType>;
+            last EQ unless $nt == $arg-><AG::Node.nodeType>;
+
+            my @str_attr = qw/node_name local_name namespace_uri
+                              prefix node_value/;
+            push @str_attr, qw/public_id system_id internal_subset/
+                if $nt == <C::Node.DOCUMENT_TYPE_NODE>;
+            for my $attr_name (@str_attr) {
+              my $v1 = $self->can ($attr_name) ? $self->$attr_name : null;
+              my $v2 = $arg->can ($attr_name) ? $arg->$attr_name : null;
+              if (defined $v1 and defined $v2) {
+                last EQ unless ''.$v1 eq ''.$v2;
+              } elsif (defined $v1 or defined $v2) {
+                last EQ;
+              }
+            }
+
+            my @num_eq_attr = qw/child_nodes attributes/;
+            push @num_eq_attr, qw/entities notations/
+                if $nt == <C::Node.DOCUMENT_TYPE_NODE>;
+            push @num_eq_attr, qw/attribute_definitions/
+                if $nt == <C::Node.ELEMENT_TYPE_DEFINITION_NODE>;
+            push @num_eq_attr, qw/declared_type default_type allowed_tokens/
+                if $nt == <C::Node.ATTRIBUTE_DEFINITION_NODE>;
+            for my $attr_name (@num_eq_attr) {
+              my $v1 = $self->can ($attr_name) ? $self->$attr_name : null;
+              my $v2 = $arg->can ($attr_name) ? $arg->$attr_name : null;
+              if (defined $v1 and defined $v2) {
+                last EQ unless $v1 == $v2;
+              } elsif (defined $v1 or defined $v2) {
+                last EQ;
+              }
+            }
+
+            if ($nt == <C::Node.DOCUMENT_TYPE_NODE>) {
+              my $dt1 = $self-><M::Node.getFeature> (<Q::fe|XDoctype>, '3.0');
+              my $dt2 = $arg->can ('get_feature')
+                          ? $arg-><M::Node.getFeature> (<Q::fe|XDoctype>, '3.0')
+                          : null;
+              if (defined $dt1 and defined $dt2) {
+                last EQ unless $dt1-><AG::DTDef.elementTypes>
+                                   == $dt2-><AG::DTDef.elementTypes>;
+              } elsif (defined $dt1) {
+                last EQ unless $dt1-><AG::DTDef.elementTypes>
+                                   -><AG::NamedNodeMap.length> == 0;
+              } elsif (defined $dt2) {
+                last EQ unless $dt2-><AG::DTDef.elementTypes>
+                                   -><AG::NamedNodeMap.length> == 0;
+              }
+            }
+
+            $r = true;
+          } # EQ
+        }__;
+
+    @@Test:
+      @@@QName: Node.isEqualNode.1.test
+      @@@enDesc:
+        All nodes are equal to themselves.
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        for my $node (<Code::tc|createNodesForTest+dt>) {
+          $test->id ($node-><AG::Node.nodeName>.'.isEqualNode.self');
+          $test->assert_true ($node-><M::Node.isEqualNode> ($node));
+
+          $test->id ($node-><AG::Node.nodeName>.'.==.self');
+          $test->assert_num_equals
+                   (actual_value => $node, expected_value => $node);
+
+          $test->id ($node-><AG::Node.nodeName>.'.==.string');
+          $test->assert_num_not_equals
+                   (actual_value => $node, expected_value => 'string');
+
+          $test->id ($node-><AG::Node.nodeName>.'.==.0');
+          $test->assert_num_not_equals
+                   (actual_value => $node, expected_value => 0);
+
+          $test->id ($node-><AG::Node.nodeName>.'.==.empty');
+          $test->assert_num_not_equals
+                   (actual_value => $node, expected_value => '');
+
+          $test->id ($node-><AG::Node.nodeName>.'.==.null');
+          $test->assert_num_not_equals
+                   (actual_value => $node, expected_value => null);
+        }
+    @@Test:
+      @@@QName: Node.isEqualNode.2.test
+      @@@enDesc:
+        Empty element equality.
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+        my $el1 = $doc-><M::Document.createElementNS> (null, 'type');
+        my $el2 = $doc-><M::Document.createElementNS> (null, 'type');
+        my $el3 = $doc-><M::Document.createElementNS> (null, 'TYPE');
+
+        $test->id ('==');
+        $test->assert_num_equals
+                 (actual_value => $el1, expected_value => $el2);
+
+        $test->id ('not.==');
+        $test->assert_num_not_equals
+                 (actual_value => $el1, expected_value => $el3);
+    @@Test:
+      @@@QName: Node.isEqualNode.3.test
+      @@@enDesc:
+        Empty elementNS equality.
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+        my $el1 = $doc-><M::Document.createElementNS> ('about:', 'type');
+        my $el2 = $doc-><M::Document.createElementNS> ('about:', 'type');
+        my $el3 = $doc-><M::Document.createElementNS> ('about:', 'TYPE');
+        my $el4 = $doc-><M::Document.createElementNS> ('DAV:', 'type');
+
+        $test->id ('equal');
+        $test->assert_num_equals
+                 (actual_value => $el1, expected_value => $el2);
+
+        $test->id ('different.local.name');
+        $test->assert_num_not_equals
+                 (actual_value => $el1, expected_value => $el3);
+
+        $test->id ('different.namespace.uri');
+        $test->assert_num_not_equals
+                 (actual_value => $el1, expected_value => $el4);
+
+        $test->id ('different.prefix');
+        $el2-><AS::Node.prefix> ('prefix');
+        $test->assert_num_not_equals
+                 (actual_value => $el1, expected_value => $el2);
 ##Node
 
 ElementTypeBinding:
@@ -8513,7 +9704,7 @@ NodeTypeDef:
         $feature =~ s/^\+//;
 
         ## TODO: Remove this code and implement autoload
-        if ($feature eq <Q::fe|xdoctype> or $feature eq <Q::ManakaiDOM|xdoctype>) {
+        if ($feature eq <Q::fe|xdoctype>) {
           require Message::DOM::XDoctype;
         }
 
@@ -8742,7 +9933,7 @@ NodeTypeDef:
       @@@PerlDef:
         my $doc;
         __CODE{createEmptyDocumentForTest:: $doc => $doc}__;
-        my $docd = $doc-><M::Node.getFeature> (<Q::ManakaiDOM:XDoctype>, '3.0');
+        my $docd = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>, '3.0');
         my $dtd = $docd-><M::d|DocumentXDoctype.createDocumentTypeDefinition>
                            ('doctype');
           my $et = $docd-><M::d|DocumentXDoctype.createElementTypeDefinition>
@@ -8780,7 +9971,7 @@ NodeTypeDef:
       @@@PerlDef:
         my $doc;
         __CODE{createEmptyDocumentForTest:: $doc => $doc}__;
-        my $docd = $doc-><M::Node.getFeature> (<Q::ManakaiDOM:XDoctype>, '3.0');
+        my $docd = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>, '3.0');
         my $dtd = $docd-><M::d|DocumentXDoctype.createDocumentTypeDefinition>
                            ('doctype');
           my $et = $docd-><M::d|DocumentXDoctype.createElementTypeDefinition>
@@ -8822,10 +10013,14 @@ NodeTypeDef:
         $test->assert_equals ($ti-><AG::c|TypeInfo.typeName>, 'NMTOKENS');
     @@L3Test:
       @@@QName: Document.createElement.defaultattr.3.test
+      @@@enDesc:
+        The <cfg::cfg|dtd-default-attributes> configuration
+        parameter is set to <DOM::false> so that no default
+        attribute should be exposed by the creation.
       @@@PerlDef:
         my $doc;
         __CODE{createEmptyDocumentForTest:: $doc => $doc}__;
-        my $docd = $doc-><M::Node.getFeature> (<Q::ManakaiDOM:XDoctype>, '3.0');
+        my $docd = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>, '3.0');
         my $dtd = $docd-><M::d|DocumentXDoctype.createDocumentTypeDefinition>
                            ('doctype');
           my $et = $docd-><M::d|DocumentXDoctype.createElementTypeDefinition>
@@ -8968,11 +10163,10 @@ NodeTypeDef:
                                  ? @$qualifiedName
                                  : split /:/, $qualifiedName, 2;
         ($prefix, $lname) = (null, $prefix) unless defined $lname;
+        $qualifiedName = defined $prefix ? $prefix.':'.$lname : $lname;
 
         if ($self-><AG::Document.strictErrorChecking>) {
           my $version = $self-><AG::Document.xmlVersion>;
-          $qualifiedName = defined $prefix ? $prefix.':'.$lname
-                                           : $lname;
           __CODE{DOMMain|ensureXMLQName::
             $INPUT = $qualifiedName, 
             $INPUT_PARAM_NAME = 'qualifiedName',
@@ -9012,6 +10206,7 @@ NodeTypeDef:
           $stem => $stem,
           $ref => $r,
           $opt => {{
+            <H::mg|nodeRefInterfaces> => [<IFName::Element>],
           }},
         }__;
 
@@ -10002,6 +11197,7 @@ NodeTypeDef:
           $stem => $stem,
           $ref => $r,
           $opt => {{
+            <H::mg|nodeRefInterfaces> => [<IFName::Attr>],
           }},
         }__;
 
@@ -10271,6 +11467,7 @@ NodeTypeDef:
           $stem => $stem,
           $ref => $r,
           $opt => {{
+            <H::mg|nodeRefInterfaces> => [<IFName::Text>],
           }},
         }__;
 
@@ -10398,6 +11595,7 @@ NodeTypeDef:
           $stem => $stem,
           $ref => $r,
           $opt => {{
+            <H::mg|nodeRefInterfaces> => [<IFName::tx|CDATASection>],
           }},
         }__;
 
@@ -10488,6 +11686,7 @@ NodeTypeDef:
           $stem => $stem,
           $ref => $r,
           $opt => {{
+            <H::mg|nodeRefInterfaces> => [<IFName::Comment>],
           }},
         }__;
 
@@ -10572,6 +11771,7 @@ NodeTypeDef:
           $stem => $stem,
           $ref => $r,
           $opt => {{
+            <H::mg|nodeRefInterfaces> => [<IFName::DocumentFragment>],
           }},
         }__;
 
@@ -10705,6 +11905,7 @@ NodeTypeDef:
           $stem => $stem,
           $ref => $r,
           $opt => {{
+            <H::mg|nodeRefInterfaces> => [<IFName::tx|EntityReference>],
           }},
         }__;
 
@@ -11004,6 +12205,7 @@ NodeTypeDef:
           $stem => $stem,
           $ref => $r,
           $opt => {{
+            <H::mg|nodeRefInterfaces> => [<IFName::tx|ProcessingInstruction>],
           }},
         }__;
 
@@ -11241,6 +12443,9 @@ NodeTypeDef:
           $r => $r,
           $prop => {<H::f|implementation>},
           $ref => $self,
+          $opt => {{
+            <H::mg|nodeRefInterfaces> => [<IFName::c|DOMImplementation>],
+          }},
         }__;
 
     @@Test:
@@ -12592,6 +13797,29 @@ NodeTypeDef:
   @mg:subnode2hh: infoset|attributes
   @mg:owner0: tc|ownerDocument
   @mg:origin0: infoset|parent
+
+  @enImplNote:
+    @@ddid: props
+    @@@:
+      {P:: Required internal properties:
+
+        - <Q::tc|ownerDocument>.
+
+        - <Q::infoset|children>, <Q::infoset|attributes>.
+
+        - <Q::infoset|localName>.
+
+      }
+
+      {P:: Optional internal properties:
+
+        - <Q::infoset|parent>.
+
+        - <Q::infoset|prefix>, <Q::infoset|namespaceName>.
+
+        - <Q::c|read-only>.
+
+      }
 
   @CODE:
     @@QName: tc|createElementForTest
@@ -16070,7 +17298,9 @@ NodeTypeDef:
             $bag => {<Code::mg|getNodeBag||ManakaiDOM|all:: $ref = $self>},
             $stemid => {$__attr->{$__ns}->{$__ln}},
             $ref => $__node,
-            $opt => {{}},
+            $opt => {{
+              <H::mg|nodeRefInterfaces> => [<IFName::Attr>],
+            }},
           }__;
           if ($__node-><AG::Node.nodeName> eq $name) {
             __FOR{!tc:ForRemove::
@@ -16177,7 +17407,9 @@ NodeTypeDef:
             $stemid => {$__attrs->{defined $namespaceURI ? $namespaceURI : ''}
                                 ->{$localName}},
             $ref => $r,
-            $opt => {{}},
+            $opt => {{
+              <H::mg|nodeRefInterfaces> => [<IFName::Attr>],
+            }},
           }__;
         }
     @@PerlDef:
@@ -16196,7 +17428,9 @@ NodeTypeDef:
             $stemid => {$__attrs->{defined $namespaceURI ? $namespaceURI : ''}
                                 ->{$localName}},
             $ref => $r,
-            $opt => {{}},
+            $opt => {{
+              <H::mg|nodeRefInterfaces> => [<IFName::Attr>],
+            }},
           }__;
         }
 
@@ -17440,7 +18674,9 @@ NodeTypeDef:
             $bag => {<Code::mg|getNodeBag||ManakaiDOM|all:: $ref = $self>},
             $stemid => {$attrs->{$nsuri}->{$ln}},
             $ref => $current,
-            $opt => {{}},
+            $opt => {{
+              <H::mg|nodeRefInterfaces> => [<IFName::Attr>],
+            }},
           }__;
         }
 
@@ -18811,6 +20047,31 @@ NodeTypeDef:
   @mg:owner0: tc|ownerDocument
   @mg:origin0: infoset|ownerElement
 
+  @enImplNote:
+    @@ddid: props
+    @@@:
+      {P:: Required internal properties:
+
+         - <Q::tc|ownerDocument>.
+
+         - <Q::infoset|children>.
+
+         - <Q::infoset|localName>.
+
+      }
+
+      {P:: Optional internal properties:
+
+         - <Q::infoset|prefix>, <Q::infoset|namespaceName>.
+
+         - <Q::infoset|ownerElement>, <Q::infoset|specified>.
+
+         - <Q::c|userDeterminedId>.
+
+         - <Q::c|read-only>.
+
+      }
+
   @IntMethod:
     @@Operator: mg|CreateNodeRefMethod
     @@Param:
@@ -18823,125 +20084,150 @@ NodeTypeDef:
       @@@Type: Node
       @@@PerlDef:
         my $class;
-        if (defined $opt->{<H::mg|nodeRefClass>}) {
-          $class = \($opt->{<H::mg|nodeRefClass>});
-        } else {
+        CLS: {
+          if (defined $opt->{<H::mg|nodeRefClass>}) {
+            $class = $opt->{<H::mg|nodeRefClass>};
+            IFCHK: {
+              for (@{$opt->{<H::mg|nodeRefInterfaces>} or []}) {
+                last IFCHK unless $$class->isa ($_);
+              }
+              last CLS;
+            } # IFCHK
+          }
+
           __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
             $r => $class,
             $prop => {<H::tc|defaultNodeRefClass>},
             $ref => $obj,
           }__;
-          unless (defined $class) {
-            my $nsuri;
-            __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-              $r => $nsuri,
-              $prop => {<H::infoset|namespaceName>},
-              $ref => $obj,
-            }__;
-            $nsuri = \'' unless defined $nsuri;
-            my $ln;
-            __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-              $r => $ln,
-              $prop => {<H::infoset|localName>},
-              $ref => $obj,
-            }__;
-            my $oeid;
-            __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-              $r => $oeid,
-              $prop => {<H::infoset|ownerElement>},
-              $ref => $obj,
-            }__;
-            my $oens;
-            my $oeln;
-            if (defined $oeid) {
-              my $bag = <Code::mg|getNodeBag||ManakaiDOM|all:: $ref = $obj>;
-              my $oeh = <Code::mg|createNodeRefHashFromID||ManakaiDOM|all::
-                                     $stemid = $oeid, $bag = $bag>;
-              __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-                $r => $oens,
-                $prop => {<H::infoset|namespaceName>},
-                $ref => $oeh,
-              }__;
-              $oens = \'' unless defined $oens;
-              __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-                $r => $oeln,
-                $prop => {<H::infoset|localName>},
-                $ref => $oeh,
-              }__;
-            } else {
-              $oens = \'*';
-              $oeln = \'*';
-            }
-
-            A: {
-              ## Use cases:
-              ##   - Any element type, |xml:id| attribute
-              ##   - Any element type, |xlink:href| attribute
-              ##   - |xslt:*| element type, any attribute
-              ##   - |xslt:*| element type, NULL namespace attribute
-              ##   - |xhtml1:*| element type, NULL namespace attribute
-
-              for my $nm (
-                [$oens, $oeln, $nsuri, $ln],
-                [$oens, \'*', $nsuri, $ln],
-                [\'*', \'*', $nsuri, $ln],
-                [$oens, $oeln, $nsuri, \'*'],
-                [$oens, \'*', $nsuri, \'*'],
-                [\'*', \'*', $nsuri, \'*'],
-                [$oens, $oeln, \'*', \'*'],
-                [$oens, \'*', \'*', \'*'],
-              ) {
-                for my $__class (sort {
-                  $Message::DOM::ClassPoint{$b} <=> $Message::DOM::ClassPoint{$a}
-                } grep {
-                  $Message::DOM::DOMFeature::ClassInfo
-                      ->{<ClassName::ManakaiDOMAttr>}
-                      ->{compat_class_by_type}
-                      ->{${$nm->[0]}}->{${$nm->[1]}}
-                      ->{${$nm->[2]}}->{${$nm->[3]}}->{$_}
-                } keys %{$Message::DOM::DOMFeature::ClassInfo
-                             ->{<ClassName::ManakaiDOMAttr>}
-                             ->{compat_class_by_type}
-                             ->{${$nm->[0]}}->{${$nm->[1]}}
-                             ->{${$nm->[2]}}->{${$nm->[3]}} or {}}) {
-                  if ($Message::DOM::DOMFeature::ClassInfo->{$__class}
-                          ->{has_feature}->{xml}->{'3.0'}) {
-                    $class = \$__class;
-                    last A;
-                  }
-                }
+          if (defined $class) {
+            IFCHK: {
+              for (@{$opt->{<H::mg|nodeRefInterfaces>} or []}) {
+                last IFCHK unless $$class->isa ($_);
               }
+              last CLS;
+            } # IFCHK
+          }
 
-              ## Generic
-              CLASS: for my $__class (sort {
+          my $nsuri;
+          __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
+            $r => $nsuri,
+            $prop => {<H::infoset|namespaceName>},
+            $ref => $obj,
+          }__;
+          $nsuri = \'' unless defined $nsuri;
+          my $ln;
+          __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
+            $r => $ln,
+            $prop => {<H::infoset|localName>},
+            $ref => $obj,
+          }__;
+          my $oeid;
+          __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
+            $r => $oeid,
+            $prop => {<H::infoset|ownerElement>},
+            $ref => $obj,
+          }__;
+          my $oens;
+          my $oeln;
+          if (defined $oeid) {
+            my $bag = <Code::mg|getNodeBag||ManakaiDOM|all:: $ref = $obj>;
+            my $oeh = <Code::mg|createNodeRefHashFromID||ManakaiDOM|all::
+                                   $stemid = $oeid, $bag = $bag>;
+            __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
+              $r => $oens,
+              $prop => {<H::infoset|namespaceName>},
+              $ref => $oeh,
+            }__;
+            $oens = \'' unless defined $oens;
+            __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
+              $r => $oeln,
+              $prop => {<H::infoset|localName>},
+              $ref => $oeh,
+            }__;
+          } else {
+            $oens = \'*';
+            $oeln = \'*';
+          }
+
+          A: {
+            ## Use cases:
+            ##   - Any element type, |xml:id| attribute
+            ##   - Any element type, |xlink:href| attribute
+            ##   - |xslt:*| element type, any attribute
+            ##   - |xslt:*| element type, NULL namespace attribute
+            ##   - |xhtml1:*| element type, NULL namespace attribute
+
+            for my $nm (
+              [$oens, $oeln, $nsuri, $ln],
+              [$oens, \'*', $nsuri, $ln],
+              [\'*', \'*', $nsuri, $ln],
+              [$oens, $oeln, $nsuri, \'*'],
+              [$oens, \'*', $nsuri, \'*'],
+              [\'*', \'*', $nsuri, \'*'],
+              [$oens, $oeln, \'*', \'*'],
+              [$oens, \'*', \'*', \'*'],
+            ) {
+              for my $__class (sort {
                 $Message::DOM::ClassPoint{$b} <=> $Message::DOM::ClassPoint{$a}
               } grep {
                 $Message::DOM::DOMFeature::ClassInfo
                     ->{<ClassName::ManakaiDOMAttr>}
-                    ->{compat_class}->{$_}
+                    ->{compat_class_by_type}
+                    ->{${$nm->[0]}}->{${$nm->[1]}}
+                    ->{${$nm->[2]}}->{${$nm->[3]}}->{$_}
               } keys %{$Message::DOM::DOMFeature::ClassInfo
                            ->{<ClassName::ManakaiDOMAttr>}
-                           ->{compat_class} or {}}) {
+                           ->{compat_class_by_type}
+                           ->{${$nm->[0]}}->{${$nm->[1]}}
+                           ->{${$nm->[2]}}->{${$nm->[3]}} or {}}) {
                 if ($Message::DOM::DOMFeature::ClassInfo->{$__class}
                         ->{has_feature}->{xml}->{'3.0'}) {
                   $class = \$__class;
-                  last A;
+                  IFCHK: {
+                    for (@{$opt->{<H::mg|nodeRefInterfaces>} or []}) {
+                      last IFCHK unless $$class->isa ($_);
+                    }
+                    last A;
+                  } # IFCHK
                 }
               }
-
-              ## Default
-              $class = \$self;
-            } # A
-
-            if (defined $oeid) {
-              __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
-                $given => $class,
-                $prop => {<H::tc|defaultNodeRefClass>},
-                $ref => $obj,
-              }__;
             }
+
+            ## Generic
+            CLASS: for my $__class (sort {
+              $Message::DOM::ClassPoint{$b} <=> $Message::DOM::ClassPoint{$a}
+            } grep {
+              $Message::DOM::DOMFeature::ClassInfo
+                  ->{<ClassName::ManakaiDOMAttr>}
+                  ->{compat_class}->{$_}
+            } keys %{$Message::DOM::DOMFeature::ClassInfo
+                         ->{<ClassName::ManakaiDOMAttr>}
+                         ->{compat_class} or {}}) {
+              if ($Message::DOM::DOMFeature::ClassInfo->{$__class}
+                      ->{has_feature}->{xml}->{'3.0'}) {
+                $class = \$__class;
+                IFCHK: {
+                  for (@{$opt->{<H::mg|nodeRefInterfaces>} or []}) {
+                    last IFCHK unless $$class->isa ($_);
+                  }
+                  last A;
+                } # IFCHK
+              }
+            }
+
+            ## Default
+            $class = \$self;
+          } # A
+
+          if (defined $oeid) {
+            __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
+              $given => $class,
+              $prop => {<H::tc|defaultNodeRefClass>},
+              $ref => $obj,
+            }__;
           }
-        }
+        } # CLS
         $r = bless $obj, $$class;
 
   @CODE:
@@ -21680,6 +22966,9 @@ NodeTypeDef:
           $r => $r,
           $prop => {<H::infoset|ownerElement>},
           $ref => $self,
+          $opt => {{
+            <H::mg|nodeRefInterfaces> => [<IFName::Element>],
+          }},
         }__;
 
     @@L2Test:
@@ -27213,7 +28502,9 @@ ResourceDef:
               $bag => {<Code::mg|getNodeBag||ManakaiDOM|all:: $ref = {$$$self}>},
               $stemid => {$v->[$index]},
               $ref => $r,
-              $opt => {{}},
+              $opt => {{
+                <H::mg|nodeRefInterfaces> => [<IFName::Node>],
+              }},
             }__;
           }
       @@@PerlDef:
@@ -28687,12 +29978,14 @@ ResourceDef:
         @@@@ForCheck: !tc|ForAttrMap
         @@@@@:
           my $list;
+          my $ifs;
           __FOR{tc:ForETMap::
             __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
               $r => $list,
               $prop => {<H::d|elementTypes>},
               $ref => {$$$self},
             }__;
+            $ifs = [<IFName::ETDef>];
           }__;
           __FOR{tc:ForATMap::
             __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
@@ -28700,6 +29993,7 @@ ResourceDef:
               $prop => {<H::d|attributeDefinitions>},
               $ref => {$$$self},
             }__;
+            $ifs = [<IFName::ATDef>];
           }__;
           __FOR{tc:ForEntityMap::
             __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
@@ -28707,6 +30001,7 @@ ResourceDef:
               $prop => {<H::d|generalEntities>},
               $ref => {$$$self},
             }__;
+            $ifs = [<IFName::tx|Entity>];
           }__;
           __FOR{tc:ForNotationMap::
             __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
@@ -28714,6 +30009,7 @@ ResourceDef:
               $prop => {<H::d|notations>},
               $ref => {$$$self},
             }__;
+            $ifs = [<IFName::tx|Notation>];
           }__;
           if (defined $list->{$name}) {
             __CODE{mg|createNodeRefFromID||ManakaiDOM|all::
@@ -28721,7 +30017,9 @@ ResourceDef:
                                 $ref = {$$$self}>},
               $stemid => {$list->{$name}},
               $ref => $r,
-              $opt => {{}},
+              $opt => {{ 
+                <H::mg|nodeRefInterfaces> => $ifs,                
+              }},
             }__;
           }
 
@@ -29072,6 +30370,7 @@ ResourceDef:
         @@@@@:
           my $list;
           my $expected_type;
+          my $ifs;
           __FOR{tc:ForETMap::
             __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
               $r => $list,
@@ -29079,6 +30378,7 @@ ResourceDef:
               $ref => {$$$self},
             }__;
             $expected_type = <C::Node.ELEMENT_TYPE_DEFINITION_NODE>;
+            $ifs = [<IFName::ETDef>];
           }__;
           __FOR{tc:ForATMap::
             __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
@@ -29087,6 +30387,7 @@ ResourceDef:
               $ref => {$$$self},
             }__;
             $expected_type = <C::Node.ATTRIBUTE_DEFINITION_NODE>;
+            $ifs = [<IFName::ATDef>];
           }__;
           __FOR{tc:ForEntityMap::
             __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
@@ -29095,6 +30396,7 @@ ResourceDef:
               $ref => {$$$self},
             }__;
             $expected_type = <C::Node.ENTITY_NODE>;
+            $ifs = [<IFName::tx|Entity>];
           }__;
           __FOR{tc:ForNotationMap::
             __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
@@ -29103,6 +30405,7 @@ ResourceDef:
               $ref => {$$$self},
             }__;
             $expected_type = <C::Node.NOTATION_NODE>;
+            $ifs = [<IFName::tx|Notation>];
           }__;
           if ($$$self-><AG::Node.ownerDocument>
                      -><AG::Document.strictErrorChecking>) {
@@ -29120,6 +30423,9 @@ ResourceDef:
               $r => $owner_def,
               $prop => {<H::d|ownerDefinition>},
               $ref => $arg,
+              $opt => {{
+                <H::mg|nodeRefInterfaces> => [<IFName::Node>],
+              }},
             }__;
             if ($owner_def and not $owner_def eq $$$self) {
               __EXCEPTION{c|INUSE_DEFINITION_ERR::
@@ -29143,7 +30449,9 @@ ResourceDef:
                                     $ref = {$$$self}>},
                 $stemid => {$list->{$name}},
                 $ref => $r,
-                $opt => {{}},
+                $opt => {{
+                  <H::mg|nodeRefInterfaces> => $ifs,
+                }},
               }__;
               if ($r eq $arg) {
                 __c:ERROR{t|replace-by-itself::
@@ -29286,12 +30594,14 @@ ResourceDef:
         @@@@ForCheck: !tc|ForAttrMap
         @@@@@:
           my $list;
+          my $ifs;
           __FOR{tc:ForETMap::
             __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
               $r => $list,
               $prop => {<H::d|elementTypes>},
               $ref => {$$$self},
             }__;
+            $ifs = [<IFName::ETDef>];
           }__;
           __FOR{tc:ForATMap::
             __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
@@ -29299,6 +30609,7 @@ ResourceDef:
               $prop => {<H::d|attributeDefinitions>},
               $ref => {$$$self},
             }__;
+            $ifs = [<IFName::ATDef>];
           }__;
           __FOR{tc:ForEntityMap::
             __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
@@ -29306,6 +30617,7 @@ ResourceDef:
               $prop => {<H::d|generalEntities>},
               $ref => {$$$self},
             }__;
+            $ifs = [<IFName::tx|Entity>];
           }__;
           __FOR{tc:ForNotationMap::
             __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
@@ -29313,6 +30625,7 @@ ResourceDef:
               $prop => {<H::d|notations>},
               $ref => {$$$self},
             }__;
+            $ifs = [<IFName::tx|Notation>];
           }__;
           if ($$$self-><AG::Node.ownerDocument>
                      -><AG::Document.strictErrorChecking>) {
@@ -29328,7 +30641,9 @@ ResourceDef:
                                   $ref = {$$$self}>},
               $stemid => {$list->{$name}},
               $ref => $r,
-              $opt => {{}},
+              $opt => {{
+                <H::mg|nodeRefInterfaces> => $ifs,
+              }},
             }__;
             __CODE{mg|deleteNodeStemPropValue||ManakaiDOM|all::
               $prop => {<H::d|ownerDefinition>},
@@ -29569,7 +30884,9 @@ ResourceDef:
                                         $ref = {$$$self}>},
                     $stemid => {$attrs->{$ns}->{$ln}},
                     $ref => $r,
-                    $opt => {{}},
+                    $opt => {{
+                      <H::mg|nodeRefInterfaces> => [<IFName::Attr>],
+                    }},
                   }__;
                   last FIND;
                 }
@@ -29580,12 +30897,14 @@ ResourceDef:
         @@@@ForCheck: !tc|ForAttrMap
         @@@@@:
           my $list;
+          my $ifs;
           __FOR{tc:ForETMap::
             __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
               $r => $list,
               $prop => {<H::d|elementTypes>},
               $ref => {$$$self},
             }__;
+            $ifs = [<IFName::ETDef>];
           }__;
           __FOR{tc:ForATMap::
             __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
@@ -29593,6 +30912,7 @@ ResourceDef:
               $prop => {<H::d|attributeDefinitions>},
               $ref => {$$$self},
             }__;
+            $ifs = [<IFName::ATDef>];
           }__;
           __FOR{tc:ForEntityMap::
             __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
@@ -29600,6 +30920,7 @@ ResourceDef:
               $prop => {<H::d|generalEntities>},
               $ref => {$$$self},
             }__;
+            $ifs = [<IFName::tx|Entity>];
           }__;
           __FOR{tc:ForNotationMap::
             __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
@@ -29607,6 +30928,7 @@ ResourceDef:
               $prop => {<H::d|notations>},
               $ref => {$$$self},
             }__;
+            $ifs = [<IFName::tx|Notation>];
           }__;
           my $key = $index >= 0 ? [sort {$a cmp $b} keys %$list]->[$index]
                                 : null;
@@ -29616,7 +30938,9 @@ ResourceDef:
                                   $ref = {$$$self}>},
               $stemid => {$list->{$key}},
               $ref => $r,
-              $opt => {{}},
+              $opt => {{
+                 <H::mg|nodeRefInterfaces> => $ifs,
+              }},
             }__;
           }
     
@@ -30575,18 +31899,24 @@ ResourceDef:
       Two <IF::NamedNodeMap>s are equal if they have the same
       <A::NamedNodeMap.length> and for each node that exists in
       one map there is a node that exists in the other map 
-      and is equal, although not necessarily at the same index.
+      and is equal, although not necessarily at the same index.  <SRC::DOM3>
+      In addition, the number of the items that are equal to a string in one list
+      is equal to the number of such items in the other list.  <SRC::manakai>
     @@enImplNote:
       See also <M::Node.isEqualNode>.
     @@Param:
-      @@@Name:arg
-      @@@Type:NamedNodeMap
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          The node list to compare equality with.
+      @@@Name: arg
+      @@@Type: NamedNodeMap
+      @@@enDesc:
+        The node map to compare equality with.
     @@Return:
-      @@@Type:DOMMain|boolean||ManakaiDOM|all
+      @@@Type: boolean
+      @@@TrueCase:
+        @@@@enDesc:
+          If the maps are equal.
+      @@@FalseCase:
+        @@@@enDesc:
+          Otherwise.
       @@@PerlDef:
         @@@@@:
           __DEEP{
@@ -30608,16 +31938,8 @@ ResourceDef:
         @@@@enImplNote:
           In manakai, nodes in namespace unaware <IF::NamedNodeMap> are
           ordered by their <A::Node.nodeName>.
- 
-        @@@@enImplNote:
-          {TODO::
-            Add test for elementTypes and attributeDefinitions
-            (they requires == equality for element type definition
-             and attribute definition nodes being defined)
-          }
 
   @IntMethod:
-    @@ForCheck: ManakaiDOM|ManakaiDOM3
     @@Operator: ManakaiDOM|MUErrorHandler
     @@enDesc:
       When a <IF::ecore|ErrorInterface||ManakaiDOM|Perl> is <Perl::report>ed
