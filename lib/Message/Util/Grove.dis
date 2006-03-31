@@ -9,7 +9,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/03/31 12:15:40 $
+    $Date: 2006/03/31 16:44:25 $
 
   @Require:
     @@Module:
@@ -361,6 +361,29 @@ IntPropDef:
   @Type: DISPerl|SCALAR
   @mg:nodeStemKey: id
 
+IntPropDef:
+  @QName: mg|onunload
+  @enDesc:
+    The code that is executed just before the node stem
+    is deleted from the node bag.  Applications <kwd:MUST-NOT>
+    rely on the code being executed.  Exactly when it
+    is executed is undefined.  However, at the time of the
+    execution, the node stem is still accessible from
+    the node bag.
+
+    The code would receive two parameters: the node bag
+    and a reference to the node identifier.  The code 
+    <kwd:MUST-NOT> modify the node identifier.  The code
+    <kwd:MUST-NOT> modify the node bag directly (neither
+    by hand nor by code fragments defined in this module); if
+    it does, the result is undefined.  The code <kwd:MAY> 
+    modify the node bag indirectly, via other node references,
+    since the referenced nodes should never part of the grove
+    being removed if there is such node reference.
+
+    The code <kwd:MUST-NOT> throw exceptions; if it does, result is undefined.
+  @Type: DISPerl|CODE
+  @mg:nodeStemKey: beforefree
 
 ## --------------------------------
 ## --- Node Reference
@@ -562,6 +585,9 @@ ClsDef:
 
           for (keys %grove) {
             $done{$_} = true;
+            if (defined $bag->{$_}->{<H::mg|onunload>}) {
+              $bag->{$_}->{<H::mg|onunload>}->($bag, \$_);
+            }
             delete $bag->{$_};
           }
           push @target, @gwreferred;

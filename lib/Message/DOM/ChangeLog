@@ -1,3 +1,23 @@
+2006-04-01  Wakaba  <wakaba@suika.fam.cx>
+
+	* TreeCore.dis (setIdAttribute, setIdAttributeNS, setIdAttributeNode):
+	Reimplemented.
+	(isId): Setter is added.
+	(Element.normalize): Definition copied from the |MDOM:Tree|
+	module.
+
+2006-03-31  Wakaba  <wakaba@suika.fam.cx>
+
+	* Makefile (clean-db): New rule.
+
+	* TreeCore.dis (setUserData): Schedule to invoke
+	the user data handler when the node is removed
+	from the memory.
+	(setAttribute, setAttributeNS): Set the [attribute type]
+	if DTD attribute definition is available.
+	(CharacterData members): Definitions copied from
+	the |MDOM:Tree| module.
+
 2006-03-31  Wakaba  <wakaba@suika.fam.cx>
 
 	* DOMCore.dis (DOMStringList.==): New overloaded operator.

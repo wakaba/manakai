@@ -1,5 +1,12 @@
 2006-03-31  Wakaba  <wakaba@suika.fam.cx>
 
+	* Makefile (clean-db): New rule.
+
+	* Grove.dis (onunload): New internal property.
+	(collectGarbage): Invoke the |mg:onunload| code if available.
+
+2006-03-31  Wakaba  <wakaba@suika.fam.cx>
+
 	* Grove.dis (getNodeStemProp0Node): The |$opt| option
 	parameter is added.
 	(mg:nodeRefInterfaces): New property.

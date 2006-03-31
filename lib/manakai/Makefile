@@ -32,8 +32,10 @@ all: $(GENERATED_FILES)
 clean:
 	$(RMALL) $(GENERATED_FILES) .*.tmp *~ .*~
 
-distclean: clean
+clean-db:
 	$(RMALL) *$(DAEM_SUFFIX) *$(DAFX_SUFFIX)
 
-## $Date: 2006/02/26 14:32:48 $
+distclean: clean clean-db
+
+## $Date: 2006/03/31 16:44:26 $
 ## License: Public Domain.

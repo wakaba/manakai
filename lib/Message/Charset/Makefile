@@ -442,8 +442,10 @@ clean:
 	$(RMALL) $(TBR_FILES) $(TBL_FILES) $(UCM_FILES)
 	$(RMDIRALL) $(ENCODE_DIRECTORIES)
 
-distclean: clean
+clean-db:
 	$(RMALL) *$(DAEM_SUFFIX) *$(DAFX_SUFFIX)
 
-## $Date: 2006/03/15 10:58:51 $
+distclean: clean clean-db
+
+## $Date: 2006/03/31 16:44:23 $
 ## License: Public Domain.

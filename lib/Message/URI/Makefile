@@ -50,8 +50,10 @@ clean:
 	$(RMALL) $(GENERATED_FILES)
 	$(RMALL) .*.tmp *~ .*~ *.BAK .*.BAK
 
-distclean: clean
+clean-db:
 	$(RMALL) *$(DAEM_SUFFIX) *$(DAFX_SUFFIX)
 
-## $Date: 2006/03/01 08:42:34 $
+distclean: clean clean-db
+
+## $Date: 2006/03/31 16:44:25 $
 ## License: Public Domain.

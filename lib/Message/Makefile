@@ -23,6 +23,16 @@ clean:
 	$(CD) URI && $(MAKE) clean
 	$(CD) Charset && $(MAKE) clean
 
+clean-db:
+#	$(CD) Body && $(MAKE) clean-db
+#	$(CD) Field && $(MAKE) clean-db
+#	$(CD) MIME && $(MAKE) clean-db
+	$(CD) Util && $(MAKE) clean-db
+	$(CD) Markup && $(MAKE) clean-db
+	$(CD) DOM && $(MAKE) clean-db
+	$(CD) URI && $(MAKE) clean-db
+	$(CD) Charset && $(MAKE) clean-db
+
 distclean:
 	$(RMALL) *.BAK .*.BAK *~ .*~
 	$(CD) Body && $(MAKE) distclean
@@ -34,5 +44,5 @@ distclean:
 	$(CD) URI && $(MAKE) distclean
 	$(CD) Charset && $(MAKE) distclean
 
-## $Date: 2006/03/10 10:52:02 $
+## $Date: 2006/03/31 16:44:23 $
 ## License: Public Domain.

@@ -90,8 +90,10 @@ clean:
 	$(RMALL) .*.tmp *~ .*~ *.BAK .*.BAK
 	$(RMALL) .core$(PM_SUFFIX)
 
-distclean: clean
+clean-db:
 	$(RMALL) *$(DAEM_SUFFIX) *$(DAFX_SUFFIX)
 
-## $Date: 2006/03/18 05:57:48 $
+distclean: clean clean-db
+
+## $Date: 2006/03/31 16:44:24 $
 ## License: Public Domain.

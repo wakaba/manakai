@@ -19,10 +19,14 @@ clean:
 	$(CD) $(MANAKAI_LIB_DIR)manakai/ && $(MAKE) clean
 	$(CD) $(MANAKAI_LIB_DIR)Message/ && $(MAKE) clean
 
+clean-db:
+	$(CD) $(MANAKAI_LIB_DIR)manakai/ && $(MAKE) clean-db
+	$(CD) $(MANAKAI_LIB_DIR)Message/ && $(MAKE) clean-db
+
 distclean:
 	$(RMALL) *~ .*~ *.BAK .*.BAK
 	$(CD) $(MANAKAI_LIB_DIR)manakai/ && $(MAKE) distclean
 	$(CD) $(MANAKAI_LIB_DIR)Message/ && $(MAKE) distclean
 
-## $Date: 2006/02/26 14:32:38 $
+## $Date: 2006/03/31 16:44:23 $
 ## License: Public Domain.

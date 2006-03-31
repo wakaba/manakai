@@ -40,7 +40,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/03/31 12:15:37 $
+      $Date: 2006/03/31 16:44:23 $
     @@ContentType:
       dis:Date.RCS
 
@@ -3822,6 +3822,8 @@ IFCls3Def:
           In manakai implementation, when a user data handler
           with type <C::OperationType.NODE_DELETE> is invoked
           is undefined, as when Perl's <Perl::DESTROY> method is invoked.
+          In addition, it might not be invoked during the global
+          destruction.
 
     @@Const:
       @@@Name: NODE_RENAMED
@@ -5443,7 +5445,7 @@ CParam:
   @dataType: DISCore|QName
   @enDesc:
     The <cfg::schema-type> parameter value is a <TYPE::DOMMain|DOMString>
-    containing an absolute DOM URI.  It representsthe type of the
+    containing an absolute DOM URI.  It represents the type of the
     schema language used to validate the document against.
 
     {NOTE:: No lexical checking is done on the absolute URI.
