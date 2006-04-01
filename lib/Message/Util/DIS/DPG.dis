@@ -15,7 +15,7 @@ Module:
   @License: license|Perl+MPL
 
   @Date:
-    $Date: 2006/04/01 14:41:34 $
+    $Date: 2006/04/01 17:52:34 $
   
   @Require:
     @@Module:
@@ -74,6 +74,10 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Markup#
   @tc:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/TreeCore/
+  @td:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/Document/
+  @te:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/Element/
   @test:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Test#
   @tx:
@@ -306,7 +310,7 @@ IFClsDef:
   @ClsQName: ManakaiDPGDocument
 
   @IFISA: Document
-  @ClsISA: tc|ManakaiDOMDocument
+  @ClsISA: td|ManakaiDOMDocument
 
   @enDesc:
     The <IF::DPGDocument> interface <kwd:MUST> be implemented by
@@ -394,7 +398,7 @@ IFClsDef:
   @ClsQName: ManakaiDPGElement
 
   @IFISA: Element
-  @ClsISA: tc|ManakaiDOMElement
+  @ClsISA: te|ManakaiDOMElement
 
   @s:elementType: AnyDPGElementType
 

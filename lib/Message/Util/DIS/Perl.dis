@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/04/01 14:41:35 $
+      $Date: 2006/04/01 17:52:34 $
     @@ContentType:
       dis:Date.RCS
   
@@ -5823,13 +5823,13 @@ TMethods:
                         ## ISSUE: Is NULL-namespace should be allowed here?
                       $r-><M::DIS|PLBlockCon.appendStatement>
                           ('$Message::DOM::DOMFeature::ClassInfo->{' .
-                           'q<Message::DOM::TreeCore::ManakaiDOMElement>'.
+                           'q<Message::DOM::Element::ManakaiDOMElement>'.
                            '}->{compat_class_by_type}->{q<' . $ns .
                            '>}->{q<' . $ln . '>}->{q<' . $pack_name . '>} = 1');
                     }
                     $r-><M::DIS|PLBlockCon.appendStatement>
                           ('$Message::DOM::DOMFeature::ClassInfo->{'.
-                           'q<Message::DOM::TreeCore::ManakaiDOMElement>'.
+                           'q<Message::DOM::Element::ManakaiDOMElement>'.
                            '}->{compat_class}->{q<' . $pack_name . '>} = 1')
                       unless $for_specific_et;
                   }
@@ -5862,7 +5862,7 @@ TMethods:
                       
                       $r-><M::DIS|PLBlockCon.appendStatement>
                           ('$Message::DOM::DOMFeature::ClassInfo->{' .
-                           'q<Message::DOM::TreeCore::ManakaiDOMAttr>'.
+                           'q<Message::DOM::Element::ManakaiDOMAttr>'.
                            '}->{compat_class_by_type}->{q<' . $etns .
                            '>}->{q<' . $etln .
                            '>}->{q<' . $ns . '>}->{q<' . $ln . '>}->{q<' .
@@ -5870,7 +5870,7 @@ TMethods:
                     }
                     $r-><M::DIS|PLBlockCon.appendStatement>
                           ('$Message::DOM::DOMFeature::ClassInfo->{'.
-                           'q<Message::DOM::TreeCore::ManakaiDOMAttr>'.
+                           'q<Message::DOM::Element::ManakaiDOMAttr>'.
                            '}->{compat_class}->{q<' . $pack_name . '>} = 1')
                       unless $for_specific_attr;
                   }
@@ -5920,13 +5920,13 @@ TMethods:
                         ## ISSUE: Is NULL-namespace should be allowed here?
                       $r-><M::DIS|PLBlockCon.appendStatement>
                           ('$Message::DOM::DOMFeature::ClassInfo->{' .
-                           'q<Message::DOM::TreeCore::ManakaiDOMDocument>'.
+                           'q<Message::DOM::Document::ManakaiDOMDocument>'.
                            '}->{compat_class_by_type}->{q<' . $ns .
                            '>}->{q<' . $ln . '>}->{q<' . $pack_name . '>} = 1');
                     }
                     $r-><M::DIS|PLBlockCon.appendStatement>
                           ('$Message::DOM::DOMFeature::ClassInfo->{'.
-                           'q<Message::DOM::TreeCore::ManakaiDOMDocument>'.
+                           'q<Message::DOM::Document::ManakaiDOMDocument>'.
                            '}->{compat_class}->{q<' . $pack_name . '>} = 1')
                       unless $for_specific_et;
                     ## TODO: by document type name and media type
@@ -5935,7 +5935,7 @@ TMethods:
                                 (<Q::tc|DocumentFragmentRole>)) {
                     $r-><M::DIS|PLBlockCon.appendStatement>
                         ('$Message::DOM::DOMFeature::ClassInfo->{'.
-                         'q<Message::DOM::TreeCore::ManakaiDOMDocumentFragment>'.
+                         'q<Message::DOM::Document::ManakaiDOMDocumentFragment>'.
                          '}->{compat_class}->{q<' . $pack_name . '>} = 1');
                   }
                   if ($role-><M::DIS|DISResource.isSubsetOfURI>

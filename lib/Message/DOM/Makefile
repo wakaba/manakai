@@ -51,9 +51,9 @@ DOT_CORE_DIS_FILES = \
 
 PM_FILES = \
   DOMFeature$(PM_SUFFIX) GenericLS$(PM_SUFFIX) \
-  DOMMain$(PM_SUFFIX) DOMCore$(PM_SUFFIX) Tree$(PM_SUFFIX) \
-  TreeCore$(PM_SUFFIX) XML$(PM_SUFFIX) \
-  DOMXML$(PM_SUFFIX) XDoctype$(PM_SUFFIX) \
+  DOMMain$(PM_SUFFIX) DOMCore$(PM_SUFFIX) \
+  TreeCore$(PM_SUFFIX) Document$(PM_SUFFIX) Element$(PM_SUFFIX) \
+  XML$(PM_SUFFIX) XDoctype$(PM_SUFFIX) \
   DOMLS$(PM_SUFFIX) XMLParser$(PM_SUFFIX) \
   SimpleLS$(PM_SUFFIX) ManakaiDOMLS2003$(PM_SUFFIX) \
   DOMHTML$(PM_SUFFIX) DOMWebForms$(PM_SUFFIX)
@@ -95,5 +95,5 @@ clean-db:
 
 distclean: clean clean-db
 
-## $Date: 2006/03/31 16:44:24 $
+## $Date: 2006/04/01 17:52:32 $
 ## License: Public Domain.

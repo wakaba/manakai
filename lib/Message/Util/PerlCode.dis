@@ -25,7 +25,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2006/04/01 14:41:33 $
+      $Date: 2006/04/01 17:52:34 $
     @@ContentType:
       dis:Date.RCS
   
@@ -78,6 +78,10 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Markup#
   @tc:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/TreeCore/
+  @td:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/Document/
+  @te:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/Element/
   @test:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Test#
   @Util:
@@ -254,7 +258,7 @@ IFClsDef:
   @IFQName: PerlCode
   @CQName: ManakaiPCCode
 
-  @CISA: tc|ManakaiDOMElement
+  @CISA: te|ManakaiDOMElement
 
   @s:elementType: AnyPCElement||ManakaiDOM|all
   @s:elementType: AnyPC2Element||ManakaiDOM|all
@@ -4298,7 +4302,7 @@ IFClsDef:
   @CQName: ManakaiPCDocument
 
   @IFISA: Document
-  @CISA: tc|ManakaiDOMDocument
+  @CISA: td|ManakaiDOMDocument
 
   @enDesc:
     A <IF::PCDocument> is a <IF::Document> that represents a Perl code.

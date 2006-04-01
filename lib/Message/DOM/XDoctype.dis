@@ -17,7 +17,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/03/31 12:15:39 $
+    $Date: 2006/04/01 17:52:33 $
   
   @Require:
     @@Module:
@@ -67,6 +67,10 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dom/tree#
   @tc:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/TreeCore/
+  @td:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/Document/
+  @te:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/Element/
   @test:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Test#
   @tx:
@@ -348,7 +352,7 @@ IFClsXDef:
   @IFQName: DocumentXDoctype
   @ClsQName: ManakaiDOMDocumentXDoctype
   
-  @ClsISA: tc|ManakaiDOMDocument
+  @ClsISA: td|ManakaiDOMDocument
 
   @f:implements: d|Feature30
   @f:provides:
@@ -7914,7 +7918,7 @@ IFClsXDef:
           If the node to insert the string or a <IF::Text> node
           is read-only.
       @@@disDef:
-        @@@@DISPerl:cloneCode: tc|ManakaiDOMAttr.manakaiAppendText
+        @@@@DISPerl:cloneCode: te|ManakaiDOMAttr.manakaiAppendText
 
     @@Test:
       @@@QName: ATDef..=.1.test
@@ -8363,9 +8367,6 @@ enImplNote:
       <M::Node.compareDocumentPosition>,
       for the new node types.
     
-    - Implement <M::Node.getFeature>, <M::Node.hasFeature>,
-      <M::f|GetFeature.hasFeature>.
-    
   }
 
 ResourceDef:
@@ -8397,17 +8398,17 @@ ResourceDef:
 
 ResourceDef:
   @QName: Document
-  @AliasFor: tc|Document
+  @AliasFor: td|Document
   @For: ManakaiDOM|DOM
 
 ResourceDef:
   @QName: Element
-  @AliasFor: tc|Element
+  @AliasFor: te|Element
   @For: ManakaiDOM|DOM
 
 ResourceDef:
   @QName: Attr
-  @AliasFor: tc|Attr
+  @AliasFor: te|Attr
   @For: ManakaiDOM|DOM
 
 ResourceDef:
@@ -8417,7 +8418,7 @@ ResourceDef:
 
 ResourceDef:
   @QName: DocumentFragment
-  @AliasFor: tc|DocumentFragment
+  @AliasFor: td|DocumentFragment
   @For: ManakaiDOM|DOM
 
 ResourceDef:

@@ -18,7 +18,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/03/31 12:15:40 $
+    $Date: 2006/04/01 17:52:33 $
 
   @Require:
     @@Module:
@@ -87,6 +87,10 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dom/tree#
   @tc:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/TreeCore/
+  @td:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/Document/
+  @te:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/Element/
   @test:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Test#
   @tx:
@@ -1182,17 +1186,17 @@ ResourceDef:
 
 ResourceDef:
   @QName: Document
-  @AliasFor: tc|Document
+  @AliasFor: td|Document
   @For: ManakaiDOM|DOM
 
 ResourceDef:
   @QName: Element
-  @AliasFor: tc|Element
+  @AliasFor: te|Element
   @For: ManakaiDOM|DOM
 
 ResourceDef:
   @QName: Attr
-  @AliasFor: tc|Attr
+  @AliasFor: te|Attr
   @For: ManakaiDOM|DOM
 
 ResourceDef:
@@ -2180,7 +2184,7 @@ NodeTypeDef:
           If the <A::Document.strictErrorChecking> is set to <DOM::false>,
           this exception <kwd:MAY-NOT> be thrown.
       @@@disDef:
-        @@@@DISPerl:cloneCode: tc|ManakaiDOMElement.appendChild
+        @@@@DISPerl:cloneCode: te|ManakaiDOMElement.appendChild
 
   @CMethod:
     @@Name: insertBefore
@@ -2254,7 +2258,7 @@ NodeTypeDef:
           If the <P::newChild> node is same as the <P::refChild> node.
           Then, the result is implementation dependent.
       @@@disDef:
-        @@@@DISPerl:cloneCode: tc|ManakaiDOMElement.insertBefore
+        @@@@DISPerl:cloneCode: te|ManakaiDOMElement.insertBefore
 
   @CMethod:
     @@Name: replaceChild
@@ -2323,7 +2327,7 @@ NodeTypeDef:
           If the <P::newChild> node is same as the <P::oldChild> node.
           Then, the result is implementation dependent.
       @@@disDef:
-        @@@@DISPerl:cloneCode: tc|ManakaiDOMElement.replaceChild
+        @@@@DISPerl:cloneCode: te|ManakaiDOMElement.replaceChild
 
     @@Test:
       @@@QName: Entity.appendChild.1.1.test
@@ -4549,7 +4553,7 @@ NodeTypeDef:
           If the node to insert the string or a <IF::Text> node
           is read-only.
       @@@disDef:
-        @@@@DISPerl:cloneCode: tc|ManakaiDOMAttr.manakaiAppendText
+        @@@@DISPerl:cloneCode: te|ManakaiDOMAttr.manakaiAppendText
 
     @@Test:
       @@@QName: Entity..=.1.test
@@ -8211,7 +8215,7 @@ NodeTypeDef:
           If the node to insert the string or a <IF::Text> node
           is read-only.
       @@@disDef:
-        @@@@DISPerl:cloneCode: tc|ManakaiDOMAttr.manakaiAppendText
+        @@@@DISPerl:cloneCode: te|ManakaiDOMAttr.manakaiAppendText
 
     @@Test:
       @@@QName: EntityRef..=.1.test
@@ -9320,7 +9324,7 @@ NodeTypeDef:
 ClsDef:
   @ClsQName: ManakaiDOMXMLBaseAttr
 
-  @ClsISA: tc|ManakaiDOMAttr
+  @ClsISA: te|ManakaiDOMAttr
 
   @DocAttr: XMLBaseAttribute||ManakaiDOM|all
   @DocAttr: XMLBaseAttributeNS||ManakaiDOM|all
@@ -9421,7 +9425,7 @@ ClsDef:
 ClsDef:
   @ClsQName: ManakaiDOMXMLIdAttr
 
-  @ClsISA: tc|ManakaiDOMAttr
+  @ClsISA: te|ManakaiDOMAttr
 
   @DocAttr: XMLIdAttribute||ManakaiDOM|all
   @DocAttr: XMLIdAttributeNS||ManakaiDOM|all
