@@ -1,3 +1,20 @@
+2006-04-01  Wakaba  <wakaba@suika.fam.cx>
+
+	* Grove.dis (destroy): Threshold value changed to 4096.
+
+	* PerlCode.dis (PerlCode): Associated as the default
+	class with |pc:*| and |pc2:*| element types.
+	(currentPackage, currentChunkNumber, getNextChunkNumber): Removed.
+	(ReflectCDATA): Reimplemented using standard |Element|
+	methods.
+	(sourceFile, sourceLine, currentSourceFile, currentSourceLine,
+	skipLines): Removed.
+	(pc:line): Removed.
+	(stringify): Support for the |pc:line| configuration
+	parameter is removed.
+
+	* DIS.dis (isFeatureProvided): Removed.
+
 2006-03-31  Wakaba  <wakaba@suika.fam.cx>
 
 	* Makefile (clean-db): New rule.

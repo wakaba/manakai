@@ -293,6 +293,8 @@ for (@{$Opt{create_module}}) {
 
   if ($out_type eq 'perl-pm') {
     status_msg_ qq<Generating Perl module from <$mod_uri> for <$mod_for>...>;
+    local $Message::Util::DIS::Perl::Implementation
+        = $impl->get_feature (ExpandedURI q<Util:PerlCode> => '1.0');
     my $pl = $mod->pl_generate_perl_module_file;
     status_msg qq<done>;
 
@@ -587,6 +589,7 @@ sub daf_check_undefined () {
 sub daf_generate_perl_test_file ($) {
   my $mod = shift;
   my $pc = $impl->get_feature (ExpandedURI q<Util:PerlCode> => '1.0');
+  local $Message::Util::DIS::Perl::Implementation = $pc;
   my $pl = $pc->create_perl_file;
   my $pack = $pl->get_last_package ("Manakai::Test", make_new_package => 1);
   $pack->add_use_perl_module_name ("Message::Util::DIS::Test");

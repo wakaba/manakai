@@ -79,7 +79,8 @@ NS_UTIL_PT_FILES = \
   util-PerlCode$(PT_SUFFIX) \
   util-DIS$(PT_SUFFIX)
 NS_UTIL_DIS_PT_FILES = \
-  util-dis-DNLite$(PT_SUFFIX)
+  util-dis-DNLite$(PT_SUFFIX) \
+  util-dis-DPG$(PT_SUFFIX)
 
 PT_FILES = \
   $(NS_MDOM_PT_FILES) \

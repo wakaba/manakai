@@ -12,7 +12,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/03/31 16:44:24 $
+    $Date: 2006/04/01 14:41:30 $
 
   @Require:
     @@Module:
@@ -708,7 +708,7 @@ ClsDef:
   @Test:
     @@QName: Impl.new.mg.test
     @@PerlDef:
-      local $Message::DOM::TreeCore::GCLatency = 0;
+      local $Message::Util::Grove::GCLatency = 0;
 
       my $impl;
       __CODE{tc|createImplForTest:: $impl => $impl}__;
@@ -882,6 +882,8 @@ ClsDef:
             my $el = $r-><M::Document.createElementNS>
                            ($namespaceURI, $qualifiedName);
             $r-><M::Node.appendChild> ($el);
+            $r = $el-><AG::Node.ownerDocument>;
+                   ## Choose the class based on document element type
           }__;
         } elsif (defined $namespaceURI) {
           __EXCEPTION{MDOMX|MDOM_NS_NULL_QNAME_WITH_NON_NULL_URI::
@@ -893,7 +895,7 @@ ClsDef:
     @@Test:
       @@@QName: Impl.createDoc.1.test
       @@@PerlDef:
-        local $Message::DOM::TreeCore::GCLatency = 0;
+        local $Message::Util::Grove::GCLatency = 0;
 
         my $impl;
         __CODE{tc|createImplForTest:: $impl => $impl}__;
@@ -929,7 +931,7 @@ ClsDef:
     @@Test:
       @@@QName: Impl.createDoc.2.test
       @@@PerlDef:
-        local $Message::DOM::TreeCore::GCLatency = 0;
+        local $Message::Util::Grove::GCLatency = 0;
 
         my $impl;
         __CODE{tc|createImplForTest:: $impl => $impl}__;
@@ -965,7 +967,7 @@ ClsDef:
     @@Test:
       @@@QName: Impl.createDoc.3.test
       @@@PerlDef:
-        local $Message::DOM::TreeCore::GCLatency = 1;
+        local $Message::Util::Grove::GCLatency = 1;
 
         my $impl;
         __CODE{tc|createImplForTest:: $impl => $impl}__;
@@ -4495,7 +4497,7 @@ IFCls1Def:
     @@L3Test:
       @@@QName: Node.Deleted.UserDataHandler
       @@@PerlDef:
-        local $Message::DOM::TreeCore::GCLatency = 0;
+        local $Message::Util::Grove::GCLatency = 0;
 
         my $impl;
         __CODE{tc|createImplForTest:: $impl => $impl}__;
@@ -5775,6 +5777,78 @@ IFCls1Def:
         $el2-><AS::Node.prefix> ('prefix');
         $test->assert_num_not_equals
                  (actual_value => $el1, expected_value => $el2);
+
+  @LXAttr:
+    @@Name: manakaiExpandedURI
+    @@enDesc:
+      The expanded URI of the name of the node.
+    @@Type: DOMString
+    @@dis:actualType: ManakaiDOM|ManakaiDOMURI
+    @@Get:
+      @@@enDesc:
+        The contatenation of the <A::Node.namespaceURI> of the node, if it 
+        is <EM::not> <DOM::null>, and the <A::Node.localName> of the node.
+      @@@nullCase:
+        @@@@enDesc:
+          If the local name of the node is <DOM::null>.
+      @@@PerlDef:
+        __DEEP{
+          my $ln = $self-><AG::Node.localName>;
+          if (defined $ln) {
+            $r = $self-><AG::Node.namespaceURI>;
+            if (defined $r) {
+              $r .= $ln;
+            } else {
+              $r = $ln;
+            }
+          } else {
+            $r = null;
+          }
+        }__;
+
+    @@Test:
+      @@@QName: Node.manakaiExpandedURI.null.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        for my $node (<Code::tc|createNodesForTest-el-attr>) {
+          $test->id ($node-><AG::Node.nodeName>);
+          $test->assert_null ($node-><AG::Node.manakaiExpandedURI>);
+        }
+    @@Test:
+      @@@QName: Node.manakaiExpandedURI.element.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+        my $el = $doc-><M::Document.createElement> ('el');
+        $test->assert_equals ($el-><AG::Node.manakaiExpandedURI>, 'el');
+    @@Test:
+      @@@QName: Node.manakaiExpandedURI.element.2.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+        my $el = $doc-><M::Document.createElementNS> ('about:', 'el');
+        $test->assert_equals ($el-><AG::Node.manakaiExpandedURI>, 'about:el');
+    @@Test:
+      @@@QName: Node.manakaiExpandedURI.attribute.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+        my $el = $doc-><M::Document.createAttribute> ('attr');
+        $test->assert_equals ($el-><AG::Node.manakaiExpandedURI>, 'attr');
+    @@Test:
+      @@@QName: Node.manakaiExpandedURI.attribute.2.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+        my $el = $doc-><M::Document.createAttributeNS> ('about:', 'a:attr');
+        $test->assert_equals ($el-><AG::Node.manakaiExpandedURI>, 'about:attr');
 ##Node
 
 ElementTypeBinding:
@@ -6011,6 +6085,153 @@ NodeTypeDef:
         - <Q::t|userData>.
 
       }
+
+  @IntMethod:
+    @@Operator: mg|CreateNodeRefMethod
+    @@Param:
+      @@@Name: obj
+      @@@Type: HASH
+    @@Param:
+      @@@Name: opt
+      @@@Type: HASH
+    @@Return:
+      @@@Type: Node
+      @@@PerlDef:
+        my $class;
+        CLS: {
+          if (defined $opt->{<H::mg|nodeRefClass>}) {
+            $class = $opt->{<H::mg|nodeRefClass>};
+            IFCHK: {
+              for (@{$opt->{<H::mg|nodeRefInterfaces>} or []}) {
+                last IFCHK unless $$class->isa ($_);
+              }
+              last CLS;
+            } # IFCHK
+          }
+
+          __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
+            $r => $class,
+            $prop => {<H::tc|defaultNodeRefClass>},
+            $ref => $obj,
+          }__;
+          if (defined $class) {
+            IFCHK: {
+              for (@{$opt->{<H::mg|nodeRefInterfaces>} or []}) {
+                last IFCHK unless $$class->isa ($_);
+              }
+              last CLS;
+            } # IFCHK
+          }
+
+          my $cns;
+          __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
+            $r => $cns,
+            $prop => {<H::infoset|children>},
+            $ref => $obj,
+          }__;
+          my $bag = <Code::mg|getNodeBag||ManakaiDOM|all:: $ref = $obj>;
+          my $deh;
+          DC: for my $cnid (@$cns) {
+            my $cnh = <Code::mg|createNodeRefHashFromID||ManakaiDOM|all::
+                                 $stemid = $cnid, $bag = $bag>;
+            my $cncls;
+            __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
+              $r => $cncls,
+              $prop => {<H::mg|nodeClass>},
+              $ref => $cnh,
+            }__;
+            if ($$cncls eq <ClassName::ManakaiDOMElement>) {
+              $deh = $cnh;
+              last DC;
+            }
+          } # DC
+          my $dens;
+          my $deln;
+          if (defined $deh) {
+            __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
+              $r => $dens,
+              $prop => {<H::infoset|namespaceName>},
+              $ref => $deh,
+            }__;
+            $dens = \'' unless defined $dens;
+            __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
+              $r => $deln,
+              $prop => {<H::infoset|localName>},
+              $ref => $deh,
+            }__;
+          } else {
+            $dens = \'*';
+            $deln = \'*';
+          }
+
+          A: {
+            ## Use cases:
+            ##   - Document element is |html5:html|
+            ##   - Document element is |NULL:rfc|
+
+            for my $nm (
+              [$dens, $deln],
+              [$dens, \'*'],
+            ) {
+              for my $__class (sort {
+                $Message::DOM::ClassPoint{$b} <=> $Message::DOM::ClassPoint{$a}
+              } grep {
+                $Message::DOM::DOMFeature::ClassInfo
+                    ->{<ClassName::ManakaiDOMDocument>}
+                    ->{compat_class_by_type}
+                    ->{${$nm->[0]}}->{${$nm->[1]}}->{$_}
+              } keys %{$Message::DOM::DOMFeature::ClassInfo
+                           ->{<ClassName::ManakaiDOMDocument>}
+                           ->{compat_class_by_type}
+                           ->{${$nm->[0]}}->{${$nm->[1]}} or {}}) {
+                if ($Message::DOM::DOMFeature::ClassInfo->{$__class}
+                        ->{has_feature}->{xml}->{'3.0'}) {
+                  $class = \$__class;
+                  IFCHK: {
+                    for (@{$opt->{<H::mg|nodeRefInterfaces>} or []}) {
+                      last IFCHK unless $$class->isa ($_);
+                    }
+                    last A;
+                  } # IFCHK
+                }
+              }
+            }
+
+            ## Generic
+            CLASS: for my $__class (sort {
+              $Message::DOM::ClassPoint{$b} <=> $Message::DOM::ClassPoint{$a}
+            } grep {
+              $Message::DOM::DOMFeature::ClassInfo
+                  ->{<ClassName::ManakaiDOMDocument>}
+                  ->{compat_class}->{$_}
+            } keys %{$Message::DOM::DOMFeature::ClassInfo
+                         ->{<ClassName::ManakaiDOMDocument>}
+                         ->{compat_class} or {}}) {
+              if ($Message::DOM::DOMFeature::ClassInfo->{$__class}
+                      ->{has_feature}->{xml}->{'3.0'}) {
+                $class = \$__class;
+                IFCHK: {
+                  for (@{$opt->{<H::mg|nodeRefInterfaces>} or []}) {
+                    last IFCHK unless $$class->isa ($_);
+                  }
+                  last A;
+                } # IFCHK
+              }
+            }
+
+            ## Default
+            $class = \$self;
+          } # A
+
+          if (defined $deh) {
+            __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
+              $given => $class,
+              $prop => {<H::tc|defaultNodeRefClass>},
+              $ref => $obj,
+            }__;
+          }
+        } # CLS
+        $r = bless $obj, $$class;
 
   @CODE:
     @@QName: tc|createEmptyDocumentForTest
@@ -10287,7 +10508,7 @@ NodeTypeDef:
     @@Test:
       @@@QName: Doc.createElNS.mg.1.test
       @@@PerlDef:
-        local $Message::DOM::TreeCore::GCLatency = 0;
+        local $Message::Util::Grove::GCLatency = 0;
 
         my $impl;
         __CODE{tc|createImplForTest:: $impl => $impl}__;
@@ -10343,7 +10564,7 @@ NodeTypeDef:
     @@Test:
       @@@QName: Doc.createElNS.mg.2.test
       @@@PerlDef:
-        local $Message::DOM::TreeCore::GCLatency = 0;
+        local $Message::Util::Grove::GCLatency = 0;
 
         my $impl;
         __CODE{tc|createImplForTest:: $impl => $impl}__;
@@ -10399,7 +10620,7 @@ NodeTypeDef:
     @@Test:
       @@@QName: Doc.createElNS.mg.3.test
       @@@PerlDef:
-        local $Message::DOM::TreeCore::GCLatency = 0;
+        local $Message::Util::Grove::GCLatency = 0;
 
         my $impl;
         __CODE{tc|createImplForTest:: $impl => $impl}__;
@@ -10455,7 +10676,7 @@ NodeTypeDef:
     @@Test:
       @@@QName: Doc.createElNS.mg.4.test
       @@@PerlDef:
-        local $Message::DOM::TreeCore::GCLatency = 0;
+        local $Message::Util::Grove::GCLatency = 0;
 
         my $impl;
         __CODE{tc|createImplForTest:: $impl => $impl}__;
@@ -10511,7 +10732,7 @@ NodeTypeDef:
     @@Test:
       @@@QName: Doc.createElNS.mg.5.test
       @@@PerlDef:
-        local $Message::DOM::TreeCore::GCLatency = 0;
+        local $Message::Util::Grove::GCLatency = 0;
 
         my $impl;
         __CODE{tc|createImplForTest:: $impl => $impl}__;
@@ -10567,7 +10788,7 @@ NodeTypeDef:
     @@Test:
       @@@QName: Doc.createElNS.mg.6.test
       @@@PerlDef:
-        local $Message::DOM::TreeCore::GCLatency = 0;
+        local $Message::Util::Grove::GCLatency = 0;
 
         my $impl;
         __CODE{tc|createImplForTest:: $impl => $impl}__;
@@ -11284,7 +11505,7 @@ NodeTypeDef:
     @@Test:
       @@@QName: Doc.createAttrNS.mg.1.test
       @@@PerlDef:
-        local $Message::DOM::TreeCore::GCLatency = 0;
+        local $Message::Util::Grove::GCLatency = 0;
 
         my $impl;
         __CODE{tc|createImplForTest:: $impl => $impl}__;
@@ -11541,7 +11762,7 @@ NodeTypeDef:
     @@Test:
       @@@QName: Doc.createTextNode.mg.1.test
       @@@PerlDef:
-        local $Message::DOM::TreeCore::GCLatency = 0;
+        local $Message::Util::Grove::GCLatency = 0;
 
         my $impl;
         __CODE{tc|createImplForTest:: $impl => $impl}__;
@@ -11669,7 +11890,7 @@ NodeTypeDef:
     @@Test:
       @@@QName: Document.createCDATASection.mg.1.test
       @@@PerlDef:
-        local $Message::DOM::TreeCore::GCLatency = 0;
+        local $Message::Util::Grove::GCLatency = 0;
 
         my $impl;
         __CODE{tc|createImplForTest:: $impl => $impl}__;
@@ -11760,7 +11981,7 @@ NodeTypeDef:
     @@Test:
       @@@QName: Document.createComment.mg.1.test
       @@@PerlDef:
-        local $Message::DOM::TreeCore::GCLatency = 0;
+        local $Message::Util::Grove::GCLatency = 0;
 
         my $impl;
         __CODE{tc|createImplForTest:: $impl => $impl}__;
@@ -11845,7 +12066,7 @@ NodeTypeDef:
     @@Test:
       @@@QName: Document.createDF.mg.1.test
       @@@PerlDef:
-        local $Message::DOM::TreeCore::GCLatency = 0;
+        local $Message::Util::Grove::GCLatency = 0;
 
         my $impl;
         __CODE{tc|createImplForTest:: $impl => $impl}__;
@@ -12006,7 +12227,7 @@ NodeTypeDef:
     @@Test:
       @@@QName: Document.createER.mg.1.test
       @@@PerlDef:
-        local $Message::DOM::TreeCore::GCLatency = 0;
+        local $Message::Util::Grove::GCLatency = 0;
 
         my $impl;
         __CODE{tc|createImplForTest:: $impl => $impl}__;
@@ -12279,7 +12500,7 @@ NodeTypeDef:
     @@Test:
       @@@QName: Document.createPI.mg.1.test
       @@@PerlDef:
-        local $Message::DOM::TreeCore::GCLatency = 0;
+        local $Message::Util::Grove::GCLatency = 0;
 
         my $impl;
         __CODE{tc|createImplForTest:: $impl => $impl}__;
@@ -13887,6 +14108,124 @@ NodeTypeDef:
         - <Q::c|read-only>.
 
       }
+
+  @IntMethod:
+    @@Operator: mg|CreateNodeRefMethod
+    @@Param:
+      @@@Name: obj
+      @@@Type: HASH
+    @@Param:
+      @@@Name: opt
+      @@@Type: HASH
+    @@Return:
+      @@@Type: Node
+      @@@PerlDef:
+        my $class;
+        CLS: {
+          if (defined $opt->{<H::mg|nodeRefClass>}) {
+            $class = $opt->{<H::mg|nodeRefClass>};
+            IFCHK: {
+              for (@{$opt->{<H::mg|nodeRefInterfaces>} or []}) {
+                last IFCHK unless $$class->isa ($_);
+              }
+              last CLS;
+            } # IFCHK
+          }
+
+          __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
+            $r => $class,
+            $prop => {<H::tc|defaultNodeRefClass>},
+            $ref => $obj,
+          }__;
+          if (defined $class) {
+            IFCHK: {
+              for (@{$opt->{<H::mg|nodeRefInterfaces>} or []}) {
+                last IFCHK unless $$class->isa ($_);
+              }
+              last CLS;
+            } # IFCHK
+          }
+
+          my $nsuri;
+          __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
+            $r => $nsuri,
+            $prop => {<H::infoset|namespaceName>},
+            $ref => $obj,
+          }__;
+          $nsuri = \'' unless defined $nsuri;
+          my $ln;
+          __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
+            $r => $ln,
+            $prop => {<H::infoset|localName>},
+            $ref => $obj,
+          }__;
+
+          A: {
+            ## Use cases:
+            ##   - |html5:a| element type
+            ##   - |html5:*| element types
+
+            for my $nm (
+              [$nsuri, $ln],
+              [$nsuri, \'*'],
+            ) {
+              for my $__class (sort {
+                $Message::DOM::ClassPoint{$b} <=> $Message::DOM::ClassPoint{$a}
+              } grep {
+                $Message::DOM::DOMFeature::ClassInfo
+                    ->{<ClassName::ManakaiDOMElement>}
+                    ->{compat_class_by_type}
+                    ->{${$nm->[0]}}->{${$nm->[1]}}->{$_}
+              } keys %{$Message::DOM::DOMFeature::ClassInfo
+                           ->{<ClassName::ManakaiDOMElement>}
+                           ->{compat_class_by_type}
+                           ->{${$nm->[0]}}->{${$nm->[1]}} or {}}) {
+                if ($Message::DOM::DOMFeature::ClassInfo->{$__class}
+                        ->{has_feature}->{xml}->{'3.0'}) {
+                  $class = \$__class;
+                  IFCHK: {
+                    for (@{$opt->{<H::mg|nodeRefInterfaces>} or []}) {
+                      last IFCHK unless $$class->isa ($_);
+                    }
+                    last A;
+                  } # IFCHK
+                }
+              }
+            }
+
+            ## Generic
+            CLASS: for my $__class (sort {
+              $Message::DOM::ClassPoint{$b} <=> $Message::DOM::ClassPoint{$a}
+            } grep {
+              $Message::DOM::DOMFeature::ClassInfo
+                  ->{<ClassName::ManakaiDOMElement>}
+                  ->{compat_class}->{$_}
+            } keys %{$Message::DOM::DOMFeature::ClassInfo
+                         ->{<ClassName::ManakaiDOMElement>}
+                         ->{compat_class} or {}}) {
+              if ($Message::DOM::DOMFeature::ClassInfo->{$__class}
+                      ->{has_feature}->{xml}->{'3.0'}) {
+                $class = \$__class;
+                IFCHK: {
+                  for (@{$opt->{<H::mg|nodeRefInterfaces>} or []}) {
+                    last IFCHK unless $$class->isa ($_);
+                  }
+                  last A;
+                } # IFCHK
+              }
+            }
+
+            ## Default
+            $class = \$self;
+          } # A
+
+          __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
+            $given => $class,
+            $prop => {<H::tc|defaultNodeRefClass>},
+            $ref => $obj,
+          }__;
+        } # CLS
+        $r = bless $obj, $$class;
 
   @CODE:
     @@QName: tc|createElementForTest

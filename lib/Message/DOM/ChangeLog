@@ -1,5 +1,18 @@
 2006-04-01  Wakaba  <wakaba@suika.fam.cx>
 
+	* DOMFeature.dis (getImplementation, getImplementationList): Support
+	for new class information variables.
+	(DOMLS:Generic): This old feature name is removed.
+
+	* GenericLS.dis (createGLSParser, createGLSSerializer): Support
+	for new class information variables.
+
+	* TreeCore.dis (manakaiExpandedURI): New attribute.
+	(Document, Element.___create_node_ref): New method
+	implementations.
+
+2006-04-01  Wakaba  <wakaba@suika.fam.cx>
+
 	* TreeCore.dis (setIdAttribute, setIdAttributeNS, setIdAttributeNode):
 	Reimplemented.
 	(isId): Setter is added.

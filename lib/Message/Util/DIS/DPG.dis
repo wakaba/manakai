@@ -15,7 +15,7 @@ Module:
   @License: license|Perl+MPL
 
   @Date:
-    $Date: 2006/02/26 14:32:44 $
+    $Date: 2006/04/01 14:41:34 $
   
   @Require:
     @@Module:
@@ -30,6 +30,8 @@ Module:
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
 Namespace:
+  @c:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
   @DIS:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#
   @dis:
@@ -44,10 +46,10 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/Core/
   @f:
     http://suika.fam.cx/~wakaba/archive/2004/dom/feature#
+  @fe:
+    http://suika.fam.cx/www/2006/feature/
   @gls:
     http://suika.fam.cx/~wakaba/archive/2004/dom/gls#
-  @html5:
-    http://www.w3.org/1999/xhtml
   @idl:
     http://suika.fam.cx/~wakaba/archive/2004/dis/IDL#
   @kwd:
@@ -62,18 +64,20 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
   @MDOMX:
     http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
-  @mn:
-    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/ManakaiNode#
   @pc:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/PerlCode#
   @pg:
     http://suika.fam.cx/~wakaba/archive/2005/11/pg/
   @rdf:
     http://www.w3.org/1999/02/22-rdf-syntax-ns#
-  @rdfs:
-    http://www.w3.org/2000/01/rdf-schema#
   @s:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Markup#
+  @tc:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/TreeCore/
+  @test:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Test#
+  @tx:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/XML/
   @Util:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/
 
@@ -107,7 +111,7 @@ FeatureDef:
     @@QName: DIS|DPG10
     @@Version: 1.0
     @@f:instanceOf: DIS|DPG
-    @@f:requires: DOMXML|XMLFeature30
+    @@f:requires: tx|XMLFeature30
     @@f:requires: pc|CoreFeature10
     @@FullName:
       @@@lang:en
@@ -206,6 +210,14 @@ ElementTypeBinding:
     @@ForCheck: ManakaiDOM|ManakaiDOM
 
 ElementTypeBinding:
+  @Name: Test
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: test|StandaloneTest
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
   @Name: IFQName
   @ElementType:
     dis:QName
@@ -274,23 +286,11 @@ ElementTypeBinding:
     @@rdf:type: DISLang|MethodParameter
 
 ElementTypeBinding:
-  @Name: plMName
-  @ElementType:
-    DISPerl:methodName
-
-ElementTypeBinding:
   @Name: PerlDef
   @ElementType:
     dis:Def
   @ShadowContent:
     @@ContentType: lang|Perl
-
-ElementTypeBinding:
-  @Name: disDef
-  @ElementType:
-    dis:Def
-  @ShadowContent:
-    @@ContentType: lang|dis
 
 ElementTypeBinding:
   @Name: PropDef
@@ -306,7 +306,7 @@ IFClsDef:
   @ClsQName: ManakaiDPGDocument
 
   @IFISA: Document
-  @ClsISA: DOMCore|ManakaiDOMDocument
+  @ClsISA: tc|ManakaiDOMDocument
 
   @enDesc:
     The <IF::DPGDocument> interface <kwd:MUST> be implemented by
@@ -314,32 +314,89 @@ IFClsDef:
 
   @f:provides:
     @@@: DIS|DPG10
-    @@f:through: DOMCore|ManakaiDOMImplementation
+    @@f:through: c|ManakaiDOMImplementation
+
+  @Test:
+    @@QName: DOMImpl.hasFeature.test
+    @@PerlDef:
+      my $impl;
+      __CODE{tc|createImplForTest:: $impl => $impl}__;
+
+      no warnings 'uninitialized';
+      for my $f (
+        [<Q::DIS|DPG>, '1.0'],
+        [<Q::DIS|DPG>, ''],
+        [<Q::DIS|DPG>, null],
+      ) {
+        $test->id ($f->[0].'.'.$f->[1].'.hasFeature');
+        my $hf = $impl-><M::f|GetFeature.hasFeature> ($f->[0], $f->[1]);
+        $test->assert_true ($hf);
+
+        $test->id ('+'.$f->[0].'.'.$f->[1].'.hasFeature');
+        my $hfp = $impl-><M::f|GetFeature.hasFeature> ('+'.$f->[0], $f->[1]);
+        $test->assert_true ($hfp);
+
+        $test->id ($f->[0].'.'.$f->[1].'.getFeature');
+        my $gf = $impl-><M::f|GetFeature.getFeature> ($f->[0], $f->[1]);
+        $test->assert_not_null ($gf);
+
+        $test->id ('+'.$f->[0].'.'.$f->[1].'.getFeature');
+        my $gfp = $impl-><M::f|GetFeature.getFeature> ($f->[0], $f->[1]);
+        $test->assert_not_null ($gfp);
+      }
 
   @s:rootElementType: RulesElementType
+
+  @Test:
+    @@QName: DOMImpl.createDocument.DPGDocument.test
+    @@PerlDef:
+      my $impl;
+      __CODE{tc|createImplForTest:: $impl => $impl}__;
+
+      my $doc = $impl-><M::c|DOMImplementation.createDocument>
+                         (<Q::pg:>, 'pg:rules');
+
+      $test->id ('Document');
+      $test->assert_isa ($doc, <IFName::Document>);
+
+      $test->id ('DPGDocument');
+      $test->assert_isa ($doc, <IFName::DPGDocument>);
+
+      my $de = $doc-><AG::Document.documentElement>;
+ 
+      $test->id ('documentElement.Element');
+      $test->assert_isa ($de, <IFName::Element>);
+
+      $test->id ('documentElement.DPGElement');
+      $test->assert_isa ($de, <IFName::DPGElement>);
+
+      $test->id ('documentElement.DPGRulesElement');
+      $test->assert_isa ($de, <IFName::DPGRulesElement>);
 ##DPGDocument
 
 ResourceDef:
   @For: ManakaiDOM|DOM
   @QName: Node
-  @AliasFor: DOMCore|Node
+  @AliasFor: tc|Node
 
 ResourceDef:
   @For: ManakaiDOM|DOM
   @QName: Document
-  @AliasFor: DOMCore|Document
+  @AliasFor: tc|Document
 
 ResourceDef:
   @For: ManakaiDOM|DOM
   @QName: Element
-  @AliasFor: DOMCore|Element
+  @AliasFor: tc|Element
 
 IFClsDef:
   @IFQName: DPGElement
   @ClsQName: ManakaiDPGElement
 
   @IFISA: Element
-  @ClsISA: DOMCore|ManakaiDOMElement
+  @ClsISA: tc|ManakaiDOMElement
+
+  @s:elementType: AnyDPGElementType
 
   @enDesc:
     The <IF::DPGElement> interface <kwd:MUST> be implemented by
@@ -347,6 +404,14 @@ IFClsDef:
     if the implementation supports the DPG object model.
 
 ##DPGElement
+
+ResourceDef:
+  @QName: AnyDPGElementType
+  @DISCore:resourceType: s|AnyElementInNS
+  @AppName:
+    @@@: pg|*
+    @@ContentType: DISCore|QName
+  @ForCheck: =ManakaiDOM|all
 
 IFClsDef:
   @IFQName: DPGElementAttribute
@@ -1349,7 +1414,7 @@ IFClsETDef:
             } elsif ($xuri eq <Q::pg:lexmode>) {
               my $name = $cel-><M::Element.getAttributeNS> (null, 'name');
               if ($lexmodes{$name}) {
-                __UNDEEP{__DOMCore:ERROR{pg|unique-lexmode-name-error::
+                __UNDEEP{__c|ERROR{pg|unique-lexmode-name-error::
                   pg|name => {$name},
                   pg|element => {$cel},
                 }__}__;
@@ -1364,7 +1429,7 @@ IFClsETDef:
               $lexmodes{$name} = \%token;
               for my $rname (@$supermodes) {
                 unless ($lexmodes{$rname}) {
-                  __UNDEEP{__DOMCore:ERROR{pg|lexmode-not-defined-error::
+                  __UNDEEP{__c|ERROR{pg|lexmode-not-defined-error::
                     pg|name => {$rname},
                     pg|element => {$cel},
                   }__}__;
@@ -2040,7 +2105,7 @@ IFClsETDef:
                 return 1; # $next_token_required == 1
               } else {
                 __UNDEEP{
-                  my $continue = __DOMCore:ERROR{pg|rule-not-defined-error::
+                  my $continue = __c|ERROR{pg|rule-not-defined-error::
                     pg|name => {$rule_name},
                     pg|element => {$statement},
                   }__;
@@ -2411,16 +2476,50 @@ IFClsDef:
 
   @DISLang:role: gls|ParserRole
 
+  @Test:
+    @@QName: GLSImplementation.createGLSParser.DPGParser.1.0.test
+    @@PerlDef:
+      require Message::DOM::GenericLS;
+      my $impl = $Message::DOM::ImplementationRegistry
+                     ->get_implementation ({<Q::fe|GenericLS> => '3.0'});
+
+      my $dp = $impl->create_gls_parser ({<Q::DIS|DPG> => '1.0'});
+      
+      $test->id ('DPGParser');
+      $test->assert_isa ($dp, <IFName::DPGParser>);
+  @Test:
+    @@QName: GLSImplementation.createGLSParser.DPGParser.empty.test
+    @@PerlDef:
+      require Message::DOM::GenericLS;
+      my $impl = $Message::DOM::ImplementationRegistry
+                     ->get_implementation ({<Q::fe|GenericLS> => '3.0'});
+
+      my $dp = $impl->create_gls_parser ({<Q::DIS|DPG> => ''});
+      
+      $test->id ('DPGParser');
+      $test->assert_isa ($dp, <IFName::DPGParser>);
+  @Test:
+    @@QName: GLSImplementation.createGLSParser.DPGParser.null.test
+    @@PerlDef:
+      require Message::DOM::GenericLS;
+      my $impl = $Message::DOM::ImplementationRegistry
+                     ->get_implementation ({<Q::fe|GenericLS> => '3.0'});
+
+      my $dp = $impl->create_gls_parser ({<Q::DIS|DPG> => null});
+      
+      $test->id ('DPGParser');
+      $test->assert_isa ($dp, <IFName::DPGParser>);
+
   @Attr:
     @@Name: domConfig
     @@enDesc:
       The configuration of the parser.
 
     @@Get:
-      @@@Type: DOMCore|DOMConfiguration
+      @@@Type: c|DOMConfiguration
       @@@enDesc: The DOM configuration object.
       @@@PerlDef:
-        __CODE{DOMCore|getConfigObject::
+        __CODE{c|getConfigObject::
           $target => $self,
           $targetHash => $self,
           $targetType => {<IFName::DPGParser>},
@@ -2451,7 +2550,7 @@ IFClsDef:
         The newly created parser.
       @@@PerlDef:
         $r = bless {
-          <H::DOMCore:implementation>
+          <H::f|implementation>
             => $impl-><M::f|GetFeature.getFeature>
                  (<Q::DIS|DPG> => ''),
         }, $self;
@@ -2495,7 +2594,7 @@ IFClsDef:
         $self->{nsresolver} = $namespaceContext;
         $self->{location} = {};
         __DEEP{
-          $r = $self->_parse_Rules ($self->{<H::DOMCore:implementation>});
+          $r = $self->_parse_Rules ($self->{<H::f|implementation>});
         }__;
 
   @Method:
@@ -2581,8 +2680,8 @@ IFClsDef:
       When a <IF::ecore|ErrorInterface||ManakaiDOM|Perl> is <Perl::report>ed,
       then this method is invoked.
       
-      The method calls the <cfg::DOMCore|error-handler> if the error is of 
-      <IF::DOMCore|DOMError>.  Otherwise, the error is re-thrown so that
+      The method calls the <cfg::c|error-handler> if the error is of 
+      <IF::c|DOMError>.  Otherwise, the error is re-thrown so that
       corresponding <Perl::catch> clause, if any, can catch the error.
     @@Param:
       @@@Name: err
@@ -2592,7 +2691,7 @@ IFClsDef:
     @@Return:
       @@@Type: DISPerl|Any
       @@@enDesc:
-        If the <P::err> is a <IF::DOMCore|DOMError>, then the return value
+        If the <P::err> is a <IF::c|DOMError>, then the return value
         of the error handler.
 
            {NOTE:: If the error is thrown, the method never returns.
@@ -2601,13 +2700,13 @@ IFClsDef:
         @@@@enDesc:
           No error handler.
       @@@PerlDef:
-        if ($err->isa (<IFName::DOMCore|DOMError||ManakaiDOM|ManakaiDOM>)) {
+        if ($err->isa (<IFName::c|DOMError||ManakaiDOM|ManakaiDOM>)) {
           __DEEP{
             A: {
               my $cfg = $self-><AG::DPGParser.domConfig>;
-              my $h = $cfg-><M::DOMCore|DOMConfiguration.getParameter>
+              my $h = $cfg-><M::c|DOMConfiguration.getParameter>
                                ('error-handler');
-              $r = $h-><M::DOMCore|DOMErrorHandler.handleError> ($err);
+              $r = $h-><M::c|DOMErrorHandler.handleError> ($err);
             } # A
           }__;
         } else {
@@ -2620,7 +2719,7 @@ IFClsDef:
       my $doc : return;
       my $docel;
       lang:Perl {
-        $doc = $impl-><M::DOMCore|DOMImplementation.createDocument>
+        $doc = $impl-><M::c|DOMImplementation.createDocument>
                       (<Q::pg:>, 'rules');
         $doc-><AS::Document.strictErrorChecking> (false);
         $docel = $doc-><AG::Document.documentElement>;
@@ -3309,9 +3408,9 @@ IFClsDef:
         my $location = {
           utf32_offset => pos ($self->{source}),
         };
-        my $continue = __DOMCore:ERROR{pg|bad-token-error::
+        my $continue = __c|ERROR{pg|bad-token-error::
           pg|error-token => {$token},
-          DOMCore|location => {$location},
+          c|location => {$location},
           pg|source-text => {\($self->{source})},
         }__;
         unless ($continue) {
@@ -3427,7 +3526,7 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type:
-      @@@@: DOMCore|DOMConfigurationParameter
+      @@@@: c|DOMConfigurationParameter
       @@@For: ManakaiDOM|DOM
     @@rdf:type:
       @@@@: DISCore|Property
@@ -3441,7 +3540,7 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type:
-      @@@@: DOMCore|DOMConfigurationParameterApplication
+      @@@@: c|DOMConfigurationParameterApplication
       @@@For: ManakaiDOM|DOM
     @@rdf:type:
       @@@@: DISCore|Property
@@ -3450,15 +3549,15 @@ ElementTypeBinding:
     @@For: =ManakaiDOM|all
 
 CParamApp:
-  @DOMCore:domConfigurationParameter: DOMCore|error-handler
-  @DOMCore:targetType: DPGParser
+  @c:domConfigurationParameter: c|error-handler
+  @c:targetType: DPGParser
 
 ElementTypeBinding:
   @Name: ErrDef
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type: DOMCore|DOMErrorType
+    @@rdf:type: c|DOMErrorType
     @@For: ManakaiDOM|DOM3
     @@ecore:textFormatter: ManakaiDPGExceptionFormatter
 
@@ -3467,7 +3566,7 @@ ErrDef:
   @enDesc:
     The parser is encountered to a token whose type is not
     allowed there.
-  @DOMCore:severity: DOMCore|SEVERITY_FATAL_ERROR
+  @c:severity: c|SEVERITY_FATAL_ERROR
   @enMufDef:
     Token |%dpg-error-token-type;|%dpg-error-token-value
     (prefix => { (|}, suffix => {|)}); is not 
@@ -3478,7 +3577,7 @@ ErrDef:
   @enDesc:
     A <CODE::lexmode> name <kwd:MUST-NOT> appear more than once in the
     same DPG document.
-  @DOMCore:severity: DOMCore|SEVERITY_ERROR
+  @c:severity: c|SEVERITY_ERROR
   @enMufDef:
     |lexmode| |%p (name => {<Q::pg|name>});| is already defined
 
@@ -3487,7 +3586,7 @@ ErrDef:
   @enDesc:
     The referenced <CODE::rule> name <kwd:MUST> be defined
     in the same DPG document.
-  @DOMCore:severity: DOMCore|SEVERITY_ERROR
+  @c:severity: c|SEVERITY_ERROR
   @enMufDef:
     |rule| |%p (name => {<Q::pg:name>});| is not defined
 
@@ -3496,7 +3595,7 @@ ErrDef:
   @enDesc:
     The referenced <CODE::lexmode> name <kwd:MUST> be defined
     in the same DPG document.
-  @DOMCore:severity: DOMCore|SEVERITY_ERROR
+  @c:severity: c|SEVERITY_ERROR
   @enMufDef:
     |lexmode| |%p (name => {<Q::pg|name>});| is not defined
 
@@ -3575,11 +3674,11 @@ ResourceDef:
 
   @enDesc:
     A <IF::DPGParser> might throw a <IF::DPGException> if the processing is
-    stopped.  The processing can be stopped due to a <IF::DOMCore|DOMError>
-    with a <A::DOMCore|DOMError.severity> of 
-    <C::DOMCore|DOMError.SEVERITY_FATAL_ERROR> or a non-recovered
-    <C::DOMCore|DOMError.SEVERITY_ERROR>, or if 
-    <M::DOMCore|DOMErrorHandler.handleError> method returned <DOM::false>.
+    stopped.  The processing can be stopped due to a <IF::c|DOMError>
+    with a <A::c|DOMError.severity> of 
+    <C::c|DOMError.SEVERITY_FATAL_ERROR> or a non-recovered
+    <C::c|DOMError.SEVERITY_ERROR>, or if 
+    <M::c|DOMErrorHandler.handleError> method returned <DOM::false>.
 
   @Attr:
     @@Name: code
@@ -3594,7 +3693,7 @@ ResourceDef:
 
     @@QName: DPGExceptionCode
 
-    @@rdfs:subClassOf: idl|unsignedShort||ManakaiDOM|all
+    @@subsetOf: idl|unsignedShort||ManakaiDOM|all
     @@Type: idl|unsignedShort||ManakaiDOM|all
 
     @@enDesc:
@@ -3696,8 +3795,8 @@ IFClsDef:
         @@@@enDesc: The option value.
       @@@Return:
         @@@@PerlDef:
-          my $pos = $o-><AG::DOMCore|DOMError.location>
-                      -><AG::DOMCore|DOMLocator.utf32Offset>;
+          my $pos = $o-><AG::c|DOMError.location>
+                      -><AG::c|DOMLocator.utf32Offset>;
           if ($pos > -1) {
             my $src = $o->{<H::pg|source-text>};
             my $start = $pos;

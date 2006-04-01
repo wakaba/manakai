@@ -9,7 +9,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/03/31 16:44:25 $
+    $Date: 2006/04/01 14:41:33 $
 
   @Require:
     @@Module:
@@ -495,7 +495,8 @@ ClsDef:
         if (--$bag->{$$id}->{<H::mg|references>} < 1) {
           push @{$bag->{<H::mg|mutations>}}, $id;
           if (@{$bag->{<H::mg|mutations>}}
-                  > ($Message::Util::Grove::GCLatency or 0)) {
+                  > (defined $Message::Util::Grove::GCLatency
+                       ? $Message::Util::Grove::GCLatency : 4096)) {
             __CODE{mg|collectGarbage:: $ref => $self}__;
           }
         }

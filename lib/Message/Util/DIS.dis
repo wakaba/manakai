@@ -23,7 +23,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2006/03/30 16:01:45 $
+      $Date: 2006/04/01 14:41:31 $
     @@ContentType:
       dis:Date.RCS
   
@@ -6441,11 +6441,6 @@ IFClsDef:
         $test->assert_true ($list2{<Q::ManakaiDOM:all>});
 ##DISFor
 
-PropDef:
-  @QName: isFeatureImplemented
-  @enDesc:
-    The list of whether a feature is implemented or not. 
-
 IFClsDef:
   @IFQName: DISResource
   @ClsQName: ManakaiDISResourceDefinition
@@ -7129,46 +7124,6 @@ IFClsDef:
         if ($self->{<Q::dis:Value>}) {
           $r = $self->{<Q::dis:Value>}-><AG::dv|DVValue.isNull>;
         }
-
-  @Method:
-    @@Name: isFeatureProvided
-    @@enDesc:
-      Whether a feature is provided by this resource or not.
-      Note that the feature is actually available (implemented)
-      or not is other thing (use <M::ManakaiDISPerlModuleDefinition
-      .plIsFeatureImplemented> instead).
-    @@Param:
-      @@@Name: featureResourceURI
-      @@@Type: ResourceURI
-      @@@enDesc:
-        The URI reference of the resource definition for the feature to test.
-    @@Return:
-      @@@Type:
-        DOMMain:boolean::ManakaiDOM:all
-      @@@enDesc:
-        Whether the feature is provided or not.
-      @@@PerlDef:
-      __DEEP{
-        my @f = @{$self-><M::ManakaiDISPropertyAccessor
-                               .getPropertyResourceList>
-                                  (<Q::DOMMain:implementFeature>,
-                                   isa_recursive => true,
-                                   default_media_type => <Q::DISCore:QName>)};
-        if (@f) {
-          for my $f (@f) {
-            if ($f-><M::ManakaiDISResourceDefinition.isSubsetOfURI>
-                         ($featureResourceURI)) {
-              $r = true;
-              last;
-            }
-          }
-        } else {
-          my $parent = $self-><AG::DIS|DISResource.parentResource>;
-          $r = $parent-><M::ManakaiDISResourceDefinition.isFeatureProvided>
-                                   ($featureResourceURI)
-            if $parent;
-        }
-      }__;
 
   @Attr:
     @@Name: featureNameList

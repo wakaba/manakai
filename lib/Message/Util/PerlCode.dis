@@ -25,7 +25,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2006/03/10 10:52:05 $
+      $Date: 2006/04/01 14:41:33 $
     @@ContentType:
       dis:Date.RCS
   
@@ -40,6 +40,8 @@ Module:
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
 Namespace:
+  @c:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
   @DIS:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#
   @dis:
@@ -66,18 +68,16 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
   @MDOMX:
     http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
-  @mn:
-    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/ManakaiNode#
   @pc:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/PerlCode#
   @pc2:
     http://suika.fam.cx/~wakaba/archive/2005/12/pc/
   @rdf:
     http://www.w3.org/1999/02/22-rdf-syntax-ns#
-  @rdfs:
-    http://www.w3.org/2000/01/rdf-schema#
   @s:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Markup#
+  @tc:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/TreeCore/
   @test:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Test#
   @Util:
@@ -116,7 +116,7 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type: DOMFeature|Feature
+    @@DISCore:resourceType: f|Feature
     @@For: =ManakaiDOM|all
 
 ElementTypeBinding:
@@ -124,12 +124,12 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type: DOMFeature|Feature
+    @@DISCore:resourceType: f|Feature
 
 ElementTypeBinding:
   @Name: featureQName
   @ElementType:
-    DOMFeature:name
+    f:name
   @ShadowContent:
     @@ContentType: DISCore|QName
 
@@ -254,10 +254,42 @@ IFClsDef:
   @IFQName: PerlCode
   @CQName: ManakaiPCCode
 
-  @CISA: DOMCore|ManakaiDOMElement
+  @CISA: tc|ManakaiDOMElement
+
+  @s:elementType: AnyPCElement||ManakaiDOM|all
+  @s:elementType: AnyPC2Element||ManakaiDOM|all
 
   @enDesc:
     A class on which another Perl code classes are constructed based. 
+
+  @Test:
+    @@QName: Document.createElementNS.PerlCode.pc1.test
+    @@PerlDef:
+      my $doc;
+      __CODE{createPCDocumentForTest:: $doc => $doc}__;
+
+      my $el1 = $doc-><M::Document.createElementNS>
+                        (<Q::pc:>, 'pc:NoSuchElementType');
+
+      $test->id ('pc.Element');
+      $test->assert_isa ($el1, <IFName::Element>);
+
+      $test->id ('pc.PerlCode');
+      $test->assert_isa ($el1, <IFName::PerlCode>);
+  @Test:
+    @@QName: Document.createElementNS.PerlCode.pc2.test
+    @@PerlDef:
+      my $doc;
+      __CODE{createPCDocumentForTest:: $doc => $doc}__;
+
+      my $el2 = $doc-><M::Document.createElementNS>
+                        (<Q::pc2:>, 'pc2:NoSuchElementType');
+
+      $test->id ('pc2.Element');
+      $test->assert_isa ($el2, <IFName::Element>);
+
+      $test->id ('pc2.PerlCode');
+      $test->assert_isa ($el2, <IFName::PerlCode>);
 
   @Attr:
     @@Name: fileNode
@@ -664,6 +696,22 @@ IFClsDef:
         }__;
 ##PerlCode
 
+ResourceDef:
+  @QName: AnyPCElement
+  @DISCore:resourceType: s|AnyElementInNS
+  @AppName:
+    @@@: pc|*
+    @@ContentType: DISCore|QName
+  @ForCheck: =ManakaiDOM|all
+
+ResourceDef:
+  @QName: AnyPC2Element
+  @DISCore:resourceType: s|AnyElementInNS
+  @AppName:
+    @@@: pc2|*
+    @@ContentType: DISCore|QName
+  @ForCheck: =ManakaiDOM|all
+
 PropDef:
   @QName: useModuleName
   @enDesc:
@@ -858,7 +906,6 @@ IFClsETDef:
                     (q<Don't edit by hand!>);
             $r .= qq<use strict;\n>;
             $self-><AS::PerlFile.currentPackage> ('main');
-            $self-><AS::PerlFile.currentChunkNumber> (0);
 
             ## -- |require| Perl Modules
             my $req = $self-><M::PerlCode.getRequirePerlModuleNameList>;
@@ -919,48 +966,15 @@ IFClsETDef:
             $r .= qq<1;\n>;
           }__;
 
-  @Attr:
+  @ATTR:
     @@Name: currentPackage
+    @@ATTRQName: pc|currentPackage
     @@enDesc:
       The current Perl package (used in stringify method).
-
-      {NOTE:: This attribute is not preserved by the <Perl::clone> operation.
-      }
-    @@Type: DOMString
+    @@ReflectCDATA:
     @@Get:
-      @@@disDef:
-        @@@@GetProp: currentPackage
     @@Set:
-      @@@disDef:
-        @@@@SetProp: currentPackage
 
-  @Attr:
-    @@Name: currentChunkNumber
-    @@enDesc:
-      The current code chunk number (used in stringify method). 
-  
-      {NOTE:: This attribute is not preserved by the <Perl::clone> operation.
-      }
-    @@Type: idl|unsignedLong||ManakaiDOM|all
-    @@Get:
-      @@@disDef:
-        @@@@GetProp: currentChunk
-    @@Set:
-      @@@disDef:
-        @@@@SetProp: currentChunk
-
-  @Method:
-    @@Name: getNextChunkNumber
-    @@enDesc:
-      Increments the current chunk number of this file 
-      and returns it. 
-    @@Return:
-      @@@Type: idl|unsignedLong||ManakaiDOM|all
-      @@@enDesc:
-        The next chunk number.
-      @@@PerlDef:
-        $r = ++$self->{<H::mn:node>}->{<H::pc:currentChunk>};
-  
   @ATTR:
     @@Name: licenseURI
     @@ATTRQName: pc|license
@@ -970,11 +984,6 @@ IFClsETDef:
     @@Get:
     @@Set:
 ##PerlFile
-
-PropDef:
-  @QName: pc|currentChunk
-  @enDesc:
-    The current chunk number.
 
 PropDef:
   @QName: pc|currentPackage
@@ -1000,7 +1009,7 @@ ReflectTypeDef:
   @enDesc:
     <IF::DOMMain:DOMString> for DOM attributes reflecting
     <SGML::CDATA> element attributes.
-  @rdfs:subClassOf: DOMString
+  @subsetOf: DOMString
   @ResourceDef:
     @@rdf:type: DOMMain|ReflectGet
     @@enDesc:
@@ -1010,25 +1019,10 @@ ReflectTypeDef:
       If the element attribute is absent, the default value, if any,
       or an empty string is returned.
     @@PerlCDef:
-      my $attr_stem;
-      __CODE{DOMCore:selectAttrNodeObjectNS::
-        $namespaceURI => $NS_URI_NO_NULL,
-        $localName => $LOCAL_NAME,
-        $r => $attr_stem,
+      __DEEP{
+        $r = $self-><M::Element.getAttributeNS> ($NS_URI, $LOCAL_NAME);
+        $r = '' unless defined $r;
       }__;
-      if ($attr_stem) {
-        my $attr;
-        __CODE{ManakaiNode:getWeakReference||ManakaiDOM:Perl::
-          $object => $attr_stem,
-          $ref => $attr,
-          $class => {<ClassName::DOMCore:ManakaiDOMAttr>},
-        }__;
-        __CODE{DOMCore:getNodeTextContent::
-          $node => $attr,
-          $result => $r,
-        }__;
-      }
-      # else : default : empty string
 
   @ResourceDef:
     @@QName: CDATADOMStringSet
@@ -1041,20 +1035,14 @@ ReflectTypeDef:
       @@@@: 
         What will happen if the <DOM::null> value is given?
     @@PerlCDef:
-      if (defined $given) {
-        my $prefix;
-        __CODE{DOMCore:setAttrValueNS::
-          $namespaceURI => $NS_URI_NO_NULL,
-          $localName => $LOCAL_NAME,
-          $prefix => $prefix,
-          $element => $self,
-          $value => $given,
-        }__;
-      } else {
-        __DEEP{
-          $self-><M::Element.removeAttributeNS> ($NS_URI_NO_NULL, $LOCAL_NAME);
-        }__;
-      }
+      __DEEP{
+        if (defined $given) {
+          $self-><M::Element.setAttributeNS>
+                   ($NS_URI, $QNAME, $given);
+        } else {
+          $self-><M::Element.removeAttributeNS> ($NS_URI, $LOCAL_NAME);
+        }
+      }__;
 
 ElementTypeBinding:
   @Name: ReflectTypeDef
@@ -1524,54 +1512,6 @@ IFClsETDef:
     A base class for node types that contains zero or more
     statements and/or blocks.
 
-  @ATTR:
-    @@Name: sourceFile
-    @@ATTRQName: pc|sourceFile
-    @@enDesc:
-      The source file name of this fragment. 
-    @@ReflectCDATA:
-    @@Get:
-      @@@enDesc:
-        Any string identifying the source. 
-      @@@nullCase:
-        @@@@enDesc: No source file name is set. 
-    @@Set:
-      @@@nullCase:
-        @@@@enDesc: No (or unknown) source file. 
-
-  @ATTR:
-    @@Name: sourceLine
-    @@ATTRQName: pc|sourceLine
-    @@enDesc:
-      Source file line number of the first line of this fragment. 
-    @@ReflectCDATA:
-    @@Get:
-    @@Set:
-
-  @ATTR:
-    @@Name: currentSourceFile
-    @@ATTRQName: pc|currentSourceFile
-    @@enDesc:
-      The current source file name that is referred when 
-      a code fragment is added. 
-    @@ReflectCDATA:
-    @@Get:
-      @@@nullCase:
-        @@@@enDesc: No source file name is set. 
-    @@Set:
-      @@@nullCase:
-        @@@@enDesc: No (or unknown) source file. 
-
-  @ATTR:
-    @@Name: currentSourceLine
-    @@ATTRQName: pc|currentSourceLine
-    @@enDesc:
-      The current line number in source file that is referred when 
-      a code fragment is added. 
-    @@ReflectCDATA:
-    @@Get:
-    @@Set:
-
   @Method:
     @@Name: appendCodeFragment
     @@enDesc:
@@ -1638,31 +1578,8 @@ IFClsETDef:
             $r = $self-><AG::Node.ownerDocument>-><M::Document.createElementNS>
                                                       (<Q::pc:>, 'unparsed');
             $r-><AS::Node.textContent> ($codeArg);
-            $r-><AS::PerlCodeStatements.sourceFile>
-               ($self-><AG::PerlCodeStatements.currentSourceFile>);
-            my $sl = $self-><AG::PerlCodeStatements.currentSourceLine>;
-            $r-><AS::PerlCodeStatements.sourceLine> ($sl);
-            $self-><AG::PerlCodeStatements.currentSourceLine>
-                      ($sl + ($codeArg =~ tr/\x0A/\x0A/));
             $self-><M::Node.appendChild> ($r);
           }__;
-
-  @Method:
-    @@Name: skipLines
-    @@enDesc:
-      Skips lines in a code. 
-    @@Param:
-      @@@Name: codeArg
-      @@@Type: DOMString
-      @@@enDesc:
-        A code fragment, which is counted lines. 
-    @@Return:
-      @@@PerlDef:
-        __DEEP{
-          $self-><AS::PerlCodeStatements.currentSourceLine>
-                   ($self-><AG::PerlCodeStatements.currentSourceLine>
-                        + ($codeArg =~ tr/\x0A/\x0A/));
-        }__;
 
   @ATTR:
     @@Name: label
@@ -2074,7 +1991,7 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type: test|StandaloneTest
+    @@DISCore:resourceType: test|StandaloneTest
     @@ForCheck: ManakaiDOM|ForClass
 
 ElementTypeBinding:
@@ -2105,30 +2022,6 @@ IFClsETDef:
   @enDesc:
     Unparsed Perl code fragments. 
 
-  @ATTR:
-    @@Name: sourceFile
-    @@ATTRQName: pc|sourceFile
-    @@enDesc:
-      The source file name of this fragment. 
-    @@ReflectCDATA:
-    @@Get:
-      @@@enDesc:
-        Any string identifying the source. 
-      @@@nullCase:
-        @@@@enDesc: No source file name is set. 
-    @@Set:
-      @@@nullCase:
-        @@@@enDesc: No (or unknown) source file. 
-
-  @ATTR:
-    @@Name: sourceLine
-    @@ATTRQName: pc|sourceLine
-    @@enDesc:
-      Source file line number of the first line of this fragment. 
-    @@ReflectCDATA:
-    @@Get:
-    @@Set:
-
   @ToStringMethod:
     @@Return:
       @@@Type: DOMString
@@ -2137,23 +2030,6 @@ IFClsETDef:
       @@@PerlDef:
           __DEEP{
             $r = "\x0A" . $self-><AG::Node.textContent> . "\x0A";
-            my $file = $self-><AG::PerlCode.fileNode>;
-            my $src_file = $file ? $file-><AG::PerlFile.sourceFile>
-                                 : $self->{<H::mn:node>}->{<H::mn:nodeID>};
-            if ($self-><AG::Node.ownerDocument>
-                     -><AG::Document.domConfig>
-                     -><M::DOMCore:DOMConfiguration.getParameter>
-                          (<Q::pc:line>)) {
-              my $nxt_cnum = $file ? $file-><M::PerlFile.getNextChunkNumber> : 0;
-              $r = sprintf qq<\n#line %d "%s [u] (Chunk #%d)"%s>.
-                           qq<#line 1 "%s [/u] (Chunk #%d)"\n>,
-                         $self-><AG::PerlUnparsedCode.sourceLine> || 1,
-                         $self-><AG::PerlUnparsedCode.sourceFile> || $src_file,
-                         $file ? $file-><M::PerlFile.getNextChunkNumber> : 0,
-                         $r,
-                         $src_file,
-                         $file ? $file-><M::PerlFile.getNextChunkNumber> : 0;
-            }
           }__;
 ##PerlUnparsedCode
 
@@ -2173,8 +2049,10 @@ IFClsETDef:
       @@@Type: DOMString
       @@@enDesc:
         Perl code.
-      @@@disDef:
-        @@@@DISPerl:cloneCode: DOMCore|ManakaiDOMNode.textContent.get
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><AG::Node.textContent>;
+        }__;
 ##PCInlineUnparsedCode
 
 IFClsETDef:
@@ -2234,7 +2112,7 @@ IFClsETDef:
             if ($escaped or
                 $self-><AG::Node.ownerDocument>
                      -><AG::Document.domConfig>
-                     -><M::DOMCore:DOMConfiguration.getParameter>
+                     -><M::CFG.getParameter>
                           (<Q::pc:preserve-line-break>)) {
               $r =~ s/\x0D/\\x0D/gs;
               $r =~ s/\x0A/\\x0A/gs;
@@ -3130,25 +3008,7 @@ IFClsETDef:
             }
             $r .= "\x0A";
 
-              if ($self-><AG::Node.ownerDocument>
-                       -><AG::Document.domConfig>
-                       -><M::DOMCore:DOMConfiguration.getParameter>
-                            (<Q::pc:line>)) {
-                my $file = $self-><AG::PerlCode.fileNode>;
-                my $sfile = $file ? $file-><AG::PerlFile.sourceFile>
-                                  : $self->{<H::mn:node>}->{<H::mn:nodeID>};
-                $r = sprintf qq<\n{\n#line %d "%s [b] (Chunk #%d)"%s>.
-                             qq<#line 1 "%s [/b] (Chunk #%d)"\n;}\n>,
-                           $self-><AG::PerlCodeStatements.sourceLine> || 1,
-                           $self-><AG::PerlCodeStatements.sourceFile> || $sfile,
-                           $file ? $file-><M::PerlFile.getNextChunkNumber> : 0,
-                           $r,
-                           $sfile,
-                           $file ? $file-><M::PerlFile.getNextChunkNumber> : 0
-                  if 2 < length $r;
-              } else {
-                $r = "\n{\n$r\n;}\n" if 2 < length $r;
-              }
+            $r = "\n{\n$r\n;}\n" if 2 < length $r;
 
               $r = "\n" . $label . ':' . $r if $label;
             }
@@ -3188,25 +3048,6 @@ IFClsETDef:
                 $r .= $child->stringify;
               }
             }
-
-            __DEEP{
-              if ($self-><AG::Node.ownerDocument>
-                       -><AG::Document.domConfig>
-                       -><M::DOMCore:DOMConfiguration.getParameter>
-                            (<Q::pc:line>)) {
-                my $file = $self-><AG::PerlCode.fileNode>;
-                my $sfile = $file ? $file-><AG::PerlFile.sourceFile>
-                                  : $self->{<H::mn:node>}->{<H::mn:nodeID>};
-                $r = sprintf qq<\n#line %d "%s [bc] (Chunk #%d)"\n%s>.
-                             qq<\n#line 1 "%s [/bc] (Chunk #%d)"\n>,
-                           $self-><AG::PerlCodeStatements.sourceLine> || 1,
-                           $self-><AG::PerlCodeStatements.sourceFile> || $sfile,
-                           $file ? $file-><M::PerlFile.getNextChunkNumber> : 0,
-                           $r,
-                           $sfile,
-                           $file ? $file-><M::PerlFile.getNextChunkNumber> : 0;
-              }
-            }__;
           }
 ##PCCodeBlocks
 
@@ -3686,24 +3527,7 @@ IFClsETDef:
             $r .= "\x0A";
             $r .= ';' unless @child;
 
-              if ($self-><AG::Node.ownerDocument>
-                       -><AG::Document.domConfig>
-                       -><M::DOMCore:DOMConfiguration.getParameter>
-                            (<Q::pc:line>)) {
-                my $file = $self-><AG::PerlCode.fileNode>;
-                my $sfile = $file ? $file-><AG::PerlFile.sourceFile>
-                                  : $self->{<H::mn:node>}->{<H::mn:nodeID>};
-                $r = sprintf qq<\n{\n#line %d "%s [b] (Chunk #%d)"%s>.
-                             qq<#line 1 "%s [/b] (Chunk #%d)"\n}\n>,
-                           $self-><AG::PerlCodeStatements.sourceLine> || 1,
-                           $self-><AG::PerlCodeStatements.sourceFile> || $sfile,
-                           $file ? $file-><M::PerlFile.getNextChunkNumber> : 0,
-                           $r,
-                           $sfile,
-                           $file ? $file-><M::PerlFile.getNextChunkNumber> : 0;
-              } else {
-                $r = "\n{\n$r\n}\n";
-              }
+            $r = "\n{\n$r\n}\n";
 
               $r = "\n" . $label . ':' . $r . '# ' . $label . "\n"
                 if length $label;
@@ -4326,28 +4150,12 @@ ElementTypeBinding:
 ## -- Configuration Parameters
 
 boolCParam:
-  @QName: pc|line
-  @nodeProp: pcline
-  @IsSupportRequired:1
-  @DOMCore:targetType: DOMCore|Document
-  @TrueCase:
-    @@DOMCore:isSupported:1
-    @@enDesc:
-      Inserts <Perl::#line> directives.
-  @FalseCase:
-    @@DOMCore:isSupported:1
-    @@IsSupportRequired:1
-    @@IsDefault:1
-    @@enDesc:
-      Does not insert any <Perl::#line> directive.
-
-boolCParam:
   @QName: pc|preserve-line-break
   @nodeProp: plb
-  @DOMCore:targetType: DOMCore|Document
+  @c:targetType: tc|Document
   @IsSupportRequired:1
   @TrueCase:
-    @@DOMCore:isSupported:1
+    @@c:isSupported:1
     @@enDesc:
       When stringifying a <IF::PerlStringLiteral>, if it contains
       <CODE::U+000A> and / or <CODE::U+000D> characters, then
@@ -4371,7 +4179,7 @@ boolCParam:
         my $str2 = $sl2->stringify;
         $test->assert_equals ($str2, q<"ab\x0Acd">);
   @FalseCase:
-    @@DOMCore:isSupported:1
+    @@c:isSupported:1
     @@IsSupportRequired:1
     @@IsDefault:1
     @@enDesc:
@@ -4425,14 +4233,14 @@ boolCParam:
 
 ResourceDef:
   @QName: CFG
-  @AliasFor: DOMCore|DOMConfiguration
+  @AliasFor: c|DOMConfiguration
   @For: ManakaiDOM|DOM3
 
 CParam:
   @QName: pc|split-resolver
   @nodeProp: pcsres
   @IsSupportRequired:1
-  @DOMCore:targetType: DOMCore|Document
+  @c:targetType: tc|Document
   @Type: DISPerl|CODE||ManakaiDOM|all
   @enDesc:
     Splits module file.  The parameter value <kwd:MUST> be
@@ -4450,7 +4258,7 @@ CParam:
 ElementTypeBinding:
   @Name: nodeProp
   @ElementType:
-    DOMCore:nodeProp
+    tc:nodeStemKey
   @ShadowContent:
     @@For: =ManakaiDOM|all
 
@@ -4460,7 +4268,7 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type:
-      @@@@: DOMCore|DOMConfigurationParameter
+      @@@@: c|DOMConfigurationParameter
       @@@For: ManakaiDOM|DOM
     @@rdf:type:
       @@@@: DISCore|Property
@@ -4474,7 +4282,7 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type:
-      @@@@: DOMCore|DOMConfigurationParameter
+      @@@@: c|DOMConfigurationParameter
       @@@For: ManakaiDOM|DOM
     @@rdf:type:
       @@@@: DISCore|Property
@@ -4490,12 +4298,34 @@ IFClsDef:
   @CQName: ManakaiPCDocument
 
   @IFISA: Document
-  @CISA: DOMCore|ManakaiDOMDocument
+  @CISA: tc|ManakaiDOMDocument
 
   @enDesc:
     A <IF::PCDocument> is a <IF::Document> that represents a Perl code.
 
   @s:rootElementType: pc|file
+
+  @Test:
+    @@QName: DOMImplementation.createDocument.PCDocument.test
+    @@PerlDef:
+      my $impl;
+      __CODE{tc|createImplForTest:: $impl => $impl}__;
+ 
+      my $doc = $impl-><M::DOMImpl.createDocument> (<Q::pc:>, 'pc:file');
+
+      $test->id ('Document');
+      $test->assert_isa ($doc, <IFName::Document>);
+
+      $test->id ('PCDocument');
+      $test->assert_isa ($doc, <IFName::PCDocument>);
+
+      my $de = $doc-><AG::Document.documentElement>;
+
+      $test->id ('documentElement.Element');
+      $test->assert_isa ($de, <IFName::Element>);
+
+      $test->id ('documentElement.PerlFile');
+      $test->assert_isa ($de, <IFName::PerlFile>);
 
   @Method:
     @@Name: createPCLiteral
@@ -4834,10 +4664,32 @@ IFClsDef:
   @enDesc:
     The class that provides factory methods. 
 
-  @CISA: DOMCore|ManakaiDOMImplementation||ManakaiDOM|ManakaiDOMLatest
+  @CISA: c|ManakaiDOMImplementation||ManakaiDOM|ManakaiDOMLatest
   @CISA: dx|ManakaiDefaultExceptionHandler||ManakaiDOM|Perl
 
   @f:provides: pc|CoreFeature10
+
+  @Test:
+    @@QName: ImplementationRegistry.PCImplementation.1.0.test
+    @@PerlDef:
+      my $impl = $Message::DOM::ImplementationRegistry
+                   ->get_implementation ({<Q::Util|PerlCode> => '1.0'});
+
+      $test->assert_isa ($impl, <IFName::PCImplementation>);
+  @Test:
+    @@QName: ImplementationRegistry.PCImplementation.empty.test
+    @@PerlDef:
+      my $impl = $Message::DOM::ImplementationRegistry
+                   ->get_implementation ({<Q::Util|PerlCode> => ''});
+
+      $test->assert_isa ($impl, <IFName::PCImplementation>);
+  @Test:
+    @@QName: ImplementationRegistry.PCImplementation.null.test
+    @@PerlDef:
+      my $impl = $Message::DOM::ImplementationRegistry
+                   ->get_implementation ({<Q::Util|PerlCode> => null});
+
+      $test->assert_isa ($impl, <IFName::PCImplementation>);
 
   @Method:
     @@Name: createPerlFile
@@ -5323,27 +5175,27 @@ IFClsDef:
 
 ResourceDef:
   @QName: DOMImpl
-  @AliasFor: DOMCore|DOMImplementation
+  @AliasFor: c|DOMImplementation
   @For: ManakaiDOM|DOM
 
 ResourceDef:
   @QName: NodeList
-  @AliasFor: DOMCore|NodeList
+  @AliasFor: tc|NodeList
   @For: ManakaiDOM|DOM
 
 ResourceDef:
   @QName: Node
-  @AliasFor: DOMCore|Node
+  @AliasFor: tc|Node
   @For: ManakaiDOM|DOM
 
 ResourceDef:
   @QName: Element
-  @AliasFor: DOMCore|Element
+  @AliasFor: tc|Element
   @For: ManakaiDOM|DOM
 
 ResourceDef:
   @QName: Document
-  @AliasFor: DOMCore|Document
+  @AliasFor: tc|Document
   @For: ManakaiDOM|DOM
 
 ## -- Exceptions
@@ -5399,7 +5251,7 @@ ResourceDef:
       Exception codes for <IF::PCException>. 
 
     @@Type: idl|unsignedShort||ManakaiDOM|all
-    @@rdfs:subClassOf: idl|unsignedShort||ManakaiDOM|all
+    @@subsetOf: idl|unsignedShort||ManakaiDOM|all
 
     @@XConstDef:
       @@@Name: HIERARCHY_REQUEST_ERR

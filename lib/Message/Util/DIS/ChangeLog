@@ -1,3 +1,13 @@
+2006-04-01  Wakaba  <wakaba@suika.fam.cx>
+
+	* Perl.dis (plImplementation): Get the instance
+	from the |$Message::Util::DIS::Perl::Implementation| variable.
+	(plIsFeatureImplemented): Removed.
+	(plPreprocessPerlCode, plPreprocessPerlStatement): The |sourceFile|
+	and |sourceLine| parameters are removed.
+
+	* DPG.dis (DPGElement): Associated to the |pg:*| element types.
+
 2006-03-30  Wakaba  <wakaba@suika.fam.cx>
 
 	* Perl.dis (plGeneratePerlModule): Generated code

@@ -13,7 +13,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/01/29 13:58:54 $
+    $Date: 2006/04/01 14:41:30 $
 
   @Require:
     @@Module: 
@@ -53,7 +53,6 @@ Namespace:
 
 FeatureDef:
   @QName: Generic
-  @featureQName: DOMLS|Generic
   @featureQName: fe|GenericLS
   @FeatureVerDef:
     @@QName: Generic30
@@ -300,7 +299,8 @@ IFClsDef:
                 #my $plus = $fname =~ s/^\+// ? t rue : f alse;
                 FVER: for my $fver (grep {$features->{$fkey}->{$_}}
                                        keys %{$features->{$fkey}}) {
-                  if ($Message::DOM::ClassFeature{$class}->{$fname}->{$fver}) {
+                  if ($Message::DOM::DOMFeature::ClassInfo->{$class}
+                          ->{has_feature}->{$fname}->{$fver}) {
                     next FVER; # Feature/version found
                   }
                   next CLS; # Not found
@@ -360,7 +360,8 @@ IFClsDef:
                 #my $plus = $fname =~ s/^\+// ? t rue : f alse;
                 FVER: for my $fver (grep {$features->{$fkey}->{$_}}
                                        keys %{$features->{$fkey}}) {
-                  if ($Message::DOM::ClassFeature{$class}->{$fname}->{$fver}) {
+                  if ($Message::DOM::DOMFeature::ClassInfo->{$class}
+                          ->{has_feature}->{$fname}->{$fver}) {
                     next FVER; # Feature/version found
                   }
                   next CLS; # Not found

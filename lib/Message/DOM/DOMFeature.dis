@@ -44,7 +44,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/03/31 12:15:38 $
+      $Date: 2006/04/01 14:41:30 $
     @@ContentType:
       dis:Date.RCS
   
@@ -2239,24 +2239,37 @@ minIFClsDef:
                 FVER: for my $fver (grep {$features->{$fkey}->{$_}}
                                        keys %{$features->{$fkey}}) {
                   $debug->(3, qq<version "$fver"...\n>);
-                  for my $cls ($class, @{$Message::DOM::ClassISA{$class}}) {
-                    if ($Message::DOM::ImplFeature{$class}->{$fname}->{$fver} ||=
-                           ## (Caching)
-                        $Message::DOM::ImplFeature{$cls}->{$fname}->{$fver}) {
-                      $debug->(4, qq<found in "$cls"\n>);
-                      next FVER; # Feature/version found
+                  if ($Message::DOM::DOMFeature::ClassInfo->{$class}
+                          ->{has_feature}->{$fname}->{$fver}) {
+                    $debug->(4, qq<found in "$class">);
+                    next FVER; # Feature/version found
+                  } else {
+                    for my $cls ($class, @{$Message::DOM::ClassISA{$class}}) {
+                      if ($Message::DOM::ImplFeature{$class}->{$fname}->{$fver} ||=
+                             ## (Caching)
+                          $Message::DOM::ImplFeature{$cls}->{$fname}->{$fver}) {
+                        $debug->(4, qq<found in "$cls"\n>);
+                        next FVER; # Feature/version found
+                      }
                     }
                   }
 
                   if ($plus) {
-                    if ($Message::DOM::ManakaiDOMImplementation::CompatClass{
-                          $class}) {
+                    ## If it is a class compatible with
+                    ## the class |ManakaiMinimumImplementation|
+                    if ($Message::DOM::DOMFeature::ClassInfo
+                          ->{<ClassName::ManakaiMinimumImplementation>}
+                          ->{compat_class}->{$class}) {
                       my %compat_cls;
                       for my $cls (grep {
-                        $Message::DOM::ManakaiDOMImplementation::CompatClass{
-                        $_}
-                      } keys
-                      %Message::DOM::ManakaiDOMImplementation::CompatClass) {
+                        $Message::DOM::DOMFeature::ClassInfo
+                          ->{<ClassName::ManakaiMinimumImplementation>}
+                          ->{compat_class}->{$_}
+                      } keys %{
+                        $Message::DOM::DOMFeature::ClassInfo
+                          ->{<ClassName::ManakaiMinimumImplementation>}
+                          ->{compat_class}
+                      }) {
                         next if $compat_cls{$cls};
                         __CODE{makeClassISAList:: $CLASS => $cls}__;
                         for my $c (@{$Message::DOM::ClassISA{$cls}}) {
@@ -2264,8 +2277,10 @@ minIFClsDef:
                         }                 
                       }
                       for my $cls (keys %compat_cls) {
-                        if ($Message::DOM::ImplFeature{$cls}
-                              ->{$fname}->{$fver}) {
+                        if ($Message::DOM::DOMFeature::ClassInfo->{$cls}
+                                ->{has_feature}->{$fname}->{$fver} or
+                            $Message::DOM::ImplFeature{$cls}
+                                ->{$fname}->{$fver}) {
                           $debug->(4, qq<found+ in "$cls"\n>);
                           next FVER; # +Feature/ver found
                         }
@@ -2362,23 +2377,35 @@ minIFClsDef:
                 my $plus = $fname =~ s/^\+// ? true : false;
                 FVER: for my $fver (grep {$features->{$fkey}->{$_}}
                                        keys %{$features->{$fkey}}) {
-                  for my $cls ($class, @{$Message::DOM::ClassISA{$class}}) {
-                    if ($Message::DOM::ImplFeature{$class}->{$fname}->{$fver} ||=
-                           ## (Caching)
-                        $Message::DOM::ImplFeature{$cls}->{$fname}->{$fver}) {
-                      next FVER; # Feature/version found
+                  if ($Message::DOM::DOMFeature::ClassInfo->{$class}
+                          ->{has_feature}->{$fname}->{$fver}) {
+                    next FVER; # Feature/version found
+                  } else {
+                    for my $cls ($class, @{$Message::DOM::ClassISA{$class}}) {
+                      if ($Message::DOM::ImplFeature{$class}->{$fname}->{$fver} ||=
+                             ## (Caching)
+                          $Message::DOM::ImplFeature{$cls}->{$fname}->{$fver}) {
+                        next FVER; # Feature/version found
+                      }
                     }
                   }
 
                   if ($plus) {
-                    if ($Message::DOM::ManakaiDOMImplementation::CompatClass{
-                          $class}) {
+                    ## If it is a class compatible with
+                    ## the class |ManakaiMinimumImplementation|
+                    if ($Message::DOM::DOMFeature::ClassInfo
+                          ->{<ClassName::ManakaiMinimumImplementation>}
+                          ->{compat_class}->{$class}) {
                       my %compat_cls;
                       for my $cls (grep {
-                        $Message::DOM::ManakaiDOMImplementation::CompatClass{
-                        $_}
-                      } keys
-                      %Message::DOM::ManakaiDOMImplementation::CompatClass) {
+                        $Message::DOM::DOMFeature::ClassInfo
+                          ->{<ClassName::ManakaiMinimumImplementation>}
+                          ->{compat_class}->{$_}
+                      } keys %{
+                        $Message::DOM::DOMFeature::ClassInfo
+                          ->{<ClassName::ManakaiMinimumImplementation>}
+                          ->{compat_class}
+                      }) {
                         next if $compat_cls{$cls};
                         __CODE{makeClassISAList:: $CLASS => $cls}__;
                         for my $c (@{$Message::DOM::ClassISA{$cls}}) {
@@ -2386,8 +2413,10 @@ minIFClsDef:
                         }                 
                       }
                       for my $cls (keys %compat_cls) {
-                        if ($Message::DOM::ImplFeature{$cls}
-                              ->{$fname}->{$fver}) {
+                        if ($Message::DOM::DOMFeature::ClassInfo->{$cls}
+                                ->{has_feature}->{$fname}->{$fver} or
+                            $Message::DOM::ImplFeature{$cls}
+                                ->{$fname}->{$fver}) {
                           next FVER; # +Feature/ver found
                         }
                       }
@@ -2515,10 +2544,13 @@ minIFClsDef:
     @@Param:
       @@@Name: obj
       @@@Type: HASH
+    @@Param:
+      @@@Name: opt
+      @@@Type: HASH
     @@Return:
       @@@Type: MinimumImplementation
       @@@PerlDef:
-        $r = bless $obj, $self;
+        $r = bless $obj, ${$opt->{<H::mg|nodeRefClass>} or \$self};
 
   @IntMethod:
     @@Name: new
@@ -2551,7 +2583,7 @@ minIFClsDef:
     @@Test:
       @@@QName: Impl.new.test
       @@@PerlDef:
-        local $Message::DOM::TreeCore::GCLatency = 0;
+        local $Message::Util::Grove::GCLatency = 0;
 
         my $impl = <ClassM::ManakaiMinimumImplementation.new>;
 
