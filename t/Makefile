@@ -70,7 +70,8 @@ NS_MDOM_PT_FILES = \
   dom-DOMCore$(PT_SUFFIX) \
   dom-TreeCore$(PT_SUFFIX) dom-Document$(PT_SUFFIX) dom-Element$(PT_SUFFIX) \
   dom-XML$(PT_SUFFIX) dom-XDoctype$(PT_SUFFIX) \
-  dom-DOMLS$(PT_SUFFIX) dom-XMLParser$(PT_SUFFIX)
+  dom-DOMLS$(PT_SUFFIX) dom-XMLParser$(PT_SUFFIX) \
+  dom-TreeStore$(PT_SUFFIX)
 NS_URI_PT_FILES = \
   uri-Generic$(PT_SUFFIX)
 NS_UTIL_PT_FILES = \

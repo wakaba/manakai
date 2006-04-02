@@ -18,7 +18,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/04/02 10:45:24 $
+    $Date: 2006/04/02 12:14:43 $
 
   @Require:
     @@Module:
@@ -9065,14 +9065,14 @@ NodeTypeDef:
        
         $test->id ('default');
         $test->assert_null ($pi-><AG::Node.baseURI>);
-        $test->assert_null ($pi-><AG::Node.manakaiBaseURI>);
+        $test->assert_null ($pi-><AG::ProcessingInstruction.manakaiBaseURI>);
 
         $test->id ('doc');
         $doc-><AS::Document.documentURI> (q<http://doc.test/>);
         $test->assert_equals
                  ($pi-><AG::Node.baseURI>,
                   q<http://doc.test/>);
-        $test->assert_null ($pi-><AG::Node.manakaiBaseURI>);
+        $test->assert_null ($pi-><AG::ProcessingInstruction.manakaiBaseURI>);
 
         $test->id ('el');
         my $el = $doc-><M::Document.createElementNS> (null, 'e');
@@ -9082,7 +9082,7 @@ NodeTypeDef:
         $test->assert_equals
                  ($pi-><AG::Node.baseURI>,
                   q<http://el.test/>);
-        $test->assert_null ($pi-><AG::Node.manakaiBaseURI>);
+        $test->assert_null ($pi-><AG::ProcessingInstruction.manakaiBaseURI>);
 
         $test->id ('ent');
         my $ent = $doc-><M::Document.createEntityReference> ('ent');
@@ -9094,7 +9094,7 @@ NodeTypeDef:
         $test->assert_equals
                  ($pi-><AG::Node.baseURI>,
                   q<http://ent.test/>);
-        $test->assert_null ($pi-><AG::Node.manakaiBaseURI>);
+        $test->assert_null ($pi-><AG::ProcessingInstruction.manakaiBaseURI>);
 
         $test->id ('pi');
         $pi-><AS::ProcessingInstruction.manakaiBaseURI> (q<http://pi.ent/>);
@@ -9102,7 +9102,7 @@ NodeTypeDef:
                  ($pi-><AG::Node.baseURI>,
                   q<http://pi.ent/>);
         $test->assert_equals
-                 ($pi-><AG::Node.manakaiBaseURI>,
+                 ($pi-><AG::ProcessingInstruction.manakaiBaseURI>,
                   q<http://pi.ent/>);
 
         $test->id ('pi.unset');
@@ -9110,7 +9110,7 @@ NodeTypeDef:
         $test->assert_equals
                  ($pi-><AG::Node.baseURI>,
                   q<http://ent.test/>);
-        $test->assert_null ($pi-><AG::Node.manakaiBaseURI>);
+        $test->assert_null ($pi-><AG::ProcessingInstruction.manakaiBaseURI>);
 
   @Attr:
     @@Name: target

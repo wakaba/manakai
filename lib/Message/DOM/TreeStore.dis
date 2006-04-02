@@ -1,0 +1,856 @@
+Module:
+  @QName: MDOM|TreeStore
+  @enFN:
+    DOM Tree Store Module
+  @enDesc:
+    The manakai DOM Tree Store Module provides a simple
+    storable representation of a DOM subtree.
+
+  @Namespace:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/TreeStorable/
+
+  @DISCore:author: DISCore|Wakaba
+  @License: license|Perl+MPL
+  @Date:
+    $Date: 2006/04/02 12:14:43 $
+
+  @Require:
+    @@Module:
+      @@@QName: MDOM|TreeCore
+      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
+    @@Module:
+      @@@WithFor: ManakaiDOM|ManakaiDOM
+    @@Module:
+      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
+  @DefaultFor: ManakaiDOM|ManakaiDOMLatest
+
+Namespace:
+  @c:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
+  @cfg:
+    http://suika.fam.cx/www/2006/dom-config/
+  @dis:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
+  @doc:
+    http://suika.fam.cx/~wakaba/archive/2005/7/tutorial#
+  @d:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/xdt#
+  @DOMMain:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/main#
+  @dx:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#
+  @dxm:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/XML#
+  @ecore:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/Core/
+  @ev:
+    http://www.w3.org/2001/xml-events
+  @f:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/feature#
+  @fe:
+    http://suika.fam.cx/www/2006/feature/
+  @idl:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/IDL#
+  @infoset:
+    http://www.w3.org/2001/04/infoset#
+  @kwd:
+    http://suika.fam.cx/~wakaba/archive/2005/rfc2119/
+  @lang:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
+  @license:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
+  @ManakaiDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
+  @ManakaiDOMCore:
+    http://suika.fam.cx/~wakaba/archive/2004/mdom-core#
+  @MDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
+  @MDOMX:
+    http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
+  @mg:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Grove/
+  @null:
+    http://suika.fam.cx/~wakaba/-temp/2003/09/27/null
+  @rdf:
+    http://www.w3.org/1999/02/22-rdf-syntax-ns#
+  @rdfs:
+    http://www.w3.org/2000/01/rdf-schema#
+  @sw010:
+    urn:x-suika-fam-cx:markup:suikawiki:0:10:
+  @t:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/tree#
+  @tc:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/TreeCore/
+  @td:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/Document/
+  @te:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/Element/
+  @test:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Test#
+  @tst:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/TreeStore/
+  @tx:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/XML/
+  @urigen:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/URI/Generic/
+  @Util:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/
+  @xml:
+    http://www.w3.org/XML/1998/namespace
+  @xml-dtd:
+    http://www.w3.org/TR/REC-xml
+  @xmlns:
+    http://www.w3.org/2000/xmlns/
+
+ElementTypeBinding:
+  @Name: CODE
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISPerl|BlockCode
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: Method
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|Method
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM
+
+ElementTypeBinding:
+  @Name: Param
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|MethodParameter
+
+ElementTypeBinding:
+  @Name: Return
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|MethodReturn
+
+ElementTypeBinding:
+  @Name: nullCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      ManakaiDOM:InCase
+    @@Value:
+      @@@is-null:1
+
+ElementTypeBinding:
+  @Name: IFQName
+  @ElementType:
+    dis:QName
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForIF
+
+ElementTypeBinding:
+  @Name: ClsQName
+  @ElementType:
+    dis:QName
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: IFISA
+  @ElementType:
+    dis:ISA
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForIF
+
+ElementTypeBinding:
+  @Name: ClsISA
+  @ElementType:
+    dis:ISA
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForClass
+
+## -- Features
+
+ElementTypeBinding:
+  @Name: FeatureDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: f|Feature
+    @@For: =ManakaiDOM|all
+
+ElementTypeBinding:
+  @Name: FeatureVerDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: f|Feature
+
+ElementTypeBinding:
+  @Name: featureQName
+  @ElementType:
+    f:name
+  @ShadowContent:
+    @@ContentType: DISCore|QName
+
+FeatureDef:
+  @QName: TSFeature
+  @featureQName: fe|TreeStore
+  @FeatureVerDef:
+    @@QName: TSFeature30
+    @@f:instanceOf: d|Feature
+    @@Version: 3.0
+    @@f:requires: c|CoreFeature30
+    @@f:requires: tx|XMLFeature30
+
+ElementTypeBinding:
+  @Name: IFClsDef
+  @ElementType: 
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType:
+      @@@@: dis|MultipleResource
+      @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
+    @@resourceFor: ManakaiDOM|ForIF
+    @@resourceFor:
+      @@@@: ManakaiDOM|ForClass
+      @@@ForCheck: ManakaiDOM|ManakaiDOMLatest
+    @@For: ManakaiDOM|DOM1
+    @@For: =ManakaiDOM|ManakaiDOM
+
+    @@DISCore:resourceType:
+      @@@@: DISLang|Interface
+      @@@ForCheck: ManakaiDOM|ForIF
+
+    @@DISCore:resourceType:
+      @@@@: DISLang|Class
+      @@@ForCheck: ManakaiDOM|ForClass
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOM||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
+
+ElementTypeBinding:
+  @Name: Test
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: test|StandaloneTest
+    @@ForCheck: ManakaiDOM|ForClass
+
+## -- Implementation
+
+IFClsDef: 
+  @IFQName: DOMImplementationTreeStore
+  @ClsQName: ManakaiDOMImplementationTreeStore
+
+  @IFISA: c|DOMImplementation
+  @ClsISA: c|ManakaiDOMImplementation
+
+  @f:provides: TSFeature30
+
+  @Test:
+    @@QName: ImplementationRegistry.getImplementation.1.test
+    @@PerlDef:
+      my $impl = $Message::DOM::ImplementationRegistry
+                   ->get_implementation ({<Q::fe|TreeStore> => '3.0'});
+      
+      $test->id ('DOMImplementationTreeStore');
+      $test->assert_isa ($impl, <IFName::DOMImplementationTreeStore>);
+
+      $test->id ('DOMImplementationTree');
+      $test->assert_isa ($impl, <IFName::c|DOMImplementation>);
+  @Test:
+    @@QName: ImplementationRegistry.getImplementation.2.test
+    @@PerlDef:
+      my $impl = $Message::DOM::ImplementationRegistry
+                   ->get_implementation ({<Q::fe|TreeStore> => '3.0',
+                                          Core => '3.0'});
+      
+      $test->id ('DOMImplementationTreeStore');
+      $test->assert_isa ($impl, <IFName::DOMImplementationTreeStore>);
+
+      $test->id ('DOMImplementationTree');
+      $test->assert_isa ($impl, <IFName::c|DOMImplementation>);
+  @Test:
+    @@QName: DOMImplementation.getFeature.1.test
+    @@PerlDef:
+      my $impl;
+      __CODE{tc|createImplForTest:: $impl => $impl}__;
+
+      my $gf = $impl->get_feature (<Q::fe|TreeStore> => '3.0');
+
+      $test->id ('DOMImplementationTreeStore');
+      $test->assert_isa ($gf, <IFName::DOMImplementationTreeStore>);
+
+      $test->id ('DOMImplementationTree');
+      $test->assert_isa ($gf, <IFName::c|DOMImplementation>);
+
+  @CODE:
+    @@QName: tst|createImplForTest
+    @@PerlDef:
+      $impl = <Class::ManakaiDOMImplementationTreeStore>->_new;
+
+  @Method:
+    @@Name: createStorableObjectFromNode
+    @@enDesc:
+      Creates a storable representation of the <IF::tc|Node>
+      and its subtree.
+    @@Param:
+      @@@Name: in
+      @@@Type: tc|Node
+      @@@enDesc:
+        The original <IF::tc|Node> to convert.
+    @@Return:
+      @@@Type: StorableObject
+      @@@enDesc:
+        A storable representation of the <P::in> node.
+      @@@dx:raises:
+        @@@@@: c|CLONE_NODE_TYPE_NOT_SUPPORTED_ERR
+        @@@@enDesc:
+          If the <P::in> node is of type other than
+          <IF::td|Document>, <IF::td|DocumentFragment>,
+          <IF::te|Element>, <IF::te|Attr>, 
+          <IF::tc|Text>, or <IF::tx|CDATASection>.
+      @@@PerlDef:
+        if ({
+          <C::tc|Node.DOCUMENT_NODE> => true,
+          <C::tc|Node.DOCUMENT_FRAGMENT_NODE> => true,
+          <C::tc|Node.ELEMENT_NODE> => true,
+          <C::tc|Node.ATTRIBUTE_NODE> => true,
+          <C::tc|Node.TEXT_NODE> => true,
+          <C::tc|Node.CDATA_SECTION_NODE> => true,
+        }->{$in-><AG::tc|Node.nodeType>}) {
+          my @target = ([$in,   # node
+                         null]); # origin
+          
+          while (@target) {
+            my $target = shift @target;
+            my $tnt = $target->[0]-><AG::tc|Node.nodeType>;
+            if ($tnt == <C::tc|Node.ELEMENT_NODE>) {
+              my $v = {};
+              
+              my $pv;
+              __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
+                $r => $pv,
+                $prop => {<H::infoset|namespaceName>},
+                $ref => {$target->[0]},
+              }__;
+              $v->{namespace_uri} = $pv if defined $pv;
+
+              __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
+                $r => $pv,
+                $prop => {<H::infoset|localName>},
+                $ref => {$target->[0]},
+              }__;
+              $v->{local_name} = $pv;
+
+              __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
+                $r => $pv,
+                $prop => {<H::infoset|prefix>},
+                $ref => {$target->[0]},
+              }__;
+              $v->{prefix} = $pv if defined $pv;
+
+              for (@{$target->[0]-><AG::tc|Node.childNodes>}) {
+                push @target, [$_, $v];
+              }
+              for (@{$target->[0]-><AG::tc|Node.attributes>}) {
+                push @target, [$_, $v];
+              }
+              if (defined $target->[1]) {
+                push @{$target->[1]->{child_nodes} ||= []}, $v;
+              } else {
+                $r = $v unless defined $r;
+              }
+            } elsif ($tnt == <C::tc|Node.ATTRIBUTE_NODE>) {
+              my $v = {
+                value => \ $target->[0]-><AG::te|Attr.value>,
+              };
+              
+              my $pv;
+              __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
+                $r => $pv,
+                $prop => {<H::infoset|namespaceName>},
+                $ref => {$target->[0]},
+              }__;
+              $v->{namespace_uri} = $pv if defined $pv;
+
+              __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
+                $r => $pv,
+                $prop => {<H::infoset|localName>},
+                $ref => {$target->[0]},
+              }__;
+              $v->{local_name} = $pv;
+
+              __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
+                $r => $pv,
+                $prop => {<H::infoset|prefix>},
+                $ref => {$target->[0]},
+              }__;
+              $v->{prefix} = $pv if defined $pv;
+
+              if (defined $target->[1]) {
+                push @{$target->[1]->{attributes} ||= []}, $v;
+              } else {
+                $r = $v unless defined $r;
+              }
+            } elsif ($tnt == <C::tc|Node.TEXT_NODE> or
+                     $tnt == <C::tc|Node.CDATA_SECTION_NODE>) {
+              my $v = {};
+              __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
+                $r => {$v->{data}},
+                $prop => {<H::infoset|content>},
+                $ref => {$target->[0]},
+              }__;
+
+              if (defined $target->[1]) {
+                push @{$target->[1]->{child_nodes} ||= []}, $v;
+              } else {
+                $r = $v unless defined $r;
+              }
+            } elsif ($tnt == <C::tc|Node.DOCUMENT_NODE>) {
+              my $v = {
+                xml_version => $target->[0]-><AG::td|Document.xmlVersion>,
+              };
+              
+              for (@{$target->[0]-><AG::tc|Node.childNodes>}) {
+                push @target, [$_, $v];
+              }
+              $r = $v unless defined $r;
+            } elsif ($tnt == <C::tc|Node.DOCUMENT_FRAGMENT_NODE>) {
+              my $v = {};
+              
+              for (@{$target->[0]-><AG::tc|Node.childNodes>}) {
+                push @target, [$_, $v];
+              }
+              $r = $v unless defined $r;
+            } elsif ($tnt == <C::tc|Node.ENTITY_REFERENCE_NODE>) {
+              for (@{$target->[0]-><AG::tc|Node.childNodes>}) {
+                push @target, [$_, $target->[1]];
+              }
+            }
+          }
+        } else {
+          __EXCEPTION{c|CLONE_NODE_TYPE_NOT_SUPPORTED_ERR::
+            MDOMX|param-name => 'in',
+            c|node => {$in},
+          }__;
+        }
+
+  @Method:
+    @@Name: createNodeFromStorableObject
+    @@enDesc:
+      Creates a <IF::tc|Node> and its subtree from a storable representation.
+    @@Param:
+      @@@Name: in
+      @@@Type: StorableObject
+      @@@enDesc:
+        The original node storable representation to convert.
+    @@Param:
+      @@@Name: od
+      @@@Type: td|Document
+      @@@enDesc:
+        The owner document to which the generated nodes
+        belong.  If the top-level <P::in> object represents
+        a document, this parameter <kwd:MUST> be ignored.
+      @@@nullCase:
+        @@@@enDesc:
+          A new empty <IF::td|Document> is created.  If the top-level
+          <P::in> object represents a document, the created <IF::td|Document>
+          <kwd:MUST> be modified so that it represents that document.
+    @@Return:
+      @@@Type: tc|Node
+      @@@enDesc:
+        A <IF::tc|Node> created from the top-level <P::in> object.
+      @@@PerlDef:
+        __DEEP{
+          $od = $self-><M::c|DOMImplementation.createDocument>;
+          my $orig_strict = $od-><AG::td|Document.strictErrorChecking>;
+          $od-><AS::td|Document.strictErrorChecking> (false);
+
+          my @target = ([$in,
+                         null,   # parent node
+                         null]); # owner element
+          while (@target) {
+            my $target = shift @target;
+            if (defined $target->[0]->{local_name}) {
+              if (defined $target->[0]->{value}) {
+              # Attribute
+                my $node = $od-><M::td|Document.createAttributeNS>
+                                  ($target->[0]->{namespace_uri},
+                                   [$target->[0]->{prefix},
+                                    $target->[0]->{local_name}]);
+                $node-><M::tc|Node.manakaiAppendText> ($target->[0]->{value});
+                if (defined $target->[2]) {
+                  $target->[2]-><M::te|Element.setAttributeNodeNS> ($node);
+                } else {
+                  $r = $node unless defined $r;
+                }
+              } else {
+              # Element
+                my $node = $od-><M::td|Document.createElementNS>
+                                  ($target->[0]->{namespace_uri},
+                                   [$target->[0]->{prefix},
+                                    $target->[0]->{local_name}]);
+                for (@{ref $target->[0]->{child_nodes} eq 'ARRAY'
+                         ? $target->[0]->{child_nodes} : []}) {
+                  push @target, [$_, $node];
+                }
+                for (@{ref $target->[0]->{attributes} eq 'ARRAY'
+                         ? $target->[0]->{attributes} : []}) {
+                  push @target, [$_, null, $node];
+                }
+                if (defined $target->[1]) {
+                  $target->[1]-><M::tc|Node.appendChild> ($node);
+                } else {
+                  $r = $node unless defined $r;
+                }
+              }
+            } elsif (defined $target->[0]->{data}) {
+            # Text
+              if (defined $target->[1]) {
+                $target->[1]-><M::tc|Node.manakaiAppendText>
+                                ($target->[0]->{data});
+              } elsif (not defined $r) {
+                $r = $od-><M::td|Document.createTextNode> ('');
+                $r-><M::tc|Node.manakaiAppendText> ($target->[0]->{data});
+              }
+            } elsif (defined $target->[0]->{xml_version}) {
+            # Document
+              my $node = $self-><M::c|DOMImplementation.createDocument>;
+              $node-><AS::td|Document.strictErrorChecking> (false);
+              $node-><AG::td|Document.domConfig>
+                   -><M::c|DOMConfiguration.setParameter>
+                       (<Q::cfg|strict-document-children> => false);
+              $node-><AS::td|Document.xmlVersion> ($target->[0]->{xml_version});
+              for (@{ref $target->[0]->{child_nodes} eq 'ARRAY'
+                       ? $target->[0]->{child_nodes} : []}) {
+                push @target, [$_, $node];
+              }
+              unless (defined $r) {
+                $r = $node;
+                $od = $node;
+                $orig_strict = true;
+              }
+            } else {
+            # Document fragment
+              unless (defined $r) {
+                $r = $od-><M::td|Document.createDocumentFragment>;
+                for (@{ref $target->[0]->{child_nodes} eq 'ARRAY'
+                         ? $target->[0]->{child_nodes} : []}) {
+                  push @target, [$_, $r];
+                }
+              }
+            }
+          }
+          $od-><AS::td|Document.strictErrorChecking> ($orig_strict);
+          if ($r-><AG::tc|Node.nodeType> == <C::tc|Node.DOCUMENT_NODE>) {
+            $r-><AG::td|Document.domConfig>
+              -><M::c|DOMConfiguration.setParameter>
+                  (<Q::cfg|strict-document-children> => null);
+          }
+        }__;
+
+  @Test:
+    @@QName: TreeStore.1.test
+    @@enDesc:
+      A non-NS element.
+    @@PerlDef:
+      my $impl;
+      __CODE{tst|createImplForTest:: $impl => $impl}__;
+
+      my $doc = $impl->create_document;
+
+      my $e1 = $doc->create_element_ns (null, 'element');
+
+      my $e2 = $impl->create_storable_object_from_node ($e1);
+
+      my $e3 = $impl->create_node_from_storable_object ($e2);
+
+      $test->assert_num_equals
+               (actual_value => $e3,
+                expected_value => $e1);
+  @Test:
+    @@QName: TreeStore.2.test
+    @@enDesc:
+      An NS element.
+    @@PerlDef:
+      my $impl;
+      __CODE{tst|createImplForTest:: $impl => $impl}__;
+
+      my $doc = $impl->create_document;
+
+      my $e1 = $doc->create_element_ns ('about:', 'a:element');
+
+      my $e2 = $impl->create_storable_object_from_node ($e1);
+
+      my $e3 = $impl->create_node_from_storable_object ($e2);
+
+      $test->assert_num_equals
+               (actual_value => $e3,
+                expected_value => $e1);
+  @Test:
+    @@QName: TreeStore.3.test
+    @@enDesc:
+      A non-NS attribute.
+    @@PerlDef:
+      my $impl;
+      __CODE{tst|createImplForTest:: $impl => $impl}__;
+
+      my $doc = $impl->create_document;
+
+      my $e1 = $doc->create_attribute_ns (null, 'element');
+      $e1->value ('attr value');
+
+      my $e2 = $impl->create_storable_object_from_node ($e1);
+
+      my $e3 = $impl->create_node_from_storable_object ($e2);
+
+      $test->assert_num_equals
+               (actual_value => $e3,
+                expected_value => $e1);
+  @Test:
+    @@QName: TreeStore.4.test
+    @@enDesc:
+      An NS attribute.
+    @@PerlDef:
+      my $impl;
+      __CODE{tst|createImplForTest:: $impl => $impl}__;
+
+      my $doc = $impl->create_document;
+
+      my $e1 = $doc->create_attribute_ns ('about:', 'a:element');
+      $e1->value ('attr value');
+
+      my $e2 = $impl->create_storable_object_from_node ($e1);
+
+      my $e3 = $impl->create_node_from_storable_object ($e2);
+
+      $test->assert_num_equals
+               (actual_value => $e3,
+                expected_value => $e1);
+  @Test:
+    @@QName: TreeStore.5.test
+    @@enDesc:
+      A text.
+    @@PerlDef:
+      my $impl;
+      __CODE{tst|createImplForTest:: $impl => $impl}__;
+
+      my $doc = $impl->create_document;
+
+      my $e1 = $doc->create_text_node ('text value');
+
+      my $e2 = $impl->create_storable_object_from_node ($e1);
+
+      my $e3 = $impl->create_node_from_storable_object ($e2);
+
+      $test->assert_num_equals
+               (actual_value => $e3,
+                expected_value => $e1);
+  @Test:
+    @@QName: TreeStore.6.test
+    @@enDesc:
+      A cdata section.
+    @@PerlDef:
+      my $impl;
+      __CODE{tst|createImplForTest:: $impl => $impl}__;
+
+      my $doc = $impl->create_document;
+
+      my $e1 = $doc->create_cdata_section ('text value');
+
+      my $e2 = $impl->create_storable_object_from_node ($e1);
+
+      my $e3 = $impl->create_node_from_storable_object ($e2);
+
+      $test->id ('nodeType');
+      $test->assert_num_equals
+               (actual_value => $e3->node_type,
+                expected_value => <C::tc|Node.TEXT_NODE>);
+
+      $test->id ('nodeValue');
+      $test->assert_equals
+               ($e3->node_value, $e1->node_value);
+  @Test:
+    @@QName: TreeStore.7.test
+    @@enDesc:
+      A document.
+    @@PerlDef:
+      my $impl;
+      __CODE{tst|createImplForTest:: $impl => $impl}__;
+
+      my $doc = $impl->create_document;
+
+      my $e1 = $doc;
+
+      my $e2 = $impl->create_storable_object_from_node ($e1);
+
+      my $e3 = $impl->create_node_from_storable_object ($e2);
+
+      $test->assert_num_equals
+               (actual_value => $e3,
+                expected_value => $e1);
+  @Test:
+    @@QName: TreeStore.8.test
+    @@enDesc:
+      A document fragment.
+    @@PerlDef:
+      my $impl;
+      __CODE{tst|createImplForTest:: $impl => $impl}__;
+
+      my $doc = $impl->create_document;
+
+      my $e1 = $doc->create_document_fragment;
+
+      my $e2 = $impl->create_storable_object_from_node ($e1);
+
+      my $e3 = $impl->create_node_from_storable_object ($e2);
+
+      $test->assert_num_equals
+               (actual_value => $e3,
+                expected_value => $e1);
+  @Test:
+    @@QName: TreeStore.9.test
+    @@enDesc:
+      A nesting element.
+    @@PerlDef:
+      my $impl;
+      __CODE{tst|createImplForTest:: $impl => $impl}__;
+
+      my $doc = $impl->create_document;
+
+      my $e1 = $doc->create_element_ns (null, 'el1');
+      $e1->append_child ($doc->create_element_ns (null, 'el2'));
+
+      my $e2 = $impl->create_storable_object_from_node ($e1);
+
+      my $e3 = $impl->create_node_from_storable_object ($e2);
+
+      $test->assert_num_equals
+               (actual_value => $e3,
+                expected_value => $e1);
+  @Test:
+    @@QName: TreeStore.10.test
+    @@enDesc:
+      A nesting element with text.
+    @@PerlDef:
+      my $impl;
+      __CODE{tst|createImplForTest:: $impl => $impl}__;
+
+      my $doc = $impl->create_document;
+
+      my $e1 = $doc->create_element_ns (null, 'el1');
+      $e1->manakai_append_text ('text value');
+      $e1->append_child ($doc->create_element_ns (null, 'el2'));
+
+      my $e2 = $impl->create_storable_object_from_node ($e1);
+
+      my $e3 = $impl->create_node_from_storable_object ($e2);
+
+      $test->assert_num_equals
+               (actual_value => $e3,
+                expected_value => $e1);
+  @Test:
+    @@QName: TreeStore.12.test
+    @@enDesc:
+      An element with attributes.
+    @@PerlDef:
+      my $impl;
+      __CODE{tst|createImplForTest:: $impl => $impl}__;
+
+      my $doc = $impl->create_document;
+
+      my $e1 = $doc->create_element_ns (null, 'el1');
+      $e1->set_attribute (a => 'b');
+      $e1->set_attribute_ns ('about:', 'b:c', 'd');
+
+      my $e2 = $impl->create_storable_object_from_node ($e1);
+
+      my $e3 = $impl->create_node_from_storable_object ($e2);
+
+      $test->assert_num_equals
+               (actual_value => $e3,
+                expected_value => $e1);
+  @Test:
+    @@QName: TreeStore.13.test
+    @@enDesc:
+      A document with element.
+    @@PerlDef:
+      my $impl;
+      __CODE{tst|createImplForTest:: $impl => $impl}__;
+
+      my $doc = $impl->create_document;
+
+      my $e1 = $doc;
+      $doc->append_child ($doc->create_element_ns (null, 'el1'));
+
+      my $e2 = $impl->create_storable_object_from_node ($e1);
+
+      my $e3 = $impl->create_node_from_storable_object ($e2);
+
+      $test->assert_num_equals
+               (actual_value => $e3,
+                expected_value => $e1);
+  @Test:
+    @@QName: TreeStore.14.test
+    @@enDesc:
+      A document fragment with element.
+    @@PerlDef:
+      my $impl;
+      __CODE{tst|createImplForTest:: $impl => $impl}__;
+
+      my $doc = $impl->create_document;
+
+      my $e1 = $doc->create_document_fragment;
+      $e1->append_child ($doc->create_element_ns (null, 'el1'));
+
+      my $e2 = $impl->create_storable_object_from_node ($e1);
+
+      my $e3 = $impl->create_node_from_storable_object ($e2);
+
+      $test->assert_num_equals
+               (actual_value => $e3,
+                expected_value => $e1);
+##DOMImplementationTreeStore
+
+ResourceDef:
+  @QName: StorableObject
+  @AliasFor: DOMMain|DOMObject
+  @For: ManakaiDOM|DOM3
+
+ElementTypeBinding:
+  @Name: enDesc
+  @ElementType:
+    dis:Description
+  @ShadowContent:
+    @@lang:en
+
+ElementTypeBinding:
+  @Name: enImplNote
+  @ElementType:
+    dis:ImplNote
+  @ShadowContent:
+    @@lang:en
+
+ElementTypeBinding:
+  @Name: enFN
+  @ElementType:
+    dis:FullName
+  @ShadowContent:
+    @@lang:en
+
+ElementTypeBinding:
+  @Name: PerlDef
+  @ElementType:
+    dis:Def
+  @ShadowContent:
+    @@ContentType:
+      lang:Perl
+    @@ForCheck: ManakaiDOM|ForClass

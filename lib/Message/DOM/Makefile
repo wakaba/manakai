@@ -39,7 +39,8 @@ DOM_FEATURE_DIS_FILES = DOMFeature$(DIS_SUFFIX) GenericLS$(DIS_SUFFIX)
 DOM_CORE_DIS_FILES = DOMMain.dis DOMCore.dis \
                      TreeCore$(DIS_SUFFIX) Document$(DIS_SUFFIX) \
                      Element$(DIS_SUFFIX) XML$(DIS_SUFFIX) XDoctype$(DIS_SUFFIX)
-DOM_LS_DIS_FILES   = SimpleLS$(DIS_SUFFIX) DOMLS$(DIS_SUFFIX)
+DOM_LS_DIS_FILES   = SimpleLS$(DIS_SUFFIX) DOMLS$(DIS_SUFFIX) \
+  TreeStore$(DIS_SUFFIX)
 XP_DIS_FILES       = XMLParser$(DIS_SUFFIX)
 DOM_HTML_DIS_FILES = DOMHTML.dis DOMWebForms.dis
 DIS_FILES = $(DOM_FEATURE_DIS_FILES) $(DOM_CORE_DIS_FILES) \
@@ -54,7 +55,7 @@ PM_FILES = \
   TreeCore$(PM_SUFFIX) Document$(PM_SUFFIX) Element$(PM_SUFFIX) \
   XML$(PM_SUFFIX) XDoctype$(PM_SUFFIX) \
   DOMLS$(PM_SUFFIX) XMLParser$(PM_SUFFIX) \
-  SimpleLS$(PM_SUFFIX) \
+  SimpleLS$(PM_SUFFIX) TreeStore$(PM_SUFFIX) \
   DOMHTML$(PM_SUFFIX) DOMWebForms$(PM_SUFFIX)
 
 GENERATED_FILES = $(PM_FILES)
@@ -98,5 +99,5 @@ clean-db:
 
 distclean: clean clean-db
 
-## $Date: 2006/04/02 10:45:23 $
+## $Date: 2006/04/02 12:14:43 $
 ## License: Public Domain.
