@@ -12,7 +12,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/04/01 17:52:32 $
+    $Date: 2006/04/02 10:45:24 $
 
   @Require:
     @@Module:
@@ -41,6 +41,8 @@ Module:
       @@@WithFor: ManakaiDOM|ManakaiDOM2
     @@Module:
       @@@WithFor: ManakaiDOM|ManakaiDOM3
+    @@Module:
+      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
 Namespace:
@@ -3586,7 +3588,8 @@ IFCls1Def:
         __DEEP{
           $r = '';
           my @target = @{$self-><AG::Node.childNodes>};
-          C: for my $node (@target) {
+          C: while (@target) {
+            my $node = shift @target;
             my $nt = $node-><AG::Node.nodeType>;
             if ($nt == <C::Node.TEXT_NODE> or
                 $nt == <C::Node.CDATA_SECTION_NODE>) {
@@ -3744,6 +3747,112 @@ IFCls1Def:
           }, exception_subtype => <Q::MDOMX|NOMOD_THIS>);
           $test->assert_equals ($node-><AG::Node.textContent>, 'text4');
         }
+    @@Test:
+      @@@QName: Node.textContent.3.test
+      @@@enDesc:
+        An element that has a child element.
+      @@@PerlDef:
+        my $el;
+        __CODE{tc|createElementForTest:: $el => $el}__;
+
+        my $ce = $el-><AG::Node.ownerDocument>
+                    -><M::Document.createElementNS> (null, 'e');
+        $el-><M::Node.appendChild> ($ce);
+
+        $test->id ('empty');
+        $test->assert_equals ($el-><AG::Node.textContent>, '');
+
+        $test->id ('child.child.text');
+        $ce-><AS::Node.textContent> ('gc');
+        $test->assert_equals ($el-><AG::Node.textContent>, 'gc');
+
+        $test->id ('child.text');
+        $el-><M::Node.manakaiAppendText> ('cc');
+        $test->assert_equals ($el-><AG::Node.textContent>, 'gccc');
+
+        $test->id ('set');
+        $el-><AS::Node.textContent> ('nc');
+        $test->assert_equals ($el-><AG::Node.textContent>, 'nc');
+    @@Test:
+      @@@QName: Node.textContent.4.test
+      @@@enDesc:
+        An element that has a child entity reference.
+      @@@PerlDef:
+        my $el;
+        __CODE{tc|createElementForTest:: $el => $el}__;
+
+        my $ce = $el-><AG::Node.ownerDocument>
+                    -><M::Document.createEntityReference> ('e');
+        $ce-><M::Node.manakaiSetReadOnly> (false, true);
+        $el-><M::Node.appendChild> ($ce);
+
+        $test->id ('empty');
+        $test->assert_equals ($el-><AG::Node.textContent>, '');
+
+        $test->id ('child.child.text');
+        $ce-><AS::Node.textContent> ('gc');
+        $test->assert_equals ($el-><AG::Node.textContent>, 'gc');
+
+        $test->id ('child.text');
+        $el-><M::Node.manakaiAppendText> ('cc');
+        $test->assert_equals ($el-><AG::Node.textContent>, 'gccc');
+
+        $test->id ('set');
+        $el-><AS::Node.textContent> ('nc');
+        $test->assert_equals ($el-><AG::Node.textContent>, 'nc');
+    @@Test:
+      @@@QName: Node.textContent.6.test
+      @@@enDesc:
+        An geref that has a child element.
+      @@@PerlDef:
+        my $el;
+        __CODE{tx|createERForTest:: $er => $el}__;
+
+        my $ce = $el-><AG::Node.ownerDocument>
+                    -><M::Document.createElementNS> (null, 'e');
+        $el-><M::Node.appendChild> ($ce);
+
+        $test->id ('empty');
+        $test->assert_equals ($el-><AG::Node.textContent>, '');
+
+        $test->id ('child.child.text');
+        $ce-><AS::Node.textContent> ('gc');
+        $test->assert_equals ($el-><AG::Node.textContent>, 'gc');
+
+        $test->id ('child.text');
+        $el-><M::Node.manakaiAppendText> ('cc');
+        $test->assert_equals ($el-><AG::Node.textContent>, 'gccc');
+
+        $test->id ('set');
+        $el-><AS::Node.textContent> ('nc');
+        $test->assert_equals ($el-><AG::Node.textContent>, 'nc');
+    @@Test:
+      @@@QName: Node.textContent.7.test
+      @@@enDesc:
+        An geref that has a child entity reference.
+      @@@PerlDef:
+        my $el;
+        __CODE{tx|createERForTest:: $er => $el}__;
+
+        my $ce = $el-><AG::Node.ownerDocument>
+                    -><M::Document.createEntityReference> ('e');
+        $ce-><M::Node.manakaiSetReadOnly> (false, true);
+        $el-><M::Node.appendChild> ($ce);
+
+        $test->id ('empty');
+        $test->assert_equals ($el-><AG::Node.textContent>, '');
+
+        $test->id ('child.child.text');
+        $ce-><AS::Node.textContent> ('gc');
+        $test->assert_equals ($el-><AG::Node.textContent>, 'gc');
+
+        $test->id ('child.text');
+        $el-><M::Node.manakaiAppendText> ('cc');
+        $test->assert_equals ($el-><AG::Node.textContent>, 'gccc');
+
+        $test->id ('set');
+        $el-><AS::Node.textContent> ('nc');
+        $test->assert_equals ($el-><AG::Node.textContent>, 'nc');
 
   @ResourceDef:
     @@QName: tc|setNodeTextContent

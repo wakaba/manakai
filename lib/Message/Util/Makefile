@@ -125,16 +125,20 @@ $(NS_UTIL_DIS_PM_FILES): %$(PM_SUFFIX): %$(DIS_SUFFIX) $(DAF_PL)
 	  --create-perl-module="$(NS_MDOM)GenericLS  ../DOM/GenericLS$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_MDOM)DOMMain    ../DOM/DOMMain$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_MDOM)DOMCore    ../DOM/DOMCore$(PM_SUFFIX)" \
-	  --create-perl-module="$(NS_MDOM)Tree       ../DOM/Tree$(PM_SUFFIX)" \
-	  --create-perl-module="$(NS_MDOM)DOMXML     ../DOM/DOMXML$(PM_SUFFIX)" \
+	  --create-perl-module="$(NS_MDOM)TreeCore   ../DOM/TreeCore$(PM_SUFFIX)" \
+	  --create-perl-module="$(NS_MDOM)Document   ../DOM/Document$(PM_SUFFIX)" \
+	  --create-perl-module="$(NS_MDOM)Element    ../DOM/Element$(PM_SUFFIX)" \
+	  --create-perl-module="$(NS_MDOM)XML        ../DOM/XML$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_MDOM)XDoctype   ../DOM/XDoctype$(PM_SUFFIX)"
 	$(PERL_CHK) PerlCode$(PM_SUFFIX)
 	$(PERL_CHK) ../DOM/DOMFeature$(PM_SUFFIX)
 	$(PERL_CHK) ../DOM/GenericLS$(PM_SUFFIX)
 	$(PERL_CHK) ../DOM/DOMMain$(PM_SUFFIX)
 	$(PERL_CHK) ../DOM/DOMCore$(PM_SUFFIX)
-	$(PERL_CHK) ../DOM/Tree$(PM_SUFFIX)
-	$(PERL_CHK) ../DOM/DOMXML$(PM_SUFFIX)
+	$(PERL_CHK) ../DOM/TreeCore$(PM_SUFFIX)
+	$(PERL_CHK) ../DOM/Document$(PM_SUFFIX)
+	$(PERL_CHK) ../DOM/Element$(PM_SUFFIX)
+	$(PERL_CHK) ../DOM/XML$(PM_SUFFIX)
 	$(PERL_CHK) ../DOM/XDoctype$(PM_SUFFIX)
 	$(TOUCH) $@
 	$(TOUCH) ../DOM/.core$(PM_SUFFIX)
@@ -154,5 +158,5 @@ clean-db:
 
 distclean: clean clean-db
 
-## $Date: 2006/03/31 16:44:25 $
+## $Date: 2006/04/02 10:45:24 $
 ## License: Public Domain.

@@ -10,13 +10,16 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/03/16 08:52:32 $
+    $Date: 2006/04/02 10:45:24 $
 
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
   @Require:
     @@Module:
       @@@QName: MDOM|DOMLS
+      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
+    @@Module:
+      @@@QName: MDOM|XML
       @@@WithFor: ManakaiDOM|ManakaiDOMLatest
     @@Module:
       @@@QName: MDOM|XDoctype
@@ -69,8 +72,16 @@ Namespace:
     http://www.w3.org/2000/01/rdf-schema#
   @t:
     http://suika.fam.cx/~wakaba/archive/2004/dom/tree#
+  @tc:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/TreeCore/
+  @td:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/Document/
+  @te:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/Element/
   @test:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Test#
+  @tx:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/XML/
   @urigen:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/URI/Generic/
   @x:
@@ -115,17 +126,22 @@ ResourceDef:
 
 ResourceDef:
   @QName: Node
-  @AliasFor: t|Node
+  @AliasFor: tc|Node
   @For: ManakaiDOM|DOM
 
 ResourceDef:
   @QName: Element
-  @AliasFor: t|Element
+  @AliasFor: te|Element
+  @For: ManakaiDOM|DOM
+
+ResourceDef:
+  @QName: Attr
+  @AliasFor: te|Attr
   @For: ManakaiDOM|DOM
 
 ResourceDef:
   @QName: Document
-  @AliasFor: t|Document
+  @AliasFor: td|Document
   @For: ManakaiDOM|DOM
 
 ResourceDef:
@@ -146,6 +162,16 @@ ResourceDef:
 ResourceDef:
   @QName: ATDef
   @AliasFor: d|AttributeDefinition
+  @For: ManakaiDOM|DOM
+
+ResourceDef:
+  @QName: GE
+  @AliasFor: tx|Entity
+  @For: ManakaiDOM|DOM
+
+ResourceDef:
+  @QName: GERef
+  @AliasFor: tx|EntityReference
   @For: ManakaiDOM|DOM
 
 ElementTypeBinding:
@@ -471,7 +497,7 @@ ClsDef:
         The newly created parser.
       @@@PerlDef:
         $r = bless {
-          <H::DOMCore:implementation> => $impl,
+          <H::f|implementation> => $impl,
         }, $self;
 
   @Method:
@@ -599,7 +625,7 @@ ClsDef:
           ## Declared attributes.
 
         __DEEP{
-          $r = $self->{<H::c|implementation>}-><M::DOMImpl.createDocument>;
+          $r = $self->{<H::f|implementation>}-><M::DOMImpl.createDocument>;
           $self->{doc} = $r;
             ## |Document| object.
           CORE::delete $self->{docx};
@@ -616,14 +642,6 @@ ClsDef:
             ##       methods on DOM nodes are disabled.  It might result
             ##       in creating an ill-formed DOM tree when parser
             ##       errors are traped by |error-handler|.
-          $self->{doc_cfg}-><M::c|DOMConfiguration.setParameter>
-                              (<Q::cfg|entity-reference-read-only> => false);
-            ## NOTE: Turn this configuration parameter off is required
-            ##       because entity reference subtree is created by
-            ##       the parser rather than |createEntityReference|'s
-            ##       cloning.  Parser's |cfg:entity-reference-read-only|
-            ##       configuration parameter controls whether generated
-            ##       subtree is then marked as read-only or not.
           $self->{doc_cfg}-><M::c|DOMConfiguration.setParameter>
                               (<Q::cfg|clone-entity-reference-subtree> => true);
             ## NOTE: Turn this configuration parameter on makes 
@@ -675,19 +693,18 @@ ClsDef:
                 $self->{char} = [];
                 local $ent->{is_opened} = true;
                 ## TODO: External entity support
+                $ent->{node}-><M::Node.manakaiSetReadOnly> (false, true);
                 $self->_parse_InternalGeneralParsedEntity ($ent->{node});
-                $ent->{node}-><AS::x|Entity.hasReplacementTree> (true);
+                $ent->{node}-><AS::GE.hasReplacementTree> (true);
+                $ent->{node}-><M::Node.manakaiSetReadOnly> (true, true);
                 $self->{entity}->[-1]->{close_file}->();
-              ## ISSUE: Should errors detected by this phase result
-              ##        in |DOMLS:PARSE_ERR| exception thrown?
-            }
-              ## TODO: Read-only if configuration (for all entities)
+                ## ISSUE: Should errors detected by this phase result
+                ##        in |DOMLS:PARSE_ERR| exception thrown?
+              }
             }
           } # cfg|entity-replacement-tree
 
           ## Turns flags to their default value
-          $self->{doc_cfg}-><M::c|DOMConfiguration.setParameter>
-                              (<Q::cfg|entity-reference-read-only> => null);
           $self->{doc_cfg}-><M::c|DOMConfiguration.setParameter>
                               (<Q::cfg|clone-entity-reference-subtree> => null);
           $self->{doc_cfg}-><M::c|DOMConfiguration.setParameter>
@@ -1424,7 +1441,7 @@ ClsDef:
           
           $pi = $doc-><M::Document.createProcessingInstruction>
                         ($name);
-          $pi-><AS::x|ProcessingInstruction.manakaiBaseURI>
+          $pi-><AS::tx|ProcessingInstruction.manakaiBaseURI>
                  ($self->{location}->{base_uri});
         }      
       } else {
@@ -1784,13 +1801,11 @@ ClsDef:
                 }
               }
               if ($attrs->{xmlns}->{def}) {
-                __CODE{t|setAttrType::
-                  $attr => $attr,
-                  $type => {$attrs->{xmlns}->{def}-><AG::ATDef.declaredType>},
-                }__;
+                $attr-><AS::Attr.manakaiAttributeType>
+                         ($attrs->{xmlns}->{def}-><AG::ATDef.declaredType>);
               }
               $el-><M::Element.setAttributeNodeNS> ($attr);
-              $attr-><AS::t|Attr.specified> (false)
+              $attr-><AS::Attr.specified> (false)
                 if $attrs->{xmlns}->{is_default};
             }
             
@@ -1806,13 +1821,11 @@ ClsDef:
                 }
               }
               if ($attrs->{$lname}->{def}) {
-                __CODE{t|setAttrType::
-                  $attr => $attr,
-                  $type => {$attrs->{$lname}->{def}-><AG::ATDef.declaredType>},
-                }__;
+                $attr-><AS::Attr.manakaiAttributeType>
+                         ($attrs->{$lname}->{def}-><AG::ATDef.declaredType>);
               }
               $el-><M::Element.setAttributeNodeNS> ($attr);
-              $attr-><AS::t|Attr.specified> (false)
+              $attr-><AS::Attr.specified> (false)
                 if $attrs->{$lname}->{is_default};
             }
             
@@ -1857,7 +1870,7 @@ ClsDef:
                     unless ($continue) {
                       __CODE{ParseError}__;
                     }
-                    unless ($attr-><AG::t|Attr.specified>) {
+                    unless ($attr-><AG::Attr.specified>) {
                       ## It is a default attribute
                       $attr = $doc-><M::Document.createAttributeNS>
                                       ($ns->{$pfx}, $name);
@@ -1882,14 +1895,12 @@ ClsDef:
                   }
                 }
                 if ($gattr{$pfx}->{$lname}->{def}) {
-                  __CODE{t|setAttrType::
-                    $attr => $attr,
-                    $type => {$gattr{$pfx}->{$lname}
-                                    ->{def}-><AG::ATDef.declaredType>},
-                  }__;
+                  $attr-><AS::Attr.manakaiAttributeType>
+                           ($gattr{$pfx}->{$lname}->{def}
+                                        -><AG::ATDef.declaredType>);
                 }
                 $el-><M::Element.setAttributeNodeNS> ($attr);
-                $attr-><AS::t|Attr.specified> (false)
+                $attr-><AS::Attr.specified> (false)
                   if $gattr{$pfx}->{$lname}->{is_default};
               } # PFX
             }
@@ -2726,6 +2737,7 @@ ClsDef:
           
           $er = $doc-><M::Document.createEntityReference>
                            ($name);
+          $er-><M::Node.manakaiSetReadOnly> (false, true);
           $er-><AS::Node.textContent> ('');
             ## NOTE: When document entity (and entities referenced directly
             ##       or indirectly from it) is parsed, no general entity
@@ -2753,7 +2765,7 @@ ClsDef:
             }                 # Otherwise VC error
             push @{$self->{entity}}, <Code::getEmptyEntityState::
                                               $name = $name>;
-            $er-><AS::x|EntityReference.manakaiExpanded> (false);
+            $er-><AS::GERef.manakaiExpanded> (false);
 
           } else {         # there IS entity declaration
             if (($self->{standalone} or not $self->{has_xref}) and
@@ -2773,7 +2785,7 @@ ClsDef:
                 __CODE{ParseError}__;
               }
             }          
-            $er-><AS::x|EntityReference.manakaiExpanded>
+            $er-><AS::GERef.manakaiExpanded>
                    ($ent->{has_replacement_text});
             push @{$self->{entity}}, <Code::getCopyOfEntityState::
                                             $entity_type = 'general_entity',
@@ -2811,7 +2823,7 @@ ClsDef:
               }
               open my $empty, '<', \'';
               $self->{entity}->[-1]->{fh} = $empty;
-              $er-><AS::x|EntityReference.manakaiExpanded> (false);
+              $er-><AS::GERef.manakaiExpanded> (false);
             } # recursive
             $ent->{is_opened} = true;
           } # entity declared
@@ -2833,9 +2845,9 @@ ClsDef:
           $self->{char} = pop @{$self->{entity_char}};
           pop (@{$self->{entity}})->{close_file}->();
           $self->{location} = $self->{entity}->[-1];
-        }
 
-        // TODO: Set read-only flag
+          $er-><M::Node.manakaiSetReadOnly> (true, true);
+        }
 
         ?lexmode EntityReference;
         ?requires-next-token;
@@ -2890,6 +2902,7 @@ ClsDef:
           __CODE{checkNCName:: $name => $name}__;
           
           $er = $self->{doc}-><M::Document.createEntityReference> ($name);
+          $er-><M::Node.manakaiSetReadOnly> (false, true);
           $er-><AS::Node.textContent> ('');
             ## NOTE: When document entity (and entities referenced directly
             ##       or indirectly from it) is parsed, no general entity
@@ -2915,7 +2928,7 @@ ClsDef:
             }                 # Otherwise VC error
             push @{$self->{entity}}, <Code::getEmptyEntityState::
                                               $name = $name>;
-            $er-><AS::x|EntityReference.manakaiExpanded> (false);
+            $er-><AS::GERef.manakaiExpanded> (false);
 
           } else {         # there IS entity declaration
             if (($self->{standalone} or not $self->{has_xref}) and
@@ -2953,7 +2966,7 @@ ClsDef:
               ## NOTE: |xp:wf-parsed-entity| is not checked
             } # if external entity
 
-            $er-><AS::x|EntityReference.manakaiExpanded>
+            $er-><AS::GERef.manakaiExpanded>
                    ($ent->{has_replacement_text});
             push @{$self->{entity}}, <Code::getCopyOfEntityState::
                                             $entity_type = 'general_entity',
@@ -2975,7 +2988,7 @@ ClsDef:
               }
               open my $empty, '<', \'';
               $self->{entity}->[-1]->{fh} = $empty;
-              $er-><AS::x|EntityReference.manakaiExpanded> (false);
+              $er-><AS::GERef.manakaiExpanded> (false);
             } # recursive
             $ent->{is_opened} = true;
           }
@@ -2998,9 +3011,9 @@ ClsDef:
           $self->{char} = pop @{$self->{entity_char}};
           pop (@{$self->{entity}})->{close_file}->();
           $self->{location} = $self->{entity}->[-1];
-        }
 
-        // TODO: Set read-only flag
+          $er-><M::Node.manakaiSetReadOnly> (true, true);
+        }
 
         ?lexmode EntityReference;
         ?requires-next-token;
@@ -3048,6 +3061,7 @@ ClsDef:
           __CODE{checkNCName:: $name => $name}__;
 
           $er = $self->{doc}-><M::Document.createEntityReference> ($name);
+          $er-><M::Node.manakaiSetReadOnly> (false, true);
           $er-><AS::Node.textContent> ('');
             ## NOTE: When document entity (and entities referenced directly
             ##       or indirectly from it) is parsed, no general entity
@@ -3073,7 +3087,7 @@ ClsDef:
             }                 # Otherwise VC error
             push @{$self->{entity}}, <Code::getEmptyEntityState::
                                               $name = $name>;
-            $er-><AS::x|EntityReference.manakaiExpanded> (false);
+            $er-><AS::GERef.manakaiExpanded> (false);
 
           } else {         # there IS entity declaration
             if (($self->{standalone} or not $self->{has_xref}) and
@@ -3111,7 +3125,7 @@ ClsDef:
               ## NOTE: |xp:wf-parsed-entity| is not checked
             } # if external entity
 
-            $er-><AS::x|EntityReference.manakaiExpanded>
+            $er-><AS::GERef.manakaiExpanded>
                    ($ent->{has_replacement_text});
             push @{$self->{entity}}, <Code::getCopyOfEntityState::
                                             $entity_type = 'general_entity',
@@ -3133,7 +3147,7 @@ ClsDef:
               }
               open my $empty, '<', \'';
               $self->{entity}->[-1]->{fh} = $empty;
-              $er-><AS::x|EntityReference.manakaiExpanded> (false);
+              $er-><AS::GERef.manakaiExpanded> (false);
             } # recursive
             $ent->{is_opened} = true;
           }
@@ -3156,9 +3170,9 @@ ClsDef:
           $self->{char} = pop @{$self->{entity_char}};
           pop (@{$self->{entity}})->{close_file}->();
           $self->{location} = $self->{entity}->[-1];
-        }
 
-        // TODO: Set read-only flag
+          $er-><M::Node.manakaiSetReadOnly> (true, true);
+        }
 
         ?lexmode EntityReference;
         ?requires-next-token;
@@ -3277,6 +3291,7 @@ ClsDef:
       // TODO: Read and process external subset if any.
       lang:Perl {
         $self->{dont_process} = true if $has_extid;
+        $node-><M::Node.manakaiSetReadOnly> (true, true);
       }
 
       // ~ (MDC) { }
@@ -3372,8 +3387,8 @@ ClsDef:
 
       ~? (STRING) {
         lang:Perl ($v => $token.value) {
-          $decl-><AS::x|Entity.systemId> ($v);
-          $decl-><AS::x|Entity.manakaiDeclarationBaseURI>
+          $decl-><AS::GE.systemId> ($v);
+          $decl-><AS::GE.manakaiDeclarationBaseURI>
                    ($self->{location}->{base_uri});
         }
       }
@@ -3962,7 +3977,7 @@ ClsDef:
             lang:Perl ($v => $token.value) : has-error {
               __CODE{checkNCName:: $name => $v}__;
               $decl->{notation} = $v;
-              $decl->{node}-><AG::x|Entity.notationName> ($v);
+              $decl->{node}-><AG::GE.notationName> ($v);
             }
           }
 
@@ -15212,6 +15227,237 @@ ClsDef:
       @@@cfg:entity-replacement-tree: 1
       @@@c:erred: <[[xp|wf-syntax-error]]> { (1, 1)..(1, 2); }
 
+    @@XMLTest:
+      @@@QName: xp.dtdecl.readonly.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE p>
+          <p/>
+      @@@test:domTree:
+        document {
+          document-type {
+            manakai-read-only: true;
+          }
+          element {
+            manakai-read-only: false;
+          }
+          manakai-read-only: false;
+        }
+    @@XMLTest:
+      @@@QName: xp.entity.decl.readonly.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE p [
+            <!ENTITY ent "val">
+          ]>
+          <p/>
+      @@@cfg:entity-replacement-tree: 1
+      @@@test:domTree:
+        document {
+          document-type {
+            general-entity {
+              node-name: 'ent';
+              manakai-read-only: true;
+              has-replacement-tree: true;
+            }
+            manakai-read-only: true;
+          }
+          element {
+            manakai-read-only: false;
+          }
+          manakai-read-only: false;
+        }
+    @@XMLTest:
+      @@@QName: xp.entity.decl.readonly.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE p [
+            <!ENTITY ent "val">
+          ]>
+          <p/>
+      @@@test:domTree:
+        document {
+          document-type {
+            general-entity {
+              node-name: 'ent';
+              manakai-read-only: true;
+            }
+            manakai-read-only: true;
+          }
+          element {
+            manakai-read-only: false;
+          }
+          manakai-read-only: false;
+        }
+    @@XMLTest:
+      @@@QName: xp.notation.decl.readonly.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE p [
+            <!NOTATION ent SYSTEM "val">
+          ]>
+          <p/>
+      @@@test:domTree:
+        document {
+          document-type {
+            notation {
+              node-name: 'ent';
+              manakai-read-only: true;
+            }
+            manakai-read-only: true;
+          }
+          element {
+            manakai-read-only: false;
+          }
+          manakai-read-only: false;
+        }
+    @@XMLTest:
+      @@@QName: xp.dtd.pi.readonly.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE p [
+            <?pi content?>
+          ]>
+          <p/>
+      @@@test:domTree:
+        document {
+          document-type {
+            pi {
+              node-name: 'pi';
+              manakai-read-only: true;
+            }
+            manakai-read-only: true;
+          }
+          element {
+            manakai-read-only: false;
+          }
+          manakai-read-only: false;
+        }
+    @@XMLTest:
+      @@@QName: xp.dtd.attlist.decl.readonly.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE p [
+            <!ATTLIST p
+              attr CDATA #IMPLIED
+            >
+          ]>
+          <p/>
+      @@@test:domTree:
+        document {
+          document-type {
+            element-type-definition {
+              node-name: 'p';
+              attribute-definition {
+                node-name: 'attr';
+                manakai-read-only: true;
+              }
+              manakai-read-only: true;
+            }
+            manakai-read-only: true;
+          }
+          element {
+            manakai-read-only: false;
+          }
+          manakai-read-only: false;
+        }
+    @@XMLTest:
+      @@@QName: xp.general.entity.reference.readonly.1.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE p [
+            <!ENTITY ent "val">
+          ]>
+          <p>&ent;</p>
+      @@@test:domTree:
+        document {
+          document-type {
+            general-entity {
+              node-name: 'ent';
+              manakai-read-only: true;
+            }
+            manakai-read-only: true;
+          }
+          element {
+            general-entity-reference {
+              text {
+                manakai-read-only: true;
+              }
+              manakai-read-only: true;
+            }
+            manakai-read-only: false;
+          }
+          manakai-read-only: false;
+        }
+    @@XMLTest:
+      @@@QName: xp.general.entity.reference.readonly.2.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE p [
+            <!ENTITY ent "val">
+          ]>
+          <p attr="&ent;"/>
+      @@@test:domTree:
+        document {
+          document-type {
+            general-entity {
+              node-name: 'ent';
+              manakai-read-only: true;
+            }
+            manakai-read-only: true;
+          }
+          element {
+            attribute {
+              node-name: 'attr';
+              general-entity-reference {
+                text {
+                  manakai-read-only: true;
+                }
+                manakai-read-only: true;
+              }
+              manakai-read-only: false;
+            }
+            manakai-read-only: false;
+          }
+          manakai-read-only: false;
+        }
+    @@XMLTest:
+      @@@QName: xp.general.entity.reference.readonly.3.test
+      @@@DEnt:
+        @@@@test:value:
+          <!DOCTYPE p [
+            <!ENTITY ent1 "val">
+            <!ENTITY ent2 "&ent1;">
+          ]>
+          <p>&ent2;</p>
+      @@@test:domTree:
+        document {
+          document-type {
+            general-entity {
+              node-name: 'ent1';
+              manakai-read-only: true;
+            }
+            general-entity {
+              node-name: 'ent2';
+              manakai-read-only: true;
+            }
+            manakai-read-only: true;
+          }
+          element {
+            general-entity-reference {
+              general-entity-reference {
+                text {
+                  manakai-read-only: true;
+                }
+                manakai-read-only: true;
+              }
+              manakai-read-only: true;
+            }
+            manakai-read-only: false;
+          }
+          manakai-read-only: false;
+        }
+
     @@PerlDef:
       my $impl = $Message::DOM::ImplementationRegistry->get_implementation ({
         'Core' => '3.0',
@@ -16430,7 +16676,7 @@ boolCParam:
     @@c:isSupported: 1
     @@enDesc:
       The parser <kwd:MUST> cnstruct the replacement subtree of
-      a general parsed <IF::x|Entity> node if the replacement text
+      a general parsed <IF::tx|Entity> node if the replacement text
       for the node is available.
 
       If this value is set to the parameter, then a fatal error 
@@ -16444,7 +16690,7 @@ boolCParam:
     @@c:isSupported: 1
     @@IsSupportRequired: 1
     @@enDesc:
-      The parser don't have to construct <IF::x|Entity> replacement
+      The parser don't have to construct <IF::tx|Entity> replacement
       subtrees.
 
   @Test:

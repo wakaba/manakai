@@ -28,14 +28,15 @@ Module:
   @License:
      license:Perl+MPL
   @Date:
-    $Date: 2006/03/16 08:52:32 $
+    $Date: 2006/04/02 10:45:22 $
 
   @Require:
     @@Module:
       @@@QName: MDOM|GenericLS
       @@@WithFor: ManakaiDOM|ManakaiDOMLatest
     @@Module:
-      @@@QName: MDOM|DOMXML
+      @@@QName: MDOM|XML
+      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
 #     @@Module:
 #        @@@Name:  DOMEvents
 ## TODO: Implement these modules
@@ -93,12 +94,16 @@ Namespace:
     http://www.w3.org/1999/02/22-rdf-syntax-ns#
   @rdfs:
     http://www.w3.org/2000/01/rdf-schema#
+  @tc:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/TreeCore/
+  @td:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/Document/
+  @te:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/Element/
   @test:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Test#
-  @xml:
-    http://www.w3.org/XML/1998/namespace
-  @xmlns:
-    http://www.w3.org/2000/xmlns/
+  @tx:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/XML/
 
 ## -- Features
 
@@ -166,7 +171,7 @@ FeatureDef:
   @featureQName: DOMLS|ParseString
   @FeatureVerDef:
     @@QName: DOMLS|ParseString10
-    @@f:requires: DOMXML|XMLVersionFeature10
+    @@f:requires: tx|XMLVersionFeature10
     @@f:version: 1.0
     @@f:instanceOf: DOMLS|ParseString
     @@enDesc:
@@ -184,7 +189,7 @@ FeatureDef:
       reasonal subset of it.  Applications can request how much level
       the parser supports the parsing of XML by specifying other features
       when they obtains a parser. The method passes the parsed
-      document as a <IF::DOMCore|Document||ManakaiDOM|ManakaiDOM>
+      document as a <IF::Document||ManakaiDOM|ManakaiDOM>
       object by the way as the <M::DOMLS|LSParser
       ||ManakaiDOM|ManakaiDOM3.parse> method would do.
 
@@ -377,16 +382,14 @@ DataTypeDef:
 DataTypeDef:
   @Name:  Node
   @AliasFor:
-    @@@:
-      DOMCore:Node
+    @@@: tc|Node
     @@For:
       !ManakaiDOM:IDL
   @Def:
     @@For:
       ManakaiDOM:IDL
     @@DISLang:dataTypeAliasFor:
-      @@@@:
-        DOMCore:Node
+      @@@@: tc|Node
       @@@ContentType:
         dis:TypeQName
     @@ContentType: lang|dis
@@ -395,16 +398,14 @@ DataTypeDef:
 DataTypeDef:
   @Name:  Document
   @AliasFor:
-    @@@:
-      DOMCore:Document
+    @@@: td|Document
     @@For:
       !ManakaiDOM:IDL
   @Def:
     @@For:
       ManakaiDOM:IDL
     @@DISLang:dataTypeAliasFor:
-      @@@@:
-        DOMCore:Document
+      @@@@: td|Document
       @@@ContentType:
         dis:TypeQName
     @@ContentType: lang|dis
@@ -413,16 +414,14 @@ DataTypeDef:
 DataTypeDef:
   @Name:  Element
   @AliasFor:
-    @@@:
-      DOMCore:Element
+    @@@: te|Element
     @@For:
       !ManakaiDOM:IDL
   @Def:
     @@For:
       ManakaiDOM:IDL
     @@DISLang:dataTypeAliasFor:
-      @@@@:
-        DOMCore:Element
+      @@@@: te|Element
       @@@ContentType:
         dis:TypeQName
     @@ContentType: lang|dis
@@ -503,9 +502,6 @@ ResourceDef:
   @DISPerl:ISA:
     @@@: dx|Exception||ManakaiDOM|Perl
     @@ForCheck: ManakaiDOM|ForClass
-  @DISPerl:ISA:
-    @@@: ManakaiDOM|ManakaiDOMObject
-    @@ForCheck: ManakaiDOM|ForClass
 
   @IFQName: LSException
   @ClsQName: ManakaiDOMLSException
@@ -556,7 +552,7 @@ ResourceDef:
         @@@Description:
           @@@@lang:en
           @@@@@:
-            An attempt was made to serialize a <IF::DOMCore:Node> using 
+            An attempt was made to serialize a <IF::Node> using 
             <IF::LSSerializer> and the processing has been stop.
 ##LSException
 
@@ -1288,8 +1284,6 @@ IFCls3Def:
   @IFQName: LSInput
   @ClsQName: ManakaiDOMLSInput
 
-  @ClsISA: ManakaiDOM|ManakaiDOMObject
-
   @f:implements: LSAsyncFeature30
 
   @Description:
@@ -1845,7 +1839,7 @@ IFDef:
       Serializing (writing) a DOM document or <IF::Node> out into XML. 
       \
       <IF::LSSerializer> accepts any type of node for serialization. 
-      If the node is a <IF::DOMCore:Document> or <IF::DOMXML:Entity>,
+      If the node is a <IF::Document> or <IF::tx|Entity>,
       a well-formed XML document or external (respectively) entity will
       be created when possible.  For all other types, the serialized form 
       is implementation dependent.
@@ -1870,25 +1864,25 @@ IFDef:
   @ImplNote:
     @@lang:en
     @@@:
-      {P:: Within a <IF::DOMCore:Document>, <IF::DOMCore:DocumentFragment> or 
-      <IF::DOMXML:Entity>:
+      {P:: Within a <IF::Document>, <IF::td|DocumentFragment> or 
+      <IF::tx|Entity>:
       \
-      - <IF::DOMCore:Document>:: The entire document is written, including the
+      - <IF::Document>:: The entire document is written, including the
         XML declaration (unless <CP::xml-declaration> is set to <DOM::false>) 
         and the document type declaration internal subset, if exists. 
       \
-      - <IF::DOMXML:Entity>:: When written directly by <M::LSSerializer.write>, 
+      - <IF::tx|Entity>:: When written directly by <M::LSSerializer.write>, 
         the entity expansion is outputed without namespace fixup.
       \
-      - <IF::DOMXML:EntityReference>:: If <CP::entities> is set to <DOM::true>
+      - <IF::tx|EntityReference>:: If <CP::entities> is set to <DOM::true>
         or the node is not expanded, the node is serialized as an entity 
         reference.  Child nodes (the expansion) are ignored.  Otherwise, 
         child nodes are serialized.
       \
-      - <IF::DOMXML:CDATASection>:: If the node contains characters 
+      - <IF::tx|CDATASection>:: If the node contains characters 
         that cannot be represented in the specified output encoding 
         or contains <CODE::MDE> and <CP::split-cdata-sections> 
-        is set to <DOM::true>, <IF::DOMXML:CDATASection> is split and 
+        is set to <DOM::true>, <IF::tx|CDATASection> is split and 
         the unrepresentable characters are serialized as numeric 
         character references in ordinary <CODE::content>.  The exact 
         position and number of splits is not specified.  If 
@@ -2168,8 +2162,6 @@ IFDef:
 IFCls3Def:
   @IFQName: LSOutput
   @ClsQName: ManakaiDOMLSOutput
-  
-  @ClsISA: ManakaiDOM|ManakaiDOMObject
 
   @Description:
     @@lang:en
@@ -2551,7 +2543,7 @@ ElementTypeBinding:
       @@@lang:en
       @@@@:
         If the <cfg::DOMCore|split-cdata-sections>
-        parameter is set to <DOM::false> and a <IF::DOMXML:CDATASection>
+        parameter is set to <DOM::false> and a <IF::tx|CDATASection>
         node contains characters that cannot be represented in the
         specified output encoding.  This error is not recoverable.
   @ShadowSibling:
@@ -2749,7 +2741,7 @@ ElementTypeBinding:
 ElementTypeBinding:
   @Name: nodeProp
   @ElementType:
-    DOMCore:nodeProp
+    tc:nodeStemKey
   @ShadowContent:
     @@For: =ManakaiDOM|all
 
@@ -3116,11 +3108,11 @@ boolCParam:
     @@IsSupportRequired:1
     @@IsDefault:1
     @@enDesc:
-      If a <IF::DOMCore:Document>, <IF::DOMCore:Element>, or 
-      <IF::DOMXML:Entity> node is serialized, the XML declaration
+      If a <IF::Document>, <IF::Element>, or 
+      <IF::tx|Entity> node is serialized, the XML declaration
       or text declaration should be included.
 
-      The <XA::version> is set to <A::DOMCore:Document.xmlVersion> if 
+      The <XA::version> is set to <A::Document.xmlVersion> if 
       the document is a Level 3 document and its value is non-<DOM::null>,
       otherwise to <XML::1.0>.
     

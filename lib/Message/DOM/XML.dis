@@ -18,7 +18,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/04/01 17:52:33 $
+    $Date: 2006/04/02 10:45:24 $
 
   @Require:
     @@Module:
@@ -35,6 +35,8 @@ Module:
       @@@WithFor: ManakaiDOM|ManakaiDOM2
     @@Module:
       @@@WithFor: ManakaiDOM|ManakaiDOM3
+    @@Module:
+      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
     @@Module:
       @@@QName: DISlib|DISMarkup
       @@@WithFor: ManakaiDOM|all
@@ -9063,12 +9065,14 @@ NodeTypeDef:
        
         $test->id ('default');
         $test->assert_null ($pi-><AG::Node.baseURI>);
+        $test->assert_null ($pi-><AG::Node.manakaiBaseURI>);
 
         $test->id ('doc');
         $doc-><AS::Document.documentURI> (q<http://doc.test/>);
         $test->assert_equals
                  ($pi-><AG::Node.baseURI>,
                   q<http://doc.test/>);
+        $test->assert_null ($pi-><AG::Node.manakaiBaseURI>);
 
         $test->id ('el');
         my $el = $doc-><M::Document.createElementNS> (null, 'e');
@@ -9078,6 +9082,7 @@ NodeTypeDef:
         $test->assert_equals
                  ($pi-><AG::Node.baseURI>,
                   q<http://el.test/>);
+        $test->assert_null ($pi-><AG::Node.manakaiBaseURI>);
 
         $test->id ('ent');
         my $ent = $doc-><M::Document.createEntityReference> ('ent');
@@ -9089,11 +9094,15 @@ NodeTypeDef:
         $test->assert_equals
                  ($pi-><AG::Node.baseURI>,
                   q<http://ent.test/>);
+        $test->assert_null ($pi-><AG::Node.manakaiBaseURI>);
 
         $test->id ('pi');
         $pi-><AS::ProcessingInstruction.manakaiBaseURI> (q<http://pi.ent/>);
         $test->assert_equals
                  ($pi-><AG::Node.baseURI>,
+                  q<http://pi.ent/>);
+        $test->assert_equals
+                 ($pi-><AG::Node.manakaiBaseURI>,
                   q<http://pi.ent/>);
 
         $test->id ('pi.unset');
@@ -9101,6 +9110,7 @@ NodeTypeDef:
         $test->assert_equals
                  ($pi-><AG::Node.baseURI>,
                   q<http://ent.test/>);
+        $test->assert_null ($pi-><AG::Node.manakaiBaseURI>);
 
   @Attr:
     @@Name: target
@@ -9292,14 +9302,24 @@ NodeTypeDef:
     @@dis:actualType: ManakaiDOM|ManakaiDOMURI
     @@Get:
       @@@enDesc:
-        Same as <A::Node.baseURI>.
+        The base DOM URI of the element, if it is explicitly set
+        to the element.
+
+          {NOTE::
+            This attribute is similar to the <InfoProp::base URI>
+            property for element information items in the XML
+            Information Set.
+          }
+
+          {NOTE::
+            To obtain the computed base URI of the element,
+            use the <A::Node.baseURI> attribute.
+          }
       @@@nullCase:
         @@@@enDesc:
-          If no base URI is available.
-      @@@PerlDef:
-        __DEEP{
-          $r = $self-><AG::Node.baseURI>;
-        }__;
+          If no explicit base DOM URI is available.
+      @@@disDef:
+        @@@@DISPerl:cloneCode: te|ManakaiDOMElement.manakaiBaseURI.get
     @@Set:
       @@@enDesc:
         Sets the base DOM URI of the node.  It <kwd:MUST> be an 
@@ -9312,13 +9332,8 @@ NodeTypeDef:
           It does not affect to the base URI of the entity or element
           in which the node is contained.
       @@@NodeReadOnlyError:
-      @@@PerlDef:
-        __CODE{tc|NodeReadOnlyError:: $node => $self}__;
-        __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
-          $given => $given,
-          $prop => {<H::infoset|baseURI>},
-          $ref => $self,
-        }__;
+      @@@disDef:
+        @@@@DISPerl:cloneCode: te|ManakaiDOMElement.manakaiBaseURI.set
 ##ProcessingInstruction
 
 ClsDef:

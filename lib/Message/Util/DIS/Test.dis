@@ -12,7 +12,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/02/22 11:22:09 $
+    $Date: 2006/04/02 10:45:24 $
   
   @Require:
     @@Module:
@@ -69,6 +69,8 @@ Namespace:
     http://www.w3.org/1999/02/22-rdf-syntax-ns#
   @rdfs:
     http://www.w3.org/2000/01/rdf-schema#
+  @tc:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/TreeCore/
   @test:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Test#
   @Util:
@@ -1908,7 +1910,7 @@ ResourceDef:
 
 ResourceDef:
   @QName: Node
-  @AliasFor: Tree|Node
+  @AliasFor: tc|Node
   @For: ManakaiDOM|ManakaiDOM
 
 PropDef:
@@ -2117,7 +2119,7 @@ IFClsDef:
         The newly created parser.
       @@@PerlDef:
         $r = bless {
-          <H::DOMCore:implementation> => $impl,
+          <H::f|implementation> => $impl,
         }, $self;
 
   @Method:

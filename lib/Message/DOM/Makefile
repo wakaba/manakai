@@ -36,11 +36,10 @@ DAF_PL = $(MANAKAI_BIN_DIR)daf.pl
 DAF = $(PERL_) $(DAF_PL) $(DAF_OPTIONS) $(DIS_OPTIONS_ALL)
 
 DOM_FEATURE_DIS_FILES = DOMFeature$(DIS_SUFFIX) GenericLS$(DIS_SUFFIX)
-DOM_CORE_DIS_FILES = DOMMain.dis DOMCore.dis DOMXML.dis \
-                     Tree$(DIS_SUFFIX) \
-                     XDoctype$(DIS_SUFFIX)
-DOM_LS_DIS_FILES   = SimpleLS$(DIS_SUFFIX) DOMLS$(DIS_SUFFIX) \
-  ManakaiDOMLS2003$(DIS_SUFFIX)
+DOM_CORE_DIS_FILES = DOMMain.dis DOMCore.dis \
+                     TreeCore$(DIS_SUFFIX) Document$(DIS_SUFFIX) \
+                     Element$(DIS_SUFFIX) XML$(DIS_SUFFIX) XDoctype$(DIS_SUFFIX)
+DOM_LS_DIS_FILES   = SimpleLS$(DIS_SUFFIX) DOMLS$(DIS_SUFFIX)
 XP_DIS_FILES       = XMLParser$(DIS_SUFFIX)
 DOM_HTML_DIS_FILES = DOMHTML.dis DOMWebForms.dis
 DIS_FILES = $(DOM_FEATURE_DIS_FILES) $(DOM_CORE_DIS_FILES) \
@@ -55,7 +54,7 @@ PM_FILES = \
   TreeCore$(PM_SUFFIX) Document$(PM_SUFFIX) Element$(PM_SUFFIX) \
   XML$(PM_SUFFIX) XDoctype$(PM_SUFFIX) \
   DOMLS$(PM_SUFFIX) XMLParser$(PM_SUFFIX) \
-  SimpleLS$(PM_SUFFIX) ManakaiDOMLS2003$(PM_SUFFIX) \
+  SimpleLS$(PM_SUFFIX) \
   DOMHTML$(PM_SUFFIX) DOMWebForms$(PM_SUFFIX)
 
 GENERATED_FILES = $(PM_FILES)
@@ -72,15 +71,19 @@ $(PM_FILES): %$(PM_SUFFIX): %$(DIS_SUFFIX) $(DAF_PL)
 	  --create-perl-module="$(NS_MDOM)GenericLS  GenericLS$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_MDOM)DOMMain    DOMMain$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_MDOM)DOMCore    DOMCore$(PM_SUFFIX)" \
-	  --create-perl-module="$(NS_MDOM)Tree       Tree$(PM_SUFFIX)" \
-	  --create-perl-module="$(NS_MDOM)DOMXML     DOMXML$(PM_SUFFIX)" \
+	  --create-perl-module="$(NS_MDOM)TreeCore   TreeCore$(PM_SUFFIX)" \
+	  --create-perl-module="$(NS_MDOM)Document   Document$(PM_SUFFIX)" \
+	  --create-perl-module="$(NS_MDOM)Element    Element$(PM_SUFFIX)" \
+	  --create-perl-module="$(NS_MDOM)XML        XML$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_MDOM)XDoctype   XDoctype$(PM_SUFFIX)"
 	$(PERL_CHK) DOMFeature$(PM_SUFFIX)
 	$(PERL_CHK) GenericLS$(PM_SUFFIX)
 	$(PERL_CHK) DOMMain$(PM_SUFFIX)
 	$(PERL_CHK) DOMCore$(PM_SUFFIX)
-	$(PERL_CHK) Tree$(PM_SUFFIX)
-	$(PERL_CHK) DOMXML$(PM_SUFFIX)
+	$(PERL_CHK) TreeCore$(PM_SUFFIX)
+	$(PERL_CHK) Document$(PM_SUFFIX)
+	$(PERL_CHK) Element$(PM_SUFFIX)
+	$(PERL_CHK) XML$(PM_SUFFIX)
 	$(PERL_CHK) XDoctype$(PM_SUFFIX)
 	$(TOUCH) $@
   ## NOTE: When you modify this rule, update |../Util/Makefile|, too.
@@ -95,5 +98,5 @@ clean-db:
 
 distclean: clean clean-db
 
-## $Date: 2006/04/01 17:52:32 $
+## $Date: 2006/04/02 10:45:23 $
 ## License: Public Domain.

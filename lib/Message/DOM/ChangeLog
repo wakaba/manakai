@@ -1,5 +1,32 @@
 2006-04-02  Wakaba  <wakaba@suika.fam.cx>
 
+	* XMLParser.dis: Updated so that it can be used
+	with |TreeCore.pm|, |Document.pm|, |Element.pm|,
+	and |XML.pm|.  Set the read-only flag to
+	the |DocumentType|, |Entity|, and |EntityReference| noes.
+
+	* Node.dis (textContent): It did not handle descendant
+	element and entity reference nodes.
+
+	* Element.dis, XML.dis (manakaiBaseURI.get): Its
+	definition has been changed to return only explicit
+	base URI specification.
+
+	* DOMLS.dis (LSInput, LSOutput): They no longer 
+	inherits the |ManakaiDOM:ManakaiDOMObject| class.
+
+	* Tree.dis, DOMXML.dis, ManakaiDOMLS2003.dis: Removed.
+
+	* Tree.pm, DOMXML.pm: Removed.
+
+	* TreeCore.pm, Document.pm, Element.pm: Added
+	to the CVS repository since they are necessary to
+	build the dis library.
+
+	* Makefile: Sync'ed to new modules disposition.
+
+2006-04-02  Wakaba  <wakaba@suika.fam.cx>
+
 	* Makefile: Rules for |Tree.pm| and |DOMXML.pm| are
 	removed.  For |Element.pm| and |Document.pm| are added.
 
