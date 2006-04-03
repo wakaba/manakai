@@ -1,3 +1,25 @@
+2006-04-03  Wakaba  <wakaba@suika.fam.cx>
+
+	* DOMMain.dis (GetPropNode, CheckReadOnly): Removed.
+
+	* Node.dis (cfg:dtd-default-attribute): The configuration
+	parameter |cfg:dtd-default-attributes| is renamed
+	as |cfg:dtd-default-attribute|.
+	(Roles): Definitions are changed so that classes
+	that implement those classes MUST implement the |Node|
+	and its subinterfaces.
+	(cfg:dtd-attribute-type): New configuration parameter.
+
+	* Document.dis (adoptNode): Don't throw exception
+	if |strictErrorChecking| is |false|.
+
+	* Element.dis (setAttribute, setAttributeNS): Don't
+	set [attribute type] if the |cfg:dtd-attribute-type| 
+	configuration parameter is set to |false|.
+	(removeAttribute, removeAttributeNS, removeAttributeNode): Don't
+	regenerate default attribute nodes if the |cfg:dtd-default-attribute|
+	configuration parameter is set to |false|.
+
 2006-04-02  Wakaba  <wakaba@suika.fam.cx>
 
 	* TreeStore.dis: New module.

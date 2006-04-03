@@ -295,7 +295,8 @@ for (@{$Opt{create_module}}) {
     status_msg_ qq<Generating Perl module from <$mod_uri> for <$mod_for>...>;
     local $Message::Util::DIS::Perl::Implementation
         = $impl->get_feature (ExpandedURI q<Util:PerlCode> => '1.0');
-    my $pl = $mod->pl_generate_perl_module_file;
+    my $pl = $mod->pl_generate_perl_module_file
+                    ($impl->get_feature (ExpandedURI q<Util:PerlCode> => '1.0'));
     status_msg qq<done>;
 
     my $output;
@@ -590,7 +591,8 @@ sub daf_generate_perl_test_file ($) {
   my $mod = shift;
   my $pc = $impl->get_feature (ExpandedURI q<Util:PerlCode> => '1.0');
   local $Message::Util::DIS::Perl::Implementation = $pc;
-  my $pl = $pc->create_perl_file;
+  my $pl = $pc->create_pc_file;
+  my $factory = $pl->owner_document;
   my $pack = $pl->get_last_package ("Manakai::Test", make_new_package => 1);
   $pack->add_use_perl_module_name ("Message::Util::DIS::Test");
   $pack->add_use_perl_module_name ("Message::Util::Error");
@@ -651,7 +653,7 @@ sub daf_generate_perl_test_file ($) {
         
         $pack->append_code ('try {');
         
-        my $test_pc = $res->pl_code_fragment;
+        my $test_pc = $res->pl_code_fragment ($factory);
         if (not defined $test_pc) {
           die "Perl test code not defined for <".$res->uri.">";
         }
@@ -727,7 +729,7 @@ sub daf_generate_perl_test_file ($) {
           $_->append_new_pc_literal (\@test);
         }
         
-        my $plc = $res->pl_code_fragment;
+        my $plc = $res->pl_code_fragment ($factory);
         unless ($plc) {
           die "Resource <".$res->uri."> does not have Perl test code";
         }

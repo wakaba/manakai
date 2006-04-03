@@ -9,7 +9,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/04/01 14:41:33 $
+    $Date: 2006/04/03 12:53:25 $
 
   @Require:
     @@Module:
@@ -165,7 +165,7 @@ ClsDef:
       Creates a new node bag.
     @@PerlDef:
       $bag = {
-        <H::mg|mutations> => [],
+        <H::mg|mutations> => {},
       };
 ##NodeBag
 
@@ -263,8 +263,9 @@ ClsDef:
       CORE::delete $bag->{${$bag->{${$owneeref->{<H::mg|nodeIDReference>}}}
                                 ->{$owner0prop} or \''}}
                        ->{$ownee1hprop};
-      push @{$bag->{<H::mg|mutations>}},
-           $bag->{${$owneeref->{<H::mg|nodeIDReference>}}}->{$owner0prop};
+      $bag->{<H::mg|mutations>}
+          ->{${$bag->{${$owneeref->{<H::mg|nodeIDReference>}}}->{$owner0prop}}}
+          = true;
       CORE::delete $bag->{${$owneeref->{<H::mg|nodeIDReference>}}}
                        ->{$owner0prop};
 ##NodeStem
@@ -493,11 +494,11 @@ ClsDef:
         my $id = $self->{<H::mg|nodeIDReference>};
         my $bag = $self->{<H::mg|nodeBag>};
         if (--$bag->{$$id}->{<H::mg|references>} < 1) {
-          push @{$bag->{<H::mg|mutations>}}, $id;
-          if (@{$bag->{<H::mg|mutations>}}
+          $bag->{<H::mg|mutations>}->{$$id} = true;
+          if (0+(keys %{$bag->{<H::mg|mutations>}})
                   > (defined $Message::Util::Grove::GCLatency
-                       ? $Message::Util::Grove::GCLatency : 4096)) {
-            __CODE{mg|collectGarbage:: $ref => $self}__;
+                       ? $Message::Util::Grove::GCLatency : 40000)) {
+            __CODE{mg|collectGarbage:: $bag => $bag}__;
           }
         }
 
@@ -506,47 +507,47 @@ ClsDef:
     @@enDesc:
       Garbage collection.
     @@Param:
-      @@@Name: ref
+      @@@Name: bag
       @@@Type: HASH
       @@@enDesc:
-        The node reference object.
+        The node bag.
     @@PerlDef:
-        my $bag = $ref->{<H::mg|nodeBag>};
-        my @target = @{$bag->{<H::mg|mutations>}};
         my %done;
         my %has_xref;
-        TARGET: while (@target) {
-          my $target = shift @target;
+        TARGET: while (%{$bag->{<H::mg|mutations>}}) {
+          my $target = each %{$bag->{<H::mg|mutations>}};
+          CORE::delete $bag->{<H::mg|mutations>}->{$target};
 
-          next TARGET if $has_xref{$$target} or $done{$$target};
+          next TARGET if $has_xref{$target} or $done{$target};
 
-          unless (defined $bag->{$$target}) {
-            $done{$$target} = true;
+          unless (defined $bag->{$target}) {
+            $done{$target} = true;
             next TARGET;
           }
 
           my %grove;
-          my @gtarget = ($target);
+          my %gtarget = ($target => true);
           my @gwreferred;
-          GTARGET: while (@gtarget) {
-            my $gtarget = shift @gtarget;
-            next GTARGET if $grove{$$gtarget};
+          GTARGET: while (%gtarget) {
+            my $gtarget = each %gtarget;
+            CORE::delete $gtarget{$gtarget};
+            next GTARGET if $grove{$gtarget};
 
-            my $gtstem = $bag->{$$gtarget};
+            my $gtstem = $bag->{$gtarget};
             unless (defined $gtstem) {
-              $done{$$gtarget} = true;
+              $done{$gtarget} = true;
               next GTARGET;
             }
 
-            if ($has_xref{$$gtarget} or $gtstem->{<H::mg|references>}) {
-              $has_xref{$$gtarget} = true;
+            if ($has_xref{$gtarget} or $gtstem->{<H::mg|references>}) {
+              $has_xref{$gtarget} = true;
               $has_xref{$_} = true for keys %grove;
-              for (@gtarget) {
-                $has_xref{$$_} = defined $bag->{$$_};
-                $done{$$_} = true;
+              for (keys %gtarget) {
+                $has_xref{$_} = defined $bag->{$_};
+                $done{$_} = true;
               }
               next TARGET;
-            } elsif ($done{$$gtarget}) {
+            } elsif ($done{$gtarget}) {
               next GTARGET;
             }
 
@@ -554,34 +555,35 @@ ClsDef:
                             ${$gtstem->{<H::mg|nodeClass>}}
                           };
 
-            for my $key (@{$clsprop->{<H::mg|origin0>}}) {
-              push @gtarget, $gtstem->{$key} if ref $gtstem->{$key};
+            for my $key (@{$clsprop->{<H::mg|origin0>} or []}) {
+              $gtarget{${$gtstem->{$key}}} = true if ref $gtstem->{$key};
             }
 
-            A: for my $key ((@{$clsprop->{<H::mg|ownee1h>}}),
-                            (@{$clsprop->{<H::mg|subnode1h>}})) {
+            A: for my $key ((@{$clsprop->{<H::mg|ownee1h>} or []}),
+                            (@{$clsprop->{<H::mg|subnode1h>} or []})) {
               next A unless ref $gtstem->{$key};
-              push @gtarget, grep {ref $_} values %{$gtstem->{$key}};
+              $gtarget{$$_} = true for grep {ref $_} values %{$gtstem->{$key}};
             }
 
-            A: for my $key (@{$clsprop->{<H::mg|subnode1a>}}) {
+            A: for my $key (@{$clsprop->{<H::mg|subnode1a>} or []}) {
               next A unless ref $gtstem->{$key};
-              push @gtarget, grep {ref $_} @{$gtstem->{$key}};
+              $gtarget{$$_} = true for grep {ref $_} @{$gtstem->{$key}};
             }
 
-            A: for my $key (@{$clsprop->{<H::mg|subnode2hh>}}) {
+            A: for my $key (@{$clsprop->{<H::mg|subnode2hh>} or []}) {
               next A unless ref $gtstem->{$key};
               B: for my $key2 (keys %{$gtstem->{$key}}) {
                 next B unless ref $gtstem->{$key}->{$key2};
-                push @gtarget, grep {ref $_} values %{$gtstem->{$key}->{$key2}};
+                $gtarget{$$_} = true for grep {ref $_}
+                                         values %{$gtstem->{$key}->{$key2}};
               }
             }
 
-            for my $key (@{$clsprop->{<H::mg|owner0>}}) {
-              push @gwreferred, $gtstem->{$key} if ref $gtstem->{$key};
+            for my $key (@{$clsprop->{<H::mg|owner0>} or []}) {
+              push @gwreferred, ${$gtstem->{$key}} if ref $gtstem->{$key};
             }
 
-            $grove{$$gtarget} = true;
+            $grove{$gtarget} = true;
           } # GTARGET
 
           for (keys %grove) {
@@ -591,9 +593,8 @@ ClsDef:
             }
             delete $bag->{$_};
           }
-          push @target, @gwreferred;
+          $bag->{<H::mg|mutations>}->{$_} = true for @gwreferred;
         } # TARGET
-        $bag->{<H::mg|mutations>} = [];
 
   @CODE:
     @@QName: mg|getNodeStemPropValue

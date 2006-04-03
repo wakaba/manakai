@@ -25,7 +25,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2006/04/01 17:52:34 $
+      $Date: 2006/04/03 12:53:25 $
     @@ContentType:
       dis:Date.RCS
   
@@ -42,6 +42,8 @@ Module:
 Namespace:
   @c:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
+  @cfg:
+    http://suika.fam.cx/www/2006/dom-config/
   @DIS:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#
   @dis:
@@ -371,8 +373,9 @@ IFClsDef:
             __DEEP{
               my @child_nodes = @{$self-><AG::Node.childNodes>};
               for my $child_node (@child_nodes) {
-                if (defined $child_node-><AG::Node.namespaceURI> and
-                    $child_node-><AG::Node.namespaceURI> eq <Q::pc:>) {
+                my $nsuri = $child_node-><AG::Node.namespaceURI>;
+                if (defined $nsuri and
+                    ($nsuri eq <Q::pc:> or $nsuri eq <Q::pc2:>)) {
                   if ($child_node-><AG::Node.localName> eq 'variable') {
                     if (substr ($originalVariable, 0, 1) eq
                           $child_node-><AG::PerlVariable.variableType> and
@@ -791,18 +794,7 @@ IFClsETDef:
       @@@enDesc:
         The package to append.
     @@Return:
-      @@@RaiseException:
-        @@@@@:IN_USE_NODE_ERR
-        @@@@enDesc:
-          An attempt is made to set a subroutine that is 
-          already used elsewhere. 
       @@@PerlDef:
-          if ($codeArg-><AG::Node.parentNode>) {
-            __EXCEPTION{IN_USE_NODE_ERR::
-              pc:childNode => {$codeArg},
-              MDOMX:param-name => 'codeArg',
-            }__;
-          }
           __DEEP{
             $self-><AG::Node.ownerDocument>-><M::Document.adoptNode> ($codeArg);
             $self-><M::Node.appendChild> ($codeArg);
@@ -1170,18 +1162,8 @@ IFClsETDef:
       @@@enDesc:
         The subroutine object.
     @@Return:
-      @@@RaiseException:
-        @@@@@:IN_USE_NODE_ERR
-        @@@@enDesc:
-          An attempt is made to set a subroutine that is 
-          already used elsewhere. 
       @@@PerlDef:
           __DEEP{
-            if ($subArg-><AG::Node.parentNode>) {
-              __UNDEEP{__EXCEPTION{IN_USE_NODE_ERR::
-                pc:childNode => {$subArg},
-              }__}__;
-            }
             $self-><AG::Node.ownerDocument>-><M::Document.adoptNode> ($subArg);
             $self-><M::Node.appendChild> ($subArg);
           }__;
@@ -1526,43 +1508,12 @@ IFClsETDef:
       @@@enDesc:
         A code fragment object. 
     @@Return:
-      @@@RaiseException:
-        @@@@@:BAD_CHILD_ERR
-        @@@@enDesc:
-          An attempt is made to append a child
-          that is not a <Class::ManakaiPerlUnparsedCode>.
-      @@@RaiseException:
-        @@@@@:IN_USE_NODE_ERR
-        @@@@enDesc:
-          An attempt is made to append a node that is 
-          already used elsewhere. 
       @@@PerlDef:
-          if ({
-            unparsed => 1, if => 1, statement => 1, block => 1,
-            choose => true,
-            blockContainer => true,
-            inlineUnparsed => 1, variable => 1, tokens => 1, atom => 1,
-            inlineContainer => 1, stringLiteral => 1, assignment => 1,
-            list => true, arrayRefLiteral => true, hashRefLiteral => true,
-          }->{$codeArg-><AG::Node.localName>}) {
-            if ($codeArg-><AG::Node.parentNode>) {
-              __EXCEPTION{IN_USE_NODE_ERR::
-                pc:childNode => {$codeArg},
-                MDOMX:param-name => 'codeArg',
-              }__;
-            }
-            __DEEP{
-              $self-><AG::Node.ownerDocument>
-                   -><M::Document.adoptNode> ($codeArg);
-              $self-><M::Node.appendChild> ($codeArg);
-            }__;
-          } else {
-            __EXCEPTION{BAD_CHILD_ERR::
-              pc:parentNode => {$self},
-              pc:childNode => {$codeArg},
-              MDOMX:param-name => 'codeArg',
-            }__;
-          }
+        __DEEP{
+          $self-><AG::Node.ownerDocument>
+               -><M::Document.adoptNode> ($codeArg);
+          $self-><M::Node.appendChild> ($codeArg);
+        }__;
 
   @Method:
     @@Name: appendCode
@@ -1710,59 +1661,7 @@ IFClsETDef:
       @@@Type: PerlIf
       @@@enDesc:
         The newly created element.
-      @@@RaiseException:
-        @@@@@:BAD_CHILD_ERR
-        @@@@enDesc:
-          An attempt is made to append a child
-          that is not valid type.
-      @@@RaiseException:
-        @@@@@:IN_USE_NODE_ERR
-        @@@@enDesc:
-          An attempt is made to append a node that is 
-          already used elsewhere. 
       @@@PerlDef:
-          for my $arg ([conditionArg => $conditionArg]) {
-            if ({
-              atom => 1, tokens => 1, inlineContainer => 1, assignment => true,
-              inlineUnparsed => 1, variable => 1, stringLiteral => true,
-              list => true, arrayRefLiteral => true, hashRefLiteral => true,
-            }->{$arg->[1]-><AG::Node.localName>}) {
-              if ($arg->[1]-><AG::Node.parentNode>) {
-                __EXCEPTION{IN_USE_NODE_ERR::
-                  pc:childNode => {$arg->[1]},
-                  MDOMX:param-name => {$arg->[0]},
-                }__;
-              }
-            } else {
-              __EXCEPTION{BAD_CHILD_ERR::
-                pc:parentNode => {$self},
-                pc:childNode => {$arg->[1]},
-                MDOMX:param-name => {$arg->[0]},
-              }__;
-            }
-          } # c
-
-          for my $arg ([trueArg => $trueArg],
-                       [falseArg => $falseArg]) {
-            next unless $arg->[1];
-            if ({
-                  blockContainer => true,
-                }->{$arg->[1]-><AG::Node.localName>}) {
-              if ($arg->[1]-><AG::Node.parentNode>) {
-                __EXCEPTION{IN_USE_NODE_ERR::
-                  pc:childNode => {$arg->[1]},
-                  MDOMX:param-name => {$arg->[0]},
-                }__;
-              }
-            } else {
-              __EXCEPTION{BAD_CHILD_ERR::
-                pc:parentNode => {$self},
-                pc:childNode => {$arg->[1]},
-                MDOMX:param-name => {$arg->[0]},
-              }__;
-            }
-          } # t/f
-
           __DEEP{
             $r = $self-><AG::Node.ownerDocument>-><M::Document.createElementNS>
                                                    (<Q::pc:>, 'if');
@@ -2773,38 +2672,7 @@ IFClsDef:
         A right hand side code fragment object. 
     @@Return:
       @@@Type: PerlAssignment
-      @@@RaiseException:
-        @@@@@:BAD_CHILD_ERR
-        @@@@enDesc:
-          An attempt is made to append a child
-          that is not valid type.
-      @@@RaiseException:
-        @@@@@:IN_USE_NODE_ERR
-        @@@@enDesc:
-          An attempt is made to append a node that is 
-          already used elsewhere. 
       @@@PerlDef:
-          for my $arg ([leftArg => $leftArg], [rightArg => $rightArg]) {
-            if ({
-              atom => 1, tokens => 1, inlineContainer => 1, assignment => true,
-              inlineUnparsed => 1, variable => 1, stringLiteral => true,
-              list => true, arrayRefLiteral => true, hashRefLiteral => true,
-            }->{$arg->[1]-><AG::Node.localName>}) {
-              if ($arg->[1]-><AG::Node.parentNode>) {
-                __EXCEPTION{IN_USE_NODE_ERR::
-                  pc:childNode => {$arg->[1]},
-                  MDOMX:param-name => {$arg->[0]},
-                }__;
-              }
-            } else {
-              __EXCEPTION{BAD_CHILD_ERR::
-                pc:parentNode => {$self},
-                pc:childNode => {$arg->[1]},
-                MDOMX:param-name => {$arg->[0]},
-              }__;
-            }
-          } # left/right
-
           __DEEP{
             $r = $self-><AG::Node.ownerDocument>-><M::Document.createElementNS>
                                                 (<Q::pc:>, 'assignment');
@@ -2898,38 +2766,12 @@ IFClsETDef:
       @@@enDesc:
         A code fragment object. 
     @@Return:
-      @@@RaiseException:
-        @@@@@:BAD_CHILD_ERR
-        @@@@enDesc:
-          An attempt is made to append a child
-          that is not a <Class::ManakaiPerlUnparsedCode>.
-      @@@RaiseException:
-        @@@@@:IN_USE_NODE_ERR
-        @@@@enDesc:
-          An attempt is made to append a node that is 
-          already used elsewhere. 
       @@@PerlDef:
-          if ({
-            atom => 1, tokens => 1, inlineContainer => 1, assignment => true,
-            inlineUnparsed => 1, variable => 1, stringLiteral => true,
-            list => true, arrayRefLiteral => true, hashRefLiteral => true,
-          }->{$codeArg-><AG::Node.localName>}) {
-            if ($codeArg-><AG::Node.parentNode>) {
-              __EXCEPTION{IN_USE_NODE_ERR::
-                pc:childNode => {$codeArg},
-              }__;
-            }
-            __DEEP{
-              $self-><AG::Node.ownerDocument>
-                   -><M::Document.adoptNode> ($codeArg);
-              $self-><M::Node.appendChild> ($codeArg);
-            }__;
-          } else {
-            __EXCEPTION{BAD_CHILD_ERR::
-              pc:parentNode => {$self},
-              pc:childNode => {$codeArg},
-            }__;
-          }
+        __DEEP{
+          $self-><AG::Node.ownerDocument>
+               -><M::Document.adoptNode> ($codeArg);
+          $self-><M::Node.appendChild> ($codeArg);
+        }__;
 
   @Method:
     @@Name: appendCode
@@ -4657,6 +4499,117 @@ IFClsDef:
     @@PerlDef:
       my $impl = <Class::ManakaiPCImplementation>->_new;
       $doc = $impl-><M::DOMImpl.createDocument> (<Q::pc:>, 'file');
+
+  @Method:
+    @@Name: createPCIf
+    @@enDesc:
+      Creates a <IF::PerlIf> object. 
+    @@Param:
+      @@@Name: conditionArg
+      @@@Type: PerlCodeInlines
+      @@@enDesc:
+        Condition code fragment object.
+    @@Param:
+      @@@Name: trueArg
+      @@@Type: PerlCodeBlocks
+      @@@enDesc:
+        A true code fragment object. 
+      @@@nullCase:
+        @@@@enDesc: No true code.
+    @@Param:
+      @@@Name: falseArg
+      @@@Type: PerlCodeBlocks
+      @@@enDesc:
+        A false code fragment object. 
+      @@@nullCase:
+        @@@@enDesc: No false code.
+    @@Return:
+      @@@Type: PerlIf
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><M::Document.createElementNS> (<Q::pc:>, 'if');
+          $r-><AS::PerlIf.condition> ($conditionArg) if defined $conditionArg;
+          $r-><AS::PerlIf.trueCode> ($trueArg) if defined $trueArg;
+          $r-><AS::PerlIf.falseCode> ($falseArg) if defined $falseArg;
+        }__;
+
+    @@Test:
+      @@@QName: PCDocument.createPCIf.noarg.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{createPCDocumentForTest:: $doc => $doc}__;
+
+        my $e1 = $doc-><M::Document.createElementNS> (null, 'e1');
+
+        my $if = $doc-><M::PCDocument.createPCIf> ($e1);
+
+        $test->assert_isa ($if, <IFName::PerlIf>);
+
+        $test->id ('condition');
+        $test->assert_equals ($if-><AG::PerlIf.condition>, $e1);
+
+        $test->id ('trueCode');
+        $test->assert_null ($if-><AG::PerlIf.trueCode>);
+
+        $test->id ('falseCode');
+        $test->assert_null ($if-><AG::PerlIf.falseCode>);
+    @@Test:
+      @@@QName: PCDocument.createPCIf.args.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{createPCDocumentForTest:: $doc => $doc}__;
+
+        my $e1 = $doc-><M::Document.createElementNS> (null, 'e1');
+        my $e2 = $doc-><M::Document.createElementNS> (null, 'e2');
+        my $e3 = $doc-><M::Document.createElementNS> (null, 'e3');
+
+        my $if = $doc-><M::PCDocument.createPCIf> ($e1, $e2, $e3);
+
+        $test->id ('return');
+        $test->assert_isa ($if, <IFName::PerlIf>);
+
+        $test->id ('condition');
+        $test->assert_equals ($if-><AG::PerlIf.condition>, $e1);
+
+        $test->id ('trueCode');
+        $test->assert_equals ($if-><AG::PerlIf.trueCode>, $e2);
+
+        $test->id ('falseCode');
+        $test->assert_equals ($if-><AG::PerlIf.falseCode>, $e3);
+
+  @Method:
+    @@Name: createPCPackage
+    @@enDesc:
+      Creates a new package scope block. 
+    @@Param:
+      @@@Name: packageName
+      @@@Type: DOMString
+      @@@enDesc:
+        The fully-qualified name of the package to create. 
+    @@Return:
+      @@@Type: PerlPackage
+      @@@enDesc:
+        The newly created package scope object. 
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><M::Document.createElementNS> (<Q::pc:>, 'package');
+          $r-><AS::PerlPackage.packageName> ($packageName);
+        }__;
+
+    @@Test:
+      @@@QName: PCDocument.createPCPackage
+      @@@PerlDef:
+        my $doc;
+        __CODE{createPCDocumentForTest:: $doc => $doc}__;
+
+        my $pack = $doc-><M::PCDocument.createPCPackage> ('Package::Name');
+
+        $test->id ('package');
+        $test->assert_isa ($pack, <IFName::PerlPackage>);
+
+        $test->id ('packageName');
+        $test->assert_equals ($pack-><AG::PerlPackage.packageName>,
+                              'Package::Name');
 ##PCDocument
 
 ## -- Implementation
@@ -4696,17 +4649,71 @@ IFClsDef:
       $test->assert_isa ($impl, <IFName::PCImplementation>);
 
   @Method:
-    @@Name: createPerlFile
+    @@Name: createPCFile
     @@enDesc:
-      Creates a Perl code file. 
+      Creates a <IF::PerlFile> object that belongs to the new
+      <IF::PCDocument>.
     @@Return:
       @@@Type: PerlFile
-      @@@enDesc: A newly created Perl source file object. 
+      @@@enDesc:
+        {P:: The newly created Perl file object where:
+
+           - The <A::Document.strictErrorChecking> attribute
+             is set to <DOM::false>.
+
+           - The <Q::cfg|dtd-default-attribute> configuration
+             parameter is set to <DOM::false>.
+
+           - The <Q::cfg|dtd-attribute-type> configuration
+             parameter is set to <DOM::false>.
+
+        }
       @@@PerlDef:
-          __DEEP{
-            $r = $self-><M::DOMImpl.createDocument> (<Q::pc:>, 'file')
-                      -><AG::Document.documentElement>;
-          }__;
+        __DEEP{
+          my $rdoc = $self-><M::DOMImpl.createDocument> (<Q::pc:>, 'file');
+
+          $rdoc-><AS::Document.strictErrorChecking> (false);
+          my $rdoc_cfg = $rdoc-><AG::Document.domConfig>;
+          $rdoc_cfg-><M::CFG.setParameter>
+                       (<Q::cfg|dtd-default-attribute> => false);
+          $rdoc_cfg-><M::CFG.setParameter>
+                       (<Q::cfg|dtd-attribute-type> => false);
+
+          $r = $rdoc-><AG::Document.documentElement>;
+        }__;
+
+    @@Test:
+      @@@QName: PCImplementation.createPCFile.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{tc|createImplForTest:: $impl => $impl}__;
+        $impl = $impl->get_feature (<Q::Util|PerlCode> => '1.0');
+
+        my $file = $impl-><M::PCImplementation.createPCFile>;
+
+        $test->id ('interface');
+        $test->assert_isa ($file, <IFName::PerlFile>);
+
+        my $od = $file->owner_document;
+
+        $test->id ('od.interface');
+        $test->assert_isa ($od, <IFName::PCDocument>);
+
+        $test->id ('parentNode');
+        $test->assert_equals ($file->parent_node, $od);
+
+        $test->id ('strictErrorChecking');
+        $test->assert_false ($od->strict_error_checking);
+
+        my $cfg = $od->dom_config;
+
+        $test->id ('cfg.dtd-default-attribute');
+        $test->assert_false ($cfg->get_parameter
+                                     (<Q::cfg|dtd-default-attribute>));
+
+        $test->id ('cfg.dtd-attribute-type');
+        $test->assert_false ($cfg->get_parameter
+                                     (<Q::cfg|dtd-attribute-type>));
 
   @Method:
     @@Name: createPerlPackage
@@ -5114,59 +5121,7 @@ IFClsDef:
         @@@@enDesc: No false code.
     @@Return:
       @@@Type: PerlIf
-      @@@RaiseException:
-        @@@@@:BAD_CHILD_ERR
-        @@@@enDesc:
-          An attempt is made to append a child
-          that is not valid type.
-      @@@RaiseException:
-        @@@@@:IN_USE_NODE_ERR
-        @@@@enDesc:
-          An attempt is made to append a node that is 
-          already used elsewhere. 
       @@@PerlDef:
-          for my $arg ([conditionArg => $conditionArg]) {
-            if ({
-              atom => 1, tokens => 1, inlineContainer => 1, assignment => true,
-              inlineUnparsed => 1, variable => 1, stringLiteral => true,
-              list => true, arrayRefLiteral => true, hashRefLiteral => true,
-            }->{$arg->[1]-><AG::Node.localName>}) {
-              if ($arg->[1]-><AG::Node.parentNode>) {
-                __EXCEPTION{IN_USE_NODE_ERR::
-                  pc:childNode => {$arg->[1]},
-                  MDOMX:param-name => {$arg->[0]},
-                }__;
-              }
-            } else {
-              __EXCEPTION{BAD_CHILD_ERR::
-                pc:parentNode => {$self},
-                pc:childNode => {$arg->[1]},
-                MDOMX:param-name => {$arg->[0]},
-              }__;
-            }
-          } # c
-
-          for my $arg ([trueArg => $trueArg],
-                       [falseArg => $falseArg]) {
-            next unless $arg->[1];
-            if ({
-                  blockContainer => true,
-                }->{$arg->[1]-><AG::Node.localName>}) {
-              if ($arg->[1]-><AG::Node.parentNode>) {
-                __EXCEPTION{IN_USE_NODE_ERR::
-                  pc:childNode => {$arg->[1]},
-                  MDOMX:param-name => {$arg->[0]},
-                }__;
-              }
-            } else {
-              __EXCEPTION{BAD_CHILD_ERR::
-                pc:parentNode => {$self},
-                pc:childNode => {$arg->[1]},
-                MDOMX:param-name => {$arg->[0]},
-              }__;
-            }
-          } # t/f
-
           __DEEP{
             $r = $self-><M::DOMImpl.createDocument> (<Q::pc:>, 'file')
                       -><M::Document.createElementNS>
@@ -5257,39 +5212,6 @@ ResourceDef:
     @@Type: idl|unsignedShort||ManakaiDOM|all
     @@subsetOf: idl|unsignedShort||ManakaiDOM|all
 
-    @@XConstDef:
-      @@@Name: HIERARCHY_REQUEST_ERR
-      @@@Value:
-        @@@@@:3
-        @@@@ContentType: DISCore|Integer
-      @@@enDesc:
-        An attempt is made to break the hierarchy. 
-      @@@XSubTypeDef:
-        @@@@QName: BAD_CHILD_ERR
-        @@@@enDesc:
-          An attempt is made to append a node as a child whose type 
-          is not allowed. 
-        @@@@XParam:
-          @@@@@QName: childNode
-          @@@@@enDesc:
-            The node attempted to append. 
-        @@@@XParam:
-          @@@@@QName: parentNode
-          @@@@@enDesc:
-            The node to whose child list an attempt to append is made. 
-      @@@XSubTypeDef:
-        @@@@QName: IN_USE_NODE_ERR
-        @@@@enDesc:
-          An attempt is made to append a node that has already been used
-          elsewhere. 
-        @@@@XParam:
-          @@@@@QName: childNode
-          @@@@@enDesc:
-            The node attempted to append. 
-        @@@@XParam:
-          @@@@@QName: parentNode
-          @@@@@enDesc:
-            The parent node of the <XP::childNode>. 
     @@XConstDef:
       @@@Name: NOT_SUPPORTED_ERR
       @@@Value:

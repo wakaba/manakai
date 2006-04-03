@@ -1,3 +1,18 @@
+2006-04-03  Wakaba  <wakaba@suika.fam.cx>
+
+	* DNLite.dis (plImplementation): Removed.
+
+	* Perl.dis (plImplementation): Removed.
+	(plCodeFragment): Changed from attribute to method.
+	(plValueCodeFragment, plCodeFragment): The |factory|
+	parameter is added.
+	(plPreprocessPerlCode, plPreprocessPerlStatement, plAppendThrow): 
+	The |factory| parameter is added.
+	(ManakaiDOM:InputNormalize, dis:GetNodeProp): Removed.
+	(plIsDefined): Removed.
+	($NS_URI_NO_NULL): Removed.
+	(setDefaultValue): Removed.
+
 2006-04-02  Wakaba  <wakaba@suika.fam.cx>
 
 	* Perl.dis (plGeneratePerlModule): Some class names are changed.

@@ -17,7 +17,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/04/02 10:45:24 $
+    $Date: 2006/04/03 12:53:25 $
   
   @Require:
     @@Module:
@@ -3676,7 +3676,6 @@ IFClsXDef:
             $stemid => {$v->{$nameArg}},
             $ref => $r,
             $opt => {{
-               <H::mg|nodeRefInterfaces> => [<IFName::ElementTypeDefinition>],
             }},
           }__;
         }
@@ -3855,7 +3854,6 @@ IFClsXDef:
             $stemid => {$v->{$nameArg}},
             $ref => $r,
             $opt => {{
-               <H::mg|nodeRefInterfaces> => [<IFName::tx|Entity>],
             }},
           }__;
         }
@@ -4040,7 +4038,6 @@ IFClsXDef:
             $stemid => {$v->{$nameArg}},
             $ref => $r,
             $opt => {{
-               <H::mg|nodeRefInterfaces> => [<IFName::tx|Notation>],
             }},
           }__;
         }
@@ -5032,7 +5029,6 @@ IFClsXDef:
             $stemid => {$v->{$nameArg}},
             $ref => $r,
             $opt => {{
-               <H::mg|nodeRefInterfaces> => [<IFName::AttributeDefinition>],
             }},
           }__;
         }
@@ -5206,7 +5202,6 @@ ResourceDef:
         $stemid => {$__list->{$__aname}},
         $ref => $r,
         $opt => {{
-           <H::mg|nodeRefInterfaces> => [<IFName::Node>],
         }},
       }__;
     }

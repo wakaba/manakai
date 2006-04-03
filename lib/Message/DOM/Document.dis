@@ -13,7 +13,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/04/02 10:45:23 $
+    $Date: 2006/04/03 12:53:24 $
 
   @Require:
     @@Module:
@@ -4973,7 +4973,7 @@ NodeTypeDef:
     @@L3Test:
       @@@QName: Document.createElement.defaultattr.3.test
       @@@enDesc:
-        The <cfg::cfg|dtd-default-attributes> configuration
+        The <cfg::cfg|dtd-default-attribute> configuration
         parameter is set to <DOM::false> so that no default
         attribute should be exposed by the creation.
       @@@PerlDef:
@@ -4994,7 +4994,7 @@ NodeTypeDef:
 
         $doc-><AG::Document.domConfig>
             -><M::c|DOMConfiguration.setParameter>
-                 (<Q::cfg|dtd-default-attributes> => false);
+                 (<Q::cfg|dtd-default-attribute> => false);
 
         my $el = $doc-><M::Document.createElement> ('et1');
 
@@ -5167,7 +5167,6 @@ NodeTypeDef:
           $stem => $stem,
           $ref => $r,
           $opt => {{
-            <H::mg|nodeRefInterfaces> => [<IFName::Element>],
           }},
         }__;
 
@@ -5695,7 +5694,7 @@ NodeTypeDef:
 
         $doc-><AG::Document.domConfig>
             -><M::c|DOMConfiguration.setParameter>
-                 (<Q::cfg|dtd-default-attributes> => false);
+                 (<Q::cfg|dtd-default-attribute> => false);
 
         my $el = $doc-><M::Document.createElementNS> (null, 'et1');
 
@@ -5709,14 +5708,15 @@ NodeTypeDef:
     @@QName: tc|exposeDefaultAttributes
     @@PerlDef:
       __DEEP{
-        my $__doctype = $document-><AG::Document.doctype>;
-        my $__cfg = $document-><AG::Document.domConfig>;
-        undef $__doctype unless $__cfg-><M::c|DOMConfiguration.getParameter>
-                                          (<Q::cfg|dtd-default-attributes>);
-        $__doctype = $__doctype-><M::Node.getFeature>
-                                   (<Q::fe|XDoctype> => '3.0')
-          if $__doctype;
-        if ($__doctype) {
+        XDA: {
+          my $__cfg = $document-><AG::Document.domConfig>;
+          last XDA unless $__cfg-><M::c|DOMConfiguration.getParameter>
+                                    (<Q::cfg|dtd-default-attribute>);
+          my $__doctype = $document-><AG::Document.doctype>;
+          last XDA unless defined $__doctype;
+          $__doctype = $__doctype-><M::Node.getFeature>
+                                   (<Q::fe|XDoctype> => '3.0');
+          last XDA unless defined $__doctype;
           my $__et = $__doctype-><M::DTDef.getElementTypeDefinitionNode>
                                    ($element_type);
           if ($__et) {
@@ -5810,7 +5810,7 @@ NodeTypeDef:
                     (<Q::cfg|clone-entity-reference-subtree> => $__copy_asis);
             $document-><AS::Document.strictErrorChecking> ($__orig_strict);
           }
-        }
+        } # XDA
       }__;
     @@enImplNote:
       @@@ddid: webbrowsers
@@ -6166,7 +6166,6 @@ NodeTypeDef:
           $stem => $stem,
           $ref => $r,
           $opt => {{
-            <H::mg|nodeRefInterfaces> => [<IFName::Attr>],
           }},
         }__;
 
@@ -6436,7 +6435,6 @@ NodeTypeDef:
           $stem => $stem,
           $ref => $r,
           $opt => {{
-            <H::mg|nodeRefInterfaces> => [<IFName::Text>],
           }},
         }__;
 
@@ -6564,7 +6562,6 @@ NodeTypeDef:
           $stem => $stem,
           $ref => $r,
           $opt => {{
-            <H::mg|nodeRefInterfaces> => [<IFName::tx|CDATASection>],
           }},
         }__;
 
@@ -6655,7 +6652,6 @@ NodeTypeDef:
           $stem => $stem,
           $ref => $r,
           $opt => {{
-            <H::mg|nodeRefInterfaces> => [<IFName::tc|Comment>],
           }},
         }__;
 
@@ -6740,7 +6736,6 @@ NodeTypeDef:
           $stem => $stem,
           $ref => $r,
           $opt => {{
-            <H::mg|nodeRefInterfaces> => [<IFName::DocumentFragment>],
           }},
         }__;
 
@@ -6874,7 +6869,6 @@ NodeTypeDef:
           $stem => $stem,
           $ref => $r,
           $opt => {{
-            <H::mg|nodeRefInterfaces> => [<IFName::tx|EntityReference>],
           }},
         }__;
 
@@ -7174,7 +7168,6 @@ NodeTypeDef:
           $stem => $stem,
           $ref => $r,
           $opt => {{
-            <H::mg|nodeRefInterfaces> => [<IFName::tx|ProcessingInstruction>],
           }},
         }__;
 
@@ -7857,8 +7850,10 @@ NodeTypeDef:
       still has the effect of removing the source node from the
       children list of its parent, if any.
 
-        {ISSUE::
+        {SpecIssue::
           This clause is somewhat unclear.
+ 
+          Are udhandlers called?
         }
 
       - <IF::Attr>::: The <A::Attr.ownerElement> attribute is set to
@@ -7953,17 +7948,22 @@ NodeTypeDef:
           One or more descendant or attribute node of the
           <P::source> node is read-only.  <SRC::manakai>
       @@@PerlDef:
-        if ($source->isa (<ClassName::tc|ManakaiDOMNode>) and
-            <Code::mg|getNodeBag||ManakaiDOM|all:: $ref = $self>
-                eq <Code::mg|getNodeBag||ManakaiDOM|all:: $ref = $source>) {
-          if ($self-><AG::Node.manakaiReadOnly>) {
+        ADOPT: {
+          last ADOPT
+            unless $source->isa (<ClassName::tc|ManakaiDOMNode>) and
+                   <Code::mg|getNodeBag||ManakaiDOM|all:: $ref = $self>
+                       eq <Code::mg|getNodeBag||ManakaiDOM|all:: $ref = $source>;
+
+          my $strict = $self-><AG::Document.strictErrorChecking>;
+          if ($strict and $self-><AG::Node.manakaiReadOnly>) {
             __EXCEPTION{MDOMX|NOMOD_THIS::
               MDOMX|param-name => 'source',
               c|node => $source,
             }__;
           }
           my $parent = $source-><AG::Node.parentNode>;
-          if ($parent and $parent-><AG::Node.manakaiReadOnly>) {
+          if ($strict and defined $parent and
+              $parent-><AG::Node.manakaiReadOnly>) {
             __EXCEPTION{MDOMX|NOMOD_PARENT::
               MDOMX|param-name => 'source',
               c|node => $parent,
@@ -7973,7 +7973,7 @@ NodeTypeDef:
           my $oe;
           if ($nt == <C::Node.ATTRIBUTE_NODE>) {
             $oe = $source-><AG::Attr.ownerElement>;
-            if ($oe and $oe-><AG::Node.manakaiReadOnly>) {
+            if ($strict and defined $oe and $oe-><AG::Node.manakaiReadOnly>) {
               __EXCEPTION{MDOMX|NOMOD_PARENT::
                 MDOMX|param-name => 'source', 
                 c|node => $oe,
@@ -7994,7 +7994,7 @@ NodeTypeDef:
           while (@nodes) {
             my $node = shift @nodes;
             my $nt = $node-><AG::Node.nodeType>;
-            if ($node-><AG::Node.manakaiReadOnly>) {
+            if ($strict and $node-><AG::Node.manakaiReadOnly>) {
               __EXCEPTION{c|NOMOD_DESCENDANT_ERR::
                 MDOMX|param-name => 'source',
                 c|node => {$node},
@@ -8023,21 +8023,25 @@ NodeTypeDef:
             }
           } # nodes
           
-          if ($parent) {
-            __DEEP{
+          __DEEP{
+            if (defined $parent) {
               $parent-><M::Node.removeChild> ($source);
-            }__;
-          } elsif ($oe) {
-            __DEEP{
+            } elsif (defined $oe) {
               $oe-><M::Element.removeAttributeNode> ($source);
-            }__;
-          }
+            }
+          }__;
 
+          $r = $source;
           my $old_od = $change_od[0]-><AG::Node.ownerDocument>;
                          ## NOTE: The array must have more than zero
                          ##       nodes by definition.  In addition,
                          ##       it cannot contain document or document
                          ##       type nodes in current implementation.
+
+          if ($old_od eq $self) {
+            last ADOPT;
+          }
+
           my $old_od_list;
           __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
             $r => $old_od_list,
@@ -8077,8 +8081,7 @@ NodeTypeDef:
               }
             }
           }
-          $r = $source;
-        } # compatible class
+        } # ADOPT
 
       @@@enImplNote:
         The order in which handlers are invoked when multiple
@@ -8145,6 +8148,67 @@ NodeTypeDef:
 
         $node-><M::Node.setUserData> ('key', null, null);
         $test->set_test_data (node => null);
+    @@Test:
+      @@@QName: Document.adoptNode.samedoc.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+        my $el = $doc-><M::Document.createElementNS> (null, 'e');
+
+        my $el2 = $doc-><M::Document.adoptNode> ($el);
+
+        $test->id ('return');
+        $test->assert_equals ($el2, $el);
+
+        $test->id ('ownerDocument');
+        $test->assert_equals ($el2-><AG::Node.ownerDocument>, $doc);
+    @@Test:
+      @@@QName: Document.adoptNode.parentNode.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+        my $parent = $doc-><M::Document.createElementNS> (null, 'ep');
+        my $el = $doc-><M::Document.createElementNS> (null, 'el');
+        $parent-><M::Node.appendChild> ($el);
+
+        my $doc2;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc2}__;
+
+        my $el2 = $doc2-><M::Document.adoptNode> ($el);
+
+        $test->id ('return');
+        $test->assert_equals ($el2, $el);
+
+        $test->id ('ownerDocument');
+        $test->assert_equals ($el2-><AG::Node.ownerDocument>, $doc2);
+
+        $test->id ('parentNode');
+        $test->assert_null ($el2-><AG::Node.parentNode>);
+    @@Test:
+      @@@QName: Document.adoptNode.ownerElement.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+        my $parent = $doc-><M::Document.createElementNS> (null, 'ep');
+        my $el = $doc-><M::Document.createAttributeNS> (null, 'el');
+        $parent-><M::Element.setAttributeNodeNS> ($el);
+
+        my $doc2;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc2}__;
+
+        my $el2 = $doc2-><M::Document.adoptNode> ($el);
+
+        $test->id ('return');
+        $test->assert_equals ($el2, $el);
+
+        $test->id ('ownerDocument');
+        $test->assert_equals ($el2-><AG::Node.ownerDocument>, $doc2);
+
+        $test->id ('ownerElement');
+        $test->assert_null ($el2-><AG::Attr.ownerElement>);
 
   @L2Method:
     @@Name: getElementById

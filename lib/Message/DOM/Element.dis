@@ -13,7 +13,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/04/02 10:45:23 $
+    $Date: 2006/04/03 12:53:24 $
 
   @Require:
     @@Module:
@@ -4359,7 +4359,6 @@ NodeTypeDef:
             $stemid => {$__attr->{$__ns}->{$__ln}},
             $ref => $__node,
             $opt => {{
-              <H::mg|nodeRefInterfaces> => [<IFName::Attr>],
             }},
           }__;
           if ($__node-><AG::Node.nodeName> eq $name) {
@@ -4443,7 +4442,6 @@ NodeTypeDef:
                                 ->{$localName}},
             $ref => $r,
             $opt => {{
-              <H::mg|nodeRefInterfaces> => [<IFName::Attr>],
             }},
           }__;
         }
@@ -4464,7 +4462,6 @@ NodeTypeDef:
                                 ->{$localName}},
             $ref => $r,
             $opt => {{
-              <H::mg|nodeRefInterfaces> => [<IFName::Attr>],
             }},
           }__;
         }
@@ -5864,19 +5861,23 @@ NodeTypeDef:
       ##       since it can be typed in the |createAttribute| method.
 
       __DEEP{
-        my $__st_doctype = $ownerDocument-><AG::Document.doctype>;
-        $__st_doctype = $__st_doctype-><M::Node.getFeature>
-                                         (<Q::fe|XDoctype> => '3.0')
-          if defined $__st_doctype;
-        if (defined $__st_doctype) {
-          my $__st_et = $__st_doctype-><M::DTDef.getElementTypeDefinitionNode>
-                                         ($element-><AG::Node.nodeName>);
-          if (defined $__st_et) {
-            my $__st_at = $__st_et-><M::ETDef.getAttributeDefinitionNode>
-                                      ($attribute_name);
-            if (defined $__st_at) {
-              $attribute-><AS::Attr.manakaiAttributeType>
-                            ($__st_at-><AG::ATDef.declaredType>);
+        if ($ownerDocument-><AG::Document.domConfig>
+                          -><M::c|DOMConfiguration.getParameter>
+                              (<Q::cfg|dtd-attribute-type>)) {
+          my $__st_doctype = $ownerDocument-><AG::Document.doctype>;
+          $__st_doctype = $__st_doctype-><M::Node.getFeature>
+                                           (<Q::fe|XDoctype> => '3.0')
+            if defined $__st_doctype;
+          if (defined $__st_doctype) {
+            my $__st_et = $__st_doctype-><M::DTDef.getElementTypeDefinitionNode>
+                                           ($element-><AG::Node.nodeName>);
+            if (defined $__st_et) {
+              my $__st_at = $__st_et-><M::ETDef.getAttributeDefinitionNode>
+                                        ($attribute_name);
+              if (defined $__st_at) {
+                $attribute-><AS::Attr.manakaiAttributeType>
+                              ($__st_at-><AG::ATDef.declaredType>);
+              }
             }
           }
         }
@@ -5957,7 +5958,6 @@ NodeTypeDef:
             $stemid => {$attrs->{$nsuri}->{$ln}},
             $ref => $current,
             $opt => {{
-              <H::mg|nodeRefInterfaces> => [<IFName::Attr>],
             }},
           }__;
         }
@@ -6208,14 +6208,19 @@ NodeTypeDef:
 
           ## Default attribute
           my $doc = $self-><AG::Node.ownerDocument>;
-          my $prefix;
-          __CODE{tc|generateDefaultAttribute::
-            $document => $doc,
-            $element_type => {$self-><AG::Node.nodeName>},
-            $element => $self,
-            $name => $name,
-            $prefix => $prefix, $localName => $name,
-          }__;
+          my $doc_cfg = $doc-><AG::Document.domConfig>;
+          if ($doc_cfg-><M::c|DOMConfiguration.getParameter>
+                          (<Q::cfg|dtd-default-attribute>)) {
+            my $prefix;
+            __CODE{tc|generateDefaultAttribute::
+              $document => $doc,
+              $element_type => {$self-><AG::Node.nodeName>},
+              $element => $self,
+              $name => $name,
+              $prefix => $prefix, $localName => $name,
+              $cfg => $doc_cfg,
+            }__;
+          }
         } # exists
 
     @@Test:
@@ -6294,6 +6299,42 @@ NodeTypeDef:
                               'dattr1 default ');
         $test->assert_false ($el-><M::Element.getAttributeNode> ('dattr1')
                                 -><AG::Attr.specified>);
+    @@L3Test:
+      @@@QName: Element.removeAttribute.defaultattr.disabled.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docd = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>, '3.0');
+        my $dtd = $docd-><M::d|DocumentXDoctype.createDocumentTypeDefinition>
+                           ('doctype');
+          my $et = $docd-><M::d|DocumentXDoctype.createElementTypeDefinition>
+                             ('et1');
+            my $at = $docd-><M::d|DocumentXDoctype.createAttributeDefinition>
+                               ('dattr1');
+            $at-><AS::ATDef.defaultType> (<C::ATDef.EXPLICIT_DEFAULT>);
+            $at-><AS::Node.textContent> ('dattr1 default ');
+          $et-><M::ETDef.setAttributeDefinitionNode> ($at);
+        $dtd-><M::DTDef.setElementTypeDefinitionNode> ($et);
+        $doc-><M::Node.appendChild> ($dtd);
+
+        $doc-><AG::Document.domConfig>
+            -><M::c|DOMConfiguration.setParameter>
+                (<Q::cfg|dtd-default-attribute> => false);
+
+        $test->id ('created.default.value');
+        my $el = $doc-><M::Document.createElement> ('et1');
+        $test->assert_null ($el-><M::Element.getAttribute> ('dattr1'));
+
+        $test->id ('set.attr');
+        $el-><M::Element.setAttribute> ('dattr1', 'non-default-value');
+        $test->assert_equals ($el-><M::Element.getAttribute> ('dattr1'),
+                              'non-default-value');
+        $test->assert_true ($el-><M::Element.getAttributeNode> ('dattr1')
+                               -><AG::Attr.specified>);
+
+        $test->id ('remove.attr');
+        $el-><M::Element.removeAttribute> ('dattr1');
+        $test->assert_null ($el-><M::Element.getAttribute> ('dattr1'));
     @@Test:
       @@@QName: Element.removeAttribute.ro.test
       @@@PerlDef:
@@ -6377,16 +6418,21 @@ NodeTypeDef:
           }__;
 
           ## Default attribute
-          my $pfx = $attr-><AG::Node.prefix>;
-          my $name = defined $pfx ? $pfx.':'.$localName : $localName;
           my $doc = $self-><AG::Node.ownerDocument>;
-          __CODE{tc|generateDefaultAttribute::
-            $document => $doc,
-            $element_type => {$self-><AG::Node.nodeName>},
-            $element => $self,
-            $name => $name,
-            $prefix => $pfx, $localName => $localName,
-          }__;
+          my $doc_cfg = $doc-><AG::Document.domConfig>;
+          if ($doc_cfg-><M::c|DOMConfiguration.getParameter>
+                          (<Q::cfg|dtd-default-attribute>)) {
+            my $pfx = $attr-><AG::Node.prefix>;
+            my $name = defined $pfx ? $pfx.':'.$localName : $localName;
+            __CODE{tc|generateDefaultAttribute::
+              $document => $doc,
+              $element_type => {$self-><AG::Node.nodeName>},
+              $element => $self,
+              $name => $name,
+              $prefix => $pfx, $localName => $localName,
+              $cfg => $doc_cfg,
+            }__;
+          }
         } # exists
 
     @@Test:
@@ -6474,6 +6520,49 @@ NodeTypeDef:
         $test->assert_false ($el-><M::Element.getAttributeNodeNS>
                                     ($uri, 'dattr1')
                                 -><AG::Attr.specified>);
+    @@L3Test:
+      @@@QName: Element.removeAttributeNS.defaultattr.disabled.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+        my $uri = 'http://www.example.com/';
+        my $docd = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>, '3.0');
+        my $dtd = $docd-><M::d|DocumentXDoctype.createDocumentTypeDefinition>
+                           ('doctype');
+          my $et = $docd-><M::d|DocumentXDoctype.createElementTypeDefinition>
+                             ('et1');
+            my $at = $docd-><M::d|DocumentXDoctype.createAttributeDefinition>
+                               ('ns1:dattr1');
+            $at-><AS::ATDef.defaultType> (<C::ATDef.EXPLICIT_DEFAULT>);
+            $at-><AS::Node.textContent> ('dattr1 default ');
+          $et-><M::ETDef.setAttributeDefinitionNode> ($at);
+            my $at2 = $docd-><M::d|DocumentXDoctype.createAttributeDefinition>
+                               ('xmlns:ns1');
+            $at2-><AS::ATDef.defaultType> (<C::ATDef.EXPLICIT_DEFAULT>);
+            $at2-><AS::Node.textContent> ($uri);
+          $et-><M::ETDef.setAttributeDefinitionNode> ($at2);
+        $dtd-><M::DTDef.setElementTypeDefinitionNode> ($et);
+        $doc-><M::Node.appendChild> ($dtd);
+
+        $doc-><AG::Document.domConfig>
+            -><M::c|DOMConfiguration.setParameter>
+                (<Q::cfg|dtd-default-attribute> => false);
+
+        $test->id ('created.default.value');
+        my $el = $doc-><M::Document.createElementNS> ($uri, 'et1');
+        $test->assert_null ($el-><M::Element.getAttributeNS> ($uri, 'dattr1'));
+
+        $test->id ('set.attr');
+        $el-><M::Element.setAttributeNS>
+               ($uri, 'ns1:dattr1', 'non-default-value');
+        $test->assert_equals ($el-><M::Element.getAttributeNS> ($uri, 'dattr1'),
+                              'non-default-value');
+        $test->assert_true ($el-><M::Element.getAttributeNodeNS> ($uri, 'dattr1')
+                               -><AG::Attr.specified>);
+
+        $test->id ('remove.attr');
+        $el-><M::Element.removeAttributeNS> ($uri, 'dattr1');
+        $test->assert_null ($el-><M::Element.getAttributeNS> ($uri, 'dattr1'));
 
   @Method:
     @@Name: removeAttributeNode
@@ -6543,15 +6632,20 @@ NodeTypeDef:
         $r = $oldAttr;
       
         ## Default attribute
-        my $name = $oldAttr-><AG::Node.nodeName>;
-        my $pfx = $oldAttr-><AG::Node.prefix>;
-        __CODE{tc|generateDefaultAttribute::
-          $document => $od,
-          $element_type => {$self-><AG::Node.nodeName>},
-          $element => $self,
-          $name => $name,
-          $prefix => $pfx, $localName => $ln,
-        }__;
+        my $doc_cfg = $od-><AG::Document.domConfig>;
+        if ($doc_cfg-><M::c|DOMConfiguration.getParameter>
+                        (<Q::cfg|dtd-default-attribute>)) {
+          my $name = $oldAttr-><AG::Node.nodeName>;
+          my $pfx = $oldAttr-><AG::Node.prefix>;
+          __CODE{tc|generateDefaultAttribute::
+            $document => $od,
+            $element_type => {$self-><AG::Node.nodeName>},
+            $element => $self,
+            $name => $name,
+            $prefix => $pfx, $localName => $ln,
+            $cfg => $doc_cfg,
+          }__;
+        }
 
     @@Test:
       @@@QName: Element.removeAttributeNode.test
@@ -6634,9 +6728,50 @@ NodeTypeDef:
         $test->assert_false ($el-><M::Element.getAttributeNode> ('dattr1')
                                 -><AG::Attr.specified>);
         $test->assert_null ($a1-><AG::Attr.ownerElement>);
+    @@L3Test:
+      @@@QName: Element.removeAttributeNode.defaultattr.disabled.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docd = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>, '3.0');
+        my $dtd = $docd-><M::d|DocumentXDoctype.createDocumentTypeDefinition>
+                           ('doctype');
+          my $et = $docd-><M::d|DocumentXDoctype.createElementTypeDefinition>
+                             ('et1');
+            my $at = $docd-><M::d|DocumentXDoctype.createAttributeDefinition>
+                               ('dattr1');
+            $at-><AS::ATDef.defaultType> (<C::ATDef.EXPLICIT_DEFAULT>);
+            $at-><AS::Node.textContent> ('dattr1 default ');
+          $et-><M::ETDef.setAttributeDefinitionNode> ($at);
+        $dtd-><M::DTDef.setElementTypeDefinitionNode> ($et);
+        $doc-><M::Node.appendChild> ($dtd);
+
+        $doc-><AG::Document.domConfig>
+            -><M::c|DOMConfiguration.setParameter>
+                (<Q::cfg|dtd-default-attribute> => false);
+
+        $test->id ('created.default.value');
+        my $el = $doc-><M::Document.createElement> ('et1');
+        $test->assert_null ($el-><M::Element.getAttribute> ('dattr1'));
+
+        $test->id ('set.attr');
+        $el-><M::Element.setAttribute> ('dattr1', 'non-default-value');
+        $test->assert_equals ($el-><M::Element.getAttribute> ('dattr1'),
+                              'non-default-value');
+        $test->assert_true ($el-><M::Element.getAttributeNode> ('dattr1')
+                               -><AG::Attr.specified>);
+
+        $test->id ('remove.attr');
+        my $a1 = $el-><M::Element.getAttributeNode> ('dattr1');
+        $el-><M::Element.removeAttributeNode> ($a1);
+        $test->assert_null ($el-><M::Element.getAttribute> ('dattr1'));
+        $test->id ('removed.attr.ownerElement');
+        $test->assert_null ($a1-><AG::Attr.ownerElement>);
 
   @CODE:
     @@QName: tc|generateDefaultAttribute
+    @@enDesc:
+      <Perl::$cfg>: DOM configuration object of the <Perl::$document>.
     @@PerlDef:
       __DEEP{
         my $__doctype = $document-><AG::Document.doctype>;
@@ -6651,10 +6786,9 @@ NodeTypeDef:
 
             my $__at = $__et-><M::ETDef.getAttributeDefinitionNode> ($name);
             if (defined $__at) {
-              my $__cfg = $document-><AG::Document.domConfig>;
-              my $__copy_asis = $__cfg-><M::c|DOMConfiguration.getParameter>
+              my $__copy_asis = $cfg-><M::c|DOMConfiguration.getParameter>
                                      (<Q::cfg|clone-entity-reference-subtree>);
-              $__cfg-><M::c|DOMConfiguration.setParameter>
+              $cfg-><M::c|DOMConfiguration.setParameter>
                         (<Q::cfg|clone-entity-reference-subtree> => true);
               ADD: {
                 my $__attr;
@@ -6703,7 +6837,7 @@ NodeTypeDef:
                               ## This method change the |specified| flag
                 $__attr-><AS::Attr.specified> (false);
               } # ADD
-              $__cfg-><M::c|DOMConfiguration.setParameter>
+              $cfg-><M::c|DOMConfiguration.setParameter>
                      (<Q::cfg|clone-entity-reference-subtree> => $__copy_asis);
             }
             $document-><AS::Document.strictErrorChecking> ($__orig_strict);
@@ -10755,7 +10889,6 @@ NodeTypeDef:
           $prop => {<H::infoset|ownerElement>},
           $ref => $self,
           $opt => {{
-            <H::mg|nodeRefInterfaces> => [<IFName::Element>],
           }},
         }__;
 

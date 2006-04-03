@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/04/01 17:52:34 $
+      $Date: 2006/04/03 12:53:26 $
     @@ContentType:
       dis:Date.RCS
   
@@ -51,6 +51,8 @@ Module:
 Namespace:
   @c:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
+  @cfg:
+    http://suika.fam.cx/www/2006/dom-config/
   @cs:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Charset/
   @dd:
@@ -109,6 +111,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/-temp/2003/09/27/null
   @pc:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/PerlCode#
+  @pc2:
+    http://suika.fam.cx/~wakaba/archive/2005/12/pc/
   @pl:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#Perl--
   @rdf:
@@ -392,21 +396,6 @@ IFClsDef:
     The object implementing the <IF::DISElementPerl> interface
     <kwd:MUST> also implement the <IF::DIS|DISElement> interface.
 
-  @Attr:
-    @@Name: plImplementation
-    @@enDesc:
-      The implementation object, which the object belongs to and
-      which implements the feature <Feature::Util|PerlCode>
-      version <FeatureVer::1.0>.
-    @@Type: DIS|MPLImpl
-    @@Get:
-      @@@nullCase:
-        @@@@enDesc:
-          There is no implementation that supports the feature
-          <Feature::Util:PerlCode> version <FeatureVer::1.0>.
-      @@@PerlDef:
-        $r = $Message::Util::DIS::Perl::Implementation;
-
   @Method:
     @@Name: plValueCodeFragment
     @@enDesc:
@@ -416,6 +405,9 @@ IFClsDef:
           This method is <EM::deprecated>; use
           <M::DISResourcePerl.getPerlCodeFromDVValue> instead.
         }
+    @@Param:
+      @@@Name: factory
+      @@@Type: PCDocument
     @@Param:
       @@@Name: attrURI
       @@@Type: DIS|AnyURI
@@ -457,11 +449,6 @@ IFClsDef:
         @@@@enDesc:
           There is no <P::attrURI> attribute.
       @@@UndeclaredPrefixException:
-      @@@RaiseException:
-        @@@@@:DIS|NO_PERL_CODE_IMPL_ERR
-        @@@@enDesc:
-          There is no implementation that implements
-          the <Feature::Util:PerlCode> feature, version <FeatureVer::1.0>.
       @@@PerlDef:
         __DEEP{
           my $dataType;
@@ -473,11 +460,7 @@ IFClsDef:
                                  database_arg => $disResource
                                      -><AG::DIS|DISAnyResource.database>)
                       : $self;
-          my $plimpl = $self-><AG::DISElementPerl.plImplementation>;
           if ($vnode) {
-            unless ($plimpl) {
-              __UNDEEP{__EXCEPTION{DIS|NO_PERL_CODE_IMPL_ERR}__}__;
-            }
             my $isnull = $vnode-><M::DIS|DISElement.disGetAttribute>
                                            (<Q::dis:is-null>,
                                             for_arg => $forArg,
@@ -485,7 +468,7 @@ IFClsDef:
                                   database_arg => $disResource
                                      -><AG::DIS|DISAnyResource.database>);
             if ($isnull and $isnull-><M::DIS|SWCFGNode.value>) {
-              $r = $plimpl-><M::DIS|MPLImpl.createPerlAtom> ('undef');
+              $r = $factory-><M::PCDocument.createPCLiteral> (null);
             } else {
               my $vnode_type_uri = $vnode-><M::DIS|DISElement.mediaTypeURI>
                                            (for_arg => $forArg,
@@ -497,12 +480,12 @@ IFClsDef:
                                                       ($vnode_type_uri);
                 if ($vnode_type-><M::DIS|DISResource.isSubsetOfURI>
                                         (<Q::dis:Boolean>)) {
-                  $r = $plimpl-><M::DIS|MPLImpl.createPerlAtom>
+                  $r = $factory-><M::PCDocument.createPCLiteral>
                                         ($vnode_value ? true : false);
                 } elsif ($vnode_type-><M::DIS|DISResource
                                              .isSubsetOfURI>
-                                        (<Q::dis:TypeQName>)) {
-                  $r = $plimpl-><M::DIS|MPLImpl.createPerlStringLiteral>
+                                        (<Q::DISCore|QName>)) {
+                  $r = $factory-><M::PCDocument.createPCLiteral>
                                     ($vnode-><M::DIS|NSResolverDIS
                                                .qnameToURI> ($vnode_value,
                                                              node => $vnode));
@@ -510,12 +493,12 @@ IFClsDef:
                                 .isSubsetOfURI> (<Q::lang:Perl>)) {
                   $r = $disResource-><M::DISResourcePerl
                              .plPreprocessPerlStatement>
-                                           ($vnode_value,
+                                           ($factory, $vnode_value,
                                             node => $vnode,
                                             contains_statements => false);
                 } else { ## DISCore:String or some
-                  $r = $plimpl-><M::DIS|MPLImpl.createPerlStringLiteral>
-                                                       ($vnode_value);
+                  $r = $factory-><M::PCDocument.createPCLiteral>
+                                   ($vnode_value);
                 }
               } elsif ($dataTypeURI) {
                 $dataType ||= $disResource-><AG::DIS|DISAnyResource.database>
@@ -523,19 +506,18 @@ IFClsDef:
                                               ($dataTypeURI);
                 if ($dataType-><M::DIS|DISResource.isSubsetOfURI>
                                               (<Q::DISIDL:AnyRealNumber>)) {
-                  $r = $plimpl-><M::DIS|MPLImpl.createPerlAtom>
+                  $r = $factory-><M::PCDocument.createPCLiteral>
                                               (0 + $vnode_value);
                 } elsif ($dataType-><M::DIS|DISResource
                                 .isSubsetOfURI> (<Q::idl|boolean>)) {
-                  $r = $plimpl-><M::DIS|MPLImpl.createPerlAtom>
+                  $r = $factory-><M::PCDocument.createPCLiteral>
                                     ($vnode_value eq 'tr'.'ue' ? true : false);
                 } else { ## |DOMString| or some
-                  $r = $plimpl-><M::DIS|MPLImpl.createPerlStringLiteral>
-                                                       ($vnode_value);
+                  $r = $factory-><M::PCDocument.createPCLiteral>
+                                   ($vnode_value);
                 }
               } else {  ## Untyped
-                $r = $plimpl-><M::DIS|MPLImpl.createPerlStringLiteral>
-                                                       ($vnode_value);
+                $r = $factory-><M::PCDocument.createPCLiteral> ($vnode_value);
               }
             }
           } # has value
@@ -546,18 +528,18 @@ IFClsDef:
                                               ($dataTypeURI);
             if ($dataType-><M::DIS|DISResource.isSubsetOfURI>
                                               (<Q::DISLang:String>)) {
-              $r = $plimpl-><M::DIS|MPLImpl.createPerlStringLiteral> ('');
+              $r = $factory-><M::PCDocument.createPCLiteral> ('');
             } elsif ($dataType-><M::DIS|DISResource.isSubsetOfURI>
                                               (<Q::idl|boolean>) or
                      $dataType-><M::DIS|DISResource.isSubsetOfURI>
                                               (<Q::DISIDL:AnyRealNumber>)) {
-              $r = $plimpl-><M::DIS|MPLImpl.createPerlAtom> ('0');
+              $r = $factory-><M::PCDocument.createPCLiteral> (0);
             } elsif ($dataType-><M::DIS|DISResource.isSubsetOfURI>
-                                              (<Q::pl:ARRAY>)) {
-              $r = $plimpl-><M::DIS|MPLImpl.createPerlAtom> ('[]');
+                                              (<Q::DISPerl|ARRAY>)) {
+              $r = $factory-><M::PCDocument.createPCLiteral> ([]);
             } elsif ($dataType-><M::DIS|DISResource.isSubsetOfURI>
-                                              (<Q::pl:HASH>)) {
-              $r = $plimpl-><M::DIS|MPLImpl.createPerlAtom> ('{}');
+                                              (<Q::DISPerl|HASH>)) {
+              $r = $factory-><M::PCDocument.createPCLiteral> ({});
             }
           }
         }__;
@@ -566,6 +548,9 @@ IFClsDef:
     @@Name: plCodeFragment
     @@enDesc:
       Converts <Q::lang:dis> into Perl code.
+    @@Param:
+      @@@Name: factory
+      @@@Type: PCDocument
     @@Param:
       @@@Name: disResource
       @@@Type: DIS|DISResource
@@ -591,7 +576,6 @@ IFClsDef:
       @@@disPerlException:
       @@@PerlDef:
         __DEEP{
-          my $plimpl = $self-><AG::DISElementPerl.plImplementation>;
           my $et = $self-><AG::DIS|SWCFGElement.expandedURI>;
           if ($et eq <Q::dis:Def>) {
             my $value = $self-><M::DIS|SWCFGNode.value>;
@@ -601,17 +585,17 @@ IFClsDef:
                 DIS:elementType => {$et},
               }__}__;
             }
-            $r = $plimpl-><M::DIS|MPLImpl.createPerlBlockContainer>;
+            $r = $factory-><M::Document.createElementNS>
+                             (<Q::pc:>, 'blockContainer');
             for my $c (@{$self-><M::DIS|DISElement.disChildElements>
                                   (for_arg => $forArg, forp_arg => $forpArg,
                                    database_arg => $databaseArg)}) {
               my $ccode = $c-><M::DISElementPerl.plCodeFragment>
-                                  ($disResource,
+                                  ($factory, $disResource,
                                    for_arg => $forArg, forp_arg => $forpArg,
                                    contains_statements => $containsStatements,
                                    database_arg => $databaseArg);
-              $r-><M::DIS|PLBlockCon.appendCodeFragment> ($ccode->clone)
-                if $ccode;
+              $r-><M::Node.appendChild> ($ccode) if defined $ccode;
             }
           } elsif ({
             <Q::DISLang:constValue> => true,
@@ -670,7 +654,7 @@ IFClsDef:
               my $data_type = $const-><AG::DIS|DISResource
                                        .disActualDataTypeResource>;
               my $val = $const->{<Q::dis:Value>}-><M::DVValuePerl.plCodeFragment>
-                            ($disResource,
+                            ($factory, $disResource,
                              data_type_uri => $data_type
                                     -><AG::DIS|DISAnyResource.uri>,
                                    database_arg => $databaseArg)
@@ -685,8 +669,8 @@ IFClsDef:
               }
             
               if ($containsStatements) {
-                $r = $plimpl-><M::DIS|MPLImpl.createPerlStatement>;
-                my $rvar = $plimpl-><M::DIS|MPLImpl.createPerlVariable>
+                $r = $factory-><M::PCDocument.createPCStatement>;
+                my $rvar = $factory-><M::PCDocument.createPCVariable>
                                                  ('$', null, 'r');
                 $r-><M::DIS|PLAnyCon.appendNewAssignment> ($rvar => $val);
               } else {
@@ -731,10 +715,10 @@ IFClsDef:
                   }
                 }__; # UNDEEP
               }
-              $r = $ret-><AG::DISResourcePerl.plCodeFragment>;
+              $r = $ret-><M::DISResourcePerl.plCodeFragment> ($factory);
             } elsif ($const-><M::DIS|DISResource.isTypeURI>
                                  (<Q::DISCore:AnyDefContainer>)) {
-              $r = $const-><AG::DISResourcePerl.plCodeFragment>;
+              $r = $const-><M::DISResourcePerl.plCodeFragment> ($factory);
             } else {
               if ($et eq <Q::DISLang:constValue>) {
                 __UNDEEP{__EXCEPTION{DIS|RESOURCE_NOT_DEFINED_ERR::
@@ -754,17 +738,16 @@ IFClsDef:
             }
           } elsif ($et eq <Q::DISLang:value>) {
             my $val = $self-><M::DISElementPerl.plValueCodeFragment>
-                            (null, $disResource,
+                            ($factory, null, $disResource,
                              for_arg => $forArg,
                              forp_arg => $forpArg,
                                    database_arg => $databaseArg);
-            $r = $plimpl-><M::DIS|MPLImpl.createPerlStatement>;
-            my $rvar = $plimpl-><M::DIS|MPLImpl.createPerlVariable>
+            $r = $factory-><M::PCDocument.createPCStatement>;
+            my $rvar = $factory-><M::PCDocument.createPCVariable>
                                                  ('$', null, 'r');
             $r-><M::DIS|PLAnyCon.appendNewAssignment> ($rvar => $val);
           } elsif ({
             <Q::dis:GetProp> => true,
-            <Q::dis:GetPropNode> => true,
             <Q::swcfg21:GetPropNode> => true,
           }->{$et}) {
             my $prop_uri = $self-><AG::DIS|DISElement.qnameValueURI>;
@@ -773,37 +756,39 @@ IFClsDef:
             $prop_res-><AS::DIS|DISAnyResource.isReferred> ($self);
             my $prop_name = $prop_res-><M::DIS|DISResourceProp.getPropertyText>
                        (<Q::DISPerl:propHashKey>, $prop_uri);
-            $r = $plimpl-><M::DIS|MPLImpl.createPerlStatement>;
+            $r = $factory-><M::PCDocument.createPCStatement>;
             my $node_prop_name = $disResource->{db}
                      -><M::DIS|DISDatabase.getResource> (<Q::mn:node>)
                      -><M::DIS|DISResourceProp.getPropertyText>
                        (<Q::DISPerl:propHashKey>, <Q::mn:node>);
-            my $val = $plimpl-><M::DIS|MPLImpl.createPerlInlineContainer>;
+            my $val = $factory-><M::Document.createElementNS>
+                                  (<Q::pc:>, 'inlineContainer');
             $val-><M::DIS|PLInCon.appendCode> ('$self->{');
             $val-><M::DIS|PLAnyCon.appendStringLiteral> ($node_prop_name);
             $val-><M::DIS|PLInCon.appendCode> ('}->{');
             $val-><M::DIS|PLAnyCon.appendStringLiteral> ($prop_name);
             $val-><M::DIS|PLInCon.appendCode> ('}');
-            my $rvar = $plimpl-><M::DIS|MPLImpl.createPerlVariable>
+            my $rvar = $factory-><M::PCDocument.createPCVariable>
                                                ('$', null, 'r');
             $r-><M::DIS|PLAnyCon.appendNewAssignment> ($rvar => $val);
             
-            if ({<Q::dis:GetPropNode> => true,
+            if ({
                  <Q::swcfg21:GetPropNode> => true}->{$et}) {
-              my $q = $plimpl-><M::DIS|MPLImpl.createPerlBlockContainer>;
-              $q-><M::DIS|PLBlockCon.appendCodeFragment> ($r);
-              $q-><M::DIS|PLBlockCon.appendNewIf>
-                       ($plimpl-><M::DIS|MPLImpl.createPerlInlineUnparsedCode>
-                                                     ('defined $r'),
-                        my $qt = $plimpl-><M::DIS|MPLImpl
-                                                .createPerlBlockContainer>);
+              my $q = $factory-><M::Document.createElementNS>
+                                  (<Q::pc:>, 'blockContainer');
+              $q-><M::Node.appendChild> ($r);
+              my $dr = $factory-><M::Document.createElementNS>
+                                  (<Q::pc:>, 'inlineUnparsed');
+              $dr-><AS::Node.textContent> ('defined $r');
+              my $qt = $factory-><M::Document.createElementNS>
+                                   (<Q::pc:>, 'blockContainer');
+              $q-><M::DIS|PLBlockCon.appendNewIf> ($dr, $qt);
+              my $qtr = $factory-><M::Document.createElementNS>
+                                   (<Q::pc:>, 'inlineContainer');
               $qt-><M::DIS|PLBlockCon.appendStatement>
-                 -><M::DIS|PLAnyCon.appendNewAssignment>
-                       ($rvar->clone => my $qtr = $plimpl-><M::DIS|MPLImpl
-                                                    .createPerlInlineContainer>);
+                 -><M::DIS|PLAnyCon.appendNewAssignment> ($rvar->clone => $qtr);
               my $cls = $disResource->{db}-><M::DIS|DISDatabase
                            .getResource> ({
-                             <Q::dis:GetPropNode> => <Q::DOMCore:ManakaiDOMNode>,
                              <Q::swcfg21:GetPropNode> =>
                                                    <Q::swcfg21:ManakaiSWCFGNode>,
                            }->{$et}, for_arg => $forArg);
@@ -820,67 +805,21 @@ IFClsDef:
             $prop_res-><AS::DIS|DISAnyResource.isReferred> ($self);
             my $prop_name = $prop_res-><M::DIS|DISResourceProp.getPropertyText>
                        (<Q::DISPerl:propHashKey>, $prop_uri);
-            $r = $plimpl-><M::DIS|MPLImpl.createPerlStatement>;
+            $r = $factory-><M::PCDocument.createPCStatement>;
             my $node_prop_name = $disResource->{db}
                      -><M::DIS|DISDatabase.getResource> (<Q::mn:node>)
                      -><M::DIS|DISResourceProp.getPropertyText>
                        (<Q::DISPerl:propHashKey>, <Q::mn:node>);
-            my $val = $plimpl-><M::DIS|MPLImpl.createPerlInlineContainer>;
+            my $val = $factory-><M::Document.createElementNS>
+                                  (<Q::pc:>, 'inlineContainer');
             $val-><M::DIS|PLInCon.appendCode> ('$self->{');
             $val-><M::DIS|PLAnyCon.appendStringLiteral> ($node_prop_name);
             $val-><M::DIS|PLInCon.appendCode> ('}->{');
             $val-><M::DIS|PLAnyCon.appendStringLiteral> ($prop_name);
             $val-><M::DIS|PLInCon.appendCode> ('}');
-            my $rvar = $plimpl-><M::DIS|MPLImpl.createPerlVariable>
+            my $rvar = $factory-><M::PCDocument.createPCVariable>
                                                ('$', null, 'given');
             $r-><M::DIS|PLAnyCon.appendNewAssignment> ($val => $rvar);
-            my $chk = $self-><M::DIS|DISElement.disGetAttribute>
-                                           (<Q::dis:CheckReadOnly>,
-                for_arg => $disResource-><AG::DIS|DISAnyResource.forURI>,
-                forp_arg => $disResource-><AG::DIS|DISAnyResource.forpURI>,
-                database_arg => $disResource-><AG::DIS|DISAnyResource.database>);
-            if ($chk and $chk-><M::DIS|SWCFGNode.value>) {
-              my $q = $plimpl-><M::DIS|MPLImpl.createPerlIf>
-                   (my $qc = $plimpl-><M::DIS|MPLImpl.createPerlInlineContainer>,
-                    my $qt = $plimpl-><M::DIS|MPLImpl.createPerlBlockContainer>);
-              my $ro_prop_name = $disResource->{db}
-                     -><M::DIS|DISDatabase.getResource> (<Q::DOMCore:read-only>)
-                     -><M::DIS|DISResourceProp.getPropertyText>
-                       (<Q::DISPerl:propHashKey>, <Q::DOMCore:read-only>);
-              $qc-><M::DIS|PLInCon.appendCode> ('$self->{');
-              $qc-><M::DIS|PLAnyCon.appendStringLiteral> ($node_prop_name);
-              $qc-><M::DIS|PLInCon.appendCode> ('}->{');
-              $qc-><M::DIS|PLAnyCon.appendStringLiteral> ($ro_prop_name);
-              $qc-><M::DIS|PLInCon.appendCode> ('}');
-
-              my $for_uri = $disResource->{db}-><M::DIS|DISDatabase.getFor>
-                               ($forArg)-><M::DIS|DISFor.isaURI>
-                               (<Q::ManakaiDOM:ManakaiDOM1>)
-                            ? $forArg : <Q::ManakaiDOM:ManakaiDOMLatest>;
-              my $cls = $disResource->{db}-><M::DIS|DISDatabase.getResource>
-                                            (<Q::DOMCore:ManakaiDOMException>,
-                                                       for_arg => $for_uri);
-              my $const = $disResource->{db}-><M::DIS|DISDatabase.getResource>
-                                 (<Q::DOMCore:NO_MODIFICATION_ALLOWED_ERR>,
-                                                       for_arg => $for_uri);
-              my $subtype = $disResource->{db}
-                                            -><M::DIS|DISDatabase.getResource>
-                                                    (<Q::MDOMX:NOMOD_THIS>,
-                                                       for_arg => $for_uri);
-              $_-><AS::DIS|DISAnyResource.isReferred>
-                               ($self) for $cls, $const, $subtype;
-              my $context_param = $disResource-><M::ManakaiDISResourcePerl
-                                        .plGetContextParameter>;
-              $disResource-><M::ManakaiDISResourcePerl
-                            .plAppendThrow>
-                               ($qt, $cls, $const, $subtype,
-                                {%$context_param},
-                                node => $self);
-              my $or = $r;
-              $r = $plimpl-><M::DIS|MPLImpl.createPerlBlockContainer>;
-              $r-><M::DIS|PLBlockCon.appendCodeFragment> ($q);
-              $r-><M::DIS|PLBlockCon.appendCodeFragment> ($or);
-            } # Read-only checking
           } elsif ($et eq <Q::DOMMain:raiseException>) {
             my ($cls, $const, $subtype)
                 = @{$disResource->{db}-><M::DIS|DISDatabase.xcrefToResource>
@@ -890,9 +829,10 @@ IFClsDef:
                                           for_arg => $forArg)};
             my $context_param = $disResource-><M::ManakaiDISResourcePerl
                                         .plGetContextParameter>;
+            $r = $factory-><M::Document.createElementNS>
+                             (<Q::pc:>, 'blockContainer');
             $disResource-><M::ManakaiDISResourcePerl.plAppendThrow>
-                        ($r = $plimpl-><M::DIS|MPLImpl.createPerlBlockContainer>,
-                         $cls, $const, $subtype,
+                        ($factory, $r, $cls, $const, $subtype,
                          {%$context_param},
                          node => $self);
           } elsif ({
@@ -910,28 +850,6 @@ IFClsDef:
           }
         }__; # DEEP
 ##DISElementPerl
-
-ResourceDef:
-  @QName: setDefaultValue
-  @rdf:type: DISPerl|BlockCode
-  @PerlDef:
-    if ($data_type-><M::DIS|DISResource.isSubsetOfURI>
-                                              (<Q::DISLang:String>)) {
-      $result = $plimpl-><M::DIS|MPLImpl.createPerlStringLiteral> ('');
-    } elsif ($data_type-><M::DIS|DISResource.isSubsetOfURI>
-                                              (<Q::idl|boolean>) or
-             $data_type-><M::DIS|DISResource.isSubsetOfURI>
-                                              (<Q::DISIDL:AnyRealNumber>)) {
-      $result = $plimpl-><M::DIS|MPLImpl.createPerlAtom> ('0');
-    } elsif ($data_type-><M::DIS|DISResource.isSubsetOfURI>
-                                              (<Q::DISPerl|ARRAY>)) {
-      $result = $plimpl-><M::DIS|MPLImpl.createPerlAtom> ('[]');
-    } elsif ($data_type-><M::DIS|DISResource.isSubsetOfURI>
-                                              (<Q::DISPerl|HASH>)) {
-      $result = $plimpl-><M::DIS|MPLImpl.createPerlAtom> ('{}');
-    }
-  @For: DIS|ForEmpty
-##setDefaultValue
 
 ResourceDef:
   @QName: setDefaultValueDoc
@@ -1016,11 +934,6 @@ PropDef:
     Cache for <A::ManakaiDISResourceDefinition.plCodeFragment>.
 
 PropDef:
-  @QName: DIS|plDefined
-  @enDesc:
-    Whether a Perl definition for this resource is implemented or not.
-
-PropDef:
   @QName: plFullyQualifiedName
   @enDesc:
     Fully qualified name.
@@ -1042,6 +955,9 @@ IFClsDef:
     @@Name: plCodeFragment
     @@enDesc:
       Returns a Perl representation of the value.
+    @@Param:
+      @@@Name: factory
+      @@@Type: PCDocument
     @@Param:
       @@@Name: disResource
       @@@Type: DIS|DISResource
@@ -1071,12 +987,8 @@ IFClsDef:
       @@@PerlDef:
         __DEEP{
           my $dataType;
-          my $plimpl = $self-><AG::DISElementPerl.plImplementation>;
-          unless ($plimpl) {
-            __UNDEEP{__EXCEPTION{DIS|NO_PERL_CODE_IMPL_ERR}__}__;
-          }
           if ($self-><AG::dv|DVValue.isNull>) {
-            $r = $plimpl-><M::DIS|MPLImpl.createPerlAtom> ('undef');
+            $r = $factory-><M::PCDocument.createPCLiteral> (null);
           } else {
             my $vnode_type = $disResource-><AG::DIS|DISAnyResource.database>
                                          -><M::DIS|DISDatabase.getResource>
@@ -1085,16 +997,16 @@ IFClsDef:
                                 .isSubsetOfURI> (<Q::lang:Perl>)) {
               $r = $disResource-><M::DISResourcePerl
                              .plPreprocessPerlStatement>
-                            ($self-><AG::dv|DVValue.stringValue>,
+                            ($factory, $self-><AG::dv|DVValue.stringValue>,
                              contains_statements => false,
                              namespace_context => $self);
             } elsif ($vnode_type-><M::DIS|DISResource.isSubsetOfURI>
                                         (<Q::DISCore:Integer>)) {
-              $r = $plimpl-><M::DIS|MPLImpl.createPerlAtom>
+              $r = $factory-><M::PCDocument.createPCLiteral>
                                   ($self-><AG::dv|DVValue.value> + 0);
             } elsif ($vnode_type-><M::DIS|DISResource.isSubsetOfURI>
                                         (<Q::DISCore:Boolean>)) {
-              $r = $plimpl-><M::DIS|MPLImpl.createPerlAtom>
+              $r = $factory-><M::PCDocument.createPCLiteral>
                                   ($self-><AG::dv|DVValue.value> ? true : false);
             } elsif ($dataTypeURI) {
               $dataType ||= $disResource-><AG::DIS|DISAnyResource.database>
@@ -1106,46 +1018,23 @@ IFClsDef:
               }
               if ($dataType-><M::DIS|DISResource.isSubsetOfURI>
                                                 (<Q::DISIDL:AnyRealNumber>)) {
-                $r = $plimpl-><M::DIS|MPLImpl.createPerlAtom>
+                $r = $factory-><M::PCDocument.createPCLiteral>
                                                 (0 + $vnode_value);
               } elsif ($dataType-><M::DIS|DISResource
                                   .isSubsetOfURI> (<Q::idl|boolean>)) {
-                $r = $plimpl-><M::DIS|MPLImpl.createPerlAtom>
+                $r = $factory-><M::PCDocument.createPCLiteral>
                                       ($vnode_value eq 'tr'.'ue' ? true :
                                        $vnode_value eq '1' ? true : false);
               } else { ## |DOMString| or some
-                $r = $plimpl-><M::DIS|MPLImpl.createPerlStringLiteral>
+                $r = $factory-><M::PCDocument.createPCLiteral>
                                          ($self-><AG::dv|DVValue.stringValue>);
               }
             } else { ## DISCore:String or some
-              $r = $plimpl-><M::DIS|MPLImpl.createPerlStringLiteral>
+              $r = $factory-><M::PCDocument.createPCLiteral>
                                     ($self-><AG::dv|DVValue.stringValue>);
             }
           }
         }__;
-
-  @Attr:
-    @@Name: plImplementation
-    @@enDesc:
-      The implementation object, which the object belongs to and
-      which implements the feature <Feature::Util|PerlCode>
-      version <FeatureVer::1.0>.
-    @@Type: DIS|MPLImpl
-    @@Get:
-      @@@enDesc:
-        The Perl code implementation object. 
-      @@@nullCase:
-        @@@@enDesc:
-          There is no implementation that supports the feature
-          <Feature::Util:PerlCode> version <FeatureVer::1.0> or
-          the resource has no source element associated.
-      @@@RaiseException:
-        @@@@@: DIS|NO_PERL_CODE_IMPL_ERR
-        @@@@enDesc:
-          There is no implementation that implements 
-          the <Feature::Util:PerlCode> feature, version <FeatureVer::1.0>. 
-      @@@PerlDef:
-        $r = $Message::Util::DIS::Perl::Implementation;
 ##DVValuePerl
 
 ElementTypeBinding:
@@ -2107,29 +1996,6 @@ IFClsDef:
   @enDesc:
     The objects implementing the <IF::DISAnyResourcePerl> interface
     <kwd:MUST> also implement the <IF::DIS|DISAnyResource> interface.
-  
-  @Attr:
-    @@Name: plImplementation
-    @@enDesc:
-      The implementation object, which the object belongs to and
-      which implements the feature <Feature::Util|PerlCode>
-      version <FeatureVer::1.0>.
-    @@Type: DIS|MPLImpl
-    @@Get:
-      @@@enDesc:
-        The Perl code implementation object. 
-      @@@nullCase:
-        @@@@enDesc:
-          There is no implementation that supports the feature
-          <Feature::Util:PerlCode> version <FeatureVer::1.0> or
-          the resource has no source element associated.
-      @@@RaiseException:
-        @@@@@: DIS|NO_PERL_CODE_IMPL_ERR
-        @@@@enDesc:
-          There is no implementation that implements 
-          the <Feature::Util:PerlCode> feature, version <FeatureVer::1.0>. 
-      @@@PerlDef:
-        $r = $Message::Util::DIS::Perl::Implementation;
 ##DISAnyResourcePerl
 
 IFClsDef:
@@ -2252,6 +2118,13 @@ IFClsDef:
     @@Name: plGeneratePerlModuleFile
     @@enDesc:
       Generates a Perl file object. 
+    @@Param:
+      @@@Name: impl
+      @@@Type: DIS|MPLImpl
+      @@@enDesc:
+        The implementation from which the file object is created.
+        It <kwd:MUST> be an object that implements the
+        <Feature::Util|PerlCode> feature version <FeatureVer::1.0>.
     @@Return:
       @@@Type: DIS|PLFile
       @@@enDesc:
@@ -2273,8 +2146,7 @@ IFClsDef:
           or have a different type than the expected one.
       @@@PerlDef:
         __DEEP{
-          $r = $self-><AG::DISAnyResourcePerl.plImplementation>
-                    -><M::DIS|MPLImpl.createPerlFile>;
+          $r = $impl-><M::DIS|MPLImpl.createPCFile>;
 
           ## -- Source information
           $r-><AS::DIS|PLFile.sourceFile>
@@ -2382,6 +2254,11 @@ ResourceDef:
 ResourceDef:
   @QName: Document
   @AliasFor: tc|Document||ManakaiDOM|ManakaiDOMLatest
+  @For: DIS|ForLatest
+
+ResourceDef:
+  @QName: CFG
+  @AliasFor: c|DOMConfiguration||ManakaiDOM|ManakaiDOMLatest
   @For: DIS|ForLatest
 
 PropDef:
@@ -2684,12 +2561,17 @@ IFClsDef:
             }
           }__;
 
-  @Attr:
+  @Method:
     @@Name: plCodeFragment
     @@enDesc:
       Perl code definition fragment of this resource. 
     @@Type: DIS|MPLCodeFragment
-    @@Get:
+    @@Param:
+      @@@Name: factory
+      @@@Type: PCDocument
+      @@@enDesc:
+        The document to which the generated code belongs.
+    @@Return:
       @@@enDesc:
         Perl code.
       @@@nullCase:
@@ -3018,6 +2900,11 @@ IFClsDef:
     @@enDesc:
       Preprocesses a Perl block-level code fragment. 
     @@Param:
+      @@@Name: factory
+      @@@Type: PCDocument
+      @@@enDesc:
+        The document to which the generated code belongs.
+    @@Param:
       @@@Name:codeArg
       @@@Type:
         lang:Perl::ManakaiDOM:all
@@ -3051,12 +2938,13 @@ IFClsDef:
       @@@InlineElementException:
       @@@PerlDef:
         __DEEP{
-          my $nsr = $namespaceContext || $node || $self->{src};
+          my $nsr = $namespaceContext || $node;
           my $db = $self-><AG::DIS|DISAnyResource.database>;
           our $RegQNameChar;
           our $RegBlockContent;
-          my $plimpl = $self-><AG::DISAnyResourcePerl.plImplementation>;
-          $r = $plimpl-><M::DIS|MPLImpl.createPerlBlock>;
+          $r = $factory-><M::Document.createElementNS>
+                           (length $codeArg ? <Q::pc2:> : <Q::pc:>,
+                            'block');
           
           for my $source_code (split /\b(_ _(?:(?!_ _)$RegQNameChar)+
                                            (?:\{$RegBlockContent\})?
@@ -3085,7 +2973,7 @@ IFClsDef:
                 $block-><M::DIS|PLBlockCon.appendCodeFragment>
                           ($self-><M::DISResourcePerl
                                     .plPreprocessPerlCode>
-                                       ($source_code,
+                                       ($factory, $source_code,
                                         method_resource => $methodResource,
                                         node => $node,
                                         namespace_context=> $namespaceContext));
@@ -3119,7 +3007,7 @@ IFClsDef:
                                         .plGetContextParameter>;
 
                   $self-><M::ManakaiDISResourcePerl.plAppendThrow>
-                               ($r, $cls, $const, $subtype,
+                               ($factory, $r, $cls, $const, $subtype,
                                 {%$param, %$context_param},
                                 node => $node,
                                         namespace_context=> $namespaceContext);
@@ -3205,7 +3093,7 @@ IFClsDef:
                         $statement-><M::DIS|PLInCon.appendCodeFragment>
                           ($self-><M::DISResourcePerl
                                   .plPreprocessPerlStatement>
-                                     ($param->{$name}->{value},
+                                     ($factory, $param->{$name}->{value},
                                       node => $node,
                                       namespace_context => $namespaceContext));
                       }
@@ -3258,8 +3146,8 @@ IFClsDef:
                       DIS:expectedType => {<Q::DISPerl:BlockCode>},
                     }__;}__;
                   }
-                  my $pc = $code-><AG::DISResourcePerl
-                                       .plCodeFragment>;
+                  my $pc = $code-><M::DISResourcePerl
+                                       .plCodeFragment> ($factory);
                   unless (defined $pc) {
                     __UNDEEP{__EXCEPTION{DIS|PERL_CODE_NOT_DEFINED_ERR::
                       DIS:sourceNode => {$node},
@@ -3271,54 +3159,23 @@ IFClsDef:
                   for my $var (grep {/^\$/} keys %$param) {
                     my $value;
                     if ($param->{$var}->{type} eq 'variable') {
-                      $value = $plimpl-><M::DIS|MPLImpl.createPerlVariable>
+                      $value = $factory-><M::PCDocument.createPCVariable>
                                           ('$', null, $param->{$var}->{value});
                     } elsif ($param->{$var}->{type} eq 'code') {
                       $value = $self-><M::DISResourcePerl
                                          .plPreprocessPerlStatement>
-                                            ($param->{$var}->{value},
+                                            ($factory, $param->{$var}->{value},
                                              contains_statements => false,
                                              node => $node,
                                         namespace_context=> $namespaceContext);
                     } else {
-                      $value = $plimpl-><M::DIS|MPLImpl.createPerlStringLiteral>
+                      $value = $factory-><M::PCDocument.createPCLiteral>
                                           ($param->{$var}->{value});
                     }
                     $pc-><M::DIS|MPLCodeFragment.replaceVariable>
                                           ($var => $value);
                   }
                   $r-><M::DIS|PLBlockCon.appendCodeFragment> ($pc);
-                } elsif ($et eq <Q::ManakaiDOM:InputNormalize>) {
-                  unless ($methodResource) {
-                    __UNDEEP{__EXCEPTION{DIS|PERL_PREPROCESS_NO_METHOD_ERR::
-                      DIS:sourceNode => {$node},
-                      DIS:sourceCode => {$source_code},
-                      DIS:elementType => {$et},
-                    }__}__;
-                  }
-                  my $param = $methodResource
-                                -><M::DIS|DISResource
-                                     .getChildResourceByNameAndType>
-                                    ($source_code, <Q::DISLang:MethodParameter>);
-                  unless ($param) {
-                    __UNDEEP{__EXCEPTION{DIS|RESOURCE_NOT_DEFINED_ERR::
-                      DIS:sourceNode => {$node},
-                      DIS:sourceCode => {$source_code},
-                      DIS:elementType => {$et},
-                      DIS:localName => {$source_code},
-                      DIS:expectedType => {<Q::DISLang:MethodParameter>},
-                    }__}__;
-                  }
-                  my $norm = $param-><M::DISResourcePerl
-                                        .plGetMethodInputNormalizer>;
-                  if ($norm) {
-                    my $norm_code = $norm-><AG::DISResourcePerl
-                                               .plCodeFragment>->clone;
-                    $norm_code-><M::DIS|MPLCodeFragment.replaceVariable>
-                       ('$INPUT' => $param-><AG::DISResourcePerl
-                                                .plVariableName>);
-                    $r-><M::DIS|PLBlockCon.appendCodeFragment> ($norm_code);
-                  }
                 } elsif ($et eq <Q::disPerl:FOR>) {
                   if ($source_code =~ s/^(((?>(?!::).)*)::\s*)//) {
                     V: for my $forq (split /\s*\|\s*/, $2) {
@@ -3332,7 +3189,7 @@ IFClsDef:
                         $r-><M::DIS|PLBlockCon.appendCodeFragment>
                             ($self-><M::DISResourcePerl
                                   .plPreprocessPerlCode>
-                                     ($source_code,
+                                     ($factory, $source_code,
                                       method_resource => $methodResource,
                                       node => $node,
                                         namespace_context=> $namespaceContext));
@@ -3358,67 +3215,6 @@ IFClsDef:
                       DIS:elementType => {$et},
                     }__}__;
                   }
-                  # if output assertion then
- =pod
-                    my $assert_block = $r-><M::DIS|PLBlockCon.appendBlock>;
-                  
-                    my $param = $self-><M::ManakaiDISResourcePerl
-                                          .plParsePreprocessParameter>
-                                           ($source_code, node => $node,
-                                        namespace_context=> $namespaceContext);
-                    my $context_param
-                            = $self-><M::ManakaiDISResourcePerl
-                                        .plGetContextParameter>;
-
-                    if ($assert_type eq <Q::DISPerl:isPositive>) {
-
-        $pre = perl_statement
-                 perl_assign
-                   'my $asActual' =>
-                          '('.perl_code ($param->{actual}, %opt).')';
-        $cond = '$asActual > 0';
-        $xparam->{ExpandedURI q<DOMMain:expectedLabel>} = 'a positive value';
-        $xparam->{ExpandedURI q<DOMMain:actualValue>}
-                                 = perl_code_literal q<$asActual>;
-      } elsif ($atype eq ExpandedURI q<DISPerl:invariant>) {
-        $cond = '0';
-        $xparam->{ExpandedURI q<DOMMain:expectedLabel>} = $param->{msg};
-        $xparam->{ExpandedURI q<DOMMain:actualValue>} = '(invariant)';
-      } else {
-        valid_err (q[Assertion type <].$atype.q[> is not supported],
-                   node => $opt{node});
-      }
-
-        $r = $pre . perl_if
-               $cond,
-               undef,
-
-
-                  my $cls = $self->{db}-><M::DIS|DISDatabase.getResource>
-                                   (<Q::dx:CoreException>);
-                  my $const = $self->{db}-><M::DIS|DISDatabase.getResource>
-                                   (<Q::MDOMX:MDOM_DEBUG_BUG>);
-                  my $subtype = $self->{db}-><M::DIS|DISDatabase.getResource>
-                                   (<Q::DOMMain:ASSERTION_ERR>);
-                  $_-><AS::DIS|DISAnyResource.isReferred>
-                          ($node || $self->{src}) for $cls, $const, $subtype;
-                  $self-><M::ManakaiDISResourcePerl
-                            .plAppendThrow>
-                               ($assert_block, $cls, $const, $subtype,
-                                {%$param, %$context_param,
-                                 <Q::DOMMain:assertionType> => {
-                                   type => 'quoted', value => $assert_type,
-                                 },
-                                 <Q::DOMMain:traceText> => {
-                                   type => 'code',
-                                   value => q<(sprintf 'at %s line %s%s%s',
-                                               __FILE__, __LINE__, "\n\t",
-                                               Carp::longmess ())>,
-                                 }}, node => $node,
-                                        namespace_context=> $namespaceContext);
-
-  =cut
-
                 } elsif ({
                   <Q::disPerl:FILE> => 1,
                   <Q::disPerl:LINE> => 1,
@@ -3449,7 +3245,8 @@ IFClsDef:
                 $r-><M::DIS|PLBlockCon.appendCodeFragment>
                        ($self-><M::DISResourcePerl
                              .plPreprocessPerlStatement>
-                                 ($source_code, contains_statements => true,
+                                 ($factory, $source_code,
+                                  contains_statements => true,
                                   node => $node,
                                         namespace_context=> $namespaceContext));
               }
@@ -3461,6 +3258,9 @@ IFClsDef:
     @@enDesc:
       Preprocesses a Perl inline code fragment
       (code fragment smaller than statement). 
+    @@Param:
+      @@@Name: factory
+      @@@Type: PCDocument
     @@Param:
       @@@Name:codeArg
       @@@Type:
@@ -3496,24 +3296,20 @@ IFClsDef:
       @@@InlineElementException:
       @@@PerlDef:
         __DEEP{
-          my $nsr = $namespaceContext || $node || $self->{src};
+          my $nsr = $namespaceContext || $node;
           our $RegQNameChar;
-          my $plimpl = $self-><AG::DISAnyResourcePerl.plImplementation>;
           my $db = $self-><AG::DIS|DISAnyResource.database>;
           if ($containsStatements) {
-            $r = $plimpl-><M::DIS|MPLImpl.createPerlBlockContainer>;
+            $r = $factory-><M::Document.createElementNS>
+                             (<Q::pc:>, 'blockContainer');
           } else {
-            $r = $plimpl-><M::DIS|MPLImpl.createPerlInlineContainer>;
+            $r = $factory-><M::Document.createElementNS>
+                             (<Q::pc:>, 'inlineContainer');
           }
           for my $source_code (split /(?<![\^\?qwr])(\x3C$RegQNameChar[^<>]+>
                                                      )/ox, $codeArg) {
             if ($source_code =~ s/^\x3C//) {
               $source_code =~ s/>$//;
-              if ($source_code =~ /=$/) {
-              ## TODO: Warning
-              #  valid_warn qq<Inline element "\x3C$source_code>" ends with a "=" - >.
-              #              q{should "=" be used place of "=>"?};
-              }
               if ($source_code =~ s/^(.+?):://) {
                 my $et = $nsr-><M::DIS|NSResolverDIS.qnameToURI>
                                      ($1,
@@ -3562,19 +3358,19 @@ IFClsDef:
                                  ($node || $self->{src} || $self->{uri});
                   if ($et eq <Q::disPerl::ClassM> and
                       $class-><M::DIS|DISResource.isTypeURI>
-                                     (<Q::ManakaiDOM:IF>)) {
+                                     (<Q::DISLang|Interface>)) {
                     __UNDEEP{
                       __EXCEPTION{DIS|INTERFACE_CLASS_METHOD_ERR::
                         DIS:uri => {$class_uri},
                         DIS:elementType => {$et},
                         DIS:sourceNode => {$node || $self->{src}},
                         DIS:sourceCode => {$source_code},
-                        DIS:expectedType => {<Q::ManakaiDOM:IF>},
+                        DIS:expectedType => {<Q::DISLang|Class>},
                       }__;
                     }__;
                   }
                   unless ($class-><M::DIS|DISResource.isTypeURI>
-                                         (<Q::ManakaiDOM:IF>)) {
+                                         (<Q::DISLang|Interface>)) {
                     $self-><M::ManakaiDISResourcePerl.plAddRequireResource>
                                          ($class => $r);
                   }
@@ -3656,7 +3452,7 @@ IFClsDef:
                     __UNDEEP{
                       __EXCEPTION{DIS|PERL_PREPROCESS_NO_CODE_NAME_ERR::
                         DIS:sourceCode => {$source_code},
-                        DIS:sourceNode => {$node || $self->{src}},
+                        DIS:sourceNode => {$node},
                       }__;
                     }__;
                   }
@@ -3672,21 +3468,21 @@ IFClsDef:
                   my $code = $self->{db}-><M::DIS|DISDatabase.getResource>
                                            ($code_uri);
                   $code-><AS::DIS|DISAnyResource.isReferred>
-                                         ($node || $self->{src} || $self->{uri});
+                                         ($node || $self-><AG::anyres.uri>);
                   unless ($code-><M::DIS|DISResource.isTypeURI>
                                            (<Q::DISPerl:InlineCode>)) {
                     __UNDEEP{__EXCEPTION{DIS|RESOURCE_NOT_DEFINED_ERR::
                       DIS:uri => {$code_uri},
-                      DIS:sourceNode => {$node || $self->{src}},
+                      DIS:sourceNode => {$node},
                       DIS:sourceCode => {$source_code},
                       DIS:expectedType => {<Q::DISPerl:InlineCode>},
                     }__;}__;
                   }
-                  my $pc = $code-><AG::DISResourcePerl
-                                       .plCodeFragment>->clone;
+                  my $pc = $code-><M::DISResourcePerl
+                                       .plCodeFragment> ($factory)->clone;
                   unless (defined $pc) {
                     __UNDEEP{__EXCEPTION{DIS|PERL_CODE_NOT_DEFINED_ERR::
-                      DIS:sourceNode => {$node || $self->{src}},
+                      DIS:sourceNode => {$node},
                       DIS:sourceCode => {$source_code},
                       DIS:uri => {$code_uri},
                     }__}__;
@@ -3694,17 +3490,17 @@ IFClsDef:
                   for my $var (grep {/^\$/} keys %$param) {
                     my $value;
                     if ($param->{$var}->{type} eq 'variable') {
-                      $value = $plimpl-><M::DIS|MPLImpl.createPerlVariable>
+                      $value = $factory-><M::PCDocument.createPCVariable>
                                           ('$', null, $param->{$var}->{value});
                     } elsif ($param->{$var}->{type} eq 'code') {
                       $value = $self-><M::DISResourcePerl
                                          .plPreprocessPerlStatement>
-                                            ($param->{$var}->{value},
+                                            ($factory, $param->{$var}->{value},
                                              contains_statements => false,
                                              node => $node,
                                         namespace_context=> $namespaceContext);
                     } else {
-                      $value = $plimpl-><M::DIS|MPLImpl.createPerlStringLiteral>
+                      $value = $factory-><M::PCDocument.createPCLiteral>
                                           ($param->{$var}->{value});
                     }
                     $pc-><M::DIS|MPLCodeFragment.replaceVariable>
@@ -3722,19 +3518,19 @@ IFClsDef:
                   my $class = $self->{db}-><M::DIS|DISDatabase.getResource>
                                                    ($class_uri);
                   $class-><AS::DIS|DISAnyResource.isReferred>
-                                        ($node || $self->{src} || $self->{uri});
+                                        ($node || $self-><AG::anyres.uri>);
                   my $const = $class-><M::DIS|DISResource
                                          .getConstResourceByName> ($const_name);
                   unless (defined $const) {
                     __UNDEEP{__EXCEPTION{DIS|RESOURCE_NOT_DEFINED_ERR::
-                      DIS:sourceNode => {$node || $self->{src}},
+                      DIS:sourceNode => {$node},
                       DIS:sourceCode => {$source_code},
                       DIS:localName => {$const_name},
-                      DIS:expectedType => {<Q::ManakaiDOM:Const>},
+                      DIS:expectedType => {<Q::DISLang|Const>},
                     }__}__;
                   }
                   $const-><AS::DIS|DISAnyResource.isReferred>
-                                                 ($node || $self->{uri});
+                            ($node || $self-><AG::anyres.uri>);
 
                   my $data_type = $const-><AG::DIS|DISResource
                                        .disActualDataTypeResource>;
@@ -3742,15 +3538,14 @@ IFClsDef:
                                           (<Q::dis:Value>);
                   if ($val) {
                     $val = $val-><M::DVValuePerl.plCodeFragment>
-                            ($const,
+                            ($factory, $const,
                              data_type_uri => $data_type
                                     -><AG::DIS|DISAnyResource.uri>);
                   } else {
                     __UNDEEP{__EXCEPTION{DIS|NO_CONST_VALUE_ERR::
-                      DIS:uri => {$const->{uri}},
+                      DIS:uri => {$const-><AG::anyres.uri>},
                       DIS:localName => {$const-><AG::DIS|DISAnyResource
                                                     .localName>},
-                      DIS:sourceNode => {$const->{src}},
                       DIS:elementType => {$et},
                    }__}__;
                   }
@@ -3758,15 +3553,15 @@ IFClsDef:
                 } else {
                   __UNDEEP{__EXCEPTION{DIS|UNSUPPORTED_ELEMENT_TYPE_ERR::
                     DIS:elementType => {$et},
-                    DIS:sourceNode => {$node || $self->{src}},
+                    DIS:sourceNode => {$node},
                     DIS:sourceCode => {$source_code},
                   }__}__;
                 }
               } else {
                 __UNDEEP{__EXCEPTION{DIS|PERL_PREPROCESS_NO_ELEMENT_TYPE_ERR::
-                  DIS:sourceNode => {$node || $self->{src}},
+                  DIS:sourceNode => {$node},
                   DIS:sourceCode => {$source_code},
-                  DIS:expectedType => {<Q::ManakaiDOM:ConstGroup>},
+                  DIS:expectedType => {<Q::DISLang|ConstGroup>},
                 }__}__;
               }
             } else {
@@ -3859,7 +3654,7 @@ IFClsDef:
         our $RegQNameChar;
         our $RegBlockContent;
         $r = {};
-        my $nsr = $namespaceContext || $node || $self->{src};
+        my $nsr = $namespaceContext || $node || $self;
         while ($paramSpec =~ s/^
           ## Parameter name
           (\$? $RegQNameChar+)\s*
@@ -3905,7 +3700,7 @@ IFClsDef:
         } else {
           __DEEP{
             $r->{$nsr-><M::DIS|NSResolverDIS.qnameToURI>
-                                 ($n, node => $node || $self->{src})} = $v;
+                                 ($n, node => $node)} = $v;
           }__;
         }
       } # while
@@ -3913,7 +3708,7 @@ IFClsDef:
       if (length $paramSpec) {
         __EXCEPTION{DIS|BROKEN_PARAM_SPEC_ERR::
           DIS:sourceCode => {$paramSpec},
-          DIS:sourceNode => {$node || $self->{src}},
+          DIS:sourceNode => {$node},
         }__;
       }
 
@@ -3923,8 +3718,7 @@ IFClsDef:
       Returns contextual parameters which describes the <QUOTE::location>
       of this resource.
     @@Return:
-      @@@Type:
-        pl:HASH::ManakaiDOM:all
+      @@@Type: DISPerl|HASH||ManakaiDOM|all
       @@@enDesc:
         Hash of parameters as <M::ManakaiDISResourcePerl
         .plParsePreprocessParameter> returns.
@@ -4023,6 +3817,9 @@ IFClsDef:
     @@enDesc:
       Appends a <Perl::report> method call statement for exception reporting.
     @@Param:
+      @@@Name: factory
+      @@@Type: PCDocument
+    @@Param:
       @@@Name: parentNode
       @@@enDesc:
         The parent Perl code node to which a new statement is appended.
@@ -4113,7 +3910,7 @@ IFClsDef:
               $statement-><M::DIS|PLInCon.appendCodeFragment>
                        ($self-><M::DISResourcePerl
                                   .plPreprocessPerlStatement>
-                                     ($xparam->{$name}->{value},
+                                     ($factory, $xparam->{$name}->{value},
                                       node => $node,
                                       namespace_context => $namespaceContext));
             }
@@ -4152,57 +3949,6 @@ IFClsDef:
             }
           }
         }__;
-
-  @Attr:
-    @@Name:plIsDefined
-    @@enDesc:
-      Whether a Perl implementation for this resource is available or not.
-    @@Type:
-      DOMMain:boolean::ManakaiDOM:all
-    @@Get:
-      @@@TrueCase:
-        @@@@enDesc:
-          This resource has its Perl definition and it is implemented.
-      @@@FalseCase:
-        @@@@enDesc:
-          Either this resource does not have any Perl definition
-          or it does have but it is not implemented yet.
-      @@@PerlDef:
-        if (exists $self->{<H::DIS:plDefined>}) {
-          $r = $self->{<H::DIS:plDefined>};
-        } else {
-          __DEEP{
-            my $typeuri = {
-              <Q::ManakaiDOM:Class> => [
-                <Q::DISLang:Method>, <Q::DISLang:Attribute>,
-              ],
-              <Q::DISLang:Method> => [
-                <Q::DISLang:MethodReturn>,
-              ],
-              <Q::DISLang:Attribute> => [
-                <Q::DISLang:AttributeGet>, <Q::DISLang::AttributeSet>,
-              ],
-            };
-            OUTMOST:
-            for my $mytype (keys %$typeuri) {
-              if ($self-><M::DIS|DISResource.isTypeURI> ($mytype)) {
-                for my $ctype ($typeuri->{$mytype}) {
-                  for my $cres (@{$self-><M::DIS|DISResource
-                                                  .getChildResourceList>}) {
-                    if ($cres-><M::DIS|DISResource.isTypeURI> ($ctype)) {
-                      unless ($cres-><AG::DISResourcePerl
-                                         .plIsDefined>) {
-                        $r = false; last OUTMOST;
-                      }
-                    }
-                  }
-                  next OUTMOST;
-                }
-              }
-            } # OUTMOST
-          }__;
-          $self->{<H::DIS:plDefined>} = $r;
-        }
   
   @IntMethod:
     @@Name: plAddRequireResource
@@ -4505,7 +4251,7 @@ TMethods:
       @@@Type: Node
       @@@PerlDef:
         __DEEP{
-          $r = $self-><AG::DISResourcePerl.plCodeFragment>
+          $r = $self-><M::DISResourcePerl.plCodeFragment> ($factory)
                     -><M::Node.cloneNode> (true);
           for (@{$self-><M::dp|DISResourcePerl.getPerlNameList>}) {
             $r-><M::DIS|MPLSub.addPerlName> ($_);
@@ -4527,10 +4273,13 @@ TMethods:
         auto-<Perl::use Message::Util::Error;>-addition.
       }
 
-  @TAttr:
+  @TMethod:
     @@Name: plCodeFragment
     @@DIS:targetType: DISLang|Method
-    @@Get:
+    @@Param:
+      @@@Name: factory
+      @@@Type: PCDocument
+    @@Return:
       @@@Type: DIS|MPLCodeFragment
       @@@PerlDef:
         __DEEP{
@@ -4547,9 +4296,8 @@ TMethods:
                 }__;
               }__;
             }
-            my $plimpl = $self-><AG::DISAnyResourcePerl.plImplementation>;
             $r = $self->{<H::DIS|plCodeFragment>}
-               = $plimpl-><M::DIS|MPLImpl.createPerlSub>
+               = $factory-><M::PCDocument.createPerlSub>
                             ($self-><AG::DISResourcePerl.plName>);
             
             ## Method parameters
@@ -4590,8 +4338,8 @@ TMethods:
                                                  .plGetMethodInputNormalizer>;
                   if ($param_processor) {
                     $param_variables[-1]->[1]
-                        = $param_processor-><AG::DISResourcePerl
-                                                 .plCodeFragment>;
+                        = $param_processor-><M::DISResourcePerl
+                                                 .plCodeFragment> ($factory);
                     unless ($param_variables[-1]->[1]) {
                      __UNDEEP{__EXCEPTION{DIS|PERL_CODE_NOT_DEFINED_ERR::
                         DIS:sourceNode => {$param->{src}},
@@ -4629,12 +4377,11 @@ TMethods:
                                                  .plGetMethodInputNormalizer>;
                 if ($param_processor) {
                   $named_param_variables[-1]->[1]
-                        = $param_processor-><AG::DISResourcePerl
-                                                 .plCodeFragment>;
+                        = $param_processor-><M::DISResourcePerl
+                                                 .plCodeFragment> ($factory);
                   unless ($param_variables[-1]->[1]) {
                    __UNDEEP{__EXCEPTION{DIS|PERL_CODE_NOT_DEFINED_ERR::
-                      DIS:sourceNode => {$param->{src}},
-                      DIS:uri => {$param->{uri}},
+                      DIS:uri => {$param-><AG::anyres.uri>},
                     }__}__;
                   }
                   $named_param_variables[-1]->[1]
@@ -4647,10 +4394,11 @@ TMethods:
             } # %$params
             
             $r-><AS::DIS|MPLSub.prototype> ($prototype);
-            $r-><M::DIS|MPLSS.appendCodeFragment>
-                   ($plimpl-><M::DIS|MPLImpl.createPerlStatement>
+            $r-><M::Node.appendChild>
+                   ($factory-><M::PCDocument.createPCStatement>)
+              -><M::DIS|PLInCon.appendCode>
                           ('my (' . join (', ', '$self',
-                             map {$_->[0]} @param_variables) . ') = @_'));
+                             map {$_->[0]} @param_variables) . ') = @_');
             for my $p (@param_variables, @named_param_variables) {
               if ($p->[1]) {  ## Input processor
                 $r-><M::DIS|MPLSS.appendCodeFragment> ($p->[1]);
@@ -4682,21 +4430,21 @@ TMethods:
             if ($data_type) {
               my $def = $data_type-><M::DIS|DISResourceProp.getPropertyValue>
                                           (<Q::dis:DefaultValue>);
-              my $rs = $plimpl-><M::DIS|MPLImpl.createPerlStatement>;
-              my $rvar = $plimpl-><M::DIS|MPLImpl.createPerlVariable>
+              my $rs = $factory-><M::PCDocument.createPCStatement>;
+              my $rvar = $factory-><M::PCDocument.createPCVariable>
                                                ('$', null, 'r');
               $rvar-><AS::PCVar.variableScope> ('my');
               if ($def) {
                 $def = $def-><M::DVValuePerl.plCodeFragment>
-                               ($self,
+                               ($factory, $self,
                                 data_type_uri => $data_type
                                        -><AG::DIS|DISAnyResource.uri>);
                 $rs-><M::DIS|PLAnyCon.appendNewAssignment> ($rvar => $def);
               } else {
-                __CODE{setDefaultValue::
+                __CODE{setDefaultValueDoc::
                   $result => $def,
                   $data_type => $data_type,
-                  $plimpl => $plimpl,
+                  $doc => $factory,
                 }__;
                 if ($def) {
                   $rs-><M::DIS|PLAnyCon.appendNewAssignment> ($rvar => $def);
@@ -4704,19 +4452,16 @@ TMethods:
                   $rs-><M::DIS|PLInCon.appendCodeFragment> ($rvar);
                 }
               }
-              $r-><M::DIS|MPLSS.appendCodeFragment> ($rs);
+              $r-><M::Node.appendChild> ($rs);
             }
 
-            my $code = $ret-><AG::DISResourcePerl.plCodeFragment>;
+            my $code = $ret-><M::DISResourcePerl.plCodeFragment> ($factory);
             if ($code) {
               for my $np (@named_param_variables) {
                 $code-><M::DIS|MPLCodeFragment.replaceVariable>
                              ($np->[2] => $np->[0]);
               }
               $r-><M::DIS|MPLSS.appendCodeFragment> ($code);
-
-              $ret->{<H::DIS:plDefined>} = true;
-              $self->{<H::DIS:plDefined>} = true;
             } else {  ## Method code not defined
               my $cls = $self->{db}-><M::DIS|DISDatabase.getResource>
                                               (<Q::dx:CoreException>,
@@ -4732,14 +4477,12 @@ TMethods:
               my $context_param = $ret-><M::ManakaiDISResourcePerl
                                              .plGetContextParameter>;
               $self-><M::ManakaiDISResourcePerl.plAppendThrow>
-                               ($r, $cls, $const, $subtype,
+                               ($factory, $r, $cls, $const, $subtype,
                                 {%$context_param});
-              $ret->{<H::DIS:plDefined>} = false;
-              $self->{<H::DIS:plDefined>} = false;
             }
 
             if ($data_type) {
-              my $rvar = $plimpl-><M::DIS|MPLImpl.createPerlVariable>
+              my $rvar = $factory-><M::PCDocument.createPCVariable>
                                                ('$', null, 'r');
 
               ## Output processor
@@ -4749,7 +4492,8 @@ TMethods:
                                         (<Q::DISLang:OutputProcessor>)
                 unless $nin and $nin-><AG::dv|DVValue.value>;
               if ($op) {
-                my $opcode = $op-><AG::dp|DISResourcePerl.plCodeFragment>;
+                my $opcode = $op-><M::DISResourcePerl.plCodeFragment>
+                                    ($factory);
                 unless ($opcode) {
                  __UNDEEP{__EXCEPTION{DIS|PERL_CODE_NOT_DEFINED_ERR::
                     DIS:uri => {$op-><AG::DIS|DISAnyResource.uri>},
@@ -4771,10 +4515,13 @@ TMethods:
   @enDesc:
     <Q::DISLang|Attribute>
 
-  @TAttr:
+  @TMethod:
     @@Name: plCodeFragment
     @@DIS:targetType: DISLang|Attribute
-    @@Get:
+    @@Param:
+      @@@Name: factory
+      @@@Type: PCDocument
+    @@Return:
       @@@Type: DIS|MPLCodeFragment
       @@@PerlDef:
         __DEEP{
@@ -4791,14 +4538,14 @@ TMethods:
               }__;
             }
             my $da; ## Reflecting element attribute
-            my $plimpl = $self-><AG::DISAnyResourcePerl.plImplementation>;
             my $data_type = $get-><AG::DIS|DISResource
                                       .disActualDataTypeResource>;
             my $data_type_value = $get-><AG::DIS|DISResource
                                      .disActualDataTypeValue>;
-            my $get_code = $plimpl-><M::DIS|MPLImpl.createPerlBlockContainer>;
+            my $get_code = $factory-><M::Document.createElementNS>
+                                       (<Q::pc:>, 'blockContainer');
             $get_code-><M::DIS|PLBlockCon.appendStatement> (q<my ($self) = @_>);
-            my $code = $get-><AG::DISResourcePerl.plCodeFragment>;
+            my $code = $get-><M::DISResourcePerl.plCodeFragment> ($factory);
             unless ($code) {
               $da = $self-><M::DIS|DISResourceProp.getPropertyResource>
                                  (<Q::dis:DocAttr>,
@@ -4819,37 +4566,28 @@ TMethods:
                               .getChildResourceByType> (<Q::DOMMain:ReflectGet>);
                 }
                 if ($daget) {
-                  $code = $daget-><AG::DISResourcePerl.plCodeFragment>->clone;
+                  $code = $daget-><M::DISResourcePerl.plCodeFragment>
+                                    ($factory)->clone;
                   my $ln = $da-><AG::DIS|DISResourceMV.mvLocalName>;
                   my $pfx = $da-><AG::DIS|DISResourceMV.mvPrefix>;
                   $pfx = defined $pfx ? $pfx . ':' : '';
                   $code-><M::DIS|MPLCodeFragment.replaceVariable>
-                         ('$LOCAL_NAME' => $plimpl-><M::DIS|MPLImpl
-                                              .createPerlStringLiteral> ($ln));
+                         ('$LOCAL_NAME' => $factory-><M::PCDocument
+                                              .createPCLiteral> ($ln));
                   $code-><M::DIS|MPLCodeFragment.replaceVariable>
-                         ('$QNAME' => $plimpl-><M::DIS|MPLImpl
-                                           .createPerlStringLiteral> ($pfx.$ln));
+                         ('$QNAME' => $factory-><M::PCDocument
+                                           .createPCLiteral> ($pfx.$ln));
                   $code-><M::DIS|MPLCodeFragment.replaceVariable>
-                         ('$PREFIX' => $plimpl-><M::DIS|MPLImpl
-                                           .createPerlStringLiteral> ($pfx));
+                         ('$PREFIX' => $factory-><M::PCDocument
+                                           .createPCLiteral> ($pfx));
                   my $nsuri = $da-><AG::DIS|DISResourceMV
                                            .mvNamespaceURI>;
                   $code-><M::DIS|MPLCodeFragment.replaceVariable>
-                         ('$NS_URI' => defined $nsuri
-                                       ? $plimpl-><M::DIS|MPLImpl
-                                              .createPerlStringLiteral> ($nsuri)
-                                       : $plimpl-><M::DIS|MPLImpl
-                                              .createPerlAtom> ('undef'));
-                  $code-><M::DIS|MPLCodeFragment.replaceVariable>
-                         ('$NS_URI_NO_NULL' => defined $nsuri
-                                       ? $plimpl-><M::DIS|MPLImpl
-                                              .createPerlStringLiteral> ($nsuri)
-                                       : $plimpl-><M::DIS|MPLImpl
-                                         .createPerlStringLiteral> (<Q::null:>));
+                         ('$NS_URI' => $factory-><M::PCDocument
+                                              .createPCLiteral> ($nsuri));
                 } else {
                   __UNDEEP{__EXCEPTION{DIS|NO_REFLECT_GET_DEFINED_ERR::
-                    DIS:sourceNode => {$self->{src}},
-                    DIS:uri => {$data_type->{uri}},
+                    DIS:uri => {$data_type-><AG::anyres.uri>},
                   }__}__;
                 }
               }
@@ -4860,18 +4598,18 @@ TMethods:
                                    (<Q::dis:DefaultValue>);
               if ($def) {
                 $def = $def-><M::DVValuePerl.plCodeFragment>
-                            ($self,
+                            ($factory, $self,
                              data_type_uri => $data_type
                                     -><AG::DIS|DISAnyResource.uri>);
               } else {
-                __CODE{setDefaultValue::
+                __CODE{setDefaultValueDoc::
                   $result => $def,
                   $data_type => $data_type,
-                  $plimpl => $plimpl,
+                  $doc => $factory,
                 }__;
               }
-              my $rs = $plimpl-><M::DIS|MPLImpl.createPerlStatement>;
-              my $rvar1 = $plimpl-><M::DIS|MPLImpl.createPerlVariable>
+              my $rs = $factory-><M::PCDocument.createPCStatement>;
+              my $rvar1 = $factory-><M::PCDocument.createPCVariable>
                                                ('$', null, 'r');
               $rvar1-><AS::PCVar.variableScope> ('my');
               if ($def) {
@@ -4879,13 +4617,13 @@ TMethods:
               } else {
                 $rs-><M::DIS|PLInCon.appendCodeFragment> ($rvar1);
               }
-              $get_code-><M::DIS|PLBlockCon.appendCodeFragment> ($rs);
+              $get_code-><M::Node.appendChild> ($rs);
 
               ## Main code
               $get_code-><M::DIS|PLBlockCon.appendCodeFragment> ($code);
 
               ## Return value
-              my $rvar = $plimpl-><M::DIS|MPLImpl.createPerlVariable>
+              my $rvar = $factory-><M::PCDocument.createPCVariable>
                                                ('$', null, 'r');
 
               ## Output processor
@@ -4895,7 +4633,8 @@ TMethods:
                                         (<Q::DISLang:OutputProcessor>)
                 unless $nin and $nin-><AG::dv|DVValue.value>;
               if ($op) {
-                my $opcode = $op-><AG::dp|DISResourcePerl.plCodeFragment>;
+                my $opcode = $op-><M::DISResourcePerl.plCodeFragment>
+                                    ($factory);
                 unless ($opcode) {
                  __UNDEEP{__EXCEPTION{DIS|PERL_CODE_NOT_DEFINED_ERR::
                     DIS:uri => {$op-><AG::DIS|DISAnyResource.uri>},
@@ -4908,8 +4647,6 @@ TMethods:
               }
 
               $get_code-><M::DIS|PLBlockCon.appendStatement> ($rvar);
-
-              $get->{<H::DIS:plDefined>} = true;
             } else {  ## Getter code not defined
               my $cls = $self->{db}-><M::DIS|DISDatabase.getResource>
                                               (<Q::dx:CoreException>,
@@ -4925,19 +4662,18 @@ TMethods:
               my $context_param = $get-><M::ManakaiDISResourcePerl
                                         .plGetContextParameter>;
               $self-><M::ManakaiDISResourcePerl.plAppendThrow>
-                               ($get_code, $cls, $const, $subtype,
+                               ($factory, $get_code, $cls, $const, $subtype,
                                 {%$context_param});
-              $get->{<H::DIS:plDefined>} = false;
-              $self->{<H::DIS:plDefined>} = false;
             }
 
             my $set = $self-><M::DIS|DISResource
                             .getChildResourceByType> (<Q::DISLang:AttributeSet>);
-            my $set_code = $plimpl-><M::DIS|MPLImpl.createPerlBlockContainer>;
+            my $set_code = $factory-><M::Document.createElementNS>
+                                       (<Q::pc:>, 'blockContainer');
             if ($set) {
               my $data_type = $set-><AG::DIS|DISResource
                                        .disActualDataTypeResource>;
-              my $code = $set-><AG::DISResourcePerl.plCodeFragment>;
+              my $code = $set-><M::DISResourcePerl.plCodeFragment> ($factory);
               unless ($code) {
                 $da ||= $self-><M::DIS|DISResourceProp
                                   .getPropertyResource>
@@ -4957,37 +4693,28 @@ TMethods:
                               .getChildResourceByType> (<Q::DOMMain:ReflectSet>);
                   }
                   if ($daset) {
-                    $code = $daset-><AG::DISResourcePerl.plCodeFragment>->clone;
+                    $code = $daset-><M::DISResourcePerl.plCodeFragment>
+                                      ($factory)->clone;
                     my $ln = $da-><AG::DIS|DISResourceMV.mvLocalName>;
                     my $pfx = $da-><AG::DIS|DISResourceMV.mvPrefix>;
                     $pfx = defined $pfx ? $pfx . ':' : '';
                     $code-><M::DIS|MPLCodeFragment.replaceVariable>
-                         ('$LOCAL_NAME' => $plimpl-><M::DIS|MPLImpl
-                                              .createPerlStringLiteral> ($ln));
+                         ('$LOCAL_NAME' => $factory-><M::PCDocument
+                                              .createPCLiteral> ($ln));
                     $code-><M::DIS|MPLCodeFragment.replaceVariable>
-                         ('$QNAME' => $plimpl-><M::DIS|MPLImpl
-                                           .createPerlStringLiteral> ($pfx.$ln));
+                         ('$QNAME' => $factory-><M::PCDocument
+                                           .createPCLiteral> ($pfx.$ln));
                     $code-><M::DIS|MPLCodeFragment.replaceVariable>
-                         ('$PREFIX' => $plimpl-><M::DIS|MPLImpl
-                                           .createPerlStringLiteral> ($pfx));
+                         ('$PREFIX' => $factory-><M::PCDocument
+                                           .createPCLiteral> ($pfx));
                     my $nsuri = $da-><AG::DIS|DISResourceMV
                                            .mvNamespaceURI>;
                     $code-><M::DIS|MPLCodeFragment.replaceVariable>
-                         ('$NS_URI' => defined $nsuri
-                                       ? $plimpl-><M::DIS|MPLImpl
-                                              .createPerlStringLiteral> ($nsuri)
-                                       : $plimpl-><M::DIS|MPLImpl
-                                              .createPerlAtom> ('undef'));
-                    $code-><M::DIS|MPLCodeFragment.replaceVariable>
-                         ('$NS_URI_NO_NULL' => defined $nsuri
-                                       ? $plimpl-><M::DIS|MPLImpl
-                                              .createPerlStringLiteral> ($nsuri)
-                                       : $plimpl-><M::DIS|MPLImpl
-                                         .createPerlStringLiteral> (<Q::null:>));
+                         ('$NS_URI' => $factory-><M::PCDocument
+                                              .createPCLiteral> ($nsuri));
                   } else {
                     __UNDEEP{__EXCEPTION{DIS|NO_REFLECT_SET_DEFINED_ERR::
-                      DIS:sourceNode => {$self->{src}},
-                      DIS:uri => {$data_type->{uri}},
+                      DIS:uri => {$data_type-><AG::anyres.uri>},
                     }__}__;
                   }
                 }
@@ -4999,8 +4726,9 @@ TMethods:
                 my $param_processor
                         = $set-><M::DISResourcePerl.plGetMethodInputNormalizer>;
                 if ($param_processor) {
-                  my $pcode = $param_processor-><AG::DISResourcePerl
-                                                    .plCodeFragment>->clone;
+                  my $pcode = $param_processor-><M::DISResourcePerl
+                                                    .plCodeFragment>
+                                                  ($factory)->clone;
                   $pcode-><M::DIS|MPLCodeFragment.replaceVariable>
                                                    ('$INPUT' => '$given');
                   $set_code-><M::DIS|PLBlockCon.appendCodeFragment> ($pcode);
@@ -5008,9 +4736,6 @@ TMethods:
 
                 ## Main code
                 $set_code-><M::DIS|PLBlockCon.appendCodeFragment> ($code);
-
-                $set->{<H::DIS:plDefined>} = true;
-                $self->{<H::DIS:plDefined>} = $get->{<H::DIS:plDefined>};
               } else { ## Setter code not defined
                 $set_code-><M::DIS|PLBlockCon.appendStatement>
                                               (q<my ($self) = @_>);
@@ -5028,10 +4753,8 @@ TMethods:
                 my $context_param = $get-><M::ManakaiDISResourcePerl
                                              .plGetContextParameter>;
                 $self-><M::ManakaiDISResourcePerl.plAppendThrow>
-                               ($set_code, $cls, $const, $subtype,
+                               ($factory, $set_code, $cls, $const, $subtype,
                                 {%$context_param});
-                $set->{<H::DIS:plDefined>} = false;
-                $self->{<H::DIS:plDefined>} = false;
               }
             } else {  ## No attribute setter
               $set_code-><M::DIS|PLBlockCon.appendStatement>
@@ -5050,21 +4773,22 @@ TMethods:
               my $context_param = $get-><M::ManakaiDISResourcePerl
                                         .plGetContextParameter>;
               $self-><M::ManakaiDISResourcePerl.plAppendThrow>
-                               ($set_code, $cls, $const, $subtype,
+                               ($factory, $set_code, $cls, $const, $subtype,
                                 {%$context_param});
-              $self->{<H::DIS:plDefined>} = $get->{<H::DIS:plDefined>};
             }
 
             $r = $self->{<H::DIS|plCodeFragment>}
-               = $plimpl-><M::DIS|MPLImpl.createPerlSub>
+               = $factory-><M::PCDocument.createPerlSub>
                             ($self-><AG::DISResourcePerl.plName>);
             $r-><AS::DIS|MPLSub.prototype> (q<$;$>);
 
             ## TODO: Don't output "if" if non-debug build
             
+            my $ip = $factory-><M::Document.createElementNS>
+                                 (<Q::pc:>, 'inlineUnparsed');
+            $ip-><AS::Node.textContent> (q<@_ == 1>);
             $r-><M::DIS|PLBlockCon.appendNewIf>
-                     ($plimpl-><M::DIS|MPLImpl.createPerlInlineUnparsedCode>
-                                        (q<@_ == 1>),
+                     ($ip,
                       $get_code,
                       $set_code);
         }__;
@@ -5087,7 +4811,8 @@ TMethods:
       @@@Type: Node
       @@@PerlDef:
         __DEEP{
-          my $method_code = $self-><AG::DISResourcePerl.plCodeFragment>;
+          my $method_code = $self-><M::DISResourcePerl.plCodeFragment>
+                                     ($factory);
           my $method_names = $self-><M::DIS|MPLSub.getPerlNameList>;
           $method_code-><M::DIS|MPLSub.clearPerlName>;
           my $type_uris = $self-><M::DIS|DISResourceProp
@@ -5202,33 +4927,35 @@ TMethods:
                . '::' . $self-><AG::DISResourcePerl.plName>;
         }__;
 
-  @TAttr:
+  @TMethod:
     @@Name: plCodeFragment
     @@DIS:targetType: DISLang|Const
-    @@Get:
+    @@Param:
+      @@@Name: factory
+      @@@Type: PCDocument
+    @@Return:
       @@@Type: DIS|MPLCodeFragment
       @@@PerlDef:
         __DEEP{
             my $data_type = $self-><AG::DIS|DISResource
                                        .disActualDataTypeResource>;
-            my $plimpl = $self-><AG::DISAnyResourcePerl.plImplementation>;
             my $value = $self-><M::DIS|DISResourceProp.getPropertyValue>
                               (<Q::dis:Value>);
             if ($value) {
               $value = $value-><M::DVValuePerl.plCodeFragment>
-                              ($self,
+                              ($factory, $self,
                                data_type_uri => $data_type
                                     -><AG::DIS|DISAnyResource.uri>);
             } else {
-              __CODE{setDefaultValue::
+              __CODE{setDefaultValueDoc::
                 $result => $value,
                 $data_type => $data_type,
-                $plimpl => $plimpl,
+                $doc => $factory,
               }__;
             }
-            $r = $plimpl-><M::DIS|MPLImpl.createPerlSub>
+          $r = $factory-><M::PCDocument.createPerlSub>
                             ($self-><AG::DISResourcePerl.plName>);
-            $r-><M::DIS|PLBlockCon.appendCodeFragment> ($value);
+          $r-><M::Node.appendChild> ($value);
             $r-><AS::DIS|MPLSub.prototype> ('');
         }__;
 
@@ -5242,7 +4969,7 @@ TMethods:
       @@@Type: Node
       @@@PerlDef:
         __DEEP{
-          $r = $self-><AG::DISResourcePerl.plCodeFragment>;
+          $r = $self-><M::DISResourcePerl.plCodeFragment> ($factory);
         }__;
 
   @TMethod:
@@ -5255,7 +4982,7 @@ TMethods:
       @@@Type: Node
       @@@PerlDef:
         __DEEP{
-          $r = $self-><AG::DISResourcePerl.plCodeFragment>;
+          $r = $self-><M::DISResourcePerl.plCodeFragment> ($factory);
         }__;
 ##DISLang:Const
 
@@ -5291,7 +5018,7 @@ TMethods:
           $r = $factory-><M::Document.createDocumentFragment>;
 
           ## Perl constant function
-          my $const = $self-><AG::DISResourcePerl.plCodeFragment>;
+          my $const = $self-><M::DISResourcePerl.plCodeFragment> ($factory);
           $factory-><M::Document.adoptNode> ($const);
           $r-><M::Node.appendChild> ($const);
 
@@ -5304,7 +5031,8 @@ TMethods:
                    'ErrorDef')
               -><AS::PCVar.hashKey> ($self-><AG::DISResourcePerl.plName>);
             $_-><M::DIS|PLAnyCon.appendNewPCLiteral> ({
-              <H::c|code> => 0+$self-><AG::DISResourcePerl.plCodeFragment>,
+              <H::c|code> => 0+$self-><M::DISResourcePerl.plCodeFragment>
+                                        ($factory),
               <H::ecore|description> =>
                 $self-><M::ManakaiDISResourcePerl.plMufDescriptionText>,
             });
@@ -5416,7 +5144,7 @@ TMethods:
                       ($gcr-><M::DISResourcePerl.getPerlInterfaceMemberCode>
                                ($factory));
               } else {
-                my $sub = $gcr-><AG::DISResourcePerl.plCodeFragment>;
+                my $sub = $gcr-><M::DISResourcePerl.plCodeFragment> ($factory);
                 $factory-><M::Document.adoptNode> ($sub);
                 $r-><M::Node.appendChild> ($sub);
               }
@@ -5502,15 +5230,17 @@ TMethods:
   @enDesc:
     <Q::DISLang|Class>
 
-  @TAttr:
+  @TMethod:
     @@Name: plCodeFragment
     @@DIS:targetType: DISLang|Class
-    @@Get:
+    @@Param:
+      @@@Name: factory
+      @@@Type: PCDocument
+    @@Return:
       @@@Type: DIS|MPLCodeFragment
       @@@PerlDef:
         __DEEP{
-            my $plimpl = $self-><AG::DISAnyResourcePerl.plImplementation>;
-            $r = $plimpl-><M::DIS|MPLImpl.createPerlPackage>
+          $r = $factory-><M::PCDocument.createPCPackage>
                               ($self-><AG::DISResourcePerl
                                          .plFullyQualifiedName>);
             ## - Inheritance
@@ -5573,7 +5303,7 @@ TMethods:
               my $tf = $self-><M::DIS|DISResourceProp.getPropertyResource>
                                 (<Q::ecore:textFormatter>);
               if ($tf) {
-                my $fpc = $plimpl-><M::DIS|MPLImpl.createPerlSub>
+                my $fpc = $factory-><M::PCDocument.createPerlSub>
                                      ('_FORMATTER_PACKAGE_');
                 $fpc-><M::DIS|PLAnyCon.appendStringLiteral>
                                      ($tf-><AG::dp|DISResourcePerl
@@ -5592,13 +5322,13 @@ TMethods:
                 for my $rm (@{$rc-><M::DIS|DISResource
                                       .getChildResourceListByType>
                                (<Q::DISLang|Method>)}) {
-                  my $c = $rm-><AG::dp|DISResourcePerl.plCodeFragment>;
+                  my $c = $rm-><M::DISResourcePerl.plCodeFragment> ($factory);
                   $rcls->{$rm-><AG::dp|DISResourcePerl.plName>} = $c;
                   $c-><M::DIS|MPLSub.clearPerlName>;
                 }
               }
               if (%rule) {
-                my $rule_def = $plimpl-><M::DIS|MPLImpl.createPerlSub>
+                my $rule_def = $factory-><M::PCDocument.createPerlSub>
                                           ('___rule_def');
                 $rule_def-><M::DIS|PLBlockCon.appendStatement>
                          -><M::DIS|PLAnyCon.appendNewPCLiteral> (\%rule);
@@ -5612,7 +5342,8 @@ TMethods:
                              (<Q::DISPerl:dpgDef>)}) {
               require Message::DOM::GenericLS;
               require Message::Util::DIS::DPG;
-              $dpgparser ||= $plimpl-><M::f|GetFeature
+              $dpgparser ||= $factory-><AG::Document.implementation>
+                                     -><M::f|GetFeature
                                          ||ManakaiDOM|ManakaiDOMLatest
                                          .getFeature>
                                        (<Q::fe:GenericLS> => '3.0')
@@ -5628,7 +5359,7 @@ TMethods:
                     ($dpgdoc-><AG::Document.documentElement>
                             -><M::DPG|DPGRulesElement
                                     ||ManakaiDOM|ManakaiDOMLatest.plCodeFragment>
-                              ($r-><AG::Node.ownerDocument>,
+                              ($factory,
                                dis_resource => $self,
                                context_object => $val));
             }
@@ -5654,7 +5385,7 @@ TMethods:
           my $cls = $self;
 
           ## -- Subroutines and variables
-          my $pack = $cls-><AG::DISResourcePerl.plCodeFragment>;
+          my $pack = $cls-><M::DISResourcePerl.plCodeFragment> ($factory);
           $factory-><M::Document.adoptNode> ($pack);
           $r-><M::Node.appendChild> ($pack);
                 my $pack_name = $cls-><AG::DISResourcePerl
@@ -6166,15 +5897,17 @@ TMethods:
             }
         }__;
 
-  @TAttr:
+  @TMethod:
     @@Name: plCodeFragment
     @@DIS:targetType: DISLang|Interface
-    @@Get:
+    @@Param:
+      @@@Name: factory
+      @@@Type: PCDocument
+    @@Return:
       @@@Type: DIS|MPLCodeFragment
       @@@PerlDef:
         __DEEP{
-          my $plimpl = $self-><AG::DISAnyResourcePerl.plImplementation>;
-          $r = $plimpl-><M::DIS|MPLImpl.createPerlPackage>
+          $r = $factory-><M::PCDocument.createPCPackage>
                               ($self-><AG::DISResourcePerl
                                          .plFullyQualifiedName>);
 
@@ -6221,7 +5954,7 @@ TMethods:
       @@@Type: Node
       @@@PerlDef:
         __DEEP{
-          $r = $self-><AG::DISResourcePerl.plCodeFragment>;
+          $r = $self-><M::DISResourcePerl.plCodeFragment> ($factory);
           for my $cr (@{$self-><M::DIS|DISResource
                                  .getChildResourceListByType>
                                           (<Q::DISLang:ConstGroup>)}) {
@@ -6268,7 +6001,7 @@ TMethods:
       @@@PerlDef:
         __DEEP{
           unless ($self-><AG::DIS|DISResource.parentResource>) {
-            my $code = $self-><AG::DISResourcePerl.plCodeFragment>;
+            my $code = $self-><M::DISResourcePerl.plCodeFragment> ($factory);
             $factory-><M::Document.adoptNode> ($code);
             $thismod_pack-><M::Node.appendChild> ($code);
           }
@@ -6306,16 +6039,18 @@ TMethods:
             }
         }__;
 
-  @TAttr:
+  @TMethod:
     @@Name: plCodeFragment
     @@DIS:targetType: DISPerl|ScalarVariable
-    @@Get:
+    @@Param:
+      @@@Name: factory
+      @@@Type: PCDocument
+    @@Return:
       @@@Type: DIS|MPLCodeFragment
       @@@PerlDef:
         __DEEP{
-            my $plimpl = $self-><AG::DISAnyResourcePerl.plImplementation>;
             my $varn = $self-><AG::DISResourcePerl.plVariableName>;
-            my $var = $plimpl-><M::DIS|MPLImpl.createPerlVariable>
+          my $var = $factory-><M::PCDocument.createPCVariable>
                                                        (null, null, $varn);
             my $data_type = $self-><AG::DIS|DISResource
                                        .disActualDataTypeResource>;
@@ -6323,17 +6058,17 @@ TMethods:
                               (<Q::dis:DefaultValue>);
             if ($value) {
               $value = $value-><M::DVValuePerl.plCodeFragment>
-                              ($self,
+                              ($factory, $self,
                                data_type_uri => $data_type
                                     -><AG::DIS|DISAnyResource.uri>);
             } else {
-              __CODE{setDefaultValue::
+              __CODE{setDefaultValueDoc::
                 $result => $value,
                 $data_type => $data_type,
-                $plimpl => $plimpl,
+                $doc => $factory,
               }__;
             }
-            $r = $plimpl-><M::DIS|MPLImpl.createPerlStatement>;
+          $r = $factory-><M::PCDocument.createPCStatement>;
             $r-><M::DIS|PLAnyCon.appendNewAssignment> ($var => $value);
         }__;
 
@@ -6356,7 +6091,7 @@ TMethods:
                                     (<Q::dis:DefaultValue>);
           if ($value) {
             $value = $value-><M::DVValuePerl.plCodeFragment>
-                                    ($self,
+                                    ($factory, $self,
                                      data_type_uri => $data_type
                                           -><AG::DIS|DISAnyResource.uri>);
             $factory-><M::Document.adoptNode> ($value);
@@ -6390,10 +6125,13 @@ TMethods:
   @enDesc:
     <Q::DISCore|AnyDefContainer>
 
-  @TAttr:
+  @TMethod:
     @@Name: plCodeFragment
     @@DIS:targetType: DISCore|AnyDefContainer
-    @@Get:
+    @@Param:
+      @@@Name: factory
+      @@@Type: PCDocument
+    @@Return:
       @@@Type: DIS|MPLCodeFragment
       @@@PerlDef:
         __DEEP{
@@ -6411,12 +6149,12 @@ TMethods:
               $r = $self->{<H::DIS|plCodeFragment>}
                  = $is_inline
                      ? $self-><M::DISResourcePerl.plPreprocessPerlStatement>
-                                           ($source_code,
+                                           ($factory, $source_code,
                                             contains_statements => false,
                                             namespace_context => $def)
                      : $self-><M::DISResourcePerl
                              .plPreprocessPerlCode>
-                                   ($source_code,
+                                   ($factory, $source_code,
                                     method_resource => 
                                 ($self-><M::DIS|DISAnyResource
                                           .isTypeURI> (<Q::DISLang:MethodReturn>)
@@ -6427,7 +6165,7 @@ TMethods:
               $r = $self->{<H::DIS|plCodeFragment>}
                  = $def-><AG::dv|DVValue.value>
                        -><M::DISElementPerl.plCodeFragment>
-                            ($self,
+                            ($factory, $self,
                              for_arg => $self-><AG::DIS|DISAnyResource.forURI>,
                              forp_arg => $self-><AG::DIS|DISAnyResource.forpURI>,
                              contains_statements => (not $is_inline),
@@ -6447,10 +6185,13 @@ TMethods:
   @enDesc:
     <Q::ManakaiDOM|InCase>
 
-  @TAttr:
+  @TMethod:
     @@Name: plCodeFragment
     @@DIS:targetType: ManakaiDOM|InCase
-    @@Get:
+    @@Param:
+      @@@Name: factory
+      @@@Type: PCDocument
+    @@Return:
       @@@Type: DIS|MPLCodeFragment
       @@@PerlDef:
         __DEEP{
@@ -6460,26 +6201,28 @@ TMethods:
                               (<Q::dis:Value>);
             if ($r) {
               $r = $r-><M::DVValuePerl.plCodeFragment>
-                              ($self,
+                              ($factory, $self,
                                data_type_uri => $data_type
                                     -><AG::DIS|DISAnyResource.uri>);
             } else {
-              my $plimpl = $self-><AG::DISAnyResourcePerl.plImplementation>;
-              __CODE{setDefaultValue::
+              __CODE{setDefaultValueDoc::
                 $result => $r,
                 $data_type => $data_type,
-                $plimpl => $plimpl,
+                $doc => $factory,
               }__;
             }
         }__;
 ##ManakaiDOM:InCase
 
 TMethods:
-  @TAttr:
+  @TMethod:
     @@Name: plCodeFragment
     @@DIS:targetType: c|DOMConfigurationParameter
     @@DIS:targetType: c|DOMConfigurationParameterApplication
-    @@Get:
+    @@Param:
+      @@@Name: factory
+      @@@Type: PCDocument
+    @@Return:
       @@@Type: DIS|MPLCodeFragment
       @@@PerlDef:
         __DEEP{
@@ -6496,7 +6239,6 @@ TMethods:
               }
             }
             my $uri = $cparam-><AG::DIS|DISAnyResource.nameURI>;
-            my $plimpl = $self-><AG::DISAnyResourcePerl.plImplementation>;
             my $db = $self-><AG::DIS|DISAnyResource.database>;
             my $cfgname = <ClassM::PLImplClass.perlLiteral>
                          ($cparam-><M::anyres.getDOMConfigurationParameterName>);
@@ -6511,8 +6253,8 @@ TMethods:
                                   ($_->[1]);
               if ($cres) {
                 $prop{$_->[0]}
-                  = bless \($cres-><AG::dp|DISResourcePerl.plCodeFragment>
-                                 ->stringify), 'manakai::code';
+                  = bless \($cres-><M::DISResourcePerl.plCodeFragment>
+                                     ($factory)->stringify), 'manakai::code';
               }
             }
             my $type = $cparam-><AG::DIS|DISResource.disActualDataTypeResource>;
@@ -6569,7 +6311,8 @@ TMethods:
                               (<Q::c|targetType>)
                          };
             my $target0 = <ClassM::PLImplClass.perlLiteral> ($target[0]);
-            $r = $plimpl-><M::DIS|MPLImpl.createPerlStatement>
+            $r = $factory-><M::PCDocument.createPCStatement>;
+            $r-><M::DIS|PLInCon.appendCode>
                    ('$Message::DOM::DOMCore::ManakaiDOMConfiguration{'.
                     $target0 . '}->{' . $cfgname . '} = ' . 
                     <ClassM::PLImplClass.perlLiteral> ({
@@ -6579,16 +6322,18 @@ TMethods:
                       %prop,
                     }));
             if (@target > 1) {
-              my $c = $plimpl-><M::DIS|MPLImpl.createPerlBlockContainer>;
-              $c-><M::DIS|PLBlockCon.appendCodeFragment> ($r);
+              my $c = $factory-><M::Document.createElementNS>
+                                  (<Q::pc:>, 'blockContainer');
+              $c-><M::Node.appendChild> ($r);
               for my $target (@target[1..$#target]) {
-                $c-><M::DIS|PLBlockCon.appendCodeFragment>
-                  ($plimpl-><M::DIS|MPLImpl.createPerlStatement>
+                $c-><M::Node.appendChild>
+                  ($factory-><M::PCDocument.createPCStatement>)
+                  -><M::DIS|PLInCon.appendCode>
                    ('$Message::DOM::DOMCore::ManakaiDOMConfiguration{'.
                     <ClassM::PLImplClass.perlLiteral> ($target) .
                     '}->{'. $cfgname .
                     '} = $Message::DOM::DOMCore::ManakaiDOMConfiguration{' .
-                    $target0 . '}->{' . $cfgname . '}'));
+                    $target0 . '}->{' . $cfgname . '}');
               }
               $r = $c;
             }
@@ -6596,14 +6341,16 @@ TMethods:
 ##domconfig param
 
 TMethods:
-  @TAttr:
+  @TMethod:
     @@Name: plCodeFragment
     @@DIS:targetType: c|DOMErrorType
-    @@Get:
+    @@Param:
+      @@@Name: factory
+      @@@Type: PCDocument
+    @@Return:
       @@@Type: DIS|MPLCodeFragment
       @@@PerlDef:
         __DEEP{
-            my $plimpl = $self-><AG::DISAnyResourcePerl.plImplementation>;
             my $db = $self-><AG::DIS|DISAnyResource.database>;
             my $sev = $self-><M::DIS|DISResourceProp.getPropertyResource>
                                 (<Q::c|severity>);
@@ -6621,7 +6368,8 @@ TMethods:
                            (<Q::ecore|MUErrorFormatter>,
                             for_arg => <Q::ManakaiDOM|Perl>);
             }
-            $r = $plimpl-><M::DIS|MPLImpl.createPerlStatement>
+          $r = $factory-><M::PCDocument.createPCStatement>;
+          $r-><M::DIS|PLInCon.appendCode>
                    ('$Message::DOM::DOMCore::ManakaiDOMError::Def{'.
                     <ClassM::PLImplClass.perlLiteral>
                       ($self-><AG::DIS|DISAnyResource.nameURI>).
@@ -6633,8 +6381,8 @@ TMethods:
                            $self-><AG::DIS|DISAnyResource.nameURI>),
                       description => $self-><M::ManakaiDISResourcePerl
                                                   .plMufDescriptionText>,
-                      <H::c|severity> => 0 + $sev-><AG::DISResourcePerl
-                                                        .plCodeFragment>,
+                      <H::c|severity> => 0 + $sev-><M::DISResourcePerl
+                                                    .plCodeFragment> ($factory),
                       <H::ecore:textFormatter> => $tf-><AG::dp|DISResourcePerl
                                                       .plFullyQualifiedName>,
                     }));

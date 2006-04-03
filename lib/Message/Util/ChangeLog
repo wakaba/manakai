@@ -1,3 +1,15 @@
+2006-04-03  Wakaba  <wakaba@suika.fam.cx>
+
+	* Grove.dis (mg:mutations): It is changed from array
+	reference to hash reference.
+
+	* PerlCode.dis (replaceVariable): The |pc2:| namespace
+	support.
+	(IN_USE_NODE_ERR, BAD_CHILD_ERR): Removed.
+	(createPCIf, createPCPackage): New methods.
+	(createPCFile): Renamed from |createPerlFile|.  Set
+	configuration parameters.
+
 2006-04-02  Wakaba  <wakaba@suika.fam.cx>
 
 	* Makefile: Update to new modules.

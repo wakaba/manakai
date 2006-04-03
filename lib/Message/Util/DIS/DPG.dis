@@ -15,7 +15,7 @@ Module:
   @License: license|Perl+MPL
 
   @Date:
-    $Date: 2006/04/01 17:52:34 $
+    $Date: 2006/04/03 12:53:26 $
   
   @Require:
     @@Module:
@@ -1952,10 +1952,10 @@ IFClsETDef:
                 my $plcode = $opt{dis_resource}
                                -><M::dp|DISResourcePerl||DIS|ForLatest
                                                 .plPreprocessPerlCode>
-                                 ($source,
+                                 ($codeDocument, $source,
                                   namespace_context => $opt{ns_context});
 
-                my $dparent = $parent-><AG::Node.ownerDocument>
+                my $dparent = $codeDocument
                                    -><M::pc|PCDocument.createPCExpression> (',');
                 for (keys %param) {
                   $rexpression_to_code

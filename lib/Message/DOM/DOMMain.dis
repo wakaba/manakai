@@ -23,7 +23,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/03/30 16:01:43 $
+    $Date: 2006/04/03 12:53:24 $
   
   @Require:
     @@Module:
@@ -306,34 +306,6 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       ManakaiDOM:InCase
-
-## -- lang:dis vocabulary
-
-TreeElementType:
-  @QName:
-    dis:CheckReadOnly
-  @dataType:
-    dis:Boolean
-  @rdfs:domain:
-    dis:SetProp
-  @Description:
-    @@lang:en
-    @@@:
-      Whether if the node to set an attribute value is read-only is 
-      checked before the setting or not. 
-
-TreeElementType:
-  @QName:
-    dis:GetPropNode
-  @dataType:
-    dis:TypeQName
-  @rdfs:range:
-    rdf:Property
-  @Description:
-    @@lang:en
-    @@@:
-      Gets the nodal value of a <Class::ManakaiDOM:ManakaiDOMNodeReference> 
-      property (actualy <Class::ManakaiDOM:ManakaiDOMNodeObject> property). 
 
 ## -- DOM specific properties and types
 
