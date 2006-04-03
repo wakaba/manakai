@@ -15,7 +15,7 @@ Module:
   @License: license|Perl+MPL
 
   @Date:
-    $Date: 2006/04/03 12:53:26 $
+    $Date: 2006/04/03 16:13:17 $
   
   @Require:
     @@Module:
@@ -1966,7 +1966,7 @@ IFClsETDef:
                     ('$'.$_ => $dparent-><AG::Node.lastChild>);
                 }
 
-                $parent-><M::pc|PerlCodeStatements.appendCodeFragment> ($plcode);
+                $parent-><M::Node.appendChild> ($plcode);
                 return $next_token_required;
               } else {
                 die qq<Lexical content type <$lang> is not supported>;

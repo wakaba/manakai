@@ -24,7 +24,7 @@ Module:
       @@@Year:2003
       @@@DISCore:author: DISCore|Wakaba
   @Date:
-    $Date: 2006/04/02 10:45:24 $
+    $Date: 2006/04/03 16:13:15 $
   
   @Require:
     @@Module:
@@ -1376,8 +1376,6 @@ IFClsDef:
         The parent node of this node, if any. 
     @@NewIn21:
     @@Get:
-      @@@disDef:
-        @@@@swcfg21:GetPropNode:parent
       @@@Description:
         @@@@lang:en
         @@@@@:The parent node. 
@@ -1388,6 +1386,11 @@ IFClsDef:
         @@@@Description:
           @@@@@lang:en
           @@@@@@:This node has no parent node. 
+      @@@PerlDef:
+        $r = $self->{<H::mn|node>}->{<H::swcfg21|parent>};
+        if (defined $r) {
+          $r = <ClassM::ManakaiSWCFGNode.getNodeReference> ($r);
+        }
 
   @Attr:
     @@Name:count
@@ -2155,8 +2158,11 @@ IFClsDef:
           @@@@@lang:en
           @@@@@@:
             This node is a document node. 
-      @@@disDef:
-        @@@@swcfg21:GetPropNode: ownerDocument
+      @@@PerlDef:
+        $r = $self->{<H::mn|node>}->{<H::swcfg21|ownerDocument>};
+        if (defined $r) {
+          $r = <ClassM::ManakaiSWCFGNode.getNodeReference> ($r);
+        }
 
   @Method:
     @@Name:lookupNamespacePrefix
@@ -3341,11 +3347,11 @@ IFClsDef:
     @@NewIn21:
     @@Type:SWCFGString
     @@Get:
-      @@@disDef:
-        @@@@GetProp:defaultETNamespaceURI
+      @@@PerlDef:
+        $r = $self->{<H::mn|node>}->{<H::swcfg21|defaultETNamespaceURI>};
     @@Set:
-      @@@disDef:
-        @@@@SetProp:defaultETNamespaceURI
+      @@@PerlDef:
+        $self->{<H::mn|node>}->{<H::swcfg21|defaultETNamespaceURI>} = $given;
 
   @Attr:
     @@Name: implementation
@@ -3357,9 +3363,8 @@ IFClsDef:
     @@NewIn21:
     @@Type: SWCFGImplementation
     @@Get:
-      @@@disDef:
-        @@@@GetProp:
-          DOMCore:implementation
+      @@@PerlDef:
+        $r = $self->{<H::mn|node>}->{<H::f|implementation>};
   
   @RedefAttr:
     @@Name:nodeType
@@ -3505,8 +3510,8 @@ IFClsDef:
         or shadow sibling tree or not. 
     @@NewIn21:
     @@Get:
-      @@@disDef:
-        @@@@GetProp: isShadowMaster
+      @@@PerlDef:
+        $r = $self->{<H::mn|node>}->{<H::swcfg21|isShadowMaster>};
   
   @RedefAttr:
     @@Name:nodeType
@@ -4789,19 +4794,6 @@ IFClsDef:
         }
         $r = <ClassName::ManakaiSWCFGParser>->new ($self);
 
-## -- lang:dis vocabulary
-
-TreeElementType:
-  @QName: GetPropNode
-  @dataType: DISCore|QName
-  @rdfs:range:
-    rdf:Property
-  @Description:
-    @@lang:en
-    @@@:
-      Gets the nodal value of a <Class::ManakaiDOM:ManakaiDOMNodeReference> 
-      property (actually <Class::ManakaiDOM:ManakaiDOMNodeObject> property). 
-
 ResourceDef:
   @QName: NodeStem
   @AliasFor: ManakaiNode|NodeStem||ManakaiDOM|Perl
@@ -5166,15 +5158,6 @@ ElementTypeBinding:
   @ShadowContent:
     @@ContentType:
       lang:Perl
-
-ElementTypeBinding:
-  @Name: TreeElementType
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type:
-      DISLang:TreeElementType
-    @@For: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: NSVariant

@@ -12,7 +12,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/04/03 12:53:24 $
+    $Date: 2006/04/03 16:13:14 $
 
   @Require:
     @@Module:
@@ -7403,12 +7403,7 @@ IFCls1Def:
                    <H::tx|CDATASectionNode>) {
             $newNode = <ClassM::tx|ManakaiDOMCDATASection.newObject> ($node);
           } else {
-            __EXCEPTION{
-              MDOMX:MDOM_DEBUG_BUG||ManakaiDOM:Perl::
-                MDOMX:values => {+{
-                  <H::DOMCore:nodeType> => $node->{<H::DOMCore:nodeType>},
-                }},
-            }__;
+            ## TODO: Assertion
           }
           $newNode->{<H::infoset:content>} = $after;
           __CODE{mn|setXRefNode||ManakaiDOM|Perl::
@@ -8010,12 +8005,6 @@ ResourceDef:
         @@@@enDesc:
           A <IF::NodeList> is unable to be edited. 
         @@@@ForCheck: tc|ForEmptyNodeList
-      @@@disDef:
-        @@@@DOMMain:raiseException: c|NOMOD_NODELIST_ERR
-        @@@@ForCheck: tc|ForGetNodeList
-      @@@disDef:
-        @@@@DOMMain:raiseException: c|NOMOD_NODELIST_ERR
-        @@@@ForCheck: tc|ForEmptyNodeList
       @@@dx:raises:
         @@@@@: MDOMX|HIERARCHY_BAD_TYPE
         @@@@enDesc:
@@ -8041,6 +8030,10 @@ ResourceDef:
               $$$self-><M::Node.appendChild> ($value);
             }
           }__;
+      @@@PerlDef:
+        @@@@ForCheck: !tc|ForChildNodeList
+        @@@@@:
+          __EXCEPTION{c|NOMOD_NODELIST_ERR}__;
 
   @IntMethod:
     @@Perlop: DELETE
@@ -8084,9 +8077,6 @@ ResourceDef:
             A <IF::NodeList> returned by <M::Document.getElementsByTagNameNS> 
             or like is unable to be edited. 
         @@@@ForCheck: !tc|ForChildNodeList
-      @@@disDef:
-        @@@@DOMMain:raiseException: c|NOMOD_NODELIST_ERR
-        @@@@ForCheck: !tc|ForChildNodeList
       @@@dx:raises:
         @@@@@: MDOMX|HIERARCHY_BAD_TYPE
         @@@@enDesc:
@@ -8104,6 +8094,10 @@ ResourceDef:
               $r = $$$self-><M::Node.removeChild> ($current);
             }
           }__;
+      @@@PerlDef:
+        @@@@ForCheck: !tc|ForChildNodeList
+        @@@@@:
+          __EXCEPTION{c|NOMOD_NODELIST_ERR}__;
 
   @Attr:
     @@Name: length
@@ -8189,7 +8183,12 @@ ResourceDef:
           greater index'th items are removed from this list.  Otherwise, 
           no action.
     @@Return:
-      @@@NoModGetNodeList:
+      @@@dx:raises:
+        @@@@@: c|NOMOD_NODELIST_ERR
+        @@@@enDesc:
+          A <IF::NodeList> returned by <M::Document.getElementsByTagNameNS> 
+          or like is unable to be edited. 
+        @@@@ForCheck: tc|ForGetNodeList
       @@@PerlDef:
         @@@@ForCheck: tc|ForChildNodeList
         @@@@@:
@@ -8201,6 +8200,10 @@ ResourceDef:
               }
             }
           }__;
+      @@@PerlDef:
+        @@@@ForCheck: tc|ForGetNodeList
+        @@@@@:
+          __EXCEPTION{c|NOMOD_NODELIST_ERR}__;
 
   @IntMethod:
      @@Perlop: EXISTS
@@ -8311,7 +8314,12 @@ ResourceDef:
       @@@@:
         Removes all items from this list. 
     @@Return:
-      @@@NoModGetNodeList:
+      @@@dx:raises:
+        @@@@@: c|NOMOD_NODELIST_ERR
+        @@@@enDesc:
+          A <IF::NodeList> returned by <M::Document.getElementsByTagNameNS> 
+          or like is unable to be edited. 
+        @@@@ForCheck: tc|ForGetNodeList
       @@@dx:raises:
         @@@@@: MDOMX|HIERARCHY_BAD_TYPE
         @@@@enDesc:
@@ -8329,6 +8337,10 @@ ResourceDef:
               $$$self-><M::Node.removeChild> ($$$self-><AG::Node.firstChild>);
             }
           }__;
+      @@@PerlDef:
+        @@@@ForCheck: tc|ForGetNodeList
+        @@@@@:
+          __EXCEPTION{c|NOMOD_NODELIST_ERR}__;
 
   @IntMethod:
     @@Perlop:@{}
@@ -8384,24 +8396,6 @@ ResourceDef:
     @@PerlDef:
       $r = bless [], <ClassName::ManakaiDOMEmptyNodeList>;
 ##NodeList
-
-ElementTypeBinding:
-  @Name:NoModGetNodeList
-  @ElementType:
-    DISCore:resourceType
-  @ShadowContent: DISCore|Resource
-  @ShadowSibling:
-    @@dx:raises:
-      @@@@: c|NOMOD_NODELIST_ERR
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          A <IF::NodeList> returned by <M::Document.getElementsByTagNameNS> 
-          or like is unable to be edited. 
-      @@@ForCheck: !tc|ForEmptyNodeList
-    @@disDef:
-      @@@DOMMain:raiseException: c|NOMOD_NODELIST_ERR
-      @@@ForCheck: !tc|ForEmptyNodeList
 
 ElementTypeBinding:
   @Name: Perlop
@@ -11032,9 +11026,10 @@ ResourceDef:
           __DEEP{
             $r = ($$$self)-><M::Element.setAttributeNodeNS> ($arg);
           }__;
-      @@@disDef:
+      @@@PerlDef:
         @@@@ForCheck: !tc|ForAttrMap
-        @@@@DOMMain:raiseException: c|NO_NS_NAMEDNODEMAP_ERR
+        @@@@@:
+          __EXCEPTION{c|NO_NS_NAMEDNODEMAP_ERR}__;
 
     @@L2Test:
       @@@QName: AttrMap.setNamedItemNS.test
@@ -11177,9 +11172,10 @@ ResourceDef:
           __DEEP{
             $r = $el-><M::Element.removeAttributeNode> ($r);
           }__;
-      @@@disDef:
+      @@@PerlDef:
         @@@@ForCheck: !tc|ForAttrMap
-        @@@@DOMMain:raiseException: c|NO_NAMED_NODE_NS_ERR
+        @@@@@:
+          __EXCEPTION{c|NO_NAMED_NODE_NS_ERR}__;
 
   @IntMethod:
     @@Perlop: ==

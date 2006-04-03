@@ -23,7 +23,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2006/04/01 14:41:31 $
+      $Date: 2006/04/03 16:13:15 $
     @@ContentType:
       dis:Date.RCS
   
@@ -3133,7 +3133,7 @@ IFClsDef:
                     __EXCEPTION{ELEMENT_NOT_ALLOWED_ERR::
                       DIS:elementType => {$et},
                       DIS:sourceNode => {$el},
-                      DIS:uri => {$mod->{uri}},
+                      DIS:uri => {$mod-><AG::anyres.uri>},
                     }__;
                   }__;
                 }
@@ -3836,11 +3836,10 @@ IFClsDef:
     @@Name: xcrefToResource
     @@enDesc:
       Returns a resource object selected by an exception code
-      reference (<Q::DOMMain:XCodeRef>).
+      reference (<Q::dx|XCRef>).
     @@Param:
       @@@Name: xcref
-      @@@Type:
-        DOMMain:XCodeRef::ManakaiDOM:all
+      @@@Type: DISString
       @@@enDesc:
         Exception code to select.
     @@Param:
@@ -4510,7 +4509,8 @@ IFClsDef:
               $r = true;
               last C;
             }
-            my $this_for = $self->{db}-><M::DIS|DISDatabase.getFor>
+            my $this_for = $self-><AG::DISAnyResource.database>
+                                -><M::DIS|DISDatabase.getFor>
                                                ($this_for_uri);
             if ($this_for-><M::DIS|DISFor.isaURI> ($forURI)) {
               $r = true;
@@ -4550,7 +4550,7 @@ IFClsDef:
           its definition is not read (i.e. <A::DISAnyResource.isDefined> is
           <DOM::false>) or since it is created in memory.
       @@@PerlDef:
-        $r = $self->{db}
+        $r = $self-><AG::DISAnyResource.database>
                   -><M::DISDatabase.getModule>
                            (${$self->{<H::DIS|definingModule>}})
            if defined $self->{<H::DIS|definingModule>};
@@ -6072,7 +6072,8 @@ ClsDef:
               $r = true;
               last C;
             }
-            my $this_for = $self->{db}-><M::DIS|DISDatabase.getFor>
+            my $this_for = $self-><AG::DISAnyResource.database>
+                                -><M::DIS|DISDatabase.getFor>
                                                ($this_for_uri);
             if ($this_for-><M::DIS|DISFor.isaURI> ($forURI)) {
               $r = true;
@@ -7459,14 +7460,16 @@ IFClsDef:
       @@@PerlDef:
         __DEEP{
           if (exists $self->{<H::DIS:mvOwnerElementURI>}) {
-            $r = $self->{db}-><M::ManakaiDISDatabase.getResource>
+            $r = $self-><AG::DISAnyResource.database>
+                      -><M::DISDatabase.getResource>
                                 ($self->{<H::DIS:mvOwnerElementURI>})
               if defined $self->{<H::DIS:mvOwnerElementURI>};
           } else {
             $r = $self-><AG::DIS|DISResource.parentResource>;
             undef $r if $r and not $r-><M::DIS|DISAnyResource
                                    .isTypeURI> (<Q::s:AnyOwnerElement>);
-            $self->{<H::DIS:mvOwnerElementURI>} = $r->{uri} if $r;
+            $self->{<H::DIS:mvOwnerElementURI>} = $r-><AG::DISAnyResource.uri>
+                if $r;
           }
         }__;
 ##DISResourceMV
@@ -7827,11 +7830,12 @@ IFClsDef:
 
         if ($recursive) {
           __DEEP{
-            $opt{___recursive_isa_done} ||= {$self->{uri} => true};
+            $opt{___recursive_isa_done} ||= {$self-><AG::anyres.uri> => true};
             my @p_res = @$r;
             for my $p_res (@p_res) {
-              next if $opt{___recursive_isa_done}->{$p_res->{uri}};
-              $opt{___recursive_isa_done}->{$p_res->{uri}} = true;
+              my $p_res_uri = $p_res-><AG::anyres.uri>;
+              next if $opt{___recursive_isa_done}->{$p_res_uri};
+              $opt{___recursive_isa_done}->{$p_res_uri} = true;
               push @$r, @{$p_res-><M::DISResourceProp.getPropertyResourceList>
                                           ($propName, recursive => true,
                                            recursive_isa => $recursiveISA,
@@ -7842,11 +7846,12 @@ IFClsDef:
         }
         if ($recursiveISA) {
           __DEEP{
-            $opt{___recursive_isa_done} ||= {$self->{uri} => true};
+            $opt{___recursive_isa_done} ||= {$self-><AG::anyres.uri> => true};
             my @p_res = @$r;
             for my $p_res (@p_res) {
-              next if $opt{___recursive_isa_done}->{$p_res->{uri}};
-              $opt{___recursive_isa_done}->{$p_res->{uri}} = true;
+              my $p_res_uri = $p_res-><AG::anyres.uri>;
+              next if $opt{___recursive_isa_done}->{$p_res_uri};
+              $opt{___recursive_isa_done}->{$p_res_uri} = true;
               push @$r, @{$p_res-><M::DISResourceProp.getPropertyResourceList>
                                           (<Q::dis:ISA>, 
                                            recursive => true,
@@ -7857,15 +7862,17 @@ IFClsDef:
         }
         if ($isaRecursive) {
           __DEEP{
-            $opt{___recursive_isa_done} ||= {$self->{uri} => true};
-            $opt{___isa_recursive_done} ||= {$self->{uri} => true};
+            my $self_uri = $self-><AG::anyres.uri>;
+            $opt{___recursive_isa_done} ||= {$self_uri => true};
+            $opt{___isa_recursive_done} ||= {$self_uri => true};
             my @p_res = @{$self-><M::DISResourceProp.getPropertyResourceList>
                                       (<Q::dis:ISA>, recursive_isa => false,
                                        recursive => false,
                                        default_media_type => <Q::dis:TFQNames>)};
             for my $p_res (@p_res) {
-              next if $opt{___isa_recursive_done}->{$p_res->{uri}};
-              $opt{___isa_recursive_done}->{$p_res->{uri}} = true;
+              my $p_res_uri = $p_res-><AG::anyres.uri>;
+              next if $opt{___isa_recursive_done}->{$p_res_uri};
+              $opt{___isa_recursive_done}->{$p_res_uri} = true;
               push @$r, @{$p_res-><M::DISResourceProp.getPropertyResourceList>
                                           ($propName, recursive_isa => false,
                                            recursive => false,
@@ -8318,6 +8325,11 @@ ResourceDef:
     DIS:UNDECLARED_NS_PREFIX_ERR::swcfg21:ForLatest
 
 ResourceDef:
+  @QName: anyres
+  @AliasFor: DISAnyResource
+  @For: DIS|ForLatest
+
+ResourceDef:
   @rdf:type:
     @@@: dis|MultipleResource
     @@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
@@ -8430,12 +8442,6 @@ ResourceDef:
             The element type URI reference of the element.
         @@@@enMufDef:
           Element type "%p (name => {<Q::DIS:elementType>});" is not supported
-      @@@XSubTypeDef:
-        @@@@QName: NO_PERL_CODE_IMPL_ERR
-        @@@@enDesc:
-          There is no implementation that supports the 
-          <Feature::Util:PerlCode> feature, version 
-          <FeatureVer::1.0>.
     @@XConstDef:
       @@@Name: INVALID_STATE_ERR
       @@@Value:

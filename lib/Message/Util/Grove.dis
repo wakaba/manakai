@@ -9,7 +9,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/04/03 12:53:25 $
+    $Date: 2006/04/03 16:13:16 $
 
   @Require:
     @@Module:
@@ -516,8 +516,9 @@ ClsDef:
         my %has_xref;
         TARGET: while (%{$bag->{<H::mg|mutations>}}) {
           my $target = each %{$bag->{<H::mg|mutations>}};
+          next TARGET unless defined $target;
           CORE::delete $bag->{<H::mg|mutations>}->{$target};
-
+        
           next TARGET if $has_xref{$target} or $done{$target};
 
           unless (defined $bag->{$target}) {
@@ -530,6 +531,7 @@ ClsDef:
           my @gwreferred;
           GTARGET: while (%gtarget) {
             my $gtarget = each %gtarget;
+            next GTARGET unless defined $gtarget;
             CORE::delete $gtarget{$gtarget};
             next GTARGET if $grove{$gtarget};
 

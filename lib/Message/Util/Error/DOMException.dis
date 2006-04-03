@@ -20,7 +20,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/03/05 10:07:05 $
+      $Date: 2006/04/03 16:13:20 $
     @@ContentType:
       dis:Date.RCS
   
@@ -54,8 +54,6 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dis/
   @disPerl:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--Perl--
-  @DOMMain:
-    http://suika.fam.cx/~wakaba/archive/2004/dom/main#
   @dx:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#
   @ecore:
@@ -302,24 +300,6 @@ BlockElementType:
       Throws an exception. 
   @dataType: DISPerl|XWSpecification
 
-## -- lang:dis vocabulary
-
-TreeElementType:
-  @Name: raiseException
-  @Description:
-    @@lang:en
-    @@@:
-      Raises an exception.  Content: Same as <Q::ManakaiDOM:raises>.
-
-ElementTypeBinding:
-  @Name: TreeElementType
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type:
-      DISLang:TreeElementType
-    @@For: =ManakaiDOM|all
-
 ## -- References to Exception
 
 LexTypeDef:
@@ -348,12 +328,6 @@ LexTypeDef:
       - subcoderef := <lt>A dis:TFQNames referring an exception or warning subcode;
                        it should be prefixed>
   @rdfs:subClassOf: DISCore|NSString
-
-ResourceDef:
-  @QName: 
-    DOMMain:XCodeRef
-  @AliasFor: dx|XCRef
-  @For: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: LexTypeDef
@@ -490,8 +464,7 @@ ResourceDef:
       the error.  It should be equal to one of constant values
       defined as members of the exception interface that the
       object implements. 
-    @@Type: 
-      DOMMain:unsigned-short::ManakaiDOM:all
+    @@Type: idl|unsignedShort||ManakaiDOM|all
     @@Get:
       @@@PerlDef:
         $r = $self->{<H::ecore:def>}->{<H::c|code>};
@@ -508,7 +481,7 @@ ResourceDef:
       {NOTE:: This attribute always has the same value as 
               <A::dx|Exception.code>.
       }
-    @@Type: DOMMain|unsigned-short||ManakaiDOM|all
+    @@Type: idl|unsignedShort||ManakaiDOM|all
     @@Get:
       @@@PerlDef:
         $r = $self->{<H::ecore:def>}->{<H::c|code>};
@@ -584,87 +557,6 @@ ResourceDef:
     @@rdf:type: DISLang|ConstGroup
     @@Type: idl|unsignedShort||ManakaiDOM|all
     @@rdfs:subClassOf: idl|unsignedShort||ManakaiDOM|all
-
-    @@ResourceDef:
-      @@@QName: 
-        MDOMX:MDOM_DEBUG_BUG
-      @@@DISCore:resourceType: dx|ErrorCode
-      @@@Value:
-        @@@@@: 3
-        @@@@ContentType: DISCore|Integer
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          Unexpected case occurs.  In general, this exception is not 
-          reported.  If the implementation has a bug and 
-          something unexpected is occur, this exception is raised. 
-        \
-          Applications <kwd:MUST-NOT> try to catch this exception. 
-          If this exception is raised, please report to the 
-          author of that module.
-          \
-          {NOTE:: New assertion mechanism and subtype <X::DOMMain|ASSERTION_ERR> 
-                  has been introduced; it should be used instead of 
-                  throwing <X::MDOMX:MDOM_DEBUG_BUG> directly. 
-          \
-          }
-      @@@XParam:
-        @@@@QName:
-          MDOMX:values
-        @@@@Description:
-          @@@@@lang:en
-          @@@@@@: Arbitrary values for debugging.
-
-      @@@XSubTypeDef:
-        @@@@QName: 
-          DOMMain:ASSERTION_ERR
-        @@@@Description:
-          @@@@@lang:en
-          @@@@@@:
-            Failure to pass an assertion. 
-        @@@@XParam:
-          @@@@@QName:
-            DOMMain:assertionType
-          @@@@@Description:
-            @@@@@@lang:en
-            @@@@@@@:Type of the assertion.
-        @@@@XParam:
-          @@@@@QName:
-            DOMMain:actualValue
-          @@@@@Description:
-            @@@@@@lang:en
-            @@@@@@@: The actual value.
-        @@@@XParam:
-          @@@@@QName:
-            DOMMain:expectedValue
-          @@@@@Description:
-            @@@@@@lang:en
-            @@@@@@@@: The expected value.
-        @@@@XParam:
-          @@@@@QName:
-            DOMMain:expectedLabel
-          @@@@@Description:
-            @@@@@@lang:en
-            @@@@@@@:
-              A simple explaination for expected value. 
-        @@@@XParam:
-          @@@@@QName:
-            DOMMain:traceText
-          @@@@@Description:
-            @@@@@@lang:en
-            @@@@@@@:
-              Perl's stack trace string (return value of <Perl::Carp::longmess>
-              is assumed). 
-        @@@@Def:
-          @@@@@lang:en
-          @@@@@ContentType:
-            lang:muf
-          @@@@@@:
-            ASSERTION ERROR: got "%p (name => {<Q::DOMMain:actualValue>});" 
-            while %p (name => {<Q::DOMMain:expectedValue>}, prefix => {"},
-            suffix => {"});%p (name => {<Q::DOMMain:expectedLabel>},
-            prefix => { (}, suffix => {)}); is expected %p (
-            name => {<Q::DOMMain:traceText>}); 
 
     @@ResourceDef:
       @@@QName: NO_MODIFICATION_ALLOWED_ERR

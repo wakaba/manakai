@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/04/03 12:53:26 $
+      $Date: 2006/04/03 16:13:17 $
     @@ContentType:
       dis:Date.RCS
   
@@ -475,7 +475,7 @@ IFClsDef:
                                             forp_arg => $forpArg);
               my $vnode_value = $vnode-><M::DIS|SWCFGNode.value>;
               if ($vnode_type_uri) {
-                my $vnode_type = $disResource->{db}
+                my $vnode_type = $disResource-><AG::anyres.database>
                                      -><M::DIS|DISDatabase.getResource>
                                                       ($vnode_type_uri);
                 if ($vnode_type-><M::DIS|DISResource.isSubsetOfURI>
@@ -661,9 +661,8 @@ IFClsDef:
                 if $const->{<Q::dis:Value>};
               unless (defined $val) {
                 __UNDEEP{__EXCEPTION{DIS|NO_CONST_VALUE_ERR::
-                  DIS:uri => {$const->{uri}},
+                  DIS:uri => {$const-><AG::anyres.uri>},
                   DIS:localName => {$const-><AG::DIS|DISAnyResource.localName>},
-                  DIS:sourceNode => {$const->{src}},
                   DIS:elementType => {$et},
                 }__}__;
               }
@@ -692,7 +691,6 @@ IFClsDef:
                                         .isTypeURI> (<Q::DISLang:Method>)) {
                     __EXCEPTION{DIS|NO_METHOD_RETURN_ERR::
                       DIS:errResource => {$const},
-                      DIS:sourceNode => {$const->{src}},
                       DIS:elementType => {$et},
                       DIS:uri => {$const-><AG::DIS|DISAnyResource.uri>},
                       DIS:localName => {$const-><AG::DIS|DISAnyResource
@@ -701,14 +699,12 @@ IFClsDef:
                   } elsif ($on and $on eq 'set') {
                     __EXCEPTION{DIS|NO_ATTR_SET_ERR::
                       DIS:errResource => {$const},
-                      DIS:sourceNode => {$const->{src}},
                       DIS:elementType => {$et},
                       DIS:uri => {$const-><AG::DIS|DISAnyResource.uri>},
                     }__;
                   } else {
                     __EXCEPTION{DIS|NO_ATTR_GET_ERR::
                       DIS:errResource => {$const},
-                      DIS:sourceNode => {$const->{src}},
                       DIS:elementType => {$et},
                       DIS:uri => {$const-><AG::DIS|DISAnyResource.uri>},
                     }__;
@@ -722,14 +718,14 @@ IFClsDef:
             } else {
               if ($et eq <Q::DISLang:constValue>) {
                 __UNDEEP{__EXCEPTION{DIS|RESOURCE_NOT_DEFINED_ERR::
-                  DIS:uri => {$const->{uri}},
+                  DIS|uri => {$const-><AG::anyres.uri>},
                   DIS:localName => {$const-><AG::DIS|DISAnyResource.localName>},
                   DIS:sourceNode => {$self},
                   DIS:expectedType => {<Q::ManakaiDOM:Const>},
                 }__}__;
               } else {  # DISPerl:cloneCode
                 __UNDEEP{__EXCEPTION{DIS|RESOURCE_NOT_DEFINED_ERR::
-                  DIS:uri => {$const->{uri}},
+                  DIS|uri => {$const-><AG::anyres.uri>},
                   DIS:localName => {$const-><AG::DIS|DISAnyResource.localName>},
                   DIS:sourceNode => {$self},
                   DIS:expectedType => {<Q::DISLang:AnyMethod>},
@@ -746,95 +742,6 @@ IFClsDef:
             my $rvar = $factory-><M::PCDocument.createPCVariable>
                                                  ('$', null, 'r');
             $r-><M::DIS|PLAnyCon.appendNewAssignment> ($rvar => $val);
-          } elsif ({
-            <Q::dis:GetProp> => true,
-            <Q::swcfg21:GetPropNode> => true,
-          }->{$et}) {
-            my $prop_uri = $self-><AG::DIS|DISElement.qnameValueURI>;
-            my $prop_res = $disResource->{db}
-                     -><M::DIS|DISDatabase.getResource> ($prop_uri);
-            $prop_res-><AS::DIS|DISAnyResource.isReferred> ($self);
-            my $prop_name = $prop_res-><M::DIS|DISResourceProp.getPropertyText>
-                       (<Q::DISPerl:propHashKey>, $prop_uri);
-            $r = $factory-><M::PCDocument.createPCStatement>;
-            my $node_prop_name = $disResource->{db}
-                     -><M::DIS|DISDatabase.getResource> (<Q::mn:node>)
-                     -><M::DIS|DISResourceProp.getPropertyText>
-                       (<Q::DISPerl:propHashKey>, <Q::mn:node>);
-            my $val = $factory-><M::Document.createElementNS>
-                                  (<Q::pc:>, 'inlineContainer');
-            $val-><M::DIS|PLInCon.appendCode> ('$self->{');
-            $val-><M::DIS|PLAnyCon.appendStringLiteral> ($node_prop_name);
-            $val-><M::DIS|PLInCon.appendCode> ('}->{');
-            $val-><M::DIS|PLAnyCon.appendStringLiteral> ($prop_name);
-            $val-><M::DIS|PLInCon.appendCode> ('}');
-            my $rvar = $factory-><M::PCDocument.createPCVariable>
-                                               ('$', null, 'r');
-            $r-><M::DIS|PLAnyCon.appendNewAssignment> ($rvar => $val);
-            
-            if ({
-                 <Q::swcfg21:GetPropNode> => true}->{$et}) {
-              my $q = $factory-><M::Document.createElementNS>
-                                  (<Q::pc:>, 'blockContainer');
-              $q-><M::Node.appendChild> ($r);
-              my $dr = $factory-><M::Document.createElementNS>
-                                  (<Q::pc:>, 'inlineUnparsed');
-              $dr-><AS::Node.textContent> ('defined $r');
-              my $qt = $factory-><M::Document.createElementNS>
-                                   (<Q::pc:>, 'blockContainer');
-              $q-><M::DIS|PLBlockCon.appendNewIf> ($dr, $qt);
-              my $qtr = $factory-><M::Document.createElementNS>
-                                   (<Q::pc:>, 'inlineContainer');
-              $qt-><M::DIS|PLBlockCon.appendStatement>
-                 -><M::DIS|PLAnyCon.appendNewAssignment> ($rvar->clone => $qtr);
-              my $cls = $disResource->{db}-><M::DIS|DISDatabase
-                           .getResource> ({
-                             <Q::swcfg21:GetPropNode> =>
-                                                   <Q::swcfg21:ManakaiSWCFGNode>,
-                           }->{$et}, for_arg => $forArg);
-              $cls-><AS::DIS|DISAnyResource.isReferred> ($self);
-              $qtr-><M::DIS|PLInCon.appendCode>
-                       ($cls-><AG::DISResourcePerl
-                         .plFullyQualifiedName> . q[->_get_node_reference ($r)]);
-              $r = $q;
-            }
-          } elsif ($et eq <Q::dis:SetProp>) {
-            my $prop_uri = $self-><AG::DIS|DISElement.qnameValueURI>;
-            my $prop_res = $disResource->{db}
-                     -><M::DIS|DISDatabase.getResource> ($prop_uri);
-            $prop_res-><AS::DIS|DISAnyResource.isReferred> ($self);
-            my $prop_name = $prop_res-><M::DIS|DISResourceProp.getPropertyText>
-                       (<Q::DISPerl:propHashKey>, $prop_uri);
-            $r = $factory-><M::PCDocument.createPCStatement>;
-            my $node_prop_name = $disResource->{db}
-                     -><M::DIS|DISDatabase.getResource> (<Q::mn:node>)
-                     -><M::DIS|DISResourceProp.getPropertyText>
-                       (<Q::DISPerl:propHashKey>, <Q::mn:node>);
-            my $val = $factory-><M::Document.createElementNS>
-                                  (<Q::pc:>, 'inlineContainer');
-            $val-><M::DIS|PLInCon.appendCode> ('$self->{');
-            $val-><M::DIS|PLAnyCon.appendStringLiteral> ($node_prop_name);
-            $val-><M::DIS|PLInCon.appendCode> ('}->{');
-            $val-><M::DIS|PLAnyCon.appendStringLiteral> ($prop_name);
-            $val-><M::DIS|PLInCon.appendCode> ('}');
-            my $rvar = $factory-><M::PCDocument.createPCVariable>
-                                               ('$', null, 'given');
-            $r-><M::DIS|PLAnyCon.appendNewAssignment> ($val => $rvar);
-          } elsif ($et eq <Q::DOMMain:raiseException>) {
-            my ($cls, $const, $subtype)
-                = @{$disResource->{db}-><M::DIS|DISDatabase.xcrefToResource>
-                                         ($self-><M::DIS|SWCFGNode.value>,
-                                          $self,
-                                          node => $self,
-                                          for_arg => $forArg)};
-            my $context_param = $disResource-><M::ManakaiDISResourcePerl
-                                        .plGetContextParameter>;
-            $r = $factory-><M::Document.createElementNS>
-                             (<Q::pc:>, 'blockContainer');
-            $disResource-><M::ManakaiDISResourcePerl.plAppendThrow>
-                        ($factory, $r, $cls, $const, $subtype,
-                         {%$context_param},
-                         node => $self);
           } elsif ({
             <Q::dis:ContentType> => true,
             <Q::dis:For> => true, <Q::dis:ForCheck> => true,
@@ -979,11 +886,6 @@ IFClsDef:
     @@Return:
       @@@Type: DIS|MPLCodeFragment
       @@@enDesc: A Perl representation of the value.
-      @@@RaiseException:
-        @@@@@:DIS|NO_PERL_CODE_IMPL_ERR
-        @@@@enDesc:
-          There is no implementation that implements
-          the <Feature::Util:PerlCode> feature, version <FeatureVer::1.0>.
       @@@PerlDef:
         __DEEP{
           my $dataType;
@@ -2235,8 +2137,9 @@ IFClsDef:
 
           ## -- Require'ing external modules
           ## TODO: Custom module construction support
+          my $db = $self-><AG::anyres.database>;
           for my $uri (@{$r-><M::DIS|MPLCodeFragment.disGetRequireURIList>}) {
-            my $mod = $self->{db}-><M::DIS|DISDatabase.getAnyResource> ($uri)
+            my $mod = $db-><M::DIS|DISDatabase.getAnyResource> ($uri)
                            -><AG::DIS|DISAnyResource.ownerModule>;
             next unless $mod;
             my $pack = $mod-><AG::DISModulePerl.plFullyQualifiedName>;
@@ -2970,7 +2873,7 @@ IFClsDef:
                               ('local $Error::Depth = $Error::Depth '.
                                ($et eq <Q::disPerl:DEEP> ? '+' : '-').
                                ' 1');
-                $block-><M::DIS|PLBlockCon.appendCodeFragment>
+                $block-><M::Node.appendChild>
                           ($self-><M::DISResourcePerl
                                     .plPreprocessPerlCode>
                                        ($factory, $source_code,
@@ -3087,10 +2990,10 @@ IFClsDef:
                            (', ' . $pname . ' => ');
                     if ($param->{$name}->{type} eq 'code') {
                       if (ref $param->{$name}->{value}) {
-                        $statement-><M::DIS|PLInCon.appendCodeFragment>
+                        $statement-><M::Node.appendChild>
                            ($param->{$name}->{value});
                       } else {
-                        $statement-><M::DIS|PLInCon.appendCodeFragment>
+                        $statement-><M::Node.appendChild>
                           ($self-><M::DISResourcePerl
                                   .plPreprocessPerlStatement>
                                      ($factory, $param->{$name}->{value},
@@ -3133,7 +3036,7 @@ IFClsDef:
                                          ($code_name, null,
                                           $self-><AG::DIS|DISAnyResource.forURI>,
                                           node => $node);
-                  my $code = $self->{db}-><M::DIS|DISDatabase.getResource>
+                  my $code = $db-><M::DIS|DISDatabase.getResource>
                                            ($code_uri);
                   $code-><AS::DIS|DISAnyResource.isReferred>
                                            ($self-><AG::DIS|DISAnyResource.uri>);
@@ -3175,7 +3078,7 @@ IFClsDef:
                     $pc-><M::DIS|MPLCodeFragment.replaceVariable>
                                           ($var => $value);
                   }
-                  $r-><M::DIS|PLBlockCon.appendCodeFragment> ($pc);
+                  $r-><M::Node.appendChild> ($pc);
                 } elsif ($et eq <Q::disPerl:FOR>) {
                   if ($source_code =~ s/^(((?>(?!::).)*)::\s*)//) {
                     V: for my $forq (split /\s*\|\s*/, $2) {
@@ -3186,7 +3089,7 @@ IFClsDef:
                                                .isForURI> ($for_uri);
                       if (($formatch and not $notfor) or
                           (not $formatch and $notfor)) {
-                        $r-><M::DIS|PLBlockCon.appendCodeFragment>
+                        $r-><M::Node.appendChild>
                             ($self-><M::DISResourcePerl
                                   .plPreprocessPerlCode>
                                      ($factory, $source_code,
@@ -3242,7 +3145,7 @@ IFClsDef:
                   }__}__;
                 }
               } else {  ## Other than block-level element
-                $r-><M::DIS|PLBlockCon.appendCodeFragment>
+                $r-><M::Node.appendChild>
                        ($self-><M::DISResourcePerl
                              .plPreprocessPerlStatement>
                                  ($factory, $source_code,
@@ -3342,7 +3245,7 @@ IFClsDef:
                                                      .ownerClassNodeURI>,
                                         $self-><AG::DIS|DISAnyResource.forURI>,
                                         node => $node);
-                  my $class = $self->{db}-><M::DIS|DISDatabase.getResource>
+                  my $class = $db-><M::DIS|DISDatabase.getResource>
                                                    ($class_uri);
                   unless ($class-><AG::DIS|DISAnyResource
                                         .isDefined>) {
@@ -3355,7 +3258,7 @@ IFClsDef:
                     }__}__;
                   }
                   $class-><AS::DIS|DISAnyResource.isReferred>
-                                 ($node || $self->{src} || $self->{uri});
+                                 ($node || $self-><AG::anyres.uri>);
                   if ($et eq <Q::disPerl::ClassM> and
                       $class-><M::DIS|DISResource.isTypeURI>
                                      (<Q::DISLang|Interface>)) {
@@ -3363,7 +3266,7 @@ IFClsDef:
                       __EXCEPTION{DIS|INTERFACE_CLASS_METHOD_ERR::
                         DIS:uri => {$class_uri},
                         DIS:elementType => {$et},
-                        DIS:sourceNode => {$node || $self->{src}},
+                        DIS:sourceNode => {$node},
                         DIS:sourceCode => {$source_code},
                         DIS:expectedType => {<Q::DISLang|Class>},
                       }__;
@@ -3388,7 +3291,7 @@ IFClsDef:
                         DIS:localName => {$method_qname},
                         DIS:parentURI => {$class_uri},
                         DIS:elementType => {$et},
-                        DIS:sourceNode => {$node || $self->{src}},
+                        DIS:sourceNode => {$node},
                         DIS:sourceCode => {$source_code},
                         DIS:expectedType => {{
                                        <Q::disPerl:AG> => <Q::DISLang:Attribute>,
@@ -3416,14 +3319,14 @@ IFClsDef:
                                                      .ownerClassNodeURI>,
                                         $self-><AG::DIS|DISAnyResource.forURI>,
                                         node => $node);
-                  my $class = $self->{db}-><M::DIS|DISDatabase.getResource>
+                  my $class = $db-><M::DIS|DISDatabase.getResource>
                                                    ($class_uri);
                   $class-><AS::DIS|DISAnyResource.isReferred>
-                                         ($node || $self->{src} || $self->{uri});
+                                         ($node || $self-><AG::anyres.uri>);
                   my $pack = $class-><AG::DISResourcePerl.plFullyQualifiedName>;
                   unless ($pack) {
                     __UNDEEP{__EXCEPTION{DIS|NO_PERL_PACKAGE_NAME_ERR::
-                      DIS:sourceNode => {$node || $self->{src}},
+                      DIS:sourceNode => {$node},
                       DIS:sourceCode => {$source_code},
                       DIS:uri => {$class_uri},
                       DIS:elementType => {$et},
@@ -3465,7 +3368,7 @@ IFClsDef:
                                          ($code_name, null,
                                           $self-><AG::DIS|DISAnyResource.forURI>,
                                           node => $node);
-                  my $code = $self->{db}-><M::DIS|DISDatabase.getResource>
+                  my $code = $db-><M::DIS|DISDatabase.getResource>
                                            ($code_uri);
                   $code-><AS::DIS|DISAnyResource.isReferred>
                                          ($node || $self-><AG::anyres.uri>);
@@ -3506,7 +3409,7 @@ IFClsDef:
                     $pc-><M::DIS|MPLCodeFragment.replaceVariable>
                                           ($var => $value);
                   }
-                  $r-><M::DIS|PLInCon.appendCodeFragment> ($pc);
+                  $r-><M::Node.appendChild> ($pc);
                 } elsif ($et eq <Q::disPerl:C>) {
                   my ($class_qname, $const_name) = split /\./, $source_code, 2;
                   my $class_uri = $nsr-><M::DIS|NSResolverDIS.tfqnamesToURI>
@@ -3515,7 +3418,7 @@ IFClsDef:
                                                      .ownerClassNodeURI>,
                                         $self-><AG::DIS|DISAnyResource.forURI>,
                                         node => $node);
-                  my $class = $self->{db}-><M::DIS|DISDatabase.getResource>
+                  my $class = $db-><M::DIS|DISDatabase.getResource>
                                                    ($class_uri);
                   $class-><AS::DIS|DISAnyResource.isReferred>
                                         ($node || $self-><AG::anyres.uri>);
@@ -3549,7 +3452,7 @@ IFClsDef:
                       DIS:elementType => {$et},
                    }__}__;
                   }
-                  $r-><M::DIS|PLInCon.appendCodeFragment> ($val);
+                  $r-><M::Node.appendChild> ($val);
                 } else {
                   __UNDEEP{__EXCEPTION{DIS|UNSUPPORTED_ELEMENT_TYPE_ERR::
                     DIS:elementType => {$et},
@@ -3762,7 +3665,7 @@ IFClsDef:
             $r->{<Q::MDOMX:on>} = {type => 'quoted', value => 'set'};
           } else {
             $r->{<Q::MDOMX:resourceURI>} = {type => 'quoted',
-                                            value => $self->{uri}};
+                                            value => $self-><AG::anyres.uri>};
           }
         }__;
 
@@ -3880,14 +3783,12 @@ IFClsDef:
         unless ($xclass-><AG::DIS|DISAnyResource.isDefined> or
                 not $xclass_module) {
           __EXCEPTION{DIS|RESOURCE_NOT_DEFINED_ERR::
-            DIS:sourceNode => {$self->{src}},
-            DIS:uri => {$xclass->{uri}},
+            DIS:uri => {$xclass-><AG::anyres.uri>},
             DIS:localName => {$xclass-><AG::DIS|DISAnyResource.localName>},
             DIS:expectedType => {<Q::dx:AnyExceptionClass>},
           }__;
         }
-        $xclass-><AS::DIS|DISAnyResource.isReferred>
-           ($self->{src} || $self->{uri});
+        $xclass-><AS::DIS|DISAnyResource.isReferred> ($self-><AG::anyres.uri>);
         $self-><M::ManakaiDISResourcePerl.plAddRequireResource>
                                ($xclass_module => $statement);
         $xparam->{-type} = {type => 'quoted',
@@ -3904,10 +3805,9 @@ IFClsDef:
                            (', ' . $pname . ' => ');
           if ($xparam->{$name}->{type} eq 'code') {
             if (ref $xparam->{$name}->{value}) {
-              $statement-><M::DIS|PLInCon.appendCodeFragment>
-                           ($xparam->{$name}->{value});
+              $statement-><M::Node.appendChild> ($xparam->{$name}->{value});
             } else {
-              $statement-><M::DIS|PLInCon.appendCodeFragment>
+              $statement-><M::Node.appendChild>
                        ($self-><M::DISResourcePerl
                                   .plPreprocessPerlStatement>
                                      ($factory, $xparam->{$name}->{value},
@@ -3994,7 +3894,7 @@ IFClsDef:
           if ($muf) {
             $r = $muf-><AG::dv|DVValue.stringValue>;
             if ($muf-><AG::dv|DVValue.dataType> eq <Q::lang:muf>) {
-              my $nsr = $muf || $node || $self->{src};
+              my $nsr = $muf || $node;
               $r =~ s{< Q ::([^<>]+)>}{$nsr-><M::DIS|NSResolverDIS
                                      .qnameToURI> ($1, node => $muf)}gex;
             }
@@ -4290,8 +4190,7 @@ TMethods:
               __UNDEEP{
                 __EXCEPTION{DIS|NO_METHOD_RETURN_ERR::
                   DIS:errResource => {$self},
-                  DIS:sourceNode => {$self->{src}},
-                  DIS:uri => {$self->{uri}},
+                  DIS:uri => {$self-><AG::anyres.uri>},
                   DIS:localName => {$self-><AG::DIS|DISAnyResource.localName>},
                 }__;
               }__;
@@ -4342,8 +4241,7 @@ TMethods:
                                                  .plCodeFragment> ($factory);
                     unless ($param_variables[-1]->[1]) {
                      __UNDEEP{__EXCEPTION{DIS|PERL_CODE_NOT_DEFINED_ERR::
-                        DIS:sourceNode => {$param->{src}},
-                        DIS:uri => {$param->{uri}},
+                        DIS:uri => {$param-><AG::anyres.uri>},
                       }__}__;
                     }
                     $param_variables[-1]->[1] = $param_variables[-1]->[1]->clone;
@@ -4357,8 +4255,7 @@ TMethods:
                                    .getPropertyBoolean>
                                       (<Q::DISPerl:isNamedParameter>, false)) {
                   __UNDEEP{__EXCEPTION{DIS|NON_NAMED_PARAMETER_AFTER_NAMED_ERR::
-                    DIS:sourceNode => {$param->{src}},
-                    DIS:uri => {$param->{uri}},
+                    DIS:uri => {$param-><AG::anyres.uri>},
                     DIS:localName => {$param-><AG::DIS|DISAnyResource
                                                   .localName>},
                   }__}__;
@@ -4401,7 +4298,7 @@ TMethods:
                              map {$_->[0]} @param_variables) . ') = @_');
             for my $p (@param_variables, @named_param_variables) {
               if ($p->[1]) {  ## Input processor
-                $r-><M::DIS|MPLSS.appendCodeFragment> ($p->[1]);
+                $r-><M::Node.appendChild> ($p->[1]);
               }
             }
  
@@ -4449,7 +4346,7 @@ TMethods:
                 if ($def) {
                   $rs-><M::DIS|PLAnyCon.appendNewAssignment> ($rvar => $def);
                 } else {
-                  $rs-><M::DIS|PLInCon.appendCodeFragment> ($rvar);
+                  $rs-><M::Node.appendChild> ($rvar);
                 }
               }
               $r-><M::Node.appendChild> ($rs);
@@ -4461,15 +4358,16 @@ TMethods:
                 $code-><M::DIS|MPLCodeFragment.replaceVariable>
                              ($np->[2] => $np->[0]);
               }
-              $r-><M::DIS|MPLSS.appendCodeFragment> ($code);
+              $r-><M::Node.appendChild> ($code);
             } else {  ## Method code not defined
-              my $cls = $self->{db}-><M::DIS|DISDatabase.getResource>
+              my $db = $self-><AG::anyres.database>;
+              my $cls = $db-><M::DIS|DISDatabase.getResource>
                                               (<Q::dx:CoreException>,
                                                for_arg => <Q::ManakaiDOM:Perl>);
-              my $const = $self->{db}-><M::DIS|DISDatabase.getResource>
+              my $const = $db-><M::DIS|DISDatabase.getResource>
                                           (<Q::dx:NOT_SUPPORTED_ERR>,
                                                for_arg => <Q::ManakaiDOM:Perl>);
-              my $subtype = $self->{db}-><M::DIS|DISDatabase.getResource>
+              my $subtype = $db-><M::DIS|DISDatabase.getResource>
                                   (<Q::MDOMX:MDOM_IMPL_METHOD_NOT_IMPLEMENTED>,
                                                for_arg => <Q::ManakaiDOM:Perl>);
               $_-><AS::DIS|DISAnyResource.isReferred>
@@ -4502,11 +4400,11 @@ TMethods:
                 $opcode = $opcode->clone;
                 $opcode-><M::DIS|MPLCodeFragment.replaceVariable>
                                          ('$INPUT' => $rvar->clone);
-                $r-><M::DIS|MPLSS.appendCodeFragment> ($opcode);
+                $r-><M::Node.appendChild> ($opcode);
               }
 
               ## Return value
-              $r-><M::DIS|MPLSS.appendCodeFragment> ($rvar);
+              $r-><M::Node.appendChild> ($rvar);
             }
         }__;
 ##DISLang:Method
@@ -4532,7 +4430,6 @@ TMethods:
               __UNDEEP{
                 __EXCEPTION{DIS|NO_ATTR_GET_ERR::
                   DIS:errResource => {$self},
-                  DIS:sourceNode => {$self->{src}},
                   DIS:uri => {$self-><AG::DIS|DISAnyResource.uri>},
                 }__;
               }__;
@@ -4615,12 +4512,12 @@ TMethods:
               if ($def) {
                 $rs-><M::DIS|PLAnyCon.appendNewAssignment> ($rvar1 => $def);
               } else {
-                $rs-><M::DIS|PLInCon.appendCodeFragment> ($rvar1);
+                $rs-><M::Node.appendChild> ($rvar1);
               }
               $get_code-><M::Node.appendChild> ($rs);
 
               ## Main code
-              $get_code-><M::DIS|PLBlockCon.appendCodeFragment> ($code);
+              $get_code-><M::Node.appendChild> ($code);
 
               ## Return value
               my $rvar = $factory-><M::PCDocument.createPCVariable>
@@ -4643,18 +4540,19 @@ TMethods:
                 $opcode = $opcode->clone;
                 $opcode-><M::DIS|MPLCodeFragment.replaceVariable>
                                          ('$INPUT' => $rvar->clone);
-                $get_code-><M::DIS|MPLSS.appendCodeFragment> ($opcode);
+                $get_code-><M::Node.appendChild> ($opcode);
               }
 
               $get_code-><M::DIS|PLBlockCon.appendStatement> ($rvar);
             } else {  ## Getter code not defined
-              my $cls = $self->{db}-><M::DIS|DISDatabase.getResource>
+              my $db = $self-><AG::anyres.database>;
+              my $cls = $db-><M::DIS|DISDatabase.getResource>
                                               (<Q::dx:CoreException>,
                                                for_arg => <Q::ManakaiDOM:Perl>);
-              my $const = $self->{db}-><M::DIS|DISDatabase.getResource>
+              my $const = $db-><M::DIS|DISDatabase.getResource>
                                           (<Q::dx:NOT_SUPPORTED_ERR>,
                                                for_arg => <Q::ManakaiDOM:Perl>);
-              my $subtype = $self->{db}-><M::DIS|DISDatabase.getResource>
+              my $subtype = $db-><M::DIS|DISDatabase.getResource>
                                     (<Q::MDOMX:MDOM_IMPL_ATTR_NOT_IMPLEMENTED>,
                                                for_arg => <Q::ManakaiDOM:Perl>);
               $_-><AS::DIS|DISAnyResource.isReferred>
@@ -4731,21 +4629,22 @@ TMethods:
                                                   ($factory)->clone;
                   $pcode-><M::DIS|MPLCodeFragment.replaceVariable>
                                                    ('$INPUT' => '$given');
-                  $set_code-><M::DIS|PLBlockCon.appendCodeFragment> ($pcode);
+                  $set_code-><M::Node.appendChild> ($pcode);
                 }
 
                 ## Main code
-                $set_code-><M::DIS|PLBlockCon.appendCodeFragment> ($code);
+                $set_code-><M::Node.appendChild> ($code);
               } else { ## Setter code not defined
                 $set_code-><M::DIS|PLBlockCon.appendStatement>
                                               (q<my ($self) = @_>);
-                my $cls = $self->{db}-><M::DIS|DISDatabase.getResource>
+                my $db = $self-><AG::anyres.database>;
+                my $cls = $db-><M::DIS|DISDatabase.getResource>
                                               (<Q::dx:CoreException>,
                                                for_arg => <Q::ManakaiDOM:Perl>);
-                my $const = $self->{db}-><M::DIS|DISDatabase.getResource>
+                my $const = $db-><M::DIS|DISDatabase.getResource>
                                           (<Q::dx:NOT_SUPPORTED_ERR>,
                                                for_arg => <Q::ManakaiDOM:Perl>);
-                my $subtype = $self->{db}-><M::DIS|DISDatabase.getResource>
+                my $subtype = $db-><M::DIS|DISDatabase.getResource>
                                     (<Q::MDOMX:MDOM_IMPL_ATTR_NOT_IMPLEMENTED>,
                                                for_arg => <Q::ManakaiDOM:Perl>);
                 $_-><AS::DIS|DISAnyResource.isReferred>
@@ -4759,13 +4658,14 @@ TMethods:
             } else {  ## No attribute setter
               $set_code-><M::DIS|PLBlockCon.appendStatement>
                                                        (q<my ($self) = @_>);
-              my $cls = $self->{db}-><M::DIS|DISDatabase.getResource>
+              my $db = $self-><AG::anyres.database>;
+              my $cls = $db-><M::DIS|DISDatabase.getResource>
                                               (<Q::dx:CoreException>,
                                                for_arg => <Q::ManakaiDOM:Perl>);
-              my $const = $self->{db}-><M::DIS|DISDatabase.getResource>
+              my $const = $db-><M::DIS|DISDatabase.getResource>
                                 (<Q::dx:NO_MODIFICATION_ALLOWED_ERR>,
                                                for_arg => <Q::ManakaiDOM:Perl>);
-              my $subtype = $self->{db}-><M::DIS|DISDatabase.getResource>
+              my $subtype = $db-><M::DIS|DISDatabase.getResource>
                                     (<Q::dx:READ_ONLY_ATTRIBUTE_ERR>,
                                                for_arg => <Q::ManakaiDOM:Perl>);
               $_-><AS::DIS|DISAnyResource.isReferred>
@@ -5215,7 +5115,7 @@ TMethods:
               unless (defined $self-><AG::DIS|DISAnyResource.localName>) {
                 __UNDEEP{
                   __EXCEPTION{DIS|NO_LOCAL_NAME_ERR::
-                    DIS:sourceNode => {$self->{src}},
+                    DIS|uri => {$self-><AG::anyres.uri>},
                   }__;
                 }__;
               }
@@ -5887,7 +5787,7 @@ TMethods:
               unless (defined $self-><AG::DIS|DISAnyResource.localName>) {
                 __UNDEEP{
                   __EXCEPTION{DIS|NO_LOCAL_NAME_ERR::
-                    DIS:sourceNode => {$self->{src}},
+                    DIS|uri => {$self-><AG::anyres.uri>},
                   }__;
                 }__;
               }
@@ -6029,7 +5929,7 @@ TMethods:
               unless (defined $self-><AG::DIS|DISAnyResource.localName>) {
                 __UNDEEP{
                   __EXCEPTION{DIS|NO_LOCAL_NAME_ERR::
-                    DIS:sourceNode => {$self->{src}},
+                    DIS|uri => {$self-><AG::anyres.uri>},
                   }__;
                 }__;
               }

@@ -48,10 +48,10 @@ $(PM_FILES): %$(PM_SUFFIX): %$(DIS_SUFFIX) $(DAF_PL)
 clean:
 	$(RMALL) $(GENERATED_FILES) .*.tmp *~ .*~
 
-clean-db;
+clean-db:
 	$(RMALL) *$(DAEM_SUFFIX) *$(DAFX_SUFFIX)
 
 distclean: clean clean-db
 
-## $Date: 2006/03/31 16:44:25 $
+## $Date: 2006/04/03 16:13:15 $
 ## License: Public Domain.
