@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/04/04 12:35:15 $
+      $Date: 2006/04/04 14:30:30 $
     @@ContentType:
       dis:Date.RCS
   
@@ -1111,7 +1111,6 @@ IFClsDef:
     interface <kwd:MUST> also implement the <IF::DIS|DISDatabase>
     interface.
 
-
   @Method:
     @@Name: plStore
     @@enDesc:
@@ -1138,11 +1137,6 @@ IFClsDef:
       @@@enDesc:
         A reference to code which resolvers a module into
         a file name path, as in <M::DISDatabasePerl.plLoadDISDatabase>.
-    @@NamedParam:
-      @@@Name: noMainDatabase
-      @@@Type: idl|boolean||ManakaiDOM|all
-      @@@enDesc:
-        If <DOM::true>, the method doesn't write the main database file.
     @@Return:
       @@@SimpleException:
       @@@PerlDef:
@@ -1154,6 +1148,7 @@ IFClsDef:
         my %mod_for;
         my %mod_mod;   ## Module objects with full properties
         my %temp_mod;  ## Module objects for index
+        my %mod_storage;
         __DEEP{
           my $core_mod = $self-><M::DIS|DISDatabase.getModule>
                                   (<Q::DISlib|DISCore>);
@@ -1190,6 +1185,11 @@ IFClsDef:
             my $mod_uri = $res-><AG::anyres.uri>;
             if ($res-><AG::DIS|DISAnyResource.isDefined> and
                 not $res->isa (<ClassName::DIS|ManakaiDISModuleLite>)) {
+              if (defined $res->{<H::DIS|nodeStorage>}) {
+                $mod_storage{$mod_uri} = $res->{<H::DIS|nodeStorage>};
+                delete $res->{<H::DIS|nodeStorage>};
+              }
+
               $mod_mod{$mod_uri} = $res;
               CORE::delete $res->{db};
               $temp_mod{$mod_uri} = bless {},
@@ -1243,16 +1243,6 @@ IFClsDef:
           nstore $mod_file{$mod_file_name}, $mod_file_name;
         }
 
-        ## The main database
-        unless ($noMainDatabase) {
-          local $self->{<H::dp|dbModuleResolver>} = null;
-          local $self->{resDef} = {};
-          local $self->{forDef} = {};
-          local $self->{modDef} = \%temp_mod;
-          local $self->{<H::DOMCore|error-handler>} = null;
-          nstore $self, $fileName;
-        }
-
         require Scalar::Util;
         for my $res (values %temp_mod,
                      map {values %{$_->{forDef}||{}},
@@ -1261,6 +1251,33 @@ IFClsDef:
           $res->{db} = $self;
           Scalar::Util::weaken ($res->{db});
         }
+
+        for my $mod_uri (keys %mod_storage) {
+          $self->{modDef}->{$mod_uri}->{<H::DIS|nodeStorage>}
+              = $mod_storage{$mod_uri};
+        }
+
+  @IntMethod:
+    @@Name: plStoreNodeStorage
+    @@Return:
+      @@@PerlDef:
+        M: for my $mod_uri (keys %{$self->{modDef}}) {
+          my $mod = $self->{modDef}->{$mod_uri};
+          next M unless $mod->{<H::DIS|nodeStorageModified>};
+          
+          my $mod_file_name = ($self->{<H::dp|dbModuleResolver>} or sub ($$) {})
+                                  ->($self, $mod, <Q::dp|ModuleNodeStorageFile>);
+
+          use Storable qw/nstore/;
+          local $Carp::CarpLevel = $Carp::CarpLevel + 1;
+          __c|ERROR{dp|info-save-database-module-node-storage-start::
+            DIS|fileName => {$mod_file_name},
+          }__;
+          nstore $mod->{<H::DIS|nodeStorage>}, $mod_file_name;
+          __c|ERROR{dp|info-save-database-module-node-storage-end::
+            DIS|fileName => {$mod_file_name},
+          }__;
+        } # M
 
   @Method:
     @@Name: plAddHashKey
@@ -1332,7 +1349,7 @@ IFClsDef:
           my $fileName;
           __DEEP{
             $fileName = ($self->{<H::dp|dbModuleResolver>} or sub () {})
-                           ->($self, $disModule);
+                           ->($self, $disModule, <Q::dp|ModuleResourceFile>);
             __UNDEEP{__DOMCore:ERROR{
             dp|info-open-database-module-resource-start::
               DIS|fileName => {$fileName},
@@ -1617,11 +1634,11 @@ IFClsDef:
       @@@PerlDef:
         use Storable qw/retrieve/;
         local $Carp::CarpLevel = $Carp::CarpLevel + 1;
-        __DOMCore:ERROR{dp|info-open-database-module-index-start::
+        __c|ERROR{dp|info-open-database-module-index-start::
           DIS|fileName => {$fileName},
         }__;
         my $idb = retrieve $fileName;
-        __DOMCore:ERROR{dp|info-open-database-module-index-end::
+        __c|ERROR{dp|info-open-database-module-index-end::
           DIS|fileName => {$fileName},
         }__;
 
@@ -1762,6 +1779,48 @@ InfoDef:
   @enMufDef: done
 
 InfoDef:
+  @QName: dp|info-open-database-module-node-storage-start
+  @enDesc:
+    Notifies that a database module node storage file is being opened.
+  @ecore:hasParameter:
+    @@@: DIS|fileName
+    @@enDesc:
+      The name of the database module node storage file.
+  @enMufDef:
+    Opening database module node storage "%p (name => {<Q::DIS|fileName>});"...
+
+InfoDef:
+  @QName: dp|info-open-database-module-node-storage-end
+  @enDesc:
+    Notifies that a database module node storage file has been opened.
+  @ecore:hasParameter:
+    @@@: DIS|fileName
+    @@enDesc:
+      The name of the database module node storage file.
+  @enMufDef: done
+
+InfoDef:
+  @QName: dp|info-save-database-module-node-storage-start
+  @enDesc:
+    Notifies that a database module node storage file is being stored.
+  @ecore:hasParameter:
+    @@@: DIS|fileName
+    @@enDesc:
+      The name of the database module node storage file.
+  @enMufDef:
+    Writing database module node storage "%p (name => {<Q::DIS|fileName>});"...
+
+InfoDef:
+  @QName: dp|info-save-database-module-node-storage-end
+  @enDesc:
+    Notifies that a database module node storage file has been stored.
+  @ecore:hasParameter:
+    @@@: DIS|fileName
+    @@enDesc:
+      The name of the database module node storage file.
+  @enMufDef: done
+
+InfoDef:
   @QName: dp|info-unload-module-start
   @enDesc:
     Notifies that a module is being unloaded.
@@ -1806,6 +1865,11 @@ ResourceDef:
 
 ResourceDef:
   @QName: dp|ModuleResourceFile
+  @DISCore:resourceType: DISCore|Resource
+  @For: =ManakaiDOM|all
+
+ResourceDef:
+  @QName: dp|ModuleNodeStorageFile
   @DISCore:resourceType: DISCore|Resource
   @For: =ManakaiDOM|all
 
@@ -1989,6 +2053,31 @@ IFClsDef:
             }
           }
         }__;
+
+  @Method:
+    @@Name: plLoadNodeStorage
+    @@enDesc:
+      Loads the <IF::Node> storage associated to the module.
+    @@Return:
+      @@@PerlDef:
+        my $db = $self-><AG::anyres.database>;
+        my $file_name = $db->{<H::dp|dbModuleResolver>}
+                           ->($db, $self, <Q::dp|ModuleNodeStorageFile>);
+
+        if (-f $file_name) {
+          use Storable qw/retrieve/;
+          local $Carp::CarpLevel = $Carp::CarpLevel + 1;
+          __c|ERROR{dp|info-open-database-module-node-storage-start::
+            DIS|fileName => {$file_name},
+          }__;
+          $self->{<H::DIS|nodeStorage>} = retrieve $file_name;
+          __c|ERROR{dp|info-open-database-module-node-storage-end::
+            DIS|fileName => {$file_name},
+          }__;
+        } else {
+          $self->{<H::DIS|nodeStorage>} = {};
+          delete $self->{<H::DIS|nodeStorageModified>};
+        }
 ##DISModulePerl
 
 ElementTypeBinding: 

@@ -23,7 +23,7 @@ Module:
       @@@DISCore:author: DISCore|Wakaba
   @Date:
     @@@:
-      $Date: 2006/04/03 16:13:15 $
+      $Date: 2006/04/04 14:30:29 $
     @@ContentType:
       dis:Date.RCS
   
@@ -46,7 +46,9 @@ Module:
     @@Module:
       @@@QName: DIS|Value
       @@@WithFor: DIS|ForLatest
-
+    @@Module:
+      @@@QName: MDOM|TreeStore
+      @@@WithFor: DIS|ForLatest
   @DefaultFor: DIS|ForLatest
 
 Namespace:
@@ -74,6 +76,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/
   @f:
     http://suika.fam.cx/~wakaba/archive/2004/dom/feature#
+  @fe:
+    http://suika.fam.cx/www/2006/feature/
   @idl:
     http://suika.fam.cx/~wakaba/archive/2004/dis/IDL#
   @infoset:
@@ -102,8 +106,16 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Markup#
   @swcfg21:
     http://suika.fam.cx/~wakaba/archive/2005/swcfg21#
+  @tc:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/TreeCore/
+  @td:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/Document/
+  @te:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/Element/
   @test:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Test#
+  @tst:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/TreeStore/
   @Util:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/
 
@@ -5543,7 +5555,111 @@ IFClsDef:
         } else {
           $r = null;
         } 
+
+  @Method:
+    @@Name: getNodeFromStorage
+    @@enDesc:
+      Returns a <IF::Node> from the storage associated
+      to the resource.
+    @@Param:
+      @@@Name: key
+      @@@Type: DISString
+      @@@enDesc:
+        A DOM URI that identifies the kind of the node.
+    @@Param:
+      @@@Name: hash
+      @@@Type: DISString
+      @@@enDesc:
+        A short string that identifies the content of the node
+        to retrieve.  If it does not match to the one associated
+        to the node in the storage, no node is returned.
+    @@Param:
+      @@@Name: factory
+      @@@Type: Document
+      @@@enDesc:
+        The document to which the retrieved node belongs.
+    @@Return:
+      @@@Type: Node
+      @@@enDesc:
+        The retrieved node.
+      @@@nullCase:
+        @@@@enDesc:
+          If no node is found.
+      @@@PerlDef:
+        require Message::DOM::TreeStore;
+        my $mod = $self-><AG::DISAnyResource.ownerModule>;
+        $mod-><M::dp|DISModulePerl.plLoadNodeStorage>
+            unless defined $mod->{<H::DIS|nodeStorage>};
+        my $st = $mod->{<H::DIS|nodeStorage>};
+        if (defined $st->{$key} and $st->{$key}->[1] eq $hash) {
+          $r = $factory->implementation
+                       ->get_feature (<Q::fe|TreeStore>)
+                       ->create_node_from_storable_object
+                           ($st->{$key}->[0], $factory);
+        }
+
+  @Method:
+    @@Name: setNodeToStorage
+    @@enDesc:
+      Saves a copy of the <IF::Node> to the storage.  Exactly
+      when the physical storage is updated is implementation dependent.
+    @@Param:
+      @@@Name: key
+      @@@Type: DISString
+      @@@enDesc:
+        A DOM URI that identifies the kind of the node.
+    @@Param:
+      @@@Name: hash
+      @@@Type: DISString
+      @@@enDesc:
+        A short string that identifies the content of the node.
+        If the <P::node> parameter is set to <DOM::null>, 
+        this value is ignored.
+    @@Param:
+      @@@Name: node
+      @@@Type: Node
+      @@@enDesc:
+        The node to store.  If there is already a node
+        with the <P::key>, it is discarded.
+      @@@nullCase:
+        @@@@enDesc:
+          The stored node, if any, is removed from the storage.
+    @@Return:
+      @@@PerlDef:
+        require Message::DOM::TreeStore;
+        my $mod = $self-><AG::DISAnyResource.ownerModule>;
+        $mod-><M::dp|DISModulePerl.plLoadNodeStorage>
+            unless defined $mod->{<H::DIS|nodeStorage>};
+        my $st = $mod->{<H::DIS|nodeStorage>};
+        if (defined $node) {
+          $st->{$key}->[0] = [$node->owner_document
+                                   ->implementation
+                                   ->get_feature (<Q::fe|TreeStore>)
+                                   ->create_storable_object_from_node
+                                       ($node), $hash];
+        } else {
+          delete $st->{$key};
+        }
+        $mod->{<H::DIS|nodeStorageModified>} = true;
 ##DISAnyResource
+
+PropDef:
+  @QName: DIS|nodeStorage
+  @DIS:key: nst
+
+PropDef:
+  @QName: DIS|nodeStorageModified
+  @DIS:key: nstmod
+
+ResourceDef:
+  @QName: Node
+  @AliasFor: tc|Node||ManakaiDOM|ManakaiDOMLatest
+  @For: DIS|ForLatest
+
+ResourceDef:
+  @QName: Document
+  @AliasFor: tc|Document||ManakaiDOM|ManakaiDOMLatest
+  @For: DIS|ForLatest
 
 ResourceDef:
   @QName: DOMConfig

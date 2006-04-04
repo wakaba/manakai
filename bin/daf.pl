@@ -34,6 +34,7 @@ GetOptions (
   'debug' => \$Opt{debug},
   'dis-file-suffix=s' => \$Opt{dis_suffix},
   'daem-file-suffix=s' => \$Opt{daem_suffix},
+  'dafs-file-suffix=s' => \$Opt{dafs_suffix},
   'dafx-file-suffix=s' => \$Opt{dafx_suffix},
   'help' => \$Opt{help},
   'search-path|I=s' => sub {
@@ -82,6 +83,7 @@ $Opt{no_undef_check} = defined $Opt{no_undef_check}
 $Opt{dis_suffix} = '.dis' unless defined $Opt{dis_suffix};
 $Opt{daem_suffix} = '.dafm' unless defined $Opt{daem_suffix};
 $Opt{dafx_suffix} = '.dafx' unless defined $Opt{dafx_suffix};
+$Opt{dafs_suffix} = '.dafs' unless defined $Opt{dafs_suffix};
 $Message::DOM::DOMFeature::DEBUG = 1 if $Opt{debug};
 require Error;
 $Error::Debug = 1 if $Opt{debug};
@@ -543,8 +545,11 @@ sub daf_db_module_resolver ($$$) {
   my ($db, $mod, $type) = @_;
   my $ns = $mod->namespace_uri;
   my $ln = $mod->local_name;
-  my $suffix = $type eq ExpandedURI q<dp:ModuleIndexFile>
-                 ? $Opt{dafx_suffix} : $Opt{daem_suffix};
+  my $suffix = {
+    ExpandedURI q<dp:ModuleIndexFile> => $Opt{dafx_suffix},
+    ExpandedURI q<dp:ModuleResourceFile> => $Opt{daem_suffix},
+    ExpandedURI q<dp:ModuleNodeStorageFile> => $Opt{dafs_suffix},
+  }->{$type} or die "Unsupported type: <$type>";
   verbose_msg qq<Database module <$ns$ln> is requested>;
   my $name = dac_search_file_path_stem ($ns, $ln, $suffix);
   if (defined $name) {
