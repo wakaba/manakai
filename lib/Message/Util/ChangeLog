@@ -1,5 +1,18 @@
 2006-04-04  Wakaba  <wakaba@suika.fam.cx>
 
+	* PerlCode.dis (PropDef): Removed (they were not used).
+	(appendPackage, appendCodeFragment): Removed.
+	(PCImplementation.createPerl* factoty methods): Removed.
+	(setSubNode, setOverloadSub): Removed.
+	(Node setter attributes): They no longer call |adoptNode|
+	method.
+	(PCImplementation): Don't inherit |dx:ManakaiDefaultExceptionHandler|.
+	(PCException): Removed.
+
+	* Grove.dis (destroy): Threshold value experimentally changed.
+
+2006-04-04  Wakaba  <wakaba@suika.fam.cx>
+
 	* Grove.dis (collectGarbage): The gc algorithm has
 	been changed (a variant of mark and sweep).
 

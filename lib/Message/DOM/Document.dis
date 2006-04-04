@@ -13,7 +13,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/04/04 10:53:14 $
+    $Date: 2006/04/04 12:35:14 $
 
   @Require:
     @@Module:
@@ -8175,8 +8175,8 @@ NodeTypeDef:
         my $el = $doc-><M::Document.createElementNS> (null, 'el');
         $parent-><M::Node.appendChild> ($el);
 
-        my $doc2;
-        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc2}__;
+        my $doc2 = $doc-><AG::Document.implementation>
+                       -><M::c|DOMImplementation.createDocument>;
 
         my $el2 = $doc2-><M::Document.adoptNode> ($el);
 
@@ -8198,8 +8198,8 @@ NodeTypeDef:
         my $el = $doc-><M::Document.createAttributeNS> (null, 'el');
         $parent-><M::Element.setAttributeNodeNS> ($el);
 
-        my $doc2;
-        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc2}__;
+        my $doc2 = $doc-><AG::Document.implementation>
+                       -><M::c|DOMImplementation.createDocument>;
 
         my $el2 = $doc2-><M::Document.adoptNode> ($el);
 

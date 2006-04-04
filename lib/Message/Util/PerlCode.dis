@@ -24,10 +24,7 @@ Module:
       @@@Year:2004
       @@@DISCore:author: DISCore|Wakaba
   @Date:
-    @@@:
-      $Date: 2006/04/03 12:53:25 $
-    @@ContentType:
-      dis:Date.RCS
+    $Date: 2006/04/04 12:35:15 $
   
   @Require:
     @@Module:
@@ -36,7 +33,6 @@ Module:
     @@Module:
       @@@QName: DISlib|DISMarkup
       @@@WithFor: ManakaiDOM|all
-
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
 Namespace:
@@ -50,10 +46,6 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
   @DISlib:
     http://suika.fam.cx/~wakaba/archive/2004/dis/
-  @dx:
-    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#
-  @ecore:
-    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/Core/
   @f:
     http://suika.fam.cx/~wakaba/archive/2004/dom/feature#
   @idl:
@@ -165,7 +157,9 @@ ElementTypeBinding:
       @@@@: dis|MultipleResource
       @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
     @@resourceFor: ManakaiDOM|ForIF
-    @@resourceFor: ManakaiDOM|ForClass
+    @@resourceFor:
+      @@@@: ManakaiDOM|ForClass
+      @@@For: ManakaiDOM|ManakaiDOMLatest
     @@For: ManakaiDOM|ManakaiDOM
 
     @@rdf:type:
@@ -719,26 +713,6 @@ ResourceDef:
     @@ContentType: DISCore|QName
   @ForCheck: =ManakaiDOM|all
 
-PropDef:
-  @QName: useModuleName
-  @enDesc:
-    The list of modules. 
-
-PropDef:
-  @QName: pc|exceptionInterfaceName
-  @enDesc:
-    The list of exception interface packages.
-
-PropDef:
-  @QName: useCharClassName
-  @enDesc:
-    The list of modules. 
-
-PropDef:
-  @QName: requireResourceURI
-  @enDesc:
-    The list of resources.
-
 ElementTypeBinding:
   @Name: ETQName
   @ElementType:
@@ -782,22 +756,6 @@ IFClsETDef:
                                                           (<Q::pc:>, 'package');
             $r-><AS::PerlPackage.packageName> ($packageName);
             $self-><M::Node.appendChild> ($r);
-          }__;
-
-  @Method:
-    @@Name: appendPackage
-    @@enDesc:
-      Appends a Perl package scope object.
-    @@Param:
-      @@@Name: codeArg
-      @@@Type: PerlPackage
-      @@@enDesc:
-        The package to append.
-    @@Return:
-      @@@PerlDef:
-          __DEEP{
-            $self-><AG::Node.ownerDocument>-><M::Document.adoptNode> ($codeArg);
-            $self-><M::Node.appendChild> ($codeArg);
           }__;
 
   @Method:
@@ -981,11 +939,6 @@ IFClsETDef:
     @@Set:
 ##PerlFile
 
-PropDef:
-  @QName: pc|currentPackage
-  @enDesc:
-    The current package fully qualified name.
-
 ElementTypeBinding:
   @Name: ReflectCDATA
   @ElementType:
@@ -1147,79 +1100,6 @@ IFClsETDef:
                           -><M::Document.createElementNS>
                                (<Q::pc:>, 'sub');
                 $r-><M::PerlSub.addPerlName> ($subName);
-                $self-><M::Node.appendChild> ($r);
-              }
-            } # F
-          }__;
-
-  @Method:
-    @@Name: setSubNode
-    @@enDesc:
-      Sets a subrotine. 
-    @@Param:
-      @@@Name: subArg
-      @@@Type: PerlSub
-      @@@enDesc:
-        The subroutine object.
-    @@Return:
-      @@@PerlDef:
-          __DEEP{
-            $self-><AG::Node.ownerDocument>-><M::Document.adoptNode> ($subArg);
-            $self-><M::Node.appendChild> ($subArg);
-          }__;
-
-  @Method:
-    @@Name: getOverloadSub
-    @@enDesc:
-      Gets an overloading subroutine. 
-    @@Param:
-      @@@Name: opName
-      @@@Type:
-        DISLang:String::ManakaiDOM:all
-      @@@enDesc:
-        The name of the overloaded operator. 
-    @@NamedParam:
-      @@@Name: makeNewNode
-      @@@Type:
-        DOMMain:boolean::ManakaiDOM:all
-      @@@enDesc:
-        Whether a new subroutine object should be created, 
-        if it is not exist, or not. 
-    @@Return:
-      @@@Type: PerlSub
-      @@@enDesc:
-        The subroutine object. 
-      @@@nullCase:
-        @@@@enDesc:
-          Either the specified subroutine is not found and 
-          the <P::makeNewNode> parameter is set to <DOM::false> or
-          the specified operator is overloaded by specifying method name. 
-      @@@UnknownOperatorException:
-      @@@PerlDef:
-          unless (<Code::operatorNameList>->{$opName}) {
-            __EXCEPTION{UNSUPPORTED_OPERATOR_ERR::
-              pc:operator => {$opName},
-              MDOMX:param-name => 'opName',
-            }__;
-          }
-          __DEEP{
-            F: {
-              for my $child (@{$self-><AG::Node.childNodes>}) {
-                if ($child-><AG::Node.nodeType> == <C::Node.ELEMENT_NODE> and
-                    defined $child-><AG::Node.namespaceURI> and
-                    $child-><AG::Node.namespaceURI> eq <Q::pc:> and
-                    $child-><AG::Node.localName> eq 'sub') {
-                  if ($child-><M::PerlSub.hasPerlOperator> ($opName)) {
-                    $r = $child;
-                    last F;
-                  }
-                }
-              }
-              if ($makeNewNode) {
-                $r = $self-><AG::Node.ownerDocument>
-                          -><M::Document.createElementNS>
-                               (<Q::pc:>, 'sub');
-                $r-><M::PerlSub.addPerlOperator> ($opName);
                 $self-><M::Node.appendChild> ($r);
               }
             } # F
@@ -1448,40 +1328,6 @@ IFClsETDef:
           }__;
 ##PCPackage
 
-ElementTypeBinding:
-  @Name: UnknownOperatorException
-  @ElementType:
-    ManakaiDOM:raises
-  @ShadowContent:
-    @@@:UNSUPPORTED_OPERATOR_ERR
-    @@enDesc:
-      An attempt is made to overload an unknown operator. 
-
-XParamDef:
-  @QName:
-    pc:operator
-  @enDesc:
-    An operator to overload. 
-
-ResourceDef:
-  @For: ManakaiDOM|Perl
-  @QName: operatorNameList
-  @enDesc:
-    The list of valid operators for <PerlModule::operator> pragma. 
-  @rdf:type: DISPerl|InlineCode
-  @PerlCDef:
-    {qw[
-                    +  1 -  1 *  1 /  1 %  1 **  1 <<  1 >>  1 x  1 .  1
-                    += 1 -= 1 *= 1 /= 1 %= 1 **= 1 <<= 1 >>= 1 x= 1 .= 1
-                    <  1 <= 1 >  1 >= 1 == 1 != 1 <=> 1
-                    lt 1 le 1 gt 1 ge 1 eq 1 ne 1 cmp 1
-                    & 1 | 1 ^ 1 neg 1 ! 1 ~ 1
-                    ++ 1 -- 1 = 1
-                    atan2 1 cos 1 sin 1 exp 1 abs 1 log 1 sqrt 1
-                    bool 1 "" 1 0+ 1 ${} 1 @{} 1 %{} 1 &{} 1 *{} 1 <> 1
-                    nomethod 1
-    ]}
-
 IFClsETDef:
   @IFQName: PerlCodeStatements
   @CQName: ManakaiPCCodeStatements
@@ -1497,23 +1343,6 @@ IFClsETDef:
   @enDesc:
     A base class for node types that contains zero or more
     statements and/or blocks.
-
-  @Method:
-    @@Name: appendCodeFragment
-    @@enDesc:
-      Appends a <Class::ManakaiPerlCodeFragment> object. 
-    @@Param:
-      @@@Name: codeArg
-      @@@Type: PerlCode
-      @@@enDesc:
-        A code fragment object. 
-    @@Return:
-      @@@PerlDef:
-        __DEEP{
-          $self-><AG::Node.ownerDocument>
-               -><M::Document.adoptNode> ($codeArg);
-          $self-><M::Node.appendChild> ($codeArg);
-        }__;
 
   @Method:
     @@Name: appendCode
@@ -1851,13 +1680,24 @@ IFClsETDef:
       @@@enDesc:
         Getting value after setting empty value must return an empty string.
       @@@PerlDef:
-        my $impl = <Class::ManakaiPCImplementation>->_new;
-        my $sub = $impl-><M::PCImplementation.createPerlSub> ("sub_name");
+        my $doc;
+        __CODE{createPCDocumentForTest:: $doc => $doc}__;
+
+        my $sub = $doc-><M::PCDocument.createPerlSub> ("sub_name");
+
+        $test->id ('PerlSub');
         $test->assert_not_null ($sub);
         
+        $test->id ('default');
+        $test->assert_null ($sub-><AG::PerlSub.prototype>);
+
         $sub-><AS::PerlSub.prototype> ('');
+
+        $test->id ('attribute');
         $test->assert_string (actual_value => $sub-><AG::PerlSub.prototype>,
                               expected_value => '');
+
+        $test->id ('stringify');
         $test->assert_true ($sub->stringify =~ /^sub sub_name \(\)/);
   
   @ToStringMethod:
@@ -1903,16 +1743,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: test|StandaloneTest
-
-XParamDef:
-  @QName: parentNode
-  @enDesc:
-    Parent node. 
-
-XParamDef:
-  @QName: childNode
-  @enDesc:
-    Child node. 
 
 IFClsETDef:
   @IFQName: PerlUnparsedCode
@@ -2757,23 +2587,6 @@ IFClsETDef:
     Perl inline code block.   
 
   @Method:
-    @@Name: appendCodeFragment
-    @@enDesc:
-      Appends a <IF::PerlCode> object. 
-    @@Param:
-      @@@Name: codeArg
-      @@@Type: PerlCode
-      @@@enDesc:
-        A code fragment object. 
-    @@Return:
-      @@@PerlDef:
-        __DEEP{
-          $self-><AG::Node.ownerDocument>
-               -><M::Document.adoptNode> ($codeArg);
-          $self-><M::Node.appendChild> ($codeArg);
-        }__;
-
-  @Method:
     @@Name: appendCode
     @@enDesc:
       Appends an unparsed Perl code fragment. 
@@ -3257,7 +3070,6 @@ IFClsETDef:
     @@Set:
       @@@PerlDef:
         __DEEP{
-          $self-><AG::Node.ownerDocument>-><M::Document.adoptNode> ($given);
           F: {
             for my $child (@{$self-><AG::Node.childNodes>}) {
               if ($child-><AG::Node.namespaceURI> eq <Q::pc:> and
@@ -3296,7 +3108,6 @@ IFClsETDef:
     @@Set:
       @@@PerlDef:
         __DEEP{
-          $self-><AG::Node.ownerDocument>-><M::Document.adoptNode> ($given);
           F: {
             for my $child (@{$self-><AG::Node.childNodes>}) {
               if ($child-><AG::Node.namespaceURI> eq <Q::pc:> and
@@ -3780,7 +3591,6 @@ IFClsETDef:
     @@Set:
       @@@PerlDef:
         __DEEP{
-          $self-><AG::Node.ownerDocument>-><M::Document.adoptNode> ($given);
           F: {
             for my $child (@{$self-><AG::Node.childNodes>}) {
               if ($child-><AG::Node.namespaceURI> eq <Q::pc:> and
@@ -3819,7 +3629,6 @@ IFClsETDef:
     @@Set:
       @@@PerlDef:
         __DEEP{
-          $self-><AG::Node.ownerDocument>-><M::Document.adoptNode> ($given);
           F: {
             for my $child (@{$self-><AG::Node.childNodes>}) {
               if ($child-><AG::Node.namespaceURI> eq <Q::pc:> and
@@ -3858,7 +3667,6 @@ IFClsETDef:
     @@Set:
       @@@PerlDef:
         __DEEP{
-          $self-><AG::Node.ownerDocument>-><M::Document.adoptNode> ($given);
           F: {
             for my $child (@{$self-><AG::Node.childNodes>}) {
               if ($child-><AG::Node.namespaceURI> eq <Q::pc:> and
@@ -3876,36 +3684,6 @@ IFClsETDef:
           }
         }__;
 ##PerlIf
-
-PropDef:
-  @QName:condition
-  @enDesc:
-    Condition.
-PropDef:
-  @QName:true
-  @enDesc:
-    If true.
-PropDef:
-  @QName:false
-  @enDesc:
-    If false.
-
-PropDef:
-  @QName:left
-  @FullName:
-    @@lang:en
-    @@@: Left hand side
-PropDef:
-  @QName:right
-  @FullName:
-    @@lang:en
-    @@@: Right hand side
-
-PropDef:
-  @QName:label
-  @enDesc:
-    Perl statement / block label.
-
 
 IFClsETDef:
   @IFQName: PCFunctionCall
@@ -3987,11 +3765,6 @@ IFClsETDef:
           }
         }__;
 ##PCFunctionCall
-
-ElementTypeBinding:
-  @Name: RaiseException
-  @ElementType:
-    dx:raises
 
 ## -- Configuration Parameters
 
@@ -4179,11 +3952,7 @@ IFClsDef:
       Creates a literal object.
 
         {NOTE:: If a member of <P::value> is a <IF::PerlCode> object,
-                then it is appended to the tree as is, except when
-                the object comes from different document than the
-                document, in which case the object is being adopted
-                to the document by <M::Document.adoptNode> method.
-                If that method fails, then the result is undefined.
+                then it is appended to the tree as is.
         }
     @@Param:
       @@@Name: value
@@ -4215,9 +3984,7 @@ IFClsDef:
                                                      : 'arrayRefLiteral');
             for my $v (ref $value eq 'HASH' ? %$value : @$value) {
               my $vo;
-              if (UNIVERSAL::isa ($v, <IFName::PerlCode>)) {
-                $vo = $self-><M::Document.adoptNode> ($v);
-              } else {
+              unless (UNIVERSAL::isa ($v, <IFName::PerlCode>)) {
                 $vo = $self-><M::PCDocument.createPCLiteral> ($v);
               }
               $r-><M::Node.appendChild> ($vo);
@@ -4622,7 +4389,6 @@ IFClsDef:
     The class that provides factory methods. 
 
   @CISA: c|ManakaiDOMImplementation||ManakaiDOM|ManakaiDOMLatest
-  @CISA: dx|ManakaiDefaultExceptionHandler||ManakaiDOM|Perl
 
   @f:provides: pc|CoreFeature10
 
@@ -4714,26 +4480,6 @@ IFClsDef:
         $test->id ('cfg.dtd-attribute-type');
         $test->assert_false ($cfg->get_parameter
                                      (<Q::cfg|dtd-attribute-type>));
-
-  @Method:
-    @@Name: createPerlPackage
-    @@enDesc:
-      Creates a new package scope block. 
-    @@Param:
-      @@@Name: packageName
-      @@@Type: DOMString
-      @@@enDesc:
-        The fully-qualified name of the package to create. 
-    @@Return:
-      @@@Type: PerlPackage
-      @@@enDesc:
-        The newly created package scope object. 
-      @@@PerlDef:
-          __DEEP{
-            $r = $self-><M::DOMImpl.createDocument> (<Q::pc:>, 'file')
-                      -><M::Document.createElementNS> (<Q::pc:>, 'package');
-            $r-><AS::PerlPackage.packageName> ($packageName);
-          }__;
 
   @IntMethod:
     @@ForCheck: ManakaiDOM|ForClass
@@ -4850,286 +4596,6 @@ IFClsDef:
           $r = join (qq<,\n>, map {<ClassM::ManakaiPCImplementation
                                               .perlLiteral> ($_)} @{$val});
         }__;
-
-  @Method:
-    @@Name: createPerlSub
-    @@enDesc:
-      Creates a new <IF::PerlSub> object. 
-    @@Param:
-      @@@Name: subName
-      @@@Type: DOMString
-      @@@enDesc:
-        The name of the subroutine to create.
-      @@@nullCase:
-        @@@@enDesc:
-          The subroutine created has no name. 
-    @@Return:
-      @@@Type: PerlSub
-      @@@enDesc: 
-        Newly created Perl subroutine object. 
-      @@@PerlDef:
-          __DEEP{
-            $r = $self-><M::DOMImpl.createDocument> (<Q::pc:>, 'file')
-                      -><M::Document.createElementNS> (<Q::pc:>, 'sub');
-            $r-><M::PerlSub.addPerlName> ($subName) if defined $subName;
-          }__;
-
-  @Method:
-    @@Name: createPerlUnparsedCode
-    @@enDesc:
-      Creates a new <Class::ManakaiPerlUnparsedCode> object. 
-    @@Param:
-      @@@Name: codeArg
-      @@@Type: DOMString
-      @@@enDesc:
-        The code fragment. 
-      @@@nullCase:
-        @@@@enDesc:
-          The fragment initially has no code. 
-    @@Return:
-      @@@Type: PerlUnparsedCode
-      @@@enDesc: 
-        Newly created Perl code object. 
-      @@@PerlDef:
-          __DEEP{
-            $r = $self-><M::DOMImpl.createDocument> (<Q::pc:>, 'file')
-                      -><M::Document.createElementNS> (<Q::pc:>, 'unparsed');
-            $r-><AS::Node.textContent> ($codeArg) if defined $codeArg;
-          }__;
-
-  @Method:
-    @@Name: createPerlInlineContainer
-    @@enDesc:
-      Creates a new <IF::PerlInlineContainer> object. 
-    @@Return:
-      @@@Type: PerlCodeInlines
-      @@@enDesc: 
-        Newly created Perl code object. 
-      @@@PerlDef:
-          __DEEP{
-            $r = $self-><M::DOMImpl.createDocument> (<Q::pc:>, 'file')
-                  -><M::Document.createElementNS> (<Q::pc:>, 'inlineContainer');
-          }__;
-
-  @Method:
-    @@Name: createPerlInlineUnparsedCode
-    @@enDesc:
-      Creates a new <IF::PerlInlineUnparsedCode> object. 
-    @@Param:
-      @@@Name: codeArg
-      @@@Type: DOMString
-      @@@enDesc:
-        The code fragment. 
-      @@@nullCase:
-        @@@@enDesc:
-          The fragment initially has no code. 
-    @@Return:
-      @@@Type: PerlInlineUnparsedCode
-      @@@enDesc: 
-        Newly created Perl code object. 
-      @@@PerlDef:
-          __DEEP{
-            $r = $self-><M::DOMImpl.createDocument> (<Q::pc:>, 'file')
-                   -><M::Document.createElementNS> (<Q::pc:>, 'inlineUnparsed');
-            $r-><AS::Node.textContent> ($codeArg) if defined $codeArg;
-          }__;
-
-  @Method:
-    @@Name: createPerlBare
-    @@enDesc:
-      Creates a new <IF::PerlTokens> object. 
-    @@Param:
-      @@@Name: codeArg
-      @@@Type: DOMString
-      @@@enDesc:
-        The code fragment. 
-    @@Return:
-      @@@Type: PerlTokens
-      @@@enDesc: 
-        Newly created Perl code object. 
-      @@@PerlDef:
-          __DEEP{
-            $r = $self-><M::DOMImpl.createDocument> (<Q::pc:>, 'file')
-                      -><M::Document.createElementNS> (<Q::pc:>, 'tokens');
-            $r-><AS::Node.textContent> ($codeArg) if defined $codeArg;
-          }__;
-
-  @Method:
-    @@Name: createPerlAtom
-    @@enDesc:
-      Creates a new <IF::PerlAtom> object. 
-    @@Param:
-      @@@Name: codeArg
-      @@@Type: DOMString
-      @@@enDesc:
-        The code fragment. 
-    @@Return:
-      @@@Type: PerlAtom
-      @@@enDesc: 
-        Newly created Perl code object. 
-      @@@PerlDef:
-          __DEEP{
-            $r = $self-><M::DOMImpl.createDocument> (<Q::pc:>, 'file')
-                      -><M::Document.createElementNS> (<Q::pc:>, 'atom');
-            $r-><AS::Node.textContent> ($codeArg) if defined $codeArg;
-          }__;
-
-  @Method:
-    @@Name: createPerlStringLiteral
-    @@enDesc:
-      Creates a new <IF::PerlStringLiteral> object. 
-    @@Param:
-      @@@Name: stringArg
-      @@@Type: DOMString
-      @@@enDesc: A string.
-    @@Return:
-      @@@Type: PerlStringLiteral
-      @@@enDesc: 
-        Newly created Perl code object. 
-      @@@PerlDef:
-          __DEEP{
-            $r = $self-><M::DOMImpl.createDocument> (<Q::pc:>, 'file')
-                   -><M::Document.createElementNS> (<Q::pc:>, 'stringLiteral');
-            $r-><AS::Node.textContent> ($stringArg);
-          }__;
-
-  @Method:
-    @@Name: createPerlVariable
-    @@enDesc:
-      Creates a new <IF::PerlVariable> object. 
-    @@Param:
-      @@@Name: variableType
-      @@@Type: DOMString
-      @@@enDesc:
-        Variable prefix.
-      @@@nullCase:
-        @@@@enDesc:
-          If the <P::packageName> is <DOM::null>, then 
-          the <P::variableType> is detected by the prefix of
-          <P::localName>.  Otherwise, it is an unprefixed variable
-          such as file handle.
-    @@Param:
-      @@@Name: packageName
-      @@@Type: DOMString
-      @@@enDesc:
-        Package name.
-      @@@nullCase:
-        @@@@enDesc:
-          The variable belongs to the current package or a 
-          lexical-scoped variable.
-    @@Param:
-      @@@Name: localName
-      @@@Type: DOMString
-      @@@enDesc:
-        Variable name.  If both <P::variableType> and <P::packageName>
-        is <DOM::null>, the <P::localName> value may be prefixed
-        by any possible <P::variableType> value.
-    @@Return:
-      @@@Type: PerlVariable
-      @@@enDesc: 
-        Newly created Perl variable object. 
-      @@@PerlDef:
-          __DEEP{
-            $r = $self-><M::DOMImpl.createDocument> (<Q::pc:>, 'file')
-                      -><M::Document.createElementNS> (<Q::pc:>, 'variable');
-            if (not $variableType and not $packageName and
-                $localName =~ s/^(\\?[\$\@%&*])//) {
-              $variableType = $1;
-            }
-            $r-><AS::PerlVariable.variableType> ($variableType)
-                                                  if defined $variableType;
-            $r-><AS::PerlVariable.packageName> ($packageName)
-                                                  if defined $packageName;
-            $r-><AS::PerlVariable.pcLocalName> ($localName);
-          }__;
-
-  @Method:
-    @@Name: createPerlBlock
-    @@enDesc:
-      Creates a new <IF::PerlBlock> object. 
-    @@Return:
-      @@@Type: PerlBlock
-      @@@enDesc: 
-        Newly created Perl code object. 
-      @@@PerlDef:
-          __DEEP{
-            $r = $self-><M::DOMImpl.createDocument> (<Q::pc:>, 'file')
-                      -><M::Document.createElementNS> (<Q::pc:>, 'block');
-          }__;
-
-  @Method:
-    @@Name: createPerlBlockContainer
-    @@enDesc:
-      Creates a new <Class::ManakaiPerlBlockContainer> object. 
-    @@Return:
-      @@@Type: PerlCodeBlocks
-      @@@enDesc: 
-        Newly created Perl code object. 
-      @@@PerlDef:
-          __DEEP{
-            $r = $self-><M::DOMImpl.createDocument> (<Q::pc:>, 'file')
-                    -><M::Document.createElementNS> (<Q::pc:>, 'blockContainer');
-          }__;
-
-  @Method:
-    @@Name: createPerlStatement
-    @@enDesc:
-      Creates a new Perl statement.
-    @@Param:
-      @@@Name: codeArg
-      @@@Type: DOMString
-      @@@enDesc:
-        A Perl statement without terminating <Perl::;>.
-      @@@nullCase:
-        @@@@enDesc:
-          No initial content.
-    @@Return:
-      @@@Type: PerlStatement
-      @@@enDesc:
-        The newly created Perl code object. 
-      @@@PerlDef:
-          __DEEP{
-            $r = $self-><M::DOMImpl.createDocument> (<Q::pc:>, 'file')
-                      -><M::Document.createElementNS> (<Q::pc:>, 'statement');
-            if (defined $codeArg) {
-              $r-><M::PerlCodeUnits.appendBare> ($codeArg);
-            }
-          }__;
-
-  @Method:
-    @@Name: createPerlIf
-    @@enDesc:
-      Creates a <IF::PerlIf> object. 
-    @@Param:
-      @@@Name: conditionArg
-      @@@Type: PerlCodeInlines
-      @@@enDesc:
-        Conditoon code fragment object.
-    @@Param:
-      @@@Name: trueArg
-      @@@Type: PerlCodeBlocks
-      @@@enDesc:
-        A true code fragment object. 
-      @@@nullCase:
-        @@@@enDesc: No true code.
-    @@Param:
-      @@@Name: falseArg
-      @@@Type: PerlCodeBlocks
-      @@@enDesc:
-        A false code fragment object. 
-      @@@nullCase:
-        @@@@enDesc: No false code.
-    @@Return:
-      @@@Type: PerlIf
-      @@@PerlDef:
-          __DEEP{
-            $r = $self-><M::DOMImpl.createDocument> (<Q::pc:>, 'file')
-                      -><M::Document.createElementNS>
-                            (<Q::pc:>, 'if');
-            $r-><AS::PerlIf.condition> ($conditionArg) if $conditionArg;
-            $r-><AS::PerlIf.trueCode> ($trueArg) if $trueArg;
-            $r-><AS::PerlIf.falseCode> ($falseArg) if $falseArg;
-          }__;
 ##PCImplementation
 
 ResourceDef:
@@ -5156,116 +4622,6 @@ ResourceDef:
   @QName: Document
   @AliasFor: tc|Document
   @For: ManakaiDOM|DOM
-
-## -- Exceptions
-
-ResourceDef:
-  @rdf:type:
-    @@@: dis|MultipleResource
-    @@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
-  @resourceFor: ManakaiDOM|ForIF
-  @resourceFor: ManakaiDOM|ForClass
-
-  @For: ManakaiDOM|Perl
-
-  @rdf:type:
-    @@@: dx|Interface
-    @@ForCheck: ManakaiDOM|ForIF
-
-  @rdf:type:
-    @@@: dx|Class
-    @@ForCheck: ManakaiDOM|ForClass
-
-  @Implement:
-    @@@: ||ManakaiDOM|ManakaiDOM|ManakaiDOM||ManakaiDOM|ForIF
-    @@ContentType: DISCore|TFPQNames
-    @@ForCheck: ManakaiDOM|ForClass
-  @Implement:
-    @@@: ||ManakaiDOM|ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
-    @@ContentType: DISCore|TFPQNames
-    @@ForCheck: ManakaiDOM|ForClass
-  @dx:implementedBy: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForClass
-
-  @f:implements: pc|CoreFeature10
-
-  @ISA:
-    @@@: dx|Exception||ManakaiDOM|Perl
-    @@ForCheck: ManakaiDOM|ForClass
-
-  @IFQName: PCException
-  @QName:
-    @@@: ManakaiPCException
-    @@ForCheck: ManakaiDOM|ForClass
-
-  @enDesc:
-    Exceptions for the <Module::Util:PerlCode> module.
-
-  @ResourceDef:
-    @@ForCheck: ManakaiDOM|ForIF
-    @@rdf:type: DISLang|ConstGroup
-
-    @@IFQName: PCExceptionCode
-
-    @@enDesc:
-      Exception codes for <IF::PCException>. 
-
-    @@Type: idl|unsignedShort||ManakaiDOM|all
-    @@subsetOf: idl|unsignedShort||ManakaiDOM|all
-
-    @@XConstDef:
-      @@@Name: NOT_SUPPORTED_ERR
-      @@@Value:
-        @@@@@:9
-        @@@@ContentType: DISCore|Integer
-      @@@enDesc:
-        An attempt is made to do something the implementation does not support. 
-      @@@XSubTypeDef:
-        @@@@QName: UNSUPPORTED_OPERATOR_ERR
-        @@@@enDesc:
-          The implementation does not support the specified operator. 
-        @@@@XParam:
-          @@@@@QName: operator
-          @@@@@enDesc:
-            The operator that is not supported. 
-        @@@@enMufDef:
-          Operator "%p (name => {<Q::pc:operator>});" is not supported
-##PCException
-
-ElementTypeBinding:
-  @Name: XConstDef
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type: dx|ErrorCode
-
-ElementTypeBinding:
-  @Name: XSubTypeDef
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type: dx|ErrorSubCode
-
-ElementTypeBinding:
-  @Name: XParam
-  @ElementType:
-    ecore:hasParameter
-
-ElementTypeBinding:
-  @Name: XParamDef
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type: ecore|Parameter
-    @@For: =ManakaiDOM|all
-
-ElementTypeBinding:
-  @Name: enMufDef
-  @ElementType:
-    ecore:defaultMessage
-  @ShadowContent:
-    @@ContentType:
-      lang:muf
-    @@lang:en
 
 ElementTypeBinding:
   @Name: Method
@@ -5433,15 +4789,6 @@ ElementTypeBinding:
     dis:Description
   @ShadowContent:
     @@lang:en
-
-ElementTypeBinding:
-  @Name: PropDef
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type:
-      rdf:Property
-    @@For: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: NamedParam

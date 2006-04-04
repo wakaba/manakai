@@ -9,7 +9,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/04/04 10:53:15 $
+    $Date: 2006/04/04 12:35:15 $
 
   @Require:
     @@Module:
@@ -532,26 +532,25 @@ ClsDef:
           $has_xref = true if $gtstem->{<H::mg|references>};
 
           for my $key (@{$clsprop->{<H::mg|origin0>} or []}) {
-            push @gtarget, ${$gtstem->{$key}}
-              if defined $gtstem->{$key} and not $grove{${$gtstem->{$key}}};
+            push @gtarget, ${$gtstem->{$key}} if defined $gtstem->{$key};
           }
 
           for my $key (@{$clsprop->{<H::mg|subnode1h>} or []}) {
             for (values %{$gtstem->{$key} or {}}) {
-              push @gtarget, $$_ unless $grove{$$_};
+              push @gtarget, $$_;
             }
           }
 
           for my $key (@{$clsprop->{<H::mg|subnode1a>} or []}) {
             for (@{$gtstem->{$key}}) {
-              push @gtarget, $$_ unless $grove{$$_};
+              push @gtarget, $$_;
             }
           }
 
           for my $key (@{$clsprop->{<H::mg|subnode2hh>} or []}) {
             for my $v (values %{$gtstem->{$key} or {}}) {
               for (values %{$v or {}}) {
-                push @gtarget, $$_ unless $grove{$$_};
+                push @gtarget, $$_;
               }
             }
           }
@@ -574,27 +573,30 @@ ClsDef:
 
       my $i = 0; 
       GI: {
+        $has_xref_group[$i+1] = [];
+        $other_group[$i+1] = [];
+
         OG: while (@{$other_group[$i]}) {
           my $other_group = shift @{$other_group[$i]};
           for my $has_group (@{$has_xref_group[$i]}) {
             for (keys %{$has_group->[1]}) {
               if ($other_group->[0]->{$_}) {
-                push @{$has_xref_group[$i+1] ||= []}, $other_group;
+                push @{$has_xref_group[$i+1]}, $other_group;
                 CORE::delete $has_group->[1]->{$_};
                 next OG;
               }
             }
           }
-          push @{$other_group[$i+1] ||= []}, $other_group;
+          push @{$other_group[$i+1]}, $other_group;
         } # OG
         
-        if (@{$other_group[$i+1] or []} and @{$has_xref_group[$i+1] or []}) {
-          $i++;                             # changed
+        $i++;
+        if (@{$has_xref_group[$i]}) { # changed
           redo GI;
         }
       } # GI
 
-      for my $nid (map {keys %{$_->[0]}} @{$other_group[$i+1]}) {
+      for my $nid (map {keys %{$_->[0]}} @{$other_group[$i]}) {
         if ($bag->{$nid}->{<H::mg|onunload>}) {
           $bag->{$nid}->{<H::mg|onunload>}->($bag, \$nid);
         }

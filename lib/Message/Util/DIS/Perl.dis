@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/04/03 16:13:17 $
+      $Date: 2006/04/04 12:35:15 $
     @@ContentType:
       dis:Date.RCS
   
@@ -5208,7 +5208,7 @@ TMethods:
                 $fpc-><M::DIS|PLAnyCon.appendStringLiteral>
                                      ($tf-><AG::dp|DISResourcePerl
                                                 .plFullyQualifiedName>);
-                $r-><M::DIS|PLPack.setSubNode> ($fpc);
+                $r-><M::Node.appendChild> ($fpc);
               }
             } # Err:MUErrorClass
 
@@ -5232,7 +5232,7 @@ TMethods:
                                           ('___rule_def');
                 $rule_def-><M::DIS|PLBlockCon.appendStatement>
                          -><M::DIS|PLAnyCon.appendNewPCLiteral> (\%rule);
-                $r-><M::DIS|PLPack.setSubNode> ($rule_def);
+                $r-><M::Node.appendChild> ($rule_def);
               }
 
  
