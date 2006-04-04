@@ -10,7 +10,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/04/02 10:45:24 $
+    $Date: 2006/04/04 10:53:14 $
 
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
@@ -648,7 +648,7 @@ ClsDef:
             ##       entity reference subtrees in attribute default values
             ##       cloned as is into default attribute node subtrees.
           $self->{doc_cfg}-><M::c|DOMConfiguration.setParameter>
-                              (<Q::cfg|dtd-default-attributes> => false);
+                              (<Q::cfg|dtd-default-attribute> => false);
             ## NOTE: Don't create DTD default attributes by
             ##       |createElementNS| method.
           $self->{doc_cfg}-><M::c|DOMConfiguration.setParameter>
@@ -708,7 +708,7 @@ ClsDef:
           $self->{doc_cfg}-><M::c|DOMConfiguration.setParameter>
                               (<Q::cfg|clone-entity-reference-subtree> => null);
           $self->{doc_cfg}-><M::c|DOMConfiguration.setParameter>
-                              (<Q::cfg|dtd-default-attributes> => null);
+                              (<Q::cfg|dtd-default-attribute> => null);
           $self->{doc_cfg}-><M::c|DOMConfiguration.setParameter>
                               (<Q::cfg|xml-id> => null);
           $self->{doc_cfg}-><M::c|DOMConfiguration.setParameter>
