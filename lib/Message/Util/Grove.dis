@@ -9,7 +9,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/04/04 14:30:30 $
+    $Date: 2006/04/05 14:49:31 $
 
   @Require:
     @@Module:
@@ -214,25 +214,8 @@ ClsDef:
     @@PerlDef:
       (
         'tag:suika.fam.cx,2005-09:' . time . ':' . $$ . ':' .
-        ($Message::Util::ManakaiNode::UniqueIDR ||=
-          [qw/A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
-              a b c d e f g h i j k l m n o p q r s t u v w x y z
-              0 1 2 3 4 5 6 7 8 9/]->[rand 62] .
-          [qw/A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
-              a b c d e f g h i j k l m n o p q r s t u v w x y z
-              0 1 2 3 4 5 6 7 8 9/]->[rand 62] .
-          [qw/A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
-              a b c d e f g h i j k l m n o p q r s t u v w x y z
-              0 1 2 3 4 5 6 7 8 9/]->[rand 62] .
-          [qw/A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
-              a b c d e f g h i j k l m n o p q r s t u v w x y z
-              0 1 2 3 4 5 6 7 8 9/]->[rand 62] .
-          [qw/A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
-              a b c d e f g h i j k l m n o p q r s t u v w x y z
-              0 1 2 3 4 5 6 7 8 9/]->[rand 62]) .
         (++$Message::Util::ManakaiNode::UniqueIDN)
       )
-
   @CODE:
     @@QName: mg|setOwnerProp
     @@enDesc:
@@ -490,12 +473,44 @@ ClsDef:
     @@Return:
       @@@PerlDef:
         my $bag = $self->{<H::mg|nodeBag>};
-        if (--($bag->{${$self->{<H::mg|nodeIDReference>}}}
-                   ->{<H::mg|references>}) < 1) {
+        my $nid = $self->{<H::mg|nodeIDReference>};
+        my $gtstem = $bag->{$$nid};
+        if (--($gtstem->{<H::mg|references>}) < 1) {
           if (++($bag->{<H::mg|mutations>})
                   > (defined $Message::Util::Grove::GCLatency
                        ? $Message::Util::Grove::GCLatency : 50000)) {
             __CODE{mg|collectGarbage:: $bag => $bag}__;
+          } else {
+            HASREF: {
+              my $clsprop = $Message::Util::Grove::ClassProp{
+                              ${$gtstem->{<H::mg|nodeClass>}}
+                            };
+          
+              for my $key (@{$clsprop->{<H::mg|origin0>} or []}) {
+                last HASREF if defined $gtstem->{$key};
+              }
+
+              for my $key ((@{$clsprop->{<H::mg|subnode1h>} or []}),
+                           (@{$clsprop->{<H::mg|ownee1h>} or []})) {
+                last HASREF if keys %{$gtstem->{$key}};
+              }
+
+              for my $key (@{$clsprop->{<H::mg|subnode1a>} or []}) {
+                last HASREF if @{$gtstem->{$key}};
+              }
+
+              for my $key (@{$clsprop->{<H::mg|subnode2hh>} or []}) {
+                for my $v (values %{$gtstem->{$key}}) {
+                  last HASREF if keys %$v;
+                }
+              }
+
+              # No reference - i.e. not referenced
+              if ($gtstem->{<H::mg|onunload>}) {
+                $gtstem->{<H::mg|onunload>}->($bag, $nid);
+              }
+              CORE::delete $bag->{$$nid};
+            } # HASREF
           }
         }
 

@@ -24,7 +24,7 @@ Module:
       @@@Year:2004
       @@@DISCore:author: DISCore|Wakaba
   @Date:
-    $Date: 2006/04/04 12:35:15 $
+    $Date: 2006/04/05 14:49:31 $
   
   @Require:
     @@Module:
@@ -3983,9 +3983,8 @@ IFClsDef:
                      (<Q::pc:>, ref $value eq 'HASH' ? 'hashRefLiteral'
                                                      : 'arrayRefLiteral');
             for my $v (ref $value eq 'HASH' ? %$value : @$value) {
-              my $vo;
               unless (UNIVERSAL::isa ($v, <IFName::PerlCode>)) {
-                $vo = $self-><M::PCDocument.createPCLiteral> ($v);
+                $v = $self-><M::PCDocument.createPCLiteral> ($v);
               }
               $r-><M::Node.appendChild> ($vo);
             }

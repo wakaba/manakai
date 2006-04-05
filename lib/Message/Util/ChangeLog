@@ -1,3 +1,11 @@
+2006-04-05  Wakaba  <wakaba@suika.fam.cx>
+
+	* Grove.dis (generateUniqueID): Don't include random number; it
+	is unnecessary as long as only local uniquness is required.
+	(destroy): Delete singleton.
+
+	* PerlCode.dis (createPCLiteral): A variable was not set.
+
 2006-04-04  Wakaba  <wakaba@suika.fam.cx>
 
 	* DIS.dis (Require): Requires the |MDOM:TreeStore| module.

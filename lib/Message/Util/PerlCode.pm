@@ -9030,17 +9030,16 @@ create_element_ns
 , ref $value eq 'HASH' ? 'hashRefLiteral'
                                              : 'arrayRefLiteral');
     for my $v (ref $value eq 'HASH' ? %$value : @$value) {
-      my $vo;
       unless (UNIVERSAL::isa ($v, 
 'Message::Util::IFLatest::PerlCode'
 )) {
-        $vo = $self->
+        $v = $self->
 create_pc_literal
  ($v);
       }
       $r->
 append_child
- ($vo);
+ ($v);
     }
   } elsif (defined $value) {
     $r = $self->
