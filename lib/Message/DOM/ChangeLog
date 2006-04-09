@@ -1,3 +1,15 @@
+2006-04-09  Wakaba  <wakaba@suika.fam.cx>
+
+	* XMLParser.dis (Require): Requires the |MCharset:Encode|
+	module.
+	(parse): Set the |inputEncoding| attribute of the generated document
+	object.
+	(resolveLSInput default implementation): The |byteStream|
+	and |encoding| attributes of the |LSInput| interface
+	are now supported.
+	(resolveLSInput): Parameters |impl| and |parser| are added.
+	(InputFile.inputEncoding): New attribute.
+
 2006-04-04  Wakaba  <wakaba@suika.fam.cx>
 
 	* Document.dis (adoptNode test): Documents were 

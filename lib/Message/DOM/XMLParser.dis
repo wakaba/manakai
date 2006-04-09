@@ -10,7 +10,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/04/04 10:53:14 $
+    $Date: 2006/04/09 14:29:41 $
 
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
@@ -24,12 +24,17 @@ Module:
     @@Module:
       @@@QName: MDOM|XDoctype
       @@@WithFor: ManakaiDOM|ManakaiDOMLatest
+    @@Module:
+      @@@QName: MCharset|Encode
+      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
 
 Namespace:
   @c:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
   @cfg:
     http://suika.fam.cx/www/2006/dom-config/
+  @cs:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Charset/
   @d:
     http://suika.fam.cx/~wakaba/archive/2004/dom/xdt#
   @dis:
@@ -60,6 +65,10 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
   @ManakaiDOMLS:
     http://suika.fam.cx/~wakaba/archive/2004/mdom-ls#
+  @MCharset:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Charset/
+  @mce:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Charset/Encode/
   @MDOM:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
   @MDOMX:
@@ -88,6 +97,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dom/xml#
   @xml:
     http://www.w3.org/XML/1998/namespace
+  @xml-auto-charset:
+    http://suika.fam.cx/www/2006/03/xml-entity/
   @xml-dtd:
     http://www.w3.org/TR/REC-xml
   @xmlns:
@@ -567,7 +578,8 @@ ClsDef:
                                 -><M::c|DOMConfiguration.getParameter>
                                     (<Q::xp|ls-input-to-input-file>);
           $in = $self->{in_in}-><M::ManakaiDOMLSInputToInputFile.resolveLSInput>
-                                  ($input,
+                                  ($self->{<H::f|implementation>}, $input,
+                                   $self,
                                    $self->{parser_cfg}
                                         -><M::c|DOMConfiguration.getParameter>
                                             ('error-handler'));
@@ -587,6 +599,7 @@ ClsDef:
           fh => $in-><AG::ManakaiDOMInputFile.filehandle>,
           base_uri => $in-><AG::ManakaiDOMInputFile.baseURI>,
           doc_uri => $in-><AG::ManakaiDOMInputFile.documentURI>,
+          in_enc => $in-><AG::ManakaiDOMInputFile.inputEncoding>,
           line => 1,
           column => 1,
           pos => 0,
@@ -669,6 +682,9 @@ ClsDef:
           $r-><AS::Document.documentURI> ($self->{entity}->[0]->{doc_uri});
           $r-><AS::Document.manakaiEntityBaseURI>
                 ($self->{entity}->[0]->{base_uri});
+
+          ## Encoding name
+          $r-><AS::Document.inputEncoding> ($self->{entity}->[0]->{in_enc});
 
           ## Document entity -> |Document| node
           $self->_parse_DocumentEntity;
@@ -15558,6 +15574,224 @@ ClsDef:
         }
       }
 
+  @XMLTests:
+    @@QName: xp.byteStream.tests
+    
+    @@XMLTest:
+      @@@QName: xp.labeled.utf-8.test
+      @@@DEnt:
+        @@@@xp:encoding: utf-8
+        @@@@test:value:
+          <p/>
+      @@@test:domTree:
+        document {
+          input-encoding: 'utf-8';
+          xml-encoding: null;
+          element {
+            node-name: 'p';
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.labeled.utf-16.be.test
+      @@@DEnt:
+        @@@@xp:encoding: utf-16
+        @@@@test:value:
+          $u00FE$u00FF$u0000<$u0000p$u0000/$u0000>
+      @@@test:domTree:
+        document {
+          xml-encoding: null;
+          input-encoding: 'utf-16';
+          element {
+            node-name: 'p';
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.labeled.utf-16.le.test
+      @@@DEnt:
+        @@@@xp:encoding: utf-16
+        @@@@test:value:
+          $u00FF$u00FE<$u0000p$u0000/$u0000>$u0000
+      @@@test:domTree:
+        document {
+          xml-encoding: null;
+          input-encoding: 'utf-16';
+          element {
+            node-name: 'p';
+          }
+        }
+    @@XMLTest:
+      @@@QName: xp.labeled.utf-16.nobom.test
+      @@@DEnt:
+        @@@@xp:encoding: utf-16
+        @@@@test:value:
+          <$u0000p$u0000/$u0000>$u0000
+      @@@c:erred: <[[xp|fatal-utf-16-no-bom]]> {}
+    @@XMLTest:
+      @@@QName: xp.labeled.unknown.test
+      @@@DEnt:
+        @@@@xp:encoding: x-unknown-encoding-name
+        @@@@test:value:
+          <p/>
+      @@@c:erred: <[[xp|fatal-unprocessable-encoding]]> {}
+    @@XMLTest:
+      @@@QName: xp.unlabeled.encdecl.unknown.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0" encoding="x-unknown-encoding-name"?>
+          <p/>
+#      @@@c:erred: <[[xp|fatal-unprocessable-encoding]]> {}
+      @@@c:erred: <[[xp|fatal-encoding-mismatch]]> {}
+    @@XMLTest:
+      @@@QName: xp.labeled.utf-8.illegal.test
+      @@@DEnt:
+        @@@@xp:encoding: utf-8
+        @@@@test:value:
+          <p/$u00A0>
+      @@@c:erred: <[[xp|fatal-illegal-byte-sequence]]> {}
+    @@XMLTest:
+      @@@QName: xp.unlabeled.encdecl.utf-8.illegal.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0" encoding="utf-8"?>
+          <p/$u00A0>
+      @@@c:erred: <[[xp|fatal-illegal-byte-sequence]]> {}
+    @@XMLTest:
+      @@@QName: xp.unlabeled.utf-8.illegal.test
+      @@@DEnt:
+        @@@@test:value:
+          <p/$u00A0>
+      @@@c:erred: <[[xp|fatal-illegal-byte-sequence]]> {}
+    @@XMLTest:
+      @@@QName: xp.mismatch.encdecl-as-utf-16.utf-8.test
+      @@@DEnt:
+        @@@@test:value:
+          <?xml version="1.0" encoding="utf-16"?>
+          <p/>
+      @@@c:erred: <[[xp|fatal-encoding-mismatch]]> {}
+    @@XMLTest:
+      @@@QName: xp.mismatch.labeled-as-utf-16.utf-8.test
+      @@@DEnt:
+        @@@@xp:encoding: utf-16
+        @@@@test:value:
+          <p/>
+      @@@c:erred: <[[xp|fatal-utf-16-no-bom]]> {}
+    @@XMLTest:
+      @@@QName: xp.labeled-as-utf-8.encdecl-utf-16.test
+      @@@DEnt:
+        @@@@xp:encoding: utf-8
+        @@@@test:value:
+          <?xml version="1.0" encoding="utf-16"?>
+          <p/>
+      @@@test:domTree:
+        document {
+          xml-encoding: 'utf-16';
+          input-encoding: 'utf-8';
+          element { }
+        }
+
+    @@PerlDef:
+      my $impl = $Message::DOM::ImplementationRegistry->get_implementation ({
+        'Core' => '3.0',
+        'XML' => '3.0',
+        'XMLVersion' => ['1.0', '1.1'],
+      });
+
+      for my $test_data (@$TestData) {
+        my $parser = <Class::ManakaiXMLParser>->new ($impl);
+
+        $test->start_new_test ($test_data->{uri});
+        my $doc_ent = $test_data->{entity}->{$test_data->{root_uri}};
+        my $not_ok;
+
+        ## -- DOM Configuration Parameters
+
+        my $pcfg = $parser->dom_config;
+        for (keys %{$test_data->{dom_config}}) {
+          $pcfg->set_parameter ($_ => $test_data->{dom_config}->{$_});
+        }
+
+        $pcfg->set_parameter ('error-handler' => sub ($$) {
+          my (undef, $err) = @_;
+	  my $err_type = $err->type;
+	  if ($test_data->{dom_error}->{$err_type}) {
+            $test->assert_error_equals
+                     (actual_value => $err,
+                      expected_hash => shift @{$test_data->{dom_error}
+                                                         ->{$err_type}});
+          } else { # Uncatched error
+            warn $err;
+            unless ($err->severity == <C::c|DOMError.SEVERITY_WARNING>) {
+              $test->failure_comment ('Unexpected error |'.$err->type.'|');
+              $not_ok = true;
+            }
+          }
+          return false;
+        });
+
+        ## -- Input Data
+
+        open my $byte, '<', \$doc_ent->{<Q::test|value>};
+        my $input = {byte_stream => $byte,
+                     system_id => $doc_ent->{<Q::test:uri>},
+                     base_uri => $doc_ent->{<Q::test:baseURI>},
+                     encoding => $doc_ent->{<Q::xp|encoding>}};
+
+        ## -- Test and Result
+
+        if ($test_data->{dom_tree}) { # Successful test
+          my $doc;
+          try {
+            $doc = $parser->parse ($input);
+            $test->assert_dom_tree_equals
+                     (actual_value => $doc,
+                      expected_hash => $test_data->{dom_tree});
+            for (values %{$test_data->{dom_error}||{}}) {
+              if (@$_) {
+                $test->failure_comment
+                         (@$_.' |DOMError|s of type |'.
+                          $_->[0]->{type}->{value}.'| are not reported');
+                $not_ok = true;
+              }
+            }
+            $not_ok ? $test->not_ok : $test->ok;
+            undef $doc;
+          } catch Message::Util::IF::DTException with {
+            require 'manakai/mndebug.pl';
+            manakai::mndebug::dump ($doc);
+          } catch Message::DOM::IF::LSException with {
+            # not_ok
+          } otherwise {
+            my $err = shift;
+            warn $err;
+            $test->not_ok;
+          };
+        } else {
+          my $doc;
+          try {
+            $doc = $parser->parse ($input);
+          } catch Message::Util::IF::DTException with {
+            require 'manakai/mndebug.pl';
+            manakai::mndebug::dump ($doc);
+          } catch Message::DOM::IF::LSException with {
+            #
+          } otherwise {
+            my $err = shift;
+            warn $err;
+            $test->not_ok;
+          };
+          for (values %{$test_data->{dom_error}||{}}) {
+            if (@$_) {
+              $test->failure_comment
+                       (@$_.' |DOMError|s of type |'.
+                        $_->[0]->{type}->{value}.'| are not reported');
+              $not_ok = true;
+            }
+          }
+          $not_ok ? $test->not_ok : $test->ok;
+        }
+      }
+
+
   @ResourceDef:
     @@QName: getEmptyEntityState
     @@rdf:type: DISPerl|InlineCode
@@ -16145,6 +16379,101 @@ WarnDef:
     @@@: xp|name
     @@enDesc:
       The name of the attribute.
+
+FatalErrDef:
+  @QName: xp|fatal-illegal-byte-sequence
+  @enDesc:
+    An XML entity is determined to be in a certain encoding but
+    contains byte sequences that are not legal in that encoding.
+  @enMufDef:
+    Illegal byte sequence
+  @enImplNote: dump
+  @ecore:hasParameter: xp|byte-sequence
+  @ecore:hasParameter: xp|code-state
+
+XWParam:
+  @QName: xp|byte-sequence
+  @enDesc:
+    A reference to the byte string that contains an error.
+
+XWParam:
+  @QName: xp|code-state
+  @enDesc:
+    A string that identifies the state defined in the coded character set
+    in which an error is encoutnered.
+
+WarnDef:
+  @QName: xp|warning-unassigned-code-point
+  @enDesc:
+    If the entity contains an unassigned code point.
+  @enMufDef:
+    Unassigned code point found
+  @enImplNote: dump
+  @ecore:hasParameter: xp|byte-sequence
+
+FatalErrDef:
+  @QName: xp|fatal-unprocessable-encoding
+  @enDesc:
+    When an XML processor encounters an entity with an encoding
+    that is unable to process.
+  @enMufDef:
+    Encoding <%p (name => {<Q::xp|charset-uri>});>
+    %p (name => {<Q::xp|encoding>}, prefix => {(}, suffix => {) });is
+    not supported
+  @ecore:hasParameter: xp|encoding
+  @ecore:hasParameter: xp|charset-uri
+
+XWParam:
+  @QName: xp|encoding
+  @enDesc:
+    The XML name of the encoding.
+  @multipleProperties: DISCore|Single
+  @dataType: DISCore|String
+  @DISCore:resourceType: DISSource|ResourceProperty
+
+XWParam:
+  @QName: xp|charset-uri
+  @enDesc:
+    The URI that identifies the encoding.
+
+FatalErrDef:
+  @QName: xp|fatal-utf-16-no-bom
+  @enDesc:
+    If the encoding of an entity is UTF-16 but it does not
+    contains <CHAR::BOM>.
+  @enMufDef:
+    The entity contains no BOM
+
+FatalErrDef:
+  @QName: xp|fatal-encoding-mismatch
+  @enDesc:
+    If an entity including an encoding declaration
+    in an encoding other than that named in the declaration.
+  @enMufDef:
+    The entity is labeled as <%p (name => {<Q::xp|charset-uri>});>
+    %p (name => {<Q::xp|encoding>}, prefix => {(}, suffix => {) });but
+    it is wrong
+  @ecore:hasParameter: xp|encoding
+  @ecore:hasParameter: xp|charset-uri
+
+WarnDef:
+  @QName: xp|warn-unknown-decode-error
+  @enDesc:
+    Unknown message from the decoder.
+  @enMufDef:
+    Encoding decoder error: <%p (name => {<Q::xp|error-type>});>
+  @ecore:hasParameter: xp|error-type
+  @ecore:hasParameter: xp|error-param
+
+XWParam:
+  @QName: xp|error-type
+  @enDesc:
+    A DOM URI that identifies the error type.
+
+XWParam:
+  @QName: xp|error-param
+  @enDesc:
+    A <Q::xp|error-type>-dependent set of error descriptions.
 
 NSFatalErrDef:
   @QName: xp|nswf-legal-ncname
@@ -16742,8 +17071,9 @@ CParam:
       @@@enDesc:
         The default resolver.
       @@@PerlDefC:
+        # resolveLSInput
         $r = sub {
-          my ($self, $input, $errorHandler) = @_;
+          my ($self, $impl, $input, $parser, $errorHandler) = @_;
           ## As defined in DOM Level 3 LS |LSInput| interface
 
           my $r = {};
@@ -16761,10 +17091,76 @@ CParam:
               ## 2. |byteStream|
               $v = $input-><AG::LSInput.byteStream>;
               if (defined $v) {
-                ## TODO: Support byte filehandle
-                  ## |encoding|
-                  ## TODO: How to guess?
-                return null;
+                require Message::Charset::Encode;
+                my $mceimpl = $impl-><M::f|GetFeature.getFeature>
+                                       (<Q::fe|MCEncode>, '1.0');
+                my $encode = $input-><AG::LSInput.encoding>;
+                my $encode_uri = defined $encode
+                                   ? $mceimpl-><M::mce|MCEncodeImplementation
+                                                   .getURIFromCharsetName>
+                                             (<Q::cs|xmlName>, $encode)
+                                   : <Q::xml-auto-charset:>;
+                $r->{filehandle} = $mceimpl-><M::mce|MCEncodeImplementation
+                                                  .createMCDecodeHandle>
+                                            ($encode_uri, $v, sub {
+                  my ($self, $fh, $type, %opt) = @_;
+                  my $continue = true;
+                  if ($type eq <Q::cs|illegal-octets-error>) {
+                    $continue = __c|ERROR{xp|fatal-illegal-byte-sequence::
+                      xp|byte-sequence => {$opt{octets}},
+                      ecore|object => {$parser},
+                    }__;
+                  } elsif ($type eq <Q::cs|unassigned-code-point-error>) {
+                    $continue = __c|ERROR{xp|warning-unassigned-code-point::
+                      xp|byte-sequence => {$opt{octets}},
+                      ecore|object => {$parser},
+                    }__;
+                    $opt{octets} = \"\x{FFFD}";
+                  } elsif ($type eq <Q::cs|invalid-state-error>) {
+                    $continue = __c|ERROR{xp|fatal-illegal-byte-sequence::
+                      xp|code-state => {$opt{state}},
+                      ecore|object => {$parser},
+                    }__;
+                  } elsif ($type eq <Q::cs|charset-not-supported-error>) {
+                    $continue = __c|ERROR{xp|fatal-unprocessable-encoding::
+                      xp|encoding => {$encode},
+                      xp|charset-uri => {$opt{charset_uri}},
+                      ecore|object => {$parser},
+                    }__;
+                  } elsif ($type eq <Q::cs|no-bom-error>) {
+                    if ($opt{charset_uri} eq <Q::cs|XML.utf-16>) {
+                      $continue = __c|ERROR{xp|fatal-utf-16-no-bom::
+                        ecore|object => {$parser},
+                      }__;
+                    } else {
+                      $continue = __c|ERROR{xp|fatal-illegal-byte-sequence::
+                        xp|code-state => 'bom',
+                        ecore|object => {$parser},
+                      }__;
+                    }
+                  } elsif ($type eq <Q::cs|charset-name-mismatch-error>) {
+                    $continue = __c|ERROR{xp|fatal-encoding-mismatch::
+                      xp|encoding => {$encode},
+                      xp|charset-uri => {$opt{charset_uri}},
+                      ecore|object => {$parser},
+                    }__;
+                  } else {
+                    $continue = __c|ERROR{xp|warn-unknown-decode-error::
+                      xp|error-type => {$type},
+                      xp|error-param => {\%opt},
+                      ecore|object => {$parser},
+                    }__;
+                  }
+                  unless ($continue) {
+                    __EXCEPTION{DOMLS|PARSE_ERR::
+                      ecore|object => {$parser},
+                    }__;
+                  }
+                });
+                $r->{input_encoding}
+                    = $r->{filehandle}-><AG::mce|MCDecodeHandle.inputEncoding>
+                        if defined $r->{filehandle};
+                last FH;
               }
 
               ## 3. |stringData|
@@ -16822,6 +17218,9 @@ CParam:
                 $r->{base_uri} = $r->{document_uri};
               }
             } # BURI
+
+            $r->{input_encoding} = $input-><AG::LSInput.encoding>
+                unless defined $r->{input_encoding};
 
           }__;
 
@@ -16962,10 +17361,20 @@ ClsDef:
     @@enDesc:
       Converts a <IF::LSInput> into a Perl filehandle.
     @@Param:
+      @@@Name: impl
+      @@@Type: f|MinimumImplementation
+      @@@enDesc:
+        The implementation object.
+    @@Param:
       @@@Name: input
       @@@Type: LSInput
       @@@enDesc:
         The input.
+    @@Param:
+      @@@Name: parser
+      @@@Type: LSParser
+      @@@enDesc:
+        The parser.
     @@Param:
       @@@Name: errorHandler
       @@@Type: c|DOMErrorHandler
@@ -16986,7 +17395,7 @@ ClsDef:
           }
       @@@PerlDef:
         __DEEP{
-          $r = $self->($self, $input, $errorHandler);
+          $r = $self->($self, $impl, $input, $parser, $errorHandler);
         }__;
       @@@enImplNote:
         Notet that the input / output processor for <CODE::$input>
@@ -17074,6 +17483,19 @@ ClsDef:
       @@@PerlDef: $r = $self->{document_uri};
     @@Set:
       @@@PerlDef: $self->{document_uri} = $given;
+
+  @Attr:
+    @@Name: inputEncoding
+    @@enDesc:
+      The input encoding name.
+    @@Type: DOMString
+    @@nullCase:
+      @@@enDesc:
+        If the input encoding name is not available.
+    @@Get:
+      @@@PerlDef: $r = $self->{input_encoding};
+    @@Set:
+      @@@PerlDef: $self->{input_encoding} = $given;
 
   @Method:
     @@Name: close

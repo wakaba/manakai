@@ -12,6 +12,7 @@ use Message::Util::QName::Filter {
   swcfg21 => q<http://suika.fam.cx/~wakaba/archive/2005/swcfg21#>,
   test => q<http://suika.fam.cx/~wakaba/archive/2004/dis/Test#>,
   Util => q<http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/>,
+  xp => q<http://suika.fam.cx/~wakaba/archive/2004/dom/xml-parser#>,
 };
 
 use Cwd;
@@ -626,16 +627,16 @@ sub daf_generate_perl_test_file ($) {
     );
   ');
 
-  $pack->append_code
-    ($pc->create_perl_statement
-       ('my $impl = $Message::DOM::ImplementationRegistry->get_implementation ({
-           "http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#Test"
-             => "1.0",
-         })'));
+  $pack->append_child ($factory->create_pc_statement)
+       ->append_code
+           ('my $impl = $Message::DOM::ImplementationRegistry
+                            ->get_implementation ({
+                "http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#Test"
+                    => "1.0",
+            })');
 
-  $pack->append_code
-      (my $num_statement = $pc->create_perl_statement 
-                                  ('my $test = $impl->create_test_manager'));
+  my $num_statement = $pack->append_child ($factory->create_pc_statement);
+  $num_statement->append_code ('my $test = $impl->create_test_manager');
 
   my $total_tests = 0;
   my %processed;
@@ -663,7 +664,7 @@ sub daf_generate_perl_test_file ($) {
           die "Perl test code not defined for <".$res->uri.">";
         }
         
-        $pack->append_code_fragment ($test_pc);
+        $pack->append_child ($test_pc);
         
         $pack->append_code ('$test->ok;');
         
@@ -694,7 +695,7 @@ sub daf_generate_perl_test_file ($) {
                                    (ExpandedURI q<test:Entity>)}) {
             my $tent = $ttest->{entity}->{$eres->uri} = {};
             for (ExpandedURI q<test:uri>, ExpandedURI q<test:baseURI>,
-                 ExpandedURI q<test:value>) {
+                 ExpandedURI q<test:value>, ExpandedURI q<xp:encoding>) {
               my $v = $eres->get_property_text ($_);
               $tent->{$_} = $v if defined $v;
             }
@@ -739,7 +740,7 @@ sub daf_generate_perl_test_file ($) {
           die "Resource <".$res->uri."> does not have Perl test code";
         }
 
-        $block->append_code_fragment ($plc);
+        $block->append_child ($plc);
         
       } # test resource type
     } # test:Test

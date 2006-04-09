@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/04/04 14:30:30 $
+      $Date: 2006/04/09 14:29:41 $
     @@ContentType:
       dis:Date.RCS
   
@@ -3886,8 +3886,14 @@ IFClsDef:
             = {type => 'quoted',
                value => $xsubtype-><AG::DIS|DISAnyResource.nameURI>}
           if $xsubtype;
+        my $db = $self-><AG::anyres.database>;
         for my $name (keys %$xparam) {
           my $pname = $name;
+          my $pres = $db-><M::DIS|DISDatabase.getResource> ($pname);
+          if ($pres-><AG::DIS|DISAnyResource.isDefined>) {
+            $pname = $pres-><M::DIS|DISResourceProp.getPropertyText>
+                                 (<Q::ecore|propKey>, $pname);
+          }
           $pname =~ s/(['\\])/\\$1/g;
           $pname = qq<'$pname'>;
           $statement-><M::DIS|PLInCon.appendCode>

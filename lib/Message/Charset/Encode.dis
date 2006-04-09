@@ -16,7 +16,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/03/15 10:58:51 $
+    $Date: 2006/04/09 14:29:41 $
   
   @Require:
     @@Module:
@@ -2388,6 +2388,12 @@ IFClsDef:
         $test->assert_null ($efh->getc);
         $test->assert_null ($error);
       } # testdata
+
+  @Method:
+    @@Name: close
+    @@Return:
+      @@@PerlDef:
+        close $self->{<H::mce|filehandle>};
 ##MCDecodeHandle
 
 ClsDef:
