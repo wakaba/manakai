@@ -75,17 +75,18 @@ NS_MDOM_PT_FILES = \
 NS_URI_PT_FILES = \
   uri-Generic$(PT_SUFFIX)
 NS_UTIL_PT_FILES = \
-  util-ManakaiNodeTest$(PT_SUFFIX) \
   util-PerlCode$(PT_SUFFIX) \
   util-DIS$(PT_SUFFIX)
 NS_UTIL_DIS_PT_FILES = \
   util-dis-DNLite$(PT_SUFFIX) \
   util-dis-DPG$(PT_SUFFIX)
 
+UTIL_MNTEST_PM = $(MANAKAI_LIB_DIR)Message/Util/ManakaiNodeTest$(PM_SUFFIX)
+
 PT_FILES = \
   $(NS_MDOM_PT_FILES) \
   $(NS_URI_PT_FILES) \
-  $(NS_UTIL_PT_FILES) $(NS_UTIL_DIS_PT_FILES)
+  $(NS_UTIL_PT_FILES) $(NS_UTIL_DIS_PT_FILES) util-ManakaiNodeTest$(PT_SUFFIX)
 
 GENERATED_FILES = $(PT_FILES)
 
@@ -137,7 +138,8 @@ $(NS_URI_PT_FILES): uri-%$(PT_SUFFIX): \
 	$(DAF) --create-perl-test="$(NS_URI)$* $@"
 	$(PERL_CHK) $@
 
-test-module-util: $(NS_UTIL_PT_FILES) $(NS_UTIL_DIS_PT_FILES) $(TEST_PM_FILES)
+test-module-util: $(NS_UTIL_PT_FILES) $(NS_UTIL_DIS_PT_FILES) \
+  util-ManakaiNodeTest$(PT_SUFFIX) $(TEST_PM_FILES)
 	$(PERL_TEST_) util-*$(PT_SUFFIX)
 
 $(NS_UTIL_PT_FILES): util-%$(PT_SUFFIX): \
@@ -145,9 +147,10 @@ $(NS_UTIL_PT_FILES): util-%$(PT_SUFFIX): \
 	$(DAF) --create-perl-test="$(NS_UTIL)$* $@"
 	$(PERL_CHK) $@
 
-util-ManakaiNode$(PT_SUFFIX): \
-  $(MANAKAI_LIB_DIR)Message/Util/%$(DIS_SUFFIX) $(UTIL_MNTEST_PM) $(DAF_PL)
-	$(DAF) --create-perl-test="$(NS_UTIL)$* $@"
+util-ManakaiNodeTest$(PT_SUFFIX): \
+  $(MANAKAI_LIB_DIR)Message/Util/ManakaiNodeTest$(DIS_SUFFIX) \
+  $(UTIL_MNTEST_PM) $(DAF_PL)
+	$(DAF) --create-perl-test="$(NS_UTIL)ManakaiNodeTest $@"
 	$(ECHO) "BEGIN {" >> $@
 	$(ECHO) "  require 'manakai/mndebug.pl';" >> $@
 	$(ECHO) "  manakai::mndebug::define_nodestem_destroy ();" >> $@

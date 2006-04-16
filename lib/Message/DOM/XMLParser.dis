@@ -10,7 +10,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/04/09 14:29:41 $
+    $Date: 2006/04/16 10:05:23 $
 
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
@@ -17517,7 +17517,7 @@ ClsDef:
           if ($self->{close}) {
             $self->{close}->($self);
           } else {
-            close $self->{filehandle};
+            $self->{filehandle}->close;
           }
         }__;
 ##ManakaiDOMInputFile

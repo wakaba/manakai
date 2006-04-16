@@ -24,7 +24,7 @@ Module:
       @@@Year:2004
       @@@DISCore:author: DISCore|Wakaba
   @Date:
-    $Date: 2006/04/05 14:49:31 $
+    $Date: 2006/04/16 10:05:24 $
   
   @Require:
     @@Module:
@@ -948,6 +948,15 @@ ElementTypeBinding:
   @ShadowSibling:
     @@actualType: CDATADOMString
 
+ElementTypeBinding:
+  @Name: ReflectCDATA2
+  @ElementType:
+    dis:Type
+  @ShadowContent:
+    @@@: DOMString
+  @ShadowSibling:
+    @@actualType: CDATADOMString2
+
 ResourceDef:
   @QName: DOMString
   @For: ManakaiDOM|Perl
@@ -956,11 +965,11 @@ ResourceDef:
 ReflectTypeDef:
   @QName: CDATADOMString
   @enDesc:
-    <IF::DOMMain:DOMString> for DOM attributes reflecting
+    <TYPE::DOMString> for DOM attributes reflecting
     <SGML::CDATA> element attributes.
   @subsetOf: DOMString
   @ResourceDef:
-    @@rdf:type: DOMMain|ReflectGet
+    @@DISCore:resourceType: DOMMain|ReflectGet
     @@enDesc:
       The DOM attribute returns the current value of the element attribute
       in a transparent, case-sensitive manner.
@@ -975,7 +984,45 @@ ReflectTypeDef:
 
   @ResourceDef:
     @@QName: CDATADOMStringSet
-    @@rdf:type: DOMMain|ReflectSet
+    @@DISCore:resourceType: DOMMain|ReflectSet
+    @@enDesc:
+      The corresponding element attribute is set to the given value,
+      in a transparent, case-sensitive manner.
+    @@ImplNote:
+      @@@lang:en
+      @@@@: 
+        What will happen if the <DOM::null> value is given?
+    @@PerlCDef:
+      __DEEP{
+        if (defined $given) {
+          $self-><M::Element.setAttributeNS>
+                   ($NS_URI, $QNAME, $given);
+        } else {
+          $self-><M::Element.removeAttributeNS> ($NS_URI, $LOCAL_NAME);
+        }
+      }__;
+
+ReflectTypeDef:
+  @QName: CDATADOMString2
+  @enDesc:
+    <TYPE::DOMString> for DOM attributes reflecting
+    <SGML::CDATA> element attributes.
+  @subsetOf: DOMString
+  @ResourceDef:
+    @@DISCore:resourceType: DOMMain|ReflectGet
+    @@enDesc:
+      The DOM attribute returns the current value of the element attribute
+      in a transparent, case-sensitive manner.
+      \
+      If the element attribute is absent, the default value, if any,
+      or <DOM::null> is returned.
+    @@PerlCDef:
+      __DEEP{
+        $r = $self-><M::Element.getAttributeNS> ($NS_URI, $LOCAL_NAME);
+      }__;
+
+  @ResourceDef:
+    @@DISCore:resourceType: DOMMain|ReflectSet
     @@enDesc:
       The corresponding element attribute is set to the given value,
       in a transparent, case-sensitive manner.
@@ -1665,7 +1712,7 @@ IFClsETDef:
     @@ATTRQName: pc|prototype
     @@enDesc:
       The prototype of this subroutine. 
-    @@ReflectCDATA:
+    @@ReflectCDATA2:
     @@Get:
       @@@nullCase:
         @@@@enDesc:
@@ -3986,7 +4033,7 @@ IFClsDef:
               unless (UNIVERSAL::isa ($v, <IFName::PerlCode>)) {
                 $v = $self-><M::PCDocument.createPCLiteral> ($v);
               }
-              $r-><M::Node.appendChild> ($vo);
+              $r-><M::Node.appendChild> ($v);
             }
           } elsif (defined $value) {
             $r = $self-><M::Document.createElementNS>
