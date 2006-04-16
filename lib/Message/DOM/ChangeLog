@@ -1,5 +1,14 @@
 2006-04-16  Wakaba  <wakaba@suika.fam.cx>
 
+	* CharacterData.dis (length, insertData, substringData, 
+	appendData, deleteData, replaceData, splitText): Reimplemented.
+
+	* DOMCore.dis (NEGATIVE_LENGTH_ERR): New error.
+	(c:index): The definition was missing.
+	(c:length): New property.
+
+2006-04-16  Wakaba  <wakaba@suika.fam.cx>
+
 	* XMLParser.dis (close): Invoke |close| method
 	rather than |close| function.
 

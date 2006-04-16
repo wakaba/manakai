@@ -40,7 +40,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/04/16 08:20:25 $
+      $Date: 2006/04/16 12:58:53 $
     @@ContentType:
       dis:Date.RCS
 
@@ -622,6 +622,18 @@ ResourceDef:
         @@@@enMufDef:
           String index%p (name => {<Q::c|index>}, prefix => { });
           is out of bounds
+      @@@SubTypeDef:
+        @@@@QName: c|NEGATIVE_LENGTH_ERR
+        @@@@enDesc:
+          If the specified length is negative.
+        @@@@XParamParamName:
+        @@@@ecore:hasParameter:
+          @@@@@@: c|length
+          @@@@@enDesc:
+            The specified length.
+        @@@@enMufDef:
+          Negative length%p (name => {<Q::c|length>}, prefix => { }); is
+          specified
      @@XConst:
       @@@QName: DOMSTRING_SIZE_ERR
         @@@intValue:  2
@@ -1697,6 +1709,16 @@ XParamDef:
 
 XParamDef:
   @QName: c|schemaType
+
+XParamDef:
+  @QName: c|index
+  @enDesc:
+    The specified index.
+
+XParamDef:
+  @QName: c|length
+  @enDesc:
+    The specified length.
 
 PropDef:
   @QName: features
