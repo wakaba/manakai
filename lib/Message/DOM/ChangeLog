@@ -1,3 +1,20 @@
+2006-04-16  Wakaba  <wakaba@suika.fam.cx>
+
+	* CharacterData.dis: New module split from |TreeCore.dis|.
+
+	* CharacterData.pm: Added to the CVS repository.
+
+	* TreeCore.dis: The |CharacterData|, |Text|, and |Comment|
+	interfaces are removed.
+	(Require): A reference to the |MDOM:CharacterData| module
+	is added.
+
+	* DOMMain.dis (StringExtended, StringOutOfBoundsException): Removed.
+
+	* DOMCore.dis (StringOutOfBoundsException): New error.
+
+	* Makefile: |CharacterData.pm| is added.
+
 2006-04-09  Wakaba  <wakaba@suika.fam.cx>
 
 	* XMLParser.dis (Require): Requires the |MCharset:Encode|

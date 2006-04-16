@@ -40,7 +40,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/03/31 16:44:23 $
+      $Date: 2006/04/16 08:20:25 $
     @@ContentType:
       dis:Date.RCS
 
@@ -568,7 +568,7 @@ ResourceDef:
             The specified index or size value is less than or greater 
             than the allowed value. 
         @@@enMufDef:
-              The index or size%t (
+              The index or size%p (
                 name => {<Q::MDOMX:param-name>},
                 prefix => {, as specified by the parameter "}, suffix => {",}); 
               is negative or greater than the allowed value.
@@ -610,6 +610,18 @@ ResourceDef:
            );%p (
              name => {<Q::DOMCore:index>},
            );) is greater than an upper bound. 
+      @@@SubTypeDef:
+        @@@@QName: c|StringIndexOutOfBoundsException
+        @@@@enDesc:
+          If the string index is out of bounds.
+        @@@@XParamParamName:
+        @@@@ecore:hasParameter:
+          @@@@@@: c|index
+          @@@@@enDesc:
+            The specified index.
+        @@@@enMufDef:
+          String index%p (name => {<Q::c|index>}, prefix => { });
+          is out of bounds
      @@XConst:
       @@@QName: DOMSTRING_SIZE_ERR
         @@@intValue:  2

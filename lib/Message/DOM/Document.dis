@@ -13,7 +13,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/04/04 12:35:14 $
+    $Date: 2006/04/16 08:20:27 $
 
   @Require:
     @@Module:
@@ -94,6 +94,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dom/tree#
   @tc:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/TreeCore/
+  @tcd:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/CharacterData/
   @td:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/Document/
   @te:
@@ -1847,7 +1849,7 @@ NodeTypeDef:
         $test->assert_isa ($item, <IFName::Node>);
 
         $test->id ('child.item.pi');
-        $test->assert_isa ($item, <IFName::tc|Comment>);
+        $test->assert_isa ($item, <IFName::tcd|Comment>);
 
         $test->id ('child.item.equals');
         $test->assert_equals ($item, $pi);
@@ -2142,7 +2144,7 @@ NodeTypeDef:
         $test->assert_isa ($item, <IFName::Node>);
 
         $test->id ('child.item.pi');
-        $test->assert_isa ($item, <IFName::tc|Comment>);
+        $test->assert_isa ($item, <IFName::tcd|Comment>);
 
         $test->id ('child.item.equals');
         $test->assert_equals ($item, $pi);
@@ -4612,7 +4614,7 @@ NodeTypeDef:
               my $nt = $node-><AG::Node.nodeType>;
               if ($nt == <C::Node.TEXT_NODE> or
                   $nt == <C::Node.CDATA_SECTION_NODE>) {
-                $r .= $node-><AG::tc|CharacterData.data>
+                $r .= $node-><AG::tcd|CharacterData.data>
                   unless $node-><AG::Text.isElementContentWhitespace>;
               } elsif ($nt == <C::Node.ELEMENT_NODE> or
                        $nt == <C::Node.ENTITY_REFERENCE_NODE>) {
@@ -6419,12 +6421,13 @@ NodeTypeDef:
       @@@enDesc:
         The newly created <IF::Text> node.
       @@@PerlDef:
+        require Message::DOM::CharacterData;
         my $bag = <Code::mg|getNodeBag||ManakaiDOM|all:: $ref = $self>;
         my $stem;
         __CODE{mg|createNodeStem||ManakaiDOM|all::
           $bag => $bag,
           $stem => $stem,
-          $class => {<ClassName::tc|ManakaiDOMText>},
+          $class => {<ClassName::tcd|ManakaiDOMText>},
           $opt => {{
             <H::tc|ownerDocument> => $self,
             <H::infoset|content> => \$data,
@@ -6457,7 +6460,7 @@ NodeTypeDef:
         $test->assert_isa ($el, <IFName::Text>);
         
         $test->id ('class');
-        $test->assert_isa ($el, <ClassName::tc|ManakaiDOMText>);
+        $test->assert_isa ($el, <ClassName::tcd|ManakaiDOMText>);
 
         my $doc_id = $doc->{<H::mg|nodeIDReference>};
         my $el_id = $el->{<H::mg|nodeIDReference>};
@@ -6625,7 +6628,7 @@ NodeTypeDef:
   @Method:
     @@Name: createComment
     @@enDesc:
-      Creates a <IF::tc|Comment> node.
+      Creates a <IF::tcd|Comment> node.
     @@Param:
       @@@Name: data
       @@@Type: DOMString
@@ -6634,14 +6637,15 @@ NodeTypeDef:
     @@Return:
       @@@Type: Comment
       @@@enDesc:
-        The newly created <IF::tc|Comment> node.
+        The newly created <IF::tcd|Comment> node.
       @@@PerlDef:
+        require Message::DOM::CharacterData;
         my $bag = <Code::mg|getNodeBag||ManakaiDOM|all:: $ref = $self>;
         my $stem;
         __CODE{mg|createNodeStem||ManakaiDOM|all::
           $bag => $bag,
           $stem => $stem,
-          $class => {<ClassName::tc|ManakaiDOMComment>},
+          $class => {<ClassName::tcd|ManakaiDOMComment>},
           $opt => {{
             <H::tc|ownerDocument> => $self,
             <H::infoset|content> => \$data,
@@ -6671,10 +6675,10 @@ NodeTypeDef:
         my $el = $doc-><M::Document.createComment> ('textdata');
         
         $test->id ('interface');
-        $test->assert_isa ($el, <IFName::tc|Comment>);
+        $test->assert_isa ($el, <IFName::tcd|Comment>);
         
         $test->id ('class');
-        $test->assert_isa ($el, <ClassName::tc|ManakaiDOMComment>);
+        $test->assert_isa ($el, <ClassName::tcd|ManakaiDOMComment>);
 
         my $doc_id = $doc->{<H::mg|nodeIDReference>};
         my $el_id = $el->{<H::mg|nodeIDReference>};
@@ -7883,7 +7887,7 @@ NodeTypeDef:
            copy-asis
          }
 
-      - <IF::Text>, <IF::tc|Comment>, <IF::tx|CDATASection>,
+      - <IF::Text>, <IF::tcd|Comment>, <IF::tx|CDATASection>,
         <IF::tx|ProcessingInstruction>:::
                       These nodes can be adopted.
 
@@ -8365,7 +8369,7 @@ NodeTypeDef:
          <A::tx|Entity.systemId>, <A::tx|Entity.notationName>, 
          <A::Notation.publicId>, <A::Notation.systemId>, 
          <A::ProcessingInstruction.target>, <A::ProcessingInstruction.data>, 
-         <A::tc|CharacterData.data>, <A::tc|CharacterData.length>.
+         <A::tcd|CharacterData.data>, <A::tcd|CharacterData.length>.
        \
          User data is not carried over.  However, if any 
          <IF::UserDataHandler>s has specified, these handlers will 
@@ -8400,7 +8404,7 @@ NodeTypeDef:
             <IF::tx|EntityReference>, 
             <IF::tx|Notation>, <IF::tx|ProcessingInstruction>,
             <IF::Text>, 
-            <IF::tx|CDATASection> and <IF::tc|Comment> nodes.
+            <IF::tx|CDATASection> and <IF::tcd|Comment> nodes.
             The descendants of 
             the <IF::Attr> node are 
             always imported.  The descendants of the
@@ -8498,7 +8502,7 @@ NodeTypeDef:
         @@@@enDesc:
           If the <cfg::c|well-formed> configuration parameter is set to
           <DOM::true> and the text content inside <IF::Attr>, <IF::Element>,
-          <IF::tc|Comment>, <IF::Text>, or <IF::tx|CDATASection> node
+          <IF::tcd|Comment>, <IF::Text>, or <IF::tx|CDATASection> node
           or the data inside <IF::tx|ProcessingInstruction> node
           contains invalid characters.
 
@@ -9415,7 +9419,7 @@ NodeTypeDef:
         $test->assert_isa ($item, <IFName::Node>);
 
         $test->id ('child.item.pi');
-        $test->assert_isa ($item, <IFName::tc|Comment>);
+        $test->assert_isa ($item, <IFName::tcd|Comment>);
 
         $test->id ('child.item.equals');
         $test->assert_equals ($item, $pi);
@@ -9704,7 +9708,7 @@ NodeTypeDef:
         $test->assert_isa ($item, <IFName::Node>);
 
         $test->id ('child.item.pi');
-        $test->assert_isa ($item, <IFName::tc|Comment>);
+        $test->assert_isa ($item, <IFName::tcd|Comment>);
 
         $test->id ('child.item.equals');
         $test->assert_equals ($item, $pi);
@@ -9990,7 +9994,7 @@ NodeTypeDef:
         $test->assert_isa ($item, <IFName::Node>);
 
         $test->id ('child.item.pi');
-        $test->assert_isa ($item, <IFName::tc|Comment>);
+        $test->assert_isa ($item, <IFName::tcd|Comment>);
 
         $test->id ('child.item.equals');
         $test->assert_equals ($item, $pi);
@@ -10240,7 +10244,7 @@ NodeTypeDef:
         $test->assert_isa ($item, <IFName::Node>);
 
         $test->id ('child.item.pi');
-        $test->assert_isa ($item, <IFName::tc|Comment>);
+        $test->assert_isa ($item, <IFName::tcd|Comment>);
 
         $test->id ('child.item.equals');
         $test->assert_equals ($item, $pi);
@@ -10490,7 +10494,7 @@ NodeTypeDef:
         $test->assert_isa ($item, <IFName::Node>);
 
         $test->id ('child.item.pi');
-        $test->assert_isa ($item, <IFName::tc|Comment>);
+        $test->assert_isa ($item, <IFName::tcd|Comment>);
 
         $test->id ('child.item.equals');
         $test->assert_equals ($item, $pi);
@@ -10740,7 +10744,7 @@ NodeTypeDef:
         $test->assert_isa ($item, <IFName::Node>);
 
         $test->id ('child.item.pi');
-        $test->assert_isa ($item, <IFName::tc|Comment>);
+        $test->assert_isa ($item, <IFName::tcd|Comment>);
 
         $test->id ('child.item.equals');
         $test->assert_equals ($item, $pi);
@@ -11000,7 +11004,7 @@ NodeTypeDef:
         $test->assert_isa ($item, <IFName::Node>);
 
         $test->id ('child.item.pi');
-        $test->assert_isa ($item, <IFName::tc|Comment>);
+        $test->assert_isa ($item, <IFName::tcd|Comment>);
 
         $test->id ('child.item.equals');
         $test->assert_equals ($item, $pi);
@@ -12408,7 +12412,7 @@ IntPropDef:
 
 ResourceDef:
   @QName: Text
-  @AliasFor: tc|Text
+  @AliasFor: tcd|Text
   @For: ManakaiDOM|DOM
 
 ResourceDef:

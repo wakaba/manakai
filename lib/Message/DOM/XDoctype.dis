@@ -17,7 +17,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/04/03 12:53:25 $
+    $Date: 2006/04/16 08:20:27 $
   
   @Require:
     @@Module:
@@ -71,6 +71,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dom/tree#
   @tc:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/TreeCore/
+  @tcd:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/CharacterData/
   @td:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/Document/
   @te:
@@ -4741,7 +4743,7 @@ IFClsXDef:
       @@@enDesc:
         The node list that is always empty.
       @@@disDef:
-        @@@@DISPerl:cloneCode: tc|ManakaiDOMCharacterData.childNodes.get
+        @@@@DISPerl:cloneCode: tcd|ManakaiDOMCharacterData.childNodes.get
 
   @CAttr:
     @@Name: baseURI
@@ -4797,7 +4799,7 @@ IFClsXDef:
         @@@@enDesc:
           The type of the node does not allow any children.
       @@@disDef:
-        @@@@DISPerl:cloneCode: tc|ManakaiDOMCharacterData.appendChild
+        @@@@DISPerl:cloneCode: tcd|ManakaiDOMCharacterData.appendChild
 
   @CMethod:
     @@Name: insertBefore
@@ -4825,7 +4827,7 @@ IFClsXDef:
         @@@@enDesc:
           The type of the node does not allow any children.
       @@@disDef:
-        @@@@DISPerl:cloneCode: tc|ManakaiDOMCharacterData.insertBefore
+        @@@@DISPerl:cloneCode: tcd|ManakaiDOMCharacterData.insertBefore
 
   @CMethod:
     @@Name: replaceChild
@@ -4850,7 +4852,7 @@ IFClsXDef:
         @@@@enDesc:
           The type of the node does not allow any children.
       @@@disDef:
-        @@@@DISPerl:cloneCode: tc|ManakaiDOMCharacterData.replaceChild
+        @@@@DISPerl:cloneCode: tcd|ManakaiDOMCharacterData.replaceChild
 
     @@Test:
       @@@QName: ETDef.appendChild.test

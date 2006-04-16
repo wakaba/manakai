@@ -18,7 +18,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/04/02 12:14:43 $
+    $Date: 2006/04/16 08:20:28 $
 
   @Require:
     @@Module:
@@ -89,6 +89,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dom/tree#
   @tc:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/TreeCore/
+  @tcd:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/CharacterData/
   @td:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/Document/
   @te:
@@ -816,7 +818,7 @@ IFCls1Def:
   @ClsQName: ManakaiDOMCDATASection
 
   @IFISA: tc|Text
-  @ClsISA: tc|ManakaiDOMText
+  @ClsISA: tcd|ManakaiDOMText
 
   @DISLang:role: mg|NodeRefRole
   @DISLang:role:
@@ -828,7 +830,7 @@ IFCls1Def:
     which is used to escape blocks of text containing characters
     that would otherwise be regarded as markup.
 
-    The <A::tc|CharacterData.data> attribute holds the text that
+    The <A::tcd|CharacterData.data> attribute holds the text that
     is contained by the <XML::CDATA> section.  No lexical checking
     is done on the content of a <XML::CDATA> section and it is therefore
     possible to have the character sequence <XML::]]<gt>> in
@@ -873,7 +875,7 @@ IFCls1Def:
       $test->assert_isa ($text, <IFName::Text>);
 
       $test->id ('CharacterData');
-      $test->assert_isa ($text, <IFName::tc|CharacterData>);
+      $test->assert_isa ($text, <IFName::tcd|CharacterData>);
 
       $test->id ('Node');
       $test->assert_isa ($text, <IFName::Node>);
@@ -974,7 +976,7 @@ IFCls1Def:
         @@@@enDesc:
           The type of the node does not allow any children.
       @@@disDef:
-        @@@@DISPerl:cloneCode: tc|ManakaiDOMCharacterData.appendChild
+        @@@@DISPerl:cloneCode: tcd|ManakaiDOMCharacterData.appendChild
 
   @CMethod:
     @@Name: insertBefore
@@ -1002,7 +1004,7 @@ IFCls1Def:
         @@@@enDesc:
           The type of the node does not allow any children.
       @@@disDef:
-        @@@@DISPerl:cloneCode: tc|ManakaiDOMCharacterData.insertBefore
+        @@@@DISPerl:cloneCode: tcd|ManakaiDOMCharacterData.insertBefore
 
   @CMethod:
     @@Name: replaceChild
@@ -1027,7 +1029,7 @@ IFCls1Def:
         @@@@enDesc:
           The type of the node does not allow any children.
       @@@disDef:
-        @@@@DISPerl:cloneCode: tc|ManakaiDOMCharacterData.replaceChild
+        @@@@DISPerl:cloneCode: tcd|ManakaiDOMCharacterData.replaceChild
 
   @Test:
     @@QName: CDATASection.appendChild.test
@@ -1068,11 +1070,11 @@ IFCls1Def:
       $test->id ('1.class');
       $test->assert_isa ($node, <IFName::CDATASection>);
       $test->id ('1.value');
-      $test->assert_equals ($node-><AG::tc|CharacterData.data>, 'aaaa');
+      $test->assert_equals ($node-><AG::tcd|CharacterData.data>, 'aaaa');
 
       $test->id (2);
       $node-><M::Node.manakaiAppendText> ('bbbb');
-      $test->assert_equals ($node-><AG::tc|CharacterData.data>, 'aaaabbbb');
+      $test->assert_equals ($node-><AG::tcd|CharacterData.data>, 'aaaabbbb');
 
   @CAttr:
     @@Name: nodeName
@@ -1438,7 +1440,7 @@ NodeTypeDef:
         Since <IF::Notation> nodes cannot have child nodes,
         the node list is always empty.
       @@@disDef:
-        @@@@DISPerl:cloneCode: tc|ManakaiDOMCharacterData.childNodes.get
+        @@@@DISPerl:cloneCode: tcd|ManakaiDOMCharacterData.childNodes.get
 
   @CAttr:
     @@Name: nodeName
@@ -1523,7 +1525,7 @@ NodeTypeDef:
         @@@@enDesc:
           The type of the node does not allow any children.
       @@@disDef:
-        @@@@DISPerl:cloneCode: tc|ManakaiDOMCharacterData.appendChild
+        @@@@DISPerl:cloneCode: tcd|ManakaiDOMCharacterData.appendChild
 
   @CMethod:
     @@Name: insertBefore
@@ -1551,7 +1553,7 @@ NodeTypeDef:
         @@@@enDesc:
           The type of the node does not allow any children.
       @@@disDef:
-        @@@@DISPerl:cloneCode: tc|ManakaiDOMCharacterData.insertBefore
+        @@@@DISPerl:cloneCode: tcd|ManakaiDOMCharacterData.insertBefore
 
   @CMethod:
     @@Name: replaceChild
@@ -1576,7 +1578,7 @@ NodeTypeDef:
         @@@@enDesc:
           The type of the node does not allow any children.
       @@@disDef:
-        @@@@DISPerl:cloneCode: tc|ManakaiDOMCharacterData.replaceChild
+        @@@@DISPerl:cloneCode: tcd|ManakaiDOMCharacterData.replaceChild
 
     @@Test:
       @@@QName: Notation.appendChild.test
@@ -8342,7 +8344,7 @@ NodeTypeDef:
         @@@@enDesc:
           If the DOM implementation was not able to obtain the absolute URI.
       @@@disDef:
-        @@@@DISPerl:cloneCode: tc|ManakaiDOMCharacterData.baseURI.get
+        @@@@DISPerl:cloneCode: tcd|ManakaiDOMCharacterData.baseURI.get
 
     @@XDTest:
       @@@QName: EntityRef.baseURI.test
@@ -8772,7 +8774,7 @@ NodeTypeDef:
         Since <IF::ProcessingInstruction> nodes cannot have child nodes,
         the node list is always empty.
       @@@disDef:
-        @@@@DISPerl:cloneCode: tc|ManakaiDOMCharacterData.childNodes.get
+        @@@@DISPerl:cloneCode: tcd|ManakaiDOMCharacterData.childNodes.get
 
   @CMethod:
     @@Name: appendChild
@@ -8793,7 +8795,7 @@ NodeTypeDef:
         @@@@enDesc:
           The type of the node does not allow any children.
       @@@disDef:
-        @@@@DISPerl:cloneCode: tc|ManakaiDOMCharacterData.appendChild
+        @@@@DISPerl:cloneCode: tcd|ManakaiDOMCharacterData.appendChild
 
   @CMethod:
     @@Name: insertBefore
@@ -8821,7 +8823,7 @@ NodeTypeDef:
         @@@@enDesc:
           The type of the node does not allow any children.
       @@@disDef:
-        @@@@DISPerl:cloneCode: tc|ManakaiDOMCharacterData.insertBefore
+        @@@@DISPerl:cloneCode: tcd|ManakaiDOMCharacterData.insertBefore
 
   @CMethod:
     @@Name: replaceChild
@@ -8846,7 +8848,7 @@ NodeTypeDef:
         @@@@enDesc:
           The type of the node does not allow any children.
       @@@disDef:
-        @@@@DISPerl:cloneCode: tc|ManakaiDOMCharacterData.replaceChild
+        @@@@DISPerl:cloneCode: tcd|ManakaiDOMCharacterData.replaceChild
 
     @@Test:
       @@@QName: PI.appendChild.test
@@ -8893,7 +8895,7 @@ NodeTypeDef:
         The node itself.
       @@@NodeReadOnlyError:
       @@@disDef:
-        @@@@DISPerl:cloneCode: tc|ManakaiDOMCharacterData.manakaiAppendText
+        @@@@DISPerl:cloneCode: tcd|ManakaiDOMCharacterData.manakaiAppendText
 
     @@Test:
       @@@QName: PI..=.1.test
