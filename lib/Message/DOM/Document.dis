@@ -13,7 +13,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/04/16 10:05:23 $
+    $Date: 2006/04/22 05:14:18 $
 
   @Require:
     @@Module:
@@ -8352,34 +8352,49 @@ NodeTypeDef:
 
   @L2Method:
     @@Name: importNode
+    @@enDesc:
+      Imports a node from another document to this document,
+      without altering or removing the source node from the original
+      document; this method creates a new copy of the source node.
 
-     @@Description:
-       @@@lang:en
-       @@@@:
-         Import a node from another document to this document, 
-         without altering or removing the source node from 
-         the original document (i.e. create a new copy of 
-         the source node in this document).
-     @@ImplNote:
-       @@@lang:en
-       @@@@:
-         Copied: <A::Node.nodeName>, <A::Node.nodeType>, <A::Node.prefix>, 
-         <A::Node.localName>, <A::Node.namespaceURI>, <A::tx|Entity.publicId>, 
-         <A::tx|Entity.systemId>, <A::tx|Entity.notationName>, 
-         <A::Notation.publicId>, <A::Notation.systemId>, 
-         <A::ProcessingInstruction.target>, <A::ProcessingInstruction.data>, 
-         <A::tcd|CharacterData.data>, <A::tcd|CharacterData.length>.
-       \
-         User data is not carried over.  However, if any 
-         <IF::UserDataHandler>s has specified, these handlers will 
-         be called with the appropriate parameters before this method 
-         returns.
-       \
-         <A::Node.parentNode> := <DOM::null>.
-         <A::Attr.ownerElement> := <DOM::null>. 
-         <A::Attr.specified> := <DOM::true>.
-         Specified attribute nodes attached to the <IF::Element> node 
-         are imported.  Default attributes are created if exists.
+      The returned node has no parent, i.e. <A::Node.parentNode>
+      is <DOM::null>.
+
+      For all nodes, importing a node creates a node object owned 
+      by the importing document, with attribute values
+      identical to the source node's <A::Node.nodeName>,
+      <A::Node.nodeType>, <A::Node.prefix>, <A::Node.localName>,
+      and <A::Node.namespaceURI>.
+
+      User data associated to the imported node is not carried
+      over.  However, if any <IF::c|UserDataHandler>s has been
+      specified along with the associated data, these handlers
+      will be called with the appropriate parameters before
+      this method returns.
+
+      - <IF::Attr>::: The <A::Attr.ownerElement> attribute
+            is set to <DOM::null> and the <A::Attr.specified>
+            flag is set to <DOM::true> on the generated <IF::Attr>
+            node.  The descendants of the source <IF::Attr>
+            are recursively imported and the resulting nodes reassmbled
+            to form the corresponding subtree.  The <P::deep>
+            parameter has no effect.
+
+      - <IF::Document>::: The <IF::Document> nodes cannot be imported.
+
+      - <IF::DocumentFragment>:::  If the <P::deep> parameter
+            is set to <DOM::null>, the descendants of the source
+            node are recursively imported and the resulting
+            nodes reassembled to form the corresponding subtree.
+            Otherwise, simply an empty node is generated.
+
+      - <IF::tx|DocumentType>::: The <IF::tx|DocumentType> nodes
+            cannot be imported <SRC::DOM3>.
+
+      {TODO:: WIP.
+      }
+
+
      @@Param:
         @@@Name:  importedNode
         @@@Type:  Node
@@ -8454,6 +8469,10 @@ NodeTypeDef:
 #              @@@@@@lang:en
 #              @@@@@@@:
 #                One of the imported names is not a SGML or XML <CODE::Name>.
+    @@enImplNote:
+      {TODO::
+        Implement this method.
+      }
 
   @L3Method:
     @@Name: normalizeDocument
@@ -8504,6 +8523,10 @@ NodeTypeDef:
           <IF::tcd|Comment>, <IF::Text>, or <IF::tx|CDATASection> node
           or the data inside <IF::tx|ProcessingInstruction> node
           contains invalid characters.
+    @@enImplNote:
+      {TODO::
+        Implement this method.
+      }
 
   @L3Method:
     @@Name: renameNode
@@ -8645,6 +8668,10 @@ NodeTypeDef:
       @@@enImplNote:
         What would happen if a non-XML or non-namespace-aware node
         is being renamed?
+    @@enImplNote:
+      {TODO::
+         Implement this method.
+      }
 
   @LXAttr:
     @@Name: manakaiEntityBaseURI

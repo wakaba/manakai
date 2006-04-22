@@ -19,7 +19,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/02/20 09:03:18 $
+      $Date: 2006/04/22 05:14:19 $
     @@ContentType:
       dis:Date.RCS
   
@@ -677,11 +677,23 @@ LexTypeDef:
   @QName: DISCore|Integer
   @enFN: Integer
   @enDesc:
-    An <Q::DISCore|Integer> is a sequence of decimal digits,
-    i.e. a sequence of characters <CHAR::DIGIT ZERO>, 
-    <CHAR::DIGIT ONE>, ..., and <CHAR::DIGIT NINE>, 
-    optionally preceded by a <CHAR::PLUS SIGN> or <CHAR::HYPHEN-MINUS>.
-    They are interpreted as a decimal integer.
+    {P:: An <Q::DISCore|Integer> is a string that match to the syntax
+         <CODE::integer>:
+
+        - <DFN::integer> := decimal-integer / hexadecimal-integer
+
+        - <DFN::decimal-integer> := sign 1*<U+0030..U+0039>
+
+        - <DFN::sign> := ["+" / "-"]
+
+        - <DFN::hexadecimal-integer> := '0x' 1*(<U+0030..U+0039> /
+                    "A" / "B" / "C" / "D" / "E" / "F")
+
+      where <DFN::decimal-integer> is interpreted as a decimal
+      integer with optional sign (positive number if not specified)
+      and <DFN::hexadecimal-integer> is interpreted as a hexadecimal
+      integer preceded by <CODE::0x>.
+    }
   @rdfs:subClassOf: DISCore|String
   @subsetOf: DISCore|String
 

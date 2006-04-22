@@ -12,7 +12,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/04/16 12:58:53 $
+    $Date: 2006/04/22 05:14:18 $
 
   @Require:
     @@Module:
@@ -2127,24 +2127,25 @@ IFCls1Def:
 
   @L3Attr:
     @@Name: wholeText
-     @@Description:
-       @@@lang:en
-       @@@@:
-         All text of logically-adjacent text nodes.
-     @@ImplNote:
-       @@@lang:en
-       @@@@:
-         The DOM Level 3 Core Specification is unclear about 
-         <IF::tx|CDATASection>s.
-         They should also be included (c.f. the definition for 
-         <A::Text.replaceWholeText>).
-         \
-         What about unexpanded entity references?
+    @@enDesc:
+      All text of logically-adjacent text nodes to this node,
+      concatenated in document order.
+
+      The <DFN::logically-adjacent text nodes> are <IF::Text>
+      or <IF::tx|CDATASection> nodes that can be visited
+      sequentially in document order or in reverse document
+      order without entering, exiting, orpassing
+      over <IF::Element>, <IF::Comment>, <IF::tx|ProcessingInstruction>
+      <SRC::DOM3>, or <IF::tx|DocumentType> <SRC::manakai> nodes.
+    @@enImplNote:
+      @@@ddid: unexpanded
+      @@@@:
+        By definition unexpanded entity references are seemed to be ignored.
     @@Type: DOMString
     @@Get:
       @@@enImplNote:
         {TODO::
-          Implement this.
+          Implement this method (by Traversal module?)
         }
 
   @L3Method:
@@ -2158,6 +2159,10 @@ IFCls1Def:
     @@enImplNote:
       {ISSUE::
         isElementContentWhitespace
+      }
+      
+      {TODO::
+        Implement this method (by Traversal module?)
       }
 
   @Method:

@@ -40,7 +40,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/04/22 00:56:40 $
+      $Date: 2006/04/22 05:14:18 $
     @@ContentType:
       dis:Date.RCS
 
@@ -786,7 +786,7 @@ ResourceDef:
           @@@@lang:en
           @@@@@: How is this exception code used?
      @@XConst:
-        @@@QName:  NO_MODIFICATION_ALLOWED_ERR
+      @@@QName: c|NO_MODIFICATION_ALLOWED_ERR
         @@@intValue:  7
         @@@Description:
           @@@@lang:en
@@ -1252,6 +1252,17 @@ ResourceDef:
           @@@@@@: c|node
           @@@@@enDesc:
             The document type node.
+      @@@SubTypeDef:
+        @@@@QName: tc|EXTERNAL_NODE_COMPARISON_ERR
+        @@@@enDesc:
+          An attempt is made to compare nodes that are from
+          different DOM implementations that do not coordinate
+          to return consistent implementation-specific results.
+        @@@@XParamParamName:
+        @@@@ecore:hasParameter:
+          @@@@@@: c|node
+          @@@@@enDesc:
+            The compared node.
 
      @@XConst:
       @@@QName: c|INUSE_ATTRIBUTE_ERR
@@ -4406,6 +4417,13 @@ IFCls3Def:
       In addition, applications can access values by hash keys
       in camel-case convention as in ECMAScript binding.
 
+  @enImplNote:
+    @@ddid: todo
+    @@@:
+      {TODO::
+        Improve quality
+      }
+
   @ResourceDef:
     @@QName: DOMCore|getConfigObject
     @@rdf:type: DISPerl|BlockCode
@@ -4432,7 +4450,8 @@ IFCls3Def:
       @@@enDesc:
         The <IF::DOMConfiguration> object tied to a hash.
     @@Return:
-      $r = $domConfig;
+      @@@PerlDef:
+        $r = $domConfig;
 
   @Method:
     @@Name: setParameter
@@ -5328,6 +5347,11 @@ boolCParam:
   @nodeProp: charnorm
   @IsSupportRequired:1
   @c:targetType: tc|Document
+  @enDesc:
+    {NOTE::
+      This configuration parameter affects to the 
+      <M::Node.normalize> method.
+    }
   @TrueCase:
     @@IsSupportRequired:0
     @@enDesc:

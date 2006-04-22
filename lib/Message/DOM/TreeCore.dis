@@ -12,7 +12,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/04/16 08:20:27 $
+    $Date: 2006/04/22 05:14:19 $
 
   @Require:
     @@Module:
@@ -159,13 +159,13 @@ ElementTypeBinding:
     @@ForCheck: !=ManakaiDOM|ManakaiDOM
 
 ElementTypeBinding:
-  @Name: L12Method
+  @Name: L123Method
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: DISLang|Method
     @@ForCheck: !=ManakaiDOM|ManakaiDOM
-  ## Modified in DOM Level 2
+  ## Modified in DOM Level 2 and 3
 
 ElementTypeBinding:
   @Name: L13Method
@@ -3785,61 +3785,6 @@ IFCls1Def:
         $ref => $node,
       }__;
 
-  @L3Bitmasks:
-    @@QName: DocumentPosition
-
-     @@Description:
-       @@@lang:en
-       @@@@:
-         A bitmask indicating the relative document position of a node 
-         with respect to another node.
-
-     @@Const:
-        @@@Name:  DOCUMENT_POSITION_DISCONNECTED
-        @@@intValue:  0x01
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            The two nodes are disconnected.  Order between disconnected nodes 
-            is always implementation-specific.
-     @@Const:
-        @@@Name:  DOCUMENT_POSITION_PRECEDING
-        @@@intValue:  0x02
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            The node precedes the reference node.
-     @@Const:
-        @@@Name:  DOCUMENT_POSITION_FOLLOWING
-        @@@intValue:  0x04
-        @@@Description:
-          @@@@lang:en
-          @@@@@: The node fllows the reference node.
-     @@Const:
-        @@@Name:  DOCUMENT_POSITION_CONTAINS
-        @@@intValue:  0x08
-        @@@Description: 
-          @@@@lang:en
-          @@@@@:
-            The node contains the reference node.  A node that 
-            contains is always preceding, too.
-     @@Const:
-        @@@Name:  DOCUMENT_POSITION_CONTAINED_BY
-        @@@intValue:  0x10
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            The node is contained by the reference node. 
-            A node that is contained is always following, too.
-     @@Const:
-        @@@Name:  DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC
-        @@@intValue:  0x20
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            The determination of preceding versus following is 
-            implementation-specific.
-
   @Method:
     @@Name: cloneNode
     @@DISCore:resourceType: DISLang|Constructor
@@ -4234,13 +4179,6 @@ IFCls1Def:
         $test->assert_isa ($clone, <IFName::tx|EntityReference>);
         $test->assert_equals ($clone-><AG::Node.textContent>, '');
         $test->assert_false ($clone-><AG::tx|EntityReference.manakaiExpanded>);
-
-  @enImplNote:
-    @@ddid: pending
-    @@@:
-      baseURI, compareDocumentPosition, isDefaultNamespace,
-      isEqualNode, isSupported, lookupNamespaceURI,
-      lookupPrefix, normalize
 
   @L3Method:
     @@Name: getFeature
@@ -4711,16 +4649,364 @@ IFCls1Def:
     @@enImplNote:
       See <URI::http://suika.fam.cx/gate/2005/sw/baseURI>.
 
+  @L3Bitmasks:
+    @@QName: DocumentPosition
+    @@enDesc:
+      A <Q::DocumentPosition> value is a bitmask indicating the
+      relative document position of a node with respect to 
+      another node.
+
+      = If the two nodes being compared are the same node, then
+        no flags are set on the result.
+
+      {OLI:: Otherwise, the order of two nodes is determined by
+             looking for common containers, i.e. containers that
+             contain both nodes.
+
+               - A node directly contains any child nodes.
+
+               - A node directly contains any other nodes attached
+                 to it such as attributes contained in an element
+                 or entities and notations contained in a document type.
+
+               - Nodes contained in contained nodes are also contained,
+                 but less-directly as the number of interventing
+                 containers increases.
+
+      }
+
+      = If there is no common container node, then the order is 
+        based upon order between the root container of each node that
+        is in no container.  In this case, the result is disconnected
+        and implementation-specific.  The result is stable as long
+        as these outermost containing nodes remain in memory
+        and are not inserted into some other containing node.
+        This would be the case when the nodes belong to different documents
+        or fragments, and cloning the document or inserting a fragment
+        might change the order.
+
+      If one of the nodes being compared contains the other node,
+      then the cotnainer node precedes the contained node,
+      and reversely the contained node follows the container.
+
+      If neither of the previous cases apply, then there exists 
+      the most direct container common to both nodes being compared.
+      In this case, the order is determined based upon the
+      two determining nodes directly contained in the most direct
+      common container that either are or contain the corresponding
+      nodes being compared.
+
+      - If these two determining nodes are both child nodes, then
+        the natural DOM order of these determining nodes within the
+        containing node is returned as the order of the corresponding
+        nodes.
+
+      - If one of the two determining nodes is a child node and
+        the other is not, then the corresponding node of the child
+        node follows the corresponding node of the non-child node.
+
+      - If neither of the two determining node is a child node 
+        and one determining node has a greater value of the
+        <A::Node.nodeType> attribute than the other, then the
+        corresponding node precedes the other.
+
+      - If neither of the two determining node is a child node
+        and the <A::Node.nodeType> is the same for both
+        determining nodes, then an implementation-dependent
+        order between teh determining nodes is returned.
+        This order is stable as long as no nodes of the same
+        <A::Node.nodeType> are inserted into or removed from
+        the direct container.
+    @@Const:
+      @@@Name: DOCUMENT_POSITION_DISCONNECTED
+      @@@intValue: 0x01
+      @@@enDesc:
+        The two nodes are disconnected.  Order between disconnected
+        nodes is always implementation-specific.
+    @@Const:
+      @@@Name: DOCUMENT_POSITION_PRECEDING
+      @@@intValue: 0x02
+      @@@enDesc:
+        The second node precedes the reference node.
+    @@Const:
+      @@@Name: DOCUMENT_POSITION_FOLLOWING
+      @@@intValue: 0x04
+      @@@enDesc:
+        The node follows the reference node.
+    @@Const:
+      @@@Name: DOCUMENT_POSITION_CONTAINS
+      @@@intValue: 0x08
+      @@@enDesc:
+        The node contains the reference node.
+
+          {NOTE::
+            A node that contains is always preceding.
+          }
+    @@Const:
+      @@@Name: DOCUMENT_POSITION_CONTAINED_BY
+      @@@intValue: 0x10
+      @@@enDesc:
+        The node is contained by the reference node.
+
+          {NOTE::
+            A node that is contained is always following.
+          }
+    @@Const:
+      @@@Name: DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC
+      @@@intValue: 0x20
+      @@@enDesc:
+        The determination of preceding versus following 
+        is implementation-specific.
+
   @L3Method:
     @@Name: compareDocumentPosition
-     @@Param:
-        @@@Name:  other
-        @@@Type:  Node
-     @@Return:
-        @@@Type:  
-          DOMMain:unsigned-short||ManakaiDOM|all
-        @@@actualType: DocumentPosition
-#        @@@Exception[list]:  DOMException
+    @@enDesc:
+      Compares the node, i.e. the <DFN::reference node>, with
+      another node with regard to their position in the 
+      document and according to the document order.
+    @@Param:
+      @@@Name: other
+      @@@Type: Node
+      @@@enDesc:
+        The node to compare against the reference node.
+    @@Return:
+      @@@Type: unsignedShort
+      @@@dis:actualType: DocumentPosition
+      @@@enDesc:
+        How the <P::other> node is positioned relatively to the reference node.
+      @@@dx:raises:
+        @@@@@: tc|EXTERNAL_NODE_COMPARISON_ERR
+        @@@@enDesc:
+          When the compared node are from different DOM implementations
+          that do not coordinate to return consistent implementation-specific
+          results.
+      @@@PerlDef:
+        __DEEP{
+          R: {
+            my @acontainer = ($self);
+            my @bcontainer = ($other);
+            F: {
+              A: while (true) {
+                if ($acontainer[-1] eq $bcontainer[-1]) {
+                  last F;
+                } else {
+                  my $ap;
+                  my $atype = $acontainer[-1]-><AG::Node.nodeType>;
+                  if ($atype == <C::Node.ATTRIBUTE_NODE>) {
+                    $ap = $acontainer[-1]-><AG::Attr.ownerElement>;
+                  } elsif ($atype == <C::Node.ENTITY_NODE>) {
+                    $ap = $acontainer[-1]
+                              -><AG::tx|Entity.ownerDocumentTypeDefinition>;
+                  } elsif ($atype == <C::Node.NOTATION_NODE>) {
+                    $ap = $acontainer[-1]
+                              -><AG::tx|Notation.ownerDocumentTypeDefinition>;
+                  } elsif ($atype == <C::Node.ELEMENT_TYPE_DEFINITION_NODE>) {
+                    $ap = $acontainer[-1]
+                              -><AG::ETDef.ownerDocumentTypeDefinition>;
+                  } elsif ($atype == <C::Node.ATTRIBUTE_DEFINITION_NODE>) {
+                    $ap = $acontainer[-1]
+                              -><AG::ATDef.ownerElementTypeDefinition>;
+                  } else {
+                    $ap = $acontainer[-1]-><AG::Node.parentNode>;
+                  }
+                  if (defined $ap) {
+                    push @acontainer, $ap;
+                  } else {
+                    last A;
+                  }
+                }
+              } # A
+
+              B: while (true) {
+                if ($acontainer[-1] eq $bcontainer[-1]) {
+                  last F;
+                } else {
+                  my $bp;
+                  my $btype = $bcontainer[-1]-><AG::Node.nodeType>;
+                  if ($btype == <C::Node.ATTRIBUTE_NODE>) {
+                    $bp = $bcontainer[-1]-><AG::Attr.ownerElement>;
+                  } elsif ($btype == <C::Node.ENTITY_NODE>) {
+                    $bp = $bcontainer[-1]
+                              -><AG::tx|Entity.ownerDocumentTypeDefinition>;
+                  } elsif ($btype == <C::Node.NOTATION_NODE>) {
+                    $bp = $bcontainer[-1]
+                              -><AG::tx|Notation.ownerDocumentTypeDefinition>;
+                  } elsif ($btype == <C::Node.ELEMENT_TYPE_DEFINITION_NODE>) {
+                    $bp = $bcontainer[-1]
+                              -><AG::ETDef.ownerDocumentTypeDefinition>;
+                  } elsif ($btype == <C::Node.ATTRIBUTE_DEFINITION_NODE>) {
+                    $bp = $bcontainer[-1]
+                              -><AG::ATDef.ownerElementTypeDefinition>;
+                  } else {
+                    $bp = $bcontainer[-1]-><AG::Node.parentNode>;
+                  }
+                  if (defined $bp) {
+                    push @bcontainer, $bp;
+                  } else {
+                    last B;
+                  }
+                }
+              } # B
+
+              ## Disconnected
+              if ($bcontainer[-1]->isa (<ClassName::Node>)) {
+                $r = <C::Node.DOCUMENT_POSITION_DISCONNECTED>
+                   | <C::Node.DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC>
+                   | ((${<Code::mg|getNodeID||ManakaiDOM|all::
+                                    $ref = {$acontainer[-1]}>} cmp
+                       ${<Code::mg|getNodeID||ManakaiDOM|all::
+                                    $ref = {$bcontainer[-1]}>})
+                          > 0 ? <C::Node.DOCUMENT_POSITION_FOLLOWING>
+                              : <C::Node.DOCUMENT_POSITION_PRECEDING>);
+              } else {
+                $r = <C::Node.DOCUMENT_POSITION_DISCONNECTED>
+                   | <C::Node.DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC>
+                   | <C::Node.DOCUMENT_POSITION_FOLLOWING>;
+                last F;
+              }
+              last R;
+            } # F
+
+            ## Common container found
+            if (@acontainer >= 2) {
+              if (@bcontainer >= 2) {
+                my $acnt = $acontainer[-2]-><AG::Node.nodeType>;
+                my $bcnt = $bcontainer[-2]-><AG::Node.nodeType>;
+                if ($acnt == <C::Node.ATTRIBUTE_NODE> or
+                    $acnt == <C::Node.ENTITY_NODE> or
+                    $acnt == <C::Node.NOTATION_NODE> or
+                    $acnt == <C::Node.ELEMENT_TYPE_DEFINITION_NODE> or
+                    $acnt == <C::Node.ATTRIBUTE_DEFINITION_NODE>) {
+                  if ($acnt == $bcnt) {
+                    $r = <C::Node.DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC>
+                       | (($acontainer[-2]-><AG::Node.nodeName> cmp
+                           $bcontainer[-2]-><AG::Node.nodeName>)
+                              > 0 ? <C::Node.DOCUMENT_POSITION_FOLLOWING>
+                                  : <C::Node.DOCUMENT_POSITION_PRECEDING>);
+                  } elsif ($bcnt == <C::Node.ATTRIBUTE_NODE> or
+                           $bcnt == <C::Node.ENTITY_NODE> or
+                           $bcnt == <C::Node.NOTATION_NODE> or
+                           $bcnt == <C::Node.ELEMENT_TYPE_DEFINITION_NODE> or
+                           $bcnt == <C::Node.ATTRIBUTE_DEFINITION_NODE>) {
+                    $r = (($acnt < $bcnt)
+                                  ? <C::Node.DOCUMENT_POSITION_FOLLOWING>
+                                  : <C::Node.DOCUMENT_POSITION_PRECEDING>);
+                  } else {
+                    ## A: Non-child and B: child
+                    $r = <C::Node.DOCUMENT_POSITION_FOLLOWING>;
+                  }
+                } elsif ($bcnt == <C::Node.ATTRIBUTE_NODE> or
+                         $bcnt == <C::Node.ENTITY_NODE> or
+                         $bcnt == <C::Node.NOTATION_NODE> or
+                         $bcnt == <C::Node.ELEMENT_TYPE_DEFINITION_NODE> or
+                         $bcnt == <C::Node.ATTRIBUTE_DEFINITION_NODE>) {
+                  ## A: Child and B: non-child
+                  $r = <C::Node.DOCUMENT_POSITION_PRECEDING>;
+                } else {
+                  ## A and B are both children
+                  for my $cn (@{$acontainer[-1]-><AG::Node.childNodes>}) {
+                    if ($cn eq $acontainer[-2]) {
+                      $r = <C::Node.DOCUMENT_POSITION_FOLLOWING>;
+                      last R;
+                    } elsif ($cn eq $bcontainer[-2]) {
+                      $r = <C::Node.DOCUMENT_POSITION_PRECEDING>;
+                      last R;
+                    }
+                  }
+                  ## TODO: Assertion
+                }
+              } else {
+                ## B contains A
+                $r = <C::Node.DOCUMENT_POSITION_CONTAINS>
+                   | <C::Node.DOCUMENT_POSITION_PRECEDING>;
+              }
+            } else {
+              if (@bcontainer >= 2) {
+                ## A contains B
+                $r = <C::Node.DOCUMENT_POSITION_CONTAINED_BY>
+                   | <C::Node.DOCUMENT_POSITION_FOLLOWING>;
+              } else {
+                ## A eq B
+                $r = 0;
+              }
+            }
+          } # R
+        }__;
+
+    @@Test:
+      @@@QName: Node.compareDocumentPosition.1.test
+      @@@enDesc:
+        Disconnect, same document.
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+        my $e1 = $doc-><M::Document.createElement> ('e1');
+        my $e2 = $doc-><M::Document.createElement> ('e2');
+
+        my $dp2 = $e1-><M::Node.compareDocumentPosition> ($e2);
+
+        $test->id ('2.DISCONNECTED');
+        $test->assert_true ($dp2 & <C::Node.DOCUMENT_POSITION_DISCONNECTED>);
+
+        $test->id ('2.IMPLEMENTATION_SPECIFIC');
+        $test->assert_true
+                 ($dp2 & <C::Node.DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC>);
+
+        $test->id ('2.P_OR_F');
+        $test->assert_true (($dp2 & <C::Node.DOCUMENT_POSITION_PRECEDING>) or
+                            ($dp2 & <C::Node.DOCUMENT_POSITION_FOLLOWING>));
+
+        my $dp1 = $e2-><M::Node.compareDocumentPosition> ($e1);
+
+        $test->id ('1.DISCONNECTED');
+        $test->assert_true ($dp1 & <C::Node.DOCUMENT_POSITION_DISCONNECTED>);
+
+        $test->id ('1.IMPLEMENTATION_SPECIFIC');
+        $test->assert_true
+                 ($dp1 & <C::Node.DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC>);
+
+        $test->id ('1.P_OR_F');
+        $test->assert_true (($dp1 & <C::Node.DOCUMENT_POSITION_PRECEDING>) or
+                            ($dp1 & <C::Node.DOCUMENT_POSITION_FOLLOWING>));
+    @@Test:
+      @@@QName: Node.compareDocumentPosition.2.test
+      @@@enDesc:
+        Two children.
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+        my $e1 = $doc-><M::Document.createElement> ('e1');
+        my $e2 = $doc-><M::Document.createElement> ('e2');
+
+        my $pe = $doc-><M::Document.createElement> ('pe');
+        $pe-><M::Node.appendChild> ($e1);
+        $pe-><M::Node.appendChild> ($e2);
+
+        my $dp2 = $e1-><M::Node.compareDocumentPosition> ($e2);
+
+        $test->id ('2.FOLLOWING');
+        $test->assert_true ($dp2 & <C::Node.DOCUMENT_POSITION_FOLLOWING>);
+
+        my $dp1 = $e2-><M::Node.compareDocumentPosition> ($e1);
+
+        $test->id ('1.PRECEDING');
+        $test->assert_true ($dp1 & <C::Node.DOCUMENT_POSITION_PRECEDING>);
+
+    @@enImplNote:
+      @@@ddid: test
+      @@@@:
+        {TODO::
+           More test cases!
+        }
+
+  @enImplNote:
+    @@ddid: cmpops
+    @@@:
+      {TODO::
+         Define <Perl::<lt>=<gt>> and/or <Perl::cmp> operators.
+      }
 
   @L3Method:
     @@Name: lookupNamespaceURI
@@ -5470,57 +5756,449 @@ IFCls1Def:
         $test->id ('grandparent.element');
         $test->assert_equals ($el2-><AG::Node.manakaiParentElement>, $el);
 
-  @L12Method:
+  @L123Method:
     @@Name: normalize
+    @@enDesc:
+      Puts all <IF::Text> nodes in the full depth of the subtree
+      underneath the <IF::Node>, including <IF::Attr> nodes
+      <SRC::DOM1SE, DOM2, DOM3>, <IF::tx|Entity> nodes <SRC::manakai>,
+      <IF::d|ElementTypeDefinition> nodes <SRC::manakai>, and
+      <IF::d|AttributeDefinition> nodes <SRC::manakai>,
+      into a <QUOTE::normal> form where only structure (e.g.
+      elements, comments, processing instructions, <XML::CDATA>
+      sections, and entity references> separates <IF::Text> nodes,
+      i.e. there are neither adjacent <IF::Text> nodes <SRC::DOM1, DOM2, DOM3>
+      nor empty <IF::Text> nodes <SRC::DOM2, DOM3>.
 
-     @@Description:
-       @@@lang:en
-       @@@@:
-         Put all <IF::Text> nodes in the full depth of the sub-tree 
-         underneath this <IF::Node>, including attribute nodes 
-         attaced to the <IF::Element>, 
-         into a <QUOTE::normal> form where only structures separate
-         <IF::Text> nodes, i.e. there are neither adjacent <IF::Text> 
-         nodes nor empty <IF::Text> nodes. <SRC::DOM 1, 2, 3>
-       \
-         If the parameter <cfg::normalize-characters> of the 
-         <A::Document.domConfig> is <DOM::true>, the characters 
-         of the <IF::Text> nodes will also be fully normalized. 
-         <SRC::DOM 3>
+        {NOTE::
+          Adjacent <IF::tx|CDATASection> nodes are not metged
+          by this method.
+        }
 
-    Adjacent <IF::tx|CDATASection> nodes are not merged.
-    <SRC::DOM1, DOM2, DOM3>
+        {NOTE::
+          This method can be used to ensure that the DOM view of a
+          document is the same as if it were saved and re-loaded,
+          and is useful when operations that depend on a
+          particular document tree structure are to be used.
+          Note that in cases where the document contains
+          <IF::tx|CDATASection> and / or <IF::tx|EntityReference> nodes,
+          the <M::Node.normalize> operation alone may not be 
+          sufficient for e.g. XPath lookups; the <M::Document.nornalizeDocument>
+          method with appropriate configuration parameters
+          might be useful for such cases.
+        }
 
-     @@ImplNote:
-       @@@lang:en
-       @@@@:
-         The spec does not say to normalize nodes other than 
-         <IF::Text> (such as <IF::tx|CDATASection>, 
-         <IF::Comment> and so on).
-     @@Return:
+      If the <cfg::c|normalize-characters> configuration
+      parameter of the document is <DOM::true>, the method will
+      also fully normalize the characters of the <IF::Text> nodes.
+      <SRC::DOM3>
+
+        {SpecIssue::
+           The spec defines in terms of <A::Node.ownerDocument>
+           but a <IF::Document> never has <A::Node.ownerDocument>.
+        }
+
+        {SpecIssue::
+          <kwd:MAY> or <kwd:MUST-NOT> one of adjacent <IF::Text> nodes
+          be reused?
+        }
+
+        {SpecIssue::
+          <A::Text.isElementContentWhitespace>?
+        }
+
+        {SpecIssue::
+          If the node itself is a <IF::Text>?  It does not belong
+          to <QUOTE::the sub-tree underneath this <IF::Node>>, do it?
+          What about character normalization?
+        }
+
+        {SpecIssue::
+          Entities attached to a document type are normalized?
+          (According to DOM spec they are read-only so that
+          always normalized, while manakai allows modifications to them.)
+        }
+
+      For an <IF::ETDef> node, all the <IF::ATDef> nodes contained
+      in the <A::ETDef.attributeDefinitions> collection <kwd:MUST> be
+      normalized.  <SRC::manakai>
+
+      For an <IF::ATDef> node, it <kwd:MUST> be normalized as if
+      it were an <IF::Attr> node.  <SRC::manakai>
+
+        {NOTE::
+           In DOM Level 1, this method is defined only in the <IF::Element>
+           interface.
+        }
+    @@Return:
       @@@dx:raises:
-         @@@@@:
-           MDOMX:NOMOD_THIS
-         @@@@Description:
-           @@@@@lang:en
-           @@@@@@:
-             This node is read-only. 
-         @@@@For:
-           ManakaiDOM:ManakaiDOM
-      @@@dx:raises:
-         @@@@@: c|NOMOD_DESCENDANT_ERR
-         @@@@Description:
-           @@@@@lang:en
-           @@@@@@:
-             One of descendant (or attribute) is read-only. 
-         @@@@For:
-           ManakaiDOM:ManakaiDOM
-     @@ImplNote:
-       @@@lang:en
-       @@@@:
-         This method was defined in the "Element" interface in the DOM 
-         Level 1, but has beem moved to the "Node" interface in the 
-         DOM Level 2.
+        @@@@@: c|NO_MODIFICATION_ALLOWED_ERR
+        @@@@enDesc:
+          If a node that is to be modified is read-only.
+ 
+            {SpecIssue::
+              Not in the spec.
+
+              {NOTE::
+                Even in DOM spec read-only node might be necessary
+                to be modified, if, e.g., a node is moved from
+                an entity subtree to any other point.
+              }
+            }
+
+            {NOTE::
+              Unlike exceptions in other methods, this exception
+              might be raised <EM::after> some modifications to
+              other nodes (that are not read-only) is performed.
+
+              {SpecIssue::
+                Is this allowed?
+              }
+            }
+      @@@PerlDef:
+        __DEEP{
+          my $ptext;
+
+          ## Children
+          my @remove;
+          for my $cn (@{$self-><AG::Node.childNodes>}) {
+            if ($cn-><AG::Node.nodeType> == <C::Node.TEXT_NODE>) {
+              my $nv = $cn-><AG::Node.nodeValue>;
+              if (length $nv) {
+                if (defined $ptext) {
+                  $ptext-><M::Node.manakaiAppendText> ($nv);
+                  $ptext-><AS::Text.isElementContentWhitespace> (true) 
+                    if $cn-><AG::Text.isElementContentWhitespace> and
+                       $ptext-><AG::Text.isElementContentWhitespace>;
+                  push @remove, $cn;
+                } else {
+                  $ptext = $cn;
+                }
+              } else {
+                push @remove, $cn;
+              }
+            } else {
+              $cn-><M::Node.normalize>;
+              undef $ptext;
+            }
+          }
+          for (@remove) {
+            $self-><M::Node.removeChild> ($_);
+          }
+
+          my $nt = $self-><AG::Node.nodeType>;
+          if ($nt == <C::Node.ELEMENT_NODE>) {
+            ## Attributes
+            my $attrs = $self-><AG::Node.attributes>;
+            for my $attr (@{$attrs}) {
+              $attr-><M::Node.normalize>;
+            }
+          } elsif ($nt == <C::Node.DOCUMENT_TYPE_NODE>) {
+            ## Element type definitions
+            my $ets = $self-><AG::DTDef.elementTypes>;
+            for my $et (@{$ets}) {
+              $et-><M::Node.normalize>;
+            }
+          } elsif ($nt == <C::Node.ELEMENT_TYPE_DEFINITION_NODE>) {
+            ## Attribute definitions
+            my $ats = $self-><AG::ETDef.attributeDefinitions>;
+            for my $at (@{$ats}) {
+              $at-><M::Node.normalize>;
+            }
+          }
+        }__;
+      @@@enImplNote:
+        {TODO::
+          Implement the <CFG::cfg|normalize-characters> configuration parameter.
+        }
+
+    @@Test:
+      @@@QName: Node.normalize.1.test
+      @@@enDesc:
+        Two direct child <IF::Text> nodes.
+      @@@PerlDef:
+        my $el;
+        __CODE{tc|createElementForTest:: $el => $el}__;
+
+        my $doc = $el-><AG::Node.ownerDocument>;
+
+        my $t1 = $doc-><M::Document.createTextNode> ('t1');
+        my $t2 = $doc-><M::Document.createTextNode> ('t2');
+        $el-><M::Node.appendChild> ($t1);
+        $el-><M::Node.appendChild> ($t2);
+
+        $el-><M::Node.normalize>;
+
+        $test->id ('textContent');
+        $test->assert_equals ($el-><AG::Node.textContent>, 't1t2');
+
+        $test->id ('length');
+        $test->assert_num_equals
+                 (actual_value => $el-><AG::Node.childNodes>
+                                     -><AG::NodeList.length>,
+                  expected_value => 1);
+    @@Test:
+      @@@QName: Node.normalize.2.test
+      @@@enDesc:
+        Four direct child <IF::Text> nodes.
+      @@@PerlDef:
+        my $el;
+        __CODE{tc|createElementForTest:: $el => $el}__;
+
+        my $doc = $el-><AG::Node.ownerDocument>;
+
+        my $t1 = $doc-><M::Document.createTextNode> ('t1');
+        my $t2 = $doc-><M::Document.createTextNode> ('t2');
+        my $t3 = $doc-><M::Document.createTextNode> ('t3');
+        my $t4 = $doc-><M::Document.createTextNode> ('t4');
+        $el-><M::Node.appendChild> ($t1);
+        $el-><M::Node.appendChild> ($t2);
+        $el-><M::Node.appendChild> ($t3);
+        $el-><M::Node.appendChild> ($t4);
+
+        $el-><M::Node.normalize>;
+
+        $test->id ('textContent');
+        $test->assert_equals ($el-><AG::Node.textContent>, 't1t2t3t4');
+
+        $test->id ('length');
+        $test->assert_num_equals
+                 (actual_value => $el-><AG::Node.childNodes>
+                                     -><AG::NodeList.length>,
+                  expected_value => 1);
+    @@Test:
+      @@@QName: Node.normalize.3.test
+      @@@enDesc:
+        Two and two direct child <IF::Text> nodes blocked by a 
+        <IF::tx|CDATASection> node.
+      @@@PerlDef:
+        my $el;
+        __CODE{tc|createElementForTest:: $el => $el}__;
+
+        my $doc = $el-><AG::Node.ownerDocument>;
+
+        my $t1 = $doc-><M::Document.createTextNode> ('t1');
+        my $t2 = $doc-><M::Document.createTextNode> ('t2');
+        my $c1 = $doc-><M::Document.createCDATASection> ('c1');
+        my $t3 = $doc-><M::Document.createTextNode> ('t3');
+        my $t4 = $doc-><M::Document.createTextNode> ('t4');
+        $el-><M::Node.appendChild> ($t1);
+        $el-><M::Node.appendChild> ($t2);
+        $el-><M::Node.appendChild> ($c1);
+        $el-><M::Node.appendChild> ($t3);
+        $el-><M::Node.appendChild> ($t4);
+
+        $el-><M::Node.normalize>;
+
+        $test->id ('textContent');
+        $test->assert_equals ($el-><AG::Node.textContent>, 't1t2c1t3t4');
+
+        $test->id ('firstChild.textContent');
+        $test->assert_equals ($el-><AG::Node.firstChild>-><AG::Node.textContent>,
+                              't1t2');
+
+        $test->id ('lastChild.textContent');
+        $test->assert_equals ($el-><AG::Node.lastChild>-><AG::Node.textContent>,
+                              't3t4');
+
+        $test->id ('length');
+        $test->assert_num_equals
+                 (actual_value => $el-><AG::Node.childNodes>
+                                     -><AG::NodeList.length>,
+                  expected_value => 3);
+    @@Test:
+      @@@QName: Node.normalize.4.test
+      @@@enDesc:
+        Two direct child <IF::Text> nodes where the first one is empty.
+      @@@PerlDef:
+        my $el;
+        __CODE{tc|createElementForTest:: $el => $el}__;
+
+        my $doc = $el-><AG::Node.ownerDocument>;
+
+        my $t1 = $doc-><M::Document.createTextNode> ('');
+        my $t2 = $doc-><M::Document.createTextNode> ('t2');
+        $el-><M::Node.appendChild> ($t1);
+        $el-><M::Node.appendChild> ($t2);
+
+        $el-><M::Node.normalize>;
+
+        $test->id ('textContent');
+        $test->assert_equals ($el-><AG::Node.textContent>, 't2');
+
+        $test->id ('length');
+        $test->assert_num_equals
+                 (actual_value => $el-><AG::Node.childNodes>
+                                     -><AG::NodeList.length>,
+                  expected_value => 1);
+    @@Test:
+      @@@QName: Node.normalize.5.test
+      @@@enDesc:
+        Two direct child <IF::Text> nodes where the second one is empty.
+      @@@PerlDef:
+        my $el;
+        __CODE{tc|createElementForTest:: $el => $el}__;
+
+        my $doc = $el-><AG::Node.ownerDocument>;
+
+        my $t1 = $doc-><M::Document.createTextNode> ('t1');
+        my $t2 = $doc-><M::Document.createTextNode> ('');
+        $el-><M::Node.appendChild> ($t1);
+        $el-><M::Node.appendChild> ($t2);
+
+        $el-><M::Node.normalize>;
+
+        $test->id ('textContent');
+        $test->assert_equals ($el-><AG::Node.textContent>, 't1');
+
+        $test->id ('length');
+        $test->assert_num_equals
+                 (actual_value => $el-><AG::Node.childNodes>
+                                     -><AG::NodeList.length>,
+                  expected_value => 1);
+    @@Test:
+      @@@QName: Node.normalize.6.test
+      @@@enDesc:
+        A direct child <IF::Text> nodes which is empty.
+      @@@PerlDef:
+        my $el;
+        __CODE{tc|createElementForTest:: $el => $el}__;
+
+        my $doc = $el-><AG::Node.ownerDocument>;
+
+        my $t1 = $doc-><M::Document.createTextNode> ('');
+        $el-><M::Node.appendChild> ($t1);
+
+        $el-><M::Node.normalize>;
+
+        $test->id ('textContent');
+        $test->assert_equals ($el-><AG::Node.textContent>, '');
+
+        $test->id ('length');
+        $test->assert_num_equals
+                 (actual_value => $el-><AG::Node.childNodes>
+                                     -><AG::NodeList.length>,
+                  expected_value => 0);
+    @@Test:
+      @@@QName: Node.normalize.7.test
+      @@@enDesc:
+        Child element which has two direct child <IF::Text> nodes.
+      @@@PerlDef:
+        my $el;
+        __CODE{tc|createElementForTest:: $el => $el}__;
+
+        my $doc = $el-><AG::Node.ownerDocument>;
+
+        my $pe = $doc-><M::Document.createElement> ('pe');
+        $pe-><M::Node.appendChild> ($el);
+
+        my $t1 = $doc-><M::Document.createTextNode> ('t1');
+        my $t2 = $doc-><M::Document.createTextNode> ('t2');
+        $el-><M::Node.appendChild> ($t1);
+        $el-><M::Node.appendChild> ($t2);
+
+        $pe-><M::Node.normalize>;
+
+        $test->id ('textContent');
+        $test->assert_equals ($el-><AG::Node.textContent>, 't1t2');
+
+        $test->id ('length');
+        $test->assert_num_equals
+                 (actual_value => $el-><AG::Node.childNodes>
+                                     -><AG::NodeList.length>,
+                  expected_value => 1);
+    @@Test:
+      @@@QName: Node.normalize.attr.1.test
+      @@@enDesc:
+        Element with an attribute with two <IF::Text> nodes.
+      @@@PerlDef:
+        my $el;
+        __CODE{tc|createElementForTest:: $el => $el}__;
+
+        my $doc = $el-><AG::Node.ownerDocument>;
+
+        my $attr = $doc-><M::Document.createAttribute> ('a');
+        $el-><M::Element.setAttributeNode> ($attr);
+
+        my $t1 = $doc-><M::Document.createTextNode> ('t1');
+        my $t2 = $doc-><M::Document.createTextNode> ('t2');
+        $attr-><M::Node.appendChild> ($t1);
+        $attr-><M::Node.appendChild> ($t2);
+
+        $el-><M::Node.normalize>;
+
+        $test->id ('textContent');
+        $test->assert_equals ($attr-><AG::Node.textContent>, 't1t2');
+
+        $test->id ('length');
+        $test->assert_num_equals
+                 (actual_value => $attr-><AG::Node.childNodes>
+                                       -><AG::NodeList.length>,
+                  expected_value => 1);
+    @@Test:
+      @@@QName: Node.normalize.atdef.1.test
+      @@@enDesc:
+        Element type definition with an attribute
+        definition with two <IF::Text> nodes.
+      @@@PerlDef:
+        my $el;
+        __CODE{d|createETDefForTest:: $etdef => $el}__;
+
+        my $doc = $el-><AG::Node.ownerDocument>;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype> => '3.0');
+
+        my $attr = $docx-><M::DocumentX.createAttributeDefinition> ('a');
+        $el-><M::ETDef.setAttributeDefinitionNode> ($attr);
+
+        my $t1 = $doc-><M::Document.createTextNode> ('t1');
+        my $t2 = $doc-><M::Document.createTextNode> ('t2');
+        $attr-><M::Node.appendChild> ($t1);
+        $attr-><M::Node.appendChild> ($t2);
+
+        $el-><M::Node.normalize>;
+
+        $test->id ('textContent');
+        $test->assert_equals ($attr-><AG::Node.textContent>, 't1t2');
+
+        $test->id ('length');
+        $test->assert_num_equals
+                 (actual_value => $attr-><AG::Node.childNodes>
+                                       -><AG::NodeList.length>,
+                  expected_value => 1);
+    @@Test:
+      @@@QName: Node.normalize.etdef.1.test
+      @@@enDesc:
+        Document type definition with an
+        element type definition with an attribute
+        definition with two <IF::Text> nodes.
+      @@@PerlDef:
+        my $el;
+        __CODE{d|createETDefForTest:: $etdef => $el}__;
+
+        my $doc = $el-><AG::Node.ownerDocument>;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype> => '3.0');
+
+        my $dtdef = $docx-><M::DocumentX.createDocumentTypeDefinition> ('d');
+        $dtdef-><M::DTDef.setElementTypeDefinitionNode> ($el);
+
+        my $attr = $docx-><M::DocumentX.createAttributeDefinition> ('a');
+        $el-><M::ETDef.setAttributeDefinitionNode> ($attr);
+
+        my $t1 = $doc-><M::Document.createTextNode> ('t1');
+        my $t2 = $doc-><M::Document.createTextNode> ('t2');
+        $attr-><M::Node.appendChild> ($t1);
+        $attr-><M::Node.appendChild> ($t2);
+
+        $dtdef-><M::Node.normalize>;
+
+        $test->id ('textContent');
+        $test->assert_equals ($attr-><AG::Node.textContent>, 't1t2');
+
+        $test->id ('length');
+        $test->assert_num_equals
+                 (actual_value => $attr-><AG::Node.childNodes>
+                                       -><AG::NodeList.length>,
+                  expected_value => 1);
 
   @L2Method:
     @@Name: isSupported
@@ -6634,7 +7312,7 @@ ResourceDef:
         @@@@enDesc:
           A <IF::NodeList> returned by <M::Document.getElementsByTagNameNS> 
           or like is unable to be edited. 
-        @@@@ForCheck: tc|ForGetNodeList
+        @@@@ForCheck: !tc|ForChildNodeList
       @@@PerlDef:
         @@@@ForCheck: tc|ForChildNodeList
         @@@@@:
@@ -6647,7 +7325,7 @@ ResourceDef:
             }
           }__;
       @@@PerlDef:
-        @@@@ForCheck: tc|ForGetNodeList
+        @@@@ForCheck: !tc|ForChildNodeList
         @@@@@:
           __EXCEPTION{c|NOMOD_NODELIST_ERR}__;
 
@@ -6754,18 +7432,14 @@ ResourceDef:
         $r = $nodeList;
 
   @IntMethod:
-    @@Perlop:CLEAR
-    @@Description:
-      @@@lang:en
-      @@@@:
-        Removes all items from this list. 
+    @@Perlop: CLEAR
     @@Return:
       @@@dx:raises:
         @@@@@: c|NOMOD_NODELIST_ERR
         @@@@enDesc:
           A <IF::NodeList> returned by <M::Document.getElementsByTagNameNS> 
           or like is unable to be edited. 
-        @@@@ForCheck: tc|ForGetNodeList
+        @@@@ForCheck: !tc|ForChildNodeList
       @@@dx:raises:
         @@@@@: MDOMX|HIERARCHY_BAD_TYPE
         @@@@enDesc:
@@ -6784,7 +7458,7 @@ ResourceDef:
             }
           }__;
       @@@PerlDef:
-        @@@@ForCheck: tc|ForGetNodeList
+        @@@@ForCheck: !tc|ForChildNodeList
         @@@@@:
           __EXCEPTION{c|NOMOD_NODELIST_ERR}__;
 

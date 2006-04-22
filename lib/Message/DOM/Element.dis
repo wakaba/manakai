@@ -13,7 +13,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/04/16 10:05:23 $
+    $Date: 2006/04/22 05:14:19 $
 
   @Require:
     @@Module:
@@ -7771,38 +7771,27 @@ NodeTypeDef:
 
   @IL1OnlyMethod:
     @@Name: normalize
-    @@Description:
-      @@@lang:en
-      @@@@:
-         Puts all <IF::Text> nodes in the full depth of the sub-tree 
-         underneath this <IF::Node>, including attribute nodes 
-         attaced to the <IF::Element>, 
-         into a <QUOTE::normal> form where only structure separates 
-         <IF::Text> nodes, i.e. there are neither adjacent <IF::Text> 
-         nodes nor empty <IF::Text> nodes. 
+    @@enDesc:
+      Puts all <IF::Text> nodes in the full depth of the subtree
+      underneath the <IF::Node>, including <IF::Attr> nodes
+      <SRC::DOM1SE>, <IF::tx|Entity> nodes <SRC::manakai>,
+      <IF::d|ElementTypeDefinition> nodes <SRC::manakai>, and
+      <IF::d|AttributeDefinition> nodes <SRC::manakai>,
+      into a <QUOTE::normal> form where only structure (e.g.
+      elements, comments, processing instructions, <XML::CDATA>
+      sections, and entity references> separates <IF::Text> nodes,
+      i.e. there are never adjacent <IF::Text> nodes.
 
-      Although the <IF::DOMXML:CDATASection> interface implements the
-      <IF::Text> interface, the <M::Node.normalize> method does 
-      not merge adjacent <IF::DOMXML:CDATASection> nodes.
-    @@ImplNote:
-      @@@lang:en
-      @@@@:
-        DOM level 2 and 3 defines <M::Node.normalize> instead 
-        of <M::Element::ManakaiDOM|ManakaiDOM1.normalize>. 
+        {NOTE::
+          Adjacent <IF::tx|CDATASection> nodes are not metged
+          by this method.
+        }
+
+        {NOTE::
+          In DOM Level 2 and later, this method is defined
+          in the <IF::Node> interface.
+        }
     @@Return:
-      @@@dx:raises:
-         @@@@@:
-           MDOMX:NOMOD_THIS
-         @@@@Description:
-           @@@@@lang:en
-           @@@@@@:
-             This node is read-only. 
-      @@@dx:raises:
-         @@@@@: c|NOMOD_DESCENDANT_ERR
-         @@@@Description:
-           @@@@@lang:en
-           @@@@@@:
-             One of descendant (or attribute) is read-only. 
 ##Element
 
 ForDef:

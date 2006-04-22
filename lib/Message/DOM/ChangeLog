@@ -1,3 +1,14 @@
+2006-04-22  Wakaba  <wakaba@suika.fam.cx>
+
+	* DOMCore.dis (NO_MODIFICATION_ALLOWED_ERR): It is now
+	a qualified name.
+	(tc:EXTERNAL_NODE_COMPARISON_ERR): New error type.
+
+	* TreeCore.dis (compareDocumentPosition): Implemented. 
+	(normalize): Implemented.
+	(STORESIZE, CLEAR): Were not implemented for |EmptyNodeList|
+	class.
+
 2006-04-16  Wakaba  <wakaba@suika.fam.cx>
 
 	* DOMCore.dis (OUT_OF_BOUND_ERR, NEGATIVE_INDEX_ERR): Removed.
