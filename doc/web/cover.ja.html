@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<title>manakai ―― インターネット・メッセージと XML のための
+Perl ライブラリ</title>
+<link rel="stylesheet" href="http://suika.fam.cx/www/style/html/xhtml">
+<link rel="copyright" href="http://suika.fam.cx/c/pd" title="Public Domain">
+</head>
+<body>
+<h1>manakai ―― インターネット・メッセージと XML のための
+Perl ライブラリ</h1>
+
+<p><dfn>manakai</dfn> は、 RFC 2822 系インターネット・メッセージと
+XML を処理するための Perl 用オブジェクト指向モジュール群です。</p>
+
+<!-- @@ TODO: 既存のモジュールより優れていることにする -->
+
+<p>manakai は、 DOM 界面を使って XML 文書を操作することができます。
+manakai の DOM 対応状況は次の表の通りです。</p>
+
+<table>
+<thead>
+<tr>
+<th scope="col">モジュール</th>
+<th scope="col">版</th>
+<th scope="col">補足説明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th scope="row">機能</th>
+<td>水準 3 (manakai 独自)</td>
+<td>
+  <p>次のすべてを実装:</p>
+  <ul>
+  <li><code class="DOMi" lang="en">ImplementationRegistry</code></li>
+  <li><code class="DOMi" lang="en">ImplementationSource</code></li>
+  <li><code class="DOMi" lang="en">ImplementationList</code></li>
+  <li><code class="DOMi" lang="en">MinimumImplementation</code></li>
+  <li><code class="DOMi" lang="en">GetFeature</code></li>
+  </ul>
+</td>
+</tr>
+<tr>
+<th scope="row">共通 <abbr lang="en" title="Load and Save">LS</abbr></th>
+<td>水準 3 (manakai 独自)</td>
+<td>
+  <p>次のすべてを実装:</p>
+  <ul>
+  <li><code class="DOMi" lang="en">GLSImplementation</code></li>
+  </ul>
+</td>
+</tr>
+<tr>
+<th scope="row">中核</th>
+<td>水準 1, 2, 3</td>
+<td>
+  <ul>
+  <li><code class="DOMa">whole_text</code>,
+  <code class="DOMm">replace_whole_text</code>,
+  <code class="DOMm">normalize_document</code>,
+  <code class="DOMm">rename_node</code>,
+  <code class="DOMm">import_node</code> は未実装</li>
+  <li><code class="DOMm">normalize</code> で設定引数
+  <code class="DOM">normalize-character</code> は未実装</li>
+  <li>一部の操作は <code class="DOMa">specified</code>
+  を自動的に真にしない</li>
+  </ul>
+</td>
+</tr>
+<tr>
+<th scope="row" lang="en">XML</th>
+<td>水準 1, 2, 3</td>
+<td>
+  <ul>
+  <li><code class="DOMa">internal_subset</code> は未実装</li>
+  </ul>
+</td>
+</tr>
+<tr>
+<th scope="row">XDoctype 定義</th>
+<td>水準 3 案 (manakai 独自)</td>
+<td>
+  <p>次の機能を実装:</p>
+  <ul>
+  <li><code class="DOMi" lang="en">DocumentTypeDefinition</code></li>
+  <li><code class="DOMi" lang="en">ElementTypeDefinition</code></li>
+  <li><code class="DOMi" lang="en">AttributeDefinition</code></li>
+  </ul>
+</td>
+</tr>
+<tr>
+<th scope="row">XDoctype 宣言</th>
+<td>水準 3 案 (manakai 独自)</td>
+<td>
+  <p>次の機能<em>のみ</em>実装:</p>
+  <ul>
+  <li><code class="DOMi" lang="en">DocumentTypeDeclaration</code></li>
+  </ul>
+</td>
+</tr>
+<tr>
+<th scope="row"><abbr lang="en" title="Load and Save">LS</abbr></th>
+<td>水準 3</td>
+<td>
+  <p>次の機能<em>のみ</em>実装:</p>
+  <ul>
+  <li><code class="DOMi" lang="en">LSInput</code></li>
+  <li><code class="DOMi" lang="en">LSOutput</code></li>
+  <li><code class="DOMi" lang="en">LSParser</code>
+  (同期読込みのみ、ほとんどの設定引数は未実装)</li>
+  </ul>
+</td>
+</tr>
+<tr>
+<th scope="row">単純 <abbr lang="en" title="Load and Save">LS</abbr></th>
+<td>第 1.0 版案 (manakai 独自)</td>
+<td>
+  <p>次のすべてを実装:</p>
+  <ul>
+  <li><code class="DOMi" lang="en">SimpleXMLSerializer</code></li>
+  </ul>
+</td>
+</tr>
+<tr>
+<th scope="row">URI 共通</th>
+<td>第 4.0 版 (manakai 独自)</td>
+<td>
+  <p>次のすべてを実装:</p>
+  <ul>
+  <li><code class="DOMi" lang="en">URIImplementation</code></li>
+  <li><code class="DOMi" lang="en">URIReference</code></li>
+  </ul>
+</td>
+</tr>
+</tbody>
+</table>
+
+<p>manakai の RFC 2822 系インターネット・メッセージを操作するためのモジュール群は、
+現在整理中です。</p>
+
+<div class="section" id="download">
+<h2 lang="en">ダウンロード</h2>
+
+<dl>
+<dt>開発版スナップ写真</dt>
+	<dd><a href="http://suika.fam.cx/www/2006/manakai-release/manakai-dev-latest">manakai
+	開発版スナップ写真 (最新版)</a></dd>
+	<dd><a href="http://suika.fam.cx/www/2006/manakai-release/manakai-0.3.1"
+	>manakai 0.3.1 (2006年4月22日)</a></dd>
+<dt>開発版</dt>
+	<dd><a href="http://suika.fam.cx/gate/cvs/messaging/manakai/"
+	lang="en">CVS repository</a> (<a
+	href="http://suika.fam.cx/admin/cvs/">suika.fam.cx</a>)</dd>
+</dl>
+
+</div>
+
+<!-- @@TODO: License description -->
+
+</body>
+</html>

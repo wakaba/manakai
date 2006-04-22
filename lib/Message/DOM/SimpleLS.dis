@@ -14,50 +14,48 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/02/26 14:32:39 $
+    $Date: 2006/04/22 08:31:00 $
 
   @Require:
     @@Module:
       @@@QName: MDOM|GenericLS
       @@@WithFor: ManakaiDOM|ManakaiDOMLatest
     @@Module:
-      @@@QName: MDOM|Tree
+      @@@QName: MDOM|TreeCore
       @@@WithFor: ManakaiDOM|ManakaiDOMLatest
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
 Namespace:
-  @c:
-    http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
   @dis:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
-  @DOMLS:
-    http://suika.fam.cx/~wakaba/archive/2004/dom/ls#
   @f:
     http://suika.fam.cx/~wakaba/archive/2004/dom/feature#
-  @idl:
-    http://suika.fam.cx/~wakaba/archive/2004/dis/IDL#
-  @infoset:
-     http://www.w3.org/2001/04/infoset#
+  @fe:
+    http://suika.fam.cx/www/2006/feature/
+  @gls:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/gls#
   @lang:
-     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
   @kwd:
     http://suika.fam.cx/~wakaba/archive/2005/rfc2119/
   @license:
-     http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
   @ManakaiDOM:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
-  @ManakaiDOMLS2003:
-    http://suika.fam.cx/~wakaba/archive/2004/9/27/mdom-old-ls#
   @MDOM:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
-  @mn:
-    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/ManakaiNode#
-  @null:
-    http://suika.fam.cx/~wakaba/-temp/2003/09/27/null
   @rdf:
     http://www.w3.org/1999/02/22-rdf-syntax-ns#
-  @rdfs:
-    http://www.w3.org/2000/01/rdf-schema#
+  @tc:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/TreeCore/
+  @tcd:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/CharacterData/
+  @td:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/Document/
+  @te:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/Element/
+  @tx:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/XML/
   @undef:
     http://suika.fam.cx/~wakaba/-temp/2003/09/27/undef
   @xml:
@@ -164,15 +162,6 @@ ElementTypeBinding:
     @@ForCheck: !=ManakaiDOM|ManakaiDOM
 
 ElementTypeBinding:
-  @Name: IntMethod
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type: DISLang|Method
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|ForClass
-    @@ManakaiDOM:isForInternal: 1
-
-ElementTypeBinding:
   @Name: Param
   @ElementType:
     dis:ResourceDef
@@ -185,36 +174,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|MethodReturn
-
-ElementTypeBinding:
-  @Name: Attr
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type: DISLang|Attribute
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM
-
-ElementTypeBinding:
-  @Name: Get
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type: DISLang|AttributeGet
-
-ElementTypeBinding:
-  @Name: Set
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type: DISLang|AttributeSet
-
-ElementTypeBinding:
-  @Name: InCase
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type:
-      ManakaiDOM:InCase
 
 ElementTypeBinding:
   @Name: enDesc
@@ -232,31 +191,23 @@ ElementTypeBinding:
 
 ## -- Serializers
 
-ElementTypeBinding:
-  @Name: PropDef
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type:
-      rdf:Property
-
 FeatureDef:
-  @QName: DOMLS|SerializeDocumentInstance
+  @QName: fe|SerializeDocumentInstance
   @FeatureVerDef:
-    @@QName: DOMLS|SerializeDocumentInstance10
+    @@QName: SerializeDocumentInstance10
     @@f:version: 1.0
-    @@f:instanceOf: DOMLS|SerializeDocumentInstance
-    @@f:requires: DOMXML|XMLVersionFeature10
+    @@f:instanceOf: fe|SerializeDocumentInstance
+    @@f:requires: tx|XMLVersionFeature10
     @@enDesc:
       {P:: To support this feature:
          \
          - the serializer class <kwd:MUST> implement the
-           <IF::DOMLS|SimpleXMLSerializer>
+           <IF::SimpleXMLSerializer>
            interface, i.e. it <kwd:MUST> have a 
-           <M::DOMLS|SimpleXMLSerializer.writeToString> method.
+           <M::SimpleXMLSerializer.writeToString> method.
          \
-         - the <M::DOMLS|SimpleXMLSerializer.writeToString>
-           method <kwd:MUST> accept a <IF::DOMCore:Document>
+         - the <M::SimpleXMLSerializer.writeToString>
+           method <kwd:MUST> accept a <IF::td|Document>
            node as its <P::nodeArg> parameter.  It <kwd:MAY>
            also accept other type of nodes as the parameter.
          \
@@ -265,18 +216,18 @@ FeatureDef:
            any external parsed entity reference. 
          \
          - the serializer <kwd:MUST> support the serialization
-           of <IF::DOMCore:Element> nodes, <IF::DOMCore:Attr>
+           of <IF::te|Element> nodes, <IF::te|Attr>
            nodes which support XML Namespaces and which are not
-           namespace declaration attributes, and <IF::DOMCore:Text> nodes.
+           namespace declaration attributes, and <IF::tcd|Text> nodes.
          \
          - the serializer <kwd:MUST> support the serialization
-           of <IF::DOMXML:CDATASection> nodes, but it does not have
+           of <IF::tx|CDATASection> nodes, but it does not have
            to result in XML <XML::CDATA> sections.  In other word, 
-           the serializer <kwd:MAY> serialize a <IF::DOMXML:CDATASection>
+           the serializer <kwd:MAY> serialize a <IF::tx|CDATASection>
            as a sequence of characters and/or character references.
          \
-         - the serializer <kwd:MAY> ignore <IF::DOMXML:EntityReference>
-           nodes and serialize their children if the <IF::DOMXML:EntityReference>
+         - the serializer <kwd:MAY> ignore <IF::tx|EntityReference>
+           nodes and serialize their children if the <IF::tx|EntityReference>
            nodes are expanded.  Otherwise, it <kwd:MUST> 
            serialize them as (unexpanded) general entity references. 
            If the serializer supports the serialization of 
@@ -284,16 +235,16 @@ FeatureDef:
            general entity declarations.
          \
          - the serialization <kwd:MAY> serialize 
-           or ignore <IF::DOMCore:Comment>, <IF::DOMXML:ProcessingInstruction>,
-           <IF::DOMXML:DocumentType>, <IF::DOMXML:Entity> and
-           <IF::DOMXML:Notation> nodes.
+           or ignore <IF::tcd|Comment>, <IF::tx|ProcessingInstruction>,
+           <IF::tx|DocumentType>, <IF::tx|Entity> and
+           <IF::tx|Notation> nodes.
          \
-         - if the <A::DOMCore:Document.xmlVersion> has a non-<DOM::null>
+         - if the <A::td|Document.xmlVersion> has a non-<DOM::null>
            value and it is different from <XML::1.0>, then
            the serializer <kwd:MUST> output an XML declaration.
          \
          - if the serializer does not support the XML version
-           as specified by the <A::DOMCore:Document.xmlVersion>,
+           as specified by the <A::td|Document.xmlVersion>,
            then the serializer <kwd:MAY> report an exception
            or error.
          \
@@ -306,28 +257,27 @@ FeatureDef:
        }
 
 IFClsXDef:
-  @IFQName: DOMLS|SimpleXMLSerializer
-  @ClsQName: DOMLS|ManakaiDOMSimpleXMLSerializer
-
-  @ClsISA: ManakaiDOM|ManakaiDOMObject
+  @IFQName: SimpleXMLSerializer
+  @ClsQName: ManakaiDOMSimpleXMLSerializer
 
   @enDesc:
     A simple XML serializer that only (or at least) supports
     document instance constructions such as elements and attributes.
 
-  @DISLang:role: DOMLS|SerializerRole
+  @DISLang:role: gls|SerializerRole
 
-  @f:implements: DOMLS|SerializeDocumentInstance10
+  @f:implements: SerializeDocumentInstance10
 
   @Method:
     @@Operator:
       @@@@:DISPerl|NewMethod
       @@@ContentType: DISCore|QName
+    @@ManakaiDOM:isForInternal: 1
     @@Return:
-      @@@Type: DOMLS|ManakaiDOMSimpleXMLSerializer
+      @@@Type: SimpleXMLSerializer
       @@@enDesc: Newly created serializer.
       @@@PerlDef:
-        $r = <ClassName::DOMLS|ManakaiDOMSimpleXMLSerializer>;
+        $r = <ClassName::ManakaiDOMSimpleXMLSerializer>;
 
   @Method:
     @@Name: writeToString
@@ -335,8 +285,7 @@ IFClsXDef:
       Serializes a document as an XML document entity.
     @@Param:
       @@@Name: nodeArg
-      @@@Type: DOMCore|Node
-      @@@actualType:  DOMCore|ManakaiDOMDocument
+      @@@Type: Node
       @@@enDesc:
         The document node to serialize.
     @@Return:
@@ -351,7 +300,7 @@ IFClsXDef:
         \
         }
       @@@PerlDef:
-        my @src = ($nodeArg->{<H::mn:node>});
+        my @src = ($nodeArg);
         my $nsbind = [{'' => '', xml => <Q::xml:>, xmlns => <Q::undef:>}];
         my $xescape = sub ($) {
           my $s = shift;
@@ -365,197 +314,162 @@ IFClsXDef:
           if (ref $src eq 'ARRAY') {
             pop @$nsbind;  ## End tag
           } elsif (ref $src) {
-            if ($src->{<H::DOMCore:nodeType>} eq <H::infoset:Element>) {
+            my $srcnt = $src->node_type;
+            if ($srcnt == <C::Node.ELEMENT_NODE>) {
               my @csrc;
               my $etag;
               push @$nsbind, my $ns = {%{$nsbind->[-1]}};
               my %attrr;
 
-              ## Non-namespace attributes
-              for my $ao (values %{$src->{<H::infoset:attributes>}
-                                       ->{<Q::ManakaiDOM:noNS>}||{}}) {
-                $attrr{$ao->{<H::DOMCore:name>}}
-                      = [@{$ao->{<H::infoset:children>}}];
+              my @attrs = @{$src->attributes};
+              my @nsattrs;
+              my @gattrs;
+              my @lattrs;
+
+              for my $attr (@attrs) {
+                my $nsuri = $attr->namespace_uri;
+                if (not defined $nsuri) {
+                  push @lattrs, $attr;
+                } elsif ($nsuri eq <Q::xmlns:>) {
+                  push @nsattrs, $attr;
+                } else {
+                  push @gattrs, $attr;
+                }
+              }
+
+              ## Implied namespace prefixes
+              my $etns = $src->namespace_uri;
+              my $etpfx = $src->local_name;
+              if (defined $etns and defined $etpfx) {
+                $ns->{$etpfx} = $etns;
+                $attrr{'xmlns:'.$etpfx} = [$xescape->($etns)];
+              }
+
+              for my $attr (@gattrs) {
+                my $atns = $attr->namespace_uri;
+                my $atpfx = $attr->prefix;
+                if (defined $atpfx) {
+                  $ns->{$atpfx} = $atns;
+                  $attrr{'xmlns:'.$atpfx} = [$xescape->($atns)];
+                }
               }
 
               ## Namespace attributes
-              for my $xmlnso (values %{$src->{<H::infoset:attributes>}
-                                           ->{<Q::xmlns:>}||{}}) {
-                my $xmlns;
-                __CODE{ManakaiNode:getWeakReference||ManakaiDOM:Perl::
-                  $object => $xmlnso, $ref => $xmlns,
-                  $class => {<ClassName::DOMCore:ManakaiDOMAttr>},
-                }__;
-                my $nsuri = $xmlns-><AG::DOMCore:Attr.value>;
-                if ($xmlnso->{<H::infoset:localName>} eq 'xmlns') {
-                  $ns->{''} = $nsuri;
-                  $attrr{'xmlns'} = [@{$xmlnso->{<H::infoset:children>}}];
+              XA: for my $attr (@nsattrs) {
+                my $attrval = $attr->value;
+                my $lname = $attr->local_name;
+                if ($lname eq 'xmlns') {
+                  $ns->{''} = $attrval;
+                  $attrr{xmlns} = [@{$attr->child_nodes}];
                 } else {
-                  if (length $nsuri) {
-                    $ns->{$xmlnso->{<H::infoset:localName>}} = $nsuri;
+                  if (length $attrval) {
+                    $ns->{$lname} = $attrval;
                   } else {
-                    $ns->{$xmlnso->{<H::infoset:localName>}} = <Q::undef:>;
+                    $ns->{$lname} = <Q::undef:>;
                   }
-                  $attrr{'xmlns:'.$xmlnso->{<H::infoset:localName>}}
-                                  = [@{$xmlnso->{<H::infoset:children>}}];
+                  $attrr{'xmlns:'.$lname} = [@{$attr->child_nodes}];
                 }
-              }
+              } # XA
 
               ## Per-element partition attributes
-              for my $ano (values %{$src->{<H::infoset:attributes>}
-                                        ->{<Q::null:>}||{}}) {
-                $attrr{$ano->{<H::infoset:localName>}}
-                                  = [@{$ano->{<H::infoset:children>}}];
+              for my $attr (@lattrs) {
+                $attrr{$attr->local_name} = [@{$attr->child_nodes}];
               }
 
               ## Global partition attributes
-              for my $ans (keys %{$src->{<H::infoset:attributes>}}) {
-                next if $ans eq <Q::xmlns:>;
-                next if $ans eq <Q::null:>;
-                next if $ans eq <Q::ManakaiDOM:noNS>;
-                my $defpfx;
-                my $ansao = [];
-                for my $ao (values %{$src->{<H::infoset:attributes>}
-                                         ->{$ans}||{}}) {
-                  my $pfx;
-                  PFX: {
-                    if (defined $ao->{<H::infoset:prefix>}) {
-                      if (defined $ns->{$ao->{<H::infoset:prefix>}}) {
-                        if ($ns->{$ao->{<H::infoset:prefix>}} eq $ans) {
-                          ## Namespace already defined
-                          $defpfx ||= $pfx = $ao->{<H::infoset:prefix>};
-                          last PFX;
+              my $dns = $ns->{''};
+              delete $ns->{''};
+              my $nsrev = {reverse %$ns};
+              $ns->{''} = $dns;
+              delete $nsrev->{<Q::undef:>}; # for security reason
+              for my $attr (@gattrs) {
+                my $atns = $attr->namespace_uri;
+                my $atpfx = $atns->prefix;
+                if (not defined $atpfx or
+                    $ns->{$atpfx} ne $atns) {
+                  if (defined $nsrev->{$atns}) {
+                    $atpfx = $nsrev->{$atns};
+                  } else {
+                    ## Prefix is not registered
+                    my @uritxt = grep {/\A[A-Za-z][A-Za-z0-9_.-]*\z/}
+                                 split /\W+/, $atns;
+                    P: {
+                      for my $pfx (reverse @uritxt) {
+                        if (not defined $ns->{$pfx}) {
+                          $atpfx = $pfx;
+                          $ns->{$pfx} = $atns;
+                          $nsrev->{$atns} = $atpfx;
+                          $attrr{$atpfx} = [$xescape->($atns)];
+                          last P;
                         }
-                      } else {
-                        ## Namespace prefix not defined yet
-                        $defpfx ||= $pfx = $ao->{<H::infoset:prefix>};
-                        $ns->{$pfx} = $ans;
-                        $attrr{'xmlns:'.$pfx} = [$xescape->($ans)];
-                        last PFX;
                       }
-                    }
-                    if (defined $defpfx) {
-                      $pfx = $defpfx;
-                      last PFX;
-                    }
-                  } # PFX
-                  push @$ansao, [$pfx, $ao];
-                }
-                next unless @$ansao;  ## No attribute in this namespace.
 
-                PFX: {
-                  last PFX if defined $defpfx;
-
-                  ## No prefix available from attribute nodes
-
-                  ## Available from already defined namespaces?
-                  for my $pfx (keys %$ns) {
-                    next unless $ns->{$pfx} eq $ans;
-                    if (length $pfx) {
-                      $defpfx = $pfx;
-                      last;
-                    }
+                      my $i = 1;
+                      $i++ while exists $ns->{'ns'.$i};
+                      $atpfx = 'ns'.$i;
+                      $ns->{$atpfx} = $atns;
+                      $nsrev->{$atns} = $atpfx;
+                      $attrr{'xmlns:ns'.$i} = [$xescape->($atns)];
+                    } # P
                   }
-                  last PFX if defined $defpfx;
-
-                  ## Available from element itself?
-                  if (defined $src->{<H::infoset:namespaceName>} and
-                      ${$src->{<H::infoset:namespaceName>}} eq $ans and
-                      defined $src->{<H::infoset:prefix>}) {
-                    if (defined $ns->{$src->{<H::infoset:prefix>}}) {
-                      if ($ns->{$src->{<H::infoset:prefix>}} eq $ans) {
-                        ## Namespace already defined
-                        $defpfx = $src->{<H::infoset:prefix>};
-                        last PFX;
-                      }
-                    } else {
-                      ## Namespace not defined yet
-                      $defpfx = $src->{<H::infoset:prefix>};
-                      $ns->{$defpfx} = $ans;
-                      $attrr{'xmlns:'.$defpfx} = [$xescape->($ans)];
-                      last PFX;
-                    }
-                  }
-
-                  ## Prefix is not defined anywhere
-                  my $i = 1;
-                  $i++ while (exists $ns->{'ns'.$i});
-                  $ns->{$defpfx = 'ns'.$i} = $ans;
-                  $attrr{'xmlns:ns'.$i} = [$xescape->($ans)];
-                } # PFX
-
-                for my $ansno (@$ansao) {
-                  $attrr{($ansno->[0] || $defpfx) . ':' .
-                         $ansno->[1]->{<H::infoset:localName>}}
-                     = [@{$ansno->[1]->{<H::infoset:children>}}];
                 }
+
+                $attrr{$atpfx.':'.$attr->local_name} = [@{$attr->child_nodes}];
               }
 
               ## Element type name
-              if (defined $src->{<H::infoset:localName>}) {
-                if (defined $src->{<H::infoset:namespaceName>}) {
-                  if (defined $src->{<H::infoset:prefix>} and
-                      defined $ns->{$src->{<H::infoset:prefix>}} and
-                      $ns->{$src->{<H::infoset:prefix>}}
-                         eq ${$src->{<H::infoset:namespaceName>}}) {
-                    ## Non-NULL namespace and prefix is defined
-                    $r .= '<' . $src->{<H::infoset:prefix>} . ':'
-                       .  $src->{<H::infoset:localName>};
-                    $etag = '</' . $src->{<H::infoset:prefix>} . ':'
-                       .  $src->{<H::infoset:localName>} . '>';
-                  } elsif (defined $src->{<H::infoset:prefix>} and
-                           not defined $ns->{$src->{<H::infoset:prefix>}}) {
-                    $attrr{'xmlns:'.$src->{<H::infoset:prefix>}}
-                      = [$xescape->(${$src->{<H::infoset:namespaceName>}})];
-                    $ns->{$src->{<H::infoset:prefix>}}
-                      = ${$src->{<H::infoset:namespaceName>}};
-                    $r .= '<' . $src->{<H::infoset:prefix>} . ':'
-                       .  $src->{<H::infoset:localName>};
-                    $etag = '</' . $src->{<H::infoset:prefix>} . ':'
-                       .  $src->{<H::infoset:localName>} . '>';
+              if (defined $etns) {
+                if (not defined $etpfx or
+                    (defined $ns->{$etpfx} and $ns->{$etpfx} ne $etns)) {
+                  if ($ns->{''} eq $etns) {
+                    $etpfx = null;
                   } else {
-                    PFX: {
-                      ## Non-NULL namespace and prefix is not defined
-                      ## but already declared as namespace attribute
-                      for my $pfx (keys %$ns) {
-                        next unless $ns->{$pfx}
-                                      eq ${$src->{<H::infoset:namespaceName>}};
-                        if (length $pfx) {
-                          $r .= '<' . $pfx . ':'
-                             .  $src->{<H::infoset:localName>};
-                          $etag = '</' . $pfx . ':'
-                                .  $src->{<H::infoset:localName>} . '>';
-                        } else {
-                          $r .= '<' . $src->{<H::infoset:localName>};
-                          $etag = '</' . $src->{<H::infoset:localName>} . '>';
+                    $etpfx = $nsrev->{$etns};
+                    unless (defined $etpfx) {
+                      ## Prefix is not registered
+                      my @uritxt = grep {/\A[A-Za-z][A-Za-z0-9_.-]*\z/}
+                                   split /\W+/, $etns;
+                      P: {
+                        for my $pfx (reverse @uritxt) {
+                          if (not defined $ns->{$pfx}) {
+                            $etpfx = $pfx;
+                            $ns->{$pfx} = $etns;
+                            $nsrev->{$etns} = $etpfx;
+                            $attrr{$etpfx} = [$xescape->($etns)];
+                            last P;
+                          }
                         }
-                        last PFX;
-                      }
-
-                      ## Non-NULL namespace and prefix is not defined anywhere
-                      my $i = 1;
-                      $i++ while (exists $ns->{'ns'.$i});
-                      $ns->{'ns'.$i} = ${$src->{<H::infoset:namespaceName>}};
-                      $attrr{'xmlns:ns'.$i} = [$xescape->($ns->{'ns'.$i})];
-                      $r .= '<'.'ns' . $i . ':' . $src->{<H::infoset:localName>};
-                      $etag = '</ns'.$i.':'.$src->{<H::infoset:localName>} . '>';
+  
+                        my $i = 1;
+                        $i++ while exists $ns->{'ns'.$i};
+                        $etpfx = 'ns'.$i;
+                        $ns->{$etpfx} = $etns;
+                        $nsrev->{$etns} = $etpfx;
+                        $attrr{'xmlns:ns'.$i} = [$xescape->($etns)];
+                      } # P
                     }
                   }
-                } else {
-                  ## Null-namespace
-                  unless ($ns->{''} eq '') {
-                    ## Default namespace is not the NULL-namespace
-                    $ns->{''} = '';
-                    $attrr{'xmlns'} = [''];
-                  }
-                  $r .= '<' . $src->{<H::infoset:localName>};
-                  $etag = '</' . $src->{<H::infoset:localName>} . '>';
+                } elsif (defined $etpfx) {
+                  $ns->{$etpfx} = $etns;
+                  $nsrev->{$etns} = $etpfx;
+                  $attrr{'xmlns:'.$etpfx} = [$xescape->($etns)];
                 }
               } else {
-                ## Non-namespace node
-                $r .= '<' . $src->{<H::DOMCore:name>};
-                $etag = '</' . $src->{<H::DOMCore:name>} . '>';
+                if ($ns->{''} ne '') {
+                  $ns->{''} = '';
+                  $attrr{xmlns} = [''];
+                }
               }
+
+              $r .= '<';
+              $etag = '</';
+              if (defined $etpfx) {
+                $r .= $etpfx . ':';
+                $etag .= $etpfx . ':';
+              }
+              my $etln = $src->local_name;
+              $r .= $etln;
+              $etag .= $etln . '>';
               
               ## Attribute specifications
               for my $an (sort keys %attrr) {
@@ -563,55 +477,44 @@ IFClsXDef:
               }
 
               ## Children
-              if (@{$src->{<H::infoset:children>}}) {
-                push @csrc, '>', @{$src->{<H::infoset:children>}}, $etag, [];
-              } elsif ($src->{<H::ManakaiDOMLS2003:use_EmptyElemTag>}) {
-                push @csrc, ' />';
-                shift @$nsbind;
-              } else {
-                push @csrc, '>' . $etag, [];
-              }
+              push @csrc, '>', @{$src->child_nodes}, $etag, [];
               unshift @src, @csrc;
-            } elsif ($src->{<H::DOMCore:nodeType>} eq <H::DOMCore:TextNode>) {
-              $r .= $xescape->($src->{<H::infoset:content>});
-            } elsif ($src->{<H::DOMCore:nodeType>} eq <H::DOMXML:CDATASectionNode>) {
-              my $text = $src->{<H::infoset:content>};
+            } elsif ($srcnt == <C::Node.TEXT_NODE>) {
+              $r .= $xescape->($src->node_value);
+            } elsif ($srcnt == <C::Node.CDATA_SECTION_NODE>) {
+              my $text = $src->node_value;
               $text =~ s/]]>/]]]]>&gt;<![CDATA[/g;
               $r .= '<![CDATA[' . $text . ']]>';
-            } elsif ($src->{<H::DOMCore:nodeType>}
-                        eq <H::DOMXML:EntityReferenceNode>) {
-              if ($src->{<H::ManakaiDOM:isExpanded>}) {
-                push @src, @{$src->{<H::infoset:children>}};
+            } elsif ($srcnt == <C::Node.ENTITY_REFERENCE_NODE>) {
+              if ($src->manakai_expanded) {
+                push @src, @{$src->child_nodes};
               } else {
-                $r .= '&' . $src->{<H::DOMCore:name>} . ';';
+                $r .= '&' . $src->node_name . ';';
               }
-            } elsif ($src->{<H::DOMCore:nodeType>}
-                        eq <H::infoset:ProcessingInstruction>) {
-              $r .= '<?' . $src->{<H::infoset:target>};
-              if (defined $src->{<H::infoset:content>} and
-                  length $src->{<H::infoset:content>}) {
-                my $data = $src->{<H::infoset:content>};
+            } elsif ($srcnt == <C::Node.PROCESSING_INSTRUCTION_NODE>) {
+              $r .= '<?' . $src->node_name;
+              my $data = $src->node_value;
+              if (length $data) {
                 $data =~ s/\?>/?&gt;/g;
                 $r .= ' ' . $data;
               }
               $r .= '?>';
-            } elsif ($src->{<H::DOMCore:nodeType>} eq <H::infoset:Comment>) {
-              my $data = $src->{<H::infoset:content>};
+            } elsif ($srcnt == <C::Node.COMMENT_NODE>) {
+              my $data = $src->node_value;
               $data =~ s/--/- - /g;
               $r .= '<!--' . $data . '-->';
-            } elsif ($src->{<H::DOMCore:nodeType>} eq <H::infoset:Document>) {
-              unshift @src, map {$_, "\x0A"} @{$src->{<H::infoset:children>}};
+            } elsif ($srcnt == <C::Node.DOCUMENT_NODE>) {
+              unshift @src, map {$_, "\x0A"} @{$src->child_nodes};
+              ## ISSUE: |cfg:strict-document-children| cparam
             }
+            # document type, entity, notation, etdef, atdef, df
           } else {
             $r .= $src;
           }
         }
 ##SimpleXMLSerializer
 
-PropDef:
-  @QName:
-    ManakaiDOMLS2003:use_EmptyElemTag
-  @enDesc:
-    Whether the <CODE::EmptyElemTag> syntax should be used
-    if the content of an element is empty or not.
-  @Type: idl|boolean||ManakaiDOM|all
+ResourceDef:
+  @QName: Node
+  @AliasFor: tc|Node
+  @For: ManakaiDOM|ManakaiDOMLatest
