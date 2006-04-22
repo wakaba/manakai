@@ -40,7 +40,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/04/16 12:58:53 $
+      $Date: 2006/04/22 00:56:40 $
     @@ContentType:
       dis:Date.RCS
 
@@ -567,49 +567,6 @@ ResourceDef:
           @@@@@: 
             The specified index or size value is less than or greater 
             than the allowed value. 
-        @@@enMufDef:
-              The index or size%p (
-                name => {<Q::MDOMX:param-name>},
-                prefix => {, as specified by the parameter "}, suffix => {",}); 
-              is negative or greater than the allowed value.
-        @@@XParamParamName:
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@: 
-              The name of parameter to which invalid value is specified.
-       @@@XParam:
-         @@@@QName:index
-         @@@@Description:
-           @@@@@lang:en
-           @@@@@@: The specified index or size. 
-       @@@SubTypeDef:
-         @@@@QName: NEGATIVE_INDEX_ERR
-         @@@@Description:
-           @@@@@lang:en
-           @@@@@@:
-             The specified index or size is negative. 
-         @@@@enMufDef:
-           The specified index or size (%p (
-             name => {<Q::MDOMX:param-name>},
-             prefix => {"},
-             suffix => {" = },
-           );%p (
-             name => {<Q::DOMCore:index>},
-           );) is negative. 
-       @@@SubTypeDef:
-         @@@@QName: OUT_OF_UPPER_BOUND_ERR
-         @@@@Description:
-           @@@@@lang:en
-           @@@@@@:
-             The specified index or size is greater than an upper bound. 
-         @@@@enMufDef:
-           The specified index or size (%p (
-             name => {<Q::MDOMX:param-name>},
-             prefix => {"},
-             suffix => {" = },
-           );%p (
-             name => {<Q::DOMCore:index>},
-           );) is greater than an upper bound. 
       @@@SubTypeDef:
         @@@@QName: c|StringIndexOutOfBoundsException
         @@@@enDesc:
