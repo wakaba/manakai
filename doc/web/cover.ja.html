@@ -13,6 +13,14 @@ Perl ライブラリ</h1>
 <p><dfn>manakai</dfn> は、 RFC 2822 系インターネット・メッセージと
 XML を処理するための Perl 用オブジェクト指向モジュール群です。</p>
 
+<div class="note memo">
+<p>
+この文書は<em>準備中</em>です。
+<a href="http://suika.fam.cx/gate/2005/sw/manakai"
+>SuikaWiki:manakai</a> もあわせてご覧下さい。
+</p>
+</div>
+
 <!-- @@ TODO: 既存のモジュールより優れていることにする -->
 
 <p>manakai は、 DOM 界面を使って XML 文書を操作することができます。
@@ -55,6 +63,7 @@ manakai の DOM 対応状況は次の表の通りです。</p>
 <th scope="row">中核</th>
 <td>水準 1, 2, 3</td>
 <td>
+  <p>次を<em>除き</em>実装済:</p>
   <ul>
   <li><code class="DOMa">whole_text</code>,
   <code class="DOMm">replace_whole_text</code>,
@@ -72,6 +81,7 @@ manakai の DOM 対応状況は次の表の通りです。</p>
 <th scope="row" lang="en">XML</th>
 <td>水準 1, 2, 3</td>
 <td>
+  <p>次を<em>除き</em>実装済:</p>
   <ul>
   <li><code class="DOMa">internal_subset</code> は未実装</li>
   </ul>
@@ -81,7 +91,7 @@ manakai の DOM 対応状況は次の表の通りです。</p>
 <th scope="row">XDoctype 定義</th>
 <td>水準 3 案 (manakai 独自)</td>
 <td>
-  <p>次の機能を実装:</p>
+  <p>次のすべてを実装:</p>
   <ul>
   <li><code class="DOMi" lang="en">DocumentTypeDefinition</code></li>
   <li><code class="DOMi" lang="en">ElementTypeDefinition</code></li>
@@ -93,7 +103,7 @@ manakai の DOM 対応状況は次の表の通りです。</p>
 <th scope="row">XDoctype 宣言</th>
 <td>水準 3 案 (manakai 独自)</td>
 <td>
-  <p>次の機能<em>のみ</em>実装:</p>
+  <p>次に挙げるもの<em>のみ</em>実装:</p>
   <ul>
   <li><code class="DOMi" lang="en">DocumentTypeDeclaration</code></li>
   </ul>
@@ -103,7 +113,7 @@ manakai の DOM 対応状況は次の表の通りです。</p>
 <th scope="row"><abbr lang="en" title="Load and Save">LS</abbr></th>
 <td>水準 3</td>
 <td>
-  <p>次の機能<em>のみ</em>実装:</p>
+  <p>次に挙げるもの<em>のみ</em>実装:</p>
   <ul>
   <li><code class="DOMi" lang="en">LSInput</code></li>
   <li><code class="DOMi" lang="en">LSOutput</code></li>
