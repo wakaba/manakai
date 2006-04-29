@@ -24,9 +24,11 @@ Module:
       @@@Year:2003
       @@@DISCore:author: DISCore|Wakaba
   @Date:
-    $Date: 2006/04/03 16:13:15 $
+    $Date: 2006/04/29 11:05:09 $
   
   @Require:
+    @@Module:
+      @@@QName: Markup|common
     @@Module:
       @@@QName: Util|ManakaiNode
       @@@WithFor: ManakaiDOM|Perl
@@ -97,26 +99,6 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/
   @UtilError:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/
-
-ResourceDef:
-  @QName:
-    Markup:
-  @rdf:type:
-    dis:ModuleGroup
-  @FullName:
-    @@lang:en
-    @@@:
-      The manakai Markup Language support modules
-  @DISPerl:packageName:
-    Message::Markup::
-  @DISPerl:interfacePackageName:
-    @@@:
-      Message::Markup::IFLatest::
-    @@ForCheck: ForLatest
-  @DISPerl:interfacePackageName:
-    @@@:
-      Message::Markup::IF::
-    @@ForCheck: ForEmpty !ForLatest
 
 ## -- "For" definitions
 

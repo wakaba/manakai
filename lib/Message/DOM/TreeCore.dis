@@ -12,7 +12,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/04/22 05:14:19 $
+    $Date: 2006/04/29 11:05:09 $
 
   @Require:
     @@Module:
@@ -315,6 +315,14 @@ ElementTypeBinding:
     @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|ManakaiDOMLatest
 
 ElementTypeBinding:
+  @Name: CLXAttr
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISLang|Attribute
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|DOMLatest ManakaiDOM|ForClass
+
+ElementTypeBinding:
   @Name: Get
   @ElementType:
     dis:ResourceDef
@@ -503,6 +511,37 @@ ElementTypeBinding:
     @@f:implements:
       @@@@: tx|XMLVersionFeature11
       @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeatureXML11
+
+ElementTypeBinding:
+  @Name: IFClsXDef
+  @ElementType: 
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType:
+      @@@@: dis|MultipleResource
+      @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
+    @@resourceFor: ManakaiDOM|ForIF
+    @@resourceFor:
+      @@@@: ManakaiDOM|ForClass
+      @@@ForCheck: ManakaiDOM|ManakaiDOMLatest
+    @@For: ManakaiDOM|DOMLatest
+    @@For: =ManakaiDOM|ManakaiDOM
+
+    @@DISCore:resourceType:
+      @@@@: DISLang|Interface
+      @@@ForCheck: ManakaiDOM|ForIF
+
+    @@DISCore:resourceType:
+      @@@@: DISLang|Class
+      @@@ForCheck: ManakaiDOM|ForClass
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOM||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
 
 ElementTypeBinding:
   @Name: IFQName
@@ -6561,6 +6600,207 @@ IFCls1Def:
 
         my $el = $doc-><M::Document.createAttributeNS> ('about:', 'a:attr');
         $test->assert_equals ($el-><AG::Node.manakaiExpandedURI>, 'about:attr');
+
+  @LXAttr:
+    @@Name: manakaiLanguage
+    @@enDesc:
+      The natural language of the node.
+
+        {NOTE::
+           Whether, to what, and how the language information is applied to
+           the content of the node depends on context such as
+           element types.
+        }
+    @@Type: DOMString
+    @@Get:
+      @@@enDesc:
+        {OLI:: If the node is an <IF::Element>,
+        
+          = If there is an attribute node whose <A::Node.localName>
+            is <XA::lang> and <A::Node.namespaceURI> is
+            <URI^^DISCore|QName::xml|>, it <kwd:MUST> return
+            the <A::Node.nodeValue> of the attribute node.
+
+          = Otherwise, if there is an attribute node whose
+            <A::Node.localName> is <XA::xml:lang> and
+            <A::Node.namespaceURI> is <DOM::null>, it
+            <kwd:MUST> return the <A::Node.nodeValue>
+            of the attribute node.
+
+        }
+
+        = If the node has a non-<DOM::null> <A::Node.parentNode>,
+          it <kwd:MUST> return the <A::Node.manakaiLanguage>
+          of that node.
+
+        = If the node has a non-<DOM::null> <A::Node.ownerDocument>,
+          it <kwd:MUST> return the <A::Node.manakaiLanguage>
+          of that node.
+
+        = If the node is a <IF::Document> and the natural
+          language information is provided, it <kwd:MUST>
+          be returned.  If such information has different
+          syntax and / or semantics than ones for the <XA::xml|lang>
+          attribute as defined in XML 1.0 and 1.1 specifications,
+          an XML-conforming string equivalent to the information
+          <kwd:MUST> be returned instead; if such convertion
+          is not possible, an empty string <kwd:MUST> be returned;
+          if more than one languages are specified, the string
+          <CODE::mul> <kwd:MUST> be returned.
+
+        = Otherwise, <DOM::null> <kwd:MUST> be returned.
+
+        {ISSUE::
+           Clarify <IF::Document>
+        }
+      @@@PerlDef:
+        my $target = $self;
+        L: {
+          while (defined $target) {
+            if ($target-><AG::Node.nodeType> == <C::Node.ELEMENT_NODE>) {
+              $r = $target-><M::Element.getAttributeNS> (<Q::xml|>, 'lang');
+              last L if defined $r;
+
+              $r = $target-><M::Element.getAttributeNS> (null, 'xml:lang');
+              last L if defined $r;
+            }
+            $target = $target-><AG::Node.parentNode>;
+          }
+
+          ## TODO: from ownerDocument
+          ## TODO: from upper-level protocol
+
+          $r = '';
+        } # L
+    @@Set:
+      @@@enDesc:
+        {LI::
+          If the node is an <IF::Element>,
+
+            - If the given value is <DOM::null>, 
+              the <XA::lang> attribute in the <URI^^DISCore|QName::xml|>
+              namespace and the <XA::xml:lang> attribute in
+              the <DOM::null> namespace <kwd:MUST> be removed
+              from the element as if the <M::Element.removeAttributeNS>
+              method were invoked, if any.
+
+            - Otherwise, if the element has a <XA::lang> attribute in
+              the <URI^^DISCore|QName::xml|> namespace,
+              it <kwd:MUST> set its <A::Attr.value> to the given value.
+              Its <A::Attr.specified> attribute <kwd:MUST> be
+              set to <DOM::true>.
+
+            - Otherwise, if the element has a <XA::xml:lang> attribute in
+              the <DOM::null> namespace,
+              it <kwd:MUST> set its <A::Attr.value> to the given value.
+              Its <A::Attr.specified> attribute <kwd:MUST> be
+              set to <DOM::true>.
+
+            - Otherwise, it <kwd:MUST> set the <XA::lang> attribute
+              in the <URI^^DISCore|QName::xml|> namespace
+              to the specified value, as if the <M::Element.setAttributeNS>
+              method were invoked on the node.
+        }
+
+        {LI::
+          {TODO::
+            If it is a <IF::Document>...
+          }
+        }
+
+        - Otherwise, setting this attribute has no effect.
+      @@@NodeReadOnlyError:
+      @@@PerlDef:
+        __DEEP{
+          if ($self-><AG::Node.nodeType> == <C::Node.ELEMENT_NODE>) {
+            if (defined $given) {
+              if ($self-><M::Element.hasAttributeNS> (null, 'xml:lang')) {
+                $self-><M::Element.setAttributeNS>
+                         (null, [null, 'xml:lang'], $given);
+              } else {
+                $self-><M::Element.setAttributeNS>
+                         (<Q::xml|>, 'xml:lang', $given);
+              }
+            } else {
+              $self-><M::Element.removeAttributeNS> (<Q::xml|>, 'lang');
+              $self-><M::Element.removeAttributeNS> (null, 'xml:lang');
+            }
+          }
+        }__;
+
+    @@Test:
+      @@@QName: Node.manakaiLanguage.get.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+        my $el = $doc-><M::Document.createElementNS> (null, 'e');
+
+        $test->id ('default');
+        $test->assert_equals ($el-><AG::Node.manakaiLanguage>, '');
+
+        $test->id ('parent.attr.ns');
+        my $parent = $doc-><M::Document.createElementNS> (null, 'e');
+        $parent-><M::Element.setAttributeNS> (<Q::xml|>, 'xml:lang', 'en');
+        $parent-><M::Node.appendChild> ($el);
+        $test->assert_equals ($el-><AG::Node.manakaiLanguage>, 'en');
+
+        $test->id ('parent.attr.nons');
+        my $parent2 = $doc-><M::Document.createElementNS> (null, 'e');
+        $parent2-><M::Element.setAttributeNS> (null, [null, 'xml:lang'], 'ja');
+        $parent2-><M::Node.appendChild> ($el);
+        $test->assert_equals ($el-><AG::Node.manakaiLanguage>, 'ja');
+
+        $test->id ('attr.ns');
+        $el-><M::Element.setAttributeNS> (<Q::xml|>, 'xml:lang', 'en');
+        $test->assert_equals ($el-><AG::Node.manakaiLanguage>, 'en');
+
+        $test->id ('attr.ns.nons');
+        $el-><M::Element.setAttributeNS> (<Q::xml|>, 'xml:lang', 'fr');
+        $el-><M::Element.setAttributeNS> (null, [null, 'xml:lang'], 'es');
+        $test->assert_equals ($el-><AG::Node.manakaiLanguage>, 'fr');
+
+        $test->id ('attrnons');
+        $el-><M::Element.removeAttributeNS> (<Q::xml|>, 'lang');
+        $test->assert_equals ($el-><AG::Node.manakaiLanguage>, 'es');
+    @@Test:
+      @@@QName: Node.manakaiLanguage.set.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+        my $el = $doc-><M::Document.createElementNS> (null, 'e');
+    
+        $test->id ('set.new');
+        $el-><AS::Node.manakaiLanguage> ('ja');
+        $test->assert_equals ($el-><AG::Node.manakaiLanguage>, 'ja');
+
+        my $attr = $el-><M::Element.getAttributeNodeNS> (<Q::xml|>, 'lang');
+
+        $test->id ('set.new.attr.value');
+        $test->assert_equals ($attr-><AG::Attr.value>, 'ja');
+
+        $test->id ('set.new.attr.specified');
+        $test->assert_true ($attr-><AG::Attr.specified>);
+  
+        $test->id ('set.change');
+        $el-><AS::Node.manakaiLanguage> ('en');
+        $test->assert_equals ($el-><AG::Node.manakaiLanguage>, 'en');
+        
+        $test->id ('set.change.attr.value');
+        $test->assert_equals ($attr-><AG::Attr.value>, 'en');
+
+        $el-><AS::Node.manakaiLanguage> (null);
+
+        $test->id ('remove.value');
+        $test->assert_equals ($attr-><AG::Attr.value>, 'en');
+
+        $test->id ('remove.ownerElement');
+        $test->assert_null ($attr-><AG::Attr.ownerElement>);
+
+        $test->id ('remove.attr');
+        $test->assert_null ($el-><M::Element.getAttributeNS>
+                                   (<Q::xml|>, 'lang'));
 ##Node
 
 ElementTypeBinding:
@@ -7515,7 +7755,159 @@ ResourceDef:
       Creats a new empty node list.
     @@PerlDef:
       $r = bless [], <ClassName::ManakaiDOMEmptyNodeList>;
+
+  @LXAttr:
+    @@Name: manakaiReadOnly
+    @@enDesc:
+      Whether the node list is read-only or not.
+    @@Type: idl|boolean||ManakaiDOM|all
+    @@Get:
+      @@@enDesc:
+        If the <IF::NodeList> is the list of child nodes of a node,
+        it <kwd:MUST> return the same value as the 
+        <A::Node.manakaiReadOnly> attribute of the node contains.
+
+        Otherwise, it <kwd:MUST> return <DOM::true> unless
+        otherwise specified.
+      @@@PerlDef:
+        @@@@ForCheck: !tc|ForChildNodeList
+        @@@@@:
+          $r = true;
+      @@@PerlDef:
+        @@@@ForCheck: tc|ForChildNodeList
+        @@@@@:
+          $r = ($$$self)-><AG::Node.manakaiReadOnly>;
+    @@enImplNote:
+      @@@ddid:setter
+      @@@@:
+        {ISSUE::
+          Is the setter necessary?
+        }
+
+    @@Test:
+      @@@QName: ChildNodeList.readOnly.test
+      @@@ForCheck: tc|ForChildNodeList
+      @@@PerlDef:
+        my $el;
+        __CODE{tc|createElementForTest:: $el => $el}__;
+
+        my $cl = $el-><AG::Node.childNodes>;
+
+        $test->id ('true');
+        $el-><M::Node.manakaiSetReadOnly> (true);
+        $test->assert_true ($cl-><AG::NodeList.manakaiReadOnly>);
+
+        $test->id ('false');
+        $el-><M::Node.manakaiSetReadOnly> (false);
+        $test->assert_false ($cl-><AG::NodeList.manakaiReadOnly>);
+    @@Test:
+      @@@QName: GetElementsNodeList.readOnly.test
+      @@@ForCheck: tc|ForGetNodeList
+      @@@PerlDef:
+        my $el;
+        __CODE{tc|createElementForTest:: $el => $el}__;
+
+        my $gl = $el-><M::Element.getElementsByTagName> ('a');
+       
+        $test->assert_true ($gl-><AG::NodeList.manakaiReadOnly>);
 ##NodeList
+
+IFClsXDef:
+  @IFQName: StaticNodeList
+  @ClsQName: ManakaiDOMStaticNodeList
+
+  @IFISA: NodeList
+
+  @enDesc:
+    A <IF::StaticNodeList> object is a list of node similar
+    to other <IF::NodeList> object, except that it is 
+    <EM::not> live.
+
+    The <A::NodeList.manakaiReadOnly> attribute <kwd:MUST>
+    contain whether the <IF::StaticNodeList> is read-only or not.
+    A <IF::StaticNodeList> <kwd:MAY> be read-only or not,
+    depending on how it is implemented.  It is encouraged
+    to implement it <EM::not> being read-only on the platform
+    where variable-length arrays are supported.
+
+  @CODE:
+    @@QName: tc|createStaticNodeList
+    @@enDesc:
+      Creats a new static node list.
+    @@PerlDef:
+      $r = bless [], <ClassName::ManakaiDOMStaticNodeList>;
+
+  @Test:
+    @@QName: StaticNodeList.new.test
+    @@PerlDef:
+      my $nl;
+      __CODE{tc|createStaticNodeList:: $r => $nl}__;
+
+      $test->id ('interface.StaticNodeList');
+      $test->assert_isa ($nl, <IFName::StaticNodeList>);
+
+      $test->id ('interface.NodeList');
+      $test->assert_isa ($nl, <IFName::NodeList>);
+
+  @CAttr:
+    @@Name: length
+    @@Type: unsignedLong
+    @@Get:
+      @@@PerlDef:
+        $r = @$self;
+
+  @CMethod:
+    @@Name: item
+    @@Param:
+      @@@Name: index
+      @@@Type: unsignedLong
+    @@Return:
+      @@@Type: Node
+      @@@PerlDef:
+        $r = $self->[$index] if $index >= 0;
+
+  @CMethod:
+    @@Perlop: ==
+    @@Param:
+      @@@Name: arg
+      @@@Type: NodeList
+    @@Return:
+      @@@Type: boolean
+      @@@PerlDef:
+        __DEEP{
+          EQ: {
+            last EQ unless UNIVERSAL::isa ($arg, <IFName::NodeList>);
+
+            my $length1 = $self-><AG::NodeList.length>;
+            my $length2 = $arg-><AG::NodeList.length>;
+            last EQ unless $length1 == $length2;
+
+            for my $i (0..($length1-1)) {
+              unless ($self-><M::NodeList.item> ($i)
+                          == $arg-><M::NodeList.item> ($i)) {
+                last EQ;
+              }
+            }
+
+            $r = true;
+          } # EQ
+        }__;
+
+  @CLXAttr:
+    @@Name: manakaiReadOnly
+    @@Type: boolean
+    @@Get:
+      @@@PerlDef:
+        $r = false;
+
+    @@Test:
+      @@@QName: StaticNodeList.readOnly.test
+      @@@PerlDef:
+        my $nl;
+        __CODE{tc|createStaticNodeList:: $r => $nl}__;
+
+        $test->assert_true ($nl-><AG::NodeList.manakaiReadOnly>);
+##StaticNodeList
 
 ElementTypeBinding:
   @Name: Perlop
@@ -10451,6 +10843,38 @@ ResourceDef:
       type definition node.
     @@PerlDef:
       $map = bless \\($node), <ClassName::ManakaiDOMNotationMap>;
+
+  @LXAttr:
+    @@Name: manakaiReadOnly
+    @@enDesc:
+      Whether the <IF::NamedNodeMap> is read-only or not.
+    @@Type: idl|boolean||ManakaiDOM|all
+    @@Get:
+      @@@enDesc:
+        If the <IF::NamedNodeMap> is attached to a node,
+        e.g. it is contained in the <A::Node.attributes>
+        attribute, then it <kwd:MUST> return the same
+        value as the <A::Node.manakaiReadOnly>
+        attribute of the containing node.
+      @@@PerlDef:
+        $r = ($$$self)-><AG::Node.manakaiReadOnly>;
+
+    @@Test:
+      @@@QName: AttrMap.readOnly.test
+      @@@ForCheck: tc|ForAttrMap
+      @@@PerlDef:
+        my $el;
+        __CODE{createElementForTest:: $el => $el}__;
+
+        my $as = $el-><AG::Node.attributes>;
+ 
+        $test->id ('true');
+        $el-><M::Node.manakaiSetReadOnly> (true);
+        $test->assert_true ($as-><AG::Node.manakaiReadOnly>);
+
+        $test->id ('false');
+        $el-><M::Node.manakaiSetReadOnly> (false);
+        $test->assert_false ($as-><AG::Node.manakaiReadOnly>);
 ##NamedNodeMap
 
 IntPropDef:

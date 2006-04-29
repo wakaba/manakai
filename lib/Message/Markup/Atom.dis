@@ -1,0 +1,4102 @@
+Module:
+  @QName: Markup|Atom
+  @enFN:
+    Atom DOM
+  @enDesc:
+    The <DFN::Atom DOM> is a language and platform independent
+    programming language interface to Atom 1.0 documents
+    built on the W3C Document Object Model (DOM).  It defines
+    a number of interfaces that provide convenience
+    methods and attributes to process Atom 1.0 documents.
+
+      {TODO::
+        - Move descriptions below to somewhere.
+
+        - Formal definition for <IF::StaticNodeList> (reference
+          to Selectors API?) is necessary.
+      }
+
+    Some attributes are defined to contain a <IF::StaticNodeList>.
+    Multiple invocations for such an attribute don't have
+    to return exactly same object, even if no changes are made
+    on the underlying DOM structure.
+
+      {NOTE::
+        The equality of <IF::StaticNodeList> objects as per
+        the <M::Node.isEqualNode> method, however, is
+        preserved as long as the underlying DOM structure
+        and the configuration parameters are not changed.
+      }
+
+    Methods and attributes defined in this module does <EM::not>
+    support <IF::tx|EntityReference>s; for example, an element
+    node that is a child node of an entity reference node
+    that is a child node of another element node is <EM::not> considered
+    as a child element node of the other element node.  As a
+    result, applications written using this module might ignore
+    parts of Atom documents unless they configures their XML
+    parser not to expose entity references in the result DOM tree.
+
+  @Namespace:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Markup/Atom/
+
+  @DISCore:author: DISCore|Wakaba
+  @License: license|Perl+MPL
+  @Date:
+    $Date: 2006/04/29 11:05:09 $
+
+  @Require:
+    @@Module:
+      @@@QName: Markup|common
+    @@Module:
+      @@@QName: MDOM|TreeCore
+      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
+    @@Module:
+      @@@WithFor: ManakaiDOM|ManakaiDOM
+    @@Module:
+      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
+  @DefaultFor: ManakaiDOM|ManakaiDOMLatest
+
+Namespace:
+  @atom:
+    http://www.w3.org/2005/Atom
+  @c:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
+  @cfg:
+    http://suika.fam.cx/www/2006/dom-config/
+  @dis:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
+  @doc:
+    http://suika.fam.cx/~wakaba/archive/2005/7/tutorial#
+  @d:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/xdt#
+  @DOMMain:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/main#
+  @dx:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#
+  @ecore:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/Core/
+  @f:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/feature#
+  @fe:
+    http://suika.fam.cx/www/2006/feature/
+  @html:
+    http://www.w3.org/1999/xhtml
+  @idl:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/IDL#
+  @kwd:
+    http://suika.fam.cx/~wakaba/archive/2005/rfc2119/
+  @lang:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
+  @license:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
+  @ManakaiDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
+  @Markup:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Markup#
+  @mat:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Markup/Atom/
+  @MDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
+  @MDOMX:
+    http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
+  @dlp:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Perl#
+  @rel:
+    http://www.iana.org/assignments/relation/
+  @s:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Markup#
+  @tc:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/TreeCore/
+  @td:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/Document/
+  @te:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/Element/
+  @test:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Test#
+  @tx:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/XML/
+  @urigen:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/URI/Generic/
+  @xml:
+    http://www.w3.org/XML/1998/namespace
+
+ElementTypeBinding:
+  @Name: CODE
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: dlp|BlockCode
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: Method
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISLang|Method
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM
+
+ElementTypeBinding:
+  @Name: Param
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISLang|MethodParameter
+
+ElementTypeBinding:
+  @Name: Return
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISLang|MethodReturn
+
+ElementTypeBinding:
+  @Name: Attr
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISLang|Attribute
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM
+
+ElementTypeBinding:
+  @Name: Get
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISLang|AttributeGet
+
+ElementTypeBinding:
+  @Name: Set
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISLang|AttributeSet
+
+ElementTypeBinding:
+  @Name: nullCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: ManakaiDOM|InCase
+    @@Value:
+      @@@is-null:1
+
+ElementTypeBinding:
+  @Name: PerlDef
+  @ElementType:
+    dis:Def
+  @ShadowContent:
+    @@ContentType: lang|Perl
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: PerlCDef
+  @ElementType:
+    dis:Def
+  @ShadowContent:
+    @@ContentType: lang|Perl
+
+ElementTypeBinding:
+  @Name: enImplNote
+  @ElementType:
+    dis:ImplNote
+  @ShadowContent:
+    @@lang:en
+
+ElementTypeBinding:
+  @Name: enFN
+  @ElementType:
+    dis:FullName
+  @ShadowContent:
+    @@lang:en
+
+ElementTypeBinding:
+  @Name: IFClsETDef
+  @ElementType: 
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType:
+      @@@@: dis|MultipleResource
+      @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass !s|ForML
+    @@resourceFor: ManakaiDOM|ForIF
+    @@resourceFor: ManakaiDOM|ForClass
+    @@resourceFor: s|ForML
+    @@For: ManakaiDOM|ManakaiDOM
+
+    @@DISCore:resourceType:
+      @@@@: DISLang|Interface
+      @@@ForCheck: ManakaiDOM|ForIF
+
+    @@DISCore:resourceType:
+      @@@@: DISLang|Class
+      @@@ForCheck: ManakaiDOM|ForClass
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOM||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
+
+    @@s:elementType:
+      @@@@: ||+||s|ForML
+      @@@ContentType: DISCore|TFPQNames
+      @@@DISCore:stopISARecursive:1
+
+    @@DISCore:resourceType:
+      @@@@: s|ElementType
+      @@@ForCheck: s|ForML
+
+    @@f:implements: AtomFeature10
+
+ElementTypeBinding:
+  @Name: IFClsDef
+  @ElementType: 
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType:
+      @@@@: dis|MultipleResource
+      @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass !s|ForML
+    @@resourceFor: ManakaiDOM|ForIF
+    @@resourceFor: ManakaiDOM|ForClass
+    @@For: ManakaiDOM|ManakaiDOM
+
+    @@DISCore:resourceType:
+      @@@@: DISLang|Interface
+      @@@ForCheck: ManakaiDOM|ForIF
+
+    @@DISCore:resourceType:
+      @@@@: DISLang|Class
+      @@@ForCheck: ManakaiDOM|ForClass
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOM||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
+
+    @@f:implements: AtomFeature10
+
+ElementTypeBinding:
+  @Name: IFQName
+  @ElementType:
+    dis:QName
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForIF
+
+ElementTypeBinding:
+  @Name: ClsQName
+  @ElementType:
+    dis:QName
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: ETRQName
+  @ElementType:
+    dis:QName
+  @ShadowContent:
+    @@ForCheck: s|ForML
+
+ElementTypeBinding:
+  @Name: ETQName
+  @ElementType:
+    dis:AppName
+  @ShadowContent:
+    @@ForCheck: s|ForML
+    @@ContentType: DISCore|QName
+
+ElementTypeBinding:
+  @Name: IFISA
+  @ElementType:
+    dis:ISA
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForIF
+
+ElementTypeBinding:
+  @Name: ClsISA
+  @ElementType:
+    dis:ISA
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: disDef
+  @ElementType:
+    dis:Def
+  @ShadowContent:
+    @@ContentType:
+      lang:dis
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: Code
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: dlp|InlineCode
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: Test
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: test|StandaloneTest
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: TestC
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: test|StandaloneTest
+
+ResourceDef:
+  @QName: Document
+  @AliasFor: td|Document
+  @For: ManakaiDOM|DOM
+
+ResourceDef:
+  @QName: Element
+  @AliasFor: te|Element
+  @For: ManakaiDOM|DOM
+
+ResourceDef:
+  @QName: Attr
+  @AliasFor: te|Attr
+  @For: ManakaiDOM|DOM
+
+ResourceDef:
+  @QName: DOMString
+  @AliasFor: DOMMain|DOMString
+  @For: ManakaiDOM|DOM
+
+ResourceDef:
+  @QName: DOMURI
+  @AliasFor: ManakaiDOM|ManakaiDOMURI
+  @For: ManakaiDOM|DOM3
+
+ResourceDef:
+  @QName: DOMTimeStamp
+  @AliasFor: DOMMain|DOMTimeStamp
+  @For: ManakaiDOM|DOM2
+
+ResourceDef:
+  @QName: boolean
+  @AliasFor: idl|boolean||ManakaiDOM|all
+
+ResourceDef:
+  @QName: Node
+  @AliasFor: tc|Node
+  @For: ManakaiDOM|ManakaiDOM
+
+ResourceDef:
+  @QName: NodeList
+  @AliasFor: tc|NodeList
+  @For: ManakaiDOM|ManakaiDOM
+
+ResourceDef:
+  @QName: StaticNodeList
+  @AliasFor: tc|StaticNodeList
+  @For: ManakaiDOM|ManakaiDOM
+
+ElementTypeBinding:
+  @Name: enDesc
+  @ElementType:
+    dis:Description
+  @ShadowContent:
+    @@lang:en
+
+ElementTypeBinding:
+  @Name: TrueCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType:
+      ManakaiDOM:InCase
+    @@Value:
+      @@@@: 1
+      @@@ContentType: DISCore|Boolean
+    @@Type: idl|boolean||ManakaiDOM|all
+
+ElementTypeBinding:
+  @Name: FalseCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType:
+      ManakaiDOM:InCase
+    @@Value:
+      @@@@: 0
+      @@@ContentType: DISCore|Boolean
+    @@Type: idl|boolean||ManakaiDOM|all
+
+## -- Features
+
+ElementTypeBinding:
+  @Name: FeatureDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: f|Feature
+    @@For: =ManakaiDOM|all
+
+ElementTypeBinding:
+  @Name: FeatureVerDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: f|Feature
+
+ElementTypeBinding:
+  @Name: featureQName
+  @ElementType:
+    f:name
+  @ShadowContent:
+    @@ContentType: DISCore|QName
+
+FeatureDef:
+  @featureQName: fe|Atom
+  @QName: AtomFeature
+  @FeatureVerDef:
+    @@QName: AtomFeature10
+    @@Version: 1.0
+    @@f:instanceOf: AtomFeature
+    @@f:requires: tx|XMLFeature30
+    @@enDesc:
+      The Atom DOM, version 1.0.
+
+## -- Implementation
+
+IFClsDef:
+  @IFQName: AtomImplementation
+  @ClsQName: ManakaiAtomImplementation
+
+  @IFISA: c|DOMImplementation
+  @ClsISA: c|ManakaiDOMImplementation
+
+  @enDesc:
+    The <IF::AtomImplementation> interface provides convenience
+    methods to create Atom documents.
+
+  @f:provides: AtomFeature10
+
+  @Test:
+    @@QName: AtomImplementation.interface.test
+    @@PerlDef:
+      for my $interface (
+        <IFName::AtomImplementation>,
+        <IFName::AtomImplementation||ManakaiDOM|ManakaiDOM>,
+        <IFName::c|DOMImplementation>,
+        <IFName::urigen|URIImplementation>,
+        <IFName::f|MinimumImplementation>,
+        <IFName::f|GetFeature>,
+      ) {
+        $test->id ($interface);
+        $test->assert_true
+                 (<Class::ManakaiAtomImplementation>->isa ($interface));
+      }
+  @Test:
+    @@QName: ImplementationRegistry.AtomImplementation.1.test
+    @@PerlDef:
+      require Message::Markup::Atom;
+      my $impl = $Message::DOM::ImplementationRegistry
+                   ->get_implementation ({
+                       <Q::fe|Atom> => '1.0',
+                     });
+
+      $test->assert_isa ($impl, <IFName::AtomImplementation>);
+  @Test:
+    @@QName: ImplementationRegistry.AtomImplementation.2.test
+    @@PerlDef:
+      require Message::Markup::Atom;
+      my $impl = $Message::DOM::ImplementationRegistry
+                   ->get_implementation ({
+                       Core => '3.0',
+                       <Q::fe|Atom> => '1.0',
+                     });
+
+      $test->assert_isa ($impl, <IFName::AtomImplementation>);
+  @Test:
+    @@QName: ImplementationRegistry.AtomImplementation.3.test
+    @@PerlDef:
+      require Message::Markup::Atom;
+      my $impl = $Message::DOM::ImplementationRegistry
+                   ->get_implementation ({
+                       XML => '3.0',
+                       <Q::fe|Atom> => '1.0',
+                     });
+
+      $test->assert_isa ($impl, <IFName::AtomImplementation>);
+
+  @Method:
+    @@Name: createAtomFeedDocument
+    @@enDesc:
+      Creates an Atom Feed Document object.
+    @@Param:
+      @@@Name: id
+      @@@Type: DOMString
+      @@@actualType: DOMURI
+      @@@enDesc:
+        The <XE::atom|id> of the feed.
+    @@Param:
+      @@@Name: title
+      @@@Type: DOMString
+      @@@enDesc:
+        The <XE::atom|title> of the feed.
+      @@@nullCase:
+        @@@@enDesc:
+          The implementation <kwd:MUST> treate <DOM::null>
+          as if an empty string is specified.
+    @@Param:
+      @@@Name: lang
+      @@@Type: DOMString
+      @@@enDesc:
+        The default natural language of the feed.
+      @@@nullCase:
+        @@@@enDesc:
+          The implementation <kwd:MUST> treate <DOM::null>
+          as if an empty string is specified.
+    @@Return:
+      @@@Type: AtomFeedDocument
+      @@@enDesc:
+        The newly created Atom Feed Document.
+
+        {P:: The returned object <kwd:MUST> be a <IF::Document> node
+             with attributes:
+
+           - <A::Node.childNodes>::: A <IF::NodeList> containing
+                                     a new <XE::atom|feed> element node.
+
+           - <A::Document.xmlVersion>::: <XML::1.0>.
+
+        }
+
+        {P:: The newly created <XE::atom|feed> element node <kwd:MUST>
+             have attributes set as:
+
+           - <A::Node.attributes>::: A <IF::NamedNodeMap> that contains
+                                     at least a new <XA::xml|lang>
+                                     attribute node.
+
+           - <A::Node.childNodes>::: A <IF::NodeList> containing
+                                     a new <XE::atom|id> element node,
+                                     a new <XE::atom|title> element node, and
+                                     a new <XE::atom|updated> element node
+                                     in any order.
+
+        }
+
+        {P:: The newly created <XA::xml|lang> attribute node <kwd:MUST>
+             have attributes set as:
+
+           - <A::Node.nodeValue>::: <P::lang>.
+
+           - <A::Attr.specified>::: <DOM::true>.
+
+        }
+
+        {P:: The newly created <XE::atom|id> element node <kwd:MUST>
+             have attributes set as:
+
+           - <A::Node.textContent>::: <P::id>.
+
+        }
+
+        {P:: The newly created <XE::atom|title> element node <kwd:MUST>
+             have attributes set as:
+
+           - <A::Node.textContent>::: <P::title>.
+
+        }
+
+        The <XA::type> attribute node <kwd:MUST-NOT> be attached
+        to the <XE::atom|title> element node.
+
+        {P:: The newly created <XE::atom|updated> element node <kwd:MUST>
+             have attributes set as:
+
+           - <A::Node.textContent>::: A uppercase RFC 3339 <CODE::date-time>
+             representation of the time when the method is invoked.
+             The implementation <kwd:MAY> align its timezone to
+             that of the environment in which the method is invoked.
+
+        }
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><M::c|DOMImplementation.createDocument>
+                        (<Q::atom|>, 'feed');
+          $r-><AS::Document.xmlVersion> ('1.0');
+
+          my $feede = $r-><AG::Document.documentElement>;
+          $feede-><AS::Node.manakaiLanguage> (defined $lang ? $lang : '');
+
+          $feede-><AS::AtomFeedElement.id> ($id);
+
+          my $titlee = $r-><M::Document.createElementNS> (<Q::atom|>, 'title');
+          $titlee-><AS::Node.textContent> (defined $title ? $title : '');
+          $feede-><M::Node.appendChild> ($titlee);
+
+          my $updatede = $r-><M::Document.createElementNS>
+                               (<Q::atom|>, 'updated');
+          $updatede-><AS::AtomDateConstruct.value> (scalar time);
+          $feede-><M::Node.appendChild> ($updatede);
+        }__;
+
+    @@Test:
+      @@@QName: AtomImplementation.createAtomFeedDocument.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{tc|createImplForTest:: $impl => $impl}__;
+        $impl = $impl->get_feature (<Q::fe|Atom> => '1.0');
+
+        my $doc = $impl-><M::AtomImplementation.createAtomFeedDocument>
+                           ('about:id', 'feed title', 'en');
+
+        $test->id ('document.interface');
+        $test->assert_isa ($doc, <IFName::Document>);
+
+        $test->id ('document.xmlVersion');
+        $test->assert_equals ($doc-><AG::Document.xmlVersion>, '1.0');
+
+        my $feed = $doc-><AG::Document.documentElement>;
+
+        $test->id ('feed.namespaceURI');
+        $test->assert_equals ($feed-><AG::Node.namespaceURI>, <Q::atom|>);
+
+        $test->id ('feed.localName');
+        $test->assert_equals ($feed-><AG::Node.localName>, 'feed');
+
+        $test->id ('feed.lang');
+        $test->assert_equals ($feed-><M::Element.getAttributeNS>
+                                         (<Q::xml|>, 'lang'),
+                              'en');
+
+        my $id;
+        my $title;
+        my $updated;
+
+        for my $cn (@{$feed-><AG::Node.childNodes>}) {
+          if ($cn-><AG::Node.nodeType> == <C::Node.ELEMENT_NODE> and
+              $cn-><AG::Node.namespaceURI> eq <Q::atom|>) {
+            if ($cn-><AG::Node.localName> eq 'id') {
+              $id = $cn;
+            } elsif ($cn-><AG::Node.localName> eq 'title') {
+              $title = $cn;
+            } elsif ($cn-><AG::Node.localName> eq 'updated') {
+              $updated = $cn;
+            }
+          }
+        }
+   
+        $test->id ('id');
+        $test->assert_not_null ($id);
+
+        $test->id ('id.value');
+        $test->assert_equals ($id-><AG::Node.textContent>, 'about:id');
+   
+        $test->id ('title');
+        $test->assert_not_null ($title);
+
+        $test->id ('title.value');
+        $test->assert_equals ($title-><AG::Node.textContent>, 'feed title');
+
+        $test->id ('title.type');
+        $test->assert_null ($title-><M::Element.getAttributeNS> (null, 'type'));
+   
+        $test->id ('updated');
+        $test->assert_not_null ($updated);
+
+        $test->id ('updated.value');
+        $test->assert_num_not_equals
+                 (actual_value => $updated-><AG::AtomDateConstruct.value>,
+                  expected_value => 0);
+
+  @Method:
+    @@Name: createAtomEntryDocument
+    @@enDesc:
+      Creates an Atom Entry Document object.
+    @@Param:
+      @@@Name: id
+      @@@Type: DOMString
+      @@@actualType: DOMURI
+      @@@enDesc:
+        The <XE::atom|id> of the entry.
+    @@Param:
+      @@@Name: title
+      @@@Type: DOMString
+      @@@enDesc:
+        The <XE::atom|title> of the entry.
+      @@@nullCase:
+        @@@@enDesc:
+          The implementation <kwd:MUST> treate <DOM::null>
+          as if an empty string is specified.
+    @@Param:
+      @@@Name: lang
+      @@@Type: DOMString
+      @@@enDesc:
+        The natural language of the entry.
+      @@@nullCase:
+        @@@@enDesc:
+          The implementation <kwd:MUST> treate <DOM::null>
+          as if an empty string is specified.
+    @@Return:
+      @@@Type: AtomEntryDocument
+      @@@enDesc:
+        The newly created Atom Entry Document.
+
+        {P:: The returned object <kwd:MUST> be a <IF::Document> node
+             with attributes:
+
+           - <A::Node.childNodes>::: A <IF::NodeList> containing
+                                     a new <XE::atom|entry> element node.
+
+           - <A::Document.xmlVersion>::: <XML::1.0>.
+
+        }
+
+        {P:: The newly created <XE::atom|entry> element node <kwd:MUST>
+             have attributes set as:
+
+           - <A::Node.attributes>::: A <IF::NamedNodeMap> that contains
+                                     at least a new <XA::xml|lang>
+                                     attribute node.
+
+           - <A::Node.childNodes>::: A <IF::NodeList> containing
+                                     a new <XE::atom|id> element node,
+                                     a new <XE::atom|title> element node, and
+                                     a new <XE::atom|updated> element node
+                                     in any order.
+
+        }
+
+        {P:: The newly created <XA::xml|lang> attribute node <kwd:MUST>
+             have attributes set as:
+
+           - <A::Node.nodeValue>::: <P::lang>.
+
+           - <A::Attr.specified>::: <DOM::true>.
+
+        }
+
+        {P:: The newly created <XE::atom|id> element node <kwd:MUST>
+             have attributes set as:
+
+           - <A::Node.textContent>::: <P::id>.
+
+        }
+
+        {P:: The newly created <XE::atom|title> element node <kwd:MUST>
+             have attributes set as:
+
+           - <A::Node.textContent>::: <P::title>.
+
+        }
+
+        The <XA::type> attribute node <kwd:MUST-NOT> be attached
+        to the <XE::atom|title> element node.
+
+        {P:: The newly created <XE::atom|updated> element node <kwd:MUST>
+             have attributes set as:
+
+           - <A::Node.textContent>::: A uppercase RFC 3339 <CODE::date-time>
+             representation of the time when the method is invoked.
+             The implementation <kwd:MAY> align its timezone to
+             that of the environment in which the method is invoked.
+
+        }
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><M::c|DOMImplementation.createDocument>
+                        (<Q::atom|>, 'entry');
+          $r-><AS::Document.xmlVersion> ('1.0');
+
+          my $feede = $r-><AG::Document.documentElement>;
+          $feede-><AS::Node.manakaiLanguage> (defined $lang ? $lang : '');
+
+          $feede-><AS::AtomFeedElement.id> ($id);
+
+          my $titlee = $r-><M::Document.createElementNS> (<Q::atom|>, 'title');
+          $titlee-><AS::Node.textContent> (defined $title ? $title : '');
+          $feede-><M::Node.appendChild> ($titlee);
+
+          my $updatede = $r-><M::Document.createElementNS>
+                               (<Q::atom|>, 'updated');
+          $updatede-><AS::AtomDateConstruct.value> (scalar time);
+          $feede-><M::Node.appendChild> ($updatede);
+        }__;
+
+    @@Test:
+      @@@QName: AtomImplementation.createAtomEntryDocument.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{tc|createImplForTest:: $impl => $impl}__;
+        $impl = $impl->get_feature (<Q::fe|Atom> => '1.0');
+
+        my $doc = $impl-><M::AtomImplementation.createAtomEntryDocument>
+                           ('about:id', 'entry title', 'en');
+
+        $test->id ('document.interface');
+        $test->assert_isa ($doc, <IFName::Document>);
+
+        $test->id ('document.xmlVersion');
+        $test->assert_equals ($doc-><AG::Document.xmlVersion>, '1.0');
+
+        my $feed = $doc-><AG::Document.documentElement>;
+
+        $test->id ('feed.namespaceURI');
+        $test->assert_equals ($feed-><AG::Node.namespaceURI>, <Q::atom|>);
+
+        $test->id ('feed.localName');
+        $test->assert_equals ($feed-><AG::Node.localName>, 'entry');
+
+        $test->id ('feed.lang');
+        $test->assert_equals ($feed-><M::Element.getAttributeNS>
+                                         (<Q::xml|>, 'lang'),
+                              'en');
+
+        my $id;
+        my $title;
+        my $updated;
+
+        for my $cn (@{$feed-><AG::Node.childNodes>}) {
+          if ($cn-><AG::Node.nodeType> == <C::Node.ELEMENT_NODE> and
+              $cn-><AG::Node.namespaceURI> eq <Q::atom|>) {
+            if ($cn-><AG::Node.localName> eq 'id') {
+              $id = $cn;
+            } elsif ($cn-><AG::Node.localName> eq 'title') {
+              $title = $cn;
+            } elsif ($cn-><AG::Node.localName> eq 'updated') {
+              $updated = $cn;
+            }
+          }
+        }
+   
+        $test->id ('id');
+        $test->assert_not_null ($id);
+
+        $test->id ('id.value');
+        $test->assert_equals ($id-><AG::Node.textContent>, 'about:id');
+   
+        $test->id ('title');
+        $test->assert_not_null ($title);
+
+        $test->id ('title.value');
+        $test->assert_equals ($title-><AG::Node.textContent>, 'entry title');
+
+        $test->id ('title.type');
+        $test->assert_null ($title-><M::Element.getAttributeNS> (null, 'type'));
+   
+        $test->id ('updated');
+        $test->assert_not_null ($updated);
+
+        $test->id ('updated.value');
+        $test->assert_num_not_equals
+                 (actual_value => $updated-><AG::AtomDateConstruct.value>,
+                  expected_value => 0);
+
+  @enImplNote:
+    @@ddid: imt
+    @@@:
+      {ISSUE::
+        The <CODE::contentType> attribute of the created document
+        should be set to <CODE::application/atom+xml>?
+      }
+
+  @CODE:
+    @@QName: returnChildElement
+    @@enDesc:
+      {P:: The algorithm to <DFN::return <VAR::element-type> child
+           element> of the element node <VAR::E> is defined as:
+
+        = If <VAR::E> contains one or more child element node
+          whose element type is <VAR::element-type>, 
+          it <kwd:MUST> return the first such element node
+          in document order.
+
+        {OLI:: Otherwise,
+
+          {OLI:: If the <cfg::cfg|create-child-element> configuration
+                 parameter is set to <DOM::true>,
+
+             = Create an element node <VAR::N> whose element type 
+               is <VAR::element-type>.
+
+             = Append <VAR::N> to <VAR::E> as if the <M::Node.appendChild>
+               method were called for <VAR::E> with its parameter
+               set to <VAR::N>.  Note that this might throw an exception.
+
+             = Then, <VAR::N> <kwd:MUST> be returned.
+
+          }
+
+          = Otherwise, <DOM::null> <kwd:MUST> be returned.
+
+        }
+
+      }
+    @@PerlDef:
+      __DEEP{
+        E: {
+          no warnings 'uninitialized';
+          for my $__el (@{$node-><AG::Node.childNodes>}) {
+            if ($__el-><AG::Node.nodeType> == <C::Node.ELEMENT_NODE> and
+                $__el-><AG::Node.localName> eq $localName and
+                $__el-><AG::Node.namespaceURI> eq $namespaceURI) {
+              $r = $__el;
+              last E;
+            }
+          }
+  
+          my $od = $node-><AG::Node.ownerDocument>;
+          if ($od-><AG::Document.domConfig>
+                 -><M::CFG.getParameter> (<Q::cfg|create-child-element>)) {
+            $r = $od-><M::Document.createElementNS> ($namespaceURI, $localName);
+            $node-><M::Node.appendChild> ($r);
+          }
+        } # E
+      }__;
+
+  @CODE:
+    @@QName: returnChildElementList
+    @@enDesc:
+      {P:: The algorithm to <DFN::return <VAR::element-type> child
+           element list> of the element node <VAR::E> is defined as:
+
+         = Creates an empty <IF::StaticNodeList> object <VAR::L>
+           that is <EM::not> read-only.
+
+         = For each child element node of <VAR::E>,
+           add that element node to <VAR::L> in document order
+           if its element type is <VAR::element-type>.
+
+         = Returns <VAR::E>.
+
+      }
+    @@PerlDef:
+      __DEEP{
+        no warnings 'uninitialized';
+        __CODE{tc|createStaticNodeList:: $r => $r}__;
+        for my $__el (@{$node-><AG::Node.childNodes>}) {
+          if ($__el-><AG::Node.nodeType> == <C::Node.ELEMENT_NODE> and
+              $__el-><AG::Node.localName> eq $localName and
+              $__el-><AG::Node.namespaceURI> eq $namespaceURI) {
+            push @{$r}, $__el;
+          }
+        }
+      }__;
+
+  @CODE:
+    @@QName: getReflectStringValue
+    @@enDesc:
+      {P:: If a DOM attribute is defined to <DFN::reflect the string value
+           of the <VAR::element-type> child element> of the node <VAR::E>,
+           the getter of the attribute <kwd:MUST> return the value
+           defined by the algorithm:
+
+        = If the <VAR::E> contains a child element node <VAR::C> whose element
+          type is <VAR::element-type>, it <kwd:MUST> return
+          the <A::Node.textContent> value of the <VAR::C>.
+
+        = Otherwise, it <kwd:MUST> return <DOM::null>.
+
+      }
+    @@PerlDef:
+      __DEEP{
+        E: {
+          no warnings 'uninitialized';
+          for my $__cn (@{$node-><AG::Node.childNodes>}) {
+            if ($__cn-><AG::Node.nodeType> == <C::Node.ELEMENT_NODE> and
+                $__cn-><AG::Node.localName> eq $localName and
+                $__cn-><AG::Node.namespaceURI> eq $namespaceURI) {
+              $r = $__cn-><AG::Node.textContent>;
+              last E;
+            }
+          }
+          $r = null;
+        } # E
+      }__;
+
+  @CODE:
+    @@QName: setReflectStringValue
+    @@enDesc:
+      {P:: If a DOM attribute is defined to <DFN::reflect the string value
+           of the <VAR::element-type> child element> of the node <VAR::E>,
+           the setter of the attribute <kwd:MUST> modify the node as
+           defined by the algorithm:
+
+        = If the given value is <DOM::null>, any child elements
+          whose element types are <VAR::element-type> <kwd:MUST>
+          be removed from the list of child nodes.
+
+        = Otherwise, if there is no <VAR::element-type> child element
+          node in the child node list of the <VAR::E>, it
+          <kwd:MUST> create an element node whose element type
+          is <VAR::element-type>, append it to the <VAR::E> as
+          if the <M::Node.appendChild> method were invoked, and
+          set the <A::Node.textContent> of the newly created
+          element node to the given value.
+
+        = Otherwise, it <kwd:MUST> set the <A::Node.textContent>
+          of the first <VAR::element-type> child element node 
+          in the child node list of the <VAR::E> to the given value.
+
+      }
+
+        {NOTE::
+          It might throw an exception.
+        }
+    @@PerlDef:
+      __DEEP{
+        no warnings 'uninitialized';
+        if (defined $given) {
+          my $__target;
+          E: {
+            for my $__cl (@{$node-><AG::Node.childNodes>}) {
+              if ($__cl-><AG::Node.nodeType> == <C::Node.ELEMENT_NODE> and
+                  $__cl-><AG::Node.localName> eq $localName and
+                  $__cl-><AG::Node.namespaceURI> eq $namespaceURI) {
+                $__target = $__cl;
+                last E;
+              }
+            }
+
+            $__target = $node-><AG::Node.ownerDocument>
+                             -><M::Document.createElementNS>
+                                 ($namespaceURI, $localName);
+            $node-><M::Node.appendChild> ($__target);
+          } # E
+ 
+          $__target-><AS::Node.textContent> ($given);
+        } else {
+          my @__remove;
+          for my $__cl (@{$node-><AG::Node.childNodes>}) {
+            if ($__cl-><AG::Node.nodeType> == <C::Node.ELEMENT_NODE> and
+                $__cl-><AG::Node.localName> eq $localName and
+                $__cl-><AG::Node.namespaceURI> eq $namespaceURI) {
+              push @__remove, $__cl;
+            }
+          }
+          $node-><M::Node.removeChild> ($_) for @__remove;
+        }
+      }__;
+
+  @CODE:
+    @@QName: getReflectAttrStringValue
+    @@enDesc:
+      {P:: If a DOM attribute is defined to <DFN::reflect the string value
+           of the <VAR::attr-name> attribute> of the node <VAR::E>,
+           the getter of the attribute <kwd:MUST> return the value
+           defined by the algorithm:
+
+        = If the <VAR::E> contains an attribute node <VAR::A> whose name
+          is <VAR::attr-name>, it <kwd:MUST> return
+          the <A::Node.nodeValue> of the <VAR::A>.
+
+        = If a default value is explicitly defined
+          where this algorithm is referenced, it <kwd:MUST>
+          return the default value.
+
+        = Otherwise, it <kwd:MUST> return <DOM::null>.
+
+      }
+    @@PerlDef:
+      __DEEP{
+        E: {
+          $r = $node-><M::Element.getAttributeNS> ($namespaceURI, $localName);
+          last E if defined $r;
+
+          $r = $defaultValue;
+        } # E
+      }__;
+
+  @CODE:
+    @@QName: setReflectAttrStringValue
+    @@enDesc:
+      {P:: If a DOM attribute is defined to <DFN::reflect the string value
+           of the <VAR::attr-name> attribute> of the node <VAR::E>,
+           the setter of the attribute <kwd:MUST> modify the node as
+           defined by the algorithm:
+
+        = If the given value is <DOM::null>, it <kwd:MUST>
+          remove the <VAR::attr-name> attribute node, if any,
+          from the list of attribute nodes of <VAR::E>.
+
+        = Otherwise, it <kwd:MUST> set the <VAR::attr-name>
+          attribute node value to the given value as if 
+          the <M::Element.setAttributeNS> method were invoked.
+
+      }
+
+        {NOTE::
+          It might throw an exception.
+        }
+    @@PerlDef:
+      __DEEP{
+        if (defined $given) {
+          $node-><M::Element.setAttributeNS> ($namespaceURI, $localName, $given);
+        } else {
+          $node-><M::Element.removeAttributeNS> ($namespaceURI, $localName);
+        }
+      }__;
+
+  @CODE:
+    @@QName: getReflectURIValue
+    @@enDesc:
+      {P:: If a DOM attribute is defined to <DFN::reflect the URI value
+           of the <VAR::element-type> child element> of the node <VAR::E>,
+           the getter of the attribute <kwd:MUST> return the value
+           defined by the algorithm:
+
+         = Get the string <VAR::S> that would be returned
+           if the DOM attribute <I::reflects the string value
+           of the <VAR::element-type> child element> of the <VAR::E>.
+
+         = If the <VAR::S> is <DOM::null>, it <kwd:MUST> return
+           <DOM::null>.
+
+         = Otherwise, if the <A::Node.baseURI> of the node
+           from which the <VAR::S> comes is <DOM::null>,
+           it <kwd:MUST> return the <VAR::S>.
+
+         = Otherwise, a string that would be returned by the
+           <M::urigen|URIReference.getAbsoluteReference>
+           method on a <IF::urigen|URIReference> object whose
+           <A::urigen|URIReference.uriReference> value
+           equals to <A::Node.textContent> with the <CODE::base> parameter
+           set to the <A::Node.baseURI> of the node
+           from which the <VAR::S> comes and the <CODE::nonStrict>
+           parameter set to <DOM::false>.
+
+      }
+    @@PerlDef:
+      __DEEP{
+        E: {
+          no warnings 'uninitialized';
+          for my $__cn (@{$node-><AG::Node.childNodes>}) {
+            if ($__cn-><AG::Node.nodeType> == <C::Node.ELEMENT_NODE> and
+                $__cn-><AG::Node.localName> eq $localName and
+                $__cn-><AG::Node.namespaceURI> eq $namespaceURI) {
+              my $__ref_buri = $__cn-><AG::Node.baseURI>;
+              if (defined $__ref_buri) {
+                $r = $node-><AG::Node.ownerDocument>
+                          -><AG::Document.implementation>
+                          -><M::urigen|URIImplementation.createURIReference>
+                              ($__cn-><AG::Node.textContent>)
+                          -><M::urigen|URIReference.getAbsoluteReference>
+                              ($__ref_buri)
+                          -><AG::urigen|URIReference.uriReference>;
+              } else {
+                $r = $__cn-><AG::Node.textContent>;
+              }
+              last E;
+            }
+          }
+          $r = null;
+        } # E
+      }__;
+
+  @CODE:
+    @@QName: setReflectURIValue
+    @@enDesc:
+      If a DOM attribute is defined to <DFN::reflect the URI value
+      of the <VAR::element-type> child element> of the node <VAR::E>,
+      the setter of the attribute <kwd:MUST> modify the node as
+      if the DOM attribute <I::reflects the string value of
+      the <VAR::element-type> child element> of the <VAR::E>.
+
+        {NOTE::
+          It might throw an exception.
+        }
+    @@PerlDef:
+      __CODE{setReflectStringValue}__;
+
+  @CODE:
+    @@QName: getReflectAttrURIValue
+    @@enDesc:
+      {P:: If a DOM attribute is defined to <DFN::reflect the URI value
+           of the <VAR::attr-name> attribute> of the node <VAR::E>,
+           the getter of the attribute <kwd:MUST> return the value
+           defined by the algorithm:
+
+         = Get the string <VAR::S> that would be returned
+           if the DOM attribute <I::reflects the string value
+           of the <VAR::attr-name> attribute> of the <VAR::E>.
+
+         = If the <VAR::S> is <DOM::null>, it <kwd:MUST> return
+           <DOM::null>.
+
+         = Otherwise, if the <A::Node.baseURI> of the node
+           from which the <VAR::S> comes is <DOM::null>,
+           it <kwd:MUST> return the <VAR::S>.
+
+         = Otherwise, a string that would be returned by the
+           <M::urigen|URIReference.getAbsoluteReference>
+           method on a <IF::urigen|URIReference> object whose
+           <A::urigen|URIReference.uriReference> value
+           equals to <A::Node.textContent> with the <CODE::base> parameter
+           set to the <A::Node.baseURI> of the node
+           from which the <VAR::S> comes and the <CODE::nonStrict>
+           parameter set to <DOM::false>.
+
+      }
+    @@PerlDef:
+      __DEEP{
+        my $__attr = $node-><M::Element.getAttributeNodeNS> 
+                              ($namespaceURI, $localName);
+        if (defined $__attr) {
+          my $__attr_base = $__attr-><AG::Node.baseURI>;
+          if (defined $__attr_base) {
+            $r = $node-><AG::Node.ownerDocument>
+                      -><AG::Document.implementation>
+                      -><M::urigen|URIImplementation.createURIReference>
+                          ($__attr-><AG::Node.nodeValue>)
+                      -><M::urigen|URIReference.getAbsoluteReference>
+                          ($__attr_base)
+                      -><AG::urigen|URIReference.uriReference>;
+          } else {
+            $r = $__attr-><AG::Node.nodeValue>;
+          }
+        } else {
+          $r = null;
+        }
+      }__;
+
+  @CODE:
+    @@QName: setReflectAttrURIValue
+    @@enDesc:
+      If a DOM attribute is defined to <DFN::reflect the URI value
+      of the <VAR::attr-name> attribute> of the node <VAR::E>,
+      the setter of the DOM attribute <kwd:MUST> modify the node as
+      if the DOM attribute <I::reflects the string value of
+      the <VAR::attr-name> attribute> of the <VAR::E>.
+
+        {NOTE::
+          It might throw an exception.
+        }
+    @@PerlDef:
+      __CODE{setReflectAttrStringValue}__;
+
+  @enImplNote:
+    @@ddid: datereflect
+    @@@:
+      {ISSUE::
+        <QUOTE::reflecting Date child element> attribute should
+        be provided for published and created?
+      }
+##AtomImplementation
+
+IFClsDef:
+  @IFQName: AtomDocument
+  @ClsQName: ManakaiAtomDocument
+
+  @IFISA: Document
+  @ClsISA: td|ManakaiDOMDocument
+
+  @s:rootElementType: AnyAtomElement||ManakaiDOM|all
+
+  @enDesc:
+    If the <Feature::fe|Atom> feature version <FeatureVer::1.0>
+    is supported, a <IF::Document> object whose <A::Document.documentElement>'s
+    <A::Node.namespaceURI>, if any, is <URI^^DISCore|QName::atom|> at least
+    at the time of creation <kwd:MUST> also
+    implement the <IF::AtomDocument> interface.  Other
+    <IF:Document> objects <kwd:MAY> also implement
+    the <IF::AtomDocument> interface.
+
+  @Test:
+    @@QName: createDocument.AtomDocument.test
+    @@PerlDef:
+      my $impl;
+      __CODE{tc|createImplForTest:: $impl => $impl}__;
+    
+      my $doc = $impl-><M::c|DOMImplementation.createDocument>
+                         (<Q::atom|>, 'unknown');
+
+      $test->id ('interface');
+      $test->assert_isa ($doc, <IFName::AtomDocument>);
+##AtomDocument
+
+IFClsDef:
+  @IFQName: AtomFeedDocument
+  @ClsQName: ManakaiFeedEntryDocument
+
+  @IFISA: AtomDocument
+  @ClsISA: ManakaiAtomDocument
+
+  @s:rootElementType:
+    @@@: atom|feed
+    @@DISCore:stopISARecursive: 1
+
+  @enDesc:
+    The <IF::AtomFeedDocument> interface provides convenience
+    methods and attributes for an Atom
+    Feed Document, i.e. representation of an Atom feed.
+
+    If the <Feature::fe|Atom> feature version <FeatureVer::1.0>
+    is supported, a <IF::Document> object whose <A::Document.documentElement>'s
+    element type, if any, is <XE::atom|feed> at least at 
+    the time of creation <kwd:MUST> also
+    implement the <IF::AtomFeedDocument> interface.  Other
+    <IF::Document> objects <kwd:MAY> also implement
+    the <IF::AtomFeedDocument> interface.
+
+  @Test:
+    @@QName: createDocument.AtomFeedDocument.test
+    @@PerlDef:
+      my $impl;
+      __CODE{tc|createImplForTest:: $impl => $impl}__;
+    
+      my $doc = $impl-><M::c|DOMImplementation.createDocument>
+                         (<Q::atom|>, 'feed');
+
+      $test->id ('interface');
+      $test->assert_isa ($doc, <IFName::AtomFeedDocument>);
+##AtomFeedDocument
+
+IFClsDef:
+  @IFQName: AtomEntryDocument
+  @ClsQName: ManakaiAtomEntryDocument
+
+  @IFISA: AtomDocument
+  @ClsISA: ManakaiAtomDocument
+
+  @s:rootElementType:
+    @@@: atom|entry
+    @@DISCore:stopISARecursive: 1
+
+  @enDesc:
+    The <IF::AtomEntryDocument> interface provides convenience
+    methods and attributes for an Atom
+    Entry Document, i.e. exactly one Atom entry, outside
+    of the context of an Atom feed.
+
+    If the <Feature::fe|Atom> feature version <FeatureVer::1.0>
+    is supported, a <IF::Document> object whose <A::Document.documentElement>'s
+    element type, if any, is <XE::atom|entry> at least at
+    the time of the creation <kwd:MUST> also
+    implement the <IF::AtomEntryDocument> interface.  Other
+    <IF::Document> objects <kwd:MAY> also implement
+    the <IF::AtomEntryDocument> interface.
+
+  @Test:
+    @@QName: createDocument.AtomEntryDocument.test
+    @@PerlDef:
+      my $impl;
+      __CODE{tc|createImplForTest:: $impl => $impl}__;
+    
+      my $doc = $impl-><M::c|DOMImplementation.createDocument>
+                         (<Q::atom|>, 'entry');
+
+      $test->id ('interface');
+      $test->assert_isa ($doc, <IFName::AtomEntryDocument>);
+##AtomEntryDocument
+
+IFClsDef:
+  @IFQName: AtomElement
+  @ClsQName: ManakaiAtomElement
+
+  @IFISA: Element
+  @ClsISA: te|ManakaiDOMElement
+   
+  @s:elementType: AnyAtomElement||ManakaiDOM|all
+
+  @enDesc:
+    The <IF::AtomElement> interface provides convenience
+    methods and attributes for Atom elements.
+    
+    If the <Feature::fe|Atom> feature version <FeatureVer::1.0>
+    is supported, an <IF::Element> object whose namespace URI
+    is <URI^^DIS|QName::atom|> <kwd:MUST> also implement
+    the <IF::AtomElement> interface.  Other <IF::Element> objects
+    <kwd:MAY> also implement the <IF::AtomElement> interface.
+
+  @enImplNote:
+    @@ddid: todo
+    @@@:
+      {TODO::
+        Need <CODE::xmllang> and <CODE::xmlbase> attributes
+        from SVG?
+      }
+
+  @Test:
+    @@QName: AtomElement.interface.test
+    @@PerlDef:
+      for my $interface (
+        <IFName::AtomElement>,
+        <IFName::AtomElement||ManakaiDOM|ManakaiDOM>,
+        <IFName::Element>,
+        <IFName::Node>,
+        <IFName::f|GetFeature>,
+      ) {
+        $test->id ($interface);
+        $test->assert_true (<Class::ManakaiAtomElement>->isa ($interface));
+      }
+  @Test:
+    @@QName: createElementNS.AtomElement.test
+    @@PerlDef:
+      my $doc;
+      __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+      my $el = $doc-><M::Document.createElementNS> (<Q::atom|>, 'unknown');
+      $test->assert_isa ($el, <IFName::AtomElement>);
+##AtomElement
+
+ResourceDef:
+  @QName: AnyAtomElement
+  @DISCore:resourceType: s|AnyElementInNS
+  @AppName:
+    @@@: atom|*
+    @@ContentType: DISCore|QName
+  @ForCheck: =ManakaiDOM|all
+
+IFClsDef:
+  @IFQName: AtomTextConstruct
+  @ClsQName: ManakaiAtomTextConstruct
+
+  @IFISA: AtomElement
+  @ClsISA: ManakaiAtomElement
+
+  @enDesc:
+    The <IF::AtomTextConstruct> interface provides convenience
+    methods and attributes for <IF::Element> nodes
+    classfied to the Text constructs.  Other <IF::Element>
+    objects <kwd:MAY> also implement the <IF::AtomTextConstruct>
+    interface.
+
+    A Text construct contains human-readable text, usually in
+    small quantities.  The content of Text constructs is
+    Language-Sensitive.
+
+  @Attr:
+    @@Name: type
+    @@enDesc:
+      The <XA::type> attribute of the element.
+
+      It <kwd:MUST> <I::reflect the string value
+      of the <XA::type> attribute> of the node.  The
+      default value <kwd:MUST> be <CODE::text>.
+    @@Type: DOMString
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          If the algorithm returns <DOM::null>.
+      @@@PerlDef:
+        __CODE{getReflectAttrStringValue::
+          $node => $self,
+          $namespaceURI => {null},
+          $localName => 'type',
+          $r => $r,
+          $defaultValue => 'text',
+        }__;
+    @@Set:
+      @@@nullCase:
+        @@@@enDesc:
+          Removes the attribute.
+      @@@NodeReadOnlyError:
+      @@@PerlDef:
+        __CODE{setReflectAttrStringValue::
+          $node => $self,
+          $namespaceURI => {null},
+          $localName => 'type',
+          $given => $given,
+        }__;
+
+  @Attr:
+    @@Name: container
+    @@enDesc:
+      The container element that contains the actual content 
+      of the construct.
+    @@Type: Element
+    @@Get:
+      @@@enDesc:
+        If the <A::AtomTextConstruct.type> is <CODE::xhtml>, 
+        the getter <kwd:MUST> <I::return the <XE::html|div> child element>.
+        Otherwise, the object itself <kwd:MUST> be returned.
+      @@@nullCase:
+        @@@@enDesc:
+          If the <A::AtomTextConstruct.type> is <CODE::xhtml>
+          and the algorithm returns <DOM::null>.
+      @@@NodeReadOnlyError:
+      @@@PerlDef:
+        __DEEP{
+          my $type = $self-><AG::AtomTextConstruct.type>;
+          if ($type eq 'xhtml') {
+            __CODE{returnChildElement::
+              $node => $self,
+              $namespaceURI => {<Q::html|>},
+              $localName => 'div',
+              $r => $r,
+            }__;
+          } else {
+            $r = $self;
+          }
+        }__;
+
+    @@Test:
+      @@@QName: AtomTextConstruct.container.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+        my $el = $doc-><M::Document.createElementNS> (<Q::atom|>, 'title');
+
+        $test->id ('no');
+        $test->assert_equals ($el-><AG::AtomTextConstruct.container>, $el);
+
+        $test->id ('text');
+        $el-><AS::AtomTextConstruct.type> ('text');
+        $test->assert_equals ($el-><AG::AtomTextConstruct.container>, $el);
+
+        $test->id ('html');
+        $el-><AS::AtomTextConstruct.type> ('html');
+        $test->assert_equals ($el-><AG::AtomTextConstruct.container>, $el);
+
+        $test->id ('xhtml');
+        $el-><AS::AtomTextConstruct.type> ('xhtml');
+        $test->assert_null ($el-><AG::AtomTextConstruct.container>);
+
+        $doc-><AG::Document.domConfig>
+            -><M::CFG.setParameter> (<Q::cfg|create-child-element> => true);
+        my $con = $el-><AG::AtomTextConstruct.container>;
+
+        $test->id ('xhtml.create');
+        $test->assert_not_equals ($con, $el);
+
+        $test->id ('xhtml.namespaceURI');
+        $test->assert_equals ($con-><AG::Node.namespaceURI>, <Q::html|>);
+
+        $test->id ('xhtml.localName');
+        $test->assert_equals ($con-><AG::Node.localName>, 'div');
+
+        $test->id ('xhtml.parentNode');
+        $test->assert_equals ($con-><AG::Node.parentNode>, $el);
+
+        $test->id ('xhtml.2');
+        $test->assert_equals ($el-><AG::AtomTextConstruct.container>, $con);
+##AtomTextConstruct
+
+IFClsDef:
+  @IFQName: AtomPersonConstruct
+  @ClsQName: ManakaiAtomPersonConstruct
+
+  @IFISA: AtomElement
+  @ClsISA: ManakaiAtomElement
+
+  @enDesc:
+    The <IF::AtomPersonConstruct> interface provides convenience
+    methods and attributes for <IF::Element> nodes
+    classfied to the Person constructs.  Other <IF::Element>
+    objects <kwd:MAY> also implement the <IF::AtomPersonConstruct>
+    interface.
+
+    A Person construct is an element that describes a person,
+    corporation, or similar entity.
+
+  @Attr:
+    @@Name: name
+    @@enDesc:
+      The <XE::atom|name> value of the feed.
+
+      It <kwd:MUST> <I::reflect the string value
+      of the <XE::atom|name> child element> of the node.
+    @@Type: DOMString
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          If the algorithm returns <DOM::null>.
+      @@@NodeReadOnlyError:
+      @@@PerlDef:
+        __CODE{getReflectStringValue::
+          $node => $self,
+          $namespaceURI => {<Q::atom|>},
+          $localName => 'name',
+          $r => $r,
+        }__;
+    @@Set:
+      @@@nullCase:
+        @@@@enDesc:
+          Removes the value.
+      @@@NodeReadOnlyError:
+      @@@PerlDef:
+        __CODE{setReflectStringValue::
+          $node => $self,
+          $namespaceURI => {<Q::atom|>},
+          $localName => 'name',
+          $given => $given,
+        }__;
+
+  @Attr:
+    @@Name: nameElement
+    @@enDesc:
+      The <XE::atom|name> child element of the node.
+    @@Type: AtomElement
+    @@Get:
+      @@@enDesc:
+        It <kwd:MUST> <I::return a <XE::atom|name> child element>
+        of the node.
+      @@@nullCase:
+        @@@@enDesc:
+          If the algorithm returns <DOM::null>.
+      @@@NodeReadOnlyError:
+      @@@PerlDef:
+        __CODE{returnChildElement::
+          $node => $self,
+          $namespaceURI => {<Q::atom|>},
+          $localName => 'name',
+          $r => $r,
+        }__;
+
+  @Attr:
+    @@Name: uri
+    @@enDesc:
+      The <XE::atom|uri> value of the feed.
+
+      It <kwd:MUST> <I::reflect the URI value
+      of the <XE::atom|uri> child element> of the node.
+    @@Type: DOMString
+    @@actualType: DOMURI
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          If the algorithm returns <DOM::null>.
+      @@@NodeReadOnlyError:
+      @@@PerlDef:
+        __CODE{getReflectURIValue::
+          $node => $self,
+          $namespaceURI => {<Q::atom|>},
+          $localName => 'uri',
+          $r => $r,
+        }__;
+    @@Set:
+      @@@nullCase:
+        @@@@enDesc:
+          Removes the value.
+      @@@NodeReadOnlyError:
+      @@@PerlDef:
+        __CODE{setReflectURIValue::
+          $node => $self,
+          $namespaceURI => {<Q::atom|>},
+          $localName => 'uri',
+          $given => $given,
+        }__;
+
+  @Attr:
+    @@Name: email
+    @@enDesc:
+      The <XE::atom|email> value of the feed.
+
+      It <kwd:MUST> <I::reflect the string value
+      of the <XE::atom|email> child element> of the node.
+    @@Type: DOMString
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          If the algorithm returns <DOM::null>.
+      @@@NodeReadOnlyError:
+      @@@PerlDef:
+        __CODE{getReflectStringValue::
+          $node => $self,
+          $namespaceURI => {<Q::atom|>},
+          $localName => 'email',
+          $r => $r,
+        }__;
+    @@Set:
+      @@@nullCase:
+        @@@@enDesc:
+          Removes the value.
+      @@@NodeReadOnlyError:
+      @@@PerlDef:
+        __CODE{setReflectStringValue::
+          $node => $self,
+          $namespaceURI => {<Q::atom|>},
+          $localName => 'email',
+          $given => $given,
+        }__;
+##AtomPersonConstruct
+
+IFClsDef:
+  @IFQName: AtomDateConstruct
+  @ClsQName: ManakaiAtomDateConstruct
+
+  @IFISA: AtomElement
+  @ClsISA: ManakaiAtomElement
+
+  @enDesc:
+    The <IF::AtomDateConstruct> interface provides convenience
+    methods and attributes for <IF::Element> nodes
+    classfied to the Date constructs.  Other <IF::Element>
+    objects <kwd:MAY> also implement the <IF::AtomDateConstruct>
+    interface.
+
+    A Date construct is an element whose content is a date that
+    conforms to the uppercase version of the RFC 3339 format.
+
+  @Attr:
+    @@Name: value
+    @@enDesc:
+      The date value of the node.
+
+      {ISSUE::
+
+        - Out of range of platform DOMTimeStamp type
+
+        - Errorous xsd:dateTime
+
+        - Leap seconds
+
+        - Timezone
+
+        - Precision
+
+      }
+    @@Type: DOMTimeStamp
+    @@Get:
+      @@@enDesc:
+        {TODO:: Define
+        }
+      @@@PerlDef:
+        my $value = $self-><AG::Node.textContent>;
+        if ($value =~ /\A(\d+)-(\d+)-(\d+)T(\d+):(\d+):(\d+)(\.\d+)?
+                         (?:Z|([+-]\d+):(\d+))\z/x) {
+          require Time::Local;
+          $r = Time::Local::timegm_nocheck
+                 ($6, defined $8 ? $8 > 0 ? $5 - $9 : $5 + $9 : $5,
+                  defined $8 ? $4 - $8 : $4, $3, $2-1, $1-1900);
+          $r += "0$7" if defined $7;
+        } else {
+          $r = 0;
+        }
+    @@Set:
+      @@@enDesc:
+        {TODO:: Define
+        }
+      @@@NodeReadOnlyError:
+      @@@PerlDef:
+        __DEEP{
+          my @value = gmtime (int ($given / 1));
+          my $value = sprintf '%04d-%02d-%02dT%02d:%02d:%02d',
+                              $value[5] + 1900, $value[4] + 1,
+                              $value[3], $value[2], $value[1], $value[0];
+          my $f = $given % 1;
+          $value .= substr (''.$f, 1) if $f;
+          $value .= 'Z';
+          $self-><AS::Node.textContent> ($value);
+        }__;
+
+  @enImplNote:
+    @@ddid: todo
+    @@@:
+      {TODO::
+         Access to components, especially timezone and -00:00.
+      }
+##AtomDateConstruct
+
+IFClsETDef:
+  @IFQName: AtomFeedElement
+  @ETQName: atom|feed
+  @ETRQName: atom|feed
+  @ClsQName: ManakaiAtomFeedElement
+
+  @IFISA: AtomElement
+  @ClsISA: ManakaiAtomElement
+
+  @enDesc:
+    The <XE::atom|feed> element is the document element 
+    of an Atom Feed Document.
+
+  @Attr:
+    @@Name: authorElements
+    @@enDesc:
+      A static list of <XE::atom|author> child elements of the node.
+    @@Type: StaticNodeList
+    @@Get:
+      @@@enDesc:
+        It <kwd:MUST> <I::return a <XE::atom|author> child element list>
+        of the node.
+      @@@PerlDef:
+        __CODE{returnChildElementList::
+          $node => $self,
+          $namespaceURI => {<Q::atom|>},
+          $localName => 'author',
+          $r => $r,
+        }__;
+
+    @@Test:
+      @@@QName: AtomFeedElement.authorElements.empty.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+        my $el = $doc-><M::Document.createElementNS> (<Q::atom|>, 'feed');
+
+        my $list = $el-><AG::AtomFeedElement.authorElements>;
+
+        $test->id ('interface');
+        $test->assert_isa ($list, <IFName::StaticNodeList>);
+
+        $test->id ('length');
+        $test->assert_num_equals
+                 (actual_value => 0+@{$list}, expected_value => 0);
+
+        $test->id ('readOnly');
+        $test->assert_false ($list-><AG::NodeList.manakaiReadOnly>);
+    @@Test:
+      @@@QName: AtomFeedElement.authorElements.two.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+        my $e1 = $doc-><M::Document.createElementNS> (<Q::atom|>, 'feed');
+        my $a1 = $doc-><M::Document.createElementNS> (<Q::atom|>, 'author');
+        $e1-><M::Node.appendChild> ($a1);
+        my $a2 = $doc-><M::Document.createElementNS> (<Q::atom|>, 'author');
+        $e1-><M::Node.appendChild> ($a2);
+
+        my $list = $e1-><AG::AtomFeedElement.authorElements>;
+        my $a3 = $doc-><M::Document.createElementNS> (<Q::atom|>, 'author');
+        $e1-><M::Node.appendChild> ($a3);
+
+        $test->id ('length');
+        $test->assert_num_equals
+                 (actual_value => 0+@{$list}, expected_value => 2);
+
+        $test->id (0);
+        $test->assert_equals ($list->[0], $a1);
+
+        $test->id (1);
+        $test->assert_equals ($list->[1], $a2);
+
+  @Attr:
+    @@Name: categoryElements
+    @@enDesc:
+      A static list of <XE::atom|category> child elements of the node.
+    @@Type: StaticNodeList
+    @@Get:
+      @@@enDesc:
+        It <kwd:MUST> <I::return a <XE::atom|category> child element list>
+        of the node.
+      @@@PerlDef:
+        __CODE{returnChildElementList::
+          $node => $self,
+          $namespaceURI => {<Q::atom|>},
+          $localName => 'category',
+          $r => $r,
+        }__;
+
+  @Attr:
+    @@Name: contributorElements
+    @@enDesc:
+      A static list of <XE::atom|contributor> child elements of the node.
+    @@Type: StaticNodeList
+    @@Get:
+      @@@enDesc:
+        It <kwd:MUST> <I::return a <XE::atom|contributor> child element list>
+        of the node.
+      @@@PerlDef:
+        __CODE{returnChildElementList::
+          $node => $self,
+          $namespaceURI => {<Q::atom|>},
+          $localName => 'contributor',
+          $r => $r,
+        }__;
+
+  @Attr:
+    @@Name: generatorElement
+    @@enDesc:
+      The <XE::atom|generator> child element of the node.
+    @@Type: AtomGeneratorElement
+    @@Get:
+      @@@enDesc:
+        It <kwd:MUST> <I::return a <XE::atom|generator> child element>
+        of the node.
+      @@@nullCase:
+        @@@@enDesc:
+          If the algorithm returns <DOM::null>.
+      @@@NodeReadOnlyError:
+      @@@PerlDef:
+        __CODE{returnChildElement::
+          $node => $self,
+          $namespaceURI => {<Q::atom|>},
+          $localName => 'generator',
+          $r => $r,
+        }__;
+
+    @@Test:
+      @@@QName: AtomFeedElement.generatorElement.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+        my $el = $doc-><M::Document.createElementNS> (<Q::atom|>, 'feed');
+
+        $test->id ('no');
+        $test->assert_null ($el-><AG::AtomFeedElement.generatorElement>);
+
+        $doc-><AG::Document.domConfig>
+            -><M::CFG.setParameter> (<Q::cfg|create-child-element> => true);
+        my $ge = $el-><AG::AtomFeedElement.generatorElement>;
+
+        $test->id ('create.interface');
+        $test->assert_isa ($ge, <IFName::Element>);
+
+        $test->id ('create.namespaceURI');
+        $test->assert_equals ($ge-><AG::Node.namespaceURI>, <Q::atom|>);
+
+        $test->id ('create.localName');
+        $test->assert_equals ($ge-><AG::Node.localName>, 'generator');
+
+        $test->id ('has');
+        my $ge2 = $el-><AG::AtomFeedElement.generatorElement>;
+        $test->assert_equals ($ge2, $ge);
+
+        $test->id ('multiple');
+        $el-><M::Node.appendChild>
+               ($doc-><M::Document.createElementNS> (<Q::atom|>, 'generator'));
+        my $ge3 = $el-><AG::AtomFeedElement.generatorElement>;
+        $test->assert_equals ($ge3, $ge);
+
+  @Attr:
+    @@Name: icon
+    @@enDesc:
+      The <XE::atom|icon> value of the feed.
+
+      It <kwd:MUST> <I::reflect the URI value
+      of the <XE::atom|icon> child element> of the node.
+    @@Type: DOMString
+    @@actualType: DOMURI
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          If the algorithm returns <DOM::null>.
+      @@@NodeReadOnlyError:
+      @@@PerlDef:
+        __CODE{getReflectURIValue::
+          $node => $self,
+          $namespaceURI => {<Q::atom|>},
+          $localName => 'icon',
+          $r => $r,
+        }__;
+    @@Set:
+      @@@nullCase:
+        @@@@enDesc:
+          Removes the value.
+      @@@NodeReadOnlyError:
+      @@@PerlDef:
+        __CODE{setReflectURIValue::
+          $node => $self,
+          $namespaceURI => {<Q::atom|>},
+          $localName => 'icon',
+          $given => $given,
+        }__;
+
+    @@Test:
+      @@@QName: AtomFeedElement.icon.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+        my $el = $doc-><M::Document.createElementNS> (<Q::atom|>, 'feed');
+
+        $test->id ('default');
+        $test->assert_null ($el-><AG::AtomFeedElement.icon>);
+
+        $test->id ('set');
+        $el-><AS::AtomFeedElement.icon> ('http://example.com/');
+        $test->assert_equals ($el-><AG::AtomFeedElement.icon>,
+                              'http://example.com/');
+
+        $test->id ('relative');
+        $el-><AS::AtomFeedElement.icon> ('favicon.ico');
+        $test->assert_equals ($el-><AG::AtomFeedElement.icon>,
+                              'favicon.ico');
+
+        $test->id ('relative.base');
+        $el-><M::Element.setAttributeNS> (<Q::xml:>, 'xml:base',
+                                          'http://www.example.com/');
+        $test->assert_equals ($el-><AG::AtomFeedElement.icon>,
+                              'http://www.example.com/favicon.ico');
+
+        $test->id ('multiple');
+        $el-><M::Node.appendChild>
+               ($doc-><M::Document.createElementNS> (<Q::atom|>, 'icon'))
+           -><AS::Node.textContent> ('/default.ico'); # ignored
+        $test->assert_equals ($el-><AG::AtomFeedElement.icon>,
+                              'http://www.example.com/favicon.ico');
+
+        $test->id ('remove');
+        $el-><AS::AtomFeedElement.icon> (null);
+        $test->assert_null ($el-><AG::AtomFeedElement.icon>);
+
+  @Attr:
+    @@Name: id
+    @@enDesc:
+      The <XE::atom|id> value of the feed.
+
+      It <kwd:MUST> <I::reflect the string value
+      of the <XE::atom|id> child element> of the node.
+    @@Type: DOMString
+    @@actualType: DOMURI
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          If the algorithm returns <DOM::null>.
+      @@@NodeReadOnlyError:
+      @@@PerlDef:
+        __CODE{getReflectStringValue::
+          $node => $self,
+          $namespaceURI => {<Q::atom|>},
+          $localName => 'id',
+          $r => $r,
+        }__;
+    @@Set:
+      @@@nullCase:
+        @@@@enDesc:
+          Removes the value.
+      @@@NodeReadOnlyError:
+      @@@PerlDef:
+        __CODE{setReflectStringValue::
+          $node => $self,
+          $namespaceURI => {<Q::atom|>},
+          $localName => 'id',
+          $given => $given,
+        }__;
+
+    @@Test:
+      @@@QName: AtomFeedElement.id.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+        my $el = $doc-><M::Document.createElementNS> (<Q::atom|>, 'feed');
+
+        $test->id ('default');
+        $test->assert_null ($el-><AG::AtomFeedElement.id>);
+
+        $test->id ('set');
+        $el-><AS::AtomFeedElement.id> ('http://example.com/');
+        $test->assert_equals ($el-><AG::AtomFeedElement.id>,
+                              'http://example.com/');
+
+        $test->id ('relative');
+        $el-><AS::AtomFeedElement.id> ('favicon.ico');
+        $test->assert_equals ($el-><AG::AtomFeedElement.id>,
+                              'favicon.ico');
+
+        $test->id ('relative.base');
+        $el-><M::Element.setAttributeNS> (<Q::xml:>, 'xml:base',
+                                          'http://www.example.com/');
+        $test->assert_equals ($el-><AG::AtomFeedElement.id>,
+                              'favicon.ico');
+
+        $test->id ('multiple');
+        $el-><M::Node.appendChild>
+               ($doc-><M::Document.createElementNS> (<Q::atom|>, 'id'))
+           -><AS::Node.textContent> ('/default.ico'); # ignored
+        $test->assert_equals ($el-><AG::AtomFeedElement.id>,
+                              'favicon.ico');
+
+        $test->id ('remove');
+        $el-><AS::AtomFeedElement.id> (null);
+        $test->assert_null ($el-><AG::AtomFeedElement.id>);
+
+  @Attr:
+    @@Name: linkElements
+    @@enDesc:
+      A static list of <XE::atom|link> child elements of the node.
+    @@Type: StaticNodeList
+    @@Get:
+      @@@enDesc:
+        It <kwd:MUST> <I::return a <XE::atom|link> child element list>
+        of the node.
+      @@@PerlDef:
+        __CODE{returnChildElementList::
+          $node => $self,
+          $namespaceURI => {<Q::atom|>},
+          $localName => 'link',
+          $r => $r,
+        }__;
+
+  @Attr:
+    @@Name: logo
+    @@enDesc:
+      The <XE::atom|logo> value of the feed.
+
+      It <kwd:MUST> <I::reflect the URI value
+      of the <XE::atom|logo> child element> of the node.
+    @@Type: DOMString
+    @@actualType: DOMURI
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          If the algorithm returns <DOM::null>.
+      @@@NodeReadOnlyError:
+      @@@PerlDef:
+        __CODE{getReflectURIValue::
+          $node => $self,
+          $namespaceURI => {<Q::atom|>},
+          $localName => 'logo',
+          $r => $r,
+        }__;
+    @@Set:
+      @@@nullCase:
+        @@@@enDesc:
+          Removes the value.
+      @@@NodeReadOnlyError:
+      @@@PerlDef:
+        __CODE{setReflectURIValue::
+          $node => $self,
+          $namespaceURI => {<Q::atom|>},
+          $localName => 'logo',
+          $given => $given,
+        }__;
+
+  @Attr:
+    @@Name: rightsElement
+    @@enDesc:
+      The <XE::atom|rights> child element of the node.
+    @@Type: AtomRightsElement
+    @@Get:
+      @@@enDesc:
+        It <kwd:MUST> <I::return a <XE::atom|rights> child element>
+        of the node.
+      @@@nullCase:
+        @@@@enDesc:
+          If the algorithm returns <DOM::null>.
+      @@@NodeReadOnlyError:
+      @@@PerlDef:
+        __CODE{returnChildElement::
+          $node => $self,
+          $namespaceURI => {<Q::atom|>},
+          $localName => 'rights',
+          $r => $r,
+        }__;
+
+  @Attr:
+    @@Name: subtitleElement
+    @@enDesc:
+      The <XE::atom|subtitle> child element of the node.
+    @@Type: AtomSubtitleElement
+    @@Get:
+      @@@enDesc:
+        It <kwd:MUST> <I::return a <XE::atom|subtitle> child element>
+        of the node.
+      @@@nullCase:
+        @@@@enDesc:
+          If the algorithm returns <DOM::null>.
+      @@@NodeReadOnlyError:
+      @@@PerlDef:
+        __CODE{returnChildElement::
+          $node => $self,
+          $namespaceURI => {<Q::atom|>},
+          $localName => 'subtitle',
+          $r => $r,
+        }__;
+
+  @Attr:
+    @@Name: titleElement
+    @@enDesc:
+      The <XE::atom|title> child element of the node.
+    @@Type: AtomTitleElement
+    @@Get:
+      @@@enDesc:
+        It <kwd:MUST> <I::return a <XE::atom|title> child element>
+        of the node.
+      @@@nullCase:
+        @@@@enDesc:
+          If the algorithm returns <DOM::null>.
+      @@@NodeReadOnlyError:
+      @@@PerlDef:
+        __CODE{returnChildElement::
+          $node => $self,
+          $namespaceURI => {<Q::atom|>},
+          $localName => 'title',
+          $r => $r,
+        }__;
+
+  @Attr:
+    @@Name: updatedElement
+    @@enDesc:
+      The <XE::atom|updated> child element of the node.
+    @@Type: AtomUpdatedElement
+    @@Get:
+      @@@enDesc:
+        It <kwd:MUST> <I::return a <XE::atom|updated> child element>
+        of the node.
+      @@@nullCase:
+        @@@@enDesc:
+          If the algorithm returns <DOM::null>.
+      @@@NodeReadOnlyError:
+      @@@PerlDef:
+        __CODE{returnChildElement::
+          $node => $self,
+          $namespaceURI => {<Q::atom|>},
+          $localName => 'updated',
+          $r => $r,
+        }__;
+
+  @Attr:
+    @@Name: entryElements
+    @@enDesc:
+      A static list of <XE::atom|entry> child elements of the node.
+    @@Type: StaticNodeList
+    @@Get:
+      @@@enDesc:
+        It <kwd:MUST> <I::return a <XE::atom|entry> child element list>
+        of the node.
+      @@@PerlDef:
+        __CODE{returnChildElementList::
+          $node => $self,
+          $namespaceURI => {<Q::atom|>},
+          $localName => 'entry',
+          $r => $r,
+        }__;
+
+  @Method:
+    @@Name: getEntryElementById
+    @@enDesc:
+      Returns an <XE::atom|entry> node selected by its <XE::atom|id>.
+    @@Param:
+      @@@Name: idArg
+      @@@Type: DOMString
+      @@@actualType: DOMURI
+      @@@enDesc:
+        The identifier of the entry.
+    @@Return:
+      @@@Type: AtomEntryElement
+      @@@enDesc:
+        The <XE::atom|entry> element whose identifier equals to
+        <P::id>.
+
+        It <kwd:MUST> return the first child element node in document
+        order whose element type is <XE::atom|entry> and
+        whose first child element node in document order
+        with element type <XE::atom|id> has <A::Node.textContent>
+        equals to <P::id>, if any, or <DOM::null>.
+      @@@nullCase:
+        @@@@enDesc:
+          If no matching element.
+      @@@PerlDef:
+        E: {
+          no warnings 'uninitialized';
+          for my $cn (@{$self-><AG::Node.childNodes>}) {
+            if ($cn-><AG::Node.nodeType> == <C::Node.ELEMENT_NODE> and
+                $cn-><AG::Node.localName> eq 'entry' and
+                $cn-><AG::Node.namespaceURI> eq <Q::atom|>) {
+              if ($cn-><AG::AtomEntryElement.id> eq $idArg) {
+                $r = $cn;
+                last E;
+              }
+            }
+          }
+        } # E
+
+  @Method:
+    @@Name: addNewEntry
+    @@enDesc:
+      Creates an <XA::atom|entry> element node and 
+      appends to the node.
+    @@Param:
+      @@@Name: id
+      @@@Type: DOMString
+      @@@actualType: DOMURI
+      @@@enDesc:
+        The <XE::atom|id> of the entry.
+    @@Param:
+      @@@Name: title
+      @@@Type: DOMString
+      @@@enDesc:
+        The <XE::atom|title> of the entry.
+      @@@nullCase:
+        @@@@enDesc:
+          The implementation <kwd:MUST> treate <DOM::null>
+          as if an empty string is specified.
+    @@Param:
+      @@@Name: lang
+      @@@Type: DOMString
+      @@@enDesc:
+        The natural language of the entry.
+      @@@nullCase:
+        @@@@enDesc:
+          No explicit language specification is added.
+    @@Return:
+      @@@Type: AtomEntryElement
+      @@@enDesc:
+        The newly created <XE::atom|entry> element.
+
+        {P:: The newly created <XE::atom|entry> element node <kwd:MUST>
+             have attributes set as:
+
+           - <A::Node.attributes>::: A <IF::NamedNodeMap> that contains
+                                     at least a new <XA::xml|lang>
+                                     attribute node except when
+                                     the <P::lang> parameter is set
+                                     to <DOM::null>.
+
+           - <A::Node.childNodes>::: A <IF::NodeList> containing
+                                     a new <XE::atom|id> element node,
+                                     a new <XE::atom|title> element node, and
+                                     a new <XE::atom|updated> element node
+                                     in any order.
+
+        }
+
+        This element node <kwd:MUST> be appended to the node
+        as if the <M::Node.appendChild> method were invoked
+        on the node and <kwd:MUST> be returned by the method.
+        Note that an exception might be thrown during this course.
+
+        {P:: The <XA::xml|lang> attribute node, if created, <kwd:MUST>
+             have attributes set as:
+
+           - <A::Node.nodeValue>::: <P::lang>.
+
+           - <A::Attr.specified>::: <DOM::true>.
+
+        }
+
+        {P:: The newly created <XE::atom|id> element node <kwd:MUST>
+             have attributes set as:
+
+           - <A::Node.textContent>::: <P::id>.
+
+        }
+
+        {P:: The newly created <XE::atom|title> element node <kwd:MUST>
+             have attributes set as:
+
+           - <A::Node.textContent>::: <P::title>.
+
+        }
+
+        The <XA::type> attribute node <kwd:MUST-NOT> be attached
+        to the <XE::atom|title> element node.
+
+        {P:: The newly created <XE::atom|updated> element node <kwd:MUST>
+             have attributes set as:
+
+           - <A::Node.textContent>::: A uppercase RFC 3339 <CODE::date-time>
+             representation of the time when the method is invoked.
+             The implementation <kwd:MAY> align its timezone to
+             that of the environment in which the method is invoked.
+
+        }
+      @@@PerlDef:
+        __DEEP{
+          my $od = $self-><AG::Node.ownerDocument>;
+
+          $r = $od-><M::Document.createElementNS> (<Q::atom|>, 'entry');
+          $r-><AS::Node.manakaiLanguage> ($lang) if defined $lang;
+
+          $r-><AS::AtomFeedElement.id> ($id);
+
+          my $titlee = $od-><M::Document.createElementNS> (<Q::atom|>, 'title');
+          $titlee-><AS::Node.textContent> (defined $title ? $title : '');
+          $r-><M::Node.appendChild> ($titlee);
+
+          my $updatede = $od-><M::Document.createElementNS>
+                                (<Q::atom|>, 'updated');
+          $updatede-><AS::AtomDateConstruct.value> (scalar time);
+          $r-><M::Node.appendChild> ($updatede);
+        }__;
+
+    @@Test:
+      @@@QName: AtomFeedElement.addNewEntry.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+        my $feed = $doc-><M::Document.createElementNS> (<Q::atom|>, 'feed');
+
+        my $ent = $feed-><M::AtomFeedElement.addNewEntry>
+                           ('about:id', 'entry title', 'en');
+
+        $test->id ('entry.interface');
+        $test->assert_isa ($ent, <IFName::AtomEntryElement>);
+
+        $test->id ('entry.namespaceURI');
+        $test->assert_equals ($ent-><AG::Node.namespaceURI>, <Q::atom|>);
+
+        $test->id ('entry.localName');
+        $test->assert_equals ($ent-><AG::Node.localName>, 'entry');
+
+        $test->id ('entry.lang');
+        $test->assert_equals ($ent-><M::Element.getAttributeNS>
+                                         (<Q::xml|>, 'lang'),
+                              'en');
+
+        my $id;
+        my $title;
+        my $updated;
+
+        for my $cn (@{$ent-><AG::Node.childNodes>}) {
+          if ($cn-><AG::Node.nodeType> == <C::Node.ELEMENT_NODE> and
+              $cn-><AG::Node.namespaceURI> eq <Q::atom|>) {
+            if ($cn-><AG::Node.localName> eq 'id') {
+              $id = $cn;
+            } elsif ($cn-><AG::Node.localName> eq 'title') {
+              $title = $cn;
+            } elsif ($cn-><AG::Node.localName> eq 'updated') {
+              $updated = $cn;
+            }
+          }
+        }
+   
+        $test->id ('id');
+        $test->assert_not_null ($id);
+
+        $test->id ('id.value');
+        $test->assert_equals ($id-><AG::Node.textContent>, 'about:id');
+   
+        $test->id ('title');
+        $test->assert_not_null ($title);
+
+        $test->id ('title.value');
+        $test->assert_equals ($title-><AG::Node.textContent>, 'entry title');
+
+        $test->id ('title.type');
+        $test->assert_null ($title-><M::Element.getAttributeNS> (null, 'type'));
+   
+        $test->id ('updated');
+        $test->assert_not_null ($updated);
+
+        $test->id ('updated.value');
+        $test->assert_num_not_equals
+                 (actual_value => $updated-><AG::AtomDateConstruct.value>,
+                  expected_value => 0);
+    @@Test:
+      @@@QName: AtomFeedElement.addNewEntry.2.test
+      @@@enDesc:
+        <DOM::null> <CODE::lang>.
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+        my $feed = $doc-><M::Document.createElementNS> (<Q::atom|>, 'feed');
+
+        my $ent = $feed-><M::AtomFeedElement.addNewEntry>
+                           ('about:id', 'entry title', null);
+
+        $test->id ('entry.lang');
+        $test->assert_null ($ent-><M::Element.getAttributeNS>
+                                    (<Q::xml|>, 'lang'));
+##AtomFeedElement
+
+IFClsETDef:
+  @IFQName: AtomEntryElement
+  @ETQName: atom|entry
+  @ETRQName: atom|entry
+  @ClsQName: ManakaiAtomEntryElement
+
+  @IFISA: AtomElement
+  @ClsISA: ManakaiAtomElement
+
+  @enDesc:
+    The <XE::atom|entry> element represents an individual
+    entry, acting as a container for metadata and data
+    associated with the entry.
+
+  @Attr:
+    @@Name: authorElements
+    @@enDesc:
+      A static list of <XE::atom|author> child elements of the node.
+    @@Type: StaticNodeList
+    @@Get:
+      @@@enDesc:
+        It <kwd:MUST> <I::return a <XE::atom|author> child element list>
+        of the node.
+      @@@disDef:
+        @@@@dlp:cloneCode: ManakaiAtomFeedElement.authorElements.get
+
+  @Attr:
+    @@Name: entryAuthorElements
+    @@enDesc:
+      A static list of <XE::atom|author> elements for the node.
+    @@Type: StaticNodeList
+    @@Get:
+      @@@enDesc:
+        = If the node contains one or more <XE::atom|author>
+          element node in its child node list, then it
+          <kwd:MUST> return a <IF::StaticNodeList> that
+          would be returned by the <A::AtomEntryElement.authorElements>
+          attribute of the node.
+
+        = Otherwise, if the node contains a <XE::atom|source>
+          element node in its child node list, then it 
+          <kwd:MUST> return a <IF::StaticNodeList> that
+          would be returned by the <A::AtomSourceElement.authorElements>
+          attribute of that node, unless its <A::NodeList.length>
+          is zero.
+
+        = Otherwise, if the <A::Node.parentNode> of the
+          node is a <XE::atom|feed> element node, then
+          it <kwd:MUST> return a <IF::StaticNodeList> that
+          would be returned by the <A::AtomFeedElement.authorElements>
+          attribute of that node.
+
+        = Otherwise, it <kwd:MUST> return a <IF::StaticNodeList>
+          whose <A::NodeList.length> is zero.
+      @@@PerlDef:
+        __DEEP{
+          E: {
+            no warnings 'uninitialized';
+            __CODE{tc|createStaticNodeList:: $r => $r}__;
+  
+            my $source;
+            for my $cn (@{$self-><AG::Node.childNodes>}) {
+              if ($cn-><AG::Node.nodeType> == <C::Node.ELEMENT_NODE> and
+                  $cn-><AG::Node.namespaceURI> eq <Q::atom|>) {
+                if ($cn-><AG::Node.localName> eq 'author') {
+                  push @{$r}, $cn;
+                } elsif ($cn-><AG::Node.localName> eq 'source') {
+                  $source = $cn;
+                }
+              }
+            }
+            last E unless @{$r} == 0;
+  
+            if (defined $source) {
+              $r = $source-><AG::AtomSourceElement.authorElements>;
+            }
+            last E unless @{$r} == 0;
+
+            my $parent = $self-><AG::Node.parentNode>;
+            if (defined $parent and
+                $parent-><AG::Node.nodeType> == <C::Node.ELEMENT_NODE> and
+                $parent-><AG::Node.namespaceURI> eq <Q::atom|> and
+                $parent-><AG::Node.localName> eq 'feed') {
+              $r = $parent-><AG::AtomFeedElement.authorElements>;
+            }
+          } # E
+        }__;
+
+    @@Test:
+      @@@QName: AtomEntryElement.entryAuthorElements.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+        my $el = $doc-><M::Document.createElementNS> (<Q::atom|>, 'entry');
+
+
+        $test->id ('empty');
+        my $list = $el-><AG::AtomEntryElement.entryAuthorElements>;
+        $test->assert_num_equals (actual_value => 0+@$list, expected_value => 0);
+
+        $test->id ('one');
+        $el-><M::Node.appendChild>
+               ($doc-><M::Document.createElementNS> (<Q::atom|>, 'author'));
+        $list = $el-><AG::AtomEntryElement.entryAuthorElements>;
+        $test->assert_num_equals (actual_value => 0+@$list, expected_value => 1);
+
+        $test->id ('source');
+        for ($el-><M::Node.appendChild>
+                    ($doc-><M::Document.createElementNS>
+                             (<Q::atom|>, 'source'))) {
+          $_-><M::Node.appendChild>
+                ($doc-><M::Document.createElementNS> (<Q::atom|>, 'author'));
+          $_-><M::Node.appendChild>
+                ($doc-><M::Document.createElementNS> (<Q::atom|>, 'author'));
+        }
+        $list = $el-><AG::AtomEntryElement.entryAuthorElements>;
+        $test->assert_num_equals (actual_value => 0+@$list, expected_value => 1);
+
+        $test->id ('parent');
+        for ($doc-><M::Document.createElementNS> (<Q::atom|>, 'feed')) {
+          $_-><M::Node.appendChild>
+                ($doc-><M::Document.createElementNS> (<Q::atom|>, 'author'));
+          $_-><M::Node.appendChild>
+                ($doc-><M::Document.createElementNS> (<Q::atom|>, 'author'));
+          $_-><M::Node.appendChild>
+                ($doc-><M::Document.createElementNS> (<Q::atom|>, 'author'));
+          $_-><M::Node.appendChild> ($el);
+        }
+        $list = $el-><AG::AtomEntryElement.entryAuthorElements>;
+        $test->assert_num_equals (actual_value => 0+@$list, expected_value => 1);
+    @@Test:
+      @@@QName: AtomEntryElement.entryAuthorElements.2.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+        my $el = $doc-><M::Document.createElementNS> (<Q::atom|>, 'entry');
+
+        $test->id ('source');
+        for ($el-><M::Node.appendChild>
+                    ($doc-><M::Document.createElementNS>
+                             (<Q::atom|>, 'source'))) {
+          $_-><M::Node.appendChild>
+                ($doc-><M::Document.createElementNS> (<Q::atom|>, 'author'));
+          $_-><M::Node.appendChild>
+                ($doc-><M::Document.createElementNS> (<Q::atom|>, 'author'));
+        }
+        my $list = $el-><AG::AtomEntryElement.entryAuthorElements>;
+        $test->assert_num_equals (actual_value => 0+@$list, expected_value => 2);
+
+        $test->id ('parent');
+        for ($doc-><M::Document.createElementNS> (<Q::atom|>, 'feed')) {
+          $_-><M::Node.appendChild>
+                ($doc-><M::Document.createElementNS> (<Q::atom|>, 'author'));
+          $_-><M::Node.appendChild>
+                ($doc-><M::Document.createElementNS> (<Q::atom|>, 'author'));
+          $_-><M::Node.appendChild>
+                ($doc-><M::Document.createElementNS> (<Q::atom|>, 'author'));
+          $_-><M::Node.appendChild> ($el);
+        }
+        $list = $el-><AG::AtomEntryElement.entryAuthorElements>;
+        $test->assert_num_equals (actual_value => 0+@$list, expected_value => 2);
+    @@Test:
+      @@@QName: AtomEntryElement.entryAuthorElements.3.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+        my $el = $doc-><M::Document.createElementNS> (<Q::atom|>, 'entry');
+
+        $test->id ('source');
+        for ($el-><M::Node.appendChild>
+                    ($doc-><M::Document.createElementNS>
+                             (<Q::atom|>, 'source'))) {
+          # empty
+        }
+        my $list = $el-><AG::AtomEntryElement.entryAuthorElements>;
+        $test->assert_num_equals (actual_value => 0+@$list, expected_value => 0);
+
+        $test->id ('parent');
+        for ($doc-><M::Document.createElementNS> (<Q::atom|>, 'feed')) {
+          $_-><M::Node.appendChild>
+                ($doc-><M::Document.createElementNS> (<Q::atom|>, 'author'));
+          $_-><M::Node.appendChild>
+                ($doc-><M::Document.createElementNS> (<Q::atom|>, 'author'));
+          $_-><M::Node.appendChild>
+                ($doc-><M::Document.createElementNS> (<Q::atom|>, 'author'));
+          $_-><M::Node.appendChild> ($el);
+        }
+        $list = $el-><AG::AtomEntryElement.entryAuthorElements>;
+        $test->assert_num_equals (actual_value => 0+@$list, expected_value => 3);
+    @@Test:
+      @@@QName: AtomEntryElement.entryAuthorElements.4.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+        my $el = $doc-><M::Document.createElementNS> (<Q::atom|>, 'entry');
+
+        $test->id ('parent');
+        for ($doc-><M::Document.createElementNS> (<Q::atom|>, 'feed')) {
+          $_-><M::Node.appendChild>
+                ($doc-><M::Document.createElementNS> (<Q::atom|>, 'author'));
+          $_-><M::Node.appendChild>
+                ($doc-><M::Document.createElementNS> (<Q::atom|>, 'author'));
+          $_-><M::Node.appendChild>
+                ($doc-><M::Document.createElementNS> (<Q::atom|>, 'author'));
+          $_-><M::Node.appendChild> ($el);
+        }
+        my $list = $el-><AG::AtomEntryElement.entryAuthorElements>;
+        $test->assert_num_equals (actual_value => 0+@$list, expected_value => 3);
+
+  @Attr:
+    @@Name: categoryElements
+    @@enDesc:
+      A static list of <XE::atom|category> child elements of the node.
+    @@Type: StaticNodeList
+    @@Get:
+      @@@enDesc:
+        It <kwd:MUST> <I::return a <XE::atom|category> child element list>
+        of the node.
+      @@@disDef:
+        @@@@dlp:cloneCode: ManakaiAtomFeedElement.categoryElements.get
+
+  @Attr:
+    @@Name: contributorElements
+    @@enDesc:
+      A static list of <XE::atom|contributor> child elements of the node.
+    @@Type: StaticNodeList
+    @@Get:
+      @@@enDesc:
+        It <kwd:MUST> <I::return a <XE::atom|contributor> child element list>
+        of the node.
+      @@@disDef:
+        @@@@dlp:cloneCode: ManakaiAtomFeedElement.contributorElements.get
+
+  @Attr:
+    @@Name: id
+    @@enDesc:
+      The <XE::atom|id> value of the feed.
+
+      It <kwd:MUST> <I::reflect the string value
+      of the <XE::atom|id> child element> of the node.
+    @@Type: DOMString
+    @@actualType: DOMURI
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          If the algorithm returns <DOM::null>.
+      @@@NodeReadOnlyError:
+      @@@disDef:
+        @@@@dlp:cloneCode: ManakaiAtomFeedElement.id.get
+    @@Set:
+      @@@nullCase:
+        @@@@enDesc:
+          Removes the value.
+      @@@NodeReadOnlyError:
+      @@@disDef:
+        @@@@dlp:cloneCode: ManakaiAtomFeedElement.id.set
+
+  @Attr:
+    @@Name: linkElements
+    @@enDesc:
+      A static list of <XE::atom|link> child elements of the node.
+    @@Type: StaticNodeList
+    @@Get:
+      @@@enDesc:
+        It <kwd:MUST> <I::return a <XE::atom|link> child element list>
+        of the node.
+      @@@disDef:
+        @@@@dlp:cloneCode: ManakaiAtomFeedElement.linkElements.get
+
+  @Attr:
+    @@Name: publishedElement
+    @@enDesc:
+      The <XE::atom|published> child element of the node.
+    @@Type: AtomPublishedElement
+    @@Get:
+      @@@enDesc:
+        It <kwd:MUST> <I::return a <XE::atom|published> child element>
+        of the node.
+      @@@nullCase:
+        @@@@enDesc:
+          If the algorithm returns <DOM::null>.
+      @@@NodeReadOnlyError:
+      @@@PerlDef:
+        __CODE{returnChildElement::
+          $node => $self,
+          $namespaceURI => {<Q::atom|>},
+          $localName => 'published',
+          $r => $r,
+        }__;
+
+  @Attr:
+    @@Name: rightsElement
+    @@enDesc:
+      The <XE::atom|rights> child element of the node.
+    @@Type: AtomRightsElement
+    @@Get:
+      @@@enDesc:
+        It <kwd:MUST> <I::return a <XE::atom|rights> child element>
+        of the node.
+      @@@nullCase:
+        @@@@enDesc:
+          If the algorithm returns <DOM::null>.
+      @@@NodeReadOnlyError:
+      @@@disDef:
+        @@@@dlp:cloneCode: ManakaiAtomFeedElement.rightsElement.get
+
+  @Attr:
+    @@Name: entryRightsElement
+    @@enDesc:
+      The <XE::atom|rights> element for the node.
+    @@Type: AtomRightsElement
+    @@Get:
+      @@@enDesc:
+        = If the node contains a <XE::atom|rights>
+          element node in its child node list, then it
+          <kwd:MUST> return the first such a node in document order.
+
+        = Otherwise, if the <A::Node.parentNode> of the
+          node is a <XE::atom|feed> element node, then
+          it <kwd:MUST> return an <IF::AtomRightsElement>
+          that would be returned by the <A::AtomFeedElement.rightsElement>
+          attribute of that node, except when it is <DOM::null>.
+
+        {OLI:: Otherwise,
+
+          {OLI:: If the <cfg::cfg|create-child-element> configuration
+                 parameter is set to <DOM::true>,
+
+             = Create an element node <VAR::N> whose element type
+               is <XE::atom|rights>.
+
+             = Append <VAR::N> to this node as if the <M::Node.appendChild>
+               method were called for the node with its parameter
+               set to <VAR::N>.  Note that this might throw an exception.
+
+             = Then, <VAR::N> <kwd:MUST> be returned.
+
+          }
+
+          = Otherwise, it <kwd:MUST> return <DOM::null>.
+        }
+      @@@nullCase:
+        @@@@enDesc:
+          If the algorithm returns <DOM::null>.
+      @@@NodeReadOnlyError:
+      @@@PerlDef:
+        __DEEP{
+          E: {
+            no warnings 'uninitialized';
+            for my $cn (@{$self-><AG::Node.childNodes>}) {
+              if ($cn-><AG::Node.nodeType> == <C::Node.ELEMENT_NODE> and
+                  $cn-><AG::Node.localName> eq 'rights' and 
+                  $cn-><AG::Node.namespaceURI> eq <Q::atom|>) {
+                $r = $cn;
+                last E;
+              }
+            }
+
+            my $parent = $self-><AG::Node.parentNode>;
+            if (defined $parent and
+                $parent-><AG::Node.nodeType> == <C::Node.ELEMENT_NODE> and
+                $parent-><AG::Node.namespaceURI> eq <Q::atom|> and
+                $parent-><AG::Node.localName> eq 'feed') {
+              for my $cn (@{$parent-><AG::Node.childNodes>}) {
+                if ($cn-><AG::Node.nodeType> == <C::Node.ELEMENT_NODE> and
+                    $cn-><AG::Node.localName> eq 'rights' and 
+                    $cn-><AG::Node.namespaceURI> eq <Q::atom|>) {
+                  $r = $cn;
+                  last E;
+                }
+              }
+            }
+
+            my $od = $self-><AG::Node.ownerDocument>;
+            if ($od-><AG::Document.domConfig>
+                   -><M::CFG.getParameter> (<Q::cfg|create-child-element>)) {
+              $r = $od-><M::Document.createElementNS> (<Q::atom|>, 'rights');
+              $self-><M::Node.appendChild> ($r);
+            }
+          } # E
+        }__;
+
+    @@Test:
+      @@@QName: AtomEntryElement.entryRightsElement.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+        my $el = $doc-><M::Document.createElementNS> (<Q::atom|>, 'entry');
+
+        $test->id ('no');
+        my $rights = $el-><AG::AtomEntryElement.entryRightsElement>;
+        $test->assert_null ($rights);
+
+        $doc-><AG::Document.domConfig>
+            -><M::CFG.setParameter> (<Q::cfg|create-child-element> => true);
+
+        $rights = $el-><AG::AtomEntryElement.entryRightsElement>;
+
+        $test->id ('created.namespaceURI');
+        $test->assert_equals ($rights-><AG::Node.namespaceURI>, <Q::atom|>);
+
+        $test->id ('created.localName');
+        $test->assert_equals ($rights-><AG::Node.localName>, 'rights');
+
+        $test->id ('created.parentNode');
+        $test->assert_equals ($rights-><AG::Node.parentNode>, $el);
+
+        $test->id ('get');
+        my $rights2 = $el-><AG::AtomEntryElement.entryRightsElement>;
+        $test->assert_equals ($rights2, $rights);
+    @@Test:
+      @@@QName: AtomEntryElement.entryRightsElement.2.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+        my $el = $doc-><M::Document.createElementNS> (<Q::atom|>, 'entry');
+
+        my $feed = $doc-><M::Document.createElementNS> (<Q::atom|>, 'feed');
+        $feed-><M::Node.appendChild> ($el);
+        my $rights = $doc-><M::Document.createElementNS> (<Q::atom|>, 'rights');
+        $feed-><M::Node.appendChild> ($rights);
+
+        $test->id ('get');
+        my $rights2 = $el-><AG::AtomEntryElement.entryRightsElement>;
+        $test->assert_equals ($rights2, $rights);
+
+  @Attr:
+    @@Name: sourceElement
+    @@enDesc:
+      The <XE::atom|source> child element of the node.
+    @@Type: AtomSourceElement
+    @@Get:
+      @@@enDesc:
+        It <kwd:MUST> <I::return a <XE::atom|source> child element>
+        of the node.
+      @@@nullCase:
+        @@@@enDesc:
+          If the algorithm returns <DOM::null>.
+      @@@NodeReadOnlyError:
+      @@@PerlDef:
+        __CODE{returnChildElement::
+          $node => $self,
+          $namespaceURI => {<Q::atom|>},
+          $localName => 'source',
+          $r => $r,
+        }__;
+
+  @Attr:
+    @@Name: summaryElement
+    @@enDesc:
+      The <XE::atom|summary> child element of the node.
+    @@Type: AtomSummaryElement
+    @@Get:
+      @@@enDesc:
+        It <kwd:MUST> <I::return a <XE::atom|summary> child element>
+        of the node.
+      @@@nullCase:
+        @@@@enDesc:
+          If the algorithm returns <DOM::null>.
+      @@@NodeReadOnlyError:
+      @@@PerlDef:
+        __CODE{returnChildElement::
+          $node => $self,
+          $namespaceURI => {<Q::atom|>},
+          $localName => 'summary',
+          $r => $r,
+        }__;
+
+  @Attr:
+    @@Name: titleElement
+    @@enDesc:
+      The <XE::atom|title> child element of the node.
+    @@Type: AtomTitleElement
+    @@Get:
+      @@@enDesc:
+        It <kwd:MUST> <I::return a <XE::atom|title> child element>
+        of the node.
+      @@@nullCase:
+        @@@@enDesc:
+          If the algorithm returns <DOM::null>.
+      @@@NodeReadOnlyError:
+      @@@disDef:
+        @@@@dlp:cloneCode: ManakaiAtomFeedElement.titleElement.get
+
+  @Attr:
+    @@Name: updatedElement
+    @@enDesc:
+      The <XE::atom|updated> child element of the node.
+    @@Type: AtomUpdatedElement
+    @@Get:
+      @@@enDesc:
+        It <kwd:MUST> <I::return a <XE::atom|updated> child element>
+        of the node.
+      @@@nullCase:
+        @@@@enDesc:
+          If the algorithm returns <DOM::null>.
+      @@@NodeReadOnlyError:
+      @@@disDef:
+        @@@@dlp:cloneCode: ManakaiAtomFeedElement.updatedElement.get
+##AtomEntryElement
+
+IFClsETDef:
+  @IFQName: AtomContentElement
+  @ETQName: atom|content
+  @ClsQName: ManakaiAtomContentElement
+
+  @IFISA: AtomElement
+  @ClsISA: ManakaiAtomElement
+
+  @enDesc:
+    The <XE::atom|content> element either contains or links to
+    the content of the entry.
+
+  @Attr:
+    @@Name: type
+    @@enDesc:
+      The type of the element.
+
+      It <kwd:MUST> <I::reflect the string value
+      of the <XA::type> attribute> of the node.  It default
+      value <kwd:MUST> be <CODE::text> if and only if
+      there is no <XA::src> attribute on the node.
+    @@Type: DOMString
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          If the algorithm returns <DOM::null>.
+      @@@PerlDef:
+        __CODE{getReflectAttrStringValue::
+          $node => $self,
+          $namespaceURI => {null},
+          $localName => 'type',
+          $r => $r,
+          $defaultValue => {
+            $self-><M::Element.hasAttributeNS> (null, 'src') ? null : 'text'
+          },
+        }__;
+    @@Set:
+      @@@nullCase:
+        @@@@enDesc:
+          Removes the attribute.
+      @@@NodeReadOnlyError:
+      @@@PerlDef:
+        __CODE{setReflectAttrStringValue::
+          $node => $self,
+          $namespaceURI => {null},
+          $localName => 'type',
+          $given => $given,
+        }__;
+
+    @@Test:
+      @@@QName: AtomContentElement.type.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+        my $el = $doc-><M::Document.createElementNS> (<Q::atom|>, 'content');
+
+        $test->id ('default.no.src');
+        $test->assert_equals ($el-><AG::AtomContentElement.type>, 'text');
+
+        $test->id ('default.src');
+        $el-><AS::AtomContentElement.src> ('http://atom.example/');
+        $test->assert_null ($el-><AG::AtomContentElement.type>);
+
+        $test->id ('set.xhtml');
+        $el-><AS::AtomContentElement.type> ('xhtml');
+        $test->assert_equals ($el-><AG::AtomContentElement.type>, 'xhtml');
+
+        $test->id ('set.imt');
+        $el-><AS::AtomContentElement.type> ('application/xml');
+        $test->assert_equals ($el-><AG::AtomContentElement.type>,
+                              'application/xml');
+
+        $test->id ('remove');
+        $el-><AS::AtomContentElement.type> (null);
+        $test->assert_null ($el-><AG::AtomContentElement.type>);
+
+  @Attr:
+    @@Name: src
+    @@enDesc:
+      The source of the remote content of the element.
+
+      It <kwd:MUST> <I::reflect the string value
+      of the <XA::src> attribute> of the node.
+    @@Type: DOMString
+    @@Type: DOMURI
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          If the algorithm returns <DOM::null>.
+      @@@PerlDef:
+        __CODE{getReflectAttrURIValue::
+          $node => $self,
+          $namespaceURI => {null},
+          $localName => 'src',
+          $r => $r,
+          $defaultValue => {null},
+        }__;
+    @@Set:
+      @@@nullCase:
+        @@@@enDesc:
+          Removes the attribute.
+      @@@NodeReadOnlyError:
+      @@@PerlDef:
+        __CODE{setReflectAttrURIValue::
+          $node => $self,
+          $namespaceURI => {null},
+          $localName => 'src',
+          $given => $given,
+        }__;
+
+    @@Test:
+      @@@QName: AtomContentElement.src.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+        my $el = $doc-><M::Document.createElementNS> (<Q::atom|>, 'content');
+
+        $test->id ('default');
+        $test->assert_null ($el-><AG::AtomContentElement.src>);
+
+        $test->id ('set');
+        $el-><AS::AtomContentElement.src> ('http://atom.example/');
+        $test->assert_equals ($el-><AG::AtomContentElement.src>,
+                              'http://atom.example/');
+
+        $test->id ('set.relative');
+        $el-><AS::AtomContentElement.src> ('atom');
+        $test->assert_equals ($el-><AG::AtomContentElement.src>, 'atom');
+
+        $test->id ('set.relative.base');
+        $el-><M::Element.setAttributeNS> (<Q::xml|>, 'xml:base',
+                                          'http://atom.example/');
+        $test->assert_equals ($el-><AG::AtomContentElement.src>,
+                              'http://atom.example/atom');
+
+        $test->id ('remove');
+        $el-><AS::AtomContentElement.src> (null);
+        $test->assert_null ($el-><AG::AtomContentElement.src>);
+
+  @Attr:
+    @@Name: container
+    @@enDesc:
+      The container element that contains the actual content for the node.
+    @@Type: Element
+    @@Get:
+      @@@enDesc:
+        - If the <A::AtomContentElement.type> is <CODE::xhtml>, 
+          it <kwd:MUST> <I::return the <XE::html|div> child element>.
+
+        - Otherwise, if the <A::AtomContentElement.src> is <DOM::null>, 
+          it <kwd:MUST> return <DOM::null>.
+
+        - Otherwise, it <kwd:MUST> return the node itself.
+      @@@nullCase:
+        @@@@enDesc:
+          If the algorithm returns <DOM::null>.
+      @@@NodeReadOnlyError:
+      @@@PerlDef:
+        __DEEP{
+          my $type = $self-><AG::AtomContentElement.type>;
+          if (defined $type and $type eq 'xhtml') {
+            __UNDEEP{
+              __CODE{returnChildElement::
+                $node => $self,
+                $namespaceURI => {<Q::html|>},
+                $localName => 'div',
+                $r => $r,
+              }__;
+            }__;
+          } elsif (not $self-><M::Element.hasAttributeNS> (null, 'src')) {
+            $r = $self;
+          }
+        }__;
+
+    @@Test:
+      @@@QName: AtomContentElement.container.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+        my $el = $doc-><M::Document.createElementNS> (<Q::atom|>, 'content');
+
+        $test->id ('no');
+        $test->assert_equals ($el-><AG::AtomContentElement.container>, $el);
+
+        $test->id ('application/smil');
+        $el-><AS::AtomContentElement.type> ('application/smil');
+        $test->assert_equals ($el-><AG::AtomContentElement.container>, $el);
+
+        $test->id ('text');
+        $el-><AS::AtomContentElement.type> ('text');
+        $test->assert_equals ($el-><AG::AtomContentElement.container>, $el);
+
+        $test->id ('html');
+        $el-><AS::AtomContentElement.type> ('html');
+        $test->assert_equals ($el-><AG::AtomContentElement.container>, $el);
+
+        $test->id ('xhtml');
+        $el-><AS::AtomContentElement.type> ('xhtml');
+        $test->assert_null ($el-><AG::AtomContentElement.container>);
+
+        $doc-><AG::Document.domConfig>
+            -><M::CFG.setParameter> (<Q::cfg|create-child-element> => true);
+        my $con = $el-><AG::AtomContentElement.container>;
+
+        $test->id ('xhtml.create');
+        $test->assert_not_equals ($con, $el);
+
+        $test->id ('xhtml.namespaceURI');
+        $test->assert_equals ($con-><AG::Node.namespaceURI>, <Q::html|>);
+
+        $test->id ('xhtml.localName');
+        $test->assert_equals ($con-><AG::Node.localName>, 'div');
+
+        $test->id ('xhtml.parentNode');
+        $test->assert_equals ($con-><AG::Node.parentNode>, $el);
+
+        $test->id ('xhtml.2');
+        $test->assert_equals ($el-><AG::AtomContentElement.container>, $con);
+    @@Test:
+      @@@QName: AtomContentElement.container.2.test
+      @@@enDesc:
+        With <XA::src>.
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+        my $el = $doc-><M::Document.createElementNS> (<Q::atom|>, 'content');
+
+        $el-><AS::AtomContentElement.src> ('http://www.example.com/');
+
+        $test->id ('no');
+        $test->assert_null ($el-><AG::AtomContentElement.container>);
+
+        $test->id ('application/smil');
+        $el-><AS::AtomContentElement.type> ('application/smil');
+        $test->assert_null ($el-><AG::AtomContentElement.container>);
+
+  @enImplNote:
+    @@ddid: base64
+    @@@:
+      {TODO::
+        Access to Base64'ed content is necessary.
+      }
+##AtomContentElement
+
+IFClsETDef:
+  @IFQName: AtomAuthorElement
+  @ETQName: atom|author
+  @ClsQName: ManakaiAtomAuthorElement
+
+  @IFISA: AtomPersonConstruct
+  @ClsISA: ManakaiAtomPersonConstruct
+
+  @enDesc:
+    The <XE::atom|author> element is a Person construct that
+    indicates the author of the entry or feed.
+##AtomAuthorElement
+
+IFClsETDef:
+  @IFQName: AtomCategoryElement
+  @ETQName: atom|category
+  @ClsQName: ManakaiAtomCategoryElement
+
+  @IFISA: AtomElement
+  @ClsISA: ManakaiAtomElement
+
+  @enDesc:
+    The <XE::atom|category> element conveys information abut
+    a category associated with an entry or feed.
+
+  @Attr:
+    @@Name: term
+    @@enDesc:
+      The <XA::term> attribute of the element.
+
+      It <kwd:MUST> <I::reflect the string value
+      of the <XA::term> attribute> of the node.
+    @@Type: DOMString
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          If the algorithm returns <DOM::null>.
+      @@@PerlDef:
+        __CODE{getReflectAttrStringValue::
+          $node => $self,
+          $namespaceURI => {null},
+          $localName => 'term',
+          $r => $r,
+          $defaultValue => {null},
+        }__;
+    @@Set:
+      @@@nullCase:
+        @@@@enDesc:
+          Removes the attribute.
+      @@@NodeReadOnlyError:
+      @@@PerlDef:
+        __CODE{setReflectAttrStringValue::
+          $node => $self,
+          $namespaceURI => {null},
+          $localName => 'term',
+          $given => $given,
+        }__;
+
+  @Attr:
+    @@Name: scheme
+    @@enDesc:
+      The categorization scheme of the element.
+
+      It <kwd:MUST> <I::reflect the URI value
+      of the <XA::scheme> attribute> of the node.
+    @@Type: DOMString
+    @@Type: DOMURI
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          If the algorithm returns <DOM::null>.
+      @@@PerlDef:
+        __CODE{getReflectAttrURIValue::
+          $node => $self,
+          $namespaceURI => {null},
+          $localName => 'scheme',
+          $r => $r,
+          $defaultValue => {null},
+        }__;
+    @@Set:
+      @@@nullCase:
+        @@@@enDesc:
+          Removes the attribute.
+      @@@NodeReadOnlyError:
+      @@@PerlDef:
+        __CODE{setReflectAttrURIValue::
+          $node => $self,
+          $namespaceURI => {null},
+          $localName => 'scheme',
+          $given => $given,
+        }__;
+
+  @Attr:
+    @@Name: label
+    @@enDesc:
+      The <XA::label> attribute of the element.
+
+      It <kwd:MUST> <I::reflect the string value
+      of the <XA::label> attribute> of the node.
+    @@Type: DOMString
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          If the algorithm returns <DOM::null>.
+      @@@PerlDef:
+        __CODE{getReflectAttrStringValue::
+          $node => $self,
+          $namespaceURI => {null},
+          $localName => 'label',
+          $r => $r,
+          $defaultValue => {null},
+        }__;
+    @@Set:
+      @@@nullCase:
+        @@@@enDesc:
+          Removes the attribute.
+      @@@NodeReadOnlyError:
+      @@@PerlDef:
+        __CODE{setReflectAttrStringValue::
+          $node => $self,
+          $namespaceURI => {null},
+          $localName => 'label',
+          $given => $given,
+        }__;
+##AtomCategoryElement
+
+IFClsETDef:
+  @IFQName: AtomContributorElement
+  @ETQName: atom|contributor
+  @ClsQName: ManakaiAtomContributorElement
+
+  @IFISA: AtomPersonConstruct
+  @ClsISA: ManakaiAtomPersonConstruct
+
+  @enDesc:
+    The <XE::atom|contributor> element is a Person construct that
+    indicates a person or other entity who contributed to the entry
+    or feed.
+##AtomContributorElement
+
+IFClsETDef:
+  @IFQName: AtomGeneratorElement
+  @ETQName: atom|generator
+  @ClsQName: ManakaiAtomGeneratorElement
+
+  @IFISA: AtomElement
+  @ClsISA: ManakaiAtomElement
+
+  @enDesc:
+    The <XE::atom|generator> element identifies the agent used
+    to generate a feed.
+
+  @Attr:
+    @@Name: uri
+    @@enDesc:
+      The URI attribute of the element.
+
+      It <kwd:MUST> <I::reflect the URI value
+      of the <XA::uri> attribute> of the node.
+    @@Type: DOMString
+    @@Type: DOMURI
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          If the algorithm returns <DOM::null>.
+      @@@PerlDef:
+        __CODE{getReflectAttrURIValue::
+          $node => $self,
+          $namespaceURI => {null},
+          $localName => 'uri',
+          $r => $r,
+          $defaultValue => {null},
+        }__;
+    @@Set:
+      @@@nullCase:
+        @@@@enDesc:
+          Removes the attribute.
+      @@@NodeReadOnlyError:
+      @@@PerlDef:
+        __CODE{setReflectAttrURIValue::
+          $node => $self,
+          $namespaceURI => {null},
+          $localName => 'uri',
+          $given => $given,
+        }__;
+
+  @Attr:
+    @@Name: version
+    @@enDesc:
+      The <XA::version> attribute of the element.
+
+      It <kwd:MUST> <I::reflect the string value
+      of the <XA::version> attribute> of the node.
+    @@Type: DOMString
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          If the algorithm returns <DOM::null>.
+      @@@PerlDef:
+        __CODE{getReflectAttrStringValue::
+          $node => $self,
+          $namespaceURI => {null},
+          $localName => 'version',
+          $r => $r,
+          $defaultValue => {null},
+        }__;
+    @@Set:
+      @@@nullCase:
+        @@@@enDesc:
+          Removes the attribute.
+      @@@NodeReadOnlyError:
+      @@@PerlDef:
+        __CODE{setReflectAttrStringValue::
+          $node => $self,
+          $namespaceURI => {null},
+          $localName => 'version',
+          $given => $given,
+        }__;
+##AtomGeneratorElement
+
+IFClsETDef:
+  @IFQName: AtomLinkElement
+  @ETQName: atom|link
+  @ClsQName: ManakaiAtomLinkElement
+
+  @IFISA: AtomElement
+  @ClsISA: ManakaiAtomElement
+
+  @enDesc:
+    The <XE::atom|link> element defines a reference from an entry
+    or feed to a Web resource.
+
+  @Attr:
+    @@Name: href
+    @@enDesc:
+      The <XA::href> attribute of the element.
+
+      It <kwd:MUST> <I::reflect the URI value
+      of the <XA::href> attribute> of the node.
+    @@Type: DOMString
+    @@Type: DOMURI
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          If the algorithm returns <DOM::null>.
+      @@@PerlDef:
+        __CODE{getReflectAttrURIValue::
+          $node => $self,
+          $namespaceURI => {null},
+          $localName => 'href',
+          $r => $r,
+          $defaultValue => {null},
+        }__;
+    @@Set:
+      @@@nullCase:
+        @@@@enDesc:
+          Removes the attribute.
+      @@@NodeReadOnlyError:
+      @@@PerlDef:
+        __CODE{setReflectAttrURIValue::
+          $node => $self,
+          $namespaceURI => {null},
+          $localName => 'href',
+          $given => $given,
+        }__;
+
+  @Attr:
+    @@Name: rel
+    @@enDesc:
+      The <XA::rel> attribute of the element.
+
+      It <kwd:MUST> <I::reflect the string value
+      of the <XA::rel> attribute> of the node, with
+      a few exceptions.  The default value <kwd:MUST> 
+      be <URI^DISCore|QName::rel|alternate>.
+    @@Type: DOMString
+    @@Get:
+      @@@enDesc:
+        If the algorithm returns a string that does not contain
+        any <CHAR::COLON> character, the string
+        <URI^DISCore|QName::rel|> <kwd:MUST> be prepended
+        for the return value of the getter.
+      @@@PerlDef:
+        __CODE{getReflectAttrStringValue::
+          $node => $self,
+          $namespaceURI => {null},
+          $localName => 'rel',
+          $r => $r,
+          $defaultValue => {<Q::rel|alternate>},
+        }__;
+        if (defined $r and index ($r, ':') == -1) {
+          $r = <Q::rel|> . $r;
+        }
+    @@Set:
+      @@@enDesc:
+        If the given value starts with <URI^DISCore|QName::rel|> (by
+        simple character-by-character comparison), such substring
+        <kwd:MUST> be removed for the purpose of the setter algorithm, 
+        if and only if the result string is not empty and does contain
+        none of <CHAR::COLON>, <CHAR::SOLIDUS>, <CHAR::QUESTION MARK>,
+        and <CHAR::NUMBER SIGN>.
+      @@@nullCase:
+        @@@@enDesc:
+          Removes the attribute.
+      @@@NodeReadOnlyError:
+      @@@PerlDef:
+        if (defined $given) {
+          $given =~ s[\Ahttp://www.iana.org/assignments/relation/([^:/?#]+)\z]
+                     [$1];
+        }
+        __CODE{setReflectAttrStringValue::
+          $node => $self,
+          $namespaceURI => {null},
+          $localName => 'rel',
+          $given => $given,
+        }__;
+
+    @@Test:
+      @@@QName: AtomLinkElement.rel.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+        my $el = $doc-><M::Document.createElementNS> (<Q::atom|>, 'link');
+
+        $test->id ('default');
+        $test->assert_equals ($el-><AG::AtomLinkElement.rel>,
+                              <Q::rel|alternate>);
+
+        $test->id ('set');
+        $el-><AS::AtomLinkElement.rel> ('http://www.example.com/');
+        $test->assert_equals ($el-><AG::AtomLinkElement.rel>,
+                              'http://www.example.com/');
+
+        $test->id ('set.self');
+        $el-><AS::AtomLinkElement.rel> ('self');
+        $test->assert_equals ($el-><AG::AtomLinkElement.rel>,
+                              <Q::rel|self>);
+
+        $test->id ('set.qrelated');
+        $el-><AS::AtomLinkElement.rel> (<Q::rel|related>);
+        $test->assert_equals ($el-><AG::AtomLinkElement.rel>,
+                              <Q::rel|related>);
+
+        $test->id ('remove');
+        $el-><AS::AtomLinkElement.rel> (null);
+        $test->assert_equals ($el-><AG::AtomLinkElement.rel>,
+                              <Q::rel|alternate>);
+
+  @Attr:
+    @@Name: type
+    @@enDesc:
+      The <XA::type> attribute of the element.
+
+      It <kwd:MUST> <I::reflect the string value
+      of the <XA::type> attribute> of the node.
+    @@Type: DOMString
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          If the algorithm returns <DOM::null>.
+      @@@PerlDef:
+        __CODE{getReflectAttrStringValue::
+          $node => $self,
+          $namespaceURI => {null},
+          $localName => 'type',
+          $r => $r,
+          $defaultValue => {null},
+        }__;
+    @@Set:
+      @@@nullCase:
+        @@@@enDesc:
+          Removes the attribute.
+      @@@NodeReadOnlyError:
+      @@@PerlDef:
+        __CODE{setReflectAttrStringValue::
+          $node => $self,
+          $namespaceURI => {null},
+          $localName => 'type',
+          $given => $given,
+        }__;
+
+  @Attr:
+    @@Name: hreflang
+    @@enDesc:
+      The <XA::hreflang> attribute of the element.
+
+      It <kwd:MUST> <I::reflect the string value
+      of the <XA::hreflang> attribute> of the node.
+    @@Type: DOMString
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          If the algorithm returns <DOM::null>.
+      @@@PerlDef:
+        __CODE{getReflectAttrStringValue::
+          $node => $self,
+          $namespaceURI => {null},
+          $localName => 'hreflang',
+          $r => $r,
+          $defaultValue => {null},
+        }__;
+    @@Set:
+      @@@nullCase:
+        @@@@enDesc:
+          Removes the attribute.
+      @@@NodeReadOnlyError:
+      @@@PerlDef:
+        __CODE{setReflectAttrStringValue::
+          $node => $self,
+          $namespaceURI => {null},
+          $localName => 'hreflang',
+          $given => $given,
+        }__;
+
+  @Attr:
+    @@Name: title
+    @@enDesc:
+      The <XA::title> attribute of the element.
+
+      It <kwd:MUST> <I::reflect the string value
+      of the <XA::title> attribute> of the node.
+    @@Type: DOMString
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          If the algorithm returns <DOM::null>.
+      @@@PerlDef:
+        __CODE{getReflectAttrStringValue::
+          $node => $self,
+          $namespaceURI => {null},
+          $localName => 'title',
+          $r => $r,
+          $defaultValue => {null},
+        }__;
+    @@Set:
+      @@@nullCase:
+        @@@@enDesc:
+          Removes the attribute.
+      @@@NodeReadOnlyError:
+      @@@PerlDef:
+        __CODE{setReflectAttrStringValue::
+          $node => $self,
+          $namespaceURI => {null},
+          $localName => 'title',
+          $given => $given,
+        }__;
+
+  @Attr:
+    @@Name: length
+    @@enDesc:
+      The <XA::length> attribute of the element.
+
+      It <kwd:MUST> <I::reflect the string value
+      of the <XA::length> attribute> of the node.
+    @@Type: DOMString
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          If the algorithm returns <DOM::null>.
+      @@@PerlDef:
+        __CODE{getReflectAttrStringValue::
+          $node => $self,
+          $namespaceURI => {null},
+          $localName => 'length',
+          $r => $r,
+          $defaultValue => {null},
+        }__;
+    @@Set:
+      @@@nullCase:
+        @@@@enDesc:
+          Removes the attribute.
+      @@@NodeReadOnlyError:
+      @@@PerlDef:
+        __CODE{setReflectAttrStringValue::
+          $node => $self,
+          $namespaceURI => {null},
+          $localName => 'length',
+          $given => $given,
+        }__;
+##AtomLinkElement
+
+IFClsETDef:
+  @IFQName: AtomPublishedElement
+  @ETQName: atom|published
+  @ClsQName: ManakaiAtomPublishedElement
+
+  @IFISA: AtomDateConstruct
+  @ClsISA: ManakaiAtomDateConstruct
+
+  @enDesc:
+    The <XE::atom|published> element is a Date construct
+    indicating an instant in time associated with an
+    event early in the life cycle of the entry.
+
+    Typically, <XE::atom|published> will be associated with
+    the initial creation or first availability of the resouce.
+##AtomPublishedElement
+
+IFClsETDef:
+  @IFQName: AtomRightsElement
+  @ETQName: atom|rights
+  @ClsQName: ManakaiAtomRightsElement
+
+  @IFISA: AtomTextConstruct
+  @ClsISA: ManakaiAtomTextConstruct
+
+  @enDesc:
+    The <XE::atom|rights> element is a Text construct
+    that conveys information about rights held in and
+    over an entry or feed.
+##AtomRightsElement
+
+IFClsETDef:
+  @IFQName: AtomSourceElement
+  @ETQName: atom|source
+  @ClsQName: ManakaiAtomSourceElement
+
+  @IFISA: AtomElement
+  @ClsISA: ManakaiAtomElement
+
+  @Attr:
+    @@Name: authorElements
+    @@enDesc:
+      A static list of <XE::atom|author> child elements of the node.
+    @@Type: StaticNodeList
+    @@Get:
+      @@@enDesc:
+        It <kwd:MUST> <I::return a <XE::atom|author> child element list>
+        of the node.
+      @@@disDef:
+        @@@@dlp:cloneCode: ManakaiAtomFeedElement.authorElements.get
+
+  @Attr:
+    @@Name: categoryElements
+    @@enDesc:
+      A static list of <XE::atom|category> child elements of the node.
+    @@Type: StaticNodeList
+    @@Get:
+      @@@enDesc:
+        It <kwd:MUST> <I::return a <XE::atom|category> child element list>
+        of the node.
+      @@@disDef:
+        @@@@dlp:cloneCode: ManakaiAtomFeedElement.categoryElements.get
+
+  @Attr:
+    @@Name: contributorElements
+    @@enDesc:
+      A static list of <XE::atom|contributor> child elements of the node.
+    @@Type: StaticNodeList
+    @@Get:
+      @@@enDesc:
+        It <kwd:MUST> <I::return a <XE::atom|contributor> child element list>
+        of the node.
+      @@@disDef:
+        @@@@dlp:cloneCode: ManakaiAtomFeedElement.contributorElements.get
+
+  @Attr:
+    @@Name: generatorElement
+    @@enDesc:
+      The <XE::atom|generator> child element of the node.
+    @@Type: AtomGeneratorElement
+    @@Get:
+      @@@enDesc:
+        It <kwd:MUST> <I::return a <XE::atom|generator> child element>
+        of the node.
+      @@@nullCase:
+        @@@@enDesc:
+          If the algorithm returns <DOM::null>.
+      @@@NodeReadOnlyError:
+      @@@disDef:
+        @@@@dlp:cloneCode: ManakaiAtomFeedElement.generatorElement.get
+
+  @Attr:
+    @@Name: icon
+    @@enDesc:
+      The <XE::atom|icon> value of the node.
+
+      It <kwd:MUST> <I::reflect the URI value
+      of the <XE::atom|icon> child element> of the node.
+    @@Type: DOMString
+    @@actualType: DOMURI
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          If the algorithm returns <DOM::null>.
+      @@@NodeReadOnlyError:
+      @@@disDef:
+        @@@@dlp:cloneCode: ManakaiAtomFeedElement.icon.get
+    @@Set:
+      @@@nullCase:
+        @@@@enDesc:
+          Removes the value.
+      @@@NodeReadOnlyError:
+      @@@disDef:
+        @@@@dlp:cloneCode: ManakaiAtomFeedElement.icon.set
+
+  @Attr:
+    @@Name: id
+    @@enDesc:
+      The <XE::atom|id> value of the node.
+
+      It <kwd:MUST> <I::reflect the string value
+      of the <XE::atom|id> child element> of the node.
+    @@Type: DOMString
+    @@actualType: DOMURI
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          If the algorithm returns <DOM::null>.
+      @@@NodeReadOnlyError:
+      @@@disDef:
+        @@@@dlp:cloneCode: ManakaiAtomFeedElement.id.get
+    @@Set:
+      @@@nullCase:
+        @@@@enDesc:
+          Removes the value.
+      @@@NodeReadOnlyError:
+      @@@disDef:
+        @@@@dlp:cloneCode: ManakaiAtomFeedElement.id.set
+
+  @Attr:
+    @@Name: linkElements
+    @@enDesc:
+      A static list of <XE::atom|link> child elements of the node.
+    @@Type: StaticNodeList
+    @@Get:
+      @@@enDesc:
+        It <kwd:MUST> <I::return a <XE::atom|link> child element list>
+        of the node.
+      @@@disDef:
+        @@@@dlp:cloneCode: ManakaiAtomFeedElement.linkElements.get
+
+  @Attr:
+    @@Name: logo
+    @@enDesc:
+      The <XE::atom|logo> value of the node.
+
+      It <kwd:MUST> <I::reflect the URI value
+      of the <XE::atom|logo> child element> of the node.
+    @@Type: DOMString
+    @@actualType: DOMURI
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          If the algorithm returns <DOM::null>.
+      @@@NodeReadOnlyError:
+      @@@disDef:
+        @@@@dlp:cloneCode: ManakaiAtomFeedElement.logo.get
+    @@Set:
+      @@@nullCase:
+        @@@@enDesc:
+          Removes the value.
+      @@@NodeReadOnlyError:
+      @@@disDef:
+        @@@@dlp:cloneCode: ManakaiAtomFeedElement.logo.set
+
+  @Attr:
+    @@Name: rightsElement
+    @@enDesc:
+      The <XE::atom|rights> child element of the node.
+    @@Type: AtomRightsElement
+    @@Get:
+      @@@enDesc:
+        It <kwd:MUST> <I::return a <XE::atom|rights> child element>
+        of the node.
+      @@@nullCase:
+        @@@@enDesc:
+          If the algorithm returns <DOM::null>.
+      @@@NodeReadOnlyError:
+      @@@disDef:
+        @@@@dlp:cloneCode: ManakaiAtomFeedElement.rightsElement.get
+
+  @Attr:
+    @@Name: subtitleElement
+    @@enDesc:
+      The <XE::atom|subtitle> child element of the node.
+    @@Type: AtomSubtitleElement
+    @@Get:
+      @@@enDesc:
+        It <kwd:MUST> <I::return a <XE::atom|subtitle> child element>
+        of the node.
+      @@@nullCase:
+        @@@@enDesc:
+          If the algorithm returns <DOM::null>.
+      @@@NodeReadOnlyError:
+      @@@disDef:
+        @@@@dlp:cloneCode: ManakaiAtomFeedElement.subtitleElement.get
+
+  @Attr:
+    @@Name: titleElement
+    @@enDesc:
+      The <XE::atom|title> child element of the node.
+    @@Type: AtomTitleElement
+    @@Get:
+      @@@enDesc:
+        It <kwd:MUST> <I::return a <XE::atom|title> child element>
+        of the node.
+      @@@nullCase:
+        @@@@enDesc:
+          If the algorithm returns <DOM::null>.
+      @@@NodeReadOnlyError:
+      @@@disDef:
+        @@@@dlp:cloneCode: ManakaiAtomFeedElement.titleElement.get
+
+  @Attr:
+    @@Name: updatedElement
+    @@enDesc:
+      The <XE::atom|updated> child element of the node.
+    @@Type: AtomUpdatedElement
+    @@Get:
+      @@@enDesc:
+        It <kwd:MUST> <I::return a <XE::atom|updated> child element>
+        of the node.
+      @@@nullCase:
+        @@@@enDesc:
+          If the algorithm returns <DOM::null>.
+      @@@NodeReadOnlyError:
+      @@@disDef:
+        @@@@dlp:cloneCode: ManakaiAtomFeedElement.updatedElement.get
+##AtomSourceElement
+
+IFClsETDef:
+  @IFQName: AtomSubtitleElement
+  @ETQName: atom|subtitle
+  @ClsQName: ManakaiAtomSubtitleElement
+
+  @IFISA: AtomTextConstruct
+  @ClsISA: ManakaiAtomTextConstruct
+
+  @enDesc:
+    The <XE::atom|subtitle> element is a Text construct
+    that conveys a human-readable description or subtitle for a feed.
+##AtomSubtitleElement
+
+IFClsETDef:
+  @IFQName: AtomSummaryElement
+  @ETQName: atom|summary
+  @ClsQName: ManakaiAtomSummaryElement
+
+  @IFISA: AtomTextConstruct
+  @ClsISA: ManakaiAtomTextConstruct
+
+  @enDesc:
+    The <XE::atom|summary> element is a Text construct
+    that conveys a short summary, abstract, or excerpt of an entry.
+##AtomSummaryElement
+
+IFClsETDef:
+  @IFQName: AtomTitleElement
+  @ETQName: atom|title
+  @ClsQName: ManakaiAtomTitleElement
+
+  @IFISA: AtomTextConstruct
+  @ClsISA: ManakaiAtomTextConstruct
+
+  @enDesc:
+    The <XE::atom|title> element is a Text construct
+    that conveys a human-readable title for an entry or feed.
+##AtomTitleElement
+
+IFClsETDef:
+  @IFQName: AtomUpdatedElement
+  @ETQName: atom|updated
+  @ClsQName: ManakaiAtomUpdatedElement
+
+  @IFISA: AtomDateConstruct
+  @ClsISA: ManakaiAtomDateConstruct
+
+  @enDesc:
+    The <XE::atom|updated> element is a Date construct
+    indicating the most recent instant in time when an 
+    entry or feed was modified in a way the publisher considers
+    significant.
+##AtomPublishedElement
+
+ElementTypeBinding:
+  @Name: NodeReadOnlyError
+  @ElementType:
+    dx:raises
+  @ShadowContent:
+    @@@: MDOMX|NOMOD_THIS
+    @@Description:
+      @@@lang:en
+      @@@@:
+        If the node or a descendant of it, which
+        is to be modified, is read-only.
+
+## -- Configuration Parameters
+
+boolCParam:
+  @QName: cfg|create-child-element
+  @tc:nodeStemKey:
+    @@@: ccldel
+    @@ForCheck: =ManakaiDOM|all
+  @c:targetType: tc|Document
+  @IsSupportRequired:1
+  @TrueCase:
+    @@c:isSupported:1
+    @@enDesc:
+      If the parameter is set to <DOM::true>, some DOM attributes
+      that returns an element will create a child element
+      when there is no element that met the condition defined
+      for that DOM attribute.
+  @FalseCase:
+    @@c:isSupported:1
+    @@IsSupportRequired:1
+    @@IsDefault:1
+    @@enDesc:
+      If the parameter is set to <DOM::true>, some DOM attributes
+      that returns an element will <EM::not> create a child element
+      even when there is no element that met the condition defined
+      for that DOM attribute.
+  @TestC:
+    @@QName: cfg.create-child-element.set.test
+    @@PerlCDef:
+      my $doc;
+      __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+      my $cfg = $doc-><AG::Document.domConfig>;
+      my $cp = <Q::cfg|create-child-element>;
+
+      $test->id ('default');
+      $test->assert_false ($cfg-><M::CFG.getParameter> ($cp));
+
+      $test->id ('set.f.to.t');
+      $cfg-><M::CFG.setParameter> ($cp => true);
+      $test->assert_true ($cfg-><M::CFG.getParameter> ($cp));
+
+      $test->id ('set.t.to.f');
+      $cfg-><M::CFG.setParameter> ($cp => false);
+      $test->assert_false ($cfg-><M::CFG.getParameter> ($cp));
+
+      $cfg-><M::CFG.setParameter> ($cp => true);
+
+      $test->id ('reset');
+      $cfg-><M::CFG.setParameter> ($cp => null);
+      $test->assert_false ($cfg-><M::CFG.getParameter> ($cp));
+
+ResourceDef:
+  @QName: CFG
+  @AliasFor: c|DOMConfiguration
+  @For: ManakaiDOM|DOM3
+
+ElementTypeBinding:
+  @Name: boolCParam
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType:
+      @@@@: c|DOMConfigurationParameter
+      @@@For: ManakaiDOM|DOM
+    @@DISCore:resourceType:
+      @@@@: DISCore|Property
+      @@@For: =ManakaiDOM|all
+    @@For: ManakaiDOM|DOM3
+    @@For: =ManakaiDOM|all
+    @@Type: idl|boolean||ManakaiDOM|all

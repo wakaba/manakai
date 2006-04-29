@@ -33,9 +33,12 @@ DAF_OPTIONS =
 DAF_PL = $(MANAKAI_BIN_DIR)daf.pl
 DAF = $(PERL_) $(DAF_PL) $(DAF_OPTIONS) $(DIS_OPTIONS_ALL)
 
-DIS_FILES = SuikaWikiConfig21.dis
+DIS_FILES = \
+  SuikaWikiConfig21$(DIS_SUFFIX) \
+  Atom$(DIS_SUFFIX)
+ADDITIONAL_DIS_FILES = common$(DIS_SUFFIX)
 
-PM_FILES = SuikaWikiConfig21$(PM_SUFFIX)
+PM_FILES = $(DIS_FILES:$(DIS_SUFFIX)=$(PM_SUFFIX))
 
 GENERATED_FILES = $(PM_FILES)
 
@@ -53,5 +56,5 @@ clean-db:
 
 distclean: clean clean-db
 
-## $Date: 2006/04/03 16:13:15 $
+## $Date: 2006/04/29 11:05:09 $
 ## License: Public Domain.

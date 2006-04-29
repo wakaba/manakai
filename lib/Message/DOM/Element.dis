@@ -13,7 +13,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/04/22 05:14:19 $
+    $Date: 2006/04/29 11:05:08 $
 
   @Require:
     @@Module:
@@ -4457,7 +4457,7 @@ NodeTypeDef:
           $ref => $self,
         }__;
         $list = $__attrs->{defined $namespaceURI ? $namespaceURI : ''};
-        if (defined $list) {
+        if (defined $list and defined $list->{$localName}) {
           __CODE{mg|createNodeRefFromID||ManakaiDOM|all::
             $bag => {<Code::mg|getNodeBag||ManakaiDOM|all:: $ref = $self>},
             $stemid => {$__attrs->{defined $namespaceURI ? $namespaceURI : ''}
@@ -6353,6 +6353,16 @@ NodeTypeDef:
 
         $test->id ('has');
         $test->assert_true ($el-><M::Element.hasAttribute> ('a'));
+    @@Test:
+      @@@QName: Element.removeAttribute.not.found.test
+      @@@PerlDef:
+        my $el;
+        __CODE{tc|createElementForTest:: $el => $el}__;
+
+        $el-><M::Element.removeAttribute> ('no.such.attribute');
+        
+        $test->assert_false ($el-><M::Element.hasAttribute>
+                                    ('no.such.attribute'));
 
   @L2Method:
     @@Name: removeAttributeNS
@@ -6565,6 +6575,26 @@ NodeTypeDef:
         $test->id ('remove.attr');
         $el-><M::Element.removeAttributeNS> ($uri, 'dattr1');
         $test->assert_null ($el-><M::Element.getAttributeNS> ($uri, 'dattr1'));
+    @@Test:
+      @@@QName: Element.removeAttributeNS.not.found.1.test
+      @@@PerlDef:
+        my $el;
+        __CODE{tc|createElementForTest:: $el => $el}__;
+
+        $el-><M::Element.removeAttributeNS> (null, 'no.such.attribute');
+        
+        $test->assert_false ($el-><M::Element.hasAttributeNS>
+                                    (null, 'no.such.attribute'));
+    @@Test:
+      @@@QName: Element.removeAttributeNS.not.found.2.test
+      @@@PerlDef:
+        my $el;
+        __CODE{tc|createElementForTest:: $el => $el}__;
+
+        $el-><M::Element.removeAttributeNS> ('about:', 'no.such.attribute');
+        
+        $test->assert_false ($el-><M::Element.hasAttributeNS>
+                                    ('about:', 'no.such.attribute'));
 
   @Method:
     @@Name: removeAttributeNode

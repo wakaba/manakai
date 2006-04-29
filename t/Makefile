@@ -56,6 +56,7 @@ DOMTEST2PERL_PL = $(MANAKAI_BIN_DIR)domtest2perl.pl
 NS_CHARSET    = http://suika.fam.cx/~wakaba/archive/2005/manakai/Charset/
 NS_MDOM = http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom\#ManakaiDOM.
 NS_MANAKAIDOM = http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom\#
+NS_MARKUP     = http://suika.fam.cx/~wakaba/archive/2005/manakai/Markup\#
 NS_URI        = http://suika.fam.cx/~wakaba/archive/2005/manakai/URI/
 NS_UTIL       = http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/
 NS_UTIL_DIS   = http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS\#
@@ -65,6 +66,8 @@ TEST_PM_FILES = \
 
 NS_CHARSET_PT_FILES = \
   charset-Encode$(PT_SUFFIX)
+NS_MARKUP_PT_FILES = \
+  markup-Atom$(PT_SUFFIX)
 NS_MDOM_PT_FILES = \
   dom-DOMFeature$(PT_SUFFIX) dom-GenericLS$(PT_SUFFIX) \
   dom-DOMCore$(PT_SUFFIX) \
@@ -84,6 +87,7 @@ NS_UTIL_DIS_PT_FILES = \
 UTIL_MNTEST_PM = $(MANAKAI_LIB_DIR)Message/Util/ManakaiNodeTest$(PM_SUFFIX)
 
 PT_FILES = \
+  $(NS_MARKUP_PT_FILES) \
   $(NS_MDOM_PT_FILES) \
   $(NS_URI_PT_FILES) \
   $(NS_UTIL_PT_FILES) $(NS_UTIL_DIS_PT_FILES) util-ManakaiNodeTest$(PT_SUFFIX)
@@ -105,6 +109,7 @@ dom1core:
 test-module-all: \
   test-module-charset \
   test-module-dom \
+  test-module-markup \
   test-module-uri \
   test-module-util
 
@@ -128,6 +133,14 @@ $(NS_MDOM_PT_FILES): dom-%$(PT_SUFFIX): \
 	#$(ECHO) "  manakai::mndebug::define_nodestem_destroy_all ();" >> $@
 	#$(ECHO) "  manakai::mndebug::define_noderef_destroy_all ();" >> $@
 	$(ECHO) "}" >> $@
+	$(PERL_CHK) $@
+
+test-module-markup: $(NS_MARKUP_PT_FILES) $(TEST_PM_FILES)
+	$(PERL_TEST_) markup-*$(PT_SUFFIX)
+
+$(NS_MARKUP_PT_FILES): markup-%$(PT_SUFFIX): \
+  $(MANAKAI_LIB_DIR)Message/Markup/%$(DIS_SUFFIX) $(DAF_PL)
+	$(DAF) --create-perl-test="$(NS_MARKUP)$* $@"
 	$(PERL_CHK) $@
 
 test-module-uri: $(NS_URI_PT_FILES) $(TEST_PM_FILES)

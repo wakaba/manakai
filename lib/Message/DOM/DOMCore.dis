@@ -40,7 +40,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/04/22 08:31:00 $
+      $Date: 2006/04/29 11:05:08 $
     @@ContentType:
       dis:Date.RCS
 
@@ -355,7 +355,7 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type: f|Feature
+    @@DISCore:resourceType: f|Feature
     @@For: =ManakaiDOM|all
 
 ElementTypeBinding:
@@ -363,7 +363,7 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type: f|Feature
+    @@DISCore:resourceType: f|Feature
 
 ElementTypeBinding:
   @Name: featureName
@@ -372,13 +372,6 @@ ElementTypeBinding:
   @ShadowContent:
     @@ContentType: DISCore|String
 
-ElementTypeBinding:
-  @Name: featureQName
-  @ElementType:
-    f:name
-  @ShadowContent:
-    @@ContentType: DISCore|QName
-
 FeatureDef:
   @featureName: Core
   @QName: CoreFeature
@@ -386,41 +379,32 @@ FeatureDef:
     @@QName: CoreFeature10
     @@Version: 1.0
     @@f:instanceOf: CoreFeature
-    @@Description:
-      @@@lang:en
-      @@@@:
-        The DOM Core Module (Fundemental Interface), Level 1. 
-        \
-        {NOTE:: Although some DOM implementations returns <DOM::true> for 
-                <M::DOMImplementations.hasFeature> with <Feature::Core> and 
-                <FeatureVer::1.0>, this behaviour is not defined by 
-                any level of W3C DOM Specification.  DOM applications 
-                should not expect DOM Level 1 Core implementation 
-                would return <DOM::true> to that method call. 
-          \
+    @@enDesc:
+      The Fundamental Interfaces in the DOM Specification, Level 1.
+
+        {NOTE::
+          Although the <Feature::Core> feature version <FeatureVer::1.0>
+          is <EM::not> formally defined in the W3C DOM specifications,
+          in some DOM implementations, including manakai, the
+          <M::DOMImplementation.hasFeature> method with parameters
+          <Feature::Core> and <FeatureVer::1.0> returns <DOM::true>.
         }
   @FeatureVerDef:
     @@QName: CoreFeature20
     @@Version: 2.0
     @@f:instanceOf: CoreFeature
     @@f:extends: CoreFeature10
-    @@Spec:
-      @@@DOM3:
-        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-BBACDC08
-    @@Description:
-      @@@lang:en
-      @@@@: The DOM Core Module, Level 2.
+    @@enDesc:
+      The DOM Core Module, also known as the Fundamental Interfaces
+      in the DOM Core Specification, Level 2.
   @FeatureVerDef:
     @@QName: CoreFeature30
     @@Version: 3.0
     @@f:instanceOf: CoreFeature
     @@f:extends: CoreFeature20
-    @@Spec:
-      @@@DOM3:
-        http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-BBACDC08
-    @@Description:
-      @@@lang:en
-      @@@@: The DOM Core Module, Level 3.
+    @@enDesc:
+      The DOM Core Module, also known as the Fundamental Interfaces
+      in the DOM Core Specification, Level 3.
 
 ## -- Exception
 
@@ -1263,6 +1247,11 @@ ResourceDef:
           @@@@@@: c|node
           @@@@@enDesc:
             The compared node.
+      @@@SubTypeDef:
+        @@@QName: c|SET_TO_NULL_ERR
+        @@@enDesc:
+          An attempt is made to set <DOM::null> where it is not allowed.
+        @@@XParamParamName:
 
      @@XConst:
       @@@QName: c|INUSE_ATTRIBUTE_ERR
