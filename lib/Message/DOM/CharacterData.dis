@@ -12,7 +12,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/04/22 05:14:18 $
+    $Date: 2006/04/30 09:48:44 $
 
   @Require:
     @@Module:
@@ -30,6 +30,9 @@ Module:
     @@Module:
       @@@WithFor: ManakaiDOM|ManakaiDOM3
     @@Module:
+      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
+    @@Module:
+      @@@QName: MDOM|Traversal
       @@@WithFor: ManakaiDOM|ManakaiDOMLatest
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
@@ -100,6 +103,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/Element/
   @test:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Test#
+  @trv:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/Traversal/
   @tx:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/XML/
   @urigen:
@@ -563,6 +568,7 @@ ElementTypeBinding:
       @@@lang:en
       @@@@:
         The node is read-only.
+
 ElementTypeBinding:
   @Name: TrueCase
   @ElementType:
@@ -2134,7 +2140,7 @@ IFCls1Def:
       The <DFN::logically-adjacent text nodes> are <IF::Text>
       or <IF::tx|CDATASection> nodes that can be visited
       sequentially in document order or in reverse document
-      order without entering, exiting, orpassing
+      order without entering, exiting, or passing
       over <IF::Element>, <IF::Comment>, <IF::tx|ProcessingInstruction>
       <SRC::DOM3>, or <IF::tx|DocumentType> <SRC::manakai> nodes.
     @@enImplNote:
@@ -2143,26 +2149,236 @@ IFCls1Def:
         By definition unexpanded entity references are seemed to be ignored.
     @@Type: DOMString
     @@Get:
-      @@@enImplNote:
-        {TODO::
-          Implement this method (by Traversal module?)
-        }
+      @@@PerlDef:
+        __DEEP{
+          require Message::DOM::Traversal;
+          my $doc = $self-><AG::Node.ownerDocument>;
+          my $doctrv = $doc-><M::Node.getFeature> (Traversal => '2.0');
+          my $tw1 = $doctrv-><M::trv|DocumentTraversal.createTreeWalker>
+                               ($doc, <C::trv|NodeFilter.SHOW_ALL>, sub {
+                                 ($_[1]-><AG::Node.nodeType>
+                                      == <C::Node.ENTITY_REFERENCE_NODE>)
+                                   ? <C::trv|NodeFilter.FILTER_SKIP>
+                                   : <C::trv|NodeFilter.FILTER_ACCEPT>
+                               }, true);
+          $tw1-><AS::trv|TreeWalker.currentNode> ($self);
+          my $tw2 = $tw1->clone;
+          $r = $self-><AG::Node.nodeValue>;
+
+          S: while (defined (my $node = $tw1-><M::trv|TreeWalker
+                                                .previousSibling>)) {
+            my $nt = $node-><AG::Node.nodeType>;
+            if ($nt == <C::Node.TEXT_NODE> or
+                $nt == <C::Node.CDATA_SECTION_NODE>) {
+              $r = $node-><AG::Node.nodeValue> . $r;
+            } else {
+              last S;
+            }
+          } # S
+
+          S: while (defined (my $node = $tw2-><M::trv|TreeWalker
+                                                .nextSibling>)) {
+            my $nt = $node-><AG::Node.nodeType>;
+            if ($nt == <C::Node.TEXT_NODE> or
+                $nt == <C::Node.CDATA_SECTION_NODE>) {
+              $r .= $node-><AG::Node.nodeValue>;
+            } else {
+              last S;
+            }
+          } # S
+        }__;
+
+    @@Test:
+      @@@QName: Text.wholeText.1.test
+      @@@PerlDef:
+        my $el;
+        __CODE{tc|createElementForTest:: $el => $el}__;
+
+        my $doc = $el-><AG::Node.ownerDocument>;
+
+        my $text1 = $doc-><M::Document.createTextNode> ('text1');
+
+        $el-><M::Node.appendChild> ($text1);
+
+        $test->assert_equals ($text1-><AG::Text.wholeText>, 'text1');
+    @@Test:
+      @@@QName: Text.wholeText.2.test
+      @@@PerlDef:
+        my $el;
+        __CODE{tc|createElementForTest:: $el => $el}__;
+
+        my $doc = $el-><AG::Node.ownerDocument>;
+
+        my $text1 = $doc-><M::Document.createTextNode> ('text1');
+        $el-><M::Node.appendChild> ($text1);
+        my $text2 = $doc-><M::Document.createTextNode> ('text2');
+        $el-><M::Node.appendChild> ($text2);
+
+        $test->id ('text1');
+        $test->assert_equals ($text1-><AG::Text.wholeText>, 'text1text2');
+        $test->id ('text2');
+        $test->assert_equals ($text2-><AG::Text.wholeText>, 'text1text2');
+    @@Test:
+      @@@QName: Text.wholeText.3.test
+      @@@PerlDef:
+        my $el;
+        __CODE{tc|createElementForTest:: $el => $el}__;
+
+        my $doc = $el-><AG::Node.ownerDocument>;
+
+        my $text1 = $doc-><M::Document.createTextNode> ('text1');
+        $el-><M::Node.appendChild> ($text1);
+        my $text2 = $doc-><M::Document.createTextNode> ('text2');
+        $el-><M::Node.appendChild> ($text2);
+        my $text3 = $doc-><M::Document.createCDATASection> ('text3');
+        $el-><M::Node.appendChild> ($text3);
+
+        $test->id ('text1');
+        $test->assert_equals ($text1-><AG::Text.wholeText>, 'text1text2text3');
+        $test->id ('text2');
+        $test->assert_equals ($text2-><AG::Text.wholeText>, 'text1text2text3');
+        $test->id ('text3');
+        $test->assert_equals ($text3-><AG::Text.wholeText>, 'text1text2text3');
+    @@Test:
+      @@@QName: Text.wholeText.4.test
+      @@@PerlDef:
+        my $el;
+        __CODE{tc|createElementForTest:: $el => $el}__;
+
+        my $doc = $el-><AG::Node.ownerDocument>;
+
+        my $text1 = $doc-><M::Document.createTextNode> ('text1');
+        $el-><M::Node.appendChild> ($text1);
+        my $text3 = $doc-><M::Document.createCDATASection> ('text3');
+        $el-><M::Node.appendChild> ($text3);
+        my $el1 = $doc-><M::Document.createElement> ('el1');
+        $el-><M::Node.appendChild> ($el1);
+        my $text2 = $doc-><M::Document.createTextNode> ('text2');
+        $el-><M::Node.appendChild> ($text2);
+
+        $test->id ('text1');
+        $test->assert_equals ($text1-><AG::Text.wholeText>, 'text1text3');
+        $test->id ('text2');
+        $test->assert_equals ($text2-><AG::Text.wholeText>, 'text2');
+        $test->id ('text3');
+        $test->assert_equals ($text3-><AG::Text.wholeText>, 'text1text3');
+    @@Test:
+      @@@QName: Text.wholeText.5.test
+      @@@PerlDef:
+        my $el;
+        __CODE{tc|createElementForTest:: $el => $el}__;
+
+        my $doc = $el-><AG::Node.ownerDocument>;
+
+        my $text1 = $doc-><M::Document.createTextNode> ('text1');
+        $el-><M::Node.appendChild> ($text1);
+        my $text3 = $doc-><M::Document.createCDATASection> ('text3');
+        $el-><M::Node.appendChild> ($text3);
+        my $er1 = $doc-><M::Document.createEntityReference> ('er1');
+        $er1-><M::Node.manakaiSetReadOnly> (false, true);
+        $el-><M::Node.appendChild> ($er1);
+        my $text4 = $doc-><M::Document.createTextNode> ('text4');
+        $er1-><M::Node.appendChild> ($text4);
+        my $text2 = $doc-><M::Document.createTextNode> ('text2');
+        $el-><M::Node.appendChild> ($text2);
+
+        $test->id ('text1');
+        $test->assert_equals ($text1-><AG::Text.wholeText>,
+                              'text1text3text4text2');
+        $test->id ('text2');
+        $test->assert_equals ($text2-><AG::Text.wholeText>,
+                              'text1text3text4text2');
+        $test->id ('text3');
+        $test->assert_equals ($text3-><AG::Text.wholeText>,
+                              'text1text3text4text2');
+        $test->id ('text4');
+        $test->assert_equals ($text4-><AG::Text.wholeText>,
+                              'text1text3text4text2');
+    @@Test:
+      @@@QName: Text.wholeText.6.test
+      @@@PerlDef:
+        my $el;
+        __CODE{tc|createElementForTest:: $el => $el}__;
+
+        my $doc = $el-><AG::Node.ownerDocument>;
+
+        my $text1 = $doc-><M::Document.createTextNode> ('text1');
+        $el-><M::Node.appendChild> ($text1);
+        my $text3 = $doc-><M::Document.createCDATASection> ('text3');
+        $el-><M::Node.appendChild> ($text3);
+        my $er1 = $doc-><M::Document.createEntityReference> ('er1');
+        $er1-><M::Node.manakaiSetReadOnly> (false, true);
+        $el-><M::Node.appendChild> ($er1);
+        my $text4 = $doc-><M::Document.createTextNode> ('text4');
+        $er1-><M::Node.appendChild> ($text4);
+        my $com1 = $doc-><M::Document.createComment> ('');
+        $er1-><M::Node.appendChild> ($com1);
+        my $text2 = $doc-><M::Document.createTextNode> ('text2');
+        $el-><M::Node.appendChild> ($text2);
+
+        $test->id ('text1');
+        $test->assert_equals ($text1-><AG::Text.wholeText>,
+                              'text1text3text4');
+        $test->id ('text2');
+        $test->assert_equals ($text2-><AG::Text.wholeText>,
+                              'text2');
+        $test->id ('text3');
+        $test->assert_equals ($text3-><AG::Text.wholeText>,
+                              'text1text3text4');
+        $test->id ('text4');
+        $test->assert_equals ($text4-><AG::Text.wholeText>,
+                              'text1text3text4');
 
   @L3Method:
     @@Name: replaceWholeText
-     @@Param:
-        @@@Name:  content
-        @@@Type:  
-          DOMMain:DOMString
-     @@Return:
-        @@@Type:  Text
+    @@enDesc:
+      Replaces the text of the node and all logically-adjacent
+      text nodes with the specified text.
+
+      All logically-adjacent text nodes are removed
+      including the current node unless it was the recipient of
+      the replacement text.
+
+      Where the nodes to be removed are read-only descendants
+      of an <IF::tx|EntityReference>, the <IF::tx|EntityReference>
+      must be removed instead of the read-only nodes.  If any
+      <IF::tx|EntityReference> to be removed has descendants
+      that are not <IF::tx|EntityReference>, <IF::Text>, or
+      <IF::tx|CDATASection> nodes, the method must fail
+      before performing any modification of the document,
+      raising a <IF::c|DOMException> with the code
+      <C::c|NO_MODIFICATION_ALLOWED_ERR>.
+    @@Param:
+      @@@Name: content
+      @@@Type: DOMString
+      @@@enDesc:
+        The content of the replacing <IF::Text> node.
+    @@Return:
+      @@@Type: Text
+      @@@enDesc:
+        The node that received the replacement text.  That is,
+        the current node, except when the current node is read-only,
+        or a new <IF::Text> or <IF::tx|CDATASection> node with the same 
+        <A::Node.nodeType> as the current node inserted at the
+        location of the replacement.
+      @@@nullCase:
+        @@@@enDesc:
+          When the replacement text is an empty string.
+      @@@dx:raises:
+        @@@@@: c|MO_MODIFICATION_ALLOWED_ERR
+        @@@@enDesc:
+          If one of the <IF::Text> nodes being replaced is read-only.
+
+            {SpecIssue::
+              <QUOTE::One of>?  Some of? All of?  A parent of?
+            }
     @@enImplNote:
-      {ISSUE::
+      {SpecIssue::
         isElementContentWhitespace
       }
-      
+
       {TODO::
-        Implement this method (by Traversal module?)
+         Implement this method.
       }
 
   @Method:
