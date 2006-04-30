@@ -12,7 +12,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/04/29 11:05:09 $
+    $Date: 2006/04/30 07:58:22 $
 
   @Require:
     @@Module:
@@ -10771,7 +10771,7 @@ ResourceDef:
           No error handler.
       @@@PerlDef:
           __DEEP{
-            ($$$self)->___report_error ($err);
+            $r = ($$$self)->___report_error ($err);
           }__;
 
   @IntMethod:
