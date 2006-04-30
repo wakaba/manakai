@@ -16,7 +16,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/04/30 07:58:22 $
+    $Date: 2006/04/30 10:27:00 $
 
   @Require:
     @@Module:
@@ -33,24 +33,12 @@ Module:
 Namespace:
   @c:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
-  @cfg:
-    http://suika.fam.cx/www/2006/dom-config/
   @dis:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
-  @doc:
-    http://suika.fam.cx/~wakaba/archive/2005/7/tutorial#
-  @d:
-    http://suika.fam.cx/~wakaba/archive/2004/dom/xdt#
-  @DOMMain:
-    http://suika.fam.cx/~wakaba/archive/2004/dom/main#
   @dx:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#
-  @dxm:
-    http://suika.fam.cx/~wakaba/archive/2004/dis/XML#
   @ecore:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/Core/
-  @ev:
-    http://www.w3.org/2001/xml-events
   @f:
     http://suika.fam.cx/~wakaba/archive/2004/dom/feature#
   @fe:
@@ -67,26 +55,12 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
   @ManakaiDOM:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
-  @ManakaiDOMCore:
-    http://suika.fam.cx/~wakaba/archive/2004/mdom-core#
   @MDOM:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
   @MDOMX:
     http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
-  @mg:
-    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Grove/
-  @null:
-    http://suika.fam.cx/~wakaba/-temp/2003/09/27/null
   @dlp:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Perl#
-  @rdf:
-    http://www.w3.org/1999/02/22-rdf-syntax-ns#
-  @rdfs:
-    http://www.w3.org/2000/01/rdf-schema#
-  @sw010:
-    urn:x-suika-fam-cx:markup:suikawiki:0:10:
-  @t:
-    http://suika.fam.cx/~wakaba/archive/2004/dom/tree#
   @tc:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/TreeCore/
   @tcd:
@@ -101,23 +75,13 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/Traversal/
   @tx:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/XML/
-  @urigen:
-    http://suika.fam.cx/~wakaba/archive/2005/manakai/URI/Generic/
-  @Util:
-    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/
-  @xml:
-    http://www.w3.org/XML/1998/namespace
-  @xml-dtd:
-    http://www.w3.org/TR/REC-xml
-  @xmlns:
-    http://www.w3.org/2000/xmlns/
 
 ElementTypeBinding:
   @Name: CODE
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@DISCore:resourceType: DISPerl|BlockCode
+    @@DISCore:resourceType: dlp|BlockCode
     @@ForCheck: ManakaiDOM|ForClass
 
 ElementTypeBinding:
@@ -145,48 +109,6 @@ ElementTypeBinding:
     @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|DOM2
 
 ElementTypeBinding:
-  @Name: CL2Method
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@DISCore:resourceType: DISLang|Method
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|DOM2 ManakaiDOM|ForClass
-
-ElementTypeBinding:
-  @Name: L3Method
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@DISCore:resourceType: DISLang|Method
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|DOM3
-
-ElementTypeBinding:
-  @Name: CL3Method
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@DISCore:resourceType: DISLang|Method
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|DOM3 ManakaiDOM|ForClass
-
-ElementTypeBinding:
-  @Name: LXMethod
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@DISCore:resourceType: DISLang|Method
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|ManakaiDOMLatest
-
-ElementTypeBinding:
-  @Name: IntMethod
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@DISCore:resourceType: DISLang|Method
-    @@ForCheck:
-      ManakaiDOM|ManakaiDOM !=ManakaiDOM|ManakaiDOM ManakaiDOM|ForClass
-    @@ManakaiDOM:isForInternal: 1
-
-ElementTypeBinding:
   @Name: Param
   @ElementType:
     dis:ResourceDef
@@ -209,23 +131,6 @@ ElementTypeBinding:
     @@ForCheck: !=ManakaiDOM|ManakaiDOM
 
 ElementTypeBinding:
-  @Name: CAttr
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@DISCore:resourceType: DISLang|Attribute
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|ForClass
-
-ElementTypeBinding:
-  @Name: IntAttr
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@DISCore:resourceType: DISLang|Attribute
-    @@ForCheck: ManakaiDOM|ForClass
-    @@ManakaiDOM:isForInternal: 1
-
-ElementTypeBinding:
   @Name: L2Attr
   @ElementType:
     dis:ResourceDef
@@ -234,56 +139,18 @@ ElementTypeBinding:
     @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|DOM2
 
 ElementTypeBinding:
-  @Name: L3Attr
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@DISCore:resourceType: DISLang|Attribute
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|DOM3
-
-ElementTypeBinding:
-  @Name: CL3Attr
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@DISCore:resourceType: DISLang|Attribute
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|DOM3 ManakaiDOM|ForClass
-
-ElementTypeBinding:
-  @Name: LXAttr
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@DISCore:resourceType: DISLang|Attribute
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|ManakaiDOMLatest
-
-ElementTypeBinding:
   @Name: Get
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: DISLang|AttributeGet
+
 ElementTypeBinding:
   @Name: Set
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: DISLang|AttributeSet
-
-ElementTypeBinding:
-  @Name: LXSet
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@DISCore:resourceType: DISLang|AttributeSet
-    @@ForCheck: ManakaiDOM|ManakaiDOMLatest
-
-ElementTypeBinding:
-  @Name: InCase
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@DISCore:resourceType: ManakaiDOM|InCase
 
 ElementTypeBinding:
   @Name: nullCase
@@ -393,30 +260,6 @@ ElementTypeBinding:
     @@ForCheck: ManakaiDOM|ForClass
 
 ElementTypeBinding:
-  @Name: Code
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@DISCore:resourceType: DISPerl|InlineCode
-    @@ForCheck: ManakaiDOM|ForClass
-
-ElementTypeBinding:
-  @Name: IntPropDef
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@DISCore:resourceType: DISCore|Property
-    @@For: =ManakaiDOM|all
-
-ElementTypeBinding:
-  @Name: RPropDef
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@DISCore:resourceType: DISSource|ResourceProperty
-    @@For: =ManakaiDOM|all
-
-ElementTypeBinding:
   @Name: Test
   @ElementType:
     dis:ResourceDef
@@ -435,18 +278,8 @@ ResourceDef:
   @For: ManakaiDOM|DOM
 
 ResourceDef:
-  @QName: Attr
-  @AliasFor: te|Attr
-  @For: ManakaiDOM|DOM
-
-ResourceDef:
   @QName: DOMString
   @AliasFor: DOMMain|DOMString
-  @For: ManakaiDOM|DOM
-
-ResourceDef:
-  @QName: DOMImpl
-  @AliasFor: c|DOMImplementation
   @For: ManakaiDOM|DOM
 
 ResourceDef:
@@ -463,11 +296,11 @@ ResourceDef:
 
 ResourceDef:
   @QName: ARRAY
-  @AliasFor: DISPerl|ARRAY||ManakaiDOM|all
+  @AliasFor: dlp|ARRAY||ManakaiDOM|all
 
 ResourceDef:
   @QName: HASH
-  @AliasFor: DISPerl|HASH||ManakaiDOM|all
+  @AliasFor: dlp|HASH||ManakaiDOM|all
 
 ResourceDef:
   @QName: Node
@@ -573,6 +406,8 @@ FeatureDef:
     @@f:requires: c|CoreFeature20
     @@enDesc:
       The DOM Traversal Module, Level 2.
+
+## -- Document
 
 IFCls2Def:
   @IFQName: DocumentTraversal
@@ -2295,7 +2130,7 @@ IFCls2Def:
         $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el2});
 
   @CMethod:
-    @@Operator: DISPerl|CloneMethod
+    @@Operator: dlp|CloneMethod
     @@enDesc:
       Creates a copy of the <IF::TreeWalker>.
     @@Return:
@@ -2311,7 +2146,7 @@ IFCls2Def:
       @@@enDesc:
         The reported error object.
     @@Return:
-      @@@Type: DISPerl|Any
+      @@@Type: dlp|Any
       @@@nullCase:
         @@@@enDesc:
           No error handler.
