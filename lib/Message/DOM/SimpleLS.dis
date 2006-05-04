@@ -14,7 +14,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/04/22 08:31:00 $
+    $Date: 2006/05/04 13:07:18 $
 
   @Require:
     @@Module:
@@ -339,8 +339,9 @@ IFClsXDef:
 
               ## Implied namespace prefixes
               my $etns = $src->namespace_uri;
-              my $etpfx = $src->local_name;
-              if (defined $etns and defined $etpfx) {
+              my $etpfx = $src->prefix;
+              if (defined $etns and defined $etpfx and
+                  not (defined $ns->{$etpfx} and $ns->{$etpfx} eq $etns)) {
                 $ns->{$etpfx} = $etns;
                 $attrr{'xmlns:'.$etpfx} = [$xescape->($etns)];
               }
@@ -348,7 +349,8 @@ IFClsXDef:
               for my $attr (@gattrs) {
                 my $atns = $attr->namespace_uri;
                 my $atpfx = $attr->prefix;
-                if (defined $atpfx) {
+                if (defined $atpfx and
+                    not (defined $ns->{$atpfx} and $ns->{$atpfx} eq $atns)) {
                   $ns->{$atpfx} = $atns;
                   $attrr{'xmlns:'.$atpfx} = [$xescape->($atns)];
                 }
@@ -384,7 +386,7 @@ IFClsXDef:
               delete $nsrev->{<Q::undef:>}; # for security reason
               for my $attr (@gattrs) {
                 my $atns = $attr->namespace_uri;
-                my $atpfx = $atns->prefix;
+                my $atpfx = $attr->prefix;
                 if (not defined $atpfx or
                     $ns->{$atpfx} ne $atns) {
                   if (defined $nsrev->{$atns}) {
@@ -435,7 +437,7 @@ IFClsXDef:
                             $etpfx = $pfx;
                             $ns->{$pfx} = $etns;
                             $nsrev->{$etns} = $etpfx;
-                            $attrr{$etpfx} = [$xescape->($etns)];
+                            $attrr{'xmlns:'.$etpfx} = [$xescape->($etns)];
                             last P;
                           }
                         }
@@ -449,10 +451,6 @@ IFClsXDef:
                       } # P
                     }
                   }
-                } elsif (defined $etpfx) {
-                  $ns->{$etpfx} = $etns;
-                  $nsrev->{$etns} = $etpfx;
-                  $attrr{'xmlns:'.$etpfx} = [$xescape->($etns)];
                 }
               } else {
                 if ($ns->{''} ne '') {

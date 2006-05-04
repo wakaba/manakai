@@ -15,7 +15,7 @@ Module:
   @License: license|Perl+MPL
 
   @Date:
-    $Date: 2006/04/03 16:13:17 $
+    $Date: 2006/05/04 13:07:19 $
   
   @Require:
     @@Module:
@@ -843,17 +843,20 @@ IFClsETDef:
               if ($_->{accept}) {
                 $dfa->{$state_name}->{accept} = $_->{accept};
                 $dfa->{$state_name}->{value} = 1 if $_->{value};
+                $dfa->{$state_name}->{nmode} = $_->{nmode}
+                    if defined $_->{nmode};
               }
               $dfa->{$state_name}->{ignore} = 1 if $_->{ignore};
             }
           }; # make_dfa_state
 
           ## Converts an internal state name to a Perl name
+          require Digest::MD5;
           my $escape_state_name = sub ($) {
             my $s = shift;
             $s =~ s/([\W_])/sprintf '_%08X', ord $1/ge;
             $s =~ s/_0000001C/__/g;
-            return $s;
+            return Digest::MD5::md5_hex ($s);
           }; # escape_state_name
       
           ## Converts a DFA state into Perl lexer code
@@ -948,6 +951,30 @@ IFClsETDef:
                       
                       if ($dfa->{$state_name}->{accept}) {
                         ## "If doesn't match, then |unshift|s |ch|"
+                        if (defined $dfa->{$state_name}->{nmode}) {
+                          for ($when_block
+                                 -><M::pc|PerlCodeStatements.appendStatement>
+                                 -><M::pc|PerlCodeUnits.appendNewPCExpression>
+                                     ('=')) {
+                            for ($_-><M::pc|PerlCodeUnits
+                                         .appendNewPCExpression> ('->')) {
+                              $_-><M::pc|PerlCodeUnits.appendNewPCVariable>
+                                    ('$', null, 'self');
+                              $_-><M::pc|PerlCodeUnits.appendBare>
+                                    ('{scanner}');
+                            }
+                            for ($_-><M::pc|PerlCodeUnits.appendNewPCApply>) {
+                              for ($_-><M::pc|PerlCodeUnits
+                                           .appendNewPCExpression> ('->')) {
+                                $_-><M::pc|PerlCodeUnits.appendNewPCVariable>
+                                      ('$', null, 'self');
+                                $_-><M::pc|PerlCodeUnits.appendBare> ('can');
+                              }
+                              $_-><M::pc|PerlCodeUnits.appendStringLiteral>
+                                    ('_scan_'.$dfa->{$state_name}->{nmode});
+                            }
+                          }
+                        }
                         for ($when_block
                                  -><M::pc|PerlCodeStatements.appendStatement>
                                  -><M::pc|PerlCodeUnits.appendNewPCFunctionCall>
@@ -973,6 +1000,29 @@ IFClsETDef:
         if ($dfa->{$state_name}->{accept}) {
           if ($state_select) {
             for ($state_select->append_new_pc_otherwise->block) {
+                          if (defined $dfa->{$state_name}->{nmode}) {
+                            for ($_-><M::pc|PerlCodeStatements.appendStatement>
+                                   -><M::pc|PerlCodeUnits.appendNewPCExpression>
+                                       ('=')) {
+                              for ($_-><M::pc|PerlCodeUnits
+                                           .appendNewPCExpression> ('->')) {
+                                $_-><M::pc|PerlCodeUnits.appendNewPCVariable>
+                                      ('$', null, 'self');
+                                $_-><M::pc|PerlCodeUnits.appendBare>
+                                      ('{scanner}');
+                              }
+                              for ($_-><M::pc|PerlCodeUnits.appendNewPCApply>) {
+                                for ($_-><M::pc|PerlCodeUnits
+                                             .appendNewPCExpression> ('->')) {
+                                  $_-><M::pc|PerlCodeUnits.appendNewPCVariable>
+                                        ('$', null, 'self');
+                                  $_-><M::pc|PerlCodeUnits.appendBare> ('can');
+                                }
+                                $_-><M::pc|PerlCodeUnits.appendStringLiteral>
+                                      ('_scan_'.$dfa->{$state_name}->{nmode});
+                              }
+                            }
+                          }
               my $push_ap = $_->append_statement
                               ->append_new_pc_function_call
                                           (undef, 'unshift')
@@ -1064,6 +1114,29 @@ IFClsETDef:
                             -><M::pc|PerlCodeUnits.appendNewPCVariable>
                                 ('@', null, 'dch');
                           for ($_-><AG::pc|PCWhen.block>) {
+                            if (defined $dfa->{$state_name}->{nmode}) {
+                              for ($_-><M::pc|PerlCodeStatements.appendStatement>
+                                     -><M::pc|PerlCodeUnits.appendNewPCExpression>
+                                         ('=')) {
+                                for ($_-><M::pc|PerlCodeUnits
+                                             .appendNewPCExpression> ('->')) {
+                                  $_-><M::pc|PerlCodeUnits.appendNewPCVariable>
+                                        ('$', null, 'self');
+                                  $_-><M::pc|PerlCodeUnits.appendBare>
+                                        ('{scanner}');
+                                }
+                                for ($_-><M::pc|PerlCodeUnits.appendNewPCApply>) {
+                                  for ($_-><M::pc|PerlCodeUnits
+                                               .appendNewPCExpression> ('->')) {
+                                    $_-><M::pc|PerlCodeUnits.appendNewPCVariable>
+                                          ('$', null, 'self');
+                                    $_-><M::pc|PerlCodeUnits.appendBare> ('can');
+                                  }
+                                  $_-><M::pc|PerlCodeUnits.appendStringLiteral>
+                                        ('_scan_'.$dfa->{$state_name}->{nmode});
+                                }
+                              }
+                            }
                             for ($_-><M::pc|PerlCodeStatements.appendStatement>
                                    -><M::pc|PerlCodeUnits
                                            .appendNewPCFunctionCall>
@@ -1140,6 +1213,29 @@ IFClsETDef:
                         }
                         for ($_-><M::pc|PCChoose.appendNewPCOtherwise>
                                -><AG::pc|PCOtherwise.block>) {
+                          if (defined $dfa->{$state_name}->{nmode}) {
+                            for ($_-><M::pc|PerlCodeStatements.appendStatement>
+                                   -><M::pc|PerlCodeUnits.appendNewPCExpression>
+                                       ('=')) {
+                              for ($_-><M::pc|PerlCodeUnits
+                                           .appendNewPCExpression> ('->')) {
+                                $_-><M::pc|PerlCodeUnits.appendNewPCVariable>
+                                      ('$', null, 'self');
+                                $_-><M::pc|PerlCodeUnits.appendBare>
+                                      ('{scanner}');
+                              }
+                              for ($_-><M::pc|PerlCodeUnits.appendNewPCApply>) {
+                                for ($_-><M::pc|PerlCodeUnits
+                                             .appendNewPCExpression> ('->')) {
+                                  $_-><M::pc|PerlCodeUnits.appendNewPCVariable>
+                                        ('$', null, 'self');
+                                  $_-><M::pc|PerlCodeUnits.appendBare> ('can');
+                                }
+                                $_-><M::pc|PerlCodeUnits.appendStringLiteral>
+                                      ('_scan_'.$dfa->{$state_name}->{nmode});
+                              }
+                            }
+                          }
                           $_-><M::pc|PerlCodeStatements.appendStatement>
                             -><M::pc|PerlCodeUnits.appendNewPCFunctionCall>
                                 (null, 'return')
@@ -1153,6 +1249,30 @@ IFClsETDef:
                         }
                       }
                     } else {
+                      if (defined $dfa->{$state_name}->{nmode}) {
+                        for ($accept_code_parent
+                               -><M::pc|PerlCodeStatements.appendStatement>
+                               -><M::pc|PerlCodeUnits.appendNewPCExpression>
+                                   ('=')) {
+                          for ($_-><M::pc|PerlCodeUnits
+                                       .appendNewPCExpression> ('->')) {
+                            $_-><M::pc|PerlCodeUnits.appendNewPCVariable>
+                              ('$', null, 'self');
+                            $_-><M::pc|PerlCodeUnits.appendBare>
+                                  ('{scanner}');
+                          }
+                          for ($_-><M::pc|PerlCodeUnits.appendNewPCApply>) {
+                            for ($_-><M::pc|PerlCodeUnits
+                                         .appendNewPCExpression> ('->')) {
+                              $_-><M::pc|PerlCodeUnits.appendNewPCVariable>
+                                    ('$', null, 'self');
+                              $_-><M::pc|PerlCodeUnits.appendBare> ('can');
+                            }
+                            $_-><M::pc|PerlCodeUnits.appendStringLiteral>
+                                  ('_scan_'.$dfa->{$state_name}->{nmode});
+                          }
+                        }
+                      }
                       $accept_code_parent
                         -><M::pc|PerlCodeStatements.appendStatement>
                         -><M::pc|PerlCodeUnits.appendNewPCFunctionCall>
@@ -1487,7 +1607,7 @@ IFClsETDef:
                   $range = $negate_range->($range);
                 }
               } else { # pg:anyChar
-                $range = [0, 'Inf'];
+                $range = [[0, 'Inf']];
               }
               
               my $new_s = {
@@ -1562,10 +1682,13 @@ IFClsETDef:
           } # $lel
           push @{$token{$;.'initial'}->{next_state}}, @{$s0->{next_state}}
             unless $is_variable;
+                  my $next_lexmode = $tel-><M::Element.getAttributeNS>
+                                             (null, 'nextLexmode');
           for my $s (@current_state) {
             $s->{accept} = $sname;
             $s->{ignore} = $ignore if $ignore;
             $s->{value} = $value if $value;
+                    $s->{nmode} = $next_lexmode if defined $next_lexmode;
           }
                 } elsif ($xuri eq <Q::pg:lQDefaultTokenStatement>) {
                   $default_token_name
@@ -2774,7 +2897,7 @@ IFClsDef:
       /*
         LStatement := LAssignmentStatement / LQDefaultTokenStatement
         LAssignmentStatement := (NAME / VARIABLE) *AttributeSpecification
-                                DEFINE 1*LRValue SEMICOLON
+                                DEFINE 1*LRValue [LNextLexmode] SEMICOLON
       */
       ~* (NAME) {
         my $lassign;
@@ -2790,6 +2913,8 @@ IFClsDef:
         ~ (DEFINE) { }
 
         &LRValueList ($doc => $doc, $parent => $lassign);
+ 
+        &LNextLexmode ($doc => $doc, $parent => $lassign);
       
         ~ (SEMICOLON) { }
       } (VARIABLE) {
@@ -2808,12 +2933,15 @@ IFClsDef:
         ~ (DEFINE) { }
 
         &LRValueList ($doc => $doc, $parent => $lassign);
+ 
+        &LNextLexmode ($doc => $doc, $parent => $lassign);
       
         ~ (SEMICOLON) { }
       } (QKEYWORD == '?default-token') {
         /*
           LQDefaultTokenStatement := '?default-token' NAME
-                                     *AttributeSpecification SEMICOLON
+                                     *AttributeSpecification
+                                     SEMICOLON
         */
         
         my $ldef;
@@ -2937,6 +3065,22 @@ IFClsDef:
         }
       }
     } // OccurenceOpt
+
+    rule LNextLexmode ($doc, $parent) {
+      /*
+        LNextLexmode := '->' NAME
+
+        The next lexmode specification is ignored if the |ignore|
+        attribute is set.
+      */
+      ~? (NEXT) {
+        ~ (NAME) {
+          lang:Perl ($v => $token.value) {
+            $parent-><M::Element.setAttributeNS> (null, 'nextLexmode', $v);
+          }
+        }
+      }
+    } // LNextLexmode
   
     rule _Rule ($doc, $parent) {
       /*
@@ -3486,6 +3630,7 @@ IFClsDef:
     MATCH := ['~'];
     DOT := ['.'];
     RANGE := ['.'] ['.'];
+      NEXT := ['-'] ['>'];
 
       /*
         Reserved name indicator

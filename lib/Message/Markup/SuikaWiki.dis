@@ -1,0 +1,1241 @@
+Module:
+  @QName: Markup|SuikaWiki
+  @enFN:
+    SuikaWiki/0.9 and SuikaWiki/0.10 Document Markup Language DOM
+  @enDesc:
+      {TODO::
+
+      }
+
+  @Namespace:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Markup/SuikaWiki/
+
+  @DISCore:author: DISCore|Wakaba
+  @License: license|Perl+MPL
+  @Date:
+    $Date: 2006/05/04 13:07:19 $
+
+  @Require:
+    @@Module:
+      @@@QName: Markup|common
+    @@Module:
+      @@@QName: MDOM|TreeCore
+      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
+    @@Module:
+      @@@WithFor: ManakaiDOM|ManakaiDOM
+    @@Module:
+      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
+    @@Module:
+      @@@QName: Markup|Atom
+      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
+  @DefaultFor: ManakaiDOM|ManakaiDOMLatest
+
+Namespace:
+  @aa:
+    http://pc5.2ch.net/test/read.cgi/hp/1096723178/aavocab#
+  @c:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
+  @cfg:
+    http://suika.fam.cx/www/2006/dom-config/
+  @dis:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
+  @doc:
+    http://suika.fam.cx/~wakaba/archive/2005/7/tutorial#
+  @d:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/xdt#
+  @DOMMain:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/main#
+  @dx:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#
+  @ecore:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/Core/
+  @f:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/feature#
+  @fe:
+    http://suika.fam.cx/www/2006/feature/
+  @gls:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/gls#
+  @html:
+    http://www.w3.org/1999/xhtml
+  @idl:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/IDL#
+  @kwd:
+    http://suika.fam.cx/~wakaba/archive/2005/rfc2119/
+  @lang:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
+  @license:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
+  @ManakaiDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
+  @mat:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Markup/Atom/
+  @Markup:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Markup#
+  @mat:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Markup/Atom/
+  @MDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
+  @MDOMX:
+    http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
+  @dlp:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Perl#
+  @html3:
+    urn:x-suika-fam-cx:markup:ietf:html:3:draft:00:
+  @html5:
+    http://www.w3.org/1999/xhtml
+  @rel:
+    http://www.iana.org/assignments/relation/
+  @s:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Markup#
+  @sw09:
+    urn:x-suika-fam-cx:markup:suikawiki:0:9:
+  @sw010:
+    urn:x-suika-fam-cx:markup:suikawiki:0:10:
+  @tc:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/TreeCore/
+  @td:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/Document/
+  @te:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/Element/
+  @test:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Test#
+  @tx:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/XML/
+  @urigen:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/URI/Generic/
+  @xhtml2:
+    http://www.w3.org/2002/06/xhtml2/
+  @xml:
+    http://www.w3.org/XML/1998/namespace
+  @xmlns:
+    http://www.w3.org/2000/xmlns/
+
+ElementTypeBinding:
+  @Name: CODE
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: dlp|BlockCode
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: Method
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISLang|Method
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM
+
+ElementTypeBinding:
+  @Name: Param
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISLang|MethodParameter
+
+ElementTypeBinding:
+  @Name: Return
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISLang|MethodReturn
+
+ElementTypeBinding:
+  @Name: Attr
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISLang|Attribute
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM
+
+ElementTypeBinding:
+  @Name: Get
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISLang|AttributeGet
+
+ElementTypeBinding:
+  @Name: Set
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISLang|AttributeSet
+
+ElementTypeBinding:
+  @Name: nullCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: ManakaiDOM|InCase
+    @@Value:
+      @@@is-null:1
+
+ElementTypeBinding:
+  @Name: PerlDef
+  @ElementType:
+    dis:Def
+  @ShadowContent:
+    @@ContentType: lang|Perl
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: PerlCDef
+  @ElementType:
+    dis:Def
+  @ShadowContent:
+    @@ContentType: lang|Perl
+
+ElementTypeBinding:
+  @Name: enImplNote
+  @ElementType:
+    dis:ImplNote
+  @ShadowContent:
+    @@lang:en
+
+ElementTypeBinding:
+  @Name: enFN
+  @ElementType:
+    dis:FullName
+  @ShadowContent:
+    @@lang:en
+
+ElementTypeBinding:
+  @Name: IFClsETDef
+  @ElementType: 
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType:
+      @@@@: dis|MultipleResource
+      @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass !s|ForML
+    @@resourceFor: ManakaiDOM|ForIF
+    @@resourceFor: ManakaiDOM|ForClass
+    @@resourceFor: s|ForML
+    @@For: ManakaiDOM|ManakaiDOM
+
+    @@DISCore:resourceType:
+      @@@@: DISLang|Interface
+      @@@ForCheck: ManakaiDOM|ForIF
+
+    @@DISCore:resourceType:
+      @@@@: DISLang|Class
+      @@@ForCheck: ManakaiDOM|ForClass
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOM||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
+
+    @@s:elementType:
+      @@@@: ||+||s|ForML
+      @@@ContentType: DISCore|TFPQNames
+      @@@DISCore:stopISARecursive:1
+
+    @@DISCore:resourceType:
+      @@@@: s|ElementType
+      @@@ForCheck: s|ForML
+
+    @@f:implements: AtomFeature10
+
+ElementTypeBinding:
+  @Name: IFClsDef
+  @ElementType: 
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType:
+      @@@@: dis|MultipleResource
+      @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass !s|ForML
+    @@resourceFor: ManakaiDOM|ForIF
+    @@resourceFor: ManakaiDOM|ForClass
+    @@For: ManakaiDOM|ManakaiDOM
+
+    @@DISCore:resourceType:
+      @@@@: DISLang|Interface
+      @@@ForCheck: ManakaiDOM|ForIF
+
+    @@DISCore:resourceType:
+      @@@@: DISLang|Class
+      @@@ForCheck: ManakaiDOM|ForClass
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOM||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
+
+    @@f:implements: AtomFeature10
+
+ElementTypeBinding:
+  @Name: IFQName
+  @ElementType:
+    dis:QName
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForIF
+
+ElementTypeBinding:
+  @Name: ClsQName
+  @ElementType:
+    dis:QName
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: ETRQName
+  @ElementType:
+    dis:QName
+  @ShadowContent:
+    @@ForCheck: s|ForML
+
+ElementTypeBinding:
+  @Name: ETQName
+  @ElementType:
+    dis:AppName
+  @ShadowContent:
+    @@ForCheck: s|ForML
+    @@ContentType: DISCore|QName
+
+ElementTypeBinding:
+  @Name: IFISA
+  @ElementType:
+    dis:ISA
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForIF
+
+ElementTypeBinding:
+  @Name: ClsISA
+  @ElementType:
+    dis:ISA
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: disDef
+  @ElementType:
+    dis:Def
+  @ShadowContent:
+    @@ContentType:
+      lang:dis
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: Code
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: dlp|InlineCode
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: Test
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: test|StandaloneTest
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: TestC
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: test|StandaloneTest
+
+ResourceDef:
+  @QName: Document
+  @AliasFor: td|Document
+  @For: ManakaiDOM|DOM
+
+ResourceDef:
+  @QName: Element
+  @AliasFor: te|Element
+  @For: ManakaiDOM|DOM
+
+ResourceDef:
+  @QName: Attr
+  @AliasFor: te|Attr
+  @For: ManakaiDOM|DOM
+
+ResourceDef:
+  @QName: DOMString
+  @AliasFor: DOMMain|DOMString
+  @For: ManakaiDOM|DOM
+
+ResourceDef:
+  @QName: DOMURI
+  @AliasFor: ManakaiDOM|ManakaiDOMURI
+  @For: ManakaiDOM|DOM3
+
+ResourceDef:
+  @QName: DOMTimeStamp
+  @AliasFor: DOMMain|DOMTimeStamp
+  @For: ManakaiDOM|DOM2
+
+ResourceDef:
+  @QName: boolean
+  @AliasFor: idl|boolean||ManakaiDOM|all
+
+ResourceDef:
+  @QName: Node
+  @AliasFor: tc|Node
+  @For: ManakaiDOM|ManakaiDOM
+
+ResourceDef:
+  @QName: NodeList
+  @AliasFor: tc|NodeList
+  @For: ManakaiDOM|ManakaiDOM
+
+ResourceDef:
+  @QName: StaticNodeList
+  @AliasFor: tc|StaticNodeList
+  @For: ManakaiDOM|ManakaiDOM
+
+ElementTypeBinding:
+  @Name: enDesc
+  @ElementType:
+    dis:Description
+  @ShadowContent:
+    @@lang:en
+
+ElementTypeBinding:
+  @Name: TrueCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType:
+      ManakaiDOM:InCase
+    @@Value:
+      @@@@: 1
+      @@@ContentType: DISCore|Boolean
+    @@Type: idl|boolean||ManakaiDOM|all
+
+ElementTypeBinding:
+  @Name: FalseCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType:
+      ManakaiDOM:InCase
+    @@Value:
+      @@@@: 0
+      @@@ContentType: DISCore|Boolean
+    @@Type: idl|boolean||ManakaiDOM|all
+
+## -- Features
+
+ElementTypeBinding:
+  @Name: FeatureDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: f|Feature
+    @@For: =ManakaiDOM|all
+
+ElementTypeBinding:
+  @Name: FeatureVerDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: f|Feature
+
+ElementTypeBinding:
+  @Name: featureQName
+  @ElementType:
+    f:name
+  @ShadowContent:
+    @@ContentType: DISCore|QName
+
+FeatureDef:
+  @featureQName: fe|SuikaWikiDML
+  @QName: SWDMLFeature
+  @FeatureVerDef:
+    @@QName: SWDMLFeature010
+    @@Version: 0.10
+    @@f:instanceOf: SWDMLFeature
+    @@f:requires: tx|XMLFeature30
+    @@enDesc:
+      The SuikaWiki Document Markup Language DOM, version 0.10.
+
+## -- Implementation
+
+## TODO:
+
+## -- Elements
+
+IFClsDef:
+  @IFQName: SWDMLElement
+  @ClsQName: ManakaiSWDMLElement
+
+  @IFISA: Element
+  @ClsISA: te|ManakaiDOMElement
+
+  @s:elementType: AnySW09Element||ManakaiDOM|all
+  @s:elementType: AnySW010Element||ManakaiDOM|all
+##SWDMLElement
+
+ResourceDef:
+  @QName: AnySW09Element
+  @DISCore:resourceType: s|AnyElementInNS
+  @AppName:
+    @@@: sw09|*
+    @@ContentType: DISCore|QName
+  @ForCheck: =ManakaiDOM|all
+
+ResourceDef:
+  @QName: AnySW010Element
+  @DISCore:resourceType: s|AnyElementInNS
+  @AppName:
+    @@@: sw010|*
+    @@ContentType: DISCore|QName
+  @ForCheck: =ManakaiDOM|all
+
+IFClsETDef:
+  @IFQName: SWDMLDocumentElement
+  @ETQName: sw09|document
+  @ClsQName: ManakaiSWDMLDocumentElement
+
+  @IFISA: SWDMLElement
+  @ClsISA: ManakaiSWDMLElement
+
+  @Attr:
+    @@Name: headElement
+    @@enDesc:
+      The <XE::xhtml2|head> child element of the node.
+    @@Type: SWDMLElement
+    @@Get:
+      @@@enDesc:
+        It <kwd:MUST> <I::return a <XE::xhtml2|head> child element>
+        of the node.
+      @@@nullCase:
+        @@@@enDesc:
+          If the algorithm returns <DOM::null>.
+      @@@NodeReadOnlyError:
+      @@@PerlDef:
+        __CODE{mat|returnChildElement::
+          $node => $self,
+          $namespaceURI => {<Q::xhtml2|>},
+          $localName => 'head',
+          $r => $r,
+        }__;
+
+  @Attr:
+    @@Name: bodyElement
+    @@enDesc:
+      The <XE::xhtml2|body> child element of the node.
+    @@Type: SWDMLElement
+    @@Get:
+      @@@enDesc:
+        It <kwd:MUST> <I::return a <XE::xhtml2|body> child element>
+        of the node.
+      @@@nullCase:
+        @@@@enDesc:
+          If the algorithm returns <DOM::null>.
+      @@@NodeReadOnlyError:
+      @@@PerlDef:
+        __CODE{mat|returnChildElement::
+          $node => $self,
+          $namespaceURI => {<Q::xhtml2|>},
+          $localName => 'body',
+          $r => $r,
+        }__;
+
+  @Attr:
+    @@Name: markupLanguageName
+    @@enDesc:
+      The markup language name.
+
+      It <kwd:MUST> <I::reflect the string value
+      of the <XA::sw09|Name> attribute> of the node.  It default
+      value <kwd:MUST> be <CODE::SuikaWiki>.
+    @@Type: DOMString
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          If the algorithm returns <DOM::null>.
+      @@@PerlDef:
+        __CODE{mat|getReflectAttrStringValue::
+          $node => $self,
+          $namespaceURI => {<Q::sw09|>},
+          $localName => 'Name',
+          $r => $r,
+          $defaultValue => 'SuikaWiki',
+        }__;
+    @@Set:
+      @@@nullCase:
+        @@@@enDesc:
+          Removes the attribute.
+      @@@NodeReadOnlyError:
+      @@@PerlDef:
+        __CODE{mat|setReflectAttrStringValue::
+          $node => $self,
+          $namespaceURI => {<Q::sw09|>},
+          $localName => 'Name',
+          $given => $given,
+        }__;
+
+  @Attr:
+    @@Name: markupLanguageVersion
+    @@enDesc:
+      The markup language version.
+
+      It <kwd:MUST> <I::reflect the string value
+      of the <XA::sw09|Version> attribute> of the node.  It default
+      value <kwd:MUST> be <CODE::0.9>.
+    @@Type: DOMString
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          If the algorithm returns <DOM::null>.
+      @@@PerlDef:
+        __CODE{mat|getReflectAttrStringValue::
+          $node => $self,
+          $namespaceURI => {<Q::sw09|>},
+          $localName => 'Version',
+          $r => $r,
+          $defaultValue => '0.9',
+        }__;
+    @@Set:
+      @@@nullCase:
+        @@@@enDesc:
+          Removes the attribute.
+      @@@NodeReadOnlyError:
+      @@@PerlDef:
+        __CODE{mat|setReflectAttrStringValue::
+          $node => $self,
+          $namespaceURI => {<Q::sw09|>},
+          $localName => 'Version',
+          $given => $given,
+        }__;
+##SWDMLDocumentElement
+
+ElementTypeBinding:
+  @Name: NodeReadOnlyError
+  @ElementType:
+    dx:raises
+  @ShadowContent:
+    @@@: MDOMX|NOMOD_THIS
+    @@Description:
+      @@@lang:en
+      @@@@:
+        If the node or a descendant of it, which
+        is to be modified, is read-only.
+
+## -- Parser
+
+IFClsDef:
+  @IFQName: SWDMLParser
+  @ClsQName: ManakaiSWDMLParser
+
+  @Implement: ecore|MUErrorTarget||ManakaiDOM|Perl
+
+  @DISLang:role: gls|ParserRole
+
+  @f:implements: SWDMLFeature010
+  @f:provides:
+    @@@: SWDMLFeature010
+    @@f:through: c|ManakaiDOMImplementation
+
+  @enDesc:
+    A <IF::SWDMLParser> object parses a SuikaWiki/0.9,
+    SuikaWikiImage/0.9, or SuikaWiki/0.10 textual document and
+    returns it as an object.
+
+  @Attr:
+    @@Name: domConfig
+    @@enDesc:
+      The configuration of the parser.
+
+    @@Get:
+      @@@Type: c|DOMConfiguration
+      @@@enDesc: The DOM configuration object.
+      @@@PerlDef:
+        __CODE{c|getConfigObject::
+          $target => $self,
+          $targetHash => $self,
+          $targetType => {<IFName::SWDMLParser>},
+          $result => $r,
+        }__;
+
+  @Method:
+    @@ManakaiDOM:isForInternal:1
+    @@ForCheck: ManakaiDOM|ForClass
+    @@Operator: DISPerl|NewMethod
+    @@enDesc:
+      Creates a new instance of the object.
+    @@Param:
+      @@@Name: impl
+      @@@Type: gls|GLSImplementation
+      @@@enDesc:
+        The implementation from which the parser is created.
+    @@Param:
+      @@@Name: features
+      @@@Type: DOMString
+      @@@dis:actualType: f|FeaturesString
+      @@@enDesc:
+        The set of features requested for the parser.
+    @@Return:
+      @@@Type: DOMMain|DOMObject
+      @@@enDesc:
+        The newly created parser.
+      @@@PerlDef:
+        $r = bless {
+          <H::f|implementation> => $impl,
+        }, $self;
+
+  @Method:
+    @@Name: parseString
+    @@enDesc:
+      Parses a string as SWDML textual document and converts it into
+      DOM tree.
+    @@Param:
+      @@@Name: sourceText
+      @@@Type: DOMString
+      @@@enDesc:
+        The text to parse.
+    @@Return:
+      @@@Type: DISPerl|HASH
+      @@@enDesc:
+        An object representation of <P::sourceText>.
+      @@@PerlDef:
+        $self->{scanner} = $self->can ('_scan_Body');
+        $self->{char} = [0x000A];
+        $self->{token} = [];
+        $self->{source} = $sourceText;
+        $self->{location} = {};
+        $self->{doc} = $self->{<H::f|implementation>}
+                            ->create_document (<Q::sw09|>, 'document');
+        $self->{doc}->strict_error_checking (false);
+        $self->{docel} = $self->{doc}->document_element;
+        $self->{docel}->set_attribute_ns (<Q::xmlns|>, 'xmlns', <Q::sw09|>);
+        $self->{docel}->set_attribute_ns (<Q::xmlns|>, 'xmlns:h2', <Q::xhtml2|>);
+        $self->{docel}->markup_language_version ('0.10');
+        $self->{docel}->append_child
+                          ($self->{doc}->create_element_ns
+                                           (<Q::xhtml2|>, 'h2:head'));
+        $self->{docel}->append_child
+                          ($self->{doc}->create_element_ns
+                                           (<Q::xhtml2|>, 'h2:body'));
+        __DEEP{
+          $self->_parse_Document;
+        }__;
+
+        $r = $self->{doc};
+
+  @Method:
+    @@Name: shiftChar
+    @@ManakaiDOM:isForInternal:1
+    @@ForCheck: ManakaiDOM|ForClass
+    @@enDesc:
+      Returns the next character.
+    @@Return:
+      @@@Type: idl|long||ManakaiDOM|all
+      @@@enDesc:
+        The code position number of the next character, if any,
+        or <CODE::-2>.
+      @@@PerlDef:
+        if (@{$self->{char}}) {
+          $r = shift @{$self->{char}};
+        } else {
+          my $char = substr ($self->{source}, pos ($self->{source}), 1);
+          pos ($self->{source})++;
+
+          if (length $char) {
+            $r = ord $char;
+            if ($r == 0x000D) {
+              my $char2 = substr ($self->{source}, pos ($self->{source}), 1);
+              if (length $char2) {
+                if (ord $char2 == 0x000A) {
+                  pos ($self->{source})++;
+                }
+                push @{$self->{char}}, 0x000A;
+              }
+            } elsif ($r == 0x000A) {
+              $r = 0x000D;
+              push @{$self->{char}}, 0x000A;
+            }
+          } else {  ## ISSUE: The last |RE|
+            $r = -1;
+          }
+        }
+
+  @Method:
+    @@ManakaiDOM:isForInternal: 1
+    @@Operator: ManakaiDOM|MUErrorHandler
+    @@enDesc:
+      When a <IF::ecore|ErrorInterface||ManakaiDOM|Perl> is <Perl::report>ed,
+      then this method is invoked.
+      
+      The method calls the <cfg::DOMCore|error-handler> if the error is of 
+      <IF::DOMCore|DOMError>.  Otherwise, the error is re-thrown so that
+      corresponding <Perl::catch> clause, if any, can catch the error.
+    @@Param:
+      @@@Name: err
+      @@@Type: ecore|ErrorInterface||ManakaiDOM|Perl
+      @@@enDesc:
+        The reported error object.
+    @@Return:
+      @@@Type: DISPerl|Any
+      @@@enDesc:
+        If the <P::err> is a <IF::DOMCore|DOMError>, then the return value
+        of the error handler.
+
+           {NOTE:: If the error is thrown, the method never returns.
+           }
+      @@@nullCase:
+        @@@@enDesc:
+          No error handler.
+      @@@PerlDef:
+        if ($err->isa (<IFName::DOMCore|DOMError||ManakaiDOM|ManakaiDOM>)) {
+          __DEEP{
+            A: {
+              my $cfg = $self-><AG::SWDMLParser.domConfig>;
+              my $h = $cfg-><M::DOMCore|DOMConfiguration.getParameter>
+                               ('error-handler');
+              $r = $h-><M::DOMCore|DOMErrorHandler.handleError> ($err);
+            } # A
+          }__;
+        } else {
+          $err-><M::ecore|ErrorInterface||ManakaiDOM|Perl.throw>;
+        }
+
+  @DISPerl:dpgDef:
+    
+    lexmode WSP {
+      $wsp := [U+0009 U+0020];
+      
+      /*
+        U+000D and U+000A characters in source stream are
+        replaced to record separators by |shiftChar|.
+      */
+      $rs := [U+000A];
+      $re := [U+000D];
+      $nonRSRE := [^U+000D U+000A];
+    }
+
+    lexmode Body
+      : extends => 'WSP'
+      : initial
+      : standalone
+    {
+      $digit := [U+0030..U+0039];
+      $ltagchar := [U+0041..U+005A U+0061..U+007A U+0030..U+0039 '-' '_'];
+      $classchar := [^'(' ')' U+005C U+000D U+000A];
+      
+      magicVersionS : value
+                    := $rs ['#'] ['?'] ['S'] ['u'] ['i'] ['k'] ['a']
+                       ['W'] ['i'] ['k'] ['i'] ['/'] ['0'] ['.'] ['9'] $wsp*
+                    -> MagicParameter;
+      magicVersionI : value
+                    := $rs ['#'] ['?'] ['S'] ['u'] ['i'] ['k'] ['a']
+                       ['W'] ['i'] ['k'] ['i'] ['I'] ['m'] ['a'] ['g'] ['e']
+                       ['/'] ['0'] ['.'] ['9'] $wsp*
+                    -> MagicParameter;
+      otherRS : ignore := $rs;
+      headingStart : value := $rs ['*']+ $wsp*;
+      listStart : value := $rs ['-' '=']+ $wsp*;
+      dlistStart : value := $rs [':'] [^':' U+000D U+000A]* [':'] $wsp*;
+      quote : value := $rs ['>']+ $wsp*;
+      eol := $re;
+      anchorNumberDef : value := ['['] $digit+ [']'];
+      anchorNumberRef : value := ['>'] ['>'] $digit+;
+      externalRefStart := ['<'] -> ExternalRefBody;
+      startTag : value := ['['] [U+0041..U+005A]+ ['['];
+      startTagClass : value := ['['] [U+0041..U+005A]+
+                               ['('] $classchar* [')'] ['['];
+      startTagClassLang : value := ['['] [U+0041..U+005A]+
+                                   ['('] $classchar* [')']
+                                   ['@'] $ltagchar* ['['];
+      startTagLang : value := ['['] [U+0041..U+005A]+ ['@'] $ltagchar* ['['];
+      termStartTag := ['['] ['['];
+      midTag : value := [']'] $wsp* ['['];
+      endTag := [']'] [']'];
+      endTagAnchorNumberRef : value := [']'] ['>'] ['>'] $digit+ [']'];
+      endTagExternalRefStart := [']'] ['<'] -> EndTagExternalRefBody;
+      preEndTag := $rs [']'] ['P'] ['R'] ['E'] [']'] $wsp* $re;
+      insEndTag := $rs [']'] ['I'] ['N'] ['S'] [']'] $wsp* $re;
+      delEndTag := $rs [']'] ['D'] ['E'] ['L'] [']'] $wsp* $re;
+      formStart : value := ['['] ['['] ['#'] [U+0061..U+007A '-']+
+                        -> FormBody;
+      emphasis2 := [U+0027] [U+0027];
+      emphasis3 := [U+0027] [U+0027] [U+0027];
+      entityRef : value := ['_'] ['_'] ['&'] ['&']
+                           [^'&' U+000D U+000A]+
+                           ['&'] ['&'] ['_'] ['_'];
+      obsPreStart : value := $rs $wsp;
+      noteLine := $rs [';'] [';'] $wsp*;
+      todoLine := $rs ['@'] ['@'] $wsp*;
+      tableLine : value := $rs [','] $nonRSRE* $re;
+      imageStart : value := $rs ['_'] ['_'] ['I'] ['M'] ['A'] ['G'] ['E']
+                            ['_'] ['_'] $re;
+      ?default-token text : value;
+    }
+    
+    lexmode MagicParameter
+      : extends => 'WSP'
+      : standalone
+    {
+      name : value := [U+0041..U+005A U+0061..U+007A U+0030..U+0039 '-']+;
+      vi := ['='];
+      lit := ['"'] -> MagicParameterValue;
+      s : ignore := $wsp+;
+      eol := $re -> Body;
+    }
+    
+    lexmode MagicParameterValue
+      : standalone
+    {
+      quotedPair : value := [U+005C] .;
+      ?default-token text : value;
+      lit := ['"'] -> MagicParameter;
+    }
+    
+    lexmode ExternalRefBody
+      : standalone
+    {
+      lit := ['"'] -> ExternalRefQuotedStringBody;
+      externalRefEnd := ['>'] -> Body;
+      ?default-token text : value;
+    }
+    lexmode EndTagExternalRefBody
+      : standalone
+    {
+      lit := ['"'] -> EndTagExternalRefQuotedStringBody;
+      endTagExternalRefEnd := ['>'] [']'] -> Body;
+      ?default-token text : value;
+    }
+    
+    lexmode ExternalRefQuotedStringBody
+      : standalone
+    {
+      lit := ['"'] -> ExternalRefBody;
+      quotedPair : value := [U+005C] . /* | ['\'] $rs $re */;
+      ?default-token text : value;
+    }
+    lexmode EndTagExternalRefQuotedStringBody
+      : standalone
+    {
+      lit := ['"'] -> EndTagExternalRefBody;
+      quotedPair : value := [U+005C] . /* | ['\'] $rs $re */;
+      ?default-token text : value;
+    }
+    
+    lexmode FormBody
+      : standalone
+    {
+      lita := [U+0027] -> FormQuotedStringBody;
+      formEnd := [']'] [']'] -> Body;
+      ?default-token text : value;
+    }
+    
+    lexmode FormQuotedStringBody
+      : standalone
+    {
+      lita := [U+0027] -> FormBody;
+      quotedPair := [U+005C] . /* | ['\'] $rs $re */;
+      ?default-token text : value;
+    }
+
+
+    rule Document
+      : standalone
+    {
+      ~? (magicVersionS) {
+        lang:Perl {
+          $self->{docel}
+               ->set_attribute_ns (<Q::sw09|>, 'sw9:Name' => 'SuikaWiki');
+          $self->{docel}->set_attribute_ns (<Q::sw09|>, 'sw9:Version' => '0.9');
+        }
+        &MagicParam;
+      } (magicVersionI) {
+        lang:Perl {
+          $self->{docel}
+               ->set_attribute_ns (<Q::sw09|>, 'sw9:Name' => 'SuikaWikiImage');
+          $self->{docel}->set_attribute_ns (<Q::sw09|>, 'sw9:Version' => '0.9');
+        }
+        &MagicParam;
+      }
+
+      my $parent;
+         /*
+            block      For block-level elements.
+            section i  For i-th-level sections.  Null if no (i-1)-th
+                       level section.
+            list i     For i-th-level list items.  Null if no i-th-level
+                       list.
+            text       For texts or inline-level elements
+                       Null if no container for inlines.
+         */
+      my $state;
+         /*
+            heading    Next |eol| closes the heading.
+            section    Otherwise.
+         */
+      lang:Perl {
+        $parent->{block} = $self->{docel}->body_element;
+        $parent->{section}->[1] = $parent->{block};
+        $state = 'section';
+      }
+
+      ~* (text) {
+        lang:Perl ($v => $token.value) {
+          unless (defined $parent->{text}) {
+            $parent->{text} = $parent->{block}
+                                     ->append_child
+                                         ($self->{doc}->create_element_ns
+                                                         (<Q::xhtml2|>, 'h2:p'));
+          }
+          $parent->{text}->manakai_append_text ($v);
+        }
+      } (startTag) {
+        my $element_type;
+        my $class_names;
+        my $lang_tag;
+        lang:Perl ($v => $token.value) {
+          $v =~ /([A-Z]+)/;
+          $element_type = $1;
+          $class_names = '';
+        }
+
+        &_StartTag ($element_type => $element_type, $class_names => $class_names,
+                    $lang_tag => $lang_tag, $parent => $parent);
+      } (startTagClass) {
+        my $element_type;
+        my $class_names;
+        my $lang_tag;
+        lang:Perl ($v => $token.value) {
+          $v =~ /([A-Z]+)\(([^()]+)/;
+          $element_type = $1;
+          $class_names = $2;
+        }
+
+        &_StartTag ($element_type => $element_type, $class_names => $class_names,
+                    $lang_tag => $lang_tag, $parent => $parent);
+      } (startTagClassLang) {
+        my $element_type;
+        my $class_names;
+        my $lang_tag;
+        lang:Perl ($v => $token.value) {
+          $v =~ /([A-Z]+)\(([^()]+)\@([^\[\]]*)/;
+          $element_type = $1;
+          $class_names = $2;
+          $lang_tag = $2;
+        }
+
+        &_StartTag ($element_type => $element_type, $class_names => $class_names,
+                    $lang_tag => $lang_tag, $parent => $parent);
+      } (startTagLang) {
+        my $element_type;
+        my $class_names;
+        my $lang_tag;
+        lang:Perl ($v => $token.value) {
+          $v =~ /([A-Z]+)\@([^\[\]]*)/;
+          $element_type = $1;
+          $class_names = '';
+          $lang_tag = $2;
+        }
+
+        &_StartTag ($element_type => $element_type, $class_names => $class_names,
+                    $lang_tag => $lang_tag, $parent => $parent);
+      } (eol) {
+        ~? (eol) {
+          lang:Perl {
+            $parent->{block} = $parent->{section}->[-1];
+            $parent->{text} = null;
+            $state = 'section';
+          }
+        } else {
+          lang:Perl {
+            if ($state eq 'heading') {
+              $parent->{text} = null;
+              $state = 'section';
+            } elsif (defined $parent->{text}) {
+              $parent->{text}->manakai_append_text ("\x0A");
+            }
+          }
+        }
+      } (listStart) {
+        lang:Perl ($v => $token.value) {
+          $v =~ /([-=]+)/;
+          my $level = length $1;
+          my $type = substr ($1, -1) eq '-' ? 'ul' : 'ol';
+          if (defined $parent->{list}->[$level]) {
+            unless ($parent->{list}->[$level]->local_name eq $type) {
+              $parent->{list}->[$level]
+                  = $parent->{list}->[$level]->parent_node
+                           ->append_child
+                                 ($self->{doc}->create_element_ns
+                                                  (<Q::xhtml2|>, 'h2:'.$type));
+            }
+          } elsif (defined $parent->{list}->[0]) {
+            my $parent_list = $parent->{list}->[-1];
+            my $parent_lc = $parent_list->last_child;
+            if (defined $parent_lc and
+                $parent_lc->node_type eq <C::Node.ELEMENT_NODE>) {
+              $parent->{list}->[$level]
+                  = $parent_lc->append_child
+                                  ($self->{doc}->create_element_ns
+                                                   (<Q::xhtml2|>, 'h2:'.$type));
+            } else {
+              $parent->{list}->[$level]
+                  = $parent_list->append_child
+                                    ($self->{doc}->create_element_ns
+                                                     (<Q::xhtml2|>, 'h2:li'))
+                                ->append_child
+                                    ($self->{doc}->create_element_ns
+                                                    (<Q::xhtml2|>, 'h2:'.$type));
+            }
+          } else {
+            $parent->{list}->[$level]
+                = $parent->{block}->append_child
+                                      ($self->{doc}->create_element_ns
+                                                    (<Q::xhtml2|>, 'h2:'.$type));
+          }
+          $parent->{block} =
+          $parent->{text} = $parent->{list}->[$level]
+                                   ->append_child
+                                       ($self->{doc}->create_element_ns
+                                                        (<Q::xhtml2|>, 'h2:li'));
+          $state = 'section';
+        }
+      } (headingStart) {
+        lang:Perl ($v => $token.value) {
+          $v =~ /(\*+)/;
+          my $level = length $1;
+          if (defined $parent->{section}->[$level]) {
+            if (defined $parent->{section}->[$level + 1]) {
+              $#{$parent->{section}} = $level;
+            }
+          } else {
+            L: for my $i (2..$level) {
+              next L if defined $parent->{section}->[$i];
+              $parent->{section}->[$i]
+                  = $self->{doc}->create_element_ns (<Q::xhtml2|>, 'h2:section');
+              $parent->{section}->[$i - 1]
+                     ->append_child ($parent->{section}->[$i]);
+            } # L
+          }
+          $parent->{block} =
+          $parent->{section}->[$level + 1]
+              = $self->{doc}->create_element_ns (<Q::xhtml2|>, 'h2:section');
+          $parent->{section}->[$level]
+                 ->append_child ($parent->{section}->[$level + 1]);
+          $parent->{text} = $self->{doc}->create_element_ns
+                                            (<Q::xhtml2|>, 'h2:h');
+          $parent->{block}->append_child ($parent->{text});
+          $state = 'heading';
+        }
+      }
+    } // Document
+
+    rule MagicParam {
+      ~* (name) {
+        my $param_el;
+        my $value;
+        lang:Perl ($v => $token.value) {
+          $param_el = $self->{doc}->create_element_ns
+                                      (<Q::sw09|>, 'parameter');
+          $param_el->set_attribute_ns (null, 'name', $v);
+          $value = '';
+        }
+
+        ~ (vi) { }
+        ~ (lit) { }
+        ~* (text) {
+          lang:Perl ($v => $token.value) {
+            $value .= $v;
+          }
+        } (quotedPair) {
+          lang:Perl ($v => $token.value) {
+            $value .= substr ($v, 1);
+          }
+        }
+        ~ (lit) { }
+
+        lang:Perl {
+          for (split /,/, $value) {
+            $param_el->append_child ($self->{doc}->create_element_ns
+                                                     (<Q::sw09|>, 'value'))
+                     ->manakai_append_text ($_);
+          }
+
+          $self->{docel}->head_element->append_child ($param_el);
+        }
+      }
+
+      ~ (eol) { }
+    } // MagicParam
+
+    rule _StartTag ($parent, $element_type, $class_names, $lang_tag) {
+      lang:Perl {
+        unless (defined $parent->{text}) {
+          $parent->{text} = $parent->{block}
+                                   ->append_child
+                                       ($self->{doc}->create_element_ns
+                                                       (<Q::xhtml2|>, 'h2:p'));
+        }
+        my @class_names = split /\s+/, $class_names;
+        my $et = {
+          ABBR => [<Q::xhtml2|>, 'abbr'],
+          CODE => [<Q::xhtml2|>, 'code'],
+          DEL  => [<Q::xhtml2|>, 'del'],
+          DFN  => [<Q::xhtml2|>, 'dfn'],
+          INS  => [<Q::xhtml2|>, 'ins'],
+          KBD  => [<Q::xhtml2|>, 'kbd'],
+          Q    => [<Q::xhtml2|>, 'q'],
+          RUBY => [<Q::xhtml2|>, 'ruby'],
+          RUBYB=> [<Q::sw09|>, 'rubyb'],
+          SAMP => [<Q::xhtml2|>, 'samp'],
+          SUB  => [<Q::xhtml2|>, 'sub'],
+          SUP  => [<Q::xhtml2|>, 'sup'],
+          VAR  => [<Q::xhtml2|>, 'var'],
+          WEAK => [<Q::sw09|>, 'weak'],
+          AA   => [<Q::aa|>, 'aa'],
+          CITE => [<Q::xhtml2|>, 'cite'],
+          CSECTION => [<Q::sw010|>, 'csection'],
+          KEY      => [<Q::sw010|>, 'key'],
+          QN       => [<Q::sw010|>, 'qn'],
+          SPAN     => [<Q::xhtml2|>, 'span'],
+          SRC      => [<Q::sw010|>, 'src'],
+        }->{$element_type};
+        unless (defined $et) {
+          $et = [<Q::xhtml2|>, 'code'];
+          push @class_names, $element_type;
+        }
+        $parent->{text}
+            = $parent->{text}->append_child
+                                 ($self->{doc}->create_element_ns
+                                                  ($et->[0], $et->[1]));
+        $parent->{text}
+               ->set_attribute_ns (null, 'class' => join ' ', @class_names)
+            if @class_names;
+        $parent->{text}
+               ->set_attribute_ns (<Q::xml|>, 'xml:lang', $lang_tag)
+            if defined $lang_tag;
+      }
+    } // _StartTag
+
+  @Code:
+    @@QName: inlineContainerElementTypes
+    @@PerlDef:
+      {
+        abbr => true, code => true, del => true, dfn => true,
+        ins => true, kbd => true, q => true, samp => true, 
+        sub => true, sup => true, var => true, weak => true,
+        aa => true, cite => true, csection => true, key => true,
+        span => true, src => true, anchor => true, nsuri => true,
+        qname => true, rb => true, rt => true,
+
+        p => true, pre => true, h => true, li => true,
+        dt => true, dd => true, ed => true, comment-p => true,
+        td => true, em => true, strong => true,
+      }
+
+# document head body section bodytext insert delete
+# ul ol dl dr table tbody tr form replace ruby rubyb qn
+# anchor-external anchor-internal anchor-end text blockquote
+
+

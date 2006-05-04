@@ -35,7 +35,8 @@ DAF = $(PERL_) $(DAF_PL) $(DAF_OPTIONS) $(DIS_OPTIONS_ALL)
 
 DIS_FILES = \
   SuikaWikiConfig21$(DIS_SUFFIX) \
-  Atom$(DIS_SUFFIX)
+  Atom$(DIS_SUFFIX) \
+  SuikaWiki$(DIS_SUFFIX)
 ADDITIONAL_DIS_FILES = common$(DIS_SUFFIX)
 
 PM_FILES = $(DIS_FILES:$(DIS_SUFFIX)=$(PM_SUFFIX))
@@ -56,5 +57,5 @@ clean-db:
 
 distclean: clean clean-db
 
-## $Date: 2006/04/29 11:05:09 $
+## $Date: 2006/05/04 13:07:19 $
 ## License: Public Domain.

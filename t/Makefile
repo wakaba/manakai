@@ -67,7 +67,7 @@ TEST_PM_FILES = \
 NS_CHARSET_PT_FILES = \
   charset-Encode$(PT_SUFFIX)
 NS_MARKUP_PT_FILES = \
-  markup-Atom$(PT_SUFFIX)
+  markup-Atom$(PT_SUFFIX) markup-SuikaWiki$(PT_SUFFIX)
 NS_MDOM_PT_FILES = \
   dom-DOMFeature$(PT_SUFFIX) dom-GenericLS$(PT_SUFFIX) \
   dom-DOMCore$(PT_SUFFIX) \
