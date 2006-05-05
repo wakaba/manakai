@@ -54,7 +54,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/05/05 09:07:19 $
+    $Date: 2006/05/05 11:19:44 $
 
   @Require:
     @@Module:
@@ -240,6 +240,29 @@ ElementTypeBinding:
     dis:FullName
   @ShadowContent:
     @@lang:en
+
+ElementTypeBinding:
+  @Name: PTests
+  @ElementType: 
+    dis:ResourceDef
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@DISCore:resourceType: test|ParserTestSet
+
+ElementTypeBinding:
+  @Name: PTest
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@DISCore:resourceType: test|ParserTest
+
+ElementTypeBinding:
+  @Name: DEnt
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: test|RootEntity
 
 ElementTypeBinding:
   @Name: IFClsETDef
@@ -754,6 +777,7 @@ IFClsDef:
         $self->{docel} = $self->{doc}->document_element;
         $self->{docel}->set_attribute_ns (<Q::xmlns|>, 'xmlns', <Q::sw09|>);
         $self->{docel}->set_attribute_ns (<Q::xmlns|>, 'xmlns:h2', <Q::xhtml2|>);
+        $self->{docel}->markup_language_name ('SuikaWiki');
         $self->{docel}->markup_language_version ('0.10');
         $self->{docel}->append_child
                           ($self->{doc}->create_element_ns
@@ -2039,4 +2063,146 @@ IFClsDef:
         __CODE{setTextParent}__;
         $parent->{text}->[-1]->manakai_append_text ($tagString);
       }
+
+  @PTests:
+    @@PTest:
+      @@@QName: p.empty.test
+      @@@DEnt:
+        @@@@test:value:
+          \
+      @@@test:domTree:
+        document {
+          element {
+            namespace-uri: 'urn:x-suika-fam-cx:markup:suikawiki:0:9:';
+            local-name: 'document';
+            markup-language-name: 'SuikaWiki';
+            markup-language-version: '0.10';
+            element {
+              namespace-uri: 'http://www.w3.org/2002/06/xhtml2/';
+              local-name: 'head';
+              has-child-nodes: false;
+            }
+            element {
+              namespace-uri: 'http://www.w3.org/2002/06/xhtml2/';
+              local-name: 'body';
+              has-child-nodes: false;
+            }
+          }
+        }
+    @@PTest:
+      @@@QName: p.magic.sw09.test
+      @@@DEnt:
+        @@@@test:value:
+          #?SuikaWiki/0.9
+      @@@test:domTree:
+        document {
+          element {
+            namespace-uri: 'urn:x-suika-fam-cx:markup:suikawiki:0:9:';
+            local-name: 'document';
+            markup-language-name: 'SuikaWiki';
+            markup-language-version: '0.9';
+            element {
+              namespace-uri: 'http://www.w3.org/2002/06/xhtml2/';
+              local-name: 'head';
+              has-child-nodes: false;
+            }
+            element {
+              namespace-uri: 'http://www.w3.org/2002/06/xhtml2/';
+              local-name: 'body';
+              has-child-nodes: false;
+            }
+          }
+        }
+    @@PTest:
+      @@@QName: p.magic.swimg09.test
+      @@@DEnt:
+        @@@@test:value:
+          #?SuikaWikiImage/0.9
+      @@@test:domTree:
+        document {
+          element {
+            namespace-uri: 'urn:x-suika-fam-cx:markup:suikawiki:0:9:';
+            local-name: 'document';
+            markup-language-name: 'SuikaWikiImage';
+            markup-language-version: '0.9';
+            element {
+              namespace-uri: 'http://www.w3.org/2002/06/xhtml2/';
+              local-name: 'head';
+              has-child-nodes: false;
+            }
+            element {
+              namespace-uri: 'http://www.w3.org/2002/06/xhtml2/';
+              local-name: 'body';
+              has-child-nodes: false;
+            }
+          }
+        }
+
+    @@PerlDef:
+      my $impl = $Message::DOM::ImplementationRegistry->get_implementation ({
+        'Core' => '3.0',
+        'XML' => '3.0',
+      });
+
+      for my $test_data (@$TestData) {
+        my $parser = <Class::ManakaiSWDMLParser>->new ($impl);
+
+        $test->start_new_test ($test_data->{uri});
+        my $doc_ent = $test_data->{entity}->{$test_data->{root_uri}};
+        my $not_ok;
+
+        ## -- DOM Configuration Parameters
+
+        my $pcfg = $parser->dom_config;
+        for (keys %{$test_data->{dom_config}}) {
+          $pcfg->set_parameter ($_ => $test_data->{dom_config}->{$_});
+        }
+
+#        $pcfg->set_parameter ('error-handler' => sub ($$) {
+#          my (undef, $err) = @_;
+#	  my $err_type = $err->type;
+#	  if ($test_data->{dom_error}->{$err_type}) {
+#            $test->assert_error_equals
+#                     (actual_value => $err,
+#                      expected_hash => shift @{$test_data->{dom_error}
+#                                                         ->{$err_type}});
+#          } else { # Uncatched error
+#            warn $err;
+#            unless ($err->severity == <C::c|DOMError.SEVERITY_WARNING>) {
+#              $test->failure_comment ('Unexpected error |'.$err->type.'|');
+#              $not_ok = true;
+#            }
+#          }
+#          return true; # continue as far as possible
+#        });
+
+        ## -- Test and Result
+
+          my $doc;
+          try {
+            $doc = $parser->parse_string ($doc_ent->{<Q::test|value>});
+            $test->assert_dom_tree_equals
+                     (actual_value => $doc,
+                      expected_hash => $test_data->{dom_tree});
+            for (values %{$test_data->{dom_error}||{}}) {
+              if (@$_) {
+                $test->failure_comment
+                         (@$_.' |DOMError|s of type |'.
+                          $_->[0]->{type}->{value}.'| are not reported');
+                $not_ok = true;
+              }
+            }
+            $not_ok ? $test->not_ok : $test->ok;
+            undef $doc;
+          } catch Message::Util::IF::DTException with {
+            require Message::DOM::SimpleLS;
+            my $ls = Message::DOM::SimpleLS::ManakaiDOMSimpleXMLSerializer->new;
+            print STDERR $ls->write_to_string ($doc);
+          } otherwise {
+            my $err = shift;
+            warn $err;
+            $test->not_ok;
+          };
+      }
+##SWDMLParser
 

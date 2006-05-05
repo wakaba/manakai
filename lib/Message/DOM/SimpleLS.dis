@@ -14,7 +14,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/05/04 13:07:18 $
+    $Date: 2006/05/05 11:19:44 $
 
   @Require:
     @@Module:
@@ -401,7 +401,7 @@ IFClsXDef:
                           $atpfx = $pfx;
                           $ns->{$pfx} = $atns;
                           $nsrev->{$atns} = $atpfx;
-                          $attrr{$atpfx} = [$xescape->($atns)];
+                          $attrr{'xmlns:'.$atpfx} = [$xescape->($atns)];
                           last P;
                         }
                       }
