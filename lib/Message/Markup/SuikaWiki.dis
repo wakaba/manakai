@@ -7,13 +7,54 @@ Module:
 
       }
 
+    <Caption::Supported element types>
+
+      - SuikaWiki/0.9 Structure:::
+            <XE::sw09|document>, <XE::xhtml2|head>, <XE::xhtml2|body>,
+            <XE::sw09|parameter> (deprecated), <XE::sw09|value> (deprecated),
+            <XE::sw09|replace> (deprecated), <XE::sw09|text> (deprecated)
+
+      - SuikaWikiImage/0.9 Structure:::
+            <XE::sw09|image> (deprecated)
+
+      - SuikaWiki/0.9 Block-level:::
+            <XE::xhtml2|section>, <XE::xhtml2|blockquote>, <XE::html3|bodytext>,
+            <XE::sw09|insert>, <XE::sw09|delete>,
+            <XE::xhtml2|ul>, <XE::xhtml2|ol>, <XE::xhtml2|dl>,
+            <XE::xhtml2|li>, <XE::sw09|dr>, <XE::xhtml2|dt>, <XE::xhtml2|dd>,
+            <XE::xhrml2|p>, <XE::xhtml2|pre>
+
+      - SuikaWiki/0.10 Block-level:::
+            <XE::sw010|ed>, <XE::sw010|comment-p>
+
+      - SuikaWiki/0.9 Table:::
+            <XE::xhtml2|table>, <XE::xhtml2|tbody>,
+            <XE::xhtml2|tr>, <XE::xhtml2|td>
+      
+      - SuikaWiki/0.9 Hyperlink:::
+            <XE::sw09|anchor-external>, <XE::sw09|anchor-internal>,
+            <XE::sw09|anchor-end>, <XE::sw09|form>
+
+      - SuikaWiki/0.9 Phrase:::
+            <XE::xhtml2|dfn>, <XE::xhtml2|q>, <XE::xhtml2|sub>, <XE::xhtml2|sup>,
+            <XE::xhtml2|abbr>, <XE::xhtml2|ruby>, <XE::sw09|rubyb>,
+            <XE::xhtml2|rb>, <XE::xhtml2|rt>, <XE::xhtml2|var>,
+            <XE::xhtml2|code>, <XE::xhtml2|kbd>, <XE::xhtml2|samp> (deprecated),
+            <XE::xhtml2|del>, <XE::xhtml2|ins>, <XE::sw09|anchor>,
+            <XE::xhtml2|em>, <XE::xhtml2|strong>, <XE::sw09|weak>
+
+      - SuikaWiki/0.10 Phrase::
+            <XE::sw010|aa>, <XE::sw010|key>, <XE::xhtml2|span>,
+            <XE::xhtml2|cite>, <XE::sw010|csection>, <XE::sw010|src>,
+            <XE::sw010|qn>, <XE::sw010|qname>, <XE::sw010|nsuri>
+
   @Namespace:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Markup/SuikaWiki/
 
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/05/04 13:07:19 $
+    $Date: 2006/05/05 09:07:19 $
 
   @Require:
     @@Module:
@@ -705,6 +746,7 @@ IFClsDef:
         $self->{char} = [0x000A];
         $self->{token} = [];
         $self->{source} = $sourceText;
+        pos ($self->{source}) = 0;
         $self->{location} = {};
         $self->{doc} = $self->{<H::f|implementation>}
                             ->create_document (<Q::sw09|>, 'document');
@@ -852,12 +894,22 @@ IFClsDef:
       startTagLang : value := ['['] [U+0041..U+005A]+ ['@'] $ltagchar* ['['];
       termStartTag := ['['] ['['];
       midTag : value := [']'] $wsp* ['['];
+      midTagLang : value := [']'] $wsp* ['@'] $ltagchar* ['['];
       endTag := [']'] [']'];
       endTagAnchorNumberRef : value := [']'] ['>'] ['>'] $digit+ [']'];
       endTagExternalRefStart := [']'] ['<'] -> EndTagExternalRefBody;
-      preEndTag := $rs [']'] ['P'] ['R'] ['E'] [']'] $wsp* $re;
-      insEndTag := $rs [']'] ['I'] ['N'] ['S'] [']'] $wsp* $re;
-      delEndTag := $rs [']'] ['D'] ['E'] ['L'] [']'] $wsp* $re;
+      preStartTag : value := $rs ['['] ['P'] ['R'] ['E'] ['['] $wsp* $re;
+      preStartTagClass : value := $rs ['['] ['P'] ['R'] ['E']
+                                  ['('] $classchar* [')'] ['['] $wsp* $re;
+      insStartTag : value := $rs ['['] ['I'] ['N'] ['S'] ['['] $wsp* $re;
+      insStartTagClass : value := $rs ['['] ['I'] ['N'] ['S']
+                                  ['('] $classchar* [')'] ['['] $wsp* $re;
+      delStartTag : value := $rs ['['] ['D'] ['E'] ['L'] ['['] $wsp* $re;
+      delStartTagClass : value := $rs ['['] ['D'] ['E'] ['L']
+                                  ['('] $classchar* [')'] ['['] $wsp* $re;
+      preEndTag : value := $rs [']'] ['P'] ['R'] ['E'] [']'] $wsp* $re;
+      insEndTag : value := $rs [']'] ['I'] ['N'] ['S'] [']'] $wsp* $re;
+      delEndTag : value := $rs [']'] ['D'] ['E'] ['L'] [']'] $wsp* $re;
       formStart : value := ['['] ['['] ['#'] [U+0061..U+007A '-']+
                         -> FormBody;
       emphasis2 := [U+0027] [U+0027];
@@ -866,8 +918,8 @@ IFClsDef:
                            [^'&' U+000D U+000A]+
                            ['&'] ['&'] ['_'] ['_'];
       obsPreStart : value := $rs $wsp;
-      noteLine := $rs [';'] [';'] $wsp*;
-      todoLine := $rs ['@'] ['@'] $wsp*;
+      noteStart : value := $rs [';'] [';'] $wsp*;
+      edStart : value := $rs ['@'] ['@'] $wsp*;
       tableLine : value := $rs [','] $nonRSRE* $re;
       imageStart : value := $rs ['_'] ['_'] ['I'] ['M'] ['A'] ['G'] ['E']
                             ['_'] ['_'] $re;
@@ -887,8 +939,9 @@ IFClsDef:
     
     lexmode MagicParameterValue
       : standalone
+      : extends => WSP
     {
-      quotedPair : value := [U+005C] .;
+      quotedPair : value := [U+005C] $nonRSRE;
       ?default-token text : value;
       lit := ['"'] -> MagicParameter;
     }
@@ -910,16 +963,18 @@ IFClsDef:
     
     lexmode ExternalRefQuotedStringBody
       : standalone
+      : extends => WSP
     {
       lit := ['"'] -> ExternalRefBody;
-      quotedPair : value := [U+005C] . /* | ['\'] $rs $re */;
+      quotedPair : value := [U+005C] $nonRSRE;
       ?default-token text : value;
     }
     lexmode EndTagExternalRefQuotedStringBody
       : standalone
+      : extends => WSP
     {
       lit := ['"'] -> EndTagExternalRefBody;
-      quotedPair : value := [U+005C] . /* | ['\'] $rs $re */;
+      quotedPair : value := [U+005C] $nonRSRE;
       ?default-token text : value;
     }
     
@@ -933,9 +988,10 @@ IFClsDef:
     
     lexmode FormQuotedStringBody
       : standalone
+      : extends => WSP
     {
       lita := [U+0027] -> FormBody;
-      quotedPair := [U+005C] . /* | ['\'] $rs $re */;
+      quotedPair : value := [U+005C] $nonRSRE;
       ?default-token text : value;
     }
 
@@ -960,35 +1016,47 @@ IFClsDef:
       }
 
       my $parent;
-         /*
-            block      For block-level elements.
+      lang:Perl {
+        $parent->{block} = [$self->{doc}->document_element->body_element];
+        $parent->{quote} = [$parent->{block}->[-1]];
+        $parent->{section}->[1] = $parent->{block}->[-1];
+        $parent->{edit} = [];
+      }
+
+      &Body ($parent => $parent);
+    } // Document
+
+    rule Body ($parent)
+      : standalone
+    {
+      /* $parent
+            block i    For block-level elements.
             section i  For i-th-level sections.  Null if no (i-1)-th
                        level section.
             list i     For i-th-level list items.  Null if no i-th-level
                        list.
-            text       For texts or inline-level elements
+            text i     For texts or inline-level elements
                        Null if no container for inlines.
+            quote i    Contains i-th-level quotation's |bodytext| element.
+            edit i     Contains |parent| state restored when i-th-level
+                       editing element is closed.
+            tr         For |tr| elements.
          */
       my $state;
          /*
             heading    Next |eol| closes the heading.
+            pre        In |pre| element.
             section    Otherwise.
          */
       lang:Perl {
-        $parent->{block} = $self->{docel}->body_element;
-        $parent->{section}->[1] = $parent->{block};
         $state = 'section';
       }
 
       ~* (text) {
         lang:Perl ($v => $token.value) {
-          unless (defined $parent->{text}) {
-            $parent->{text} = $parent->{block}
-                                     ->append_child
-                                         ($self->{doc}->create_element_ns
-                                                         (<Q::xhtml2|>, 'h2:p'));
-          }
-          $parent->{text}->manakai_append_text ($v);
+          CORE::delete $parent->{tr};
+          __CODE{setTextParent}__;
+          $parent->{text}->[-1]->manakai_append_text ($v);
         }
       } (startTag) {
         my $element_type;
@@ -1040,96 +1108,807 @@ IFClsDef:
 
         &_StartTag ($element_type => $element_type, $class_names => $class_names,
                     $lang_tag => $lang_tag, $parent => $parent);
+      } (termStartTag) {
+        lang:Perl {
+          CORE::delete $parent->{tr};
+          __CODE{setTextParent}__;
+          my $a_el = $self->{doc}->create_element_ns (<Q::sw09|>, 'anchor');
+          $parent->{text}->[-1]->append_child ($a_el);
+          push @{$parent->{text}}, $a_el;
+        }
+      } (midTag) {
+        lang:Perl ($v => $token.value) {
+          CORE::delete $parent->{tr};
+          if (defined $parent->{text}->[0]) {
+            my $xuri = $parent->{text}->[-1]->manakai_expanded_uri;
+            if ($xuri eq <Q::xhtml2|rb> or $xuri eq <Q::xhtml2|rt>) {
+              push @{$parent->{text}},
+                   $parent->{text}->[-1]->parent_node
+                                        ->append_child
+                                            ($self->{doc}->create_element_ns
+                                                             (<Q::xhtml2|>,
+                                                              'h2:rt'));
+            } elsif ($xuri eq <Q::sw010|qname>) {
+              push @{$parent->{text}},
+                   $parent->{text}->[-1]->parent_node
+                                        ->append_child
+                                            ($self->{doc}->create_element_ns
+                                                             (<Q::sw010|>,
+                                                              'nsuri'));
+            } else {
+              __CODE{setTextParent}__;
+              $parent->{text}->[-1]->manakai_append_text ($v);
+            }
+          } else {
+            __CODE{setTextParent}__;
+            $parent->{text}->[-1]->manakai_append_text ($v);
+          }
+        }
+      } (midTagLang) {
+        lang:Perl ($v => $token.value) {
+          CORE::delete $parent->{tr};
+          if (defined $parent->{text}->[0]) {
+            my $xuri = $parent->{text}->[-1]->manakai_expanded_uri;
+            $v =~ /\@([A-Za-z0-9-]*)/;
+            my $lang = $1;
+            if ($xuri eq <Q::xhtml2|rb> or $xuri eq <Q::xhtml2|rt>) {
+              push @{$parent->{text}},
+                   $parent->{text}->[-1]->parent_node
+                                        ->append_child
+                                            ($self->{doc}->create_element_ns
+                                                             (<Q::xhtml2|>,
+                                                              'h2:rt'));
+              $parent->{text}->[-1]
+                     ->set_attribute_ns (<Q::xml|>, 'xml:lang', $lang);
+            } elsif ($xuri eq <Q::sw010|qname>) {
+              push @{$parent->{text}},
+                   $parent->{text}->[-1]->parent_node
+                                        ->append_child
+                                            ($self->{doc}->create_element_ns
+                                                             (<Q::sw010|>,
+                                                              'nsuri'));
+              $parent->{text}->[-1]
+                     ->set_attribute_ns (<Q::xml|>, 'xml:lang', $lang);
+            } else {
+              __CODE{setTextParent}__;
+              $parent->{text}->[-1]->manakai_append_text ($v);
+            }
+          } else {
+            __CODE{setTextParent}__;
+            $parent->{text}->[-1]->manakai_append_text ($v);
+          }
+        }
+      } (endTag) {
+        lang:Perl {
+          my $iref;
+          my $xref;
+          __CODE{endTag:: $tagString => ']]'}__;
+        }
+      } (endTagAnchorNumberRef) {
+        lang:Perl ($v => $token.value) {
+          $v =~ />>([0-9]+)/;
+          my $iref = $1;
+          my $xref;
+          __CODE{endTag:: $tagString => $v}__;
+        }
+      } (endTagExternalRefStart) {
+        my $xref;
+        lang:Perl {
+          $xref = '';
+        }
+        ~* (text) {
+          lang:Perl ($v => $token.value) {
+            $xref .= $v;
+          }
+        } (quotedPair) {
+          lang:Perl ($v => $token.value) {
+            $xref .= $v;
+          }
+        } (lit) {
+          lang:Perl {
+            $xref .= '"';
+          }
+        }
+        ~ (endTagExternalRefEnd) { }
+        lang:Perl {
+          my $iref;
+          __CODE{endTag:: $tagString => {']<'.$xref.'>]'}}__;
+        }
       } (eol) {
         ~? (eol) {
           lang:Perl {
-            $parent->{block} = $parent->{section}->[-1];
-            $parent->{text} = null;
-            $state = 'section';
+            CORE::delete $parent->{tr};
+            if ($state eq 'pre') {
+              $parent->{text}->[-1]->manakai_append_text ("\x0A\x0A"); 
+            } elsif ($state eq 'obspre') {
+              $#{$parent->{block}}--;
+              $parent->{text} = [];
+              $state = 'section';
+            } else {
+              $parent->{block} = [$parent->{section}->[-1]];
+              $parent->{quote} = [$parent->{block}->[-1]];
+              $parent->{list} = [];
+              $parent->{text} = [];
+              $state = 'section';
+            }
           }
         } else {
           lang:Perl {
+            CORE::delete $parent->{tr};
             if ($state eq 'heading') {
-              $parent->{text} = null;
+              $parent->{text} = [];
               $state = 'section';
-            } elsif (defined $parent->{text}) {
-              $parent->{text}->manakai_append_text ("\x0A");
+            } elsif ($state eq 'pre') {
+              $parent->{text}->[-1]->manakai_append_text ("\x0A");
+            } elsif (defined $parent->{text}->[0]) {
+              $parent->{text}->[-1]->manakai_append_text ("\x0A");
             }
           }
+        }
+      } (anchorNumberDef) {
+        lang:Perl ($v => $token.value) {
+          CORE::delete $parent->{tr};
+          __CODE{setTextParent}__;
+          my $a_el = $self->{doc}->create_element_ns (<Q::sw09|>, 'anchor-end');
+          $a_el->set_attribute_ns (<Q::sw09|>, 'sw9:anchor',
+                                   0+substr ($v, 1, length ($v) - 2));
+          $a_el->text_content ($v);
+          $parent->{text}->[-1]->append_child ($a_el);
+        }
+      } (anchorNumberRef) {
+        lang:Perl ($v => $token.value) {
+          CORE::delete $parent->{tr};
+          __CODE{setTextParent}__;
+          my $a_el = $self->{doc}
+                          ->create_element_ns (<Q::sw09|>, 'anchor-internal');
+          $a_el->set_attribute_ns (<Q::sw09|>, 'sw9:anchor',
+                                   0+substr ($v, 2));
+          $a_el->text_content ($v);
+          $parent->{text}->[-1]->append_child ($a_el);
+        }
+      } (externalRefStart) {
+        my $xref;
+        ~ (text) {
+          lang:Perl ($v => $token.value) {
+            $xref .= $v;
+          }
+        } (quotedPair) {
+          lang:Perl ($v => $token.value) {
+            $xref .= $v;
+          }
+        } (lit) {
+          lang:Perl {
+            $xref .= '"';
+          }
+        }
+        ~ (externalRefEnd) { }
+        lang:Perl {
+          CORE::delete $parent->{tr};
+          __CODE{setTextParent}__;
+          my $a_el = $self->{doc}
+                          ->create_element_ns (<Q::sw09|>, 'anchor-external');
+          my $data = $xref;
+          my $scheme;
+          if ($data =~ s/^([A-Z]+)://) {
+            $scheme = $1;
+          } else {
+            $scheme = 'URI';
+          }
+          $a_el->set_attribute_ns (<Q::sw09|>, 'sw9:resScheme', $scheme);
+          $a_el->set_attribute_ns (<Q::sw09|>, 'sw9:resParameter', $data);
+          $a_el->text_content ($xref);
+          $parent->{text}->[-1]->append_child ($a_el);
         }
       } (listStart) {
         lang:Perl ($v => $token.value) {
-          $v =~ /([-=]+)/;
-          my $level = length $1;
-          my $type = substr ($1, -1) eq '-' ? 'ul' : 'ol';
-          if (defined $parent->{list}->[$level]) {
-            unless ($parent->{list}->[$level]->local_name eq $type) {
-              $parent->{list}->[$level]
-                  = $parent->{list}->[$level]->parent_node
-                           ->append_child
-                                 ($self->{doc}->create_element_ns
-                                                  (<Q::xhtml2|>, 'h2:'.$type));
-            }
-          } elsif (defined $parent->{list}->[0]) {
-            my $parent_list = $parent->{list}->[-1];
-            my $parent_lc = $parent_list->last_child;
-            if (defined $parent_lc and
-                $parent_lc->node_type eq <C::Node.ELEMENT_NODE>) {
-              $parent->{list}->[$level]
-                  = $parent_lc->append_child
-                                  ($self->{doc}->create_element_ns
-                                                   (<Q::xhtml2|>, 'h2:'.$type));
-            } else {
-              $parent->{list}->[$level]
-                  = $parent_list->append_child
-                                    ($self->{doc}->create_element_ns
-                                                     (<Q::xhtml2|>, 'h2:li'))
-                                ->append_child
-                                    ($self->{doc}->create_element_ns
-                                                    (<Q::xhtml2|>, 'h2:'.$type));
-            }
+          CORE::delete $parent->{tr};
+          if ($state eq 'pre' or $state eq 'obspre') {
+            $parent->{text}->[-1]->manakai_append_text (substr $v, 1);
           } else {
-            $parent->{list}->[$level]
-                = $parent->{block}->append_child
+            $v =~ /([-=]+)/;
+            my $level = length ($1) - 1;
+            my $type = substr ($1, -1) eq '-' ? 'ul' : 'ol';
+            if (defined $parent->{list}->[$level]) {
+              unless ($parent->{list}->[$level]->local_name eq $type) {
+                $parent->{list}->[$level]
+                    = $parent->{list}->[$level]->parent_node
+                             ->append_child
+                                   ($self->{doc}->create_element_ns
+                                                    (<Q::xhtml2|>, 'h2:'.$type));
+              }
+            } elsif (defined $parent->{list}->[0]) {
+              my $parent_list = $parent->{list}->[-1];
+              my $parent_lc = $parent_list->last_child;
+              if (defined $parent_lc and
+                  $parent_lc->node_type eq <C::Node.ELEMENT_NODE>) {
+                $parent->{list}->[$level]
+                    = $parent_lc->append_child
+                                    ($self->{doc}->create_element_ns
+                                                   (<Q::xhtml2|>, 'h2:'.$type));
+              } else {
+                $parent->{list}->[$level]
+                    = $parent_list->append_child
+                                      ($self->{doc}->create_element_ns
+                                                       (<Q::xhtml2|>, 'h2:li'))
+                                  ->append_child
                                       ($self->{doc}->create_element_ns
                                                     (<Q::xhtml2|>, 'h2:'.$type));
-          }
-          $parent->{block} =
-          $parent->{text} = $parent->{list}->[$level]
-                                   ->append_child
-                                       ($self->{doc}->create_element_ns
+              }
+            } else {
+              $parent->{list}->[$level]
+                  = $parent->{block}->[-1]->append_child
+                                        ($self->{doc}->create_element_ns
+                                                    (<Q::xhtml2|>, 'h2:'.$type));
+            }
+            push @{$parent->{block}},
+                 $parent->{list}->[$level]->append_child
+                                              ($self->{doc}->create_element_ns
                                                         (<Q::xhtml2|>, 'h2:li'));
-          $state = 'section';
+            $parent->{text} = [$parent->{block}->[-1]];
+            $state = 'section';
+          }
+        }
+      } (dlistStart) {
+        lang:Perl ($v => $token.value) {
+          CORE::delete $parent->{tr};
+          if ($state eq 'pre' or $state eq 'obspre') {
+            $parent->{text}->[-1]->manakai_append_text (substr ($v, 1));
+          } else {
+            $v =~ /:([^:]*)/;
+            my $dt_src = $1;
+
+            my $dr_el = $self->{doc}->create_element_ns (<Q::sw09|>, 'dr');
+            my $dt_el = $self->{doc}->create_element_ns (<Q::xhtml2|>, 'h2:dt');
+            my $dd_el = $self->{doc}->create_element_ns (<Q::xhtml2|>, 'h2:dd');
+            $dr_el->append_child ($dt_el);
+            $dr_el->append_child ($dd_el);
+
+            if ($parent->{block}->[-1]->manakai_expanded_uri eq <Q::xhtml2|dd>) {
+              $parent->{block}->[-1]->parent_node->parent_node
+                     ->append_child ($dr_el);
+            } else {
+              my $dl_el = $self->{doc}->create_element_ns
+                                          (<Q::xhtml2|>, 'h2:dl');
+              $dl_el->append_child ($dr_el);
+              $parent->{block}->[-1]->append_child ($dl_el);
+            }
+            push @{$parent->{block}}, $dd_el;
+            $parent->{text} = [$dd_el];
+            $parent->{list} = [];
+            $parent->{edit} = [];
+            $state = 'section';
+
+            my $original_pos = pos $self->{source};
+            {
+              local $self->{token} = [];
+              local $self->{char} = [];
+              local $self->{source} = $dt_src;
+              pos ($self->{source}) = 0;
+              local $self->{location} = {};
+              local $self->{scanner} = $self->can ('_scan_Body');
+              $self->_parse_Body ({
+                block => [$dt_el],
+                quote => [$dt_el],
+                section => [null, $dt_el],
+                text => [$dt_el],
+              });
+            }
+            pos ($self->{source}) = $original_pos;
+          }
+        }
+      } (emphasis2) {
+        lang:Perl {
+          CORE::delete $parent->{tr};
+          if (defined $parent->{text}->[1] and
+              $parent->{text}->[-1]->manakai_expanded_uri eq <Q::xhtml2|em>) {
+            $#{$parent->{text}}--;
+          } else {
+            __CODE{setTextParent}__;
+            my $em_el = $self->{doc}->create_element_ns (<Q::xhtml2|>, 'h2:em');
+            $parent->{text}->[-1]->append_child ($em_el);
+            push @{$parent->{text}}, $em_el;
+          }
+        }
+      } (emphasis3) {
+        lang:Perl {
+          CORE::delete $parent->{tr};
+          if (defined $parent->{text}->[1] and
+              $parent->{text}->[-1]->manakai_expanded_uri
+                  eq <Q::xhtml2|strong>) {
+            $#{$parent->{text}}--;
+          } else {
+            __CODE{setTextParent}__;
+            my $em_el = $self->{doc}->create_element_ns
+                                        (<Q::xhtml2|>, 'h2:strong');
+            $parent->{text}->[-1]->append_child ($em_el);
+            push @{$parent->{text}}, $em_el;
+          }
+        }
+      } (quote) {
+        lang:Perl ($v => $token.value) {
+          CORE::delete $parent->{tr};
+          if ($state eq 'pre' or $state eq 'obspre') {
+            $parent->{text}->[-1]->manakai_append_text (substr ($v, 1));
+          } else {
+            $v =~ /(>+)/;
+            my $level = length $1;
+            if (defined $parent->{quote}->[$level]) {
+              if (defined $parent->{quote}->[$level + 1]) {
+                $#{$parent->{quote}} = $level;
+              }
+            } else {
+              L: for my $i (1..$level) {
+                next L if defined $parent->{quote}->[$i];
+                $parent->{quote}->[$i]
+                    = $parent->{quote}->[$i - 1]
+                           ->append_child ($self->{doc}->create_element_ns
+                                      (<Q::xhtml2|>, 'h2:blockquote'))
+                           ->append_child
+                               ($self->{doc}->create_element_ns
+                                                (<Q::html3|>, 'h3:bodytext'));
+              } # L
+            }
+            push @{$parent->{block}}, $parent->{quote}->[$level];
+            $parent->{text} = [];
+            $parent->{list} = [];
+            $state = 'section';
+          }
         }
       } (headingStart) {
         lang:Perl ($v => $token.value) {
-          $v =~ /(\*+)/;
-          my $level = length $1;
-          if (defined $parent->{section}->[$level]) {
-            if (defined $parent->{section}->[$level + 1]) {
-              $#{$parent->{section}} = $level;
-            }
+          CORE::delete $parent->{tr};
+          if ($state eq 'pre' or $state eq 'obspre') {
+            $parent->{text}->[-1]->manakai_append_text (substr ($v, 1));
           } else {
-            L: for my $i (2..$level) {
-              next L if defined $parent->{section}->[$i];
-              $parent->{section}->[$i]
-                  = $self->{doc}->create_element_ns (<Q::xhtml2|>, 'h2:section');
-              $parent->{section}->[$i - 1]
-                     ->append_child ($parent->{section}->[$i]);
-            } # L
+            $v =~ /(\*+)/;
+            my $level = length $1;
+            if (defined $parent->{section}->[$level]) {
+              if (defined $parent->{section}->[$level + 1]) {
+                $#{$parent->{section}} = $level;
+              }
+            } else {
+              L: for my $i (2..$level) {
+                next L if defined $parent->{section}->[$i];
+                $parent->{section}->[$i]
+                    = $self->{doc}->create_element_ns
+                                      (<Q::xhtml2|>, 'h2:section');
+                $parent->{section}->[$i - 1]
+                       ->append_child ($parent->{section}->[$i]);
+              } # L
+            }
+            $parent->{section}->[$level + 1]
+                = $self->{doc}->create_element_ns (<Q::xhtml2|>, 'h2:section');
+            $parent->{section}->[$level]
+                   ->append_child ($parent->{section}->[$level + 1]);
+            $parent->{block} = [$parent->{section}->[$level + 1]];
+            $parent->{quote} = [$parent->{block}->[-1]];
+            $parent->{text} = [$self->{doc}->create_element_ns
+                                               (<Q::xhtml2|>, 'h2:h')];
+            $parent->{block}->[-1]->append_child ($parent->{text}->[-1]);
+            $parent->{list} = [];
+            $state = 'heading';
           }
-          $parent->{block} =
-          $parent->{section}->[$level + 1]
-              = $self->{doc}->create_element_ns (<Q::xhtml2|>, 'h2:section');
-          $parent->{section}->[$level]
-                 ->append_child ($parent->{section}->[$level + 1]);
-          $parent->{text} = $self->{doc}->create_element_ns
-                                            (<Q::xhtml2|>, 'h2:h');
-          $parent->{block}->append_child ($parent->{text});
-          $state = 'heading';
+        }
+      } (noteStart) {
+        lang:Perl ($v => $token.value) {
+          CORE::delete $parent->{tr};
+          if ($state eq 'pre' or $state eq 'obspre') {
+            $parent->{text}->[-1]->manakai_append_text
+                                     (substr ($v, 1, length ($v) - 2) . "\x0A");
+          } else {
+            my $ed_el = $self->{doc}->create_element_ns
+                                        (<Q::sw010|>, 'sw10:comment-p');
+            $parent->{block}->[-1]->append_child ($ed_el);
+            push @{$parent->{block}}, $ed_el;
+            $parent->{list} = [];
+            $parent->{quote} = [$ed_el];
+            $parent->{text} = [$ed_el];
+            $state = 'section';
+          }
+        }
+      } (edStart) {
+        lang:Perl ($v => $token.value) {
+          CORE::delete $parent->{tr};
+          if ($state eq 'pre' or $state eq 'obspre') {
+            $parent->{text}->[-1]->manakai_append_text
+                                     (substr ($v, 1, length ($v) - 2) . "\x0A");
+          } else {
+            my $ed_el = $self->{doc}->create_element_ns (<Q::sw010|>, 'sw10:ed');
+            $parent->{block}->[-1]->append_child ($ed_el);
+            push @{$parent->{block}}, $ed_el;
+            $parent->{list} = [];
+            $parent->{quote} = [$ed_el];
+            $parent->{text} = [$ed_el];
+            $state = 'section';
+          }
+        }
+      } (preStartTag) {
+        lang:Perl ($v => $token.value) {
+          CORE::delete $parent->{tr};
+          if ($state eq 'pre' or $state eq 'obspre') {
+            $parent->{text}->[-1]->manakai_append_text
+                                     (substr ($v, 1, length ($v) - 2) . "\x0A");
+          } else {
+            my $pre_el = $self->{doc}->create_element_ns
+                                         (<Q::xhtml2|>, 'h2:pre');
+            $pre_el->set_attribute_ns (<Q::xml|>, 'xml:space', 'preserve');
+            $parent->{block}->[-1]->append_child ($pre_el);
+            push @{$parent->{block}}, $pre_el;
+            $parent->{text} = [$pre_el];
+            $state = 'pre';
+          }
+        }
+      } (preStartTagClass) {
+        lang:Perl ($v => $token.value) {
+          CORE::delete $parent->{tr};
+          if ($state eq 'pre' or $state eq 'obspre') {
+            $parent->{text}->[-1]->manakai_append_text
+                                     (substr ($v, 1, length ($v) - 2) . "\x0A");
+          } else {
+            my $pre_el = $self->{doc}->create_element_ns
+                                         (<Q::xhtml2|>, 'h2:pre');
+            $pre_el->set_attribute_ns (<Q::xml|>, 'xml:space', 'preserve');
+            $v =~ /\(([^()]*)/;
+            $pre_el->set_attribute_ns (null, class => $1);
+            $parent->{block}->[-1]->append_child ($pre_el);
+            push @{$parent->{block}}, $pre_el;
+            $parent->{text} = [$pre_el];
+            $state = 'pre';
+          }
+        }
+      } (obsPreStart) {
+        lang:Perl ($v => $token.value) {
+          CORE::delete $parent->{tr};
+          unless ($state eq 'pre' or $state eq 'obspre') {
+            my $pre_el = $self->{doc}->create_element_ns
+                                         (<Q::xhtml2|>, 'h2:pre');
+            $pre_el->set_attribute_ns (<Q::xml|>, 'xml:space', 'preserve');
+            $parent->{block}->[-1]->append_child ($pre_el);
+            push @{$parent->{block}}, $pre_el;
+            $parent->{text} = [$pre_el];
+            $state = 'obspre';
+          }
+          $parent->{text}->[-1]->manakai_append_text (substr ($v, 1));
+        }
+      } (preEndTag) {
+        lang:Perl ($v => $token.value) {
+          CORE::delete $parent->{tr};
+          if ($state eq 'pre' or $state eq 'obspre') {
+            $#{$parent->{block}}--;
+            $parent->{text} = [];
+            $parent->{list} = [];
+            $parent->{quote} = [$parent->{block}->[-1]];
+            $state = 'section';
+          } else {
+            __CODE{setTextParent}__;
+            $parent->{text}->[-1]->manakai_append_text
+                                     (substr ($v, 1, length ($v) - 2) . "\x0A");
+          }
+        }
+      } (insStartTag) {
+        lang:Perl ($v => $token.value) {
+          CORE::delete $parent->{tr};
+          if ($state eq 'pre' or $state eq 'obspre') {
+            $parent->{text}->[-1]->manakai_append_text
+                                     (substr ($v, 1, length ($v) - 2) . "\x0A");
+          } else {
+            my $ins_el = $self->{doc}->create_element_ns (<Q::sw09|>, 'insert');
+            $parent->{block}->[-1]->append_child ($ins_el);
+            push @{$parent->{edit}}, {
+              section => $parent->{section},
+              block => $parent->{block},
+              text => $parent->{text},
+              list => $parent->{list},
+              quote => $parent->{quote},
+              type => 'insert',
+            };
+            $parent->{section} = [null, $ins_el];
+            $parent->{block} = [$ins_el];
+            $parent->{text} = [];
+            $parent->{list} = [];
+            $parent->{quote} = [$parent->{block}->[-1]];
+          }
+        }
+      } (insStartTagClass) {
+        lang:Perl ($v => $token.value) {
+          CORE::delete $parent->{tr};
+          if ($state eq 'pre' or $state eq 'obspre') {
+            $parent->{text}->[-1]->manakai_append_text
+                                     (substr ($v, 1, length ($v) - 2) . "\x0A");
+          } else {
+            my $ins_el = $self->{doc}->create_element_ns (<Q::sw09|>, 'insert');
+            $parent->{block}->[-1]->append_child ($ins_el);
+            $v =~ /\(([^()]*)/;
+            $ins_el->set_attribute_ns (null, class => $1);
+            push @{$parent->{edit}}, {
+              section => $parent->{section},
+              block => $parent->{block},
+              list => $parent->{list},
+              quote => $parent->{quote},
+              type => 'insert',
+            };
+            $parent->{section} = [null, $ins_el];
+            $parent->{block} = [$ins_el];
+            $parent->{text} = [];
+            $parent->{list} = [];
+            $parent->{quote} = [$parent->{block}->[-1]];
+          }
+        }
+      } (insEndTag) {
+        lang:Perl ($v => $token.value) {
+          CORE::delete $parent->{tr};
+          if ($state eq 'pre' or $state eq 'obspre') {
+            $parent->{text}->[-1]->manakai_append_text
+                                     (substr ($v, 1, length ($v) - 2) . "\x0A");
+          } else {
+            if (defined $parent->{edit}->[0] and
+                $parent->{edit}->[-1]->{type} eq 'insert') {
+              my $rp = pop @{$parent->{edit}};
+              $parent->{$_} = $rp->{$_}
+                for qw/section block list quote/;
+              $parent->{text} = [];
+            } else {
+              $parent->{text}->[-1]->manakai_append_text
+                                     (substr ($v, 1, length ($v) - 2) . "\x0A");
+            }
+          }
+        }
+      } (delStartTag) {
+        lang:Perl ($v => $token.value) {
+          CORE::delete $parent->{tr};
+          if ($state eq 'pre' or $state eq 'obspre') {
+            $parent->{text}->[-1]->manakai_append_text
+                                     (substr ($v, 1, length ($v) - 2) . "\x0A");
+          } else {
+            my $ins_el = $self->{doc}->create_element_ns (<Q::sw09|>, 'delete');
+            $parent->{block}->[-1]->append_child ($ins_el);
+            push @{$parent->{edit}}, {
+              section => $parent->{section},
+              block => $parent->{block},
+              list => $parent->{list},
+              quote => $parent->{quote},
+              type => 'delete',
+            };
+            $parent->{section} = [null, $ins_el];
+            $parent->{block} = [$ins_el];
+            $parent->{text} = [];
+            $parent->{list} = [];
+            $parent->{quote} = [$parent->{block}->[-1]];
+          }
+        }
+      } (delStartTagClass) {
+        lang:Perl ($v => $token.value) {
+          CORE::delete $parent->{tr};
+          if ($state eq 'pre' or $state eq 'obspre') {
+            $parent->{text}->[-1]->manakai_append_text
+                                     (substr ($v, 1, length ($v) - 2) . "\x0A");
+          } else {
+            my $ins_el = $self->{doc}->create_element_ns (<Q::sw09|>, 'delete');
+            $parent->{block}->[-1]->append_child ($ins_el);
+            $v =~ /\(([^()]*)/;
+            $ins_el->set_attribute_ns (null, class => $1);
+            push @{$parent->{edit}}, {
+              section => $parent->{section},
+              block => $parent->{block},
+              list => $parent->{list},
+              quote => $parent->{quote},
+              type => 'delete',
+            };
+            $parent->{section} = [null, $ins_el];
+            $parent->{block} = [$ins_el];
+            $parent->{text} = [];
+            $parent->{list} = [];
+            $parent->{quote} = [$parent->{block}->[-1]];
+          }
+        }
+      } (delEndTag) {
+        lang:Perl ($v => $token.value) {
+          CORE::delete $parent->{tr};
+          if ($state eq 'pre' or $state eq 'obspre') {
+            $parent->{text}->[-1]->manakai_append_text
+                                     (substr ($v, 1, length ($v) - 2) . "\x0A");
+          } else {
+            if (defined $parent->{edit}->[0] and
+                $parent->{edit}->[-1]->{type} eq 'delete') {
+              my $rp = pop @{$parent->{edit}};
+              $parent->{$_} = $rp->{$_}
+                for qw/section block list quote/;
+              $parent->{text} = [];
+            } else {
+              $parent->{text}->[-1]->manakai_append_text
+                                     (substr ($v, 1, length ($v) - 2) . "\x0A");
+            }
+          }
+        }
+      } (tableLine) {
+        lang:Perl ($v => $token.value) {
+          if ($state eq 'pre' or $state eq 'obspre') {
+            $parent->{text}->[-1]->manakai_append_text (substr ($v, 1));
+          } else {
+            my $tbody_el;
+            if (defined $parent->{tr}) {
+              $tbody_el = $parent->{tr};
+            } else {
+              my $tbl_el = $self->{doc}->create_element_ns
+                                           (<Q::xhtml2|>, 'h2:table');
+              my $tbody_el = $self->{doc}->create_element_ns
+                                             (<Q::xhtml2|>, 'h2:tbody');
+              $tbl_el->append_child ($tbody_el);
+              $parent->{block}->[-1]->append_child ($tbl_el);
+              $parent->{tr} = $tbody_el;
+            }
+      
+            my $tr_el = $self->{doc}->create_element_ns (<Q::xhtml2|>, 'h2:tr');
+            $parent->{tr}->append_child ($tr_el);
+            my $src = substr ($v, 1, length ($v) - 2);
+            my $prev_cell;
+            C: while ($src =~ /\G,\s*/gc) {
+              $src =~ /\G([^,"][^,]*|"(?>[^"\\]*)(?>(?>[^"\\]+|\\.)*)"\s*)/gc;
+              my $cell = defined $1 ? $1 : '';
+              if ($cell =~ s/^"//) {
+                $cell =~ s/"\s*$//g;
+                $cell =~ s/\\(.)/$1/gs;
+              } else {
+                $cell =~ s/\s+$//g;
+                if ($cell eq '==') {
+                  if (ref $prev_cell) {
+                    my $colspan = $prev_cell->get_attribute_ns (null, 'colspan');
+                    $colspan = defined $colspan ? $colspan + 1 : 1;
+                    $prev_cell->set_attribute_ns (null, colspan => $colspan);
+                    next C;
+                  }
+                }
+              }
+              $prev_cell = $self->{doc}->create_element_ns
+                                           (<Q::xhtml2|>, 'h2:td');
+              $tr_el->append_child ($prev_cell);
+
+              my $original_pos = pos $self->{source};
+              {
+                local $self->{token} = [];
+                local $self->{char} = [];
+                local $self->{source} = $cell;
+                pos ($self->{source}) = 0;
+                local $self->{location} = {};
+                local $self->{scanner} = $self->can ('_scan_Body');
+                $self->_parse_Body ({
+                  block => [$prev_cell],
+                  quote => [$prev_cell],
+                  section => [null, $prev_cell],
+                  text => [$prev_cell],
+                });
+              }
+              pos ($self->{source}) = $original_pos;
+            }
+            $parent->{text} = [];
+            $state = 'section';
+          }
+        }
+      } (formStart) {
+        my $form_el;
+        my $param;
+        my $ref;
+        lang:Perl ($v => $token.value) {
+          CORE::delete $parent->{tr};
+          $form_el = $self->{doc}->create_element_ns (<Q::sw09|>, 'form');
+          $v =~ /#([a-z-]+)/;
+          $form_el->set_attribute_ns (null, ref => $ref = $1);
+          $param = '';
+        }
+
+        ~* (text) {
+          lang:Perl ($v => $token.value) {
+            $param .= $v;
+          }
+        } (quotedPair) {
+          lang:Perl ($v => $token.value) {
+            $param .= $v;
+          }
+        } (lita) {
+          lang:Perl ($v => $token.value) {
+            $param .= "'";
+          }
+        }
+
+        ~ (formEnd) { }
+
+        lang:Perl {
+          if ($param =~ s/^\(([^()]*)\)//) {
+            $form_el->set_attribute_ns (null, id => $1);
+          }
+          if ($ref eq 'form' and
+              $param =~ m{\A
+                    : ' ((?>[^\\']*)(?>(?>[^\\']+|\\.)*)) '       ## input
+                (?> : ' ((?>[^\\']*)(?>(?>[^\\']+|\\.)*)) '       ## template
+                (?> : ' ((?>[^\\']*)(?>(?>[^\\']+|\\.)*)) ' )? )? ## option
+              \z}x) {
+            my ($in, $te, $op) = ($1, defined $2 ? $2 : '',
+                                  defined $3 ? $3 : '');
+            s/\\(.)/$1/g for $in, $te, $op;
+            $form_el->set_attribute_ns (null, input => $1);
+            $form_el->set_attribute_ns (null, template => defined $2 ? $2 : '');
+            $form_el->set_attribute_ns (null, option => defined $3 ? $3 : '');
+          } else {
+            $param =~ s/^://;
+            $form_el->set_attribute_ns (null, parameter => $param);
+          }
+
+          if (defined $parent->{text}->[0]) {
+            $parent->{text}->[-1]->append_child ($form_el);
+          } else {
+            $parent->{block}->[-1]->append_child ($form_el);
+          }
+        }
+      } (magicVersionS) {
+        lang:Perl ($v => $token.value) {
+          CORE::delete $parent->{tr};
+          __CODE{setTextParent}__;
+          $parent->{text}->[-1]->manakai_append_text (substr ($v, 1));
+        }
+        ?lexmode Body;
+      } (magicVersionI) {
+        lang:Perl ($v => $token.value) {
+          CORE::delete $parent->{tr};
+          __CODE{setTextParent}__;
+          $parent->{text}->[-1]->manakai_append_text ($v);
+        }
+        ?lexmode Body;
+      } (entityRef) {
+        lang:Perl ($v => $token.value) {
+          CORE::delete $parent->{tr};
+          my $ref_el = $self->{doc}->create_element_ns (<Q::sw09|>, 'replace');
+          $ref_el->set_attribute_ns
+                     (null, 'by', substr ($v, 4, length ($v) - 8));
+          if (defined $parent->{text}->[0]) {
+            $parent->{text}->[-1]->append_child ($ref_el);
+          } else {
+            $parent->{block}->[-1]->append_child ($ref_el);
+          }
+        }
+      } (imageStart) {
+        lang:Perl {
+          my $img_el = $self->{doc}->create_element_ns (<Q::sw09|>, 'image');
+
+          my $value = '';
+          while (my $token = shift @{$self->{token}}) {
+            $value .= $token->{value} if defined $token->{value};
+          }
+          $value =~ tr/\x0D//d;
+          $img_el->manakai_append_text ($value);
+          $value = '';
+          
+          while ((my $char = $self->_shift_char) >= 0) {
+            if ($char == 0x000D) {
+              $img_el->manakai_append_text ($value);
+              $value = '';
+            } else {
+              $value .= ord $char;
+            }
+          }
+          $img_el->manakai_append_text ($value);
+
+          $self->{doc}->document_element->append_child ($img_el);
+        }
+      } (name) {
+        lang:Perl ($v => $token.value) {
+          CORE::delete $parent->{tr};
+          __CODE{setTextParent}__;
+          $parent->{text}->[-1]->manakai_append_text ($v);
+        }
+      } (vi) {
+        lang:Perl ($v => $token.value) {
+          CORE::delete $parent->{tr};
+          __CODE{setTextParent}__;
+          $parent->{text}->[-1]->manakai_append_text ('=');
+        }
+      } (lit) {
+        lang:Perl ($v => $token.value) {
+          CORE::delete $parent->{tr};
+          __CODE{setTextParent}__;
+          $parent->{text}->[-1]->manakai_append_text ($v);
         }
       }
-    } // Document
+    } // Body
 
     rule MagicParam {
       ~* (name) {
@@ -1171,12 +1950,7 @@ IFClsDef:
 
     rule _StartTag ($parent, $element_type, $class_names, $lang_tag) {
       lang:Perl {
-        unless (defined $parent->{text}) {
-          $parent->{text} = $parent->{block}
-                                   ->append_child
-                                       ($self->{doc}->create_element_ns
-                                                       (<Q::xhtml2|>, 'h2:p'));
-        }
+        __CODE{setTextParent}__;
         my @class_names = split /\s+/, $class_names;
         my $et = {
           ABBR => [<Q::xhtml2|>, 'abbr'],
@@ -1205,37 +1979,64 @@ IFClsDef:
           $et = [<Q::xhtml2|>, 'code'];
           push @class_names, $element_type;
         }
-        $parent->{text}
-            = $parent->{text}->append_child
-                                 ($self->{doc}->create_element_ns
-                                                  ($et->[0], $et->[1]));
-        $parent->{text}
-               ->set_attribute_ns (null, 'class' => join ' ', @class_names)
+        my $el = $self->{doc}->create_element_ns ($et->[0], $et->[1]);
+        $parent->{text}->[-1]->append_child ($el);
+        $el->set_attribute_ns (null, 'class' => join ' ', @class_names)
             if @class_names;
-        $parent->{text}
-               ->set_attribute_ns (<Q::xml|>, 'xml:lang', $lang_tag)
+        $el->set_attribute_ns (<Q::xml|>, 'xml:lang', $lang_tag)
             if defined $lang_tag;
+
+        if ($element_type eq 'RUBY' or $element_type eq 'RUBYB' or
+            $element_type eq 'RUBYB') {
+          $el = $el->append_child ($self->{doc}->create_element_ns
+                                                   (<Q::xhtml2|>, 'rb'));
+        } elsif ($element_type eq 'QN') {
+          $el = $el->append_child ($self->{doc}->create_element_ns
+                                                   (<Q::sw010|>, 'qname'));
+        }
+
+        push @{$parent->{text}}, $el;
       }
     } // _StartTag
 
-  @Code:
-    @@QName: inlineContainerElementTypes
-    @@PerlDef:
-      {
-        abbr => true, code => true, del => true, dfn => true,
-        ins => true, kbd => true, q => true, samp => true, 
-        sub => true, sup => true, var => true, weak => true,
-        aa => true, cite => true, csection => true, key => true,
-        span => true, src => true, anchor => true, nsuri => true,
-        qname => true, rb => true, rt => true,
+    token-error default : default {
+      //
+    }
 
-        p => true, pre => true, h => true, li => true,
-        dt => true, dd => true, ed => true, comment-p => true,
-        td => true, em => true, strong => true,
+  @CODE:
+    @@QName: setTextParent
+    @@PerlDef:
+      unless (defined $parent->{text}->[0]) {
+        $parent->{text} = [$parent->{block}->[-1]
+                                  ->append_child
+                                      ($self->{doc}->create_element_ns
+                                                      (<Q::xhtml2|>, 'h2:p'))];
       }
 
-# document head body section bodytext insert delete
-# ul ol dl dr table tbody tr form replace ruby rubyb qn
-# anchor-external anchor-internal anchor-end text blockquote
-
+  @CODE:
+    @@QName: endTag
+    @@PerlDef:
+      if (defined $parent->{text}->[1]) {
+        if (defined $iref) {
+          $parent->{text}->[-1]->set_attribute_ns
+                                   (<Q::sw09|>, 'sw9:anchor', 0+$iref);
+        }
+        if (defined $xref) {
+          if ($xref =~ s/^([A-Z]+)://) {
+            $parent->{text}->[-1]->set_attribute_ns
+                                     (<Q::sw09|>, 'sw9:resScheme', $1);
+            $parent->{text}->[-1]->set_attribute_ns
+                                     (<Q::sw09|>, 'sw9:resParameter', $xref);
+          } else {
+            $parent->{text}->[-1]->set_attribute_ns
+                                     (<Q::sw09|>, 'sw9:resScheme', 'URI');
+            $parent->{text}->[-1]->set_attribute_ns
+                                     (<Q::sw09|>, 'sw9:resParameter', $xref);
+          }
+        }
+        $#{$parent->{text}}--;
+      } else {
+        __CODE{setTextParent}__;
+        $parent->{text}->[-1]->manakai_append_text ($tagString);
+      }
 

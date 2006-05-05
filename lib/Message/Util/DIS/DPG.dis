@@ -15,7 +15,7 @@ Module:
   @License: license|Perl+MPL
 
   @Date:
-    $Date: 2006/05/04 13:07:19 $
+    $Date: 2006/05/05 09:07:19 $
   
   @Require:
     @@Module:
@@ -1159,9 +1159,13 @@ IFClsETDef:
                               $ld-><M::pc|PerlCodeUnits.appendAtom> (0);
                               $ld-><M::pc|PerlCodeUnits.appendNewPCVariable>
                                      ('@', null, 'dch');
+                              my %val;
+                              $val{value}
+                                  = $value{value}-><M::Node.cloneNode> (true)
+                                  if defined $value{value};
                               $_-><M::pc|PerlCodeUnits.appendNewPCLiteral> ({
                                        type => $dfa->{$state_name}->{accept},
-                                       %value,
+                                       %val,
                                        location => $factory
                                             -><M::pc|PCDocument.createPCVariable>
                                                 ('$', null, 'location'),
