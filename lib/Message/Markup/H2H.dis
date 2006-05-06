@@ -13,7 +13,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/05/06 11:03:53 $
+    $Date: 2006/05/06 11:44:26 $
 
   @Require:
     @@Module:
@@ -595,10 +595,10 @@ IFClsDef:
       @@@enDesc:
         An object representation of <P::sourceText>.
       @@@PerlDef:
-        $self->{line} = [];
         $self->{token} = [];
-        $self->{source} = $sourceText;
-        pos ($self->{source}) = 0;
+        $sourceText =~ s/\x0D\x0A/\x0A/g;
+        $sourceText =~ tr/\x0D/\x0A/;
+        $self->{line} = [split /\x0A/, $sourceText];
         $self->{location} = {};
         $self->{doc} = $self->{<H::f|implementation>}
                             ->create_document (<Q::html5|>, 'html');
@@ -627,8 +627,6 @@ IFClsDef:
       @@@PerlDef:
         if (@{$self->{line}}) {
           $r = shift @{$self->{line}};
-        } elsif ($self->{source} =~ /([^\x0D\x0A]+)/gc) {
-          $r = $1;
         } else {
           $r = null;
         }
@@ -726,31 +724,31 @@ IFClsDef:
                 }
                 if (@value == 2) {
                   unshift @{$self->{line}}, 'RB',
-                                           'DATA {} '.$value[1],
+                                           'DATA {} >>'.$value[1],
                                          '/RB',
                                          'RT',
-                                           'DATA {} '.$value[0],
+                                           'DATA {} >>'.$value[0],
                                          '/RT',
                                        '/'.$command;
                 } else {
-                  unshift @{$self->{line}}, 'DATA {} '.$value[0], '/'.$command;
+                  unshift @{$self->{line}}, 'DATA {} >>'.$value[0], '/'.$command;
                 }
               } elsif ($command eq 'CITE') {
                 if (@value == 2) {
                   if (defined $uri or $value[0] !~ /^[a-z-]+:/) {
                     unshift @{$self->{line}}, 'SRC',
-                                             'DATA {} '.$value[0].' '.$value[1],
+                                             'DATA {} >>'.$value[0].' '.$value[1],
                                            '/SRC', 'BODYTEXT';
                   } else {
                     push @token, {type => 'uri', value => $uriv->($value[0])};
                     unshift @{$self->{line}}, 'SRC',
-                                             'DATA {} '.$value[1],
+                                             'DATA {} >>'.$value[1],
                                            '/SRC', 'BODYTEXT';
                   }
                 } elsif (@value == 1) {
                   if (defined $uri or $value[0] !~ /^[a-z-]+:/) {
                     unshift @{$self->{line}}, 'SRC',
-                                             'DATA {} '.$value[0],
+                                             'DATA {} >>'.$value[0],
                                            '/SRC', 'BODYTEXT';
                   } else {
                     push @token, {type => 'uri', value => $uriv->($value[0])};
@@ -761,6 +759,7 @@ IFClsDef:
                 }
               } elsif ($command eq 'DATA') {
                 my @token;
+                $line =~ s/^>>//;
                 while (length $line) {
                   if ($line =~ s/^<([a-z0-9]+)\s*//) {
                     my $tagname = $1;
@@ -823,7 +822,7 @@ IFClsDef:
                 T5 => true, T6 => true, T7 => true, SP => true,
               }->{$command}) {
                 if (@value) {
-                  unshift @{$self->{line}}, 'DATA {} '.$value[0], '/'.$command;
+                  unshift @{$self->{line}}, 'DATA {} >>'.$value[0], '/'.$command;
                 }
               } elsif ($command eq 'DIV') {
                 if (@value) {
@@ -834,57 +833,57 @@ IFClsDef:
                 $value[0] =~ s/[is]/, /;
                 $r = {type => 'start', value => 'LINK'};
                 push @token, {type => 'uri', value => "($value[0])"};
-                unshift @{$self->{line}}, 'DATA {} '.$value[1], '/LINK';
+                unshift @{$self->{line}}, 'DATA {} >>'.$value[1], '/LINK';
               } elsif ($command eq 'LIMG') {
                 $r = {type => 'start', value => 'IMG'};
                 push @token, {type => 'uri', value => $uriv->($value[0])};
-                unshift @{$self->{line}}, 'DATA {} '.$value[3], '/IMG';
+                unshift @{$self->{line}}, 'DATA {} >>'.$value[3], '/IMG';
               } elsif ($command eq 'LMG') {
                 $r = {type => 'start', value => 'IMG'};
                 push @token, {type => 'uri', value => $uriv->($value[0])};
-                unshift @{$self->{line}}, 'DATA {} '.$value[1], '/IMG';
+                unshift @{$self->{line}}, 'DATA {} >>'.$value[1], '/IMG';
               } elsif ($command eq 'LINK') {
                 if (@value == 2) {
                   push @token, {type => 'uri', value => $uriv->($value[0])};
-                  unshift @{$self->{line}}, 'DATA {} '.$value[1], '/LINK';
+                  unshift @{$self->{line}}, 'DATA {} >>'.$value[1], '/LINK';
                 } elsif ($flag =~ /\+/) {
                   push @token, {type => 'uri', value => $uriv->($value[0])};
                 } else {
-                  unshift @{$self->{line}}, 'DATA {} '.$value[0], '/LINK';
+                  unshift @{$self->{line}}, 'DATA {} >>'.$value[0], '/LINK';
                 }
               } elsif ($command eq 'NEW') {
                 $r = {type => 'start', value => 'SECTION'};
-                unshift @{$self->{line}}, 'H', 'DATA {} '.$value[0], '/H';
+                unshift @{$self->{line}}, 'H', 'DATA {} >>'.$value[0], '/H';
               } elsif ($command eq 'LNEW') {
                 $r = {type => 'start', value => 'SECTION'};
                 push @token, {type => 'uri', value => $uriv->($value[0])};
-                unshift @{$self->{line}}, 'H', 'DATA {} '.$value[1], '/H';
+                unshift @{$self->{line}}, 'H', 'DATA {} >>'.$value[1], '/H';
               } elsif ($command eq 'SUB') {
                 $r = {type => 'start', value => 'SUB'};
-                unshift @{$self->{line}}, 'H', 'DATA {} '.$value[0], '/H';
+                unshift @{$self->{line}}, 'H', 'DATA {} >>'.$value[0], '/H';
               } elsif ($command eq 'PERSON') {
                 push @token, {type => 'key', value => $attrvalue->($value[0])};
-                unshift @{$self->{line}}, 'DATA {} '.$value[1], '/PERSON';
+                unshift @{$self->{line}}, 'DATA {} >>'.$value[1], '/PERSON';
               } elsif ($command eq 'SEE') {
                 if (@value == 2) {
                   push @token, {type => 'key', value => $attrvalue->($value[0])};
-                  unshift @{$self->{line}}, 'DATA {} '.$value[1], '/SEE';
+                  unshift @{$self->{line}}, 'DATA {} >>'.$value[1], '/SEE';
                 } else {
-                  unshift @{$self->{line}}, 'DATA {} '.$value[0], '/SEE';
+                  unshift @{$self->{line}}, 'DATA {} >>'.$value[0], '/SEE';
                 }
               } elsif ($command eq 'SPAN') {
                 if (@value == 2) {
                   push @token, {type => 'class',
                                 value => $attrvalue->($value[0])};
-                  unshift @{$self->{line}}, 'DATA {} '.$value[1], '/SPAN';
+                  unshift @{$self->{line}}, 'DATA {} >>'.$value[1], '/SPAN';
                 } else {
-                  unshift @{$self->{line}}, 'DATA {} '.$value[0], '/SPAN';
+                  unshift @{$self->{line}}, 'DATA {} >>'.$value[0], '/SPAN';
                 }
               } elsif ($command eq 'OK') {
                 $r = {type => '#EOF'};
                 next L;
               } elsif ($command eq 'XML') {
-                unshift @{$self->{line}}, 'DATA {} XML '.$line;
+                unshift @{$self->{line}}, 'DATA {} >>XML '.$line;
                 next L;
               }
 
@@ -907,7 +906,7 @@ IFClsDef:
               $r = {type => 'html-comment', value => $line};
               last L;
             } else {
-              unshift @{$self->{line}}, 'DATA {} '.$line;
+              unshift @{$self->{line}}, 'DATA {} >>'.$line;
               next L;
             }
           } # L
@@ -951,10 +950,14 @@ IFClsDef:
             } else {
               $parent->{text}->manakai_append_text ("\x0A") if $state eq 'eol';
               $parent->{text}->manakai_append_text ($token->{value});
-              $state = 'data' if $state eq 'br';
+              $state = 'data';
             }
           } elsif ($token->{type} eq 'eol') {
-            $state = $state eq 'br' ? 'data' : 'eol';
+            if ($state eq 'eol') {
+              $parent->{text}->manakai_append_text ("\x0A");
+            } else {
+              $state = $state eq 'br' ? 'data' : 'eol';
+            }
           } elsif ($token->{type} eq 'start') {
             my $info = {
                       # nsuri, qname, parent, state
@@ -1044,6 +1047,7 @@ IFClsDef:
               strong => [<Q::html5|>, 'strong', $parent->{text}, 'data'],
               sup => [<Q::html5|>, 'sup', $parent->{text}, 'data'],
               table => [<Q::html5|>, 'table', $parent->{text}, 'data'],
+              tbody => [<Q::html5|>, 'tbody', $parent->{text}, 'data'],
               td => [<Q::html5|>, 'td', $parent->{text}, 'data'],
               th => [<Q::html5|>, 'th', $parent->{text}, 'data'],
               thead => [<Q::html5|>, 'thead', $parent->{text}, 'data'],
@@ -1070,9 +1074,10 @@ IFClsDef:
             }
             $parent->{attr} = $parent->{text};
             $state = {
-              <Q::html5|ul> => 'list',
-              <Q::html5|ol> => 'list',
-            }->{$parent->{text}->manakai_expanded_uri} || 'data';
+              UL => 'list',
+              OL => 'list',
+            }->{$parent->{text}->get_user_data ('command-name')}
+                || $state eq 'br' ? 'br' : 'data';
           } elsif ($token->{type} eq 'char') {
             my $el = $self->{doc}->create_element_ns (<Q::h2h|>, 'char');
             $el->manakai_append_text ($token->{value});
