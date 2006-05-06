@@ -13,7 +13,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/05/06 11:44:26 $
+    $Date: 2006/05/06 16:01:04 $
 
   @Require:
     @@Module:
@@ -476,8 +476,8 @@ FeatureDef:
   @featureQName: fe|H2H
   @QName: H2HFeature
   @FeatureVerDef:
-    @@QName: H2HFeature010
-    @@Version: 0.10
+    @@QName: H2HFeature10
+    @@Version: 1.0
     @@f:instanceOf: H2HFeature
     @@f:requires: tx|XMLFeature30
     @@enDesc:
@@ -529,9 +529,9 @@ IFClsDef:
 
   @DISLang:role: gls|ParserRole
 
-  @f:implements: H2HFeature010
+  @f:implements: H2HFeature10
   @f:provides:
-    @@@: H2HFeature010
+    @@@: H2HFeature10
     @@f:through: c|ManakaiDOMImplementation
 
   @enDesc:
@@ -577,7 +577,7 @@ IFClsDef:
         The newly created parser.
       @@@PerlDef:
         $r = bless {
-          <H::f|implementation> => $impl,
+          <H::f|implementation> => $impl->get_feature ('XML' => '3.0'),
         }, $self;
 
   @Method:

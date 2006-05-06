@@ -43,7 +43,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/04/29 11:05:09 $
+    $Date: 2006/05/06 16:01:04 $
 
   @Require:
     @@Module:
@@ -2711,6 +2711,27 @@ IFClsETDef:
         of the node.
       @@@disDef:
         @@@@dlp:cloneCode: ManakaiAtomFeedElement.categoryElements.get
+
+  @Attr:
+    @@Name: contentElement
+    @@enDesc:
+      The <XE::atom|content> child element of the node.
+    @@Type: AtomContentElement
+    @@Get:
+      @@@enDesc:
+        It <kwd:MUST> <I::return a <XE::atom|content> child element>
+        of the node.
+      @@@nullCase:
+        @@@@enDesc:
+          If the algorithm returns <DOM::null>.
+      @@@NodeReadOnlyError:
+      @@@PerlDef:
+        __CODE{returnChildElement::
+          $node => $self,
+          $namespaceURI => {<Q::atom|>},
+          $localName => 'content',
+          $r => $r,
+        }__;
 
   @Attr:
     @@Name: contributorElements

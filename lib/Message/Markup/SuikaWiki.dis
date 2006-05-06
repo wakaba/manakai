@@ -54,7 +54,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/05/05 11:19:44 $
+    $Date: 2006/05/06 16:01:04 $
 
   @Require:
     @@Module:
@@ -747,7 +747,7 @@ IFClsDef:
         The newly created parser.
       @@@PerlDef:
         $r = bless {
-          <H::f|implementation> => $impl,
+          <H::f|implementation> => $impl->get_feature ('XML' => '3.0'),
         }, $self;
 
   @Method:
