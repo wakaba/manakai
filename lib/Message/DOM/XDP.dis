@@ -1,0 +1,1985 @@
+Module:
+  @QName: MDOM|XDP
+  @enFN:
+    XDP DOM
+  @enDesc:
+    The <DFN::XDP>, <DFN::XML DTD Physical Structure DOM>
+    provides facility to compose XML DTD with its physical
+    structure.
+
+  @Namespace:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/XDP/
+
+  @DISCore:author: DISCore|Wakaba
+  @License: license|Perl+MPL
+  @Date:
+    $Date: 2006/05/13 12:06:21 $
+
+  @Require:
+    @@Module:
+      @@@QName: Markup|common
+    @@Module:
+      @@@QName: MDOM|TreeCore
+      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
+    @@Module:
+      @@@WithFor: ManakaiDOM|ManakaiDOM
+    @@Module:
+      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
+  @DefaultFor: ManakaiDOM|ManakaiDOMLatest
+
+Namespace:
+  @atom:
+    http://www.w3.org/2005/Atom
+  @c:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
+  @cfg:
+    http://suika.fam.cx/www/2006/dom-config/
+  @dis:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
+  @doc:
+    http://suika.fam.cx/~wakaba/archive/2005/7/tutorial#
+  @d:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/xdt#
+  @DOMMain:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/main#
+  @dx:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#
+  @ecore:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/Core/
+  @f:
+    http://suika.fam.cx/~wakaba/archive/2004/dom/feature#
+  @fe:
+    http://suika.fam.cx/www/2006/feature/
+  @html:
+    http://www.w3.org/1999/xhtml
+  @idl:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/IDL#
+  @kwd:
+    http://suika.fam.cx/~wakaba/archive/2005/rfc2119/
+  @lang:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
+  @license:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
+  @ManakaiDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
+  @Markup:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Markup#
+  @mat:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Markup/Atom/
+  @MDOM:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
+  @MDOMX:
+    http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
+  @dlp:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Perl#
+  @rel:
+    http://www.iana.org/assignments/relation/
+  @s:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Markup#
+  @tc:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/TreeCore/
+  @td:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/Document/
+  @te:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/Element/
+  @test:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Test#
+  @trv:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/Traversal/
+  @tx:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/XML/
+  @urigen:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/URI/Generic/
+  @xdp:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/XDP/
+  @xml:
+    http://www.w3.org/XML/1998/namespace
+
+ElementTypeBinding:
+  @Name: CODE
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: dlp|BlockCode
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: Method
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISLang|Method
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM
+
+ElementTypeBinding:
+  @Name: Param
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISLang|MethodParameter
+
+ElementTypeBinding:
+  @Name: Return
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISLang|MethodReturn
+
+ElementTypeBinding:
+  @Name: Attr
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISLang|Attribute
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM
+
+ElementTypeBinding:
+  @Name: CAttr
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISLang|Attribute
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: Get
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISLang|AttributeGet
+
+ElementTypeBinding:
+  @Name: Set
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISLang|AttributeSet
+
+ElementTypeBinding:
+  @Name: nullCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: ManakaiDOM|InCase
+    @@Value:
+      @@@is-null:1
+
+ElementTypeBinding:
+  @Name: PerlDef
+  @ElementType:
+    dis:Def
+  @ShadowContent:
+    @@ContentType: lang|Perl
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: PerlCDef
+  @ElementType:
+    dis:Def
+  @ShadowContent:
+    @@ContentType: lang|Perl
+
+ElementTypeBinding:
+  @Name: enImplNote
+  @ElementType:
+    dis:ImplNote
+  @ShadowContent:
+    @@lang:en
+
+ElementTypeBinding:
+  @Name: enFN
+  @ElementType:
+    dis:FullName
+  @ShadowContent:
+    @@lang:en
+
+ElementTypeBinding:
+  @Name: IFClsETDef
+  @ElementType: 
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType:
+      @@@@: dis|MultipleResource
+      @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass !s|ForML
+    @@resourceFor: ManakaiDOM|ForIF
+    @@resourceFor: ManakaiDOM|ForClass
+    @@resourceFor: s|ForML
+    @@For: ManakaiDOM|ManakaiDOM
+
+    @@DISCore:resourceType:
+      @@@@: DISLang|Interface
+      @@@ForCheck: ManakaiDOM|ForIF
+
+    @@DISCore:resourceType:
+      @@@@: DISLang|Class
+      @@@ForCheck: ManakaiDOM|ForClass
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOM||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
+
+    @@s:elementType:
+      @@@@: ||+||s|ForML
+      @@@ContentType: DISCore|TFPQNames
+      @@@DISCore:stopISARecursive:1
+
+    @@DISCore:resourceType:
+      @@@@: s|ElementType
+      @@@ForCheck: s|ForML
+
+    @@f:implements: XDPFeature30
+
+ElementTypeBinding:
+  @Name: IFClsDef
+  @ElementType: 
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType:
+      @@@@: dis|MultipleResource
+      @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass !s|ForML
+    @@resourceFor: ManakaiDOM|ForIF
+    @@resourceFor: ManakaiDOM|ForClass
+    @@For: ManakaiDOM|ManakaiDOM
+
+    @@DISCore:resourceType:
+      @@@@: DISLang|Interface
+      @@@ForCheck: ManakaiDOM|ForIF
+
+    @@DISCore:resourceType:
+      @@@@: DISLang|Class
+      @@@ForCheck: ManakaiDOM|ForClass
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOM||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
+
+    @@f:implements: XDPFeature30
+
+ElementTypeBinding:
+  @Name: IFQName
+  @ElementType:
+    dis:QName
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForIF
+
+ElementTypeBinding:
+  @Name: ClsQName
+  @ElementType:
+    dis:QName
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: ETRQName
+  @ElementType:
+    dis:QName
+  @ShadowContent:
+    @@ForCheck: s|ForML
+
+ElementTypeBinding:
+  @Name: ETQName
+  @ElementType:
+    dis:AppName
+  @ShadowContent:
+    @@ForCheck: s|ForML
+    @@ContentType: DISCore|QName
+
+ElementTypeBinding:
+  @Name: IFISA
+  @ElementType:
+    dis:ISA
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForIF
+
+ElementTypeBinding:
+  @Name: ClsISA
+  @ElementType:
+    dis:ISA
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: disDef
+  @ElementType:
+    dis:Def
+  @ShadowContent:
+    @@ContentType:
+      lang:dis
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: Code
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: dlp|InlineCode
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: Test
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: test|StandaloneTest
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
+  @Name: TestC
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: test|StandaloneTest
+
+ResourceDef:
+  @QName: Document
+  @AliasFor: td|Document
+  @For: ManakaiDOM|DOM
+
+ResourceDef:
+  @QName: Element
+  @AliasFor: te|Element
+  @For: ManakaiDOM|DOM
+
+ResourceDef:
+  @QName: Attr
+  @AliasFor: te|Attr
+  @For: ManakaiDOM|DOM
+
+ResourceDef:
+  @QName: Text
+  @AliasFor: te|Text
+  @For: ManakaiDOM|DOM
+
+ResourceDef:
+  @QName: DOMString
+  @AliasFor: DOMMain|DOMString
+  @For: ManakaiDOM|DOM
+
+ResourceDef:
+  @QName: boolean
+  @AliasFor: idl|boolean||ManakaiDOM|all
+
+ResourceDef:
+  @QName: Node
+  @AliasFor: tc|Node
+  @For: ManakaiDOM|ManakaiDOM
+
+ResourceDef:
+  @QName: NodeFilter
+  @AliasFor: trv|NodeFilter
+  @For: ManakaiDOM|DOM2
+
+ResourceDef:
+  @QName: TreeWalker
+  @AliasFor: trv|TreeWalker
+  @For: ManakaiDOM|DOM2
+
+ElementTypeBinding:
+  @Name: enDesc
+  @ElementType:
+    dis:Description
+  @ShadowContent:
+    @@lang:en
+
+ElementTypeBinding:
+  @Name: TrueCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType:
+      ManakaiDOM:InCase
+    @@Value:
+      @@@@: 1
+      @@@ContentType: DISCore|Boolean
+    @@Type: idl|boolean||ManakaiDOM|all
+
+ElementTypeBinding:
+  @Name: FalseCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType:
+      ManakaiDOM:InCase
+    @@Value:
+      @@@@: 0
+      @@@ContentType: DISCore|Boolean
+    @@Type: idl|boolean||ManakaiDOM|all
+
+## -- Features
+
+ElementTypeBinding:
+  @Name: FeatureDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: f|Feature
+    @@For: =ManakaiDOM|all
+
+ElementTypeBinding:
+  @Name: FeatureVerDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: f|Feature
+
+ElementTypeBinding:
+  @Name: featureQName
+  @ElementType:
+    f:name
+  @ShadowContent:
+    @@ContentType: DISCore|QName
+
+FeatureDef:
+  @featureQName: fe|XDP
+  @QName: XDPFeature
+  @FeatureVerDef:
+    @@QName: XDPFeature30
+    @@Version: 3.0
+    @@f:instanceOf: XDPFeature
+    @@f:requires: tx|XMLFeature30
+    @@enDesc:
+      The XDP DOM, version 3.0.
+
+## -- Document
+
+IFClsDef:
+  @IFQName: XDPDocument
+  @ClsQName: ManakaiDOMXDPDocument
+
+  @IFISA: Document
+  @ClsISA: td|ManakaiDOMDocument
+
+  @f:implements: XDPFeature30
+  @f:provides:
+    @@@: XDPFeature30
+    @@f:through: c|ManakaiDOMImplementation
+
+  @enDesc:
+    The <IF::XDPDocument> interface provides a set of methods
+    to create instances of XDP interfaces.
+
+    If the implementation supports the <Feature::fe|XDP> feature
+    version <Feature::3.0>, <IF::Document> objects <kwd:MUST> also
+    implement the <IF::XDPDocument> interface.
+
+  @Test:
+    @@QName: XDPDocument.interface.test
+    @@PerlDef:
+      for (
+        <IFName::XDPDocument>,
+        <IFName::Document>,
+        <IFName::Node>,
+        <IFName::f|GetFeature>,
+      ) {
+        $test->id ($_);
+        $test->assert_true (<Class::ManakaiDOMXDPDocument>->isa ($_));
+      }
+
+  @Test:
+    @@QName: Document.getFeature.XDPDocument.test
+    @@PerlDef:
+      my $doc;
+      __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+      my $docp = $doc->get_feature (<Q::fe|XDP>, '3.0');
+
+      $test->id ($docp, <IFName::XDPDocument>);
+
+  @CODE:
+    @@QName: createXDPDocumentForTest
+    @@PerlDef:
+      my $__edoc;
+      __CODE{tc|createEmptyDocumentForTest:: $doc => $__edoc}__;
+      $doc = $__edoc->get_feature (<Q::fe|XDP> => '3.0');
+
+  @Method:
+    @@Name: createXDPS
+    @@dlp:methodName: create_xdp_s
+    @@enDesc:
+      Creates a <XE::xdp|s> element.
+    @@Param:
+      @@@Name: value
+      @@@Type: DOMString
+      @@@enDesc:
+        The value of the element.
+      @@@nullCase:
+        @@@@enDesc:
+          The element's <A::Node.textContent> is set to
+          a <CHAR::SPACE>.
+    @@Return:
+      @@@Type: XDPElement
+      @@@enDesc:
+        The newly created element node.
+
+        {P:: A new <IF::Element> node with following attributes
+             <kwd:MUST> be returned:
+
+           - <A::Node.localName>::: <XE::s>.
+
+           - <A::Node.namespaceURI>::: <URI^^DISCore|QName::xdp|>.
+
+           - <A::Node.ownerDocument>::: The document.
+
+           - <A::Node.textContent>::: <P::value>, or a <CHAR::SPACE>
+                                      if <P::value> is <DOM::null>.
+           
+        }
+
+        If <IF::Text> nodes are created, its
+        <A::Text.isElementContentWhitespace> attribute value
+        <kwd:MUST> be set to <DOM::false>.
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><M::Document.createElementNS> (<Q::xdp|>, 's');
+          $r-><AS::Node.textContent> (defined $value ? $value : ' ');
+        }__;
+
+    @@Test:
+      @@@QName: XDPDocument.createXDPS.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{createXDPDocumentForTest}__;
+
+        my $value = "\t";
+        my $el = $doc-><M::XDPDocument.createXDPS> ($value);
+
+        $test->id ('interface');
+        $test->assert_isa ($el, <IFName::XDPElement>);
+
+        $test->id ('namespaceURI');
+        $test->assert_equals ($el-><AG::Node.namespaceURI>, <Q::xdp|>);
+
+        $test->id ('localName');
+        $test->assert_equals ($el-><AG::Node.localName>, 's');
+
+        $test->id ('textContent');
+        $test->assert_equals ($el-><AG::Node.textContent>, $value);
+
+        $test->id ('dtdText');
+        $test->assert_equals ($el-><AG::XDPElement.dtdText>, $value);
+    @@Test:
+      @@@QName: XDPDocument.createXDPS.2.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{createXDPDocumentForTest}__;
+
+        my $value = null;
+        my $el = $doc-><M::XDPDocument.createXDPS> ($value);
+
+        $test->id ('interface');
+        $test->assert_isa ($el, <IFName::XDPElement>);
+
+        $test->id ('namespaceURI');
+        $test->assert_equals ($el-><AG::Node.namespaceURI>, <Q::xdp|>);
+
+        $test->id ('localName');
+        $test->assert_equals ($el-><AG::Node.localName>, 's');
+
+        $test->id ('textContent');
+        $test->assert_equals ($el-><AG::Node.textContent>, ' ');
+
+        $test->id ('dtdText');
+        $test->assert_equals ($el-><AG::XDPElement.dtdText>, ' ');
+
+  @Method:
+    @@Name: createXDPName
+    @@enDesc:
+      Creates a <XE::xdp|name> element.
+    @@Param:
+      @@@Name: value
+      @@@Type: DOMString
+      @@@enDesc:
+        The value of the element.
+      @@@nullCase:
+        @@@@enDesc:
+          Same as an empty string.
+    @@Return:
+      @@@Type: XDPElement
+      @@@enDesc:
+        The newly created element node.
+
+        {P:: A new <IF::Element> node with following attributes
+             <kwd:MUST> be returned:
+
+           - <A::Node.localName>::: <XE::name>.
+
+           - <A::Node.namespaceURI>::: <URI^^DISCore|QName::xdp|>.
+
+           - <A::Node.ownerDocument>::: The document.
+
+           - <A::Node.textContent>::: <P::value>, or an empty
+                                      string if <P::value> is <DOM::null>.
+           
+        }
+
+        If <IF::Text> nodes are created, its
+        <A::Text.isElementContentWhitespace> attribute value
+        <kwd:MUST> be set to <DOM::false>.
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><M::Document.createElementNS> (<Q::xdp|>, 'name');
+          $r-><AS::Node.textContent> (defined $value ? $value : '');
+        }__;
+
+    @@Test:
+      @@@QName: XDPDocument.createXDPName.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{createXDPDocumentForTest}__;
+
+        my $value = "example-name";
+        my $el = $doc-><M::XDPDocument.createXDPName> ($value);
+
+        $test->id ('interface');
+        $test->assert_isa ($el, <IFName::XDPElement>);
+
+        $test->id ('namespaceURI');
+        $test->assert_equals ($el-><AG::Node.namespaceURI>, <Q::xdp|>);
+
+        $test->id ('localName');
+        $test->assert_equals ($el-><AG::Node.localName>, 'name');
+
+        $test->id ('textContent');
+        $test->assert_equals ($el-><AG::Node.textContent>, $value);
+
+        $test->id ('dtdText');
+        $test->assert_equals ($el-><AG::XDPElement.dtdText>, $value);
+    @@Test:
+      @@@QName: XDPDocument.createXDPName.2.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{createXDPDocumentForTest}__;
+
+        my $value = "example-name";
+        my $el = $doc-><M::XDPDocument.createXDPName> (null);
+
+        $test->id ('interface');
+        $test->assert_isa ($el, <IFName::XDPElement>);
+
+        $test->id ('namespaceURI');
+        $test->assert_equals ($el-><AG::Node.namespaceURI>, <Q::xdp|>);
+
+        $test->id ('localName');
+        $test->assert_equals ($el-><AG::Node.localName>, 'name');
+
+        $test->id ('textContent');
+        $test->assert_equals ($el-><AG::Node.textContent>, '');
+
+        $test->id ('dtdText');
+        $test->assert_equals ($el-><AG::XDPElement.dtdText>, '');
+
+  @Method:
+    @@Name: createXDPNmtoken
+    @@enDesc:
+      Creates a <XE::xdp|nmtoken> element.
+    @@Param:
+      @@@Name: value
+      @@@Type: DOMString
+      @@@enDesc:
+        The value of the element.
+      @@@nullCase:
+        @@@@enDesc:
+          Same as an empty string.
+    @@Return:
+      @@@Type: XDPElement
+      @@@enDesc:
+        The newly created element node.
+
+        {P:: A new <IF::Element> node with following attributes
+             <kwd:MUST> be returned:
+
+           - <A::Node.localName>::: <XE::nmtoken>.
+
+           - <A::Node.namespaceURI>::: <URI^^DISCore|QName::xdp|>.
+
+           - <A::Node.ownerDocument>::: The document.
+
+           - <A::Node.textContent>::: <P::value>, or an empty
+                                      string if <P::value> is <DOM::null>.
+           
+        }
+
+        If <IF::Text> nodes are created, its
+        <A::Text.isElementContentWhitespace> attribute value
+        <kwd:MUST> be set to <DOM::false>.
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><M::Document.createElementNS> (<Q::xdp|>, 'nmtoken');
+          $r-><AS::Node.textContent> (defined $value ? $value : '');
+        }__;
+
+    @@Test:
+      @@@QName: XDPDocument.createXDPNmtoken.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{createXDPDocumentForTest}__;
+
+        my $value = "example-name";
+        my $el = $doc-><M::XDPDocument.createXDPNmtoken> ($value);
+
+        $test->id ('interface');
+        $test->assert_isa ($el, <IFName::XDPElement>);
+
+        $test->id ('namespaceURI');
+        $test->assert_equals ($el-><AG::Node.namespaceURI>, <Q::xdp|>);
+
+        $test->id ('localName');
+        $test->assert_equals ($el-><AG::Node.localName>, 'nmtoken');
+
+        $test->id ('textContent');
+        $test->assert_equals ($el-><AG::Node.textContent>, $value);
+
+        $test->id ('dtdText');
+        $test->assert_equals ($el-><AG::XDPElement.dtdText>, $value);
+    @@Test:
+      @@@QName: XDPDocument.createXDPNmtoken.2.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{createXDPDocumentForTest}__;
+
+        my $el = $doc-><M::XDPDocument.createXDPNmtoken> (null);
+
+        $test->id ('interface');
+        $test->assert_isa ($el, <IFName::XDPElement>);
+
+        $test->id ('namespaceURI');
+        $test->assert_equals ($el-><AG::Node.namespaceURI>, <Q::xdp|>);
+
+        $test->id ('localName');
+        $test->assert_equals ($el-><AG::Node.localName>, 'nmtoken');
+
+        $test->id ('textContent');
+        $test->assert_equals ($el-><AG::Node.textContent>, '');
+
+        $test->id ('dtdText');
+        $test->assert_equals ($el-><AG::XDPElement.dtdText>, '');
+
+  @Method:
+    @@Name: createXDPKeyword
+    @@enDesc:
+      Creates a <XE::xdp|keyword> element.
+    @@Param:
+      @@@Name: value
+      @@@Type: DOMString
+      @@@enDesc:
+        The value of the element.
+      @@@nullCase:
+        @@@@enDesc:
+          Same as an empty string.
+    @@Return:
+      @@@Type: XDPElement
+      @@@enDesc:
+        The newly created element node.
+
+        {P:: A new <IF::Element> node with following attributes
+             <kwd:MUST> be returned:
+
+           - <A::Node.localName>::: <XE::keyword>.
+
+           - <A::Node.namespaceURI>::: <URI^^DISCore|QName::xdp|>.
+
+           - <A::Node.ownerDocument>::: The document.
+
+           - <A::Node.textContent>::: <P::value>, or an empty
+                                      string if <P::value> is <DOM::null>.
+           
+        }
+
+        If <IF::Text> nodes are created, its
+        <A::Text.isElementContentWhitespace> attribute value
+        <kwd:MUST> be set to <DOM::false>.
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><M::Document.createElementNS> (<Q::xdp|>, 'keyword');
+          $r-><AS::Node.textContent> (defined $value ? $value : '');
+        }__;
+
+    @@Test:
+      @@@QName: XDPDocument.createXDPKeyword.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{createXDPDocumentForTest}__;
+
+        my $value = "PUBLIC";
+        my $el = $doc-><M::XDPDocument.createXDPKeyword> ($value);
+
+        $test->id ('interface');
+        $test->assert_isa ($el, <IFName::XDPElement>);
+
+        $test->id ('namespaceURI');
+        $test->assert_equals ($el-><AG::Node.namespaceURI>, <Q::xdp|>);
+
+        $test->id ('localName');
+        $test->assert_equals ($el-><AG::Node.localName>, 'keyword');
+
+        $test->id ('textContent');
+        $test->assert_equals ($el-><AG::Node.textContent>, $value);
+
+        $test->id ('dtdText');
+        $test->assert_equals ($el-><AG::XDPElement.dtdText>, $value);
+    @@Test:
+      @@@QName: XDPDocument.createXDPKeyword.2.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{createXDPDocumentForTest}__;
+
+        my $el = $doc-><M::XDPDocument.createXDPKeyword> (null);
+
+        $test->id ('interface');
+        $test->assert_isa ($el, <IFName::XDPElement>);
+
+        $test->id ('namespaceURI');
+        $test->assert_equals ($el-><AG::Node.namespaceURI>, <Q::xdp|>);
+
+        $test->id ('localName');
+        $test->assert_equals ($el-><AG::Node.localName>, 'keyword');
+
+        $test->id ('textContent');
+        $test->assert_equals ($el-><AG::Node.textContent>, '');
+
+        $test->id ('dtdText');
+        $test->assert_equals ($el-><AG::XDPElement.dtdText>, '');
+
+  @Method:
+    @@Name: createXDPRNIKeyword
+    @@enDesc:
+      Creates a <XE::xdp|rni-keyword> element.
+    @@Param:
+      @@@Name: value
+      @@@Type: DOMString
+      @@@enDesc:
+        The value of the element.
+      @@@nullCase:
+        @@@@enDesc:
+          Same as an empty string.
+    @@Return:
+      @@@Type: XDPRNIKeywordElement
+      @@@enDesc:
+        The newly created element node.
+
+        {P:: A new <IF::Element> node with following attributes
+             <kwd:MUST> be returned:
+
+           - <A::Node.localName>::: <XE::rni-keyword>.
+
+           - <A::Node.namespaceURI>::: <URI^^DISCore|QName::xdp|>.
+
+           - <A::Node.ownerDocument>::: The document.
+
+           - <A::Node.textContent>::: <P::value>, or an empty
+                                      string if <P::value> is <DOM::null>.
+           
+        }
+
+        If <IF::Text> nodes are created, its
+        <A::Text.isElementContentWhitespace> attribute value
+        <kwd:MUST> be set to <DOM::false>.
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><M::Document.createElementNS> (<Q::xdp|>, 'rni-keyword');
+          $r-><AS::Node.textContent> (defined $value ? $value : '');
+        }__;
+
+    @@Test:
+      @@@QName: XDPDocument.createXDPRNIKeyword.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{createXDPDocumentForTest}__;
+
+        my $value = "PCDATA";
+        my $el = $doc-><M::XDPDocument.createXDPRNIKeyword> ($value);
+
+        $test->id ('interface');
+        $test->assert_isa ($el, <IFName::XDPElement>);
+
+        $test->id ('namespaceURI');
+        $test->assert_equals ($el-><AG::Node.namespaceURI>, <Q::xdp|>);
+
+        $test->id ('localName');
+        $test->assert_equals ($el-><AG::Node.localName>, 'rni-keyword');
+
+        $test->id ('textContent');
+        $test->assert_equals ($el-><AG::Node.textContent>, $value);
+
+        $test->id ('dtdText');
+        $test->assert_equals ($el-><AG::XDPElement.dtdText>, '#'.$value);
+    @@Test:
+      @@@QName: XDPDocument.createXDPRNIKeyword.2.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{createXDPDocumentForTest}__;
+
+        my $el = $doc-><M::XDPDocument.createXDPRNIKeyword> (null);
+
+        $test->id ('interface');
+        $test->assert_isa ($el, <IFName::XDPElement>);
+
+        $test->id ('namespaceURI');
+        $test->assert_equals ($el-><AG::Node.namespaceURI>, <Q::xdp|>);
+
+        $test->id ('localName');
+        $test->assert_equals ($el-><AG::Node.localName>, 'rni-keyword');
+
+        $test->id ('textContent');
+        $test->assert_equals ($el-><AG::Node.textContent>, '');
+
+        $test->id ('dtdText');
+        $test->assert_equals ($el-><AG::XDPElement.dtdText>, '#');
+
+  @Method:
+    @@Name: createXDPDelimiter
+    @@enDesc:
+      Creates a <XE::xdp|delimiter> element.
+    @@Param:
+      @@@Name: value
+      @@@Type: DOMString
+      @@@enDesc:
+        The value of the element.
+      @@@nullCase:
+        @@@@enDesc:
+          Same as an empty string.
+    @@Return:
+      @@@Type: XDPElement
+      @@@enDesc:
+        The newly created element node.
+
+        {P:: A new <IF::Element> node with following attributes
+             <kwd:MUST> be returned:
+
+           - <A::Node.localName>::: <XE::delimiter>.
+
+           - <A::Node.namespaceURI>::: <URI^^DISCore|QName::xdp|>.
+
+           - <A::Node.ownerDocument>::: The document.
+
+           - <A::Node.textContent>::: <P::value>, or an empty
+                                      string if <P::value> is <DOM::null>.
+           
+        }
+
+        If <IF::Text> nodes are created, its
+        <A::Text.isElementContentWhitespace> attribute value
+        <kwd:MUST> be set to <DOM::false>.
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><M::Document.createElementNS> (<Q::xdp|>, 'delimiter');
+          $r-><AS::Node.textContent> (defined $value ? $value : '');
+        }__;
+
+    @@Test:
+      @@@QName: XDPDocument.createXDPDelimiter.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{createXDPDocumentForTest}__;
+
+        my $value = "%";
+        my $el = $doc-><M::XDPDocument.createXDPDelimiter> ($value);
+
+        $test->id ('interface');
+        $test->assert_isa ($el, <IFName::XDPElement>);
+
+        $test->id ('namespaceURI');
+        $test->assert_equals ($el-><AG::Node.namespaceURI>, <Q::xdp|>);
+
+        $test->id ('localName');
+        $test->assert_equals ($el-><AG::Node.localName>, 'delimiter');
+
+        $test->id ('textContent');
+        $test->assert_equals ($el-><AG::Node.textContent>, $value);
+
+        $test->id ('dtdText');
+        $test->assert_equals ($el-><AG::XDPElement.dtdText>, $value);
+    @@Test:
+      @@@QName: XDPDocument.createXDPDelimiter.2.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{createXDPDocumentForTest}__;
+
+        my $el = $doc-><M::XDPDocument.createXDPDelimiter> (null);
+
+        $test->id ('interface');
+        $test->assert_isa ($el, <IFName::XDPElement>);
+
+        $test->id ('namespaceURI');
+        $test->assert_equals ($el-><AG::Node.namespaceURI>, <Q::xdp|>);
+
+        $test->id ('localName');
+        $test->assert_equals ($el-><AG::Node.localName>, 'delimiter');
+
+        $test->id ('textContent');
+        $test->assert_equals ($el-><AG::Node.textContent>, '');
+
+        $test->id ('dtdText');
+        $test->assert_equals ($el-><AG::XDPElement.dtdText>, '');
+
+  @Method:
+    @@Name: createXDPEntityValue
+    @@enDesc:
+      Creates a <XE::xdp|entity-value> element.
+    @@Param:
+      @@@Name: value
+      @@@Type: DOMString
+      @@@enDesc:
+        The value of the element.
+      @@@nullCase:
+        @@@@enDesc:
+          Same as an empty string.
+    @@Return:
+      @@@Type: XDPEntityValueElement
+      @@@enDesc:
+        The newly created element node.
+
+        {P:: A new <IF::Element> node with following attributes
+             <kwd:MUST> be returned:
+
+           - <A::Node.localName>::: <XE::entity-value>.
+
+           - <A::Node.namespaceURI>::: <URI^^DISCore|QName::xdp|>.
+
+           - <A::Node.ownerDocument>::: The document.
+
+           - <A::Node.textContent>::: <P::value>, or an empty
+                                      string if <P::value> is <DOM::null>.
+           
+        }
+
+        If <IF::Text> nodes are created, its
+        <A::Text.isElementContentWhitespace> attribute value
+        <kwd:MUST> be set to <DOM::false>.
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><M::Document.createElementNS> (<Q::xdp|>, 'entity-value');
+          $r-><AS::Node.textContent> (defined $value ? $value : '');
+        }__;
+
+    @@Test:
+      @@@QName: XDPDocument.createXDPEntityValue.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{createXDPDocumentForTest}__;
+
+        my $value = q<a%b;c&d;e"f"g'h'i>;
+        my $qvalue = q<'a&#x25;b;c&#x26;d;e"f"g&#x27;h&#x27;i'>;
+        my $el = $doc-><M::XDPDocument.createXDPEntityValue> ($value);
+
+        $test->id ('interface');
+        $test->assert_isa ($el, <IFName::XDPEntityValueElement>);
+
+        $test->id ('namespaceURI');
+        $test->assert_equals ($el-><AG::Node.namespaceURI>, <Q::xdp|>);
+
+        $test->id ('localName');
+        $test->assert_equals ($el-><AG::Node.localName>, 'entity-value');
+
+        $test->id ('textContent');
+        $test->assert_equals ($el-><AG::Node.textContent>, $value);
+
+        $test->id ('dtdText');
+        $test->assert_equals ($el-><AG::XDPElement.dtdText>, $qvalue);
+    @@Test:
+      @@@QName: XDPDocument.createXDPEntityValue.2.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{createXDPDocumentForTest}__;
+
+        my $el = $doc-><M::XDPDocument.createXDPEntityValue> (null);
+
+        $test->id ('interface');
+        $test->assert_isa ($el, <IFName::XDPEntityValueElement>);
+
+        $test->id ('namespaceURI');
+        $test->assert_equals ($el-><AG::Node.namespaceURI>, <Q::xdp|>);
+
+        $test->id ('localName');
+        $test->assert_equals ($el-><AG::Node.localName>, 'entity-value');
+
+        $test->id ('textContent');
+        $test->assert_equals ($el-><AG::Node.textContent>, '');
+
+        $test->id ('dtdText');
+        $test->assert_equals ($el-><AG::XDPElement.dtdText>, '""');
+
+  @Method:
+    @@Name: createXDPMinimumLiteral
+    @@enDesc:
+      Creates a <XE::xdp|minimum-literal> element.
+    @@Param:
+      @@@Name: value
+      @@@Type: DOMString
+      @@@enDesc:
+        The value of the element.
+      @@@nullCase:
+        @@@@enDesc:
+          Same as an empty string.
+    @@Return:
+      @@@Type: XDPMinimumLiteralElement
+      @@@enDesc:
+        The newly created element node.
+
+        {P:: A new <IF::Element> node with following attributes
+             <kwd:MUST> be returned:
+
+           - <A::Node.localName>::: <XE::minimum-literal>.
+
+           - <A::Node.namespaceURI>::: <URI^^DISCore|QName::xdp|>.
+
+           - <A::Node.ownerDocument>::: The document.
+
+           - <A::Node.textContent>::: <P::value>, or an empty
+                                      string if <P::value> is <DOM::null>.
+           
+        }
+
+        If <IF::Text> nodes are created, its
+        <A::Text.isElementContentWhitespace> attribute value
+        <kwd:MUST> be set to <DOM::false>.
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><M::Document.createElementNS>
+                        (<Q::xdp|>, 'minimum-literal');
+          $r-><AS::Node.textContent> (defined $value ? $value : '');
+        }__;
+
+    @@Test:
+      @@@QName: XDPDocument.createXDPMinimumLiteral.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{createXDPDocumentForTest}__;
+
+        my $value = q<a%b;c&d;e"f"g'h'i>;
+        my $qvalue = q<"a%b;c&d;e%22f%22g'h'i">;
+        my $el = $doc-><M::XDPDocument.createXDPMinimumLiteral> ($value);
+
+        $test->id ('interface');
+        $test->assert_isa ($el, <IFName::XDPMinimumLiteralElement>);
+
+        $test->id ('namespaceURI');
+        $test->assert_equals ($el-><AG::Node.namespaceURI>, <Q::xdp|>);
+
+        $test->id ('localName');
+        $test->assert_equals ($el-><AG::Node.localName>, 'minimum-literal');
+
+        $test->id ('textContent');
+        $test->assert_equals ($el-><AG::Node.textContent>, $value);
+
+        $test->id ('dtdText');
+        $test->assert_equals ($el-><AG::XDPElement.dtdText>, $qvalue);
+    @@Test:
+      @@@QName: XDPDocument.createXDPMinimumLiteral.2.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{createXDPDocumentForTest}__;
+
+        my $el = $doc-><M::XDPDocument.createXDPMinimumLiteral> (null);
+
+        $test->id ('interface');
+        $test->assert_isa ($el, <IFName::XDPMinimumLiteralElement>);
+
+        $test->id ('namespaceURI');
+        $test->assert_equals ($el-><AG::Node.namespaceURI>, <Q::xdp|>);
+
+        $test->id ('localName');
+        $test->assert_equals ($el-><AG::Node.localName>, 'minimum-literal');
+
+        $test->id ('textContent');
+        $test->assert_equals ($el-><AG::Node.textContent>, '');
+
+        $test->id ('dtdText');
+        $test->assert_equals ($el-><AG::XDPElement.dtdText>, '""');
+
+  @Method:
+    @@Name: createXDPSystemLiteral
+    @@enDesc:
+      Creates a <XE::xdp|system-literal> element.
+    @@Param:
+      @@@Name: value
+      @@@Type: DOMString
+      @@@enDesc:
+        The value of the element.
+      @@@nullCase:
+        @@@@enDesc:
+          Same as an empty string.
+    @@Return:
+      @@@Type: XDPSystemLiteralElement
+      @@@enDesc:
+        The newly created element node.
+
+        {P:: A new <IF::Element> node with following attributes
+             <kwd:MUST> be returned:
+
+           - <A::Node.localName>::: <XE::system-literal>.
+
+           - <A::Node.namespaceURI>::: <URI^^DISCore|QName::xdp|>.
+
+           - <A::Node.ownerDocument>::: The document.
+
+           - <A::Node.textContent>::: <P::value>, or an empty
+                                      string if <P::value> is <DOM::null>.
+           
+        }
+
+        If <IF::Text> nodes are created, its
+        <A::Text.isElementContentWhitespace> attribute value
+        <kwd:MUST> be set to <DOM::false>.
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><M::Document.createElementNS>
+                        (<Q::xdp|>, 'system-literal');
+          $r-><AS::Node.textContent> (defined $value ? $value : '');
+        }__;
+
+    @@Test:
+      @@@QName: XDPDocument.createXDPSystemLiteral.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{createXDPDocumentForTest}__;
+
+        my $value = q<a%b;c&d;e"f"g'h'i>;
+        my $qvalue = q<"a%b;c&d;e%22f%22g'h'i">;
+        my $el = $doc-><M::XDPDocument.createXDPSystemLiteral> ($value);
+
+        $test->id ('interface');
+        $test->assert_isa ($el, <IFName::XDPSystemLiteralElement>);
+
+        $test->id ('namespaceURI');
+        $test->assert_equals ($el-><AG::Node.namespaceURI>, <Q::xdp|>);
+
+        $test->id ('localName');
+        $test->assert_equals ($el-><AG::Node.localName>, 'system-literal');
+
+        $test->id ('textContent');
+        $test->assert_equals ($el-><AG::Node.textContent>, $value);
+
+        $test->id ('dtdText');
+        $test->assert_equals ($el-><AG::XDPElement.dtdText>, $qvalue);
+    @@Test:
+      @@@QName: XDPDocument.createXDPSystemLiteral.2.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{createXDPDocumentForTest}__;
+
+        my $el = $doc-><M::XDPDocument.createXDPSystemLiteral> (null);
+
+        $test->id ('interface');
+        $test->assert_isa ($el, <IFName::XDPSystemLiteralElement>);
+
+        $test->id ('namespaceURI');
+        $test->assert_equals ($el-><AG::Node.namespaceURI>, <Q::xdp|>);
+
+        $test->id ('localName');
+        $test->assert_equals ($el-><AG::Node.localName>, 'system-literal');
+
+        $test->id ('textContent');
+        $test->assert_equals ($el-><AG::Node.textContent>, '');
+
+        $test->id ('dtdText');
+        $test->assert_equals ($el-><AG::XDPElement.dtdText>, '""');
+
+  @Method:
+    @@Name: createXDPAttrLiteral
+    @@enDesc:
+      Creates a <XE::xdp|attr-literal> element.
+    @@Param:
+      @@@Name: value
+      @@@Type: DOMString
+      @@@enDesc:
+        The value of the element.
+      @@@nullCase:
+        @@@@enDesc:
+          Same as an empty string.
+    @@Return:
+      @@@Type: XDPAttrLiteralElement
+      @@@enDesc:
+        The newly created element node.
+
+        {P:: A new <IF::Element> node with following attributes
+             <kwd:MUST> be returned:
+
+           - <A::Node.localName>::: <XE::attr-literal>.
+
+           - <A::Node.namespaceURI>::: <URI^^DISCore|QName::xdp|>.
+
+           - <A::Node.ownerDocument>::: The document.
+
+           - <A::Node.textContent>::: <P::value>, or an empty
+                                      string if <P::value> is <DOM::null>.
+           
+        }
+
+        If <IF::Text> nodes are created, its
+        <A::Text.isElementContentWhitespace> attribute value
+        <kwd:MUST> be set to <DOM::false>.
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><M::Document.createElementNS>
+                        (<Q::xdp|>, 'attr-literal');
+          $r-><AS::Node.textContent> (defined $value ? $value : '');
+        }__;
+
+    @@Test:
+      @@@QName: XDPDocument.createXDPAttrLiteral.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{createXDPDocumentForTest}__;
+
+        my $value = q<a%b;c&d;e"f"g'h'i>;
+        my $qvalue = q<'a%b;c&amp;d;e"f"g&apos;h&apos;i'>;
+        my $el = $doc-><M::XDPDocument.createXDPAttrLiteral> ($value);
+
+        $test->id ('interface');
+        $test->assert_isa ($el, <IFName::XDPAttrLiteralElement>);
+
+        $test->id ('namespaceURI');
+        $test->assert_equals ($el-><AG::Node.namespaceURI>, <Q::xdp|>);
+
+        $test->id ('localName');
+        $test->assert_equals ($el-><AG::Node.localName>, 'attr-literal');
+
+        $test->id ('textContent');
+        $test->assert_equals ($el-><AG::Node.textContent>, $value);
+
+        $test->id ('dtdText');
+        $test->assert_equals ($el-><AG::XDPElement.dtdText>, $qvalue);
+    @@Test:
+      @@@QName: XDPDocument.createXDPAttrLiteral.2.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{createXDPDocumentForTest}__;
+
+        my $el = $doc-><M::XDPDocument.createXDPAttrLiteral> (null);
+
+        $test->id ('interface');
+        $test->assert_isa ($el, <IFName::XDPAttrLiteralElement>);
+
+        $test->id ('namespaceURI');
+        $test->assert_equals ($el-><AG::Node.namespaceURI>, <Q::xdp|>);
+
+        $test->id ('localName');
+        $test->assert_equals ($el-><AG::Node.localName>, 'attr-literal');
+
+        $test->id ('textContent');
+        $test->assert_equals ($el-><AG::Node.textContent>, '');
+
+        $test->id ('dtdText');
+        $test->assert_equals ($el-><AG::XDPElement.dtdText>, '""');
+##XDPDocument
+
+IFClsDef:
+  @IFQName: XDPElement
+  @ClsQName: ManakaiDOMXDPElement
+
+  @IFISA: Element
+  @ClsISA: te|ManakaiDOMElement
+
+  @s:elementType: AnyXDPElement||ManakaiDOM|all
+
+  @Test:
+    @@QName: createElementNS.XDPElement.test
+    @@PerlDef:
+      my $doc;
+      __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+      my $el = $doc-><M::Document.createElementNS> (<Q::xdp:>, 'anElement');
+  
+      $test->assert_isa ($el, <IFName::XDPElement>);
+
+  @Attr:
+    @@Name: dtdText
+    @@enDesc:
+      The serialized representation of the element and its descendants.
+    @@Type: DOMString
+    @@Get:
+      @@@enDesc:
+        {ISSUE::
+          Definition
+        }
+      @@@PerlDef:
+        require Message::DOM::Traversal;
+        my $doctrv = $self-><AG::Node.ownerDocument>
+                          -><M::Node.getFeature> (Traversal => '2.0');
+        my $tw = $doctrv->create_tree_walker
+                            ($self, <C::NodeFilter.SHOW_ELEMENT> |
+                                    <C::NodeFilter.SHOW_TEXT> |
+                                    <C::NodeFilter.SHOW_CDATA_SECTION>,
+                             sub {
+                               my $node = $_[1];
+                               if ($node-><AG::Node.nodeType>
+                                       == <C::Node.ELEMENT_NODE>) {
+                                 my $ns = $node-><AG::Node.namespaceURI>;
+                                 if (not defined $ns) {
+                                   return <C::NodeFilter.FILTER_REJECT>;
+                                 } elsif ($ns eq <Q::xdp|>) {
+                                   return <C::NodeFilter.FILTER_ACCEPT>;
+                                 } else {
+                                   return <C::NodeFilter.FILTER_REJECT>;
+                                 }
+                               } else {
+                                 return <C::NodeFilter.FILTER_ACCEPT>;
+                               }
+                             }, true);
+        my $current = $tw->first_child;
+        $r = '';
+        C: while (defined $current) {
+          if ($current-><AG::Node.nodeType> == <C::Node.ELEMENT_NODE>) {
+            $r .= $current-><AG::XDPElement.dtdText>;
+          } else {
+            $r .= $current-><AG::Node.textContent>;
+          }
+          
+          $current = $tw->next_sibling;
+        } # C
+##XDPElement
+
+ResourceDef:
+  @QName: AnyXDPElement
+  @DISCore:resourceType: s|AnyElementInNS
+  @AppName:
+    @@@: xdp|*
+    @@ContentType: DISCore|QName
+  @ForCheck: =ManakaiDOM|all
+
+IFClsETDef:
+  @IFQName: XDPPEElement
+  @ETQName: xdp|pe
+  @ClsQName: ManakaiDOMXDPPEElement
+
+  @IFISA: XDPElement
+  @ClsISA: ManakaiDOMXDPElement
+
+  @enDesc:
+    An <XE::xdp|pe> element represents an XML parameter
+    entity, an XML external subset entity, or an XML internal subset.
+##XDPPEElement
+
+IFClsETDef:
+  @IFQName: XDPElementElement
+  @ETQName: xdp|element
+  @ClsQName: ManakaiDOMXDPElementElement
+
+  @IFISA: XDPElement
+  @ClsISA: ManakaiDOMXDPElement
+
+  @enDesc:
+    An <XE::xdp|element> element represents an XML <XML::ELEMENT>
+    declaration.
+
+  @CAttr:
+    @@Name: dtdText
+    @@Type: DOMString
+    @@Get:
+      @@@PerlDef:
+        $r = '<!ELEMENT'.$self->SUPER::dtd_text.'>';
+##XDPElementElement
+
+IFClsETDef:
+  @IFQName: XDPModelGroupElement
+  @ETQName: xdp|model-group
+  @ClsQName: ManakaiDOMXDPModelGroupElement
+
+  @IFISA: XDPElement
+  @ClsISA: ManakaiDOMXDPElement
+
+  @enDesc:
+    An <XE::xdp|model-group> element represents an XML model
+    group.
+
+  @CAttr:
+    @@Name: dtdText
+    @@Type: DOMString
+    @@Get:
+      @@@PerlDef:
+        $r = '('.$self->SUPER::dtd_text.')';
+##XDPModelGroupElement
+
+IFClsETDef:
+  @IFQName: XDPAttlistElement
+  @ETQName: xdp|attlist
+  @ClsQName: ManakaiDOMXDPAttlistElement
+
+  @IFISA: XDPElement
+  @ClsISA: ManakaiDOMXDPElement
+
+  @enDesc:
+    An <XE::xdp|attlist> element represents an XML <XML::ATTLIST>
+    declaration.
+
+  @CAttr:
+    @@Name: dtdText
+    @@Type: DOMString
+    @@Get:
+      @@@PerlDef:
+        $r = '<!ATTLIST'.$self->SUPER::dtd_text.'>';
+##XDPAttlistElement
+
+IFClsETDef:
+  @IFQName: XDPEnumGroupElement
+  @ETQName: xdp|enum-group
+  @ClsQName: ManakaiDOMXDPEnumGroupElement
+
+  @IFISA: XDPElement
+  @ClsISA: ManakaiDOMXDPElement
+
+  @enDesc:
+    An <XE::xdp|enum-group> element represents an XML enumeration
+    group in an attribute definition.
+
+  @CAttr:
+    @@Name: dtdText
+    @@Type: DOMString
+    @@Get:
+      @@@PerlDef:
+        $r = '('.$self->SUPER::dtd_text.')';
+##XDPEnumGroupElement
+
+IFClsETDef:
+  @IFQName: XDPEntityElement
+  @ETQName: xdp|entity
+  @ClsQName: ManakaiDOMXDPEntityElement
+
+  @IFISA: XDPElement
+  @ClsISA: ManakaiDOMXDPElement
+
+  @enDesc:
+    An <XE::xdp|entity> element represents an XML <XML::ENTITY>
+    declaration.
+
+  @CAttr:
+    @@Name: dtdText
+    @@Type: DOMString
+    @@Get:
+      @@@PerlDef:
+        $r = '<!ENTITY'.$self->SUPER::dtd_text.'>';
+##XDPEntityElement
+
+IFClsETDef:
+  @IFQName: XDPNotationElement
+  @ETQName: xdp|notation
+  @ClsQName: ManakaiDOMXDPNotationElement
+
+  @IFISA: XDPElement
+  @ClsISA: ManakaiDOMXDPElement
+
+  @enDesc:
+    An <XE::xdp|notation> element represents an XML <XML::NOTATION>
+    declaration.
+
+  @CAttr:
+    @@Name: dtdText
+    @@Type: DOMString
+    @@Get:
+      @@@PerlDef:
+        $r = '<!NOTATION'.$self->SUPER::dtd_text.'>';
+##XDPNotationElement
+
+IFClsETDef:
+  @IFQName: XDPMarkedSectionElement
+  @ETQName: xdp|marked-section
+  @ClsQName: ManakaiDOMXDPMarkedSectionElement
+
+  @IFISA: XDPElement
+  @ClsISA: ManakaiDOMXDPElement
+
+  @enDesc:
+    An <XE::xdp|marked-section> element represents an XML conditional
+    section.
+
+  @CAttr:
+    @@Name: dtdText
+    @@Type: DOMString
+    @@Get:
+      @@@PerlDef:
+        $r = '<!['.$self->SUPER::dtd_text.']]>';
+##XDPMarkedSectionElement
+
+IFClsETDef:
+  @IFQName: XDPMarkedSectionStatusElement
+  @ETQName: xdp|marked-section-status
+  @ClsQName: ManakaiDOMXDPMarkedSectionStatusElement
+
+  @IFISA: XDPElement
+  @ClsISA: ManakaiDOMXDPElement
+
+  @enDesc:
+    An <XE::xdp|marked-section-status> element represents the
+    status part of an XML marked section.
+
+  @CAttr:
+    @@Name: dtdText
+    @@Type: DOMString
+    @@Get:
+      @@@PerlDef:
+        $r = $self->SUPER::dtd_text.'[';
+##XDPMarkedSectionStatusElement
+
+IFClsETDef:
+  @IFQName: XDPCommentElement
+  @ETQName: xdp|comment
+  @ClsQName: ManakaiDOMXDPCommentElement
+
+  @IFISA: XDPElement
+  @ClsISA: ManakaiDOMXDPElement
+
+  @enDesc:
+    An <XE::xdp|comment> element represents an XML comment.
+
+  @CAttr:
+    @@Name: dtdText
+    @@Type: DOMString
+    @@Get:
+      @@@PerlDef:
+        $r = $self->SUPER::dtd_text;
+        $r =~ s/--/- - /g;
+        $r = '<!--'.$r.'-->';
+##XDPCommentElement
+
+IFClsETDef:
+  @IFQName: XDPPIElement
+  @ETQName: xdp|pi
+  @ClsQName: ManakaiDOMXDPPIElement
+
+  @IFISA: XDPElement
+  @ClsISA: ManakaiDOMXDPElement
+
+  @enDesc:
+    An <XE::xdp|pi> element represents an XML processing
+    instruction.
+
+  @CAttr:
+    @@Name: dtdText
+    @@Type: DOMString
+    @@Get:
+      @@@PerlDef:
+        $r = $self->SUPER::dtd_text;
+        $r =~ s/\?>/?&gt;/g;
+        $r = '<?'.$r.'?>';
+##XDPPIElement
+
+IFClsETDef:
+  @IFQName: XDPTextDeclElement
+  @ETQName: xdp|text-decl
+  @ClsQName: ManakaiDOMXDPTextDeclElement
+
+  @IFISA: XDPElement
+  @ClsISA: ManakaiDOMXDPElement
+
+  @enDesc:
+    An <XE::xdp|text-decl> element represents an XML text declaration.
+
+  @CAttr:
+    @@Name: dtdText
+    @@Type: DOMString
+    @@Get:
+      @@@PerlDef:
+        $r = $self->SUPER::dtd_text;
+        $r =~ s/\?>/?&gt;/g;
+        $r = '<?'.$r.'?>';
+##XDPTextDeclElement
+
+IFClsETDef:
+  @IFQName: XDPPAttrElement
+  @ETQName: xdp|pattr
+  @ClsQName: ManakaiDOMXDPPAttrElement
+
+  @IFISA: XDPElement
+  @ClsISA: ManakaiDOMXDPElement
+
+  @enDesc:
+    An <XE::xdp|pattr> element represents a pseudo-attribute.
+##XDPPAttrElement
+
+IFClsETDef:
+  @IFQName: XDPPERefElement
+  @ETQName: xdp|peref
+  @ClsQName: ManakaiDOMXDPPERefElement
+
+  @IFISA: XDPElement
+  @ClsISA: ManakaiDOMXDPElement
+
+  @enDesc:
+    An <XE::xdp|peref> element represents an XML parameter entity
+    reference.
+
+  @CAttr:
+    @@Name: dtdText
+    @@Type: DOMString
+    @@Get:
+      @@@PerlDef:
+        $r = '%'.$self->SUPER::dtd_text.';';
+##XDPPERefElement
+
+IFClsETDef:
+  @IFQName: XDPGERefElement
+  @ETQName: xdp|geref
+  @ClsQName: ManakaiDOMXDPGERefElement
+
+  @IFISA: XDPElement
+  @ClsISA: ManakaiDOMXDPElement
+
+  @enDesc:
+    An <XE::xdp|geref> element represents an XML general entity
+    reference.
+
+  @CAttr:
+    @@Name: dtdText
+    @@Type: DOMString
+    @@Get:
+      @@@PerlDef:
+        $r = '&'.$self->SUPER::dtd_text.';';
+##XDPGERefElement
+
+IFClsETDef:
+  @IFQName: XDPNCRElement
+  @ETQName: xdp|ncr
+  @ClsQName: ManakaiDOMXDPNCRElement
+
+  @IFISA: XDPElement
+  @ClsISA: ManakaiDOMXDPElement
+
+  @enDesc:
+    An <XE::xdp|ncr> element represents an XML numeric character
+    reference.
+
+  @CAttr:
+    @@Name: dtdText
+    @@Type: DOMString
+    @@Get:
+      @@@PerlDef:
+        $r = '&#'.$self->SUPER::dtd_text.';';
+##XDPNCRElement
+
+IFClsETDef:
+  @IFQName: XDPHCRElement
+  @ETQName: xdp|hcr
+  @ClsQName: ManakaiDOMXDPHCRElement
+
+  @IFISA: XDPElement
+  @ClsISA: ManakaiDOMXDPElement
+
+  @enDesc:
+    An <XE::xdp|hcr> element represents an XML hexadecimal character
+    reference.
+
+  @CAttr:
+    @@Name: dtdText
+    @@Type: DOMString
+    @@Get:
+      @@@PerlDef:
+        $r = '&#x'.$self->SUPER::dtd_text.';';
+##XDPHCRElement
+
+IFClsETDef:
+  @IFQName: XDPRNIKeywordElement
+  @ETQName: xdp|rni-keyword
+  @ClsQName: ManakaiDOMXDPRNIKeywordElement
+
+  @IFISA: XDPElement
+  @ClsISA: ManakaiDOMXDPElement
+
+  @enDesc:
+    An <XE::xdp|rni-keyword> element represents an XML keyword
+    prepended by a <CHAR::NUMBER SIGN>.
+
+  @CAttr:
+    @@Name: dtdText
+    @@Type: DOMString
+    @@Get:
+      @@@PerlDef:
+        $r = '#'.$self->SUPER::dtd_text;
+##XDPRNIKeywordElement
+
+IFClsETDef:
+  @IFQName: XDPEntityValueElement
+  @ETQName: xdp|entity-value
+  @ClsQName: ManakaiDOMXDPEntityValueElement
+
+  @IFISA: XDPElement
+  @ClsISA: ManakaiDOMXDPElement
+
+  @enDesc:
+    An <XE::xdp|entity-value> element represents an XML entity
+    value.
+
+  @CAttr:
+    @@Name: dtdText
+    @@Type: DOMString
+    @@Get:
+      @@@PerlDef:
+        require Message::DOM::Traversal;
+        my $doctrv = $self-><AG::Node.ownerDocument>
+                          -><M::Node.getFeature> (Traversal => '2.0');
+        my $tw = $doctrv->create_tree_walker
+                            ($self, <C::NodeFilter.SHOW_ELEMENT> |
+                                    <C::NodeFilter.SHOW_TEXT> |
+                                    <C::NodeFilter.SHOW_CDATA_SECTION>,
+                             sub {
+                               my $node = $_[1];
+                               if ($node-><AG::Node.nodeType>
+                                       == <C::Node.ELEMENT_NODE>) {
+                                 my $ns = $node-><AG::Node.namespaceURI>;
+                                 if (not defined $ns) {
+                                   return <C::NodeFilter.FILTER_REJECT>;
+                                 } elsif ($ns eq <Q::xdp|>) {
+                                   return <C::NodeFilter.FILTER_ACCEPT>;
+                                 } else {
+                                   return <C::NodeFilter.FILTER_REJECT>;
+                                 }
+                               } else {
+                                 return <C::NodeFilter.FILTER_ACCEPT>;
+                               }
+                             }, true);
+        my $current = $tw->first_child;
+        $r = '';
+        C: while (defined $current) {
+          if ($current-><AG::Node.nodeType> == <C::Node.ELEMENT_NODE>) {
+            if ({
+                  <Q::xdp|peref> => true,
+                }->{$current->manakai_expanded_uri}) {
+              $r .= $current-><AG::XDPElement.dtdText>;
+            } else {
+              my $v = $current-><AG::XDPElement.dtdText>;
+              $v =~ s/&/&#x26;/g;
+              $v =~ s/%/&#x25;/g;
+              $r .= $v;
+            }
+          } else {
+            my $v = $current-><AG::Node.textContent>;
+            $v =~ s/&/&#x26;/g;
+            $v =~ s/%/&#x25;/g;
+            $r .= $v;
+          }
+          
+          $current = $tw->next_sibling;
+        } # C
+
+        if ($r =~ /"/) {
+          $r =~ s/'/&#x27;/g;
+          $r = "'".$r."'";
+        } else {
+          $r =~ s/"/&#x22;/g;
+          $r = '"'.$r.'"';
+        }
+##XDPEntityValueElement
+
+IFClsETDef:
+  @IFQName: XDPAttrLiteralElement
+  @ETQName: xdp|attr-literal
+  @ClsQName: ManakaiDOMXDPAttrLiteralElement
+
+  @IFISA: XDPElement
+  @ClsISA: ManakaiDOMXDPElement
+
+  @enDesc:
+    An <XE::xdp|attr-literal> element represents an XML attribute
+    value literal.
+
+  @CAttr:
+    @@Name: dtdText
+    @@Type: DOMString
+    @@Get:
+      @@@PerlDef:
+        require Message::DOM::Traversal;
+        my $doctrv = $self-><AG::Node.ownerDocument>
+                          -><M::Node.getFeature> (Traversal => '2.0');
+        my $tw = $doctrv->create_tree_walker
+                            ($self, <C::NodeFilter.SHOW_ELEMENT> |
+                                    <C::NodeFilter.SHOW_TEXT> |
+                                    <C::NodeFilter.SHOW_CDATA_SECTION>,
+                             sub {
+                               my $node = $_[1];
+                               if ($node-><AG::Node.nodeType>
+                                       == <C::Node.ELEMENT_NODE>) {
+                                 my $ns = $node-><AG::Node.namespaceURI>;
+                                 if (not defined $ns) {
+                                   return <C::NodeFilter.FILTER_REJECT>;
+                                 } elsif ($ns eq <Q::xdp|>) {
+                                   return <C::NodeFilter.FILTER_ACCEPT>;
+                                 } else {
+                                   return <C::NodeFilter.FILTER_REJECT>;
+                                 }
+                               } else {
+                                 return <C::NodeFilter.FILTER_ACCEPT>;
+                               }
+                             }, true);
+        my $current = $tw->first_child;
+        $r = '';
+        C: while (defined $current) {
+          if ($current-><AG::Node.nodeType> == <C::Node.ELEMENT_NODE>) {
+            if ({
+                  <Q::xdp|geref> => true,
+                  <Q::xdp|ncr> => true,
+                  <Q::xdp|hcr> => true,
+                }->{$current->manakai_expanded_uri}) {
+              $r .= $current-><AG::XDPElement.dtdText>;
+            } else {
+              my $v = $current-><AG::XDPElement.dtdText>;
+              $v =~ s/&/&amp;/g;
+              $r .= $v;
+            }
+          } else {
+            my $v = $current-><AG::Node.textContent>;
+            $v =~ s/&/&amp;/g;
+            $r .= $v;
+          }
+          
+          $current = $tw->next_sibling;
+        } # C
+
+        if ($r =~ /"/) {
+          $r =~ s/'/&apos;/g;
+          $r = "'".$r."'";
+        } else {
+          $r =~ s/"/&quot;/g;
+          $r = '"'.$r.'"';
+        }
+##XDPPAttrLiteralElement
+
+IFClsETDef:
+  @IFQName: XDPMinimumLiteralElement
+  @ETQName: xdp|minimum-literal
+  @ClsQName: ManakaiDOMXDPMinimumLiteralElement
+
+  @IFISA: XDPElement
+  @ClsISA: ManakaiDOMXDPElement
+
+  @enDesc:
+    An <XE::xdp|minimum-literal> element represents an XML public identifier
+    literal.
+
+  @CAttr:
+    @@Name: dtdText
+    @@Type: DOMString
+    @@Get:
+      @@@PerlDef:
+        $r = $self->SUPER::dtd_text;
+        $r =~ s/"/%22/g;
+        $r = '"'.$r.'"';
+##XDPMinimumLiteralElement
+
+IFClsETDef:
+  @IFQName: XDPSystemLiteralElement
+  @ETQName: xdp|system-literal
+  @ClsQName: ManakaiDOMXDPSystemLiteralElement
+
+  @IFISA: XDPElement
+  @ClsISA: ManakaiDOMXDPElement
+
+  @enDesc:
+    An <XE::xdp|system-literal> element represents an XML system
+    literal.
+
+  @CAttr:
+    @@Name: dtdText
+    @@Type: DOMString
+    @@Get:
+      @@@PerlDef:
+        $r = $self->SUPER::dtd_text;
+        $r =~ s/"/%22/g;
+        $r = '"'.$r.'"';
+##XDPSystemLiteralElement

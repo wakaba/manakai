@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/04/09 14:29:41 $
+      $Date: 2006/05/13 12:06:21 $
     @@ContentType:
       dis:Date.RCS
   
@@ -480,7 +480,7 @@ IFClsDef:
                                                       ($vnode_type_uri);
                 if ($vnode_type-><M::DIS|DISResource.isSubsetOfURI>
                                         (<Q::dis:Boolean>)) {
-                  $r = $factory-><M::PCDocument.createPCLiteral>
+                  $r = $factory-><M::PCDocument.createPCNumberLiteral>
                                         ($vnode_value ? true : false);
                 } elsif ($vnode_type-><M::DIS|DISResource
                                              .isSubsetOfURI>
@@ -506,11 +506,11 @@ IFClsDef:
                                               ($dataTypeURI);
                 if ($dataType-><M::DIS|DISResource.isSubsetOfURI>
                                               (<Q::DISIDL:AnyRealNumber>)) {
-                  $r = $factory-><M::PCDocument.createPCLiteral>
+                  $r = $factory-><M::PCDocument.createPCNumberLiteral>
                                               (0 + $vnode_value);
                 } elsif ($dataType-><M::DIS|DISResource
                                 .isSubsetOfURI> (<Q::idl|boolean>)) {
-                  $r = $factory-><M::PCDocument.createPCLiteral>
+                  $r = $factory-><M::PCDocument.createPCNumberLiteral>
                                     ($vnode_value eq 'tr'.'ue' ? true : false);
                 } else { ## |DOMString| or some
                   $r = $factory-><M::PCDocument.createPCLiteral>
@@ -533,7 +533,7 @@ IFClsDef:
                                               (<Q::idl|boolean>) or
                      $dataType-><M::DIS|DISResource.isSubsetOfURI>
                                               (<Q::DISIDL:AnyRealNumber>)) {
-              $r = $factory-><M::PCDocument.createPCLiteral> (0);
+              $r = $factory-><M::PCDocument.createPCNumberLiteral> (0);
             } elsif ($dataType-><M::DIS|DISResource.isSubsetOfURI>
                                               (<Q::DISPerl|ARRAY>)) {
               $r = $factory-><M::PCDocument.createPCLiteral> ([]);
@@ -904,11 +904,11 @@ IFClsDef:
                              namespace_context => $self);
             } elsif ($vnode_type-><M::DIS|DISResource.isSubsetOfURI>
                                         (<Q::DISCore:Integer>)) {
-              $r = $factory-><M::PCDocument.createPCLiteral>
+              $r = $factory-><M::PCDocument.createPCNumberLiteral>
                                   ($self-><AG::dv|DVValue.value> + 0);
             } elsif ($vnode_type-><M::DIS|DISResource.isSubsetOfURI>
                                         (<Q::DISCore:Boolean>)) {
-              $r = $factory-><M::PCDocument.createPCLiteral>
+              $r = $factory-><M::PCDocument.createPCNumberLiteral>
                                   ($self-><AG::dv|DVValue.value> ? true : false);
             } elsif ($dataTypeURI) {
               $dataType ||= $disResource-><AG::DIS|DISAnyResource.database>
@@ -920,11 +920,11 @@ IFClsDef:
               }
               if ($dataType-><M::DIS|DISResource.isSubsetOfURI>
                                                 (<Q::DISIDL:AnyRealNumber>)) {
-                $r = $factory-><M::PCDocument.createPCLiteral>
+                $r = $factory-><M::PCDocument.createPCNumberLiteral>
                                                 (0 + $vnode_value);
               } elsif ($dataType-><M::DIS|DISResource
                                   .isSubsetOfURI> (<Q::idl|boolean>)) {
-                $r = $factory-><M::PCDocument.createPCLiteral>
+                $r = $factory-><M::PCDocument.createPCNumberLiteral>
                                       ($vnode_value eq 'tr'.'ue' ? true :
                                        $vnode_value eq '1' ? true : false);
               } else { ## |DOMString| or some
@@ -6594,12 +6594,12 @@ TMethods:
     @@Return:
       @@@Type: DIS|MPLCodeFragment
       @@@PerlDef:
-        $r = $factory-><M::PCDocument.createPCLiteral>
-                         (defined $s
-                            ? $s-><AG::dv|DVValue.isNull>
-                                ? null
-                                : $s-><AG::dv|DVValue.value> ? true : false
-                            : null);
+        $r = defined $s
+               ? $s-><AG::dv|DVValue.isNull>
+                   ? $factory-><M::PCDocument.createPCLiteral> (null)
+                   : $factory-><M::PCDocument.createPCNumberLiteral>
+                                 ($s-><AG::dv|DVValue.value> ? true : false)
+               : $factory-><M::PCDocument.createPCLiteral> (null);
 ##DISCore|Boolean
 
 TMethods:
@@ -6620,10 +6620,10 @@ TMethods:
     @@Return:
       @@@Type: DIS|MPLCodeFragment
       @@@PerlDef:
-        $r = $factory-><M::PCDocument.createPCLiteral>
-                         (defined $s
-                            ? $s-><AG::dv|DVValue.isNull>
-                                ? null
-                                : 0+$s-><AG::dv|DVValue.value>
-                            : null);
+        $r = defined $s
+               ? $s-><AG::dv|DVValue.isNull>
+                   ? $factory-><M::PCDocument.createPCLiteral> (null)
+                   : $factory-><M::PCDocument.createPCNumberLiteral>
+                                 (0+$s-><AG::dv|DVValue.value>)
+               : $factory-><M::PCDocument.createPCLiteral> (null);
 ##DISCore|Integer
