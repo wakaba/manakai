@@ -16,7 +16,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/05/13 12:06:21 $
+    $Date: 2006/05/13 12:30:36 $
 
   @Require:
     @@Module:
@@ -3029,7 +3029,7 @@ IFCls2Def:
   
           my $__nt = $target-><AG::Node.nodeType>;
           if ($__nt < 33 and
-              ($self->{what_to_show} & (2 << ($__nt-1)))) {
+              ($self->{what_to_show} & (1 << ($__nt-1)))) {
             last WHATTOSHOW;
           }
   
@@ -3038,7 +3038,7 @@ IFCls2Def:
         } # WHATTOSHOW
 
         if (defined $self->{filter}) {
-          $result = $self->{filter}->($self->{filter}, $target);
+          $result = $self->{filter}-><M::NodeFilter.acceptNode> ($target);
         } else {
           $result = <C::NodeFilter.FILTER_ACCEPT>;
         }
@@ -3155,6 +3155,18 @@ IFCls2Def:
     flags before applying filters.  If a node is skipped by 
     the active <CODE::whatToShow> flags, a <IF::NodeFilter> will
     not be called to evaluate that node.
+
+    For manakai's Perl binding, an application <kwd:MAY> use
+    a code reference as if it were a <IF::NodeFilter>; if it is set to
+    a parameter that expects a <IF::NodeFilter>, the implementation
+    <kwd:MUST> <Perl::bless> it with a class so that it
+    implements the <IF::NodeFilter> interface.  Invoking the
+    <M::NodeFilter.acceptNode> method on such <IF::NodeFilter>
+    <kwd:MUST> result in the referenced code being invoked
+    with the <Perl::$self> parameter, i.e. the <IF::NodeFilter>
+    itself, and the <CODE::node> parameter.  The return
+    value of the <M::NodeFilter.acceptNode> <kwd:MUST>
+    be the return value of the code.
 
   @ResourceDef:
     @@DISCore:resourceType: DISLang|InputProcessor
@@ -3398,4 +3410,6 @@ IFCls2Def:
         but it lets it propagate up to the application's code
         that invokes the <IF::TreeWalker> or
         <IF::NodeIterator> method.
+      @@@PerlDef:
+        goto &$self;
 ##NodeFilter
