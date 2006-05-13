@@ -43,7 +43,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/05/06 16:01:04 $
+    $Date: 2006/05/13 05:40:58 $
 
   @Require:
     @@Module:
@@ -1809,6 +1809,12 @@ IFClsETDef:
   @enDesc:
     The <XE::atom|feed> element is the document element 
     of an Atom Feed Document.
+
+    {ISSUE::
+      <XE::atom|entry> children <kwd:MUST> be placed after
+      any other elements.  Attributes creating children
+      should insert them before any entries?
+    }
 
   @Attr:
     @@Name: authorElements

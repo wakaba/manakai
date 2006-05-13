@@ -1,3 +1,11 @@
+2006-05-13  Wakaba  <wakaba@suika.fam.cx>
+
+	* Traversal.dis (MANAKAI_FILTER_OPAQUE): New |AcceptNode| value.
+	(TreeWalker): The |MANAKAI_FILTER_OPAQUE| value support
+	is added.  The |FILTER_REJECT| value is treated
+	as |FILTER_ACCEPT| if the |currentNode| is in the
+	rejected subtree as specified in the spec.
+
 2006-05-05  Wakaba  <wakaba@suika.fam.cx>
 
 	* SimpleLS.dis: An |xmlns:| prefix was missing.

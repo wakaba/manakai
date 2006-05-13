@@ -16,7 +16,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/04/30 10:27:00 $
+    $Date: 2006/05/13 05:40:58 $
 
   @Require:
     @@Module:
@@ -364,6 +364,14 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: DISLang|Const
+
+ElementTypeBinding:
+  @Name: mConst
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISLang|Const
+    @@For: ManakaiDOM|ManakaiDOMLatest
 
 ElementTypeBinding:
   @Name: intValue
@@ -883,20 +891,43 @@ IFCls2Def:
         @@@@enDesc:
           If the current node has no visible children, returns <DOM::null>
           and retains the current node.
+
+          If the <IF::NodeFilter>, if any, returns 
+          <C::NodeFilter.MANAKAI_FILTER_OPAQUE> for the
+          <A::TreeWalker.currentNode>, this method
+          <kwd:MUST> return <DOM::null>.
+
+            {NOTE::
+              By definition, the parent of the
+              <M::TreeWalker.firstChild> node, if any, is
+              either a child of the <A::TreeWalker.currentNode>
+              or a descendant of the <A::TreeWalker.currentNode>
+              where all ancestors between <A::TreeWalker.currentNode>
+              and that node is <C::NodeFilter.FILTER_SKIP>ped.
+              That means that the only node that might be
+              <C::NodeFilter.MANAKAI_FILTER_OPAQUE> is the
+              <A::TreeWalker.currentNode>.
+            }
       @@@PerlDef:
         __DEEP{
-          my @target = (@{$self->{current_node}-><AG::Node.childNodes>});
-          A: while (@target) {
-            my $target = shift @target;
-            my $result;
-            __CODE{testNode}__;
-            if ($result == <C::NodeFilter.FILTER_ACCEPT>) {
-              $r = $self->{current_node} = $target;
-              last A;
-            } elsif ($result == <C::NodeFilter.FILTER_SKIP>) {
-              unshift @target, @{$target-><AG::Node.childNodes>};
-            }
-          } # A
+          my $sresult;
+          __CODE{testNode:: $target => {$self->{current_node}},
+                            $result => $sresult}__;
+          if ($sresult != <C::NodeFilter.MANAKAI_FILTER_OPAQUE>) {
+            my @target = (@{$self->{current_node}-><AG::Node.childNodes>});
+            A: while (@target) {
+              my $target = shift @target;
+              my $result;
+              __CODE{testNode}__;
+              if ($result == <C::NodeFilter.FILTER_ACCEPT> or
+                  $result == <C::NodeFilter.MANAKAI_FILTER_OPAQUE>) {
+                $r = $self->{current_node} = $target;
+                last A;
+              } elsif ($result == <C::NodeFilter.FILTER_SKIP>) {
+                unshift @target, @{$target-><AG::Node.childNodes>};
+              }
+            } # A
+          } # not opaque
         }__;
 
     @@Test:
@@ -967,6 +998,107 @@ IFCls2Def:
         $test->assert_null ($tw-><M::TreeWalker.firstChild>);
         $test->id ('el4.currentNode');
         $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el4});
+    @@Test:
+      @@@QName: TreeWalker.firstChild.3.test
+      @@@enDesc:
+        expandEntityReferences
+      @@@PerlDef:
+        my $doc;
+        my $doctrv;
+        __CODE{createDocForTest}__;
+
+        my %node;
+        __CODE{TreeForTestER1}__;
+
+        my $tw = $doctrv-><M::DocumentTraversal.createTreeWalker>
+                            ($node{el1}, <C::NodeFilter.SHOW_ALL>, null, false);
+
+        $test->id ('el1');
+        $test->assert_equals ($tw-><M::TreeWalker.firstChild>, $node{er1});
+        $test->id ('el1.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{er1});
+
+        $tw-><AS::TreeWalker.currentNode> ($node{er1});
+        $test->id ('er1');
+        $test->assert_null ($tw-><M::TreeWalker.firstChild>);
+        $test->id ('er1.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{er1});
+
+        $tw-><AS::TreeWalker.currentNode> ($node{el3});
+        $test->id ('el3');
+        $test->assert_equals ($tw-><M::TreeWalker.firstChild>, $node{el4});
+        $test->id ('el3.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el4});
+
+        $test->id ('el4');
+        $test->assert_null ($tw-><M::TreeWalker.firstChild>);
+        $test->id ('el4.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el4});
+
+        $tw-><AS::TreeWalker.currentNode> ($node{el5});
+        $test->id ('el5');
+        $test->assert_null ($tw-><M::TreeWalker.firstChild>);
+        $test->id ('el5.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el5});
+
+        $tw-><AS::TreeWalker.currentNode> ($node{el6});
+        $test->id ('el6');
+        $test->assert_null ($tw-><M::TreeWalker.firstChild>);
+        $test->id ('el6.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el6});
+    @@Test:
+      @@@QName: TreeWalker.firstChild.4.test
+      @@@enDesc:
+        expandEntityReferences emulated by <C::NodeFilter.MANAKAI_FILTER_OPAQUE>
+      @@@PerlDef:
+        my $doc;
+        my $doctrv;
+        __CODE{createDocForTest}__;
+
+        my %node;
+        __CODE{TreeForTestER1}__;
+
+        my $tw = $doctrv-><M::DocumentTraversal.createTreeWalker>
+                            ($node{el1}, <C::NodeFilter.SHOW_ALL>, sub {
+                               $_[1]->node_type
+                                   == <C::Node.ENTITY_REFERENCE_NODE>
+                                 ? <C::NodeFilter.MANAKAI_FILTER_OPAQUE>
+                                 : <C::NodeFilter.FILTER_ACCEPT>
+                             }, true);
+
+        $test->id ('el1');
+        $test->assert_equals ($tw-><M::TreeWalker.firstChild>, $node{er1});
+        $test->id ('el1.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{er1});
+
+        $tw-><AS::TreeWalker.currentNode> ($node{er1});
+        $test->id ('er1');
+        $test->assert_null ($tw-><M::TreeWalker.firstChild>);
+        $test->id ('er1.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{er1});
+
+        $tw-><AS::TreeWalker.currentNode> ($node{el3});
+        $test->id ('el3');
+        $test->assert_equals ($tw-><M::TreeWalker.firstChild>, $node{el4});
+        $test->id ('el3.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el4});
+
+        $test->id ('el4');
+        $test->assert_null ($tw-><M::TreeWalker.firstChild>);
+        $test->id ('el4.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el4});
+
+        $tw-><AS::TreeWalker.currentNode> ($node{el5});
+        $test->id ('el5');
+        $test->assert_null ($tw-><M::TreeWalker.firstChild>);
+        $test->id ('el5.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el5});
+
+        $tw-><AS::TreeWalker.currentNode> ($node{el6});
+        $test->id ('el6');
+        $test->assert_null ($tw-><M::TreeWalker.firstChild>);
+        $test->id ('el6.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el6});
 
   @L2Method:
     @@Name: lastChild
@@ -980,20 +1112,43 @@ IFCls2Def:
         @@@@enDesc:
           If the current node has no visible children, returns <DOM::null>
           and retains the current node.
+
+          If the <IF::NodeFilter>, if any, returns 
+          <C::NodeFilter.MANAKAI_FILTER_OPAQUE> for the
+          <A::TreeWalker.currentNode>, this method
+          <kwd:MUST> return <DOM::null>.
+
+            {NOTE::
+              By definition, the parent of the
+              <M::TreeWalker.lastChild> node, if any, is
+              either a child of the <A::TreeWalker.currentNode>
+              or a descendant of the <A::TreeWalker.currentNode>
+              where all ancestors between <A::TreeWalker.currentNode>
+              and that node is <C::NodeFilter.FILTER_SKIP>ped.
+              That means that the only node that might be
+              <C::NodeFilter.MANAKAI_FILTER_OPAQUE> is the
+              <A::TreeWalker.currentNode>.
+            }
       @@@PerlDef:
         __DEEP{
-          my @target = (@{$self->{current_node}-><AG::Node.childNodes>});
-          A: while (@target) {
-            my $target = pop @target;
-            my $result;
-            __CODE{testNode}__;
-            if ($result == <C::NodeFilter.FILTER_ACCEPT>) {
-              $r = $self->{current_node} = $target;
-              last A;
-            } elsif ($result == <C::NodeFilter.FILTER_SKIP>) {
-              push @target, @{$target-><AG::Node.childNodes>};
-            }
-          } # A
+          my $sresult;
+          __CODE{testNode:: $target => {$self->{current_node}},
+                            $result => $sresult}__;
+          if ($sresult != <C::NodeFilter.MANAKAI_FILTER_OPAQUE>) {
+            my @target = (@{$self->{current_node}-><AG::Node.childNodes>});
+            A: while (@target) {
+              my $target = pop @target;
+              my $result;
+              __CODE{testNode}__;
+              if ($result == <C::NodeFilter.FILTER_ACCEPT> or
+                  $result == <C::NodeFilter.MANAKAI_FILTER_OPAQUE>) {
+                $r = $self->{current_node} = $target;
+                last A;
+              } elsif ($result == <C::NodeFilter.FILTER_SKIP>) {
+                push @target, @{$target-><AG::Node.childNodes>};
+              }
+            } # A
+          }
         }__;
 
     @@Test:
@@ -1066,6 +1221,107 @@ IFCls2Def:
         $test->assert_null ($tw-><M::TreeWalker.lastChild>);
         $test->id ('el4.currentNode');
         $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el4});
+    @@Test:
+      @@@QName: TreeWalker.lastChild.3.test
+      @@@enDesc:
+        expandEntityReferences
+      @@@PerlDef:
+        my $doc;
+        my $doctrv;
+        __CODE{createDocForTest}__;
+
+        my %node;
+        __CODE{TreeForTestER2}__;
+
+        my $tw = $doctrv-><M::DocumentTraversal.createTreeWalker>
+                            ($node{el1}, <C::NodeFilter.SHOW_ALL>, null, false);
+
+        $test->id ('el1');
+        $test->assert_equals ($tw-><M::TreeWalker.lastChild>, $node{er1});
+        $test->id ('el1.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{er1});
+
+        $tw-><AS::TreeWalker.currentNode> ($node{el2});
+        $test->id ('el2');
+        $test->assert_null ($tw-><M::TreeWalker.lastChild>);
+        $test->id ('el2.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el2});
+
+        $tw-><AS::TreeWalker.currentNode> ($node{er1});
+        $test->id ('er1');
+        $test->assert_null ($tw-><M::TreeWalker.lastChild>);
+        $test->id ('er1.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{er1});
+
+        $tw-><AS::TreeWalker.currentNode> ($node{el3});
+        $test->id ('el3');
+        $test->assert_equals ($tw-><M::TreeWalker.lastChild>, $node{el4});
+        $test->id ('el3.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el4});
+
+        $test->id ('el4');
+        $test->assert_null ($tw-><M::TreeWalker.lastChild>);
+        $test->id ('el4.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el4});
+
+        $tw-><AS::TreeWalker.currentNode> ($node{el5});
+        $test->id ('el5');
+        $test->assert_null ($tw-><M::TreeWalker.lastChild>);
+        $test->id ('el5.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el5});
+    @@Test:
+      @@@QName: TreeWalker.lastChild.4.test
+      @@@enDesc:
+        expandEntityReferences emulated by <C::NodeFilter.MANAKAI_FILTER_OPAQUE>
+      @@@PerlDef:
+        my $doc;
+        my $doctrv;
+        __CODE{createDocForTest}__;
+
+        my %node;
+        __CODE{TreeForTestER2}__;
+
+        my $tw = $doctrv-><M::DocumentTraversal.createTreeWalker>
+                            ($node{el1}, <C::NodeFilter.SHOW_ALL>, sub {
+                               $_[1]->node_type
+                                   == <C::Node.ENTITY_REFERENCE_NODE>
+                                 ? <C::NodeFilter.MANAKAI_FILTER_OPAQUE>
+                                 : <C::NodeFilter.FILTER_ACCEPT>
+                             }, true);
+
+        $test->id ('el1');
+        $test->assert_equals ($tw-><M::TreeWalker.lastChild>, $node{er1});
+        $test->id ('el1.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{er1});
+
+        $tw-><AS::TreeWalker.currentNode> ($node{er1});
+        $test->id ('er1');
+        $test->assert_null ($tw-><M::TreeWalker.lastChild>);
+        $test->id ('er1.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{er1});
+
+        $tw-><AS::TreeWalker.currentNode> ($node{el3});
+        $test->id ('el3');
+        $test->assert_equals ($tw-><M::TreeWalker.lastChild>, $node{el4});
+        $test->id ('el3.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el4});
+
+        $test->id ('el4');
+        $test->assert_null ($tw-><M::TreeWalker.lastChild>);
+        $test->id ('el4.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el4});
+
+        $tw-><AS::TreeWalker.currentNode> ($node{el5});
+        $test->id ('el5');
+        $test->assert_null ($tw-><M::TreeWalker.lastChild>);
+        $test->id ('el5.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el5});
+
+        $tw-><AS::TreeWalker.currentNode> ($node{el2});
+        $test->id ('el2');
+        $test->assert_null ($tw-><M::TreeWalker.lastChild>);
+        $test->id ('el2.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el2});
 
   @L2Method:
     @@Name: parentNode
@@ -1084,6 +1340,10 @@ IFCls2Def:
           to step upward from the <A::TreeWalker.root> node,
           or if it fails to find a vislble ancestor node,
           it retains the current position and returns <DOM::null>.
+
+          For the purpose of this method, <C::NodeFilter.MANAKAI_FILTER_OPAQUE>
+          <kwd:MUST> be handled by the same way as 
+          <C::NodeFilter.FILTER_ACCEPT>.
       @@@PerlDef:
         __DEEP{
           unless ($self->{current_node} eq $self->{root}) {
@@ -1091,7 +1351,8 @@ IFCls2Def:
             T: while (defined $target) {
               my $result;
               __CODE{testNode}__;
-              if ($result == <C::NodeFilter.FILTER_ACCEPT>) {
+              if ($result == <C::NodeFilter.FILTER_ACCEPT> or
+                  $result == <C::NodeFilter.MANAKAI_FILTER_OPAQUE>) {
                 $r = $self->{current_node} = $target;
                 last T;
               } elsif ($target eq $self->{root}) {
@@ -1215,6 +1476,151 @@ IFCls2Def:
         $test->assert_equals ($tw-><M::TreeWalker.parentNode>, $node{el1});
         $test->id ('el4.currentNode');
         $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el1});
+    @@Test:
+      @@@QName: TreeWalker.parentNode.4.test
+      @@@enDesc:
+        FILTER_REJECT works as if FILTER_SKIP if the currentNode
+        is in the rejected subtree.
+      @@@PerlDef:
+        my $doc;
+        my $doctrv;
+        __CODE{createDocForTest}__;
+
+        my %node;
+        __CODE{TreeForTest1}__;
+        
+        my $tw = $doctrv-><M::DocumentTraversal.createTreeWalker>
+                            ($node{el1}, <C::NodeFilter.SHOW_ALL>, sub {
+                              $_[1]->local_name eq 'el3'
+                                ? <C::NodeFilter.FILTER_REJECT>
+                                : <C::NodeFilter.FILTER_ACCEPT>
+                            });
+
+        $test->id ('el1');
+        $test->assert_null ($tw-><M::TreeWalker.parentNode>);
+        $test->id ('el1.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el1});
+
+        $test->id ('el2');
+        $tw-><AS::TreeWalker.currentNode> ($node{el2});
+        $test->assert_equals ($tw-><M::TreeWalker.parentNode>, $node{el1});
+        $test->id ('el2.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el1});
+
+        $test->id ('el3');
+        $tw-><AS::TreeWalker.currentNode> ($node{el3});
+        $test->assert_equals ($tw-><M::TreeWalker.parentNode>, $node{el1});
+        $test->id ('el3.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el1});
+
+        $test->id ('el4');
+        $tw-><AS::TreeWalker.currentNode> ($node{el4});
+        $test->assert_equals ($tw-><M::TreeWalker.parentNode>, $node{el1});
+        $test->id ('el4.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el1});
+    @@Test:
+      @@@QName: TreeWalker.parentNode.5.test
+      @@@enDesc:
+        expandEntityReferences
+      @@@PerlDef:
+        my $doc;
+        my $doctrv;
+        __CODE{createDocForTest}__;
+
+        my %node;
+        __CODE{TreeForTestER1}__;
+        
+        my $tw = $doctrv-><M::DocumentTraversal.createTreeWalker>
+                            ($node{el1}, <C::NodeFilter.SHOW_ALL>, null, false);
+
+        $test->id ('el1');
+        $test->assert_null ($tw-><M::TreeWalker.parentNode>);
+        $test->id ('el1.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el1});
+
+        $tw-><AS::TreeWalker.currentNode> ($node{er1});
+        $test->id ('er1');
+        $test->assert_equals ($tw-><M::TreeWalker.parentNode>, $node{el1});
+        $test->id ('er1.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el1});
+
+        $tw-><AS::TreeWalker.currentNode> ($node{el3});
+        $test->id ('el3');
+        $test->assert_equals ($tw-><M::TreeWalker.parentNode>, $node{er1});
+        $test->id ('el3.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{er1});
+
+        $tw-><AS::TreeWalker.currentNode> ($node{el4});
+        $test->id ('el4');
+        $test->assert_equals ($tw-><M::TreeWalker.parentNode>, $node{er1});
+        $test->id ('el4.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{er1});
+
+        $tw-><AS::TreeWalker.currentNode> ($node{el5});
+        $test->id ('el5');
+        $test->assert_equals ($tw-><M::TreeWalker.parentNode>, $node{er1});
+        $test->id ('el5.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{er1});
+
+        $tw-><AS::TreeWalker.currentNode> ($node{el6});
+        $test->id ('el6');
+        $test->assert_equals ($tw-><M::TreeWalker.parentNode>, $node{el1});
+        $test->id ('el6.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el1});
+    @@Test:
+      @@@QName: TreeWalker.parentNode.6.test
+      @@@enDesc:
+        MANAKAI_FILTER_OPAQUE
+      @@@PerlDef:
+        my $doc;
+        my $doctrv;
+        __CODE{createDocForTest}__;
+
+        my %node;
+        __CODE{TreeForTestER1}__;
+        
+        my $tw = $doctrv-><M::DocumentTraversal.createTreeWalker>
+                            ($node{el1}, <C::NodeFilter.SHOW_ALL>, sub {
+                               $_[1]->node_type
+                                   == <C::Node.ENTITY_REFERENCE_NODE>
+                                 ? <C::NodeFilter.MANAKAI_FILTER_OPAQUE>
+                                 : <C::NodeFilter.FILTER_ACCEPT>
+                             }, true);
+
+        $test->id ('el1');
+        $test->assert_null ($tw-><M::TreeWalker.parentNode>);
+        $test->id ('el1.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el1});
+
+        $tw-><AS::TreeWalker.currentNode> ($node{er1});
+        $test->id ('er1');
+        $test->assert_equals ($tw-><M::TreeWalker.parentNode>, $node{el1});
+        $test->id ('er1.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el1});
+
+        $tw-><AS::TreeWalker.currentNode> ($node{el3});
+        $test->id ('el3');
+        $test->assert_equals ($tw-><M::TreeWalker.parentNode>, $node{er1});
+        $test->id ('el3.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{er1});
+
+        $tw-><AS::TreeWalker.currentNode> ($node{el4});
+        $test->id ('el4');
+        $test->assert_equals ($tw-><M::TreeWalker.parentNode>, $node{el3});
+        $test->id ('el4.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el3});
+
+        $tw-><AS::TreeWalker.currentNode> ($node{el5});
+        $test->id ('el5');
+        $test->assert_equals ($tw-><M::TreeWalker.parentNode>, $node{er1});
+        $test->id ('el5.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{er1});
+
+        $tw-><AS::TreeWalker.currentNode> ($node{el6});
+        $test->id ('el6');
+        $test->assert_equals ($tw-><M::TreeWalker.parentNode>, $node{el1});
+        $test->id ('el6.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el1});
 
   @L2Method:
     @@Name: nextNode
@@ -1235,6 +1641,12 @@ IFCls2Def:
           {SpecIssue::
             Clarification is necessary; e.g. nextNode of root is null?
           }
+
+          If the <A::TreeWalker.currentNode> is marked as 
+          <C::NodeFilter.MANAKAI_FILTER_OPAQUE> by the <IF::NodeFilter>,
+          the method <kwd:MUST-NOT> return any descendant of
+          the <A::TreeWalker.currentNode>.  Otherwise,
+          it <kwd:MUST> be treated as if <C::NodeFilter.FILTER_ACCEPT>.
       @@@PerlDef:
         __DEEP{
           my $target = $self->{current_node};
@@ -1262,7 +1674,8 @@ IFCls2Def:
   
               my $result;
               __CODE{testNode}__;
-              if ($result == <C::NodeFilter.FILTER_ACCEPT>) {
+              if ($result == <C::NodeFilter.FILTER_ACCEPT> or
+                  $result == <C::NodeFilter.MANAKAI_FILTER_OPAQUE>) {
                 $r = $self->{current_node} = $target;
                 last T;
               } elsif ($result == <C::NodeFilter.FILTER_SKIP>) {
@@ -1439,11 +1852,112 @@ IFCls2Def:
         $test->assert_null ($tw-><M::TreeWalker.nextNode>);
         $test->id ('el5.currentNode');
         $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el5});
+    @@Test:
+      @@@QName: TreeWalker.nextNode.5.test
+      @@@enDesc:
+        expandEntityReferences
+      @@@PerlDef:
+        my $doc;
+        my $doctrv;
+        __CODE{createDocForTest}__;
+
+        my %node;
+        __CODE{TreeForTestER1}__;
+        
+        my $tw = $doctrv-><M::DocumentTraversal.createTreeWalker>
+                            ($node{el1}, <C::NodeFilter.SHOW_ALL>);
+
+        $test->id ('el1');
+        $test->assert_equals ($tw-><M::TreeWalker.nextNode>, $node{er1});
+        $test->id ('el1.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{er1});
+
+        $test->id ('er1');
+        $test->assert_equals ($tw-><M::TreeWalker.nextNode>, $node{el6});
+        $test->id ('er1.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el6});
+
+        $tw-><AS::TreeWalker.currentNode> ($node{el3});
+        $test->id ('el3');
+        $test->assert_equals ($tw-><M::TreeWalker.nextNode>, $node{el4});
+        $test->id ('el3.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el4});
+
+        $tw-><AS::TreeWalker.currentNode> ($node{el4});
+        $test->id ('el4');
+        $test->assert_equals ($tw-><M::TreeWalker.nextNode>, $node{el6});
+        $test->id ('el4.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el6});
+
+        $tw-><AS::TreeWalker.currentNode> ($node{el5});
+        $test->id ('el5');
+        $test->assert_equals ($tw-><M::TreeWalker.nextNode>, $node{el6});
+        $test->id ('el5.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el6});
+
+        $tw-><AS::TreeWalker.currentNode> ($node{el6});
+        $test->id ('el6');
+        $test->assert_null ($tw-><M::TreeWalker.nextNode>);
+        $test->id ('el6.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el6});
+    @@Test:
+      @@@QName: TreeWalker.nextNode.6.test
+      @@@enDesc:
+        MANAKAI_FILTER_OPAQUE
+      @@@PerlDef:
+        my $doc;
+        my $doctrv;
+        __CODE{createDocForTest}__;
+
+        my %node;
+        __CODE{TreeForTestER1}__;
+        
+        my $tw = $doctrv-><M::DocumentTraversal.createTreeWalker>
+                            ($node{el1}, <C::NodeFilter.SHOW_ALL>, sub {
+                               $_[1]->node_type
+                                   == <C::Node.ENTITY_REFERENCE_NODE>
+                                 ? <C::NodeFilter.MANAKAI_FILTER_OPAQUE>
+                                 : <C::NodeFilter.FILTER_ACCEPT>
+                             }, true);
+
+        $test->id ('el1');
+        $test->assert_equals ($tw-><M::TreeWalker.nextNode>, $node{er1});
+        $test->id ('el1.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{er1});
+
+        $test->id ('er1');
+        $test->assert_equals ($tw-><M::TreeWalker.nextNode>, $node{el6});
+        $test->id ('er1.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el6});
+
+        $tw-><AS::TreeWalker.currentNode> ($node{el3});
+        $test->id ('el3');
+        $test->assert_equals ($tw-><M::TreeWalker.nextNode>, $node{el4});
+        $test->id ('el3.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el4});
+
+        $test->id ('el4');
+        $test->assert_equals ($tw-><M::TreeWalker.nextNode>, $node{el5});
+        $test->id ('el4.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el5});
+
+        $test->id ('el5');
+        $test->assert_equals ($tw-><M::TreeWalker.nextNode>, $node{el6});
+        $test->id ('el5.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el6});
+
+        $test->id ('el6');
+        $test->assert_null ($tw-><M::TreeWalker.nextNode>);
+        $test->id ('el6.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el6});
 
   @L2Method:
     @@Name: nextSibling
     @@enDesc:
       Moves and returns to the next visible sibling of the current node.
+
+      The <C::NodeFilter.MANAKAI_FILTER_OPAQUE> value <kwd:MUST>
+      be treated as if <C::NodeFilter.FILTER_ACCEPT> is specified.
     @@Return:
       @@@Type: Node
       @@@enDesc:
@@ -1477,7 +1991,8 @@ IFCls2Def:
   
               my $result;
               __CODE{testNode}__;
-              if ($result == <C::NodeFilter.FILTER_ACCEPT>) {
+              if ($result == <C::NodeFilter.FILTER_ACCEPT> or
+                  $result == <C::NodeFilter.MANAKAI_FILTER_OPAQUE>) {
                 $r = $self->{current_node} = $target;
                 last T;
               } elsif ($result == <C::NodeFilter.FILTER_SKIP>) {
@@ -1664,12 +2179,127 @@ IFCls2Def:
         $test->assert_null ($tw-><M::TreeWalker.nextSibling>);
         $test->id ('el5.currentNode');
         $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el5});
+    @@Test:
+      @@@QName: TreeWalker.nextSibling.5.test
+      @@@enDesc:
+        expandEntityReferences
+      @@@PerlDef:
+        my $doc;
+        my $doctrv;
+        __CODE{createDocForTest}__;
+
+        my %node;
+        __CODE{TreeForTestER1}__;
+        
+        my $tw = $doctrv-><M::DocumentTraversal.createTreeWalker>
+                            ($node{el1}, <C::NodeFilter.SHOW_ALL>, null, false);
+
+        $test->id ('el1');
+        $test->assert_null ($tw-><M::TreeWalker.nextSibling>);
+        $test->id ('el1.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el1});
+
+        $test->id ('er1');
+        $tw-><AS::TreeWalker.currentNode> ($node{er1});
+        $test->assert_equals ($tw-><M::TreeWalker.nextSibling>, $node{el6});
+        $test->id ('er1.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el6});
+
+        $test->id ('el3');
+        $tw-><AS::TreeWalker.currentNode> ($node{el3});
+        $test->assert_null ($tw-><M::TreeWalker.nextSibling>);
+        $test->id ('el3.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el3});
+
+        $test->id ('el4');
+        $tw-><AS::TreeWalker.currentNode> ($node{el4});
+        $test->assert_null ($tw-><M::TreeWalker.nextSibling>);
+        $test->id ('el4.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el4});
+
+        $test->id ('el5');
+        $tw-><AS::TreeWalker.currentNode> ($node{el5});
+        $test->assert_null ($tw-><M::TreeWalker.nextSibling>);
+        $test->id ('el5.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el5});
+
+        $test->id ('el6');
+        $tw-><AS::TreeWalker.currentNode> ($node{el6});
+        $test->assert_null ($tw-><M::TreeWalker.nextSibling>);
+        $test->id ('el6.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el6});
+    @@Test:
+      @@@QName: TreeWalker.nextSibling.6.test
+      @@@enDesc:
+        MANAKAI_FILTER_OPAQUE
+      @@@PerlDef:
+        my $doc;
+        my $doctrv;
+        __CODE{createDocForTest}__;
+
+        my %node;
+        __CODE{TreeForTestER1}__;
+        
+        my $tw = $doctrv-><M::DocumentTraversal.createTreeWalker>
+                            ($node{el1}, <C::NodeFilter.SHOW_ALL>, sub {
+                               $_[1]->node_type
+                                   == <C::Node.ENTITY_REFERENCE_NODE>
+                                 ? <C::NodeFilter.MANAKAI_FILTER_OPAQUE>
+                                 : <C::NodeFilter.FILTER_ACCEPT>
+                             }, true);
+
+        $test->id ('el1');
+        $test->assert_null ($tw-><M::TreeWalker.nextSibling>);
+        $test->id ('el1.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el1});
+
+        $test->id ('er1');
+        $tw-><AS::TreeWalker.currentNode> ($node{er1});
+        $test->assert_equals ($tw-><M::TreeWalker.nextSibling>, $node{el6});
+        $test->id ('er1.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el6});
+
+        $test->id ('el3');
+        $tw-><AS::TreeWalker.currentNode> ($node{el3});
+        $test->assert_equals ($tw-><M::TreeWalker.nextSibling>, $node{el5});
+        $test->id ('el3.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el5});
+
+        $test->id ('el4');
+        $tw-><AS::TreeWalker.currentNode> ($node{el4});
+        $test->assert_null ($tw-><M::TreeWalker.nextSibling>);
+        $test->id ('el4.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el4});
+
+        $test->id ('el5');
+        $tw-><AS::TreeWalker.currentNode> ($node{el5});
+        $test->assert_null ($tw-><M::TreeWalker.nextSibling>);
+        $test->id ('el5.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el5});
+
+        $test->id ('el6');
+        $tw-><AS::TreeWalker.currentNode> ($node{el6});
+        $test->assert_null ($tw-><M::TreeWalker.nextSibling>);
+        $test->id ('el6.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el6});
 
   @L2Method:
     @@Name: previousNode
     @@enDesc:
       Moves and returns to the previous visible node in document order
       relative to the current node.
+
+      This method <kwd:MUST-NOT> return a descendant
+      of a sibling of the <A::TreeWalker.currentNode> if 
+      an ancestor between the descendant and the parent
+      of the <A::TreeWalker.currentNode> (exclusive)
+      is marked as <C::NodeFilter.MANAKAI_FILTER_OPAQUE> by
+      the <IF::NodeFilter> if any.  If the node that is
+      a candidate to return is an ancestor of the
+      <A::TreeWalker.currentNode>, the <C::NodeFilter.MANAKAI_FILTER_OPAQUE>
+      value returned by a <IF::NodeFilter> <kwd:MUST> be
+      treated as if the <C::NodeFilter.FILTER_ACCEPT> value
+      is returned.
     @@Return:
       @@@Type: Node
       @@@enDesc:
@@ -1696,7 +2326,10 @@ IFCls2Def:
               if (defined $ptarget) {
                 my $result;
                 __CODE{testNode:: $target => $ptarget}__;
-                if ($result != <C::NodeFilter.FILTER_REJECT>) {
+                if ($result == <C::NodeFilter.MANAKAI_FILTER_OPAQUE>) {
+                  $r = $self->{current_node} = $ptarget;
+                  last T;
+                } elsif ($result != <C::NodeFilter.FILTER_REJECT>) {
                   my $tw = $self->clone;
                   $tw->{current_node} = $ptarget;
                   $tw->{root} = $ptarget;
@@ -1715,7 +2348,8 @@ IFCls2Def:
               if (defined $ptarget) {
                 my $result;
                 __CODE{testNode:: $target => $ptarget}__;
-                if ($result == <C::NodeFilter.FILTER_ACCEPT>) {
+                if ($result == <C::NodeFilter.FILTER_ACCEPT> or
+                    $result == <C::NodeFilter.MANAKAI_FILTER_OPAQUE>) {
                   $r = $self->{current_node} = $ptarget;
                   last T;
                 } else {
@@ -1900,11 +2534,122 @@ IFCls2Def:
         $test->assert_equals ($tw-><M::TreeWalker.previousNode>, $node{el2});
         $test->id ('el5.currentNode');
         $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el2});
+    @@Test:
+      @@@QName: TreeWalker.previousNode.5.test
+      @@@enDesc:
+        expandEntityReferences
+      @@@PerlDef:
+        my $doc;
+        my $doctrv;
+        __CODE{createDocForTest}__;
+
+        my %node;
+        __CODE{TreeForTestER1}__;
+        
+        my $tw = $doctrv-><M::DocumentTraversal.createTreeWalker>
+                            ($node{el1}, <C::NodeFilter.SHOW_ALL>, null, false);
+
+        $test->id ('el1');
+        $test->assert_null ($tw-><M::TreeWalker.previousNode>);
+        $test->id ('el1.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el1});
+
+        $test->id ('er1');
+        $tw-><AS::TreeWalker.currentNode> ($node{er1});
+        $test->assert_equals ($tw-><M::TreeWalker.previousNode>, $node{el1});
+        $test->id ('er1.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el1});
+
+        $test->id ('el3');
+        $tw-><AS::TreeWalker.currentNode> ($node{el3});
+        $test->assert_equals ($tw-><M::TreeWalker.previousNode>, $node{er1});
+        $test->id ('el3.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{er1});
+
+        $test->id ('el4');
+        $tw-><AS::TreeWalker.currentNode> ($node{el4});
+        $test->assert_equals ($tw-><M::TreeWalker.previousNode>, $node{er1});
+        $test->id ('el4.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{er1});
+
+        $test->id ('el5');
+        $tw-><AS::TreeWalker.currentNode> ($node{el5});
+        $test->assert_equals ($tw-><M::TreeWalker.previousNode>, $node{er1});
+        $test->id ('el5.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{er1});
+
+        $test->id ('el6');
+        $tw-><AS::TreeWalker.currentNode> ($node{el6});
+        $test->assert_equals ($tw-><M::TreeWalker.previousNode>, $node{er1});
+        $test->id ('el6.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{er1});
+    @@Test:
+      @@@QName: TreeWalker.previousNode.6.test
+      @@@enDesc:
+        MANAKAI_FILTER_OPAQUE
+      @@@PerlDef:
+        my $doc;
+        my $doctrv;
+        __CODE{createDocForTest}__;
+
+        my %node;
+        __CODE{TreeForTestER1}__;
+        
+        my $tw = $doctrv-><M::DocumentTraversal.createTreeWalker>
+                            ($node{el1}, <C::NodeFilter.SHOW_ALL>, sub {
+                               $_[1]->node_type
+                                   == <C::Node.ENTITY_REFERENCE_NODE>
+                                 ? <C::NodeFilter.MANAKAI_FILTER_OPAQUE>
+                                 : <C::NodeFilter.FILTER_ACCEPT>
+                             }, true);
+
+        $test->id ('el1');
+        $test->assert_null ($tw-><M::TreeWalker.previousNode>);
+        $test->id ('el1.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el1});
+
+        $test->id ('er1');
+        $tw-><AS::TreeWalker.currentNode> ($node{er1});
+        $test->assert_equals ($tw-><M::TreeWalker.previousNode>, $node{el1});
+        $test->id ('er1.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el1});
+
+        $test->id ('el3');
+        $tw-><AS::TreeWalker.currentNode> ($node{el3});
+        $test->assert_equals ($tw-><M::TreeWalker.previousNode>, $node{er1});
+        $test->id ('el3.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{er1});
+
+        $test->id ('el4');
+        $tw-><AS::TreeWalker.currentNode> ($node{el4});
+        $test->assert_equals ($tw-><M::TreeWalker.previousNode>, $node{el3});
+        $test->id ('el4.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el3});
+
+        $test->id ('el5');
+        $tw-><AS::TreeWalker.currentNode> ($node{el5});
+        $test->assert_equals ($tw-><M::TreeWalker.previousNode>, $node{el4});
+        $test->id ('el5.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el4});
+
+        $test->id ('el6');
+        $tw-><AS::TreeWalker.currentNode> ($node{el6});
+        $test->assert_equals ($tw-><M::TreeWalker.previousNode>, $node{er1});
+        $test->id ('el6.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{er1});
 
   @L2Method:
     @@Name: previousSibling
     @@enDesc:
       Moves and returns to the previous visible sibling of the current node.
+
+      If a node that is a candicate to be returned is marked as
+      <C::NodeFilter.MANAKAI_FILTER_OPAQUE>, it <kwd:MUST>
+      be treated as <C::NodeFilter.FILTER_ACCEPT> when the
+      node is a sibling of the <A::TreeWalker.currentNode>,
+      or as in <M::TreeWalker.lastChild> where the
+      <A::TreeWalker.currentNode> would be the sibling
+      of the actual <A::TreeWalker.currentNode> otherwise.
     @@Return:
       @@@Type: Node
       @@@enDesc:
@@ -1930,7 +2675,8 @@ IFCls2Def:
                 last P unless defined $current;
                 my $presult;
                 __CODE{testNode:: $result => $presult, $target => $current}__;
-                if ($presult != <C::NodeFilter.FILTER_SKIP>) {
+                if ($presult != <C::NodeFilter.FILTER_SKIP> and
+                    $presult != <C::NodeFilter.FILTER_REJECT>) {
                   last P;
                 }
               } # P
@@ -1938,7 +2684,8 @@ IFCls2Def:
   
               my $result;
               __CODE{testNode}__;
-              if ($result == <C::NodeFilter.FILTER_ACCEPT>) {
+              if ($result == <C::NodeFilter.FILTER_ACCEPT> or
+                  $result == <C::NodeFilter.MANAKAI_FILTER_OPAQUE>) {
                 $r = $self->{current_node} = $target;
                 last T;
               } elsif ($result == <C::NodeFilter.FILTER_SKIP>) {
@@ -2119,15 +2866,118 @@ IFCls2Def:
 
         $test->id ('el4');
         $tw-><AS::TreeWalker.currentNode> ($node{el4});
-        $test->assert_null ($tw-><M::TreeWalker.previousSibling>);
+        $test->assert_equals ($tw-><M::TreeWalker.previousSibling>, $node{el2});
         $test->id ('el4.currentNode');
-        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el4});
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el2});
 
         $test->id ('el5');
         $tw-><AS::TreeWalker.currentNode> ($node{el5});
         $test->assert_equals ($tw-><M::TreeWalker.previousSibling>, $node{el2});
         $test->id ('el5.currentNode');
         $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el2});
+    @@Test:
+      @@@QName: TreeWalker.previousSibling.5.test
+      @@@enDesc:
+        expandEntityReferences
+      @@@PerlDef:
+        my $doc;
+        my $doctrv;
+        __CODE{createDocForTest}__;
+
+        my %node;
+        __CODE{TreeForTestER1}__;
+        
+        my $tw = $doctrv-><M::DocumentTraversal.createTreeWalker>
+                            ($node{el1}, <C::NodeFilter.SHOW_ALL>, null, false);
+
+        $test->id ('el1');
+        $test->assert_null ($tw-><M::TreeWalker.previousSibling>);
+        $test->id ('el1.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el1});
+
+        $test->id ('er1');
+        $tw-><AS::TreeWalker.currentNode> ($node{er1});
+        $test->assert_null ($tw-><M::TreeWalker.previousSibling>);
+        $test->id ('er1.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{er1});
+
+        $test->id ('el3');
+        $tw-><AS::TreeWalker.currentNode> ($node{el3});
+        $test->assert_null ($tw-><M::TreeWalker.previousSibling>);
+        $test->id ('el3.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el3});
+
+        $test->id ('el4');
+        $tw-><AS::TreeWalker.currentNode> ($node{el4});
+        $test->assert_null ($tw-><M::TreeWalker.previousSibling>);
+        $test->id ('el4.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el4});
+
+        $test->id ('el5');
+        $tw-><AS::TreeWalker.currentNode> ($node{el5});
+        $test->assert_null ($tw-><M::TreeWalker.previousSibling>);
+        $test->id ('el5.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el5});
+
+        $test->id ('el6');
+        $tw-><AS::TreeWalker.currentNode> ($node{el6});
+        $test->assert_equals ($tw-><M::TreeWalker.previousSibling>, $node{er1});
+        $test->id ('el6.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{er1});
+    @@Test:
+      @@@QName: TreeWalker.previousSibling.6.test
+      @@@enDesc:
+        MANAKAI_FILTER_OPAQUE
+      @@@PerlDef:
+        my $doc;
+        my $doctrv;
+        __CODE{createDocForTest}__;
+
+        my %node;
+        __CODE{TreeForTestER1}__;
+        
+        my $tw = $doctrv-><M::DocumentTraversal.createTreeWalker>
+                            ($node{el1}, <C::NodeFilter.SHOW_ALL>, sub {
+                               $_[1]->node_type
+                                   == <C::Node.ENTITY_REFERENCE_NODE>
+                                 ? <C::NodeFilter.MANAKAI_FILTER_OPAQUE>
+                                 : <C::NodeFilter.FILTER_ACCEPT>
+                             }, true);
+
+        $test->id ('el1');
+        $test->assert_null ($tw-><M::TreeWalker.previousSibling>);
+        $test->id ('el1.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el1});
+
+        $test->id ('er1');
+        $tw-><AS::TreeWalker.currentNode> ($node{er1});
+        $test->assert_null ($tw-><M::TreeWalker.previousSibling>);
+        $test->id ('er1.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{er1});
+
+        $test->id ('el3');
+        $tw-><AS::TreeWalker.currentNode> ($node{el3});
+        $test->assert_null ($tw-><M::TreeWalker.previousSibling>);
+        $test->id ('el3.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el3});
+
+        $test->id ('el4');
+        $tw-><AS::TreeWalker.currentNode> ($node{el4});
+        $test->assert_null ($tw-><M::TreeWalker.previousSibling>);
+        $test->id ('el4.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el4});
+
+        $test->id ('el5');
+        $tw-><AS::TreeWalker.currentNode> ($node{el5});
+        $test->assert_equals ($tw-><M::TreeWalker.previousSibling>, $node{el3});
+        $test->id ('el5.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{el3});
+
+        $test->id ('el6');
+        $tw-><AS::TreeWalker.currentNode> ($node{el6});
+        $test->assert_equals ($tw-><M::TreeWalker.previousSibling>, $node{er1});
+        $test->id ('el6.currentNode');
+        $test->assert_equals ($tw-><AG::TreeWalker.currentNode>, $node{er1});
 
   @CMethod:
     @@Operator: dlp|CloneMethod
@@ -2225,6 +3075,36 @@ IFCls2Def:
       $node{el1}->append_child ($node{el3});
       $node{el3}->append_child ($node{el4});
       $node{el1}->append_child ($node{el5});
+  @CODE:
+    @@QName: TreeForTestER1
+    @@PerlDef:
+      $node{el1} = $doc->create_element ('el1');
+      $node{er1} = $doc->create_entity_reference ('er1');
+      $node{er1}->manakai_set_read_only (false, true);
+      $node{el3} = $doc->create_element ('el3');
+      $node{el4} = $doc->create_element ('el4');
+      $node{el5} = $doc->create_element ('el5');
+      $node{el6} = $doc->create_element ('el6');
+      $node{el1}->append_child ($node{er1});
+      $node{er1}->append_child ($node{el3});
+      $node{el3}->append_child ($node{el4});
+      $node{er1}->append_child ($node{el5});
+      $node{el1}->append_child ($node{el6});
+  @CODE:
+    @@QName: TreeForTestER2
+    @@PerlDef:
+      $node{el1} = $doc->create_element ('el1');
+      $node{el2} = $doc->create_element ('el2');
+      $node{er1} = $doc->create_entity_reference ('er1');
+      $node{er1}->manakai_set_read_only (false, true);
+      $node{el3} = $doc->create_element ('el3');
+      $node{el4} = $doc->create_element ('el4');
+      $node{el5} = $doc->create_element ('el5');
+      $node{el1}->append_child ($node{el2});
+      $node{el1}->append_child ($node{er1});
+      $node{er1}->append_child ($node{el3});
+      $node{er1}->append_child ($node{el5});
+      $node{el3}->append_child ($node{el4});
 ##TreeWalker
 
 IFCls2Def:
@@ -2305,6 +3185,36 @@ IFCls2Def:
         Skip the node.  Navigation methods defined for
         <IF::NodeIterator> or <IF::TreeWalker> will not return the node.
         The children of the node will still be considered.
+    @@mConst:
+      @@@Name: MANAKAI_FILTER_OPAQUE
+      @@@intValue: 12101
+      @@@enDesc:
+        Accept the node itself while rejecting its children if any.
+
+        If the <C::NodeFilter.MANAKAI_FILTER_OPAQUE> value is 
+        specified for a node, the node itself <kwd:MUST> be treated
+        as if the <C::NodeFilter.FILTER_ACCEPT> value is specified.
+        However, any descendant of the node <kwd:MUST> be
+        hidden from the logical view as if the
+        <C::NodeFilter.FILTER_REJECT> value is specified for
+        the ancestor node.
+
+          {NOTE::
+            This value can be used to emulate the
+            <A::TreeWalker.expandEntityReferences> flag.
+            However, unlike that flag, this filtering option
+            makes the engine behave for descendants as if the node is
+            rejected rather than the descendants of the node
+            is rejected.
+          }
+
+          {ISSUE::
+            Better name?  Any verb?
+          }
+
+          {ISSUE::
+            Interaction to <IF::NodeIterator>s
+          }
 
   @BitMaskGroup:
     @@Label:

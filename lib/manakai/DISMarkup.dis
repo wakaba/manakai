@@ -13,7 +13,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/09/23 18:25:10 $
+      $Date: 2006/05/13 05:40:58 $
     @@ContentType:
       dis:Date.RCS
   
@@ -35,6 +35,8 @@ Namespace:
      http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
   @ManakaiDOM:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
+  @mv: 
+    http://suika.fam.cx/www/2006/05/mv/
   @owl:
     http://www.w3.org/2002/07/owl#
   @rdf:
@@ -46,17 +48,135 @@ Namespace:
 
 ## -- Markup language vocabulary types
 
+ResourceTypeDef:
+  @QName: mv|Item
+  @enFN: item
+  @enDesc:
+    An <Q::mv|Item> is a component in markup language vocabulary.
+
+ResourceTypeDef:
+  @QName: mv|ItemType
+  @enFN: item type
+  @enDesc:
+    An <Q::mv|ItemType> is a class of components in markup
+    language vocabulary.
+  @subsetOf: mv|Item
+
+RPropDef:
+  @QName: mv|name
+  @enFN: name
+  @enDesc:
+    A <Q::mv|name> is a name to identity the <Q::mv|Item>.
+  @rdfs:domain: mv|Item
+  @dataType: DISCore|String
+  @multipleProperties: DISCore|UnorderedList
+
+RPropDef:
+  @QName: mv|qualifiedName
+  @enFN: qualified name
+  @enDesc:
+    The pair of the namespace URI and local name of the <Q::mv|Item>.
+  @rdfs:domain: mv|Item
+  @dataType: DISCore|QName
+  @multipleProperties: DISCore|UnorderedList
+
+RPropDef:
+  @QName: mv|publicIdentifier
+  @enFN: public identifier
+  @enDesc:
+    The public identifier of the <Q::mv|Item>.
+  @rdfs:domain: mv|Item
+  @dataType: DISCore|String
+  @multipleProperties: DISCore|UnorderedList
+  @subsetOf: mv|name
+
+RPropDef:
+  @QName: mv|systemIdentifier
+  @enFN: system identifier
+  @enDesc:
+    The system identifier of the <Q::mv|Item>.
+  @rdfs:domain: mv|Item
+  @dataType: DISCore|String
+  @multipleProperties: DISCore|UnorderedList
+  @subsetOf: mv|name
+
+ResourceTypeDef:
+  @QName: mv|Document
+  @enFN: document
+  @enDesc:
+    A <Q::mv|Document> is a document.
+  @subsetOf: mv|Item
+
+ResourceTypeDef:
+  @QName: mv|DocumentType
+  @enFN: document type
+  @enDesc:
+    A <Q::mv|DocumentType> is a class of documents.
+  @subsetOf: mv|ItemType
+
+RPropDef:
+  @QName: mv|documentTypeName
+  @enFN: document type name
+  @enDesc:
+    The name of the document type.
+  @subsetOf: mv|name
+  @dataType: DISCore|String
+  @multipleProperties: DISCore|Single
+
+ResourceTypeDef:
+  @QName: mv|Element
+  @enFN: element
+  @enDesc:
+    An <Q::mv|Element> is an element in markup language vocabulary.
+  @subsetOf: mv|Item
+
+ResourceTypeDef:
+  @QName: mv|ElementType
+  @enFN: element type
+  @enDesc:
+    An <Q::mv|ElementType> is a class of <Q::mv|Element>s.
+  @subsetOf: mv|ItemType
+  @subsetOf: mv|ElementTypeOrNSElementTypes
+
+RPropDef:
+  @QName: mv|elementTypeName
+  @enFN: element type name
+  @enDesc:
+    The name of the element type.
+  @subsetOf: mv|name
+  @rdfs:domain: mv|ElementtypeOrNSElementTypes
+  @dataType: DISCore|QName
+  @multipleProperties: DISCore|Single
+
+ResourceTypeDef:
+  @QName: mv|ElementTypes
+  @enFN: element types
+  @enDesc:
+    An <Q::mv|ElementTypes> is a set of <Q::mv|ElementType>s.
+
+ResourceTypeDef:
+  @QName: mv|NSElementTypes
+  @enFN: element types in a namespace
+  @enDesc:
+    An <Q::mv|NSElementTypes> is a set of <Q::mv|ElementType>s
+    belong to a <Q::mv|Namespace>.
+  @subsetOf: mv|ElementTypes
+  @subsetOf: mv|ElementTypeOrNSElementTypes
+
+ResourceTypeDef:
+  @QName: mv|ElementTypeOrNSElementTypes
+  @enFN: element type or element types in a namespace
+  @enDesc:
+    An <Q::mv|ElementTypeOrNSElementTypes> is either
+    a <Q::mv|ElementType> or a <Q::mv|NSElementTypes>.
+
 ElementTypeBinding:
   @Name: ResourceTypeDef
   @ElementType: 
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      rdfs:Class
-    @@ISA:
-      rdfs:Class
-    @@ForCheck:
-      =ManakaiDOM:all
+    @@DISCore:resourceType: DISCore|resourceType
+    @@subsetOf: DISCore|resourceType
 
 ElementTypeBinding:
   @Name: enDesc
@@ -65,32 +185,53 @@ ElementTypeBinding:
   @ShadowContent:
     @@lang:en
 
+ElementTypeBinding:
+  @Name: enFN
+  @ElementType:
+    dis:FullName
+  @ShadowContent:
+    @@lang:en
+
 ResourceTypeDef:
   @QName: ElementTypeOrElementInNS
-  @enDesc:
-    <Q::ElementType>s and <Q::AnyElementInNS>'es.
+  @AliasFor: mv|ElementTypeOrNSElementTypes
 
 ResourceTypeDef:
   @QName: ElementType
-  @Description:
-    @@lang:en
-    @@@:
-      A markup language element type. 
-  @rdfs:subClassOf: ElementTypeOrElementInNS
+  @AliasFor: mv|ElementType
 
 ResourceTypeDef:
   @QName: AnyElementInNS
+  @AliasFor: mv|NSElementTypes
+
+ResourceTypeDef:
+  @QName: mv|Attribute
+  @enFN: attribute
   @enDesc:
-    Element type wildcards that represent any element type
-    in a particular namespace.
-  @rdfs:subClassOf: ElementTypeOrElementInNS
+    An <Q::mv|Attribute> is an attribute in markup language
+    vocabulary.
+  @subsetOf: mv|Item
 
 ResourceTypeDef:
   @QName: Attribute
-  @Description:
-    @@lang:en
-    @@@:
-      A markup language element attribute type.  
+  @AliasFor: mv|Attribute
+
+ResourceTypeDef:
+  @QName: mv|AttributeType
+  @enFN: attribute type
+  @enDesc:
+    An <Q::mv|AttributeType> is a class of attributes.
+  @subsetOf: mv|ItemType
+
+RPropDef:
+  @QName: mv|attributeTypeName
+  @enFN: attribute type name
+  @enDesc:
+    The name of the <Q::mv|AttributeType>.
+  @rdfs:domain: mv|AttributeType
+  @subsetOf: mv|name
+  @dataType: DISCore|QName
+  @multipleProperties: DISCore|Single
 
 ResourceTypeDef:
   @QName: AnyAttributeInNS
@@ -101,45 +242,62 @@ ResourceTypeDef:
 ## -- Markup language vocabulary characteristics
 
 ElementTypeBinding:
-  @Name: PropDef
+  @Name: RPropDef
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      rdf:Property
+    @@DISCore:resourceType: DISSource|ResourceProperty
 
-PropDef:
-  @QName: elementType
-  @Description:
-    @@lang:en
-    @@@:
-      A subject resource is associated with an object element type. 
-  @rdfs:domain: AnyElementInNS
-  @dataType:
-    dis:TFQNames
-  @multipleProperties: DISCore|UnorderedList
-
-PropDef:
-  @QName: rootElementType
+RPropDef:
+  @QName: mv|elementType
+  @enFN: associated element type
   @enDesc:
-    The subject resource is associated with documents whose
-    root element type is identified by the object resource.
-  @rdfs:domain: AnyElementInNS
-  @dataType:
-    dis:TFQNames
+    If an <VAR::S>'s <Q::mv|ElementType> is <VAR::O>,
+    <VAR::S> is associated to element type <VAR::O>.
+  @rdfs:range: mv|ElementTypeOrNSElementTypes
+  @dataType: DISCore|TFQNames
   @multipleProperties: DISCore|UnorderedList
 
-PropDef:
-  @QName:
-    dis:DocAttr
-  @Description:
-    @@lang:en
-    @@@:
-      A subject resource is associated with an object markup attribute. 
-  @rdfs:domain: Attribute
-  @dataType:
-    dis:TFQNames
+ResourceDef:
+  @QName: elementType
+  @AliasFor: mv|elementType
+
+RPropDef:
+  @QName: mv|rootElementType
+  @enFN: associated root element type
+  @enDesc:
+    If an <VAR::S>'s is <Q::mv|rootElementType>, 
+    <VAR::S> is associated to documents whose root element
+    type is <VAR::O>.
+  @rdfs:range: mv|ElementTypeOrNSElementTypes
+  @dataType: DISCore|TFQNames
   @multipleProperties: DISCore|UnorderedList
+
+ResourceDef:
+  @QName: rootElementType
+  @AliasFor: mv|rootElementType
+
+RPropDef:
+  @QName: mv|documentType
+  @enFN: associated document type
+  @enDesc:
+    If an <VAR::S>'s <Q::mv|documentType> is <VAR::O>,
+    <VAR::S> is associated to documents whose document
+    type is <VAR::O>.
+
+RPropDef:
+  @QName: mv|attributeType
+  @enFN: associated attribute
+  @enDesc:
+    If an <VAR::S>'s <Q::mv|attribute> is <VAR::O>, 
+    <VAR::S> is associated to attribute <VAR::O>.
+  @rdfs:range: mv|AttributeType
+  @dataType: DISCore|TFQNames
+  @multipleProperties: DISCore|UnorderedList
+
+RPropDef:
+  @QName: dis|DocAttr
+  @AliasFor: mv|attributeType
 
 ## -- "For markup" definitions
 
