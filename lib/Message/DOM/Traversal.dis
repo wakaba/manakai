@@ -16,7 +16,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/05/13 12:30:36 $
+    $Date: 2006/05/14 06:51:48 $
 
   @Require:
     @@Module:
@@ -109,6 +109,14 @@ ElementTypeBinding:
     @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|DOM2
 
 ElementTypeBinding:
+  @Name: LXMethod
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISLang|Method
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|DOMLatest
+
+ElementTypeBinding:
   @Name: Param
   @ElementType:
     dis:ResourceDef
@@ -137,6 +145,14 @@ ElementTypeBinding:
   @ShadowContent:
     @@DISCore:resourceType: DISLang|Attribute
     @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|DOM2
+
+ElementTypeBinding:
+  @Name: LXAttr
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISLang|Attribute
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|DOMLatest
 
 ElementTypeBinding:
   @Name: Get
@@ -221,6 +237,37 @@ ElementTypeBinding:
     @@f:implements:
       @@@@: TraversalFeature20
       @@@For: ManakaiDOM|DOM2
+
+ElementTypeBinding:
+  @Name: IFClsXDef
+  @ElementType: 
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType:
+      @@@@: dis|MultipleResource
+      @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
+    @@resourceFor: ManakaiDOM|ForIF
+    @@resourceFor:
+      @@@@: ManakaiDOM|ForClass
+      @@@ForCheck: ManakaiDOM|ManakaiDOMLatest
+    @@For: ManakaiDOM|DOMLatest
+    @@For: =ManakaiDOM|ManakaiDOM
+
+    @@DISCore:resourceType:
+      @@@@: DISLang|Interface
+      @@@ForCheck: ManakaiDOM|ForIF
+
+    @@DISCore:resourceType:
+      @@@@: DISLang|Class
+      @@@ForCheck: ManakaiDOM|ForClass
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOM||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
 
 ElementTypeBinding:
   @Name: IFQName
@@ -345,6 +392,16 @@ ElementTypeBinding:
   @ShadowContent:
     @@DISCore:resourceType: DISLang|ConstGroup
     @@ForCheck: ManakaiDOM|ForIF !=ManakaiDOM|ManakaiDOM
+    @@Type: unsignedShort
+    @@subsetOf: unsignedShort
+
+ElementTypeBinding:
+  @Name: mShortConstGroup
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISLang|ConstGroup
+    @@ForCheck: ManakaiDOM|ForIF ManakaiDOM|ManakaiDOMLatest
     @@Type: unsignedShort
     @@subsetOf: unsignedShort
 
@@ -528,7 +585,7 @@ IFCls2Def:
 
         The <P::root> functions as a stopping point for traversal
         methods that look upwards in the document structure, such
-        as <M::TreeWalker.parentNode> and <P::TreeWalker.nextNode>.
+        as <M::TreeWalker.parentNode> and <M::TreeWalker.nextNode>.
 
         The <P::root> must not be <DOM::null>.
     @@Param:
@@ -654,6 +711,171 @@ IFCls2Def:
 
         $test->assert_exception (code => sub {
           $doctrv-><M::DocumentTraversal.createTreeWalker>;
+        }, exception_subtype => <Q::c|SET_TO_NULL_ERR>);
+
+  @LXMethod:
+    @@Name: manakaiCreateSerialWalker
+    @@enDesc:
+      Creates a new <IF::SerialWalker> object.
+    @@Param:
+      @@@Name: root
+      @@@Type: Node
+      @@@enDesc:
+        The node that will serve as the root for the <IF::SerialWalker>.
+
+        The <P::whatToShow> flags and the <IF::NodeFilter>
+        are not considered when setting this value; any node type
+        will be accepted as the root.
+
+        The <A::TreeWalker.currentNode> of the created <IF::TreeWalker>
+        is initialized to the <P::root> node, whether or not it 
+        is visible.  
+
+        The <P::root> functions as a stopping point for traversal
+        methods that look upwards in the document structure, i.e.
+        <M::SerialWalker.nextNode>.
+
+        The <P::root> <kwd:MUST-NOT> be <DOM::null>.  If it is,
+        the implementation <kwd:MUST> throw an exception.
+    @@Param:
+      @@@Name: whatToShow
+      @@@Type: unsignedShort
+      @@@actualType: WhatToShow
+      @@@enDesc:
+        The flags that specifies which node types may appear in the
+        logical view of the tree presented by the <IF::SerialWalker>.
+
+        The set of the flags are defined in the <IF::NodeFilter> interface.
+        They can be combined using the binary <CODE::OR> operation.
+    @@Param:
+      @@@Name: filter
+      @@@Type: NodeFilter
+      @@@enDesc:
+        The <IF::NodeFilter> to be used with the created <IF::SerialWalker>.
+      @@@nullCase:
+        @@@@enDesc:
+          Indicates that no filter is used.
+    @@Param:
+      @@@Name: entityReferenceExpansion
+      @@@Type: boolean
+      @@@enDesc:
+        The <A::SerialWalker.expandEntityReferences> flag of 
+        the created <IF::TreeWalker>.
+      @@@TrueCase:
+        @@@@enDesc:
+          The contents of the <IF::tx|EntityReference> nodes
+          <EM::are> presented in the logical view.
+      @@@FalseCase:
+        @@@@enDesc:
+          The contents of the <IF::tx|EntityReference> nodes
+          are <EM::not> presented in the logical view.
+    @@Return:
+      @@@Type: SerialWalker
+      @@@enDesc:
+        {P:: The newly created <IF::SerialWalker>.  It <kwd:MUST>
+             have attributes set as:
+
+             - <A::SerialWalker.currentNode>::: <P::root>.
+
+             - <A::SerialWalker.expandEntityReferences>:::
+                   <P::entityReferenceExpansion>.
+
+             - <A::SerialWalker.filter>::: <P::filter>.
+
+             - <A::SerialWalker.root>::: <P::root>.
+
+             - <A::SerialWalker.whatToShow>::: <P::whatToShow>.
+
+        }
+      @@@dx:raises:
+        @@@@@: c|SET_TO_NULL_ERR
+        @@@@enDesc:
+          If the specified <P::root> is <DOM::null>.
+      @@@PerlDef:
+        unless (defined $root) {
+          __EXCEPTION{c|SET_TO_NULL_ERR::
+            MDOMX|param-name => 'root',
+          }__;
+        }
+        $r = bless {
+          root => $root,
+          what_to_show => defined $whatToShow ? $whatToShow : 0,
+          filter => $filter,
+          expand_entity_references => $entityReferenceExpansion,
+          current_node => $root,
+          next => [[$root, 0, '']],
+          _index => {'' => 0},
+        }, <ClassName::ManakaiDOMSerialWalker>;
+
+    @@Test:
+      @@@QName: DocumentTraversal.createSerialWalker.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+        my $doctrv = $doc-><M::Node.getFeature> (Traversal => '2.0');
+
+        my $el = $doc-><M::Document.createElement> ('e');
+        
+        my $tw = $doctrv-><M::DocumentTraversal.manakaiCreateSerialWalker>
+                            ($el);
+
+        $test->id ('return');
+        $test->assert_isa ($tw, <IFName::SerialWalker>);
+
+        $test->id ('whatToShow');
+        $test->assert_num_equals
+                 (actual_value => $tw-><AG::SerialWalker.whatToShow>,
+                  expected_value => 0);
+
+        $test->id ('filter');
+        $test->assert_null ($tw-><AG::SerialWalker.filter>);
+
+        $test->id ('expandEntityReferences');
+        $test->assert_false ($tw-><AG::SerialWalker.expandEntityReferences>);
+
+        $test->id ('currentNode');
+        $test->assert_equals ($tw-><AG::SerialWalker.currentNode>, $el);
+    @@Test:
+      @@@QName: DocumentTraversal.createSerialWalker.2.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+        my $doctrv = $doc-><M::Node.getFeature> (Traversal => '2.0');
+
+        my $el = $doc-><M::Document.createElement> ('e');
+        
+        my $filter = sub { };
+        my $tw = $doctrv-><M::DocumentTraversal.manakaiCreateSerialWalker>
+                            ($el, <C::NodeFilter.SHOW_ALL>, $filter, true);
+
+        $test->id ('return');
+        $test->assert_isa ($tw, <IFName::SerialWalker>);
+
+        $test->id ('whatToShow');
+        $test->assert_num_equals
+                 (actual_value => $tw-><AG::SerialWalker.whatToShow>,
+                  expected_value => <C::NodeFilter.SHOW_ALL>);
+
+        $test->id ('filter');
+        $test->assert_equals ($tw-><AG::SerialWalker.filter>, $filter);
+
+        $test->id ('filter.interface');
+        $test->assert_isa ($tw-><AG::SerialWalker.filter>, <IFName::NodeFilter>);
+
+        $test->id ('expandEntityReferences');
+        $test->assert_true ($tw-><AG::SerialWalker.expandEntityReferences>);
+
+        $test->id ('currentNode');
+        $test->assert_equals ($tw-><AG::SerialWalker.currentNode>, $el);
+    @@Test:
+      @@@QName: DocumentTraversal.createSerialWalker.3.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+        my $doctrv = $doc-><M::Node.getFeature> (Traversal => '2.0');
+
+        $test->assert_exception (code => sub {
+          $doctrv-><M::DocumentTraversal.manakaiCreateSerialWalker>;
         }, exception_subtype => <Q::c|SET_TO_NULL_ERR>);
 ##DocumentTraversal
 
@@ -3413,3 +3635,1285 @@ IFCls2Def:
       @@@PerlDef:
         goto &$self;
 ##NodeFilter
+
+IFClsXDef:
+  @IFQName: SerialWalker
+  @ClsQName: ManakaiDOMSerialWalker
+
+  @enDesc:
+    {ISSUE::
+      Better name?
+    }
+
+    A <IF::SerialWalker> object can be used to traverse
+    the subtree rooted by a node in document order.
+    Unlike <IF::TreeWalker> and <IF::NodeIterator>, the
+    <IF::SerialWalker> object cannot go back toward
+    nodes that had already been seen.  The
+    <IF::SerialWalker>, however, revisits a node after its
+    children are visited.  This might be useful when
+    an application wants to serialize a subtree in a format
+    where delimiter and / or terminator should be inserted
+    between and / or after nodes.
+
+    How the <IF::SerialWalker> works is defined by the following
+    reference algorithm.  An implementation does not have to
+    implement this exact algorithm, but it <kwd:MUST> implement
+    its method so that it has the same effect as the
+    reference algorithm when the underlying subtree has not
+    been modified.
+
+    At the time of creation of the <IF::SerialWalker>, 
+    the implementation <kwd:MUST> prepare a queue and
+    <kwd:MUST> initialize it by pushing the <A::SerialWalker.root> node.
+
+    {P:: When the <M::SerialWalker.nextNode> method is invoked,
+
+       - If the queue is empty, the method <kwd:MUST> return
+         <DOM::null>.  It <kwd:MUST-NOT> change 
+         <A::SerialWalker.currentNode>, <A::SerialWalker.currentPhase>,
+         and <A::SerialWalker.currentIndex> attributes.
+
+       {LI:: Otherwise, 
+
+          - Shift a node from the queue.  If the node has
+            the phase value, the method <kwd:MUST> return
+            the node.  In addition, it <kwd:MUST> set
+            the <A::SerialWalker.currentNode> attribute to the node,
+            the <A::SerialWalker.currentPhase> attribute to
+            the associated phase value, and the
+            <A::SerialWalker.currentIndex> attribute to
+            the integer value that is large by one than
+            the most recent <A::SerialWalker.currentIndex> value
+            when the <A::SerialWalker.currentNode> was
+            same as the shiftted node.  If it is the first time
+            the node is set to the <A::SerialWalker.currentNode>
+            attribute, the <A::SerialWalker.currentIndex>
+            attribute <kwd:MUST> set to zero.
+
+          {LI:: Otherwise, determine whether the shifted node
+                should be accepted or not, using 
+                <A::SerialWalker.expandEntityReferences>,
+                <A::SerialWalker.whatToShow>, and
+                <A::SerialWalker.filter> attributes, as defined
+                for the <IF::TreeWalker> interface.
+
+             {LI:: If the node is <C::NodeFilter.FILTER_ACCEPT>ed,
+
+                = Prepend the node to the queue, with
+                  phase value set to <C::SerialWalker.POST_PHASE>.
+ 
+                = Prepend the child nodes of the node, if any,
+                  to the queue keeping the document order,
+                  without phase value.  That is, the first child
+                  <kwd:MUST> be located at the top (first
+                  position) of the queue.
+
+                = Prepend the node to the queue, with
+                  phase value set to <C::SerialWalker.PRE_PHASE>.
+               
+                = If the node has a previous sibling in the logical view,
+                  preprend the parent node of the node in the logical
+                  view, with phase value set to <C::SerialWalker.IN_PHASE>.
+
+                = Invoke the algorithm recursively.
+
+             }
+
+             {LI:: If the node is <C::NodeFilter.FILTER_SKIP>ped,
+
+                = Prepend the child nodes of the node, if any,
+                  to the queue keeping the document order,
+                  without phase value.  That is, the first child
+                  <kwd:MUST> be located at the top (first
+                  position) of the queue.
+
+                = Invoke the algorithm recursively.
+
+             }
+
+             {LI:: If the node is <C::NodeFilter.MANAKAI_FILTER_OPAQUE>,
+ 
+                = Prepend the node to the queue, with
+                  phase value set to <C::SerialWalker.POST_PHASE>.
+
+                = Prepend the node to the queue, with
+                  phase value set to <C::SerialWalker.PRE_PHASE>.
+               
+                = If the node has a previous sibling in the logical view,
+                  preprend the parent node of the node in the logical
+                  view, with phase value set to <C::SerialWalker.IN_PHASE>.
+
+                = Invoke the algorithm recursively.
+
+             }
+
+             - Otherwise, invoke the algorithm recursively.
+
+          }
+       }
+
+    }
+
+    {NOTE::
+      This algorithm will stop unless nodes are simulataneously
+      populated to the underlying tree by application via
+      e.g. <IF::NodeFilter>.
+    }
+
+    Implementation <kwd:MAY> choose to implement the <IF::SerialWalker>
+    using another algorithm.  In particular, when the <IF::NodeFilter>
+    is invoked might vary across implementations.  Implementations
+    should try to return the same effect as the reference algorithm
+    even if the underlying subtree is modified, but applications
+    <kwd:MUST-NOT> rely on the particular implementation's behavior.
+
+    As long as the underlying subtree is not modified, a node will
+    never set to the <A::SerialWalker.currentNode> attribute
+    with the <A::SerialWalker.currentPhase> of <C::SerialWalker.PRE_PHASE>.
+    If the underlying subtree is modified, depending on how
+    the method is implemented, it might be in case.  For 
+    the purpose of description below, such duplication was considered
+    as if they were different nodes.
+
+    {P:: Even if the underlying subtree has been modified during
+         the traversal, the implementation <kwd:MUST> ensure
+         the following conditions are met:
+
+      - A node <kwd:MUST-NOT> be set to the <A::SerialWalker.currentNode>
+        attribute with the <A::SerialWalker.currentPhase> of
+        <C::SerialWalker.PRE_PHASE> or <C::SerialWalker.POST_PHASE>
+        more than once respectively.
+
+      - A node <kwd:MUST-NOT> be set to the <A::SerialWalker.currentNode>
+        attribute with the <A::SerialWalker.currentPhase> of
+        <C::SerialWalker.IN_PHASE> before it is once set to
+        the same node with the <A::SerialWalker.currentPhase>
+        of <C::SerialWalker.PRE_PHASE>, or after it is once set
+        to the same node with the <A::SerialWalker.currentPhase>
+        of <C::SerialWalker.POST_PHASE>.
+
+      - A node <kwd:MUST-NOT> be set to the <A::SerialWalker.currentNode>
+        attribute with the <A::SerialWalker.currentPhase> of
+        <C::SerialWalker.POST_PHASE> before it is once set to
+        the same node with the <A::SerialWalker.currentPhase>
+        of <C::SerialWalker.PRE_PHASE>.
+
+      - A node <kwd:MUST> be set to the <A::SerialWalker.currentNode>
+        attribute with the <A::SerialWalker.currentPhase> of
+        <C::SerialWalker.POST_PHASE> later if it is once set to
+        the same node with the <A::SerialWalker.currentPhase>
+        of <C::SerialWalker.PRE_PHASE>.
+
+      - The <A::SerialWalker.currentPhase> <kwd:MUST-NOT> set
+        to <C::SerialWalker.PRE_PHASE> unless its value is
+        <C::SerialWalker.PRE_PHASE> or <C::SerialWalker.IN_PHASE>.
+
+      - The <A::SerialWalker.currentPhase> <kwd:MUST-NOT> set
+        to <C::SerialWalker.IN_PHASE> unless its value is
+        <C::SerialWalker.POST_PHASE>.
+
+      - The <A::SerialWalker.currentPhase> <kwd:MUST-NOT> set
+        to <C::SerialWalker.POST_PHASE> unless its value is
+        <C::SerialWalker.PRE_PHASE> or <C::SerialWalker.POST_PHASE>.
+
+      - If a node <VAR::N> is set to the <A::SerialWalker.currentNode>
+        attribute and then another node <VAR::M> is set to the attribute
+        with both <A::SerialWalker.currentPhase> of <C::SerialWalker.PRE_PHASE>,
+        the <A::SerialWalker.currentNode> attribute <kwd:MUST-NOT> be set to
+        <VAR::N> with <A::SerialWalker.currentPhase> of
+        <C::SerialWalker.POST_PHASE> before once the
+        <A::SerialWalker.currentNode> attribute is set to
+        <VAR::M> with <A::SerialWalker.currentPhase> of 
+        <C::SerialWalker.POST_PHASE>.
+
+      - For each time the <A::SerialWalker.currentNode> attribute is
+        set to a node, the <A::SerialWalker.currentIndex> <kwd:MUST>
+        be increased by one.  If the node is set to the attribute
+        for the first time, the <A::SerialWalker.currentIndex> 
+        <kwd:MUST> be set to zero.  That is, with and only with
+        <C::SerialWalker.PRE_PHASE> the <A::SerialWalker.currentIndex>
+        can be zero.
+    }
+
+  @CODE:
+    @@QName: createSWForTest
+    @@PerlDef:
+      my $doc;
+      __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+      my $docel = $doc-><M::Document.createElement> ('docel');
+
+      $doc-><M::Node.appendChild> ($docel);
+
+      my $doctrv = $doc-><M::Node.getFeature> ('Traversal', '2.0');
+      $sw = $doctrv-><M::DocumentTraversal.manakaiCreateSerialWalker> ($docel);
+
+  @LXAttr:
+    @@Name: root
+    @@enDesc:
+      The root node of the <IF::SerialWalker>.
+    @@Type: Node
+    @@Get:
+      @@@enDesc:
+        The root node set when the <IF::SerialWalker> is created.
+      @@@PerlDef:
+        $r = $self->{root};
+
+  @LXAttr:
+    @@Name: currentNode
+    @@enDesc:
+      The current node of the <IF::SerialWalker>.
+
+        {NOTE::
+          Unlike <IF::TreeWalker>, the <A::SerialWalker.currentNode>
+          attribute is read-only.
+        }
+    @@Type: Node
+    @@Get:
+      @@@enDesc:
+        The current node.
+      @@@PerlDef:
+        $r = $self->{current_node};
+
+  @mShortConstGroup:
+    @@IFQName: SerialWalkerPhase
+    @@enDesc:
+      An integer to indicate a phase of <IF::SerialWalker>.
+
+    @@mConst:
+      @@@Name: PRE_PHASE
+      @@@intValue: 1
+      @@@enDesc:
+        The <A::SerialWalker.currentNode> is visited by
+        the <IF::SerialWalker> for the first time.  It is
+        expected that the same node will be revisited
+        with <A::SerialWalker.currentPhase> of 
+        <C::SerialWalker.IN_PHASE> (optionally) and
+        <C::SerialWalker.POST_PHASE> later.
+    @@mConst:
+      @@@Name: IN_PHASE
+      @@@intValue: 2
+      @@@enDesc:
+        The <A::SerialWalker.currentNode> is visited
+        by the <IF::SerialWalker>, not for the first
+        or last time, between visitings to its two child nodes.
+    @@mConst:
+      @@@Name: POST_PHASE
+      @@@intValue: 3
+      @@@enDesc:
+        The <A::SerialWalker.currentNode> is visited
+        by the <IF::SerialWalker> for the last time.
+
+  @LXAttr:
+    @@Name: currentPhase
+    @@enDesc:
+      The current phase of the <IF::SerialWalker>.
+    @@Type: unsignedShort
+    @@actualType: SerialWalkerPhase
+    @@Get:
+      @@@enDesc:
+        An integer to indicate the current phase.
+      @@@PerlDef:
+        $r = $self->{current_phase};
+
+  @LXAttr:
+    @@Name: currentIndex
+    @@enDesc:
+      The current index of the <IF::SerialWalker>.  The 
+      <DFN::current index> represents how many times the
+      <A::SerialWalker.currentNode> is exposed through
+      the <IF::SerialWalker>.
+    @@Type: unsignedLong
+    @@Get:
+      @@@enDesc:
+        An integer to indicate the current index.
+      @@@PerlDef:
+        $r = $self->{current_index};
+
+  @LXAttr:
+    @@Name: expandEntityReferences
+    @@enDesc:
+      The value of the flag that determines whether the children of
+      <IF::tx|EntityReference> nodes are visible to the <IF::SerialWalker>.
+
+      {NOTE::
+        To produce a view of the document that has entity references
+        expanded and does not expose the <IF::tx|EntityReference> nodes
+        themselves, use the <A::SerialWalker.whatToShow> flags to hide the
+        <IF::tx|EntityReference> nodes and set the
+        <A::SerialWalker.expandEntityReferences> flag to <DOM::true>
+        when creating the <IF::SerialWalker>.
+
+        To produce a view of the document that has <IF::tx|EntityReference>
+        nodes but no entity expansion, use the <A::SerialWalker.whatToShow>
+        flags to show the <IF::tx|EntityReference> nodes and set the
+        <A::SerialWalker.expandEntityReferences> flag to <DOM::false>
+        when creating the <IF::SerialWalker>.
+      }
+    @@Get:
+      @@@TrueCase:
+        @@@@enDesc:
+          The children and their descendants of <IF::tx|EntityReference>
+          nodes will <EM::not> be rejected.  Note that
+          the <A::SerialWalker.whatToShow> flags and the
+          <A::SerialWalker.filter> set to the <IF::SerialWalker>
+          might reject them as usual way.
+      @@@FalseCase:
+        @@@@enDesc:
+          The children and their descendants of entity reference nodes
+          will be rejected.  This rejection takes precedence over
+          the <A::SerialWalker.whatToShow> flags and the
+          <A::SerialWalker.filter> set to the 
+          <IF::SerialWalker>, if any.
+    @@Type: boolean
+    @@Get:
+      @@@enDesc:
+        The <CODE::entityReferenceExpansion> value that
+        was specified when the <IF::SerialWalker> was created.
+      @@@PerlDef:
+        $r = $self->{expand_entity_references};
+
+  @LXAttr:
+    @@Name: filter
+    @@enDesc:
+      The filter used to screen nodes.
+    @@Type: NodeFilter
+    @@Get:
+      @@@enDesc:
+        The <IF::NodeFilter> that was specified when the
+        <IF::SerialWalker> was created.
+      @@@nullCase:
+        @@@@enDesc:
+          If no <IF::NodeFilter> was specified when the
+          <IF::SerialWalker> was created.
+      @@@PerlDef:
+        $r = $self->{filter};
+
+  @LXAttr:
+    @@Name: whatToShow
+    @@enDesc:
+      The flags that determines which node types are presented
+      via the <IF::SerialWalker>.  The available set of constants
+      is defined in the <IF::NodeFilter> interface.
+
+      Nodes not accepted by the <A::SerialWalker.whatToShow>
+      flags will be skipped, but their children may still be
+      considered.  This skip takes precedence over the 
+      <A::SerialWalker.filter> set to the <IF::SerialWalker>, if any.
+    @@Type: unsignedShort
+    @@actualType: WhatToShow
+    @@Get:
+      @@@enDesc:
+        The <CODE::whatToShow> value that was specified
+        when the <IF::SerialWalker> was created.
+      @@@PerlDef:
+        $r = $self->{what_to_show};
+
+  @LXMethod:
+    @@Name: nextNode
+    @@enDesc:
+      Returns the node next to the <A::SerialWalker.currentNode>
+      of the <IF::SerialWalker>.
+    @@Return:
+      @@@Type: Node
+      @@@enDesc:
+        The next node.
+      @@@nullCase:
+        @@@@enDesc:
+          If no next node.
+      @@@PerlDef:
+        A: {
+          unless (@{$self->{next}}) {
+            #
+          } elsif ($self->{next}->[0]->[1] != 0) {
+            my $v = shift @{$self->{next}};
+            $r = $self->{current_node} = $v->[0];
+            $self->{current_phase} = $v->[1];
+            $self->{current_index} = $self->{_index}->{$v->[2]}++;
+          } else {
+            my $v = shift @{$self->{next}};
+            my $vresult;
+            __CODE{testNode:: $target => {$v->[0]}, $result => $vresult}__;
+
+            my @pnext;
+            if ($vresult == <C::NodeFilter.FILTER_ACCEPT>) {
+              my $key = $v->[2].'.'.$self->{_index}->{$v->[2]};
+
+              push @pnext, [$v->[3], <C::SerialWalker.IN_PHASE>, $v->[4]]
+                if defined $v->[3] and $self->{_index}->{$v->[4].'.1'};
+
+              $self->{_index}->{$key} = 0;
+              push @pnext, [$v->[0], <C::SerialWalker.PRE_PHASE>, $key];
+  
+              push @pnext, [$_, 0, $key, $v->[0], $key]
+                for @{$v->[0]-><AG::Node.childNodes>};
+              push @pnext, [$v->[0], <C::SerialWalker.POST_PHASE>, $key];
+            } elsif ($vresult == <C::NodeFilter.FILTER_SKIP>) {
+              push @pnext, [$_, 0, $v->[2], $v->[3], $v->[4]]
+                for @{$v->[0]-><AG::Node.childNodes>};
+            } elsif ($vresult == <C::NodeFilter.MANAKAI_FILTER_OPAQUE>) {
+              my $key = $v->[2].'.'.$self->{_index}->{$v->[2]};
+
+              push @pnext, [$v->[3], <C::SerialWalker.IN_PHASE>, $v->[4]]
+                if defined $v->[3] and $self->{_index}->{$v->[4].'.1'};
+
+              $self->{_index}->{$key} = 0;
+              push @pnext, [$v->[0], <C::SerialWalker.PRE_PHASE>, $key];
+              push @pnext, [$v->[0], <C::SerialWalker.POST_PHASE>, $key];
+            }
+            unshift @{$self->{next}}, @pnext;
+            redo A;
+          }
+        } # A
+      
+    @@Test:
+      @@@QName: SerialWalker.nextNode.1.test
+      @@@PerlDef:
+        my $doc;
+        my $doctrv;
+        __CODE{createDocForTest}__;
+
+        my %node;
+        __CODE{TreeForTest3}__;
+
+        my $sw = $doctrv-><M::DocumentTraversal.manakaiCreateSerialWalker>
+                            ($node{el1}, <C::NodeFilter.SHOW_ALL>);
+
+        $test->id ('1.nextNode');
+        $test->assert_equals ($sw-><M::SerialWalker.nextNode>, $node{el1});
+        $test->id ('1.currentNode');
+        $test->assert_equals ($sw-><AG::SerialWalker.currentNode>, $node{el1});
+        $test->id ('1.currentPhase');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentPhase>,
+                  expected_value => <C::SerialWalker.PRE_PHASE>);
+        $test->id ('1.currentIndex');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentIndex>,
+                  expected_value => 0);
+
+        $test->id ('2.nextNode');
+        $test->assert_equals ($sw-><M::SerialWalker.nextNode>, $node{el2});
+        $test->id ('2.currentNode');
+        $test->assert_equals ($sw-><AG::SerialWalker.currentNode>, $node{el2});
+        $test->id ('2.currentPhase');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentPhase>,
+                  expected_value => <C::SerialWalker.PRE_PHASE>);
+        $test->id ('2.currentIndex');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentIndex>,
+                  expected_value => 0);
+
+        $test->id ('3.nextNode');
+        $test->assert_equals ($sw-><M::SerialWalker.nextNode>, $node{el2});
+        $test->id ('3.currentNode');
+        $test->assert_equals ($sw-><AG::SerialWalker.currentNode>, $node{el2});
+        $test->id ('3.currentPhase');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentPhase>,
+                  expected_value => <C::SerialWalker.POST_PHASE>);
+        $test->id ('3.currentIndex');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentIndex>,
+                  expected_value => 1);
+
+        $test->id ('4.nextNode');
+        $test->assert_equals ($sw-><M::SerialWalker.nextNode>, $node{el1});
+        $test->id ('4.currentNode');
+        $test->assert_equals ($sw-><AG::SerialWalker.currentNode>, $node{el1});
+        $test->id ('4.currentPhase');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentPhase>,
+                  expected_value => <C::SerialWalker.IN_PHASE>);
+        $test->id ('4.currentIndex');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentIndex>,
+                  expected_value => 1);
+
+        $test->id ('5.nextNode');
+        $test->assert_equals ($sw-><M::SerialWalker.nextNode>, $node{el3});
+        $test->id ('5.currentNode');
+        $test->assert_equals ($sw-><AG::SerialWalker.currentNode>, $node{el3});
+        $test->id ('5.currentPhase');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentPhase>,
+                  expected_value => <C::SerialWalker.PRE_PHASE>);
+        $test->id ('5.currentIndex');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentIndex>,
+                  expected_value => 0);
+
+        $test->id ('6.nextNode');
+        $test->assert_equals ($sw-><M::SerialWalker.nextNode>, $node{el4});
+        $test->id ('6.currentNode');
+        $test->assert_equals ($sw-><AG::SerialWalker.currentNode>, $node{el4});
+        $test->id ('6.currentPhase');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentPhase>,
+                  expected_value => <C::SerialWalker.PRE_PHASE>);
+        $test->id ('6.currentIndex');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentIndex>,
+                  expected_value => 0);
+
+        $test->id ('7.nextNode');
+        $test->assert_equals ($sw-><M::SerialWalker.nextNode>, $node{el4});
+        $test->id ('7.currentNode');
+        $test->assert_equals ($sw-><AG::SerialWalker.currentNode>, $node{el4});
+        $test->id ('7.currentPhase');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentPhase>,
+                  expected_value => <C::SerialWalker.POST_PHASE>);
+        $test->id ('7.currentIndex');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentIndex>,
+                  expected_value => 1);
+
+        $test->id ('8.nextNode');
+        $test->assert_equals ($sw-><M::SerialWalker.nextNode>, $node{el3});
+        $test->id ('8.currentNode');
+        $test->assert_equals ($sw-><AG::SerialWalker.currentNode>, $node{el3});
+        $test->id ('8.currentPhase');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentPhase>,
+                  expected_value => <C::SerialWalker.POST_PHASE>);
+        $test->id ('8.currentIndex');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentIndex>,
+                  expected_value => 1);
+
+        $test->id ('9.nextNode');
+        $test->assert_equals ($sw-><M::SerialWalker.nextNode>, $node{el1});
+        $test->id ('9.currentNode');
+        $test->assert_equals ($sw-><AG::SerialWalker.currentNode>, $node{el1});
+        $test->id ('9.currentPhase');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentPhase>,
+                  expected_value => <C::SerialWalker.IN_PHASE>);
+        $test->id ('9.currentIndex');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentIndex>,
+                  expected_value => 2);
+
+        $test->id ('10.nextNode');
+        $test->assert_equals ($sw-><M::SerialWalker.nextNode>, $node{el5});
+        $test->id ('10.currentNode');
+        $test->assert_equals ($sw-><AG::SerialWalker.currentNode>, $node{el5});
+        $test->id ('10.currentPhase');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentPhase>,
+                  expected_value => <C::SerialWalker.PRE_PHASE>);
+        $test->id ('10.currentIndex');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentIndex>,
+                  expected_value => 0);
+
+        $test->id ('11.nextNode');
+        $test->assert_equals ($sw-><M::SerialWalker.nextNode>, $node{el5});
+        $test->id ('11.currentNode');
+        $test->assert_equals ($sw-><AG::SerialWalker.currentNode>, $node{el5});
+        $test->id ('11.currentPhase');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentPhase>,
+                  expected_value => <C::SerialWalker.POST_PHASE>);
+        $test->id ('11.currentIndex');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentIndex>,
+                  expected_value => 1);
+
+        $test->id ('12.nextNode');
+        $test->assert_equals ($sw-><M::SerialWalker.nextNode>, $node{el1});
+        $test->id ('12.currentNode');
+        $test->assert_equals ($sw-><AG::SerialWalker.currentNode>, $node{el1});
+        $test->id ('12.currentPhase');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentPhase>,
+                  expected_value => <C::SerialWalker.POST_PHASE>);
+        $test->id ('12.currentIndex');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentIndex>,
+                  expected_value => 3);
+
+        $test->id ('13.nextNode');
+        $test->assert_null ($sw-><M::SerialWalker.nextNode>);
+        $test->id ('13.currentNode');
+        $test->assert_equals ($sw-><AG::SerialWalker.currentNode>, $node{el1});
+        $test->id ('13.currentPhase');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentPhase>,
+                  expected_value => <C::SerialWalker.POST_PHASE>);
+        $test->id ('13.currentIndex');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentIndex>,
+                  expected_value => 3);
+
+        $test->id ('14.nextNode');
+        $test->assert_null ($sw-><M::SerialWalker.nextNode>);
+        $test->id ('14.currentNode');
+        $test->assert_equals ($sw-><AG::SerialWalker.currentNode>, $node{el1});
+        $test->id ('14.currentPhase');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentPhase>,
+                  expected_value => <C::SerialWalker.POST_PHASE>);
+        $test->id ('14.currentIndex');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentIndex>,
+                  expected_value => 3);
+    @@Test:
+      @@@QName: SerialWalker.nextNode.2.test
+      @@@PerlDef:
+        my $doc;
+        my $doctrv;
+        __CODE{createDocForTest}__;
+
+        my %node;
+        __CODE{TreeForTest3}__;
+
+        my $sw = $doctrv-><M::DocumentTraversal.manakaiCreateSerialWalker>
+                            ($node{el1}, <C::NodeFilter.SHOW_ALL>, sub {
+                               $_[1]->local_name eq 'el3'
+                                 ? <C::NodeFilter.FILTER_SKIP>
+                                 : <C::NodeFilter.FILTER_ACCEPT>
+                             });
+
+        $test->id ('1.nextNode');
+        $test->assert_equals ($sw-><M::SerialWalker.nextNode>, $node{el1});
+        $test->id ('1.currentNode');
+        $test->assert_equals ($sw-><AG::SerialWalker.currentNode>, $node{el1});
+        $test->id ('1.currentPhase');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentPhase>,
+                  expected_value => <C::SerialWalker.PRE_PHASE>);
+        $test->id ('1.currentIndex');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentIndex>,
+                  expected_value => 0);
+
+        $test->id ('2.nextNode');
+        $test->assert_equals ($sw-><M::SerialWalker.nextNode>, $node{el2});
+        $test->id ('2.currentNode');
+        $test->assert_equals ($sw-><AG::SerialWalker.currentNode>, $node{el2});
+        $test->id ('2.currentPhase');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentPhase>,
+                  expected_value => <C::SerialWalker.PRE_PHASE>);
+        $test->id ('2.currentIndex');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentIndex>,
+                  expected_value => 0);
+
+        $test->id ('3.nextNode');
+        $test->assert_equals ($sw-><M::SerialWalker.nextNode>, $node{el2});
+        $test->id ('3.currentNode');
+        $test->assert_equals ($sw-><AG::SerialWalker.currentNode>, $node{el2});
+        $test->id ('3.currentPhase');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentPhase>,
+                  expected_value => <C::SerialWalker.POST_PHASE>);
+        $test->id ('3.currentIndex');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentIndex>,
+                  expected_value => 1);
+
+        $test->id ('4.nextNode');
+        $test->assert_equals ($sw-><M::SerialWalker.nextNode>, $node{el1});
+        $test->id ('4.currentNode');
+        $test->assert_equals ($sw-><AG::SerialWalker.currentNode>, $node{el1});
+        $test->id ('4.currentPhase');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentPhase>,
+                  expected_value => <C::SerialWalker.IN_PHASE>);
+        $test->id ('4.currentIndex');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentIndex>,
+                  expected_value => 1);
+
+        $test->id ('6.nextNode');
+        $test->assert_equals ($sw-><M::SerialWalker.nextNode>, $node{el4});
+        $test->id ('6.currentNode');
+        $test->assert_equals ($sw-><AG::SerialWalker.currentNode>, $node{el4});
+        $test->id ('6.currentPhase');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentPhase>,
+                  expected_value => <C::SerialWalker.PRE_PHASE>);
+        $test->id ('6.currentIndex');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentIndex>,
+                  expected_value => 0);
+
+        $test->id ('7.nextNode');
+        $test->assert_equals ($sw-><M::SerialWalker.nextNode>, $node{el4});
+        $test->id ('7.currentNode');
+        $test->assert_equals ($sw-><AG::SerialWalker.currentNode>, $node{el4});
+        $test->id ('7.currentPhase');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentPhase>,
+                  expected_value => <C::SerialWalker.POST_PHASE>);
+        $test->id ('7.currentIndex');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentIndex>,
+                  expected_value => 1);
+
+        $test->id ('9.nextNode');
+        $test->assert_equals ($sw-><M::SerialWalker.nextNode>, $node{el1});
+        $test->id ('9.currentNode');
+        $test->assert_equals ($sw-><AG::SerialWalker.currentNode>, $node{el1});
+        $test->id ('9.currentPhase');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentPhase>,
+                  expected_value => <C::SerialWalker.IN_PHASE>);
+        $test->id ('9.currentIndex');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentIndex>,
+                  expected_value => 2);
+
+        $test->id ('10.nextNode');
+        $test->assert_equals ($sw-><M::SerialWalker.nextNode>, $node{el5});
+        $test->id ('10.currentNode');
+        $test->assert_equals ($sw-><AG::SerialWalker.currentNode>, $node{el5});
+        $test->id ('10.currentPhase');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentPhase>,
+                  expected_value => <C::SerialWalker.PRE_PHASE>);
+        $test->id ('10.currentIndex');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentIndex>,
+                  expected_value => 0);
+
+        $test->id ('11.nextNode');
+        $test->assert_equals ($sw-><M::SerialWalker.nextNode>, $node{el5});
+        $test->id ('11.currentNode');
+        $test->assert_equals ($sw-><AG::SerialWalker.currentNode>, $node{el5});
+        $test->id ('11.currentPhase');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentPhase>,
+                  expected_value => <C::SerialWalker.POST_PHASE>);
+        $test->id ('11.currentIndex');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentIndex>,
+                  expected_value => 1);
+
+        $test->id ('12.nextNode');
+        $test->assert_equals ($sw-><M::SerialWalker.nextNode>, $node{el1});
+        $test->id ('12.currentNode');
+        $test->assert_equals ($sw-><AG::SerialWalker.currentNode>, $node{el1});
+        $test->id ('12.currentPhase');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentPhase>,
+                  expected_value => <C::SerialWalker.POST_PHASE>);
+        $test->id ('12.currentIndex');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentIndex>,
+                  expected_value => 3);
+
+        $test->id ('13.nextNode');
+        $test->assert_null ($sw-><M::SerialWalker.nextNode>);
+        $test->id ('13.currentNode');
+        $test->assert_equals ($sw-><AG::SerialWalker.currentNode>, $node{el1});
+        $test->id ('13.currentPhase');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentPhase>,
+                  expected_value => <C::SerialWalker.POST_PHASE>);
+        $test->id ('13.currentIndex');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentIndex>,
+                  expected_value => 3);
+
+        $test->id ('14.nextNode');
+        $test->assert_null ($sw-><M::SerialWalker.nextNode>);
+        $test->id ('14.currentNode');
+        $test->assert_equals ($sw-><AG::SerialWalker.currentNode>, $node{el1});
+        $test->id ('14.currentPhase');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentPhase>,
+                  expected_value => <C::SerialWalker.POST_PHASE>);
+        $test->id ('14.currentIndex');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentIndex>,
+                  expected_value => 3);
+    @@Test:
+      @@@QName: SerialWalker.nextNode.3.test
+      @@@enDesc:
+        MANAKAI_FILTER_OPAQUE
+      @@@PerlDef:
+        my $doc;
+        my $doctrv;
+        __CODE{createDocForTest}__;
+
+        my %node;
+        __CODE{TreeForTest3}__;
+
+        my $sw = $doctrv-><M::DocumentTraversal.manakaiCreateSerialWalker>
+                            ($node{el1}, <C::NodeFilter.SHOW_ALL>, sub {
+                               $_[1]->local_name eq 'el3'
+                                 ? <C::NodeFilter.MANAKAI_FILTER_OPAQUE>
+                                 : <C::NodeFilter.FILTER_ACCEPT>
+                             });
+
+        $test->id ('1.nextNode');
+        $test->assert_equals ($sw-><M::SerialWalker.nextNode>, $node{el1});
+        $test->id ('1.currentNode');
+        $test->assert_equals ($sw-><AG::SerialWalker.currentNode>, $node{el1});
+        $test->id ('1.currentPhase');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentPhase>,
+                  expected_value => <C::SerialWalker.PRE_PHASE>);
+        $test->id ('1.currentIndex');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentIndex>,
+                  expected_value => 0);
+
+        $test->id ('2.nextNode');
+        $test->assert_equals ($sw-><M::SerialWalker.nextNode>, $node{el2});
+        $test->id ('2.currentNode');
+        $test->assert_equals ($sw-><AG::SerialWalker.currentNode>, $node{el2});
+        $test->id ('2.currentPhase');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentPhase>,
+                  expected_value => <C::SerialWalker.PRE_PHASE>);
+        $test->id ('2.currentIndex');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentIndex>,
+                  expected_value => 0);
+
+        $test->id ('3.nextNode');
+        $test->assert_equals ($sw-><M::SerialWalker.nextNode>, $node{el2});
+        $test->id ('3.currentNode');
+        $test->assert_equals ($sw-><AG::SerialWalker.currentNode>, $node{el2});
+        $test->id ('3.currentPhase');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentPhase>,
+                  expected_value => <C::SerialWalker.POST_PHASE>);
+        $test->id ('3.currentIndex');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentIndex>,
+                  expected_value => 1);
+
+        $test->id ('4.nextNode');
+        $test->assert_equals ($sw-><M::SerialWalker.nextNode>, $node{el1});
+        $test->id ('4.currentNode');
+        $test->assert_equals ($sw-><AG::SerialWalker.currentNode>, $node{el1});
+        $test->id ('4.currentPhase');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentPhase>,
+                  expected_value => <C::SerialWalker.IN_PHASE>);
+        $test->id ('4.currentIndex');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentIndex>,
+                  expected_value => 1);
+
+        $test->id ('6.nextNode');
+        $test->assert_equals ($sw-><M::SerialWalker.nextNode>, $node{el3});
+        $test->id ('6.currentNode');
+        $test->assert_equals ($sw-><AG::SerialWalker.currentNode>, $node{el3});
+        $test->id ('6.currentPhase');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentPhase>,
+                  expected_value => <C::SerialWalker.PRE_PHASE>);
+        $test->id ('6.currentIndex');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentIndex>,
+                  expected_value => 0);
+
+        $test->id ('7.nextNode');
+        $test->assert_equals ($sw-><M::SerialWalker.nextNode>, $node{el3});
+        $test->id ('7.currentNode');
+        $test->assert_equals ($sw-><AG::SerialWalker.currentNode>, $node{el3});
+        $test->id ('7.currentPhase');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentPhase>,
+                  expected_value => <C::SerialWalker.POST_PHASE>);
+        $test->id ('7.currentIndex');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentIndex>,
+                  expected_value => 1);
+
+        $test->id ('9.nextNode');
+        $test->assert_equals ($sw-><M::SerialWalker.nextNode>, $node{el1});
+        $test->id ('9.currentNode');
+        $test->assert_equals ($sw-><AG::SerialWalker.currentNode>, $node{el1});
+        $test->id ('9.currentPhase');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentPhase>,
+                  expected_value => <C::SerialWalker.IN_PHASE>);
+        $test->id ('9.currentIndex');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentIndex>,
+                  expected_value => 2);
+
+        $test->id ('10.nextNode');
+        $test->assert_equals ($sw-><M::SerialWalker.nextNode>, $node{el5});
+        $test->id ('10.currentNode');
+        $test->assert_equals ($sw-><AG::SerialWalker.currentNode>, $node{el5});
+        $test->id ('10.currentPhase');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentPhase>,
+                  expected_value => <C::SerialWalker.PRE_PHASE>);
+        $test->id ('10.currentIndex');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentIndex>,
+                  expected_value => 0);
+
+        $test->id ('11.nextNode');
+        $test->assert_equals ($sw-><M::SerialWalker.nextNode>, $node{el5});
+        $test->id ('11.currentNode');
+        $test->assert_equals ($sw-><AG::SerialWalker.currentNode>, $node{el5});
+        $test->id ('11.currentPhase');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentPhase>,
+                  expected_value => <C::SerialWalker.POST_PHASE>);
+        $test->id ('11.currentIndex');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentIndex>,
+                  expected_value => 1);
+
+        $test->id ('12.nextNode');
+        $test->assert_equals ($sw-><M::SerialWalker.nextNode>, $node{el1});
+        $test->id ('12.currentNode');
+        $test->assert_equals ($sw-><AG::SerialWalker.currentNode>, $node{el1});
+        $test->id ('12.currentPhase');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentPhase>,
+                  expected_value => <C::SerialWalker.POST_PHASE>);
+        $test->id ('12.currentIndex');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentIndex>,
+                  expected_value => 3);
+
+        $test->id ('13.nextNode');
+        $test->assert_null ($sw-><M::SerialWalker.nextNode>);
+        $test->id ('13.currentNode');
+        $test->assert_equals ($sw-><AG::SerialWalker.currentNode>, $node{el1});
+        $test->id ('13.currentPhase');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentPhase>,
+                  expected_value => <C::SerialWalker.POST_PHASE>);
+        $test->id ('13.currentIndex');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentIndex>,
+                  expected_value => 3);
+
+        $test->id ('14.nextNode');
+        $test->assert_null ($sw-><M::SerialWalker.nextNode>);
+        $test->id ('14.currentNode');
+        $test->assert_equals ($sw-><AG::SerialWalker.currentNode>, $node{el1});
+        $test->id ('14.currentPhase');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentPhase>,
+                  expected_value => <C::SerialWalker.POST_PHASE>);
+        $test->id ('14.currentIndex');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentIndex>,
+                  expected_value => 3);
+    @@Test:
+      @@@QName: SerialWalker.nextNode.4.test
+      @@@enDesc:
+        FILTER_REJECT
+      @@@PerlDef:
+        my $doc;
+        my $doctrv;
+        __CODE{createDocForTest}__;
+
+        my %node;
+        __CODE{TreeForTest3}__;
+
+        my $sw = $doctrv-><M::DocumentTraversal.manakaiCreateSerialWalker>
+                            ($node{el1}, <C::NodeFilter.SHOW_ALL>, sub {
+                               $_[1]->local_name eq 'el3'
+                                 ? <C::NodeFilter.FILTER_REJECT>
+                                 : <C::NodeFilter.FILTER_ACCEPT>
+                             });
+
+        $test->id ('1.nextNode');
+        $test->assert_equals ($sw-><M::SerialWalker.nextNode>, $node{el1});
+        $test->id ('1.currentNode');
+        $test->assert_equals ($sw-><AG::SerialWalker.currentNode>, $node{el1});
+        $test->id ('1.currentPhase');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentPhase>,
+                  expected_value => <C::SerialWalker.PRE_PHASE>);
+        $test->id ('1.currentIndex');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentIndex>,
+                  expected_value => 0);
+
+        $test->id ('2.nextNode');
+        $test->assert_equals ($sw-><M::SerialWalker.nextNode>, $node{el2});
+        $test->id ('2.currentNode');
+        $test->assert_equals ($sw-><AG::SerialWalker.currentNode>, $node{el2});
+        $test->id ('2.currentPhase');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentPhase>,
+                  expected_value => <C::SerialWalker.PRE_PHASE>);
+        $test->id ('2.currentIndex');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentIndex>,
+                  expected_value => 0);
+
+        $test->id ('3.nextNode');
+        $test->assert_equals ($sw-><M::SerialWalker.nextNode>, $node{el2});
+        $test->id ('3.currentNode');
+        $test->assert_equals ($sw-><AG::SerialWalker.currentNode>, $node{el2});
+        $test->id ('3.currentPhase');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentPhase>,
+                  expected_value => <C::SerialWalker.POST_PHASE>);
+        $test->id ('3.currentIndex');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentIndex>,
+                  expected_value => 1);
+
+        $test->id ('4.nextNode');
+        $test->assert_equals ($sw-><M::SerialWalker.nextNode>, $node{el1});
+        $test->id ('4.currentNode');
+        $test->assert_equals ($sw-><AG::SerialWalker.currentNode>, $node{el1});
+        $test->id ('4.currentPhase');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentPhase>,
+                  expected_value => <C::SerialWalker.IN_PHASE>);
+        $test->id ('4.currentIndex');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentIndex>,
+                  expected_value => 1);
+
+        $test->id ('10.nextNode');
+        $test->assert_equals ($sw-><M::SerialWalker.nextNode>, $node{el5});
+        $test->id ('10.currentNode');
+        $test->assert_equals ($sw-><AG::SerialWalker.currentNode>, $node{el5});
+        $test->id ('10.currentPhase');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentPhase>,
+                  expected_value => <C::SerialWalker.PRE_PHASE>);
+        $test->id ('10.currentIndex');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentIndex>,
+                  expected_value => 0);
+
+        $test->id ('11.nextNode');
+        $test->assert_equals ($sw-><M::SerialWalker.nextNode>, $node{el5});
+        $test->id ('11.currentNode');
+        $test->assert_equals ($sw-><AG::SerialWalker.currentNode>, $node{el5});
+        $test->id ('11.currentPhase');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentPhase>,
+                  expected_value => <C::SerialWalker.POST_PHASE>);
+        $test->id ('11.currentIndex');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentIndex>,
+                  expected_value => 1);
+
+        $test->id ('12.nextNode');
+        $test->assert_equals ($sw-><M::SerialWalker.nextNode>, $node{el1});
+        $test->id ('12.currentNode');
+        $test->assert_equals ($sw-><AG::SerialWalker.currentNode>, $node{el1});
+        $test->id ('12.currentPhase');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentPhase>,
+                  expected_value => <C::SerialWalker.POST_PHASE>);
+        $test->id ('12.currentIndex');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentIndex>,
+                  expected_value => 2);
+
+        $test->id ('13.nextNode');
+        $test->assert_null ($sw-><M::SerialWalker.nextNode>);
+        $test->id ('13.currentNode');
+        $test->assert_equals ($sw-><AG::SerialWalker.currentNode>, $node{el1});
+        $test->id ('13.currentPhase');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentPhase>,
+                  expected_value => <C::SerialWalker.POST_PHASE>);
+        $test->id ('13.currentIndex');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentIndex>,
+                  expected_value => 2);
+
+        $test->id ('14.nextNode');
+        $test->assert_null ($sw-><M::SerialWalker.nextNode>);
+        $test->id ('14.currentNode');
+        $test->assert_equals ($sw-><AG::SerialWalker.currentNode>, $node{el1});
+        $test->id ('14.currentPhase');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentPhase>,
+                  expected_value => <C::SerialWalker.POST_PHASE>);
+        $test->id ('14.currentIndex');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentIndex>,
+                  expected_value => 2);
+    @@Test:
+      @@@QName: SerialWalker.nextNode.5.test
+      @@@enDesc:
+        FILTER_REJECT all children
+      @@@PerlDef:
+        my $doc;
+        my $doctrv;
+        __CODE{createDocForTest}__;
+
+        my %node;
+        __CODE{TreeForTest3}__;
+
+        my $sw = $doctrv-><M::DocumentTraversal.manakaiCreateSerialWalker>
+                            ($node{el1}, <C::NodeFilter.SHOW_ALL>, sub {
+                               $_[1]->local_name eq 'el4'
+                                 ? <C::NodeFilter.FILTER_REJECT>
+                                 : <C::NodeFilter.FILTER_ACCEPT>
+                             });
+
+        $test->id ('1.nextNode');
+        $test->assert_equals ($sw-><M::SerialWalker.nextNode>, $node{el1});
+        $test->id ('1.currentNode');
+        $test->assert_equals ($sw-><AG::SerialWalker.currentNode>, $node{el1});
+        $test->id ('1.currentPhase');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentPhase>,
+                  expected_value => <C::SerialWalker.PRE_PHASE>);
+        $test->id ('1.currentIndex');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentIndex>,
+                  expected_value => 0);
+
+        $test->id ('2.nextNode');
+        $test->assert_equals ($sw-><M::SerialWalker.nextNode>, $node{el2});
+        $test->id ('2.currentNode');
+        $test->assert_equals ($sw-><AG::SerialWalker.currentNode>, $node{el2});
+        $test->id ('2.currentPhase');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentPhase>,
+                  expected_value => <C::SerialWalker.PRE_PHASE>);
+        $test->id ('2.currentIndex');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentIndex>,
+                  expected_value => 0);
+
+        $test->id ('3.nextNode');
+        $test->assert_equals ($sw-><M::SerialWalker.nextNode>, $node{el2});
+        $test->id ('3.currentNode');
+        $test->assert_equals ($sw-><AG::SerialWalker.currentNode>, $node{el2});
+        $test->id ('3.currentPhase');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentPhase>,
+                  expected_value => <C::SerialWalker.POST_PHASE>);
+        $test->id ('3.currentIndex');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentIndex>,
+                  expected_value => 1);
+
+        $test->id ('4.nextNode');
+        $test->assert_equals ($sw-><M::SerialWalker.nextNode>, $node{el1});
+        $test->id ('4.currentNode');
+        $test->assert_equals ($sw-><AG::SerialWalker.currentNode>, $node{el1});
+        $test->id ('4.currentPhase');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentPhase>,
+                  expected_value => <C::SerialWalker.IN_PHASE>);
+        $test->id ('4.currentIndex');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentIndex>,
+                  expected_value => 1);
+
+        $test->id ('5.nextNode');
+        $test->assert_equals ($sw-><M::SerialWalker.nextNode>, $node{el3});
+        $test->id ('5.currentNode');
+        $test->assert_equals ($sw-><AG::SerialWalker.currentNode>, $node{el3});
+        $test->id ('5.currentPhase');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentPhase>,
+                  expected_value => <C::SerialWalker.PRE_PHASE>);
+        $test->id ('5.currentIndex');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentIndex>,
+                  expected_value => 0);
+
+        $test->id ('6.nextNode');
+        $test->assert_equals ($sw-><M::SerialWalker.nextNode>, $node{el3});
+        $test->id ('6.currentNode');
+        $test->assert_equals ($sw-><AG::SerialWalker.currentNode>, $node{el3});
+        $test->id ('6.currentPhase');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentPhase>,
+                  expected_value => <C::SerialWalker.POST_PHASE>);
+        $test->id ('6.currentIndex');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentIndex>,
+                  expected_value => 1);
+
+        $test->id ('7.nextNode');
+        $test->assert_equals ($sw-><M::SerialWalker.nextNode>, $node{el1});
+        $test->id ('7.currentNode');
+        $test->assert_equals ($sw-><AG::SerialWalker.currentNode>, $node{el1});
+        $test->id ('7.currentPhase');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentPhase>,
+                  expected_value => <C::SerialWalker.IN_PHASE>);
+        $test->id ('7.currentIndex');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentIndex>,
+                  expected_value => 2);
+
+        $test->id ('10.nextNode');
+        $test->assert_equals ($sw-><M::SerialWalker.nextNode>, $node{el5});
+        $test->id ('10.currentNode');
+        $test->assert_equals ($sw-><AG::SerialWalker.currentNode>, $node{el5});
+        $test->id ('10.currentPhase');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentPhase>,
+                  expected_value => <C::SerialWalker.PRE_PHASE>);
+        $test->id ('10.currentIndex');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentIndex>,
+                  expected_value => 0);
+
+        $test->id ('11.nextNode');
+        $test->assert_equals ($sw-><M::SerialWalker.nextNode>, $node{el5});
+        $test->id ('11.currentNode');
+        $test->assert_equals ($sw-><AG::SerialWalker.currentNode>, $node{el5});
+        $test->id ('11.currentPhase');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentPhase>,
+                  expected_value => <C::SerialWalker.POST_PHASE>);
+        $test->id ('11.currentIndex');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentIndex>,
+                  expected_value => 1);
+
+        $test->id ('12.nextNode');
+        $test->assert_equals ($sw-><M::SerialWalker.nextNode>, $node{el1});
+        $test->id ('12.currentNode');
+        $test->assert_equals ($sw-><AG::SerialWalker.currentNode>, $node{el1});
+        $test->id ('12.currentPhase');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentPhase>,
+                  expected_value => <C::SerialWalker.POST_PHASE>);
+        $test->id ('12.currentIndex');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentIndex>,
+                  expected_value => 3);
+
+        $test->id ('13.nextNode');
+        $test->assert_null ($sw-><M::SerialWalker.nextNode>);
+        $test->id ('13.currentNode');
+        $test->assert_equals ($sw-><AG::SerialWalker.currentNode>, $node{el1});
+        $test->id ('13.currentPhase');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentPhase>,
+                  expected_value => <C::SerialWalker.POST_PHASE>);
+        $test->id ('13.currentIndex');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentIndex>,
+                  expected_value => 3);
+
+        $test->id ('14.nextNode');
+        $test->assert_null ($sw-><M::SerialWalker.nextNode>);
+        $test->id ('14.currentNode');
+        $test->assert_equals ($sw-><AG::SerialWalker.currentNode>, $node{el1});
+        $test->id ('14.currentPhase');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentPhase>,
+                  expected_value => <C::SerialWalker.POST_PHASE>);
+        $test->id ('14.currentIndex');
+        $test->assert_num_equals
+                 (actual_value => $sw-><AG::SerialWalker.currentIndex>,
+                  expected_value => 3);
+##SerialWalker
