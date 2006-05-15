@@ -13,7 +13,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/05/15 12:06:09 $
+    $Date: 2006/05/15 12:58:02 $
 
   @Require:
     @@Module:
@@ -3220,6 +3220,322 @@ IFClsDef:
 
         $test->id ('dtdText');
         $test->assert_equals ($el-><AG::XDPElement.dtdText>, '()');
+
+  @Method:
+    @@Name: createXDPAttrDefinition
+    @@enDesc:
+      Creates a <XE::xdp|attr-definition> element.
+
+      {ISSUE::
+        Declared type and default type parameters should be added?
+      }
+    @@Param:
+      @@@Name: name
+      @@@Type: DOMString
+      @@@enDesc: 
+        The name of the attribute.
+      @@@nullCase:
+        @@@@enDesc:
+          All parameters are ignored.
+    @@Return:
+      @@@Type: XDPElement
+      @@@enDesc:
+        The newly created element node.
+
+        {P:: A new <IF::Element> node with following attributes
+             <kwd:MUST> be returned:
+
+           - <A::Node.localName>::: <XE::attr-definition>.
+
+           - <A::Node.namespaceURI>::: <URI^^DISCore|QName::xdp|>.
+
+           - <A::Node.ownerDocument>::: The document.
+           
+        }
+
+        {P:: If <P::name> is different from <DOM::null>, a
+             <IF::Element> node with following attributes
+             <kwd:MUST> be appended to the returned node
+             as if the <M::Node.appendChild> method were invoked.
+
+           - <A::Node.localName>::: <XE::name>.
+
+           - <A::Node.namespaceURI>::: <URI^^DISCore|QName::xdp|>.
+
+           - <A::Node.ownerDocument>::: The document.
+
+           - <A::Node.textContent>::: <P::name>.
+
+        }
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><M::Document.createElementNS>
+                        (<Q::xdp|>, 'attr-definition');
+          $r-><M::Node.appendChild>
+                ($self-><M::XDPDocument.createXDPName> ($name))
+            if defined $name;
+        }__;
+
+    @@Test:
+      @@@QName: XDPDocument.createXDPAttrDefinition.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{createXDPDocumentForTest}__;
+
+        my $el = $doc-><M::XDPDocument.createXDPAttrDefinition> ('aname');
+
+        $test->id ('interface');
+        $test->assert_isa ($el, <IFName::XDPElement>);
+
+        $test->id ('namespaceURI');
+        $test->assert_equals ($el-><AG::Node.namespaceURI>, <Q::xdp|>);
+
+        $test->id ('localName');
+        $test->assert_equals ($el-><AG::Node.localName>, 'attr-definition');
+
+        $test->id ('dtdText');
+        $test->assert_equals ($el-><AG::XDPElement.dtdText>, 'aname');
+    @@Test:
+      @@@QName: XDPDocument.createXDPAttrDefinition.2.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{createXDPDocumentForTest}__;
+
+        my $el = $doc-><M::XDPDocument.createXDPAttrDefinition>;
+
+        $test->id ('interface');
+        $test->assert_isa ($el, <IFName::XDPElement>);
+
+        $test->id ('namespaceURI');
+        $test->assert_equals ($el-><AG::Node.namespaceURI>, <Q::xdp|>);
+
+        $test->id ('localName');
+        $test->assert_equals ($el-><AG::Node.localName>, 'attr-definition');
+
+        $test->id ('dtdText');
+        $test->assert_equals ($el-><AG::XDPElement.dtdText>, '');
+
+  @Method:
+    @@Name: createXDPAttlist
+    @@enDesc:
+      Creates a <XE::xdp|attlist> element.
+    @@Param:
+      @@@Name: name
+      @@@Type: DOMString
+      @@@enDesc: 
+        The name in the declaration.
+      @@@nullCase:
+        @@@@enDesc:
+          The declaration does not contain any name.
+    @@Return:
+      @@@Type: XDPAttlistElement
+      @@@enDesc:
+        The newly created element node.
+
+        {P:: A new <IF::Element> node with following attributes
+             <kwd:MUST> be returned:
+
+           - <A::Node.localName>::: <XE::attlist>.
+
+           - <A::Node.namespaceURI>::: <URI^^DISCore|QName::xdp|>.
+
+           - <A::Node.ownerDocument>::: The document.
+           
+        }
+
+        {P:: If <P::name> is different from <DOM::null>, two
+             <IF::Element> nodes with following attributes
+             <kwd:MUST> be appended to the returned node
+             as if the <M::Node.appendChild> method were invoked in order.
+
+           {LI::
+             
+             - <A::Node.localName>::: <XE::s>.
+
+             - <A::Node.namespaceURI>::: <URI^^DISCore|QName::xdp|>.
+ 
+             - <A::Node.ownerDocument>::: The document.
+
+             - <A::Node.textContent>::: A <CHAR::SPACE>.
+
+           }
+
+           {LI::
+
+             - <A::Node.localName>::: <XE::name>.
+
+             - <A::Node.namespaceURI>::: <URI^^DISCore|QName::xdp|>.
+ 
+             - <A::Node.ownerDocument>::: The document.
+
+             - <A::Node.textContent>::: <P::name>.
+
+           }
+
+        }
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><M::Document.createElementNS>
+                        (<Q::xdp|>, 'attlist');
+          if (defined $name) {
+            $r-><M::Node.appendChild>
+                  ($self-><M::XDPDocument.createXDPS> (' '));
+            $r-><M::Node.appendChild>
+                  ($self-><M::XDPDocument.createXDPName> ($name));
+          }
+        }__;
+
+    @@Test:
+      @@@QName: XDPDocument.createXDPAttlist.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{createXDPDocumentForTest}__;
+
+        my $el = $doc-><M::XDPDocument.createXDPAttlist> ('aname');
+
+        $test->id ('interface');
+        $test->assert_isa ($el, <IFName::XDPAttlistElement>);
+
+        $test->id ('namespaceURI');
+        $test->assert_equals ($el-><AG::Node.namespaceURI>, <Q::xdp|>);
+
+        $test->id ('localName');
+        $test->assert_equals ($el-><AG::Node.localName>, 'attlist');
+
+        $test->id ('dtdText');
+        $test->assert_equals ($el-><AG::XDPElement.dtdText>, '<!ATTLIST aname>');
+    @@Test:
+      @@@QName: XDPDocument.createXDPAttlist.2.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{createXDPDocumentForTest}__;
+
+        my $el = $doc-><M::XDPDocument.createXDPAttlist>;
+
+        $test->id ('interface');
+        $test->assert_isa ($el, <IFName::XDPAttlistElement>);
+
+        $test->id ('namespaceURI');
+        $test->assert_equals ($el-><AG::Node.namespaceURI>, <Q::xdp|>);
+
+        $test->id ('localName');
+        $test->assert_equals ($el-><AG::Node.localName>, 'attlist');
+
+        $test->id ('dtdText');
+        $test->assert_equals ($el-><AG::XDPElement.dtdText>, '<!ATTLIST>');
+
+  @Method:
+    @@Name: createXDPElement
+    @@enDesc:
+      Creates a <XE::xdp|element> element.
+
+      {ISSUE::
+        Should declared content parameter be added?
+      }
+    @@Param:
+      @@@Name: name
+      @@@Type: DOMString
+      @@@enDesc: 
+        The name in the declaration.
+      @@@nullCase:
+        @@@@enDesc:
+          The declaration does not contain any name.
+    @@Return:
+      @@@Type: XDPElementElement
+      @@@enDesc:
+        The newly created element node.
+
+        {P:: A new <IF::Element> node with following attributes
+             <kwd:MUST> be returned:
+
+           - <A::Node.localName>::: <XE::element>.
+
+           - <A::Node.namespaceURI>::: <URI^^DISCore|QName::xdp|>.
+
+           - <A::Node.ownerDocument>::: The document.
+           
+        }
+
+        {P:: If <P::name> is different from <DOM::null>, two
+             <IF::Element> nodes with following attributes
+             <kwd:MUST> be appended to the returned node
+             as if the <M::Node.appendChild> method were invoked in order.
+
+           {LI::
+             
+             - <A::Node.localName>::: <XE::s>.
+
+             - <A::Node.namespaceURI>::: <URI^^DISCore|QName::xdp|>.
+ 
+             - <A::Node.ownerDocument>::: The document.
+
+             - <A::Node.textContent>::: A <CHAR::SPACE>.
+
+           }
+
+           {LI::
+
+             - <A::Node.localName>::: <XE::name>.
+
+             - <A::Node.namespaceURI>::: <URI^^DISCore|QName::xdp|>.
+ 
+             - <A::Node.ownerDocument>::: The document.
+
+             - <A::Node.textContent>::: <P::name>.
+
+           }
+
+        }
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><M::Document.createElementNS>
+                        (<Q::xdp|>, 'element');
+          if (defined $name) {
+            $r-><M::Node.appendChild>
+                  ($self-><M::XDPDocument.createXDPS> (' '));
+            $r-><M::Node.appendChild>
+                  ($self-><M::XDPDocument.createXDPName> ($name));
+          }
+        }__;
+
+    @@Test:
+      @@@QName: XDPDocument.createXDPElement.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{createXDPDocumentForTest}__;
+
+        my $el = $doc-><M::XDPDocument.createXDPElement> ('aname');
+
+        $test->id ('interface');
+        $test->assert_isa ($el, <IFName::XDPElementElement>);
+
+        $test->id ('namespaceURI');
+        $test->assert_equals ($el-><AG::Node.namespaceURI>, <Q::xdp|>);
+
+        $test->id ('localName');
+        $test->assert_equals ($el-><AG::Node.localName>, 'element');
+
+        $test->id ('dtdText');
+        $test->assert_equals ($el-><AG::XDPElement.dtdText>, '<!ELEMENT aname>');
+    @@Test:
+      @@@QName: XDPDocument.createXDPElement.2.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{createXDPDocumentForTest}__;
+
+        my $el = $doc-><M::XDPDocument.createXDPElement>;
+
+        $test->id ('interface');
+        $test->assert_isa ($el, <IFName::XDPElementElement>);
+
+        $test->id ('namespaceURI');
+        $test->assert_equals ($el-><AG::Node.namespaceURI>, <Q::xdp|>);
+
+        $test->id ('localName');
+        $test->assert_equals ($el-><AG::Node.localName>, 'element');
+
+        $test->id ('dtdText');
+        $test->assert_equals ($el-><AG::XDPElement.dtdText>, '<!ELEMENT>');
 ##XDPDocument
 
 IFClsDef:
