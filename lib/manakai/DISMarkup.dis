@@ -13,7 +13,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/05/13 05:40:58 $
+      $Date: 2006/05/18 09:09:22 $
     @@ContentType:
       dis:Date.RCS
   
@@ -35,6 +35,8 @@ Namespace:
      http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
   @ManakaiDOM:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
+  @m12n: 
+    http://suika.fam.cx/www/2006/05/m12n/
   @mv: 
     http://suika.fam.cx/www/2006/05/mv/
   @owl:
@@ -67,9 +69,35 @@ RPropDef:
   @enFN: name
   @enDesc:
     A <Q::mv|name> is a name to identity the <Q::mv|Item>.
-  @rdfs:domain: mv|Item
+  @subsetOf: dis|AppName
   @dataType: DISCore|String
   @multipleProperties: DISCore|UnorderedList
+
+RPropDef:
+  @QName: mv|longName
+  @enFN: long name
+  @enDesc:
+    A human readable name of the <Q::mv|Item>, without any <Q::mv|version>.
+  @subsetOf: dis|AppName
+  @dataType: DISCore|String
+  @multipleProperties: DISCore|UnorderedList
+
+RPropDef:
+  @QName: mv|version
+  @enFN: version
+  @enDesc:
+    A human readable version name of the <Q::mv|Item>.
+  @subsetOf: dis|AppName
+  @dataType: DISCore|String
+  @multipleProperties: DISCore|UnorderedList
+
+RPropDef:
+  @QName: mv|targetNamespace
+  @enFN: target namespace
+  @enDesc:
+    The namespace whose members are defined by the <Q::mv|Item>.
+  @dataType: DISCore|QName
+  @multipleProperties: DISCore|Single
 
 RPropDef:
   @QName: mv|qualifiedName
@@ -124,6 +152,32 @@ RPropDef:
   @multipleProperties: DISCore|Single
 
 ResourceTypeDef:
+  @QName: mv|DocumentTypeAnyModule
+  @enFN: document type module or driver
+  @subsetOf: mv|Item
+
+ResourceTypeDef:
+  @QName: mv|DocumentTypeModule
+  @enFN: document type module
+  @enDesc:
+    A <Q::mv|DocumentTypeModule> is a module 
+    that is a possible part of a <Q::mv|DocumentType>.
+  @subsetOf: mv|DocumentTypeAnyModule
+
+ResourceTypeDef:
+  @QName: mv|DocumentTypeDriver
+  @enFN: document type driver
+  @subsetOf: mv|DocumentTypeAnyModule
+
+ResourceTypeDef:
+  @QName: mv|DocumentTypeModuleSet
+  @enFN: document type module set
+  @enDesc:
+    A <Q::mv|DocumentTypeModuleSet> is a set of zero or more
+    <Q::mv|DocumentTypeModule>s.
+  @subsetOf: mv|Item
+
+ResourceTypeDef:
   @QName: mv|Element
   @enFN: element
   @enDesc:
@@ -137,6 +191,20 @@ ResourceTypeDef:
     An <Q::mv|ElementType> is a class of <Q::mv|Element>s.
   @subsetOf: mv|ItemType
   @subsetOf: mv|ElementTypeOrNSElementTypes
+
+RPropDef:
+  @QName: mv|contentModel
+  @enFN: content model
+
+ResourceTypeDef:
+  @QName: mv|ElementTypeClass
+  @enFN: element type class
+  @subsetOf: mv|ElementType
+
+ResourceTypeDef:
+  @QName: mv|ElementTypeMix
+  @enFN: element type mixed class
+  @subsetOf: mv|ElementType
 
 RPropDef:
   @QName: mv|elementTypeName
@@ -205,6 +273,15 @@ ResourceTypeDef:
   @AliasFor: mv|NSElementTypes
 
 ResourceTypeDef:
+  @QName: mv|ElementContentModel
+  @enFN: element content model
+  @enDesc:
+    An <Q::mv|ElementContentModel> is a content model for
+    element types.
+  @subsetOf: mv|Item
+  @subsetOf: DISCore|AnyType
+
+ResourceTypeDef:
   @QName: mv|Attribute
   @enFN: attribute
   @enDesc:
@@ -238,6 +315,23 @@ ResourceTypeDef:
   @enDesc:
     Attribute name wildcards that represent any attribute
     in a particular namespace.
+
+ResourceTypeDef:
+  @QName: mv|SimpleType
+  @enFN: simple type
+  @enDesc:
+    A <Q::mv|SimpleType> is a set of constaraints to strings.
+    It is generally defines its semantics as well as syntax.
+  @subsetOf: mv|Item
+  @subsetOf: DISCore|AnyType
+
+ResourceTypeDef:
+  @QName: mv|Notation
+  @enFN: notation
+  @enDesc:
+    A <Q::mv|Notation> is a notation in XML.
+  @subsetOf: mv|Item
+  @subsetOf: DISCore|AnyType
 
 ## -- Markup language vocabulary characteristics
 

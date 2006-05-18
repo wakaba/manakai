@@ -19,7 +19,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/01/27 16:24:37 $
+      $Date: 2006/05/18 09:09:22 $
     @@ContentType:
       dis:Date.RCS
   
@@ -29,6 +29,8 @@ Module:
   @Require:
     @@Module:
       @@@QName: DIS|DISPerl
+    @@Module:
+      @@@QName: DIS|DISMarkup
 
 Namespace:
   @DIS:
@@ -53,8 +55,10 @@ Namespace:
      http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
   @license:
      http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
-  @m12n:
-    http://suika.fam.cx/~wakaba/archive/2004/dis/XML#
+  @m12n: 
+    http://suika.fam.cx/www/2006/05/m12n/
+  @mv: 
+    http://suika.fam.cx/www/2006/05/mv/
   @ManakaiDOM:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
   @infoset:
@@ -906,6 +910,11 @@ AttrTypeDef:
     infoset:AttributeType.ENUMERATION
   @InfosetName: ENUMERATION
 
+ResourceDef:
+  @QName: dxm|PCDATA
+  @enFN:
+    <XML::PCDATA>
+  @DISCore:resourceType: DISCore|AnyType
 
 InfoPropDef:
   @QName:
@@ -1448,6 +1457,13 @@ ElementTypeBinding:
     dis:Description
   @ShadowContent:
     @@lang:en
+
+ElementTypeBinding:
+  @Name: enFN
+  @ElementType:
+    dis:FullName
+  @ShadowContent:
+    @@lang:en
   
 ElementTypeBinding:
   @Name: enLabel
@@ -1586,51 +1602,61 @@ InfoPropDef:
 
 ## XHTML m12n Modularized Document Types
 
-ResourceDef:
+ResourceTypeDef:
+  @QName: m12n|Facilities
+  @enFN: facilities
+  @enDesc:
+    The term <Q::m12n|Facilities> represents <Q::m12n|Element>s,
+    <Q::m12n|Attribute>s, and the semantics associated
+    with those <Q::m12n|Element>s and <Q::m12n|Attribute>s.
+
+ResourceTypeDef:
   @QName:
     m12n:DocumentModel
+  @enFN: document model
   @enDesc:
     The effective structure and constraints of a given document type.
     The document model constitutes the abstract representation of 
     the physical or semantic structures of a class of documents.
-  @rdf:type:
-    rdfs:Class
+  @subsetOf: mv|DocumentType
 
-ResourceDef:
+ResourceTypeDef:
   @QName:
     m12n:DocumentType
+  @enFN: document type
   @enDesc:
     A class of documents sharing a common abstract structure. 
-  @rdf:type:
-    rdfs:Class
+  @subsetOf: mv|DocumentType
 # @rdfs:subClassOf:
 #   sgml:DocumentType
 
-ResourceDef:
+ResourceTypeDef:
   @QName:
     m12n:HybridDocumentType
-  @rdf:type:
-    rdfs:Class
-  @rdfs:subClassOf:
-    m12n:DocumentType
+  @enFN: hybrid document type
   @enDesc:
     A hybrid document type is a document type composed from
     a collection of XML DTDs or DTD Modules.
+  @subsetOf: m12n|DocumentType
 
-ResourceDef:
+ResourceTypeDef:
   @QName:
     m12n:DocumentTypeDefinition
+  @enFN: document type definition
   @enDesc:
     A formal, machine-readable expression of the XML structure and
     syntax rules to which a document instance of a specific document
     type must conform; the schema type used in XML 1.0 to validate
     conformance of a document instance to its declared document type.
-  @rdf:type:
-    rdfs:Class
 
 ResourceDef:
+  @QName: m12n|DTD
+  @AliasFor: m12n|DocumentTypeDefinition
+
+ResourceTypeDef:
   @QName:
     m12n:MarkupModel
+  @enFN: markup model
   @enDesc:
     The markup vocabulary and grammer as defined by a document
     type definition.
@@ -1638,39 +1664,39 @@ ResourceDef:
     The markup model is the concrete representation in markup syntax
     of the document model.  The same document model may be 
     expressed by a variety of markup models.
-  @rdf:type:
-    rdfs:Class
+  @subsetOf: mv|DocumentType
 
-ResourceDef:
+ResourceTypeDef:
   @QName:
     m12n:Driver
   @enDesc:
     A generally short file used to declare and instantiate the
     modules of a DTD.
-  @rdf:type:
-    rdfs:Class
+  @subsetOf: mv|DocumentTypeModule
 
-ResourceDef:
+ResourceTypeDef:
+  @QName: m12n|Document
+  @enFN: document
+  @subsetOf: mv|Document
+
+ResourceTypeDef:
   @QName:
     m12n:HybridDocument
+  @enFN: hybrid document
   @enDesc:
     A hybrid document is a document that uses more than one XML
-    namespaces.
-  @rdf:type:
-    rdfs:Class
+    namespaces.  Hybrid documents may be defined as documents that
+    contain elements or attributes from hybrid document types.
+  @subsetOf: m12n|Document
 
 ResourceDef:
   @QName:
     m12n:parentDocumentType
+  @enFN: parent document type
   @enDesc:
     The parent document type of a hybrid document is 
     the document type of the root element.
-  @rdf:type:
-    rdf:Property
-  @rdfs:domain:
-    m12n:HybridDocument
-  @rdfs:range:
-    m12n:DocumentType
+  @DISCore:resourceType: DISCore|Property
 
 ResourceDef:
   @QName:
@@ -1679,17 +1705,17 @@ ResourceDef:
     A unit of document type specification corresponding to 
     a distinct type of content, corresponding to a 
     markup construct reflecting this distinct type.
-  @rdf:type:
-    rdfs:Class
+  @DISCore:resourceType: mv|Item
+  @subsetOf: mv|DocumentTypeModule
 
-ResourceDef:
+ResourceTypeDef:
   @QName:
     m12n:Module
+  @enFN: module
   @enDesc:
     An anstract unit within a document model expressed as a
     DTD fragment, used to consolidate markup declaration.
-  @rdf:type:
-    rdfs:Class
+  @subsetOf: mv|DocumentTypeModule
 
 ResourceDef:
   @QName: AnyModuleDefinition
@@ -1730,22 +1756,40 @@ ResourceDef:
     rdfs:Class
   @rdfs:subClassOf: AnyModuleDefinition
 
-ResourceDef:
+ResourceTypeDef:
   @QName:
     m12n:MarkupDeclaration
+  @enFN: markup declaration
   @enDesc:
     A syntactical construct within a DTD declaring an entity or
     defining a markup structure.
-  @rdf:type:
-    rdfs:Class
 
-ResourceDef:
+ResourceTypeDef:
   @QName:
     m12n:ElementType
   @enDesc:
     A container for a distinct semantic class of document content.
-  @rdf:type:
-    rdfs:Class
+  @subsetOf: mv|ElementType
+
+RPropDef:
+  @QName: m12n|genericIdentifier
+  @enFN: generic identifier
+  @enDesc:
+    The name identifying the element type of an element.
+  @subsetOf: mv|elementTypeName
+  @dataType: DISCore|String
+  @multipleProperties: DISCore|Single
+
+ResourceDef:
+  @QName: m12n|elementTypeName
+  @AliasFor: m12n|genericIdentifier
+
+ElementTypeBinding:
+  @Name: RPropDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISSource|ResourceProperty
 
 ResourceDef:
   @QName:
@@ -1758,13 +1802,13 @@ ResourceDef:
   @rdfs:subClassOf:
     m12n:MarkupDeclaration
 
-ResourceDef:
+ResourceTypeDef:
   @QName:
     m12n:Element
+  @enFN: element
   @enDesc:
     An instance of an element type.
-  @rdf:type:
-    rdfs:Class
+  @subsetOf: mv|Element
 
 ResourceDef:
   @QName:
@@ -1778,14 +1822,26 @@ ResourceDef:
   @rdfs:subClassOf:
     m12n:MarkupDeclaration
 
-ResourceDef:
+ElementTypeBinding:
+  @Name: ResourceTypeDef
+  @ElementType: 
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISCore|resourceType
+    @@subsetOf: DISCore|resourceType
+
+ResourceTypeDef:
+  @QName: m12n|Attribute
+  @enFN: attribute
+  @subsetOf: mv|Attribute
+
+ResourceTypeDef:
   @QName:
     m12n:ContentModel
   @enDesc:
     The declared markup structure allowed within instances
     of an element type. 
-  @rdf:type:
-    rdfs:Class
+  @subsetOf: mv|ElementContentModel
 
 ResourceDef:
   @QName: ElementContentModel
@@ -1805,22 +1861,73 @@ ResourceDef:
   @rdfs:subClassOf:
     m12n:ContentModel
 
-ResourceDef:
+ResourceTypeDef:
   @QName:
     m12n:ModularizationModel
+  @enFN: modularization model
   @enDesc:
     The abstract design of the document type definition 
     in support of the modularization goals.
-  @rdf:type:
-    rdfs:Class
 
-ResourceDef:
+ResourceTypeDef:
   @QName:
     m12n:Modularization
+  @enFN: modularization
   @enDesc:
     An implementation of a modularization model.
-  @rdf:type:
-    rdfs:Class
+
+ResourceTypeDef:
+  @QName: m12n|Tag
+  @enFN: tag
+  @enDesc:
+    Descriptive markup delimiting the start and end of an element.
+
+ResourceTypeDef:
+  @QName: m12n|Entity
+  @enFN: entity
+  @enDesc:
+    An <Q::m12n|Entity> is a logical or physical storage unit
+    containing document content.
+  @subsetOf: mv|Item
+
+ResourceTypeDef: 
+  @QName: m12n|ParameterEntity
+  @enFN: parameter entity
+  @enDesc:
+    An <Q::m12n|Entity> whose scope of use is within the document
+    prolog.
+
+ResourceTypeDef:
+  @QName: m12n|InternalEntity
+  @enFN: internal entity
+  @enDesc:
+    An <Q::m12n|InternalEntity> is an <Q::m12n|Entity> whose
+    content is defined entirely within the document entity.
+  @subsetOf: m12n|Entity
+
+ResourceTypeDef:
+  @QName: m12n|ExternalEntity
+  @enFN: external entity
+  @enDesc:
+    An <Q::m12n|ExternalEntity> is an <Q::m12n|Entity> whose
+    content is defined external to the document entity.
+  @subsetOf: m12n|Entity
+
+ResourceTypeDef:
+  @QName: m12n|EntityReference
+  @enFN: entity reference
+  @enDesc:
+    An <Q::m12n|EntityReference> is a mnemonic string used as a
+    reference to the content of a declared entity.
+  @subsetOf: mv|Item
+
+ResourceDef:
+  @QName: m12n|instantiate
+  @enFN: instantiate
+  @DISCore:resourceType: DISCore|Resource
+  @enDesc:
+    To replace an entity reference with an instance of
+    its declared content.
 
 ## -- Lexical Datatypes
 
