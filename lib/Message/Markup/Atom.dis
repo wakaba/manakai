@@ -43,7 +43,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/05/13 05:40:58 $
+    $Date: 2006/05/19 11:02:11 $
 
   @Require:
     @@Module:
@@ -66,6 +66,8 @@ Namespace:
     http://suika.fam.cx/www/2006/dom-config/
   @dis:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
+  @dlp:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Perl#
   @doc:
     http://suika.fam.cx/~wakaba/archive/2005/7/tutorial#
   @d:
@@ -90,6 +92,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
   @license:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
+  @m12n: 
+    http://suika.fam.cx/www/2006/05/m12n/
   @ManakaiDOM:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
   @Markup:
@@ -100,8 +104,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
   @MDOMX:
     http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
-  @dlp:
-    http://suika.fam.cx/~wakaba/archive/2004/dis/Perl#
+  @mv: 
+    http://suika.fam.cx/www/2006/05/mv/
   @rel:
     http://www.iana.org/assignments/relation/
   @s:
@@ -413,6 +417,13 @@ ElementTypeBinding:
     @@lang:en
 
 ElementTypeBinding:
+  @Name: enLN
+  @ElementType:
+    mv:longName
+  @ShadowContent:
+    @@lang:en
+
+ElementTypeBinding:
   @Name: TrueCase
   @ElementType:
     dis:ResourceDef
@@ -470,6 +481,62 @@ FeatureDef:
     @@f:requires: tx|XMLFeature30
     @@enDesc:
       The Atom DOM, version 1.0.
+
+## -- Modules
+
+ModuleSetDef:
+  @QName: Atom
+  @mv:id: atom
+  @enLN: Atom
+  @mv:version: 1.0
+  @mv:contains: AtomFeed
+  @mv:contains: AtomEntry
+  @mv:contains: AtomProperty
+
+ModuleDef:
+  @QName: AtomFeed
+  @mv:id: feed
+  @enLN: Feed
+  @mv:contains: atom|feed
+
+ModuleDef:
+  @QName: AtomEntry
+  @mv:id: entry
+  @enLN: Entry
+  @mv:contains: atom|entry
+
+ModuleDef:
+  @QName: AtomProperty
+  @mv:id: prop
+  @enLN: Property
+  @mv:contains: atom|content
+  @mv:contains: atom|category
+  @mv:contains: atom|generator
+  @mv:contains: atom|source
+  @mv:contains: atom|link
+  @mv:contains: atom|author
+  @mv:contains: atom|published
+  @mv:contains: atom|updated
+  @mv:contains: atom|id
+  @mv:contains: atom|title
+  @mv:contains: atom|email
+  @mv:contains: atom|uri
+ 
+ElementTypeBinding:
+  @Name: ModuleSetDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: mv|XMLDTDModuleSet
+    @@For: =ManakaiDOM|ManakaiDOMLatest
+
+ElementTypeBinding:
+  @Name: ModuleDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: mv|XMLDTDModule
+    @@For: =ManakaiDOM|ManakaiDOMLatest
 
 ## -- Implementation
 

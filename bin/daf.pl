@@ -16,18 +16,27 @@ use Cwd;
 use Getopt::Long;
 use Pod::Usage;
 my %Opt = (create_module => []);
+my @target_modules;
 GetOptions (
+  'create-dtd-modules=s' => sub {
+    shift;
+    my $i = [split /\s+/, shift, 3];
+    $i->[3] = 'dtd-modules';
+    push @{$Opt{create_module}}, $i;
+  },
   'create-perl-module=s' => sub {
     shift;
     my $i = [split /\s+/, shift, 3];
     $i->[3] = 'perl-pm';
     push @{$Opt{create_module}}, $i;
+    push @target_modules, [$i->[0], $i->[2]];
   },
   'create-perl-test=s' => sub {
     shift;
     my $i = [split /\s+/, shift, 3];
     $i->[3] = 'perl-t';
     push @{$Opt{create_module}}, $i;
+    push @target_modules, [$i->[0], $i->[2]];
   },
   'debug' => \$Opt{debug},
   'dis-file-suffix=s' => \$Opt{dis_suffix},
@@ -35,6 +44,11 @@ GetOptions (
   'dafs-file-suffix=s' => \$Opt{dafs_suffix},
   'dafx-file-suffix=s' => \$Opt{dafx_suffix},
   'help' => \$Opt{help},
+  'load-module=s' => sub {
+    shift;
+    my $i = [split /\s+/, shift, 2];
+    push @target_modules, [$i->[0], $i->[1]];
+  },
   'search-path|I=s' => sub {
     shift;
     my @value = split /\s+/, shift;
@@ -129,6 +143,10 @@ for (@{$Opt{create_module}}) {
     $feature{ExpandedURI q<fe:GenericLS>} = '3.0';
     $feature{'+' . ExpandedURI q<DIS:TDT>} = '1.0';
     $feature{'+' . ExpandedURI q<Util:PerlCode>} = '1.0';
+  } elsif ($out_type eq 'dtd-modules') {
+    require 'manakai/daf-dtd-modules.pl';
+    $feature{ExpandedURI q<fe:GenericLS>} = '3.0';
+    $feature{'+' . ExpandedURI q<fe:XDP>} = '3.0';
   }
 }
 
@@ -157,12 +175,6 @@ my %ModuleNameNamespaceBinding = (
     ## some module has |DISCore:author| property before |dis:Require|
     ## property.
 );
-
-my @target_modules;
-for (@{$Opt{create_module}}) {
-  my ($mod_uri, $out_path, $mod_for, $out_type) = @$_;
-  push @target_modules, [$mod_uri, $mod_for];
-}
 
 my $ResourceCount = 0;
 $db->pl_update_module (\@target_modules,
@@ -294,6 +306,8 @@ for (@{$Opt{create_module}}) {
     daf_perl_pm ($mod_uri, $out_file_path, $mod_for);
   } elsif ($out_type eq 'perl-t') {
     daf_perl_t ($mod_uri, $out_file_path, $mod_for);
+  } elsif ($out_type eq 'dtd-modules') {
+    daf_dtd_modules ($mod_uri, $out_file_path, $mod_for);
   }
 }
 

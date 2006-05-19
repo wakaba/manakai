@@ -19,7 +19,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/05/18 09:09:22 $
+      $Date: 2006/05/19 11:02:11 $
     @@ContentType:
       dis:Date.RCS
   
@@ -1600,6 +1600,110 @@ InfoPropDef:
 
 ## TODO: PSVI
 
+## --- XML Concepts
+
+ResourceTypeDef:
+  @QName: dxm|DocumentType
+  @enFN: document type
+  @enDesc:
+    A <Q::dxm|DocumentType> is a class of documents.
+  @subsetOf: mv|DocumentType
+
+ResourceTypeDef:
+  @QName: dxm|DocumentTypeDefinition
+  @enFN: document type definition
+  @enDesc:
+    A <Q::dxm|DocumentTypeDefinition> is a grammer for
+    a class of documents.
+  @subsetOf: mv|DocumentTypeDefinition
+
+ResourceDef:
+  @QName: dxm|DTD
+  @AliasFor: dxm|DocumentTypeDefinition
+
+ResourceTypeDef:
+  @QName: dxm|Entity
+  @enFN: entity
+  @enDesc:
+    An <Q::dxm|Entity> is a storage units in an XML document.
+  @subsetOf: mv|Item
+
+RPropDef:
+  @QName: dxm|content
+  @enFN: content
+  @dataType: DISCore|String
+  @multipleProperties: DISCore|Single
+
+RPropDef:
+  @QName: dxm|entityName
+  @enFN: entity name
+  @subsetOf: mv|name
+  @dataType: DISCore|String
+  @multipleProperties: DISCore|Single
+
+ResourceTypeDef:
+  @QName: dxm|DocumentEntity
+  @enFN: document entity
+  @enDesc:
+    The <Q::dxm|DocumentEntity> of an XML document serves as the
+    root of the entity tree and a starting-point for an XML processor.
+  @subsetOf: dxm|Entity
+
+ResourceTypeDef:
+  @QName: dxm|ExternalSubset
+  @enFN: external subset
+  @enDesc:
+    An <Q::dxm|ExternalSubset> is a special kind of
+    <Q::dxm|ExternalEntity>.
+  @subsetOf: dxm|ExternalEntity
+
+ResourceDef:
+  @QName: dxm|ExternalDTDSubset
+  @AliasFor: dxm|ExternalSubset
+
+ResourceTypeDef:
+  @QName: dxm|ParsedEntity
+  @enFN: parsed entity
+  @enDesc:
+    The <Q::dxm|content>s of a <Q::dxm|ParsedEntity> are referred
+    to as its <Q::dxm|replacementText>.  This text
+    is considered an integral part of the document.
+  @subsetOf: dxm|Entity
+
+ResourceTypeDef:
+  @QName: dxm|UnparsedEntity
+  @enFN: unparsed entity
+  @enDesc:
+    An <Q::dxm|UnparsedEntity> is a resource whose <Q::dxm|content>s
+    may or may not be text, and if text, may be other than XML.
+  @subsetOf: dxm|Entity
+
+ResourceTypeDef:
+  @QName: dxm|GeneralEntity
+  @enFN: general entity
+  @enDesc:
+    A <Q::dxm|GeneralEntity> is an <Q::dxm|Entity> for use within
+    the document content.
+  @subsetOf: dxm|Entity
+
+ResourceTypeDef:
+  @QName: dxm|ParameterEntity
+  @enFN: parameter entity
+  @enDesc:
+    A <Q::dxm|ParameterEntity> is a <Q::dxm|ParsedEntity> for
+    use within the <Q::dxm|DTD>.
+  @subsetOf: dxm|ParsedEntity
+
+ResourceTypeDef:
+  @QName: dxm|InternalEntity
+  @enFN: internal entity
+  @subsetOf: dxm|Entity
+
+ResourceTypeDef:
+  @QName: dxm|ExternalEntity
+  @enFN: external entity
+  @subsetOf: dxm|Entity
+
 ## XHTML m12n Modularized Document Types
 
 ResourceTypeDef:
@@ -1674,6 +1778,10 @@ ResourceTypeDef:
     modules of a DTD.
   @subsetOf: mv|DocumentTypeModule
 
+ResourceDef:
+  @QName: m12n|DriverFile
+  @AliasFor: m12n|Driver
+
 ResourceTypeDef:
   @QName: m12n|Document
   @enFN: document
@@ -1698,7 +1806,20 @@ ResourceDef:
     the document type of the root element.
   @DISCore:resourceType: DISCore|Property
 
-ResourceDef:
+ResourceTypeDef:
+  @QName: m12n|ModuleSet
+  @enDesc:
+    A <Q::m12n|ModuleSet> is a set of <Q::m12n|Module>s.
+
+    Although there is formally no such a concept in the
+    XHTML Modularization specifications, <Q::m12n|Modules>
+    defined them share the same XML namespace and 
+    their DTD or XML Schema implementations share the same prefixes
+    in names.
+  @subsetOf: mv|Module
+  @DISCore:resourceType: mv|Item
+
+ResourceTypeDef:
   @QName:
     m12n:AbstractModule
   @enDesc:
@@ -1920,6 +2041,33 @@ ResourceTypeDef:
     An <Q::m12n|EntityReference> is a mnemonic string used as a
     reference to the content of a declared entity.
   @subsetOf: mv|Item
+
+ResourceTypeDef:
+  @QName: m12n|FileEntity
+  @enFN: file entity
+  @subsetOf: mv|Item
+
+ResourceTypeDef:
+  @QName: m12n|SubModule
+  @enFN: sub-module
+  @enDesc:
+    A <Q::m12n|SubModule> is just a <Q::m12n|FileEntity>
+    that is separated so that it can be incorporated into
+    the ultimate DTD at the appropriate point.
+  @subsetOf: m12n|FileEntity
+
+ResourceTypeDef:
+  @QName: m12n|QualifiedNamesSubModule
+  @enFN: qualified names sub-module
+  @subsetOf: m12n|SubModule
+
+ResourceTypeDef:
+  @QName: m12n|DeclarationSubModule
+  @enFN: declaration sub-module
+  @enDesc:
+    A <Q::m12n|DeclarationSubModule> is a <Q::m12n|FileEntity>
+    that declares the XML DTD elements and attribute lists.
+  @subsetOf: m12n|FileEntity
 
 ResourceDef:
   @QName: m12n|instantiate

@@ -13,7 +13,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/05/18 09:09:22 $
+      $Date: 2006/05/19 11:02:11 $
     @@ContentType:
       dis:Date.RCS
   
@@ -74,6 +74,17 @@ RPropDef:
   @multipleProperties: DISCore|UnorderedList
 
 RPropDef:
+  @QName: mv|id
+  @enFN: identifier
+  @enDesc:
+    An <Q::mv|id> is a name of the <Q::mv|Item>, typically
+    used in entire or a part of a name of a concrete
+    representation of <Q::mv|Item> or file name of it.
+  @subsetOf: mv|name
+  @dataType: DISCore|String
+  @multipleProperties: DISCore|Single
+
+RPropDef:
   @QName: mv|longName
   @enFN: long name
   @enDesc:
@@ -128,6 +139,12 @@ RPropDef:
   @multipleProperties: DISCore|UnorderedList
   @subsetOf: mv|name
 
+RPropDef:
+  @QName: mv|contains
+  @enFN: contains
+  @dataType: DISCore|TFQNames
+  @multipleProperties: DISCore|OrderedList
+
 ResourceTypeDef:
   @QName: mv|Document
   @enFN: document
@@ -150,6 +167,14 @@ RPropDef:
   @subsetOf: mv|name
   @dataType: DISCore|String
   @multipleProperties: DISCore|Single
+
+ResourceTypeDef:
+  @QName: mv|DocumentTypeDefinition
+  @enFN: document type definition
+  @enDesc:
+    A <Q::mv|DocumentTypeDefinition> is a grammer for
+    a <Q::mv|DocumentType>.
+  @subsetOf: mv|Item
 
 ResourceTypeDef:
   @QName: mv|DocumentTypeAnyModule
@@ -392,6 +417,22 @@ RPropDef:
 RPropDef:
   @QName: dis|DocAttr
   @AliasFor: mv|attributeType
+
+## -- XML DTD Modules
+
+ResourceTypeDef:
+  @QName: mv|XMLDTDModuleSet
+  @enFN: XML DTD module set
+  @enDesc:
+    A set of <Q::mv|XMLDTDModule>s.
+  @subsetOf: mv|DocumentTypeModuleSet
+
+ResourceTypeDef:
+  @QName: mv|XMLDTDModule
+  @enFN: XML DTD module
+  @enDesc:
+    An <Q::mv|XMLDTDModule> is an XML DTD module.
+  @subsetOf: mv|DocumentTypeModule
 
 ## -- "For markup" definitions
 
