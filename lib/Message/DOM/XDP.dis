@@ -13,7 +13,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/05/15 12:58:02 $
+    $Date: 2006/05/20 05:11:37 $
 
   @Require:
     @@Module:
@@ -3536,6 +3536,133 @@ IFClsDef:
 
         $test->id ('dtdText');
         $test->assert_equals ($el-><AG::XDPElement.dtdText>, '<!ELEMENT>');
+
+  @Method:
+    @@Name: createXDPIf
+    @@enDesc:
+      Creates an <XE::xdp|if> element.
+    @@Param:
+      @@@Name: statusEntity
+      @@@Type: DOMString
+      @@@enDesc: 
+        The name of the parameter entity that contains
+        the status of the marked section.
+      @@@nullCase:
+        @@@@enDesc:
+          Same as an empty string.
+    @@Return:
+      @@@Type: XDPIfElement
+      @@@enDesc:
+        The newly created element node.
+
+        {P:: A new <IF::Element> node with following attributes
+             <kwd:MUST> be returned:
+
+           - <A::Node.localName>::: <XE::if>.
+
+           - <A::Node.namespaceURI>::: <URI^^DISCore|QName::xdp|>.
+
+           - <A::Node.ownerDocument>::: The document.
+           
+        }
+
+        {P:: The <A::Node.attributes> <IF::tc|NamedNodeMap>
+             of the returned <IF:Element> node <kwd:MUST> contain
+             a new <IF::te|Attr> node with following attributes:
+ 
+           - <A::Node.localName>::: <XA::status-entity>.
+
+           - <A::Node.namespaceURI>::: <DOM::null>.
+
+           - <A::te|Attr.specified>::: <DOM::true>.
+
+           - <A::Node.textContent>::: <P::statusEntity>, or an empty
+                                      string if <P::statusEntity>
+                                      is <DOM::null>.
+
+        }
+
+        {P:: <A::Node.childNodes> <IF::tc|NodeList> of
+             the returned <IF::Element> node <kwd:MUST> contain
+             two <IF::Element> nodes in order:
+
+           {LI::
+             
+             - <A::Node.localName>::: <XE::true>.
+
+             - <A::Node.namespaceURI>::: <URI^^DISCore|QName::xdp|>.
+ 
+             - <A::Node.ownerDocument>::: The document.
+
+             - <A::Node.textContent>::: An empty string.
+
+           }
+
+           {LI::
+
+             - <A::Node.localName>::: <XE::false>.
+
+             - <A::Node.namespaceURI>::: <URI^^DISCore|QName::xdp|>.
+ 
+             - <A::Node.ownerDocument>::: The document.
+
+             - <A::Node.textContent>::: An empty string.
+
+           }
+
+        }
+      @@@PerlDef:
+        __DEEP{
+          $r = $self-><M::Document.createElementNS> (<Q::xdp|>, 'if');
+          $r-><M::Element.setAttributeNS>
+                (null, 'status-entity',
+                 defined $statusEntity ? $statusEntity : '');
+          $r-><M::Node.appendChild>
+                ($self-><M::Document.createElementNS> (<Q::xdp|>, 'tr'.'ue'));
+          $r-><M::Node.appendChild>
+                ($self-><M::Document.createElementNS> (<Q::xdp|>, 'fal'.'se'));
+        }__;
+
+    @@Test:
+      @@@QName: XDPDocument.createXDPIf.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{createXDPDocumentForTest}__;
+
+        my $el = $doc-><M::XDPDocument.createXDPIf> ('aname');
+
+        $test->id ('interface');
+        $test->assert_isa ($el, <IFName::XDPIfElement>);
+
+        $test->id ('namespaceURI');
+        $test->assert_equals ($el-><AG::Node.namespaceURI>, <Q::xdp|>);
+
+        $test->id ('localName');
+        $test->assert_equals ($el-><AG::Node.localName>, 'if');
+
+        $test->id ('dtdText');
+        $test->assert_equals ($el-><AG::XDPElement.dtdText>,
+                              "<![%aname;[\n<!-- end of aname -->]]>\n");
+
+        $test->id ('fc');
+        my $fc = $el-><AG::Node.firstChild>;
+        $test->assert_isa ($fc, <IFName::XDPElement>);
+
+        $test->id ('fc.namespaceURI');
+        $test->assert_equals ($fc-><AG::Node.namespaceURI>, <Q::xdp|>);
+
+        $test->id ('fc.localName');
+        $test->assert_equals ($fc-><AG::Node.localName>, 'tr'.'ue');
+
+        $test->id ('lc');
+        my $lc = $el-><AG::Node.lastChild>;
+        $test->assert_isa ($fc, <IFName::XDPElement>);
+
+        $test->id ('lc.namespaceURI');
+        $test->assert_equals ($lc-><AG::Node.namespaceURI>, <Q::xdp|>);
+
+        $test->id ('lc.localName');
+        $test->assert_equals ($lc-><AG::Node.localName>, 'fal'.'se');
 ##XDPDocument
 
 IFClsDef:
@@ -4150,3 +4277,77 @@ IFClsETDef:
         $r =~ s/"/%22/g;
         $r = '"'.$r.'"';
 ##XDPSystemLiteralElement
+
+IFClsETDef:
+  @IFQName: XDPIfElement
+  @ETQName: xdp|if
+  @ClsQName: ManakaiDOMXDPIfElement
+
+  @IFISA: XDPElement
+  @ClsISA: ManakaiDOMXDPElement
+
+  @enDesc:
+    An <XE::xdp|if> element represents a set of XML DTD declarations
+    with a conditional section that can be enabled by a
+    parameter entity.
+
+  @CAttr:
+    @@Name: dtdText
+    @@Type: DOMString
+    @@Get:
+      @@@PerlDef:
+        __DEEP{
+          require Message::DOM::Traversal;
+          my $doctrv = $self-><AG::Node.ownerDocument>
+                            -><M::Node.getFeature> (Traversal => '2.0');
+          my $tw = $doctrv->create_tree_walker
+                              ($self, <C::NodeFilter.SHOW_ELEMENT> |
+                                      <C::NodeFilter.SHOW_TEXT> |
+                                      <C::NodeFilter.SHOW_CDATA_SECTION>,
+                               sub {
+                                 my $node = $_[1];
+                                 if ($node-><AG::Node.nodeType>
+                                         == <C::Node.ELEMENT_NODE>) {
+                                   my $ns = $node-><AG::Node.namespaceURI>;
+                                   if (not defined $ns) {
+                                     return <C::NodeFilter.FILTER_REJECT>;
+                                   } elsif ($ns eq <Q::xdp|>) {
+                                     return <C::NodeFilter.FILTER_ACCEPT>;
+                                   } else {
+                                     return <C::NodeFilter.FILTER_REJECT>;
+                                   }
+                                 } else {
+                                   return <C::NodeFilter.FILTER_ACCEPT>;
+                                 }
+                               }, true);
+          my $current = $tw->first_child;
+
+          my $pename = $self-><M::Element.getAttributeNS>
+                                (null, 'status-entity');
+          $r = '<![%'.$pename.";[\n";
+     
+          my $has_true;
+          C: while (defined $current) {
+            if ($current-><AG::Node.nodeType> == <C::Node.ELEMENT_NODE>) {
+              if (not $has_true and
+                  $current->manakai_expanded_uri eq <Q::xdp|true>) {
+                $r .= $current-><AG::XDPElement.dtdText>;
+                $r .= "<!-- end of $pename -->]]>";
+                $has_true = true;
+              } elsif ($current->manakai_expanded_uri eq <Q::xdp|false>) {
+                my $v = $current-><AG::XDPElement.dtdText>;
+                $r .= "\n" if length $v;
+                $r .= $v;
+              } else {
+                $r .= $current-><AG::XDPElement.dtdText>;
+              }
+            } else {
+              $r .= $current-><AG::XDPElement.dtdText>;
+            }
+          
+            $current = $tw->next_sibling;
+          } # C
+
+          $r .= "<!-- end of $pename -->]]>" unless $has_true;
+        }__;
+##XDPIfElement

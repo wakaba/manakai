@@ -12,10 +12,11 @@ use Message::Util::QName::Filter {
   Util => q<http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/>,
 };
 
+our$VERSION=do{my @r=(q$Revision: 1.15 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Cwd;
 use Getopt::Long;
 use Pod::Usage;
-my %Opt = (create_module => []);
+our %Opt = (create_module => []);
 my @target_modules;
 GetOptions (
   'create-dtd-modules=s' => sub {
@@ -49,6 +50,7 @@ GetOptions (
     my $i = [split /\s+/, shift, 2];
     push @target_modules, [$i->[0], $i->[1]];
   },
+  'mod-file-suffix=s' => \$Opt{mod_suffix},
   'search-path|I=s' => sub {
     shift;
     my @value = split /\s+/, shift;
@@ -96,6 +98,7 @@ $Opt{dis_suffix} = '.dis' unless defined $Opt{dis_suffix};
 $Opt{daem_suffix} = '.dafm' unless defined $Opt{daem_suffix};
 $Opt{dafx_suffix} = '.dafx' unless defined $Opt{dafx_suffix};
 $Opt{dafs_suffix} = '.dafs' unless defined $Opt{dafs_suffix};
+$Opt{mod_suffix} = '.mod' unless defined $Opt{mod_suffix};
 $Message::DOM::DOMFeature::DEBUG = 1 if $Opt{debug};
 require Error;
 $Error::Debug = 1 if $Opt{debug};

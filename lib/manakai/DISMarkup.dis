@@ -13,7 +13,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/05/19 11:02:11 $
+      $Date: 2006/05/20 05:11:37 $
     @@ContentType:
       dis:Date.RCS
   
@@ -79,8 +79,20 @@ RPropDef:
   @enDesc:
     An <Q::mv|id> is a name of the <Q::mv|Item>, typically
     used in entire or a part of a name of a concrete
-    representation of <Q::mv|Item> or file name of it.
+    representation of the <Q::mv|Item> or file name of it,
+    without any <Q::mv|vid>.
   @subsetOf: mv|name
+  @dataType: DISCore|String
+  @multipleProperties: DISCore|Single
+
+RPropDef:
+  @QName: mv|vid
+  @enFN: version identifier
+  @enDesc:
+    An <Q::mv|vid> is a version of the <Q::mv|Item>, typically
+    used as a part of a name of a concreate representation
+    of the <Q::mv|Item> or file name of it.
+  @subsetOf: dis|AppName
   @dataType: DISCore|String
   @multipleProperties: DISCore|Single
 
@@ -101,6 +113,13 @@ RPropDef:
   @subsetOf: dis|AppName
   @dataType: DISCore|String
   @multipleProperties: DISCore|UnorderedList
+
+RPropDef:
+  @QName: mv|shortDescription
+  @enFN: short description
+  @subsetOf: dis|Description
+  @dataType: DISCore|String
+  @multipleProperties: DISCore|Single
 
 RPropDef:
   @QName: mv|targetNamespace
