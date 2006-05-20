@@ -43,7 +43,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/05/20 05:11:37 $
+    $Date: 2006/05/20 10:13:02 $
 
   @Require:
     @@Module:
@@ -161,6 +161,22 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: DISLang|Attribute
+    @@ForCheck: !=ManakaiDOM|ManakaiDOM
+
+ElementTypeBinding:
+  @Name: ATTR
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType:
+      @@@@: DISLang|Attribute
+      @@@ForCheck: ManakaiDOM|ForIF
+    @@DISCore:resourceType:
+      @@@@: DISLang|Attribute
+      @@@ForCheck: ManakaiDOM|ForClass
+    @@DISCore:resourceType:
+      @@@@: mv|Attribute
+      @@@ForCheck: s|ForML
     @@ForCheck: !=ManakaiDOM|ManakaiDOM
 
 ElementTypeBinding:
@@ -286,6 +302,46 @@ ElementTypeBinding:
     @@f:implements: AtomFeature10
 
 ElementTypeBinding:
+  @Name: IFClsConstructDef
+  @ElementType: 
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType:
+      @@@@: dis|MultipleResource
+      @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass !s|ForML
+    @@resourceFor: ManakaiDOM|ForIF
+    @@resourceFor: ManakaiDOM|ForClass
+    @@resourceFor: mv|ForCM
+    @@resourceFor: mv|ForAG
+    @@For: ManakaiDOM|ManakaiDOM
+
+    @@DISCore:resourceType:
+      @@@@: DISLang|Interface
+      @@@ForCheck: ManakaiDOM|ForIF
+
+    @@DISCore:resourceType:
+      @@@@: DISLang|Class
+      @@@ForCheck: ManakaiDOM|ForClass
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOM||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
+
+    @@DISCore:resourceType:
+      @@@@: mv|AttributeTypeGroup
+      @@@ForCheck: mv|ForAG
+
+    @@DISCore:resourceType:
+      @@@@: mv|ElementContentModel
+      @@@ForCheck: mv|ForCM
+
+    @@f:implements: AtomFeature10
+
+ElementTypeBinding:
   @Name: IFQName
   @ElementType:
     dis:QName
@@ -313,6 +369,34 @@ ElementTypeBinding:
   @ShadowContent:
     @@ForCheck: s|ForML
     @@ContentType: DISCore|QName
+
+ElementTypeBinding:
+  @Name: CMQName
+  @ElementType:
+    dis:QName
+  @ShadowContent:
+    @@ForCheck: mv|ForCM
+
+ElementTypeBinding:
+  @Name: CMName
+  @ElementType:
+    mv:elementContentModelName
+  @ShadowContent:
+    @@ForCheck: mv|ForCM
+
+ElementTypeBinding:
+  @Name: AGQName
+  @ElementType:
+    dis:QName
+  @ShadowContent:
+    @@ForCheck: mv|ForAG
+
+ElementTypeBinding:
+  @Name: AGName
+  @ElementType:
+    mv:attributeTypeGroupName
+  @ShadowContent:
+    @@ForCheck: mv|ForAG
 
 ElementTypeBinding:
   @Name: IFISA
@@ -492,7 +576,8 @@ ModuleSetDef:
   @mv:version: 1.0
   @mv:contains: AtomFeed
   @mv:contains: AtomEntry
-  @mv:contains: AtomProperty
+  @mv:contains: AtomProperties
+  @mv:contains: AtomDatatypes
 
 ModuleDef:
   @QName: AtomFeed
@@ -507,9 +592,9 @@ ModuleDef:
   @mv:contains: atom|entry
 
 ModuleDef:
-  @QName: AtomProperty
-  @mv:id: prop
-  @enLN: Property
+  @QName: AtomProperties
+  @mv:id: props
+  @enLN: Properties
   @mv:contains: atom|content
   @mv:contains: atom|category
   @mv:contains: atom|generator
@@ -522,6 +607,17 @@ ModuleDef:
   @mv:contains: atom|title
   @mv:contains: atom|email
   @mv:contains: atom|uri
+
+ModuleDef:
+  @QName: AtomDatatypes
+  @mv:id: datatypes
+  @enLN: Datatypes
+  @mv:contains: TextAG
+  @mv:contains: TextCM
+  @mv:contains: PersonAG
+  @mv:contains: PersonCM
+  @mv:contains: DateAG
+  @mv:contains: DateCM
  
 ElementTypeBinding:
   @Name: ModuleSetDef
@@ -1523,9 +1619,13 @@ ResourceDef:
     @@ContentType: DISCore|QName
   @ForCheck: =ManakaiDOM|all
 
-IFClsDef:
+IFClsConstructDef:
   @IFQName: AtomTextConstruct
   @ClsQName: ManakaiAtomTextConstruct
+  @AGQName: TextAG
+  @AGName: text
+  @CMQName: TextCM
+  @CMName: text
 
   @IFISA: AtomElement
   @ClsISA: ManakaiAtomElement
@@ -1541,7 +1641,7 @@ IFClsDef:
     small quantities.  The content of Text constructs is
     Language-Sensitive.
 
-  @Attr:
+  @ATTR:
     @@Name: type
     @@enDesc:
       The <XA::type> attribute of the element.
@@ -1649,9 +1749,13 @@ IFClsDef:
         $test->assert_equals ($el-><AG::AtomTextConstruct.container>, $con);
 ##AtomTextConstruct
 
-IFClsDef:
+IFClsConstructDef:
   @IFQName: AtomPersonConstruct
   @ClsQName: ManakaiAtomPersonConstruct
+  @AGQName: PersonAG
+  @AGName: person
+  @CMQName: PersonCM
+  @CMName: person
 
   @IFISA: AtomElement
   @ClsISA: ManakaiAtomElement
@@ -1788,9 +1892,13 @@ IFClsDef:
         }__;
 ##AtomPersonConstruct
 
-IFClsDef:
+IFClsConstructDef:
   @IFQName: AtomDateConstruct
   @ClsQName: ManakaiAtomDateConstruct
+  @AGQName: DateAG
+  @AGName: date
+  @CMQName: DateCM
+  @CMName: date
 
   @IFISA: AtomElement
   @ClsISA: ManakaiAtomElement
@@ -3092,6 +3200,7 @@ IFClsETDef:
 IFClsETDef:
   @IFQName: AtomContentElement
   @ETQName: atom|content
+  @ETRQName: atom|content
   @ClsQName: ManakaiAtomContentElement
 
   @IFISA: AtomElement
@@ -3340,6 +3449,7 @@ IFClsETDef:
 IFClsETDef:
   @IFQName: AtomAuthorElement
   @ETQName: atom|author
+  @ETRQName: atom|author
   @ClsQName: ManakaiAtomAuthorElement
 
   @IFISA: AtomPersonConstruct
@@ -3353,6 +3463,7 @@ IFClsETDef:
 IFClsETDef:
   @IFQName: AtomCategoryElement
   @ETQName: atom|category
+  @ETRQName: atom|category
   @ClsQName: ManakaiAtomCategoryElement
 
   @IFISA: AtomElement
@@ -3466,6 +3577,7 @@ IFClsETDef:
 IFClsETDef:
   @IFQName: AtomContributorElement
   @ETQName: atom|contributor
+  @ETRQName: atom|contributor
   @ClsQName: ManakaiAtomContributorElement
 
   @IFISA: AtomPersonConstruct
@@ -3480,6 +3592,7 @@ IFClsETDef:
 IFClsETDef:
   @IFQName: AtomGeneratorElement
   @ETQName: atom|generator
+  @ETRQName: atom|generator
   @ClsQName: ManakaiAtomGeneratorElement
 
   @IFISA: AtomElement
@@ -3560,6 +3673,7 @@ IFClsETDef:
 IFClsETDef:
   @IFQName: AtomLinkElement
   @ETQName: atom|link
+  @ETRQName: atom|link
   @ClsQName: ManakaiAtomLinkElement
 
   @IFISA: AtomElement
@@ -3569,7 +3683,7 @@ IFClsETDef:
     The <XE::atom|link> element defines a reference from an entry
     or feed to a Web resource.
 
-  @Attr:
+  @ATTR:
     @@Name: href
     @@enDesc:
       The <XA::href> attribute of the element.
@@ -3577,7 +3691,7 @@ IFClsETDef:
       It <kwd:MUST> <I::reflect the URI value
       of the <XA::href> attribute> of the node.
     @@Type: DOMString
-    @@Type: DOMURI
+    @@actualType: DOMURI
     @@Get:
       @@@nullCase:
         @@@@enDesc:
@@ -3603,7 +3717,7 @@ IFClsETDef:
           $given => $given,
         }__;
 
-  @Attr:
+  @ATTR:
     @@Name: rel
     @@enDesc:
       The <XA::rel> attribute of the element.
@@ -3613,6 +3727,7 @@ IFClsETDef:
       a few exceptions.  The default value <kwd:MUST> 
       be <URI^DISCore|QName::rel|alternate>.
     @@Type: DOMString
+    @@actualType: DOMURI
     @@Get:
       @@@enDesc:
         If the algorithm returns a string that does not contain
@@ -3686,7 +3801,7 @@ IFClsETDef:
         $test->assert_equals ($el-><AG::AtomLinkElement.rel>,
                               <Q::rel|alternate>);
 
-  @Attr:
+  @ATTR:
     @@Name: type
     @@enDesc:
       The <XA::type> attribute of the element.
@@ -3719,7 +3834,7 @@ IFClsETDef:
           $given => $given,
         }__;
 
-  @Attr:
+  @ATTR:
     @@Name: hreflang
     @@enDesc:
       The <XA::hreflang> attribute of the element.
@@ -3752,7 +3867,7 @@ IFClsETDef:
           $given => $given,
         }__;
 
-  @Attr:
+  @ATTR:
     @@Name: title
     @@enDesc:
       The <XA::title> attribute of the element.
@@ -3785,7 +3900,7 @@ IFClsETDef:
           $given => $given,
         }__;
 
-  @Attr:
+  @ATTR:
     @@Name: length
     @@enDesc:
       The <XA::length> attribute of the element.
@@ -3822,6 +3937,7 @@ IFClsETDef:
 IFClsETDef:
   @IFQName: AtomPublishedElement
   @ETQName: atom|published
+  @ETRQName: atom|published
   @ClsQName: ManakaiAtomPublishedElement
 
   @IFISA: AtomDateConstruct
@@ -3839,6 +3955,7 @@ IFClsETDef:
 IFClsETDef:
   @IFQName: AtomRightsElement
   @ETQName: atom|rights
+  @ETRQName: atom|rights
   @ClsQName: ManakaiAtomRightsElement
 
   @IFISA: AtomTextConstruct
@@ -3853,6 +3970,7 @@ IFClsETDef:
 IFClsETDef:
   @IFQName: AtomSourceElement
   @ETQName: atom|source
+  @ETRQName: atom|source
   @ClsQName: ManakaiAtomSourceElement
 
   @IFISA: AtomElement
@@ -4062,6 +4180,7 @@ IFClsETDef:
 IFClsETDef:
   @IFQName: AtomSubtitleElement
   @ETQName: atom|subtitle
+  @ETRQName: atom|subtitle
   @ClsQName: ManakaiAtomSubtitleElement
 
   @IFISA: AtomTextConstruct
@@ -4075,6 +4194,7 @@ IFClsETDef:
 IFClsETDef:
   @IFQName: AtomSummaryElement
   @ETQName: atom|summary
+  @ETRQName: atom|summary
   @ClsQName: ManakaiAtomSummaryElement
 
   @IFISA: AtomTextConstruct
@@ -4088,6 +4208,7 @@ IFClsETDef:
 IFClsETDef:
   @IFQName: AtomTitleElement
   @ETQName: atom|title
+  @ETRQName: atom|title
   @ClsQName: ManakaiAtomTitleElement
 
   @IFISA: AtomTextConstruct
@@ -4101,6 +4222,7 @@ IFClsETDef:
 IFClsETDef:
   @IFQName: AtomUpdatedElement
   @ETQName: atom|updated
+  @ETRQName: atom|updated
   @ClsQName: ManakaiAtomUpdatedElement
 
   @IFISA: AtomDateConstruct

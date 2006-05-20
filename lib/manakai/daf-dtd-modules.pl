@@ -2,6 +2,7 @@ use strict;
 use Message::Util::QName::Filter {
   dis => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis-->,
   fe => q<http://suika.fam.cx/www/2006/feature/>,
+  iat => q<http://www.w3.org/2001/04/infoset#AttributeType.>,
   ManakaiDOM => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#>,
   mv => q<http://suika.fam.cx/www/2006/05/mv/>,
   Util => q<http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/>,
@@ -96,7 +97,7 @@ sub daf_dtd_modules ($$$) {
 
       for my $mgcd (@{daf_dm_get_components ($mgc)}) {
         if ($mgcd->is_type_uri (ExpandedURI q<mv:ElementType>)) {
-          my $mgcd_local_name = daf_dm_get_local_name ($mgcd);
+          my $mgcd_local_name = daf_dm_get_et_local_name ($mgcd);
           my $mgcd_prefix = $mg_idvid . '.' . $mgcd_local_name . '.';
 
           push @mod_header_list, $mgcd_local_name;
@@ -197,11 +198,49 @@ sub daf_dtd_modules ($$$) {
           $xdp_al_decl->append_child
                           ($xdp_doc->create_xdp_peref ($mgcd_prefix.'qname'));
 
+          daf_dm_add_attrdefs ($mgcd => $xdp_al_decl, $xdp_doc);
+
           ## TODO: attributes
 
           $xdp_al_true->append_child ($xdp_doc->create_xdp_s ("\n"));
 
           $xdp_entity->append_child ($xdp_doc->create_xdp_s ("\n\n"));
+        } elsif ($mgcd->is_type_uri (ExpandedURI q<mv:ElementContentModel>)) {
+          my $mgcd_local_name = daf_dm_get_cm_name ($mgcd);
+          my $mgcd_prefix = $mg_idvid . '.' . $mgcd_local_name . '.';          
+          my $mgcd_short_desc = daf_dm_get_short_desc ($mgcd);
+          $mgcd_short_desc = $mgcd_local_name unless defined $mgcd_short_desc;
+          my $mgcd_full_name = $mgcd_prefix . 'content';
+
+          $xdp_entity->append_child
+                         ($xdp_doc->create_xdp_comment
+                                      (' '.$mgcd_short_desc.' '));
+          $xdp_entity->append_child ($xdp_doc->create_xdp_s ("\n"));
+          $xdp_entity->append_child
+                         ($xdp_doc->create_xdp_entity
+                                      (1, $mgcd_full_name, ''));
+          $xdp_entity->append_child ($xdp_doc->create_xdp_s ("\n\n"));
+
+          ## TODO: content model
+        } elsif ($mgcd->is_type_uri (ExpandedURI q<mv:AttributeTypeGroup>)) {
+          my $mgcd_local_name = daf_dm_get_ag_name ($mgcd);
+          my $mgcd_prefix = $mg_idvid . '.' . $mgcd_local_name . '.';          
+          my $mgcd_short_desc = daf_dm_get_short_desc ($mgcd);
+          $mgcd_short_desc = $mgcd_local_name unless defined $mgcd_short_desc;
+          my $mgcd_full_name = $mgcd_prefix . 'attrib';
+
+          $xdp_entity->append_child
+                         ($xdp_doc->create_xdp_comment
+                                      (' '.$mgcd_short_desc.' '));
+          $xdp_entity->append_child ($xdp_doc->create_xdp_s ("\n"));
+          my $at_decl = $xdp_entity->append_child
+                                       ($xdp_doc->create_xdp_entity
+                                                    (1, $mgcd_full_name, ''));
+          daf_dm_add_attrdefs ($mgcd, $at_decl->last_child, $xdp_doc);
+
+          $xdp_entity->append_child ($xdp_doc->create_xdp_s ("\n\n"));
+        } else {
+          daf_dm_unsupported_type_error ($mgcd, 'module');
         }
       }
 
@@ -223,6 +262,8 @@ sub daf_dtd_modules ($$$) {
       print $mgc_file $xdp_entity->dtd_text;
       close $mgc_file;
       status_msg q<done>;
+    } else {
+      daf_dm_unsupported_type_error ($mgc, 'module group');
     }
   }
 
@@ -273,7 +314,7 @@ sub daf_dm_get_components ($) {
   $r;
 } # daf_dm_get_components
 
-sub daf_dm_get_local_name ($) {
+sub daf_dm_get_et_local_name ($) {
   my ($res) = @_;
   my $v = $res->get_property_value (ExpandedURI q<mv:elementTypeName>);
   if (defined $v) {
@@ -281,7 +322,120 @@ sub daf_dm_get_local_name ($) {
   } else {
     return $res->local_name;
   }
-} # daf_dm_get_vid
+} # daf_dm_get_et_local_name
+
+sub daf_dm_get_et_nsuri ($) {
+  my ($res) = @_;
+  my $v = $res->get_property_value (ExpandedURI q<mv:elementTypeName>);
+  if (defined $v) {
+    return $v->can ('namespace_uri') ? $v->namespace_uri : $v->string_value;
+  } else {
+    return $res->namespace_uri;
+  }
+} # daf_dm_get_et_nsuri
+
+sub daf_dm_get_at_local_name ($) {
+  my ($res) = @_;
+  my $v = $res->get_property_value (ExpandedURI q<mv:attributeTypeName>);
+  if (defined $v) {
+    return $v->can ('local_name') ? $v->local_name : $v->string_value;
+  } else {
+    return $res->local_name;
+  }
+} # daf_dm_get_at_local_name
+
+sub daf_dm_get_at_nsuri ($) {
+  my ($res) = @_;
+  my $v = $res->get_property_value (ExpandedURI q<mv:attributeTypeName>);
+  if (defined $v) {
+    return $v->can ('namespace_uri') ? $v->namespace_uri : $v->string_value;
+  } else {
+    return $res->namespace_uri;
+  }
+} # daf_dm_get_at_nsuri
+
+sub daf_dm_get_cm_name ($) {
+  my ($res) = @_;
+  my $v = $res->get_property_value (ExpandedURI q<mv:elementContentModelName>);
+  if (defined $v) {
+    return $v->can ('local_name') ? $v->local_name : $v->string_value;
+  } else {
+    return $res->local_name;
+  }
+} # daf_dm_get_cm_name
+
+sub daf_dm_get_ag_name ($) {
+  my ($res) = @_;
+  my $v = $res->get_property_value (ExpandedURI q<mv:attributeTypeGroupName>);
+  if (defined $v) {
+    return $v->can ('local_name') ? $v->local_name : $v->string_value;
+  } else {
+    return $res->local_name;
+  }
+} # daf_dm_get_ag_name
+
+sub daf_dm_get_xml_attr_type ($) {
+  my ($res) = @_;
+  if ($res->is_subset_of_uri (ExpandedURI q<iat:ID>)) {
+    return 'ID';
+  } elsif ($res->is_subset_of_uri (ExpandedURI q<iat:IDREF>)) {
+    return 'IDREF';
+  } elsif ($res->is_subset_of_uri (ExpandedURI q<iat:IDREFS>)) {
+    return 'IDREFS';
+  } elsif ($res->is_subset_of_uri (ExpandedURI q<iat:ENTITY>)) {
+    return 'ENTITY';
+  } elsif ($res->is_subset_of_uri (ExpandedURI q<iat:ENTITIES>)) {
+    return 'ENTITIES';
+  } elsif ($res->is_subset_of_uri (ExpandedURI q<iat:NMTOKEN>)) {
+    return 'NMTOKEN';
+  } elsif ($res->is_subset_of_uri (ExpandedURI q<iat:NMTOKENS>)) {
+    return 'NMTOKENS';
+  } elsif ($res->is_subset_of_uri (ExpandedURI q<iat:NOTATION>)) {
+    return 'NOTATION';
+  } elsif ($res->is_subset_of_uri (ExpandedURI q<iat:ENUMERATION>)) {
+    return undef;
+  } else {
+    return 'CDATA';
+  }
+} # daf_dm_get_xml_attr_type
+
+sub daf_dm_add_attrdefs ($$$) {
+  my ($mgcd, $xdp_al_decl, $xdp_doc) = @_;
+
+  for my $mgcde (@{$mgcd->get_child_resource_list_by_type
+                            (ExpandedURI q<mv:Attribute>)}) {
+    my $mgcde_local_name = daf_dm_get_at_local_name ($mgcde);
+    my $mgcde_nsuri = daf_dm_get_at_nsuri ($mgcde);
+    unless (defined $mgcde_nsuri) {
+      if (not $xdp_al_decl->has_child_nodes and
+          $xdp_al_decl->manakai_expanded_uri
+              eq ExpandedURI q<xdp:entity-value>) {
+        $xdp_al_decl->previous_sibling->text_content ("\n\t");
+      } else {
+        $xdp_al_decl->append_child ($xdp_doc->create_xdp_s ("\n\t"));
+      }
+      my $ad = $xdp_doc->create_xdp_attr_definition;
+      $xdp_al_decl->append_child ($ad);
+
+      $ad->append_child ($xdp_doc->create_xdp_name ($mgcde_local_name));
+      $ad->append_child ($xdp_doc->create_xdp_s ("\t"));
+
+      ## TODO:
+      $ad->append_child ($xdp_doc->create_xdp_keyword ('CDATA'));
+      $ad->append_child ($xdp_doc->create_xdp_s ("\t"));
+      $ad->append_child ($xdp_doc->create_xdp_rni_keyword ('IMPLIED'));
+    } else {
+      ## TODO:
+    }
+  }
+} # adaf_dm_add_attrdefs
+
+sub daf_dm_unsupported_type_error ($$) {
+  my ($res, $context) = @_;
+  my $v = 'Resource <'.$res->uri.'> is ignored since its type is not '.
+          'supported in '.$context."; Type:\n";
+  $v .= "\t<".$_.">\n" for @{$res->get_type_uri_list};
+} # daf_dm_unsupported_type_error
 
 1;
 

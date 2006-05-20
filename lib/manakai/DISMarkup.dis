@@ -13,7 +13,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/05/20 05:11:37 $
+      $Date: 2006/05/20 10:13:02 $
     @@ContentType:
       dis:Date.RCS
   
@@ -325,6 +325,13 @@ ResourceTypeDef:
   @subsetOf: mv|Item
   @subsetOf: DISCore|AnyType
 
+RPropDef:
+  @QName: mv|elementContentModelName
+  @enFN: element content model name
+  @subsetOf: mv|name
+  @dataType: DISCore|String
+  @multipleProperties: DISCore|Single
+
 ResourceTypeDef:
   @QName: mv|Attribute
   @enFN: attribute
@@ -354,6 +361,24 @@ RPropDef:
   @dataType: DISCore|QName
   @multipleProperties: DISCore|Single
 
+RPropDef:
+  @QName: mv|attributeValueType
+  @enFN: attribute value type
+  @dataType: DISCore|TFQNames
+  @multipleProperties: DISCore|Single
+
+ResourceTypeDef:
+  @QName: mv|AttributeTypeGroup
+  @enFN: attribute type group
+  @subsetOf: mv|Item
+
+RPropDef:
+  @QName: mv|attributeTypeGroupName
+  @enFN: attribute type group name
+  @subsetOf: mv|name
+  @dataType: DISCore|String
+  @multipleProperties: DISCore|Single
+
 ResourceTypeDef:
   @QName: AnyAttributeInNS
   @enDesc:
@@ -368,6 +393,11 @@ ResourceTypeDef:
     It is generally defines its semantics as well as syntax.
   @subsetOf: mv|Item
   @subsetOf: DISCore|AnyType
+
+ResourceTypeDef:
+  @QName: mv|AttributeValueType
+  @enFN: attribute value type
+  @subsetOf: mv|SimpleType
 
 ResourceTypeDef:
   @QName: mv|Notation
@@ -470,3 +500,14 @@ ForDef:
     @@lang:en
     @@@:
       For an element type
+
+ForDef:
+  @QName: mv|ForCM
+  @enFN: for content model
+  @ISA: s|ForML
+
+ForDef:
+  @QName: mv|ForAG
+  @enFN: for attribute type group
+  @ISA: s|ForML
+
