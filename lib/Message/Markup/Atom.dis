@@ -43,7 +43,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/05/20 10:13:02 $
+    $Date: 2006/05/21 08:55:21 $
 
   @Require:
     @@Module:
@@ -175,7 +175,7 @@ ElementTypeBinding:
       @@@@: DISLang|Attribute
       @@@ForCheck: ManakaiDOM|ForClass
     @@DISCore:resourceType:
-      @@@@: mv|Attribute
+      @@@@: mv|AttributeType
       @@@ForCheck: s|ForML
     @@ForCheck: !=ManakaiDOM|ManakaiDOM
 
@@ -308,7 +308,8 @@ ElementTypeBinding:
   @ShadowContent:
     @@DISCore:resourceType:
       @@@@: dis|MultipleResource
-      @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass !s|ForML
+      @@@ForCheck:
+        !ManakaiDOM|ForIF !ManakaiDOM|ForClass !s|ForML !mv|ForCM !mv|ForAG
     @@resourceFor: ManakaiDOM|ForIF
     @@resourceFor: ManakaiDOM|ForClass
     @@resourceFor: mv|ForCM
@@ -574,10 +575,10 @@ ModuleSetDef:
   @mv:vid: 10
   @enLN: Atom
   @mv:version: 1.0
-  @mv:contains: AtomFeed
-  @mv:contains: AtomEntry
-  @mv:contains: AtomProperties
   @mv:contains: AtomDatatypes
+  @mv:contains: AtomProperties
+  @mv:contains: AtomEntry
+  @mv:contains: AtomFeed
 
 ModuleDef:
   @QName: AtomFeed
@@ -612,6 +613,15 @@ ModuleDef:
   @QName: AtomDatatypes
   @mv:id: datatypes
   @enLN: Datatypes
+
+  @mv:contains: atomNCName
+  @mv:contains: atomMediaType
+  @mv:contains: atomLanguageTag
+  @mv:contains: atomUri
+  @mv:contains: atomEmailAddress
+
+  @mv:contains: atomCommonAttributes
+
   @mv:contains: TextAG
   @mv:contains: TextCM
   @mv:contains: PersonAG
@@ -1561,6 +1571,75 @@ IFClsDef:
       $test->assert_isa ($doc, <IFName::AtomEntryDocument>);
 ##AtomEntryDocument
 
+AGDef:
+  @QName: atomCommonAttributes
+  @enFN: common attributes
+  @mv:attributeTypeGroupName: common
+  
+  @ATDef:
+    @@mv:attributeTypeName: xml|base
+    @@mv:attributeValueType: atomUri
+
+  @ATDef: 
+    @@mv:attributeTypeName: xml|lang
+    @@mv:attributeValueType: atomLanguageTag
+
+  #undefinedAttribute*
+##atomCommonAttributes
+
+STDef:
+  @QName: atomNCName
+  @mv:datatypeEntityName: NCName
+  #subsetOf: xsd|string
+  #minLength, pattern
+
+STDef:
+  @QName: atomMediaType
+  @mv:datatypeEntityName: MediaType
+  #subsetOf xsd|string
+  # pattern
+
+STDef:
+  @QName: atomLanguageTag
+  @mv:datatypeEntityName: LangaugeTag
+  #subsetOf: xsd|string
+  #pattern
+
+STDef:
+  @QName: atomUri
+  @mv:datatypeEntityName: URI
+  #aliasfor text
+
+STDef:
+  @QName: atomEmailAddress
+  @mv:datatypeEntityName: EmailAddress
+  #subsetOf xsd|string
+  #pattern
+
+ElementTypeBinding:
+  @Name: AGDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: mv|AttributeTypeGroup
+    @@For: =ManakaiDOM|ManakaiDOMLatest
+
+ElementTypeBinding:
+  @Name: ATDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: mv|AttributeType
+    @@For: =ManakaiDOM|ManakaiDOMLatest
+
+ElementTypeBinding:
+  @Name: STDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: mv|XMLDTDDatatypeEntity
+    @@For: =ManakaiDOM|ManakaiDOMLatest
+
 IFClsDef:
   @IFQName: AtomElement
   @ClsQName: ManakaiAtomElement
@@ -1638,7 +1717,7 @@ IFClsConstructDef:
     interface.
 
     A Text construct contains human-readable text, usually in
-    small quantities.  The content of Text constructs is
+    small quantities.  The content of a Text construct is
     Language-Sensitive.
 
   @ATTR:
@@ -1807,7 +1886,7 @@ IFClsConstructDef:
     @@Name: nameElement
     @@enDesc:
       The <XE::atom|name> child element of the node.
-    @@Type: AtomElement
+    @@Type: AtomNameElement
     @@Get:
       @@@enDesc:
         It <kwd:MUST> <I::return a <XE::atom|name> child element>
@@ -3198,6 +3277,46 @@ IFClsETDef:
 ##AtomEntryElement
 
 IFClsETDef:
+  @IFQName: AtomIdElement
+  @ETQName: atom|id
+  @ETRQName: atom|id
+  @ClsQName: ManakaiAtomIdElement
+
+  @IFISA: AtomElement
+  @ClsISA: ManakaiAtomElement
+##AtomIdElement
+
+IFClsETDef:
+  @IFQName: AtomNameElement
+  @ETQName: atom|name
+  @ETRQName: atom|name
+  @ClsQName: ManakaiAtomNameElement
+
+  @IFISA: AtomElement
+  @ClsISA: ManakaiAtomElement
+##AtomNameElement
+
+IFClsETDef:
+  @IFQName: AtomUriElement
+  @ETQName: atom|uri
+  @ETRQName: atom|uri
+  @ClsQName: ManakaiAtomUriElement
+
+  @IFISA: AtomElement
+  @ClsISA: ManakaiAtomElement
+##AtomUriElement
+
+IFClsETDef:
+  @IFQName: AtomEmailElement
+  @ETQName: atom|email
+  @ETRQName: atom|email
+  @ClsQName: ManakaiAtomEmailElement
+
+  @IFISA: AtomElement
+  @ClsISA: ManakaiAtomElement
+##AtomEmailElement
+
+IFClsETDef:
   @IFQName: AtomContentElement
   @ETQName: atom|content
   @ETRQName: atom|content
@@ -3454,6 +3573,8 @@ IFClsETDef:
 
   @IFISA: AtomPersonConstruct
   @ClsISA: ManakaiAtomPersonConstruct
+  @mv:contains: PersonAG
+  @mv:elementContentModel: PersonCM
 
   @enDesc:
     The <XE::atom|author> element is a Person construct that
@@ -3582,6 +3703,8 @@ IFClsETDef:
 
   @IFISA: AtomPersonConstruct
   @ClsISA: ManakaiAtomPersonConstruct
+  @mv:contains: PersonAG
+  @mv:elementContentModel: PersonCM
 
   @enDesc:
     The <XE::atom|contributor> element is a Person construct that
@@ -3942,6 +4065,8 @@ IFClsETDef:
 
   @IFISA: AtomDateConstruct
   @ClsISA: ManakaiAtomDateConstruct
+  @mv:contains: DateAG
+  @mv:elementContentModel: DateCM
 
   @enDesc:
     The <XE::atom|published> element is a Date construct
@@ -3960,6 +4085,8 @@ IFClsETDef:
 
   @IFISA: AtomTextConstruct
   @ClsISA: ManakaiAtomTextConstruct
+  @mv:contains: TextAG
+  @mv:elementContentModel: TextCM
 
   @enDesc:
     The <XE::atom|rights> element is a Text construct
@@ -4185,6 +4312,8 @@ IFClsETDef:
 
   @IFISA: AtomTextConstruct
   @ClsISA: ManakaiAtomTextConstruct
+  @mv:contains: TextAG
+  @mv:elementContentModel: TextCM
 
   @enDesc:
     The <XE::atom|subtitle> element is a Text construct
@@ -4199,6 +4328,8 @@ IFClsETDef:
 
   @IFISA: AtomTextConstruct
   @ClsISA: ManakaiAtomTextConstruct
+  @mv:contains: TextAG
+  @mv:elementContentModel: TextCM
 
   @enDesc:
     The <XE::atom|summary> element is a Text construct
@@ -4213,6 +4344,8 @@ IFClsETDef:
 
   @IFISA: AtomTextConstruct
   @ClsISA: ManakaiAtomTextConstruct
+  @mv:contains: TextAG
+  @mv:elementContentModel: TextCM
 
   @enDesc:
     The <XE::atom|title> element is a Text construct
@@ -4227,6 +4360,8 @@ IFClsETDef:
 
   @IFISA: AtomDateConstruct
   @ClsISA: ManakaiAtomDateConstruct
+  @mv:contains: DateAG
+  @mv:elementContentModel: DateCM
 
   @enDesc:
     The <XE::atom|updated> element is a Date construct

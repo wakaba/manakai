@@ -13,7 +13,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/05/20 10:13:02 $
+    $Date: 2006/05/21 08:55:21 $
 
   @Require:
     @@Module:
@@ -4134,6 +4134,7 @@ IFClsETDef:
         C: while (defined $current) {
           if ($current-><AG::Node.nodeType> == <C::Node.ELEMENT_NODE>) {
             if ({
+                  <Q::xdp|attr-definition> => true,
                   <Q::xdp|peref> => true,
                 }->{$current->manakai_expanded_uri}) {
               $r .= $current-><AG::XDPElement.dtdText>;

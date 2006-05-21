@@ -19,7 +19,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/05/20 10:13:02 $
+      $Date: 2006/05/21 08:55:21 $
     @@ContentType:
       dis:Date.RCS
   
@@ -865,46 +865,55 @@ AttrTypeDef:
   @QName:
     infoset:AttributeType.ID
   @InfosetName: ID
+  @dxm:keyword: ID
 
 AttrTypeDef:
   @QName:
     infoset:AttributeType.IDREF
   @InfosetName: IDREF
+  @dxm:keyword: IDREF
 
 AttrTypeDef:
   @QName:
     infoset:AttributeType.IDREFS
   @InfosetName: IDREFS
+  @dxm:keyword: IDREFS
 
 AttrTypeDef:
   @QName:
     infoset:AttributeType.ENTITY
   @InfosetName: ENTITY
+  @dxm:keyword: ENTITY
 
 AttrTypeDef:
   @QName:
     infoset:AttributeType.ENTITIES
   @InfosetName: ENTITIES
+  @dxm:keyword: ENTITIES
 
 AttrTypeDef:
   @QName:
     infoset:AttributeType.NMTOKEN
   @InfosetName: NMTOKEN
+  @dxm:keyword: NMTOKEN
 
 AttrTypeDef:
   @QName:
     infoset:AttributeType.NMTOKENS
   @InfosetName: NMTOKENS
+  @dxm:keyword: NMTOKENS
 
 AttrTypeDef:
   @QName:
     infoset:AttributeType.NOTATION
   @InfosetName: NOTATION
+  @dxm:keyword: NOTATION
 
 AttrTypeDef:
   @QName:
     infoset:AttributeType.CDATA
   @InfosetName: CDATA
+  @dxm:keyword: CDATA
 
 AttrTypeDef:
   @QName:
@@ -916,6 +925,7 @@ ResourceDef:
   @enFN:
     <XML::PCDATA>
   @DISCore:resourceType: DISCore|AnyType
+  @dxm:keyword: PCDATA
 
 InfoPropDef:
   @QName:
@@ -1602,6 +1612,13 @@ InfoPropDef:
 ## TODO: PSVI
 
 ## --- XML Concepts
+
+RPropDef:
+  @QName: dxm|keyword
+  @enFN: XML keyword
+  @subsetOf: mv|name
+  @dataType: DISCore|String
+  @multipleProperties: DISCore|String
 
 ResourceTypeDef:
   @QName: dxm|DocumentType

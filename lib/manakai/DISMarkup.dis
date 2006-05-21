@@ -13,7 +13,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/05/20 10:13:02 $
+      $Date: 2006/05/21 08:55:21 $
     @@ContentType:
       dis:Date.RCS
   
@@ -29,6 +29,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dis/
   @dis:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
+  @dxm:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/XML#
   @lang:
      http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
   @license:
@@ -326,6 +328,14 @@ ResourceTypeDef:
   @subsetOf: DISCore|AnyType
 
 RPropDef:
+  @QName: mv|elementContentModel
+  @enFN: element content model
+  @enDesc:
+    The <Q::mv|elementContentModel> applied to an <Q::mv|ElementType>.
+  @dataType: DISCore|TFQNames
+  @multipleProperties: DISCore|Single
+
+RPropDef:
   @QName: mv|elementContentModelName
   @enFN: element content model name
   @subsetOf: mv|name
@@ -393,6 +403,13 @@ ResourceTypeDef:
     It is generally defines its semantics as well as syntax.
   @subsetOf: mv|Item
   @subsetOf: DISCore|AnyType
+
+RPropDef:
+  @QName: mv|simpleTypeName
+  @enFN: simple type name
+  @subsetOf: mv|name
+  @dataType: DISCore|String
+  @multipleProperties: DISCore|Single
 
 ResourceTypeDef:
   @QName: mv|AttributeValueType
@@ -482,6 +499,28 @@ ResourceTypeDef:
   @enDesc:
     An <Q::mv|XMLDTDModule> is an XML DTD module.
   @subsetOf: mv|DocumentTypeModule
+
+ResourceTypeDef:
+  @QName: mv|XMLDTDDatatypeEntity
+  @enFN: XML DTD datatype parameter entity
+  @subsetOf: mv|SimpleType
+  @subsetOf: dxm|ParameterEntity
+  @subsetOf: dxm|InternalEntity
+
+RPropDef:
+  @QName: mv|datatypeEntityName
+  @enFN: datatype entity name
+  @enDesc:
+    The name of the <Q::mv|DatatypeEntity>, without <XML::.datatype>
+    suffix and possible prefix.
+  @dataType: DISCore|String
+  @multipleProperties: DISCore|Single
+
+RPropDef:
+  @QName: mv|datatypeXMLAttributeType
+  @enFN: XML attribute type
+  @dataType: DISCore|QName
+  @multipleProperties: DISCore|Single
 
 ## -- "For markup" definitions
 
