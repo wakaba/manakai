@@ -43,7 +43,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/05/21 08:55:21 $
+    $Date: 2006/05/28 06:34:59 $
 
   @Require:
     @@Module:
@@ -584,12 +584,14 @@ ModuleDef:
   @QName: AtomFeed
   @mv:id: feed
   @enLN: Feed
+  @mv:contains: feed-prop
   @mv:contains: atom|feed
 
 ModuleDef:
   @QName: AtomEntry
   @mv:id: entry
   @enLN: Entry
+  @mv:contains: entry-prop
   @mv:contains: atom|entry
 
 ModuleDef:
@@ -597,17 +599,22 @@ ModuleDef:
   @mv:id: props
   @enLN: Properties
   @mv:contains: atom|content
+  @mv:contains: atom|contributor
   @mv:contains: atom|category
   @mv:contains: atom|generator
-  @mv:contains: atom|source
   @mv:contains: atom|link
   @mv:contains: atom|author
   @mv:contains: atom|published
   @mv:contains: atom|updated
+  @mv:contains: atom|icon
   @mv:contains: atom|id
+  @mv:contains: atom|logo
+  @mv:contains: atom|rights
+  @mv:contains: atom|subtitle
+  @mv:contains: atom|summary
   @mv:contains: atom|title
-  @mv:contains: atom|email
-  @mv:contains: atom|uri
+  @mv:contains: source-prop
+  @mv:contains: atom|source
 
 ModuleDef:
   @QName: AtomDatatypes
@@ -620,12 +627,23 @@ ModuleDef:
   @mv:contains: atomUri
   @mv:contains: atomEmailAddress
 
+  @mv:contains: undefinedAttributes
   @mv:contains: atomCommonAttributes
+
+  @mv:contains: simpleExtensionElements
+  @mv:contains: structuredExtensionElements
+  @mv:contains: extensionElements
 
   @mv:contains: TextAG
   @mv:contains: TextCM
+
+  @mv:contains: atom|name
+  @mv:contains: atom|email
+  @mv:contains: atom|uri
   @mv:contains: PersonAG
+  @mv:contains: person-prop
   @mv:contains: PersonCM
+
   @mv:contains: DateAG
   @mv:contains: DateCM
  
@@ -1584,7 +1602,7 @@ AGDef:
     @@mv:attributeTypeName: xml|lang
     @@mv:attributeValueType: atomLanguageTag
 
-  #undefinedAttribute*
+  @mv:refers: undefinedAttributes
 ##atomCommonAttributes
 
 STDef:
@@ -1630,6 +1648,22 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: mv|AttributeType
+    @@For: =ManakaiDOM|ManakaiDOMLatest
+
+ElementTypeBinding:
+  @Name: ECDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: mv|ElementTypeClass
+    @@For: =ManakaiDOM|ManakaiDOMLatest
+
+ElementTypeBinding:
+  @Name: EMDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: mv|ElementTypeClassMix
     @@For: =ManakaiDOM|ManakaiDOMLatest
 
 ElementTypeBinding:
@@ -1971,6 +2005,14 @@ IFClsConstructDef:
         }__;
 ##AtomPersonConstruct
 
+ECDef:
+  @QName: person-prop
+  @mv:elementTypeClassName: person-prop
+  @mv:refers: atom|name
+  @mv:refers: atom|uri
+  @mv:refers: atom|email
+  @mv:refers: extensionElements
+
 IFClsConstructDef:
   @IFQName: AtomDateConstruct
   @ClsQName: ManakaiAtomDateConstruct
@@ -2051,6 +2093,23 @@ IFClsConstructDef:
          Access to components, especially timezone and -00:00.
       }
 ##AtomDateConstruct
+
+ECDef:
+  @QName: feed-prop
+  @mv:elementTypeClassName: feed-prop
+  @mv:refers: atom|author
+  @mv:refers: atom|category
+  @mv:refers: atom|contributor
+  @mv:refers: atom|generator
+  @mv:refers: atom|icon
+  @mv:refers: atom|id
+  @mv:refers: atom|link
+  @mv:refers: atom|logo
+  @mv:refers: atom|rights
+  @mv:refers: atom|subtitle
+  @mv:refers: atom|title
+  @mv:refers: atom|updated
+  @mv:refers: extensionElements
 
 IFClsETDef:
   @IFQName: AtomFeedElement
@@ -2748,6 +2807,23 @@ IFClsETDef:
                                     (<Q::xml|>, 'lang'));
 ##AtomFeedElement
 
+ECDef:
+  @QName: entry-prop
+  @mv:elementTypeClassName: entry-prop
+  @mv:refers: atom|author
+  @mv:refers: atom|category
+  @mv:refers: atom|content
+  @mv:refers: atom|contributor
+  @mv:refers: atom|id
+  @mv:refers: atom|link
+  @mv:refers: atom|published
+  @mv:refers: atom|rights
+  @mv:refers: atom|source
+  @mv:refers: atom|summary
+  @mv:refers: atom|title
+  @mv:refers: atom|updated
+  @mv:refers: extensionElements
+
 IFClsETDef:
   @IFQName: AtomEntryElement
   @ETQName: atom|entry
@@ -3287,6 +3363,16 @@ IFClsETDef:
 ##AtomIdElement
 
 IFClsETDef:
+  @IFQName: AtomIconElement
+  @ETQName: atom|icon
+  @ETRQName: atom|icon
+  @ClsQName: ManakaiAtomIconElement
+
+  @IFISA: AtomElement
+  @ClsISA: ManakaiAtomElement
+##AtomIconElement
+
+IFClsETDef:
   @IFQName: AtomNameElement
   @ETQName: atom|name
   @ETRQName: atom|name
@@ -3315,6 +3401,16 @@ IFClsETDef:
   @IFISA: AtomElement
   @ClsISA: ManakaiAtomElement
 ##AtomEmailElement
+
+IFClsETDef:
+  @IFQName: AtomLogoElement
+  @ETQName: atom|logo
+  @ETRQName: atom|logo
+  @ClsQName: ManakaiAtomLogoElement
+
+  @IFISA: AtomElement
+  @ClsISA: ManakaiAtomElement
+##AtomLogoElement
 
 IFClsETDef:
   @IFQName: AtomContentElement
@@ -3573,7 +3669,7 @@ IFClsETDef:
 
   @IFISA: AtomPersonConstruct
   @ClsISA: ManakaiAtomPersonConstruct
-  @mv:contains: PersonAG
+  @mv:refers: PersonAG
   @mv:elementContentModel: PersonCM
 
   @enDesc:
@@ -3703,7 +3799,7 @@ IFClsETDef:
 
   @IFISA: AtomPersonConstruct
   @ClsISA: ManakaiAtomPersonConstruct
-  @mv:contains: PersonAG
+  @mv:refers: PersonAG
   @mv:elementContentModel: PersonCM
 
   @enDesc:
@@ -4065,7 +4161,7 @@ IFClsETDef:
 
   @IFISA: AtomDateConstruct
   @ClsISA: ManakaiAtomDateConstruct
-  @mv:contains: DateAG
+  @mv:refers: DateAG
   @mv:elementContentModel: DateCM
 
   @enDesc:
@@ -4085,7 +4181,7 @@ IFClsETDef:
 
   @IFISA: AtomTextConstruct
   @ClsISA: ManakaiAtomTextConstruct
-  @mv:contains: TextAG
+  @mv:refers: TextAG
   @mv:elementContentModel: TextCM
 
   @enDesc:
@@ -4093,6 +4189,23 @@ IFClsETDef:
     that conveys information about rights held in and
     over an entry or feed.
 ##AtomRightsElement
+
+ECDef:
+  @QName: source-prop
+  @mv:elementTypeClassName: source-prop
+  @mv:refers: atom|author
+  @mv:refers: atom|category
+  @mv:refers: atom|contributor
+  @mv:refers: atom|generator
+  @mv:refers: atom|icon
+  @mv:refers: atom|id
+  @mv:refers: atom|link
+  @mv:refers: atom|logo
+  @mv:refers: atom|rights
+  @mv:refers: atom|subtitle
+  @mv:refers: atom|title
+  @mv:refers: atom|updated
+  @mv:refers: extensionElements
 
 IFClsETDef:
   @IFQName: AtomSourceElement
@@ -4312,7 +4425,7 @@ IFClsETDef:
 
   @IFISA: AtomTextConstruct
   @ClsISA: ManakaiAtomTextConstruct
-  @mv:contains: TextAG
+  @mv:refers: TextAG
   @mv:elementContentModel: TextCM
 
   @enDesc:
@@ -4328,7 +4441,7 @@ IFClsETDef:
 
   @IFISA: AtomTextConstruct
   @ClsISA: ManakaiAtomTextConstruct
-  @mv:contains: TextAG
+  @mv:refers: TextAG
   @mv:elementContentModel: TextCM
 
   @enDesc:
@@ -4344,7 +4457,7 @@ IFClsETDef:
 
   @IFISA: AtomTextConstruct
   @ClsISA: ManakaiAtomTextConstruct
-  @mv:contains: TextAG
+  @mv:refers: TextAG
   @mv:elementContentModel: TextCM
 
   @enDesc:
@@ -4360,7 +4473,7 @@ IFClsETDef:
 
   @IFISA: AtomDateConstruct
   @ClsISA: ManakaiAtomDateConstruct
-  @mv:contains: DateAG
+  @mv:refers: DateAG
   @mv:elementContentModel: DateCM
 
   @enDesc:
@@ -4452,3 +4565,25 @@ ElementTypeBinding:
     @@For: ManakaiDOM|DOM3
     @@For: =ManakaiDOM|all
     @@Type: idl|boolean||ManakaiDOM|all
+
+ECDef:
+  @QName: simpleExtensionElements
+  @mv:elementTypeClassName: simple.extra
+  @DISCore:resourceType: mv|ElementTypeAdditionalClass
+
+ECDef:
+  @QName: structuredExtensionElements
+  @mv:elementTypeClassName: structured.extra
+  @DISCore:resourceType: mv|ElementTypeAdditionalClass
+
+EMDef:
+  @QName: extensionElements
+  @mv:elementTypeClassName: extra
+  @mv:refers: simpleExtensionElements
+  @mv:refers: structuredExtensionElements
+  @DISCore:resourceType: mv|ElementTypeAdditionalClass
+
+AGDef:
+  @QName: undefinedAttributes
+  @mv:attributeTypeGroupName: common.extra
+

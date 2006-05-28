@@ -13,7 +13,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/05/21 08:55:21 $
+      $Date: 2006/05/28 06:35:00 $
     @@ContentType:
       dis:Date.RCS
   
@@ -166,6 +166,12 @@ RPropDef:
   @dataType: DISCore|TFQNames
   @multipleProperties: DISCore|OrderedList
 
+RPropDef:
+  @QName: mv|refers
+  @enFN: contains reference to
+  @dataType: DISCore|TFQNames
+  @multipleProperties: DISCore|OrderedList
+
 ResourceTypeDef:
   @QName: mv|Document
   @enFN: document
@@ -239,20 +245,6 @@ ResourceTypeDef:
   @subsetOf: mv|ElementTypeOrNSElementTypes
 
 RPropDef:
-  @QName: mv|contentModel
-  @enFN: content model
-
-ResourceTypeDef:
-  @QName: mv|ElementTypeClass
-  @enFN: element type class
-  @subsetOf: mv|ElementType
-
-ResourceTypeDef:
-  @QName: mv|ElementTypeMix
-  @enFN: element type mixed class
-  @subsetOf: mv|ElementType
-
-RPropDef:
   @QName: mv|elementTypeName
   @enFN: element type name
   @enDesc:
@@ -317,6 +309,28 @@ ResourceTypeDef:
 ResourceTypeDef:
   @QName: AnyElementInNS
   @AliasFor: mv|NSElementTypes
+
+ResourceTypeDef:
+  @QName: mv|ElementTypeClass
+  @enFN: element type class
+  @subsetOf: mv|ElementTypes
+
+ResourceTypeDef:
+  @QName: mv|ElementTypeClassMix
+  @enFN: element type mixed class
+  @subsetOf: mv|ElementTypeClass
+
+ResourceTypeDef:
+  @QName: mv|ElementTypeAdditionalClass
+  @enFN: element type additional class
+  @subsetOf: mv|ElementTypeClass
+
+RPropDef:
+  @QName: mv|elementTypeClassName
+  @enFN: element type class name
+  @subsetOf: mv|name
+  @dataType: DISCore|String
+  @multipleProperties: DISCore|Single
 
 ResourceTypeDef:
   @QName: mv|ElementContentModel
