@@ -13,7 +13,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/05/28 06:35:00 $
+      $Date: 2006/05/28 10:33:24 $
     @@ContentType:
       dis:Date.RCS
   
@@ -356,6 +356,24 @@ RPropDef:
   @dataType: DISCore|String
   @multipleProperties: DISCore|Single
 
+LexTypeDef:
+  @QName: lang|dcmodel
+  @enDesc:
+    The <Q::lang|dcmodel> format can be used to describes an
+    <Q::mv|ElementContentModel>.
+
+    <Q::lang|dcmodel> := s <Q::DISCore|TFQNames> s / group
+
+    group := s "(" *(s connector / s <Q::DISCore|TFQNames> s occurence) s ")"
+             s occurence s
+
+    occurence := ["+" / "*" / "?"]
+
+    connector := "|" / ","
+
+    s := *<lt>Perl \s<gt>
+  @subsetOf: DISCore|NSString
+
 ResourceTypeDef:
   @QName: mv|Attribute
   @enFN: attribute
@@ -564,3 +582,9 @@ ForDef:
   @enFN: for attribute type group
   @ISA: s|ForML
 
+ElementTypeBinding:
+  @Name: LexTypeDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISCore|LexicalType

@@ -22,10 +22,7 @@ Module:
       @@@Year:2004
       @@@DISCore:author: DISCore|Wakaba
   @Date:
-    @@@:
-      $Date: 2006/04/04 14:30:29 $
-    @@ContentType:
-      dis:Date.RCS
+    $Date: 2006/05/28 10:33:24 $
   
   @Require:
     @@Module:
@@ -39,7 +36,7 @@ Module:
       @@@WithFor: DIS|ForEmpty
     @@Module:
       @@@QName: MDOM|DOMFeature
-      @@@WithFor: ManakaiDOM|all
+      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
     @@Module:
       @@@QName: DIS|Perl
       @@@WithFor: DIS|ForLatest
@@ -47,8 +44,11 @@ Module:
       @@@QName: DIS|Value
       @@@WithFor: DIS|ForLatest
     @@Module:
+      @@@QName: MDOM|DOMCore
+      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
+    @@Module:
       @@@QName: MDOM|TreeStore
-      @@@WithFor: DIS|ForLatest
+      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
   @DefaultFor: DIS|ForLatest
 
 Namespace:
@@ -4989,6 +4989,23 @@ IFClsDef:
                       $name => $prop_uri,
                     }__;
                     $new_value_type = <Q::DISCore:URI>;
+                  } elsif ($el-><M::DISElement.mediaTypeMatch>
+                                   (<Q::DISCore:NSString>,
+                                    $mtopt{default_media_type}, %mtopt)) {
+                    $el-><M::DISElement.preserveNodePath>;
+                    __CODE{dv|createValueRef::
+                      $value_ref => {$el-><AG::SWCFGNode.valueRef>},
+                      $base_type => {$base_type = <Q::DISCore:NSString>},
+                      $type => $new_value_type,
+                      $result => $new_value,
+                      $name => $prop_uri,
+                    }__;
+                    $new_value-><AS::dv|DVNSValue.defaultNamespaceURIRef>
+                      ($el-><M::DISElement.getDefaultNamespaceURIRef>);
+                    $new_value-><AS::dv|DVNSValue.namespaceBindingList>
+                      ($el-><M::DISElement.getNamespaceBindingList> ($db));
+                    $new_value-><AS::dv|DVValue.sourceNodePath>
+                      ($el-><M::SWCFGNode.flag> ('nodePath'));
                   } elsif ($el-><M::DISElement.mediaTypeMatch>
                                      (<Q::lang:dis>, $mtopt{default_media_type},
                                       %mtopt)) {
