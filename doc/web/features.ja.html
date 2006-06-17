@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<title>manakai 0.3.3 が実装している機能</title>
+<link rel="stylesheet" href="http://suika.fam.cx/www/style/html/xhtml">
+<link rel="copyright" href="http://suika.fam.cx/c/pd" title="Public Domain">
+<link rel="contents" href="./">
+</head>
+<body>
+<h1>manakai 0.3.3 の機能</h1>
+
+<div class="note memo">
+<p>
+この文書は<em>準備中</em>です。
+<a href="http://suika.fam.cx/gate/2005/sw/manakai"
+>SuikaWiki:manakai</a> もあわせてご覧下さい。
+</p>
+</div>
+
+<p>manakai 0.3.3 は、次の表に示す DOM モジュールを実装しています。</p>
+
+<table>
+<thead>
+<tr>
+<th scope="col">モジュール</th>
+<th scope="col">版</th>
+<th scope="col">補足説明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th scope="row">機能</th>
+<td>水準 3 (manakai 独自)</td>
+<td>
+  <p>次のすべてを実装:</p>
+  <ul>
+  <li><code class="DOMi" lang="en">ImplementationRegistry</code></li>
+  <li><code class="DOMi" lang="en">ImplementationSource</code></li>
+  <li><code class="DOMi" lang="en">ImplementationList</code></li>
+  <li><code class="DOMi" lang="en">MinimumImplementation</code></li>
+  <li><code class="DOMi" lang="en">GetFeature</code></li>
+  </ul>
+</td>
+</tr>
+<tr>
+<th scope="row">共通 <abbr lang="en" title="Load and Save">LS</abbr></th>
+<td>水準 3 (manakai 独自)</td>
+<td>
+  <p>次のすべてを実装:</p>
+  <ul>
+  <li><code class="DOMi" lang="en">GLSImplementation</code></li>
+  </ul>
+</td>
+</tr>
+<tr>
+<th scope="row">中核</th>
+<td>水準 1, 2, 3</td>
+<td>
+  <p>次を<em>除き</em>実装済:</p>
+  <ul>
+  <li><code class="DOMa">whole_text</code>,
+  <code class="DOMm">replace_whole_text</code>,
+  <code class="DOMm">normalize_document</code>,
+  <code class="DOMm">rename_node</code>,
+  <code class="DOMm">import_node</code> は未実装</li>
+  <li><code class="DOMm">normalize</code> で設定引数
+  <code class="DOM">normalize-character</code> は未実装</li>
+  <li>一部の操作は <code class="DOMa">specified</code>
+  を自動的に真にしない</li>
+  </ul>
+</td>
+</tr>
+<tr>
+<th scope="row" lang="en">XML</th>
+<td>水準 1, 2, 3</td>
+<td>
+  <p>次を<em>除き</em>実装済:</p>
+  <ul>
+  <li><code class="DOMa">internal_subset</code> は未実装</li>
+  </ul>
+</td>
+</tr>
+<tr>
+<th scope="row">XDoctype 定義</th>
+<td>水準 3 案 (manakai 独自)</td>
+<td>
+  <p>次のすべてを実装:</p>
+  <ul>
+  <li><code class="DOMi" lang="en">DocumentTypeDefinition</code></li>
+  <li><code class="DOMi" lang="en">ElementTypeDefinition</code></li>
+  <li><code class="DOMi" lang="en">AttributeDefinition</code></li>
+  </ul>
+</td>
+</tr>
+<tr>
+<th scope="row">XDoctype 宣言</th>
+<td>水準 3 案 (manakai 独自)</td>
+<td>
+  <p>次に挙げるもの<em>のみ</em>実装:</p>
+  <ul>
+  <li><code class="DOMi" lang="en">DocumentTypeDeclaration</code></li>
+  </ul>
+</td>
+</tr>
+<tr>
+<th scope="row"><abbr lang="en"
+    title="XML DTD Physical Structure Object Model">XDP</abbr></th>
+<td>第 1.0 版案 (manakai 独自)</td>
+<td></td>
+</tr>
+<tr>
+<th scope="row"><abbr lang="en" title="Load and Save">LS</abbr></th>
+<td>水準 3</td>
+<td>
+  <p>次に挙げるもの<em>のみ</em>実装:</p>
+  <ul>
+  <li><code class="DOMi" lang="en">LSInput</code></li>
+  <li><code class="DOMi" lang="en">LSOutput</code></li>
+  <li><code class="DOMi" lang="en">LSParser</code>
+  (同期読込みのみ、ほとんどの設定引数は未実装)</li>
+  </ul>
+</td>
+</tr>
+<tr>
+<th scope="row">単純 <abbr lang="en" title="Load and Save">LS</abbr></th>
+<td>第 1.0 版案 (manakai 独自)</td>
+<td>
+  <p>次のすべてを実装:</p>
+  <ul>
+  <li><code class="DOMi" lang="en">SimpleXMLSerializer</code></li>
+  </ul>
+</td>
+</tr>
+<tr>
+<th scope="row">URI 共通</th>
+<td>第 4.0 版 (manakai 独自)</td>
+<td>
+  <p>次のすべてを実装:</p>
+  <ul>
+  <li><code class="DOMi" lang="en">URIImplementation</code></li>
+  <li><code class="DOMi" lang="en">URIReference</code></li>
+  </ul>
+</td>
+</tr>
+<tr>
+<th scope="row" rowspan="2">探索</th>
+<td><a href="http://www.w3.org/TR/2000/REC-DOM-Level-2-Traversal-Range-20001113/"
+    title="DOM 水準 2 探索および範囲">水準 2</a></td>
+<td><a href="http://www.w3.org/TR/2000/REC-DOM-Level-2-Traversal-Range-20001113/traversal.html#Traversal-NodeIterator"
+    ><code class="DOMi" lang="en">NodeIterator</code></a> 
+    は<em>未</em>実装。</td>
+</tr>
+<tr>
+<td>(manakai 独自)</td>
+<td><a href="http://suika.fam.cx/gate/2005/sw/SerialWalker"
+    ><code class="DOMi" lang="en">SerialWalker</code></a>。</td>
+</tr>
+<tr>
+<th scope="row" lang="en">Atom</th>
+<td><a href="http://suika.fam.cx/gate/2005/sw/Atom%20DOM"
+    title="SuikaWiki : Atom DOM">第 1.0 版案</a> (manakai 独自)</td>
+<td></td>
+</tr>
+<tr>
+<th scope="row">SuikaWiki/0.9 構文解析</th>
+<td>第 1.0 版案 (manakai 独自)</td>
+<td></td>
+</tr>
+<tr>
+<th scope="row"><a href="http://suika.fam.cx/gate/2005/sw/H2H"
+    title="SuikaWiki : H2H">H2H</a> 構文解析</th>
+<td>第 1.0 版案 (manakai 独自)</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+</body>
+</html>
