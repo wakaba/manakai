@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<title>manakai 0.3.* の変更点</title>
+<link rel="stylesheet" href="http://suika.fam.cx/www/style/html/xhtml">
+<link rel="copyright" href="http://suika.fam.cx/c/pd" title="Public Domain">
+<link rel="contents" href="./">
+<!-- <http://suika.fam.cx/gate/2005/sw/manakai/%E3%83%A1%E3%83%A2/2006-05-12> -->
+</head>
+<body>
+<h1>manakai 0.3.<var>*</var> の変更点</h1>
+
+<div class="section" id="manakai-0-3-2">
+<h2>manakai 0.3.2 の変更点</h2>
+
+<ul>
+  <li id="manakai-0-3-2-treewalker">
+    <span class="caption"><a href="http://www.w3.org/TR/2000/REC-DOM-Level-2-Traversal-Range-20001113/traversal.html#Traversal-TreeWalker"><code class="DOMi" lang="en">TreeWalker</code></a></span>:
+    <a href="http://www.w3.org/TR/2000/REC-DOM-Level-2-Traversal-Range-20001113/traversal.html"
+        ><abbr lang="en" title="Document Object Model">DOM</abbr>
+        水準 2 探索モジュール</a>より、
+        <a href="http://www.w3.org/TR/2000/REC-DOM-Level-2-Traversal-Range-20001113/traversal.html#Traversal-TreeWalker"><code class="DOMi" lang="en">TreeWalker</code></a>,
+        <a href="http://www.w3.org/TR/2000/REC-DOM-Level-2-Traversal-Range-20001113/traversal.html#Traversal-NodeFilter"><code class="DOMi" lang="en">NodeFilter</code></a>,
+        <a href="http://www.w3.org/TR/2000/REC-DOM-Level-2-Traversal-Range-20001113/traversal.html#Traversal-DocumentTraversal"><code class="DOMi" lang="en">DocumentTraversal</code></a>
+        に対応しました。
+        <a href="http://www.w3.org/TR/2000/REC-DOM-Level-2-Traversal-Range-20001113/traversal.html#Traversal-TreeWalker"><code class="DOMi" lang="en">TreeWalker</code></a>
+        を使うと、木構造を上下前後自由に歩き回ることができます。
+        <a href="http://www.w3.org/TR/2000/REC-DOM-Level-2-Traversal-Range-20001113/traversal.html#Traversal-NodeFilter"><code class="DOMi" lang="en">NodeFilter</code></a>
+        によって<q>論理的</q>に見える節点を制限することができます。
+  </li>
+  <li id="manakai-0-3-2-serialwalker">
+    <span class="caption"><a href="http://suika.fam.cx/gate/2005/sw/SerialWalker"><code class="DOMi" lang="en">SerialWalker</code></a></span>: 
+    探索モジュールの独自拡張として、 
+    <a href="http://suika.fam.cx/gate/2005/sw/SerialWalker"><code class="DOMi" lang="en">SerialWalker</code></a>
+    を実装しました。 <a href="http://suika.fam.cx/gate/2005/sw/SerialWalker"><code class="DOMi" lang="en">SerialWalker</code></a>
+    は木構造中の節点を文書順に訪問します。その際、子節点を訪問し、
+    文書順で次の節点に移動する前に、親節点を再訪問します。
+  </li>
+  <li id="manakai-0-3-2-atom-dom">
+    <span class="caption"><a href="http://suika.fam.cx/gate/2005/sw/Atom%20DOM"
+        lang="en">Atom <abbr title="Document Object Model">DOM</abbr></a></span>:
+    <a href="urn:ietf:rfc:4287" lang="en">Atom 1.0</a>
+    文書を作成・処理するための便利な <abbr lang="en"
+        title="Application Programming Interface">API</abbr>
+    を実装しました。
+  </li>
+  <li id="manakai-0-3-2-sw09">
+    <span class="caption">SuikaWiki/0.9 構文解析</span>:
+    <a href="http://suika.fam.cx/gate/2005/sw/">SuikaWiki</a>
+    で使われているマーク付け言語族、 SuikaWiki/0.9, SuikaWikiImage/0.9,
+    SuikaWiki/0.10 のテキスト形式文書から 
+    <abbr lang="en" title="Extensible Markup Language">XML</abbr>
+    <abbr lang="en" title="Document Object Model">DOM</abbr> 木
+    を作る構文解析器を実装しました。
+  </li>
+  <li id="manakai-0-3-2-h2h">
+    <span class="caption"><a href="http://suika.fam.cx/gate/2005/sw/H2H">H2H</a>
+    構文解析</span>:
+    <a href="http://suika.fam.cx/~wakaba/d/">冬様もすなる日記というもの</a>などで使われているマーク付け言語族、
+    H2H/0.9 および H2H/1.0 の文書から
+    <abbr lang="en" title="Extensible Markup Language">XML</abbr>
+    <abbr lang="en" title="Document Object Model">DOM</abbr> 木
+    を作る構文解析器を実装しました。
+  </li>
+  <li id="manakai-0-3-2-xdp">
+    <span class="caption"><abbr lang="en">XDP</abbr> ―― 
+    <abbr lang="en" title="Extensible Markup Language">XML</abbr> 
+    <abbr lang="en" title="Document Type Definition">DTD</abbr> 
+    の物理構造 Object Model</span>:
+    <abbr lang="en" title="Extensible Markup Language">XML</abbr>
+    <abbr lang="en" title="Document Type Definition">DTD</abbr>
+    のマーク宣言や引数実体などの物理的構造を
+    <abbr lang="en" title="Extensible Markup Language">XML</abbr>
+    <abbr lang="en" title="Document Object Model">DOM</abbr>
+    で構築し、そこから
+    <abbr lang="en" title="Extensible Markup Language">XML</abbr>
+    <abbr lang="en" title="Document Type Definition">DTD</abbr>
+    を生成することができる <abbr lang="en">XDP</abbr>
+    モジュールを実装しました。
+  </li>
+  <li id="manakai-0-3-2-dtdm">
+    <span class="caption"><abbr lang="en" title="Document Type Definition"
+        >DTD</abbr> モジュール生成</span>:
+    <code class="file" lang="en">daf.pl</code> の
+    <code lang="en">--create-dtd-modules</code> オプションにより、
+    <abbr lang="en">dis</abbr> データベースから
+    <a href="http://www.w3.org/TR/xhtml-modularization"
+        ><abbr lang="en" title="Modularization of XHTML"><abbr
+            title="Extensible HyperText Markup Language">XHTML</abbr>
+    m12n</abbr></a>
+    と共存可能な <abbr lang="en" title="Document Type Definition">DTD</abbr>
+    モジュールを生成できるようになりました。ただし、
+    現時点では要素型宣言 (内容モデル群指定を除きます。), データ型実体宣言, 
+    要素型クラス実体宣言, 属性定義並び宣言, 
+    属性集合実体宣言にしか対応していません。また、
+    <abbr lang="en" title="Document Type Definition">DTD</abbr>
+    駆動器は生成できません。
+  </li>
+</ul>
+</div>
+
+
+</body>
+</html>
