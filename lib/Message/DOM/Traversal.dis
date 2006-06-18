@@ -16,7 +16,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/05/14 06:51:48 $
+    $Date: 2006/06/18 04:12:48 $
 
   @Require:
     @@Module:
@@ -3951,7 +3951,11 @@ IFClsXDef:
         <A::SerialWalker.expandEntityReferences> flag to <DOM::false>
         when creating the <IF::SerialWalker>.
       }
+    @@Type: boolean
     @@Get:
+      @@@enDesc:
+        The <CODE::entityReferenceExpansion> value that
+        was specified when the <IF::SerialWalker> was created.
       @@@TrueCase:
         @@@@enDesc:
           The children and their descendants of <IF::tx|EntityReference>
@@ -3966,11 +3970,6 @@ IFClsXDef:
           the <A::SerialWalker.whatToShow> flags and the
           <A::SerialWalker.filter> set to the 
           <IF::SerialWalker>, if any.
-    @@Type: boolean
-    @@Get:
-      @@@enDesc:
-        The <CODE::entityReferenceExpansion> value that
-        was specified when the <IF::SerialWalker> was created.
       @@@PerlDef:
         $r = $self->{expand_entity_references};
 

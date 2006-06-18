@@ -12,7 +12,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/04/30 07:58:22 $
+    $Date: 2006/06/18 04:12:48 $
 
   @Require:
     @@Module:
@@ -7906,7 +7906,7 @@ IFClsXDef:
         my $nl;
         __CODE{tc|createStaticNodeList:: $r => $nl}__;
 
-        $test->assert_true ($nl-><AG::NodeList.manakaiReadOnly>);
+        $test->assert_false ($nl-><AG::NodeList.manakaiReadOnly>);
 ##StaticNodeList
 
 ElementTypeBinding:

@@ -13,7 +13,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/05/21 08:55:21 $
+    $Date: 2006/06/18 04:12:48 $
 
   @Require:
     @@Module:
@@ -3643,7 +3643,7 @@ IFClsDef:
 
         $test->id ('dtdText');
         $test->assert_equals ($el-><AG::XDPElement.dtdText>,
-                              "<![%aname;[\n<!-- end of aname -->]]>\n");
+                              "<![%aname;[\n<!-- end of aname -->]]>");
 
         $test->id ('fc');
         my $fc = $el-><AG::Node.firstChild>;
