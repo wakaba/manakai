@@ -22,7 +22,7 @@ Module:
       @@@Year:2004
       @@@DISCore:author: DISCore|Wakaba
   @Date:
-    $Date: 2006/05/28 10:33:24 $
+    $Date: 2006/08/15 10:59:24 $
   
   @Require:
     @@Module:
@@ -3641,6 +3641,12 @@ IFClsDef:
       @@@nullCase:
         @@@@enDesc:
           No event handler is read.
+    @@NamedParam:
+      @@@Name: implementation
+      @@@Type: MinImpl
+      @@@enDesc:
+        The <IF::MinImpl> object to which the database belongs.
+        It might be used to create property value objects.
     @@Return:
       @@@RaiseException:
         @@@@@: UNSUPPORTED_ELEMENT_TYPE_ERR
@@ -3654,7 +3660,8 @@ IFClsDef:
             next F if $fd->isa (<ClassName::ManakaiDISModuleLite>);
             if ($fd-><AG::DISAnyResource.isDefined>) {
               $fd-><M::DISAnyResource.readProperties>
-                (on_resource_read => $onResourceRead);
+                (on_resource_read => $onResourceRead,
+                 implementation => $implementation);
             }
           }
           CORE::delete $self->{<H::DIS|sourceFile>};
@@ -4346,7 +4353,7 @@ IFClsDef:
    }
 
    The objects implementing this interface <kwd:MUST> also implement
-   the <IF::DOMMinImpl> interface.
+   the <IF::GetFeature> interface.
 
   @Attr:
     @@Name: uri
@@ -4720,10 +4727,8 @@ IFClsDef:
       definition is read. 
     @@Get:
       @@@Type: DISElement
-      @@@clsActualType: ManakaiDISElement
       @@@InCase:
         @@@@Type: DISModuleElement
-        @@@@clsActualType: ManakaiDISModuleElement
         @@@@enDesc: If this resource is a module.
       @@@PerlDef: $r = $self->{src};
       @@@nullCase:
@@ -4735,7 +4740,6 @@ IFClsDef:
     @@enDesc:
       The <QUOTE::dis> database to which the resource belongs.
     @@Type: DISDatabase
-    @@clsActualType: ManakaiDISDatabase
     @@Get:
       @@@PerlDef:
         $r = $self->{db};
@@ -4754,6 +4758,12 @@ IFClsDef:
       @@@nullCase:
         @@@@enDesc:
           No event handler is read.
+    @@NamedParam:
+      @@@Name: implementation
+      @@@Type: MinImpl
+      @@@enDesc:
+        The <IF::MinImpl> object to which the database belongs.
+        It might be used to create property value objects.
     @@Return:
       @@@RaiseException:
         @@@@@: UNSUPPORTED_ELEMENT_TYPE_ERR
@@ -4765,6 +4775,7 @@ IFClsDef:
             my $for = $self-><AG::DISAnyResource.forURI>;
             my $forp = $self-><AG::DISAnyResource.forpURI>;
             my $db = $self-><AG::DISAnyResource.database>;
+            my $factory;
             for my $el (@{$src-><M::DISElement.disChildElements>
                             (for_arg => $for,
                              forp_arg => $forp,
@@ -4989,6 +5000,26 @@ IFClsDef:
                       $name => $prop_uri,
                     }__;
                     $new_value_type = <Q::DISCore:URI>;
+                  } elsif ($el-><M::DISElement.mediaTypeMatch>
+                                   (<Q::lang|dcmodel>,
+                                    $mtopt{default_media_type}, %mtopt)) {
+                    unless (defined $factory) {
+                      $factory = $implementation
+                                   -><M::GetFeature.getFeature>
+                                       ('Core' => '3.0')
+                                   -><M::DOMImpl.createDocument>;
+                    }
+                    my $mt = $db-><M::DISDatabase.getResource>
+                                    ($el-><M::DISElement.mediaTypeURI>);
+                    my $node = $mt-><M::DISAnyResource.parseString>
+                                      ($el-><M::SWCFGNode.value>, $el, $factory);
+                    __CODE{dv|createXMLValue::
+                      $value => $node,
+                      $result => $new_value,
+                      $name => $prop_uri,
+                    }__;
+                    $new_value-><AS::dv|DVValue.sourceNodePath>
+                      ($el-><M::SWCFGNode.flag> ('nodePath'));
                   } elsif ($el-><M::DISElement.mediaTypeMatch>
                                    (<Q::DISCore:NSString>,
                                     $mtopt{default_media_type}, %mtopt)) {
@@ -5658,6 +5689,49 @@ IFClsDef:
           delete $st->{$key};
         }
         $mod->{<H::DIS|nodeStorageModified>} = true;
+
+  @Method:
+    @@Name: parseString
+    @@enDesc:
+      Parses a string assuming that this resource is a <Q::DISCore|LexicalType>.
+    @@Param:
+      @@@Name: s
+      @@@Type: DISString
+      @@@enDesc:
+        The string to parse.
+    @@Param:
+      @@@Name: ns
+      @@@Type: NSResolverDIS
+      @@@enDesc:
+        The namespace context object.
+    @@Param:
+      @@@Name: factory
+      @@@Type: Document
+      @@@enDesc:
+        The <IF::Document> node to which the returned <IF::Node> belongs.
+    @@Return:
+      @@@Type: Node
+      @@@enDesc:
+        The <IF::Node> object obtained as a result of parsing 
+        of <P::s> in the context of <P::ns>.
+      @@@nullCase:
+        @@@@enDesc:
+          If this resource is not a <Q::DISCore|LexicalType>
+          or if no parser is found.
+      @@@PerlDef:
+        my $method;
+        __CODE{DIS|getMethodForType::
+          $type_resource => $self,
+          $method_name => 'parse_string',
+          $method => $method,
+        }__;
+        if ($method) {
+          __DEEP{
+            $r = $method->(@_);
+          }__;
+        } else {
+          $r = null;
+        } 
 ##DISAnyResource
 
 PropDef:
@@ -5675,7 +5749,12 @@ ResourceDef:
 
 ResourceDef:
   @QName: Document
-  @AliasFor: tc|Document||ManakaiDOM|ManakaiDOMLatest
+  @AliasFor: td|Document||ManakaiDOM|ManakaiDOMLatest
+  @For: DIS|ForLatest
+
+ResourceDef:
+  @QName: Element
+  @AliasFor: te|Element||ManakaiDOM|ManakaiDOMLatest
   @For: DIS|ForLatest
 
 ResourceDef:
@@ -5759,7 +5838,7 @@ IFClsDef:
   @ClsISA: dp|ManakaiDISAnyResourcePerl
   @ClsISA: ManakaiDISAnyResource
 
-  @Implement: DOMMinImpl
+  @Implement: GetFeature
 
   @enDesc:
     <QUOTE::dis> module definitions. 
@@ -6021,7 +6100,7 @@ PropDef:
 ClsDef:
   @ClsQName: ManakaiDISModuleLite
 
-  @Implement: DOMMinImpl
+  @Implement: GetFeature
   @Implement: DIS|DISResourceProp
   @Implement: dp|DISAnyResourcePerl
   @Implement: dp|DISModulePerl
@@ -7639,10 +7718,12 @@ PropDef:
     ManakaiDOM:Class
 
 ResourceDef:
-  @QName: DOMMinImpl
-  @AliasFor:
-    DOMFeature:GetFeature::ManakaiDOM:ManakaiDOMLatest
-  @For: DIS|ForEmpty
+  @QName: MinImpl
+  @AliasFor: f|MinimumImplementation||ManakaiDOM|ManakaiDOMLatest
+
+ResourceDef:
+  @QName: GetFeature
+  @AliasFor: f|GetFeature||ManakaiDOM|ManakaiDOMLatest
 
 ResourceDef:
   @QName: SWCFGNode
@@ -7661,6 +7742,10 @@ ResourceDef:
   @AliasFor:
     swcfg21:SWCFGDocument::swcfg21:ForLatest
   @For: DIS|ForEmpty
+
+ResourceDef:
+  @QName: DOMImpl
+  @AliasFor: c|DOMImplementation||ManakaiDOM|ManakaiDOMLatest
 
 XParamDef:
   @QName: sourceNodePath
@@ -8309,6 +8394,74 @@ TMethods:
           }
         }__;
 ##dx:ErrorSubCode
+
+TMethods:
+  @TMethod:
+    @@Name: parseString
+    @@DIS:targetType: lang|dcmodel
+    @@Param:
+      @@@Name: s
+      @@@Type: DISString
+    @@Param:
+      @@@Name: ns
+      @@@Type: NSResolverDIS
+    @@Param:
+      @@@Name: factory
+      @@@Type: Document
+    @@Return:
+      @@@Type: Node
+      @@@PerlDef:
+        __DEEP{
+          my $for_uri = $self-><AG::DISAnyResource.forURI>;
+          $s =~ s/^\s+//;
+          if ($s =~ s/^([^\s(][^\s+*?]*)\s*//) {
+            $r = $factory-><M::Document.createElementNS>
+                             (<Q::lang|dcmodel:>, 'terminal');
+            my $uri = $ns-><M::NSResolverDIS.tfqnamesToURI>
+                             ($1, null, $for_uri);
+            $r-><AS::Node.textContent> ($uri);
+            if ($s =~ s/^([+*?])\s*//) {
+              $r-><M::Element.setAttributeNS> (null, 'occurence', $1);
+            }
+          } else {
+            $s =~ s/^\(\s*//;
+            $r = $factory-><M::Document.createElementNS>
+                             (<Q::lang|dcmodel:>, 'group');
+            my $current = $r;
+            my $last;
+            while (length $s) {
+              if ($s =~ s/^([^\s()+*?|,&][^\s)+*?,&]*|[+*?|,&][^\s)+*?,&]+)\s*//) {
+                my $el = $factory-><M::Document.createElementNS>
+                                     (<Q::lang|dcmodel:>, 'terminal');
+                my $uri = $self-><M::NSResolverDIS.tfqnamesToURI>
+                                   ($1, null, $for_uri, node => $ns);
+                $el-><AS::Node.textContent> ($uri);
+                $current-><M::Node.appendChild> ($el);
+                $last = $el;
+              } elsif ($s =~ s/^([+*?])\s*//) {
+                if (defined $last) {
+                  $last-><M::Element.setAttributeNS> (null, 'occurence', $1);
+                  $last = null;
+                }
+              } elsif ($s =~ s/^([|,&])\s*//) {
+                $current-><M::Element.setAttributeNS> (null, 'connector', $1);
+                $last = null;
+              } elsif ($s =~ s/^\(\s*//) {
+                my $el = $factory-><M::Document.createElementNS>
+                                     (<Q::lang|dcmodel:>, 'group');
+                $current = $current-><M::Node.appendChild> ($el);
+                $last = null;
+              } elsif ($s =~ s/^\)\s*//) {
+                $last = $current;
+                $current = $current-><AG::Node.parentNode>;
+                $current = $last unless defined $current; # error
+              } else {
+                last; # error
+              }
+            }
+          }
+        }__;
+##lang:dcmodel
 
 ElementTypeBinding:
   @Name: PropNameParam

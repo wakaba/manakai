@@ -12,7 +12,7 @@ use Message::Util::QName::Filter {
   Util => q<http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/>,
 };
 
-our$VERSION=do{my @r=(q$Revision: 1.15 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our$VERSION=do{my @r=(q$Revision: 1.16 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Cwd;
 use Getopt::Long;
 use Pod::Usage;
@@ -262,7 +262,7 @@ $db->read_properties (on_resource_read => sub ($$) {
     status_msg_ " " if ($ResourceCount % (10 * 10)) == 0;
     status_msg '' if ($ResourceCount % (10 * 50)) == 0;
   }
-});
+}, implementation => $impl);
 status_msg '';
 status_msg "done";
 
