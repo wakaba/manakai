@@ -50,7 +50,8 @@ DIS_FILES = $(DOM_FEATURE_DIS_FILES) $(DOM_CORE_DIS_FILES) \
   $(DOM_MISC_DIS_FILES)
 DOT_CORE_DIS_FILES = \
   $(DOM_FEATURE_DIS_FILES) \
-  $(DOM_CORE_DIS_FILES)
+  $(DOM_CORE_DIS_FILES) \
+  TreeStore$(DIS_SUFFIX)
 
 PM_FILES = \
   DOMFeature$(PM_SUFFIX) GenericLS$(PM_SUFFIX) \
@@ -82,7 +83,8 @@ $(PM_FILES): %$(PM_SUFFIX): %$(DIS_SUFFIX) $(DAF_PL)
 	  --create-perl-module="$(NS_MDOM)Element    Element$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_MDOM)CharacterData CharacterData$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_MDOM)XML        XML$(PM_SUFFIX)" \
-	  --create-perl-module="$(NS_MDOM)XDoctype   XDoctype$(PM_SUFFIX)"
+	  --create-perl-module="$(NS_MDOM)XDoctype   XDoctype$(PM_SUFFIX)" \
+	  --create-perl-module="$(NS_MDOM)TreeStore  TreeStore$(PM_SUFFIX)"
 	$(PERL_CHK) DOMFeature$(PM_SUFFIX)
 	$(PERL_CHK) GenericLS$(PM_SUFFIX)
 	$(PERL_CHK) DOMMain$(PM_SUFFIX)
@@ -93,6 +95,7 @@ $(PM_FILES): %$(PM_SUFFIX): %$(DIS_SUFFIX) $(DAF_PL)
 	$(PERL_CHK) CharacterData$(PM_SUFFIX)
 	$(PERL_CHK) XML$(PM_SUFFIX)
 	$(PERL_CHK) XDoctype$(PM_SUFFIX)
+	$(PERL_CHK) TreeStore$(PM_SUFFIX)
 	$(TOUCH) $@
   ## NOTE: When you modify this rule, update |../Util/Makefile|, too.
 
@@ -106,5 +109,5 @@ clean-db:
 
 distclean: clean clean-db
 
-## $Date: 2006/05/13 12:06:21 $
+## $Date: 2006/08/15 03:54:37 $
 ## License: Public Domain.

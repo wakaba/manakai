@@ -17,7 +17,7 @@ Module:
   @License:
     license:Perl+MPL
   @Date:
-    $Date: 2006/05/28 10:33:24 $
+    $Date: 2006/08/15 03:54:37 $
   
   @Require:
     @@Module:
@@ -26,6 +26,12 @@ Module:
     @@Module:
       @@@QName: DIS|Perl
       @@@WithFor: DIS|ForLatest
+    @@Module:
+      @@@QName: MDOM|TreeCore
+      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
+    @@Module:
+      @@@QName: MDOM|TreeStore
+      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
 
   @DefaultFor: 
     DIS:ForLatest
@@ -45,6 +51,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/Core/
   @f:
     http://suika.fam.cx/~wakaba/archive/2004/dom/feature#
+  @fe:
+    http://suika.fam.cx/www/2006/feature/
   @infoset:
     http://www.w3.org/2001/04/infoset#
   @kwd:
@@ -69,6 +77,16 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Markup#
   @swcfg21:
     http://suika.fam.cx/~wakaba/archive/2005/swcfg21#
+  @tc:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/TreeCore/
+  @td:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/Document/
+  @te:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/Element/
+  @test:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Test#
+  @tst:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/TreeStore/
   @Util:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/
 
@@ -103,6 +121,7 @@ FeatureDef:
     @@Version: 1.0
     @@f:instanceOf: DIS|Value
     @@f:requires: DIS|CoreFeature10
+    @@f:requires: tst|TSFeature30
     @@FullName:
       @@@lang:en
       @@@@:
@@ -209,8 +228,16 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type: DISLang|Method
+    @@DISCore:resourceType: DISLang|Method
     @@For: !=DIS|ForEmpty
+
+ElementTypeBinding:
+  @Name: ClsMethod
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISLang|Method
+    @@ForCheck: !=DIS|ForEmpty ManakaiDOM|ForClass
 
 ElementTypeBinding:
   @Name: Return
@@ -224,7 +251,15 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type: DISLang|MethodParameter
+    @@DISCore:resourceType: DISLang|MethodParameter
+
+ElementTypeBinding:
+  @Name: NamedParam
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISLang|MethodParameter
+    @@DISPerl:isNamedParameter: 1
 
 ElementTypeBinding:
   @Name: Attr
@@ -233,6 +268,14 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type: DISLang|Attribute
     @@For: !=DIS|ForEmpty
+
+ElementTypeBinding:
+  @Name: ClsAttr
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISLang|Attribute
+    @@ForCheck: !=DIS|ForEmpty ManakaiDOM|ForClass
 
 ElementTypeBinding:
   @Name: Get
@@ -248,11 +291,21 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type: DISLang|AttributeSet
 
+ElementTypeBinding:
+  @Name: Test
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: test|StandaloneTest
+    @@ForCheck: ManakaiDOM|ForClass
+
 ## -- Implementation
 
 IFClsDef:
   @IFQName: DISImplementationValue
   @ClsQName: ManakaiDISImplementationValue
+  
+  @ClsISA: tst|ManakaiDOMImplementationTreeStore||ManakaiDOM|ManakaiDOMLatest
 
   @f:provides: DIS|Value10
 
@@ -279,8 +332,7 @@ IFClsDef:
       @@@nullCase:
         @@@@enDesc: 
           The initial value is <CODE::null>.
-    @@Param:
-      @@@DISPerl:isNamedParameter:1
+    @@NamedParam:
       @@@Name: baseType
       @@@Type: DISString
       @@@enDesc:
@@ -289,7 +341,6 @@ IFClsDef:
         @@@@enDesc: No base type.
     @@Return:
       @@@Type: DVValue
-      @@@caType: ManakaiDVValue
       @@@enDesc:
         The newly created value.
       @@@PerlDef:
@@ -336,8 +387,7 @@ IFClsDef:
       @@@nullCase:
         @@@@enDesc: 
           The initial value is <CODE::null>.
-    @@Param:
-      @@@DISPerl:isNamedParameter:1
+    @@NamedParam:
       @@@Name: baseType
       @@@Type: DISString
       @@@enDesc:
@@ -346,7 +396,6 @@ IFClsDef:
         @@@@enDesc: No base type.
     @@Return:
       @@@Type: DVValue
-      @@@caType: ManakaiDVValue
       @@@enDesc:
         The newly created value.
       @@@PerlDef:
@@ -376,6 +425,60 @@ IFClsDef:
         }__;
 
   @Method:
+    @@Name: createDVXMLValue
+    @@enDesc:
+      Creates a <IF::DVXMLValue> object.
+    @@Param:
+      @@@Name: node
+      @@@Type: Node
+      @@@enDesc:
+        The <IF::Node> of the object.
+    @@Return:
+      @@@Type: DVXMLValue
+      @@@enDesc:
+        The newly created value.
+      @@@PerlDef:
+        $r = bless \ {
+        }, <ClassName::ManakaiDVXMLValue>;
+        __DEEP{
+          $r-><M::DVXMLValue.setNode> ($node, tsimpl => $self);
+        }__;
+
+    @@Test:
+      @@@QName: DVImpl.createDVXMLValue.test
+      @@@PerlDef:
+        my $impl = $Message::DOM::ImplementationRegistry
+                     ->get_implementation
+                         ({<Q::DIS|Value> => '1.0',
+                           <Q::fe|TreeStore> => '3.0'});
+
+        my $node;
+        __CODE{tc|createElementForTest||ManakaiDOM|ManakaiDOMLatest::
+          $el => $node,
+        }__;
+        $node-><AS::Node.textContent> ('abcdefg');
+
+        my $v = $impl-><M::DISImplementationValue.createDVXMLValue>
+                         ($node);
+
+        $test->id ('interface.DVXMLValue');
+        $test->assert_isa ($v, <IFName::DVXMLValue>);
+
+        $test->id ('interface.DVValue');
+        $test->assert_isa ($v, <IFName::DVValue>);
+
+        $test->id ('node.textContent');
+        my $node2 = $v-><M::DVXMLValue.getNode> (tsimpl => $impl);
+        $test->assert_equals ($node2-><AG::Node.textContent>, 'abcdefg');
+
+        $test->id ('node=');
+        $test->assert_num_equals
+                 (actual_value => $node2, expected_value => $node);
+
+        #$test->id ('stringValue');
+        #$test->assert_equals ($v->string_value, 'abcdefg');
+
+  @Method:
     @@Name: createDVOrderedList
     @@enDesc:
       Creates a new <IF::DVOrderedList> object.
@@ -386,8 +489,7 @@ IFClsDef:
         The canonical URI of the data type of the value.
       @@@nullCase:
         @@@@enDesc: Any type is allowed.
-    @@Param:
-      @@@DISPerl:isNamedParameter:1
+    @@NamedParam:
       @@@Name: baseType
       @@@Type: DISString
       @@@enDesc:
@@ -428,8 +530,7 @@ IFClsDef:
         The canonical URI of the data type of the value.
       @@@nullCase:
         @@@@enDesc: Any type is allowed.
-    @@Param:
-      @@@DISPerl:isNamedParameter:1
+    @@NamedParam:
       @@@Name: baseType
       @@@Type: DISString
       @@@enDesc:
@@ -479,6 +580,23 @@ IFClsDef:
 
   @ResourceDef:
     @@ForCheck: ManakaiDOM|ForClass
+    @@QName: createXMLValue
+    @@DISCore:resourceType: DISPerl|BlockCode
+    @@enDesc:
+      Creates an XML value object.
+    @@PerlDef:
+      __DEEP{
+        $result = $Message::DOM::ImplementationRegistry
+                     ->get_implementation
+                         ({<Q::DIS|Value> => '1.0',
+                           <Q::fe|TreeStore> => '3.0'})
+                     -><M::DISImplementationValue.createDVXMLValue>
+                         ($value);
+        $result-><AS::DVValue.name> ($name);
+      }__;
+
+  @ResourceDef:
+    @@ForCheck: ManakaiDOM|ForClass
     @@QName: createURI
     @@rdf:type: DISPerl|BlockCode
     @@enDesc:
@@ -490,13 +608,6 @@ IFClsDef:
         $result-><AS::DVValue.name> ($name);
       }__;
 ##DISImplementationValue
-
-ElementTypeBinding:
-  @Name: caType
-  @ElementType:
-    dis:actualType
-  @ShadowContent:
-    @@ForCheck: ManakaiDOM|ForClass
 
 ## -- Any Value
 
@@ -522,7 +633,7 @@ IFClsDef:
 
   @ClsISA: dp|ManakaiDVValuePerl
 
-  @Implement: f|GetFeature||ManakaiDOM|ManakaiDOMLatest
+  @Implement: GetFeature
   @ClsISA: f|ManakaiHasFeatureByGetFeature||ManakaiDOM|ManakaiDOMLatest
 
   @ClsISA:
@@ -1052,6 +1163,163 @@ ElementTypeBinding:
         The implementation has encounted an undeclared namespace prefix. 
 
 IFClsDef:
+  @IFQName: DVXMLValue
+  @ClsQName: ManakaiDVXMLValue
+
+  @IFISA: DVValue
+  @ClsISA: ManakaiDVValue
+
+  @enDesc:
+    A <IF::DVXMLValue> object is a <IF::DVValue> containing
+    a <IF::Node>.
+
+    {TODO::
+      Define <A::DVValue.value> and <A::DVValue.stringValue>.
+    }
+
+    {TODO::
+       Define what <A::DVValue.dataType> is.
+    }
+
+  @Method:
+    @@Name: getNode
+    @@enDesc:
+      Returns the <IF::Node> object contained as the value
+      of the <IF::DVXMLValue>.
+
+      {TODO::
+         Define if <P::tsimpl> and <P::od> is missing.
+      }
+    @@NamedParam:
+      @@@Name: tsimpl
+      @@@Type: TSImpl
+      @@@enDesc:
+        The <IF::TSImpl> object used to extract <IF::Node>.
+      @@@nullCase:
+        @@@@enDesc:
+          An implementation object to which the <P::od> object
+          belongs or a newly created implementation object
+          is used.
+    @@NamedParam:
+      @@@Name: od
+      @@@Type: Document
+      @@@enDesc:
+        The <IF::Document> object to which the <IF::Node> belongs.
+      @@@nullCase:
+        @@@@enDesc:
+          Either <P::tsimpl> object or a newly created implementation
+          object is used to create a new <IF::Document> object
+          that is used in place of <P::od>.
+    @@Return:
+      @@@Type: Node
+      @@@enDesc:
+        The <IF::Node> object.
+      @@@PerlDef:
+        __DEEP{
+          unless (defined $tsimpl) {
+            if (defined $od) {
+              $tsimpl = $od-><AG::Document.implementation>
+                           -><M::GetFeature.getFeature>
+                               (<Q::fe|TreeStore> => '3.0');
+            } else {
+              $tsimpl = $Message::DOM::ImplementationRegistry
+                          ->get_implementation ({<Q::fe|TreeStore> => '3.0'});
+            }
+          }
+          $r = $tsimpl->create_node_from_storable_object
+                          (${$$self->{value}}, $od);
+        }__;
+
+  @Method:
+    @@Name: setNode
+    @@enDesc:
+      Sets a <IF::Node> object as a value contained by the <IF::DVXMLValue>.
+    @@Param:
+      @@@Name: newNode
+      @@@Type: Node
+      @@@enDesc:
+        The new <IF::Node> object set as the value.
+    @@NamedParam:
+      @@@Name: tsimpl
+      @@@Type: TSImpl
+      @@@enDesc:
+        The <IF::TSImpl> object used to obtain storable object.
+      @@@nullCase:
+        @@@@enDesc:
+          {P:: Use the <IF::TSImpl> object obtained by the following
+               procedure:
+
+            = <VAR::od> <lt>- <A::Node.ownerDocument> of <P::newNode>.
+
+            = <VAR::impl> <lt>- <A::Document.implementation> of <P::od>.
+
+            = <VAR::tsimpl> <lt>- <M::GetFeature.getFeature> on <P::impl>
+                                  with parameters set to
+                                  <Feature::fe|TreeStoer> and <FeatureVer::3.0>.
+
+          }
+    @@Return:
+      @@@PerlDef:
+        __DEEP{
+          unless (defined $tsimpl) {
+            $tsimpl = $newNode-><AG::Node.ownerDocument>
+                              -><AG::Document.implementation>
+                              -><M::GetFeature.getFeature>
+                                  (<Q::fe|TreeStore> => '3.0');
+          }
+          $$self->{value} = \ ($tsimpl->create_storable_object_from_node
+                                          ($newNode));
+        }__;
+
+  @ClsAttr:
+    @@Name: dataType
+    @@Get:
+      @@@enDesc: The data type URI.
+      @@@Type: DISString
+      @@@PerlDef:
+        $r = q<data:,temporary--xml-node>;
+
+  @Test:
+    @@QName: DVXMLValue.value.test
+    @@PerlDef:
+      my $node;
+      __CODE{tc|createElementForTest||ManakaiDOM|ManakaiDOMLatest::
+        $el => $node,
+      }__;
+      $node->text_content ('abcdefg');
+
+      my $v;
+      __CODE{createXMLValue::
+        $result => $v,
+        $name => 'name',
+        $value => $node,
+      }__;
+
+      $test->id ('getNode');
+      $test->assert_num_equals
+               (actual_value => $v->get_node, expected_value => $node);
+
+      #$test->id ('stringValue');
+      #$test->assert_equals ($v->string_value, 'abcdefg');
+##DVXMLValue
+
+ResourceDef:
+  @QName: Node
+  @AliasFor: tc|Node||ManakaiDOM|ManakaiDOMLatest
+
+ResourceDef:
+  @QName: Document
+  @AliasFor: td|Document||ManakaiDOM|ManakaiDOMLatest
+
+ResourceDef:
+  @QName: GetFeature
+  @AliasFor: f|GetFeature||ManakaiDOM|ManakaiDOMLatest
+
+ResourceDef:
+  @QName: TSImpl
+  @AliasFor: tst|DOMImplementationTreeStore||ManakaiDOM|ManakaiDOMLatest
+
+IFClsDef:
   @IFQName: DVList
   @ClsQName: ManakaiDVList
 
@@ -1076,8 +1344,7 @@ IFClsDef:
         An item.
     @@Return:
 
-  @Method:
-    @@ForCheck: ManakaiDOM|ForClass
+  @ClsMethod:
     @@Name: getProperty
     @@enDesc:
       Returns the value of a property.
@@ -1169,9 +1436,8 @@ IFClsDef:
       @@@PerlDef:
         $r = <Q::DVOrderedList>;
 
-  @Method:
+  @ClsMethod:
     @@plOp: @{}
-    @@ForCheck: ManakaiDOM|ForClass
     @@Return:
       @@@Type: DISPerl|ARRAY||ManakaiDOM|all
       @@@PerlDef:

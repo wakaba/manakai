@@ -130,7 +130,8 @@ $(NS_UTIL_DIS_PM_FILES): %$(PM_SUFFIX): %$(DIS_SUFFIX) $(DAF_PL)
 	  --create-perl-module="$(NS_MDOM)Element    ../DOM/Element$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_MDOM)CharacterData ../DOM/CharacterData$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_MDOM)XML        ../DOM/XML$(PM_SUFFIX)" \
-	  --create-perl-module="$(NS_MDOM)XDoctype   ../DOM/XDoctype$(PM_SUFFIX)"
+	  --create-perl-module="$(NS_MDOM)XDoctype   ../DOM/XDoctype$(PM_SUFFIX)" \
+	  --create-perl-module="$(NS_MDOM)TreeStore  ../DOM/TreeStore$(PM_SUFFIX)"
 	$(PERL_CHK) PerlCode$(PM_SUFFIX)
 	$(PERL_CHK) ../DOM/DOMFeature$(PM_SUFFIX)
 	$(PERL_CHK) ../DOM/GenericLS$(PM_SUFFIX)
@@ -142,6 +143,7 @@ $(NS_UTIL_DIS_PM_FILES): %$(PM_SUFFIX): %$(DIS_SUFFIX) $(DAF_PL)
 	$(PERL_CHK) ../DOM/CharacterData$(PM_SUFFIX)
 	$(PERL_CHK) ../DOM/XML$(PM_SUFFIX)
 	$(PERL_CHK) ../DOM/XDoctype$(PM_SUFFIX)
+	$(PERL_CHK) ../DOM/TreeStore$(PM_SUFFIX)
 	$(TOUCH) $@
 	$(TOUCH) ../DOM/.core$(PM_SUFFIX)
 
@@ -160,5 +162,5 @@ clean-db:
 
 distclean: clean clean-db
 
-## $Date: 2006/04/16 08:20:28 $
+## $Date: 2006/08/15 03:54:37 $
 ## License: Public Domain.

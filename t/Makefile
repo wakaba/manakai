@@ -84,7 +84,8 @@ NS_UTIL_PT_FILES = \
   util-DIS$(PT_SUFFIX)
 NS_UTIL_DIS_PT_FILES = \
   util-dis-DNLite$(PT_SUFFIX) \
-  util-dis-DPG$(PT_SUFFIX)
+  util-dis-DPG$(PT_SUFFIX) \
+  util-dis-Value$(PT_SUFFIX)
 
 UTIL_MNTEST_PM = $(MANAKAI_LIB_DIR)Message/Util/ManakaiNodeTest$(PM_SUFFIX)
 
