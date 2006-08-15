@@ -22,7 +22,7 @@ Module:
       @@@Year:2004
       @@@DISCore:author: DISCore|Wakaba
   @Date:
-    $Date: 2006/08/15 10:59:24 $
+    $Date: 2006/08/15 12:57:06 $
   
   @Require:
     @@Module:
@@ -5012,7 +5012,8 @@ IFClsDef:
                     my $mt = $db-><M::DISDatabase.getResource>
                                     ($el-><M::DISElement.mediaTypeURI>);
                     my $node = $mt-><M::DISAnyResource.parseString>
-                                      ($el-><M::SWCFGNode.value>, $el, $factory);
+                                      ($el-><M::SWCFGNode.value>, $el, $factory,
+                                       for_arg => $for);
                     __CODE{dv|createXMLValue::
                       $value => $node,
                       $result => $new_value,
@@ -5709,6 +5710,7 @@ IFClsDef:
       @@@Type: Document
       @@@enDesc:
         The <IF::Document> node to which the returned <IF::Node> belongs.
+    @@ForParam:
     @@Return:
       @@@Type: Node
       @@@enDesc:
@@ -8408,17 +8410,17 @@ TMethods:
     @@Param:
       @@@Name: factory
       @@@Type: Document
+    @@ForParam:
     @@Return:
       @@@Type: Node
       @@@PerlDef:
         __DEEP{
-          my $for_uri = $self-><AG::DISAnyResource.forURI>;
           $s =~ s/^\s+//;
           if ($s =~ s/^([^\s(][^\s+*?]*)\s*//) {
             $r = $factory-><M::Document.createElementNS>
                              (<Q::lang|dcmodel:>, 'terminal');
             my $uri = $ns-><M::NSResolverDIS.tfqnamesToURI>
-                             ($1, null, $for_uri);
+                             ($1, null, $forArg);
             $r-><AS::Node.textContent> ($uri);
             if ($s =~ s/^([+*?])\s*//) {
               $r-><M::Element.setAttributeNS> (null, 'occurence', $1);
@@ -8433,8 +8435,8 @@ TMethods:
               if ($s =~ s/^([^\s()+*?|,&][^\s)+*?,&]*|[+*?|,&][^\s)+*?,&]+)\s*//) {
                 my $el = $factory-><M::Document.createElementNS>
                                      (<Q::lang|dcmodel:>, 'terminal');
-                my $uri = $self-><M::NSResolverDIS.tfqnamesToURI>
-                                   ($1, null, $for_uri, node => $ns);
+                my $uri = $ns-><M::NSResolverDIS.tfqnamesToURI>
+                                   ($1, null, $forArg, node => $ns);
                 $el-><AS::Node.textContent> ($uri);
                 $current-><M::Node.appendChild> ($el);
                 $last = $el;
