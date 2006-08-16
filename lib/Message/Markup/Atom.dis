@@ -43,7 +43,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/05/28 06:34:59 $
+    $Date: 2006/08/16 10:30:03 $
 
   @Require:
     @@Module:
@@ -76,6 +76,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dom/main#
   @dx:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#
+  @dxm:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/XML#
   @ecore:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/Core/
   @f:
@@ -625,9 +627,12 @@ ModuleDef:
   @mv:contains: atomMediaType
   @mv:contains: atomLanguageTag
   @mv:contains: atomUri
+  @mv:contains: atomUriCM
   @mv:contains: atomEmailAddress
+  @mv:contains: atomEmailAddressCM
 
   @mv:contains: undefinedAttributes
+  @mv:contains: undefinedContent
   @mv:contains: atomCommonAttributes
 
   @mv:contains: simpleExtensionElements
@@ -1627,12 +1632,20 @@ STDef:
   @QName: atomUri
   @mv:datatypeEntityName: URI
   #aliasfor text
+STCDef:
+  @QName: atomUriCM
+  @mv:elementContentModelName: URI
+  @cm: (dxm|PCDATA||ManakaiDOM|all)*
 
 STDef:
   @QName: atomEmailAddress
   @mv:datatypeEntityName: EmailAddress
   #subsetOf xsd|string
   #pattern
+STCDef:
+  @QName: atomEmailAddressCM
+  @mv:elementContentModelName: EmailAddress
+  @cm: (dxm|PCDATA||ManakaiDOM|all)*
 
 ElementTypeBinding:
   @Name: AGDef
@@ -1672,6 +1685,14 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: mv|XMLDTDDatatypeEntity
+    @@For: =ManakaiDOM|ManakaiDOMLatest
+
+ElementTypeBinding:
+  @Name: STCDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: mv|ElementContentModel
     @@For: =ManakaiDOM|ManakaiDOMLatest
 
 IFClsDef:
@@ -1732,6 +1753,13 @@ ResourceDef:
     @@ContentType: DISCore|QName
   @ForCheck: =ManakaiDOM|all
 
+ElementTypeBinding:
+  @Name: cm
+  @ElementType:
+    mv:elementContentModel
+  @ShadowContent:
+    @@ContentType: lang|dcmodel
+
 IFClsConstructDef:
   @IFQName: AtomTextConstruct
   @ClsQName: ManakaiAtomTextConstruct
@@ -1742,6 +1770,15 @@ IFClsConstructDef:
 
   @IFISA: AtomElement
   @ClsISA: ManakaiAtomElement
+
+  @cm:
+    dxm|ANY||ManakaiDOM|all
+  @enImplNote:
+    @@ddid:cm
+    @@@:
+      {TODO::
+        (dxm|PCDATA||ManakaiDOM|all | html|div)*
+      }
 
   @enDesc:
     The <IF::AtomTextConstruct> interface provides convenience
@@ -1872,6 +1909,9 @@ IFClsConstructDef:
 
   @IFISA: AtomElement
   @ClsISA: ManakaiAtomElement
+
+  @cm:
+    (person-prop+)
 
   @enDesc:
     The <IF::AtomPersonConstruct> interface provides convenience
@@ -2024,6 +2064,15 @@ IFClsConstructDef:
   @IFISA: AtomElement
   @ClsISA: ManakaiAtomElement
 
+  @cm:
+    (dxm|PCDATA||ManakaiDOM|all)*
+  @enImplNote:
+    @@ddid: cm
+    @@@:
+      {TODO::
+        xsd|dateTime
+      }
+
   @enDesc:
     The <IF::AtomDateConstruct> interface provides convenience
     methods and attributes for <IF::Element> nodes
@@ -2119,6 +2168,9 @@ IFClsETDef:
 
   @IFISA: AtomElement
   @ClsISA: ManakaiAtomElement
+
+  @cm:
+    (feed-prop+, atom|entry*)
 
   @enDesc:
     The <XE::atom|feed> element is the document element 
@@ -2833,6 +2885,9 @@ IFClsETDef:
   @IFISA: AtomElement
   @ClsISA: ManakaiAtomElement
 
+  @cm:
+    (entry-prop+)
+
   @enDesc:
     The <XE::atom|entry> element represents an individual
     entry, acting as a container for metadata and data
@@ -3360,6 +3415,8 @@ IFClsETDef:
 
   @IFISA: AtomElement
   @ClsISA: ManakaiAtomElement
+  
+  @cm: atomUriCM
 ##AtomIdElement
 
 IFClsETDef:
@@ -3370,6 +3427,8 @@ IFClsETDef:
 
   @IFISA: AtomElement
   @ClsISA: ManakaiAtomElement
+
+  @cm: atomUriCM
 ##AtomIconElement
 
 IFClsETDef:
@@ -3380,6 +3439,8 @@ IFClsETDef:
 
   @IFISA: AtomElement
   @ClsISA: ManakaiAtomElement
+
+  @cm: TextCM
 ##AtomNameElement
 
 IFClsETDef:
@@ -3390,6 +3451,8 @@ IFClsETDef:
 
   @IFISA: AtomElement
   @ClsISA: ManakaiAtomElement
+
+  @cm: atomUriCM
 ##AtomUriElement
 
 IFClsETDef:
@@ -3400,6 +3463,8 @@ IFClsETDef:
 
   @IFISA: AtomElement
   @ClsISA: ManakaiAtomElement
+
+  @cm: atomEmailAddressCM
 ##AtomEmailElement
 
 IFClsETDef:
@@ -3410,6 +3475,8 @@ IFClsETDef:
 
   @IFISA: AtomElement
   @ClsISA: ManakaiAtomElement
+
+  @cm: atomUriCM
 ##AtomLogoElement
 
 IFClsETDef:
@@ -3420,6 +3487,9 @@ IFClsETDef:
 
   @IFISA: AtomElement
   @ClsISA: ManakaiAtomElement
+
+  @cm:
+    dxm|ANY||ManakaiDOM|all
 
   @enDesc:
     The <XE::atom|content> element either contains or links to
@@ -3686,6 +3756,8 @@ IFClsETDef:
   @IFISA: AtomElement
   @ClsISA: ManakaiAtomElement
 
+  @cm: undefinedContent
+
   @enDesc:
     The <XE::atom|category> element conveys information abut
     a category associated with an entry or feed.
@@ -3817,6 +3889,9 @@ IFClsETDef:
   @IFISA: AtomElement
   @ClsISA: ManakaiAtomElement
 
+  @cm:
+    (dxm|PCDATA||ManakaiDOM|all)*
+
   @enDesc:
     The <XE::atom|generator> element identifies the agent used
     to generate a feed.
@@ -3897,6 +3972,8 @@ IFClsETDef:
 
   @IFISA: AtomElement
   @ClsISA: ManakaiAtomElement
+
+  @cm: undefinedContent
 
   @enDesc:
     The <XE::atom|link> element defines a reference from an entry
@@ -4215,6 +4292,9 @@ IFClsETDef:
 
   @IFISA: AtomElement
   @ClsISA: ManakaiAtomElement
+
+  @cm:
+    (source-prop*)
 
   @Attr:
     @@Name: authorElements
@@ -4587,3 +4667,11 @@ AGDef:
   @QName: undefinedAttributes
   @mv:attributeTypeGroupName: common.extra
 
+ResourceDef:
+  @QName: undefinedContent
+  @mv:elementContentModelName: undefined
+  @For: =ManakaiDOM|ManakaiDOMLatest
+  @DISCore:resourceType: mv|ElementContentModel
+  @cm: dxm|ANY||ManakaiDOM|all
+  @enImplNote:
+    (text | anyForeignElement)*

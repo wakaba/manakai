@@ -12,7 +12,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date:
-    $Date: 2006/08/15 03:54:37 $
+    $Date: 2006/08/16 10:30:03 $
   
   @DefaultFor:
     ManakaiDOM:all
@@ -370,6 +370,23 @@ LexTypeDef:
 
     s := *<lt>Perl \s<gt>
   @subsetOf: DISCore|NSString
+
+ResourceDef:
+  @QName: mv|AnyElementContent
+  @enFN: any
+  @enDesc:
+    The <Q::mv|AnyElementContent> is a content model
+    that allows any content including, but not limited
+    to child <Q::mv|Element> nodes and texts.
+  @DISCore:resourceType: mv|ElementContentModel
+
+ResourceDef:
+  @QName: mv|EmptyElementContent
+  @enFN: empty
+  @enDesc:
+    The <Q::mv|EmptyElementContent> is the minimum content model,
+    which allows no content within the element.
+  @DISCore:resourceType: mv|ElementContentModel
 
 ResourceTypeDef:
   @QName: mv|Attribute

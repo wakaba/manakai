@@ -123,37 +123,15 @@ sub daf_dtd_modules ($$$) {
           my $xdp_el_true = $xdp_el->first_child;
           $xdp_entity->append_child ($xdp_el);
 
-          my $mgcd_cmv = $mgcd->get_property_value
-                                  (ExpandedURI q<mv:elementContentModel>);
-          if ($mgcd_cmv) {
-            my $mgcd_cm = UNIVERSAL::isa ($mgcd_cmv,
-                                          'Message::Util::IF::DVURIValue')
-                            ? $mgcd_cmv->get_resource ($mgcd->database) : undef;
-            if (defined $mgcd_cm and
-                $mgcd_cm->is_type_uri (ExpandedURI q<mv:ElementContentModel>)) {
-              $xdp_el_true->append_child
-                              ($xdp_doc->create_xdp_entity
-                                           (1, $mgcd_prefix.'content', ''))
-                          ->last_child
-                          ->append_child
-                              ($xdp_doc->create_xdp_peref
-                                           (daf_dm_get_entity_name ($mgcd_cm)));
-            } elsif (UNIVERSAL::isa ($mgcd_cmv,
-                                     'Message::Util::IF::DVXMLValue')) {
-              daf_dtd_cm ($xdp_doc, $mgcd_prefix, $db,
-                          $mgcd_cmv->get_node (od => $xdp_doc) => $xdp_el_true);
-            } else {
-              $xdp_el_true->append_child
-                              ($xdp_doc->create_xdp_entity
-                                           (1, $mgcd_prefix.'content', 'EMPTY'));
-            }
-          } else {
-            $xdp_el_true->append_child
-                            ($xdp_doc->create_xdp_entity
-                                         (1, $mgcd_prefix.'content', 'EMPTY'));
-          }
+          ## Content model entity
+          my $xdp_content_entity = $xdp_doc->create_xdp_entity
+                                               (1, $mgcd_prefix.'content', '');
+          $xdp_el_true->append_child ($xdp_content_entity);
           $xdp_el_true->append_child ($xdp_doc->create_xdp_s ("\n"));
+          daf_dtd_cm ($xdp_doc, $mgcd_prefix.'content', $db,
+                      $mgcd => $xdp_content_entity->last_child);
 
+          ## QName entity and tagmin entities
           $xdp_el_true->append_child
                           ($xdp_doc->create_xdp_entity
                                        (1, $mgcd_prefix.'qname',
@@ -240,12 +218,13 @@ sub daf_dtd_modules ($$$) {
                                       (' '.$mgcd_short_desc.' '));
           $xdp_entity->append_child ($xdp_doc->create_xdp_s ("\n"));
 
-          $xdp_entity->append_child
-                         ($xdp_doc->create_xdp_entity
-                                      (1, $mgcd_full_name, ''));
+          ## Content model entity
+          my $xdp_content_entity = $xdp_doc->create_xdp_entity
+                                               (1, $mgcd_full_name, '');
+          $xdp_entity->append_child ($xdp_content_entity);
           $xdp_entity->append_child ($xdp_doc->create_xdp_s ("\n\n"));
-
-          ## TODO: content model
+          daf_dtd_cm ($xdp_doc, $mgcd_full_name, $db,
+                      $mgcd => $xdp_content_entity->last_child);
         } elsif ($mgcd->is_type_uri (ExpandedURI q<mv:AttributeTypeGroup>)) {
           my $mgcd_short_desc = daf_dm_get_short_desc ($mgcd);
           if (defined $mgcd_short_desc) {
@@ -357,66 +336,87 @@ sub daf_dtd_modules ($$$) {
 } # daf_dtd_modules
 
 sub daf_dtd_cm ($$) {
-  my ($doc, $prefix, $db, $src => $dest) = @_;
+  my ($doc, $label, $db, $src => $dest) = @_;
 
-  my $container = $dest->append_child
-                           ($doc->create_xdp_entity
-                                    (1, $prefix.'content', ''))
-                       ->last_child;
+  my $src_v = $src->get_property_value (ExpandedURI q<mv:elementContentModel>);
+  if (defined $src_v) {
+    my $src_cm = $src_v->isa ('Message::Util::IF::DVURIValue')
+                   ? $src_v->get_resource ($db) : undef;
+    if (defined $src_cm and
+        $src_cm->is_type_uri (ExpandedURI q<mv:ElementContentModel>)) {
+      $dest->append_child 
+               ($doc->create_xdp_peref (daf_dm_get_entity_name ($src_cm)));
+    } elsif (defined $src_v and
+             $src_v->isa ('Message::Util::IF::DVXMLValue')) {
+      my @in = ([$src_v->get_node (od => $doc) => $dest, undef]);
+      ## TODO: connector
+      A: while (@in) {
+        my $in = shift @in;
 
-  my @in = ([$src => $container, undef]);
-  ## TODO: connector
-  A: while (@in) {
-    my $in = shift @in;
+        my $xuri = $in->[0]->manakai_expanded_uri;
+        if ($xuri eq ExpandedURI q<lang:dcmodel:group>) {
+          if (defined $in->[2] and length $in->[2]) {
+            $in->[1]->append_child ($doc->create_xdp_s (' '))
+              unless $in->[2] eq ',';
+            $in->[1]->append_child ($doc->create_xdp_delimiter ($in->[2]));
+            $in->[1]->append_child ($doc->create_xdp_s (' '));
+          }
 
-    my $xuri = $in->[0]->manakai_expanded_uri;
-    if ($xuri eq ExpandedURI q<lang:dcmodel:group>) {
-      if (defined $in->[2] and length $in->[2]) {
-        $in->[1]->append_child ($doc->create_xdp_s (' ')) unless $in->[2] eq ',';
-        $in->[1]->append_child ($doc->create_xdp_delimiter ($in->[2]));
-        $in->[1]->append_child ($doc->create_xdp_s (' '));
-      }
+          my $group = $doc->create_xdp_model_group;
+          $in->[1]->append_child ($group);
+          my $occur = $in->[0]->get_attribute_ns (undef, 'occurence');
+          if (defined $occur and length $occur) {
+            $in->[1]->append_child ($doc->create_xdp_delimiter ($occur));
+          }
+          my $connector = $in->[0]->get_attribute_ns (undef, 'connector');
+          my $i = 0;
+          for (@{$in->[0]->child_nodes}) {
+            next unless $_->node_type == $_->ELEMENT_NODE;
+            push @in, [$_ => $group, $i++ == 0 ? undef : $connector];
+          }
+        } elsif ($xuri eq ExpandedURI q<lang:dcmodel:terminal>) {
+          my $res = $db->get_resource ($in->[0]->text_content);
+          $res->is_referred ($label);
 
-      my $group = $doc->create_xdp_model_group;
-      $in->[1]->append_child ($group);
-      my $occur = $in->[0]->get_attribute_ns (undef, 'occurence');
-      if (defined $occur and length $occur) {
-        $in->[1]->append_child
-                    ($doc->create_xdp_delimiter ($occur));
-      }
-      my $connector = $in->[0]->get_attribute_ns (undef, 'connector');
-      my $i = 0;
-      for (@{$in->[0]->child_nodes}) {
-        next unless $_->node_type == $_->ELEMENT_NODE;
-        push @in, [$_ => $group, $i++ == 0 ? undef : $connector];
-      }
-    } elsif ($xuri eq ExpandedURI q<lang:dcmodel:terminal>) {
-      my $res = $db->get_resource ($in->[0]->text_content);
-      $res->is_referred ($prefix.'content');
-      my $name = daf_dm_get_entity_name ($res);
+          if (defined $in->[2] and length $in->[2] and
+              not $res->is_type_uri
+                          (ExpandedURI q<mv:ElementTypeAdditionalClass>)) {
+            $in->[1]->append_child ($doc->create_xdp_s (' '))
+              unless $in->[2] eq ',';
+            $in->[1]->append_child ($doc->create_xdp_delimiter ($in->[2]));
+            $in->[1]->append_child ($doc->create_xdp_s (' '));
+          }
 
-      if (defined $in->[2] and length $in->[2] and
-          not $res->is_type_uri (ExpandedURI q<mv:ElementTypeAdditionalClass>)) {
-        $in->[1]->append_child ($doc->create_xdp_s (' ')) unless $in->[2] eq ',';
-        $in->[1]->append_child ($doc->create_xdp_delimiter ($in->[2]));
-        $in->[1]->append_child ($doc->create_xdp_s (' '));
-      }
-
-      my $el = $doc->create_xdp_peref ($name);
-      my $occur = $in->[0]->get_attribute_ns (undef, 'occurence');
-      if (defined $occur and length $occur) {
-        for ($in->[1]->append_child
-                         ($doc->create_xdp_model_group)) {
-          $_->append_child ($el);
+          my $res_uri = $res->uri;
+          if ($res_uri eq ExpandedURI q<dxm:PCDATA>) {
+            $in->[1]->append_child ($doc->create_xdp_rni_keyword ('PCDATA'));
+          } elsif ($res_uri eq ExpandedURI q<dxm:ANY>) {
+            $in->[1]->append_child ($doc->create_xdp_keyword ('ANY'));
+          } elsif ($res_uri eq ExpandedURI q<dxm:EMPTY>) {
+            $in->[1]->append_child ($doc->create_xdp_keyword ('EMPTY'));
+          } else {
+            my $name = daf_dm_get_entity_name ($res);
+            my $el = $doc->create_xdp_peref ($name);
+            my $occur = $in->[0]->get_attribute_ns (undef, 'occurence');
+            if (defined $occur and length $occur) {
+              for ($in->[1]->append_child ($doc->create_xdp_model_group)) {
+                $_->append_child ($el);
+              }
+              $in->[1]->append_child ($doc->create_xdp_delimiter ($occur));
+            } else {
+              $in->[1]->append_child ($el);
+            }
+          }
+        } else {
+          warn "<$xuri>: Unknown element type";
         }
-        $_->append_child ($doc->create_xdp_delimiter ($occur));
-      } else {
-        $in->[1]->append_child ($el);
-      }
+      } # A
     } else {
-      warn "<$xuri>: Unknown element type";
+      $dest->append_child ($doc->create_xdp_keyword ('EMPTY'));
     }
-  } # A
+  } else {
+    $dest->append_child ($doc->create_xdp_keyword ('EMPTY'));
+  }
 } # daf_dtd_cm
 
 sub daf_dm_get_name ($) {
@@ -619,7 +619,7 @@ sub daf_dm_unsupported_type_error ($$) {
   sub daf_dm_get_entity_name ($;$) {
     my ($res, $suffix) = @_;
     
-    my $r = $EntityName{$res->uri}->{defined $suffix ? $suffix : ''};
+    my $r = $EntityName{$res->uri}->{defined $suffix ? $suffix : '#default'};
     return $r if defined $r;
 
     if ($DMBelongTo{$res->uri}) {
@@ -674,7 +674,7 @@ sub daf_dm_unsupported_type_error ($$) {
       $r .= '.' . $res->local_name;
     }
 
-    return $EntityName{$res->uri}->{defined $suffix ? $suffix : ''} = $r;
+    return $EntityName{$res->uri}->{defined $suffix ? $suffix : '#default'} = $r;
   } # daf_dm_get_entity_name
 }
 

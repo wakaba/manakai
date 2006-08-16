@@ -19,7 +19,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/05/21 08:55:21 $
+      $Date: 2006/08/16 10:30:03 $
     @@ContentType:
       dis:Date.RCS
   
@@ -1721,6 +1721,35 @@ ResourceTypeDef:
   @QName: dxm|ExternalEntity
   @enFN: external entity
   @subsetOf: dxm|Entity
+
+ResourceTypeDef:
+  @QName: dxm|AnyElementContent
+  @enFN: constraint for the element's content
+  @subsetOf: mv|ElementContentModel
+
+ResourceDef:
+  @QName: dxm|ANY
+  @enFN:
+    <XML::ANY>
+  @DISCore:resourceType: dxm|AnyElementContent
+  @subsetOf: mv|AnyElementContent
+
+ResourceDef:
+  @QName: dxm|EMPTY
+  @enFN:
+    <XML::EMPTY>
+  @DISCore:resourceType: dxm|AnyElementContent
+  @subsetOf: mv|EmptyElementContent
+
+ResourceTypeDef:
+  @QName: dxm|ElementContent
+  @enFN: element content
+  @subsetOf: dxm|AnyElementContent
+
+ResourceTypeDef:
+  @QName: dxm|MixedContent
+  @enFN: mixed content
+  @subsetOf: dxm|MixedContent
 
 ## XHTML m12n Modularized Document Types
 
