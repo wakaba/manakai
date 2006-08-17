@@ -1,3 +1,15 @@
+2006-08-17  Wakaba  <wakaba@suika.fam.cx>
+
+	* DISMarkup.dis (mv|namespacePrefixed): New property.
+	(mv|XMLDTDQNameModule): New.
+	(mv|XMLDTDQNameEntity): New.
+
+	* daf-dtd-modules.pl (daf_dm_qname_module_content): New function.
+	(daf_dm_moduke_content): Split from |daf_dtd_modules|.
+	(daf_dm_get_entity_name): Capitalize all letters
+	in the entity names in the module sets.
+	(daf_dm_get_file_entity_name): New.
+
 2006-08-16  Wakaba  <wakaba@suika.fam.cx>
 
 	* DISMarkup.dis (mv|AnyElementContent, mv|EmptyElementContent): News.

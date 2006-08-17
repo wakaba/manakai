@@ -43,7 +43,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/08/16 10:30:03 $
+    $Date: 2006/08/17 12:12:02 $
 
   @Require:
     @@Module:
@@ -88,6 +88,8 @@ Namespace:
     http://www.w3.org/1999/xhtml
   @idl:
     http://suika.fam.cx/~wakaba/archive/2004/dis/IDL#
+  @infoset:
+    http://www.w3.org/2001/04/infoset#
   @kwd:
     http://suika.fam.cx/~wakaba/archive/2005/rfc2119/
   @lang:
@@ -581,6 +583,11 @@ ModuleSetDef:
   @mv:contains: AtomProperties
   @mv:contains: AtomEntry
   @mv:contains: AtomFeed
+  @mv:contains: AtomQName
+
+  @infoset:namespaceName: 
+    http://www.w3.org/2005/Atom
+  @infoset:prefix: atom
 
 ModuleDef:
   @QName: AtomFeed
@@ -651,6 +658,15 @@ ModuleDef:
 
   @mv:contains: DateAG
   @mv:contains: DateCM
+
+ResourceDef:
+  @QName: AtomQName
+  @enLN: Qualified Names
+  @mv:id: qname
+  @For: =ManakaiDOM|ManakaiDOMLatest
+  @DISCore:resourceType: mv|XMLDTDQNameModule
+
+  @mv:contains: Atom
  
 ElementTypeBinding:
   @Name: ModuleSetDef
@@ -1771,6 +1787,8 @@ IFClsConstructDef:
   @IFISA: AtomElement
   @ClsISA: ManakaiAtomElement
 
+  @mv:refers: atomCommonAttributes
+
   @cm:
     dxm|ANY||ManakaiDOM|all
   @enImplNote:
@@ -1909,6 +1927,8 @@ IFClsConstructDef:
 
   @IFISA: AtomElement
   @ClsISA: ManakaiAtomElement
+
+  @mv:refers: atomCommonAttributes
 
   @cm:
     (person-prop+)
@@ -2064,6 +2084,8 @@ IFClsConstructDef:
   @IFISA: AtomElement
   @ClsISA: ManakaiAtomElement
 
+  @mv:refers: atomCommonAttributes
+
   @cm:
     (dxm|PCDATA||ManakaiDOM|all)*
   @enImplNote:
@@ -2168,6 +2190,8 @@ IFClsETDef:
 
   @IFISA: AtomElement
   @ClsISA: ManakaiAtomElement
+
+  @mv:refers: atomCommonAttributes
 
   @cm:
     (feed-prop+, atom|entry*)
@@ -2885,6 +2909,8 @@ IFClsETDef:
   @IFISA: AtomElement
   @ClsISA: ManakaiAtomElement
 
+  @mv:refers: atomCommonAttributes
+
   @cm:
     (entry-prop+)
 
@@ -3415,6 +3441,8 @@ IFClsETDef:
 
   @IFISA: AtomElement
   @ClsISA: ManakaiAtomElement
+
+  @mv:refers: atomCommonAttributes
   
   @cm: atomUriCM
 ##AtomIdElement
@@ -3428,6 +3456,8 @@ IFClsETDef:
   @IFISA: AtomElement
   @ClsISA: ManakaiAtomElement
 
+  @mv:refers: atomCommonAttributes
+
   @cm: atomUriCM
 ##AtomIconElement
 
@@ -3440,6 +3470,7 @@ IFClsETDef:
   @IFISA: AtomElement
   @ClsISA: ManakaiAtomElement
 
+  # no common attribs
   @cm: TextCM
 ##AtomNameElement
 
@@ -3452,6 +3483,7 @@ IFClsETDef:
   @IFISA: AtomElement
   @ClsISA: ManakaiAtomElement
 
+  # no common attribs
   @cm: atomUriCM
 ##AtomUriElement
 
@@ -3464,6 +3496,7 @@ IFClsETDef:
   @IFISA: AtomElement
   @ClsISA: ManakaiAtomElement
 
+  # no common attribs
   @cm: atomEmailAddressCM
 ##AtomEmailElement
 
@@ -3476,6 +3509,8 @@ IFClsETDef:
   @IFISA: AtomElement
   @ClsISA: ManakaiAtomElement
 
+  @mv:refers: atomCommonAttributes
+
   @cm: atomUriCM
 ##AtomLogoElement
 
@@ -3487,6 +3522,8 @@ IFClsETDef:
 
   @IFISA: AtomElement
   @ClsISA: ManakaiAtomElement
+
+  @mv:refers: atomCommonAttributes
 
   @cm:
     dxm|ANY||ManakaiDOM|all
@@ -3756,6 +3793,8 @@ IFClsETDef:
   @IFISA: AtomElement
   @ClsISA: ManakaiAtomElement
 
+  @mv:refers: atomCommonAttributes
+
   @cm: undefinedContent
 
   @enDesc:
@@ -3889,6 +3928,8 @@ IFClsETDef:
   @IFISA: AtomElement
   @ClsISA: ManakaiAtomElement
 
+  @mv:refers: atomCommonAttributes
+
   @cm:
     (dxm|PCDATA||ManakaiDOM|all)*
 
@@ -3972,6 +4013,8 @@ IFClsETDef:
 
   @IFISA: AtomElement
   @ClsISA: ManakaiAtomElement
+
+  @mv:refers: atomCommonAttributes
 
   @cm: undefinedContent
 
@@ -4292,6 +4335,8 @@ IFClsETDef:
 
   @IFISA: AtomElement
   @ClsISA: ManakaiAtomElement
+
+  @mv:refers: atomCommonAttributes
 
   @cm:
     (source-prop*)

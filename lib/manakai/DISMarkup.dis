@@ -12,7 +12,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date:
-    $Date: 2006/08/16 10:30:03 $
+    $Date: 2006/08/17 12:12:02 $
   
   @DefaultFor:
     ManakaiDOM:all
@@ -539,12 +539,39 @@ ResourceTypeDef:
     A set of <Q::mv|XMLDTDModule>s.
   @subsetOf: mv|DocumentTypeModuleSet
 
+RPropDef:
+  @QName: mv|namespacePrefixed
+  @enFN: namespace prefixed entity value
+  @dataType: DISCore|Tristate
+  @multipleProperties: DISCore|Single
+  @enDesc:
+    The <Q::mv|namespacePrefixed> property specify the value
+    of the parameter entity whose name suffix is <XML::prefixed>.
+
+    If the value is <CODE::1>, then the entity value is 
+    <XML::INCLUDED>, which make qualified names prefixed.
+
+    If the value is <CODE::-1>, then the entity value is
+    <XML::IGNORE>, which make  qualified names not prefixed.
+
+    If the value is <CODE::0>, then the entity value is
+    <XML::%NS.prefixed;>, i.e. same as the global specification
+    for the prefixedness of the qualified names.
+
 ResourceTypeDef:
   @QName: mv|XMLDTDModule
   @enFN: XML DTD module
   @enDesc:
     An <Q::mv|XMLDTDModule> is an XML DTD module.
   @subsetOf: mv|DocumentTypeModule
+
+ResourceTypeDef:
+  @QName: mv|XMLDTDQNameModule
+  @enFN: XML DTD qualified name module
+  @enDesc:
+    An <Q::mv|XMLDTDQNameModule> is an XML DTD module
+    that contains a set of <Q::mv|XMLDTDQNameEntity>s.
+  @subsetOf: mv|XMLDTDModule
 
 ResourceTypeDef:
   @QName: mv|XMLDTDDatatypeEntity
@@ -567,6 +594,12 @@ RPropDef:
   @enFN: XML attribute type
   @dataType: DISCore|QName
   @multipleProperties: DISCore|Single
+
+ResourceTypeDef:
+  @QName: mv|XMLDTDQNameEntity
+  @enFN: XML DTD qualified name parameter entity
+  @subsetOf: dxm|ParameterEntity
+  @subsetOf: dxm|InternalEntity
 
 ## -- "For markup" definitions
 
