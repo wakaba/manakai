@@ -1,3 +1,14 @@
+2006-08-18  Wakaba  <wakaba@suika.fam.cx>
+
+	* Atom.dis (Require): Reference to the |DISlib:DISMarkup|
+	module is added.
+	(Atom): The |mv:id| and |mv:vid| properties
+	are removed so that the entity name prefix becomes |Atom.|
+	and file name prefix becomes |atom-|.  The |infoset:namespaceName|
+	and |infoset:prefix| properties are replaced with
+	the |mv:targetNamespace| and |mv:defaultNamespacePrefix|
+	properties.
+
 2006-08-17  Wakaba  <wakaba@suika.fam.cx>
 
 	* Atom.dis (Atom): The |AtomQName| module is added.

@@ -12,7 +12,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date:
-    $Date: 2006/08/17 12:12:02 $
+    $Date: 2006/08/18 12:26:54 $
   
   @DefaultFor:
     ManakaiDOM:all
@@ -557,6 +557,12 @@ RPropDef:
     If the value is <CODE::0>, then the entity value is
     <XML::%NS.prefixed;>, i.e. same as the global specification
     for the prefixedness of the qualified names.
+
+RPropDef:
+  @QName: mv|defaultNamespacePrefix
+  @enFN: default namespace prefix
+  @dataType: DISCore|String
+  @multipleProperties: DISCore|Single
 
 ResourceTypeDef:
   @QName: mv|XMLDTDModule

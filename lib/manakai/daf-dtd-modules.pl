@@ -349,8 +349,12 @@ sub daf_dm_qname_module_content ($$$$) {
   my $file_prefix = daf_dm_get_file_entity_name ($mg, '') . '-';
 
   ## Section A
+
+  ## NS.prefixed
   $entity->append_child ($doc->create_xdp_entity (1, 'NS.prefixed', 'IGNORE'));
   $entity->append_child ($doc->create_xdp_s ("\n"));
+
+  ## MODULE.prefixed
   my $prefixed_default = $mg->get_property_text
                                  (ExpandedURI q<mv:namespacePrefixed>, '0');
   if ($prefixed_default ne '0') {
@@ -365,21 +369,25 @@ sub daf_dm_qname_module_content ($$$$) {
   }
   $entity->append_child ($doc->create_xdp_s ("\n\n"));
 
+  ## MODULE.xmlns
   $entity->append_child
              ($doc->create_xdp_entity
                       (1, $prefix.'xmlns',
                        $mg->get_property_text
-                               (ExpandedURI q<infoset:namespaceName>,
+                               (ExpandedURI q<mv:targetNamespace>,
                                 $mg->namespace_uri)));
   $entity->append_child ($doc->create_xdp_s ("\n"));
+
+  ## MODULE.prefix
   my $ns_prefix = $mg->get_property_text
-                         (ExpandedURI q<infoset:prefix>,
+                         (ExpandedURI q<mv:defaultNamespacePrefix>,
                           substr $prefix, 0, length ($prefix) - 1);
   $entity->append_child
              ($doc->create_xdp_entity
                       (1, $prefix.'prefix', $ns_prefix));
   $entity->append_child ($doc->create_xdp_s ("\n\n"));
 
+  ## MODULE.pfx
   my $if = $entity->append_child ($doc->create_xdp_if ($prefix.'prefixed'));
   for ($if->first_child) { # true
     for ($_->append_child ($doc->create_xdp_entity (1, $prefix.'pfx'))
@@ -394,6 +402,7 @@ sub daf_dm_qname_module_content ($$$$) {
   }
   $entity->append_child ($doc->create_xdp_s ("\n\n"));
 
+  ## module-qname-extra.mod
   $entity->append_child ($doc->create_xdp_entity
                                  (1, $file_prefix.'qname-extra.mod', ''));
   $entity->append_child ($doc->create_xdp_s ("\n"));
@@ -401,13 +410,11 @@ sub daf_dm_qname_module_content ($$$$) {
                                  ($file_prefix.'qname-extra.mod'));
   $entity->append_child ($doc->create_xdp_s ("\n\n"));
 
-  $entity->append_child ($doc->create_xdp_entity
-                                 (1, $prefix.'xmlns.extra.attrib', ''));
-  $entity->append_child ($doc->create_xdp_s ("\n\n"));
-
+  ## URI.datatype
   $entity->append_child ($doc->create_xdp_entity (1, 'URI.datatype', 'CDATA'));
   $entity->append_child ($doc->create_xdp_s ("\n\n"));
-  
+
+  ## MODULE.xmlns.attrib.prefixed
   for ($entity->append_child ($doc->create_xdp_entity
                                       (1, $prefix.'xmlns.attrib.prefixed'))) {
     $_->insert_before ($doc->create_xdp_s ("\n\t"), $_->last_child);
@@ -424,32 +431,45 @@ sub daf_dm_qname_module_content ($$$$) {
         ->append_child ($doc->create_xdp_peref ($prefix.'xmlns'));
     }
   }
-  $entity->append_child ($doc->create_xdp_s ("\n"));
+  $entity->append_child ($doc->create_xdp_s ("\n\n"));
+
+  ## MODULE.xmlns.extra.attrib
   $if = $entity->append_child ($doc->create_xdp_if ($prefix.'prefixed'));
   for ($if->first_child) { # true
-    for ($_->append_child ($doc->create_xdp_entity (1, 'NS.decl.attrib'))) {
+    for ($_->append_child ($doc->create_xdp_entity
+                                   (1, $prefix.'xmlns.extra.attrib'))) {
       $_->insert_before ($doc->create_xdp_s ("\n\t"), $_->last_child);
-      for ($_->last_child) {
-        $_->append_child ($doc->create_xdp_peref
-                                  ($prefix.'xmlns.attrib.prefixed'));
-        $_->append_child ($doc->create_xdp_s ("\n\t"));
-        $_->append_child ($doc->create_xdp_peref
-                                  ($prefix.'xmlns.extra.attrib'));
-      }
+      $_->last_child->append_child ($doc->create_xdp_peref
+                                            ($prefix.'xmlns.attrib.prefixed'));
     }
     $_->append_child ($doc->create_xdp_s ("\n"));
   }
   for ($if->last_child) { # false
-    for ($_->append_child ($doc->create_xdp_entity (1, 'NS.decl.attrib'))) {
-      $_->insert_before ($doc->create_xdp_s ("\n\t"), $_->last_child);
-      $_->last_child->append_child ($doc->create_xdp_peref
-                                            ($prefix.'xmlns.extra.attrib'));
+    $_->append_child ($doc->create_xdp_entity (1, $prefix.'xmlns.extra.attrib'));
+  }
+  $entity->append_child ($doc->create_xdp_s ("\n\n"));
+
+  ## XHTML.xmlns.extra.attrib
+  for ($entity->append_child ($doc->create_xdp_entity
+                                      (1, 'XHTML.xmlns.extra.attrib'))) {
+    $_->insert_before ($doc->create_xdp_s ("\n\t"), $_->last_child);
+    for ($_->last_child) {
+      $_->append_child ($doc->create_xdp_peref ($prefix.'xmlns.extra.attrib'));
+    }
+  }
+  $entity->append_child ($doc->create_xdp_s ("\n"));
+
+  ## NS.decl.attrib
+  for ($entity->append_child ($doc->create_xdp_entity (1, 'NS.decl.attrib'))) {
+    $_->insert_before ($doc->create_xdp_s ("\n\t"), $_->last_child);
+    for ($_->last_child) {
+      $_->append_child ($doc->create_xdp_peref
+                                ('XHTML.xmlns.extra.attrib'));
     }
   }
   $entity->append_child ($doc->create_xdp_s ("\n\n"));
 
-  ## TODO: prefix for global attr
-
+  ## MODULE.xmlns.attrib
   $if = $entity->append_child ($doc->create_xdp_if ($prefix.'prefixed'));
   for ($if->first_child) { # true
     for ($_->append_child ($doc->create_xdp_entity
@@ -483,6 +503,7 @@ sub daf_dm_qname_module_content ($$$$) {
   }
   $entity->append_child ($doc->create_xdp_s ("\n\n"));
 
+  ## module-qname.redecl
   $entity->append_child ($doc->create_xdp_entity
                                  (1, $file_prefix.'qname.redecl', ''));
   $entity->append_child ($doc->create_xdp_s ("\n"));
@@ -860,7 +881,6 @@ sub daf_dm_unsupported_type_error ($$) {
       $v1 .= $v2 if defined $v1 and defined $v2;
       $v1 = $res->local_name unless defined $v1;
       $r .= $v1;
-      $r = uc $r;
     } else {
       $r .= '.' . $res->local_name;
     }

@@ -43,7 +43,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/08/17 12:12:02 $
+    $Date: 2006/08/18 12:26:54 $
 
   @Require:
     @@Module:
@@ -55,6 +55,9 @@ Module:
       @@@WithFor: ManakaiDOM|ManakaiDOM
     @@Module:
       @@@WithFor: ManakaiDOM|ManakaiDOMLatest
+    @@Module:
+      @@@QName: DISlib|DISMarkup
+      @@@WithFor: ManakaiDOM|all
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
 Namespace:
@@ -64,12 +67,12 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
   @cfg:
     http://suika.fam.cx/www/2006/dom-config/
+  @DISlib:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/
   @dis:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
   @dlp:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Perl#
-  @doc:
-    http://suika.fam.cx/~wakaba/archive/2005/7/tutorial#
   @d:
     http://suika.fam.cx/~wakaba/archive/2004/dom/xdt#
   @DOMMain:
@@ -88,22 +91,16 @@ Namespace:
     http://www.w3.org/1999/xhtml
   @idl:
     http://suika.fam.cx/~wakaba/archive/2004/dis/IDL#
-  @infoset:
-    http://www.w3.org/2001/04/infoset#
   @kwd:
     http://suika.fam.cx/~wakaba/archive/2005/rfc2119/
   @lang:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#
   @license:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
-  @m12n: 
-    http://suika.fam.cx/www/2006/05/m12n/
   @ManakaiDOM:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
   @Markup:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Markup#
-  @mat:
-    http://suika.fam.cx/~wakaba/archive/2005/manakai/Markup/Atom/
   @MDOM:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
   @MDOMX:
@@ -575,8 +572,6 @@ FeatureDef:
 
 ModuleSetDef:
   @QName: Atom
-  @mv:id: atom
-  @mv:vid: 10
   @enLN: Atom
   @mv:version: 1.0
   @mv:contains: AtomDatatypes
@@ -585,9 +580,8 @@ ModuleSetDef:
   @mv:contains: AtomFeed
   @mv:contains: AtomQName
 
-  @infoset:namespaceName: 
-    http://www.w3.org/2005/Atom
-  @infoset:prefix: atom
+  @mv:targetNamespace: atom|
+  @mv:defaultNamespacePrefix: atom
 
 ModuleDef:
   @QName: AtomFeed
