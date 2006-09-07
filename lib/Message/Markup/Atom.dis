@@ -43,7 +43,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/08/18 12:26:54 $
+    $Date: 2006/09/07 07:25:29 $
 
   @Require:
     @@Module:
@@ -2793,6 +2793,8 @@ IFClsETDef:
                                 (<Q::atom|>, 'updated');
           $updatede-><AS::AtomDateConstruct.value> (scalar time);
           $r-><M::Node.appendChild> ($updatede);
+
+          $self-><M::Node.appendChild> ($r);
         }__;
 
     @@Test:
@@ -2859,6 +2861,9 @@ IFClsETDef:
         $test->assert_num_not_equals
                  (actual_value => $updated-><AG::AtomDateConstruct.value>,
                   expected_value => 0);
+
+        $test->id ('parent');
+        $test->assert_equals ($ent-><AG::Node.parentNode>, $feed);
     @@Test:
       @@@QName: AtomFeedElement.addNewEntry.2.test
       @@@enDesc:
