@@ -12,7 +12,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date:
-    $Date: 2006/08/18 12:26:54 $
+    $Date: 2006/09/10 11:19:24 $
   
   @DefaultFor:
     ManakaiDOM:all
@@ -156,6 +156,14 @@ RPropDef:
   @dataType: DISCore|String
   @multipleProperties: DISCore|UnorderedList
   @subsetOf: mv|name
+
+RPropDef:
+  @QName: mv|systemIdentifierBaseURI
+  @enFN: system identifier base URI
+  @enDesc:
+    The base URI for the <Q::mv|systemIdentifier>.
+  @dataType: DISCore|String
+  @multipleProperties: DISCore|Single
 
 RPropDef:
   @QName: mv|contains
@@ -565,11 +573,26 @@ RPropDef:
   @multipleProperties: DISCore|Single
 
 ResourceTypeDef:
+  @QName: mv|XMLDTDAnyModule
+  @enFN: XML DTD module or driver
+  @subsetOf: dxm|ParameterEntity
+  @subsetOf: dxm|ExternalEntity
+
+ResourceTypeDef:
   @QName: mv|XMLDTDModule
   @enFN: XML DTD module
   @enDesc:
     An <Q::mv|XMLDTDModule> is an XML DTD module.
+
+      {NOTE::
+        In the context of  XHTML Modularization, the term <QUOTE::DTD module>
+        sometimes refers to a set of DTD submodules that corresponding
+        to an abstract module.  However, the <Q::mv|XMLDTDModule>
+        only represents a DTD submodule, i.e. an XML external parameter
+        entity.
+      }
   @subsetOf: mv|DocumentTypeModule
+  @subsetOf: mv|XMLDTDAnyModule
 
 ResourceTypeDef:
   @QName: mv|XMLDTDQNameModule
@@ -606,6 +629,12 @@ ResourceTypeDef:
   @enFN: XML DTD qualified name parameter entity
   @subsetOf: dxm|ParameterEntity
   @subsetOf: dxm|InternalEntity
+
+ResourceTypeDef:
+  @QName: mv|XMLDTDDriver
+  @enFN: XML DTD Driver
+  @subsetOf: mv|DocumentTypeDriver
+  @subsetOf: mv|XMLDTDAnyModule
 
 ## -- "For markup" definitions
 

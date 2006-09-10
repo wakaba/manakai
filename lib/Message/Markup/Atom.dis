@@ -43,7 +43,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/09/07 07:25:29 $
+    $Date: 2006/09/10 11:19:24 $
 
   @Require:
     @@Module:
@@ -582,6 +582,7 @@ ModuleSetDef:
 
   @mv:targetNamespace: atom|
   @mv:defaultNamespacePrefix: atom
+  @mv:systemIdentifierBaseURI: \
 
 ModuleDef:
   @QName: AtomFeed
@@ -661,6 +662,21 @@ ResourceDef:
   @DISCore:resourceType: mv|XMLDTDQNameModule
 
   @mv:contains: Atom
+
+ResourceDef:
+  @QName: Atom10
+  @enLN: Atom 1.0
+  @mv:id: atom10
+  @For: =ManakaiDOM|ManakaiDOMLatest
+  @DISCore:resourceType: mv|XMLDTDDriver
+
+  @mv:refers: Atom
+
+  @mv:refers: AtomQName
+  @mv:refers: AtomDatatypes
+  @mv:refers: AtomProperties
+  @mv:refers: AtomEntry
+  @mv:refers: AtomFeed
  
 ElementTypeBinding:
   @Name: ModuleSetDef
@@ -1608,6 +1624,8 @@ AGDef:
   @QName: atomCommonAttributes
   @enFN: common attributes
   @mv:attributeTypeGroupName: common
+
+  @mv:refers: Atom
   
   @ATDef:
     @@mv:attributeTypeName: xml|base
@@ -3471,6 +3489,8 @@ IFClsETDef:
 
   # no common attribs
   @cm: TextCM
+
+  @mv:refers: Atom
 ##AtomNameElement
 
 IFClsETDef:
@@ -3484,6 +3504,8 @@ IFClsETDef:
 
   # no common attribs
   @cm: atomUriCM
+
+  @mv:refers: Atom
 ##AtomUriElement
 
 IFClsETDef:
@@ -3497,6 +3519,8 @@ IFClsETDef:
 
   # no common attribs
   @cm: atomEmailAddressCM
+
+  @mv:refers: Atom
 ##AtomEmailElement
 
 IFClsETDef:
@@ -3531,7 +3555,7 @@ IFClsETDef:
     The <XE::atom|content> element either contains or links to
     the content of the entry.
 
-  @Attr:
+  @ATTR:
     @@Name: type
     @@enDesc:
       The type of the element.
@@ -3596,7 +3620,7 @@ IFClsETDef:
         $el-><AS::AtomContentElement.type> (null);
         $test->assert_null ($el-><AG::AtomContentElement.type>);
 
-  @Attr:
+  @ATTR:
     @@Name: src
     @@enDesc:
       The source of the remote content of the element.

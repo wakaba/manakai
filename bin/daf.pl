@@ -12,13 +12,19 @@ use Message::Util::QName::Filter {
   Util => q<http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/>,
 };
 
-our$VERSION=do{my @r=(q$Revision: 1.16 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our$VERSION=do{my @r=(q$Revision: 1.17 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Cwd;
 use Getopt::Long;
 use Pod::Usage;
 our %Opt = (create_module => []);
 my @target_modules;
 GetOptions (
+  'create-dtd-driver=s' => sub {
+    shift;
+    my $i = [split /\s+/, shift, 3];
+    $i->[3] = 'dtd-driver';
+    push @{$Opt{create_module}}, $i;
+  },
   'create-dtd-modules=s' => sub {
     shift;
     my $i = [split /\s+/, shift, 3];
@@ -44,6 +50,7 @@ GetOptions (
   'daem-file-suffix=s' => \$Opt{daem_suffix},
   'dafs-file-suffix=s' => \$Opt{dafs_suffix},
   'dafx-file-suffix=s' => \$Opt{dafx_suffix},
+  'dtd-file-suffix=s' => \$Opt{dtd_suffix},
   'help' => \$Opt{help},
   'load-module=s' => sub {
     shift;
@@ -98,6 +105,7 @@ $Opt{dis_suffix} = '.dis' unless defined $Opt{dis_suffix};
 $Opt{daem_suffix} = '.dafm' unless defined $Opt{daem_suffix};
 $Opt{dafx_suffix} = '.dafx' unless defined $Opt{dafx_suffix};
 $Opt{dafs_suffix} = '.dafs' unless defined $Opt{dafs_suffix};
+$Opt{dtd_suffix} = '.dtd' unless defined $Opt{dtd_suffix};
 $Opt{mod_suffix} = '.mod' unless defined $Opt{mod_suffix};
 $Message::DOM::DOMFeature::DEBUG = 1 if $Opt{debug};
 require Error;
@@ -147,6 +155,10 @@ for (@{$Opt{create_module}}) {
     $feature{'+' . ExpandedURI q<DIS:TDT>} = '1.0';
     $feature{'+' . ExpandedURI q<Util:PerlCode>} = '1.0';
   } elsif ($out_type eq 'dtd-modules') {
+    require 'manakai/daf-dtd-modules.pl';
+    $feature{ExpandedURI q<fe:GenericLS>} = '3.0';
+    $feature{'+' . ExpandedURI q<fe:XDP>} = '3.0';
+  } elsif ($out_type eq 'dtd-driver') {
     require 'manakai/daf-dtd-modules.pl';
     $feature{ExpandedURI q<fe:GenericLS>} = '3.0';
     $feature{'+' . ExpandedURI q<fe:XDP>} = '3.0';
@@ -311,6 +323,8 @@ for (@{$Opt{create_module}}) {
     daf_perl_t ($mod_uri, $out_file_path, $mod_for);
   } elsif ($out_type eq 'dtd-modules') {
     daf_dtd_modules ($mod_uri, $out_file_path, $mod_for);
+  } elsif ($out_type eq 'dtd-driver') {
+    daf_dtd_driver ($mod_uri, $out_file_path, $mod_for);
   }
 }
 

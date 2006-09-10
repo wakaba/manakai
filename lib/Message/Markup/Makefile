@@ -56,7 +56,8 @@ $(PM_FILES): %$(PM_SUFFIX): %$(DIS_SUFFIX) $(DAF_PL)
 atom: $(DAF_PL)
 	$(DAF) \
 	  --load-module="$(NS_MARKUP)Atom" \
-	  --create-dtd-modules="$(NS_ATOM)Atom . $(NS_MANAKAIDOM)ManakaiDOMLatest"
+	  --create-dtd-modules="$(NS_ATOM)Atom . $(NS_MANAKAIDOM)ManakaiDOMLatest" \
+	  --create-dtd-driver="$(NS_ATOM)Atom10 . $(NS_MANAKAIDOM)ManakaiDOMLatest"
 
 clean:
 	$(RMALL) $(GENERATED_FILES) .*.tmp *~ .*~
@@ -66,5 +67,5 @@ clean-db:
 
 distclean: clean clean-db
 
-## $Date: 2006/05/19 11:02:11 $
+## $Date: 2006/09/10 11:19:24 $
 ## License: Public Domain.

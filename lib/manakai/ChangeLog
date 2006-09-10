@@ -1,3 +1,22 @@
+2006-09-10  Wakaba  <wakaba@suika.fam.cx>
+
+	* DISMarkup.dis (mv:systemIdentifierBaseURI): New property.
+	(mv:XMLDTDAnyModule, mv:XMLDTDDriver): New resource types.
+
+	* daf-dtd-modules.pl (daf_dtd_modules): Its main part
+	is split into another function named |daf_dm_create_module_file|.
+	(daf_dtd_driver): New function for DTD driver support.
+	(daf_dm_create_module_file): New function.
+	(daf_dm_dtd_driver_content): New function.
+	(daf_dm_qname_module_content): What declarations
+	are generated is changed so that generated DTD modules
+	are more resemble to HTML WG's ones.
+	(daf_dm_register_all_components): New function.
+	(daf_dm_get_module_group): New function.
+	(daf_dm_get_entity_name): Support for DTD drivers is added.  Use
+	uppercase'ized name for DTD module sets (to align with
+	HTML WG's DTD modules).
+
 2006-08-18  Wakaba  <wakaba@suika.fam.cx>
 
 	* DISMarkup.dis (mv|defaultNamespacePrefix): New property.

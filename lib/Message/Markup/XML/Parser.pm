@@ -16,7 +16,7 @@ This module is part of manakai.
 
 package Message::Markup::XML::Parser;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.23 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.24 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Char::Class::XML qw!InXML_NameStartChar InXMLNameChar InXMLChar
                         InXML_deprecated_noncharacter InXML_unicode_xml_not_suitable!;
 require Message::Markup::XML;
@@ -1242,9 +1242,9 @@ sub _warn_char_val ($$$%) {
   } elsif ($ch =~ /^(.*?)(\p{InXML_deprecated_noncharacter})/) {
     $self->_clp ($1 => $o);
     $self->_raise_error ($o, type => 'WARN_UNICODE_NONCHARACTER', t => ord $2);
-  } elsif ($ch =~ /^(.*?)(\p{Compat})/) {
-    $self->_clp ($1 => $o);
-    $self->_raise_error ($o, type => 'WARN_UNICODE_COMPAT_CHARACTER', t => ord $2);
+#  } elsif ($ch =~ /^(.*?)(\p{Compat})/) {
+#    $self->_clp ($1 => $o);
+#    $self->_raise_error ($o, type => 'WARN_UNICODE_COMPAT_CHARACTER', t => ord $2);
   } elsif ($ch =~ /^(.*?)(\p{InXML_unicode_xml_not_suitable})/) {
     $self->_clp ($1 => $o);
     $self->_raise_error ($o, type => 'WARN_UNICODE_XML_NOT_SUITABLE_CHARACTER', t => ord $2);
@@ -2012,4 +2012,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2005/11/16 10:07:13 $
+1; # $Date: 2006/09/10 11:19:24 $

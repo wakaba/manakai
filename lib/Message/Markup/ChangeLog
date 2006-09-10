@@ -1,3 +1,17 @@
+2006-09-10  Wakaba  <wakaba@suika.fam.cx>
+
+	* Atom.dis (Atom): The |mv:systemIdentifierBaseURI|
+	property is set.  It is an empty value to allow to move
+	DTD modules without modification.
+	(Atom10): New DTD driver for ordinary Atom 1.0 documents.
+	(AtomNameElement, AtomUriElement, AtomEmailElement): References
+	for |Atom| module are added for |%ATOM.xmlns.attrib;|
+	references in the |ATTLIST| declarations.
+	(AtomContentElement): Content attribute definitions
+	for |type| and |src| attributes are added.
+
+	* Makefile (atom): Generate |Atom10| DTD driver.
+
 2006-09-07  Wakaba  <wakaba@suika.fam.cx>
 
 	* Atom.dis (addNewEntry): The new element was not

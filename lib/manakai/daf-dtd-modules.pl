@@ -37,35 +37,63 @@ sub daf_dtd_modules ($$$) {
   my $mg_namever = $mg_name;
   $mg_namever .= ' ' . $mg_ver if defined $mg_ver;
 
-  my $xdp_impl = $impl->get_feature (ExpandedURI q<fe:XDP> => '3.0');
-
   for my $mgc (@{daf_dm_get_components ($mg)}) {
     daf_dm_register_component ($mgc => $mg);
 
-    if ($mgc->is_type_uri (ExpandedURI q<mv:XMLDTDModule>)) {
-      my $mgc_name = daf_dm_get_name ($mgc);
-      my $mgc_ver = daf_dm_get_ver ($mgc);
-      my $mgc_namever = $mgc_name . ' Module';
-      $mgc_namever .= ' ' . $mgc_ver if defined $mgc_ver;
+    if ($mgc->is_type_uri (ExpandedURI q<mv:XMLDTDAnyModule>)) {
+      daf_dm_create_module_file ($mg, $mgc, $out_dir_path, $mg_namever);
+    } else {
+      daf_dm_unsupported_type_error ($mgc, 'module group');
+    }
+  }
 
-      my $mgc_file_name = daf_dm_get_file_entity_name ($mgc, $Opt{mod_suffix});
+} # daf_dtd_modules
+
+sub daf_dtd_driver ($$$) {
+  my ($mg_uri, $out_dir_path, $mg_for) = @_;
+
+  unless (defined $mg_for) {
+    $mg_for = $db->get_module ($mg_uri)
+                 ->get_property_text (ExpandedURI q<dis:DefaultFor>,
+                                      ExpandedURI q<ManakaiDOM:all>);
+  }
+  my $mg = $db->get_resource ($mg_uri, for_arg => $mg_for);
+
+  daf_dm_create_module_file (undef, $mg, $out_dir_path);
+} # daf_dtd_driver
+
+sub daf_dm_create_module_file ($$$) {
+  my ($mg, $mgc, $out_dir_path, $mg_namever) = @_;
+  my $is_driver = $mgc->is_type_uri (ExpandedURI q<mv:XMLDTDDriver>);
+  my $mgc_name = daf_dm_get_name ($mgc);
+  my $mgc_ver = daf_dm_get_ver ($mgc);
+  my $mgc_namever = $mgc_name;
+  $mgc_namever .= ' Module' unless $is_driver;
+  $mgc_namever .= ' ' . $mgc_ver if defined $mgc_ver;
+
+      my $mgc_file_name = daf_dm_get_file_entity_name
+                            ($mgc,
+                             $is_driver ? $Opt{dtd_suffix} : $Opt{mod_suffix});
       my $mgc_file_path = qq<$out_dir_path/$mgc_file_name>;
-      status_msg_ qq<Generating DTD module "$mgc_file_path"...>;
+      status_msg_ qq<Generating DTD @{[$is_driver ? 'driver' : 'module'
+                     ]} "$mgc_file_path"...>;
 
-      my $xdp_doc = $xdp_impl->create_document (ExpandedURI q<xdp:>, 'pe');
-      my $xdp_entity = $xdp_doc->document_element;
+  my $xdp_impl = $impl->get_feature (ExpandedURI q<fe:XDP> => '3.0');
+  my $xdp_doc = $xdp_impl->create_document (ExpandedURI q<xdp:>, 'pe');
+  my $xdp_entity = $xdp_doc->document_element;
 
-      ## -- Header
-      $xdp_entity->append_child
-                     ($xdp_doc->create_xdp_comment (' '.('.' x 71).' '));
-      $xdp_entity->append_child ($xdp_doc->create_xdp_s ("\n"));
-      $xdp_entity->append_child
-                     ($xdp_doc->create_xdp_comment
-                                  (' '.$mg_namever.' '.$mgc_namever.' '.
-                                   ('.' x (69 - length ($mg_namever)
-                                              - length ($mgc_namever))).' '));
-      $xdp_entity->append_child ($xdp_doc->create_xdp_s ("\n"));
-      my $data = ' file: ' . $mgc_file_name . "\n\n";
+  ## -- Header
+  $xdp_entity->append_child
+                 ($xdp_doc->create_xdp_comment (' '.('.' x 71).' '));
+  $xdp_entity->append_child ($xdp_doc->create_xdp_s ("\n"));
+  my $title = $mgc_namever;
+  $title = $mg_namever . ' ' . $mgc_namever if defined $mg_namever;
+  $xdp_entity->append_child
+                 ($xdp_doc->create_xdp_comment
+                              (' '.$title.' '.
+                                   ('.' x (69 - length ($title))) . ' '));
+  $xdp_entity->append_child ($xdp_doc->create_xdp_s ("\n"));
+  my $data = ' file: ' . $mgc_file_name . "\n\n";
 
       ## TODO: License term
 
@@ -91,6 +119,9 @@ sub daf_dtd_modules ($$$) {
                                                    (' '.$mgc_name."\n\n"));
       $xdp_entity->append_child ($xdp_doc->create_xdp_s ("\n\n"));
 
+  if ($is_driver) {
+    daf_dm_dtd_driver_content ($mgc, $xdp_doc, $xdp_entity);
+  } else {
       if ($mgc->is_type_uri (ExpandedURI q<mv:XMLDTDQNameModule>)) {
         daf_dm_qname_module_content ($mg, $mgc => $xdp_doc, $xdp_entity);
       } else {
@@ -103,6 +134,7 @@ sub daf_dtd_modules ($$$) {
           $mod_header->manakai_append_text ("\n");
         }
       }
+  }
 
       ## -- Footer
       $xdp_entity->append_child
@@ -116,12 +148,7 @@ sub daf_dtd_modules ($$$) {
       print $mgc_file $xdp_entity->dtd_text;
       close $mgc_file;
       status_msg q<done>;
-    } else {
-      daf_dm_unsupported_type_error ($mgc, 'module group');
-    }
-  }
-
-} # daf_dtd_modules
+} # daf_dm_create_module_file
 
 sub daf_dm_module_content ($$$$$$) {
   my ($db, $mg, $mgc => $xdp_doc, $xdp_entity, $mod_header_list) = @_;
@@ -179,7 +206,7 @@ sub daf_dm_module_content ($$$$$$) {
                                    (1, $mgcd_prefix.'tagmin.end', '-'));
       $xdp_el_true->append_child ($xdp_doc->create_xdp_s ("\n"));
 
-      my $xdp_el_tagmin = $xdp_doc->create_xdp_if ('sgml.tag.minimizable');
+      my $xdp_el_tagmin = $xdp_doc->create_xdp_if ('SGML.tag.minimizable');
       $xdp_el_true->append_child ($xdp_el_tagmin);
 
       for ($xdp_el_tagmin->first_child
@@ -342,6 +369,331 @@ sub daf_dm_module_content ($$$$$$) {
   }
 } # daf_dm_module_content
 
+sub daf_dm_dtd_driver_content ($$$) {
+  my ($res => $doc, $entity) = @_;
+
+  my @ns;
+  my @mod;
+  for my $mgcd (@{$res->get_property_resource_list
+                          (ExpandedURI q<mv:refers>)}) {
+      if ($mgcd->is_type_uri (ExpandedURI q<mv:XMLDTDModuleSet>)) {
+        my $prefix = daf_dm_get_entity_name ($mgcd, '');
+        push @ns, {
+          prefix => $prefix,
+          nsprefixed => $mgcd->get_property_text
+                                (ExpandedURI q<mv:namespacePrefixed>, '0'),
+          nsuri => $mgcd->get_property_text
+                            (ExpandedURI q<mv:targetNamespace>,
+                             $mgcd->namespace_uri),
+          nsprefix => $mgcd->get_property_text
+                               (ExpandedURI q<mv:defaultNamespacePrefix>,
+                                $prefix),
+          sysid_base => $mgcd->get_property_text
+                               (ExpandedURI q<mv:systemIdentifierBaseURI>,
+                                ''),
+        };
+        daf_dm_register_all_components ($mgcd => $mgcd);
+      } elsif ($mgcd->is_type_uri (ExpandedURI q<mv:XMLDTDModule>)) {
+        push @mod, $mgcd;
+      } else {
+        daf_dm_unsupported_type_error ($mgcd, 'DTD driver');
+      }
+    }
+
+  ## MODULE.module
+  for my $ns (@ns) {
+    $entity->append_child
+               ($doc->create_xdp_entity (1, $ns->{prefix}.'.module', 'INCLUDE'));
+    $entity->append_child ($doc->create_xdp_s ("\n"));
+  }
+  $entity->append_child ($doc->create_xdp_s ("\n"));
+
+  ## MODULE.xmlns
+  for my $ns (@ns) {
+    $entity->append_child
+               ($doc->create_xdp_entity (1, $ns->{prefix}.'.xmlns',
+                                         $ns->{nsuri}));
+    $entity->append_child ($doc->create_xdp_s ("\n"));
+  }
+  $entity->append_child ($doc->create_xdp_s ("\n"));
+
+  ## MODULE.sysid.base
+  for my $ns (@ns) {
+    $entity->append_child
+               ($doc->create_xdp_entity (1, $ns->{prefix}.'.sysid.base',
+                                         $ns->{sysid_base}));
+    $entity->append_child ($doc->create_xdp_s ("\n"));
+  }
+  $entity->append_child ($doc->create_xdp_s ("\n"));
+
+  ## NS.prefixed
+  my $ns_prefixed = $res->get_property_text
+                            (ExpandedURI q<mv:namespacePrefixed>, '0');
+  if ($ns_prefixed > 0) { # positive
+    $entity->append_child
+               ($doc->create_xdp_entity (1, 'NS.prefixed', 'INCLUDE'));
+  } else { # zero or negative
+    $entity->append_child
+               ($doc->create_xdp_entity (1, 'NS.prefixed', 'IGNORE'));
+  }
+  $entity->append_child ($doc->create_xdp_s ("\n"));
+
+  for my $ns (@ns) {
+    ## MODULE.prefixed
+    if ($ns->{nsprefixed} ne '0') {
+      $entity->append_child
+                 ($doc->create_xdp_entity (1, $ns->{prefix}.'.prefixed',
+                                           $ns->{nsprefixed} > 0
+                                             ? 'INCLUDE' : 'IGNORE'));
+    } else {
+      $entity->append_child ($doc->create_xdp_entity
+                                     (1, $ns->{prefix}.'.prefixed'))
+             ->last_child
+             ->append_child ($doc->create_xdp_peref ('NS.prefixed'));
+    }
+    $entity->append_child ($doc->create_xdp_s ("\n"));
+
+    ## MODULE.prefix
+    $entity->append_child
+               ($doc->create_xdp_entity
+                        (1, $ns->{prefix}.'.prefix', $ns->{nsprefix}));
+    $entity->append_child ($doc->create_xdp_s ("\n"));
+  }
+  $entity->append_child ($doc->create_xdp_s ("\n"));
+
+  ## URI.datatype
+  $entity->append_child ($doc->create_xdp_entity (1, 'URI.datatype', 'CDATA'));
+  $entity->append_child ($doc->create_xdp_s ("\n\n"));
+
+  ## MODULE.xmlns.extra.attrib
+  for my $ns (@ns) {
+    $entity->append_child
+               ($doc->create_xdp_entity
+                        (1, $ns->{prefix}.'.xmlns.extra.attrib'));
+    $entity->append_child ($doc->create_xdp_s ("\n"));
+  }
+  $entity->append_child ($doc->create_xdp_s ("\n"));
+
+  ## MODULE.xmlns.attrib.prefixed
+  for my $ns (@ns) {
+    for ($entity->append_child
+                    ($doc->create_xdp_entity
+                             (1, $ns->{prefix}.'.xmlns.attrib.prefixed'))) {
+      $_->insert_before ($doc->create_xdp_s ("\n\t"), $_->last_child);
+      for ($_->last_child->append_child ($doc->create_xdp_attr_definition)) {
+        for ($_->append_child ($doc->create_xdp_name ('xmlns:'))) {
+          $_->append_child ($doc->create_xdp_peref ($ns->{prefix}.'.prefix'));
+        }
+        $_->append_child ($doc->create_xdp_s ("\t"));
+        $_->append_child ($doc->create_xdp_peref ('URI.datatype'));
+        $_->append_child ($doc->create_xdp_s ("\t"));
+        $_->append_child ($doc->create_xdp_rni_keyword ('FIXED'));
+        $_->append_child ($doc->create_xdp_s (' '));
+        $_->append_child ($doc->create_xdp_attr_literal)
+          ->append_child ($doc->create_xdp_peref ($ns->{prefix}.'.xmlns'));
+      }
+    }
+    $entity->append_child ($doc->create_xdp_s ("\n"));
+  }
+  $entity->append_child ($doc->create_xdp_s ("\n"));
+
+  ## MODULE.xmlns.attrib.default
+  for my $ns (@ns) {
+    for ($entity->append_child
+                    ($doc->create_xdp_entity
+                             (1, $ns->{prefix}.'.xmlns.attrib.default'))) {
+      $_->insert_before ($doc->create_xdp_s ("\n\t"), $_->last_child);
+      for ($_->last_child->append_child ($doc->create_xdp_attr_definition)) {
+        $_->append_child ($doc->create_xdp_name ('xmlns'));
+        $_->append_child ($doc->create_xdp_s ("\t"));
+        $_->append_child ($doc->create_xdp_peref ('URI.datatype'));
+        $_->append_child ($doc->create_xdp_s ("\t"));
+        $_->append_child ($doc->create_xdp_rni_keyword ('FIXED'));
+        $_->append_child ($doc->create_xdp_s (' '));
+        $_->append_child ($doc->create_xdp_attr_literal)
+          ->append_child ($doc->create_xdp_peref ($ns->{prefix}.'.xmlns'));
+      }
+    }
+    $entity->append_child ($doc->create_xdp_s ("\n"));
+  }
+  $entity->append_child ($doc->create_xdp_s ("\n"));
+
+  ## MODULE.xmlns.decl.attrib
+  for my $ns (@ns) {
+    my $if0 = $entity->append_child
+                         ($doc->create_xdp_if ($ns->{prefix}.'.module'));
+    for ($if0->first_child) { # true
+      my $if = $_->append_child
+                     ($doc->create_xdp_if ($ns->{prefix}.'.prefixed'));
+      for ($if->first_child) { # true
+        for ($_->append_child ($doc->create_xdp_entity
+                                       (1,
+                                        $ns->{prefix}.'.xmlns.decl.attrib'))) {
+          $_->insert_before ($doc->create_xdp_s ("\n\t"), $_->last_child);
+          for ($_->last_child) {
+            $_->append_child ($doc->create_xdp_peref
+                                      ($ns->{prefix}.'.xmlns.attrib.prefixed'));
+          }
+        }
+        $_->append_child ($doc->create_xdp_s ("\n"));
+      }
+      for ($if->last_child) { # false
+        for ($_->append_child ($doc->create_xdp_entity
+                                       (1,
+                                        $ns->{prefix}.'.xmlns.decl.attrib'))) {
+          $_->insert_before ($doc->create_xdp_s ("\n\t"), $_->last_child);
+          for ($_->last_child) {
+            $_->append_child ($doc->create_xdp_peref
+                                      ($ns->{prefix}.'.xmlns.attrib.default'));
+          }
+        }
+      }
+      $_->append_child ($doc->create_xdp_s ("\n"));
+    }
+    for ($if0->last_child) { # false
+      $_->append_child ($doc->create_xdp_entity
+                                (1, $ns->{prefix}.'.xmlns.decl.attrib', ''));
+    }
+    $entity->append_child ($doc->create_xdp_s ("\n"));
+  }
+  $entity->append_child ($doc->create_xdp_s ("\n"));
+
+  ## MODULE.xmlns.prefixed.attrib
+  for my $ns (@ns) {
+    my $if0 = $entity->append_child
+                         ($doc->create_xdp_if ($ns->{prefix}.'.module'));
+    for ($if0->first_child) { # true
+      my $if = $_->append_child
+                     ($doc->create_xdp_if ($ns->{prefix}.'.prefixed'));
+      for ($if->first_child) { # true
+        for ($_->append_child
+                   ($doc->create_xdp_entity
+                            (1, $ns->{prefix}.'.xmlns.prefixed.attrib'))) {
+          $_->insert_before ($doc->create_xdp_s ("\n\t"), $_->last_child);
+          for ($_->last_child) {
+            $_->append_child ($doc->create_xdp_peref
+                                      ($ns->{prefix}.'.xmlns.attrib.prefixed'));
+          }
+        }
+        $_->append_child ($doc->create_xdp_s ("\n"));
+      }
+      $_->append_child ($doc->create_xdp_s ("\n"));
+    }
+    for ($if0->last_child) { # false
+      $_->append_child ($doc->create_xdp_entity
+                                (1, $ns->{prefix}.'.xmlns.prefixed.attrib'));
+    }
+    $entity->append_child ($doc->create_xdp_s ("\n"));
+  }
+  $entity->append_child ($doc->create_xdp_s ("\n"));
+
+  ## NS.decl.attrib
+  for ($entity->append_child ($doc->create_xdp_entity (1, 'NS.decl.attrib'))) {
+    $_->insert_before ($doc->create_xdp_s ("\n\t"), $_->last_child);
+    for my $ent ($_->last_child) {
+      for my $ns (@ns) {
+        $ent->append_child ($doc->create_xdp_peref
+                                    ($ns->{prefix}.'.xmlns.prefixed.attrib'));
+        $ent->append_child ($doc->create_xdp_s ("\n\t"));
+      }
+      for my $ns (@ns[0]) {
+        $ent->append_child ($doc->create_xdp_peref
+                                    ($ns->{prefix}.'.xmlns.extra.attrib'));
+      }
+      for my $ns (@ns[1..$#ns]) {
+        $ent->append_child ($doc->create_xdp_s ("\n\t"));
+        $ent->append_child ($doc->create_xdp_peref
+                                    ($ns->{prefix}.'.xmlns.extra.attrib'));
+      }
+    }
+  }
+  $entity->append_child ($doc->create_xdp_s ("\n\n"));
+
+  ## -- Modules
+  for my $mod_res (@mod) {
+    my $mod_prefix = daf_dm_get_file_entity_name ($mod_res, '');
+    my $mod_mg = daf_dm_get_module_group ($mod_res);
+
+    ## Description
+    my $desc = daf_dm_get_short_desc ($mod_res);
+    $desc = $mod_res->local_name . ' Module'
+      unless defined $desc and length $desc;
+    $desc .= ' ' . ('.' x (61 - length ($desc)));
+    $entity->append_child ($doc->create_xdp_comment (' ' . $desc . ' '));
+    $entity->append_child ($doc->create_xdp_s ("\n"));
+
+    ## MODULE.module
+    $entity->append_child
+      ($doc->create_xdp_entity (1, $mod_prefix.'.module', 'INCLUDE'));
+    $entity->append_child ($doc->create_xdp_s ("\n"));
+    
+    my $if = $entity->append_child ($doc->create_xdp_if ($mod_prefix.'.module'));
+    for ($if->first_child) { # true
+      my $mod_mg_prefix = daf_dm_get_entity_name ($mod_mg, '');
+
+      ## MODULE.mod.fpi
+      my $pubid = $mod_res->get_property_text
+                              (ExpandedURI q<mv:publicIdentifier>);
+      if (defined $pubid) {
+        for ($_->append_child ($doc->create_xdp_entity
+                                       (1, $mod_prefix.'.mod.fpi', $pubid))) {
+          $_->insert_before ($doc->create_xdp_s ("\n\t"), $_->last_child);
+        }
+        $_->append_child ($doc->create_xdp_s ("\n"));
+      }
+
+      ## MODULE.mod.sysid
+      for ($_->append_child ($doc->create_xdp_entity
+                                     (1, $mod_prefix.'.mod.sysid'))) {
+        $_->insert_before ($doc->create_xdp_s ("\n\t"), $_->last_child);
+        for ($_->last_child) {
+          $_->append_child ($doc->create_xdp_peref
+                                    ($mod_mg_prefix.'.sysid.base'));
+          $_->append_child
+                ($doc->create_text_node
+                         (daf_dm_get_file_entity_name
+                            ($mod_res, $Opt{mod_suffix})));
+        }
+      }
+      $_->append_child ($doc->create_xdp_s ("\n"));
+
+      ## MODULE.mod.decl
+      for ($_->append_child ($doc->create_xdp_entity
+                                     (1, $mod_prefix.'.mod.decl'))) {
+        $_->insert_before ($doc->create_xdp_s ("\n\t"), $_->last_child);
+        for ($_->last_child) {
+          if (defined $pubid) {
+            $_->append_child ($doc->create_xdp_name ('PUBLIC'));
+            $_->append_child ($doc->create_xdp_s);
+            $_->append_child ($doc->create_xdp_delimiter ('"'));
+            $_->append_child ($doc->create_xdp_peref ($mod_prefix.'.mod.fpi'));
+            $_->append_child ($doc->create_xdp_delimiter ('"'));
+          } else {
+            $_->append_child ($doc->create_xdp_name ('SYSTEM'));
+          }
+          $_->append_child ($doc->create_xdp_s);
+          $_->append_child ($doc->create_xdp_delimiter ('"'));
+          $_->append_child ($doc->create_xdp_peref ($mod_prefix.'.mod.sysid'));
+          $_->append_child ($doc->create_xdp_delimiter ('"'));
+        }
+      }
+      $_->append_child ($doc->create_xdp_s ("\n"));
+
+      ## MODULE.mod
+      for ($_->append_child ($doc->create_xdp_entity (1, $mod_prefix.'.mod'))) {
+        $_->remove_child ($_->last_child);
+        $_->append_child ($doc->create_xdp_s ("\n\t"));
+        $_->append_child ($doc->create_xdp_peref ($mod_prefix.'.mod.decl'));
+      }
+      $_->append_child ($doc->create_xdp_s ("\n"));
+
+      $_->append_child ($doc->create_xdp_peref ($mod_prefix.'.mod'));
+      $_->append_child ($doc->create_xdp_s ("\n"));
+    }
+    $entity->append_child ($doc->create_xdp_s ("\n\n"));
+  }
+} # daf_dm_dtd_driver_content
+
 sub daf_dm_qname_module_content ($$$$) {
   my ($mg, $res => $doc, $entity) = @_;
 
@@ -414,6 +766,11 @@ sub daf_dm_qname_module_content ($$$$) {
   $entity->append_child ($doc->create_xdp_entity (1, 'URI.datatype', 'CDATA'));
   $entity->append_child ($doc->create_xdp_s ("\n\n"));
 
+  ## MODULE.xmlns.extra.attrib
+  $entity->append_child
+    ($doc->create_xdp_entity (1, $prefix.'xmlns.extra.attrib'));
+  $entity->append_child ($doc->create_xdp_s ("\n\n"));
+
   ## MODULE.xmlns.attrib.prefixed
   for ($entity->append_child ($doc->create_xdp_entity
                                       (1, $prefix.'xmlns.attrib.prefixed'))) {
@@ -433,38 +790,76 @@ sub daf_dm_qname_module_content ($$$$) {
   }
   $entity->append_child ($doc->create_xdp_s ("\n\n"));
 
-  ## MODULE.xmlns.extra.attrib
+  ## MODULE.xmlns.attrib.default
+  for ($entity->append_child ($doc->create_xdp_entity
+                                      (1, $prefix.'xmlns.attrib.default'))) {
+    $_->insert_before ($doc->create_xdp_s ("\n\t"), $_->last_child);
+    for ($_->last_child->append_child ($doc->create_xdp_attr_definition)) {
+      $_->append_child ($doc->create_xdp_name ('xmlns'));
+      $_->append_child ($doc->create_xdp_s ("\t"));
+      $_->append_child ($doc->create_xdp_peref ('URI.datatype'));
+      $_->append_child ($doc->create_xdp_s ("\t"));
+      $_->append_child ($doc->create_xdp_rni_keyword ('FIXED'));
+      $_->append_child ($doc->create_xdp_s (' '));
+      $_->append_child ($doc->create_xdp_attr_literal)
+        ->append_child ($doc->create_xdp_peref ($prefix.'xmlns'));
+    }
+  }
+  $entity->append_child ($doc->create_xdp_s ("\n\n"));
+
+  ## MODULE.xmlns.decl.attrib
   $if = $entity->append_child ($doc->create_xdp_if ($prefix.'prefixed'));
   for ($if->first_child) { # true
     for ($_->append_child ($doc->create_xdp_entity
-                                   (1, $prefix.'xmlns.extra.attrib'))) {
+                                   (1, $prefix.'xmlns.decl.attrib'))) {
       $_->insert_before ($doc->create_xdp_s ("\n\t"), $_->last_child);
-      $_->last_child->append_child ($doc->create_xdp_peref
-                                            ($prefix.'xmlns.attrib.prefixed'));
+      for ($_->last_child) {
+        $_->append_child ($doc->create_xdp_peref
+                                  ($prefix.'xmlns.attrib.prefixed'));
+      }
     }
     $_->append_child ($doc->create_xdp_s ("\n"));
   }
   for ($if->last_child) { # false
-    $_->append_child ($doc->create_xdp_entity (1, $prefix.'xmlns.extra.attrib'));
+    for ($_->append_child ($doc->create_xdp_entity
+                                   (1, $prefix.'xmlns.decl.attrib'))) {
+      $_->insert_before ($doc->create_xdp_s ("\n\t"), $_->last_child);
+      for ($_->last_child) {
+        $_->append_child ($doc->create_xdp_peref
+                                  ($prefix.'xmlns.attrib.default'));
+      }
+    }
   }
   $entity->append_child ($doc->create_xdp_s ("\n\n"));
 
-  ## XHTML.xmlns.extra.attrib
-  for ($entity->append_child ($doc->create_xdp_entity
-                                      (1, 'XHTML.xmlns.extra.attrib'))) {
-    $_->insert_before ($doc->create_xdp_s ("\n\t"), $_->last_child);
-    for ($_->last_child) {
-      $_->append_child ($doc->create_xdp_peref ($prefix.'xmlns.extra.attrib'));
+  ## MODULE.xmlns.prefixed.attrib
+  $if = $entity->append_child ($doc->create_xdp_if ($prefix.'prefixed'));
+  for ($if->first_child) { # true
+    for ($_->append_child ($doc->create_xdp_entity
+                                   (1, $prefix.'xmlns.prefixed.attrib'))) {
+      $_->insert_before ($doc->create_xdp_s ("\n\t"), $_->last_child);
+      for ($_->last_child) {
+        $_->append_child ($doc->create_xdp_peref
+                                  ($prefix.'xmlns.attrib.prefixed'));
+      }
     }
+    $_->append_child ($doc->create_xdp_s ("\n"));
   }
-  $entity->append_child ($doc->create_xdp_s ("\n"));
+  for ($if->last_child) { # false
+    $_->append_child ($doc->create_xdp_entity
+                              (1, $prefix.'xmlns.prefixed.attrib'));
+  }
+  $entity->append_child ($doc->create_xdp_s ("\n\n"));
 
   ## NS.decl.attrib
   for ($entity->append_child ($doc->create_xdp_entity (1, 'NS.decl.attrib'))) {
     $_->insert_before ($doc->create_xdp_s ("\n\t"), $_->last_child);
     for ($_->last_child) {
       $_->append_child ($doc->create_xdp_peref
-                                ('XHTML.xmlns.extra.attrib'));
+                                ($prefix.'xmlns.prefixed.attrib'));
+      $_->append_child ($doc->create_xdp_s ("\n\t"));
+      $_->append_child ($doc->create_xdp_peref
+                                ($prefix.'xmlns.extra.attrib'));
     }
   }
   $entity->append_child ($doc->create_xdp_s ("\n\n"));
@@ -485,22 +880,19 @@ sub daf_dm_qname_module_content ($$$$) {
                                    (1, $prefix.'xmlns.attrib'))) {
       $_->insert_before ($doc->create_xdp_s ("\n\t"), $_->last_child);
       for ($_->last_child) {
-        for ($_->append_child ($doc->create_xdp_attr_definition)) {
-          $_->append_child ($doc->create_xdp_name ('xmlns'));
-          $_->append_child ($doc->create_xdp_s ("\t"));
-          $_->append_child ($doc->create_xdp_peref ('URI.datatype'));
-          $_->append_child ($doc->create_xdp_s ("\t"));
-          $_->append_child ($doc->create_xdp_rni_keyword ('FIXED'));
-          $_->append_child ($doc->create_xdp_s (' '));
-          $_->append_child ($doc->create_xdp_attr_literal)
-            ->append_child ($doc->create_xdp_peref ($prefix.'xmlns'));
-        }
+        $_->append_child ($doc->create_xdp_peref
+                                  ($prefix.'xmlns.attrib.default'));
         $_->append_child ($doc->create_xdp_s ("\n\t"));
         $_->append_child ($doc->create_xdp_peref
                                   ('NS.decl.attrib'));
       }
     }
   }
+  $entity->append_child ($doc->create_xdp_s ("\n\n"));
+
+  ## SGML.tag.minimizable
+  $entity->append_child
+             ($doc->create_xdp_entity (1, 'SGML.tag.minimizable', 'IGNORE'));
   $entity->append_child ($doc->create_xdp_s ("\n\n"));
 
   ## module-qname.redecl
@@ -802,6 +1194,16 @@ sub daf_dm_add_attrdefs ($$$) {
         $xdp_al_decl->append_child ($xdp_doc->create_xdp_s ("\n\t"));
       }
       $xdp_al_decl->append_child ($xdp_doc->create_xdp_peref ($long_name));
+    } elsif ($mgcde->is_type_uri (ExpandedURI q<mv:XMLDTDModuleSet>)) {
+      my $long_name = daf_dm_get_entity_name ($mgcde) . '.xmlns.attrib';
+      if (not $xdp_al_decl->has_child_nodes and
+          $xdp_al_decl->manakai_expanded_uri
+              eq ExpandedURI q<xdp:entity-value>) {
+        $xdp_al_decl->previous_sibling->text_content ("\n\t");
+      } else {
+        $xdp_al_decl->append_child ($xdp_doc->create_xdp_s ("\n\t"));
+      }
+      $xdp_al_decl->append_child ($xdp_doc->create_xdp_peref ($long_name));
     } else {
       daf_dm_unsupported_type_error ($mgcde, 'attribute context');
     }
@@ -825,6 +1227,22 @@ sub daf_dm_unsupported_type_error ($$) {
     $DMBelongTo{$res->uri} ||= $mod;
   } # daf_dm_register_component
 
+  sub daf_dm_register_all_components ($$) {
+    my ($res, $mod) = @_;
+    my @list = ($res);
+    while (@list) {
+      my $r = shift @list;
+      next if $DMBelongTo{$r->uri};
+      $DMBelongTo{$r->uri} ||= $mod;
+      push @list, @{daf_dm_get_components ($res)};
+    }
+  } # daf_dm_register_all_components
+
+  sub daf_dm_get_module_group ($) {
+    my $res = shift;
+    return $DMBelongTo{$res->uri};
+  } # daf_dm_get_module_group
+
   my %EntityName;
 
   sub daf_dm_get_entity_name ($;$) {
@@ -837,7 +1255,8 @@ sub daf_dm_unsupported_type_error ($$) {
       $r = daf_dm_get_entity_name ($DMBelongTo{$res->uri});
     } else {
       warn qq[$0: Resource <@{[$res->uri]}> is not referenced from any module\n]
-        unless $res->is_type_uri (ExpandedURI q<mv:XMLDTDModuleSet>);
+        unless $res->is_type_uri (ExpandedURI q<mv:XMLDTDModuleSet>) or
+               $res->is_type_uri (ExpandedURI q<mv:XMLDTDDriver>);
       $r = '';
     }
 
@@ -876,6 +1295,12 @@ sub daf_dm_unsupported_type_error ($$) {
       $v1 = $res->local_name unless defined $v1;
       $r .= '-' . $v1 . (defined $suffix ? $suffix : '.mod');
     } elsif ($res->is_type_uri (ExpandedURI q<mv:XMLDTDModuleSet>)) {
+      my $v1 = $res->get_property_text (ExpandedURI q<mv:id>);
+      my $v2 = $res->get_property_text (ExpandedURI q<mv:vid>);
+      $v1 .= $v2 if defined $v1 and defined $v2;
+      $v1 = $res->local_name unless defined $v1;
+      $r .= uc $v1;
+    } elsif ($res->is_type_uri (ExpandedURI q<mv:XMLDTDDriver>)) {
       my $v1 = $res->get_property_text (ExpandedURI q<mv:id>);
       my $v2 = $res->get_property_text (ExpandedURI q<mv:vid>);
       $v1 .= $v2 if defined $v1 and defined $v2;
