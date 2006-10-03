@@ -43,7 +43,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/09/10 11:19:24 $
+    $Date: 2006/10/03 09:37:36 $
 
   @Require:
     @@Module:
@@ -119,6 +119,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/Element/
   @test:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Test#
+  @thr:
+    http://purl.org/syndication/thread/1.0
   @tx:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/XML/
   @urigen:
@@ -270,8 +272,6 @@ ElementTypeBinding:
       @@@@: s|ElementType
       @@@ForCheck: s|ForML
 
-    @@f:implements: AtomFeature10
-
 ElementTypeBinding:
   @Name: IFClsDef
   @ElementType: 
@@ -299,8 +299,6 @@ ElementTypeBinding:
       @@@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
       @@@ContentType: DISCore|TFPQNames
       @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
-
-    @@f:implements: AtomFeature10
 
 ElementTypeBinding:
   @Name: IFClsConstructDef
@@ -341,7 +339,6 @@ ElementTypeBinding:
       @@@@: mv|ElementContentModel
       @@@ForCheck: mv|ForCM
 
-    @@f:implements: AtomFeature10
 
 ElementTypeBinding:
   @Name: IFQName
@@ -568,6 +565,17 @@ FeatureDef:
     @@enDesc:
       The Atom DOM, version 1.0.
 
+FeatureDef:
+  @featureQName: fe|AtomThreading
+  @QName: AtomThreadingFeature
+  @FeatureVerDef:
+    @@QName: AtomThreadingFeature10
+    @@Version: 1.0
+    @@f:instanceOf: AtomThreadingFeature
+    @@f:requires: fe|AtomFeature10
+    @@enDesc:
+      The Atom Threading Extension DOM, version 1.0.
+
 ## -- Modules
 
 ModuleSetDef:
@@ -708,6 +716,7 @@ IFClsDef:
     methods to create Atom documents.
 
   @f:provides: AtomFeature10
+  @f:implements: AtomFeature10
 
   @Test:
     @@QName: AtomImplementation.interface.test
@@ -1512,6 +1521,98 @@ IFClsDef:
         <QUOTE::reflecting Date child element> attribute should
         be provided for published and created?
       }
+
+  @CODE:
+    @@QName: getReflectAttrNonNegativeIntegerValue
+    @@enDesc:
+      {P:: If a DOM attribute is defined to <DFN::reflect the 
+           non-negative integer value of the <VAR::attr-name> attribute>
+           of the node <VAR::E>, the getter of the attribute <kwd:MUST>
+           return the value defined by the algorithm:
+
+        {OLI:: If the <VAR::E> contains an attribute node <VAR::A> whose name
+               is <VAR::attr-name>:
+
+          = If the <A::Node.nodeValue> of the <VAR::A> is
+            one or more sequence of digits (<CHAR::DIGIT ZERO>, 
+            <CHAR::DIGIT ONE>, ..., <CHAR::DIGIT NINE>) optionally
+            preceding by a <CHAR::PLUS SIGN>, then
+            the attribute getter <kwd:MUST> return a value
+            by interpreting the <A::Node.nodeValue> of the <VAR::A>
+            as a decimal number.
+
+        }
+
+        = If a default value is explicitly defined
+          where this algorithm is referenced, it <kwd:MUST>
+          return the default value.
+
+        = Otherwise, it <kwd:MUST> return a binding-specific
+          default value, if it is defined by the specification
+          of the binding, or <DOM::-1>.
+
+      }
+
+        {NOTE::
+          In Atom Threading Extension <SRC::RFC 4685>,
+          the <CHAR::PLUS SIGN> and leading <CHAR::DIGIT ZERO>s
+          are prohibitted.
+        }
+    @@PerlDef:
+      __DEEP{
+        E: {
+          $r = $node-><M::Element.getAttributeNS> ($namespaceURI, $localName);
+          if (defined $r) {
+            if ($r =~ /\A\+?([0-9]+)\z/) {
+              $r = 0+$1;
+              last E;
+            }
+          }
+
+          $r = $defaultValue;
+          $r = -1 unless defined $r;
+        } # E
+      }__;
+
+  @CODE:
+    @@QName: setReflectAttrNonNegativeIntegerValue
+    @@enDesc:
+      {P:: If a DOM attribute is defined to <DFN::reflect the
+           non-negative integer value
+           of the <VAR::attr-name> attribute> of the node <VAR::E>,
+           the setter of the attribute <kwd:MUST> modify the node as
+           defined by the algorithm:
+
+        = If the given value is <DOM::-1> or one of binding-specific
+          default values, if any, as defined by the specification
+          of the binding, it <kwd:MUST>
+          remove the <VAR::attr-name> attribute node, if any,
+          from the list of attribute nodes of <VAR::E>.
+
+        = Otherwise, it <kwd:MUST> set the <VAR::attr-name>
+          attribute node value to a string representation
+          of the given value as if 
+          the <M::Element.setAttributeNS> method were invoked.
+          The string representation <kwd:MUST> be a decimal
+          number consist of one or more sequence of digits
+          (<CHAR::DIGIT ZERO>, <CHAR::DIGIT ONE>, ..., <CHAR::DIGIT NINE>)
+          <EM::without> any leading <CHAR::DIGIT ZERO>.
+          The <CHAR::PLUS SIGN> <kwd:MUST> be omitted.
+
+      }
+
+        {NOTE::
+          It might throw an exception.
+        }
+    @@PerlDef:
+      __DEEP{
+        if (defined $given and $given >= 0) {
+          $node-><M::Element.setAttributeNS>
+                   ($namespaceURI, $localName, 0+$given);
+        } else {
+          $node-><M::Element.removeAttributeNS> ($namespaceURI, $localName);
+        }
+      }__;
 ##AtomImplementation
 
 IFClsDef:
@@ -1521,6 +1622,7 @@ IFClsDef:
   @IFISA: Document
   @ClsISA: td|ManakaiDOMDocument
 
+  @f:implements: AtomFeature10
   @s:rootElementType: AnyAtomElement||ManakaiDOM|all
 
   @enDesc:
@@ -1552,6 +1654,7 @@ IFClsDef:
   @IFISA: AtomDocument
   @ClsISA: ManakaiAtomDocument
 
+  @f:implements: AtomFeature10
   @s:rootElementType:
     @@@: atom|feed
     @@DISCore:stopISARecursive: 1
@@ -1589,6 +1692,7 @@ IFClsDef:
   @IFISA: AtomDocument
   @ClsISA: ManakaiAtomDocument
 
+  @f:implements: AtomFeature10
   @s:rootElementType:
     @@@: atom|entry
     @@DISCore:stopISARecursive: 1
@@ -1730,6 +1834,7 @@ IFClsDef:
   @IFISA: Element
   @ClsISA: te|ManakaiDOMElement
    
+  @f:implements: AtomFeature10
   @s:elementType: AnyAtomElement||ManakaiDOM|all
 
   @enDesc:
@@ -1799,6 +1904,7 @@ IFClsConstructDef:
   @IFISA: AtomElement
   @ClsISA: ManakaiAtomElement
 
+  @f:implements: AtomFeature10
   @mv:refers: atomCommonAttributes
 
   @cm:
@@ -1940,6 +2046,7 @@ IFClsConstructDef:
   @IFISA: AtomElement
   @ClsISA: ManakaiAtomElement
 
+  @f:implements: AtomFeature10
   @mv:refers: atomCommonAttributes
 
   @cm:
@@ -2096,6 +2203,7 @@ IFClsConstructDef:
   @IFISA: AtomElement
   @ClsISA: ManakaiAtomElement
 
+  @f:implements: AtomFeature10
   @mv:refers: atomCommonAttributes
 
   @cm:
@@ -2203,6 +2311,7 @@ IFClsETDef:
   @IFISA: AtomElement
   @ClsISA: ManakaiAtomElement
 
+  @f:implements: AtomFeature10
   @mv:refers: atomCommonAttributes
 
   @cm:
@@ -2926,6 +3035,7 @@ IFClsETDef:
   @IFISA: AtomElement
   @ClsISA: ManakaiAtomElement
 
+  @f:implements: AtomFeature10
   @mv:refers: atomCommonAttributes
 
   @cm:
@@ -3459,6 +3569,7 @@ IFClsETDef:
   @IFISA: AtomElement
   @ClsISA: ManakaiAtomElement
 
+  @f:implements: AtomFeature10
   @mv:refers: atomCommonAttributes
   
   @cm: atomUriCM
@@ -3473,6 +3584,7 @@ IFClsETDef:
   @IFISA: AtomElement
   @ClsISA: ManakaiAtomElement
 
+  @f:implements: AtomFeature10
   @mv:refers: atomCommonAttributes
 
   @cm: atomUriCM
@@ -3487,6 +3599,7 @@ IFClsETDef:
   @IFISA: AtomElement
   @ClsISA: ManakaiAtomElement
 
+  @f:implements: AtomFeature10
   # no common attribs
   @cm: TextCM
 
@@ -3502,6 +3615,7 @@ IFClsETDef:
   @IFISA: AtomElement
   @ClsISA: ManakaiAtomElement
 
+  @f:implements: AtomFeature10
   # no common attribs
   @cm: atomUriCM
 
@@ -3517,6 +3631,7 @@ IFClsETDef:
   @IFISA: AtomElement
   @ClsISA: ManakaiAtomElement
 
+  @f:implements: AtomFeature10
   # no common attribs
   @cm: atomEmailAddressCM
 
@@ -3532,6 +3647,7 @@ IFClsETDef:
   @IFISA: AtomElement
   @ClsISA: ManakaiAtomElement
 
+  @f:implements: AtomFeature10
   @mv:refers: atomCommonAttributes
 
   @cm: atomUriCM
@@ -3546,6 +3662,7 @@ IFClsETDef:
   @IFISA: AtomElement
   @ClsISA: ManakaiAtomElement
 
+  @f:implements: AtomFeature10
   @mv:refers: atomCommonAttributes
 
   @cm:
@@ -3799,6 +3916,8 @@ IFClsETDef:
 
   @IFISA: AtomPersonConstruct
   @ClsISA: ManakaiAtomPersonConstruct
+
+  @f:implements: AtomFeature10
   @mv:refers: PersonAG
   @mv:elementContentModel: PersonCM
 
@@ -3816,6 +3935,7 @@ IFClsETDef:
   @IFISA: AtomElement
   @ClsISA: ManakaiAtomElement
 
+  @f:implements: AtomFeature10
   @mv:refers: atomCommonAttributes
 
   @cm: undefinedContent
@@ -3933,6 +4053,8 @@ IFClsETDef:
 
   @IFISA: AtomPersonConstruct
   @ClsISA: ManakaiAtomPersonConstruct
+
+  @f:implements: AtomFeature10
   @mv:refers: PersonAG
   @mv:elementContentModel: PersonCM
 
@@ -3951,6 +4073,7 @@ IFClsETDef:
   @IFISA: AtomElement
   @ClsISA: ManakaiAtomElement
 
+  @f:implements: AtomFeature10
   @mv:refers: atomCommonAttributes
 
   @cm:
@@ -4037,6 +4160,7 @@ IFClsETDef:
   @IFISA: AtomElement
   @ClsISA: ManakaiAtomElement
 
+  @f:implements: AtomFeature10
   @mv:refers: atomCommonAttributes
 
   @cm: undefinedContent
@@ -4172,6 +4296,18 @@ IFClsETDef:
       of the <XA::type> attribute> of the node.
     @@Type: DOMString
     @@Get:
+      @@@enDesc:
+        {P:: If the feature <Feature^^DISCore|QName::AtomThreadingFeature10>
+             is supported, the attribute getter <kwd:MUST> return
+             the string <CODE::application/atom+xml> when both of the
+             following conditions are met:
+
+           - The attribute getter would otherwise return <DOM::null>.
+
+           - The <A::AtomLinkElement.rel> attribute contains
+             a string value of <URI^^DISCore|QName::rel|replies>.
+
+        }
       @@@nullCase:
         @@@@enDesc:
           If the algorithm returns <DOM::null>.
@@ -4183,6 +4319,15 @@ IFClsETDef:
           $r => $r,
           $defaultValue => {null},
         }__;
+
+        unless (defined $r) {
+          __DEEP{
+            my $rel = $self-><AG::AtomLinkElement.rel>;
+            if (defined $rel and $rel eq <Q::rel|replies>) {
+              $r = q<application/atom+xml>;
+            }
+          }__;
+        }
     @@Set:
       @@@nullCase:
         @@@@enDesc:
@@ -4195,6 +4340,74 @@ IFClsETDef:
           $localName => 'type',
           $given => $given,
         }__;
+
+    @@Test:
+      @@@QName: AtomLinkElement.type.!rel.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+        my $el = $doc-><M::Document.createElementNS> (<Q::atom|>, 'link');
+
+        $test->id ('implied');
+        my $type0 = $el-><AG::AtomLinkElement.type>;
+        $test->assert_null ($type0);
+
+        $test->id ('explicit');
+        $el-><AS::AtomLinkElement.type> ('application/atom+xml');
+        my $type1 = $el-><AG::AtomLinkElement.type>;
+        $test->assert_equals ($type1, q<application/atom+xml>);
+
+        $test->id ('different');
+        $el-><AS::AtomLinkElement.type> ('application/xhtml+xml');
+        my $type2 = $el-><AG::AtomLinkElement.type>;
+        $test->assert_equals ($type2, q<application/xhtml+xml>);
+    @@Test:
+      @@@QName: AtomLinkElement.type.rel!=replies.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+        my $el = $doc-><M::Document.createElementNS> (<Q::atom|>, 'link');
+
+        $el-><AS::AtomLinkElement.rel> (<Q::rel|alternate>);
+
+        $test->id ('implied');
+        my $type0 = $el-><AG::AtomLinkElement.type>;
+        $test->assert_null ($type0);
+
+        $test->id ('explicit');
+        $el-><AS::AtomLinkElement.type> ('application/atom+xml');
+        my $type1 = $el-><AG::AtomLinkElement.type>;
+        $test->assert_equals ($type1, q<application/atom+xml>);
+
+        $test->id ('different');
+        $el-><AS::AtomLinkElement.type> ('application/xhtml+xml');
+        my $type2 = $el-><AG::AtomLinkElement.type>;
+        $test->assert_equals ($type2, q<application/xhtml+xml>);
+    @@Test:
+      @@@QName: AtomLinkElement.type.rel=replies.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+        my $el = $doc-><M::Document.createElementNS> (<Q::atom|>, 'link');
+
+        $el-><AS::AtomLinkElement.rel> (<Q::rel|replies>);
+
+        $test->id ('implied');
+        my $type0 = $el-><AG::AtomLinkElement.type>;
+        $test->assert_equals ($type0, q<application/atom+xml>);
+
+        $test->id ('explicit');
+        $el-><AS::AtomLinkElement.type> ('application/atom+xml');
+        my $type1 = $el-><AG::AtomLinkElement.type>;
+        $test->assert_equals ($type1, q<application/atom+xml>);
+
+        $test->id ('different');
+        $el-><AS::AtomLinkElement.type> ('application/xhtml+xml');
+        my $type2 = $el-><AG::AtomLinkElement.type>;
+        $test->assert_equals ($type2, q<application/xhtml+xml>);
 
   @ATTR:
     @@Name: hreflang
@@ -4304,6 +4517,8 @@ IFClsETDef:
 
   @IFISA: AtomDateConstruct
   @ClsISA: ManakaiAtomDateConstruct
+
+  @f:implements: AtomFeature10
   @mv:refers: DateAG
   @mv:elementContentModel: DateCM
 
@@ -4324,6 +4539,8 @@ IFClsETDef:
 
   @IFISA: AtomTextConstruct
   @ClsISA: ManakaiAtomTextConstruct
+
+  @f:implements: AtomFeature10
   @mv:refers: TextAG
   @mv:elementContentModel: TextCM
 
@@ -4359,6 +4576,7 @@ IFClsETDef:
   @IFISA: AtomElement
   @ClsISA: ManakaiAtomElement
 
+  @f:implements: AtomFeature10
   @mv:refers: atomCommonAttributes
 
   @cm:
@@ -4573,6 +4791,8 @@ IFClsETDef:
 
   @IFISA: AtomTextConstruct
   @ClsISA: ManakaiAtomTextConstruct
+
+  @f:implements: AtomFeature10
   @mv:refers: TextAG
   @mv:elementContentModel: TextCM
 
@@ -4589,6 +4809,8 @@ IFClsETDef:
 
   @IFISA: AtomTextConstruct
   @ClsISA: ManakaiAtomTextConstruct
+
+  @f:implements: AtomFeature10
   @mv:refers: TextAG
   @mv:elementContentModel: TextCM
 
@@ -4605,6 +4827,8 @@ IFClsETDef:
 
   @IFISA: AtomTextConstruct
   @ClsISA: ManakaiAtomTextConstruct
+
+  @f:implements: AtomFeature10
   @mv:refers: TextAG
   @mv:elementContentModel: TextCM
 
@@ -4621,6 +4845,8 @@ IFClsETDef:
 
   @IFISA: AtomDateConstruct
   @ClsISA: ManakaiAtomDateConstruct
+
+  @f:implements: AtomFeature10
   @mv:refers: DateAG
   @mv:elementContentModel: DateCM
 
@@ -4743,3 +4969,445 @@ ResourceDef:
   @cm: dxm|ANY||ManakaiDOM|all
   @enImplNote:
     (text | anyForeignElement)*
+
+## -- Atom Threading Extension [RFC 4685]
+
+IFClsDef:
+  @IFQName: AtomEntryElementThread
+  @ClsQName: ManakaiAtomEntryElementThread
+
+  @ClsISA: ManakaiAtomEntryElement
+
+  @f:implements: AtomThreadingFeature10
+
+  @enDesc:
+    If the feature <Feature^^DISCore|QName::AtomThreadingFeature10>
+    is supported, any <IF::Element> whose element type
+    is <XE::atom|entry> <kwd:MUST> implement the <IF::AtomEntryElementThread>
+    interface in addition to other appropriate interfaces.
+
+  @Test:
+    @@QName: AtomEntryElementThread.1.test
+    @@PerlDef:
+      my $doc;
+      __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+      my $el = $doc->create_element_ns (<Q::atom|>, 'entry');
+
+      $test->id ('interface');
+      $test->assert_isa ($el, <IFName::AtomEntryElementThread>);
+
+      $test->id ('feature');
+      $test->assert_true ($el->is_supported (<Q::fe|AtomThreading> => '1.0'));
+
+  @Attr:
+    @@Name: threadInReplyToElements
+    @@enDesc:
+      A static list of <XE::thr|in-reply-to> child elements of the node.
+    @@Type: StaticNodeList
+    @@Get:
+      @@@enDesc:
+        It <kwd:MUST> <I::return a <XE::thr|in-reply-to> child element list>
+        of the node.
+      @@@PerlDef:
+        __CODE{returnChildElementList::
+          $node => $self,
+          $namespaceURI => {<Q::thr|>},
+          $localName => 'in-reply-to',
+          $r => $r,
+        }__;
+##AtomEntryElementThread
+
+IFClsETDef:
+  @IFQName: AtomThreadInReplyToElement
+  @ETQName: thr|in-reply-to
+  @ETRQName: thr|in-reply-to
+  @ClsQName: ManakaiAtomThreadInReplyToElement
+
+  @IFISA: AtomDateConstruct
+  @ClsISA: ManakaiAtomDateConstruct
+
+  @f:implements: AtomThreadingFeature10
+  @mv:refers: atomCommonAttributes
+
+  @cm: undefinedContent
+
+  @enDesc:
+    The <XE::thr|in-reply-to> element is used to indicate
+    that an entry is a response to another resource.
+
+    If the entry is a response to multiple resources,
+    additional <XE::thr|in-reply-to> element <kwd:MAY>
+    be used.
+
+    RFC 4685 assigns no significance to the order in which
+    multiple <XE::thr|in-reply-to> element appear within
+    an entry.
+
+  @Test:
+    @@QName: AtomThreadInReplyToElement.1.test
+    @@PerlDef:
+      my $doc;
+      __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+      my $el = $doc->create_element_ns (<Q::thr|>, 'in-reply-to');
+
+      $test->id ('interface');
+      $test->assert_isa ($el, <IFName::AtomThreadInReplyToElement>);
+
+      $test->id ('feature');
+      $test->assert_true ($el->is_supported (<Q::fe|AtomThreading> => '1.0'));
+
+  @ATTR:
+    @@Name: ref
+    @@enDesc:
+      The <XA::ref> attribute of the element.
+
+      It <kwd:MUST> <I::reflect the URI value
+      of the <XA::ref> attribute> of the node.
+
+      The <XA::ref> attribute specifies the persistent,
+      universally unique identifier of the resource being
+      responded to.  The value <kwd:MUST> conform to
+      the same construction and comparison rules as the
+      value of the <XE::atom|id> element.  Though the IRI
+      might use a dereferenceable scheme, processors <kwd:MUST-NOT>
+      assume that it can be dereferenced.
+
+      The <XE::thr|in-reply-to> element <kwd:MUST> contain
+      a <XA::ref> attribute identifying the resource that
+      is being respnoded to.
+
+      If the resource being responded to does not have a persistent,
+      universally unique identifier, the publisher <kwd:MUST> assign an
+      identifier that satisfies all the considerations in Section 4.2.6 of
+      RFC 4287 for use as the value of the <XA::ref> attribute.
+      In that case, if a representation of the resource can be retrieved
+      from an IRI that can be used as a valid atom:id value, then this IRI
+      <kwd:SHOULD> be used as the value of both the <XA::ref> and
+      <XA::href> attributes.
+    @@Type: DOMString
+    @@actualType: DOMURI
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          If the algorithm returns <DOM::null>.
+      @@@PerlDef:
+        __CODE{getReflectAttrURIValue::
+          $node => $self,
+          $namespaceURI => {null},
+          $localName => 'ref',
+          $r => $r,
+          $defaultValue => {null},
+        }__;
+    @@Set:
+      @@@nullCase:
+        @@@@enDesc:
+          Removes the attribute.
+      @@@NodeReadOnlyError:
+      @@@PerlDef:
+        __CODE{setReflectAttrURIValue::
+          $node => $self,
+          $namespaceURI => {null},
+          $localName => 'ref',
+          $given => $given,
+        }__;
+	
+  @ATTR:
+    @@Name: source
+    @@enDesc:
+      The <XA::source> attribute of the element.
+
+      It <kwd:MUST> <I::reflect the URI value
+      of the <XA::source> attribute> of the node.
+
+      The <XA::source> attribute <kwd:MAY> be used to specify the IRI
+      of an Atom Feed or Entry Document containing an 
+      <XE::atom|entry> with an <XE::atom|id> value equal to the
+      value of the <XA::ref> attribute.  The IRI specified <kwd:MUST>
+      be dereferenceable.
+    @@Type: DOMString
+    @@actualType: DOMURI
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          If the algorithm returns <DOM::null>.
+      @@@PerlDef:
+        __CODE{getReflectAttrURIValue::
+          $node => $self,
+          $namespaceURI => {null},
+          $localName => 'source',
+          $r => $r,
+          $defaultValue => {null},
+        }__;
+    @@Set:
+      @@@nullCase:
+        @@@@enDesc:
+          Removes the attribute.
+      @@@NodeReadOnlyError:
+      @@@PerlDef:
+        __CODE{setReflectAttrURIValue::
+          $node => $self,
+          $namespaceURI => {null},
+          $localName => 'source',
+          $given => $given,
+        }__;
+	
+  @ATTR:
+    @@Name: href
+    @@enDesc:
+      The <XA::href> attribute of the element.
+
+      It <kwd:MUST> <I::reflect the URI value
+      of the <XA::href> attribute> of the node.
+
+      The <XA::href> attribute specifies an IRI that may be used
+      to retrieve a representation of the resource being
+      responded to.  The IRI specified <kwd:MUST> be
+      dereferenceable.
+    @@Type: DOMString
+    @@actualType: DOMURI
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          If the algorithm returns <DOM::null>.
+      @@@PerlDef:
+        __CODE{getReflectAttrURIValue::
+          $node => $self,
+          $namespaceURI => {null},
+          $localName => 'href',
+          $r => $r,
+          $defaultValue => {null},
+        }__;
+    @@Set:
+      @@@nullCase:
+        @@@@enDesc:
+          Removes the attribute.
+      @@@NodeReadOnlyError:
+      @@@PerlDef:
+        __CODE{setReflectAttrURIValue::
+          $node => $self,
+          $namespaceURI => {null},
+          $localName => 'href',
+          $given => $given,
+        }__;
+  
+  @ATTR:
+    @@Name: type
+    @@enDesc:
+      The <XA::type> attribute of the element.
+
+      It <kwd:MUST> <I::reflect the string value
+      of the <XA::type> attribute> of the node.
+
+      The <XA::type> attribute <kwd:MAY> be used to provide
+      a hint to the client about the media type of the
+      resource identified by the <XA::href> attribute.
+      The <XA::type> attribute is only meaningful if a
+      corresponding <XA::href> attribute is also provided.
+    @@Type: DOMString
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          If the algorithm returns <DOM::null>.
+      @@@PerlDef:
+        __CODE{getReflectAttrStringValue::
+          $node => $self,
+          $namespaceURI => {null},
+          $localName => 'type',
+          $r => $r,
+          $defaultValue => {null},
+        }__;
+    @@Set:
+      @@@nullCase:
+        @@@@enDesc:
+          Removes the attribute.
+      @@@NodeReadOnlyError:
+      @@@PerlDef:
+        __CODE{setReflectAttrStringValue::
+          $node => $self,
+          $namespaceURI => {null},
+          $localName => 'type',
+          $given => $given,
+        }__;
+##AtomThreadInReplyToElement
+
+IFClsDef:
+  @IFQName: AtomLinkElementThread
+  @ClsQName: ManakaiAtomLinkElementThread
+
+  @ClsISA: ManakaiAtomLinkElement
+
+  @f:implements: AtomThreadingFeature10
+
+  @enDesc:
+    An <XE::atom|link> element with a <XA::rel> attribute value of
+    <XML::replies> may be used to reference a resource where responses
+    to an entry may be found.  If the <XA::type> attribute of the 
+    <XE::atom|link> is omitted, its value is assumed to be 
+    <XML::application/atom+xml>.
+
+    A <XML::replies> link appearing as a child of the <XE::atom|feed>
+    or <XE::atom|source> element indicates that the referenced
+    resource likely contains responses to any of that 
+    feed's entries.  A <XML::replies> 
+    link appearing as a child of an <XE::atom|entry> element
+    indicates that the linked resource likely contains responses
+    specific to that entry.
+
+    If the feature <Feature^^DISCore|QName::AtomThreadingFeature10>
+    is supported, any <IF::Element> whose element type
+    is <XE::atom|link> <kwd:MUST> implement the <IF::AtomLinkElementThread>
+    interface in addition to other appropriate interfaces.
+
+  @Test:
+    @@QName: AtomLinkElementThread.1.test
+    @@PerlDef:
+      my $doc;
+      __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+      my $el = $doc->create_element_ns (<Q::atom|>, 'link');
+
+      $test->id ('interface');
+      $test->assert_isa ($el, <IFName::AtomLinkElementThread>);
+
+      $test->id ('feature');
+      $test->assert_true ($el->is_supported (<Q::fe|AtomThreading> => '1.0'));
+
+  @ATTR:
+    @@Name: threadCount
+    @@enDesc:
+      The <XA::thr|count> attribute of the element.
+
+      It <kwd:MUST> <I::reflect the non-negative integer value
+      of the <XA::thr|count> attribute> of the node.
+
+      An <XE::atom|link> element using the <XML::replies>
+      <XA::rel> attribute value <kwd:MAY> contain 
+      a <XA::thr|count> attribute whose value is a
+      non-negative integer that provides a hint to clients
+      as to the total number of replies contained by the
+      linked resource.  The value is advisory and
+      may not accurately reflect the actual number of replies.
+    @@Type: idl|long||ManakaiDOM|all
+    @@Get:
+      @@@PerlDef:
+        __CODE{getReflectAttrNonNegativeIntegerValue::
+          $node => $self,
+          $namespaceURI => {<Q::thr|>},
+          $localName => 'count',
+          $r => $r,
+          $defaultValue => {null},
+        }__;
+    @@Set:
+      @@@NodeReadOnlyError:
+      @@@PerlDef:
+        __CODE{setReflectAttrNonNegativeIntegerValue::
+          $node => $self,
+          $namespaceURI => {<Q::thr|>},
+          $localName => 'count',
+          $given => $given,
+        }__;
+
+    @@Test:
+      @@@QName: AtomLinkElementThread.threadCount.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+        my $link = $doc->create_element_ns (<Q::atom|>, 'link');
+
+        $test->id ('default');
+        $test->assert_num_equals
+                 (expected_value => -1,
+                  actual_value =>
+                    $link-><AG::AtomLinkElementThread.threadCount>);
+
+        $test->id ('zero');
+        $link-><AS::AtomLinkElementThread.threadCount> (0);
+        $test->assert_num_equals
+                 (expected_value => 0,
+                  actual_value =>
+                    $link-><AG::AtomLinkElementThread.threadCount>);
+        $test->id ('zero.attr');
+        $test->assert_equals ($link->get_attribute_ns (<Q::thr|>, 'count'), '0');
+
+        $test->id ('one');
+        $link-><AS::AtomLinkElementThread.threadCount> (1);
+        $test->assert_num_equals
+                 (expected_value => 1,
+                  actual_value =>
+                    $link-><AG::AtomLinkElementThread.threadCount>);
+        $test->id ('one.attr');
+        $test->assert_equals ($link->get_attribute_ns (<Q::thr|>, 'count'), '1');
+
+        $test->id ('10000');
+        $link-><AS::AtomLinkElementThread.threadCount> (10000);
+        $test->assert_num_equals
+                 (expected_value => 10000,
+                  actual_value =>
+                    $link-><AG::AtomLinkElementThread.threadCount>);
+        $test->id ('10000.attr');
+        $test->assert_equals ($link->get_attribute_ns (<Q::thr|>, 'count'),
+                              '10000');
+
+        $test->id ('+10000');
+        $link->set_attribute_ns (<Q::thr|>, 'thr:count', '+10000');
+        $test->assert_num_equals
+                 (expected_value => 10000,
+                  actual_value =>
+                    $link-><AG::AtomLinkElementThread.threadCount>);
+
+        $test->id ('010000');
+        $link->set_attribute_ns (<Q::thr|>, 'thr:count', '010000');
+        $test->assert_num_equals
+                 (expected_value => 10000,
+                  actual_value =>
+                    $link-><AG::AtomLinkElementThread.threadCount>);
+
+        $test->id ('-100');
+        $link-><AS::AtomLinkElementThread.threadCount> (-100);
+        $test->assert_num_equals
+                 (expected_value => -1,
+                  actual_value =>
+                    $link-><AG::AtomLinkElementThread.threadCount>);
+        $test->id ('-100.attr');
+        $test->assert_false ($link->has_attribute_ns (<Q::thr|>, 'count'));
+
+        $test->id ('120a');
+        $link->set_attribute_ns (<Q::thr|>, 'thr:count', '120a');
+        $test->assert_num_equals
+                 (expected_value => -1,
+                  actual_value =>
+                    $link-><AG::AtomLinkElementThread.threadCount>);
+
+        $test->id ('-1');
+        $link-><AS::AtomLinkElementThread.threadCount> (-1);
+        $test->assert_num_equals
+                 (expected_value => -1,
+                  actual_value =>
+                    $link-><AG::AtomLinkElementThread.threadCount>);
+        $test->id ('-1.attr');
+        $test->assert_false ($link->has_attribute_ns (<Q::thr|>, 'count'));
+
+  @enImplNote:
+    @@ddid: updated
+    @@@:
+      {TODO::
+        <XA::thr|updated> attribute
+      }
+##AtomLinkElementThread
+
+enImplNote:
+  @@ddid: total
+  @@@:
+    {TODO::
+      <XE::thr|total>
+    }
+
+enImplNote:
+  @@ddid: threaddtd
+  @@@:
+    {TODO::
+      DTD impl for threading
+    }

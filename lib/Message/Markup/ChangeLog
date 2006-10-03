@@ -1,3 +1,16 @@
+2006-10-03  Wakaba  <wakaba@suika.fam.cx>
+
+	* Atom.dis (fe|AtomThreading 1.0): New feature.
+	(getReflectAttrNonNegativeIntegerValue,
+	setReflectAttrNonNegativeIntegerValue): New codes.
+	(AtomLinkElement.type): Return |application/atom+xml|
+	if the |type| content attribute is not specified
+	and the |rel| content attribute value is |replies| (and
+	the |fe:AtomThreading| feature is supported).
+	(AtomEntryElementThread): New interface.
+	(AtomThreadInReplyToElement): New interface.
+	(AtoLinkElementThread): New interface.
+
 2006-09-10  Wakaba  <wakaba@suika.fam.cx>
 
 	* Atom.dis (Atom): The |mv:systemIdentifierBaseURI|
