@@ -40,7 +40,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/04/30 07:58:20 $
+      $Date: 2006/11/03 17:53:31 $
     @@ContentType:
       dis:Date.RCS
 
@@ -2719,7 +2719,6 @@ IFCls1Def:
   @IFQName: DOMImplementation
   @ClsQName: ManakaiDOMImplementation
 
-  @ClsISA: tc|ManakaiDOMImplementationTC
   @ClsISA: urigen|ManakaiURIImplementation
   @Implement: ecore|MUErrorTarget||ManakaiDOM|Perl
 
@@ -3253,6 +3252,28 @@ IFCls1Def:
           CORE::warn $err;
         } else {
           $err-><M::ecore|ErrorInterface||ManakaiDOM|Perl.throw>;
+        }
+
+  @Method:
+    @@Operator:
+      @@@@: AUTOLOAD
+      @@@ContentType: DISPerl|Perl
+    @@DISPerl:noParameterModification: 1
+    @@Return:
+      @@@PerlDef:
+        use Message::Util::AutoLoad::Registry;
+        my $al = our $AUTOLOAD;
+        $al =~ s/.+:://;
+        if ($Message::Util::AutoLoad::Registry::Method
+            ->{<ClassName::ManakaiDOMImplementation>}->{$al}) {
+          eval qq{ require $Message::Util::AutoLoad::Registry::Method->{
+              <ClassName::ManakaiDOMImplementation>}->{$al}->{module} };
+          die $@ if $@;
+          no strict 'refs';
+          goto &{$AUTOLOAD};
+        } else {
+          require Carp;
+          Carp::croak (qq<Can't locate method "$AUTOLOAD">);
         }
 ##DOMImplementation
 

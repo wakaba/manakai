@@ -13,7 +13,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/04/03 12:53:27 $
+      $Date: 2006/11/03 17:53:35 $
     @@ContentType:
       dis:Date.RCS
   
@@ -113,6 +113,35 @@ ElementTypeBinding:
     @@lang:en
 
 ## -- Common Programming Language Constructs
+
+ResourceTypeDef:
+  @QName: DISLang|AnyObject
+  @enFN: object
+  @enDesc:
+    A <Q::DISLang|AnyObject> is an object or value in
+    programming languages.
+  @subsetOf: DISCore|Resource
+
+ResourceTypeDef:
+  @QName: DISLang|Object
+  @enFN: object
+  @enDesc:
+    A <Q::DISLang|Object> is an object in object-oriented
+    programming languages.
+  @subsetOf: DISLang|Object
+
+ResourceTypeDef:
+  @QName: DISLang|Value
+  @enFN: value
+  @enDesc:
+    A <Q::DISLang|Value> is a value in programming languages.
+    
+      {NOTE::
+        In some programming language <Q::DISLang|Value>
+        is not an <Q::DISLang|Object>, while in some other language
+        any <Q::DISLang|Value> is an <Q::DISLang|Object>.
+      }
+  @subsetOf: DISLang|AnyObject
 
 ResourceTypeDef:
   @QName: DISLang|AnyDataType
@@ -629,6 +658,46 @@ ResourceDef:
     @@@:
       Dummy role.
   @rdf:type: Role
+
+## -- Class Inheritance
+
+PropDef:
+  @QName: DISLang|extends
+  @enFN: extends
+  @enDesc:
+    The <Q::DISLang|extends> property states that
+    the subject <Q::DISLang|AnyClass> extends
+    the object <Q::DISLang|AnyClass>.
+  @subsetOf: dis|ISA
+
+PropDef:
+  @QName: DISLang|formallyExtends
+  @enFN: formally extends
+  @enDesc:
+    The <Q::DISLang|formallyExtends> property
+    is a subproperty of <Q::DISLang|extends>
+    where the <Q::DISLang|extends> relationship
+    is stated in the formal definition of it.
+  @subsetOf: DISLang|extends
+
+PropDef:
+  @QName: DISLang|informallyExtends
+  @enFN: informally extends
+  @enDesc:
+    The <Q::DISLang|informallyExtends> property
+    is a subproperty of <Q::DISLang|extends>
+    where the <Q::DISLang|extends> relationship
+    is not stated in the formal definition of it.
+  @subsetOf: DISLang|extends
+
+PropDef:
+  @QName: DISLang|implements
+  @enFN: implements
+  @enDesc:
+    The <Q::DISLang|extends> propery states that
+    the subject <Q::DISLang|Class> implements
+    the object <Q::DISLang|Interface>.
+  @subsetOf: dis|Implement
 
 ## -- The lang:dis tree language vocabulary
 

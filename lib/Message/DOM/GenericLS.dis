@@ -13,7 +13,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/04/01 14:41:30 $
+    $Date: 2006/11/03 17:53:32 $
 
   @Require:
     @@Module: 
@@ -26,6 +26,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
   @DOMLS:
     http://suika.fam.cx/~wakaba/archive/2004/dom/ls#
+  @domperl:
+    http://suika.fam.cx/~wakaba/archive/2006/dom/perl/
   @f:
     http://suika.fam.cx/~wakaba/archive/2004/dom/feature#
   @fe:
@@ -98,14 +100,14 @@ ElementTypeBinding:
 ElementTypeBinding:
   @Name: IFISA
   @ElementType:
-    dis:ISA
+    domperl:extends
   @ShadowContent:
     @@ForCheck: ManakaiDOM|ForIF
 
 ElementTypeBinding:
   @Name: ClsISA
   @ElementType:
-    dis:ISA
+    domperl:classExtends
   @ShadowContent:
     @@ForCheck: ManakaiDOM|ForClass
 
@@ -220,6 +222,7 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: test|StandaloneTest
+    @@ForCheck: ManakaiDOM|ForClass
 
 ## -- Implementation
 
@@ -227,8 +230,26 @@ IFClsDef:
   @IFQName: GLSImplementation
   @ClsQName: ManakaiGLSImplementation
 
-  @IFISA: f|MinimumImplementation
-  @ClsISA: f|ManakaiMinimumImplementation
+  @domperl:implementedByObjectsOf: f|MinimumImplementation
+  @domperl:classImplementedByObjectsOf: f|ManakaiMinimumImplementation
+
+  @DISLang:role:
+    @@@: DISLang|NullRole
+    @@DISCore:stopISARecursive: 1
+
+  @ImplNote:
+    @@lang:en
+    @@ddid: domimpl
+    @@@:
+      {TODO::
+        Replace by |DOMImplementation|
+        (see <URI::http://suika.fam.cx/gate/2005/sw/manakai/Issue/1/11>).
+      }
+
+      {TODO::
+        Remove null role once DIS/Perl.dis is revised so that
+        objectsOf no longer inherits roles.
+      }
 
   @enDesc:
     The <IF::GLSImplementation> interface provides
@@ -242,9 +263,21 @@ IFClsDef:
       There is also a JavaScript implementation:
       <URI::http://suika.fam.cx/gate/cvs/www/cx/fam/suika/y2005/LS/Generic.js>.
 
+  @Test:
+    @@QName: GLSImplementation.interface.1.test
+    @@PerlDef:
+      $test->assert_true
+          (<ClassName::f|ManakaiMinimumImplementation>->isa
+              (<IFName::GLSImplementation>));
+  @Test:
+    @@QName: GLSImplementation.class.1.test
+    @@PerlDef:
+      $test->assert_true
+          (<ClassName::f|ManakaiMinimumImplementation>->isa
+              (<IFName::ManakaiGLSImplementation>));
+
   @f:provides: Generic30
   @Test:
-    @@ForCheck: ManakaiDOM|ForClass
     @@enDesc:
       The implementation registry should know this class when the
       module is loaded.
@@ -313,9 +346,8 @@ IFClsDef:
             } # CLS
 
     @@Test:
-      @@@ForCheck: ManakaiDOM|ForClass
       @@@PerlDef:
-        my $impl = <Class::ManakaiGLSImplementation>->_new;
+        my $impl = <Class::f|ManakaiMinimumImplementation>->_new;
         my $v = $impl-><M::GLSImplementation.createGLSParser> ({
             <Q::DOMLS:NoSuchFeature> => '1.0',
         });
@@ -374,9 +406,8 @@ IFClsDef:
             } # CLS
 
     @@Test:
-      @@@ForCheck: ManakaiDOM|ForClass
       @@@PerlDef:
-        my $impl = <Class::ManakaiGLSImplementation>->_new;
+        my $impl = <Class::f|ManakaiMinimumImplementation>->_new;
         my $v = $impl-><M::GLSImplementation.createGLSSerializer> ({
             <Q::DOMLS:NoSuchFeature> => '1.0',
         });

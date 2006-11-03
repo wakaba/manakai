@@ -13,7 +13,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/12/20 12:16:52 $
+      $Date: 2006/11/03 17:53:35 $
     @@ContentType:
       dis:Date.RCS
   
@@ -595,8 +595,13 @@ ResourceTypeDef:
 RPropDef:
   @QName: p|ISA
   @enFN: base class
-  @rdfs:subPropertyOf: dis|ISA
-  @subsetOf: dis|ISA
+  @subsetOf: DISLang|formallyExtends
+  @dataType: DISCore|TFQNames
+  @multipleProperties: DISCore|OrderedList
+
+RPropDef:
+  @QName: p|revISA
+  @enFN: is a super class of
   @dataType: DISCore|TFQNames
   @multipleProperties: DISCore|OrderedList
 
@@ -788,6 +793,15 @@ RPropDef:
     @@@:
       Whether a subject resource should be listed in <Perl::@EXPORT_OK> 
       or not.
+  @dataType: DISCore|Boolean
+  @multipleProperties: DISCore|Single
+
+RPropDef:
+  @QName: p|noParameterModification
+  @enDesc:
+    Indicates that the code to declare subroutine arguments
+    should not be automatically inserted at the begining
+    of the subroutine generated from the resource.
   @dataType: DISCore|Boolean
   @multipleProperties: DISCore|Single
 

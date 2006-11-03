@@ -1,3 +1,16 @@
+2006-11-03  Wakaba  <wakaba@suika.fam.cx>
+
+	* autoload/: New directory.
+
+	* DIS.dis (getPropertyResourceList): Unused |defaultMediaType|
+	parameter is deleted.  New |isaRecursivePropName|
+	and |recursiveISAPropName| parameters are added.
+
+	* PerlCode.dis (addRevISAPackageName, getRevISAPackageName):
+	New methods.
+	(stringify): Support for the rev-ISA packages is added.
+	(getAutoloadDefinitionList): New method.
+
 2006-08-15  Wakaba  <wakaba@suika.fam.cx>
 
 	* DIS.dis (parseString): New |for_arg| parameter is added.

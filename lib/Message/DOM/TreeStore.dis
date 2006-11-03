@@ -12,7 +12,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/08/15 03:54:37 $
+    $Date: 2006/11/03 17:53:33 $
 
   @Require:
     @@Module:
@@ -37,6 +37,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dom/xdt#
   @DOMMain:
     http://suika.fam.cx/~wakaba/archive/2004/dom/main#
+  @domperl:
+    http://suika.fam.cx/~wakaba/archive/2006/dom/perl/
   @dx:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#
   @dxm:
@@ -156,20 +158,6 @@ ElementTypeBinding:
   @ShadowContent:
     @@ForCheck: ManakaiDOM|ForClass
 
-ElementTypeBinding:
-  @Name: IFISA
-  @ElementType:
-    dis:ISA
-  @ShadowContent:
-    @@ForCheck: ManakaiDOM|ForIF
-
-ElementTypeBinding:
-  @Name: ClsISA
-  @ElementType:
-    dis:ISA
-  @ShadowContent:
-    @@ForCheck: ManakaiDOM|ForClass
-
 ## -- Features
 
 ElementTypeBinding:
@@ -249,10 +237,31 @@ IFClsDef:
   @IFQName: DOMImplementationTreeStore
   @ClsQName: ManakaiDOMImplementationTreeStore
 
-  @IFISA: c|DOMImplementation
-  @ClsISA: c|ManakaiDOMImplementation
+  @domperl:implementedByObjectsOf: c|DOMImplementation
+  @domperl:classImplementedByObjectsOf: c|ManakaiDOMImplementation
+
+  @DISLang:role:
+    @@@: DISLang|NullRole
+    @@DISCore:stopISARecursive: 1
+    @@enImplNote:
+      {TODO::
+        Remove this property
+      }
 
   @f:provides: TSFeature30
+
+  @Test:
+    @@QName: DOMImplementationTreeStore.interface.1.test
+    @@PerlDef:
+      $test->assert_true
+          (<Class::c|ManakaiDOMImplementation>->isa
+              (<IFName::DOMImplementationTreeStore>));
+  @Test:
+    @@QName: DOMImplementationTreeStore.class.1.test
+    @@PerlDef:
+      $test->assert_true
+          (<Class::c|ManakaiDOMImplementation>->isa
+              (<IFName::ManakaiDOMImplementationTreeStore>));
 
   @Test:
     @@QName: ImplementationRegistry.getImplementation.1.test
@@ -294,7 +303,7 @@ IFClsDef:
   @CODE:
     @@QName: tst|createImplForTest
     @@PerlDef:
-      $impl = <Class::ManakaiDOMImplementationTreeStore>->_new;
+      $impl = <Class::c|ManakaiDOMImplementation>->_new;
 
   @Method:
     @@Name: createStorableObjectFromNode

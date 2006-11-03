@@ -12,7 +12,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/06/18 04:12:48 $
+    $Date: 2006/11/03 17:53:32 $
 
   @Require:
     @@Module:
@@ -61,6 +61,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dom/xdt#
   @DOMMain:
     http://suika.fam.cx/~wakaba/archive/2004/dom/main#
+  @domperl:
+    http://suika.fam.cx/~wakaba/archive/2006/dom/perl/
   @dx:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#
   @dxm:
@@ -651,6 +653,14 @@ ClsDef:
     The <Class::ManakaiDOMImplementationTC> class implements
     two factory methods to create DOM <IF::Document> or
     <IF::tx|DocumentType> defined in DOM Level 2 or higher.
+
+  @domperl:classImplementedByObjectsOf: c|ManakaiDOMImplementation
+  @Test:
+    @@QName: DOMImplementationTC.class.1.test
+    @@PerlDef:
+      $test->assert_true
+          (<Class::c|ManakaiDOMImplementation>->isa
+              (<ClassName::ManakaiDOMImplementationTC>));
 
   @Test:
     @@QName: Impl.new.mg.test

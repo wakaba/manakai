@@ -44,7 +44,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/04/01 14:41:30 $
+      $Date: 2006/11/03 17:53:32 $
     @@ContentType:
       dis:Date.RCS
   
@@ -89,14 +89,24 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dis/
   @doc:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Document#
+  @domcommon:
+    http://suika.fam.cx/~wakaba/archive/2006/dom/common/
   @DOMCore:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
+  @domes:
+    http://suika.fam.cx/~wakaba/archive/2006/dom/ecmascript/
   @DOMEvents:
     http://suika.fam.cx/~wakaba/archive/2004/dom/events#
+  @domidl:
+    http://suika.fam.cx/~wakaba/archive/2006/dom/idl/ 
+  @domjava:
+    http://suika.fam.cx/~wakaba/archive/2006/dom/java/
   @DOMMain:
     http://suika.fam.cx/~wakaba/archive/2004/dom/main#
   @DOMMetaImpl:
     http://suika.fam.cx/~wakaba/archive/2004/dom/meta#
+  @domperl:
+    http://suika.fam.cx/~wakaba/archive/2006/dom/perl/
   @dx:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#
   @f:
@@ -380,6 +390,190 @@ ForDef:
   @QName: ManakaiDOM|ForSpecPerl
   @ISA: ManakaiDOM|ForSpec
   @ISA: ManakaiDOM|Perl
+
+## --- The Document Object Model Comcepts
+
+DOMConceptDef:
+  @QName: domcommon|DOM
+  @enFN: Document Object Model (DOM)
+  @enDesc:
+    The Document Object Model (DOM).
+
+      {NOTE::
+        The <Q::domcommon|DOM> resource stand for the DOM
+        model rather than (an instance of) <Q::domocommon|Tree>.
+      }
+
+ResourceTypeDef:
+  @QName: domcommon|Binding
+  @enFN: DOM binding
+  @enDesc:
+    A <Q::domcommon|Binding> is a binding of
+    the <Q::domcommon|DOM> for a programming
+    language or environment.
+
+DOMConceptDef:
+  @QName: domjava|Binding
+  @enFN: DOM Java binding
+  @enDesc:
+    The <Q::domjava|Binding> is a <Q::domcommon|Binding>
+    for the Java programming language.
+  @DISCore:resourceType: domcommon|Binding
+
+DOMConceptDef:
+  @QName: domes|Binding
+  @enFN: DOM ECMAScript binding
+  @enDesc:
+    The <Q::domes|Binding> is a <Q::domcommon|Binding>
+    for the ECMAScript programming language.
+  @DISCore:resourceType: domcommon|Binding
+
+DOMConceptDef:
+  @QName: domidl|Binding
+  @enFN: DOM IDL binding
+  @enDesc:
+    The <Q::domidl|Binding> is a (pseudo-)<Q::domcommon|Binding>
+    for the IDL used in DOM specification.
+  @DISCore:resourceType: domcommon|Binding
+
+DOMConceptDef:
+  @QName: domperl|Binding
+  @enFN: manakai's Perl binding of DOM
+  @enDesc:
+    The <Q::domperl|Binding> is a <Q::domcommon|Binding>
+    for the Perl programming language defined for manakai.
+  @DISCore:resourceType: domcommon|Binding
+
+ResourceTypeDef:
+  @QName: domcommon|Tree
+  @enFN: tree
+  @enDesc:
+    A <Q::domcommon|Tree> is a document tree in <Q::domcommon|DOM>.
+
+ResourceTypeDef:
+  @QName: domcommon|Object
+  @enFN: object
+  @enDesc:
+    A <Q::domcommon|Object> is an object.
+
+      {ISSUE::
+        <Q::DISLang|Object> and <Q::DISLang|Value>;
+        objects implementing DOM interfaces and objects not implementing
+        any DOM interface...
+      }
+  @subsetOf: DISLang|AnyObject
+
+ResourceTypeDef:
+  @QName: domcommon|Interface
+  @enFN: DOM interface
+  @enDesc:
+    A <Q::domcommon|Interface> is an <Q::DISLang|Interface>
+    intended to be implemented by <Q::domcommon|DOM> objects.
+  @subsetOf: DISLang|Interface
+
+ResourceTypeDef:
+  @QName: domperl|Interface
+  @enFN: Perl interface
+  @enDesc:
+    A <Q::domperl|Interface> is a <Q::p|Package>
+    with a set of rules that any <Q::domperl|Class> 
+    that <Q::domperl|implements> the <Q::domperl|Interface>
+    <kwd:MUST> satisfy.
+  @subsetOf: domcommon|Interface
+  @subsetOf: p|Package
+
+RPropDef:
+  @QName: domcommon|extends
+  @enFN: extends
+  @enDesc:
+    The <Q::domcommon|extends> property states that
+    the subject <Q::domcommon|Interface> is an
+    extension to the object <Q::domcommon|Interface>.
+  @subsetOf: DISLang|formallyExtends
+
+RPropDef:
+  @QName: domperl|extends
+  @enFN: extends
+  @subsetOf: domcommon|extends
+  @subsetOf: p|ISA
+  @dataType: DISCore|TFPQNames
+  @multipleProperties: DISCore|OrderedList
+
+RPropDef:
+  @QName: domcommon|implementedByObjectsOf
+  @enFN: is implemented by objects implementing
+  @enDesc:
+    The <Q::domcommon|implementedByObjectsOf>
+    property states that the subject <Q::domcommon|Interface>,
+    if supported, must be implemented by any
+    objects implementing the object <Q::domcommon|Interface>.
+  @subsetOf: DISLang|informallyExtends
+
+RPropDef:
+  @QName: domperl|implementedByObjectsOf
+  @enFN: is implemented by objects implementing
+  @subsetOf: domcommon|implementedByObjectsOf
+  @subsetOf: p|revISA
+  @dataType: DISCore|TFPQNames
+  @multipleProperties: DISCore|OrderedList
+
+ResourceTypeDef:
+  @QName: domperl|Class
+  @enFN: Perl class
+  @enDesc:
+    A <Q::domperl|Class> is a <Q::p|Package> that
+    <Q::domperl|implements> zero or more <Q::domperl|Interface>s.
+  @subsetOf: DISLang|Class
+  @subsetOf: p|Package
+
+RPropDef:
+  @QName: domperl|implements
+  @enFN: implements
+  @enDesc:
+    The <Q::domperl|implements> property states that
+    the subject <Q::domperl|Class> satisfies requirements
+    imposed by the object <Q::domperl|Interface>.
+  @subsetOf: DISLang|formallyExtends
+  @dataType: DISCore|TFPQNames
+  @multipleProperties: DISCore|OrderedList
+
+RPropDef:
+  @QName: domperl|classExtends
+  @enFN: extends
+  @subsetOf: p|ISA
+  @dataType: DISCore|TFPQNames
+  @multipleProperties: DISCore|OrderedList
+
+RPropDef:
+  @QName: domperl|classImplementedByObjectsOf
+  @enFN: is implemented by objects implementing
+  @subsetOf: p|revISA
+  @dataType: DISCore|TFPQNames
+  @multipleProperties: DISCore|OrderedList
+
+ElementTypeBinding:
+  @Name: enFN
+  @ElementType:
+    dis:FullName
+  @ShadowContent:
+    @@lang:en
+
+ElementTypeBinding:
+  @Name: DOMConceptDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISCore|Resource
+    @@ForCheck: =ManakaiDOM|all
+
+ElementTypeBinding:
+  @Name: ResourceTypeDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISCore|ResourceType
+    @@subsetOf: DISCore|Resource
+    @@ForCheck: =ManakaiDOM|all
 
 ## -- The DOM "feature" system
 
@@ -3143,8 +3337,15 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@rdf:type:
-      rdf:Property
+    @@DISCore:resourceType: DISCore|Property
+    @@For: =ManakaiDOM|all
+
+ElementTypeBinding:
+  @Name: RPropDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISSource|ResourceProperty
     @@For: =ManakaiDOM|all
 
 ElementTypeBinding:

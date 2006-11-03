@@ -22,7 +22,7 @@ Module:
       @@@Year:2004
       @@@DISCore:author: DISCore|Wakaba
   @Date:
-    $Date: 2006/08/15 12:57:06 $
+    $Date: 2006/11/03 17:53:33 $
   
   @Require:
     @@Module:
@@ -7382,11 +7382,6 @@ IFClsDef:
                 some feature names.
         }
       @@@RaiseException:
-        @@@@@:UNSUPPORTED_MEDIA_TYPE_ERR
-        @@@@enDesc:
-          There is an <Q::dis:AppName> attribute whose media 
-          type is not supported.
-      @@@RaiseException:
         @@@@@: NO_SOURCE_NODE_ERR
         @@@@enDesc:
           This resource definition does not have associated node 
@@ -7906,11 +7901,6 @@ IFClsDef:
       @@@Type: DISPerl|ARRAY||ManakaiDOM|all
       @@@enDesc:
         A list of the property value strings. 
-      @@@RaiseException:
-        @@@@@:UNSUPPORTED_MEDIA_TYPE_ERR
-        @@@@enDesc:
-          There is an attribute whose media
-          type is not supported.
       @@@PerlDef:
         my $pr = $self-><AG::DISAnyResource.database>
                       -><M::DISDatabase.getResource> ($propName);
@@ -7945,11 +7935,6 @@ IFClsDef:
         @@@@enDesc:
           No value has specified. 
       @@@UndeclaredPrefixException:
-      @@@RaiseException:
-        @@@@@:UNSUPPORTED_MEDIA_TYPE_ERR
-        @@@@enDesc:
-          The media type of the attribute node in the source tree
-          corresponding to this resource is not supported. 
       @@@PerlDef:
         __DEEP{
           my $v = $self-><M::DISResourceProp.getPropertyValue>
@@ -7983,11 +7968,20 @@ IFClsDef:
       @@@TrueCase:
         @@@@enDesc:
           If a property value is a resource <VAR::R> and 
-          the resource <VAR::R> <Q::dis:ISA>'s (or inherits) <VAR::S>, then
+          the resource <VAR::R> does <P::recursiveISAPropName> <VAR::S>, then
           the resource <VAR::S> is also a value in the list.
       @@@FalseCase:
         @@@@enDesc:
           Only the resources directly specified as property values is returned.
+    @@NamedParam:
+      @@@Name: recursiveISAPropName
+      @@@Type: DISString
+      @@@enDesc:
+        The URI of the property used when the <P::recursiveISA>
+        option is enabled.
+      @@@nullCase:
+        @@@@enDesc:
+          The default value, <Q::dis|ISA>, is used.
     @@NamedParam:
       @@@Name: isaRecursive
       @@@Type:
@@ -7997,7 +7991,7 @@ IFClsDef:
         of this resource should also be included to the returned list or not.
       @@@TrueCase:
         @@@@enDesc:
-          If this resource <Q::dis:ISA>'s (or inherits) another resource 
+          If this resource does <P::isaRecursivePropName> another resource 
           <VAR::S> and the <VAR::S> resource has a <P::propName>
           property value of <VAR::R>, then the resource <VAR::R>
           is also a value in the list.
@@ -8005,16 +7999,14 @@ IFClsDef:
         @@@@enDesc:
           Only the resource directly specified is the returned.
     @@NamedParam:
-      @@@Name: defaultMediaType
-      @@@Type: ResourceURI
+      @@@Name: isaRecursivePropName
+      @@@Type: DISString
       @@@enDesc:
-        The URI reference of the default media type which is used 
-        when the property value is retrieved from the source tree 
-        and the source tree element does not have its <Q::dis:ContentType>
-        attribute specified. 
+        The URI of the property used when the <P::isaRecursive>
+        option is enabled.
       @@@nullCase:
         @@@@enDesc:
-          Defaulted to <Q::DISCore:QName>.
+          The default value, <Q::dis|ISA>, is used.
     @@Return:
       @@@Type: ResourceList
       @@@enDesc:
@@ -8024,11 +8016,6 @@ IFClsDef:
         \
         }
       @@@UndeclaredPrefixException:
-      @@@RaiseException:
-        @@@@@:UNSUPPORTED_MEDIA_TYPE_ERR
-        @@@@enDesc:
-          The media type of the attribute node in the source tree
-          corresponding to this resource is not supported. 
       @@@PerlDef:
         $r = [];
         __DEEP{
@@ -8059,13 +8046,14 @@ IFClsDef:
               push @$r, @{$p_res-><M::DISResourceProp.getPropertyResourceList>
                                           ($propName, recursive => true,
                                            recursive_isa => $recursiveISA,
-                         ___recursive_isa_done => $opt{___recursive_isa_done},
-                         default_media_type => $defaultMediaType)};
+                         ___recursive_isa_done => $opt{___recursive_isa_done})};
             }
           }__;
         }
         if ($recursiveISA) {
           __DEEP{
+            $recursiveISAPropName = <Q::dis|ISA>
+                unless defined $recursiveISAPropName;
             $opt{___recursive_isa_done} ||= {$self-><AG::anyres.uri> => true};
             my @p_res = @$r;
             for my $p_res (@p_res) {
@@ -8073,20 +8061,21 @@ IFClsDef:
               next if $opt{___recursive_isa_done}->{$p_res_uri};
               $opt{___recursive_isa_done}->{$p_res_uri} = true;
               push @$r, @{$p_res-><M::DISResourceProp.getPropertyResourceList>
-                                          (<Q::dis:ISA>, 
+                                          ($recursiveISAPropName, 
                                            recursive => true,
-                         ___recursive_isa_done => $opt{___recursive_isa_done},
-                         default_media_type => $defaultMediaType)};
+                         ___recursive_isa_done => $opt{___recursive_isa_done})};
             }
           }__;
         }
         if ($isaRecursive) {
           __DEEP{
+            $isaRecursivePropName = <Q::dis|ISA>
+                unless defined $isaRecursivePropName;
             my $self_uri = $self-><AG::anyres.uri>;
             $opt{___recursive_isa_done} ||= {$self_uri => true};
             $opt{___isa_recursive_done} ||= {$self_uri => true};
             my @p_res = @{$self-><M::DISResourceProp.getPropertyResourceList>
-                                      (<Q::dis:ISA>, recursive_isa => false,
+                                      ($isaRecursivePropName, recursive_isa => false,
                                        recursive => false,
                                        default_media_type => <Q::dis:TFQNames>)};
             for my $p_res (@p_res) {
@@ -8098,8 +8087,7 @@ IFClsDef:
                                            recursive => false,
                                        isa_recursive => true,
                                        ___isa_recursive_done =>
-                                                     $opt{___isa_recursive_done},
-                                       default_media_type => $defaultMediaType)};
+                                                     $opt{___isa_recursive_done})};
             }
           }__;
         }

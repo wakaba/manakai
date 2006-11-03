@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/05/13 12:06:21 $
+      $Date: 2006/11/03 17:53:34 $
     @@ContentType:
       dis:Date.RCS
   
@@ -71,6 +71,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dom/main#
   @DOMMetaImpl:
     http://suika.fam.cx/~wakaba/archive/2004/dom/meta#
+  @domperl:
+    http://suika.fam.cx/~wakaba/archive/2006/dom/perl/
   @dp:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#Perl/
   @dv:
@@ -113,6 +115,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/PerlCode#
   @pc2:
     http://suika.fam.cx/~wakaba/archive/2005/12/pc/
+  @p:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Perl#
   @pl:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#Perl--
   @rdf:
@@ -4294,10 +4298,12 @@ TMethods:
                = $factory-><M::PCDocument.createPerlSub>
                             ($self-><AG::DISResourcePerl.plName>);
             
-            ## Method parameters
+          ## Method parameters
+          my @named_param_variables;
+          unless ($self->get_property_boolean
+              (<Q::DISPerl|noParameterModification>)) {
             my $params = $self-><M::DIS|DISResource.getChildResourceList>;
             my @param_variables;
-            my @named_param_variables;
             my $prototype = '$';
             my $is_optional_param = false;
             my $is_named_param = false;
@@ -4396,6 +4402,7 @@ TMethods:
                 $r-><M::Node.appendChild> ($p->[1]);
               }
             }
+          }
  
             ## TODO: in/out
             
@@ -5239,6 +5246,25 @@ TMethods:
                               ($self-><AG::DISResourcePerl
                                          .plFullyQualifiedName>);
             ## - Inheritance
+            my $has_class_extends;
+            for my $scls (@{$self->get_property_resource_list
+                (<Q::domperl|classExtends>)}) {
+              my $spack_name = $scls->pl_fully_qualified_name;
+              if (defined $spack_name) {
+                $r->add_isa_package ($spack_name);
+              } else {
+                __UNDEEP{__EXCEPTION{DIS|NO_PERL_PACKAGE_NAME_ERR::
+                  DIS:uri => {$scls->uri},
+                  DIS:elementType => {<Q::domperl|classExtends>},
+                }__}__;
+              }
+              $self->_pl_add_require_resource ($scls => $r);
+              $has_class_extends = 1;
+            }
+
+            unless ($has_class_extends) {
+              ## TODO: Remove this clause
+
             for my $scls (@{$self-><M::DIS|DISResourceProp
                                      .getPropertyResourceList> (<Q::dis:ISA>)}) {
               my $spack_name = $scls-><AG::DISResourcePerl.plFullyQualifiedName>;
@@ -5254,6 +5280,8 @@ TMethods:
                                                   ($scls => $r);
             }
 
+            }
+
             ## dis:AppISA packages
             for my $spack_name (@{
               $self-><AG::DISResourcePerl.plAdditionalISAPackages>
@@ -5266,6 +5294,8 @@ TMethods:
             ## - Implementing interfaces
             for my $scls (@{$self-><M::DIS|DISResourceProp
                                          .getPropertyResourceList>
+                 ## TODO: change to domperl|classImplements
+                 ##       with recursive_isa_prop_name domperl|extends
                                     (<Q::dis:Implement>, recursive_isa => true,
                                      default_media_type => <Q::dis:TFQNames>)}) {
               my $spack_name = $scls-><AG::DISResourcePerl
@@ -5280,6 +5310,21 @@ TMethods:
               }
             }
     
+            ## - Inheritance (reversed direction)
+            for my $scls (@{$self->get_property_resource_list
+                (<Q::domperl|classImplementedByObjectsOf>)}) {
+              my $spack_name = $scls->pl_fully_qualified_name;
+              if (defined $spack_name) {
+                $r->add_rev_isa_package ($spack_name);
+              } else {
+                __UNDEEP{__EXCEPTION{DIS|NO_PERL_PACKAGE_NAME_ERR::
+                  DIS|uri => {$scls->uri},
+                  DIS|elementType => {<Q::domperl|classImplementedByObjectsOf>},
+                }__}__;
+              }
+              $self->_pl_add_require_resource ($scls => $r);
+            }
+
             ## - Class members
             my @cr = @{$self-><M::DIS|DISResource.getChildResourceList>};
             for my $cr (@cr) {
@@ -5510,6 +5555,7 @@ TMethods:
                           .getPropertyResourceList>
                              (<Q::DISLang:role>, isa_recursive => true,
                               default_media_type => <Q::dis:TypeQName>)}) {
+                ## TODO: isa_recursive_prop_name => domperl|extends
                   if ($role-><M::DIS|DISResource.isSubsetOfURI>
     (<Q::DOMMetaImpl:ImplementationSourceForManakaiDOMImplementationRegistry>)) {
                     $r-><M::DIS|PLBlockCon.appendStatement>

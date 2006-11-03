@@ -39,6 +39,11 @@ sub daf_perl_pm ($$$) {
     print $output $pl->stringify;
     close $output;
     status_msg q<done>;
+
+  require Message::Util::AutoLoad::Config;
+  my $alconf = Message::Util::AutoLoad::Config->new;
+  $alconf->register_all ($pl->owner_document->get_autoload_definition_list);
+  $alconf->save;
 } # daf_perl_pm
 
 1;

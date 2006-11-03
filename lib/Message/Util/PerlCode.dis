@@ -24,7 +24,7 @@ Module:
       @@@Year:2004
       @@@DISCore:author: DISCore|Wakaba
   @Date:
-    $Date: 2006/04/16 10:05:24 $
+    $Date: 2006/11/03 17:53:34 $
   
   @Require:
     @@Module:
@@ -1185,6 +1185,40 @@ IFClsETDef:
         }__;
 
   @Method:
+    @@Name: addRevISAPackage
+    @@enDesc:
+      Adds a class package name into the list of the package
+      name of classes extending this class.
+    @@Param:
+      @@@Name: packageName
+      @@@Type: DOMString
+      @@@enDesc:
+        The package name of the class added to the list.
+    @@Return:
+      @@@PerlDef:
+        __DEEP{
+          my $v = $self->get_attribute_ns (<Q::pc:>, 'extending-classes');
+          $self->set_attribute_ns
+              (<Q::pc:>, 'pc:extending-classes' =>
+               join ' ', (split /\s+/, defined $v ? $v : ''), $packageName);
+        }__;
+
+  @Method:
+    @@Name: getRevISAPackageNameList
+    @@enDesc:
+      Returns a snapshot list of the package names
+      of the classes extending this class.
+    @@Return:
+      @@@Type: DISPerl|ARRAY||ManakaiDOM|all
+      @@@enDesc:
+        An ordered snapshot list of superpackage names.
+      @@@PerlDef:
+        __DEEP{
+          my $v = $self->get_attribute_ns (<Q::pc:>, 'extending-classes');
+          $r = [split /\s+/, defined $v ? $v : ''];
+        }__;
+
+  @Method:
     @@Name: addImplementPackage
     @@enDesc:
       Adds a interface package that this class implements. 
@@ -1247,6 +1281,11 @@ IFClsETDef:
               $r .= 'push our @ISA, ' .
                 <ClassM::ManakaiPCImplementation.perlList> (\@isa) .
                 ";\n";
+            }
+
+            for my $pack_name (@{$self->get_rev_isa_package_name_list}) {
+              $r .= 'push @' . $pack_name . '::ISA, q<' . $pn .
+                  "> unless $pack_name->isa q<$pn>;\n";
             }
 
             ## |use| Perl Modules
@@ -4423,6 +4462,45 @@ IFClsDef:
         $test->id ('packageName');
         $test->assert_equals ($pack-><AG::PerlPackage.packageName>,
                               'Package::Name');
+
+  @Method:
+    @@Name: getAutoloadDefinitionList
+    @@enDesc:
+      Returns a set of definitions for autoloading.
+    @@Return:
+      @@@Type: DISPerl|HASH||ManakaiDOM|all
+      @@@PerlDef:
+        __DEEP{
+          my $file = $self->document_element;
+          my $first_pack;
+          my $first_pack_name;
+          for my $pack (@{$file ? $file->child_nodes : []}) {
+            next unless $pack->can ('get_rev_isa_package_name_list');
+            unless (defined $first_pack) {
+              $first_pack = $pack;
+              $first_pack_name = $first_pack->package_name;
+            }
+            my $rev_isa = $pack->get_rev_isa_package_name_list;
+            next unless @$rev_isa;
+            my $pack_name = $pack->package_name;
+            for my $mem (@{$pack->child_nodes}) {
+              next unless $mem->can ('get_perl_name_list');
+              my $proto = $mem->prototype;
+              for my $name (@{$mem->get_perl_name_list}) {
+                $r->{method}->{$_}->{$name} = {
+                  module => $first_pack_name,
+                  class => $pack_name,
+                  prototype =>  $proto,
+                } for @$rev_isa;
+              }
+            }
+          }
+        }__;
+
+    @@ImplNote:
+      {TODO::
+        Test
+      }
 ##PCDocument
 
 ## -- Implementation

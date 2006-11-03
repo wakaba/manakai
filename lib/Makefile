@@ -11,6 +11,7 @@ CP = cp
 ECHO = -echo
 
 all: 
+	$(CD) $(MANAKAI_LIB_DIR)Message/Util/AutoLoad/ && $(MAKE) all
 	$(CD) $(MANAKAI_LIB_DIR)manakai/ && $(MAKE) all
 	$(CD) $(MANAKAI_LIB_DIR)Message/ && $(MAKE) all
 
@@ -28,5 +29,5 @@ distclean:
 	$(CD) $(MANAKAI_LIB_DIR)manakai/ && $(MAKE) distclean
 	$(CD) $(MANAKAI_LIB_DIR)Message/ && $(MAKE) distclean
 
-## $Date: 2006/03/31 16:44:23 $
+## $Date: 2006/11/03 17:53:31 $
 ## License: Public Domain.

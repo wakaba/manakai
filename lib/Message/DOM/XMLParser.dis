@@ -10,7 +10,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/04/16 10:05:23 $
+    $Date: 2006/11/03 17:53:33 $
 
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
@@ -482,7 +482,7 @@ ClsDef:
     @@PerlDef:
       require Message::DOM::GenericLS;
       $xp = <Class::ManakaiXMLParser>
-              ->new (<Class::gls|ManakaiGLSImplementation>->_new, '');
+              ->new (<Class::f|ManakaiMinimumImplementation>->_new, '');
 
   @Method:
     @@ManakaiDOM:isForInternal:1
