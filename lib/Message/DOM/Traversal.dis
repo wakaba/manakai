@@ -16,7 +16,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/11/04 12:25:13 $
+    $Date: 2006/11/04 17:25:06 $
 
   @Require:
     @@Module:
@@ -502,7 +502,7 @@ IFCls2Def:
         <IFName::f|GetFeature>,
       ) {
         $test->id ($if);
-        $test->assert_isa (<ClassName::ManakaiDOMDocumentTraversal>, $if);
+        $test->assert_isa (<ClassName::td|ManakaiDOMDocument>, $if);
       }
 
   @Test:

@@ -12,7 +12,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/11/03 17:53:33 $
+    $Date: 2006/11/04 17:25:06 $
 
   @Require:
     @@Module:
@@ -240,15 +240,8 @@ IFClsDef:
   @domperl:implementedByObjectsOf: c|DOMImplementation
   @domperl:classImplementedByObjectsOf: c|ManakaiDOMImplementation
 
-  @DISLang:role:
-    @@@: DISLang|NullRole
-    @@DISCore:stopISARecursive: 1
-    @@enImplNote:
-      {TODO::
-        Remove this property
-      }
-
   @f:provides: TSFeature30
+  @f:implements: TSFeature30
 
   @Test:
     @@QName: DOMImplementationTreeStore.interface.1.test
@@ -270,7 +263,7 @@ IFClsDef:
                    ->get_implementation ({<Q::fe|TreeStore> => '3.0'});
       
       $test->id ('DOMImplementationTreeStore');
-      $test->assert_isa ($impl, <IFName::DOMImplementationTreeStore>);
+      $test->assert_isa ($impl, <ClassName::ManakaiDOMImplementationTreeStore>);
 
       $test->id ('DOMImplementationTree');
       $test->assert_isa ($impl, <IFName::c|DOMImplementation>);
@@ -282,7 +275,7 @@ IFClsDef:
                                           Core => '3.0'});
       
       $test->id ('DOMImplementationTreeStore');
-      $test->assert_isa ($impl, <IFName::DOMImplementationTreeStore>);
+      $test->assert_isa ($impl, <ClassName::ManakaiDOMImplementationTreeStore>);
 
       $test->id ('DOMImplementationTree');
       $test->assert_isa ($impl, <IFName::c|DOMImplementation>);
@@ -295,7 +288,7 @@ IFClsDef:
       my $gf = $impl->get_feature (<Q::fe|TreeStore> => '3.0');
 
       $test->id ('DOMImplementationTreeStore');
-      $test->assert_isa ($gf, <IFName::DOMImplementationTreeStore>);
+      $test->assert_isa ($gf, <ClassName::ManakaiDOMImplementationTreeStore>);
 
       $test->id ('DOMImplementationTree');
       $test->assert_isa ($gf, <IFName::c|DOMImplementation>);

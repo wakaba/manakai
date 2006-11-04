@@ -44,7 +44,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/11/04 12:25:11 $
+      $Date: 2006/11/04 17:25:06 $
     @@ContentType:
       dis:Date.RCS
   
@@ -2512,7 +2512,7 @@ minIFClsDef:
       @@@PerlCDef:
         $r = <ClassName::ManakaiImplementationList>->new;
         __DEEP{
-          push @$r, $self->get_implementation;
+          push @$r, $self->get_implementation ($features);
         }__;
 
   @Method:

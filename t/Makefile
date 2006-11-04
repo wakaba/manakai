@@ -110,11 +110,11 @@ dom1core:
 	  $(PERL_TEST_) $(DOMTEST_PERL_DIR)level1/core/$(DOMTEST_FILE).pl
 
 test-module-all: \
-  test-module-charset \
   test-module-dom \
-  test-module-markup \
+  test-module-charset \
   test-module-uri \
-  test-module-util
+  test-module-util \
+  test-module-markup
 
 test-module-charset: $(NS_CHARSET_PT_FILES) $(TEST_PM_FILES)
 	$(PERL_TEST_) charset-*$(PT_SUFFIX)

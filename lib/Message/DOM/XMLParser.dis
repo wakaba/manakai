@@ -10,7 +10,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/11/04 12:25:14 $
+    $Date: 2006/11/04 17:25:07 $
 
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
@@ -17191,8 +17191,7 @@ CParam:
                 $r->{base_uri} = $input-><AG::LSInput.baseURI>
                   unless defined $r->{base_uri};
                 if (defined $r->{base_uri}) {
-                  $r->{document_uri}
-                    = <ClassM::urigen|ManakaiURIReference.new> (\$v)
+                  $r->{document_uri} = $impl->create_uri_reference (\$v)
                         -><M::urigen|URIReference.getAbsoluteReference>
                             ($r->{base_uri})
                         -><AG::urigen|URIReference.uriReference>;

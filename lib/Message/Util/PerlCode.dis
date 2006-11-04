@@ -24,7 +24,7 @@ Module:
       @@@Year:2004
       @@@DISCore:author: DISCore|Wakaba
   @Date:
-    $Date: 2006/11/04 12:25:16 $
+    $Date: 2006/11/04 17:25:10 $
   
   @Require:
     @@Module:
@@ -814,13 +814,13 @@ IFClsDef:
         $test->assert_not_null ($feature);
 
         $test->id ('namespaceURI');
-        $test->assert_null ($feature->namespace_uri);
+        $test->assert_equals ($feature->namespace_uri, <Q::pc|>);
 
         $test->id ('localName');
         $test->assert_equals ($feature->local_name, 'elementType');
 
         $test->id ('pcNamespaceURI');
-        $test->assert_equals ($feature->pc_namespace_uri, 'feature-name');
+        $test->assert_equals ($feature->pc_namespace_uri, '');
 
         $test->id ('pcLocalName');
         $test->assert_equals ($feature->pc_local_name, 'feature-version');
@@ -4566,7 +4566,7 @@ IFClsDef:
     @@QName: createPCDocumentForTest
     @@rdf:type: DISPerl|BlockCode
     @@PerlDef:
-      my $impl = <Class::ManakaiPCImplementation>->_new;
+      my $impl = <Class::c|ManakaiDOMImplementation>->_new;
       $doc = $impl-><M::DOMImpl.createDocument> (<Q::pc:>, 'file');
 
   @Method:
@@ -4760,21 +4760,21 @@ IFClsDef:
       my $impl = $Message::DOM::ImplementationRegistry
                    ->get_implementation ({<Q::Util|PerlCode> => '1.0'});
 
-      $test->assert_isa ($impl, <IFName::PCImplementation>);
+      $test->assert_isa ($impl, <ClassName::ManakaiPCImplementation>);
   @Test:
     @@QName: ImplementationRegistry.PCImplementation.empty.test
     @@PerlDef:
       my $impl = $Message::DOM::ImplementationRegistry
                    ->get_implementation ({<Q::Util|PerlCode> => ''});
 
-      $test->assert_isa ($impl, <IFName::PCImplementation>);
+      $test->assert_isa ($impl, <ClassName::ManakaiPCImplementation>);
   @Test:
     @@QName: ImplementationRegistry.PCImplementation.null.test
     @@PerlDef:
       my $impl = $Message::DOM::ImplementationRegistry
                    ->get_implementation ({<Q::Util|PerlCode> => null});
 
-      $test->assert_isa ($impl, <IFName::PCImplementation>);
+      $test->assert_isa ($impl, <ClassName::ManakaiPCImplementation>);
 
   @Method:
     @@Name: createPCFile

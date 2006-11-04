@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/11/04 12:25:19 $
+      $Date: 2006/11/04 17:25:10 $
     @@ContentType:
       dis:Date.RCS
   
@@ -37,6 +37,8 @@ Module:
     DIS:ForLatest
 
 Namespace:
+  @c:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
   @dd:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#DISDoc/
   @ddel:
@@ -105,8 +107,6 @@ Namespace:
     urn:x-suika-fam-cx:markup:suikawiki:0:10:
   @swcfg21:
     http://suika.fam.cx/~wakaba/archive/2005/swcfg21#
-  @td:
-    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/Document/
   @test:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Test#
   @Util:
@@ -298,9 +298,10 @@ IFClsDef:
 
   @f:provides: DIS|DNLite10
 
-  @domperl:implementedByObjectsOf: td|Document||ManakaiDOM|ManakaiDOMLatest
+  @domperl:implementedByObjectsOf:
+    c|DOMImplementation||ManakaiDOM|ManakaiDOMLatest
   @domperl:classImplementedByObjectsOf:
-    td|ManakaiDOMDocument||ManakaiDOM|ManakaiDOMLatest
+    c|ManakaiDOMImplementation||ManakaiDOM|ManakaiDOMLatest
 
   @enDesc:
     The object implementing the <IF::DISImplementationDNLite>
@@ -1351,7 +1352,7 @@ IFClsDef:
     @@Test:
       @@@ForCheck: ManakaiDOM|ForClass
       @@@PerlDef:
-        my $impl = <Class::DIS|ManakaiDISImplementation>->_new;
+        my $impl = <Class::c|ManakaiDOMImplementation||ManakaiDOM|ManakaiDOMLatest>->_new;
         my $db = $impl-><M::DIS|DISImplementation.createDISDatabase>;
 
         my $node = bless {}, <ClassName::ManakaiDNLElement>;

@@ -13,7 +13,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/11/04 12:25:13 $
+    $Date: 2006/11/04 17:25:06 $
 
   @Require:
     @@Module:
@@ -482,7 +482,7 @@ IFClsDef:
         <IFName::f|GetFeature>,
       ) {
         $test->id ($_);
-        $test->assert_true (<Class::ManakaiDOMXDPDocument>->isa ($_));
+        $test->assert_true (<Class::td|ManakaiDOMDocument>->isa ($_));
       }
 
   @Test:

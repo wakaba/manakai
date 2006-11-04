@@ -1,3 +1,18 @@
+2006-11-05  Wakaba  <wakaba@suika.fam.cx>
+
+	* Element.dis (___get_node_ref): |eval|ed |require|
+	statement was broken.
+
+	* DOMFeature.dis (getImplementationList): Argument
+	is not passed to the |getImplementation| method.
+
+	* TreeStore.dis (DOMImplementationTreeStore): It
+	did not |f:implements| the |TSFeature30| feature.
+
+	* XMLParser.dis: Use |create_uri_reference|
+	method instead of internal |_new| method
+	to create a URI reference object.
+
 2006-11-04  Wakaba  <wakaba@suika.fam.cx>
 
 	* DOMCore.dis (ManakaiDOMImplementation): No longer

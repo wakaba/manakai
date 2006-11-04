@@ -12,7 +12,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/11/04 12:25:21 $
+    $Date: 2006/11/04 17:25:11 $
   
   @Require:
     @@Module:
@@ -37,6 +37,8 @@ Module:
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
 Namespace:
+  @c:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
   @DIS:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#
   @dis:
@@ -73,8 +75,6 @@ Namespace:
     http://www.w3.org/2000/01/rdf-schema#
   @tc:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/TreeCore/
-  @td:
-    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/Document/
   @test:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Test#
   @Util:
@@ -243,8 +243,8 @@ IFClsDef:
   @IFQName: DTImplementation
   @ClsQName: ManakaiDTImplementation
 
-  @domperl:implementedByObjectsOf: td|Document
-  @domperl:classImplementedByObjectsOf: td|ManakaiDOMDocument
+  @domperl:implementedByObjectsOf: c|DOMImplementation
+  @domperl:classImplementedByObjectsOf: c|ManakaiDOMImplementation
 
   @f:provides: DIS|Test10
 
