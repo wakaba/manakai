@@ -13,7 +13,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/11/03 17:53:32 $
+    $Date: 2006/11/04 12:25:13 $
 
   @Require:
     @@Module: 
@@ -22,6 +22,8 @@ Module:
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
 Namespace:
+  @c:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
   @dis:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
   @DOMLS:
@@ -94,20 +96,6 @@ ElementTypeBinding:
   @Name: ClsQName
   @ElementType:
     dis:QName
-  @ShadowContent:
-    @@ForCheck: ManakaiDOM|ForClass
-
-ElementTypeBinding:
-  @Name: IFISA
-  @ElementType:
-    domperl:extends
-  @ShadowContent:
-    @@ForCheck: ManakaiDOM|ForIF
-
-ElementTypeBinding:
-  @Name: ClsISA
-  @ElementType:
-    domperl:classExtends
   @ShadowContent:
     @@ForCheck: ManakaiDOM|ForClass
 
@@ -230,26 +218,8 @@ IFClsDef:
   @IFQName: GLSImplementation
   @ClsQName: ManakaiGLSImplementation
 
-  @domperl:implementedByObjectsOf: f|MinimumImplementation
-  @domperl:classImplementedByObjectsOf: f|ManakaiMinimumImplementation
-
-  @DISLang:role:
-    @@@: DISLang|NullRole
-    @@DISCore:stopISARecursive: 1
-
-  @ImplNote:
-    @@lang:en
-    @@ddid: domimpl
-    @@@:
-      {TODO::
-        Replace by |DOMImplementation|
-        (see <URI::http://suika.fam.cx/gate/2005/sw/manakai/Issue/1/11>).
-      }
-
-      {TODO::
-        Remove null role once DIS/Perl.dis is revised so that
-        objectsOf no longer inherits roles.
-      }
+  @domperl:implementedByObjectsOf: c|DOMImplementation
+  @domperl:classImplementedByObjectsOf: c|ManakaiDOMImplementation
 
   @enDesc:
     The <IF::GLSImplementation> interface provides
@@ -267,13 +237,13 @@ IFClsDef:
     @@QName: GLSImplementation.interface.1.test
     @@PerlDef:
       $test->assert_true
-          (<ClassName::f|ManakaiMinimumImplementation>->isa
+          (<ClassName::c|ManakaiDOMImplementation>->isa
               (<IFName::GLSImplementation>));
   @Test:
     @@QName: GLSImplementation.class.1.test
     @@PerlDef:
       $test->assert_true
-          (<ClassName::f|ManakaiMinimumImplementation>->isa
+          (<ClassName::c|ManakaiDOMImplementation>->isa
               (<IFName::ManakaiGLSImplementation>));
 
   @f:provides: Generic30
@@ -324,6 +294,19 @@ IFClsDef:
           No parser implementation found that supports 
           all of the requested features.
       @@@PerlDef:
+        ## Load modules if necessary
+        for my $fname (keys %$features) {
+          for my $fver (grep {$features->{$fname}->{$_}}
+              keys %{$features->{$fname} or {}}) {
+            if ($Message::Util::AutoLoad::Registry::Feature->{$fname}->{$fver}) {
+              eval qq{require
+                  $Message::Util::AutoLoad::Registry::Feature->{
+                  $fname}->{$fver}->{module}};
+              die $@ if $@;
+            }
+          }
+        }
+
             CLS: for my $class (grep {
               $Message::DOM::DOMLS::ParserClass{$_}
             } keys %Message::DOM::DOMLS::ParserClass) {
@@ -347,7 +330,7 @@ IFClsDef:
 
     @@Test:
       @@@PerlDef:
-        my $impl = <Class::f|ManakaiMinimumImplementation>->_new;
+        my $impl = <Class::c|ManakaiDOMImplementation>->_new;
         my $v = $impl-><M::GLSImplementation.createGLSParser> ({
             <Q::DOMLS:NoSuchFeature> => '1.0',
         });
@@ -384,6 +367,19 @@ IFClsDef:
           No serializer implementation found that supports 
           all of the requested features.
       @@@PerlDef:
+        ## Load modules if necessary
+        for my $fname (keys %$features) {
+          for my $fver (grep {$features->{$fname}->{$_}}
+              keys %{$features->{$fname} or {}}) {
+            if ($Message::Util::AutoLoad::Registry::Feature->{$fname}->{$fver}) {
+              eval qq{require
+                  $Message::Util::AutoLoad::Registry::Feature->{
+                  $fname}->{$fver}->{module}};
+              die $@ if $@;
+            }
+          }
+        }
+
             CLS: for my $class (grep {
               $Message::DOM::DOMLS::SerializerClass{$_}
             } keys %Message::DOM::DOMLS::SerializerClass) {
@@ -407,7 +403,7 @@ IFClsDef:
 
     @@Test:
       @@@PerlDef:
-        my $impl = <Class::f|ManakaiMinimumImplementation>->_new;
+        my $impl = <Class::c|ManakaiDOMImplementation>->_new;
         my $v = $impl-><M::GLSImplementation.createGLSSerializer> ({
             <Q::DOMLS:NoSuchFeature> => '1.0',
         });

@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/11/03 17:53:34 $
+      $Date: 2006/11/04 12:25:20 $
     @@ContentType:
       dis:Date.RCS
   
@@ -302,6 +302,11 @@ ElementTypeBinding:
 IFClsDef: 
   @IFQName: DISImplementationPerl
   @ClsQName: ManakaiDISImplementationPerl
+
+  @domperl:implementedByObjectsOf:
+    c|DOMImplementation||ManakaiDOM|ManakaiDOMLatest
+  @domperl:classImplementedByObjectsOf:
+    c|ManakaiDOMImplementation||ManakaiDOM|ManakaiDOMLatest
 
   @enDesc:
     The object implementing <IF::DISImplementationPerl> interface
@@ -5325,6 +5330,16 @@ TMethods:
               $self->_pl_add_require_resource ($scls => $r);
             }
 
+            ## - Required modules
+            for my $val (@{$self->get_property_value_list
+                (<Q::p|require>)}) {
+              if ($val->can ('get_resource')) {
+                $self->_pl_add_require_resource ($val->get_resource => $r);
+              } else {
+                $r->add_require_perl_module_name ($val->value);
+              }
+            }
+
             ## - Class members
             my @cr = @{$self-><M::DIS|DISResource.getChildResourceList>};
             for my $cr (@cr) {
@@ -5523,7 +5538,7 @@ TMethods:
                 FI: for my $feature (@{$cls-><M::DIS|DISResourceProp
                           .getPropertyResourceList>
                              (<Q::f:implements>,
-                              isa_recursive => true)}) {
+                              isa_recursive => true)}) { ## TODO: isa_recursive_prop_name
                   my $furi = $feature-><AG::DIS|DISAnyResource.uri>;
                   next FI if $fdup{$furi};
                   $fdup{$furi} = true;
@@ -5542,6 +5557,11 @@ TMethods:
                       ('$Message::DOM::DOMFeature::ClassInfo'.
                        '->{q<' . $pack_name . '>}->{has_feature}' .
                        ' = ' . <ClassM::PLImplClass.perlLiteral> (\%ifeature));
+                for my $fname (keys %ifeature) {
+                  for my $fver (keys %{$ifeature{$fname}}) {
+                    $pack->add_implemented_feature ($fname => $fver); 
+                  }
+                }
 
                 ## TODO: Features from implementing interfaces.
 
@@ -5594,10 +5614,9 @@ TMethods:
                       $ns = '' unless defined $ns;
                         ## ISSUE: Is NULL-namespace should be allowed here?
                       $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::DOM::DOMFeature::ClassInfo->{' .
-                           'q<Message::DOM::Element::ManakaiDOMElement>'.
-                           '}->{compat_class_by_type}->{q<' . $ns .
-                           '>}->{q<' . $ln . '>}->{q<' . $pack_name . '>} = 1');
+                          ('$Message::DOM::Element::ElementClass'.
+                           "->{q<$ns>}->{q<$ln>} = q<$pack_name>");
+                      $pack->add_implemented_element_type ($ns, $ln);
                     }
                     $r-><M::DIS|PLBlockCon.appendStatement>
                           ('$Message::DOM::DOMFeature::ClassInfo->{'.

@@ -22,7 +22,7 @@ Module:
       @@@Year:2004
       @@@DISCore:author: DISCore|Wakaba
   @Date:
-    $Date: 2006/11/03 17:53:33 $
+    $Date: 2006/11/04 12:25:15 $
   
   @Require:
     @@Module:
@@ -64,6 +64,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dom/ls#
   @DOMMain:
     http://suika.fam.cx/~wakaba/archive/2004/dom/main#
+  @domperl:
+    http://suika.fam.cx/~wakaba/archive/2006/dom/perl/
   @dp:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#Perl/
   @dv:
@@ -350,10 +352,9 @@ IFClsDef:
   @IFQName: DISImplementation
   @ClsQName: ManakaiDISImplementation
 
-  @ClsISA:
-    swcfg21:ManakaiSWCFGImplementation::swcfg21:ForLatest
-  @ClsISA: dp|ManakaiDISImplementationPerl
-  @ClsISA: dv|ManakaiDISImplementationValue
+  @domperl:implementedByObjectsOf: DOMImpl
+  @domperl:classImplementedByObjectsOf:
+    c|ManakaiDOMImplementation||ManakaiDOM|ManakaiDOMLatest
 
   @Description:
     @@lang:en
@@ -689,7 +690,7 @@ IFClsDef:
       }
     @@Param:
       @@@Name: impl
-      @@@Type: DOMFeature|MinimumImplementation||ManakaiDOM|ManakaiDOMLatest
+      @@@Type: DOMImpl
       @@@enDesc:
         An implementation object.  The <M::DOMFeature|GetFeature.getFeature>
         method with parameter values <Feature::DIS|Core> and
@@ -3643,9 +3644,9 @@ IFClsDef:
           No event handler is read.
     @@NamedParam:
       @@@Name: implementation
-      @@@Type: MinImpl
+      @@@Type: DOMImpl
       @@@enDesc:
-        The <IF::MinImpl> object to which the database belongs.
+        The <IF::DOMImpl> object to which the database belongs.
         It might be used to create property value objects.
     @@Return:
       @@@RaiseException:
@@ -4760,9 +4761,9 @@ IFClsDef:
           No event handler is read.
     @@NamedParam:
       @@@Name: implementation
-      @@@Type: MinImpl
+      @@@Type: DOMImpl
       @@@enDesc:
-        The <IF::MinImpl> object to which the database belongs.
+        The <IF::DOMImpl> object to which the database belongs.
         It might be used to create property value objects.
     @@Return:
       @@@RaiseException:
@@ -7713,10 +7714,6 @@ PropDef:
     rdf:Resource
   @rdfs:domain: 
     ManakaiDOM:Class
-
-ResourceDef:
-  @QName: MinImpl
-  @AliasFor: f|MinimumImplementation||ManakaiDOM|ManakaiDOMLatest
 
 ResourceDef:
   @QName: GetFeature

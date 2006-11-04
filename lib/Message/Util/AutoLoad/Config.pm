@@ -11,7 +11,7 @@ a way to register a Perl module to the autoload registry.
 
 use strict;
 package Message::Util::AutoLoad::Config;
-our $VERSION = do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 use Data::Dumper;
 our $Modified;
@@ -105,12 +105,27 @@ A set of autoload definitions.
 
 sub register_all ($$) {
   my ($self, $list) = @_;
+
   for my $class (keys %{$list->{method} or {}}) {
     for my $method (keys %{$list->{method}->{$class}}) {
       $Message::Util::AutoLoad::Registry::Method->{$class}->{$method}
           = $list->{method}->{$class}->{$method};
       $Modified = 1;
     }
+  }
+
+  for my $fname (keys %{$list->{feature} or {}}) {
+    $Message::Util::AutoLoad::Registry::Feature->{$fname}->{$_}
+        = $list->{feature}->{$fname}->{$_}
+        for keys %{$list->{feature}->{$fname}};
+    $Modified = 1;
+  }
+
+  for my $nsuri (keys %{$list->{element_type} or {}}) {
+    $Message::Util::AutoLoad::Registry::ElementType->{$nsuri}->{$_}
+        = $list->{element_type}->{$nsuri}->{$_}
+        for keys %{$list->{element_type}->{$nsuri}};
+    $Modified = 1;
   }
 } # register_all
 
@@ -137,10 +152,22 @@ use strict;
 
 EOH
 
+  local $Data::Dumper::Sortkeys = 1;
+
   ## Method-to-module mapping
   my $method = Dumper ($Message::Util::AutoLoad::Registry::Method);
   $method =~ s/\$VAR1/our \$Method/;
   $r .= $method;
+
+  ## Feature-to-module mapping
+  my $feature = Dumper ($Message::Util::AutoLoad::Registry::Feature);
+  $feature =~ s/\$VAR1/our \$Feature/;
+  $r .= $feature;
+
+  ## Element-type-to-module mapping
+  my $et = Dumper ($Message::Util::AutoLoad::Registry::ElementType);
+  $et =~ s/\$VAR1/our \$ElementType/;
+  $r .= $et;
 
   ## Method prototype declarations for |can| method
   my $clean = sub {
@@ -162,7 +189,7 @@ EOH
       my $class_name = $clean->($m->{class});
       $class_methods->{$class_name}->{$method_name}
           = defined $m->{prototype} ? " ($m->{prototype})" : '';
-      $class_revisas->{$class_name}->{$pack_name} = 1;
+      $class_revisas->{$class_name}->{$pack_name} = $clean->($m->{module});
     }
   }
   for my $class_name (keys %$class_methods) {
@@ -176,9 +203,20 @@ EOH
     for my $pack_name (keys %{$class_revisas->{$class_name}}) {
       $r .= "push \@${pack_name}::ISA, '$class_name'
           unless $pack_name->isa ('$class_name');\n";
-      $al_pack_name ||= $pack_name;
+      $al_pack_name ||= $class_revisas->{$class_name}->{$pack_name};
     }
-    $r .= "*${class_name}::AUTOLOAD = \\&${al_pack_name}::AUTOLOAD;\n";
+    $r .= <<EOH;
+sub ${class_name}::AUTOLOAD {
+  require $al_pack_name;
+  no strict 'refs';
+  if ($class_name->can (\$${class_name}::AUTOLOAD)) {
+    goto &{\$${class_name}::AUTOLOAD};
+  } else {
+    require Carp;
+    Carp::croak (qq<Can't locate method "\$${class_name}::AUTOLOAD">);
+  }
+}
+EOH
   }
 
 $r .= <<EOH;
@@ -216,4 +254,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2006/11/03 17:53:34 $
+1; # $Date: 2006/11/04 12:25:19 $

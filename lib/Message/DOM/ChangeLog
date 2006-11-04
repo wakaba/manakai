@@ -1,6 +1,70 @@
 2006-11-04  Wakaba  <wakaba@suika.fam.cx>
 
 	* DOMCore.dis (ManakaiDOMImplementation): No longer
+	explicitly inherits |urigen:ManakaiURIImplementation| (and
+	the |f:ManakaiMinimumImplementation| class inherited
+	by it).  The |f:Minimum| feature is ever implemented
+	for compatibility (but is expected to be removed).
+	Internal methods such as |___report_error| are copied from
+	obsolete |f:MinimumImplementation| class.  DOM3
+	methods |hasFeature| and |getFeature| are also
+	moved from that class, but they now support no
+	foreign classes.
+
+	* DOMFeature.dis (ManakaiImplementationSource): It
+	now |p:require|s |Message::Util::AutoLoad::Registry|.
+	The class no longer support classes
+	other than |ManakaiDOMImplementation|.  Note 
+	that the |ImplementationRegistry| object does continue
+	to support foreign classes via foreign classes
+	implementing |ImplementationSource|
+	or |DOMImplementationSource| interface.
+	(MinimumImplementation): Removed.
+
+	* DOMLS.dis (ManakaiDOMImplementationLS): It no
+	longer inherit the |ManakaiDOMImplementation|; it
+	is now expected to be implemented by |DOMImplementation|
+	objects.
+
+	* DOMMain.dis (null): Removed.
+
+	* Document.dis (___create_node_ref): It no
+	longer support foreign classes other
+	than |Message::DOM::Document::ManakaiDOMDocument|.
+	Note that document format specific DOM
+	interfaces, if supported, should be
+	all instances of the |Document| interface
+	in the implementation, as defined
+	in the Web Applications 1.0 specification (where
+	the |HTMLDocument| interface must be implemented
+	by all |Document| objects, even if the |Document|
+	contains no HTML element).
+
+	* GenericLS.dis (GLSImplementation): It no
+        longer inherit the |MinimumImplementation|; it
+        is now expected to be implemented by |DOMImplementation|
+        objects.
+	(createGLSParser, createGLSSerializer): Load
+	module implementing parser or serializer
+	if necessary.
+
+	* Traversal.dis (ManakaiDOMDocumentTraversal): It no
+	longer inherits the |ManakaiDOMDocument|; it
+	is now expected to be implemented by |Document|
+	objects.
+
+	* XDP.dis (XDPDocument): It no longer
+	inherits the |Document|; it is now expected
+	to be implemented by all |Document| objects.
+
+	* XDoctype.dis (ManakaiDOMDocumentXDoctype): It no
+        longer inherits the |ManakaiDOMDocument|; it
+        is now expected to be implemented by |Document|
+        objects.
+
+2006-11-04  Wakaba  <wakaba@suika.fam.cx>
+
+	* DOMCore.dis (ManakaiDOMImplementation): No longer
 	explicitly inherits |tc:ManakaiDOMImplementationTC|.
 	(ManakaiDOMImplementation.AUTOLOAD): New method definition.
 

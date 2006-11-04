@@ -44,7 +44,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/11/03 17:53:32 $
+      $Date: 2006/11/04 12:25:11 $
     @@ContentType:
       dis:Date.RCS
   
@@ -77,10 +77,15 @@ Module:
     @@Module:
       @@@QName: DISlib|Test
       @@@WithFor: ManakaiDOM|all
+    @@Module:
+      @@@QName: MDOM|DOMCore
+      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
   @DefaultFor:
     ManakaiDOM:ManakaiDOMLatest
 
 Namespace:
+  @c:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
   @def:
     http://suika.fam.cx/~wakaba/archive/2004/dom/feature#spec.
   @dis:
@@ -2380,6 +2385,11 @@ minIFClsDef:
   
   @DISLang:role: DOMMetaImpl|ManakaiDOMImplementationSourceRole
 
+  @p:require:
+    @@ContentType: DISPerl|Perl
+    @@@:
+      Message::Util::AutoLoad::Registry
+
   @enDesc:
     The objects implementing <IF::ImplementationSource> interface provides 
     access to available implementations.  The 
@@ -2417,79 +2427,18 @@ minIFClsDef:
             @@@@@@: 
               This source has no implementation that supports the 
               desired features and versions.
-        @@@PerlCDef:
-            my $debug = $Message::DOM::DOMFeature::DEBUG
-                      ? sub ($@) { print STDERR (('  ' x shift), @_) }
-                      : sub ($@) {};
-            CLS: for my $class (grep {
-              $Message::DOM::ManakaiDOMImplementationSource::SourceClass{$_}
-            } keys %Message::DOM::ManakaiDOMImplementationSource::SourceClass) {
-              $debug->(1, qq<Class "$class"...\n>);
-              __CODE{makeClassISAList:: $CLASS => $class}__;
-              for my $fname (keys %$features) {
-                my $fkey = $fname;
-                my $plus = $fname =~ s/^\+// ? true : false;
-                $debug->(2, qq<Feature "$fname">, ($plus?'+':''), qq<,\n>);
-                FVER: for my $fver (grep {$features->{$fkey}->{$_}}
-                                       keys %{$features->{$fkey}}) {
-                  $debug->(3, qq<version "$fver"...\n>);
-                  if ($Message::DOM::DOMFeature::ClassInfo->{$class}
-                          ->{has_feature}->{$fname}->{$fver}) {
-                    $debug->(4, qq<found in "$class">);
-                    next FVER; # Feature/version found
-                  } else {
-                    for my $cls ($class, @{$Message::DOM::ClassISA{$class}}) {
-                      if ($Message::DOM::ImplFeature{$class}->{$fname}->{$fver} ||=
-                             ## (Caching)
-                          $Message::DOM::ImplFeature{$cls}->{$fname}->{$fver}) {
-                        $debug->(4, qq<found in "$cls"\n>);
-                        next FVER; # Feature/version found
-                      }
-                    }
-                  }
-
-                  if ($plus) {
-                    ## If it is a class compatible with
-                    ## the class |ManakaiMinimumImplementation|
-                    if ($Message::DOM::DOMFeature::ClassInfo
-                          ->{<ClassName::ManakaiMinimumImplementation>}
-                          ->{compat_class}->{$class}) {
-                      my %compat_cls;
-                      for my $cls (grep {
-                        $Message::DOM::DOMFeature::ClassInfo
-                          ->{<ClassName::ManakaiMinimumImplementation>}
-                          ->{compat_class}->{$_}
-                      } keys %{
-                        $Message::DOM::DOMFeature::ClassInfo
-                          ->{<ClassName::ManakaiMinimumImplementation>}
-                          ->{compat_class}
-                      }) {
-                        next if $compat_cls{$cls};
-                        __CODE{makeClassISAList:: $CLASS => $cls}__;
-                        for my $c (@{$Message::DOM::ClassISA{$cls}}) {
-                          $compat_cls{$c} = true;
-                        }                 
-                      }
-                      for my $cls (keys %compat_cls) {
-                        if ($Message::DOM::DOMFeature::ClassInfo->{$cls}
-                                ->{has_feature}->{$fname}->{$fver} or
-                            $Message::DOM::ImplFeature{$cls}
-                                ->{$fname}->{$fver}) {
-                          $debug->(4, qq<found+ in "$cls"\n>);
-                          next FVER; # +Feature/ver found
-                        }
-                      }
-                    }
-                  }
-                  $debug->(2, qq<not found\n>);
-                  next CLS; # Not found
-                } # FVER
-              } # FNAME
-
-              ## Class found
-              $r = $class->_new;
-              last CLS;    ## NOTE: Method name directly written
-            } # CLS
+      @@@PerlCDef:
+        for my $feature (keys %$features) {
+          my $fkey = $feature;
+          my $plus = $feature =~ s/^\+// ? 1 : 0;
+          for my $version (grep {$features->{$fkey}->{$_}}
+              keys %{$features->{$fkey}}) {
+            if ($Message::Util::AutoLoad::Registry::Feature
+                ->{$feature}->{$version}) {
+              $r = <Class::c|ManakaiDOMImplementation>->_new;
+            }
+          }
+        }
 
   @Method:
      @@Name:  getDOMImplementation
@@ -2560,70 +2509,11 @@ minIFClsDef:
           @@@@@:
             A list of implementations that support the desired 
             features and versions.
-        @@@PerlCDef:
-            $r = <ClassName::ManakaiImplementationList>->new;
-            CLS: for my $class (grep {
-              $Message::DOM::ManakaiDOMImplementationSource::SourceClass{$_}
-            } keys %Message::DOM::ManakaiDOMImplementationSource::SourceClass) {
-              __CODE{makeClassISAList:: $CLASS => $class}__;
-              for my $fname (keys %$features) {
-                my $fkey = $fname;
-                my $plus = $fname =~ s/^\+// ? true : false;
-                FVER: for my $fver (grep {$features->{$fkey}->{$_}}
-                                       keys %{$features->{$fkey}}) {
-                  if ($Message::DOM::DOMFeature::ClassInfo->{$class}
-                          ->{has_feature}->{$fname}->{$fver}) {
-                    next FVER; # Feature/version found
-                  } else {
-                    for my $cls ($class, @{$Message::DOM::ClassISA{$class}}) {
-                      if ($Message::DOM::ImplFeature{$class}->{$fname}->{$fver} ||=
-                             ## (Caching)
-                          $Message::DOM::ImplFeature{$cls}->{$fname}->{$fver}) {
-                        next FVER; # Feature/version found
-                      }
-                    }
-                  }
-
-                  if ($plus) {
-                    ## If it is a class compatible with
-                    ## the class |ManakaiMinimumImplementation|
-                    if ($Message::DOM::DOMFeature::ClassInfo
-                          ->{<ClassName::ManakaiMinimumImplementation>}
-                          ->{compat_class}->{$class}) {
-                      my %compat_cls;
-                      for my $cls (grep {
-                        $Message::DOM::DOMFeature::ClassInfo
-                          ->{<ClassName::ManakaiMinimumImplementation>}
-                          ->{compat_class}->{$_}
-                      } keys %{
-                        $Message::DOM::DOMFeature::ClassInfo
-                          ->{<ClassName::ManakaiMinimumImplementation>}
-                          ->{compat_class}
-                      }) {
-                        next if $compat_cls{$cls};
-                        __CODE{makeClassISAList:: $CLASS => $cls}__;
-                        for my $c (@{$Message::DOM::ClassISA{$cls}}) {
-                          $compat_cls{$c} = true;
-                        }                 
-                      }
-                      for my $cls (keys %compat_cls) {
-                        if ($Message::DOM::DOMFeature::ClassInfo->{$cls}
-                                ->{has_feature}->{$fname}->{$fver} or
-                            $Message::DOM::ImplFeature{$cls}
-                                ->{$fname}->{$fver}) {
-                          next FVER; # +Feature/ver found
-                        }
-                      }
-                    }
-                  }
-                  next CLS; # Not found
-                } # FVER
-              } # FNAME
-
-              ## Class found
-              push @$r, $class->_new;
-              last CLS;                 ## NOTE: Method name directly written
-            } # CLS
+      @@@PerlCDef:
+        $r = <ClassName::ManakaiImplementationList>->new;
+        __DEEP{
+          push @$r, $self->get_implementation;
+        }__;
 
   @Method:
      @@Name:  getDOMImplementationList
@@ -2681,392 +2571,11 @@ ResourceDef:
 
 ## -- Simplified DOMImplementation interface
 
-minIFClsDef:
-  @IFQName: MinimumImplementation
-  @ClsQName: ManakaiMinimumImplementation
-
-  @Implement: GetFeature
-  @ISA:
-    @@@@: GetFeature
-    @@@ForCheck: ManakaiDOM|ForIF
-
-  @DISLang:role: mg|NodeRefRole
-  @DISLang:role: f|ManakaiMinimumImplementationCompatible
-
-  @f:provides: min30
-
-  @Description:
-    @@lang:en
-    @@@:
-      The <IF::MinimumImplementation> interface 
-      is a subset of the DOM Level 3 <IF::DOMCore:DOMImplementation>
-      interface.  This interface provides only two methods:
-      <M::GetFeature.hasFeature> (DOM Level 1) and
-      <M::GetFeature.getFeature> (DOM Level 3).
-
-  @Test:
-    @@QName: MinimumImplementation.from.ImplementationList.test
-    @@PerlDef:
-      my $list = $Message::DOM::ImplementationRegistry
-                   ->get_implementation_list ({<Q::fe|min> => '3.0'});
-      A: {
-        for my $impl (@$list) {
-          if ($impl->isa (<ClassName::ManakaiMinimumImplementation>)) {
-            last A;
-          }
-        }
-        $test->assert_never;
-      }
-  
-  @IntMethod:
-    @@Operator: mg|CreateNodeStemMethod
-    @@Param:
-      @@@Name: bag
-      @@@Type: HASH
-    @@Param:
-      @@@Name: obj
-      @@@Type: HASH
-    @@Return:
-      @@@Type: HASH
-      @@@PerlDef:
-        $obj->{<H::f|revImplementation>} = {};
-        $r = $obj;
-  @mg:ownee1h: f|revImplementation
-
-  @IntMethod:
-    @@Operator: mg|CreateNodeRefMethod
-    @@Param:
-      @@@Name: obj
-      @@@Type: HASH
-    @@Param:
-      @@@Name: opt
-      @@@Type: HASH
-    @@Return:
-      @@@Type: MinimumImplementation
-      @@@PerlDef:
-        $r = bless $obj, ${$opt->{<H::mg|nodeRefClass>} or \$self};
-
-  @IntMethod:
-    @@Name: new
-    @@enDesc:
-      Constructs a new instance of the <IF::MinimumImplementation>
-      and returns it.
-    @@Return:
-      @@@Type: MinimumImplementation
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          The newly created implementation object.
-      @@@PerlDef:
-        my $bag;
-        __CODE{mg|createNodeBag||ManakaiDOM|all:: $bag => $bag}__;
-        my $stem;
-        __CODE{mg|createNodeStem||ManakaiDOM|all::
-          $bag => $bag,
-          $stem => $stem,
-          $class => $self,
-          $opt => {{}},
-        }__;
-        __CODE{mg|createNodeRef||ManakaiDOM|all::
-          $bag => $bag,
-          $stem => $stem,
-          $ref => $r,
-          $opt => {{}},
-        }__;
-
-    @@Test:
-      @@@QName: Impl.new.test
-      @@@PerlDef:
-        local $Message::Util::Grove::GCLatency = 0;
-
-        my $impl = <ClassM::ManakaiMinimumImplementation.new>;
-
-        my $bag = $impl->{<H::mg|nodeBag>};
-        my $id = $impl->{<H::mg|nodeIDReference>};
-        
-        $test->id ('interface');
-        $test->assert_isa ($impl, <IFName::MinimumImplementation>);
-        
-        $test->id ('class');
-        $test->assert_isa ($impl, <ClassName::ManakaiMinimumImplementation>);
-
-        undef $impl;
-
-        $test->id ('gc');
-        $test->assert_null ($bag->{$$id});
-
-  @IntMethod:
-    @@Operator:
-      @@@@: DESTROY
-      @@@ContentType: DISPerl|Perl
-    @@Return:
-      @@@disDef:
-        @@@@DISPerl:cloneCode: mg|NodeRef||ManakaiDOM|all.destroy
-
-  @Method:
-    @@Name:  hasFeature
-    @@ForCheck: ManakaiDOM|ForClass
-    @@Description:
-      @@@lang:en
-      @@@@:
-         Tests whether this implementation supports a specific 
-         feature and version or not.
-    @@Param:
-      @@@Name:  feature
-      @@@Type: MIString
-      @@@actualType: FeatureNameString
-      @@@Description:
-        @@@@lang:en
-        @@@@@: 
-          The name of the feature to test, with or without 
-          <CHAR::PLUS SIGN> prefix.
-    @@Param:
-      @@@Name:  version
-      @@@Type: MIString
-      @@@actualType: FeatureVersionString
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          The version number of the feature to test. 
-    @@Return:
-      @@@Type:  
-        DOMMain:boolean::ManakaiDOM:all
-      @@@Description:
-        @@@@lang:en
-        @@@@@: 
-          Whether the feature and version is implemented or not.
-      @@@InCase:
-        @@@@Value: 
-          @@@@@@:1
-          @@@@@ContentType: DISCore|Boolean
-        @@@@Description:
-          @@@@@lang:en
-          @@@@@@: 
-            The <P::feature> is implemented in the specified <P::version>.
-      @@@InCase:
-        @@@@Value: 
-          @@@@@@:0
-          @@@@@ContentType: DISCore|Boolean
-        @@@@Description:
-          @@@@@lang:en
-          @@@@@@: The feature is not implemented.
-      @@@PerlCDef:
-        my $plus = $feature =~ s/^\+// ? 1 : 0;
-        my $class = ref $self;
-        A: {
-          if ($Message::DOM::DOMFeature::ClassInfo->{$class}
-                  ->{has_feature}->{$feature}->{$version}) {
-            $r = true;
-            last A;
-          } 
-          __CODE{makeClassISAList:: $CLASS => $class}__;
-          for my $cls ($class, @{$Message::DOM::ClassISA{$class}}) {
-            if ($Message::DOM::ImplFeature{$class}->{$feature}->{$version}) {
-              $r = true;
-               last A;
-            }
-          }
-
-          if ($plus) {
-            CLASS: for my $class (grep {
-              $Message::DOM::DOMFeature::ClassInfo
-                  ->{<ClassName::ManakaiMinimumImplementation>}
-                  ->{compat_class}->{$_}
-            } keys %{$Message::DOM::DOMFeature::ClassInfo
-                         ->{<ClassName::ManakaiMinimumImplementation>}
-                         ->{compat_class} or {}}) {
-              for my $cls ($class, @{$Message::DOM::ClassISA{$class}}) {
-                if ($Message::DOM::DOMFeature::ClassInfo->{$cls}
-                        ->{has_feature}->{$feature}->{$version}) {
-                  $r = true;
-                  last A;
-                } elsif ($Message::DOM::ImplFeature{$cls}
-                             ->{$feature}->{$version}) {
-                  $r = true;
-                  last A;
-                }
-              }
-            }
-          } # plus
-        } # A
-
-  @Method:
-     @@Name:  getFeature
-     @@ForCheck: ManakaiDOM|ForClass
-     @@Description:
-        @@@lang:en
-        @@@@:
-          Returns a specialized object that implements the specialized 
-          interfaces of the specified feature and version.
-     @@Param:
-        @@@Name:  feature
-        @@@Type: MIString
-        @@@actualType: FeatureNameString
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            A feature name to request.
-     @@Param:
-        @@@Name:  version
-        @@@Type: MIString
-        @@@actualType: FeatureVersionString
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            A feature version number to request.
-     @@Return:
-        @@@Type: DOMMain|Object||ManakaiDOM|all
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            An object that implements the specialized APIs of the 
-            <P::feature> and <P::version>.  It might or might not 
-            implements the <IF::MinimumImplementation> interface. 
-            In addition, the object might or might not part of 
-            manakai. 
-
-            If the object implements the <IF::MinimumImplementation>
-            interface or the <IF::DOMCore:DOMImplementation>, 
-            it must delegate to the primary core <IF::MinimumImplementation> 
-            and must not result incosistent with the primary core 
-            <IF::MinimumImplementation> such as
-            <M::GetFeature.hasFeature>, 
-            <M::GetFeature.getFeature>, etc.
-        @@@InCase:
-          @@@@Value:
-            @@@@@is-null:1
-          @@@@enDesc:
-            There is no object available that implements interfaces 
-            associated with the <P::feature> and <P::version>. 
-      @@@PerlCDef:
-        $feature =~ s/^\+//;
-        if ($Message::DOM::DOMFeature::ClassInfo->{ref $self}
-              ->{has_feature}->{$feature}->{$version}) {
-          $r = $self;
-        } else {
-          CLASS: for my $__class (sort {
-            $Message::DOM::ClassPoint{$b} <=> $Message::DOM::ClassPoint{$a}
-          } grep {
-            $Message::DOM::DOMFeature::ClassInfo
-                ->{<ClassName::ManakaiMinimumImplementation>}
-                ->{compat_class}->{$_}
-          } keys %{$Message::DOM::DOMFeature::ClassInfo
-                       ->{<ClassName::ManakaiMinimumImplementation>}
-                       ->{compat_class} or {}}) {
-            ## Static
-            if ($Message::DOM::DOMFeature::ClassInfo->{$__class}
-                    ->{has_feature}->{$feature}->{$version}) {
-              __CODE{mg|createNodeRefFromID||ManakaiDOM|all::
-                $bag => {<Code::mg|getNodeBag||ManakaiDOM|all:: $ref = $self>},
-                $stemid => {<Code::mg|getNodeID||ManakaiDOM|all:: $ref = $self>},
-                $ref => $r,
-                $opt => {{
-                  <H::mg|nodeRefClass> => \$__class,
-                }},
-              }__;
-              last CLASS;
-            } else {
-              ## Dynamic
-              __CODE{makeClassISAList:: $CLASS => $__class}__;
-              for my $cls ($__class, @{$Message::DOM::ClassISA{$__class}}) {
-                if ($Message::DOM::ImplFeature{$cls}->{$feature}->{$version}) {
-                  __CODE{mg|createNodeRefFromID||ManakaiDOM|all::
-                    $bag => {<Code::mg|getNodeBag||ManakaiDOM|all::
-                                        $ref = $self>},
-                    $stemid => {<Code::mg|getNodeID||ManakaiDOM|all::
-                                           $ref = $self>},
-                    $ref => $r,
-                    $opt => {{
-                      <H::mg|nodeRefClass> => \$cls,
-                    }},
-                  }__;
-                  last CLASS;
-                }
-              }
-            }
-          } # CLASS
-        }
-
-  @IntMethod:
-    @@Operator:
-      @@@@: eq
-      @@@ContentType: DISPerl|Perl
-    @@enDesc:
-      For Perl binding, the <Perl::eq> operation to a <IF::MinimumImplementation>
-      object <kwd:MUST> return <DOM::true> value if and only if
-      another operand is a <IF::MinimumImplementation> representing
-      the same implementation object and any methods defined in the
-      <IF::MinimumImplementation> interface would return the same result.
-      
-        {NOTE:: The <Perl::eq> operation for two different object
-                with different interfaces representing the same implementation
-                would return <DOM::true>.
-        }
-    @@ImplNote:
-      @@@lang:en
-      @@@@:
-        {ISSUE:: Is this definition harmless?
-        }
-    @@Param:
-      @@@Name: other
-      @@@Type: DISPerl|Any
-      @@@enDesc:
-        Another operand.
-      @@@InCase:
-        @@@@Value:
-          @@@@@is-null:1
-        @@@@enDesc:
-          Another operand is <DOM::null> and the method would
-          return <DOM::false>.
-    @@Return:
-      @@@Type: idl|boolean||ManakaiDOM|all
-      @@@enDesc:
-        Whether the implementation and <P::obj> is the same or not.
-      @@@PerlDef:
-        if (UNIVERSAL::isa
-              ($other,
-               <IFName::MinimumImplementation||ManakaiDOM|ManakaiDOM>) and
-            $other->isa ('HASH') and
-            exists $other->{<H::mg|nodeIDReference>}) {
-          $r = ($other->{<H::mg|nodeIDReference>}
-                    eq $self->{<H::mg|nodeIDReference>});
-        }
-
-    @@Test:
-      @@@enDesc:
-        The same object would return <DOM::true>.
-      @@@PerlDef:
-        my $ia = <Class::ManakaiMinimumImplementation>->_new;
-        $test->assert_equals ($ia, $ia);
-    @@Test:
-      @@@enDesc:
-        Two different implementations would return <DOM::false>.
-      @@@PerlDef:
-        my $ia = <Class::ManakaiMinimumImplementation>->_new;
-        my $ib = <Class::ManakaiMinimumImplementation>->_new;
-        $test->assert_not_equals ($ia, $ib);
-##MinimumImplementation
-
 PropDef:
   @QName: ManakaiDOM|implID
   @enDesc:
     The identifier of an implementation.
   @Type: DISPerl|String
-  @rdfs:domain: f|MinimumImplementation||ManakaiDOM|ManakaiDOM
-
-ResourceDef:
-  @QName: DOMMetaImpl|ManakaiDOMMinimumImplementation
-  @For: ManakaiDOM|ManakaiDOM3
-  @AliasFor: ManakaiMinimumImplementation
-  @ImplNote:
-    @@lang:en
-    @@@:
-      This historical alias will be removed.
-
-ResourceDef:
-  @QName: DOMMetaImpl|ManakaiDOMMinimumImplementationIF
-  @For: ManakaiDOM|ManakaiDOM3
-  @AliasFor: MinimumImplementation
 
 ResourceDef:
   @For: ManakaiDOM|DOM3
@@ -3252,7 +2761,9 @@ ResourceDef:
       - <Perl::$r>::: The return value.
     @@PerlDef:
       if ($Message::DOM::DOMFeature::ClassInfo->{ref $self}
-            ->{has_feature}->{$feature}->{$version}) {
+            ->{has_feature}->{$feature}->{$version} or
+          $Message::Util::AutoLoad::Registry::Feature
+              ->{$feature}->{$version}) {
         $r = $self;
       } else {
         CLASS: for my $__class (sort {
@@ -3263,7 +2774,9 @@ ResourceDef:
         } keys %{$Message::DOM::DOMFeature::ClassInfo->{$base_class}
                      ->{compat_class} or {}}) {
           if ($Message::DOM::DOMFeature::ClassInfo->{$__class}
-                  ->{has_feature}->{$feature}->{$version}) {
+                  ->{has_feature}->{$feature}->{$version} or
+              $Message::Util::AutoLoad::Registry::Feature
+                  ->{$feature}->{$version}) {
             __CODE{mg|createNodeRefFromID||ManakaiDOM|all::
               $bag => {<Code::mg|getNodeBag||ManakaiDOM|all:: $ref = $self>},
               $stemid => {<Code::mg|getNodeID||ManakaiDOM|all:: $ref = $self>},

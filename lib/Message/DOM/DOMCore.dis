@@ -40,7 +40,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/11/03 17:53:31 $
+      $Date: 2006/11/04 12:25:10 $
     @@ContentType:
       dis:Date.RCS
 
@@ -128,6 +128,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Grove/
   @MURI:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/URI/
+  @p:
+    http://suika.fam.cx/~wakaba/archive/2004/dis/Perl#
   @rdf:
     http://www.w3.org/1999/02/22-rdf-syntax-ns#
   @rdfs:
@@ -2719,14 +2721,18 @@ IFCls1Def:
   @IFQName: DOMImplementation
   @ClsQName: ManakaiDOMImplementation
 
-  @ClsISA: urigen|ManakaiURIImplementation
+  @Implement: f|GetFeature
   @Implement: ecore|MUErrorTarget||ManakaiDOM|Perl
+  @DISLang:role: mg|NodeRefRole
+  @DISLang:role: f|ManakaiMinimumImplementationCompatible
 
   @enDesc:
     The <IF::DOMImplementation> interface provides a number
     of methods for performing operations that are independent
     of any particular instance of the document object model.
 
+  @f:implements: f|min30
+  @f:provides: f|min30
   @f:provides:
     @@@: CoreFeature10
     @@ForCheck:
@@ -2789,9 +2795,6 @@ IFCls1Def:
       $test->id ('DOMImplementation');
       $test->assert_isa ($impl, <IFName::DOMImplementation>);
 
-      $test->id ('MinimumImplementation');
-      $test->assert_isa ($impl, <IFName::f|MinimumImplementation>);
-
       $test->id ('MUErrorTarget');
       $test->assert_isa ($impl, <IFName::ecore|MUErrorTarget||ManakaiDOM|Perl>);
 
@@ -2815,141 +2818,83 @@ IFCls1Def:
 
       $test->id ('create_uri_reference');
       $test->assert_true ($impl->can ('create_uri_reference'));
+  
+  @IntMethod:
+    @@Operator: mg|CreateNodeStemMethod
+    @@Param:
+      @@@Name: bag
+      @@@Type: HASH
+    @@Param:
+      @@@Name: obj
+      @@@Type: HASH
+    @@Return:
+      @@@Type: HASH
+      @@@PerlDef:
+        $obj->{<H::f|revImplementation>} = {};
+        $r = $obj;
+  @mg:ownee1h: f|revImplementation
 
-  @Method:
-    @@ForCheck: !ManakaiDOM|ForClass
-     @@Name:  hasFeature
-     @@Description:
-       @@@lang:en
-       @@@@:
-         Tests whether this DOM implementation supports a specific 
-         feature and version or not.
-     @@Param:
-        @@@Name:  feature
-        @@@Type:
-          DOMMain:DOMString
-        @@@actualType: DOMFeature|FeatureNameString
-        @@@Description:
-          @@@@lang:en
-          @@@@@: 
-            A name of feature to test, with an optional <CHAR::PLUS SIGN>
-            prefix.
+  @IntMethod:
+    @@Operator: mg|CreateNodeRefMethod
+    @@Param:
+      @@@Name: obj
+      @@@Type: HASH
+    @@Param:
+      @@@Name: opt
+      @@@Type: HASH
+    @@Return:
+      @@@Type: DOMImplementation
+      @@@PerlDef:
+        $r = bless $obj, ${$opt->{<H::mg|nodeRefClass>} or \$self};
+
+  @IntMethod:
+    @@Name: new
+    @@enDesc:
+      Constructs a new instance of the <IF::DOMImplementation>
+      and returns it.
+    @@Return:
+      @@@Type: DOMImplementation
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The newly created implementation object.
+      @@@PerlDef:
+        my $bag;
+        __CODE{mg|createNodeBag||ManakaiDOM|all:: $bag => $bag}__;
+        my $stem;
+        __CODE{mg|createNodeStem||ManakaiDOM|all::
+          $bag => $bag,
+          $stem => $stem,
+          $class => $self,
+          $opt => {{}},
+        }__;
+        __CODE{mg|createNodeRef||ManakaiDOM|all::
+          $bag => $bag,
+          $stem => $stem,
+          $ref => $r,
+          $opt => {{}},
+        }__;
+
+    @@Test:
+      @@@QName: Impl.new.test
+      @@@PerlDef:
+        local $Message::Util::Grove::GCLatency = 0;
+
+        my $impl = <ClassM::ManakaiDOMImplementation.new>;
+
+        my $bag = $impl->{<H::mg|nodeBag>};
+        my $id = $impl->{<H::mg|nodeIDReference>};
         
-        @@@ImplNote:
-          @@@@lang:en
-          @@@@@: Move to DOMMain
-        @@@InCase:
-          @@@@Value: HTML
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              The DOM HTML feature.
-              This is one of the allowed values in DOM Level 1 First Edition.
-        @@@InCase:
-          @@@@Value: XML
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              The DOM XML feature.
-              This is one of the allowed values in DOM Level 1 First Edition.
-        @@@InCase:
-          @@@@Label:
-            @@@@@@:
-              XML 1.0 <CODE::Name>
-            @@@@@lang:en
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              Only an XML 1.0 Name is allowed in DOM Level 1 Second Edition 
-              and DOM Level 2.
-        @@@InCase:
-          @@@@Label:
-            @@@@@@: Reversed Internet domain name
-            @@@@@lang:en
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              DOM Level 1 First Edition and DOM Level 2 specifications 
-              says that the feature name defined outside the DOM specifications 
-              should use the reversed Internet domain name to avoid 
-              possible confliction.
-            \
-              This recommendation is withdrawn by the Errata of the DOM Level 2 
-              Specifications.
-        @@@InCase:
-          @@@@Label:
-            @@@@@lang:en
-            @@@@@@:
-              Feature name preceeded by a <CODE::PLUS SIGN>
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              The specified feature may not be directly castable
-              but would be available through the method "getFeature".
-     @@Param:
-        @@@Name:  version
-        @@@Type:
-          DOMMain:DOMString
-        @@@actualType:
-          ManakaiDOM:ManakaiDOMFeatureVersion
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            Version number of feature to test.
+        $test->id ('interface');
+        $test->assert_isa ($impl, <IFName::DOMImplementation>);
+        
+        $test->id ('class');
+        $test->assert_isa ($impl, <ClassName::ManakaiDOMImplementation>);
 
-        @@@ImplNote:
-          @@@@lang:en
-          @@@@@: Move to DOMMain
-        @@@InCase:
-          @@@@Value: 1.0
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              DOM Level 1.
-              This is the only allowed value in DOM Level 1 and
-              one of allowed values in DOM Level 2.
-        @@@InCase:
-          @@@@Value: 2.0
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              DOM Level 2.
-              This is one of allowed values in DOM Level 2.
-        @@@InCase:
-          @@@@Value:
-            @@@@@is-null:1
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              No particular version is specified.
-              \
-              It is implied that this value is allowed in DOM 
-              Level 1 and Level 2.  DOM Level 2 Errata and DOM 
-              Level 3 explicitly allow this value specified.
-        @@@InCase:
-          @@@@Value: \
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              No particular version is specified.
-              \
-              This value is allowed in DOM Level 2 Errata and 
-              DOM Level 3.
-     @@Return:
-        @@@Type:  
-          DOMMain:boolean||ManakaiDOM|all
-        @@@Description:
-          @@@@lang:en
-          @@@@@: 
-            Whether the feature and version is implemented or not.
-        @@@TrueCase:
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@: The feature is implemented in the specified version.
-        @@@FalseCase:
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@: The feature is not implemented.
+        undef $impl;
+
+        $test->id ('gc');
+        $test->assert_null ($bag->{$$id});
 
   @IL2Method:
     @@Name: createDocumentType
@@ -3147,79 +3092,6 @@ IFCls1Def:
           does not support XML namespaces.
         @@@@enImplNote:
           What <IF::tc|Document>?  The created one?
-        
-  @Method:
-    @@ForCheck: !ManakaiDOM|ForClass
-     @@Name:  getFeature
-     @@Description:
-        @@@lang:en
-        @@@@:
-          Returns a specialized object that implements the specialized 
-          interfaces of the specified feature and version.
-     @@Param:
-        @@@Name:  feature
-        @@@Type:
-          DOMMain:DOMString
-        @@@actualType: FeatureNameString
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            A feature name to request.
-
-        ## TODO: Move to DOMMain
-        @@@InCase: 
-          @@@@Label: 
-            @@@@@@:
-              Feature name preceeded by a <CHAR::PLUS SIGN>
-            @@@@@lang:en
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              The <CHAR::PLUS SIGN> is ignored.
-     @@Param:
-        @@@Name:  version
-        @@@Type:
-          DOMMain:DOMString
-        @@@actualType:
-          ManakaiDOM:ManakaiDOMFeatureVersion
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            A feature version number to request.
-     @@SpecLevel:3
-     @@Level[list]:  3
-     @@For:
-       ManakaiDOM:DOM3
-     @@Return:
-        @@@Type:  
-          DOMMain:DOMObject
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            An object that implements the specialized APIs of the 
-            <P::feature> and <P::version>.  It might or might not 
-            implements the <IF::DOMImplementation> interface. 
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            In addition, the object might or might not part of 
-            manakai. 
-          @@@@For:
-            ManakaiDOM:ManakaiDOM
-        @@@ImplNote:
-          @@@@lang:en
-          @@@@@:
-            If the object implements the <IF::DOMImplementation> interface, 
-            it must delegate to the primary core <IF::DOMImplementation> 
-            and must not result incosistent with the primary core 
-            <IF::DOMImplementation> such as <M::DOMImplementation.hasFeature>, 
-            <M::DOMImplementation.getFeature>, etc.
-        @@@InCase:
-          @@@@Value:
-            @@@@@is-null:1
-          @@@@@: 
-            There is no object available that implements interfaces 
-            associated with the <P::feature> and <P::version>. 
 
   @IntMethod:
     @@Operator: ManakaiDOM|MUErrorHandler
@@ -3254,27 +3126,178 @@ IFCls1Def:
           $err-><M::ecore|ErrorInterface||ManakaiDOM|Perl.throw>;
         }
 
-  @Method:
+  @IntMethod:
     @@Operator:
-      @@@@: AUTOLOAD
+      @@@@: DESTROY
       @@@ContentType: DISPerl|Perl
-    @@DISPerl:noParameterModification: 1
     @@Return:
+      @@@disDef:
+        @@@@DISPerl:cloneCode: mg|NodeRef||ManakaiDOM|all.destroy
+
+  @Method:
+    @@Name:  hasFeature
+    @@ForCheck: ManakaiDOM|ForClass
+    @@Description:
+      @@@lang:en
+      @@@@:
+         Tests whether this implementation supports a specific 
+         feature and version or not.
+    @@Param:
+      @@@Name:  feature
+      @@@Type: DOMString
+      @@@actualType: f|FeatureNameString
+      @@@Description:
+        @@@@lang:en
+        @@@@@: 
+          The name of the feature to test, with or without 
+          <CHAR::PLUS SIGN> prefix.
+    @@Param:
+      @@@Name:  version
+      @@@Type: DOMString
+      @@@actualType: f|FeatureVersionString
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          The version number of the feature to test. 
+    @@Return:
+      @@@Type:  
+        DOMMain:boolean::ManakaiDOM:all
+      @@@Description:
+        @@@@lang:en
+        @@@@@: 
+          Whether the feature and version is implemented or not.
+      @@@InCase:
+        @@@@Value: 
+          @@@@@@:1
+          @@@@@ContentType: DISCore|Boolean
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: 
+            The <P::feature> is implemented in the specified <P::version>.
+      @@@InCase:
+        @@@@Value: 
+          @@@@@@:0
+          @@@@@ContentType: DISCore|Boolean
+        @@@@Description:
+          @@@@@lang:en
+          @@@@@@: The feature is not implemented.
       @@@PerlDef:
-        use Message::Util::AutoLoad::Registry;
-        my $al = our $AUTOLOAD;
-        $al =~ s/.+:://;
-        if ($Message::Util::AutoLoad::Registry::Method
-            ->{<ClassName::ManakaiDOMImplementation>}->{$al}) {
-          eval qq{ require $Message::Util::AutoLoad::Registry::Method->{
-              <ClassName::ManakaiDOMImplementation>}->{$al}->{module} };
-          die $@ if $@;
-          no strict 'refs';
-          goto &{$AUTOLOAD};
-        } else {
-          require Carp;
-          Carp::croak (qq<Can't locate method "$AUTOLOAD">);
+        my $plus = $feature =~ s/^\+// ? 1 : 0;
+        $r = $Message::Util::AutoLoad::Registry::Feature->{$feature}->{$version}
+            ? 1 : 0;
+
+  @Method:
+     @@Name:  getFeature
+     @@ForCheck: ManakaiDOM|ForClass
+     @@Description:
+        @@@lang:en
+        @@@@:
+          Returns a specialized object that implements the specialized 
+          interfaces of the specified feature and version.
+     @@Param:
+        @@@Name:  feature
+        @@@Type: DOMString
+        @@@actualType: f|FeatureNameString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            A feature name to request.
+     @@Param:
+        @@@Name:  version
+        @@@Type: DOMString
+        @@@actualType: f|FeatureVersionString
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            A feature version number to request.
+     @@Return:
+        @@@Type: DOMMain|Object||ManakaiDOM|all
+        @@@Description:
+          @@@@lang:en
+          @@@@@:
+            An object that implements the specialized APIs of the 
+            <P::feature> and <P::version>.  It might or might not 
+            implements the <IF::DOMImplementation> interface. 
+            In addition, the object might or might not part of 
+            manakai. 
+
+            If the object implements the <IF::DOMImplementation> interface,
+            it must delegate to the primary core <IF::DOMImplementation> 
+            and must not result incosistent with the primary core 
+            <IF::DOMImplementation> such as
+            <M::DOMImplementation.hasFeature>, 
+            <M::DOMImplementation.getFeature>, etc.
+        @@@InCase:
+          @@@@Value:
+            @@@@@is-null:1
+          @@@@enDesc:
+            There is no object available that implements interfaces 
+            associated with the <P::feature> and <P::version>. 
+      @@@PerlDef:
+        $feature =~ s/^\+//;
+        if ($Message::Util::AutoLoad::Registry::Feature
+            ->{$feature}->{$version}) {
+          $r = $self;
         }
+
+  @IntMethod:
+    @@Operator:
+      @@@@: eq
+      @@@ContentType: DISPerl|Perl
+    @@enDesc:
+      For Perl binding, the <Perl::eq> operation to a <IF::DOMImplementation>
+      object <kwd:MUST> return <DOM::true> value if and only if
+      another operand is a <IF::DOMImplementation> representing
+      the same implementation object and any methods defined in the
+      <IF::DOMImplementation> interface would return the same result.
+      
+        {NOTE:: The <Perl::eq> operation for two different object
+                with different interfaces representing the same implementation
+                would return <DOM::true>.
+        }
+    @@ImplNote:
+      @@@lang:en
+      @@@@:
+        {ISSUE:: Is this definition harmless?
+        }
+    @@Param:
+      @@@Name: other
+      @@@Type: DISPerl|Any
+      @@@enDesc:
+        Another operand.
+      @@@InCase:
+        @@@@Value:
+          @@@@@is-null:1
+        @@@@enDesc:
+          Another operand is <DOM::null> and the method would
+          return <DOM::false>.
+    @@Return:
+      @@@Type: idl|boolean||ManakaiDOM|all
+      @@@enDesc:
+        Whether the implementation and <P::obj> is the same or not.
+      @@@PerlDef:
+        if (UNIVERSAL::isa
+              ($other,
+               <IFName::DOMImplementation||ManakaiDOM|ManakaiDOM>) and
+            $other->isa ('HASH') and
+            exists $other->{<H::mg|nodeIDReference>}) {
+          $r = ($other->{<H::mg|nodeIDReference>}
+                    eq $self->{<H::mg|nodeIDReference>});
+        }
+
+    @@Test:
+      @@@enDesc:
+        The same object would return <DOM::true>.
+      @@@PerlDef:
+        my $ia = <Class::ManakaiDOMImplementation>->_new;
+        $test->assert_equals ($ia, $ia);
+    @@Test:
+      @@@enDesc:
+        Two different implementations would return <DOM::false>.
+      @@@PerlDef:
+        my $ia = <Class::ManakaiDOMImplementation>->_new;
+        my $ib = <Class::ManakaiDOMImplementation>->_new;
+        $test->assert_not_equals ($ia, $ib);
 ##DOMImplementation
 
 PropDef:

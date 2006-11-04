@@ -17,7 +17,7 @@ Module:
   @License:
     license:Perl+MPL
   @Date:
-    $Date: 2006/08/15 03:54:37 $
+    $Date: 2006/11/04 12:25:21 $
   
   @Require:
     @@Module:
@@ -26,6 +26,9 @@ Module:
     @@Module:
       @@@QName: DIS|Perl
       @@@WithFor: DIS|ForLatest
+    @@Module:
+      @@@QName: MDOM|DOMCore
+      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
     @@Module:
       @@@QName: MDOM|TreeCore
       @@@WithFor: ManakaiDOM|ManakaiDOMLatest
@@ -37,12 +40,16 @@ Module:
     DIS:ForLatest
 
 Namespace:
+  @c:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
   @DIS:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#
   @dis:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
   @DOMMain:
     http://suika.fam.cx/~wakaba/archive/2004/dom/main#
+  @domperl:
+    http://suika.fam.cx/~wakaba/archive/2006/dom/perl/
   @dp:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#Perl/
   @dx:
@@ -304,8 +311,11 @@ ElementTypeBinding:
 IFClsDef:
   @IFQName: DISImplementationValue
   @ClsQName: ManakaiDISImplementationValue
-  
-  @ClsISA: tst|ManakaiDOMImplementationTreeStore||ManakaiDOM|ManakaiDOMLatest
+
+  @domperl:implementedByObjectsOf:
+    c|DOMImplementation||ManakaiDOM|ManakaiDOMLatest
+  @domperl:classImplementedByObjectsOf:
+    c|ManakaiDOMImplementation||ManakaiDOM|ManakaiDOMLatest
 
   @f:provides: DIS|Value10
 

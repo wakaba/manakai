@@ -12,7 +12,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/04/02 10:45:24 $
+    $Date: 2006/11/04 12:25:21 $
   
   @Require:
     @@Module:
@@ -21,7 +21,7 @@ Module:
       @@@QName: DISlib|Test
       @@@WithFor: ManakaiDOM|all
     @@Module:
-      @@@QName: MDOM|DOMFeature
+      @@@QName: MDOM|DOMCore
       @@@WithFor: ManakaiDOM|ManakaiDOMLatest
     @@Module:
       @@@QName: MDOM|GenericLS
@@ -43,6 +43,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
   @DISlib:
     http://suika.fam.cx/~wakaba/archive/2004/dis/
+  @domperl:
+    http://suika.fam.cx/~wakaba/archive/2006/dom/perl/
   @dtest:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#Test/
   @dx:
@@ -71,6 +73,8 @@ Namespace:
     http://www.w3.org/2000/01/rdf-schema#
   @tc:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/TreeCore/
+  @td:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/Document/
   @test:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Test#
   @Util:
@@ -239,8 +243,8 @@ IFClsDef:
   @IFQName: DTImplementation
   @ClsQName: ManakaiDTImplementation
 
-  @IFISA: f|MinimumImplementation
-  @ClsISA: f|ManakaiMinimumImplementation
+  @domperl:implementedByObjectsOf: td|Document
+  @domperl:classImplementedByObjectsOf: td|ManakaiDOMDocument
 
   @f:provides: DIS|Test10
 

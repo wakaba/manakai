@@ -1,3 +1,28 @@
+2006-11-04  Wakaba  <wakaba@suika.fam.cx>
+
+	* DNLite.dis (DISImplementationDNLite): It no
+	longer inherits the |ManakaiDISImplementation|; it
+        is now expected to be implemented by |DOMImplementation| objects.
+
+	* DPG.dis (DPGDocument): It no longer inherits
+	the |ManakaiDOMDocument| class; it is now expected to be
+	implemented by all |Document| objects.
+
+	* Perl.dis (DISImplementationPerl): It is now
+	expected to be implemented by all |DOMImplementation| objects.
+	(plCodeFragment): Support for the |p:require|
+	property is added.  It no longer output |ClassInfo|
+	for classes for specific element types; instead,
+	it invoke |add_implemented_element_type| method.
+
+	* Test.dis (DTImplementation): It no longer
+	inherits the |MinimumImplementation| interface;
+	instead, it is expected to be implemented
+	by all |DOMImplementation| objects.
+
+	* Value.dis (DISImplementationValue): It is now
+	expected to be implemented by all |DOMImplementation| objects.
+
 2006-11-03  Wakaba  <wakaba@suika.fam.cx>
 
 	* Perl.dis (plCodeFragment): Don't generate

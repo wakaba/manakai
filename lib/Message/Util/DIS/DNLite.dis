@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/04/03 12:53:26 $
+      $Date: 2006/11/04 12:25:19 $
     @@ContentType:
       dis:Date.RCS
   
@@ -51,6 +51,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--Perl--
   @DOMMain:
     http://suika.fam.cx/~wakaba/archive/2004/dom/main#
+  @domperl:
+    http://suika.fam.cx/~wakaba/archive/2006/dom/perl/
   @dp:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#Perl/
   @dv:
@@ -103,6 +105,8 @@ Namespace:
     urn:x-suika-fam-cx:markup:suikawiki:0:10:
   @swcfg21:
     http://suika.fam.cx/~wakaba/archive/2005/swcfg21#
+  @td:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/Document/
   @test:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Test#
   @Util:
@@ -293,7 +297,10 @@ IFClsDef:
   @ClsQName: ManakaiDISImplementationDNLite
 
   @f:provides: DIS|DNLite10
-  @ClsISA: DIS|ManakaiDISImplementation
+
+  @domperl:implementedByObjectsOf: td|Document||ManakaiDOM|ManakaiDOMLatest
+  @domperl:classImplementedByObjectsOf:
+    td|ManakaiDOMDocument||ManakaiDOM|ManakaiDOMLatest
 
   @enDesc:
     The object implementing the <IF::DISImplementationDNLite>

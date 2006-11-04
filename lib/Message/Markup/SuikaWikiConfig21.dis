@@ -24,7 +24,7 @@ Module:
       @@@Year:2003
       @@@DISCore:author: DISCore|Wakaba
   @Date:
-    $Date: 2006/04/29 11:05:09 $
+    $Date: 2006/11/04 12:25:14 $
   
   @Require:
     @@Module:
@@ -51,6 +51,8 @@ Module:
   @DefaultFor: swcfg21|ForLatest
 
 Namespace:
+  @c:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
   @DIS:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#
   @dis:
@@ -63,6 +65,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
   @DOMLS:
     http://suika.fam.cx/~wakaba/archive/2004/dom/ls#
+  @domperl:
+    http://suika.fam.cx/~wakaba/archive/2006/dom/perl/
   @dx:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#
   @ecore:
@@ -4629,7 +4633,7 @@ IFClsDef:
       }
     @@Param:
       @@@Name: impl
-      @@@Type: f|MinimumImplementation||ManakaiDOM|ManakaiDOMLatest
+      @@@Type: c|DOMImplementation||ManakaiDOM|ManakaiDOMLatest
       @@@enDesc:
         An implementation object.  The <M::f|GetFeature.getFeature>
         method with parameter values <Feature::swcfg21|Core> and
@@ -4666,7 +4670,10 @@ IFClsDef:
   @IFQName: SWCFGImplementation
   @ClsQName: ManakaiSWCFGImplementation
 
-  @ClsISA: f|ManakaiMinimumImplementation||ManakaiDOM|ManakaiDOMLatest
+  @domperl:implementedByObjectsOf:
+    c|DOMImplementation||ManakaiDOM|ManakaiDOMLatest
+  @domperl:classImplementedByObjectsOf:
+    c|ManakaiDOMImplementation||ManakaiDOM|ManakaiDOMLatest
 
   @f:provides: CoreFeature21
 

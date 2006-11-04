@@ -13,7 +13,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/04/22 05:14:18 $
+    $Date: 2006/11/04 12:25:13 $
 
   @Require:
     @@Module:
@@ -50,6 +50,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dom/xdt#
   @DOMMain:
     http://suika.fam.cx/~wakaba/archive/2004/dom/main#
+  @domperl:
+    http://suika.fam.cx/~wakaba/archive/2006/dom/perl/
   @dx:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#
   @dxm:
@@ -768,141 +770,7 @@ NodeTypeDef:
     @@Return:
       @@@Type: Node
       @@@PerlDef:
-        my $class;
-        CLS: {
-          if (defined $opt->{<H::mg|nodeRefClass>}) {
-            $class = $opt->{<H::mg|nodeRefClass>};
-            IFCHK: {
-              for (@{$opt->{<H::mg|nodeRefInterfaces>} or []}) {
-                last IFCHK unless $$class->isa ($_);
-              }
-              last CLS;
-            } # IFCHK
-          }
-
-          __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-            $r => $class,
-            $prop => {<H::tc|defaultNodeRefClass>},
-            $ref => $obj,
-          }__;
-          if (defined $class) {
-            IFCHK: {
-              for (@{$opt->{<H::mg|nodeRefInterfaces>} or []}) {
-                last IFCHK unless $$class->isa ($_);
-              }
-              last CLS;
-            } # IFCHK
-          }
-
-          my $cns;
-          __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-            $r => $cns,
-            $prop => {<H::infoset|children>},
-            $ref => $obj,
-          }__;
-          my $bag = <Code::mg|getNodeBag||ManakaiDOM|all:: $ref = $obj>;
-          my $deh;
-          DC: for my $cnid (@$cns) {
-            my $cnh = <Code::mg|createNodeRefHashFromID||ManakaiDOM|all::
-                                 $stemid = $cnid, $bag = $bag>;
-            my $cncls;
-            __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-              $r => $cncls,
-              $prop => {<H::mg|nodeClass>},
-              $ref => $cnh,
-            }__;
-            if ($$cncls eq <ClassName::te|ManakaiDOMElement>) {
-              $deh = $cnh;
-              last DC;
-            }
-          } # DC
-          my $dens;
-          my $deln;
-          if (defined $deh) {
-            __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-              $r => $dens,
-              $prop => {<H::infoset|namespaceName>},
-              $ref => $deh,
-            }__;
-            $dens = \'' unless defined $dens;
-            __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-              $r => $deln,
-              $prop => {<H::infoset|localName>},
-              $ref => $deh,
-            }__;
-          } else {
-            $dens = \'*';
-            $deln = \'*';
-          }
-
-          A: {
-            ## Use cases:
-            ##   - Document element is |html5:html|
-            ##   - Document element is |NULL:rfc|
-
-            for my $nm (
-              [$dens, $deln],
-              [$dens, \'*'],
-            ) {
-              for my $__class (sort {
-                $Message::DOM::ClassPoint{$b} <=> $Message::DOM::ClassPoint{$a}
-              } grep {
-                $Message::DOM::DOMFeature::ClassInfo
-                    ->{<ClassName::ManakaiDOMDocument>}
-                    ->{compat_class_by_type}
-                    ->{${$nm->[0]}}->{${$nm->[1]}}->{$_}
-              } keys %{$Message::DOM::DOMFeature::ClassInfo
-                           ->{<ClassName::ManakaiDOMDocument>}
-                           ->{compat_class_by_type}
-                           ->{${$nm->[0]}}->{${$nm->[1]}} or {}}) {
-                if ($Message::DOM::DOMFeature::ClassInfo->{$__class}
-                        ->{has_feature}->{xml}->{'3.0'}) {
-                  $class = \$__class;
-                  IFCHK: {
-                    for (@{$opt->{<H::mg|nodeRefInterfaces>} or []}) {
-                      last IFCHK unless $$class->isa ($_);
-                    }
-                    last A;
-                  } # IFCHK
-                }
-              }
-            }
-
-            ## Generic
-            CLASS: for my $__class (sort {
-              $Message::DOM::ClassPoint{$b} <=> $Message::DOM::ClassPoint{$a}
-            } grep {
-              $Message::DOM::DOMFeature::ClassInfo
-                  ->{<ClassName::ManakaiDOMDocument>}
-                  ->{compat_class}->{$_}
-            } keys %{$Message::DOM::DOMFeature::ClassInfo
-                         ->{<ClassName::ManakaiDOMDocument>}
-                         ->{compat_class} or {}}) {
-              if ($Message::DOM::DOMFeature::ClassInfo->{$__class}
-                      ->{has_feature}->{xml}->{'3.0'}) {
-                $class = \$__class;
-                IFCHK: {
-                  for (@{$opt->{<H::mg|nodeRefInterfaces>} or []}) {
-                    last IFCHK unless $$class->isa ($_);
-                  }
-                  last A;
-                } # IFCHK
-              }
-            }
-
-            ## Default
-            $class = \$self;
-          } # A
-
-          if (defined $deh) {
-            __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
-              $given => $class,
-              $prop => {<H::tc|defaultNodeRefClass>},
-              $ref => $obj,
-            }__;
-          }
-        } # CLS
-        $r = bless $obj, $$class;
+        $r = bless $obj, <ClassName::ManakaiDOMDocument>;
 
   @CODE:
     @@QName: tc|createEmptyDocumentForTest

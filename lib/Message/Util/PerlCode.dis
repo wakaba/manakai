@@ -24,7 +24,7 @@ Module:
       @@@Year:2004
       @@@DISCore:author: DISCore|Wakaba
   @Date:
-    $Date: 2006/11/03 17:53:34 $
+    $Date: 2006/11/04 12:25:16 $
   
   @Require:
     @@Module:
@@ -46,6 +46,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
   @DISlib:
     http://suika.fam.cx/~wakaba/archive/2004/dis/
+  @domperl:
+    http://suika.fam.cx/~wakaba/archive/2006/dom/perl/
   @f:
     http://suika.fam.cx/~wakaba/archive/2004/dom/feature#
   @idl:
@@ -695,7 +697,144 @@ IFClsDef:
         __DEEP{
           $r = $self-><M::Node.cloneNode> (true);
         }__;
-##PerlCode
+
+  @Method:
+    @@Name: addImplementedFeature
+    @@enDesc:
+      Adds a pair of feature name and version to the list
+      of features implemented by the code.
+    @@Param:
+      @@@Name: name
+      @@@Type: DOMString
+      @@@enDesc:
+        The name of the feature.
+    @@Param:
+      @@@Name: version
+      @@@Type: DOMString
+      @@@enDesc:
+        The version of the feature.
+    @@Return:
+      @@@PerlDef:
+        __DEEP{
+          my $feature = $self->owner_document->create_element_ns
+              (<Q::pc|>, 'hasFeature');
+          $feature->feature_name ($name);
+          $feature->feature_version ($version);
+          $self->append_child ($feature);
+        }__;
+
+    @@Test:
+      @@@QName: PCElement.addImplementedFeature.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{createPCDocumentForTest:: $doc => $doc}__;
+ 
+        my $pack = $doc->create_pc_package ('PackageName');
+        $pack->add_implemented_feature ('feature-name', 'feature-version');
+
+        $test->id ('child');
+        my $feature = $pack->last_child;
+        $test->assert_not_null ($feature);
+
+        $test->id ('namespaceURI');
+        $test->assert_equals ($feature->namespace_uri, <Q::pc|>);
+
+        $test->id ('localName');
+        $test->assert_equals ($feature->local_name, 'hasFeature');
+
+        $test->id ('featureName');
+        $test->assert_equals ($feature->feature_name, 'feature-name');
+
+        $test->id ('featureVersion');
+        $test->assert_equals ($feature->feature_version, 'feature-version');
+
+  @Method:
+    @@Name: addImplementedElementType
+    @@enDesc:
+      Adds an element type to the list
+      of element type specific interfaces implemented by the code.
+    @@Param:
+      @@@Name: namespaceURI
+      @@@Type: DOMString
+      @@@enDesc:
+        The namespace URI of the element type.
+      @@@nullCase:
+        @@@@enDesc:
+          The element type does not belong to any namespace.
+    @@Param:
+      @@@Name: localName
+      @@@Type: DOMString
+      @@@enDesc:
+        The local name of the element type.
+    @@Return:
+      @@@PerlDef:
+        __DEEP{
+          my $et = $self->owner_document->create_element_ns
+              (<Q::pc|>, 'elementType');
+          $et->pc_namespace_uri ($namespaceURI);
+          $et->pc_local_name ($localName);
+          $self->append_child ($et);
+        }__;
+
+    @@Test:
+      @@@QName: PCElement.addImplementedElementType.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{createPCDocumentForTest:: $doc => $doc}__;
+ 
+        my $pack = $doc->create_pc_package ('PackageName');
+        $pack->add_implemented_element_type ('feature-name', 'feature-version');
+
+        $test->id ('child');
+        my $feature = $pack->last_child;
+        $test->assert_not_null ($feature);
+
+        $test->id ('namespaceURI');
+        $test->assert_equals ($feature->namespace_uri, <Q::pc|>);
+
+        $test->id ('localName');
+        $test->assert_equals ($feature->local_name, 'elementType');
+
+        $test->id ('pcNamespaceURI');
+        $test->assert_equals ($feature->pc_namespace_uri, 'feature-name');
+
+        $test->id ('pcLocalName');
+        $test->assert_equals ($feature->pc_local_name, 'feature-version');
+    @@Test:
+      @@@QName: PCElement.addImplementedElementType.2.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{createPCDocumentForTest:: $doc => $doc}__;
+ 
+        my $pack = $doc->create_pc_package ('PackageName');
+        $pack->add_implemented_element_type (undef, 'feature-version');
+
+        $test->id ('child');
+        my $feature = $pack->last_child;
+        $test->assert_not_null ($feature);
+
+        $test->id ('namespaceURI');
+        $test->assert_null ($feature->namespace_uri);
+
+        $test->id ('localName');
+        $test->assert_equals ($feature->local_name, 'elementType');
+
+        $test->id ('pcNamespaceURI');
+        $test->assert_equals ($feature->pc_namespace_uri, 'feature-name');
+
+        $test->id ('pcLocalName');
+        $test->assert_equals ($feature->pc_local_name, 'feature-version');
+
+  @ToStringMethod:
+    @@Return:
+      @@@Type: DOMString
+      @@@PerlDef:
+        __DEEP{
+          for (@{$self->child_nodes}) {
+            $r .= $_;
+          }
+        }__;
+##PCCode
 
 ResourceDef:
   @QName: AnyPCElement
@@ -1285,7 +1424,7 @@ IFClsETDef:
 
             for my $pack_name (@{$self->get_rev_isa_package_name_list}) {
               $r .= 'push @' . $pack_name . '::ISA, q<' . $pn .
-                  "> unless $pack_name->isa q<$pn>;\n";
+                  "> unless $pack_name->isa (q<$pn>);\n";
             }
 
             ## |use| Perl Modules
@@ -3852,6 +3991,86 @@ IFClsETDef:
         }__;
 ##PCFunctionCall
 
+IFClsETDef:
+  @IFQName: PCHasFeature
+  @CQName: ManakaiPCHasFeature
+  @ETQName: pc|hasFeature
+
+  @IFISA: PerlCode
+
+  @IFISA: PerlCodeStatements
+  @CISA: ManakaiPCCodeStatements
+
+  @enDesc:
+    The <XE::pc|hasFeature> element is used to indicate
+    that the code contained in the parent element implements
+    a feature identified by attributes of the
+    <XE::pc|hasFeature> element.
+
+  @ATTR:
+    @@Name: featureName
+    @@ATTRQName: pc|featureName
+    @@enDesc:
+      The name of the feature.
+    @@ReflectCDATA:
+    @@Get:
+    @@Set:
+
+  @ATTR:
+    @@Name: featureVersion
+    @@ATTRQName: pc|featureVersion
+    @@enDesc:
+      The version of the feature.
+    @@ReflectCDATA:
+    @@Get:
+    @@Set:
+
+  @ToStringMethod:
+    @@Return:
+      @@@Type: DOMString
+      @@@PerlDef: \
+##PCHasFeature
+
+IFClsETDef:
+  @IFQName: PCElementType
+  @CQName: ManakaiPCElementType
+  @ETQName: pc|elementType
+
+  @IFISA: PerlCode
+
+  @IFISA: PerlCodeStatements
+  @CISA: ManakaiPCCodeStatements
+
+  @enDesc:
+    The <XE::pc|hasFeature> element is used to indicate
+    that the code contained in the parent element implements
+    the interface for an interface identified by attributes of the
+    <XE::pc|elementType> element.
+
+  @ATTR:
+    @@Name: pcNamespaceURI
+    @@ATTRQName: pc|namespaceURI
+    @@enDesc:
+      The namespace URI of the element type.
+    @@ReflectCDATA:
+    @@Get:
+    @@Set:
+
+  @ATTR:
+    @@Name: pcLocalName
+    @@ATTRQName: pc|localName
+    @@enDesc:
+      The local name of the element type.
+    @@ReflectCDATA:
+    @@Get:
+    @@Set:
+
+  @ToStringMethod:
+    @@Return:
+      @@@Type: DOMString
+      @@@PerlDef: \
+##PCElementType
+
 ## -- Configuration Parameters
 
 boolCParam:
@@ -4002,13 +4221,11 @@ IFClsDef:
   @IFQName: PCDocument
   @CQName: ManakaiPCDocument
 
-  @IFISA: Document
-  @CISA: td|ManakaiDOMDocument
+  @domperl:implementedByObjectsOf: Document
+  @domperl:classImplementedByObjectsOf: td|ManakaiDOMDocument
 
   @enDesc:
     A <IF::PCDocument> is a <IF::Document> that represents a Perl code.
-
-  @s:rootElementType: pc|file
 
   @Test:
     @@QName: DOMImplementation.createDocument.PCDocument.test
@@ -4475,14 +4692,33 @@ IFClsDef:
           my $first_pack;
           my $first_pack_name;
           for my $pack (@{$file ? $file->child_nodes : []}) {
-            next unless $pack->can ('get_rev_isa_package_name_list');
+            next unless $pack->can ('package_name');
             unless (defined $first_pack) {
               $first_pack = $pack;
               $first_pack_name = $first_pack->package_name;
             }
+
+            for my $feature (@{$pack->get_elements_by_tag_name_ns
+                (<Q::pc|>, 'hasFeature')}) {
+              $r->{feature}->{$feature->feature_name}
+                  ->{$feature->feature_version} = {
+                module => $first_pack_name,
+              };
+            }
+
+            for my $feature (@{$pack->get_elements_by_tag_name_ns
+                (<Q::pc|>, 'elementType')}) {
+              my $nsuri = $feature->pc_namespace_uri;
+              $r->{element_type}->{defined $nsuri ? $nsuri : ''}
+                  ->{$feature->pc_local_name} = {
+                module => $first_pack_name,
+              };
+            }
+
             my $rev_isa = $pack->get_rev_isa_package_name_list;
             next unless @$rev_isa;
             my $pack_name = $pack->package_name;
+
             for my $mem (@{$pack->child_nodes}) {
               next unless $mem->can ('get_perl_name_list');
               my $proto = $mem->prototype;
@@ -4512,7 +4748,9 @@ IFClsDef:
   @enDesc:
     The class that provides factory methods. 
 
-  @CISA: c|ManakaiDOMImplementation||ManakaiDOM|ManakaiDOMLatest
+  @domperl:implementedByObjectsOf: DOMImpl
+  @domperl:classImplementedByObjectsOf: 
+    c|ManakaiDOMImplementation||ManakaiDOM|ManakaiDOMLatest
 
   @f:provides: pc|CoreFeature10
 

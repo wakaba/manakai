@@ -23,7 +23,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/03/10 10:52:03 $
+    $Date: 2006/11/04 12:25:15 $
   
   @Require:
     @@Module:
@@ -31,13 +31,20 @@ Module:
       @@@WithFor: ManakaiDOM|ManakaiDOMLatest
     @@Module:
       @@@WithFor: ManakaiDOM|ManakaiDOM
+    @@Module:
+      @@@QName: MDOM|DOMCore
+      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
 Namespace:
+  @c:
+    http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
   @dis:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
   @DISlib:
     http://suika.fam.cx/~wakaba/archive/2004/dis/
+  @domperl:
+    http://suika.fam.cx/~wakaba/archive/2006/dom/perl/
   @dx:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#
   @f:
@@ -273,8 +280,8 @@ IFClsDef:
   @IFQName: URIImplementation
   @ClsQName: ManakaiURIImplementation
 
-  @IFISA: f|MinimumImplementation
-  @ClsISA: f|ManakaiMinimumImplementation
+  @domperl:implementedByObjectsOf: c|DOMImplementation
+  @domperl:classImplementedByObjectsOf: c|ManakaiDOMImplementation
 
   @enDesc:
     The <IF::URIImplementation> interface provides

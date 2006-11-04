@@ -12,7 +12,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/11/03 17:53:32 $
+    $Date: 2006/11/04 12:25:13 $
 
   @Require:
     @@Module:
@@ -672,9 +672,6 @@ ClsDef:
 
       my $bag = $impl->{<H::mg|nodeBag>};
       my $id = $impl->{<H::mg|nodeIDReference>};
-        
-      $test->id ('interface');
-      $test->assert_isa ($impl, <IFName::f|MinimumImplementation>);
         
       $test->id ('interface');
       $test->assert_isa ($impl, <IFName::c|DOMImplementation>);

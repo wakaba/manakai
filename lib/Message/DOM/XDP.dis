@@ -13,7 +13,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/08/17 12:12:02 $
+    $Date: 2006/11/04 12:25:13 $
 
   @Require:
     @@Module:
@@ -42,6 +42,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dom/xdt#
   @DOMMain:
     http://suika.fam.cx/~wakaba/archive/2004/dom/main#
+  @domperl:
+    http://suika.fam.cx/~wakaba/archive/2006/dom/perl/
   @dx:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#
   @ecore:
@@ -454,8 +456,8 @@ IFClsDef:
   @IFQName: XDPDocument
   @ClsQName: ManakaiDOMXDPDocument
 
-  @IFISA: Document
-  @ClsISA: td|ManakaiDOMDocument
+  @domperl:implementedByObjectsOf: Document
+  @domperl:classImplementedByObjectsOf: td|ManakaiDOMDocument
 
   @f:implements: XDPFeature30
   @f:provides:

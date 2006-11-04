@@ -28,7 +28,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date:
-    $Date: 2006/04/02 10:45:22 $
+    $Date: 2006/11/04 12:25:12 $
 
   @Require:
     @@Module:
@@ -58,6 +58,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
   @c:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
+  @domperl:
+    http://suika.fam.cx/~wakaba/archive/2006/dom/perl/
   @dx:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#
   @ecore:
@@ -743,14 +745,27 @@ IFCls3Def:
   @IFQName: DOMImplementationLS
   @ClsQName: ManakaiDOMImplementationLS
 
-  @ClsISA: DOMCore|ManakaiDOMImplementation
-  @ClsISA: gls|ManakaiGLSImplementation
+  @domperl:implementedByObjectsOf: c|DOMImplementation
+  @domperl:classImplementedByObjectsOf: c|ManakaiDOMImplementation
 
   @f:provides: LSFeature30
 
   @enDesc:
     The <IF::DOMImplementationLS> interface contains factory methods
     for creating objects for load and save.
+
+  @Test:
+    @@QName: DOMImplementationLS.interface.1.test
+    @@PerlDef:
+      $test->assert_true
+          (<Class::c|ManakaiDOMImplementation>->isa
+              (<IFName::DOMImplementationLS>));
+  @Test:
+    @@QName: DOMImplementationLS.class.1.test
+    @@PerlDef:
+      $test->assert_true
+          (<Class::c|ManakaiDOMImplementation>->isa
+              (<ClassName::ManakaiDOMImplementationLS>));
 
   @enDesc:
     @@ForCheck: ManakaiDOM|ForIF

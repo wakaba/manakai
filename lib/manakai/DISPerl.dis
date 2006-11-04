@@ -13,7 +13,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/11/03 17:53:35 $
+      $Date: 2006/11/04 12:25:21 $
     @@ContentType:
       dis:Date.RCS
   
@@ -785,6 +785,20 @@ ResourceDef:
     See <Class::UNIVERSAL> class.
 
 ## -- Perl construct properties
+
+RPropDef:
+  @QName: p|require
+  @enFN:
+    <Perl::require>s
+  @dataType: DISCore|TFPQNames
+  @multipleProperties: DISCore|OrderedList
+
+RPropDef:
+  @QName: p|use
+  @enFN:
+    <Perl::use>s
+  @dataType: DISCore|TFPQNames
+  @multipleProperties: DISCore|OrderedList
 
 RPropDef:
   @QName: isExportOK

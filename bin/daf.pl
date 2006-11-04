@@ -12,7 +12,7 @@ use Message::Util::QName::Filter {
   Util => q<http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/>,
 };
 
-our$VERSION=do{my @r=(q$Revision: 1.17 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our$VERSION=do{my @r=(q$Revision: 1.18 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Cwd;
 use Getopt::Long;
 use Pod::Usage;
@@ -107,7 +107,6 @@ $Opt{dafx_suffix} = '.dafx' unless defined $Opt{dafx_suffix};
 $Opt{dafs_suffix} = '.dafs' unless defined $Opt{dafs_suffix};
 $Opt{dtd_suffix} = '.dtd' unless defined $Opt{dtd_suffix};
 $Opt{mod_suffix} = '.mod' unless defined $Opt{mod_suffix};
-$Message::DOM::DOMFeature::DEBUG = 1 if $Opt{debug};
 require Error;
 $Error::Debug = 1 if $Opt{debug};
 $Message::Util::Error::VERBOSE = 1 if $Opt{verbose};
