@@ -7,7 +7,7 @@ use Message::Util::QName::Filter {
   swcfg21 => q<http://suika.fam.cx/~wakaba/archive/2005/swcfg21#>,
 };
 
-our$VERSION=do{my @r=(q$Revision: 1.19 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our$VERSION=do{my @r=(q$Revision: 1.20 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Cwd;
 use Getopt::Long;
 use Pod::Usage;
@@ -128,6 +128,14 @@ sub verbose_msg_ ($) {
   print STDERR $s if $Opt{verbose};
 }
 
+sub daf_open_source_dis_document ($);
+sub daf_open_current_module_index ($$);
+sub daf_convert_dis_document_to_dnl_document ();
+sub daf_get_referring_module_uri_list ($);
+sub dac_search_file_path_stem ($$$);
+sub daf_get_module_index_file_name ($);
+sub daf_check_undefined ();
+
 ## ---- The MAIN Program
 
 my $start_time;
@@ -172,7 +180,7 @@ my $ResourceCount = 0;
 $db->pl_update_module (\@target_modules,
 get_module_index_file_name => sub {
   shift; # $db
-  daf_get_module_index_file_name (@_);
+  daf_get_module_index_file_name (shift);
 },
 get_module_source_document_from_uri => sub {
   my ($db, $module_uri, $module_for) = @_;
@@ -464,7 +472,7 @@ sub dac_search_file_path_stem ($$$) {
   return undef;
 } # dac_search_file_path_stem;
 
-sub daf_get_module_index_file_name ($$) {
+sub daf_get_module_index_file_name ($) {
   my ($module_uri) = @_;
   my $ns = $module_uri;
   $ns =~ s/(\w+)\z//;

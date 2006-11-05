@@ -43,7 +43,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/11/05 09:16:30 $
+    $Date: 2006/11/05 12:31:50 $
 
   @Require:
     @@Module:
@@ -795,7 +795,7 @@ IFClsDef:
           The implementation <kwd:MUST> treate <DOM::null>
           as if an empty string is specified.
     @@Return:
-      @@@Type: AtomFeedDocument
+      @@@Type: AtomDocument
       @@@enDesc:
         The newly created Atom Feed Document.
 
@@ -978,7 +978,7 @@ IFClsDef:
           The implementation <kwd:MUST> treate <DOM::null>
           as if an empty string is specified.
     @@Return:
-      @@@Type: AtomEntryDocument
+      @@@Type: AtomDocument
       @@@enDesc:
         The newly created Atom Entry Document.
 
@@ -1645,77 +1645,6 @@ IFClsDef:
       $test->id ('interface');
       $test->assert_isa ($doc, <IFName::AtomDocument>);
 ##AtomDocument
-
-IFClsDef:
-  @IFQName: AtomFeedDocument
-  @ClsQName: ManakaiFeedEntryDocument
-
-  @domperl:implementedByObjectsOf: Document
-  @domperl:classImplementedByObjectsOf: td|ManakaiDOMDocument
-
-  @f:implements: AtomFeature10
-
-  @enDesc:
-    The <IF::AtomFeedDocument> interface provides convenience
-    methods and attributes for an Atom
-    Feed Document, i.e. representation of an Atom feed.
-
-    If the <Feature::fe|Atom> feature version <FeatureVer::1.0>
-    is supported, a <IF::Document> object whose <A::Document.documentElement>'s
-    element type, if any, is <XE::atom|feed> at least at 
-    the time of creation <kwd:MUST> also
-    implement the <IF::AtomFeedDocument> interface.  Other
-    <IF::Document> objects <kwd:MAY> also implement
-    the <IF::AtomFeedDocument> interface.
-
-  @Test:
-    @@QName: createDocument.AtomFeedDocument.test
-    @@PerlDef:
-      my $impl;
-      __CODE{tc|createImplForTest:: $impl => $impl}__;
-    
-      my $doc = $impl-><M::c|DOMImplementation.createDocument>
-                         (<Q::atom|>, 'feed');
-
-      $test->id ('interface');
-      $test->assert_isa ($doc, <IFName::AtomFeedDocument>);
-##AtomFeedDocument
-
-IFClsDef:
-  @IFQName: AtomEntryDocument
-  @ClsQName: ManakaiAtomEntryDocument
-
-  @domperl:implementedByObjectsOf: Document
-  @domperl:classImplementedByObjectsOf: td|ManakaiDOMDocument
-
-  @f:implements: AtomFeature10
-
-  @enDesc:
-    The <IF::AtomEntryDocument> interface provides convenience
-    methods and attributes for an Atom
-    Entry Document, i.e. exactly one Atom entry, outside
-    of the context of an Atom feed.
-
-    If the <Feature::fe|Atom> feature version <FeatureVer::1.0>
-    is supported, a <IF::Document> object whose <A::Document.documentElement>'s
-    element type, if any, is <XE::atom|entry> at least at
-    the time of the creation <kwd:MUST> also
-    implement the <IF::AtomEntryDocument> interface.  Other
-    <IF::Document> objects <kwd:MAY> also implement
-    the <IF::AtomEntryDocument> interface.
-
-  @Test:
-    @@QName: createDocument.AtomEntryDocument.test
-    @@PerlDef:
-      my $impl;
-      __CODE{tc|createImplForTest:: $impl => $impl}__;
-    
-      my $doc = $impl-><M::c|DOMImplementation.createDocument>
-                         (<Q::atom|>, 'entry');
-
-      $test->id ('interface');
-      $test->assert_isa ($doc, <IFName::AtomEntryDocument>);
-##AtomEntryDocument
 
 AGDef:
   @QName: atomCommonAttributes

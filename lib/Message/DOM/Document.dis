@@ -13,7 +13,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/11/05 09:16:29 $
+    $Date: 2006/11/05 12:31:50 $
 
   @Require:
     @@Module:
@@ -6099,7 +6099,7 @@ NodeTypeDef:
         If an adopted node has user data with handlers being registered,
         those handlers are invoked after the adoption occurred,
         with the <CODE::operation>
-        parameter set to <C::c|UserDataHandler.NODE_ADOPTED>,
+        parameter set to <C::tc|UserDataHandler.NODE_ADOPTED>,
         <CODE::src> parameter set to the adopted node, and
         the <CODE::dest> parameter set to <DOM::null>.
 
@@ -6269,8 +6269,8 @@ NodeTypeDef:
             for my $key (keys %{$src_ud or {}}) {
               my $dh = $src_ud->{$key}->[1];
               if ($dh) {
-                $dh-><M::c|UserDataHandler.handle>
-                         (<C::c|UserDataHandler.NODE_ADOPTED>,
+                $dh-><M::tc|UserDataHandler.handle>
+                         (<C::tc|UserDataHandler.NODE_ADOPTED>,
                           $key, $src_ud->{$key}->[0], $src, null);
               }
             }
@@ -6327,7 +6327,7 @@ NodeTypeDef:
           my ($self, $op, $key, $data, $src, $dest) = @_;
           $udh_called = true;
 
-          $test->assert_equals ($op, <C::c|UserDataHandler.NODE_ADOPTED>);
+          $test->assert_equals ($op, <C::tc|UserDataHandler.NODE_ADOPTED>);
           $test->assert_equals ($key, 'key');
           $test->assert_equals (ref $data, 'HASH');
           $test->assert_not_null ($src);
@@ -6556,7 +6556,7 @@ NodeTypeDef:
       and <A::Node.namespaceURI>.
 
       User data associated to the imported node is not carried
-      over.  However, if any <IF::c|UserDataHandler>s has been
+      over.  However, if any <IF::tc|UserDataHandler>s has been
       specified along with the associated data, these handlers
       will be called with the appropriate parameters before
       this method returns.
@@ -6740,7 +6740,7 @@ NodeTypeDef:
       the node is first removed from the owner <IF::Element>'s attribute
       map.  Then, once renamed, it is put back.
 
-      In addition, a user data event <C::c|UserDataHandler.NODE_RENAMED>
+      In addition, a user data event <C::tc|UserDataHandler.NODE_RENAMED>
       is fired if there are user data handlers registered to the node.
       When the implementation supports the feature <Feature::MutationNameEvents>,
       each mutation operation involved in the method fires the appropriate

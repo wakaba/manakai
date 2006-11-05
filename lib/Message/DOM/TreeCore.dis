@@ -12,7 +12,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/11/05 09:16:30 $
+    $Date: 2006/11/05 12:31:50 $
 
   @Require:
     @@Module:
@@ -3281,7 +3281,7 @@ IFCls1Def:
 
       - The duplicate node has no user data, i.e. user data 
         associated to the node is not carried over.  However,
-        if any <IF::c|UserDataHandlers> has been specified along with
+        if any <IF::UserDataHandlers> has been specified along with
         the associated data, those handlers will be called with
         the appropriate parameters before the method returns.  <SRC::DOM3>
 
@@ -3319,8 +3319,8 @@ IFCls1Def:
       - Cloning a node does not copy the event listeners attached to it.
         <SRC::DOM2 Events, DOM3 Events>
 
-      {NOTE:: <IF::c|UserDataHandler>s are prohibitted to throw exceptions;
-              if a <IF::c|UserDataHandler> that is registered to the node
+      {NOTE:: <IF::UserDataHandler>s are prohibitted to throw exceptions;
+              if a <IF::UserDataHandler> that is registered to the node
               being cloned throws an exception, then the result of
               the method is undefined.
       }
@@ -3496,8 +3496,8 @@ IFCls1Def:
             for my $key (keys %{$src_ud}) {
               my $dh = $src_ud->{$key}->[1];
               if ($dh) {
-                $dh-><M::c|UserDataHandler.handle>
-                        (<C::c|UserDataHandler.NODE_CLONED>,
+                $dh-><M::UserDataHandler.handle>
+                        (<C::UserDataHandler.NODE_CLONED>,
                          $key, $src_ud->{$key}->[0], $src, $sd->[1]);
               }
             }
@@ -3532,7 +3532,7 @@ IFCls1Def:
           my ($self, $op, $key, $data, $src, $dest) = @_;
           $udh_called = true;
 
-          $test->assert_equals ($op, <C::c|UserDataHandler.NODE_CLONED>);
+          $test->assert_equals ($op, <C::UserDataHandler.NODE_CLONED>);
           $test->assert_equals ($key, 'key');
           $test->assert_equals (ref $data, 'HASH');
           $test->assert_not_null ($src);
@@ -3858,7 +3858,7 @@ IFCls1Def:
           Removes any existing association to the <P::key>.
     @@Param:
       @@@Name: handler
-      @@@Type: c|UserDataHandler
+      @@@Type: UserDataHandler
       @@@enDesc:
         The handler to associate to the <P::key>.
       @@@nullCase:
@@ -3902,7 +3902,7 @@ IFCls1Def:
               for my $key (keys %$uds) {
                 if (defined $uds->{$key}->[1]) {
                   $uds->{$key}->[1]->($uds->{$key}->[1],
-                                      <C::c|UserDataHandler.NODE_DELETED>,
+                                      <C::UserDataHandler.NODE_DELETED>,
                                       $key, $uds->{$key}->[0]);
                 }
               }
@@ -3967,9 +3967,9 @@ IFCls1Def:
           $udh_called = true;
 
           $test->id ('self');
-          $test->assert_isa ($self, <IFName::c|UserDataHandler>);
+          $test->assert_isa ($self, <IFName::UserDataHandler>);
           $test->id ('operation');
-          $test->assert_equals ($op, <C::c|UserDataHandler.NODE_DELETED>);
+          $test->assert_equals ($op, <C::UserDataHandler.NODE_DELETED>);
           $test->id ('key');
           $test->assert_equals ($key, 'key');
           $test->id ('data');
@@ -10899,3 +10899,220 @@ IntPropDef:
     Whether a node is read-only or not.
   @Type: DISPerl|Boolean
   @tc:nodeStemKey: ro
+
+ElementTypeBinding:
+  @Name: IFCls3Def
+  @ElementType: 
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@: dis|MultipleResource
+      @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
+    @@resourceFor: ManakaiDOM|ForIF
+    @@resourceFor:
+      @@@@: ManakaiDOM|ForClass
+      @@@ForCheck: ManakaiDOM|ManakaiDOM !=ManakaiDOM|ManakaiDOM
+    @@For: ManakaiDOM|DOM3
+    @@For: =ManakaiDOM|ManakaiDOM
+
+    @@rdf:type:
+      @@@@: DISLang|Interface
+      @@@ForCheck: ManakaiDOM|ForIF
+
+    @@rdf:type:
+      @@@@: DISLang|Class
+      @@@ForCheck: ManakaiDOM|ForClass
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOM||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOM3||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM3
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
+
+    @@f:implements:
+      @@@@: c|CoreFeature30
+      @@@For: ManakaiDOM|DOM3
+    @@f:implements:
+      @@@@: tx|XMLFeature30
+      @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeature
+    @@f:implements:
+      @@@@: tx|XMLVersionFeature10
+      @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeature
+    @@f:implements:
+      @@@@: tx|XMLVersionFeature11
+      @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeatureXML11
+
+ElementTypeBinding:
+  @Name: ConstGroup
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|ConstGroup
+    @@ForCheck: ManakaiDOM|ForIF !=ManakaiDOM|ManakaiDOM
+
+ElementTypeBinding:
+  @Name: Const
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type: DISLang|Const
+
+IFCls3Def:
+  @IFQName: UserDataHandler
+  @ClsQName: ManakaiDOMUserDataHandler
+
+  @enDesc:
+    A <IF::UserDataHandler> is a handler that gets called when the
+    node the object is associated to is being cloned, imported,
+    or renamed.  It can be used by the application to implement various
+    behaviors regarding the user data associated to the DOM nodes.
+
+  @enDesc:
+    @@ForCheck: ManakaiDOM|Perl
+    @@ddid: perl
+    @@@:
+      For manakai's Perl binding, a <Perl::CODE> reference 
+      can be set as if it is a <IF::UserDataHandler> to any
+      method parameter whose type is defined as <IF::UserDataHandler>.
+      When the <M::UserDataHandler.handle> method would be invoked,
+      the <Perl::CODE> reference itself is executed as if it is a 
+      subroutine implementing the method.
+
+        {NOTE:: The DOM implementation might <Perl::bless> such 
+                <Perl::CODE> reference with appropriate class name
+                when the reference is given to a method.
+        }
+
+      Any <IF::UserDataHandler> object <kwd:MUST> be <DOM::true>
+      when it is evaluated in Boolean context.
+
+  @enDesc:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@ddid: class
+    @@@:
+      If a <Perl::CODE> reference is used as a <IF::UserDataHandler>,
+      the reference will be <Perl::bless>ed to the class
+      <Class::ManakaiDOMUserDataHandler>.
+
+  @ResourceDef:
+    @@rdf:type: DISLang|InputProcessor
+    @@rdf:type: DISLang|OutputProcessor
+    @@PerlDefC:
+      $INPUT = bless $INPUT, <ClassName::ManakaiDOMUserDataHandler>
+        if ref $INPUT eq 'CODE';
+
+  @ConstGroup:
+    @@QName:  OperationType
+
+    @@rdfs:subClassOf: idl|unsignedShort||ManakaiDOM|all
+    @@Type: idl|unsignedShort||ManakaiDOM|all
+
+    @@enDesc:
+      An <Q::OperationType> value is an integer indicating the
+      type of operation being performed on a node.
+
+    @@Const:
+      @@@Name: NODE_CLONED
+      @@@intValue: 1
+      @@@enDesc:
+        The node is cloned.
+      @@@enImplNote:
+        <M::tc|Node.cloneNode>.
+
+    @@Const:
+      @@@Name: NODE_IMPORTED
+      @@@intValue: 2
+      @@@enDesc:
+        The node is imported.
+      @@@enImplNote:
+        <M::tc|Document.importNode>.
+
+    @@Const:
+      @@@Name: NODE_DELETED
+      @@@intValue: 3
+      @@@enDesc:
+        The node is deleted.
+      
+          {NOTE:: This may not be supported or may not be reliable
+                  in certain environments, such as Java, where
+                  the implementation has no real control over when
+                  objects are actually deleted.
+          }
+      @@@enDesc:
+        @@@@ddid: manakai
+        @@@@For: ManakaiDOM|ManakaiDOM
+        @@@@@:
+          In manakai implementation, when a user data handler
+          with type <C::OperationType.NODE_DELETE> is invoked
+          is undefined, as when Perl's <Perl::DESTROY> method is invoked.
+          In addition, it might not be invoked during the global
+          destruction.
+
+    @@Const:
+      @@@Name: NODE_RENAMED
+      @@@intValue: 4
+      @@@enDesc:
+        The node is renamed.
+      @@@enImplNote:
+        <M::tc|Document.renameNode>.
+
+    @@Const:
+      @@@Name: NODE_ADOPTED
+      @@@intValue: 5
+      @@@enDesc:
+        The node is adopted to the document.
+      @@@enImplNote:
+        <M::tc|Document.adoptNode>.
+
+  @Method:
+    @@Name: handle
+    @@enDesc:
+      The <M::UserDataHandler.handle> method is called whenever
+      the node for which the handler is registered is imported or cloned.
+
+      DOM applications must not raise exceptions in a <IF::UserDataHandler>.
+      The effect of throwing exceptions from the handler is implementation
+      dependent.
+
+    @@Param:
+      @@@Name: operation
+      @@@Type: idl|unsignedShort||ManakaiDOM|all
+      @@@dis:actualType: OperationType
+      @@@enDesc:
+        The type of operation that is being performed on the node.
+    @@Param:
+      @@@Name: key
+      @@@Type: DOMMain|DOMString
+      @@@enDesc:
+        The key for which the handler is being called.
+    @@Param:
+      @@@Name: data
+      @@@Type: DOMMain|DOMUserData
+      @@@enDesc:
+        The data for which the handler is being called.
+    @@Param:
+      @@@Name: src
+      @@@Type: tc|Node
+      @@@enDesc:
+        The node to which the <P::operation> is being performed.
+      @@@nullCase:
+        @@@@enDesc:
+          The handler is called when the node is being deleted.
+    @@Param:
+      @@@Name: dst
+      @@@Type: tc|Node
+      @@@enDesc:
+        The node newly created.
+      @@@nullCase:
+        @@@@enDesc:
+          No node is newly created.
+    @@Return:
+      @@@PerlDef:
+        goto &$self;
+##UserDataHandler

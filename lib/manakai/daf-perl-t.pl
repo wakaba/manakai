@@ -51,7 +51,6 @@ sub daf_perl_t ($$$) {
 
 sub daf_generate_perl_test_file ($) {
   my $mod = shift;
-  local $Message::Util::DIS::Perl::Implementation = $impl;
   my $pl = $impl->create_pc_file;
   my $factory = $pl->owner_document;
   my $pack = $pl->get_last_package ("Manakai::Test", make_new_package => 1);

@@ -13,7 +13,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/11/05 09:16:30 $
+    $Date: 2006/11/05 12:31:50 $
 
   @Require:
     @@Module:
@@ -927,8 +927,8 @@ ClsDef:
         $test->id ('attr.type');
         my $ti = $an-><AG::Attr.schemaTypeInfo>;
         $test->assert_equals
-                 ($ti-><AG::c|TypeInfo.typeNamespace>, <Q::xml-dtd:>);
-        $test->assert_equals ($ti-><AG::c|TypeInfo.typeName>, 'NMTOKENS');
+                 ($ti-><AG::TypeInfo.typeNamespace>, <Q::xml-dtd:>);
+        $test->assert_equals ($ti-><AG::TypeInfo.typeName>, 'NMTOKENS');
     @@L3Test:
       @@@QName: Document.createElement.defaultattr.3.test
       @@@enDesc:
@@ -1629,8 +1629,8 @@ ClsDef:
         $test->id ('attr.type');
         my $ti = $an-><AG::Attr.schemaTypeInfo>;
         $test->assert_equals
-                 ($ti-><AG::c|TypeInfo.typeNamespace>, <Q::xml-dtd:>);
-        $test->assert_equals ($ti-><AG::c|TypeInfo.typeName>, 'NMTOKENS');
+                 ($ti-><AG::TypeInfo.typeNamespace>, <Q::xml-dtd:>);
+        $test->assert_equals ($ti-><AG::TypeInfo.typeName>, 'NMTOKENS');
     @@Test:
       @@@QName: Document.createElementNS.defaultattr.3.test
       @@@PerlDef:
@@ -1953,37 +1953,37 @@ ClsDef:
         $cfg-><M::c|DOMConfiguration.setParameter> (<Q::cfg|xml-id> => true);
         my $at1 = $doc-><M::Document.createAttribute> ('xml:id');
         $test->assert_equals
-                 ($at1-><AG::Attr.schemaTypeInfo>-><AG::c|TypeInfo.typeName>,
+                 ($at1-><AG::Attr.schemaTypeInfo>-><AG::TypeInfo.typeName>,
                   'ID');
         $test->assert_equals
                  ($at1-><AG::Attr.schemaTypeInfo>
-                      -><AG::c|TypeInfo.typeNamespace>,
+                      -><AG::TypeInfo.typeNamespace>,
                   <Q::xml-dtd:>);
 
         $test->id ('id.other');
         my $at2 = $doc-><M::Document.createAttribute> ('id');
         $test->assert_null
-                 ($at2-><AG::Attr.schemaTypeInfo>-><AG::c|TypeInfo.typeName>);
+                 ($at2-><AG::Attr.schemaTypeInfo>-><AG::TypeInfo.typeName>);
         $test->assert_null
                  ($at2-><AG::Attr.schemaTypeInfo>
-                      -><AG::c|TypeInfo.typeNamespace>);
+                      -><AG::TypeInfo.typeNamespace>);
 
         $test->id ('noid.xmlid');
         $cfg-><M::c|DOMConfiguration.setParameter> (<Q::cfg|xml-id> => false);
         my $at3 = $doc-><M::Document.createAttribute> ('xml:id');
         $test->assert_null
-                 ($at3-><AG::Attr.schemaTypeInfo>-><AG::c|TypeInfo.typeName>);
+                 ($at3-><AG::Attr.schemaTypeInfo>-><AG::TypeInfo.typeName>);
         $test->assert_null
                  ($at3-><AG::Attr.schemaTypeInfo>
-                      -><AG::c|TypeInfo.typeNamespace>);
+                      -><AG::TypeInfo.typeNamespace>);
 
         $test->id ('noid.other');
         my $at4 = $doc-><M::Document.createAttribute> ('id');
         $test->assert_null
-                 ($at4-><AG::Attr.schemaTypeInfo>-><AG::c|TypeInfo.typeName>);
+                 ($at4-><AG::Attr.schemaTypeInfo>-><AG::TypeInfo.typeName>);
         $test->assert_null
                  ($at4-><AG::Attr.schemaTypeInfo>
-                      -><AG::c|TypeInfo.typeNamespace>);
+                      -><AG::TypeInfo.typeNamespace>);
 
   @CMethod:
     @@Name: createAttributeNS
@@ -2328,37 +2328,37 @@ ClsDef:
         $cfg-><M::c|DOMConfiguration.setParameter> (<Q::cfg|xml-id> => true);
         my $at1 = $doc-><M::Document.createAttributeNS> (<Q::xml:>, 'xml:id');
         $test->assert_equals
-                 ($at1-><AG::Attr.schemaTypeInfo>-><AG::c|TypeInfo.typeName>,
+                 ($at1-><AG::Attr.schemaTypeInfo>-><AG::TypeInfo.typeName>,
                   'ID');
         $test->assert_equals
                  ($at1-><AG::Attr.schemaTypeInfo>
-                      -><AG::c|TypeInfo.typeNamespace>,
+                      -><AG::TypeInfo.typeNamespace>,
                   <Q::xml-dtd:>);
 
         $test->id ('id.other');
         my $at2 = $doc-><M::Document.createAttributeNS> (null, 'id');
         $test->assert_null
-                 ($at2-><AG::Attr.schemaTypeInfo>-><AG::c|TypeInfo.typeName>);
+                 ($at2-><AG::Attr.schemaTypeInfo>-><AG::TypeInfo.typeName>);
         $test->assert_null
                  ($at2-><AG::Attr.schemaTypeInfo>
-                      -><AG::c|TypeInfo.typeNamespace>);
+                      -><AG::TypeInfo.typeNamespace>);
 
         $test->id ('noid.xmlid');
         $cfg-><M::c|DOMConfiguration.setParameter> (<Q::cfg|xml-id> => false);
         my $at3 = $doc-><M::Document.createAttributeNS> (<Q::xml:>, 'xml:id');
         $test->assert_null
-                 ($at3-><AG::Attr.schemaTypeInfo>-><AG::c|TypeInfo.typeName>);
+                 ($at3-><AG::Attr.schemaTypeInfo>-><AG::TypeInfo.typeName>);
         $test->assert_null
                  ($at3-><AG::Attr.schemaTypeInfo>
-                      -><AG::c|TypeInfo.typeNamespace>);
+                      -><AG::TypeInfo.typeNamespace>);
 
         $test->id ('noid.other');
         my $at4 = $doc-><M::Document.createAttributeNS> (null, 'id');
         $test->assert_null
-                 ($at4-><AG::Attr.schemaTypeInfo>-><AG::c|TypeInfo.typeName>);
+                 ($at4-><AG::Attr.schemaTypeInfo>-><AG::TypeInfo.typeName>);
         $test->assert_null
                  ($at4-><AG::Attr.schemaTypeInfo>
-                      -><AG::c|TypeInfo.typeNamespace>);
+                      -><AG::TypeInfo.typeNamespace>);
 ##DocumentElement
 
 ElementTypeBinding:
@@ -7018,16 +7018,16 @@ NodeTypeDef:
         $el-><M::Element.setAttribute> ('xml:id' => 'value');
         my $sti = $el-><M::Element.getAttributeNode> ('xml:id')
                      -><AG::Attr.schemaTypeInfo>;
-        $test->assert_equals ($sti-><AG::c|TypeInfo.typeName>, 'ID');
+        $test->assert_equals ($sti-><AG::TypeInfo.typeName>, 'ID');
         $test->assert_equals
-                 ($sti-><AG::c|TypeInfo.typeNamespace>, <Q::xml-dtd:>);
+                 ($sti-><AG::TypeInfo.typeNamespace>, <Q::xml-dtd:>);
 
         $test->id ('id.other');
         $el-><M::Element.setAttribute> ('id' => 'value');
         my $sti2 = $el-><M::Element.getAttributeNode> ('id')
                       -><AG::Attr.schemaTypeInfo>;
-        $test->assert_null ($sti2-><AG::c|TypeInfo.typeName>);
-        $test->assert_null ($sti2-><AG::c|TypeInfo.typeNamespace>);
+        $test->assert_null ($sti2-><AG::TypeInfo.typeName>);
+        $test->assert_null ($sti2-><AG::TypeInfo.typeNamespace>);
 
         my $el2 = $el-><AG::Node.ownerDocument>
                      -><M::Document.createElement> ('e');
@@ -7037,15 +7037,15 @@ NodeTypeDef:
         $el2-><M::Element.setAttribute> ('xml:id' => 'value');
         my $sti3 = $el2-><M::Element.getAttributeNode> ('xml:id')
                        -><AG::Attr.schemaTypeInfo>;
-        $test->assert_null ($sti3-><AG::c|TypeInfo.typeName>);
-        $test->assert_null ($sti3-><AG::c|TypeInfo.typeNamespace>);
+        $test->assert_null ($sti3-><AG::TypeInfo.typeName>);
+        $test->assert_null ($sti3-><AG::TypeInfo.typeNamespace>);
 
         $test->id ('noid.other');
         $el2-><M::Element.setAttribute> ('id' => 'value');
         my $sti4 = $el2-><M::Element.getAttributeNode> ('id')
                        -><AG::Attr.schemaTypeInfo>;
-        $test->assert_null ($sti4-><AG::c|TypeInfo.typeName>);
-        $test->assert_null ($sti4-><AG::c|TypeInfo.typeNamespace>);
+        $test->assert_null ($sti4-><AG::TypeInfo.typeName>);
+        $test->assert_null ($sti4-><AG::TypeInfo.typeNamespace>);
 
   @L2Method:
     @@Name: setAttributeNS
@@ -7390,16 +7390,16 @@ NodeTypeDef:
         $el-><M::Element.setAttributeNS> (<Q::xml:>, 'xml:id' => 'value');
         my $sti = $el-><M::Element.getAttributeNodeNS> (<Q::xml:>, 'id')
                      -><AG::Attr.schemaTypeInfo>;
-        $test->assert_equals ($sti-><AG::c|TypeInfo.typeName>, 'ID');
+        $test->assert_equals ($sti-><AG::TypeInfo.typeName>, 'ID');
         $test->assert_equals
-                 ($sti-><AG::c|TypeInfo.typeNamespace>, <Q::xml-dtd:>);
+                 ($sti-><AG::TypeInfo.typeNamespace>, <Q::xml-dtd:>);
 
         $test->id ('id.other');
         $el-><M::Element.setAttributeNS> (null, 'id' => 'value');
         my $sti2 = $el-><M::Element.getAttributeNodeNS> (null, 'id')
                       -><AG::Attr.schemaTypeInfo>;
-        $test->assert_null ($sti2-><AG::c|TypeInfo.typeName>);
-        $test->assert_null ($sti2-><AG::c|TypeInfo.typeNamespace>);
+        $test->assert_null ($sti2-><AG::TypeInfo.typeName>);
+        $test->assert_null ($sti2-><AG::TypeInfo.typeNamespace>);
 
         my $el2 = $el-><AG::Node.ownerDocument>
                      -><M::Document.createElementNS> (null, 'e');
@@ -7409,15 +7409,15 @@ NodeTypeDef:
         $el2-><M::Element.setAttributeNS> (<Q::xml:>, 'xml:id' => 'value');
         my $sti3 = $el2-><M::Element.getAttributeNodeNS> (<Q::xml:>, 'id')
                        -><AG::Attr.schemaTypeInfo>;
-        $test->assert_null ($sti3-><AG::c|TypeInfo.typeName>);
-        $test->assert_null ($sti3-><AG::c|TypeInfo.typeNamespace>);
+        $test->assert_null ($sti3-><AG::TypeInfo.typeName>);
+        $test->assert_null ($sti3-><AG::TypeInfo.typeNamespace>);
 
         $test->id ('noid.other');
         $el2-><M::Element.setAttributeNS> (null, 'id' => 'value');
         my $sti4 = $el2-><M::Element.getAttributeNodeNS> (null, 'id')
                        -><AG::Attr.schemaTypeInfo>;
-        $test->assert_null ($sti4-><AG::c|TypeInfo.typeName>);
-        $test->assert_null ($sti4-><AG::c|TypeInfo.typeNamespace>);
+        $test->assert_null ($sti4-><AG::TypeInfo.typeName>);
+        $test->assert_null ($sti4-><AG::TypeInfo.typeNamespace>);
 
   @ResourceDef:
     @@QName: tc|setAttrValueNS
@@ -8529,11 +8529,11 @@ NodeTypeDef:
       The type information associated with the element.
     @@enImplNote:
       Currently manakai does not support XML Schema, so it is 
-      always a no-type <IF::c|TypeInfo>.  It is expected that
+      always a no-type <IF::TypeInfo>.  It is expected that
       a future version of the implementation will return an
       element type definition node that also implement the
-      <IF::c|TypeInfo> interface when the schema language is XML DTD.
-    @@Type: c|TypeInfo
+      <IF::TypeInfo> interface when the schema language is XML DTD.
+    @@Type: TypeInfo
     @@Get:
       @@@PerlDef:
         __CODE{c|createDTDTypeInfo::
@@ -8551,9 +8551,9 @@ NodeTypeDef:
                ('schema-type' => q[http://dummy.example/]);
 
         my $sti = $el-><AG::Element.schemaTypeInfo>;
-        $test->assert_isa ($sti, <IFName::c|TypeInfo>);
-        $test->assert_null ($sti-><AG::c|TypeInfo.typeName>);
-        $test->assert_null ($sti-><AG::c|TypeInfo.typeNamespace>);
+        $test->assert_isa ($sti, <IFName::TypeInfo>);
+        $test->assert_null ($sti-><AG::TypeInfo.typeName>);
+        $test->assert_null ($sti-><AG::TypeInfo.typeNamespace>);
     @@L3Test:
       @@@QName: Element.schemaTypeInfo.dtd.test
       @@@PerlDef:
@@ -8565,9 +8565,9 @@ NodeTypeDef:
                ('schema-type' => <Q::xml-dtd:>);
 
         my $sti = $el-><AG::Element.schemaTypeInfo>;
-        $test->assert_isa ($sti, <IFName::c|TypeInfo>);
-        $test->assert_null ($sti-><AG::c|TypeInfo.typeName>);
-        $test->assert_null ($sti-><AG::c|TypeInfo.typeNamespace>);
+        $test->assert_isa ($sti, <IFName::TypeInfo>);
+        $test->assert_null ($sti-><AG::TypeInfo.typeName>);
+        $test->assert_null ($sti-><AG::TypeInfo.typeNamespace>);
 
   @Method:
     @@Name: getElementsByTagName
@@ -12905,7 +12905,7 @@ NodeTypeDef:
       While the type information contained in the attribute is guarantee
       to be correct after loading the document or validation,
       it may not be reliable if the node was moved.
-    @@Type: c|TypeInfo
+    @@Type: TypeInfo
     @@Get:
       @@@PerlDef:
         my $type;
@@ -12932,9 +12932,9 @@ NodeTypeDef:
         my $attr = $el-><M::Element.getAttributeNodeNS> (null, 'a');
 
         my $sti = $attr-><AG::Attr.schemaTypeInfo>;
-        $test->assert_isa ($sti, <IFName::c|TypeInfo>);
-        $test->assert_null ($sti-><AG::c|TypeInfo.typeName>);
-        $test->assert_null ($sti-><AG::c|TypeInfo.typeNamespace>);
+        $test->assert_isa ($sti, <IFName::TypeInfo>);
+        $test->assert_null ($sti-><AG::TypeInfo.typeName>);
+        $test->assert_null ($sti-><AG::TypeInfo.typeNamespace>);
     @@L3Test:
       @@@QName: Attr.schemaTypeInfo.dtd.test
       @@@PerlDef:
@@ -12948,9 +12948,9 @@ NodeTypeDef:
         my $attr = $el-><M::Element.getAttributeNodeNS> (null, 'a');
 
         my $sti = $attr-><AG::Attr.schemaTypeInfo>;
-        $test->assert_isa ($sti, <IFName::c|TypeInfo>);
-        $test->assert_null ($sti-><AG::c|TypeInfo.typeName>);
-        $test->assert_null ($sti-><AG::c|TypeInfo.typeNamespace>);
+        $test->assert_isa ($sti, <IFName::TypeInfo>);
+        $test->assert_null ($sti-><AG::TypeInfo.typeName>);
+        $test->assert_null ($sti-><AG::TypeInfo.typeNamespace>);
     @@L3Test:
       @@@QName: Attr.schemaTypeInfo.dtd.cdata.test
       @@@PerlDef:
@@ -12965,10 +12965,10 @@ NodeTypeDef:
         $attr-><AS::Attr.manakaiAttributeType> (<C::ATDef.CDATA_ATTR>);
 
         my $sti = $attr-><AG::Attr.schemaTypeInfo>;
-        $test->assert_isa ($sti, <IFName::c|TypeInfo>);
-        $test->assert_equals ($sti-><AG::c|TypeInfo.typeName>, 'CDATA');
+        $test->assert_isa ($sti, <IFName::TypeInfo>);
+        $test->assert_equals ($sti-><AG::TypeInfo.typeName>, 'CDATA');
         $test->assert_equals
-                 ($sti-><AG::c|TypeInfo.typeNamespace>, <Q::xml-dtd:>);
+                 ($sti-><AG::TypeInfo.typeNamespace>, <Q::xml-dtd:>);
 
   @L3Attr:
     @@Name: isId
@@ -13251,3 +13251,476 @@ IntPropDef:
   @Type: DISPerl|Boolean||ManakaiDOM|all
   @rdfs:range: Attr
   @tc:nodeStemKey: isudid
+
+IFCls3Def:
+  @IFQName: TypeInfo
+  @ClsQName: ManakaiDOMDTDTypeInfo
+
+  @enDesc:
+    The <IF::TypeInfo> interface represents a type referenced from
+    <IF::Element> or <IF::Attr> nodes, specified in the schemas
+    associated with the document.  The type is a pair of a namespace URI
+    and name properties, and depends on the document's schema.
+
+  @enDesc:
+    @@ddid: xml10-dtd
+    @@@:
+      {P:: If the document's schema is an XML 1.0 DTD:
+  
+        - If the type is referenced from an <IF::|Attr> node and
+          there is a declaration for the attribute, 
+          <A::TypeInfo.typeNamespace> is 
+          <URI::http://www.w3.org/TR/REC-xml> and <A::TypeInfo.typeName>
+          is <InfoProp::attribute type> property value.
+
+        - If the type is referenced from an <IF::Attr> node and
+          there is no declaration for the attribute,
+          <A::TypeInfo.typeNamespace> and <A::TypeInfo.typeName>
+          are <DOM::null>.
+
+        - If the type is referenced from an <IF::Element> node,
+          <A::TypeInfo.typeNamespace> and <A::TypeInfo.typeName>
+          are <DOM::null>.
+
+      }
+  @enImplNote:
+    @@ddid: xml11-dtd
+    @@@:
+      XML 1.1 DTD??  Name character sets differ in XML 1.0 and 1.1
+      so namespace URI should be changed?
+  @enDesc:
+    @@ddid: xml-schema10
+    @@@:
+      {P:: If the document's schema is in XML Schema 1.0, the values
+           are computed from PSVI properties as:
+
+           - If <InfoProp::validity> property exists <EM::and> is
+             <CODE::valud> or <CODE::notKnown>::: <A::TypeInfo.typeNamespace>
+             is <XSCompProp::target namespace> and <A::TypeInfo.typeName>
+             is <XSCompProp::name> of the declared type if available,
+             or <DOM::null>.  Since XML Schema 1.0 does not require
+             exposing the declared type, DOM implementation might choose
+             not to provide type information if validity is not valid.
+
+           {LI:: If <InfoProp::validity> property exists and is <CODE::valid>:::
+
+              {OLI:: If <InfoProp::member type definition> exists:::
+
+                {OLI:: If <XSCompProp::name> is not absent:::
+                    <A::TypeInfo.typeNamespace> is <XSCompProp::target namespace>
+                    and <A::TypeInfo.typeName> is <XSCompProp::name>
+                    of the <InfoItem::member type definition>.
+                }
+
+                {OLI:: Otherwise::: <A::TypeInfo.typeNamespace> and
+                       <A::typeInfo.typeName> is the namespace and local
+                       name of the corresponding anonymous type name.
+                }
+
+              }
+
+              {OLI:: If <InfoProp::type definition> exists:::
+
+                {OLI:: If <XSCompProp::name> is not absent:::
+                    <A::TypeInfo.typeNamespace> is <XSCompProp::target namespace>
+                    and <A::TypeInfo.typeName> is <XSCompProp::name>
+                    of the <InfoItem::type definition>.
+                }
+
+                {OLI:: Otherwise::: <A::TypeInfo.typeNamespace> and
+                       <A::typeInfo.typeName> is the namespace and local
+                       name of the corresponding anonymous type name.
+                }
+
+              }
+
+              {OLI:: If <InfoProp::member type definition anonymous> exists:::
+
+                {OLI:: If it is false:::
+                    <A::TypeInfo.typeNamespace> is <InfoProp::member
+                    type definition namespace>
+                    and <A::TypeInfo.typeName> is <InfoProp::member
+                    type definition name>.
+                }
+
+                {OLI:: Otherwise::: <A::TypeInfo.typeNamespace> and
+                       <A::typeInfo.typeName> is the namespace and local
+                       name of the corresponding anonymous type name.
+                }
+
+              }
+
+              {OLI:: If <InfoProp::type definition anonymous> exists:::
+
+                {OLI:: If it is false:::
+                    <A::TypeInfo.typeNamespace> is <InfoProp::type
+                    definition namespace> and <A::TypeInfo.typeName>
+                    is <InfoProp::type definition name>.
+                }
+
+                {OLI:: Otherwise::: <A::TypeInfo.typeNamespace> and
+                       <A::typeInfo.typeName> is the namespace and local
+                       name of the corresponding anonymous type name.
+                }
+
+              }
+
+           }
+
+      }
+  @enImplNote:
+    @@ddid: other-lang
+    @@@:
+      Other schema languages are outside of the scope of the W3C.
+
+  @ResourceDef:
+    @@ForCheck: ManakaiDOM|ForClass
+    @@QName: c|createDTDTypeInfo
+    @@enDesc:
+      Returns a <IF::TypeInfo> object for an XML DTD type.
+    @@rdf:type: DISPerl|BlockCode
+    @@PerlDef:
+      my $v = $type || 0;
+      $result = bless \$v, <ClassName::ManakaiDOMDTDTypeInfo>;
+
+  @Attr:
+    @@Name: typeName
+    @@enDesc:
+      The name of the type declared for the associated element or attribute.
+    @@Type: DOMString
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          If the type is unknown.
+      @@@PerlDef:
+        $r = {
+          <C::ATDef.CDATA_ATTR> => 'CDATA',
+          <C::ATDef.ID_ATTR> => 'ID',
+          <C::ATDef.IDREF_ATTR> => 'IDREF',
+          <C::ATDef.IDREFS_ATTR> => 'IDREFS',
+          <C::ATDef.ENTITY_ATTR> => 'ENTITY',
+          <C::ATDef.ENTITIES_ATTR> => 'ENTITIES',
+          <C::ATDef.NMTOKEN_ATTR> => 'NMTOKEN',
+          <C::ATDef.NMTOKENS_ATTR> => 'NMTOKENS',
+          <C::ATDef.NOTATION_ATTR> => 'NOTATION',
+          <C::ATDef.ENUMERATION_ATTR> => 'ENUMERATION',
+        }->{$$self};
+       
+  @Attr:
+    @@Name: typeNamespace
+    @@enDesc:
+      The namespace of the type declared for the associated element or
+      attribute.
+    @@Type: DOMString
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          If the type is unknown or if no namespace information is available.
+      @@@enImplNote:
+        Is it namespace <EM::URI>?
+      @@@PerlDef:
+        $r = {
+          <C::ATDef.CDATA_ATTR> => true,
+          <C::ATDef.ID_ATTR> => true,
+          <C::ATDef.IDREF_ATTR> => true,
+          <C::ATDef.IDREFS_ATTR> => true,
+          <C::ATDef.ENTITY_ATTR> => true,
+          <C::ATDef.ENTITIES_ATTR> => true,
+          <C::ATDef.NMTOKEN_ATTR> => true,
+          <C::ATDef.NMTOKENS_ATTR> => true,
+          <C::ATDef.NOTATION_ATTR> => true,
+          <C::ATDef.ENUMERATION_ATTR> => true,
+        }->{$$self} ? <Q::xml-dtd|> : undef;
+
+  @ConstGroup:
+    @@QName: DerivationMethods
+
+    @@enDesc:
+      These are the available values for the <P::derivationMethod>
+      parameter of the <M::TypeInfo.isDerivedFrom> method.  It is
+      a set of possible types of derivation and the values represent
+      bit positions.  If a bit in the <P::derivationMethod> parameter
+      is set to <CODE::1>, the corresponding type if derivation will
+      be taken into account when evaluating the derivation between
+      the reference type definition and the other type definition.
+      When using the <M::TypeInfo.isDerivedFrom> method, combining
+      all of them in the <P::derivationMethod> parameter is equivalent
+      to invoking the method for each of them separately
+      and combining the results with the <CODE::or> boolean function.
+      DOM Level 3 Core specification only defines the type of
+      derivation for XML Schema.
+    @@enImplNote:
+      Any type derives from <Q::xsd:anyType>.  (Can any bit be used 
+      to test it?)
+
+    @@rdfs:subClassOf: idl|unsignedLong||ManakaiDOM|all
+    @@Type: idl|unsignedLong||ManakaiDOM|all
+    @@IsBitMask:1
+
+    @@Const:
+      @@@Name: DERIVATION_RESTRICTION
+      @@@intValue: 1
+      @@@enDesc:
+        The derivation by <CODE::restriction>.
+
+        In XML Schema 1.0, the reference type definition is derived
+        from the other type definition if the other type definition
+        is the same as the reference type definition, or if the other
+        type definition can be reached recursively following the
+        <XSCompName::base type definition> property from the reference
+        type definition, and all the <CODE::derivation method>s involved
+        are <CODE::restriction>.
+
+        Note that any simple type derives from <Q::xsd:anySimpleType>
+        by restriction.
+    @@Const:
+      @@@Name: DERIVATION_EXTENSION
+      @@@intValue: 2
+      @@@enDesc:
+        The derivation by <CODE::extension>.
+
+        In XML Schema 1.0, the reference type definition
+        is derived by <CODE::extension> from the other type definition if
+        the other type definition can be reached recursively following
+        the <XSCompProp::base type definition> property from
+        the reference type definition, and at least one of the <CODE::derivation
+        method>s involved is an <CODE::extension>.
+    @@Const:
+      @@@Name: DERIVATION_UNION
+      @@@intValue: 4
+      @@@enDesc:
+        The derivation by <CODE::union>.
+
+        In XML Schema 1.0, the reference type definition is derived by
+        <CODE::union> from the other type definition if there exists two
+        type definitions <VAR::T1> and <VAR::T2> such that the reference
+        type definition is derived from <VAR::T1> by
+        <C::TypeInfo.DERIVATION_RESTRICTION> or
+        <C::TypeInfo.DERIVATION_EXTENSION>, <VAR::T2> is derived from
+        the other type definition by <C::TypeInfo.DERIVATION_RESTRICTION>,
+        <VAR::T1> has <XSCompProp::variety> <CODE::union>, and one of
+        the <XSCompProp::member type definition> is <VAR::T2>.
+        Note that <VAR::T1>
+        could be the same as the reference type definition, and
+        <VAR::T2> could be the same as the other type definition.
+    @@Const:
+      @@@Name: DERIVATION_LIST
+      @@@intValue: 8
+      @@@enDesc:
+        The derivation by <CODE::list>.
+   
+        In XML Schema 1.0, the reference type definition is derived by
+        <CODE::list> from the other type definition if there exists two type
+        definitions <VAR::T1> and <VAR::T2> such that the reference type
+        definition is derived from <VAR::T1> by
+        <C::TypeInfo.DERIVATION_RESTRICTION> or
+        <C::TypeInfo.DERIVATION_EXTENSION>, <VAR::T2> is derived from
+        the other type definition by <C::TypeInfo.DERIVATION_RESTRICTION>,
+        <VAR::T1> has <XSCompProp::variety> <CODE::list>, and <VAR::T2>
+        is the <XSCompProp::item type definition>.  Note that <VAR::T1>
+        could be the same as the reference type definition, and
+        <VAR::T2> could be the same as the other type definition.
+
+  @Method:
+    @@Name: isDerivedFrom
+    @@enDesc:
+      Returns whether there is a derivation between the type
+      (<DFN::the reference type definition>) and <DFN::the other type
+      definition>.
+    @@Param:
+      @@@Name: typeNamespaceArg
+      @@@Type: DOMString
+      @@@enDesc:
+        The namespace of the other type definition.
+      @@@enImplNote:
+        Can't it be <DOM::null>?
+    @@Param:
+      @@@Name: typeNameArg
+      @@@Type: DOMString
+      @@@enDesc:
+        The name of the other type definition.
+    @@Param:
+      @@@Name: derivationMethod
+      @@@Type: idl|unsignedLong||ManakaiDOM|all
+      @@@dis:actualType: DerivationMethods
+      @@@enDesc:
+        The type of derivation and conditions applied between two
+        types.
+    @@Return:
+      @@@Type: idl|boolean||ManakaiDOM|all
+      @@@TrueCase:
+        @@@@enDesc:
+          If the document's schema language is XML Schema and
+          the reference type definition is derived from the other
+          type definition according to the <P::derivationMethod> parameter.
+
+          If the document's schema language is XML Schema,
+          the value of the <P::derivationMethod> parameter is <CODE::0>,
+          and the other type definition can be reached by recursing any
+          combination of <XSCompProp::base type definition>, 
+          <XSCompProp::item type definition>, or <XSCompProp::member
+          type definitions> properties.
+      @@@FalseCase:
+        @@@@enDesc:
+          If the document's schema language is DTD or no schema
+          is associated with the document.
+
+          If the document's schema language is XML Schema and
+          it does not meet the condition to return <DOM::true>.
+      @@@PerlDef:\
+        @@@@enImplNote:
+          <DOM::false>.
+
+  @IntMethod:
+    @@Operator:
+      @@@@: eq
+      @@@ContentType: DISPerl|Perl
+    @@enDesc:
+      For manakai's Perl binding, a <IF::TypeInfo> is equal (<Perl::eq>)
+      to another <IF::TypeInfo> if and only if their 
+      <A::TypeInfo.typeNamespace> and <A::TypeInfo.typeName> is literally
+      equals respectively.
+    @@Param:
+      @@@Name: t
+      @@@Type: TypeInfo
+    @@Return:
+      @@@Type: idl|boolean||ManakaiDOM|all
+      @@@PerlDef:
+        __DEEP{
+          if (UNIVERSAL::isa ($t, <IFName::TypeInfo>)) {
+            my $ln1 = $self-><AG::TypeInfo.typeName>;
+            my $ln2 = $t-><AG::TypeInfo.typeName>;
+            if ((defined $ln1 and defined $ln2 and $ln1 eq $ln2) or
+                (not defined $ln1 or not defined $ln2)) {
+              my $ns1 = $self-><AG::TypeInfo.typeNamespace>;
+              my $ns2 = $t-><AG::TypeInfo.typeNamespace>;
+              if ((defined $ns1 and defined $ns2 and $ns1 eq $ns2) or
+                  (not defined $ns1 and not defined $ns2)) {
+                $r = true;
+              }
+            }
+          }
+       }__;
+    @@L3Test:
+      @@@QName: DTDTypeInfo.==.test
+      @@@PerlDef:
+        $test->id ('cdata.cdata');
+        my $t1;
+        __CODE{c|createDTDTypeInfo::
+          $result => $t1,
+          $type => {<C::ATDef.CDATA_ATTR>},
+        }__;
+        my $t2;
+        __CODE{c|createDTDTypeInfo::
+          $result => $t2,
+          $type => {<C::ATDef.CDATA_ATTR>},
+        }__;
+        $test->assert_equals ($t1, $t2);
+
+        $test->id ('cdata.unknown');
+        __CODE{c|createDTDTypeInfo::
+          $result => $t2,
+          $type => {<C::ATDef.UNKNOWN_ATTR>},
+        }__;
+        $test->assert_not_equals ($t1, $t2);
+
+        $test->id ('cdata.no-type');
+        __CODE{c|createDTDTypeInfo::
+          $result => $t2,
+          $type => {<C::ATDef.NO_TYPE_ATTR>},
+        }__;
+        $test->assert_not_equals ($t1, $t2);
+
+        $test->id ('cdata.id');
+        __CODE{c|createDTDTypeInfo::
+          $result => $t2,
+          $type => {<C::ATDef.ID_ATTR>},
+        }__;
+        $test->assert_not_equals ($t1, $t2);
+
+        $test->id ('unknown.unknown');
+        __CODE{c|createDTDTypeInfo::
+          $result => $t1,
+          $type => {<C::ATDef.UNKNOWN_ATTR>},
+        }__;
+        __CODE{c|createDTDTypeInfo::
+          $result => $t2,
+          $type => {<C::ATDef.UNKNOWN_ATTR>},
+        }__;
+        $test->assert_equals ($t1, $t2);
+
+        $test->id ('unknown.no-type');
+        __CODE{c|createDTDTypeInfo::
+          $result => $t2,
+          $type => {<C::ATDef.NO_TYPE_ATTR>},
+        }__;
+        $test->assert_equals ($t1, $t2);
+
+        $test->id ('unknown.no-type-info');
+        $t2 = 100;
+        $test->assert_not_equals ($t1, $t2);
+##TypeInfo
+
+
+ElementTypeBinding:
+  @Name: ConstGroup
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISLang|ConstGroup
+    @@ForCheck: ManakaiDOM|ForIF !=ManakaiDOM|ManakaiDOM
+
+ElementTypeBinding:
+  @Name: Const
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISLang|Const
+
+ElementTypeBinding:
+  @Name: IFCls3Def
+  @ElementType: 
+    dis:ResourceDef
+  @ShadowContent:
+    @@rdf:type:
+      @@@@: dis|MultipleResource
+      @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
+    @@resourceFor: ManakaiDOM|ForIF
+    @@resourceFor:
+      @@@@: ManakaiDOM|ForClass
+      @@@ForCheck: ManakaiDOM|ManakaiDOM !=ManakaiDOM|ManakaiDOM
+    @@For: ManakaiDOM|DOM3
+    @@For: =ManakaiDOM|ManakaiDOM
+
+    @@rdf:type:
+      @@@@: DISLang|Interface
+      @@@ForCheck: ManakaiDOM|ForIF
+
+    @@rdf:type:
+      @@@@: DISLang|Class
+      @@@ForCheck: ManakaiDOM|ForClass
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOM||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOM3||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM3
+    @@Implement:
+      @@@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
+      @@@ContentType: DISCore|TFPQNames
+      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
+
+    @@f:implements:
+      @@@@: c|CoreFeature30
+      @@@For: ManakaiDOM|DOM3
+    @@f:implements:
+      @@@@: tx|XMLFeature30
+      @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeature
+    @@f:implements:
+      @@@@: tx|XMLVersionFeature10
+      @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeature
+    @@f:implements:
+      @@@@: tx|XMLVersionFeature11
+      @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeatureXML11
