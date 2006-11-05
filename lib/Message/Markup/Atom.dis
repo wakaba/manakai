@@ -43,7 +43,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/11/04 17:25:07 $
+    $Date: 2006/11/05 09:16:30 $
 
   @Require:
     @@Module:
@@ -731,7 +731,7 @@ IFClsDef:
       ) {
         $test->id ($interface);
         $test->assert_true
-                 (<Class::ManakaiAtomImplementation>->isa ($interface));
+                 (<Class::c|ManakaiDOMImplementation>->isa ($interface));
       }
   @Test:
     @@QName: ImplementationRegistry.AtomImplementation.1.test

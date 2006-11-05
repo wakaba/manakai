@@ -23,7 +23,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/11/04 12:25:12 $
+    $Date: 2006/11/05 09:16:29 $
   
   @Require:
     @@Module:
@@ -31,15 +31,6 @@ Module:
         DISlib:DISIDL
       @@@WithFor:
         ManakaiDOM:all
-    @@Module:
-      @@@QName: Util|ManakaiNode
-      @@@WithFor:
-        ManakaiDOM:Perl
-    @@Module:
-      @@@QName:
-        UtilError:DOMException
-      @@@WithFor:
-        ManakaiDOM:Perl
     @@Module:
       @@@WithFor:
         ManakaiDOM:ManakaiDOM
@@ -172,33 +163,6 @@ ElementTypeBinding:
     @@For: =ManakaiDOM|all
 
 ElementTypeBinding:
-  @Name: SubTypeDef
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type: dx|ErrorSubCode
-
-ElementTypeBinding:
-  @Name: XParam
-  @ElementType:
-    ecore:hasParameter
-
-ElementTypeBinding:
-  @Name: Const
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type: 
-      ManakaiDOM:Const
-
-ElementTypeBinding:
-  @Name: XConst
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type: dx|ErrorCode
-
-ElementTypeBinding:
   @Name: Attr
   @ElementType:
     dis:ResourceDef
@@ -275,13 +239,6 @@ ElementTypeBinding:
     @@For: =ManakaiDOM|all
     @@rdfs:subClassOf:
       DISCore:String::ManakaiDOM:all
-
-FormatDef:
-  @QName: DOMMethodParameterName
-  @Description:
-    @@lang:en
-    @@@:
-      A DOM method parameter name. 
 
 ElementTypeBinding:
   @Name: Return
@@ -367,124 +324,7 @@ ElementTypeBinding:
     @@ContentType:
       lang:Perl
 
-## -- DOM Feature
-
-ResourceDef:
-  @QName: 
-    DOMMain:docSupportsXMLFeature
-  @rdf:type: p|InlineCode
-  @Description:
-    @@lang:en
-    @@@:
-      Whether a document has support for the <Feature::XML> feature or not.
-  @PerlDef:
-    ($DOCOBJ->{<H::DOMCore:hasFeature>}->{XML})
-
-ElementTypeBinding:
-  @Name: FeatureDef
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type: DOMFeature|Feature
-    @@For: =ManakaiDOM|all
-
-ElementTypeBinding:
-  @Name: FeatureVerDef
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type: DOMFeature|Feature
-
-ElementTypeBinding:
-  @Name: featureQName
-  @ElementType:
-    f:name
-  @ShadowContent:
-    @@ContentType: DISCore|QName
-
-## -- Manakai object
-
-ResourceDef:
-  @QName: 
-    ManakaiDOM:ManakaiDOMObject
-  @rdf:type:
-    ManakaiDOM:Class
-  @For: 
-    ManakaiDOM:ManakaiDOM
-
-  @Implement: ecore|MUErrorTarget||ManakaiDOM|Perl
-
-  @Description:
-    @@lang:en
-    @@@:
-      The common class that is inherited by all manakai DOM object classes.
-  
-  @ResourceDef:
-    @@rdf:type: DISLang|Method
-    @@ForCheck: ManakaiDOM|ManakaiDOM !=ManakaiDOM|ManakaiDOM
-    @@ManakaiDOM:isForInternal: 1
-    @@Operator: ManakaiDOM|MUErrorHandler
-    @@Description:
-      @@@lang:en
-      @@@@:
-        This method is a generic error handler; all manakai exceptions 
-        and warnings associated to an object are once reported to this method 
-        and then delivered to appropriate entities. 
-        \
-        If the error is an exception (such as <IF::DOMCore:DOMException> or 
-        <IF::ManakaiDOM:ManakaiDOMImplementationException>), it is 
-        simply thrown.  If the error is only a warning, it is reported 
-        via the <IF::DOMCore:DOMError> interface. 
-        \
-        See <PerlModule::Message::Util::Error> documentation for more 
-        information on the error reporting mechanism.
-        \
-        {NOTE:: This kind of methods are named as <Perl::___report_error> 
-                in the convention of <PerlModule::Message::Util::Error>. 
-        \
-        }
-    @@Param:
-      @@@Name:err
-      @@@Type: ecore|ErrorInterface||ManakaiDOM|Perl
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          An exception object that describes what kind of error it is 
-          and how it should be recovered. 
-          \
-          {NOTE:: Exception objects in manakai implementation 
-                  inherit the class <PerlModule::Message::Util::Error>, 
-                  which in turn inherits <PerlModule::Error>.
-          \
-          }
-    @@Return:
-      @@@PerlDef:
-          if ($err->isa (<IFName::DOMCore|DOMError||ManakaiDOM|ManakaiDOM>)) {
-            CORE::warn $err;
-          } else {
-            $err-><M::ecore|ErrorInterface||ManakaiDOM|Perl.throw>;
-          }
-##ManakaiDOMObject
-
 ## -- DOM Core Specification datatypes
-
-ResourceDef:
-  @Name: DOMDataType
-  @Description:
-    @@lang:en
-    @@@:
-      A DOM data type.
-  @rdf:type:
-    rdfs:Class
-  @rdfs:subClassOf: idl|IDLDataType
-  @For: =ManakaiDOM|all
-
-ElementTypeBinding:
-  @Name: DOMDataTypeDef
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type: DOMDataType
 
 ResourceDef:
   @For:
@@ -493,7 +333,7 @@ ResourceDef:
   @enLabel:
     <DOM::DOMTimeStamp>
 
-  @rdf:type: DOMDataType
+  @DISCore:resourceType: DISLang|DataType
   @Description:
     @@lang:en
     @@@: 
@@ -508,7 +348,8 @@ ResourceDef:
   @idl:ecmascript: js|Date
 ##DOMTimeStamp
 
-DOMDataTypeDef:
+ResourceDef:
+  @DISCore:resourceType: DISLang|DataType
   @QName: DOMUserData
   @For: ManakaiDOM|DOM3
   @enLabel:
@@ -533,7 +374,8 @@ ElementTypeBinding:
   @ShadowContent:
     @@lang:en
 
-DOMDataTypeDef:
+ResourceDef:
+  @DISCore:resourceType: DISLang|DataType
   @QName: DOMObject
   @For: ManakaiDOM|DOM3
   @enLabel:
@@ -559,7 +401,7 @@ DOMDataTypeDef:
 
 ResourceDef:
   @QName: DOMString
-  @rdf:type: DOMDataType
+  @DISCore:resourceType: DISLang|DataType
   @enLabel:
     <DOM::DOMString>
 
@@ -575,15 +417,6 @@ ResourceDef:
     @@@: 
       A string.  It is used to store Unicode characters.
 ##DOMString
-
-ResourceDef:
-  @QName: ManakaiDOMString
-  @AliasFor: DOMString
-  @ImplNote:
-    @@lang:en
-    @@@:
-      This is a historical variant for <TYPE::DOMString>.
-  @For: ManakaiDOM|ManakaiDOM
 
 ## -- DOM specialized string types
 
@@ -760,6 +593,7 @@ StringDataTypeDef:
     @@rdf:type: DISLang|InputProcessor
     @@PerlDef:
       if (CORE::defined $INPUT and CORE::length $INPUT == 0) {
+        require Message::DOM::DOMMain;
         __DOMCore:ERROR{DOMMain|empty-namespace-uri::
         }__;
 
@@ -1003,6 +837,7 @@ StringDataTypeDef:
         ManakaiDOM:DOM3
     @@PerlDef:
       if (defined $INPUT and $INPUT eq '') {
+        require Message::DOM::DOMMain;
         __c|ERROR{DOMMain|empty-namespace-prefix::
         }__;
         undef $INPUT;

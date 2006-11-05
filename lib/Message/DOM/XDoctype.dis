@@ -17,7 +17,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/11/04 12:25:13 $
+    $Date: 2006/11/05 09:16:30 $
   
   @Require:
     @@Module:
@@ -129,6 +129,22 @@ FeatureDef:
       {ISSUE::
         Should it require <Q::d|Feature30>?
       }
+
+ElementTypeBinding:
+  @Name: ClsDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType:
+      @@@@: dis|MultipleResource
+      @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
+    @@resourceFor:
+      @@@@: ManakaiDOM|ForClass
+    @@For: ManakaiDOM|ManakaiDOMLatest
+
+    @@DISCore:resourceType:
+      @@@@: DISLang|Class
+      @@@ForCheck: ManakaiDOM|ForClass
 
 ElementTypeBinding:
   @Name: IFClsXDef
@@ -355,6 +371,273 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type: test|StandaloneTest
     @@ForCheck: ManakaiDOM|ForClass
+
+## -- DOM Implementation
+
+ClsDef:
+  @ClsQName: ManakaiDOMImplementationXDoctype
+
+  @enDesc:
+    The <Class::ManakaiDOMImplementationXDoctype> class implements
+    a factory method to create DOM
+    <IF::tx|DocumentType> defined in DOM Level 2 or higher.
+
+  @domperl:classImplementedByObjectsOf: c|ManakaiDOMImplementation
+  @Test:
+    @@QName: DOMImplementationXDoctype.class.1.test
+    @@PerlDef:
+      $test->assert_true
+          (<Class::c|ManakaiDOMImplementation>->isa
+              (<ClassName::ManakaiDOMImplementationXDoctype>));
+
+  @Test:
+    @@QName: Impl.new.mg.test
+    @@PerlDef:
+      local $Message::Util::Grove::GCLatency = 0;
+
+      my $impl;
+      __CODE{tc|createImplForTest:: $impl => $impl}__;
+
+      my $bag = $impl->{<H::mg|nodeBag>};
+      my $id = $impl->{<H::mg|nodeIDReference>};
+        
+      $test->id ('interface');
+      $test->assert_isa ($impl, <IFName::c|DOMImplementation>);
+        
+      $test->id ('class');
+      $test->assert_isa ($impl, <ClassName::ManakaiDOMImplementationXDoctype>);
+
+      undef $impl;
+
+      $test->id ('gc');
+      $test->assert_null ($bag->{$$id});
+
+  @CMethod:
+    @@Name: createDocumentType
+    @@enDesc:
+      Creates an empty <IF::tx|DocumentType> node.  Entity
+      declarations and notations are not made available.
+      Entity reference expansions and default attribute additions do
+      not occur.
+    @@DOMMain:isNamespaceAware: 1
+    @@enImplNote:
+      @@@ddid: xml2feature
+      @@@@:
+        The <CITE::DOM Level 2 Core> specification said that HTML-only 
+        DOM Level 2 implementations does not need to implement this member. 
+        The DOM Level 2 Errata withdraws it and it requires HTML-only 
+        DOM implementations throw a <X::c|DOMException.NOT_SUPPORTED_ERR>. 
+    @@enDesc:
+      @@@ddid: manakai
+      @@@For: ManakaiDOM|ManakaiDOM
+      @@@@:
+        In manakai, the method <M::c|DOMImplementation.createDocumentType>
+        is <EM::deprecated>; use the method
+        <M::DocumentX.createDocumentTypeDefinition> instead.
+    @@Param:
+      @@@Name: qualifiedName
+      @@@Type: DOMString
+      @@@enDesc:
+        The XML Namespaces 1.0 <SRC::DOM2, DOM3> qualified name of
+        the document type to be created.
+    @@Param:
+      @@@Name: publicId
+      @@@Type: DOMString
+      @@@enDesc:
+        The public identifier of the external subset.
+      @@@nullCase:
+        @@@@enDesc:
+          The external subset has no public identifier or
+          the document type has no external subset.  <SRC::manakai>
+    @@Param:
+      @@@Name: systemId
+      @@@Type: DOMString
+      @@@enDesc:
+        The system identifier of the external subset.
+      @@@nullCase:
+        @@@@enDesc:
+          The external subset has no system identifier or
+          the document type has no external subset.  <SRC::manakai>
+    @@enImplNote:
+      @@@ddid: badparam
+      @@@@:
+        Can <P::systemId> and / or <P::publicId> be <DOM::null>?
+
+        What should happen if <P::publicId> is non-<DOM::null>
+        and <P::systemId> is <DOM::null>?
+
+        What should happen if <P::publicId> or <P::systemId> 
+        is ill-formed?
+    @@Return:
+      @@@Type: tx|DocumentType
+      @@@enDesc:
+        The newly created <IF::tx|DocumentType> node with
+        <A::Node.ownerDocument> set to <DOM::null>.
+      @@@dx:raises:
+        @@@@@: MDOMX|MDOM_BAD_NAME
+        @@@@enDesc:
+          If the <P::qualifiedName> is not an XML 1.0 <CODE::Name>
+          <SRC::DOM3>.
+      @@@dx:raises:
+        @@@@@: MDOMX|MDOM_NS_MALFORMED_QNAME
+        @@@@enDesc:
+          If the <P::qualifiedName> is malformed.
+      @@@enImplNote:
+        @@@@ddid: strict
+        @@@@@:
+          The <A::Document.strictErrorChecking> attribute is
+          <EM::not> applied to these errors, since it has no
+          associated <IF::Document> node.
+      @@@iRaises:
+        @@@@@: MDOMX|MDOM_IMPL_NOSUPPORT_XMLNS
+        @@@@enDesc:
+          This exception may be raised if the implementation does not support 
+          the feature <Feature::XML> and the language exposed through
+          the document does not support XML namespaces.
+        @@@@enImplNote:
+          <QUOTE::Document>?  What document?
+      @@@PerlDef:
+        ## Validate |qualifiedName| - don't use |InputProcessor|
+        ## since it refers |strictErrorChecking| attribute.
+        unless (<Code::DOMMain|testXML10Name:: $INPUT = $qualifiedName>) {
+          __EXCEPTION{MDOMX|MDOM_BAD_NAME::
+            infoset|name => {$qualifiedName},
+            MDOMX|param-name => 'qualifiedName',
+            infoset|version => '1.0',
+          }__;
+        }
+        unless (<Code::DOMMain|testXML10QName:: $INPUT = $qualifiedName>) {
+          __EXCEPTION{MDOMX|MDOM_NS_MALFORMED_QNAME::
+            infoset|name => {$qualifiedName},
+            MDOMX|param-name => 'qualifiedName',
+            infoset|version => '1.0',
+          }__;
+        }
+
+        my $bag = <Code::mg|getNodeBag||ManakaiDOM|all:: $ref = $self>;
+        my $stem;
+        __CODE{mg|createNodeStem||ManakaiDOM|all::
+          $bag => $bag,
+          $stem => $stem,
+          $class => {<ClassName::d|ManakaiDOMDocumentTypeDefinition>},
+          $opt => {{
+            <H::infoset|name> => \$qualifiedName,
+            <H::f|implementation> => $self,
+          }},
+        }__;
+        __CODE{mg|createNodeRef||ManakaiDOM|all::
+          $bag => $bag,
+          $stem => $stem,
+          $ref => $r,
+          $opt => {{}},
+        }__;
+
+        if (defined $publicId){ 
+          $r-><AS::tx|DocumentType.publicId> ($publicId);
+        }
+        if (defined $systemId){ 
+          $r-><AS::tx|DocumentType.systemId> ($systemId);
+        }
+        $r-><M::Node.manakaiSetReadOnly> (true, true);
+
+    @@Test:
+      @@@QName: DOMImplDoc.createDocumentType.ncname.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{tc|createImplForTest:: $impl => $impl}__;
+
+        $test->id ('create');
+        my $dtype = $impl-><M::c|DOMImplementation.createDocumentType> ('qname');
+        $test->assert_isa ($dtype, <IFName::tx|DocumentType>);
+
+        $test->id ('nodeName');
+        $test->assert_equals ($dtype-><AG::Node.nodeName>, 'qname');
+    @@Test:
+      @@@QName: DOMImplDoc.createDocumentType.qname.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{tc|createImplForTest:: $impl => $impl}__;
+
+        $test->id ('create');
+        my $dtype = $impl-><M::c|DOMImplementation.createDocumentType>
+                             ('pfx:qname');
+        $test->assert_isa ($dtype, <IFName::tx|DocumentType>);
+
+        $test->id ('nodeName');
+        $test->assert_equals ($dtype-><AG::Node.nodeName>, 'pfx:qname');
+    @@Test:
+      @@@QName: DOMImplDoc.createDocumentType.non.name11.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{tc|createImplForTest:: $impl => $impl}__;
+
+        $test->id ('create');
+        $test->assert_exception (code => sub {
+          $impl-><M::c|DOMImplementation.createDocumentType> ('12345');
+        }, exception_subtype => <Q::MDOMX|MDOM_BAD_NAME>);
+    @@Test:
+      @@@QName: DOMImplDoc.createDocumentType.name11.non.name10.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{tc|createImplForTest:: $impl => $impl}__;
+
+        $test->id ('create');
+        $test->assert_exception (code => sub {
+          $impl-><M::c|DOMImplementation.createDocumentType>
+                   ("\x{3001}\x{3002}");
+                   ## A Name in XML 1.1 but not in XML 1.0.
+        }, exception_subtype => <Q::MDOMX|MDOM_BAD_NAME>);
+    @@Test:
+      @@@QName: DOMImplDoc.createDocumentType.non.qname11.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{tc|createImplForTest:: $impl => $impl}__;
+
+        $test->id ('create');
+        $test->assert_exception (code => sub {
+          $impl-><M::c|DOMImplementation.createDocumentType> (':aa');
+        }, exception_subtype => <Q::MDOMX|MDOM_NS_MALFORMED_QNAME>);
+    @@Test:
+      @@@QName: DOMImplDoc.createDocumentType.qname11.non.qname10.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{tc|createImplForTest:: $impl => $impl}__;
+
+        $test->id ('create');
+        $test->assert_exception (code => sub {
+          $impl-><M::c|DOMImplementation.createDocumentType>
+                   ("a:\x{3005}b");
+                    ## A QName in XMLNames 1.1 but not in XMLNames 1.0.
+        }, exception_subtype => <Q::MDOMX|MDOM_NS_MALFORMED_QNAME>);
+    @@Test:
+      @@@QName: DOMImplDoc.createDocumentType.pubid.sysid.test
+      @@@PerlDef:
+        my $impl;
+        __CODE{tc|createImplForTest:: $impl => $impl}__;
+
+        $test->id ('create');
+        my $dtype = $impl-><M::c|DOMImplementation.createDocumentType>
+                             ('qname', 'pubid', 'sysid');
+        $test->assert_isa ($dtype, <IFName::tx|DocumentType>);
+
+        $test->id ('nodeName');
+        $test->assert_equals ($dtype-><AG::Node.nodeName>, 'qname');
+
+        $test->id ('publicId');
+        $test->assert_equals ($dtype-><AG::tx|DocumentType.publicId>, 'pubid');
+
+        $test->id ('systemId');
+        $test->assert_equals ($dtype-><AG::tx|DocumentType.systemId>, 'sysid');
+##DOMImplementationXDoctype
+
+ElementTypeBinding:
+  @Name: iRaises
+  @ElementType:
+    dx:raises
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForIF
+
+## -- Document
 
 IFClsXDef:
   @IFQName: DocumentXDoctype
@@ -4210,9 +4493,7 @@ IFClsXDef:
           $r => $r,
           $prop => {<H::f|implementation>},
           $ref => $self,
-          $opt => {{
-            <H::mg|nodeRefInterfaces> => [<IFName::c|DOMImplementation>],
-          }},
+          $opt => {{}},
         }__;
         unless ($r) {
           __DEEP{

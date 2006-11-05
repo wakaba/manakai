@@ -44,7 +44,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/11/04 17:25:06 $
+      $Date: 2006/11/05 09:16:29 $
     @@ContentType:
       dis:Date.RCS
   
@@ -495,6 +495,14 @@ RPropDef:
     the subject <Q::domcommon|Interface> is an
     extension to the object <Q::domcommon|Interface>.
   @subsetOf: DISLang|formallyExtends
+
+RPropDef:
+  @QName: domidl|extends
+  @enFN: extends
+  @subsetOf: domcommon|extends
+  @subsetOf: idl|extends
+  @dataType: DISCore|TFPQNames
+  @multipleProperties: DISCore|OrderedList
 
 RPropDef:
   @QName: domperl|extends
@@ -2747,6 +2755,8 @@ ResourceDef:
   @CODE:
     @@QName: f|getFeatureImpl
     @@enDesc:
+      The implementation template of the <CODE::getFeature> method.
+
       - <Perl::$self>::: The object.
 
       - <Perl::$feature>::: Normalized feature name with 
@@ -2760,34 +2770,8 @@ ResourceDef:
 
       - <Perl::$r>::: The return value.
     @@PerlDef:
-      if ($Message::DOM::DOMFeature::ClassInfo->{ref $self}
-            ->{has_feature}->{$feature}->{$version} or
-          $Message::Util::AutoLoad::Registry::Feature
-              ->{$feature}->{$version}) {
+      if ($Message::Util::AutoLoad::Registry::Feature->{$feature}->{$version}) {
         $r = $self;
-      } else {
-        CLASS: for my $__class (sort {
-          $Message::DOM::ClassPoint{$b} <=> $Message::DOM::ClassPoint{$a}
-        } grep {
-          $Message::DOM::DOMFeature::ClassInfo->{$base_class}
-              ->{compat_class}->{$_}
-        } keys %{$Message::DOM::DOMFeature::ClassInfo->{$base_class}
-                     ->{compat_class} or {}}) {
-          if ($Message::DOM::DOMFeature::ClassInfo->{$__class}
-                  ->{has_feature}->{$feature}->{$version} or
-              $Message::Util::AutoLoad::Registry::Feature
-                  ->{$feature}->{$version}) {
-            __CODE{mg|createNodeRefFromID||ManakaiDOM|all::
-              $bag => {<Code::mg|getNodeBag||ManakaiDOM|all:: $ref = $self>},
-              $stemid => {<Code::mg|getNodeID||ManakaiDOM|all:: $ref = $self>},
-              $ref => $r,
-              $opt => {{
-                <H::mg|nodeRefClass> => \$__class,
-              }},
-            }__;
-            last CLASS;
-          }
-        } # CLASS
       }
 ##GetFeature
 

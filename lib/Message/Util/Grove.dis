@@ -9,7 +9,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/04/05 14:49:31 $
+    $Date: 2006/11/05 09:16:34 $
 
   @Require:
     @@Module:
@@ -744,19 +744,3 @@ IntPropDef:
     The node bag object referenced by the node reference object.
   @Type: DISPerl|Ref
   @mg:nodeRefKey: b
-
-## -- Other Property Names for Options
-
-IntPropDef:
-  @QName: mg|nodeRefClass
-  @mg:nodeStemKey: nrcls
-  @enDesc:
-    The Perl package name of the class of the node reference.
-
-IntPropDef:
-  @QName: mg|nodeRefInterfaces
-  @mg:nodeStemKey: nrifs
-  @enDesc:
-    A reference to the array that contains the Perl
-    package names of the interfaces that the node reference
-    should implement.

@@ -42,7 +42,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2005/10/09 13:57:12 $
+      $Date: 2006/11/05 09:16:29 $
     @@ContentType:
       dis:Date.RCS
 
@@ -1075,11 +1075,6 @@ ElementTypeBinding:
       @@@ForCheck:
         ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
         ManakaiDOM:DOMHTMLFeature !ForHTML
-    @@ISA:
-      @@@@:
-        ManakaiDOM:ManakaiDOMObject
-      @@@ForCheck:
-        ManakaiDOM:ForClass
     @@Implement:
       @@@@: ||+||ManakaiDOM|ForIF
       @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM1
@@ -1106,11 +1101,6 @@ ElementTypeBinding:
       @@@ForCheck:
         ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
         ManakaiDOM:DOMHTMLFeature !ForHTML
-    @@ISA:
-      @@@@:
-        ManakaiDOM:ManakaiDOMObject
-      @@@ForCheck:
-        ManakaiDOM:ForClass
 
 ElementTypeBinding:
   @Name: IfCls12ETDef
@@ -1778,8 +1768,6 @@ IF:
       @@@Name:title
       @@@Type:
         DOMMain:DOMString
-      @@@actualType:
-        DOMMain:ManakaiDOMString
       @@@Description:
         @@@@lang:en
         @@@@@:

@@ -40,7 +40,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/11/04 17:25:05 $
+      $Date: 2006/11/05 09:16:28 $
     @@ContentType:
       dis:Date.RCS
 
@@ -512,9 +512,6 @@ ResourceDef:
   @ISA:
     @@@: dx|Exception||ManakaiDOM|Perl
     @@ForCheck: ManakaiDOM|ForClass
-  @ISA:
-    @@@: ManakaiDOM|ManakaiDOMObject
-    @@ForCheck: ManakaiDOM|ForClass
 
   @IFQName: DOMException
   @ClsQName: ManakaiDOMException
@@ -651,8 +648,7 @@ ResourceDef:
           @@@@XParam:
             @@@@@QName:
               MDOMX:param-name
-            @@@@@Type:
-              DOMMain:DOMMethodParameterName
+            @@@@@Type: DOMString
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@:
@@ -667,8 +663,7 @@ ResourceDef:
           @@@@XParam:
             @@@@@QName:
               MDOMX:param-name
-            @@@@@Type:
-              DOMMain:DOMMethodParameterName
+            @@@@@Type: DOMString
             @@@@@Description:
               @@@@@@lang:en
               @@@@@@@:
@@ -1820,7 +1815,6 @@ IFCls3Def:
   @ClsQName: ManakaiDOMImplementationList
 
   @ClsISA: f|ManakaiImplementationList
-  @ClsISA: ManakaiDOM|ManakaiDOMObject
 
   @enDesc:
     The <IF::DOMImplementationList> interface provides the 
@@ -1889,7 +1883,6 @@ IFCls3Def:
   @ClsQName: ManakaiDOMImplementationSource
 
   @ClsISA: f|ManakaiImplementationSource
-  @ClsISA: ManakaiDOM|ManakaiDOMObject
 
   @enDesc:
     The <IF::DOMImplementationSource> interface permits a DOM
@@ -2453,8 +2446,6 @@ IFCls3Def:
   @IFQName: NameList
   @ClsQName: ManakaiDOMNameList
 
-  @ClsISA: ManakaiDOM|ManakaiDOMObject
-
   @enDesc:
     Objects implementing <IF::NameList> interface are used to
     represent ordered collections of parallel pairs of name
@@ -2815,6 +2806,11 @@ IFCls1Def:
 
       $test->id ('create_uri_reference');
       $test->assert_true ($impl->can ('create_uri_reference'));
+
+  @CODE:
+    @@QName: tc|createImplForTest
+    @@PerlDef:
+      $impl = <ClassName::c|ManakaiDOMImplementation>->_new;
   
   @IntMethod:
     @@Operator: mg|CreateNodeStemMethod
@@ -2842,7 +2838,7 @@ IFCls1Def:
     @@Return:
       @@@Type: DOMImplementation
       @@@PerlDef:
-        $r = bless $obj, ${$opt->{<H::mg|nodeRefClass>} or \$self};
+        $r = bless $obj, $self;
 
   @IntMethod:
     @@Name: new
@@ -3300,6 +3296,14 @@ PropDef:
   @ImplNote: Temporary.
 
 ElementTypeBinding:
+  @Name: CODE
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType: DISPerl|BlockCode
+    @@ForCheck: ManakaiDOM|ForClass
+
+ElementTypeBinding:
   @Name: actualType
   @ElementType:
     dis:actualType
@@ -3347,8 +3351,6 @@ ElementTypeBinding:
 IFCls3Def:
   @IFQName: c|TypeInfo
   @ClsQName: c|ManakaiDOMDTDTypeInfo
-
-  @ClsISA: ManakaiDOM|ManakaiDOMObject
 
   @enDesc:
     The <IF::TypeInfo> interface represents a type referenced from
@@ -3924,7 +3926,6 @@ IFCls3Def:
 
   @Implement: ecore|MUErrorInterface
   @ClsISA: ecore|MUError||ManakaiDOM|Perl
-  @ClsISA: ManakaiDOM|ManakaiDOMObject
 
   @enDesc:
     The <IF::DOMError> interface describes an error.
@@ -4413,8 +4414,6 @@ ElementTypeBinding:
 IFCls3Def:
   @IFQName: DOMConfiguration
   @ClsQName: ManakaiDOMConfiguration
-  
-  @ClsISA: ManakaiDOM|ManakaiDOMObject
 
   @enDesc:
     The <IF::DOMConfiguration> interface represents the configuration
@@ -4462,6 +4461,53 @@ IFCls3Def:
     @@PerlDef:
       $result = bless [$target, $targetHash, $targetType],
                       <ClassName::ManakaiDOMConfiguration>;
+
+  @IntMethod:
+    @@Operator: ManakaiDOM|MUErrorHandler
+    @@Description:
+      @@@lang:en
+      @@@@:
+        This method is a generic error handler; all manakai exceptions 
+        and warnings associated to an object are once reported to this method 
+        and then delivered to appropriate entities. 
+        \
+        If the error is an exception (such as <IF::DOMCore:DOMException> or 
+        <IF::ManakaiDOM:ManakaiDOMImplementationException>), it is 
+        simply thrown.  If the error is only a warning, it is reported 
+        via the <IF::DOMCore:DOMError> interface. 
+        \
+        See <PerlModule::Message::Util::Error> documentation for more 
+        information on the error reporting mechanism.
+        \
+        {NOTE:: This kind of methods are named as <Perl::___report_error> 
+                in the convention of <PerlModule::Message::Util::Error>. 
+        \
+        }
+    @@Param:
+      @@@Name:err
+      @@@Type: ecore|ErrorInterface||ManakaiDOM|Perl
+      @@@Description:
+        @@@@lang:en
+        @@@@@:
+          An exception object that describes what kind of error it is 
+          and how it should be recovered. 
+          \
+          {NOTE:: Exception objects in manakai implementation 
+                  inherit the class <PerlModule::Message::Util::Error>, 
+                  which in turn inherits <PerlModule::Error>.
+          \
+          }
+    @@Return:
+      @@@PerlDef:
+          if ($err->isa (<IFName::DOMCore|DOMError||ManakaiDOM|ManakaiDOM>)) {
+            CORE::warn $err;
+          } else {
+            $err-><M::ecore|ErrorInterface||ManakaiDOM|Perl.throw>;
+          }
+    @@enImplNote:
+      {TODO::
+        Need to refer <IF::td|Document>'s error handler.
+      }
 
   @IntMethod:
     @@Operator:

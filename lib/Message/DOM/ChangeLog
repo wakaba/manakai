@@ -1,5 +1,57 @@
 2006-11-05  Wakaba  <wakaba@suika.fam.cx>
 
+	* CharacterData.dis (ManakaiDOMDocumentCharacterData): New
+	class.  Factory methods |createTextNode| and |createComment|
+	are moved from |ManakaiDOMDocument|.
+
+	* DOMCore.dis: References to |ManakaiDOMObject|
+	are removed.
+	(tc:createImplForTest): Moved from |TreeCore.dis|.
+	(DOMImplementation.___create_node_ref): Support
+	for the |mg:nodeRefClass| option is removed.
+	(ManakaiDOMConfiguration.___report_error): Moved
+	from |ManakaiDOMObject| class.
+
+	* DOMFeature.dis (domidl:extends): New property.
+	(f:getFeatureImpl): Support for |+| classes is removed.
+
+	* DOMMain.dis (DOMMain:docSupportsXMLFeature): Removed.
+	(ManakaiDOM:ManakaiDOMObject): Removed.
+	(DOMDataType): Removed.
+
+	* Document.dis (ManakaiDOMImplementationDocument): 
+	The |createDocument| method is moved from
+	the |ManakaiDOMImplementationTC| in |TreeCore.dis|.
+	(ManakaiDOMDocument.___create_node_ref): Removed.
+	(createElement, createElementNS, createAttribute,
+	createAttributeNS, createTextNode, createComment,
+	createCDATASection, createEntityReference,
+	createProcessingInstruction): Class implementations
+	are moved to each module.
+
+	* Element.dis (ManakaiDOMImplementationElement): Factory
+	methods are moved from |Document.dis|.
+	(ManakaiDOMElement.___create_node_ref): Support
+	for old class registry is removed.
+	(ManakaiDOMAttr.___create_node_ref): Removed.
+	(Attr.baseURI): Implementation
+	for |xml:base| attribute is merged.
+	(Attr.nodeValue, Attr.value): Implementation
+	for |xml:id| attribute is merged.
+
+	* TreeCore.dis (ManakaiDOMImplementationTC): Removed.
+
+	* XDoctype.dis (ManakaiDOMImplementationXDoctype): The
+	definition for |createDocumentType| method
+	is moved from |TreeCore.dis|.
+
+	* XML.dis (ManakaiDOMXMLDocument): Factory
+	methods are moved from |Document.dis|.
+	(ManakaiDOMXMLBaseAttr, ManakaiDOMXMLIdAttr): Removed (merged
+	into |ManakaiDOMAttr| in |Element.dis|).
+
+2006-11-05  Wakaba  <wakaba@suika.fam.cx>
+
 	* Element.dis (___get_node_ref): |eval|ed |require|
 	statement was broken.
 

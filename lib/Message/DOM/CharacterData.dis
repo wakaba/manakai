@@ -12,7 +12,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/04/30 10:27:00 $
+    $Date: 2006/11/05 09:16:28 $
 
   @Require:
     @@Module:
@@ -49,6 +49,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dom/xdt#
   @DOMMain:
     http://suika.fam.cx/~wakaba/archive/2004/dom/main#
+  @domperl:
+    http://suika.fam.cx/~wakaba/archive/2006/dom/perl/
   @dx:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#
   @dxm:
@@ -599,6 +601,249 @@ ElementTypeBinding:
     dx:raises
   @ShadowContent:
     @@ForCheck: ManakaiDOM|ForIF
+
+## -- Document
+
+ClsDef:
+  @ClsQName: ManakaiDOMDocumentCharacterData
+
+  @domperl:classImplementedByObjectsOf: td|ManakaiDOMDocument
+  @Test:
+    @@QName: DocumentCharacterData.class.1.test
+    @@PerlDef:
+      $test->assert_true
+          (<Class::td|ManakaiDOMDocument>->isa
+              (<ClassName::ManakaiDOMDocumentCharacterData>));
+
+  @CMethod:
+    @@Name: createTextNode
+    @@enDesc:
+      Creates a <IF::Text> node given the specified string.
+    @@Param:
+      @@@Name: data
+      @@@Type: DOMString
+      @@@enDesc:
+        The data for the node.
+    @@Return:
+      @@@Type: Text
+      @@@enDesc:
+        The newly created <IF::Text> node.
+      @@@PerlDef:
+        my $bag = <Code::mg|getNodeBag||ManakaiDOM|all:: $ref = $self>;
+        my $stem;
+        __CODE{mg|createNodeStem||ManakaiDOM|all::
+          $bag => $bag,
+          $stem => $stem,
+          $class => {<ClassName::tcd|ManakaiDOMText>},
+          $opt => {{
+            <H::tc|ownerDocument> => $self,
+            <H::infoset|content> => \$data,
+          }},
+        }__;
+        __CODE{mg|createNodeRef||ManakaiDOM|all::
+          $bag => $bag,
+          $stem => $stem,
+          $ref => $r,
+          $opt => {{
+          }},
+        }__;
+
+    @@Test:
+      @@@QName: Doc.createTextNode.mg.1.test
+      @@@PerlDef:
+        local $Message::Util::Grove::GCLatency = 0;
+
+        my $impl;
+        __CODE{tc|createImplForTest:: $impl => $impl}__;
+
+        my $bag = $impl->{<H::mg|nodeBag>};
+        my $id = $impl->{<H::mg|nodeIDReference>};
+
+        my $doc = $impl-><M::c|DOMImplementation.createDocument>;
+
+        my $el = $doc-><M::Document.createTextNode> ('textdata');
+        
+        $test->id ('interface');
+        $test->assert_isa ($el, <IFName::Text>);
+        
+        $test->id ('class');
+        $test->assert_isa ($el, <ClassName::tcd|ManakaiDOMText>);
+
+        my $doc_id = $doc->{<H::mg|nodeIDReference>};
+        my $el_id = $el->{<H::mg|nodeIDReference>};
+
+        undef $impl;
+
+        $test->id ('gc.impl.1');
+        $test->assert_not_null ($bag->{$$id});
+
+        $test->id ('gc.doc.1');
+        $test->assert_not_null ($bag->{$$doc_id});
+
+        $test->id ('gc.el.1');
+        $test->assert_not_null ($bag->{$$el_id});
+
+        undef $doc;
+
+        $test->id ('gc.impl.2');
+        $test->assert_not_null ($bag->{$$id});
+
+        $test->id ('gc.doc.2');
+        $test->assert_not_null ($bag->{$$doc_id});
+
+        $test->id ('gc.el.2');
+        $test->assert_not_null ($bag->{$$el_id});
+
+        undef $el;
+
+        $test->id ('gc.impl.3');
+        $test->assert_null ($bag->{$$id});
+
+        $test->id ('gc.doc.3');
+        $test->assert_null ($bag->{$$doc_id});
+
+        $test->id ('gc.el.3');
+        $test->assert_null ($bag->{$$el_id});
+    @@Test:
+      @@@QName: Document.createTextNode.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+        my $text = $doc-><M::Document.createTextNode> ('text data');
+       
+        $test->id ('interface');
+        $test->assert_isa ($text, <IFName::Text>);
+
+        $test->id ('nodeValue');
+        $test->assert_equals ($text-><AG::Node.nodeValue>, 'text data');
+ 
+        $test->id ('isElementContentWhitespace');
+        $test->assert_false ($text-><AG::Text.isElementContentWhitespace>);
+    @@Test:
+      @@@QName: Document.createTextNode.2.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+        my $text = $doc-><M::Document.createTextNode> ('');
+       
+        $test->id ('interface');
+        $test->assert_isa ($text, <IFName::Text>);
+
+        $test->id ('nodeValue');
+        $test->assert_equals ($text-><AG::Node.nodeValue>, '');
+ 
+        $test->id ('isElementContentWhitespace');
+        $test->assert_false ($text-><AG::Text.isElementContentWhitespace>);
+
+  @CMethod:
+    @@Name: createComment
+    @@enDesc:
+      Creates a <IF::tcd|Comment> node.
+    @@Param:
+      @@@Name: data
+      @@@Type: DOMString
+      @@@enDesc:
+        The data for the node.
+    @@Return:
+      @@@Type: Comment
+      @@@enDesc:
+        The newly created <IF::tcd|Comment> node.
+      @@@PerlDef:
+        my $bag = <Code::mg|getNodeBag||ManakaiDOM|all:: $ref = $self>;
+        my $stem;
+        __CODE{mg|createNodeStem||ManakaiDOM|all::
+          $bag => $bag,
+          $stem => $stem,
+          $class => {<ClassName::tcd|ManakaiDOMComment>},
+          $opt => {{
+            <H::tc|ownerDocument> => $self,
+            <H::infoset|content> => \$data,
+          }},
+        }__;
+        __CODE{mg|createNodeRef||ManakaiDOM|all::
+          $bag => $bag,
+          $stem => $stem,
+          $ref => $r,
+          $opt => {{
+          }},
+        }__;
+
+    @@Test:
+      @@@QName: Document.createComment.mg.1.test
+      @@@PerlDef:
+        local $Message::Util::Grove::GCLatency = 0;
+
+        my $impl;
+        __CODE{tc|createImplForTest:: $impl => $impl}__;
+
+        my $bag = $impl->{<H::mg|nodeBag>};
+        my $id = $impl->{<H::mg|nodeIDReference>};
+
+        my $doc = $impl-><M::c|DOMImplementation.createDocument>;
+
+        my $el = $doc-><M::Document.createComment> ('textdata');
+        
+        $test->id ('interface');
+        $test->assert_isa ($el, <IFName::tcd|Comment>);
+        
+        $test->id ('class');
+        $test->assert_isa ($el, <ClassName::tcd|ManakaiDOMComment>);
+
+        my $doc_id = $doc->{<H::mg|nodeIDReference>};
+        my $el_id = $el->{<H::mg|nodeIDReference>};
+
+        undef $impl;
+
+        $test->id ('gc.impl.1');
+        $test->assert_not_null ($bag->{$$id});
+
+        $test->id ('gc.doc.1');
+        $test->assert_not_null ($bag->{$$doc_id});
+
+        $test->id ('gc.el.1');
+        $test->assert_not_null ($bag->{$$el_id});
+
+        undef $doc;
+
+        $test->id ('gc.impl.2');
+        $test->assert_not_null ($bag->{$$id});
+
+        $test->id ('gc.doc.2');
+        $test->assert_not_null ($bag->{$$doc_id});
+
+        $test->id ('gc.el.2');
+        $test->assert_not_null ($bag->{$$el_id});
+
+        undef $el;
+
+        $test->id ('gc.impl.3');
+        $test->assert_null ($bag->{$$id});
+
+        $test->id ('gc.doc.3');
+        $test->assert_null ($bag->{$$doc_id});
+
+        $test->id ('gc.el.3');
+        $test->assert_null ($bag->{$$el_id});
+##DocumentCharacterData
+
+ElementTypeBinding:
+  @Name: ClsDef
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType:
+      @@@@: dis|MultipleResource
+      @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
+    @@resourceFor: ManakaiDOM|ForClass
+    @@For: ManakaiDOM|ManakaiDOMLatest
+
+    @@DISCore:resourceType:
+      @@@@: DISLang|Class
+      @@@ForCheck: ManakaiDOM|ForClass
+
+## -- CharacterData
 
 IFCls1Def:
   @IFQName: CharacterData

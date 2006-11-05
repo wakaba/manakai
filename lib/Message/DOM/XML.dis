@@ -18,7 +18,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/04/16 10:05:23 $
+    $Date: 2006/11/05 09:16:30 $
 
   @Require:
     @@Module:
@@ -55,6 +55,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dis/
   @DOMMain:
     http://suika.fam.cx/~wakaba/archive/2004/dom/main#
+  @domperl:
+    http://suika.fam.cx/~wakaba/archive/2006/dom/perl/
   @dx:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#
   @f:
@@ -812,6 +814,598 @@ IntPropDef:
   @enDesc:
     Is the entity reference expanded.
   @tc:nodeStemKey: xpnded
+
+## -- Document
+
+ClsDef:
+  @ClsQName: ManakaiDOMXMLDocument
+
+  @domperl:classImplementedByObjectsOf: td|ManakaiDOMDocument
+  @Test:
+    @@QName: XMLDocument.class.1.test
+    @@PerlDef:
+      $test->assert_true
+          (<Class::td|ManakaiDOMDocument>->isa
+              (<ClassName::ManakaiDOMXMLDocument>));
+
+  @CMethod:
+    @@Name: createCDATASection
+    @@enDesc:
+      Creates a <IF::tx|CDATASection> node.
+    @@Param:
+      @@@Name: data
+      @@@Type: DOMString
+      @@@enDesc:
+        The data for the <IF::tx|CDATASection> content.
+    @@Return:
+      @@@Type: tx|CDATASection
+      @@@enDesc:
+        The newly created <IF::tx|CDATASection> node.
+      @@@iRaises:
+        @@@@@: MDOMX|MDOM_DOC_NOSUPPORT_XML
+        @@@@enDesc:
+          If the document is an HTML document.
+      @@@PerlDef:
+        my $bag = <Code::mg|getNodeBag||ManakaiDOM|all:: $ref = $self>;
+        my $stem;
+        __CODE{mg|createNodeStem||ManakaiDOM|all::
+          $bag => $bag,
+          $stem => $stem,
+          $class => {<ClassName::tx|ManakaiDOMCDATASection>},
+          $opt => {{
+            <H::tc|ownerDocument> => $self,
+            <H::infoset|content> => \$data,
+          }},
+        }__;
+        __CODE{mg|createNodeRef||ManakaiDOM|all::
+          $bag => $bag,
+          $stem => $stem,
+          $ref => $r,
+          $opt => {{
+          }},
+        }__;
+
+    @@Test:
+      @@@QName: Document.createCDATASection.mg.1.test
+      @@@PerlDef:
+        local $Message::Util::Grove::GCLatency = 0;
+
+        my $impl;
+        __CODE{tc|createImplForTest:: $impl => $impl}__;
+
+        my $bag = $impl->{<H::mg|nodeBag>};
+        my $id = $impl->{<H::mg|nodeIDReference>};
+
+        my $doc = $impl-><M::c|DOMImplementation.createDocument>;
+
+        my $el = $doc-><M::Document.createCDATASection> ('textdata');
+        
+        $test->id ('interface');
+        $test->assert_isa ($el, <IFName::tx|CDATASection>);
+        
+        $test->id ('class');
+        $test->assert_isa ($el, <ClassName::tx|ManakaiDOMCDATASection>);
+
+        my $doc_id = $doc->{<H::mg|nodeIDReference>};
+        my $el_id = $el->{<H::mg|nodeIDReference>};
+
+        undef $impl;
+
+        $test->id ('gc.impl.1');
+        $test->assert_not_null ($bag->{$$id});
+
+        $test->id ('gc.doc.1');
+        $test->assert_not_null ($bag->{$$doc_id});
+
+        $test->id ('gc.el.1');
+        $test->assert_not_null ($bag->{$$el_id});
+
+        undef $doc;
+
+        $test->id ('gc.impl.2');
+        $test->assert_not_null ($bag->{$$id});
+
+        $test->id ('gc.doc.2');
+        $test->assert_not_null ($bag->{$$doc_id});
+
+        $test->id ('gc.el.2');
+        $test->assert_not_null ($bag->{$$el_id});
+
+        undef $el;
+
+        $test->id ('gc.impl.3');
+        $test->assert_null ($bag->{$$id});
+
+        $test->id ('gc.doc.3');
+        $test->assert_null ($bag->{$$doc_id});
+
+        $test->id ('gc.el.3');
+        $test->assert_null ($bag->{$$el_id});
+
+  @CMethod:
+    @@Name: createEntityReference
+    @@enDesc:
+      Creates an <IF::tx|EntityReference> node.
+
+      In addition, if the referenced entity is known, the child
+      list of the <IF::tx|EntityReference> node is made the same
+      as that of the corresponding <IF::tx|Entity> node.
+
+      Note that if any descendant of the <IF::tx|Entity> node has
+      an unbound namespace prefix, the corresponding descendant of 
+      the created <IF::tx|EntityReference> node is also unbound,
+      i.e. its <A::Node.namespaceURI> is <DOM::null>.  DOM levels
+      2 and 3 do not support any mechanism to resolve namespace
+      prefixes in this case.  <SRC::DOM2, DOM3>
+    @@DOMMain:isNamespaceUnaware: 1
+    @@Param:
+      @@@Name: name
+      @@@Type: DOMString
+      @@@enDesc:
+        The name of the entity to reference.
+
+          {NOTE:: Namespace well-formedness check is not performed.
+          }
+      @@@enImplNote:
+        {ISSUE::
+           What would be made if the <P::name> is the name of one of
+           predefined entities?
+        }
+    @@Return:
+      @@@Type: tx|EntityReference
+      @@@enDesc:
+        The newly created <IF::tx|EntityReference> node.
+      @@@dx:raises:
+        @@@@@: MDOMX|MDOM_BAD_NAME
+        @@@@enDesc:
+          If the <P::name> is not an XML <CODE::Name> according
+          to the XML version in use specified in the
+          <A::Document.xmlVersion> attribute.
+      @@@dx:raises:
+        @@@@@: MDOMX|MDOM_DOC_NOSUPPORT_XML
+        @@@@enDesc:
+          If it is an HTML document.
+      @@@PerlDef:
+        our $CreateEntityReference_OpenEntity;
+          ## NOTE: Multithread unsafe
+
+        my $orig_strict = $self-><AG::Document.strictErrorChecking>;
+        if ($orig_strict) {
+          my $version = $self-><AG::Document.xmlVersion>;
+          __CODE{DOMMain|ensureXMLName::
+            $INPUT => $name, $INPUT_PARAM_NAME => 'name',
+            $XMLVERSION => $version,
+          }__;
+        }
+
+        my $bag = <Code::mg|getNodeBag||ManakaiDOM|all:: $ref = $self>;
+        my $stem;
+        __CODE{mg|createNodeStem||ManakaiDOM|all::
+          $bag => $bag,
+          $stem => $stem,
+          $class => {<ClassName::tx|ManakaiDOMEntityReference>},
+          $opt => {{
+            <H::infoset|name> => \$name,
+            <H::tc|ownerDocument> => $self,
+          }},
+        }__;
+        __CODE{mg|createNodeRef||ManakaiDOM|all::
+          $bag => $bag,
+          $stem => $stem,
+          $ref => $r,
+          $opt => {{
+          }},
+        }__;
+
+        ## Expansion
+        __DEEP{
+          unless ($CreateEntityReference_OpenEntity->{$name}) {
+            local $CreateEntityReference_OpenEntity->{$name} = true;
+            my $__doctype = $self-><AG::Document.doctype>;
+            $__doctype = $__doctype-><M::Node.getFeature>
+                                     (<Q::fe|XDoctype> => '3.0')
+              if $__doctype;
+            if ($__doctype) {
+              my $__et = $__doctype-><M::DTDef.getGeneralEntityNode> ($name);
+              if ($__et) {
+                $self-><AS::Document.strictErrorChecking> (false);
+                my @node;
+                for my $c (@{$__et-><AG::Node.childNodes>}) {
+                  my $clone = $c-><M::Node.cloneNode> (true);
+                  $r-><M::Node.appendChild> ($clone);
+                  push @node, $clone;
+                }
+                $r-><AS::tx|EntityReference.manakaiExpanded>
+                      ($__et-><AG::tx|Entity.hasReplacementTree>);
+                $self-><AS::Document.strictErrorChecking> ($orig_strict);
+              } # entity
+            } # doctype
+          }
+          $r-><M::Node.manakaiSetReadOnly> (true, true);
+        }__;
+
+    @@Test:
+      @@@QName: Document.createER.mg.1.test
+      @@@PerlDef:
+        local $Message::Util::Grove::GCLatency = 0;
+
+        my $impl;
+        __CODE{tc|createImplForTest:: $impl => $impl}__;
+
+        my $bag = $impl->{<H::mg|nodeBag>};
+        my $id = $impl->{<H::mg|nodeIDReference>};
+
+        my $doc = $impl-><M::c|DOMImplementation.createDocument>;
+
+        my $el = $doc-><M::Document.createEntityReference> ('entity');
+        
+        $test->id ('interface');
+        $test->assert_isa ($el, <IFName::tx|EntityReference>);
+        
+        $test->id ('class');
+        $test->assert_isa ($el, <ClassName::tx|ManakaiDOMEntityReference>);
+
+        my $doc_id = $doc->{<H::mg|nodeIDReference>};
+        my $el_id = $el->{<H::mg|nodeIDReference>};
+
+        undef $impl;
+
+        $test->id ('gc.impl.1');
+        $test->assert_not_null ($bag->{$$id});
+
+        $test->id ('gc.doc.1');
+        $test->assert_not_null ($bag->{$$doc_id});
+
+        $test->id ('gc.el.1');
+        $test->assert_not_null ($bag->{$$el_id});
+
+        undef $doc;
+
+        $test->id ('gc.impl.2');
+        $test->assert_not_null ($bag->{$$id});
+
+        $test->id ('gc.doc.2');
+        $test->assert_not_null ($bag->{$$doc_id});
+
+        $test->id ('gc.el.2');
+        $test->assert_not_null ($bag->{$$el_id});
+
+        undef $el;
+
+        $test->id ('gc.impl.3');
+        $test->assert_null ($bag->{$$id});
+
+        $test->id ('gc.doc.3');
+        $test->assert_null ($bag->{$$doc_id});
+
+        $test->id ('gc.el.3');
+        $test->assert_null ($bag->{$$el_id});
+    @@XDTest:
+      @@@QName: Document.createER.nodef.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+        my $ent = $doc-><M::Document.createEntityReference> ('ent1');
+        $test->assert_isa ($ent, <IFName::tx|EntityReference>);
+        
+        $test->id ('node.name');
+        $test->assert_equals ($ent-><AG::Node.nodeName>, 'ent1');
+
+        $test->id ('not.expanded');
+        $test->assert_false ($ent-><AG::tx|EntityReference.manakaiExpanded>);
+
+        $test->id ('empty');
+        $test->assert_false ($ent-><M::Node.hasChildNodes>);
+
+        $test->id ('readonly');
+        $test->assert_true ($ent-><AG::Node.manakaiReadOnly>);
+    @@XDTest:
+      @@@QName: Document.createER.hasdef.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docd = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>, '3.0');
+        my $dtd = $docd-><M::d|DocumentXDoctype.createDocumentTypeDefinition>
+                           ('doctype');
+          my $et = $docd-><M::d|DocumentXDoctype.createGeneralEntity>
+                             ('ent1');
+          $et-><AS::Node.textContent> ('replacement text content');
+          $et-><AS::tx|Entity.hasReplacementTree> (true);
+        $dtd-><M::DTDef.setGeneralEntityNode> ($et);
+        $doc-><M::Node.appendChild> ($dtd);
+
+        my $ent = $doc-><M::Document.createEntityReference> ('ent1');
+        $test->assert_isa ($ent, <IFName::tx|EntityReference>);
+        
+        $test->id ('node.name');
+        $test->assert_equals ($ent-><AG::Node.nodeName>, 'ent1');
+
+        $test->id ('expanded');
+        $test->assert_true ($ent-><AG::tx|EntityReference.manakaiExpanded>);
+
+        $test->id ('not.empty');
+        $test->assert_true ($ent-><M::Node.hasChildNodes>);
+
+        $test->id ('text.content');
+        $test->assert_equals ($ent-><AG::Node.textContent>,
+                              'replacement text content');
+
+        $test->id ('is.read.only');
+        $test->assert_exception (code => sub {
+          $ent-><AS::Node.textContent> ('new value');
+        }, exception_subtype => <Q::MDOMX|NOMOD_THIS>);
+    @@XDTest:
+      @@@QName: Document.createER.hasdef.no-read-only.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docd = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>, '3.0');
+        my $dtd = $docd-><M::d|DocumentXDoctype.createDocumentTypeDefinition>
+                           ('doctype');
+          my $et = $docd-><M::d|DocumentXDoctype.createGeneralEntity>
+                             ('ent1');
+          $et-><AS::Node.textContent> ('replacement text content');
+          $et-><AS::tx|Entity.hasReplacementTree> (true);
+        $dtd-><M::DTDef.setGeneralEntityNode> ($et);
+        $doc-><M::Node.appendChild> ($dtd);
+
+        my $ent = $doc-><M::Document.createEntityReference> ('ent1');
+        $test->assert_isa ($ent, <IFName::tx|EntityReference>);
+        $ent-><M::Node.manakaiSetReadOnly> (false, true);
+        
+        $test->id ('node.name');
+        $test->assert_equals ($ent-><AG::Node.nodeName>, 'ent1');
+
+        $test->id ('expanded');
+        $test->assert_true ($ent-><AG::tx|EntityReference.manakaiExpanded>);
+
+        $test->id ('not.empty');
+        $test->assert_true ($ent-><M::Node.hasChildNodes>);
+
+        $test->id ('text.content');
+        $test->assert_equals ($ent-><AG::Node.textContent>,
+                              'replacement text content');
+
+        $test->id ('is.not.read.only');
+        $ent-><AS::Node.textContent> ('new value');
+        $test->assert_equals ($ent-><AG::Node.textContent>,
+                              'new value');
+    @@XDTest:
+      @@@QName: Document.createER.hasdef.recursive.direct.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docd = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>, '3.0');
+        my $dtd = $docd-><M::d|DocumentXDoctype.createDocumentTypeDefinition>
+                           ('doctype');
+          my $ent0 = $doc-><M::Document.createEntityReference> ('ent1');
+          $test->assert_false ($ent0-><AG::tx|EntityReference.manakaiExpanded>);
+          my $et = $docd-><M::d|DocumentXDoctype.createGeneralEntity>
+                             ('ent1');
+          $et-><M::Node.appendChild> ($ent0);
+          $et-><AS::tx|Entity.hasReplacementTree> (true);
+        $dtd-><M::DTDef.setGeneralEntityNode> ($et);
+        $doc-><M::Node.appendChild> ($dtd);
+
+        $test->id ('create');
+        my $ent = $doc-><M::Document.createEntityReference> ('ent1');
+        $test->assert_isa ($ent, <IFName::tx|EntityReference>);
+        $test->assert_true ($ent-><AG::tx|EntityReference.manakaiExpanded>);
+
+        $test->id ('firstChild');
+        $test->assert_not_null ($ent-><AG::Node.firstChild>);
+        $test->assert_false ($ent-><AG::Node.firstChild>
+                                 -><AG::tx|EntityReference.manakaiExpanded>);
+    @@XDTest:
+      @@@QName: Document.createER.hasdef.recursive.indirect.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docd = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>, '3.0');
+        my $dtd = $docd-><M::d|DocumentXDoctype.createDocumentTypeDefinition>
+                           ('doctype');
+          my $ent0 = $doc-><M::Document.createEntityReference> ('ent2');
+          $test->assert_false ($ent0-><AG::tx|EntityReference.manakaiExpanded>);
+          my $et = $docd-><M::d|DocumentXDoctype.createGeneralEntity>
+                             ('ent1');
+          $et-><M::Node.appendChild> ($ent0);
+          $et-><AS::tx|Entity.hasReplacementTree> (true);
+
+          my $ent0_2 = $doc-><M::Document.createEntityReference> ('ent1');
+          my $et_2 = $docd-><M::d|DocumentXDoctype.createGeneralEntity>
+                             ('ent2');
+          $et_2-><M::Node.appendChild> ($ent0_2);
+          $et_2-><AS::tx|Entity.hasReplacementTree> (true);
+        $dtd-><M::DTDef.setGeneralEntityNode> ($et);
+        $doc-><M::Node.appendChild> ($dtd);
+
+        $test->id ('create');
+        my $ent = $doc-><M::Document.createEntityReference> ('ent1');
+        $test->assert_isa ($ent, <IFName::tx|EntityReference>);
+        $test->assert_true ($ent-><AG::tx|EntityReference.manakaiExpanded>);
+
+        $test->id ('firstChild');
+        $test->assert_not_null ($ent-><AG::Node.firstChild>);
+        $test->assert_false ($ent-><AG::Node.firstChild>
+                                 -><AG::tx|EntityReference.manakaiExpanded>);
+
+  @CMethod:
+    @@Name: createProcessingInstruction
+    @@enDesc:
+      Creates a <IF::tx|ProcessingInstruction> node given the
+      specified name and data strings.
+    @@Param:
+      @@@Name: target
+      @@@Type: DOMString
+      @@@enDesc:
+        The target part of the processing instruction.
+    @@Param:
+      @@@Name: data
+      @@@Type: DOMString
+      @@@enDesc:
+        The data for the node.
+    @@Return:
+      @@@Type: tx|ProcessingInstruction
+      @@@enDesc:
+        The newly created <IF::tx|ProcessingInstruction> node.
+      @@@dx:raises:
+        @@@@@: MDOMX|MDOM_BAD_NAME
+        @@@@enDesc:
+          If the <P::name> is not an XML <CODE::Name> according
+          to the XML version in use specified in the
+          <A::Document.xmlVersion> attribute.
+        @@@@UnlessStrictErrorChecking:
+        @@@@enImplNote:
+          <ABNF::"XML"> is not allowed as a target in XML
+          but it is not forbidden in DOM.
+          <URI::http://lists.w3.org/Archives/Public/www-dom/2001JanMar/thread.html#77>
+      @@@dx:raises:
+        @@@@@: MDOMX|MDOM_DOC_NOSUPPORT_XML
+        @@@@enDesc:
+          If the document is an HTML document.
+      @@@PerlDef:
+        if ($self-><AG::Document.strictErrorChecking>) {
+          my $version = $self-><AG::Document.xmlVersion>;
+          __CODE{DOMMain|ensureXMLName::
+            $INPUT => $target, $INPUT_PARAM_NAME => 'target',
+            $XMLVERSION => $version,
+          }__;
+        }
+
+        my $bag = <Code::mg|getNodeBag||ManakaiDOM|all:: $ref = $self>;
+        $data = '' unless defined $data;
+        my $stem;
+        __CODE{mg|createNodeStem||ManakaiDOM|all::
+          $bag => $bag,
+          $stem => $stem,
+          $class => {<ClassName::tx|ManakaiDOMProcessingInstruction>},
+          $opt => {{
+            <H::infoset|target> => \$target,
+            <H::infoset|content> => \$data,
+            <H::tc|ownerDocument> => $self,
+          }},
+        }__;
+        __CODE{mg|createNodeRef||ManakaiDOM|all::
+          $bag => $bag,
+          $stem => $stem,
+          $ref => $r,
+          $opt => {{
+          }},
+        }__;
+
+    @@Test:
+      @@@QName: Document.createPI.mg.1.test
+      @@@PerlDef:
+        local $Message::Util::Grove::GCLatency = 0;
+
+        my $impl;
+        __CODE{tc|createImplForTest:: $impl => $impl}__;
+
+        my $bag = $impl->{<H::mg|nodeBag>};
+        my $id = $impl->{<H::mg|nodeIDReference>};
+
+        my $doc = $impl-><M::c|DOMImplementation.createDocument>;
+
+        my $el = $doc-><M::Document.createProcessingInstruction> ('pi', 'data');
+        
+        $test->id ('interface');
+        $test->assert_isa ($el, <IFName::tx|ProcessingInstruction>);
+        
+        $test->id ('class');
+        $test->assert_isa ($el, <ClassName::tx|ManakaiDOMProcessingInstruction>);
+
+        my $doc_id = $doc->{<H::mg|nodeIDReference>};
+        my $el_id = $el->{<H::mg|nodeIDReference>};
+
+        undef $impl;
+
+        $test->id ('gc.impl.1');
+        $test->assert_not_null ($bag->{$$id});
+
+        $test->id ('gc.doc.1');
+        $test->assert_not_null ($bag->{$$doc_id});
+
+        $test->id ('gc.el.1');
+        $test->assert_not_null ($bag->{$$el_id});
+
+        undef $doc;
+
+        $test->id ('gc.impl.2');
+        $test->assert_not_null ($bag->{$$id});
+
+        $test->id ('gc.doc.2');
+        $test->assert_not_null ($bag->{$$doc_id});
+
+        $test->id ('gc.el.2');
+        $test->assert_not_null ($bag->{$$el_id});
+
+        undef $el;
+
+        $test->id ('gc.impl.3');
+        $test->assert_null ($bag->{$$id});
+
+        $test->id ('gc.doc.3');
+        $test->assert_null ($bag->{$$doc_id});
+
+        $test->id ('gc.el.3');
+        $test->assert_null ($bag->{$$el_id});
+    @@Test:
+      @@@QName: Document.createProcessingInstruction.1.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+        my $pi = $doc-><M::Document.createProcessingInstruction>
+                          ('target', 'data');
+
+        $test->id ('interface');
+        $test->assert_isa ($pi, <IFName::tx|ProcessingInstruction>);
+
+        $test->id ('nodeName');
+        $test->assert_equals ($pi-><AG::Node.nodeName>, 'target');
+
+        $test->id ('nodeValue');
+        $test->assert_equals ($pi-><AG::Node.nodeValue>, 'data');
+    @@Test:
+      @@@QName: Document.createProcessingInstruction.2.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+
+        my $pi = $doc-><M::Document.createProcessingInstruction>
+                          ('target:name', '');
+
+        $test->id ('interface');
+        $test->assert_isa ($pi, <IFName::tx|ProcessingInstruction>);
+
+        $test->id ('nodeName');
+        $test->assert_equals ($pi-><AG::Node.nodeName>, 'target:name');
+
+        $test->id ('nodeValue');
+        $test->assert_equals ($pi-><AG::Node.nodeValue>, '');
+##XMLDocument
+
+ElementTypeBinding:
+  @Name: UnlessStrictErrorChecking
+  @ElementType:
+    dis:Description
+  @ShadowContent:
+    @@ddid: unlessStrictErrorChecking
+    @@For: ManakaiDOM|ManakaiDOM3
+    @@@:
+      In manakai implementation, this exception is not thrown
+      when <A::Document.strictErrorChecking> attribute is set to
+      <DOM::false>.
+
+ElementTypeBinding:
+  @Name: iRaises
+  @ElementType:
+    dx:raises
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForIF
+
+## -- CDATASection
 
 IFCls1Def:
   @IFQName: CDATASection
@@ -1924,13 +2518,7 @@ NodeTypeDef:
           $r => $r,
           $prop => {<H::d|ownerDefinition>},
           $ref => $self,
-          $opt => {{
-            <H::mg|nodeRefInterfaces> => [
-              <IFName::DTDef>,
-              <IFName::d|DocumentTypeDeclaration>,
-              <IFName::DocumentType>,
-            ],
-          }},
+          $opt => {{}},
         }__;
 
     @@XDTest:
@@ -9337,276 +9925,3 @@ NodeTypeDef:
       @@@disDef:
         @@@@DISPerl:cloneCode: te|ManakaiDOMElement.manakaiBaseURI.set
 ##ProcessingInstruction
-
-ClsDef:
-  @ClsQName: ManakaiDOMXMLBaseAttr
-
-  @ClsISA: te|ManakaiDOMAttr
-
-  @DocAttr: XMLBaseAttribute||ManakaiDOM|all
-  @DocAttr: XMLBaseAttributeNS||ManakaiDOM|all
-
-  @enDesc:
-    A <Class::ManakaiDOMXMLBaseAttr> object represents
-    an <XA::xml:base> attribute node.
-    
-  @L2Test:
-    @@QName: createAttrNodeNS.xml-base.test
-    @@PerlDef:
-      my $doc;
-      __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
- 
-      my $xb = $doc-><M::Document.createAttributeNS> (<Q::xml:>, 'xml:base');
-      $test->assert_isa ($xb, <IFName::Attr>);
-      $test->assert_isa ($xb, <ClassName::ManakaiDOMXMLBaseAttr>);
-
-  @L2Test:
-    @@QName: setAttributeNS.xml-base.text
-    @@PerlDef:
-      my $doc;
-      __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
-
-      my $el = $doc-><M::Document.createElementNS> (null, 'e');
-      $el-><M::Element.setAttributeNS> (<Q::xml:>, 'xml:base', 'about:');
-      my $at = $el-><M::Element.getAttributeNodeNS> (<Q::xml:>, 'base');
-      $test->assert_isa ($at, <IFName::Attr>);
-      $test->assert_isa ($at, <ClassName::ManakaiDOMXMLBaseAttr>);
-
-  @enImplNote:
-    @@ddid: nons
-    @@@:
-      {ISSUE::
-        The <XA::xml:lang> attribute that does not belong to any
-        namespace (namespace-unaware).
-      }      
-
-  @CL3Attr:
-    @@Name: baseURI
-    @@enDesc:
-      The base URI of the node.
-    @@Type: DOMString
-    @@Get:
-      @@@PerlDef:
-        __DEEP{
-          my $oe = $self-><AG::Attr.ownerElement>;
-          if ($oe) {
-            my $oep = $oe-><AG::Node.parentNode>;
-            if ($oep) {
-              $r = $oep-><AG::Node.baseURI>;
-            } else {
-              $r = $self-><AG::Node.ownerDocument>-><AG::Node.baseURI>;
-            }
-          } else {
-            $r = $self-><AG::Node.ownerDocument>-><AG::Node.baseURI>;
-          }
-        }__;
-  
-    @@L3Test:
-      @@@QName: XMLBase.baseURI.test
-      @@@PerlDef:
-        my $doc;
-        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
-
-        my $attr = $doc-><M::Document.createAttributeNS>
-                           (<Q::xml:>, 'xml:base');
-        $attr-><AS::Attr.value> (q<http://attr.test/>);
-
-        $test->id ('initial');
-        $test->assert_null ($attr-><AG::Node.baseURI>);
-
-        $test->id ('doc');
-        $doc-><AS::Document.documentURI> (q<http://doc.test/>);
-        $test->assert_equals
-                 ($attr-><AG::Node.baseURI>,
-                  q<http://doc.test/>);
-
-        my $el = $doc-><M::Document.createElementNS> (null, 'e');
-       
-        $test->id ('el');
-        $el-><M::Element.setAttributeNodeNS> ($attr);
-        $test->assert_equals
-                 ($attr-><AG::Node.baseURI>,
-                  q<http://doc.test/>);
-
-        my $pel = $doc-><M::Document.createElementNS> (null, 'e');
-
-        $test->id ('pel');
-        $pel-><M::Element.setAttributeNS> (<Q::xml:>, 'xml:base',
-                                           q<http://pel.test/>);
-        $pel-><M::Node.appendChild> ($el);
-        $test->assert_equals
-                 ($attr-><AG::Node.baseURI>,
-                  q<http://pel.test/>);
-##XMLBaseAttr
-
-ClsDef:
-  @ClsQName: ManakaiDOMXMLIdAttr
-
-  @ClsISA: te|ManakaiDOMAttr
-
-  @DocAttr: XMLIdAttribute||ManakaiDOM|all
-  @DocAttr: XMLIdAttributeNS||ManakaiDOM|all
-
-  @enDesc:
-    A <Class::ManakaiDOMXMLIdAttr> object represents
-    an <XA::xml:id> attribute node.
-    
-  @L2Test:
-    @@QName: createAttrNodeNS.xml-id.test
-    @@PerlDef:
-      my $doc;
-      __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
- 
-      my $xb = $doc-><M::Document.createAttributeNS> (<Q::xml:>, 'xml:id');
-      $test->assert_isa ($xb, <IFName::Attr>);
-      $test->assert_isa ($xb, <ClassName::ManakaiDOMXMLIdAttr>);
-
-  @L2Test:
-    @@QName: setAttributeNS.xml-id.text
-    @@PerlDef:
-      my $doc;
-      __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
-
-      my $el = $doc-><M::Document.createElementNS> (null, 'e');
-      $el-><M::Element.setAttributeNS> (<Q::xml:>, 'xml:id', 'about:');
-      my $at = $el-><M::Element.getAttributeNodeNS> (<Q::xml:>, 'id');
-      $test->assert_isa ($at, <IFName::Attr>);
-      $test->assert_isa ($at, <ClassName::ManakaiDOMXMLIdAttr>);
-
-  @enImplNote:
-    @@ddid: nons
-    @@@:
-      {ISSUE::
-        The <XA::xml:id> attribute that does not belong to any
-        namespace (namespace-unaware).
-      }      
-
-  @CAttr:
-    @@Name: value
-    @@enDesc:
-      The <InfoProp::normalized value> of the attribute.
-    @@Type: DOMString
-    @@Get:
-      @@@PerlDef:
-        __DEEP{
-          $r = $self->SUPER::value;
-          if ($self-><AG::Attr.manakaiAttributeType>
-                  == <C::ATDef.ID_ATTR> and
-              $self-><AG::Node.ownerDocument>-><AG::Document.domConfig>
-                   -><M::c|DOMConfiguration.getParameter> (<Q::cfg|xml-id>)) {
-            $r =~ s/[\x09\x0A\x0D\x20]+/ /g;
-            $r =~ s/\A //;
-            $r =~ s/ \z//;
-          }
-        }__;
-    @@Set:
-      @@@NodeReadOnlyError:
-      @@@PerlDef:
-        __DEEP{
-          $self->SUPER::value ($given);
-        }__;
-
-  @CAttr:
-    @@Name: nodeValue
-    @@enDesc:
-      The <InfoProp::normalized value> of the attribute.
-    @@Type: DOMString
-    @@Get:
-      @@@disDef:
-        @@@@DISPerl:cloneCode: ManakaiDOMXMLIdAttr.value.get
-    @@Set:
-      @@@NodeReadOnlyError:
-      @@@disDef:
-        @@@@DISPerl:cloneCode: ManakaiDOMXMLIdAttr.value.set
-
-  @Test:
-    @@QName: XMLIdAttr.value.test
-    @@PerlDef:
-      my $doc;
-      __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
-
-      my $cfg = $doc-><AG::Document.domConfig>;
-
-      $cfg-><M::c|DOMConfiguration.setParameter> (<Q::cfg|xml-id> => true);
-
-      my $attr1 = $doc-><M::Document.createAttributeNS> (<Q::xml:>, 'xml:id');
-      $attr1-><AS::Node.textContent> (" ab\x09\x0A\x0D\x20cd ");
- 
-      $test->id ('id.value');
-      $test->assert_equals
-               ($attr1-><AG::Attr.value>,
-                "ab cd");
-
-      $test->id ('id.nodeValue');
-      $test->assert_equals
-               ($attr1-><AG::Node.nodeValue>,
-                "ab cd");
-
-      $test->id ('id.textContent');
-      $test->assert_equals
-               ($attr1-><AG::Node.textContent>,
-                " ab\x09\x0A\x0D\x20cd ");
-
-      $cfg-><M::c|DOMConfiguration.setParameter> (<Q::cfg|xml-id> => false);
-
-      my $attr2 = $doc-><M::Document.createAttributeNS> (<Q::xml:>, 'xml:id');
-      $attr2-><AS::Node.textContent> (" ab\x09\x0A\x0D\x20cd ");
- 
-      $test->id ('noid.value');
-      $test->assert_equals
-               ($attr2-><AG::Attr.value>,
-                " ab\x09\x0A\x0D\x20cd ");
-
-      $test->id ('noid.nodeValue');
-      $test->assert_equals
-               ($attr2-><AG::Node.nodeValue>,
-                " ab\x09\x0A\x0D\x20cd ");
-
-      $test->id ('noid.textContent');
-      $test->assert_equals
-               ($attr2-><AG::Node.textContent>,
-                " ab\x09\x0A\x0D\x20cd ");
-##XMLIdAttr
-
-ResourceDef:
-  @QName: XMLBaseAttribute
-  @AppName:
-    @@@:
-      xml:base
-    @@ContentType: DISCore|String
-  @For: =ManakaiDOM|all
-  @DISCore:resourceType: s|Attribute
-  @enDesc:
-     The <XA::xml:base> attribute.
-
-ResourceDef:
-  @QName: XMLBaseAttributeNS
-  @AppName:
-    @@@: xml|base
-    @@ContentType: DISCore|QName
-  @For: =ManakaiDOM|all
-  @DISCore:resourceType: s|Attribute
-  @enDesc:
-     The <XA::xml:base> attribute.
-
-ResourceDef:
-  @QName: XMLIdAttribute
-  @AppName:
-    @@@:
-      xml:id
-    @@ContentType: DISCore|String
-  @For: =ManakaiDOM|all
-  @DISCore:resourceType: s|Attribute
-  @enDesc:
-     The <XA::xml:id> attribute.
-
-ResourceDef:
-  @QName: XMLIdAttributeNS
-  @AppName:
-    @@@: xml|id
-    @@ContentType: DISCore|QName
-  @For: =ManakaiDOM|all
-  @DISCore:resourceType: s|Attribute
-  @enDesc:
-     The <XA::xml:id> attribute.
-

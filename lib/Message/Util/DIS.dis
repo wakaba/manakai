@@ -22,7 +22,7 @@ Module:
       @@@Year:2004
       @@@DISCore:author: DISCore|Wakaba
   @Date:
-    $Date: 2006/11/04 12:25:15 $
+    $Date: 2006/11/05 09:16:31 $
   
   @Require:
     @@Module:
@@ -4066,11 +4066,6 @@ IFClsDef:
       <IF::DOMCore|DOMException>s,
       the error is rethrown so that appropriate <Perl::catch> clause
       can catch the error.
-    @@enImplNote:
-      For implementations which does not have the
-      <IF::c|DOMError||ManakaiDOM|ManakaiDOM3> interface, the method
-      is defined in the <Class::ManakaiDOM|ManakaiDOMObject> class
-      and it is not overridden here.
     @@Param:
       @@@Name: err
       @@@Type: ecore|ErrorInterface||ManakaiDOM|Perl
@@ -5486,11 +5481,6 @@ IFClsDef:
       <IF::c|DOMError>.  Otherwise, including the cases of <IF::c|DOMException>s,
       the error is rethrown so that appropriate <Perl::catch> clause
       can catch the error.
-    @@enImplNote:
-      For implementations which does not have the
-      <IF::c|DOMError||ManakaiDOM|ManakaiDOM3> interface, the method
-      is defined in the <Class::ManakaiDOM|ManakaiDOMObject> class
-      and it is not overridden here.
     @@Param:
       @@@Name: err
       @@@Type: ecore|ErrorInterface||ManakaiDOM|Perl
