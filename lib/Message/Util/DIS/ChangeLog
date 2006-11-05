@@ -1,5 +1,14 @@
 2006-11-05  Wakaba  <wakaba@suika.fam.cx>
 
+	* Perl.dis (DISImplementationPerl): Removed.
+	(plLoadDISDatabaseModule): |require|s 
+	modules |Message::Util::DIS::Value|
+	and |Message::Util::DIS::DNLite| since
+	loaded objects might implement classes
+	defined in these modules.
+
+2006-11-05  Wakaba  <wakaba@suika.fam.cx>
+
 	* DNLite.dis (DISImplementationDNLite): Inheritance
 	was incorrect.
 

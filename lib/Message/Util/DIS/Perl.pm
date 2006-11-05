@@ -4476,6 +4476,7 @@ data_type eq
 
 'http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis'
 ) {
+
       $r = $self->{
 'http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#plCodeFragment'
 }
@@ -5541,6 +5542,9 @@ push @Message::DOM::DOMCore::ManakaiDOMImplementation::ISA, q<Message::Util::DIS
 sub pl_load_dis_database ($$$) {
 my ($self, $fileName, $moduleResolver) = @_;
 my $r;
+        require Message::Util::DIS;
+        require Message::Util::DIS::DNLite;
+        require Message::Util::DIS::Value;
 
 {
 
@@ -6807,6 +6811,9 @@ if
 ($disModule->isa (
 'Message::Util::DIS::ManakaiDISModuleLite'
 )) {
+          require Message::Util::DIS::DNLite;
+          require Message::Util::DIS::Value;
+
   my $dbmod;
   my $fileName;
   

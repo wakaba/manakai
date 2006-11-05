@@ -44,7 +44,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/11/05 09:16:29 $
+      $Date: 2006/11/05 10:57:30 $
     @@ContentType:
       dis:Date.RCS
   
@@ -2022,8 +2022,11 @@ ResourceDef:
           @@@@lang:en
           @@@@@: 
             A list of desired features that must be implemented.
+      @@@nullCase:
+        @@@@enDesc:
+          Any implementation is allowed.
      @@Return:
-       @@@Type: MinimumImplementation
+       @@@Type: c|DOMImplementation
        @@@enDesc:
          The first implementation that has the desired features.
          The object returned by this method may not implement
@@ -2137,6 +2140,9 @@ ResourceDef:
         @@@Description:
           @@@@lang:en
           @@@@@: A list of desired features that must be implemented.
+      @@@nullCase:
+        @@@@enDesc:
+          Any implementation is allowed.
      @@Return:
        @@@Type:  ImplementationList
        @@@actualType: ManakaiImplementationList
@@ -2420,8 +2426,11 @@ minIFClsDef:
           @@@@@:
             A string that specifies which features and versions are 
             required.
+      @@@nullCase:
+        @@@@enDesc:
+          Any implementation is allowed.
      @@Return:
-        @@@Type:MinimumImplementation
+        @@@Type: c|DOMImplementation
         @@@Description:
           @@@@lang:en
           @@@@@: 
@@ -2436,17 +2445,36 @@ minIFClsDef:
               This source has no implementation that supports the 
               desired features and versions.
       @@@PerlCDef:
+        $r = <Class::c|ManakaiDOMImplementation>->_new;
         for my $feature (keys %$features) {
           my $fkey = $feature;
           my $plus = $feature =~ s/^\+// ? 1 : 0;
           for my $version (grep {$features->{$fkey}->{$_}}
               keys %{$features->{$fkey}}) {
-            if ($Message::Util::AutoLoad::Registry::Feature
+            unless ($Message::Util::AutoLoad::Registry::Feature
                 ->{$feature}->{$version}) {
-              $r = <Class::c|ManakaiDOMImplementation>->_new;
+              undef $r;
             }
           }
         }
+
+    @@Test:
+      @@@QName: ImplementationSource.getImplementation.1.test
+      @@@PerlDef:
+        my $is = <ClassM::ManakaiImplementationSource.getImplementation>;
+        $test->assert_isa ($is, <IFName::c|DOMImplementation>);
+    @@Test:
+      @@@QName: ImplementationSource.getImplementation.2.test
+      @@@PerlDef:
+        my $is = <ClassM::ManakaiImplementationSource.getImplementation>
+            ({'core' => '3.0'});
+        $test->assert_isa ($is, <IFName::c|DOMImplementation>);
+    @@Test:
+      @@@QName: ImplementationSource.getImplementation.3.test
+      @@@PerlDef:
+        my $is = <ClassM::ManakaiImplementationSource.getImplementation>
+            ({'core' => '3.0', 'xml' => '3.0'});
+        $test->assert_isa ($is, <IFName::c|DOMImplementation>);
 
   @Method:
      @@Name:  getDOMImplementation
@@ -2509,9 +2537,11 @@ minIFClsDef:
           @@@@lang:en
           @@@@@:
             A string that specifies which features and versions are required.
+      @@@nullCase:
+        @@@@enDesc:
+          Any implementation is allowed.
      @@Return:
         @@@Type:  ImplementationList
-        @@@actualType: ManakaiImplementationList
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -2520,7 +2550,8 @@ minIFClsDef:
       @@@PerlCDef:
         $r = <ClassName::ManakaiImplementationList>->new;
         __DEEP{
-          push @$r, $self->get_implementation ($features);
+          my $v = $self->get_implementation ($features);
+          push @$r, $v if defined $v;
         }__;
 
   @Method:
@@ -2553,6 +2584,16 @@ minIFClsDef:
                            .getImplementationList> ($features);
           }__;
 ##ImplementationSource
+
+ElementTypeBinding:
+  @Name: nullCase
+  @ElementType:
+    dis:ResourceDef
+  @ShadowContent:
+    @@DISCore:resourceType:
+      ManakaiDOM:InCase
+    @@Value:
+      @@@is-null:1
 
 ResourceDef:
   @QName: makeClassISAList

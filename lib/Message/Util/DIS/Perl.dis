@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/11/04 12:25:20 $
+      $Date: 2006/11/05 10:57:30 $
     @@ContentType:
       dis:Date.RCS
   
@@ -296,96 +296,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|AttributeSet
-
-## -- Implementation
-
-IFClsDef: 
-  @IFQName: DISImplementationPerl
-  @ClsQName: ManakaiDISImplementationPerl
-
-  @domperl:implementedByObjectsOf:
-    c|DOMImplementation||ManakaiDOM|ManakaiDOMLatest
-  @domperl:classImplementedByObjectsOf:
-    c|ManakaiDOMImplementation||ManakaiDOM|ManakaiDOMLatest
-
-  @enDesc:
-    The object implementing <IF::DISImplementationPerl> interface
-    <kwd:MUST> also implement the <IF::DIS|DISImplementation> interface.
-
-  @f:provides: DIS|Perl10
-
-  @Method:
-    @@Name: plLoadDISDatabase
-    @@enDesc:
-      Loads a database from a file that was saved by 
-      <M::DISDatabasePerl.plStore>. 
-      \
-      {NOTE:: <QUOTE::dis> documents restored from external file
-              would have different <A::DIS|DISDocument.implementation> 
-              than this <Class::DISImplementationPerl>, even if 
-              it has been created by this implementation
-              and stored in the same session. 
-      \
-      }
-
-      Implementation does not have to able to restore a database
-      saved by other implementation.
-    @@Param:
-      @@@Name:fileName
-      @@@Type: 
-        DISLang:String::ManakaiDOM:all
-      @@@enDesc:
-        An environment-dependent file name.  How the relative pathes
-        is interpreted is implementation dependent.
-      @@@enDesc:
-        @@@@ForCheck: ManakaiDOM|ForClass
-        @@@@@:
-          In this implementation, relative pathes are resolved against
-          the current directory of the context.
-    @@Param:
-      @@@Name: moduleResolver
-      @@@Type: DISPerl|CODE||ManakaiDOM|all
-      @@@enDesc:
-        A reference to code.  The code would be passed two parameters,
-        the database and a module, and it <kwd:MUST> return
-        a <TYPE::DISPerl|String||ManakaiDOM|all> or <DOM::null>.
-        It is expected that the code constructs a file name path
-        from the module parameter.  Returning <DOM::null> means
-        that the code cannot create the file name.   The 
-        code <kwd:SHOULD-NOT> throw any exception.  The code
-        would be called when a submodule have to be loaded.
-
-        {NOTE:: If the returned path is relative, it is
-                resolved against the context, i.e. the current directory.
-        }
-    @@Return:
-      @@@Type: DIS|DISDatabase
-      @@@clsActualType: DIS|ManakaiDISDatabase
-      @@@SimpleException:
-      @@@PerlDef:
-        use Storable qw/retrieve/;
-        local $Carp::CarpLevel = $Carp::CarpLevel + 1;
-        $r = retrieve $fileName;
-
-        ## Restores weak references
-        require Scalar::Util;
-        for my $doc (values %{$r->{<H::DIS:sourceFile>}}) {
-          Scalar::Util::weaken ($doc->{<H::mn:node>}->{<H::DIS:db>})
-            if $doc->{<H::mn:node>}->{<H::DIS:db>};
-          Scalar::Util::weaken ($doc->{db}) if $doc->{db};
-          Scalar::Util::weaken ($doc->{ns}->{'###db'}) if $doc->{ns}->{'###db'};
-        }
-        for my $def (values %{$r->{modDef}},
-                     values %{$r->{forDef}},
-                     values %{$r->{resDef}}) {
-          $def->{db} = $r;
-          Scalar::Util::weaken ($def->{db});
-        }
-
-        $r->{<H::dp|dbModuleResolver>} = $moduleResolver;
-        delete $r->{<H::DOMCore|error-handler>};
-          ## Remove |undef| value if exists.
-##DISImplementationPerl
 
 ResourceDef:
   @QName: disdb
@@ -1354,6 +1264,9 @@ IFClsDef:
     @@Return:
       @@@PerlDef:
         if ($disModule->isa (<ClassName::DIS|ManakaiDISModuleLite>)) {
+          require Message::Util::DIS::DNLite;
+          require Message::Util::DIS::Value;
+
           my $dbmod;
           my $fileName;
           __DEEP{

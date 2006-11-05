@@ -15,7 +15,6 @@ use Message::Util::DIS::Test;
 use Message::DOM::GenericLS;
 
 our $impl; # Assigned in the main script
-our $limpl;
 our $db;
 my $tdt_parser;
 
@@ -52,9 +51,8 @@ sub daf_perl_t ($$$) {
 
 sub daf_generate_perl_test_file ($) {
   my $mod = shift;
-  my $pc = $impl->get_feature (ExpandedURI q<Util:PerlCode> => '1.0');
-  local $Message::Util::DIS::Perl::Implementation = $pc;
-  my $pl = $pc->create_pc_file;
+  local $Message::Util::DIS::Perl::Implementation = $impl;
+  my $pl = $impl->create_pc_file;
   my $factory = $pl->owner_document;
   my $pack = $pl->get_last_package ("Manakai::Test", make_new_package => 1);
   $pack->add_use_perl_module_name ("Message::Util::DIS::Test");
@@ -139,7 +137,7 @@ sub daf_generate_perl_test_file ($) {
         my $block = $pack->append_new_pc_block;
         my @test;
         
-        $tdt_parser ||= $limpl->create_gls_parser
+        $tdt_parser ||= $impl->create_gls_parser
                                  ({
                                    ExpandedURI q<DIS:TDT> => '1.0',
                                   });

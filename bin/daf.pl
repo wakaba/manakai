@@ -1,18 +1,13 @@
 #!/usr/bin/perl -w 
 use strict;
 use Message::Util::QName::Filter {
-  c => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#>,
-  DIS => q<http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#>,
   dis => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis-->,
   dp => q<http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#Perl/>,
-  fe => q<http://suika.fam.cx/www/2006/feature/>,
   ManakaiDOM => q<http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#>,
-  pc => q<http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/PerlCode#>,
   swcfg21 => q<http://suika.fam.cx/~wakaba/archive/2005/swcfg21#>,
-  Util => q<http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/>,
 };
 
-our$VERSION=do{my @r=(q$Revision: 1.18 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our$VERSION=do{my @r=(q$Revision: 1.19 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Cwd;
 use Getopt::Long;
 use Pod::Usage;
@@ -138,39 +133,23 @@ sub verbose_msg_ ($) {
 my $start_time;
 BEGIN { $start_time = time }
 
-use Message::Util::DIS::DNLite;
-
-my %feature;
+use Message::DOM::DOMCore;
 
 for (@{$Opt{create_module}}) {
   my (undef, undef, undef, $out_type) = @$_;
 
   if ($out_type eq 'perl-pm') {
     require 'manakai/daf-perl-pm.pl';
-    $feature{'+' . ExpandedURI q<Util:PerlCode>} = '1.0';
   } elsif ($out_type eq 'perl-t') {
     require 'manakai/daf-perl-t.pl';
-    $feature{ExpandedURI q<fe:GenericLS>} = '3.0';
-    $feature{'+' . ExpandedURI q<DIS:TDT>} = '1.0';
-    $feature{'+' . ExpandedURI q<Util:PerlCode>} = '1.0';
   } elsif ($out_type eq 'dtd-modules') {
     require 'manakai/daf-dtd-modules.pl';
-    $feature{ExpandedURI q<fe:GenericLS>} = '3.0';
-    $feature{'+' . ExpandedURI q<fe:XDP>} = '3.0';
   } elsif ($out_type eq 'dtd-driver') {
     require 'manakai/daf-dtd-modules.pl';
-    $feature{ExpandedURI q<fe:GenericLS>} = '3.0';
-    $feature{'+' . ExpandedURI q<fe:XDP>} = '3.0';
   }
 }
 
-our $limpl = $Message::DOM::ImplementationRegistry->get_implementation
-                           ({ExpandedURI q<fe:Min> => '3.0',
-                             '+' . ExpandedURI q<DIS:DNLite> => '1.0',
-                             '+' . ExpandedURI q<DIS:Core> => '1.0',
-                             %feature,
-                           });
-our $impl = $limpl->get_feature (ExpandedURI q<DIS:Core> => '1.0');
+our $impl = $Message::DOM::ImplementationRegistry->get_implementation;
 
 ## --- Loading and Updating the Database
 
@@ -180,7 +159,6 @@ $db->pl_database_module_resolver (\&daf_db_module_resolver);
 $db->dom_config->set_parameter ('error-handler' => \&daf_on_error);
 
 my $parser = $impl->create_dis_parser;
-my $DNi = $impl->get_feature (ExpandedURI q<DIS:DNLite> => '1.0');
 my %ModuleSourceDISDocument;
 my %ModuleSourceDNLDocument;
 my %ModuleNameNamespaceBinding = (
@@ -307,7 +285,6 @@ status_msg "done";
 
 daf_check_undefined ();
 
-undef $DNi;
 undef %ModuleSourceDNLDocument;
 exit $HasError if $HasError;
 
@@ -336,7 +313,6 @@ $db->free;
 undef $db;
 status_msg "done";
 
-undef $limpl;
 undef $impl;
 
 {
@@ -429,7 +405,7 @@ sub daf_convert_dis_document_to_dnl_document () {
     my $dis_doc = $ModuleSourceDISDocument{$module_uri};
     next M unless $dis_doc;
     verbose_msg_ qq<Converting <$module_uri>...>;
-    my $dnl_doc = $DNi->convert_dis_document_to_dnl_document
+    my $dnl_doc = $impl->convert_dis_document_to_dnl_document
                           ($dis_doc, database_arg => $db,
                            base_namespace_binding =>
                              {(map {$_->local_name => $_->target_namespace_uri}
