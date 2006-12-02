@@ -24,7 +24,7 @@ Module:
       @@@Year:2004
       @@@DISCore:author: DISCore|Wakaba
   @Date:
-    $Date: 2006/11/05 09:16:34 $
+    $Date: 2006/12/02 12:46:25 $
   
   @Require:
     @@Module:
@@ -4758,21 +4758,21 @@ IFClsDef:
     @@QName: ImplementationRegistry.PCImplementation.1.0.test
     @@PerlDef:
       my $impl = $Message::DOM::ImplementationRegistry
-                   ->get_implementation ({<Q::Util|PerlCode> => '1.0'});
+                   ->get_dom_implementation ({<Q::Util|PerlCode> => '1.0'});
 
       $test->assert_isa ($impl, <ClassName::ManakaiPCImplementation>);
   @Test:
     @@QName: ImplementationRegistry.PCImplementation.empty.test
     @@PerlDef:
       my $impl = $Message::DOM::ImplementationRegistry
-                   ->get_implementation ({<Q::Util|PerlCode> => ''});
+                   ->get_dom_implementation ({<Q::Util|PerlCode> => ''});
 
       $test->assert_isa ($impl, <ClassName::ManakaiPCImplementation>);
   @Test:
     @@QName: ImplementationRegistry.PCImplementation.null.test
     @@PerlDef:
       my $impl = $Message::DOM::ImplementationRegistry
-                   ->get_implementation ({<Q::Util|PerlCode> => null});
+                   ->get_dom_implementation ({<Q::Util|PerlCode> => null});
 
       $test->assert_isa ($impl, <ClassName::ManakaiPCImplementation>);
 

@@ -15,7 +15,7 @@ Module:
   @License: license|Perl+MPL
 
   @Date:
-    $Date: 2006/11/05 09:16:35 $
+    $Date: 2006/12/02 12:46:25 $
   
   @Require:
     @@Module:
@@ -2612,7 +2612,7 @@ IFClsDef:
     @@PerlDef:
       require Message::DOM::GenericLS;
       my $impl = $Message::DOM::ImplementationRegistry
-                     ->get_implementation ({<Q::fe|GenericLS> => '3.0'});
+                     ->get_dom_implementation ({<Q::fe|GenericLS> => '3.0'});
 
       my $dp = $impl->create_gls_parser ({<Q::DIS|DPG> => '1.0'});
       
@@ -2623,7 +2623,7 @@ IFClsDef:
     @@PerlDef:
       require Message::DOM::GenericLS;
       my $impl = $Message::DOM::ImplementationRegistry
-                     ->get_implementation ({<Q::fe|GenericLS> => '3.0'});
+                     ->get_dom_implementation ({<Q::fe|GenericLS> => '3.0'});
 
       my $dp = $impl->create_gls_parser ({<Q::DIS|DPG> => ''});
       
@@ -2634,7 +2634,7 @@ IFClsDef:
     @@PerlDef:
       require Message::DOM::GenericLS;
       my $impl = $Message::DOM::ImplementationRegistry
-                     ->get_implementation ({<Q::fe|GenericLS> => '3.0'});
+                     ->get_dom_implementation ({<Q::fe|GenericLS> => '3.0'});
 
       my $dp = $impl->create_gls_parser ({<Q::DIS|DPG> => null});
       

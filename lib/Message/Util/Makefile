@@ -124,6 +124,7 @@ $(NS_UTIL_DIS_PM_FILES): %$(PM_SUFFIX): %$(DIS_SUFFIX) $(DAF_PL)
 	  --create-perl-module="$(NS_MDOM)DOMFeature ../DOM/DOMFeature$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_MDOM)GenericLS  ../DOM/GenericLS$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_MDOM)DOMMain    ../DOM/DOMMain$(PM_SUFFIX)" \
+	  --create-perl-module="$(NS_MDOM)DOMString  ../DOM/DOMString$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_MDOM)DOMCore    ../DOM/DOMCore$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_MDOM)TreeCore   ../DOM/TreeCore$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_MDOM)Document   ../DOM/Document$(PM_SUFFIX)" \
@@ -136,6 +137,7 @@ $(NS_UTIL_DIS_PM_FILES): %$(PM_SUFFIX): %$(DIS_SUFFIX) $(DAF_PL)
 	$(PERL_CHK) ../DOM/DOMFeature$(PM_SUFFIX)
 	$(PERL_CHK) ../DOM/GenericLS$(PM_SUFFIX)
 	$(PERL_CHK) ../DOM/DOMMain$(PM_SUFFIX)
+	$(PERL_CHK) ../DOM/DOMString$(PM_SUFFIX)
 	$(PERL_CHK) ../DOM/DOMCore$(PM_SUFFIX)
 	$(PERL_CHK) ../DOM/TreeCore$(PM_SUFFIX)
 	$(PERL_CHK) ../DOM/Document$(PM_SUFFIX)
@@ -162,5 +164,5 @@ clean-db:
 
 distclean: clean clean-db
 
-## $Date: 2006/08/15 03:54:37 $
+## $Date: 2006/12/02 12:46:25 $
 ## License: Public Domain.

@@ -13,7 +13,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/11/05 12:31:50 $
+    $Date: 2006/12/02 12:46:21 $
 
   @Require:
     @@Module:
@@ -506,19 +506,19 @@ ElementTypeBinding:
       @@@For: ManakaiDOM|DOM3
     @@DOMMain:implementFeature:
       @@@@: tx|XMLFeature10
-      @@@For: ManakaiDOM|DOM1 ManakaiDOM|DOMXMLFeature
+      @@@For: ManakaiDOM|DOM1
     @@DOMMain:implementFeature:
       @@@@: tx|XMLFeature20
-      @@@For: ManakaiDOM|DOM2 ManakaiDOM|DOMXMLFeature
+      @@@For: ManakaiDOM|DOM2
     @@DOMMain:implementFeature:
       @@@@: tx|XMLFeature30
-      @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeature
+      @@@For: ManakaiDOM|DOM3
     @@DOMMain:implementFeature:
       @@@@: tx|XMLVersionFeature10
-      @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeature
+      @@@For: ManakaiDOM|DOM3
     @@DOMMain:implementFeature:
       @@@@: tx|XMLVersionFeature11
-      @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeatureXML11
+      @@@For: ManakaiDOM|DOM3
 ElementTypeBinding:
   @Name: IFQName
   @ElementType:
@@ -8074,7 +8074,6 @@ NodeTypeDef:
         } # exists
 
     @@Test:
-      @@@ForCheck: ManakaiDOM|DOMXMLFeature
       @@@QName: Element.removeAttributeNS.test
       @@@PerlDef:
         my $el;
@@ -12666,6 +12665,7 @@ NodeTypeDef:
           by a single <CODE::U+0020> character.
       @@@PerlDef:
          __DEEP{
+           $r = '';
             for my $child (@{$self-><AG::Node.childNodes>}) {
               if ($child-><AG::Node.nodeType> ==
                   <C::Node.ENTITY_REFERENCE_NODE>) {
@@ -13717,10 +13717,10 @@ ElementTypeBinding:
       @@@For: ManakaiDOM|DOM3
     @@f:implements:
       @@@@: tx|XMLFeature30
-      @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeature
+      @@@For: ManakaiDOM|DOM3
     @@f:implements:
       @@@@: tx|XMLVersionFeature10
-      @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeature
+      @@@For: ManakaiDOM|DOM3
     @@f:implements:
       @@@@: tx|XMLVersionFeature11
-      @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeatureXML11
+      @@@For: ManakaiDOM|DOM3

@@ -17,7 +17,7 @@ Module:
   @License:
     license:Perl+MPL
   @Date:
-    $Date: 2006/11/04 12:25:21 $
+    $Date: 2006/12/02 12:46:26 $
   
   @Require:
     @@Module:
@@ -458,7 +458,7 @@ IFClsDef:
       @@@QName: DVImpl.createDVXMLValue.test
       @@@PerlDef:
         my $impl = $Message::DOM::ImplementationRegistry
-                     ->get_implementation
+                     ->get_dom_implementation
                          ({<Q::DIS|Value> => '1.0',
                            <Q::fe|TreeStore> => '3.0'});
 
@@ -597,7 +597,7 @@ IFClsDef:
     @@PerlDef:
       __DEEP{
         $result = $Message::DOM::ImplementationRegistry
-                     ->get_implementation
+                     ->get_dom_implementation
                          ({<Q::DIS|Value> => '1.0',
                            <Q::fe|TreeStore> => '3.0'})
                      -><M::DISImplementationValue.createDVXMLValue>
@@ -1233,7 +1233,7 @@ IFClsDef:
                                (<Q::fe|TreeStore> => '3.0');
             } else {
               $tsimpl = $Message::DOM::ImplementationRegistry
-                          ->get_implementation ({<Q::fe|TreeStore> => '3.0'});
+                          ->get_dom_implementation ({<Q::fe|TreeStore> => '3.0'});
             }
           }
           $r = $tsimpl->create_node_from_storable_object

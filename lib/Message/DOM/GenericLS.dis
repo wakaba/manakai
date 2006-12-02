@@ -13,11 +13,14 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/11/04 12:25:13 $
+    $Date: 2006/12/02 12:46:22 $
 
   @Require:
     @@Module: 
       @@@QName: MDOM|DOMFeature
+      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
+    @@Module:
+      @@@QName: MDOM|DOMString
       @@@WithFor: ManakaiDOM|ManakaiDOMLatest
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
@@ -50,6 +53,8 @@ Namespace:
     http://www.w3.org/1999/02/22-rdf-syntax-ns#
   @rdfs:
     http://www.w3.org/2000/01/rdf-schema#
+  @str:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/DOMString/
   @test:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Test#
 
@@ -254,7 +259,7 @@ IFClsDef:
     @@PerlDef:
       I: {
         for my $impl (@{$Message::DOM::ImplementationRegistry
-                              ->get_implementation_list
+                              ->get_dom_implementation_list
                                   ({<Q::fe:GenericLS> => '3.0'})}) {
           if ($impl->isa (<ClassName::ManakaiGLSImplementation>)) {
             last I;
@@ -273,7 +278,7 @@ IFClsDef:
          }
     @@Param:
       @@@Name: features
-      @@@Type: f|MIString
+      @@@Type: str|DOMString
       @@@actualType: f|FeaturesString
       @@@enDesc:
         A list of features that must be supported by 
@@ -346,7 +351,7 @@ IFClsDef:
          }
     @@Param:
       @@@Name: features
-      @@@Type: f|MIString
+      @@@Type: str|DOMString
       @@@actualType: f|FeaturesString
       @@@enDesc:
         A list of features that must be supported by 

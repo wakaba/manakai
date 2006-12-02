@@ -1,3 +1,47 @@
+2006-12-02  Wakaba  <wakaba@suika.fam.cx>
+
+	* DOMString.dis: New module.
+
+	* DOMString.pm: New file.
+
+	* DOMCore.dis (min): Moved from |DOMFeature.dis|.
+	(ImplementationRegistryVariable): Moved from |DOMFeature.dis|.
+	Now it references the |DOMImplementationRegistry| object.
+	(DOMImplementationRegistryVariable): Moved from |DOMMain.dis|.
+	(DOMImplementationRegistry): New interface and
+	class, reformed from |ImplementationRegistry| in |DOMFeature.dis|
+	and |DOMImplementationRegistry| in |DOMMain.dis|.  Note
+	that the class no longer support |get_implementation|
+	and |get_implementation_list| methods from
+	the |ImplementationRegistry| interface.
+	(DOMImplementationList): Class implemented; no
+	longer inherits from |ImplementationList|.
+	(DOMImplementationSource): Class implemented; no
+	longer inherits from |ImplementationSource|.  Note that
+	the class no longer support |get_implementation|
+	and |get_implementation_list| methods from
+	the |ImplementationSource| interface.
+	(DOMStringList): Removed.
+
+	* DOMFeature.dis (min, ManakaiDOM:DOMHTMLFeature,
+	ManakaiDOM:DOMEventsFeature, ManakaiDOM:DOMXMLFeature,
+	ManakaiDOM:DOMXMLFeatureXML11, most part of 
+	documentation for obsolete DOM Level 3 Minimum Implementation
+	module, obsolete property name aliases, 
+	ImplemenationRegistryVar, ImplementationRegistry,
+	DEBUG, MIString, ImplementationList, ImplementationSource,
+	ManakaiDOM:implID): Removed.
+
+	* DOMMain.dis (Redefine, RedefinedBy, Redefined): Removed.
+	(DOMString): Removed.
+	(DOMImplementationRegistryVar, DOMImplementationRegistry): Removed.
+
+	* Makefile: |DOMString.pm| is added.
+
+	* TreeCore.dis (is_default_namespace): |null| was
+	returned where a false is expected (|null| is
+	a false in Perl, but real |false| is appropriate here).
+
 2006-11-05  Wakaba  <wakaba@suika.fam.cx>
 
 	* DOMCore.dis (TypeInfo, UserDataHandler): Removed.

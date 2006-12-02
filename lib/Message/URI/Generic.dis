@@ -23,7 +23,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/11/04 17:25:09 $
+    $Date: 2006/12/02 12:46:25 $
   
   @Require:
     @@Module:
@@ -71,6 +71,8 @@ Namespace:
     http://www.w3.org/1999/02/22-rdf-syntax-ns#
   @rdfs:
     http://www.w3.org/2000/01/rdf-schema#
+  @str:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/DOMString/
   @test:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Test#
 
@@ -296,7 +298,7 @@ IFClsDef:
     @@PerlDef:
       I: {
         for my $impl (@{$Message::DOM::ImplementationRegistry
-                              ->get_implementation_list
+                              ->get_dom_implementation_list
                                   ({<Q::fe|URI> => '4.0'})}) {
           if ($impl->isa (<IFName::URIImplementation>)) {
             last I;
@@ -4205,7 +4207,7 @@ IFClsDef:
 
 ResourceDef:
   @QName: String
-  @AliasFor: f|MIString
+  @AliasFor: str|DOMString
   @For: ManakaiDOM|ManakaiDOM
 
 ElementTypeBinding:

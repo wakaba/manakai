@@ -8,7 +8,6 @@ Module:
     http://suika.fam.cx/~wakaba/archive/2004/dom/feature#
   @idl:prefix: manakai.suika.fam.cx
   @idl:moduleName: mi
-  @j:packageQualifiedName: cx.fam.suika.manakai
   
   @Description:
     @@lang:en
@@ -44,7 +43,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/11/05 10:57:30 $
+      $Date: 2006/12/02 12:46:21 $
     @@ContentType:
       dis:Date.RCS
   
@@ -96,8 +95,6 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Document#
   @domcommon:
     http://suika.fam.cx/~wakaba/archive/2006/dom/common/
-  @DOMCore:
-    http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
   @domes:
     http://suika.fam.cx/~wakaba/archive/2006/dom/ecmascript/
   @DOMEvents:
@@ -116,18 +113,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#
   @f:
     http://suika.fam.cx/~wakaba/archive/2004/dom/feature#
-  @fe:
-    http://suika.fam.cx/www/2006/feature/
   @idl:
     http://suika.fam.cx/~wakaba/archive/2004/dis/IDL#
-  @infoset:
-    http://www.w3.org/2001/04/infoset#
-  @j:
-    http://suika.fam.cx/~wakaba/archive/2004/dis/Java#
-  @jlang:
-    java:java.lang.
-  @js:
-    http://suika.fam.cx/~wakaba/archive/2004/dis/ECMAScript#
   @kwd:
     http://suika.fam.cx/~wakaba/archive/2005/rfc2119/
   @lang:
@@ -148,6 +135,8 @@ Namespace:
     http://www.w3.org/1999/02/22-rdf-syntax-ns#
   @rdfs:
     http://www.w3.org/2000/01/rdf-schema#
+  @str:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/DOMString/
   @test:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Test#
   @ty:
@@ -156,10 +145,6 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/
   @UtilError:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/
-  @xml:
-    http://www.w3.org/XML/1998/namespace
-  @xmlns:
-    http://www.w3.org/2000/xmlns/
 
 ResourceDef:
   @QName:
@@ -191,7 +176,6 @@ ResourceDef:
     @@@:
       Message::DOM::IFLevel3::
     @@For: ManakaiDOM|ManakaiDOM3 !ManakaiDOM|ManakaiDOMLatest
-    @@For: ManakaiDOM|ForSpec3
   @DISPerl:interfacePackageName:
     @@@:
       Message::DOM::IFLevel2::
@@ -253,40 +237,6 @@ ForDef:
   @ISA:
     ManakaiDOM:DOM3
 
-ForDef:
-  @QName: 
-    ManakaiDOM:DOMHTMLFeature
-  @FullName:
-    @@lang:en
-    @@@: For DOM HTML feature, any version
-  @ISA:
-    ManakaiDOM:DOM
-
-ForDef:
-  @QName: 
-    ManakaiDOM:DOMXMLFeature
-  @FullName:
-    @@lang:en
-    @@@: For DOM XML feature, any version
-  @ISA:
-    ManakaiDOM:DOM
-
-ForDef:
-  @QName: ManakaiDOM|DOMXMLFeatureXML11
-  @FullName:
-    @@lang:en
-    @@@: For DOM XML feature, any version, with XML 1.1 support
-  @ISA: ManakaiDOM|DOMXMLFeature
-
-ForDef:
-  @QName:
-    ManakaiDOM:DOMEventsFeature
-  @FullName:
-    @@lang:en
-    @@@:  For DOM Events feature, any version
-  @ISA:
-    ManakaiDOM:DOM
-
 ## For the manakai DOM implementation
 
 ForDef:
@@ -307,12 +257,6 @@ ForDef:
     @@@: For the manakai DOM Level 1 implementation
   @Implement:
     ManakaiDOM:DOM1
-  @Implement: 
-    ManakaiDOM:DOMXMLFeature
-  @Implement: 
-    ManakaiDOM:DOMHTMLFeature
-  @Implement:
-    ManakaiDOM:DOMEventsFeature
   @ISA:
     ManakaiDOM:ManakaiDOM
 ForDef:
@@ -335,7 +279,6 @@ ForDef:
     ManakaiDOM:DOM3
   @ISA:
     ManakaiDOM:ManakaiDOM2
-  @ISA: ManakaiDOM|DOMXMLFeatureXML11
 ForDef:
   @QName:
     ManakaiDOM:ManakaiDOMLatest
@@ -346,55 +289,6 @@ ForDef:
     ManakaiDOM:DOMLatest
   @ISA:
     ManakaiDOM:ManakaiDOM3
-
-ForDef:
-  @QName: ManakaiDOM|ForSpec
-  @ISA: doc|ForDoc
-  @ISA: ManakaiDOM|DOM
-  @FullName:
-    @@lang:en
-    @@@: For specification
-
-ForDef:
-  @QName: ManakaiDOM|ForSpec3
-  @ISA: ManakaiDOM|DOM3
-  @ISA: ManakaiDOM|ForSpec
-  @FullName:
-    @@lang:en
-    @@@: For Level 3 of specification
-
-ForDef:
-  @QName: ManakaiDOM|ForSpecLatest
-  @ISA: ManakaiDOM|DOMLatest
-  @ISA: ManakaiDOM|ForSpec3
-  @FullName:
-    @@@: For the latest version of specification
-    @@lang:en
-
-ForDef:
-  @QName: ManakaiDOM|ForSpecAll
-  @ISA: ManakaiDOM|ForSpec
-  @ISA: ManakaiDOM|Java
-
-ForDef:
-  @QName: ManakaiDOM|ForSpecIDL
-  @ISA: ManakaiDOM|ForSpec
-  @ISA: ManakaiDOM|Java
-
-ForDef:
-  @QName: ManakaiDOM|ForSpecJava
-  @ISA: ManakaiDOM|ForSpec
-  @ISA: ManakaiDOM|Java
-
-ForDef:
-  @QName: ManakaiDOM|ForSpecECMAScript
-  @ISA: ManakaiDOM|ForSpec
-  @ISA: ManakaiDOM|ECMAScript
-
-ForDef:
-  @QName: ManakaiDOM|ForSpecPerl
-  @ISA: ManakaiDOM|ForSpec
-  @ISA: ManakaiDOM|Perl
 
 ## --- The Document Object Model Comcepts
 
@@ -776,7 +670,6 @@ StringDataTypeDef:
   @QName: FeaturesString
   @For:
     ManakaiDOM:DOM3
-  @For: ManakaiDOM|ForSpec3
   @FullName:
     @@lang:en
     @@@: 
@@ -975,12 +868,6 @@ ElementTypeBinding:
     @@DISCore:resourceType: test|StandaloneTest
 
 ResourceDef:
-  @QName: 
-    ManakaiDOM:ManakaiDOMFeatures
-  @For: ManakaiDOM|DOM3
-  @AliasFor: FeaturesString
-
-ResourceDef:
   @QName: Feature
   @FullName:
     @@lang:en
@@ -991,35 +878,7 @@ ResourceDef:
     rdfs:Class::ManakaiDOM:all
   @For: =ManakaiDOM|all
 
-ResourceDef:
-  @QName:
-    DOMMain:DOMFeature
-  @For: =ManakaiDOM|all
-  @AliasFor: Feature
-
 ## -- The feature system (manakai)
-
-ElementTypeBinding:
-  @Name: FeatureDef
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type: Feature
-    @@For: =ManakaiDOM|all
-
-ElementTypeBinding:
-  @Name: FeatureVerDef
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type: Feature
-
-ElementTypeBinding:
-  @Name: featureQName
-  @ElementType:
-    f:name
-  @ShadowContent:
-    @@ContentType: DISCore|QName
 
 PropDef:
   @QName: f|name
@@ -1031,7 +890,7 @@ PropDef:
   @multipleProperties: DISCore|UnorderedList
 
 PropDef:
-  @QName: version
+  @QName: f|version
   @FullName:
     @@lang:en
     @@@: Feature version
@@ -1060,11 +919,6 @@ PropDef:
   @dataType: dis|TypeQName
   @multipleProperties: DISCore|UnorderedList
 
-ResourceDef:
-  @QName: DOMMetaImpl|provideFeature
-  @AliasFor: provides
-  @For: =ManakaiDOM|all
-
 PropDef:
   @QName: through
   @Description:
@@ -1080,11 +934,6 @@ PropDef:
     ManakaiDOM:Class
   @dataType: dis|TFQNames
   @multipleProperties: DISCore|UnorderedList
-
-ResourceDef:
-  @QName: DOMMetaImpl|providedThrough
-  @AliasFor: through
-  @For: =ManakaiDOM|all
 
 PropDef:
   @QName: implements
@@ -1114,11 +963,6 @@ PropDef:
   @dataType: dis|TypeQName
   @multipleProperties: DISCore|UnorderedList
 
-ResourceDef:
-  @QName: DOMMetaImpl|instanceFeatureOf
-  @AliasFor: instanceOf
-  @For: =ManakaiDOM|all
-
 PropDef:
   @QName: extends
   @Description:
@@ -1130,11 +974,6 @@ PropDef:
   @dataType: dis|TypeQName
   @multipleProperties: DISCore|UnorderedList
 
-ResourceDef:
-  @QName: DOMMetaImpl|extendFeature
-  @AliasFor: extends
-  @For: =ManakaiDOM|all
-
 PropDef:
   @QName: requires
   @Description:
@@ -1145,12 +984,6 @@ PropDef:
   @dataType:
     dis:TypeQName
   @multipleProperties: DISCore|UnorderedList
-
-ResourceDef:
-  @QName: 
-    DOMMain:requireFeature
-  @AliasFor: requires
-  @For: =ManakaiDOM|all
 
 ## -- Roles
 
@@ -1353,39 +1186,6 @@ PropDef:
   @dataType: dis|TFQNames
   @multipleProperties: DISCore|UnorderedList
 
-## -- The bootstrap object
-
-ResourceDef:
-  @QName: ImplementationRegistryVar
-  @rdf:type:
-    DISPerl:ScalarVariable
-  @DISPerl:variableName:
-    Message::DOM::ImplementationRegistry
-  @DefaultValue:
-    @@@:
-      <ClassName::ImplementationRegistry::ManakaiDOM:ManakaiDOMLatest>
-    @@ContentType:
-      lang:Perl
-  @Type: DISPerl|String||ManakaiDOM|all
-  @For:
-    ManakaiDOM:ManakaiDOMLatest
-
-ResourceDef:
-  @QName: DEBUG
-  @rdf:type: DISPerl|ScalarVariable
-  @DISPerl:variableName:
-    Message::DOM::DOMFeature::DEBUG
-  @Type: DISPerl|Boolean||ManakaiDOM|all
-  @For: ManakaiDOM|ManakaiDOMLatest
-  @enDesc:
-    The variable <Perl::$Message::DOM::DOMFeature::DEBUG> controls
-    whether <M::ManakaiImplementationSource.getImplementation>
-    should print debug message to the standard error output or not.
-    If the variable is set to <DOM::true>, the process to find
-    an implementation is shown so application developers can
-    known what module should be loaded or what class is actually in use.
-  @ForCheck: !ManakaiDOM|all
-
 ElementTypeBinding:
   @Name: enDesc
   @ElementType:
@@ -1395,126 +1195,14 @@ ElementTypeBinding:
 
 ## -- The Minimum Implementation Specification
 
-FeatureDef:
-  @QName: min
-  @FeatureVerDef:
-    @@featureQName: fe|Min
-    @@featureQName: ManakaiDOM|Minimum
-    @@Version: 3.0
-    @@QName: min30
-    @@Description:
-      @@@lang:en
-      @@@@:
-        Minimum DOM implementation, level 3.
-    @@f:instanceOf: min
 
 ElementTypeBinding:
   @Name: Doc
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@For: ManakaiDOM|ForSpec
+    @@ForCheck: !ManakaiDOM|all
     @@rdf:type: doc|Documentation
-
-Doc:
-  @QName: def|Document
-
-  @enTitle:
-    Document Object Model (DOM) Minimum Implementation Level 3
-  @doc:shortTitle:
-    @@lang:en
-    @@@:
-      DOM Minimum Implementation Level 3
-
-  @rdf:type: doc|Document
-
-  @doc:author: DISCore|Wakaba
-
-  @doc:part:
-    @@@: def|Abstract
-    @@doc:rel: doc|abstract
-    @@doc:rel: doc|additionalSection
-
-  @doc:part:
-    @@@: def|Status
-    @@doc:rel: doc|status
-    @@doc:rel: doc|additionalSection
-
-  @doc:part:
-    @@@: def|TOC
-    @@doc:rel: doc|shortTOC
-    @@doc:rel: doc|additionalSection
-
-  @doc:part:
-    @@@: def|expandedTOC
-    @@doc:rel: doc|longTOC
-    @@doc:rel: doc|additionalSection
-    @@doc:rel: f|Chapter
-
-  @doc:part:
-    @@@: def|MinImpl
-    @@doc:rel: doc|mainSection
-    @@doc:rel: f|Chapter
-
-  @doc:part:
-    @@@: def|IDLDefinitions
-    @@doc:rel: f|IDLDefinitions
-    @@doc:rel: doc|appendix
-    @@doc:rel: f|Chapter
-  @doc:part:
-    @@@: def|JavaBinding
-    @@doc:rel: f|JavaBinding
-    @@doc:rel: doc|appendix
-    @@doc:rel: f|Chapter
-  @doc:part:
-    @@@: def|ECMAScriptBinding
-    @@doc:rel: f|ECMAScriptBinding
-    @@doc:rel: doc|appendix
-    @@doc:rel: f|Chapter
-  @doc:part:
-    @@@: def|PerlBinding
-    @@doc:rel: f|PerlBinding
-    @@doc:rel: doc|appendix
-    @@doc:rel: f|Chapter
-
-  @doc:part:
-    @@@: def|References
-    @@doc:rel: doc|references
-    @@doc:rel: doc|additionalSection
-    @@doc:rel: f|Chapter
-
-  @doc:part:
-    @@@: def|Index
-    @@doc:rel: doc|index
-    @@doc:rel: doc|additionalSection
-    @@doc:rel: f|Chapter
-
-  @FileName: Overview
-
-ResourceDef:
-  @QName: f|IDLDefinitions
-  @For: =ManakaiDOM|all
-  @rdf:type: rdfs|Resource
-
-ResourceDef:
-  @QName: f|JavaBinding
-  @For: =ManakaiDOM|all
-  @rdf:type: rdfs|Resource
-
-ResourceDef:
-  @QName: f|ECMAScriptBinding
-  @For: =ManakaiDOM|all
-  @rdf:type: rdfs|Resource
-
-ResourceDef:
-  @QName: f|PerlBinding
-  @For: =ManakaiDOM|all
-  @rdf:type: rdfs|Resource
-
-ResourceDef:
-  @QName: f|Chapter
-  @For: =ManakaiDOM|all
-  @rdf:type: rdfs|Resource
 
 ElementTypeBinding:
   @Name: enContent
@@ -1522,7 +1210,7 @@ ElementTypeBinding:
     doc:content
   @ShadowContent:
     @@lang:en
-    @@ForCheck: ManakaiDOM|ForSpec
+    @@ForCheck: !ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: enTitle
@@ -1530,188 +1218,7 @@ ElementTypeBinding:
     doc:title
   @ShadowContent:
     @@lang:en
-    @@ForCheck: ManakaiDOM|ForSpec
-
-Doc:
-  @QName: def|Abstract
-  @enContent:
-    This specification defines the Document Object Model
-    Minimum Implementation Level 3, a set of interface
-    that allows applications to dynamically obtain
-    implementations of DOM or any other object model.
-
-Doc:
-  @QName: def|Status
-
-Doc:
-  @QName: def|TOC
-  @doc:part: f|ShortTOC||ManakaiDOM|all
-
-Doc:
-  @QName: def|expandedTOC
-  @doc:part: f|LongTOC||ManakaiDOM|all
-
-  @FileName: expanded-toc
-
-ResourceDef:
-  @QName: f|ShortTOC
-  @rdf:type: rdfs|Resource
-  @For: =ManakaiDOM|all
-
-ResourceDef:
-  @QName: f|LongTOC
-  @rdf:type: rdfs|Resource
-  @For: =ManakaiDOM|all
-
-Doc:
-  @QName: def|MinImpl
-
-  @enTitle: Document Object Model Minimum Implementation
-  @doc:shortTitle:
-    @@lang:en
-    @@@:
-      DOM Minimum Implementation
-
-  @doc:part:
-    @@@: def|Introduction
-    @@doc:rel: doc|subsection
-  @doc:part:
-    @@@: def|Definitions
-    @@doc:rel: doc|subsection
-  @doc:part:
-    @@@: def|Interfaces
-    @@doc:rel: doc|subsection
-
-  @FileName: minimpl
-
-Doc:
-  @QName: def|Introduction
-  @enTitle: Introduction
-
-Doc:
-  @QName: def|Definitions
-  @enTitle: Definitions
-
-  @doc:part:
-    @@@: def|MIString
-    @@doc:rel: doc|subsection
-  @doc:part:
-    @@@: f|FeatureNameString
-    @@doc:rel: doc|subsection
-  @doc:part:
-    @@@: f|FeatureVersionString
-    @@doc:rel: doc|subsection
-  @doc:part:
-    @@@: f|FeaturesString
-    @@doc:rel: doc|subsection
-  @doc:part:
-    @@@: def|ImplRegDescription
-    @@doc:rel: doc|subsection
-
-Doc:
-  @QName: def|Interfaces
-  @enTitle: Interfaces
-
-  @doc:part:
-    @@@: f|ImplementationList
-    @@doc:rel: doc|subsection
-  @doc:part:
-    @@@: f|ImplementationSource
-    @@doc:rel: doc|subsection
-  @doc:part:
-    @@@: f|MinimumImplementation
-    @@doc:rel: doc|subsection
-  @doc:part:
-    @@@: f|GetFeature
-    @@doc:rel: doc|subsection
-
-Doc:
-  @QName: def|IDLDefinitions
-
-  @enContent:
-    This appendix comtains the complete OMG IDL <SRC::OMG IDL> for the
-    Level 3 Document Object Model Minimum Implementation definitions.
-
-  # The IDL files are also available as: <idl.zip>.
-
-  @doc:part:
-    @@@: MDOM|DOMFeature
-    @@doc:as: idl|File
-
-  @FileName: idl-definitions
-
-Doc:
-  @QName: def|JavaBinding
-  @FileName: java-binding
-
-  @enContent:
-    This appendix contains the complete Java binding for the
-    Level 3 Document Object Model Minimum Implementation.
-
-  @doc:part:
-    @@@: def|MIStringJava
-    @@doc:rel: doc|subsection
-  @doc:part:
-    @@@: def|ImplRegJava
-    @@doc:rel: doc|subsection
-  @doc:part:
-    @@@: MDOM|DOMFeature
-    @@doc:as: j|Package
-    @@doc:rel: doc|subsection
-
-Doc:
-  @QName: def|ECMAScriptBinding
-  @FileName: ecma-script-binding
-
-  @enContent:
-    This appendix contains the complete ECMAScript binding for the
-    Level 3 Document Object Model Minimum Implementation.
-
-  @doc:part:
-    @@@: def|MIStringECMAScript
-    @@doc:rel: doc|subsection
-  @doc:part:
-    @@@: def|ImplRegECMAScript
-    @@doc:rel: doc|subsection
-  @doc:part:
-    @@@: MDOM|DOMFeature
-    @@doc:as: f|ECMAScriptBindingDefinition
-    @@doc:rel: doc|subsection
-
-ResourceDef:
-  @QName: f|ECMAScriptBindingDefinition
-  @rdf:type: rdfs|Class
-
-Doc:
-  @QName: def|PerlBinding
-  @FileName: perl-binding
-
-  @enContent:
-    This appendix contains the complete Perl binding for the
-    Level 3 Document Object Model Minimum Implementation.
-
-  @doc:part:
-    @@@: def|PerlTypes
-    @@doc:rel: doc|subsection
-  @doc:part:
-    @@@: def|MIStringPerl
-    @@doc:rel: doc|subsection
-  @doc:part:
-    @@@: def|PerlInterfaces
-    @@doc:rel: doc|subsection
-  @doc:part:
-    @@@: def|PerlMethods
-    @@doc:rel: doc|subsection
-  @doc:part:
-    @@@: def|PerlExceptions
-    @@doc:rel: doc|subsection
-  @doc:part:
-    @@@: def|ImplRegPerl
-    @@doc:rel: doc|subsection
-  @doc:part:
-    @@@: MDOM|DOMFeature
-    @@doc:as: f|PerlBindingDefinition
-    @@doc:rel: doc|subsection
+    @@ForCheck: !ManakaiDOM|all
 
 Doc:
   @QName: def|PerlTypes
@@ -1737,13 +1244,6 @@ Doc:
     in Perl.  IDL type <TYPE^^DISCore|QName::idl|Object> is bound to object.
 
     The <DOM::null> value is bound to <Perl::undef>.
-
-Doc:
-  @QName: def|PerlInterfaces
-  @enTitle: Interfaces, Modules and Constants
-  @enContent:
-    {TODO:: tbd
-    }
 
 Doc:
   @QName: def|PerlMethods
@@ -1774,86 +1274,6 @@ Doc:
     <Class::dx:Error||ManakaiDOM|Perl> module <kwd:SHOULD>
     be employed as a basis of exception throwing mechanism.
 
-ResourceDef:
-  @QName: f|PerlBindingDefinition
-  @rdf:type: rdfs|Class
-
-Doc:
-  @QName: def|References
-
-  @doc:part:
-    @@@: def|NormativeReferences
-    @@doc:rel: doc|normativeReferences
-    @@doc:rel: doc|subsection
-  @doc:part:
-    @@@: def|InformativeReferences
-    @@doc:rel: doc|informativeReferences
-    @@doc:rel: doc|subsection
-
-  @FileName: references
-
-Doc:
-  @QName: def|NormativeReferences
-
-Doc:
-  @QName: def|InformativeReferences
-
-Doc:
-  @QName: def|Index
-  @doc:part: f|Index||ManakaiDOM|all
-
-  @FileName: def-index
-
-ResourceDef:
-  @QName: f|Index
-  @rdf:type: rdfs|Resource
-  @For: =ManakaiDOM|all
-
-Doc:
-  @QName: def|MIString
-  @enTitle:
-    The <TYPE::MIString> Type
-  @enContent:
-    The <TYPE::MIString> type is used to store character.
-  @doc:part: f|MIString
-
-ResourceDef:
-  @QName: MIString
-  @For: ManakaiDOM|DOM
-  @Label:
-    @@lang:en
-    @@@:
-      <DOM::MIString>
-  @rdf:type: idl|IDLDataType
-  @rdf:type: idl|ValueType
-
-  @rdfs:subClassOf: DISLang|String||ManakaiDOM|all
-
-  @enDesc:
-    A <TYPE::MIString> is a sequence of characters.  How
-    the characters are represented is implementation dependent.
-
-  @idl:sequenceOf: idl|unsignedShort
-  @idl:java: jlang|String
-  @idl:ecmascript: js|StringType
-  @idl:perl: p|CharacterString
-
-Doc:
-  @QName: def|MIStringJava
-  @enTitle:
-    The <TYPE::MIString> Type
-  @enContent:
-    For Java, <TYPE::MIString> is bound to the <Java::String> class,
-    which is a sequence of UTF-16's 16-bit code units.
-
-Doc:
-  @QName: def|MIStringECMAScript
-  @enTitle:
-    The <TYPE::MIString> Type
-  @enContent:
-    For Perl, <TYPE::MIString> is bound to the <JS::String> type,
-    which is a sequence of UTF-16's 16-bit code units.
-
 Doc:
   @QName: def|MIStringPerl
   @enTitle:
@@ -1865,766 +1285,6 @@ Doc:
     a sequence of bytes or octets.  If it is represented
     internally as a byte string, i.e. the utf8 flag turned off,
     it <kwd:MUST> be interpreted as a ISO/IEC 8859-1 <bibref::ISO8859-1> string.
-
-## -- The implementation registry object
-
-ResourceDef:
-  @QName:
-    @@@: ImplementationRegistry
-    @@ForCheck: !ManakaiDOM|ForSpec
-  @QName: 
-    @@@: def|ImplRegDescription
-    @@ForCheck: ManakaiDOM|ForSpecAll
-  @QName: 
-    @@@: def|ImplRegJava
-    @@ForCheck: ManakaiDOM|ForSpecJava
-  @QName: 
-    @@@: def|ImplRegECMAScript
-    @@ForCheck: ManakaiDOM|ForSpecECMAScript
-  @QName: 
-    @@@: def|ImplRegPerl
-    @@ForCheck: ManakaiDOM|ForSpecPerl
-
-  @enTitle:
-    The <CODE::ImplementationRegistry> Object
-
-  @rdf:type:
-    @@@@: DISLang|Class
-    @@@ForCheck: ManakaiDOM|ManakaiDOM
-
-  @rdf:type:
-    @@@@: dis|MultipleResource
-    @@@ForCheck:
-      ManakaiDOM|ForSpec !ManakaiDOM|ForSpecJava !ManakaiDOM|ForSpecAll
-      !ManakaiDOM|ForSpecPerl !ManakaiDOM|ForSpecECMAScript
-  @resourceFor: ManakaiDOM|ForSpecAll
-  @resourceFor: ManakaiDOM|ForSpecJava
-  @resourceFor: ManakaiDOM|ForSpecECMAScript
-  @resourceFor: ManakaiDOM|ForSpecPerl
-
-  @rdf:type:
-    @@@@: doc|Documentation
-    @@@ForCheck: ManakaiDOM|ForSpecAll
-  @rdf:type:
-    @@@@: doc|Documentation
-    @@@ForCheck: ManakaiDOM|ForSpecJava
-  @rdf:type:
-    @@@@: doc|Documentation
-    @@@ForCheck: ManakaiDOM|ForSpecECMAScript
-  @rdf:type:
-    @@@@: doc|Documentation
-    @@@ForCheck: ManakaiDOM|ForSpecPerl
-
-  @For: ManakaiDOM|DOM3
-  @For: ManakaiDOM|ForSpec3
-
-  @Implement: ImplementationSource||ManakaiDOM|ManakaiDOM3
-  @Implement:
-    @@@: ImplementationSource||ManakaiDOM|ManakaiDOMLatest
-    @@For: ManakaiDOM|ManakaiDOMLatest
-
-  @enContent:
-    @@ForCheck: ManakaiDOM|ForSpecAll
-    @@@:
-    DOM Level 3 Core specification introduces a <CODE::DOMImplementationRegistry>
-    object with a function that lets an application find DOM
-    implementations, based on the specific features it requires.
-    DOM Level 3 Minimum Implementation defines a more generalized
-    <CODE::ImplementationRegistry> object, with which an application
-    can find implementations that supports specific features.
-
-    How this object is found and what it exactly looks like is 
-    not defined here, because this cannot done in a
-    language-independent manner.  Instead, each language binding
-    defines its own way of doing this.  The object
-    <kwd:MUST> implement the <IF::ImplementationSource>
-    interface.
-
-  @enContent:
-    @@ForCheck: ManakaiDOM|ForSpecJava
-    @@@:
-      The <Java::ImplementationRegistry> is first initialized by 
-      the application or the implementation, depending on the context, 
-      through the Java system property
-      <Java::cx.fam.suika.manakai.ImplementationSourceList>.
-      The value of this property is a space separated list of
-      names of available classes implementing the 
-      <IF::ImplementationSource> interface.
-
-      {TODO:: Defines the class and clarifies the relationship
-              to <Java::DOMImplementationRegistry> object.
-      }
-
-  @enContent:
-    @@ForCheck: ManakaiDOM|ForSpecECMAScript
-    @@@:
-      In ECMAScript binding, the global scope object
-      has the <JS::ImplementationRegistry> property whose value
-      is an object which implements
-      the <IF::ImplementationSource> interface.
-
-      {TODO:: How the object finds implementations?
-      }
-
-  @enContent:
-    @@ForCheck: ManakaiDOM|ForSpecPerl
-    @@@:
-      In Perl binding, the scalar variable 
-      <Perl::$Message::DOM::ImplementationRegistry> has a reference
-      with which methods defined in <IF::ImplementationSource> interface
-      can be called.
-
-        {NOTE:: The variable value might be a package name
-                rather than a hard reference.
-        }
-
-      {TODO:: Describes how the object finds implementations.
-      }
-
-  @Description:
-    @@lang:en
-    @@@:
-      A binding dependent bootstrap for <IF::MinimumImplementation> objects.
-  @Description:
-    @@For:
-      ManakaiDOM:ManakaiDOM
-    @@lang:en
-    @@@:
-      A bootstrap class/object from which DOM implementations can be 
-      retrieved.  For the manakai
-      <Class::ImplementationRegistry> 
-      implementation, DOM applications can access the registry both 
-      via class methods and via object methods.  That is, applications 
-      are free, but need not to instantiate a 
-      <Class::ImplementationRegistry> object to get 
-      DOM implementations. 
-      \
-      {NOTE:: Authors of DOM applications will usually want to access 
-              the registry by the means of class methods (i.e. no 
-              instance objects), since most applications don't 
-              require more than one implementations.
-      \
-      }
-
-  @Method:
-     @@Name:  getImplementation
-     @@ManakaiDOM:isStatic: 1
-     @@Description:
-       @@@lang:en
-       @@@@:
-         Seeks and returns the first implementation that implements 
-         desired features. 
-     @@Param:
-        @@@Name:  features
-        @@@Type:  MIString
-        @@@actualType: FeaturesString
-        @@@Description:
-          @@@@lang:en
-          @@@@@: 
-            A list of desired features that must be implemented.
-      @@@nullCase:
-        @@@@enDesc:
-          Any implementation is allowed.
-     @@Return:
-       @@@Type: c|DOMImplementation
-       @@@enDesc:
-         The first implementation that has the desired features.
-         The object returned by this method may not implement
-         the <IF::DOMCore:DOMImplementation> interface.
-       @@@enDesc:
-         @@@@For: ManakaiDOM|ManakaiDOM
-         @@@@@:
-           {NOTE:: The object returned by this method might not
-                   be a manakai object.
-           }
-       @@@InCase:
-         @@@@Value:
-           @@@@@is-null:1
-         @@@@Description:
-           @@@@@lang:en
-           @@@@@@: 
-             No implementation implementing the desired features is found.
-       @@@PerlDef:
-           __CODE{DOMMain:stringifyFeatures:: $IN => $features,
-                                              $OUT => $features}__;
-           __DEEP{
-             C: for my $class (
-               keys %Message::DOM::ManakaiDOMImplementationRegistry::SourceClass
-             ) {
-               if ($class->isa (<IFName::ImplementationSource>)) {
-                 $r = $class-><M::ImplementationSource
-                               .getImplementation> ($features);
-               } else {
-                 $r = $class-><M::ImplementationSource
-                               .getDOMImplementation> ($features);
-               }
-               last C if defined $r;
-             }
-           }__;
-      @@@ImplNote:
-        @@@@lang:en
-        @@@@@:
-          Converting <P::features> into a string is necessary since 
-          a <IF::DOMCore:DOMImplementationSource> might not be part 
-          of manakai so that it does not support the hash representation. 
-
-  @Method:
-     @@Name:  getDOMImplementation
-     @@ManakaiDOM:isStatic: 1
-     @@Description:
-       @@@lang:en
-       @@@@:
-         Seeks and returns the first implementation that implements 
-         desired features. 
-     @@Param:
-        @@@Name:  features
-        @@@Type:  MIString
-        @@@actualType: FeaturesString
-        @@@Description:
-          @@@@lang:en
-          @@@@@: 
-            A list of desired features that must be implemented.
-     @@Return:
-       @@@Type: MinimumImplementation
-       @@@enDesc:
-         The first DOM implementation that has the desired features.
-         The object returned by this method <kwd:MUST> implement
-         the <IF::DOMCore:DOMImplementation> interface defined
-         in DOM Level 3 and it <kwd:MUST> has the feature
-         <Feature::Core> version <FeatureVer::3.0>.
-       @@@enDesc:
-         @@@@For: ManakaiDOM|ManakaiDOM
-         @@@@@:
-           {NOTE:: The object returned by this method might not
-                   be a manakai object.
-           }
-       @@@InCase:
-         @@@@Value:
-           @@@@@is-null:1
-         @@@@Description:
-           @@@@@lang:en
-           @@@@@@: 
-             No implementation implementing the desired features is found.
-       @@@PerlDef:
-           $features->{core}->{'3.0'} = true;
-           __CODE{DOMMain:stringifyFeatures:: $IN => $features,
-                                              $OUT => $features}__;
-           __DEEP{
-             C: for my $class (
-               keys %Message::DOM::ManakaiDOMImplementationRegistry::SourceClass
-             ) {
-               $r = $class-><M::ImplementationSource
-                               .getDOMImplementation> ($features);
-               last C if defined $r;
-             }
-           }__;
-      @@@ImplNote:
-        @@@@lang:en
-        @@@@@:
-          Converting <P::features> into a string is necessary since 
-          a <IF::DOMCore:DOMImplementationSource> might not be part 
-          of manakai so that it does not support the hash representation. 
-
-  @Method:
-     @@Name:  getImplementationList
-     @@ManakaiDOM:isStatic: 1
-     @@Description:
-       @@@lang:en
-       @@@@:
-         Returns a list of all the implementations that implement 
-         desired features.
-     @@Param:
-        @@@Name:  features
-        @@@Type:  MIString
-        @@@actualType: FeaturesString
-        @@@Description:
-          @@@@lang:en
-          @@@@@: A list of desired features that must be implemented.
-      @@@nullCase:
-        @@@@enDesc:
-          Any implementation is allowed.
-     @@Return:
-       @@@Type:  ImplementationList
-       @@@actualType: ManakaiImplementationList
-       @@@Description:
-         @@@@lang:en
-         @@@@@: 
-           A list of implementations that support the desired features. 
-           The object returned by this method might not implement
-           the <IF::DOMCore:DOMImplementation> interface.
-
-           {NOTE:: Since implementation sources reports the same
-                   implementation, the list <kwd:MAY> contain an implementation
-                   more than one times.
-           }
-       @@@enDesc:
-         @@@@For: ManakaiDOM|ManakaiDOM
-         @@@@@:
-           {NOTE:: Although the list returned by this method itself
-                   is a manakai object, each item in the list might
-                   not a manakai object.
-           }
-       @@@PerlDef:
-           __CODE{DOMMain:stringifyFeatures:: $IN => $features,
-                                              $OUT => $features}__;
-           __DEEP{
-             $r = <Class::ManakaiImplementationList>->new;
-             for my $class (
-               keys %Message::DOM::ManakaiDOMImplementationRegistry::SourceClass
-             ) {
-               if ($class->isa (<IFName::ImplementationSource>)) {
-                 $r-><M::ImplementationList.appendItems>
-                         ($class-><M::ImplementationSource
-                                       .getImplementationList> ($features));
-               } else {
-                 $r-><M::ImplementationList.appendItems>
-                         ($class-><M::ImplementationSource
-                                       .getDOMImplementationList> ($features));
-               }
-             }
-           }__;
-
-  @Method:
-     @@Name:  getDOMImplementationList
-     @@ManakaiDOM:isStatic: 1
-     @@Description:
-       @@@lang:en
-       @@@@:
-         Returns a list of all the DOM implementations that implement 
-         desired features.
-     @@Param:
-        @@@Name:  features
-        @@@Type:  MIString
-        @@@actualType: FeaturesString
-        @@@Description:
-          @@@@lang:en
-          @@@@@: A list of desired features that must be implemented.
-     @@Return:
-       @@@Type:  ImplementationList
-       @@@actualType: ManakaiImplementationList
-       @@@Description:
-         @@@@lang:en
-         @@@@@: 
-           A list of DOM implementations that support the desired features. 
-           The object returned by this method <kwd:MUST> implement
-           the <IF::DOMCore:DOMImplementation> interface defined
-           in DOM Level 3 and it <kwd:MUST> has the feature
-           <Feature::Core> version <FeatureVer::3.0>.
-
-           {NOTE:: Since implementation sources reports the same
-                   implementation, the list <kwd:MAY> contain an implementation
-                   more than one times.
-           }
-       @@@enDesc:
-         @@@@For: ManakaiDOM|ManakaiDOM
-         @@@@@:
-           {NOTE:: Although the list returned by this method itself
-                   is a manakai object, each item in the list might
-                   not a manakai object.
-           }
-       @@@PerlDef:
-           $features->{core}->{'3.0'} = true;
-           __CODE{DOMMain:stringifyFeatures:: $IN => $features,
-                                              $OUT => $features}__;
-           __DEEP{
-             $r = <Class::ManakaiImplementationList>->new;
-             for my $class (
-               keys %Message::DOM::ManakaiDOMImplementationRegistry::SourceClass
-             ) {
-               $r-><M::ImplementationList.appendItems>
-                         ($class-><M::ImplementationSource
-                                       .getDOMImplementationList> ($features));
-             }
-           }__;
-##ImplementationRegistry
-
-## -- DOM implementation list & source modeled from DOM Level 3 Core module
-
-ElementTypeBinding:
-  @Name: minIFClsDef
-  @ElementType: 
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type:
-      @@@@: dis|MultipleResource
-      @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
-    @@resourceFor: ManakaiDOM|ForIF
-    @@resourceFor:
-      @@@@: ManakaiDOM|ForClass
-      @@@ForCheck: ManakaiDOM|ManakaiDOM !=ManakaiDOM|ManakaiDOM
-    @@For: ManakaiDOM|DOM3
-    @@For: =ManakaiDOM|ManakaiDOM
-    @@For: ManakaiDOM|ForSpecLatest
-
-    @@rdf:type:
-      @@@@: DISLang|Interface
-      @@@ForCheck: ManakaiDOM|ForIF ManakaiDOM|ManakaiDOM
-
-    @@rdf:type:
-      @@@@: idl|Interface
-      @@@ForCheck: ManakaiDOM|ForIF ManakaiDOM|ForSpecLatest
-
-    @@rdf:type:
-      @@@@: DISLang|Class
-      @@@ForCheck: ManakaiDOM|ForClass
-    @@Implement:
-      @@@@: ||ManakaiDOM|ManakaiDOM||ManakaiDOM|ForIF
-      @@@ContentType: DISCore|TFPQNames
-      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
-    @@Implement:
-      @@@@: ||ManakaiDOM|ManakaiDOM3||ManakaiDOM|ForIF
-      @@@ContentType: DISCore|TFPQNames
-      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM3
-    @@Implement:
-      @@@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
-      @@@ContentType: DISCore|TFPQNames
-      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
-
-    @@DOMMain:implementFeature: min30
-
-minIFClsDef:
-  @IFQName: ImplementationList
-  @ClsQName: ManakaiImplementationList
-
-  @enDesc:
-    An ordered collection of objects which implement the
-    <IF::MinimumImplementation> interface.
-
-    {NOTE:: How this collection is implemented is unspecified.
-    }
-
-    {NOTE:: This collection is <EM::not> <QUOTE::live>.
-    }
-  @enDesc:
-    @@@:
-      In the Perl binding, the <IF::ImplementationList> objects
-      might be handled as if they are arrays.
-  
-  @Method:
-     @@Name:  item
-    @@Operator: DISLang|ArrayGet
-     @@Description:
-       @@@lang:en
-       @@@@: 
-         Returns the <P::index>th item in this collection.
-     @@Param:
-        @@@Name:  index
-        @@@Type:  
-          DOMMain:unsigned-long::ManakaiDOM:all
-        @@@Description:
-          @@@@lang:en
-          @@@@@: 
-            An index of the item to retrieve in this collection.
-     @@Return:
-        @@@Type: MinimumImplementation
-        @@@Description:
-          @@@@lang:en
-          @@@@@: 
-            The implementation at the <P::index>th position in
-            the collection.
-        @@@InCase:
-          @@@@Value: 
-            @@@@@is-null:1
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              There is no <P::index>th implementation in the collection.
-        @@@PerlCDef:
-          if (not defined $index or
-              $index < 0 or
-              $index > $#$self) {
-            $r = null;
-          } else {
-            $r = $self->[$index];
-          }
-  @Attr:
-     @@Name:  length
-     @@Description:
-       @@@lang:en
-       @@@@:  
-         The number of implementation objects in the collection.
-     @@Get:
-        @@@Type:  
-          DOMMain:unsigned-long::ManakaiDOM:all
-        @@@PerlCDef:
-            $r = @$self;
-
-  @Method:
-    @@Operator:
-      @@@@: DISPerl|NewMethod
-      @@@ContentType: dis|TypeQName
-    @@ManakaiDOM:isStatic:1
-    @@ManakaiDOM:isForInternal:1
-    @@ForCheck: ManakaiDOM|ForClass
-    @@enDesc:
-      Creates a new <IF::ImplementationList> object and returns it.
-    @@Return:
-      @@@Type: ImplementationList
-      @@@actualType: ManakaiImplementationList
-      @@@enDesc: The newly created list.
-      @@@PerlDef:
-          $r = bless [], ref $self ? ref $self : $self;
-  @Method:
-    @@Name: appendItems
-    @@enDesc:
-      Appends a list of implementations after the last item
-      in the collection.
-
-      {NOTE:: This method is provided for the convinience of
-              <IF::ImplementationSource>s.
-      }
-    @@Param:
-      @@@Name: list
-      @@@Type: ImplementationList
-      @@@enDesc:
-        A list of implementations.
-      @@@enDesc:
-        @@@@For: ManakaiDOM|Perl
-        @@@@For: ManakaiDOM|ForSpec
-        @@@@@:
-          In the Perl binding, the parameter value <kwd:MAY> be 
-          a <IF::MinimumImplementation> object.
-    @@Return:
-      @@@PerlCDef:
-        if ($list->isa (<IFName::ImplementationList>)) {
-          push @$self, @$list;
-        } else {
-          push @$self, $list;
-        }
-##ImplementationList
-
-minIFClsDef:
-  @IFQName: ImplementationSource
-  @ClsQName: ManakaiImplementationSource
-  
-  @DISLang:role: DOMMetaImpl|ManakaiDOMImplementationSourceRole
-
-  @p:require:
-    @@ContentType: DISPerl|Perl
-    @@@:
-      Message::Util::AutoLoad::Registry
-
-  @enDesc:
-    The objects implementing <IF::ImplementationSource> interface provides 
-    access to available implementations.  The 
-    <Class::ImplementationRegistry> object is a special case
-    of the instance of this interface.
-
-  @Method:
-     @@Name:  getImplementation
-     @@Description:
-        @@@lang:en
-        @@@@: 
-          Returns the first implementation that support specific 
-          features.
-     @@Param:
-        @@@Name:  features
-        @@@Type: MIString
-        @@@actualType: FeaturesString
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            A string that specifies which features and versions are 
-            required.
-      @@@nullCase:
-        @@@@enDesc:
-          Any implementation is allowed.
-     @@Return:
-        @@@Type: c|DOMImplementation
-        @@@Description:
-          @@@@lang:en
-          @@@@@: 
-            The first implementation that support the desired 
-            features and versions.
-        @@@InCase:
-          @@@@Value:
-            @@@@@is-null:1
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@: 
-              This source has no implementation that supports the 
-              desired features and versions.
-      @@@PerlCDef:
-        $r = <Class::c|ManakaiDOMImplementation>->_new;
-        for my $feature (keys %$features) {
-          my $fkey = $feature;
-          my $plus = $feature =~ s/^\+// ? 1 : 0;
-          for my $version (grep {$features->{$fkey}->{$_}}
-              keys %{$features->{$fkey}}) {
-            unless ($Message::Util::AutoLoad::Registry::Feature
-                ->{$feature}->{$version}) {
-              undef $r;
-            }
-          }
-        }
-
-    @@Test:
-      @@@QName: ImplementationSource.getImplementation.1.test
-      @@@PerlDef:
-        my $is = <ClassM::ManakaiImplementationSource.getImplementation>;
-        $test->assert_isa ($is, <IFName::c|DOMImplementation>);
-    @@Test:
-      @@@QName: ImplementationSource.getImplementation.2.test
-      @@@PerlDef:
-        my $is = <ClassM::ManakaiImplementationSource.getImplementation>
-            ({'core' => '3.0'});
-        $test->assert_isa ($is, <IFName::c|DOMImplementation>);
-    @@Test:
-      @@@QName: ImplementationSource.getImplementation.3.test
-      @@@PerlDef:
-        my $is = <ClassM::ManakaiImplementationSource.getImplementation>
-            ({'core' => '3.0', 'xml' => '3.0'});
-        $test->assert_isa ($is, <IFName::c|DOMImplementation>);
-
-  @Method:
-     @@Name:  getDOMImplementation
-     @@Description:
-        @@@lang:en
-        @@@@: 
-          Returns the first DOM implementation that support specific 
-          features.
-
-          {NOTE:: An implementation supports the DOM if 
-                  it supports the <Feature::Core> feature.
-                  In the <IF::ImplementationSource> objects
-                  implementing the <Feature::ManakaiDOM|Minimum>
-                  version <FeatureVer::3.0>, a DOM implementation
-                  <kwd:MUST> support the <Feature::Core> feature
-                  version <FeatureVer::3.0>.
-          }
-     @@Param:
-        @@@Name:  features
-        @@@Type: MIString
-        @@@actualType: FeaturesString
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            A string that specifies which features and versions are 
-            required.
-     @@Return:
-        @@@Type:MinimumImplementation
-        @@@Description:
-          @@@@lang:en
-          @@@@@: 
-            The first DOM implementation that support the desired 
-            features and versions.
-        @@@InCase:
-          @@@@Value:
-            @@@@@is-null:1
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@: 
-              This source has no DOM implementation that supports the 
-              desired features and versions.
-        @@@PerlCDef:
-          $features->{'core'}->{'3.0'} = true;
-          __DEEP{
-            $r = $self-><M::ImplementationSource.getImplementation> ($features);
-          }__;
-
-  @Method:
-     @@Name:  getImplementationList
-     @@Description:
-       @@@lang:en
-       @@@@:
-         Returns a list of implementations that support the specified 
-         features and versions.
-     @@Param:
-        @@@Name:  features
-        @@@Type: MIString
-        @@@actualType: FeaturesString
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            A string that specifies which features and versions are required.
-      @@@nullCase:
-        @@@@enDesc:
-          Any implementation is allowed.
-     @@Return:
-        @@@Type:  ImplementationList
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            A list of implementations that support the desired 
-            features and versions.
-      @@@PerlCDef:
-        $r = <ClassName::ManakaiImplementationList>->new;
-        __DEEP{
-          my $v = $self->get_implementation ($features);
-          push @$r, $v if defined $v;
-        }__;
-
-  @Method:
-     @@Name:  getDOMImplementationList
-     @@Description:
-       @@@lang:en
-       @@@@:
-         Returns a list of DOM implementations that support the specified 
-         features and versions.
-     @@Param:
-        @@@Name:  features
-        @@@Type: MIString
-        @@@actualType: FeaturesString
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            A string that specifies which features and versions are required.
-     @@Return:
-        @@@Type:  ImplementationList
-        @@@actualType: ManakaiImplementationList
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            A list of DOM implementations that support the desired 
-            features and versions.
-        @@@PerlCDef:
-          __DEEP{
-            $features->{core}->{'3.0'} = true;
-            $r = $self-><M::ImplementationSource
-                           .getImplementationList> ($features);
-          }__;
-##ImplementationSource
-
-ElementTypeBinding:
-  @Name: nullCase
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@DISCore:resourceType:
-      ManakaiDOM:InCase
-    @@Value:
-      @@@is-null:1
-
-ResourceDef:
-  @QName: makeClassISAList
-  @rdf:type: DISPerl|BlockCode
-  @enDesc:
-    Makes the list of <QUOTE::is-a> classes of a class.
-  @PerlDef:
-    unless ($Message::DOM::ClassISA{$CLASS}) {
-      no strict 'refs';
-      my %__class;
-      my @__chk = ($CLASS);
-      while (my $__chk = shift @__chk) {
-        $__class{$__chk} = true;
-        for my $__isa (@{$__chk . '::ISA'}) {
-          if ($__isa !~ /::IF(?:Level.|Latest)?::/ and 
-              not $__class{$__isa}) {
-            push @__chk, $__isa;
-          }
-        }
-      }
-      $Message::DOM::ClassISA{$CLASS} = [keys %__class];
-    }
-  @For: ManakaiDOM|ManakaiDOM3
-
-## -- Simplified DOMImplementation interface
-
-PropDef:
-  @QName: ManakaiDOM|implID
-  @enDesc:
-    The identifier of an implementation.
-  @Type: DISPerl|String
 
 ResourceDef:
   @For: ManakaiDOM|DOM3
@@ -2641,10 +1301,6 @@ ResourceDef:
     @@@: DISLang|Interface
     @@ForCheck: ManakaiDOM|ForIF
     @@For: ManakaiDOM|ManakaiDOM
-  @rdf:type:
-    @@@: idl|Interface
-    @@ForCheck: ManakaiDOM|ForIF
-    @@For: ManakaiDOM|ForSpec
   @IFQName: GetFeature
 
   @rdf:type:
@@ -2691,7 +1347,7 @@ ResourceDef:
          feature and version or not.
     @@Param:
       @@@Name:  feature
-      @@@Type: MIString
+      @@@Type: str|DOMString
       @@@actualType: FeatureNameString
       @@@Description:
         @@@@lang:en
@@ -2700,7 +1356,7 @@ ResourceDef:
           <CHAR::PLUS SIGN> prefix.
     @@Param:
       @@@Name:  version
-      @@@Type: MIString
+      @@@Type: str|DOMString
       @@@actualType: FeatureVersionString
       @@@Description:
         @@@@lang:en
@@ -2752,7 +1408,7 @@ ResourceDef:
           interfaces of the specified feature and version.
      @@Param:
         @@@Name:  feature
-        @@@Type: MIString
+        @@@Type: str|DOMString
         @@@actualType: FeatureNameString
         @@@Description:
           @@@@lang:en
@@ -2760,7 +1416,7 @@ ResourceDef:
             A feature name to request.
      @@Param:
         @@@Name:  version
-        @@@Type: MIString
+        @@@Type: str|DOMString
         @@@actualType: FeatureVersionString
         @@@Description:
           @@@@lang:en
@@ -2887,44 +1543,12 @@ ElementTypeBinding:
     @@For: =ManakaiDOM|all
 
 ElementTypeBinding:
-  @Name: Attr
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type: DISLang|Attribute
-    @@ForCheck:
-      ManakaiDOM:DOM !=ManakaiDOM:ManakaiDOM
-
-ElementTypeBinding:
-  @Name: Get
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type: DISLang|AttributeGet
-
-ElementTypeBinding:
-  @Name: Set
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type: DISLang|AttributeSet
-
-ElementTypeBinding:
   @Name: Method
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: DISLang|Method
     @@ForCheck: ManakaiDOM|DOM !=ManakaiDOM|ManakaiDOM
-
-ElementTypeBinding:
-  @Name: IntMethod
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@DISCore:resourceType: DISLang|Method
-    @@ForCheck: ManakaiDOM|DOM !=ManakaiDOM|ManakaiDOM ManakaiDOM|ForClass
-    @@ManakaiDOM:isForInternal: 1
 
 ElementTypeBinding:
   @Name: Param
@@ -2955,10 +1579,9 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type: DISLang|DataType
     @@rdfs:subClassOf:
-      @@@@: MIString
+      @@@@: str|DOMString
       @@@For: ManakaiDOM|DOM
     @@For: ManakaiDOM|DOM
-    @@For: ManakaiDOM|ForSpec
 
 ElementTypeBinding:
   @Name: IFQName

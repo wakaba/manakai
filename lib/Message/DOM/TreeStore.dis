@@ -12,7 +12,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/11/04 17:25:06 $
+    $Date: 2006/12/02 12:46:22 $
 
   @Require:
     @@Module:
@@ -260,7 +260,7 @@ IFClsDef:
     @@QName: ImplementationRegistry.getImplementation.1.test
     @@PerlDef:
       my $impl = $Message::DOM::ImplementationRegistry
-                   ->get_implementation ({<Q::fe|TreeStore> => '3.0'});
+                   ->get_dom_implementation ({<Q::fe|TreeStore> => '3.0'});
       
       $test->id ('DOMImplementationTreeStore');
       $test->assert_isa ($impl, <ClassName::ManakaiDOMImplementationTreeStore>);
@@ -271,7 +271,7 @@ IFClsDef:
     @@QName: ImplementationRegistry.getImplementation.2.test
     @@PerlDef:
       my $impl = $Message::DOM::ImplementationRegistry
-                   ->get_implementation ({<Q::fe|TreeStore> => '3.0',
+                   ->get_dom_implementation ({<Q::fe|TreeStore> => '3.0',
                                           Core => '3.0'});
       
       $test->id ('DOMImplementationTreeStore');

@@ -12,7 +12,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/11/05 12:31:50 $
+    $Date: 2006/12/02 12:46:22 $
 
   @Require:
     @@Module:
@@ -468,19 +468,19 @@ ElementTypeBinding:
       @@@For: ManakaiDOM|DOM3
     @@f:implements:
       @@@@: tx|XMLFeature10
-      @@@For: ManakaiDOM|DOM1 ManakaiDOM|DOMXMLFeature
+      @@@For: ManakaiDOM|DOM1
     @@f:implements:
       @@@@: tx|XMLFeature20
-      @@@For: ManakaiDOM|DOM2 ManakaiDOM|DOMXMLFeature
+      @@@For: ManakaiDOM|DOM2
     @@f:implements:
       @@@@: tx|XMLFeature30
-      @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeature
+      @@@For: ManakaiDOM|DOM3
     @@f:implements:
       @@@@: tx|XMLVersionFeature10
-      @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeature
+      @@@For: ManakaiDOM|DOM3
     @@f:implements:
       @@@@: tx|XMLVersionFeature11
-      @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeatureXML11
+      @@@For: ManakaiDOM|DOM3
 
 ElementTypeBinding:
   @Name: IFClsXDef
@@ -5058,7 +5058,7 @@ IFCls1Def:
               }
               $el = $el-><AG::Node.manakaiParentElement>;
               redo EL if defined $el;
-              $r = null;
+              $r = 0;
             } # EL;
           } else {
             my $el = $nt == <C::Node.DOCUMENT_NODE>
@@ -5069,7 +5069,7 @@ IFCls1Def:
             if (defined $el) {
               $r = $el-><M::Node.isDefaultNamespace> ($namespaceURI);
             } else {
-              $r = null;
+              $r = 0;
             }
           }
         }__;
@@ -7445,7 +7445,7 @@ ResourceDef:
 
   @resourceFor:
     @@@: tc|ForEntityMap
-    @@ForCheck: ManakaiDOM|ManakaiDOM1 ManakaiDOM|DOMXMLFeature
+    @@ForCheck: ManakaiDOM|ManakaiDOM1
   @QName:
     @@@: ManakaiDOMEntityMap
     @@ForCheck: tc|ForEntityMap
@@ -7464,11 +7464,11 @@ ResourceDef:
     @@ForCheck: tc|ForEntityMap ManakaiDOM|DOM3
   @f:implements:
     @@@: tx|XMLVersionFeature11
-    @@ForCheck: tc|ForEntityMap ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeatureXML11
+    @@ForCheck: tc|ForEntityMap ManakaiDOM|DOM3
 
   @resourceFor:
     @@@: tc|ForNotationMap
-    @@ForCheck: ManakaiDOM|ManakaiDOM1 ManakaiDOM|DOMXMLFeature
+    @@ForCheck: ManakaiDOM|ManakaiDOM1
   @QName:
     @@@: ManakaiDOMNotationMap
     @@ForCheck: tc|ForNotationMap
@@ -7487,7 +7487,7 @@ ResourceDef:
     @@ForCheck: tc|ForNotationMap ManakaiDOM|DOM3
   @f:implements:
     @@@: tx|XMLVersionFeature11
-    @@ForCheck: tc|ForNotationMap ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeatureXML11
+    @@ForCheck: tc|ForNotationMap ManakaiDOM|DOM3
 
   @DISCore:resourceType:
     @@@: DISLang|Class
@@ -10940,13 +10940,13 @@ ElementTypeBinding:
       @@@For: ManakaiDOM|DOM3
     @@f:implements:
       @@@@: tx|XMLFeature30
-      @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeature
+      @@@For: ManakaiDOM|DOM3
     @@f:implements:
       @@@@: tx|XMLVersionFeature10
-      @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeature
+      @@@For: ManakaiDOM|DOM3
     @@f:implements:
       @@@@: tx|XMLVersionFeature11
-      @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeatureXML11
+      @@@For: ManakaiDOM|DOM3
 
 ElementTypeBinding:
   @Name: ConstGroup

@@ -37,6 +37,7 @@ DAF = $(PERL_) $(DAF_PL) $(DAF_OPTIONS) $(DIS_OPTIONS_ALL)
 
 DOM_FEATURE_DIS_FILES = DOMFeature$(DIS_SUFFIX) GenericLS$(DIS_SUFFIX)
 DOM_CORE_DIS_FILES = DOMMain.dis DOMCore.dis \
+                     DOMString$(DIS_SUFFIX) \
                      TreeCore$(DIS_SUFFIX) Document$(DIS_SUFFIX) \
                      Element$(DIS_SUFFIX) CharacterData$(DIS_SUFFIX) \
                      XML$(DIS_SUFFIX) XDoctype$(DIS_SUFFIX)
@@ -55,7 +56,7 @@ DOT_CORE_DIS_FILES = \
 
 PM_FILES = \
   DOMFeature$(PM_SUFFIX) GenericLS$(PM_SUFFIX) \
-  DOMMain$(PM_SUFFIX) DOMCore$(PM_SUFFIX) \
+  DOMMain$(PM_SUFFIX) DOMCore$(PM_SUFFIX) DOMString$(PM_SUFFIX) \
   TreeCore$(PM_SUFFIX) Document$(PM_SUFFIX) Element$(PM_SUFFIX) \
   CharacterData$(PM_SUFFIX) XML$(PM_SUFFIX) XDoctype$(PM_SUFFIX) \
   DOMLS$(PM_SUFFIX) XMLParser$(PM_SUFFIX) \
@@ -77,6 +78,7 @@ $(PM_FILES): %$(PM_SUFFIX): %$(DIS_SUFFIX) $(DAF_PL)
 	  --create-perl-module="$(NS_MDOM)DOMFeature DOMFeature$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_MDOM)GenericLS  GenericLS$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_MDOM)DOMMain    DOMMain$(PM_SUFFIX)" \
+	  --create-perl-module="$(NS_MDOM)DOMString  DOMString$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_MDOM)DOMCore    DOMCore$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_MDOM)TreeCore   TreeCore$(PM_SUFFIX)" \
 	  --create-perl-module="$(NS_MDOM)Document   Document$(PM_SUFFIX)" \
@@ -88,6 +90,7 @@ $(PM_FILES): %$(PM_SUFFIX): %$(DIS_SUFFIX) $(DAF_PL)
 	$(PERL_CHK) DOMFeature$(PM_SUFFIX)
 	$(PERL_CHK) GenericLS$(PM_SUFFIX)
 	$(PERL_CHK) DOMMain$(PM_SUFFIX)
+	$(PERL_CHK) DOMString$(PM_SUFFIX)
 	$(PERL_CHK) DOMCore$(PM_SUFFIX)
 	$(PERL_CHK) TreeCore$(PM_SUFFIX)
 	$(PERL_CHK) Document$(PM_SUFFIX)
@@ -109,5 +112,5 @@ clean-db:
 
 distclean: clean clean-db
 
-## $Date: 2006/08/15 03:54:37 $
+## $Date: 2006/12/02 12:46:22 $
 ## License: Public Domain.

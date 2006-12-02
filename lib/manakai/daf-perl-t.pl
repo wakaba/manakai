@@ -84,7 +84,7 @@ sub daf_generate_perl_test_file ($) {
   $pack->append_child ($factory->create_pc_statement)
        ->append_code
            ('my $impl = $Message::DOM::ImplementationRegistry
-                            ->get_implementation ({
+                            ->get_dom_implementation ({
                 "http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#Test"
                     => "1.0",
             })');

@@ -7,7 +7,7 @@ use Message::Util::QName::Filter {
   swcfg21 => q<http://suika.fam.cx/~wakaba/archive/2005/swcfg21#>,
 };
 
-our$VERSION=do{my @r=(q$Revision: 1.20 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our$VERSION=do{my @r=(q$Revision: 1.21 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Cwd;
 use Getopt::Long;
 use Pod::Usage;
@@ -157,7 +157,7 @@ for (@{$Opt{create_module}}) {
   }
 }
 
-our $impl = $Message::DOM::ImplementationRegistry->get_implementation;
+our $impl = $Message::DOM::ImplementationRegistry->get_dom_implementation;
 
 ## --- Loading and Updating the Database
 

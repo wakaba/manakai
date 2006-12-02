@@ -19,9 +19,6 @@ Module:
   @FullName:
     @@lang:en
     @@@: DOM Core Module
-  @Spec:
-    @@DOM3:
-      http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-BBACDC08
   @Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
   
@@ -40,7 +37,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/11/05 12:31:49 $
+      $Date: 2006/12/02 12:46:19 $
     @@ContentType:
       dis:Date.RCS
 
@@ -67,6 +64,9 @@ Module:
     @@Module:
       @@@QName: MURI|Generic
       @@@WithFor: ManakaiDOM|ManakaiDOMLatest
+    @@Module:
+      @@@QName: MDOM|DOMString
+      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
 Namespace:
@@ -76,16 +76,26 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dom/xdt#
   @dis:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
+  @domcommon:
+    http://suika.fam.cx/~wakaba/archive/2006/dom/common/
   @DOMCore:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
+  @domes:
+    http://suika.fam.cx/~wakaba/archive/2006/dom/ecmascript/
   @DOMEvents:
     http://suika.fam.cx/~wakaba/archive/2004/dom/events#
+  @domidl:
+    http://suika.fam.cx/~wakaba/archive/2006/dom/idl/ 
+  @domjava:
+    http://suika.fam.cx/~wakaba/archive/2006/dom/java/
   @DOMLS:
     http://suika.fam.cx/~wakaba/archive/2004/dom/ls#
   @DOMMain:
     http://suika.fam.cx/~wakaba/archive/2004/dom/main#
   @DOMMetaImpl:
     http://suika.fam.cx/~wakaba/archive/2004/dom/meta#
+  @domperl:
+    http://suika.fam.cx/~wakaba/archive/2006/dom/perl/
   @dx:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#
   @dxm:
@@ -134,6 +144,8 @@ Namespace:
     http://www.w3.org/1999/02/22-rdf-syntax-ns#
   @rdfs:
     http://www.w3.org/2000/01/rdf-schema#
+  @str:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/DOMString/
   @t:
     http://suika.fam.cx/~wakaba/archive/2004/dom/tree#
   @tc:
@@ -375,6 +387,30 @@ ElementTypeBinding:
     @@ContentType: DISCore|String
 
 FeatureDef:
+  @QName: min
+  @FeatureVerDef:
+    @@featureQName: fe|Min
+    @@featureQName: ManakaiDOM|Minimum
+    @@Version: 3.0
+    @@QName: f|min30
+    @@Description:
+      @@@lang:en
+      @@@@:
+        Minimum DOM implementation, level 3.
+
+        {NOTE::
+          This feature will be removed.
+        }
+    @@f:instanceOf: min
+
+ElementTypeBinding:
+  @Name: featureQName
+  @ElementType:
+    f:name
+  @ShadowContent:
+    @@ContentType: DISCore|QName
+
+FeatureDef:
   @featureName: Core
   @QName: CoreFeature
   @FeatureVerDef:
@@ -495,19 +531,19 @@ ResourceDef:
 
   @f:implements:
     @@@: tx|XMLFeature10
-    @@For: ManakaiDOM|DOM1 ManakaiDOM|DOMXMLFeature
+    @@For: ManakaiDOM|DOM1
   @f:implements:
     @@@: tx|XMLFeature20
-    @@For: ManakaiDOM|DOM2 ManakaiDOM|DOMXMLFeature
+    @@For: ManakaiDOM|DOM2
   @f:implements:
     @@@: tx|XMLFeature30
-    @@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeature
+    @@For: ManakaiDOM|DOM3
   @f:implements:
     @@@: tx|XMLVersionFeature10
-    @@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeature
+    @@For: ManakaiDOM|DOM3
   @f:implements:
     @@@: tx|XMLVersionFeature11
-    @@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeatureXML11
+    @@For: ManakaiDOM|DOM3
 
   @ISA:
     @@@: dx|Exception||ManakaiDOM|Perl
@@ -940,8 +976,6 @@ ResourceDef:
           @@@@enMufDef:
             This is not a supported event object; use createEvent method 
             or implement the CustomEvent interface
-          @@@@For:
-            ManakaiDOM:DOMEventsFeature
         @@@SubTypeDef:
           @@@@QName:
             MDOMX:MDOM_DOC_NOSUPPORT_XML
@@ -1575,8 +1609,6 @@ ResourceDef:
             @@@@@@:
               An attempt is made to set a namespace URI to 
               an HTML node. 
-          @@@@For:
-            ManakaiDOM:DOMHTMLFeature
       @@@SubTypeDef:
         @@@@QName: c|NO_NS_NAMEDNODEMAP_ERR
         @@@@enDesc:
@@ -1678,7 +1710,6 @@ PropDef:
   @QName: features
   @enDesc:
     Lists of features.
-  @Type: ManakaiDOM|ManakaiDOMFeatures
 
 ElementTypeBinding:
   @Name: IFCls1Def
@@ -1734,19 +1765,19 @@ ElementTypeBinding:
       @@@For: ManakaiDOM|DOM3
     @@f:implements:
       @@@@: tx|XMLFeature10
-      @@@For: ManakaiDOM|DOM1 ManakaiDOM|DOMXMLFeature
+      @@@For: ManakaiDOM|DOM1
     @@f:implements:
       @@@@: tx|XMLFeature20
-      @@@For: ManakaiDOM|DOM2 ManakaiDOM|DOMXMLFeature
+      @@@For: ManakaiDOM|DOM2
     @@f:implements:
       @@@@: tx|XMLFeature30
-      @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeature
+      @@@For: ManakaiDOM|DOM3
     @@f:implements:
       @@@@: tx|XMLVersionFeature10
-      @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeature
+      @@@For: ManakaiDOM|DOM3
     @@f:implements:
       @@@@: tx|XMLVersionFeature11
-      @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeatureXML11
+      @@@For: ManakaiDOM|DOM3
 
 ElementTypeBinding:
   @Name: IFCls3Def
@@ -1788,13 +1819,13 @@ ElementTypeBinding:
       @@@For: ManakaiDOM|DOM3
     @@f:implements:
       @@@@: tx|XMLFeature30
-      @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeature
+      @@@For: ManakaiDOM|DOM3
     @@f:implements:
       @@@@: tx|XMLVersionFeature10
-      @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeature
+      @@@For: ManakaiDOM|DOM3
     @@f:implements:
       @@@@: tx|XMLVersionFeature11
-      @@@For: ManakaiDOM|DOM3 ManakaiDOM|DOMXMLFeatureXML11
+      @@@For: ManakaiDOM|DOM3
 
 ElementTypeBinding:
   @Name: IFQName
@@ -1810,11 +1841,148 @@ ElementTypeBinding:
   @ShadowContent:
     @@ForCheck: ManakaiDOM|ForClass
 
+## -- Bootstrap DOMImplementationRegistry object
+
+ResourceDef:
+  @QName: ImplementationRegistryVariable
+  @DISCore:resourceType: p|ScalarVariable
+  @p:variableName:
+    Message::DOM::ImplementationRegistry
+  @DefaultValue:
+    @@@:
+      <ClassName::ManakaiDOMImplementationRegistry>
+    @@ContentType: lang|Perl
+  @Type: p|String||ManakaiDOM|all
+  @For: =ManakaiDOM|ManakaiDOMLatest
+
+ResourceDef:
+  @QName: DOMImplementationRegistryVariable
+  @DISCore:resourceType: p|ScalarVariable
+  @p:variableName:
+    Message::DOM::DOMImplementationRegistry
+  @DefaultValue:
+    @@@:
+      <ClassName::ManakaiDOMImplementationRegistry>
+    @@ContentType: lang|Perl
+  @Type: DISLang|String||ManakaiDOM|all
+  @For: =ManakaiDOM|ManakaiDOMLatest
+  @enImplNote:
+    {ISSUE::
+       There are three options:
+
+        - Retain both <Perl::$Message::DOM::ImplementationRegistry>
+          and <Perl::$Message::DOM::DOMImplementationRegistry>.
+
+        - Remove <Perl::$Message::DOM::ImplementationRegistry>
+          for <QUOTE::name compatibility> with DOM3.
+
+        - Remove <Perl::$Message::DOM::DOMImplementationRegistry>
+          for backward compatibility and removing redundancy.
+    }
+
+IFCls3Def:
+  @IFQName: DOMImplementationRegistry
+  @ClsQName: ManakaiDOMImplementationRegistry
+
+  @DISCore:resourceType: domcommon|Object
+  @Implement: DOMImplementationSource
+
+  @enDesc:
+    DOM Level 3 Core specification introduces a <IF::DOMImplementationRegistry>
+    object with a function that lets an application find DOM
+    implementations, based on the specific features it requires.
+
+    How this object is found and what it exactly looks like is 
+    not defined here, because this cannot done in a
+    language-independent manner.  Instead, each language binding
+    defines its own way of doing this.
+
+      In Perl binding, the scalar variable 
+      <Perl::$Message::DOM::ImplementationRegistry> has a reference
+      with which methods defined in <IF::DOMImplementationSource> interface
+      can be called.
+
+        {NOTE:: The variable value might be a package name
+                rather than a hard reference.
+        }
+
+      {TODO:: Describes how the object finds implementations.
+      }
+
+  @Method:
+     @@Name:  getDOMImplementation
+    @@enDesc:
+         Seeks and returns the first implementation that implements 
+         desired features. 
+     @@Param:
+        @@@Name:  features
+        @@@Type: DOMString
+        @@@actualType: f|FeaturesString
+      @@@enDesc:
+            A list of desired features that must be implemented.
+     @@Return:
+       @@@Type: DOMImplementation
+       @@@enDesc:
+         The first DOM implementation that has the desired features.
+      @@@nullCase:
+        @@@@enDesc:
+             No implementation implementing the desired features is found.
+       @@@PerlDef:
+           __CODE{DOMMain:stringifyFeatures:: $IN => $features,
+                                              $OUT => $features}__;
+           __DEEP{
+             C: for my $class (
+               keys %Message::DOM::ManakaiDOMImplementationRegistry::SourceClass
+             ) {
+               $r = $class->get_dom_implementation ($features);
+               last C if defined $r;
+             }
+           }__;
+      @@@enImplNote:
+        @@@@ddid: strfeatures
+        @@@@@:
+          Converting <P::features> into a string is necessary since 
+          a <IF::DOMCore:DOMImplementationSource> might not be part 
+          of manakai so that it does not support the hash representation. 
+
+  @Method:
+     @@Name:  getDOMImplementationList
+     @@ManakaiDOM:isStatic: 1
+     @@Description:
+       @@@lang:en
+       @@@@:
+         Returns a list of all the DOM implementations that implement 
+         desired features.
+     @@Param:
+        @@@Name:  features
+        @@@Type: DOMString
+        @@@actualType: f|FeaturesString
+        @@@Description:
+          @@@@lang:en
+          @@@@@: A list of desired features that must be implemented.
+     @@Return:
+       @@@Type: DOMImplementationList
+       @@@Description:
+         @@@@lang:en
+         @@@@@: 
+           A list of DOM implementations that support the desired features. 
+       @@@PerlDef:
+           __CODE{DOMMain:stringifyFeatures:: $IN => $features,
+                                              $OUT => $features}__;
+           __DEEP{
+             $r = <Class::ManakaiDOMImplementationList>->new;
+             for my $class (
+               keys %Message::DOM::ManakaiDOMImplementationRegistry::SourceClass
+             ) {
+               $r->_append_items
+                   ($class->get_dom_implementation_list ($features));
+             }
+           }__;
+##DOMImplementationRegistry
+
 IFCls3Def:
   @IFQName: DOMImplementationList
   @ClsQName: ManakaiDOMImplementationList
-
-  @ClsISA: f|ManakaiImplementationList
 
   @enDesc:
     The <IF::DOMImplementationList> interface provides the 
@@ -1838,7 +2006,8 @@ IFCls3Def:
     @@enDesc:
       The number of items in the collection.
     @@Get:
-    @@ForCheck: !ManakaiDOM|ForClass
+      @@@PerlDef:
+            $r = @$self;
 
   @Method:
     @@Name: item
@@ -1849,7 +2018,6 @@ IFCls3Def:
       @@@Name:index
       @@@Type:DOMMain|unsigned-long||ManakaiDOM|all
       @@@enDesc: Index in the collection.
-    @@ForCheck: !ManakaiDOM|ForClass
     @@Return:
       @@@enDesc:
         The <IF::DOMImplementation> object at the <P::index>th
@@ -1858,6 +2026,14 @@ IFCls3Def:
         @@@@enDesc:
           If the <P::index> is greater than or equal to
           the number of items in the collection.
+      @@@PerlDef:
+          if (not defined $index or
+              $index < 0 or
+              $index > $#$self) {
+            $r = null;
+          } else {
+            $r = $self->[$index];
+          }
 
   @Method:
     @@Operator:
@@ -1872,17 +2048,39 @@ IFCls3Def:
     @@Return:
       @@@enDesc: The newly created list.
       @@@PerlDef:
-        __DEEP{
-          $r = bless $self->SUPER::new,
-                     <ClassName::ManakaiDOMImplementationList>;
-        }__;
+        $r = bless [], ref $self ? ref $self : $self;
+
+  @IntMethod:
+    @@Name: appendItems
+    @@enDesc:
+      Appends a list of implementations after the last item
+      in the collection.
+
+      {NOTE:: This method is provided for the convinience of
+              <Class::ManakaiDOMImplementationSource>s.
+      }
+    @@Param:
+      @@@Name: list
+      @@@Type: ImplementationList
+      @@@enDesc:
+        A list of implementations.
+      @@@enDesc:
+        @@@@For: ManakaiDOM|Perl
+        @@@@@:
+          In the Perl binding, the parameter value <kwd:MAY> be 
+          a <IF::DOMImplementation> object.
+    @@Return:
+      @@@PerlDef:
+        if ($list->isa (<IFName::DOMImplementationList>)) {
+          push @$self, @$list;
+        } else {
+          push @$self, $list;
+        }
 ##DOMImplementationList
 
 IFCls3Def:
   @IFQName: DOMImplementationSource
   @ClsQName: ManakaiDOMImplementationSource
-
-  @ClsISA: f|ManakaiImplementationSource
 
   @enDesc:
     The <IF::DOMImplementationSource> interface permits a DOM
@@ -1894,16 +2092,21 @@ IFCls3Def:
     so that its <IF::DOMImplementation> objects are made available
     from the <Class::DOMMain:DOMImplementationRegistry> object.
 
+  @DISLang:role: DOMMetaImpl|ManakaiDOMImplementationSourceRole
+  @p:require:
+    @@ContentType: DISPerl|Perl
+    @@@:
+      Message::Util::AutoLoad::Registry
+
   @Method:
     @@Name: getDOMImplementation
-    @@ForCheck: !ManakaiDOM|ForClass
     @@enDesc:
       Returns the first DOM implementation that supports the specified
       features.
     @@Param:
       @@@Name: features
       @@@Type: DOMMain|DOMString
-      @@@actualType: DOMFeature|FeaturesString
+      @@@actualType: f|FeaturesString
       @@@enDesc:
         A space-separeted list in which features and versions
         are specified.
@@ -1917,6 +2120,37 @@ IFCls3Def:
         @@@@enDesc:
           The source has no DOM implementation that supports the 
           desired features.
+      @@@PerlDef:
+        $r = <Class::c|ManakaiDOMImplementation>->_new;
+        for my $feature (keys %$features) {
+          my $fkey = $feature;
+          my $plus = $feature =~ s/^\+// ? 1 : 0;
+          for my $version (grep {$features->{$fkey}->{$_}}
+              keys %{$features->{$fkey}}) {
+            unless ($Message::Util::AutoLoad::Registry::Feature
+                ->{$feature}->{$version}) {
+              undef $r;
+            }
+          }
+        }
+
+    @@Test:
+      @@@QName: ImplementationSource.getImplementation.1.test
+      @@@PerlDef:
+        my $is = <ClassM::ManakaiDOMImplementationSource.getDOMImplementation>;
+        $test->assert_isa ($is, <IFName::c|DOMImplementation>);
+    @@Test:
+      @@@QName: ImplementationSource.getImplementation.2.test
+      @@@PerlDef:
+        my $is = <ClassM::ManakaiDOMImplementationSource.getDOMImplementation>
+            ({'core' => '3.0'});
+        $test->assert_isa ($is, <IFName::c|DOMImplementation>);
+    @@Test:
+      @@@QName: ImplementationSource.getImplementation.3.test
+      @@@PerlDef:
+        my $is = <ClassM::ManakaiDOMImplementationSource.getDOMImplementation>
+            ({'core' => '3.0', 'xml' => '3.0'});
+        $test->assert_isa ($is, <IFName::c|DOMImplementation>);
 
   @Method:
     @@Name: getDOMImplementationList
@@ -1926,19 +2160,19 @@ IFCls3Def:
     @@Param:
       @@@Name: features
       @@@Type: DOMMain|DOMString
-      @@@actualType: DOMFeature|FeaturesString
+      @@@actualType: f|FeaturesString
       @@@enDesc:
         A space-separeted list in which features and versions
         are specified.
     @@Return:
       @@@Type: DOMImplementationList
-      @@@actualType: ManakaiDOMImplementationList
       @@@enDesc:
         A list of DOM implementations that support the desired features.
       @@@PerlDef:     
-        __DEEP{      ## NOTE: Method name is directly written.
-          $r = bless $self->SUPER::get_dom_implementation_list ($features),
-                     <ClassName::ManakaiDOMImplementationList>;
+        $r = <ClassName::ManakaiDOMImplementationList>->new;
+        __DEEP{
+          my $v = $self->get_dom_implementation ($features);
+          push @$r, $v if defined $v;
         }__;
 ##DOMImplementationSource
 
@@ -1955,492 +2189,6 @@ ElementTypeBinding:
     dis:ISA
   @ShadowContent:
     @@ForCheck: ManakaiDOM|ForClass
-
-IFCls3Def:
-  @IFQName: DOMStringList
-  @ClsQName: ManakaiDOMStringList
-
-  @AppISA:
-    Tie::Array
-
-  @enDesc:
-    Objects implementing the <IF::DOMStringList> interface are
-    used to represent ordered collection of <TYPE::DOMMain|DOMString>
-    values.
-
-    {NOTE:: How this collection is implemented is neither defined nor
-            constrained.
-    }
-
-    The items in the <IF::DOMStringList> are accessible via an
-    ordinal index, starting from <CODE::0>.
-
-  @enDesc:
-    @@For: ManakaiDOM|ManakaiDOM
-    @@ddid:perl
-    @@@:
-      In the manakai implementation, a <IF::DOMStringList> object
-      can be dereferenced as if it is a reference to the array
-      containing all items in the list.
-
-  @enDesc:
-    @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
-    @@ddid:exists
-    @@@:
-      In the current implementation, each item value can be
-      <DOM::null> that is different from an empty string.  In
-      addition, an item can be <EM::not exist> state.
-
-      The <EM::not exist> state is different from <DOM::null>.
-      In various operations defined in DOM, however, it is
-      assumed that there is as if a <DOM::null> value for
-      each <EM::not exist> slot, if an item slot whose index
-      greater than it <EM::exists>.
-
-  @ResourceDef:
-    @@ForCheck: ManakaiDOM|ForClass
-    @@QName: c|createNodeDOMStringList
-    @@enDesc:
-      <Perl::$node>, <Perl::$r>, <Perl::$key>.
-    @@DISCore:resourceType: DISPerl|BlockCode
-    @@PerlDef:
-      $r = bless \[$node, $key], <ClassName::ManakaiDOMStringList>;
-
-  @ResourceDef:
-    @@ForCheck: ManakaiDOM|ForClass
-    @@QName: newDOMStringListForTest
-    @@rdf:type: DISPerl|BlockCode
-    @@PerlDef:
-      require Message::DOM::XDoctype;
-      my $__impl;
-      __CODE{tc|createImplForTest:: $impl => $__impl}__;
-      my $__doc = $__impl-><M::DOMImplementation.createDocument>;
-      my $__docx = $__doc-><M::DOMImplementation.getFeature> (<Q::fe|XDoctype>);
-      my $__at = $__docx-><M::d|DocumentXDoctype.createAttributeDefinition>
-                            ('at1');
-      __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
-        $given => {[]},
-        $prop => {$key},
-        $ref => $__at,
-      }__;
-      __CODE{c|createNodeDOMStringList::
-        $node => $__at, $r => $list,
-        $key => $key,
-      }__;
-
-  @Method:
-     @@Name:  item
-    @@Operator:
-      @@@@: FETCH
-      @@@ContentType: DISPerl|Perl
-     @@Spec:
-       @@@DOM3:
-         http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#DOMStringList-item
-     @@Description:
-       @@@lang:en
-       @@@@: 
-         Returns a <TYPE::DOMMain:DOMString> object in this collection.
-     @@Param:
-        @@@Name:  index
-        @@@Type:  
-          DOMMain:unsigned-long||ManakaiDOM|all
-        @@@Description:
-          @@@@lang:en
-          @@@@@: 
-            The index of the object to retrieve in this collection.
-     @@Return:
-        @@@Type:  
-          DOMMain:DOMString
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            The <TYPE::DOMMain:DOMString> object at the <P::index>th 
-            position in this collection.
-        @@@InCase:
-          @@@@Value:
-            @@@@@is-null:1
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:
-              Either the specified <P::index> is negative or greater 
-              than or equal to the number of <TYPE::DOMMain:DOMString> 
-              objects in this collection.
-      @@@PerlDef:
-        my $v;
-        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-          $r => $v,
-          $prop => {$$self->[1]},
-          $ref => {$$self->[0]},
-        }__;
-        if (not defined $index or
-            $index < 0 or
-            $index > $#$v) {
-          $r = null;
-        } else {
-          $r = $v->[$index];
-        }
-
-  @IntMethod:
-    @@Operator:
-      @@@@: STORE
-      @@@ContentType: DISPerl|Perl
-    @@Param:
-      @@@Name: index
-      @@@Type: idl|unsignedLong||ManakaiDOM|all
-    @@Param:
-      @@@Name: value
-      @@@Type: DOMString
-    @@Return:
-      @@@Type: DOMString
-      @@@enDesc:
-        The old value.
-      @@@nullCase:
-        @@@@enDesc:
-          No old value or <DOM::null> is the old value.
-      @@@dx:raises:
-        @@@@@: MDOMX|NOMOD_THIS
-        @@@@enDesc:
-          If the list is read-only.
-      @@@PerlDef:
-        __DEEP{  ## NOTE: Bare method name
-          $$self->[0]->_check_read_only;
-        }__;
-        my $v;
-        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-          $r => $v,
-          $prop => {$$self->[1]},
-          $ref => {$$self->[0]},
-        }__;
-        $r = $v->[$index] if defined wantarray;
-        $v->[$index] = $value;
-
-  @IntMethod:
-    @@Operator:
-      @@@@: DELETE
-      @@@ContentType: DISPerl|Perl
-    @@Param:
-      @@@Name: index
-      @@@Type: idl|unsignedLong||ManakaiDOM|all
-    @@Return:
-      @@@Type: DOMString
-      @@@enDesc:
-        The old value.
-      @@@nullCase:
-        @@@@enDesc:
-          No old value or <DOM::null> is the old value.
-      @@@dx:raises:
-        @@@@@: MDOMX|NOMOD_THIS
-        @@@@enDesc:
-          If the list is read-only.
-      @@@PerlDef:
-        __DEEP{  ## NOTE: Bare method name
-          $$self->[0]->_check_read_only;
-        }__;
-        my $v;
-        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-          $r => $v,
-          $prop => {$$self->[1]},
-          $ref => {$$self->[0]},
-        }__;
-        $r = $v->[$index] if defined wantarray;
-        CORE::delete $v->[$index];
-
-  @IntMethod:
-    @@Operator:
-      @@@@: EXISTS
-      @@@ContentType: DISPerl|Perl
-    @@Param:
-      @@@Name: index
-      @@@Type: idl|unsignedLong||ManakaiDOM|all
-    @@Return:
-      @@@Type: idl|boolean||ManakaiDOM|all
-      @@@PerlDef:
-        my $v;
-        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-          $r => $v,
-          $prop => {$$self->[1]},
-          $ref => {$$self->[0]},
-        }__;
-        $r = CORE::exists $v->[$index];
-          
-  @Attr:
-     @@Name:  length
-    @@Operator:
-      @@@@: FETCHSIZE
-      @@@ContentType: DISPerl|Perl
-     @@Spec:
-       @@@DOM3:
-         http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#DOMStringList-length
-     @@Description:
-       @@@lang:en
-       @@@@: 
-         The number of <TYPE::DOMMain:DOMString> object in this collection.
-     @@Get:
-        @@@Type:  
-          DOMMain:unsigned-long||ManakaiDOM|all
-        @@@Description:
-          @@@@lang:en
-          @@@@@: 
-            The number of strings in this collection.
-      @@@PerlDef:
-        my $v;
-        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-          $r => $v,
-          $prop => {$$self->[1]},
-          $ref => {$$self->[0]},
-        }__;
-        $r = @$v;
-
-  @Method:
-     @@Name:  contains
-     @@Spec:
-       @@@DOM3: 
-         http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#DOMStringList-contains
-     @@Description:
-       @@@lang:en
-       @@@@: 
-         Tests whether a string is an item of this collection or not.
-     @@Param:
-        @@@Name:  str
-        @@@Type:  
-          DOMMain:DOMString
-        @@@Description:
-          @@@@lang:en
-          @@@@@: 
-            A string to look for.
-     @@Return:
-        @@@Type:  
-          DOMMain:boolean::ManakaiDOM:all
-        @@@Description:
-          @@@@lang:en
-          @@@@@: 
-            Whether the <P::str> is part of this collection or not.
-        @@@TrueCase:
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@: 
-              The <P::str> has been found in this collection.
-        @@@FalseCase:
-          @@@@Description:
-            @@@@@lang:en
-            @@@@@@:  
-              The <P::str> has not been found in this collection.
-      @@@PerlDef:
-        my $v;
-        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-          $r => $v,
-          $prop => {$$self->[1]},
-          $ref => {$$self->[0]},
-        }__;
-        CHK: {
-          __DEEP{
-            for (@$v) {
-              if ($str eq $_) {
-                $r = true;
-                last CHK;
-              }
-            }
-          }__;
-        } # CHK
-
-  @IntMethod:
-    @@Operator:
-      @@@@: TIEARRAY
-      @@@ContentType: DISPerl|Perl
-    @@Param:
-      @@@Name: list
-      @@@Type: DOMStringList
-    @@Return:
-      @@@Type: DOMStringList
-      @@@PerlDef: $r = $list
-
-  @IntMethod:
-    @@Operator:
-      @@@@: @{}
-      @@@ContentType: DISPerl|Perl
-    @@Return:
-      @@@Type: DISPerl|ARRAY||ManakaiDOM|all
-      @@@PerlDef:
-        tie my @list, ref $self, $self;
-        $r = \@list;
-
-  @Test:
-    @@QName: ManakaiDOMStringList.methods.test
-    @@PerlDef:
-      my $list;
-      __CODE{newDOMStringListForTest::
-        $key => 'a',
-      }__;
-
-      ## length (0)
-      $test->assert_equals (0 + @$list, 0);
-      $test->assert_equals ($list-><AG::DOMStringList.length>, 0);
-
-      ## PUSH
-      push @$list, 'String1';
-
-      ## length (1)
-      $test->assert_equals (0 + @$list, 1);
-      $test->assert_equals ($list-><AG::DOMStringList.length>, 1);
-
-      ## FETCH
-      $test->assert_string (actual_value => $list->[0],
-                            expected_value => 'String1');
-
-      ## item
-      $test->assert_string (actual_value => $list-><M::DOMStringList.item> (0),
-                            expected_value => 'String1');
-
-      ## PUSH
-      push @$list, 'String2';
-
-      ## length (2)
-      $test->assert_equals (0 + @$list, 2);
-      $test->assert_equals ($list-><AG::DOMStringList.length>, 2);
-
-      ## FETCH
-      $test->assert_string (actual_value => $list->[1],
-                            expected_value => 'String2');
-      $test->assert_string (actual_value => $list->[0],
-                            expected_value => 'String1');
-    
-      ## EXISTS
-      $test->assert_true (exists $list->[0]);
-      $test->assert_true (exists $list->[1]);
-      $test->assert_false (exists $list->[2]);
-      $test->assert_false (exists $list->[3]);
-
-      ## DELETE
-      delete $list->[0];
-    
-      ## FETCHSIZE
-      $test->assert_equals (0 + @$list, 2);
-
-      ## EXISTS
-      $test->assert_false (exists $list->[0]);
-      $test->assert_true (exists $list->[1]);
-
-      ## FETCH
-      $test->assert_string (actual_value => $list->[1],
-                            expected_value => 'String2');
-  
-      ## STORE
-      $list->[0] = 'String3';
-
-      ## FETCH
-      $test->assert_string (actual_value => $list->[0],
-                            expected_value => 'String3');
- 
-      ## STORE
-      $list->[1] = 'String4';
-      $test->assert_string (actual_value => $list->[1],
-                            expected_value => 'String4');
-      $list->[2] = 'String5';
-      $test->assert_string (actual_value => $list->[2],
-                            expected_value => 'String5');
-      $test->assert_equals (0 + @$list, 3);
-
-      ## contains
-      $test->assert_true ($list-><M::DOMStringList.contains> ('String4'));
-      $test->assert_true ($list-><M::DOMStringList.contains> ('String5'));
-      $test->assert_true ($list-><M::DOMStringList.contains> ('String3'));
-
-      ## DELETE
-      delete $list->[2];
-      $test->assert_false (exists $list->[2]);
-      $test->assert_equals (0 + @$list, 2);
-
-      ## Don't invoke |DESTROY| method
-      bless $list, 'dummy';
-
-  @IntMethod:
-    @@Operator:
-      @@@@: ==
-      @@@ContentType: DISPerl|Perl
-    @@enImplNote:
-      Order insignificant equality for <A::tc|ATDef.allowedTokens>.
-
-      See <M::tc|Node.isEqualNode>.
-
-      {ISSUE::
-        Is order significant equality necessary for other applications?
-      }
-
-      {ISSUE::
-        Should a Perl array reference be allowed as <P::arg>?
-      }
-    @@Param:
-      @@@Name: arg
-      @@@Type: DOMStringList
-    @@Return:
-      @@@Type: boolean
-      @@@PerlDef:
-        EQ: {
-          last EQ
-              unless UNIVERSAL::isa
-                         ($arg, <IFName::DOMStringList||ManakaiDOM|ManakaiDOM>);
-          my @v1 = @$self;
-          my @v2 = @$arg;
-          last EQ unless @v1 == @v2;
-          no warnings 'uninitialized';
-          (@v1) = sort {$a cmp $b} @v1;
-          (@v2) = sort {$a cmp $b} @v2;
-          for my $i (0..$#v1) {
-            if (defined $v1[$i] and defined $v2[$i]) {
-              last EQ unless $v1[$i] eq $v2[$i];
-            } elsif (defined $v1[$i] or defined $v2[$i]) {
-              last EQ;
-            }
-          }
-          $r = true;
-        } # EQ
-
-    @@Test:
-      @@@QName: DOMStringList.==.test
-      @@@PerlDef:
-        my $list1;
-        __CODE{newDOMStringListForTest::
-          $key => 'a',
-          $list => $list1,
-        }__;
-        my $list2;
-        __CODE{newDOMStringListForTest::
-          $key => 'a',
-          $list => $list2,
-        }__;
-
-        $test->id ('empty');
-        $test->assert_num_equals
-                 (expected_value => $list1, actual_value => $list2);
-
-        $test->id ('empty.string');
-        push @$list1, '';
-        push @$list2, '';
-        $test->assert_num_equals
-                 (expected_value => $list1, actual_value => $list2);
-
-        $test->id ('two.strings');
-        push @$list1, 'str';
-        push @$list2, 'str';
-        $test->assert_num_equals
-                 (expected_value => $list1, actual_value => $list2);
-
-        $test->id ('two.three.strings.diff');
-        push @$list1, 'a';
-        $test->assert_num_not_equals
-                 (expected_value => $list1, actual_value => $list2);
-
-        $test->id ('three.strings.diff');
-        push @$list2, 'b';
-        $test->assert_num_not_equals
-                 (expected_value => $list1, actual_value => $list2);
-
-        $test->id ('four.strings.equal');
-        push @$list1, 'b';
-        push @$list2, 'a';
-        $test->assert_num_equals
-                 (expected_value => $list1, actual_value => $list2);
-##DOMStringList
 
 IFCls3Def:
   @IFQName: NameList
@@ -2468,9 +2216,6 @@ IFCls3Def:
 
   @Method:
      @@Name:  getName
-     @@Spec:
-       @@@DOM3:
-         http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#NameList-getName
      @@Description:
         @@@lang:en
         @@@@: 
@@ -2508,9 +2253,6 @@ IFCls3Def:
           }          
   @Method:
      @@Name:  getNamespaceURI
-     @@Spec:
-       @@@DOM3:
-         http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#NameList-getNamespaceURI
      @@Description:
        @@@lang:en
        @@@@:
@@ -2550,9 +2292,6 @@ IFCls3Def:
           }          
   @Attr:
      @@Name:  length
-     @@Spec:
-       @@@DOM3:
-         http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#NameList-length
      @@Description:
        @@@lang:en
        @@@@:
@@ -2568,9 +2307,6 @@ IFCls3Def:
           $r = @$self;
   @Method:
      @@Name:  contains
-     @@Spec:
-       @@@DOM3:
-         http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#NameList-contains
      @@Description:
        @@@lang:en
        @@@@: 
@@ -2621,9 +2357,6 @@ IFCls3Def:
     @@NSVersion: .containsNS
   @Method:
      @@Name:  containsNS
-     @@Spec:
-       @@@DOM3:
-         http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#NameList-containsNS
      @@NoNSVersion: .contains
      @@Description:
        @@@lang:en
@@ -2715,7 +2448,6 @@ IFCls1Def:
   @Implement: f|GetFeature
   @Implement: ecore|MUErrorTarget||ManakaiDOM|Perl
   @DISLang:role: mg|NodeRefRole
-  @DISLang:role: f|ManakaiMinimumImplementationCompatible
 
   @enDesc:
     The <IF::DOMImplementation> interface provides a number
@@ -2739,23 +2471,23 @@ IFCls1Def:
   @f:provides:
     @@@: tx|XMLFeature10
     @@ForCheck:
-      ManakaiDOM:DOM1 ManakaiDOM|DOMXMLFeature
+      ManakaiDOM:DOM1
   @f:provides:
     @@@: tx|XMLFeature20
     @@ForCheck:
-      ManakaiDOM:DOM2 ManakaiDOM|DOMXMLFeature
+      ManakaiDOM:DOM2
   @f:provides:
     @@@: tx|XMLFeature30
     @@ForCheck:
-      ManakaiDOM:DOM3 ManakaiDOM|DOMXMLFeature
+      ManakaiDOM:DOM3
   @f:provides:
     @@@: tx|XMLVersionFeature10
     @@ForCheck:
-      ManakaiDOM:DOM3 ManakaiDOM|DOMXMLFeature
+      ManakaiDOM:DOM3
   @f:provides:
     @@@: tx|XMLVersionFeature11
     @@ForCheck:
-      ManakaiDOM:DOM3 ManakaiDOM|DOMXMLFeatureXML11
+      ManakaiDOM:DOM3
 
   @Test:
     @@QName: DOMImplementation.from.ImplementationList.test
@@ -2768,7 +2500,7 @@ IFCls1Def:
       ) {
         $test->id (join ',', %$features);
         my $list = $Message::DOM::ImplementationRegistry
-                     ->get_implementation_list ($features);
+                     ->get_dom_implementation_list ($features);
         A: {
           for my $impl (@$list) {
             if ($impl->isa (<ClassName::ManakaiDOMImplementation>)) {
@@ -3290,10 +3022,6 @@ IFCls1Def:
         my $ib = <Class::ManakaiDOMImplementation>->_new;
         $test->assert_not_equals ($ia, $ib);
 ##DOMImplementation
-
-PropDef:
-  @QName: dis|DOM3
-  @ImplNote: Temporary.
 
 ElementTypeBinding:
   @Name: CODE
@@ -4318,9 +4046,12 @@ IFCls3Def:
           The order of the parameter names are undefined.
         @@@@ForCheck: ManakaiDOM|ManakaiDOM
       @@@PerlDef:
-        $r = bless [
-          keys %{$Message::DOM::DOMCore::ManakaiDOMConfiguration{$self->[2]}}
-        ], <ClassName::ManakaiDOMStringList>;
+        __CODE{str|createDOMStringList::
+          $r => $r,
+          $list => {[
+            keys %{$Message::DOM::DOMCore::ManakaiDOMConfiguration{$self->[2]}}
+          ]},
+        }__;
 
   @IntMethod:
     @@Operator:
