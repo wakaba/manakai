@@ -12,7 +12,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/12/02 12:46:22 $
+    $Date: 2006/12/03 05:40:34 $
 
   @Require:
     @@Module:
@@ -691,11 +691,7 @@ IFCls1Def:
 
   @ClsISA: f|ManakaiHasFeatureByGetFeature
   @Implement: ecore|MUErrorTarget||ManakaiDOM|Perl
-  @DISLang:role:
-    @@@: mg|NodeRefRole
-    @@enImplNote:
-      If it is necessary to add a role, then add to
-      the <IF::tx|CDATASection>, too.
+  @DISLang:role: mg|NodeRefRole
 
   @enDesc:
     The <IF::Node> interface is the primary datatype for the entire 
@@ -6264,144 +6260,12 @@ RoleDef:
     It <kwd:MUST> implement the <IF::Element> interface.
 
 RoleDef:
-  @QName: tc|AttributeRole
-  @enDesc:
-    Any class playing this role may be retrievable from 
-    <M::Node.getFeature> method of an <IF::Attr> node. 
-
-    It <kwd:MUST> implement the <IF::Attr> interface.
-
-RoleDef:
-  @QName: tc|TextRole
-  @enDesc:
-    Any class playing this role may be retrievable from 
-    <M::Node.getFeature> method of an <IF::Text> node. 
-
-    It <kwd:MUST> implement the <IF::Text> interface.
-
-RoleDef:
-  @QName: tc|CommentRole
-  @enDesc:
-    Any class playing this role may be retrievable from 
-    <M::Node.getFeature> method of an <IF::Comment> node. 
-
-    It <kwd:MUST> implement the <IF::Comment> interface.
-
-RoleDef:
-  @QName: tc|DocumentRole
-  @enDesc:
-    Any class playing this role may be retrievable from 
-    <M::Node.getFeature> method of an <IF::Document> node. 
-
-    It <kwd:MUST> implement the <IF::Document> interface.
-
-RoleDef:
-  @QName: tc|DocumentFragmentRole
-  @enDesc:
-    Any class playing this role may be retrievable from 
-    <M::Node.getFeature> method of an <IF::DocumentFragment> node. 
-
-    It <kwd:MUST> implement the <IF::DocumentFragment> interface.
-
-RoleDef:
-  @QName: tc|DocumentTypeRole
-  @enDesc:
-    Any class playing this role may be retrievable from 
-    <M::Node.getFeature> method of an <IF::tx|DocumentType> node. 
-
-    It <kwd:MUST> implement the <IF::tx|DocumentType> interface.
-
-RoleDef:
-  @QName: tc|EntityRole
-  @enDesc:
-    Any class playing this role may be retrievable from 
-    <M::Node.getFeature> method of an <IF::tx|Entity> node. 
-
-    It <kwd:MUST> implement the <IF::tx|Entity> interface.
-
-RoleDef:
-  @QName: tc|EntityReferenceRole
-  @enDesc:
-    Any class playing this role may be retrievable from 
-    <M::Node.getFeature> method of an <IF::tx|EntityReference> node. 
-
-    It <kwd:MUST> implement the <IF::tx|EntityReference> interface.
-
-RoleDef:
   @QName: tc|ProcessingInstructionRole
   @enDesc:
     Any class playing this role may be retrievable from 
     <M::Node.getFeature> method of an <IF::tx|ProcessingInstruction> node. 
 
     It <kwd:MUST> implement the <IF::tx|ProcessingInstruction> interface.
-
-RoleDef:
-  @QName: tc|NotationRole
-  @enDesc:
-    Any class playing this role may be retrievable from 
-    <M::Node.getFeature> method of a <IF::tx|Notation> node. 
-
-    It <kwd:MUST> implement the <IF::tx|Notation> interface.
-
-RoleDef:
-  @QName: tc|CDATASectionRole
-  @enDesc:
-    Any class playing this role may be retrievable from 
-    <M::Node.getFeature> method of a <IF::tx|CDATASection> node. 
-
-    It <kwd:MUST> implement the <IF::tx|CDATASection> interface.
-
-RoleDef:
-  @QName: tc|NamespaceRole
-  @enDesc:
-    Any class playing this role may be retrievable from 
-    <M::Node.getFeature> method of a <IF::DOMXPath:Namespace> node. 
-
-    It <kwd:MUST> implement the <CODE::XPathNamespace> interface.
-
-RoleDef:
-  @QName: tc|ElementTypeDefinitionRole
-  @enDesc:
-    Any class playing the <Q::tc|ElementTypeDefinitionRole>
-    might be retrieved by <M::Node.getFeature> method of
-    an <IF::d|ElementTypeDefinition> node.
-
-    It <kwd:MUST> implement the <IF::ETDef> interface.
-
-RoleDef:
-  @QName: tc|AttributeDefinitionRole
-  @enDesc:
-    Any class playing the <Q::tc|AttributeDefinitionRole>
-    might be retrieved by <M::Node.getFeature> method of
-    an <IF::d|AttributeDefinition> node.
-
-    It <kwd:MUST> implement the <IF::ATDef> interface.
-
-RoleDef:
-  @QName: tc|AnyNodeRole
-  @enDesc:
-    Any class playing this role may be retrievable from 
-    <M::Node.getFeature> method of a <IF::Node> node. 
-
-    It <kwd:MUST> implement the <IF::Node> interface.
-  @subsetOf: tc|ElementRole
-  @subsetOf: tc|AttributeRole
-  @subsetOf: tc|DocumentRole
-  @subsetOf: tc|DocumentFragmentRole
-  @subsetOf: tc|DocumentTypeRole
-  @subsetOf: tc|TextRole
-  @subsetOf: tc|CommentRole
-  @subsetOf: tc|EntityRole
-  @subsetOf: tc|EntityReferenceRole
-  @subsetOf: tc|NotationRole
-  @subsetOf: tc|ProcessingInstructionRole
-  @subsetOf: tc|CDATASectionRole
-  @subsetOf: tc|NamespaceRole
-
-enImplNote:
-  @ddid: xerole
-  @@:
-    Role for those not implementing the <IF::Node> interface.
 
 IntPropDef:
   @QName: tc|defaultNodeRefClass

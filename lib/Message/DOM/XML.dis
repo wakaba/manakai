@@ -18,7 +18,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/12/02 12:46:23 $
+    $Date: 2006/12/03 05:40:34 $
 
   @Require:
     @@Module:
@@ -1397,11 +1397,6 @@ IFCls1Def:
   @IFISA: tc|Text
   @ClsISA: tcd|ManakaiDOMText
 
-  @DISLang:role: mg|NodeRefRole
-  @DISLang:role:
-    @@@: tc|CDATASectionRole
-    @@DISCore:stopISARecursive: 1
-
   @enDesc:
     A <IF::CDATASection> object represents a <XML::CDATA> section,
     which is used to escape blocks of text containing characters
@@ -1788,8 +1783,6 @@ ResourceDef:
 NodeTypeIFDef:
   @IFQName: DocumentType
 
-  @DISLang:role: tc|DocumentTypeRole
-
   @enDesc:
     The <IF::tx|DocumentType> interface procides an interface to
     the list of general entities and notations that are defined
@@ -1922,8 +1915,6 @@ enImplNote:
 NodeTypeDef:
   @IFQName: Notation
   @ClsQName: ManakaiDOMNotation
-
-  @DISLang:role: tc|NotationRole
   
   @enDesc:
     A <IF::Notation> node represents a notation declared in the DTD.
@@ -2534,8 +2525,6 @@ ResourceDef:
 NodeTypeDef:
   @IFQName: Entity
   @ClsQName: ManakaiDOMEntity
-
-  @DISLang:role: tc|EntityRole
 
   @enDesc:
     An <IF::Entity> node represents a known entity, either
@@ -6030,8 +6019,6 @@ NodeTypeDef:
 NodeTypeDef:
   @IFQName: EntityReference
   @ClsQName: ManakaiDOMEntityReference
-
-  @DISLang:role: tc|EntityReferenceRole
 
   @enDesc:
     An <IF::EntityReference> node represents an entity reference

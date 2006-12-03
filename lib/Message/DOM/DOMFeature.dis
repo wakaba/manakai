@@ -43,7 +43,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/12/02 12:46:21 $
+      $Date: 2006/12/03 05:40:33 $
     @@ContentType:
       dis:Date.RCS
   
@@ -1026,79 +1026,6 @@ ResourceDef:
       {NOTE:: Whether the class implements the 
               <IF::DOMCore:ManakaiDOMImplementationSource> interface
               or not is another problem.
-      \
-      }
-
-ResourceDef:
-  @QName: DOMMetaImpl|ImplementationForManakaiDOMImplementationSource
-  @rdf:type:
-    DISLang:Role
-  @ForCheck:
-    =ManakaiDOM:all
-  @Description:
-    @@lang:en
-    @@@:
-      The <QUOTE::role> that instances of the class is available via
-      the <IF::DOMCore:DOMImplementationSource> interface 
-      implemented by the <Class::DOMCore:ManakaiDOMImplementationSource>
-      objects.
-
-ResourceDef:
-  @QName: DOMMetaImpl|ImplementationCompatibleWithManakaiDOMMinimumImplementation
-  @rdf:type:
-    DISLang:Role
-  @ForCheck:
-    =ManakaiDOM:all
-  @Description:
-    @@lang:en
-    @@@:
-      The <QUOTE::role> that the class is compatible with the class
-      <Class::ManakaiDOMMinimumImplementation> so that 
-      any instance of the class compatible with it is castable 
-      to the class via the <M::ManakaiDOMMinimumImplementation
-      .getFeature> method.
-
-ResourceDef:
-  @QName: DOMMetaImpl|ManakaiAnyImplementationRole
-  @rdf:type:
-    DISLang:Role
-  @ForCheck:
-    =ManakaiDOM:all
-  @rdfs:subClassOf: 
-    DOMMetaImpl|ImplementationCompatibleWithManakaiDOMMinimumImplementation
-  @Description:
-    @@lang:en
-    @@@:
-      Any class that plays this <QUOTE::role> might be accessible 
-      via <M::ManakaiDOMMinimumImplementation
-            ::ManakaiDOM:ManakaiDOMLatest.getFeature>.
-      \
-      {NOTE:: The class don't have to implement the 
-              <IF::DOMMinimumImplementation
-                 ::ManakaiDOM:ManakaiDOMLatest> interface.
-      \
-      }
-
-ResourceDef:
-  @QName: f|ManakaiMinimumImplementationCompatible
-  @rdf:type:
-    DISLang:Role
-  @ForCheck:
-    =ManakaiDOM:all
-  @rdfs:subClassOf: DOMMetaImpl|ImplementationForManakaiDOMImplementationSource
-  @rdfs:subClassOf: DOMMetaImpl|ManakaiAnyImplementationRole
-  @Description:
-    @@lang:en
-    @@@:
-      Any class that plays this <QUOTE::role> might be accessible
-      via <Class::DOMCore:ManakaiDOMImplementationSource
-                ::ManakaiDOM:ManakaiDOMLatest>
-      or <M::DOMMetaImpl:ManakaiDOMMinimumImplementation
-           ::ManakaiDOM:ManakaiDOMLatest.getFeature>.
-      \
-      {NOTE:: The class that plays this <QUOTE::role> must implement the
-              <IF::DOMMetaImpl:ManakaiDOMMinimumImplementation
-                 ::ManakaiDOM:ManakaiDOMLatest> interface.
       \
       }
 

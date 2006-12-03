@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/11/05 10:57:30 $
+      $Date: 2006/12/03 05:40:35 $
     @@ContentType:
       dis:Date.RCS
   
@@ -5495,30 +5495,13 @@ TMethods:
                           ('$Message::DOM::ManakaiDOMImplementationRegistry'.
                            '::SourceClass{q<' . $pack_name . '>} = 1');
                   }
-                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
-            (<Q::DOMMetaImpl:ImplementationForManakaiDOMImplementationSource>)) {
-                    $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::DOM::ManakaiDOMImplementationSource'.
-                           '::SourceClass{q<' . $pack_name . '>} = 1');
-                  }
-                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
-                               (<Q::f|ManakaiMinimumImplementationCompatible>)) {
-                    $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::DOM::DOMFeature::ClassInfo->{'.
-                           'q<Message::DOM::DOMFeature::'.
-                           'ManakaiMinimumImplementation>'.
-                           '}->{compat_class}->{q<' . $pack_name . '>} = 1');
-                  }
                   
                   ## Node
                   if ($role-><M::DIS|DISResource.isSubsetOfURI>
                                 (<Q::tc|ElementRole>)) {
-                    my $for_specific_et;
                     for my $et (@{$cls-><M::DIS|DISResourceProp
                           .getPropertyResourceList>
-                             (<Q::s:elementType>, isa_recursive => true,
-                              default_media_type => <Q::dis:TFQNames>)}) {
-                      $for_specific_et = true;
+                             (<Q::s:elementType>, isa_recursive => 1)}) {
                       my $ln = $et-><AG::DIS|DISResourceMV
                                         .mvLocalName>;
                       $ln = '*' unless defined $ln;
@@ -5531,175 +5514,11 @@ TMethods:
                            "->{q<$ns>}->{q<$ln>} = q<$pack_name>");
                       $pack->add_implemented_element_type ($ns, $ln);
                     }
-                    $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::DOM::DOMFeature::ClassInfo->{'.
-                           'q<Message::DOM::Element::ManakaiDOMElement>'.
-                           '}->{compat_class}->{q<' . $pack_name . '>} = 1')
-                      unless $for_specific_et;
-                  }
-                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
-                                (<Q::tc|AttributeRole>)) {
-                    my $for_specific_attr;
-                    for my $at (@{$cls-><M::DIS|DISResourceProp
-                          .getPropertyResourceList>
-                             (<Q::dis:DocAttr>, isa_recursive => true,
-                              default_media_type => <Q::dis:TFQNames>)}) {
-                      $for_specific_attr = true;
-                      my $ln = $at-><AG::DIS|DISResourceMV
-                                        .mvLocalName>;
-                      $ln = '*' unless defined $ln;
-                      my $ns = $at-><AG::DIS|DISResourceMV
-                                        .mvNamespaceURI>;
-                      $ns = '' unless defined $ns;
-                      my $et = $at-><AG::DIS|DISResourceMV
-                                        .mvOwnerElementResource>;
-                      my $etns = '*';
-                      my $etln = '*';
-                      if ($et) {
-                        $etns = $et-><AG::DIS|DISResourceMV.mvLocalName>;
-                        $etln = '*' unless defined $etln;
-                        my $etns = $at-><AG::DIS|DISResourceMV
-                                          .mvNamespaceURI>;
-                        $etns = '' unless defined $etns;
-                          ## ISSUE: Should NULL-namespace be allowed here?
-                      }
-                      
-                      $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::DOM::DOMFeature::ClassInfo->{' .
-                           'q<Message::DOM::Element::ManakaiDOMAttr>'.
-                           '}->{compat_class_by_type}->{q<' . $etns .
-                           '>}->{q<' . $etln .
-                           '>}->{q<' . $ns . '>}->{q<' . $ln . '>}->{q<' .
-                           $pack_name . '>} = 1');
-                    }
-                    $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::DOM::DOMFeature::ClassInfo->{'.
-                           'q<Message::DOM::Element::ManakaiDOMAttr>'.
-                           '}->{compat_class}->{q<' . $pack_name . '>} = 1')
-                      unless $for_specific_attr;
-                  }
-                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
-                                (<Q::tc|TextRole>)) {
-                    $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::DOM::DOMFeature::ClassInfo->{'.
-                           'q<Message::DOM::TreeCore::ManakaiDOMText>'.
-                           '}->{compat_class}->{q<' . $pack_name . '>} = 1');
-                  }
-                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
-                                (<Q::tc|CommentRole>)) {
-                    $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::DOM::DOMFeature::ClassInfo->{'.
-                           'q<Message::DOM::TreeCore::ManakaiDOMComment>'.
-                           '}->{compat_class}->{q<' . $pack_name . '>} = 1');
-                  }
-                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
-                                (<Q::tc|CDATASectionRole>)) {
-                    $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::DOM::DOMFeature::ClassInfo->{'.
-                           'q<Message::DOM::XML::ManakaiDOMCDATASection>'.
-                           '}->{compat_class}->{q<' . $pack_name . '>} = 1');
                   }
                   if ($role-><M::DIS|DISResource.isSubsetOfURI>
                                 (<Q::tc|ProcessingInstructionRole>)) {
-                    $r-><M::DIS|PLBlockCon.appendStatement>
-                        ('$Message::DOM::DOMFeature::ClassInfo->{'.
-                         'q<Message::DOM::XML::ManakaiDOMProcessingInstruction>'.
-                         '}->{compat_class}->{q<' . $pack_name . '>} = 1');
-                    ## TODO: Target name dependent
+                    ## TODO: Target-dependent class information
                   }
-                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
-                                (<Q::tc|DocumentRole>)) {
-                    my $for_specific_et;
-                    for my $et (@{$cls-><M::DIS|DISResourceProp
-                          .getPropertyResourceList>
-                             (<Q::s:rootElementType>, isa_recursive => true,
-                              default_media_type => <Q::dis:TFQNames>)}) {
-                      $for_specific_et = true;
-                      my $ln = $et-><AG::DIS|DISResourceMV
-                                        .mvLocalName>;
-                      $ln = '*' unless defined $ln;
-                      my $ns = $et-><AG::DIS|DISResourceMV
-                                        .mvNamespaceURI>;
-                      $ns = '' unless defined $ns;
-                        ## ISSUE: Is NULL-namespace should be allowed here?
-                      $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::DOM::DOMFeature::ClassInfo->{' .
-                           'q<Message::DOM::Document::ManakaiDOMDocument>'.
-                           '}->{compat_class_by_type}->{q<' . $ns .
-                           '>}->{q<' . $ln . '>}->{q<' . $pack_name . '>} = 1');
-                    }
-                    $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::DOM::DOMFeature::ClassInfo->{'.
-                           'q<Message::DOM::Document::ManakaiDOMDocument>'.
-                           '}->{compat_class}->{q<' . $pack_name . '>} = 1')
-                      unless $for_specific_et;
-                    ## TODO: by document type name and media type
-                  }
-                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
-                                (<Q::tc|DocumentFragmentRole>)) {
-                    $r-><M::DIS|PLBlockCon.appendStatement>
-                        ('$Message::DOM::DOMFeature::ClassInfo->{'.
-                         'q<Message::DOM::Document::ManakaiDOMDocumentFragment>'.
-                         '}->{compat_class}->{q<' . $pack_name . '>} = 1');
-                  }
-                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
-                                (<Q::tc|DocumentTypeRole>)) {
-                    $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::DOM::DOMFeature::ClassInfo->{'.
-                           'q<Message::DOM::XDoctype::'.
-                           'ManakaiDOMDocumentTypeDefinition>'.
-                           '}->{compat_class}->{q<' . $pack_name . '>} = 1');
-                    ## TODO: Doctype name or public ID dependent
-                  }
-                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
-                                (<Q::tc|EntityRole>)) {
-                    $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::DOM::DOMFeature::ClassInfo->{'.
-                           'q<Message::DOM::XML::ManakaiDOMEntity>'.
-                           '}->{compat_class}->{q<' . $pack_name . '>} = 1');
-                    ## TODO: Entity name or public ID dependent
-                  }
-                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
-                                (<Q::tc|EntityReferenceRole>)) {
-                    $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::DOM::DOMFeature::ClassInfo->{'.
-                           'q<Message::DOM::XML::ManakaiDOMEntityReference>'.
-                           '}->{compat_class}->{q<' . $pack_name . '>} = 1');
-                    ## TODO: Entity name or public ID dependent
-                  }
-                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
-                                (<Q::tc|NotationRole>)) {
-                    $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::DOM::DOMFeature::ClassInfo->{'.
-                           'q<Message::DOM::XML::ManakaiDOMNotation>'.
-                           '}->{compat_class}->{q<' . $pack_name . '>} = 1');
-                    ## TODO: Notation name or public ID dependent
-                  }
-                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
-                                (<Q::tc|NamespaceRole>)) {
-                    $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::DOM::DOMFeature::ClassInfo->{'.
-                           'q<Message::DOM::XPath::ManakaiDOMXPathNamespace>'.
-                           '}->{compat_class}->{q<' . $pack_name . '>} = 1');
-                  }
-                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
-                                (<Q::tc|ElementTypeDefinitionRole>)) {
-                    $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::DOM::DOMFeature::ClassInfo->{'.
-                           'q<Message::DOM::XDoctype::'.
-                           'ManakaiDOMElementTypeDefinition>'.
-                           '}->{compat_class}->{q<' . $pack_name . '>} = 1');
-                  }
-                  if ($role-><M::DIS|DISResource.isSubsetOfURI>
-                                (<Q::tc|AttributeDefinitionRole>)) {
-                    $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::DOM::DOMFeature::ClassInfo->{'.
-                           'q<Message::DOM::XDoctype::'.
-                           'ManakaiDOMAttributeDefinition>'.
-                           '}->{compat_class}->{q<' . $pack_name . '>} = 1');
-                  }
-                  ## NOTE: tc:AnyNodeRole is subset of  
-                  ##       tc:ElementRole and tc:TextRole and ...
 
                   if ($role-><M::DIS|DISResource.isSubsetOfURI>
                                 (<Q::gls:ParserRole>)) {

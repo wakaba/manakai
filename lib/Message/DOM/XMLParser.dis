@@ -10,7 +10,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/12/02 12:46:23 $
+    $Date: 2006/12/03 05:40:35 $
 
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
@@ -73,8 +73,8 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
   @MDOMX:
     http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
-  @mn:
-    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/ManakaiNode#
+  @mg:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Grove/
   @rdf:
     http://www.w3.org/1999/02/22-rdf-syntax-ns#
   @rdfs:
@@ -4053,7 +4053,7 @@ ClsDef:
                 __CODE{ParseError}__;
               }
             }
-            $self->{dtdecl}->{<H::mn:node>}->{{
+            $self->{dtdecl}->{<H::mg|node>}->{{
               lt => <H::d|hasLtDeclaration>,
               gt => <H::d|hasGtDeclaration>,
               amp => <H::d|hasAmpDeclaration>,
