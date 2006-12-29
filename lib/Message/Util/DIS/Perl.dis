@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/12/03 05:40:35 $
+      $Date: 2006/12/29 14:45:46 $
     @@ContentType:
       dis:Date.RCS
   
@@ -2028,9 +2028,9 @@ IFClsDef:
       the <Class::DIS|ManakaiDISPropertyAccessor> class.
   
   @Method:
-    @@Name: plGeneratePerlModuleFile
+    @@Name: plGeneratePerlModuleDocument
     @@enDesc:
-      Generates a Perl file object. 
+      Generates a Perl module document from the resource.
     @@Param:
       @@@Name: impl
       @@@Type: DIS|MPLImpl
@@ -2039,9 +2039,10 @@ IFClsDef:
         It <kwd:MUST> be an object that implements the
         <Feature::Util|PerlCode> feature version <FeatureVer::1.0>.
     @@Return:
-      @@@Type: DIS|PLFile
+      @@@Type: PCDocument
       @@@enDesc:
-        A Perl file object generated from this resource.
+        This method <kwd:MUST> return a <IF::PCDocument>
+        object generated from the resource.
       @@@RaiseException:
         @@@@@:DIS|NO_LICENSE_ATTR_ERR
         @@@@enDesc:
@@ -2059,15 +2060,16 @@ IFClsDef:
           or have a different type than the expected one.
       @@@PerlDef:
         __DEEP{
-          $r = $impl-><M::DIS|MPLImpl.createPCFile>;
+          $r = $impl->create_pc_document;
+          my $rdoc = $r->document_element;
 
           ## -- Source information
-          $r-><AS::DIS|PLFile.sourceFile>
+          $rdoc-><AS::DIS|PLFile.sourceFile>
                  ($self-><M::DIS|DISResourceProp.getPropertyText>
                                 (<Q::DIS:sourceFile>, ''));
-          $r-><AS::DIS|PLFile.sourceModule>
+          $rdoc-><AS::DIS|PLFile.sourceModule>
                   ($self-><AG::DIS|DISAnyResource.nameURI>);
-          $r-><AS::DIS|PLFile.sourceFor>
+          $rdoc-><AS::DIS|PLFile.sourceFor>
                                 ($self-><AG::DIS|DISAnyResource.forURI>);
           
           ## -- License information
@@ -2081,13 +2083,13 @@ IFClsDef:
               DIS:uri => {$ownermod-><AG::DIS|DISAnyResource.uri>},
             }__}__;
           }
-          $r-><AS::DIS|PLFile.licenseURI>
+          $rdoc-><AS::DIS|PLFile.licenseURI>
                             ($license-><AG::DIS|DISAnyResource.uri>);
 
           ## -- Classes
           ## TODO: Custom module construction support
           my $thismod_name = $self-><AG::DISModulePerl.plFullyQualifiedName>;
-          my $thismod_pack = $r-><M::DIS|PLFile.getLastPackage>
+          my $thismod_pack = $rdoc-><M::DIS|PLFile.getLastPackage>
                                      ($thismod_name, make_new_package => true);
           my %const;
           my %processed_class;
@@ -2099,12 +2101,11 @@ IFClsDef:
                 = true;
               
               my $mcode = $cls-><M::DISResourcePerl.getPerlModuleMemberCode>
-                                  ($r-><AG::Node.ownerDocument>,
+                                  ($r,
                                    $thismod_pack, \%const);
               if ($mcode) {
-                $r-><AG::Node.ownerDocument>
-                  -><M::Document.adoptNode> ($mcode);
-                $r-><M::Node.appendChild> ($mcode);
+                $r-><M::Document.adoptNode> ($mcode);
+                $rdoc-><M::Node.appendChild> ($mcode);
               }
 
               if ($cls-><M::DIS|DISAnyResource.isTypeURI>
@@ -2149,12 +2150,12 @@ IFClsDef:
           ## -- Require'ing external modules
           ## TODO: Custom module construction support
           my $db = $self-><AG::anyres.database>;
-          for my $uri (@{$r-><M::DIS|MPLCodeFragment.disGetRequireURIList>}) {
+          for my $uri (@{$rdoc-><M::DIS|MPLCodeFragment.disGetRequireURIList>}) {
             my $mod = $db-><M::DIS|DISDatabase.getAnyResource> ($uri)
                            -><AG::DIS|DISAnyResource.ownerModule>;
             next unless $mod;
             my $pack = $mod-><AG::DISModulePerl.plFullyQualifiedName>;
-            $r-><M::DIS|MPLCodeFragment.addRequirePerlModuleName> ($pack)
+            $rdoc-><M::DIS|MPLCodeFragment.addRequirePerlModuleName> ($pack)
               unless $pack eq $thismod_name;
           }
         }__;

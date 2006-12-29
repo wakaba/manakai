@@ -12,7 +12,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/12/03 05:40:34 $
+    $Date: 2006/12/29 14:45:42 $
 
   @Require:
     @@Module:
@@ -87,20 +87,12 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
   @ManakaiDOM:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
-  @ManakaiDOMCore:
-    http://suika.fam.cx/~wakaba/archive/2004/mdom-core#
   @MDOM:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
   @MDOMX:
     http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
-  @mg:
-    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Grove/
-  @null:
-    http://suika.fam.cx/~wakaba/-temp/2003/09/27/null
   @rdf:
     http://www.w3.org/1999/02/22-rdf-syntax-ns#
-  @rdfs:
-    http://www.w3.org/2000/01/rdf-schema#
   @sw010:
     urn:x-suika-fam-cx:markup:suikawiki:0:10:
   @t:
@@ -691,7 +683,6 @@ IFCls1Def:
 
   @ClsISA: f|ManakaiHasFeatureByGetFeature
   @Implement: ecore|MUErrorTarget||ManakaiDOM|Perl
-  @DISLang:role: mg|NodeRefRole
 
   @enDesc:
     The <IF::Node> interface is the primary datatype for the entire 
@@ -704,41 +695,50 @@ IFCls1Def:
     whose <A::Node.nodeType> equals to <C::Node.ELEMENT_NODE>
     would also implement the <IF::Element> interface.
 
-  @IntMethod:
-    @@Operator: mg|CreateNodeRefMethod
-    @@Param:
-      @@@Name: obj
-      @@@Type: HASH
-    @@Param:
-      @@@Name: opt
-      @@@Type: HASH
-    @@Return:
-      @@@Type: Node
-      @@@PerlDef:
-        $r = bless $obj, $self;
+  @enDesc:
+    @@ddid: root
+    @@@:
+      In the manakai DOM implementation, the application
+      <kwd:MUST> hold at least one reference to the root
+      node of tree, as long as it is willing to
+      access to some nodes in the tree.  For example,
+      an application to construct a document
+      must keep the <IF::Document> node referenced
+      from some variable during entire the operation
+      is done.  It does not limited to <IF::Document>
+      nodes; a reference to <IF::Element> node
+      that is created by the <IF::Document.createElementNS>
+      method must be hold until the node is 
+      inserted into another tree.
 
-  @IntMethod:
-    @@Operator: mg|CreateNodeStemMethod
-    @@Param:
-      @@@Name: bag
-      @@@Type: HASH
-    @@Param:
-      @@@Name: obj
-      @@@Type: HASH
-    @@Param:
-      @@@Name: opt
-      @@@Type: HASH
-    @@Return:
-      @@@Type: HASH
-      @@@PerlDef:
-        __CODE{mg|setOwnerProp||ManakaiDOM|all::
-          $bag => $bag,
-          $ownerref => {$opt->{<H::tc|ownerDocument>}},
-          $ownee1hprop => {<H::tc|revOwnerDocument>},
-          $ownee => {$obj},
-          $owner0prop => {<H::tc|ownerDocument>},
-        }__;
-        $r = $obj;
+        {NOTE::
+          This restriction comes from the fact that the
+          Perl admits the reference counting garbage 
+          collection mechanism and manakai weakens
+          some inner-tree references to avoid
+          memory leak led by the limitation of that
+          mechanism.  The weakened references include:
+          <A::Node.parentNode>, <A::Element.ownerElement>,
+          <A::ETDef.ownerDocumentTypeDefinition>,
+          <A::tx|Entity.ownerDocumentTypeDefinition>,
+          <A::tx|Notation.ownerDocumentTypeDefinition>, and
+          <A::ATDef.ownerElementTypeDefinition>.
+        }
+
+  @enImplNote:
+    @@ddid: internal
+    @@@:
+      A <Class::ManakaiDOMNode> is a reference to a reference
+      to a hash that contains various property values
+      for the node.
+
+      A subclass of the <Class::ManakaiDOMClass>
+      <kwd:MUST-NOT> <Perl::overload> the <Perl::${}>
+      operator.
+
+      The hash reference referenced by a
+      <Class::ManakaiDOMNode> <kwd:MUST-NOT> be
+      <Perl::bless>ed with any class.
 
   @Code:
     @@QName: tc|createNodesForTest
@@ -842,8 +842,13 @@ IFCls1Def:
       @@@@: DESTROY
       @@@ContentType: DISPerl|Perl
     @@Return:
-      @@@disDef:
-        @@@@DISPerl:cloneCode: mg|NodeRef||ManakaiDOM|all.destroy
+      @@@PerlDef:
+        my $unload = $$self->{<H::tc|onunload>};
+        if ($unload) {
+          __DEEP{
+            $unload->($self);
+          }__;
+        }
 
   @IntMethod:
     @@Operator: ManakaiDOM|MUErrorHandler
@@ -1002,13 +1007,8 @@ IFCls1Def:
         @@@@enDesc:
           If it is a DOM Level 1 node.
       @@@PerlDef:
-        my $v;
-        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-          $r => $v,
-          $prop => {<H::infoset|localName>},
-          $ref => $self,
-        }__;
-        $r = defined $v ? $$v : null;
+        my $v = $$self->{<H::infoset|localName>};
+        $r = defined $v ? $$v : undef;
       @@@enImplNote:
         @@@@ddid: dom1
         @@@@@:
@@ -1054,13 +1054,8 @@ IFCls1Def:
         @@@@enDesc:
           If it is a DOM Level 1 node.
       @@@PerlDef:
-        my $v;
-        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-          $r => $v,
-          $prop => {<H::infoset|namespaceName>},
-          $ref => $self,
-        }__;
-        $r = defined $v ? $$v : null;
+        my $v = $$self->{<H::infoset|namespaceName>};
+        $r = defined $v ? $$v : undef;
       @@@enImplNote:
         @@@@ddid:dom1
         @@@@@:
@@ -1204,13 +1199,7 @@ IFCls1Def:
         @@@@enDesc:
           If the node has no parent.
       @@@PerlDef:
-        __CODE{mg|getNodeStemProp0Node||ManakaiDOM|all::
-          $r => $r,
-          $prop => {<H::infoset|parent>},
-          $ref => $self,
-          $opt => {{
-          }},
-        }__;
+        $r = $$self->{<H::infoset|parent>};
 
     @@XDTest:
       @@@QName: Node.parentNode.1.test
@@ -1238,13 +1227,7 @@ IFCls1Def:
           If the node is a <IF::tx|DocumentType> that is not
           used with any <IF::Document> yet.
       @@@PerlDef:
-        __CODE{mg|getNodeStemProp0Node||ManakaiDOM|all::
-          $r => $r,
-          $prop => {<H::tc|ownerDocument>},
-          $ref => $self,
-          $opt => {{
-          }},
-        }__;
+        $r = $$self->{<H::tc|ownerDocument>};
 
     @@Test:
       @@@QName: Node.ownerDocument.1.test
@@ -1311,12 +1294,8 @@ IFCls1Def:
         @@@@enDesc:
           Otherwise.
       @@@PerlDef:
-        if (UNIVERSAL::isa ($other, <IFName::Node||ManakaiDOM|ManakaiDOM>) and
-            $other->isa ('HASH') and
-            exists $other->{<H::mg|nodeIDReference>}) {
-          $r = ($other->{<H::mg|nodeIDReference>}
-                    eq $self->{<H::mg|nodeIDReference>});
-        }
+        $r = (UNIVERSAL::isa ($other, <ClassName::ManakaiDOMNode>) and
+            $$self eq $$other);
 
   @LXAttr:
     @@Name: manakaiReadOnly
@@ -1331,11 +1310,7 @@ IFCls1Def:
         If the node is <EM::not> read-only.
     @@Get:
       @@@PerlDef:
-        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-          $r => $r,
-          $prop => {<H::c|read-only>},
-          $ref => $self,
-        }__;
+        $r = $$self->{<H::c|read-only>};
 
     @@CODE:
       @@@QName: tc|NodeReadOnlyError
@@ -1394,12 +1369,7 @@ IFCls1Def:
           my @target = ($self);
           while (@target) {
             my $target = shift @target;
-
-            __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
-              $given => {$newValue},
-              $prop => {<H::c|read-only>},
-              $ref => $target,
-            }__;
+            $$target->{<H::c|read-only>} = $newValue;
 
             push @target, @{$target-><AG::Node.childNodes>};
 
@@ -1417,11 +1387,7 @@ IFCls1Def:
             }
           }
         } else { # not deep
-          __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
-            $given => {$newValue},
-            $prop => {<H::c|read-only>},
-            $ref => $self,
-          }__;
+          $$self->{<H::c|read-only>} = $newValue;
         }
 
     @@Test:
@@ -1450,9 +1416,8 @@ IFCls1Def:
       @@@QName: Element.manakaiSetReadOnly.1.test
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
-
-        my $doc = $el-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         my $c1 = $doc-><M::Document.createElement> ('c1');
         $el-><M::Node.appendChild> ($c1);
@@ -1486,9 +1451,9 @@ IFCls1Def:
       @@@QName: DTDef.manakaiSetReadOnly.1.test
       @@@PerlDef:
         my $dtd;
-        __CODE{d|createDTDefForTest:: $dtdef => $dtd}__;
+        my $doc;
+        __CODE{d|createDTDefForTest:: $dtdef => $dtd, $doc => $doc}__;
 
-        my $doc = $dtd-><AG::Node.ownerDocument>;
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>, '3.0');
 
         my $c1 = $doc-><M::Document.createProcessingInstruction> ('c1');
@@ -1523,9 +1488,9 @@ IFCls1Def:
       @@@QName: ETDef.manakaiSetReadOnly.1.test
       @@@PerlDef:
         my $et;
-        __CODE{d|createETDefForTest:: $etdef => $et}__;
+        my $doc;
+        __CODE{d|createETDefForTest:: $etdef => $et, $doc => $doc}__;
 
-        my $doc = $et-><AG::Node.ownerDocument>;
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>, '3.0');
 
         my $c1 = $docx-><M::DocumentX.createAttributeDefinition> ('c1');
@@ -1593,20 +1558,9 @@ IFCls1Def:
         @@@@enDesc:
           If there is no child node.
       @@@PerlDef:
-        my $v;
-        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-          $r => $v,
-          $prop => {<H::infoset|children>},
-          $ref => $self,
-        }__;
+        my $v = $$self->{<H::infoset|children>};
         if (defined $v and defined $v->[0]) {
-          __CODE{mg|createNodeRefFromID||ManakaiDOM|all::
-            $bag => {<Code::mg|getNodeBag||ManakaiDOM|all:: $ref = $self>},
-            $stemid => {$v->[0]},
-            $ref => $r,
-            $opt => {{
-            }},
-          }__;
+          $r = $v->[0];
         }
 
     @@Test:
@@ -1634,20 +1588,9 @@ IFCls1Def:
         @@@@enDesc:
           If there is no child node.
       @@@PerlDef:
-        my $v;
-        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-          $r => $v,
-          $prop => {<H::infoset|children>},
-          $ref => $self,
-        }__;
-        if (defined $v and defined $v->[0]) { # If 0, then there is -1
-          __CODE{mg|createNodeRefFromID||ManakaiDOM|all::
-            $bag => {<Code::mg|getNodeBag||ManakaiDOM|all:: $ref = $self>},
-            $stemid => {$v->[-1]},
-            $ref => $r,
-            $opt => {{
-            }},
-          }__;
+        my $v = $$self->{<H::infoset|children>};
+        if (defined $v and defined $v->[0]) {
+          $r = $v->[-1]; # There is $v->[-1] iff there is $v->[0].
         }
 
   @Attr:
@@ -2304,23 +2247,11 @@ IFCls1Def:
           ## -- Removes from parent
           if ($nc_parent) {
             if ($child_nt == <C::Node.DOCUMENT_FRAGMENT_NODE>) {
-              __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
-                $given => {[]},
-                $prop => {<H::infoset|children>},
-                $ref => $newChild,
-              }__;
+              $$newChild->{<H::infoset|children>} = [];
             } else {
-              my $v;
-              __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-                $r => $v,
-                $prop => {<H::infoset|children>},
-                $ref => $nc_parent,
-              }__;
+              my $v = $$nc_parent->{<H::infoset|children>};
               RP: for my $i (0..$#$v) {
-                my $nodeid = $v->[$i];
-                if (<Code::mg|nodeIDMatch||ManakaiDOM|all::
-                        $noderef = {$new_child[0]},
-                        $nodeid = $nodeid>) {
+                if ($v->[$i] eq $new_child[0]) {
                   splice @$v, $i, 1, ();
                   last RP;
                 }
@@ -2330,51 +2261,32 @@ IFCls1Def:
 
           ## -- Rewrite the |parentNode| properties
           for my $nc (@new_child) {
-            __CODE{mg|setNodeStemProp0Node||ManakaiDOM|all::
-              $prop => {<H::infoset|parent>},
-              $ref => $nc,
-              $given => $self,
-            }__;
+            $$nc->{<H::infoset|parent>} = $self;
+            Scalar::Util::weaken ($$nc->{<H::infoset|parent>});
           }
 
-          my $children;
-          __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-            $r => $children,
-            $prop => {<H::infoset|children>},
-            $ref => $self,
-          }__;
+          my $children = $$self->{<H::infoset|children>};
 
           __FOR{tc:ForAppendChild::
             ## -- Adds to children list
-            push @$children, map {
-              <Code::mg|getNodeID||ManakaiDOM|all:: $ref = $_>
-            } @new_child;
+            push @$children, @new_child;
             $r = $newChild;
           }__;
 
           __FOR{tc:ForInsertBefore::
             ## -- Adds to children list
             if ($index == -1) {
-              push @$children, map {
-                <Code::mg|getNodeID||ManakaiDOM|all:: $ref = $_>
-              } @new_child;
+              push @$children, @new_child;
             } else {
-              splice @$children, $index, 0, map {
-                <Code::mg|getNodeID||ManakaiDOM|all:: $ref = $_>
-              } @new_child;
+              splice @$children, $index, 0, @new_child;
             }
             $r = $newChild;
           }__;
 
           __FOR{tc:ForReplaceChild::
             ## -- Replaces the node
-            splice @$children, $index, 1, map {
-              <Code::mg|getNodeID||ManakaiDOM|all:: $ref = $_>
-            } @new_child;
-            __CODE{mg|deleteNodeStemPropValue||ManakaiDOM|all::
-              $prop => {<H::infoset|parent>},
-              $ref => $refChild,
-            }__;
+            splice @$children, $index, 1, @new_child;
+            CORE::delete $$refChild->{<H::infoset|parent>};
             $r = $refChild;
           }__;
         }__;
@@ -2479,20 +2391,12 @@ IFCls1Def:
       @@@PerlDef:
           F: {
             my $i = -1;
-            for my $cld (@{$self-><AG::Node.childNodes>}) {
+            my $v = $$self->{<H::infoset|children>};
+            for my $cld (@$v) {
               $i++;
               if ($cld eq $oldChild) {
-                my $v;
-                __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-                  $r => $v,
-                  $prop => {<H::infoset|children>},
-                  $ref => $self,
-                }__;
                 splice @$v, $i, 1, ();
-                __CODE{mg|deleteNodeStemPropValue||ManakaiDOM|all::
-                  $prop => {<H::infoset|parent>},
-                  $ref => $oldChild,
-                }__;
+                CORE::delete $$oldChild->{<H::infoset|parent>};
                 $r = $oldChild;
                 last F;
               }
@@ -2507,9 +2411,8 @@ IFCls1Def:
       @@@QName: Node.removeChild.1.test
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
-
-        my $doc = $el-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         my $c1 = $doc-><M::Document.createElementNS> (null, 'e');
         $el-><M::Node.appendChild> ($c1);
@@ -2543,9 +2446,8 @@ IFCls1Def:
       @@@QName: Node.removeChild.2.test
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
-
-        my $doc = $el-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         my $c1 = $doc-><M::Document.createElementNS> (null, 'e');
         $el-><M::Node.appendChild> ($c1);
@@ -2579,9 +2481,8 @@ IFCls1Def:
       @@@QName: Node.removeChild.3.test
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
-
-        my $doc = $el-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         my $c1 = $doc-><M::Document.createElementNS> (null, 'e');
         $el-><M::Node.appendChild> ($c1);
@@ -2615,9 +2516,8 @@ IFCls1Def:
       @@@QName: Node.removeChild.4.test
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
-
-        my $doc = $el-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         my $c1 = $doc-><M::Document.createElementNS> (null, 'e');
         $el-><M::Node.appendChild> ($c1);
@@ -3125,7 +3025,8 @@ IFCls1Def:
         An element that has a child element.
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         my $ce = $el-><AG::Node.ownerDocument>
                     -><M::Document.createElementNS> (null, 'e');
@@ -3151,7 +3052,8 @@ IFCls1Def:
         An element that has a child entity reference.
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         my $ce = $el-><AG::Node.ownerDocument>
                     -><M::Document.createEntityReference> ('e');
@@ -3178,7 +3080,8 @@ IFCls1Def:
         An geref that has a child element.
       @@@PerlDef:
         my $el;
-        __CODE{tx|createERForTest:: $er => $el}__;
+        my $doc;
+        __CODE{tx|createERForTest:: $er => $el, $doc => $doc}__;
 
         my $ce = $el-><AG::Node.ownerDocument>
                     -><M::Document.createElementNS> (null, 'e');
@@ -3204,7 +3107,8 @@ IFCls1Def:
         An geref that has a child entity reference.
       @@@PerlDef:
         my $el;
-        __CODE{tx|createERForTest:: $er => $el}__;
+        my $doc;
+        __CODE{tx|createERForTest:: $er => $el, $doc => $doc}__;
 
         my $ce = $el-><AG::Node.ownerDocument>
                     -><M::Document.createEntityReference> ('e');
@@ -3226,43 +3130,28 @@ IFCls1Def:
         $el-><AS::Node.textContent> ('nc');
         $test->assert_equals ($el-><AG::Node.textContent>, 'nc');
 
-  @ResourceDef:
+  @CODE:
     @@QName: tc|setNodeTextContent
-    @@rdf:type: DISPerl|BlockCode
     @@Description:
       @@@lang:en
       @@@@:
         Sets a string as the text content of a node.
-    @@ForCheck:
-      ManakaiDOM:ForClass
     @@PerlDef:
       __CODE{tc|NodeReadOnlyError:: $node => $node}__;
  
-      my @__old_children = @{$node-><AG::Node.childNodes>};
-      for my $__old_child (@__old_children) {
-        __CODE{mg|deleteNodeStemPropValue||ManakaiDOM|all::
-          $prop => {<H::infoset|parent>},
-          $ref => $__old_child,
-        }__;
+      for my $__old_child (@{${$node}->{<H::infoset|children>}}) {
+        CORE::delete $$__old_child->{<H::infoset|parent>};
       }
 
       my @__new_children;
       if (defined $given and length $given) {
         my $__text = $ownerDocument-><M::Document.createTextNode> ($given);
-        push @__new_children, <Code::mg|getNodeID||ManakaiDOM|all::
-                                       $ref = $__text>;
-        __CODE{mg|setNodeStemProp0Node||ManakaiDOM|all::
-          $prop => {<H::infoset|parent>},
-          $ref => $__text,
-          $given => $node,
-        }__;
+        push @__new_children, $__text;
+        $$__text->{<H::infoset|parent>} = $node;
+        Scalar::Util::weaken ($$__text->{<H::infoset|parent>});
       }
 
-      __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
-        $given => {\@__new_children},
-        $prop => {<H::infoset|children>},
-        $ref => $node,
-      }__;
+      ${$node}->{<H::infoset|children>} = \@__new_children;
 
   @Method:
     @@Name: cloneNode
@@ -3475,12 +3364,7 @@ IFCls1Def:
               ## TODO: Assertion
             }
 
-            my $udhs;
-            __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-              $r => $udhs,
-              $prop => {<H::t|userData>},
-              $ref => $self,
-            }__;
+            my $udhs = $$self->{<H::t|userData>};
             push @udh, [$node => $clone, $udhs] if $udhs and %$udhs;
           } # @node
           $od-><AS::Document.strictErrorChecking> (true) if $strict_check;
@@ -3810,14 +3694,8 @@ IFCls1Def:
         @@@@enDesc:
           No object is associated.
       @@@PerlDef:
-        my $v;
-        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-          $r => $v,
-          $prop => {<H::t|userData>},
-          $ref => $self,
-        }__;
+        my $v = $$self->{<H::t|userData>};
         $r = $v->{$key}->[0];
-
 
   @L3Method:
     @@Name: setUserData
@@ -3868,33 +3746,16 @@ IFCls1Def:
         @@@@enDesc:
           No object was associated.
       @@@PerlDef:
-        __CODE{mg|orSetNodeStemPropValue||ManakaiDOM|all::
-          $given => {{}},
-          $prop => {<H::t|userData>},
-          $ref => $self,
-        }__;
-        my $v;
-        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-          $r => $v,
-          $prop => {<H::t|userData>},
-          $ref => $self,
-        }__;
+        my $v = ($$self->{<H::t|userData>} ||= {});
         $r = $v->{$key}->[0];
 
         if (defined $data) {
           $v->{$key} = [$data, $handler];
 
           if (defined $handler) {
-            my $rc = sub {
-              my ($bag, $nid) = @_;
-              my $nh = <Code::mg|createNodeRefHashFromID||ManakaiDOM|all::
-                                  $stemid = $nid, $bag = $bag>;
-              my $uds;
-              __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-                $r => $uds,
-                $prop => {<H::t|userData>},
-                $ref => $nh,
-              }__;
+            $$self->{<H::tc|onunload>} = sub ($) {
+              my ($node) = @_;
+              my $uds = $$node->{<H::t|userData>};
               for my $key (keys %$uds) {
                 if (defined $uds->{$key}->[1]) {
                   $uds->{$key}->[1]->($uds->{$key}->[1],
@@ -3903,11 +3764,6 @@ IFCls1Def:
                 }
               }
             }; # rc
-            __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
-              $given => $rc,
-              $prop => {<H::mg|onunload>},
-              $ref => $self,
-            }__;
           }
         } else {
           CORE::delete $v->{$key};
@@ -3948,8 +3804,6 @@ IFCls1Def:
     @@L3Test:
       @@@QName: Node.Deleted.UserDataHandler
       @@@PerlDef:
-        local $Message::Util::Grove::GCLatency = 0;
-
         my $impl;
         __CODE{tc|createImplForTest:: $impl => $impl}__;
         my $doc = $impl-><M::c|DOMImplementation.createDocument>
@@ -3976,9 +3830,9 @@ IFCls1Def:
           $test->assert_null ($dest);
         });
 
-        undef $doc;
         undef $node;
         undef $impl;
+        undef $doc;
 
         $test->id ('called');
         $test->assert_true ($udh_called);
@@ -3996,15 +3850,9 @@ IFCls1Def:
         @@@@enDesc:
           Otherwise.
       @@@PerlDef:
-        my $attrs;
-        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-          $r => $attrs,
-          $prop => {<H::infoset|attributes>},
-          $ref => $self,
-        }__;
-        A: for (values %{$attrs or {}}) {
+        A: for (values %{$$self->{<H::infoset|attributes>} or {}}) {
           if (keys %$_) {
-            $r = true;
+            $r = 1;
             last A;
           }
         }
@@ -4027,7 +3875,8 @@ IFCls1Def:
       @@@QName: Element.hasAttributes.test
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         $test->id ('initial');
         $test->assert_false ($el-><M::Node.hasAttributes>);
@@ -4066,13 +3915,7 @@ IFCls1Def:
         @@@@enDesc:
           Otherwise.
       @@@PerlDef:
-        my $v;
-        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-          $r => $v,
-          $prop => {<H::infoset|children>},
-          $ref => $self,
-        }__;
-        $r = (@{$v or []} > 0);
+        $r = (@{$$self->{<H::infoset|children>} or []} > 0);
 
     @@Test:
       @@@QName: Node.hasChildNodes.test
@@ -4331,10 +4174,7 @@ IFCls1Def:
               if ($bcontainer[-1]->isa (<ClassName::Node>)) {
                 $r = <C::Node.DOCUMENT_POSITION_DISCONNECTED>
                    | <C::Node.DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC>
-                   | ((${<Code::mg|getNodeID||ManakaiDOM|all::
-                                    $ref = {$acontainer[-1]}>} cmp
-                       ${<Code::mg|getNodeID||ManakaiDOM|all::
-                                    $ref = {$bcontainer[-1]}>})
+                   | ((${$acontainer[-1]} cmp ${$bcontainer[-1]})
                           > 0 ? <C::Node.DOCUMENT_POSITION_FOLLOWING>
                               : <C::Node.DOCUMENT_POSITION_PRECEDING>);
               } else {
@@ -5214,9 +5054,8 @@ IFCls1Def:
       @@@QName: Node.manakaiParentElement.1.test
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
-
-        my $doc = $el-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         $test->id ('no.parent');
         $test->assert_null ($el-><AG::Node.manakaiParentElement>);
@@ -5397,9 +5236,8 @@ IFCls1Def:
         Two direct child <IF::Text> nodes.
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
-
-        my $doc = $el-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         my $t1 = $doc-><M::Document.createTextNode> ('t1');
         my $t2 = $doc-><M::Document.createTextNode> ('t2');
@@ -5422,9 +5260,8 @@ IFCls1Def:
         Four direct child <IF::Text> nodes.
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
-
-        my $doc = $el-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         my $t1 = $doc-><M::Document.createTextNode> ('t1');
         my $t2 = $doc-><M::Document.createTextNode> ('t2');
@@ -5452,9 +5289,8 @@ IFCls1Def:
         <IF::tx|CDATASection> node.
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
-
-        my $doc = $el-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         my $t1 = $doc-><M::Document.createTextNode> ('t1');
         my $t2 = $doc-><M::Document.createTextNode> ('t2');
@@ -5491,9 +5327,8 @@ IFCls1Def:
         Two direct child <IF::Text> nodes where the first one is empty.
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
-
-        my $doc = $el-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         my $t1 = $doc-><M::Document.createTextNode> ('');
         my $t2 = $doc-><M::Document.createTextNode> ('t2');
@@ -5516,9 +5351,8 @@ IFCls1Def:
         Two direct child <IF::Text> nodes where the second one is empty.
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
-
-        my $doc = $el-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         my $t1 = $doc-><M::Document.createTextNode> ('t1');
         my $t2 = $doc-><M::Document.createTextNode> ('');
@@ -5541,9 +5375,8 @@ IFCls1Def:
         A direct child <IF::Text> nodes which is empty.
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
-
-        my $doc = $el-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         my $t1 = $doc-><M::Document.createTextNode> ('');
         $el-><M::Node.appendChild> ($t1);
@@ -5564,9 +5397,8 @@ IFCls1Def:
         Child element which has two direct child <IF::Text> nodes.
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
-
-        my $doc = $el-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         my $pe = $doc-><M::Document.createElement> ('pe');
         $pe-><M::Node.appendChild> ($el);
@@ -5592,9 +5424,8 @@ IFCls1Def:
         Element with an attribute with two <IF::Text> nodes.
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
-
-        my $doc = $el-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         my $attr = $doc-><M::Document.createAttribute> ('a');
         $el-><M::Element.setAttributeNode> ($attr);
@@ -5621,9 +5452,9 @@ IFCls1Def:
         definition with two <IF::Text> nodes.
       @@@PerlDef:
         my $el;
-        __CODE{d|createETDefForTest:: $etdef => $el}__;
+        my $doc;
+        __CODE{d|createETDefForTest:: $etdef => $el, $doc => $doc}__;
 
-        my $doc = $el-><AG::Node.ownerDocument>;
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype> => '3.0');
 
         my $attr = $docx-><M::DocumentX.createAttributeDefinition> ('a');
@@ -5652,9 +5483,9 @@ IFCls1Def:
         definition with two <IF::Text> nodes.
       @@@PerlDef:
         my $el;
-        __CODE{d|createETDefForTest:: $etdef => $el}__;
+        my $doc;
+        __CODE{d|createETDefForTest:: $etdef => $el, $doc => $doc}__;
 
-        my $doc = $el-><AG::Node.ownerDocument>;
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype> => '3.0');
 
         my $dtdef = $docx-><M::DocumentX.createDocumentTypeDefinition> ('d');
@@ -6278,7 +6109,26 @@ RPropDef:
   @enDesc:
     Hash key for <Class::ManakaiDOMNode||ManakaiDOM|ManakaiDOMLatest>
     node stems.
-  @subsetOf: mg|nodeStemKey
+  @subsetOf: DISPerl|propHashKey
+  @multipleProperties: DISCore|Single
+  @dataType: DISCore|String
+
+IntPropDef:
+  @QName: tc|onunload
+  @enDesc:
+    The code that is executed just before the node
+    is deleted.  Applications <kwd:MUST-NOT>
+    rely on the code being executed.  Exactly when it
+    is executed is undefined. 
+
+    The code would receive a parameter: the node to
+    which the code is attached.  The code
+    <kwd:MUST-NOT> modify the node; if
+    it does, the result is undefined.
+
+    The code <kwd:MUST-NOT> throw exceptions; if it does, result is undefined.
+  @Type: DISPerl|CODE
+  @tc:nodeStemKey: udbeforefree
 
 ForDef:
   @QName: tc|ForAppendChild
@@ -6536,20 +6386,9 @@ ResourceDef:
       @@@PerlDef:
         @@@@ForCheck: tc|ForChildNodeList
         @@@@@:
-          my $v;
-          __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-            $r => $v,
-            $prop => {<H::infoset|children>},
-            $ref => {$$$self},
-          }__;
+          my $v = ${$$$self}->{<H::infoset|children>};
           if ($index >= 0 and defined $v->[$index]) {
-            __CODE{mg|createNodeRefFromID||ManakaiDOM|all::
-              $bag => {<Code::mg|getNodeBag||ManakaiDOM|all:: $ref = {$$$self}>},
-              $stemid => {$v->[$index]},
-              $ref => $r,
-              $opt => {{
-              }},
-            }__;
+            $r = $v->[$index];
           }
       @@@PerlDef:
         @@@@ForCheck: tc|ForGetNodeList
@@ -6584,9 +6423,9 @@ ResourceDef:
       @@@QName: ChildNodeList.item.1.test
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
-        my $doc = $el-><AG::Node.ownerDocument>;
         my $cl = $el-><AG::Node.childNodes>;
 
         my $e1 = $doc-><M::Document.createElementNS> (null, 'e');
@@ -6616,9 +6455,9 @@ ResourceDef:
       @@@QName: ChildNodeList.item.2.test
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
-        my $doc = $el-><AG::Node.ownerDocument>;
         my $cl = $el-><AG::Node.childNodes>;
 
         $test->id ('0');
@@ -6781,13 +6620,7 @@ ResourceDef:
       @@@PerlDef:
         @@@@ForCheck: tc|ForChildNodeList
         @@@@@:
-          my $v;
-          __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-            $r => $v,
-            $prop => {<H::infoset|children>},
-            $ref => {$$$self},
-          }__;
-          $r = @$v;
+          $r = @{${$$$self}->{<H::infoset|children>}};
       @@@PerlDef:
         @@@@ForCheck: tc|ForGetNodeList
         @@@@@:
@@ -6814,9 +6647,9 @@ ResourceDef:
       @@@QName: ChildNodeList.length.test
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
-        my $doc = $el-><AG::Node.ownerDocument>;
         my $cl = $el-><AG::Node.childNodes>;
 
         $test->id ('initial');
@@ -6895,13 +6728,7 @@ ResourceDef:
       @@@PerlDef:
         @@@@ForCheck: tc|ForChildNodeList
         @@@@@:
-          my $v;
-          __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-            $r => $v,
-            $prop => {<H::infoset|children>},
-            $ref => {$$$self},
-          }__;
-          $r = CORE::exists $v->[$index];
+          $r = CORE::exists ${$$$self}->{<H::infoset|children>}->[$index];
       @@@PerlDef:
         @@@@ForCheck: tc|ForGetNodeList
         @@@@@:
@@ -7097,7 +6924,8 @@ ResourceDef:
       @@@ForCheck: tc|ForChildNodeList
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         my $cl = $el-><AG::Node.childNodes>;
 
@@ -7113,7 +6941,8 @@ ResourceDef:
       @@@ForCheck: tc|ForGetNodeList
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         my $gl = $el-><M::Element.getElementsByTagName> ('a');
        
@@ -7468,8 +7297,9 @@ ResourceDef:
       @@@QName: AttrMap.P.test
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest}__;
-        my $doc = $el-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
+        
         my $em = $el-><AG::Node.attributes>;
 
         $test->id ('hash.scalar');
@@ -7530,8 +7360,9 @@ ResourceDef:
       @@@QName: EntityMap.P.test
       @@@PerlDef:
         my $dtd;
-        __CODE{d|createDTDefForTest:: $dtdef => $dtd}__;
-        my $doc = $dtd-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{d|createDTDefForTest:: $dtdef => $dtd, $doc => $doc}__;
+        
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>, '3.0');
         my $em = $dtd-><AG::d|DocumentTypeDefinition.generalEntities>;
 
@@ -7595,8 +7426,9 @@ ResourceDef:
       @@@QName: NotationMap.P.test
       @@@PerlDef:
         my $dtd;
-        __CODE{d|createDTDefForTest:: $dtdef => $dtd}__;
-        my $doc = $dtd-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{d|createDTDefForTest:: $dtdef => $dtd, $doc => $doc}__;
+        
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>, '3.0');
         my $em = $dtd-><AG::d|DocumentTypeDefinition.notations>;
 
@@ -7660,8 +7492,9 @@ ResourceDef:
       @@@QName: ETMap.P.test
       @@@PerlDef:
         my $dtd;
-        __CODE{d|createDTDefForTest:: $dtdef => $dtd}__;
-        my $doc = $dtd-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{d|createDTDefForTest:: $dtdef => $dtd, $doc => $doc}__;
+        
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>, '3.0');
         my $em = $dtd-><AG::d|DocumentTypeDefinition.elementTypes>;
 
@@ -7725,8 +7558,9 @@ ResourceDef:
       @@@QName: ATMap.P.test
       @@@PerlDef:
         my $dtd;
-        __CODE{d|createDTDefForTest:: $dtdef => $dtd}__;
-        my $doc = $dtd-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{d|createDTDefForTest:: $dtdef => $dtd, $doc => $doc}__;
+        
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>, '3.0');
         my $etd = $docx-><M::d|DocumentXDoctype.createElementTypeDefinition>
                           ('etd');
@@ -7830,8 +7664,9 @@ ResourceDef:
       @@@QName: AttrMap.@.test
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
-        my $doc = $el-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
+        
         my $em = $el-><AG::Node.attributes>;
 
         $test->id ('length.0');
@@ -7877,8 +7712,9 @@ ResourceDef:
       @@@QName: ETMap.@.test
       @@@PerlDef:
         my $dtd;
-        __CODE{d|createDTDefForTest:: $dtdef => $dtd}__;
-        my $doc = $dtd-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{d|createDTDefForTest:: $dtdef => $dtd, $doc => $doc}__;
+        
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>, '3.0');
         my $em = $dtd-><AG::d|DocumentTypeDefinition.elementTypes>;
 
@@ -7926,8 +7762,9 @@ ResourceDef:
       @@@QName: EntityMap.@.test
       @@@PerlDef:
         my $dtd;
-        __CODE{d|createDTDefForTest:: $dtdef => $dtd}__;
-        my $doc = $dtd-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{d|createDTDefForTest:: $dtdef => $dtd, $doc => $doc}__;
+       
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>, '3.0');
         my $em = $dtd-><AG::d|DocumentTypeDefinition.generalEntities>;
 
@@ -7975,8 +7812,9 @@ ResourceDef:
       @@@QName: NotationMap.@.test
       @@@PerlDef:
         my $dtd;
-        __CODE{d|createDTDefForTest:: $dtdef => $dtd}__;
-        my $doc = $dtd-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{d|createDTDefForTest:: $dtdef => $dtd, $doc => $doc}__;
+      
         my $em = $dtd-><AG::d|DocumentTypeDefinition.notations>;
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>, '3.0');
 
@@ -8024,8 +7862,9 @@ ResourceDef:
       @@@QName: ATMap.@.test
       @@@PerlDef:
         my $dtd;
-        __CODE{d|createDTDefForTest:: $dtdef => $dtd}__;
-        my $doc = $dtd-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{d|createDTDefForTest:: $dtdef => $dtd, $doc => $doc}__;
+        
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>, '3.0');
         my $etd = $docx-><M::d|DocumentXDoctype.createElementTypeDefinition>
                           ('et1');
@@ -8103,50 +7942,26 @@ ResourceDef:
         @@@@@:
           my $list;
           __FOR{tc:ForETMap::
-            __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-              $r => $list,
-              $prop => {<H::d|elementTypes>},
-              $ref => {$$$self},
-            }__;
+            $list = ${$$$self}->{<H::d|elementTypes>};
           }__;
           __FOR{tc:ForATMap::
-            __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-              $r => $list,
-              $prop => {<H::d|attributeDefinitions>},
-              $ref => {$$$self},
-            }__;
+            $list = ${$$$self}->{<H::d|attributeDefinitions>};
           }__;
           __FOR{tc:ForEntityMap::
-            __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-              $r => $list,
-              $prop => {<H::d|generalEntities>},
-              $ref => {$$$self},
-            }__;
+            $list = ${$$$self}->{<H::d|generalEntities>};
           }__;
           __FOR{tc:ForNotationMap::
-            __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-              $r => $list,
-              $prop => {<H::d|notations>},
-              $ref => {$$$self},
-            }__;
+            $list = ${$$$self}->{<H::d|notations>};
           }__;
-          if (defined $list->{$name}) {
-            __CODE{mg|createNodeRefFromID||ManakaiDOM|all::
-              $bag => {<Code::mg|getNodeBag||ManakaiDOM|all::
-                                $ref = {$$$self}>},
-              $stemid => {$list->{$name}},
-              $ref => $r,
-              $opt => {{ 
-              }},
-            }__;
-          }
+          $r = $list->{$name};
 
     @@Test:
       @@@ForCheck: tc|ForAttrMap
       @@@QName: AttrMap.getNamedItem.test
       @@@PerlDef:
         my $el;
-        __CODE{createElementForTest:: $el => $el}__;
+        my $doc;
+        __CODE{createElementForTest:: $el => $el, $doc => $doc}__;
 
         my $map = $el-><AG::Node.attributes>;
         $test->assert_isa ($map, <IFName::NamedNodeMap>);
@@ -8173,7 +7988,8 @@ ResourceDef:
       @@@QName: AttrMap.getNamedItem.qname.test
       @@@PerlDef:
         my $el;
-        __CODE{createElementForTest:: $el => $el}__;
+        my $doc;
+        __CODE{createElementForTest:: $el => $el, $doc => $doc}__;
 
         my $map = $el-><AG::Node.attributes>;
         $test->assert_isa ($map, <IFName::NamedNodeMap>);
@@ -8199,8 +8015,8 @@ ResourceDef:
       @@@QName: AttrMap.getNamedItem.setNamedItem.test
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
-        my $doc = $el-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         my $em = $el-><AG::Node.attributes>;
         $test->assert_isa ($em, <IFName::tc|NamedNodeMap>);
@@ -8247,8 +8063,9 @@ ResourceDef:
       @@@QName: etmap.getNamedItem.setNamedItem.test
       @@@PerlDef:
         my $dtd;
-        __CODE{d|createDTDefForTest:: $dtdef => $dtd}__;
-        my $doc = $dtd-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{d|createDTDefForTest:: $dtdef => $dtd, $doc => $doc}__;
+        
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>, '3.0');
 
         my $em = $dtd-><AG::d|DocumentTypeDefinition.elementTypes>;
@@ -8298,8 +8115,9 @@ ResourceDef:
       @@@QName: EntityMap.getNamedItem.setNamedItem.test
       @@@PerlDef:
         my $dtd;
-        __CODE{d|createDTDefForTest:: $dtdef => $dtd}__;
-        my $doc = $dtd-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{d|createDTDefForTest:: $dtdef => $dtd, $doc => $doc}__;
+       
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>, '3.0');
 
         my $em = $dtd-><AG::d|DocumentTypeDefinition.generalEntities>;
@@ -8349,8 +8167,9 @@ ResourceDef:
       @@@QName: NotationMap.getNamedItem.setNamedItem.test
       @@@PerlDef:
         my $dtd;
-        __CODE{d|createDTDefForTest:: $dtdef => $dtd}__;
-        my $doc = $dtd-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{d|createDTDefForTest:: $dtdef => $dtd, $doc => $doc}__;
+       
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>, '3.0');
 
         my $em = $dtd-><AG::d|DocumentTypeDefinition.notations>;
@@ -8489,35 +8308,19 @@ ResourceDef:
           my $list;
           my $expected_type;
           __FOR{tc:ForETMap::
-            __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-              $r => $list,
-              $prop => {<H::d|elementTypes>},
-              $ref => {$$$self},
-            }__;
+            $list = ${$$$self}->{<H::d|elementTypes>};
             $expected_type = <C::Node.ELEMENT_TYPE_DEFINITION_NODE>;
           }__;
           __FOR{tc:ForATMap::
-            __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-              $r => $list,
-              $prop => {<H::d|attributeDefinitions>},
-              $ref => {$$$self},
-            }__;
+            $list = ${$$$self}->{<H::d|attributeDefinitions>};
             $expected_type = <C::Node.ATTRIBUTE_DEFINITION_NODE>;
           }__;
           __FOR{tc:ForEntityMap::
-            __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-              $r => $list,
-              $prop => {<H::d|generalEntities>},
-              $ref => {$$$self},
-            }__;
+            $list = ${$$$self}->{<H::d|generalEntities>};
             $expected_type = <C::Node.ENTITY_NODE>;
           }__;
           __FOR{tc:ForNotationMap::
-            __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-              $r => $list,
-              $prop => {<H::d|notations>},
-              $ref => {$$$self},
-            }__;
+            $list = ${$$$self}->{<H::d|notations>};
             $expected_type = <C::Node.NOTATION_NODE>;
           }__;
           if ($$$self-><AG::Node.ownerDocument>
@@ -8531,14 +8334,7 @@ ResourceDef:
               __EXCEPTION{c|NOMOD_NAMEDNODEMAP_ERR::
               }__;
             }
-            my $owner_def;
-            __CODE{mg|getNodeStemProp0Node||ManakaiDOM|all::
-              $r => $owner_def,
-              $prop => {<H::d|ownerDefinition>},
-              $ref => $arg,
-              $opt => {{
-              }},
-            }__;
+            my $owner_def = $$arg->{<H::d|ownerDefinition>};
             if ($owner_def and not $owner_def eq $$$self) {
               __EXCEPTION{c|INUSE_DEFINITION_ERR::
                 MDOMX:param-name => 'arg',
@@ -8556,14 +8352,7 @@ ResourceDef:
           SET: {
             my $name = $arg-><AG::Node.nodeName>;
             if (defined $list->{$name}) {
-              __CODE{mg|createNodeRefFromID||ManakaiDOM|all::
-                $bag => {<Code::mg|getNodeBag||ManakaiDOM|all::
-                                    $ref = {$$$self}>},
-                $stemid => {$list->{$name}},
-                $ref => $r,
-                $opt => {{
-                }},
-              }__;
+              $r = $list->{$name};
               if ($r eq $arg) {
                 __c:ERROR{t|replace-by-itself::
                   c:relatedData => {$arg},
@@ -8572,13 +8361,9 @@ ResourceDef:
                 last SET;
               }
             }
-            $list->{$name} = <Code::mg|getNodeID||ManakaiDOM|all::
-                                        $ref = $arg>;
-            __CODE{mg|setNodeStemProp0Node||ManakaiDOM|all::
-              $prop => {<H::d|ownerDefinition>},
-              $ref => $arg,
-              $given => {$$$self},
-            }__;
+            $list->{$name} = $arg;
+            $$arg->{<H::d|ownerDefinition>} = $$$self;
+            Scalar::Util::weaken ($$arg->{<H::d|ownerDefinition>});
           } # SET
 
     @@enImplNote:
@@ -8605,9 +8390,7 @@ ResourceDef:
       @@@PerlDef:
         my $doc;
         my $el;
-        __CODE{createElementForTest:: $el => $el}__;
-
-        $doc = $el-><AG::Node.ownerDocument>;
+        __CODE{createElementForTest:: $el => $el, $doc => $doc}__;
 
         my $map = $el-><AG::Node.attributes>;
 
@@ -8707,35 +8490,19 @@ ResourceDef:
           my $list;
           my $ifs;
           __FOR{tc:ForETMap::
-            __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-              $r => $list,
-              $prop => {<H::d|elementTypes>},
-              $ref => {$$$self},
-            }__;
+            $list = ${$$$self}->{<H::d|elementTypes>};
             $ifs = [<IFName::ETDef>];
           }__;
           __FOR{tc:ForATMap::
-            __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-              $r => $list,
-              $prop => {<H::d|attributeDefinitions>},
-              $ref => {$$$self},
-            }__;
+            $list = ${$$$self}->{<H::d|attributeDefinitions>};
             $ifs = [<IFName::ATDef>];
           }__;
           __FOR{tc:ForEntityMap::
-            __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-              $r => $list,
-              $prop => {<H::d|generalEntities>},
-              $ref => {$$$self},
-            }__;
+            $list = ${$$$self}->{<H::d|generalEntities>};
             $ifs = [<IFName::tx|Entity>];
           }__;
           __FOR{tc:ForNotationMap::
-            __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-              $r => $list,
-              $prop => {<H::d|notations>},
-              $ref => {$$$self},
-            }__;
+            $list = ${$$$self}->{<H::d|notations>};
             $ifs = [<IFName::tx|Notation>];
           }__;
           if ($$$self-><AG::Node.ownerDocument>
@@ -8747,18 +8514,8 @@ ResourceDef:
           } # strictErrorChecking
 
           if (defined $list->{$name}) {
-            __CODE{mg|createNodeRefFromID||ManakaiDOM|all::
-              $bag => {<Code::mg|getNodeBag||ManakaiDOM|all::
-                                  $ref = {$$$self}>},
-              $stemid => {$list->{$name}},
-              $ref => $r,
-              $opt => {{
-              }},
-            }__;
-            __CODE{mg|deleteNodeStemPropValue||ManakaiDOM|all::
-              $prop => {<H::d|ownerDefinition>},
-              $ref => $r,
-            }__;
+            $r = $list->{$name};
+            CORE::delete $$r->{<H::d|ownerDefinition>};
             CORE::delete $list->{$name};
           } else {
             __EXCEPTION{c|NO_NAMED_NODE_ERR::
@@ -8772,8 +8529,9 @@ ResourceDef:
       @@@ForCheck: tc|ForAttrMap
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
-        my $doc = $el-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
+        
         my $em = $el-><AG::Node.attributes>;
         undef $el;
 
@@ -8800,8 +8558,9 @@ ResourceDef:
       @@@ForCheck: tc|ForETMap
       @@@PerlDef:
         my $dtd;
-        __CODE{d|createDTDefForTest:: $dtdef => $dtd}__;
-        my $doc = $dtd-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{d|createDTDefForTest:: $dtdef => $dtd, $doc => $doc}__;
+        
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>, '3.0');
         my $em = $dtd-><AG::d|DocumentTypeDefinition.elementTypes>;
         undef $dtd;
@@ -8830,8 +8589,9 @@ ResourceDef:
       @@@ForCheck: tc|ForATMap
       @@@PerlDef:
         my $dtd;
-        __CODE{d|createDTDefForTest:: $dtdef => $dtd}__;
-        my $doc = $dtd-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{d|createDTDefForTest:: $dtdef => $dtd, $doc => $doc}__;
+        
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>, '3.0');
         my $etd = $docx-><M::d|DocumentXDoctype.createElementTypeDefinition>
                           ('et1');
@@ -8863,8 +8623,9 @@ ResourceDef:
       @@@ForCheck: tc|ForEntityMap
       @@@PerlDef:
         my $dtd;
-        __CODE{d|createDTDefForTest:: $dtdef => $dtd}__;
-        my $doc = $dtd-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{d|createDTDefForTest:: $dtdef => $dtd, $doc => $doc}__;
+        
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>, '3.0');
         my $em = $dtd-><AG::d|DocumentTypeDefinition.generalEntities>;
         undef $dtd;
@@ -8893,8 +8654,9 @@ ResourceDef:
       @@@ForCheck: tc|ForNotationMap
       @@@PerlDef:
         my $dtd;
-        __CODE{d|createDTDefForTest:: $dtdef => $dtd}__;
-        my $doc = $dtd-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{d|createDTDefForTest:: $dtdef => $dtd, $doc => $doc}__;
+        
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>, '3.0');
         my $em = $dtd-><AG::d|DocumentTypeDefinition.notations>;
         undef $dtd;
@@ -8980,23 +8742,11 @@ ResourceDef:
         @@@@@:
           FIND: {
             my $i = 0;
-            my $attrs;
-            __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-              $r => $attrs,
-              $prop => {<H::infoset|attributes>},
-              $ref => {$$$self},
-            }__;
+            my $attrs = ${$$$self}->{<H::infoset|attributes>};
             for my $ns (sort {$a cmp $b} keys %{$attrs}) {
               for my $ln (sort {$a cmp $b} keys %{$attrs->{$ns}}) {
                 if ($i++ == $index) {
-                  __CODE{mg|createNodeRefFromID||ManakaiDOM|all::
-                    $bag => {<Code::mg|getNodeBag||ManakaiDOM|all::
-                                        $ref = {$$$self}>},
-                    $stemid => {$attrs->{$ns}->{$ln}},
-                    $ref => $r,
-                    $opt => {{
-                    }},
-                  }__;
+                  $r = $attrs->{$ns}->{$ln};
                   last FIND;
                 }
               }
@@ -9008,44 +8758,21 @@ ResourceDef:
           my $list;
           my $ifs;
           __FOR{tc:ForETMap::
-            __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-              $r => $list,
-              $prop => {<H::d|elementTypes>},
-              $ref => {$$$self},
-            }__;
+            $list = ${$$$self}->{<H::d|elementTypes>};
           }__;
           __FOR{tc:ForATMap::
-            __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-              $r => $list,
-              $prop => {<H::d|attributeDefinitions>},
-              $ref => {$$$self},
-            }__;
+            $list = ${$$$self}->{<H::d|attributeDefinitions>};
           }__;
           __FOR{tc:ForEntityMap::
-            __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-              $r => $list,
-              $prop => {<H::d|generalEntities>},
-              $ref => {$$$self},
-            }__;
+            $list = ${$$$self}->{<H::d|generalEntities>};
           }__;
           __FOR{tc:ForNotationMap::
-            __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-              $r => $list,
-              $prop => {<H::d|notations>},
-              $ref => {$$$self},
-            }__;
+            $list = ${$$$self}->{<H::d|notations>};
           }__;
           my $key = $index >= 0 ? [sort {$a cmp $b} keys %$list]->[$index]
                                 : null;
           if (defined $key and defined $list->{$key}) {
-            __CODE{mg|createNodeRefFromID||ManakaiDOM|all::
-              $bag => {<Code::mg|getNodeBag||ManakaiDOM|all::
-                                  $ref = {$$$self}>},
-              $stemid => {$list->{$key}},
-              $ref => $r,
-              $opt => {{
-              }},
-            }__;
+            $r = $list->{$key};
           }
     
     @@Test:
@@ -9053,8 +8780,9 @@ ResourceDef:
       @@@ForCheck: tc|ForAttrMap
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
-        my $doc = $el-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
+        
         my $em = $el-><AG::Node.attributes>;
         
         $test->id ('no.item');
@@ -9086,8 +8814,9 @@ ResourceDef:
       @@@ForCheck: tc|ForETMap
       @@@PerlDef:
         my $dtd;
-        __CODE{d|createDTDefForTest:: $dtdef => $dtd}__;
-        my $doc = $dtd-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{d|createDTDefForTest:: $dtdef => $dtd, $doc => $doc}__;
+        
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>, '3.0');
         my $em = $dtd-><AG::d|DocumentTypeDefinition.elementTypes>;
         
@@ -9120,8 +8849,9 @@ ResourceDef:
       @@@ForCheck: tc|ForATMap
       @@@PerlDef:
         my $dtd;
-        __CODE{d|createDTDefForTest:: $dtdef => $dtd}__;
-        my $doc = $dtd-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{d|createDTDefForTest:: $dtdef => $dtd, $doc => $doc}__;
+        
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>, '3.0');
         my $etd = $docx-><M::d|DocumentXDoctype.createElementTypeDefinition>
                           ('et1');
@@ -9157,8 +8887,9 @@ ResourceDef:
       @@@ForCheck: tc|ForEntityMap
       @@@PerlDef:
         my $dtd;
-        __CODE{d|createDTDefForTest:: $dtdef => $dtd}__;
-        my $doc = $dtd-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{d|createDTDefForTest:: $dtdef => $dtd, $doc => $doc}__;
+        
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>, '3.0');
         my $em = $dtd-><AG::d|DocumentTypeDefinition.generalEntities>;
         
@@ -9191,8 +8922,9 @@ ResourceDef:
       @@@ForCheck: tc|ForNotationMap
       @@@PerlDef:
         my $dtd;
-        __CODE{d|createDTDefForTest:: $dtdef => $dtd}__;
-        my $doc = $dtd-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{d|createDTDefForTest:: $dtdef => $dtd, $doc => $doc}__;
+        
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>, '3.0');
         my $em = $dtd-><AG::d|DocumentTypeDefinition.notations>;
         
@@ -9230,54 +8962,29 @@ ResourceDef:
       @@@PerlDef:
         @@@@ForCheck: tc|ForAttrMap
         @@@@@:
-          my $list;
-          __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-            $r => $list,
-            $prop => {<H::infoset|attributes>},
-            $ref => {$$$self},
-          }__;
+          my $list = ${$$$self}->{<H::infoset|attributes>};
           for my $l (values %$list) {
             $r += grep {$l->{$_}} keys %$l;
           }
       @@@PerlDef:
         @@@@ForCheck: tc|ForETMap
         @@@@@:
-          my $list;
-          __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-            $r => $list,
-            $prop => {<H::d|elementTypes>},
-            $ref => {$$$self},
-          }__;
+          my $list = ${$$$self}->{<H::d|elementTypes>};
           $r = @{[map {$_} values %$list]};
       @@@PerlDef:
         @@@@ForCheck: tc|ForATMap
         @@@@@:
-          my $list;
-          __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-            $r => $list,
-            $prop => {<H::d|attributeDefinitions>},
-            $ref => {$$$self},
-          }__;
+          my $list = ${$$$self}->{<H::d|attributeDefinitions>};
           $r = @{[map {$_} values %$list]};
       @@@PerlDef:
         @@@@ForCheck: tc|ForEntityMap
         @@@@@:
-          my $list;
-          __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-            $r => $list,
-            $prop => {<H::d|generalEntities>},
-            $ref => {$$$self},
-          }__;
+          my $list = ${$$$self}->{<H::d|generalEntities>};
           $r = @{[map {$_} values %$list]};
       @@@PerlDef:
         @@@@ForCheck: tc|ForNotationMap
         @@@@@:
-          my $list;
-          __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-            $r => $list,
-            $prop => {<H::d|notations>},
-            $ref => {$$$self},
-          }__;
+          my $list = ${$$$self}->{<H::d|notations>};
           $r = @{[map {$_} values %$list]};
 
     @@Test:
@@ -9285,8 +8992,9 @@ ResourceDef:
       @@@ForCheck: tc|ForAttrMap
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
-        my $doc = $el-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
+        
         my $et = $el-><AG::Node.attributes>;
 
         $test->id ('length.0');
@@ -9314,8 +9022,9 @@ ResourceDef:
       @@@ForCheck: tc|ForETMap
       @@@PerlDef:
         my $dtd;
-        __CODE{d|createDTDefForTest:: $dtdef => $dtd}__;
-        my $doc = $dtd-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{d|createDTDefForTest:: $dtdef => $dtd, $doc => $doc}__;
+       
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>, '3.0');
         my $et = $dtd-><AG::d|DocumentTypeDefinition.elementTypes>;
 
@@ -9344,8 +9053,9 @@ ResourceDef:
       @@@ForCheck: tc|ForATMap
       @@@PerlDef:
         my $dtd;
-        __CODE{d|createDTDefForTest:: $dtdef => $dtd}__;
-        my $doc = $dtd-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{d|createDTDefForTest:: $dtdef => $dtd, $doc => $doc}__;
+        
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>, '3.0');
         my $etd = $docx-><M::d|DocumentXDoctype.createElementTypeDefinition>
                           ('et1');
@@ -9376,8 +9086,9 @@ ResourceDef:
       @@@ForCheck: tc|ForEntityMap
       @@@PerlDef:
         my $dtd;
-        __CODE{d|createDTDefForTest:: $dtdef => $dtd}__;
-        my $doc = $dtd-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{d|createDTDefForTest:: $dtdef => $dtd, $doc => $doc}__;
+        
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>, '3.0');
         my $et = $dtd-><AG::d|DocumentTypeDefinition.generalEntities>;
 
@@ -9406,8 +9117,9 @@ ResourceDef:
       @@@ForCheck: tc|ForNotationMap
       @@@PerlDef:
         my $dtd;
-        __CODE{d|createDTDefForTest:: $dtdef => $dtd}__;
-        my $doc = $dtd-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{d|createDTDefForTest:: $dtdef => $dtd, $doc => $doc}__;
+        
         my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>, '3.0');
         my $et = $dtd-><AG::d|DocumentTypeDefinition.notations>;
 
@@ -9472,42 +9184,22 @@ ResourceDef:
       @@@PerlDef:
         @@@@ForCheck: tc|ForETMap
         @@@@@:
-          my $list;
-          __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-            $r => $list,
-            $prop => {<H::d|elementTypes>},
-            $ref => {$$$self},
-          }__;
+          my $list = ${$$$self}->{<H::d|elementTypes>};
           $r = exists $list->{$key};
       @@@PerlDef:
         @@@@ForCheck: tc|ForATMap
         @@@@@:
-          my $list;
-          __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-            $r => $list,
-            $prop => {<H::d|attributeDefinitions>},
-            $ref => {$$$self},
-          }__;
+          my $list = ${$$$self}->{<H::d|attributeDefinitions>};
           $r = exists $list->{$key};
       @@@PerlDef:
         @@@@ForCheck: tc|ForEntityMap
         @@@@@:
-          my $list;
-          __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-            $r => $list,
-            $prop => {<H::d|generalEntities>},
-            $ref => {$$$self},
-          }__;
+          my $list = ${$$$self}->{<H::d|generalEntities>};
           $r = exists $list->{$key};
       @@@PerlDef:
         @@@@ForCheck: tc|ForNotationMap
         @@@@@:
-          my $list;
-          __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-            $r => $list,
-            $prop => {<H::d|notations>},
-            $ref => {$$$self},
-          }__;
+          my $list = ${$$$self}->{<H::d|notations>};
           $r = exists $list->{$key};
 
   @IntMethod:
@@ -9522,54 +9214,30 @@ ResourceDef:
           __DEEP{
             my $node = $self-><M::NamedNodeMap.item> (0);
             $r = $node ? $node-><AG::Node.nodeName> : null;
-            __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
-              $given => {1},
-              $prop => {<H::tc|hashPosition>},
-              $ref => {$$$self},
-            }__;
+            ${$$$self}->{<H::tc|hashPosition>} = 1;
           }__;
       @@@PerlDef:
         @@@@ForCheck: tc|ForETMap
         @@@@@:
-          my $list;
-          __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-            $r => $list,
-            $prop => {<H::d|elementTypes>},
-            $ref => {$$$self},
-          }__;
+          my $list = ${$$$self}->{<H::d|elementTypes>};
           my $a = keys %$list; # reset
           $r = each %$list;
       @@@PerlDef:
         @@@@ForCheck: tc|ForATMap
         @@@@@:
-          my $list;
-          __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-            $r => $list,
-            $prop => {<H::d|attributeDefinitions>},
-            $ref => {$$$self},
-          }__;
+          my $list = ${$$$self}->{<H::d|attributeDefinitions>};
           my $a = keys %$list; # reset
           $r = each %$list;
       @@@PerlDef:
         @@@@ForCheck: tc|ForEntityMap
         @@@@@:
-          my $list;
-          __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-            $r => $list,
-            $prop => {<H::d|generalEntities>},
-            $ref => {$$$self},
-          }__;
+          my $list = ${$$$self}->{<H::d|generalEntities>};
           my $a = keys %$list; # reset
           $r = each %$list;
       @@@PerlDef:
         @@@@ForCheck: tc|ForNotationMap
         @@@@@:
-          my $list;
-          __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-            $r => $list,
-            $prop => {<H::d|notations>},
-            $ref => {$$$self},
-          }__;
+          my $list = ${$$$self}->{<H::d|notations>};
           my $a = keys %$list; # reset
           $r = each %$list;
 
@@ -9586,54 +9254,29 @@ ResourceDef:
         @@@@ForCheck: tc|ForAttrMap
         @@@@@:
           __DEEP{
-            my $i;
-            __CODE{mg|get++NodeStemPropValue||ManakaiDOM|all::
-              $r => $i,
-              $prop => {<H::tc|hashPosition>},
-              $ref => {$$$self},
-            }__;
+            my $i = ${$$$self}->{<H::tc|hashPosition>}++;
             my $node = $self-><M::NamedNodeMap.item> ($i);
             $r = $node ? $node-><AG::Node.nodeName> : null;
           }__;
       @@@PerlDef:
         @@@@ForCheck: tc|ForETMap
         @@@@@:
-          my $list;
-          __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-            $r => $list,
-            $prop => {<H::d|elementTypes>},
-            $ref => {$$$self},
-          }__;
+          my $list = ${$$$self}->{<H::d|elementTypes>};
           $r = each %$list;
       @@@PerlDef:
         @@@@ForCheck: tc|ForATMap
         @@@@@:
-          my $list;
-          __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-            $r => $list,
-            $prop => {<H::d|attributeDefinitions>},
-            $ref => {$$$self},
-          }__;
+          my $list = ${$$$self}->{<H::d|attributeDefinitions>};
           $r = each %$list;
       @@@PerlDef:
         @@@@ForCheck: tc|ForEntityMap
         @@@@@:
-          my $list;
-          __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-            $r => $list,
-            $prop => {<H::d|generalEntities>},
-            $ref => {$$$self},
-          }__;
+          my $list = ${$$$self}->{<H::d|generalEntities>};
           $r = each %$list;
       @@@PerlDef:
         @@@@ForCheck: tc|ForNotationMap
         @@@@@:
-          my $list;
-          __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-            $r => $list,
-            $prop => {<H::d|notations>},
-            $ref => {$$$self},
-          }__;
+          my $list = ${$$$self}->{<H::d|notations>};
           $r = each %$list;
 
   @IntMethod:
@@ -9646,42 +9289,22 @@ ResourceDef:
       @@@PerlDef:
         @@@@ForCheck: tc|ForETMap
         @@@@@:
-          my $list;
-          __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-            $r => $list,
-            $prop => {<H::d|elementTypes>},
-            $ref => {$$$self},
-          }__;
+          my $list = ${$$$self}->{<H::d|elementTypes>};
           $r = scalar %$list;
       @@@PerlDef:
         @@@@ForCheck: tc|ForATMap
         @@@@@:
-          my $list;
-          __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-            $r => $list,
-            $prop => {<H::d|attributeDefinitions>},
-            $ref => {$$$self},
-          }__;
+          my $list = ${$$$self}->{<H::d|attributeDefinitions>};
           $r = scalar %$list;
       @@@PerlDef:
         @@@@ForCheck: tc|ForEntityMap
         @@@@@:
-          my $list;
-          __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-            $r => $list,
-            $prop => {<H::d|generalEntities>},
-            $ref => {$$$self},
-          }__;
+          my $list = ${$$$self}->{<H::d|generalEntities>};
           $r = scalar %$list;
       @@@PerlDef:
         @@@@ForCheck: tc|ForNotationMap
         @@@@@:
-          my $list;
-          __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-            $r => $list,
-            $prop => {<H::d|notations>},
-            $ref => {$$$self},
-          }__;
+          my $list = ${$$$self}->{<H::d|notations>};
           $r = scalar %$list;
 
   @L2Method:
@@ -9740,7 +9363,8 @@ ResourceDef:
       @@@ForCheck: tc|ForAttrMap
       @@@PerlDef:
         my $el;
-        __CODE{createElementForTest:: $el => $el}__;
+        my $doc;
+        __CODE{createElementForTest:: $el => $el, $doc => $doc}__;
         my $as = $el-><AG::Node.attributes>;
 
         my $uri = 'http://www.example/';
@@ -9856,9 +9480,9 @@ ResourceDef:
       @@@ForCheck: tc|ForAttrMap
       @@@PerlDef:
         my $el;
-        __CODE{createElementForTest:: $el => $el}__;
+        my $doc;
+        __CODE{createElementForTest:: $el => $el, $doc => $doc}__;
         my $as = $el-><AG::Node.attributes>;
-        my $doc = $el-><AG::Node.ownerDocument>;
 
         my $uri = 'http://www.example/';
         my $ln = 'el1';
@@ -10105,11 +9729,7 @@ ResourceDef:
       Creates an attribute node map from an element node.
     @@PerlDef:
       $map = bless \\($node), <ClassName::ManakaiDOMAttrMap>;
-      __CODE{mg|orSetNodeStemPropValue||ManakaiDOM|all::
-        $given => {-1},
-        $prop => {<H::tc|hashPosition>},
-        $ref => $node,
-      }__;
+      $$node->{<H::tc|hashPosition>} ||= 0;
 
   @CODE:
     @@ForCheck: tc|ForETMap ManakaiDOM|ManakaiDOMLatest
@@ -10167,7 +9787,8 @@ ResourceDef:
       @@@ForCheck: tc|ForAttrMap
       @@@PerlDef:
         my $el;
-        __CODE{createElementForTest:: $el => $el}__;
+        my $doc;
+        __CODE{createElementForTest:: $el => $el, $doc => $doc}__;
 
         my $as = $el-><AG::Node.attributes>;
  
@@ -10753,8 +10374,6 @@ IntPropDef:
   @enDesc:
     A hash reference whose value is a reference to the array of 
     data and its handler.
-  @rdfs:domain: Node
-  @rdfs:range: DISPerl|HASH
   @tc:nodeStemKey: ud
 
 IntPropDef:
@@ -10874,7 +10493,7 @@ IFCls3Def:
   @ConstGroup:
     @@QName:  OperationType
 
-    @@rdfs:subClassOf: idl|unsignedShort||ManakaiDOM|all
+    @@subsetOf: idl|unsignedShort||ManakaiDOM|all
     @@Type: idl|unsignedShort||ManakaiDOM|all
 
     @@enDesc:

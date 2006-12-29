@@ -13,7 +13,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/12/03 05:40:33 $
+    $Date: 2006/12/29 14:45:41 $
 
   @Require:
     @@Module:
@@ -76,22 +76,12 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
   @ManakaiDOM:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
-  @ManakaiDOMCore:
-    http://suika.fam.cx/~wakaba/archive/2004/mdom-core#
   @MDOM:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
   @MDOMX:
     http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
-  @mg:
-    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Grove/
-  @null:
-    http://suika.fam.cx/~wakaba/-temp/2003/09/27/null
   @rdf:
     http://www.w3.org/1999/02/22-rdf-syntax-ns#
-  @rdfs:
-    http://www.w3.org/2000/01/rdf-schema#
-  @sw010:
-    urn:x-suika-fam-cx:markup:suikawiki:0:10:
   @t:
     http://suika.fam.cx/~wakaba/archive/2004/dom/tree#
   @tc:
@@ -708,28 +698,6 @@ ClsDef:
           (<Class::c|ManakaiDOMImplementation>->isa
               (<ClassName::ManakaiDOMImplementationDocument>));
 
-  @Test:
-    @@QName: Impl.new.mg.test
-    @@PerlDef:
-      local $Message::Util::Grove::GCLatency = 0;
-
-      my $impl;
-      __CODE{tc|createImplForTest:: $impl => $impl}__;
-
-      my $bag = $impl->{<H::mg|nodeBag>};
-      my $id = $impl->{<H::mg|nodeIDReference>};
-        
-      $test->id ('interface');
-      $test->assert_isa ($impl, <IFName::c|DOMImplementation>);
-        
-      $test->id ('class');
-      $test->assert_isa ($impl, <ClassName::ManakaiDOMImplementationDocument>);
-
-      undef $impl;
-
-      $test->id ('gc');
-      $test->assert_null ($bag->{$$id});
-
   @CMethod:
     @@Name: createDocument
     @@enDesc:
@@ -848,23 +816,13 @@ ClsDef:
         @@@@enImplNote:
           What <IF::Document>?  The created one?
       @@@PerlDef:
-        my $bag = <Code::mg|getNodeBag||ManakaiDOM|all:: $ref = $self>;
-        my $stem;
-        __CODE{mg|createNodeStem||ManakaiDOM|all::
-          $bag => $bag,
-          $stem => $stem,
-          $class => {<ClassName::td|ManakaiDOMDocument>},
-          $opt => {{
-            <H::f|implementation> => $self,
-          }},
-        }__;
-        __CODE{mg|createNodeRef||ManakaiDOM|all::
-          $bag => $bag,
-          $stem => $stem,
-          $ref => $r,
-          $opt => {{
-          }},
-        }__;
+        require Scalar::Util;
+        $r = bless \{
+          <H::infoset|children> => [],
+          <H::f|implementation> => $self,
+          <H::infoset|version> => '1.0',
+          <H::c|strictErrorChecking> => 1,
+        }, <ClassName::td|ManakaiDOMDocument>;
 
         if (defined $doctype) {
           __DEEP{
@@ -886,108 +844,6 @@ ClsDef:
             infoset|namespaceURI => {$namespaceURI},
           }__;
         }
-
-    @@Test:
-      @@@QName: Impl.createDoc.1.test
-      @@@PerlDef:
-        local $Message::Util::Grove::GCLatency = 0;
-
-        my $impl;
-        __CODE{tc|createImplForTest:: $impl => $impl}__;
-
-        my $bag = $impl->{<H::mg|nodeBag>};
-        my $id = $impl->{<H::mg|nodeIDReference>};
-
-        my $doc = $impl-><M::c|DOMImplementation.createDocument>;
-        
-        $test->id ('interface');
-        $test->assert_isa ($doc, <IFName::Document>);
-        
-        $test->id ('class');
-        $test->assert_isa ($doc, <ClassName::td|ManakaiDOMDocument>);
-
-        my $doc_id = $doc->{<H::mg|nodeIDReference>};
-
-        undef $impl;
-
-        $test->id ('gc.impl.1');
-        $test->assert_not_null ($bag->{$$id});
-
-        $test->id ('gc.doc.1');
-        $test->assert_not_null ($bag->{$$doc_id});
-
-        undef $doc;
-
-        $test->id ('gc.impl.2');
-        $test->assert_null ($bag->{$$id});
-
-        $test->id ('gc.doc.2');
-        $test->assert_null ($bag->{$$doc_id});
-    @@Test:
-      @@@QName: Impl.createDoc.2.test
-      @@@PerlDef:
-        local $Message::Util::Grove::GCLatency = 0;
-
-        my $impl;
-        __CODE{tc|createImplForTest:: $impl => $impl}__;
-
-        my $bag = $impl->{<H::mg|nodeBag>};
-        my $id = $impl->{<H::mg|nodeIDReference>};
-
-        my $doc = $impl-><M::c|DOMImplementation.createDocument>;
-        
-        $test->id ('interface');
-        $test->assert_isa ($doc, <IFName::Document>);
-        
-        $test->id ('class');
-        $test->assert_isa ($doc, <ClassName::td|ManakaiDOMDocument>);
-
-        my $doc_id = $doc->{<H::mg|nodeIDReference>};
-
-        undef $doc;
-
-        $test->id ('gc.impl.1');
-        $test->assert_not_null ($bag->{$$id});
-
-        $test->id ('gc.doc.1');
-        $test->assert_null ($bag->{$$doc_id});
-
-        undef $impl;
-
-        $test->id ('gc.impl.2');
-        $test->assert_null ($bag->{$$id});
-
-        $test->id ('gc.doc.2');
-        $test->assert_null ($bag->{$$doc_id});
-    @@Test:
-      @@@QName: Impl.createDoc.3.test
-      @@@PerlDef:
-        local $Message::Util::Grove::GCLatency = 1;
-
-        my $impl;
-        __CODE{tc|createImplForTest:: $impl => $impl}__;
-
-        my $bag = $impl->{<H::mg|nodeBag>};
-        my $id = $impl->{<H::mg|nodeIDReference>};
-
-        my $doc = $impl-><M::c|DOMImplementation.createDocument>;
-        
-        $test->id ('interface');
-        $test->assert_isa ($doc, <IFName::Document>);
-        
-        $test->id ('class');
-        $test->assert_isa ($doc, <ClassName::td|ManakaiDOMDocument>);
-
-        my $doc_id = $doc->{<H::mg|nodeIDReference>};
-
-        undef $doc;
-        undef $impl;
-
-        $test->id ('gc.impl.1');
-        $test->assert_null ($bag->{$$id});
-
-        $test->id ('gc.doc.1');
-        $test->assert_null ($bag->{$$doc_id});
 ##DOMImplementationDocument
 
 ## -- Document
@@ -1014,35 +870,6 @@ NodeTypeDef:
             A <IF::Document> node can be created by 
             <M::c|DOMImplementation.createDocument> method.
     }
-
-  @IntMethod:
-    @@Operator: mg|CreateNodeStemMethod
-    @@Param:
-      @@@Name: bag
-      @@@Type: HASH
-    @@Param:
-      @@@Name: obj
-      @@@Type: HASH
-    @@Param:
-      @@@Name: opt
-      @@@Type: HASH
-    @@Return:
-      @@@Type: HASH
-      @@@PerlDef:
-        $obj->{<H::infoset|children>} = [];
-        $obj->{<H::tc|revOwnerDocument>} = {};
-        $obj->{<H::infoset|version>} = '1.0';
-        __CODE{mg|setOwnerProp||ManakaiDOM|all::
-          $bag => $bag,
-          $ownerref => {$opt->{<H::f|implementation>}},
-          $ownee1hprop => {<H::f|revImplementation>},
-          $ownee => {$obj},
-          $owner0prop => {<H::f|implementation>},
-        }__;
-        $r = $obj;
-  @mg:subnode1a: infoset|children
-  @mg:ownee1h: tc|revOwnerDocument
-  @mg:owner0: f|implementation
 
   @enImplNote:
     @@ddid: props
@@ -1346,20 +1173,9 @@ NodeTypeDef:
         }__;
         if ($child_nt == <C::Node.DOCUMENT_TYPE_NODE> and
             not defined $newChild-><AG::Node.ownerDocument>) {
-          my $bag = <Code::mg|getNodeBag||ManakaiDOM|all:: $ref = $self>;
-          __CODE{mg|deleteOwnerProp||ManakaiDOM|all::
-            $bag => $bag,
-            $owneeref => $newChild,
-            $owner0prop => {<H::f|implementation>},
-            $ownee1hprop => {<H::f|revImplementation>},
-          }__;
-          __CODE{mg|setOwnerPropRR||ManakaiDOM|all::
-            $bag => $bag,
-            $ownerref => $self,
-            $ownee1hprop => {<H::tc|revOwnerDocument>},
-            $owneeref => $newChild,
-            $owner0prop => {<H::tc|ownerDocument>},
-          }__;
+          CORE::delete $$newChild->{<H::f|implementation>};
+          $$newChild->{<H::tc|ownerDocument>} = $self;
+          Scalar::Util::weaken ($$newChild->{<H::tc|ownerDocument>});
         }
 
   @CMethod:
@@ -1560,20 +1376,9 @@ NodeTypeDef:
         }__;
         if ($child_nt == <C::Node.DOCUMENT_TYPE_NODE> and
             not defined $newChild-><AG::Node.ownerDocument>) {
-          my $bag = <Code::mg|getNodeBag||ManakaiDOM|all:: $ref = $self>;
-          __CODE{mg|deleteOwnerProp||ManakaiDOM|all::
-            $bag => $bag,
-            $owneeref => $newChild,
-            $owner0prop => {<H::f|implementation>},
-            $ownee1hprop => {<H::f|revImplementation>},
-          }__;
-          __CODE{mg|setOwnerPropRR||ManakaiDOM|all::
-            $bag => $bag,
-            $ownerref => $self,
-            $ownee1hprop => {<H::tc|revOwnerDocument>},
-            $owneeref => $newChild,
-            $owner0prop => {<H::tc|ownerDocument>},
-          }__;
+          CORE::delete $$newChild->{<H::f|implementation>};
+          $$newChild->{<H::tc|ownerDocument>} = $self;
+          Scalar::Util::weaken ($$newChild->{<H::tc|ownerDocument>});
         }
 
   @CMethod:
@@ -1767,20 +1572,9 @@ NodeTypeDef:
         }__;
         if ($child_nt == <C::Node.DOCUMENT_TYPE_NODE> and
             not defined $newChild-><AG::Node.ownerDocument>) {
-          my $bag = <Code::mg|getNodeBag||ManakaiDOM|all:: $ref = $self>;
-          __CODE{mg|deleteOwnerProp||ManakaiDOM|all::
-            $bag => $bag,
-            $owneeref => $newChild,
-            $owner0prop => {<H::f|implementation>},
-            $ownee1hprop => {<H::f|revImplementation>},
-          }__;
-          __CODE{mg|setOwnerPropRR||ManakaiDOM|all::
-            $bag => $bag,
-            $ownerref => $self,
-            $ownee1hprop => {<H::tc|revOwnerDocument>},
-            $owneeref => $newChild,
-            $owner0prop => {<H::tc|ownerDocument>},
-          }__;
+          CORE::delete $$newChild->{<H::f|implementation>};
+          $$newChild->{<H::tc|ownerDocument>} = $self;
+          Scalar::Util::weaken ($$newChild->{<H::tc|ownerDocument>});
         }
 
     @@Test:
@@ -4832,12 +4626,6 @@ NodeTypeDef:
       @@@nullCase:
       @@@PerlDef:
         $feature =~ s/^\+//;
-
-        ## TODO: Remove this code and implement autoload
-        if ($feature eq <Q::fe|xdoctype>) {
-          require Message::DOM::XDoctype;
-        }
-
         __CODE{f|getFeatureImpl::
           $self => $self,
           $feature => $feature, $version => $version, $r => $r,
@@ -4878,17 +4666,9 @@ NodeTypeDef:
         @@@@enDesc:
           If it is not available.
       @@@PerlDef:
-        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-          $r => $r,
-          $prop => {<H::infoset|baseURI>},
-          $ref => $self,
-        }__;
+        $r = $$self->{<H::infoset|baseURI>};
         unless (defined $r) {
-          __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-            $r => $r,
-            $prop => {<H::c|documentURI>},
-            $ref => $self,
-          }__;
+          $r = $$self->{<H::c|documentURI>};
         }
       @@@enImplNote:
         {TODO::
@@ -5293,80 +5073,11 @@ NodeTypeDef:
       @@@enDesc:
         A newly created <IF::DocumentFragment> node.
       @@@PerlDef:
-        my $bag = <Code::mg|getNodeBag||ManakaiDOM|all:: $ref = $self>;
-        my $stem;
-        __CODE{mg|createNodeStem||ManakaiDOM|all::
-          $bag => $bag,
-          $stem => $stem,
-          $class => {<ClassName::ManakaiDOMDocumentFragment>},
-          $opt => {{
-            <H::tc|ownerDocument> => $self,
-          }},
-        }__;
-        __CODE{mg|createNodeRef||ManakaiDOM|all::
-          $bag => $bag,
-          $stem => $stem,
-          $ref => $r,
-          $opt => {{
-          }},
-        }__;
-
-    @@Test:
-      @@@QName: Document.createDF.mg.1.test
-      @@@PerlDef:
-        local $Message::Util::Grove::GCLatency = 0;
-
-        my $impl;
-        __CODE{tc|createImplForTest:: $impl => $impl}__;
-
-        my $bag = $impl->{<H::mg|nodeBag>};
-        my $id = $impl->{<H::mg|nodeIDReference>};
-
-        my $doc = $impl-><M::c|DOMImplementation.createDocument>;
-
-        my $el = $doc-><M::Document.createDocumentFragment>;
-        
-        $test->id ('interface');
-        $test->assert_isa ($el, <IFName::DocumentFragment>);
-        
-        $test->id ('class');
-        $test->assert_isa ($el, <ClassName::ManakaiDOMDocumentFragment>);
-
-        my $doc_id = $doc->{<H::mg|nodeIDReference>};
-        my $el_id = $el->{<H::mg|nodeIDReference>};
-
-        undef $impl;
-
-        $test->id ('gc.impl.1');
-        $test->assert_not_null ($bag->{$$id});
-
-        $test->id ('gc.doc.1');
-        $test->assert_not_null ($bag->{$$doc_id});
-
-        $test->id ('gc.el.1');
-        $test->assert_not_null ($bag->{$$el_id});
-
-        undef $doc;
-
-        $test->id ('gc.impl.2');
-        $test->assert_not_null ($bag->{$$id});
-
-        $test->id ('gc.doc.2');
-        $test->assert_not_null ($bag->{$$doc_id});
-
-        $test->id ('gc.el.2');
-        $test->assert_not_null ($bag->{$$el_id});
-
-        undef $el;
-
-        $test->id ('gc.impl.3');
-        $test->assert_null ($bag->{$$id});
-
-        $test->id ('gc.doc.3');
-        $test->assert_null ($bag->{$$doc_id});
-
-        $test->id ('gc.el.3');
-        $test->assert_null ($bag->{$$el_id});
+        $r = bless \{
+          <H::tc|ownerDocument> => $self,
+          <H::infoset|children> => [],
+        }, <ClassName::ManakaiDOMDocumentFragment>;
+        Scalar::Util::weaken ($$r->{<H::tc|ownerDocument>});
 
   @Method:
     @@ForCheck: ManakaiDOM|ForIF
@@ -5465,19 +5176,10 @@ NodeTypeDef:
         the behavior is undefined.
     @@Get:
       @@@PerlDef:
-        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-          $r => $r,
-          $prop => {<H::c|strictErrorChecking>},
-          $ref => $self,
-        }__;
-        $r = true unless defined $r;
+        $r = $$self->{<H::c|strictErrorChecking>};
     @@Set:
       @@@PerlDef:
-        __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
-          $given => {$given ? true : false},
-          $prop => {<H::c|strictErrorChecking>},
-          $ref => $self,
-        }__;
+        $$self->{<H::c|strictErrorChecking>} = $given;
 
     @@L3Test:
       @@@QName: Document.strictErrorChecking.test
@@ -5515,8 +5217,7 @@ NodeTypeDef:
       @@@PerlDef:
         __CODE{c|getConfigObject::
           $target => $self,
-          $targetHash => {<Code::mg|getNodeStem||ManakaiDOM|all::
-                                     $ref = $self>},
+          $targetHash => {$$self},
           $targetType => {<IFName::Document>},
           $result => $r,
         }__;
@@ -5588,12 +5289,7 @@ NodeTypeDef:
     @@Type: c|DOMImplementation
     @@Get:
       @@@PerlDef:
-        __CODE{mg|getNodeStemProp0Node||ManakaiDOM|all::
-          $r => $r,
-          $prop => {<H::f|implementation>},
-          $ref => $self,
-          $opt => {{}},
-        }__;
+        $r = $$self->{<H::f|implementation>};
 
     @@Test:
       @@@QName: Document.implementation.test
@@ -5629,12 +5325,7 @@ NodeTypeDef:
         If the document does not support the <Feature::XML> feature.
     @@Get:
       @@@PerlDef:
-        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-          $r => $r,
-          $prop => {<H::infoset|version>},
-          $ref => $self,
-        }__;
-        $r = '1.0' unless defined $r;
+        $r = $$self->{<H::infoset|version>};
     @@Set:
       @@@enDesc:
         Changing this attribute will affect methods that checks
@@ -5662,11 +5353,7 @@ NodeTypeDef:
         if (defined $given and
             ($given eq '1.0' or $given eq '1.1' or
              not $self-><AG::Document.strictErrorChecking>)) {
-          __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
-            $given => $given,
-            $prop => {<H::infoset|version>},
-            $ref => $self,
-          }__;
+          $$self->{<H::infoset|version>} = $given;
         } else {
           __EXCEPTION{MDOMX|MDOM_IMPL_NOSUPPORT_XMLVER::
             infoset|version => {$given},
@@ -5820,11 +5507,7 @@ NodeTypeDef:
     @@dis:actualType: ManakaiDOM|ManakaiDOMURI
     @@Get:
       @@@PerlDef:
-        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-          $r => $r,
-          $prop => {<H::c|documentURI>},
-          $ref => $self,
-        }__;
+        $r = $$self->{<H::c|documentURI>};
     @@Set:
       @@@enDesc:
         No lexical checking is performed when setting this attribute;
@@ -5833,11 +5516,7 @@ NodeTypeDef:
       @@@NodeReadOnlyError:
       @@@PerlDef:
         __CODE{tc|NodeReadOnlyError:: $node => $self}__;
-        __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
-          $given => $given,
-          $prop => {<H::c|documentURI>},
-          $ref => $self,
-        }__;
+        $$self->{<H::c|documentURI>} = $given;
 
     @@Test:
       @@@QName: Document.documentURI.test
@@ -5875,11 +5554,7 @@ NodeTypeDef:
         created in memory.
     @@Get:
       @@@PerlDef:
-        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-          $r => $r,
-          $prop => {<H::infoset|characterEncodingScheme>},
-          $ref => $self,
-        }__;
+        $r = $$self->{<H::infoset|characterEncodingScheme>};
     @@LXSet:
       @@@enDesc:
         Sets the attribute value.  No lexical checking is performed
@@ -5890,11 +5565,7 @@ NodeTypeDef:
       @@@NodeReadOnlyError:
       @@@PerlDef:
         __CODE{tc|NodeReadOnlyError:: $node => $self}__;
-        __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
-          $given => $given,
-          $prop => {<H::infoset|characterEncodingScheme>},
-          $ref => $self,
-        }__;
+        $$self->{<H::infoset|characterEncodingScheme>} = $given;
 
     @@Test:
       @@@QName: Document.inputEncoding.test
@@ -5924,11 +5595,7 @@ NodeTypeDef:
         the <IF::Document> was created in memory.
     @@Get:
       @@@PerlDef:
-        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-          $r => $r,
-          $prop => {<H::c|xmlEncoding>},
-          $ref => $self,
-        }__;
+        $r = $$self->{<H::c|xmlEncoding>};
     @@LXSet:
       @@@enDesc:
         The value of the <XA::encoding> declaration.  No lexical
@@ -5939,11 +5606,7 @@ NodeTypeDef:
       @@@NodeReadOnlyError:
       @@@PerlDef:
         __CODE{tc|NodeReadOnlyError:: $node => $self}__;
-        __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
-          $given => $given,
-          $prop => {<H::c|xmlEncoding>},
-          $ref => $self,
-        }__;
+        $$self->{<H::c|xmlEncoding>} = $given;
 
     @@Test:
       @@@QName: Document.xmlEncoding.test
@@ -5977,11 +5640,7 @@ NodeTypeDef:
         or is unspecified.
     @@Get:
       @@@PerlDef:
-        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-          $r => $r,
-          $prop => {<H::infoset|standalone>},
-          $ref => $self,
-        }__;
+        $r = $$self->{<H::infoset|standalone>};
     @@Set:
       @@@enDesc:
         No verification is performed on the value when setting
@@ -5997,11 +5656,7 @@ NodeTypeDef:
       @@@NodeReadOnlyError:
       @@@PerlDef:
         __CODE{tc|NodeReadOnlyError:: $node => $self}__;
-        __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
-          $given => $given,
-          $prop => {<H::infoset|standalone>},
-          $ref => $self,
-        }__;
+        $$self->{<H::infoset|standalone>} = $given;
 
     @@Test:
       @@@QName: Document.xmlStandalone.test
@@ -6142,9 +5797,7 @@ NodeTypeDef:
       @@@PerlDef:
         ADOPT: {
           last ADOPT
-            unless $source->isa (<ClassName::tc|ManakaiDOMNode>) and
-                   <Code::mg|getNodeBag||ManakaiDOM|all:: $ref = $self>
-                       eq <Code::mg|getNodeBag||ManakaiDOM|all:: $ref = $source>;
+            unless $source->isa (<ClassName::tc|ManakaiDOMNode>);
 
           my $strict = $self-><AG::Document.strictErrorChecking>;
           if ($strict and $self-><AG::Node.manakaiReadOnly>) {
@@ -6234,36 +5887,13 @@ NodeTypeDef:
             last ADOPT;
           }
 
-          my $old_od_list;
-          __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-            $r => $old_od_list,
-            $prop => {<H::tc|revOwnerDocument>},
-            $ref => $old_od,
-          }__;
-          my $new_od_list;
-          __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-            $r => $new_od_list,
-            $prop => {<H::tc|revOwnerDocument>},
-            $ref => $self,
-          }__;
           for my $n (@change_od) {
-            __CODE{mg|setNodeStemProp0Node||ManakaiDOM|all::
-              $prop => {<H::tc|ownerDocument>},
-              $ref => $n,
-              $given => $self,
-            }__;
-            my $nid = <Code::mg|getNodeID||ManakaiDOM|all:: $ref = $n>;
-            CORE::delete $old_od_list->{$$nid};
-            $new_od_list->{$$nid} = $nid;
+            $$n->{<H::tc|ownerDocument>} = $self;
+            Scalar::Util::weaken ($$n->{<H::tc|ownerDocument>});
           }
 
           for my $src (@change_od) {
-            my $src_ud;
-            __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-              $r => $src_ud,
-              $prop => {<H::t|userData>},
-              $ref => $src,
-            }__;
+            my $src_ud = $$src->{<H::t|userData>};
             for my $key (keys %{$src_ud or {}}) {
               my $dh = $src_ud->{$key}->[1];
               if ($dh) {
@@ -6280,7 +5910,7 @@ NodeTypeDef:
         nodes are adopted is undefined.  Called just after the adoption
         or after all nodes are adopted is also unspecified.
 
-        Is is invoked even if <A::Node.ownerDocument> is unchanged?
+        Is it invoked even if <A::Node.ownerDocument> is unchanged?
 
     @@Test:
       @@@QName: Node.adoptNode.1.test
@@ -6876,17 +6506,9 @@ NodeTypeDef:
         @@@@enDesc:
           If no base DOM URI is available.
       @@@PerlDef:
-        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-          $r => $r,
-          $prop => {<H::infoset|baseURI>},
-          $ref => $self,
-        }__;
+        $r = $$self->{<H::infoset|baseURI>};
         unless (defined $r) {
-          __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-            $r => $r,
-            $prop => {<H::c|documentURI>},
-            $ref => $self,
-          }__;
+          $r = $$self->{<H::c|documentURI>};
         }
     @@Set:
       @@@enDesc:
@@ -6900,11 +6522,7 @@ NodeTypeDef:
       @@@NodeReadOnlyError:
       @@@PerlDef:
         __CODE{tc|NodeReadOnlyError:: $node => $self}__;
-        __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
-          $given => $given,
-          $prop => {<H::infoset|baseURI>},
-          $ref => $self,
-        }__;
+        $$self->{<H::infoset|baseURI>} = $given;
 
   @LXAttr:
     @@Name: allDeclarationsProcessed
@@ -6936,20 +6554,12 @@ NodeTypeDef:
         true.
     @@Get:
       @@@PerlDef:
-        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-          $r => $r,
-          $prop => {<H::infoset|allDeclarationsProcessed>},
-          $ref => $self,
-        }__;
+        $r = $$self->{<H::infoset|allDeclarationsProcessed>};
     @@Set:
       @@@NodeReadOnlyError:
       @@@PerlDef:
         __CODE{tc|NodeReadOnlyError:: $node => $self}__;
-        __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
-          $given => $given,
-          $prop => {<H::infoset|allDeclarationsProcessed>},
-          $ref => $self,
-        }__;
+        $$self->{<H::infoset|allDeclarationsProcessed>} = $given;
     @@LXTest:
       @@@QName: Document.allDeclarationsProcessed.test
       @@@PerlDef:
@@ -7056,31 +6666,6 @@ NodeTypeDef:
     example, a <IF::DocumentFragment> node might have only one
     child node and that child node could be a <IF::Text? node.
 
-  @IntMethod:
-    @@Operator: mg|CreateNodeStemMethod
-    @@Param:
-      @@@Name: bag
-      @@@Type: HASH
-    @@Param:
-      @@@Name: obj
-      @@@Type: HASH
-    @@Param:
-      @@@Name: opt
-      @@@Type: HASH
-    @@Return:
-      @@@Type: HASH
-      @@@PerlDef:
-        $obj->{<H::infoset|children>} = [];
-        __CODE{mg|setOwnerProp||ManakaiDOM|all::
-          $bag => $bag,
-          $ownerref => {$opt->{<H::tc|ownerDocument>}},
-          $ownee1hprop => {<H::tc|revOwnerDocument>},
-          $ownee => {$obj},
-          $owner0prop => {<H::tc|ownerDocument>},
-        }__;
-        $r = $obj;
-  @mg:subnode1a: infoset|children
-  @mg:owner0: tc|ownerDocument
   @enImplNote:
     @@ddid: props
     @@@:
@@ -7102,9 +6687,8 @@ NodeTypeDef:
   @CODE:
     @@QName: tc|createDFForTest
     @@PerlDef:
-      my $__doc;
-      __CODE{tc|createEmptyDocumentForTest:: $doc => $__doc}__;
-      $df = $__doc-><M::Document.createDocumentFragment>;
+      __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+      $df = $doc-><M::Document.createDocumentFragment>;
 
   @CAttr:
     @@Name: nodeType
@@ -7118,7 +6702,8 @@ NodeTypeDef:
       @@@QName: DF.nodeType.test
       @@@PerlDef:
         my $df;
-        __CODE{tc|createDFForTest:: $df => $df}__;
+        my $doc;
+        __CODE{tc|createDFForTest:: $df => $df, $doc => $doc}__;
 
         $test->id ('nodeType');
         $test->assert_num_equals
@@ -7454,7 +7039,8 @@ NodeTypeDef:
     @@QName: DF.attributes.test
     @@PerlDef:
       my $text;
-      __CODE{tc|createDFForTest:: $df => $text}__;
+      my $doc;
+      __CODE{tc|createDFForTest:: $df => $text, $doc => $doc}__;
 
       $test->assert_null ($text-><AG::Node.attributes>);
 
@@ -7475,7 +7061,8 @@ NodeTypeDef:
       @@@QName: DF.nodeName.test
       @@@PerlDef:
         my $text;
-        __CODE{tc|createDFForTest:: $df => $text}__;
+        my $doc;
+        __CODE{tc|createDFForTest:: $df => $text, $doc => $doc}__;
 
         $test->assert_equals ($text-><AG::Node.nodeName>,
                               '#document-fragment');
@@ -10555,7 +10142,8 @@ NodeTypeDef:
       @@@QName: DF.getFeature.test
       @@@PerlDef:
         my $node;
-        __CODE{tc|createDFForTest:: $df => $node}__;
+        my $doc;
+        __CODE{tc|createDFForTest:: $df => $node, $doc => $doc}__;
 
         for (
           [Core => '1.0', <IFName::DocumentFragment||ManakaiDOM|ManakaiDOM1>],

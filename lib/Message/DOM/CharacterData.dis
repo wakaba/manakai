@@ -12,7 +12,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/12/03 05:40:32 $
+    $Date: 2006/12/29 14:45:40 $
 
   @Require:
     @@Module:
@@ -81,8 +81,6 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
   @MDOMX:
     http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
-  @mg:
-    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Grove/
   @null:
     http://suika.fam.cx/~wakaba/-temp/2003/09/27/null
   @dlp:
@@ -629,81 +627,12 @@ ClsDef:
       @@@enDesc:
         The newly created <IF::Text> node.
       @@@PerlDef:
-        my $bag = <Code::mg|getNodeBag||ManakaiDOM|all:: $ref = $self>;
-        my $stem;
-        __CODE{mg|createNodeStem||ManakaiDOM|all::
-          $bag => $bag,
-          $stem => $stem,
-          $class => {<ClassName::tcd|ManakaiDOMText>},
-          $opt => {{
-            <H::tc|ownerDocument> => $self,
-            <H::infoset|content> => \$data,
-          }},
-        }__;
-        __CODE{mg|createNodeRef||ManakaiDOM|all::
-          $bag => $bag,
-          $stem => $stem,
-          $ref => $r,
-          $opt => {{
-          }},
-        }__;
+        $r = bless \{
+          <H::tc|ownerDocument> => $self,
+          <H::infoset|content> => \$data,
+        }, <ClassName::tcd|ManakaiDOMText>;
+        Scalar::Util::weaken ($$r->{<H::tc|ownerDocument>});
 
-    @@Test:
-      @@@QName: Doc.createTextNode.mg.1.test
-      @@@PerlDef:
-        local $Message::Util::Grove::GCLatency = 0;
-
-        my $impl;
-        __CODE{tc|createImplForTest:: $impl => $impl}__;
-
-        my $bag = $impl->{<H::mg|nodeBag>};
-        my $id = $impl->{<H::mg|nodeIDReference>};
-
-        my $doc = $impl-><M::c|DOMImplementation.createDocument>;
-
-        my $el = $doc-><M::Document.createTextNode> ('textdata');
-        
-        $test->id ('interface');
-        $test->assert_isa ($el, <IFName::Text>);
-        
-        $test->id ('class');
-        $test->assert_isa ($el, <ClassName::tcd|ManakaiDOMText>);
-
-        my $doc_id = $doc->{<H::mg|nodeIDReference>};
-        my $el_id = $el->{<H::mg|nodeIDReference>};
-
-        undef $impl;
-
-        $test->id ('gc.impl.1');
-        $test->assert_not_null ($bag->{$$id});
-
-        $test->id ('gc.doc.1');
-        $test->assert_not_null ($bag->{$$doc_id});
-
-        $test->id ('gc.el.1');
-        $test->assert_not_null ($bag->{$$el_id});
-
-        undef $doc;
-
-        $test->id ('gc.impl.2');
-        $test->assert_not_null ($bag->{$$id});
-
-        $test->id ('gc.doc.2');
-        $test->assert_not_null ($bag->{$$doc_id});
-
-        $test->id ('gc.el.2');
-        $test->assert_not_null ($bag->{$$el_id});
-
-        undef $el;
-
-        $test->id ('gc.impl.3');
-        $test->assert_null ($bag->{$$id});
-
-        $test->id ('gc.doc.3');
-        $test->assert_null ($bag->{$$doc_id});
-
-        $test->id ('gc.el.3');
-        $test->assert_null ($bag->{$$el_id});
     @@Test:
       @@@QName: Document.createTextNode.1.test
       @@@PerlDef:
@@ -751,81 +680,11 @@ ClsDef:
       @@@enDesc:
         The newly created <IF::tcd|Comment> node.
       @@@PerlDef:
-        my $bag = <Code::mg|getNodeBag||ManakaiDOM|all:: $ref = $self>;
-        my $stem;
-        __CODE{mg|createNodeStem||ManakaiDOM|all::
-          $bag => $bag,
-          $stem => $stem,
-          $class => {<ClassName::tcd|ManakaiDOMComment>},
-          $opt => {{
-            <H::tc|ownerDocument> => $self,
-            <H::infoset|content> => \$data,
-          }},
-        }__;
-        __CODE{mg|createNodeRef||ManakaiDOM|all::
-          $bag => $bag,
-          $stem => $stem,
-          $ref => $r,
-          $opt => {{
-          }},
-        }__;
-
-    @@Test:
-      @@@QName: Document.createComment.mg.1.test
-      @@@PerlDef:
-        local $Message::Util::Grove::GCLatency = 0;
-
-        my $impl;
-        __CODE{tc|createImplForTest:: $impl => $impl}__;
-
-        my $bag = $impl->{<H::mg|nodeBag>};
-        my $id = $impl->{<H::mg|nodeIDReference>};
-
-        my $doc = $impl-><M::c|DOMImplementation.createDocument>;
-
-        my $el = $doc-><M::Document.createComment> ('textdata');
-        
-        $test->id ('interface');
-        $test->assert_isa ($el, <IFName::tcd|Comment>);
-        
-        $test->id ('class');
-        $test->assert_isa ($el, <ClassName::tcd|ManakaiDOMComment>);
-
-        my $doc_id = $doc->{<H::mg|nodeIDReference>};
-        my $el_id = $el->{<H::mg|nodeIDReference>};
-
-        undef $impl;
-
-        $test->id ('gc.impl.1');
-        $test->assert_not_null ($bag->{$$id});
-
-        $test->id ('gc.doc.1');
-        $test->assert_not_null ($bag->{$$doc_id});
-
-        $test->id ('gc.el.1');
-        $test->assert_not_null ($bag->{$$el_id});
-
-        undef $doc;
-
-        $test->id ('gc.impl.2');
-        $test->assert_not_null ($bag->{$$id});
-
-        $test->id ('gc.doc.2');
-        $test->assert_not_null ($bag->{$$doc_id});
-
-        $test->id ('gc.el.2');
-        $test->assert_not_null ($bag->{$$el_id});
-
-        undef $el;
-
-        $test->id ('gc.impl.3');
-        $test->assert_null ($bag->{$$id});
-
-        $test->id ('gc.doc.3');
-        $test->assert_null ($bag->{$$doc_id});
-
-        $test->id ('gc.el.3');
-        $test->assert_null ($bag->{$$el_id});
+        $r = bless \{
+          <H::tc|ownerDocument> => $self,
+          <H::infoset|content> => \$data,
+        }, <ClassName::tcd|ManakaiDOMComment>;
+        Scalar::Util::weaken ($$r->{<H::tc|ownerDocument>});
 ##DocumentCharacterData
 
 ElementTypeBinding:
@@ -902,32 +761,6 @@ IFCls1Def:
       }
 
       It <kwd:MAY>, but need not, override other attributes and methods.
-
-  @IntMethod:
-    @@Operator: mg|CreateNodeStemMethod
-    @@Param:
-      @@@Name: bag
-      @@@Type: HASH
-    @@Param:
-      @@@Name: obj
-      @@@Type: HASH
-    @@Param:
-      @@@Name: opt
-      @@@Type: HASH
-    @@Return:
-      @@@Type: HASH
-      @@@PerlDef:
-        $obj->{<H::infoset|content>} = $opt->{<H::infoset|content>};
-        __CODE{mg|setOwnerProp||ManakaiDOM|all::
-          $bag => $bag,
-          $ownerref => {$opt->{<H::tc|ownerDocument>}},
-          $ownee1hprop => {<H::tc|revOwnerDocument>},
-          $ownee => {$obj},
-          $owner0prop => {<H::tc|ownerDocument>},
-        }__;
-        $r = $obj;
-  @mg:owner0: tc|ownerDocument
-  @mg:origin0: infoset|parent
 
   @CAttr:
     @@Name: childNodes
@@ -1055,12 +888,7 @@ IFCls1Def:
             __UNDEEP{__EXCEPTION{MDOMX|NOMOD_THIS::
             }__}__;
           }
-          my $v;
-          __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-            $r => $v,
-            $prop => {<H::infoset|content>},
-            $ref => $self,
-          }__;
+          my $v = $$self->{<H::infoset|content>};
           $$v .= ref $string eq 'SCALAR' ? $$string : $string;
           $r = $self;
         }__;
@@ -1145,12 +973,7 @@ IFCls1Def:
       @@@Type: unsignedLong
       @@@dx:raises: c|StringIndexOutOfBoundsException
       @@@PerlDef:
-        my $v;
-        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-          $r => $v,
-          $prop => {<H::infoset|content>},
-          $ref => $self,
-        }__;
+        my $v = $$self->{<H::infoset|content>};
 
         if (not defined $offset32 or $offset32 < 0 or
             CORE::length ($$v) < $offset32) {
@@ -1172,7 +995,8 @@ IFCls1Def:
       @@@QName: CharacterData.findOffset16.test
       @@@PerlDef:
         my $text;
-        __CODE{tc|createTextForTest:: $text => $text}__;
+        my $doc;
+        __CODE{tc|createTextForTest:: $text => $text, $doc => $doc}__;
 
         my @data = (
           '', # 0
@@ -1241,12 +1065,7 @@ IFCls1Def:
                 being changed.
         }
       @@@PerlDef:
-        my $v;
-        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-          $r => $v,
-          $prop => {<H::infoset|content>},
-          $ref => $self,
-        }__;
+        my $v = $$self->{<H::infoset|content>};
 
         if (not defined $offset16 or $offset16 < 0) {
           __EXCEPTION{c|StringIndexOutOfBoundsException::
@@ -1278,7 +1097,8 @@ IFCls1Def:
       @@@QName: CharacterData.findOffset32.test
       @@@PerlDef:
         my $text;
-        __CODE{tc|createTextForTest:: $text => $text}__;
+        my $doc;
+        __CODE{tc|createTextForTest:: $text => $text, $doc => $doc}__;
 
         my @data = (
           '', # 0
@@ -1359,23 +1179,12 @@ IFCls1Def:
           When it would return more characters than fit in a
           <TYPE::DOMString> variable on the implementation platform.
       @@@PerlDef:
-        my $v;
-        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-          $r => $v,
-          $prop => {<H::infoset|content>},
-          $ref => $self,
-        }__;
-        $r = $$v;
+        $r = ${$$self->{<H::infoset|content>}};
     @@Set:
       @@@NodeReadOnlyError:
       @@@PerlDef:
         __CODE{tc|NodeReadOnlyError:: $node => $self}__;
-        my $v;
-        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-          $r => $v,
-          $prop => {<H::infoset|content>},
-          $ref => $self,
-        }__;
+        my $v = $$self->{<H::infoset|content>};
         $$v = defined $given ? $given : '';
                 ## NOTE: Setting NULL is supported for
                 ##       compatibility with |textContent|.
@@ -1515,12 +1324,7 @@ IFCls1Def:
     @@Get:
       @@@Type: unsignedLong
       @@@PerlDef:
-        my $v;
-        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-          $r => $v,
-          $prop => {<H::infoset|content>},
-          $ref => $self,
-        }__;
+        my $v = $$self->{<H::infoset|content>};
         $r = CORE::length $$v;
         $r++ while $$v =~ /[\x{10000}-\x{10FFFF}]/g;
 
@@ -1528,7 +1332,8 @@ IFCls1Def:
       @@@QName: CharacterData.length.test
       @@@PerlDef:
         my $text;
-        __CODE{tc|createTextForTest:: $text => $text}__;
+        my $doc;
+        __CODE{tc|createTextForTest:: $text => $text, $doc => $doc}__;
 
         for my $testdata (
           # id, data, length
@@ -1625,7 +1430,8 @@ IFCls1Def:
       @@@QName: CharacterData.substringData.1.test
       @@@PerlDef:
         my $text;
-        __CODE{tc|createTextForTest:: $text => $text}__;
+        my $doc;
+        __CODE{tc|createTextForTest:: $text => $text, $doc => $doc}__;
 
         $test->id (1);
         $test->assert_equals
@@ -1638,7 +1444,8 @@ IFCls1Def:
       @@@QName: CharacterData.substringData.2.test
       @@@PerlDef:
         my $text;
-        __CODE{tc|createTextForTest:: $text => $text}__;
+        my $doc;
+        __CODE{tc|createTextForTest:: $text => $text, $doc => $doc}__;
 
         $text-><AS::CharacterData.data> ('abcdefg');
 
@@ -1682,7 +1489,8 @@ IFCls1Def:
       @@@QName: CharacterData.appendData.test
       @@@PerlDef:
         my $text;
-        __CODE{tc|createTextForTest:: $text => $text}__;
+        my $doc;
+        __CODE{tc|createTextForTest:: $text => $text, $doc => $doc}__;
 
         $test->id ('empty.to.empty');
         $text-><M::CharacterData.appendData> ('');
@@ -1741,7 +1549,8 @@ IFCls1Def:
       @@@QName: CharacterData.insertData.1.test
       @@@PerlDef:
         my $text;
-        __CODE{tc|createTextForTest:: $text => $text}__;
+        my $doc;
+        __CODE{tc|createTextForTest:: $text => $text, $doc => $doc}__;
 
         $test->id (1);
         $test->assert_exception (code => sub {
@@ -1771,7 +1580,8 @@ IFCls1Def:
       @@@QName: CharacterData.insertData.2.test
       @@@PerlDef:
         my $text;
-        __CODE{tc|createTextForTest:: $text => $text}__;
+        my $doc;
+        __CODE{tc|createTextForTest:: $text => $text, $doc => $doc}__;
 
         $test->id (1);
         $text-><M::CharacterData.insertData> (0, "\x{10000}");
@@ -1861,7 +1671,8 @@ IFCls1Def:
       @@@QName: CharacterData.deleteData.empty.test
       @@@PerlDef:
         my $text;
-        __CODE{tc|createTextForTest:: $text => $text}__;
+        my $doc;
+        __CODE{tc|createTextForTest:: $text => $text, $doc => $doc}__;
 
         $test->id ('1');
         $text-><M::CharacterData.deleteData> (0, 0);
@@ -1889,7 +1700,8 @@ IFCls1Def:
       @@@QName: CharacterData.deleteData.1.test
       @@@PerlDef:
         my $text;
-        __CODE{tc|createTextForTest:: $text => $text}__;
+        my $doc;
+        __CODE{tc|createTextForTest:: $text => $text, $doc => $doc}__;
 
         $text-><M::CharacterData.appendData> ('abcdefg');
 
@@ -1927,7 +1739,8 @@ IFCls1Def:
       @@@QName: CharacterData.deleteData.2.test
       @@@PerlDef:
         my $text;
-        __CODE{tc|createTextForTest:: $text => $text}__;
+        my $doc;
+        __CODE{tc|createTextForTest:: $text => $text, $doc => $doc}__;
 
         $text-><M::CharacterData.appendData> ("ab\x{10000}cdefg");
 
@@ -1938,7 +1751,8 @@ IFCls1Def:
       @@@QName: CharacterData.deleteData.3.test
       @@@PerlDef:
         my $text;
-        __CODE{tc|createTextForTest:: $text => $text}__;
+        my $doc;
+        __CODE{tc|createTextForTest:: $text => $text, $doc => $doc}__;
 
         $text-><M::CharacterData.appendData> ("ab\x{10000}cdefg");
 
@@ -2003,7 +1817,8 @@ IFCls1Def:
       @@@QName: CharacterData.replaceData.test
       @@@PerlDef:
         my $text;
-        __CODE{tc|createTextForTest:: $text => $text}__;
+        my $doc;
+        __CODE{tc|createTextForTest:: $text => $text, $doc => $doc}__;
 
         $test->id (1);
         $text-><M::CharacterData.appendData> ('abcdefg');
@@ -2090,9 +1905,8 @@ IFCls1Def:
   @CODE:
     @@QName: tc|createTextForTest
     @@PerlDef:
-      my $__doc;
-      __CODE{tc|createEmptyDocumentForTest:: $doc => $__doc}__;
-      $text = $__doc-><M::Document.createTextNode> ('');
+      __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+      $text = $doc-><M::Document.createTextNode> ('');
 
   @CAttr:
     @@Name: nodeType
@@ -2106,7 +1920,8 @@ IFCls1Def:
       @@@QName: Text.nodeType.test
       @@@PerlDef:
         my $text;
-        __CODE{tc|createTextForTest:: $text => $text}__;
+        my $doc;
+        __CODE{tc|createTextForTest:: $text => $text, $doc => $doc}__;
 
         $test->id ('nodeType');
         $test->assert_num_equals
@@ -2117,7 +1932,8 @@ IFCls1Def:
     @@QName: Text.parentNode.1.test
     @@PerlDef:
       my $text;
-      __CODE{tc|createTextForTest:: $text => $text}__;
+      my $doc;
+      __CODE{tc|createTextForTest:: $text => $text, $doc => $doc}__;
 
       $test->assert_null ($text-><AG::Node.parentNode>);
 
@@ -2162,7 +1978,8 @@ IFCls1Def:
     @@QName: Text.readOnly.test
     @@PerlDef:
       my $text;
-      __CODE{tc|createTextForTest:: $text => $text}__;
+      my $doc;
+      __CODE{tc|createTextForTest:: $text => $text, $doc => $doc}__;
 
       $test->id ('default');
       $test->assert_false ($text-><AG::Node.manakaiReadOnly>);
@@ -2185,7 +2002,8 @@ IFCls1Def:
       @@@QName: Text.nodeName.test
       @@@PerlDef:
         my $text;
-        __CODE{tc|createTextForTest:: $text => $text}__;
+        my $doc;
+        __CODE{tc|createTextForTest:: $text => $text, $doc => $doc}__;
 
         $test->assert_equals ($text-><AG::Node.nodeName>, '#text');
 
@@ -2266,7 +2084,8 @@ IFCls1Def:
       @@@QName: Text.getFeature.test
       @@@PerlDef:
         my $node;
-        __CODE{tc|createTextForTest:: $text => $node}__;
+        my $doc;
+        __CODE{tc|createTextForTest:: $text => $node, $doc => $doc}__;
 
         for (
           [Core => '1.0', <IFName::Text||ManakaiDOM|ManakaiDOM1>],
@@ -2337,11 +2156,7 @@ IFCls1Def:
     @@Type: boolean
     @@Get:
       @@@PerlDef:
-        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-          $r => $r,
-          $prop => {<H::infoset|elementContentWhitespace>},
-          $ref => $self,
-        }__;
+        $r = $$self->{<H::infoset|elementContentWhitespace>};
     @@LXSet:
       @@@enImplNote:
         {TODO::
@@ -2350,17 +2165,14 @@ IFCls1Def:
       @@@NodeReadOnlyError:
       @@@PerlDef:
         __CODE{tc|NodeReadOnlyError:: $node => $self}__;
-        __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
-          $given => $given,
-          $prop => {<H::infoset|elementContentWhitespace>},
-          $ref => $self,
-        }__;
+        $$self->{<H::infoset|elementContentWhitespace>} = $given;
 
     @@Test:
       @@@QName: Text.isElementContentWhitespace.test
       @@@PerlDef:
         my $node;
-        __CODE{tc|createTextForTest:: $text => $node}__;
+        my $doc;
+        __CODE{tc|createTextForTest:: $text => $node, $doc => $doc}__;
         $node-><AS::Node.nodeValue> (' ');
 
         $test->id ('default');
@@ -2435,9 +2247,8 @@ IFCls1Def:
       @@@QName: Text.wholeText.1.test
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
-
-        my $doc = $el-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         my $text1 = $doc-><M::Document.createTextNode> ('text1');
 
@@ -2448,9 +2259,8 @@ IFCls1Def:
       @@@QName: Text.wholeText.2.test
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
-
-        my $doc = $el-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         my $text1 = $doc-><M::Document.createTextNode> ('text1');
         $el-><M::Node.appendChild> ($text1);
@@ -2465,9 +2275,8 @@ IFCls1Def:
       @@@QName: Text.wholeText.3.test
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
-
-        my $doc = $el-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         my $text1 = $doc-><M::Document.createTextNode> ('text1');
         $el-><M::Node.appendChild> ($text1);
@@ -2486,9 +2295,8 @@ IFCls1Def:
       @@@QName: Text.wholeText.4.test
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
-
-        my $doc = $el-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         my $text1 = $doc-><M::Document.createTextNode> ('text1');
         $el-><M::Node.appendChild> ($text1);
@@ -2509,9 +2317,8 @@ IFCls1Def:
       @@@QName: Text.wholeText.5.test
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
-
-        my $doc = $el-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         my $text1 = $doc-><M::Document.createTextNode> ('text1');
         $el-><M::Node.appendChild> ($text1);
@@ -2541,9 +2348,8 @@ IFCls1Def:
       @@@QName: Text.wholeText.6.test
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
-
-        my $doc = $el-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         my $text1 = $doc-><M::Document.createTextNode> ('text1');
         $el-><M::Node.appendChild> ($text1);
@@ -2722,7 +2528,8 @@ IFCls1Def:
       @@@QName: Text.splitText.1.test
       @@@PerlDef:
         my $node;
-        __CODE{tc|createTextForTest:: $text => $node}__;
+        my $doc;
+        __CODE{tc|createTextForTest:: $text => $node, $doc => $doc}__;
         $node-><AS::Node.nodeValue> ('abcdefg');
 
         my $return = $node-><M::Text.splitText> (3);
@@ -2747,7 +2554,8 @@ IFCls1Def:
       @@@QName: Text.splitText.2.test
       @@@PerlDef:
         my $node;
-        __CODE{tc|createTextForTest:: $text => $node}__;
+        my $doc;
+        __CODE{tc|createTextForTest:: $text => $node, $doc => $doc}__;
         $node-><AS::Node.nodeValue> ('abcdefg');
 
         my $el = $node-><AG::Node.ownerDocument>
@@ -2776,7 +2584,8 @@ IFCls1Def:
       @@@QName: CDATASection.splitText.1.test
       @@@PerlDef:
         my $node;
-        __CODE{tx|createCDATASectionForTest:: $text => $node}__;
+        my $doc;
+        __CODE{tx|createCDATASectionForTest:: $text => $node, $doc => $doc}__;
         $node-><AS::Node.nodeValue> ('abcdefg');
 
         my $return = $node-><M::Text.splitText> (3);
@@ -2801,7 +2610,8 @@ IFCls1Def:
       @@@QName: CDATASection.splitText.2.test
       @@@PerlDef:
         my $node;
-        __CODE{tx|createCDATASectionForTest:: $text => $node}__;
+        my $doc;
+        __CODE{tx|createCDATASectionForTest:: $text => $node, $doc => $doc}__;
         $node-><AS::Node.nodeValue> ('abcdefg');
 
         my $el = $node-><AG::Node.ownerDocument>
@@ -2868,9 +2678,8 @@ IFCls1Def:
   @CODE:
     @@QName: tc|createCommentForTest
     @@PerlDef:
-      my $__doc;
-      __CODE{tc|createEmptyDocumentForTest:: $doc => $__doc}__;
-      $text = $__doc-><M::Document.createComment> ('text');
+      __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+      $text = $doc-><M::Document.createComment> ('text');
 
   @CAttr:
     @@Name: nodeType
@@ -2884,7 +2693,8 @@ IFCls1Def:
       @@@QName: Comment.nodeType.test
       @@@PerlDef:
         my $text;
-        __CODE{tc|createCommentForTest:: $text => $text}__;
+        my $doc;
+        __CODE{tc|createCommentForTest:: $text => $text, $doc => $doc}__;
 
         $test->id ('nodeType');
         $test->assert_num_equals
@@ -2895,7 +2705,8 @@ IFCls1Def:
     @@QName: Comment.parentNode.1.test
     @@PerlDef:
       my $text;
-      __CODE{tc|createCommentForTest:: $text => $text}__;
+      my $doc;
+      __CODE{tc|createCommentForTest:: $text => $text, $doc => $doc}__;
 
       $test->assert_null ($text-><AG::Node.parentNode>);
 
@@ -2940,7 +2751,8 @@ IFCls1Def:
     @@QName: Comment.readOnly.test
     @@PerlDef:
       my $text;
-      __CODE{tc|createCommentForTest:: $text => $text}__;
+      my $doc;
+      __CODE{tc|createCommentForTest:: $text => $text, $doc => $doc}__;
 
       $test->id ('default');
       $test->assert_false ($text-><AG::Node.manakaiReadOnly>);
@@ -2963,7 +2775,8 @@ IFCls1Def:
       @@@QName: Comment.nodeName.test
       @@@PerlDef:
         my $text;
-        __CODE{tc|createCommentForTest:: $text => $text}__;
+        my $doc;
+        __CODE{tc|createCommentForTest:: $text => $text, $doc => $doc}__;
 
         $test->assert_equals ($text-><AG::Node.nodeName>, '#comment');
 
@@ -3044,7 +2857,8 @@ IFCls1Def:
       @@@QName: Comment.getFeature.test
       @@@PerlDef:
         my $node;
-        __CODE{tc|createCommentForTest:: $text => $node}__;
+        my $doc;
+        __CODE{tc|createCommentForTest:: $text => $node, $doc => $doc}__;
 
         for (
           [Core => '1.0', <IFName::Comment||ManakaiDOM|ManakaiDOM1>],

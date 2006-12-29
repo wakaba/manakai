@@ -13,7 +13,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/12/03 05:40:33 $
+    $Date: 2006/12/29 14:45:41 $
 
   @Require:
     @@Module:
@@ -76,22 +76,14 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/license#
   @ManakaiDOM:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
-  @ManakaiDOMCore:
-    http://suika.fam.cx/~wakaba/archive/2004/mdom-core#
   @MDOM:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
   @MDOMX:
     http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
-  @mg:
-    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Grove/
   @null:
     http://suika.fam.cx/~wakaba/-temp/2003/09/27/null
   @rdf:
     http://www.w3.org/1999/02/22-rdf-syntax-ns#
-  @rdfs:
-    http://www.w3.org/2000/01/rdf-schema#
-  @sw010:
-    urn:x-suika-fam-cx:markup:suikawiki:0:10:
   @t:
     http://suika.fam.cx/~wakaba/archive/2004/dom/tree#
   @tc:
@@ -1106,25 +1098,55 @@ ClsDef:
           }
         }
 
-        my $bag = <Code::mg|getNodeBag||ManakaiDOM|all:: $ref = $self>;
-        my $stem;
-        __CODE{mg|createNodeStem||ManakaiDOM|all::
-          $bag => $bag,
-          $stem => $stem,
-          $class => {<ClassName::te|ManakaiDOMElement>},
-          $opt => {{
-            <H::tc|ownerDocument> => $self,
-            <H::infoset|namespaceName> => \$namespaceURI,
-            <H::infoset|prefix> => \$prefix,
-            <H::infoset|localName> => \$lname,
-          }},
+        ## -- Choose the most apppropriate class for the element
+        my $class = <ClassName::ManakaiDOMElement>;
+        CLS: {
+          my $nsuri = defined $namespaceURI ? $namespaceURI : '';
+
+          ## Use cases:
+          ##   - |html5:a| element type
+          ##   - |html5:*| element types
+          A: for my $nm (
+            [$nsuri, $lname],
+            [$nsuri, '*'],
+          ) {
+            unless ($Message::DOM::Element::ElementClass
+                ->{$nm->[0]}->{$nm->[1]}) {
+              if ($Message::Util::AutoLoad::Registry::ElementType
+                  ->{$nm->[0]}->{$nm->[1]}) {
+                eval qq{require
+                    $Message::Util::AutoLoad::Registry::ElementType->{
+                    $nm->[0]}->{$nm->[1]}->{module}};
+                die $@ if $@;
+              }
+            }
+
+            if ($Message::DOM::Element::ElementClass
+                ->{$nm->[0]}->{$nm->[1]}) {
+              $class = $Message::DOM::Element::ElementClass
+                  ->{$nm->[0]}->{$nm->[1]};
+              last A;
+            }
+          } # A
+        } # CLS
+
+        $r = bless \{
+          <H::tc|ownerDocument> => $self,
+          <H::infoset|children> => [],
+          <H::infoset|attributes> => {},
+        }, $class;
+        Scalar::Util::weaken ($$r->{<H::tc|ownerDocument>});
+        __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
+          $result => {$$r->{<H::infoset|namespaceName>}},
+          $given => $namespaceURI,
         }__;
-        __CODE{mg|createNodeRef||ManakaiDOM|all::
-          $bag => $bag,
-          $stem => $stem,
-          $ref => $r,
-          $opt => {{
-          }},
+        __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
+          $result => {$$r->{<H::infoset|prefix>}},
+          $given => $prefix,
+        }__;
+        __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
+          $result => {$$r->{<H::infoset|localName>}},
+          $given => $lname,
         }__;
 
         ## Default attributes
@@ -1134,342 +1156,6 @@ ClsDef:
           $element_type => $qualifiedName,
         }__;
 
-    @@Test:
-      @@@QName: Doc.createElNS.mg.1.test
-      @@@PerlDef:
-        local $Message::Util::Grove::GCLatency = 0;
-
-        my $impl;
-        __CODE{tc|createImplForTest:: $impl => $impl}__;
-
-        my $bag = $impl->{<H::mg|nodeBag>};
-        my $id = $impl->{<H::mg|nodeIDReference>};
-
-        my $doc = $impl-><M::c|DOMImplementation.createDocument>;
-
-        my $el = $doc-><M::Document.createElementNS> (null, 'e');
-        
-        $test->id ('interface');
-        $test->assert_isa ($el, <IFName::Element>);
-        
-        $test->id ('class');
-        $test->assert_isa ($el, <ClassName::te|ManakaiDOMElement>);
-
-        my $doc_id = $doc->{<H::mg|nodeIDReference>};
-        my $el_id = $el->{<H::mg|nodeIDReference>};
-
-        undef $impl;
-
-        $test->id ('gc.impl.1');
-        $test->assert_not_null ($bag->{$$id});
-
-        $test->id ('gc.doc.1');
-        $test->assert_not_null ($bag->{$$doc_id});
-
-        $test->id ('gc.el.1');
-        $test->assert_not_null ($bag->{$$el_id});
-
-        undef $doc;
-
-        $test->id ('gc.impl.2');
-        $test->assert_not_null ($bag->{$$id});
-
-        $test->id ('gc.doc.2');
-        $test->assert_not_null ($bag->{$$doc_id});
-
-        $test->id ('gc.el.2');
-        $test->assert_not_null ($bag->{$$el_id});
-
-        undef $el;
-
-        $test->id ('gc.impl.3');
-        $test->assert_null ($bag->{$$id});
-
-        $test->id ('gc.doc.3');
-        $test->assert_null ($bag->{$$doc_id});
-
-        $test->id ('gc.el.3');
-        $test->assert_null ($bag->{$$el_id});
-    @@Test:
-      @@@QName: Doc.createElNS.mg.2.test
-      @@@PerlDef:
-        local $Message::Util::Grove::GCLatency = 0;
-
-        my $impl;
-        __CODE{tc|createImplForTest:: $impl => $impl}__;
-
-        my $bag = $impl->{<H::mg|nodeBag>};
-        my $id = $impl->{<H::mg|nodeIDReference>};
-
-        my $doc = $impl-><M::c|DOMImplementation.createDocument>;
-
-        my $el = $doc-><M::Document.createElementNS> (null, 'e');
-        
-        $test->id ('interface');
-        $test->assert_isa ($el, <IFName::Element>);
-        
-        $test->id ('class');
-        $test->assert_isa ($el, <ClassName::te|ManakaiDOMElement>);
-
-        my $doc_id = $doc->{<H::mg|nodeIDReference>};
-        my $el_id = $el->{<H::mg|nodeIDReference>};
-
-        undef $impl;
-
-        $test->id ('gc.impl.1');
-        $test->assert_not_null ($bag->{$$id});
-
-        $test->id ('gc.doc.1');
-        $test->assert_not_null ($bag->{$$doc_id});
-
-        $test->id ('gc.el.1');
-        $test->assert_not_null ($bag->{$$el_id});
-
-        undef $el;
-
-        $test->id ('gc.impl.2');
-        $test->assert_not_null ($bag->{$$id});
-
-        $test->id ('gc.doc.2');
-        $test->assert_not_null ($bag->{$$doc_id});
-
-        $test->id ('gc.el.2');
-        $test->assert_null ($bag->{$$el_id});
-
-        undef $doc;
-
-        $test->id ('gc.impl.3');
-        $test->assert_null ($bag->{$$id});
-
-        $test->id ('gc.doc.3');
-        $test->assert_null ($bag->{$$doc_id});
-
-        $test->id ('gc.el.3');
-        $test->assert_null ($bag->{$$el_id});
-    @@Test:
-      @@@QName: Doc.createElNS.mg.3.test
-      @@@PerlDef:
-        local $Message::Util::Grove::GCLatency = 0;
-
-        my $impl;
-        __CODE{tc|createImplForTest:: $impl => $impl}__;
-
-        my $bag = $impl->{<H::mg|nodeBag>};
-        my $id = $impl->{<H::mg|nodeIDReference>};
-
-        my $doc = $impl-><M::c|DOMImplementation.createDocument>;
-
-        my $el = $doc-><M::Document.createElementNS> (null, 'e');
-        
-        $test->id ('interface');
-        $test->assert_isa ($el, <IFName::Element>);
-        
-        $test->id ('class');
-        $test->assert_isa ($el, <ClassName::te|ManakaiDOMElement>);
-
-        my $doc_id = $doc->{<H::mg|nodeIDReference>};
-        my $el_id = $el->{<H::mg|nodeIDReference>};
-
-        undef $doc;
-
-        $test->id ('gc.impl.1');
-        $test->assert_not_null ($bag->{$$id});
-
-        $test->id ('gc.doc.1');
-        $test->assert_not_null ($bag->{$$doc_id});
-
-        $test->id ('gc.el.1');
-        $test->assert_not_null ($bag->{$$el_id});
-
-        undef $impl;
-
-        $test->id ('gc.impl.2');
-        $test->assert_not_null ($bag->{$$id});
-
-        $test->id ('gc.doc.2');
-        $test->assert_not_null ($bag->{$$doc_id});
-
-        $test->id ('gc.el.2');
-        $test->assert_not_null ($bag->{$$el_id});
-
-        undef $el;
-
-        $test->id ('gc.impl.3');
-        $test->assert_null ($bag->{$$id});
-
-        $test->id ('gc.doc.3');
-        $test->assert_null ($bag->{$$doc_id});
-
-        $test->id ('gc.el.3');
-        $test->assert_null ($bag->{$$el_id});
-    @@Test:
-      @@@QName: Doc.createElNS.mg.4.test
-      @@@PerlDef:
-        local $Message::Util::Grove::GCLatency = 0;
-
-        my $impl;
-        __CODE{tc|createImplForTest:: $impl => $impl}__;
-
-        my $bag = $impl->{<H::mg|nodeBag>};
-        my $id = $impl->{<H::mg|nodeIDReference>};
-
-        my $doc = $impl-><M::c|DOMImplementation.createDocument>;
-
-        my $el = $doc-><M::Document.createElementNS> (null, 'e');
-        
-        $test->id ('interface');
-        $test->assert_isa ($el, <IFName::Element>);
-        
-        $test->id ('class');
-        $test->assert_isa ($el, <ClassName::te|ManakaiDOMElement>);
-
-        my $doc_id = $doc->{<H::mg|nodeIDReference>};
-        my $el_id = $el->{<H::mg|nodeIDReference>};
-
-        undef $doc;
-
-        $test->id ('gc.impl.1');
-        $test->assert_not_null ($bag->{$$id});
-
-        $test->id ('gc.doc.1');
-        $test->assert_not_null ($bag->{$$doc_id});
-
-        $test->id ('gc.el.1');
-        $test->assert_not_null ($bag->{$$el_id});
-
-        undef $el;
-
-        $test->id ('gc.impl.2');
-        $test->assert_not_null ($bag->{$$id});
-
-        $test->id ('gc.doc.2');
-        $test->assert_null ($bag->{$$doc_id});
-
-        $test->id ('gc.el.2');
-        $test->assert_null ($bag->{$$el_id});
-
-        undef $impl;
-
-        $test->id ('gc.impl.3');
-        $test->assert_null ($bag->{$$id});
-
-        $test->id ('gc.doc.3');
-        $test->assert_null ($bag->{$$doc_id});
-
-        $test->id ('gc.el.3');
-        $test->assert_null ($bag->{$$el_id});
-    @@Test:
-      @@@QName: Doc.createElNS.mg.5.test
-      @@@PerlDef:
-        local $Message::Util::Grove::GCLatency = 0;
-
-        my $impl;
-        __CODE{tc|createImplForTest:: $impl => $impl}__;
-
-        my $bag = $impl->{<H::mg|nodeBag>};
-        my $id = $impl->{<H::mg|nodeIDReference>};
-
-        my $doc = $impl-><M::c|DOMImplementation.createDocument>;
-
-        my $el = $doc-><M::Document.createElementNS> (null, 'e');
-        
-        $test->id ('interface');
-        $test->assert_isa ($el, <IFName::Element>);
-        
-        $test->id ('class');
-        $test->assert_isa ($el, <ClassName::te|ManakaiDOMElement>);
-
-        my $doc_id = $doc->{<H::mg|nodeIDReference>};
-        my $el_id = $el->{<H::mg|nodeIDReference>};
-
-        undef $el;
-
-        $test->id ('gc.impl.1');
-        $test->assert_not_null ($bag->{$$id});
-
-        $test->id ('gc.doc.1');
-        $test->assert_not_null ($bag->{$$doc_id});
-
-        $test->id ('gc.el.1');
-        $test->assert_null ($bag->{$$el_id});
-
-        undef $impl;
-
-        $test->id ('gc.impl.2');
-        $test->assert_not_null ($bag->{$$id});
-
-        $test->id ('gc.doc.2');
-        $test->assert_not_null ($bag->{$$doc_id});
-
-        $test->id ('gc.el.2');
-        $test->assert_null ($bag->{$$el_id});
-
-        undef $doc;
-
-        $test->id ('gc.impl.3');
-        $test->assert_null ($bag->{$$id});
-
-        $test->id ('gc.doc.3');
-        $test->assert_null ($bag->{$$doc_id});
-
-        $test->id ('gc.el.3');
-        $test->assert_null ($bag->{$$el_id});
-    @@Test:
-      @@@QName: Doc.createElNS.mg.6.test
-      @@@PerlDef:
-        local $Message::Util::Grove::GCLatency = 0;
-
-        my $impl;
-        __CODE{tc|createImplForTest:: $impl => $impl}__;
-
-        my $bag = $impl->{<H::mg|nodeBag>};
-        my $id = $impl->{<H::mg|nodeIDReference>};
-
-        my $doc = $impl-><M::c|DOMImplementation.createDocument>;
-
-        my $el = $doc-><M::Document.createElementNS> (null, 'e');
-        
-        $test->id ('interface');
-        $test->assert_isa ($el, <IFName::Element>);
-        
-        $test->id ('class');
-        $test->assert_isa ($el, <ClassName::te|ManakaiDOMElement>);
-
-        my $doc_id = $doc->{<H::mg|nodeIDReference>};
-        my $el_id = $el->{<H::mg|nodeIDReference>};
-
-        undef $el;
-
-        $test->id ('gc.impl.1');
-        $test->assert_not_null ($bag->{$$id});
-
-        $test->id ('gc.doc.1');
-        $test->assert_not_null ($bag->{$$doc_id});
-
-        $test->id ('gc.el.1');
-        $test->assert_null ($bag->{$$el_id});
-
-        undef $doc;
-
-        $test->id ('gc.impl.2');
-        $test->assert_not_null ($bag->{$$id});
-
-        $test->id ('gc.doc.2');
-        $test->assert_null ($bag->{$$doc_id});
-
-        $test->id ('gc.el.2');
-        $test->assert_null ($bag->{$$el_id});
-
-        undef $impl;
-
-        $test->id ('gc.impl.3');
-        $test->assert_null ($bag->{$$id});
-
-        $test->id ('gc.doc.3');
-        $test->assert_null ($bag->{$$doc_id});
-
-        $test->id ('gc.el.3');
-        $test->assert_null ($bag->{$$el_id});
     @@Test:
       @@@QName: Document.createElementNS.1.test
       @@@PerlDef:
@@ -2102,27 +1788,25 @@ ClsDef:
           }__;
         }
 
-        my $bag = <Code::mg|getNodeBag||ManakaiDOM|all:: $ref = $self>;
-        my $stem;
-        __CODE{mg|createNodeStem||ManakaiDOM|all::
-          $bag => $bag,
-          $stem => $stem,
-          $class => {<ClassName::te|ManakaiDOMAttr>},
-          $opt => {{
-            <H::tc|ownerDocument> => $self,
-            <H::infoset|namespaceName> => \$namespaceURI,
-            <H::infoset|prefix> => \$prefix,
-            <H::infoset|localName> => \$lname,
-            <H::infoset|specified> => true,
-          }},
+        $r = bless \{
+          <H::tc|ownerDocument> => $self,
+          <H::infoset|children> => [],
+          <H::infoset|specified> => 1,
+        }, <ClassName::te|ManakaiDOMAttr>;
+        Scalar::Util::weaken ($$r->{<H::tc|ownerDocument>});
+        __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
+          $result => {$$r->{<H::infoset|namespaceName>}},
+          $given => $namespaceURI,
         }__;
-        __CODE{mg|createNodeRef||ManakaiDOM|all::
-          $bag => $bag,
-          $stem => $stem,
-          $ref => $r,
-          $opt => {{
-          }},
+        __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
+          $result => {$$r->{<H::infoset|prefix>}},
+          $given => $prefix,
         }__;
+        __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
+          $result => {$$r->{<H::infoset|localName>}},
+          $given => $lname,
+        }__;
+
 
         ## Attribute type information
         if ((defined $namespaceURI and $namespaceURI eq <Q::xml:> and
@@ -2137,62 +1821,6 @@ ClsDef:
           }__;
         }
 
-    @@Test:
-      @@@QName: Doc.createAttrNS.mg.1.test
-      @@@PerlDef:
-        local $Message::Util::Grove::GCLatency = 0;
-
-        my $impl;
-        __CODE{tc|createImplForTest:: $impl => $impl}__;
-
-        my $bag = $impl->{<H::mg|nodeBag>};
-        my $id = $impl->{<H::mg|nodeIDReference>};
-
-        my $doc = $impl-><M::c|DOMImplementation.createDocument>;
-
-        my $el = $doc-><M::Document.createAttributeNS> (null, 'e');
-        
-        $test->id ('interface');
-        $test->assert_isa ($el, <IFName::Attr>);
-        
-        $test->id ('class');
-        $test->assert_isa ($el, <ClassName::te|ManakaiDOMAttr>);
-
-        my $doc_id = $doc->{<H::mg|nodeIDReference>};
-        my $el_id = $el->{<H::mg|nodeIDReference>};
-
-        undef $impl;
-
-        $test->id ('gc.impl.1');
-        $test->assert_not_null ($bag->{$$id});
-
-        $test->id ('gc.doc.1');
-        $test->assert_not_null ($bag->{$$doc_id});
-
-        $test->id ('gc.el.1');
-        $test->assert_not_null ($bag->{$$el_id});
-
-        undef $doc;
-
-        $test->id ('gc.impl.2');
-        $test->assert_not_null ($bag->{$$id});
-
-        $test->id ('gc.doc.2');
-        $test->assert_not_null ($bag->{$$doc_id});
-
-        $test->id ('gc.el.2');
-        $test->assert_not_null ($bag->{$$el_id});
-
-        undef $el;
-
-        $test->id ('gc.impl.3');
-        $test->assert_null ($bag->{$$id});
-
-        $test->id ('gc.doc.3');
-        $test->assert_null ($bag->{$$doc_id});
-
-        $test->id ('gc.el.3');
-        $test->assert_null ($bag->{$$el_id});
     @@Test:
       @@@QName: Document.createAttributeNS.1.test
       @@@PerlDef:
@@ -2388,47 +2016,6 @@ NodeTypeDef:
     An <IF::Element> object represents an element in a document.
     Elements may have attributes associated with them.
   
-  @IntMethod:
-    @@Operator: mg|CreateNodeStemMethod
-    @@Param:
-      @@@Name: bag
-      @@@Type: HASH
-    @@Param:
-      @@@Name: obj
-      @@@Type: HASH
-    @@Param:
-      @@@Name: opt
-      @@@Type: HASH
-    @@Return:
-      @@@Type: HASH
-      @@@PerlDef:
-        $obj->{<H::infoset|children>} = [];
-        $obj->{<H::infoset|attributes>} = {};
-        __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
-          $result => {$obj->{<H::infoset|namespaceName>}},
-          $given => {${$opt->{<H::infoset|namespaceName>}}},
-        }__;
-        __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
-          $result => {$obj->{<H::infoset|prefix>}},
-          $given => {${$opt->{<H::infoset|prefix>}}},
-        }__;
-        __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
-          $result => {$obj->{<H::infoset|localName>}},
-          $given => {${$opt->{<H::infoset|localName>}}},
-        }__;
-        __CODE{mg|setOwnerProp||ManakaiDOM|all::
-          $bag => $bag,
-          $ownerref => {$opt->{<H::tc|ownerDocument>}},
-          $ownee1hprop => {<H::tc|revOwnerDocument>},
-          $ownee => {$obj},
-          $owner0prop => {<H::tc|ownerDocument>},
-        }__;
-        $r = $obj;
-  @mg:subnode1a: infoset|children
-  @mg:subnode2hh: infoset|attributes
-  @mg:owner0: tc|ownerDocument
-  @mg:origin0: infoset|parent
-
   @enImplNote:
     @@ddid: props
     @@@:
@@ -2452,85 +2039,11 @@ NodeTypeDef:
 
       }
 
-  @IntMethod:
-    @@Operator: mg|CreateNodeRefMethod
-    @@Param:
-      @@@Name: obj
-      @@@Type: HASH
-    @@Param:
-      @@@Name: opt
-      @@@Type: HASH
-    @@Return:
-      @@@Type: Node
-      @@@PerlDef:
-        my $class;
-        CLS: {
-          ## From the cache
-          __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-            $r => $class,
-            $prop => {<H::tc|defaultNodeRefClass>},
-            $ref => $obj,
-          }__;
-          if (defined $class) {
-            last CLS;
-          } else {
-            $class = \$self;
-          }
-
-          my $nsuri;
-          __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-            $r => $nsuri,
-            $prop => {<H::infoset|namespaceName>},
-            $ref => $obj,
-          }__;
-          $nsuri = \'' unless defined $nsuri;
-          my $ln;
-          __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-            $r => $ln,
-            $prop => {<H::infoset|localName>},
-            $ref => $obj,
-          }__;
-
-          ## Use cases:
-          ##   - |html5:a| element type
-          ##   - |html5:*| element types
-          A: for my $nm (
-            [$nsuri, $ln],
-            [$nsuri, \'*'],
-          ) {
-            unless ($Message::DOM::Element::ElementClass
-                ->{${$nm->[0]}}->{${$nm->[1]}}) {
-              if ($Message::Util::AutoLoad::Registry::ElementType
-                  ->{${$nm->[0]}}->{${$nm->[1]}}) {
-                eval qq{require
-                    $Message::Util::AutoLoad::Registry::ElementType->{
-                    ${$nm->[0]}}->{${$nm->[1]}}->{module}};
-                die $@ if $@;
-              }
-            }
-
-            if ($Message::DOM::Element::ElementClass
-                ->{${$nm->[0]}}->{${$nm->[1]}}) {
-              $class = \($Message::DOM::Element::ElementClass
-                  ->{${$nm->[0]}}->{${$nm->[1]}});
-              last A;
-            }
-          } # A
-
-          __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
-            $given => $class,
-            $prop => {<H::tc|defaultNodeRefClass>},
-            $ref => $obj,
-          }__;
-        } # CLS
-        $r = bless $obj, $$class;
-
   @CODE:
     @@QName: tc|createElementForTest
     @@PerlDef:
-      my $__doc;
-      __CODE{tc|createEmptyDocumentForTest:: $doc => $__doc}__;
-      $el = $__doc-><M::Document.createElementNS>
+      __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+      $el = $doc-><M::Document.createElementNS>
                     ('http://www.example.net/', 'ex:element');
 
   @CAttr:
@@ -2545,7 +2058,8 @@ NodeTypeDef:
       @@@QName: Element.nodeType.test
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         $test->id ('nodeType');
         $test->assert_num_equals
@@ -2563,13 +2077,8 @@ NodeTypeDef:
         @@@@enDesc:
           If the namespace prefix is unspecified.
       @@@PerlDef:
-        my $v;
-        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-          $r => $v,
-          $prop => {<H::infoset|prefix>},
-          $ref => $self,
-        }__;
-        $r = defined $v ? $$v : null;
+        my $v = $$self->{<H::infoset|prefix>};
+        $r = defined $v ? $$v : undef;
     @@Set:
       @@@nullCase:
       @@@dx:raises:
@@ -2601,12 +2110,7 @@ NodeTypeDef:
         my $od = $self-><AG::Node.ownerDocument>;
         if ($od-><AG::Document.strictErrorChecking>) {
           __CODE{tc|NodeReadOnlyError:: $node => $self}__;
-          my $nsuri;
-          __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-            $r => $nsuri,
-            $prop => {<H::infoset|namespaceName>},
-            $ref => $self,
-          }__;
+          my $nsuri = $$self->{<H::infoset|namespaceName>};
           if (not defined $nsuri) {
             __EXCEPTION{MDOMX|MDOM_NS_PREFIX_WITH_NULL_URI::
               infoset|prefix => {$given},
@@ -2625,12 +2129,11 @@ NodeTypeDef:
             $XMLVERSION => $version,
           }__;
         } # strict
-        my $v = defined $given ? \$given : null;
-        __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
-          $given => $v,
-          $prop => {<H::infoset|prefix>},
-          $ref => $self,
-        }__;
+        if (defined $given) {
+          $$self->{<H::infoset|prefix>} = \$given;
+        } else {
+          CORE::delete $$self->{<H::infoset|prefix>};
+        }
 
     @@L2Test:
       @@@QName: Element.localName.1.test
@@ -3192,7 +2695,8 @@ NodeTypeDef:
       @@@QName: Element.attributes.test
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
         
         my $as = $el-><AG::Node.attributes>;
         $test->assert_isa ($as, <IFName::NamedNodeMap>);
@@ -3232,18 +2736,8 @@ NodeTypeDef:
     @@Type: DOMString
     @@Get:
       @@@PerlDef: 
-        my $prefix;
-        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-          $r => $prefix,
-          $prop => {<H::infoset|prefix>},
-          $ref => $self,
-        }__;
-        my $lname;
-        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-          $r => $lname,
-          $prop => {<H::infoset|localName>},
-          $ref => $self,
-        }__;
+        my $prefix = $$self->{<H::infoset|prefix>};
+        my $lname = $$self->{<H::infoset|localName>};
         $r = defined $prefix ? $$prefix.':'.$$lname : $$lname;
     @@enImplNote:
       {ISSUE::
@@ -5688,7 +5182,8 @@ NodeTypeDef:
       @@@QName: Element.getFeature.test
       @@@PerlDef:
         my $node;
-        __CODE{tc|createElementForTest:: $el => $node}__;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $node, $doc => $doc}__;
 
         for (
           [Core => '1.0', <IFName::Element||ManakaiDOM|ManakaiDOM1>],
@@ -5713,11 +5208,7 @@ NodeTypeDef:
         @@@@enDesc:
           If it is not available.
       @@@PerlDef:
-        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-          $r => $r,
-          $prop => {<H::infoset|baseURI>},
-          $ref => $self,
-        }__;
+        $r = $$self->{<H::infoset|baseURI>};
         unless (defined $r) {
           __DEEP{
             my $xb = $self-><M::Element.getAttributeNodeNS>
@@ -5949,19 +5440,14 @@ NodeTypeDef:
     @@Param:
       @@@Name: r
       @@@Out: 1
-      @@@Type: NodeStem
+      @@@Type: Node
       @@@Description:
         @@@@lang:en
         @@@@@:
-          The <IF::NodeStem> object.  If there is no attribute
+          The <IF::Node> object.  If there is no attribute
           node, then its value is left unchanged.
     @@PerlDef:
-      my $__attr;
-      __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-        $r => $__attr,
-        $prop => {<H::infoset|attributes>},
-        $ref => $self,
-      }__;
+      my $__attr = ${$self}->{<H::infoset|attributes>};
 
       ## Note that we no longer support DOM Level 1 nodes.
 
@@ -5981,14 +5467,7 @@ NodeTypeDef:
 
       NS: for my $__ns (sort {$a cmp $b} keys %$__attr) {
         for my $__ln (sort {$a cmp $b} keys %{$__attr->{$__ns}}) {
-          my $__node;
-          __CODE{mg|createNodeRefFromID||ManakaiDOM|all::
-            $bag => {<Code::mg|getNodeBag||ManakaiDOM|all:: $ref = $self>},
-            $stemid => {$__attr->{$__ns}->{$__ln}},
-            $ref => $__node,
-            $opt => {{
-            }},
-          }__;
+          my $__node = $__attr->{$__ns}->{$__ln};
           if ($__node-><AG::Node.nodeName> eq $name) {
             __FOR{!tc:ForRemove::
               $r = $__node;
@@ -6056,42 +5535,20 @@ NodeTypeDef:
     @@PerlDef:
       @@@ForCheck: !tc|ForRemove
       @@@@:
-        my $__attrs;
-        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-          $r => $__attrs,
-          $prop => {<H::infoset|attributes>},
-          $ref => $self,
-        }__;
+        my $__attrs = ${$self}->{<H::infoset|attributes>};
         if (defined $__attrs->{defined $namespaceURI ? $namespaceURI : ''}
                             ->{$localName}) {
-          __CODE{mg|createNodeRefFromID||ManakaiDOM|all::
-            $bag => {<Code::mg|getNodeBag||ManakaiDOM|all:: $ref = $self>},
-            $stemid => {$__attrs->{defined $namespaceURI ? $namespaceURI : ''}
-                                ->{$localName}},
-            $ref => $r,
-            $opt => {{
-            }},
-          }__;
+          $r = $__attrs->{defined $namespaceURI ? $namespaceURI : ''}
+                                ->{$localName};
         }
     @@PerlDef:
       @@@ForCheck: tc|ForRemove
       @@@@:
-        my $__attrs;
-        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-          $r => $__attrs,
-          $prop => {<H::infoset|attributes>},
-          $ref => $self,
-        }__;
+        my $__attrs = ${$self}->{<H::infoset|attributes>};
         $list = $__attrs->{defined $namespaceURI ? $namespaceURI : ''};
         if (defined $list and defined $list->{$localName}) {
-          __CODE{mg|createNodeRefFromID||ManakaiDOM|all::
-            $bag => {<Code::mg|getNodeBag||ManakaiDOM|all:: $ref = $self>},
-            $stemid => {$__attrs->{defined $namespaceURI ? $namespaceURI : ''}
-                                ->{$localName}},
-            $ref => $r,
-            $opt => {{
-            }},
-          }__;
+          $r = $__attrs->{defined $namespaceURI ? $namespaceURI : ''}
+                                ->{$localName};
         }
 
   @Method:
@@ -6141,9 +5598,8 @@ NodeTypeDef:
         No NS attribute.
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
-
-        my $doc = $el-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         $test->id ('initial');
         $test->assert_null ($el-><M::Element.getAttribute> ('a1'));
@@ -6167,9 +5623,8 @@ NodeTypeDef:
         NS = <DOM::null> attribute.
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
-
-        my $doc = $el-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         $test->id ('initial');
         $test->assert_null ($el-><M::Element.getAttribute> ('a1'));
@@ -6193,9 +5648,8 @@ NodeTypeDef:
         NS attribute.
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
-
-        my $doc = $el-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         $test->id ('initial');
         $test->assert_null ($el-><M::Element.getAttribute> ('ns:a1'));
@@ -6220,9 +5674,8 @@ NodeTypeDef:
         <XA::xmlns> attribute.
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
-
-        my $doc = $el-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         $test->id ('initial');
         $test->assert_null ($el-><M::Element.getAttribute> ('xmlns'));
@@ -6305,9 +5758,8 @@ NodeTypeDef:
         NS = <DOM::null> attribute.
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
-
-        my $doc = $el-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         $test->id ('initial');
         $test->assert_null ($el-><M::Element.getAttributeNS> (null, 'a1'));
@@ -6329,9 +5781,8 @@ NodeTypeDef:
         Non NS attribute.
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
-
-        my $doc = $el-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         $test->id ('initial');
         $test->assert_null ($el-><M::Element.getAttributeNS> (null, 'a1'));
@@ -6353,9 +5804,9 @@ NodeTypeDef:
         NS attribute.
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
-        my $doc = $el-><AG::Node.ownerDocument>;
         my $ns = 'http://ns.test/';
 
         $test->id ('initial');
@@ -6409,9 +5860,8 @@ NodeTypeDef:
         No NS attribute.
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
-
-        my $doc = $el-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         $test->id ('initial');
         my $return1 = $el-><M::Element.getAttributeNode> ('a1');
@@ -6428,9 +5878,8 @@ NodeTypeDef:
         NS = <DOM::null> attribute.
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
-
-        my $doc = $el-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         $test->id ('initial');
         my $return1 = $el-><M::Element.getAttributeNode> ('a1');
@@ -6447,9 +5896,9 @@ NodeTypeDef:
         NS attribute.
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
-        my $doc = $el-><AG::Node.ownerDocument>;
         my $ns = 'http://ns.test/';
 
         $test->id ('initial');
@@ -6513,9 +5962,8 @@ NodeTypeDef:
         No NS attribute.
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
-
-        my $doc = $el-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         $test->id ('initial');
         my $return1 = $el-><M::Element.getAttributeNodeNS> (null, 'a1');
@@ -6532,9 +5980,8 @@ NodeTypeDef:
         NS = <DOM::null> attribute.
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
-
-        my $doc = $el-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         $test->id ('initial');
         my $return1 = $el-><M::Element.getAttributeNodeNS> (null, 'a1');
@@ -6551,9 +5998,9 @@ NodeTypeDef:
         NS attribute.
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
-        my $doc = $el-><AG::Node.ownerDocument>;
         my $ns = 'http://ns.test/';
 
         $test->id ('initial');
@@ -6611,9 +6058,8 @@ NodeTypeDef:
       @@@QName: Element.hasAttribute.1.test
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
-
-        my $doc = $el-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         $test->id ('initial');
         $test->assert_false ($el-><M::Element.hasAttribute> ('a1'));
@@ -6630,9 +6076,8 @@ NodeTypeDef:
       @@@QName: Element.hasAttribute.2.test
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
-
-        my $doc = $el-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         $test->id ('initial');
         $test->assert_false ($el-><M::Element.hasAttribute> ('a1'));
@@ -6654,9 +6099,8 @@ NodeTypeDef:
       @@@QName: Element.hasAttribute.3.test
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
-
-        my $doc = $el-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         $test->id ('initial');
         $test->assert_false ($el-><M::Element.hasAttribute> ('m:a1'));
@@ -6723,9 +6167,8 @@ NodeTypeDef:
       @@@QName: Element.hasAttributeNS.1.test
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
-
-        my $doc = $el-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
         
         $test->id ('initial');
         $test->assert_false ($el-><M::Element.hasAttributeNS> (null, 'a1'));
@@ -6738,9 +6181,8 @@ NodeTypeDef:
       @@@QName: Element.hasAttributeNS.2.test
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
-
-        my $doc = $el-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
         
         $test->id ('initial');
         $test->assert_false ($el-><M::Element.hasAttributeNS> (null, 'a1'));
@@ -6758,9 +6200,9 @@ NodeTypeDef:
       @@@QName: Element.hasAttributeNS.3.test
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
-        my $doc = $el-><AG::Node.ownerDocument>;
         my $ns = 'about:';
         
         $test->id ('initial');
@@ -6847,19 +6289,10 @@ NodeTypeDef:
         } else { ## There is no such attribute
           __DEEP{
             $__anode = $od-><M::Document.createAttribute> ($name);
-            my $__attrs;
-            __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-              $r => $__attrs,
-              $prop => {<H::infoset|attributes>},
-              $ref => $self,
-            }__;
-            $__attrs->{''}->{$name}
-                = <Code::mg|getNodeID||ManakaiDOM|all:: $ref = $__anode>;
-            __CODE{mg|setNodeStemProp0Node||ManakaiDOM|all::
-              $prop => {<H::infoset|ownerElement>},
-              $ref => $__anode,
-              $given => $self,
-            }__;
+            my $__attrs = $$self->{<H::infoset|attributes>};
+            $__attrs->{''}->{$name} = $__anode;
+            $$__anode->{<H::infoset|ownerElement>} = $self;
+            Scalar::Util::weaken ($$__anode->{<H::infoset|ownerElement>});
           }__;
           __CODE{setAttribute.setSchemaTypeInfo::
             $element => $self,
@@ -6877,7 +6310,8 @@ NodeTypeDef:
       @@@QName: Element.setAttribute.1.test
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         $el-><M::Element.setAttribute> ('a1', 'v1');
 
@@ -6913,7 +6347,8 @@ NodeTypeDef:
       @@@QName: Element.setAttribute.2.test
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         $el-><M::Element.setAttributeNS> (<Q::xml:>, 'xml:lang', 'ja');
 
@@ -7008,9 +6443,10 @@ NodeTypeDef:
       @@@QName: Element.setAttribute.xmlid.test
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
-        my $cfg = $el-><AG::Node.ownerDocument>-><AG::Document.domConfig>;
+        my $cfg = $doc->dom_config;
 
         $cfg-><M::c|DOMConfiguration.setParameter> (<Q::cfg|xml-id> => true);
 
@@ -7183,7 +6619,8 @@ NodeTypeDef:
       @@@QName: Element.setAttributeNS.1.test
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         $el-><M::Element.setAttributeNS> (null, 'a1', 'v1');
         my $a1 = $el-><M::Element.getAttributeNodeNS> (null, 'a1');
@@ -7212,7 +6649,8 @@ NodeTypeDef:
       @@@QName: Element.setAttributeNS.2.test
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         my $ns = 'about:';
 
@@ -7252,7 +6690,8 @@ NodeTypeDef:
       @@@QName: Element.setAttributeNS.3.test
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         my $ns = 'about:';
 
@@ -7380,7 +6819,8 @@ NodeTypeDef:
       @@@QName: Element.setAttributeNS.xmlid.test
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         my $cfg = $el-><AG::Node.ownerDocument>-><AG::Document.domConfig>;
 
@@ -7443,19 +6883,11 @@ NodeTypeDef:
         __DEEP{
           $__anode = $ownerDocument-><M::Document.createAttributeNS>
                                       ($namespaceURI, [$prefix, $localName]);
-          my $__attrs;
-          __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-            $r => $__attrs,
-            $prop => {<H::infoset|attributes>},
-            $ref => $element,
-          }__;
+          my $__attrs = ${$element}->{<H::infoset|attributes>};
           $__attrs->{defined $namespaceURI ? $namespaceURI : ''}->{$localName}
-              = <Code::mg|getNodeID||ManakaiDOM|all:: $ref = $__anode>;
-          __CODE{mg|setNodeStemProp0Node||ManakaiDOM|all::
-            $prop => {<H::infoset|ownerElement>},
-            $ref => $__anode,
-            $given => $element,
-          }__;
+              = $__anode;
+          $$__anode->{<H::infoset|ownerElement>} = $element;
+          Scalar::Util::weaken ($$__anode->{<H::infoset|ownerElement>});
         }__;
         __CODE{setAttribute.setSchemaTypeInfo::
           $element => $element,
@@ -7573,22 +7005,8 @@ NodeTypeDef:
         my $nsuri = $newAttr-><AG::Node.namespaceURI>;
         $nsuri = '' unless defined $nsuri;
         my $ln = $newAttr-><AG::Node.localName>;
-        my $attrs;
-        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-          $r => $attrs,
-          $prop => {<H::infoset|attributes>},
-          $ref => $self,
-        }__;
-        my $current;
-        if (defined $attrs->{$nsuri}->{$ln}) {
-          __CODE{mg|createNodeRefFromID||ManakaiDOM|all::
-            $bag => {<Code::mg|getNodeBag||ManakaiDOM|all:: $ref = $self>},
-            $stemid => {$attrs->{$nsuri}->{$ln}},
-            $ref => $current,
-            $opt => {{
-            }},
-          }__;
-        }
+        my $attrs = $$self->{<H::infoset|attributes>};
+        my $current = $attrs->{$nsuri}->{$ln};
 
         if (defined $newAttr-><AG::Attr.ownerElement>) {
           if (defined $current and $current eq $newAttr) {
@@ -7608,20 +7026,13 @@ NodeTypeDef:
             }__;
           }
 
-          $attrs->{$nsuri}->{$ln} = <Code::mg|getNodeID||ManakaiDOM|all::
-                                               $ref = $newAttr>;
-          __CODE{mg|setNodeStemProp0Node||ManakaiDOM|all::
-            $prop => {<H::infoset|ownerElement>},
-            $ref => $newAttr,
-            $given => $self,
-          }__;
+          $attrs->{$nsuri}->{$ln} = $newAttr;
+          $$newAttr->{<H::infoset|ownerElement>} = $self;
+          Scalar::Util::weaken ($$newAttr->{<H::infoset|ownerElement>});
           $newAttr-><AS::Attr.specified> (true);
 
           if (defined $current) {
-            __CODE{mg|deleteNodeStemPropValue||ManakaiDOM|all::
-              $prop => {<H::infoset|ownerElement>},
-              $ref => $current,
-            }__;
+            CORE::delete $$current->{<H::infoset|ownerElement>};
             $r = $current;
           }
         }
@@ -7630,8 +7041,8 @@ NodeTypeDef:
       @@@QName: Element.setAttributeNode.test
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
-        my $doc = $el-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         my $a1 = $doc-><M::Document.createAttribute> ('attr1');
         $a1-><AS::Attr.value> ('value1');
@@ -7766,8 +7177,8 @@ NodeTypeDef:
       @@@QName: Element.setAttributeNodeNS.1.test
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
-        my $doc = $el-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         my $a1 = $doc-><M::Document.createAttributeNS> (null, 'a1');
         $a1-><AS::Attr.value> ('v1');
@@ -7829,10 +7240,7 @@ NodeTypeDef:
 
           ## Remove the attribute node
           CORE::delete $list->{$key};
-          __CODE{mg|deleteNodeStemPropValue||ManakaiDOM|all::
-            $prop => {<H::infoset|ownerElement>},
-            $ref => $attr,
-          }__;
+          CORE::delete $$attr->{<H::infoset|ownerElement>};
 
           ## Default attribute
           my $doc = $self-><AG::Node.ownerDocument>;
@@ -7855,7 +7263,8 @@ NodeTypeDef:
       @@@QName: Element.removeAttribute.test
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         $test->id ('remove.no.attr');
         $el-><M::Element.removeAttribute> ('at1');
@@ -7873,7 +7282,8 @@ NodeTypeDef:
       @@@QName: Element.removeAttribute.nsattr.test
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         $test->id ('remove.no.attr');
         $el-><M::Element.removeAttribute> ('ns1:at1');
@@ -7967,7 +7377,8 @@ NodeTypeDef:
       @@@QName: Element.removeAttribute.ro.test
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         $el-><M::Element.setAttribute> (a => 'b');
         $el-><M::Node.manakaiSetReadOnly> (true);
@@ -7983,7 +7394,8 @@ NodeTypeDef:
       @@@QName: Element.removeAttribute.not.found.test
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         $el-><M::Element.removeAttribute> ('no.such.attribute');
         
@@ -8050,10 +7462,7 @@ NodeTypeDef:
          
           ## Removes the attribute node
           CORE::delete $list->{$localName};
-          __CODE{mg|deleteNodeStemPropValue||ManakaiDOM|all::
-            $prop => {<H::infoset|ownerElement>},
-            $ref => $attr,
-          }__;
+          CORE::delete $$attr->{<H::infoset|ownerElement>};
 
           ## Default attribute
           my $doc = $self-><AG::Node.ownerDocument>;
@@ -8077,7 +7486,8 @@ NodeTypeDef:
       @@@QName: Element.removeAttributeNS.test
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         $test->id ('remove.no.attr');
         $el-><M::Element.removeAttributeNS> (null, 'at1');
@@ -8095,7 +7505,8 @@ NodeTypeDef:
       @@@QName: Element.removeAttributeNS.global.test
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         my $uri = 'http://example.com/';
         $test->id ('remove.no.attr');
@@ -8204,7 +7615,8 @@ NodeTypeDef:
       @@@QName: Element.removeAttributeNS.not.found.1.test
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         $el-><M::Element.removeAttributeNS> (null, 'no.such.attribute');
         
@@ -8214,7 +7626,8 @@ NodeTypeDef:
       @@@QName: Element.removeAttributeNS.not.found.2.test
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         $el-><M::Element.removeAttributeNS> ('about:', 'no.such.attribute');
         
@@ -8260,19 +7673,11 @@ NodeTypeDef:
 
         my $ln = $oldAttr-><AG::Node.localName>;
         FIND: {
-          my $attrs;
-          __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-            $r => $attrs,
-            $prop => {<H::infoset|attributes>},
-            $ref => $self,
-          }__;
+          my $attrs = $$self->{<H::infoset|attributes>};
           my $nsuri = $oldAttr-><AG::Node.namespaceURI>;
           my $list = $attrs->{defined $nsuri ? $nsuri : ''};
-          my $list_nid = $list->{$ln};
-          if (defined $list_nid and
-              <Code::mg|nodeIDMatch||ManakaiDOM|all::
-                        $noderef = $oldAttr,
-                        $nodeid = $list_nid>) {
+          my $list_node = $list->{$ln};
+          if (defined $list_node and $list_node eq $oldAttr) {
             CORE::delete $list->{$ln};
             last FIND;
           }
@@ -8282,10 +7687,7 @@ NodeTypeDef:
           }__;
         } # FIND
 
-        __CODE{mg|deleteNodeStemPropValue||ManakaiDOM|all::
-          $prop => {<H::infoset|ownerElement>},
-          $ref => $oldAttr,
-        }__;
+        CORE::delete $$oldAttr->{<H::infoset|ownerElement>};
         $r = $oldAttr;
       
         ## Default attribute
@@ -8308,7 +7710,8 @@ NodeTypeDef:
       @@@QName: Element.removeAttributeNode.test
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         $test->id ('remove.no.attr');
         $el-><M::Element.removeAttribute> ('at1');
@@ -8328,7 +7731,8 @@ NodeTypeDef:
       @@@QName: Element.removeAttributeNode.nsattr.test
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         $test->id ('remove.no.attr');
         $el-><M::Element.removeAttribute> ('ns1:at1');
@@ -8449,12 +7853,7 @@ NodeTypeDef:
                         (<Q::cfg|clone-entity-reference-subtree> => true);
               ADD: {
                 my $__attr;
-                my $__attrs;
-                __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-                  $r => $__attrs,
-                  $prop => {<H::infoset|attributes>},
-                  $ref => $element,
-                }__;
+                my $__attrs = ${$element}->{<H::infoset|attributes>};
                 if (defined $prefix) {   ## prefixed attr
                   my $__nsuri = $element-><M::Node.lookupNamespaceURI>
                                             ($prefix);
@@ -8543,7 +7942,8 @@ NodeTypeDef:
       @@@QName: Element.schemaTypeInfo.no-schema.test
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
         $el-><AG::Node.ownerDocument>
            -><AG::Document.domConfig>
            -><M::c|DOMConfiguration.setParameter>
@@ -8557,7 +7957,8 @@ NodeTypeDef:
       @@@QName: Element.schemaTypeInfo.dtd.test
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
         $el-><AG::Node.ownerDocument>
            -><AG::Document.domConfig>
            -><M::c|DOMConfiguration.setParameter>
@@ -8610,9 +8011,8 @@ NodeTypeDef:
       @@@QName: Element.getElementsByTagName.1.test
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
-
-        my $doc = $el-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         $test->id ('nodelist');
         my $nl = $el-><M::Element.getElementsByTagName> ('target');
@@ -8661,9 +8061,8 @@ NodeTypeDef:
       @@@QName: Element.getElementsByTagName.2.test
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
-
-        my $doc = $el-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         $test->id ('nodelist');
         my $nl = $el-><M::Element.getElementsByTagName> ('a:target');
@@ -8803,9 +8202,8 @@ NodeTypeDef:
       @@@QName: Element.getElementsByTagNameNS.1.test
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
-
-        my $doc = $el-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         $test->id ('nodelist');
         my $nl = $el-><M::Element.getElementsByTagNameNS>
@@ -8855,9 +8253,8 @@ NodeTypeDef:
       @@@QName: Element.getElementsByTagNameNS.2.test
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
-
-        my $doc = $el-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         $test->id ('nodelist');
         my $nl = $el-><M::Element.getElementsByTagNameNS>
@@ -8928,11 +8325,7 @@ NodeTypeDef:
         @@@@enDesc:
           If no explicit base DOM URI is available.
       @@@PerlDef:
-        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-          $r => $r,
-          $prop => {<H::infoset|baseURI>},
-          $ref => $self,
-        }__;
+        $r = $$self->{<H::infoset|baseURI>};
     @@Set:
       @@@enDesc:
         Sets the base DOM URI of the element.  It <kwd:MUST> be an
@@ -8949,11 +8342,7 @@ NodeTypeDef:
       @@@NodeReadOnlyError:
       @@@PerlDef:
         __CODE{tc|NodeReadOnlyError:: $node => $self}__;
-        __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
-          $given => $given,
-          $prop => {<H::infoset|baseURI>},
-          $ref => $self,
-        }__;
+        $$self->{<H::infoset|baseURI>} = $given;
 
   @L3Method:
     @@Name: setIdAttribute
@@ -9020,7 +8409,8 @@ NodeTypeDef:
       @@@QName: Element.setIdAttribute.test
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         $el-><M::Element.setAttribute> ('a', 'id');
 
@@ -9040,7 +8430,8 @@ NodeTypeDef:
       @@@QName: Element.setIdAttribute.element.read-only.test
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         $el-><M::Element.setAttribute> ('a', 'id');
 
@@ -9066,7 +8457,8 @@ NodeTypeDef:
       @@@QName: Element.setIdAttribute.attr.read-only.test
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         $el-><M::Element.setAttribute> ('a', 'id');
 
@@ -9094,7 +8486,8 @@ NodeTypeDef:
       @@@QName: Element.setIdAttribute.not.found.test
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         $test->id ('true.not.found.exception');
         $test->assert_exception (code => sub {
@@ -9185,7 +8578,8 @@ NodeTypeDef:
       @@@QName: Element.setIdAttributeNS.test
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         $el-><M::Element.setAttributeNS> ('about:', 'a:a', 'id');
 
@@ -9205,7 +8599,8 @@ NodeTypeDef:
       @@@QName: Element.setIdAttributeNS.element.read-only.test
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         $el-><M::Element.setAttributeNS> ('about:', 'a:a', 'id');
 
@@ -9231,7 +8626,8 @@ NodeTypeDef:
       @@@QName: Element.setIdAttributeNS.attr.read-only.test
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         $el-><M::Element.setAttributeNS> ('about:', 'a:a', 'id');
 
@@ -9259,7 +8655,8 @@ NodeTypeDef:
       @@@QName: Element.setIdAttributeNS.not.found.test
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         $test->id ('true.not.found.exception');
         $test->assert_exception (code => sub {
@@ -9332,7 +8729,8 @@ NodeTypeDef:
       @@@QName: Element.setIdAttributeNode.test
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         my $attr = $el-><AG::Node.ownerDocument>
                       -><M::Document.createAttribute> ('a');
@@ -9353,7 +8751,8 @@ NodeTypeDef:
       @@@QName: Element.setIdAttributeNode.element.read-only.test
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         my $attr = $el-><AG::Node.ownerDocument>
                       -><M::Document.createAttribute> ('a');
@@ -9380,7 +8779,8 @@ NodeTypeDef:
       @@@QName: Element.setIdAttributeNode.attr.read-only.test
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         my $attr = $el-><AG::Node.ownerDocument>
                       -><M::Document.createAttribute> ('a');
@@ -9409,7 +8809,8 @@ NodeTypeDef:
       @@@QName: Element.setIdAttributeNode.not.found.test
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
 
         my $attr = $el-><AG::Node.ownerDocument>
                       -><M::Document.createAttribute> ('a');
@@ -9573,46 +8974,6 @@ NodeTypeDef:
 
       }
 
-  @IntMethod:
-    @@Operator: mg|CreateNodeStemMethod
-    @@Param:
-      @@@Name: bag
-      @@@Type: HASH
-    @@Param:
-      @@@Name: obj
-      @@@Type: HASH
-    @@Param:
-      @@@Name: opt
-      @@@Type: HASH
-    @@Return:
-      @@@Type: HASH
-      @@@PerlDef:
-        $obj->{<H::infoset|children>} = [];
-        __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
-          $result => {$obj->{<H::infoset|namespaceName>}},
-          $given => {${$opt->{<H::infoset|namespaceName>}}},
-        }__;
-        __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
-          $result => {$obj->{<H::infoset|prefix>}},
-          $given => {${$opt->{<H::infoset|prefix>}}},
-        }__;
-        __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
-          $result => {$obj->{<H::infoset|localName>}},
-          $given => {${$opt->{<H::infoset|localName>}}},
-        }__;
-        $obj->{<H::infoset|specified>} = $opt->{<H::infoset|specified>};
-        __CODE{mg|setOwnerProp||ManakaiDOM|all::
-          $bag => $bag,
-          $ownerref => {$opt->{<H::tc|ownerDocument>}},
-          $ownee1hprop => {<H::tc|revOwnerDocument>},
-          $ownee => {$obj},
-          $owner0prop => {<H::tc|ownerDocument>},
-        }__;
-        $r = $obj;
-  @mg:subnode1a: infoset|children
-  @mg:owner0: tc|ownerDocument
-  @mg:origin0: infoset|ownerElement
-
   @enImplNote:
     @@ddid: props
     @@@:
@@ -9641,9 +9002,8 @@ NodeTypeDef:
   @CODE:
     @@QName: tc|createAttrForTest
     @@PerlDef:
-      my $__doc;
-      __CODE{tc|createEmptyDocumentForTest:: $doc => $__doc}__;
-      $attr = $__doc-><M::Document.createAttributeNS>
+      __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+      $attr = $doc-><M::Document.createAttributeNS>
                       ('http://www.example.net/', 'ex:element');
 
   @CAttr:
@@ -9658,7 +9018,8 @@ NodeTypeDef:
       @@@QName: Attr.nodeType.test
       @@@PerlDef:
         my $attr;
-        __CODE{tc|createAttrForTest:: $attr => $attr}__;
+        my $doc;
+        __CODE{tc|createAttrForTest:: $attr => $attr, $doc => $doc}__;
 
         $test->id ('nodeType');
         $test->assert_num_equals
@@ -9676,12 +9037,7 @@ NodeTypeDef:
         @@@@enDesc:
           If the namespace prefix is unspecified.
       @@@PerlDef:
-        my $v;
-        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-          $r => $v,
-          $prop => {<H::infoset|prefix>},
-          $ref => $self,
-        }__;
+        my $v = $$self->{<H::infoset|prefix>};
         $r = defined $v ? $$v : null;
     @@Set:
       @@@nullCase:
@@ -9725,12 +9081,7 @@ NodeTypeDef:
         my $od = $self-><AG::Node.ownerDocument>;
         if ($od-><AG::Document.strictErrorChecking>) {
           __CODE{tc|NodeReadOnlyError:: $node => $self}__;
-          my $nsuri;
-          __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-            $r => $nsuri,
-            $prop => {<H::infoset|namespaceName>},
-            $ref => $self,
-          }__;
+          my $nsuri = $$self->{<H::infoset|namespaceName>};
           if (not defined $nsuri) {
             __EXCEPTION{MDOMX|MDOM_NS_PREFIX_WITH_NULL_URI::
               infoset|prefix => {$given},
@@ -9760,12 +9111,11 @@ NodeTypeDef:
             $XMLVERSION => $version,
           }__;
         } # strict
-        my $v = defined $given ? \$given : null;
-        __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
-          $given => $v,
-          $prop => {<H::infoset|prefix>},
-          $ref => $self,
-        }__;
+        if (defined $given) {
+          $$self->{<H::infoset|prefix>} = \$given;
+        } else {
+          CORE::delete $$self->{<H::infoset|prefix>};
+        }
 
     @@L2Test:
       @@@QName: Attr.localName.1.test
@@ -10254,18 +9604,8 @@ NodeTypeDef:
     @@Type: DOMString
     @@Get:
       @@@PerlDef:
-        my $prefix;
-        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-          $r => $prefix,
-          $prop => {<H::infoset|prefix>},
-          $ref => $self,
-        }__;
-        my $lname;
-        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-          $r => $lname,
-          $prop => {<H::infoset|localName>},
-          $ref => $self,
-        }__;
+        my $prefix = $$self->{<H::infoset|prefix>};
+        my $lname = $$self->{<H::infoset|localName>};
         $r = defined $prefix ? $$prefix.':'.$$lname : $$lname;
     @@enImplNote:
       {ISSUE::
@@ -12293,7 +11633,8 @@ NodeTypeDef:
       @@@QName: Attr.getFeature.test
       @@@PerlDef:
         my $node;
-        __CODE{tc|createAttrForTest:: $attr => $node}__;
+        my $doc;
+        __CODE{tc|createAttrForTest:: $attr => $node, $doc => $doc}__;
 
         for (
           [Core => '1.0', <IFName::Attr||ManakaiDOM|ManakaiDOM1>],
@@ -12451,13 +11792,7 @@ NodeTypeDef:
         @@@@enDesc:
           If the attribute is not in use.
       @@@PerlDef:
-        __CODE{mg|getNodeStemProp0Node||ManakaiDOM|all::
-          $r => $r,
-          $prop => {<H::infoset|ownerElement>},
-          $ref => $self,
-          $opt => {{
-          }},
-        }__;
+        $r = $$self->{<H::infoset|ownerElement>};
 
     @@L2Test:
       @@@QName: Attr.ownerElement.1.test
@@ -12505,19 +11840,9 @@ NodeTypeDef:
         Otherwise.
     @@Get:
       @@@PerlDef:
-        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-          $r => $r,
-          $prop => {<H::infoset|specified>},
-          $ref => $self,
-        }__;
+        $r = $$self->{<H::infoset|specified>};
         unless ($r) {
-          my $oe;
-          __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-            $r => $oe,
-            $prop => {<H::infoset|ownerElement>},
-            $ref => $self,
-          }__;
-          unless (defined $oe) {
+          unless (defined $$self->{<H::infoset|ownerElement>}) {
             $r = true;
           }
         }
@@ -12539,19 +11864,9 @@ NodeTypeDef:
       @@@PerlDef:
         __CODE{tc|NodeReadOnlyError:: $node => $self}__;
         unless ($given) {
-          my $oe;
-          __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-            $r => $oe,
-            $prop => {<H::infoset|ownerElement>},
-            $ref => $self,
-          }__;
-          $given = true unless defined $oe;
+          $given = 1 unless defined $$self->{<H::infoset|ownerElement>};
         }
-        __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
-          $given => $given,
-          $prop => {<H::infoset|specified>},
-          $ref => $self,
-        }__;
+        $$self->{<H::infoset|specified>} = $given;
 
     @@enImplNote:
       @@@ddid: mutation 
@@ -12674,12 +11989,7 @@ NodeTypeDef:
                 $r .= $child-><AG::Node.textContent>;
               }
             } # childNodes
-            my $vt;
-            __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-              $r => $vt,
-              $prop => {<H::infoset|attributeType>},
-              $ref => $self,
-            }__;
+            my $vt = $$self->{<H::infoset|attributeType>};
             unless (not defined $vt or
                     $vt == <C::ATDef.NO_TYPE_ATTR> or
                     $vt == <C::ATDef.UNKNOWN_ATTR> or
@@ -12906,12 +12216,7 @@ NodeTypeDef:
     @@Type: TypeInfo
     @@Get:
       @@@PerlDef:
-        my $type;
-        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-          $r => $type,
-          $prop => {<H::infoset|attributeType>},
-          $ref => $self,
-        }__;
+        my $type = $$self->{<H::infoset|attributeType>};
         __CODE{c|createDTDTypeInfo::
           $result => $r,
           $type => $type,
@@ -12921,7 +12226,8 @@ NodeTypeDef:
       @@@QName: Attr.schemaTypeInfo.no-schema.test
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
         $el-><AG::Node.ownerDocument>
            -><AG::Document.domConfig>
            -><M::c|DOMConfiguration.setParameter>
@@ -12937,7 +12243,8 @@ NodeTypeDef:
       @@@QName: Attr.schemaTypeInfo.dtd.test
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
         $el-><AG::Node.ownerDocument>
            -><AG::Document.domConfig>
            -><M::c|DOMConfiguration.setParameter>
@@ -12953,7 +12260,8 @@ NodeTypeDef:
       @@@QName: Attr.schemaTypeInfo.dtd.cdata.test
       @@@PerlDef:
         my $el;
-        __CODE{tc|createElementForTest:: $el => $el}__;
+        my $doc;
+        __CODE{tc|createElementForTest:: $el => $el, $doc => $doc}__;
         $el-><AG::Node.ownerDocument>
            -><AG::Document.domConfig>
            -><M::c|DOMConfiguration.setParameter>
@@ -13026,24 +12334,14 @@ NodeTypeDef:
         @@@@@:
           T: {
             ## DTD Attribute Type
-            my $type;
-            __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-              $r => $type,
-              $prop => {<H::infoset|attributeType>},
-              $ref => $self,
-            }__;
+            my $type = $$self->{<H::infoset|attributeType>};
             if (defined $type and $type == <C::ATDef.ID_ATTR>) {
               $r = true;
               last T;
             }
 
             ## User-determined ID
-            my $udid;
-            __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-              $r => $udid,
-              $prop => {<H::c|userDeterminedId>},
-              $ref => $self,
-            }__;
+            my $udid = $$self->{<H::c|userDeterminedId>};
             if ($udid) {
               $r = true;
               last T;
@@ -13084,11 +12382,7 @@ NodeTypeDef:
       @@@NodeReadOnlyError:
       @@@PerlDef:
         __CODE{tc|NodeReadOnlyError:: $node => $self}__;
-        __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
-          $given => $given,
-          $prop => {<H::c|userDeterminedId>},
-          $ref => $self,
-        }__;
+        $$self->{<H::c|userDeterminedId>} = $given;
 
     @@Test:
       @@@QName: Attr.isId.dtdid.test
@@ -13096,7 +12390,8 @@ NodeTypeDef:
         DTD-determined ID attribute.
       @@@PerlDef:
         my $attr;
-        __CODE{tc|createAttrForTest:: $attr => $attr}__;
+        my $doc;
+        __CODE{tc|createAttrForTest:: $attr => $attr, $doc => $doc}__;
 
         $attr-><AS::Attr.manakaiAttributeType> (<C::ATDef.ID_ATTR>);
 
@@ -13116,7 +12411,8 @@ NodeTypeDef:
         User-determined ID attribute.
       @@@PerlDef:
         my $attr;
-        __CODE{tc|createAttrForTest:: $attr => $attr}__;
+        my $doc;
+        __CODE{tc|createAttrForTest:: $attr => $attr, $doc => $doc}__;
 
         $test->id ('default');
         $test->assert_false ($attr-><AG::Attr.isId>);
@@ -13183,21 +12479,13 @@ NodeTypeDef:
     @@dis:actualType: d|DeclaredValueType
     @@Get:
       @@@PerlDef:
-        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-          $r => $r,
-          $prop => {<H::infoset|attributeType>},
-          $ref => $self,
-        }__;
+        $r = $$self->{<H::infoset|attributeType>};
         $r = <C::ATDef.NO_TYPE_ATTR> unless defined $r;
     @@Set:
       @@@NodeReadOnlyError:
       @@@PerlDef:
         __CODE{tc|NodeReadOnlyError:: $node => $self}__;
-        __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
-          $given => $given,
-          $prop => {<H::infoset|attributeType>},
-          $ref => $self,
-        }__;
+        $$self->{<H::infoset|attributeType>} = $given;
 ##Attr
 
 ElementTypeBinding:
@@ -13247,7 +12535,6 @@ IntPropDef:
   @enDesc:
     Whether it is a user-determined ID attribute or not.
   @Type: DISPerl|Boolean||ManakaiDOM|all
-  @rdfs:range: Attr
   @tc:nodeStemKey: isudid
 
 IFCls3Def:
@@ -13451,7 +12738,7 @@ IFCls3Def:
       Any type derives from <Q::xsd:anyType>.  (Can any bit be used 
       to test it?)
 
-    @@rdfs:subClassOf: idl|unsignedLong||ManakaiDOM|all
+    @@subsetOf: idl|unsignedLong||ManakaiDOM|all
     @@Type: idl|unsignedLong||ManakaiDOM|all
     @@IsBitMask:1
 

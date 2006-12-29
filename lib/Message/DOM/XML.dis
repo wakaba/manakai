@@ -18,7 +18,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/12/03 05:40:34 $
+    $Date: 2006/12/29 14:45:43 $
 
   @Require:
     @@Module:
@@ -79,8 +79,6 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
   @MDOMX:
     http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
-  @mg:
-    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Grove/
   @rdf:
     http://www.w3.org/1999/02/22-rdf-syntax-ns#
   @s:
@@ -829,81 +827,11 @@ ClsDef:
         @@@@enDesc:
           If the document is an HTML document.
       @@@PerlDef:
-        my $bag = <Code::mg|getNodeBag||ManakaiDOM|all:: $ref = $self>;
-        my $stem;
-        __CODE{mg|createNodeStem||ManakaiDOM|all::
-          $bag => $bag,
-          $stem => $stem,
-          $class => {<ClassName::tx|ManakaiDOMCDATASection>},
-          $opt => {{
-            <H::tc|ownerDocument> => $self,
-            <H::infoset|content> => \$data,
-          }},
-        }__;
-        __CODE{mg|createNodeRef||ManakaiDOM|all::
-          $bag => $bag,
-          $stem => $stem,
-          $ref => $r,
-          $opt => {{
-          }},
-        }__;
-
-    @@Test:
-      @@@QName: Document.createCDATASection.mg.1.test
-      @@@PerlDef:
-        local $Message::Util::Grove::GCLatency = 0;
-
-        my $impl;
-        __CODE{tc|createImplForTest:: $impl => $impl}__;
-
-        my $bag = $impl->{<H::mg|nodeBag>};
-        my $id = $impl->{<H::mg|nodeIDReference>};
-
-        my $doc = $impl-><M::c|DOMImplementation.createDocument>;
-
-        my $el = $doc-><M::Document.createCDATASection> ('textdata');
-        
-        $test->id ('interface');
-        $test->assert_isa ($el, <IFName::tx|CDATASection>);
-        
-        $test->id ('class');
-        $test->assert_isa ($el, <ClassName::tx|ManakaiDOMCDATASection>);
-
-        my $doc_id = $doc->{<H::mg|nodeIDReference>};
-        my $el_id = $el->{<H::mg|nodeIDReference>};
-
-        undef $impl;
-
-        $test->id ('gc.impl.1');
-        $test->assert_not_null ($bag->{$$id});
-
-        $test->id ('gc.doc.1');
-        $test->assert_not_null ($bag->{$$doc_id});
-
-        $test->id ('gc.el.1');
-        $test->assert_not_null ($bag->{$$el_id});
-
-        undef $doc;
-
-        $test->id ('gc.impl.2');
-        $test->assert_not_null ($bag->{$$id});
-
-        $test->id ('gc.doc.2');
-        $test->assert_not_null ($bag->{$$doc_id});
-
-        $test->id ('gc.el.2');
-        $test->assert_not_null ($bag->{$$el_id});
-
-        undef $el;
-
-        $test->id ('gc.impl.3');
-        $test->assert_null ($bag->{$$id});
-
-        $test->id ('gc.doc.3');
-        $test->assert_null ($bag->{$$doc_id});
-
-        $test->id ('gc.el.3');
-        $test->assert_null ($bag->{$$el_id});
+        $r = bless \{
+          <H::tc|ownerDocument> => $self,
+          <H::infoset|content> => \$data,          
+        }, <ClassName::tx|ManakaiDOMCDATASection>;
+        Scalar::Util::weaken ($$r->{<H::tc|ownerDocument>});
 
   @CMethod:
     @@Name: createEntityReference
@@ -961,23 +889,14 @@ ClsDef:
           }__;
         }
 
-        my $bag = <Code::mg|getNodeBag||ManakaiDOM|all:: $ref = $self>;
-        my $stem;
-        __CODE{mg|createNodeStem||ManakaiDOM|all::
-          $bag => $bag,
-          $stem => $stem,
-          $class => {<ClassName::tx|ManakaiDOMEntityReference>},
-          $opt => {{
-            <H::infoset|name> => \$name,
-            <H::tc|ownerDocument> => $self,
-          }},
-        }__;
-        __CODE{mg|createNodeRef||ManakaiDOM|all::
-          $bag => $bag,
-          $stem => $stem,
-          $ref => $r,
-          $opt => {{
-          }},
+        $r = bless \{
+          <H::tc|ownerDocument> => $self,
+          <H::infoset|children> => [],
+        }, <ClassName::tx|ManakaiDOMEntityReference>;
+        Scalar::Util::weaken ($$r->{<H::tc|ownerDocument>});
+        __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
+          $result => {$$r->{<H::infoset|name>}},
+          $given => $name,
         }__;
 
         ## Expansion
@@ -1007,62 +926,6 @@ ClsDef:
           $r-><M::Node.manakaiSetReadOnly> (true, true);
         }__;
 
-    @@Test:
-      @@@QName: Document.createER.mg.1.test
-      @@@PerlDef:
-        local $Message::Util::Grove::GCLatency = 0;
-
-        my $impl;
-        __CODE{tc|createImplForTest:: $impl => $impl}__;
-
-        my $bag = $impl->{<H::mg|nodeBag>};
-        my $id = $impl->{<H::mg|nodeIDReference>};
-
-        my $doc = $impl-><M::c|DOMImplementation.createDocument>;
-
-        my $el = $doc-><M::Document.createEntityReference> ('entity');
-        
-        $test->id ('interface');
-        $test->assert_isa ($el, <IFName::tx|EntityReference>);
-        
-        $test->id ('class');
-        $test->assert_isa ($el, <ClassName::tx|ManakaiDOMEntityReference>);
-
-        my $doc_id = $doc->{<H::mg|nodeIDReference>};
-        my $el_id = $el->{<H::mg|nodeIDReference>};
-
-        undef $impl;
-
-        $test->id ('gc.impl.1');
-        $test->assert_not_null ($bag->{$$id});
-
-        $test->id ('gc.doc.1');
-        $test->assert_not_null ($bag->{$$doc_id});
-
-        $test->id ('gc.el.1');
-        $test->assert_not_null ($bag->{$$el_id});
-
-        undef $doc;
-
-        $test->id ('gc.impl.2');
-        $test->assert_not_null ($bag->{$$id});
-
-        $test->id ('gc.doc.2');
-        $test->assert_not_null ($bag->{$$doc_id});
-
-        $test->id ('gc.el.2');
-        $test->assert_not_null ($bag->{$$el_id});
-
-        undef $el;
-
-        $test->id ('gc.impl.3');
-        $test->assert_null ($bag->{$$id});
-
-        $test->id ('gc.doc.3');
-        $test->assert_null ($bag->{$$doc_id});
-
-        $test->id ('gc.el.3');
-        $test->assert_null ($bag->{$$el_id});
     @@XDTest:
       @@@QName: Document.createER.nodef.test
       @@@PerlDef:
@@ -1256,83 +1119,17 @@ ClsDef:
           }__;
         }
 
-        my $bag = <Code::mg|getNodeBag||ManakaiDOM|all:: $ref = $self>;
         $data = '' unless defined $data;
-        my $stem;
-        __CODE{mg|createNodeStem||ManakaiDOM|all::
-          $bag => $bag,
-          $stem => $stem,
-          $class => {<ClassName::tx|ManakaiDOMProcessingInstruction>},
-          $opt => {{
-            <H::infoset|target> => \$target,
-            <H::infoset|content> => \$data,
-            <H::tc|ownerDocument> => $self,
-          }},
-        }__;
-        __CODE{mg|createNodeRef||ManakaiDOM|all::
-          $bag => $bag,
-          $stem => $stem,
-          $ref => $r,
-          $opt => {{
-          }},
+        $r = bless \{
+          <H::tc|ownerDocument> => $self,
+          <H::infoset|content> => \$data,
+        }, <ClassName::tx|ManakaiDOMProcessingInstruction>;
+        Scalar::Util::weaken ($$r->{<H::tc|ownerDocument>});
+        __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
+          $result => {$$r->{<H::infoset|target>}},
+          $given => $target,
         }__;
 
-    @@Test:
-      @@@QName: Document.createPI.mg.1.test
-      @@@PerlDef:
-        local $Message::Util::Grove::GCLatency = 0;
-
-        my $impl;
-        __CODE{tc|createImplForTest:: $impl => $impl}__;
-
-        my $bag = $impl->{<H::mg|nodeBag>};
-        my $id = $impl->{<H::mg|nodeIDReference>};
-
-        my $doc = $impl-><M::c|DOMImplementation.createDocument>;
-
-        my $el = $doc-><M::Document.createProcessingInstruction> ('pi', 'data');
-        
-        $test->id ('interface');
-        $test->assert_isa ($el, <IFName::tx|ProcessingInstruction>);
-        
-        $test->id ('class');
-        $test->assert_isa ($el, <ClassName::tx|ManakaiDOMProcessingInstruction>);
-
-        my $doc_id = $doc->{<H::mg|nodeIDReference>};
-        my $el_id = $el->{<H::mg|nodeIDReference>};
-
-        undef $impl;
-
-        $test->id ('gc.impl.1');
-        $test->assert_not_null ($bag->{$$id});
-
-        $test->id ('gc.doc.1');
-        $test->assert_not_null ($bag->{$$doc_id});
-
-        $test->id ('gc.el.1');
-        $test->assert_not_null ($bag->{$$el_id});
-
-        undef $doc;
-
-        $test->id ('gc.impl.2');
-        $test->assert_not_null ($bag->{$$id});
-
-        $test->id ('gc.doc.2');
-        $test->assert_not_null ($bag->{$$doc_id});
-
-        $test->id ('gc.el.2');
-        $test->assert_not_null ($bag->{$$el_id});
-
-        undef $el;
-
-        $test->id ('gc.impl.3');
-        $test->assert_null ($bag->{$$id});
-
-        $test->id ('gc.doc.3');
-        $test->assert_null ($bag->{$$doc_id});
-
-        $test->id ('gc.el.3');
-        $test->assert_null ($bag->{$$el_id});
     @@Test:
       @@@QName: Document.createProcessingInstruction.1.test
       @@@PerlDef:
@@ -1430,15 +1227,15 @@ IFCls1Def:
   @CODE:
     @@QName: tx|createCDATASectionForTest
     @@PerlDef:
-      my $__doc;
-      __CODE{tc|createEmptyDocumentForTest:: $doc => $__doc}__;
-      $text = $__doc-><M::Document.createCDATASection> ('text');
+      __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+      $text = $doc-><M::Document.createCDATASection> ('text');
 
   @Test:
     @@QName: CDATASection.interfaces.test
     @@PerlDef:
       my $text;
-      __CODE{tx|createCDATASectionForTest:: $text => $text}__;
+      my $doc;
+      __CODE{tx|createCDATASectionForTest:: $text => $text, $doc => $doc}__;
 
       $test->id ('CDATASection');
       $test->assert_isa ($text, <IFName::CDATASection>);
@@ -1468,7 +1265,8 @@ IFCls1Def:
       @@@QName: CDATASection.nodeType.test
       @@@PerlDef:
         my $text;
-        __CODE{tx|createCDATASectionForTest:: $text => $text}__;
+        my $doc;
+        __CODE{tx|createCDATASectionForTest:: $text => $text, $doc => $doc}__;
 
         $test->id ('nodeType');
         $test->assert_num_equals
@@ -1479,7 +1277,8 @@ IFCls1Def:
     @@QName: CDATASection.parentNode.1.test
     @@PerlDef:
       my $text;
-      __CODE{tc|createTextForTest:: $text => $text}__;
+      my $doc;
+      __CODE{tc|createTextForTest:: $text => $text, $doc => $doc}__;
 
       $test->assert_null ($text-><AG::Node.parentNode>);
 
@@ -1524,7 +1323,8 @@ IFCls1Def:
     @@QName: CDATASection.readOnly.test
     @@PerlDef:
       my $text;
-      __CODE{tx|createCDATASectionForTest:: $text => $text}__;
+        my $doc;
+      __CODE{tx|createCDATASectionForTest:: $text => $text, $doc => $doc}__;
 
       $test->id ('default');
       $test->assert_false ($text-><AG::Node.manakaiReadOnly>);
@@ -1665,7 +1465,8 @@ IFCls1Def:
       @@@QName: CDATASection.nodeName.test
       @@@PerlDef:
         my $text;
-        __CODE{tx|createCDATASectionForTest:: $text => $text}__;
+        my $doc;
+        __CODE{tx|createCDATASectionForTest:: $text => $text, $doc => $doc}__;
 
         $test->assert_equals ($text-><AG::Node.nodeName>,
                               '#cdata-section');
@@ -1702,7 +1503,8 @@ IFCls1Def:
       @@@QName: CDATASection.getFeature.test
       @@@PerlDef:
         my $node;
-        __CODE{tx|createCDATASectionForTest:: $text => $node}__;
+        my $doc;
+        __CODE{tx|createCDATASectionForTest:: $text => $node, $doc => $doc}__;
 
         for (
           [Core => '1.0', <IFName::CDATASection||ManakaiDOM|ManakaiDOM1>],
@@ -1933,35 +1735,6 @@ NodeTypeDef:
     to the attribute <A::Notation.publicId> makes it impossible
     to serialize the document into an XML document.
 
-  @IntMethod:
-    @@Operator: mg|CreateNodeStemMethod
-    @@Param:
-      @@@Name: bag
-      @@@Type: HASH
-    @@Param:
-      @@@Name: obj
-      @@@Type: HASH
-    @@Param:
-      @@@Name: opt
-      @@@Type: HASH
-    @@Return:
-      @@@Type: HASH
-      @@@PerlDef:
-        __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
-          $result => {$obj->{<H::infoset|name>}},
-          $given => {${$opt->{<H::infoset|name>}}},
-        }__;
-        __CODE{mg|setOwnerProp||ManakaiDOM|all::
-          $bag => $bag,
-          $ownerref => {$opt->{<H::tc|ownerDocument>}},
-          $ownee1hprop => {<H::tc|revOwnerDocument>},
-          $ownee => {$obj},
-          $owner0prop => {<H::tc|ownerDocument>},
-        }__;
-        $r = $obj;
-  @mg:owner0: tc|ownerDocument
-  @mg:origin0: d|ownerDefinition
-
   @enImplNote:
     @@ddid:props
     @@@:
@@ -1987,15 +1760,13 @@ NodeTypeDef:
   @CODE:
     @@QName: tx|createNotationForTest
     @@PerlDef:
-      my $__docx;
-      __CODE{d|createEmptyDocumentXForTest:: $docx => $__docx}__;
-      $not = $__docx-><M::DocumentX.createNotation> ('not');
+      __CODE{d|createEmptyDocumentXForTest:: $docx => $doc}__;
+      $not = $doc-><M::DocumentX.createNotation> ('not');
   @CODE:
     @@QName: tx|createRONotationForTest
     @@PerlDef:
-      my $docx;
-      __CODE{d|createEmptyDocumentXForTest:: $docx => $docx}__;
-      $not = $docx-><M::DocumentX.createNotation> ('not');
+      __CODE{d|createEmptyDocumentXForTest:: $docx => $doc}__;
+      $not = $doc-><M::DocumentX.createNotation> ('not');
       $not-><M::Node.manakaiSetReadOnly> (true, true);
 
   @CAttr:
@@ -2018,13 +1789,7 @@ NodeTypeDef:
     @@Type: DOMString
     @@Get:
       @@@PerlDef:
-        my $v;
-        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-          $r => $v,
-          $prop => {<H::infoset|name>},
-          $ref => {$self},
-        }__;
-        $r = $$v;
+        $r = ${$$self->{<H::infoset|name>}};
 
     @@Test:
       @@@QName: Notation.nodeName.test
@@ -2048,7 +1813,8 @@ NodeTypeDef:
       @@@QName: Notation.nodeType.test
       @@@PerlDef:
         my $text;
-        __CODE{tx|createNotationForTest:: $not => $text}__;
+        my $doc;
+        __CODE{tx|createNotationForTest:: $not => $text, $doc => $doc}__;
 
         $test->id ('nodeType');
         $test->assert_num_equals
@@ -2222,7 +1988,8 @@ NodeTypeDef:
       @@@QName: Notation.getFeature.test
       @@@PerlDef:
         my $node;
-        __CODE{tx|createNotationForTest:: $not => $node}__;
+        my $doc;
+        __CODE{tx|createNotationForTest:: $not => $node, $doc => $doc}__;
 
         for (
           [Core => '1.0', <IFName::Notation||ManakaiDOM|ManakaiDOM1>],
@@ -2247,11 +2014,7 @@ NodeTypeDef:
     @@Type: DOMString
     @@Get:
       @@@PerlDef:
-        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-          $r => $r,
-          $prop => {<H::infoset|publicIdentifier>},
-          $ref => {$self},
-        }__;
+        $r = $$self->{<H::infoset|publicIdentifier>};
     @@LXSet:
       @@@enDesc:
         Sets the attribute value.  No lexical checking is
@@ -2262,17 +2025,14 @@ NodeTypeDef:
       @@@NodeReadOnlyError:
       @@@PerlDef:
         __CODE{tc|NodeReadOnlyError:: $node => $self}__;
-        __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
-          $given => $given,
-          $prop => {<H::infoset|publicIdentifier>},
-          $ref => $self,
-        }__;
+        $$self->{<H::infoset|publicIdentifier>} = $given;
 
     @@XDTest:
       @@@QName: Notation.publicId.test
       @@@PerlDef:
         my $et;
-        __CODE{tx|createNotationForTest:: $not => $et}__;
+        my $doc;
+        __CODE{tx|createNotationForTest:: $not => $et, $doc => $doc}__;
         
         $test->id ('default');
         $test->assert_null ($et-><AG::Notation.publicId>);
@@ -2296,11 +2056,7 @@ NodeTypeDef:
     @@Type: DOMString
     @@Get:
       @@@PerlDef:
-        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-          $r => $r,
-          $prop => {<H::infoset|systemIdentifier>},
-          $ref => {$self},
-        }__;
+        $r = $$self->{<H::infoset|systemIdentifier>};
     @@LXSet:
       @@@enDesc:
         Sets the attribute value.  No lexical checking is
@@ -2311,17 +2067,14 @@ NodeTypeDef:
       @@@NodeReadOnlyError:
       @@@PerlDef:
         __CODE{tc|NodeReadOnlyError:: $node => $self}__;
-        __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
-          $given => $given,
-          $prop => {<H::infoset|systemIdentifier>},
-          $ref => $self,
-        }__;
+        $$self->{<H::infoset|systemIdentifier>} = $given;
 
     @@XDTest:
       @@@QName: Notation.systemId.test
       @@@PerlDef:
         my $et;
-        __CODE{tx|createNotationForTest:: $not => $et}__;
+        my $doc;
+        __CODE{tx|createNotationForTest:: $not => $et, $doc => $doc}__;
         
         $test->id ('default');
         $test->assert_null ($et-><AG::Notation.systemId>);
@@ -2406,11 +2159,7 @@ NodeTypeDef:
           If there is no explicit base URI information and
           the <A::Node.baseURI> attribute contains <DOM::null>.
       @@@PerlDef:
-        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-          $r => $r,
-          $prop => {<H::infoset|declarationBaseURI>},
-          $ref => {$self},
-        }__;
+        $r = $$self->{<H::infoset|declarationBaseURI>};
         unless (defined $r) {
           __DEEP{
             $r = $self-><AG::Node.baseURI>;
@@ -2429,11 +2178,7 @@ NodeTypeDef:
       @@@NodeReadOnlyError:
       @@@PerlDef:
         __CODE{tc|NodeReadOnlyError:: $node => $self}__;
-        __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
-          $given => $given,
-          $prop => {<H::infoset|declarationBaseURI>},
-          $ref => $self,
-        }__;
+        $$self->{<H::infoset|declarationBaseURI>} = $given;
 
     @@XDTest:
       @@@QName: Notation.declBaseURI.test
@@ -2488,18 +2233,14 @@ NodeTypeDef:
         @@@@enDesc:
           The notation is not attached to any document type.
       @@@PerlDef:
-        __CODE{mg|getNodeStemProp0Node||ManakaiDOM|all::
-          $r => $r,
-          $prop => {<H::d|ownerDefinition>},
-          $ref => $self,
-          $opt => {{}},
-        }__;
+        $r = $$self->{<H::d|ownerDefinition>};
 
     @@XDTest:
       @@@QName: Notation.ownerDTDef.test
       @@@PerlDef:
         my $et;
-        __CODE{tx|createNotationForTest:: $not => $et}__;
+        my $doc;
+        __CODE{tx|createNotationForTest:: $not => $et, $doc => $doc}__;
  
         my $odt = $et-><AG::Notation.ownerDocumentTypeDefinition>;
         $test->assert_null ($odt);
@@ -2575,37 +2316,6 @@ NodeTypeDef:
     entity is an error.  An external entity with its
     <A::Entity.systemId> set to <DOM::null> is unserializable.
 
-  @IntMethod:
-    @@Operator: mg|CreateNodeStemMethod
-    @@Param:
-      @@@Name: bag
-      @@@Type: HASH
-    @@Param:
-      @@@Name: obj
-      @@@Type: HASH
-    @@Param:
-      @@@Name: opt
-      @@@Type: HASH
-    @@Return:
-      @@@Type: HASH
-      @@@PerlDef:
-        __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
-          $result => {$obj->{<H::infoset|name>}},
-          $given => {${$opt->{<H::infoset|name>}}},
-        }__;
-        __CODE{mg|setOwnerProp||ManakaiDOM|all::
-          $bag => $bag,
-          $ownerref => {$opt->{<H::tc|ownerDocument>}},
-          $ownee1hprop => {<H::tc|revOwnerDocument>},
-          $ownee => {$obj},
-          $owner0prop => {<H::tc|ownerDocument>},
-        }__;
-        $obj->{<H::infoset|children>} = [];
-        $r = $obj;
-  @mg:owner0: tc|ownerDocument
-  @mg:origin0: d|ownerDefinition
-  @mg:subnode1a: infoset|children
-
   @enImplNote:
     @@ddid:props
     @@@:
@@ -2640,15 +2350,13 @@ NodeTypeDef:
   @CODE:
     @@QName: tx|createGEForTest
     @@PerlDef:
-      my $__docx;
-      __CODE{d|createEmptyDocumentXForTest:: $docx => $__docx}__;
-      $gent = $__docx-><M::DocumentX.createGeneralEntity> ('gent');
+      __CODE{d|createEmptyDocumentXForTest:: $docx => $doc}__;
+      $gent = $doc-><M::DocumentX.createGeneralEntity> ('gent');
   @CODE:
     @@QName: tx|createROGEForTest
     @@PerlDef:
-      my $docx;
-      __CODE{d|createEmptyDocumentXForTest:: $docx => $docx}__;
-      $gent = $docx-><M::DocumentX.createGeneralEntity> ('gent');
+      __CODE{d|createEmptyDocumentXForTest:: $docx => $doc}__;
+      $gent = $doc-><M::DocumentX.createGeneralEntity> ('gent');
       $gent-><M::Node.manakaiSetReadOnly> (true, true);
 
   @CAttr:
@@ -2683,7 +2391,8 @@ NodeTypeDef:
       @@@QName: GE.nodeType.test
       @@@PerlDef:
         my $text;
-        __CODE{tx|createGEForTest:: $gent => $text}__;
+        my $doc;
+        __CODE{tx|createGEForTest:: $gent => $text, $doc => $doc}__;
 
         $test->id ('nodeType');
         $test->assert_num_equals
@@ -5187,7 +4896,8 @@ NodeTypeDef:
       @@@QName: Entity.getFeature.test
       @@@PerlDef:
         my $node;
-        __CODE{tx|createGEForTest:: $gent => $node}__;
+        my $doc;
+        __CODE{tx|createGEForTest:: $gent => $node, $doc => $doc}__;
 
         for (
           [Core => '1.0', <IFName::Entity||ManakaiDOM|ManakaiDOM1>],
@@ -5274,11 +4984,7 @@ NodeTypeDef:
           or if the character encoding name of the entity is not 
           known to the implementation.
       @@@PerlDef:
-        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-          $r => $r,
-          $prop => {<H::infoset|characterEncodingScheme>},
-          $ref => {$self},
-        }__;
+        $r = $$self->{<H::infoset|characterEncodingScheme>};
     @@LXSet:
       @@@enDesc:
         Sets the attribute value.  No lexical checking is performed
@@ -5289,17 +4995,14 @@ NodeTypeDef:
       @@@NodeReadOnlyError:
       @@@PerlDef:
         __CODE{tc|NodeReadOnlyError:: $node => $self}__;
-        __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
-          $given => $given,
-          $prop => {<H::infoset|characterEncodingScheme>},
-          $ref => $self,
-        }__;
+        $$self->{<H::infoset|characterEncodingScheme>} = $given;
 
     @@Test:
       @@@QName: Entity.inputEncoding.test
       @@@PerlDef:
         my $node;
-        __CODE{tx|createGEForTest:: $gent => $node}__;
+        my $doc;
+        __CODE{tx|createGEForTest:: $gent => $node, $doc => $doc}__;
 
         $test->id ('initial');
         $test->assert_null ($node-><AG::Entity.inputEncoding>);
@@ -5322,11 +5025,7 @@ NodeTypeDef:
         @@@@enDesc:
           If it is a parsed entity.
       @@@PerlDef:
-        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-          $r => $r,
-          $prop => {<H::infoset|notationName>},
-          $ref => {$self},
-        }__;
+        $r = $$self->{<H::infoset|notationName>};
     @@LXSet:
       @@@enDesc:
         Sets the attribute value.  No lexical checking is performed
@@ -5341,17 +5040,14 @@ NodeTypeDef:
       @@@NodeReadOnlyError:
       @@@PerlDef:
         __CODE{tc|NodeReadOnlyError:: $node => $self}__;
-        __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
-          $given => $given,
-          $prop => {<H::infoset|notationName>},
-          $ref => $self,
-        }__;
+        $$self->{<H::infoset|notationName>} = $given;
 
     @@Test:
       @@@QName: Entity.notationName.test
       @@@PerlDef:
         my $node;
-        __CODE{tx|createGEForTest:: $gent => $node}__;
+        my $doc;
+        __CODE{tx|createGEForTest:: $gent => $node, $doc => $doc}__;
 
         $test->id ('initial');
         $test->assert_null ($node-><AG::Entity.notationName>);
@@ -5374,11 +5070,7 @@ NodeTypeDef:
     @@Type: DOMString
     @@Get:
       @@@PerlDef:
-        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-          $r => $r,
-          $prop => {<H::infoset|publicIdentifier>},
-          $ref => {$self},
-        }__;
+        $r = $$self->{<H::infoset|publicIdentifier>};
     @@LXSet:
       @@@enDesc:
         Sets the attribute value.  No lexical checking is performed
@@ -5389,17 +5081,14 @@ NodeTypeDef:
       @@@NodeReadOnlyError:
       @@@PerlDef:
         __CODE{tc|NodeReadOnlyError:: $node => $self}__;
-        __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
-          $given => $given,
-          $prop => {<H::infoset|publicIdentifier>},
-          $ref => $self,
-        }__;
+        $$self->{<H::infoset|publicIdentifier>} = $given;
 
     @@Test:
       @@@QName: Entity.publicId.test
       @@@PerlDef:
         my $node;
-        __CODE{tx|createGEForTest:: $gent => $node}__;
+        my $doc;
+        __CODE{tx|createGEForTest:: $gent => $node, $doc => $doc}__;
 
         $test->id ('initial');
         $test->assert_null ($node-><AG::Entity.publicId>);
@@ -5423,11 +5112,7 @@ NodeTypeDef:
         No system identifier is associated.
     @@Get:
       @@@PerlDef:
-        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-          $r => $r,
-          $prop => {<H::infoset|systemIdentifier>},
-          $ref => {$self},
-        }__;
+        $r = $$self->{<H::infoset|systemIdentifier>};
     @@LXSet:
       @@@enDesc:
         Sets the attribute value.  No lexical checking is performed
@@ -5438,17 +5123,14 @@ NodeTypeDef:
       @@@NodeReadOnlyError:
       @@@PerlDef:
         __CODE{tc|NodeReadOnlyError:: $node => $self}__;
-        __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
-          $given => $given,
-          $prop => {<H::infoset|systemIdentifier>},
-          $ref => $self,
-        }__;
+        $$self->{<H::infoset|systemIdentifier>} = $given;
 
     @@Test:
       @@@QName: Entity.systemId.test
       @@@PerlDef:
         my $node;
-        __CODE{tx|createGEForTest:: $gent => $node}__;
+        my $doc;
+        __CODE{tx|createGEForTest:: $gent => $node, $doc => $doc}__;
 
         $test->id ('initial');
         $test->assert_null ($node-><AG::Entity.systemId>);
@@ -5474,11 +5156,7 @@ NodeTypeDef:
     @@Type: DOMString
     @@Get:
       @@@PerlDef:
-        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-          $r => $r,
-          $prop => {<H::c|xmlEncoding>},
-          $ref => {$self},
-        }__;
+        $r = $$self->{<H::c|xmlEncoding>};
     @@LXSet:
       @@@enDesc:
         Sets the attribute value.  No lexical checking is performed
@@ -5489,17 +5167,14 @@ NodeTypeDef:
       @@@NodeReadOnlyError:
       @@@PerlDef:
         __CODE{tc|NodeReadOnlyError:: $node => $self}__;
-        __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
-          $given => $given,
-          $prop => {<H::c|xmlEncoding>},
-          $ref => $self,
-        }__;
+        $$self->{<H::c|xmlEncoding>} = $given;
 
     @@Test:
       @@@QName: Entity.xmlEncoding.test
       @@@PerlDef:
         my $node;
-        __CODE{tx|createGEForTest:: $gent => $node}__;
+        my $doc;
+        __CODE{tx|createGEForTest:: $gent => $node, $doc => $doc}__;
 
         $test->id ('initial');
         $test->assert_null ($node-><AG::Entity.xmlEncoding>);
@@ -5532,11 +5207,7 @@ NodeTypeDef:
     @@Type: DOMString
     @@Get:
       @@@PerlDef:
-        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-          $r => $r,
-          $prop => {<H::infoset|version>},
-          $ref => {$self},
-        }__;
+        $r = $$self->{<H::infoset|version>};
     @@LXSet:
       @@@enDesc:
         Sets the attribute value.  No lexical checking is performed
@@ -5547,11 +5218,7 @@ NodeTypeDef:
       @@@NodeReadOnlyError:
       @@@PerlDef:
         __CODE{tc|NodeReadOnlyError:: $node => $self}__;
-        __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
-          $given => $given,
-          $prop => {<H::infoset|version>},
-          $ref => $self,
-        }__;
+        $$self->{<H::infoset|version>} = $given;
       @@@enImplNote:
         {ISSUE::
           Should <X::c|DOMException.NOT_SUPPORTED_ERR> be thrown?
@@ -5561,7 +5228,8 @@ NodeTypeDef:
       @@@QName: Entity.xmlVersion.test
       @@@PerlDef:
         my $node;
-        __CODE{tx|createGEForTest:: $gent => $node}__;
+        my $doc;
+        __CODE{tx|createGEForTest:: $gent => $node, $doc => $doc}__;
 
         $test->id ('initial');
         $test->assert_null ($node-><AG::Entity.xmlVersion>);
@@ -5598,11 +5266,7 @@ NodeTypeDef:
           If there is no explicit base URI information and
           the <A::Node.baseURI> attribute contains <DOM::null>.
       @@@PerlDef:
-        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-          $r => $r,
-          $prop => {<H::infoset|declarationBaseURI>},
-          $ref => {$self},
-        }__;
+        $r = $$self->{<H::infoset|declarationBaseURI>};
         unless (defined $r) {
           __DEEP{
             $r = $self-><AG::Node.baseURI>;
@@ -5622,11 +5286,7 @@ NodeTypeDef:
       @@@NodeReadOnlyError:
       @@@PerlDef:
         __CODE{tc|NodeReadOnlyError:: $node => $self}__;
-        __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
-          $given => $given,
-          $prop => {<H::infoset|declarationBaseURI>},
-          $ref => $self,
-        }__;
+        $$self->{<H::infoset|declarationBaseURI>} = $given;
 
     @@XDTest:
       @@@QName: Entity.declBaseURI.test
@@ -5696,11 +5356,7 @@ NodeTypeDef:
           If there is no explicit base URI or entity URI information and
           the <A::Node.baseURI> attribute contains <DOM::null>.
       @@@PerlDef:
-        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-          $r => $r,
-          $prop => {<H::tx|entityBaseURI>},
-          $ref => {$self},
-        }__;
+        $r = $$self->{<H::tx|entityBaseURI>};
         unless (defined $r) {
           __DEEP{
             $r = $self-><AG::Entity.manakaiEntityURI>;
@@ -5724,11 +5380,7 @@ NodeTypeDef:
       @@@NodeReadOnlyError:
       @@@PerlDef:
         __CODE{tc|NodeReadOnlyError:: $node => $self}__;
-        __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
-          $given => $given,
-          $prop => {<H::tx|entityBaseURI>},
-          $ref => $self,
-        }__;
+        $$self->{<H::tx|entityBaseURI>} = $given;
 
     @@XDTest:
       @@@QName: Entity.entBaseURI.test
@@ -5811,11 +5463,7 @@ NodeTypeDef:
           is an internal entity and not modified since the tree construction,
           the entity URI must be <DOM::null>.
       @@@PerlDef:
-        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-          $r => $r,
-          $prop => {<H::tx|entityURI>},
-          $ref => {$self},
-        }__;
+        $r = $$self->{<H::tx|entityURI>};
         unless (defined $r) {
           __DEEP{
             $r = $self-><AG::Entity.systemId>;
@@ -5846,11 +5494,7 @@ NodeTypeDef:
       @@@NodeReadOnlyError:
       @@@PerlDef:
         __CODE{tc|NodeReadOnlyError:: $node => $self}__;
-        __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
-          $given => $given,
-          $prop => {<H::tx|entityURI>},
-          $ref => $self,
-        }__;
+        $$self->{<H::tx|entityURI>} = $given;
 
     @@XDTest:
       @@@QName: Entity.entURI.test
@@ -5917,20 +5561,12 @@ NodeTypeDef:
         @@@@enDesc:
           Otherwise.
       @@@PerlDef:
-        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-          $r => $r,
-          $prop => {<H::tx|hasReplacementTree>},
-          $ref => {$self},
-        }__;
+        $r = $$self->{<H::tx|hasReplacementTree>};
     @@Set:
       @@@NodeReadOnlyError:
       @@@PerlDef:
         __CODE{tc|NodeReadOnlyError:: $node => $self}__;
-        __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
-          $given => $given,
-          $prop => {<H::tx|hasReplacementTree>},
-          $ref => $self,
-        }__;
+        $$self->{<H::tx|hasReplacementTree>} = $given;
 
   @LXAttr:
     @@Name: ownerDocumentTypeDefinition
@@ -5949,7 +5585,8 @@ NodeTypeDef:
       @@@QName: Entity.ownerDTDef.test
       @@@PerlDef:
         my $et;
-        __CODE{tx|createGEForTest:: $gent => $et}__;
+        my $doc;
+        __CODE{tx|createGEForTest:: $gent => $et, $doc => $doc}__;
  
         my $odt = $et-><AG::Entity.ownerDocumentTypeDefinition>;
         $test->assert_null ($odt);
@@ -5983,26 +5620,19 @@ NodeTypeDef:
         is created in memory.
     @@Get:
       @@@PerlDef:
-        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-          $r => $r,
-          $prop => {<H::tx|externalDeclaration>},
-          $ref => {$self},
-        }__;
+        $r = $$self->{<H::tx|externalDeclaration>};
     @@Set:
       @@@NodeReadOnlyError:
       @@@PerlDef:
         __CODE{tc|NodeReadOnlyError:: $node => $self}__;
-        __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
-          $given => $given,
-          $prop => {<H::tx|externalDeclaration>},
-          $ref => $self,
-        }__;
+        $$self->{<H::tx|externalDeclaration>} = $given;
 
     @@XDTest:
       @@@QName: Entity.isExternallyDeclared.test
       @@@PerlDef:
         my $et;
-        __CODE{tx|createGEForTest:: $gent => $et}__;
+        my $doc;
+        __CODE{tx|createGEForTest:: $gent => $et, $doc => $doc}__;
 
         $test->id ('default');
         $test->assert_false ($et-><AG::Entity.isExternallyDeclared>);
@@ -6068,37 +5698,6 @@ NodeTypeDef:
     <M::Document.normalizeDocument> method with appropriate 
     configuration parameters can be used to remove such incosistency.
   
-  @IntMethod:
-    @@Operator: mg|CreateNodeStemMethod
-    @@Param:
-      @@@Name: bag
-      @@@Type: HASH
-    @@Param:
-      @@@Name: obj
-      @@@Type: HASH
-    @@Param:
-      @@@Name: opt
-      @@@Type: HASH
-    @@Return:
-      @@@Type: HASH
-      @@@PerlDef:
-        $obj->{<H::infoset|children>} = [];
-        __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
-          $result => {$obj->{<H::infoset|name>}},
-          $given => {${$opt->{<H::infoset|name>}}},
-        }__;
-        __CODE{mg|setOwnerProp||ManakaiDOM|all::
-          $bag => $bag,
-          $ownerref => {$opt->{<H::tc|ownerDocument>}},
-          $ownee1hprop => {<H::tc|revOwnerDocument>},
-          $ownee => {$obj},
-          $owner0prop => {<H::tc|ownerDocument>},
-        }__;
-        $r = $obj;
-  @mg:subnode1a: infoset|children
-  @mg:owner0: tc|ownerDocument
-  @mg:origin0: infoset|parent
-
   @enImplNote:
     @@ddid: props
     @@@:
@@ -6128,16 +5727,14 @@ NodeTypeDef:
   @CODE:
     @@QName: tx|createERForTest
     @@PerlDef:
-      my $__doc;
-      __CODE{tc|createEmptyDocumentForTest:: $doc => $__doc}__;
-      $er = $__doc-><M::Document.createEntityReference> ('er');
+      __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+      $er = $doc-><M::Document.createEntityReference> ('er');
       $er-><M::Node.manakaiSetReadOnly> (false, true);
   @CODE:
     @@QName: tx|createROERForTest
     @@PerlDef:
-      my $__doc;
-      __CODE{tc|createEmptyDocumentForTest:: $doc => $__doc}__;
-      $er = $__doc-><M::Document.createEntityReference> ('er');
+      __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+      $er = $doc-><M::Document.createEntityReference> ('er');
 
   @CAttr:
     @@Name: nodeType
@@ -6151,7 +5748,8 @@ NodeTypeDef:
       @@@QName: ER.nodeType.test
       @@@PerlDef:
         my $er;
-        __CODE{tx|createERForTest:: $er => $er}__;
+        my $doc;
+        __CODE{tx|createERForTest:: $er => $er, $doc => $doc}__;
 
         $test->id ('nodeType');
         $test->assert_num_equals
@@ -8867,7 +8465,8 @@ NodeTypeDef:
       @@@QName: ER.getFeature.test
       @@@PerlDef:
         my $node;
-        __CODE{tx|createERForTest:: $er => $node}__;
+        my $doc;
+        __CODE{tx|createERForTest:: $er => $node, $doc => $doc}__;
 
         for (
           [Core => '1.0', <IFName::EntityReference||ManakaiDOM|ManakaiDOM1>],
@@ -8958,20 +8557,12 @@ NodeTypeDef:
     @@Type: boolean
     @@Get:
       @@@PerlDef:
-        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-          $r => $r,
-          $prop => {<H::tx|expanded>},
-          $ref => {$self},
-        }__;
+        $r = $$self->{<H::tx|expanded>};
     @@Set:
       @@@NodeReadOnlyError:
       @@@PerlDef:
         __CODE{tc|NodeReadOnlyError:: $node => $self}__;
-        __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
-          $given => $given,
-          $prop => {<H::tx|expanded>},
-          $ref => $self,
-        }__;
+        $$self->{<H::tx|expanded>} = $given;
     @@enImplNote:
       {ISSUE::
         Should subtree modifications turn the flag like <A::Attr.specified>?
@@ -8981,7 +8572,8 @@ NodeTypeDef:
       @@@QName: EntityReference.manakaiExpanded.test
       @@@PerlDef:
         my $node;
-        __CODE{tx|createERForTest:: $er => $node}__;
+        my $doc;
+        __CODE{tx|createERForTest:: $er => $node, $doc => $doc}__;
 
         $test->id ('set.false.1');
         $node-><AS::EntityReference.manakaiExpanded> (false);
@@ -9024,11 +8616,7 @@ NodeTypeDef:
           If there is no explicit base URI or entity URI information and
           the <A::Node.baseURI> attribute contains <DOM::null>.
       @@@PerlDef:
-        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-          $r => $r,
-          $prop => {<H::tx|entityBaseURI>},
-          $ref => {$self},
-        }__;
+        $r = $$self->{<H::tx|entityBaseURI>};
         unless (defined $r) {
           __DEEP{
             $r = $self-><AG::Node.baseURI>;
@@ -9057,11 +8645,7 @@ NodeTypeDef:
       @@@NodeReadOnlyError:
       @@@PerlDef:
         __CODE{tc|NodeReadOnlyError:: $node => $self}__;
-        __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
-          $given => $given,
-          $prop => {<H::tx|entityBaseURI>},
-          $ref => $self,
-        }__;
+        $$self->{<H::tx|entityBaseURI>} = $given;
 
     @@XDTest:
       @@@QName: EntityRef.entBaseURI.test
@@ -9117,20 +8701,12 @@ NodeTypeDef:
         The node is <EM::not> an external entity reference.
     @@Get:
       @@@PerlDef:
-        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-          $r => $r,
-          $prop => {<H::tx|isExternalEntity>},
-          $ref => {$self},
-        }__;
+        $r = $$self->{<H::tx|isExternalEntity>};
     @@Set:
       @@@NodeReadOnlyError:
       @@@PerlDef:
         __CODE{tc|NodeReadOnlyError:: $node => $self}__;
-        __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
-          $given => $given,
-          $prop => {<H::tx|isExternalEntity>},
-          $ref => $self,
-        }__;
+        $$self->{<H::tx|isExternalEntity>} = $given;
     @@enImplNote:
       {ISSUE::
         Default value?
@@ -9182,35 +8758,6 @@ NodeTypeDef:
     possible to have the character sequence <XML::?<gt>> in the content,
     which is illegal in XML.
   
-  @IntMethod:
-    @@Operator: mg|CreateNodeStemMethod
-    @@Param:
-      @@@Name: bag
-      @@@Type: HASH
-    @@Param:
-      @@@Name: obj
-      @@@Type: HASH
-    @@Param:
-      @@@Name: opt
-      @@@Type: HASH
-    @@Return:
-      @@@Type: HASH
-      @@@PerlDef:
-        __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
-          $result => {$obj->{<H::infoset|target>}},
-          $given => {${$opt->{<H::infoset|target>}}},
-        }__;
-        $obj->{<H::infoset|content>} = $opt->{<H::infoset|content>};
-        __CODE{mg|setOwnerProp||ManakaiDOM|all::
-          $bag => $bag,
-          $ownerref => {$opt->{<H::tc|ownerDocument>}},
-          $ownee1hprop => {<H::tc|revOwnerDocument>},
-          $ownee => {$obj},
-          $owner0prop => {<H::tc|ownerDocument>},
-        }__;
-        $r = $obj;
-  @mg:owner0: tc|ownerDocument
-  @mg:origin0: infoset|parent
   @enImplNote:
     @@ddid: props
     @@@:
@@ -9241,9 +8788,8 @@ NodeTypeDef:
   @CODE:
     @@QName: tx|createPIForTest
     @@PerlDef:
-      my $__doc;
-      __CODE{tc|createEmptyDocumentForTest:: $doc => $__doc}__;
-      $pi = $__doc-><M::Document.createProcessingInstruction> ('pi', 'data');
+      __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+      $pi = $doc-><M::Document.createProcessingInstruction> ('pi', 'data');
 
   @CAttr:
     @@Name: nodeType
@@ -9257,7 +8803,8 @@ NodeTypeDef:
       @@@QName: PI.nodeType.test
       @@@PerlDef:
         my $pi;
-        __CODE{tx|createPIForTest:: $pi => $pi}__;
+        my $doc;
+        __CODE{tx|createPIForTest:: $pi => $pi, $doc => $doc}__;
 
         $test->id ('nodeType');
         $test->assert_num_equals
@@ -9552,7 +9099,8 @@ NodeTypeDef:
       @@@QName: PI.getFeature.test
       @@@PerlDef:
         my $node;
-        __CODE{tx|createPIForTest:: $pi => $node}__;
+        my $doc;
+        __CODE{tx|createPIForTest:: $pi => $node, $doc => $doc}__;
 
         for (
           [Core => '1.0', <IFName::ProcessingInstruction||ManakaiDOM|ManakaiDOM1>],
@@ -9580,11 +9128,7 @@ NodeTypeDef:
         @@@@enDesc:
           If the absolute base DOM URI is not available.
       @@@PerlDef:
-        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-          $r => $r,
-          $prop => {<H::infoset|baseURI>},
-          $ref => {$self},
-        }__;
+        $r = $$self->{<H::infoset|baseURI>};
         unless (defined $r) {
           __DEEP{
             my $node = $self-><AG::Node.parentNode>;
@@ -9680,13 +9224,7 @@ NodeTypeDef:
     @@Type: DOMString
     @@Get:
       @@@PerlDef:
-        my $v;
-        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-          $r => $v,
-          $prop => {<H::infoset|target>},
-          $ref => {$self},
-        }__;
-        $r = $$v;
+        $r = ${$$self->{<H::infoset|target>}};
 
     @@Test:
       @@@QName: PI.nodeName.test
@@ -9714,22 +9252,12 @@ NodeTypeDef:
     @@Type: DOMString
     @@Get:
       @@@PerlDef:
-        my $v;
-        __CODE{mg|getNodeStemPropValue||ManakaiDOM|all::
-          $r => $v,
-          $prop => {<H::infoset|content>},
-          $ref => {$self},
-        }__;
-        $r = $$v;
+        $r = ${$$self->{<H::infoset|content>}};
     @@Set:
       @@@NodeReadOnlyError:
       @@@PerlDef:
         __CODE{tc|NodeReadOnlyError:: $node => $self}__;
-        __CODE{mg|setNodeStemPropValue||ManakaiDOM|all::
-          $given => {\$given},
-          $prop => {<H::infoset|content>},
-          $ref => $self,
-        }__;
+        $$self->{<H::infoset|content>} = \$given;
 
     @@Test:
       @@@QName: PI.nodeValue.textContent.data.test

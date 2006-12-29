@@ -1,3 +1,13 @@
+2006-12-29  Wakaba  <wakaba@suika.fam.cx>
+
+	* TreeCore.dis, DOMCore.dis, Document.dis,
+	Element.dis, CharacterData.dis, XML.dis, 
+	XDoctype.dis, DOMString.dis, TreeStore.dis,
+	XMLParser.dis: Use Perl native
+	hashs and |Scalar::Util|'s weak references in favor of |Grove.dis|
+	for DOM nodes.  See
+	also <http://suika.fam.cx/gate/2005/sw/manakai/%E3%83%A1%E3%83%A2/2006-12-29>.
+
 2006-12-03  Wakaba  <wakaba@suika.fam.cx>
 
 	* DOMFeature.dis, TreeCore.dis: Unused |role|s are removed.

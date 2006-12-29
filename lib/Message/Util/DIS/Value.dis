@@ -17,7 +17,7 @@ Module:
   @License:
     license:Perl+MPL
   @Date:
-    $Date: 2006/12/02 12:46:26 $
+    $Date: 2006/12/29 14:45:49 $
   
   @Require:
     @@Module:
@@ -463,8 +463,9 @@ IFClsDef:
                            <Q::fe|TreeStore> => '3.0'});
 
         my $node;
+        my $doc;
         __CODE{tc|createElementForTest||ManakaiDOM|ManakaiDOMLatest::
-          $el => $node,
+          $el => $node, $doc => $doc,
         }__;
         $node-><AS::Node.textContent> ('abcdefg');
 
@@ -1293,8 +1294,9 @@ IFClsDef:
     @@QName: DVXMLValue.value.test
     @@PerlDef:
       my $node;
+      my $doc;
       __CODE{tc|createElementForTest||ManakaiDOM|ManakaiDOMLatest::
-        $el => $node,
+        $el => $node, $doc => $doc,
       }__;
       $node->text_content ('abcdefg');
 

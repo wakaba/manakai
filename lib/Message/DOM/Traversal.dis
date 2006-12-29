@@ -16,7 +16,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/11/04 17:25:06 $
+    $Date: 2006/12/29 14:45:41 $
 
   @Require:
     @@Module:
@@ -936,7 +936,6 @@ IFCls2Def:
   @CODE:
     @@QName: createTWForTest
     @@PerlDef:
-      my $doc;
       __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
 
       my $docel = $doc-><M::Document.createElement> ('docel');
@@ -994,11 +993,10 @@ IFCls2Def:
       @@@QName: TreeWalker.currentNode.set.test
       @@@PerlDef:
         my $tw;
-        __CODE{createTWForTest:: $tw => $tw}__;
-        
-        my $od = $tw-><AG::TreeWalker.currentNode>-><AG::Node.ownerDocument>;
+        my $doc;
+        __CODE{createTWForTest:: $tw => $tw, $doc => $doc}__;
 
-        my $el = $od-><M::Document.createElement> ('e');
+        my $el = $doc-><M::Document.createElement> ('e');
 
         $tw-><AS::TreeWalker.currentNode> ($el);
 
@@ -1007,7 +1005,8 @@ IFCls2Def:
       @@@QName: TreeWalker.currentNode.set.null.test
       @@@PerlDef:
         my $tw;
-        __CODE{createTWForTest:: $tw => $tw}__;
+        my $doc;
+        __CODE{createTWForTest:: $tw => $tw, $doc => $doc}__;
 
         $test->assert_exception (code => sub {
           $tw-><AS::TreeWalker.currentNode> (null);
@@ -3840,7 +3839,6 @@ IFClsXDef:
   @CODE:
     @@QName: createSWForTest
     @@PerlDef:
-      my $doc;
       __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
 
       my $docel = $doc-><M::Document.createElement> ('docel');

@@ -29,10 +29,10 @@ sub daf_perl_t ($$$) {
   my $mod = $db->get_module ($mod_uri, for_arg => $mod_for);
 
     status_msg_ qq<Generating Perl test from <$mod_uri> for <$mod_for>...>;
-    my $pl = daf_generate_perl_test_file ($mod);
+    my $pl = daf_generate_perl_test_document ($mod);
     status_msg qq<done>;
 
-    my $cfg = $pl->owner_document->dom_config;
+    my $cfg = $pl->dom_config;
     $cfg->set_parameter (ExpandedURI q<pc:preserve-line-break> => 1);
 
     my $output;
@@ -44,15 +44,15 @@ sub daf_perl_t ($$$) {
                           defined $out_file_path
                             ? q<">.$out_file_path.q<">
                             : 'to stdout';
-    print $output $pl->stringify;
+    print $output $pl->document_element->stringify;
     close $output;
     status_msg q<done>;
 } # daf_perl_t
 
-sub daf_generate_perl_test_file ($) {
+sub daf_generate_perl_test_document ($) {
   my $mod = shift;
-  my $pl = $impl->create_pc_file;
-  my $factory = $pl->owner_document;
+  my $factory = $impl->create_pc_document;
+  my $pl = $factory->document_element;
   my $pack = $pl->get_last_package ("Manakai::Test", make_new_package => 1);
   $pack->add_use_perl_module_name ("Message::Util::DIS::Test");
   $pack->add_use_perl_module_name ("Message::Util::Error");
@@ -202,8 +202,8 @@ sub daf_generate_perl_test_file ($) {
   
   $num_statement->append_code (' (' . $total_tests . ')');
 
-  return $pl;
-} # daf_generate_perl_test_file
+  return $factory;
+} # daf_generate_perl_test_document
 
 1;
 

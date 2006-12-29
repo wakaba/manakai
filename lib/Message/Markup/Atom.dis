@@ -43,7 +43,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/12/02 12:46:24 $
+    $Date: 2006/12/29 14:45:44 $
 
   @Require:
     @@Module:
@@ -3135,7 +3135,9 @@ IFClsETDef:
         $test->assert_num_equals (actual_value => 0+@$list, expected_value => 0);
 
         $test->id ('parent');
+        my $parent;
         for ($doc-><M::Document.createElementNS> (<Q::atom|>, 'feed')) {
+          $parent = $_;
           $_-><M::Node.appendChild>
                 ($doc-><M::Document.createElementNS> (<Q::atom|>, 'author'));
           $_-><M::Node.appendChild>
@@ -3155,7 +3157,9 @@ IFClsETDef:
         my $el = $doc-><M::Document.createElementNS> (<Q::atom|>, 'entry');
 
         $test->id ('parent');
+        my $parent;
         for ($doc-><M::Document.createElementNS> (<Q::atom|>, 'feed')) {
+          $parent = $_;
           $_-><M::Node.appendChild>
                 ($doc-><M::Document.createElementNS> (<Q::atom|>, 'author'));
           $_-><M::Node.appendChild>

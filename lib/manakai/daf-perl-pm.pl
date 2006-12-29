@@ -23,7 +23,7 @@ sub daf_perl_pm ($$$) {
     status_msg_ qq<Generating Perl module from <$mod_uri> for <$mod_for>...>;
     local $Message::Util::DIS::Perl::Implementation
         = $impl->get_feature (ExpandedURI q<Util:PerlCode> => '1.0');
-    my $pl = $mod->pl_generate_perl_module_file
+    my $pl = $mod->pl_generate_perl_module_document
                     ($impl->get_feature (ExpandedURI q<Util:PerlCode> => '1.0'));
     status_msg qq<done>;
 
@@ -36,13 +36,13 @@ sub daf_perl_pm ($$$) {
                           defined $out_file_path
                             ? q<">.$out_file_path.q<">
                             : 'to stdout';
-    print $output $pl->stringify;
+    print $output $pl->document_element->stringify;
     close $output;
     status_msg q<done>;
 
   require Message::Util::AutoLoad::Config;
   my $alconf = Message::Util::AutoLoad::Config->new;
-  $alconf->register_all ($pl->owner_document->get_autoload_definition_list);
+  $alconf->register_all ($pl->get_autoload_definition_list);
   $alconf->save;
 } # daf_perl_pm
 

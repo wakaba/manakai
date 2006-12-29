@@ -24,7 +24,7 @@ Module:
       @@@Year:2004
       @@@DISCore:author: DISCore|Wakaba
   @Date:
-    $Date: 2006/12/02 12:46:25 $
+    $Date: 2006/12/29 14:45:45 $
   
   @Require:
     @@Module:
@@ -4777,14 +4777,13 @@ IFClsDef:
       $test->assert_isa ($impl, <ClassName::ManakaiPCImplementation>);
 
   @Method:
-    @@Name: createPCFile
+    @@Name: createPCDocument
     @@enDesc:
-      Creates a <IF::PerlFile> object that belongs to the new
-      <IF::PCDocument>.
+      Creates a Perl document,
     @@Return:
-      @@@Type: PerlFile
+      @@@Type: PCDocument
       @@@enDesc:
-        {P:: The newly created Perl file object where:
+        {P:: The newly created <IF::PCDocument> object where:
 
            - The <A::Document.strictErrorChecking> attribute
              is set to <DOM::false>.
@@ -4795,45 +4794,38 @@ IFClsDef:
            - The <Q::cfg|dtd-attribute-type> configuration
              parameter is set to <DOM::false>.
 
+           - The <A::Node.childNodes> list contains an
+             <IF::Element> node whose <A::Node.namespaceURI>
+             is <URI^^DISCore|QName::pc|> and <A::Node.localName>
+             is <XE::file>.
         }
       @@@PerlDef:
         __DEEP{
-          my $rdoc = $self-><M::DOMImpl.createDocument> (<Q::pc:>, 'file');
+          $r = $self-><M::DOMImpl.createDocument> (<Q::pc:>, 'file');
 
-          $rdoc-><AS::Document.strictErrorChecking> (false);
-          my $rdoc_cfg = $rdoc-><AG::Document.domConfig>;
-          $rdoc_cfg-><M::CFG.setParameter>
+          $r-><AS::Document.strictErrorChecking> (false);
+          my $cfg = $r-><AG::Document.domConfig>;
+          $cfg-><M::CFG.setParameter>
                        (<Q::cfg|dtd-default-attribute> => false);
-          $rdoc_cfg-><M::CFG.setParameter>
+          $cfg-><M::CFG.setParameter>
                        (<Q::cfg|dtd-attribute-type> => false);
-
-          $r = $rdoc-><AG::Document.documentElement>;
         }__;
 
     @@Test:
-      @@@QName: PCImplementation.createPCFile.test
+      @@@QName: PCImplementation.createPCDocument.test
       @@@PerlDef:
         my $impl;
         __CODE{tc|createImplForTest:: $impl => $impl}__;
-        $impl = $impl->get_feature (<Q::Util|PerlCode> => '1.0');
 
-        my $file = $impl-><M::PCImplementation.createPCFile>;
-
-        $test->id ('interface');
-        $test->assert_isa ($file, <IFName::PerlFile>);
-
-        my $od = $file->owner_document;
+        my $pcdoc = $impl->create_pc_document;
 
         $test->id ('od.interface');
-        $test->assert_isa ($od, <IFName::PCDocument>);
-
-        $test->id ('parentNode');
-        $test->assert_equals ($file->parent_node, $od);
+        $test->assert_isa ($pcdoc, <IFName::PCDocument>);
 
         $test->id ('strictErrorChecking');
-        $test->assert_false ($od->strict_error_checking);
+        $test->assert_false ($pcdoc->strict_error_checking);
 
-        my $cfg = $od->dom_config;
+        my $cfg = $pcdoc->dom_config;
 
         $test->id ('cfg.dtd-default-attribute');
         $test->assert_false ($cfg->get_parameter
@@ -4842,6 +4834,12 @@ IFClsDef:
         $test->id ('cfg.dtd-attribute-type');
         $test->assert_false ($cfg->get_parameter
                                      (<Q::cfg|dtd-attribute-type>));
+
+        $test->id ('document_element.interface');
+        $test->assert_isa ($pcdoc->document_element, <IFName::PerlFile>);
+
+        $test->id ('document_element.parent_node');
+        $test->assert_equals ($pcdoc->document_element->parent_node, $pcdoc);
 
   @IntMethod:
     @@ForCheck: ManakaiDOM|ForClass
