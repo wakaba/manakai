@@ -22,7 +22,7 @@ Module:
       @@@Year:2004
       @@@DISCore:author: DISCore|Wakaba
   @Date:
-    $Date: 2006/12/02 12:46:25 $
+    $Date: 2006/12/30 02:37:06 $
   
   @Require:
     @@Module:
@@ -205,54 +205,6 @@ FeatureDef:
         The <QUOTE::dis> object model, version 1.0. 
     @@f:requires:
       swcfg21:CoreFeature21
-
-## -- Roles
-
-ElementTypeBinding:
-  @Name: RoleDef
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type:
-      DISLang:Role
-    @@ForCheck:
-      =ManakaiDOM:all
-
-RoleDef:
-  @QName: ModuleRole
-  @enDesc:
-    Any class playing this role may be returned by
-    <M::ManakaiDISModuleDefinition.getFeature> method with
-    appropriate feature parameters.
-
-RoleDef:
-  @QName: ForRole
-  @enDesc:
-    Any class playing this role may be returned by
-    <M::ManakaiDISForDefinition.getFeature> method with
-    appropriate feature parameters.
-
-RoleDef:
-  @QName: ResourceRole
-  @enDesc:
-    Any class playing this role may be returned by
-    <M::ManakaiDISResourceDefinition.getFeature> method with
-    appropriate feature parameters.
-
-RoleDef:
-  @QName: ElementRole
-  @enDesc:
-    Any class playing this role may be returned by
-    <M::ManakaiDISElement.getFeature> method with
-    appropriate feature parameters.
-
-RoleDef:
-  @QName: DatabaseRole
-  @enDesc:
-    Any class playing this role may be returned by
-    <M::ManakaiDISDatabase.getFeature> method with
-    appropriate feature parameters.
-
 
 ElementTypeBinding:
   @Name: IFQName
@@ -672,49 +624,6 @@ IFClsDef:
                                         .defaultElementTypeNamespaceURI>
                     (<Q::dis:>);
         }
-
-  @IntMethod:
-    @@ForCheck: ManakaiDOM|ForClass
-    @@Operator: 
-      @@@@: DISPerl|NewMethod
-      @@@ContentType: DISCore|QName
-    @@ForCheck: ManakaiDOM|ForClass
-    @@enDesc:
-      Creates a new instance of the <IF::DISParser> interface
-      and returns it.
-
-      {NOTE:: This method is compatible with the role <Q::DOMLS:ParserRole>
-              so that this class is accessible via the
-              <M::DOMLS|DOMImplementationLSExtended.createMLSParser>
-              method.
-      }
-    @@Param:
-      @@@Name: impl
-      @@@Type: DOMImpl
-      @@@enDesc:
-        An implementation object.  The <M::DOMFeature|GetFeature.getFeature>
-        method with parameter values <Feature::DIS|Core> and
-        <FeatureVer::1.0> respectively <kwd:MUST> return
-        an object implementing the <IF::DISImplementation> interface.
-    @@Param:
-      @@@Name: features
-      @@@Type: DISLang|String||ManakaiDOM|all
-      @@@dis:actualType: DOMFeature|FeaturesString||ManakaiDOM|ManakaiDOMLatest
-      @@@enDesc:
-        A list of requested features.  In the current implementation
-        this parameter is ignored.
-    @@Return:
-      @@@Type: DOMMain|Object||ManakaiDOM|all
-      @@@actualType: ManakaiDISParser
-      @@@enDesc: The newly created parser object.
-      @@@PerlDef:
-        __DEEP{
-          $r = $self->SUPER::new
-                       ($impl-><M::DOMFeature|GetFeature
-                                 ||ManakaiDOM|ManakaiDOMLatest.getFeature>
-                           (<Q::swcfg21:Core> => '2.1'),
-                        $features);
-        }__;
 ##DISParser
 
 IFClsDef:
@@ -1039,7 +948,6 @@ IFClsDef:
   @IFQName: NSResolverDIS
   @ClsQName: ManakaiNSResolverDIS
 
-
   @Method:
     @@Name: prefixToURI
     @@Description:
@@ -1353,8 +1261,6 @@ IFClsDef:
     @@lang:en
     @@@:
       <QUOTE::dis> element node objects. 
-
-  @DISLang:role: ElementRole
 
   @Method:
     @@Name: forMatch
@@ -2043,57 +1949,6 @@ IFClsDef:
         }__;
 
   @Method:
-     @@Name:  getFeature
-     @@Description:
-        @@@lang:en
-        @@@@:
-          Returns a specialized object that implements the specialized 
-          interfaces of the specified feature and version.
-     @@Param:
-        @@@Name:  feature
-        @@@Type: swcfg21|SWCFGString||swcfg21|ForLatest
-        @@@actualType: DOMFeature|FeatureNameString||ManakaiDOM|ManakaiDOMLatest
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            A feature name to request.
-     @@Param:
-        @@@Name:  version
-        @@@Type: swcfg21|SWCFGString||swcfg21|ForLatest
-        @@@actualType:
-          DOMFeature|FeatureVersionString||ManakaiDOM|ManakaiDOMLatest
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            A feature version number to request.
-     @@Return:
-        @@@Type:  
-          DOMMain:Object::ManakaiDOM:all
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            An object that implements the specialized APIs of the 
-            <P::feature> and <P::version>.
-        @@@nullCase:
-          @@@@enDesc: 
-            There is no object available that implements interfaces 
-            associated with the <P::feature> and <P::version>. 
-        @@@PerlDef:
-            $feature =~ s/^\+//;
-            CLASS: for my $class (grep {
-              $Message::Util::DIS::ManakaiDISElement::CompatClass{$_}
-            } keys %Message::Util::DIS::ManakaiDISElement::CompatClass) {
-              if ($Message::DOM::ClassFeature{$class}->{$feature}->{$version}) {
-                __CODE{ManakaiNode|getNewReference||ManakaiDOM|Perl::
-                  $object => {$self->{<H::mn:node>}},
-                  $ref => $r,
-                  $class => $class,
-                }__;
-                last CLASS;
-              }
-            }
-
-  @Method:
     @@Name: unlinkFromDocument
     @@enDesc:
       Removes any relationship to this node from the owner document tree.
@@ -2267,11 +2122,6 @@ IFClsDef:
 
   @enDesc:
     The <Q::dis:Module> elements. 
-
-  @DISLang:role:
-    @@@:
-      DISLang:NullRole
-    @@DISCore:stopISARecursive:1
 
   @Attr:
     @@Name: requireElement
@@ -2563,8 +2413,6 @@ IFClsDef:
 
   @enDesc:
     Resource database created from <QUOTE::dis> source data. 
-
-  @DISLang:role: DatabaseRole
 
   @Method:
     @@Name: getModule
@@ -3967,56 +3815,6 @@ IFClsDef:
         }__;
 
   @Method:
-     @@Name:  getFeature
-     @@Description:
-        @@@lang:en
-        @@@@:
-          Returns a specialized object that implements the specialized 
-          interfaces of the specified feature and version.
-     @@Param:
-        @@@Name:  feature
-        @@@Type:
-          DISLang:String::ManakaiDOM:all
-        @@@actualType:
-          ManakaiDOM:ManakaiDOMFeatureName::ManakaiDOM:ManakaiDOMLatest
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            A feature name to request.
-     @@Param:
-        @@@Name:  version
-        @@@Type:
-          DISLang:String::ManakaiDOM:all
-        @@@actualType:
-          ManakaiDOM:ManakaiDOMFeatureVersion::ManakaiDOM:ManakaiDOMLatest
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            A feature version number to request.
-     @@Return:
-        @@@Type: 
-          DOMMain:Object::ManakaiDOM:all
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            An object that implements the specialized APIs of the 
-            <P::feature> and <P::version>. 
-        @@@nullCase:
-          @@@@enDesc: 
-            There is no object available that implements interfaces 
-            associated with the <P::feature> and <P::version>. 
-        @@@PerlDef:
-          $feature =~ s/^\+//;
-          CLASS: for my $class (grep {
-            $Message::Util::DIS::ManakaiDISDatabase::CompatClass{$_}
-          } keys %Message::Util::DIS::ManakaiDISDatabase::CompatClass) {
-            if ($Message::DOM::ClassFeature{$class}->{$feature}->{$version}) {
-              $r = bless {o => $self}, $class;
-              last CLASS;
-            }
-          }
-
-  @Method:
     @@Name: free
     @@enDesc:
       Marks the database, resources in the database, and source
@@ -4327,8 +4125,6 @@ IFClsDef:
   @IFQName: DISAnyResource
   @ClsQName: ManakaiDISAnyResource
 
-  @ClsISA: DOMFeature|ManakaiHasFeatureByGetFeature||ManakaiDOM|ManakaiDOMLatest
-
   @enDesc:
     {P:: A <IF::DISAnyResource> object represents a resource defined
     in <QUOTE::dis> files.  In <QUOTE::dis> model, resources are
@@ -4347,9 +4143,6 @@ IFClsDef:
                      <IF::DISModule> interface.
 
    }
-
-   The objects implementing this interface <kwd:MUST> also implement
-   the <IF::GetFeature> interface.
 
   @Attr:
     @@Name: uri
@@ -5000,10 +4793,7 @@ IFClsDef:
                                    (<Q::lang|dcmodel>,
                                     $mtopt{default_media_type}, %mtopt)) {
                     unless (defined $factory) {
-                      $factory = $implementation
-                                   -><M::GetFeature.getFeature>
-                                       ('Core' => '3.0')
-                                   -><M::DOMImpl.createDocument>;
+                      $factory = $implementation->create_document;
                     }
                     my $mt = $db-><M::DISDatabase.getResource>
                                     ($el-><M::DISElement.mediaTypeURI>);
@@ -5831,8 +5621,6 @@ IFClsDef:
   @ClsISA: dp|ManakaiDISAnyResourcePerl
   @ClsISA: ManakaiDISAnyResource
 
-  @Implement: GetFeature
-
   @enDesc:
     <QUOTE::dis> module definitions. 
 
@@ -5841,8 +5629,6 @@ IFClsDef:
     @@@:
       The objects implementing the <IF::DISModule> interface <kwd:MUST>
       also implement the <IF::DISAnyResource> interface.
-
-  @DISLang:role: ModuleRole
   
   @Attr:
     @@ForCheck: ManakaiDOM|ForClass
@@ -5870,56 +5656,6 @@ IFClsDef:
           The resource is not part of any module since
           its definition is not read (<IF::DISModule.isDefined> is <DOM::false>).
       @@@PerlDef: $r = $self;
-
-  @Method:
-    @@ForCheck: ManakaiDOM|ForClass
-     @@Name:  getFeature
-     @@Description:
-        @@@lang:en
-        @@@@:
-          Returns a specialized object that implements the specialized 
-          interfaces of the specified feature and version.
-     @@Param:
-        @@@Name:  feature
-        @@@Type:
-          DISLang:String::ManakaiDOM:all
-        @@@actualType: DOMFeature|FeatureNameString||ManakaiDOM|ManakaiDOMLatest
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            A feature name to request.
-     @@Param:
-        @@@Name:  version
-        @@@Type:
-          DISLang:String::ManakaiDOM:all
-        @@@actualType:
-          DOMFeature|FeatureVersionString||ManakaiDOM|ManakaiDOMLatest
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            A feature version number to request.
-     @@Return:
-        @@@Type: 
-          DOMMain:Object::ManakaiDOM:all
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            An object that implements the specialized APIs of the 
-            <P::feature> and <P::version>. 
-        @@@nullCase:
-          @@@@enDesc: 
-            There is no object available that implements interfaces 
-            associated with the <P::feature> and <P::version>. 
-        @@@PerlDef:
-          $feature =~ s/^\+//;
-          CLASS: for my $class (grep {
-            $Message::Util::DIS::ManakaiDISModuleDefinition::CompatClass{$_}
-          } keys %Message::Util::DIS::ManakaiDISModuleDefinition::CompatClass) {
-            if ($Message::DOM::ClassFeature{$class}->{$feature}->{$version}) {
-              $r = bless {o => $self}, $class;
-              last CLASS;
-            }
-          }
 
   @Method:
     @@Name: addResourceList
@@ -6093,7 +5829,6 @@ PropDef:
 ClsDef:
   @ClsQName: ManakaiDISModuleLite
 
-  @Implement: GetFeature
   @Implement: DIS|DISResourceProp
   @Implement: dp|DISAnyResourcePerl
   @Implement: dp|DISModulePerl
@@ -6408,8 +6143,6 @@ IFClsDef:
   @ClsISA: ManakaiDISPropertyAccessor
   @ClsISA: ManakaiDISAnyResource
 
-  @DISLang:role: ForRole
-
   @Description:
     @@lang:en
     @@@:
@@ -6480,56 +6213,6 @@ IFClsDef:
             }
           }
         }__;
-
-  @Method:
-     @@Name:  getFeature
-     @@Description:
-        @@@lang:en
-        @@@@:
-          Returns a specialized object that implements the specialized 
-          interfaces of the specified feature and version.
-     @@Param:
-        @@@Name:  feature
-        @@@Type:
-          DISLang:String::ManakaiDOM:all
-        @@@actualType:
-          ManakaiDOM:ManakaiDOMFeatureName::ManakaiDOM:ManakaiDOMLatest
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            A feature name to request.
-     @@Param:
-        @@@Name:  version
-        @@@Type:
-          DISLang:String::ManakaiDOM:all
-        @@@actualType:
-          ManakaiDOM:ManakaiDOMFeatureVersion::ManakaiDOM:ManakaiDOMLatest
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            A feature version number to request.
-     @@Return:
-        @@@Type: 
-          DOMMain:Object::ManakaiDOM:all
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            An object that implements the specialized APIs of the 
-            <P::feature> and <P::version>. 
-        @@@nullCase:
-          @@@@enDesc: 
-            There is no object available that implements interfaces 
-            associated with the <P::feature> and <P::version>. 
-        @@@PerlDef:
-          $feature =~ s/^\+//;
-          CLASS: for my $class (grep {
-            $Message::Util::DIS::ManakaiDISForDefinition::CompatClass{$_}
-          } keys %Message::Util::DIS::ManakaiDISForDefinition::CompatClass) {
-            if ($Message::DOM::ClassFeature{$class}->{$feature}->{$version}) {
-              $r = bless {o => $self}, $class;
-              last CLASS;
-            }
-          }
 
   @Attr:
     @@ForCheck: ManakaiDOM|ForClass
@@ -6657,8 +6340,6 @@ IFClsDef:
   @ClsISA: dp|ManakaiDISAnyResourcePerl
   @ClsISA: ManakaiDISPropertyAccessor
   @ClsISA: ManakaiDISAnyResource
-
-  @DISLang:role: ResourceRole
 
   @enDesc:
     <QUOTE::dis> resource definitions. 
@@ -7401,57 +7082,6 @@ IFClsDef:
           }
         }__;
 
-  @Method:
-     @@ForCheck: ManakaiDOM|ForClass
-     @@Name:  getFeature
-     @@Description:
-        @@@lang:en
-        @@@@:
-          Returns a specialized object that implements the specialized 
-          interfaces of the specified feature and version.
-     @@Param:
-        @@@Name:  feature
-        @@@Type:
-          DISLang:String::ManakaiDOM:all
-        @@@actualType:
-          ManakaiDOM:ManakaiDOMFeatureName::ManakaiDOM:ManakaiDOMLatest
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            A feature name to request.
-     @@Param:
-        @@@Name:  version
-        @@@Type:
-          DISLang:String::ManakaiDOM:all
-        @@@actualType:
-          ManakaiDOM:ManakaiDOMFeatureVersion::ManakaiDOM:ManakaiDOMLatest
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            A feature version number to request.
-     @@Return:
-        @@@Type: 
-          DOMMain:Object::ManakaiDOM:all
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            An object that implements the specialized APIs of the 
-            <P::feature> and <P::version>. 
-        @@@nullCase:
-          @@@@enDesc: 
-            There is no object available that implements interfaces 
-            associated with the <P::feature> and <P::version>. 
-        @@@PerlDef:
-          $feature =~ s/^\+//;
-          CLASS: for my $class (grep {
-            $Message::Util::DIS::ManakaiDISResourceDefinition::CompatClass{$_}
-          } keys %Message::Util::DIS::ManakaiDISResourceDefinition::CompatClass){
-            if ($Message::DOM::ClassFeature{$class}->{$feature}->{$version}) {
-              $r = bless {o => $self}, $class;
-              last CLASS;
-            }
-          }
-
   @Attr:
     @@Name: multiplePropertiesURI
     @@enDesc:
@@ -7704,10 +7334,6 @@ PropDef:
     rdf:Resource
   @rdfs:domain: 
     ManakaiDOM:Class
-
-ResourceDef:
-  @QName: GetFeature
-  @AliasFor: f|GetFeature||ManakaiDOM|ManakaiDOMLatest
 
 ResourceDef:
   @QName: SWCFGNode

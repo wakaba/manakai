@@ -17,7 +17,7 @@ Module:
   @License:
     license:Perl+MPL
   @Date:
-    $Date: 2006/12/29 14:45:49 $
+    $Date: 2006/12/30 02:37:09 $
   
   @Require:
     @@Module:
@@ -622,30 +622,11 @@ IFClsDef:
 
 ## -- Any Value
 
-RoleDef:
-  @QName: ValueRole
-  @enDesc:
-    A class implementing the <Q::ValueRole> is compatible with
-    the <Class::ManakaiDVValue> class.
-
-ElementTypeBinding:
-  @Name: RoleDef
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type:
-      DISLang:Role
-    @@ForCheck:
-      =ManakaiDOM:all
-
 IFClsDef:
   @IFQName: DVValue
   @ClsQName: ManakaiDVValue
 
   @ClsISA: dp|ManakaiDVValuePerl
-
-  @Implement: GetFeature
-  @ClsISA: f|ManakaiHasFeatureByGetFeature||ManakaiDOM|ManakaiDOMLatest
 
   @ClsISA:
     dx:ManakaiDefaultExceptionHandler::ManakaiDOM:Perl
@@ -963,53 +944,6 @@ IFClsDef:
     @@Set:
       @@@PerlDef: $$self->{nodePath} = $given;
 
-  @Method:
-    @@ForCheck: ManakaiDOM|ForClass
-     @@Name:  getFeature
-     @@Description:
-        @@@lang:en
-        @@@@:
-          Returns a specialized object that implements the specialized 
-          interfaces of the specified feature and version.
-     @@Param:
-        @@@Name:  feature
-        @@@Type: DISString
-        @@@actualType: f|FeatureNameString||ManakaiDOM|ManakaiDOMLatest
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            A feature name to request.
-     @@Param:
-        @@@Name:  version
-        @@@Type: DISString
-        @@@actualType: f|FeatureVersionString||ManakaiDOM|ManakaiDOMLatest
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            A feature version number to request.
-     @@Return:
-        @@@Type: 
-          DOMMain:Object::ManakaiDOM:all
-        @@@Description:
-          @@@@lang:en
-          @@@@@:
-            An object that implements the specialized APIs of the 
-            <P::feature> and <P::version>. 
-        @@@nullCase:
-          @@@@enDesc: 
-            There is no object available that implements interfaces 
-            associated with the <P::feature> and <P::version>. 
-        @@@PerlDef:
-          $feature =~ s/^\+//;
-          CLASS: for my $class (grep {
-            $Message::Util::DIS::Value::ManakaiDVValue::CompatClass{$_}
-          } keys %Message::Util::DIS::Value::ManakaiDVValue::CompatClass) {
-            if ($Message::DOM::ClassFeature{$class}->{$feature}->{$version}) {
-              $r = bless {o => $self}, $class;
-              last CLASS;
-            }
-          }
-
   @Attr:
     @@Name: name
     @@enDesc:
@@ -1229,9 +1163,7 @@ IFClsDef:
         __DEEP{
           unless (defined $tsimpl) {
             if (defined $od) {
-              $tsimpl = $od-><AG::Document.implementation>
-                           -><M::GetFeature.getFeature>
-                               (<Q::fe|TreeStore> => '3.0');
+              $tsimpl = $od->implementation;
             } else {
               $tsimpl = $Message::DOM::ImplementationRegistry
                           ->get_dom_implementation ({<Q::fe|TreeStore> => '3.0'});
@@ -1266,17 +1198,14 @@ IFClsDef:
 
             = <VAR::tsimpl> <lt>- <M::GetFeature.getFeature> on <P::impl>
                                   with parameters set to
-                                  <Feature::fe|TreeStoer> and <FeatureVer::3.0>.
+                                  <Feature::fe|TreeStore> and <FeatureVer::3.0>.
 
           }
     @@Return:
       @@@PerlDef:
         __DEEP{
           unless (defined $tsimpl) {
-            $tsimpl = $newNode-><AG::Node.ownerDocument>
-                              -><AG::Document.implementation>
-                              -><M::GetFeature.getFeature>
-                                  (<Q::fe|TreeStore> => '3.0');
+            $tsimpl = $newNode->owner_document->implementation;
           }
           $$self->{value} = \ ($tsimpl->create_storable_object_from_node
                                           ($newNode));
