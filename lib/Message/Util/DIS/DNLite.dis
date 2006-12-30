@@ -18,7 +18,7 @@ Module:
   @License:
     license:Perl+MPL
   @Date:
-    $Date: 2006/12/30 12:50:00 $
+    $Date: 2006/12/30 13:25:37 $
   
   @Require:
     @@Module:
@@ -99,7 +99,7 @@ FeatureDef:
   @QName: DIS|DNLite
   @FeatureVerDef:
     @@QName: DIS|DNLite10
-    @@Version: 1.0
+    @@f:version: 1.0
     @@f:instanceOf: DIS|DNLite
     @@f:requires: DIS|CoreFeature10
     @@FullName:
@@ -137,7 +137,7 @@ ElementTypeBinding:
       @@@ForCheck: ManakaiDOM|ForClass
       @@@ContentType: DISCore|TFPQNames
 
-    @@DOMMain:implementFeature: DIS|DNLite10
+    @@f:implements: DIS|DNLite10
 
 ElementTypeBinding:
   @Name: IFDef
@@ -153,7 +153,7 @@ ElementTypeBinding:
       @@@@: ManakaiDOM|IF
       @@@ForCheck: ManakaiDOM|ForIF
 
-    @@DOMMain:implementFeature: DIS|DNLite10
+    @@f:implements: DIS|DNLite10
 
 ElementTypeBinding:
   @Name: ClsDef
@@ -169,7 +169,7 @@ ElementTypeBinding:
       @@@@: ManakaiDOM|Class
       @@@ForCheck: ManakaiDOM|ForClass
 
-    @@DOMMain:implementFeature: DIS|DNLite10
+    @@f:implements: DIS|DNLite10
 
 ElementTypeBinding:
   @Name: IFQName
@@ -246,8 +246,6 @@ ElementTypeBinding:
 IFClsDef:
   @IFQName: DISImplementationDNLite
   @ClsQName: ManakaiDISImplementationDNLite
-
-  @f:provides: DIS|DNLite10
 
   @domperl:implementedByObjectsOf:
     c|DOMImplementation

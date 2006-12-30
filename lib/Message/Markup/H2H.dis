@@ -13,7 +13,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/12/30 12:00:41 $
+    $Date: 2006/12/30 13:25:34 $
 
   @Require:
     @@Module:
@@ -450,7 +450,7 @@ FeatureDef:
   @QName: H2HFeature
   @FeatureVerDef:
     @@QName: H2HFeature10
-    @@Version: 1.0
+    @@f:version: 1.0
     @@f:instanceOf: H2HFeature
     @@f:requires: tx|XMLFeature30
     @@enDesc:
@@ -503,9 +503,6 @@ IFClsDef:
   @DISLang:role: gls|ParserRole
 
   @f:implements: H2HFeature10
-  @f:provides:
-    @@@: H2HFeature10
-    @@f:through: c|ManakaiDOMImplementation
 
   @enDesc:
     A <IF::H2HParser> object parses an H2H/0.9 or H2H/1.0

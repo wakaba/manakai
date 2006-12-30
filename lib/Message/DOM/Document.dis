@@ -13,7 +13,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/12/30 12:00:38 $
+    $Date: 2006/12/30 13:25:33 $
 
   @Require:
     @@Module:
@@ -426,22 +426,14 @@ ElementTypeBinding:
       @@@ContentType: DISCore|TFPQNames
       @@@ForCheck: ManakaiDOM|ForClass
 
-    @@f:implements:
-      @@@@: DOMCore|CoreFeature10
-    @@DOMMain:implementFeature:
-      @@@@: DOMCore|CoreFeature20
-    @@DOMMain:implementFeature:
-      @@@@: DOMCore|CoreFeature30
-    @@DOMMain:implementFeature:
-      @@@@: tx|XMLFeature10
-    @@DOMMain:implementFeature:
-      @@@@: tx|XMLFeature20
-    @@DOMMain:implementFeature:
-      @@@@: tx|XMLFeature30
-    @@DOMMain:implementFeature:
-      @@@@: tx|XMLVersionFeature10
-    @@DOMMain:implementFeature:
-      @@@@: tx|XMLVersionFeature11
+    @@f:implements: c|CoreFeature10
+    @@f:implements: c|CoreFeature20
+    @@f:implements: c|CoreFeature30
+    @@f:implements: tx|XMLFeature10
+    @@f:implements: tx|XMLFeature20
+    @@f:implements: tx|XMLFeature30
+    @@f:implements: tx|XMLVersionFeature10
+    @@f:implements: tx|XMLVersionFeature11
 
 ElementTypeBinding:
   @Name: IFQName

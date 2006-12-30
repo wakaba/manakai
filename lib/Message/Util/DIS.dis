@@ -22,7 +22,7 @@ Module:
       @@@Year:2004
       @@@DISCore:author: DISCore|Wakaba
   @Date:
-    $Date: 2006/12/30 12:49:58 $
+    $Date: 2006/12/30 13:25:34 $
   
   @Require:
     @@Module:
@@ -137,7 +137,7 @@ FeatureDef:
   @QName: Core
   @FeatureVerDef:
     @@QName: CoreFeature10
-    @@Version: 1.0
+    @@f:version: 1.0
     @@DOMFeature:instanceOf: Core
     @@FullName:
       @@@lang:en
@@ -203,8 +203,7 @@ ElementTypeBinding:
       @@@ContentType: DISCore|TFPQNames
       @@@ForCheck: ManakaiDOM|ForClass
 
-    @@DOMMain:implementFeature:
-      @@@@: CoreFeature10
+    @@f:implements: CoreFeature10
 
 ElementTypeBinding:
   @Name: ClsDef
@@ -222,8 +221,7 @@ ElementTypeBinding:
       @@@@: ManakaiDOM|Class
       @@@ForCheck: ManakaiDOM|ForClass
 
-    @@DOMMain:implementFeature:
-      @@@@: CoreFeature10
+    @@f:implements: CoreFeature10
 
 ElementTypeBinding:
   @Name: clsActualType

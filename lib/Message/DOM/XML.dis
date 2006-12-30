@@ -18,7 +18,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/12/30 12:00:39 $
+    $Date: 2006/12/30 13:25:34 $
 
   @Require:
     @@Module:
@@ -597,7 +597,7 @@ FeatureDef:
   @featureName: XML
   @QName: XMLFeature
   @FeatureVerDef:
-    @@Version: 1.0
+    @@f:version: 1.0
     @@QName: XMLFeature10
     @@f:instanceOf: XMLFeature
     @@f:requires: c|CoreFeature10
@@ -606,7 +606,7 @@ FeatureDef:
       @@@@:
         The DOM XML Module, Level 1.
   @FeatureVerDef:
-    @@Version: 2.0
+    @@f:version: 2.0
     @@QName: XMLFeature20
     @@f:extends: XMLFeature10
     @@f:requires: c|CoreFeature20
@@ -615,7 +615,7 @@ FeatureDef:
       @@@@:
         The DOM XML Module, Level 2.
   @FeatureVerDef:
-    @@Version: 3.0
+    @@f:version: 3.0
     @@QName: XMLFeature30
     @@f:extends: XMLFeature20
     @@f:requires: c|CoreFeature30
@@ -629,14 +629,14 @@ FeatureDef:
   @featureName: XMLVersion
   @QName: XMLVersionFeature
   @FeatureVerDef:
-    @@Version: 1.0
+    @@f:version: 1.0
     @@QName: XMLVersionFeature10
     @@f:instanceOf: XMLVersionFeature
     @@Description:
       @@@lang:en
       @@@@: The Extensible Markup Language (XML) 1.0. 
   @FeatureVerDef:
-    @@Version: 1.1
+    @@f:version: 1.1
     @@QName: XMLVersionFeature11
     @@f:instanceOf: XMLVersionFeature
     @@Description:

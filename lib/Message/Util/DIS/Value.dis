@@ -17,7 +17,7 @@ Module:
   @License:
     license:Perl+MPL
   @Date:
-    $Date: 2006/12/30 12:00:48 $
+    $Date: 2006/12/30 13:25:40 $
   
   @Require:
     @@Module:
@@ -116,7 +116,7 @@ FeatureDef:
   @QName: DIS|Value
   @FeatureVerDef:
     @@QName: DIS|Value10
-    @@Version: 1.0
+    @@f:version: 1.0
     @@f:instanceOf: DIS|Value
     @@f:requires: DIS|CoreFeature10
     @@f:requires: tst|TSFeature30
@@ -155,7 +155,7 @@ ElementTypeBinding:
       @@@ForCheck: ManakaiDOM|ForClass
       @@@ContentType: DISCore|TFPQNames
 
-    @@DOMMain:implementFeature: DIS|Value10
+    @@f:implements: DIS|Value10
 
 ElementTypeBinding:
   @Name: IFDef
@@ -301,8 +301,6 @@ IFClsDef:
     c|DOMImplementation
   @domperl:classImplementedByObjectsOf:
     c|ManakaiDOMImplementation
-
-  @f:provides: DIS|Value10
 
   @enDesc:
     The object implementing the <IF::DISImplementationValue>

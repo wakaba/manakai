@@ -12,7 +12,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/12/30 08:27:46 $
+    $Date: 2006/12/30 13:25:33 $
 
   @Require:
     @@Module:
@@ -151,7 +151,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: f|Feature
-    @@For: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: FeatureVerDef
@@ -173,7 +172,7 @@ FeatureDef:
   @FeatureVerDef:
     @@QName: TSFeature30
     @@f:instanceOf: d|Feature
-    @@Version: 3.0
+    @@f:version: 3.0
     @@f:requires: c|CoreFeature30
     @@f:requires: tx|XMLFeature30
 
@@ -219,7 +218,6 @@ IFClsDef:
   @domperl:implementedByObjectsOf: c|DOMImplementation
   @domperl:classImplementedByObjectsOf: c|ManakaiDOMImplementation
 
-  @f:provides: TSFeature30
   @f:implements: TSFeature30
 
   @Test:

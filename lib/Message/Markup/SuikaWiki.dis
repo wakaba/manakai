@@ -54,7 +54,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/12/30 12:00:41 $
+    $Date: 2006/12/30 13:25:34 $
 
   @Require:
     @@Module:
@@ -492,7 +492,7 @@ FeatureDef:
   @QName: SWDMLFeature
   @FeatureVerDef:
     @@QName: SWDMLFeature010
-    @@Version: 0.10
+    @@f:version: 0.10
     @@f:instanceOf: SWDMLFeature
     @@f:requires: tx|XMLFeature30
     @@enDesc:
@@ -673,9 +673,6 @@ IFClsDef:
   @DISLang:role: gls|ParserRole
 
   @f:implements: SWDMLFeature010
-  @f:provides:
-    @@@: SWDMLFeature010
-    @@f:through: c|ManakaiDOMImplementation
 
   @enDesc:
     A <IF::SWDMLParser> object parses a SuikaWiki/0.9,

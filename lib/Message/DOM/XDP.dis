@@ -13,7 +13,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/12/30 12:00:39 $
+    $Date: 2006/12/30 13:25:34 $
 
   @Require:
     @@Module:
@@ -419,7 +419,7 @@ FeatureDef:
   @QName: XDPFeature
   @FeatureVerDef:
     @@QName: XDPFeature30
-    @@Version: 3.0
+    @@f:version: 3.0
     @@f:instanceOf: XDPFeature
     @@f:requires: tx|XMLFeature30
     @@enDesc:
@@ -435,9 +435,6 @@ IFClsDef:
   @domperl:classImplementedByObjectsOf: td|ManakaiDOMDocument
 
   @f:implements: XDPFeature30
-  @f:provides:
-    @@@: XDPFeature30
-    @@f:through: c|ManakaiDOMImplementation
 
   @enDesc:
     The <IF::XDPDocument> interface provides a set of methods

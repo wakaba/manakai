@@ -43,7 +43,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/12/30 12:00:41 $
+    $Date: 2006/12/30 13:25:34 $
 
   @Require:
     @@Module:
@@ -529,7 +529,7 @@ FeatureDef:
   @QName: AtomFeature
   @FeatureVerDef:
     @@QName: AtomFeature10
-    @@Version: 1.0
+    @@f:version: 1.0
     @@f:instanceOf: AtomFeature
     @@f:requires: tx|XMLFeature30
     @@enDesc:
@@ -540,7 +540,7 @@ FeatureDef:
   @QName: AtomThreadingFeature
   @FeatureVerDef:
     @@QName: AtomThreadingFeature10
-    @@Version: 1.0
+    @@f:version: 1.0
     @@f:instanceOf: AtomThreadingFeature
     @@f:requires: fe|AtomFeature10
     @@enDesc:
@@ -681,7 +681,6 @@ IFClsDef:
     The <IF::AtomImplementation> interface provides convenience
     methods to create Atom documents.
 
-  @f:provides: AtomFeature10
   @f:implements: AtomFeature10
 
   @Test:

@@ -42,10 +42,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date:
-    @@@:
-      $Date: 2006/12/30 12:00:38 $
-    @@ContentType:
-      dis:Date.RCS
+    $Date: 2006/12/30 13:25:33 $
   
   @Require:
     @@Module:
@@ -63,8 +60,6 @@ Module:
 Namespace:
   @c:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/dom-core#
-  @def:
-    http://suika.fam.cx/~wakaba/archive/2004/dom/feature#spec.
   @dis:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
   @DISlib:
@@ -85,8 +80,6 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dom/meta#
   @domperl:
     http://suika.fam.cx/~wakaba/archive/2006/dom/perl/
-  @dx:
-    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#
   @f:
     http://suika.fam.cx/~wakaba/archive/2004/dom/feature#
   @idl:
@@ -101,8 +94,6 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#
   @MDOM:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
-  @MDOMX:
-    http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
   @p:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Perl#
   @rdf:
@@ -115,8 +106,6 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Test#
   @ty:
     http://suika.fam.cx/~wakaba/archive/2005/7/tutorial#
-  @Util:
-    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/
 
 ResourceDef:
   @QName:
@@ -131,102 +120,6 @@ ResourceDef:
       Message::DOM::
   @DISPerl:interfacePackageName:
       Message::DOM::IF::
-
-## -- "For" definitions
-
-## For the Document Object Model
-
-ForDef:
-  @QName:
-    ManakaiDOM:DOM
-  @FullName:
-    @@lang:en
-    @@@: For DOM
-ForDef:
-  @QName:
-    ManakaiDOM:DOM1
-  @FullName:
-    @@lang:en
-    @@@: For DOM Level 1
-  @ISA:
-    ManakaiDOM:DOM
-ForDef:
-  @QName:
-    ManakaiDOM:DOM2
-  @FullName:
-    @@lang:en
-    @@@: For DOM Level 2
-  @ISA:
-    ManakaiDOM:DOM1
-ForDef:
-  @QName:
-    ManakaiDOM:DOM3
-  @FullName:
-    @@lang:en
-    @@@: For DOM Level 3
-  @ISA:
-    ManakaiDOM:DOM2
-ForDef:
-  @QName:
-    ManakaiDOM:DOMLatest
-  @FullName:
-    @@lang:en
-    @@@: For the latest level of DOM
-  @ISA:
-    ManakaiDOM:DOM3
-
-## For the manakai DOM implementation
-
-ForDef:
-  @QName:
-    ManakaiDOM:ManakaiDOM
-  @FullName:
-    @@lang:en
-    @@@: For the manakai DOM implementation
-  @Implement:
-    ManakaiDOM:DOM
-  @ISA:
-    ManakaiDOM:Perl
-ForDef:
-  @QName:
-    ManakaiDOM:ManakaiDOM1
-  @FullName:
-    @@lang:en
-    @@@: For the manakai DOM Level 1 implementation
-  @Implement:
-    ManakaiDOM:DOM1
-  @ISA:
-    ManakaiDOM:ManakaiDOM
-ForDef:
-  @QName:
-    ManakaiDOM:ManakaiDOM2
-  @FullName:
-    @@lang:en
-    @@@: For the manakai DOM Level 2 implementation
-  @Implement:
-    ManakaiDOM:DOM2
-  @ISA:
-    ManakaiDOM:ManakaiDOM1
-ForDef:
-  @QName:
-    ManakaiDOM:ManakaiDOM3
-  @FullName:
-    @@lang:en
-    @@@: For the manakai DOM Level 3 implementation
-  @Implement:
-    ManakaiDOM:DOM3
-  @ISA:
-    ManakaiDOM:ManakaiDOM2
-ForDef:
-  @QName:
-    ManakaiDOM:ManakaiDOMLatest
-  @FullName:
-    @@lang:en
-    @@@: For the manakai implementation of the latest level of DOM
-  @Implement:
-    ManakaiDOM:DOMLatest
-  @ISA:
-    ManakaiDOM:ManakaiDOM3
 
 ## --- The Document Object Model Comcepts
 
@@ -818,38 +711,6 @@ PropDef:
   @dataType: DISCore|String
   @multipleProperties: DISCore|UnorderedList
 
-ResourceDef:
-  @QName:
-    dis:Version
-  @AliasFor: version
-
-PropDef:
-  @QName: provides
-  @Description:
-    @@lang:en
-    @@@:
-      The subject resource intends to provide a part 
-      of the object feature. 
-  @rdfs:domain: Feature
-  @dataType: dis|TypeQName
-  @multipleProperties: DISCore|UnorderedList
-
-PropDef:
-  @QName: through
-  @Description:
-    @@lang:en
-    @@@:
-      The feature is provided through the object class. 
-      \
-      If this attribute is missing from a <Q::provideFeature>
-      element and its parent is a <Q::ManakaiDOM:Class> definition,
-      then that class with the current <QUOTE::for> is
-      the <Q::providedThrough> class.
-  @rdfs:domain:
-    ManakaiDOM:Class
-  @dataType: dis|TFQNames
-  @multipleProperties: DISCore|UnorderedList
-
 PropDef:
   @QName: implements
   @Description:
@@ -857,14 +718,8 @@ PropDef:
     @@@:
       A subject resource implements a object feature. 
   @rdfs:range: Feature
-  @dataType: 
-    dis:TypeQName
+  @dataType: DISCore|QName
   @multipleProperties: DISCore|UnorderedList
-
-ResourceDef:
-  @QName:
-    DOMMain:implementFeature
-  @AliasFor: implements
 
 PropDef:
   @QName: instanceOf
@@ -874,7 +729,7 @@ PropDef:
       The subject feature is an instance of the object feature set.
   @rdfs:range: Feature
   @rdfs:domain: Feature
-  @dataType: dis|TypeQName
+  @dataType: DISCore|QName
   @multipleProperties: DISCore|UnorderedList
 
 PropDef:
@@ -885,7 +740,7 @@ PropDef:
       The subject feature extends the object feature.
   @rdfs:range: Feature
   @rdfs:domain: Feature
-  @dataType: dis|TypeQName
+  @dataType: DISCore|QName
   @multipleProperties: DISCore|UnorderedList
 
 PropDef:
@@ -895,8 +750,7 @@ PropDef:
     @@@:
       A subject resource requires a object feature. 
   @rdfs:range: Feature
-  @dataType:
-    dis:TypeQName
+  @dataType: DISCore|QName
   @multipleProperties: DISCore|UnorderedList
 
 ## -- Roles
@@ -959,18 +813,9 @@ PropDef:
             Classes that should be available via 
             <M::DOMEvents:ManakaiDOMDocumentEvent.createEvent>.
       \
-        - <CODE::DOMCore:DOMImplementation>::: 
-            Classes that might be available via <Class::ImplementationRegistry>, 
-            <IF::DOMCore:DOMImplementationSource> or 
-            <M::DOMCore:DOMImplementation.getFeature>. 
-      \
         - <CODE::DOMCore:DOMImplementationSource>:::
             Classes that should be known to 
             <Class::ImplementationRegistry>.
-      \
-        - <CODE::DOMCore:Node>::: 
-            Classes that might be available via <M::DOMCore:Node.getFeature> 
-            or any <IF::Node> returning method and attributes.
       \
       }
       \
@@ -979,10 +824,6 @@ PropDef:
               with old <CODE::cdis2pm> utility.
       \
       }
-  @rdfs:domain:
-    ManakaiDOM:Class
-  @rdfs:range:
-    ManakaiDOM:IF
   @dataType: dis|TFQNames
   @multipleProperties: DISCore|UnorderedList
 

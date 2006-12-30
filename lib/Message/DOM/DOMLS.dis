@@ -21,7 +21,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date:
-    $Date: 2006/12/30 12:00:38 $
+    $Date: 2006/12/30 13:25:33 $
 
   @Require:
     @@Module:
@@ -122,7 +122,7 @@ FeatureDef:
   @featureName: LS
   @QName: LSFeature
   @FeatureVerDef:
-    @@Version:3.0
+    @@f:version:3.0
     @@QName: LSFeature30
     @@f:instanceOf: LSFeature
     @@f:requires: c|CoreFeature20
@@ -135,7 +135,7 @@ FeatureDef:
   @featureName: LS-Async
   @QName: LSAsyncFeature
   @FeatureVerDef:
-    @@Version:3.0
+    @@f:version:3.0
     @@QName: LSAsyncFeature30
     @@f:instanceOf: LSAsyncFeature
     @@f:requires: LSFeature30
@@ -525,8 +525,6 @@ IFCls3Def:
 
   @domperl:implementedByObjectsOf: c|DOMImplementation
   @domperl:classImplementedByObjectsOf: c|ManakaiDOMImplementation
-
-  @f:provides: LSFeature30
 
   @enDesc:
     The <IF::DOMImplementationLS> interface contains factory methods

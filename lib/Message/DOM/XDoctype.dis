@@ -17,7 +17,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/12/30 12:00:39 $
+    $Date: 2006/12/30 13:25:34 $
   
   @Require:
     @@Module:
@@ -110,7 +110,7 @@ FeatureDef:
   @FeatureVerDef:
     @@QName: d|Feature30
     @@f:instanceOf: d|Feature
-    @@Version: 3.0
+    @@f:version: 3.0
 
 FeatureDef:
   @QName: d|DeclFeature
@@ -118,7 +118,7 @@ FeatureDef:
   @FeatureVerDef:
     @@QName: d|DeclFeature30
     @@f:instanceOf: d|DeclFeature
-    @@Version: 3.0
+    @@f:version: 3.0
     @@enImplNote:
       {ISSUE::
         Should it require <Q::d|Feature30>?
@@ -598,9 +598,6 @@ IFClsXDef:
   @domperl:classImplementedByObjectsOf: td|ManakaiDOMDocument  
 
   @f:implements: d|Feature30
-  @f:provides:
-    @@@: d|Feature30
-    @@f:through: c|ManakaiDOMImplementation
   
   @enDesc:
     The <IF::DocumentXDoctype> interface provides 

@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/12/30 12:50:00 $
+      $Date: 2006/12/30 13:25:37 $
     @@ContentType:
       dis:Date.RCS
   
@@ -152,7 +152,7 @@ FeatureDef:
   @QName: DIS|Perl
   @FeatureVerDef:
     @@QName: DIS|Perl10
-    @@Version: 1.0
+    @@f:version: 1.0
     @@f:instanceOf: DIS|Perl
     @@f:requires: DIS|CoreFeature10
     @@f:requires: gls|Generic30
@@ -5301,66 +5301,6 @@ TMethods:
                 }
 
                 ## -- Features
-                my %feature;
-                for my $v (@{$cls-><M::DIS|DISResourceProp.getPropertyValueList>
-                                      (<Q::f:provides>)}) {
-                  my $f = $self-><AG::DIS|DISAnyResource.database>
-                               -><M::DIS|DISDatabase.getResource>
-                                     ($v->isa (<IFName::dv|DVURIValue>)
-                                         ? $v-><AG::dv|DVURIValue.uri>
-                                         : $v-><AG::dv|DVValue.value>);
-                  unless ($f-><AS::DIS|DISAnyResource.isDefined>) {
-                    __UNDEEP{__EXCEPTION{DIS|RESOURCE_NOT_DEFINED_ERR::
-                      DIS:uri => {$f-><AG::DIS|DISAnyResource.uri>},
-                      DIS:expectedType => {<Q::f:Feature>},
-                    }__}__;
-                  }
-                  for my $s ($f, @{$f-><M::DIS|DISResourceProp
-                                    .getPropertyResourceList>
-                                   (<Q::f:extends>,
-                                    recursive => true,
-                                    default_media_type => <Q::dis:TypeQName>)}) {
-                    $feature{$s-><AG::DIS|DISAnyResource.uri>}
-                         = [$s, $v];
-                  }
-                }
-                for my $f (values %feature) {
-                  my @fname = @{$f->[0]-><AG::DIS|DISResource
-                                        .featureNameList>};
-                  my $fver = $f->[0]-><M::DIS|DISResourceProp
-                                        .getPropertyText>
-                                        (<Q::dis:Version>, null);
-                  next unless defined $fver;
-                  my $pt = $f->[1]-><M::dv|DVValue.getProperty>
-                                            (<Q::f:through>);
-                  if (UNIVERSAL::isa ($pt, <IFName::dv|DVURIValue>)) {
-                    my $c = $pt-><M::dv|DVURIValue.getResource>
-                              ($self-><AG::DIS|DISAnyResource.database>);
-                    $c-><AS::DIS|DISAnyResource.isReferred>
-                                    ($f->[0]-><AG::DIS|DISAnyResource.uri>);
-                    my $cp = $c-><AG::DISResourcePerl.plFullyQualifiedName>;
-                    for my $fname (@fname) {
-                      $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::DOM::ImplFeature{q<' . $cp .
-                           '>}->{q<' .
-                           $fname . '>}->{q<' . $fver . '>} ||= 1');
-                      $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::DOM::ImplFeature{q<' . $cp .
-                           '>}->{q<' . $fname . '>}->{q<>} = 1');
-                    }
-                  } else { # no "through" attribute
-                    for my $fname (@fname) {
-                      $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::DOM::ImplFeature{q<' . $pack_name .
-                           '>}->{q<' .
-                           $fname . '>}->{q<' . $fver . '>} ||= 1');
-                      $r-><M::DIS|PLBlockCon.appendStatement>
-                          ('$Message::DOM::ImplFeature{q<' . $pack_name .
-                           '>}->{q<' . $fname . '>}->{q<>} = 1');
-                    }
-                  }
-                } # for
-
                 my %ifeature;
                 my $ifpoint = 0;
                 my %fdup; # Check duplications
@@ -5374,7 +5314,7 @@ TMethods:
 
                   my $fver = $feature-><M::DIS|DISResourceProp
                                         .getPropertyText>
-                                        (<Q::dis:Version>, null);
+                                        (<Q::f|version>, null);
                   $ifpoint += $fver;
                   for my $fname (@{$feature-><AG::DIS|DISResource
                                                  .featureNameList>}) {
