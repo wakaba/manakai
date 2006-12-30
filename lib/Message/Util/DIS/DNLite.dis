@@ -18,7 +18,7 @@ Module:
   @License:
     license:Perl+MPL
   @Date:
-    $Date: 2006/12/30 12:00:44 $
+    $Date: 2006/12/30 12:50:00 $
   
   @Require:
     @@Module:
@@ -1127,20 +1127,6 @@ IFClsDef:
         M: for my $n (@{$self->{child}||[]}) {
           if (${$n->{uri}} eq <Q::dis:Require>) {
             $r = $n;
-            last M;
-          }
-        }
-
-  @Attr:
-    @@Name: defaultForURI
-    @@Get: 
-      @@@Type: DISString
-      @@@PerlDef:
-        M: for my $n (@{$self->{child}||[]}) {
-          if (${$n->{uri}} eq <Q::dis:DefaultFor>) {
-            __DEEP{
-              $r = $n-><AG::DNLNode.qnameValueURI> if defined $n->{value};
-            }__;
             last M;
           }
         }

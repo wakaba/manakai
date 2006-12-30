@@ -18,17 +18,12 @@ our $impl; # Assigned in the main script
 our $db;
 my $tdt_parser;
 
-sub daf_perl_t ($$$) {
-  my ($mod_uri, $out_file_path, $mod_for) = @_;
+sub daf_perl_t ($$) {
+  my ($mod_uri, $out_file_path) = @_;
 
-  unless (defined $mod_for) {
-    $mod_for = $db->get_module ($mod_uri)
-                  ->get_property_text (ExpandedURI q<dis:DefaultFor>,
-                                       ExpandedURI q<ManakaiDOM:all>);
-  }
-  my $mod = $db->get_module ($mod_uri, for_arg => $mod_for);
+  my $mod = $db->get_module ($mod_uri);
 
-    status_msg_ qq<Generating Perl test from <$mod_uri> for <$mod_for>...>;
+    status_msg_ qq<Generating Perl test from <$mod_uri>...>;
     my $pl = daf_generate_perl_test_document ($mod);
     status_msg qq<done>;
 

@@ -22,7 +22,7 @@ Module:
       @@@Year:2004
       @@@DISCore:author: DISCore|Wakaba
   @Date:
-    $Date: 2006/12/30 12:00:42 $
+    $Date: 2006/12/30 12:49:58 $
   
   @Require:
     @@Module:
@@ -2066,35 +2066,6 @@ IFClsDef:
                         .getAttributeNS>
                                    (<Q::dis:>, 'Require', make_new_node => true),
                      <ClassName::ManakaiDISElement>;
-        }__;
-
-  @Attr:
-    @@Name: defaultForURI
-    @@enDesc:
-      The value of <Q::dis:DefaultFor> attribute. 
-    @@Type: ForURI
-    @@Get:
-      @@@enDesc:
-        The value of <Q::dis:DefaultFor> child element.  If missing, 
-        <Q::ManakaiDOM:all> is returned. 
-      @@@PerlDef:
-        __DEEP{
-          my $df = $self-><M::swcfg21:SWCFGNode
-                                .getAttributeNS>
-                                         (<Q::dis:>, 'DefaultFor');
-          if ($df) {
-            $r = (bless $df, <ClassName::ManakaiDISElement>)
-                 -><AG::DISElement.qnameValueURI>
-              || <Q::ManakaiDOM:all>;
-          } else {
-            $r = <Q::ManakaiDOM:all>;
-          }
-        }__;
-    @@Set:
-      @@@PerlDef:
-        __DEEP{
-          $self-><M::swcfg21:SWCFGNode.setAttributeNS>
-                                     (<Q::dis:>, 'DefaultFor' => $given);
         }__;
 
   @Attr:

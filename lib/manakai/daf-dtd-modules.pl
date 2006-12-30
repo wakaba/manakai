@@ -23,11 +23,6 @@ our %Opt;
 sub daf_dtd_modules ($$$) {
   my ($mg_uri, $out_dir_path, $mg_for) = @_;
 
-  unless (defined $mg_for) {
-    $mg_for = $db->get_module ($mg_uri)
-                 ->get_property_text (ExpandedURI q<dis:DefaultFor>,
-                                      ExpandedURI q<ManakaiDOM:all>);
-  }
   my $mg = $db->get_resource ($mg_uri, for_arg => $mg_for);
 
   status_msg qq<DTD module group <$mg_uri> for <$mg_for>...>;
@@ -52,11 +47,6 @@ sub daf_dtd_modules ($$$) {
 sub daf_dtd_driver ($$$) {
   my ($mg_uri, $out_dir_path, $mg_for) = @_;
 
-  unless (defined $mg_for) {
-    $mg_for = $db->get_module ($mg_uri)
-                 ->get_property_text (ExpandedURI q<dis:DefaultFor>,
-                                      ExpandedURI q<ManakaiDOM:all>);
-  }
   my $mg = $db->get_resource ($mg_uri, for_arg => $mg_for);
 
   daf_dm_create_module_file (undef, $mg, $out_dir_path);

@@ -7,7 +7,7 @@ use Message::Util::QName::Filter {
   swcfg21 => q<http://suika.fam.cx/~wakaba/archive/2005/swcfg21#>,
 };
 
-our$VERSION=do{my @r=(q$Revision: 1.21 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our$VERSION=do{my @r=(q$Revision: 1.22 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Cwd;
 use Getopt::Long;
 use Pod::Usage;
@@ -31,14 +31,14 @@ GetOptions (
     my $i = [split /\s+/, shift, 3];
     $i->[3] = 'perl-pm';
     push @{$Opt{create_module}}, $i;
-    push @target_modules, [$i->[0], $i->[2]];
+    push @target_modules, $i->[0];
   },
   'create-perl-test=s' => sub {
     shift;
     my $i = [split /\s+/, shift, 3];
     $i->[3] = 'perl-t';
     push @{$Opt{create_module}}, $i;
-    push @target_modules, [$i->[0], $i->[2]];
+    push @target_modules, $i->[0];
   },
   'debug' => \$Opt{debug},
   'dis-file-suffix=s' => \$Opt{dis_suffix},
@@ -50,7 +50,7 @@ GetOptions (
   'load-module=s' => sub {
     shift;
     my $i = [split /\s+/, shift, 2];
-    push @target_modules, [$i->[0], $i->[1]];
+    push @target_modules, $i->[0];
   },
   'mod-file-suffix=s' => \$Opt{mod_suffix},
   'search-path|I=s' => sub {
@@ -302,9 +302,9 @@ for (@{$Opt{create_module}}) {
   my ($mod_uri, $out_file_path, $mod_for, $out_type) = @$_;
 
   if ($out_type eq 'perl-pm') {
-    daf_perl_pm ($mod_uri, $out_file_path, $mod_for);
+    daf_perl_pm ($mod_uri, $out_file_path);
   } elsif ($out_type eq 'perl-t') {
-    daf_perl_t ($mod_uri, $out_file_path, $mod_for);
+    daf_perl_t ($mod_uri, $out_file_path);
   } elsif ($out_type eq 'dtd-modules') {
     daf_dtd_modules ($mod_uri, $out_file_path, $mod_for);
   } elsif ($out_type eq 'dtd-driver') {

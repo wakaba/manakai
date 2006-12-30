@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/12/30 12:00:45 $
+      $Date: 2006/12/30 12:50:00 $
     @@ContentType:
       dis:Date.RCS
   
@@ -1409,7 +1409,7 @@ IFClsDef:
 
           ## -- Creates a list of modules that must be updated
           my $update_module = {};
-          my $target_module = {map {$_->[0] => true} @$modules};
+          my $target_module = {map {$_ => true} @$modules};
           my $checked_module = {};
           my %update_read;
           T: while (%$target_module) {
@@ -1440,7 +1440,7 @@ IFClsDef:
                 $target_module->{$_} = true;
               }
               $update_module->{$target_module_uri} = true;
-              $update_read{$target_module_uri}->{<Q::ManakaiDOM|all>} = true;
+              $update_read{$target_module_uri} = 1;
             } else { # Source is not updated
               for (@{$target_module_resource
                        -><M::DIS|DISModule.getReferringModuleURIList>}) {
@@ -1455,59 +1455,32 @@ IFClsDef:
           for my $mod (@{$db-><M::disdb.getModuleResourceList>}) {
             my $mod_uri = $mod-><AG::anyres.nameURI>;
             if ($update_module->{$mod_uri}) {
-              my $mod_for = $mod-><AG::anyres.forURI>;
-              $update_read{$mod_uri}->{$mod_for} = true;
+              $update_read{$mod_uri} = 1;
               __UNDEEP{__DOMCore:ERROR{dp|info-unload-module-start::
                 DIS|uri => {$mod_uri},
-                DIS|forURI => {$mod_for},
               }__}__;
               $srinfo = $db-><M::disdb.unloadModule> ($mod, srinfo => $srinfo);
               __UNDEEP{__DOMCore:ERROR{dp|info-unload-module-end::
                 DIS|uri => {$mod_uri},
-                DIS|forURI => {$mod_for},
               }__}__;
             }
           }
 
-          for (@$modules) {
-            my ($mod_name, $mod_for) = @$_;
-            my $tfuri;
-            if (not defined $mod_for or $mod_for eq '') {
-              $mod_for = <Q::ManakaiDOM|all>;
-              if (defined $db->{modDef}->{$mod_name} and
-                  defined $db->{modDef}->{$mod_name}->{<Q::dis|DefaultFor>}) {
-                $mod_for = $db-><M::disdb.getModule> ($mod_name)
-                              -><M::DIS|DISResourceProp.getPropertyText>
-                                  (<Q::dis|DefaultFor>, <Q::ManakaiDOM|all>);
-              } else {
-                my $mod_doc = $getModuleSourceDocumentFromURI
-                                ->($db, $mod_name, $mod_for);
-                my $mod_el = $mod_doc-><AG::DIS|DISDocument.moduleElement>;
-                if ($mod_el) {
-                  $mod_for = $mod_el-><AG::DIS|DISModuleElement.defaultForURI>;
-                } else {
-                  $mod_for = <Q::ManakaiDOM|all>;
-                }
-              }
-            }
-            $mod_for = <Q::ManakaiDOM|all> if $mod_for eq '';
-            __CODE{DIS|tfurisToURI:: $turi => $mod_name, $furi => $mod_for,
-                                     $uri => $tfuri}__;
-            unless (defined $db->{modDef}->{$tfuri}) {
-              $update_read{$mod_name}->{$mod_for} = true;
+          for my $mod_name (@$modules) {
+            unless (defined $db->{modDef}->{$mod_name}) {
+              $update_read{$mod_name} = 1;
             }
           }
 
           ## Reads updated sources
           for my $mod_name (keys %update_read) {
-            for my $mod_for (keys %{$update_read{$mod_name}}) {
-              $db-><M::disdb.loadModule>
+            $db-><M::disdb.loadModule>
                      ($getModuleSourceDocumentFromURI
-                        ->($db, $mod_name, $mod_for),
+                        ->($db, $mod_name, <Q::ManakaiDOM|all>),
                       $getModuleSourceDocumentFromResource,
-                      for_arg => $mod_for, on_resource_read => $onResourceRead,
+                      for_arg => <Q::ManakaiDOM|all>,
+                      on_resource_read => $onResourceRead,
                       srinfo => $srinfo);
-            }
           }
         }__;
 

@@ -10,17 +10,12 @@ use Message::Util::PerlCode;
 our $impl; # Assigned in the main script
 our $db;
 
-sub daf_perl_pm ($$$) {
-  my ($mod_uri, $out_file_path, $mod_for) = @_;
+sub daf_perl_pm ($$) {
+  my ($mod_uri, $out_file_path) = @_;
 
-  unless (defined $mod_for) {
-    $mod_for = $db->get_module ($mod_uri)
-                  ->get_property_text (ExpandedURI q<dis:DefaultFor>,
-                                       ExpandedURI q<ManakaiDOM:all>);
-  }
-  my $mod = $db->get_module ($mod_uri, for_arg => $mod_for);
+  my $mod = $db->get_module ($mod_uri);
 
-    status_msg_ qq<Generating Perl module from <$mod_uri> for <$mod_for>...>;
+    status_msg_ qq<Generating Perl module from <$mod_uri>...>;
     local $Message::Util::DIS::Perl::Implementation
         = $impl->get_feature (ExpandedURI q<Util:PerlCode> => '1.0');
     my $pl = $mod->pl_generate_perl_module_document
