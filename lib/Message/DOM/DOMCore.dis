@@ -19,7 +19,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/12/30 08:27:44 $
+    $Date: 2006/12/30 12:00:38 $
 
   @Require:
     @@Module:
@@ -324,7 +324,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: f|Feature
-    @@For: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: FeatureVerDef
@@ -460,7 +459,7 @@ ResourceDef:
     @@@: tx|XMLVersionFeature11
 
   @ISA:
-    @@@: dx|Exception||ManakaiDOM|Perl
+    @@@: dx|Exception
     @@ForCheck: ManakaiDOM|ForClass
 
   @IFQName: DOMException
@@ -473,7 +472,7 @@ ResourceDef:
   @Attr:
      @@Name:  code
      @@Get:
-       @@@Type: idl|unsignedShort||ManakaiDOM|all
+       @@@Type: idl|unsignedShort
        @@@actualType: ExceptionCode
        @@@Description:
          @@@@lang:en
@@ -490,8 +489,8 @@ ResourceDef:
      @@Description:
        @@@lang:en
        @@@@: Integers indicating the type of error generated.
-     @@rdfs:subClassOf: idl|unsignedShort||ManakaiDOM|all
-     @@Type: idl|unsignedShort||ManakaiDOM|all
+     @@rdfs:subClassOf: idl|unsignedShort
+     @@Type: idl|unsignedShort
      @@XConst:
         @@@Name:  INDEX_SIZE_ERR
         @@@intValue:  1
@@ -636,7 +635,7 @@ ResourceDef:
      @@XConst:
         @@@Name:  WRONG_DOCUMENT_ERR
         @@@Type:  
-          DOMMain:unsigned-short||ManakaiDOM|all
+          DOMMain:unsigned-short
         @@@intValue:  4
         @@@Description:
           @@@@lang:en
@@ -671,7 +670,7 @@ ResourceDef:
      @@XConst:
         @@@Name:  INVALID_CHARACTER_ERR
         @@@Type:  
-          DOMMain:unsigned-short||ManakaiDOM|all
+          DOMMain:unsigned-short
         @@@intValue:  5
         @@@Description:
           @@@@lang:en
@@ -1033,7 +1032,7 @@ ResourceDef:
           @@@@XParam: 
             @@@@@QName:
               DOMLS:mode
-            @@@@@Type: idl|unsignedShort||ManakaiDOM|all
+            @@@@@Type: idl|unsignedShort
             #  DOMLS:DOMImplementationLSMode
             @@@@@Description:
               @@@@@@lang:en
@@ -1046,7 +1045,7 @@ ResourceDef:
          @@@@QName: 
            MDOMX:MDOM_IMPL_BY_APP
          @@@@Type: 
-           DOMMain:unsigned-short::ManakaiDOM:all
+           DOMMain:unsigned-short
          @@@@intValue: 4
          @@@@enDesc:
            A method or attribute is not implemented; it is expected
@@ -1201,7 +1200,7 @@ ResourceDef:
      @@XConst:
       @@@QName: c|INUSE_ATTRIBUTE_ERR
         @@@Type:  
-          DOMMain:unsigned-short::ManakaiDOM:all
+          DOMMain:unsigned-short
         @@@intValue:  10
         @@@Description:
           @@@@lang:en
@@ -1582,7 +1581,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: ecore|Parameter
-    @@For: =ManakaiDOM|all
 
 XParamDef:
   @QName: c|node
@@ -1630,7 +1628,7 @@ ElementTypeBinding:
       @@@@: DISLang|Class
       @@@ForCheck: ManakaiDOM|ForClass
     @@Implement:
-      @@@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
+      @@@@: ||+||ManakaiDOM|ForIF
       @@@ContentType: DISCore|TFPQNames
       @@@ForCheck: ManakaiDOM|ForClass
 
@@ -1709,7 +1707,7 @@ ResourceDef:
     @@@:
       <ClassName::ManakaiDOMImplementationRegistry>
     @@ContentType: lang|Perl
-  @Type: p|String||ManakaiDOM|all
+  @Type: p|String
 
 ResourceDef:
   @QName: DOMImplementationRegistryVariable
@@ -1720,7 +1718,7 @@ ResourceDef:
     @@@:
       <ClassName::ManakaiDOMImplementationRegistry>
     @@ContentType: lang|Perl
-  @Type: DISLang|String||ManakaiDOM|all
+  @Type: DISLang|String
   @enImplNote:
     {ISSUE::
        There are three options:
@@ -1857,7 +1855,7 @@ IFCls3Def:
 
   @Attr:
     @@Name: length
-    @@Type: DOMMain|unsigned-long||ManakaiDOM|all
+    @@Type: DOMMain|unsigned-long
     @@enDesc:
       The number of items in the collection.
     @@Get:
@@ -1871,7 +1869,7 @@ IFCls3Def:
     @@Type: DOMImplementation
     @@Param:
       @@@Name:index
-      @@@Type:DOMMain|unsigned-long||ManakaiDOM|all
+      @@@Type:DOMMain|unsigned-long
       @@@enDesc: Index in the collection.
     @@Return:
       @@@enDesc:
@@ -2076,7 +2074,7 @@ IFCls3Def:
      @@Param:
         @@@Name:  index
         @@@Type:  
-          DOMMain:unsigned-long||ManakaiDOM|all
+          DOMMain:unsigned-long
         @@@Description:
           @@@@lang:en
           @@@@@: 
@@ -2113,7 +2111,7 @@ IFCls3Def:
      @@Param:
         @@@Name:  index
         @@@Type:  
-          DOMMain:unsigned-long||ManakaiDOM|all
+          DOMMain:unsigned-long
         @@@Description:
           @@@@lang:en
           @@@@@: 
@@ -2151,7 +2149,7 @@ IFCls3Def:
          The number of pairs in this collection.
      @@Get:
         @@@Type:  
-          DOMMain:unsigned-long||ManakaiDOM|all
+          DOMMain:unsigned-long
         @@@Description:
           @@@@lang:en
           @@@@@: 
@@ -2178,7 +2176,7 @@ IFCls3Def:
             A name to look for.
      @@Return:
         @@@Type:  
-          DOMMain:boolean||ManakaiDOM|all
+          DOMMain:boolean
         @@@TrueCase:
           @@@@Description:
             @@@@@lang:en
@@ -2245,7 +2243,7 @@ IFCls3Def:
             A name to look for.
      @@Return:
         @@@Type:  
-          DOMMain:boolean||ManakaiDOM|all
+          DOMMain:boolean
         @@@TrueCase:
           @@@@Description:
             @@@@@lang:en
@@ -2300,7 +2298,7 @@ IFCls1Def:
   @ClsQName: ManakaiDOMImplementation
 
   @Implement: f|GetFeature
-  @Implement: ecore|MUErrorTarget||ManakaiDOM|Perl
+  @Implement: ecore|MUErrorTarget
 
   @enDesc:
     The <IF::DOMImplementation> interface provides a number
@@ -2339,7 +2337,7 @@ IFCls1Def:
       $test->assert_isa ($impl, <IFName::DOMImplementation>);
 
       $test->id ('MUErrorTarget');
-      $test->assert_isa ($impl, <IFName::ecore|MUErrorTarget||ManakaiDOM|Perl>);
+      $test->assert_isa ($impl, <IFName::ecore|MUErrorTarget>);
 
       $test->id ('hasFeature');
       $test->assert_true ($impl->can ('has_feature'));
@@ -2583,7 +2581,7 @@ IFCls1Def:
   @IntMethod:
     @@Operator: ManakaiDOM|MUErrorHandler
     @@enDesc:
-      When a <IF::ecore|ErrorInterface||ManakaiDOM|Perl> is <Perl::report>ed,
+      When a <IF::ecore|ErrorInterface> is <Perl::report>ed,
       then this method is invoked.
       
       The method calls the <cfg::error-handler> if the error is of 
@@ -2592,7 +2590,7 @@ IFCls1Def:
       can catch the error.
     @@Param:
       @@@Name: err
-      @@@Type: ecore|ErrorInterface||ManakaiDOM|Perl
+      @@@Type: ecore|ErrorInterface
       @@@enDesc:
         The reported error object.
     @@Return:
@@ -2610,7 +2608,7 @@ IFCls1Def:
         if ($err->isa (<IFName::c|DOMError>)) {
           CORE::warn $err;
         } else {
-          $err-><M::ecore|ErrorInterface||ManakaiDOM|Perl.throw>;
+          $err-><M::ecore|ErrorInterface.throw>;
         }
 
   @Method:
@@ -2639,7 +2637,7 @@ IFCls1Def:
           The version number of the feature to test. 
     @@Return:
       @@@Type:  
-        DOMMain:boolean::ManakaiDOM:all
+        DOMMain:boolean
       @@@Description:
         @@@@lang:en
         @@@@@: 
@@ -2688,7 +2686,7 @@ IFCls1Def:
           @@@@@:
             A feature version number to request.
      @@Return:
-        @@@Type: DOMMain|Object||ManakaiDOM|all
+        @@@Type: DOMMain|Object
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -2749,7 +2747,7 @@ IFCls1Def:
           Another operand is <DOM::null> and the method would
           return <DOM::false>.
     @@Return:
-      @@@Type: idl|boolean||ManakaiDOM|all
+      @@@Type: idl|boolean
       @@@enDesc:
         Whether the implementation and <P::obj> is the same or not.
       @@@PerlDef:
@@ -2805,7 +2803,7 @@ ElementTypeBinding:
     @@Value:
       @@@@: 1
       @@@ContentType: DISCore|Boolean
-    @@Type: idl|boolean||ManakaiDOM|all
+    @@Type: idl|boolean
 
 ElementTypeBinding:
   @Name: FalseCase
@@ -2817,7 +2815,7 @@ ElementTypeBinding:
     @@Value:
       @@@@: 0
       @@@ContentType: DISCore|Boolean
-    @@Type: idl|boolean||ManakaiDOM|all
+    @@Type: idl|boolean
 
 ElementTypeBinding:
   @Name: intValue
@@ -2838,7 +2836,7 @@ IFCls3Def:
   @ClsQName: ManakaiDOMError
 
   @Implement: ecore|MUErrorInterface
-  @ClsISA: ecore|MUError||ManakaiDOM|Perl
+  @ClsISA: ecore|MUError
 
   @enDesc:
     The <IF::DOMError> interface describes an error.
@@ -2851,8 +2849,8 @@ IFCls3Def:
   @ConstGroup:
     @@QName: ErrorSeverity
   
-    @@rdfs:subClassOf: idl|unsignedShort||ManakaiDOM|all
-    @@Type: idl|unsignedShort||ManakaiDOM|all
+    @@rdfs:subClassOf: idl|unsignedShort
+    @@Type: idl|unsignedShort
 
     @@enDesc:
       An integer indicating the severity of the error.
@@ -2886,7 +2884,7 @@ IFCls3Def:
     @@enDesc:
       The severity of the error from <TYPE::ErrorSeverity>.
     @@Get:
-      @@@Type: idl|unsignedShort||ManakaiDOM|all
+      @@@Type: idl|unsignedShort
       @@@dis:actualType: ErrorSeverity
       @@@PerlDef:
         $r = $self->{-def}->{<H::DOMCore:severity>};
@@ -2900,7 +2898,7 @@ IFCls3Def:
       @@@enDesc:
         In manakai the <A::DOMError.message> is written in the
         <LANG::i-default> language and is equals to the attribute
-        <A::ecore|Error||ManakaiDOM|Perl.text>.
+        <A::ecore|Error.text>.
     @@Type: DOMMain|DOMString
     @@Get:
       @@@PerlDef:
@@ -2999,7 +2997,6 @@ IFCls3Def:
 
 ResourceDef:
   @QName: c|ERROR
-  @For: =ManakaiDOM|all
   @enDesc:
     Reports a <IF::DOMError>.
   @rdf:type: DISPerl|BlockElementType
@@ -3050,7 +3047,7 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DOMCore|DOMErrorType
-    @@ecore:textFormatter: ecore|MUErrorFormatter||ManakaiDOM|Perl
+    @@ecore:textFormatter: ecore|MUErrorFormatter
 
 ElementTypeBinding:
   @Name: errname
@@ -3074,7 +3071,7 @@ StringDataTypeDef:
 SPropDef:
   @QName: DOMCore|errorType
   @enDesc:
-    The error type name as in <A::DOMError||ManakaiDOM|ManakaiDOMLatest.type>.
+    The error type name as in <A::DOMError.type>.
   @rdfs:domain: DOMCore|DOMErrorType
   @rdfs:subPropertyOf: dis|AppName
   @dataType: DISCore|QName
@@ -3104,13 +3101,11 @@ ErrDef:
       resulting from the split.
 
 ResourceDef:
-  @For: =ManakaiDOM|all
   @rdf:type: rdfs|Resource
   @QName: DOMCore|TextNode
   @dxm:nodeTypeName: x
 
 ResourceDef:
-  @For: =ManakaiDOM|all
   @rdf:type: rdfs|Resource
   @QName: DOMCore|DocumentFragmentNode
   @dxm:nodeTypeName: f
@@ -3169,7 +3164,7 @@ IFCls3Def:
                 calls to the <M::DOMErrorHandler.handleError> method.
         }
     @@Return:
-      @@@Type: idl|boolean||ManakaiDOM|all
+      @@@Type: idl|boolean
       @@@enDesc:
         Whether the processing should be continued or not.
          
@@ -3198,7 +3193,7 @@ IFCls3Def:
     @@Name: lineNumber
     @@enDesc:
       The line number the locator is pointing to.
-    @@Type: idl|long||ManakaiDOM|all
+    @@Type: idl|long
     @@Get:
       @@@InCase:
         @@@@intValue: -1
@@ -3217,7 +3212,7 @@ IFCls3Def:
     @@Name: columnNumber
     @@enDesc:
       The column number the locator is pointing to.
-    @@Type: idl|long||ManakaiDOM|all
+    @@Type: idl|long
     @@Get:
       @@@InCase:
         @@@@intValue: -1
@@ -3233,7 +3228,7 @@ IFCls3Def:
     @@Name: byteOffset
     @@enDesc:
       The byte ofset into the input source the locator is pointin to.
-    @@Type: idl|long||ManakaiDOM|all
+    @@Type: idl|long
     @@Get:
       @@@InCase:
         @@@@intValue: -1
@@ -3252,7 +3247,7 @@ IFCls3Def:
       The manakai binding has decided that the method name is 
       <Perl::utf16_offset> rather than <Perl::utf_16_offset>,
       since the later is ugly and there is <Perl::utf8> pragma in Perl.
-    @@Type: idl|long||ManakaiDOM|all
+    @@Type: idl|long
     @@Get:
       @@@InCase;
         @@@@intValue: -1
@@ -3270,7 +3265,7 @@ IFCls3Def:
 
         {NOTE:: This attribute is a manakai extension.
         }
-    @@Type: idl|long||ManakaiDOM|all
+    @@Type: idl|long
     @@Get:
       @@@InCase;
         @@@@intValue: -1
@@ -3391,7 +3386,7 @@ IFCls3Def:
         }
     @@Param:
       @@@Name:err
-      @@@Type: ecore|ErrorInterface||ManakaiDOM|Perl
+      @@@Type: ecore|ErrorInterface
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -3408,7 +3403,7 @@ IFCls3Def:
           if ($err->isa (<IFName::c|DOMError>)) {
             CORE::warn $err;
           } else {
-            $err-><M::ecore|ErrorInterface||ManakaiDOM|Perl.throw>;
+            $err-><M::ecore|ErrorInterface.throw>;
           }
     @@enImplNote:
       {TODO::
@@ -3718,7 +3713,7 @@ IFCls3Def:
         @@@@enDesc:
           <DOM::true> would be returned.
     @@Return:
-      @@@Type: idl|boolean||ManakaiDOM|all
+      @@@Type: idl|boolean
       @@@TrueCase:
         @@@@enDesc:
           The parameter could not be successfully set to the specified
@@ -3763,7 +3758,7 @@ IFCls3Def:
         The key.  It must be either a
         parameter name or its camel-case variant in ECMAScript binding.
     @@Return:
-      @@@Type: idl|boolean||ManakaiDOM|all
+      @@@Type: idl|boolean
       @@@PerlDef:
         my $p = $Message::DOM::DOMCore::ManakaiDOMConfiguration{$self->[2]}
                 ->{lc $key};
@@ -4151,7 +4146,7 @@ CParam:
       @@@dis:actualType: DOMErrorHandler
       @@@enDesc: The new value.
     @@Return:
-      @@@Type: idl|void||ManakaiDOM|all
+      @@@Type: idl|void
       @@@PerlDefC:
         $self->[1]->{<H::DOMCore:error-handler>} = $value;
     @@enImplNote:
@@ -4170,7 +4165,7 @@ CParam:
       @@@dis:actualType: DOMErrorHandler
       @@@enDesc: The new value.
     @@Return:
-      @@@Type: idl|boolean||ManakaiDOM|all
+      @@@Type: idl|boolean
       @@@PerlDefC:
         $r = UNIVERSAL::isa ($value, <IFName::DOMErrorHandler>);
     @@enImplNote:
@@ -4232,7 +4227,7 @@ boolCParam:
       @@@dis:actualType: DOMConfigurationParameterName
       @@@enDesc: The name of the parameter.
     @@Return:
-      @@@Type: idl|boolean||ManakaiDOM|all
+      @@@Type: idl|boolean
       @@@PerlDefC:
         __DEEP{
           $r = !$self-><M::DOMConfiguration.getParameter>
@@ -4264,10 +4259,10 @@ boolCParam:
     @@Param:
       @@@Name: value
       @@@Type: DOMMain|DOMUserData
-      @@@dis:actualType: idl|boolean||ManakaiDOM|all
+      @@@dis:actualType: idl|boolean
       @@@enDesc: The new value.
     @@Return:
-      @@@Type: idl|void||ManakaiDOM|all
+      @@@Type: idl|void
       @@@PerlDefC:
         ## TODO: Warning
 ##infoset
@@ -4428,7 +4423,7 @@ CParam:
       @@@dis:actualType: DOMMain|DOMString
       @@@enDesc: The new value.
     @@Return:
-      @@@Type: idl|void||ManakaiDOM|all
+      @@@Type: idl|void
       @@@PerlDefC:
         $self->[1]->{<H::DOMCore:schema-location>} = $value;
 ##schema-location
@@ -4619,7 +4614,7 @@ enImplNote:
 ResourceTypeDef:
   @QName: DOMCore|DOMConfigurationParameter
   @enDesc:
-    A parameter used on <IF::DOMConfiguration::ManakaiDOM|ManakaiDOM> objects.
+    A parameter used on <IF::DOMConfiguration> objects.
   @DISCore:resourceType: DISSource|ResourceProperty
 
 ResourceTypeDef:
@@ -4654,8 +4649,6 @@ ElementTypeBinding:
   @Name: nodeProp
   @ElementType:
     tc:nodeStemKey
-  @ShadowContent:
-    @@For: =ManakaiDOM|all
 
 XParamDef:
   @QName: DOMCore|configurationParameterValue
@@ -4686,8 +4679,7 @@ SPropDef:
   @enImplNote:
     {ISSUE:: Current implementation is not so good.
              For example, it cannot represent the situation that
-             the implementation <html5:var::A> of <IF::DOMCore:Document
-             ::ManakaiDOM|ManakaiDOMLatest> supports a 
+             the implementation <html5:var::A> of <IF::c|Document> supports a 
              value while another implementation <html5:var::B>
              of the interface does not support the value.
     }
@@ -4768,7 +4760,7 @@ ElementTypeBinding:
       @@@@: DOMCore|DOMConfigurationParameter
     @@rdf:type:
       @@@@: DISSource|ResourceProperty
-    @@Type: idl|boolean||ManakaiDOM|all
+    @@Type: idl|boolean
     @@subsetOf:
       @@@@: c|anyDOMConfigurationParameter
     @@multipleProperties:
@@ -4789,7 +4781,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: rdf|Property
-    @@For: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: RPropDef
@@ -4797,7 +4788,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISSource|ResourceProperty
-    @@For: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: SPropDef
@@ -4805,4 +4795,3 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISSource|Property
-    @@For: =ManakaiDOM|all

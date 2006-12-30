@@ -12,7 +12,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/12/30 08:27:45 $
+    $Date: 2006/12/30 12:00:39 $
 
   @Require:
     @@Module:
@@ -487,7 +487,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: DISCore|Property
-    @@For: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: RPropDef
@@ -495,7 +494,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: DISSource|ResourceProperty
-    @@For: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: Test
@@ -564,23 +562,23 @@ ResourceDef:
 
 ResourceDef:
   @QName: boolean
-  @AliasFor: idl|boolean||ManakaiDOM|all
+  @AliasFor: idl|boolean
 
 ResourceDef:
   @QName: unsignedLong
-  @AliasFor: idl|unsignedLong||ManakaiDOM|all
+  @AliasFor: idl|unsignedLong
 
 ResourceDef:
   @QName: unsignedShort
-  @AliasFor: idl|unsignedShort||ManakaiDOM|all
+  @AliasFor: idl|unsignedShort
 
 ResourceDef:
   @QName: ARRAY
-  @AliasFor: DISPerl|ARRAY||ManakaiDOM|all
+  @AliasFor: DISPerl|ARRAY
 
 ResourceDef:
   @QName: HASH
-  @AliasFor: DISPerl|HASH||ManakaiDOM|all
+  @AliasFor: DISPerl|HASH
 
 ResourceDef:
   @QName: DocumentX
@@ -603,7 +601,7 @@ IFCls1Def:
   @ClsQName: ManakaiDOMNode
 
   @ClsISA: f|ManakaiHasFeatureByGetFeature
-  @Implement: ecore|MUErrorTarget||ManakaiDOM|Perl
+  @Implement: ecore|MUErrorTarget
 
   @enDesc:
     The <IF::Node> interface is the primary datatype for the entire 
@@ -752,7 +750,7 @@ IFCls1Def:
 
         $test->id ($node-><AG::Node.nodeName>.'.MUErrorTarget');
         $test->assert_isa
-                 ($node, <IFName::ecore|MUErrorTarget||ManakaiDOM|Perl>);
+                 ($node, <IFName::ecore|MUErrorTarget>);
 
         $test->id ($node-><AG::Node.nodeName>.'.GetFeature');
         $test->assert_isa ($node, <IFName::f|GetFeature>);
@@ -774,7 +772,7 @@ IFCls1Def:
   @IntMethod:
     @@Operator: ManakaiDOM|MUErrorHandler
     @@enDesc:
-      When a <IF::ecore|ErrorInterface||ManakaiDOM|Perl> is <Perl::report>ed
+      When a <IF::ecore|ErrorInterface> is <Perl::report>ed
       with an <Perl::-object> of <IF::Node>, then this method is invoked.
       
       The method calls the <cfg::error-handler> if the error is of 
@@ -783,7 +781,7 @@ IFCls1Def:
       can catch the error.
     @@Param:
       @@@Name: err
-      @@@Type: ecore|ErrorInterface||ManakaiDOM|Perl
+      @@@Type: ecore|ErrorInterface
       @@@enDesc:
         The reported error object.
     @@Return:
@@ -817,7 +815,7 @@ IFCls1Def:
             } # A
           }__;
         } else {
-          $err-><M::ecore|ErrorInterface||ManakaiDOM|Perl.throw>;
+          $err-><M::ecore|ErrorInterface.throw>;
         }
 
   @Constants:
@@ -2251,7 +2249,7 @@ IFCls1Def:
       @@@enDesc:
         The string to append.
       @@@InCase:
-        @@@@Type: DISPerl|SCALAR||ManakaiDOM|all
+        @@@@Type: DISPerl|SCALAR
         @@@@enDesc:
           A copy of the string value referenced from the value
           is appended.
@@ -6116,7 +6114,7 @@ ElementTypeBinding:
     @@Value:
       @@@@: 1
       @@@ContentType: DISCore|Boolean
-    @@Type: idl|boolean||ManakaiDOM|all
+    @@Type: idl|boolean
 
 ElementTypeBinding:
   @Name: FalseCase
@@ -6128,7 +6126,7 @@ ElementTypeBinding:
     @@Value:
       @@@@: 0
       @@@ContentType: DISCore|Boolean
-    @@Type: idl|boolean||ManakaiDOM|all
+    @@Type: idl|boolean
 
 ResourceDef:
   @QName: CharacterData
@@ -6747,7 +6745,7 @@ ResourceDef:
         \
         }
     @@Return:
-      @@@Type: DISPerl|ARRAY||ManakaiDOM|all
+      @@@Type: DISPerl|ARRAY
       @@@PerlDef:
         @@@@ForCheck: !tc|ForEmptyNodeList
         @@@@@:
@@ -6792,7 +6790,7 @@ ResourceDef:
     @@Name: manakaiReadOnly
     @@enDesc:
       Whether the node list is read-only or not.
-    @@Type: idl|boolean||ManakaiDOM|all
+    @@Type: idl|boolean
     @@Get:
       @@@enDesc:
         If the <IF::NodeList> is the list of child nodes of a node,
@@ -7507,7 +7505,7 @@ ResourceDef:
       not support substitions to array items (e.g. <Perl::$map-<lt>[2] = $node>
       does not work).
     @@Return:
-      @@@Type: DISPerl|ARRAY||ManakaiDOM|all
+      @@@Type: DISPerl|ARRAY
       @@@PerlDef:
         @@@@ForCheck: tc|ForAttrMap
         @@@@@:
@@ -8607,7 +8605,7 @@ ResourceDef:
       Returns the <P::index>th item in the map.
     @@Param:
       @@@Name: index
-      @@@Type: idl|unsignedLong||ManakaiDOM|all
+      @@@Type: idl|unsignedLong
       @@@enDesc:
         The ordinal index of a node to retrieve.
     @@Return:
@@ -8838,7 +8836,7 @@ ResourceDef:
     @@Perlop: FETCHSIZE
     @@enDesc:
       The number of nodes in the map.
-    @@Type: idl|unsignedLong||ManakaiDOM|all
+    @@Type: idl|unsignedLong
     @@Get:
       @@@PerlDef:
         @@@@ForCheck: tc|ForAttrMap
@@ -9029,7 +9027,7 @@ ResourceDef:
     @@Perlop: STORESIZE
     @@Param:
       @@@Name: count
-      @@@Type: idl|unsignedLong||ManakaiDOM|all
+      @@@Type: idl|unsignedLong
     @@Return:
       @@@dx:raises:
         @@@@@: c|NOMOD_NAMEDNODEMAP_ERR
@@ -9055,7 +9053,7 @@ ResourceDef:
       @@@Name: key
       @@@Type: DOMString
     @@Return:
-      @@@Type: idl|boolean||ManakaiDOM|all
+      @@@Type: idl|boolean
       @@@PerlDef:
         @@@@ForCheck: !tc|ForETMap !tc|ForATMap !tc|ForEntityMap !tc|ForNotationMap
         @@@@@:
@@ -9562,7 +9560,7 @@ ResourceDef:
   @IntMethod:
     @@Operator: ManakaiDOM|MUErrorHandler
     @@enDesc:
-      When a <IF::ecore|ErrorInterface||ManakaiDOM|Perl> is <Perl::report>ed
+      When a <IF::ecore|ErrorInterface> is <Perl::report>ed
       with an <Perl::-object> of <IF::NamedNodeMap> that represents
       a set of attributes, then this method is invoked.
       
@@ -9572,7 +9570,7 @@ ResourceDef:
       can catch the error.
     @@Param:
       @@@Name: err
-      @@@Type: ecore|ErrorInterface||ManakaiDOM|Perl
+      @@@Type: ecore|ErrorInterface
       @@@enDesc:
         The reported error object.
     @@Return:
@@ -9661,7 +9659,7 @@ ResourceDef:
     @@Name: manakaiReadOnly
     @@enDesc:
       Whether the <IF::NamedNodeMap> is read-only or not.
-    @@Type: idl|boolean||ManakaiDOM|all
+    @@Type: idl|boolean
     @@Get:
       @@@enDesc:
         If the <IF::NamedNodeMap> is attached to a node,
@@ -9761,7 +9759,7 @@ ResourceDef:
     @@Perlop: FETCH
     @@Param:
       @@@Name: index
-      @@@Type: idl|unsignedLong||ManakaiDOM|all
+      @@@Type: idl|unsignedLong
     @@Return:
       @@@Type: Node
       @@@nullCase:
@@ -9776,9 +9774,9 @@ ResourceDef:
       <Perl::EXISTS> for tied array.
     @@Param:
       @@@Name: index
-      @@@Type: idl|unsignedLong||ManakaiDOM|all
+      @@@Type: idl|unsignedLong
     @@Return:
-      @@@Type: idl|boolean||ManakaiDOM|all
+      @@@Type: idl|boolean
       @@@PerlDef:
         __DEEP{
           my $length = $self-><AG::NamedNodeMap.length>;
@@ -9804,7 +9802,7 @@ ResourceDef:
         and prefix when applicable.
     @@Param:
       @@@Name: index
-      @@@Type: idl|unsignedLong||ManakaiDOM|all
+      @@@Type: idl|unsignedLong
       @@@enDesc:
         The ordinal index of the node to remove.
     @@Return:
@@ -9843,23 +9841,18 @@ ElementTypeBinding:
       @@@@: c|DOMConfigurationParameter
     @@DISCore:resourceType:
       @@@@: DISSource|ResourceProperty
-    @@Type: idl|boolean||ManakaiDOM|all
+    @@Type: idl|boolean
     @@subsetOf:
       @@@@: c|anyDOMConfigurationParameter
-      @@@For: =ManakaiDOM|all
     @@multipleProperties:
       @@@@: DISCore|Single
-      @@@For: =ManakaiDOM|all
     @@dataType: 
       @@@@: DISCore|Boolean
-      @@@For: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: nodeProp
   @ElementType: 
     tc:nodeStemKey
-  @ShadowContent:
-    @@For: =ManakaiDOM|all
 
 boolCParam:
   @QName: cfg|clone-entity-reference-subtree
@@ -10155,7 +10148,7 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: c|DOMErrorType
-    @@ecore:textFormatter: ecore|MUErrorFormatter||ManakaiDOM|Perl
+    @@ecore:textFormatter: ecore|MUErrorFormatter
 
 ElementTypeBinding:
   @Name: errname
@@ -10356,8 +10349,8 @@ IFCls3Def:
   @ConstGroup:
     @@QName:  OperationType
 
-    @@subsetOf: idl|unsignedShort||ManakaiDOM|all
-    @@Type: idl|unsignedShort||ManakaiDOM|all
+    @@subsetOf: idl|unsignedShort
+    @@Type: idl|unsignedShort
 
     @@enDesc:
       An <Q::OperationType> value is an integer indicating the
@@ -10427,7 +10420,7 @@ IFCls3Def:
 
     @@Param:
       @@@Name: operation
-      @@@Type: idl|unsignedShort||ManakaiDOM|all
+      @@@Type: idl|unsignedShort
       @@@dis:actualType: OperationType
       @@@enDesc:
         The type of operation that is being performed on the node.

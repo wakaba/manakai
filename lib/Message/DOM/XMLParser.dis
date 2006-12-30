@@ -10,7 +10,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/12/30 08:27:48 $
+    $Date: 2006/12/30 12:00:40 $
 
   @Require:
     @@Module:
@@ -106,7 +106,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: f|Feature
-    @@For: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: FeatureVerDef
@@ -214,7 +213,7 @@ ElementTypeBinding:
     @@Value:
       @@@@: 1
       @@@ContentType: DISCore|Boolean
-    @@Type: idl|boolean||ManakaiDOM|all
+    @@Type: idl|boolean
 
 ElementTypeBinding:
   @Name: FalseCase
@@ -226,7 +225,7 @@ ElementTypeBinding:
     @@Value:
       @@@@: 0
       @@@ContentType: DISCore|Boolean
-    @@Type: idl|boolean||ManakaiDOM|all
+    @@Type: idl|boolean
 
 ResourceDef:
   @QName: LSParser
@@ -409,7 +408,7 @@ ClsDef:
     @@Name: async
     @@enDesc:
       Whether the parser is asynchronous or not.
-    @@Type: idl|boolean||ManakaiDOM|all
+    @@Type: idl|boolean
     @@Get:
       @@@FalseCase:
         @@@@enDesc:
@@ -428,7 +427,7 @@ ClsDef:
     @@Name: busy
     @@enDesc:
       Whether the parser is currently busy loading a document or not.
-    @@Type: idl|boolean||ManakaiDOM|all
+    @@Type: idl|boolean
     @@Get:
       @@@TrueCase:
         @@@@enDesc:
@@ -716,7 +715,7 @@ ClsDef:
     @@enDesc:
       Returns the next character.
     @@Return:
-      @@@Type: idl|long||ManakaiDOM|all
+      @@@Type: idl|long
       @@@enDesc:
         The code position number of the next character, if any,
         or <CODE::-1>.
@@ -856,7 +855,7 @@ ClsDef:
     @@ManakaiDOM:isForInternal: 1
     @@Operator: ManakaiDOM|MUErrorHandler
     @@enDesc:
-      When a <IF::ecore|ErrorInterface||ManakaiDOM|Perl> is <Perl::report>ed,
+      When a <IF::ecore|ErrorInterface> is <Perl::report>ed,
       then this method is invoked.
       
       The method calls the <cfg::DOMCore|error-handler> if the error is of 
@@ -864,7 +863,7 @@ ClsDef:
       corresponding <Perl::catch> clause, if any, can catch the error.
     @@Param:
       @@@Name: err
-      @@@Type: ecore|ErrorInterface||ManakaiDOM|Perl
+      @@@Type: ecore|ErrorInterface
       @@@enDesc:
         The reported error object.
     @@Return:
@@ -889,7 +888,7 @@ ClsDef:
             } # A
           }__;
         } else {
-          $err-><M::ecore|ErrorInterface||ManakaiDOM|Perl.throw>;
+          $err-><M::ecore|ErrorInterface.throw>;
         }
 
   @DISPerl:dpgDef:
@@ -16677,7 +16676,6 @@ ElementTypeBinding:
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
-    @@For: =ManakaiDOM|all
     @@rdf:type: ecore|Parameter
 
 ElementTypeBinding:
@@ -16774,7 +16772,7 @@ ElementTypeBinding:
 ClsDef:
   @ClsQName: ManakaiXMLParserExceptionFormatter
 
-  @ClsISA: ecore|MUErrorFormatter||ManakaiDOM|Perl
+  @ClsISA: ecore|MUErrorFormatter
 
   @RuleDef:
     @@Name: xp-error-token-type
@@ -16897,13 +16895,10 @@ ElementTypeBinding:
       @@@@: c|DOMConfigurationParameter
     @@rdf:type:
       @@@@: DISSource|ResourceProperty
-      @@@For: =ManakaiDOM|all
     @@subsetOf:
       @@@@: c|anyDOMConfigurationParameter
-      @@@For: =ManakaiDOM|all
     @@multipleProperties:
       @@@@: DISCore|Single
-      @@@For: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: CParamApp
@@ -16922,17 +16917,13 @@ ElementTypeBinding:
       @@@@: c|DOMConfigurationParameter
     @@DISCore:resourceType:
       @@@@: DISSource|ResourceProperty
-      @@@For: =ManakaiDOM|all
-    @@Type: idl|boolean||ManakaiDOM|all
+    @@Type: idl|boolean
     @@subsetOf:
       @@@@: c|anyDOMConfigurationParameter
-      @@@For: =ManakaiDOM|all
     @@multipleProperties:
       @@@@: DISCore|Single
-      @@@For: =ManakaiDOM|all
     @@dataType: 
       @@@@: DISCore|Boolean
-      @@@For: =ManakaiDOM|all
 
 CParamApp:
   @QName: xml-id
@@ -16952,8 +16943,7 @@ boolCParam:
   @QName: cfg|entity-replacement-tree
   @DOMLS:lsKey:
     @@@: erep
-    @@For: =ManakaiDOM|all
-  @Type: idl|boolean||ManakaiDOM|all
+  @Type: idl|boolean
   @c:targetType: xp|ManakaiXMLParser
   @IsSupportRequired: 1
   @c:isSupported: 1
@@ -17007,7 +16997,6 @@ CParam:
   @QName: xp|ls-input-to-input-file
   @DOMLS:lsKey:
     @@@: i2i
-    @@For: =ManakaiDOM|all
   @Type: ManakaiDOMLSInputToInputFile
   @c:targetType: xp|ManakaiXMLParser
   @IsSupportRequired: 1
@@ -17196,7 +17185,7 @@ CParam:
       @@@dis:actualType: ManakaiDOMLSInputToInputFile
       @@@enDesc: The new value.
     @@Return:
-      @@@Type: idl|void||ManakaiDOM|all
+      @@@Type: idl|void
       @@@PerlDefC:
         $self->[1]->{<H::xp|ls-input-to-input-file>} = $value;
     @@enImplNote:
@@ -17215,7 +17204,7 @@ CParam:
       #@@@dis:actualType: ManakaiDOMLSInputToInputFile
       @@@enDesc: The new value.
     @@Return:
-      @@@Type: idl|boolean||ManakaiDOM|all
+      @@@Type: idl|boolean
       @@@PerlDefC:
         $r = UNIVERSAL::isa ($value, 'CODE') or
              UNIVERSAL::isa ($value, <ClassName::ManakaiDOMLSInputToInputFile>);
@@ -17389,7 +17378,7 @@ ClsDef:
 
   @Attr:
     @@Name: filehandle
-    @@Type: DISPerl|filehandle||ManakaiDOM|all
+    @@Type: DISPerl|filehandle
     @@enDesc:
       The input filehandle.
 

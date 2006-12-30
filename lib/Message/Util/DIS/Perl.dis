@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/12/30 08:27:51 $
+      $Date: 2006/12/30 12:00:45 $
     @@ContentType:
       dis:Date.RCS
   
@@ -28,25 +28,16 @@ Module:
       @@@QName: DIS|common
     @@Module:
       @@@QName: Util|DIS
-      @@@WithFor: DIS|ForLatest
     @@Module:
       @@@QName: DIS|Value
-      @@@WithFor: DIS|ForLatest
     @@Module:
       @@@QName: Util|PerlCode
-      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
     @@Module:
       @@@QName: DIS|DPG
-      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
     @@Module:
       @@@QName: MDOM|GenericLS
-      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
     @@Module:
       @@@QName: DISlib|Charset
-      @@@WithFor: ManakaiDOM|all
-
-  @DefaultFor: 
-    DIS:ForLatest
 
 Namespace:
   @c:
@@ -142,7 +133,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: f|Feature
-    @@For: ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: FeatureVerDef
@@ -203,8 +193,6 @@ ElementTypeBinding:
 
     @@f:implements: DIS|Perl10
 
-    @@ForCheck: DIS|ForEmpty
-
 ElementTypeBinding:
   @Name: IFDef
   @ElementType:
@@ -220,8 +208,6 @@ ElementTypeBinding:
       @@@ForCheck: ManakaiDOM|ForIF
 
     @@f:implements: DIS|Perl10
-
-    @@ForCheck: DIS|ForEmpty
 
 ElementTypeBinding:
   @Name: IFQName
@@ -257,7 +243,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|Method
-    @@For: !=DIS|ForEmpty
 
 ElementTypeBinding:
   @Name: Return
@@ -279,7 +264,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|Attribute
-    @@For: !=DIS|ForEmpty
 
 ElementTypeBinding:
   @Name: Get
@@ -298,7 +282,6 @@ ElementTypeBinding:
 ResourceDef:
   @QName: disdb
   @AliasFor: DIS|DISDatabase
-  @For: DIS|ForEmpty
 
 ## -- SWCFG nodes
 
@@ -354,7 +337,7 @@ IFClsDef:
           as if <Q::DISCore:String>.
     @@NamedParam:
       @@@Name:useDefaultValue
-      @@@Type: idl|boolean||ManakaiDOM|all
+      @@@Type: idl|boolean
       @@@enDesc:
         Whether some default value should be provided if possible or not.
     @@Type:
@@ -478,7 +461,7 @@ IFClsDef:
     @@ForpParam:
     @@NamedParam:
       @@@Name: containsStatements
-      @@@Type: idl|boolean||ManakaiDOM|all
+      @@@Type: idl|boolean
       @@@enDesc:
         Whether the code is block-level or inline-level.
     @@NamedParam:
@@ -694,63 +677,51 @@ ResourceDef:
                                               (<Q::DISPerl|HASH>)) {
       $result = $doc-><M::PCDocument.createPCLiteral> ({});
     }
-  @For: DIS|ForEmpty
 ##setDefaultValueDoc
 
 ResourceDef:
   @QName: DIS|MPLImpl
-  @AliasFor: pc|PCImplementation||ManakaiDOM|ManakaiDOMLatest
-  @For: DIS|ForEmpty
+  @AliasFor: pc|PCImplementation
 
 ResourceDef:
   @QName: DIS|MPLCodeFragment
-  @AliasFor: pc|PerlCode||ManakaiDOM|ManakaiDOMLatest
-  @For: DIS|ForEmpty
+  @AliasFor: pc|PerlCode
 
 ResourceDef:
   @QName: DIS|PLFile
-  @AliasFor: pc|PerlFile||ManakaiDOM|ManakaiDOMLatest
-  @For: DIS|ForEmpty
+  @AliasFor: pc|PerlFile
 
 ResourceDef:
   @QName: DIS|PLPack
-  @AliasFor: pc|PerlPackage||ManakaiDOM|ManakaiDOMLatest
-  @For: DIS|ForEmpty
+  @AliasFor: pc|PerlPackage
 
 ResourceDef:
   @QName: DIS|PLInCon
-  @AliasFor: pc|PerlCodeInlines||ManakaiDOM|ManakaiDOMLatest
-  @For: DIS|ForEmpty
+  @AliasFor: pc|PerlCodeInlines
 
 ResourceDef:
   @QName: DIS|PLBlockCon
-  @AliasFor: pc|PerlCodeStatements||ManakaiDOM|ManakaiDOMLatest
-  @For: DIS|ForEmpty
+  @AliasFor: pc|PerlCodeStatements
 
 ResourceDef:
   @QName: DIS|MPLSS
-  @AliasFor: pc|PerlCodeStatements||ManakaiDOM|ManakaiDOMLatest
-  @For: DIS|ForEmpty
+  @AliasFor: pc|PerlCodeStatements
 
 ResourceDef:
   @QName: DIS|PLAnyCon
-  @AliasFor: pc|PerlCodeUnits||ManakaiDOM|ManakaiDOMLatest
-  @For: DIS|ForEmpty
+  @AliasFor: pc|PerlCodeUnits
 
 ResourceDef:
   @QName: DIS|MPLSub
-  @AliasFor: pc|PerlSub||ManakaiDOM|ManakaiDOMLatest
-  @For: DIS|ForEmpty
+  @AliasFor: pc|PerlSub
 
 ResourceDef:
   @QName: DIS|MPLUnparsedCode
-  @AliasFor: pc|PerlUnparsedCode||ManakaiDOM|ManakaiDOMLatest
-  @For: DIS|ForEmpty
+  @AliasFor: pc|PerlUnparsedCode
 
 ResourceDef:
   @QName: PCVar
-  @AliasFor: pc|PerlVariable||ManakaiDOM|ManakaiDOMLatest
-  @For: DIS|ForEmpty
+  @AliasFor: pc|PerlVariable
 
 PropDef:
   @QName: DIS|plCodeFragment
@@ -769,7 +740,6 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       rdf:Property
-    @@For: =ManakaiDOM|all
 
 IFClsDef:
   @IFQName: DVValuePerl
@@ -883,8 +853,7 @@ ElementTypeBinding:
 
 ResourceDef:
   @QName: PLImplClass
-  @AliasFor: PerlCode|ManakaiPCImplementation||ManakaiDOM|ManakaiDOMLatest
-  @For: DIS|ForEmpty
+  @AliasFor: PerlCode|ManakaiPCImplementation
 
 ElementTypeBinding:
   @Name: ForpParam
@@ -1040,7 +1009,7 @@ IFClsDef:
     @@Param:
       @@@Name: fileName
       @@@Type:
-        DISLang:String::ManakaiDOM:all
+        DISLang:String
       @@@enDesc:
         An environment-dependent file name of external database to save. 
         \
@@ -1050,7 +1019,7 @@ IFClsDef:
         }
     @@Param:
       @@@Name: moduleResolver
-      @@@Type: DISPerl|CODE||ManakaiDOM|all
+      @@@Type: DISPerl|CODE
       @@@enDesc:
         A reference to code which resolvers a module into
         a file name path, as in <M::DISDatabasePerl.plLoadDISDatabase>.
@@ -1207,7 +1176,7 @@ IFClsDef:
         An identifier to define the scope of hash key.
     @@Param:
       @@@Name: keyName
-      @@@Type: DISLang|String||ManakaiDOM|all
+      @@@Type: DISLang|String
       @@@enDesc:
         Hash key value to register.
     @@Param:
@@ -1353,12 +1322,12 @@ IFClsDef:
       are synced with the source.
     @@Param:
       @@@Name: modules
-      @@@Type: DISPerl|ARRAY||ManakaiDOM|all
+      @@@Type: DISPerl|ARRAY
       @@@enDesc:
         A list of pairs of module name URI and <QUOTE::for> URI.
     @@NamedParam:
       @@@Name: getModuleIndexFileName
-      @@@Type: DISPerl|CODE||ManakaiDOM|all
+      @@@Type: DISPerl|CODE
       @@@enDesc:
         A code to convert a module URI into file name.
  
@@ -1372,7 +1341,7 @@ IFClsDef:
         parameter.
     @@NamedParam:
       @@@Name: getModuleSourceDocumentFromURI
-      @@@Type: DISPerl|CODE||ManakaiDOM|all
+      @@@Type: DISPerl|CODE
       @@@enDesc:
         A code to obtain the <QUOTE::dis> document object
         from the name URI of the module.
@@ -1390,13 +1359,13 @@ IFClsDef:
         dependent.
     @@NamedParam:
       @@@Name: getModuleSourceDocumentFromResource
-      @@@Type: DISPerl|CODE||ManakaiDOM|all
+      @@@Type: DISPerl|CODE
       @@@enDesc:
         The <CODE::resolver> parameter to the <M::disdb.loadModule>
         method.
     @@NamedParam:
       @@@Name: getModuleSourceRevision
-      @@@Type: DISPerl|CODE||ManakaiDOM|all
+      @@@Type: DISPerl|CODE
       @@@enDesc:
         A code to obtain the revision number of the module source
         file.
@@ -1415,7 +1384,7 @@ IFClsDef:
         return a positive number.
     @@NamedParam:
       @@@Name: getReferringModuleURIList
-      @@@Type: DISPerl|CODE||ManakaiDOM|all
+      @@@Type: DISPerl|CODE
       @@@enDesc:
         A code to return a list of URIs of modules referenced
         from a module source file.
@@ -1429,7 +1398,7 @@ IFClsDef:
         from the module source file identified by the second parameter.
     @@NamedParam:
       @@@Name: onResourceRead
-      @@@Type: DISPerl|CODE||ManakaiDOM|all
+      @@@Type: DISPerl|CODE
       @@@enDesc:
         The <CODE::onResourceRead> parameter to the
         <M::disdb.loadModule> method.
@@ -1517,7 +1486,7 @@ IFClsDef:
                 if ($mod_el) {
                   $mod_for = $mod_el-><AG::DIS|DISModuleElement.defaultForURI>;
                 } else {
-                  $mod_for = <Q::ManakaiODM|all>;
+                  $mod_for = <Q::ManakaiDOM|all>;
                 }
               }
             }
@@ -1598,7 +1567,7 @@ IFClsDef:
     @@enDesc:
       The database resource module file resolver.
       See <M::DISImplementationPerl.plLoadDISDatabase>.
-    @@Type: DISPerl|CODE||ManakaiDOM|all
+    @@Type: DISPerl|CODE
     @@Get:
       @@@PerlDef:
         $r = $self->{<H::dp|dbModuleResolver>};
@@ -1613,9 +1582,8 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: DOMCore|DOMErrorType
-    @@For: DIS|ForLatest
-    @@ecore:textFormatter: ecore|MUErrorFormatter||ManakaiDOM|Perl
-    @@DOMCore:severity: DOMCore|SEVERITY_ERROR||ManakaiDOM|ManakaiDOMLatest
+    @@ecore:textFormatter: ecore|MUErrorFormatter
+    @@DOMCore:severity: DOMCore|SEVERITY_ERROR
 
 ElementTypeBinding:
   @Name: InfoDef
@@ -1623,9 +1591,8 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: DOMCore|DOMErrorType
-    @@For: DIS|ForLatest
-    @@ecore:textFormatter: ecore|MUErrorFormatter||ManakaiDOM|Perl
-    @@DOMCore:severity: DOMCore|SEVERITY_WARNING||ManakaiDOM|ManakaiDOMLatest
+    @@ecore:textFormatter: ecore|MUErrorFormatter
+    @@DOMCore:severity: DOMCore|SEVERITY_WARNING
 
 ErrDef:
   @QName: dp|error-module-is-already-in-database
@@ -1784,17 +1751,14 @@ InfoDef:
 ResourceDef:
   @QName: dp|ModuleIndexFile
   @DISCore:resourceType: DISCore|Resource
-  @For: =ManakaiDOM|all
 
 ResourceDef:
   @QName: dp|ModuleResourceFile
   @DISCore:resourceType: DISCore|Resource
-  @For: =ManakaiDOM|all
 
 ResourceDef:
   @QName: dp|ModuleNodeStorageFile
   @DISCore:resourceType: DISCore|Resource
-  @For: =ManakaiDOM|all
 
 PropDef:
   @QName: dp|dbModuleResolver
@@ -1900,7 +1864,7 @@ IFClsDef:
     @@enDesc:
       The fully-qualified Perl class package name. 
     @@Type:
-      pl:package-name::ManakaiDOM:all
+      pl:package-name
     @@Get:
       @@@NoPerlModuleNameException:
       @@@PerlDef:
@@ -1938,7 +1902,7 @@ IFClsDef:
     @@enDesc:
       The fully-qualified Perl interface package name. 
     @@Type:
-      pl:package-name::ManakaiDOM:all
+      pl:package-name
     @@Get:
       @@@NoPerlModuleNameException:
       @@@PerlDef:
@@ -2164,23 +2128,20 @@ IFClsDef:
 
 ResourceDef:
   @QName: Node
-  @AliasFor: tc|Node||ManakaiDOM|ManakaiDOMLatest
-  @For: DIS|ForLatest
+  @AliasFor: tc|Node
 
 ResourceDef:
   @QName: Document
-  @AliasFor: tc|Document||ManakaiDOM|ManakaiDOMLatest
-  @For: DIS|ForLatest
+  @AliasFor: tc|Document
 
 ResourceDef:
   @QName: CFG
-  @AliasFor: c|DOMConfiguration||ManakaiDOM|ManakaiDOMLatest
-  @For: DIS|ForLatest
+  @AliasFor: c|DOMConfiguration
 
 PropDef:
   @QName: dp|plName
   @enDesc:
-    <A::DISResourcePerl||DIS|ForLatest.plName>.
+    <A::DISResourcePerl.plName>.
 
 ElementTypeBinding:
   @Name: TMethods
@@ -2192,7 +2153,6 @@ ElementTypeBinding:
       @@@ForCheck: !ManakaiDOM|ForClass
     @@resourceFor: ManakaiDOM|ForClass
     @@DISCore:resourceType: DISCore|Resource
-    @@For: DIS|ForLatest
 
 ElementTypeBinding:
   @Name: TMethod
@@ -2213,7 +2173,6 @@ ElementTypeBinding:
 ResourceDef:
   @QName: anyres
   @AliasFor: DIS|DISAnyResource
-  @For: DIS|ForEmpty
 
 ElementTypeBinding:
   @Name: CODE
@@ -2273,7 +2232,7 @@ IFClsDef:
     @@enDesc:
       Returns a list of Perl method names assigned to the resource.
     @@Return:
-      @@@Type: DISPerl|ARRAY||ManakaiDOM|all
+      @@@Type: DISPerl|ARRAY
       @@@enDesc:
         An unordered snapshot list of Perl names.
       @@@RaiseException:
@@ -2355,7 +2314,7 @@ IFClsDef:
     @@enDesc:
       Returns a list of Perl operators assigned to the resource.
     @@Return:
-      @@@Type: DISPerl|ARRAY||ManakaiDOM|all
+      @@@Type: DISPerl|ARRAY
       @@@enDesc:
         An unordered snapshot list of Perl operators.
       @@@PerlDef:
@@ -2419,7 +2378,7 @@ IFClsDef:
     @@enDesc:
       The Perl variable name with prefix.
     @@Type:
-      lang:Perl::ManakaiDOM:all
+      lang:Perl
     @@Get:
       @@@nullCase:
         @@@@enDesc:
@@ -2458,7 +2417,7 @@ IFClsDef:
     @@enDesc:
       The Perl parameter prototype character.
     @@Type:
-      lang:Perl::ManakaiDOM:all
+      lang:Perl
     @@Get:
       @@@PerlDef:
           __DEEP{
@@ -2573,7 +2532,7 @@ IFClsDef:
         The package of the module.
     @@Param:
       @@@Name: const
-      @@@Type: DISPerl|HASH||ManakaiDOM|all
+      @@@Type: DISPerl|HASH
     @@Return:
       @@@Type: Node
       @@@enDesc:
@@ -2730,7 +2689,7 @@ IFClsDef:
       superclass package names (i.e. <Q::dis:AppISA>
       attributes values for Perl).
     @@Type: 
-      pl:ARRAY::ManakaiDOM:all
+      pl:ARRAY
     @@Get:
       @@@PerlDef:
         for my $t (@{$self-><M::DIS|DISResourceProp.getPropertyTextList>
@@ -2750,7 +2709,7 @@ IFClsDef:
       @@@@: qr/[^\s<>"'\/\\\[\]\{\},!\?=\$\@%]/
       @@@ContentType:
         lang:Perl
-    @@Type: idl|any||ManakaiDOM|all
+    @@Type: idl|any
 
   @ResourceDef:
     @@ForCheck: ManakaiDOM|ForClass
@@ -2759,7 +2718,7 @@ IFClsDef:
       A regular expression for a block.
     @@rdf:type:
       DISPerl:ScalarVariable
-    @@Type: idl|any||ManakaiDOM|all
+    @@Type: idl|any
     @@DefaultValue:
       @@@@:
         qr/(?>[^{}\\]*)(?>(?>[^{}\\]+|\\.|\{(??{$RegBlockContent})\})*)/
@@ -2821,7 +2780,7 @@ IFClsDef:
     @@Param:
       @@@Name:codeArg
       @@@Type:
-        lang:Perl::ManakaiDOM:all
+        lang:Perl
       @@@enDesc:
         A Perl block-level code (statements and/or blocks).
     @@NodeParam:
@@ -2845,7 +2804,7 @@ IFClsDef:
           <P::node> or implied one if any.
     @@Return:
       @@@Type: 
-        lang:Perl::ManakaiDOM:all
+        lang:Perl
       @@@enDesc:
         Preprocessed Perl code. 
       @@@BlockElementException:
@@ -2968,8 +2927,7 @@ IFClsDef:
                                for_arg => $err-><AG::DIS|DISAnyResource.forURI>);
                   if (not $errcls-><AG::DIS|DISAnyResource.isDefined>) {
                     $errcls = $db-><M::DIS|DISDatabase.getResource>
-                              (<Q::DOMCore:ManakaiDOMError>,
-                               for_arg => <Q::ManakaiDOM:ManakaiDOMLatest>);
+                              (<Q::DOMCore:ManakaiDOMError>);
                   }
 
                   for ($err, $errcls) {
@@ -3178,14 +3136,14 @@ IFClsDef:
     @@Param:
       @@@Name:codeArg
       @@@Type:
-        lang:Perl::ManakaiDOM:all
+        lang:Perl
       @@@enDesc:
         A Perl code fragment.
     @@NodeParam:
     @@NamedParam:
       @@@Name:containsStatements
       @@@Type:
-        DOMMain:boolean::ManakaiDOM:all
+        DOMMain:boolean
       @@@enDesc:
         Whether one or more statements might be contained
         in <P::codeArg> or not.
@@ -3541,7 +3499,7 @@ IFClsDef:
     @@Param:
       @@@Name: paramSpec
       @@@Type:
-        DISLang:String::ManakaiDOM:all
+        DISLang:String
       @@@enDesc:
         A parameter specification to parse.
     @@NodeParam:
@@ -3553,7 +3511,7 @@ IFClsDef:
           <P::node> or implied one if any.
     @@Return:
       @@@Type:
-        pl:HASH::ManakaiDOM:all
+        pl:HASH
       @@@enDesc:
         Hash containing parameters.  Each hash value is also 
         a hash reference, containing two keys <CODE::type> 
@@ -3632,7 +3590,7 @@ IFClsDef:
       Returns contextual parameters which describes the <QUOTE::location>
       of this resource.
     @@Return:
-      @@@Type: DISPerl|HASH||ManakaiDOM|all
+      @@@Type: DISPerl|HASH
       @@@enDesc:
         Hash of parameters as <M::ManakaiDISResourcePerl
         .plParsePreprocessParameter> returns.
@@ -3762,7 +3720,7 @@ IFClsDef:
     @@Param:
       @@@Name: xparam
       @@@Type:
-        pl:HASH::ManakaiDOM:all
+        pl:HASH
       @@@enDesc:
         A hash containing parameters passed to the <Perl::report> method. 
         A hash key is to be a parameter name.  Hash values 
@@ -3791,8 +3749,7 @@ IFClsDef:
            ' -object => $self');
         my $xclass_module = $xclass-><AG::DIS|DISAnyResource
                                             .ownerModule>;
-        unless ($xclass-><AG::DIS|DISAnyResource.isDefined> or
-                not $xclass_module) {
+        unless ($xclass-><AG::DIS|DISAnyResource.isDefined>) {
           __EXCEPTION{DIS|RESOURCE_NOT_DEFINED_ERR::
             DIS:uri => {$xclass-><AG::anyres.uri>},
             DIS:localName => {$xclass-><AG::DIS|DISAnyResource.localName>},
@@ -3844,7 +3801,7 @@ IFClsDef:
       <QUOTE::Nullability> is defined for method parameters, 
       method returns, attribute getters and attribute setters.
     @@Type:
-      DOMMain:boolean::ManakaiDOM:all
+      DOMMain:boolean
     @@Get:
       @@@RaiseException:
         @@@@@: DIS|NO_DIS_TYPE_ERR
@@ -3902,7 +3859,7 @@ IFClsDef:
     @@NodeParam:
     @@Return:
       @@@Type:
-        DISLang:String::ManakaiDOM:all
+        DISLang:String
       @@@PerlDef:
         __DEEP{
           my $muf = $self-><M::DIS|DISResourceProp.getPropertyValue>
@@ -4382,14 +4339,14 @@ TMethods:
             } else {  ## Method code not defined
               my $db = $self-><AG::anyres.database>;
               my $cls = $db-><M::DIS|DISDatabase.getResource>
-                                              (<Q::dx:CoreException>,
-                                               for_arg => <Q::ManakaiDOM:Perl>);
+                                              (<Q::dx:CoreException>);
+
               my $const = $db-><M::DIS|DISDatabase.getResource>
-                                          (<Q::dx:NOT_SUPPORTED_ERR>,
-                                               for_arg => <Q::ManakaiDOM:Perl>);
+                                          (<Q::dx:NOT_SUPPORTED_ERR>);
+
               my $subtype = $db-><M::DIS|DISDatabase.getResource>
-                                  (<Q::MDOMX:MDOM_IMPL_METHOD_NOT_IMPLEMENTED>,
-                                               for_arg => <Q::ManakaiDOM:Perl>);
+                                 (<Q::MDOMX:MDOM_IMPL_METHOD_NOT_IMPLEMENTED>);
+
               $_-><AS::DIS|DISAnyResource.isReferred>
                  ($ret-><AG::DIS|DISAnyResource.uri>) for $cls, $const, $subtype;
               my $context_param = $ret-><M::ManakaiDISResourcePerl
@@ -4567,14 +4524,12 @@ TMethods:
             } else {  ## Getter code not defined
               my $db = $self-><AG::anyres.database>;
               my $cls = $db-><M::DIS|DISDatabase.getResource>
-                                              (<Q::dx:CoreException>,
-                                               for_arg => <Q::ManakaiDOM:Perl>);
+                                              (<Q::dx:CoreException>);
               my $const = $db-><M::DIS|DISDatabase.getResource>
-                                          (<Q::dx:NOT_SUPPORTED_ERR>,
-                                               for_arg => <Q::ManakaiDOM:Perl>);
+                                          (<Q::dx:NOT_SUPPORTED_ERR>);
               my $subtype = $db-><M::DIS|DISDatabase.getResource>
-                                    (<Q::MDOMX:MDOM_IMPL_ATTR_NOT_IMPLEMENTED>,
-                                               for_arg => <Q::ManakaiDOM:Perl>);
+                                   (<Q::MDOMX:MDOM_IMPL_ATTR_NOT_IMPLEMENTED>);
+
               $_-><AS::DIS|DISAnyResource.isReferred>
                  ($get-><AG::DIS|DISAnyResource.uri>) for $cls, $const, $subtype;
               my $context_param = $get-><M::ManakaiDISResourcePerl
@@ -4659,14 +4614,12 @@ TMethods:
                                               (q<my ($self) = @_>);
                 my $db = $self-><AG::anyres.database>;
                 my $cls = $db-><M::DIS|DISDatabase.getResource>
-                                              (<Q::dx:CoreException>,
-                                               for_arg => <Q::ManakaiDOM:Perl>);
+                                              (<Q::dx:CoreException>);
                 my $const = $db-><M::DIS|DISDatabase.getResource>
-                                          (<Q::dx:NOT_SUPPORTED_ERR>,
-                                               for_arg => <Q::ManakaiDOM:Perl>);
+                                          (<Q::dx:NOT_SUPPORTED_ERR>);
                 my $subtype = $db-><M::DIS|DISDatabase.getResource>
-                                    (<Q::MDOMX:MDOM_IMPL_ATTR_NOT_IMPLEMENTED>,
-                                               for_arg => <Q::ManakaiDOM:Perl>);
+                                   (<Q::MDOMX:MDOM_IMPL_ATTR_NOT_IMPLEMENTED>);
+
                 $_-><AS::DIS|DISAnyResource.isReferred>
                  ($set-><AG::DIS|DISAnyResource.uri>) for $cls, $const, $subtype;
                 my $context_param = $get-><M::ManakaiDISResourcePerl
@@ -4680,14 +4633,12 @@ TMethods:
                                                        (q<my ($self) = @_>);
               my $db = $self-><AG::anyres.database>;
               my $cls = $db-><M::DIS|DISDatabase.getResource>
-                                              (<Q::dx:CoreException>,
-                                               for_arg => <Q::ManakaiDOM:Perl>);
+                                              (<Q::dx:CoreException>);
               my $const = $db-><M::DIS|DISDatabase.getResource>
-                                (<Q::dx:NO_MODIFICATION_ALLOWED_ERR>,
-                                               for_arg => <Q::ManakaiDOM:Perl>);
+                                (<Q::dx:NO_MODIFICATION_ALLOWED_ERR>);
               my $subtype = $db-><M::DIS|DISDatabase.getResource>
-                                    (<Q::dx:READ_ONLY_ATTRIBUTE_ERR>,
-                                               for_arg => <Q::ManakaiDOM:Perl>);
+                                    (<Q::dx:READ_ONLY_ATTRIBUTE_ERR>);
+
               $_-><AS::DIS|DISAnyResource.isReferred>
                 ($self-><AG::DIS|DISAnyResource.uri>) for $cls, $const, $subtype;
               my $context_param = $get-><M::ManakaiDISResourcePerl
@@ -5311,22 +5262,14 @@ TMethods:
               require Message::DOM::GenericLS;
               require Message::Util::DIS::DPG;
               $dpgparser ||= $factory-><AG::Document.implementation>
-                                     -><M::f|GetFeature
-                                         ||ManakaiDOM|ManakaiDOMLatest
-                                         .getFeature>
-                                       (<Q::fe:GenericLS> => '3.0')
-                                  -><M::gls|GLSImplementation
-                                         ||ManakaiDOM|ManakaiDOMLatest
-                                                           .createGLSParser>
+                                  ->create_gls_parser
                                        ({<Q::DIS|DPG> => '1.0'});
-              my $dpgdoc = $dpgparser-><M::DPG|DPGParser
-                                       ||ManakaiDOM|ManakaiDOMLatest.parseString>
+              my $dpgdoc = $dpgparser->parse_string
                               ($val-><AG::dv|DVValue.value>, $val);
               
               $r-><M::Node.appendChild>
                     ($dpgdoc-><AG::Document.documentElement>
-                            -><M::DPG|DPGRulesElement
-                                    ||ManakaiDOM|ManakaiDOMLatest.plCodeFragment>
+                            ->pl_code_fragment
                               ($factory,
                                dis_resource => $self,
                                context_object => $val));
@@ -5344,7 +5287,7 @@ TMethods:
       @@@Type: DIS|PLPack
     @@Param:
       @@@Name: const
-      @@@Type: DISPerl|HASH||ManakaiDOM|all
+      @@@Type: DISPerl|HASH
     @@Return:
       @@@Type: Node
       @@@PerlDef:
@@ -5589,8 +5532,7 @@ TMethods:
 
 ResourceDef:
   @QName: PCDocument
-  @AliasFor: pc|PCDocument||ManakaiDOM|ManakaiDOMLatest
-  @For: DIS|ForEmpty
+  @AliasFor: pc|PCDocument
 
 TMethods:
   @enDesc:
@@ -5675,7 +5617,7 @@ TMethods:
       @@@Type: DIS|PLPack
     @@Param:
       @@@Name: const
-      @@@Type: DISPerl|HASH||ManakaiDOM|all
+      @@@Type: DISPerl|HASH
     @@Return:
       @@@Type: Node
       @@@PerlDef:
@@ -6091,8 +6033,7 @@ TMethods:
                                 (<Q::ecore:textFormatter>);
             unless ($tf) {
               $tf = $db-><M::DIS|DISDatabase.getResource>
-                           (<Q::ecore|MUErrorFormatter>,
-                            for_arg => <Q::ManakaiDOM|Perl>);
+                           (<Q::ecore|MUErrorFormatter>);
             }
           $r = $factory-><M::PCDocument.createPCStatement>;
           $r-><M::DIS|PLInCon.appendCode>

@@ -18,20 +18,15 @@ Module:
   @License:
     license:Perl+MPL
   @Date:
-    $Date: 2006/12/30 02:37:09 $
+    $Date: 2006/12/30 12:00:44 $
   
   @Require:
     @@Module:
       @@@QName: Util|DIS
-      @@@WithFor: DIS|ForLatest
     @@Module:
       @@@QName: DIS|common
     @@Module:
       @@@QName: DIS|Perl
-      @@@WithFor: DIS|ForLatest
-
-  @DefaultFor: 
-    DIS:ForLatest
 
 Namespace:
   @c:
@@ -85,7 +80,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: f|Feature
-    @@For: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: FeatureVerDef
@@ -145,8 +139,6 @@ ElementTypeBinding:
 
     @@DOMMain:implementFeature: DIS|DNLite10
 
-    @@ForCheck: DIS|ForEmpty
-
 ElementTypeBinding:
   @Name: IFDef
   @ElementType:
@@ -163,8 +155,6 @@ ElementTypeBinding:
 
     @@DOMMain:implementFeature: DIS|DNLite10
 
-    @@ForCheck: DIS|ForEmpty
-
 ElementTypeBinding:
   @Name: ClsDef
   @ElementType:
@@ -180,8 +170,6 @@ ElementTypeBinding:
       @@@ForCheck: ManakaiDOM|ForClass
 
     @@DOMMain:implementFeature: DIS|DNLite10
-
-    @@ForCheck: DIS|ForEmpty
 
 ElementTypeBinding:
   @Name: IFQName
@@ -217,7 +205,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|Method
-    @@For: !=DIS|ForEmpty
 
 ElementTypeBinding:
   @Name: Return
@@ -239,7 +226,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|Attribute
-    @@For: !=DIS|ForEmpty
 
 ElementTypeBinding:
   @Name: Get
@@ -264,9 +250,9 @@ IFClsDef:
   @f:provides: DIS|DNLite10
 
   @domperl:implementedByObjectsOf:
-    c|DOMImplementation||ManakaiDOM|ManakaiDOMLatest
+    c|DOMImplementation
   @domperl:classImplementedByObjectsOf:
-    c|ManakaiDOMImplementation||ManakaiDOM|ManakaiDOMLatest
+    c|ManakaiDOMImplementation
 
   @enDesc:
     The object implementing the <IF::DISImplementationDNLite>
@@ -286,7 +272,7 @@ IFClsDef:
       @@@nullCase:
     @@NamedParam:
       @@@Name: baseNamespaceBinding
-      @@@Type: DISPerl|HASH||ManakaiDOM|all
+      @@@Type: DISPerl|HASH
       @@@enDesc:
         A base set of namespace bindings.
       @@@nullCase:
@@ -363,7 +349,7 @@ IFClsDef:
                 nodePath => \$np,
               }, <ClassName::ManakaiDNLElement>;
               push @{$result_parent->{child}||=[]}, $a;
-              __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
+              __CODE{DISPerl|HashStringRef::
                 $result => {$a->{uri}},
                 $given => {$xu},
               }__;
@@ -375,10 +361,10 @@ IFClsDef:
               my $source_childs = $source_node-><AG::SNode.childNodes>;
               for (my $i = 0;
                    $i < $source_childs-><AG::swcfg21:SWCFGChildNodeList
-                                           ::swcfg21:ForLatest.length>; $i++) {
+                                           .length>; $i++) {
                 my $source_child = $source_childs
                                      -><M::swcfg21:SWCFGChildNodeList
-                                         ::swcfg21:ForLatest.item> ($i);
+                                         .item> ($i);
                 $cn->($self, $db, $source_child => $a);
               }
               $np = $source_node-><AG::SEl.realQualifiedName>;
@@ -426,24 +412,23 @@ IFClsDef:
 
 ResourceDef:
   @QName: SNode
-  @AliasFor: swcfg21|SWCFGNode||swcfg21|ForLatest
-  @For: DIS|ForEmpty
+  @AliasFor: swcfg21|SWCFGNode
+
 ResourceDef:
   @QName: SEl
-  @AliasFor: swcfg21|SWCFGElement||swcfg21|ForLatest
-  @For: DIS|ForEmpty
+  @AliasFor: swcfg21|SWCFGElement
+
 ResourceDef:
   @QName: DNode
-  @AliasFor: DIS|DISNode||DIS|ForLatest
-  @For: DIS|ForEmpty
+  @AliasFor: DIS|DISNode
+
 ResourceDef:
   @QName: DDoc
-  @AliasFor: DIS|DISDocument||DIS|ForLatest
-  @For: DIS|ForEmpty
+  @AliasFor: DIS|DISDocument
+
 ResourceDef:
   @QName: DEl
-  @AliasFor: DIS|DISElement||DIS|ForLatest
-  @For: DIS|ForEmpty
+  @AliasFor: DIS|DISElement
 
 ElementTypeBinding:
   @Name: caType
@@ -462,12 +447,12 @@ IFClsDef:
   @ClsISA: DIS|ManakaiNSResolverDIS
 
   @ClsISA:
-    dx:ManakaiDefaultExceptionHandler::ManakaiDOM:Perl
+    dx:ManakaiDefaultExceptionHandler
 
   @Attr:
     @@Name: childNodes
     @@Get:
-      @@@Type: pl|ARRAY||ManakaiDOM|all
+      @@@Type: pl|ARRAY
       @@@enDesc:
         The list of child elements.
 
@@ -534,7 +519,7 @@ IFClsDef:
   @Attr:
     @@Name: nodeIDRef
     @@Get:
-      @@@Type: DISPerl|SCALAR||ManakaiDOM|all
+      @@@Type: DISPerl|SCALAR
       @@@nullCase:
         @@@@enDesc: No node identifier.
       @@@PerlDef: $r = $self->{nodeID};
@@ -544,7 +529,7 @@ IFClsDef:
     @@Param:
       @@@Name: key
       @@@DISPerl:isNamedParameter:1
-      @@@Type: DOMMain|any||ManakaiDOM|all
+      @@@Type: DOMMain|any
       @@@enDesc: Ignored.
     @@Return:
       @@@Type: DISString
@@ -576,7 +561,7 @@ IFClsDef:
       @@@Name: databaseArg
       @@@Type: DIS|DISDatabase
     @@Return:
-      @@@Type: pl|ARRAY||ManakaiDOM|all
+      @@@Type: pl|ARRAY
       @@@enDesc:
         The current snapshot of child nodes.
       @@@PerlDef:
@@ -593,7 +578,7 @@ IFClsDef:
   @Method:
     @@Name: disAllChildElements
     @@Return:
-      @@@Type: pl|ARRAY||ManakaiDOM|all
+      @@@Type: pl|ARRAY
       @@@PerlDef:
         $r = [@{$self->{child}||[]}];
 
@@ -649,7 +634,7 @@ IFClsDef:
 
   @Method:
     @@Name: valueRef
-    @@Type: DISPerl|SCALAR||ManakaiDOM|all
+    @@Type: DISPerl|SCALAR
     @@Return:
       @@@nullCase:
         @@@@enDesc: No value.
@@ -733,7 +718,7 @@ IFClsDef:
       }
     @@Get:
       @@@Type:
-        DISCore:NamespacePrefix::ManakaiDOM:all
+        DISCore:NamespacePrefix
       @@@nullCase:
         @@@@enDesc:
           No value. 
@@ -862,7 +847,7 @@ IFClsDef:
       @@@Type: DIS|DISDatabase
     @@NamedParam:
       @@@Name: srinfo
-      @@@Type: DISPerl|HASH||ManakaiDOM|all
+      @@@Type: DISPerl|HASH
       @@@enDesc:
         The <CODE::srinfo> hash.
       @@@nullCase:
@@ -870,7 +855,7 @@ IFClsDef:
           No <CODE::srinfo>.
     @@Return:
       @@@Type:
-        DOMMain:boolean::ManakaiDOM:all
+        DOMMain:boolean
       @@@TrueCase:
         @@@@enDesc:
           Either the element type expanded URI reference of this element is 
@@ -898,7 +883,7 @@ IFClsDef:
       }
     @@Get:
       @@@Type:
-        DOMMain:boolean::ManakaiDOM:all
+        DOMMain:boolean
       @@@TrueCase:
         @@@@enDesc:
           This element defines a resource. 
@@ -925,7 +910,7 @@ IFClsDef:
       @@@Type: DIS|DISDatabase
     @@Return:
       @@@Type:
-        DOMMain:boolean::ManakaiDOM:all
+        DOMMain:boolean
       @@@TrueCase:
         @@@@enDesc:
           This element is a property.
@@ -1012,7 +997,7 @@ IFClsDef:
   @Method:
     @@Name: getDefaultNamespaceURIRef
     @@enDesc: A reference to the URI of the default namespace.
-    @@Type: DISPerl|SCALAR||ManakaiDOM|all
+    @@Type: DISPerl|SCALAR
     @@nullCase:
       @@@enDesc: No namespace.
     @@Return:
@@ -1023,7 +1008,7 @@ IFClsDef:
     @@Name: getNamespaceBindingList
     @@enDesc:
       Returns the <QUOTE::live> hash reference of namespace bindings.      
-    @@Type: DISPerl|HASH||ManakaiDOM|all
+    @@Type: DISPerl|HASH
     @@Param:
       @@@Name: databaseArg
       @@@Type: DIS|DISDatabase
@@ -1210,7 +1195,7 @@ IFClsDef:
           The database associated to the document is used.
     @@Return:
       @@@Type:
-        DOMMain:boolean::ManakaiDOM:all
+        DOMMain:boolean
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -1317,7 +1302,7 @@ IFClsDef:
     @@Test:
       @@@ForCheck: ManakaiDOM|ForClass
       @@@PerlDef:
-        my $impl = <Class::c|ManakaiDOMImplementation||ManakaiDOM|ManakaiDOMLatest>->_new;
+        my $impl = <Class::c|ManakaiDOMImplementation>->_new;
         my $db = $impl-><M::DIS|DISImplementation.createDISDatabase>;
 
         my $node = bless {}, <ClassName::ManakaiDNLElement>;
@@ -1400,7 +1385,7 @@ IFClsDef:
         A <QUOTE::dis> database.
     @@Return:
       @@@Type:
-        DOMMain:boolean::ManakaiDOM:all
+        DOMMain:boolean
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -1650,8 +1635,7 @@ ElementTypeBinding:
 
 ResourceDef:
   @QName: DISString
-  @AliasFor: DISLang|String||ManakaiDOM|all
-  @For: DIS|ForEmpty
+  @AliasFor: DISLang|String
 
 ElementTypeBinding:
   @Name: PerlDef
@@ -1691,7 +1675,7 @@ ElementTypeBinding:
       @@@@:1
       @@@ContentType: DISCore|Boolean
     @@Type:
-      DOMMain:boolean::ManakaiDOM:all
+      DOMMain:boolean
 
 ElementTypeBinding:
   @Name: FalseCase
@@ -1704,4 +1688,4 @@ ElementTypeBinding:
       @@@@:0
       @@@ContentType: DISCore|Boolean
     @@Type:
-      DOMMain:boolean::ManakaiDOM:all
+      DOMMain:boolean

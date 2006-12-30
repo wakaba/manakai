@@ -16,17 +16,15 @@ Module:
 
   @DISCore:author: DISCore|Wakaba
   @License:
-     license:Perl+MPL
+    license:Perl+MPL
   @Date:
-    $Date: 2006/04/03 16:13:17 $
+    $Date: 2006/12/30 12:00:43 $
   
   @Require:
     @@Module:
       @@@QName: DISlib|DISPerl
-      @@@WithFor: ManakaiDOM|all
-
-  @DefaultFor:
-    ManakaiDOM:Perl
+    @@Module:
+      @@@QName: Util|common
 
 Namespace:
   @dis:
@@ -49,25 +47,6 @@ Namespace:
     http://www.w3.org/2000/01/rdf-schema#
   @Util:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/
-
-ResourceDef:
-  @QName:
-    Util:
-  @rdf:type:
-    dis:ModuleGroup
-  @FullName:
-    @@lang:en
-    @@@:
-      The manakai support modules
-  @DISPerl:packageName:
-    Message::Util::
-  @DISPerl:interfacePackageName:
-    Message::Util::IF::
-  @ImplNote:
-    @@lang:en
-    @@@:
-      This resource is also defined in <Module::Util:DIS> and
-      <Module::Util:PerlCode> modules.
 
 ## -- Internal node object
 
@@ -121,13 +100,12 @@ ClassDef:
         <Class::ManakaiDOM:ManakaiDOMNodeObject> and returns it.
     @@Param:
       @@@Name: className
-      @@@Type: DISLang|String||ManakaiDOM|all
+      @@@Type: DISLang|String
       @@@enDesc:
         The name of a class which is typically used as reference
         to the node.  The class <kwd:SHOULD> implement the 
         <IF::NodeRef> interface.  The <QUOTE::dis> definition
-        for the class <kwd:SHOULD> play the role of <Q::mn|NodeRefRole
-        ||ManakaiDOM|all>.
+        for the class <kwd:SHOULD> play the role of <Q::mn|NodeRefRole>.
     @@Return:
       @@@Type: NodeStem
       @@@Description:
@@ -151,13 +129,12 @@ ClassDef:
       the node.
     @@Param:
       @@@Name: className
-      @@@Type: DISLang|String||ManakaiDOM|all
+      @@@Type: DISLang|String
       @@@enDesc:
         The name of a class which is typically used as reference
         to the node.  The class <kwd:SHOULD> implement the 
         <IF::NodeRef> interface.  The <QUOTE::dis> definition
-        for the class <kwd:SHOULD> play the role of <Q::mn|NodeRefRole
-        ||ManakaiDOM|all>.
+        for the class <kwd:SHOULD> play the role of <Q::mn|NodeRefRole>.
     @@Return:
       @@@Type: NodeStem
       @@@enDesc: The newly created node.
@@ -202,7 +179,7 @@ ClassDef:
       @@@rdf:type:
         DISPerl:CodeParameter
       @@@Name: $class
-      @@@Type: DISLang|String||ManakaiDOM|all
+      @@@Type: DISLang|String
       @@@enDesc:
         A package name with which <P::$ref> is blessed. 
       @@@In:1
@@ -257,7 +234,7 @@ ClassDef:
       @@@rdf:type:
         DISPerl:CodeParameter
       @@@Name: $class
-      @@@Type: DISLang|String||ManakaiDOM|all
+      @@@Type: DISLang|String
       @@@enDesc:
         A package name with which <P::$ref> is blessed. 
       @@@In:1
@@ -301,7 +278,7 @@ ClassDef:
       @@@rdf:type:
         DISPerl:CodeParameter
       @@@Name: $class
-      @@@Type: DISLang|String||ManakaiDOM|all
+      @@@Type: DISLang|String
       @@@enDesc:
         A package name with which <P::$ref> is blessed.
       @@@In:1
@@ -321,7 +298,7 @@ ClassDef:
         from the outside of the tree or not. 
     @@Return:
       @@@Type: 
-        DISPerl:Boolean::ManakaiDOM:all
+        DISPerl:Boolean
       @@@InCase:
         @@@@Value:
           @@@@@@:1
@@ -563,19 +540,19 @@ ClassDef:
     @@Param:
       @@@Name: treeID
       @@@Type: 
-        DISPerl:String::ManakaiDOM:all
+        DISPerl:String
       @@@Description:
         @@@@lang:en
         @@@@@:
           The new tree identifier. 
        @@@InCase:
-        @@@@Type: DISPerl|SCALAR||ManakaiDOM|all
+        @@@@Type: DISPerl|SCALAR
         @@@@enDesc:
           A reference to the new tree identifier.
           The tree will reference the identifier as it.
     @@Param:
       @@@Name: groveRC
-      @@@Type: DISPerl|SCALAR||ManakaiDOM|all
+      @@@Type: DISPerl|SCALAR
       @@@enDesc:
         The new reference counter.
     @@Return:
@@ -659,7 +636,7 @@ ClassDef:
           A node to compare with. 
     @@Return:
       @@@Type: 
-        DISPerl:Boolean::ManakaiDOM:all
+        DISPerl:Boolean
       @@@Description:
         @@@@lang:en
         @@@@@: Whether the two nodes are same or not.
@@ -842,7 +819,6 @@ ClassDef:
 ResourceDef:
   @QName: mn|NodeRefRole
   @rdf:type: DISLang|Role
-  @For: =ManakaiDOM|all
   @enDesc: 
     The <QUOTE::dis> definition for a class which plays the role
     of <Q::mn|NodeRefRole> provides a set of <QUOTE::dis> properties such
@@ -862,7 +838,7 @@ PropDef:
   @QName: mn|subnode0
   @enDesc:
     A property of type <Q::mn|subnode0> takes a value of 
-    reference to another node (<Q::mn|NodeStem||ManakaiDOM|Perl>)
+    reference to another node (<Q::mn|NodeStem>)
     in the same grove.  The referenced node is considered
     to make a part of the node and just one <Q::mn|origin0>
     property of the referenced node <kwd:MUST> have a reference
@@ -919,7 +895,7 @@ PropDef:
     <html5:var::m> and <html5:var::s> are increased, so that
     the tree <html5:var::s> would not be deleted while this
     link has been maintained.  When the property value is unset
-    or an <M::NodeStem||ManakaiDOM|Perl.importTree> operation
+    or an <M::NodeStem.importTree> operation
     makes two trees to one, then two reference counters
     are decreased.
 
@@ -980,22 +956,21 @@ PropDef:
 PropDef:
   @QName: mn|node
   @mn:refName: node
-  @rdfs:domain: mn|NodeRef||ManakaiDOM|Perl
-  @rdfs:range: mn|NodeStem||ManakaiDOM|Perl
+  @rdfs:domain: mn|NodeRef
+  @rdfs:range: mn|NodeStem
 
 PropDef:
   @QName: mn|isWeak
   @enDesc:
     Whether a reference is weak or not. 
-  @rdfs:domain: mn|NodeRef||ManakaiDOM|Perl
+  @rdfs:domain: mn|NodeRef
   @Type: DISPerl|Boolean
   @mn:refName: w
 
 PropDef:
   @QName: mn|stemName
   @enDesc:
-    The key name of the property when it is used in <Class::ManakaiNodeStem
-    ::ManakaiDOM:Perl>.
+    The key name of the property when it is used in <Class::ManakaiNodeStem>.
   @dataType: DISCore|String
   @multipleProperties: DISCore|Single
   @rdfs:domain: rdfs|Property
@@ -1004,8 +979,7 @@ PropDef:
 PropDef:
   @QName: mn|refName
   @enDesc:
-    The key name of the property when it is used in <Class::ManakaiNodeRef
-    ::ManakaiDOM:Perl>.
+    The key name of the property when it is used in <Class::ManakaiNodeRef>.
   @dataType: DISCore|String
   @multipleProperties: DISCore|Single
   @rdfs:domain: rdfs|Property
@@ -1018,7 +992,6 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       rdf:Property
-    @@For: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name:enDesc
@@ -1041,8 +1014,6 @@ ResourceDef:
       {NOTE:: A URI reference is generated by this code. 
       \
       }
-
-  @For: =ManakaiDOM|Perl
 
   @PerlDef:
       (
@@ -1076,7 +1047,6 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       DISLang:TreeElementType
-    @@For: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: ClassDef
@@ -1093,7 +1063,6 @@ ElementTypeBinding:
     @@rdf:type:
       @@@@: DISLang|Class
       @@@ForCheck: ManakaiDOM|ForClass
-    @@ForCheck: ManakaiDOM|Perl
 
 ElementTypeBinding:
   @Name: IntMethod

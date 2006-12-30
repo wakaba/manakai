@@ -13,7 +13,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/12/30 08:27:45 $
+    $Date: 2006/12/30 12:00:39 $
 
   @Require:
     @@Module:
@@ -508,7 +508,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: DISCore|Property
-    @@For: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: RPropDef
@@ -516,7 +515,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: DISSource|ResourceProperty
-    @@For: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: Test
@@ -572,23 +570,23 @@ ResourceDef:
 
 ResourceDef:
   @QName: boolean
-  @AliasFor: idl|boolean||ManakaiDOM|all
+  @AliasFor: idl|boolean
 
 ResourceDef:
   @QName: unsignedLong
-  @AliasFor: idl|unsignedLong||ManakaiDOM|all
+  @AliasFor: idl|unsignedLong
 
 ResourceDef:
   @QName: unsignedShort
-  @AliasFor: idl|unsignedShort||ManakaiDOM|all
+  @AliasFor: idl|unsignedShort
 
 ResourceDef:
   @QName: ARRAY
-  @AliasFor: DISPerl|ARRAY||ManakaiDOM|all
+  @AliasFor: DISPerl|ARRAY
 
 ResourceDef:
   @QName: HASH
-  @AliasFor: DISPerl|HASH||ManakaiDOM|all
+  @AliasFor: DISPerl|HASH
 
 ResourceDef:
   @QName: DocumentX
@@ -1071,15 +1069,15 @@ ClsDef:
           <H::infoset|attributes> => {},
         }, $class;
         Scalar::Util::weaken ($$r->{<H::tc|ownerDocument>});
-        __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
+        __CODE{DISPerl|HashStringRef::
           $result => {$$r->{<H::infoset|namespaceName>}},
           $given => $namespaceURI,
         }__;
-        __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
+        __CODE{DISPerl|HashStringRef::
           $result => {$$r->{<H::infoset|prefix>}},
           $given => $prefix,
         }__;
-        __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
+        __CODE{DISPerl|HashStringRef::
           $result => {$$r->{<H::infoset|localName>}},
           $given => $lname,
         }__;
@@ -1728,15 +1726,15 @@ ClsDef:
           <H::infoset|specified> => 1,
         }, <ClassName::te|ManakaiDOMAttr>;
         Scalar::Util::weaken ($$r->{<H::tc|ownerDocument>});
-        __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
+        __CODE{DISPerl|HashStringRef::
           $result => {$$r->{<H::infoset|namespaceName>}},
           $given => $namespaceURI,
         }__;
-        __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
+        __CODE{DISPerl|HashStringRef::
           $result => {$$r->{<H::infoset|prefix>}},
           $given => $prefix,
         }__;
-        __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
+        __CODE{DISPerl|HashStringRef::
           $result => {$$r->{<H::infoset|localName>}},
           $given => $lname,
         }__;
@@ -5037,7 +5035,7 @@ NodeTypeDef:
       @@@enDesc:
         The string to append.
       @@@InCase:
-        @@@@Type: DISPerl|SCALAR||ManakaiDOM|all
+        @@@@Type: DISPerl|SCALAR
         @@@@enDesc:
           A copy of the string value referenced from the value
           is appended.
@@ -11477,7 +11475,7 @@ NodeTypeDef:
       @@@enDesc:
         The string to append.
       @@@InCase:
-        @@@@Type: DISPerl|SCALAR||ManakaiDOM|all
+        @@@@Type: DISPerl|SCALAR
         @@@@enDesc:
           A copy of the string value referenced from the value
           is appended.
@@ -12455,7 +12453,7 @@ ElementTypeBinding:
     @@Value:
       @@@@: 1
       @@@ContentType: DISCore|Boolean
-    @@Type: idl|boolean||ManakaiDOM|all
+    @@Type: idl|boolean
 
 ElementTypeBinding:
   @Name: FalseCase
@@ -12467,13 +12465,13 @@ ElementTypeBinding:
     @@Value:
       @@@@: 0
       @@@ContentType: DISCore|Boolean
-    @@Type: idl|boolean||ManakaiDOM|all
+    @@Type: idl|boolean
 
 IntPropDef:
   @QName: c|userDeterminedId
   @enDesc:
     Whether it is a user-determined ID attribute or not.
-  @Type: DISPerl|Boolean||ManakaiDOM|all
+  @Type: DISPerl|Boolean
   @tc:nodeStemKey: isudid
 
 IFCls3Def:
@@ -12677,8 +12675,8 @@ IFCls3Def:
       Any type derives from <Q::xsd:anyType>.  (Can any bit be used 
       to test it?)
 
-    @@subsetOf: idl|unsignedLong||ManakaiDOM|all
-    @@Type: idl|unsignedLong||ManakaiDOM|all
+    @@subsetOf: idl|unsignedLong
+    @@Type: idl|unsignedLong
     @@IsBitMask:1
 
     @@Const:
@@ -12765,13 +12763,13 @@ IFCls3Def:
         The name of the other type definition.
     @@Param:
       @@@Name: derivationMethod
-      @@@Type: idl|unsignedLong||ManakaiDOM|all
+      @@@Type: idl|unsignedLong
       @@@dis:actualType: DerivationMethods
       @@@enDesc:
         The type of derivation and conditions applied between two
         types.
     @@Return:
-      @@@Type: idl|boolean||ManakaiDOM|all
+      @@@Type: idl|boolean
       @@@TrueCase:
         @@@@enDesc:
           If the document's schema language is XML Schema and
@@ -12808,7 +12806,7 @@ IFCls3Def:
       @@@Name: t
       @@@Type: TypeInfo
     @@Return:
-      @@@Type: idl|boolean||ManakaiDOM|all
+      @@@Type: idl|boolean
       @@@PerlDef:
         __DEEP{
           if (UNIVERSAL::isa ($t, <IFName::TypeInfo>)) {

@@ -22,34 +22,23 @@ Module:
       @@@Year:2004
       @@@DISCore:author: DISCore|Wakaba
   @Date:
-    $Date: 2006/12/30 08:27:50 $
+    $Date: 2006/12/30 12:00:42 $
   
   @Require:
     @@Module:
+      @@@QName: Util|common
+    @@Module:
       @@@QName: Markup|SuikaWikiConfig21
-      @@@WithFor: swcfg21|ForLatest
-    @@Module:
-      @@@QName: Util|DIS
-      @@@WithFor: DIS|ForLatest
-    @@Module:
-      @@@QName: Util|DIS
-      @@@WithFor: DIS|ForEmpty
     @@Module:
       @@@QName: MDOM|DOMFeature
-      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
     @@Module:
       @@@QName: DIS|Perl
-      @@@WithFor: DIS|ForLatest
     @@Module:
       @@@QName: DIS|Value
-      @@@WithFor: DIS|ForLatest
     @@Module:
       @@@QName: MDOM|DOMCore
-      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
     @@Module:
       @@@QName: MDOM|TreeStore
-      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
-  @DefaultFor: DIS|ForLatest
 
 Namespace:
   @c:
@@ -121,49 +110,6 @@ Namespace:
   @Util:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/
 
-## -- "For" definitions
-
-ForDef:
-  @QName: DIS|ForEmpty
-  @enDesc:
-    For any version
-  @ISA: ManakaiDOM|Perl
-
-ForDef:
-  @QName: 
-    DIS:ForLatest
-  @Description:
-    @@lang:en
-    @@@:
-      For latest version of the <Module::Util:DIS> module implementation
-  @ISA: DIS|ForEmpty
-
-## -- Module sets
-
-ResourceDef:
-  @QName: Util|
-  @For: DIS|ForEmpty
-  @rdf:type: dis|ModuleGroup
-  @FullName:
-    @@lang:en
-    @@@:
-      Manakai support modules
-  @DISPerl:packageName:
-    Message::Util::
-  @DISPerl:interfacePackageName:
-    @@@:
-      Message::Util::IF::
-    @@For: DIS|ForEmpty !DIS|ForLatest
-  @DISPerl:interfacePackageName:
-    @@@:
-      Message::Util::IFLatest::
-    @@For: DIS|ForLatest
-  @ImplNote:
-    @@lang:en
-    @@@:
-      Resources <Q::Util|> for <Q::ManakaiDOM|all> and for <Q::ManakaiDOM|Perl>
-      is defined in module <Module::Util|ManakaiNode>.
-
 ## -- Features
 
 ElementTypeBinding:
@@ -172,8 +118,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DOMFeature|Feature
-    @@ForCheck:
-      =ManakaiDOM:all
 
 ElementTypeBinding:
   @Name: FeatureVerDef
@@ -245,9 +189,6 @@ ElementTypeBinding:
     @@resourceFor: ManakaiDOM|ForIF
     @@resourceFor:
       @@@@: ManakaiDOM|ForClass
-      @@@ForCheck: ForEmpty !=ForEmpty
-    @@For: ForLatest
-    @@For: =ForEmpty
 
     @@rdf:type:
       @@@@: ManakaiDOM|IF
@@ -256,18 +197,14 @@ ElementTypeBinding:
     @@rdf:type:
       @@@@: ManakaiDOM|Class
       @@@ForCheck: ManakaiDOM|ForClass
+
     @@Implement:
-      @@@@: ||ForEmpty||ManakaiDOM|ForIF
+      @@@@: ||+||ManakaiDOM|ForIF
       @@@ContentType: DISCore|TFPQNames
-      @@@ForCheck: ManakaiDOM|ForClass ForEmpty
-    @@Implement:
-      @@@@: ||ForLatest||ManakaiDOM|ForIF
-      @@@ContentType: DISCore|TFPQNames
-      @@@ForCheck: ManakaiDOM|ForClass ForLatest
+      @@@ForCheck: ManakaiDOM|ForClass
 
     @@DOMMain:implementFeature:
       @@@@: CoreFeature10
-      @@@For: ForLatest
 
 ElementTypeBinding:
   @Name: ClsDef
@@ -280,8 +217,6 @@ ElementTypeBinding:
 
     @@resourceFor:
       @@@@: ManakaiDOM|ForClass
-      @@@ForCheck: ForEmpty !=ForEmpty
-    @@For: ForLatest
 
     @@rdf:type:
       @@@@: ManakaiDOM|Class
@@ -289,7 +224,6 @@ ElementTypeBinding:
 
     @@DOMMain:implementFeature:
       @@@@: CoreFeature10
-      @@@For: ForLatest
 
 ElementTypeBinding:
   @Name: clsActualType
@@ -306,7 +240,7 @@ IFClsDef:
 
   @domperl:implementedByObjectsOf: DOMImpl
   @domperl:classImplementedByObjectsOf:
-    c|ManakaiDOMImplementation||ManakaiDOM|ManakaiDOMLatest
+    c|ManakaiDOMImplementation
 
   @Description:
     @@lang:en
@@ -327,10 +261,10 @@ IFClsDef:
         @@@@@:
           The newly created <QUOTE::dis> document object.
       @@@PerlDef:
-        $r = bless $self-><M::swcfg21:SWCFGImplementation::swcfg21:ForLatest
+        $r = bless $self-><M::swcfg21:SWCFGImplementation
                                               .createSWCFGDocument>,
                    <ClassName::ManakaiDISDocument>;
-        $r-><AS::swcfg21:SWCFGDocument::swcfg21:ForLatest
+        $r-><AS::swcfg21:SWCFGDocument
                                         .defaultElementTypeNamespaceURI>
                     (<Q::dis:>);
 
@@ -348,7 +282,7 @@ IFClsDef:
         @@@@@: 
           A newly created <QUOTE::dis> parser. 
       @@@PerlDef:
-        $r = bless $self-><M::swcfg21:SWCFGImplementation::swcfg21:ForLatest
+        $r = bless $self-><M::swcfg21:SWCFGImplementation
                                            .createSWCFGParser>,
                    <ClassName::ManakaiDISParser>;
 
@@ -430,7 +364,7 @@ IFClsDef:
             Equivalent to <QUOTE::for all>, i.e. <Q::ManakaiDOM:all>. 
     @@Return:
       @@@Type: 
-        DISCore:TFURI::ManakaiDOM:all
+        DISCore:TFURI
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -543,12 +477,12 @@ IFClsDef:
     @@Param:
       @@@Name: camelName
       @@@Type:
-        DISLang:String::ManakaiDOM:all
+        DISLang:String
       @@@enDesc:
         The source name. 
     @@Return:
       @@@Type:
-        DISLang:String::ManakaiDOM:all
+        DISLang:String
       @@@enDesc:
         The result name. 
       @@@PerlDef:
@@ -575,9 +509,9 @@ IFClsDef:
   @IFQName: DISParser
   @ClsQName: ManakaiDISParser
 
-  @IFISA: swcfg21|SWCFGParser||swcfg21|ForLatest
+  @IFISA: swcfg21|SWCFGParser
   @ClsISA:
-    swcfg21:ManakaiSWCFGParser::swcfg21:ForLatest
+    swcfg21:ManakaiSWCFGParser
 
   @Description:
     @@lang:en
@@ -591,7 +525,7 @@ IFClsDef:
         Parses a <QUOTE::dis> document and returns it as an object tree. 
     @@Param:
       @@@Name: input
-      @@@Type: DISPerl|HASH||ManakaiDOM|all
+      @@@Type: DISPerl|HASH
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -605,7 +539,7 @@ IFClsDef:
           The <QUOTE::dis> document object created from the <P::input>. 
       @@@RaiseException:
         @@@@@:
-          swcfg21:SWCFG_PARSE_ERR::swcfg21:ForLatest
+          swcfg21:SWCFG_PARSE_ERR
         @@@@Description:
           @@@@@lang:en
           @@@@@@:
@@ -614,13 +548,10 @@ IFClsDef:
       @@@PerlDef:
         __DEEP{
           $r = $self->SUPER::parse ($input)
-                      ## NOTE: Method name directly written
-                      #< M::swcfg21:ManakaiSWCFGParser
-                      #  ::swcfg21:ForLatest.parse> ($input)
         }__;
         if (defined $r) {
           $r = bless $r, <ClassName::ManakaiDISDocument>;
-          $r-><AS::swcfg21:SWCFGDocument::swcfg21:ForLatest
+          $r-><AS::swcfg21:SWCFGDocument
                                         .defaultElementTypeNamespaceURI>
                     (<Q::dis:>);
         }
@@ -638,7 +569,7 @@ IFClsDef:
     @@lang:en
     @@@:
       This class does not inherit 
-      <Class::swcfg21:ManakaiSWCFGNode::swcfg21:ForLatest>, since 
+      <Class::swcfg21:ManakaiSWCFGNode>, since 
       inheriting classes such as <Class::ManakaiDISElement> indirectly 
       inherit it. 
 
@@ -665,7 +596,7 @@ IFClsDef:
     @@NamedParam:
       @@@Name: makeNewBinding
       @@@Type: 
-        DOMMain:boolean::ManakaiDOM:all
+        DOMMain:boolean
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -682,9 +613,9 @@ IFClsDef:
           @@@@@@:
             Simply returns the <DOM::null> if no prefix associated. 
     @@Return:
-      @@@Type: swcfg21|SWCFGString||swcfg21|ForLatest
+      @@@Type: swcfg21|SWCFGString
       @@@actualType:
-        DISCore:NamespacePrefix::ManakaiDOM:all
+        DISCore:NamespacePrefix
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -698,7 +629,7 @@ IFClsDef:
             No associated namespace prefix found. 
       @@@PerlDef:
         $r = null;
-        my $od = $self-><AG::swcfg21:SWCFGNode::swcfg21:ForLatest
+        my $od = $self-><AG::swcfg21:SWCFGNode
                                           .ownerDocument> || $self;
         my $binds = $od->{<H::mn:node>}->{<H::swcfg21:nsBinding>};
         if (defined $namespaceURI) {
@@ -788,7 +719,7 @@ IFClsDef:
     @@Param:
       @@@Name:prefix
       @@@Type:
-        DISCore:NamespacePrefix::ManakaiDOM:all
+        DISCore:NamespacePrefix
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -796,7 +727,7 @@ IFClsDef:
     @@NamedParam:
       @@@Name: makeNewBinding
       @@@Type:
-        DOMMain:boolean::ManakaiDOM:all
+        DOMMain:boolean
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -819,7 +750,7 @@ IFClsDef:
     @@NamedParam:
       @@@Name: raisePrefixException
       @@@Type:
-        DOMMain:boolean::ManakaiDOM:all
+        DOMMain:boolean
       @@@enDesc:
         Whehter an exception should be thrown if <P::prefix>
         is not declared or not. 
@@ -887,7 +818,7 @@ IFClsDef:
     @@ManakaiDOM:isStatic:1
     @@Param:
       @@@Name:object
-      @@@Type: ManakaiNode|NodeStem||ManakaiDOM|Perl
+      @@@Type: ManakaiNode|NodeStem
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -914,7 +845,7 @@ IFClsDef:
                     qq[(ref: "@{[ref $object]}")]},
           }__;
         }
-        __CODE{ManakaiNode|getNewReference||ManakaiDOM|Perl::
+        __CODE{ManakaiNode|getNewReference::
           $object => $object,
           $ref => $r,
           $class => $class,
@@ -957,7 +888,7 @@ IFClsDef:
     @@Param:
       @@@Name: prefix
       @@@Type:
-        DISCore:NamespacePrefix::ManakaiDOM:all
+        DISCore:NamespacePrefix
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -1006,7 +937,7 @@ IFClsDef:
         an expanded URI reference. 
     @@Param:
       @@@Name: qname
-      @@@Type: DISCore|QName||ManakaiDOM|all
+      @@@Type: DISCore|QName
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -1052,7 +983,7 @@ IFClsDef:
         a pair of namespace URI and local name. 
     @@Param:
       @@@Name: qname
-      @@@Type: DISCore|QName||ManakaiDOM|all
+      @@@Type: DISCore|QName
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -1060,7 +991,7 @@ IFClsDef:
     @@NodeParam:
     @@Return:
       @@@Type:
-        DISPerl:ARRAY::ManakaiDOM:all
+        DISPerl:ARRAY
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -1087,7 +1018,7 @@ IFClsDef:
     @@Param:
       @@@Name: tfqnames
       @@@Type: 
-        dis:TFQNames::ManakaiDOM:all
+        dis:TFQNames
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -1121,7 +1052,7 @@ IFClsDef:
     @@NodeParam:
     @@Return:
       @@@Type: 
-        DISCore:TFURI::ManakaiDOM:all
+        DISCore:TFURI
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -1164,7 +1095,7 @@ IFClsDef:
     @@Param:
       @@@Name: tfpqnames
       @@@Type: 
-        DISCore:TFPQNames::ManakaiDOM:all
+        DISCore:TFPQNames
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -1198,7 +1129,7 @@ IFClsDef:
     @@NodeParam:
     @@Return:
       @@@Type: 
-        DISCore:TFURI::ManakaiDOM:all
+        DISCore:TFURI
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -1254,7 +1185,7 @@ IFClsDef:
   @ClsISA: ManakaiNSResolverDIS
   @ClsISA: ManakaiDISNode
   @ClsISA:
-    swcfg21:ManakaiSWCFGElement::swcfg21:ForLatest
+    swcfg21:ManakaiSWCFGElement
   @ClsISA: dp|ManakaiDISElementPerl
 
   @Description:
@@ -1298,7 +1229,7 @@ IFClsDef:
           The database associated to the document is used.
     @@Return:
       @@@Type:
-        DOMMain:boolean::ManakaiDOM:all
+        DOMMain:boolean
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -1321,11 +1252,11 @@ IFClsDef:
 
             my @ce = @{$self-><M::ManakaiDISElement.disAllChildElements>};
             for my $ce (@ce) {
-              my $et = $ce-><AG::swcfg21:SWCFGElement::swcfg21:ForLatest
+              my $et = $ce-><AG::swcfg21:SWCFGElement
                                                       .expandedURI>;
               if ($et eq <Q::dis:ForCheck>) {
                 my $fors = [split /\s+/, $ce-><M::swcfg21:SWCFGNode
-                                                ::swcfg21:ForLatest.value>];
+                                                .value>];
                 FCs: for my $f (@$fors) {
                   if ($f =~ /^!=(.+)$/) {        ## -- NOT EQUAL TO
                     my $uri = $self-><M::NSResolverDIS.qnameToURI> ($1);
@@ -1376,11 +1307,11 @@ IFClsDef:
 
             my $has_for = false;
             for my $ce (@ce) {
-              if ($ce-><AG::swcfg21:SWCFGElement::swcfg21:ForLatest
+              if ($ce-><AG::swcfg21:SWCFGElement
                                                      .expandedURI> eq
                   <Q::dis:For>) {
                 my $fors = [split /\s+/, $ce-><M::swcfg21:SWCFGNode
-                                                ::swcfg21:ForLatest.value>];
+                                                .value>];
                 my $ok = true;
                 $has_for = true;
                 AFOR: for my $f (@$fors) {
@@ -1466,7 +1397,7 @@ IFClsDef:
           The database associated to the document is used.
     @@Return:
       @@@Type:
-        DOMMain:boolean::ManakaiDOM:all
+        DOMMain:boolean
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -1558,7 +1489,7 @@ IFClsDef:
         C: for my $c (@{$self-><M::ManakaiDISElement.disChildElements>
                                   (for_arg => $forArg, forp_arg => $forpArg,
                                    database_arg => $databaseArg)}) {
-          if ($c-><AG::swcfg21:SWCFGElement::swcfg21:ForLatest
+          if ($c-><AG::swcfg21:SWCFGElement
                                     .expandedURI> eq $attrName and
               $c-><M::ManakaiDISElement.mediaTypeMatch>
                                   ($mediaType, $defaultMediaType,
@@ -1600,7 +1531,7 @@ IFClsDef:
         for my $c (@{$self-><M::ManakaiDISElement.disChildElements>
                                   (for_arg => $forArg, forp_arg => $forpArg,
                                    database_arg => $databaseArg)}) {
-          if ($c-><AG::swcfg21:SWCFGElement::swcfg21:ForLatest
+          if ($c-><AG::swcfg21:SWCFGElement
                                           .expandedURI> eq $attrName and
               $c-><M::ManakaiDISElement.mediaTypeMatch>
                                   ($mediaType, $defaultMediaType,
@@ -1632,11 +1563,11 @@ IFClsDef:
       @@@PerlDef:
         $r = bless [], <ClassName::ManakaiDISElementList>;    
         __DEEP{
-          C: for my $cn (@{$self-><AG::swcfg21:SWCFGNode::swcfg21:ForLatest
+          C: for my $cn (@{$self-><AG::swcfg21:SWCFGNode
                                                        .childNodes>}) {
             ## $cn is an #element.
             my $dn;
-            __CODE{ManakaiNode|getNewReference||ManakaiDOM|Perl::
+            __CODE{ManakaiNode|getNewReference::
               $object => {$cn->{<H::mn:node>}},
               $ref => $dn,
               $class => {<ClassName::ManakaiDISElement>},
@@ -1660,11 +1591,11 @@ IFClsDef:
       @@@PerlDef:
         $r = bless [], <ClassName::ManakaiDISElementList>;    
         __DEEP{
-          for my $cn (@{$self-><AG::swcfg21:SWCFGNode::swcfg21:ForLatest
+          for my $cn (@{$self-><AG::swcfg21:SWCFGNode
                                                        .childNodes>}) {
             ## $cn is an #element.
             my $dn;
-            __CODE{ManakaiNode|getNewReference||ManakaiDOM|Perl::
+            __CODE{ManakaiNode|getNewReference::
               $object => {$cn->{<H::mn:node>}},
               $ref => $dn,
               $class => {<ClassName::ManakaiDISElement>},
@@ -1689,7 +1620,7 @@ IFClsDef:
       @@@UndeclaredPrefixException:
       @@@PerlDef:
         __DEEP{
-          my $v = $self-><M::swcfg21:SWCFGNode::swcfg21:ForLatest.value>;
+          my $v = $self-><M::swcfg21:SWCFGNode.value>;
           if (defined $v and not ref $v eq 'ARRAY') {
             $r = $self-><M::NSResolverDIS.qnameToURI> ($v, node => $self);
           } else {
@@ -1708,13 +1639,13 @@ IFClsDef:
       }
     @@Get:
       @@@Type:
-        DISCore:LocalName::ManakaiDOM:all
+        DISCore:LocalName
       @@@nullCase:
         @@@@enDesc:
           No value. 
       @@@PerlDef:
         __DEEP{
-          my $v = $self-><M::swcfg21:SWCFGNode::swcfg21:ForLatest.value>;
+          my $v = $self-><M::swcfg21:SWCFGNode.value>;
           if (defined $v and not ref $v eq 'ARRAY') {
             my ($n, $v) = split /\s*[:|]\s*/, $v, 2;
             $r = defined $v ? $v : $n;
@@ -1734,13 +1665,13 @@ IFClsDef:
       }
     @@Get:
       @@@Type:
-        DISCore:NamespacePrefix::ManakaiDOM:all
+        DISCore:NamespacePrefix
       @@@nullCase:
         @@@@enDesc:
           No value. 
       @@@PerlDef:
         __DEEP{
-          my $v = $self-><M::swcfg21:SWCFGNode::swcfg21:ForLatest.value>;
+          my $v = $self-><M::swcfg21:SWCFGNode.value>;
           if (defined $v and not ref $v eq 'ARRAY') {
             my ($p, $l) = split /\s*[:|]\s*/, $v, 2;
             $r = defined $l ? $p : null;
@@ -1766,7 +1697,7 @@ IFClsDef:
       @@@UndeclaredPrefixException:
       @@@PerlDef:
         __DEEP{
-          my $v = $self-><M::swcfg21:SWCFGNode::swcfg21:ForLatest.value>;
+          my $v = $self-><M::swcfg21:SWCFGNode.value>;
           if (defined $v and not ref $v eq 'ARRAY') {
             my ($p, $v) = split /\s*[:|]\s*/, $v, 2;
             $r = $self-><M::NSResolverDIS.prefixToURI>
@@ -1823,7 +1754,7 @@ IFClsDef:
           No value. 
       @@@UndeclaredPrefixException:
       @@@PerlDef:
-        my $v = $self-><M::swcfg21:SWCFGNode::swcfg21:ForLatest.value>;
+        my $v = $self-><M::swcfg21:SWCFGNode.value>;
         if (defined $v and not ref $v eq 'ARRAY') {
           __DEEP{
             if ($self-><M::ManakaiDISElement.mediaTypeMatch>
@@ -1856,7 +1787,7 @@ IFClsDef:
         An element type name URI reference to test. 
     @@NamedParam:
       @@@Name: srinfo
-      @@@Type: DISPerl|HASH||ManakaiDOM|all
+      @@@Type: DISPerl|HASH
       @@@enDesc:
         The <CODE::srinfo> hash.
       @@@nullCase:
@@ -1864,7 +1795,7 @@ IFClsDef:
           No <CODE::srinfo>.
     @@Return:
       @@@Type:
-        DOMMain:boolean::ManakaiDOM:all
+        DOMMain:boolean
       @@@TrueCase:
         @@@@enDesc:
           Either the element type expanded URI reference of this element is 
@@ -1875,8 +1806,7 @@ IFClsDef:
       @@@NoDBException:
       @@@PerlDef:
         __DEEP{
-          my $et = $self-><AG::swcfg21:SWCFGElement::swcfg21:ForLatest
-                                                          .expandedURI>;
+          my $et = $self->expanded_uri;
           my $rdef = $self-><AG::ManakaiDISNode.ownerDISDocument>
                                    -><AG::ManakaiDISDocument.disDatabase>
                                    -><M::ManakaiDISDatabase.getResource> ($et);
@@ -1895,7 +1825,7 @@ IFClsDef:
       }
     @@Get:
       @@@Type:
-        DOMMain:boolean::ManakaiDOM:all
+        DOMMain:boolean
       @@@TrueCase:
         @@@@enDesc:
           This element defines a resource. 
@@ -1923,7 +1853,7 @@ IFClsDef:
       @@@nullCase:
     @@Return:
       @@@Type:
-        DOMMain:boolean::ManakaiDOM:all
+        DOMMain:boolean
       @@@TrueCase:
         @@@@enDesc:
           This element is a property.
@@ -1980,14 +1910,14 @@ IFClsDef:
                                    $node->{<H::swcfg21:shadowSibling>};
           }
           $self->{<H::mn:node>}
-               -><M::ManakaiNode|NodeStem||ManakaiDOM|Perl.orphanate>;
+               -><M::ManakaiNode|NodeStem.orphanate>;
         }__;
 
   @Method:
     @@Name: getNamespaceBindingList
     @@enDesc:
       Returns the <QUOTE::live> hash reference of namespace bindings.      
-    @@Type: DISPerl|HASH||ManakaiDOM|all
+    @@Type: DISPerl|HASH
     @@Param:
       @@@Name: databaseArg
       @@@Type: DISDatabase
@@ -2017,7 +1947,7 @@ IFClsDef:
   @Method:
     @@Name: getDefaultNamespaceURIRef
     @@enDesc: A reference to the URI of the default namespace.
-    @@Type: DISPerl|SCALAR||ManakaiDOM|all
+    @@Type: DISPerl|SCALAR
     @@Return:
       @@@PerlDef:
         my $ods = $self->{<H::mn:node>}->{<H::swcfg21:ownerDocument>};
@@ -2103,8 +2033,7 @@ RPropDef:
 
 ResourceDef:
   @QName: DISString
-  @AliasFor: DISLang|String||ManakaiDOM|all
-  @For: DIS|ForEmpty
+  @AliasFor: DISLang|String
 
 ElementTypeBinding:
   @Name: ResourceTypeDef
@@ -2134,7 +2063,7 @@ IFClsDef:
       @@@PerlDef:
         __DEEP{
           $r = bless $self-><M::swcfg21:SWCFGNode
-                        ::swcfg21:ForLatest.getAttributeNS>
+                        .getAttributeNS>
                                    (<Q::dis:>, 'Require', make_new_node => true),
                      <ClassName::ManakaiDISElement>;
         }__;
@@ -2150,7 +2079,7 @@ IFClsDef:
         <Q::ManakaiDOM:all> is returned. 
       @@@PerlDef:
         __DEEP{
-          my $df = $self-><M::swcfg21:SWCFGNode::swcfg21:ForLatest
+          my $df = $self-><M::swcfg21:SWCFGNode
                                 .getAttributeNS>
                                          (<Q::dis:>, 'DefaultFor');
           if ($df) {
@@ -2164,7 +2093,7 @@ IFClsDef:
     @@Set:
       @@@PerlDef:
         __DEEP{
-          $self-><M::swcfg21:SWCFGNode::swcfg21:ForLatest.setAttributeNS>
+          $self-><M::swcfg21:SWCFGNode.setAttributeNS>
                                      (<Q::dis:>, 'DefaultFor' => $given);
         }__;
 
@@ -2182,11 +2111,11 @@ IFClsDef:
     @@Get:
       @@@PerlDef:
         __DEEP{
-          my $df = $self-><M::swcfg21:SWCFGNode::swcfg21:ForLatest
+          my $df = $self-><M::swcfg21:SWCFGNode
                                 .getAttributeNS>
                                          (<Q::dis:>, 'Namespace');
           if ($df) {
-            $r = $df-><M::swcfg21:SWCFGNode::swcfg21:ForLatest.value>;
+            $r = $df->value;
           } else {
             __ASSERT{DISPerl:invariant::
               msg => {qq["dis:Namespace" attribute not found]},
@@ -2196,7 +2125,7 @@ IFClsDef:
     @@Set:
       @@@PerlDef:
         __DEEP{
-          $self-><M::swcfg21:SWCFGNode::swcfg21:ForLatest.setAttributeNS>
+          $self-><M::swcfg21:SWCFGNode.setAttributeNS>
                                      (<Q::dis:>, 'Namespace' => $given);
         }__;
 ##DISModuleElement
@@ -2222,7 +2151,7 @@ IFClsDef:
 
   @ClsISA: ManakaiDISNode
   @ClsISA:
-    swcfg21:ManakaiSWCFGComment::swcfg21:ForLatest
+    swcfg21:ManakaiSWCFGComment
 
   @Description:
     @@lang:en
@@ -2236,7 +2165,7 @@ IFClsDef:
 
   @ClsISA: ManakaiDISNode
   @ClsISA:
-    swcfg21:ManakaiSWCFGDocumentFragment::swcfg21:ForLatest
+    swcfg21:ManakaiSWCFGDocumentFragment
 
   @Description:
     @@lang:en
@@ -2250,7 +2179,7 @@ IFClsDef:
 
   @ClsISA: ManakaiDISNode
   @ClsISA:
-    swcfg21:ManakaiSWCFGDocument::swcfg21:ForLatest
+    swcfg21:ManakaiSWCFGDocument
 
   @Description:
     @@lang:en
@@ -2268,7 +2197,7 @@ IFClsDef:
       @@@PerlDef:
         __DEEP{
           $r = $self-><M::swcfg21:SWCFGNode
-                        ::swcfg21:ForLatest.getAttributeNS>
+                        .getAttributeNS>
                                    (<Q::dis:>, 'Module', make_new_node => true);
         }__;
         $r = bless $r, <ClassName::ManakaiDISModuleElement>;
@@ -2316,12 +2245,12 @@ IFClsDef:
       @@@PerlDef:
         $r = bless [], <ClassName::ManakaiDISElementList>;    
         __DEEP{
-          C: for my $cn (@{$self-><AG::swcfg21:SWCFGNode::swcfg21:ForLatest
+          C: for my $cn (@{$self-><AG::swcfg21:SWCFGNode
                                                        .childNodes>}) {
-            next C unless $cn-><AG::swcfg21:SWCFGNode::swcfg21:ForLatest
+            next C unless $cn-><AG::swcfg21:SWCFGNode
                                               .nodeType> eq '#element';
             my $dn;
-            __CODE{ManakaiNode|getNewReference||ManakaiDOM|Perl::
+            __CODE{ManakaiNode|getNewReference::
               $object => {$cn->{<H::mn:node>}},
               $ref => $dn,
               $class => {<ClassName::ManakaiDISElement>},
@@ -2345,12 +2274,12 @@ IFClsDef:
       @@@PerlDef:
         $r = bless [], <ClassName::ManakaiDISElementList>;    
         __DEEP{
-          C: for my $cn (@{$self-><AG::swcfg21:SWCFGNode::swcfg21:ForLatest
+          C: for my $cn (@{$self-><AG::swcfg21:SWCFGNode
                                                        .childNodes>}) {
-            next C unless $cn-><AG::swcfg21:SWCFGNode::swcfg21:ForLatest
+            next C unless $cn-><AG::swcfg21:SWCFGNode
                                               .nodeType> eq '#element';
             my $dn;
-            __CODE{ManakaiNode|getNewReference||ManakaiDOM|Perl::
+            __CODE{ManakaiNode|getNewReference::
               $object => {$cn->{<H::mn:node>}},
               $ref => $dn,
               $class => {<ClassName::ManakaiDISElement>},
@@ -2363,10 +2292,10 @@ IFClsDef:
     @@Name: addNamespaceBinding
     @@Param:
       @@@Name: prefix
-      @@@Type: DISLang|String||ManakaiDOM|all
+      @@@Type: DISLang|String
     @@Param:
       @@@Name: namespaceURI
-      @@@Type: DISLang|String||ManakaiDOM|all
+      @@@Type: DISLang|String
       @@@nullCase:
     @@Return:
       @@@PerlDef:
@@ -2382,9 +2311,9 @@ IFClsDef:
     @@Name: disNamespaceResolver
     @@enDesc:
       A namespace resolver code that is called by
-      <M::swcfg21|SWCFGNode||swcfg21|ForLatest.lookupNamesopaceURI> method
+      <M::swcfg21|SWCFGNode.lookupNamesopaceURI> method
       when in-document namespace binding information is not sufficient.
-    @@Type: DISPerl|CODE||ManakaiDOM|Perl
+    @@Type: DISPerl|CODE
     @@Get:
       @@@PerlDef:
         $r = $self->{<H::mn:node>}->{<H::DIS|disNamespaceResolver>};
@@ -2456,7 +2385,7 @@ IFClsDef:
                }, <ClassName::ManakaiDISModuleDefinition>;
           require Scalar::Util;
           Scalar::Util::weaken ($r->{db});
-          __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
+          __CODE{DISPerl|HashStringRef::
             $result => {$r->{for}},
             $given => {<Q::ManakaiDOM|all>},
           }__;
@@ -2624,7 +2553,7 @@ IFClsDef:
                }, <ClassName::ManakaiDISResourceDefinition>;
           require Scalar::Util;
           Scalar::Util::weaken ($r->{db});
-          __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
+          __CODE{DISPerl|HashStringRef::
             $result => {$r->{for}},
             $given => {<Q::ManakaiDOM|all>},
           }__;
@@ -2776,7 +2705,7 @@ IFClsDef:
     @@NamedParam:
       @@@Name: onResourceRead
       @@@Type:
-        DISPerl:CODE::ManakaiDOM:all
+        DISPerl:CODE
       @@@enDesc:
         An event handler called when a resource is read.
       @@@nullCase:
@@ -2784,7 +2713,7 @@ IFClsDef:
           No event handler is read.
     @@NamedParam:
       @@@Name: srinfo
-      @@@Type: DISPerl|HASH||ManakaiDOM|all
+      @@@Type: DISPerl|HASH
       @@@enDesc:
         A hash returned by <M::DISDatabase.unloadModule>, to
         restore super-resource relationship.
@@ -2829,7 +2758,7 @@ IFClsDef:
           }
           $mod_name_node = bless $mod_name_node, <ClassName::ManakaiDISElement>
             if $mod_name_node->isa (<ClassName::swcfg21:ManakaiSWCFGElement
-                                              ::swcfg21:ForLatest>);
+                                              >);
           my $mod_name_uri = $mod_name_node
                                 -><AG::DISElement.qnameValueURI>;
           my $mod = $self-><M::DISDatabase.getModule>
@@ -2838,16 +2767,16 @@ IFClsDef:
           unless ($mod-><AG::DISAnyResource.isDefined>) {
             ## -- Initializes Module Definition Object
             my $v = $mod_name_node-><AG::DISElement.qnameValueLocalName>;
-            __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
+            __CODE{DISPerl|HashStringRef::
               $result => {$mod->{localName}},
               $given => {$v},
             }__;
             my $ns = $mod_name_node-><AG::DISElement.qnameValueNamespaceURI>;
-            __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
+            __CODE{DISPerl|HashStringRef::
               $result => {$mod->{namespaceURI}},
               $given => {$ns},
             }__;
-            __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
+            __CODE{DISPerl|HashStringRef::
               $result => {$mod->{for}},
               $given => {$forArg},
             }__;
@@ -2921,7 +2850,7 @@ IFClsDef:
               if ($mqn) {
                 my $mqv = $mqn-><M::SWCFGNode.value>;
                 my $mqp = ($mqn->isa (<ClassName::swcfg21:ManakaiSWCFGElement
-                                                ::swcfg21:ForLatest>)
+                                                >)
                            ? (bless $mqn, <ClassName::ManakaiDISElement>) : $mqn)
                           -><M::NSResolverDIS.qnameToPair> ($mqv, node => $mqn);
                 ($nuri, $ln) = @$mqp;
@@ -2939,7 +2868,7 @@ IFClsDef:
                                               (<Q::dis:>, 'WithFor');
               if ($wfn) {
                 $for = ($wfn->isa (<ClassName::swcfg21:ManakaiSWCFGElement
-                                             ::swcfg21:ForLatest>)
+                                             >)
                            ? (bless $wfn, <ClassName::ManakaiDISElement>) : $wfn)
                        -><AG::DISElement.qnameValueURI>;
               } else {
@@ -3031,7 +2960,7 @@ IFClsDef:
         The source <QUOTE::dis> <Q::dis:ForDef> element object. 
     @@NamedParam:
       @@@Name: srinfo
-      @@@Type: DISPerl|HASH||ManakaiDOM|all
+      @@@Type: DISPerl|HASH
       @@@enDesc:
         A hash returned by <M::DISDatabase.unloadModule>, to
         restore super-resource relationship.
@@ -3054,7 +2983,7 @@ IFClsDef:
           }
           $qn_node = bless $qn_node, <ClassName::ManakaiDISElement>
             if $qn_node->isa (<ClassName::swcfg21:ManakaiSWCFGElement
-                                        ::swcfg21:ForLatest>);
+                                        >);
           my $qn_uri = $qn_node-><AG::DISElement.qnameValueURI>;
           my $for = $self-><M::DISDatabase.getFor> ($qn_uri);
         
@@ -3152,7 +3081,7 @@ IFClsDef:
     @@NamedParam:
       @@@Name: onResourceRead
       @@@Type:
-        DISPerl:CODE::ManakaiDOM:all
+        DISPerl:CODE
       @@@enDesc:
         An event handler called when a resource is read.
       @@@nullCase:
@@ -3160,7 +3089,7 @@ IFClsDef:
           No event handler is read.
     @@NamedParam:
       @@@Name: srinfo
-      @@@Type: DISPerl|HASH||ManakaiDOM|all
+      @@@Type: DISPerl|HASH
       @@@enDesc:
         A hash returned by <M::DISDatabase.unloadModule>, to
         restore super-resource relationship.
@@ -3227,12 +3156,12 @@ IFClsDef:
               }__;
             }
             my $v = $qn_node-><AG::DIS|DISElement.qnameValueLocalName>;
-            __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
+            __CODE{DISPerl|HashStringRef::
               $result => {$res->{localName}},
               $given => {$v},
             }__;
             my $ns = $qn_node-><AG::DIS|DISElement.qnameValueNamespaceURI>;
-            __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
+            __CODE{DISPerl|HashStringRef::
               $result => {$res->{namespaceURI}},
               $given => {$ns},
             }__;
@@ -3247,7 +3176,7 @@ IFClsDef:
                 my $ru;
                 my $ruf;
                 my $ln = $n_node-><M::swcfg21:SWCFGNode
-                                    ::swcfg21:ForLatest.value>;
+                                    .value>;
                 __CODE{getChildResourceURI:: $parentURI => $puri,
                                              $localName => $ln,
                                              $result => $ru}__;
@@ -3256,7 +3185,7 @@ IFClsDef:
                 push @res_uri, $ruf;
                 $res = $self-><M::DISDatabase.getResource> ($ruf);
                 my $v = $n_node-><M::SWCFGNode.value>;
-                __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
+                __CODE{DISPerl|HashStringRef::
                   $result => {$res->{localName}},
                   $given => {$v},
                 }__;
@@ -3283,11 +3212,11 @@ IFClsDef:
                     }__;
                  }__;
                 }
-                __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
+                __CODE{DISPerl|HashStringRef::
                   $result => {$res->{namespaceURI}},
                   $given => {$ns_uri},
                 }__;
-                __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
+                __CODE{DISPerl|HashStringRef::
                   $result => {$res->{localName}},
                   $given => {$ln},
                 }__;
@@ -3298,7 +3227,7 @@ IFClsDef:
               $res->{<H::DIS|isAnon>} = true;
             }
           } # anon
-          __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
+          __CODE{DISPerl|HashStringRef::
             $result => {$res->{for}},
             $given => {$forArg},
           }__;
@@ -3484,7 +3413,7 @@ IFClsDef:
     @@NamedParam:
       @@@Name: onResourceRead
       @@@Type:
-        DISPerl:CODE::ManakaiDOM:all
+        DISPerl:CODE
       @@@enDesc:
         An event handler called when a resource is read.
       @@@nullCase:
@@ -3561,7 +3490,7 @@ IFClsDef:
         The module to remove.
     @@NamedParam:
       @@@Name: srinfo
-      @@@Type: DISPerl|HASH||ManakaiDOM|all
+      @@@Type: DISPerl|HASH
       @@@enDesc:
         A hash returned by <M::DISDatabase.unloadModule>, to
         restore super-resource relationship later.  The hash
@@ -3570,7 +3499,7 @@ IFClsDef:
         @@@@enDesc:
           If it is not the updating.
     @@Return:
-      @@@Type: DISPerl|HASH||ManakaiDOM|all
+      @@@Type: DISPerl|HASH
       @@@enDesc:
         {LI:: <CODE::resource> or <CODE::for>::: 
 
@@ -3720,7 +3649,7 @@ IFClsDef:
     @@NodeParam:
     @@Return:
       @@@Type: 
-        DISPerl:ARRAY::ManakaiDOM:all
+        DISPerl:ARRAY
       @@@enDesc:
         A reference to the array containing two or three 
         resource definitions (<Class::ManakaiDISResourceDefinition>).
@@ -3823,7 +3752,7 @@ IFClsDef:
     @@Return:
       @@@PerlDef:
         for my $file (values %{$self->{<H::DIS|sourceFile>}}) {
-          $file-><M::ManakaiNode|ManakaiNodeRef||ManakaiDOM|Perl.free>
+          $file-><M::ManakaiNode|ManakaiNodeRef.free>
             if $file;
         }
         CORE::delete $self->{modDef};
@@ -3835,7 +3764,7 @@ IFClsDef:
     @@enDesc:
       Returns a snapshot list of URIs of modules in the database.
     @@Return:
-      @@@Type: DISPerl|ARRAY||ManakaiDOM|all
+      @@@Type: DISPerl|ARRAY
       @@@enDesc:
         A snapshot list of URIs.
       @@@PerlDef:
@@ -3846,7 +3775,7 @@ IFClsDef:
     @@enDesc:
       Returns a snapshot list of URIs of resources in the database.
     @@Return:
-      @@@Type: DISPerl|ARRAY||ManakaiDOM|all
+      @@@Type: DISPerl|ARRAY
       @@@enDesc:
         A snapshot list of URIs.
       @@@PerlDef:
@@ -3856,7 +3785,7 @@ IFClsDef:
   @IntMethod:
     @@Operator: ManakaiDOM|MUErrorHandler
     @@enDesc:
-      When a <IF::ecore|ErrorInterface||ManakaiDOM|Perl> is <Perl::report>ed
+      When a <IF::ecore|ErrorInterface> is <Perl::report>ed
       with an <Perl::-object> of <IF::Node>, then this method is invoked.
       
       The method calls the <cfg::error-handler> if the error is of 
@@ -3866,11 +3795,11 @@ IFClsDef:
       can catch the error.
     @@Param:
       @@@Name: err
-      @@@Type: ecore|ErrorInterface||ManakaiDOM|Perl
+      @@@Type: ecore|ErrorInterface
       @@@enDesc:
         The reported error object.
     @@Return:
-      @@@Type: DISPerl|Any||ManakaiDOM|Perl
+      @@@Type: DISPerl|Any
       @@@enDesc:
         If the <P::err> is a <IF::c|DOMError>, then the return value
         of the error handler.
@@ -3885,11 +3814,10 @@ IFClsDef:
           __DEEP{
             my $cfg = $self-><AG::DISDatabase.domConfig>;
             my $h = $cfg-><M::DOMConfig.getParameter> ('error-handler');
-            $r = $h-><M::DOMCore|DOMErrorHandler||ManakaiDOM|ManakaiDOMLatest
-                        .handleError> ($err);
+            $r = $h-><M::DOMCore|DOMErrorHandler.handleError> ($err);
           }__;
         } else {
-          $err-><M::ecore|ErrorInterface||ManakaiDOM|Perl.throw>;
+          $err-><M::ecore|ErrorInterface.throw>;
         }
 
   @Attr:
@@ -3900,7 +3828,7 @@ IFClsDef:
       @@@Type: DOMConfig
       @@@enDesc: The DOM configuration object.
       @@@PerlDef:
-        __CODE{c|getConfigObject||ManakaiDOM|ManakaiDOMLatest::
+        __CODE{c|getConfigObject::
           $target => $self,
           $targetHash => {$self},
           $targetType => {<IFName::DISDatabase>},
@@ -3922,7 +3850,7 @@ IFClsDef:
 ##DISDatabase
 
 CParamApp:
-  @c:domConfigurationParameter: c|error-handler||ManakaiDOM|ManakaiDOMLatest
+  @c:domConfigurationParameter: c|error-handler
   @c:targetType: DISDatabase
 
 ElementTypeBinding:
@@ -3931,7 +3859,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: c|DOMConfigurationParameterApplication
-    @@For: DIS|ForLatest
 
 PropDef:
   @QName: DIS|resourceModuleMap
@@ -3944,7 +3871,6 @@ PropDef:
   @QName: sourceNodeID
   @enDesc:
     The URI reference of the source node identifier. 
-  @rdfs:domain: DIS|DISResource||DIS|ForEmpty
   @DIS:key: snid
   @Type: DISPerl|SCALAR
 
@@ -3952,8 +3878,6 @@ PropDef:
   @QName: DIS|resource
   @enDesc:    
     Resources defined in a module. 
-  @rdfs:range: DIS|DISResource||DIS|ForEmpty
-  @rdfs:domain: DIS|DISModule||DIS|ForEmpty
   @DIS:key: mres
   @Type: DISPerl|ARRAY
 
@@ -3993,14 +3917,9 @@ ResourceDef:
   @QName: DIS|DISResourceList
   @enDesc:
     A reference to array whose items are resource 
-    (<IF::DIS|DISAnyResource||DIS|ForEmpty>) objects.
+    (<IF::DIS|DISAnyResource>) objects.
   @rdfs:subClassOf: DISPerl|ARRAY
-  @For: =ManakaiDOM|all
   @rdf:type: DISLang|DataType
-  @For: DIS|ForEmpty !=DIS|ForEmpty
-  @AliasFor:
-    @@@@: ||ManakaiDOM|all
-    @@@For: DIS|ForEmpty
 
 ElementTypeBinding:
   @Name: ForDefDupException
@@ -4087,7 +4006,7 @@ IFClsDef:
     @@Param:
       @@@Name: moduleLocalName
       @@@Type: 
-        DISCore:LocalName::ManakaiDOM:all
+        DISCore:LocalName
       @@@enDesc:
         The local name of the module name. 
     @@Param:
@@ -4165,7 +4084,7 @@ IFClsDef:
 
   @Attr:
     @@Name: uriRef
-    @@Type: DISPerl|SCALAR||ManakaiDOM|all
+    @@Type: DISPerl|SCALAR
     @@enDesc:
       A reference to the URI of the resource.
 
@@ -4178,7 +4097,7 @@ IFClsDef:
   @Attr:
     @@Name: uris
     @@Type:
-      DISPerl:Array::ManakaiDOM:all
+      DISPerl:Array
     @@enDesc:
       A set of URIs that identifies the resource.
     @@Get:
@@ -4206,7 +4125,7 @@ IFClsDef:
         Another resource object to compare.
     @@Return:
       @@@Type:
-        DOMMain:boolean::ManakaiDOM:all
+        DOMMain:boolean
       @@@enDesc:
         Whether two resources are same or not. 
       @@@TrueCase:
@@ -4250,7 +4169,7 @@ IFClsDef:
       {NOTE:: <QUOTE::for> resources has no local name.
       }
     @@Type:
-      DISCore:LocalName::ManakaiDOM:all
+      DISCore:LocalName
     @@Get:
       @@@PerlDef:
         $r = defined $self->{localName} ? ${$self->{localName}} : null;
@@ -4303,7 +4222,7 @@ IFClsDef:
         A <QUOTE::for> URI reference to test.
     @@Return:
       @@@Type:
-        DOMMain:boolean::ManakaiDOM:all
+        DOMMain:boolean
       @@@TrueCase:
         @@@@enDesc:
           This resource is for <P::forURI>.
@@ -4334,7 +4253,7 @@ IFClsDef:
       @@@@:
         Whether this module is defined or not. 
     @@Type:
-      DOMMain:boolean::ManakaiDOM:all
+      DOMMain:boolean
     @@Get:
       @@@PerlDef:
         $r = $self->{<H::DIS|isDefined>};
@@ -4383,7 +4302,7 @@ IFClsDef:
     @@Name: ownerModuleURIRef
     @@enDesc:
       A reference to a URI of the owner module of the resource.
-    @@Type: DISPerl|SCALAR||ManakaiDOM|Perl
+    @@Type: DISPerl|SCALAR
     @@nullCase:
       @@@enDesc:
         The resource does not belong to any module since the
@@ -4402,7 +4321,7 @@ IFClsDef:
       @@@lang:en
       @@@@:
         Whether the resource is referenced somewhere or not. 
-    @@Type: DISLang|String||ManakaiDOM|all
+    @@Type: DISLang|String
     @@Get:
       @@@enDesc:
         A node path string that identifies the node from
@@ -4473,7 +4392,7 @@ IFClsDef:
       @@@@:
         Modules and <QUOTE::for>s does not have source node identifier
         in the current implementation.
-    @@Type: DISPerl|SCALAR||ManakaiDOM|all
+    @@Type: DISPerl|SCALAR
     @@Get:
       @@@nullCase:
         @@@@enDesc:
@@ -4493,7 +4412,7 @@ IFClsDef:
     @@enDesc:
       Whether the resource has persistent name or not. 
     @@Type: 
-      DOMMain:boolean::ManakaiDOM:all
+      DOMMain:boolean
     @@Get:
       @@@TrueCase:
         This resource does <EM::not> have any globally unique name. 
@@ -4541,7 +4460,7 @@ IFClsDef:
     @@NamedParam:
       @@@Name: onResourceRead
       @@@Type:
-        DISPerl:CODE::ManakaiDOM:all
+        DISPerl:CODE
       @@@enDesc:
         An event handler called when a resource is read.
       @@@nullCase:
@@ -5004,7 +4923,7 @@ IFClsDef:
         A type URI reference to test. 
     @@Return:
       @@@Type:
-        DOMMain:boolean::ManakaiDOM:all 
+        DOMMain:boolean
       @@@TrueCase:
         @@@@enDesc:
           This is a <P::typeURI> resource. 
@@ -5130,7 +5049,7 @@ IFClsDef:
         A URI to add.
     @@NamedParam:
       @@@Name: srinfo
-      @@@Type: DISPerl|HASH||ManakaiDOM|all
+      @@@Type: DISPerl|HASH
       @@@enDesc:
         A hash returned by <M::DISDatabase.unloadModule>, to
         restore super-resource relationship.
@@ -5264,7 +5183,7 @@ IFClsDef:
   @IntMethod:
     @@Operator: ManakaiDOM|MUErrorHandler
     @@enDesc:
-      When a <IF::ecore|ErrorInterface||ManakaiDOM|Perl> is <Perl::report>ed
+      When a <IF::ecore|ErrorInterface> is <Perl::report>ed
       with an <Perl::-object> of <IF::Node>, then this method is invoked.
       
       The method calls the <cfg::error-handler> if the error is of 
@@ -5273,11 +5192,11 @@ IFClsDef:
       can catch the error.
     @@Param:
       @@@Name: err
-      @@@Type: ecore|ErrorInterface||ManakaiDOM|Perl
+      @@@Type: ecore|ErrorInterface
       @@@enDesc:
         The reported error object.
     @@Return:
-      @@@Type: DISPerl|Any||ManakaiDOM|Perl
+      @@@Type: DISPerl|Any
       @@@enDesc:
         If the <P::err> is a <IF::c|DOMError>, then the return value
         of the error handler.
@@ -5293,11 +5212,10 @@ IFClsDef:
             my $cfg = $self-><AG::DISAnyResource.database>
                            -><AG::DISDatabase.domConfig>;
             my $h = $cfg-><M::DOMConfig.getParameter> ('error-handler');
-            $r = $h-><M::DOMCore|DOMErrorHandler||ManakaiDOM|ManakaiDOMLatest
-                        .handleError> ($err);
+            $r = $h-><M::DOMCore|DOMErrorHandler.handleError> ($err);
           }__;
         } else {
-          $err-><M::ecore|ErrorInterface||ManakaiDOM|Perl.throw>;
+          $err-><M::ecore|ErrorInterface.throw>;
         }
 
   @Method:
@@ -5527,23 +5445,19 @@ PropDef:
 
 ResourceDef:
   @QName: Node
-  @AliasFor: tc|Node||ManakaiDOM|ManakaiDOMLatest
-  @For: DIS|ForLatest
+  @AliasFor: tc|Node
 
 ResourceDef:
   @QName: Document
-  @AliasFor: td|Document||ManakaiDOM|ManakaiDOMLatest
-  @For: DIS|ForLatest
+  @AliasFor: td|Document
 
 ResourceDef:
   @QName: Element
-  @AliasFor: te|Element||ManakaiDOM|ManakaiDOMLatest
-  @For: DIS|ForLatest
+  @AliasFor: te|Element
 
 ResourceDef:
   @QName: DOMConfig
-  @AliasFor: DOMCore|DOMConfiguration||ManakaiDOM|ManakaiDOMLatest
-  @For: DIS|ForLatest
+  @AliasFor: DOMCore|DOMConfiguration
 
 ErrDef:
   @QName: DIS|more-than-one-methods-for-a-type
@@ -5553,7 +5467,7 @@ ErrDef:
   @enMufDef:
     Method |%p (name => {<Q::DIS|method-name>});| for
     resource <%p (name => {<Q::DIS|uri>});> has multiple definitions
-  @c:severity: DOMCore|SEVERITY_WARNING||ManakaiDOM|ManakaiDOMLatest
+  @c:severity: DOMCore|SEVERITY_WARNING
   @ecore:hasParameter:
     @@@: DIS|uri
     @@enDesc:
@@ -5591,8 +5505,7 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: DOMCore|DOMErrorType
-    @@For: DIS|ForLatest
-    @@ecore:textFormatter: ecore|MUErrorFormatter||ManakaiDOM|Perl
+    @@ecore:textFormatter: ecore|MUErrorFormatter
 
 URITypeDef:
   @QName: AnyResourceURI
@@ -5634,7 +5547,7 @@ IFClsDef:
     @@ForCheck: ManakaiDOM|ForClass
     @@Name: uris
     @@Type:
-      DISPerl:Array::ManakaiDOM:all
+      DISPerl:Array
     @@enDesc:
       A reference to the snapshot array containing the URI reference
       of the module.
@@ -5862,7 +5775,7 @@ ClsDef:
 
   @Attr:
     @@Name: uriRef
-    @@Type: DISPerl|SCALAR||ManakaiDOM|all
+    @@Type: DISPerl|SCALAR
     @@enDesc:
       A reference to the URI of the resource.
 
@@ -5876,7 +5789,7 @@ ClsDef:
     @@ForCheck: ManakaiDOM|ForClass
     @@Name: uris
     @@Type:
-      DISPerl:Array::ManakaiDOM:all
+      DISPerl:Array
     @@enDesc:
       A reference to the snapshot array containing the URI reference
       of the module.
@@ -5901,7 +5814,7 @@ ClsDef:
         Another resource object to compare.
     @@Return:
       @@@Type:
-        DOMMain:boolean::ManakaiDOM:all
+        DOMMain:boolean
       @@@enDesc:
         Whether two resources are same or not. 
       @@@TrueCase:
@@ -5945,7 +5858,7 @@ ClsDef:
       {NOTE:: <QUOTE::for> resources has no local name.
       }
     @@Type:
-      DISCore:LocalName::ManakaiDOM:all
+      DISCore:LocalName
     @@Get:
       @@@PerlDef:
         $r = defined $self->{localName} ? ${$self->{localName}} : null;
@@ -5998,7 +5911,7 @@ ClsDef:
         A <QUOTE::for> URI reference to test.
     @@Return:
       @@@Type:
-        DOMMain:boolean::ManakaiDOM:all
+        DOMMain:boolean
       @@@TrueCase:
         @@@@enDesc:
           This resource is for <P::forURI>.
@@ -6029,7 +5942,7 @@ ClsDef:
       @@@@:
         Whether this module is defined or not. 
     @@Type:
-      DOMMain:boolean::ManakaiDOM:all
+      DOMMain:boolean
     @@Get:
       @@@PerlDef:
         $r = $self->{<H::DIS|isDefined>};
@@ -6070,7 +5983,7 @@ ClsDef:
     @@Name: ownerModuleURIRef
     @@enDesc:
       A reference to a URI of the owner module of the resource.
-    @@Type: DISPerl|SCALAR||ManakaiDOM|Perl
+    @@Type: DISPerl|SCALAR
     @@nullCase:
       @@@enDesc:
         The resource does not belong to any module since the
@@ -6152,7 +6065,7 @@ IFClsDef:
     @@ForCheck: ManakaiDOM|ForClass
     @@Name: uris
     @@Type: 
-      DISPerl:Array::ManakaiDOM:all
+      DISPerl:Array
     @@actualType: ForURIList
     @@enDesc:
       A reference to the snapshot array containing the URI reference
@@ -6176,7 +6089,7 @@ IFClsDef:
           Another <QUOTE::for> URI reference to test. 
     @@Return:
       @@@Type: 
-        DOMMain:boolean::ManakaiDOM:all
+        DOMMain:boolean
       @@@TrueCase:
         @@@@enDesc:
           <P::superURI> is a super-<QUOTE::for> of this <QUOTE::for>. 
@@ -6261,7 +6174,7 @@ IFClsDef:
         A <QUOTE::for> URI reference to test.
     @@Return:
       @@@Type:
-        DOMMain:boolean::ManakaiDOM:all
+        DOMMain:boolean
       @@@TrueCase:
         @@@@enDesc:
           This resource is for <P::forURI>.  The attribute
@@ -6354,7 +6267,7 @@ IFClsDef:
     @@ForCheck: ManakaiDOM|ForClass
     @@Name: uris
     @@Type: 
-      DISPerl:Array::ManakaiDOM:all
+      DISPerl:Array
     @@enDesc:
       Returns the current <EM::snapshot> of the URI references
       for this resource, including the alias URI references.
@@ -6377,7 +6290,7 @@ IFClsDef:
           Another resource URI reference to test. 
     @@NamedParam:
       @@@Name: srinfo
-      @@@Type: DISPerl|HASH||ManakaiDOM|all
+      @@@Type: DISPerl|HASH
       @@@enDesc:
         The <CODE::srinfo> hash.
       @@@nullCase:
@@ -6385,7 +6298,7 @@ IFClsDef:
           No <CODE::srinfo>.
     @@Return:
       @@@Type: 
-        DOMMain:boolean::ManakaiDOM:all
+        DOMMain:boolean
       @@@TrueCase:
         @@@@enDesc:
           <P::superURI> is a super-resource of this resource. 
@@ -6434,7 +6347,7 @@ IFClsDef:
         A <QUOTE::dis> resource definition object. 
     @@NamedParam:
       @@@Name: srinfo
-      @@@Type: DISPerl|HASH||ManakaiDOM|all
+      @@@Type: DISPerl|HASH
       @@@enDesc:
         The <CODE::srinfo> hash.
       @@@nullCase:
@@ -6477,12 +6390,12 @@ IFClsDef:
     @@NodeParam:
     @@NamedParam:
       @@@Name: noEqualityCheck
-      @@@Type: idl|boolean||ManakaiDOM|all
+      @@@Type: idl|boolean
       @@@enDesc:
         Don't throw <X::MERGE_ITSELF_ERR> exception.
     @@NamedParam:
       @@@Name: srinfo
-      @@@Type: DISPerl|HASH||ManakaiDOM|all
+      @@@Type: DISPerl|HASH
       @@@enDesc:
         The <CODE::srinfo> hash.
       @@@nullCase:
@@ -6690,7 +6603,7 @@ IFClsDef:
       @@@enDesc: Another resource to compare.
     @@Return:
       @@@Type:
-        DOMMain:unsigned-long::ManakaiDOM:all
+        DOMMain:unsigned-long
       @@@PerlDef:
         if (UNIVERSAL::isa ($anotherResource,
                             <ClassName::ManakaiDISResourceDefinition>)) {
@@ -6833,7 +6746,7 @@ IFClsDef:
     @@Param:
       @@@Name: localName
       @@@Type:
-        DISCore:LocalName::ManakaiDOM:all
+        DISCore:LocalName
       @@@enDesc:
         A local name. 
     @@Param:
@@ -6872,7 +6785,7 @@ IFClsDef:
     @@Param:
       @@@Name:localName
       @@@Type:
-        DISLang:String::ManakaiDOM:all
+        DISLang:String
       @@@enDesc:
         Constant name.
     @@Return:
@@ -7005,7 +6918,7 @@ IFClsDef:
       <Q::dis:Value> attribute node that in turn has
       <Q::dis:is-null> attribute whose value set to <DOM::true>.
     @@Type:
-      DOMMain:boolean::ManakaiDOM:all
+      DOMMain:boolean
     @@Get:
       @@@PerlDef:
         if ($self->{<Q::dis:Value>}) {
@@ -7040,7 +6953,7 @@ IFClsDef:
         }
 
     @@Type:
-      DISPerl:ARRAY::ManakaiDOM:all
+      DISPerl:ARRAY
     @@Get:
       @@@enDesc:
         A reference to the array containing feature names.
@@ -7087,7 +7000,7 @@ IFClsDef:
     @@enDesc:
       Whether the property allows multiple occurence of the attribute
       in the <QUOTE::dis> source tree.
-    @@Type: DISLang|String||ManakaiDOM|all
+    @@Type: DISLang|String
     @@Get:
       @@@PerlDef:
         __DEEP{
@@ -7105,7 +7018,7 @@ IFClsDef:
     @@Name: defaultLextypeURI
     @@enDesc:
       The URI of the default lexical type for the <QUOTE::dis> attribute.
-    @@Type: DISLang|String||ManakaiDOM|all
+    @@Type: DISLang|String
     @@Get:
       @@@PerlDef:
         __DEEP{
@@ -7164,16 +7077,14 @@ IFClsDef:
 
 ResourceDef:
   @QName: String
-  @AliasFor: DISLang|String||ManakaiDOM|all
-  @For: DIS|ForEmpty
+  @AliasFor: DISLang|String
 
 ResourceDef:
   @QName: RevisionNumber
-  @AliasFor: idl|unsignedLong||ManakaiDOM|all
-  @For: DIS|ForEmpty
+  @AliasFor: idl|unsignedLong
   @enImplNote:
     {ISSUE::
-      Should be <Q::idl|unsignedLongLong||ManakaiDOM|all>?
+      Should be <Q::idl|unsignedLongLong>?
     }
 
 PropDef:
@@ -7190,7 +7101,7 @@ ElementTypeBinding:
 
 DataTypeDef:
   @QName: URIList
-  @rdfs:subClassOf: DISPerl|ARRAY||ManakaiDOM|all
+  @rdfs:subClassOf: DISPerl|ARRAY
 
 IFClsDef:
   @IFQName: DISResourceMV
@@ -7206,7 +7117,7 @@ IFClsDef:
       The local name of the markup vocabulary element defined by this
       resource.
     @@Type:
-      DISLang:String::ManakaiDOM:all
+      DISLang:String
     @@Get:
       @@@nullCase:
         @@@@enDesc:
@@ -7230,7 +7141,7 @@ IFClsDef:
       A typical namespace prefix of the markup vocabulary element defined
       by this resource.
     @@Type:
-      DISLang:String::ManakaiDOM:all
+      DISLang:String
     @@Get:
       @@@nullCase:
         @@@@enDesc:
@@ -7338,24 +7249,21 @@ PropDef:
 ResourceDef:
   @QName: SWCFGNode
   @AliasFor:
-    swcfg21:SWCFGNode::swcfg21:ForLatest
-  @For: DIS|ForEmpty
+    swcfg21:SWCFGNode
 
 ResourceDef:
   @QName: SWCFGElement
   @AliasFor:
-    swcfg21:SWCFGElement::swcfg21:ForLatest
-  @For: DIS|ForEmpty
+    swcfg21:SWCFGElement
 
 ResourceDef:
   @QName: SWCFGDoc
   @AliasFor:
-    swcfg21:SWCFGDocument::swcfg21:ForLatest
-  @For: DIS|ForEmpty
+    swcfg21:SWCFGDocument
 
 ResourceDef:
   @QName: DOMImpl
-  @AliasFor: c|DOMImplementation||ManakaiDOM|ManakaiDOMLatest
+  @AliasFor: c|DOMImplementation
 
 XParamDef:
   @QName: sourceNodePath
@@ -7412,7 +7320,7 @@ IFClsDef:
       Returns a property value objects.
     @@PropNameParam:
     @@Return:
-      @@@Type: DISPerl|ARRAY||ManakaiDOM|all
+      @@@Type: DISPerl|ARRAY
       @@@enDesc: The property value.
       @@@PerlDef:
         my $pr = $self-><AG::DISAnyResource.database>
@@ -7431,13 +7339,13 @@ IFClsDef:
     @@Param:
       @@@Name:default
       @@@Type:
-        DOMMain:boolean::ManakaiDOM:all
+        DOMMain:boolean
       @@@enDesc:
         The default value that is returned if no explicit property 
         value specification found for this resource. 
     @@Return:
       @@@Type:
-        DOMMain:boolean::ManakaiDOM:all
+        DOMMain:boolean
       @@@enDesc:
         The property value. 
       @@@PerlDef:
@@ -7468,7 +7376,7 @@ IFClsDef:
     @@Param:
       @@@Name:default
       @@@Type:
-        swcfg21:SWCFGString::swcfg21:ForLatest
+        swcfg21:SWCFGString
       @@@enDesc:
         The default value that is returned if no explicit property 
         value specification found for this resource. 
@@ -7478,7 +7386,7 @@ IFClsDef:
           no value specified. 
     @@Return:
       @@@Type:
-        swcfg21:SWCFGString::swcfg21:ForLatest
+        swcfg21:SWCFGString
       @@@enDesc:
         The property value string. 
       @@@nullCase:
@@ -7511,7 +7419,7 @@ IFClsDef:
     @@PropNameParam:
     @@MediaTypeDefaultParam:
     @@Return:
-      @@@Type: DISPerl|ARRAY||ManakaiDOM|all
+      @@@Type: DISPerl|ARRAY
       @@@enDesc:
         A list of the property value strings. 
       @@@PerlDef:
@@ -7566,14 +7474,14 @@ IFClsDef:
     @@NamedParam:
       @@@Name: recursive
       @@@Type:
-        DOMMain:boolean::ManakaiDOM:all
+        DOMMain:boolean
       @@@enDesc:
         Whether property resource values of this resource
         should also be included to the returned list or not.
     @@NamedParam:
       @@@Name: recursiveISA
       @@@Type:
-        DOMMain:boolean::ManakaiDOM:all
+        DOMMain:boolean
       @@@enDesc:
         Whether the <Q::dis:ISA> ancestors of the resources
         that are property values should also be included in the returned list
@@ -7598,7 +7506,7 @@ IFClsDef:
     @@NamedParam:
       @@@Name: isaRecursive
       @@@Type:
-        DOMMain:boolean::ManakaiDOM:all
+        DOMMain:boolean
       @@@enDesc:
         Whether property resource values of <Q::dis:ISA> resources
         of this resource should also be included to the returned list or not.
@@ -7867,7 +7775,6 @@ ElementTypeBinding:
       @@@ForCheck: !ManakaiDOM|ForClass
     @@resourceFor: ManakaiDOM|ForClass
     @@DISCore:resourceType: DISCore|Resource
-    @@For: DIS|ForLatest
 
 ElementTypeBinding:
   @Name: TMethod
@@ -8087,7 +7994,7 @@ PropDef:
     @@@:
       Whether the subject resource is anonymous or not. 
   @Type:
-    DOMMain:boolean::ManakaiDOM:all
+    DOMMain:boolean
 
 PropDef:
   @QName:isDefined
@@ -8178,7 +8085,7 @@ DataTypeDef:
   @enDesc:
     References to array containing resource definition objects.
   @rdfs:subClassOf:
-    DISPerl:ARRAY::ManakaiDOM:all
+    DISPerl:ARRAY
 
 ElementTypeBinding:
   @Name: DataTypeDef
@@ -8208,15 +8115,8 @@ XParamDef:
   @Type: ManakaiDISNode
 
 ResourceDef:
-  @QName: UNDECLARED_NS_PREFIX_ERR
-  @For: ForEmpty
-  @AliasFor: 
-    DIS:UNDECLARED_NS_PREFIX_ERR::swcfg21:ForLatest
-
-ResourceDef:
   @QName: anyres
   @AliasFor: DISAnyResource
-  @For: DIS|ForLatest
 
 ResourceDef:
   @rdf:type:
@@ -8225,9 +8125,6 @@ ResourceDef:
   @resourceFor: ManakaiDOM|ForIF
   @resourceFor:
     @@@: ManakaiDOM|ForClass
-    @@ForCheck: ForEmpty !=ForEmpty
-  @For: ForLatest
-  @For: =ForEmpty
 
   @rdf:type:
     @@@: dx|Interface
@@ -8238,21 +8135,16 @@ ResourceDef:
     @@ForCheck: ManakaiDOM|ForClass
 
   @Implement:
-    @@@: ||ForEmpty||ManakaiDOM|ForIF
+    @@@: ||+||ManakaiDOM|ForIF
     @@ContentType: DISCore|TFPQNames
-    @@ForCheck: ManakaiDOM|ForClass ForEmpty
-  @Implement:
-    @@@: ||ForLatest||ManakaiDOM|ForIF
-    @@ContentType: DISCore|TFPQNames
-    @@ForCheck: ManakaiDOM|ForClass ForLatest
-  @dx:implementedBy: ||DIS|ForLatest||ManakaiDOM|ForClass
+    @@ForCheck: ManakaiDOM|ForClass
+  @dx:implementedBy: ||+||ManakaiDOM|ForClass
 
   @f:implements:
     @@@: CoreFeature10
-    @@For: ForLatest
 
   @ISA:
-    @@@: dx|Exception||ManakaiDOM|Perl
+    @@@: dx|Exception
     @@ForCheck: ManakaiDOM|ForClass
 
   @IFQName: DISException
@@ -8265,12 +8157,12 @@ ResourceDef:
 
   @ResourceDef:
     @@rdf:type: DISLang|ConstGroup
-    @@ForCheck: ManakaiDOM|ForIF !=DIS|ForEmpty
+    @@ForCheck: ManakaiDOM|ForIF
 
     @@IFQName: DISExceptionCode
 
-    @@rdfs:subClassOf: idl|unsignedShort||ManakaiDOM|all
-    @@Type: idl|unsignedShort||ManakaiDOM|all
+    @@rdfs:subClassOf: idl|unsignedShort
+    @@Type: idl|unsignedShort
 
     @@enDesc:
       Exception codes for <Class::DISException>. 
@@ -8987,7 +8879,7 @@ XParamDef:
 XParamDef:
   @QName: sourceCode
   @Type:
-    DISLang:String::ManakaiDOM:all
+    DISLang:String
   @enDesc:
     The source code fragment in which an error occurred.
 
@@ -9007,7 +8899,7 @@ XParamDef:
 XParamDef:
   @QName: localName
   @Type: 
-    DISCore:LocalName::ManakaiDOM:all
+    DISCore:LocalName
   @enDesc:
     The local name of the resource, unique in <Q::namespaceURI> namespace. 
 
@@ -9051,7 +8943,6 @@ ElementTypeBinding:
     DISPerl:methodName
   @ShadowContent:
     @@ContentType: lang|Perl
-    @@For: ManakaiDOM|Perl
 
 ElementTypeBinding:
   @Name: plCName
@@ -9059,7 +8950,6 @@ ElementTypeBinding:
     DISPerl:exportTagName
   @ShadowContent:
     @@ContentType: lang|Perl
-    @@For: ManakaiDOM|Perl
 
 ElementTypeBinding:
   @Name: Method
@@ -9068,7 +8958,6 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       DISLang:Method
-    @@For: !=ForEmpty
 
 ElementTypeBinding:
   @Name: CMethod
@@ -9077,7 +8966,7 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       DISLang:Method
-    @@ForCheck: !=ForEmpty ManakaiDOM|ForClass
+    @@ForCheck: ManakaiDOM|ForClass
 
 ElementTypeBinding:
   @Name: IntMethod
@@ -9096,7 +8985,6 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       DISLang:Attribute
-    @@For: !=ForEmpty
 
 ElementTypeBinding:
   @Name: CAttr
@@ -9105,7 +8993,7 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       DISLang:Attribute
-    @@ForCheck: !=ForEmpty ManakaiDOM|ForClass
+    @@ForCheck: ManakaiDOM|ForClass
 
 ElementTypeBinding:
   @Name: Return
@@ -9177,7 +9065,7 @@ ElementTypeBinding:
       @@@@: 1
       @@@ContentType: DISCore|Boolean
     @@Type:
-      DOMMain:boolean::ManakaiDOM:all
+      DOMMain:boolean
 
 ElementTypeBinding:
   @Name: FalseCase
@@ -9190,7 +9078,7 @@ ElementTypeBinding:
       @@@@: 0
       @@@ContentType: DISCore|Boolean
     @@Type:
-      DOMMain:boolean::ManakaiDOM:all
+      DOMMain:boolean
 
 ElementTypeBinding:
   @Name: enDesc
@@ -9205,7 +9093,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: DISCore|Property
-    @@For: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: RPropDef
@@ -9213,7 +9100,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: DISSource|ResourceProperty
-    @@For: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: MethodRedef
@@ -9415,7 +9301,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: ecore|Parameter
-    @@For: =ManakaiDOM|all
 
 XParamDef:
   @QName: DIS|moduleURI

@@ -11,18 +11,13 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/02/26 06:42:57 $
+    $Date: 2006/12/30 12:00:43 $
 
   @Require:
     @@Module:
       @@@QName: Util|ManakaiNode
-      @@@WithFor: ManakaiDOM|Perl
     @@Module:
       @@@QName: DISlib|Test
-      @@@WithFor: ManakaiDOM|all
-
-  @DefaultFor:
-    ManakaiDOM:Perl
 
 Namespace:
   @dis:
@@ -63,7 +58,6 @@ ElementTypeBinding:
     @@rdf:type:
       @@@@: DISLang|Class
       @@@ForCheck: ManakaiDOM|ForClass
-    @@ForCheck: ManakaiDOM|Perl
 
 ElementTypeBinding:
   @Name: IntMethod
@@ -146,7 +140,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: rdf|Property
-    @@For: =ManakaiDOM|all
 
 ClsDef:
   @ClsQName: Node1
@@ -282,10 +275,10 @@ ClsDef:
     @@Name: set
     @@Param:
       @@@Name: ns
-      @@@Type: DISPerl|String||ManakaiDOM|all
+      @@@Type: DISPerl|String
     @@Param:
       @@@Name: name
-      @@@Type: DISPerl|String||ManakaiDOM|all
+      @@@Type: DISPerl|String
     @@Param:
       @@@Name: newChild
       @@@Type: Node1
@@ -659,10 +652,10 @@ ClsDef:
     @@Name: set
     @@Param:
       @@@Name: ns
-      @@@Type: DISPerl|String||ManakaiDOM|all
+      @@@Type: DISPerl|String
     @@Param:
       @@@Name: name
-      @@@Type: DISPerl|String||ManakaiDOM|all
+      @@@Type: DISPerl|String
     @@Param:
       @@@Name: newChild
       @@@Type: Node2

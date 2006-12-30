@@ -13,7 +13,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/12/30 08:27:46 $
+    $Date: 2006/12/30 12:00:39 $
 
   @Require:
     @@Module:
@@ -241,10 +241,7 @@ ElementTypeBinding:
     @@DISCore:resourceType:
       @@@@: DISLang|Class
       @@@ForCheck: ManakaiDOM|ForClass
-    @@Implement:
-      @@@@: ||+||ManakaiDOM|ForIF
-      @@@ContentType: DISCore|TFPQNames
-      @@@ForCheck: ManakaiDOM|ForClass
+
     @@Implement:
       @@@@: ||+||ManakaiDOM|ForIF
       @@@ContentType: DISCore|TFPQNames
@@ -349,7 +346,7 @@ ResourceDef:
 
 ResourceDef:
   @QName: boolean
-  @AliasFor: idl|boolean||ManakaiDOM|all
+  @AliasFor: idl|boolean
 
 ResourceDef:
   @QName: Node
@@ -380,7 +377,7 @@ ElementTypeBinding:
     @@Value:
       @@@@: 1
       @@@ContentType: DISCore|Boolean
-    @@Type: idl|boolean||ManakaiDOM|all
+    @@Type: idl|boolean
 
 ElementTypeBinding:
   @Name: FalseCase
@@ -392,7 +389,7 @@ ElementTypeBinding:
     @@Value:
       @@@@: 0
       @@@ContentType: DISCore|Boolean
-    @@Type: idl|boolean||ManakaiDOM|all
+    @@Type: idl|boolean
 
 ## -- Features
 
@@ -402,7 +399,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: f|Feature
-    @@For: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: FeatureVerDef
@@ -3654,7 +3650,7 @@ IFClsDef:
   @IFISA: Element
   @ClsISA: te|ManakaiDOMElement
 
-  @s:elementType: AnyXDPElement||ManakaiDOM|all
+  @s:elementType: AnyXDPElement
 
   @Test:
     @@QName: createElementNS.XDPElement.test

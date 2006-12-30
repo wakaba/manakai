@@ -43,7 +43,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/12/30 08:27:45 $
+      $Date: 2006/12/30 12:00:38 $
     @@ContentType:
       dis:Date.RCS
   
@@ -792,8 +792,7 @@ ResourceDef:
   @rdf:type:
     rdfs:Class
   @rdfs:subClassOf:
-    rdfs:Class::ManakaiDOM:all
-  @For: =ManakaiDOM|all
+    rdfs:Class
 
 ## -- The feature system (manakai)
 
@@ -823,7 +822,6 @@ ResourceDef:
   @QName:
     dis:Version
   @AliasFor: version
-  @For: =ManakaiDOM|all
 
 PropDef:
   @QName: provides
@@ -867,7 +865,6 @@ ResourceDef:
   @QName:
     DOMMain:implementFeature
   @AliasFor: implements
-  @For: =ManakaiDOM|all
 
 PropDef:
   @QName: instanceOf
@@ -962,16 +959,16 @@ PropDef:
             Classes that should be available via 
             <M::DOMEvents:ManakaiDOMDocumentEvent.createEvent>.
       \
-        - <CODE::DOMCore:DOMImplementation::ManakaiDOM:ManakaiDOM>::: 
+        - <CODE::DOMCore:DOMImplementation>::: 
             Classes that might be available via <Class::ImplementationRegistry>, 
             <IF::DOMCore:DOMImplementationSource> or 
             <M::DOMCore:DOMImplementation.getFeature>. 
       \
-        - <CODE::DOMCore:DOMImplementationSource::ManakaiDOM:ManakaiDOM>:::
+        - <CODE::DOMCore:DOMImplementationSource>:::
             Classes that should be known to 
             <Class::ImplementationRegistry>.
       \
-        - <CODE::DOMCore:Node::ManakaiDOM:ManakaiDOM>::: 
+        - <CODE::DOMCore:Node>::: 
             Classes that might be available via <M::DOMCore:Node.getFeature> 
             or any <IF::Node> returning method and attributes.
       \
@@ -1076,7 +1073,7 @@ ResourceDef:
         @@@@enDesc: Any version of the feature.
     @@Return:
       @@@Type:  
-        DOMMain:boolean::ManakaiDOM:all
+        DOMMain:boolean
       @@@Description:
         @@@@lang:en
         @@@@@: 
@@ -1135,7 +1132,7 @@ ResourceDef:
           @@@@@is-null:1
         @@@@enDesc: Any version of the feature.
      @@Return:
-        @@@Type: DOMMain|Object||ManakaiDOM|all
+        @@@Type: DOMMain|Object
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -1218,7 +1215,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: DISCore|Property
-    @@For: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: RPropDef
@@ -1226,7 +1222,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: DISSource|ResourceProperty
-    @@For: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: Method

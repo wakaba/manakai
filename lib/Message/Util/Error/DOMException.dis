@@ -19,31 +19,17 @@ Module:
   @License:
      license:Perl+MPL
   @Date:
-    @@@:
-      $Date: 2006/04/03 16:13:20 $
-    @@ContentType:
-      dis:Date.RCS
+    $Date: 2006/12/30 12:00:49 $
   
   @Require:
     @@Module:
       @@@QName:
         DISlib:DISPerl
-      @@@WithFor:
-        ManakaiDOM:all
     @@Module:
       @@@QName:
         DISlib:DISIDL
-      @@@WithFor:
-        ManakaiDOM:all
-    @@Module:
-      @@@QName: Err|DOMException
-      @@@WithFor:
-        ManakaiDOM:Perl
     @@Module:
       @@@QName: Err|Core
-      @@@WithFor: ManakaiDOM|Perl
-  @DefaultFor:
-    ManakaiDOM:Perl
 
 Namespace:
   @c:
@@ -80,7 +66,6 @@ Namespace:
 ## -- Module group for documentation
 
 ResourceDef:
-  @For: =ManakaiDOM|all
   @rdf:type: dis|ModuleGroup
 
   @QName: dx|ManakaiErrorModules
@@ -93,20 +78,20 @@ ResourceDef:
     The <DFN::manakai Error Modules> is a set of modules that
     provide facilities for error and exception handling.
 
-    The <Class::ecore|Error||ManakaiDOM|Perl> module, which is
+    The <Class::ecore|Error> module, which is
     strictly not part of manakai, enables Perl programs
     to throw exceptions and to catch them by <Perl::try> and
     <Perl::catch> syntax.
 
-    The <Class::ecore|MUError||ManakaiDOM|Perl> module
-    extends the <Class::ecore|Error||ManakaiDOM|Perl> module
+    The <Class::ecore|MUError> module
+    extends the <Class::ecore|Error> module
     so that programs can report errors by various ways,
-    e.g. via <Class::ecore|Error||ManakaiDOM|Perl>'s exception
+    e.g. via <Class::ecore|Error>'s exception
     <Perl::throw>ing or via so-called error handler code, through
     the one <Perl::report> statement.
 
-    The <Module::Err|DOMException||ManakaiDOM|Perl> module
-    again extends the <Class::ecore|MUError||ManakaiDOM|Perl>
+    The <Module::Err|DOMException> module
+    again extends the <Class::ecore|MUError>
     module and it provides a base implementation for
     DOM-compatible exception system.  Not only it has
     an attribute for DOM error code, it also has a
@@ -114,8 +99,8 @@ ResourceDef:
     situation clearer than the DOM code.  In addition,
     parameters can be defined for each sub-codes.
 
-  @DISCore:module: Err|Core||ManakaiDOM|Perl
-  @DISCore:module: Err|DOMException||ManakaiDOM|Perl
+  @DISCore:module: Err|Core
+  @DISCore:module: Err|DOMException
 ##ManakaiErrorModules
 
 ElementTypeBinding:
@@ -165,7 +150,7 @@ ResourceTypeDef:
     It is expected that the interfaces of this type have
     a <CODE::code> attribute which returns the error code.
   @rdfs:subClassOf:
-    AnyExceptionAnyClass::ManakaiDOM:all
+    AnyExceptionAnyClass
   @rdfs:subClassOf: Err|MUErrorInterface
   @rdfs:subClassOf: DISLang|Exception
 
@@ -181,7 +166,7 @@ ResourceTypeDef:
       Concrete implementations of any type of <QUOTE::exception>,
       including <QUOTE::error> and <QUOTE::warning>.
   @rdfs:subClassOf:
-    AnyExceptionAnyClass::ManakaiDOM:all
+    AnyExceptionAnyClass
   @rdfs:subClassOf: Err|MUErrorClass
 
 ResourceTypeDef:
@@ -192,7 +177,7 @@ ResourceTypeDef:
     @@@:
       A concrete implementation of an exception type.
   @rdfs:subClassOf:
-    AnyExceptionClass::ManakaiDOM:all
+    AnyExceptionClass
   @rdfs:subClassOf: DISLang|Exception
   @rdfs:subClassOf: ecore|AnyErrorCode
 
@@ -233,7 +218,6 @@ ElementTypeBinding:
     @@rdf:type:
       rdfs:Class
     @@rdfs:subClassOf: rdfs|Class
-    @@For: =ManakaiDOM|all
 
 ## -- Throwing of exceptions
 
@@ -250,7 +234,6 @@ SPropDef:
 ResourceDef:
   @QName: ManakaiDOM|raises
   @AliasFor: dx|raises
-  @For: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: PropDef
@@ -259,7 +242,6 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       rdf:Property
-    @@For: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: SPropDef
@@ -270,7 +252,6 @@ ElementTypeBinding:
       rdf:Property
     @@rdf:type: DISSource|Property
     @@rdf:type: DISSource|ResourceProperty
-    @@For: =ManakaiDOM|all
 
 ## -- lang:Perl vocabulary
 
@@ -280,7 +261,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISPerl|BlockElementType
-    @@For: =ManakaiDOM|all
 
 LexTypeDef:
   @QName: DISPerl|XWSpecification
@@ -335,13 +315,12 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISCore|LexicalType
-    @@For: =ManakaiDOM|all
 
 ## -- Exception classes
 
 XWParam:
   @QName: c|code
-  @Type: idl|unsignedLong||ManakaiDOM|all
+  @Type: idl|unsignedLong
   @enDesc:
     Error code.
   @enImplNote:
@@ -364,8 +343,6 @@ ResourceDef:
   @rdf:type: dx|Class
 
   @ISA: ecore|MUError
-
-  @For: ManakaiDOM|Perl
 
   @enDesc:
     The <Class::dx|Exception> class is a basis for implementation
@@ -395,7 +372,7 @@ ResourceDef:
         }
     @@Get:
       @@@Type:
-        DISLang:String::ManakaiDOM:all
+        DISLang:String
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -438,7 +415,7 @@ ResourceDef:
         }
     @@Return:
       @@@Type:
-        DISLang:String::ManakaiDOM:all
+        DISLang:String
       @@@PerlDef:
         $r = $self->SUPER::stringify;
         if (defined $self->{<H::MDOMX:class>}) {
@@ -464,7 +441,7 @@ ResourceDef:
       the error.  It should be equal to one of constant values
       defined as members of the exception interface that the
       object implements. 
-    @@Type: idl|unsignedShort||ManakaiDOM|all
+    @@Type: idl|unsignedShort
     @@Get:
       @@@PerlDef:
         $r = $self->{<H::ecore:def>}->{<H::c|code>};
@@ -481,7 +458,7 @@ ResourceDef:
       {NOTE:: This attribute always has the same value as 
               <A::dx|Exception.code>.
       }
-    @@Type: idl|unsignedShort||ManakaiDOM|all
+    @@Type: idl|unsignedShort
     @@Get:
       @@@PerlDef:
         $r = $self->{<H::ecore:def>}->{<H::c|code>};
@@ -491,7 +468,7 @@ ResourceDef:
     @@enDesc:
       The type of the error, i.e. the local name of the constant
       function whose value is the numeric exception code of the error.
-    @@Type: DISLang|String||ManakaiDOM|all
+    @@Type: DISLang|String
     @@Get:
       @@@PerlDef:
         $r = $self->{<H::ecore:type>};
@@ -500,7 +477,7 @@ ResourceDef:
     @@Name: subtype
     @@enDesc:
       The subtype of the error.
-    @@Type: DISLang|String||ManakaiDOM|all
+    @@Type: DISLang|String
     @@Get:
       @@@enDesc:
         A URI reference that identifies the subtype.
@@ -519,7 +496,6 @@ ResourceDef:
     @@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
   @resourceFor: ManakaiDOM|ForIF
   @resourceFor: ManakaiDOM|ForClass
-  @For: ManakaiDOM|Perl
 
   @QName:
     @@@: dx|ICoreException
@@ -555,8 +531,8 @@ ResourceDef:
     @@ForCheck: ManakaiDOM|ForIF
     @@QName: dx|CoreExceptionCode
     @@rdf:type: DISLang|ConstGroup
-    @@Type: idl|unsignedShort||ManakaiDOM|all
-    @@rdfs:subClassOf: idl|unsignedShort||ManakaiDOM|all
+    @@Type: idl|unsignedShort
+    @@rdfs:subClassOf: idl|unsignedShort
 
     @@ResourceDef:
       @@@QName: NO_MODIFICATION_ALLOWED_ERR
@@ -750,7 +726,7 @@ XWParam:
 XWParam:
   @QName:
     MDOMX:class
-  @Type: DISPerl|String||ManakaiDOM|all
+  @Type: DISPerl|String
   @Description:
     @@lang:en
     @@@:
@@ -759,20 +735,20 @@ XWParam:
 
 XWParam:
   @QName: MDOMX|attr
-  @Type: DISPerl|String||ManakaiDOM|all
+  @Type: DISPerl|String
   @enDesc:
     The name of the attribute subroutine in whcih an exception is thrown.
 
 XWParam:
   @QName: MDOMX|on
-  @Type: DISPerl|String||ManakaiDOM|all
+  @Type: DISPerl|String
   @enDesc:
     The type of the attribute operation in which an exception is thrown.
     The value must be either <CODE::get> or <CODE::set>.
 
 XWParam:
   @QName: MDOMX|method
-  @Type: DISPerl|String||ManakaiDOM|all
+  @Type: DISPerl|String
   @enDesc:
     The name of the method subroutine in which an exception is thrown.
 
@@ -791,7 +767,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: ecore|Parameter
-    @@For: =ManakaiDOM|all
 
 ## -- Exception target
 
@@ -800,8 +775,7 @@ ResourceDef:
   @enDesc:
     This class provides a default exception handler.
   @rdf:type: DISLang|Class
-  @ForCheck:
-    ManakaiDOM:Perl
+
   @Implement: ecore|MUErrorTarget
 
   @ResourceDef:
@@ -818,11 +792,10 @@ ResourceDef:
         and warnings associated to an object are once reported to this method 
         and then delivered to appropriate entities. 
         \
-        If the error is an exception (such as <X::c|DOMException
-        ||ManakaiDOM|ManakaiDOM> or 
+        If the error is an exception (such as <X::c|DOMException> or 
         <X::ManakaiDOM:ManakaiDOMImplementationException>), it is 
         simply thrown.  If the error is only a warning, it is reported 
-        via the <IF::c|DOMError||ManakaiDOM|ManakaiDOM> interface. 
+        via the <IF::c|DOMError> interface. 
         \
         See <PerlModule::Message::Util::Error> documentation for more 
         information on the error reporting mechanism.

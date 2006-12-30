@@ -17,27 +17,19 @@ Module:
   @License:
     license:Perl+MPL
   @Date:
-    $Date: 2006/12/30 02:37:09 $
+    $Date: 2006/12/30 12:00:48 $
   
   @Require:
     @@Module:
       @@@QName: Util|DIS
-      @@@WithFor: DIS|ForLatest
     @@Module:
       @@@QName: DIS|Perl
-      @@@WithFor: DIS|ForLatest
     @@Module:
       @@@QName: MDOM|DOMCore
-      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
     @@Module:
       @@@QName: MDOM|TreeCore
-      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
     @@Module:
       @@@QName: MDOM|TreeStore
-      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
-
-  @DefaultFor: 
-    DIS:ForLatest
 
 Namespace:
   @c:
@@ -105,7 +97,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: f|Feature
-    @@For: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: FeatureVerDef
@@ -166,8 +157,6 @@ ElementTypeBinding:
 
     @@DOMMain:implementFeature: DIS|Value10
 
-    @@ForCheck: DIS|ForEmpty
-
 ElementTypeBinding:
   @Name: IFDef
   @ElementType:
@@ -183,8 +172,6 @@ ElementTypeBinding:
       @@@ForCheck: ManakaiDOM|ForIF
 
     @@f:implements: DIS|Value10
-
-    @@ForCheck: DIS|ForEmpty
 
 ElementTypeBinding:
   @Name: ClsDef
@@ -236,7 +223,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: DISLang|Method
-    @@For: !=DIS|ForEmpty
 
 ElementTypeBinding:
   @Name: ClsMethod
@@ -244,7 +230,7 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: DISLang|Method
-    @@ForCheck: !=DIS|ForEmpty ManakaiDOM|ForClass
+    @@ForCheck: ManakaiDOM|ForClass
 
 ElementTypeBinding:
   @Name: Return
@@ -274,7 +260,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|Attribute
-    @@For: !=DIS|ForEmpty
 
 ElementTypeBinding:
   @Name: ClsAttr
@@ -282,7 +267,7 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: DISLang|Attribute
-    @@ForCheck: !=DIS|ForEmpty ManakaiDOM|ForClass
+    @@ForCheck: ManakaiDOM|ForClass
 
 ElementTypeBinding:
   @Name: Get
@@ -313,9 +298,9 @@ IFClsDef:
   @ClsQName: ManakaiDISImplementationValue
 
   @domperl:implementedByObjectsOf:
-    c|DOMImplementation||ManakaiDOM|ManakaiDOMLatest
+    c|DOMImplementation
   @domperl:classImplementedByObjectsOf:
-    c|ManakaiDOMImplementation||ManakaiDOM|ManakaiDOMLatest
+    c|ManakaiDOMImplementation
 
   @f:provides: DIS|Value10
 
@@ -335,7 +320,7 @@ IFClsDef:
         The canonical URI of the data type of the value.
     @@Param:
       @@@Name: value
-      @@@Type: DOMMain|any||ManakaiDOM|all
+      @@@Type: DOMMain|any
       @@@enDesc:
         The value of the object.  It is equivalent to
         set a value to <A::DVValue.value> attribute of the value.
@@ -371,7 +356,7 @@ IFClsDef:
         }
         $r = bless \ {
         }, $class;
-        __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
+        __CODE{DISPerl|HashStringRef::
           $result => {$$r->{type}},
           $given => {$dataType},
         }__;
@@ -390,7 +375,7 @@ IFClsDef:
         The canonical URI of the data type of the value.
     @@Param:
       @@@Name: valueRef
-      @@@Type: DISPerl|SCALAR||ManakaiDOM|all
+      @@@Type: DISPerl|SCALAR
       @@@enDesc:
         The value of the object.  It is equivalent to
         set a value to <A::DVValue.value> attribute of the value.
@@ -426,7 +411,7 @@ IFClsDef:
         }
         $r = bless \ {
         }, $class;
-        __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
+        __CODE{DISPerl|HashStringRef::
           $result => {$$r->{type}},
           $given => {$dataType},
         }__;
@@ -464,7 +449,7 @@ IFClsDef:
 
         my $node;
         my $doc;
-        __CODE{tc|createElementForTest||ManakaiDOM|ManakaiDOMLatest::
+        __CODE{tc|createElementForTest::
           $el => $node, $doc => $doc,
         }__;
         $node-><AS::Node.textContent> ('abcdefg');
@@ -629,7 +614,7 @@ IFClsDef:
   @ClsISA: dp|ManakaiDVValuePerl
 
   @ClsISA:
-    dx:ManakaiDefaultExceptionHandler::ManakaiDOM:Perl
+    dx:ManakaiDefaultExceptionHandler
 
   @enDesc:
     A <IF::DVValue> object represents a value in <QUOTE::dis> model.
@@ -684,7 +669,7 @@ IFClsDef:
     @@Name: value
     @@enDesc:
       The value.  What is the attribute value varies by its data type.
-    @@Type: DOMMain|any||ManakaiDOM|all
+    @@Type: DOMMain|any
     @@Get:
       @@@nullCase:
         @@@@enDesc:
@@ -715,7 +700,7 @@ IFClsDef:
               the value via the reference unless it is
               known to safe.
       }
-    @@Type: DISPerl|SCALAR||ManakaiDOM|all
+    @@Type: DISPerl|SCALAR
     @@nullCase:
       @@@enDesc:
         The value is <DOM::null>.
@@ -734,7 +719,7 @@ IFClsDef:
     @@Name: isNull
     @@enDesc:
       Whether the value is <CODE::null> or not.
-    @@Type: DOMMain|boolean||ManakaiDOM|all
+    @@Type: DOMMain|boolean
     @@Get:
       @@@TrueCase:
         @@@@enDesc:
@@ -786,7 +771,7 @@ IFClsDef:
     @@enDesc:
       Returns a tied array.
     @@Return:
-      @@@Type: DISPerl|ARRAY||ManakaiDOM|all
+      @@@Type: DISPerl|ARRAY
       @@@enDesc: A reference to the new tied array.
       @@@PerlDef:
         tie my @list, ref $self, $self;
@@ -802,11 +787,11 @@ IFClsDef:
     @@ManakaiDOM:isStatic:1
     @@Param:
       @@@Name: object
-      @@@Type: DOMMain|any||ManakaiDOM|all
+      @@@Type: DOMMain|any
       @@@enDesc: 
         The <IF::DVValue> object to tie.
     @@Return:
-      @@@Type: DOMMain|any||ManakaiDOM|all
+      @@@Type: DOMMain|any
       @@@enDesc:
         The tied <IF::DVValue> object.
       @@@PerlDef: $r = $object;
@@ -819,7 +804,7 @@ IFClsDef:
     @@enDesc:
       Returns a tied hash.
     @@Return:
-      @@@Type: DISPerl|HASH||ManakaiDOM|all
+      @@@Type: DISPerl|HASH
       @@@enDesc: A reference to the new tied hash.
       @@@PerlDef:
         tie my %list, ref $self, $self;
@@ -835,11 +820,11 @@ IFClsDef:
     @@ManakaiDOM:isStatic:1
     @@Param:
       @@@Name: object
-      @@@Type: DOMMain|any||ManakaiDOM|all
+      @@@Type: DOMMain|any
       @@@enDesc: 
         The <IF::DVValue> object to tie.
     @@Return:
-      @@@Type: DOMMain|any||ManakaiDOM|all
+      @@@Type: DOMMain|any
       @@@enDesc:
         The tied <IF::DVValue> object.
       @@@PerlDef: $r = $object;
@@ -849,9 +834,9 @@ IFClsDef:
     @@plOp: FETCH
     @@Param:
       @@@Name: index
-      @@@Type: DOMMain|unsigned-long||ManakaiDOM|all
+      @@@Type: DOMMain|unsigned-long
     @@Return:
-      @@@Type: DOMMain|any||ManakaiDOM|all
+      @@@Type: DOMMain|any
       @@@nullCase:
         @@@@enDesc:
           No <P::index>th item.
@@ -862,10 +847,10 @@ IFClsDef:
     @@plOp: STORE
     @@Param:
       @@@Name: index
-      @@@Type: DOMMain|unsigned-long||ManakaiDOM|all
+      @@@Type: DOMMain|unsigned-long
     @@Param:
       @@@Name: value
-      @@@Type: DOMMain|any||ManakaiDOM|all
+      @@@Type: DOMMain|any
     @@Return:
       @@@PerlDef: \
 
@@ -873,7 +858,7 @@ IFClsDef:
     @@ForCheck: ManakaiDOM|ForClass
     @@plOp: FETCHSIZE
     @@Return:
-      @@@Type: DOMMain|unsigned-long||ManakaiDOM|all
+      @@@Type: DOMMain|unsigned-long
       @@@PerlDef: $r = 1;
 
   @Method:
@@ -887,9 +872,9 @@ IFClsDef:
     @@plOp: EXISTS
     @@Param:
       @@@Name: index
-      @@@Type: DOMMain|unsigned-long||ManakaiDOM|all
+      @@@Type: DOMMain|unsigned-long
     @@Return:
-      @@@Type: DOMMain|boolean||ManakaiDOM|all
+      @@@Type: DOMMain|boolean
       @@@PerlDef:
         $r = ($index == 1);
 
@@ -954,7 +939,7 @@ IFClsDef:
         $r = defined $$self->{name} ? ${$$self->{name}} : null;
     @@Set:
       @@@PerlDef:
-        __CODE{DISPerl|HashStringRef||ManakaiDOM|all::
+        __CODE{DISPerl|HashStringRef::
           $result => {$$self->{name}},
           $given => $given,
         }__;
@@ -987,7 +972,7 @@ IFClsDef:
 
   @Attr:
     @@Name: namespaceBindingList
-    @@Type: DISPerl|HASH||ManakaiDOM|all
+    @@Type: DISPerl|HASH
     @@enDesc:
       The <QUOTE::live> hash reference of namespace bindings.
     @@Get:
@@ -1064,7 +1049,7 @@ IFClsDef:
 
   @Attr:
     @@Name: defaultNamespaceURIRef
-    @@Type: DISPerl|SCALAR||ManakaiDOM|all
+    @@Type: DISPerl|SCALAR
     @@Get:
       @@@PerlDef: $r = $$self->{defaultNS};
     @@Set:
@@ -1224,7 +1209,7 @@ IFClsDef:
     @@PerlDef:
       my $node;
       my $doc;
-      __CODE{tc|createElementForTest||ManakaiDOM|ManakaiDOMLatest::
+      __CODE{tc|createElementForTest::
         $el => $node, $doc => $doc,
       }__;
       $node->text_content ('abcdefg');
@@ -1246,19 +1231,19 @@ IFClsDef:
 
 ResourceDef:
   @QName: Node
-  @AliasFor: tc|Node||ManakaiDOM|ManakaiDOMLatest
+  @AliasFor: tc|Node
 
 ResourceDef:
   @QName: Document
-  @AliasFor: td|Document||ManakaiDOM|ManakaiDOMLatest
+  @AliasFor: td|Document
 
 ResourceDef:
   @QName: GetFeature
-  @AliasFor: f|GetFeature||ManakaiDOM|ManakaiDOMLatest
+  @AliasFor: f|GetFeature
 
 ResourceDef:
   @QName: TSImpl
-  @AliasFor: tst|DOMImplementationTreeStore||ManakaiDOM|ManakaiDOMLatest
+  @AliasFor: tst|DOMImplementationTreeStore
 
 IFClsDef:
   @IFQName: DVList
@@ -1271,7 +1256,7 @@ IFClsDef:
     @@Name: length
     @@enDesc:
       The number of the items in the list.
-    @@Type: DOMMain|unsigned-long||ManakaiDOM|all
+    @@Type: DOMMain|unsigned-long
     @@Get:
 
   @Method:
@@ -1363,7 +1348,7 @@ IFClsDef:
     @@ForCheck: ManakaiDOM|ForClass
     @@enDesc:
       The number of the items in the list.
-    @@Type: DOMMain|unsigned-long||ManakaiDOM|all
+    @@Type: DOMMain|unsigned-long
     @@Get:
       @@@PerlDef:
         $r = @{$$self->{array}};
@@ -1380,7 +1365,7 @@ IFClsDef:
   @ClsMethod:
     @@plOp: @{}
     @@Return:
-      @@@Type: DISPerl|ARRAY||ManakaiDOM|all
+      @@@Type: DISPerl|ARRAY
       @@@PerlDef:
         $r = $$self->{array};
 
@@ -1453,7 +1438,7 @@ IFClsDef:
     @@ForCheck: ManakaiDOM|ForClass
     @@Param:
       @@@Name: index
-      @@@Type: DOMMain|unsigned-long||ManakaiDOM|all
+      @@@Type: DOMMain|unsigned-long
     @@Return:
       @@@Type: DVValue
       @@@nullCase:
@@ -1489,7 +1474,7 @@ IFClsDef:
     @@ForCheck: ManakaiDOM|ForClass
     @@enDesc:
       The number of the items in the list.
-    @@Type: DOMMain|unsigned-long||ManakaiDOM|all
+    @@Type: DOMMain|unsigned-long
     @@plOp: FETCHSIZE
     @@Get:
       @@@PerlDef:
@@ -1508,7 +1493,7 @@ IFClsDef:
     @@plOp: %{}
     @@ForCheck: ManakaiDOM|ForClass
     @@Return:
-      @@@Type: DISPerl|HASH||ManakaiDOM|all
+      @@@Type: DISPerl|HASH
       @@@PerlDef:
         $r = $$self->{hash};
 
@@ -1601,9 +1586,9 @@ IFClsDef:
     @@ForCheck: ManakaiDOM|ForClass
     @@Param:
       @@@Name: index
-      @@@Type: DOMMain|unsigned-long||ManakaiDOM|all
+      @@@Type: DOMMain|unsigned-long
     @@Return:
-      @@@Type: DOMMain|any||ManakaiDOM|all
+      @@@Type: DOMMain|any
       @@@actualType: DVValue
       @@@nullCase:
         @@@@enDesc:
@@ -1616,10 +1601,10 @@ IFClsDef:
     @@ForCheck: ManakaiDOM|ForClass
     @@Param:
       @@@Name: index
-      @@@Type: DOMMain|unsigned-long||ManakaiDOM|all
+      @@@Type: DOMMain|unsigned-long
     @@Param:
       @@@Name: newValue
-      @@@Type: DOMMain|any||ManakaiDOM|all
+      @@@Type: DOMMain|any
       @@@nullCase:
         @@@@enDesc: 
           The new value is <DOM::null>.
@@ -1754,7 +1739,7 @@ ClsDef:
 
   @Attr:
     @@Name: namespaceBindingList
-    @@Type: DISPerl|HASH||ManakaiDOM|all
+    @@Type: DISPerl|HASH
     @@Get:
       @@@PerlDef:
         __DEEP{
@@ -1974,11 +1959,11 @@ ClsDef:
     @@Get:
       @@@PerlDef:
         $r = $self-><AG::DVValue.value>
-                  -><M::swcfg21:SWCFGNode||swcfg21:ForLatest.value>;
+                  -><M::swcfg21:SWCFGNode.value>;
     @@Set:
       @@@PerlDef:
         $self-><AG::DVValue.value>
-             -><M::swcfg21:SWCFGNode||swcfg21:ForLatest.value>
+             -><M::swcfg21:SWCFGNode.value>
                  (new_value => $given);
 ##DVSWCFGElement
 
@@ -1991,8 +1976,7 @@ ElementTypeBinding:
 
 ResourceDef:
   @QName: DISString
-  @AliasFor: DISLang|String||ManakaiDOM|all
-  @For: DIS|ForEmpty
+  @AliasFor: DISLang|String
 
 ElementTypeBinding:
   @Name: PerlDef
@@ -2032,7 +2016,7 @@ ElementTypeBinding:
       @@@@:1
       @@@ContentType: DISCore|Boolean
     @@Type:
-      DOMMain:boolean::ManakaiDOM:all
+      DOMMain:boolean
 
 
 ElementTypeBinding:
@@ -2046,4 +2030,4 @@ ElementTypeBinding:
       @@@@:0
       @@@ContentType: DISCore|Boolean
     @@Type:
-      DOMMain:boolean::ManakaiDOM:all
+      DOMMain:boolean

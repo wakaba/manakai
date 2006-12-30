@@ -24,31 +24,21 @@ Module:
       @@@Year:2003
       @@@DISCore:author: DISCore|Wakaba
   @Date:
-    $Date: 2006/11/04 12:25:14 $
+    $Date: 2006/12/30 12:00:42 $
   
   @Require:
     @@Module:
       @@@QName: Markup|common
     @@Module:
       @@@QName: Util|ManakaiNode
-      @@@WithFor: ManakaiDOM|Perl
     @@Module:
       @@@QName: DISlib|DISIDL
-      @@@WithFor: ManakaiDOM|all
     @@Module:
       @@@QName: UtilError|DOMException
-      @@@WithFor: ManakaiDOM|Perl
-    @@Module:
-      @@@WithFor: swcfg21|ForEmpty
-    @@Module:
-      @@@WithFor: swcfg21|ForLatest
     @@Module:
       @@@QName: MDOM|DOMFeature
-      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
     @@Module:
       @@@QName: MDOM|GenericLS
-      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
-  @DefaultFor: swcfg21|ForLatest
 
 Namespace:
   @c:
@@ -104,27 +94,6 @@ Namespace:
   @UtilError:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/
 
-## -- "For" definitions
-
-## For a version
-
-ForDef:
-  @QName: swcfg21|ForEmpty
-  @FullName:
-    @@lang:en
-    @@@:
-      For interface of <QUOTE::any> version
-  @ISA:
-    ManakaiDOM:Perl
-
-ForDef:
-  @QName:
-    swcfg21:ForLatest
-  @FullName:
-    @@lang:en
-    @@@: For latest version
-  @ISA: swcfg21|ForEmpty
-
 ## -- Features and versions
 
 ElementTypeBinding:
@@ -133,7 +102,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: f|Feature
-    @@For: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: FeatureVerDef
@@ -192,9 +160,6 @@ ElementTypeBinding:
     @@resourceFor: ManakaiDOM|ForIF
     @@resourceFor:
       @@@@: ManakaiDOM|ForClass
-      @@@ForCheck: ForEmpty !=ForEmpty
-    @@For: ForLatest
-    @@For: =ForEmpty
 
     @@rdf:type:
       @@@@: DISLang|Interface
@@ -203,18 +168,14 @@ ElementTypeBinding:
     @@rdf:type:
       @@@@: DISLang|Class
       @@@ForCheck: ManakaiDOM|ForClass
+
     @@Implement:
-      @@@@: ||ForEmpty||ManakaiDOM|ForIF
+      @@@@: ||+||ManakaiDOM|ForIF
       @@@ContentType: DISCore|TFPQNames
-      @@@ForCheck: ManakaiDOM|ForClass ForEmpty
-    @@Implement:
-      @@@@: ||ForLatest||ManakaiDOM|ForIF
-      @@@ContentType: DISCore|TFPQNames
-      @@@ForCheck: ManakaiDOM|ForClass ForLatest
+      @@@ForCheck: ManakaiDOM|ForClass
 
     @@f:implements:
       @@@@: CoreFeature21
-      @@@For: ForLatest
 
 ## -- Node
 
@@ -222,8 +183,8 @@ IFClsDef:
   @IFQName: SWCFGNode
   @ClsQName: ManakaiSWCFGNode
 
-  @ClsISA: ManakaiNode|ManakaiNodeRef||ManakaiDOM|Perl
-  @ClsISA: dx|ManakaiDefaultExceptionHandler||ManakaiDOM|Perl
+  @ClsISA: ManakaiNode|ManakaiNodeRef
+  @ClsISA: dx|ManakaiDefaultExceptionHandler
   
   @Description:
     @@lang:en
@@ -248,7 +209,7 @@ IFClsDef:
         Appends a node to the list of children of this node. 
     @@Param:
       @@@Name:node
-      @@@Type: idl|Object||ManakaiDOM|all
+      @@@Type: idl|Object
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -863,7 +824,7 @@ IFClsDef:
         given condition, if any. 
     @@Param:
       @@@Name:code
-      @@@Type: DISPerl|CODE||ManakaiDOM|all
+      @@@Type: DISPerl|CODE
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -876,7 +837,7 @@ IFClsDef:
           passed to the function. 
     @@NamedParam:
       @@@Name:makeNewNode
-      @@@Type: DISPerl|CODE||ManakaiDOM|all
+      @@@Type: DISPerl|CODE
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -1204,7 +1165,7 @@ IFClsDef:
         <CODE::#comment>, the list is always empty. 
     @@Get:
       @@@PerlDef:
-        __CODE{ManakaiNode|getNewReference||ManakaiDOM|Perl::
+        __CODE{ManakaiNode|getNewReference::
           $object => {$self->{<H::mn:node>}},
           $ref => {$r},
           $class => {<ClassName::ManakaiSWCFGChildNodeList>},
@@ -1582,7 +1543,7 @@ IFClsDef:
         A reference to the value of this node. 
     @@NewIn21:
     @@Get:
-      @@@Type: DISPerl|SCALAR||ManakaiDOM|all
+      @@@Type: DISPerl|SCALAR
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -2099,7 +2060,7 @@ IFClsDef:
               my @l = $c->{<H::mn:node>};
               while (@l) {
                 my $l = shift @l; next unless $l;
-                __CODE{mn|setXRefNode||ManakaiDOM|Perl::
+                __CODE{mn|setXRefNode::
                   $referrer => {$l},
                   $propName => {<H::swcfg21:ownerDocument>},
                   $referent => {$r->{<H::mn:node>}},
@@ -2446,7 +2407,7 @@ IFClsDef:
                     qq[(ref: "@{[ref $object]}")]},
           }__;
         }
-        __CODE{ManakaiNode|getNewReference||ManakaiDOM|Perl::
+        __CODE{ManakaiNode|getNewReference::
           $object => $object, 
           $ref => $r,
           $class => $class,
@@ -2511,7 +2472,7 @@ IFClsDef:
       @@@Name: refClass
       @@@Type: SWCFGString
       @@@enDesc:
-        The name of a <IF::mn|NodeRef||ManakaiDOM|Perl> class.
+        The name of a <IF::mn|NodeRef> class.
     @@Return:
       @@@Type: NodeStem
       @@@Description:
@@ -2521,7 +2482,7 @@ IFClsDef:
       @@@PerlDef:
         @@@@@:
           my $node =
-             $r = <ClassM::ManakaiNode|ManakaiNodeStem||ManakaiDOM|Perl.new>
+             $r = <ClassM::ManakaiNode|ManakaiNodeStem.new>
                     ($refClass);
           $node->{<H::swcfg21:childNodes>} = [];
         @@@@ImplNote:
@@ -2562,7 +2523,7 @@ IFClsDef:
       A reference to the node identifier.
     @@NewIn21:
     @@Get:
-      @@@Type: DISPerl|SCALAR||ManakaiDOM|all
+      @@@Type: DISPerl|SCALAR
       @@@PerlDef:
         $r = \($self->{<H::mn:node>}->{<H::mn:nodeID>});
 ##SWCFGNode
@@ -2573,8 +2534,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: ecore|Parameter
-    @@For:
-      =ManakaiDOM:all
 
 PropDef:
   @QName: fileName
@@ -3253,7 +3212,7 @@ IFClsDef:
           The newly created element. 
       @@@PerlDef:
         $r = <ClassM::ManakaiSWCFGElement.newObject>;
-        __CODE{mn|setXRefNode||ManakaiDOM|Perl::
+        __CODE{mn|setXRefNode::
           $referrer => {$r},
           $propName => {<H::swcfg21:ownerDocument>},
           $referent => {$self->{<H::mn:node>}},
@@ -3294,7 +3253,7 @@ IFClsDef:
           The newly created comment. 
       @@@PerlDef:
         $r = <ClassM::ManakaiSWCFGComment.newObject>;
-        __CODE{mn|setXRefNode||ManakaiDOM|Perl::
+        __CODE{mn|setXRefNode::
           $referrer => {$r},
           $propName => {<H::swcfg21:ownerDocument>},
           $referent => {$self->{<H::mn:node>}},
@@ -3317,7 +3276,7 @@ IFClsDef:
           The newly created document fragment node. 
       @@@PerlDef:
         $r = <ClassM::ManakaiSWCFGDocumentFragment.newObject>;
-        __CODE{mn|setXRefNode||ManakaiDOM|Perl::
+        __CODE{mn|setXRefNode::
           $referrer => {$r},
           $propName => {<H::swcfg21:ownerDocument>},
           $referent => {$self->{<H::mn:node>}},
@@ -3566,7 +3525,7 @@ IFClsDef:
   @IFQName: SWCFGChildNodeList
   @ClsQName: ManakaiSWCFGChildNodeList
 
-  @ClsISA: ManakaiNode|ManakaiNodeRef||ManakaiDOM|Perl
+  @ClsISA: ManakaiNode|ManakaiNodeRef
   @AppISA:
     @@ForCheck: ManakaiDOM|ForClass
     @@ContentType:
@@ -3620,7 +3579,7 @@ IFClsDef:
     @@NewIn21:
     @@Param:
       @@@Name:index
-      @@@Type: idl|long||ManakaiDOM|all
+      @@@Type: idl|long
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -3717,7 +3676,7 @@ IFClsDef:
         \
         }
     @@Return:
-      @@@Type: DISPerl|ARRAY||ManakaiDOM|all
+      @@@Type: DISPerl|ARRAY
       @@@PerlDef:
         tie my @list, ref $self, $self;
         $r = \@list;
@@ -3732,14 +3691,14 @@ IFClsDef:
       @@@lang:en
       @@@@:
         Redefines destructor for the class
-        <Class::ManakaiNode|ManakaiNodeRef||ManakaiDOM|Perl>, 
+        <Class::ManakaiNode|ManakaiNodeRef>, 
         since the <PerlModule::Tie::Array> also has its own empty destructor. 
     @@Return:
       @@@Def:
         @@@@ContentType:
           lang:dis
         @@@@DISPerl:cloneCode:
-          ManakaiNode|ManakaiNodeRef||ManakaiDOM|Perl.destroy
+          ManakaiNode|ManakaiNodeRef.destroy
 ##SWCFGChildNodeList
 
 PropDef:
@@ -3861,8 +3820,6 @@ ResourceDef:
     @@@:
       The special-purpose namespace to which qualified names 
       unparsed because of element type bindings belong. 
-  @For:
-    =ManakaiDOM:all
 
 PropDef:
   @QName:isShadowMaster
@@ -3885,7 +3842,7 @@ PropDef:
 
 PropDef:
   @QName:flag
-  @Type: DISPerl|HASH||ManakaiDOM|all
+  @Type: DISPerl|HASH
   @Description:
     @@lang:en
     @@@:
@@ -3894,7 +3851,7 @@ PropDef:
 
 PropDef:
   @QName:option
-  @Type: DISPerl|HASH||ManakaiDOM|all
+  @Type: DISPerl|HASH
   @Description:
     @@lang:en
     @@@:
@@ -3919,9 +3876,6 @@ ResourceDef:
   @resourceFor: ManakaiDOM|ForIF
   @resourceFor:
     @@@: ManakaiDOM|ForClass
-    @@ForCheck: ForEmpty !=ForEmpty
-  @For: ForLatest
-  @For: =ForEmpty
 
   @rdf:type:
     @@@: dx|Interface
@@ -3932,21 +3886,16 @@ ResourceDef:
     @@ForCheck: ManakaiDOM|ForClass
 
   @Implement:
-    @@@: ||ForEmpty||ManakaiDOM|ForIF
+    @@@: ||+||ManakaiDOM|ForIF
     @@ContentType: DISCore|TFPQNames
-    @@ForCheck: ManakaiDOM|ForClass ForEmpty
-  @Implement:
-    @@@: ||ForLatest||ManakaiDOM|ForIF
-    @@ContentType: DISCore|TFPQNames
-    @@ForCheck: ManakaiDOM|ForClass ForLatest
-  @dx:implementedBy: ||swcfg21|ForLatest||ManakaiDOM|ForClass
+    @@ForCheck: ManakaiDOM|ForClass
+  @dx:implementedBy: ||+||ManakaiDOM|ForClass
 
   @f:implements:
     @@@: CoreFeature21
-    @@For: ForLatest
 
   @ISA:
-    @@@: dx|Exception||ManakaiDOM|Perl
+    @@@: dx|Exception
     @@ForCheck: ManakaiDOM|ForClass
 
   @IFQName: SWCFGException
@@ -3959,12 +3908,12 @@ ResourceDef:
 
   @ResourceDef:
     @@rdf:type: DISLang|ConstGroup
-    @@ForCheck: ManakaiDOM|ForIF !=ForEmpty
+    @@ForCheck: ManakaiDOM|ForIF
 
     @@IFQName: SWCFGExceptionCode
 
-    @@rdfs:subClassOf: idl|unsignedShort||ManakaiDOM|all
-    @@Type:idl|unsignedShort||ManakaiDOM|all
+    @@rdfs:subClassOf: idl|unsignedShort
+    @@Type:idl|unsignedShort
 
     @@XConst:
       @@@Name:HIERARCHY_REQUEST_ERR
@@ -4232,30 +4181,24 @@ XPropDef:
 
 ResourceDef:
   @QName: SWCFGString
-  @AliasFor: DISPerl|String||ManakaiDOM|all
-  @For: swcfg21|ForEmpty
+  @AliasFor: DISPerl|String
 
 ResourceDef:
   @QName: boolean
-  @AliasFor: idl|boolean||ManakaiDOM|all
-  @For: swcfg21|ForEmpty
+  @AliasFor: idl|boolean
 
 ResourceDef:
   @QName: any
-  @AliasFor: idl|any||ManakaiDOM|all
-  @For: swcfg21|ForEmpty
+  @AliasFor: idl|any
 
 ResourceDef:
   @QName: unsignedLong
-  @AliasFor: idl|unsignedLong||ManakaiDOM|all
-  @For: swcfg21|ForEmpty
+  @AliasFor: idl|unsignedLong
 
 ElementTypeBinding:
   @Name: plCName
   @ElementType:
     DISPerl:exportTagName
-  @ShadowContent:
-    @@For: ManakaiDOM|Perl
 
 ## -- Load
 
@@ -4263,7 +4206,7 @@ IFClsDef:
   @IFQName: SWCFGParser
   @ClsQName: ManakaiSWCFGParser
 
-  @ClsISA: DOMException|ManakaiDefaultExceptionHandler||ManakaiDOM|Perl
+  @ClsISA: DOMException|ManakaiDefaultExceptionHandler
 
   @DISLang:role: DOMLS|ParserRole
 
@@ -4280,7 +4223,7 @@ IFClsDef:
         Parses a SuikaWikiConfig document from a resource. 
     @@Param:
       @@@Name:input
-      @@@Type: DISPerl|HASH||ManakaiDOM|all
+      @@@Type: DISPerl|HASH
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -4633,7 +4576,7 @@ IFClsDef:
       }
     @@Param:
       @@@Name: impl
-      @@@Type: c|DOMImplementation||ManakaiDOM|ManakaiDOMLatest
+      @@@Type: c|DOMImplementation
       @@@enDesc:
         An implementation object.  The <M::f|GetFeature.getFeature>
         method with parameter values <Feature::swcfg21|Core> and
@@ -4642,20 +4585,16 @@ IFClsDef:
     @@Param:
       @@@Name: features
       @@@Type: SWCFGString
-      @@@dis:actualType: f|FeaturesString||ManakaiDOM|ManakaiDOMLatest
+      @@@dis:actualType: f|FeaturesString
       @@@enDesc:
         A list of requested features.  In the current implementation
         this parameter is ignored.
     @@Return:
-      @@@Type: idl|Object||ManakaiDOM|all
+      @@@Type: idl|Object
       @@@actualType: ManakaiSWCFGParser
       @@@enDesc: The newly created parser object.
       @@@PerlDef:
-        $r = bless {<H::f|implementation> =>
-                       $impl-><M::f|GetFeature
-                                ||ManakaiDOM|ManakaiDOMLatest.getFeature>
-                          (<Q::swcfg21:Core> => '2.1')},
-                   $self;
+        $r = bless {<H::f|implementation> => $impl}, $self;
 ##SWCFGParser
 
 PropDef:
@@ -4671,9 +4610,9 @@ IFClsDef:
   @ClsQName: ManakaiSWCFGImplementation
 
   @domperl:implementedByObjectsOf:
-    c|DOMImplementation||ManakaiDOM|ManakaiDOMLatest
+    c|DOMImplementation
   @domperl:classImplementedByObjectsOf:
-    c|ManakaiDOMImplementation||ManakaiDOM|ManakaiDOMLatest
+    c|ManakaiDOMImplementation
 
   @f:provides: CoreFeature21
 
@@ -4785,11 +4724,11 @@ IFClsDef:
 
 ResourceDef:
   @QName: NodeStem
-  @AliasFor: ManakaiNode|NodeStem||ManakaiDOM|Perl
+  @AliasFor: ManakaiNode|NodeStem
 
 ResourceDef:
   @QName: NodeRef
-  @AliasFor: ManakaiNode|NodeRef||ManakaiDOM|Perl
+  @AliasFor: ManakaiNode|NodeRef
 
 ## -- Syntax sugar
 
@@ -4800,11 +4739,6 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       rdf:Property
-    @@AliasFor:
-      @@@@:
-        ::ManakaiDOM:all
-      @@@For:
-        !=ManakaiDOM:all
 
 ElementTypeBinding:
   @Name: IFQName
@@ -4841,7 +4775,6 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       DISLang:Method
-    @@For: !=ForEmpty
 
 ElementTypeBinding:
   @Name: IntMethod
@@ -5096,7 +5029,6 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       DISLang:Attribute
-    @@For: !=ForEmpty
 
 ElementTypeBinding:
   @Name: RedefAttr
@@ -5212,7 +5144,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: ecore|Parameter
-    @@For: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: ConstValue

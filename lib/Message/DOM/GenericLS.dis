@@ -13,7 +13,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/12/30 08:27:45 $
+    $Date: 2006/12/30 12:00:39 $
 
   @Require:
     @@Module: 
@@ -71,7 +71,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: f|Feature
-    @@For: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: FeatureVerDef
@@ -278,7 +277,7 @@ IFClsDef:
         \
         }
     @@Return:
-      @@@Type: idl|Object||ManakaiDOM|all
+      @@@Type: idl|Object
       @@@enDesc:
         The newly created parser object, which supports
         the features requested by the <P::features> parameter.
@@ -351,7 +350,7 @@ IFClsDef:
         \
         }
     @@Return:
-      @@@Type: idl|Object||ManakaiDOM|all
+      @@@Type: idl|Object
       @@@enDesc:
         The newly created serializer object, which supports
         the features requested by the <P::features> parameter.
@@ -433,14 +432,12 @@ ElementTypeBinding:
 ResourceDef:
   @QName: gls|ParserRole
   @rdf:type: DISLang|Role
-  @For: =ManakaiDOM|all
   @enDesc:
     Classes playing this role are parsers and 
     may be instantiated via the <M::ManakaiGLSImplementation
     .createGLSParser> method.
 
 ResourceDef:
-  @For: =ManakaiDOM|all
   @QName: DOMLS|ParserRole
   @AliasFor: gls|ParserRole
 
@@ -449,7 +446,6 @@ ResourceDef:
 ResourceDef:
   @QName: gls|SerializerRole
   @rdf:type: DISLang|Role
-  @For: =ManakaiDOM|all
   @enDesc:
     Classes playing this role are serializers and 
     may be instantiated via the <M::ManakaiGLSImplementation
@@ -458,4 +454,3 @@ ResourceDef:
 ResourceDef:
   @QName: DOMLS|SerializerRole
   @AliasFor: gls|SerializerRole
-  @For: =ManakaiDOM|all

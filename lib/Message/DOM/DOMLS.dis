@@ -21,7 +21,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date:
-    $Date: 2006/12/30 08:27:45 $
+    $Date: 2006/12/30 12:00:38 $
 
   @Require:
     @@Module:
@@ -96,7 +96,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: f|Feature
-    @@For: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: FeatureVerDef
@@ -301,7 +300,7 @@ ResourceDef:
     @@@: LSAsyncFeature30
 
   @DISPerl:ISA:
-    @@@: dx|Exception||ManakaiDOM|Perl
+    @@@: dx|Exception
     @@ForCheck: ManakaiDOM|ForClass
 
   @IFQName: LSException
@@ -323,7 +322,7 @@ ResourceDef:
   @Attr:
      @@Name:  code
      @@Get:
-        @@@Type: idl|unsignedShort||ManakaiDOM|all
+        @@@Type: idl|unsignedShort
         @@@actualType: LSExceptionCode
      @@ForCheck: ManakaiDOM|ForIF
 
@@ -333,8 +332,8 @@ ResourceDef:
 
     @@QName: LSExceptionCode
 
-    @@rdfs:subClassOf: idl|unsignedShort||ManakaiDOM|all
-    @@Type: idl|unsignedShort||ManakaiDOM|all
+    @@rdfs:subClassOf: idl|unsignedShort
+    @@Type: idl|unsignedShort
 
     @@enDesc:
       An integer indicating the type of error generated.
@@ -560,8 +559,8 @@ IFCls3Def:
     @@ForCheck: ManakaiDOM|ForIF
     @@QName: DOMImplementationLSMode
 
-    @@rdfs:subClassOf: idl|unsignedShort||ManakaiDOM|all
-    @@Type: idl|unsignedShort||ManakaiDOM|all
+    @@rdfs:subClassOf: idl|unsignedShort
+    @@Type: idl|unsignedShort
 
      @@Description:
        @@@lang:en
@@ -587,7 +586,7 @@ IFCls3Def:
       Creates a new <IF::LSParser>.
     @@Param:
       @@@Name: mode
-      @@@Type: idl|unsignedShort||ManakaiDOM|all
+      @@@Type: idl|unsignedShort
       @@@dis:actualType: DOMImplementationLSMode
       @@@enDesc:
         The mode of the parser.
@@ -887,7 +886,7 @@ IFDef:
      @@Name:  async
      @@Get:
         @@@Type:
-           DOMMain:boolean||ManakaiDOM|all
+           DOMMain:boolean
         @@@InCase:
            @@@@Value:  true
            @@@@Description:
@@ -904,7 +903,7 @@ IFDef:
      @@Name:  busy
      @@Get:
         @@@Type:
-           DOMMain:boolean||ManakaiDOM|all
+           DOMMain:boolean
         @@@InCase:
            @@@@Value:  true
            @@@@Description:
@@ -1015,8 +1014,8 @@ IFDef:
   @ConstGroup:
     @@QName: ACTION_TYPES
 
-    @@rdfs:subClassOf: idl|unsignedShort||ManakaiDOM|all
-    @@Type: idl|unsignedShort||ManakaiDOM|all
+    @@rdfs:subClassOf: idl|unsignedShort
+    @@Type: idl|unsignedShort
 
      @@Description:
        @@@lang:en
@@ -1050,7 +1049,7 @@ IFDef:
      @@Param:
         @@@Name:  action
         @@@Type:
-           DOMMain:unsigned-short||ManakaiDOM|all
+           DOMMain:unsigned-short
      @@Return:
         @@@Type:  Node
         @@@ImplNote:
@@ -1182,7 +1181,7 @@ IFCls3Def:
      @@Set:
        @@@InCase:
          @@@@Type:
-           DISPerl:SCALAR::ManakaiDOM:all
+           DISPerl:SCALAR
          @@@@Description:
            @@@@@lang:en
            @@@@@@:
@@ -1209,7 +1208,7 @@ IFCls3Def:
      @@Type:
        DOMMain:DOMString
      @@actualType:
-       DOMMain:SystemID||ManakaiDOM|all
+       DOMMain:SystemID
      @@Get:
         @@@PerlDef:
           $r = $self->{system_id};
@@ -1228,7 +1227,7 @@ IFCls3Def:
      @@Type:
        DOMMain:DOMString
      @@actualType:
-       DOMMain:PublicID::ManakaiDOM:all
+       DOMMain:PublicID
      @@Get:
         @@@PerlDef:
           $r = $self->{public_id};
@@ -1307,7 +1306,7 @@ IFCls3Def:
      @@Name:  certifiedText
      @@Get:
         @@@Type:
-           DOMMain:boolean||ManakaiDOM|all
+           DOMMain:boolean
         @@@InCase:
            @@@@Value:  true
         @@@InCase:
@@ -1316,7 +1315,7 @@ IFCls3Def:
           $r = $self->{certified_text};
      @@Set:
         @@@Type:
-           DOMMain:boolean||ManakaiDOM|all
+           DOMMain:boolean
         @@@InCase:
            @@@@Value:  true
            @@@@Description:
@@ -1388,7 +1387,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: rdf|Property
-    @@For: =ManakaiDOM|all
 
 ErrDef:
   @QName: DOMLS|relative-uri
@@ -1511,7 +1509,7 @@ IFCls3Def:
     @@Param:
       @@@Name: publicId
       @@@Type: DOMMain|DOMString
-      @@@dis:actualType: DOMMain|PublicID||ManakaiDOM|all
+      @@@dis:actualType: DOMMain|PublicID
       @@@enDesc:
         The public identifier of the external entity being referenced.
       @@@nullCase:
@@ -1521,7 +1519,7 @@ IFCls3Def:
     @@Param:
       @@@Name: systemId
       @@@Type: DOMMain|DOMString
-      @@@dis:actualType: DOMMain|SystemID||ManakaiDOM|all
+      @@@dis:actualType: DOMMain|SystemID
       @@@enDesc:
         The system identifier or RFC 2396 URI reference of the
         external resource being referenced.
@@ -1571,8 +1569,8 @@ IFDef:
         Constants returned by startElement and acceptNode
         @@@lang:  en
 
-    @@rdfs:subClassOf: idl|short||ManakaiDOM|all
-    @@Type: idl|short||ManakaiDOM|all
+    @@rdfs:subClassOf: idl|short
+    @@Type: idl|short
 
      @@Const:
         @@@Name:  FILTER_ACCEPT
@@ -1601,7 +1599,7 @@ IFDef:
         @@@Type:  Element
      @@Return:
         @@@Type:
-           DOMMain:unsigned-short||ManakaiDOM|all
+           DOMMain:unsigned-short
         @@@actualType: FilterReturnValue
   @Method:
      @@Name:  acceptNode
@@ -1610,13 +1608,13 @@ IFDef:
         @@@Type:  Node
      @@Return:
         @@@Type:
-           DOMMain:unsigned-short||ManakaiDOM|all
+           DOMMain:unsigned-short
         @@@actualType: FilterReturnValue
   @Attr:
      @@Name:  whatToShow
      @@Get:
         @@@Type:
-           DOMMain:unsigned-long||ManakaiDOM|all
+           DOMMain:unsigned-long
 
 IFDef:
   @Name:  LSSerializer
@@ -1834,7 +1832,7 @@ IFDef:
             The destination.
      @@Return:
         @@@Type:
-           DOMMain:boolean||ManakaiDOM|all
+           DOMMain:boolean
         @@@InCase:
            @@@@Value:  true
            @@@@Description:
@@ -1890,7 +1888,7 @@ IFDef:
           @@@@@:The URI to write to.
      @@Return:
         @@@Type:
-           DOMMain:boolean||ManakaiDOM|all
+           DOMMain:boolean
         @@@InCase:
            @@@@Value:  true
            @@@@Description:
@@ -2039,7 +2037,7 @@ IFCls3Def:
      @@Type:
        DOMMain:DOMString
      @@actualType:
-       DOMMain:SystemID||ManakaiDOM|all
+       DOMMain:SystemID
      @@Get:
         @@@PerlDef:
           $r = $self->{systemId};
@@ -2115,12 +2113,12 @@ IFDef:
      @@Name:  position
      @@Get:
         @@@Type:
-           DOMMain:unsigned-long||ManakaiDOM|all
+           DOMMain:unsigned-long
   @Attr:
      @@Name:  totalSize
      @@Get:
         @@@Type:
-           DOMMain:unsigned-long||ManakaiDOM|all
+           DOMMain:unsigned-long
 IFDef:
   @Name:  LSLoadEvent
 #  @ISA:
@@ -2147,7 +2145,7 @@ IFDef:
      @@Name:  whatToShow
      @@Get:
         @@@Type:
-           DOMMain:unsigned-long||ManakaiDOM|all
+           DOMMain:unsigned-long
 
 ElementTypeBinding:
   @Name: ErrDef
@@ -2434,13 +2432,10 @@ ElementTypeBinding:
       @@@@: DOMCore|DOMConfigurationParameter
     @@rdf:type:
       @@@@: DISSource|ResourceProperty
-      @@@For: =ManakaiDOM|all
     @@subsetOf:
       @@@@: c|anyDOMConfigurationParameter
-      @@@For: =ManakaiDOM|all
     @@multipleProperties:
       @@@@: DISCore|Single
-      @@@For: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: CParamApp
@@ -2459,17 +2454,13 @@ ElementTypeBinding:
       @@@@: DOMCore|DOMConfigurationParameter
     @@rdf:type:
       @@@@: DISSource|ResourceProperty
-      @@@For: =ManakaiDOM|all
-    @@Type: idl|boolean||ManakaiDOM|all
+    @@Type: idl|boolean
     @@subsetOf:
       @@@@: c|anyDOMConfigurationParameter
-      @@@For: =ManakaiDOM|all
     @@multipleProperties:
       @@@@: DISCore|Single
-      @@@For: =ManakaiDOM|all
     @@dataType: 
       @@@@: DISCore|Boolean
-      @@@For: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: TrueCase
@@ -2482,7 +2473,7 @@ ElementTypeBinding:
       @@@@: 1
       @@@ContentType: DISCore|Boolean
     @@Type:
-      DOMMain:boolean::ManakaiDOM:all
+      DOMMain:boolean
 
 ElementTypeBinding:
   @Name: FalseCase
@@ -2495,7 +2486,7 @@ ElementTypeBinding:
       @@@@: 0
       @@@ContentType: DISCore|Boolean
     @@Type:
-      DOMMain:boolean::ManakaiDOM:all
+      DOMMain:boolean
 
 ElementTypeBinding:
   @Name: boolValue
@@ -2522,8 +2513,6 @@ ElementTypeBinding:
   @Name: nodeProp
   @ElementType:
     tc:nodeStemKey
-  @ShadowContent:
-    @@For: =ManakaiDOM|all
 
 CParamApp:
   @QName: DOMLS|canonical-form.parser
@@ -2746,7 +2735,7 @@ CParam:
       @@@dis:actualType: DOMMain|DOMString
       @@@enDesc: The new value.
     @@Return:
-      @@@Type: idl|void||ManakaiDOM|all
+      @@@Type: idl|void
       @@@PerlCDef:
         $self->[1]->{<H::DOMLS:resource-resolver>} = $value;
 
@@ -2800,7 +2789,7 @@ CParamApp:
       @@@dis:actualType: DOMMain|DOMString
       @@@enDesc: The new value.
     @@Return:
-      @@@Type: idl|void||ManakaiDOM|all
+      @@@Type: idl|void
       @@@PerlCDef: \
 
 CParamApp:

@@ -15,19 +15,15 @@ Module:
   @License: license|Perl+MPL
 
   @Date:
-    $Date: 2006/12/30 08:27:51 $
+    $Date: 2006/12/30 12:00:44 $
   
   @Require:
     @@Module:
       @@@QName: DIS|common
     @@Module:
       @@@QName: Util|PerlCode
-      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
     @@Module:
       @@@QName: DIS|Perl
-      @@@WithFor: DIS|ForLatest
-
-  @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
 Namespace:
   @c:
@@ -95,7 +91,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: f|Feature
-    @@For: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: FeatureVerDef
@@ -390,7 +385,7 @@ IFClsDef:
   @IFISA: Element
   @ClsISA: te|ManakaiDOMElement
 
-  @s:elementType: AnyDPGElementType||ManakaiDOM|all
+  @s:elementType: AnyDPGElementType
 
   @enDesc:
     The <IF::DPGElement> interface <kwd:MUST> be implemented by
@@ -462,7 +457,7 @@ IFClsDef:
       @@@enDesc:
         The name of the attribute.
     @@Return:
-      @@@Type: DISPerl|ARRAY||ManakaiDOM|all
+      @@@Type: DISPerl|ARRAY
       @@@enDesc:
         A reference to a snapshot list of the attribute values.
 
@@ -528,13 +523,13 @@ IFClsETDef:
         belong to the document.
     @@NamedParam:
       @@@Name: disResource
-      @@@Type: dp|DISResourcePerl||DIS|ForLatest
+      @@@Type: dp|DISResourcePerl
       @@@enDesc:
         The <QUOTE::dis> resource object against which <Q::lang:Perl>
         code fragments, if any, are evaluated and converted into Perl code.
     @@NamedParam:
       @@@Name: contextObject
-      @@@Type: DIS|NSResolverDIS||DIS|ForLatest
+      @@@Type: DIS|NSResolverDIS
       @@@enDesc:
         The context where various references, such as namespace prefixes
         and relative URI references, are evaluated.  It <kwd:MUST> implement
@@ -2066,7 +2061,7 @@ IFClsETDef:
                 }
 
                 my $plcode = $opt{dis_resource}
-                               -><M::dp|DISResourcePerl||DIS|ForLatest
+                               -><M::dp|DISResourcePerl
                                                 .plPreprocessPerlCode>
                                  ($codeDocument, $source,
                                   namespace_context => $opt{ns_context});
@@ -2584,7 +2579,7 @@ IFClsDef:
   @IFQName: DPGParser
   @ClsQName: ManakaiDPGParser
 
-  @Implement: ecore|MUErrorTarget||ManakaiDOM|Perl
+  @Implement: ecore|MUErrorTarget
 
   @enDesc:
     A <IF::DPGParser> object parses a DPG source document and 
@@ -2687,7 +2682,7 @@ IFClsDef:
         The text to parse.
     @@Param:
       @@@Name: namespaceContext
-      @@@Type: DIS|NSResolverDIS||DIS|ForLatest
+      @@@Type: DIS|NSResolverDIS
       @@@enDesc:
         The namespace prefix resolver against which <P::sourceText>
         is evaluated.
@@ -2724,7 +2719,7 @@ IFClsDef:
     @@enDesc:
       Returns the next character.
     @@Return:
-      @@@Type: idl|long||ManakaiDOM|all
+      @@@Type: idl|long
       @@@enDesc:
         The code position number of the next character, if any,
         or <CODE::-2>.
@@ -2797,7 +2792,7 @@ IFClsDef:
     @@ManakaiDOM:isForInternal: 1
     @@Operator: ManakaiDOM|MUErrorHandler
     @@enDesc:
-      When a <IF::ecore|ErrorInterface||ManakaiDOM|Perl> is <Perl::report>ed,
+      When a <IF::ecore|ErrorInterface> is <Perl::report>ed,
       then this method is invoked.
       
       The method calls the <cfg::c|error-handler> if the error is of 
@@ -2805,7 +2800,7 @@ IFClsDef:
       corresponding <Perl::catch> clause, if any, can catch the error.
     @@Param:
       @@@Name: err
-      @@@Type: ecore|ErrorInterface||ManakaiDOM|Perl
+      @@@Type: ecore|ErrorInterface
       @@@enDesc:
         The reported error object.
     @@Return:
@@ -2830,7 +2825,7 @@ IFClsDef:
             } # A
           }__;
         } else {
-          $err-><M::ecore|ErrorInterface||ManakaiDOM|Perl.throw>;
+          $err-><M::ecore|ErrorInterface.throw>;
         }
 
   @DISPerl:dpgDef:
@@ -3312,7 +3307,7 @@ IFClsDef:
           my ($prefix, $lname) = split /:/, $name;
           ($prefix, $lname) = (null, $prefix) unless defined $lname;
           my $nsuri = $self->{nsresolver}
-                           -><M::DIS|NSResolverDIS||DIS|ForLatest
+                           -><M::DIS|NSResolverDIS
                                 .prefixToURI> ($prefix);
           $embed = $doc-><M::Document.createElementNS>
                                (<Q::pg:>, 'embedStatement');
@@ -3670,7 +3665,6 @@ ElementTypeBinding:
       @@@@: c|DOMConfigurationParameter
     @@rdf:type:
       @@@@: DISCore|Property
-      @@@For: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: CParamApp
@@ -3681,7 +3675,6 @@ ElementTypeBinding:
       @@@@: c|DOMConfigurationParameterApplication
     @@rdf:type:
       @@@@: DISCore|Property
-      @@@For: =ManakaiDOM|all
 
 CParamApp:
   @c:domConfigurationParameter: c|error-handler
@@ -3790,7 +3783,7 @@ ResourceDef:
     @@@: DIS|DPG10
 
   @DISPerl:ISA:
-    @@@: dx|Exception||ManakaiDOM|Perl
+    @@@: dx|Exception
     @@ForCheck: ManakaiDOM|ForClass
 
   @IFQName: DPGException
@@ -3809,7 +3802,7 @@ ResourceDef:
   @Attr:
     @@Name: code
     @@Get:
-      @@@Type: idl|unsignedShort||ManakaiDOM|all
+      @@@Type: idl|unsignedShort
       @@@dis:actualType: DPGExceptionCode
     @@ForCheck: ManakaiDOM|ForIF
 
@@ -3819,8 +3812,8 @@ ResourceDef:
 
     @@QName: DPGExceptionCode
 
-    @@subsetOf: idl|unsignedShort||ManakaiDOM|all
-    @@Type: idl|unsignedShort||ManakaiDOM|all
+    @@subsetOf: idl|unsignedShort
+    @@Type: idl|unsignedShort
 
     @@enDesc:
       An integer indicating the type of error generated.
@@ -3849,7 +3842,7 @@ IFClsDef:
   @IFQName: DPGExceptionFormatter
   @ClsQName: ManakaiDPGExceptionFormatter
 
-  @ClsISA: ecore|MUErrorFormatter||ManakaiDOM|Perl
+  @ClsISA: ecore|MUErrorFormatter
 
   @RuleDef:
     @@Name: dpg-error-token-type

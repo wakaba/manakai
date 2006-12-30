@@ -24,9 +24,11 @@ Module:
       @@@Year:2004
       @@@DISCore:author: DISCore|Wakaba
   @Date:
-    $Date: 2006/12/30 08:27:51 $
+    $Date: 2006/12/30 12:00:44 $
   
   @Require:
+    @@Module:
+      @@@QName: Util|common
     @@Module:
       @@@QName: MDOM|DOMCore
     @@Module:
@@ -80,20 +82,6 @@ Namespace:
   @Util:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/
 
-## -- Module sets
-
-ResourceDef:
-  @QName: Util|
-  @rdf:type: dis|ModuleGroup
-  @FullName:
-    @@lang:en
-    @@@:
-      Manakai support modules
-  @DISPerl:packageName:
-    Message::Util::
-  @DISPerl:interfacePackageName:
-    Message::Util::IF::
-
 ## -- Features
 
 ElementTypeBinding:
@@ -102,7 +90,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: f|Feature
-    @@For: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: FeatureVerDef
@@ -234,8 +221,8 @@ IFClsDef:
 
   @CISA: te|ManakaiDOMElement
 
-  @s:elementType: AnyPCElement||ManakaiDOM|all
-  @s:elementType: AnyPC2Element||ManakaiDOM|all
+  @s:elementType: AnyPCElement
+  @s:elementType: AnyPC2Element
 
   @enDesc:
     A class on which another Perl code classes are constructed based. 
@@ -307,7 +294,7 @@ IFClsDef:
     @@Param:
       @@@Name: originalVariable
       @@@Type:
-        lang:Perl::ManakaiDOM:all
+        lang:Perl
       @@@enDesc:
         Original variable specification, including prefix. 
         \
@@ -317,7 +304,7 @@ IFClsDef:
     @@Param:
       @@@Name: newValue
       @@@Type: 
-        DOMMain:any::ManakaiDOM:all
+        DOMMain:any
       @@@enDesc:
         New value to replace.
       @@@InCase:
@@ -326,7 +313,7 @@ IFClsDef:
           New Perl code fragment to replace by.
       @@@InCase:
         @@@@Type:
-          lang:Perl::ManakaiDOM:all
+          lang:Perl
         @@@@enDesc:
           Inline Perl code fragment string to replace by.
     @@Return:
@@ -544,7 +531,7 @@ IFClsDef:
       by this code fragment, including all descendant nodes
       except <Q::pc:package> nodes and their descendant nodes. 
     @@Return:
-      @@@Type: DISPerl|ARRAY||ManakaiDOM|all
+      @@@Type: DISPerl|ARRAY
       @@@enDesc:
         A list of module names.  Note that the list is <EM::dead>; 
         any modification to it does not affect to the code fragment
@@ -565,7 +552,7 @@ IFClsDef:
       by this code fragment, including all descendant nodes
       except <Q::pc:package> nodes and their descendant nodes. 
     @@Return:
-      @@@Type: DISPerl|HASH||ManakaiDOM|all
+      @@@Type: DISPerl|HASH
       @@@enDesc:
         A list of module names.  Note that the list is <EM::dead>; 
         any modification to it does not affect to the code fragment
@@ -590,7 +577,7 @@ IFClsDef:
       Returns a list of Perl modules names that is <Perl::require>d
       by this code fragment, including all descendant nodes. 
     @@Return:
-      @@@Type: DISPerl|ARRAY||ManakaiDOM|all
+      @@@Type: DISPerl|ARRAY
       @@@enDesc:
         A list of module names.  Note that the list is <EM::dead>; 
         any modification to it does not affect to the code fragment
@@ -610,7 +597,7 @@ IFClsDef:
       Returns a list of Perl exception interface package names 
       by this code fragment, including all descendant nodes. 
     @@Return:
-      @@@Type: DISPerl|ARRAY||ManakaiDOM|all
+      @@@Type: DISPerl|ARRAY
       @@@enDesc:
         A list of package names.  Note that the list is <EM::dead>; 
         any modification to it does not affect to the code fragment
@@ -650,7 +637,7 @@ IFClsDef:
       Returns a list of <QUOTE::dis> resource URI references that is
       <Perl::require>d by this code fragment, including all descendant nodes. 
     @@Return:
-      @@@Type: DISPerl|ARRAY||ManakaiDOM|all
+      @@@Type: DISPerl|ARRAY
       @@@enDesc:
         A list of resource URI references.  Note that the list is <EM::dead>; 
         any modification to it does not affect to the code fragment
@@ -818,7 +805,6 @@ ResourceDef:
   @AppName:
     @@@: pc|*
     @@ContentType: DISCore|QName
-  @ForCheck: =ManakaiDOM|all
 
 ResourceDef:
   @QName: AnyPC2Element
@@ -826,7 +812,6 @@ ResourceDef:
   @AppName:
     @@@: pc2|*
     @@ContentType: DISCore|QName
-  @ForCheck: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: ETQName
@@ -884,7 +869,7 @@ IFClsETDef:
         The fully-qualified name of the package to get. 
     @@NamedParam:
       @@@Name: makeNewPackage
-      @@@Type: idl|boolean||ManakaiDOM|all
+      @@@Type: idl|boolean
       @@@enDesc:
         Whether a new package scope object should be created if 
         no package of <P::packageName> found. 
@@ -1074,7 +1059,7 @@ ElementTypeBinding:
 
 ResourceDef:
   @QName: DOMString
-  @AliasFor: DOMMain|DOMString||ManakaiDOM|ManakaiDOMLatest
+  @AliasFor: DOMMain|DOMString
 
 ReflectTypeDef:
   @QName: CDATADOMString
@@ -1226,7 +1211,7 @@ IFClsETDef:
         The name of subroutine to get. 
     @@NamedParam:
       @@@Name: makeNewNode
-      @@@Type: idl|boolean||ManakaiDOM|all
+      @@@Type: idl|boolean
       @@@enDesc:
         Whether a new subroutine object should be created, 
         if it is not exist, or not. 
@@ -1286,7 +1271,7 @@ IFClsETDef:
     @@enDesc:
       Returns a list of names of packages extended by the package.
     @@Return:
-      @@@Type: DISPerl|ARRAY||ManakaiDOM|all
+      @@@Type: DISPerl|ARRAY
       @@@enDesc:
         An ordered snapshot list of superpackage names.
       @@@PerlDef:
@@ -1320,7 +1305,7 @@ IFClsETDef:
       Returns a snapshot list of the package names
       of the classes extending this class.
     @@Return:
-      @@@Type: DISPerl|ARRAY||ManakaiDOM|all
+      @@@Type: DISPerl|ARRAY
       @@@enDesc:
         An ordered snapshot list of superpackage names.
       @@@PerlDef:
@@ -1353,7 +1338,7 @@ IFClsETDef:
     @@enDesc:
       Returns a list of names of packages implemented by the package.
     @@Return:
-      @@@Type: DISPerl|ARRAY||ManakaiDOM|all
+      @@@Type: DISPerl|ARRAY
       @@@enDesc:
         An unordered snapshot list of interface packages.
       @@@PerlDef:
@@ -1478,7 +1463,7 @@ IFClsETDef:
     @@enDesc:
       Returns a list of export tag and names.
     @@Return:
-      @@@Type: DISPerl|HASH||ManakaiDOM|all
+      @@@Type: DISPerl|HASH
       @@@enDesc:
         Snapshot list of lists.
       @@@PerlDef:
@@ -1748,7 +1733,7 @@ IFClsETDef:
     @@enDesc:
       Returns a list of names of the subroutine.
     @@Return:
-      @@@Type: DISPerl|ARRAY||ManakaiDOM|all
+      @@@Type: DISPerl|ARRAY
       @@@enDesc:
         An unordered snapshot list of names.
       @@@PerlDef:
@@ -1769,7 +1754,7 @@ IFClsETDef:
       @@@Type: DOMString
       @@@enDesc: The name.
     @@Return:
-      @@@Type: idl|boolean||ManakaiDOM|all
+      @@@Type: idl|boolean
       @@@PerlDef:
         __DEEP{
           my $l;
@@ -1819,7 +1804,7 @@ IFClsETDef:
     @@enDesc:
       Returns a list of operators of the subroutine.
     @@Return:
-      @@@Type: DISPerl|ARRAY||ManakaiDOM|all
+      @@@Type: DISPerl|ARRAY
       @@@enDesc:
         An unordered snapshot list of operators.
       @@@PerlDef:
@@ -1840,7 +1825,7 @@ IFClsETDef:
       @@@Type: DOMString
       @@@enDesc: The operator.
     @@Return:
-      @@@Type: idl|boolean||ManakaiDOM|all
+      @@@Type: idl|boolean
       @@@PerlDef:
         __DEEP{
           my $l;
@@ -1919,7 +1904,7 @@ IFClsETDef:
 
   @NumValMethod:
     @@Return:
-      @@@Type: idl|unsignedLong||ManakaiDOM|all
+      @@@Type: idl|unsignedLong
       @@@PerlDef:
           __DEEP{
             $r = 0 + $self-><AG::Node.lastChild>;
@@ -2020,7 +2005,7 @@ IFClsETDef:
 
   @NumValMethod:
     @@Return:
-      @@@Type: idl|unsignedLong||ManakaiDOM|all
+      @@@Type: idl|unsignedLong
       @@@enDesc:
         Numeric value of the Perl code. 
       @@@PerlDef:
@@ -2303,7 +2288,7 @@ IFClsETDef:
 
 ResourceDef:
   @QName: unsignedLong
-  @AliasFor: idl|unsignedLong||ManakaiDOM|all
+  @AliasFor: idl|unsignedLong
 
 IFClsETDef:
   @IFQName: PerlTokens
@@ -2338,7 +2323,7 @@ IFClsETDef:
   
   @NumValMethod:
     @@Return:
-      @@@Type: idl|unsignedLong||ManakaiDOM|all
+      @@@Type: idl|unsignedLong
       @@@enDesc:
         Numeric value of the Perl code. 
       @@@PerlDef:
@@ -2479,7 +2464,7 @@ IFClsDef:
     @@Name: length
     @@enDesc:
       The number of child code fragments. 
-    @@Type: idl|unsignedLong||ManakaiDOM|all
+    @@Type: idl|unsignedLong
     @@Get:
       @@@PerlDef:
           __DEEP{
@@ -3124,7 +3109,7 @@ IFClsETDef:
     @@Name: operandNumber
     @@enDesc:
       The number of operands.
-    @@Type: idl|unsignedLong||ManakaiDOM|all
+    @@Type: idl|unsignedLong
     @@Get:
       @@@PerlDef:
         __DEEP{
@@ -3495,7 +3480,7 @@ IFClsETDef:
       Returns a <IF::PCWhen> by its ordinal index.
     @@Param:
       @@@Name: index
-      @@@Type: idl|unsignedLong||ManakaiDOM|all
+      @@@Type: idl|unsignedLong
       @@@enDesc:
         The ordinal index of the <Q::pc|when> element.
     @@Return:
@@ -4134,7 +4119,7 @@ CParam:
   @nodeProp: pcsres
   @IsSupportRequired:1
   @c:targetType: tc|Document
-  @Type: DISPerl|CODE||ManakaiDOM|all
+  @Type: DISPerl|CODE
   @enDesc:
     Splits module file.  The parameter value <kwd:MUST> be
     a Perl code reference.  The serializer would invoke
@@ -4152,8 +4137,6 @@ ElementTypeBinding:
   @Name: nodeProp
   @ElementType:
     tc:nodeStemKey
-  @ShadowContent:
-    @@For: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: CParam
@@ -4164,7 +4147,6 @@ ElementTypeBinding:
       @@@@: c|DOMConfigurationParameter
     @@rdf:type:
       @@@@: DISCore|Property
-      @@@For: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: boolCParam
@@ -4175,8 +4157,7 @@ ElementTypeBinding:
       @@@@: c|DOMConfigurationParameter
     @@rdf:type:
       @@@@: DISCore|Property
-      @@@For: =ManakaiDOM|all
-    @@Type: idl|boolean||ManakaiDOM|all
+    @@Type: idl|boolean
 
 ## -- PCDocument
 
@@ -4222,20 +4203,20 @@ IFClsDef:
         }
     @@Param:
       @@@Name: value
-      @@@Type: DISPerl|Any||ManakaiDOM|all
+      @@@Type: DISPerl|Any
       @@@enDesc:
         The value.
       @@@InCase:
-        @@@@Type: DISPerl|String||ManakaiDOM|all
+        @@@@Type: DISPerl|String
         @@@@enDesc:
           A <IF::PerlStringLiteral> whose value is <P::value> is created.
       @@@InCase:
-        @@@@Type: DISPerl|ARRAY||ManakaiDOM|all
+        @@@@Type: DISPerl|ARRAY
         @@@@enDesc:
           A <IF::PCArrayRefLiteral> is created.  If <P::value>
           has items, then objects are recursively created.
       @@@InCase:
-        @@@@Type: DISPerl|HASH||ManakaiDOM|all
+        @@@@Type: DISPerl|HASH
         @@@@enDesc:
           A <IF::PCHashRefLiteral> is created.  If <P::value>
           has key-value pairs, then objects are recursively created.
@@ -4648,7 +4629,7 @@ IFClsDef:
     @@enDesc:
       Returns a set of definitions for autoloading.
     @@Return:
-      @@@Type: DISPerl|HASH||ManakaiDOM|all
+      @@@Type: DISPerl|HASH
       @@@PerlDef:
         __DEEP{
           my $file = $self->document_element;
@@ -4713,7 +4694,7 @@ IFClsDef:
 
   @domperl:implementedByObjectsOf: DOMImpl
   @domperl:classImplementedByObjectsOf: 
-    c|ManakaiDOMImplementation||ManakaiDOM|ManakaiDOMLatest
+    c|ManakaiDOMImplementation
 
   @f:provides: pc|CoreFeature10
 
@@ -4834,7 +4815,7 @@ IFClsDef:
       Returns RFC 3339 <CODE::date-time> representation of a date. 
     @@Param:
       @@@Name: perlDate
-      @@@Type: idl|unsignedLong||ManakaiDOM|all
+      @@@Type: idl|unsignedLong
       @@@enDesc:
         A Perl representation of date. 
     @@Return:
@@ -4854,7 +4835,7 @@ IFClsDef:
       Returns date for version. 
     @@Param:
       @@@Name: perlDate
-      @@@Type: idl|unsignedLong||ManakaiDOM|all
+      @@@Type: idl|unsignedLong
       @@@enDesc:
         A Perl representation of date. 
     @@Return:
@@ -4872,7 +4853,7 @@ IFClsDef:
       Perl code representation. 
     @@Param:
       @@@Name: val
-      @@@Type: DISPerl|Any||ManakaiDOM|all
+      @@@Type: DISPerl|Any
       @@@enDesc:
         A Perl value. 
     @@Return:
@@ -4907,7 +4888,7 @@ IFClsDef:
       Perl code representation of a list. 
     @@Param:
       @@@Name: val
-      @@@Type: DISPerl|ARRAY||ManakaiDOM|all
+      @@@Type: DISPerl|ARRAY
       @@@enDesc:
         A Perl array reference. 
     @@Return:
@@ -5085,7 +5066,7 @@ ElementTypeBinding:
       @@@@:1
       @@@ContentType: DISCore|Boolean
     @@Type:
-      DOMMain:boolean::ManakaiDOM:all
+      DOMMain:boolean
 
 
 ElementTypeBinding:
@@ -5099,7 +5080,7 @@ ElementTypeBinding:
       @@@@:0
       @@@ContentType: DISCore|Boolean
     @@Type:
-      DOMMain:boolean::ManakaiDOM:all
+      DOMMain:boolean
 
 ElementTypeBinding:
   @Name: enDesc

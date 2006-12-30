@@ -15,7 +15,7 @@ Module:
       This module provides DOM basic types such as <TYPE::DOMString>
       and classes and properties to describe common DOM concept
       such as <TYPE::ManakaiDOM:ManakaiDOMURI> and
-      <TFQ::reflectGet::ManakaiDOM:all>.  In addition,
+      <TFQ::reflectGet>.  In addition,
       it provides the <Class::DOMImplementationRegistry>
       object from which DOM applications can obtain
       various DOM implementations.
@@ -23,7 +23,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/12/30 08:27:45 $
+    $Date: 2006/12/30 12:00:38 $
   
   @Require:
     @@Module:
@@ -98,10 +98,9 @@ ElementTypeBinding:
     @@rdf:type:
       rdfs:Class
     @@rdfs:subClassOf:
-      rdfs:Class::ManakaiDOM:all
+      rdfs:Class
     @@subsetOf:
-      rdfs:Class::ManakaiDOM:all
-    @@For: =ManakaiDOM|all
+      rdfs:Class
 
 ElementTypeBinding:
   @Name: PropDef
@@ -110,7 +109,6 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       rdf:Property
-    @@For: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: Attr
@@ -183,9 +181,8 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISCore|LexicalType
-    @@For: =ManakaiDOM|all
     @@rdfs:subClassOf:
-      DISCore:String::ManakaiDOM:all
+      DISCore:String
 
 ElementTypeBinding:
   @Name: Return
@@ -261,7 +258,7 @@ ResourceDef:
       An absolute or relative time.  It is represented 
       as a number of milliseconds.
 
-  @rdfs:subClassOf: idl|unsignedLongLong||ManakaiDOM|all
+  @rdfs:subClassOf: idl|unsignedLongLong
 
   @idl:typedefAs: idl|unsignedLongLong
   @idl:java: j|long
@@ -276,11 +273,6 @@ ResourceDef:
     <DOM::DOMUserData>
   
   @enDesc: A reference to application data.
-
-  @Def:
-    @@ContentType: lang|dis
-    @@DISLang:dataTypeAliasFor: DOMMain|any||ManakaiDOM|all
-    @@For: ManakaiDOM|IDL
 
   @idl:java: jlang|Object
   @idl:ecmascript: js|AnyType
@@ -300,7 +292,7 @@ ResourceDef:
   @enLabel:
     <DOM::DOMObject>
 
-  @rdfs:subClassOf: idl|Object||ManakaiDOM|all
+  @rdfs:subClassOf: idl|Object
   
   @enDesc: An object reference.
 
@@ -758,7 +750,7 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DOMCore|DOMErrorType
-    @@ecore:textFormatter: ecore|MUErrorFormatter||ManakaiDOM|Perl
+    @@ecore:textFormatter: ecore|MUErrorFormatter
 
 StringDataTypeDef:
   @QName: ManakaiDOMXMLLocalName

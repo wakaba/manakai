@@ -13,7 +13,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/12/30 08:27:45 $
+    $Date: 2006/12/30 12:00:38 $
 
   @Require:
     @@Module:
@@ -494,7 +494,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: DISCore|Property
-    @@For: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: RPropDef
@@ -502,7 +501,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: DISSource|ResourceProperty
-    @@For: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: Test
@@ -554,23 +552,23 @@ ResourceDef:
 
 ResourceDef:
   @QName: boolean
-  @AliasFor: idl|boolean||ManakaiDOM|all
+  @AliasFor: idl|boolean
 
 ResourceDef:
   @QName: unsignedLong
-  @AliasFor: idl|unsignedLong||ManakaiDOM|all
+  @AliasFor: idl|unsignedLong
 
 ResourceDef:
   @QName: unsignedShort
-  @AliasFor: idl|unsignedShort||ManakaiDOM|all
+  @AliasFor: idl|unsignedShort
 
 ResourceDef:
   @QName: ARRAY
-  @AliasFor: DISPerl|ARRAY||ManakaiDOM|all
+  @AliasFor: DISPerl|ARRAY
 
 ResourceDef:
   @QName: HASH
-  @AliasFor: DISPerl|HASH||ManakaiDOM|all
+  @AliasFor: DISPerl|HASH
 
 ResourceDef:
   @QName: DocumentX
@@ -4230,7 +4228,7 @@ NodeTypeDef:
       @@@enDesc:
         The string to append.
       @@@InCase:
-        @@@@Type: DISPerl|SCALAR||ManakaiDOM|all
+        @@@@Type: DISPerl|SCALAR
         @@@@enDesc:
           A copy of the string value referenced from the value
           is appended.
@@ -6174,7 +6172,7 @@ NodeTypeDef:
             be imported.
      @@Param:
         @@@Name:  deep
-        @@@Type:  DOMMain|boolean||ManakaiDOM|all
+        @@@Type:  DOMMain|boolean
         @@@Description:
           @@@@lang:en
           @@@@@:
@@ -6576,7 +6574,7 @@ ElementTypeBinding:
     @@Value:
       @@@@: 1
       @@@ContentType: DISCore|Boolean
-    @@Type: idl|boolean||ManakaiDOM|all
+    @@Type: idl|boolean
 
 ElementTypeBinding:
   @Name: FalseCase
@@ -6588,7 +6586,7 @@ ElementTypeBinding:
     @@Value:
       @@@@: 0
       @@@ContentType: DISCore|Boolean
-    @@Type: idl|boolean||ManakaiDOM|all
+    @@Type: idl|boolean
 
 NodeTypeDef:
   @IFQName: DocumentFragment
@@ -10020,7 +10018,7 @@ NodeTypeDef:
       @@@enDesc:
         The string to append.
       @@@InCase:
-        @@@@Type: DISPerl|SCALAR||ManakaiDOM|all
+        @@@@Type: DISPerl|SCALAR
         @@@@enDesc:
           A copy of the string value referenced from the value
           is appended.
