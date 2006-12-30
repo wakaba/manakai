@@ -43,7 +43,7 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/12/03 05:40:33 $
+      $Date: 2006/12/30 01:55:52 $
     @@ContentType:
       dis:Date.RCS
   
@@ -56,14 +56,6 @@ Module:
         @@@@@:
           <Module::DISlib|DISPerl>, <Module::DISlib|Java>,
           <Module::DISlib|ECMAScript> is also referenced.
-    @@Module:
-      @@@QName:
-        UtilError:DOMException
-      @@@WithFor:
-        ManakaiDOM:all
-    @@Module:
-      @@@QName: Util|Grove
-      @@@WithFor: ManakaiDOM|all
     @@Module:
       @@@WithFor:
         ManakaiDOM:ManakaiDOM
@@ -127,8 +119,6 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
   @MDOMX:
     http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
-  @mg:
-    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Grove/
   @p:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Perl#
   @rdf:
@@ -143,8 +133,6 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2005/7/tutorial#
   @Util:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/
-  @UtilError:
-    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/
 
 ResourceDef:
   @QName:
@@ -1406,28 +1394,6 @@ ElementTypeBinding:
   @ShadowContent:
     @@DISCore:resourceType: DISPerl|BlockCode
     @@ForCheck: ManakaiDOM|ForClass
-
-ElementTypeBinding:
-  @Name: IntPropDef
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@DISCore:resourceType: DISCore|Property
-    @@For: =ManakaiDOM|all
-
-IntPropDef:
-  @QName: f|revImplementation
-  @enDesc:
-    Reversed <Q::f|implementation>
-  @Type: HASH
-  @mg:nodeStemKey: lpmi
-
-IntPropDef:
-  @QName: f|implementation
-  @enDesc:
-    Associated implementation
-  @Type: HASH
-  @mg:nodeStemKey: impl
 
 ElementTypeBinding:
   @Name: PerlDef

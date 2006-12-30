@@ -1,21 +1,5 @@
 Module:
-  @QName:
-    MDOM:DOMCore
-  @AppName:
-    @@@:  dom
-    @@prefix:  w3c.org
-    @@ContentType:
-      lang:IDL-DOM
-    @@For:
-      ManakaiDOM:IDL
-  @AppName:
-    @@@: org.w3c.dom
-    @@ContentType:
-      lang:Java
-    @@ForCheck:
-      ManakaiDOM:ForIF
-    @@For:
-      ManakaiDOM:Java
+  @QName: MDOM|DOMCore
   @FullName:
     @@lang:en
     @@@: DOM Core Module
@@ -33,13 +17,9 @@ Module:
       conforming DOM implementations.
   
   @DISCore:author: DISCore|Wakaba
-  @License:
-     license:Perl+MPL
+  @License: license|Perl+MPL
   @Date:
-    @@@:
-      $Date: 2006/12/30 01:45:50 $
-    @@ContentType:
-      dis:Date.RCS
+    $Date: 2006/12/30 01:55:51 $
 
   @Require:
     @@Module:
@@ -62,11 +42,13 @@ Module:
       @@@QName: MDOM|XDoctype
       @@@WithFor: ManakaiDOM|ManakaiDOMLatest
     @@Module:
-      @@@QName: MURI|Generic
-      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
-    @@Module:
       @@@QName: MDOM|DOMString
       @@@WithFor: ManakaiDOM|ManakaiDOMLatest
+    @@Module:
+      @@@QName:
+        UtilError:DOMException
+      @@@WithFor:
+        ManakaiDOM:all
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
 Namespace:
@@ -134,10 +116,6 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#ManakaiDOM.
   @MDOMX:
     http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#
-  @mg:
-    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Grove/
-  @MURI:
-    http://suika.fam.cx/~wakaba/archive/2005/manakai/URI/
   @p:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Perl#
   @rdf:
@@ -154,12 +132,10 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dis/Test#
   @tx:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/XML/
-  @urigen:
-    http://suika.fam.cx/~wakaba/archive/2005/manakai/URI/Generic/
+  @UtilError:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/
   @xml:
     http://www.w3.org/XML/1998/namespace
-  @xml-dtd:
-    http://www.w3.org/TR/REC-xml
   @xmlns:
     http://www.w3.org/2000/xmlns/
 
@@ -2919,6 +2895,13 @@ IFCls1Def:
         my $ib = <Class::ManakaiDOMImplementation>->_new;
         $test->assert_not_equals ($ia, $ib);
 ##DOMImplementation
+
+PropDef:
+  @QName: f|implementation
+  @enDesc:
+    Associated implementation
+  @Type: HASH
+  @tc:nodeStemKey: impl
 
 ElementTypeBinding:
   @Name: CODE
