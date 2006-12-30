@@ -3897,7 +3897,7 @@ ref $resolver eq 'CODE';
 ## -- Module Name, URI
 $opt{for_arg} = 
 'http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#all' unless 
-defined $opt{for_arg};
+defined $opt{for_arg} and $opt{for_arg} ne '';
 my $mod_node;
 my $mod_name_node;
 
@@ -6003,7 +6003,7 @@ my $r;
 
 if 
 ($err->isa (
-'Message::DOM::IFLatest::DOMError'
+'Message::DOM::IF::DOMError'
 )) {
   
 
@@ -8184,7 +8184,7 @@ my $r;
 
 if 
 ($err->isa (
-'Message::DOM::IFLatest::DOMError'
+'Message::DOM::IF::DOMError'
 )) {
   
 

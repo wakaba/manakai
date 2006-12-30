@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/12/30 04:42:59 $
+      $Date: 2006/12/30 08:27:51 $
     @@ContentType:
       dis:Date.RCS
   
@@ -1503,7 +1503,7 @@ IFClsDef:
           for (@$modules) {
             my ($mod_name, $mod_for) = @$_;
             my $tfuri;
-            unless (defined $mod_for) {
+            if (not defined $mod_for or $mod_for eq '') {
               $mod_for = <Q::ManakaiDOM|all>;
               if (defined $db->{modDef}->{$mod_name} and
                   defined $db->{modDef}->{$mod_name}->{<Q::dis|DefaultFor>}) {
@@ -1516,9 +1516,12 @@ IFClsDef:
                 my $mod_el = $mod_doc-><AG::DIS|DISDocument.moduleElement>;
                 if ($mod_el) {
                   $mod_for = $mod_el-><AG::DIS|DISModuleElement.defaultForURI>;
+                } else {
+                  $mod_for = <Q::ManakaiODM|all>;
                 }
               }
             }
+            $mod_for = <Q::ManakaiDOM|all> if $mod_for eq '';
             __CODE{DIS|tfurisToURI:: $turi => $mod_name, $furi => $mod_for,
                                      $uri => $tfuri}__;
             unless (defined $db->{modDef}->{$tfuri}) {

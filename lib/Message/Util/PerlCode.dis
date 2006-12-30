@@ -24,16 +24,13 @@ Module:
       @@@Year:2004
       @@@DISCore:author: DISCore|Wakaba
   @Date:
-    $Date: 2006/12/30 04:42:58 $
+    $Date: 2006/12/30 08:27:51 $
   
   @Require:
     @@Module:
       @@@QName: MDOM|DOMCore
-      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
     @@Module:
       @@@QName: DISlib|DISMarkup
-      @@@WithFor: ManakaiDOM|all
-  @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
 Namespace:
   @c:
@@ -87,7 +84,6 @@ Namespace:
 
 ResourceDef:
   @QName: Util|
-  @For: ManakaiDOM|DOM
   @rdf:type: dis|ModuleGroup
   @FullName:
     @@lang:en
@@ -96,18 +92,7 @@ ResourceDef:
   @DISPerl:packageName:
     Message::Util::
   @DISPerl:interfacePackageName:
-    @@@:
-      Message::Util::IF::
-    @@For: ManakaiDOM|ManakaiDOM !ManakaiDOM|ManakaiDOMLatest
-  @DISPerl:interfacePackageName:
-    @@@:
-      Message::Util::IFLatest::
-    @@For: ManakaiDOM|ManakaiDOMLatest
-  @ImplNote:
-    @@lang:en
-    @@@:
-      Resources <Q::Util|> for <Q::ManakaiDOM|all> and for <Q::ManakaiDOM|Perl>
-      is defined in module <Module::Util|ManakaiNode>.
+    Message::Util::IF::
 
 ## -- Features
 
@@ -161,8 +146,6 @@ ElementTypeBinding:
     @@resourceFor: ManakaiDOM|ForIF
     @@resourceFor:
       @@@@: ManakaiDOM|ForClass
-      @@@For: ManakaiDOM|ManakaiDOMLatest
-    @@For: ManakaiDOM|ManakaiDOM
 
     @@rdf:type:
       @@@@: DISLang|Interface
@@ -173,9 +156,9 @@ ElementTypeBinding:
       @@@ForCheck: ManakaiDOM|ForClass
 
     @@Implement:
-      @@@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
+      @@@@: ||+||ManakaiDOM|ForIF
       @@@ContentType: DISCore|TFPQNames
-      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
+      @@@ForCheck: ManakaiDOM|ForClass
 
     @@f:implements: pc|CoreFeature10
 
@@ -190,7 +173,6 @@ ElementTypeBinding:
     @@resourceFor: ManakaiDOM|ForIF
     @@resourceFor: ManakaiDOM|ForClass
     @@resourceFor: s|ForML
-    @@For: ManakaiDOM|ManakaiDOM
 
     @@rdf:type:
       @@@@: DISLang|Interface
@@ -201,9 +183,9 @@ ElementTypeBinding:
       @@@ForCheck: ManakaiDOM|ForClass
 
     @@Implement:
-      @@@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
+      @@@@: ||+||ManakaiDOM|ForIF
       @@@ContentType: DISCore|TFPQNames
-      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
+      @@@ForCheck: ManakaiDOM|ForClass
 
     @@s:elementType:
       @@@@: ||+||s|ForML
@@ -1092,7 +1074,6 @@ ElementTypeBinding:
 
 ResourceDef:
   @QName: DOMString
-  @For: ManakaiDOM|Perl
   @AliasFor: DOMMain|DOMString||ManakaiDOM|ManakaiDOMLatest
 
 ReflectTypeDef:
@@ -1179,8 +1160,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|DataType
-    @@ForCheck: !ManakaiDOM|IDL
-    @@For: ManakaiDOM|DOM
 
 ElementTypeBinding:
   @Name: ATTR
@@ -1204,7 +1183,6 @@ ElementTypeBinding:
       @@@@: ||+||s|ForML
       @@@ContentType: DISCore|TFPQNames
       @@@ForCheck: ManakaiDOM|ForIF
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM
 
 ElementTypeBinding:
   @Name: ATTRQName
@@ -2326,7 +2304,6 @@ IFClsETDef:
 ResourceDef:
   @QName: unsignedLong
   @AliasFor: idl|unsignedLong||ManakaiDOM|all
-  @For: ManakaiDOM|DOM
 
 IFClsETDef:
   @IFQName: PerlTokens
@@ -3736,7 +3713,6 @@ IFClsETDef:
 ##PCOtherwise
 
 ResourceDef:
-  @For: ManakaiDOM|ManakaiDOM
   @QName: getChildElementByType
   @rdf:type: DISPerl|BlockCode
   @enDesc:
@@ -4152,7 +4128,6 @@ boolCParam:
 ResourceDef:
   @QName: CFG
   @AliasFor: c|DOMConfiguration
-  @For: ManakaiDOM|DOM3
 
 CParam:
   @QName: pc|split-resolver
@@ -4187,12 +4162,9 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       @@@@: c|DOMConfigurationParameter
-      @@@For: ManakaiDOM|DOM
     @@rdf:type:
       @@@@: DISCore|Property
       @@@For: =ManakaiDOM|all
-    @@For: ManakaiDOM|DOM3
-    @@For: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: boolCParam
@@ -4201,12 +4173,9 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       @@@@: c|DOMConfigurationParameter
-      @@@For: ManakaiDOM|DOM
     @@rdf:type:
       @@@@: DISCore|Property
       @@@For: =ManakaiDOM|all
-    @@For: ManakaiDOM|DOM3
-    @@For: =ManakaiDOM|all
     @@Type: idl|boolean||ManakaiDOM|all
 
 ## -- PCDocument
@@ -4955,27 +4924,22 @@ IFClsDef:
 ResourceDef:
   @QName: DOMImpl
   @AliasFor: c|DOMImplementation
-  @For: ManakaiDOM|DOM
 
 ResourceDef:
   @QName: NodeList
   @AliasFor: tc|NodeList
-  @For: ManakaiDOM|DOM
 
 ResourceDef:
   @QName: Node
   @AliasFor: tc|Node
-  @For: ManakaiDOM|DOM
 
 ResourceDef:
   @QName: Element
   @AliasFor: te|Element
-  @For: ManakaiDOM|DOM
 
 ResourceDef:
   @QName: Document
   @AliasFor: td|Document
-  @For: ManakaiDOM|DOM
 
 ElementTypeBinding:
   @Name: Method

@@ -12,14 +12,14 @@ require Message::DOM::Element;
 require Message::Util::Error::DOMException;
 package Message::Util::PerlCode;
 our $VERSION = 20061229.0836;
-$Message::DOM::DOMCore::ManakaiDOMConfiguration{'Message::DOM::IFLatest::Document'}->{'http://suika.fam.cx/~wakaba/archive/2005/manakai/util/perlcode#preserve-line-break'} = {'iname',
+$Message::DOM::DOMCore::ManakaiDOMConfiguration{'Message::DOM::IF::Document'}->{'http://suika.fam.cx/~wakaba/archive/2005/manakai/util/perlcode#preserve-line-break'} = {'iname',
 'plb',
 'type',
 'boolean',
 'vsupport',
 ['1',
 '1']};
-$Message::DOM::DOMCore::ManakaiDOMConfiguration{'Message::DOM::IFLatest::Document'}->{'http://suika.fam.cx/~wakaba/archive/2005/manakai/util/perlcode#split-resolver'} = {'iname',
+$Message::DOM::DOMCore::ManakaiDOMConfiguration{'Message::DOM::IF::Document'}->{'http://suika.fam.cx/~wakaba/archive/2005/manakai/util/perlcode#split-resolver'} = {'iname',
 'pcsres',
 'otype',
 undef,

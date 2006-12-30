@@ -10,23 +10,17 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/12/30 04:42:54 $
-
-  @DefaultFor: ManakaiDOM|ManakaiDOMLatest
+    $Date: 2006/12/30 08:27:48 $
 
   @Require:
     @@Module:
       @@@QName: MDOM|DOMLS
-      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
     @@Module:
       @@@QName: MDOM|XML
-      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
     @@Module:
       @@@QName: MDOM|XDoctype
-      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
     @@Module:
       @@@QName: MCharset|Encode
-      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
 
 Namespace:
   @c:
@@ -131,57 +125,46 @@ ElementTypeBinding:
 ResourceDef:
   @QName: DOMString
   @AliasFor: DOMMain|DOMString
-  @For: ManakaiDOM|DOM
 
 ResourceDef:
   @QName: Node
   @AliasFor: tc|Node
-  @For: ManakaiDOM|DOM
 
 ResourceDef:
   @QName: Element
   @AliasFor: te|Element
-  @For: ManakaiDOM|DOM
 
 ResourceDef:
   @QName: Attr
   @AliasFor: te|Attr
-  @For: ManakaiDOM|DOM
 
 ResourceDef:
   @QName: Document
   @AliasFor: td|Document
-  @For: ManakaiDOM|DOM
 
 ResourceDef:
   @QName: DocumentXDoctype
   @AliasFor: d|DocumentXDoctype
-  @For: ManakaiDOM|DOM
 
 ResourceDef:
   @QName: DTDef
   @AliasFor: d|DocumentTypeDefinition
-  @For: ManakaiDOM|DOM
 
 ResourceDef:
   @QName: ETDef
   @AliasFor: d|ElementTypeDefinition
-  @For: ManakaiDOM|DOM
 
 ResourceDef:
   @QName: ATDef
   @AliasFor: d|AttributeDefinition
-  @For: ManakaiDOM|DOM
 
 ResourceDef:
   @QName: GE
   @AliasFor: tx|Entity
-  @For: ManakaiDOM|DOM
 
 ResourceDef:
   @QName: GERef
   @AliasFor: tx|EntityReference
-  @For: ManakaiDOM|DOM
 
 ElementTypeBinding:
   @Name: ClsDef
@@ -193,9 +176,6 @@ ElementTypeBinding:
       @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
     @@resourceFor:
       @@@@: ManakaiDOM|ForClass
-      @@@ForCheck: ManakaiDOM|ManakaiDOM !=ManakaiDOM|ManakaiDOM
-    @@For: ManakaiDOM|DOM3
-    @@For: =ManakaiDOM|ManakaiDOM
 
     @@rdf:type:
       @@@@: DISLang|Class
@@ -251,7 +231,6 @@ ElementTypeBinding:
 ResourceDef:
   @QName: LSParser
   @AliasFor: DOMLS|LSParser
-  @For: ManakaiDOM|DOM3
 
 ClsDef:
   @ClsQName: ManakaiXMLParser
@@ -15904,7 +15883,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DOMCore|DOMErrorType
-    @@For: ManakaiDOM|DOM3
     @@ecore:textFormatter: ManakaiXMLParserExceptionFormatter
     @@c:severity: c|SEVERITY_FATAL_ERROR
 
@@ -15914,7 +15892,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DOMCore|DOMErrorType
-    @@For: ManakaiDOM|DOM3
     @@ecore:textFormatter: ManakaiXMLParserExceptionFormatter
     @@c:severity: c|SEVERITY_FATAL_ERROR
 
@@ -15924,7 +15901,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: c|DOMErrorType
-    @@For: ManakaiDOM|DOM3
     @@ecore:textFormatter: ManakaiXMLParserExceptionFormatter
     @@c:severity: c|SEVERITY_FATAL_ERROR
 
@@ -15934,7 +15910,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: c|DOMErrorType
-    @@For: ManakaiDOM|DOM3
     @@ecore:textFormatter: ManakaiXMLParserExceptionFormatter
     @@c:severity: c|SEVERITY_FATAL_ERROR
 
@@ -15944,7 +15919,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: c|DOMErrorType
-    @@For: ManakaiDOM|DOM3
     @@ecore:textFormatter: ManakaiXMLParserExceptionFormatter
     @@c:severity: c|SEVERITY_ERROR
 
@@ -15954,7 +15928,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: c|DOMErrorType
-    @@For: ManakaiDOM|DOM3
     @@ecore:textFormatter: ManakaiXMLParserExceptionFormatter
     @@c:severity: c|SEVERITY_ERROR
 
@@ -15964,7 +15937,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: c|DOMErrorType
-    @@For: ManakaiDOM|DOM3
     @@ecore:textFormatter: ManakaiXMLParserExceptionFormatter
     @@c:severity: c|SEVERITY_WARNING
 
@@ -16720,17 +16692,14 @@ ElementTypeBinding:
 ResourceDef:
   @QName: DOMImpl
   @AliasFor: DOMCore|DOMImplementation
-  @For: ManakaiDOM|DOM
 
 ResourceDef:
   @QName: LSInput
   @AliasFor: DOMLS|LSInput
-  @For: ManakaiDOM|DOM
 
 ResourceDef:
   @QName: LSParser
   @AliasFor: DOMLS|LSParser
-  @For: ManakaiDOM|DOM
 
 ElementTypeBinding:
   @Name: Attr
@@ -16738,7 +16707,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|Attribute
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM
 
 ElementTypeBinding:
   @Name: Get
@@ -16767,7 +16735,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|Method
-    @@For: !=ManakaiDOM|ManakaiDOM
 
 ElementTypeBinding:
   @Name: Return
@@ -16928,12 +16895,9 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       @@@@: c|DOMConfigurationParameter
-      @@@For: ManakaiDOM|DOM
     @@rdf:type:
       @@@@: DISSource|ResourceProperty
       @@@For: =ManakaiDOM|all
-    @@For: ManakaiDOM|DOM3
-    @@For: =ManakaiDOM|all
     @@subsetOf:
       @@@@: c|anyDOMConfigurationParameter
       @@@For: =ManakaiDOM|all
@@ -16948,8 +16912,6 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       @@@@: c|DOMConfigurationParameterApplication
-      @@@For: ManakaiDOM|DOM
-    @@For: ManakaiDOM|DOM3
 
 ElementTypeBinding:
   @Name: boolCParam
@@ -16958,12 +16920,9 @@ ElementTypeBinding:
   @ShadowContent:
     @@DISCore:resourceType:
       @@@@: c|DOMConfigurationParameter
-      @@@For: ManakaiDOM|DOM
     @@DISCore:resourceType:
       @@@@: DISSource|ResourceProperty
       @@@For: =ManakaiDOM|all
-    @@For: ManakaiDOM|DOM3
-    @@For: =ManakaiDOM|all
     @@Type: idl|boolean||ManakaiDOM|all
     @@subsetOf:
       @@@@: c|anyDOMConfigurationParameter
@@ -17337,7 +17296,6 @@ ClsDef:
 
   @enDesc:
     @@ddid: perl
-    @@ForCheck: ManakaiDOM|ManakaiDOM
     @@@:
       For Perl binding, any parameter that accepts
       a <Class::ManakaiDOMLSInputToInputFile> would also accept a Perl code
@@ -17406,7 +17364,6 @@ ClsDef:
 
   @enDesc:
     @@ddid: perl
-    @@ForCheck: ManakaiDOM|ManakaiDOM
     @@@:
       For Perl binding, any parameter that accepts
       a <Class::ManakaiDOMInputFile> would also accept a Perl hash reference.

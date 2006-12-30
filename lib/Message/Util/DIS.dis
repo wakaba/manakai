@@ -22,7 +22,7 @@ Module:
       @@@Year:2004
       @@@DISCore:author: DISCore|Wakaba
   @Date:
-    $Date: 2006/12/30 04:42:55 $
+    $Date: 2006/12/30 08:27:50 $
   
   @Require:
     @@Module:
@@ -2813,7 +2813,7 @@ IFClsDef:
         $resolver = bless $resolver, <ClassName::ManakaiDISModuleResolver>
                       if ref $resolver eq 'CODE'; 
         ## -- Module Name, URI
-        $forArg = <Q::ManakaiDOM:all> unless defined $forArg;
+        $forArg = <Q::ManakaiDOM:all> unless defined $forArg and $forArg ne '';
         my $mod_node;
         my $mod_name_node;
         __DEEP{

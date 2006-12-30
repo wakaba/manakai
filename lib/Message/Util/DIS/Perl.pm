@@ -6655,7 +6655,7 @@ report Message::DOM::DOMCore::ManakaiDOMError -object => $self, '-type' => 'http
   for (@$modules) {
     my ($mod_name, $mod_for) = @$_;
     my $tfuri;
-    unless (defined $mod_for) {
+    unless (defined $mod_for and $mod_for ne '') {
       $mod_for = 
 'http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#all'
 ;
@@ -6684,10 +6684,16 @@ module_element
           $mod_for = $mod_el->
 default_for_uri
 ;
-        }
+        } else {
+      $mod_for = 
+'http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#all';
+}
       }
+
     }
-    
+      $mod_for = 
+'http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#all'
+if $mod_for eq '';    
 
 {
 

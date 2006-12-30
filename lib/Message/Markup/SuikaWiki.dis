@@ -54,18 +54,15 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/12/30 04:42:55 $
+    $Date: 2006/12/30 08:27:50 $
 
   @Require:
     @@Module:
       @@@QName: Markup|common
     @@Module:
       @@@QName: MDOM|TreeCore
-      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
     @@Module:
       @@@QName: Markup|Atom
-      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
-  @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
 Namespace:
   @aa:
@@ -183,7 +180,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: DISLang|Attribute
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM
 
 ElementTypeBinding:
   @Name: Get
@@ -271,7 +267,6 @@ ElementTypeBinding:
     @@resourceFor: ManakaiDOM|ForIF
     @@resourceFor: ManakaiDOM|ForClass
     @@resourceFor: s|ForML
-    @@For: ManakaiDOM|ManakaiDOM
 
     @@DISCore:resourceType:
       @@@@: DISLang|Interface
@@ -282,9 +277,9 @@ ElementTypeBinding:
       @@@ForCheck: ManakaiDOM|ForClass
 
     @@Implement:
-      @@@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
+      @@@@: ||+||ManakaiDOM|ForIF
       @@@ContentType: DISCore|TFPQNames
-      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
+      @@@ForCheck: ManakaiDOM|ForClass
 
     @@s:elementType:
       @@@@: ||+||s|ForML
@@ -307,7 +302,6 @@ ElementTypeBinding:
       @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass !s|ForML
     @@resourceFor: ManakaiDOM|ForIF
     @@resourceFor: ManakaiDOM|ForClass
-    @@For: ManakaiDOM|ManakaiDOM
 
     @@DISCore:resourceType:
       @@@@: DISLang|Interface
@@ -318,9 +312,9 @@ ElementTypeBinding:
       @@@ForCheck: ManakaiDOM|ForClass
 
     @@Implement:
-      @@@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
+      @@@@: ||+||ManakaiDOM|ForIF
       @@@ContentType: DISCore|TFPQNames
-      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
+      @@@ForCheck: ManakaiDOM|ForClass
 
     @@f:implements: AtomFeature10
 
@@ -402,32 +396,26 @@ ElementTypeBinding:
 ResourceDef:
   @QName: Document
   @AliasFor: td|Document
-  @For: ManakaiDOM|DOM
 
 ResourceDef:
   @QName: Element
   @AliasFor: te|Element
-  @For: ManakaiDOM|DOM
 
 ResourceDef:
   @QName: Attr
   @AliasFor: te|Attr
-  @For: ManakaiDOM|DOM
 
 ResourceDef:
   @QName: DOMString
   @AliasFor: DOMMain|DOMString
-  @For: ManakaiDOM|DOM
 
 ResourceDef:
   @QName: DOMURI
   @AliasFor: ManakaiDOM|ManakaiDOMURI
-  @For: ManakaiDOM|DOM3
 
 ResourceDef:
   @QName: DOMTimeStamp
   @AliasFor: DOMMain|DOMTimeStamp
-  @For: ManakaiDOM|DOM2
 
 ResourceDef:
   @QName: boolean
@@ -436,17 +424,14 @@ ResourceDef:
 ResourceDef:
   @QName: Node
   @AliasFor: tc|Node
-  @For: ManakaiDOM|ManakaiDOM
 
 ResourceDef:
   @QName: NodeList
   @AliasFor: tc|NodeList
-  @For: ManakaiDOM|ManakaiDOM
 
 ResourceDef:
   @QName: StaticNodeList
   @AliasFor: tc|StaticNodeList
-  @For: ManakaiDOM|ManakaiDOM
 
 ElementTypeBinding:
   @Name: enDesc

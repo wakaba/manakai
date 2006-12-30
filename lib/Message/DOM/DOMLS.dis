@@ -4,13 +4,6 @@ Module:
   @Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/dom/ls#
 
-  @AppName:
-     @@@:  ls
-     @@ContentType:
-        lang:IDL-DOM
-     @@prefix:  dom.w3c.org
-    @@ForCheck: ManakaiDOM|IDL
-
   @FullName:
     @@@: DOM Load and Save Module
     @@@@lang:en
@@ -28,21 +21,18 @@ Module:
   @License:
      license:Perl+MPL
   @Date:
-    $Date: 2006/12/30 04:42:51 $
+    $Date: 2006/12/30 08:27:45 $
 
   @Require:
     @@Module:
       @@@QName: MDOM|GenericLS
-      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
     @@Module:
       @@@QName: MDOM|XML
-      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
 #     @@Module:
 #        @@@Name:  DOMEvents
 ## TODO: Implement these modules
 #     @@Module:
 #        @@@Name:  DOMTraversal
-  @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
 Namespace:
   @dis:
@@ -171,8 +161,8 @@ FeatureDef:
       A parser class that support the <Feature::DOMLS|ParserString>
       feature version <FeatureVer::1.0> <kwd:MUST> provide a method
       whose name is <DOM::parse>.  The method has at least one 
-      parameter whose type is <IF::DOMLS|LSInput||ManakaiDOM|ManakaiDOMLatest>
-      or its subset that at least has <A::DOMLS|LSInput.stringData>
+      parameter whose type is <IF::LSInput>
+      or its subset that at least has <A::LSInput.stringData>
       and <A::DOMLS|LSInput.baseURI> attributes.  The method
       <kwd:MUST> be able to parse an XML document entity
       in the <A::DOMLS|LSInput.stringData>
@@ -200,76 +190,20 @@ ElementTypeBinding:
     @@rdf:type: DISLang|DataType
 
 DataTypeDef:
-  @For: ManakaiDOM|DOM3
   @Name:  LSInputStream
   @Description:
     @@lang:en
     @@@:
       A reference to a byte stream source of an XML input.
 
-  @Def:
-    @@For:
-      ManakaiDOM:IDL
-    @@ContentType:
-      lang:dis
-    @@DISLang:dataTypeAliasFor:
-      @@@@:
-        DOMMain:Object
-      @@@ContentType:
-        dis:TypeQName
-  @Def:
-    @@For:
-      ManakaiDOM:Java
-    @@DISLang:dataTypeAliasFor:
-      @@@@: java.io.InputStream
-      @@@ContentType:
-        lang:Java
-    @@ContentType: lang|dis
-  @Def:
-    @@For:
-      ManakaiDOM:ECMAScript
-    @@DISLang:dataTypeAliasFor:
-      @@@@: Object
-      @@@ContentType:
-        lang:ECMAScript
-    @@ContentType: lang|dis
-
 DataTypeDef:
-  @For: ManakaiDOM|DOM3
   @Name:  LSOutputStream
   @Description:
     @@lang:en
     @@@:
       A byte stream destination for the XML output.
 
-  @Def:
-    @@For:
-      ManakaiDOM:IDL
-    @@DISLang:dataTypeAliasFor:
-      @@@@:
-        DOMMain:Object
-      @@@ContentType:
-        dis:TypeQName
-    @@ContentType: lang|dis
-  @Def:
-    @@For:
-      ManakaiDOM:Java
-    @@DISLang:dataTypeAliasFor:
-      @@@@: java.io.OutputStream
-      @@@ContentType:
-        lang:Java
-    @@ContentType: lang|dis
-  @Def:
-    @@For:
-      ManakaiDOM:ECMAScript
-    @@DISLang:dataTypeAliasFor:
-      @@@@: Object
-      @@@ContentType:
-        lang:ECMAScript
-    @@ContentType: lang|dis
-
 DataTypeDef:
-  @For: ManakaiDOM|DOM3
   @Name:  LSReader
   @Description:
     @@lang:en
@@ -277,32 +211,7 @@ DataTypeDef:
       A character stream, i.e. a sequence of input characters 
       in 16-bit units, for the XML input.
 
-  @Def:
-    @@For:
-      ManakaiDOM:IDL
-    @@DISLang:dataTypeAliasFor:
-      @@@@:
-        DOMMain:Object
-      @@@ContentType:
-        dis:TypeQName
-    @@ContentType: lang|dis
-  @Def:
-    @@For:
-      ManakaiDOM:Java
-    @@DISLang:dataTypeAliasFor:
-      @@@@: java.io.Reader
-      @@@ContentType:
-        lang:Java
-    @@ContentType: lang|dis
-  @Description:
-    @@lang:en
-    @@@:
-      The <TYPE::LSReader> has no recommended meaning in ECMAScript binding.
-    @@For:
-      ManakaiDOM:ECMAScript
-
 DataTypeDef:
-  @For: ManakaiDOM|DOM3
   @Name:  LSWriter
   @Description:
     @@lang:en
@@ -310,114 +219,32 @@ DataTypeDef:
       A character stream, i.e. a sequence of characters in 16-bit units, 
       for the XML output.
 
-  @Def:
-    @@For:
-      ManakaiDOM:IDL
-    @@DISLang:dataTypeAliasFor:
-      @@@@:
-        DOMMain:Object
-      @@@ContentType:
-        dis:TypeQName
-    @@ContentType: lang|dis
-  @Def:
-    @@For:
-      ManakaiDOM:Java
-    @@DISLang:dataTypeAliasFor:
-      @@@@: java.io.Writer
-      @@@ContentType:
-        lang:Java
-    @@ContentType: lang|dis
-  @Description:
-    @@For:
-      ManakaiDOM:ECMAScript
-    @@lang:en
-    @@@:
-      The <TYPE::LSWriter> has no recommended meaning in ECMAScript binding.
-
 DataTypeDef:
   @Name: DOMString
   @AliasFor:
     @@@:
       DOMMain:DOMString
-    @@For:
-      !ManakaiDOM:IDL
-  @Def:
-    @@For:
-      ManakaiDOM:IDL
-    @@DISLang:dataTypeAliasFor:
-      @@@@:
-        DOMMain:DOMString
-      @@@ContentType:
-        dis:TypeQName
-    @@ContentType: lang|dis
-  @For:
-    ManakaiDOM:DOM3
+
 DataTypeDef:
   @Name:  DOMConfiguration
   @AliasFor:
     @@@:
       DOMCore:DOMConfiguration
-    @@For:
-      !ManakaiDOM:IDL
-  @Def:
-    @@DISLang:dataTypeAliasFor:
-      @@@@:
-        DOMCore:DOMConfiguration
-      @@@ContentType:
-        dis:TypeQName
-    @@For:
-      ManakaiDOM:IDL
-    @@ContentType: lang|dis
-  @For:
-    ManakaiDOM:DOM3
+
 DataTypeDef:
   @Name:  Node
   @AliasFor:
     @@@: tc|Node
-    @@For:
-      !ManakaiDOM:IDL
-  @Def:
-    @@For:
-      ManakaiDOM:IDL
-    @@DISLang:dataTypeAliasFor:
-      @@@@: tc|Node
-      @@@ContentType:
-        dis:TypeQName
-    @@ContentType: lang|dis
-  @For:
-    ManakaiDOM:DOM3
+
 DataTypeDef:
   @Name:  Document
   @AliasFor:
     @@@: td|Document
-    @@For:
-      !ManakaiDOM:IDL
-  @Def:
-    @@For:
-      ManakaiDOM:IDL
-    @@DISLang:dataTypeAliasFor:
-      @@@@: td|Document
-      @@@ContentType:
-        dis:TypeQName
-    @@ContentType: lang|dis
-  @For:
-    ManakaiDOM:DOM3
+
 DataTypeDef:
   @Name:  Element
   @AliasFor:
     @@@: te|Element
-    @@For:
-      !ManakaiDOM:IDL
-  @Def:
-    @@For:
-      ManakaiDOM:IDL
-    @@DISLang:dataTypeAliasFor:
-      @@@@: te|Element
-      @@@ContentType:
-        dis:TypeQName
-    @@ContentType: lang|dis
-  @For:
-    ManakaiDOM:DOM3
 
 ## Fundamental Interfaces
 
@@ -451,9 +278,6 @@ ResourceDef:
   @resourceFor: ManakaiDOM|ForIF
   @resourceFor:
     @@@: ManakaiDOM|ForClass
-    @@ForCheck: ManakaiDOM|ManakaiDOM !=ManakaiDOM|ManakaiDOM
-  @For: ManakaiDOM|DOM3
-  @For: =ManakaiDOM|ManakaiDOM
 
   @rdf:type:
     @@@: dx|Interface
@@ -464,19 +288,17 @@ ResourceDef:
     @@ForCheck: ManakaiDOM|ForClass
 
   @Implement:
-    @@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
+    @@@: ||+||ManakaiDOM|ForIF
     @@ContentType: DISCore|TFPQNames
-    @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
+    @@ForCheck: ManakaiDOM|ForClass
   @dx:implementedBy:
-    @@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForClass
-    @@ForCheck: ManakaiDOM|ForIF ManakaiDOM|ManakaiDOMLatest
+    @@@: ||+||ManakaiDOM|ForClass
+    @@ForCheck: ManakaiDOM|ForIF
 
   @f:implements:
     @@@: LSFeature30
-    @@For: ManakaiDOM|DOM3
   @f:implements:
     @@@: LSAsyncFeature30
-    @@For: ManakaiDOM|DOM3
 
   @DISPerl:ISA:
     @@@: dx|Exception||ManakaiDOM|Perl
@@ -507,7 +329,7 @@ ResourceDef:
 
   @ResourceDef:
     @@rdf:type: DISLang|ConstGroup
-    @@ForCheck: ManakaiDOM|ForIF !=ManakaiDOM|ManakaiDOM
+    @@ForCheck: ManakaiDOM|ForIF
 
     @@QName: LSExceptionCode
 
@@ -574,9 +396,6 @@ ElementTypeBinding:
     @@resourceFor: ManakaiDOM|ForIF
     @@resourceFor:
       @@@@: ManakaiDOM|ForClass
-      @@@ForCheck: ManakaiDOM|ManakaiDOM !=ManakaiDOM|ManakaiDOM
-    @@For: ManakaiDOM|DOM3
-    @@For: =ManakaiDOM|ManakaiDOM
 
     @@rdf:type:
       @@@@: ManakaiDOM|IF
@@ -587,16 +406,14 @@ ElementTypeBinding:
       @@@ForCheck: ManakaiDOM|ForClass
 
     @@Implement:
-      @@@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
+      @@@@: ||+||ManakaiDOM|ForIF
       @@@ContentType: DISCore|TFPQNames
-      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
+      @@@ForCheck: ManakaiDOM|ForClass
 
     @@f:implements:
       @@@@: LSFeature30
-      @@@For: ManakaiDOM|DOM3
     @@f:implements:
       @@@@: LSAsyncFeature30
-      @@@For: ManakaiDOM|DOM3 ManakaiDOM|ForIF
 
 ElementTypeBinding:
   @Name: IFDef
@@ -605,10 +422,6 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       ManakaiDOM:IF
-    @@For:
-      ManakaiDOM:DOM3
-    @@For:
-      =ManakaiDOM:ManakaiDOM
 
 ElementTypeBinding:
   @Name: Method
@@ -616,7 +429,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|Method
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM
 
 ElementTypeBinding:
   @Name: IntMethod
@@ -624,7 +436,7 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|Method
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|ForClass
+    @@ForCheck: ManakaiDOM|ForClass
     @@ManakaiDOM:isForInternal: 1
 
 ElementTypeBinding:
@@ -652,7 +464,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|Attribute
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM
 
 ElementTypeBinding:
   @Name: Get
@@ -682,7 +493,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|ConstGroup
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM
 
 ElementTypeBinding:
   @Name: Const
@@ -709,7 +519,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: dx|ErrorSubCode
-    @@For: ManakaiDOM|ManakaiDOM
 
 IFCls3Def:
   @IFQName: DOMImplementationLS
@@ -959,7 +768,7 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISPerl|BlockCode
-    @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
+    @@ForCheck: ManakaiDOM|ForClass
 
 ElementTypeBinding:
   @Name: Test
@@ -979,9 +788,6 @@ ElementTypeBinding:
 IFDef:
   @Name:
     @@@: LSParser
-
-  @For:
-    ManakaiDOM:DOM3
 
   @DISLang:role: ParserRole
 
@@ -1035,7 +841,6 @@ IFDef:
 
   @enDesc:
     @@ddid: gls
-    @@For: ManakaiDOM|ManakaiDOM
     @@@:
       In manakai, an <IF::LSParser> object can be retrieved via the
       <M::gls|GLSImplementation.createGLSParser> method, as well
@@ -1382,9 +1187,7 @@ IFCls3Def:
            @@@@@lang:en
            @@@@@@:
              The value referred from the given value is set to the new 
-             attribute value.
-         @@@@For:
-           ManakaiDOM:ManakaiDOM
+             attribute value in manakai's Perl binding.
        @@@PerlDef:
          $self->{string_data} = ref $given eq 'SCALAR' ? $given : \$given;
   @Attr:
@@ -1455,12 +1258,16 @@ IFCls3Def:
          @@@@@: DOMLS|null-base-uri
          @@@@enDesc:
            If the new value is <DOM::null>.
-         @@@@For: ManakaiDOM|ManakaiDOM
+
+             {NOTE:: Manakai-specific.
+             }
        @@@c:reports:
          @@@@@: DOMLS|relative-base-uri
          @@@@enDesc:
            If the new value is a relative reference.
-         @@@@For: ManakaiDOM|ManakaiDOM
+
+             {NOTE:: Manakai-specific.
+             }
        @@@PerlDef:
          if (not defined $given) {
            __DOMCore:ERROR{DOMLS|null-base-uri::
@@ -1541,6 +1348,7 @@ IFCls3Def:
 
   @Description:
     @@lang:en
+    @@ddid: manakai
     @@@:
       In the manakai DOM implementation, an unblessed hash reference 
       is also able to be passed as a <IF::LSInput> method parameter. 
@@ -1551,8 +1359,6 @@ IFCls3Def:
       with an exception of <A::stringData>, whose value should be 
       a reference to a scalar string value (it is not just a string
       value for efficient). 
-    @@ForCheck:
-      ManakaiDOM:ManakaiDOM
 
   @ResourceDef:
     @@rdf:type: DISLang|InputProcessor
@@ -1614,7 +1420,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DOMCore|DOMErrorType
-    @@For: ManakaiDOM|DOM3
 
 IFCls3Def:
   @IFQName: LSResourceResolver
@@ -1641,7 +1446,6 @@ IFCls3Def:
 
   @enDesc:
     @@ddid:perl
-    @@For: ManakaiDOM|ManakaiDOM
     @@@:
       In manakai, a <IF::LSResourceResolver> <kwd:MUST> be dereferencable
       as if it is a code reference (reference to a subroutine).
@@ -2253,7 +2057,9 @@ IFCls3Def:
           @@@@@: DOMLS|relative-uri
           @@@@enDesc:
             If the new value is a relative reference.
-          @@@@For: ManakaiDOM|ManakaiDOM
+
+              {NOTE:: Manakai-specific.
+              }
         @@@PerlDef:
           if (<Code::DOMMain:isRelativeDOMURI:: $INPUT = $given>) {
             __DOMCore:ERROR{DOMLS|relative-uri::
@@ -2349,7 +2155,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DOMCore|DOMErrorType
-    @@For: ManakaiDOM|DOM3
 
 ElementTypeBinding:
   @Name: errname
@@ -2627,12 +2432,9 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       @@@@: DOMCore|DOMConfigurationParameter
-      @@@For: ManakaiDOM|DOM
     @@rdf:type:
       @@@@: DISSource|ResourceProperty
       @@@For: =ManakaiDOM|all
-    @@For: ManakaiDOM|DOM3
-    @@For: =ManakaiDOM|all
     @@subsetOf:
       @@@@: c|anyDOMConfigurationParameter
       @@@For: =ManakaiDOM|all
@@ -2647,8 +2449,6 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       @@@@: c|DOMConfigurationParameterApplication
-      @@@For: ManakaiDOM|DOM
-    @@For: ManakaiDOM|DOM3
 
 ElementTypeBinding:
   @Name: boolCParam
@@ -2657,12 +2457,9 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       @@@@: DOMCore|DOMConfigurationParameter
-      @@@For: ManakaiDOM|DOM
     @@rdf:type:
       @@@@: DISSource|ResourceProperty
       @@@For: =ManakaiDOM|all
-    @@For: ManakaiDOM|DOM3
-    @@For: =ManakaiDOM|all
     @@Type: idl|boolean||ManakaiDOM|all
     @@subsetOf:
       @@@@: c|anyDOMConfigurationParameter

@@ -22,7 +22,6 @@ PERL_CHK = $(PERLC) $(PERLC_OPTIONS_ALL)
 TOUCH = touch
 
 NS_MDOM = http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom\#ManakaiDOM.
-NS_MANAKAIDOM = http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom\#
 
 DIS_OPTIONS = 
 DIS_OPTIONS_ALL = $(DIS_OPTIONS) \
@@ -112,5 +111,5 @@ clean-db:
 
 distclean: clean clean-db
 
-## $Date: 2006/12/02 12:46:22 $
+## $Date: 2006/12/30 08:27:45 $
 ## License: Public Domain.

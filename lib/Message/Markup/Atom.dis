@@ -43,18 +43,15 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/12/30 04:42:55 $
+    $Date: 2006/12/30 08:27:49 $
 
   @Require:
     @@Module:
       @@@QName: Markup|common
     @@Module:
       @@@QName: MDOM|TreeCore
-      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
     @@Module:
       @@@QName: DISlib|DISMarkup
-      @@@WithFor: ManakaiDOM|all
-  @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
 Namespace:
   @atom:
@@ -140,7 +137,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: DISLang|Method
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM
 
 ElementTypeBinding:
   @Name: Param
@@ -162,7 +158,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: DISLang|Attribute
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM
 
 ElementTypeBinding:
   @Name: ATTR
@@ -178,7 +173,6 @@ ElementTypeBinding:
     @@DISCore:resourceType:
       @@@@: mv|AttributeType
       @@@ForCheck: s|ForML
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM
 
 ElementTypeBinding:
   @Name: Get
@@ -243,7 +237,6 @@ ElementTypeBinding:
     @@resourceFor: ManakaiDOM|ForIF
     @@resourceFor: ManakaiDOM|ForClass
     @@resourceFor: s|ForML
-    @@For: ManakaiDOM|ManakaiDOM
 
     @@DISCore:resourceType:
       @@@@: DISLang|Interface
@@ -254,9 +247,9 @@ ElementTypeBinding:
       @@@ForCheck: ManakaiDOM|ForClass
 
     @@Implement:
-      @@@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
+      @@@@: ||+||ManakaiDOM|ForIF
       @@@ContentType: DISCore|TFPQNames
-      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
+      @@@ForCheck: ManakaiDOM|ForClass
 
     @@s:elementType:
       @@@@: ||+||s|ForML
@@ -277,7 +270,6 @@ ElementTypeBinding:
       @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass !s|ForML
     @@resourceFor: ManakaiDOM|ForIF
     @@resourceFor: ManakaiDOM|ForClass
-    @@For: ManakaiDOM|ManakaiDOM
 
     @@DISCore:resourceType:
       @@@@: DISLang|Interface
@@ -288,9 +280,9 @@ ElementTypeBinding:
       @@@ForCheck: ManakaiDOM|ForClass
 
     @@Implement:
-      @@@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
+      @@@@: ||+||ManakaiDOM|ForIF
       @@@ContentType: DISCore|TFPQNames
-      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
+      @@@ForCheck: ManakaiDOM|ForClass
 
 ElementTypeBinding:
   @Name: IFClsConstructDef
@@ -305,7 +297,6 @@ ElementTypeBinding:
     @@resourceFor: ManakaiDOM|ForClass
     @@resourceFor: mv|ForCM
     @@resourceFor: mv|ForAG
-    @@For: ManakaiDOM|ManakaiDOM
 
     @@DISCore:resourceType:
       @@@@: DISLang|Interface
@@ -316,9 +307,9 @@ ElementTypeBinding:
       @@@ForCheck: ManakaiDOM|ForClass
 
     @@Implement:
-      @@@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
+      @@@@: ||+||ManakaiDOM|ForIF
       @@@ContentType: DISCore|TFPQNames
-      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
+      @@@ForCheck: ManakaiDOM|ForClass
 
     @@DISCore:resourceType:
       @@@@: mv|AttributeTypeGroup
@@ -435,32 +426,26 @@ ElementTypeBinding:
 ResourceDef:
   @QName: Document
   @AliasFor: td|Document
-  @For: ManakaiDOM|DOM
 
 ResourceDef:
   @QName: Element
   @AliasFor: te|Element
-  @For: ManakaiDOM|DOM
 
 ResourceDef:
   @QName: Attr
   @AliasFor: te|Attr
-  @For: ManakaiDOM|DOM
 
 ResourceDef:
   @QName: DOMString
   @AliasFor: DOMMain|DOMString
-  @For: ManakaiDOM|DOM
 
 ResourceDef:
   @QName: DOMURI
   @AliasFor: ManakaiDOM|ManakaiDOMURI
-  @For: ManakaiDOM|DOM3
 
 ResourceDef:
   @QName: DOMTimeStamp
   @AliasFor: DOMMain|DOMTimeStamp
-  @For: ManakaiDOM|DOM2
 
 ResourceDef:
   @QName: boolean
@@ -469,17 +454,14 @@ ResourceDef:
 ResourceDef:
   @QName: Node
   @AliasFor: tc|Node
-  @For: ManakaiDOM|ManakaiDOM
 
 ResourceDef:
   @QName: NodeList
   @AliasFor: tc|NodeList
-  @For: ManakaiDOM|ManakaiDOM
 
 ResourceDef:
   @QName: StaticNodeList
   @AliasFor: tc|StaticNodeList
-  @For: ManakaiDOM|ManakaiDOM
 
 ElementTypeBinding:
   @Name: enDesc
@@ -655,7 +637,6 @@ ResourceDef:
   @QName: AtomQName
   @enLN: Qualified Names
   @mv:id: qname
-  @For: =ManakaiDOM|ManakaiDOMLatest
   @DISCore:resourceType: mv|XMLDTDQNameModule
 
   @mv:contains: Atom
@@ -664,7 +645,6 @@ ResourceDef:
   @QName: Atom10
   @enLN: Atom 1.0
   @mv:id: atom10
-  @For: =ManakaiDOM|ManakaiDOMLatest
   @DISCore:resourceType: mv|XMLDTDDriver
 
   @mv:refers: Atom
@@ -681,7 +661,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: mv|XMLDTDModuleSet
-    @@For: =ManakaiDOM|ManakaiDOMLatest
 
 ElementTypeBinding:
   @Name: ModuleDef
@@ -689,7 +668,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: mv|XMLDTDModule
-    @@For: =ManakaiDOM|ManakaiDOMLatest
 
 ## -- Implementation
 
@@ -1693,7 +1671,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: mv|AttributeTypeGroup
-    @@For: =ManakaiDOM|ManakaiDOMLatest
 
 ElementTypeBinding:
   @Name: ATDef
@@ -1701,7 +1678,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: mv|AttributeType
-    @@For: =ManakaiDOM|ManakaiDOMLatest
 
 ElementTypeBinding:
   @Name: ECDef
@@ -1709,7 +1685,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: mv|ElementTypeClass
-    @@For: =ManakaiDOM|ManakaiDOMLatest
 
 ElementTypeBinding:
   @Name: EMDef
@@ -1717,7 +1692,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: mv|ElementTypeClassMix
-    @@For: =ManakaiDOM|ManakaiDOMLatest
 
 ElementTypeBinding:
   @Name: STDef
@@ -1725,7 +1699,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: mv|XMLDTDDatatypeEntity
-    @@For: =ManakaiDOM|ManakaiDOMLatest
 
 ElementTypeBinding:
   @Name: STCDef
@@ -1733,7 +1706,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: mv|ElementContentModel
-    @@For: =ManakaiDOM|ManakaiDOMLatest
 
 IFClsDef:
   @IFQName: AtomElement
@@ -4834,7 +4806,6 @@ boolCParam:
 ResourceDef:
   @QName: CFG
   @AliasFor: c|DOMConfiguration
-  @For: ManakaiDOM|DOM3
 
 ElementTypeBinding:
   @Name: boolCParam
@@ -4843,12 +4814,9 @@ ElementTypeBinding:
   @ShadowContent:
     @@DISCore:resourceType:
       @@@@: c|DOMConfigurationParameter
-      @@@For: ManakaiDOM|DOM
     @@DISCore:resourceType:
       @@@@: DISCore|Property
       @@@For: =ManakaiDOM|all
-    @@For: ManakaiDOM|DOM3
-    @@For: =ManakaiDOM|all
     @@Type: idl|boolean||ManakaiDOM|all
 
 ECDef:
@@ -4875,7 +4843,6 @@ AGDef:
 ResourceDef:
   @QName: undefinedContent
   @mv:elementContentModelName: undefined
-  @For: =ManakaiDOM|ManakaiDOMLatest
   @DISCore:resourceType: mv|ElementContentModel
   @cm: dxm|ANY||ManakaiDOM|all
   @enImplNote:

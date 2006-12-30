@@ -12,16 +12,13 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/12/30 04:42:49 $
+    $Date: 2006/12/30 08:27:43 $
 
   @Require:
     @@Module:
       @@@QName: MDOM|TreeCore
-      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
     @@Module:
       @@@QName: MDOM|Traversal
-      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
-  @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
 Namespace:
   @c:
@@ -119,7 +116,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: DISLang|Method
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM
 
 ElementTypeBinding:
   @Name: CMethod
@@ -127,7 +123,7 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: DISLang|Method
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|ForClass
+    @@ForCheck: ManakaiDOM|ForClass
 
 ElementTypeBinding:
   @Name: L2Method
@@ -135,7 +131,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: DISLang|Method
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|DOM2
 
 ElementTypeBinding:
   @Name: CL2Method
@@ -143,7 +138,7 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: DISLang|Method
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|DOM2 ManakaiDOM|ForClass
+    @@ForCheck: ManakaiDOM|ForClass
 
 ElementTypeBinding:
   @Name: L3Method
@@ -151,7 +146,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: DISLang|Method
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|DOM3
 
 ElementTypeBinding:
   @Name: CL3Method
@@ -159,7 +153,7 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: DISLang|Method
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|DOM3 ManakaiDOM|ForClass
+    @@ForCheck: ManakaiDOM|ForClass
 
 ElementTypeBinding:
   @Name: LXMethod
@@ -167,7 +161,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: DISLang|Method
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|ManakaiDOMLatest
 
 ElementTypeBinding:
   @Name: IntMethod
@@ -175,8 +168,7 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: DISLang|Method
-    @@ForCheck:
-      ManakaiDOM|ManakaiDOM !=ManakaiDOM|ManakaiDOM ManakaiDOM|ForClass
+    @@ForCheck: ManakaiDOM|ForClass
     @@ManakaiDOM:isForInternal: 1
 
 ElementTypeBinding:
@@ -199,7 +191,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: DISLang|Attribute
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM
 
 ElementTypeBinding:
   @Name: CAttr
@@ -207,7 +198,7 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: DISLang|Attribute
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|ForClass
+    @@ForCheck: ManakaiDOM|ForClass
 
 ElementTypeBinding:
   @Name: IntAttr
@@ -224,7 +215,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: DISLang|Attribute
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|DOM2
 
 ElementTypeBinding:
   @Name: L3Attr
@@ -232,7 +222,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: DISLang|Attribute
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|DOM3
 
 ElementTypeBinding:
   @Name: CL3Attr
@@ -240,7 +229,7 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: DISLang|Attribute
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|DOM3 ManakaiDOM|ForClass
+    @@ForCheck: ManakaiDOM|ForClass
 
 ElementTypeBinding:
   @Name: LXAttr
@@ -248,7 +237,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: DISLang|Attribute
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|ManakaiDOMLatest
 
 ElementTypeBinding:
   @Name: Get
@@ -269,7 +257,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: DISLang|AttributeSet
-    @@ForCheck: ManakaiDOM|ManakaiDOMLatest
 
 ElementTypeBinding:
   @Name: InCase
@@ -320,9 +307,6 @@ ElementTypeBinding:
     @@resourceFor: ManakaiDOM|ForIF
     @@resourceFor:
       @@@@: ManakaiDOM|ForClass
-      @@@ForCheck: ManakaiDOM|ManakaiDOMLatest
-    @@For: ManakaiDOM|DOM1
-    @@For: =ManakaiDOM|ManakaiDOM
 
     @@DISCore:resourceType:
       @@@@: DISLang|Interface
@@ -332,34 +316,26 @@ ElementTypeBinding:
       @@@@: DISLang|Class
       @@@ForCheck: ManakaiDOM|ForClass
     @@Implement:
-      @@@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
+      @@@@: ||+||ManakaiDOM|ForIF
       @@@ContentType: DISCore|TFPQNames
-      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
+      @@@ForCheck: ManakaiDOM|ForClass
 
     @@f:implements:
       @@@@: c|CoreFeature10
-      @@@For: ManakaiDOM|DOM1
     @@f:implements:
       @@@@: c|CoreFeature20
-      @@@For: ManakaiDOM|DOM2
     @@f:implements:
       @@@@: c|CoreFeature30
-      @@@For: ManakaiDOM|DOM3
     @@f:implements:
       @@@@: tx|XMLFeature10
-      @@@For: ManakaiDOM|DOM1
     @@f:implements:
       @@@@: tx|XMLFeature20
-      @@@For: ManakaiDOM|DOM2
     @@f:implements:
       @@@@: tx|XMLFeature30
-      @@@For: ManakaiDOM|DOM3
     @@f:implements:
       @@@@: tx|XMLVersionFeature10
-      @@@For: ManakaiDOM|DOM3
     @@f:implements:
       @@@@: tx|XMLVersionFeature11
-      @@@For: ManakaiDOM|DOM3
 
 ElementTypeBinding:
   @Name: IF2Def
@@ -370,8 +346,6 @@ ElementTypeBinding:
       @@@@: dis|MultipleResource
       @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
     @@resourceFor: ManakaiDOM|ForIF
-    @@For: ManakaiDOM|DOM1
-    @@For: =ManakaiDOM|ManakaiDOM
 
     @@DISCore:resourceType:
       @@@@: DISLang|Interface
@@ -449,32 +423,26 @@ ElementTypeBinding:
 ResourceDef:
   @QName: Document
   @AliasFor: td|Document
-  @For: ManakaiDOM|DOM
 
 ResourceDef:
   @QName: DocumentFragment
   @AliasFor: td|DocumentFragment
-  @For: ManakaiDOM|DOM
 
 ResourceDef:
   @QName: Element
   @AliasFor: te|Element
-  @For: ManakaiDOM|DOM
 
 ResourceDef:
   @QName: Attr
   @AliasFor: te|Attr
-  @For: ManakaiDOM|DOM
 
 ResourceDef:
   @QName: DOMString
   @AliasFor: DOMMain|DOMString
-  @For: ManakaiDOM|DOM
 
 ResourceDef:
   @QName: DOMImpl
   @AliasFor: c|DOMImplementation
-  @For: ManakaiDOM|DOM
 
 ResourceDef:
   @QName: boolean
@@ -499,28 +467,22 @@ ResourceDef:
 ResourceDef:
   @QName: DocumentX
   @AliasFor: d|DocumentXDoctype
-  @For: ManakaiDOM|ManakaiDOMLatest
 
 ResourceDef:
   @QName: DTDef
   @AliasFor: d|DocumentTypeDefinition
-  @For: ManakaiDOM|ManakaiDOMLatest
 
 ResourceDef:
   @QName: ETDef
   @AliasFor: d|ElementTypeDefinition
-  @For: ManakaiDOM|ManakaiDOMLatest
 
 ResourceDef:
   @QName: ATDef
   @AliasFor: d|AttributeDefinition
-  @For: ManakaiDOM|ManakaiDOMLatest
 
 ResourceDef:
   @QName: Node
   @AliasFor: tc|Node
-  @For: ManakaiDOM|ManakaiDOM
-
 
 ElementTypeBinding:
   @Name: enDesc
@@ -667,7 +629,6 @@ ElementTypeBinding:
       @@@@: dis|MultipleResource
       @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
     @@resourceFor: ManakaiDOM|ForClass
-    @@For: ManakaiDOM|ManakaiDOMLatest
 
     @@DISCore:resourceType:
       @@@@: DISLang|Class
@@ -1817,7 +1778,6 @@ ElementTypeBinding:
         of performance.  Usually applications should prefer normal
         string functions of Perl.
       }
-    @@For: ManakaiDOM|ManakaiDOM
     @@ddid:Offset16Note
 
 IFCls1Def:

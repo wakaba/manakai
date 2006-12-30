@@ -14,16 +14,13 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/12/30 04:42:52 $
+    $Date: 2006/12/30 08:27:45 $
 
   @Require:
     @@Module:
       @@@QName: MDOM|GenericLS
-      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
     @@Module:
       @@@QName: MDOM|TreeCore
-      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
-  @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
 Namespace:
   @dis:
@@ -133,9 +130,6 @@ ElementTypeBinding:
     @@resourceFor: ManakaiDOM|ForIF
     @@resourceFor:
       @@@@: ManakaiDOM|ForClass
-      @@@ForCheck: ManakaiDOM|ManakaiDOM !=ManakaiDOM|ManakaiDOM
-    @@For: ManakaiDOM|ManakaiDOMLatest
-    @@For: =ManakaiDOM|ManakaiDOM
 
     @@rdf:type:
       @@@@: DISLang|Interface
@@ -146,9 +140,9 @@ ElementTypeBinding:
       @@@ForCheck: ManakaiDOM|ForClass
 
     @@Implement:
-      @@@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
+      @@@@: ||+||ManakaiDOM|ForIF
       @@@ContentType: DISCore|TFPQNames
-      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
+      @@@ForCheck: ManakaiDOM|ForClass
 
 ElementTypeBinding:
   @Name: Method
@@ -156,7 +150,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|Method
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM
 
 ElementTypeBinding:
   @Name: Param
@@ -512,4 +505,3 @@ IFClsXDef:
 ResourceDef:
   @QName: Node
   @AliasFor: tc|Node
-  @For: ManakaiDOM|ManakaiDOMLatest

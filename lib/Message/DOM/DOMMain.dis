@@ -23,22 +23,16 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/12/30 04:42:51 $
+    $Date: 2006/12/30 08:27:45 $
   
   @Require:
     @@Module:
       @@@QName:
         DISlib:DISIDL
-      @@@WithFor:
-        ManakaiDOM:all
     @@Module:
       @@@QName: MDOM|DOMFeature
-      @@@WithFor:
-        ManakaiDOM:ManakaiDOMLatest
     @@Module:
       @@@QName: MDOM|DOMCore
-      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
-  @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
 Namespace:
   @c:
@@ -85,6 +79,8 @@ Namespace:
     http://www.w3.org/1999/02/22-rdf-syntax-ns#
   @rdfs:
     http://www.w3.org/2000/01/rdf-schema#
+  @str:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/DOM/DOMString/
   @Util:
     http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/
   @UtilError:
@@ -93,37 +89,6 @@ Namespace:
     http://www.w3.org/XML/1998/namespace
   @xmlns:
     http://www.w3.org/2000/xmlns/
-
-ResourceDef:
-  @ForCheck:
-    !=ManakaiDOM|all
-    ManakaiDOM|ManakaiDOM !=ManakaiDOM|ManakaiDOM !ManakaiDOM|ManakaiDOM3
-  @QName:
-    MDOM:
-  @rdf:type:
-    dis:ModuleGroup
-  @FullName:
-    @@lang:en
-    @@@:
-      The manakai DOM modules
-  @p:packageName:
-    @@@:
-      Message::DOM::
-    @@For: ManakaiDOM|ManakaiDOM
-    @@ManakaiDOM:moduleSuffix:
-      @@@@: Level2
-      @@@For: ManakaiDOM|ManakaiDOM2 !ManakaiDOM|ManakaiDOM3
-    @@ManakaiDOM:moduleSuffix:
-      @@@@: Level1
-      @@@For: ManakaiDOM|ManakaiDOM1 !ManakaiDOM|ManakaiDOM2
-  @p:interfacePackageName:
-    @@@:
-      Message::DOM::IFLevel2::
-    @@For: ManakaiDOM|ManakaiDOM2 !ManakaiDOM|ManakaiDOM3
-  @p:interfacePackageName:
-    @@@:
-      Message::DOM::IFLevel1::
-    @@For: ManakaiDOM|ManakaiDOM1 !ManakaiDOM|ManakaiDOM2
 
 ElementTypeBinding:
   @Name: ResourceTypeDef
@@ -285,8 +250,6 @@ ElementTypeBinding:
 ## -- DOM Core Specification datatypes
 
 ResourceDef:
-  @For:
-    ManakaiDOM:DOM2
   @QName: DOMTimeStamp
   @enLabel:
     <DOM::DOMTimeStamp>
@@ -309,7 +272,6 @@ ResourceDef:
 ResourceDef:
   @DISCore:resourceType: DISLang|DataType
   @QName: DOMUserData
-  @For: ManakaiDOM|DOM3
   @enLabel:
     <DOM::DOMUserData>
   
@@ -335,7 +297,6 @@ ElementTypeBinding:
 ResourceDef:
   @DISCore:resourceType: DISLang|DataType
   @QName: DOMObject
-  @For: ManakaiDOM|DOM3
   @enLabel:
     <DOM::DOMObject>
 
@@ -365,9 +326,7 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|DataType
-    @@rdfs:subClassOf: DOMString
-    @@ForCheck:
-      ManakaiDOM:ManakaiDOM
+    @@subsetOf: str|DOMString
 
 StringDataTypeDef:
   @QName: 
@@ -536,9 +495,7 @@ StringDataTypeDef:
         __DOMCore:ERROR{DOMMain|empty-namespace-uri::
         }__;
 
-        __FOR{ManakaiDOM:DOM3::
-          $INPUT = undef;
-        }__;
+        $INPUT = undef;
       }
 
 StringDataTypeDef:
@@ -690,7 +647,6 @@ StringDataTypeDef:
         What should be done for HTML name is not studied yet. 
     @@PerlDef:
         if (defined $INPUT) {
-          __FOR{ManakaiDOM:DOM3::
             if (((not defined $XMLVERSION or $XMLVERSION eq '1.0') and
                  not <Code::DOMMain:testXML10Name:: $INPUT = $INPUT>) or
                 (defined $XMLVERSION and $XMLVERSION eq '1.1' and
@@ -701,16 +657,6 @@ StringDataTypeDef:
                 infoset:version => {$XMLVERSION},
               }__;
             }
-          }__;
-          __FOR{!ManakaiDOM:DOM3::
-            unless (<Code::DOMMain:testXML10Name:: $INPUT = $INPUT>) {
-              __EXCEPTION{MDOMX:MDOM_BAD_NAME::
-                DOMCore:name => {$INPUT},
-                MDOMX:param-name => '$INPUT_PARAM_NAME',
-                infoset:version => '1.0',
-              }__;
-            }
-          }__;
         }
 
 StringDataTypeDef:

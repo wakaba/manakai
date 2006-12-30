@@ -12,7 +12,6 @@ Module:
 
   @enDesc:
     @@ddid:src
-    @@For: ManakaiDOM|Perl
     @@@:
       Portions of the Perl implementation contained in the module
       are derived from the example parser (April 7, 2004) available at
@@ -23,16 +22,13 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/12/30 04:42:55 $
+    $Date: 2006/12/30 08:27:50 $
   
   @Require:
     @@Module:
       @@@QName: MDOM|DOMFeature
-      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
     @@Module:
       @@@QName: MDOM|DOMCore
-      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
-  @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
 Namespace:
   @c:
@@ -84,13 +80,7 @@ ResourceDef:
   @DISPerl:packageName:
     Message::URI::
   @DISPerl:interfacePackageName:
-    @@@:
-      Message::URI::IFLatest::
-    @@For: ManakaiDOM|ManakaiDOMLatest
-  @DISPerl:interfacePackageName:
-    @@@:
-      Message::URI::IF::
-    @@For: !ManakaiDOM|ManakaiDOMLatest
+    Message::URI::IF::
 
 ## -- Features
 
@@ -165,9 +155,6 @@ ElementTypeBinding:
     @@resourceFor: ManakaiDOM|ForIF
     @@resourceFor:
       @@@@: ManakaiDOM|ForClass
-      @@@ForCheck: ManakaiDOM|ManakaiDOM !=ManakaiDOM|ManakaiDOM
-    @@For: ManakaiDOM|ManakaiDOMLatest
-    @@For: =ManakaiDOM|ManakaiDOM
 
     @@rdf:type:
       @@@@: DISLang|Interface
@@ -178,13 +165,12 @@ ElementTypeBinding:
       @@@ForCheck: ManakaiDOM|ForClass
 
     @@Implement:
-      @@@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
+      @@@@: ||+||ManakaiDOM|ForIF
       @@@ContentType: DISCore|TFPQNames
-      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
+      @@@ForCheck: ManakaiDOM|ForClass
 
     @@f:implements:
       @@@@: URIFeature40
-      @@@For: ManakaiDOM|ManakaiDOMLatest
 
 ElementTypeBinding:
   @Name: Method
@@ -192,7 +178,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|Method
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM
 
 ElementTypeBinding:
   @Name: IntMethod
@@ -200,7 +185,7 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|Method
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|ForClass
+    @@ForCheck: ManakaiDOM|ForClass
     @@ManakaiDOM:isForInternal: 1
 
 ElementTypeBinding:
@@ -231,7 +216,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: DISLang|Attribute
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM
 
 ElementTypeBinding:
   @Name: Get
@@ -317,9 +301,9 @@ IFClsDef:
           A new <IF::URIReference> object with its
           <A::URIReference.uriReference> set to the parameter value.
       @@@InCase:
-        @@@@For: ManakaiDOM|Perl
         @@@@Type: DISPerl|SCALAR||ManakaiDOM|all
         @@@@enDesc:
+          In Perl binding:
           A new <IF::URIReference> object with its
           <A::URIReference.uriReference> set to the value referenced
           by the parameter value.  Any modification to the <IF::URIReference>
@@ -1788,7 +1772,6 @@ IFClsDef:
       @@@enDesc:
         The ordinal index of the path segment, starting from zero.
       @@@enDesc:
-        @@@@For: ManakaiDOM|Perl
         @@@@ddid: a
         @@@@@:
           For Perl binding, if the <P::index> is negative, then
@@ -1911,7 +1894,6 @@ IFClsDef:
       @@@enDesc:
         The ordinal index of the path segment to replace.
       @@@enDesc:
-        @@@@For: ManakaiDOM|Perl
         @@@@ddid: a
         @@@@@:
           For Perl binding, if the <P::index> is negative, then
@@ -3376,7 +3358,6 @@ IFClsDef:
       @@@enDesc:
         The base DOM URI against which the DOM URI is resolved.
       @@@enDesc:
-        @@@@For: ManakaiDOM|Perl
         @@@@ddid:perl
         @@@@@:
           For Perl binding, any value that can be specified
@@ -3427,7 +3408,6 @@ IFClsDef:
         If the scheme component of the <P::base> is missing, then
         the result is undefined.
       @@@enDesc:
-        @@@@For: ManakaiDOM|Perl
         @@@@ddid:perl
         @@@@@:
           For Perl binding, any value that can be specified
@@ -3709,7 +3689,6 @@ IFClsDef:
       @@@enDesc:
         The base DOM URI against which the DOM URI is resolved.
       @@@enDesc:
-        @@@@For: ManakaiDOM|Perl
         @@@@ddid:perl
         @@@@@:
           For Perl binding, any value that can be specified
@@ -3782,7 +3761,6 @@ IFClsDef:
         If it does not contain the scheme component, then the result
         is undefined.
       @@@enDesc:
-        @@@@For: ManakaiDOM|Perl
         @@@@ddid:perl
         @@@@@:
           For Perl binding, any value that can be specified
@@ -4163,7 +4141,6 @@ IFClsDef:
       <A::URIReference.uriReference> value.
     @@enDesc:
       @@@ddid: p
-      @@@For: ManakaiDOM|Perl
       @@@@:
         For Perl binding, the <Perl::clone> method <kwd:MUST>
         act as the <M::URIReference.cloneURIReference> would do.
@@ -4203,7 +4180,6 @@ IFClsDef:
 ResourceDef:
   @QName: String
   @AliasFor: str|DOMString
-  @For: ManakaiDOM|ManakaiDOM
 
 ElementTypeBinding:
   @Name: enDesc

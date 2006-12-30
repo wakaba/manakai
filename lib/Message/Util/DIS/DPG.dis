@@ -15,7 +15,7 @@ Module:
   @License: license|Perl+MPL
 
   @Date:
-    $Date: 2006/12/30 04:42:58 $
+    $Date: 2006/12/30 08:27:51 $
   
   @Require:
     @@Module:
@@ -170,8 +170,6 @@ ElementTypeBinding:
 
     @@f:implements: DIS|DPG10
 
-    @@ForCheck: ManakaiDOM|ManakaiDOM
-
 ElementTypeBinding:
   @Name: IFClsDef
   @ElementType:
@@ -197,8 +195,6 @@ ElementTypeBinding:
 
     @@f:implements: DIS|DPG10
 
-    @@ForCheck: ManakaiDOM|ManakaiDOM
-
 ElementTypeBinding:
   @Name: IFDef
   @ElementType:
@@ -212,8 +208,6 @@ ElementTypeBinding:
     @@rdf:type:
       @@@@: DISLang|Interface
       @@@ForCheck: ManakaiDOM|ForIF
-
-    @@ForCheck: ManakaiDOM|ManakaiDOM
 
 ElementTypeBinding:
   @Name: Test
@@ -275,7 +269,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|Method
-    @@For: !=ManakaiDOM|ManakaiDOM
 
 ElementTypeBinding:
   @Name: Return
@@ -379,17 +372,14 @@ IFClsDef:
 ##DPGDocument
 
 ResourceDef:
-  @For: ManakaiDOM|DOM
   @QName: Node
   @AliasFor: tc|Node
 
 ResourceDef:
-  @For: ManakaiDOM|DOM
   @QName: Document
   @AliasFor: tc|Document
 
 ResourceDef:
-  @For: ManakaiDOM|DOM
   @QName: Element
   @AliasFor: tc|Element
 
@@ -506,7 +496,6 @@ ElementTypeBinding:
       @@@is-null:1
 
 ResourceDef:
-  @For: ManakaiDOM|DOM
   @QName: DOMString
   @AliasFor: DOMMain|DOMString
 
@@ -3657,7 +3646,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|Attribute
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM
 
 ElementTypeBinding:
   @Name: Get
@@ -3680,12 +3668,9 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       @@@@: c|DOMConfigurationParameter
-      @@@For: ManakaiDOM|DOM
     @@rdf:type:
       @@@@: DISCore|Property
       @@@For: =ManakaiDOM|all
-    @@For: ManakaiDOM|DOM3
-    @@For: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: CParamApp
@@ -3694,12 +3679,9 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type:
       @@@@: c|DOMConfigurationParameterApplication
-      @@@For: ManakaiDOM|DOM
     @@rdf:type:
       @@@@: DISCore|Property
       @@@For: =ManakaiDOM|all
-    @@For: ManakaiDOM|DOM3
-    @@For: =ManakaiDOM|all
 
 CParamApp:
   @c:domConfigurationParameter: c|error-handler
@@ -3711,7 +3693,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: c|DOMErrorType
-    @@For: ManakaiDOM|DOM3
     @@ecore:textFormatter: ManakaiDPGExceptionFormatter
 
 ErrDef:
@@ -3788,9 +3769,6 @@ ResourceDef:
   @resourceFor: ManakaiDOM|ForIF
   @resourceFor:
     @@@: ManakaiDOM|ForClass
-    @@ForCheck: ManakaiDOM|ManakaiDOM !=ManakaiDOM|ManakaiDOM
-  @For: ManakaiDOM|DOM3
-  @For: =ManakaiDOM|ManakaiDOM
 
   @rdf:type:
     @@@: dx|Interface
@@ -3801,16 +3779,15 @@ ResourceDef:
     @@ForCheck: ManakaiDOM|ForClass
 
   @Implement:
-    @@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
+    @@@: ||+||ManakaiDOM|ForIF
     @@ContentType: DISCore|TFPQNames
-    @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
+    @@ForCheck: ManakaiDOM|ForClass
   @dx:implementedBy:
-    @@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForClass
-    @@ForCheck: ManakaiDOM|ForIF ManakaiDOM|ManakaiDOMLatest
+    @@@: ||+||ManakaiDOM|ForClass
+    @@ForCheck: ManakaiDOM|ForIF
 
   @f:implements:
     @@@: DIS|DPG10
-    @@For: ManakaiDOM|DOM3
 
   @DISPerl:ISA:
     @@@: dx|Exception||ManakaiDOM|Perl
@@ -3838,7 +3815,7 @@ ResourceDef:
 
   @ResourceDef:
     @@rdf:type: DISLang|ConstGroup
-    @@ForCheck: ManakaiDOM|ForIF !=ManakaiDOM|ManakaiDOM
+    @@ForCheck: ManakaiDOM|ForIF
 
     @@QName: DPGExceptionCode
 

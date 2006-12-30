@@ -25,13 +25,11 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/12/30 04:42:51 $
+    $Date: 2006/12/30 08:27:45 $
 
   @Require:
     @@Module:
       @@@QName: MDOM|DOMCore
-      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
-  @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
 Namespace:
   @c:
@@ -202,7 +200,6 @@ ElementTypeBinding:
       @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
     @@resourceFor: ManakaiDOM|ForIF
     @@resourceFor: ManakaiDOM|ForClass
-    @@For: ManakaiDOM|ManakaiDOM
 
     @@DISCore:resourceType:
       @@@@: DISLang|Interface
@@ -213,7 +210,7 @@ ElementTypeBinding:
       @@@ForCheck: ManakaiDOM|ForClass
 
     @@Implement:
-      @@@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
+      @@@@: ||+||ManakaiDOM|ForIF
       @@@ContentType: DISCore|TFPQNames
       @@@ForCheck: ManakaiDOM|ForClass
 
@@ -226,7 +223,6 @@ ElementTypeBinding:
       @@@@: dis|MultipleResource
       @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
     @@resourceFor: ManakaiDOM|ForIF
-    @@For: ManakaiDOM|ManakaiDOM
 
     @@DISCore:resourceType:
       @@@@: DISLang|Interface
@@ -335,12 +331,11 @@ IFDef:
 
   @enDesc:
     A string.  It is used to store Unicode characters.
-
-  @ResourceDef:
-    @@QName: DOMMain|DOMString
-    @@AliasFor: DOMString
-    @@ForCheck: ManakaiDOM|ForIF
 ##DOMString
+
+ResourceDef:
+  @QName: DOMMain|DOMString
+  @AliasFor: DOMString
 
 IFClsDef:
   @IFQName: DOMStringList

@@ -35,7 +35,7 @@ Module:
       one interfaces offer their feature to applications 
       in the common manner.  This interface is manakai
       specific but it is a subset of the DOM Level 3
-      <IF::DOMCore:DOMImplementation::ManakaiDOM:ManakaiDOM3>
+      <IF::DOMCore:DOMImplementation>
       interface.
 
   @DISCore:author: DISCore|Wakaba
@@ -43,14 +43,13 @@ Module:
      license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/12/30 04:42:51 $
+      $Date: 2006/12/30 08:27:45 $
     @@ContentType:
       dis:Date.RCS
   
   @Require:
     @@Module:
       @@@QName: DISlib|DISIDL
-      @@@WithFor: ManakaiDOM|all
       @@@ImplNote:
         @@@@lang:en
         @@@@@:
@@ -58,12 +57,8 @@ Module:
           <Module::DISlib|ECMAScript> is also referenced.
     @@Module:
       @@@QName: DISlib|Test
-      @@@WithFor: ManakaiDOM|all
     @@Module:
       @@@QName: MDOM|DOMCore
-      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
-  @DefaultFor:
-    ManakaiDOM:ManakaiDOMLatest
 
 Namespace:
   @c:
@@ -74,8 +69,6 @@ Namespace:
     http://suika.fam.cx/~wakaba/archive/2004/8/18/lang#dis--
   @DISlib:
     http://suika.fam.cx/~wakaba/archive/2004/dis/
-  @doc:
-    http://suika.fam.cx/~wakaba/archive/2004/dis/Document#
   @domcommon:
     http://suika.fam.cx/~wakaba/archive/2006/dom/common/
   @domes:
@@ -135,43 +128,9 @@ ResourceDef:
     @@@:
       The manakai DOM modules
   @DISPerl:packageName:
-    @@@:
       Message::DOM::
-    @@For: ManakaiDOM|ManakaiDOM
-    @@ManakaiDOM:moduleSuffix:
-      @@@@: Level3
-      @@@For: ManakaiDOM|ManakaiDOM3 !ManakaiDOM|ManakaiDOMLatest
-    @@ManakaiDOM:moduleSuffix:
-      @@@@: Level2
-      @@@For: ManakaiDOM|ManakaiDOM2 !ManakaiDOM|ManakaiDOM3
-    @@ManakaiDOM:moduleSuffix:
-      @@@@: Level1
-      @@@For: ManakaiDOM|ManakaiDOM1 !ManakaiDOM|ManakaiDOM2
   @DISPerl:interfacePackageName:
-    @@@:
-      Message::DOM::IFLatest::
-    @@For: ManakaiDOM|ManakaiDOMLatest
-  @DISPerl:interfacePackageName:
-    @@@:
-      Message::DOM::IFLevel3::
-    @@For: ManakaiDOM|ManakaiDOM3 !ManakaiDOM|ManakaiDOMLatest
-  @DISPerl:interfacePackageName:
-    @@@:
-      Message::DOM::IFLevel2::
-    @@For: ManakaiDOM|ManakaiDOM2 !ManakaiDOM|ManakaiDOM3
-  @DISPerl:interfacePackageName:
-    @@@:
-      Message::DOM::IFLevel1::
-    @@For: ManakaiDOM|ManakaiDOM1 !ManakaiDOM|ManakaiDOM2
-  @DISPerl:interfacePackageName:
-    @@@:
       Message::DOM::IF::
-    @@For: ManakaiDOM|ManakaiDOM !ManakaiDOM|ManakaiDOM1
-  @ImplNote:
-    @@lang:en
-    @@@:
-      This resource is also defined in <Module::MDOM|DOMMain>
-      module for <Q::ManakaiDOM|ManakaiDOM1> and <Q::ManakaiDOM|ManakaiDOM2>.
 
 ## -- "For" definitions
 
@@ -469,8 +428,6 @@ StringDataTypeDef:
     @@lang:en
     @@@: DOM feature name
 
-  @enTitle: Feature Names
-
   @enDesc:
     Features are identified by pairs of <DFN::feature name>s (which
     is often referred simply as <QUOTE::features>) and
@@ -587,8 +544,6 @@ StringDataTypeDef:
     @@lang:en
     @@@: DOM feature version
 
-  @enTitle: Feature Version Numbers
-
   @enDesc:
     <DFN::Feature version> identifies a version of the feature.
 
@@ -635,15 +590,10 @@ StringDataTypeDef:
 
 StringDataTypeDef:
   @QName: FeaturesString
-  @For:
-    ManakaiDOM:DOM3
   @FullName:
     @@lang:en
     @@@: 
       DOM <CODE::features>
-
-  @enTitle:
-    <CODE::features>
 
   @enDesc:
     Some methods takes a parameter known as <DFN::<CODE::features>>,
@@ -1008,7 +958,7 @@ PropDef:
       \
       {P:: Currently, its values includes: 
       \
-        - <CODE::DOMEvents:ManakaiDOMEvent::ManakaiDOM:ManakaiDOMLatest>::: 
+        - <CODE::DOMEvents:ManakaiDOMEvent>::: 
             Classes that should be available via 
             <M::DOMEvents:ManakaiDOMDocumentEvent.createEvent>.
       \
@@ -1039,47 +989,6 @@ PropDef:
   @dataType: dis|TFQNames
   @multipleProperties: DISCore|UnorderedList
 
-PropDef:
-  @QName:
-    dis:compat
-  @Description:
-    @@lang:en
-    @@@:
-      The internal data structure (and so on) of a subject resource is 
-      compatible with that of object resource. 
-      \
-      This property is described as a child element of 
-      <Q::dis:Role> property element because of historical reason. 
-      \
-      {P:: Currently used its values are:
-         \
-         - <CODE::DOMCore:ManakaiDOMImplementation::ManakaiDOM:ManakaiDOMLatest>::: 
-             An class that should be available via 
-             <M::DOMCore:ManakaiDOMImplementation.getFeature>. 
-         \
-         - <CODE::DOMCore:ManakaiDOMImplementationSource::ManakaiDOM:ManakaiDOMLatest>:::
-             An class that is able to handle as same manner 
-             as <M::DOMCore:ManakaiDOMImplementationSource> by 
-             <Class::ImplementationRegistry>.
-         \
-         - <CODE::DOMCore:ManakaiDOMNode::ManakaiDOM:ManakaiDOMLatest>:::
-             An class that should be available via 
-             <M::DOMCore:ManakaiDOMNode.getFeature>.
-         \
-      }
-      \
-      {NOTE:: <Q::dis:compat> is deprecated in favor of <Q::DISLang:role>;
-              <Q::dis:compat> is retained here for compatibility 
-              with old <CODE::cdis2pm> utility.
-      \
-      }
-  @rdfs:domain:
-    ManakaiDOM:Class
-  @rdfs:range:
-    ManakaiDOM:Class
-  @dataType: dis|TFQNames
-  @multipleProperties: DISCore|UnorderedList
-
 ElementTypeBinding:
   @Name: enDesc
   @ElementType:
@@ -1089,112 +998,17 @@ ElementTypeBinding:
 
 ## -- The Minimum Implementation Specification
 
-
-ElementTypeBinding:
-  @Name: Doc
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@ForCheck: !ManakaiDOM|all
-    @@rdf:type: doc|Documentation
-
-ElementTypeBinding:
-  @Name: enContent
-  @ElementType:
-    doc:content
-  @ShadowContent:
-    @@lang:en
-    @@ForCheck: !ManakaiDOM|all
-
-ElementTypeBinding:
-  @Name: enTitle
-  @ElementType:
-    doc:title
-  @ShadowContent:
-    @@lang:en
-    @@ForCheck: !ManakaiDOM|all
-
-Doc:
-  @QName: def|PerlTypes
-  @enTitle: Basic Data Types
-  @enContent:
-    For Perl, IDL types <TYPE^^DISCore|QName::idl|long>,
-    <TYPE^^DISCore|QName::idl|unsignedLong>,
-    <TYPE^^DISCore|QName::idl|unsignedLongLong>,
-    <TYPE^^DISCore|QName::idl|short>, and
-    <TYPE^^DISCore|QName::idl|unsignedShort> are bound to number value.
-    This does not means that a parameter value whose type is e.g. 
-    <TYPE^^DISCore|QName::idl|unsignedLong> must be a Perl scalar value whose
-    internal representation has number value.  Rather,
-    it should be interpreted as the value would be 
-    evaluated in the number context.  For example, the
-    value obtained from a string literal <Perl::"123">
-    in the source code is a valid value of
-    <TYPE^^DISCore|QName::idl|unsignedLong>
-    parameter.  Similary, IDL type <TYPE^^DISCore|QName::idl|boolean>
-    is expected to be evaluated in the Boolean context.
-
-    IDL type <TYPE^^DISCore|QName::idl|any> is corresponding to any scalar value
-    in Perl.  IDL type <TYPE^^DISCore|QName::idl|Object> is bound to object.
-
-    The <DOM::null> value is bound to <Perl::undef>.
-
-Doc:
-  @QName: def|PerlMethods
-  @enTitle: Methods and Attributes in Perl Binding
-  @enContent:
-    In Perl, DOM methods and attributes are implemented
-    as methods.  Read-only attributes are methods with no
-    parameter in Perl.  Read-write attributes are methods
-    with one parameter.  If the parameter is specified, then
-    an attribute value is set to the value.  Otherwise, 
-    the method returns the attribute value.  Note that the
-    parameter value might be <DOM::null> and it is different
-    from not specifying the parameter.
-
-    A parameter of any method is <DFN::optional> if 
-    either <DOM::null> or Boolean <DOM::false> is a possible value
-    for the parameter and any other parameters following it, if any,
-    is all optional.  Applications don't have to specify
-    optional parameters if their values are <DOM::null> or <DOM::false>.
-
-Doc:
-  @QName: def|PerlExceptions
-  @enTitle: Exceptions
-  @enContent:
-    Some methods and attributes might throw exceptions.  In Perl,
-    throwing an exception is done by the function <Perl::die>.
-    To improve compatibility among implementations, the
-    <Class::dx:Error||ManakaiDOM|Perl> module <kwd:SHOULD>
-    be employed as a basis of exception throwing mechanism.
-
-Doc:
-  @QName: def|MIStringPerl
-  @enTitle:
-    The <TYPE::MIString> Type
-  @enContent:
-    The <TYPE::MIString> type is bound to Perl string value and
-    expected to be evaluated in the string context.  A <TYPE::MIString>
-    value <kwd:MUST> be interpreted as a sequence of characters rather than
-    a sequence of bytes or octets.  If it is represented
-    internally as a byte string, i.e. the utf8 flag turned off,
-    it <kwd:MUST> be interpreted as a ISO/IEC 8859-1 <bibref::ISO8859-1> string.
-
 ResourceDef:
-  @For: ManakaiDOM|DOM3
-  @For: =ManakaiDOM|ManakaiDOM
   @rdf:type:
     @@@: dis|MultipleResource
     @@ForCheck: !ManakaiDOM|ForClass !ManakaiDOM|ForIF
   @resourceFor: ManakaiDOM|ForIF
   @resourceFor:
     @@@: ManakaiDOM|ForClass
-    @@For: ManakaiDOM|ManakaiDOM3
 
   @rdf:type:
     @@@: DISLang|Interface
     @@ForCheck: ManakaiDOM|ForIF
-    @@For: ManakaiDOM|ManakaiDOM
   @IFQName: GetFeature
 
   @rdf:type:
@@ -1420,7 +1234,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: DISLang|Method
-    @@ForCheck: ManakaiDOM|DOM !=ManakaiDOM|ManakaiDOM
 
 ElementTypeBinding:
   @Name: Param
@@ -1450,10 +1263,7 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|DataType
-    @@rdfs:subClassOf:
-      @@@@: str|DOMString
-      @@@For: ManakaiDOM|DOM
-    @@For: ManakaiDOM|DOM
+    @@subsetOf: str|DOMString
 
 ElementTypeBinding:
   @Name: IFQName
