@@ -54,17 +54,13 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/12/02 12:46:25 $
+    $Date: 2006/12/30 04:42:55 $
 
   @Require:
     @@Module:
       @@@QName: Markup|common
     @@Module:
       @@@QName: MDOM|TreeCore
-      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
-    @@Module:
-      @@@WithFor: ManakaiDOM|ManakaiDOM
-    @@Module:
       @@@WithFor: ManakaiDOM|ManakaiDOMLatest
     @@Module:
       @@@QName: Markup|Atom
@@ -284,10 +280,7 @@ ElementTypeBinding:
     @@DISCore:resourceType:
       @@@@: DISLang|Class
       @@@ForCheck: ManakaiDOM|ForClass
-    @@Implement:
-      @@@@: ||ManakaiDOM|ManakaiDOM||ManakaiDOM|ForIF
-      @@@ContentType: DISCore|TFPQNames
-      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
+
     @@Implement:
       @@@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
       @@@ContentType: DISCore|TFPQNames
@@ -323,10 +316,7 @@ ElementTypeBinding:
     @@DISCore:resourceType:
       @@@@: DISLang|Class
       @@@ForCheck: ManakaiDOM|ForClass
-    @@Implement:
-      @@@@: ||ManakaiDOM|ManakaiDOM||ManakaiDOM|ForIF
-      @@@ContentType: DISCore|TFPQNames
-      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
+
     @@Implement:
       @@@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
       @@@ContentType: DISCore|TFPQNames
@@ -855,7 +845,7 @@ IFClsDef:
         @@@@enDesc:
           No error handler.
       @@@PerlDef:
-        if ($err->isa (<IFName::DOMCore|DOMError||ManakaiDOM|ManakaiDOM>)) {
+        if ($err->isa (<IFName::DOMCore|DOMError>)) {
           __DEEP{
             A: {
               my $cfg = $self-><AG::SWDMLParser.domConfig>;

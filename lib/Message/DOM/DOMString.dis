@@ -25,21 +25,11 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/12/30 02:37:06 $
+    $Date: 2006/12/30 04:42:51 $
 
   @Require:
     @@Module:
       @@@QName: MDOM|DOMCore
-      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
-    @@Module:
-      @@@WithFor: ManakaiDOM|ManakaiDOM
-    @@Module:
-      @@@WithFor: ManakaiDOM|ManakaiDOM1
-    @@Module:
-      @@@WithFor: ManakaiDOM|ManakaiDOM2
-    @@Module:
-      @@@WithFor: ManakaiDOM|ManakaiDOM3
-    @@Module:
       @@@WithFor: ManakaiDOM|ManakaiDOMLatest
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
@@ -113,7 +103,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: DISLang|Method
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM
 
 ElementTypeBinding:
   @Name: IntMethod
@@ -121,7 +110,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: DISLang|Method
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM
     @@ManakaiDOM:isForInternal: 1
 
 ElementTypeBinding:
@@ -144,7 +132,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: DISLang|Attribute
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM
 
 ElementTypeBinding:
   @Name: Get
@@ -212,7 +199,7 @@ ElementTypeBinding:
   @ShadowContent:
     @@DISCore:resourceType:
       @@@@: dis|MultipleResource
-      @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass !s|ForML
+      @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
     @@resourceFor: ManakaiDOM|ForIF
     @@resourceFor: ManakaiDOM|ForClass
     @@For: ManakaiDOM|ManakaiDOM
@@ -224,14 +211,11 @@ ElementTypeBinding:
     @@DISCore:resourceType:
       @@@@: DISLang|Class
       @@@ForCheck: ManakaiDOM|ForClass
-    @@Implement:
-      @@@@: ||ManakaiDOM|ManakaiDOM||ManakaiDOM|ForIF
-      @@@ContentType: DISCore|TFPQNames
-      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
+
     @@Implement:
       @@@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
       @@@ContentType: DISCore|TFPQNames
-      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
+      @@@ForCheck: ManakaiDOM|ForClass
 
 ElementTypeBinding:
   @Name: IFDef
@@ -240,7 +224,7 @@ ElementTypeBinding:
   @ShadowContent:
     @@DISCore:resourceType:
       @@@@: dis|MultipleResource
-      @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass !s|ForML
+      @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
     @@resourceFor: ManakaiDOM|ForIF
     @@For: ManakaiDOM|ManakaiDOM
 
@@ -386,7 +370,6 @@ IFClsDef:
     }
 
   @enDesc:
-    @@For: ManakaiDOM|ManakaiDOM
     @@ddid:perl
     @@@:
       In the manakai implementation, a <IF::DOMStringList> object
@@ -394,7 +377,7 @@ IFClsDef:
       containing all items in the list.
 
   @enDesc:
-    @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
+    @@ForCheck: ManakaiDOM|ForClass
     @@ddid:exists
     @@@:
       In the current implementation, each item value can be
@@ -748,8 +731,7 @@ IFClsDef:
       @@@PerlDef:
         EQ: {
           last EQ
-              unless UNIVERSAL::isa
-                         ($arg, <IFName::DOMStringList||ManakaiDOM|ManakaiDOM>);
+              unless UNIVERSAL::isa ($arg, <IFName::DOMStringList>);
           my @v1 = @$self;
           my @v2 = @$arg;
           last EQ unless @v1 == @v2;

@@ -10,7 +10,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/12/29 14:45:43 $
+    $Date: 2006/12/30 04:42:54 $
 
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
@@ -900,7 +900,7 @@ ClsDef:
         @@@@enDesc:
           No error handler.
       @@@PerlDef:
-        if ($err->isa (<IFName::DOMCore|DOMError||ManakaiDOM|ManakaiDOM>)) {
+        if ($err->isa (<IFName::DOMCore|DOMError>)) {
           __DEEP{
             A: {
               my $cfg = $self-><AG::LSParser.domConfig>;
@@ -15875,7 +15875,6 @@ ResourceDef:
     $result->{utf32_offset} = 0 if $result->{utf32_offset} < 0;
     $result->{column_number} = 0 if $result->{column_number} < 0;
                             ## 0 or 1, which should be?
-  @For: ManakaiDOM|ManakaiDOM3
 
 ElementTypeBinding:
   @Name: RuleDef

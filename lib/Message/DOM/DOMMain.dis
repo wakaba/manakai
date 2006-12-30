@@ -23,7 +23,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/12/02 12:46:21 $
+    $Date: 2006/12/30 04:42:51 $
   
   @Require:
     @@Module:
@@ -31,21 +31,6 @@ Module:
         DISlib:DISIDL
       @@@WithFor:
         ManakaiDOM:all
-    @@Module:
-      @@@WithFor:
-        ManakaiDOM:ManakaiDOM
-    @@Module:
-      @@@WithFor:
-        ManakaiDOM:ManakaiDOM1
-    @@Module:
-      @@@WithFor:
-        ManakaiDOM:ManakaiDOM2
-    @@Module:
-      @@@WithFor:
-        ManakaiDOM:ManakaiDOM3
-    @@Module:
-      @@@WithFor:
-        ManakaiDOM:ManakaiDOMLatest
     @@Module:
       @@@QName: MDOM|DOMFeature
       @@@WithFor:
@@ -168,8 +153,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|Attribute
-    @@ForCheck:
-      ManakaiDOM:DOM !=ManakaiDOM|ManakaiDOM
 
 ElementTypeBinding:
   @Name: Get
@@ -221,7 +204,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|Method
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM
 
 ElementTypeBinding:
   @Name: Param
@@ -385,7 +367,7 @@ ElementTypeBinding:
     @@rdf:type: DISLang|DataType
     @@rdfs:subClassOf: DOMString
     @@ForCheck:
-      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM
+      ManakaiDOM:ManakaiDOM
 
 StringDataTypeDef:
   @QName: 
@@ -621,8 +603,6 @@ ImplNote:
 StringDataTypeDef:
   @QName:
     ManakaiDOM:ManakaiDOMKeyIdentifier
-  @For:
-    ManakaiDOM:ManakaiDOM3
   @FullName:
     @@lang:en
     @@@: DOM key identifier
@@ -639,8 +619,6 @@ StringDataTypeDef:
 StringDataTypeDef:
   @QName:
     ManakaiDOM:ManakaiDOMKeyIdentifiers
-  @For:
-    ManakaiDOM:ManakaiDOM3
   @FullName:
     @@lang:en
     @@@: List of DOM key identifiers
@@ -790,8 +768,6 @@ StringDataTypeDef:
         the empty prefix string is treated is implementation-dependent;
         the manakai DOM implementations does not distingulish
         it with the <DOM::null> value.
-      @@@For:
-        ManakaiDOM:DOM3
     @@PerlDef:
       if (defined $INPUT and $INPUT eq '') {
         require Message::DOM::DOMMain;
@@ -836,7 +812,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DOMCore|DOMErrorType
-    @@For: ManakaiDOM|DOM3
     @@ecore:textFormatter: ecore|MUErrorFormatter||ManakaiDOM|Perl
 
 StringDataTypeDef:

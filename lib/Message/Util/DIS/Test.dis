@@ -12,7 +12,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/11/05 12:31:51 $
+    $Date: 2006/12/30 04:42:59 $
   
   @Require:
     @@Module:
@@ -25,10 +25,6 @@ Module:
       @@@WithFor: ManakaiDOM|ManakaiDOMLatest
     @@Module:
       @@@QName: MDOM|GenericLS
-      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
-    @@Module:
-      @@@WithFor: ManakaiDOM|ManakaiDOM
-    @@Module:
       @@@WithFor: ManakaiDOM|ManakaiDOMLatest
     @@Module:
       @@@QName: Util|DIS
@@ -156,10 +152,7 @@ ElementTypeBinding:
     @@rdf:type:
       @@@@: DISLang|Class
       @@@ForCheck: ManakaiDOM|ForClass
-    @@Implement:
-      @@@@: ||ManakaiDOM|ManakaiDOM||ManakaiDOM|ForIF
-      @@@ContentType: DISCore|TFPQNames
-      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
+
     @@Implement:
       @@@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
       @@@ContentType: DISCore|TFPQNames
@@ -2264,7 +2257,7 @@ IFClsDef:
         @@@@enDesc:
           No error handler.
       @@@PerlDef:
-        if ($err->isa (<IFName::DOMCore|DOMError||ManakaiDOM|ManakaiDOM>)) {
+        if ($err->isa (<IFName::DOMCore|DOMError>)) {
           __DEEP{
             A: {
               my $cfg = $self-><AG::TDTParser.domConfig>;

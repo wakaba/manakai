@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/12/30 02:37:09 $
+      $Date: 2006/12/30 04:42:59 $
     @@ContentType:
       dis:Date.RCS
   
@@ -4197,7 +4197,7 @@ TMethods:
       @@@Type: DIS|MPLCodeFragment
       @@@PerlDef:
         __DEEP{
-            $self->{<H::DIS|plCodeFragment>} = null;  ## To avoid loop
+          local $self->{<H::DIS|plCodeFragment>} = null;  ## To avoid loop
             my $ret = $self-><M::DIS|DISResource
                             .getChildResourceByType> (<Q::DISLang:MethodReturn>);
             unless ($ret) { 
@@ -4440,7 +4440,7 @@ TMethods:
       @@@Type: DIS|MPLCodeFragment
       @@@PerlDef:
         __DEEP{
-            $self->{<H::DIS|plCodeFragment>} = null;  ## To avoid loop
+          local $self->{<H::DIS|plCodeFragment>} = null;  ## To avoid loop
             my $get = $self-><M::DIS|DISResource
                             .getChildResourceByType> (<Q::DISLang:AttributeGet>);
             unless ($get) { 
@@ -5858,7 +5858,7 @@ TMethods:
       @@@Type: DIS|MPLCodeFragment
       @@@PerlDef:
         __DEEP{
-            $self->{<Q::DIS|plCodeFragment>} = null;  ## To avoid loop
+          local $self->{<Q::DIS|plCodeFragment>} = null;  ## To avoid loop
             my $def = $self-><M::DIS|DISResourceProp.getPropertyValue>
                                 (<Q::dis:Def>);
             $def = $def->[0] if $def;

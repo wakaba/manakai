@@ -12,7 +12,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/12/30 02:37:06 $
+    $Date: 2006/12/30 04:42:53 $
 
   @Require:
     @@Module:
@@ -32,16 +32,6 @@ Module:
       @@@WithFor: ManakaiDOM|ManakaiDOMLatest
     @@Module:
       @@@QName: MDOM|XDoctype
-      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
-    @@Module:
-      @@@WithFor: ManakaiDOM|ManakaiDOM
-    @@Module:
-      @@@WithFor: ManakaiDOM|ManakaiDOM1
-    @@Module:
-      @@@WithFor: ManakaiDOM|ManakaiDOM2
-    @@Module:
-      @@@WithFor: ManakaiDOM|ManakaiDOM3
-    @@Module:
       @@@WithFor: ManakaiDOM|ManakaiDOMLatest
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
@@ -424,22 +414,6 @@ ElementTypeBinding:
       @@@@: DISLang|Class
       @@@ForCheck: ManakaiDOM|ForClass
     @@Implement:
-      @@@@: ||ManakaiDOM|ManakaiDOM||ManakaiDOM|ForIF
-      @@@ContentType: DISCore|TFPQNames
-      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
-    @@Implement:
-      @@@@: ||ManakaiDOM|ManakaiDOM1||ManakaiDOM|ForIF
-      @@@ContentType: DISCore|TFPQNames
-      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM1
-    @@Implement:
-      @@@@: ||ManakaiDOM|ManakaiDOM2||ManakaiDOM|ForIF
-      @@@ContentType: DISCore|TFPQNames
-      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM2
-    @@Implement:
-      @@@@: ||ManakaiDOM|ManakaiDOM3||ManakaiDOM|ForIF
-      @@@ContentType: DISCore|TFPQNames
-      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM3
-    @@Implement:
       @@@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
       @@@ContentType: DISCore|TFPQNames
       @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
@@ -491,10 +465,6 @@ ElementTypeBinding:
     @@DISCore:resourceType:
       @@@@: DISLang|Class
       @@@ForCheck: ManakaiDOM|ForClass
-    @@Implement:
-      @@@@: ||ManakaiDOM|ManakaiDOM||ManakaiDOM|ForIF
-      @@@ContentType: DISCore|TFPQNames
-      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
     @@Implement:
       @@@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
       @@@ContentType: DISCore|TFPQNames
@@ -872,7 +842,7 @@ IFCls1Def:
         @@@@enDesc:
           No error handler.
       @@@PerlDef:
-        if ($err->isa (<IFName::c|DOMError||ManakaiDOM|ManakaiDOM>)) {
+        if ($err->isa (<IFName::c|DOMError>)) {
           __DEEP{
             A: {
               my $doc = $self-><AG::Node.ownerDocument>;
@@ -3604,20 +3574,20 @@ IFCls1Def:
         no warnings 'uninitialized';
         for my $node (<Code::tc|createNodesForTest+dt>) {
           for my $f (
-            [Core => '1.0', <IFName::Node||ManakaiDOM|ManakaiDOM1>],
-            [Core => '2.0', <IFName::Node||ManakaiDOM|ManakaiDOM2>],
-            [Core => '3.0', <IFName::Node||ManakaiDOM|ManakaiDOM3>],
-            [Core => '', <IFName::Node||ManakaiDOM|ManakaiDOM>],
-            [Core => null, <IFName::Node||ManakaiDOM|ManakaiDOM>],
-            [XML => '1.0', <IFName::Node||ManakaiDOM|ManakaiDOM1>],
-            [XML => '2.0', <IFName::Node||ManakaiDOM|ManakaiDOM2>],
-            [XML => '3.0', <IFName::Node||ManakaiDOM|ManakaiDOM3>],
-            [XML => '', <IFName::Node||ManakaiDOM|ManakaiDOM>],
-            [XML => null, <IFName::Node||ManakaiDOM|ManakaiDOM>],
-            [XMLVersion => '1.0', <IFName::Node||ManakaiDOM|ManakaiDOM3>],
-            [XMLVersion => '1.1', <IFName::Node||ManakaiDOM|ManakaiDOM3>],
-            [XMLVersion => '', <IFName::Node||ManakaiDOM|ManakaiDOM>],
-            [XMLVersion => null, <IFName::Node||ManakaiDOM|ManakaiDOM>],
+            [Core => '1.0', <IFName::Node>],
+            [Core => '2.0', <IFName::Node>],
+            [Core => '3.0', <IFName::Node>],
+            [Core => '', <IFName::Node>],
+            [Core => null, <IFName::Node>],
+            [XML => '1.0', <IFName::Node>],
+            [XML => '2.0', <IFName::Node>],
+            [XML => '3.0', <IFName::Node>],
+            [XML => '', <IFName::Node>],
+            [XML => null, <IFName::Node>],
+            [XMLVersion => '1.0', <IFName::Node>],
+            [XMLVersion => '1.1', <IFName::Node>],
+            [XMLVersion => '', <IFName::Node>],
+            [XMLVersion => null, <IFName::Node>],
             ['-unknown-feature', '3.0', false],
             ['-unknown-feature', '', false],
             ['-unknown-feature', null, false],
@@ -5657,7 +5627,7 @@ IFCls1Def:
         __DEEP{
           EQ: {
             last EQ unless UNIVERSAL::isa
-                             ($arg, <IFName::Node||ManakaiDOM|ManakaiDOM>);
+                             ($arg, <IFName::Node>);
             my $nt = $self-><AG::Node.nodeType>;
             last EQ unless $nt == $arg-><AG::Node.nodeType>;
 
@@ -6309,18 +6279,6 @@ ResourceDef:
     @@@: DISLang|Class
     @@ForCheck: tc|ForEmptyNodeList
 
-  @Implement:
-    @@@: NodeList||ManakaiDOM|ManakaiDOM
-    @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
-  @Implement:
-    @@@: NodeList||ManakaiDOM|ManakaiDOM1
-    @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM1
-  @Implement:
-    @@@: NodeList||ManakaiDOM|ManakaiDOM2
-    @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM2
-  @Implement:
-    @@@: NodeList||ManakaiDOM|ManakaiDOM3
-    @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM3
   @Implement:
     @@@: NodeList||ManakaiDOM|ManakaiDOMLatest
     @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
@@ -7104,7 +7062,6 @@ ResourceDef:
 
   @resourceFor:
     @@@: tc|ForAttrMap
-    @@ForCheck: ManakaiDOM|ManakaiDOM1
   @QName:
     @@@: ManakaiDOMAttrMap
     @@ForCheck: tc|ForAttrMap
@@ -7133,7 +7090,6 @@ ResourceDef:
 
   @resourceFor:
     @@@: tc|ForEntityMap
-    @@ForCheck: ManakaiDOM|ManakaiDOM1
   @QName:
     @@@: ManakaiDOMEntityMap
     @@ForCheck: tc|ForEntityMap
@@ -7156,26 +7112,25 @@ ResourceDef:
 
   @resourceFor:
     @@@: tc|ForNotationMap
-    @@ForCheck: ManakaiDOM|ManakaiDOM1
   @QName:
     @@@: ManakaiDOMNotationMap
     @@ForCheck: tc|ForNotationMap
 
   @f:implements:
     @@@: tx|XMLFeature10
-    @@ForCheck: tc|ForNotationMap ManakaiDOM|DOM1
+    @@ForCheck: tc|ForNotationMap
   @f:implements:
     @@@: tx|XMLFeature20
-    @@ForCheck: tc|ForNotationMap ManakaiDOM|DOM2
+    @@ForCheck: tc|ForNotationMap
   @f:implements:
     @@@: tx|XMLFeature30
-    @@ForCheck: tc|ForNotationMap ManakaiDOM|DOM3
+    @@ForCheck: tc|ForNotationMap
   @f:implements:
     @@@: tx|XMLVersionFeature10
-    @@ForCheck: tc|ForNotationMap ManakaiDOM|DOM3
+    @@ForCheck: tc|ForNotationMap
   @f:implements:
     @@@: tx|XMLVersionFeature11
-    @@ForCheck: tc|ForNotationMap ManakaiDOM|DOM3
+    @@ForCheck: tc|ForNotationMap
 
   @DISCore:resourceType:
     @@@: DISLang|Class
@@ -7188,20 +7143,8 @@ ResourceDef:
     @@ForCheck: ManakaiDOM|ForClass
 
   @Implement:
-    @@@: NamedNodeMap||ManakaiDOM|ManakaiDOM
-    @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
-  @Implement:
-    @@@: NamedNodeMap||ManakaiDOM|ManakaiDOM1
-    @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM1
-  @Implement:
-    @@@: NamedNodeMap||ManakaiDOM|ManakaiDOM2
-    @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM2
-  @Implement:
-    @@@: NamedNodeMap||ManakaiDOM|ManakaiDOM3
-    @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM3
-  @Implement:
     @@@: NamedNodeMap||ManakaiDOM|ManakaiDOMLatest
-    @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
+    @@ForCheck: ManakaiDOM|ForClass
 
   @enDesc:
     An object implementing the <IF::NamedNodeMap> interface represents
@@ -7979,7 +7922,7 @@ ResourceDef:
         $el-><M::Element.removeAttribute> ('a1');
         $test->assert_null ($map-><M::NamedNodeMap.getNamedItem> ('a1'));
     @@Test:
-      @@@ForCheck: tc|ForAttrMap ManakaiDOM|DOM2
+      @@@ForCheck: tc|ForAttrMap
       @@@QName: AttrMap.getNamedItem.qname.test
       @@@PerlDef:
         my $el;
@@ -8251,10 +8194,13 @@ ResourceDef:
           the one that created the map.
         @@@@enDesc:
           @@@@@ddid: no-doc
-          @@@@@ForCheck: !tc|ForAttrMap ManakaiDOM|ManakaiDOM
+          @@@@@ForCheck: !tc|ForAttrMap
           @@@@@@:
             If the map is attached to a <IF::tx|DocumentType> 
             whose <A::Node.ownerDocument> is <DOM::null>.
+
+              {NOTE:: Not in the spec.
+              }
       @@@dx:raises:
         @@@@@: c|NOMOD_NAMEDNODEMAP_ERR
         @@@@enDesc:
@@ -9330,12 +9276,15 @@ ResourceDef:
           does not identify any node in the map.
         @@@@enDesc:
           @@@@@ddid:nons
-          @@@@@ForCheck: !tc|ForAttrMap ManakaiDOM|ManakaiDOM
+          @@@@@ForCheck: !tc|ForAttrMap
           @@@@@@:
             If it is a <IF::NamedNodeMap> containing element type definitions,
             attribute definitions, entities, or notations attached to
             <IF::d|DocumentTypeDefinition> or <IF::d|ElementTypeDefinition>
             nodes.
+
+              {NOTE:: Not in the spec.
+              }
       @@@dx:raises:
         @@@@@: MDOMX|MDOM_IMPL_NOSUPPORT_XMLNS
         @@@@enDesc:
@@ -9444,13 +9393,16 @@ ResourceDef:
           and the language exposed through the <IF::Document> does
           not support XML namespaces.
       @@@dx:raises:
-        @@@@ForCheck: !tc|ForAttrMap ManakaiDOM|ManakaiDOM
+        @@@@ForCheck: !tc|ForAttrMap
         @@@@@: c|NO_NS_NAMEDNODEMAP_ERR
         @@@@enDesc:
           If it is a <IF::NamedNodeMap> containing element type definitions,
           attribute definitions, entities, or notations attached to
           <IF::d|DocumentTypeDefinition> or <IF::d|ElementTypeDefinition>
           nodes.  They does not support XML namespaces.
+
+            {NOTE:: Not in the spec.
+            }
       @@@c:reports:
         @@@@@: t|replace-by-itself
         @@@@enDesc:
@@ -9718,7 +9670,7 @@ ResourceDef:
       @@@PerlDef: $r = $map;
 
   @CODE:
-    @@ForCheck: tc|ForAttrMap ManakaiDOM|ManakaiDOMLatest
+    @@ForCheck: tc|ForAttrMap
     @@QName: getAttrMap
     @@enDesc:
       Creates an attribute node map from an element node.
@@ -9727,7 +9679,7 @@ ResourceDef:
       $$node->{<H::tc|hashPosition>} ||= 0;
 
   @CODE:
-    @@ForCheck: tc|ForETMap ManakaiDOM|ManakaiDOMLatest
+    @@ForCheck: tc|ForETMap
     @@QName: getElementTypeDefNodeMap
     @@enDesc:
       Creates an element type definition node map from a document
@@ -9736,7 +9688,7 @@ ResourceDef:
       $map = bless \\($node), <ClassName::ManakaiDOMElementTypeDefMap>;
 
   @CODE:
-    @@ForCheck: tc|ForATMap ManakaiDOM|ManakaiDOMLatest
+    @@ForCheck: tc|ForATMap
     @@QName: getAttrDefNodeMap
     @@enDesc:
       Creates an attribute definition node map from a document
@@ -9745,7 +9697,7 @@ ResourceDef:
       $map = bless \\($node), <ClassName::ManakaiDOMAttrDefMap>;
 
   @CODE:
-    @@ForCheck: tc|ForEntityMap ManakaiDOM|ManakaiDOMLatest
+    @@ForCheck: tc|ForEntityMap
     @@QName: getEntityNodeMap
     @@enDesc:
       Creates an entity node map from a document
@@ -9754,7 +9706,7 @@ ResourceDef:
       $map = bless \\($node), <ClassName::ManakaiDOMEntityMap>;
 
   @CODE:
-    @@ForCheck: tc|ForNotationMap ManakaiDOM|ManakaiDOMLatest
+    @@ForCheck: tc|ForNotationMap
     @@QName: getNotationNodeMap
     @@enDesc:
       Creates a notation node map from a document
@@ -10389,9 +10341,7 @@ ElementTypeBinding:
     @@resourceFor: ManakaiDOM|ForIF
     @@resourceFor:
       @@@@: ManakaiDOM|ForClass
-      @@@ForCheck: ManakaiDOM|ManakaiDOM !=ManakaiDOM|ManakaiDOM
     @@For: ManakaiDOM|DOM3
-    @@For: =ManakaiDOM|ManakaiDOM
 
     @@rdf:type:
       @@@@: DISLang|Interface
@@ -10400,14 +10350,6 @@ ElementTypeBinding:
     @@rdf:type:
       @@@@: DISLang|Class
       @@@ForCheck: ManakaiDOM|ForClass
-    @@Implement:
-      @@@@: ||ManakaiDOM|ManakaiDOM||ManakaiDOM|ForIF
-      @@@ContentType: DISCore|TFPQNames
-      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
-    @@Implement:
-      @@@@: ||ManakaiDOM|ManakaiDOM3||ManakaiDOM|ForIF
-      @@@ContentType: DISCore|TFPQNames
-      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM3
     @@Implement:
       @@@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
       @@@ContentType: DISCore|TFPQNames

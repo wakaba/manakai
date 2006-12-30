@@ -15,7 +15,7 @@ Module:
   @License: license|Perl+MPL
 
   @Date:
-    $Date: 2006/12/02 12:46:25 $
+    $Date: 2006/12/30 04:42:58 $
   
   @Require:
     @@Module:
@@ -2831,7 +2831,7 @@ IFClsDef:
         @@@@enDesc:
           No error handler.
       @@@PerlDef:
-        if ($err->isa (<IFName::c|DOMError||ManakaiDOM|ManakaiDOM>)) {
+        if ($err->isa (<IFName::c|DOMError>)) {
           __DEEP{
             A: {
               my $cfg = $self-><AG::DPGParser.domConfig>;
@@ -3800,10 +3800,6 @@ ResourceDef:
     @@@: dx|Class
     @@ForCheck: ManakaiDOM|ForClass
 
-  @Implement:
-    @@@: ||ManakaiDOM|ManakaiDOM||ManakaiDOM|ForIF
-    @@ContentType: DISCore|TFPQNames
-    @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
   @Implement:
     @@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
     @@ContentType: DISCore|TFPQNames

@@ -22,7 +22,7 @@ Module:
       @@@Year:2004
       @@@DISCore:author: DISCore|Wakaba
   @Date:
-    $Date: 2006/12/30 02:37:06 $
+    $Date: 2006/12/30 04:42:55 $
   
   @Require:
     @@Module:
@@ -3881,7 +3881,7 @@ IFClsDef:
         @@@@enDesc:
           No error handler.
       @@@PerlDef:
-        if ($err->isa (<IFName::c|DOMError||ManakaiDOM|ManakaiDOM>)) {
+        if ($err->isa (<IFName::c|DOMError>)) {
           __DEEP{
             my $cfg = $self-><AG::DISDatabase.domConfig>;
             my $h = $cfg-><M::DOMConfig.getParameter> ('error-handler');
@@ -5288,7 +5288,7 @@ IFClsDef:
         @@@@enDesc:
           No error handler.
       @@@PerlDef:
-        if ($err->isa (<IFName::c|DOMError||ManakaiDOM|ManakaiDOM>)) {
+        if ($err->isa (<IFName::c|DOMError>)) {
           __DEEP{
             my $cfg = $self-><AG::DISAnyResource.database>
                            -><AG::DISDatabase.domConfig>;

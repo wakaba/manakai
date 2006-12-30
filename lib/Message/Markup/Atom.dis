@@ -43,17 +43,13 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/12/29 14:45:44 $
+    $Date: 2006/12/30 04:42:55 $
 
   @Require:
     @@Module:
       @@@QName: Markup|common
     @@Module:
       @@@QName: MDOM|TreeCore
-      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
-    @@Module:
-      @@@WithFor: ManakaiDOM|ManakaiDOM
-    @@Module:
       @@@WithFor: ManakaiDOM|ManakaiDOMLatest
     @@Module:
       @@@QName: DISlib|DISMarkup
@@ -256,10 +252,7 @@ ElementTypeBinding:
     @@DISCore:resourceType:
       @@@@: DISLang|Class
       @@@ForCheck: ManakaiDOM|ForClass
-    @@Implement:
-      @@@@: ||ManakaiDOM|ManakaiDOM||ManakaiDOM|ForIF
-      @@@ContentType: DISCore|TFPQNames
-      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
+
     @@Implement:
       @@@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
       @@@ContentType: DISCore|TFPQNames
@@ -293,10 +286,7 @@ ElementTypeBinding:
     @@DISCore:resourceType:
       @@@@: DISLang|Class
       @@@ForCheck: ManakaiDOM|ForClass
-    @@Implement:
-      @@@@: ||ManakaiDOM|ManakaiDOM||ManakaiDOM|ForIF
-      @@@ContentType: DISCore|TFPQNames
-      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
+
     @@Implement:
       @@@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
       @@@ContentType: DISCore|TFPQNames
@@ -324,10 +314,7 @@ ElementTypeBinding:
     @@DISCore:resourceType:
       @@@@: DISLang|Class
       @@@ForCheck: ManakaiDOM|ForClass
-    @@Implement:
-      @@@@: ||ManakaiDOM|ManakaiDOM||ManakaiDOM|ForIF
-      @@@ContentType: DISCore|TFPQNames
-      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
+
     @@Implement:
       @@@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
       @@@ContentType: DISCore|TFPQNames
@@ -725,7 +712,6 @@ IFClsDef:
     @@PerlDef:
       for my $interface (
         <IFName::AtomImplementation>,
-        <IFName::AtomImplementation||ManakaiDOM|ManakaiDOM>,
         <IFName::c|DOMImplementation>,
         <IFName::f|GetFeature>,
       ) {
@@ -1782,7 +1768,6 @@ IFClsDef:
     @@PerlDef:
       for my $interface (
         <IFName::AtomElement>,
-        <IFName::AtomElement||ManakaiDOM|ManakaiDOM>,
         <IFName::Element>,
         <IFName::Node>,
         <IFName::f|GetFeature>,

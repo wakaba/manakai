@@ -6003,7 +6003,7 @@ my $r;
 
 if 
 ($err->isa (
-'Message::DOM::IF::DOMError'
+'Message::DOM::IFLatest::DOMError'
 )) {
   
 
@@ -8184,7 +8184,7 @@ my $r;
 
 if 
 ($err->isa (
-'Message::DOM::IF::DOMError'
+'Message::DOM::IFLatest::DOMError'
 )) {
   
 

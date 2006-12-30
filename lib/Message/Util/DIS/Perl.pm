@@ -210,7 +210,7 @@ local $Error::Depth = $Error::Depth + 1;
 {
 
 
-
+local
     $self->{
 'http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#plCodeFragment'
 } = 
@@ -756,7 +756,7 @@ local $Error::Depth = $Error::Depth + 1;
 {
 
 
-
+local
     $self->{
 'http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#plCodeFragment'
 } = 
@@ -1363,6 +1363,7 @@ _pl_append_throw
                        ($factory, $set_code, $cls, $const, $subtype,
                         {%$context_param});
     }
+
 
     $r = $self->{
 'http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#plCodeFragment'
@@ -4021,7 +4022,7 @@ local $Error::Depth = $Error::Depth + 1;
 {
 
 
-
+local
     $self->{
 'http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/DIS#plCodeFragment'
 } = 

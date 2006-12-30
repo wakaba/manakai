@@ -13,7 +13,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/12/30 01:55:52 $
+    $Date: 2006/12/30 04:42:51 $
 
   @Require:
     @@Module:
@@ -24,16 +24,6 @@ Module:
       @@@WithFor: ManakaiDOM|ManakaiDOMLatest
     @@Module:
       @@@QName: MDOM|XDoctype
-      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
-    @@Module:
-      @@@WithFor: ManakaiDOM|ManakaiDOM
-    @@Module:
-      @@@WithFor: ManakaiDOM|ManakaiDOM1
-    @@Module:
-      @@@WithFor: ManakaiDOM|ManakaiDOM2
-    @@Module:
-      @@@WithFor: ManakaiDOM|ManakaiDOM3
-    @@Module:
       @@@WithFor: ManakaiDOM|ManakaiDOMLatest
   @DefaultFor: ManakaiDOM|ManakaiDOMLatest
 
@@ -120,7 +110,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|Method
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM
 
 ElementTypeBinding:
   @Name: L12Method
@@ -128,7 +117,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|Method
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM
   ## Modified in DOM Level 2
 
 ElementTypeBinding:
@@ -137,7 +125,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|Method
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM
   ## Modified in DOM Level 3
 
 ElementTypeBinding:
@@ -146,14 +133,13 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|Method
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|ForClass
+    @@ForCheck: ManakaiDOM|ForClass
 ElementTypeBinding:
   @Name: L2Method
   @ElementType:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: DISLang|Method
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|DOM2
 
 ElementTypeBinding:
   @Name: CL2Method
@@ -161,7 +147,7 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: DISLang|Method
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|DOM2 ManakaiDOM|ForClass
+    @@ForCheck: ManakaiDOM|ForClass
 
 ElementTypeBinding:
   @Name: L3Method
@@ -169,7 +155,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|Method
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|DOM3
 
 ElementTypeBinding:
   @Name: CL3Method
@@ -177,7 +162,7 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|Method
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|DOM3 ManakaiDOM|ForClass
+    @@ForCheck: ManakaiDOM|ForClass
 
 ElementTypeBinding:
   @Name: LXMethod
@@ -185,7 +170,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|Method
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|ManakaiDOMLatest
 
 ElementTypeBinding:
   @Name: IntMethod
@@ -193,8 +177,7 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|Method
-    @@ForCheck:
-      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM ManakaiDOM|ForClass
+    @@ForCheck: ManakaiDOM|ForClass
     @@ManakaiDOM:isForInternal: 1
 
 ElementTypeBinding:
@@ -217,7 +200,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|Attribute
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM
 
 ElementTypeBinding:
   @Name: CAttr
@@ -225,7 +207,7 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: DISLang|Attribute
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|ForClass
+    @@ForCheck: ManakaiDOM|ForClass
 
 ElementTypeBinding:
   @Name: IntAttr
@@ -242,7 +224,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|Attribute
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|DOM2
 
 ElementTypeBinding:
   @Name: L12Attr
@@ -250,7 +231,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|Attribute
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|DOM1
   # Modified in DOM Level 2
 
 ElementTypeBinding:
@@ -259,7 +239,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|Attribute
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|DOM1
   # Modified in DOM Level 3
 
 ElementTypeBinding:
@@ -268,7 +247,7 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|Attribute
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|DOM2 ManakaiDOM|ForClass
+    @@ForCheck: ManakaiDOM|ForClass
 
 ElementTypeBinding:
   @Name: L3Attr
@@ -276,7 +255,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|Attribute
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|DOM3
   ## Note that there are attributes introduced in DOM Level 3
   ## but also defined for lower levels as internal attributes
   ## for the purpose of internal use.
@@ -287,7 +265,7 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|Attribute
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|DOM3 ManakaiDOM|ForClass
+    @@ForCheck: ManakaiDOM|ForClass
 
 ElementTypeBinding:
   @Name: LXAttr
@@ -295,7 +273,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|Attribute
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|ManakaiDOMLatest
 
 ElementTypeBinding:
   @Name: Get
@@ -317,7 +294,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|AttributeSet
-    @@ForCheck: ManakaiDOM|ManakaiDOMLatest
 
 ElementTypeBinding:
   @Name: InCase
@@ -343,7 +319,7 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: DISLang|ConstGroup
-    @@ForCheck: ManakaiDOM|ForIF !=ManakaiDOM|ManakaiDOM
+    @@ForCheck: ManakaiDOM|ForIF
     @@Type: unsignedShort
     @@subsetOf: unsignedShort
 
@@ -353,7 +329,7 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: DISLang|ConstGroup
-    @@ForCheck: ManakaiDOM|ForIF !=ManakaiDOM|ManakaiDOM
+    @@ForCheck: ManakaiDOM|ForIF
     @@Type: unsignedShort
     @@subsetOf: unsignedShort
 
@@ -433,9 +409,7 @@ ElementTypeBinding:
     @@resourceFor: ManakaiDOM|ForIF
     @@resourceFor:
       @@@@: ManakaiDOM|ForClass
-      @@@ForCheck: ManakaiDOM|ManakaiDOMLatest
     @@For: ManakaiDOM|DOM1
-    @@For: =ManakaiDOM|ManakaiDOM
 
     @@rdf:type:
       @@@@: DISLang|Interface
@@ -453,50 +427,27 @@ ElementTypeBinding:
       @@@ForCheck: ManakaiDOM|ForClass
 
     @@Implement:
-      @@@@: ||ManakaiDOM|ManakaiDOM||ManakaiDOM|ForIF
-      @@@ContentType: DISCore|TFPQNames
-      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
-    @@Implement:
-      @@@@: ||ManakaiDOM|ManakaiDOM1||ManakaiDOM|ForIF
-      @@@ContentType: DISCore|TFPQNames
-      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM1
-    @@Implement:
-      @@@@: ||ManakaiDOM|ManakaiDOM2||ManakaiDOM|ForIF
-      @@@ContentType: DISCore|TFPQNames
-      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM2
-    @@Implement:
-      @@@@: ||ManakaiDOM|ManakaiDOM3||ManakaiDOM|ForIF
-      @@@ContentType: DISCore|TFPQNames
-      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM3
-    @@Implement:
       @@@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
       @@@ContentType: DISCore|TFPQNames
-      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
+      @@@ForCheck: ManakaiDOM|ForClass
 
     @@f:implements:
       @@@@: DOMCore|CoreFeature10
-      @@@For: ManakaiDOM|DOM1
     @@DOMMain:implementFeature:
       @@@@: DOMCore|CoreFeature20
-      @@@For: ManakaiDOM|DOM2
     @@DOMMain:implementFeature:
       @@@@: DOMCore|CoreFeature30
-      @@@For: ManakaiDOM|DOM3
     @@DOMMain:implementFeature:
       @@@@: tx|XMLFeature10
-      @@@For: ManakaiDOM|DOM1
     @@DOMMain:implementFeature:
       @@@@: tx|XMLFeature20
-      @@@For: ManakaiDOM|DOM2
     @@DOMMain:implementFeature:
       @@@@: tx|XMLFeature30
-      @@@For: ManakaiDOM|DOM3
     @@DOMMain:implementFeature:
       @@@@: tx|XMLVersionFeature10
-      @@@For: ManakaiDOM|DOM3
     @@DOMMain:implementFeature:
       @@@@: tx|XMLVersionFeature11
-      @@@For: ManakaiDOM|DOM3
+
 ElementTypeBinding:
   @Name: IFQName
   @ElementType:
@@ -572,7 +523,7 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: test|StandaloneTest
-    @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|DOM2
+    @@ForCheck: ManakaiDOM|ForClass
 
 ElementTypeBinding:
   @Name: L3Test
@@ -580,7 +531,7 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: test|StandaloneTest
-    @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|DOM3
+    @@ForCheck: ManakaiDOM|ForClass
 
 ElementTypeBinding:
   @Name: LXTest
@@ -588,7 +539,7 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: test|StandaloneTest
-    @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
+    @@ForCheck: ManakaiDOM|ForClass
 
 ElementTypeBinding:
   @Name: XDTest
@@ -596,7 +547,7 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: test|StandaloneTest
-    @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
+    @@ForCheck: ManakaiDOM|ForClass
 
 ResourceDef:
   @QName: DOMString
@@ -1265,7 +1216,9 @@ NodeTypeDef:
         @@@@enDesc:
           If the <P::newChild> node is same as the <P::refChild> node.
           Then, the result is implementation dependent.
-        @@@@For: ManakaiDOM|ManakaiDOM
+
+            {NOTE:: Manakai-specific behavior.
+            }
       @@@PerlDef:
         my $strictc = $self-><AG::Document.domConfig>
                            -><M::c|DOMConfiguration.getParameter>
@@ -1463,7 +1416,9 @@ NodeTypeDef:
         @@@@enDesc:
           If the <P::newChild> node is same as the <P::oldChild> node.
           Then, the result is implementation dependent.
-        @@@@For: ManakaiDOM|ManakaiDOM
+
+            {NOTE:: Manakai-specific behavior.
+            }
       @@@PerlDef:
         my $strictc = $self-><AG::Document.domConfig>
                            -><M::c|DOMConfiguration.getParameter>
@@ -4642,12 +4597,12 @@ NodeTypeDef:
         __CODE{tc|createEmptyDocumentForTest:: $doc => $node}__;
 
         for (
-          [Core => '1.0', <IFName::Document||ManakaiDOM|ManakaiDOM1>],
-          [Core => '2.0', <IFName::Document||ManakaiDOM|ManakaiDOM2>],
-          [Core => '3.0', <IFName::Document||ManakaiDOM|ManakaiDOM3>],
-          [XML => '1.0', <IFName::Document||ManakaiDOM|ManakaiDOM1>],
-          [XML => '2.0', <IFName::Document||ManakaiDOM|ManakaiDOM2>],
-          [XML => '3.0', <IFName::Document||ManakaiDOM|ManakaiDOM3>],
+          [Core => '1.0', <IFName::Document>],
+          [Core => '2.0', <IFName::Document>],
+          [Core => '3.0', <IFName::Document>],
+          [XML => '1.0', <IFName::Document>],
+          [XML => '2.0', <IFName::Document>],
+          [XML => '3.0', <IFName::Document>],
         ) {
           $test->id ($_->[0].'.'.$_->[1]);
           my $sp = $node-><M::Node.getFeature> ($_->[0], $_->[1]);
@@ -5240,7 +5195,9 @@ NodeTypeDef:
       @@@nullCase:
         @@@@enDesc:
           If the document has no element.
-        @@@@For: ManakaiDOM|ManakaiDOM
+
+            {NOTE:: Not in the spec.
+            }
       @@@PerlDef:
         __DEEP{
           F: for my $child (@{$self-><AG::Node.childNodes>}) {
@@ -5389,17 +5346,21 @@ NodeTypeDef:
       For an XML document with a document type declaration,
       this attribute contains the <IF::tx|DocumentType> node.
     @@enDesc:
-      @@@For: ManakaiDOM|DOM3
       @@@ddid: html
       @@@@:
         For an HTML document, this attribute may contain
         a <IF::tx|DocumentType> node independently of the presence or
         absence of document type declaration. 
+
+           {NOTE:: DOM Level 3.
+           }
     @@enDesc:
-      @@@For: !ManakaiDOM|DOM3
-      @@@ddid: html
+      @@@ddid: htmlold
       @@@@:
         For an HTML document, the attribute value is always <DOM::null>.
+
+          {NOTE:: DOM levels 1 and 2.
+          }
 
     @@enDesc:
       @@@ddid: note
@@ -5426,16 +5387,22 @@ NodeTypeDef:
     @@Get:
       @@@nullCase:
         @@@@enDesc:
-          @@@@@For: ManakaiDOM|DOM3
+          @@@@@ddid:dom3
           @@@@@@:
             If the document does not have a document type declaration,
             or if it is an HTML document and the implementation does not
             expose the document type declaration to the DOM.
+
+              {NOTE:: DOM Level 3.
+              }
         @@@@enDesc:
-          @@@@@For: !ManakaiDOM|DOM3
+          @@@@@ddid: dom1
           @@@@@@:
             If the document does not have a document type declaration,
             or if it is an HTML document.
+
+              {NOTE:: DOM levels 1 and 2.
+              }
       @@@PerlDef:
         @@@@@:
           __DEEP{
@@ -6430,11 +6397,13 @@ NodeTypeDef:
           nor <C::Node.ATTRIBUTE_NODE>.
         @@@@enDesc:
           @@@@@ddid: nonns
-          @@@@@For: ManakaiDOM|ManakaiDOM
           @@@@@@:
             Or, if the <P::n> does not support namespace since
             it is created by DOM Level 1 method or does not support
             the <Feature::XML> feature.
+
+              {NOTE:: Not in the spec.
+              }
       @@@dx:raises:
         @@@@@: c|RENAME_DOCUMENT_ELEMENT_NOT_SUPPORTED_ERR
         @@@@enDesc:
@@ -6589,7 +6558,6 @@ ElementTypeBinding:
     dis:Description
   @ShadowContent:
     @@ddid: unlessStrictErrorChecking
-    @@For: ManakaiDOM|ManakaiDOM3
     @@@:
       In manakai implementation, this exception is not thrown
       when <A::Document.strictErrorChecking> attribute is set to
@@ -6822,7 +6790,9 @@ NodeTypeDef:
         @@@@@: t|HIERARCHY_DOCUMENT_FRAGMENT_ITSELF_ERR
         @@@@enDesc:
           If <P::newChild> is the node itself.
-        @@@@For: ManakaiDOM|ManakaiDOM
+
+            {NOTE:: Not in the spec.
+            }
       @@@PerlDef:
         if ($self eq $newChild) {
           __EXCEPTION{t|HIERARCHY_DOCUMENT_FRAGMENT_ITSELF_ERR::
@@ -6912,12 +6882,16 @@ NodeTypeDef:
         @@@@enDesc:
           If the <P::newChild> node is same as the <P::refChild> node.
           Then, the result is implementation dependent.
-        @@@@For: ManakaiDOM|ManakaiDOM
+        
+            {NOTE:: Manakai-specific behavior.
+            }
       @@@dx:raises:
         @@@@@: t|HIERARCHY_DOCUMENT_FRAGMENT_ITSELF_ERR
         @@@@enDesc:
           If <P::newChild> is the node itself.
-        @@@@For: ManakaiDOM|ManakaiDOM
+ 
+            {NOTE:: Not in the spec.
+            }
       @@@PerlDef:
         if ($self eq $newChild) {
           __EXCEPTION{t|HIERARCHY_DOCUMENT_FRAGMENT_ITSELF_ERR::
@@ -7003,12 +6977,16 @@ NodeTypeDef:
         @@@@enDesc:
           If the <P::newChild> node is same as the <P::oldChild> node.
           Then, the result is implementation dependent.
-        @@@@For: ManakaiDOM|ManakaiDOM
+        
+            {NOTE:: Manakai-specific behavior.
+            }
       @@@dx:raises:
         @@@@@: t|HIERARCHY_DOCUMENT_FRAGMENT_ITSELF_ERR
         @@@@enDesc:
           If <P::newChild> is the node itself.
-        @@@@For: ManakaiDOM|ManakaiDOM
+
+            {NOTE:: Not in the spec.
+            }
       @@@PerlDef:
         if ($self eq $newChild) {
           __EXCEPTION{t|HIERARCHY_DOCUMENT_FRAGMENT_ITSELF_ERR::
@@ -10144,12 +10122,12 @@ NodeTypeDef:
         __CODE{tc|createDFForTest:: $df => $node, $doc => $doc}__;
 
         for (
-          [Core => '1.0', <IFName::DocumentFragment||ManakaiDOM|ManakaiDOM1>],
-          [Core => '2.0', <IFName::DocumentFragment||ManakaiDOM|ManakaiDOM2>],
-          [Core => '3.0', <IFName::DocumentFragment||ManakaiDOM|ManakaiDOM3>],
-          [XML => '1.0', <IFName::DocumentFragment||ManakaiDOM|ManakaiDOM1>],
-          [XML => '2.0', <IFName::DocumentFragment||ManakaiDOM|ManakaiDOM2>],
-          [XML => '3.0', <IFName::DocumentFragment||ManakaiDOM|ManakaiDOM3>],
+          [Core => '1.0', <IFName::DocumentFragment>],
+          [Core => '2.0', <IFName::DocumentFragment>],
+          [Core => '3.0', <IFName::DocumentFragment>],
+          [XML => '1.0', <IFName::DocumentFragment>],
+          [XML => '2.0', <IFName::DocumentFragment>],
+          [XML => '3.0', <IFName::DocumentFragment>],
         ) {
           $test->id ($_->[0].'.'.$_->[1]);
           my $sp = $node-><M::Node.getFeature> ($_->[0], $_->[1]);

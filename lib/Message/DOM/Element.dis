@@ -13,7 +13,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/12/30 01:55:53 $
+    $Date: 2006/12/30 04:42:51 $
 
   @Require:
     @@Module:
@@ -24,16 +24,6 @@ Module:
       @@@WithFor: ManakaiDOM|ManakaiDOMLatest
     @@Module:
       @@@QName: MDOM|XDoctype
-      @@@WithFor: ManakaiDOM|ManakaiDOMLatest
-    @@Module:
-      @@@WithFor: ManakaiDOM|ManakaiDOM
-    @@Module:
-      @@@WithFor: ManakaiDOM|ManakaiDOM1
-    @@Module:
-      @@@WithFor: ManakaiDOM|ManakaiDOM2
-    @@Module:
-      @@@WithFor: ManakaiDOM|ManakaiDOM3
-    @@Module:
       @@@WithFor: ManakaiDOM|ManakaiDOMLatest
     @@Module:
       @@@QName: MURI|Generic
@@ -126,7 +116,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|Method
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM
 
 ElementTypeBinding:
   @Name: L12Method
@@ -134,7 +123,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|Method
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM
   ## Modified in DOM Level 2
 
 ElementTypeBinding:
@@ -143,7 +131,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|Method
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM
   ## Modified in DOM Level 3
 
 ElementTypeBinding:
@@ -152,7 +139,7 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|Method
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|ForClass
+    @@ForCheck: ManakaiDOM|ForClass
 
 ElementTypeBinding:
   @Name: IL1OnlyMethod
@@ -160,9 +147,7 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: DISLang|Method
-    @@ForCheck:
-      !=ManakaiDOM|ManakaiDOM ManakaiDOM|DOM1 !ManakaiDOM|DOM2
-      ManakaiDOM|ForIF
+    @@ForCheck: ManakaiDOM|ForIF
 
 ElementTypeBinding:
   @Name: L2Method
@@ -170,7 +155,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: DISLang|Method
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|DOM2
 
 ElementTypeBinding:
   @Name: CL2Method
@@ -178,7 +162,7 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: DISLang|Method
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|DOM2 ManakaiDOM|ForClass
+    @@ForCheck: ManakaiDOM|ForClass
 
 ElementTypeBinding:
   @Name: L3Method
@@ -186,7 +170,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|Method
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|DOM3
 
 ElementTypeBinding:
   @Name: CL3Method
@@ -194,7 +177,7 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|Method
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|DOM3 ManakaiDOM|ForClass
+    @@ForCheck: ManakaiDOM|ForClass
 
 ElementTypeBinding:
   @Name: LXMethod
@@ -202,7 +185,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|Method
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|ManakaiDOMLatest
 
 ElementTypeBinding:
   @Name: IntMethod
@@ -210,8 +192,7 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|Method
-    @@ForCheck:
-      ManakaiDOM:ManakaiDOM !=ManakaiDOM:ManakaiDOM ManakaiDOM|ForClass
+    @@ForCheck: ManakaiDOM|ForClass
     @@ManakaiDOM:isForInternal: 1
 
 ElementTypeBinding:
@@ -234,7 +215,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|Attribute
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM
 
 ElementTypeBinding:
   @Name: CAttr
@@ -242,7 +222,7 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: DISLang|Attribute
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|ForClass
+    @@ForCheck: ManakaiDOM|ForClass
 
 ElementTypeBinding:
   @Name: IntAttr
@@ -259,7 +239,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|Attribute
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|DOM2
 
 ElementTypeBinding:
   @Name: L12Attr
@@ -267,7 +246,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|Attribute
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|DOM1
   # Modified in DOM Level 2
 
 ElementTypeBinding:
@@ -276,7 +254,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|Attribute
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|DOM1
   # Modified in DOM Level 3
 
 ElementTypeBinding:
@@ -285,7 +262,7 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|Attribute
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|DOM2 ManakaiDOM|ForClass
+    @@ForCheck: ManakaiDOM|ForClass
 
 ElementTypeBinding:
   @Name: L3Attr
@@ -293,7 +270,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|Attribute
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|DOM3
   ## Note that there are attributes introduced in DOM Level 3
   ## but also defined for lower levels as internal attributes
   ## for the purpose of internal use.
@@ -304,7 +280,7 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|Attribute
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|DOM3 ManakaiDOM|ForClass
+    @@ForCheck: ManakaiDOM|ForClass
 
 ElementTypeBinding:
   @Name: LXAttr
@@ -312,7 +288,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|Attribute
-    @@ForCheck: !=ManakaiDOM|ManakaiDOM ManakaiDOM|ManakaiDOMLatest
 
 ElementTypeBinding:
   @Name: Get
@@ -334,7 +309,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|AttributeSet
-    @@ForCheck: ManakaiDOM|ManakaiDOMLatest
 
 ElementTypeBinding:
   @Name: InCase
@@ -360,7 +334,7 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: DISLang|ConstGroup
-    @@ForCheck: ManakaiDOM|ForIF !=ManakaiDOM|ManakaiDOM
+    @@ForCheck: ManakaiDOM|ForIF
     @@Type: unsignedShort
     @@subsetOf: unsignedShort
 
@@ -370,7 +344,7 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: DISLang|ConstGroup
-    @@ForCheck: ManakaiDOM|ForIF !=ManakaiDOM|ManakaiDOM
+    @@ForCheck: ManakaiDOM|ForIF
     @@Type: unsignedShort
     @@subsetOf: unsignedShort
 
@@ -450,9 +424,7 @@ ElementTypeBinding:
     @@resourceFor: ManakaiDOM|ForIF
     @@resourceFor:
       @@@@: ManakaiDOM|ForClass
-      @@@ForCheck: ManakaiDOM|ManakaiDOMLatest
     @@For: ManakaiDOM|DOM1
-    @@For: =ManakaiDOM|ManakaiDOM
 
     @@rdf:type:
       @@@@: DISLang|Interface
@@ -470,50 +442,27 @@ ElementTypeBinding:
       @@@ForCheck: ManakaiDOM|ForClass
 
     @@Implement:
-      @@@@: ||ManakaiDOM|ManakaiDOM||ManakaiDOM|ForIF
-      @@@ContentType: DISCore|TFPQNames
-      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
-    @@Implement:
-      @@@@: ||ManakaiDOM|ManakaiDOM1||ManakaiDOM|ForIF
-      @@@ContentType: DISCore|TFPQNames
-      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM1
-    @@Implement:
-      @@@@: ||ManakaiDOM|ManakaiDOM2||ManakaiDOM|ForIF
-      @@@ContentType: DISCore|TFPQNames
-      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM2
-    @@Implement:
-      @@@@: ||ManakaiDOM|ManakaiDOM3||ManakaiDOM|ForIF
-      @@@ContentType: DISCore|TFPQNames
-      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM3
-    @@Implement:
       @@@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
       @@@ContentType: DISCore|TFPQNames
-      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
+      @@@ForCheck: ManakaiDOM|ForClass
 
     @@f:implements:
       @@@@: DOMCore|CoreFeature10
-      @@@For: ManakaiDOM|DOM1
     @@DOMMain:implementFeature:
       @@@@: DOMCore|CoreFeature20
-      @@@For: ManakaiDOM|DOM2
     @@DOMMain:implementFeature:
       @@@@: DOMCore|CoreFeature30
-      @@@For: ManakaiDOM|DOM3
     @@DOMMain:implementFeature:
       @@@@: tx|XMLFeature10
-      @@@For: ManakaiDOM|DOM1
     @@DOMMain:implementFeature:
       @@@@: tx|XMLFeature20
-      @@@For: ManakaiDOM|DOM2
     @@DOMMain:implementFeature:
       @@@@: tx|XMLFeature30
-      @@@For: ManakaiDOM|DOM3
     @@DOMMain:implementFeature:
       @@@@: tx|XMLVersionFeature10
-      @@@For: ManakaiDOM|DOM3
     @@DOMMain:implementFeature:
       @@@@: tx|XMLVersionFeature11
-      @@@For: ManakaiDOM|DOM3
+
 ElementTypeBinding:
   @Name: IFQName
   @ElementType:
@@ -589,7 +538,7 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: test|StandaloneTest
-    @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|DOM2
+    @@ForCheck: ManakaiDOM|ForClass
 
 ElementTypeBinding:
   @Name: L3Test
@@ -597,7 +546,7 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: test|StandaloneTest
-    @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|DOM3
+    @@ForCheck: ManakaiDOM|ForClass
 
 ElementTypeBinding:
   @Name: LXTest
@@ -605,7 +554,7 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: test|StandaloneTest
-    @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
+    @@ForCheck: ManakaiDOM|ForClass
 
 ElementTypeBinding:
   @Name: XDTest
@@ -613,7 +562,7 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: test|StandaloneTest
-    @@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
+    @@ForCheck: ManakaiDOM|ForClass
 
 ResourceDef:
   @QName: Document
@@ -1525,7 +1474,6 @@ ClsDef:
         }__;
       @@@enImplNote:
         @@@@ddid: schema
-        @@@@For: ManakaiDOM|ManakaiDOM
         @@@@@:
           The created node does not have DTD type information,
           since its element type is not known.
@@ -2552,7 +2500,10 @@ NodeTypeDef:
         @@@@enDesc:
           If the <P::newChild> node is same as the <P::refChild> node.
           Then, the result is implementation dependent.
-        @@@@For: ManakaiDOM|ManakaiDOM
+        
+
+            {NOTE:: Manakai-specific behavior.
+            }
       @@@PerlDef:
         my $self_od = $self-><AG::Node.ownerDocument>;
         if ($self_od-><AG::Document.strictErrorChecking>) {
@@ -2650,7 +2601,9 @@ NodeTypeDef:
         @@@@enDesc:
           If the <P::newChild> node is same as the <P::oldChild> node.
           Then, the result is implementation dependent.
-        @@@@For: ManakaiDOM|ManakaiDOM
+        
+            {NOTE:: Manakai-specific behavior.
+            }
       @@@PerlDef:
         my $self_od = $self-><AG::Node.ownerDocument>;
         if ($self_od-><AG::Document.strictErrorChecking>) {
@@ -5189,12 +5142,12 @@ NodeTypeDef:
         __CODE{tc|createElementForTest:: $el => $node, $doc => $doc}__;
 
         for (
-          [Core => '1.0', <IFName::Element||ManakaiDOM|ManakaiDOM1>],
-          [Core => '2.0', <IFName::Element||ManakaiDOM|ManakaiDOM2>],
-          [Core => '3.0', <IFName::Element||ManakaiDOM|ManakaiDOM3>],
-          [XML => '1.0', <IFName::Element||ManakaiDOM|ManakaiDOM1>],
-          [XML => '2.0', <IFName::Element||ManakaiDOM|ManakaiDOM2>],
-          [XML => '3.0', <IFName::Element||ManakaiDOM|ManakaiDOM3>],
+          [Core => '1.0', <IFName::Element>],
+          [Core => '2.0', <IFName::Element>],
+          [Core => '3.0', <IFName::Element>],
+          [XML => '1.0', <IFName::Element>],
+          [XML => '2.0', <IFName::Element>],
+          [XML => '3.0', <IFName::Element>],
         ) {
           $test->id ($_->[0].'.'.$_->[1]);
           my $sp = $node-><M::Node.getFeature> ($_->[0], $_->[1]);
@@ -5400,8 +5353,7 @@ NodeTypeDef:
                   q<http://ent.test/>);
 
   @ResourceDef:
-    @@ForCheck:
-      ManakaiDOM:ManakaiDOM ManakaiDOM:ForClass
+    @@ForCheck: ManakaiDOM|ForClass
     @@DISCore:resourceType:
       @@@@:
         dis:MultipleResource
@@ -5486,8 +5438,7 @@ NodeTypeDef:
       } # NS
 
   @ResourceDef:
-    @@ForCheck:
-      ManakaiDOM:ManakaiDOM ManakaiDOM:ForClass
+    @@ForCheck: ManakaiDOM|ForClass
     @@rdf:type:
       @@@@:
         dis:MultipleResource
@@ -9489,7 +9440,9 @@ NodeTypeDef:
         @@@@enDesc:
           If the <P::newChild> node is same as the <P::refChild> node.
           Then, the result is implementation dependent.
-        @@@@For: ManakaiDOM|ManakaiDOM
+        
+            {NOTE:: Manakai-specific behavior.
+            }
       @@@PerlDef:
         my $self_od = $self-><AG::Node.ownerDocument>;
         my $child_od = $newChild-><AG::Node.ownerDocument>;
@@ -9566,7 +9519,9 @@ NodeTypeDef:
         @@@@enDesc:
           If the <P::newChild> node is same as the <P::oldChild> node.
           Then, the result is implementation dependent.
-        @@@@For: ManakaiDOM|ManakaiDOM
+        
+            {NOTE:: Manakai-specific behavior.
+            }
       @@@PerlDef:
         my $self_od = $self-><AG::Node.ownerDocument>;
         my $child_od = $newChild-><AG::Node.ownerDocument>;
@@ -11640,12 +11595,12 @@ NodeTypeDef:
         __CODE{tc|createAttrForTest:: $attr => $node, $doc => $doc}__;
 
         for (
-          [Core => '1.0', <IFName::Attr||ManakaiDOM|ManakaiDOM1>],
-          [Core => '2.0', <IFName::Attr||ManakaiDOM|ManakaiDOM2>],
-          [Core => '3.0', <IFName::Attr||ManakaiDOM|ManakaiDOM3>],
-          [XML => '1.0', <IFName::Attr||ManakaiDOM|ManakaiDOM1>],
-          [XML => '2.0', <IFName::Attr||ManakaiDOM|ManakaiDOM2>],
-          [XML => '3.0', <IFName::Attr||ManakaiDOM|ManakaiDOM3>],
+          [Core => '1.0', <IFName::Attr>],
+          [Core => '2.0', <IFName::Attr>],
+          [Core => '3.0', <IFName::Attr>],
+          [XML => '1.0', <IFName::Attr>],
+          [XML => '2.0', <IFName::Attr>],
+          [XML => '3.0', <IFName::Attr>],
         ) {
           $test->id ($_->[0].'.'.$_->[1]);
           my $sp = $node-><M::Node.getFeature> ($_->[0], $_->[1]);
@@ -11959,7 +11914,6 @@ NodeTypeDef:
     @@Type: DOMString
     @@Get:
       @@@enDesc:
-        @@@@ForCheck: ManakaiDOM|ManakaiDOM
         @@@@@:
           In the manakai implementation, it is the concatenation of
           the <DFN::text content> of every child node.  For <IF::Text>
@@ -12956,7 +12910,7 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@DISCore:resourceType: DISLang|ConstGroup
-    @@ForCheck: ManakaiDOM|ForIF !=ManakaiDOM|ManakaiDOM
+    @@ForCheck: ManakaiDOM|ForIF
 
 ElementTypeBinding:
   @Name: Const
@@ -12976,9 +12930,7 @@ ElementTypeBinding:
     @@resourceFor: ManakaiDOM|ForIF
     @@resourceFor:
       @@@@: ManakaiDOM|ForClass
-      @@@ForCheck: ManakaiDOM|ManakaiDOM !=ManakaiDOM|ManakaiDOM
     @@For: ManakaiDOM|DOM3
-    @@For: =ManakaiDOM|ManakaiDOM
 
     @@rdf:type:
       @@@@: DISLang|Interface
@@ -12988,27 +12940,15 @@ ElementTypeBinding:
       @@@@: DISLang|Class
       @@@ForCheck: ManakaiDOM|ForClass
     @@Implement:
-      @@@@: ||ManakaiDOM|ManakaiDOM||ManakaiDOM|ForIF
-      @@@ContentType: DISCore|TFPQNames
-      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
-    @@Implement:
-      @@@@: ||ManakaiDOM|ManakaiDOM3||ManakaiDOM|ForIF
-      @@@ContentType: DISCore|TFPQNames
-      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM3
-    @@Implement:
       @@@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
       @@@ContentType: DISCore|TFPQNames
-      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
+      @@@ForCheck: ManakaiDOM|ForClass
 
     @@f:implements:
       @@@@: c|CoreFeature30
-      @@@For: ManakaiDOM|DOM3
     @@f:implements:
       @@@@: tx|XMLFeature30
-      @@@For: ManakaiDOM|DOM3
     @@f:implements:
       @@@@: tx|XMLVersionFeature10
-      @@@For: ManakaiDOM|DOM3
     @@f:implements:
       @@@@: tx|XMLVersionFeature11
-      @@@For: ManakaiDOM|DOM3
