@@ -22,7 +22,7 @@ Module:
       @@@Year:2004
       @@@DISCore:author: DISCore|Wakaba
   @Date:
-    $Date: 2006/12/30 15:43:01 $
+    $Date: 2006/12/31 00:55:05 $
   
   @Require:
     @@Module:
@@ -1301,57 +1301,7 @@ IFClsDef:
               } # dis:ForCheck
             } # children
 
-            my $has_for = false;
-            for my $ce (@ce) {
-              if ($ce-><AG::swcfg21:SWCFGElement
-                                                     .expandedURI> eq
-                  <Q::dis:For>) {
-                my $fors = [split /\s+/, $ce-><M::swcfg21:SWCFGNode
-                                                .value>];
-                my $ok = true;
-                $has_for = true;
-                AFOR: for my $f (@$fors) {
-                  if ($f =~ /^!=(.+)$/) {         ## -- NOT EQUAL TO
-                    my $uri = $self-><M::NSResolverDIS.qnameToURI> ($1);
-                    my $for = $databaseArg-><M::DISDatabase.getFor> ($uri);
-                    $for-><AS::DISAnyResource.isReferred> ($ce);
-                    if ($for eq $for_res) {
-                      $ok = false;
-                      last AFOR;
-                    }
-                  } elsif ($f =~ /^!(.+)$/) {     ## -- NOT ISA
-                    my $uri = $self-><M::NSResolverDIS.qnameToURI> ($1);
-                    my $for = $databaseArg-><M::DISDatabase.getFor> ($uri);
-                    $for-><AS::DISAnyResource.isReferred> ($ce);
-                    if ($for_res-><M::ManakaiDISForDefinition.isaURI> ($uri)) {
-                      $ok = false;
-                      last AFOR;
-                    }
-                  } elsif ($f =~ /^=(.+)$/) {     ## -- EQUAL TO
-                    my $uri = $self-><M::NSResolverDIS.qnameToURI> ($1);
-                    my $for = $databaseArg-><M::DISDatabase.getFor> ($uri);
-                    $for-><AS::DISAnyResource.isReferred> ($ce);
-                    unless ($for eq $for_res) {
-                      $ok = false;
-                      last AFOR;
-                    }
-                  } else {                        ## -- ISA
-                    my $uri = $self-><M::NSResolverDIS.qnameToURI> ($f);
-                    my $for = $databaseArg-><M::DISDatabase.getFor> ($uri);
-                    $for-><AS::DISAnyResource.isReferred> ($ce);
-                    unless ($for_res-><M::ManakaiDISForDefinition.isaURI>($uri)){
-                      $ok = false;
-                      last AFOR;
-                    }
-                  }
-                } # AFOR
-                if ($ok) {
-                  $r = true;
-                  last FORMATCH;
-                }
-              } # dis:For
-            } # $ce
-            $r = $has_for ? false : true;
+            $r = 1;
           }__;
         } # FORMATCH
 
@@ -4460,7 +4410,6 @@ IFClsDef:
                 <Q::dis:AliasFor> => true,
                 <Q::dis:ContentType> => true,
                 <Q::dis:dataType> => true,
-                <Q::dis:For> => true,
                 <Q::dis:ForCheck> => true,
                 <Q::dis:Name> => true,
                 <Q::dis:Namespace> => true,
@@ -4780,7 +4729,6 @@ IFClsDef:
                     my $xu = $ce-><AG::SWCFGElement.expandedURI>;
                     if ({
                       <Q::dis:AliasFor> => true,
-                      <Q::dis:For> => true,
                       <Q::dis:ForCheck> => true,
                       <Q::dis:ContentType> => true,
                       <Q::dis:resourceFor> => true,

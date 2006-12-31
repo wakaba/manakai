@@ -18,7 +18,7 @@ Module:
   @License:
     license:Perl+MPL
   @Date:
-    $Date: 2006/12/30 13:25:37 $
+    $Date: 2006/12/31 00:55:09 $
   
   @Require:
     @@Module:
@@ -287,27 +287,7 @@ IFClsDef:
           my ($self, $db, $source_node => $result_parent) = @_;
           __DEEP{
             my $xu = $source_node-><AG::SEl.expandedURI>;
-            if ($xu eq <Q::dis:For>) {
-              push @{$result_parent->{for}}, my $pr = {};
-              for my $q (grep {length $_}
-                         split /\s+/, $source_node-><M::SNode.value>) {
-                my $p = '<=';
-                $p = $1 if $q =~ s/^(!(?:=|<=)?|=|<=)//;
-                $p = '!<=' if $p eq '!';
-                my $uri = $source_node-><M::DIS|NSResolverDIS.qnameToURI> ($q);
-                $pr->{$uri} = {
-                  '' => {$p => $p},
-                  '<=' => {$p => $p, '!<=' => 'X', '!=' => '<'},
-                  '!<=' => {'<=' => 'X', '!<=' => '!<=', '<' => 'X',
-                            '=' => 'X', '!=' => '!<='},
-                  '=' => {$p => 'X', '<=' => '=', '=' => '='},
-                  '!=' => {$p => $p, '<=' => '<', '=' => 'X'},
-                  'X' => {$p => 'X'},
-                }->{$pr->{$uri} or ''}->{$p};
-                $db-><M::DIS|DISDatabase.getFor> ($uri)
-                   -><AS::DIS|DISAnyResource.isReferred> ($source_node);
-              }
-            } elsif ($xu eq <Q::dis:ForCheck>) {
+            if ($xu eq <Q::dis:ForCheck>) {
               for my $q (grep {length $_}
                          split /\s+/, $source_node-><M::SNode.value>) {
                 my $p = '<=';
@@ -1239,47 +1219,7 @@ IFClsDef:
               }
             } # FCs
 
-            for my $fors (@{$self->{for}||[]}) {
-              my $ok = true;
-              AFOR: for my $uri (keys %{$fors}) {
-                my $p = $fors->{$uri};
-                if ($p eq '<=') {
-                  unless ($for_res-><M::DIS|DISFor.isaURI> ($uri)) {
-                    $ok = false;
-                    last AFOR;
-                  }
-                } elsif ($p eq '<') {
-                  my $for = $databaseArg-><M::DIS|DISDatabase.getFor> ($uri);
-                  unless (not ($for_res eq $for) and
-                          $for_res-><M::DIS|DISFor.isaURI> ($uri)) {
-                    $ok = false;
-                    last AFOR;
-                  }
-                } elsif ($p eq '!<=') {
-                  if ($for_res-><M::DIS|DISFor.isaURI> ($uri)) {
-                    $ok = false;
-                    last AFOR;
-                  }
-                } elsif ($p eq '=') {
-                  my $for = $databaseArg-><M::DIS|DISDatabase.getFor> ($uri);
-                  unless ($for_res eq $for) {
-                    $ok = false;
-                    last AFOR;
-                  }
-                } elsif ($p eq '!=') {
-                  my $for = $databaseArg-><M::DIS|DISDatabase.getFor> ($uri);
-                  if ($for_res eq $for) {
-                    $ok = false;
-                    last AFOR;
-                  }
-                }
-              } # AFOR
-              if ($ok) {
-                $r = true;
-                last FORMATCH;
-              }
-            } # fors
-            $r = @{$self->{for}||[]} ? false : true;
+            $r = 1;
           }__;
         } # FORMATCH
 
@@ -1291,7 +1231,7 @@ IFClsDef:
 
         my $node = bless {}, <ClassName::ManakaiDNLElement>;
 
-        $node->{for} = [+{qw/a <=/}];
+        $node->{forp} = [+{qw/a <=/}];
 
         $test->assert_true ($node-><M::DNLElement.forMatch>
                               ('a', [], database_arg => $db),
@@ -1305,7 +1245,7 @@ IFClsDef:
                                ('b', [], database_arg => $db),
                              uri => <Q::DNLElement.ForMatch.Test.NoMatch>);
 
-        $node->{for} = [+{}];
+        $node->{forp} = [+{}];
 
         $test->assert_true ($node-><M::DNLElement.forMatch>
                               (<Q::ManakaiDOM:all>, [], database_arg => $db),
@@ -1316,7 +1256,7 @@ IFClsDef:
                               ('a', [], database_arg => $db),
                  uri => <Q::DNLElement.ForMatch.Test.ImpliedAllSuperMatch>);
 
-        $node->{for} = [+{a => '<=', b => '!<='}];
+        $node->{forp} = [+{a => '<=', b => '!<='}];
 
         $test->assert_true
                 ($node-><M::DNLElement.forMatch>
