@@ -55,7 +55,6 @@ sub daf_generate_perl_test_document ($) {
 
   $pl->source_file ($mod->get_property_text (ExpandedURI q<DIS:sourceFile>, ""));
   $pl->source_module ($mod->name_uri);
-  $pl->source_for ($mod->for_uri);
   $pl->license_uri ($mod->get_property_resource (ExpandedURI q<dis:License>)
                         ->uri);
 
@@ -157,7 +156,7 @@ sub daf_generate_perl_test_document ($) {
           for my $v (@{$tres->get_property_value_list
                               (ExpandedURI q<c:anyDOMConfigurationParameter>)}) {
             my $cpuri = $v->name;
-            my $cp = $db->get_resource ($cpuri, for_arg => $tres->for_uri);
+            my $cp = $db->get_resource ($cpuri);
             $ttest->{dom_config}->{$cp->get_dom_configuration_parameter_name}
               = $v->get_perl_code ($block->owner_document, $tres);
           }
@@ -171,8 +170,7 @@ sub daf_generate_perl_test_document ($) {
           ## Expected |DOMError|s
           for (@{$tres->get_property_value_list (ExpandedURI q<c:erred>)}) {
             my $err = $tdt_parser->parse_tdt_error_string
-                                     ($_->string_value, $db, $_,
-                                      undef, $tres->for_uri);
+                                     ($_->string_value, $db, $_);
             push @{$ttest->{dom_error}->{$err->{type}->{value}} ||= []}, $err;
           }
         }

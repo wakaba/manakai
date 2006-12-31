@@ -25,7 +25,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date:
-    $Date: 2006/12/30 13:25:40 $
+    $Date: 2006/12/31 09:12:03 $
 
   @Require:
     @@Module:
@@ -182,7 +182,7 @@ PropDef:
   @QName: idl|aliasFor
   @enFN: IDL Type Reference (obsolete)
   @multipleProperties: DISCore|Single
-  @dataType: DISCore|TFQNames
+  @dataType: DISCore|QName
 
 RPropDef:
   @QName: idl|typedefAs
@@ -230,7 +230,7 @@ PropDef:
   @rdfs:range: idl|AnyType
   @rdfs:domain: idl|AnyTyped
   @multipleProperties: DISCore|Single
-  @dataType: DISCore|TFQNames
+  @dataType: DISCore|QName
 
 ResourceTypeDef:
   @QName: idl|AnyInterface
@@ -264,7 +264,7 @@ PropDef:
   @rdfs:subPropertyOf: dis|ISA
   @subsetOf: DISLang|formallyExtends
   @multipleProperties: DISCore|OrderedList
-  @dataType: DISCore|TFQNames
+  @dataType: DISCore|QName
   @rdfs:domain: idl|Interface
   @rdfs:range: idl|Interface
 
@@ -348,14 +348,14 @@ PropDef:
   @enFN:
     IDL <CODE::raises>
   @multipleProperties: DISCore|OrderedList
-  @dataType: DISCore|TFQNames
+  @dataType: DISCore|QName
 
 PropDef:
   @QName: idl|raisesOnRetrieveal
   @enFN:
     <CODE::raises> on attribute retrieveal
   @multipleProperties: DISCore|OrderedList
-  @dataType: DISCore|TFQNames
+  @dataType: DISCore|QName
   @rdfs:subPropertyOf: idl|raises
   @subsetOf: idl|raises
   @rdfs:subPropertyOf: idl|comment
@@ -366,7 +366,7 @@ PropDef:
   @enFN:
     <CODE::raises> on attribute setting
   @multipleProperties: DISCore|OrderedList
-  @dataType: DISCore|TFQNames
+  @dataType: DISCore|QName
   @rdfs:subPropertyOf: idl|raises
   @subsetOf: idl|raises
   @rdfs:subPropertyOf: idl|comment
@@ -423,7 +423,7 @@ PropDef:
   @enFN: Introduced Specification
   @rdfs:subPropertyOf: idl|comment
   @subsetOf: idl|comment
-  @dataType: DISCore|TFQNames
+  @dataType: DISCore|QName
   @multipleProperties: DISCore|OrderedList
 
 PropDef:
@@ -431,7 +431,7 @@ PropDef:
   @enFN: Modified Specification
   @rdfs:subPropertyOf: idl|comment
   @subsetOf: idl|comment
-  @dataType: DISCore|TFQNames
+  @dataType: DISCore|QName
   @multipleProperties: DISCore|OrderedList
 
 ElementTypeBinding:

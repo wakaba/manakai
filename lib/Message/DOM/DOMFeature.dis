@@ -42,7 +42,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date:
-    $Date: 2006/12/30 13:25:33 $
+    $Date: 2006/12/31 09:11:53 $
   
   @Require:
     @@Module:
@@ -420,6 +420,7 @@ StringDataTypeDef:
     }
 
   @InputProcessor:
+    @@QName: FeatureNameInputProcessor
     @@PerlDef:
       $INPUT = lc $INPUT;
 
@@ -478,6 +479,7 @@ StringDataTypeDef:
     }
 
   @InputProcessor:
+    @@QName: FeatureVersionInputProcessor
     @@PerlDef:
       $INPUT = '' unless defined $INPUT;
 
@@ -539,6 +541,7 @@ StringDataTypeDef:
     }
 
   @InputProcessor:
+    @@QName: FeaturesInputProcessor
     @@PerlDef:
       __CODE{featuresParamToFeaturesHash::
         $INPUT => $INPUT,
@@ -824,7 +827,7 @@ PropDef:
               with old <CODE::cdis2pm> utility.
       \
       }
-  @dataType: dis|TFQNames
+  @dataType: DISCore|QName
   @multipleProperties: DISCore|UnorderedList
 
 ElementTypeBinding:

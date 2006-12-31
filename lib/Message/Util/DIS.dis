@@ -22,7 +22,7 @@ Module:
       @@@Year:2004
       @@@DISCore:author: DISCore|Wakaba
   @Date:
-    $Date: 2006/12/31 00:55:05 $
+    $Date: 2006/12/31 09:11:57 $
   
   @Require:
     @@Module:
@@ -246,27 +246,6 @@ IFClsDef:
       A <QUOTE::dis> implementation object. 
 
   @Method:
-    @@Name: createDISDocument
-    @@Description:
-      @@@lang:en
-      @@@@:
-        Creates an empty <IF::DISDocument> node.
-    @@Return:
-      @@@Type: DISDocument
-      @@@clsActualType: ManakaiDISDocument
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          The newly created <QUOTE::dis> document object.
-      @@@PerlDef:
-        $r = bless $self-><M::swcfg21:SWCFGImplementation
-                                              .createSWCFGDocument>,
-                   <ClassName::ManakaiDISDocument>;
-        $r-><AS::swcfg21:SWCFGDocument
-                                        .defaultElementTypeNamespaceURI>
-                    (<Q::dis:>);
-
-  @Method:
     @@Name: createDISParser
     @@Description:
       @@@lang:en
@@ -329,91 +308,19 @@ IFClsDef:
       my $res = $db-><M::DISDatabase.getResource> (<Q::DISCore|Resource>);
       $res-><M::DISResource.addSuperResource> ($any);
 
-  @Method:
-    @@Name: tfurisToURI
-    @@Description:
-      @@@lang:en
-      @@@@:
-        Converts a pair of name URI reference and <QUOTE::for> URI reference 
-        into a <Q::dis:TFQNames>-expanded URI reference. 
-    @@Param:
-      @@@Name: typeURI
-      @@@Type: NameURI
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          A URI reference to identify a resource. 
-      @@@nullCase:
-        @@@@Description:
-          @@@@@lang:en
-          @@@@@@:
-            Equivalent to <Q::DOMMain:any> (for historical reason). 
-    @@Param:
-      @@@Name: forURI
-      @@@Type: ForURI
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          A <QUOTE::for> URI reference. 
-      @@@nullCase:
-        @@@@Description:
-          @@@@@lang:en
-          @@@@@@:
-            Equivalent to <QUOTE::for all>, i.e. <Q::ManakaiDOM:all>. 
-    @@Return:
-      @@@Type: 
-        DISCore:TFURI
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          The <Q::dis:TFQNames>-expanded URI references.  
-      @@@PerlDef:
-        $typeURI = <Q::DOMMain:any> unless defined $typeURI;
-        $forURI = <Q::ManakaiDOM:all> unless defined $forURI;
-        __CODE{tfurisToURI:: $turi => $typeURI, $furi => $forURI, $uri => $r}__;
-
-  @ResourceDef:
-    @@ForCheck: ManakaiDOM|ForClass
-    @@QName: tfurisToURI
-    @@rdf:type: DISPerl|BlockCode
-    @@enDesc:
-        Converts a pair of name URI reference and <QUOTE::for> URI reference 
-        into a <Q::dis:TFQNames>-expanded URI reference. 
-    @@PerlDef:      
-        if ($furi eq <Q::ManakaiDOM:all>) {
-          $uri = $turi;
-        } else {
-          ## NOTE: [RFC 3986]
-          ##       fragment    := *(pchar / "/" / "?")
-          ##       pchar       := unreserved / pct-encoded / sub-delims / [:@]
-          ##       unreserved  := ALPHA / DIGIT / [._~-]
-          ##       sub-delims  := [!$&'()*+,;=]
-          ## NOTE: [XPointer Framework]
-          ##       SchemeData  := *EscapedData
-          ##       EscapedData := NormalChar / "^(" / "^)" / "^^"
-          ##                    / "(" SchemeData ")"
-          ##       NormalChar  := UnicodeChar - [()^]
-          my $__turi = $turi;
-          my $__furi = $furi;
-          for my $__uri ($__turi, $__furi) {
-            $__uri =~ s{([^0-9A-Za-z!\$'()*,:;=?\@_./~-])}{sprintf '%%%02X', ord $1}ge;
-          }
-          $uri = qq<tag:suika.fam.cx,2005-09:$__turi+$__furi>;
-        }
-
   @ResourceDef:
     @@QName: tfpurisToURI
     @@rdf:type: DISPerl|BlockCode
     @@enDesc:
-        Converts a set of name URI reference and <QUOTE::for> URI reference 
+        Converts a set of name URI reference 
         and <QUOTE::for+> URI references into a URi reference. 
     @@ForCheck: ManakaiDOM|ForClass
     @@PerlDef:      
-        if ($furi eq <Q::ManakaiDOM:all> and @{$forp} == 0) {
+        if (@{$forp} == 0) {
           $uri = $turi;
-        } elsif (@{$forp}) {
+        } else {
           my $__turi = $turi;
-          my $__furi = $furi;
+          my $__furi = <Q::ManakaiDOM|all>;
           for my $__uri ($__turi, $__furi) {
             $__uri =~ s{([^0-9A-Za-z!\$'()*,:;=?\@_./~-])}{sprintf '%%%02X', ord $1}ge;
           }
@@ -425,13 +332,6 @@ IFClsDef:
             push @__fp, $__fpuri;
           }
           $uri = qq<tag:suika.fam.cx,2005-09:$__turi+$__furi+>.join ('+', @__fp);
-        } else {
-          my $__turi = $turi;
-          my $__furi = $furi;
-          for my $__uri ($__turi, $__furi) {
-            $__uri =~ s{([^0-9A-Za-z!\$'(),*:;=?\@_./~-])}{sprintf '%%%02X', ord $1}ge;
-          }
-          $uri = qq<tag:suika.fam.cx,2005-09:$__turi+$__furi>;
         }
 
   @CODE:
@@ -1005,83 +905,6 @@ IFClsDef:
         }__;
 
   @Method:
-    @@Name: tfqnamesToURI
-    @@Description:
-      @@@lang:en
-      @@@@:
-        Converts a <Q::dis:TFQNames>
-        into an expanded URI reference. 
-    @@Param:
-      @@@Name: tfqnames
-      @@@Type: 
-        dis:TFQNames
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          A <Q::dis:TFQNames> to identify a resource. 
-    @@Param:
-      @@@Name: defaultTypeURI
-      @@@Type: NameURI
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          A name URI reference used if it is missing from 
-          <P::tfqnames>. 
-      @@@nullCase:
-        @@@@Description:
-          @@@@@lang:en
-          @@@@@@:
-            Equivalent to <Q::DOMMain:any>. 
-    @@Param:
-      @@@Name: defaultForURI
-      @@@Type: ForURI
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          A <QUOTE::for> URI reference used if it is missing from 
-          <P::tfqnames>. 
-      @@@nullCase:
-        @@@@Description:
-          @@@@@lang:en
-          @@@@@@:
-            Equivalent to <QUOTE::for all>, i.e. <Q::ManakaiDOM:all>. 
-    @@NodeParam:
-    @@Return:
-      @@@Type: 
-        DISCore:TFURI
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          The <Q::dis:TFQNames>-expanded URI references.  
-      @@@UndeclaredPrefixException:
-      @@@PerlDef:
-        my ($typeq, $forq) = split /\s*[:|][:|]\s*/, $tfqnames, 2;
-        my ($typeURI, $forURI);
-        if (defined $forq) {
-          __DEEP{
-            $typeURI = $typeq eq ''
-                       ? defined $defaultTypeURI ? $defaultTypeURI
-                                                 : <Q::DOMMain:any>
-                       : $self-><M::NSResolverDIS.qnameToURI> ($typeq, %opt);
-          }__;
-          if (length $forq) {
-            $forURI = $self-><M::NSResolverDIS.qnameToURI> ($forq, %opt);
-          } else {
-            $forURI = <Q::ManakaiDOM:all>;
-          }
-        } else {  ## "For" omitted
-          __DEEP{
-            $typeURI = $typeq eq ''
-                       ? defined $defaultTypeURI ? $defaultTypeURI
-                                                 : <Q::DOMMain:any>
-                       : $self-><M::NSResolverDIS.qnameToURI> ($typeq, %opt);
-          }__;
-          $forURI = defined $defaultForURI ? $defaultForURI
-                                           : <Q::ManakaiDOM:all>;
-        }
-        __CODE{tfurisToURI:: $turi => $typeURI, $furi => $forURI, $uri => $r}__;
-
-  @Method:
     @@Name: tfpqnamesToURI
     @@Description:
       @@@lang:en
@@ -1109,62 +932,27 @@ IFClsDef:
           @@@@@lang:en
           @@@@@@:
             Equivalent to <Q::DOMMain:any>. 
-    @@Param:
-      @@@Name: defaultForURI
-      @@@Type: ForURI
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          A <QUOTE::for> URI reference used if it is missing from 
-          <P::tfqnames>. 
-      @@@nullCase:
-        @@@@Description:
-          @@@@@lang:en
-          @@@@@@:
-            Equivalent to <QUOTE::for all>, i.e. <Q::ManakaiDOM:all>. 
     @@NodeParam:
     @@Return:
-      @@@Type: 
-        DISCore:TFURI
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          The <Q::dis:TFQNames>-expanded URI references.  
+      @@@Type: DISString
+      @@@enDesc:
+        The URI reference obtained by expanding the <P::tfpqnames>.
       @@@UndeclaredPrefixException:
       @@@PerlDef:
-        my ($typeq, $forq, @forpq) = split /\s*[:|][:|]\s*/, $tfpqnames;
-        my ($typeURI, $forURI);
+        my ($typeq, undef, @forpq) = split /\s*[:|][:|]\s*/, $tfpqnames;
+        my ($typeURI);
         my $forpURI = [];
-        undef $forq if defined $forq and $forq eq '+';
-        if (defined $forq) {
-          __DEEP{
-            $typeURI = $typeq eq ''
-                       ? defined $defaultTypeURI ? $defaultTypeURI
-                                                 : <Q::DOMMain:any>
-                       : $self-><M::NSResolverDIS.qnameToURI> ($typeq, %opt);
-            if (length $forq) {
-              $forURI = $self-><M::NSResolverDIS.qnameToURI> ($forq, %opt);
-            } else {
-              $forURI = <Q::ManakaiDOM:all>;
-            }
-          }__;
-        } else {  ## "For" omitted
-          __DEEP{
-            $typeURI = $typeq eq ''
-                       ? defined $defaultTypeURI ? $defaultTypeURI
-                                                 : <Q::DOMMain:any>
-                       : $self-><M::NSResolverDIS.qnameToURI> ($typeq, %opt);
-          }__;
-          $forURI = defined $defaultForURI ? $defaultForURI
-                                           : <Q::ManakaiDOM:all>;
-        }
         __DEEP{
+          $typeURI = $typeq eq ''
+                       ? defined $defaultTypeURI ? $defaultTypeURI
+                                                 : <Q::DOMMain:any>
+                       : $self-><M::NSResolverDIS.qnameToURI> ($typeq, %opt);
           for my $forpq (@forpq) {
             push @$forpURI, $self-><M::NSResolverDIS.qnameToURI>
                                                  ($forpq, %opt);
           }
         }__;
-        __CODE{tfpurisToURI:: $turi => $typeURI, $furi => $forURI,
+        __CODE{tfpurisToURI:: $turi => $typeURI,
                               $forp => $forpURI,  $uri => $r}__;
 ##NSResolverDIS
 
@@ -1198,10 +986,8 @@ IFClsDef:
     @@Param:
       @@@Name: forArg
       @@@Type: ForURI
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          The <QUOTE::For> URI reference to test against. 
+      @@@enDesc:
+        This parameter <kwd:MUST> be ignored.
     @@Param:
       @@@Name: forpArg
       @@@Type: ForURIList
@@ -1229,11 +1015,10 @@ IFClsDef:
       @@@Description:
         @@@@lang:en
         @@@@@:
-          Whether this element is for <P::forArg> and <P::forpArg> or not. 
+          Whether this element is for <P::forpArg> or not. 
       @@@UndeclaredPrefixException:
       @@@NoDBException:
       @@@PerlDef:
-        $forArg = <Q::ManakaiDOM:all> unless defined $forArg;
         $forpArg ||= [];
 
         FORMATCH: {
@@ -1241,7 +1026,7 @@ IFClsDef:
             my $for_res = ($databaseArg ||=
                            $self-><AG::DISNode.ownerDISDocument>
                                 -><AG::DISDocument.disDatabase>)
-                                -><M::DISDatabase.getFor> ($forArg);
+                                ->get_for (<Q::ManakaiDOM|all>);
             my $forp_res = [map {
                                   $databaseArg-><M::DISDatabase.getFor> ($_)
                                 } @{$forpArg}];
@@ -1331,8 +1116,6 @@ IFClsDef:
           @@@@@lang:en
           @@@@@@:
             No default type provided.  All <P::mediaType> will match. 
-    @@ForParam:
-    @@ForpParam:
     @@NamedParam:
       @@@Name: databaseArg
       @@@Type: DISDatabase
@@ -1384,8 +1167,6 @@ IFClsDef:
       @@@nullCase:
         @@@@enDesc:
           No default is specified. 
-    @@ForParam:
-    @@ForpParam:
     @@Return:
       @@@enDesc:
         The media type URI reference of this element. 
@@ -1411,7 +1192,6 @@ IFClsDef:
       @@@Type: AnyURI
       @@@enDesc:
         The name expanded URI of the node to retrieve. 
-    @@ForParam:
     @@ForpParam:
     @@MediaTypeParam:
     @@MediaTypeDefaultParam:
@@ -1433,13 +1213,12 @@ IFClsDef:
           No attribute node found. 
       @@@PerlDef:
         C: for my $c (@{$self-><M::ManakaiDISElement.disChildElements>
-                                  (for_arg => $forArg, forp_arg => $forpArg,
+                                  (forp_arg => $forpArg,
                                    database_arg => $databaseArg)}) {
           if ($c-><AG::swcfg21:SWCFGElement
                                     .expandedURI> eq $attrName and
               $c-><M::ManakaiDISElement.mediaTypeMatch>
                                   ($mediaType, $defaultMediaType,
-                                   for_arg => $forArg, forp_arg => $forpArg,
                                    database_arg => $databaseArg)) {
             $r = $c;
             last C;
@@ -1455,7 +1234,6 @@ IFClsDef:
       @@@Type: AnyURI
       @@@enDesc:
         The name expanded URI of the node to retrieve. 
-    @@ForParam:
     @@ForpParam:
     @@MediaTypeParam:
     @@MediaTypeDefaultParam:
@@ -1475,13 +1253,12 @@ IFClsDef:
       @@@PerlDef:
         $r = bless [], <ClassName::ManakaiDISElementList>;
         for my $c (@{$self-><M::ManakaiDISElement.disChildElements>
-                                  (for_arg => $forArg, forp_arg => $forpArg,
+                                  (forp_arg => $forpArg,
                                    database_arg => $databaseArg)}) {
           if ($c-><AG::swcfg21:SWCFGElement
                                           .expandedURI> eq $attrName and
               $c-><M::ManakaiDISElement.mediaTypeMatch>
                                   ($mediaType, $defaultMediaType,
-                                   for_arg => $forArg, forp_arg => $forpArg,
                                    database_arg => $databaseArg)) {
             push @$r, $c;
           }
@@ -1491,7 +1268,6 @@ IFClsDef:
     @@Name: disChildElements
     @@enDesc:
       A list of child elements, with <QUOTE::for> check.  
-    @@ForParam:
     @@ForpParam:
     @@NamedParam:
       @@@Name: databaseArg
@@ -1519,7 +1295,7 @@ IFClsDef:
               $class => {<ClassName::ManakaiDISElement>},
             }__;
             next C unless $dn-><M::ManakaiDISElement.forMatch>
-                                      ($forArg, $forpArg,
+                                      (undef, $forpArg,
                                        database_arg => $databaseArg);
             push @$r, $dn;
           }
@@ -1656,7 +1432,7 @@ IFClsDef:
   @Method:
     @@Name: tfqnamesValueURI
     @@enDesc:
-      The element value (written as <Q::dis:TFQNames>),
+      The element value (written as <Q::DISCore|TFPQNames>),
       as URI reference. 
       \
       {NOTE:: What should be if list value?
@@ -1675,24 +1451,6 @@ IFClsDef:
           @@@@@lang:en
           @@@@@@:
             Equivalent to <Q::DOMMain:any>. 
-    @@Param:
-      @@@Name: defaultForURI
-      @@@Type: ForURI
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          A <QUOTE::for> URI reference used if it is missing from 
-          <P::tfqnames>. 
-      @@@nullCase:
-        @@@@Description:
-          @@@@@lang:en
-          @@@@@@:
-            Equivalent to <QUOTE::for all>, i.e. <Q::ManakaiDOM:all>. 
-    @@ForParam:
-    @@ForpParam:
-    @@NamedParam:
-      @@@Name:databaseArg
-      @@@Type:DISDatabase
     @@Return:
       @@@Type:ResourceURI
       @@@nullCase:
@@ -1703,18 +1461,9 @@ IFClsDef:
         my $v = $self-><M::swcfg21:SWCFGNode.value>;
         if (defined $v and not ref $v eq 'ARRAY') {
           __DEEP{
-            if ($self-><M::ManakaiDISElement.mediaTypeMatch>
-                                 (<Q::DISCore:TFPQNames>, <Q::DISCore:TFPQNames>,
-                                  for_arg => $forArg, forp_arg => $forpArg,
-                                  database_arg => $databaseArg)) {
-              $r = $self-><M::NSResolverDIS.tfpqnamesToURI>
-                                  ($v, $defaultTypeURI, $defaultForURI,
+            $r = $self-><M::NSResolverDIS.tfpqnamesToURI>
+                                  ($v, $defaultTypeURI,
                                    node => $self);
-            } else {
-              $r = $self-><M::NSResolverDIS.tfqnamesToURI>
-                                  ($v, $defaultTypeURI, $defaultForURI,
-                                   node => $self);
-            }
           }__;
         } else {
           $r = null;
@@ -2144,7 +1893,6 @@ IFClsDef:
     @@Name: disChildElements
     @@enDesc:
       A list of child elements, with <QUOTE::for> checks.  
-    @@ForParam:
     @@ForpParam:
     @@NamedParam:
       @@@Name: databaseArg
@@ -2173,7 +1921,7 @@ IFClsDef:
               $class => {<ClassName::ManakaiDISElement>},
             }__;
             next C unless $dn-><M::ManakaiDISElement.forMatch>
-                                              ($forArg, $forpArg,
+                                              (undef, $forpArg,
                                                database_arg => $databaseArg);
             push @$r, $dn;
           }
@@ -2273,7 +2021,6 @@ IFClsDef:
         @@@@lang:en
         @@@@@:
           A <QUOTE::dis> module URI reference. 
-    @@ForParam:
     @@Return:
       @@@Type: DISModule
       @@@clsActualType: ManakaiDISModuleDefinition
@@ -2282,19 +2029,12 @@ IFClsDef:
         @@@@@:
           The module definition. 
       @@@PerlDef:
-        my $modURI;
-        if (defined $forArg) {
-          __CODE{tfurisToURI:: $turi => $moduleURI, $furi => $forArg,
-                               $uri => $modURI}__;
+        if (defined $self->{modDef}->{$moduleURI}) {
+          $r = $self->{modDef}->{$moduleURI};
         } else {
-          $modURI = $moduleURI;
-        }
-        if (defined $self->{modDef}->{$modURI}) {
-          $r = $self->{modDef}->{$modURI};
-        } else {
-          $r = $self->{modDef}->{$modURI}
+          $r = $self->{modDef}->{$moduleURI}
              = bless {
-                 uri => $modURI,
+                 uri => $moduleURI,
                  db => $self,
                  forp => [],
                  <H::DIS|typeURI> => <Q::DISCore|Module>,
@@ -2302,10 +2042,6 @@ IFClsDef:
                }, <ClassName::ManakaiDISModuleDefinition>;
           require Scalar::Util;
           Scalar::Util::weaken ($r->{db});
-          __CODE{DISPerl|HashStringRef::
-            $result => {$r->{for}},
-            $given => {<Q::ManakaiDOM|all>},
-          }__;
         }
 
     @@Test:
@@ -2418,7 +2154,6 @@ IFClsDef:
           @@@@@lang:en
           @@@@@@:
             Defaulted to <Q::DOMMain:any>. 
-    @@ForParam:
     @@Return:
       @@@Type: DISResource
       @@@clsActualType: ManakaiDISResourceDefinition
@@ -2433,13 +2168,7 @@ IFClsDef:
           it is not.
       @@@PerlDef:
         $resourceURI = <Q::DOMMain:any> unless defined $resourceURI;
-        my $resURI;
-        if (defined $forArg) {
-          __CODE{tfurisToURI:: $turi => $resourceURI, $furi => $forArg,
-                               $uri => $resURI}__;
-        } else {
-          $resURI = $resourceURI;
-        }
+        my $resURI = $resourceURI;
 
         if (defined $self->{resDef}->{$resURI}) {
           $r = $self->{resDef}->{$resURI};
@@ -2470,10 +2199,6 @@ IFClsDef:
                }, <ClassName::ManakaiDISResourceDefinition>;
           require Scalar::Util;
           Scalar::Util::weaken ($r->{db});
-          __CODE{DISPerl|HashStringRef::
-            $result => {$r->{for}},
-            $given => {<Q::ManakaiDOM|all>},
-          }__;
         }
 
     @@Test:
@@ -2512,7 +2237,6 @@ IFClsDef:
           @@@@@lang:en
           @@@@@@:
             Defaulted to <Q::DOMMain:any>. 
-    @@ForParam:
     @@Return:
       @@@Type: DIS|DISAnyResource
       @@@Description:
@@ -2526,13 +2250,7 @@ IFClsDef:
           it is not.
       @@@PerlDef:
         $resourceURI = <Q::DOMMain:any> unless defined $resourceURI;
-        my $resURI;
-        if (defined $forArg) {
-          __CODE{tfurisToURI:: $turi => $resourceURI, $furi => $forArg,
-                               $uri => $resURI}__;
-        } else {
-          $resURI = $resourceURI;
-        }
+        my $resURI = $resourceURI;
 
         if (defined $self->{resDef}->{$resURI}) {
           $r = $self->{resDef}->{$resURI};
@@ -2618,7 +2336,6 @@ IFClsDef:
       @@@Type: DISModuleResolver
       @@@enDesc:
         The resolver to convert module name into <QUOTE::dis> document object. 
-    @@ForParam:
     @@NamedParam:
       @@@Name: onResourceRead
       @@@Type:
@@ -2659,7 +2376,6 @@ IFClsDef:
         $resolver = bless $resolver, <ClassName::ManakaiDISModuleResolver>
                       if ref $resolver eq 'CODE'; 
         ## -- Module Name, URI
-        $forArg = <Q::ManakaiDOM:all> unless defined $forArg and $forArg ne '';
         my $mod_node;
         my $mod_name_node;
         __DEEP{
@@ -2679,7 +2395,7 @@ IFClsDef:
           my $mod_name_uri = $mod_name_node
                                 -><AG::DISElement.qnameValueURI>;
           my $mod = $self-><M::DISDatabase.getModule>
-                                   ($mod_name_uri, for_arg => $forArg);
+                                   ($mod_name_uri);
         
           unless ($mod-><AG::DISAnyResource.isDefined>) {
             ## -- Initializes Module Definition Object
@@ -2692,10 +2408,6 @@ IFClsDef:
             __CODE{DISPerl|HashStringRef::
               $result => {$mod->{namespaceURI}},
               $given => {$ns},
-            }__;
-            __CODE{DISPerl|HashStringRef::
-              $result => {$mod->{for}},
-              $given => {$forArg},
             }__;
             $mod->{src} = $mod_node;
             $mod->{<Q::DIS|isDefined>} = true;
@@ -2716,25 +2428,21 @@ IFClsDef:
             ## -- Loads "for" definition
             my $root_elements
                        = $doc-><M::DISDocument.disAllChildElements>;
-            if ($mod-><AG::DISAnyResource.forURI> eq <Q::ManakaiDOM:all>) {
-              R: for my $el (@$root_elements) {
-                next R unless $el-><AG::SWCFGElement
+            R: for my $el (@$root_elements) {
+              next R unless $el-><AG::SWCFGElement
                                           .expandedURI> eq <Q::dis:ForDef>;
-                $self-><M::DISDatabase.loadFor>
+              $self-><M::DISDatabase.loadFor>
                          ($mod, $el, srinfo => $srinfo);
-              }
             }
 
             ## -- Loads "for all"
             my $rmod = $self-><M::DISDatabase.getModule>
-                               ($mod_name_uri,
-                                for_arg => <Q::ManakaiDOM:all>);
+                               ($mod_name_uri);
             unless ($rmod-><AG::DISAnyResource.isDefined>) {
               my $rdoc = $resolver-><M::DISModuleResolver.uriToDocument>
                                ($self, $rmod-><AG::DISAnyResource.uri>,
                                 $mod-><AG::DISAnyResource.namespaceURI>,
-                                $mod-><AG::DISAnyResource.localName>,
-                                <Q::ManakaiDOM:all>);
+                                $mod-><AG::DISAnyResource.localName>);
               unless ($rdoc) {
                 __UNDEEP{
                   __EXCEPTION{UNABLE_TO_GET_MODULE_ERR::
@@ -2742,13 +2450,12 @@ IFClsDef:
                     DIS:namespaceURI =>
                                {$mod-><AG::DISAnyResource.namespaceURI>},
                     DIS:localName => {$mod-><AG::DISAnyResource.localName>},
-                    DIS:for => {<Q::ManakaiDOM:all>},
                     DIS:sourceNode => {$mod-><AG::DISAnyResource.sourceElement>},
                   }__;
                 }__;
               }
               $self-><M::DISDatabase.loadModule>
-                            ($rdoc, $resolver, for_arg => <Q::ManakaiDOM:all>,
+                            ($rdoc, $resolver,
                              on_resource_read => $onResourceRead,
                              srinfo => $srinfo);
             } else { # if "for all" loaded
@@ -2758,11 +2465,10 @@ IFClsDef:
             }
 
             ## -- Loads Required Modules
-            ##    NOTE:: "dis:For" is not allowed since "dis:ForDef" is not read
             my $req_node = $mod_node-><AG::DISModuleElement.requireElement>;
             for my $rm (@{$req_node-><M::DISElement.disAllChildElements>}) {
               next unless $rm-><AG::SWCFGElement.expandedURI> eq <Q::dis:Module>;
-              my ($uri, $nuri, $ln, $for);
+              my ($uri, $nuri, $ln);
               my $mqn = $rm-><M::SWCFGNode.getAttributeNS> (<Q::dis:>, 'QName');
               if ($mqn) {
                 my $mqv = $mqn-><M::SWCFGNode.value>;
@@ -2781,36 +2487,25 @@ IFClsDef:
                   $ln = $mod-><AG::DISAnyResource.localName>;
                 }
               }
-              my $wfn = $rm-><M::SWCFGNode.getAttributeNS>
-                                              (<Q::dis:>, 'WithFor');
-              if ($wfn) {
-                $for = ($wfn->isa (<ClassName::swcfg21:ManakaiSWCFGElement
-                                             >)
-                           ? (bless $wfn, <ClassName::ManakaiDISElement>) : $wfn)
-                       -><AG::DISElement.qnameValueURI>;
-              } else {
-                $for = $mod-><AG::DISAnyResource.forURI>;
-              }
               my $rmod = $self-><M::DISDatabase.getModule>
-                                       ($nuri . $ln, for_arg => $for);
+                                       ($nuri . $ln);
               $mod-><M::DISModule.addReferringModuleURI> ($nuri.$ln);
               unless ($rmod-><AG::DISAnyResource.isDefined>) {
                 my $rdoc = $resolver-><M::DISModuleResolver.uriToDocument>
                                        ($self, $rmod-><AG::DISAnyResource.uri>,
-                                        $nuri, $ln, $for);
+                                        $nuri, $ln);
                 unless ($rdoc) {
                   __UNDEEP{
                     __EXCEPTION{UNABLE_TO_GET_MODULE_ERR::
                       DIS:uri => {$rmod-><AG::DISAnyResource.uri>},
                       DIS:namespaceURI => {$nuri},
                       DIS:localName => {$ln},
-                      DIS:for => {$for},
                       DIS:sourceNode => {$rm},
                     }__;
                   }__;
                 }
                 $self-><M::DISDatabase.loadModule>
-                                       ($rdoc, $resolver, for_arg => $for,
+                                       ($rdoc, $resolver,
                                         on_resource_read => $onResourceRead,
                                         srinfo => $srinfo);
               }
@@ -2818,13 +2513,11 @@ IFClsDef:
             
             ## -- Loads child resources
             $root_elements = $doc-><M::DISDocument.disChildElements>
-                                         (for_arg => $forArg,
-                                          database_arg => $self);
+                                         (database_arg => $self);
             for my $el (@$root_elements) {
               if ($el-><AG::DISElement.isResourceElement>) {
                 $self-><M::DISDatabase.loadResource>
                                          ($mod, null, null, $el,
-                                          for_arg => $forArg,
                                           on_resource_read => $onResourceRead,
                                           srinfo => $srinfo);
               } else {
@@ -2964,13 +2657,11 @@ IFClsDef:
     @@Param:
       @@@Name: mod
       @@@Type: DISModule
-      @@@clsActualType: ManakaiDISModuleDefinition
       @@@enDesc:
         The module in which the resource to load is defined. 
     @@Param:
       @@@Name: parentResource
       @@@Type: DISResource
-      @@@clsActualType: ManakaiDISResourceDefinition
       @@@enDesc:
         The (static) parent resource in which the resource to load is defined. 
       @@@nullCase:
@@ -2980,7 +2671,6 @@ IFClsDef:
     @@Param:
       @@@Name: dynParent
       @@@Type: DISResource
-      @@@clsActualType: ManakaiDISResourceDefinition
       @@@enDesc:
         The dynamic parent resource of the resource to load. 
       @@@nullCase:
@@ -2993,7 +2683,6 @@ IFClsDef:
       @@@clsActualType: ManakaiDISElement
       @@@enDesc:
         The source <QUOTE::dis> <Q::dis:ResourceDef> element object. 
-    @@ForParam:
     @@ForpParam:
     @@NamedParam:
       @@@Name: onResourceRead
@@ -3022,7 +2711,6 @@ IFClsDef:
           There is a resorce that does not have any <Q::rdf:type>
           attribute.
       @@@PerlDef:
-        $forArg = <Q::ManakaiDOM:all> unless defined $forArg;
         $forpArg ||= [];
         __DEEP{
           ## -- Node names
@@ -3031,34 +2719,27 @@ IFClsDef:
           ## Unique resource identifier generated from node id
           my $node_id = $el-><AG::SWCFGNode.nodeIDRef>;
           my $node_uri;
-          __CODE{tfpurisToURI:: $turi => {$$node_id}, $furi => $forArg,
+          __CODE{tfpurisToURI:: $turi => {$$node_id},
                                 $forp => $forpArg, $uri => $node_uri}__;
 
           my $al_node = $el-><M::DISElement.disGetAttribute>
-                                      (<Q::dis:AliasFor>, for_arg => $forArg,
+                                      (<Q::dis:AliasFor>,
                                        forp_arg => $forpArg,
                                        database_arg => $self);
           my $al_canon_uri;
           if ($al_node) {
-            $al_canon_uri = $al_node-><M::DISElement.tfqnamesValueURI>
-                            ($$node_id, $forArg,
-                             for_arg => $forArg,
-                             forp_arg => $forpArg,
-                             database_arg => $self);
+            $al_canon_uri = $al_node->qname_value_uri;
           }
 
           ## User defined resource identifiers
           my $qn_node = $el-><M::ManakaiDISElement.disGetAttribute>
-                                      (<Q::dis:QName>, for_arg => $forArg,
+                                      (<Q::dis:QName>,
                                        forp_arg => $forpArg, 
                                        database_arg => $self);
           my $res;
           ALD: {
           if ($qn_node) {
-            my $qn_uri = $qn_node-><AG::ManakaiDISElement.qnameValueURI>;
-            my $qn_urif;
-            __CODE{tfurisToURI:: $turi => $qn_uri, $furi => $forArg,
-                                 $uri => $qn_urif}__;
+            my $qn_urif = $qn_node-><AG::ManakaiDISElement.qnameValueURI>;
             push @res_uri, $qn_urif;
             $res = $self-><M::DISDatabase.getResource> ($qn_urif);
             if ($res-><AG::DISAnyResource.isDefined>) {
@@ -3084,7 +2765,7 @@ IFClsDef:
             }__;
           } else { ## Anonymous or local
             my $n_node = $el-><M::ManakaiDISElement.disGetAttribute>
-                                      (<Q::dis:Name>, for_arg => $forArg,
+                                      (<Q::dis:Name>,
                                        forp_arg => $forpArg,
                                        database_arg => $self);
             if ($n_node) {
@@ -3097,8 +2778,7 @@ IFClsDef:
                 __CODE{getChildResourceURI:: $parentURI => $puri,
                                              $localName => $ln,
                                              $result => $ru}__;
-                __CODE{tfurisToURI:: $turi => $ru, $furi => $forArg,
-                                     $uri => $ruf}__;
+                $ruf = $ru;
                 push @res_uri, $ruf;
                 $res = $self-><M::DISDatabase.getResource> ($ruf);
                 my $v = $n_node-><M::SWCFGNode.value>;
@@ -3111,10 +2791,7 @@ IFClsDef:
                 my $ln = $n_node-><M::SWCFGNode.value>;
                 my $ns_uri = $mod-><AG::DISAnyResource.sourceElement>
                                  -><AG::DISModuleElement.definingNamespaceURI>;
-                my $qn_uri = $ns_uri . $ln;
-                my $qn_urif;
-                __CODE{tfurisToURI:: $turi => $qn_uri, $furi => $forArg,
-                                     $uri => $qn_urif}__;
+                my $qn_urif = $ns_uri . $ln;
                 push @res_uri, $qn_urif;
                 $res = $self-><M::DISDatabase.getResource> ($qn_urif);
                 if ($res-><AG::DISAnyResource.isDefined>) {
@@ -3144,10 +2821,6 @@ IFClsDef:
               $res->{<H::DIS|isAnon>} = true;
             }
           } # anon
-          __CODE{DISPerl|HashStringRef::
-            $result => {$res->{for}},
-            $given => {$forArg},
-          }__;
           $res->{forp} = $forpArg;
           $res->{src} = $el;
           $res->{<H::DIS|definingModule>} = \ ($mod->{uri});
@@ -3189,7 +2862,7 @@ IFClsDef:
           my @props;
           my @cres;
           my @ce0 = @{$el-><M::DISElement.disChildElements>
-                                    (for_arg => $forArg, forp_arg => $forpArg,
+                                    (forp_arg => $forpArg,
                                      database_arg => $self)};
           my $has_type = $al_node;
           while (@ce0) {
@@ -3217,10 +2890,7 @@ IFClsDef:
                                          database_arg => $self,
                                          srinfo => $srinfo)) {
               my $sres = $self-><M::DISDatabase.getResource>
-                                  ($ce-><M::DISElement.tfqnamesValueURI>
-                                                    ($$node_id, $forArg,
-                                    for_arg => $forArg, forp_arg => $forpArg,
-                                    database_arg => $self));
+                                  ($ce->qname_value_uri);
               $res-><M::DISResource.addSuperResource> ($sres, srinfo => $srinfo);
             } elsif ($ce-><AG::DISElement.isResourceElement>) {
               push @cres, $ce;
@@ -3294,7 +2964,7 @@ IFClsDef:
             for my $re (@cres) {
               $self-><M::ManakaiDISDatabase.loadResource>
                                      ($mod, $res, $res, $re,
-                                      for_arg => $forArg, forp_arg => $forpArg,
+                                      forp_arg => $forpArg,
                                       on_resource_read => $onResourceRead,
                                       srinfo => $srinfo);
             }
@@ -3312,7 +2982,6 @@ IFClsDef:
                 $for-><AS::DISAnyResource.isReferred> ($pe);
                 $self-><M::ManakaiDISDatabase.loadResource>
                                 ($mod, $parentResource, $res, $el,
-                                 for_arg => $forArg,
                                  forp_arg => [@{$forpArg}, $for_uri],
                                  on_resource_read => $onResourceRead,
                                  srinfo => $srinfo);
@@ -3562,7 +3231,6 @@ IFClsDef:
       @@@enDesc:
         A context element node.  Namespace prefixes in 
         <P::xcref> are resolved against this node.
-    @@ForParam:
     @@NodeParam:
     @@Return:
       @@@Type: 
@@ -3585,25 +3253,25 @@ IFClsDef:
         __DEEP{
           if (defined $q3) {
             $r->[2] = $self-><M::ManakaiDISDatabase.getResource>
-                         ($contextNode-><M::NSResolverDIS.tfqnamesToURI>
-                                          ($q3, null, $forArg, node => $node));
+                         ($contextNode-><M::NSResolverDIS.qnameToURI>
+                                          ($q3, node => $node));
             $r->[1] = $r->[2]-><AG::DIS|DISResource.parentResource>;
           } elsif (defined $q2) {
             if ($q2 =~ /:/) {
               $r->[1] = $self-><M::ManakaiDISDatabase.getResource>
-                         ($contextNode-><M::NSResolverDIS.tfqnamesToURI>
-                                          ($q2, null, $forArg, node => $node));
+                         ($contextNode-><M::NSResolverDIS.qnameToURI>
+                                          ($q2, node => $node));
             } else {
               $r->[0] = $self-><M::ManakaiDISDatabase.getResource>
-                         ($contextNode-><M::NSResolverDIS.tfqnamesToURI>
-                                          ($q1, null, $forArg, node => $node));
+                         ($contextNode-><M::NSResolverDIS.qnameToURI>
+                                          ($q1, node => $node));
               $r->[1] = $r->[0]-><M::ManakaiDISResourceDefinition
                                     .getConstResourceByName> ($q2);
             }
           } else {  ## $q1 only
             $r->[2] = $self-><M::ManakaiDISDatabase.getResource>
-                         ($contextNode-><M::NSResolverDIS.tfqnamesToURI>
-                                          ($q1, null, $forArg, node => $node));
+                         ($contextNode-><M::NSResolverDIS.qnameToURI>
+                                          ($q1, node => $node));
             if ($r->[2]-><M::DISAnyResource.isTypeURI> (<Q::dx:ErrorSubCode>)) {
               $r->[1] = $r->[2]-><AG::DIS|DISResource.parentResource>;
             } else {
@@ -3926,11 +3594,6 @@ IFClsDef:
         DISCore:LocalName
       @@@enDesc:
         The local name of the module name. 
-    @@Param:
-      @@@Name: moduleFor
-      @@@Type: ForURI
-      @@@enDesc:
-        The <QUOTE::for> URI reference for which the module is defined. 
     @@Return:
       @@@Type: DISDocument
       @@@clsActualType: ManakaiDISDocument
@@ -3944,6 +3607,8 @@ IFClsDef:
         goto &$self;
 
   @ResourceDef:
+    @@ForCheck: ManakaiDOM|ForIF
+    @@QName: DISModuleResolverInputProcessor
     @@rdf:type: DISLang|InputProcessor
     @@PerlDef:
       $INPUT = bless $INPUT, <ClassName::ManakaiDISModuleResolver>
@@ -4104,15 +3769,6 @@ IFClsDef:
         $r = defined $self->{namespaceURI} ? ${$self->{namespaceURI}} : null;
 
   @Attr:
-    @@Name: forURI
-    @@Type: ForURI
-    @@enDesc:
-      The <QUOTE::for> URI reference for which this module is defined. 
-    @@Get:
-      @@@PerlDef:
-        $r = defined $self->{for} ? ${$self->{for}} : null;
-
-  @Attr:
     @@Name: forpURI
     @@enDesc:
       The <QUOTE::for+> URI references for which this resource is defined. 
@@ -4148,7 +3804,7 @@ IFClsDef:
           This resource is not for <P::forURI>.
       @@@PerlDef:
         __DEEP{
-          C: for my $this_for_uri (${$self->{for}||\''}, @{$self->{forp}||[]}) {
+          C: for my $this_for_uri (<Q::ManakaiDOM|all>, @{$self->{forp}||[]}) {
             if ($this_for_uri eq $forURI) { ## Shortcut
               $r = true;
               last C;
@@ -4397,13 +4053,11 @@ IFClsDef:
       @@@PerlDef:
         __DEEP{
           if (my $src = $self->{src}) {
-            my $for = $self-><AG::DISAnyResource.forURI>;
             my $forp = $self-><AG::DISAnyResource.forpURI>;
             my $db = $self-><AG::DISAnyResource.database>;
             my $factory;
             for my $el (@{$src-><M::DISElement.disChildElements>
-                            (for_arg => $for,
-                             forp_arg => $forp,
+                            (forp_arg => $forp,
                              database_arg => $db)}) {
               my $xu = $el-><AG::SWCFGElement.expandedURI>;
               if ({
@@ -4434,9 +4088,7 @@ IFClsDef:
                   my $base_type;
                   my $copy_tree = false;
                   
-                  my %mtopt = (for_arg => $for,
-                               forp_arg => $forp,
-                               default_media_type => $prop-><AG::DISResource
+                  my %mtopt = (default_media_type => $prop-><AG::DISResource
                                                             .defaultLextypeURI>,
                                database_arg => $db);
                   my $new_value_type = $el-><M::DISElement.mediaTypeURI>(%mtopt);
@@ -4475,18 +4127,12 @@ IFClsDef:
                     }
                     ## TODO: Check whether defined
                   } elsif ($el-><M::DISElement.mediaTypeMatch>
-                       (<Q::dis:TFQNames>, $mtopt{default_media_type}, %mtopt) or
-                           $el-><M::DISElement.mediaTypeMatch>
                   (<Q::DISCore:TFPQNames>, $mtopt{default_media_type}, %mtopt)) {
                     __CODE{dv|createURI::
                       $uri => {$el-><M::DISElement.tfqnamesValueURI>
-                              ($self-><AG::DISAnyResource.sourceNodeID>,
-                               $self-><AG::DISAnyResource.forURI>,
-                               for_arg => $self-><AG::DISAnyResource.forURI>,
-                               forp_arg => $self-><AG::DISAnyResource.forpURI>,
-                               database_arg => $db)},
+                              ($self-><AG::DISAnyResource.sourceNodeID>)},
                       $result => $new_value,
-                      $name => {$prop_uri},
+                      $name => $prop_uri,
                     }__;
                     ## TODO: Check whether defined
                     $new_value_type = <Q::DISCore:URI>;
@@ -4553,8 +4199,7 @@ IFClsDef:
                               $mtopt{default_media_type}, %mtopt)) {
                     my $x = $db-><M::DISDatabase.xcrefToResource>
                                  ($el-><M::SWCFGNode.value>,
-                                  $el, node => $el,
-                              for_arg => $self-><AG::DIS|DISAnyResource.forURI>);
+                                  $el, node => $el);
                     __CODE{dv|createURI::
                       $uri => {($x->[2] or $x->[1] or $x->[0])
                                -><AG::DISAnyResource.uri>},
@@ -4563,66 +4208,6 @@ IFClsDef:
                     }__;
                     $new_value-><M::dv|DVURIValue.getResource> ($db)
                               -><AS::DISAnyResource.isReferred> ($el);
-                    $new_value_type = <Q::DISCore:URI>;
-                  } elsif ($el-><M::DISElement.mediaTypeMatch>
-                             (<Q::DISLang|MemberRef>,
-                              $mtopt{default_media_type}, %mtopt)) {
-                    my $v = $el-><M::SWCFGNode.value>;
-                    $v =~ s/^\s+//;  $v =~ s/\s+$//;
-                    my ($clsq, $mem, $gs) = split /\s*\.\s*/, $v, 3;
-                    my $res;
-                    if (defined $mem) {
-                      my $cls = $db-><M::DISDatabase.getResource>
-                                     ($el-><M::DISElement.tfqnamesValueURI>
-                              ($clsq, $self-><AG::DISAnyResource.sourceNodeID>,
-                               $self-><AG::DISAnyResource.forURI>, node => $el));
-                      $cls-><AS::DISAnyResource.isReferred> ($el);
-                      $res = $cls-><M::DISResource.getChildResourceByNameAndType>
-                                     ($mem, <Q::DISLang:AnyMethod>);
-                      unless ($res) {
-                        __UNDEEP{__EXCEPTION{DIS|RESOURCE_NOT_DEFINED_ERR::
-                          DIS:localName => {$mem},
-                          DIS:parentURI => {$cls-><AG::DISAnyResource.uri>},
-                          DIS:elementType => {$el-><AG::SWCFGElement
-                                                             .expandedURI>},
-                          DIS:sourceNode => {$el},
-                          DIS:sourceCode => {$v},
-                          DIS:expectedType => {
-                            defined $gs ? <Q::DISLang:Attribute>
-                                        : <Q::DISLang:Method>
-                          },
-                        }__}__;
-                      }
-                      if (defined $gs) {
-                        $res = $res-><M::DISResource.getChildResourceByType>
-                                 ($gs eq 'get' ? <Q::DISLang|AttributeGet>
-                                               : <Q::DISLang|AttributeSet>);
-                        unless ($res) {
-                          __UNDEEP{__EXCEPTION{DIS|RESOURCE_NOT_DEFINED_ERR::
-                            DIS:parentURI => {$res-><AG::DISAnyResource.uri>},
-                            DIS:elementType => {$el-><AG::SWCFGElement
-                                                               .expandedURI>},
-                            DIS:sourceNode => {$el},
-                            DIS:sourceCode => {$v},
-                            DIS:expectedType => {
-                              $gs eq 'get' ? <Q::DISLang:AttributeGet>
-                                           : <Q::DISLang:AttributeSet>
-                            },
-                          }__}__;
-                        }                        
-                      }
-                    } else {
-                      $res = $db-><M::DISDatabase.getResource>
-                                     ($el-><M::DISElement.tfqnamesValueURI>
-                              ($clsq, $self-><AG::DISAnyResource.sourceNodeID>,
-                               $self-><AG::DISAnyResource.forURI>, node => $el));
-                    }
-                    $res-><AS::DISAnyResource.isReferred> ($el);
-                    __CODE{dv|createURI::
-                      $uri => {$el-><AG::DISAnyResource.uri>},
-                      $result => $new_value,
-                      $name => $prop_uri,
-                    }__;
                     $new_value_type = <Q::DISCore:URI>;
                   } elsif ($el-><M::DISElement.mediaTypeMatch>
                                    (<Q::lang|dcmodel>,
@@ -4634,7 +4219,7 @@ IFClsDef:
                                     ($el-><M::DISElement.mediaTypeURI>);
                     my $node = $mt-><M::DISAnyResource.parseString>
                                       ($el-><M::SWCFGNode.value>, $el, $factory,
-                                       for_arg => $for);
+                                       );
                     __CODE{dv|createXMLValue::
                       $value => $node,
                       $result => $new_value,
@@ -4723,8 +4308,7 @@ IFClsDef:
 
                   unless ($copy_tree) {
                   for my $ce (@{$el-><M::DISElement.disChildElements>
-                            (for_arg => $for,
-                             forp_arg => $forp,
+                            (forp_arg => $forp,
                              database_arg => $db)}) {
                     my $xu = $ce-><AG::SWCFGElement.expandedURI>;
                     if ({
@@ -5324,7 +4908,6 @@ IFClsDef:
       @@@Type: Document
       @@@enDesc:
         The <IF::Document> node to which the returned <IF::Node> belongs.
-    @@ForParam:
     @@Return:
       @@@Type: Node
       @@@enDesc:
@@ -5791,15 +5374,6 @@ ClsDef:
         $r = defined $self->{namespaceURI} ? ${$self->{namespaceURI}} : null;
 
   @Attr:
-    @@Name: forURI
-    @@Type: ForURI
-    @@enDesc:
-      The <QUOTE::for> URI reference for which this module is defined. 
-    @@Get:
-      @@@PerlDef:
-        $r = defined $self->{for} ? ${$self->{for}} : null;
-
-  @Attr:
     @@Name: forpURI
     @@enDesc:
       The <QUOTE::for+> URI references for which this resource is defined. 
@@ -5835,7 +5409,7 @@ ClsDef:
           This resource is not for <P::forURI>.
       @@@PerlDef:
         __DEEP{
-          C: for my $this_for_uri (${$self->{for}||\''}, @{$self->{forp}||[]}) {
+          C: for my $this_for_uri (<Q::ManakaiDOM|all>, @{$self->{forp}||[]}) {
             if ($this_for_uri eq $forURI) { ## Shortcut
               $r = true;
               last C;
@@ -6041,23 +5615,6 @@ IFClsDef:
             }
           }
         }__;
-
-  @Attr:
-    @@ForCheck: ManakaiDOM|ForClass
-    @@Name: forURI
-    @@Type: ForURI
-    @@enDesc:
-      The <QUOTE::for> URI reference for which this module is defined. 
-    @@Get:
-      @@@InCase:
-        @@@@Value:
-          @@@@@@: ManakaiDOM|all
-          @@@@@ContentType: DISCore|QName
-        @@@@enDesc:
-          The attribute value is always <Q::ManakaiDOM|all> for a
-          <QUOTE::for> resource.
-      @@@PerlDef:
-        $r = <Q::ManakaiDOM|all>;
 
   @Attr:
     @@Name: forpURI
@@ -7332,7 +6889,6 @@ IFClsDef:
     @@enDesc:
       Returns a list of property value text. 
     @@PropNameParam:
-    @@MediaTypeDefaultParam:
     @@Return:
       @@@Type: DISPerl|ARRAY
       @@@enDesc:
@@ -7352,17 +6908,6 @@ IFClsDef:
     @@enDesc:
       Gets property value resource. 
     @@PropNameParam:
-    @@NamedParam:
-      @@@Name: defaultMediaType
-      @@@Type: ResourceURI
-      @@@enDesc:
-        The URI reference of the default media type which is used 
-        when the property value is retrieved from the source tree 
-        and the source tree element does not have its <Q::dis:ContentType>
-        attribute specified. 
-      @@@nullCase:
-        @@@@enDesc:
-          Defaulted to <Q::DISCore:QName>.
     @@Return:
       @@@Type: DIS|DISAnyResource
       @@@enDesc:
@@ -7513,7 +7058,7 @@ IFClsDef:
             my @p_res = @{$self-><M::DISResourceProp.getPropertyResourceList>
                                       ($isaRecursivePropName, recursive_isa => false,
                                        recursive => false,
-                                       default_media_type => <Q::dis:TFQNames>)};
+                                       )};
             for my $p_res (@p_res) {
               my $p_res_uri = $p_res-><AG::anyres.uri>;
               next if $opt{___isa_recursive_done}->{$p_res_uri};
@@ -7833,7 +7378,6 @@ TMethods:
     @@Param:
       @@@Name: factory
       @@@Type: Document
-    @@ForParam:
     @@Return:
       @@@Type: Node
       @@@PerlDef:
@@ -7842,8 +7386,8 @@ TMethods:
           if ($s =~ s/^([^\s(][^\s+*?]*)\s*//) {
             $r = $factory-><M::Document.createElementNS>
                              (<Q::lang|dcmodel:>, 'terminal');
-            my $uri = $ns-><M::NSResolverDIS.tfqnamesToURI>
-                             ($1, null, $forArg);
+            my $uri = $ns-><M::NSResolverDIS.qnameToURI>
+                             ($1);
             $r-><AS::Node.textContent> ($uri);
             if ($s =~ s/^([+*?])\s*//) {
               $r-><M::Element.setAttributeNS> (null, 'occurence', $1);
@@ -7858,8 +7402,8 @@ TMethods:
               if ($s =~ s/^([^\s()+*?|,&][^\s)+*?,&]*|[+*?|,&][^\s)+*?,&]+)\s*//) {
                 my $el = $factory-><M::Document.createElementNS>
                                      (<Q::lang|dcmodel:>, 'terminal');
-                my $uri = $ns-><M::NSResolverDIS.tfqnamesToURI>
-                                   ($1, null, $forArg, node => $ns);
+                my $uri = $ns-><M::NSResolverDIS.qnameToURI>
+                                   ($1, node => $ns);
                 $el-><AS::Node.textContent> ($uri);
                 $current-><M::Node.appendChild> ($el);
                 $last = $el;
@@ -9061,31 +8605,6 @@ ElementTypeBinding:
         @@@@lang:en
         @@@@@:
           The source of the name is not a node. 
-
-ElementTypeBinding:
-  @Name: ForParam
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type:
-      DISLang:MethodParameter
-    @@DISPerl:isNamedParameter:1
-    @@Name: forArg
-    @@Type: ForURI
-    @@Description:
-      @@@lang:en
-      @@@@:
-        The <QUOTE::for> URI reference. 
-    @@ResourceDef:
-      @@@rdf:type:
-        ManakaiDOM:InCase
-      @@@Value:
-        @@@@is-null:1
-        @@@@ContentType: DISCore|String
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          Equivalent to <Q::ManakaiDOM:all>, i.e. <QUOTE::for all>. 
 
 ElementTypeBinding:
   @Name: ForpParam

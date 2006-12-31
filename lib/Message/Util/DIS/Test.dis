@@ -12,7 +12,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/12/30 13:25:40 $
+    $Date: 2006/12/31 09:12:02 $
   
   @Require:
     @@Module:
@@ -2148,22 +2148,6 @@ IFClsDef:
       @@@Type: DIS|NSResolverDIS
       @@@enDesc:
         An namespace resolver.
-    @@Param:
-      @@@Name: defaultTURI
-      @@@Type: DOMString
-      @@@enDesc:
-        The default <QUOTE::T> URI for <Q::DISCore:TFQNames>.
-      @@@nullCase:
-        @@@@enDesc:
-          <Q::DOMMain:any> is the default for historical reason.
-    @@Param:
-      @@@Name: defaultFURI
-      @@@Type: DOMString
-      @@@enDesc:
-        The default <QUOTE::F> URI for <Q::DISCore:TFQNames>.
-      @@@nullCase:
-        @@@@enDesc:
-          <Q::ManakaiDOM:all>.
     @@Return:
       @@@Type: DISPerl|HASH
       @@@enDesc:
@@ -2178,8 +2162,6 @@ IFClsDef:
         $self->{source} = $sourceText;
         $self->{dis_database} = $disDatabase;
         $self->{ns_resolver_dis} = $nsResolver;
-        $self->{default_t} = $defaultTURI;
-        $self->{default_f} = $defaultFURI;
         $self->{location} = {};
         __DEEP{
           $r = $self->_parse_tdterr;
@@ -2290,8 +2272,6 @@ IFClsDef:
       /* URI */
       URI : value := ['<'] [^'<' '>' '[' ']'] [^'<' '>']* ['>'];
       QName : value := ['<'] ['['] [^'<' '>' '[' ']']* [']'] ['>'];
-      TFQNames : value := ['<'] ['['] ['['] [^'<' '>' '[' ']']*
-                          [']'] [']'] ['>'];
       
       /* Ignored white space */
       WSP : ignore := [U+0009..U+000D U+0020]+;
@@ -2356,14 +2336,13 @@ IFClsDef:
     rule tdterr : standalone {
       my $err : return;
 
-      ~ (TFQNames) {
+      ~ (QName) {
         lang:Perl ($v => $token.value) : has-error {
-          my $disq = substr ($v, 3, length ($v) - 6);
+          my $disq = substr ($v, 2, length ($v) - 4);
           my $erruri;
           try {
             $erruri = $self->{ns_resolver_dis}
-                           ->tfqnames_to_uri ($disq, $self->{default_t},
-                                                     $self->{default_f});
+                           ->qname_to_uri ($disq);
           } catch Message::Util::Error with {
             my $err = shift;
             if ($err->can ('subtype') and

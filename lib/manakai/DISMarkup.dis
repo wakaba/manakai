@@ -12,7 +12,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date:
-    $Date: 2006/12/30 13:25:40 $
+    $Date: 2006/12/31 09:12:03 $
 
   @Require:
     @@Module:
@@ -165,13 +165,13 @@ RPropDef:
 RPropDef:
   @QName: mv|contains
   @enFN: contains
-  @dataType: DISCore|TFQNames
+  @dataType: DISCore|QName
   @multipleProperties: DISCore|OrderedList
 
 RPropDef:
   @QName: mv|refers
   @enFN: contains reference to
-  @dataType: DISCore|TFQNames
+  @dataType: DISCore|QName
   @multipleProperties: DISCore|OrderedList
 
 ResourceTypeDef:
@@ -348,7 +348,7 @@ RPropDef:
   @enFN: element content model
   @enDesc:
     The <Q::mv|elementContentModel> applied to an <Q::mv|ElementType>.
-  @dataType: DISCore|TFQNames
+  @dataType: DISCore|QName
   @multipleProperties: DISCore|Single
 
 RPropDef:
@@ -364,9 +364,9 @@ LexTypeDef:
     The <Q::lang|dcmodel> format can be used to describes an
     <Q::mv|ElementContentModel>.
 
-    <Q::lang|dcmodel> := s <Q::DISCore|TFQNames> s / group
+    <Q::lang|dcmodel> := s <Q::DISCore|QName> s / group
 
-    group := s "(" *(s connector / s <Q::DISCore|TFQNames> s occurence) s ")"
+    group := s "(" *(s connector / s <Q::DISCore|QName> s occurence) s ")"
              s occurence s
 
     occurence := ["+" / "*" / "?"]
@@ -425,7 +425,7 @@ RPropDef:
 RPropDef:
   @QName: mv|attributeValueType
   @enFN: attribute value type
-  @dataType: DISCore|TFQNames
+  @dataType: DISCore|QName
   @multipleProperties: DISCore|Single
 
 ResourceTypeDef:
@@ -491,7 +491,7 @@ RPropDef:
     If an <VAR::S>'s <Q::mv|ElementType> is <VAR::O>,
     <VAR::S> is associated to element type <VAR::O>.
   @rdfs:range: mv|ElementTypeOrNSElementTypes
-  @dataType: DISCore|TFQNames
+  @dataType: DISCore|QName
   @multipleProperties: DISCore|UnorderedList
 
 ResourceDef:
@@ -506,7 +506,7 @@ RPropDef:
     <VAR::S> is associated to documents whose root element
     type is <VAR::O>.
   @rdfs:range: mv|ElementTypeOrNSElementTypes
-  @dataType: DISCore|TFQNames
+  @dataType: DISCore|QName
   @multipleProperties: DISCore|UnorderedList
 
 ResourceDef:
@@ -528,7 +528,7 @@ RPropDef:
     If an <VAR::S>'s <Q::mv|attribute> is <VAR::O>, 
     <VAR::S> is associated to attribute <VAR::O>.
   @rdfs:range: mv|AttributeType
-  @dataType: DISCore|TFQNames
+  @dataType: DISCore|QName
   @multipleProperties: DISCore|UnorderedList
 
 RPropDef:

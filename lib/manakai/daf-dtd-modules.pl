@@ -20,12 +20,12 @@ our $impl; # Assigned in the main script
 our $db;
 our %Opt;
 
-sub daf_dtd_modules ($$$) {
-  my ($mg_uri, $out_dir_path, $mg_for) = @_;
+sub daf_dtd_modules ($$) {
+  my ($mg_uri, $out_dir_path) = @_;
 
-  my $mg = $db->get_resource ($mg_uri, for_arg => $mg_for);
+  my $mg = $db->get_resource ($mg_uri);
 
-  status_msg qq<DTD module group <$mg_uri> for <$mg_for>...>;
+  status_msg qq<DTD module group <$mg_uri>...>;
 
   my $mg_name = daf_dm_get_name ($mg);
   my $mg_ver = daf_dm_get_ver ($mg);
@@ -44,10 +44,10 @@ sub daf_dtd_modules ($$$) {
 
 } # daf_dtd_modules
 
-sub daf_dtd_driver ($$$) {
-  my ($mg_uri, $out_dir_path, $mg_for) = @_;
+sub daf_dtd_driver ($$) {
+  my ($mg_uri, $out_dir_path) = @_;
 
-  my $mg = $db->get_resource ($mg_uri, for_arg => $mg_for);
+  my $mg = $db->get_resource ($mg_uri);
 
   daf_dm_create_module_file (undef, $mg, $out_dir_path);
 } # daf_dtd_driver

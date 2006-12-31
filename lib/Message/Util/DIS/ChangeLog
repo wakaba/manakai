@@ -1,5 +1,14 @@
 2006-12-31  Wakaba  <wakaba@suika.fam.cx>
 
+	* DNLite.dis, Perl.dis: Support for |for| is entirely removed.
+
+	* Test.dis (parseTDTErrorString): The |defaultTURI|
+	and |defaultFURI| parameters are removed.
+	(lexmode): |TFQNames| token type is removed.
+	(tdterr): Accepts |QName| where |TFQNames| was accepted.
+
+2006-12-31  Wakaba  <wakaba@suika.fam.cx>
+
 	* DNLite.dis (forMatch, convert...): Support for the |For|
 	property is removed.
 

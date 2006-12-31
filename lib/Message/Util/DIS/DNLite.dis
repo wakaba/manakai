@@ -18,7 +18,7 @@ Module:
   @License:
     license:Perl+MPL
   @Date:
-    $Date: 2006/12/31 01:14:53 $
+    $Date: 2006/12/31 09:12:01 $
   
   @Require:
     @@Module:
@@ -533,7 +533,6 @@ IFClsDef:
     @@Name: disChildElements
     @@enDesc:
       A list of child elements, with <QUOTE::for> checks.
-    @@ForParam:
     @@ForpParam:
     @@NamedParam:
       @@@Name: databaseArg
@@ -546,7 +545,7 @@ IFClsDef:
         $r = [];
         __DEEP{
           for my $cn (@{$self->{child}||[]}) {
-            if ($cn-><M::DNLElement.forMatch> ($forArg, $forpArg,
+            if ($cn-><M::DNLElement.forMatch> (undef, $forpArg,
                                                database_arg => $databaseArg)) {
               push @$r, $cn;
             }
@@ -762,26 +761,6 @@ IFClsDef:
           @@@@@lang:en
           @@@@@@:
             Equivalent to <Q::DOMMain:any>. 
-    @@Param:
-      @@@Name: defaultForURI
-      @@@Type: DIS|ForURI
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          A <QUOTE::for> URI reference used if it is missing from 
-          <P::tfqnames>. 
-      @@@InCase:
-        @@@@Value:
-          @@@@@is-null:1
-        @@@@Description:
-          @@@@@lang:en
-          @@@@@@:
-            Equivalent to <QUOTE::for all>, i.e. <Q::ManakaiDOM:all>. 
-    @@ForParam:
-    @@ForpParam:
-    @@NamedParam:
-      @@@Name: databaseArg
-      @@@Type: DIS|DISDatabase
     @@Return:
       @@@Type: DIS|ResourceURI
       @@@nullCase:
@@ -792,18 +771,9 @@ IFClsDef:
         my $v = $self-><M::SNode.value>;
         if (defined $v and not ref $v eq 'ARRAY') {
           __DEEP{
-            if ($self-><M::DNLElement.mediaTypeMatch>
-                                 (<Q::DISCore:TFPQNames>, <Q::DISCore:TFPQNames>,
-                                  for_arg => $forArg, forp_arg => $forpArg,
-                                  database_arg => $databaseArg)) {
-              $r = $self-><M::DIS|NSResolverDIS.tfpqnamesToURI>
-                                  ($v, $defaultTypeURI, $defaultForURI,
+            $r = $self-><M::DIS|NSResolverDIS.tfpqnamesToURI>
+                                  ($v, $defaultTypeURI,
                                    node => $self);
-            } else {
-              $r = $self-><M::DIS|NSResolverDIS.tfqnamesToURI>
-                                  ($v, $defaultTypeURI, $defaultForURI,
-                                   node => $self);
-            }
           }__;
         } else {
           $r = null;
@@ -1130,10 +1100,8 @@ IFClsDef:
     @@Param:
       @@@Name: forArg
       @@@Type: DIS|ForURI
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          The <QUOTE::For> URI reference to test against. 
+      @@@enDesc:
+        This parameter <kwd:MUST> be ignored.
     @@Param:
       @@@Name: forpArg
       @@@Type: DIS|ForURIList
@@ -1163,16 +1131,15 @@ IFClsDef:
       @@@Description:
         @@@@lang:en
         @@@@@:
-          Whether this element is for <P::forArg> and <P::forpArg> or not. 
+          Whether this element is for <P::forpArg> or not. 
       @@@UndeclaredPrefixException:
       @@@NoDBException:
       @@@PerlDef:
-        $forArg = <Q::ManakaiDOM:all> unless defined $forArg;
         $forpArg ||= [];
 
         FORMATCH: {
           __DEEP{
-            my $for_res = $databaseArg-><M::DIS|DISDatabase.getFor> ($forArg);
+            my $for_res = $databaseArg->get_for (<Q::ManakaiDOM|all>);
             my $forp_res = [map {
                                   $databaseArg-><M::DIS|DISDatabase.getFor> ($_)
                                 } @{$forpArg}];
@@ -1300,8 +1267,6 @@ IFClsDef:
           @@@@@lang:en
           @@@@@@:
             No default type provided.  All <P::mediaType> will match. 
-    @@ForParam:
-    @@ForpParam:
     @@NamedParam:
       @@@Name: databaseArg
       @@@Type: DIS|DISDatabase
@@ -1338,8 +1303,6 @@ IFClsDef:
       @@@nullCase:
         @@@@enDesc:
           No default is specified. 
-    @@ForParam:
-    @@ForpParam:
     @@Return:
       @@@enDesc:
         The media type URI reference of this element. 
@@ -1368,7 +1331,6 @@ IFClsDef:
       @@@Type: DIS|AnyURI
       @@@enDesc:
         The name expanded URI of the node to retrieve. 
-    @@ForParam:
     @@ForpParam:
     @@MediaTypeParam:
     @@MediaTypeDefaultParam:
@@ -1386,12 +1348,11 @@ IFClsDef:
           No attribute node found. 
       @@@PerlDef:
         C: for my $c (@{$self-><M::DNLNode.disChildElements>
-                                  (for_arg => $forArg, forp_arg => $forpArg,
+                                  (forp_arg => $forpArg,
                                    database_arg => $databaseArg)}) {
           if (${$c->{uri}} eq $attrName and
               $c-><M::DNLElement.mediaTypeMatch>
                                   ($mediaType, $defaultMediaType,
-                                   for_arg => $forArg, forp_arg => $forpArg,
                                    database_arg => $databaseArg)) {
             $r = $c;
             last C;
@@ -1443,30 +1404,6 @@ ElementTypeBinding:
         @@@@lang:en
         @@@@@:
           The source of the name is not a node. 
-
-ElementTypeBinding:
-  @Name: ForParam
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type:
-      DISLang:MethodParameter
-    @@DISPerl:isNamedParameter:1
-    @@Name: forArg
-    @@Type: DIS|ForURI
-    @@Description:
-      @@@lang:en
-      @@@@:
-        The <QUOTE::for> URI reference. 
-    @@ResourceDef:
-      @@@rdf:type:
-        ManakaiDOM:InCase
-      @@@Value:
-        @@@@is-null:1
-      @@@Description:
-        @@@@lang:en
-        @@@@@:
-          Equivalent to <Q::ManakaiDOM:all>, i.e. <QUOTE::for all>. 
 
 ElementTypeBinding:
   @Name: ForpParam

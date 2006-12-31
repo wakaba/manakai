@@ -21,7 +21,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date:
-    $Date: 2006/12/30 13:25:33 $
+    $Date: 2006/12/31 09:11:53 $
 
   @Require:
     @@Module:
@@ -1335,7 +1335,7 @@ IFCls3Def:
       @@@@:
         Construct a new instance of the <IF::LSInput>.
     @@Return:
-      @@@Type:ManakaiDOMLSInput
+      @@@Type: LSInput
       @@@Description:
         @@@@lang:en
         @@@@@:
@@ -1358,6 +1358,8 @@ IFCls3Def:
       value for efficient). 
 
   @ResourceDef:
+    @@ForCheck: ManakaiDOM|ForIF
+    @@QName: LSInputIOProcessor
     @@rdf:type: DISLang|InputProcessor
     @@rdf:type: DISLang|OutputProcessor
     @@PerlCDef:
@@ -1545,6 +1547,8 @@ IFCls3Def:
         goto &$self;
 
   @ResourceDef:
+    @@ForCheck: ManakaiDOM|ForIF
+    @@QName: LSResourceResolverIOProcessor
     @@rdf:type: DISLang|InputProcessor
     @@rdf:type: DISLang|OutputProcessor
     @@PerlCDef:

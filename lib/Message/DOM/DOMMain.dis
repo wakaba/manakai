@@ -23,7 +23,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/12/30 12:00:38 $
+    $Date: 2006/12/31 09:11:53 $
   
   @Require:
     @@Module:
@@ -151,14 +151,14 @@ PropDef:
   @QName: reflectGet
   @enDesc:
     Getter template for a <QUOTE::reflecting> DOM attribute.
-  @dataType: dis|TFQNames
+  @dataType: DISCore|QName
   @rdfs:range: ReflectGet
 
 PropDef:
   @QName: reflectSet
   @enDesc:
     Setter template for a <QUOTE::reflecting> DOM attribute.
-  @dataType: dis|TFQNames
+  @dataType: DISCore|QName
   @rdfs:range: ReflectSet
 
 ElementTypeBinding:
@@ -380,6 +380,7 @@ StringDataTypeDef:
     containing a list of DOM URIs separated by white space
     characters (<CODE::S> in XML 1.0).
   @ResourceDef:
+    @@QName: DOMURIsInputProcessor
     @@rdf:type: DISLang|InputProcessor
     @@PerlDef:
       if (defined $INPUT and not ref $INPUT) {
@@ -480,6 +481,7 @@ StringDataTypeDef:
       string is outputed as part of the implementation.
 
   @ResourceDef:
+    @@QName: DOMNamespaceURIInputProcessor
     @@rdf:type: DISLang|InputProcessor
     @@PerlDef:
       if (CORE::defined $INPUT and CORE::length $INPUT == 0) {
@@ -584,6 +586,7 @@ StringDataTypeDef:
       a plain string of identifiers.
 
   @ResourceDef:
+    @@QName: DOMKeyIdentifierInputProcessor
     @@rdf:type: DISLang|InputProcessor
     @@PerlDef:
       if (CORE::defined $INPUT) {
@@ -600,6 +603,7 @@ StringDataTypeDef:
     @@lang:en
     @@@: XML Name
   @ResourceDef:
+    @@QName: XMLNameInputIdentifier
     @@rdf:type: DISLang|InputProcessor
     @@PerlDef: \
 
@@ -659,6 +663,7 @@ StringDataTypeDef:
     @@@: XML NCName
 
   @ResourceDef:
+    @@QName: XMLNCNameInputProcessor
     @@rdf:type: DISLang|InputProcessor
     @@PerlDef:\
 
@@ -822,6 +827,7 @@ StringDataTypeDef:
     XML 1.0 QName
   
   @ResourceDef:
+    @@QName: XML10QNameInputProcessor
     @@rdf:type: DISLang|InputProcessor
     @@PerlDef:
     if (<Code::DOMCore:doStrictErrorChecking:: $nodeRef = $self>) {
@@ -867,6 +873,7 @@ StringDataTypeDef:
     XML 1.1 QName
   
   @ResourceDef:
+    @@QName: XML11QNameInputProcessor
     @@rdf:type: DISLang|InputProcessor
     @@PerlDef:
     if (<Code::DOMCore:doStrictErrorChecking:: $nodeRef = $self>) {

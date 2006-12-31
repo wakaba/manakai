@@ -1,5 +1,13 @@
 2006-12-31  Wakaba  <wakaba@suika.fam.cx>
 
+	* |InputProcessor|s and |OutputProcessor|s are
+	named so that |report| statements in Perl
+	module outputs can be identified by name. |dis:dataType|s
+	of |DISCore:TFQNames| are all replaced
+	by |DISCore:QName|.
+
+2006-12-31  Wakaba  <wakaba@suika.fam.cx>
+
 	* Element.dis (createElementNS): If an array reference
 	is specified as the |qualifiedName| parameter,
 	don't set the first item as the local name

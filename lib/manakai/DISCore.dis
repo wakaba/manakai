@@ -17,7 +17,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/12/31 00:55:10 $
+    $Date: 2006/12/31 09:12:03 $
 
   @Require:
     @@Module:
@@ -75,7 +75,7 @@ ResourceTypeDef:
     Required <QUOTE::dis> Module
   @rdfs:domain: DISCore|Module
   @rdfs:range: DISCore|Module
-  @dataType: DISCore|ModuleTFQNames
+  @dataType: DISCore|QName
   @multipleProperties: DISCore|UnorderedList
 
 ## -- dis "for"
@@ -181,7 +181,7 @@ CPropDef:
   @enDesc:
     The subject resource has the object resource as a member.
   @multipleProperties: DISCore|UnorderedList
-  @dataType: DISCore|TFQNames
+  @dataType: DISCore|QName
   @rdfs:range: DISCore|AnyResource
 
 SPropDef:
@@ -189,7 +189,7 @@ SPropDef:
   @enDesc:
     The subject resource has the object module as a member.
   @multipleProperties: DISCore|UnorderedList
-  @dataType: DISCore|ModuleTFQNames
+  @dataType: DISCore|QName
   @rdfs:range: DISCore|Module
   @rdfs:subPropertyOf: DISCore|anyResource
   @subsetOf: DISCore|anyResource
@@ -199,7 +199,7 @@ SPropDef:
   @enDesc:
     The subject resource has the object <QUOTE::dis> resource as a member.
   @multipleProperties: DISCore|UnorderedList
-  @dataType: DISCore|TFQNames
+  @dataType: DISCore|QName
   @rdfs:range: DISCore|Module
   @rdfs:subPropertyOf: DISCore|anyResource
   @subsetOf: DISCore|anyResource
@@ -323,7 +323,7 @@ CPropDef:
     rdfs:Resource
   @rdfs:range:
     rdfs:Resource
-  @dataType: DISCore|TFQNames
+  @dataType: DISCore|QName
   @multipleProperties: OrderedList
 
 SPropDef:
@@ -339,7 +339,7 @@ SPropDef:
     rdfs:Resource
   @subsetOf: derivedFrom
   @rdfs:subPropertyOf:derivedFrom
-  @dataType: DISCore|TFQNames
+  @dataType: DISCore|QName
   @multipleProperties: UnorderedList
 
 CPropDef:
@@ -354,7 +354,7 @@ CPropDef:
               not be directly specified in the <Q::dis> files.
       \
       }
-  @dataType: DISCore|TFQNames
+  @dataType: DISCore|QName
   @multipleProperties: UnorderedList
 
 SPropDef:
@@ -373,7 +373,7 @@ SPropDef:
   @DISCore:resourceType: DISCore|ElementType
   @subsetOf: derivedFrom
   @rdfs:subPropertyOf:derivedFrom
-  @dataType: DISCore|TFQNames
+  @dataType: DISCore|QName
   @multipleProperties: OrderedList
 
 CPropDef:
@@ -399,7 +399,7 @@ SPropDef:
       <QUOTE::Implementing> relationship of a resource.
   @subsetOf:derivedFrom
   @rdfs:subPropertyOf:derivedFrom
-  @dataType: DISCore|TFQNames
+  @dataType: DISCore|QName
   @multipleProperties: UnorderedList
 
 SPropDef:
@@ -720,20 +720,6 @@ LexTypeDef:
   @subsetOf: DISCore|DISString
 
 LexTypeDef:
-  @QName: DISCore|TFURI
-  @enFN:
-    <Q::DISCore|TFQNames>-expanded URI
-  @enDesc:
-    A <Q::DISCore|TFURI> is an absolute <Q::DISCore:URI> extracted
-    from a <Q::DISCore|TFQNames>.
-
-      {NOTE:: <Q::DISCore|TFURI>s and <Q::DISCore|TFQNames>s
-              have the one-to-one relationship.
-      }
-  @rdfs:subClassOf: DISCore|URI
-  @subsetOf: DISCore|URI
-
-LexTypeDef:
   @QName: DISCore|TFPURI
   @enFN:
     <Q::DISCore|TFPQNames>-expanded URI
@@ -844,13 +830,6 @@ LexTypeDef:
 ResourceDef:
   @QName: dis|TFQNames
   @AliasFor: DISCore|TFQNames
-
-LexTypeDef:
-  @QName: DISCore|ModuleTFQNames
-  @enFN:
-    <QUOTE::dis> T & F QNames identifying a <Q::DISCore:Module>
-  @rdfs:subClassOf: DISCore|TFQNames
-  @subsetOf: DISCore|TFQNames
 
 LexTypeDef:
   @QName: DISCore|TFPQNames
@@ -1016,7 +995,7 @@ SPropDef:
 
 CPropDef:
   @QName: alt
-  @dataType: DISCore|TFQNames
+  @dataType: DISCore|QName
   @DISCore:resourceType: DISSource|PropertyProperty
   @Description:
     @@lang:en

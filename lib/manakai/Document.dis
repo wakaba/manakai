@@ -8,7 +8,7 @@ Module:
 
   @DISCore:author: DISCore|Wakaba
   @Date:
-    $Date: 2006/12/30 13:25:40 $
+    $Date: 2006/12/31 09:12:03 $
   @License: license|Perl+MPL
 
   @Require:
@@ -261,7 +261,7 @@ PropDef:
   @rdfs:domain: doc|DocumentFragment
   @rdfs:range: doc|DocumentFragment
   @multipleProperties: DISCore|OrderedList
-  @dataType: DISCore|TFQNames
+  @dataType: DISCore|QName
   @rdfs:subPropertyOf: DISCore|resource
   @subsetOf: DISCore|resource
 
@@ -272,7 +272,7 @@ PropDef:
   @rdfs:subPropertyOf: doc|part
   @subsetOf: doc|part
   @multipleProperties: DISCore|OrderedList
-  @dataType: DISCore|TFQNames
+  @dataType: DISCore|QName
 
 PropDef:
   @QName: doc|mainSection
@@ -281,28 +281,28 @@ PropDef:
   @rdfs:subPropertyOf: doc|section
   @subsetOf: doc|section
   @multipleProperties: DISCore|OrderedList
-  @dataType: DISCore|TFQNames
+  @dataType: DISCore|QName
 
 PropDef:
   @QName: doc|additionalSection
   @rdfs:subPropertyOf: doc|section
   @subsetOf: doc|section
   @multipleProperties: DISCore|OrderedList
-  @dataType: DISCore|TFQNames
+  @dataType: DISCore|QName
 
 PropDef:
   @QName: doc|subsection
   @rdfs:subPropertyOf: doc|subsection
   @subsetOf: doc|section
   @multipleProperties: DISCore|OrderedList
-  @dataType: DISCore|TFQNames
+  @dataType: DISCore|QName
 
 PropDef:
   @QName: doc|appendix
   @rdfs:subPropertyOf: doc|section
   @subsetOf: doc|section
   @multipleProperties: DISCore|OrderedList
-  @dataType: DISCore|TFQNames
+  @dataType: DISCore|QName
 
 PropDef:
   @QName: doc|abstract
@@ -314,7 +314,7 @@ PropDef:
   @rdfs:subPropertyOf: doc|part
   @subsetOf: doc|part
   @multipleProperties: DISCore|OrderedList
-  @dataType: DISCore|TFQNames
+  @dataType: DISCore|QName
 
 PropDef:
   @QName: doc|status
@@ -322,7 +322,7 @@ PropDef:
   @rdfs:subPropertyOf: doc|part
   @subsetOf: doc|part
   @multipleProperties: DISCore|OrderedList
-  @dataType: DISCore|TFQNames
+  @dataType: DISCore|QName
 
 PropDef:
   @QName: doc|toc
@@ -330,7 +330,7 @@ PropDef:
   @rdfs:subPropertyOf: doc|part
   @subsetOf: doc|part
   @multipleProperties: DISCore|OrderedList
-  @dataType: DISCore|TFQNames
+  @dataType: DISCore|QName
 
 PropDef:
   @QName: doc|shortTOC
@@ -338,7 +338,7 @@ PropDef:
   @rdfs:subPropertyOf: doc|toc
   @subsetOf: doc|toc
   @multipleProperties: DISCore|OrderedList
-  @dataType: DISCore|TFQNames
+  @dataType: DISCore|QName
 
 PropDef:
   @QName: doc|longTOC
@@ -346,7 +346,7 @@ PropDef:
   @rdfs:subPropertyOf: doc|toc
   @subsetOf: doc|toc
   @multipleProperties: DISCore|OrderedList
-  @dataType: DISCore|TFQNames
+  @dataType: DISCore|QName
 
 PropDef:
   @QName: doc|references
@@ -354,7 +354,7 @@ PropDef:
   @rdfs:subPropertyOf: doc|part
   @subsetOf: doc|part
   @multipleProperties: DISCore|OrderedList
-  @dataType: DISCore|TFQNames
+  @dataType: DISCore|QName
 
 PropDef:
   @QName: doc|normativeReferences
@@ -362,7 +362,7 @@ PropDef:
   @rdfs:subPropertyOf: doc|references
   @subsetOf: doc|references
   @multipleProperties: DISCore|OrderedList
-  @dataType: DISCore|TFQNames
+  @dataType: DISCore|QName
 
 PropDef:
   @QName: doc|informativeReferences
@@ -370,7 +370,7 @@ PropDef:
   @rdfs:subPropertyOf: doc|references
   @subsetOf: doc|references
   @multipleProperties: DISCore|OrderedList
-  @dataType: DISCore|TFQNames
+  @dataType: DISCore|QName
 
 PropDef:
   @QName: doc|index
@@ -378,7 +378,7 @@ PropDef:
   @rdfs:subPropertyOf: doc|part
   @subsetOf: doc|part
   @multipleProperties: DISCore|OrderedList
-  @dataType: DISCore|TFQNames
+  @dataType: DISCore|QName
 
 ResourceTypeDef:
   @QName: doc|Relationship
@@ -414,7 +414,7 @@ PropDef:
 
 PropDef:
   @QName: doc|errata
-  @dataType: DISCore|TFQNames
+  @dataType: DISCore|QName
   @multipleProperties: DISCore|Single
 
 ## -- Properties describing authors and licenses

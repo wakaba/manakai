@@ -7,7 +7,7 @@ use Message::Util::QName::Filter {
   swcfg21 => q<http://suika.fam.cx/~wakaba/archive/2005/swcfg21#>,
 };
 
-our$VERSION=do{my @r=(q$Revision: 1.22 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our$VERSION=do{my @r=(q$Revision: 1.23 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Cwd;
 use Getopt::Long;
 use Pod::Usage;
@@ -196,10 +196,10 @@ get_module_source_document_from_uri => sub {
   }
   return $ModuleSourceDNLDocument{$module_uri};
 },
-get_module_source_document_from_resource => sub ($$$$$$) {
-  my ($self, $db, $uri, $ns, $ln, $for) = @_;
+get_module_source_document_from_resource => sub ($$$$$) {
+  my ($self, $db, $uri, $ns, $ln) = @_;
   status_msg '';
-  status_msg qq<Loading module "$ln" for <$for>...>;
+  status_msg qq<Loading module "$ln"...>;
   $ResourceCount = 0;
 
   my $module_uri = $ns.$ln;
@@ -299,16 +299,16 @@ exit $HasError if $HasError;
 ## --- Creating Files
 
 for (@{$Opt{create_module}}) {
-  my ($mod_uri, $out_file_path, $mod_for, $out_type) = @$_;
+  my ($mod_uri, $out_file_path, undef, $out_type) = @$_;
 
   if ($out_type eq 'perl-pm') {
     daf_perl_pm ($mod_uri, $out_file_path);
   } elsif ($out_type eq 'perl-t') {
     daf_perl_t ($mod_uri, $out_file_path);
   } elsif ($out_type eq 'dtd-modules') {
-    daf_dtd_modules ($mod_uri, $out_file_path, $mod_for);
+    daf_dtd_modules ($mod_uri, $out_file_path);
   } elsif ($out_type eq 'dtd-driver') {
-    daf_dtd_driver ($mod_uri, $out_file_path, $mod_for);
+    daf_dtd_driver ($mod_uri, $out_file_path);
   }
 }
 

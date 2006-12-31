@@ -19,7 +19,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/12/30 15:42:56 $
+    $Date: 2006/12/31 09:11:52 $
 
   @Require:
     @@Module:
@@ -3007,7 +3007,7 @@ SPropDef:
   @enDesc:
     A method or attribute might report an error.
   @multipleProperties: DISCore|UnorderedList
-  @dataType: DISCore|TFQNames
+  @dataType: DISCore|QName
 
 SPropDef:
   @QName: c|erred
@@ -3021,7 +3021,7 @@ SPropDef:
   @Description:
     @@lang:en
     @@@: The severity of an error.
-  @dataType: DISCore|TFQNames
+  @dataType: DISCore|QName
   @multipleProperties: DISCore|Single
   @ecore:propKey: sev
 
@@ -3143,6 +3143,8 @@ IFCls3Def:
       invoke the code.
 
   @ResourceDef:
+    @@ForCheck: ManakaiDOM|ForIF
+    @@QName: DOMErrorHandlerIOProcessor
     @@rdf:type: DISLang|InputProcessor
     @@rdf:type: DISLang|OutputProcessor
     @@PerlDefC:
@@ -3302,6 +3304,8 @@ IFCls3Def:
         $r = $self->{uri};
 
   @ResourceDef:
+    @@ForCheck: ManakaiDOM|ForIF
+    @@QName: DOMLocatorIOProcessor
     @@rdf:type: DISLang|InputProcessor
     @@rdf:type: DISLang|OutputProcessor
     @@PerlDefC:
@@ -3856,6 +3860,7 @@ StringDataTypeDef:
     but it is not enforced by the DOM implementation.
     <SRC::DOM Level 3 Core>
   @ResourceDef:
+    @@QName: DOMConfigurationParameterInputProcessor
     @@rdf:type: DISLang|InputProcessor
     @@PerlDefC:
       $INPUT = lc $INPUT;
@@ -4631,7 +4636,7 @@ SPropDef:
   @rdfs:domain: c|DOMConfigurationParameterApplication
   @rdfs:range: c|DOMConfigurationParameter
   @rdfs:subClassOf: DISCore|derivedFrom
-  @dataType: DISCore|TFQNames
+  @dataType: DISCore|QName
   @multipleProperties: DISCore|Single
 
 SPropDef:
@@ -4695,7 +4700,7 @@ SPropDef:
   @QName: DOMCore|targetType
   @enDesc:
     The type of objects for which the configuration parameter is defined.
-  @dataType: DISCore|TFQNames
+  @dataType: DISCore|QName
   @multipleProperties: DISCore|UnorderedList
   @rdfs:domain: DOMCore|DOMConfigurationParameter
   @rdfs:range: DISLang|Interface
@@ -4704,7 +4709,7 @@ SPropDef:
   @QName: dis|SetParam
   @enDesc:
     The parameter affected by the setting of the value.
-  @dataType: DISCore|TFQNames
+  @dataType: DISCore|QName
   @multipleProperties: DISCore|UnorderedList
   @rdfs:range: DOMCore|DOMConfigurationParameter
 
