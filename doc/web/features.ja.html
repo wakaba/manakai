@@ -5,6 +5,15 @@
 <link rel="stylesheet" href="http://suika.fam.cx/www/style/html/xhtml">
 <link rel="copyright" href="http://suika.fam.cx/c/pd" title="Public Domain">
 <link rel="contents" href="./">
+<style type="text/css">
+.not-implemented {
+  margin: 0.1em;
+  border-color: red;
+  border-width: 0.2em;
+  border-style: dotted;
+  padding: 0.1em;
+}
+</style>
 </head>
 <body>
 <h1>manakai 0.3.3 の機能</h1>
@@ -29,34 +38,11 @@
 </thead>
 <tbody>
 <tr>
-<th scope="row">機能</th>
-<td>水準 3 (manakai 独自)</td>
-<td>
-  <p>次のすべてを実装:</p>
-  <ul>
-  <li><code class="DOMi" lang="en">ImplementationRegistry</code></li>
-  <li><code class="DOMi" lang="en">ImplementationSource</code></li>
-  <li><code class="DOMi" lang="en">ImplementationList</code></li>
-  <li><code class="DOMi" lang="en">MinimumImplementation</code></li>
-  <li><code class="DOMi" lang="en">GetFeature</code></li>
-  </ul>
-</td>
-</tr>
-<tr>
-<th scope="row">共通 <abbr lang="en" title="Load and Save">LS</abbr></th>
-<td>水準 3 (manakai 独自)</td>
-<td>
-  <p>次のすべてを実装:</p>
-  <ul>
-  <li><code class="DOMi" lang="en">GLSImplementation</code></li>
-  </ul>
-</td>
-</tr>
-<tr>
 <th scope="row">中核</th>
 <td>水準 1, 2, 3</td>
 <td>
-  <p>次を<em>除き</em>実装済:</p>
+  <p>ほぼ実装済</p>
+  <div class="not-implemented">
   <ul>
   <li><code class="DOMa">whole_text</code>,
   <code class="DOMm">replace_whole_text</code>,
@@ -68,16 +54,25 @@
   <li>一部の操作は <code class="DOMa">specified</code>
   を自動的に真にしない</li>
   </ul>
+  </div>
 </td>
 </tr>
 <tr>
-<th scope="row" lang="en">XML</th>
-<td>水準 1, 2, 3</td>
+<th scope="row" lang="en" rowspan="2">XML</th>
+<td>水準 1</td>
+<td></td>
+</tr>
+<tr>
 <td>
-  <p>次を<em>除き</em>実装済:</p>
+  <a href="http://www.w3.org/TR/2000/REC-DOM-Level-2-Core-20001113/core.html"
+      title="DOM 水準 2 XML">水準 2</a>, 3</td>
+<td>
+  <p>ほぼ実装済</p>
+  <div class="not-implemented">
   <ul>
   <li><code class="DOMa">internal_subset</code> は未実装</li>
   </ul>
+  </div>
 </td>
 </tr>
 <tr>
@@ -96,7 +91,7 @@
 <th scope="row">XDoctype 宣言</th>
 <td>水準 3 案 (manakai 独自)</td>
 <td>
-  <p>次に挙げるもの<em>のみ</em>実装:</p>
+  <p>次のすべてを実装:</p>
   <ul>
   <li><code class="DOMi" lang="en">DocumentTypeDeclaration</code></li>
   </ul>
@@ -109,16 +104,72 @@
 <td></td>
 </tr>
 <tr>
+<th scope="row">共通 <abbr lang="en" title="Load and Save">LS</abbr></th>
+<td>水準 3 (manakai 独自)</td>
+<td></td>
+</tr>
+<tr>
 <th scope="row"><abbr lang="en" title="Load and Save">LS</abbr></th>
-<td>水準 3</td>
+<td>
+  <a href="http://www.w3.org/TR/2004/REC-DOM-Level-3-LS-20040407/load-save.html"
+      title="DOM 水準 3 読み込みおよび保存">水準 3</a>
+</td>
 <td>
   <p>次に挙げるもの<em>のみ</em>実装:</p>
   <ul>
-  <li><code class="DOMi" lang="en">LSInput</code></li>
-  <li><code class="DOMi" lang="en">LSOutput</code></li>
-  <li><code class="DOMi" lang="en">LSParser</code>
-  (同期読込みのみ、ほとんどの設定引数は未実装)</li>
+  <li><a href="http://www.w3.org/TR/2004/REC-DOM-Level-3-LS-20040407/load-save.html#LS-DOMImplementation"
+      ><code class="DOMi" lang="en">DOMImplementationLS</code></a></li>
+  <li><a href="http://www.w3.org/TR/2004/REC-DOM-Level-3-LS-20040407/load-save.html#LS-LSInput"
+      ><code class="DOMi" lang="en">LSInput</code></a></li>
+  <li><a href="http://www.w3.org/TR/2004/REC-DOM-Level-3-LS-20040407/load-save.html#LS-LSOutput"
+      ><code class="DOMi" lang="en">LSOutput</code></a></li>
+  <li><a href="http://www.w3.org/TR/2004/REC-DOM-Level-3-LS-20040407/load-save.html#LS-LSParser"
+      ><code class="DOMi" lang="en">LSParser</code></a> の一部</li>
+  <li><a href="http://www.w3.org/TR/2006/REC-xml-20060816" lang="en">XML
+  1.0</a>,
+  <a href="http://www.w3.org/TR/2006/REC-xml11-20060816" lang="en">XML
+  1.1</a> に対応</li>
   </ul>
+  <div class="not-implemented">
+    <ul>
+    <li>名前空間<em>非</em>製形式には未対応</li>
+    <li>妥当性は検証しない</li>
+    <li>外部実体は読み込まない</li>
+    <li><a href="http://www.w3.org/TR/2006/REC-xml11-20060816/#dt-fullnorm"
+        >完全正規化性</a>は検査しない</li>
+    <li><a href="http://www.w3.org/TR/2004/REC-DOM-Level-3-LS-20040407/load-save.html#LS-LSParser"
+        ><code class="DOMi" lang="en">LSParser</code></a>
+        の<em>非</em>同期読み込みは未実装</li>
+    <li><a href="http://www.w3.org/TR/2004/REC-DOM-Level-3-LS-20040407/load-save.html#LS-LSParser"
+        ><code class="DOMi" lang="en">LSParser</code></a>
+        はほとんどの設定引数に未対応</li>
+    <li><a href="http://www.w3.org/TR/2004/REC-DOM-Level-3-LS-20040407/load-save.html#LS-LSParser"
+        ><code class="DOMi" lang="en">LSParser</code></a>
+        の <a href="http://www.w3.org/TR/2004/REC-DOM-Level-3-LS-20040407/load-save.html#LS-LSParser-async"
+            ><code class="DOMm">abort</code></a>,
+        <a href="http://www.w3.org/TR/2004/REC-DOM-Level-3-LS-20040407/load-save.html#LS-LSParser-filter"
+            ><code class="DOMa" lang="en">filter</code></a>,
+        <a href="http://www.w3.org/TR/2004/REC-DOM-Level-3-LS-20040407/load-save.html#LS-LSParser-parseURI"
+            ><code class="DOMm" lang="en">parse_uri</code></a>,
+        <a href="http://www.w3.org/TR/2004/REC-DOM-Level-3-LS-20040407/load-save.html#LS-LSParser-parseWithContext"
+            ><code class="DOMm" lang="en">parse_with_context</code></a>
+        は未実装</li>
+    <li><a href="http://www.w3.org/TR/2004/REC-DOM-Level-3-LS-20040407/load-save.html#LS-LSParser"
+        ><code class="DOMi" lang="en">LSParser</code></a>
+        への入力としての <a
+        href="http://www.w3.org/TR/2004/REC-DOM-Level-3-LS-20040407/load-save.html#LS-LSInput"
+        ><code class="DOMi" lang="en">LSInput</code></a> の
+        <a href="http://www.w3.org/TR/2004/REC-DOM-Level-3-LS-20040407/load-save.html#LS-LSInput-publicId"
+        ><code class="DOMa" lang="en">public_id</code></a>, 
+        <a href="http://www.w3.org/TR/2004/REC-DOM-Level-3-LS-20040407/load-save.html#LS-LSInput-systemId"
+        ><code class="DOMa" lang="en">system_id</code></a> は未実装</li>
+    <li><a href="http://www.w3.org/TR/2004/REC-DOM-Level-3-LS-20040407/load-save.html#LS-LSParser"
+      ><code class="DOMi" lang="en">LSParser</code></a> は
+        <code class="DOMi" lang="en">EventTarget</code> を未実装</li>
+    <li><a href="http://www.w3.org/TR/2004/REC-DOM-Level-3-LS-20040407/load-save.html#LS-LSSerializer"
+        ><code class="DOMi" lang="en">LSSerializer</code></a> は未実装</li>
+    </ul>
+  </div>
 </td>
 </tr>
 <tr>
@@ -144,11 +195,21 @@
 </tr>
 <tr>
 <th scope="row" rowspan="2">探索</th>
-<td><a href="http://www.w3.org/TR/2000/REC-DOM-Level-2-Traversal-Range-20001113/"
-    title="DOM 水準 2 探索および範囲">水準 2</a></td>
-<td><a href="http://www.w3.org/TR/2000/REC-DOM-Level-2-Traversal-Range-20001113/traversal.html#Traversal-NodeIterator"
-    ><code class="DOMi" lang="en">NodeIterator</code></a> 
-    は<em>未</em>実装。</td>
+<td>
+  <a href="http://www.w3.org/TR/2000/REC-DOM-Level-2-Traversal-Range-20001113/traversal.html"
+    title="DOM 水準 2 探索">水準 2</a></td>
+<td>
+  <p><a href="http://www.w3.org/TR/2000/REC-DOM-Level-2-Traversal-Range-20001113/traversal.html#Traversal-TreeWalker"
+      ><code class="DOMi" lang="en">TreeWalker</code></a>
+  は実装済</p>
+  <div class="not-implemented">
+    <ul>
+    <li><a href="http://www.w3.org/TR/2000/REC-DOM-Level-2-Traversal-Range-20001113/traversal.html#Traversal-NodeIterator"
+        ><code class="DOMi" lang="en">NodeIterator</code></a> 
+    は未実装</li>
+    </ul>
+  </div>
+</td>
 </tr>
 <tr>
 <td>(manakai 独自)</td>
@@ -174,6 +235,11 @@
 </tr>
 </tbody>
 </table>
+
+<div class="note memo">
+<p><a href="http://suika.fam.cx/gate/2005/sw/manakai/roadmap"
+    >今後実装する予定の機能の一覧</a>もご覧ください。</p>
+</div>
 
 </body>
 </html>
