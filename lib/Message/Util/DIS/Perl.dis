@@ -19,7 +19,7 @@ Module:
     license:Perl+MPL
   @Date:
     @@@:
-      $Date: 2006/12/30 13:25:37 $
+      $Date: 2006/12/31 02:39:38 $
     @@ContentType:
       dis:Date.RCS
   
@@ -2042,7 +2042,6 @@ IFClsDef:
                                   ($r,
                                    $thismod_pack, \%const);
               if ($mcode) {
-                $r-><M::Document.adoptNode> ($mcode);
                 $rdoc-><M::Node.appendChild> ($mcode);
               }
 
@@ -4671,8 +4670,6 @@ TMethods:
                 $st-><M::DIS|PLBlockCon.appendCode> ('}->{');
                 $st-><M::DIS|PLAnyCon.appendStringLiteral> ($method_name_0);
                 $st-><M::DIS|PLBlockCon.appendCode> ('} = ');
-                $st-><AG::Node.ownerDocument>
-                   -><M::Document.adoptNode> ($method_code);
                 $st-><M::Node.appendChild> ($method_code);
           $thismod_pack-><M::Node.appendChild> ($st);
           for my $type_uri (@$type_uris) {
@@ -4863,7 +4860,6 @@ TMethods:
 
           ## Perl constant function
           my $const = $self-><M::DISResourcePerl.plCodeFragment> ($factory);
-          $factory-><M::Document.adoptNode> ($const);
           $r-><M::Node.appendChild> ($const);
 
           ## Error definition
@@ -4989,7 +4985,6 @@ TMethods:
                                ($factory));
               } else {
                 my $sub = $gcr-><M::DISResourcePerl.plCodeFragment> ($factory);
-                $factory-><M::Document.adoptNode> ($sub);
                 $r-><M::Node.appendChild> ($sub);
               }
             }
@@ -5014,8 +5009,6 @@ TMethods:
             my $mcode = $_-><M::DISResourcePerl.getPerlInterfaceMemberCode>
                               ($factory);
             if ($mcode) {
-              $r-><AG::Node.ownerDocument>
-                -><M::Document.adoptNode> ($mcode);
               $r-><M::Node.appendChild> ($mcode);
             }
           }
@@ -5183,8 +5176,6 @@ TMethods:
               my $mcode = $cr-><M::DISResourcePerl.getPerlClassMemberCode>
                                   ($r-><AG::Node.ownerDocument>);
               if ($mcode) {
-                $r-><AG::Node.ownerDocument>
-                  -><M::Document.adoptNode> ($mcode);
                 $r-><M::Node.appendChild> ($mcode);
               }
             }
@@ -5270,7 +5261,6 @@ TMethods:
 
           ## -- Subroutines and variables
           my $pack = $cls-><M::DISResourcePerl.plCodeFragment> ($factory);
-          $factory-><M::Document.adoptNode> ($pack);
           $r-><M::Node.appendChild> ($pack);
                 my $pack_name = $cls-><AG::DISResourcePerl
                                           .plFullyQualifiedName>;
@@ -5512,8 +5502,6 @@ TMethods:
             my $mcode = $cr-><M::DISResourcePerl.getPerlInterfaceMemberCode>
                               ($r-><AG::Node.ownerDocument>);
             if ($mcode) {
-              $r-><AG::Node.ownerDocument>
-                -><M::Document.adoptNode> ($mcode);
               $r-><M::Node.appendChild> ($mcode);
             }
           }
@@ -5583,7 +5571,6 @@ TMethods:
         __DEEP{
           unless ($self-><AG::DIS|DISResource.parentResource>) {
             my $code = $self-><M::DISResourcePerl.plCodeFragment> ($factory);
-            $factory-><M::Document.adoptNode> ($code);
             $thismod_pack-><M::Node.appendChild> ($code);
           }
         }__;
@@ -5675,7 +5662,6 @@ TMethods:
                                     ($factory, $self,
                                      data_type_uri => $data_type
                                           -><AG::DIS|DISAnyResource.uri>);
-            $factory-><M::Document.adoptNode> ($value);
           } else {
             __CODE{setDefaultValueDoc::
               $result => $value,

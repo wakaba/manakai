@@ -17,7 +17,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/12/31 00:55:05 $
+    $Date: 2006/12/31 02:39:38 $
   
   @Require:
     @@Module:
@@ -3618,10 +3618,7 @@ IFClsXDef:
         the collection is live, a change of the read-only flag
         of the node immediately affects to the collection.
       @@@PerlDef:
-        __CODE{tc|getElementTypeDefNodeMap::
-          $node => $self,
-          $map => $r,
-        }__;
+        $r = bless \\($self), <ClassName::tc|ManakaiDOMElementTypeDefMap>;
 
     @@Test:
       @@@QName: dtd.elementTypes.test
@@ -3659,10 +3656,7 @@ IFClsXDef:
         the collection is live, a change of the read-only flag
         of the node immediately affects to the collection.
       @@@PerlDef:
-        __CODE{tc|getEntityNodeMap::
-          $node => $self,
-          $map => $r,
-        }__;
+        $r = bless \\($self), <ClassName::tc|ManakaiDOMEntityMap>;
 
     @@Test:
       @@@QName: DocumentTypeDefinition.generalEntities.test
@@ -3723,10 +3717,7 @@ IFClsXDef:
         the collection is live, a change of the read-only flag
         of the node immediately affects to the collection.
       @@@PerlDef:
-        __CODE{tc|getNotationNodeMap::
-          $node => $self,
-          $map => $r,
-        }__;
+        $r = bless \\($self), <ClassName::tc|ManakaiDOMNotationMap>;
 
     @@Test:
       @@@QName: DocumentTypeDefinition.notations.test
@@ -5026,10 +5017,7 @@ IFClsXDef:
         the collection is live, a change of the read-only flag
         of the node immediately affects to the collection.
       @@@PerlDef:
-        __CODE{tc|getAttrDefNodeMap::
-          $node => $self,
-          $map => $r,
-        }__;
+        $r = bless \\($self), <ClassName::tc|ManakaiDOMAttrDefMap>;
 
     @@Test:
       @@@QName: elementTypeDef.attrDefs.test

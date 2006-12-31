@@ -13,7 +13,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/12/30 13:25:33 $
+    $Date: 2006/12/31 02:39:37 $
 
   @Require:
     @@Module:
@@ -994,11 +994,14 @@ ClsDef:
           If the current document does not support the <Feature::XML>
           feature.
       @@@PerlDef:
-        my ($prefix, $lname) = ref $qualifiedName eq 'ARRAY'
-                                 ? @$qualifiedName
-                                 : split /:/, $qualifiedName, 2;
-        ($prefix, $lname) = (null, $prefix) unless defined $lname;
-        $qualifiedName = defined $prefix ? $prefix.':'.$lname : $lname;
+        my ($prefix, $lname);
+        if (ref $qualifiedName eq 'ARRAY') {
+          ($prefix, $lname) = @$qualifiedName;
+          $qualifiedName = defined $prefix ? $prefix.':'.$lname : $lname;
+        } else {
+          ($prefix, $lname) = split /:/, $qualifiedName, 2;
+          ($prefix, $lname) = (null, $prefix) unless defined $lname;
+        }
 
         if ($self-><AG::Document.strictErrorChecking>) {
           my $version = $self-><AG::Document.xmlVersion>;
@@ -1025,40 +1028,39 @@ ClsDef:
 
         ## -- Choose the most apppropriate class for the element
         my $class = <ClassName::ManakaiDOMElement>;
-        CLS: {
-          my $nsuri = defined $namespaceURI ? $namespaceURI : '';
+        my $nsuri = defined $namespaceURI ? $namespaceURI : '';
 
-          ## Use cases:
-          ##   - |html5:a| element type
-          ##   - |html5:*| element types
-          A: for my $nm (
-            [$nsuri, $lname],
-            [$nsuri, '*'],
-          ) {
-            unless ($Message::DOM::Element::ElementClass
+        ## Use cases:
+        ##   - |html5:a| element type
+        ##   - |html5:*| element types
+        A: for my $nm (
+          [$nsuri, $lname],
+          [$nsuri, '*'],
+        ) {
+          unless ($Message::DOM::Element::ElementClass
+              ->{$nm->[0]}->{$nm->[1]}) {
+            if ($Message::Util::AutoLoad::Registry::ElementType
                 ->{$nm->[0]}->{$nm->[1]}) {
-              if ($Message::Util::AutoLoad::Registry::ElementType
-                  ->{$nm->[0]}->{$nm->[1]}) {
-                eval qq{require
-                    $Message::Util::AutoLoad::Registry::ElementType->{
-                    $nm->[0]}->{$nm->[1]}->{module}};
-                die $@ if $@;
-              }
+              eval qq{require
+                  $Message::Util::AutoLoad::Registry::ElementType->{
+                  $nm->[0]}->{$nm->[1]}->{module}};
+              die $@ if $@;
             }
+          }
 
-            if ($Message::DOM::Element::ElementClass
-                ->{$nm->[0]}->{$nm->[1]}) {
-              $class = $Message::DOM::Element::ElementClass
-                  ->{$nm->[0]}->{$nm->[1]};
-              last A;
-            }
-          } # A
-        } # CLS
+          if ($Message::DOM::Element::ElementClass
+              ->{$nm->[0]}->{$nm->[1]}) {
+            $class = $Message::DOM::Element::ElementClass
+                ->{$nm->[0]}->{$nm->[1]};
+            last A;
+          }
+        } # A
 
         $r = bless \{
           <H::tc|ownerDocument> => $self,
           <H::infoset|children> => [],
           <H::infoset|attributes> => {},
+          <H::tc|contentAttributeList> => [],
         }, $class;
         Scalar::Util::weaken ($$r->{<H::tc|ownerDocument>});
         __CODE{DISPerl|HashStringRef::
@@ -1282,9 +1284,7 @@ ClsDef:
                                     (<Q::cfg|dtd-default-attribute>);
           my $__doctype = $document-><AG::Document.doctype>;
           last XDA unless defined $__doctype;
-          $__doctype = $__doctype-><M::Node.getFeature>
-                                   (<Q::fe|XDoctype> => '3.0');
-          last XDA unless defined $__doctype;
+
           my $__et = $__doctype-><M::DTDef.getElementTypeDefinitionNode>
                                    ($element_type);
           if ($__et) {
@@ -2614,10 +2614,8 @@ NodeTypeDef:
     @@Type: NamedNodeMap
     @@Get:
       @@@PerlDef:
-        __CODE{tc|getAttrMap::
-          $node => $self,
-          $map => $r,
-        }__;
+        $r = bless \\($self), <ClassName::tc|ManakaiDOMAttrMap>;
+        $$self->{<H::tc|hashPosition>} ||= 0;
 
     @@Test:
       @@@QName: Element.attributes.test
@@ -5403,6 +5401,7 @@ NodeTypeDef:
               $r = $__node;
               $list = $__attr->{$__ns};
               $key = $__ln;
+              CORE::delete ${$__node}->{<H::tc|contentAttributeList>};
             }__;
             last NS;
           }
@@ -5475,6 +5474,7 @@ NodeTypeDef:
         if (defined $list and defined $list->{$localName}) {
           $r = $__attrs->{defined $namespaceURI ? $namespaceURI : ''}
                                 ->{$localName};
+          CORE::delete ${$self}->{<H::tc|contentAttributeList>};
         }
 
   @Method:
@@ -6215,6 +6215,7 @@ NodeTypeDef:
         } else { ## There is no such attribute
           __DEEP{
             $__anode = $od-><M::Document.createAttribute> ($name);
+            CORE::delete $$self->{<H::tc|contentAttributeList>};
             my $__attrs = $$self->{<H::infoset|attributes>};
             $__attrs->{''}->{$name} = $__anode;
             $$__anode->{<H::infoset|ownerElement>} = $self;
@@ -6809,6 +6810,7 @@ NodeTypeDef:
         __DEEP{
           $__anode = $ownerDocument-><M::Document.createAttributeNS>
                                       ($namespaceURI, [$prefix, $localName]);
+          CORE::delete $$self->{<H::tc|contentAttributeList>};
           my $__attrs = ${$element}->{<H::infoset|attributes>};
           $__attrs->{defined $namespaceURI ? $namespaceURI : ''}->{$localName}
               = $__anode;
@@ -6931,6 +6933,7 @@ NodeTypeDef:
         my $nsuri = $newAttr-><AG::Node.namespaceURI>;
         $nsuri = '' unless defined $nsuri;
         my $ln = $newAttr-><AG::Node.localName>;
+        CORE::delete $$self->{<H::tc|contentAttributeList>};
         my $attrs = $$self->{<H::infoset|attributes>};
         my $current = $attrs->{$nsuri}->{$ln};
 
@@ -7599,6 +7602,7 @@ NodeTypeDef:
 
         my $ln = $oldAttr-><AG::Node.localName>;
         FIND: {
+          CORE::delete $$self->{<H::tc|contentAttributeList>};
           my $attrs = $$self->{<H::infoset|attributes>};
           my $nsuri = $oldAttr-><AG::Node.namespaceURI>;
           my $list = $attrs->{defined $nsuri ? $nsuri : ''};
@@ -7779,6 +7783,7 @@ NodeTypeDef:
                         (<Q::cfg|clone-entity-reference-subtree> => true);
               ADD: {
                 my $__attr;
+                CORE::delete $$self->{<H::tc|contentAttributeList>};
                 my $__attrs = ${$element}->{<H::infoset|attributes>};
                 if (defined $prefix) {   ## prefixed attr
                   my $__nsuri = $element-><M::Node.lookupNamespaceURI>

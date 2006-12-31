@@ -12,7 +12,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/12/30 12:00:39 $
+    $Date: 2006/12/31 02:39:38 $
 
   @Require:
     @@Module:
@@ -1443,10 +1443,7 @@ IFCls1Def:
     @@Type: NodeList
     @@Get:
       @@@PerlDef:
-        __CODE{tc|createChildNodeList::
-          $node => $self,
-          $r => $r,
-        }__;
+        $r = bless \\($self), <ClassName::ManakaiDOMChildNodeList>;
 
     @@Test:
       @@@QName: Node.childNodes.test
@@ -6756,14 +6753,6 @@ ResourceDef:
         @@@@@: \
 
   @CODE:
-    @@QName: tc|createChildNodeList
-    @@ForCheck: tc|ForChildNodeList
-    @@enDesc:
-      Creats a new child node list.
-    @@PerlDef:
-      $r = bless \\($node), <ClassName::ManakaiDOMChildNodeList>;
-
-  @CODE:
     @@QName: tc|createGetElementsNodeList
     @@ForCheck: tc|ForGetNodeList
     @@enDesc:
@@ -8619,18 +8608,20 @@ ResourceDef:
       @@@PerlDef:
         @@@@ForCheck: tc|ForAttrMap
         @@@@@:
-          FIND: {
-            my $i = 0;
-            my $attrs = ${$$$self}->{<H::infoset|attributes>};
+          ## Update the sorted content attribute name list
+          my $list = ${$$$self}->{<H::tc|contentAttributeList>};
+          my $attrs = ${$$$self}->{<H::infoset|attributes>};
+          unless (defined $list) {
+            $list = [];
             for my $ns (sort {$a cmp $b} keys %{$attrs}) {
-              for my $ln (sort {$a cmp $b} keys %{$attrs->{$ns}}) {
-                if ($i++ == $index) {
-                  $r = $attrs->{$ns}->{$ln};
-                  last FIND;
-                }
-              }
+              push @$list,
+                  map {[$ns => $_]} sort {$a cmp $b} keys %{$attrs->{$ns}};
             }
-          } # FIND
+            ${$$$self}->{<H::tc|contentAttributeList>} = $list;
+          }
+
+          $r = $attrs->{$list->[$index]->[0]}->{$list->[$index]->[1]}
+              if $index >= 0 and $list->[$index];
       @@@PerlDef:
         @@@@ForCheck: !tc|ForAttrMap
         @@@@@:
@@ -8841,9 +8832,14 @@ ResourceDef:
       @@@PerlDef:
         @@@@ForCheck: tc|ForAttrMap
         @@@@@:
-          my $list = ${$$$self}->{<H::infoset|attributes>};
-          for my $l (values %$list) {
-            $r += grep {$l->{$_}} keys %$l;
+          my $list = ${$$$self}->{<H::tc|contentAttributeList>};
+          if (defined $list) {
+            $r = @$list;
+          } else {
+            my $list = ${$$$self}->{<H::infoset|attributes>};
+            for my $l (values %$list) {
+              $r += grep {$l->{$_}} keys %$l;
+            }
           }
       @@@PerlDef:
         @@@@ForCheck: tc|ForETMap
@@ -9610,51 +9606,6 @@ ResourceDef:
       @@@Type: NamedNodeMap
       @@@PerlDef: $r = $map;
 
-  @CODE:
-    @@ForCheck: tc|ForAttrMap
-    @@QName: getAttrMap
-    @@enDesc:
-      Creates an attribute node map from an element node.
-    @@PerlDef:
-      $map = bless \\($node), <ClassName::ManakaiDOMAttrMap>;
-      $$node->{<H::tc|hashPosition>} ||= 0;
-
-  @CODE:
-    @@ForCheck: tc|ForETMap
-    @@QName: getElementTypeDefNodeMap
-    @@enDesc:
-      Creates an element type definition node map from a document
-      type definition node.
-    @@PerlDef:
-      $map = bless \\($node), <ClassName::ManakaiDOMElementTypeDefMap>;
-
-  @CODE:
-    @@ForCheck: tc|ForATMap
-    @@QName: getAttrDefNodeMap
-    @@enDesc:
-      Creates an attribute definition node map from a document
-      type definition node.
-    @@PerlDef:
-      $map = bless \\($node), <ClassName::ManakaiDOMAttrDefMap>;
-
-  @CODE:
-    @@ForCheck: tc|ForEntityMap
-    @@QName: getEntityNodeMap
-    @@enDesc:
-      Creates an entity node map from a document
-      type definition node.
-    @@PerlDef:
-      $map = bless \\($node), <ClassName::ManakaiDOMEntityMap>;
-
-  @CODE:
-    @@ForCheck: tc|ForNotationMap
-    @@QName: getNotationNodeMap
-    @@enDesc:
-      Creates a notation node map from a document
-      type definition node.
-    @@PerlDef:
-      $map = bless \\($node), <ClassName::ManakaiDOMNotationMap>;
-
   @LXAttr:
     @@Name: manakaiReadOnly
     @@enDesc:
@@ -9688,6 +9639,19 @@ ResourceDef:
         $el-><M::Node.manakaiSetReadOnly> (false);
         $test->assert_false ($as-><AG::Node.manakaiReadOnly>);
 ##NamedNodeMap
+
+IntPropDef:
+  @QName: tc|contentAttributeList
+  @tc:nodeStemKey: sattrs
+  @enDesc:
+    The sorted list of content attributes contained in an <IF::Element>.
+
+    When a Perl method modify the <Q::infoset|attributes>
+    hash of the <IF::Element>, it <kwd:MUST> update or reset
+    the <Q::tc|contentAttributeList>.
+
+    This property is used to optimize <A::NamedNodeMap.item>,
+    especially for <Perl::key> operation.
 
 IntPropDef:
   @QName: tc|hashPosition

@@ -1,3 +1,22 @@
+2006-12-31  Wakaba  <wakaba@suika.fam.cx>
+
+	* Element.dis (createElementNS): If an array reference
+	is specified as the |qualifiedName| parameter,
+	don't set the first item as the local name
+	even if the second item is not specified (or
+	specified as |undef|).
+	(createElementNS, setAttribute, setAttributeNS,
+	removeAttribute, removeAttributeNS,
+	setAttributeNode, setAttributeNodeNS,
+	removeAttributeNode, removeAttributeNodeNS): Sets
+	or removes the |tc:contentAttributeList| value.
+
+	* TreeCore.dis (AttrMap.item): Caches the result
+	of sorting of content attribute names.
+	(getAttrMap, getElementTypeDefNodeMap,
+	getAttrDefNodeMap, getEntityNodeMap, getNotationNodeMap): Removed.
+	(tc:contentAttributeList): New property.
+
 2006-12-30  Wakaba  <wakaba@suika.fam.cx>
 
 	* DOMFeature.dis (ForDef): Removed.
