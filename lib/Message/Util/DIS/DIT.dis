@@ -11,7 +11,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/12/29 02:14:49 $
+    $Date: 2007/01/20 11:54:40 $
   
   @Require:
     @@Module:
@@ -88,7 +88,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DOMFeature|Feature
-    @@For: ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: FeatureVerDef
@@ -145,7 +144,6 @@ ElementTypeBinding:
       @@@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
     @@resourceFor: ManakaiDOM|ForIF
     @@resourceFor: ManakaiDOM|ForClass
-    @@For: ManakaiDOM|ManakaiDOM
 
     @@rdf:type:
       @@@@: DISLang|Interface
@@ -154,14 +152,11 @@ ElementTypeBinding:
     @@rdf:type:
       @@@@: DISLang|Class
       @@@ForCheck: ManakaiDOM|ForClass
+
     @@Implement:
-      @@@@: ||ManakaiDOM|ManakaiDOM||ManakaiDOM|ForIF
+      @@@@: ||+||ManakaiDOM|ForIF
       @@@ContentType: DISCore|TFPQNames
-      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOM
-    @@Implement:
-      @@@@: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForIF
-      @@@ContentType: DISCore|TFPQNames
-      @@@ForCheck: ManakaiDOM|ForClass ManakaiDOM|ManakaiDOMLatest
+      @@@ForCheck: ManakaiDOM|ForClass
 
     @@f:implements: DIS|DIT10
 
@@ -199,7 +194,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|Method
-    @@For: !=ManakaiDOM|ManakaiDOM
 
 ElementTypeBinding:
   @Name: Return
@@ -221,7 +215,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISLang|Attribute
-    @@For: !=ManakaiDOM|ManakaiDOM
 
 ElementTypeBinding:
   @Name: Get
@@ -237,35 +230,13 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type: DISLang|AttributeSet
 
-## -- Implementation
-
-IFClsDef: 
-  @IFQName: DITImplementation
-  @ClsQName: ManakaiDITImplementation
-
-  @domperl:implementedByObjectsOf: c|DOMImplementation
-  @domperl:classImplementedByObjectsOf: c|ManakaiDOMImplementation
-
-##DITImplementation
-
-ElementTypeBinding:
-  @Name: NamedParam
-  @ElementType:
-    dis:ResourceDef
-  @ShadowContent:
-    @@rdf:type:
-      DISLang:MethodParameter
-    @@DISPerl:isNamedParameter:1
-
 ResourceDef:
   @QName: DOMString
   @AliasFor: str|DOMString
-  @For: ManakaiDOM|ManakaiDOM
 
 ResourceDef:
   @QName: Node
   @AliasFor: tc|Node
-  @For: ManakaiDOM|ManakaiDOM
 
 ElementTypeBinding:
   @Name: PerlDef
@@ -304,7 +275,7 @@ ElementTypeBinding:
     @@Value:
       @@@@: 1
       @@@ContentType: DISCore|Boolean
-    @@Type: idl|boolean||ManakaiDOM|all
+    @@Type: idl|boolean
 
 ElementTypeBinding:
   @Name: FalseCase
@@ -316,44 +287,7 @@ ElementTypeBinding:
     @@Value:
       @@@@: 0
       @@@ContentType: DISCore|Boolean
-    @@Type: idl|boolean||ManakaiDOM|all
-
-IFClsDef:
-  @IFQName: DITException
-  @ClsQName: ManakaiDITException
-
-  @rdf:type:
-    @@@: dx|Interface
-    @@ForCheck: ManakaiDOM|ForIF
-
-  @rdf:type:
-    @@@: dx|Class
-    @@ForCheck: ManakaiDOM|ForClass
-
-  @ClsISA: dx|Exception||ManakaiDOM|Perl
-  @dx:implementedBy: ||ManakaiDOM|ManakaiDOMLatest||ManakaiDOM|ForClass
-
-  @ResourceDef:
-    @@QName: DITExceptionCode
-    @@ForCheck: ManakaiDOM|ForIF
-    @@rdf:type: DISLang|ConstGroup
-
-    @@enDesc:
-      Exception codes for <IF::DITException>. 
-
-    @@Type: idl|unsignedShort||ManakaiDOM|all
-    @@rdfs:subClassOf: idl|unsignedShort||ManakaiDOM|all
-
-    @@ResourceDef:
-      @@@QName: dit|PARSE_ERR
-      @@@DISCore:resourceType: dx|ErrorCode
-      @@@Value:
-        @@@@@: 81
-        @@@@ContentType: DISCore|Integer
-      @@@enDesc:
-        An attempt was made to load a DIT document and
-        the processing has been stopped.
-##DITException
+    @@Type: idl|boolean
 
 ElementTypeBinding:
   @Name: RPropDef:
@@ -361,7 +295,6 @@ ElementTypeBinding:
     dis:ResourceDef
   @ShadowContent:
     @@rdf:type: DISSource|Property
-    @@For: =ManakaiDOM|all
 
 ElementTypeBinding:
   @Name: SPropDef
@@ -370,13 +303,12 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type: DISSource|Property
     @@rdf:type: DISSource|ResourceProperty
-    @@For: =ManakaiDOM|all
 
 IFClsDef:
   @IFQName: DITParser
   @ClsQName: ManakaiDITParser
 
-  @Implement: ecore|MUErrorTarget||ManakaiDOM|Perl
+  @Implement: ecore|MUErrorTarget
 
   @DISLang:role: gls|ParserRole
 
@@ -387,7 +319,7 @@ IFClsDef:
     returns it as an object. 
 
     A <IF::DITParser> object can be retrieved by 
-    <M::GenericLS|GLSImplementation.createGLSParer>
+    <M::GenericLS|GLSImplementation.createGLSParer>.
 
   @Attr:
     @@Name: domConfig
@@ -494,7 +426,7 @@ IFClsDef:
     @@ManakaiDOM:isForInternal: 1
     @@Operator: ManakaiDOM|MUErrorHandler
     @@enDesc:
-      When a <IF::ecore|ErrorInterface||ManakaiDOM|Perl> is <Perl::report>ed,
+      When a <IF::ecore|ErrorInterface> is <Perl::report>ed,
       then this method is invoked.
       
       The method calls the <cfg::DOMCore|error-handler> if the error is of 
@@ -502,7 +434,7 @@ IFClsDef:
       corresponding <Perl::catch> clause, if any, can catch the error.
     @@Param:
       @@@Name: err
-      @@@Type: ecore|ErrorInterface||ManakaiDOM|Perl
+      @@@Type: ecore|ErrorInterface
       @@@enDesc:
         The reported error object.
     @@Return:
@@ -517,7 +449,7 @@ IFClsDef:
         @@@@enDesc:
           No error handler.
       @@@PerlDef:
-        if ($err->isa (<IFName::DOMCore|DOMError||ManakaiDOM|ManakaiDOM>)) {
+        if ($err->isa (<IFName::DOMCore|DOMError>)) {
           __DEEP{
             A: {
               my $cfg = $self-><AG::TDTParser.domConfig>;
@@ -527,7 +459,7 @@ IFClsDef:
             } # A
           }__;
         } else {
-          $err-><M::ecore|ErrorInterface||ManakaiDOM|Perl.throw>;
+          $err-><M::ecore|ErrorInterface.throw>;
         }
 
   @DISPerl:dpgDef:
@@ -536,10 +468,18 @@ IFClsDef:
       /* Name */
       $name-start-char := [U+0041..U+005A U+0061..U+007A];
       $name-char       := [U+0041..U+005A U+0061..U+007A U+0030..U+0039 '-' '_'];
-      NAME : value := $name-start-char $name-char*;
+      $name := $name-start-char $name-char*;
+      $prefixed-name := $name? ['|'] $name?;
+      NAME : value := $name;
+      PREFIXEDNAME : value := $prefixed-name;
+      ANDNAME : value := ['&'] $name;
+      DOLLERNAME : value := ['$'] $name;
 
       /* At-keyword */
-      ATKEYWORD : value := ['@'] $name-start-char $name-char*;
+      ATKEYWORD : value := ['@'] $name;
+
+      /* RNI-keyword */
+      RNIKEYWORD : value := ['#'] $name;
 
       /* Block */
       LBRACE := ['{'];
@@ -550,10 +490,12 @@ IFClsDef:
       SEMICOLON := [';'];
 
       /* String */
-      STRING : value := [U+0027] [^U+0027]* [U+0027];
       $hexdigit := [U+0030..U+0039 U+0041..U+0046 U+0061..U+0066];
-      CHAR : value := ['U'] ['+'] $hexdigit $hexdigit $hexdigit $hexdigit
-                                  $hexdigit? $hexdigit?;
+      $ucs2 := [U+005C] ['u'] $hexdigit $hexdigit $hexdigit $hexdigit;
+      $ucs4 := [U+005C] ['U'] $hexdigit $hexdigit $hexdigit $hexdigit
+          $hexdigit $hexdigit $hexdigit $hexdigit;
+      $schar := $ucs2? $ucs4? [^U+0027 U+005C]?
+      STRING : value := [U+0027] $schar* [U+0027];
 
       /* Number */
       MINUS := ['-'];
@@ -572,9 +514,6 @@ IFClsDef:
 
       /* URI */
       URI : value := ['<'] [^'<' '>' '[' ']'] [^'<' '>']* ['>'];
-      QNAME : value := ['<'] ['['] [^'<' '>' '[' ']']* [']'] ['>'];
-      TFQNAMES : value := ['<'] ['['] ['['] [^'<' '>' '[' ']']*
-                          [']'] [']'] ['>'];
       
       /* Ignored white space */
       WSP : ignore := [U+0009..U+000D U+0020]+;
@@ -591,15 +530,47 @@ IFClsDef:
     */
     rule document : standalone : recursive {
       /*
-        document := *at-namespace *(declaration / block)
+        root-document := *at-namespace *at-require *at-import body
 
-        declaration := 
-        block := 
+        imported-document := *at-namespace *at-require *at-import
 
-        at-namespace := '@namespace' NAME uri SEMICOLON
-            / '@namespace' uri SEMICOLON
+        body := *(in-resource-rule / at-let)
+    
+        in-resource-rule := property / resource / ref / empty-rule
 
-        uri := URI / QNAME / TFQNAMES
+        at-namespace := '@namespace' namespace-prefix uri SEMICOLON
+
+        at-require := '@require' qname SEMICOLON
+
+        at-import := '@import' qname SEMICOLON
+ 
+        at-let := '@let' ANDNAME parameters resource SEMICOLON
+
+        property := qname COLON value SEMICOLON
+
+        resource := LBRACE *in-resource-rule RBRACE
+
+        ref := ANDNAME
+
+        empty-rule := SEMICOLON
+
+        parameters := VARNAME *(COMMA VARNAME)
+
+        value := primitive-value [LBRACE *property RBRACE] / variable-ref
+
+        primitive-value := STRING / number / URI / PREFIXEDNAME / function-call
+
+        function-call := NAME LPAREN [value *(COMMA value)] RPAREN
+
+        variable-ref := DOLLERNAME
+
+        namespace-prefix := NAME / '#default'
+
+        uri := URI / qname
+
+        qname := NAME / PREFIXEDNAME
+
+        number := MINUS? (DNUM / XNUM / BNUM)
 
         cwsp := WSP / COMMENT1 / COMMENT2
           ;; allowed everywhere
@@ -624,435 +595,15 @@ IFClsDef:
       ~ (#EOF) { }
     } // document
 
-    /*
-      A TDT Error Description Document (|lang:tdterr|).
-
-        tdterr := any-err-type-qname "{" position *(attribute / empty-statement)
-                                     "}"
-        any-err-type-qname := QName ;; References a |ecore:AnyErrorCode|.
-        position := [QName / URI] ["(" number "," number ")"
-                                   [".." "(" number "," number ")"]] ";"
-    */
-    rule tdterr : standalone {
-      my $err : return;
-
-      ~ (TFQNames) {
-        lang:Perl ($v => $token.value) : has-error {
-          my $disq = substr ($v, 3, length ($v) - 6);
-          my $erruri;
-          try {
-            $erruri = $self->{ns_resolver_dis}
-                           ->tfqnames_to_uri ($disq, $self->{default_t},
-                                                     $self->{default_f});
-          } catch Message::Util::Error with {
-            my $err = shift;
-            if ($err->can ('subtype') and
-                $err->subtype eq <Q::DIS:UNDECLARED_NS_PREFIX_ERR
-                                   ::SuikaWikiConfig21:ForLatest>) {
-              my $location = {
-                utf32_offset => pos ($self->{source}),
-              };
-              my $continue =
-              __DOMCore:ERROR{dtest|undeclared-namespace-prefix-error::
-                dtest|error-token => {$token},
-                DOMCore|location => {$location},
-                dtest|source-text => {\($self->{source})},
-                dtest|qname => {$disq},
-              }__;
-              unless ($continue) {
-                __EXCEPTION{dtest|PARSE_ERR::
-                }__;
-              }
-              $erruri = $disq;
-            } else {
-              $err->throw;
-            }
-          };
-          my $errres = $self->{dis_database}->get_resource ($erruri);
-          $errres->is_referred (true);
-          if ($errres->is_type_uri (<Q::dx|ErrorSubCode>)) {
-            $err->{subtype} = {
-              type => 'string',
-              value => $errres->name_uri,
-            };
-          } elsif ($errres->is_type_uri (<Q::dx|ErrorCode>)) {
-            $err->{type} = {
-              type => 'string',
-              value => $errres->local_name,
-            };
-          } elsif ($errres->is_type_uri (<Q::DOMCore|DOMErrorType>)) {
-            $err->{type} = {
-              type => 'string',
-              value => $errres->get_property_text
-                                  (<Q::DOMCore|errorType>, $errres->name_uri),
-            },
-          } else {
-            my $location = {
-              utf32_offset => pos ($self->{source}),
-            };
-            my $continue = __DOMCore:ERROR{dtest|bad-error-resource-error::
-              dtest|error-token => {$token},
-              DOMCore|location => {$location},
-              dtest|source-text => {\($self->{source})},
-              dtest|qname => {$disq},
-              dtest|relatedURI => {$erruri},
-              dtest|resource => {$errres},
-            }__;
-            unless ($continue) {
-              __EXCEPTION{dtest|PARSE_ERR::
-              }__;
-            }
-          }
-        }
-      }
-
-      ~ (LBRACE) { }
-
-      my $has_pos;
-
-      ~? (QName) {
-        lang:Perl ($v => $token.value) {
-          my $disq = substr ($v, 2, length ($v) - 4);
-          my $erruri;
-          try {
-            $erruri = $self->{ns_resolver_dis}->qname_to_uri ($disq);
-          } catch Message::Util::Error with {
-            my $err = shift;
-            if ($err->can ('subtype') and
-                $err->subtype eq <Q::DIS:UNDECLARED_NS_PREFIX_ERR
-                                   ::SuikaWikiConfig21:ForLatest>) {
-              my $location = {
-                utf32_offset => pos ($self->{source}),
-              };
-              my $continue =
-              __DOMCore:ERROR{dtest|undeclared-namespace-prefix-error::
-                dtest|error-token => {$token},
-                DOMCore|location => {$location},
-                dtest|source-text => {\($self->{source})},
-                dtest|qname => {$disq},
-              }__;
-              unless ($continue) {
-                __EXCEPTION{dtest|PARSE_ERR::
-                }__;
-              }
-              $erruri = $disq;
-            } else {
-              $err->throw;
-            }
-          };
-          $err->{location}->{type} = 'DOMLocator';
-          $err->{location}->{uri} = $erruri;
-          $has_pos = true;
-        }
-      } (URI) {
-        lang:Perl ($v => $token.vakue) {
-          $err->{location}->{type} = 'DOMLocator';
-          $err->{location}->{uri}
-            = {type => 'string', value => substr ($v, length ($v) - 2)};
-          $has_pos = true;
-        }
-      }
-
-      ~? (LPAREN) {
-        ~ (DNUM) {
-          lang:Perl ($v => $token.value) {
-            $err->{location}->{type} = 'DOMLocator';
-            $err->{location}->{_line_column} = {l1 => 0+$v, l2 => 0+$v};
-          }
-        } (XNUM) {
-          lang:Perl ($v => $token.value) {
-            $err->{location}->{type} = 'DOMLocator';
-            $err->{location}->{_line_column} = {l1 => hex $v, l2 => hex $v};
-          }
-        } (BNUM) {
-          lang:Perl ($v => $token.value) {
-            $err->{location}->{type} = 'DOMLocator';
-            $err->{location}->{_line_column} = {l1 => eval $v, l2 => eval $v};
-          }
-        }
-        ~ (COMMA) { }
-        ~ (DNUM) {
-          lang:Perl ($v => $token.value) {
-            $err->{location}->{_line_column}->{c1} =
-            $err->{location}->{_line_column}->{c2} = 0+ $v;
-          }
-        } (XNUM) {
-          lang:Perl ($v => $token.value) {
-            $err->{location}->{_line_column}->{c1} =
-            $err->{location}->{_line_column}->{c2} = hex $v;
-          }
-        } (BNUM) {
-          lang:Perl ($v => $token.value) {
-            $err->{location}->{_line_column}->{c1} =
-            $err->{location}->{_line_column}->{c2} = eval $v;
-          }
-        }
-        ~ (RPAREN) { }
-
-        ~? (RANGE) {
-          ~ (LPAREN) { }
-          ~ (DNUM) {
-            lang:Perl ($v => $token.value) {
-              $err->{location}->{_line_column}->{l2} = 0+ $v;
-            }
-          } (XNUM) {
-            lang:Perl ($v => $token.value) {
-              $err->{location}->{_line_column}->{l2} = hex $v;
-            }
-          } (BNUM) {
-            lang:Perl ($v => $token.value) {
-              $err->{location}->{_line_column}->{l2} = eval $v;
-            }
-          }
-          ~ (COMMA) { }
-          ~ (DNUM) {
-            lang:Perl ($v => $token.value) {
-              $err->{location}->{_line_column}->{c2} = 0+ $v;
-            }
-          } (XNUM) {
-            lang:Perl ($v => $token.value) {
-              $err->{location}->{_line_column}->{c2} = hex $v;
-            }
-          } (BNUM) {
-            lang:Perl ($v => $token.value) {
-              $err->{location}->{_line_column}->{c2} = eval $v;
-            }
-          }
-          ~ (RPAREN) { }
-        }
-
-        lang:Perl { $has_pos = true; }
-      }
-
-      if-true ($has_pos) {
-        ~ (SEMICOLON) { }
-      }
-
-      &_node ($node => $err);
-
-      ~ (#EOF) { }
-    }
-
-    rule _node ($node) : standalone : recursive {
-      // ~ (NAME) { }
-      // ~ (LBRACE) { }
-
-      ~* (NAME) {
-        my $name;
-        lang:Perl ($v => $token.value) {
-          $name = $v;
-        }
-
-        ~ (COLON) {
-          &_attribute ($node => $node, $name => $name);
-        } (LBRACE) {
-          my $subnode;
-          lang:Perl {
-            $subnode = {
-              node_type => $name,
-            };
-            if ($name eq 'attribute') {
-              push @{$node->{attributes}||=[]}, $subnode;
-            } elsif ($name eq 'element-type-definition') {
-              push @{$node->{element_types}||=[]}, $subnode;
-            } elsif ($name eq 'attribute-definition') {
-              push @{$node->{attribute_definitions}||=[]}, $subnode;
-            } elsif ($name eq 'general-entity') {
-              push @{$node->{general_entities}||=[]}, $subnode;
-            } elsif ($name eq 'notation') {
-              push @{$node->{notations}||=[]}, $subnode;
-            } elsif ($name eq 'namespace') {
-              push @{$node->{namespaces}||=[]}, $subnode;
-            } else {
-              push @{$node->{child_nodes}||=[]}, $subnode;
-            }
-          }
-          &_node ($node => $subnode);
-        }
-      } (SEMICOLON) { }
-
-      ~ (RBRACE) { }
-
-    } // _node
-
-    rule _attribute ($node, $name) {
-      /*
-        attribute := attribute-name ":" attribute-value ";"
-        attribute-name := NAME
-        attribute-value := 'null' / 'true' / 'false'
-                         / string
-                         / number
-                         / 'const' "(" NAME ")"
-                         / 'DOMStringList' "(" [string] *("," string) [","] ")"
-                         / 'TypeInfo' "(" [string / 'null']
-                                          *("," (string / 'null')) [","] ")"
-        string := 1*(STRING / CHAR)
-        number := DNUM / HNUM / BNUM
-      */
- 
-      // ~ (NAME) { }
-      // ~ (COLON) { }
-
-      lang:Perl {
-        $name =~ tr/-/_/;
-      }
-
-      ~ (NAME == 'null') {
-        lang:Perl {
-          $node->{$name} = {type => 'nu'.'ll'};
-        }
-      } (NAME == 'true') {
-        lang:Perl {
-          $node->{$name} = {type => 'boolean', value => 1};
-        }
-      } (NAME == 'false') {
-        lang:Perl {
-          $node->{$name} = {type => 'boolean', value => 0};
-        }
-      } (STRING) {
-        lang:Perl ($v => $token.value) {
-          $node->{$name} = {type => 'string',
-                            value => substr ($v, 1, length ($v) - 2)};
-        }
-
-        ~* (STRING) {
-          lang:Perl ($v => $token.value) {
-            $node->{$name}->{value} .= substr ($v, 1, length ($v) - 2);
-          }
-        } (CHAR) {
-          lang:Perl ($v => $token.value) {
-            $node->{$name}->{value} .= chr hex substr ($v, 2);
-          }
-        }
-      } (CHAR) {
-        lang:Perl ($v => $token.value) {
-          $node->{$name} = {type => 'string',
-                            value => chr hex substr ($v, 2)};
-        }
-
-        ~* (STRING) {
-          lang:Perl ($v => $token.value) {
-            $node->{$name}->{value} .= substr ($v, 1, length ($v) - 2);
-          }
-        } (CHAR) {
-          lang:Perl ($v => $token.value) {
-            $node->{$name}->{value} .= chr hex substr ($v, 2);
-          }
-        }
-      } (DNUM) {
-        lang:Perl ($v => $token.value) {
-          $node->{$name} = {type => 'number', value => 0+$v};
-        }
-      } (XNUM) {
-        lang:Perl ($v => $token.value) {
-          $node->{$name} = {type => 'number', value => hex $v};
-        }
-      } (BNUM) {
-        lang:Perl ($v => $token.value) {
-          $node->{$name} = {type => 'number', value => eval $v};
-        }
-      } (NAME == 'const') {
-        ~ (LPAREN) { }
-
-        ~ (NAME) {
-          lang:Perl ($v => $token.value) {
-            $node->{$name} = {type => 'const', value => $v};
-          }
-        }
-
-        ~ (RPAREN) { }
-      } (NAME == 'DOMStringList') {
-        my $list;
-        lang:Perl {
-          $node->{$name} = {type => 'DOMStringList', value => ($list = [])};
-        }
-
-        ~ (LPAREN) { }
-
-        ~* (STRING) {
-          lang:Perl ($v => $token.value) {
-            push @$list, substr ($v, 1, length ($v) - 2);
-          }
-          ~* (STRING) {
-            lang:Perl ($v => $token.value) {
-              $list->[-1] .= substr ($v, 1, length ($v) - 2);
-            }
-          } (CHAR) {
-            lang:Perl ($v => $token.value) {
-              $list->[-1] .= chr hex substr ($v, 2);
-            }
-          }
-        } (CHAR) {
-          lang:Perl ($v => $token.value) {
-            push @$list, chr hex substr ($v, 2);
-          }
-          ~* (STRING) {
-            lang:Perl ($v => $token.value) {
-              $list->[-1] .= substr ($v, 1, length ($v) - 2);
-            }
-          } (CHAR) {
-            lang:Perl ($v => $token.value) {
-              $list->[-1] .= chr hex substr ($v, 2);
-            }
-          }
-        } (COMMA) : separator : terminator? { }
-
-        ~ (RPAREN) { }
-      } (NAME == 'TypeInfo') {
-        my $list;
-        lang:Perl {
-          $node->{$name} = {type => 'TypeInfo', value => ($list = [])};
-        }
-
-        ~ (LPAREN) { }
-
-        ~* (STRING) {
-          lang:Perl ($v => $token.value) {
-            push @$list, substr ($v, 1, length ($v) - 2);
-          }
-          ~* (STRING) {
-            lang:Perl ($v => $token.value) {
-              $list->[-1] .= substr ($v, 1, length ($v) - 2);
-            }
-          } (CHAR) {
-            lang:Perl ($v => $token.value) {
-              $list->[-1] .= chr hex substr ($v, 2);
-            }
-          }
-        } (CHAR) {
-          lang:Perl ($v => $token.value) {
-            push @$list, chr hex substr ($v, 2);
-          }
-          ~* (STRING) {
-            lang:Perl ($v => $token.value) {
-              $list->[-1] .= substr ($v, 1, length ($v) - 2);
-            }
-          } (CHAR) {
-            lang:Perl ($v => $token.value) {
-              $list->[-1] .= chr hex substr ($v, 2);
-            }
-          }
-        } (NAME == 'null') {
-          lang:Perl {
-            push @$list, null;
-          }
-        } (COMMA) : separator : terminator? { }
-
-        ~ (RPAREN) { }
-      }
-
-      ~ (SEMICOLON) { }
-    } // _attribute
-
     token-error default : default {
       lang:Perl {
         my $location = {
           utf32_offset => pos ($self->{source}),
         };
-        my $continue = __DOMCore:ERROR{dtest|bad-token-error::
-          dtest|error-token => {$token},
+        my $continue = __DOMCore:ERROR{dit|bad-token-error::
+          dit|error-token => {$token},
           DOMCore|location => {$location},
-          dtest|source-text => {\($self->{source})},
+          dit|source-text => {\($self->{source})},
         }__;
         unless ($continue) {
           __EXCEPTION{dtest|PARSE_ERR::
@@ -1061,16 +612,16 @@ IFClsDef:
         $self->{has_error} = true;
       }
     } // token-error default
-##TDTParser
+##DITParser
 
 IFClsDef:
-  @IFQName: DTExceptionFormatter
-  @ClsQName: ManakaiDTExceptionFormatter
+  @IFQName: DITExceptionFormatter
+  @ClsQName: ManakaiDITExceptionFormatter
 
   @ClsISA: ecore|MUErrorFormatter||ManakaiDOM|Perl
 
   @RuleDef:
-    @@Name: tdt-error-token-type
+    @@Name: dit-error-token-type
     @@enDesc:
       The type of the token the parser is encountered.
 
@@ -1090,11 +641,11 @@ IFClsDef:
         @@@@enDesc: The option value.
       @@@Return:
         @@@@PerlDef:
-          $p->{-result} = $o->{<H::dtest|error-token>}->{type}
-            if defined $o->{<H::dtest|error-token>}->{type};
+          $p->{-result} = $o->{<H::dit|error-token>}->{type}
+            if defined $o->{<H::dit|error-token>}->{type};
 
   @RuleDef:
-    @@Name: tdt-error-token-value
+    @@Name: dit-error-token-value
     @@enDesc:
       The value of the token the parser is encountered, if any.
 
@@ -1114,11 +665,11 @@ IFClsDef:
         @@@@enDesc: The option value.
       @@@Return:
         @@@@PerlDef:
-          $p->{-result} = $o->{<H::dtest|error-token>}->{value}
-            if defined $o->{<H::dtest|error-token>}->{value};
+          $p->{-result} = $o->{<H::dit|error-token>}->{value}
+            if defined $o->{<H::dit|error-token>}->{value};
 
   @RuleDef:
-    @@Name: tdt-error-lines
+    @@Name: dit-error-lines
     @@enDesc:
       A copy of fragment of the source text that contains the line
       where the error occurred, if available.
@@ -1142,7 +693,7 @@ IFClsDef:
           my $pos = $o-><AG::DOMCore|DOMError.location>
                       -><AG::DOMCore|DOMLocator.utf32Offset>;
           if ($pos > -1) {
-            my $src = $o->{<H::dtest|source-text>};
+            my $src = $o->{<H::dit|source-text>};
             my $start = $pos;
             $start = rindex ($$src, "\x0A", $start - 1) for 0..2;
             $start++;
@@ -1151,7 +702,7 @@ IFClsDef:
             $end = length $$src if $end < 0;
             $p->{-result} = substr $$src, $start, $end - $start;
           }
-##DPGExceptionFormatter
+##DITExceptionFormatter
 
 ElementTypeBinding:
   @Name: RuleDef
@@ -1178,27 +729,27 @@ ElementTypeBinding:
       lang:muf
 
 PropDef:
-  @QName: dtest|error-token
+  @QName: dit|error-token
   @enDesc:
     The token where the parser found an error.
 
 PropDef:
-  @QName: dtest|source-text
+  @QName: dit|source-text
   @enDesc:
     A reference to the original source text, if available.
 
 PropDef:
-  @QName: dtest|relatedURI
+  @QName: dit|relatedURI
   @enDesc:
     A related URI.
 
 PropDef:
-  @QName: dtest|resource
+  @QName: dit|resource
   @enDesc:
     A related <QUOTE::dis> resource.
 
 PropDef:
-  @QName: dtest|qname
+  @QName: dit|qname
   @enDesc:
     A related <QUOTE::dis> QName.
 
@@ -1218,7 +769,7 @@ ElementTypeBinding:
 
 CParamApp:
   @DOMCore:domConfigurationParameter: DOMCore|error-handler
-  @DOMCore:targetType: TDTParser
+  @DOMCore:targetType: DITParser
 
 ElementTypeBinding:
   @Name: ErrDef
@@ -1227,31 +778,31 @@ ElementTypeBinding:
   @ShadowContent:
     @@rdf:type: DOMCore|DOMErrorType
     @@For: ManakaiDOM|DOM3
-    @@ecore:textFormatter: ManakaiDTExceptionFormatter
+    @@ecore:textFormatter: ManakaiDITExceptionFormatter
 
 ErrDef:
-  @QName: dtest|bad-token-error
+  @QName: dit|bad-token-error
   @enDesc:
     The parser is encountered to a token whose type is not
     allowed there.
   @DOMCore:severity: DOMCore|SEVERITY_FATAL_ERROR
   @enMufDef:
-    Token |%tdt-error-token-type;|%tdt-error-token-value
+    Token |%dit-error-token-type;|%dit-error-token-value
     (prefix => { (|}, suffix => {|)}); is not 
-    allowed %tdt-error-lines (prefix => {(|}, suffix => {|)});
+    allowed %dit-error-lines (prefix => {(|}, suffix => {|)});
 
 ErrDef:
-  @QName: dtest|undeclared-namespace-prefix-error
+  @QName: dit|undeclared-namespace-prefix-error
   @enDesc:
     The namespace prefix is not declared.
   @DOMCore:severity: DOMCore|SEVERITY_ERROR
   @enMufDef:
-    |%p (name => {<Q::dtest:qname>});|: Namespace prefix is not declared
+    |%p (name => {<Q::dit|qname>});|: Namespace prefix is not declared
 
 ErrDef:
-  @QName: dtest|bad-error-resource-error
+  @QName: dit|bad-error-resource-error
   @enDesc:
     The type of an error resource is not supported.
   @DOMCore:severity: DOMCore|SEVERITY_ERROR
   @enMufDef:
-    <%p (name => {<Q::dtest:uri>});>: Not an error of supported error type
+    <%p (name => {<Q::dit|uri>});>: Not an error of supported error type
