@@ -13,7 +13,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/12/31 00:55:05 $
+    $Date: 2007/03/21 11:28:18 $
 
   @Require:
     @@Module: 
@@ -36,6 +36,8 @@ Namespace:
     http://suika.fam.cx/www/2006/feature/
   @gls:
     http://suika.fam.cx/~wakaba/archive/2004/dom/gls#
+  @dx:
+    http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#
   @idl:
     http://suika.fam.cx/~wakaba/archive/2004/dis/IDL#
   @lang:
@@ -449,6 +451,51 @@ ResourceDef:
     may be instantiated via the <M::ManakaiGLSImplementation
     .createGLSSerializer> method.
 
+## -- Error
+
 ResourceDef:
   @QName: DOMLS|SerializerRole
   @AliasFor: gls|SerializerRole
+
+IFClsDef:
+  @IFQName: GLSException
+  @ClsQName: ManakaiGLSException
+
+  @DISCore:resourceType:
+    @@@: dx|Interface
+    @@ForCheck: ManakaiDOM|ForIF
+  @DISCore:resourceType:
+    @@@: dx|Class
+    @@ForCheck: ManakaiDOM|ForClass
+
+  @ClsISA: dx|Exception
+  @dx:implementedBy: ||+||ManakaiDOM|ForClass
+
+  @ResourceDef:
+    @@QName: GLSExceptionCode
+    @@ForCheck: ManakaiDOM|ForIF
+    @@rdf:type: DISLang|ConstGroup
+
+    @@enDesc:
+      Exception codes for <IF::GLSException>. 
+
+    @@Type: idl|unsignedShort
+    @@rdfs:subClassOf: idl|unsignedShort
+
+    @@ResourceDef:
+      @@@QName: gls|PARSE_ERR
+      @@@DISCore:resourceType: dx|ErrorCode
+      @@@Value:
+        @@@@@: 81
+        @@@@ContentType: DISCore|Integer
+      @@@enDesc:
+        An attempt was made to load a document and
+        the processing has been stopped.
+##GLSException
+
+ElementTypeBinding:
+  @Name: ClsISA
+  @ElementType:
+    dis:ISA
+  @ShadowContent:
+    @@ForCheck: ManakaiDOM|ForClass

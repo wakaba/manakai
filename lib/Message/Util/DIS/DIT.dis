@@ -11,7 +11,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2007/01/20 11:54:40 $
+    $Date: 2007/03/21 11:28:18 $
   
   @Require:
     @@Module:
@@ -391,7 +391,7 @@ IFClsDef:
       @@@PerlDef:
         $self->{char} = [];
         $self->{token} = [];
-        $self->{source} = $sourceText;
+        $self->{source} = \$sourceText;
         $self->{location} = {};
         __DEEP{
           $r = $self->_parse_document;
@@ -412,14 +412,88 @@ IFClsDef:
         if (@{$self->{char}}) {
           $r = shift @{$self->{char}};
         } else {
-          my $char = substr ($self->{source}, pos ($self->{source}), 1);
-          pos ($self->{source})++;
+          my $char = substr (${$self->{source}}, pos (${$self->{source}}), 1);
+          pos (${$self->{source}})++;
 
           if (length $char) {
             $r = ord $char;
           } else {
             $r = -1;
           }
+        }
+  
+  @Method:
+    @@ManakaiDOM:isForInternal: 1
+    @@Name: qnameToURI
+    @@enDesc:
+      Resolves a qualified name in DIT document into the URI.
+    @@Param:
+      @@@Name: qname
+      @@@Type: DOMString
+      @@@enDesc:
+        The qualified name to resolve.
+    @@Return:
+      @@@Type: DOMString
+      @@@enDesc:
+        The URI.
+      @@@dx:raises:
+        @@@@@: dit|PARSE_ERR
+        @@@@enDesc:
+          If the namespace prefix is not defined.
+      @@@PerlDef:
+        my ($pfx, $ln) = split /\|/, $qname, 2;
+            my $uri = $self->{namespace}->{$pfx};
+            if (defined $uri) {
+              $r = $uri . $ln;
+            } else {
+              my $location = {
+                utf32_offset => pos (${$self->{source}}),
+              };
+              my $continue = __c|ERROR{dit|namespace-prefix-not-defined-error::
+                dit|error-token => {$token},
+                dit|source-text => {$self->{source}},
+                c|location => {$location},
+                dit|namespace-prefix => {$prefix},
+              }__;
+              unless ($continue) {
+                __EXCEPTION{dit|PARSE_ERR}__;
+              }
+              $r = $ln;
+            }
+
+  @Method:
+    @@Name: parseEmbedBlock
+    @@ManakaiDOM:isForInternal:1
+    @@ForCheck: ManakaiDOM|ForClass
+    @@enDesc:
+      Parses an embed statement block.
+    @@Return:
+      @@@PerlDef:
+        my $token = $self->_scan_default;
+        if ($token->{type} eq 'QSTART') {
+          my $nest_count = 1; # already opened
+          my $s = '';
+          __DEEP{
+            C: while ((my $ch = $self->_shift_char) > -1) {
+              if ($ch == 0x007B) {
+                $s .= '{'; # }
+                $nest_count++;
+              } elsif ($ch == 0x007D) {
+                if (--$nest_count == 0) {
+                  last C;
+                } elsif ($nest_count < 0) {
+                  $nest_count = 0;
+                }
+                $s .= chr $ch;
+              } else {
+                $s .= chr $ch;
+              }
+            }
+
+            push @{$self->{value}}, {type => 'string', value => $s};
+          }__;
+        } else {
+          unshift @{$self->{token}}, $token;
         }
 
   @Method:
@@ -472,6 +546,10 @@ IFClsDef:
       $prefixed-name := $name? ['|'] $name?;
       NAME : value := $name;
       PREFIXEDNAME : value := $prefixed-name;
+          /*
+            A |PREFIXEDNAME| are to be expanded into a triple
+            of namespace prefix, namespace URI, and local name.
+          */
       ANDNAME : value := ['&'] $name;
       DOLLERNAME : value := ['$'] $name;
 
@@ -487,6 +565,8 @@ IFClsDef:
 
       /* Declaration */
       COLON := [':'];
+      DCOLON := [':'] [':'];
+      EQUAL := ['='];
       SEMICOLON := [';'];
 
       /* String */
@@ -496,10 +576,11 @@ IFClsDef:
           $hexdigit $hexdigit $hexdigit $hexdigit;
       $schar := $ucs2? $ucs4? [^U+0027 U+005C]?
       STRING : value := [U+0027] $schar* [U+0027];
+      QSTART := ['q'] ['{'];
 
       /* Number */
       MINUS := ['-'];
-      DNUM : value := [U+0030..U+0039]+;
+      DNUM : value := [U+0030..U+0039] [U+0030..U+0039 '_']*;
       XNUM : value := ['0'] ['x']
                       [U+0030..U+0039 U+0041..U+0046 U+0061..U+0066 '_']+;
       BNUM : value := ['0'] ['b'] ['0' '1' '_']+;
@@ -514,6 +595,11 @@ IFClsDef:
 
       /* URI */
       URI : value := ['<'] [^'<' '>' '[' ']'] [^'<' '>']* ['>'];
+
+      /*
+        cwsp := WSP / COMMENT1 / COMMENT2
+          ;; allowed everywhere
+      */
       
       /* Ignored white space */
       WSP : ignore := [U+0009..U+000D U+0020]+;
@@ -526,93 +612,622 @@ IFClsDef:
     } // lexmode default
 
     /*
+      QSTRING := 'q{' *((<any character> - '{' / '}') / QSTRING) '}'
+
+          ISSUE: How escapes ('\' <any character>) should be parsed?
+    */
+    rule QSTRING
+           : perl-name => 'embed_block'
+           <external>;
+
+    /*
       A DIT Document (|lang:dit|).
     */
-    rule document : standalone : recursive {
+    rule root-document : standalone {
       /*
-        root-document := *at-namespace *at-require *at-import body
-
-        imported-document := *at-namespace *at-require *at-import
-
-        body := *(in-resource-rule / at-let)
-    
-        in-resource-rule := property / resource / ref / empty-rule
-
-        at-namespace := '@namespace' namespace-prefix uri SEMICOLON
-
-        at-require := '@require' qname SEMICOLON
-
-        at-import := '@import' qname SEMICOLON
- 
-        at-let := '@let' ANDNAME parameters resource SEMICOLON
-
-        property := qname COLON value SEMICOLON
-
-        resource := LBRACE *in-resource-rule RBRACE
-
-        ref := ANDNAME
-
-        empty-rule := SEMICOLON
-
-        parameters := VARNAME *(COMMA VARNAME)
-
-        value := primitive-value [LBRACE *property RBRACE] / variable-ref
-
-        primitive-value := STRING / number / URI / PREFIXEDNAME / function-call
-
-        function-call := NAME LPAREN [value *(COMMA value)] RPAREN
-
-        variable-ref := DOLLERNAME
-
-        namespace-prefix := NAME / '#default'
-
-        uri := URI / qname
-
-        qname := NAME / PREFIXEDNAME
-
-        number := MINUS? (DNUM / XNUM / BNUM)
-
-        cwsp := WSP / COMMENT1 / COMMENT2
-          ;; allowed everywhere
+        root-document := header body
       */
 
-      my $node : return;
       lang:Perl {
-        $node = {
-        };
+        ## Reset
+        $self->{namespace} = {};
+        $self->{default_namespace} = undef;
       }
 
-      ~ (NAME) {
-        lang:Perl ($v => $token.value) {
-          $node->{node_type} = $v;
+      &header;
+
+      &body;
+
+      ~ (#EOF) { }
+    } // root-document
+
+    rule imported-document : standalone {
+      /*
+        imported-document := header
+      */
+
+      &header;
+
+      ~ (#EOF) { }
+    } // imported-document
+
+    rule header {
+      /*
+        header := *at-namespace *at-require *at-import
+      */
+
+      &at-namespaces;
+      &at-requires;
+      &at-imports;
+    } // header
+
+    rule at-namespaces {
+      ~* (ATKEYWORD == '@namespace') {
+        /*
+          at-namespace := '@namespace' namespace-prefix (URI / PREFIXEDNAME)
+              SEMICOLON
+              ;; NOTE: In this context the namespace prefix in |PREFIXEDNAME|
+              ;; is not significant once it is resolved into a namespace URI.
+
+          namespace-prefix := NAME / '#default'
+        */
+        my $prefix;
+        ~ (NAME) {
+          lang:Perl ($value => $token.value) {
+            $prefix = $value;
+          }
+        } (RNIKEYWORD == '#default') {
+          //
+        }
+
+        my $nsuri;
+        ~ (URI) {
+          lang:Perl ($value => $token.value) {
+            $nsuri = substr $value, 1, length ($value) - 2;
+          }
+        } (PREFIXEDNAME) {
+          lang:Perl ($value => $token.value) {
+            $nsuri = $self->_qname_to_uri ($value);
+          }
+        }
+
+        lang:Perl {
+          if (defined $prefix) {
+            if (defined $self->{namespace}->{$prefix}) {
+              my $location = {
+                utf32_offset => pos (${$self->{source}}),
+              };
+              my $continue = __c|ERROR{dit|namespace-prefix-redefined-error::
+                c|location => {$location},
+                dit|namespace-prefix => {$prefix},
+                dit|old-definition => {$self->{namespace}->{$prefix}},
+                dit|new-definition => {$nsuri},
+              }__;
+              unless ($continue) {
+                __EXCEPTION{dit|PARSE_ERR}__;
+              }
+            }
+            $self->{namespace}->{$prefix} = $nsuri;
+          } else {
+            if (defined $self->{default_namespace}) {
+              my $location = {
+                utf32_offset => pos (${$self->{source}}),
+              };
+              my $continue = __c|ERROR{dit|namespace-prefix-redefined-error::
+                c|location => {$location},
+                dit|namespace-prefix => {$prefix},
+                dit|old-definition => {$self->{default_namespace}},
+                dit|new-definition => {$nsuri},
+              }__;
+              unless ($continue) {
+                __EXCEPTION{dit|PARSE_ERR}__;
+              }
+            }
+            $self->{default_namespace} = $nsuri;
+          }
+        }
+      }
+      ~ (SEMICOLON) { }
+    } // at-namespaces
+
+    rule at-requires {
+      ~* (ATKEYWORD == '@require') {
+        /*
+          at-require := '@require' PREFIXEDNAME SEMICOLON
+        */
+        ~ (PREFIXEDNAME) {
+          lang:Perl ($value => $token.value) {
+            my $module_uri = $self->_qname_to_uri ($value);
+            ## TODO: What to do?
+          }
+        }
+        ~ (SEMICOLON) { }
+      }
+    } // at-requires
+
+    rule at-imports { 
+      ~* (ATIMPORT == '@import') {
+        /*
+          at-import := '@import' PREFIXEDNAME SEMICOLON
+        */
+        ~ (PREFIXEDNAME) {
+          lang:Perl ($value => $token.value) {
+            my $file_uri = $self->_qname_to_uri ($value);
+
+            ## NOTE: Intentionally no warning when
+            ## the file has already been imported by anywhere
+            unless ($self->{imported_uri}->{$file_uri}) {
+              $self->{imported_uri}->{$file_uri} = 1;
+
+              push @{$self->{file}},
+                  [$self->{source}, $self->{location},
+                  $self->{char}, $self->{token}];
+  
+              ## TODO: get file's content
+              my $s = '';
+              $self->{source} = $s;
+              $self->{location} = {}; ## TODO: set something
+              $self->{char} = [];
+              $self->{token} = [];
+              $self->parse_imported_document;
+
+              my $file = pop @{$self->{file}};
+              $self->{source} = $file->[0];
+              $self->{location} = $file->[1];
+              $self->{char} = $file->[2];
+              $self->{token} = $file->[3];
+            }
+          }
+        }
+        ~ (SEMICOLON) { }
+      }
+    } // at-imports
+
+    rule body {
+      /*
+        body := *(in-resource-rule / resource / at-let)
+    
+        in-resource-rule := property / ref / empty-rule
+      */
+
+      ~* (PREFIXEDNAME) {
+        my $prop_uri;
+        lang:Perl ($value => $token.value) {
+          $prop_uri = $self->_qname_to_uri ($value);
+        }
+        &_property ($prop_uri => $prop_uri);
+      } (ATKEYWORD == '@let') {
+        &_at-let;
+      } (LBRACE) {
+        &_resource;
+      } (ANDNAME) {
+        /*
+          ref := ANDNAME
+        */
+
+        // TODO: expansion
+      } (SEMICOLON) {
+        /*
+          empty-rule := SEMICOLON
+        */
+      }
+    } // body
+
+    rule _at-let {
+      /*
+        at-let := '@let' ANDNAME parameters resource SEMICOLON
+
+        parameters := [VARNAME *(COMMA VARNAME)]
+            ;; ISSUE: Should a block allowed as a parameter?
+      */
+
+      my $let_name;
+      ~ (ANDNAME) {
+        lang:Perl ($value => $token.value) {
+          $let_name = $value;
+          if (defined $self->{let}->{$let_name}) {
+            ## ISSUE: error? override?
+          }
         }
       }
 
-      ~ (LBRACE) { }
+      ~* (VARNAME) {
 
-      &_node ($node => $node);
+      } (COMMA) : separator {
+        /* ISSUE: $a,,$b == $a,$b ?? */
+      }
 
-      ~ (#EOF) { }
-    } // document
+      ~ (LBRACE) {
+        &_resource;
+      }
+
+      // TODO: 
+
+      ~ (SEMICOLON) { }
+    } // _at-let
+
+    rule _resource : recursive {
+      /*
+        resource := LBRACE *in-resource-rule RBRACE
+      */
+
+      ~* (PREFIXEDNAME) {
+        my $prop_uri;
+        lang:Perl ($value => $token.value) {
+          $prop_uri = $self->_qname_to_uri ($value);
+        }
+        &_property ($prop_uri => $prop_uri);
+      } (ANDNAME) {
+        /*
+          ref := ANDNAME
+        */
+
+        // TODO: expansion
+      } (SEMICOLON) {
+        /*
+          empty-rule := SEMICOLON
+        */
+      }
+
+      ~ (RBRACE) { }
+    } // _resource
+
+    rule _property ($prop_uri) : recursive {
+      /*
+        property := one-value-property / ordered-list-property
+            / unordered-list-property
+
+        one-value-property := property EQUAL value SEMICOLON
+
+        unordered-list-property := property-name DCOLON value SEMICOLON
+
+        ordered-list-property := property-name COLON value SEMICOLON
+
+        property-name := PREFIXEDNAME
+            ;; ISSUE: Should a |NAME| be allowed as a property name?
+            ;; ISSUE: Should a union of properties be allowed?
+            ;; TODO: A special syntax for |dis|subsetOf| is necessary
+      */
+
+      ~ (EQUAL) {
+
+      } (DCOLON) {
+    
+      } (COLON) {
+
+      }
+
+      // TODO: value
+
+      ~ (SEMICOLON) { }
+    } // _property
+
+    rule value : recursive {
+      /*
+        value := (primitive-or-function / resource)
+            [LBRACE *(property / empty-rule) RBRACE]
+            / variable-ref
+            ;; ISSUE: Should a block allowed after |variable-ref|?
+            ;; ISSUE: {a; b} is not allowed now...
+      */
+
+      ~ (DOLLERNAME) {
+        /*
+          variable-ref := DOLLERNAME
+        */
+
+        // TODO:
+      } else {
+        ~ (LBRACE) {
+          lang:Perl {
+            push @{$self->{resources}}, $self->{resource};
+            $self->{resource} = {};
+          }
+
+          &_resource;
+
+          lang:Perl {
+            my $uri = '## TODO: DISCore:uri from |{resource}|';
+            my $v = $self->{impl}->create_dv_value (<Q::DISCore|URI>, $uri);
+            ## TODO: register |{resource}| to anywhere
+            push @{$self->{value}}, $v;
+            $self->{resource} = pop @{$self->{resources}};
+          }
+        } else {
+          &primitive-or-function;
+        }
+        
+        ~ (LBRACE) {
+          ~* (PREFIXEDNAME) {
+            // property
+            my $prop_uri;
+            lang:Perl ($value => $token.value) {
+              $prop_uri = $self->_qname_to_uri ($value);
+            }
+            &_property ($prop_uri => $prop_uri);
+          } (SEMICOLON) {
+            // empty-rule
+          }
+          ~ (RBRACE) { }
+        }
+      }
+    } // value
+
+    rule primitive-or-function : recursive {
+      /*
+        primitive-or-function := primitive-value / function-call
+
+        primitive-value := STRING / QSTRING / number / URI / PREFIXEDNAME
+
+        number := MINUS? (DNUM / XNUM / BNUM)
+      */
+
+        ~ (STRING) {
+          lang:Perl ($value => $token.value) {
+            my $v = substr $value, 1, length ($value) - 2;
+            $v =~ s/\\(u[0-9A-Fa-f]{4}|U[0-9A-Fa-f]{8})/
+              chr hex substr $1, 1
+            /ge;
+            push @{$self->{value}},
+                $self->{impl}->create_dv_value_ref
+                    (<Q::DISLang|String>, \$v);
+          }
+        } (QSTART) {
+          &QSTRING;
+        } (PREFIXEDNAME) {
+          lang:Perl ($value => $token.value) {
+            my ($pfx, $ln) = split /\|/, $value, 2;
+            my $uri = $self->{namespace}->{$pfx};
+            if (defined $uri) {
+              push @{$self->{value}},
+                  my $v = $self->{impl}->create_dv_value
+                      (<Q::DISLang|QName>, $ln);
+              $v->prefix ($pfx);
+              $v->namespace_uri ($uri);
+            } else {
+              my $location = {
+                utf32_offset => pos (${$self->{source}}),
+              };
+              my $continue = __c|ERROR{dit|namespace-prefix-not-defined-error::
+                dit|error-token => {$token},
+                dit|source-text => {$self->{source}},
+                c|location => {$location},
+                dit|namespace-prefix => {$prefix},
+              }__;
+              unless ($continue) {
+                __EXCEPTION{dit|PARSE_ERR}__;
+              }
+              push @{$self->{value}},
+                  my $v = $self->{impl}->create_dv_value
+                      (<Q::DISLang|QName>, $ln);
+              $v->prefix ($pfx);
+            }
+          }
+        } (URI) {
+          lang:Perl ($value => $token.value) {
+            my $v = substr $value, 1, length ($value) - 2;
+            push @{$self->{value}}, 
+                $self->{impl}->create_dv_value_ref (<Q::DISCore|URI>, \$v);
+          }
+        } (DNUM) {
+          lang:Perl ($value => $token.value) {
+            my $v = $value;
+            $v =~ tr/_//d;
+            $v =~ s/^0+//;
+            push @{$self->{value}},
+                $self->{impl}->create_dv_value_ref
+                    (<Q::DISLang|Number>, 0+$v);
+          }
+        } (XNUM) {
+          lang:Perl ($value => $token.value) {
+            my $v = $value;
+            $v =~ tr/_//d;
+            push @{$self->{value}},
+                $self->{impl}->create_dv_value_ref
+                    (<Q::DISLang|Number>, hex $v);
+          }
+        } (BNUM) {
+          lang:Perl ($value => $token.value) {
+            my $v = $value;
+            $v =~ tr/_//d;
+            push @{$self->{value}},
+                $self->{impl}->create_dv_value_ref
+                    (<Q::DISLang|Number>, 0+eval $v);
+          }
+        } (MINUS) {
+          ~ (DNUM) {
+            lang:Perl ($value => $token.value) {
+              my $v = $value;
+              $v =~ tr/_//d;
+              $v =~ s/^0+//;
+              push @{$self->{value}},
+                  $self->{impl}->create_dv_value_ref
+                      (<Q::DISLang|Number>, -$v);
+            }
+          } (XNUM) {
+            lang:Perl ($value => $token.value) {
+              my $v = $value;
+              $v =~ tr/_//d;
+              push @{$self->{value}}, 
+                  $self->{impl}->create_dv_value_ref
+                      (<Q::DISLang|Number>, -hex $v);
+            }
+          } (BNUM) {
+            lang:Perl ($value => $token.value) {
+              my $v = $value;
+              $v =~ tr/_//d;
+              push @{$self->{value}},
+                  $self->{impl}->create_dv_value_ref
+                      (<Q::DISLang|Number>, -eval $v);
+            }
+          }
+        } (NAME) {
+          /*
+            function-call := NAME [LPAREN
+                [primitive-or-function *(COMMA primitive-or-function)] RPAREN]
+          */
+          my $function_name;
+          lang:Perl ($value => $token.value) {
+            $function_name = $value;
+            push @{$self->{values}}, $self->{value};
+            $self->{value} = [];
+          }
+
+        ~? (LPAREN) {
+          &primitive-or-function;
+          ~* (COMMA) {
+            &primitive-or-function;
+          }
+          ~ (RPAREN) { }
+        }
+
+          lang:Perl {
+            my $param = $self->{value};
+            $self->{value} = pop @{$self->{values}};
+
+            ## TODO: param number check
+
+            if ($function_name eq 'tr'.'ue') {
+              push @{$self->{value}},
+                  $self->{impl}->create_dv_value_ref
+                      (<Q::DISLang|Boolean>, 1);
+            } elsif ($function_name eq 'fal'.'se') {
+              push @{$self->{value}},
+                  $self->{impl}->create_dv_value_ref
+                      (<Q::DISLang|Boolean>, 0);
+            } elsif ($function_name eq 'nu'.'ll') {
+              push @{$self->{value}}, 
+                  my $v = $self->{impl}->create_dv_value_ref
+                      (<Q::DISLang|Null>, 0);
+              $v->is_null (1);
+            } elsif ($function_name eq 'with-type') {
+              my $new_type = $param->[1]->value;
+              ## TODO:
+            } elsif ($function_name eq 'local-name') {
+              if ($param->[0]->can ('local_name')) {
+                push @{$self->{value}},
+                    $self->{impl}->create_dv_value 
+                        (<Q::DISLang|String>, $param->[0]->local_name);
+              } else {
+                push @{$self->{value}}, $param->[0];
+              }
+            } elsif ($function_name eq 'namespace-uri') {
+              my $nsuri;
+              if ($param->[0]->can ('namespace_uri')) {
+                $nsuri = $param->[0]->namespace_uri;
+              }
+              push @{$self->{value}},
+                  my $v = $self->{impl}->create_dv_value
+                      (<Q::DISLang|URI>, defined $nsuri ? $nsuri : '');
+              $v->is_null (1) unless defined $nsuri;
+            } elsif ($function_name eq 'namespace-prefix') {
+              my $prefix;
+              if ($param->[0]->can ('prefix')) {
+                $prefix = $param->[0]->prefix;
+              }
+              push @{$self->{value}},
+                  my $v = $self->{impl}->create_dv_value
+                      (<Q::DISLang|String>, defined $prefix ? $prefix : '');
+              $v->is_null (1) unless defined $prefix;
+            } else {
+              ## TODO: error
+            }
+          }
+    } // primitive-or-function
 
     token-error default : default {
       lang:Perl {
         my $location = {
           utf32_offset => pos ($self->{source}),
         };
-        my $continue = __DOMCore:ERROR{dit|bad-token-error::
+        my $continue = __c|ERROR{dit|bad-token-error::
           dit|error-token => {$token},
-          DOMCore|location => {$location},
+          c|location => {$location},
           dit|source-text => {\($self->{source})},
         }__;
         unless ($continue) {
-          __EXCEPTION{dtest|PARSE_ERR::
+          __EXCEPTION{dit|PARSE_ERR::
           }__;
         }
         $self->{has_error} = true;
       }
     } // token-error default
 ##DITParser
+
+
+ResourceDef:
+  @DISCore:resourceType:
+    @@@: dis|MultipleResource
+    @@ForCheck: !ManakaiDOM|ForIF !ManakaiDOM|ForClass
+  @resourceFor: ManakaiDOM|ForIF
+  @resourceFor:
+    @@@: ManakaiDOM|ForClass
+
+  @DISCore:resourceType:
+    @@@: dx|Interface
+    @@ForCheck: ManakaiDOM|ForIF
+
+  @DISCore:resourceType:
+    @@@: dx|Class
+    @@ForCheck: ManakaiDOM|ForClass
+
+  @Implement:
+    @@@: ||+||ManakaiDOM|ForIF
+    @@ContentType: DISCore|TFPQNames
+    @@ForCheck: ManakaiDOM|ForClass
+  @dx:implementedBy:
+    @@@: ||+||ManakaiDOM|ForClass
+    @@ForCheck: ManakaiDOM|ForIF
+
+  @f:implements:
+    @@@: DIS|DPG10
+
+  @DISPerl:ISA:
+    @@@: dx|Exception
+    @@ForCheck: ManakaiDOM|ForClass
+
+  @IFQName: DITException
+  @ClsQName: ManakaiDITException
+
+  @ecore:textFormatter: ManakaiDITExceptionFormatter
+
+  @enDesc:
+    A <IF::DITParser> might throw a <IF::DPGException> if the processing is
+    stopped.  The processing can be stopped due to a <IF::c|DOMError>
+    with a <A::c|DOMError.severity> of 
+    <C::c|DOMError.SEVERITY_FATAL_ERROR> or a non-recovered
+    <C::c|DOMError.SEVERITY_ERROR>, or if 
+    <M::c|DOMErrorHandler.handleError> method returned <DOM::false>.
+
+  @Attr:
+    @@Name: code
+    @@Get:
+      @@@Type: idl|unsignedShort
+      @@@dis:actualType: DITExceptionCode
+    @@ForCheck: ManakaiDOM|ForIF
+
+  @ResourceDef:
+    @@rdf:type: DISLang|ConstGroup
+    @@ForCheck: ManakaiDOM|ForIF
+
+    @@QName: DITExceptionCode
+
+    @@subsetOf: idl|unsignedShort
+    @@Type: idl|unsignedShort
+
+    @@enDesc:
+      An integer indicating the type of error generated.
+
+    @@ResourceDef:
+      @@@QName: dit|PARSE_ERR
+      @@@DISCore:resourceType: dx|ErrorCode
+      @@@Value:
+        @@@@@: 81
+        @@@@ContentType: DISCore|Integer
+      @@@enDesc:
+        An attempt was made to load a DIT document and
+        the processing has been stopped.
+##DITException
 
 IFClsDef:
   @IFQName: DITExceptionFormatter
@@ -749,9 +1364,15 @@ PropDef:
     A related <QUOTE::dis> resource.
 
 PropDef:
-  @QName: dit|qname
+  @QName: dit|namespace-prefix
   @enDesc:
-    A related <QUOTE::dis> QName.
+    The namespace prefix.
+
+PropDef:
+  @QName: dit|old-definition
+
+PropDef:
+  @QName: dit|new-definition
 
 ElementTypeBinding:
   @Name: CParamApp
@@ -792,12 +1413,12 @@ ErrDef:
     allowed %dit-error-lines (prefix => {(|}, suffix => {|)});
 
 ErrDef:
-  @QName: dit|undeclared-namespace-prefix-error
+  @QName: dit|namespace-prefix-not-defined-error
   @enDesc:
     The namespace prefix is not declared.
   @DOMCore:severity: DOMCore|SEVERITY_ERROR
   @enMufDef:
-    |%p (name => {<Q::dit|qname>});|: Namespace prefix is not declared
+    Namespace prefix |%p (name => {<Q::dit|namespace-prefix>});| is not defined
 
 ErrDef:
   @QName: dit|bad-error-resource-error
@@ -806,3 +1427,12 @@ ErrDef:
   @DOMCore:severity: DOMCore|SEVERITY_ERROR
   @enMufDef:
     <%p (name => {<Q::dit|uri>});>: Not an error of supported error type
+
+ErrDef:
+  @QName: dit|namespace-prefix-redefined-error
+  @enDesc:
+    The specified namespace prefix is already bound to a namespace URI.
+  @c:severity: c|SEVERITY_ERROR
+  @enMufDef:
+    Namespace prefix |%p (name => {<Q::dit|namespace-prefix>});| is
+    already bound to <%p (name => {<Q::dit|old-definition>});>

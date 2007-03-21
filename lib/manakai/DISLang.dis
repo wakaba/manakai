@@ -12,7 +12,7 @@ Module:
   @License:
      license:Perl+MPL
   @Date:
-    $Date: 2006/12/31 09:12:03 $
+    $Date: 2007/03/21 11:28:19 $
 
   @Require:
     @@Module:
@@ -561,6 +561,19 @@ DataTypeDef:
               data type.
       }
   @rdfs:subClassOf: DISLang|Any
+  @subsetOf: DISLang|Any
+
+DataTypeDef:
+  @QName: DISLang|Number
+  @enFN: number
+  @enDesc:
+    Number in programming languages.
+  @subsetOf: DISLang|Any
+
+DataTypeDef:
+  @QName: DISLang|QName
+  @enFN:
+    triple of namespace prefix, namespace URI, and local name
   @subsetOf: DISLang|Any
 
 ## - Operator
