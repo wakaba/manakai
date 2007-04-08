@@ -11,7 +11,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2007/03/21 11:28:18 $
+    $Date: 2007/04/08 07:34:21 $
   
   @Require:
     @@Module:
@@ -790,16 +790,35 @@ IFClsDef:
         in-resource-rule := property / ref / empty-rule
       */
 
+      lang:Perl {
+        $self->{resources} = [];
+        $self->{resource} = {};
+      }
+
       ~* (PREFIXEDNAME) {
         my $prop_uri;
+        my $let_param;
         lang:Perl ($value => $token.value) {
           $prop_uri = $self->_qname_to_uri ($value);
+          $let_param = {};
         }
-        &_property ($prop_uri => $prop_uri);
+        &_property ($prop_uri => $prop_uri, $let_param => $let_param);
       } (ATKEYWORD == '@let') {
         &_at-let;
       } (LBRACE) {
-        &_resource;
+        my $let_param;
+        lang:Perl {
+          push @{$self->{resources}}, $self->{resource};
+          $self->{resource} = {};
+
+          $let_param = {};
+        }
+        &_resource ($let_param => $let_param);
+        lang:Perl {
+          ## TODO: instantiate resource
+
+          $self->{resource} = pop @{$self->{resources}};
+        }
       } (ANDNAME) {
         /*
           ref := ANDNAME
@@ -831,22 +850,55 @@ IFClsDef:
         }
       }
 
-      ~* (VARNAME) {
+      my $let_param;
+      my $let_arg;
+      lang:Perl {
+        push @{$self->{resources}}, $self->{resource};
+        $self->{resource} = {};
 
+        $let_param = {};
+        $let_arg = [];
+      }
+      ~* (VARNAME) {
+        lang:Perl ($value => $token.value) {
+          my $param_name = substr $value, 1;
+          my $i = @$let_arg;
+          $let_param{$param_name} = sub {
+            if (ref $let_arg->[$i] eq 'CODE') {
+              return $let_arg->[$i]->();
+            } else {
+              return $let_arg->[$i];
+            }
+          };
+          push @$let_arg, undef;
+        }
       } (COMMA) : separator {
         /* ISSUE: $a,,$b == $a,$b ?? */
       }
 
       ~ (LBRACE) {
-        &_resource;
+        &_resource ($let_param => $let_param);
       }
 
       // TODO: 
+      lang:Perl {
+        my $prop = $self->{resource};
+        $self->{let}->{$let_name} = {
+          param_number => scalar @$let_arg,
+          apply => sub {
+            my ($res, $param) = @_;
+            @$let_arg = @$param;
+            ## TODO: instantieate $prop
+          },
+        };
+
+        $self->{resource} = pop @{$self->{resources}};
+      }
 
       ~ (SEMICOLON) { }
     } // _at-let
 
-    rule _resource : recursive {
+    rule _resource ($let_param) : recursive {
       /*
         resource := LBRACE *in-resource-rule RBRACE
       */
@@ -856,7 +908,7 @@ IFClsDef:
         lang:Perl ($value => $token.value) {
           $prop_uri = $self->_qname_to_uri ($value);
         }
-        &_property ($prop_uri => $prop_uri);
+        &_property ($prop_uri => $prop_uri, $let_param => $let_param);
       } (ANDNAME) {
         /*
           ref := ANDNAME
@@ -872,7 +924,7 @@ IFClsDef:
       ~ (RBRACE) { }
     } // _resource
 
-    rule _property ($prop_uri) : recursive {
+    rule _property ($prop_uri, $let_param) : recursive {
       /*
         property := one-value-property / ordered-list-property
             / unordered-list-property
@@ -889,20 +941,74 @@ IFClsDef:
             ;; TODO: A special syntax for |dis|subsetOf| is necessary
       */
 
-      ~ (EQUAL) {
-
-      } (DCOLON) {
-    
-      } (COLON) {
-
+      lang:Perl {
+        push @{$self->{values}}, $self->{value};
+        $self->{value} = [];
       }
 
-      // TODO: value
+      my $mode;
+      ~ (EQUAL) {
+        lang:Perl {
+          $mode = '=';
+        }
+      } (DCOLON) {
+        lang:Perl {
+          $mode = '::';
+        }
+      } (COLON) {
+        //
+      }
+
+      &value ($let_param => $let_param);
+
+      lang:Perl {
+        my $value = $self->{value}->[0];
+            ## NOTE: If an error is ignored, |{value}| might be empty...
+        if ($mode eq '=') {
+          $self->{property}->{$prop_uri} = $value;
+        } elsif ($mode eq '::') { # unordered
+          if (defined $self->{property}->{$prop_uri}) {
+            if (ref $self->{property}->{$prop_uri} eq 'ARRAY') {
+              if (ref $self->{property}->{$prop_uri} eq 'ARRAY') {
+                push @{$self->{property}->{$prop_uri}->[0]}, $value;
+              } else {
+                push @{$self->{property}->{$prop_uri}}, $value;
+                $self->{property}->{$prop_uri}
+                    = [$self->{property}->{$prop_uri}];
+              }
+            } else {
+              $self->{property}->{$prop_uri}
+                  = [[$self->{property}->{$prop_uri}, $value]];
+            }
+          } else {
+            $self->{property}->{$prop_uri} = [[$value]];
+          }
+        } else { # ordered
+          if (defined $self->{property}->{$prop_uri}) {
+            if (ref $self->{property}->{$prop_uri} eq 'ARRAY') {
+              if (ref $self->{property}->{$prop_uri} eq 'ARRAY') {
+                push @{$self->{property}->{$prop_uri}->[0]}, $value;
+                $self->{property}->{$prop_uri}
+                    = $self->{property}->{$prop_uri}->[0];
+              } else {
+                push @{$self->{property}->{$prop_uri}}, $value;
+              }
+            } else {
+              $self->{property}->{$prop_uri}
+                  = [$self->{property}->{$prop_uri}, $value];
+            }
+          } else {
+            $self->{property}->{$prop_uri} = [$value];
+          }
+        }
+
+        $self->{value} = pop @{$self->{values}};
+      }
 
       ~ (SEMICOLON) { }
     } // _property
 
-    rule value : recursive {
+    rule value ($let_param) : recursive {
       /*
         value := (primitive-or-function / resource)
             [LBRACE *(property / empty-rule) RBRACE]
@@ -916,7 +1022,25 @@ IFClsDef:
           variable-ref := DOLLERNAME
         */
 
-        // TODO:
+        lang:Perl ($value => $token.value) {
+          my $var_name = substr $value, 1;
+          my $var_func = $let_param->{$var_name};
+          unless (defined $var_func) {
+            my $location = {
+              utf32_offset => pos (${$self->{source}}),
+            };
+            my $continue = __c|ERROR{dit|let-param-not-defined-error::
+              dit|error-token => {$token},
+              dit|source-text => {$self->{source}},
+              c|location => {$location},
+              dit|param-name => {$var_name},
+            }__;
+            unless ($continue) {
+              __EXCEPTION{dit|PARSE_ERR}__;
+            }
+          }
+          push @{$self->{value}}, $var_func;
+        }
       } else {
         ~ (LBRACE) {
           lang:Perl {
@@ -924,36 +1048,63 @@ IFClsDef:
             $self->{resource} = {};
           }
 
-          &_resource;
+          &_resource ($let_param => $let_param);
 
           lang:Perl {
-            my $uri = '## TODO: DISCore:uri from |{resource}|';
-            my $v = $self->{impl}->create_dv_value (<Q::DISCore|URI>, $uri);
+            my $res = $self->{resource};
             ## TODO: register |{resource}| to anywhere
-            push @{$self->{value}}, $v;
+            push @{$self->{value}}, sub {
+              ## create real resource object from $res
+              my $uri = '## TODO: DISCore:uri from |{resource}|';
+              ## then return reference value to the resource
+              return $self->{impl}->create_dv_value (<Q::DISCore|URI>, $uri);
+            };
+
             $self->{resource} = pop @{$self->{resources}};
           }
         } else {
-          &primitive-or-function;
+          &primitive-or-function ($let_param => $let_param);
         }
         
         ~ (LBRACE) {
+          lang:Perl {
+            push @{$self->{resources}}, $self->{resource};
+            $self->{resource} = {};
+          }
+
           ~* (PREFIXEDNAME) {
             // property
             my $prop_uri;
             lang:Perl ($value => $token.value) {
               $prop_uri = $self->_qname_to_uri ($value);
             }
-            &_property ($prop_uri => $prop_uri);
+            &_property ($prop_uri => $prop_uri, $let_param => $let_param);
           } (SEMICOLON) {
             // empty-rule
+          }
+
+          lang:Perl {
+            my $value = $self->{value}->[-1];
+            my $prop = $self->{resource};
+            my $func = sub {
+              my $value = $value->();
+              for my $prop_uri (keys %$prop) {
+                ## TODO: set props
+              }
+              return $value;
+            };
+            $self->{value}->[-1] = sub {
+              return $func->();
+            };
+
+            $self->{resource} = pop @{$self->{resources}};
           }
           ~ (RBRACE) { }
         }
       }
     } // value
 
-    rule primitive-or-function : recursive {
+    rule primitive-or-function ($let_param) : recursive {
       /*
         primitive-or-function := primitive-value / function-call
 
@@ -1061,78 +1212,158 @@ IFClsDef:
                       (<Q::DISLang|Number>, -eval $v);
             }
           }
-        } (NAME) {
-          /*
-            function-call := NAME [LPAREN
-                [primitive-or-function *(COMMA primitive-or-function)] RPAREN]
-          */
-          my $function_name;
-          lang:Perl ($value => $token.value) {
-            $function_name = $value;
-            push @{$self->{values}}, $self->{value};
-            $self->{value} = [];
-          }
+      } (NAME) {
+        /*
+          function-call := NAME [LPAREN
+              [primitive-or-function *(COMMA primitive-or-function)] RPAREN]
+        */
+        my $function_name;
+        lang:Perl ($value => $token.value) {
+          $function_name = $value;
+          push @{$self->{values}}, $self->{value};
+          $self->{value} = [];
+        }
 
         ~? (LPAREN) {
-          &primitive-or-function;
+          &primitive-or-function ($let_param => $let_param);
           ~* (COMMA) {
-            &primitive-or-function;
+            &primitive-or-function ($let_param => $let_param);
           }
           ~ (RPAREN) { }
         }
 
-          lang:Perl {
+        lang:Perl {
             my $param = $self->{value};
             $self->{value} = pop @{$self->{values}};
 
-            ## TODO: param number check
-
-            if ($function_name eq 'tr'.'ue') {
-              push @{$self->{value}},
-                  $self->{impl}->create_dv_value_ref
-                      (<Q::DISLang|Boolean>, 1);
-            } elsif ($function_name eq 'fal'.'se') {
-              push @{$self->{value}},
-                  $self->{impl}->create_dv_value_ref
-                      (<Q::DISLang|Boolean>, 0);
-            } elsif ($function_name eq 'nu'.'ll') {
-              push @{$self->{value}}, 
-                  my $v = $self->{impl}->create_dv_value_ref
-                      (<Q::DISLang|Null>, 0);
-              $v->is_null (1);
-            } elsif ($function_name eq 'with-type') {
-              my $new_type = $param->[1]->value;
-              ## TODO:
-            } elsif ($function_name eq 'local-name') {
-              if ($param->[0]->can ('local_name')) {
-                push @{$self->{value}},
-                    $self->{impl}->create_dv_value 
+            my $funcdef = {
+              'fal'.'se' => {
+                param => [],
+                return => sub {
+                  $self->{impl}->create_dv_value_ref (<Q::DISLang|Boolean>, 0);
+                },
+              },
+              'local-name' => {
+                param => [
+                  {},
+                ],
+                return => sub {
+                  my ($param) = @_;
+                  if ($param->[0]->can ('local_name')) {
+                    return $self->{impl}->create_dv_value 
                         (<Q::DISLang|String>, $param->[0]->local_name);
-              } else {
-                push @{$self->{value}}, $param->[0];
-              }
-            } elsif ($function_name eq 'namespace-uri') {
-              my $nsuri;
-              if ($param->[0]->can ('namespace_uri')) {
-                $nsuri = $param->[0]->namespace_uri;
-              }
-              push @{$self->{value}},
+                  } else {
+                    return $param->[0];
+                  }                  
+                },
+              },
+              'namespace-prefix' => {
+                param => [
+                  {},
+                ],
+                return => sub {
+                  my ($param) = @_;
+                  my $prefix;
+                  if ($param->[0]->can ('prefix')) {
+                    $prefix = $param->[0]->prefix;
+                  }                  
+                  my $v = $self->{impl}->create_dv_value
+                      (<Q::DISCore|String>, defined $prefix ? $prefix : '');
+                  $v->is_null (1) unless defined $prefix;
+                  return $v;
+                },
+              },
+              'namespace-uri' => {
+                param => [
+                  {},
+                ],
+                return => sub {
+                  my ($param) = @_;
+                  my $nsuri;
+                  if ($param->[0]->can ('namespace_uri')) {
+                    $nsuri = $param->[0]->namespace_uri;
+                  }                  
                   my $v = $self->{impl}->create_dv_value
                       (<Q::DISLang|URI>, defined $nsuri ? $nsuri : '');
-              $v->is_null (1) unless defined $nsuri;
-            } elsif ($function_name eq 'namespace-prefix') {
-              my $prefix;
-              if ($param->[0]->can ('prefix')) {
-                $prefix = $param->[0]->prefix;
+                  $v->is_null (1) unless defined $nsuri;
+                  return $v;
+                },
+              },
+              'nu'.'ll' => {
+                param => [],
+                return => sub {
+                  my $v = $self->{impl}->create_dv_value_ref
+                      (<Q::DISLang|Null>, 0);
+                  $v->is_null (1);
+                  return $v;
+                },
+              },
+              'tr'.'ue' => {
+                param => [],
+                return => sub {
+                  $self->{impl}->create_dv_value_ref (<Q::DISLang|Boolean>, 1);
+                },
+              },
+              'with-type' => {
+                param => [
+                  {},
+                  {},
+                ],
+                return => sub {
+                  my ($param) = @_;
+                  ## TODO:
+                },
+              },
+            }->{$function_name};
+
+            unless ($funcdef) {
+              my $location = {
+                utf32_offset => pos (${$self->{source}}),
+              };
+              my $continue = __c|ERROR{dit|unknown-function-error::
+                c|location => {$location},
+                dit|function-name => {$function_name},
+              }__;
+              unless ($continue) {
+                __EXCEPTION{dit|PARSE_ERR}__;
               }
-              push @{$self->{value}},
-                  my $v = $self->{impl}->create_dv_value
-                      (<Q::DISLang|String>, defined $prefix ? $prefix : '');
-              $v->is_null (1) unless defined $prefix;
-            } else {
-              ## TODO: error
             }
+            if (@$param != @{$funcdef->{param}}) {
+              my $location = {
+                utf32_offset => pos (${$self->{source}}),
+              };
+              my $continue = __c|ERROR{dit|param-number-unmatch-error::
+                c|location => {$location},
+                dit|function-name => {$function_name},
+                dit|function-param-number => {scalar @{$funcdef->{param}}},
+                dit|function-argument-number => {scalar @$param},
+              }__;
+              unless ($continue) {
+                __EXCEPTION{dit|PARSE_ERR}__;
+              }
+            }
+
+            my $has_ref;
+            for (@$param) {
+              if (ref $_ eq 'CODE') {
+                $has_ref = 1;
+                last;
+              }
+            }
+          if ($has_ref) {
+            push @{$self->{value}}, sub {
+              for (@$param) {
+                if (ref $_ eq 'CODE') {
+                  $_ = $_->();
+                }
+              }
+              return $funcdef->{return}->($param);
+            };
+          } else {
+            push @{$self->{value}}, $funcdef->{return}->($param);
           }
+        }
+      }
     } // primitive-or-function
 
     token-error default : default {
@@ -1436,3 +1667,46 @@ ErrDef:
   @enMufDef:
     Namespace prefix |%p (name => {<Q::dit|namespace-prefix>});| is
     already bound to <%p (name => {<Q::dit|old-definition>});>
+
+ErrDef:
+  @QName: dit|unknown-function-error
+  @enDesc:
+    This error <kwd:MUST> be reported when an unknown function
+    is attempted to be invoked.
+  @c:severity: c|SEVERITY_ERROR
+  @enMufDef:
+    Function |%p (name => {<Q::dit|function-name>});| is not defined
+
+ErrDef:
+  @QName: dit|param-number-unmatch-error
+  @enDesc:
+    This error <kwd:MUST> be reported when the number of the arguments
+    given to the function is different from the number of the arguments
+    expected by the function.
+  @c:severity: c|SEVERITY_ERROR
+  @enMufDef:
+    Function |%p (name => {<Q::dit|function-name>});| receives
+    %p (name => {<Q::dit|function-argument-number>}); arguments
+    where %p (name => {<Q::dit|function-parameter-number>});
+    is expected
+
+PropDef:
+  @QName: dit|function-name
+
+PropDef:
+  @QName: dit|function-argument-number
+
+PropDef:
+  @QName: dit|function-param-number
+
+ErrDef:
+  @QName: dit|let-param-not-defined-error
+  @enDesc:
+    This error <kwd:MUST> be reported when an undefined
+    variable reference is found.
+  @c:severity: c|SEVERITY_ERROR
+  @enMufDef:
+    Variable |%p (name => {<Q::dit|param-name>});| is not defined
+
+PropDef:
+  @QName: dit|param-name
