@@ -503,7 +503,7 @@ for my $v (
   ok $st, $v->[3], 'Text or binary: ' . $v->[4];
 
   ## Unknown type
-  my $st = What::ContentType->get_sniffed_type (get_file_head => sub {
+  $st = What::ContentType->get_sniffed_type (get_file_head => sub {
     return $v->[0]; 
   },
   supported_image_types => {'image/jpeg' => 1});
@@ -538,7 +538,7 @@ for my $v (
   }
 
   ## Feed or HTML
-  my $st = What::ContentType->get_sniffed_type (get_file_head => sub {
+  $st = What::ContentType->get_sniffed_type (get_file_head => sub {
     return $v->[0]; 
   },
   http_content_type_byte => 'text/html',
@@ -547,5 +547,5 @@ for my $v (
 }
 
 ## License: Public Domain.
-## $Date: 2007/04/24 13:35:35 $
+## $Date: 2007/04/24 14:24:33 $
 1;
