@@ -1,0 +1,170 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>What::ContentType - What Sniffed Type the Entity is?</title>
+<link rev="made" href="mailto:admin@suika.fam.cx" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#method">METHOD</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#license">LICENSE</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>What::ContentType - What Sniffed Type the Entity is?</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+  require What::ContentType;
+  my $sniffed_type = What::ContentType-&gt;get_sniffed_type (
+    get_file_head =&gt; sub {
+      my $n = shift;
+      return $first_n_bytes_of_the_entity;
+    },
+    http_content_type_byte =&gt; $content_type_field_body_of_the_entity_in_bytes,
+    has_http_content_encoding =&gt; $is_there_cotntent_encoding_field ? 1 : 0,
+    supported_image_types =&gt; {
+      'image/jpeg' =&gt; 1, 'image/png' =&gt; 1, 'image/gif' =&gt; 1, # for example
+    },
+  );</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>The <code>What::ContentType</code> module can be used when you want to
+know <em>what</em> the media type, or <em>content type</em>, of an entity is in fact.
+It implements the algorithm for sniffing a file used when
+a Web browser determine how to handle it, as defined
+in Web Applications 1.0 (aka HTML5) specification.</p>
+<p>
+</p>
+<hr />
+<h1><a name="method">METHOD</a></h1>
+<dl>
+<dt><strong><a name="item_get_sniffed_type"><em>$sniffed_type</em> = What::ContentType-&gt;get_sniffed_type (<em>named-parameters</em>)</a></strong><br />
+</dt>
+<dd>
+Returns the sniffed type of an entity.
+</dd>
+<dl>
+<dt><strong><a name="item_content_type_metadata">content_type_metadata</a></strong><br />
+</dt>
+<dd>
+The Content-Type metadata as defined in Web Applications 1.0.
+The value of this parameter MUST be an Internet Media Type (with
+any parameters), that match to the <code>media-type</code> rule
+defined in RFC 2616.
+</dd>
+<dd>
+<p>If the <a href="#item_http_content_type_byte"><code>http_content_type_byte</code></a> parameter is specified,
+then this parameter has no effect.  Otherwise,
+this parameter MUST be specified if and only if any Content-Type metadata
+is available.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_get_file_head">get_file_head</a></strong><br />
+</dt>
+<dd>
+The code reference used to obtain first <em>$n</em> bytes of the 
+entity sniffed.  The value of this parameter MUST be a
+reference to a subroutine that returns a string.
+</dd>
+<dd>
+<p>This parameter MUST be specified.  If missing, an empty
+(zero-length) entity is assumed.</p>
+</dd>
+<dd>
+<p>When invoked, the code receives a parameter <em>$n</em> that 
+represents the number of bytes expected.  The code SHOULD
+return <em>$n</em> bytes at the beginning of the entity.
+If more than <em>$n</em> bytes are returned, then <em>$n</em> + 1
+byte and later are discarded.  The code MAY return
+a string whose length is less than <em>$n</em> bytes
+if no more bytes is available.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_has_http_content_encoding">has_http_content_encoding</a></strong><br />
+</dt>
+<dd>
+Whether the entity has HTTP <code>Content-Encoding</code> header field specified.
+</dd>
+<dd>
+<p>This parameter MUST be set to a true value
+if and only if the entity is transfered over HTTP
+and the HTTP response entity contains the <code>Content-Encoding</code>
+header field.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_http_content_type_byte">http_content_type_byte</a></strong><br />
+</dt>
+<dd>
+The byte sequence of the <code>field-body</code> part of the HTTP
+<code>Content-Type</code> header field of the entity.
+</dd>
+<dd>
+<p>This parameter MUST be set to the byte sequence of
+the <code>Content-Type</code> header field's <code>field-body</code> of
+the entity if and only if it is transfered over HTTP
+and the HTTP response entity contains the <code>Content-Type</code>
+header field.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_supported_image_types">supported_image_types</a></strong><br />
+</dt>
+<dd>
+A reference to the hash that contains the list of supported
+image types.
+</dd>
+<dd>
+<p>This parameter MUST be set to a reference to the hash
+whose keys are Internet Media Types (without any parameter)
+and whose values are whether image formats with those Internet Media Types
+are supported or not.  A value MUST be true if and only
+if the Internet Media Type is supported.</p>
+</dd>
+<dd>
+<p>If this parameter is missing, then no image types are 
+considered as supported.</p>
+</dd>
+<p></p></dl>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p>Web Applications 1.0 Working Draft - 
+Determining the type of a new resource in a browsing context
+&lt;http://www.whatwg.org/specs/web-apps/current-work/#content-type-sniffing&gt;</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;.</p>
+<p>
+</p>
+<hr />
+<h1><a name="license">LICENSE</a></h1>
+<p>Copyright 2007 Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;</p>
+<p>This library is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.</p>
+
+</body>
+
+</html>
