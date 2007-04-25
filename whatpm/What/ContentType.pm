@@ -29,7 +29,7 @@ in Web Applications 1.0 (aka HTML5) specification.
 
 package What::ContentType;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## Table in <http://www.whatwg.org/specs/web-apps/current-work/#content-type1>.
 ##
@@ -116,6 +116,8 @@ my @ImageSniffingTable = (
 =item I<$sniffed_type> = What::ContentType->get_sniffed_type (I<named-parameters>)
 
 Returns the sniffed type of an entity.
+
+Named parameters:
 
 =over 4
 
@@ -369,4 +371,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2007/04/24 14:33:40 $
+# $Date: 2007/04/25 11:19:22 $
