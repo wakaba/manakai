@@ -1,6 +1,6 @@
 package What::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## This is a very, very early version of an HTML parser.
 
@@ -15876,4 +15876,4 @@ sub _tokenize_attempt_to_consume_an_entity ($) {
 } # _tokenize_attempt_to_consume_an_entity
 
 1;
-# $Date: 2007/04/28 14:29:00 $
+# $Date: 2007/04/28 14:31:34 $

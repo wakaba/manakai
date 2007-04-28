@@ -29,7 +29,7 @@ in Web Applications 1.0 (aka HTML5) specification.
 
 package What::ContentType;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## Table in <http://www.whatwg.org/specs/web-apps/current-work/#content-type1>.
 ##
@@ -44,7 +44,6 @@ our @UnknownSniffingTable = (
   [
     "\xFF\xFF\xDF\xDF\xDF\xDF\xDF\xDF\xDF\xFF\xDF\xDF\xDF\xDF",
     "\x3C\x21\x44\x4F\x43\x54\x59\x50\x45\x20\x48\x54\x4D\x4C",
-         ## ISSUE: Second byte of pattern is incorrect in spec
     "text/html",
   ],
   [
@@ -356,7 +355,7 @@ sub get_sniffed_type ($%) {
 Web Applications 1.0 Working Draft - 
 Determining the type of a new resource in a browsing context
 <http://www.whatwg.org/specs/web-apps/current-work/#content-type-sniffing>
-(Revision 780, 25 April 2007)
+(Revision 789, 28 April 2007)
 
 =head1 AUTHOR
 
@@ -372,4 +371,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2007/04/28 14:29:00 $
+# $Date: 2007/04/28 14:31:34 $
