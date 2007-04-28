@@ -1,0 +1,1200 @@
+package What::HTML;
+use strict;
+our $VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+
+## This is a very, very early version of an HTML parser.
+
+my $permitted_slash_tag_name = {
+  base => 1,
+  link => 1,
+  meta => 1,
+  hr => 1,
+  br => 1,
+  img=> 1,
+  embed => 1,
+  param => 1,
+  area => 1,
+  col => 1,
+  input => 1,
+};
+
+sub new ($) {
+  my $class = shift;
+  my $self = bless {}, $class;
+  $self->{set_next_input_character} = sub {
+    $self->{next_input_character} = -1;
+  };
+  $self->{parse_error} = sub {
+    # 
+  };
+  return $self;
+} # new
+
+## Implementations MUST act as if state machine in the spec
+
+sub _initialize_tokenizer ($) {
+  my $self = shift;
+  $self->{state} = 'data'; # MUST
+  $self->{content_model_flag} = 'PCDATA'; # be
+  undef $self->{current_token}; # start tag, end tag, comment, or DOCTYPE
+  undef $self->{current_attribute};
+  undef $self->{last_emitted_start_tag_name};
+  undef $self->{last_attribute_value_state};
+  $self->{char} = [];
+  # $self->{next_input_character}
+  !!!next-input-character;
+  $self->{token} = [];
+} # _initialize_tokenizer
+
+## A token has:
+##   ->{type} eq 'DOCTYPE', 'start tag', 'end tag', 'comment',
+##       'character', or 'end-of-file'
+##   ->{name} (DOCTYPE, start tag (tagname), end tag (tagname))
+    ## ISSUE: the spec need s/tagname/tag name/
+##   ->{error} == 1 or 0 (DOCTYPE)
+##   ->{attributes} isa HASH (start tag, end tag)
+##   ->{data} (comment, character)
+
+## Macros
+##   Macros MUST be preceded by three EXCLAMATION MARKs.
+##   emit ($token)
+##     Emits the specified token.
+
+## Emitted token MUST immediately be handled by the tree construction state.
+
+## Before each step, UA MAY check to see if either one of the scripts in
+## "list of scripts that will execute as soon as possible" or the first
+## script in the "list of scripts that will execute asynchronously",
+## has completed loading.  If one has, then it MUST be executed
+## and removed from the list.
+
+sub _get_next_token ($) {
+  my $self = shift;
+  if (@{$self->{token}}) {
+    return shift @{$self->{token}};
+  }
+
+  A: {
+    if ($self->{state} eq 'data') {
+      if ($self->{next_input_character} == 0x0026) { # &
+        if ($self->{content_model_flag} eq 'PCDATA' or
+            $self->{content_model_flag} eq 'RCDATA') {
+          $self->{state} = 'entity data';
+          !!!next-input-character;
+          redo A;
+        } else {
+          #
+        }
+      } elsif ($self->{next_input_character} == 0x003C) { # <
+        if ($self->{content_model_flag} ne 'PLAINTEXT') {
+          $self->{state} = 'tag open';
+          !!!next-input-character;
+          redo A;
+        } else {
+          #
+        }
+      } elsif ($self->{next_input_character} == -1) {
+        !!!emit ({type => 'end-of-file'});
+        last A; ## TODO: ok?
+      }
+      # Anything else
+      my $token = {type => 'character',
+                   data => chr $self->{next_input_character}};
+      ## Stay in the data state
+      !!!next-input-character;
+
+      !!!emit ($token);
+
+      redo A;
+    } elsif ($self->{state} eq 'entity data') {
+      ## (cannot happen in CDATA state)
+      
+      my $token = $self->_tokenize_attempt_to_consume_an_entity;
+
+      $self->{state} = 'data';
+      # next-input-character is already done
+
+      unless (defined $token) {
+        !!!emit ({type => 'character', data => '&'});
+      } else {
+        !!!emit ($token);
+      }
+
+      redo A;
+    } elsif ($self->{state} eq 'tag open') {
+      if ($self->{content_model_flag} eq 'RCDATA' or
+          $self->{content_model_flag} eq 'CDATA') {
+        if ($self->{next_input_character} == 0x002F) { # /
+          !!!next-input-character;
+          $self->{state} = 'close tag open';
+          redo A;
+        } else {
+          ## reconsume
+          $self->{state} = 'data';
+
+          !!!emit (type => 'character', data => {'/'});
+
+          redo A;
+        }
+      } elsif ($self->{content_model_flag} eq 'PCDATA') {
+        if ($self->{next_input_character} == 0x0021) { # !
+          $self->{state} = 'markup declaration open';
+          !!!next-input-character;
+          redo A;
+        } elsif ($self->{next_input_character} == 0x002F) { # /
+          $self->{state} = 'close tag open';
+          !!!next-input-character;
+          redo A;
+        } elsif (0x0041 <= $self->{next_input_character} and
+                 $self->{next_input_character} <= 0x005A) { # A..Z
+          $self->{current_token}
+            = {type => 'start tag',
+               tag_name => chr ($self->{next_input_character} + 0x0020)};
+          $self->{state} = 'tag name';
+          !!!next-input-character;
+          redo A;
+        } elsif (0x0061 <= $self->{next_input_character} and
+                 $self->{next_input_character} <= 0x007A) { # a..z
+          $self->{current_token} = {type => 'start tag',
+                            tag_name => chr ($self->{next_input_character})};
+          $self->{state} = 'tag name';
+          !!!next-input-character;
+          redo A;
+        } elsif ($self->{next_input_character} == 0x003E) { # >
+          !!!parse-error;
+          $self->{state} = 'data';
+          !!!next-input-character;
+
+          !!!emit ({type => 'character', data => '>'});
+
+          redo A;
+        } elsif ($self->{next_input_character} == 0x003F) { # ?
+          !!!parse-error;
+          $self->{state} = 'bogus comment';
+          ## $self->{next_input_character} is intentionally left as is
+          redo A;
+        } else {
+          !!!parse-error;
+          $self->{state} = 'data';
+          ## reconsume
+
+          !!!emit ({type => 'character', data => '<'});
+
+          redo A;
+        }
+      } else {
+        die "$0: $self->{content_model_flag}: Unknown content model flag";
+      }
+    } elsif ($self->{state} eq 'close tag open') {
+      if ($self->{content_model_flag} eq 'RCDATA' or
+          $self->{content_model_flag} eq 'CDATA') {
+        my @next_char;
+        TAGNAME: for (my $i = 0; $i < length $self->{last_emitted_start_tag_name}; $i++) {
+          push @next_char, $self->{next_input_character};
+          my $c = ord substr ($self->{last_emitted_start_tag_name}, $i, 1);
+          my $C = 0x0061 <= $c && $c <= 0x007A ? $c - 0x0020 : $c;
+          if ($self->{next_input_character} == $c or $self->{next_input_character} == $C) {
+            !!!next-input-character;
+            next TAGNAME;
+          } else {
+            !!!parse-error;
+            $self->{next_input_character} = shift @next_char; # reconsume
+            !!!back-next-input-character (@next_char);
+            $self->{state} = 'data';
+
+            !!!emit ({type => 'character', data => '</'});
+
+            redo A;
+          }
+        }
+    
+        unless ($self->{next_input_character} == 0x0009 or
+                $self->{next_input_character} == 0x000A or
+                $self->{next_input_character} == 0x000B or
+                $self->{next_input_character} == 0x000C or
+                $self->{next_input_character} == 0x0020 or
+                $self->{next_input_character} == 0x003E or
+                $self->{next_input_character} == 0x002F or
+                $self->{next_input_character} == 0x003C or
+                $self->{next_input_character} == -1) {
+          !!!parse-error;
+          $self->{next_input_character} = shift @next_char; # reconsume
+          !!!back-next-input-character (@next_char);
+          $self->{state} = 'data';
+
+          !!!emit ({type => 'character', data => '</'});
+
+          redo A;
+        } else {
+          $self->{next_input_character} = shift @next_char;
+          !!!back-next-input-character (@next_char);
+          # and consume...
+        }
+      }
+      
+      if (0x0041 <= $self->{next_input_character} and
+          $self->{next_input_character} <= 0x005A) { # A..Z
+        $self->{current_token} = {type => 'end tag',
+                          tag_name => chr ($self->{next_input_character} + 0x0020)};
+        $self->{state} = 'tag name';
+        !!!next-input-character;
+        redo A;
+      } elsif (0x0061 <= $self->{next_input_character} and
+               $self->{next_input_character} <= 0x007A) { # a..z
+        $self->{current_token} = {type => 'end tag',
+                          tag_name => chr ($self->{next_input_character})};
+        $self->{state} = 'tag name';
+        !!!next-input-character;
+        redo A;
+      } elsif ($self->{next_input_character} == 0x003E) { # >
+        !!!parse-error;
+        $self->{state} = 'data';
+        !!!next-input-character;
+        redo A;
+      } elsif ($self->{next_input_character} == -1) {
+        !!!parse-error;
+        $self->{state} = 'data';
+        # reconsume
+
+        !!!emit ({type => 'character', data => '</'});
+
+        redo A;
+      } else {
+        !!!parse-error;
+        $self->{state} = 'bogus comment';
+        ## $self->{next_input_character} is intentionally left as is
+        redo A;
+      }
+    } elsif ($self->{state} eq 'tag name') {
+      if ($self->{next_input_character} == 0x0009 or # HT
+          $self->{next_input_character} == 0x000A or # LF
+          $self->{next_input_character} == 0x000B or # VT
+          $self->{next_input_character} == 0x000C or # FF
+          $self->{next_input_character} == 0x0020) { # SP
+        $self->{state} = 'before attribute name';
+        !!!next-input-character;
+        redo A;
+      } elsif ($self->{next_input_character} == 0x003E) { # >
+        if ($self->{current_token}->{type} eq 'start tag') {
+          $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
+        } elsif ($self->{current_token}->{type} eq 'end tag') {
+          $self->{content_model_flag} = 'PCDATA'; # MUST
+          if ($self->{current_token}->{attribute}) {
+            !!!parse-error;
+          }
+        } else {
+          die "$0: $self->{current_token}->{type}: Unknown token type";
+        }
+        $self->{state} = 'data';
+        !!!next-input-character;
+
+        !!!emit ($self->{current_token}); # start tag or end tag
+        undef $self->{current_token};
+
+        redo A;
+      } elsif (0x0041 <= $self->{next_input_character} and
+               $self->{next_input_character} <= 0x005A) { # A..Z
+        $self->{current_token}->{tag_name} .= chr ($self->{next_input_character} + 0x0020);
+          # start tag or end tag
+        ## Stay in this state
+        !!!next-input-character;
+        redo A;
+      } elsif ($self->{next_input_character} == 0x003C or # <
+               $self->{next_input_character} == -1) {
+        !!!parse-error;
+        if ($self->{current_token}->{type} eq 'start tag') {
+          $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
+        } elsif ($self->{current_token}->{type} eq 'end tag') {
+          $self->{content_model_flag} = 'PCDATA'; # MUST
+          if ($self->{current_token}->{attribute}) {
+            !!!parse-error;
+          }
+        } else {
+          die "$0: $self->{current_token}->{type}: Unknown token type";
+        }
+        $self->{state} = 'data';
+        # reconsume
+
+        !!!emit ($self->{current_token}); # start tag or end tag
+        undef $self->{current_token};
+
+        redo A;
+      } elsif ($self->{next_input_character} == 0x002F) { # /
+        !!!next-input-character;
+        if ($self->{next_input_character} == 0x003E and # >
+            $self->{current_token}->{type} eq 'start tag' and
+            $permitted_slash_tag_name->{$self->{current_token}->{tag_name}}) {
+          # permitted slash
+          #
+        } else {
+          !!!parse-error;
+        }
+        $self->{state} = 'before attribute name';
+        # next-input-character is already done
+        redo A;
+      } else {
+        $self->{current_token}->{tag_name} .= chr $self->{next_input_character};
+          # start tag or end tag
+        ## Stay in the state
+        !!!next-input-character;
+        redo A;
+      }
+    } elsif ($self->{state} eq 'before attribute name') {
+      if ($self->{next_input_character} == 0x0009 or # HT
+          $self->{next_input_character} == 0x000A or # LF
+          $self->{next_input_character} == 0x000B or # VT
+          $self->{next_input_character} == 0x000C or # FF
+          $self->{next_input_character} == 0x0020) { # SP
+        ## Stay in the state
+        !!!next-input-character;
+        redo A;
+      } elsif ($self->{next_input_character} == 0x003E) { # >
+        if ($self->{current_token}->{type} eq 'start tag') {
+          $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
+        } elsif ($self->{current_token}->{type} eq 'end tag') {
+          $self->{content_model_flag} = 'PCDATA'; # MUST
+          if ($self->{current_token}->{attribute}) {
+            !!!parse-error;
+          }
+        } else {
+          die "$0: $self->{current_token}->{type}: Unknown token type";
+        }
+        $self->{state} = 'data';
+        !!!next-input-character;
+
+        !!!emit ($self->{current_token}); # start tag or end tag
+        undef $self->{current_token};
+
+        redo A;
+      } elsif (0x0041 <= $self->{next_input_character} and
+               $self->{next_input_character} <= 0x005A) { # A..Z
+        $self->{current_attribute} = {name => chr ($self->{next_input_character} + 0x0020),
+                              value => ''};
+        $self->{state} = 'attribute name';
+        !!!next-input-character;
+        redo A;
+      } elsif ($self->{next_input_character} == 0x002F) { # /
+        !!!next-input-character;
+        if ($self->{next_input_character} == 0x003E and # >
+            $self->{current_token}->{type} eq 'start tag' and
+            $permitted_slash_tag_name->{$self->{current_token}->{tag_name}}) {
+          # permitted slash
+          #
+        } else {
+          !!!parse-error;
+        }
+        ## Stay in the state
+        # next-input-character is already done
+        redo A;
+      } elsif ($self->{next_input_character} == 0x003C or # <
+               $self->{next_input_character} == -1) {
+        !!!parse-error;
+        if ($self->{current_token}->{type} eq 'start tag') {
+          $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
+        } elsif ($self->{current_token}->{type} eq 'end tag') {
+          $self->{content_model_flag} = 'PCDATA'; # MUST
+          if ($self->{current_token}->{attribute}) {
+            !!!parse-error;
+          }
+        } else {
+          die "$0: $self->{current_token}->{type}: Unknown token type";
+        }
+        $self->{state} = 'data';
+        # reconsume
+
+        !!!emit ($self->{current_token}); # start tag or end tag
+        undef $self->{current_token};
+
+        redo A;
+      } else {
+        $self->{current_attribute} = {name => chr ($self->{next_input_character}),
+                              value => ''};
+        $self->{state} = 'attribute name';
+        !!!next-input-character;
+        redo A;
+      }
+    } elsif ($self->{state} eq 'attribute name') {
+      my $before_leave = sub {
+        if (exists $self->{current_token}->{attribute} # start tag or end tag
+            ->{$self->{current_attribute}->{name}}) { # MUST
+          !!!parse-error;
+          ## Discard $self->{current_attribute} # MUST
+        } else {
+          $self->{current_token}->{attribute}->{$self->{current_attribute}->{name}}
+            = $self->{current_attribute};
+        }
+        undef $self->{current_attribute};
+      }; # $before_leave
+
+      if ($self->{next_input_character} == 0x0009 or # HT
+          $self->{next_input_character} == 0x000A or # LF
+          $self->{next_input_character} == 0x000B or # VT
+          $self->{next_input_character} == 0x000C or # FF
+          $self->{next_input_character} == 0x0020) { # SP
+        $before_leave->();
+        $self->{state} = 'after attribute name';
+        !!!next-input-character;
+        redo A;
+      } elsif ($self->{next_input_character} == 0x003D) { # =
+        $before_leave->();
+        $self->{state} = 'before attribute value';
+        !!!next-input-character;
+        redo A;
+      } elsif ($self->{next_input_character} == 0x003E) { # >
+        $before_leave->();
+        if ($self->{current_token}->{type} eq 'start tag') {
+          $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
+        } elsif ($self->{current_token}->{type} eq 'end tag') {
+          $self->{content_model_flag} = 'PCDATA'; # MUST
+          if ($self->{current_token}->{attribute}) {
+            !!!parse-error;
+          }
+        } else {
+          die "$0: $self->{current_token}->{type}: Unknown token type";
+        }
+        $self->{state} = 'data';
+        !!!next-input-character;
+
+        !!!emit ($self->{current_token}); # start tag or end tag
+        undef $self->{current_token};
+
+        redo A;
+      } elsif (0x0041 <= $self->{next_input_character} and
+               $self->{next_input_character} <= 0x005A) { # A..Z
+        $self->{current_attribute}->{name} .= chr ($self->{next_input_character} + 0x0020);
+        ## Stay in the state
+        !!!next-input-character;
+        redo A;
+      } elsif ($self->{next_input_character} == 0x002F) { # /
+        $before_leave->();
+        !!!next-input-character;
+        if ($self->{next_input_character} == 0x003E and # >
+            $self->{current_token}->{type} eq 'start tag' and
+            $permitted_slash_tag_name->{$self->{current_token}->{tag_name}}) {
+          # permitted slash
+          #
+        } else {
+          !!!parse-error;
+        }
+        $self->{state} = 'before attribute name';
+        # next-input-character is already done
+        redo A;
+      } elsif ($self->{next_input_character} == 0x003C or # <
+               $self->{next_input_character} == -1) {
+        !!!parse-error;
+        $before_leave->();
+        if ($self->{current_token}->{type} eq 'start tag') {
+          $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
+        } elsif ($self->{current_token}->{type} eq 'end tag') {
+          $self->{content_model_flag} = 'PCDATA'; # MUST
+          if ($self->{current_token}->{attribute}) {
+            !!!parse-error;
+          }
+        } else {
+          die "$0: $self->{current_token}->{type}: Unknown token type";
+        }
+        $self->{state} = 'data';
+        # reconsume
+
+        !!!emit ($self->{current_token}); # start tag or end tag
+        undef $self->{current_token};
+
+        redo A;
+      } else {
+        $self->{current_attribute}->{name} .= chr ($self->{next_input_character});
+        ## Stay in the state
+        !!!next-input-character;
+        redo A;
+      }
+    } elsif ($self->{state} eq 'after attribute name') {
+      if ($self->{next_input_character} == 0x0009 or # HT
+          $self->{next_input_character} == 0x000A or # LF
+          $self->{next_input_character} == 0x000B or # VT
+          $self->{next_input_character} == 0x000C or # FF
+          $self->{next_input_character} == 0x0020) { # SP
+        ## Stay in the state
+        !!!next-input-character;
+        redo A;
+      } elsif ($self->{next_input_character} == 0x003D) { # =
+        $self->{state} = 'before attribute value';
+        !!!next-input-character;
+        redo A;
+      } elsif ($self->{next_input_character} == 0x003E) { # >
+        if ($self->{current_token}->{type} eq 'start tag') {
+          $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
+        } elsif ($self->{current_token}->{type} eq 'end tag') {
+          $self->{content_model_flag} = 'PCDATA'; # MUST
+          if ($self->{current_token}->{attribute}) {
+            !!!parse-error;
+          }
+        } else {
+          die "$0: $self->{current_token}->{type}: Unknown token type";
+        }
+        $self->{state} = 'data';
+        !!!next-input-character;
+
+        !!!emit ($self->{current_token}); # start tag or end tag
+        undef $self->{current_token};
+
+        redo A;
+      } elsif (0x0041 <= $self->{next_input_character} and
+               $self->{next_input_character} <= 0x005A) { # A..Z
+        $self->{current_attribute} = {name => chr ($self->{next_input_character} + 0x0020),
+                              value => ''};
+        $self->{state} = 'attribute name';
+        !!!next-input-character;
+        redo A;
+      } elsif ($self->{next_input_character} == 0x002F) { # /
+        !!!next-input-character;
+        if ($self->{next_input_character} == 0x003E and # >
+            $self->{current_token}->{type} eq 'start tag' and
+            $permitted_slash_tag_name->{$self->{current_token}->{tag_name}}) {
+          # permitted slash
+          #
+        } else {
+          !!!parse-error;
+        }
+        $self->{state} = 'before attribute name';
+        # next-input-character is already done
+        redo A;
+      } elsif ($self->{next_input_character} == 0x003C or # <
+               $self->{next_input_character} == -1) {
+        !!!parse-error;
+        if ($self->{current_token}->{type} eq 'start tag') {
+          $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
+        } elsif ($self->{current_token}->{type} eq 'end tag') {
+          $self->{content_model_flag} = 'PCDATA'; # MUST
+          if ($self->{current_token}->{attribute}) {
+            !!!parse-error;
+          }
+        } else {
+          die "$0: $self->{current_token}->{type}: Unknown token type";
+        }
+        $self->{state} = 'data';
+        # reconsume
+
+        !!!emit ($self->{current_token}); # start tag or end tag
+        undef $self->{current_token};
+
+        redo A;
+      } else {
+        $self->{current_attribute} = {name => chr ($self->{next_input_character}),
+                              value => ''};
+        $self->{state} = 'attribute name';
+        !!!next-input-character;
+        redo A;        
+      }
+    } elsif ($self->{state} eq 'before attribute value') {
+      if ($self->{next_input_character} == 0x0009 or # HT
+          $self->{next_input_character} == 0x000A or # LF
+          $self->{next_input_character} == 0x000B or # VT
+          $self->{next_input_character} == 0x000C or # FF
+          $self->{next_input_character} == 0x0020) { # SP      
+        ## Stay in the state
+        !!!next-input-character;
+        redo A;
+      } elsif ($self->{next_input_character} == 0x0022) { # "
+        $self->{state} = 'attribute value (double-quoted)';
+        !!!next-input-character;
+        redo A;
+      } elsif ($self->{next_input_character} == 0x0026) { # &
+        $self->{state} = 'attribute value (unquoted)';
+        ## reconsume
+        redo A;
+      } elsif ($self->{next_input_character} == 0x0027) { # '
+        $self->{state} = 'attribute value (single-quoted)';
+        !!!next-input-character;
+        redo A;
+      } elsif ($self->{next_input_character} == 0x003E) { # >
+        if ($self->{current_token}->{type} eq 'start tag') {
+          $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
+        } elsif ($self->{current_token}->{type} eq 'end tag') {
+          $self->{content_model_flag} = 'PCDATA'; # MUST
+          if ($self->{current_token}->{attribute}) {
+            !!!parse-error;
+          }
+        } else {
+          die "$0: $self->{current_token}->{type}: Unknown token type";
+        }
+        $self->{state} = 'data';
+        !!!next-input-character;
+
+        !!!emit ($self->{current_token}); # start tag or end tag
+        undef $self->{current_token};
+
+        redo A;
+      } elsif ($self->{next_input_character} == 0x003C or # <
+               $self->{next_input_character} == -1) {
+        !!!parse-error;
+        if ($self->{current_token}->{type} eq 'start tag') {
+          $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
+        } elsif ($self->{current_token}->{type} eq 'end tag') {
+          $self->{content_model_flag} = 'PCDATA'; # MUST
+          if ($self->{current_token}->{attribute}) {
+            !!!parse-error;
+          }
+        } else {
+          die "$0: $self->{current_token}->{type}: Unknown token type";
+        }
+        $self->{state} = 'data';
+        ## reconsume
+
+        !!!emit ($self->{current_token}); # start tag or end tag
+        undef $self->{current_token};
+
+        redo A;
+      } else {
+        $self->{current_attribute}->{value} .= chr ($self->{next_input_character});
+        $self->{state} = 'attribute value (unquoted)';
+        !!!next-input-character;
+        redo A;
+      }
+    } elsif ($self->{state} eq 'attribute value (double-quoted)') {
+      if ($self->{next_input_character} == 0x0022) { # "
+        $self->{state} = 'before attribute name';
+        !!!next-input-character;
+        redo A;
+      } elsif ($self->{next_input_character} == 0x0026) { # &
+        $self->{last_attribute_value_state} = 'attribute value (double-quoted)';
+        $self->{state} = 'entity in attribute value';
+        !!!next-input-character;
+        redo A;
+      } elsif ($self->{next_input_character} == -1) {
+        !!!parse-error;
+        if ($self->{current_token}->{type} eq 'start tag') {
+          $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
+        } elsif ($self->{current_token}->{type} eq 'end tag') {
+          $self->{content_model_flag} = 'PCDATA'; # MUST
+          if ($self->{current_token}->{attribute}) {
+            !!!parse-error;
+          }
+        } else {
+          die "$0: $self->{current_token}->{type}: Unknown token type";
+        }
+        $self->{state} = 'data';
+        ## reconsume
+
+        !!!emit ($self->{current_token}); # start tag or end tag
+        undef $self->{current_token};
+
+        redo A;
+      } else {
+        $self->{current_attribute}->{value} .= chr ($self->{next_input_character});
+        ## Stay in the state
+        !!!next-input-character;
+        redo A;
+      }
+    } elsif ($self->{state} eq 'attribute value (single-quoted)') {
+      if ($self->{next_input_character} == 0x0027) { # '
+        $self->{state} = 'before attribute name';
+        !!!next-input-character;
+        redo A;
+      } elsif ($self->{next_input_character} == 0x0026) { # &
+        $self->{last_attribute_value_state} = 'attribute value (single-quoted)';
+        $self->{state} = 'entity in attribute value';
+        !!!next-input-character;
+        redo A;
+      } elsif ($self->{next_input_character} == -1) {
+        !!!parse-error;
+        if ($self->{current_token}->{type} eq 'start tag') {
+          $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
+        } elsif ($self->{current_token}->{type} eq 'end tag') {
+          $self->{content_model_flag} = 'PCDATA'; # MUST
+          if ($self->{current_token}->{attribute}) {
+            !!!parse-error;
+          }
+        } else {
+          die "$0: $self->{current_token}->{type}: Unknown token type";
+        }
+        $self->{state} = 'data';
+        ## reconsume
+
+        !!!emit ($self->{current_token}); # start tag or end tag
+        undef $self->{current_token};
+
+        redo A;
+      } else {
+        $self->{current_attribute}->{value} .= chr ($self->{next_input_character});
+        ## Stay in the state
+        !!!next-input-character;
+        redo A;
+      }
+    } elsif ($self->{state} eq 'attribute value (unquoted)') {
+      if ($self->{next_input_character} == 0x0009 or # HT
+          $self->{next_input_character} == 0x000A or # LF
+          $self->{next_input_character} == 0x000B or # HT
+          $self->{next_input_character} == 0x000C or # FF
+          $self->{next_input_character} == 0x0020) { # SP
+        $self->{state} = 'before attribute name';
+        !!!next-input-character;
+        redo A;
+      } elsif ($self->{next_input_character} == 0x0026) { # &
+        $self->{last_attribute_value_state} = 'attribute value (unquoted)';
+        $self->{state} = 'entity in attribute value';
+        !!!next-input-character;
+        redo A;
+      } elsif ($self->{next_input_character} == 0x003E) { # >
+        if ($self->{current_token}->{type} eq 'start tag') {
+          $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
+        } elsif ($self->{current_token}->{type} eq 'end tag') {
+          $self->{content_model_flag} = 'PCDATA'; # MUST
+          if ($self->{current_token}->{attribute}) {
+            !!!parse-error;
+          }
+        } else {
+          die "$0: $self->{current_token}->{type}: Unknown token type";
+        }
+        $self->{state} = 'data';
+        !!!next-input-character;
+
+        !!!emit ($self->{current_token}); # start tag or end tag
+        undef $self->{current_token};
+
+        redo A;
+      } elsif ($self->{next_input_character} == 0x003C or # <
+               $self->{next_input_character} == -1) {
+        !!!parse-error;
+        if ($self->{current_token}->{type} eq 'start tag') {
+          $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
+        } elsif ($self->{current_token}->{type} eq 'end tag') {
+          $self->{content_model_flag} = 'PCDATA'; # MUST
+          if ($self->{current_token}->{attribute}) {
+            !!!parse-error;
+          }
+        } else {
+          die "$0: $self->{current_token}->{type}: Unknown token type";
+        }
+        $self->{state} = 'data';
+        ## reconsume
+
+        !!!emit ($self->{current_token}); # start tag or end tag
+        undef $self->{current_token};
+
+        redo A;
+      } else {
+        $self->{current_attribute}->{value} .= chr ($self->{next_input_character});
+        ## Stay in the state
+        !!!next-input-character;
+        redo A;
+      }
+    } elsif ($self->{state} eq 'entity in attribute value') {
+      my $token = $self->_tokenize_attempt_to_consume_an_entity;
+
+      unless (defined $token) {
+        $self->{current_attribute}->{value} .= '&';
+      } else {
+        $self->{current_attribute}->{value} .= $token->{data};
+        ## ISSUE: spec says "append the returned character token to the current attribute's value"
+      }
+
+      $self->{state} = $self->{last_attribute_value_state};
+      # next-input-character is already done
+      redo A;
+    } elsif ($self->{state} eq 'bogus comment') {
+      ## (only happen if PCDATA state)
+      
+      my $token = {type => 'comment', data => ''};
+
+      BC: {
+        if ($self->{next_input_character} == 0x003E) { # >
+          $self->{state} = 'data';
+          !!!next-input-character;
+
+          !!!emit ($token);
+
+          redo A;
+        } elsif ($self->{next_input_character} == -1) { 
+          $self->{state} = 'data';
+          ## reconsume
+
+          !!!emit ($token);
+
+          redo A;
+        } else {
+          $token->{data} .= chr ($self->{next_input_character});
+          !!!next-input-character;
+          redo BC;
+        }
+      } # BC
+    } elsif ($self->{state} eq 'markup declaration open') {
+      ## (only happen if PCDATA state)
+
+      my @next_char;
+      push @next_char, $self->{next_input_character};
+      
+      if ($self->{next_input_character} == 0x002D) { # -
+        !!!next-input-character;
+        push @next_char, $self->{next_input_character};
+        if ($self->{next_input_character} == 0x002D) { # -
+          $self->{current_token} = {type => 'comment', data => ''};
+          $self->{state} = 'comment';
+          !!!next-input-character;
+          redo A;
+        }
+      } elsif ($self->{next_input_character} == 0x0044 or # D
+               $self->{next_input_character} == 0x0064) { # d
+        !!!next-input-character;
+        push @next_char, $self->{next_input_character};
+        if ($self->{next_input_character} == 0x004F or # O
+            $self->{next_input_character} == 0x006F) { # o
+          !!!next-input-character;
+          push @next_char, $self->{next_input_character};
+          if ($self->{next_input_character} == 0x0043 or # C
+              $self->{next_input_character} == 0x0063) { # c
+            !!!next-input-character;
+            push @next_char, $self->{next_input_character};
+            if ($self->{next_input_character} == 0x0054 or # T
+                $self->{next_input_character} == 0x0074) { # t
+              !!!next-input-character;
+              push @next_char, $self->{next_input_character};
+              if ($self->{next_input_character} == 0x0059 or # Y
+                  $self->{next_input_character} == 0x0079) { # y
+                !!!next-input-character;
+                push @next_char, $self->{next_input_character};
+                if ($self->{next_input_character} == 0x0050 or # P
+                    $self->{next_input_character} == 0x0070) { # p
+                  !!!next-input-character;
+                  push @next_char, $self->{next_input_character};
+                  if ($self->{next_input_character} == 0x0045 or # E
+                      $self->{next_input_character} == 0x0065) { # e
+                    ## ISSUE: What a stupid code this is!
+                    $self->{state} = 'DOCTYPE';
+                    !!!next-input-character;
+                    redo A;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+
+      !!!parse-error;
+      $self->{next_input_character} = shift @next_char;
+      !!!back-next-input-character (@next_char);
+      $self->{state} = 'bogus comment';
+      redo A;
+      
+      ## ISSUE: typos in spec: chacacters, is is a parse error
+      ## ISSUE: spec is somewhat unclear on "is the first character that will be in the comment"; what is "that will be in the comment" is what the algorithm defines, isn't it?
+    } elsif ($self->{state} eq 'comment') {
+      if ($self->{next_input_character} == 0x002D) { # -
+        $self->{state} = 'comment dash';
+        !!!next-input-character;
+        redo A;
+      } elsif ($self->{next_input_character} == -1) {
+        !!!parse-error;
+        $self->{state} = 'data';
+        ## reconsume
+
+        !!!emit ($self->{current_token}); # comment
+        undef $self->{current_token};
+
+        redo A;
+      } else {
+        $self->{current_token}->{data} .= chr ($self->{next_input_character}); # comment
+        ## Stay in the state
+        !!!next-input-character;
+        redo A;
+      }
+    } elsif ($self->{state} eq 'comment dash') {
+      if ($self->{next_input_character} == 0x002D) { # -
+        $self->{state} = 'comment end';
+        !!!next-input-character;
+        redo A;
+      } elsif ($self->{next_input_character} == -1) {
+        !!!parse-error;
+        $self->{state} = 'data';
+        ## reconsume
+
+        !!!emit ($self->{current_token}); # comment
+        undef $self->{current_token};
+
+        redo A;
+      } else {
+        $self->{current_token}->{data} .= '-' . chr ($self->{next_input_character}); # comment
+        $self->{state} = 'comment';
+        !!!next-input-character;
+        redo A;
+      }
+    } elsif ($self->{state} eq 'comment end') {
+      if ($self->{next_input_character} == 0x003E) { # >
+        $self->{state} = 'data';
+        !!!next-input-character;
+
+        !!!emit ($self->{current_token}); # comment
+        undef $self->{current_token};
+
+        redo A;
+      } elsif ($self->{next_input_character} == 0x002D) { # -
+        !!!parse-error;
+        $self->{current_token}->{data} .= '-'; # comment
+        ## Stay in the state
+        !!!next-input-character;
+        redo A;
+      } elsif ($self->{next_input_character} == -1) {
+        !!!parse-error;
+        $self->{state} = 'data';
+        ## reconsume
+
+        !!!emit ($self->{current_token}); # comment
+        undef $self->{current_token};
+
+        redo A;
+      } else {
+        !!!parse-error;
+        $self->{current_token}->{data} .= '--' . chr ($self->{next_input_character}); # comment
+        $self->{state} = 'comment';
+        !!!next-input-character;
+        redo A;
+      } 
+    } elsif ($self->{state} eq 'DOCTYPE') {
+      if ($self->{next_input_character} == 0x0009 or # HT
+          $self->{next_input_character} == 0x000A or # LF
+          $self->{next_input_character} == 0x000B or # VT
+          $self->{next_input_character} == 0x000C or # FF
+          $self->{next_input_character} == 0x0020) { # SP
+        $self->{state} = 'before DOCTYPE name';
+        !!!next-input-character;
+        redo A;
+      } else {
+        !!!parse-error;
+        $self->{state} = 'before DOCTYPE name';
+        ## reconsume
+        redo A;
+      }
+    } elsif ($self->{state} eq 'before DOCTYPE name') {
+      if ($self->{next_input_character} == 0x0009 or # HT
+          $self->{next_input_character} == 0x000A or # LF
+          $self->{next_input_character} == 0x000B or # VT
+          $self->{next_input_character} == 0x000C or # FF
+          $self->{next_input_character} == 0x0020) { # SP
+        ## Stay in the state
+        !!!next-input-character;
+        redo A;
+      } elsif (0x0061 <= $self->{next_input_character} and
+               $self->{next_input_character} <= 0x007A) { # a..z
+        $self->{current_token} = {type => 'DOCTYPE',
+                          name => chr ($self->{next_input_character} - 0x0020),
+                          error => 1};
+        $self->{state} = 'DOCTYPE name';
+        !!!next-input-character;
+        redo A;
+      } elsif ($self->{next_input_character} == 0x003E) { # >
+        !!!parse-error;
+        $self->{state} = 'data';
+        !!!next-input-character;
+
+        !!!emit ({type => 'DOCTYPE', name => '', error => 1});
+
+        redo A;
+      } elsif ($self->{next_input_character} == -1) { 
+        !!!parse-error;
+        $self->{state} = 'data';
+        ## reconsume
+
+        !!!emit ({type => 'DOCTYPE', name => '', error => 1});
+
+        redo A;
+      } else {
+        $self->{current_token} = {type => 'DOCTYPE',
+                          name => chr ($self->{next_input_character}),
+                          error => 1};
+        $self->{state} = 'DOCTYPE name';
+        !!!next-input-character;
+        redo A;
+      }
+    } elsif ($self->{state} eq 'DOCTYPE name') {
+      if ($self->{next_input_character} == 0x0009 or # HT
+          $self->{next_input_character} == 0x000A or # LF
+          $self->{next_input_character} == 0x000B or # VT
+          $self->{next_input_character} == 0x000C or # FF
+          $self->{next_input_character} == 0x0020) { # SP
+        $self->{current_token}->{error} = ($self->{current_token}->{name} ne 'HTML'); # DOCTYPE
+        $self->{state} = 'after DOCTYPE name';
+        !!!next-input-character;
+        redo A;
+      } elsif ($self->{next_input_character} == 0x003E) { # >
+        $self->{current_token}->{error} = ($self->{current_token}->{name} ne 'HTML'); # DOCTYPE
+        $self->{state} = 'data';
+        !!!next-input-character;
+
+        !!!emit ($self->{current_token}); # DOCTYPE
+        undef $self->{current_token};
+
+        redo A;
+      } elsif (0x0061 <= $self->{next_input_character} and
+               $self->{next_input_character} <= 0x007A) { # a..z
+        $self->{current_token}->{name} .= chr ($self->{next_input_character} - 0x0020); # DOCTYPE
+        #$self->{current_token}->{error} = ($self->{current_token}->{name} ne 'HTML');
+        ## Stay in the state
+        !!!next-input-character;
+        redo A;
+      } elsif ($self->{next_input_character} == -1) {
+        !!!parse-error;
+        $self->{current_token}->{error} = ($self->{current_token}->{name} ne 'HTML'); # DOCTYPE
+        $self->{state} = 'data';
+        ## reconsume
+
+        !!!emit ($self->{current_token});
+        undef $self->{current_token};
+
+        redo A;
+      } else {
+        $self->{current_token}->{name} .= chr ($self->{next_input_character} - 0x0020); # DOCTYPE
+        #$self->{current_token}->{error} = ($self->{current_token}->{name} ne 'HTML');
+        ## Stay in the state
+        !!!next-input-character;
+        redo A;
+      }
+    } elsif ($self->{state} eq 'after DOCTYPE name') {
+      if ($self->{next_input_character} == 0x0009 or # HT
+          $self->{next_input_character} == 0x000A or # LF
+          $self->{next_input_character} == 0x000B or # VT
+          $self->{next_input_character} == 0x000C or # FF
+          $self->{next_input_character} == 0x0020) { # SP
+        ## Stay in the state
+        !!!next-input-character;
+        redo A;
+      } elsif ($self->{next_input_character} == 0x003E) { # >
+        $self->{state} = 'data';
+        !!!next-input-character;
+
+        !!!emit ($self->{current_token}); # DOCTYPE
+        undef $self->{current_token};
+
+        redo A;
+      } elsif ($self->{next_input_character} == -1) {
+        !!!parse-error;
+        $self->{state} = 'data';
+        ## reconsume
+
+        !!!emit ($self->{current_token}); # DOCTYPE
+        undef $self->{current_token};
+
+        redo A;
+      } else {
+        !!!parse-error;
+        $self->{current_token}->{error} = 1; # DOCTYPE
+        $self->{state} = 'bogus DOCTYPE';
+        !!!next-input-character;
+        redo A;
+      }
+    } elsif ($self->{state} eq 'bogus DOCTYPE') {
+      if ($self->{next_input_character} == 0x003E) { # >
+        $self->{state} = 'data';
+        !!!next-input-character;
+
+        !!!emit ($self->{current_token}); # DOCTYPE
+        undef $self->{current_token};
+
+        redo A;
+      } elsif ($self->{next_input_character} == -1) {
+        !!!parse-error;
+        $self->{state} = 'data';
+        ## reconsume
+
+        !!!emit ($self->{current_token}); # DOCTYPE
+        undef $self->{current_token};
+
+        redo A;
+      } else {
+        ## Stay in the state
+        !!!next-input-character;
+        redo A;
+      }
+    } else {
+      die "$0: $self->{state}: Unknown state";
+    }
+  } # A   
+
+  die "$0: _get_next_token: unexpected case";
+} # _get_next_token
+
+sub _tokenize_attempt_to_consume_an_entity ($) {
+  my $self = shift;
+  my $r;
+  
+  if ($self->{next_input_character} == 0x0023) { # #
+    !!!next-input-character;
+    my $num;
+    if ($self->{next_input_character} == 0x0078 or # x
+        $self->{next_input_character} == 0x0058) { # X
+      X: {
+        my $x_char = $self->{next_input_character};
+        !!!next-input-character;
+        if (0x0030 <= $self->{next_input_character} and 
+            $self->{next_input_character} <= 0x0039) { # 0..9
+          $num ||= 0;
+          $num *= 0x10;
+          $num += $self->{next_input_character} - 0x0030;
+          redo X;
+        } elsif (0x0061 <= $self->{next_input_character} and
+                 $self->{next_input_character} <= 0x0066) { # a..f
+          ## ISSUE: the spec says U+0078, which is apparently incorrect
+          $num ||= 0;
+          $num *= 0x10;
+          $num += $self->{next_input_character} - 0x0060 + 9;
+          redo X;
+        } elsif (0x0041 <= $self->{next_input_character} and
+                 $self->{next_input_character} <= 0x0046) { # A..F
+          ## ISSUE: the spec says U+0058, which is apparently incorrect
+          $num ||= 0;
+          $num *= 0x10;
+          $num += $self->{next_input_character} - 0x0040 + 9;
+          redo X;
+        } elsif (not defined $num) { # no hexadecimal digit
+          !!!parse-error;
+          $self->{next_input_character} = 0x0023; # #
+          !!!back-next-input-character ($x_char);
+          last X; ## nothing is returned
+        } elsif ($self->{next_input_character} == 0x003B) { # ;
+          !!!next-input-character;
+        } else {
+          !!!parse-error;
+        }
+
+        ## TODO: check the definition for |a valid Unicode character|.
+        if ($num > 1114111 or $num == 0) {
+          $num = 0xFFFD; # REPLACEMENT CHARACTER
+          ## ISSUE: Why this is not an error?
+        }
+
+        $r = {type => 'character', data => chr $num};
+      } # X
+    } else {
+      D: {
+        if (0x0030 <= $self->{next_input_character} and 
+            $self->{next_input_character} <= 0x0039) { # 0..9
+          $num *= 10;
+          $num += $self->{next_input_character} - 0x0030;
+          !!!next-input-character;
+          redo D;
+        } else {
+          !!!parse-error;
+          !!!back-next-input-character ($self->{next_input_character});
+          $self->{next_input_character} = 0x0023; # #
+          last D; ## nothing is returned
+        }
+
+        if ($self->{next_input_character} == 0x003B) { # ;
+          !!!next-input-character;
+        } else {
+          !!!parse-error;
+        }
+
+        ## TODO: check the definition for |a valid Unicode character|.
+        if ($num > 1114111 or $num == 0) {
+          $num = 0xFFFD; # REPLACEMENT CHARACTER
+          ## ISSUE: Why this is not an error?
+        }
+
+        $r = {type => 'character', data => chr $num};
+      } # D
+    }
+  !!!consume-entity}
+  return $r;
+} # _tokenize_attempt_to_consume_an_entity
+
+1;
+# $Date: 2007/04/28 14:29:01 $

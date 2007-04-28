@@ -29,7 +29,7 @@ in Web Applications 1.0 (aka HTML5) specification.
 
 package What::ContentType;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## Table in <http://www.whatwg.org/specs/web-apps/current-work/#content-type1>.
 ##
@@ -356,6 +356,7 @@ sub get_sniffed_type ($%) {
 Web Applications 1.0 Working Draft - 
 Determining the type of a new resource in a browsing context
 <http://www.whatwg.org/specs/web-apps/current-work/#content-type-sniffing>
+(Revision 780, 25 April 2007)
 
 =head1 AUTHOR
 
@@ -371,4 +372,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2007/04/25 11:19:22 $
+# $Date: 2007/04/28 14:29:00 $
