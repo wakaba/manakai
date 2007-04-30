@@ -1,13 +1,15 @@
 #!/usr/bin/perl
 use strict;
 
+my $dir_name;
 BEGIN {
+  $dir_name = 't/tokenizer/';
   my $skip = "You don't have JSON module";
   eval q{
          use JSON 1.00;
          $skip = "You don't have make command";
-         system ('make', 'tokenizer-files') == 0 or die
-           unless -f 'tokenizer/test1.test';
+         system ('cd $dir_name; cd ..; make tokenizer-files') == 0 or die
+           unless -f $dir_name.'test1.test';
          $skip = '';
         };
   if ($skip) {
@@ -16,20 +18,30 @@ BEGIN {
     exit;
   }
   $JSON::UnMapping = 1;
+  $JSON::UTF8 = 1;
 }
 
 use Test;
-use Data::Dumper;
 BEGIN { plan tests => 38 }
 
+use Data::Dumper;
+$Data::Dumper::Useqq = 1;
+sub Data::Dumper::qquote {
+  my $s = shift;
+  $s =~ s/([^\x20\x21-\x26\x28-\x5B\x5D-\x7E])/sprintf '\x{%02X}', ord $1/ge;
+  return q<qq'> . $s . q<'>;
+} # Data::Dumper::qquote
+
 use What::HTML;
+use Encode;
 
 for my $file_name (qw[
-                      tokenizer/test1.test
-                      tokenizer/test2.test
-                      tokenizer/contentModelFlags.test
+                      test1.test
+                      test2.test
+                      contentModelFlags.test
                      ]) {
-  open my $file, '<:utf8', $file_name or die "$0: $file_name: $!";
+  open my $file, '<', $dir_name.$file_name
+    or die "$0: $dir_name$file_name: $!";
   local $/ = undef;
   my $js = <$file>;
   close $file;
@@ -51,7 +63,8 @@ for my $file_name (qw[
       $j++;
     }
 
-    my @cm = @{$test->{content_model_flags} || ['PCDATA']};
+    my @cm = @{$test->{contentModelFlags} || ['PCDATA']};
+    my $last_start_tag = $test->{lastStartTag};
     for my $cm (@cm) {
       my $p = What::HTML->new;
       my $i = 0;
@@ -59,6 +72,24 @@ for my $file_name (qw[
         my $self = shift;
         $self->{next_input_character} = -1 and return if $i >= length $s;
         $self->{next_input_character} = ord substr $s, $i++, 1;
+
+        if ($self->{next_input_character} == 0x000D) { # CR
+          if ($i >= length $s) {
+            #
+          } else {
+            my $next_char = ord substr $s, $i++, 1;
+            if ($next_char == 0x000A) { # LF
+              #
+            } else {
+              push @{$self->{char}}, $next_char;
+            }
+          }
+          $self->{next_input_character} = 0x000A; # LF # MUST
+        } elsif ($self->{next_input_character} > 0x10FFFF) {
+          $self->{next_input_character} = 0xFFFD; # REPLACEMENT CHARACTER # MUST
+        } elsif ($self->{next_input_character} == 0x0000) { # NULL
+          $self->{next_input_character} = 0xFFFD; # REPLACEMENT CHARACTER # MUST
+        }
       };
       
       my @token;
@@ -68,6 +99,7 @@ for my $file_name (qw[
       
       $p->_initialize_tokenizer;
       $p->{content_model_flag} = $cm;
+      $p->{last_emitted_start_tag_name} = $last_start_tag;
 
       while (1) {
         my $token = $p->_get_next_token;
@@ -99,8 +131,10 @@ for my $file_name (qw[
       
       my $expected_dump = Dumper ($test->{output});
       my $parser_dump = Dumper (\@token);
-      ok $parser_dump, $expected_dump, $test->{description};
+      ok $parser_dump, $expected_dump,
+        $test->{description} . ': ' . $test->{input};
     }
   }
 }
 
+## $Date: 2007/04/30 11:45:24 $

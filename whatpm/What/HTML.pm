@@ -1,6 +1,6 @@
 package What::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## This is a very, very early version of an HTML parser.
 
@@ -1701,47 +1701,54 @@ sub _tokenize_attempt_to_consume_an_entity ($) {
 
         $r = {type => 'character', data => chr $num};
       } # X
+    } elsif (0x0030 <= $self->{next_input_character} and
+             $self->{next_input_character} <= 0x0039) { # 0..9
+      my $code = $self->{next_input_character} - 0x0030;
+      
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
+      
+      while (0x0030 <= $self->{next_input_character} and 
+                $self->{next_input_character} <= 0x0039) { # 0..9
+        $code *= 10;
+        $code += $self->{next_input_character} - 0x0030;
+        
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
+      }
+
+      if ($self->{next_input_character} == 0x003B) { # ;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
+      } else {
+        $self->{parse_error}->();
+      }
+
+      ## TODO: check the definition for |a valid Unicode character|.
+      if ($code > 1114111 or $code == 0) {
+        $code = 0xFFFD; # REPLACEMENT CHARACTER
+        ## ISSUE: Why this is not an error?
+      }
+      
+      $r = {type => 'character', data => chr $code};
     } else {
-      D: {
-        if (0x0030 <= $self->{next_input_character} and 
-            $self->{next_input_character} <= 0x0039) { # 0..9
-          $num *= 10;
-          $num += $self->{next_input_character} - 0x0030;
-          
-      if (@{$self->{char}}) {
-        $self->{next_input_character} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_input_character}->($self);
-      }
-  
-          redo D;
-        } else {
-          $self->{parse_error}->();
-          unshift @{$self->{char}},  ($self->{next_input_character});
-          $self->{next_input_character} = 0x0023; # #
-          last D; ## nothing is returned
-        }
-
-        if ($self->{next_input_character} == 0x003B) { # ;
-          
-      if (@{$self->{char}}) {
-        $self->{next_input_character} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_input_character}->($self);
-      }
-  
-        } else {
-          $self->{parse_error}->();
-        }
-
-        ## TODO: check the definition for |a valid Unicode character|.
-        if ($num > 1114111 or $num == 0) {
-          $num = 0xFFFD; # REPLACEMENT CHARACTER
-          ## ISSUE: Why this is not an error?
-        }
-
-        $r = {type => 'character', data => chr $num};
-      } # D
+      $self->{parse_error}->();
+      unshift @{$self->{char}},  ($self->{next_input_character});
+      $self->{next_input_character} = 0x0023; # #
     }
       } elsif ($self->{next_input_character} == 65) { # A
       
@@ -19456,4 +19463,4 @@ sub inner_html ($$$) {
 } # inner_html
 
 1;
-# $Date: 2007/04/30 09:59:35 $
+# $Date: 2007/04/30 11:45:24 $

@@ -1,5 +1,15 @@
 2007-04-30  Wakaba  <wakaba@suika.fam.cx>
 
+	* HTML-tokenizer.t: |Data::Dumper::Useqq| is replaced
+	by customized ones so that utf8 vs byte string handling
+	cause no error.  Set |$JSON::UTF8| flag on so
+	that the |JSON| module turns the utf8 flag on.
+	Support for the |contentModelFlags| and |lastStartTag|
+	test props.  Show the input as well as description
+	when a test fails.
+
+2007-04-30  Wakaba  <wakaba@suika.fam.cx>
+
 	* .cvsignore: New file.
 
 	* Makefile: New file.
