@@ -1,6 +1,6 @@
 package What::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## This is a very, very early version of an HTML parser.
 
@@ -2457,7 +2457,7 @@ sub _construct_tree ($) {
         }
         
         ## Step 6
-        $node->append_child ($last_node);
+        $node->[0]->append_child ($last_node->[0]);
         
         ## Step 7
         $last_node = $node;
@@ -2467,7 +2467,7 @@ sub _construct_tree ($) {
       } # S7  
       
       ## Step 8
-      $common_ancestor_node->append_child ($last_node);
+      $common_ancestor_node->[0]->append_child ($last_node->[0]);
       
       ## Step 9
       my $clone = [$formatting_element->[0]->clone_node (0),
@@ -3018,7 +3018,7 @@ sub _construct_tree ($) {
         
         $token = $self->_get_next_token;
         return;
-      } elsif ($token->{tag_name} eq 'tbale') {
+      } elsif ($token->{tag_name} eq 'table') {
         ## has a p element in scope
         INSCOPE: for (reverse @$open_elements) {
           if ($_->[1] eq 'p') {
@@ -3481,6 +3481,7 @@ sub _construct_tree ($) {
       if ($token->{type} eq 'DOCTYPE') {
         if ($token->{error}) {
           ## ISSUE: Spec currently left this case undefined.
+          $self->{parse_error}-> ('missing DOCTYPE');
         }
         my $doctype = $self->{document}->create_document_type_definition
           ($token->{name});
@@ -3495,6 +3496,7 @@ sub _construct_tree ($) {
                 'end-of-file' => 1,
                }->{$token->{type}}) {
         ## ISSUE: Spec currently left this case undefined.
+        $self->{parse_error}-> ('missing DOCTYPE');
         $phase = 'root element';
         ## reprocess
         redo B;
@@ -3509,6 +3511,7 @@ sub _construct_tree ($) {
           }
         }
         ## ISSUE: Spec currently left this case undefined.
+        $self->{parse_error}-> ('missing DOCTYPE');
         $phase = 'root element';
         ## reprocess
         redo B;
@@ -3663,6 +3666,7 @@ sub _construct_tree ($) {
             } else {
               $self->{parse_error}->();
               ## Ignore the token
+              $token = $self->_get_next_token;
               redo B;
             }
           } else {
@@ -4111,7 +4115,21 @@ sub _construct_tree ($) {
                      });
           redo B;
         } elsif ($insertion_mode eq 'in caption') {
-          if ($token->{type} eq 'start tag') {
+          if ($token->{type} eq 'character') {
+            ## NOTE: This is a code clone of "character in body".
+            $reconstruct_active_formatting_elements->();
+            
+            $open_elements->[-1]->[0]->manakai_append_text ($token->{data});
+
+            $token = $self->_get_next_token;
+            redo B;
+          } elsif ($token->{type} eq 'comment') {
+            ## NOTE: This is a code clone of "comment in body".
+            my $comment = $self->{document}->create_comment ($token->{data});
+            $open_elements->[-1]->[0]->append_child ($comment);
+            $token = $self->_get_next_token;
+            redo B;
+          } elsif ($token->{type} eq 'start tag') {
             if ({
                  caption => 1, col => 1, colgroup => 1, tbody => 1,
                  td => 1, tfoot => 1, th => 1, thead => 1, tr => 1,
@@ -4662,7 +4680,7 @@ sub _construct_tree ($) {
                 $token->{tag_name} eq 'td') {
               ## Clear back to table row context
               while (not {
-                th => 1, td => 1, html => 1,
+                tr => 1, html => 1,
               }->{$open_elements->[-1]->[1]}) {
                 $self->{parse_error}->();
                 pop @$open_elements;
@@ -5000,7 +5018,7 @@ sub _construct_tree ($) {
               #
             }
           } elsif ($token->{type} eq 'end tag') {
-            if ($token->{type} eq 'td' or $token->{type} eq 'th') {
+            if ($token->{tag_name} eq 'td' or $token->{tag_name} eq 'th') {
               ## have an element in table scope
               my $i;
               INSCOPE: for (reverse 0..$#$open_elements) {
@@ -5065,7 +5083,6 @@ sub _construct_tree ($) {
                 my $node = $open_elements->[$_];
                 if ($node->[1] eq $token->{tag_name}) {
                   $i = $_;
-                  $tn = $node->[1];
                   last INSCOPE;
                 } elsif ($node->[1] eq 'td' or $node->[1] eq 'th') {
                   $tn = $node->[1];
@@ -5328,7 +5345,7 @@ sub _construct_tree ($) {
             $token = $self->_get_next_token;
             redo B;
           } elsif ($token->{type} eq 'end tag') {
-            if ($token->{type} eq 'html') {
+            if ($token->{tag_name} eq 'html') {
               ## TODO: if inner_html, parse-error, ignore the token; otherwise,
 
               $phase = 'trailing end';
@@ -5637,4 +5654,4 @@ sub inner_html ($$$) {
 } # inner_html
 
 1;
-# $Date: 2007/04/30 12:06:12 $
+# $Date: 2007/04/30 14:12:02 $

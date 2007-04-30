@@ -3,12 +3,13 @@ use strict;
 
 my $dir_name;
 BEGIN {
+  my $test_dir_name = 't/';
   $dir_name = 't/tokenizer/';
   my $skip = "You don't have JSON module";
   eval q{
          use JSON 1.00;
          $skip = "You don't have make command";
-         system ('cd $dir_name; cd ..; make tokenizer-files') == 0 or die
+         system ("cd $test_dir_name; make tokenizer-files") == 0 or die
            unless -f $dir_name.'test1.test';
          $skip = '';
         };
@@ -22,7 +23,7 @@ BEGIN {
 }
 
 use Test;
-BEGIN { plan tests => 38 }
+BEGIN { plan tests => 67 }
 
 use Data::Dumper;
 $Data::Dumper::Useqq = 1;
@@ -33,7 +34,6 @@ sub Data::Dumper::qquote {
 } # Data::Dumper::qquote
 
 use What::HTML;
-use Encode;
 
 for my $file_name (qw[
                       test1.test
@@ -137,4 +137,4 @@ for my $file_name (qw[
   }
 }
 
-## $Date: 2007/04/30 11:45:24 $
+## $Date: 2007/04/30 14:12:02 $
