@@ -1,6 +1,6 @@
 package What::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## This is a very, very early version of an HTML parser.
 
@@ -187,7 +187,7 @@ sub _get_next_token ($) {
           $self->{state} = 'data';
           !!!next-input-character;
 
-          !!!emit ({type => 'character', data => '>'});
+          !!!emit ({type => 'character', data => '<>'});
 
           redo A;
         } elsif ($self->{next_input_character} == 0x003F) { # ?
@@ -1063,7 +1063,8 @@ sub _get_next_token ($) {
 
         redo A;
       } else {
-        $self->{current_token}->{name} .= chr ($self->{next_input_character} - 0x0020); # DOCTYPE
+        $self->{current_token}->{name}
+          .= chr ($self->{next_input_character}); # DOCTYPE
         #$self->{current_token}->{error} = ($self->{current_token}->{name} ne 'HTML');
         ## Stay in the state
         !!!next-input-character;
@@ -4291,4 +4292,4 @@ sub inner_html ($$$) {
 } # inner_html
 
 1;
-# $Date: 2007/04/30 07:41:50 $
+# $Date: 2007/04/30 09:59:35 $
