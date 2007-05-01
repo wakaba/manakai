@@ -1,0 +1,119 @@
+=head1 NAME
+
+What::HTML - An HTML Parser
+
+=head1 SYNOPSIS
+
+  use What::HTML;
+  
+  my $s = q<<!DOCTYPE html><html>...</html>>;
+  # $doc = an empty DOM |Document| object
+  my $on_error = sub {
+    my $error_code = shift;
+    warn $error_code, "\n";
+  };
+  
+  What::HTML->parse_string ($s => $doc, $onerror);
+  
+  ## Then, |$doc| is the DOM representation of |$s|.
+
+=head1 DESCRIPTION
+
+The C<What::HTML> module is an experimental implementation
+of the HTML5 parsing specification.
+
+=head1 METHODS
+
+=over 4
+
+=item [I<$doc> =] What::HTML->parse_string (I<$s>, I<$doc>[, I<$onerror>]);
+
+Parse a string I<$s> as an HTML document.
+
+The first argument, I<$s>, MUST be a string.  It is parsed
+as a sequence of characters representing an HTML document.
+
+The second argument, I<$doc>, MUST be an empty read-write 
+DOM C<Document> object.  The HTML DOM tree is constructed
+onto this C<Document> object.
+
+The third argument, I<$onerror>, MUST be a reference to
+the error handler code.  Whenever a parse error is detected,
+this code is invoked with an argument that contains a
+useless string that might describe what is wrong.
+The code MAY throw an exception, so that whole the parsing
+process aborts.  Otherwise, the parser will continue to
+process the input.  The code MUST NOT modify I<$s> or I<$doc>.
+If it does, then the result is undefined.
+This argument is optional; if missing, any
+parse error makes that string being C<warn>ed.
+
+The method returns the DOM C<Document> object (i.e. the second argument).
+
+Note that the C<What::NanoDOM> module provides a non-conforming
+implementation of DOM that only implements the subset that
+is necessary for the purpose of C<What::HTML>'s parsing and
+serializing.
+With this module, creating a new HTML C<Document> object
+from a string containing HTML document can be coded as:
+
+  use What::HTML;
+  use What::NanoDOM;
+  my $doc = What::HTML->parse_string ($s => What::NanoDOM->new, $onerror);
+
+=item I<$s> = What::HTML->get_inner_html (I<$node>[, I<$onerror>]);
+
+Return the HTML serialization of a DOM node I<$node>.
+
+The first argument, I<$node>, MUST be a DOM C<Document>,
+C<Node>, or C<DocumentFragment> object.
+
+The second argument, I<$onerror>, MUST be a reference to the
+error handling code.  This code will be invoked if a descendant
+of C<$node> is not of C<Element>, C<Text>, C<CDATASection>,
+C<Comment>, C<DocumentType>, or C<EntityReference> so
+that C<INVALID_STATE_ERR> MUST be thrown.
+The code will be invoked with an argument, which is the node
+whose type is invalid.  
+This argument is optional; if missing, any such
+node is simply ignored.
+
+The method returns the C<inner_html> attribute
+value, i.e. the HTML serialization of the C<$node>.
+
+=back
+
+=head1 TODO
+
+Tokenizer should emit a sequence of character tokens as one token
+to improve performance.
+
+A method that accepts a byte stream as an input.
+
+Charset detection algorithm.
+
+Setting inner_html.
+
+And there are many "TODO"s and "ISSUE"s in the source code.
+
+=head1 SEE ALSO
+
+Web Applications 1.0 Working Draft (aka HTML5)
+<http://whatwg.org/html5>.  (Revision 792, 1 May 2007)
+
+L<What::NanoDOM>
+
+=head1 AUTHOR
+
+Wakaba <w@suika.fam.cx>.
+
+=head1 LICENSE
+
+Copyright 2007 Wakaba <w@suika.fam.cx>
+
+This library is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+=cut
+
+# $Date: 2007/05/01 07:46:42 $

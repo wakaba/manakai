@@ -32,8 +32,22 @@
 |   <body>
 
 #data
+<!DOCTYPE html><html><head></head><body><title class="a"></title></body></html>
+#errors
+title in body
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <title>
+|       class="a"
+|   <body>
+
+#data
 <!DOCTYPE html><html><head></head><body></body><title class="a"></title></html>
 #errors
+data after body
+title in body
 #document
 | <!DOCTYPE HTML>
 | <html>
@@ -68,6 +82,21 @@
 #data
 <!DOCTYPE html><html><head><title></title></head><body><meta name="a"></body></html>
 #errors
+meta in body
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <title>
+|     <meta>
+|       name="a"
+|   <body>
+
+#data
+<!DOCTYPE html><html><head><title></title></head><body></body><meta name="a"></html>
+#errors
+data after body
+meta in body
 #document
 | <!DOCTYPE HTML>
 | <html>
@@ -92,6 +121,21 @@
 #data
 <!DOCTYPE html><html><head><title></title></head><body><link rel="a"></body></html>
 #errors
+link in body
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <title>
+|     <link>
+|       rel="a"
+|   <body>
+
+#data
+<!DOCTYPE html><html><head><title></title></head><body></body><link rel="a"></html>
+#errors
+data after body
+link in body
 #document
 | <!DOCTYPE HTML>
 | <html>
@@ -116,6 +160,21 @@
 #data
 <!DOCTYPE html><html><head><title></title></head><body><base href="http://"></body></html>
 #errors
+base in body
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <title>
+|     <base>
+|       href="http://"
+|   <body>
+
+#data
+<!DOCTYPE html><html><head><title></title></head><body></body><base href="http://"></html>
+#errors
+data after body
+base in body
 #document
 | <!DOCTYPE HTML>
 | <html>
@@ -128,7 +187,8 @@
 #data
 <!DOCTYPE html><p><b><p>X
 #errors
-...TBD
+<b> is not closed before second <p>
+<b> is not closed before end-of-file
 #document
 | <!DOCTYPE HTML>
 | <html>

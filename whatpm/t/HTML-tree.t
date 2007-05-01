@@ -20,7 +20,7 @@ BEGIN {
 }
 
 use Test;
-BEGIN { plan tests => 402 }
+BEGIN { plan tests => 410 }
 
 use Data::Dumper;
 $Data::Dumper::Useqq = 1;
@@ -71,59 +71,29 @@ for my $file_name (grep {$_} split /\s+/, qq[
 }
 
 use What::HTML;
+use What::NanoDOM;
 
 sub test ($) {
   my $test = shift;
 
-  my $s = $test->{data};
-
-  my $p = What::HTML->new;
-  my $i = 0;
-  $p->{set_next_input_character} = sub {
-    my $self = shift;
-    $self->{next_input_character} = -1 and return if $i >= length $s;
-    $self->{next_input_character} = ord substr $s, $i++, 1;
-    
-    if ($self->{next_input_character} == 0x000D) { # CR
-      if ($i >= length $s) {
-        #
-      } else {
-        my $next_char = ord substr $s, $i++, 1;
-        if ($next_char == 0x000A) { # LF
-          #
-        } else {
-          push @{$self->{char}}, $next_char;
-        }
-      }
-      $self->{next_input_character} = 0x000A; # LF # MUST
-    } elsif ($self->{next_input_character} > 0x10FFFF) {
-      $self->{next_input_character} = 0xFFFD; # REPLACEMENT CHARACTER # MUST
-    } elsif ($self->{next_input_character} == 0x0000) { # NULL
-      $self->{next_input_character} = 0xFFFD; # REPLACEMENT CHARACTER # MUST
-    }
-  };
-  
+  my $doc = What::NanoDOM::Document->new;
   my @errors;
-  $p->{parse_error} = sub {
-    my $msg = shift;
-    push @errors, $msg;
-  };
   
   $SIG{INT} = sub {
-    print scalar serialize ($p->{document});
+    print scalar serialize ($doc);
     exit;
   };
-  
-  $p->_initialize_tokenizer;
-  $p->_initialize_tree_constructor;
-  $p->_construct_tree;
-  $p->_terminate_tree_constructor;
+
+  What::HTML->parse_string
+      ($test->{data} => $doc, sub {
+         my $msg = shift;
+         push @errors, $msg;
+       });
 
   ok scalar @errors, scalar @{$test->{errors}},
     'Parse error: ' . $test->{data} . '; ' . 
     join (', ', @errors) . ';' . join (', ', @{$test->{errors}});
 
-  my $doc = $p->{document};
   my $doc_s = serialize ($doc);
   ok $doc_s, $test->{document}, 'Document tree: ' . $test->{data};
 } # test
@@ -162,4 +132,4 @@ sub serialize ($) {
 } # serialize
 
 ## License: Public Domain.
-## $Date: 2007/05/01 06:22:12 $
+## $Date: 2007/05/01 07:46:42 $

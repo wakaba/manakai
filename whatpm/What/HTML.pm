@@ -1,8 +1,8 @@
 package What::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
-## This is a very, very early version of an HTML parser.
+## This is an early version of an HTML parser.
 
 my $permitted_slash_tag_name = {
   base => 1,
@@ -301,6 +301,49 @@ my $formatting_category = {
   s => 1, small => 1, strile => 1, strong => 1, tt => 1, u => 1,
 };
 # $phrasing_category: all other elements
+
+sub parse_string ($$$;$) {
+  my $self = shift->new;
+  my $s = \$_[0];
+  $self->{document} = $_[1];
+
+  my $i;
+  my $i = 0;
+  $self->{set_next_input_character} = sub {
+    my $self = shift;
+    $self->{next_input_character} = -1 and return if $i >= length $$s;
+    $self->{next_input_character} = ord substr $$s, $i++, 1;
+    
+    if ($self->{next_input_character} == 0x000D) { # CR
+      if ($i >= length $$s) {
+        #
+      } else {
+        my $next_char = ord substr $$s, $i++, 1;
+        if ($next_char == 0x000A) { # LF
+          #
+        } else {
+          push @{$self->{char}}, $next_char;
+        }
+      }
+      $self->{next_input_character} = 0x000A; # LF # MUST
+    } elsif ($self->{next_input_character} > 0x10FFFF) {
+      $self->{next_input_character} = 0xFFFD; # REPLACEMENT CHARACTER # MUST
+    } elsif ($self->{next_input_character} == 0x0000) { # NULL
+      $self->{next_input_character} = 0xFFFD; # REPLACEMENT CHARACTER # MUST
+    }
+  };
+
+  $self->{parse_error} = $_[2] || sub {
+    warn "Parse error at character $i\n"; ## TODO: Report (line, column) pair
+  };
+
+  $self->_initialize_tokenizer;
+  $self->_initialize_tree_constructor;
+  $self->_construct_tree;
+  $self->_terminate_tree_constructor;
+
+  return $self->{document};
+} # parse_string
 
 sub new ($) {
   my $class = shift;
@@ -2081,11 +2124,11 @@ sub _tokenize_attempt_to_consume_an_entity ($) {
 
 sub _initialize_tree_constructor ($) {
   my $self = shift;
-  require What::NanoDOM;
-  $self->{document} = What::NanoDOM::Document->new;
+  ## NOTE: $self->{document} MUST be specified before this method is called
   $self->{document}->strict_error_checking (0);
   ## TODO: Turn mutation events off # MUST
   ## TODO: Turn loose Document option (manakai extension) on
+  ## TODO: Mark the Document as an HTML document # MUST
 } # _initialize_tree_constructor
 
 sub _terminate_tree_constructor ($) {
@@ -2565,7 +2608,7 @@ sub _construct_tree ($) {
       } elsif ({
                 base => 1, link => 1, meta => 1,
                }->{$token->{tag_name}}) {
-        $self->{parse_error}->();
+        $self->{parse_error}-> ($token->{tag_name}.' in body');
         ## NOTE: This is an "as if in head" code clone
         my $el;
         
@@ -2583,11 +2626,10 @@ sub _construct_tree ($) {
           $insert->($el);
         }
         
-        ## ISSUE: Issue on magical <base> in the spec
-        
         $token = $self->_get_next_token;
         return;
       } elsif ($token->{tag_name} eq 'title') {
+        $self->{parse_error}-> ('title in body');
         ## NOTE: There is an "as if in head" code clone
         my $title_el;
         
@@ -3833,8 +3875,6 @@ sub _construct_tree ($) {
       
               (defined $head_element ? $head_element : $open_elements->[-1]->[0])
                 ->append_child ($el);
-              
-              ## ISSUE: Issue on magical <base> in the spec
 
               $token = $self->_get_next_token;
               redo B;
@@ -5502,7 +5542,7 @@ sub _construct_tree ($) {
             #
           }
 
-          $self->{parse_error}->();
+          $self->{parse_error}-> ('data after body');
           $insertion_mode = 'in body';
           ## reprocess
           redo B;
@@ -5698,7 +5738,7 @@ sub _construct_tree ($) {
   ## TODO: script stuffs
 } # _construct_tree
 
-sub inner_html ($$$) {
+sub get_inner_html ($$$) {
   my ($class, $node, $on_error) = @_;
 
   ## Step 1
@@ -5786,13 +5826,14 @@ sub inner_html ($$$) {
     } elsif ($nt == 5) { # entrefs
       push @node, @{$child->child_nodes};
     } else {
-      $on_error->($child);
+      $on_error->($child) if defined $on_error;
     }
+    ## ISSUE: This code does not support PIs.
   } # C
   
   ## Step 3
   return \$s;
-} # inner_html
+} # get_inner_html
 
 1;
-# $Date: 2007/05/01 06:22:12 $
+# $Date: 2007/05/01 07:46:42 $

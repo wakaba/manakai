@@ -1,5 +1,14 @@
 2007-05-01  Wakaba  <wakaba@suika.fam.cx>
 
+	* HTML-tree.t: Use new |What::HTML->parse_string| method
+	so that this test don't have to know parser class's
+	internals.
+
+	* tree-test-1.dat: New tests for "(<head> stuffs) in body"
+	and "(<head> stuffs) after body" are added.
+
+2007-05-01  Wakaba  <wakaba@suika.fam.cx>
+
 	* HTML-tree.t: New test file is added.  Sort key
 	was incorrect.
 
