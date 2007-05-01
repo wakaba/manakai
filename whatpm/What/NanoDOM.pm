@@ -1,3 +1,17 @@
+=head1 NAME
+
+What::NanoDOM - A Non-Conforming Implementation of DOM Subset
+
+=head1 DESCRIPTION
+
+The C<What::NanoDOM> module contains a non-conforming implementation
+of a subset of DOM.  It is the intention that this module is
+used only for the purpose of testing the C<What::HTML> module.
+
+See source code if you would like to know what it does.
+
+=cut
+
 package What::NanoDOM;
 use strict;
 
@@ -323,5 +337,22 @@ sub name ($) {
   return shift->{name};
 } # name
 
+=head1 SEE ALSO
+
+L<What::HTML>
+
+=head1 AUTHOR
+
+Wakaba <w@suika.fam.cx>.
+
+=head1 LICENSE
+
+Copyright 2007 Wakaba <w@suika.fam.cx>
+
+This library is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+=cut
+
 1;
-# $Date: 2007/05/01 06:22:12 $
+# $Date: 2007/05/01 08:17:44 $

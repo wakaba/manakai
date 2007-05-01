@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title>What::ContentType - What Sniffed Type the Entity is?</title>
+<title>What::ContentType - Content Type and Character Encoding Sniffer</title>
 <link rel="stylesheet" href="http://suika.fam.cx/www/style/html/pod.css" type="text/css" />
 <link rev="made" href="mailto:admin@suika.fam.cx" />
 </head>
@@ -17,6 +17,7 @@
 	<li><a href="#synopsis">SYNOPSIS</a></li>
 	<li><a href="#description">DESCRIPTION</a></li>
 	<li><a href="#method">METHOD</a></li>
+	<li><a href="#to_do">TO DO</a></li>
 	<li><a href="#see_also">SEE ALSO</a></li>
 	<li><a href="#author">AUTHOR</a></li>
 	<li><a href="#license">LICENSE</a></li>
@@ -27,12 +28,14 @@
 <p>
 </p>
 <h1><a name="name">NAME</a></h1>
-<p>What::ContentType - What Sniffed Type the Entity is?</p>
+<p>What::ContentType - Content Type and Character Encoding Sniffer</p>
 <p>
 </p>
 <hr />
 <h1><a name="synopsis">SYNOPSIS</a></h1>
 <pre>
+  ## Content-Type Sniffing
+  
   require What::ContentType;
   my $sniffed_type = What::ContentType-&gt;get_sniffed_type (
     get_file_head =&gt; sub {
@@ -45,15 +48,22 @@
       'image/jpeg' =&gt; 1, 'image/png' =&gt; 1, 'image/gif' =&gt; 1, # for example
     },
   );</pre>
+<pre>
+  ## Character Encoding Sniffing for HTML Documents
+  
+  ## NOT IMPLEMENTED YET!</pre>
 <p>
 </p>
 <hr />
 <h1><a name="description">DESCRIPTION</a></h1>
-<p>The <code>What::ContentType</code> module can be used when you want to
-know <em>what</em> the media type, or <em>content type</em>, of an entity is in fact.
-It implements the algorithm for sniffing a file used when
-a Web browser determine how to handle it, as defined
-in Web Applications 1.0 (aka HTML5) specification.</p>
+<p>The <code>What::ContentType</code> module contains media type sniffer
+for Web user agents.  It implements the content type detecting
+algorithm as defined in the Web Applications 1.0 specification.</p>
+<p>In addition, a future version of this module is expected
+to also implement the character encoding detection algorithm
+for HTML documents as described in that specification.</p>
+<p>This module is part of WHAT.pm - Perl Modules for 
+Web Hypertext Application Technologies.</p>
 <p>
 </p>
 <hr />
@@ -62,10 +72,11 @@ in Web Applications 1.0 (aka HTML5) specification.</p>
 <dt><strong><a name="item_get_sniffed_type"><em>$sniffed_type</em> = What::ContentType-&gt;get_sniffed_type (<em>named-parameters</em>)</a></strong><br />
 </dt>
 <dd>
-Returns the sniffed type of an entity.
+Returns the sniffed type of an entity.  Arguments to
+this method MUST be specified as name-value pairs.
 </dd>
 <dd>
-<p>Named parameters:</p>
+<p>Named parameters defined for this method:</p>
 </dd>
 <dl>
 <dt><strong><a name="item_content_type_metadata">content_type_metadata</a></strong><br />
@@ -152,11 +163,16 @@ considered as supported.</p>
 <p>
 </p>
 <hr />
+<h1><a name="to_do">TO DO</a></h1>
+<p>Add method for charset detection.</p>
+<p>
+</p>
+<hr />
 <h1><a name="see_also">SEE ALSO</a></h1>
 <p>Web Applications 1.0 Working Draft - 
 Determining the type of a new resource in a browsing context
 &lt;http://www.whatwg.org/specs/web-apps/current-work/#content-type-sniffing&gt;
-(Revision 789, 28 April 2007)</p>
+(Revision 792, 1 May 2007)</p>
 <p>
 </p>
 <hr />

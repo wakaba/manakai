@@ -1,9 +1,11 @@
 =head1 NAME
 
-What::ContentType - What Sniffed Type the Entity is?
+What::ContentType - Content Type and Character Encoding Sniffer
 
 =head1 SYNOPSIS
 
+  ## Content-Type Sniffing
+  
   require What::ContentType;
   my $sniffed_type = What::ContentType->get_sniffed_type (
     get_file_head => sub {
@@ -17,19 +19,28 @@ What::ContentType - What Sniffed Type the Entity is?
     },
   );
 
+  ## Character Encoding Sniffing for HTML Documents
+  
+  ## NOT IMPLEMENTED YET!
+
 =head1 DESCRIPTION
 
-The C<What::ContentType> module can be used when you want to
-know I<what> the media type, or I<content type>, of an entity is in fact.
-It implements the algorithm for sniffing a file used when
-a Web browser determine how to handle it, as defined
-in Web Applications 1.0 (aka HTML5) specification.
+The C<What::ContentType> module contains media type sniffer
+for Web user agents.  It implements the content type detecting
+algorithm as defined in the Web Applications 1.0 specification.
+
+In addition, a future version of this module is expected
+to also implement the character encoding detection algorithm
+for HTML documents as described in that specification.
+
+This module is part of WHAT.pm - Perl Modules for 
+Web Hypertext Application Technologies.
 
 =cut
 
 package What::ContentType;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## Table in <http://www.whatwg.org/specs/web-apps/current-work/#content-type1>.
 ##
@@ -114,9 +125,10 @@ my @ImageSniffingTable = (
 
 =item I<$sniffed_type> = What::ContentType->get_sniffed_type (I<named-parameters>)
 
-Returns the sniffed type of an entity.
+Returns the sniffed type of an entity.  Arguments to
+this method MUST be specified as name-value pairs.
 
-Named parameters:
+Named parameters defined for this method:
 
 =over 4
 
@@ -350,12 +362,16 @@ sub get_sniffed_type ($%) {
 
 =back
 
+=head1 TO DO
+
+Add method for charset detection.
+
 =head1 SEE ALSO
 
 Web Applications 1.0 Working Draft - 
 Determining the type of a new resource in a browsing context
 <http://www.whatwg.org/specs/web-apps/current-work/#content-type-sniffing>
-(Revision 789, 28 April 2007)
+(Revision 792, 1 May 2007)
 
 =head1 AUTHOR
 
@@ -371,4 +387,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2007/04/28 14:31:34 $
+# $Date: 2007/05/01 08:17:44 $

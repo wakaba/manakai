@@ -1,0 +1,169 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>What::HTML - An HTML Parser</title>
+<link rel="stylesheet" href="http://suika.fam.cx/www/style/html/pod.css" type="text/css" />
+<link rev="made" href="mailto:admin@suika.fam.cx" />
+</head>
+
+<body>
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#methods">METHODS</a></li>
+	<li><a href="#to_do">TO DO</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#license">LICENSE</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>What::HTML - An HTML Parser</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+  use What::HTML;
+  
+  my $s = q&lt;&lt;!DOCTYPE html&gt;&lt;html&gt;...&lt;/html&gt;&gt;;
+  # $doc = an empty DOM |Document| object
+  my $on_error = sub {
+    my $error_code = shift;
+    warn $error_code, &quot;\n&quot;;
+  };
+  
+  What::HTML-&gt;parse_string ($s =&gt; $doc, $onerror);
+  
+  ## Then, |$doc| is the DOM representation of |$s|.</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>The <code>What::HTML</code> module contains HTML parser and serializer.</p>
+<p>The HTML parser can be used to construct the DOM tree representation
+from an HTML document.  The parsing and tree construction are done 
+as described in the Web Application 1.0 specification.</p>
+<p>The HTML serializer can be used to obtain the HTML document representation
+of a DOM tree (or a tree fragment thereof).  The serialization
+is performed as described in the Web Applications 1.0 specification
+for <code>innerHTML</code> DOM attribute.</p>
+<p>This module is part of WHAT.pm - Perl Modules for 
+Web Hypertext Application Technologies.</p>
+<p>
+</p>
+<hr />
+<h1><a name="methods">METHODS</a></h1>
+<dl>
+<dt><strong><a name="item_parse_string">[<em>$doc</em> =] What::HTML-&gt;parse_string (<em>$s</em>, <em>$doc</em>[, <em>$onerror</em>]);</a></strong><br />
+</dt>
+<dd>
+Parse a string <em>$s</em> as an HTML document.
+</dd>
+<dd>
+<p>The first argument, <em>$s</em>, MUST be a string.  It is parsed
+as a sequence of characters representing an HTML document.</p>
+</dd>
+<dd>
+<p>The second argument, <em>$doc</em>, MUST be an empty read-write 
+DOM <code>Document</code> object.  The HTML DOM tree is constructed
+onto this <code>Document</code> object.</p>
+</dd>
+<dd>
+<p>The third argument, <em>$onerror</em>, MUST be a reference to
+the error handler code.  Whenever a parse error is detected,
+this code is invoked with an argument that contains a
+useless string that might describe what is wrong.
+The code MAY throw an exception, so that whole the parsing
+process aborts.  Otherwise, the parser will continue to
+process the input.  The code MUST NOT modify <em>$s</em> or <em>$doc</em>.
+If it does, then the result is undefined.
+This argument is optional; if missing, any
+parse error makes that string being <code>warn</code>ed.</p>
+</dd>
+<dd>
+<p>The method returns the DOM <code>Document</code> object (i.e. the second argument).</p>
+</dd>
+<dd>
+<p>Note that the <code>What::NanoDOM</code> module provides a non-conforming
+implementation of DOM that only implements the subset that
+is necessary for the purpose of <code>What::HTML</code>'s parsing and
+serializing.
+With this module, creating a new HTML <code>Document</code> object
+from a string containing HTML document can be coded as:</p>
+</dd>
+<dd>
+<pre>
+  use What::HTML;
+  use What::NanoDOM;
+  my $doc = What::HTML-&gt;parse_string ($s =&gt; What::NanoDOM-&gt;new, $onerror);</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item_get_inner_html"><em>$s</em> = What::HTML-&gt;get_inner_html (<em>$node</em>[, <em>$onerror</em>]);</a></strong><br />
+</dt>
+<dd>
+Return the HTML serialization of a DOM node <em>$node</em>.
+</dd>
+<dd>
+<p>The first argument, <em>$node</em>, MUST be a DOM <code>Document</code>,
+<code>Node</code>, or <code>DocumentFragment</code> object.</p>
+</dd>
+<dd>
+<p>The second argument, <em>$onerror</em>, MUST be a reference to the
+error handling code.  This code will be invoked if a descendant
+of <code>$node</code> is not of <code>Element</code>, <code>Text</code>, <code>CDATASection</code>,
+<code>Comment</code>, <code>DocumentType</code>, or <code>EntityReference</code> so
+that <code>INVALID_STATE_ERR</code> MUST be thrown.
+The code will be invoked with an argument, which is the node
+whose type is invalid.  
+This argument is optional; if missing, any such
+node is simply ignored.</p>
+</dd>
+<dd>
+<p>The method returns the <code>inner_html</code> attribute
+value, i.e. the HTML serialization of the <code>$node</code>.</p>
+</dd>
+<p></p></dl>
+<p>
+</p>
+<hr />
+<h1><a name="to_do">TO DO</a></h1>
+<p>Tokenizer should emit a sequence of character tokens as one token
+to improve performance.</p>
+<p>A method that accepts a byte stream as an input.</p>
+<p>Charset detection algorithm.</p>
+<p>Setting inner_html.</p>
+<p>And there are many ``TODO''s and ``ISSUE''s in the source code.</p>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p>Web Applications 1.0 Working Draft (aka HTML5)
+&lt;http://whatwg.org/html5&gt;.  (Revision 792, 1 May 2007)</p>
+<p><a href="../What/NanoDOM.html">the What::NanoDOM manpage</a></p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;.</p>
+<p>
+</p>
+<hr />
+<h1><a name="license">LICENSE</a></h1>
+<p>Copyright 2007 Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;</p>
+<p>This library is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.</p>
+
+</body>
+
+</html>

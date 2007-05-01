@@ -19,8 +19,19 @@ What::HTML - An HTML Parser
 
 =head1 DESCRIPTION
 
-The C<What::HTML> module is an experimental implementation
-of the HTML5 parsing specification.
+The C<What::HTML> module contains HTML parser and serializer.
+
+The HTML parser can be used to construct the DOM tree representation
+from an HTML document.  The parsing and tree construction are done 
+as described in the Web Application 1.0 specification.
+
+The HTML serializer can be used to obtain the HTML document representation
+of a DOM tree (or a tree fragment thereof).  The serialization
+is performed as described in the Web Applications 1.0 specification
+for C<innerHTML> DOM attribute.
+
+This module is part of WHAT.pm - Perl Modules for 
+Web Hypertext Application Technologies.
 
 =head1 METHODS
 
@@ -83,7 +94,7 @@ value, i.e. the HTML serialization of the C<$node>.
 
 =back
 
-=head1 TODO
+=head1 TO DO
 
 Tokenizer should emit a sequence of character tokens as one token
 to improve performance.
@@ -116,4 +127,4 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-# $Date: 2007/05/01 07:46:42 $
+# $Date: 2007/05/01 08:17:44 $
