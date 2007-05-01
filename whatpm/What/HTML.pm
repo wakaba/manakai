@@ -1,6 +1,6 @@
 package What::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## This is a very, very early version of an HTML parser.
 
@@ -446,7 +446,7 @@ sub _get_next_token ($) {
           ## reconsume
           $self->{state} = 'data';
 
-          return  (type => 'character', data => {'/'});
+          return  ({type => 'character', data => '<'});
 
           redo A;
         }
@@ -2119,6 +2119,8 @@ sub _construct_tree ($) {
   my $insertion_mode = 'before head';
 
   my $reconstruct_active_formatting_elements = sub { # MUST
+    my $insert = shift;
+
     ## Step 1
     return unless @$active_formatting_elements;
 
@@ -2134,8 +2136,8 @@ sub _construct_tree ($) {
       }
     }
     
-    ## Step 4
     S4: {
+      ## Step 4
       last S4 if $active_formatting_elements->[0]->[0] eq $entry->[0];
 
       ## Step 5
@@ -2149,9 +2151,9 @@ sub _construct_tree ($) {
         my $in_open_elements;
         OE: for (@$open_elements) {
           if ($entry->[0] eq $_->[0]) {
-          $in_open_elements = 1;
-          last OE;
-        }
+            $in_open_elements = 1;
+            last OE;
+          }
         }
         if ($in_open_elements) {
           #
@@ -2167,16 +2169,17 @@ sub _construct_tree ($) {
 
     S7: {
       ## Step 8
-      my $clone = $entry->[0]->clone_node (0);
+      my $clone = [$entry->[0]->clone_node (0), $entry->[1]];
     
       ## Step 9
-      $open_elements->[-1]->[0]->append_child ($clone);
-      push @$open_elements, [$clone, $entry->[1]];
+      $insert->($clone->[0]);
+      push @$open_elements, $clone;
       
       ## Step 10
       $active_formatting_elements->[$i] = $open_elements->[-1];
-      
-      unless ($i == $#$active_formatting_elements) {
+
+      ## Step 11
+      unless ($clone->[0] eq $active_formatting_elements->[-1]->[0]) {
         ## Step 7'
         $i++;
         $entry = $active_formatting_elements->[$i];
@@ -2281,10 +2284,16 @@ sub _construct_tree ($) {
   }; # $style_start_tag
 
   my $script_start_tag = sub {
-    my $script_el; 
+    my $script_el;
+    
       $script_el = $self->{document}->create_element_ns
         (q<http://www.w3.org/1999/xhtml>, [undef,  'script']);
     
+        for my $attr_name (keys %{ $token->{attributes}}) {
+          $script_el->set_attribute_ns (undef, [undef, $attr_name],
+                                 $token->{attributes} ->{$attr_name}->{value});
+        }
+      
     ## TODO: mark as "parser-inserted"
 
     $self->{content_model_flag} = 'CDATA';
@@ -2300,7 +2309,7 @@ sub _construct_tree ($) {
     }
               
     $self->{content_model_flag} = 'PCDATA';
-              
+
     if ($token->{type} eq 'end tag' and
         $token->{tag_name} eq 'script') {
       ## Ignore the token
@@ -2509,6 +2518,41 @@ sub _construct_tree ($) {
     } # FET
   }; # $formatting_end_tag
 
+  my $insert_to_current = sub {
+    $open_elements->[-1]->[0]->append_child (shift);
+  }; # $insert_to_current
+
+  my $insert_to_foster = sub {
+                       my $child = shift;
+                       if ({
+                            table => 1, tbody => 1, tfoot => 1,
+                            thead => 1, tr => 1,
+                           }->{$open_elements->[-1]->[1]}) {
+                         # MUST
+                         my $foster_parent_element;
+                         my $next_sibling;
+                         OE: for (reverse 0..$#$open_elements) {
+                           if ($open_elements->[$_]->[1] eq 'table') {
+                             my $parent = $open_elements->[$_]->[0]->parent_node;
+                             if (defined $parent and $parent->node_type == 1) {
+                               $foster_parent_element = $parent;
+                               $next_sibling = $open_elements->[$_]->[0];
+                             } else {
+                               $foster_parent_element
+                                 = $open_elements->[$_ - 1]->[0];
+                             }
+                             last OE;
+                           }
+                         } # OE
+                         $foster_parent_element = $open_elements->[0]->[0]
+                           unless defined $foster_parent_element;
+                         $foster_parent_element->insert_before
+                           ($child, $next_sibling);
+                       } else {
+                         $open_elements->[-1]->[0]->append_child ($child);
+                       }
+  }; # $insert_to_foster
+
   my $in_body = sub {
     my $insert = shift;
     if ($token->{type} eq 'start tag') {
@@ -2519,7 +2563,7 @@ sub _construct_tree ($) {
         $style_start_tag->();
         return;
       } elsif ({
-                base => 1, link => 1, meta => 1, title => 1,
+                base => 1, link => 1, meta => 1,
                }->{$token->{tag_name}}) {
         $self->{parse_error}->();
         ## NOTE: This is an "as if in head" code clone
@@ -2541,6 +2585,43 @@ sub _construct_tree ($) {
         
         ## ISSUE: Issue on magical <base> in the spec
         
+        $token = $self->_get_next_token;
+        return;
+      } elsif ($token->{tag_name} eq 'title') {
+        ## NOTE: There is an "as if in head" code clone
+        my $title_el;
+        
+      $title_el = $self->{document}->create_element_ns
+        (q<http://www.w3.org/1999/xhtml>, [undef,  'title']);
+    
+        for my $attr_name (keys %{ $token->{attributes}}) {
+          $title_el->set_attribute_ns (undef, [undef, $attr_name],
+                                 $token->{attributes} ->{$attr_name}->{value});
+        }
+      
+        (defined $head_element ? $head_element : $open_elements->[-1]->[0])
+          ->append_child ($title_el);
+        $self->{content_model_flag} = 'RCDATA';
+        
+        my $text = '';
+        $token = $self->_get_next_token;
+        while ($token->{type} eq 'character') {
+          $text .= $token->{data};
+          $token = $self->_get_next_token;
+        }
+        if (length $text) {
+          $title_el->manakai_append_text ($text);
+        }
+        
+        $self->{content_model_flag} = 'PCDATA';
+        
+        if ($token->{type} eq 'end tag' and
+            $token->{tag_name} eq 'title') {
+          ## Ignore the token
+        } else {
+          $self->{parse_error}->();
+          ## ISSUE: And ignore?
+        }
         $token = $self->_get_next_token;
         return;
       } elsif ($token->{tag_name} eq 'body') {
@@ -2683,7 +2764,7 @@ sub _construct_tree ($) {
           }
           
           ## Step 4
-          $i++;
+          $i--;
           $node = $open_elements->[$i];
           redo LI;
         } # LI
@@ -2741,7 +2822,7 @@ sub _construct_tree ($) {
           }
           
           ## Step 4
-          $i++;
+          $i--;
           $node = $open_elements->[$i];
           redo LI;
         } # LI
@@ -2863,16 +2944,21 @@ sub _construct_tree ($) {
         AFE: for my $i (reverse 0..$#$active_formatting_elements) {
           my $node = $active_formatting_elements->[$i];
           if ($node->[1] eq 'a') {
-            $self->{parse_error}->();
+            $self->{parse_error}-> ('a in a');
             
             unshift @{$self->{token}}, $token;
             $token = {type => 'end tag', tag_name => 'a'};
             $formatting_end_tag->($token->{tag_name});
             
-            splice @$active_formatting_elements, $i;
+            AFE2: for (reverse 0..$#$active_formatting_elements) {
+              if ($active_formatting_elements->[$_]->[0] eq $node->[0]) {
+                splice @$active_formatting_elements, $_, 1;
+                last AFE2;
+              }
+            } # AFE2
             OE: for (reverse 0..$#$open_elements) {
               if ($open_elements->[$_]->[0] eq $node->[0]) {
-                splice @$open_elements, $_;
+                splice @$open_elements, $_, 1;
                 last OE;
               }
             } # OE
@@ -2882,7 +2968,7 @@ sub _construct_tree ($) {
           }
         } # AFE
           
-        $reconstruct_active_formatting_elements->();
+        $reconstruct_active_formatting_elements->($insert_to_current);
 
         
     {
@@ -2909,7 +2995,7 @@ sub _construct_tree ($) {
                 nobr => 1, s => 1, small => 1, strile => 1, 
                 strong => 1, tt => 1, u => 1,
                }->{$token->{tag_name}}) {
-        $reconstruct_active_formatting_elements->();
+        $reconstruct_active_formatting_elements->($insert_to_current);
         
         
     {
@@ -2948,7 +3034,7 @@ sub _construct_tree ($) {
           }
         } # INSCOPE
           
-        $reconstruct_active_formatting_elements->();
+        $reconstruct_active_formatting_elements->($insert_to_current);
           
         
     {
@@ -2972,7 +3058,7 @@ sub _construct_tree ($) {
         return;
       } elsif ($token->{tag_name} eq 'marquee' or 
                $token->{tag_name} eq 'object') {
-        $reconstruct_active_formatting_elements->();
+        $reconstruct_active_formatting_elements->($insert_to_current);
         
         
     {
@@ -2995,7 +3081,7 @@ sub _construct_tree ($) {
         $token = $self->_get_next_token;
         return;
       } elsif ($token->{tag_name} eq 'xmp') {
-        $reconstruct_active_formatting_elements->();
+        $reconstruct_active_formatting_elements->($insert_to_current);
         
         
     {
@@ -3064,7 +3150,7 @@ sub _construct_tree ($) {
           $token->{tag_name} = 'img';
         }
         
-        $reconstruct_active_formatting_elements->();
+        $reconstruct_active_formatting_elements->($insert_to_current);
         
         
     {
@@ -3122,7 +3208,7 @@ sub _construct_tree ($) {
         $token = $self->_get_next_token;
         return;
       } elsif ($token->{tag_name} eq 'input') {
-        $reconstruct_active_formatting_elements->();
+        $reconstruct_active_formatting_elements->($insert_to_current);
         
         
     {
@@ -3161,7 +3247,7 @@ sub _construct_tree ($) {
                         {type => 'start tag', tag_name => 'p'},
                         {type => 'start tag', tag_name => 'label'},
                         {type => 'character',
-                         data => 'This is a searchable index.  Insert your search keywords here: '}, # SHOULD
+                         data => 'This is a searchable index. Insert your search keywords here: '}, # SHOULD
                         ## TODO: make this configurable
                         {type => 'start tag', tag_name => 'input', attributes => $at},
                         #{type => 'character', data => ''}, # SHOULD
@@ -3222,8 +3308,8 @@ sub _construct_tree ($) {
         }
         $token = $self->_get_next_token;
         return;
-      } elsif ($token->{type} eq 'select') {
-        $reconstruct_active_formatting_elements->();
+      } elsif ($token->{tag_name} eq 'select') {
+        $reconstruct_active_formatting_elements->($insert_to_current);
         
         
     {
@@ -3258,7 +3344,7 @@ sub _construct_tree ($) {
         
         ## ISSUE: An issue on HTML5 new elements in the spec.
       } else {
-        $reconstruct_active_formatting_elements->();
+        $reconstruct_active_formatting_elements->($insert_to_current);
         
         
     {
@@ -3574,8 +3660,9 @@ sub _construct_tree ($) {
         my $top_el = $open_elements->[0]->[0];
         for my $attr_name (keys %{$token->{attributes}}) {
           unless ($top_el->has_attribute_ns (undef, $attr_name)) {
-            $top_el->set_attribute_ns (undef, [undef, $attr_name], 
-                                       $token->{attributes}->{value});
+            $top_el->set_attribute_ns
+              (undef, [undef, $attr_name], 
+               $token->{attributes}->{$attr_name}->{value});
           }
         }
         $token = $self->_get_next_token;
@@ -3690,14 +3777,21 @@ sub _construct_tree ($) {
             redo B;
           } elsif ($token->{type} eq 'start tag') {
             if ($token->{tag_name} eq 'title') {
-              my $title_el; 
+              ## NOTE: There is an "as if in head" code clone
+              my $title_el;
+              
       $title_el = $self->{document}->create_element_ns
         (q<http://www.w3.org/1999/xhtml>, [undef,  'title']);
     
+        for my $attr_name (keys %{ $token->{attributes}}) {
+          $title_el->set_attribute_ns (undef, [undef, $attr_name],
+                                 $token->{attributes} ->{$attr_name}->{value});
+        }
+      
               (defined $head_element ? $head_element : $open_elements->[-1]->[0])
                 ->append_child ($title_el);
               $self->{content_model_flag} = 'RCDATA';
-              
+
               my $text = '';
               $token = $self->_get_next_token;
               while ($token->{type} eq 'character') {
@@ -3873,7 +3967,7 @@ sub _construct_tree ($) {
         } elsif ($insertion_mode eq 'in body') {
           if ($token->{type} eq 'character') {
             ## NOTE: There is a code clone of "character in body".
-            $reconstruct_active_formatting_elements->();
+            $reconstruct_active_formatting_elements->($insert_to_current);
             
             $open_elements->[-1]->[0]->manakai_append_text ($token->{data});
 
@@ -3886,17 +3980,64 @@ sub _construct_tree ($) {
             $token = $self->_get_next_token;
             redo B;
           } else {
-            $in_body->(sub {
-                         $open_elements->[-1]->[0]->append_child (shift);
-                       });
+            $in_body->($insert_to_current);
             redo B;
           }
         } elsif ($insertion_mode eq 'in table') {
           if ($token->{type} eq 'character') {
-            $reconstruct_active_formatting_elements->();
+            ## NOTE: There are "character in table" code clones.
+            if ($token->{data} =~ s/^([\x09\x0A\x0B\x0C\x20]+)//) {
+              $open_elements->[-1]->[0]->manakai_append_text ($1);
+              
+              unless (length $token->{data}) {
+                $token = $self->_get_next_token;
+                redo B;
+              }
+            }
 
-            $open_elements->[-1]->[0]->manakai_append_text ($token->{data});
-
+            ## As if in body, but insert into foster parent element
+            ## ISSUE: Spec says that "whenever a node would be inserted
+            ## into the current node" while characters might not be
+            ## result in a new Text node.
+            $reconstruct_active_formatting_elements->($insert_to_foster);
+            
+            if ({
+                 table => 1, tbody => 1, tfoot => 1,
+                 thead => 1, tr => 1,
+                }->{$open_elements->[-1]->[1]}) {
+              # MUST
+              my $foster_parent_element;
+              my $next_sibling;
+              my $prev_sibling;
+              OE: for (reverse 0..$#$open_elements) {
+                if ($open_elements->[$_]->[1] eq 'table') {
+                  my $parent = $open_elements->[$_]->[0]->parent_node;
+                  if (defined $parent and $parent->node_type == 1) {
+                    $foster_parent_element = $parent;
+                    $next_sibling = $open_elements->[$_]->[0];
+                    $prev_sibling = $next_sibling->previous_sibling;
+                  } else {
+                    $foster_parent_element = $open_elements->[$_ - 1]->[0];
+                    $prev_sibling = $foster_parent_element->last_child;
+                  }
+                  last OE;
+                }
+              } # OE
+              $foster_parent_element = $open_elements->[0]->[0] and
+              $prev_sibling = $foster_parent_element->last_child
+                unless defined $foster_parent_element;
+              if (defined $prev_sibling and
+                  $prev_sibling->node_type == 3) {
+                $prev_sibling->manakai_append_text ($token->{data});
+              } else {
+                $foster_parent_element->insert_before
+                  ($self->{document}->create_text_node ($token->{data}),
+                   $next_sibling);
+              }
+            } else {
+              $open_elements->[-1]->[0]->manakai_append_text ($token->{data});
+            }
+            
             $token = $self->_get_next_token;
             redo B;
           } elsif ($token->{type} eq 'comment') {
@@ -4081,43 +4222,13 @@ sub _construct_tree ($) {
             #
           }
 
-          ## NOTE: There are code clones of "misc in table".
           $self->{parse_error}->();
-          $in_body->(sub {
-                       my $child = shift;
-                       if ({
-                            table => 1, tbody => 1, tfoot => 1,
-                            thead => 1, tr => 1,
-                           }->{$open_elements->[-1]->[1]}) {
-                         # MUST
-                         my $foster_parent_element;
-                         my $next_sibling;
-                         OE: for (reverse 0..$#$open_elements) {
-                           if ($open_elements->[$_]->[1] eq 'table') {
-                             my $parent = $open_elements->[$_]->[0]->parent_node;
-                             if (defined $parent and $parent->node_type == 1) {
-                               $foster_parent_element = $parent;
-                               $next_sibling = $open_elements->[$_]->[0];
-                             } else {
-                               $foster_parent_element
-                                 = $open_elements->[$_ - 1]->[0];
-                             }
-                             last OE;
-                           }
-                         } # OE
-                         $foster_parent_element = $open_elements->[0]->[0]
-                           unless defined $foster_parent_element;
-                         $foster_parent_element->insert_before
-                           ($child, $next_sibling);
-                       } else {
-                         $open_elements->[-1]->[0]->append_child ($child);
-                       }
-                     });
+          $in_body->($insert_to_foster);
           redo B;
         } elsif ($insertion_mode eq 'in caption') {
           if ($token->{type} eq 'character') {
             ## NOTE: This is a code clone of "character in body".
-            $reconstruct_active_formatting_elements->();
+            $reconstruct_active_formatting_elements->($insert_to_current);
             
             $open_elements->[-1]->[0]->manakai_append_text ($token->{data});
 
@@ -4294,9 +4405,7 @@ sub _construct_tree ($) {
             #
           }
               
-          $in_body->(sub {
-                       $open_elements->[-1]->[0]->append_child (shift);
-                     });
+          $in_body->($insert_to_current);
           redo B;
         } elsif ($insertion_mode eq 'in column group') {
           if ($token->{type} eq 'character') {
@@ -4377,11 +4486,59 @@ sub _construct_tree ($) {
           }
         } elsif ($insertion_mode eq 'in table body') {
           if ($token->{type} eq 'character') {
-            ## Copied from 'in table'
-            $reconstruct_active_formatting_elements->();
+            ## NOTE: This is a "character in table" code clone.
+            if ($token->{data} =~ s/^([\x09\x0A\x0B\x0C\x20]+)//) {
+              $open_elements->[-1]->[0]->manakai_append_text ($1);
+              
+              unless (length $token->{data}) {
+                $token = $self->_get_next_token;
+                redo B;
+              }
+            }
 
-            $open_elements->[-1]->[0]->manakai_append_text ($token->{data});
+            ## As if in body, but insert into foster parent element
+            ## ISSUE: Spec says that "whenever a node would be inserted
+            ## into the current node" while characters might not be
+            ## result in a new Text node.
+            $reconstruct_active_formatting_elements->($insert_to_foster);
 
+            if ({
+                 table => 1, tbody => 1, tfoot => 1,
+                 thead => 1, tr => 1,
+                }->{$open_elements->[-1]->[1]}) {
+              # MUST
+              my $foster_parent_element;
+              my $next_sibling;
+              my $prev_sibling;
+              OE: for (reverse 0..$#$open_elements) {
+                if ($open_elements->[$_]->[1] eq 'table') {
+                  my $parent = $open_elements->[$_]->[0]->parent_node;
+                  if (defined $parent and $parent->node_type == 1) {
+                    $foster_parent_element = $parent;
+                    $next_sibling = $open_elements->[$_]->[0];
+                    $prev_sibling = $next_sibling->previous_sibling;
+                  } else {
+                    $foster_parent_element = $open_elements->[$_ - 1]->[0];
+                    $prev_sibling = $foster_parent_element->last_child;
+                  }
+                  last OE;
+                }
+              } # OE
+              $foster_parent_element = $open_elements->[0]->[0] and
+              $prev_sibling = $foster_parent_element->last_child
+                unless defined $foster_parent_element;
+              if (defined $prev_sibling and
+                  $prev_sibling->node_type == 3) {
+                $prev_sibling->manakai_append_text ($token->{data});
+              } else {
+                $foster_parent_element->insert_before
+                  ($self->{document}->create_text_node ($token->{data}),
+                   $next_sibling);
+              }
+            } else {
+              $open_elements->[-1]->[0]->manakai_append_text ($token->{data});
+            }
+            
             $token = $self->_get_next_token;
             redo B;
           } elsif ($token->{type} eq 'comment') {
@@ -4627,46 +4784,64 @@ sub _construct_tree ($) {
           }
           
           ## As if in table
-          ## NOTE: This is a code clone of "misc in table".
           $self->{parse_error}->();
-          $in_body->(sub {
-                       my $child = shift;
-                       if ({
-                            table => 1, tbody => 1, tfoot => 1,
-                            thead => 1, tr => 1,
-                           }->{$open_elements->[-1]->[1]}) {
-                         # MUST
-                         my $foster_parent_element;
-                         my $next_sibling;
-                         OE: for (reverse 0..$#$open_elements) {
-                           if ($open_elements->[$_]->[1] eq 'table') {
-                             my $parent = $open_elements->[$_]->[0]->parent_node;
-                             if (defined $parent and $parent->node_type == 1) {
-                               $foster_parent_element = $parent;
-                               $next_sibling = $open_elements->[$_]->[0];
-                             } else {
-                               $foster_parent_element
-                                 = $open_elements->[$_ - 1]->[0];
-                             }
-                             last OE;
-                           }
-                         } # OE
-                         $foster_parent_element = $open_elements->[0]->[0]
-                           unless defined $foster_parent_element;
-                         $foster_parent_element->insert_before
-                           ($child, $next_sibling);
-                       } else {
-                         $open_elements->[-1]->[0]->append_child ($child);
-                       }
-                     });
+          $in_body->($insert_to_foster);
           redo B;
         } elsif ($insertion_mode eq 'in row') {
           if ($token->{type} eq 'character') {
-            ## Copied from 'in table'
-            $reconstruct_active_formatting_elements->();
+            ## NOTE: This is a "character in table" code clone.
+            if ($token->{data} =~ s/^([\x09\x0A\x0B\x0C\x20]+)//) {
+              $open_elements->[-1]->[0]->manakai_append_text ($1);
+              
+              unless (length $token->{data}) {
+                $token = $self->_get_next_token;
+                redo B;
+              }
+            }
 
-            $open_elements->[-1]->[0]->manakai_append_text ($token->{data});
-
+            ## As if in body, but insert into foster parent element
+            ## ISSUE: Spec says that "whenever a node would be inserted
+            ## into the current node" while characters might not be
+            ## result in a new Text node.
+            $reconstruct_active_formatting_elements->($insert_to_foster);
+            
+            if ({
+                 table => 1, tbody => 1, tfoot => 1,
+                 thead => 1, tr => 1,
+                }->{$open_elements->[-1]->[1]}) {
+              # MUST
+              my $foster_parent_element;
+              my $next_sibling;
+              my $prev_sibling;
+              OE: for (reverse 0..$#$open_elements) {
+                if ($open_elements->[$_]->[1] eq 'table') {
+                  my $parent = $open_elements->[$_]->[0]->parent_node;
+                  if (defined $parent and $parent->node_type == 1) {
+                    $foster_parent_element = $parent;
+                    $next_sibling = $open_elements->[$_]->[0];
+                    $prev_sibling = $next_sibling->previous_sibling;
+                  } else {
+                    $foster_parent_element = $open_elements->[$_ - 1]->[0];
+                    $prev_sibling = $foster_parent_element->last_child;
+                  }
+                  last OE;
+                }
+              } # OE
+              $foster_parent_element = $open_elements->[0]->[0] and
+              $prev_sibling = $foster_parent_element->last_child
+                unless defined $foster_parent_element;
+              if (defined $prev_sibling and
+                  $prev_sibling->node_type == 3) {
+                $prev_sibling->manakai_append_text ($token->{data});
+              } else {
+                $foster_parent_element->insert_before
+                  ($self->{document}->create_text_node ($token->{data}),
+                   $next_sibling);
+              }
+            } else {
+              $open_elements->[-1]->[0]->manakai_append_text ($token->{data});
+            }
+            
             $token = $self->_get_next_token;
             redo B;
           } elsif ($token->{type} eq 'comment') {
@@ -4936,43 +5111,13 @@ sub _construct_tree ($) {
           }
 
           ## As if in table
-          ## NOTE: This is a code clone of "misc in table".
           $self->{parse_error}->();
-          $in_body->(sub {
-                       my $child = shift;
-                       if ({
-                            table => 1, tbody => 1, tfoot => 1,
-                            thead => 1, tr => 1,
-                           }->{$open_elements->[-1]->[1]}) {
-                         # MUST
-                         my $foster_parent_element;
-                         my $next_sibling;
-                         OE: for (reverse 0..$#$open_elements) {
-                           if ($open_elements->[$_]->[1] eq 'table') {
-                             my $parent = $open_elements->[$_]->[0]->parent_node;
-                             if (defined $parent and $parent->node_type == 1) {
-                               $foster_parent_element = $parent;
-                               $next_sibling = $open_elements->[$_]->[0];
-                             } else {
-                               $foster_parent_element
-                                 = $open_elements->[$_ - 1]->[0];
-                             }
-                             last OE;
-                           }
-                         } # OE
-                         $foster_parent_element = $open_elements->[0]->[0]
-                           unless defined $foster_parent_element;
-                         $foster_parent_element->insert_before
-                           ($child, $next_sibling);
-                       } else {
-                         $open_elements->[-1]->[0]->append_child ($child);
-                       }
-                     });
+          $in_body->($insert_to_foster);
           redo B;
         } elsif ($insertion_mode eq 'in cell') {
           if ($token->{type} eq 'character') {
             ## NOTE: This is a code clone of "character in body".
-            $reconstruct_active_formatting_elements->();
+            $reconstruct_active_formatting_elements->($insert_to_current);
             
             $open_elements->[-1]->[0]->manakai_append_text ($token->{data});
 
@@ -5112,9 +5257,7 @@ sub _construct_tree ($) {
             #
           }
           
-          $in_body->(sub {
-                       $open_elements->[-1]->[0]->append_child (shift);
-                     });
+          $in_body->($insert_to_current);
           redo B;
         } elsif ($insertion_mode eq 'in select') {
           if ($token->{type} eq 'character') {
@@ -5323,12 +5466,13 @@ sub _construct_tree ($) {
 
           $self->{parse_error}->();
           ## Ignore the token
+          $token = $self->_get_next_token;
           redo B;
         } elsif ($insertion_mode eq 'after body') {
           if ($token->{type} eq 'character') {
             if ($token->{data} =~ s/^([\x09\x0A\x0B\x0C\x20]+)//) {
               ## As if in body
-              $reconstruct_active_formatting_elements->();
+              $reconstruct_active_formatting_elements->($insert_to_current);
               
               $open_elements->[-1]->[0]->manakai_append_text ($token->{data});
 
@@ -5420,9 +5564,7 @@ sub _construct_tree ($) {
               $token = $self->_get_next_token;
               redo B;
             } elsif ($token->{tag_name} eq 'noframes') {
-              $in_body->(sub {
-                           $open_elements->[-1]->[0]->append_child (shift);
-                         });
+              $in_body->($insert_to_current);
               redo B;
             } else {
               #
@@ -5474,9 +5616,7 @@ sub _construct_tree ($) {
             redo B;
           } elsif ($token->{type} eq 'start tag') {
             if ($token->{tag_name} eq 'noframes') {
-              $in_body->(sub {
-                           $open_elements->[-1]->[0]->append_child (shift);
-                         });
+              $in_body->($insert_to_current);
               redo B;
             } else {
               #
@@ -5518,14 +5658,15 @@ sub _construct_tree ($) {
         redo B;
       } elsif ($token->{type} eq 'character') {
         if ($token->{data} =~ s/^([\x09\x0A\x0B\x0C\x20]+)//) {
+          my $data = $1;
           ## As if in the main phase.
           ## NOTE: The insertion mode in the main phase
           ## just before the phase has been changed to the trailing
           ## end phase is either "after body" or "after frameset".
-          $reconstruct_active_formatting_elements->()
+          $reconstruct_active_formatting_elements->($insert_to_current)
             if $phase eq 'main';
           
-          $open_elements->[-1]->[0]->manakai_append_text ($token->{data});
+          $open_elements->[-1]->[0]->manakai_append_text ($data);
           
           unless (length $token->{data}) {
             $token = $self->_get_next_token;
@@ -5654,4 +5795,4 @@ sub inner_html ($$$) {
 } # inner_html
 
 1;
-# $Date: 2007/04/30 14:12:02 $
+# $Date: 2007/05/01 06:22:12 $

@@ -2,8 +2,9 @@
 use strict;
 
 my $dir_name;
+my $test_dir_name;
 BEGIN {
-  my $test_dir_name = 't/';
+  $test_dir_name = 't/';
   $dir_name = 't/tree-construction/';
   my $skip = "You don't have make command";
   eval q{
@@ -19,7 +20,7 @@ BEGIN {
 }
 
 use Test;
-BEGIN { plan tests => 67 }
+BEGIN { plan tests => 402 }
 
 use Data::Dumper;
 $Data::Dumper::Useqq = 1;
@@ -29,14 +30,15 @@ sub Data::Dumper::qquote {
   return q<qq'> . $s . q<'>;
 } # Data::Dumper::qquote
 
-for my $file_name (qw[
-                      tests1.dat
-                      tests2.dat
-                      tests3.dat
-                      tests4.dat
+for my $file_name (grep {$_} split /\s+/, qq[
+                      ${dir_name}tests1.dat
+                      ${dir_name}tests2.dat
+                      ${dir_name}tests3.dat
+                      ${dir_name}tests4.dat
+                      ${test_dir_name}tree-test-1.dat
                      ]) {
-  open my $file, '<', $dir_name.$file_name
-    or die "$0: $dir_name$file_name: $!";
+  open my $file, '<', $file_name
+    or die "$0: $file_name: $!";
 
   my $test;
   my $mode = 'data';
@@ -53,8 +55,8 @@ for my $file_name (qw[
     } elsif (/^#document$/) {
       $test->{document} = '';
       $mode = 'document';
-    } elsif (/^$/) {
-      test ($test) if $test->{errors};
+    } elsif (defined $test->{document} and /^$/) {
+      test ($test);
       undef $test;
     } else {
       if ($mode eq 'data' or $mode eq 'document') {
@@ -137,7 +139,7 @@ sub serialize ($) {
     if ($nt == $child->[0]->ELEMENT_NODE) {
       $r .= '| ' . $child->[1] . '<' . $child->[0]->tag_name . ">\x0A"; ## ISSUE: case?
 
-      for my $attr (sort {$a->[1] cmp $b->[1]} map { [$_->name, $_->value] }
+      for my $attr (sort {$a->[0] cmp $b->[0]} map { [$_->name, $_->value] }
                     @{$child->[0]->attributes}) {
         $r .= '| ' . $child->[1] . '  ' . $attr->[0] . '="'; ## ISSUE: case?
         $r .= $attr->[1] . '"' . "\x0A";
@@ -160,4 +162,4 @@ sub serialize ($) {
 } # serialize
 
 ## License: Public Domain.
-## $Date: 2007/04/30 14:12:02 $
+## $Date: 2007/05/01 06:22:12 $

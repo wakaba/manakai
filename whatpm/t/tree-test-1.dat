@@ -1,0 +1,163 @@
+#data
+<!DOCTYPE html><html title="t"><head><title></title></head><body></body></html>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   title="t"
+|   <head>
+|     <title>
+|   <body>
+
+#data
+<!DOCTYPE html><html><head title="t"><title></title></head><body></body></html>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     title="t"
+|     <title>
+|   <body>
+
+#data
+<!DOCTYPE html><html><head><title class="t"></title></head><body></body></html>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <title>
+|       class="t"
+|   <body>
+
+#data
+<!DOCTYPE html><html><head></head><body></body><title class="a"></title></html>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <title>
+|       class="a"
+|   <body>
+
+#data
+<!DOCTYPE html><html><head><title></title></head><body title="t"></body></html>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <title>
+|   <body>
+|     title="t"
+
+#data
+<!DOCTYPE html><html><head><title></title><meta name="a"></head><body></body></html>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <title>
+|     <meta>
+|       name="a"
+|   <body>
+
+#data
+<!DOCTYPE html><html><head><title></title></head><body><meta name="a"></body></html>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <title>
+|     <meta>
+|       name="a"
+|   <body>
+
+#data
+<!DOCTYPE html><html><head><title></title><link rel="a"></head><body></body></html>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <title>
+|     <link>
+|       rel="a"
+|   <body>
+
+#data
+<!DOCTYPE html><html><head><title></title></head><body><link rel="a"></body></html>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <title>
+|     <link>
+|       rel="a"
+|   <body>
+
+#data
+<!DOCTYPE html><html><head><title></title><base href="http://"></head><body></body></html>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <title>
+|     <base>
+|       href="http://"
+|   <body>
+
+#data
+<!DOCTYPE html><html><head><title></title></head><body><base href="http://"></body></html>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <title>
+|     <base>
+|       href="http://"
+|   <body>
+
+#data
+<!DOCTYPE html><p><b><p>X
+#errors
+...TBD
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <p>
+|       <b>
+|     <p>
+|       <b>
+|         "X"
+
+#data
+<!DOCTYPE html><b><p>
+#errors
+...TBD
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     ????
+
+#data
+<!DOCTYPE html><b><p>X
+#errors
+...TBD
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     ????

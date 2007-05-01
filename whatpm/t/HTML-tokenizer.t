@@ -2,8 +2,9 @@
 use strict;
 
 my $dir_name;
+my $test_dir_name;
 BEGIN {
-  my $test_dir_name = 't/';
+  $test_dir_name = 't/';
   $dir_name = 't/tokenizer/';
   my $skip = "You don't have JSON module";
   eval q{
@@ -23,7 +24,7 @@ BEGIN {
 }
 
 use Test;
-BEGIN { plan tests => 67 }
+BEGIN { plan tests => 70 }
 
 use Data::Dumper;
 $Data::Dumper::Useqq = 1;
@@ -35,13 +36,14 @@ sub Data::Dumper::qquote {
 
 use What::HTML;
 
-for my $file_name (qw[
-                      test1.test
-                      test2.test
-                      contentModelFlags.test
+for my $file_name (grep {$_} split /\s+/, qq[
+                      ${dir_name}test1.test
+                      ${dir_name}test2.test
+                      ${dir_name}contentModelFlags.test
+                      ${test_dir_name}tokenizer-test-1.test
                      ]) {
-  open my $file, '<', $dir_name.$file_name
-    or die "$0: $dir_name$file_name: $!";
+  open my $file, '<', $file_name
+    or die "$0: $file_name: $!";
   local $/ = undef;
   my $js = <$file>;
   close $file;
@@ -137,4 +139,4 @@ for my $file_name (qw[
   }
 }
 
-## $Date: 2007/04/30 14:12:02 $
+## $Date: 2007/05/01 06:22:12 $

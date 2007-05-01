@@ -63,6 +63,7 @@ sub insert_before ($$;$) {
   return $new_child;
 } # insert_before
 
+## NOTE: Only applied to Elements and Documents
 sub remove_child ($$) {
   my ($self, $old_child) = @_;
   my $parent_list = $self->{child_nodes};
@@ -79,6 +80,28 @@ sub remove_child ($$) {
 sub has_child_nodes ($) {
   return @{shift->{child_nodes}} > 0;
 } # has_child_nodes
+
+## NOTE: Only applied to Elements and Documents
+sub last_child ($) {
+  my $self = shift;
+  return @{$self->{child_nodes}} ? $self->{child_nodes}->[-1] : undef;
+} # last_child
+
+## NOTE: Only applied to Elements and Documents
+sub previous_sibling ($) {
+  my $self = shift;
+  my $parent = $self->{parent_node};
+  return undef unless defined $parent;
+  my $r;
+  for (@{$parent->{child_nodes}}) {
+    if ($_ eq $self) {
+      return $r;
+    } else {
+      $r = $_;
+    }
+  }
+  return undef;
+} # previous_sibling
 
 sub ELEMENT_NODE () { 1 }
 sub ATTRIBUTE_NODE () { 2 }
@@ -166,9 +189,12 @@ sub clone_node ($$) {
   }, ref $self;
   for my $ns (keys %{$self->{attributes}}) {
     for my $ln (keys %{$self->{attributes}->{$ns}}) {
+      my $attr = $self->{attributes}->{$ns}->{$ln};
       $clone->{attributes}->{$ns}->{$ln} = bless {
-        prefix => $self->{attributes}->{$ns}->{$ln}->{prefix},
-        value => $self->{attributes}->{$ns}->{$ln}->{value},
+        namespace_uri => $attr->{namespace_uri},
+        prefix => $attr->{prefix},
+        local_name => $attr->{local_name},
+        value => $attr->{value},
       }, ref $self->{attributes}->{$ns}->{$ln};
     }
   }
@@ -298,4 +324,4 @@ sub name ($) {
 } # name
 
 1;
-# $Date: 2007/04/30 14:12:02 $
+# $Date: 2007/05/01 06:22:12 $
