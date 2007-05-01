@@ -15,8 +15,8 @@ my $mode = $http->meta_variable ('PATH_INFO');
 
 if ($mode eq '/html' or $mode eq '/test') {
   require Encode;
-  require What::HTML;
-  require What::NanoDOM;
+  require Whatpm::HTML;
+  require Whatpm::NanoDOM;
 
   my $s = $http->parameter ('s');
   if (length $s > 1000_000) {
@@ -34,14 +34,14 @@ if ($mode eq '/html' or $mode eq '/test') {
     print STDOUT "0,0,", $_[0], "\n";
   };
 
-  my $doc = What::HTML->parse_string
-      ($s => What::NanoDOM::Document->new, $onerror);
+  my $doc = Whatpm::HTML->parse_string
+      ($s => Whatpm::NanoDOM::Document->new, $onerror);
 
   print "#document\n";
 
   my $out;
   if ($mode eq '/html') {
-    $out = What::HTML->get_inner_html ($doc);
+    $out = Whatpm::HTML->get_inner_html ($doc);
   } else { # test
     $out = test_serialize ($doc);
   }
