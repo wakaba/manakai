@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title>What::ContentType - Content Type and Character Encoding Sniffer</title>
+<title>Whatpm::ContentType - Content Type and Character Encoding Sniffer</title>
 <link rel="stylesheet" href="http://suika.fam.cx/www/style/html/pod.css" type="text/css" />
 <link rev="made" href="mailto:admin@suika.fam.cx" />
 </head>
@@ -28,7 +28,7 @@
 <p>
 </p>
 <h1><a name="name">NAME</a></h1>
-<p>What::ContentType - Content Type and Character Encoding Sniffer</p>
+<p>Whatpm::ContentType - Content Type and Character Encoding Sniffer</p>
 <p>
 </p>
 <hr />
@@ -36,8 +36,8 @@
 <pre>
   ## Content-Type Sniffing
   
-  require What::ContentType;
-  my $sniffed_type = What::ContentType-&gt;get_sniffed_type (
+  require Whatpm::ContentType;
+  my $sniffed_type = Whatpm::ContentType-&gt;get_sniffed_type (
     get_file_head =&gt; sub {
       my $n = shift;
       return $first_n_bytes_of_the_entity;
@@ -56,20 +56,20 @@
 </p>
 <hr />
 <h1><a name="description">DESCRIPTION</a></h1>
-<p>The <code>What::ContentType</code> module contains media type sniffer
+<p>The <code>Whatpm::ContentType</code> module contains media type sniffer
 for Web user agents.  It implements the content type detecting
 algorithm as defined in the Web Applications 1.0 specification.</p>
 <p>In addition, a future version of this module is expected
 to also implement the character encoding detection algorithm
 for HTML documents as described in that specification.</p>
-<p>This module is part of WHAT.pm - Perl Modules for 
+<p>This module is part of Whatpm - Perl Modules for 
 Web Hypertext Application Technologies.</p>
 <p>
 </p>
 <hr />
 <h1><a name="method">METHOD</a></h1>
 <dl>
-<dt><strong><a name="item_get_sniffed_type"><em>$sniffed_type</em> = What::ContentType-&gt;get_sniffed_type (<em>named-parameters</em>)</a></strong><br />
+<dt><strong><a name="item_get_sniffed_type"><em>$sniffed_type</em> = Whatpm::ContentType-&gt;get_sniffed_type (<em>named-parameters</em>)</a></strong><br />
 </dt>
 <dd>
 Returns the sniffed type of an entity.  Arguments to

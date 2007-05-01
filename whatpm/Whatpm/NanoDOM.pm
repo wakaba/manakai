@@ -1,21 +1,21 @@
 =head1 NAME
 
-What::NanoDOM - A Non-Conforming Implementation of DOM Subset
+Whatpm::NanoDOM - A Non-Conforming Implementation of DOM Subset
 
 =head1 DESCRIPTION
 
-The C<What::NanoDOM> module contains a non-conforming implementation
+The C<Whatpm::NanoDOM> module contains a non-conforming implementation
 of a subset of DOM.  It is the intention that this module is
-used only for the purpose of testing the C<What::HTML> module.
+used only for the purpose of testing the C<Whatpm::HTML> module.
 
 See source code if you would like to know what it does.
 
 =cut
 
-package What::NanoDOM;
+package Whatpm::NanoDOM;
 use strict;
 
-package What::NanoDOM::Node;
+package Whatpm::NanoDOM::Node;
 
 sub new ($) {
   my $class = shift;
@@ -130,8 +130,8 @@ sub DOCUMENT_TYPE_NODE () { 10 }
 sub DOCUMENT_FRAGMENT_NODE () { 11 }
 sub NOTATION_NODE () { 12 }
 
-package What::NanoDOM::Document;
-push our @ISA, 'What::NanoDOM::Node';
+package Whatpm::NanoDOM::Document;
+push our @ISA, 'Whatpm::NanoDOM::Node';
 
 sub new ($) {
   my $self = shift->SUPER::new;
@@ -159,29 +159,29 @@ sub strict_error_checking {
 
 sub create_text_node ($$) {
   shift;
-  return What::NanoDOM::Text->new (shift);
+  return Whatpm::NanoDOM::Text->new (shift);
 } # create_text_node
 
 sub create_comment ($$) {
   shift;
-  return What::NanoDOM::Comment->new (shift);
+  return Whatpm::NanoDOM::Comment->new (shift);
 } # create_comment
 
 ## The second parameter only supports manakai extended way
 ## to specify qualified name - "[$prefix, $local_name]"
 sub create_element_ns ($$$) {
   my ($self, $nsuri, $qn) = @_;
-  return What::NanoDOM::Element->new ($nsuri, $qn->[0], $qn->[1]);
+  return Whatpm::NanoDOM::Element->new ($nsuri, $qn->[0], $qn->[1]);
 } # create_element_ns
 
 ## A manakai extension
 sub create_document_type_definition ($$) {
   shift;
-  return What::NanoDOM::DocumentType->new (shift);
+  return Whatpm::NanoDOM::DocumentType->new (shift);
 } # create_document_type_definition
 
-package What::NanoDOM::Element;
-push our @ISA, 'What::NanoDOM::Node';
+package Whatpm::NanoDOM::Element;
+push our @ISA, 'Whatpm::NanoDOM::Node';
 
 sub new ($$$$) {
   my $self = shift->SUPER::new;
@@ -222,7 +222,7 @@ sub manakai_append_text ($$) {
       $self->{child_nodes}->[-1]->node_type == 3) {
     $self->{child_nodes}->[-1]->manakai_append_text (shift);
   } else {
-    my $text = What::NanoDOM::Text->new (shift);
+    my $text = Whatpm::NanoDOM::Text->new (shift);
     $self->append_child ($text);
   }
 } # manakai_append_text
@@ -262,11 +262,11 @@ sub has_attribute_ns ($$$) {
 sub set_attribute_ns ($$$$) {
   my ($self, $nsuri, $qn, $value) = @_;
   $self->{attributes}->{$nsuri}->{$qn->[1]}
-    = What::NanoDOM::Attr->new ($nsuri, $qn->[0], $qn->[1], $value);
+    = Whatpm::NanoDOM::Attr->new ($nsuri, $qn->[0], $qn->[1], $value);
 } # set_attribute_ns
 
-package What::NanoDOM::Attr;
-push our @ISA, 'What::NanoDOM::Node';
+package Whatpm::NanoDOM::Attr;
+push our @ISA, 'Whatpm::NanoDOM::Node';
 
 sub new ($$$$$) {
   my $self = shift->SUPER::new;
@@ -293,8 +293,8 @@ sub value ($) {
   return shift->{value};
 } # value
 
-package What::NanoDOM::CharacterData;
-push our @ISA, 'What::NanoDOM::Node';
+package Whatpm::NanoDOM::CharacterData;
+push our @ISA, 'Whatpm::NanoDOM::Node';
 
 sub new ($$) {
   my $self = shift->SUPER::new;
@@ -312,18 +312,18 @@ sub data ($) {
   return shift->{data};
 } # data
 
-package What::NanoDOM::Text;
-push our @ISA, 'What::NanoDOM::CharacterData';
+package Whatpm::NanoDOM::Text;
+push our @ISA, 'Whatpm::NanoDOM::CharacterData';
 
 sub node_type () { 3 }
 
-package What::NanoDOM::Comment;
-push our @ISA, 'What::NanoDOM::CharacterData';
+package Whatpm::NanoDOM::Comment;
+push our @ISA, 'Whatpm::NanoDOM::CharacterData';
 
 sub node_type () { 8 }
 
-package What::NanoDOM::DocumentType;
-push our @ISA, 'What::NanoDOM::Node';
+package Whatpm::NanoDOM::DocumentType;
+push our @ISA, 'Whatpm::NanoDOM::Node';
 
 sub new ($$) {
   my $self = shift->SUPER::new;
@@ -339,7 +339,7 @@ sub name ($) {
 
 =head1 SEE ALSO
 
-L<What::HTML>
+L<Whatpm::HTML>
 
 =head1 AUTHOR
 
@@ -355,4 +355,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2007/05/01 10:36:06 $
+# $Date: 2007/05/01 10:47:37 $

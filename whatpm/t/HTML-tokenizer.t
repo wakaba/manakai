@@ -34,7 +34,7 @@ sub Data::Dumper::qquote {
   return q<qq'> . $s . q<'>;
 } # Data::Dumper::qquote
 
-use What::HTML;
+use Whatpm::HTML;
 
 for my $file_name (grep {$_} split /\s+/, qq[
                       ${dir_name}test1.test
@@ -68,7 +68,7 @@ for my $file_name (grep {$_} split /\s+/, qq[
     my @cm = @{$test->{contentModelFlags} || ['PCDATA']};
     my $last_start_tag = $test->{lastStartTag};
     for my $cm (@cm) {
-      my $p = What::HTML->new;
+      my $p = Whatpm::HTML->new;
       my $i = 0;
       $p->{set_next_input_character} = sub {
         my $self = shift;
@@ -139,4 +139,4 @@ for my $file_name (grep {$_} split /\s+/, qq[
   }
 }
 
-## $Date: 2007/05/01 06:22:12 $
+## $Date: 2007/05/01 10:47:37 $

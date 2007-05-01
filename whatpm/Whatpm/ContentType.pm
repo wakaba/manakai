@@ -1,13 +1,13 @@
 =head1 NAME
 
-What::ContentType - Content Type and Character Encoding Sniffer
+Whatpm::ContentType - Content Type and Character Encoding Sniffer
 
 =head1 SYNOPSIS
 
   ## Content-Type Sniffing
   
-  require What::ContentType;
-  my $sniffed_type = What::ContentType->get_sniffed_type (
+  require Whatpm::ContentType;
+  my $sniffed_type = Whatpm::ContentType->get_sniffed_type (
     get_file_head => sub {
       my $n = shift;
       return $first_n_bytes_of_the_entity;
@@ -25,7 +25,7 @@ What::ContentType - Content Type and Character Encoding Sniffer
 
 =head1 DESCRIPTION
 
-The C<What::ContentType> module contains media type sniffer
+The C<Whatpm::ContentType> module contains media type sniffer
 for Web user agents.  It implements the content type detecting
 algorithm as defined in the Web Applications 1.0 specification.
 
@@ -33,14 +33,14 @@ In addition, a future version of this module is expected
 to also implement the character encoding detection algorithm
 for HTML documents as described in that specification.
 
-This module is part of WHAT.pm - Perl Modules for 
+This module is part of Whatpm - Perl Modules for 
 Web Hypertext Application Technologies.
 
 =cut
 
-package What::ContentType;
+package Whatpm::ContentType;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## Table in <http://www.whatwg.org/specs/web-apps/current-work/#content-type1>.
 ##
@@ -123,7 +123,7 @@ my @ImageSniffingTable = (
 
 =over 4
 
-=item I<$sniffed_type> = What::ContentType->get_sniffed_type (I<named-parameters>)
+=item I<$sniffed_type> = Whatpm::ContentType->get_sniffed_type (I<named-parameters>)
 
 Returns the sniffed type of an entity.  Arguments to
 this method MUST be specified as name-value pairs.
@@ -387,4 +387,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2007/05/01 10:36:06 $
+# $Date: 2007/05/01 10:47:37 $

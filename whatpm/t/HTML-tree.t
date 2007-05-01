@@ -70,13 +70,13 @@ for my $file_name (grep {$_} split /\s+/, qq[
   test ($test) if $test->{errors};
 }
 
-use What::HTML;
-use What::NanoDOM;
+use Whatpm::HTML;
+use Whatpm::NanoDOM;
 
 sub test ($) {
   my $test = shift;
 
-  my $doc = What::NanoDOM::Document->new;
+  my $doc = Whatpm::NanoDOM::Document->new;
   my @errors;
   
   $SIG{INT} = sub {
@@ -84,7 +84,7 @@ sub test ($) {
     exit;
   };
 
-  What::HTML->parse_string
+  Whatpm::HTML->parse_string
       ($test->{data} => $doc, sub {
          my $msg = shift;
          push @errors, $msg;
@@ -132,4 +132,4 @@ sub serialize ($) {
 } # serialize
 
 ## License: Public Domain.
-## $Date: 2007/05/01 07:46:42 $
+## $Date: 2007/05/01 10:47:37 $

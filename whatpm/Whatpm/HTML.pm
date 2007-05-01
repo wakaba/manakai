@@ -1,6 +1,6 @@
-package What::HTML;
+package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## This is an early version of an HTML parser.
 
@@ -3609,7 +3609,7 @@ sub _construct_tree ($) {
       if ($token->{type} eq 'DOCTYPE') {
         if ($token->{error}) {
           ## ISSUE: Spec currently left this case undefined.
-          $self->{parse_error}-> ('missing DOCTYPE');
+          $self->{parse_error}-> ('bogus DOCTYPE');
         }
         my $doctype = $self->{document}->create_document_type_definition
           ($token->{name});
@@ -5836,4 +5836,4 @@ sub get_inner_html ($$$) {
 } # get_inner_html
 
 1;
-# $Date: 2007/05/01 10:36:06 $
+# $Date: 2007/05/01 10:47:37 $

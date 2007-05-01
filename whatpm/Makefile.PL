@@ -2,7 +2,7 @@
 use strict;
 use ExtUtils::MakeMaker;
 WriteMakefile (
-  NAME => 'What.PM',
+  NAME => 'Whatpm',
   DISTNAME => 'whatpm',
   VERSION => '0.1',
   dist => {COMPRESS => 'gzip', SUFFIX => '.gz'},

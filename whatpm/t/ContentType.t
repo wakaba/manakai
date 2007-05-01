@@ -3,7 +3,7 @@ use Test;
 
 BEGIN { plan tests => 780 }
 
-use What::ContentType;
+use Whatpm::ContentType;
 
 sub x (@) { join '', map { chr hex $_ } @_ }
 
@@ -495,7 +495,7 @@ for my $v (
   ],
 ) {
   ## Text or binary
-  my $st = What::ContentType->get_sniffed_type (get_file_head => sub {
+  my $st = Whatpm::ContentType->get_sniffed_type (get_file_head => sub {
     return $v->[0]; 
   }, http_content_type_byte => $v->[1],
   has_http_content_encoding => $v->[2],
@@ -503,7 +503,7 @@ for my $v (
   ok $st, $v->[3], 'Text or binary: ' . $v->[4];
 
   ## Unknown type
-  $st = What::ContentType->get_sniffed_type (get_file_head => sub {
+  $st = Whatpm::ContentType->get_sniffed_type (get_file_head => sub {
     return $v->[0]; 
   },
   supported_image_types => {'image/jpeg' => 1});
@@ -512,7 +512,7 @@ for my $v (
   ## Image
   for my $img_type (qw(image/png image/gif image/jpeg)) {
     ## If it is the only supported type
-    my $st = What::ContentType->get_sniffed_type (get_file_head => sub {
+    my $st = Whatpm::ContentType->get_sniffed_type (get_file_head => sub {
       return $v->[0];
     },
     http_content_type_byte => $img_type,
@@ -520,7 +520,7 @@ for my $v (
     ok $st, $img_type, 'Image (only): ' . $v->[4];
 
     ## If there is no supported type
-    $st = What::ContentType->get_sniffed_type (get_file_head => sub {
+    $st = Whatpm::ContentType->get_sniffed_type (get_file_head => sub {
       return $v->[0];
     },
     http_content_type_byte => $img_type,
@@ -528,7 +528,7 @@ for my $v (
     ok $st, $img_type, 'Image (no): ' . $v->[4];
 
     ## If all types are supported
-    $st = What::ContentType->get_sniffed_type (get_file_head => sub {
+    $st = Whatpm::ContentType->get_sniffed_type (get_file_head => sub {
       return $v->[0];
     },
     http_content_type_byte => $img_type,
@@ -538,7 +538,7 @@ for my $v (
   }
 
   ## Feed or HTML
-  $st = What::ContentType->get_sniffed_type (get_file_head => sub {
+  $st = Whatpm::ContentType->get_sniffed_type (get_file_head => sub {
     return $v->[0]; 
   },
   http_content_type_byte => 'text/html',
@@ -547,5 +547,5 @@ for my $v (
 }
 
 ## License: Public Domain.
-## $Date: 2007/04/24 14:24:33 $
+## $Date: 2007/05/01 10:47:37 $
 1;

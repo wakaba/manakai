@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title>What::HTML - An HTML Parser</title>
+<title>Whatpm::HTML - An HTML Parser</title>
 <link rel="stylesheet" href="http://suika.fam.cx/www/style/html/pod.css" type="text/css" />
 <link rev="made" href="mailto:admin@suika.fam.cx" />
 </head>
@@ -28,13 +28,13 @@
 <p>
 </p>
 <h1><a name="name">NAME</a></h1>
-<p>What::HTML - An HTML Parser</p>
+<p>Whatpm::HTML - An HTML Parser</p>
 <p>
 </p>
 <hr />
 <h1><a name="synopsis">SYNOPSIS</a></h1>
 <pre>
-  use What::HTML;
+  use Whatpm::HTML;
   
   my $s = q&lt;&lt;!DOCTYPE html&gt;&lt;html&gt;...&lt;/html&gt;&gt;;
   # $doc = an empty DOM |Document| object
@@ -43,14 +43,14 @@
     warn $error_code, &quot;\n&quot;;
   };
   
-  What::HTML-&gt;parse_string ($s =&gt; $doc, $onerror);
+  Whatpm::HTML-&gt;parse_string ($s =&gt; $doc, $onerror);
   
   ## Then, |$doc| is the DOM representation of |$s|.</pre>
 <p>
 </p>
 <hr />
 <h1><a name="description">DESCRIPTION</a></h1>
-<p>The <code>What::HTML</code> module contains HTML parser and serializer.</p>
+<p>The <code>Whatpm::HTML</code> module contains HTML parser and serializer.</p>
 <p>The HTML parser can be used to construct the DOM tree representation
 from an HTML document.  The parsing and tree construction are done 
 as described in the Web Application 1.0 specification.</p>
@@ -58,14 +58,14 @@ as described in the Web Application 1.0 specification.</p>
 of a DOM tree (or a tree fragment thereof).  The serialization
 is performed as described in the Web Applications 1.0 specification
 for <code>innerHTML</code> DOM attribute.</p>
-<p>This module is part of WHAT.pm - Perl Modules for 
+<p>This module is part of Whatpm - Perl Modules for 
 Web Hypertext Application Technologies.</p>
 <p>
 </p>
 <hr />
 <h1><a name="methods">METHODS</a></h1>
 <dl>
-<dt><strong><a name="item_parse_string">[<em>$doc</em> =] What::HTML-&gt;parse_string (<em>$s</em>, <em>$doc</em>[, <em>$onerror</em>]);</a></strong><br />
+<dt><strong><a name="item_parse_string">[<em>$doc</em> =] Whatpm::HTML-&gt;parse_string (<em>$s</em>, <em>$doc</em>[, <em>$onerror</em>]);</a></strong><br />
 </dt>
 <dd>
 Parse a string <em>$s</em> as an HTML document.
@@ -95,21 +95,22 @@ parse error makes that string being <code>warn</code>ed.</p>
 <p>The method returns the DOM <code>Document</code> object (i.e. the second argument).</p>
 </dd>
 <dd>
-<p>Note that the <code>What::NanoDOM</code> module provides a non-conforming
+<p>Note that the <code>Whatpm::NanoDOM</code> module provides a non-conforming
 implementation of DOM that only implements the subset that
-is necessary for the purpose of <code>What::HTML</code>'s parsing and
+is necessary for the purpose of <code>Whatpm::HTML</code>'s parsing and
 serializing.
 With this module, creating a new HTML <code>Document</code> object
 from a string containing HTML document can be coded as:</p>
 </dd>
 <dd>
 <pre>
-  use What::HTML;
-  use What::NanoDOM;
-  my $doc = What::HTML-&gt;parse_string ($s =&gt; What::NanoDOM-&gt;new, $onerror);</pre>
+  use Whatpm::HTML;
+  use Whatpm::NanoDOM;
+  my $doc = Whatpm::HTML-&gt;parse_string
+      ($s =&gt; Whatpm::NanoDOM::Document-&gt;new, $onerror);</pre>
 </dd>
 <p></p>
-<dt><strong><a name="item_get_inner_html"><em>$s</em> = What::HTML-&gt;get_inner_html (<em>$node</em>[, <em>$onerror</em>]);</a></strong><br />
+<dt><strong><a name="item_get_inner_html"><em>$s</em> = Whatpm::HTML-&gt;get_inner_html (<em>$node</em>[, <em>$onerror</em>]);</a></strong><br />
 </dt>
 <dd>
 Return the HTML serialization of a DOM node <em>$node</em>.
@@ -130,7 +131,7 @@ This argument is optional; if missing, any such
 node is simply ignored.</p>
 </dd>
 <dd>
-<p>The method returns the <code>inner_html</code> attribute
+<p>The method returns a reference to the <code>inner_html</code> attribute
 value, i.e. the HTML serialization of the <code>$node</code>.</p>
 </dd>
 <p></p></dl>
@@ -150,7 +151,7 @@ to improve performance.</p>
 <h1><a name="see_also">SEE ALSO</a></h1>
 <p>Web Applications 1.0 Working Draft (aka HTML5)
 &lt;http://whatwg.org/html5&gt;.  (Revision 792, 1 May 2007)</p>
-<p><a href="../What/NanoDOM.html">the What::NanoDOM manpage</a></p>
+<p><a href="../Whatpm/NanoDOM.html">the Whatpm::NanoDOM manpage</a></p>
 <p>
 </p>
 <hr />
