@@ -70,7 +70,8 @@ from a string containing HTML document can be coded as:
 
   use What::HTML;
   use What::NanoDOM;
-  my $doc = What::HTML->parse_string ($s => What::NanoDOM->new, $onerror);
+  my $doc = What::HTML->parse_string
+      ($s => What::NanoDOM::Document->new, $onerror);
 
 =item I<$s> = What::HTML->get_inner_html (I<$node>[, I<$onerror>]);
 
@@ -89,7 +90,7 @@ whose type is invalid.
 This argument is optional; if missing, any such
 node is simply ignored.
 
-The method returns the C<inner_html> attribute
+The method returns a reference to the C<inner_html> attribute
 value, i.e. the HTML serialization of the C<$node>.
 
 =back
@@ -127,4 +128,4 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-# $Date: 2007/05/01 08:17:44 $
+# $Date: 2007/05/01 10:36:06 $

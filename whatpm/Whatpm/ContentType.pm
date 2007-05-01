@@ -40,7 +40,7 @@ Web Hypertext Application Technologies.
 
 package What::ContentType;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## Table in <http://www.whatwg.org/specs/web-apps/current-work/#content-type1>.
 ##
@@ -387,4 +387,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2007/05/01 08:17:44 $
+# $Date: 2007/05/01 10:36:06 $

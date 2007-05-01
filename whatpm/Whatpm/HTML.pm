@@ -1,6 +1,6 @@
 package What::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## This is an early version of an HTML parser.
 
@@ -369,7 +369,13 @@ sub _initialize_tokenizer ($) {
   undef $self->{last_attribute_value_state};
   $self->{char} = [];
   # $self->{next_input_character}
-  !!!next-input-character;
+  
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
   $self->{token} = [];
 } # _initialize_tokenizer
 
@@ -407,7 +413,13 @@ sub _get_next_token ($) {
         if ($self->{content_model_flag} eq 'PCDATA' or
             $self->{content_model_flag} eq 'RCDATA') {
           $self->{state} = 'entity data';
-          !!!next-input-character;
+          
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
           redo A;
         } else {
           #
@@ -415,22 +427,34 @@ sub _get_next_token ($) {
       } elsif ($self->{next_input_character} == 0x003C) { # <
         if ($self->{content_model_flag} ne 'PLAINTEXT') {
           $self->{state} = 'tag open';
-          !!!next-input-character;
+          
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
           redo A;
         } else {
           #
         }
       } elsif ($self->{next_input_character} == -1) {
-        !!!emit ({type => 'end-of-file'});
+        return  ({type => 'end-of-file'});
         last A; ## TODO: ok?
       }
       # Anything else
       my $token = {type => 'character',
                    data => chr $self->{next_input_character}};
       ## Stay in the data state
-      !!!next-input-character;
+      
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
 
-      !!!emit ($token);
+      return  ($token);
 
       redo A;
     } elsif ($self->{state} eq 'entity data') {
@@ -442,9 +466,9 @@ sub _get_next_token ($) {
       # next-input-character is already done
 
       unless (defined $token) {
-        !!!emit ({type => 'character', data => '&'});
+        return  ({type => 'character', data => '&'});
       } else {
-        !!!emit ($token);
+        return  ($token);
       }
 
       redo A;
@@ -452,25 +476,43 @@ sub _get_next_token ($) {
       if ($self->{content_model_flag} eq 'RCDATA' or
           $self->{content_model_flag} eq 'CDATA') {
         if ($self->{next_input_character} == 0x002F) { # /
-          !!!next-input-character;
+          
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
           $self->{state} = 'close tag open';
           redo A;
         } else {
           ## reconsume
           $self->{state} = 'data';
 
-          !!!emit ({type => 'character', data => '<'});
+          return  ({type => 'character', data => '<'});
 
           redo A;
         }
       } elsif ($self->{content_model_flag} eq 'PCDATA') {
         if ($self->{next_input_character} == 0x0021) { # !
           $self->{state} = 'markup declaration open';
-          !!!next-input-character;
+          
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
           redo A;
         } elsif ($self->{next_input_character} == 0x002F) { # /
           $self->{state} = 'close tag open';
-          !!!next-input-character;
+          
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
           redo A;
         } elsif (0x0041 <= $self->{next_input_character} and
                  $self->{next_input_character} <= 0x005A) { # A..Z
@@ -478,34 +520,52 @@ sub _get_next_token ($) {
             = {type => 'start tag',
                tag_name => chr ($self->{next_input_character} + 0x0020)};
           $self->{state} = 'tag name';
-          !!!next-input-character;
+          
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
           redo A;
         } elsif (0x0061 <= $self->{next_input_character} and
                  $self->{next_input_character} <= 0x007A) { # a..z
           $self->{current_token} = {type => 'start tag',
                             tag_name => chr ($self->{next_input_character})};
           $self->{state} = 'tag name';
-          !!!next-input-character;
+          
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
           redo A;
         } elsif ($self->{next_input_character} == 0x003E) { # >
-          !!!parse-error;
+          $self->{parse_error}->();
           $self->{state} = 'data';
-          !!!next-input-character;
+          
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
 
-          !!!emit ({type => 'character', data => '<>'});
+          return  ({type => 'character', data => '<>'});
 
           redo A;
         } elsif ($self->{next_input_character} == 0x003F) { # ?
-          !!!parse-error;
+          $self->{parse_error}->();
           $self->{state} = 'bogus comment';
           ## $self->{next_input_character} is intentionally left as is
           redo A;
         } else {
-          !!!parse-error;
+          $self->{parse_error}->();
           $self->{state} = 'data';
           ## reconsume
 
-          !!!emit ({type => 'character', data => '<'});
+          return  ({type => 'character', data => '<'});
 
           redo A;
         }
@@ -521,15 +581,21 @@ sub _get_next_token ($) {
           my $c = ord substr ($self->{last_emitted_start_tag_name}, $i, 1);
           my $C = 0x0061 <= $c && $c <= 0x007A ? $c - 0x0020 : $c;
           if ($self->{next_input_character} == $c or $self->{next_input_character} == $C) {
-            !!!next-input-character;
+            
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
             next TAGNAME;
           } else {
-            !!!parse-error;
+            $self->{parse_error}->();
             $self->{next_input_character} = shift @next_char; # reconsume
-            !!!back-next-input-character (@next_char);
+            unshift @{$self->{char}},  (@next_char);
             $self->{state} = 'data';
 
-            !!!emit ({type => 'character', data => '</'});
+            return  ({type => 'character', data => '</'});
 
             redo A;
           }
@@ -545,17 +611,17 @@ sub _get_next_token ($) {
                 $self->{next_input_character} == 0x002F or # /
                 $self->{next_input_character} == 0x003C or # <
                 $self->{next_input_character} == -1) {
-          !!!parse-error;
+          $self->{parse_error}->();
           $self->{next_input_character} = shift @next_char; # reconsume
-          !!!back-next-input-character (@next_char);
+          unshift @{$self->{char}},  (@next_char);
           $self->{state} = 'data';
 
-          !!!emit ({type => 'character', data => '</'});
+          return  ({type => 'character', data => '</'});
 
           redo A;
         } else {
           $self->{next_input_character} = shift @next_char;
-          !!!back-next-input-character (@next_char);
+          unshift @{$self->{char}},  (@next_char);
           # and consume...
         }
       }
@@ -565,30 +631,48 @@ sub _get_next_token ($) {
         $self->{current_token} = {type => 'end tag',
                           tag_name => chr ($self->{next_input_character} + 0x0020)};
         $self->{state} = 'tag name';
-        !!!next-input-character;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
         redo A;
       } elsif (0x0061 <= $self->{next_input_character} and
                $self->{next_input_character} <= 0x007A) { # a..z
         $self->{current_token} = {type => 'end tag',
                           tag_name => chr ($self->{next_input_character})};
         $self->{state} = 'tag name';
-        !!!next-input-character;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
         redo A;
       } elsif ($self->{next_input_character} == 0x003E) { # >
-        !!!parse-error;
+        $self->{parse_error}->();
         $self->{state} = 'data';
-        !!!next-input-character;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
         redo A;
       } elsif ($self->{next_input_character} == -1) {
-        !!!parse-error;
+        $self->{parse_error}->();
         $self->{state} = 'data';
         # reconsume
 
-        !!!emit ({type => 'character', data => '</'});
+        return  ({type => 'character', data => '</'});
 
         redo A;
       } else {
-        !!!parse-error;
+        $self->{parse_error}->();
         $self->{state} = 'bogus comment';
         ## $self->{next_input_character} is intentionally left as is
         redo A;
@@ -600,7 +684,13 @@ sub _get_next_token ($) {
           $self->{next_input_character} == 0x000C or # FF
           $self->{next_input_character} == 0x0020) { # SP
         $self->{state} = 'before attribute name';
-        !!!next-input-character;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
         redo A;
       } elsif ($self->{next_input_character} == 0x003E) { # >
         if ($self->{current_token}->{type} eq 'start tag') {
@@ -608,15 +698,21 @@ sub _get_next_token ($) {
         } elsif ($self->{current_token}->{type} eq 'end tag') {
           $self->{content_model_flag} = 'PCDATA'; # MUST
           if ($self->{current_token}->{attributes}) {
-            !!!parse-error;
+            $self->{parse_error}->();
           }
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
         }
         $self->{state} = 'data';
-        !!!next-input-character;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
 
-        !!!emit ($self->{current_token}); # start tag or end tag
+        return  ($self->{current_token}); # start tag or end tag
         undef $self->{current_token};
 
         redo A;
@@ -625,17 +721,23 @@ sub _get_next_token ($) {
         $self->{current_token}->{tag_name} .= chr ($self->{next_input_character} + 0x0020);
           # start tag or end tag
         ## Stay in this state
-        !!!next-input-character;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
         redo A;
       } elsif ($self->{next_input_character} == 0x003C or # <
                $self->{next_input_character} == -1) {
-        !!!parse-error;
+        $self->{parse_error}->();
         if ($self->{current_token}->{type} eq 'start tag') {
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} eq 'end tag') {
           $self->{content_model_flag} = 'PCDATA'; # MUST
           if ($self->{current_token}->{attributes}) {
-            !!!parse-error;
+            $self->{parse_error}->();
           }
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
@@ -643,19 +745,25 @@ sub _get_next_token ($) {
         $self->{state} = 'data';
         # reconsume
 
-        !!!emit ($self->{current_token}); # start tag or end tag
+        return  ($self->{current_token}); # start tag or end tag
         undef $self->{current_token};
 
         redo A;
       } elsif ($self->{next_input_character} == 0x002F) { # /
-        !!!next-input-character;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
         if ($self->{next_input_character} == 0x003E and # >
             $self->{current_token}->{type} eq 'start tag' and
             $permitted_slash_tag_name->{$self->{current_token}->{tag_name}}) {
           # permitted slash
           #
         } else {
-          !!!parse-error;
+          $self->{parse_error}->();
         }
         $self->{state} = 'before attribute name';
         # next-input-character is already done
@@ -664,7 +772,13 @@ sub _get_next_token ($) {
         $self->{current_token}->{tag_name} .= chr $self->{next_input_character};
           # start tag or end tag
         ## Stay in the state
-        !!!next-input-character;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
         redo A;
       }
     } elsif ($self->{state} eq 'before attribute name') {
@@ -674,7 +788,13 @@ sub _get_next_token ($) {
           $self->{next_input_character} == 0x000C or # FF
           $self->{next_input_character} == 0x0020) { # SP
         ## Stay in the state
-        !!!next-input-character;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
         redo A;
       } elsif ($self->{next_input_character} == 0x003E) { # >
         if ($self->{current_token}->{type} eq 'start tag') {
@@ -682,15 +802,21 @@ sub _get_next_token ($) {
         } elsif ($self->{current_token}->{type} eq 'end tag') {
           $self->{content_model_flag} = 'PCDATA'; # MUST
           if ($self->{current_token}->{attributes}) {
-            !!!parse-error;
+            $self->{parse_error}->();
           }
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
         }
         $self->{state} = 'data';
-        !!!next-input-character;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
 
-        !!!emit ($self->{current_token}); # start tag or end tag
+        return  ($self->{current_token}); # start tag or end tag
         undef $self->{current_token};
 
         redo A;
@@ -699,30 +825,42 @@ sub _get_next_token ($) {
         $self->{current_attribute} = {name => chr ($self->{next_input_character} + 0x0020),
                               value => ''};
         $self->{state} = 'attribute name';
-        !!!next-input-character;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
         redo A;
       } elsif ($self->{next_input_character} == 0x002F) { # /
-        !!!next-input-character;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
         if ($self->{next_input_character} == 0x003E and # >
             $self->{current_token}->{type} eq 'start tag' and
             $permitted_slash_tag_name->{$self->{current_token}->{tag_name}}) {
           # permitted slash
           #
         } else {
-          !!!parse-error;
+          $self->{parse_error}->();
         }
         ## Stay in the state
         # next-input-character is already done
         redo A;
       } elsif ($self->{next_input_character} == 0x003C or # <
                $self->{next_input_character} == -1) {
-        !!!parse-error;
+        $self->{parse_error}->();
         if ($self->{current_token}->{type} eq 'start tag') {
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} eq 'end tag') {
           $self->{content_model_flag} = 'PCDATA'; # MUST
           if ($self->{current_token}->{attributes}) {
-            !!!parse-error;
+            $self->{parse_error}->();
           }
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
@@ -730,7 +868,7 @@ sub _get_next_token ($) {
         $self->{state} = 'data';
         # reconsume
 
-        !!!emit ($self->{current_token}); # start tag or end tag
+        return  ($self->{current_token}); # start tag or end tag
         undef $self->{current_token};
 
         redo A;
@@ -738,14 +876,20 @@ sub _get_next_token ($) {
         $self->{current_attribute} = {name => chr ($self->{next_input_character}),
                               value => ''};
         $self->{state} = 'attribute name';
-        !!!next-input-character;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
         redo A;
       }
     } elsif ($self->{state} eq 'attribute name') {
       my $before_leave = sub {
         if (exists $self->{current_token}->{attributes} # start tag or end tag
             ->{$self->{current_attribute}->{name}}) { # MUST
-          !!!parse-error;
+          $self->{parse_error}->();
           ## Discard $self->{current_attribute} # MUST
         } else {
           $self->{current_token}->{attributes}->{$self->{current_attribute}->{name}}
@@ -760,12 +904,24 @@ sub _get_next_token ($) {
           $self->{next_input_character} == 0x0020) { # SP
         $before_leave->();
         $self->{state} = 'after attribute name';
-        !!!next-input-character;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
         redo A;
       } elsif ($self->{next_input_character} == 0x003D) { # =
         $before_leave->();
         $self->{state} = 'before attribute value';
-        !!!next-input-character;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
         redo A;
       } elsif ($self->{next_input_character} == 0x003E) { # >
         $before_leave->();
@@ -774,15 +930,21 @@ sub _get_next_token ($) {
         } elsif ($self->{current_token}->{type} eq 'end tag') {
           $self->{content_model_flag} = 'PCDATA'; # MUST
           if ($self->{current_token}->{attributes}) {
-            !!!parse-error;
+            $self->{parse_error}->();
           }
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
         }
         $self->{state} = 'data';
-        !!!next-input-character;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
 
-        !!!emit ($self->{current_token}); # start tag or end tag
+        return  ($self->{current_token}); # start tag or end tag
         undef $self->{current_token};
 
         redo A;
@@ -790,32 +952,44 @@ sub _get_next_token ($) {
                $self->{next_input_character} <= 0x005A) { # A..Z
         $self->{current_attribute}->{name} .= chr ($self->{next_input_character} + 0x0020);
         ## Stay in the state
-        !!!next-input-character;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
         redo A;
       } elsif ($self->{next_input_character} == 0x002F) { # /
         $before_leave->();
-        !!!next-input-character;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
         if ($self->{next_input_character} == 0x003E and # >
             $self->{current_token}->{type} eq 'start tag' and
             $permitted_slash_tag_name->{$self->{current_token}->{tag_name}}) {
           # permitted slash
           #
         } else {
-          !!!parse-error;
+          $self->{parse_error}->();
         }
         $self->{state} = 'before attribute name';
         # next-input-character is already done
         redo A;
       } elsif ($self->{next_input_character} == 0x003C or # <
                $self->{next_input_character} == -1) {
-        !!!parse-error;
+        $self->{parse_error}->();
         $before_leave->();
         if ($self->{current_token}->{type} eq 'start tag') {
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} eq 'end tag') {
           $self->{content_model_flag} = 'PCDATA'; # MUST
           if ($self->{current_token}->{attributes}) {
-            !!!parse-error;
+            $self->{parse_error}->();
           }
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
@@ -823,14 +997,20 @@ sub _get_next_token ($) {
         $self->{state} = 'data';
         # reconsume
 
-        !!!emit ($self->{current_token}); # start tag or end tag
+        return  ($self->{current_token}); # start tag or end tag
         undef $self->{current_token};
 
         redo A;
       } else {
         $self->{current_attribute}->{name} .= chr ($self->{next_input_character});
         ## Stay in the state
-        !!!next-input-character;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
         redo A;
       }
     } elsif ($self->{state} eq 'after attribute name') {
@@ -840,11 +1020,23 @@ sub _get_next_token ($) {
           $self->{next_input_character} == 0x000C or # FF
           $self->{next_input_character} == 0x0020) { # SP
         ## Stay in the state
-        !!!next-input-character;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
         redo A;
       } elsif ($self->{next_input_character} == 0x003D) { # =
         $self->{state} = 'before attribute value';
-        !!!next-input-character;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
         redo A;
       } elsif ($self->{next_input_character} == 0x003E) { # >
         if ($self->{current_token}->{type} eq 'start tag') {
@@ -852,15 +1044,21 @@ sub _get_next_token ($) {
         } elsif ($self->{current_token}->{type} eq 'end tag') {
           $self->{content_model_flag} = 'PCDATA'; # MUST
           if ($self->{current_token}->{attributes}) {
-            !!!parse-error;
+            $self->{parse_error}->();
           }
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
         }
         $self->{state} = 'data';
-        !!!next-input-character;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
 
-        !!!emit ($self->{current_token}); # start tag or end tag
+        return  ($self->{current_token}); # start tag or end tag
         undef $self->{current_token};
 
         redo A;
@@ -869,30 +1067,42 @@ sub _get_next_token ($) {
         $self->{current_attribute} = {name => chr ($self->{next_input_character} + 0x0020),
                               value => ''};
         $self->{state} = 'attribute name';
-        !!!next-input-character;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
         redo A;
       } elsif ($self->{next_input_character} == 0x002F) { # /
-        !!!next-input-character;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
         if ($self->{next_input_character} == 0x003E and # >
             $self->{current_token}->{type} eq 'start tag' and
             $permitted_slash_tag_name->{$self->{current_token}->{tag_name}}) {
           # permitted slash
           #
         } else {
-          !!!parse-error;
+          $self->{parse_error}->();
         }
         $self->{state} = 'before attribute name';
         # next-input-character is already done
         redo A;
       } elsif ($self->{next_input_character} == 0x003C or # <
                $self->{next_input_character} == -1) {
-        !!!parse-error;
+        $self->{parse_error}->();
         if ($self->{current_token}->{type} eq 'start tag') {
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} eq 'end tag') {
           $self->{content_model_flag} = 'PCDATA'; # MUST
           if ($self->{current_token}->{attributes}) {
-            !!!parse-error;
+            $self->{parse_error}->();
           }
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
@@ -900,7 +1110,7 @@ sub _get_next_token ($) {
         $self->{state} = 'data';
         # reconsume
 
-        !!!emit ($self->{current_token}); # start tag or end tag
+        return  ($self->{current_token}); # start tag or end tag
         undef $self->{current_token};
 
         redo A;
@@ -908,7 +1118,13 @@ sub _get_next_token ($) {
         $self->{current_attribute} = {name => chr ($self->{next_input_character}),
                               value => ''};
         $self->{state} = 'attribute name';
-        !!!next-input-character;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
         redo A;        
       }
     } elsif ($self->{state} eq 'before attribute value') {
@@ -918,11 +1134,23 @@ sub _get_next_token ($) {
           $self->{next_input_character} == 0x000C or # FF
           $self->{next_input_character} == 0x0020) { # SP      
         ## Stay in the state
-        !!!next-input-character;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
         redo A;
       } elsif ($self->{next_input_character} == 0x0022) { # "
         $self->{state} = 'attribute value (double-quoted)';
-        !!!next-input-character;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
         redo A;
       } elsif ($self->{next_input_character} == 0x0026) { # &
         $self->{state} = 'attribute value (unquoted)';
@@ -930,7 +1158,13 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($self->{next_input_character} == 0x0027) { # '
         $self->{state} = 'attribute value (single-quoted)';
-        !!!next-input-character;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
         redo A;
       } elsif ($self->{next_input_character} == 0x003E) { # >
         if ($self->{current_token}->{type} eq 'start tag') {
@@ -938,27 +1172,33 @@ sub _get_next_token ($) {
         } elsif ($self->{current_token}->{type} eq 'end tag') {
           $self->{content_model_flag} = 'PCDATA'; # MUST
           if ($self->{current_token}->{attributes}) {
-            !!!parse-error;
+            $self->{parse_error}->();
           }
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
         }
         $self->{state} = 'data';
-        !!!next-input-character;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
 
-        !!!emit ($self->{current_token}); # start tag or end tag
+        return  ($self->{current_token}); # start tag or end tag
         undef $self->{current_token};
 
         redo A;
       } elsif ($self->{next_input_character} == 0x003C or # <
                $self->{next_input_character} == -1) {
-        !!!parse-error;
+        $self->{parse_error}->();
         if ($self->{current_token}->{type} eq 'start tag') {
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} eq 'end tag') {
           $self->{content_model_flag} = 'PCDATA'; # MUST
           if ($self->{current_token}->{attributes}) {
-            !!!parse-error;
+            $self->{parse_error}->();
           }
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
@@ -966,34 +1206,52 @@ sub _get_next_token ($) {
         $self->{state} = 'data';
         ## reconsume
 
-        !!!emit ($self->{current_token}); # start tag or end tag
+        return  ($self->{current_token}); # start tag or end tag
         undef $self->{current_token};
 
         redo A;
       } else {
         $self->{current_attribute}->{value} .= chr ($self->{next_input_character});
         $self->{state} = 'attribute value (unquoted)';
-        !!!next-input-character;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
         redo A;
       }
     } elsif ($self->{state} eq 'attribute value (double-quoted)') {
       if ($self->{next_input_character} == 0x0022) { # "
         $self->{state} = 'before attribute name';
-        !!!next-input-character;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
         redo A;
       } elsif ($self->{next_input_character} == 0x0026) { # &
         $self->{last_attribute_value_state} = 'attribute value (double-quoted)';
         $self->{state} = 'entity in attribute value';
-        !!!next-input-character;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
         redo A;
       } elsif ($self->{next_input_character} == -1) {
-        !!!parse-error;
+        $self->{parse_error}->();
         if ($self->{current_token}->{type} eq 'start tag') {
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} eq 'end tag') {
           $self->{content_model_flag} = 'PCDATA'; # MUST
           if ($self->{current_token}->{attributes}) {
-            !!!parse-error;
+            $self->{parse_error}->();
           }
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
@@ -1001,34 +1259,52 @@ sub _get_next_token ($) {
         $self->{state} = 'data';
         ## reconsume
 
-        !!!emit ($self->{current_token}); # start tag or end tag
+        return  ($self->{current_token}); # start tag or end tag
         undef $self->{current_token};
 
         redo A;
       } else {
         $self->{current_attribute}->{value} .= chr ($self->{next_input_character});
         ## Stay in the state
-        !!!next-input-character;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
         redo A;
       }
     } elsif ($self->{state} eq 'attribute value (single-quoted)') {
       if ($self->{next_input_character} == 0x0027) { # '
         $self->{state} = 'before attribute name';
-        !!!next-input-character;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
         redo A;
       } elsif ($self->{next_input_character} == 0x0026) { # &
         $self->{last_attribute_value_state} = 'attribute value (single-quoted)';
         $self->{state} = 'entity in attribute value';
-        !!!next-input-character;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
         redo A;
       } elsif ($self->{next_input_character} == -1) {
-        !!!parse-error;
+        $self->{parse_error}->();
         if ($self->{current_token}->{type} eq 'start tag') {
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} eq 'end tag') {
           $self->{content_model_flag} = 'PCDATA'; # MUST
           if ($self->{current_token}->{attributes}) {
-            !!!parse-error;
+            $self->{parse_error}->();
           }
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
@@ -1036,14 +1312,20 @@ sub _get_next_token ($) {
         $self->{state} = 'data';
         ## reconsume
 
-        !!!emit ($self->{current_token}); # start tag or end tag
+        return  ($self->{current_token}); # start tag or end tag
         undef $self->{current_token};
 
         redo A;
       } else {
         $self->{current_attribute}->{value} .= chr ($self->{next_input_character});
         ## Stay in the state
-        !!!next-input-character;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
         redo A;
       }
     } elsif ($self->{state} eq 'attribute value (unquoted)') {
@@ -1053,12 +1335,24 @@ sub _get_next_token ($) {
           $self->{next_input_character} == 0x000C or # FF
           $self->{next_input_character} == 0x0020) { # SP
         $self->{state} = 'before attribute name';
-        !!!next-input-character;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
         redo A;
       } elsif ($self->{next_input_character} == 0x0026) { # &
         $self->{last_attribute_value_state} = 'attribute value (unquoted)';
         $self->{state} = 'entity in attribute value';
-        !!!next-input-character;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
         redo A;
       } elsif ($self->{next_input_character} == 0x003E) { # >
         if ($self->{current_token}->{type} eq 'start tag') {
@@ -1066,27 +1360,33 @@ sub _get_next_token ($) {
         } elsif ($self->{current_token}->{type} eq 'end tag') {
           $self->{content_model_flag} = 'PCDATA'; # MUST
           if ($self->{current_token}->{attributes}) {
-            !!!parse-error;
+            $self->{parse_error}->();
           }
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
         }
         $self->{state} = 'data';
-        !!!next-input-character;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
 
-        !!!emit ($self->{current_token}); # start tag or end tag
+        return  ($self->{current_token}); # start tag or end tag
         undef $self->{current_token};
 
         redo A;
       } elsif ($self->{next_input_character} == 0x003C or # <
                $self->{next_input_character} == -1) {
-        !!!parse-error;
+        $self->{parse_error}->();
         if ($self->{current_token}->{type} eq 'start tag') {
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} eq 'end tag') {
           $self->{content_model_flag} = 'PCDATA'; # MUST
           if ($self->{current_token}->{attributes}) {
-            !!!parse-error;
+            $self->{parse_error}->();
           }
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
@@ -1094,14 +1394,20 @@ sub _get_next_token ($) {
         $self->{state} = 'data';
         ## reconsume
 
-        !!!emit ($self->{current_token}); # start tag or end tag
+        return  ($self->{current_token}); # start tag or end tag
         undef $self->{current_token};
 
         redo A;
       } else {
         $self->{current_attribute}->{value} .= chr ($self->{next_input_character});
         ## Stay in the state
-        !!!next-input-character;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
         redo A;
       }
     } elsif ($self->{state} eq 'entity in attribute value') {
@@ -1125,21 +1431,33 @@ sub _get_next_token ($) {
       BC: {
         if ($self->{next_input_character} == 0x003E) { # >
           $self->{state} = 'data';
-          !!!next-input-character;
+          
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
 
-          !!!emit ($token);
+          return  ($token);
 
           redo A;
         } elsif ($self->{next_input_character} == -1) { 
           $self->{state} = 'data';
           ## reconsume
 
-          !!!emit ($token);
+          return  ($token);
 
           redo A;
         } else {
           $token->{data} .= chr ($self->{next_input_character});
-          !!!next-input-character;
+          
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
           redo BC;
         }
       } # BC
@@ -1150,43 +1468,97 @@ sub _get_next_token ($) {
       push @next_char, $self->{next_input_character};
       
       if ($self->{next_input_character} == 0x002D) { # -
-        !!!next-input-character;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
         push @next_char, $self->{next_input_character};
         if ($self->{next_input_character} == 0x002D) { # -
           $self->{current_token} = {type => 'comment', data => ''};
           $self->{state} = 'comment';
-          !!!next-input-character;
+          
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
           redo A;
         }
       } elsif ($self->{next_input_character} == 0x0044 or # D
                $self->{next_input_character} == 0x0064) { # d
-        !!!next-input-character;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
         push @next_char, $self->{next_input_character};
         if ($self->{next_input_character} == 0x004F or # O
             $self->{next_input_character} == 0x006F) { # o
-          !!!next-input-character;
+          
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
           push @next_char, $self->{next_input_character};
           if ($self->{next_input_character} == 0x0043 or # C
               $self->{next_input_character} == 0x0063) { # c
-            !!!next-input-character;
+            
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
             push @next_char, $self->{next_input_character};
             if ($self->{next_input_character} == 0x0054 or # T
                 $self->{next_input_character} == 0x0074) { # t
-              !!!next-input-character;
+              
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
               push @next_char, $self->{next_input_character};
               if ($self->{next_input_character} == 0x0059 or # Y
                   $self->{next_input_character} == 0x0079) { # y
-                !!!next-input-character;
+                
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
                 push @next_char, $self->{next_input_character};
                 if ($self->{next_input_character} == 0x0050 or # P
                     $self->{next_input_character} == 0x0070) { # p
-                  !!!next-input-character;
+                  
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
                   push @next_char, $self->{next_input_character};
                   if ($self->{next_input_character} == 0x0045 or # E
                       $self->{next_input_character} == 0x0065) { # e
                     ## ISSUE: What a stupid code this is!
                     $self->{state} = 'DOCTYPE';
-                    !!!next-input-character;
+                    
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
                     redo A;
                   }
                 }
@@ -1196,9 +1568,9 @@ sub _get_next_token ($) {
         }
       }
 
-      !!!parse-error;
+      $self->{parse_error}->();
       $self->{next_input_character} = shift @next_char;
-      !!!back-next-input-character (@next_char);
+      unshift @{$self->{char}},  (@next_char);
       $self->{state} = 'bogus comment';
       redo A;
       
@@ -1207,72 +1579,114 @@ sub _get_next_token ($) {
     } elsif ($self->{state} eq 'comment') {
       if ($self->{next_input_character} == 0x002D) { # -
         $self->{state} = 'comment dash';
-        !!!next-input-character;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
         redo A;
       } elsif ($self->{next_input_character} == -1) {
-        !!!parse-error;
+        $self->{parse_error}->();
         $self->{state} = 'data';
         ## reconsume
 
-        !!!emit ($self->{current_token}); # comment
+        return  ($self->{current_token}); # comment
         undef $self->{current_token};
 
         redo A;
       } else {
         $self->{current_token}->{data} .= chr ($self->{next_input_character}); # comment
         ## Stay in the state
-        !!!next-input-character;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
         redo A;
       }
     } elsif ($self->{state} eq 'comment dash') {
       if ($self->{next_input_character} == 0x002D) { # -
         $self->{state} = 'comment end';
-        !!!next-input-character;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
         redo A;
       } elsif ($self->{next_input_character} == -1) {
-        !!!parse-error;
+        $self->{parse_error}->();
         $self->{state} = 'data';
         ## reconsume
 
-        !!!emit ($self->{current_token}); # comment
+        return  ($self->{current_token}); # comment
         undef $self->{current_token};
 
         redo A;
       } else {
         $self->{current_token}->{data} .= '-' . chr ($self->{next_input_character}); # comment
         $self->{state} = 'comment';
-        !!!next-input-character;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
         redo A;
       }
     } elsif ($self->{state} eq 'comment end') {
       if ($self->{next_input_character} == 0x003E) { # >
         $self->{state} = 'data';
-        !!!next-input-character;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
 
-        !!!emit ($self->{current_token}); # comment
+        return  ($self->{current_token}); # comment
         undef $self->{current_token};
 
         redo A;
       } elsif ($self->{next_input_character} == 0x002D) { # -
-        !!!parse-error;
+        $self->{parse_error}->();
         $self->{current_token}->{data} .= '-'; # comment
         ## Stay in the state
-        !!!next-input-character;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
         redo A;
       } elsif ($self->{next_input_character} == -1) {
-        !!!parse-error;
+        $self->{parse_error}->();
         $self->{state} = 'data';
         ## reconsume
 
-        !!!emit ($self->{current_token}); # comment
+        return  ($self->{current_token}); # comment
         undef $self->{current_token};
 
         redo A;
       } else {
-        !!!parse-error;
+        $self->{parse_error}->();
         $self->{current_token}->{data} .= '--' . chr ($self->{next_input_character}); # comment
         $self->{state} = 'comment';
-        !!!next-input-character;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
         redo A;
       } 
     } elsif ($self->{state} eq 'DOCTYPE') {
@@ -1282,10 +1696,16 @@ sub _get_next_token ($) {
           $self->{next_input_character} == 0x000C or # FF
           $self->{next_input_character} == 0x0020) { # SP
         $self->{state} = 'before DOCTYPE name';
-        !!!next-input-character;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
         redo A;
       } else {
-        !!!parse-error;
+        $self->{parse_error}->();
         $self->{state} = 'before DOCTYPE name';
         ## reconsume
         redo A;
@@ -1297,7 +1717,13 @@ sub _get_next_token ($) {
           $self->{next_input_character} == 0x000C or # FF
           $self->{next_input_character} == 0x0020) { # SP
         ## Stay in the state
-        !!!next-input-character;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
         redo A;
       } elsif (0x0061 <= $self->{next_input_character} and
                $self->{next_input_character} <= 0x007A) { # a..z
@@ -1305,22 +1731,34 @@ sub _get_next_token ($) {
                           name => chr ($self->{next_input_character} - 0x0020),
                           error => 1};
         $self->{state} = 'DOCTYPE name';
-        !!!next-input-character;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
         redo A;
       } elsif ($self->{next_input_character} == 0x003E) { # >
-        !!!parse-error;
+        $self->{parse_error}->();
         $self->{state} = 'data';
-        !!!next-input-character;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
 
-        !!!emit ({type => 'DOCTYPE', name => '', error => 1});
+        return  ({type => 'DOCTYPE', name => '', error => 1});
 
         redo A;
       } elsif ($self->{next_input_character} == -1) { 
-        !!!parse-error;
+        $self->{parse_error}->();
         $self->{state} = 'data';
         ## reconsume
 
-        !!!emit ({type => 'DOCTYPE', name => '', error => 1});
+        return  ({type => 'DOCTYPE', name => '', error => 1});
 
         redo A;
       } else {
@@ -1328,7 +1766,13 @@ sub _get_next_token ($) {
                           name => chr ($self->{next_input_character}),
                           error => 1};
         $self->{state} = 'DOCTYPE name';
-        !!!next-input-character;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
         redo A;
       }
     } elsif ($self->{state} eq 'DOCTYPE name') {
@@ -1339,14 +1783,26 @@ sub _get_next_token ($) {
           $self->{next_input_character} == 0x0020) { # SP
         $self->{current_token}->{error} = ($self->{current_token}->{name} ne 'HTML'); # DOCTYPE
         $self->{state} = 'after DOCTYPE name';
-        !!!next-input-character;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
         redo A;
       } elsif ($self->{next_input_character} == 0x003E) { # >
         $self->{current_token}->{error} = ($self->{current_token}->{name} ne 'HTML'); # DOCTYPE
         $self->{state} = 'data';
-        !!!next-input-character;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
 
-        !!!emit ($self->{current_token}); # DOCTYPE
+        return  ($self->{current_token}); # DOCTYPE
         undef $self->{current_token};
 
         redo A;
@@ -1355,15 +1811,21 @@ sub _get_next_token ($) {
         $self->{current_token}->{name} .= chr ($self->{next_input_character} - 0x0020); # DOCTYPE
         #$self->{current_token}->{error} = ($self->{current_token}->{name} ne 'HTML');
         ## Stay in the state
-        !!!next-input-character;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
         redo A;
       } elsif ($self->{next_input_character} == -1) {
-        !!!parse-error;
+        $self->{parse_error}->();
         $self->{current_token}->{error} = ($self->{current_token}->{name} ne 'HTML'); # DOCTYPE
         $self->{state} = 'data';
         ## reconsume
 
-        !!!emit ($self->{current_token});
+        return  ($self->{current_token});
         undef $self->{current_token};
 
         redo A;
@@ -1372,7 +1834,13 @@ sub _get_next_token ($) {
           .= chr ($self->{next_input_character}); # DOCTYPE
         #$self->{current_token}->{error} = ($self->{current_token}->{name} ne 'HTML');
         ## Stay in the state
-        !!!next-input-character;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
         redo A;
       }
     } elsif ($self->{state} eq 'after DOCTYPE name') {
@@ -1382,53 +1850,83 @@ sub _get_next_token ($) {
           $self->{next_input_character} == 0x000C or # FF
           $self->{next_input_character} == 0x0020) { # SP
         ## Stay in the state
-        !!!next-input-character;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
         redo A;
       } elsif ($self->{next_input_character} == 0x003E) { # >
         $self->{state} = 'data';
-        !!!next-input-character;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
 
-        !!!emit ($self->{current_token}); # DOCTYPE
+        return  ($self->{current_token}); # DOCTYPE
         undef $self->{current_token};
 
         redo A;
       } elsif ($self->{next_input_character} == -1) {
-        !!!parse-error;
+        $self->{parse_error}->();
         $self->{state} = 'data';
         ## reconsume
 
-        !!!emit ($self->{current_token}); # DOCTYPE
+        return  ($self->{current_token}); # DOCTYPE
         undef $self->{current_token};
 
         redo A;
       } else {
-        !!!parse-error;
+        $self->{parse_error}->();
         $self->{current_token}->{error} = 1; # DOCTYPE
         $self->{state} = 'bogus DOCTYPE';
-        !!!next-input-character;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
         redo A;
       }
     } elsif ($self->{state} eq 'bogus DOCTYPE') {
       if ($self->{next_input_character} == 0x003E) { # >
         $self->{state} = 'data';
-        !!!next-input-character;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
 
-        !!!emit ($self->{current_token}); # DOCTYPE
+        return  ($self->{current_token}); # DOCTYPE
         undef $self->{current_token};
 
         redo A;
       } elsif ($self->{next_input_character} == -1) {
-        !!!parse-error;
+        $self->{parse_error}->();
         $self->{state} = 'data';
         ## reconsume
 
-        !!!emit ($self->{current_token}); # DOCTYPE
+        return  ($self->{current_token}); # DOCTYPE
         undef $self->{current_token};
 
         redo A;
       } else {
         ## Stay in the state
-        !!!next-input-character;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
         redo A;
       }
     } else {
@@ -1443,13 +1941,25 @@ sub _tokenize_attempt_to_consume_an_entity ($) {
   my $self = shift;
   
   if ($self->{next_input_character} == 0x0023) { # #
-    !!!next-input-character;
+    
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
     my $num;
     if ($self->{next_input_character} == 0x0078 or # x
         $self->{next_input_character} == 0x0058) { # X
       X: {
         my $x_char = $self->{next_input_character};
-        !!!next-input-character;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
         if (0x0030 <= $self->{next_input_character} and 
             $self->{next_input_character} <= 0x0039) { # 0..9
           $num ||= 0;
@@ -1471,14 +1981,20 @@ sub _tokenize_attempt_to_consume_an_entity ($) {
           $num += $self->{next_input_character} - 0x0040 + 9;
           redo X;
         } elsif (not defined $num) { # no hexadecimal digit
-          !!!parse-error;
+          $self->{parse_error}->();
           $self->{next_input_character} = 0x0023; # #
-          !!!back-next-input-character ($x_char);
+          unshift @{$self->{char}},  ($x_char);
           return undef;
         } elsif ($self->{next_input_character} == 0x003B) { # ;
-          !!!next-input-character;
+          
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
         } else {
-          !!!parse-error;
+          $self->{parse_error}->();
         }
 
         ## TODO: check the definition for |a valid Unicode character|.
@@ -1492,20 +2008,38 @@ sub _tokenize_attempt_to_consume_an_entity ($) {
     } elsif (0x0030 <= $self->{next_input_character} and
              $self->{next_input_character} <= 0x0039) { # 0..9
       my $code = $self->{next_input_character} - 0x0030;
-      !!!next-input-character;
+      
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
       
       while (0x0030 <= $self->{next_input_character} and 
                 $self->{next_input_character} <= 0x0039) { # 0..9
         $code *= 10;
         $code += $self->{next_input_character} - 0x0030;
         
-        !!!next-input-character;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
       }
 
       if ($self->{next_input_character} == 0x003B) { # ;
-        !!!next-input-character;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
       } else {
-        !!!parse-error;
+        $self->{set_next_input_character}->($self);
+      }
+  
+      } else {
+        $self->{parse_error}->();
       }
 
       ## TODO: check the definition for |a valid Unicode character|.
@@ -1516,8 +2050,8 @@ sub _tokenize_attempt_to_consume_an_entity ($) {
       
       return {type => 'character', data => chr $code};
     } else {
-      !!!parse-error;
-      !!!back-next-input-character ($self->{next_input_character});
+      $self->{parse_error}->();
+      unshift @{$self->{char}},  ($self->{next_input_character});
       $self->{next_input_character} = 0x0023; # #
       return undef;
     }
@@ -1526,7 +2060,13 @@ sub _tokenize_attempt_to_consume_an_entity ($) {
            (0x0061 <= $self->{next_input_character} and
             $self->{next_input_character} <= 0x007A)) {
     my $entity_name = chr $self->{next_input_character};
-    !!!next-input-character;
+    
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
 
     my $value = $entity_name;
     my $match;
@@ -1546,26 +2086,38 @@ sub _tokenize_attempt_to_consume_an_entity ($) {
       } else {
         $value .= chr $self->{next_input_character};
       }
-      !!!next-input-character;
+      
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
     }
     
     if ($match) {
       if ($self->{next_input_character} == 0x003B) { # ;
-        !!!next-input-character;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
       } else {
-        !!!parse-error;
+        $self->{set_next_input_character}->($self);
+      }
+  
+      } else {
+        $self->{parse_error}->();
       }
 
       return {type => 'character', data => $value};
     } else {
-      !!!parse-error;
+      $self->{parse_error}->();
       ## NOTE: No characters are consumed in the spec.
-      !!!back-token ({type => 'character', data => $value});
+      unshift @{$self->{token}}, ({type => 'character', data => $value});
       return undef;
     }
   } else {
     ## no characters are consumed
-    !!!parse-error;
+    $self->{parse_error}->();
     return undef;
   }
 } # _tokenize_attempt_to_consume_an_entity
@@ -1599,7 +2151,7 @@ sub _construct_tree ($) {
   ## of all those characters. # MUST
   
   my $token;
-  !!!next-token;
+  $token = $self->_get_next_token;
 
   my $phase = 'initial'; # MUST
 
@@ -1743,7 +2295,10 @@ sub _construct_tree ($) {
   }; # $reset_insertion_mode
 
   my $style_start_tag = sub {
-    my $style_el; !!!create-element ($style_el, 'style');
+    my $style_el; 
+      $style_el = $self->{document}->create_element_ns
+        (q<http://www.w3.org/1999/xhtml>, [undef,  'style']);
+    
     ## $insertion_mode eq 'in head' and ... (always true)
     (($insertion_mode eq 'in head' and defined $head_element)
      ? $head_element : $open_elements->[-1]->[0])
@@ -1751,10 +2306,10 @@ sub _construct_tree ($) {
     $self->{content_model_flag} = 'CDATA';
               
     my $text = '';
-    !!!next-token;
+    $token = $self->_get_next_token;
     while ($token->{type} eq 'character') {
       $text .= $token->{data};
-      !!!next-token;
+      $token = $self->_get_next_token;
     } # stop if non-character token or tokenizer stops tokenising
     if (length $text) {
       $style_el->manakai_append_text ($text);
@@ -1765,24 +2320,32 @@ sub _construct_tree ($) {
     if ($token->{type} eq 'end tag' and $token->{tag_name} eq 'style') {
       ## Ignore the token
     } else {
-      !!!parse-error;
+      $self->{parse_error}->();
       ## ISSUE: And ignore?
     }
-    !!!next-token;
+    $token = $self->_get_next_token;
   }; # $style_start_tag
 
   my $script_start_tag = sub {
     my $script_el;
-    !!!create-element ($script_el, 'script', $token->{attributes});
+    
+      $script_el = $self->{document}->create_element_ns
+        (q<http://www.w3.org/1999/xhtml>, [undef,  'script']);
+    
+        for my $attr_name (keys %{ $token->{attributes}}) {
+          $script_el->set_attribute_ns (undef, [undef, $attr_name],
+                                 $token->{attributes} ->{$attr_name}->{value});
+        }
+      
     ## TODO: mark as "parser-inserted"
 
     $self->{content_model_flag} = 'CDATA';
     
     my $text = '';
-    !!!next-token;
+    $token = $self->_get_next_token;
     while ($token->{type} eq 'character') {
       $text .= $token->{data};
-      !!!next-token;
+      $token = $self->_get_next_token;
     } # stop if non-character token or tokenizer stops tokenising
     if (length $text) {
       $script_el->manakai_append_text ($text);
@@ -1794,7 +2357,7 @@ sub _construct_tree ($) {
         $token->{tag_name} eq 'script') {
       ## Ignore the token
     } else {
-      !!!parse-error;
+      $self->{parse_error}->();
       ## ISSUE: And ignore?
       ## TODO: mark as "already executed"
     }
@@ -1812,7 +2375,7 @@ sub _construct_tree ($) {
       ## TODO: if there is a script that will execute as soon as the parser resume, then...
     }
     
-    !!!next-token;
+    $token = $self->_get_next_token;
   }; # $script_start_tag
 
   my $formatting_end_tag = sub {
@@ -1832,9 +2395,9 @@ sub _construct_tree ($) {
         }
       } # AFE
       unless (defined $formatting_element) {
-        !!!parse-error;
+        $self->{parse_error}->();
         ## Ignore the token
-        !!!next-token;
+        $token = $self->_get_next_token;
         return;
       }
       ## has an element in scope
@@ -1847,9 +2410,9 @@ sub _construct_tree ($) {
             $formatting_element_i_in_open = $_;
             last INSCOPE;
           } else { # in open elements but not in scope
-            !!!parse-error;
+            $self->{parse_error}->();
             ## Ignore the token
-            !!!next-token;
+            $token = $self->_get_next_token;
             return;
           }
         } elsif ({
@@ -1860,13 +2423,13 @@ sub _construct_tree ($) {
         }
       } # INSCOPE
       unless (defined $formatting_element_i_in_open) {
-        !!!parse-error;
+        $self->{parse_error}->();
         pop @$active_formatting_elements; # $formatting_element
-        !!!next-token; ## TODO: ok?
+        $token = $self->_get_next_token; ## TODO: ok?
         return;
       }
       if (not $open_elements->[-1]->[0] eq $formatting_element->[0]) {
-        !!!parse-error;
+        $self->{parse_error}->();
       }
       
       ## Step 2
@@ -1889,7 +2452,7 @@ sub _construct_tree ($) {
       unless (defined $furthest_block) { # MUST
         splice @$open_elements, $formatting_element_i_in_open;
         splice @$active_formatting_elements, $formatting_element_i_in_active, 1;
-        !!!next-token;
+        $token = $self->_get_next_token;
         return;
       }
       
@@ -2045,32 +2608,48 @@ sub _construct_tree ($) {
       } elsif ({
                 base => 1, link => 1, meta => 1,
                }->{$token->{tag_name}}) {
-        !!!parse-error ($token->{tag_name}.' in body');
+        $self->{parse_error}-> ($token->{tag_name}.' in body');
         ## NOTE: This is an "as if in head" code clone
         my $el;
-        !!!create-element ($el, $token->{tag_name}, $token->{attributes});
+        
+      $el = $self->{document}->create_element_ns
+        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
+    
+        for my $attr_name (keys %{ $token->{attributes}}) {
+          $el->set_attribute_ns (undef, [undef, $attr_name],
+                                 $token->{attributes} ->{$attr_name}->{value});
+        }
+      
         if (defined $head_element) {
           $head_element->append_child ($el);
         } else {
           $insert->($el);
         }
         
-        !!!next-token;
+        $token = $self->_get_next_token;
         return;
       } elsif ($token->{tag_name} eq 'title') {
-        !!!parse-error ('title in body');
+        $self->{parse_error}-> ('title in body');
         ## NOTE: There is an "as if in head" code clone
         my $title_el;
-        !!!create-element ($title_el, 'title', $token->{attributes});
+        
+      $title_el = $self->{document}->create_element_ns
+        (q<http://www.w3.org/1999/xhtml>, [undef,  'title']);
+    
+        for my $attr_name (keys %{ $token->{attributes}}) {
+          $title_el->set_attribute_ns (undef, [undef, $attr_name],
+                                 $token->{attributes} ->{$attr_name}->{value});
+        }
+      
         (defined $head_element ? $head_element : $open_elements->[-1]->[0])
           ->append_child ($title_el);
         $self->{content_model_flag} = 'RCDATA';
         
         my $text = '';
-        !!!next-token;
+        $token = $self->_get_next_token;
         while ($token->{type} eq 'character') {
           $text .= $token->{data};
-          !!!next-token;
+          $token = $self->_get_next_token;
         }
         if (length $text) {
           $title_el->manakai_append_text ($text);
@@ -2082,13 +2661,13 @@ sub _construct_tree ($) {
             $token->{tag_name} eq 'title') {
           ## Ignore the token
         } else {
-          !!!parse-error;
+          $self->{parse_error}->();
           ## ISSUE: And ignore?
         }
-        !!!next-token;
+        $token = $self->_get_next_token;
         return;
       } elsif ($token->{tag_name} eq 'body') {
-        !!!parse-error;
+        $self->{parse_error}->();
               
         if (@$open_elements == 1 or
             $open_elements->[1]->[1] ne 'body') {
@@ -2103,7 +2682,7 @@ sub _construct_tree ($) {
             }
           }
         }
-        !!!next-token;
+        $token = $self->_get_next_token;
         return;
       } elsif ({
                 address => 1, blockquote => 1, center => 1, dir => 1, 
@@ -2114,7 +2693,7 @@ sub _construct_tree ($) {
         ## has a p element in scope
         INSCOPE: for (reverse @$open_elements) {
           if ($_->[1] eq 'p') {
-            !!!back-token;
+            unshift @{$self->{token}}, $token;
             $token = {type => 'end tag', tag_name => 'p'};
             return;
           } elsif ({
@@ -2125,28 +2704,43 @@ sub _construct_tree ($) {
           }
         } # INSCOPE
           
-        !!!insert-element-t ($token->{tag_name}, $token->{attributes});
+        
+    {
+      my $el;
+      
+      $el = $self->{document}->create_element_ns
+        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
+    
+        for my $attr_name (keys %{  $token->{attributes}}) {
+          $el->set_attribute_ns (undef, [undef, $attr_name],
+                                  $token->{attributes} ->{$attr_name}->{value});
+        }
+      
+      $insert->($el);
+      push @$open_elements, [$el, $token->{tag_name}];
+    }
+  
         if ($token->{tag_name} eq 'pre') {
-          !!!next-token;
+          $token = $self->_get_next_token;
           if ($token->{type} eq 'character') {
             $token->{data} =~ s/^\x0A//;
             unless (length $token->{data}) {
-              !!!next-token;
+              $token = $self->_get_next_token;
             }
           }
         } else {
-          !!!next-token;
+          $token = $self->_get_next_token;
         }
         return;
       } elsif ($token->{tag_name} eq 'form') {
         if (defined $form_element) {
-          !!!parse-error;
+          $self->{parse_error}->();
           ## Ignore the token
         } else {
           ## has a p element in scope
           INSCOPE: for (reverse @$open_elements) {
             if ($_->[1] eq 'p') {
-              !!!back-token;
+              unshift @{$self->{token}}, $token;
               $token = {type => 'end tag', tag_name => 'p'};
               return;
             } elsif ({
@@ -2157,16 +2751,31 @@ sub _construct_tree ($) {
             }
           } # INSCOPE
             
-          !!!insert-element-t ($token->{tag_name}, $token->{attributes});
+          
+    {
+      my $el;
+      
+      $el = $self->{document}->create_element_ns
+        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
+    
+        for my $attr_name (keys %{  $token->{attributes}}) {
+          $el->set_attribute_ns (undef, [undef, $attr_name],
+                                  $token->{attributes} ->{$attr_name}->{value});
+        }
+      
+      $insert->($el);
+      push @$open_elements, [$el, $token->{tag_name}];
+    }
+  
           $form_element = $open_elements->[-1]->[0];
-          !!!next-token;
+          $token = $self->_get_next_token;
           return;
         }
       } elsif ($token->{tag_name} eq 'li') {
         ## has a p element in scope
         INSCOPE: for (reverse @$open_elements) {
           if ($_->[1] eq 'p') {
-            !!!back-token;
+            unshift @{$self->{token}}, $token;
             $token = {type => 'end tag', tag_name => 'p'};
             return;
           } elsif ({
@@ -2202,14 +2811,29 @@ sub _construct_tree ($) {
           redo LI;
         } # LI
           
-        !!!insert-element-t ($token->{tag_name}, $token->{attributes});
-        !!!next-token;
+        
+    {
+      my $el;
+      
+      $el = $self->{document}->create_element_ns
+        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
+    
+        for my $attr_name (keys %{  $token->{attributes}}) {
+          $el->set_attribute_ns (undef, [undef, $attr_name],
+                                  $token->{attributes} ->{$attr_name}->{value});
+        }
+      
+      $insert->($el);
+      push @$open_elements, [$el, $token->{tag_name}];
+    }
+  
+        $token = $self->_get_next_token;
         return;
       } elsif ($token->{tag_name} eq 'dd' or $token->{tag_name} eq 'dt') {
         ## has a p element in scope
         INSCOPE: for (reverse @$open_elements) {
           if ($_->[1] eq 'p') {
-            !!!back-token;
+            unshift @{$self->{token}}, $token;
             $token = {type => 'end tag', tag_name => 'p'};
             return;
           } elsif ({
@@ -2245,14 +2869,29 @@ sub _construct_tree ($) {
           redo LI;
         } # LI
           
-        !!!insert-element-t ($token->{tag_name}, $token->{attributes});
-        !!!next-token;
+        
+    {
+      my $el;
+      
+      $el = $self->{document}->create_element_ns
+        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
+    
+        for my $attr_name (keys %{  $token->{attributes}}) {
+          $el->set_attribute_ns (undef, [undef, $attr_name],
+                                  $token->{attributes} ->{$attr_name}->{value});
+        }
+      
+      $insert->($el);
+      push @$open_elements, [$el, $token->{tag_name}];
+    }
+  
+        $token = $self->_get_next_token;
         return;
       } elsif ($token->{tag_name} eq 'plaintext') {
         ## has a p element in scope
         INSCOPE: for (reverse @$open_elements) {
           if ($_->[1] eq 'p') {
-            !!!back-token;
+            unshift @{$self->{token}}, $token;
             $token = {type => 'end tag', tag_name => 'p'};
             return;
           } elsif ({
@@ -2263,11 +2902,26 @@ sub _construct_tree ($) {
           }
         } # INSCOPE
           
-        !!!insert-element-t ($token->{tag_name}, $token->{attributes});
+        
+    {
+      my $el;
+      
+      $el = $self->{document}->create_element_ns
+        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
+    
+        for my $attr_name (keys %{  $token->{attributes}}) {
+          $el->set_attribute_ns (undef, [undef, $attr_name],
+                                  $token->{attributes} ->{$attr_name}->{value});
+        }
+      
+      $insert->($el);
+      push @$open_elements, [$el, $token->{tag_name}];
+    }
+  
           
         $self->{content_model_flag} = 'PLAINTEXT';
           
-        !!!next-token;
+        $token = $self->_get_next_token;
         return;
       } elsif ({
                 h1 => 1, h2 => 1, h3 => 1, h4 => 1, h5 => 1, h6 => 1,
@@ -2276,7 +2930,7 @@ sub _construct_tree ($) {
         INSCOPE: for (reverse 0..$#$open_elements) {
           my $node = $open_elements->[$_];
           if ($node->[1] eq 'p') {
-            !!!back-token;
+            unshift @{$self->{token}}, $token;
             $token = {type => 'end tag', tag_name => 'p'};
             return;
           } elsif ({
@@ -2305,21 +2959,36 @@ sub _construct_tree ($) {
         } # INSCOPE
           
         if (defined $i) {
-          !!!parse-error;
+          $self->{parse_error}->();
           splice @$open_elements, $i;
         }
           
-        !!!insert-element-t ($token->{tag_name}, $token->{attributes});
+        
+    {
+      my $el;
+      
+      $el = $self->{document}->create_element_ns
+        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
+    
+        for my $attr_name (keys %{  $token->{attributes}}) {
+          $el->set_attribute_ns (undef, [undef, $attr_name],
+                                  $token->{attributes} ->{$attr_name}->{value});
+        }
+      
+      $insert->($el);
+      push @$open_elements, [$el, $token->{tag_name}];
+    }
+  
           
-        !!!next-token;
+        $token = $self->_get_next_token;
         return;
       } elsif ($token->{tag_name} eq 'a') {
         AFE: for my $i (reverse 0..$#$active_formatting_elements) {
           my $node = $active_formatting_elements->[$i];
           if ($node->[1] eq 'a') {
-            !!!parse-error ('a in a');
+            $self->{parse_error}-> ('a in a');
             
-            !!!back-token;
+            unshift @{$self->{token}}, $token;
             $token = {type => 'end tag', tag_name => 'a'};
             $formatting_end_tag->($token->{tag_name});
             
@@ -2343,10 +3012,25 @@ sub _construct_tree ($) {
           
         $reconstruct_active_formatting_elements->($insert_to_current);
 
-        !!!insert-element-t ($token->{tag_name}, $token->{attributes});
+        
+    {
+      my $el;
+      
+      $el = $self->{document}->create_element_ns
+        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
+    
+        for my $attr_name (keys %{  $token->{attributes}}) {
+          $el->set_attribute_ns (undef, [undef, $attr_name],
+                                  $token->{attributes} ->{$attr_name}->{value});
+        }
+      
+      $insert->($el);
+      push @$open_elements, [$el, $token->{tag_name}];
+    }
+  
         push @$active_formatting_elements, $open_elements->[-1];
 
-        !!!next-token;
+        $token = $self->_get_next_token;
         return;
       } elsif ({
                 b => 1, big => 1, em => 1, font => 1, i => 1,
@@ -2355,18 +3039,33 @@ sub _construct_tree ($) {
                }->{$token->{tag_name}}) {
         $reconstruct_active_formatting_elements->($insert_to_current);
         
-        !!!insert-element-t ($token->{tag_name}, $token->{attributes});
+        
+    {
+      my $el;
+      
+      $el = $self->{document}->create_element_ns
+        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
+    
+        for my $attr_name (keys %{  $token->{attributes}}) {
+          $el->set_attribute_ns (undef, [undef, $attr_name],
+                                  $token->{attributes} ->{$attr_name}->{value});
+        }
+      
+      $insert->($el);
+      push @$open_elements, [$el, $token->{tag_name}];
+    }
+  
         push @$active_formatting_elements, $open_elements->[-1];
         
-        !!!next-token;
+        $token = $self->_get_next_token;
         return;
       } elsif ($token->{tag_name} eq 'button') {
         ## has a button element in scope
         INSCOPE: for (reverse 0..$#$open_elements) {
           my $node = $open_elements->[$_];
           if ($node->[1] eq 'button') {
-            !!!parse-error;
-            !!!back-token;
+            $self->{parse_error}->();
+            unshift @{$self->{token}}, $token;
             $token = {type => 'end tag', tag_name => 'button'};
             return;
           } elsif ({
@@ -2379,34 +3078,79 @@ sub _construct_tree ($) {
           
         $reconstruct_active_formatting_elements->($insert_to_current);
           
-        !!!insert-element-t ($token->{tag_name}, $token->{attributes});
+        
+    {
+      my $el;
+      
+      $el = $self->{document}->create_element_ns
+        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
+    
+        for my $attr_name (keys %{  $token->{attributes}}) {
+          $el->set_attribute_ns (undef, [undef, $attr_name],
+                                  $token->{attributes} ->{$attr_name}->{value});
+        }
+      
+      $insert->($el);
+      push @$open_elements, [$el, $token->{tag_name}];
+    }
+  
         push @$active_formatting_elements, ['#marker', ''];
 
-        !!!next-token;
+        $token = $self->_get_next_token;
         return;
       } elsif ($token->{tag_name} eq 'marquee' or 
                $token->{tag_name} eq 'object') {
         $reconstruct_active_formatting_elements->($insert_to_current);
         
-        !!!insert-element-t ($token->{tag_name}, $token->{attributes});
+        
+    {
+      my $el;
+      
+      $el = $self->{document}->create_element_ns
+        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
+    
+        for my $attr_name (keys %{  $token->{attributes}}) {
+          $el->set_attribute_ns (undef, [undef, $attr_name],
+                                  $token->{attributes} ->{$attr_name}->{value});
+        }
+      
+      $insert->($el);
+      push @$open_elements, [$el, $token->{tag_name}];
+    }
+  
         push @$active_formatting_elements, ['#marker', ''];
         
-        !!!next-token;
+        $token = $self->_get_next_token;
         return;
       } elsif ($token->{tag_name} eq 'xmp') {
         $reconstruct_active_formatting_elements->($insert_to_current);
         
-        !!!insert-element-t ($token->{tag_name}, $token->{attributes});
+        
+    {
+      my $el;
+      
+      $el = $self->{document}->create_element_ns
+        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
+    
+        for my $attr_name (keys %{  $token->{attributes}}) {
+          $el->set_attribute_ns (undef, [undef, $attr_name],
+                                  $token->{attributes} ->{$attr_name}->{value});
+        }
+      
+      $insert->($el);
+      push @$open_elements, [$el, $token->{tag_name}];
+    }
+  
         
         $self->{content_model_flag} = 'CDATA';
         
-        !!!next-token;
+        $token = $self->_get_next_token;
         return;
       } elsif ($token->{tag_name} eq 'table') {
         ## has a p element in scope
         INSCOPE: for (reverse @$open_elements) {
           if ($_->[1] eq 'p') {
-            !!!back-token;
+            unshift @{$self->{token}}, $token;
             $token = {type => 'end tag', tag_name => 'p'};
             return;
           } elsif ({
@@ -2417,11 +3161,26 @@ sub _construct_tree ($) {
           }
         } # INSCOPE
           
-        !!!insert-element-t ($token->{tag_name}, $token->{attributes});
+        
+    {
+      my $el;
+      
+      $el = $self->{document}->create_element_ns
+        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
+    
+        for my $attr_name (keys %{  $token->{attributes}}) {
+          $el->set_attribute_ns (undef, [undef, $attr_name],
+                                  $token->{attributes} ->{$attr_name}->{value});
+        }
+      
+      $insert->($el);
+      push @$open_elements, [$el, $token->{tag_name}];
+    }
+  
           
         $insertion_mode = 'in table';
           
-        !!!next-token;
+        $token = $self->_get_next_token;
         return;
       } elsif ({
                 area => 1, basefont => 1, bgsound => 1, br => 1,
@@ -2429,22 +3188,37 @@ sub _construct_tree ($) {
                 image => 1,
                }->{$token->{tag_name}}) {
         if ($token->{tag_name} eq 'image') {
-          !!!parse-error;
+          $self->{parse_error}->();
           $token->{tag_name} = 'img';
         }
         
         $reconstruct_active_formatting_elements->($insert_to_current);
         
-        !!!insert-element-t ($token->{tag_name}, $token->{attributes});
+        
+    {
+      my $el;
+      
+      $el = $self->{document}->create_element_ns
+        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
+    
+        for my $attr_name (keys %{  $token->{attributes}}) {
+          $el->set_attribute_ns (undef, [undef, $attr_name],
+                                  $token->{attributes} ->{$attr_name}->{value});
+        }
+      
+      $insert->($el);
+      push @$open_elements, [$el, $token->{tag_name}];
+    }
+  
         pop @$open_elements;
         
-        !!!next-token;
+        $token = $self->_get_next_token;
         return;
       } elsif ($token->{tag_name} eq 'hr') {
         ## has a p element in scope
         INSCOPE: for (reverse @$open_elements) {
           if ($_->[1] eq 'p') {
-            !!!back-token;
+            unshift @{$self->{token}}, $token;
             $token = {type => 'end tag', tag_name => 'p'};
             return;
           } elsif ({
@@ -2455,26 +3229,56 @@ sub _construct_tree ($) {
           }
         } # INSCOPE
           
-        !!!insert-element-t ($token->{tag_name}, $token->{attributes});
+        
+    {
+      my $el;
+      
+      $el = $self->{document}->create_element_ns
+        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
+    
+        for my $attr_name (keys %{  $token->{attributes}}) {
+          $el->set_attribute_ns (undef, [undef, $attr_name],
+                                  $token->{attributes} ->{$attr_name}->{value});
+        }
+      
+      $insert->($el);
+      push @$open_elements, [$el, $token->{tag_name}];
+    }
+  
         pop @$open_elements;
           
-        !!!next-token;
+        $token = $self->_get_next_token;
         return;
       } elsif ($token->{tag_name} eq 'input') {
         $reconstruct_active_formatting_elements->($insert_to_current);
         
-        !!!insert-element-t ($token->{tag_name}, $token->{attributes});
+        
+    {
+      my $el;
+      
+      $el = $self->{document}->create_element_ns
+        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
+    
+        for my $attr_name (keys %{  $token->{attributes}}) {
+          $el->set_attribute_ns (undef, [undef, $attr_name],
+                                  $token->{attributes} ->{$attr_name}->{value});
+        }
+      
+      $insert->($el);
+      push @$open_elements, [$el, $token->{tag_name}];
+    }
+  
         ## TODO: associate with $form_element if defined
         pop @$open_elements;
         
-        !!!next-token;
+        $token = $self->_get_next_token;
         return;
       } elsif ($token->{tag_name} eq 'isindex') {
-        !!!parse-error;
+        $self->{parse_error}->();
         
         if (defined $form_element) {
           ## Ignore the token
-          !!!next-token;
+          $token = $self->_get_next_token;
           return;
         } else {
           my $at = $token->{attributes};
@@ -2495,7 +3299,7 @@ sub _construct_tree ($) {
                         {type => 'end tag', tag_name => 'form'},
                        );
           $token = shift @tokens;
-          !!!back-token (@tokens);
+          unshift @{$self->{token}}, (@tokens);
           return;
         }
       } elsif ({
@@ -2506,7 +3310,15 @@ sub _construct_tree ($) {
                }->{$token->{tag_name}}) {
         my $tag_name = $token->{tag_name};
         my $el;
-        !!!create-element ($el, $token->{tag_name}, $token->{attributes});
+        
+      $el = $self->{document}->create_element_ns
+        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
+    
+        for my $attr_name (keys %{ $token->{attributes}}) {
+          $el->set_attribute_ns (undef, [undef, $attr_name],
+                                 $token->{attributes} ->{$attr_name}->{value});
+        }
+      
         
         if ($token->{tag_name} eq 'textarea') {
           ## TODO: form_element if defined
@@ -2518,10 +3330,10 @@ sub _construct_tree ($) {
         $insert->($el);
         
         my $text = '';
-        !!!next-token;
+        $token = $self->_get_next_token;
         while ($token->{type} eq 'character') {
           $text .= $token->{data};
-          !!!next-token;
+          $token = $self->_get_next_token;
         }
         if (length $text) {
           $el->manakai_append_text ($text);
@@ -2533,18 +3345,33 @@ sub _construct_tree ($) {
             $token->{tag_name} eq $tag_name) {
           ## Ignore the token
         } else {
-          !!!parse-error;
+          $self->{parse_error}->();
           ## ISSUE: And ignore?
         }
-        !!!next-token;
+        $token = $self->_get_next_token;
         return;
       } elsif ($token->{tag_name} eq 'select') {
         $reconstruct_active_formatting_elements->($insert_to_current);
         
-        !!!insert-element-t ($token->{tag_name}, $token->{attributes});
+        
+    {
+      my $el;
+      
+      $el = $self->{document}->create_element_ns
+        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
+    
+        for my $attr_name (keys %{  $token->{attributes}}) {
+          $el->set_attribute_ns (undef, [undef, $attr_name],
+                                  $token->{attributes} ->{$attr_name}->{value});
+        }
+      
+      $insert->($el);
+      push @$open_elements, [$el, $token->{tag_name}];
+    }
+  
         
         $insertion_mode = 'in select';
-        !!!next-token;
+        $token = $self->_get_next_token;
         return;
       } elsif ({
                 caption => 1, col => 1, colgroup => 1, frame => 1,
@@ -2552,18 +3379,33 @@ sub _construct_tree ($) {
                 tbody => 1, td => 1, tfoot => 1, th => 1,
                 thead => 1, tr => 1,
                }->{$token->{tag_name}}) {
-        !!!parse-error;
+        $self->{parse_error}->();
         ## Ignore the token
-        !!!next-token;
+        $token = $self->_get_next_token;
         return;
         
         ## ISSUE: An issue on HTML5 new elements in the spec.
       } else {
         $reconstruct_active_formatting_elements->($insert_to_current);
         
-        !!!insert-element-t ($token->{tag_name}, $token->{attributes});
         
-        !!!next-token;
+    {
+      my $el;
+      
+      $el = $self->{document}->create_element_ns
+        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
+    
+        for my $attr_name (keys %{  $token->{attributes}}) {
+          $el->set_attribute_ns (undef, [undef, $attr_name],
+                                  $token->{attributes} ->{$attr_name}->{value});
+        }
+      
+      $insert->($el);
+      push @$open_elements, [$el, $token->{tag_name}];
+    }
+  
+        
+        $token = $self->_get_next_token;
         return;
       }
     } elsif ($token->{type} eq 'end tag') {
@@ -2571,30 +3413,30 @@ sub _construct_tree ($) {
         if (@$open_elements > 1 and $open_elements->[1]->[1] eq 'body') {
           ## ISSUE: There is an issue in the spec.
           if ($open_elements->[-1]->[1] ne 'body') {
-            !!!parse-error;
+            $self->{parse_error}->();
           }
           $insertion_mode = 'after body';
-          !!!next-token;
+          $token = $self->_get_next_token;
           return;
         } else {
-          !!!parse-error;
+          $self->{parse_error}->();
           ## Ignore the token
-          !!!next-token;
+          $token = $self->_get_next_token;
           return;
         }
       } elsif ($token->{tag_name} eq 'html') {
         if (@$open_elements > 1 and $open_elements->[1]->[1] eq 'body') {
           ## ISSUE: There is an issue in the spec.
           if ($open_elements->[-1]->[1] ne 'body') {
-            !!!parse-error;
+            $self->{parse_error}->();
           }
           $insertion_mode = 'after body';
           ## reprocess
           return;
         } else {
-          !!!parse-error;
+          $self->{parse_error}->();
           ## Ignore the token
-          !!!next-token;
+          $token = $self->_get_next_token;
           return;
         }
       } elsif ({
@@ -2619,7 +3461,7 @@ sub _construct_tree ($) {
                  p => ($token->{tag_name} ne 'p'),
                  td => 1, th => 1, tr => 1,
                 }->{$open_elements->[-1]->[1]}) {
-              !!!back-token;
+              unshift @{$self->{token}}, $token;
               $token = {type => 'end tag',
                         tag_name => $open_elements->[-1]->[1]}; # MUST
               return;
@@ -2635,7 +3477,7 @@ sub _construct_tree ($) {
         } # INSCOPE
         
         if ($open_elements->[-1]->[1] ne $token->{tag_name}) {
-          !!!parse-error;
+          $self->{parse_error}->();
         }
         
         splice @$open_elements, $i if defined $i;
@@ -2644,7 +3486,7 @@ sub _construct_tree ($) {
           if {
             button => 1, marquee => 1, object => 1,
           }->{$token->{tag_name}};
-        !!!next-token;
+        $token = $self->_get_next_token;
         return;
       } elsif ({
                 h1 => 1, h2 => 1, h3 => 1, h4 => 1, h5 => 1, h6 => 1,
@@ -2661,7 +3503,7 @@ sub _construct_tree ($) {
                  dd => 1, dt => 1, li => 1, p => 1,
                  td => 1, th => 1, tr => 1,
                 }->{$open_elements->[-1]->[1]}) {
-              !!!back-token;
+              unshift @{$self->{token}}, $token;
               $token = {type => 'end tag',
                         tag_name => $open_elements->[-1]->[1]}; # MUST
               return;
@@ -2677,11 +3519,11 @@ sub _construct_tree ($) {
         } # INSCOPE
         
         if ($open_elements->[-1]->[1] ne $token->{tag_name}) {
-          !!!parse-error;
+          $self->{parse_error}->();
         }
         
         splice @$open_elements, $i if defined $i;
-        !!!next-token;
+        $token = $self->_get_next_token;
         return;
       } elsif ({
                 a => 1,
@@ -2703,9 +3545,9 @@ sub _construct_tree ($) {
                 table => 1, textarea => 1, wbr => 1,
                 noscript => 0, ## TODO: if scripting is enabled
                }->{$token->{tag_name}}) {
-        !!!parse-error;
+        $self->{parse_error}->();
         ## Ignore the token
-        !!!next-token;
+        $token = $self->_get_next_token;
         return;
         
         ## ISSUE: Issue on HTML5 new elements in spec
@@ -2724,7 +3566,7 @@ sub _construct_tree ($) {
                  dd => 1, dt => 1, li => 1, p => 1,
                  td => 1, th => 1, tr => 1,
                 }->{$open_elements->[-1]->[1]}) {
-              !!!back-token;
+              unshift @{$self->{token}}, $token;
               $token = {type => 'end tag',
                         tag_name => $open_elements->[-1]->[1]}; # MUST
               return;
@@ -2732,7 +3574,7 @@ sub _construct_tree ($) {
         
             ## Step 2
             if ($token->{tag_name} ne $open_elements->[-1]->[1]) {
-              !!!parse-error;
+              $self->{parse_error}->();
             }
             
             ## Step 3
@@ -2744,9 +3586,9 @@ sub _construct_tree ($) {
                 #not $phrasing_category->{$node->[1]} and
                 ($special_category->{$node->[1]} or
                  $scoping_category->{$node->[1]})) {
-              !!!parse-error;
+              $self->{parse_error}->();
               ## Ignore the token
-              !!!next-token;
+              $token = $self->_get_next_token;
               last S2;
             }
           }
@@ -2767,13 +3609,13 @@ sub _construct_tree ($) {
       if ($token->{type} eq 'DOCTYPE') {
         if ($token->{error}) {
           ## ISSUE: Spec currently left this case undefined.
-          !!!parse-error ('missing DOCTYPE');
+          $self->{parse_error}-> ('missing DOCTYPE');
         }
         my $doctype = $self->{document}->create_document_type_definition
           ($token->{name});
         $self->{document}->append_child ($doctype);
         $phase = 'root element';
-        !!!next-token;
+        $token = $self->_get_next_token;
         redo B;
       } elsif ({
                 comment => 1,
@@ -2782,7 +3624,7 @@ sub _construct_tree ($) {
                 'end-of-file' => 1,
                }->{$token->{type}}) {
         ## ISSUE: Spec currently left this case undefined.
-        !!!parse-error ('missing DOCTYPE');
+        $self->{parse_error}-> ('missing DOCTYPE');
         $phase = 'root element';
         ## reprocess
         redo B;
@@ -2792,12 +3634,12 @@ sub _construct_tree ($) {
           ## ISSUE: DOM3 Core does not allow Document > Text
           unless (length $token->{data}) {
             ## Stay in the phase
-            !!!next-token;
+            $token = $self->_get_next_token;
             redo B;
           }
         }
         ## ISSUE: Spec currently left this case undefined.
-        !!!parse-error ('missing DOCTYPE');
+        $self->{parse_error}-> ('missing DOCTYPE');
         $phase = 'root element';
         ## reprocess
         redo B;
@@ -2806,16 +3648,16 @@ sub _construct_tree ($) {
       }
     } elsif ($phase eq 'root element') {
       if ($token->{type} eq 'DOCTYPE') {
-        !!!parse-error;
+        $self->{parse_error}->();
         ## Ignore the token
         ## Stay in the phase
-        !!!next-token;
+        $token = $self->_get_next_token;
         redo B;
       } elsif ($token->{type} eq 'comment') {
         my $comment = $self->{document}->create_comment ($token->{data});
         $self->{document}->append_child ($comment);
         ## Stay in the phase
-        !!!next-token;
+        $token = $self->_get_next_token;
         redo B;
       } elsif ($token->{type} eq 'character') {
         if ($token->{data} =~ s/^([\x09\x0A\x0B\x0C\x20]+)//) {
@@ -2823,7 +3665,7 @@ sub _construct_tree ($) {
           ## ISSUE: DOM3 Core does not allow Document > Text
           unless (length $token->{data}) {
             ## Stay in the phase
-            !!!next-token;
+            $token = $self->_get_next_token;
             redo B;
           }
         }
@@ -2838,7 +3680,10 @@ sub _construct_tree ($) {
       } else {
         die "$0: $token->{type}: Unknown token";
       }
-      my $root_element; !!!create-element ($root_element, 'html');
+      my $root_element; 
+      $root_element = $self->{document}->create_element_ns
+        (q<http://www.w3.org/1999/xhtml>, [undef,  'html']);
+    
       $self->{document}->append_child ($root_element);
       $open_elements = [[$root_element, 'html']];
       $phase = 'main';
@@ -2846,10 +3691,10 @@ sub _construct_tree ($) {
       redo B;
     } elsif ($phase eq 'main') {
       if ($token->{type} eq 'DOCTYPE') {
-        !!!parse-error;
+        $self->{parse_error}->();
         ## Ignore the token
         ## Stay in the phase
-        !!!next-token;
+        $token = $self->_get_next_token;
         redo B;
       } elsif ($token->{type} eq 'start tag' and
                $token->{tag_name} eq 'html') {
@@ -2862,21 +3707,21 @@ sub _construct_tree ($) {
                $token->{attributes}->{$attr_name}->{value});
           }
         }
-        !!!next-token;
+        $token = $self->_get_next_token;
         redo B;
       } elsif ($token->{type} eq 'end-of-file') {
         ## Generate implied end tags
         if ({
              dd => 1, dt => 1, li => 1, p => 1, td => 1, th => 1, tr => 1,
             }->{$open_elements->[-1]->[1]}) {
-          !!!back-token;
+          unshift @{$self->{token}}, $token;
           $token = {type => 'end tag', tag_name => $open_elements->[-1]->[1]};
           redo B;
         }
         
         if (@$open_elements > 2 or
             (@$open_elements == 2 and $open_elements->[1]->[1] ne 'body')) {
-          !!!parse-error;
+          $self->{parse_error}->();
         } else {
           ## TODO: inner_html parser and @$open_elements > 1 and $open_elements->[1] ne 'body', then parse-error
         }
@@ -2891,12 +3736,15 @@ sub _construct_tree ($) {
             if ($token->{data} =~ s/^([\x09\x0A\x0B\x0C\x20]+)//) {
               $open_elements->[-1]->[0]->manakai_append_text ($1);
               unless (length $token->{data}) {
-                !!!next-token;
+                $token = $self->_get_next_token;
                 redo B;
               }
             }
             ## As if <head>
-            !!!create-element ($head_element, 'head');
+            
+      $head_element = $self->{document}->create_element_ns
+        (q<http://www.w3.org/1999/xhtml>, [undef,  'head']);
+    
             $open_elements->[-1]->[0]->append_child ($head_element);
             push @$open_elements, [$head_element, 'head'];
             $insertion_mode = 'in head';
@@ -2905,16 +3753,24 @@ sub _construct_tree ($) {
           } elsif ($token->{type} eq 'comment') {
             my $comment = $self->{document}->create_comment ($token->{data});
             $open_elements->[-1]->[0]->append_child ($comment);
-            !!!next-token;
+            $token = $self->_get_next_token;
             redo B;
           } elsif ($token->{type} eq 'start tag') {
             my $attr = $token->{tag_name} eq 'head' ? $token->{attributes} : {};
-            !!!create-element ($head_element, 'head', $attr);
+            
+      $head_element = $self->{document}->create_element_ns
+        (q<http://www.w3.org/1999/xhtml>, [undef,  'head']);
+    
+        for my $attr_name (keys %{ $attr}) {
+          $head_element->set_attribute_ns (undef, [undef, $attr_name],
+                                 $attr ->{$attr_name}->{value});
+        }
+      
             $open_elements->[-1]->[0]->append_child ($head_element);
             push @$open_elements, [$head_element, 'head'];
             $insertion_mode = 'in head';
             if ($token->{tag_name} eq 'head') {
-              !!!next-token;
+              $token = $self->_get_next_token;
             #} elsif ({
             #          base => 1, link => 1, meta => 1,
             #          script => 1, style => 1, title => 1,
@@ -2927,16 +3783,19 @@ sub _construct_tree ($) {
           } elsif ($token->{type} eq 'end tag') {
             if ($token->{tag_name} eq 'html') {
               ## As if <head>
-              !!!create-element ($head_element, 'head');
+              
+      $head_element = $self->{document}->create_element_ns
+        (q<http://www.w3.org/1999/xhtml>, [undef,  'head']);
+    
               $open_elements->[-1]->[0]->append_child ($head_element);
               push @$open_elements, [$head_element, 'head'];
               $insertion_mode = 'in head';
               ## reprocess
               redo B;
             } else {
-              !!!parse-error;
+              $self->{parse_error}->();
               ## Ignore the token
-              !!!next-token;
+              $token = $self->_get_next_token;
               redo B;
             }
           } else {
@@ -2947,7 +3806,7 @@ sub _construct_tree ($) {
             if ($token->{data} =~ s/^([\x09\x0A\x0B\x0C\x20]+)//) {
               $open_elements->[-1]->[0]->manakai_append_text ($1);
               unless (length $token->{data}) {
-                !!!next-token;
+                $token = $self->_get_next_token;
                 redo B;
               }
             }
@@ -2956,22 +3815,30 @@ sub _construct_tree ($) {
           } elsif ($token->{type} eq 'comment') {
             my $comment = $self->{document}->create_comment ($token->{data});
             $open_elements->[-1]->[0]->append_child ($comment);
-            !!!next-token;
+            $token = $self->_get_next_token;
             redo B;
           } elsif ($token->{type} eq 'start tag') {
             if ($token->{tag_name} eq 'title') {
               ## NOTE: There is an "as if in head" code clone
               my $title_el;
-              !!!create-element ($title_el, 'title', $token->{attributes});
+              
+      $title_el = $self->{document}->create_element_ns
+        (q<http://www.w3.org/1999/xhtml>, [undef,  'title']);
+    
+        for my $attr_name (keys %{ $token->{attributes}}) {
+          $title_el->set_attribute_ns (undef, [undef, $attr_name],
+                                 $token->{attributes} ->{$attr_name}->{value});
+        }
+      
               (defined $head_element ? $head_element : $open_elements->[-1]->[0])
                 ->append_child ($title_el);
               $self->{content_model_flag} = 'RCDATA';
 
               my $text = '';
-              !!!next-token;
+              $token = $self->_get_next_token;
               while ($token->{type} eq 'character') {
                 $text .= $token->{data};
-                !!!next-token;
+                $token = $self->_get_next_token;
               }
               if (length $text) {
                 $title_el->manakai_append_text ($text);
@@ -2983,10 +3850,10 @@ sub _construct_tree ($) {
                   $token->{tag_name} eq 'title') {
                 ## Ignore the token
               } else {
-                !!!parse-error;
+                $self->{parse_error}->();
                 ## ISSUE: And ignore?
               }
-              !!!next-token;
+              $token = $self->_get_next_token;
               redo B;
             } elsif ($token->{tag_name} eq 'style') {
               $style_start_tag->();
@@ -2997,16 +3864,24 @@ sub _construct_tree ($) {
             } elsif ({base => 1, link => 1, meta => 1}->{$token->{tag_name}}) {
               ## NOTE: There are "as if in head" code clones
               my $el;
-              !!!create-element ($el, $token->{tag_name}, $token->{attributes});
+              
+      $el = $self->{document}->create_element_ns
+        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
+    
+        for my $attr_name (keys %{ $token->{attributes}}) {
+          $el->set_attribute_ns (undef, [undef, $attr_name],
+                                 $token->{attributes} ->{$attr_name}->{value});
+        }
+      
               (defined $head_element ? $head_element : $open_elements->[-1]->[0])
                 ->append_child ($el);
 
-              !!!next-token;
+              $token = $self->_get_next_token;
               redo B;
             } elsif ($token->{tag_name} eq 'head') {
-              !!!parse-error;
+              $self->{parse_error}->();
               ## Ignore the token
-              !!!next-token;
+              $token = $self->_get_next_token;
               redo B;
             } else {
               #
@@ -3016,17 +3891,17 @@ sub _construct_tree ($) {
               if ($open_elements->[-1]->[1] eq 'head') {
                 pop @$open_elements;
               } else {
-                !!!parse-error;
+                $self->{parse_error}->();
               }
               $insertion_mode = 'after head';
-              !!!next-token;
+              $token = $self->_get_next_token;
               redo B;
             } elsif ($token->{tag_name} eq 'html') {
               #
             } else {
-              !!!parse-error;
+              $self->{parse_error}->();
               ## Ignore the token
-              !!!next-token;
+              $token = $self->_get_next_token;
               redo B;
             }
           } else {
@@ -3047,7 +3922,7 @@ sub _construct_tree ($) {
             if ($token->{data} =~ s/^([\x09\x0A\x0B\x0C\x20]+)//) {
               $open_elements->[-1]->[0]->manakai_append_text ($1);
               unless (length $token->{data}) {
-                !!!next-token;
+                $token = $self->_get_next_token;
                 redo B;
               }
             }
@@ -3056,24 +3931,54 @@ sub _construct_tree ($) {
           } elsif ($token->{type} eq 'comment') {
             my $comment = $self->{document}->create_comment ($token->{data});
             $open_elements->[-1]->[0]->append_child ($comment);
-            !!!next-token;
+            $token = $self->_get_next_token;
             redo B;
           } elsif ($token->{type} eq 'start tag') {
             if ($token->{tag_name} eq 'body') {
-              !!!insert-element ('body', $token->{attributes});
+              
+    {
+      my $el;
+      
+      $el = $self->{document}->create_element_ns
+        (q<http://www.w3.org/1999/xhtml>, [undef,  'body']);
+    
+        for my $attr_name (keys %{  $token->{attributes}}) {
+          $el->set_attribute_ns (undef, [undef, $attr_name],
+                                  $token->{attributes} ->{$attr_name}->{value});
+        }
+      
+      $open_elements->[-1]->[0]->append_child ($el);
+      push @$open_elements, [$el, 'body'];
+    }
+  
               $insertion_mode = 'in body';
-              !!!next-token;
+              $token = $self->_get_next_token;
               redo B;
             } elsif ($token->{tag_name} eq 'frameset') {
-              !!!insert-element ('frameset', $token->{attributes});
+              
+    {
+      my $el;
+      
+      $el = $self->{document}->create_element_ns
+        (q<http://www.w3.org/1999/xhtml>, [undef,  'frameset']);
+    
+        for my $attr_name (keys %{  $token->{attributes}}) {
+          $el->set_attribute_ns (undef, [undef, $attr_name],
+                                  $token->{attributes} ->{$attr_name}->{value});
+        }
+      
+      $open_elements->[-1]->[0]->append_child ($el);
+      push @$open_elements, [$el, 'frameset'];
+    }
+  
               $insertion_mode = 'in frameset';
-              !!!next-token;
+              $token = $self->_get_next_token;
               redo B;
             } elsif ({
                       base => 1, link => 1, meta => 1,
                       script=> 1, style => 1, title => 1,
                      }->{$token->{tag_name}}) {
-              !!!parse-error;
+              $self->{parse_error}->();
                $insertion_mode = 'in head';
               ## reprocess
               redo B;
@@ -3085,7 +3990,17 @@ sub _construct_tree ($) {
           }
           
           ## As if <body>
-          !!!insert-element ('body');
+          
+    {
+      my $el;
+      
+      $el = $self->{document}->create_element_ns
+        (q<http://www.w3.org/1999/xhtml>, [undef,  'body']);
+    
+      $open_elements->[-1]->[0]->append_child ($el);
+      push @$open_elements, [$el, 'body'];
+    }
+  
           $insertion_mode = 'in body';
           ## reprocess
           redo B;
@@ -3096,13 +4011,13 @@ sub _construct_tree ($) {
             
             $open_elements->[-1]->[0]->manakai_append_text ($token->{data});
 
-            !!!next-token;
+            $token = $self->_get_next_token;
             redo B;
           } elsif ($token->{type} eq 'comment') {
             ## NOTE: There is a code clone of "comment in body".
             my $comment = $self->{document}->create_comment ($token->{data});
             $open_elements->[-1]->[0]->append_child ($comment);
-            !!!next-token;
+            $token = $self->_get_next_token;
             redo B;
           } else {
             $in_body->($insert_to_current);
@@ -3115,7 +4030,7 @@ sub _construct_tree ($) {
               $open_elements->[-1]->[0]->manakai_append_text ($1);
               
               unless (length $token->{data}) {
-                !!!next-token;
+                $token = $self->_get_next_token;
                 redo B;
               }
             }
@@ -3163,12 +4078,12 @@ sub _construct_tree ($) {
               $open_elements->[-1]->[0]->manakai_append_text ($token->{data});
             }
             
-            !!!next-token;
+            $token = $self->_get_next_token;
             redo B;
           } elsif ($token->{type} eq 'comment') {
             my $comment = $self->{document}->create_comment ($token->{data});
             $open_elements->[-1]->[0]->append_child ($comment);
-            !!!next-token;
+            $token = $self->_get_next_token;
             redo B;
           } elsif ($token->{type} eq 'start tag') {
             if ({
@@ -3179,14 +4094,29 @@ sub _construct_tree ($) {
               ## Clear back to table context
               while ($open_elements->[-1]->[1] ne 'table' and
                      $open_elements->[-1]->[1] ne 'html') {
-                !!!parse-error;
+                $self->{parse_error}->();
                 pop @$open_elements;
               }
 
               push @$active_formatting_elements, ['#marker', '']
                 if $token->{tag_name} eq 'caption';
 
-              !!!insert-element ($token->{tag_name}, $token->{attributes});
+              
+    {
+      my $el;
+      
+      $el = $self->{document}->create_element_ns
+        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
+    
+        for my $attr_name (keys %{  $token->{attributes}}) {
+          $el->set_attribute_ns (undef, [undef, $attr_name],
+                                  $token->{attributes} ->{$attr_name}->{value});
+        }
+      
+      $open_elements->[-1]->[0]->append_child ($el);
+      push @$open_elements, [$el, $token->{tag_name}];
+    }
+  
               $insertion_mode = {
                                  caption => 'in caption',
                                  colgroup => 'in column group',
@@ -3194,7 +4124,7 @@ sub _construct_tree ($) {
                                  tfoot => 'in table body',
                                  thead => 'in table body',
                                 }->{$token->{tag_name}};
-              !!!next-token;
+              $token = $self->_get_next_token;
               redo B;
             } elsif ({
                       col => 1,
@@ -3203,18 +4133,28 @@ sub _construct_tree ($) {
               ## Clear back to table context
               while ($open_elements->[-1]->[1] ne 'table' and
                      $open_elements->[-1]->[1] ne 'html') {
-                !!!parse-error;
+                $self->{parse_error}->();
                 pop @$open_elements;
               }
 
-              !!!insert-element ($token->{tag_name} eq 'col' ? 'colgroup' : 'tbody');
+              
+    {
+      my $el;
+      
+      $el = $self->{document}->create_element_ns
+        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name} eq 'col' ? 'colgroup' : 'tbody']);
+    
+      $open_elements->[-1]->[0]->append_child ($el);
+      push @$open_elements, [$el, $token->{tag_name} eq 'col' ? 'colgroup' : 'tbody'];
+    }
+  
               $insertion_mode = $token->{tag_name} eq 'col'
                 ? 'in column group' : 'in table body';
               ## reprocess
               redo B;
             } elsif ($token->{tag_name} eq 'table') {
               ## NOTE: There are code clones for this "table in table"
-              !!!parse-error;
+              $self->{parse_error}->();
 
               ## As if </table>
               ## have a table element in table scope
@@ -3231,9 +4171,9 @@ sub _construct_tree ($) {
                 }
               } # INSCOPE
               unless (defined $i) {
-                !!!parse-error;
+                $self->{parse_error}->();
                 ## Ignore tokens </table><table>
-                !!!next-token;
+                $token = $self->_get_next_token;
                 redo B;
               }
               
@@ -3242,16 +4182,16 @@ sub _construct_tree ($) {
                    dd => 1, dt => 1, li => 1, p => 1,
                    td => 1, th => 1, tr => 1,
                   }->{$open_elements->[-1]->[1]}) {
-                !!!back-token; # <table>
+                unshift @{$self->{token}}, $token; # <table>
                 $token = {type => 'end tag', tag_name => 'table'};
-                !!!back-token;
+                unshift @{$self->{token}}, $token;
                 $token = {type => 'end tag',
                           tag_name => $open_elements->[-1]->[1]}; # MUST
                 redo B;
               }
 
               if ($open_elements->[-1]->[1] ne 'table') {
-                !!!parse-error;
+                $self->{parse_error}->();
               }
 
               splice @$open_elements, $i;
@@ -3279,9 +4219,9 @@ sub _construct_tree ($) {
                 }
               } # INSCOPE
               unless (defined $i) {
-                !!!parse-error;
+                $self->{parse_error}->();
                 ## Ignore the token
-                !!!next-token;
+                $token = $self->_get_next_token;
                 redo B;
               }
               
@@ -3290,30 +4230,30 @@ sub _construct_tree ($) {
                    dd => 1, dt => 1, li => 1, p => 1,
                    td => 1, th => 1, tr => 1,
                   }->{$open_elements->[-1]->[1]}) {
-                !!!back-token;
+                unshift @{$self->{token}}, $token;
                 $token = {type => 'end tag',
                           tag_name => $open_elements->[-1]->[1]}; # MUST
                 redo B;
               }
 
               if ($open_elements->[-1]->[1] ne 'table') {
-                !!!parse-error;
+                $self->{parse_error}->();
               }
 
               splice @$open_elements, $i;
 
               $reset_insertion_mode->();
 
-              !!!next-token;
+              $token = $self->_get_next_token;
               redo B;
             } elsif ({
                       body => 1, caption => 1, col => 1, colgroup => 1,
                       html => 1, tbody => 1, td => 1, tfoot => 1, th => 1,
                       thead => 1, tr => 1,
                      }->{$token->{tag_name}}) {
-              !!!parse-error;
+              $self->{parse_error}->();
               ## Ignore the token
-              !!!next-token;
+              $token = $self->_get_next_token;
               redo B;
             } else {
               #
@@ -3322,7 +4262,7 @@ sub _construct_tree ($) {
             #
           }
 
-          !!!parse-error;
+          $self->{parse_error}->();
           $in_body->($insert_to_foster);
           redo B;
         } elsif ($insertion_mode eq 'in caption') {
@@ -3332,20 +4272,20 @@ sub _construct_tree ($) {
             
             $open_elements->[-1]->[0]->manakai_append_text ($token->{data});
 
-            !!!next-token;
+            $token = $self->_get_next_token;
             redo B;
           } elsif ($token->{type} eq 'comment') {
             ## NOTE: This is a code clone of "comment in body".
             my $comment = $self->{document}->create_comment ($token->{data});
             $open_elements->[-1]->[0]->append_child ($comment);
-            !!!next-token;
+            $token = $self->_get_next_token;
             redo B;
           } elsif ($token->{type} eq 'start tag') {
             if ({
                  caption => 1, col => 1, colgroup => 1, tbody => 1,
                  td => 1, tfoot => 1, th => 1, thead => 1, tr => 1,
                 }->{$token->{tag_name}}) {
-              !!!parse-error;
+              $self->{parse_error}->();
 
               ## As if </caption>
               ## have a table element in table scope
@@ -3362,9 +4302,9 @@ sub _construct_tree ($) {
                 }
               } # INSCOPE
               unless (defined $i) {
-                !!!parse-error;
+                $self->{parse_error}->();
                 ## Ignore the token
-                !!!next-token;
+                $token = $self->_get_next_token;
                 redo B;
               }
               
@@ -3373,16 +4313,16 @@ sub _construct_tree ($) {
                    dd => 1, dt => 1, li => 1, p => 1,
                    td => 1, th => 1, tr => 1,
                   }->{$open_elements->[-1]->[1]}) {
-                !!!back-token; # <?>
+                unshift @{$self->{token}}, $token; # <?>
                 $token = {type => 'end tag', tag_name => 'caption'};
-                !!!back-token;
+                unshift @{$self->{token}}, $token;
                 $token = {type => 'end tag',
                           tag_name => $open_elements->[-1]->[1]}; # MUST
                 redo B;
               }
 
               if ($open_elements->[-1]->[1] ne 'caption') {
-                !!!parse-error;
+                $self->{parse_error}->();
               }
 
               splice @$open_elements, $i;
@@ -3412,9 +4352,9 @@ sub _construct_tree ($) {
                 }
               } # INSCOPE
               unless (defined $i) {
-                !!!parse-error;
+                $self->{parse_error}->();
                 ## Ignore the token
-                !!!next-token;
+                $token = $self->_get_next_token;
                 redo B;
               }
               
@@ -3423,14 +4363,14 @@ sub _construct_tree ($) {
                    dd => 1, dt => 1, li => 1, p => 1,
                    td => 1, th => 1, tr => 1,
                   }->{$open_elements->[-1]->[1]}) {
-                !!!back-token;
+                unshift @{$self->{token}}, $token;
                 $token = {type => 'end tag',
                           tag_name => $open_elements->[-1]->[1]}; # MUST
                 redo B;
               }
 
               if ($open_elements->[-1]->[1] ne 'caption') {
-                !!!parse-error;
+                $self->{parse_error}->();
               }
 
               splice @$open_elements, $i;
@@ -3439,10 +4379,10 @@ sub _construct_tree ($) {
 
               $insertion_mode = 'in table';
 
-              !!!next-token;
+              $token = $self->_get_next_token;
               redo B;
             } elsif ($token->{tag_name} eq 'table') {
-              !!!parse-error;
+              $self->{parse_error}->();
 
               ## As if </caption>
               ## have a table element in table scope
@@ -3459,9 +4399,9 @@ sub _construct_tree ($) {
                 }
               } # INSCOPE
               unless (defined $i) {
-                !!!parse-error;
+                $self->{parse_error}->();
                 ## Ignore the token
-                !!!next-token;
+                $token = $self->_get_next_token;
                 redo B;
               }
               
@@ -3470,16 +4410,16 @@ sub _construct_tree ($) {
                    dd => 1, dt => 1, li => 1, p => 1,
                    td => 1, th => 1, tr => 1,
                   }->{$open_elements->[-1]->[1]}) {
-                !!!back-token; # </table>
+                unshift @{$self->{token}}, $token; # </table>
                 $token = {type => 'end tag', tag_name => 'caption'};
-                !!!back-token;
+                unshift @{$self->{token}}, $token;
                 $token = {type => 'end tag',
                           tag_name => $open_elements->[-1]->[1]}; # MUST
                 redo B;
               }
 
               if ($open_elements->[-1]->[1] ne 'caption') {
-                !!!parse-error;
+                $self->{parse_error}->();
               }
 
               splice @$open_elements, $i;
@@ -3495,7 +4435,7 @@ sub _construct_tree ($) {
                       html => 1, tbody => 1, td => 1, tfoot => 1,
                       th => 1, thead => 1, tr => 1,
                      }->{$token->{tag_name}}) {
-              !!!parse-error;
+              $self->{parse_error}->();
               ## Ignore the token
               redo B;
             } else {
@@ -3512,7 +4452,7 @@ sub _construct_tree ($) {
             if ($token->{data} =~ s/^([\x09\x0A\x0B\x0C\x20]+)//) {
               $open_elements->[-1]->[0]->manakai_append_text ($1);
               unless (length $token->{data}) {
-                !!!next-token;
+                $token = $self->_get_next_token;
                 redo B;
               }
             }
@@ -3521,13 +4461,28 @@ sub _construct_tree ($) {
           } elsif ($token->{type} eq 'comment') {
             my $comment = $self->{document}->create_comment ($token->{data});
             $open_elements->[-1]->[0]->append_child ($comment);
-            !!!next-token;
+            $token = $self->_get_next_token;
             redo B;
           } elsif ($token->{type} eq 'start tag') {
             if ($token->{tag_name} eq 'col') {
-              !!!insert-element ($token->{tag_name}, $token->{attributes});
+              
+    {
+      my $el;
+      
+      $el = $self->{document}->create_element_ns
+        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
+    
+        for my $attr_name (keys %{  $token->{attributes}}) {
+          $el->set_attribute_ns (undef, [undef, $attr_name],
+                                  $token->{attributes} ->{$attr_name}->{value});
+        }
+      
+      $open_elements->[-1]->[0]->append_child ($el);
+      push @$open_elements, [$el, $token->{tag_name}];
+    }
+  
               pop @$open_elements;
-              !!!next-token;
+              $token = $self->_get_next_token;
               redo B;
             } else { 
               #
@@ -3535,20 +4490,20 @@ sub _construct_tree ($) {
           } elsif ($token->{type} eq 'end tag') {
             if ($token->{tag_name} eq 'colgroup') {
               if ($open_elements->[-1]->[1] eq 'html') {
-                !!!parse-error;
+                $self->{parse_error}->();
                 ## Ignore the token
-                !!!next-token;
+                $token = $self->_get_next_token;
                 redo B;
               } else {
                 pop @$open_elements; # colgroup
                 $insertion_mode = 'in table';
-                !!!next-token;
+                $token = $self->_get_next_token;
                 redo B;             
               }
             } elsif ($token->{tag_name} eq 'col') {
-              !!!parse-error;
+              $self->{parse_error}->();
               ## Ignore the token
-              !!!next-token;
+              $token = $self->_get_next_token;
               redo B;
             } else {
               # 
@@ -3559,9 +4514,9 @@ sub _construct_tree ($) {
 
           ## As if </colgroup>
           if ($open_elements->[-1]->[1] eq 'html') {
-            !!!parse-error;
+            $self->{parse_error}->();
             ## Ignore the token
-            !!!next-token;
+            $token = $self->_get_next_token;
             redo B;
           } else {
             pop @$open_elements; # colgroup
@@ -3576,7 +4531,7 @@ sub _construct_tree ($) {
               $open_elements->[-1]->[0]->manakai_append_text ($1);
               
               unless (length $token->{data}) {
-                !!!next-token;
+                $token = $self->_get_next_token;
                 redo B;
               }
             }
@@ -3624,13 +4579,13 @@ sub _construct_tree ($) {
               $open_elements->[-1]->[0]->manakai_append_text ($token->{data});
             }
             
-            !!!next-token;
+            $token = $self->_get_next_token;
             redo B;
           } elsif ($token->{type} eq 'comment') {
             ## Copied from 'in table'
             my $comment = $self->{document}->create_comment ($token->{data});
             $open_elements->[-1]->[0]->append_child ($comment);
-            !!!next-token;
+            $token = $self->_get_next_token;
             redo B;
           } elsif ($token->{type} eq 'start tag') {
             if ({
@@ -3641,16 +4596,41 @@ sub _construct_tree ($) {
               while (not {
                 tbody => 1, tfoot => 1, thead => 1, html => 1,
               }->{$open_elements->[-1]->[1]}) {
-                !!!parse-error;
+                $self->{parse_error}->();
                 pop @$open_elements;
               }
               
               $insertion_mode = 'in row';
               if ($token->{tag_name} eq 'tr') {
-                !!!insert-element ($token->{tag_name}, $token->{attributes});
-                !!!next-token;
+                
+    {
+      my $el;
+      
+      $el = $self->{document}->create_element_ns
+        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
+    
+        for my $attr_name (keys %{  $token->{attributes}}) {
+          $el->set_attribute_ns (undef, [undef, $attr_name],
+                                  $token->{attributes} ->{$attr_name}->{value});
+        }
+      
+      $open_elements->[-1]->[0]->append_child ($el);
+      push @$open_elements, [$el, $token->{tag_name}];
+    }
+  
+                $token = $self->_get_next_token;
               } else {
-                !!!insert-element ('tr');
+                
+    {
+      my $el;
+      
+      $el = $self->{document}->create_element_ns
+        (q<http://www.w3.org/1999/xhtml>, [undef,  'tr']);
+    
+      $open_elements->[-1]->[0]->append_child ($el);
+      push @$open_elements, [$el, 'tr'];
+    }
+  
                 ## reprocess
               }
               redo B;
@@ -3674,9 +4654,9 @@ sub _construct_tree ($) {
                 }
               } # INSCOPE
               unless (defined $i) {
-                !!!parse-error;
+                $self->{parse_error}->();
                 ## Ignore the token
-                !!!next-token;
+                $token = $self->_get_next_token;
                 redo B;
               }
 
@@ -3684,7 +4664,7 @@ sub _construct_tree ($) {
               while (not {
                 tbody => 1, tfoot => 1, thead => 1, html => 1,
               }->{$open_elements->[-1]->[1]}) {
-                !!!parse-error;
+                $self->{parse_error}->();
                 pop @$open_elements;
               }
 
@@ -3701,7 +4681,7 @@ sub _construct_tree ($) {
               redo B;
             } elsif ($token->{tag_name} eq 'table') {
               ## NOTE: This is a code clone of "table in table"
-              !!!parse-error;
+              $self->{parse_error}->();
 
               ## As if </table>
               ## have a table element in table scope
@@ -3718,9 +4698,9 @@ sub _construct_tree ($) {
                 }
               } # INSCOPE
               unless (defined $i) {
-                !!!parse-error;
+                $self->{parse_error}->();
                 ## Ignore tokens </table><table>
-                !!!next-token;
+                $token = $self->_get_next_token;
                 redo B;
               }
               
@@ -3729,16 +4709,16 @@ sub _construct_tree ($) {
                    dd => 1, dt => 1, li => 1, p => 1,
                    td => 1, th => 1, tr => 1,
                   }->{$open_elements->[-1]->[1]}) {
-                !!!back-token; # <table>
+                unshift @{$self->{token}}, $token; # <table>
                 $token = {type => 'end tag', tag_name => 'table'};
-                !!!back-token;
+                unshift @{$self->{token}}, $token;
                 $token = {type => 'end tag',
                           tag_name => $open_elements->[-1]->[1]}; # MUST
                 redo B;
               }
 
               if ($open_elements->[-1]->[1] ne 'table') {
-                !!!parse-error;
+                $self->{parse_error}->();
               }
 
               splice @$open_elements, $i;
@@ -3768,9 +4748,9 @@ sub _construct_tree ($) {
                 }
               } # INSCOPE
               unless (defined $i) {
-                !!!parse-error;
+                $self->{parse_error}->();
                 ## Ignore the token
-                !!!next-token;
+                $token = $self->_get_next_token;
                 redo B;
               }
 
@@ -3778,13 +4758,13 @@ sub _construct_tree ($) {
               while (not {
                 tbody => 1, tfoot => 1, thead => 1, html => 1,
               }->{$open_elements->[-1]->[1]}) {
-                !!!parse-error;
+                $self->{parse_error}->();
                 pop @$open_elements;
               }
 
               pop @$open_elements;
               $insertion_mode = 'in table';
-              !!!next-token;
+              $token = $self->_get_next_token;
               redo B;
             } elsif ($token->{tag_name} eq 'table') {
               ## have an element in table scope
@@ -3803,9 +4783,9 @@ sub _construct_tree ($) {
                 }
               } # INSCOPE
               unless (defined $i) {
-                !!!parse-error;
+                $self->{parse_error}->();
                 ## Ignore the token
-                !!!next-token;
+                $token = $self->_get_next_token;
                 redo B;
               }
 
@@ -3813,7 +4793,7 @@ sub _construct_tree ($) {
               while (not {
                 tbody => 1, tfoot => 1, thead => 1, html => 1,
               }->{$open_elements->[-1]->[1]}) {
-                !!!parse-error;
+                $self->{parse_error}->();
                 pop @$open_elements;
               }
 
@@ -3832,9 +4812,9 @@ sub _construct_tree ($) {
                       body => 1, caption => 1, col => 1, colgroup => 1,
                       html => 1, td => 1, th => 1, tr => 1,
                      }->{$token->{tag_name}}) {
-              !!!parse-error;
+              $self->{parse_error}->();
               ## Ignore the token
-              !!!next-token;
+              $token = $self->_get_next_token;
               redo B;
             } else {
               #
@@ -3844,7 +4824,7 @@ sub _construct_tree ($) {
           }
           
           ## As if in table
-          !!!parse-error;
+          $self->{parse_error}->();
           $in_body->($insert_to_foster);
           redo B;
         } elsif ($insertion_mode eq 'in row') {
@@ -3854,7 +4834,7 @@ sub _construct_tree ($) {
               $open_elements->[-1]->[0]->manakai_append_text ($1);
               
               unless (length $token->{data}) {
-                !!!next-token;
+                $token = $self->_get_next_token;
                 redo B;
               }
             }
@@ -3902,13 +4882,13 @@ sub _construct_tree ($) {
               $open_elements->[-1]->[0]->manakai_append_text ($token->{data});
             }
             
-            !!!next-token;
+            $token = $self->_get_next_token;
             redo B;
           } elsif ($token->{type} eq 'comment') {
             ## Copied from 'in table'
             my $comment = $self->{document}->create_comment ($token->{data});
             $open_elements->[-1]->[0]->append_child ($comment);
-            !!!next-token;
+            $token = $self->_get_next_token;
             redo B;
           } elsif ($token->{type} eq 'start tag') {
             if ($token->{tag_name} eq 'th' or
@@ -3917,16 +4897,31 @@ sub _construct_tree ($) {
               while (not {
                 tr => 1, html => 1,
               }->{$open_elements->[-1]->[1]}) {
-                !!!parse-error;
+                $self->{parse_error}->();
                 pop @$open_elements;
               }
               
-              !!!insert-element ($token->{tag_name}, $token->{attributes});
+              
+    {
+      my $el;
+      
+      $el = $self->{document}->create_element_ns
+        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
+    
+        for my $attr_name (keys %{  $token->{attributes}}) {
+          $el->set_attribute_ns (undef, [undef, $attr_name],
+                                  $token->{attributes} ->{$attr_name}->{value});
+        }
+      
+      $open_elements->[-1]->[0]->append_child ($el);
+      push @$open_elements, [$el, $token->{tag_name}];
+    }
+  
               $insertion_mode = 'in cell';
 
               push @$active_formatting_elements, ['#marker', ''];
               
-              !!!next-token;
+              $token = $self->_get_next_token;
               redo B;
             } elsif ({
                       caption => 1, col => 1, colgroup => 1,
@@ -3947,9 +4942,9 @@ sub _construct_tree ($) {
                 }
               } # INSCOPE
               unless (defined $i) {
-                !!!parse-error;
+                $self->{parse_error}->();
                 ## Ignore the token
-                !!!next-token;
+                $token = $self->_get_next_token;
                 redo B;
               }
 
@@ -3957,7 +4952,7 @@ sub _construct_tree ($) {
               while (not {
                 tr => 1, html => 1,
               }->{$open_elements->[-1]->[1]}) {
-                !!!parse-error;
+                $self->{parse_error}->();
                 pop @$open_elements;
               }
 
@@ -3967,7 +4962,7 @@ sub _construct_tree ($) {
               redo B;
             } elsif ($token->{tag_name} eq 'table') {
               ## NOTE: This is a code clone of "table in table"
-              !!!parse-error;
+              $self->{parse_error}->();
 
               ## As if </table>
               ## have a table element in table scope
@@ -3984,9 +4979,9 @@ sub _construct_tree ($) {
                 }
               } # INSCOPE
               unless (defined $i) {
-                !!!parse-error;
+                $self->{parse_error}->();
                 ## Ignore tokens </table><table>
-                !!!next-token;
+                $token = $self->_get_next_token;
                 redo B;
               }
               
@@ -3995,16 +4990,16 @@ sub _construct_tree ($) {
                    dd => 1, dt => 1, li => 1, p => 1,
                    td => 1, th => 1, tr => 1,
                   }->{$open_elements->[-1]->[1]}) {
-                !!!back-token; # <table>
+                unshift @{$self->{token}}, $token; # <table>
                 $token = {type => 'end tag', tag_name => 'table'};
-                !!!back-token;
+                unshift @{$self->{token}}, $token;
                 $token = {type => 'end tag',
                           tag_name => $open_elements->[-1]->[1]}; # MUST
                 redo B;
               }
 
               if ($open_elements->[-1]->[1] ne 'table') {
-                !!!parse-error;
+                $self->{parse_error}->();
               }
 
               splice @$open_elements, $i;
@@ -4032,9 +5027,9 @@ sub _construct_tree ($) {
                 }
               } # INSCOPE
               unless (defined $i) {
-                !!!parse-error;
+                $self->{parse_error}->();
                 ## Ignore the token
-                !!!next-token;
+                $token = $self->_get_next_token;
                 redo B;
               }
 
@@ -4042,13 +5037,13 @@ sub _construct_tree ($) {
               while (not {
                 tr => 1, html => 1,
               }->{$open_elements->[-1]->[1]}) {
-                !!!parse-error;
+                $self->{parse_error}->();
                 pop @$open_elements;
               }
 
               pop @$open_elements; # tr
               $insertion_mode = 'in table body';
-              !!!next-token;
+              $token = $self->_get_next_token;
               redo B;
             } elsif ($token->{tag_name} eq 'table') {
               ## As if </tr>
@@ -4066,9 +5061,9 @@ sub _construct_tree ($) {
                 }
               } # INSCOPE
               unless (defined $i) {
-                !!!parse-error;
+                $self->{parse_error}->();
                 ## Ignore the token
-                !!!next-token;
+                $token = $self->_get_next_token;
                 redo B;
               }
 
@@ -4076,7 +5071,7 @@ sub _construct_tree ($) {
               while (not {
                 tr => 1, html => 1,
               }->{$open_elements->[-1]->[1]}) {
-                !!!parse-error;
+                $self->{parse_error}->();
                 pop @$open_elements;
               }
 
@@ -4101,9 +5096,9 @@ sub _construct_tree ($) {
                 }
               } # INSCOPE
               unless (defined $i) {
-                !!!parse-error;
+                $self->{parse_error}->();
                 ## Ignore the token
-                !!!next-token;
+                $token = $self->_get_next_token;
                 redo B;
               }
 
@@ -4122,9 +5117,9 @@ sub _construct_tree ($) {
                 }
               } # INSCOPE
               unless (defined $i) {
-                !!!parse-error;
+                $self->{parse_error}->();
                 ## Ignore the token
-                !!!next-token;
+                $token = $self->_get_next_token;
                 redo B;
               }
 
@@ -4132,7 +5127,7 @@ sub _construct_tree ($) {
               while (not {
                 tr => 1, html => 1,
               }->{$open_elements->[-1]->[1]}) {
-                !!!parse-error;
+                $self->{parse_error}->();
                 pop @$open_elements;
               }
 
@@ -4144,9 +5139,9 @@ sub _construct_tree ($) {
                       body => 1, caption => 1, col => 1,
                       colgroup => 1, html => 1, td => 1, th => 1,
                      }->{$token->{tag_name}}) {
-              !!!parse-error;
+              $self->{parse_error}->();
               ## Ignore the token
-              !!!next-token;
+              $token = $self->_get_next_token;
               redo B;
             } else {
               #
@@ -4156,7 +5151,7 @@ sub _construct_tree ($) {
           }
 
           ## As if in table
-          !!!parse-error;
+          $self->{parse_error}->();
           $in_body->($insert_to_foster);
           redo B;
         } elsif ($insertion_mode eq 'in cell') {
@@ -4166,13 +5161,13 @@ sub _construct_tree ($) {
             
             $open_elements->[-1]->[0]->manakai_append_text ($token->{data});
 
-            !!!next-token;
+            $token = $self->_get_next_token;
             redo B;
           } elsif ($token->{type} eq 'comment') {
             ## NOTE: This is a code clone of "comment in body".
             my $comment = $self->{document}->create_comment ($token->{data});
             $open_elements->[-1]->[0]->append_child ($comment);
-            !!!next-token;
+            $token = $self->_get_next_token;
             redo B;
           } elsif ($token->{type} eq 'start tag') {
             if ({
@@ -4194,14 +5189,14 @@ sub _construct_tree ($) {
                 }
               } # INSCOPE
               unless (defined $tn) {
-                !!!parse-error;
+                $self->{parse_error}->();
                 ## Ignore the token
-                !!!next-token;
+                $token = $self->_get_next_token;
                 redo B;
               }
 
               ## Close the cell
-              !!!back-token; # <?>
+              unshift @{$self->{token}}, $token; # <?>
               $token = {type => 'end tag', tag_name => $tn};
               redo B;
             } else {
@@ -4223,9 +5218,9 @@ sub _construct_tree ($) {
                 }
               } # INSCOPE
               unless (defined $i) {
-                !!!parse-error;
+                $self->{parse_error}->();
                 ## Ignore the token
-                !!!next-token;
+                $token = $self->_get_next_token;
                 redo B;
               }
               
@@ -4236,14 +5231,14 @@ sub _construct_tree ($) {
                    th => ($token->{tag_name} eq 'td'),
                    tr => 1,
                   }->{$open_elements->[-1]->[1]}) {
-                !!!back-token;
+                unshift @{$self->{token}}, $token;
                 $token = {type => 'end tag',
                           tag_name => $open_elements->[-1]->[1]}; # MUST
                 redo B;
               }
 
               if ($open_elements->[-1]->[1] ne $token->{tag_name}) {
-                !!!parse-error;
+                $self->{parse_error}->();
               }
 
               splice @$open_elements, $i;
@@ -4252,15 +5247,15 @@ sub _construct_tree ($) {
 
               $insertion_mode = 'in row';
 
-              !!!next-token;
+              $token = $self->_get_next_token;
               redo B;
             } elsif ({
                       body => 1, caption => 1, col => 1,
                       colgroup => 1, html => 1,
                      }->{$token->{tag_name}}) {
-              !!!parse-error;
+              $self->{parse_error}->();
               ## Ignore the token
-              !!!next-token;
+              $token = $self->_get_next_token;
               redo B;
             } elsif ({
                       table => 1, tbody => 1, tfoot => 1, 
@@ -4285,14 +5280,14 @@ sub _construct_tree ($) {
                 }
               } # INSCOPE
               unless (defined $i) {
-                !!!parse-error;
+                $self->{parse_error}->();
                 ## Ignore the token
-                !!!next-token;
+                $token = $self->_get_next_token;
                 redo B;
               }
 
               ## Close the cell
-              !!!back-token; # </?>
+              unshift @{$self->{token}}, $token; # </?>
               $token = {type => 'end tag', tag_name => $tn};
               redo B;
             } else {
@@ -4307,12 +5302,12 @@ sub _construct_tree ($) {
         } elsif ($insertion_mode eq 'in select') {
           if ($token->{type} eq 'character') {
             $open_elements->[-1]->[0]->manakai_append_text ($token->{data});
-            !!!next-token;
+            $token = $self->_get_next_token;
             redo B;
           } elsif ($token->{type} eq 'comment') {
             my $comment = $self->{document}->create_comment ($token->{data});
             $open_elements->[-1]->[0]->append_child ($comment);
-            !!!next-token;
+            $token = $self->_get_next_token;
             redo B;
           } elsif ($token->{type} eq 'start tag') {
             if ($token->{tag_name} eq 'option') {
@@ -4321,8 +5316,23 @@ sub _construct_tree ($) {
                 pop @$open_elements;
               }
 
-              !!!insert-element ($token->{tag_name}, $token->{attributes});
-              !!!next-token;
+              
+    {
+      my $el;
+      
+      $el = $self->{document}->create_element_ns
+        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
+    
+        for my $attr_name (keys %{  $token->{attributes}}) {
+          $el->set_attribute_ns (undef, [undef, $attr_name],
+                                  $token->{attributes} ->{$attr_name}->{value});
+        }
+      
+      $open_elements->[-1]->[0]->append_child ($el);
+      push @$open_elements, [$el, $token->{tag_name}];
+    }
+  
+              $token = $self->_get_next_token;
               redo B;
             } elsif ($token->{tag_name} eq 'optgroup') {
               if ($open_elements->[-1]->[1] eq 'option') {
@@ -4335,11 +5345,26 @@ sub _construct_tree ($) {
                 pop @$open_elements;
               }
 
-              !!!insert-element ($token->{tag_name}, $token->{attributes});
-              !!!next-token;
+              
+    {
+      my $el;
+      
+      $el = $self->{document}->create_element_ns
+        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
+    
+        for my $attr_name (keys %{  $token->{attributes}}) {
+          $el->set_attribute_ns (undef, [undef, $attr_name],
+                                  $token->{attributes} ->{$attr_name}->{value});
+        }
+      
+      $open_elements->[-1]->[0]->append_child ($el);
+      push @$open_elements, [$el, $token->{tag_name}];
+    }
+  
+              $token = $self->_get_next_token;
               redo B;
             } elsif ($token->{tag_name} eq 'select') {
-              !!!parse-error;
+              $self->{parse_error}->();
               ## As if </select> instead
               ## have an element in table scope
               my $i;
@@ -4355,9 +5380,9 @@ sub _construct_tree ($) {
                 }
               } # INSCOPE
               unless (defined $i) {
-                !!!parse-error;
+                $self->{parse_error}->();
                 ## Ignore the token
-                !!!next-token;
+                $token = $self->_get_next_token;
                 redo B;
               }
               
@@ -4365,7 +5390,7 @@ sub _construct_tree ($) {
 
               $reset_insertion_mode->();
 
-              !!!next-token;
+              $token = $self->_get_next_token;
               redo B;
             } else {
               #
@@ -4379,19 +5404,19 @@ sub _construct_tree ($) {
               } elsif ($open_elements->[-1]->[1] eq 'optgroup') {
                 pop @$open_elements;
               } else {
-                !!!parse-error;
+                $self->{parse_error}->();
                 ## Ignore the token
               }
-              !!!next-token;
+              $token = $self->_get_next_token;
               redo B;
             } elsif ($token->{tag_name} eq 'option') {
               if ($open_elements->[-1]->[1] eq 'option') {
                 pop @$open_elements;
               } else {
-                !!!parse-error;
+                $self->{parse_error}->();
                 ## Ignore the token
               }
-              !!!next-token;
+              $token = $self->_get_next_token;
               redo B;
             } elsif ($token->{tag_name} eq 'select') {
               ## have an element in table scope
@@ -4408,9 +5433,9 @@ sub _construct_tree ($) {
                 }
               } # INSCOPE
               unless (defined $i) {
-                !!!parse-error;
+                $self->{parse_error}->();
                 ## Ignore the token
-                !!!next-token;
+                $token = $self->_get_next_token;
                 redo B;
               }
               
@@ -4418,13 +5443,13 @@ sub _construct_tree ($) {
 
               $reset_insertion_mode->();
 
-              !!!next-token;
+              $token = $self->_get_next_token;
               redo B;
             } elsif ({
                       caption => 1, table => 1, tbody => 1,
                       tfoot => 1, thead => 1, tr => 1, td => 1, th => 1,
                      }->{$token->{tag_name}}) {
-              !!!parse-error;
+              $self->{parse_error}->();
               
               ## have an element in table scope
               my $i;
@@ -4441,7 +5466,7 @@ sub _construct_tree ($) {
               } # INSCOPE
               unless (defined $i) {
                 ## Ignore the token
-                !!!next-token;
+                $token = $self->_get_next_token;
                 redo B;
               }
               
@@ -4460,9 +5485,9 @@ sub _construct_tree ($) {
                 }
               } # INSCOPE
               unless (defined $i) {
-                !!!parse-error;
+                $self->{parse_error}->();
                 ## Ignore the </select> token
-                !!!next-token; ## TODO: ok?
+                $token = $self->_get_next_token; ## TODO: ok?
                 redo B;
               }
               
@@ -4479,9 +5504,9 @@ sub _construct_tree ($) {
             #
           }
 
-          !!!parse-error;
+          $self->{parse_error}->();
           ## Ignore the token
-          !!!next-token;
+          $token = $self->_get_next_token;
           redo B;
         } elsif ($insertion_mode eq 'after body') {
           if ($token->{type} eq 'character') {
@@ -4492,7 +5517,7 @@ sub _construct_tree ($) {
               $open_elements->[-1]->[0]->manakai_append_text ($token->{data});
 
               unless (length $token->{data}) {
-                !!!next-token;
+                $token = $self->_get_next_token;
                 redo B;
               }
             }
@@ -4501,14 +5526,14 @@ sub _construct_tree ($) {
           } elsif ($token->{type} eq 'comment') {
             my $comment = $self->{document}->create_comment ($token->{data});
             $open_elements->[0]->[0]->append_child ($comment);
-            !!!next-token;
+            $token = $self->_get_next_token;
             redo B;
           } elsif ($token->{type} eq 'end tag') {
             if ($token->{tag_name} eq 'html') {
               ## TODO: if inner_html, parse-error, ignore the token; otherwise,
 
               $phase = 'trailing end';
-              !!!next-token;
+              $token = $self->_get_next_token;
               redo B;
             } else {
               #
@@ -4517,7 +5542,7 @@ sub _construct_tree ($) {
             #
           }
 
-          !!!parse-error ('data after body');
+          $self->{parse_error}-> ('data after body');
           $insertion_mode = 'in body';
           ## reprocess
           redo B;
@@ -4527,7 +5552,7 @@ sub _construct_tree ($) {
               $open_elements->[-1]->[0]->manakai_append_text ($token->{data});
 
               unless (length $token->{data}) {
-                !!!next-token;
+                $token = $self->_get_next_token;
                 redo B;
               }
             }
@@ -4536,17 +5561,47 @@ sub _construct_tree ($) {
           } elsif ($token->{type} eq 'comment') {
             my $comment = $self->{document}->create_comment ($token->{data});
             $open_elements->[-1]->[0]->append_child ($comment);
-            !!!next-token;
+            $token = $self->_get_next_token;
             redo B;
           } elsif ($token->{type} eq 'start tag') {
             if ($token->{tag_name} eq 'frameset') {
-              !!!insert-element ($token->{tag_name}, $token->{attributes});
-              !!!next-token;
+              
+    {
+      my $el;
+      
+      $el = $self->{document}->create_element_ns
+        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
+    
+        for my $attr_name (keys %{  $token->{attributes}}) {
+          $el->set_attribute_ns (undef, [undef, $attr_name],
+                                  $token->{attributes} ->{$attr_name}->{value});
+        }
+      
+      $open_elements->[-1]->[0]->append_child ($el);
+      push @$open_elements, [$el, $token->{tag_name}];
+    }
+  
+              $token = $self->_get_next_token;
               redo B;
             } elsif ($token->{tag_name} eq 'frame') {
-              !!!insert-element ($token->{tag_name}, $token->{attributes});
+              
+    {
+      my $el;
+      
+      $el = $self->{document}->create_element_ns
+        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
+    
+        for my $attr_name (keys %{  $token->{attributes}}) {
+          $el->set_attribute_ns (undef, [undef, $attr_name],
+                                  $token->{attributes} ->{$attr_name}->{value});
+        }
+      
+      $open_elements->[-1]->[0]->append_child ($el);
+      push @$open_elements, [$el, $token->{tag_name}];
+    }
+  
               pop @$open_elements;
-              !!!next-token;
+              $token = $self->_get_next_token;
               redo B;
             } elsif ($token->{tag_name} eq 'noframes') {
               $in_body->($insert_to_current);
@@ -4558,12 +5613,12 @@ sub _construct_tree ($) {
             if ($token->{tag_name} eq 'frameset') {
               if ($open_elements->[-1]->[1] eq 'html' and
                   @$open_elements == 1) {
-                !!!parse-error;
+                $self->{parse_error}->();
                 ## Ignore the token
-                !!!next-token;
+                $token = $self->_get_next_token;
               } else {
                 pop @$open_elements;
-                !!!next-token;
+                $token = $self->_get_next_token;
               }
               
               ## if not inner_html and
@@ -4578,9 +5633,9 @@ sub _construct_tree ($) {
             #
           }
           
-          !!!parse-error;
+          $self->{parse_error}->();
           ## Ignore the token
-          !!!next-token;
+          $token = $self->_get_next_token;
           redo B;
         } elsif ($insertion_mode eq 'after frameset') {
           if ($token->{type} eq 'character') {
@@ -4588,7 +5643,7 @@ sub _construct_tree ($) {
               $open_elements->[-1]->[0]->manakai_append_text ($token->{data});
 
               unless (length $token->{data}) {
-                !!!next-token;
+                $token = $self->_get_next_token;
                 redo B;
               }
             }
@@ -4597,7 +5652,7 @@ sub _construct_tree ($) {
           } elsif ($token->{type} eq 'comment') {
             my $comment = $self->{document}->create_comment ($token->{data});
             $open_elements->[-1]->[0]->append_child ($comment);
-            !!!next-token;
+            $token = $self->_get_next_token;
             redo B;
           } elsif ($token->{type} eq 'start tag') {
             if ($token->{tag_name} eq 'noframes') {
@@ -4609,7 +5664,7 @@ sub _construct_tree ($) {
           } elsif ($token->{type} eq 'end tag') {
             if ($token->{tag_name} eq 'html') {
               $phase = 'trailing end';
-              !!!next-token;
+              $token = $self->_get_next_token;
               redo B;
             } else {
               #
@@ -4618,9 +5673,9 @@ sub _construct_tree ($) {
             #
           }
           
-          !!!parse-error;
+          $self->{parse_error}->();
           ## Ignore the token
-          !!!next-token;
+          $token = $self->_get_next_token;
           redo B;
 
           ## ISSUE: An issue in spec there
@@ -4632,14 +5687,14 @@ sub _construct_tree ($) {
       ## states in the main stage is preserved yet # MUST
       
       if ($token->{type} eq 'DOCTYPE') {
-        !!!parse-error;
+        $self->{parse_error}->();
         ## Ignore the token
-        !!!next-token;
+        $token = $self->_get_next_token;
         redo B;
       } elsif ($token->{type} eq 'comment') {
         my $comment = $self->{document}->create_comment ($token->{data});
         $self->{document}->append_child ($comment);
-        !!!next-token;
+        $token = $self->_get_next_token;
         redo B;
       } elsif ($token->{type} eq 'character') {
         if ($token->{data} =~ s/^([\x09\x0A\x0B\x0C\x20]+)//) {
@@ -4654,18 +5709,18 @@ sub _construct_tree ($) {
           $open_elements->[-1]->[0]->manakai_append_text ($data);
           
           unless (length $token->{data}) {
-            !!!next-token;
+            $token = $self->_get_next_token;
             redo B;
           }
         }
 
-        !!!parse-error;
+        $self->{parse_error}->();
         $phase = 'main';
         ## reprocess
         redo B;
       } elsif ($token->{type} eq 'start tag' or
                $token->{type} eq 'end tag') {
-        !!!parse-error;
+        $self->{parse_error}->();
         $phase = 'main';
         ## reprocess
         redo B;
@@ -4781,4 +5836,4 @@ sub get_inner_html ($$$) {
 } # get_inner_html
 
 1;
-# $Date: 2007/05/01 07:46:42 $
+# $Date: 2007/05/01 10:36:06 $
