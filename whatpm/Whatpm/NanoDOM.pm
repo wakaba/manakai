@@ -15,6 +15,14 @@ See source code if you would like to know what it does.
 package Whatpm::NanoDOM;
 use strict;
 
+require Scalar::Util;
+
+package Whatpm::NanoDOM::DOMImplementation;
+
+sub create_document ($) {
+  return Whatpm::NanoDOM::Document->new;
+} # create_document
+
 package Whatpm::NanoDOM::Node;
 
 sub new ($) {
@@ -48,7 +56,8 @@ sub append_child ($$) {
     }
   }
   push @{$self->{child_nodes}}, $new_child;
-  $new_child->{parent_node} = $self; ## TODO: weaken this ref
+  $new_child->{parent_node} = $self;
+  Scalar::Util::weaken ($new_child->{parent_node});
   return $new_child;
 } # append_child
 
@@ -171,7 +180,7 @@ sub create_comment ($$) {
 ## to specify qualified name - "[$prefix, $local_name]"
 sub create_element_ns ($$$) {
   my ($self, $nsuri, $qn) = @_;
-  return Whatpm::NanoDOM::Element->new ($nsuri, $qn->[0], $qn->[1]);
+  return Whatpm::NanoDOM::Element->new ($self, $nsuri, $qn->[0], $qn->[1]);
 } # create_element_ns
 
 ## A manakai extension
@@ -180,11 +189,17 @@ sub create_document_type_definition ($$) {
   return Whatpm::NanoDOM::DocumentType->new (shift);
 } # create_document_type_definition
 
+sub implementation ($) {
+  return 'Whatpm::NanoDOM::DOMImplementation';
+} # implementation
+
 package Whatpm::NanoDOM::Element;
 push our @ISA, 'Whatpm::NanoDOM::Node';
 
-sub new ($$$$) {
+sub new ($$$$$) {
   my $self = shift->SUPER::new;
+  $self->{owner_document} = shift;
+  Scalar::Util::weaken ($self->{owner_document});
   $self->{namespace_uri} = shift;
   $self->{prefix} = shift;
   $self->{local_name} = shift;
@@ -192,6 +207,10 @@ sub new ($$$$) {
   $self->{child_nodes} = [];
   return $self;
 } # new
+
+sub owner_document ($) {
+  return shift->{owner_document};
+} # owner_document
 
 sub clone_node ($$) {
   my ($self, $deep) = @_; ## NOTE: Deep cloning is not supported
@@ -239,6 +258,14 @@ sub attributes ($) {
   }
   return $r;
 } # attributes
+
+sub local_name ($) { # TODO: HTML5 case
+  return shift->{local_name};
+} # local_name
+
+sub namespace_uri ($) {
+  return shift->{namespace_uri};
+} # namespace_uri
 
 sub node_type { 1 }
 
@@ -355,4 +382,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2007/05/01 10:47:37 $
+# $Date: 2007/05/02 13:44:34 $

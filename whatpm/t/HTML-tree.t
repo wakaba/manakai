@@ -20,7 +20,7 @@ BEGIN {
 }
 
 use Test;
-BEGIN { plan tests => 410 }
+BEGIN { plan tests => 422 }
 
 use Data::Dumper;
 $Data::Dumper::Useqq = 1;
@@ -55,6 +55,10 @@ for my $file_name (grep {$_} split /\s+/, qq[
     } elsif (/^#document$/) {
       $test->{document} = '';
       $mode = 'document';
+    } elsif (/^#document-fragment (\S+)$/) {
+      $test->{document} = '';
+      $mode = 'document';
+      $test->{element} = $1;
     } elsif (defined $test->{document} and /^$/) {
       test ($test);
       undef $test;
@@ -84,18 +88,26 @@ sub test ($) {
     exit;
   };
 
-  Whatpm::HTML->parse_string
-      ($test->{data} => $doc, sub {
-         my $msg = shift;
-         push @errors, $msg;
-       });
-
+  my $onerror = sub {
+    my %opt = @_;
+    push @errors, join ':', $opt{line}, $opt{column}, $opt{type};
+  };
+  my $result;
+  unless (defined $test->{element}) {
+    Whatpm::HTML->parse_string ($test->{data} => $doc, $onerror);
+    $result = serialize ($doc);
+  } else {
+    my $el = $doc->create_element_ns
+      ('http://www.w3.org/1999/xhtml', [undef, $test->{element}]);
+    Whatpm::HTML->set_inner_html ($el, $test->{data}, $onerror);
+    $result = serialize ($el);
+  }
+    
   ok scalar @errors, scalar @{$test->{errors}},
     'Parse error: ' . $test->{data} . '; ' . 
     join (', ', @errors) . ';' . join (', ', @{$test->{errors}});
 
-  my $doc_s = serialize ($doc);
-  ok $doc_s, $test->{document}, 'Document tree: ' . $test->{data};
+  ok $result, $test->{document}, 'Document tree: ' . $test->{data};
 } # test
 
 sub serialize ($) {
@@ -132,4 +144,4 @@ sub serialize ($) {
 } # serialize
 
 ## License: Public Domain.
-## $Date: 2007/05/01 10:47:37 $
+## $Date: 2007/05/02 13:44:35 $

@@ -4,7 +4,8 @@ MKDIR = mkdir
 all: tokenizer-files tree-construction-files
 
 tokenizer-files: tokenizer \
-  tokenizer/test1.test tokenizer/test2.test tokenizer/contentModelFlags.test
+  tokenizer/test1.test tokenizer/test2.test tokenizer/contentModelFlags.test \
+  tokenizer-result.txt
 
 tokenizer:
 	$(MKDIR) $@
@@ -12,11 +13,15 @@ tokenizer:
 tokenizer/%.test:
 	$(WGET) -O $@ http://html5lib.googlecode.com/svn/trunk/tests/$@
 
+tokenizer-result.txt: always
+	cd .. && perl t/HTML-tokenizer.t &> t/$@
+
 tree-construction-files: tree-construction \
   tree-construction/tests1.dat \
   tree-construction/tests2.dat \
   tree-construction/tests3.dat \
-  tree-construction/tests4.dat
+  tree-construction/tests4.dat \
+  tree-construction-result.txt
 
 tree-construction:
 	$(MKDIR) $@
@@ -24,5 +29,10 @@ tree-construction:
 tree-construction/%.dat:
 	$(WGET) -O $@ http://html5lib.googlecode.com/svn/trunk/tests/$@
 
+tree-construction-result.txt: always
+	cd .. && perl t/HTML-tree.t &> t/$@
+
+always:
+
 ## License: Public Domain.
-## $Date: 2007/04/30 14:12:02 $
+## $Date: 2007/05/02 13:44:35 $

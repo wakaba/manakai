@@ -18,7 +18,7 @@ while (<>) {
       my \$el;
       !!!create-element (\$el, $1, $2);
       \$insert->(\$el);
-      push \@\$open_elements, [\$el, $1];
+      push \@{\$self->{open_elements}}, [\$el, $1];
     }
   }}ge;
   s{!!!insert-element-t\s*\(([^(),]+)\)\s*;}{qq{
@@ -26,23 +26,23 @@ while (<>) {
       my \$el;
       !!!create-element (\$el, $1);
       \$insert->(\$el);
-      push \@\$open_elements, [\$el, $1];
+      push \@{\$self->{open_elements}}, [\$el, $1];
     }
   }}ge;
   s{!!!insert-element\s*\(([^(),]+),([^(),]+)\)\s*;}{qq{
     {
       my \$el;
       !!!create-element (\$el, $1, $2);
-      \$open_elements->[-1]->[0]->append_child (\$el);
-      push \@\$open_elements, [\$el, $1];
+      \$self->{open_elements}->[-1]->[0]->append_child (\$el);
+      push \@{\$self->{open_elements}}, [\$el, $1];
     }
   }}ge;
   s{!!!insert-element\s*\(([^(),]+)\)\s*;}{qq{
     {
       my \$el;
       !!!create-element (\$el, $1);
-      \$open_elements->[-1]->[0]->append_child (\$el);
-      push \@\$open_elements, [\$el, $1];
+      \$self->{open_elements}->[-1]->[0]->append_child (\$el);
+      push \@{\$self->{open_elements}}, [\$el, $1];
     }
   }}ge;
   s{!!!create-element\s*\(([^(),]+),([^(),]+)(?:,([^(),]+))?\)\s*;}{

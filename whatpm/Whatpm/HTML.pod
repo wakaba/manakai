@@ -59,6 +59,11 @@ If it does, then the result is undefined.
 This argument is optional; if missing, any
 parse error makes that string being C<warn>ed.
 
+B<NOTE>: To be a conforming user agent, the code MUST either
+abort the processing by throwing an exception at the first
+invocation or MUST continue the processing until the parser
+stops.
+
 The method returns the DOM C<Document> object (i.e. the second argument).
 
 Note that the C<Whatpm::NanoDOM> module provides a non-conforming
@@ -66,7 +71,7 @@ implementation of DOM that only implements the subset that
 is necessary for the purpose of C<Whatpm::HTML>'s parsing and
 serializing.
 With this module, creating a new HTML C<Document> object
-from a string containing HTML document can be coded as:
+from a string containing HTML document might be coded as:
 
   use Whatpm::HTML;
   use Whatpm::NanoDOM;
@@ -82,7 +87,7 @@ C<Node>, or C<DocumentFragment> object.
 
 The second argument, I<$onerror>, MUST be a reference to the
 error handling code.  This code will be invoked if a descendant
-of C<$node> is not of C<Element>, C<Text>, C<CDATASection>,
+of I<$node> is not of C<Element>, C<Text>, C<CDATASection>,
 C<Comment>, C<DocumentType>, or C<EntityReference> so
 that C<INVALID_STATE_ERR> MUST be thrown.
 The code will be invoked with an argument, which is the node
@@ -91,7 +96,7 @@ This argument is optional; if missing, any such
 node is simply ignored.
 
 The method returns a reference to the C<inner_html> attribute
-value, i.e. the HTML serialization of the C<$node>.
+value, i.e. the HTML serialization of the I<$node>.
 
 =back
 
@@ -109,6 +114,9 @@ Setting inner_html.
 And there are many "TODO"s and "ISSUE"s in the source code.
 
 =head1 SEE ALSO
+
+Whatpm
+<http://suika.fam.cx/www/markup/html/whatpm/readme>
 
 Web Applications 1.0 Working Draft (aka HTML5)
 <http://whatwg.org/html5>.  (Revision 792, 1 May 2007)
@@ -128,4 +136,4 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-# $Date: 2007/05/01 10:47:37 $
+# $Date: 2007/05/02 13:44:34 $

@@ -24,7 +24,7 @@ BEGIN {
 }
 
 use Test;
-BEGIN { plan tests => 70 }
+BEGIN { plan tests => 72 }
 
 use Data::Dumper;
 $Data::Dumper::Useqq = 1;
@@ -139,4 +139,4 @@ for my $file_name (grep {$_} split /\s+/, qq[
   }
 }
 
-## $Date: 2007/05/01 10:47:37 $
+## $Date: 2007/05/02 13:44:35 $

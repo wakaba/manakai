@@ -3,6 +3,12 @@
 {"description":"non-PCDATA content model flag, start tag-like string",
 "contentModelFlags":["PLAINTEXT","RCDATA","CDATA"],
 "input":"<div>",
-"output":[["Character", "<div>"]]}
+"output":[["Character", "<div>"]]},
+
+{"description":"end tag followed by character data",
+"contentModelFlags":["RCDATA","CDATA"],
+"lastStartTag":"xxx",
+"input":"AB</xxx>CD",
+"output":[["Character", "AB"],["EndTag", "xxx"],["Character", "CD"]]}
 
 ]}

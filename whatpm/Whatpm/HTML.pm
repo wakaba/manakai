@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## This is an early version of an HTML parser.
 
@@ -307,12 +307,16 @@ sub parse_string ($$$;$) {
   my $s = \$_[0];
   $self->{document} = $_[1];
 
-  my $i;
+  ## NOTE: |set_inner_html| copies most of this method's code
+
   my $i = 0;
+  my $line = 1;
+  my $column = 0;
   $self->{set_next_input_character} = sub {
     my $self = shift;
     $self->{next_input_character} = -1 and return if $i >= length $$s;
     $self->{next_input_character} = ord substr $$s, $i++, 1;
+    $column++;
     
     if ($self->{next_input_character} == 0x000D) { # CR
       if ($i >= length $$s) {
@@ -326,6 +330,8 @@ sub parse_string ($$$;$) {
         }
       }
       $self->{next_input_character} = 0x000A; # LF # MUST
+      $line++;
+      $column = -1;
     } elsif ($self->{next_input_character} > 0x10FFFF) {
       $self->{next_input_character} = 0xFFFD; # REPLACEMENT CHARACTER # MUST
     } elsif ($self->{next_input_character} == 0x0000) { # NULL
@@ -333,8 +339,12 @@ sub parse_string ($$$;$) {
     }
   };
 
-  $self->{parse_error} = $_[2] || sub {
-    warn "Parse error at character $i\n"; ## TODO: Report (line, column) pair
+  my $onerror = $_[2] || sub {
+    my (%opt) = @_;
+    warn "Parse error ($opt{type}) at line $opt{line} column $opt{column}\n";
+  };
+  $self->{parse_error} = sub {
+    $onerror->(@_, line => $line, column => $column);
   };
 
   $self->_initialize_tokenizer;
@@ -542,7 +552,7 @@ sub _get_next_token ($) {
   
           redo A;
         } elsif ($self->{next_input_character} == 0x003E) { # >
-          $self->{parse_error}->();
+          $self->{parse_error}-> (type => 'empty start tag');
           $self->{state} = 'data';
           
       if (@{$self->{char}}) {
@@ -556,12 +566,12 @@ sub _get_next_token ($) {
 
           redo A;
         } elsif ($self->{next_input_character} == 0x003F) { # ?
-          $self->{parse_error}->();
+          $self->{parse_error}-> (type => 'pio');
           $self->{state} = 'bogus comment';
           ## $self->{next_input_character} is intentionally left as is
           redo A;
         } else {
-          $self->{parse_error}->();
+          $self->{parse_error}-> (type => 'bare stago');
           $self->{state} = 'data';
           ## reconsume
 
@@ -590,7 +600,7 @@ sub _get_next_token ($) {
   
             next TAGNAME;
           } else {
-            $self->{parse_error}->();
+            $self->{parse_error}-> (type => 'unmatched end tag');
             $self->{next_input_character} = shift @next_char; # reconsume
             unshift @{$self->{char}},  (@next_char);
             $self->{state} = 'data';
@@ -611,7 +621,7 @@ sub _get_next_token ($) {
                 $self->{next_input_character} == 0x002F or # /
                 $self->{next_input_character} == 0x003C or # <
                 $self->{next_input_character} == -1) {
-          $self->{parse_error}->();
+          $self->{parse_error}-> (type => 'unmatched end tag');
           $self->{next_input_character} = shift @next_char; # reconsume
           unshift @{$self->{char}},  (@next_char);
           $self->{state} = 'data';
@@ -653,7 +663,7 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif ($self->{next_input_character} == 0x003E) { # >
-        $self->{parse_error}->();
+        $self->{parse_error}-> (type => 'empty end tag');
         $self->{state} = 'data';
         
       if (@{$self->{char}}) {
@@ -664,7 +674,7 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif ($self->{next_input_character} == -1) {
-        $self->{parse_error}->();
+        $self->{parse_error}-> (type => 'bare etago');
         $self->{state} = 'data';
         # reconsume
 
@@ -672,7 +682,7 @@ sub _get_next_token ($) {
 
         redo A;
       } else {
-        $self->{parse_error}->();
+        $self->{parse_error}-> (type => 'bogus end tag');
         $self->{state} = 'bogus comment';
         ## $self->{next_input_character} is intentionally left as is
         redo A;
@@ -698,7 +708,7 @@ sub _get_next_token ($) {
         } elsif ($self->{current_token}->{type} eq 'end tag') {
           $self->{content_model_flag} = 'PCDATA'; # MUST
           if ($self->{current_token}->{attributes}) {
-            $self->{parse_error}->();
+            $self->{parse_error}-> (type => 'end tag attribute');
           }
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
@@ -731,13 +741,13 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($self->{next_input_character} == 0x003C or # <
                $self->{next_input_character} == -1) {
-        $self->{parse_error}->();
+        $self->{parse_error}-> (type => 'unclosed tag');
         if ($self->{current_token}->{type} eq 'start tag') {
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} eq 'end tag') {
           $self->{content_model_flag} = 'PCDATA'; # MUST
           if ($self->{current_token}->{attributes}) {
-            $self->{parse_error}->();
+            $self->{parse_error}-> (type => 'end tag attribute');
           }
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
@@ -763,7 +773,7 @@ sub _get_next_token ($) {
           # permitted slash
           #
         } else {
-          $self->{parse_error}->();
+          $self->{parse_error}-> (type => 'nestc');
         }
         $self->{state} = 'before attribute name';
         # next-input-character is already done
@@ -802,7 +812,7 @@ sub _get_next_token ($) {
         } elsif ($self->{current_token}->{type} eq 'end tag') {
           $self->{content_model_flag} = 'PCDATA'; # MUST
           if ($self->{current_token}->{attributes}) {
-            $self->{parse_error}->();
+            $self->{parse_error}-> (type => 'end tag attribute');
           }
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
@@ -847,20 +857,20 @@ sub _get_next_token ($) {
           # permitted slash
           #
         } else {
-          $self->{parse_error}->();
+          $self->{parse_error}-> (type => 'nestc');
         }
         ## Stay in the state
         # next-input-character is already done
         redo A;
       } elsif ($self->{next_input_character} == 0x003C or # <
                $self->{next_input_character} == -1) {
-        $self->{parse_error}->();
+        $self->{parse_error}-> (type => 'unclosed tag');
         if ($self->{current_token}->{type} eq 'start tag') {
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} eq 'end tag') {
           $self->{content_model_flag} = 'PCDATA'; # MUST
           if ($self->{current_token}->{attributes}) {
-            $self->{parse_error}->();
+            $self->{parse_error}-> (type => 'end tag attribute');
           }
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
@@ -889,7 +899,7 @@ sub _get_next_token ($) {
       my $before_leave = sub {
         if (exists $self->{current_token}->{attributes} # start tag or end tag
             ->{$self->{current_attribute}->{name}}) { # MUST
-          $self->{parse_error}->();
+          $self->{parse_error}-> (type => 'dupulicate attribute');
           ## Discard $self->{current_attribute} # MUST
         } else {
           $self->{current_token}->{attributes}->{$self->{current_attribute}->{name}}
@@ -930,7 +940,7 @@ sub _get_next_token ($) {
         } elsif ($self->{current_token}->{type} eq 'end tag') {
           $self->{content_model_flag} = 'PCDATA'; # MUST
           if ($self->{current_token}->{attributes}) {
-            $self->{parse_error}->();
+            $self->{parse_error}-> (type => 'end tag attribute');
           }
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
@@ -975,21 +985,21 @@ sub _get_next_token ($) {
           # permitted slash
           #
         } else {
-          $self->{parse_error}->();
+          $self->{parse_error}-> (type => 'nestc');
         }
         $self->{state} = 'before attribute name';
         # next-input-character is already done
         redo A;
       } elsif ($self->{next_input_character} == 0x003C or # <
                $self->{next_input_character} == -1) {
-        $self->{parse_error}->();
+        $self->{parse_error}-> (type => 'unclosed tag');
         $before_leave->();
         if ($self->{current_token}->{type} eq 'start tag') {
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} eq 'end tag') {
           $self->{content_model_flag} = 'PCDATA'; # MUST
           if ($self->{current_token}->{attributes}) {
-            $self->{parse_error}->();
+            $self->{parse_error}-> (type => 'end tag attribute');
           }
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
@@ -1044,7 +1054,7 @@ sub _get_next_token ($) {
         } elsif ($self->{current_token}->{type} eq 'end tag') {
           $self->{content_model_flag} = 'PCDATA'; # MUST
           if ($self->{current_token}->{attributes}) {
-            $self->{parse_error}->();
+            $self->{parse_error}-> (type => 'end tag attribute');
           }
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
@@ -1089,20 +1099,20 @@ sub _get_next_token ($) {
           # permitted slash
           #
         } else {
-          $self->{parse_error}->();
+          $self->{parse_error}-> (type => 'nestc');
         }
         $self->{state} = 'before attribute name';
         # next-input-character is already done
         redo A;
       } elsif ($self->{next_input_character} == 0x003C or # <
                $self->{next_input_character} == -1) {
-        $self->{parse_error}->();
+        $self->{parse_error}-> (type => 'unclosed tag');
         if ($self->{current_token}->{type} eq 'start tag') {
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} eq 'end tag') {
           $self->{content_model_flag} = 'PCDATA'; # MUST
           if ($self->{current_token}->{attributes}) {
-            $self->{parse_error}->();
+            $self->{parse_error}-> (type => 'end tag attribute');
           }
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
@@ -1172,7 +1182,7 @@ sub _get_next_token ($) {
         } elsif ($self->{current_token}->{type} eq 'end tag') {
           $self->{content_model_flag} = 'PCDATA'; # MUST
           if ($self->{current_token}->{attributes}) {
-            $self->{parse_error}->();
+            $self->{parse_error}-> (type => 'end tag attribute');
           }
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
@@ -1192,13 +1202,13 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($self->{next_input_character} == 0x003C or # <
                $self->{next_input_character} == -1) {
-        $self->{parse_error}->();
+        $self->{parse_error}-> (type => 'unclosed tag');
         if ($self->{current_token}->{type} eq 'start tag') {
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} eq 'end tag') {
           $self->{content_model_flag} = 'PCDATA'; # MUST
           if ($self->{current_token}->{attributes}) {
-            $self->{parse_error}->();
+            $self->{parse_error}-> (type => 'end tag attribute');
           }
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
@@ -1245,13 +1255,13 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif ($self->{next_input_character} == -1) {
-        $self->{parse_error}->();
+        $self->{parse_error}-> (type => 'unclosed attribute value');
         if ($self->{current_token}->{type} eq 'start tag') {
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} eq 'end tag') {
           $self->{content_model_flag} = 'PCDATA'; # MUST
           if ($self->{current_token}->{attributes}) {
-            $self->{parse_error}->();
+            $self->{parse_error}-> (type => 'end tag attribute');
           }
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
@@ -1298,13 +1308,13 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif ($self->{next_input_character} == -1) {
-        $self->{parse_error}->();
+        $self->{parse_error}-> (type => 'unclosed attribute value');
         if ($self->{current_token}->{type} eq 'start tag') {
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} eq 'end tag') {
           $self->{content_model_flag} = 'PCDATA'; # MUST
           if ($self->{current_token}->{attributes}) {
-            $self->{parse_error}->();
+            $self->{parse_error}-> (type => 'end tag attribute');
           }
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
@@ -1360,7 +1370,7 @@ sub _get_next_token ($) {
         } elsif ($self->{current_token}->{type} eq 'end tag') {
           $self->{content_model_flag} = 'PCDATA'; # MUST
           if ($self->{current_token}->{attributes}) {
-            $self->{parse_error}->();
+            $self->{parse_error}-> (type => 'end tag attribute');
           }
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
@@ -1380,13 +1390,13 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($self->{next_input_character} == 0x003C or # <
                $self->{next_input_character} == -1) {
-        $self->{parse_error}->();
+        $self->{parse_error}-> (type => 'unclosed tag');
         if ($self->{current_token}->{type} eq 'start tag') {
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} eq 'end tag') {
           $self->{content_model_flag} = 'PCDATA'; # MUST
           if ($self->{current_token}->{attributes}) {
-            $self->{parse_error}->();
+            $self->{parse_error}-> (type => 'end tag attribute');
           }
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
@@ -1568,7 +1578,7 @@ sub _get_next_token ($) {
         }
       }
 
-      $self->{parse_error}->();
+      $self->{parse_error}-> (type => 'bogus comment open');
       $self->{next_input_character} = shift @next_char;
       unshift @{$self->{char}},  (@next_char);
       $self->{state} = 'bogus comment';
@@ -1588,7 +1598,7 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif ($self->{next_input_character} == -1) {
-        $self->{parse_error}->();
+        $self->{parse_error}-> (type => 'unclosed comment');
         $self->{state} = 'data';
         ## reconsume
 
@@ -1620,7 +1630,7 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif ($self->{next_input_character} == -1) {
-        $self->{parse_error}->();
+        $self->{parse_error}-> (type => 'unclosed comment');
         $self->{state} = 'data';
         ## reconsume
 
@@ -1656,7 +1666,7 @@ sub _get_next_token ($) {
 
         redo A;
       } elsif ($self->{next_input_character} == 0x002D) { # -
-        $self->{parse_error}->();
+        $self->{parse_error}-> (type => 'dash in comment');
         $self->{current_token}->{data} .= '-'; # comment
         ## Stay in the state
         
@@ -1668,7 +1678,7 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif ($self->{next_input_character} == -1) {
-        $self->{parse_error}->();
+        $self->{parse_error}-> (type => 'unclosed comment');
         $self->{state} = 'data';
         ## reconsume
 
@@ -1677,7 +1687,7 @@ sub _get_next_token ($) {
 
         redo A;
       } else {
-        $self->{parse_error}->();
+        $self->{parse_error}-> (type => 'dash in comment');
         $self->{current_token}->{data} .= '--' . chr ($self->{next_input_character}); # comment
         $self->{state} = 'comment';
         
@@ -1705,7 +1715,7 @@ sub _get_next_token ($) {
   
         redo A;
       } else {
-        $self->{parse_error}->();
+        $self->{parse_error}-> (type => 'no space before DOCTYPE name');
         $self->{state} = 'before DOCTYPE name';
         ## reconsume
         redo A;
@@ -1740,7 +1750,7 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif ($self->{next_input_character} == 0x003E) { # >
-        $self->{parse_error}->();
+        $self->{parse_error}-> (type => 'no DOCTYPE name');
         $self->{state} = 'data';
         
       if (@{$self->{char}}) {
@@ -1754,7 +1764,7 @@ sub _get_next_token ($) {
 
         redo A;
       } elsif ($self->{next_input_character} == -1) { 
-        $self->{parse_error}->();
+        $self->{parse_error}-> (type => 'no DOCTYPE name');
         $self->{state} = 'data';
         ## reconsume
 
@@ -1820,7 +1830,7 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif ($self->{next_input_character} == -1) {
-        $self->{parse_error}->();
+        $self->{parse_error}-> (type => 'unclosed DOCTYPE');
         $self->{current_token}->{error} = ($self->{current_token}->{name} ne 'HTML'); # DOCTYPE
         $self->{state} = 'data';
         ## reconsume
@@ -1873,7 +1883,7 @@ sub _get_next_token ($) {
 
         redo A;
       } elsif ($self->{next_input_character} == -1) {
-        $self->{parse_error}->();
+        $self->{parse_error}-> (type => 'unclosed DOCTYPE');
         $self->{state} = 'data';
         ## reconsume
 
@@ -1882,7 +1892,7 @@ sub _get_next_token ($) {
 
         redo A;
       } else {
-        $self->{parse_error}->();
+        $self->{parse_error}-> (type => 'string after DOCTYPE name');
         $self->{current_token}->{error} = 1; # DOCTYPE
         $self->{state} = 'bogus DOCTYPE';
         
@@ -1910,7 +1920,7 @@ sub _get_next_token ($) {
 
         redo A;
       } elsif ($self->{next_input_character} == -1) {
-        $self->{parse_error}->();
+        $self->{parse_error}-> (type => 'unclosed DOCTYPE');
         $self->{state} = 'data';
         ## reconsume
 
@@ -1981,7 +1991,7 @@ sub _tokenize_attempt_to_consume_an_entity ($) {
           $num += $self->{next_input_character} - 0x0040 + 9;
           redo X;
         } elsif (not defined $num) { # no hexadecimal digit
-          $self->{parse_error}->();
+          $self->{parse_error}-> (type => 'bare hcro');
           $self->{next_input_character} = 0x0023; # #
           unshift @{$self->{char}},  ($x_char);
           return undef;
@@ -1994,7 +2004,7 @@ sub _tokenize_attempt_to_consume_an_entity ($) {
       }
   
         } else {
-          $self->{parse_error}->();
+          $self->{parse_error}-> (type => 'no refc');
         }
 
         ## TODO: check the definition for |a valid Unicode character|.
@@ -2039,7 +2049,7 @@ sub _tokenize_attempt_to_consume_an_entity ($) {
       }
   
       } else {
-        $self->{parse_error}->();
+        $self->{parse_error}-> (type => 'no refc');
       }
 
       ## TODO: check the definition for |a valid Unicode character|.
@@ -2050,7 +2060,7 @@ sub _tokenize_attempt_to_consume_an_entity ($) {
       
       return {type => 'character', data => chr $code};
     } else {
-      $self->{parse_error}->();
+      $self->{parse_error}-> (type => 'bare nero');
       unshift @{$self->{char}},  ($self->{next_input_character});
       $self->{next_input_character} = 0x0023; # #
       return undef;
@@ -2105,19 +2115,19 @@ sub _tokenize_attempt_to_consume_an_entity ($) {
       }
   
       } else {
-        $self->{parse_error}->();
+        $self->{parse_error}-> (type => 'refc');
       }
 
       return {type => 'character', data => $value};
     } else {
-      $self->{parse_error}->();
+      $self->{parse_error}-> (type => 'bare ero');
       ## NOTE: No characters are consumed in the spec.
       unshift @{$self->{token}}, ({type => 'character', data => $value});
       return undef;
     }
   } else {
     ## no characters are consumed
-    $self->{parse_error}->();
+    $self->{parse_error}-> (type => 'bare ero');
     return undef;
   }
 } # _tokenize_attempt_to_consume_an_entity
@@ -2139,6 +2149,9 @@ sub _terminate_tree_constructor ($) {
 
 ## ISSUE: Should append_child (for example) in script executed in tree construction stage fire mutation events?
 
+{ # tree construction stage
+  my $token;
+
 sub _construct_tree ($) {
   my ($self) = @_;
 
@@ -2150,16 +2163,186 @@ sub _construct_tree ($) {
   ## characters and insert one Text node whose data is concatenation
   ## of all those characters. # MUST
   
-  my $token;
   $token = $self->_get_next_token;
 
-  my $phase = 'initial'; # MUST
+  $self->{insertion_mode} = 'before head';
+  undef $self->{form_element};
+  undef $self->{head_element};
+  $self->{open_elements} = [];
+  undef $self->{inner_html_node};
 
-  my $open_elements = [];
+  $self->_tree_construction_initial; # MUST
+  $self->_tree_construction_root_element;
+  $self->_tree_construction_main;
+} # _construct_tree
+
+sub _tree_construction_initial ($) {
+  my $self = shift;
+  B: {
+      if ($token->{type} eq 'DOCTYPE') {
+        if ($token->{error}) {
+          ## ISSUE: Spec currently left this case undefined.
+          $self->{parse_error}-> (type => 'bogus DOCTYPE');
+        }
+        my $doctype = $self->{document}->create_document_type_definition
+          ($token->{name});
+        $self->{document}->append_child ($doctype);
+        #$phase = 'root element';
+        $token = $self->_get_next_token;
+        #redo B;
+        return;
+      } elsif ({
+                comment => 1,
+                'start tag' => 1,
+                'end tag' => 1,
+                'end-of-file' => 1,
+               }->{$token->{type}}) {
+        ## ISSUE: Spec currently left this case undefined.
+        $self->{parse_error}-> (type => 'missing DOCTYPE');
+        #$phase = 'root element';
+        ## reprocess
+        #redo B;
+        return;
+      } elsif ($token->{type} eq 'character') {
+        if ($token->{data} =~ s/^([\x09\x0A\x0B\x0C\x20]+)//) {
+          $self->{document}->manakai_append_text ($1);
+          ## ISSUE: DOM3 Core does not allow Document > Text
+          unless (length $token->{data}) {
+            ## Stay in the phase
+            $token = $self->_get_next_token;
+            redo B;
+          }
+        }
+        ## ISSUE: Spec currently left this case undefined.
+        $self->{parse_error}-> (type => 'missing DOCTYPE');
+        #$phase = 'root element';
+        ## reprocess
+        #redo B;
+        return;
+      } else {
+        die "$0: $token->{type}: Unknown token";
+      }
+    } # B
+} # _tree_construction_initial
+
+sub _tree_construction_root_element ($) {
+  my $self = shift;
+  
+  B: {
+      if ($token->{type} eq 'DOCTYPE') {
+        $self->{parse_error}-> (type => 'in html:#DOCTYPE');
+        ## Ignore the token
+        ## Stay in the phase
+        $token = $self->_get_next_token;
+        redo B;
+      } elsif ($token->{type} eq 'comment') {
+        my $comment = $self->{document}->create_comment ($token->{data});
+        $self->{document}->append_child ($comment);
+        ## Stay in the phase
+        $token = $self->_get_next_token;
+        redo B;
+      } elsif ($token->{type} eq 'character') {
+        if ($token->{data} =~ s/^([\x09\x0A\x0B\x0C\x20]+)//) {
+          $self->{document}->manakai_append_text ($1);
+          ## ISSUE: DOM3 Core does not allow Document > Text
+          unless (length $token->{data}) {
+            ## Stay in the phase
+            $token = $self->_get_next_token;
+            redo B;
+          }
+        }
+        #
+      } elsif ({
+                'start tag' => 1,
+                'end tag' => 1,
+                'end-of-file' => 1,
+               }->{$token->{type}}) {
+        ## ISSUE: There is an issue in the spec
+        #
+      } else {
+        die "$0: $token->{type}: Unknown token";
+      }
+      my $root_element; 
+      $root_element = $self->{document}->create_element_ns
+        (q<http://www.w3.org/1999/xhtml>, [undef,  'html']);
+    
+      $self->{document}->append_child ($root_element);
+      push @{$self->{open_elements}}, [$root_element, 'html'];
+      #$phase = 'main';
+      ## reprocess
+      #redo B;
+      return;
+  } # B
+} # _tree_construction_root_element
+
+sub _reset_insertion_mode ($) {
+  my $self = shift;
+
+    ## Step 1
+    my $last;
+    
+    ## Step 2
+    my $i = -1;
+    my $node = $self->{open_elements}->[$i];
+    
+    ## Step 3
+    S3: {
+      $last = 1 if $self->{open_elements}->[0]->[0] eq $node->[0];
+      if (defined $self->{inner_html_node}) {
+        if ($self->{inner_html_node}->[1] eq 'td' or
+            $self->{inner_html_node}->[1] eq 'th') {
+          #
+        } else {
+          $node = $self->{inner_html_node};
+        }
+      }
+    
+      ## Step 4..13
+      my $new_mode = {
+                      select => 'in select',
+                      td => 'in cell',
+                      th => 'in cell',
+                      tr => 'in row',
+                      tbody => 'in table body',
+                      thead => 'in table head',
+                      tfoot => 'in table foot',
+                      caption => 'in caption',
+                      colgroup => 'in column group',
+                      table => 'in table',
+                      head => 'in body', # not in head!
+                      body => 'in body',
+                      frameset => 'in frameset',
+                     }->{$node->[1]};
+      $self->{insertion_mode} = $new_mode and return if defined $new_mode;
+      
+      ## Step 14
+      if ($node->[1] eq 'html') {
+        unless (defined $self->{head_element}) {
+          $self->{insertion_mode} = 'before head';
+        } else {
+          $self->{insertion_mode} = 'after head';
+        }
+        return;
+      }
+      
+      ## Step 15
+      $self->{insertion_mode} = 'in body' and return if $last;
+      
+      ## Step 16
+      $i--;
+      $node = $self->{open_elements}->[$i];
+      
+      ## Step 17
+      redo S3;
+    } # S3
+} # _reset_insertion_mode
+
+sub _tree_construction_main ($) {
+  my $self = shift;
+
+  my $phase = 'main';
+
   my $active_formatting_elements = [];
-  my $head_element;
-  my $form_element;
-  my $insertion_mode = 'before head';
 
   my $reconstruct_active_formatting_elements = sub { # MUST
     my $insert = shift;
@@ -2173,7 +2356,7 @@ sub _construct_tree ($) {
 
     ## Step 2
     return if $entry->[0] eq '#marker';
-    for (@$open_elements) {
+    for (@{$self->{open_elements}}) {
       if ($entry->[0] eq $_->[0]) {
         return;
       }
@@ -2192,7 +2375,7 @@ sub _construct_tree ($) {
         #
       } else {
         my $in_open_elements;
-        OE: for (@$open_elements) {
+        OE: for (@{$self->{open_elements}}) {
           if ($entry->[0] eq $_->[0]) {
             $in_open_elements = 1;
             last OE;
@@ -2216,10 +2399,10 @@ sub _construct_tree ($) {
     
       ## Step 9
       $insert->($clone->[0]);
-      push @$open_elements, $clone;
+      push @{$self->{open_elements}}, $clone;
       
       ## Step 10
-      $active_formatting_elements->[$i] = $open_elements->[-1];
+      $active_formatting_elements->[$i] = $self->{open_elements}->[-1];
 
       ## Step 11
       unless ($clone->[0] eq $active_formatting_elements->[-1]->[0]) {
@@ -2241,67 +2424,14 @@ sub _construct_tree ($) {
     }
   }; # $clear_up_to_marker
 
-  my $reset_insertion_mode = sub {
-    ## Step 1
-    my $last;
-    
-    ## Step 2
-    my $i = -1;
-    my $node = $open_elements->[$i];
-    
-    ## Step 3
-    S3: {
-      $last = 1 if $open_elements->[0]->[0] eq $node->[0];
-      ## TODO: the element whose inner_html is set is neither td nor th, then $node = the element
-    
-      ## Step 4..13
-      my $new_mode = {
-                      select => 'in select',
-                      td => 'in cell',
-                      th => 'in cell',
-                      tr => 'in row',
-                      tbody => 'in table body',
-                      thead => 'in table head',
-                      tfoot => 'in table foot',
-                      caption => 'in caption',
-                      colgroup => 'in column group',
-                      table => 'in table',
-                      head => 'in body', # not in head!
-                      body => 'in body',
-                      frameset => 'in frameset',
-                     }->{$node->[1]};
-      $insertion_mode = $new_mode and return if defined $new_mode;
-      
-      ## Step 14
-      if ($node->[1] eq 'html') {
-        unless (defined $head_element) {
-          $insertion_mode = 'before head';
-        } else {
-          $insertion_mode = 'after head';
-        }
-        return;
-      }
-      
-      ## Step 15
-      $insertion_mode = 'in body' and return if $last;
-      
-      ## Step 16
-      $i--;
-      $node = $open_elements->[$i];
-      
-      ## Step 17
-      redo S3;
-    } # S3
-  }; # $reset_insertion_mode
-
   my $style_start_tag = sub {
     my $style_el; 
       $style_el = $self->{document}->create_element_ns
         (q<http://www.w3.org/1999/xhtml>, [undef,  'style']);
     
-    ## $insertion_mode eq 'in head' and ... (always true)
-    (($insertion_mode eq 'in head' and defined $head_element)
-     ? $head_element : $open_elements->[-1]->[0])
+    ## $self->{insertion_mode} eq 'in head' and ... (always true)
+    (($self->{insertion_mode} eq 'in head' and defined $self->{head_element})
+     ? $self->{head_element} : $self->{open_elements}->[-1]->[0])
       ->append_child ($style_el);
     $self->{content_model_flag} = 'CDATA';
               
@@ -2320,7 +2450,7 @@ sub _construct_tree ($) {
     if ($token->{type} eq 'end tag' and $token->{tag_name} eq 'style') {
       ## Ignore the token
     } else {
-      $self->{parse_error}->();
+      $self->{parse_error}-> (type => 'in CDATA:#'.$token->{type});
       ## ISSUE: And ignore?
     }
     $token = $self->_get_next_token;
@@ -2357,18 +2487,19 @@ sub _construct_tree ($) {
         $token->{tag_name} eq 'script') {
       ## Ignore the token
     } else {
-      $self->{parse_error}->();
+      $self->{parse_error}-> (type => 'in CDATA:#'.$token->{type});
       ## ISSUE: And ignore?
       ## TODO: mark as "already executed"
     }
     
-    ## TODO: inner_html mode then mark as "already executed" and skip
-    if (1) {
+    if (defined $self->{inner_html_node}) {
+      ## TODO: mark as "already executed"
+    } else {
       ## TODO: $old_insertion_point = current insertion point
       ## TODO: insertion point = just before the next input character
       
-      (($insertion_mode eq 'in head' and defined $head_element)
-       ? $head_element : $open_elements->[-1]->[0])->append_child ($script_el);
+      (($self->{insertion_mode} eq 'in head' and defined $self->{head_element})
+       ? $self->{head_element} : $self->{open_elements}->[-1]->[0])->append_child ($script_el);
       
       ## TODO: insertion point = $old_insertion_point (might be "undefined")
       
@@ -2395,7 +2526,7 @@ sub _construct_tree ($) {
         }
       } # AFE
       unless (defined $formatting_element) {
-        $self->{parse_error}->();
+        $self->{parse_error}-> (type => 'unmatched end tag:'.$tag_name);
         ## Ignore the token
         $token = $self->_get_next_token;
         return;
@@ -2403,8 +2534,8 @@ sub _construct_tree ($) {
       ## has an element in scope
       my $in_scope = 1;
       my $formatting_element_i_in_open;  
-      INSCOPE: for (reverse 0..$#$open_elements) {
-        my $node = $open_elements->[$_];
+      INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
+        my $node = $self->{open_elements}->[$_];
         if ($node->[0] eq $formatting_element->[0]) {
           if ($in_scope) {
             $formatting_element_i_in_open = $_;
@@ -2428,15 +2559,15 @@ sub _construct_tree ($) {
         $token = $self->_get_next_token; ## TODO: ok?
         return;
       }
-      if (not $open_elements->[-1]->[0] eq $formatting_element->[0]) {
+      if (not $self->{open_elements}->[-1]->[0] eq $formatting_element->[0]) {
         $self->{parse_error}->();
       }
       
       ## Step 2
       my $furthest_block;
       my $furthest_block_i_in_open;
-      OE: for (reverse 0..$#$open_elements) {
-        my $node = $open_elements->[$_];
+      OE: for (reverse 0..$#{$self->{open_elements}}) {
+        my $node = $self->{open_elements}->[$_];
         if (not $formatting_category->{$node->[1]} and
             #not $phrasing_category->{$node->[1]} and
             ($special_category->{$node->[1]} or
@@ -2450,14 +2581,14 @@ sub _construct_tree ($) {
       
       ## Step 3
       unless (defined $furthest_block) { # MUST
-        splice @$open_elements, $formatting_element_i_in_open;
+        splice @{$self->{open_elements}}, $formatting_element_i_in_open;
         splice @$active_formatting_elements, $formatting_element_i_in_active, 1;
         $token = $self->_get_next_token;
         return;
       }
       
       ## Step 4
-      my $common_ancestor_node = $open_elements->[$formatting_element_i_in_open - 1];
+      my $common_ancestor_node = $self->{open_elements}->[$formatting_element_i_in_open - 1];
       
       ## Step 5
       my $furthest_block_parent = $furthest_block->[0]->parent_node;
@@ -2477,7 +2608,7 @@ sub _construct_tree ($) {
       S7: {
         ## Step 1
         $node_i_in_open--;
-        $node = $open_elements->[$node_i_in_open];
+        $node = $self->{open_elements}->[$node_i_in_open];
         
         ## Step 2
         my $node_i_in_active;
@@ -2488,7 +2619,7 @@ sub _construct_tree ($) {
               last S7S2;
             }
           }
-          splice @$open_elements, $node_i_in_open, 1;
+          splice @{$self->{open_elements}}, $node_i_in_open, 1;
           redo S7;
         } # S7S2
         
@@ -2504,7 +2635,7 @@ sub _construct_tree ($) {
         if ($node->[0]->has_child_nodes ()) {
           my $clone = [$node->[0]->clone_node (0), $node->[1]];
           $active_formatting_elements->[$node_i_in_active] = $clone;
-          $open_elements->[$node_i_in_open] = $clone;
+          $self->{open_elements}->[$node_i_in_open] = $clone;
           $node = $clone;
         }
         
@@ -2546,15 +2677,15 @@ sub _construct_tree ($) {
       
       ## Step 13
       undef $i;
-      OE: for (reverse 0..$#$open_elements) {
-        if ($open_elements->[$_]->[0] eq $formatting_element->[0]) {
-          splice @$open_elements, $_, 1;
+      OE: for (reverse 0..$#{$self->{open_elements}}) {
+        if ($self->{open_elements}->[$_]->[0] eq $formatting_element->[0]) {
+          splice @{$self->{open_elements}}, $_, 1;
           $i-- and last OE if defined $i;
-        } elsif ($open_elements->[$_]->[0] eq $furthest_block->[0]) {
+        } elsif ($self->{open_elements}->[$_]->[0] eq $furthest_block->[0]) {
           $i = $_;
         }
       } # OE
-      splice @$open_elements, $i + 1, 1, $clone;
+      splice @{$self->{open_elements}}, $i + 1, 1, $clone;
       
       ## Step 14
       redo FET;
@@ -2562,7 +2693,7 @@ sub _construct_tree ($) {
   }; # $formatting_end_tag
 
   my $insert_to_current = sub {
-    $open_elements->[-1]->[0]->append_child (shift);
+    $self->{open_elements}->[-1]->[0]->append_child (shift);
   }; # $insert_to_current
 
   my $insert_to_foster = sub {
@@ -2570,29 +2701,29 @@ sub _construct_tree ($) {
                        if ({
                             table => 1, tbody => 1, tfoot => 1,
                             thead => 1, tr => 1,
-                           }->{$open_elements->[-1]->[1]}) {
+                           }->{$self->{open_elements}->[-1]->[1]}) {
                          # MUST
                          my $foster_parent_element;
                          my $next_sibling;
-                         OE: for (reverse 0..$#$open_elements) {
-                           if ($open_elements->[$_]->[1] eq 'table') {
-                             my $parent = $open_elements->[$_]->[0]->parent_node;
+                         OE: for (reverse 0..$#{$self->{open_elements}}) {
+                           if ($self->{open_elements}->[$_]->[1] eq 'table') {
+                             my $parent = $self->{open_elements}->[$_]->[0]->parent_node;
                              if (defined $parent and $parent->node_type == 1) {
                                $foster_parent_element = $parent;
-                               $next_sibling = $open_elements->[$_]->[0];
+                               $next_sibling = $self->{open_elements}->[$_]->[0];
                              } else {
                                $foster_parent_element
-                                 = $open_elements->[$_ - 1]->[0];
+                                 = $self->{open_elements}->[$_ - 1]->[0];
                              }
                              last OE;
                            }
                          } # OE
-                         $foster_parent_element = $open_elements->[0]->[0]
+                         $foster_parent_element = $self->{open_elements}->[0]->[0]
                            unless defined $foster_parent_element;
                          $foster_parent_element->insert_before
                            ($child, $next_sibling);
                        } else {
-                         $open_elements->[-1]->[0]->append_child ($child);
+                         $self->{open_elements}->[-1]->[0]->append_child ($child);
                        }
   }; # $insert_to_foster
 
@@ -2608,7 +2739,7 @@ sub _construct_tree ($) {
       } elsif ({
                 base => 1, link => 1, meta => 1,
                }->{$token->{tag_name}}) {
-        $self->{parse_error}-> ($token->{tag_name}.' in body');
+        $self->{parse_error}-> (type => 'in body:'.$token->{tag_name});
         ## NOTE: This is an "as if in head" code clone
         my $el;
         
@@ -2620,8 +2751,8 @@ sub _construct_tree ($) {
                                  $token->{attributes} ->{$attr_name}->{value});
         }
       
-        if (defined $head_element) {
-          $head_element->append_child ($el);
+        if (defined $self->{head_element}) {
+          $self->{head_element}->append_child ($el);
         } else {
           $insert->($el);
         }
@@ -2629,7 +2760,7 @@ sub _construct_tree ($) {
         $token = $self->_get_next_token;
         return;
       } elsif ($token->{tag_name} eq 'title') {
-        $self->{parse_error}-> ('title in body');
+        $self->{parse_error}-> (type => 'in body:title');
         ## NOTE: There is an "as if in head" code clone
         my $title_el;
         
@@ -2641,7 +2772,7 @@ sub _construct_tree ($) {
                                  $token->{attributes} ->{$attr_name}->{value});
         }
       
-        (defined $head_element ? $head_element : $open_elements->[-1]->[0])
+        (defined $self->{head_element} ? $self->{head_element} : $self->{open_elements}->[-1]->[0])
           ->append_child ($title_el);
         $self->{content_model_flag} = 'RCDATA';
         
@@ -2661,19 +2792,19 @@ sub _construct_tree ($) {
             $token->{tag_name} eq 'title') {
           ## Ignore the token
         } else {
-          $self->{parse_error}->();
+          $self->{parse_error}-> (type => 'in RCDATA:#'.$token->{type});
           ## ISSUE: And ignore?
         }
         $token = $self->_get_next_token;
         return;
       } elsif ($token->{tag_name} eq 'body') {
-        $self->{parse_error}->();
+        $self->{parse_error}-> (type => 'in body:body');
               
-        if (@$open_elements == 1 or
-            $open_elements->[1]->[1] ne 'body') {
+        if (@{$self->{open_elements}} == 1 or
+            $self->{open_elements}->[1]->[1] ne 'body') {
           ## Ignore the token
         } else {
-          my $body_el = $open_elements->[1]->[0];
+          my $body_el = $self->{open_elements}->[1]->[0];
           for my $attr_name (keys %{$token->{attributes}}) {
             unless ($body_el->has_attribute_ns (undef, $attr_name)) {
               $body_el->set_attribute_ns
@@ -2691,7 +2822,7 @@ sub _construct_tree ($) {
                 pre => 1,
                }->{$token->{tag_name}}) {
         ## has a p element in scope
-        INSCOPE: for (reverse @$open_elements) {
+        INSCOPE: for (reverse @{$self->{open_elements}}) {
           if ($_->[1] eq 'p') {
             unshift @{$self->{token}}, $token;
             $token = {type => 'end tag', tag_name => 'p'};
@@ -2717,7 +2848,7 @@ sub _construct_tree ($) {
         }
       
       $insert->($el);
-      push @$open_elements, [$el, $token->{tag_name}];
+      push @{$self->{open_elements}}, [$el, $token->{tag_name}];
     }
   
         if ($token->{tag_name} eq 'pre') {
@@ -2733,12 +2864,12 @@ sub _construct_tree ($) {
         }
         return;
       } elsif ($token->{tag_name} eq 'form') {
-        if (defined $form_element) {
-          $self->{parse_error}->();
+        if (defined $self->{form_element}) {
+          $self->{parse_error}-> (type => 'in form:form');
           ## Ignore the token
         } else {
           ## has a p element in scope
-          INSCOPE: for (reverse @$open_elements) {
+          INSCOPE: for (reverse @{$self->{open_elements}}) {
             if ($_->[1] eq 'p') {
               unshift @{$self->{token}}, $token;
               $token = {type => 'end tag', tag_name => 'p'};
@@ -2764,16 +2895,16 @@ sub _construct_tree ($) {
         }
       
       $insert->($el);
-      push @$open_elements, [$el, $token->{tag_name}];
+      push @{$self->{open_elements}}, [$el, $token->{tag_name}];
     }
   
-          $form_element = $open_elements->[-1]->[0];
+          $self->{form_element} = $self->{open_elements}->[-1]->[0];
           $token = $self->_get_next_token;
           return;
         }
       } elsif ($token->{tag_name} eq 'li') {
         ## has a p element in scope
-        INSCOPE: for (reverse @$open_elements) {
+        INSCOPE: for (reverse @{$self->{open_elements}}) {
           if ($_->[1] eq 'p') {
             unshift @{$self->{token}}, $token;
             $token = {type => 'end tag', tag_name => 'p'};
@@ -2788,11 +2919,11 @@ sub _construct_tree ($) {
           
         ## Step 1
         my $i = -1;
-        my $node = $open_elements->[$i];
+        my $node = $self->{open_elements}->[$i];
         LI: {
           ## Step 2
           if ($node->[1] eq 'li') {
-            splice @$open_elements, $i;
+            splice @{$self->{open_elements}}, $i;
             last LI;
           }
           
@@ -2807,7 +2938,7 @@ sub _construct_tree ($) {
           
           ## Step 4
           $i--;
-          $node = $open_elements->[$i];
+          $node = $self->{open_elements}->[$i];
           redo LI;
         } # LI
           
@@ -2824,14 +2955,14 @@ sub _construct_tree ($) {
         }
       
       $insert->($el);
-      push @$open_elements, [$el, $token->{tag_name}];
+      push @{$self->{open_elements}}, [$el, $token->{tag_name}];
     }
   
         $token = $self->_get_next_token;
         return;
       } elsif ($token->{tag_name} eq 'dd' or $token->{tag_name} eq 'dt') {
         ## has a p element in scope
-        INSCOPE: for (reverse @$open_elements) {
+        INSCOPE: for (reverse @{$self->{open_elements}}) {
           if ($_->[1] eq 'p') {
             unshift @{$self->{token}}, $token;
             $token = {type => 'end tag', tag_name => 'p'};
@@ -2846,11 +2977,11 @@ sub _construct_tree ($) {
           
         ## Step 1
         my $i = -1;
-        my $node = $open_elements->[$i];
+        my $node = $self->{open_elements}->[$i];
         LI: {
           ## Step 2
           if ($node->[1] eq 'dt' or $node->[1] eq 'dd') {
-            splice @$open_elements, $i;
+            splice @{$self->{open_elements}}, $i;
             last LI;
           }
           
@@ -2865,7 +2996,7 @@ sub _construct_tree ($) {
           
           ## Step 4
           $i--;
-          $node = $open_elements->[$i];
+          $node = $self->{open_elements}->[$i];
           redo LI;
         } # LI
           
@@ -2882,14 +3013,14 @@ sub _construct_tree ($) {
         }
       
       $insert->($el);
-      push @$open_elements, [$el, $token->{tag_name}];
+      push @{$self->{open_elements}}, [$el, $token->{tag_name}];
     }
   
         $token = $self->_get_next_token;
         return;
       } elsif ($token->{tag_name} eq 'plaintext') {
         ## has a p element in scope
-        INSCOPE: for (reverse @$open_elements) {
+        INSCOPE: for (reverse @{$self->{open_elements}}) {
           if ($_->[1] eq 'p') {
             unshift @{$self->{token}}, $token;
             $token = {type => 'end tag', tag_name => 'p'};
@@ -2915,7 +3046,7 @@ sub _construct_tree ($) {
         }
       
       $insert->($el);
-      push @$open_elements, [$el, $token->{tag_name}];
+      push @{$self->{open_elements}}, [$el, $token->{tag_name}];
     }
   
           
@@ -2927,8 +3058,8 @@ sub _construct_tree ($) {
                 h1 => 1, h2 => 1, h3 => 1, h4 => 1, h5 => 1, h6 => 1,
                }->{$token->{tag_name}}) {
         ## has a p element in scope
-        INSCOPE: for (reverse 0..$#$open_elements) {
-          my $node = $open_elements->[$_];
+        INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
+          my $node = $self->{open_elements}->[$_];
           if ($node->[1] eq 'p') {
             unshift @{$self->{token}}, $token;
             $token = {type => 'end tag', tag_name => 'p'};
@@ -2943,8 +3074,8 @@ sub _construct_tree ($) {
           
         ## has an element in scope
         my $i;
-        INSCOPE: for (reverse 0..$#$open_elements) {
-          my $node = $open_elements->[$_];
+        INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
+          my $node = $self->{open_elements}->[$_];
           if ({
                h1 => 1, h2 => 1, h3 => 1, h4 => 1, h5 => 1, h6 => 1,
               }->{$node->[1]}) {
@@ -2959,8 +3090,8 @@ sub _construct_tree ($) {
         } # INSCOPE
           
         if (defined $i) {
-          $self->{parse_error}->();
-          splice @$open_elements, $i;
+          $self->{parse_error}-> (type => 'in hn:hn');
+          splice @{$self->{open_elements}}, $i;
         }
           
         
@@ -2976,7 +3107,7 @@ sub _construct_tree ($) {
         }
       
       $insert->($el);
-      push @$open_elements, [$el, $token->{tag_name}];
+      push @{$self->{open_elements}}, [$el, $token->{tag_name}];
     }
   
           
@@ -2986,7 +3117,7 @@ sub _construct_tree ($) {
         AFE: for my $i (reverse 0..$#$active_formatting_elements) {
           my $node = $active_formatting_elements->[$i];
           if ($node->[1] eq 'a') {
-            $self->{parse_error}-> ('a in a');
+            $self->{parse_error}-> (type => 'in a:a');
             
             unshift @{$self->{token}}, $token;
             $token = {type => 'end tag', tag_name => 'a'};
@@ -2998,9 +3129,9 @@ sub _construct_tree ($) {
                 last AFE2;
               }
             } # AFE2
-            OE: for (reverse 0..$#$open_elements) {
-              if ($open_elements->[$_]->[0] eq $node->[0]) {
-                splice @$open_elements, $_, 1;
+            OE: for (reverse 0..$#{$self->{open_elements}}) {
+              if ($self->{open_elements}->[$_]->[0] eq $node->[0]) {
+                splice @{$self->{open_elements}}, $_, 1;
                 last OE;
               }
             } # OE
@@ -3025,10 +3156,10 @@ sub _construct_tree ($) {
         }
       
       $insert->($el);
-      push @$open_elements, [$el, $token->{tag_name}];
+      push @{$self->{open_elements}}, [$el, $token->{tag_name}];
     }
   
-        push @$active_formatting_elements, $open_elements->[-1];
+        push @$active_formatting_elements, $self->{open_elements}->[-1];
 
         $token = $self->_get_next_token;
         return;
@@ -3052,19 +3183,19 @@ sub _construct_tree ($) {
         }
       
       $insert->($el);
-      push @$open_elements, [$el, $token->{tag_name}];
+      push @{$self->{open_elements}}, [$el, $token->{tag_name}];
     }
   
-        push @$active_formatting_elements, $open_elements->[-1];
+        push @$active_formatting_elements, $self->{open_elements}->[-1];
         
         $token = $self->_get_next_token;
         return;
       } elsif ($token->{tag_name} eq 'button') {
         ## has a button element in scope
-        INSCOPE: for (reverse 0..$#$open_elements) {
-          my $node = $open_elements->[$_];
+        INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
+          my $node = $self->{open_elements}->[$_];
           if ($node->[1] eq 'button') {
-            $self->{parse_error}->();
+            $self->{parse_error}-> (type => 'in button:button');
             unshift @{$self->{token}}, $token;
             $token = {type => 'end tag', tag_name => 'button'};
             return;
@@ -3091,7 +3222,7 @@ sub _construct_tree ($) {
         }
       
       $insert->($el);
-      push @$open_elements, [$el, $token->{tag_name}];
+      push @{$self->{open_elements}}, [$el, $token->{tag_name}];
     }
   
         push @$active_formatting_elements, ['#marker', ''];
@@ -3115,7 +3246,7 @@ sub _construct_tree ($) {
         }
       
       $insert->($el);
-      push @$open_elements, [$el, $token->{tag_name}];
+      push @{$self->{open_elements}}, [$el, $token->{tag_name}];
     }
   
         push @$active_formatting_elements, ['#marker', ''];
@@ -3138,7 +3269,7 @@ sub _construct_tree ($) {
         }
       
       $insert->($el);
-      push @$open_elements, [$el, $token->{tag_name}];
+      push @{$self->{open_elements}}, [$el, $token->{tag_name}];
     }
   
         
@@ -3148,7 +3279,7 @@ sub _construct_tree ($) {
         return;
       } elsif ($token->{tag_name} eq 'table') {
         ## has a p element in scope
-        INSCOPE: for (reverse @$open_elements) {
+        INSCOPE: for (reverse @{$self->{open_elements}}) {
           if ($_->[1] eq 'p') {
             unshift @{$self->{token}}, $token;
             $token = {type => 'end tag', tag_name => 'p'};
@@ -3174,11 +3305,11 @@ sub _construct_tree ($) {
         }
       
       $insert->($el);
-      push @$open_elements, [$el, $token->{tag_name}];
+      push @{$self->{open_elements}}, [$el, $token->{tag_name}];
     }
   
           
-        $insertion_mode = 'in table';
+        $self->{insertion_mode} = 'in table';
           
         $token = $self->_get_next_token;
         return;
@@ -3188,7 +3319,7 @@ sub _construct_tree ($) {
                 image => 1,
                }->{$token->{tag_name}}) {
         if ($token->{tag_name} eq 'image') {
-          $self->{parse_error}->();
+          $self->{parse_error}-> (type => 'image');
           $token->{tag_name} = 'img';
         }
         
@@ -3207,16 +3338,16 @@ sub _construct_tree ($) {
         }
       
       $insert->($el);
-      push @$open_elements, [$el, $token->{tag_name}];
+      push @{$self->{open_elements}}, [$el, $token->{tag_name}];
     }
   
-        pop @$open_elements;
+        pop @{$self->{open_elements}};
         
         $token = $self->_get_next_token;
         return;
       } elsif ($token->{tag_name} eq 'hr') {
         ## has a p element in scope
-        INSCOPE: for (reverse @$open_elements) {
+        INSCOPE: for (reverse @{$self->{open_elements}}) {
           if ($_->[1] eq 'p') {
             unshift @{$self->{token}}, $token;
             $token = {type => 'end tag', tag_name => 'p'};
@@ -3242,10 +3373,10 @@ sub _construct_tree ($) {
         }
       
       $insert->($el);
-      push @$open_elements, [$el, $token->{tag_name}];
+      push @{$self->{open_elements}}, [$el, $token->{tag_name}];
     }
   
-        pop @$open_elements;
+        pop @{$self->{open_elements}};
           
         $token = $self->_get_next_token;
         return;
@@ -3265,18 +3396,18 @@ sub _construct_tree ($) {
         }
       
       $insert->($el);
-      push @$open_elements, [$el, $token->{tag_name}];
+      push @{$self->{open_elements}}, [$el, $token->{tag_name}];
     }
   
-        ## TODO: associate with $form_element if defined
-        pop @$open_elements;
+        ## TODO: associate with $self->{form_element} if defined
+        pop @{$self->{open_elements}};
         
         $token = $self->_get_next_token;
         return;
       } elsif ($token->{tag_name} eq 'isindex') {
-        $self->{parse_error}->();
+        $self->{parse_error}-> (type => 'isindex');
         
-        if (defined $form_element) {
+        if (defined $self->{form_element}) {
           ## Ignore the token
           $token = $self->_get_next_token;
           return;
@@ -3321,7 +3452,7 @@ sub _construct_tree ($) {
       
         
         if ($token->{tag_name} eq 'textarea') {
-          ## TODO: form_element if defined
+          ## TODO: $self->{form_element} if defined
           $self->{content_model_flag} = 'RCDATA';
         } else {
           $self->{content_model_flag} = 'CDATA';
@@ -3345,7 +3476,11 @@ sub _construct_tree ($) {
             $token->{tag_name} eq $tag_name) {
           ## Ignore the token
         } else {
-          $self->{parse_error}->();
+          if ($token->{tag_name} eq 'textarea') {
+            $self->{parse_error}-> (type => 'in CDATA:#'.$token->{type});
+          } else {
+            $self->{parse_error}-> (type => 'in RCDATA:#'.$token->{type});
+          }
           ## ISSUE: And ignore?
         }
         $token = $self->_get_next_token;
@@ -3366,11 +3501,11 @@ sub _construct_tree ($) {
         }
       
       $insert->($el);
-      push @$open_elements, [$el, $token->{tag_name}];
+      push @{$self->{open_elements}}, [$el, $token->{tag_name}];
     }
   
         
-        $insertion_mode = 'in select';
+        $self->{insertion_mode} = 'in select';
         $token = $self->_get_next_token;
         return;
       } elsif ({
@@ -3379,7 +3514,7 @@ sub _construct_tree ($) {
                 tbody => 1, td => 1, tfoot => 1, th => 1,
                 thead => 1, tr => 1,
                }->{$token->{tag_name}}) {
-        $self->{parse_error}->();
+        $self->{parse_error}-> (type => 'in body:'.$token->{tag_name});
         ## Ignore the token
         $token = $self->_get_next_token;
         return;
@@ -3401,7 +3536,7 @@ sub _construct_tree ($) {
         }
       
       $insert->($el);
-      push @$open_elements, [$el, $token->{tag_name}];
+      push @{$self->{open_elements}}, [$el, $token->{tag_name}];
     }
   
         
@@ -3410,31 +3545,31 @@ sub _construct_tree ($) {
       }
     } elsif ($token->{type} eq 'end tag') {
       if ($token->{tag_name} eq 'body') {
-        if (@$open_elements > 1 and $open_elements->[1]->[1] eq 'body') {
+        if (@{$self->{open_elements}} > 1 and $self->{open_elements}->[1]->[1] eq 'body') {
           ## ISSUE: There is an issue in the spec.
-          if ($open_elements->[-1]->[1] ne 'body') {
-            $self->{parse_error}->();
+          if ($self->{open_elements}->[-1]->[1] ne 'body') {
+            $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
           }
-          $insertion_mode = 'after body';
+          $self->{insertion_mode} = 'after body';
           $token = $self->_get_next_token;
           return;
         } else {
-          $self->{parse_error}->();
+          $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
           ## Ignore the token
           $token = $self->_get_next_token;
           return;
         }
       } elsif ($token->{tag_name} eq 'html') {
-        if (@$open_elements > 1 and $open_elements->[1]->[1] eq 'body') {
+        if (@{$self->{open_elements}} > 1 and $self->{open_elements}->[1]->[1] eq 'body') {
           ## ISSUE: There is an issue in the spec.
-          if ($open_elements->[-1]->[1] ne 'body') {
-            $self->{parse_error}->();
+          if ($self->{open_elements}->[-1]->[1] ne 'body') {
+            $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[1]->[1]);
           }
-          $insertion_mode = 'after body';
+          $self->{insertion_mode} = 'after body';
           ## reprocess
           return;
         } else {
-          $self->{parse_error}->();
+          $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
           ## Ignore the token
           $token = $self->_get_next_token;
           return;
@@ -3450,8 +3585,8 @@ sub _construct_tree ($) {
                }->{$token->{tag_name}}) {
         ## has an element in scope
         my $i;
-        INSCOPE: for (reverse 0..$#$open_elements) {
-          my $node = $open_elements->[$_];
+        INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
+          my $node = $self->{open_elements}->[$_];
           if ($node->[1] eq $token->{tag_name}) {
             ## generate implied end tags
             if ({
@@ -3460,10 +3595,10 @@ sub _construct_tree ($) {
                  li => ($token->{tag_name} ne 'li'),
                  p => ($token->{tag_name} ne 'p'),
                  td => 1, th => 1, tr => 1,
-                }->{$open_elements->[-1]->[1]}) {
+                }->{$self->{open_elements}->[-1]->[1]}) {
               unshift @{$self->{token}}, $token;
               $token = {type => 'end tag',
-                        tag_name => $open_elements->[-1]->[1]}; # MUST
+                        tag_name => $self->{open_elements}->[-1]->[1]}; # MUST
               return;
             }
             $i = $_;
@@ -3476,12 +3611,12 @@ sub _construct_tree ($) {
           }
         } # INSCOPE
         
-        if ($open_elements->[-1]->[1] ne $token->{tag_name}) {
-          $self->{parse_error}->();
+        if ($self->{open_elements}->[-1]->[1] ne $token->{tag_name}) {
+          $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
         }
         
-        splice @$open_elements, $i if defined $i;
-        undef $form_element if $token->{tag_name} eq 'form';
+        splice @{$self->{open_elements}}, $i if defined $i;
+        undef $self->{form_element} if $token->{tag_name} eq 'form';
         $clear_up_to_marker->()
           if {
             button => 1, marquee => 1, object => 1,
@@ -3493,8 +3628,8 @@ sub _construct_tree ($) {
                }->{$token->{tag_name}}) {
         ## has an element in scope
         my $i;
-        INSCOPE: for (reverse 0..$#$open_elements) {
-          my $node = $open_elements->[$_];
+        INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
+          my $node = $self->{open_elements}->[$_];
           if ({
                h1 => 1, h2 => 1, h3 => 1, h4 => 1, h5 => 1, h6 => 1,
               }->{$node->[1]}) {
@@ -3502,10 +3637,10 @@ sub _construct_tree ($) {
             if ({
                  dd => 1, dt => 1, li => 1, p => 1,
                  td => 1, th => 1, tr => 1,
-                }->{$open_elements->[-1]->[1]}) {
+                }->{$self->{open_elements}->[-1]->[1]}) {
               unshift @{$self->{token}}, $token;
               $token = {type => 'end tag',
-                        tag_name => $open_elements->[-1]->[1]}; # MUST
+                        tag_name => $self->{open_elements}->[-1]->[1]}; # MUST
               return;
             }
             $i = $_;
@@ -3518,11 +3653,11 @@ sub _construct_tree ($) {
           }
         } # INSCOPE
         
-        if ($open_elements->[-1]->[1] ne $token->{tag_name}) {
-          $self->{parse_error}->();
+        if ($self->{open_elements}->[-1]->[1] ne $token->{tag_name}) {
+          $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
         }
         
-        splice @$open_elements, $i if defined $i;
+        splice @{$self->{open_elements}}, $i if defined $i;
         $token = $self->_get_next_token;
         return;
       } elsif ({
@@ -3545,7 +3680,7 @@ sub _construct_tree ($) {
                 table => 1, textarea => 1, wbr => 1,
                 noscript => 0, ## TODO: if scripting is enabled
                }->{$token->{tag_name}}) {
-        $self->{parse_error}->();
+        $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
         ## Ignore the token
         $token = $self->_get_next_token;
         return;
@@ -3555,7 +3690,7 @@ sub _construct_tree ($) {
       } else {
         ## Step 1
         my $node_i = -1;
-        my $node = $open_elements->[$node_i];
+        my $node = $self->{open_elements}->[$node_i];
 
         ## Step 2
         S2: {
@@ -3565,20 +3700,22 @@ sub _construct_tree ($) {
             if ({
                  dd => 1, dt => 1, li => 1, p => 1,
                  td => 1, th => 1, tr => 1,
-                }->{$open_elements->[-1]->[1]}) {
+                }->{$self->{open_elements}->[-1]->[1]}) {
               unshift @{$self->{token}}, $token;
               $token = {type => 'end tag',
-                        tag_name => $open_elements->[-1]->[1]}; # MUST
+                        tag_name => $self->{open_elements}->[-1]->[1]}; # MUST
               return;
             }
         
             ## Step 2
-            if ($token->{tag_name} ne $open_elements->[-1]->[1]) {
-              $self->{parse_error}->();
+            if ($token->{tag_name} ne $self->{open_elements}->[-1]->[1]) {
+              $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
             }
             
             ## Step 3
-            splice @$open_elements, $node_i;
+            splice @{$self->{open_elements}}, $node_i;
+
+            $token = $self->_get_next_token;
             last S2;
           } else {
             ## Step 3
@@ -3586,7 +3723,7 @@ sub _construct_tree ($) {
                 #not $phrasing_category->{$node->[1]} and
                 ($special_category->{$node->[1]} or
                  $scoping_category->{$node->[1]})) {
-              $self->{parse_error}->();
+              $self->{parse_error}-> (type => 'not closed:'.$node->[1]);
               ## Ignore the token
               $token = $self->_get_next_token;
               last S2;
@@ -3595,103 +3732,20 @@ sub _construct_tree ($) {
           
           ## Step 4
           $node_i--;
-          $node = $open_elements->[$node_i];
+          $node = $self->{open_elements}->[$node_i];
           
           ## Step 5;
           redo S2;
         } # S2
+	return;
       }
     }
   }; # $in_body
 
   B: {
-    if ($phase eq 'initial') {
+    if ($phase eq 'main') {
       if ($token->{type} eq 'DOCTYPE') {
-        if ($token->{error}) {
-          ## ISSUE: Spec currently left this case undefined.
-          $self->{parse_error}-> ('bogus DOCTYPE');
-        }
-        my $doctype = $self->{document}->create_document_type_definition
-          ($token->{name});
-        $self->{document}->append_child ($doctype);
-        $phase = 'root element';
-        $token = $self->_get_next_token;
-        redo B;
-      } elsif ({
-                comment => 1,
-                'start tag' => 1,
-                'end tag' => 1,
-                'end-of-file' => 1,
-               }->{$token->{type}}) {
-        ## ISSUE: Spec currently left this case undefined.
-        $self->{parse_error}-> ('missing DOCTYPE');
-        $phase = 'root element';
-        ## reprocess
-        redo B;
-      } elsif ($token->{type} eq 'character') {
-        if ($token->{data} =~ s/^([\x09\x0A\x0B\x0C\x20]+)//) {
-          $self->{document}->manakai_append_text ($1);
-          ## ISSUE: DOM3 Core does not allow Document > Text
-          unless (length $token->{data}) {
-            ## Stay in the phase
-            $token = $self->_get_next_token;
-            redo B;
-          }
-        }
-        ## ISSUE: Spec currently left this case undefined.
-        $self->{parse_error}-> ('missing DOCTYPE');
-        $phase = 'root element';
-        ## reprocess
-        redo B;
-      } else {
-        die "$0: $token->{type}: Unknown token";
-      }
-    } elsif ($phase eq 'root element') {
-      if ($token->{type} eq 'DOCTYPE') {
-        $self->{parse_error}->();
-        ## Ignore the token
-        ## Stay in the phase
-        $token = $self->_get_next_token;
-        redo B;
-      } elsif ($token->{type} eq 'comment') {
-        my $comment = $self->{document}->create_comment ($token->{data});
-        $self->{document}->append_child ($comment);
-        ## Stay in the phase
-        $token = $self->_get_next_token;
-        redo B;
-      } elsif ($token->{type} eq 'character') {
-        if ($token->{data} =~ s/^([\x09\x0A\x0B\x0C\x20]+)//) {
-          $self->{document}->manakai_append_text ($1);
-          ## ISSUE: DOM3 Core does not allow Document > Text
-          unless (length $token->{data}) {
-            ## Stay in the phase
-            $token = $self->_get_next_token;
-            redo B;
-          }
-        }
-        #
-      } elsif ({
-                'start tag' => 1,
-                'end tag' => 1,
-                'end-of-file' => 1,
-               }->{$token->{type}}) {
-        ## ISSUE: There is an issue in the spec
-        #
-      } else {
-        die "$0: $token->{type}: Unknown token";
-      }
-      my $root_element; 
-      $root_element = $self->{document}->create_element_ns
-        (q<http://www.w3.org/1999/xhtml>, [undef,  'html']);
-    
-      $self->{document}->append_child ($root_element);
-      $open_elements = [[$root_element, 'html']];
-      $phase = 'main';
-      ## reprocess
-      redo B;
-    } elsif ($phase eq 'main') {
-      if ($token->{type} eq 'DOCTYPE') {
-        $self->{parse_error}->();
+        $self->{parse_error}-> (type => 'in html:#DOCTYPE');
         ## Ignore the token
         ## Stay in the phase
         $token = $self->_get_next_token;
@@ -3699,7 +3753,7 @@ sub _construct_tree ($) {
       } elsif ($token->{type} eq 'start tag' and
                $token->{tag_name} eq 'html') {
         ## TODO: unless it is the first start tag token, parse-error
-        my $top_el = $open_elements->[0]->[0];
+        my $top_el = $self->{open_elements}->[0]->[0];
         for my $attr_name (keys %{$token->{attributes}}) {
           unless ($top_el->has_attribute_ns (undef, $attr_name)) {
             $top_el->set_attribute_ns
@@ -3713,17 +3767,19 @@ sub _construct_tree ($) {
         ## Generate implied end tags
         if ({
              dd => 1, dt => 1, li => 1, p => 1, td => 1, th => 1, tr => 1,
-            }->{$open_elements->[-1]->[1]}) {
+            }->{$self->{open_elements}->[-1]->[1]}) {
           unshift @{$self->{token}}, $token;
-          $token = {type => 'end tag', tag_name => $open_elements->[-1]->[1]};
+          $token = {type => 'end tag', tag_name => $self->{open_elements}->[-1]->[1]};
           redo B;
         }
         
-        if (@$open_elements > 2 or
-            (@$open_elements == 2 and $open_elements->[1]->[1] ne 'body')) {
-          $self->{parse_error}->();
-        } else {
-          ## TODO: inner_html parser and @$open_elements > 1 and $open_elements->[1] ne 'body', then parse-error
+        if (@{$self->{open_elements}} > 2 or
+            (@{$self->{open_elements}} == 2 and $self->{open_elements}->[1]->[1] ne 'body')) {
+          $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
+        } elsif (defined $self->{inner_html_node} and
+                 @{$self->{open_elements}} > 1 and
+                 $self->{open_elements}->[1]->[1] ne 'body') {
+          $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
         }
 
         ## Stop parsing
@@ -3731,10 +3787,10 @@ sub _construct_tree ($) {
 
         ## ISSUE: There is an issue in the spec.
       } else {
-        if ($insertion_mode eq 'before head') {
+        if ($self->{insertion_mode} eq 'before head') {
           if ($token->{type} eq 'character') {
             if ($token->{data} =~ s/^([\x09\x0A\x0B\x0C\x20]+)//) {
-              $open_elements->[-1]->[0]->manakai_append_text ($1);
+              $self->{open_elements}->[-1]->[0]->manakai_append_text ($1);
               unless (length $token->{data}) {
                 $token = $self->_get_next_token;
                 redo B;
@@ -3742,33 +3798,33 @@ sub _construct_tree ($) {
             }
             ## As if <head>
             
-      $head_element = $self->{document}->create_element_ns
+      $self->{head_element} = $self->{document}->create_element_ns
         (q<http://www.w3.org/1999/xhtml>, [undef,  'head']);
     
-            $open_elements->[-1]->[0]->append_child ($head_element);
-            push @$open_elements, [$head_element, 'head'];
-            $insertion_mode = 'in head';
+            $self->{open_elements}->[-1]->[0]->append_child ($self->{head_element});
+            push @{$self->{open_elements}}, [$self->{head_element}, 'head'];
+            $self->{insertion_mode} = 'in head';
             ## reprocess
             redo B;
           } elsif ($token->{type} eq 'comment') {
             my $comment = $self->{document}->create_comment ($token->{data});
-            $open_elements->[-1]->[0]->append_child ($comment);
+            $self->{open_elements}->[-1]->[0]->append_child ($comment);
             $token = $self->_get_next_token;
             redo B;
           } elsif ($token->{type} eq 'start tag') {
             my $attr = $token->{tag_name} eq 'head' ? $token->{attributes} : {};
             
-      $head_element = $self->{document}->create_element_ns
+      $self->{head_element} = $self->{document}->create_element_ns
         (q<http://www.w3.org/1999/xhtml>, [undef,  'head']);
     
         for my $attr_name (keys %{ $attr}) {
-          $head_element->set_attribute_ns (undef, [undef, $attr_name],
+          $self->{head_element}->set_attribute_ns (undef, [undef, $attr_name],
                                  $attr ->{$attr_name}->{value});
         }
       
-            $open_elements->[-1]->[0]->append_child ($head_element);
-            push @$open_elements, [$head_element, 'head'];
-            $insertion_mode = 'in head';
+            $self->{open_elements}->[-1]->[0]->append_child ($self->{head_element});
+            push @{$self->{open_elements}}, [$self->{head_element}, 'head'];
+            $self->{insertion_mode} = 'in head';
             if ($token->{tag_name} eq 'head') {
               $token = $self->_get_next_token;
             #} elsif ({
@@ -3784,16 +3840,16 @@ sub _construct_tree ($) {
             if ($token->{tag_name} eq 'html') {
               ## As if <head>
               
-      $head_element = $self->{document}->create_element_ns
+      $self->{head_element} = $self->{document}->create_element_ns
         (q<http://www.w3.org/1999/xhtml>, [undef,  'head']);
     
-              $open_elements->[-1]->[0]->append_child ($head_element);
-              push @$open_elements, [$head_element, 'head'];
-              $insertion_mode = 'in head';
+              $self->{open_elements}->[-1]->[0]->append_child ($self->{head_element});
+              push @{$self->{open_elements}}, [$self->{head_element}, 'head'];
+              $self->{insertion_mode} = 'in head';
               ## reprocess
               redo B;
             } else {
-              $self->{parse_error}->();
+              $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
               ## Ignore the token
               $token = $self->_get_next_token;
               redo B;
@@ -3801,10 +3857,10 @@ sub _construct_tree ($) {
           } else {
             die "$0: $token->{type}: Unknown type";
           }
-        } elsif ($insertion_mode eq 'in head') {
+        } elsif ($self->{insertion_mode} eq 'in head') {
           if ($token->{type} eq 'character') {
             if ($token->{data} =~ s/^([\x09\x0A\x0B\x0C\x20]+)//) {
-              $open_elements->[-1]->[0]->manakai_append_text ($1);
+              $self->{open_elements}->[-1]->[0]->manakai_append_text ($1);
               unless (length $token->{data}) {
                 $token = $self->_get_next_token;
                 redo B;
@@ -3814,7 +3870,7 @@ sub _construct_tree ($) {
             #
           } elsif ($token->{type} eq 'comment') {
             my $comment = $self->{document}->create_comment ($token->{data});
-            $open_elements->[-1]->[0]->append_child ($comment);
+            $self->{open_elements}->[-1]->[0]->append_child ($comment);
             $token = $self->_get_next_token;
             redo B;
           } elsif ($token->{type} eq 'start tag') {
@@ -3830,7 +3886,7 @@ sub _construct_tree ($) {
                                  $token->{attributes} ->{$attr_name}->{value});
         }
       
-              (defined $head_element ? $head_element : $open_elements->[-1]->[0])
+              (defined $self->{head_element} ? $self->{head_element} : $self->{open_elements}->[-1]->[0])
                 ->append_child ($title_el);
               $self->{content_model_flag} = 'RCDATA';
 
@@ -3850,7 +3906,7 @@ sub _construct_tree ($) {
                   $token->{tag_name} eq 'title') {
                 ## Ignore the token
               } else {
-                $self->{parse_error}->();
+                $self->{parse_error}-> (type => 'in RCDATA:#'.$token->{type});
                 ## ISSUE: And ignore?
               }
               $token = $self->_get_next_token;
@@ -3873,13 +3929,13 @@ sub _construct_tree ($) {
                                  $token->{attributes} ->{$attr_name}->{value});
         }
       
-              (defined $head_element ? $head_element : $open_elements->[-1]->[0])
+              (defined $self->{head_element} ? $self->{head_element} : $self->{open_elements}->[-1]->[0])
                 ->append_child ($el);
 
               $token = $self->_get_next_token;
               redo B;
             } elsif ($token->{tag_name} eq 'head') {
-              $self->{parse_error}->();
+              $self->{parse_error}-> (type => 'in head:head');
               ## Ignore the token
               $token = $self->_get_next_token;
               redo B;
@@ -3888,18 +3944,18 @@ sub _construct_tree ($) {
             }
           } elsif ($token->{type} eq 'end tag') {
             if ($token->{tag_name} eq 'head') {
-              if ($open_elements->[-1]->[1] eq 'head') {
-                pop @$open_elements;
+              if ($self->{open_elements}->[-1]->[1] eq 'head') {
+                pop @{$self->{open_elements}};
               } else {
-                $self->{parse_error}->();
+                $self->{parse_error}-> (type => 'unmatched end tag:head');
               }
-              $insertion_mode = 'after head';
+              $self->{insertion_mode} = 'after head';
               $token = $self->_get_next_token;
               redo B;
             } elsif ($token->{tag_name} eq 'html') {
               #
             } else {
-              $self->{parse_error}->();
+              $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
               ## Ignore the token
               $token = $self->_get_next_token;
               redo B;
@@ -3908,19 +3964,19 @@ sub _construct_tree ($) {
             #
           }
 
-          if ($open_elements->[-1]->[1] eq 'head') {
+          if ($self->{open_elements}->[-1]->[1] eq 'head') {
             ## As if </head>
-            pop @$open_elements;
+            pop @{$self->{open_elements}};
           }
-          $insertion_mode = 'after head';
+          $self->{insertion_mode} = 'after head';
           ## reprocess
           redo B;
 
           ## ISSUE: An issue in the spec.
-        } elsif ($insertion_mode eq 'after head') {
+        } elsif ($self->{insertion_mode} eq 'after head') {
           if ($token->{type} eq 'character') {
             if ($token->{data} =~ s/^([\x09\x0A\x0B\x0C\x20]+)//) {
-              $open_elements->[-1]->[0]->manakai_append_text ($1);
+              $self->{open_elements}->[-1]->[0]->manakai_append_text ($1);
               unless (length $token->{data}) {
                 $token = $self->_get_next_token;
                 redo B;
@@ -3930,7 +3986,7 @@ sub _construct_tree ($) {
             #
           } elsif ($token->{type} eq 'comment') {
             my $comment = $self->{document}->create_comment ($token->{data});
-            $open_elements->[-1]->[0]->append_child ($comment);
+            $self->{open_elements}->[-1]->[0]->append_child ($comment);
             $token = $self->_get_next_token;
             redo B;
           } elsif ($token->{type} eq 'start tag') {
@@ -3947,11 +4003,11 @@ sub _construct_tree ($) {
                                   $token->{attributes} ->{$attr_name}->{value});
         }
       
-      $open_elements->[-1]->[0]->append_child ($el);
-      push @$open_elements, [$el, 'body'];
+      $self->{open_elements}->[-1]->[0]->append_child ($el);
+      push @{$self->{open_elements}}, [$el, 'body'];
     }
   
-              $insertion_mode = 'in body';
+              $self->{insertion_mode} = 'in body';
               $token = $self->_get_next_token;
               redo B;
             } elsif ($token->{tag_name} eq 'frameset') {
@@ -3967,19 +4023,19 @@ sub _construct_tree ($) {
                                   $token->{attributes} ->{$attr_name}->{value});
         }
       
-      $open_elements->[-1]->[0]->append_child ($el);
-      push @$open_elements, [$el, 'frameset'];
+      $self->{open_elements}->[-1]->[0]->append_child ($el);
+      push @{$self->{open_elements}}, [$el, 'frameset'];
     }
   
-              $insertion_mode = 'in frameset';
+              $self->{insertion_mode} = 'in frameset';
               $token = $self->_get_next_token;
               redo B;
             } elsif ({
                       base => 1, link => 1, meta => 1,
-                      script=> 1, style => 1, title => 1,
+                      script => 1, style => 1, title => 1,
                      }->{$token->{tag_name}}) {
-              $self->{parse_error}->();
-               $insertion_mode = 'in head';
+              $self->{parse_error}-> (type => 'after head:'.$token->{tag_name});
+              $self->{insertion_mode} = 'in head';
               ## reprocess
               redo B;
             } else {
@@ -3997,43 +4053,45 @@ sub _construct_tree ($) {
       $el = $self->{document}->create_element_ns
         (q<http://www.w3.org/1999/xhtml>, [undef,  'body']);
     
-      $open_elements->[-1]->[0]->append_child ($el);
-      push @$open_elements, [$el, 'body'];
+      $self->{open_elements}->[-1]->[0]->append_child ($el);
+      push @{$self->{open_elements}}, [$el, 'body'];
     }
   
-          $insertion_mode = 'in body';
+          $self->{insertion_mode} = 'in body';
           ## reprocess
           redo B;
-        } elsif ($insertion_mode eq 'in body') {
+        } elsif ($self->{insertion_mode} eq 'in body') {
           if ($token->{type} eq 'character') {
             ## NOTE: There is a code clone of "character in body".
             $reconstruct_active_formatting_elements->($insert_to_current);
             
-            $open_elements->[-1]->[0]->manakai_append_text ($token->{data});
+            $self->{open_elements}->[-1]->[0]->manakai_append_text ($token->{data});
 
             $token = $self->_get_next_token;
             redo B;
           } elsif ($token->{type} eq 'comment') {
             ## NOTE: There is a code clone of "comment in body".
             my $comment = $self->{document}->create_comment ($token->{data});
-            $open_elements->[-1]->[0]->append_child ($comment);
+            $self->{open_elements}->[-1]->[0]->append_child ($comment);
             $token = $self->_get_next_token;
             redo B;
           } else {
             $in_body->($insert_to_current);
             redo B;
           }
-        } elsif ($insertion_mode eq 'in table') {
+        } elsif ($self->{insertion_mode} eq 'in table') {
           if ($token->{type} eq 'character') {
             ## NOTE: There are "character in table" code clones.
             if ($token->{data} =~ s/^([\x09\x0A\x0B\x0C\x20]+)//) {
-              $open_elements->[-1]->[0]->manakai_append_text ($1);
+              $self->{open_elements}->[-1]->[0]->manakai_append_text ($1);
               
               unless (length $token->{data}) {
                 $token = $self->_get_next_token;
                 redo B;
               }
             }
+
+            $self->{parse_error}-> (type => 'in table:#character');
 
             ## As if in body, but insert into foster parent element
             ## ISSUE: Spec says that "whenever a node would be inserted
@@ -4044,26 +4102,26 @@ sub _construct_tree ($) {
             if ({
                  table => 1, tbody => 1, tfoot => 1,
                  thead => 1, tr => 1,
-                }->{$open_elements->[-1]->[1]}) {
+                }->{$self->{open_elements}->[-1]->[1]}) {
               # MUST
               my $foster_parent_element;
               my $next_sibling;
               my $prev_sibling;
-              OE: for (reverse 0..$#$open_elements) {
-                if ($open_elements->[$_]->[1] eq 'table') {
-                  my $parent = $open_elements->[$_]->[0]->parent_node;
+              OE: for (reverse 0..$#{$self->{open_elements}}) {
+                if ($self->{open_elements}->[$_]->[1] eq 'table') {
+                  my $parent = $self->{open_elements}->[$_]->[0]->parent_node;
                   if (defined $parent and $parent->node_type == 1) {
                     $foster_parent_element = $parent;
-                    $next_sibling = $open_elements->[$_]->[0];
+                    $next_sibling = $self->{open_elements}->[$_]->[0];
                     $prev_sibling = $next_sibling->previous_sibling;
                   } else {
-                    $foster_parent_element = $open_elements->[$_ - 1]->[0];
+                    $foster_parent_element = $self->{open_elements}->[$_ - 1]->[0];
                     $prev_sibling = $foster_parent_element->last_child;
                   }
                   last OE;
                 }
               } # OE
-              $foster_parent_element = $open_elements->[0]->[0] and
+              $foster_parent_element = $self->{open_elements}->[0]->[0] and
               $prev_sibling = $foster_parent_element->last_child
                 unless defined $foster_parent_element;
               if (defined $prev_sibling and
@@ -4075,14 +4133,14 @@ sub _construct_tree ($) {
                    $next_sibling);
               }
             } else {
-              $open_elements->[-1]->[0]->manakai_append_text ($token->{data});
+              $self->{open_elements}->[-1]->[0]->manakai_append_text ($token->{data});
             }
             
             $token = $self->_get_next_token;
             redo B;
           } elsif ($token->{type} eq 'comment') {
             my $comment = $self->{document}->create_comment ($token->{data});
-            $open_elements->[-1]->[0]->append_child ($comment);
+            $self->{open_elements}->[-1]->[0]->append_child ($comment);
             $token = $self->_get_next_token;
             redo B;
           } elsif ($token->{type} eq 'start tag') {
@@ -4092,10 +4150,10 @@ sub _construct_tree ($) {
                  tbody => 1, tfoot => 1, thead => 1,
                 }->{$token->{tag_name}}) {
               ## Clear back to table context
-              while ($open_elements->[-1]->[1] ne 'table' and
-                     $open_elements->[-1]->[1] ne 'html') {
-                $self->{parse_error}->();
-                pop @$open_elements;
+              while ($self->{open_elements}->[-1]->[1] ne 'table' and
+                     $self->{open_elements}->[-1]->[1] ne 'html') {
+                $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
+                pop @{$self->{open_elements}};
               }
 
               push @$active_formatting_elements, ['#marker', '']
@@ -4113,11 +4171,11 @@ sub _construct_tree ($) {
                                   $token->{attributes} ->{$attr_name}->{value});
         }
       
-      $open_elements->[-1]->[0]->append_child ($el);
-      push @$open_elements, [$el, $token->{tag_name}];
+      $self->{open_elements}->[-1]->[0]->append_child ($el);
+      push @{$self->{open_elements}}, [$el, $token->{tag_name}];
     }
   
-              $insertion_mode = {
+              $self->{insertion_mode} = {
                                  caption => 'in caption',
                                  colgroup => 'in column group',
                                  tbody => 'in table body',
@@ -4131,10 +4189,10 @@ sub _construct_tree ($) {
                       td => 1, th => 1, tr => 1,
                      }->{$token->{tag_name}}) {
               ## Clear back to table context
-              while ($open_elements->[-1]->[1] ne 'table' and
-                     $open_elements->[-1]->[1] ne 'html') {
-                $self->{parse_error}->();
-                pop @$open_elements;
+              while ($self->{open_elements}->[-1]->[1] ne 'table' and
+                     $self->{open_elements}->[-1]->[1] ne 'html') {
+                $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
+                pop @{$self->{open_elements}};
               }
 
               
@@ -4144,23 +4202,23 @@ sub _construct_tree ($) {
       $el = $self->{document}->create_element_ns
         (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name} eq 'col' ? 'colgroup' : 'tbody']);
     
-      $open_elements->[-1]->[0]->append_child ($el);
-      push @$open_elements, [$el, $token->{tag_name} eq 'col' ? 'colgroup' : 'tbody'];
+      $self->{open_elements}->[-1]->[0]->append_child ($el);
+      push @{$self->{open_elements}}, [$el, $token->{tag_name} eq 'col' ? 'colgroup' : 'tbody'];
     }
   
-              $insertion_mode = $token->{tag_name} eq 'col'
+              $self->{insertion_mode} = $token->{tag_name} eq 'col'
                 ? 'in column group' : 'in table body';
               ## reprocess
               redo B;
             } elsif ($token->{tag_name} eq 'table') {
               ## NOTE: There are code clones for this "table in table"
-              $self->{parse_error}->();
+              $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
 
               ## As if </table>
               ## have a table element in table scope
               my $i;
-              INSCOPE: for (reverse 0..$#$open_elements) {
-                my $node = $open_elements->[$_];
+              INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
+                my $node = $self->{open_elements}->[$_];
                 if ($node->[1] eq 'table') {
                   $i = $_;
                   last INSCOPE;
@@ -4171,7 +4229,7 @@ sub _construct_tree ($) {
                 }
               } # INSCOPE
               unless (defined $i) {
-                $self->{parse_error}->();
+                $self->{parse_error}-> (type => 'unmatched end tag:table');
                 ## Ignore tokens </table><table>
                 $token = $self->_get_next_token;
                 redo B;
@@ -4181,22 +4239,22 @@ sub _construct_tree ($) {
               if ({
                    dd => 1, dt => 1, li => 1, p => 1,
                    td => 1, th => 1, tr => 1,
-                  }->{$open_elements->[-1]->[1]}) {
+                  }->{$self->{open_elements}->[-1]->[1]}) {
                 unshift @{$self->{token}}, $token; # <table>
                 $token = {type => 'end tag', tag_name => 'table'};
                 unshift @{$self->{token}}, $token;
                 $token = {type => 'end tag',
-                          tag_name => $open_elements->[-1]->[1]}; # MUST
+                          tag_name => $self->{open_elements}->[-1]->[1]}; # MUST
                 redo B;
               }
 
-              if ($open_elements->[-1]->[1] ne 'table') {
-                $self->{parse_error}->();
+              if ($self->{open_elements}->[-1]->[1] ne 'table') {
+                $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
               }
 
-              splice @$open_elements, $i;
+              splice @{$self->{open_elements}}, $i;
 
-              $reset_insertion_mode->();              
+              $self->_reset_insertion_mode; 
 
               ## reprocess
               redo B;
@@ -4207,8 +4265,8 @@ sub _construct_tree ($) {
             if ($token->{tag_name} eq 'table') {
               ## have a table element in table scope
               my $i;
-              INSCOPE: for (reverse 0..$#$open_elements) {
-                my $node = $open_elements->[$_];
+              INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
+                my $node = $self->{open_elements}->[$_];
                 if ($node->[1] eq $token->{tag_name}) {
                   $i = $_;
                   last INSCOPE;
@@ -4219,7 +4277,7 @@ sub _construct_tree ($) {
                 }
               } # INSCOPE
               unless (defined $i) {
-                $self->{parse_error}->();
+                $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
                 ## Ignore the token
                 $token = $self->_get_next_token;
                 redo B;
@@ -4229,20 +4287,20 @@ sub _construct_tree ($) {
               if ({
                    dd => 1, dt => 1, li => 1, p => 1,
                    td => 1, th => 1, tr => 1,
-                  }->{$open_elements->[-1]->[1]}) {
+                  }->{$self->{open_elements}->[-1]->[1]}) {
                 unshift @{$self->{token}}, $token;
                 $token = {type => 'end tag',
-                          tag_name => $open_elements->[-1]->[1]}; # MUST
+                          tag_name => $self->{open_elements}->[-1]->[1]}; # MUST
                 redo B;
               }
 
-              if ($open_elements->[-1]->[1] ne 'table') {
-                $self->{parse_error}->();
+              if ($self->{open_elements}->[-1]->[1] ne 'table') {
+                $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
               }
 
-              splice @$open_elements, $i;
+              splice @{$self->{open_elements}}, $i;
 
-              $reset_insertion_mode->();
+              $self->_reset_insertion_mode;
 
               $token = $self->_get_next_token;
               redo B;
@@ -4251,7 +4309,7 @@ sub _construct_tree ($) {
                       html => 1, tbody => 1, td => 1, tfoot => 1, th => 1,
                       thead => 1, tr => 1,
                      }->{$token->{tag_name}}) {
-              $self->{parse_error}->();
+              $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
               ## Ignore the token
               $token = $self->_get_next_token;
               redo B;
@@ -4262,22 +4320,22 @@ sub _construct_tree ($) {
             #
           }
 
-          $self->{parse_error}->();
+          $self->{parse_error}-> (type => 'in table:'.$token->{tag_name});
           $in_body->($insert_to_foster);
           redo B;
-        } elsif ($insertion_mode eq 'in caption') {
+        } elsif ($self->{insertion_mode} eq 'in caption') {
           if ($token->{type} eq 'character') {
             ## NOTE: This is a code clone of "character in body".
             $reconstruct_active_formatting_elements->($insert_to_current);
             
-            $open_elements->[-1]->[0]->manakai_append_text ($token->{data});
+            $self->{open_elements}->[-1]->[0]->manakai_append_text ($token->{data});
 
             $token = $self->_get_next_token;
             redo B;
           } elsif ($token->{type} eq 'comment') {
             ## NOTE: This is a code clone of "comment in body".
             my $comment = $self->{document}->create_comment ($token->{data});
-            $open_elements->[-1]->[0]->append_child ($comment);
+            $self->{open_elements}->[-1]->[0]->append_child ($comment);
             $token = $self->_get_next_token;
             redo B;
           } elsif ($token->{type} eq 'start tag') {
@@ -4285,13 +4343,13 @@ sub _construct_tree ($) {
                  caption => 1, col => 1, colgroup => 1, tbody => 1,
                  td => 1, tfoot => 1, th => 1, thead => 1, tr => 1,
                 }->{$token->{tag_name}}) {
-              $self->{parse_error}->();
+              $self->{parse_error}-> (type => 'not closed:caption');
 
               ## As if </caption>
               ## have a table element in table scope
               my $i;
-              INSCOPE: for (reverse 0..$#$open_elements) {
-                my $node = $open_elements->[$_];
+              INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
+                my $node = $self->{open_elements}->[$_];
                 if ($node->[1] eq 'caption') {
                   $i = $_;
                   last INSCOPE;
@@ -4302,7 +4360,7 @@ sub _construct_tree ($) {
                 }
               } # INSCOPE
               unless (defined $i) {
-                $self->{parse_error}->();
+                $self->{parse_error}-> (type => 'unmatched end tag:caption');
                 ## Ignore the token
                 $token = $self->_get_next_token;
                 redo B;
@@ -4312,24 +4370,24 @@ sub _construct_tree ($) {
               if ({
                    dd => 1, dt => 1, li => 1, p => 1,
                    td => 1, th => 1, tr => 1,
-                  }->{$open_elements->[-1]->[1]}) {
+                  }->{$self->{open_elements}->[-1]->[1]}) {
                 unshift @{$self->{token}}, $token; # <?>
                 $token = {type => 'end tag', tag_name => 'caption'};
                 unshift @{$self->{token}}, $token;
                 $token = {type => 'end tag',
-                          tag_name => $open_elements->[-1]->[1]}; # MUST
+                          tag_name => $self->{open_elements}->[-1]->[1]}; # MUST
                 redo B;
               }
 
-              if ($open_elements->[-1]->[1] ne 'caption') {
-                $self->{parse_error}->();
+              if ($self->{open_elements}->[-1]->[1] ne 'caption') {
+                $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
               }
 
-              splice @$open_elements, $i;
+              splice @{$self->{open_elements}}, $i;
 
               $clear_up_to_marker->();
 
-              $insertion_mode = 'in table';
+              $self->{insertion_mode} = 'in table';
 
               ## reprocess
               redo B;
@@ -4340,8 +4398,8 @@ sub _construct_tree ($) {
             if ($token->{tag_name} eq 'caption') {
               ## have a table element in table scope
               my $i;
-              INSCOPE: for (reverse 0..$#$open_elements) {
-                my $node = $open_elements->[$_];
+              INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
+                my $node = $self->{open_elements}->[$_];
                 if ($node->[1] eq $token->{tag_name}) {
                   $i = $_;
                   last INSCOPE;
@@ -4352,7 +4410,7 @@ sub _construct_tree ($) {
                 }
               } # INSCOPE
               unless (defined $i) {
-                $self->{parse_error}->();
+                $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
                 ## Ignore the token
                 $token = $self->_get_next_token;
                 redo B;
@@ -4362,33 +4420,33 @@ sub _construct_tree ($) {
               if ({
                    dd => 1, dt => 1, li => 1, p => 1,
                    td => 1, th => 1, tr => 1,
-                  }->{$open_elements->[-1]->[1]}) {
+                  }->{$self->{open_elements}->[-1]->[1]}) {
                 unshift @{$self->{token}}, $token;
                 $token = {type => 'end tag',
-                          tag_name => $open_elements->[-1]->[1]}; # MUST
+                          tag_name => $self->{open_elements}->[-1]->[1]}; # MUST
                 redo B;
               }
 
-              if ($open_elements->[-1]->[1] ne 'caption') {
-                $self->{parse_error}->();
+              if ($self->{open_elements}->[-1]->[1] ne 'caption') {
+                $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
               }
 
-              splice @$open_elements, $i;
+              splice @{$self->{open_elements}}, $i;
 
               $clear_up_to_marker->();
 
-              $insertion_mode = 'in table';
+              $self->{insertion_mode} = 'in table';
 
               $token = $self->_get_next_token;
               redo B;
             } elsif ($token->{tag_name} eq 'table') {
-              $self->{parse_error}->();
+              $self->{parse_error}-> (type => 'not closed:caption');
 
               ## As if </caption>
               ## have a table element in table scope
               my $i;
-              INSCOPE: for (reverse 0..$#$open_elements) {
-                my $node = $open_elements->[$_];
+              INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
+                my $node = $self->{open_elements}->[$_];
                 if ($node->[1] eq 'caption') {
                   $i = $_;
                   last INSCOPE;
@@ -4399,7 +4457,7 @@ sub _construct_tree ($) {
                 }
               } # INSCOPE
               unless (defined $i) {
-                $self->{parse_error}->();
+                $self->{parse_error}-> (type => 'unmatched end tag:caption');
                 ## Ignore the token
                 $token = $self->_get_next_token;
                 redo B;
@@ -4409,24 +4467,24 @@ sub _construct_tree ($) {
               if ({
                    dd => 1, dt => 1, li => 1, p => 1,
                    td => 1, th => 1, tr => 1,
-                  }->{$open_elements->[-1]->[1]}) {
+                  }->{$self->{open_elements}->[-1]->[1]}) {
                 unshift @{$self->{token}}, $token; # </table>
                 $token = {type => 'end tag', tag_name => 'caption'};
                 unshift @{$self->{token}}, $token;
                 $token = {type => 'end tag',
-                          tag_name => $open_elements->[-1]->[1]}; # MUST
+                          tag_name => $self->{open_elements}->[-1]->[1]}; # MUST
                 redo B;
               }
 
-              if ($open_elements->[-1]->[1] ne 'caption') {
-                $self->{parse_error}->();
+              if ($self->{open_elements}->[-1]->[1] ne 'caption') {
+                $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
               }
 
-              splice @$open_elements, $i;
+              splice @{$self->{open_elements}}, $i;
 
               $clear_up_to_marker->();
 
-              $insertion_mode = 'in table';
+              $self->{insertion_mode} = 'in table';
 
               ## reprocess
               redo B;
@@ -4435,7 +4493,7 @@ sub _construct_tree ($) {
                       html => 1, tbody => 1, td => 1, tfoot => 1,
                       th => 1, thead => 1, tr => 1,
                      }->{$token->{tag_name}}) {
-              $self->{parse_error}->();
+              $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
               ## Ignore the token
               redo B;
             } else {
@@ -4447,10 +4505,10 @@ sub _construct_tree ($) {
               
           $in_body->($insert_to_current);
           redo B;
-        } elsif ($insertion_mode eq 'in column group') {
+        } elsif ($self->{insertion_mode} eq 'in column group') {
           if ($token->{type} eq 'character') {
             if ($token->{data} =~ s/^([\x09\x0A\x0B\x0C\x20]+)//) {
-              $open_elements->[-1]->[0]->manakai_append_text ($1);
+              $self->{open_elements}->[-1]->[0]->manakai_append_text ($1);
               unless (length $token->{data}) {
                 $token = $self->_get_next_token;
                 redo B;
@@ -4460,7 +4518,7 @@ sub _construct_tree ($) {
             #
           } elsif ($token->{type} eq 'comment') {
             my $comment = $self->{document}->create_comment ($token->{data});
-            $open_elements->[-1]->[0]->append_child ($comment);
+            $self->{open_elements}->[-1]->[0]->append_child ($comment);
             $token = $self->_get_next_token;
             redo B;
           } elsif ($token->{type} eq 'start tag') {
@@ -4477,11 +4535,11 @@ sub _construct_tree ($) {
                                   $token->{attributes} ->{$attr_name}->{value});
         }
       
-      $open_elements->[-1]->[0]->append_child ($el);
-      push @$open_elements, [$el, $token->{tag_name}];
+      $self->{open_elements}->[-1]->[0]->append_child ($el);
+      push @{$self->{open_elements}}, [$el, $token->{tag_name}];
     }
   
-              pop @$open_elements;
+              pop @{$self->{open_elements}};
               $token = $self->_get_next_token;
               redo B;
             } else { 
@@ -4489,19 +4547,19 @@ sub _construct_tree ($) {
             }
           } elsif ($token->{type} eq 'end tag') {
             if ($token->{tag_name} eq 'colgroup') {
-              if ($open_elements->[-1]->[1] eq 'html') {
-                $self->{parse_error}->();
+              if ($self->{open_elements}->[-1]->[1] eq 'html') {
+                $self->{parse_error}-> (type => 'unmatched end tag:colgroup');
                 ## Ignore the token
                 $token = $self->_get_next_token;
                 redo B;
               } else {
-                pop @$open_elements; # colgroup
-                $insertion_mode = 'in table';
+                pop @{$self->{open_elements}}; # colgroup
+                $self->{insertion_mode} = 'in table';
                 $token = $self->_get_next_token;
                 redo B;             
               }
             } elsif ($token->{tag_name} eq 'col') {
-              $self->{parse_error}->();
+              $self->{parse_error}-> (type => 'unmatched end tag:col');
               ## Ignore the token
               $token = $self->_get_next_token;
               redo B;
@@ -4513,28 +4571,30 @@ sub _construct_tree ($) {
           }
 
           ## As if </colgroup>
-          if ($open_elements->[-1]->[1] eq 'html') {
-            $self->{parse_error}->();
+          if ($self->{open_elements}->[-1]->[1] eq 'html') {
+            $self->{parse_error}-> (type => 'unmatched end tag:colgroup');
             ## Ignore the token
             $token = $self->_get_next_token;
             redo B;
           } else {
-            pop @$open_elements; # colgroup
-            $insertion_mode = 'in table';
+            pop @{$self->{open_elements}}; # colgroup
+            $self->{insertion_mode} = 'in table';
             ## reprocess
             redo B;
           }
-        } elsif ($insertion_mode eq 'in table body') {
+        } elsif ($self->{insertion_mode} eq 'in table body') {
           if ($token->{type} eq 'character') {
             ## NOTE: This is a "character in table" code clone.
             if ($token->{data} =~ s/^([\x09\x0A\x0B\x0C\x20]+)//) {
-              $open_elements->[-1]->[0]->manakai_append_text ($1);
+              $self->{open_elements}->[-1]->[0]->manakai_append_text ($1);
               
               unless (length $token->{data}) {
                 $token = $self->_get_next_token;
                 redo B;
               }
             }
+
+            $self->{parse_error}-> (type => 'in table:#character');
 
             ## As if in body, but insert into foster parent element
             ## ISSUE: Spec says that "whenever a node would be inserted
@@ -4545,26 +4605,26 @@ sub _construct_tree ($) {
             if ({
                  table => 1, tbody => 1, tfoot => 1,
                  thead => 1, tr => 1,
-                }->{$open_elements->[-1]->[1]}) {
+                }->{$self->{open_elements}->[-1]->[1]}) {
               # MUST
               my $foster_parent_element;
               my $next_sibling;
               my $prev_sibling;
-              OE: for (reverse 0..$#$open_elements) {
-                if ($open_elements->[$_]->[1] eq 'table') {
-                  my $parent = $open_elements->[$_]->[0]->parent_node;
+              OE: for (reverse 0..$#{$self->{open_elements}}) {
+                if ($self->{open_elements}->[$_]->[1] eq 'table') {
+                  my $parent = $self->{open_elements}->[$_]->[0]->parent_node;
                   if (defined $parent and $parent->node_type == 1) {
                     $foster_parent_element = $parent;
-                    $next_sibling = $open_elements->[$_]->[0];
+                    $next_sibling = $self->{open_elements}->[$_]->[0];
                     $prev_sibling = $next_sibling->previous_sibling;
                   } else {
-                    $foster_parent_element = $open_elements->[$_ - 1]->[0];
+                    $foster_parent_element = $self->{open_elements}->[$_ - 1]->[0];
                     $prev_sibling = $foster_parent_element->last_child;
                   }
                   last OE;
                 }
               } # OE
-              $foster_parent_element = $open_elements->[0]->[0] and
+              $foster_parent_element = $self->{open_elements}->[0]->[0] and
               $prev_sibling = $foster_parent_element->last_child
                 unless defined $foster_parent_element;
               if (defined $prev_sibling and
@@ -4576,7 +4636,7 @@ sub _construct_tree ($) {
                    $next_sibling);
               }
             } else {
-              $open_elements->[-1]->[0]->manakai_append_text ($token->{data});
+              $self->{open_elements}->[-1]->[0]->manakai_append_text ($token->{data});
             }
             
             $token = $self->_get_next_token;
@@ -4584,7 +4644,7 @@ sub _construct_tree ($) {
           } elsif ($token->{type} eq 'comment') {
             ## Copied from 'in table'
             my $comment = $self->{document}->create_comment ($token->{data});
-            $open_elements->[-1]->[0]->append_child ($comment);
+            $self->{open_elements}->[-1]->[0]->append_child ($comment);
             $token = $self->_get_next_token;
             redo B;
           } elsif ($token->{type} eq 'start tag') {
@@ -4592,15 +4652,19 @@ sub _construct_tree ($) {
                  tr => 1,
                  th => 1, td => 1,
                 }->{$token->{tag_name}}) {
+              unless ($token->{tag_name} eq 'tr') {
+                $self->{parse_error}-> (type => 'missing start tag:tr');
+              }
+
               ## Clear back to table body context
               while (not {
                 tbody => 1, tfoot => 1, thead => 1, html => 1,
-              }->{$open_elements->[-1]->[1]}) {
-                $self->{parse_error}->();
-                pop @$open_elements;
+              }->{$self->{open_elements}->[-1]->[1]}) {
+                $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
+                pop @{$self->{open_elements}};
               }
               
-              $insertion_mode = 'in row';
+              $self->{insertion_mode} = 'in row';
               if ($token->{tag_name} eq 'tr') {
                 
     {
@@ -4614,8 +4678,8 @@ sub _construct_tree ($) {
                                   $token->{attributes} ->{$attr_name}->{value});
         }
       
-      $open_elements->[-1]->[0]->append_child ($el);
-      push @$open_elements, [$el, $token->{tag_name}];
+      $self->{open_elements}->[-1]->[0]->append_child ($el);
+      push @{$self->{open_elements}}, [$el, $token->{tag_name}];
     }
   
                 $token = $self->_get_next_token;
@@ -4627,8 +4691,8 @@ sub _construct_tree ($) {
       $el = $self->{document}->create_element_ns
         (q<http://www.w3.org/1999/xhtml>, [undef,  'tr']);
     
-      $open_elements->[-1]->[0]->append_child ($el);
-      push @$open_elements, [$el, 'tr'];
+      $self->{open_elements}->[-1]->[0]->append_child ($el);
+      push @{$self->{open_elements}}, [$el, 'tr'];
     }
   
                 ## reprocess
@@ -4640,8 +4704,8 @@ sub _construct_tree ($) {
                      }->{$token->{tag_name}}) {
               ## have an element in table scope
               my $i;
-              INSCOPE: for (reverse 0..$#$open_elements) {
-                my $node = $open_elements->[$_];
+              INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
+                my $node = $self->{open_elements}->[$_];
                 if ({
                      tbody => 1, thead => 1, tfoot => 1,
                     }->{$node->[1]}) {
@@ -4654,7 +4718,7 @@ sub _construct_tree ($) {
                 }
               } # INSCOPE
               unless (defined $i) {
-                $self->{parse_error}->();
+                $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
                 ## Ignore the token
                 $token = $self->_get_next_token;
                 redo B;
@@ -4663,9 +4727,9 @@ sub _construct_tree ($) {
               ## Clear back to table body context
               while (not {
                 tbody => 1, tfoot => 1, thead => 1, html => 1,
-              }->{$open_elements->[-1]->[1]}) {
-                $self->{parse_error}->();
-                pop @$open_elements;
+              }->{$self->{open_elements}->[-1]->[1]}) {
+                $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
+                pop @{$self->{open_elements}};
               }
 
               ## As if <{current node}>
@@ -4675,19 +4739,19 @@ sub _construct_tree ($) {
               ## Clear back to table body context
               ## nop by definition
 
-              pop @$open_elements;
-              $insertion_mode = 'in table';
+              pop @{$self->{open_elements}};
+              $self->{insertion_mode} = 'in table';
               ## reprocess
               redo B;
             } elsif ($token->{tag_name} eq 'table') {
               ## NOTE: This is a code clone of "table in table"
-              $self->{parse_error}->();
+              $self->{parse_error}-> (type => 'not closed:table');
 
               ## As if </table>
               ## have a table element in table scope
               my $i;
-              INSCOPE: for (reverse 0..$#$open_elements) {
-                my $node = $open_elements->[$_];
+              INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
+                my $node = $self->{open_elements}->[$_];
                 if ($node->[1] eq 'table') {
                   $i = $_;
                   last INSCOPE;
@@ -4698,7 +4762,7 @@ sub _construct_tree ($) {
                 }
               } # INSCOPE
               unless (defined $i) {
-                $self->{parse_error}->();
+                $self->{parse_error}-> (type => 'unmatched end tag:table');
                 ## Ignore tokens </table><table>
                 $token = $self->_get_next_token;
                 redo B;
@@ -4708,22 +4772,22 @@ sub _construct_tree ($) {
               if ({
                    dd => 1, dt => 1, li => 1, p => 1,
                    td => 1, th => 1, tr => 1,
-                  }->{$open_elements->[-1]->[1]}) {
+                  }->{$self->{open_elements}->[-1]->[1]}) {
                 unshift @{$self->{token}}, $token; # <table>
                 $token = {type => 'end tag', tag_name => 'table'};
                 unshift @{$self->{token}}, $token;
                 $token = {type => 'end tag',
-                          tag_name => $open_elements->[-1]->[1]}; # MUST
+                          tag_name => $self->{open_elements}->[-1]->[1]}; # MUST
                 redo B;
               }
 
-              if ($open_elements->[-1]->[1] ne 'table') {
-                $self->{parse_error}->();
+              if ($self->{open_elements}->[-1]->[1] ne 'table') {
+                $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
               }
 
-              splice @$open_elements, $i;
+              splice @{$self->{open_elements}}, $i;
 
-              $reset_insertion_mode->();              
+              $self->_reset_insertion_mode;
 
               ## reprocess
               redo B;
@@ -4736,8 +4800,8 @@ sub _construct_tree ($) {
                 }->{$token->{tag_name}}) {
               ## have an element in table scope
               my $i;
-              INSCOPE: for (reverse 0..$#$open_elements) {
-                my $node = $open_elements->[$_];
+              INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
+                my $node = $self->{open_elements}->[$_];
                 if ($node->[1] eq $token->{tag_name}) {
                   $i = $_;
                   last INSCOPE;
@@ -4748,7 +4812,7 @@ sub _construct_tree ($) {
                 }
               } # INSCOPE
               unless (defined $i) {
-                $self->{parse_error}->();
+                $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
                 ## Ignore the token
                 $token = $self->_get_next_token;
                 redo B;
@@ -4757,20 +4821,20 @@ sub _construct_tree ($) {
               ## Clear back to table body context
               while (not {
                 tbody => 1, tfoot => 1, thead => 1, html => 1,
-              }->{$open_elements->[-1]->[1]}) {
-                $self->{parse_error}->();
-                pop @$open_elements;
+              }->{$self->{open_elements}->[-1]->[1]}) {
+                $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
+                pop @{$self->{open_elements}};
               }
 
-              pop @$open_elements;
-              $insertion_mode = 'in table';
+              pop @{$self->{open_elements}};
+              $self->{insertion_mode} = 'in table';
               $token = $self->_get_next_token;
               redo B;
             } elsif ($token->{tag_name} eq 'table') {
               ## have an element in table scope
               my $i;
-              INSCOPE: for (reverse 0..$#$open_elements) {
-                my $node = $open_elements->[$_];
+              INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
+                my $node = $self->{open_elements}->[$_];
                 if ({
                      tbody => 1, thead => 1, tfoot => 1,
                     }->{$node->[1]}) {
@@ -4783,7 +4847,7 @@ sub _construct_tree ($) {
                 }
               } # INSCOPE
               unless (defined $i) {
-                $self->{parse_error}->();
+                $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
                 ## Ignore the token
                 $token = $self->_get_next_token;
                 redo B;
@@ -4792,9 +4856,9 @@ sub _construct_tree ($) {
               ## Clear back to table body context
               while (not {
                 tbody => 1, tfoot => 1, thead => 1, html => 1,
-              }->{$open_elements->[-1]->[1]}) {
-                $self->{parse_error}->();
-                pop @$open_elements;
+              }->{$self->{open_elements}->[-1]->[1]}) {
+                $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
+                pop @{$self->{open_elements}};
               }
 
               ## As if <{current node}>
@@ -4804,15 +4868,15 @@ sub _construct_tree ($) {
               ## Clear back to table body context
               ## nop by definition
 
-              pop @$open_elements;
-              $insertion_mode = 'in table';
+              pop @{$self->{open_elements}};
+              $self->{insertion_mode} = 'in table';
               ## reprocess
               redo B;
             } elsif ({
                       body => 1, caption => 1, col => 1, colgroup => 1,
                       html => 1, td => 1, th => 1, tr => 1,
                      }->{$token->{tag_name}}) {
-              $self->{parse_error}->();
+              $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
               ## Ignore the token
               $token = $self->_get_next_token;
               redo B;
@@ -4824,20 +4888,22 @@ sub _construct_tree ($) {
           }
           
           ## As if in table
-          $self->{parse_error}->();
+          $self->{parse_error}-> (type => 'in table:'.$token->{tag_name});
           $in_body->($insert_to_foster);
           redo B;
-        } elsif ($insertion_mode eq 'in row') {
+        } elsif ($self->{insertion_mode} eq 'in row') {
           if ($token->{type} eq 'character') {
             ## NOTE: This is a "character in table" code clone.
             if ($token->{data} =~ s/^([\x09\x0A\x0B\x0C\x20]+)//) {
-              $open_elements->[-1]->[0]->manakai_append_text ($1);
+              $self->{open_elements}->[-1]->[0]->manakai_append_text ($1);
               
               unless (length $token->{data}) {
                 $token = $self->_get_next_token;
                 redo B;
               }
             }
+
+            $self->{parse_error}-> (type => 'in table:#character');
 
             ## As if in body, but insert into foster parent element
             ## ISSUE: Spec says that "whenever a node would be inserted
@@ -4848,26 +4914,26 @@ sub _construct_tree ($) {
             if ({
                  table => 1, tbody => 1, tfoot => 1,
                  thead => 1, tr => 1,
-                }->{$open_elements->[-1]->[1]}) {
+                }->{$self->{open_elements}->[-1]->[1]}) {
               # MUST
               my $foster_parent_element;
               my $next_sibling;
               my $prev_sibling;
-              OE: for (reverse 0..$#$open_elements) {
-                if ($open_elements->[$_]->[1] eq 'table') {
-                  my $parent = $open_elements->[$_]->[0]->parent_node;
+              OE: for (reverse 0..$#{$self->{open_elements}}) {
+                if ($self->{open_elements}->[$_]->[1] eq 'table') {
+                  my $parent = $self->{open_elements}->[$_]->[0]->parent_node;
                   if (defined $parent and $parent->node_type == 1) {
                     $foster_parent_element = $parent;
-                    $next_sibling = $open_elements->[$_]->[0];
+                    $next_sibling = $self->{open_elements}->[$_]->[0];
                     $prev_sibling = $next_sibling->previous_sibling;
                   } else {
-                    $foster_parent_element = $open_elements->[$_ - 1]->[0];
+                    $foster_parent_element = $self->{open_elements}->[$_ - 1]->[0];
                     $prev_sibling = $foster_parent_element->last_child;
                   }
                   last OE;
                 }
               } # OE
-              $foster_parent_element = $open_elements->[0]->[0] and
+              $foster_parent_element = $self->{open_elements}->[0]->[0] and
               $prev_sibling = $foster_parent_element->last_child
                 unless defined $foster_parent_element;
               if (defined $prev_sibling and
@@ -4879,7 +4945,7 @@ sub _construct_tree ($) {
                    $next_sibling);
               }
             } else {
-              $open_elements->[-1]->[0]->manakai_append_text ($token->{data});
+              $self->{open_elements}->[-1]->[0]->manakai_append_text ($token->{data});
             }
             
             $token = $self->_get_next_token;
@@ -4887,7 +4953,7 @@ sub _construct_tree ($) {
           } elsif ($token->{type} eq 'comment') {
             ## Copied from 'in table'
             my $comment = $self->{document}->create_comment ($token->{data});
-            $open_elements->[-1]->[0]->append_child ($comment);
+            $self->{open_elements}->[-1]->[0]->append_child ($comment);
             $token = $self->_get_next_token;
             redo B;
           } elsif ($token->{type} eq 'start tag') {
@@ -4896,9 +4962,9 @@ sub _construct_tree ($) {
               ## Clear back to table row context
               while (not {
                 tr => 1, html => 1,
-              }->{$open_elements->[-1]->[1]}) {
-                $self->{parse_error}->();
-                pop @$open_elements;
+              }->{$self->{open_elements}->[-1]->[1]}) {
+                $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
+                pop @{$self->{open_elements}};
               }
               
               
@@ -4913,11 +4979,11 @@ sub _construct_tree ($) {
                                   $token->{attributes} ->{$attr_name}->{value});
         }
       
-      $open_elements->[-1]->[0]->append_child ($el);
-      push @$open_elements, [$el, $token->{tag_name}];
+      $self->{open_elements}->[-1]->[0]->append_child ($el);
+      push @{$self->{open_elements}}, [$el, $token->{tag_name}];
     }
   
-              $insertion_mode = 'in cell';
+              $self->{insertion_mode} = 'in cell';
 
               push @$active_formatting_elements, ['#marker', ''];
               
@@ -4930,8 +4996,8 @@ sub _construct_tree ($) {
               ## As if </tr>
               ## have an element in table scope
               my $i;
-              INSCOPE: for (reverse 0..$#$open_elements) {
-                my $node = $open_elements->[$_];
+              INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
+                my $node = $self->{open_elements}->[$_];
                 if ($node->[1] eq 'tr') {
                   $i = $_;
                   last INSCOPE;
@@ -4942,7 +5008,7 @@ sub _construct_tree ($) {
                 }
               } # INSCOPE
               unless (defined $i) {
-                $self->{parse_error}->();
+                $self->{parse_error}-> (type => 'unmacthed end tag:'.$token->{tag_name});
                 ## Ignore the token
                 $token = $self->_get_next_token;
                 redo B;
@@ -4951,24 +5017,24 @@ sub _construct_tree ($) {
               ## Clear back to table row context
               while (not {
                 tr => 1, html => 1,
-              }->{$open_elements->[-1]->[1]}) {
-                $self->{parse_error}->();
-                pop @$open_elements;
+              }->{$self->{open_elements}->[-1]->[1]}) {
+                $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
+                pop @{$self->{open_elements}};
               }
 
-              pop @$open_elements; # tr
-              $insertion_mode = 'in table body';
+              pop @{$self->{open_elements}}; # tr
+              $self->{insertion_mode} = 'in table body';
               ## reprocess
               redo B;
             } elsif ($token->{tag_name} eq 'table') {
               ## NOTE: This is a code clone of "table in table"
-              $self->{parse_error}->();
+              $self->{parse_error}-> (type => 'not closed:table');
 
               ## As if </table>
               ## have a table element in table scope
               my $i;
-              INSCOPE: for (reverse 0..$#$open_elements) {
-                my $node = $open_elements->[$_];
+              INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
+                my $node = $self->{open_elements}->[$_];
                 if ($node->[1] eq 'table') {
                   $i = $_;
                   last INSCOPE;
@@ -4979,7 +5045,7 @@ sub _construct_tree ($) {
                 }
               } # INSCOPE
               unless (defined $i) {
-                $self->{parse_error}->();
+                $self->{parse_error}-> (type => 'unmatched end tag:table');
                 ## Ignore tokens </table><table>
                 $token = $self->_get_next_token;
                 redo B;
@@ -4989,22 +5055,22 @@ sub _construct_tree ($) {
               if ({
                    dd => 1, dt => 1, li => 1, p => 1,
                    td => 1, th => 1, tr => 1,
-                  }->{$open_elements->[-1]->[1]}) {
+                  }->{$self->{open_elements}->[-1]->[1]}) {
                 unshift @{$self->{token}}, $token; # <table>
                 $token = {type => 'end tag', tag_name => 'table'};
                 unshift @{$self->{token}}, $token;
                 $token = {type => 'end tag',
-                          tag_name => $open_elements->[-1]->[1]}; # MUST
+                          tag_name => $self->{open_elements}->[-1]->[1]}; # MUST
                 redo B;
               }
 
-              if ($open_elements->[-1]->[1] ne 'table') {
-                $self->{parse_error}->();
+              if ($self->{open_elements}->[-1]->[1] ne 'table') {
+                $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
               }
 
-              splice @$open_elements, $i;
+              splice @{$self->{open_elements}}, $i;
 
-              $reset_insertion_mode->();              
+              $self->_reset_insertion_mode;
 
               ## reprocess
               redo B;
@@ -5015,8 +5081,8 @@ sub _construct_tree ($) {
             if ($token->{tag_name} eq 'tr') {
               ## have an element in table scope
               my $i;
-              INSCOPE: for (reverse 0..$#$open_elements) {
-                my $node = $open_elements->[$_];
+              INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
+                my $node = $self->{open_elements}->[$_];
                 if ($node->[1] eq $token->{tag_name}) {
                   $i = $_;
                   last INSCOPE;
@@ -5027,7 +5093,7 @@ sub _construct_tree ($) {
                 }
               } # INSCOPE
               unless (defined $i) {
-                $self->{parse_error}->();
+                $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
                 ## Ignore the token
                 $token = $self->_get_next_token;
                 redo B;
@@ -5036,21 +5102,21 @@ sub _construct_tree ($) {
               ## Clear back to table row context
               while (not {
                 tr => 1, html => 1,
-              }->{$open_elements->[-1]->[1]}) {
-                $self->{parse_error}->();
-                pop @$open_elements;
+              }->{$self->{open_elements}->[-1]->[1]}) {
+                $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
+                pop @{$self->{open_elements}};
               }
 
-              pop @$open_elements; # tr
-              $insertion_mode = 'in table body';
+              pop @{$self->{open_elements}}; # tr
+              $self->{insertion_mode} = 'in table body';
               $token = $self->_get_next_token;
               redo B;
             } elsif ($token->{tag_name} eq 'table') {
               ## As if </tr>
               ## have an element in table scope
               my $i;
-              INSCOPE: for (reverse 0..$#$open_elements) {
-                my $node = $open_elements->[$_];
+              INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
+                my $node = $self->{open_elements}->[$_];
                 if ($node->[1] eq 'tr') {
                   $i = $_;
                   last INSCOPE;
@@ -5061,7 +5127,7 @@ sub _construct_tree ($) {
                 }
               } # INSCOPE
               unless (defined $i) {
-                $self->{parse_error}->();
+                $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{type});
                 ## Ignore the token
                 $token = $self->_get_next_token;
                 redo B;
@@ -5070,13 +5136,13 @@ sub _construct_tree ($) {
               ## Clear back to table row context
               while (not {
                 tr => 1, html => 1,
-              }->{$open_elements->[-1]->[1]}) {
-                $self->{parse_error}->();
-                pop @$open_elements;
+              }->{$self->{open_elements}->[-1]->[1]}) {
+                $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
+                pop @{$self->{open_elements}};
               }
 
-              pop @$open_elements; # tr
-              $insertion_mode = 'in table body';
+              pop @{$self->{open_elements}}; # tr
+              $self->{insertion_mode} = 'in table body';
               ## reprocess
               redo B;
             } elsif ({
@@ -5084,8 +5150,8 @@ sub _construct_tree ($) {
                      }->{$token->{tag_name}}) {
               ## have an element in table scope
               my $i;
-              INSCOPE: for (reverse 0..$#$open_elements) {
-                my $node = $open_elements->[$_];
+              INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
+                my $node = $self->{open_elements}->[$_];
                 if ($node->[1] eq $token->{tag_name}) {
                   $i = $_;
                   last INSCOPE;
@@ -5096,7 +5162,7 @@ sub _construct_tree ($) {
                 }
               } # INSCOPE
               unless (defined $i) {
-                $self->{parse_error}->();
+                $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
                 ## Ignore the token
                 $token = $self->_get_next_token;
                 redo B;
@@ -5105,8 +5171,8 @@ sub _construct_tree ($) {
               ## As if </tr>
               ## have an element in table scope
               my $i;
-              INSCOPE: for (reverse 0..$#$open_elements) {
-                my $node = $open_elements->[$_];
+              INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
+                my $node = $self->{open_elements}->[$_];
                 if ($node->[1] eq 'tr') {
                   $i = $_;
                   last INSCOPE;
@@ -5117,7 +5183,7 @@ sub _construct_tree ($) {
                 }
               } # INSCOPE
               unless (defined $i) {
-                $self->{parse_error}->();
+                $self->{parse_error}-> (type => 'unmatched end tag:tr');
                 ## Ignore the token
                 $token = $self->_get_next_token;
                 redo B;
@@ -5126,20 +5192,20 @@ sub _construct_tree ($) {
               ## Clear back to table row context
               while (not {
                 tr => 1, html => 1,
-              }->{$open_elements->[-1]->[1]}) {
-                $self->{parse_error}->();
-                pop @$open_elements;
+              }->{$self->{open_elements}->[-1]->[1]}) {
+                $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
+                pop @{$self->{open_elements}};
               }
 
-              pop @$open_elements; # tr
-              $insertion_mode = 'in table body';
+              pop @{$self->{open_elements}}; # tr
+              $self->{insertion_mode} = 'in table body';
               ## reprocess
               redo B;
             } elsif ({
                       body => 1, caption => 1, col => 1,
                       colgroup => 1, html => 1, td => 1, th => 1,
                      }->{$token->{tag_name}}) {
-              $self->{parse_error}->();
+              $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
               ## Ignore the token
               $token = $self->_get_next_token;
               redo B;
@@ -5151,22 +5217,22 @@ sub _construct_tree ($) {
           }
 
           ## As if in table
-          $self->{parse_error}->();
+          $self->{parse_error}-> (type => 'in table:'.$token->{tag_name});
           $in_body->($insert_to_foster);
           redo B;
-        } elsif ($insertion_mode eq 'in cell') {
+        } elsif ($self->{insertion_mode} eq 'in cell') {
           if ($token->{type} eq 'character') {
             ## NOTE: This is a code clone of "character in body".
             $reconstruct_active_formatting_elements->($insert_to_current);
             
-            $open_elements->[-1]->[0]->manakai_append_text ($token->{data});
+            $self->{open_elements}->[-1]->[0]->manakai_append_text ($token->{data});
 
             $token = $self->_get_next_token;
             redo B;
           } elsif ($token->{type} eq 'comment') {
             ## NOTE: This is a code clone of "comment in body".
             my $comment = $self->{document}->create_comment ($token->{data});
-            $open_elements->[-1]->[0]->append_child ($comment);
+            $self->{open_elements}->[-1]->[0]->append_child ($comment);
             $token = $self->_get_next_token;
             redo B;
           } elsif ($token->{type} eq 'start tag') {
@@ -5177,8 +5243,8 @@ sub _construct_tree ($) {
                 }->{$token->{tag_name}}) {
               ## have an element in table scope
               my $tn;
-              INSCOPE: for (reverse 0..$#$open_elements) {
-                my $node = $open_elements->[$_];
+              INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
+                my $node = $self->{open_elements}->[$_];
                 if ($node->[1] eq 'td' or $node->[1] eq 'th') {
                   $tn = $node->[1];
                   last INSCOPE;
@@ -5189,7 +5255,7 @@ sub _construct_tree ($) {
                 }
               } # INSCOPE
               unless (defined $tn) {
-                $self->{parse_error}->();
+                $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
                 ## Ignore the token
                 $token = $self->_get_next_token;
                 redo B;
@@ -5206,8 +5272,8 @@ sub _construct_tree ($) {
             if ($token->{tag_name} eq 'td' or $token->{tag_name} eq 'th') {
               ## have an element in table scope
               my $i;
-              INSCOPE: for (reverse 0..$#$open_elements) {
-                my $node = $open_elements->[$_];
+              INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
+                my $node = $self->{open_elements}->[$_];
                 if ($node->[1] eq $token->{tag_name}) {
                   $i = $_;
                   last INSCOPE;
@@ -5218,7 +5284,7 @@ sub _construct_tree ($) {
                 }
               } # INSCOPE
               unless (defined $i) {
-                $self->{parse_error}->();
+                $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
                 ## Ignore the token
                 $token = $self->_get_next_token;
                 redo B;
@@ -5230,22 +5296,22 @@ sub _construct_tree ($) {
                    td => ($token->{tag_name} eq 'th'),
                    th => ($token->{tag_name} eq 'td'),
                    tr => 1,
-                  }->{$open_elements->[-1]->[1]}) {
+                  }->{$self->{open_elements}->[-1]->[1]}) {
                 unshift @{$self->{token}}, $token;
                 $token = {type => 'end tag',
-                          tag_name => $open_elements->[-1]->[1]}; # MUST
+                          tag_name => $self->{open_elements}->[-1]->[1]}; # MUST
                 redo B;
               }
 
-              if ($open_elements->[-1]->[1] ne $token->{tag_name}) {
-                $self->{parse_error}->();
+              if ($self->{open_elements}->[-1]->[1] ne $token->{tag_name}) {
+                $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
               }
 
-              splice @$open_elements, $i;
+              splice @{$self->{open_elements}}, $i;
 
               $clear_up_to_marker->();
 
-              $insertion_mode = 'in row';
+              $self->{insertion_mode} = 'in row';
 
               $token = $self->_get_next_token;
               redo B;
@@ -5253,7 +5319,7 @@ sub _construct_tree ($) {
                       body => 1, caption => 1, col => 1,
                       colgroup => 1, html => 1,
                      }->{$token->{tag_name}}) {
-              $self->{parse_error}->();
+              $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
               ## Ignore the token
               $token = $self->_get_next_token;
               redo B;
@@ -5264,8 +5330,8 @@ sub _construct_tree ($) {
               ## have an element in table scope
               my $i;
               my $tn;
-              INSCOPE: for (reverse 0..$#$open_elements) {
-                my $node = $open_elements->[$_];
+              INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
+                my $node = $self->{open_elements}->[$_];
                 if ($node->[1] eq $token->{tag_name}) {
                   $i = $_;
                   last INSCOPE;
@@ -5280,7 +5346,7 @@ sub _construct_tree ($) {
                 }
               } # INSCOPE
               unless (defined $i) {
-                $self->{parse_error}->();
+                $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
                 ## Ignore the token
                 $token = $self->_get_next_token;
                 redo B;
@@ -5299,21 +5365,21 @@ sub _construct_tree ($) {
           
           $in_body->($insert_to_current);
           redo B;
-        } elsif ($insertion_mode eq 'in select') {
+        } elsif ($self->{insertion_mode} eq 'in select') {
           if ($token->{type} eq 'character') {
-            $open_elements->[-1]->[0]->manakai_append_text ($token->{data});
+            $self->{open_elements}->[-1]->[0]->manakai_append_text ($token->{data});
             $token = $self->_get_next_token;
             redo B;
           } elsif ($token->{type} eq 'comment') {
             my $comment = $self->{document}->create_comment ($token->{data});
-            $open_elements->[-1]->[0]->append_child ($comment);
+            $self->{open_elements}->[-1]->[0]->append_child ($comment);
             $token = $self->_get_next_token;
             redo B;
           } elsif ($token->{type} eq 'start tag') {
             if ($token->{tag_name} eq 'option') {
-              if ($open_elements->[-1]->[1] eq 'option') {
+              if ($self->{open_elements}->[-1]->[1] eq 'option') {
                 ## As if </option>
-                pop @$open_elements;
+                pop @{$self->{open_elements}};
               }
 
               
@@ -5328,21 +5394,21 @@ sub _construct_tree ($) {
                                   $token->{attributes} ->{$attr_name}->{value});
         }
       
-      $open_elements->[-1]->[0]->append_child ($el);
-      push @$open_elements, [$el, $token->{tag_name}];
+      $self->{open_elements}->[-1]->[0]->append_child ($el);
+      push @{$self->{open_elements}}, [$el, $token->{tag_name}];
     }
   
               $token = $self->_get_next_token;
               redo B;
             } elsif ($token->{tag_name} eq 'optgroup') {
-              if ($open_elements->[-1]->[1] eq 'option') {
+              if ($self->{open_elements}->[-1]->[1] eq 'option') {
                 ## As if </option>
-                pop @$open_elements;
+                pop @{$self->{open_elements}};
               }
 
-              if ($open_elements->[-1]->[1] eq 'optgroup') {
+              if ($self->{open_elements}->[-1]->[1] eq 'optgroup') {
                 ## As if </optgroup>
-                pop @$open_elements;
+                pop @{$self->{open_elements}};
               }
 
               
@@ -5357,19 +5423,19 @@ sub _construct_tree ($) {
                                   $token->{attributes} ->{$attr_name}->{value});
         }
       
-      $open_elements->[-1]->[0]->append_child ($el);
-      push @$open_elements, [$el, $token->{tag_name}];
+      $self->{open_elements}->[-1]->[0]->append_child ($el);
+      push @{$self->{open_elements}}, [$el, $token->{tag_name}];
     }
   
               $token = $self->_get_next_token;
               redo B;
             } elsif ($token->{tag_name} eq 'select') {
-              $self->{parse_error}->();
+              $self->{parse_error}-> (type => 'not closed:select');
               ## As if </select> instead
               ## have an element in table scope
               my $i;
-              INSCOPE: for (reverse 0..$#$open_elements) {
-                my $node = $open_elements->[$_];
+              INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
+                my $node = $self->{open_elements}->[$_];
                 if ($node->[1] eq $token->{tag_name}) {
                   $i = $_;
                   last INSCOPE;
@@ -5380,15 +5446,15 @@ sub _construct_tree ($) {
                 }
               } # INSCOPE
               unless (defined $i) {
-                $self->{parse_error}->();
+                $self->{parse_error}-> (type => 'unmatched end tag:select');
                 ## Ignore the token
                 $token = $self->_get_next_token;
                 redo B;
               }
               
-              splice @$open_elements, $i;
+              splice @{$self->{open_elements}}, $i;
 
-              $reset_insertion_mode->();
+              $self->_reset_insertion_mode;
 
               $token = $self->_get_next_token;
               redo B;
@@ -5397,23 +5463,23 @@ sub _construct_tree ($) {
             }
           } elsif ($token->{type} eq 'end tag') {
             if ($token->{tag_name} eq 'optgroup') {
-              if ($open_elements->[-1]->[1] eq 'option' and
-                  $open_elements->[-2]->[1] eq 'optgroup') {
+              if ($self->{open_elements}->[-1]->[1] eq 'option' and
+                  $self->{open_elements}->[-2]->[1] eq 'optgroup') {
                 ## As if </option>
-                splice @$open_elements, -2;
-              } elsif ($open_elements->[-1]->[1] eq 'optgroup') {
-                pop @$open_elements;
+                splice @{$self->{open_elements}}, -2;
+              } elsif ($self->{open_elements}->[-1]->[1] eq 'optgroup') {
+                pop @{$self->{open_elements}};
               } else {
-                $self->{parse_error}->();
+                $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
                 ## Ignore the token
               }
               $token = $self->_get_next_token;
               redo B;
             } elsif ($token->{tag_name} eq 'option') {
-              if ($open_elements->[-1]->[1] eq 'option') {
-                pop @$open_elements;
+              if ($self->{open_elements}->[-1]->[1] eq 'option') {
+                pop @{$self->{open_elements}};
               } else {
-                $self->{parse_error}->();
+                $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
                 ## Ignore the token
               }
               $token = $self->_get_next_token;
@@ -5421,8 +5487,8 @@ sub _construct_tree ($) {
             } elsif ($token->{tag_name} eq 'select') {
               ## have an element in table scope
               my $i;
-              INSCOPE: for (reverse 0..$#$open_elements) {
-                my $node = $open_elements->[$_];
+              INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
+                my $node = $self->{open_elements}->[$_];
                 if ($node->[1] eq $token->{tag_name}) {
                   $i = $_;
                   last INSCOPE;
@@ -5433,15 +5499,15 @@ sub _construct_tree ($) {
                 }
               } # INSCOPE
               unless (defined $i) {
-                $self->{parse_error}->();
+                $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
                 ## Ignore the token
                 $token = $self->_get_next_token;
                 redo B;
               }
               
-              splice @$open_elements, $i;
+              splice @{$self->{open_elements}}, $i;
 
-              $reset_insertion_mode->();
+              $self->_reset_insertion_mode;
 
               $token = $self->_get_next_token;
               redo B;
@@ -5449,12 +5515,12 @@ sub _construct_tree ($) {
                       caption => 1, table => 1, tbody => 1,
                       tfoot => 1, thead => 1, tr => 1, td => 1, th => 1,
                      }->{$token->{tag_name}}) {
-              $self->{parse_error}->();
+              $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
               
               ## have an element in table scope
               my $i;
-              INSCOPE: for (reverse 0..$#$open_elements) {
-                my $node = $open_elements->[$_];
+              INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
+                my $node = $self->{open_elements}->[$_];
                 if ($node->[1] eq $token->{tag_name}) {
                   $i = $_;
                   last INSCOPE;
@@ -5473,8 +5539,8 @@ sub _construct_tree ($) {
               ## As if </select>
               ## have an element in table scope
               undef $i;
-              INSCOPE: for (reverse 0..$#$open_elements) {
-                my $node = $open_elements->[$_];
+              INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
+                my $node = $self->{open_elements}->[$_];
                 if ($node->[1] eq 'select') {
                   $i = $_;
                   last INSCOPE;
@@ -5485,15 +5551,15 @@ sub _construct_tree ($) {
                 }
               } # INSCOPE
               unless (defined $i) {
-                $self->{parse_error}->();
+                $self->{parse_error}-> (type => 'unmatched end tag:select');
                 ## Ignore the </select> token
                 $token = $self->_get_next_token; ## TODO: ok?
                 redo B;
               }
               
-              splice @$open_elements, $i;
+              splice @{$self->{open_elements}}, $i;
 
-              $reset_insertion_mode->();
+              $self->_reset_insertion_mode;
 
               ## reprocess
               redo B;
@@ -5504,17 +5570,17 @@ sub _construct_tree ($) {
             #
           }
 
-          $self->{parse_error}->();
+          $self->{parse_error}-> (type => 'in select:'.$token->{tag_name});
           ## Ignore the token
           $token = $self->_get_next_token;
           redo B;
-        } elsif ($insertion_mode eq 'after body') {
+        } elsif ($self->{insertion_mode} eq 'after body') {
           if ($token->{type} eq 'character') {
             if ($token->{data} =~ s/^([\x09\x0A\x0B\x0C\x20]+)//) {
               ## As if in body
               $reconstruct_active_formatting_elements->($insert_to_current);
               
-              $open_elements->[-1]->[0]->manakai_append_text ($token->{data});
+              $self->{open_elements}->[-1]->[0]->manakai_append_text ($token->{data});
 
               unless (length $token->{data}) {
                 $token = $self->_get_next_token;
@@ -5523,33 +5589,41 @@ sub _construct_tree ($) {
             }
             
             #
+            $self->{parse_error}-> (type => 'after body:#'.$token->{type});
           } elsif ($token->{type} eq 'comment') {
             my $comment = $self->{document}->create_comment ($token->{data});
-            $open_elements->[0]->[0]->append_child ($comment);
+            $self->{open_elements}->[0]->[0]->append_child ($comment);
             $token = $self->_get_next_token;
             redo B;
+          } elsif ($token->{type} eq 'start tag') {
+            $self->{parse_error}-> (type => 'after body:'.$token->{tag_name});
+            #
           } elsif ($token->{type} eq 'end tag') {
             if ($token->{tag_name} eq 'html') {
-              ## TODO: if inner_html, parse-error, ignore the token; otherwise,
-
-              $phase = 'trailing end';
-              $token = $self->_get_next_token;
-              redo B;
+              if (defined $self->{inner_html_node}) {
+                $self->{parse_error}-> (type => 'unmatched end tag:html');
+                ## Ignore the token
+                $token = $self->_get_next_token;
+                redo B;
+              } else {
+                $phase = 'trailing end';
+                $token = $self->_get_next_token;
+                redo B;
+              }
             } else {
-              #
+              $self->{parse_error}-> (type => 'after body:/'.$token->{tag_name});
             }
           } else {
-            #
+            $self->{parse_error}-> (type => 'after body:#'.$token->{type});
           }
 
-          $self->{parse_error}-> ('data after body');
-          $insertion_mode = 'in body';
+          $self->{insertion_mode} = 'in body';
           ## reprocess
           redo B;
-        } elsif ($insertion_mode eq 'in frameset') {
+        } elsif ($self->{insertion_mode} eq 'in frameset') {
           if ($token->{type} eq 'character') {
             if ($token->{data} =~ s/^([\x09\x0A\x0B\x0C\x20]+)//) {
-              $open_elements->[-1]->[0]->manakai_append_text ($token->{data});
+              $self->{open_elements}->[-1]->[0]->manakai_append_text ($token->{data});
 
               unless (length $token->{data}) {
                 $token = $self->_get_next_token;
@@ -5560,7 +5634,7 @@ sub _construct_tree ($) {
             #
           } elsif ($token->{type} eq 'comment') {
             my $comment = $self->{document}->create_comment ($token->{data});
-            $open_elements->[-1]->[0]->append_child ($comment);
+            $self->{open_elements}->[-1]->[0]->append_child ($comment);
             $token = $self->_get_next_token;
             redo B;
           } elsif ($token->{type} eq 'start tag') {
@@ -5577,8 +5651,8 @@ sub _construct_tree ($) {
                                   $token->{attributes} ->{$attr_name}->{value});
         }
       
-      $open_elements->[-1]->[0]->append_child ($el);
-      push @$open_elements, [$el, $token->{tag_name}];
+      $self->{open_elements}->[-1]->[0]->append_child ($el);
+      push @{$self->{open_elements}}, [$el, $token->{tag_name}];
     }
   
               $token = $self->_get_next_token;
@@ -5596,11 +5670,11 @@ sub _construct_tree ($) {
                                   $token->{attributes} ->{$attr_name}->{value});
         }
       
-      $open_elements->[-1]->[0]->append_child ($el);
-      push @$open_elements, [$el, $token->{tag_name}];
+      $self->{open_elements}->[-1]->[0]->append_child ($el);
+      push @{$self->{open_elements}}, [$el, $token->{tag_name}];
     }
   
-              pop @$open_elements;
+              pop @{$self->{open_elements}};
               $token = $self->_get_next_token;
               redo B;
             } elsif ($token->{tag_name} eq 'noframes') {
@@ -5611,19 +5685,19 @@ sub _construct_tree ($) {
             }
           } elsif ($token->{type} eq 'end tag') {
             if ($token->{tag_name} eq 'frameset') {
-              if ($open_elements->[-1]->[1] eq 'html' and
-                  @$open_elements == 1) {
-                $self->{parse_error}->();
+              if ($self->{open_elements}->[-1]->[1] eq 'html' and
+                  @{$self->{open_elements}} == 1) {
+                $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
                 ## Ignore the token
                 $token = $self->_get_next_token;
               } else {
-                pop @$open_elements;
+                pop @{$self->{open_elements}};
                 $token = $self->_get_next_token;
               }
               
               ## if not inner_html and
-              if ($open_elements->[-1]->[1] ne 'frameset') {
-                $insertion_mode = 'after frameset';
+              if ($self->{open_elements}->[-1]->[1] ne 'frameset') {
+                $self->{insertion_mode} = 'after frameset';
               }
               redo B;
             } else {
@@ -5633,14 +5707,18 @@ sub _construct_tree ($) {
             #
           }
           
-          $self->{parse_error}->();
+          if (defined $token->{tag_name}) {
+            $self->{parse_error}-> (type => 'in frameset:'.$token->{tag_name});
+          } else {
+            $self->{parse_error}-> (type => 'in frameset:#'.$token->{type});
+          }
           ## Ignore the token
           $token = $self->_get_next_token;
           redo B;
-        } elsif ($insertion_mode eq 'after frameset') {
+        } elsif ($self->{insertion_mode} eq 'after frameset') {
           if ($token->{type} eq 'character') {
             if ($token->{data} =~ s/^([\x09\x0A\x0B\x0C\x20]+)//) {
-              $open_elements->[-1]->[0]->manakai_append_text ($token->{data});
+              $self->{open_elements}->[-1]->[0]->manakai_append_text ($token->{data});
 
               unless (length $token->{data}) {
                 $token = $self->_get_next_token;
@@ -5651,7 +5729,7 @@ sub _construct_tree ($) {
             #
           } elsif ($token->{type} eq 'comment') {
             my $comment = $self->{document}->create_comment ($token->{data});
-            $open_elements->[-1]->[0]->append_child ($comment);
+            $self->{open_elements}->[-1]->[0]->append_child ($comment);
             $token = $self->_get_next_token;
             redo B;
           } elsif ($token->{type} eq 'start tag') {
@@ -5673,21 +5751,25 @@ sub _construct_tree ($) {
             #
           }
           
-          $self->{parse_error}->();
+          if (defined $token->{tag_name}) {
+            $self->{parse_error}-> (type => 'after frameset:'.$token->{tag_name});
+          } else {
+            $self->{parse_error}-> (type => 'after frameset:#'.$token->{type});
+          }
           ## Ignore the token
           $token = $self->_get_next_token;
           redo B;
 
           ## ISSUE: An issue in spec there
         } else {
-          die "$0: $insertion_mode: Unknown insertion mode";
+          die "$0: $self->{insertion_mode}: Unknown insertion mode";
         }
       }
     } elsif ($phase eq 'trailing end') {
       ## states in the main stage is preserved yet # MUST
       
       if ($token->{type} eq 'DOCTYPE') {
-        $self->{parse_error}->();
+        $self->{parse_error}-> (type => 'after html:#DOCTYPE');
         ## Ignore the token
         $token = $self->_get_next_token;
         redo B;
@@ -5706,7 +5788,7 @@ sub _construct_tree ($) {
           $reconstruct_active_formatting_elements->($insert_to_current)
             if $phase eq 'main';
           
-          $open_elements->[-1]->[0]->manakai_append_text ($data);
+          $self->{open_elements}->[-1]->[0]->manakai_append_text ($data);
           
           unless (length $token->{data}) {
             $token = $self->_get_next_token;
@@ -5714,13 +5796,13 @@ sub _construct_tree ($) {
           }
         }
 
-        $self->{parse_error}->();
+        $self->{parse_error}-> (type => 'after html:#character');
         $phase = 'main';
         ## reprocess
         redo B;
       } elsif ($token->{type} eq 'start tag' or
                $token->{type} eq 'end tag') {
-        $self->{parse_error}->();
+        $self->{parse_error}-> (type => 'after html:'.$token->{tag_name});
         $phase = 'main';
         ## reprocess
         redo B;
@@ -5736,10 +5818,163 @@ sub _construct_tree ($) {
   ## Stop parsing # MUST
   
   ## TODO: script stuffs
-} # _construct_tree
+} # _tree_construct_main
+
+sub set_inner_html ($$$) {
+  my $class = shift;
+  my $node = shift;
+  my $s = \$_[0];
+  my $onerror = $_[1];
+
+  my $nt = $node->node_type;
+  if ($nt == 9) {
+    # MUST
+    
+    ## Step 1 # MUST
+    ## TODO: If the document has an active parser, ...
+    ## ISSUE: There is an issue in the spec.
+    
+    ## Step 2 # MUST
+    my @cn = @{$node->child_nodes};
+    for (@cn) {
+      $node->remove_child ($_);
+    }
+
+    ## Step 3, 4, 5 # MUST
+    $class->parse_string ($$s => $node, $onerror);
+  } elsif ($nt == 1) {
+    ## TODO: If non-html element
+
+    ## NOTE: Most of this code is copied from |parse_string|
+
+    ## Step 1 # MUST
+    my $doc = $node->owner_document->implementation->create_document;
+    ## TODO: Mark as HTML document
+    my $p = $class->new;
+    $p->{document} = $doc;
+
+    ## Step 9 # MUST
+    my $i = 0;
+    my $line = 1;
+    my $column = 0;
+    $p->{set_next_input_character} = sub {
+      my $self = shift;
+      $self->{next_input_character} = -1 and return if $i >= length $$s;
+      $self->{next_input_character} = ord substr $$s, $i++, 1;
+      $column++;
+      
+      if ($self->{next_input_character} == 0x000D) { # CR
+        if ($i >= length $$s) {
+          #
+        } else {
+          my $next_char = ord substr $$s, $i++, 1;
+          if ($next_char == 0x000A) { # LF
+            #
+          } else {
+            push @{$self->{char}}, $next_char;
+          }
+        }
+        $self->{next_input_character} = 0x000A; # LF # MUST
+        $line++;
+        $column = -1;
+      } elsif ($self->{next_input_character} > 0x10FFFF) {
+        $self->{next_input_character} = 0xFFFD; # REPLACEMENT CHARACTER # MUST
+      } elsif ($self->{next_input_character} == 0x0000) { # NULL
+        $self->{next_input_character} = 0xFFFD; # REPLACEMENT CHARACTER # MUST
+      }
+    };
+    
+    my $ponerror = $onerror || sub {
+      my (%opt) = @_;
+      warn "Parse error ($opt{type}) at line $opt{line} column $opt{column}\n";
+    };
+    $p->{parse_error} = sub {
+      $ponerror->(@_, line => $line, column => $column);
+    };
+    
+    $p->_initialize_tokenizer;
+    $p->_initialize_tree_constructor;
+
+    ## Step 2
+    my $node_ln = $node->local_name;
+    $p->{content_model_flag} = {
+      title => 'RCDATA',
+      textarea => 'RCDATA',
+      style => 'CDATA',
+      script => 'CDATA',
+      xmp => 'CDATA',
+      iframe => 'CDATA',
+      noembed => 'CDATA',
+      noframes => 'CDATA',
+      noscript => 'CDATA',
+      plaintext => 'PLAINTEXT',
+    }->{$node_ln} || 'PCDATA';
+       ## ISSUE: What is "the name of the element"? local name?
+
+    $p->{inner_html_node} = [$node, $node_ln];
+
+    ## Step 4
+    my $root = $doc->create_element_ns
+      ('http://www.w3.org/1999/xhtml', [undef, 'html']);
+
+    ## Step 5 # MUST
+    $doc->append_child ($root);
+
+    ## Step 6 # MUST
+    push @{$p->{open_elements}}, [$root, 'html'];
+
+    undef $p->{head_element};
+
+    ## Step 7 # MUST
+    $p->_reset_insertion_mode;
+
+    ## Step 8 # MUST
+    my $anode = $node;
+    AN: while (defined $anode) {
+      if ($anode->node_type == 1) {
+        my $nsuri = $anode->namespace_uri;
+        if (defined $nsuri and $nsuri eq 'http://www.w3.org/1999/xhtml') {
+          if ($anode->local_name eq 'form') { ## TODO: case?
+            $p->{form_element} = $anode;
+            last AN;
+          }
+        }
+      }
+      $anode = $anode->parent_node;
+    } # AN
+    
+    ## Step 3 # MUST
+    ## Step 10 # MUST
+    {
+      my $self = $p;
+      $token = $self->_get_next_token;
+    }
+    $p->_tree_construction_main;
+
+    ## Step 11 # MUST
+    my @cn = @{$node->child_nodes};
+    for (@cn) {
+      $node->remove_child ($_);
+    }
+    ## ISSUE: mutation events? read-only?
+
+    ## Step 12 # MUST
+    @cn = @{$root->child_nodes};
+    for (@cn) {
+      $node->append_child ($_);
+    }
+    ## ISSUE: adopt_node? mutation events?
+
+    $p->_terminate_tree_constructor;
+  } else {
+    die "$0: |set_inner_html| is not defined for node of type $nt";
+  }
+} # set_inner_html
+
+} # tree construction stage
 
 sub get_inner_html ($$$) {
-  my ($class, $node, $on_error) = @_;
+  my (undef, $node, $on_error) = @_;
 
   ## Step 1
   my $s = '';
@@ -5836,4 +6071,4 @@ sub get_inner_html ($$$) {
 } # get_inner_html
 
 1;
-# $Date: 2007/05/01 10:47:37 $
+# $Date: 2007/05/02 13:44:33 $

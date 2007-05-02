@@ -1,3 +1,19 @@
+2007-05-02  Wakaba  <wakaba@suika.fam.cx>
+
+	* NanoDOM.pm (DOMImplementation): New class.
+	(append_child): Weaken the |parent_node| reference.
+	(create_element_ns, Element new): Set the |owner_document|
+	reference.
+	(implementation): New attribute.
+	(owner_document, local_name, namespace_uri): New attributes.
+
+	* HTML.pm.src (parse_string): Line and column numbers
+	are now provided to error handler.
+	(!!!parse-error): Short descriptions are added.
+	(_construct_tree): Split into three methods; support
+	for innerHTML mode.
+	(set_inner_html): New method.
+
 2007-05-01  Wakaba  <wakaba@suika.fam.cx>
 
 	* NanoDOM.html: Documentation is added.
