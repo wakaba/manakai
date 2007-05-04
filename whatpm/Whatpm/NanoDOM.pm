@@ -39,6 +39,19 @@ sub parent_node ($) {
   return shift->{parent_node};
 } # parent_node
 
+sub manakai_parent_element ($) {
+  my $self = shift;
+  my $parent = $self->{parent_node};
+  while (defined $parent) {
+    if ($parent->node_type == 1) {
+      return $parent;
+    } else {
+      $parent = $parent->{parent_node};
+    }
+  }
+  return undef;
+} # manakai_parent_element
+
 ## NOTE: Only applied to Elements and Documents
 sub child_nodes ($) {
   return shift->{child_nodes};
@@ -193,6 +206,16 @@ sub implementation ($) {
   return 'Whatpm::NanoDOM::DOMImplementation';
 } # implementation
 
+sub document_element ($) {
+  my $self = shift;
+  for (@{$self->child_nodes}) {
+    if ($_->node_type == 1) {
+      return $_;
+    }
+  }
+  return undef;
+} # document_element
+
 package Whatpm::NanoDOM::Element;
 push our @ISA, 'Whatpm::NanoDOM::Node';
 
@@ -263,9 +286,30 @@ sub local_name ($) { # TODO: HTML5 case
   return shift->{local_name};
 } # local_name
 
+sub manakai_local_name ($) {
+  return shift->{local_name}; # no case fixing for HTML5
+} # manakai_local_name
+
 sub namespace_uri ($) {
   return shift->{namespace_uri};
 } # namespace_uri
+
+sub manakai_element_type_match ($$$) {
+  my ($self, $nsuri, $ln) = @_;
+  if (defined $nsuri) {
+    if (defined $self->{namespace_uri} and $nsuri eq $self->{namespace_uri}) {
+      return ($ln eq $self->{local_name});
+    } else {
+      return 0;
+    }
+  } else {
+    if (not defined $self->{namespace_uri}) {
+      return ($ln eq $self->{local_name});
+    } else {
+      return 0;
+    }
+  }
+} # manakai_element_type_match
 
 sub node_type { 1 }
 
@@ -382,4 +426,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2007/05/02 13:44:34 $
+# $Date: 2007/05/04 09:16:04 $

@@ -1,5 +1,93 @@
 {"tests": [
 
+{"description":"<!DOCTYPE",
+"input":"<!DOCTYPE",
+"output":["ParseError","ParseError",["DOCTYPE", "", true]]},
+
+{"description":"<!DOCTYPE ",
+"input":"<!DOCTYPE ",
+"output":["ParseError",["DOCTYPE", "", true]]},
+
+{"description":"<!DOCTYPE >",
+"input":"<!DOCTYPE >",
+"output":["ParseError",["DOCTYPE", "", true]]},
+
+{"description":"<!DOCTYPE h",
+"input":"<!DOCTYPE h",
+"output":["ParseError",["DOCTYPE", "H", true]]},
+
+{"description":"<!DOCTYPE H",
+"input":"<!DOCTYPE H",
+"output":["ParseError",["DOCTYPE", "H", true]]},
+
+{"description":"<!DOCTYPE h>",
+"input":"<!DOCTYPE h>",
+"output":[["DOCTYPE", "H", true]]},
+
+{"description":"<!DOCTYPE H>",
+"input":"<!DOCTYPE H>",
+"output":[["DOCTYPE", "H", true]]},
+
+{"description":"<!DOCTYPE ht",
+"input":"<!DOCTYPE ht",
+"output":["ParseError",["DOCTYPE", "HT", true]]},
+
+{"description":"<!DOCTYPE Ht",
+"input":"<!DOCTYPE Ht",
+"output":["ParseError",["DOCTYPE", "HT", true]]},
+
+{"description":"<!DOCTYPE hT",
+"input":"<!DOCTYPE hT",
+"output":["ParseError",["DOCTYPE", "HT", true]]},
+
+{"description":"<!DOCTYPE ht>",
+"input":"<!DOCTYPE ht>",
+"output":[["DOCTYPE", "HT", true]]},
+
+{"description":"<!DOCTYPE Ht>",
+"input":"<!DOCTYPE Ht>",
+"output":[["DOCTYPE", "HT", true]]},
+
+{"description":"<!DOCTYPE hT>",
+"input":"<!DOCTYPE hT>",
+"output":[["DOCTYPE", "HT", true]]},
+
+{"description":"<!DOCTYPE hT>",
+"input":"<!DOCTYPE hT>",
+"output":[["DOCTYPE", "HT", true]]},
+
+{"description":"<!DOCTYPE htm",
+"input":"<!DOCTYPE htm",
+"output":["ParseError",["DOCTYPE", "HTM", true]]},
+
+{"description":"<!DOCTYPE Htm",
+"input":"<!DOCTYPE Htm",
+"output":["ParseError",["DOCTYPE", "HTM", true]]},
+
+{"description":"<!DOCTYPE hTM",
+"input":"<!DOCTYPE hTM",
+"output":["ParseError",["DOCTYPE", "HTM", true]]},
+
+{"description":"<!DOCTYPE htm>",
+"input":"<!DOCTYPE htm>",
+"output":[["DOCTYPE", "HTM", true]]},
+
+{"description":"<!DOCTYPE Htm>",
+"input":"<!DOCTYPE Htm>",
+"output":[["DOCTYPE", "HTM", true]]},
+
+{"description":"<!DOCTYPE hTM>",
+"input":"<!DOCTYPE hTM>",
+"output":[["DOCTYPE", "HTM", true]]},
+
+{"description":"<!DOCTYPE html5",
+"input":"<!DOCTYPE html5",
+"output":["ParseError",["DOCTYPE", "HTML5", true]]},
+
+{"description":"<!DOCTYPE html5>",
+"input":"<!DOCTYPE html5>",
+"output":[["DOCTYPE", "HTML5", true]]},
+
 {"description":"non-PCDATA content model flag, start tag-like string",
 "contentModelFlags":["PLAINTEXT","RCDATA","CDATA"],
 "input":"<div>",

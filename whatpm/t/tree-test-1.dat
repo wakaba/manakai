@@ -203,21 +203,61 @@ base in body
 #data
 <!DOCTYPE html><b><p>
 #errors
-...TBD
+<b> not closed
 #document
 | <!DOCTYPE HTML>
 | <html>
 |   <head>
 |   <body>
-|     ????
+|     <b>
+|       <p>
 
 #data
 <!DOCTYPE html><b><p>X
 #errors
-...TBD
+<b> not closed
 #document
 | <!DOCTYPE HTML>
 | <html>
 |   <head>
 |   <body>
-|     ????
+|     <b>
+|       <p>
+|         "X"
+
+#data
+<link rel="a" href="b">
+#errors
+link in body
+#document-fragment head
+| <link>
+|   href="b"
+|   rel="a"
+
+#data
+<meta name="a" content="b">
+#errors
+meta in body
+#document-fragment head
+| <meta>
+|   content="b"
+|   name="a"
+
+#data
+<base href="a" target="b">
+#errors
+base in body
+#document-fragment head
+| <base>
+|   href="a"
+|   target="b"
+
+#data
+<base href="a" target="b">a
+#errors
+base in body
+#document-fragment head
+| <base>
+|   href="a"
+|   target="b"
+| "a"

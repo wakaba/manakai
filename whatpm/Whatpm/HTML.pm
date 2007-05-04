@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## This is an early version of an HTML parser.
 
@@ -278,7 +278,43 @@ my $entity_char = {
   zeta => "\x{03B6}",
   zwj => "\x{200D}",
   zwnj => "\x{200C}",
-};
+}; # $entity_char
+
+## <http://lists.whatwg.org/pipermail/whatwg-whatwg.org/2006-December/thread.html#8562>
+my $c1_entity_char = {
+     128, 8364,
+     129, 65533,
+     130, 8218,
+     131, 402,
+     132, 8222,
+     133, 8230,
+     134, 8224,
+     135, 8225,
+     136, 710,
+     137, 8240,
+     138, 352,
+     139, 8249,
+     140, 338,
+     141, 65533,
+     142, 381,
+     143, 65533,
+     144, 65533,
+     145, 8216,
+     146, 8217,
+     147, 8220,
+     148, 8221,
+     149, 8226,
+     150, 8211,
+     151, 8212,
+     152, 732,
+     153, 8482,
+     154, 353,
+     155, 8250,
+     156, 339,
+     157, 65533,
+     158, 382,
+     159, 376,
+}; # $c1_entity_char
 
 my $special_category = {
   address => 1, area => 1, base => 1, basefont => 1, bgsound => 1,
@@ -318,7 +354,10 @@ sub parse_string ($$$;$) {
     $self->{next_input_character} = ord substr $$s, $i++, 1;
     $column++;
     
-    if ($self->{next_input_character} == 0x000D) { # CR
+    if ($self->{next_input_character} == 0x000A) { # LF
+      $line++;
+      $column = 0;
+    } elsif ($self->{next_input_character} == 0x000D) { # CR
       if ($i >= length $$s) {
         #
       } else {
@@ -331,7 +370,7 @@ sub parse_string ($$$;$) {
       }
       $self->{next_input_character} = 0x000A; # LF # MUST
       $line++;
-      $column = -1;
+      $column = 0;
     } elsif ($self->{next_input_character} > 0x10FFFF) {
       $self->{next_input_character} = 0xFFFD; # REPLACEMENT CHARACTER # MUST
     } elsif ($self->{next_input_character} == 0x0000) { # NULL
@@ -1737,6 +1776,7 @@ sub _get_next_token ($) {
         redo A;
       } elsif (0x0061 <= $self->{next_input_character} and
                $self->{next_input_character} <= 0x007A) { # a..z
+## ISSUE: "Set the token's name name to the" in the spec
         $self->{current_token} = {type => 'DOCTYPE',
                           name => chr ($self->{next_input_character} - 0x0020),
                           error => 1};
@@ -1775,6 +1815,7 @@ sub _get_next_token ($) {
         $self->{current_token} = {type => 'DOCTYPE',
                           name => chr ($self->{next_input_character}),
                           error => 1};
+## ISSUE: "Set the token's name name to the" in the spec
         $self->{state} = 'DOCTYPE name';
         
       if (@{$self->{char}}) {
@@ -1958,9 +1999,9 @@ sub _tokenize_attempt_to_consume_an_entity ($) {
         $self->{set_next_input_character}->($self);
       }
   
-    my $num;
     if ($self->{next_input_character} == 0x0078 or # x
         $self->{next_input_character} == 0x0058) { # X
+      my $num;
       X: {
         my $x_char = $self->{next_input_character};
         
@@ -2008,9 +2049,14 @@ sub _tokenize_attempt_to_consume_an_entity ($) {
         }
 
         ## TODO: check the definition for |a valid Unicode character|.
+        ## <http://lists.whatwg.org/pipermail/whatwg-whatwg.org/2006-December/thread.html#8189>
         if ($num > 1114111 or $num == 0) {
           $num = 0xFFFD; # REPLACEMENT CHARACTER
           ## ISSUE: Why this is not an error?
+        } elsif (0x80 <= $num and $num <= 0x9F) {
+          ## NOTE: <http://lists.whatwg.org/pipermail/whatwg-whatwg.org/2006-December/thread.html#8562>
+          ## ISSUE: Not in the spec yet; parse error?
+          $num = $c1_entity_char->{$num};
         }
 
         return {type => 'character', data => chr $num};
@@ -2056,6 +2102,10 @@ sub _tokenize_attempt_to_consume_an_entity ($) {
       if ($code > 1114111 or $code == 0) {
         $code = 0xFFFD; # REPLACEMENT CHARACTER
         ## ISSUE: Why this is not an error?
+      } elsif (0x80 <= $code and $code <= 0x9F) {
+        ## NOTE: <http://lists.whatwg.org/pipermail/whatwg-whatwg.org/2006-December/thread.html#8562>
+        ## ISSUE: Not in the spec yet; parse error?
+        $code = $c1_entity_char->{$code};
       }
       
       return {type => 'character', data => chr $code};
@@ -2541,7 +2591,7 @@ sub _tree_construction_main ($) {
             $formatting_element_i_in_open = $_;
             last INSCOPE;
           } else { # in open elements but not in scope
-            $self->{parse_error}->();
+            $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
             ## Ignore the token
             $token = $self->_get_next_token;
             return;
@@ -2554,13 +2604,13 @@ sub _tree_construction_main ($) {
         }
       } # INSCOPE
       unless (defined $formatting_element_i_in_open) {
-        $self->{parse_error}->();
+        $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
         pop @$active_formatting_elements; # $formatting_element
         $token = $self->_get_next_token; ## TODO: ok?
         return;
       }
       if (not $self->{open_elements}->[-1]->[0] eq $formatting_element->[0]) {
-        $self->{parse_error}->();
+        $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
       }
       
       ## Step 2
@@ -5862,8 +5912,11 @@ sub set_inner_html ($$$) {
       $self->{next_input_character} = -1 and return if $i >= length $$s;
       $self->{next_input_character} = ord substr $$s, $i++, 1;
       $column++;
-      
-      if ($self->{next_input_character} == 0x000D) { # CR
+
+      if ($self->{next_input_character} == 0x000A) { # LF
+        $line++;
+        $column = 0;
+      } elsif ($self->{next_input_character} == 0x000D) { # CR
         if ($i >= length $$s) {
           #
         } else {
@@ -5876,7 +5929,7 @@ sub set_inner_html ($$$) {
         }
         $self->{next_input_character} = 0x000A; # LF # MUST
         $line++;
-        $column = -1;
+        $column = 0;
       } elsif ($self->{next_input_character} > 0x10FFFF) {
         $self->{next_input_character} = 0xFFFD; # REPLACEMENT CHARACTER # MUST
       } elsif ($self->{next_input_character} == 0x0000) { # NULL
@@ -6071,4 +6124,4 @@ sub get_inner_html ($$$) {
 } # get_inner_html
 
 1;
-# $Date: 2007/05/02 13:44:33 $
+# $Date: 2007/05/04 09:16:04 $
