@@ -261,3 +261,32 @@ base in body
 |   href="a"
 |   target="b"
 | "a"
+
+#data
+<!DOCTYPE html><ins><p>XX</ins>YYY
+#errors
+1,32,not closed:p
+1,34,not closed:ins
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <ins>
+|       <p>
+|         "XXYYY"
+
+## when script is disabled
+#data
+<!DOCTYPE html><noscript>aaa<noscript>bbb</noscript>ccc</noscript>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <noscript>
+|       "aaa"
+|       <noscript>
+|         "bbb"
+|       "ccc"

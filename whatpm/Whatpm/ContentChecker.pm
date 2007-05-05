@@ -3,13 +3,21 @@ use strict;
 
 my $ElementDefault = {
   checker => sub {
-    my (undef, $el, $onerror) = @_;
+    my ($self, $el) = @_;
     my $children = [];
     my @nodes = (@{$el->child_nodes});
     while (@nodes) {
       my $node = shift @nodes;
+      $self->_remove_minuses ($node) and next if ref $node eq 'HASH';
+
       my $nt = $node->node_type;
       if ($nt == 1) {
+        my $node_ns = $node->namespace_uri;
+        $node_ns = '' unless defined $node_ns;
+        my $node_ln = $node->manakai_local_name;
+        if ($self->{minuses}->{$node_ns}->{$node_ln}) {
+          $self->{onerror}->(node => $node, type => 'element not allowed');
+        }
         push @$children, $node;
       } elsif ($nt == 5) {
         unshift @nodes, @{$node->child_nodes};
@@ -33,14 +41,9 @@ my $HTMLMetadataElements = [
   [$HTML_NS, 'title'],
 ];
 
-my $HTMLSectioningElements = [
-  [$HTML_NS, 'body'],
-  [$HTML_NS, 'section'],
-  [$HTML_NS, 'nav'],
-  [$HTML_NS, 'article'],
-  [$HTML_NS, 'blockquote'],
-  [$HTML_NS, 'aside'],
-];
+my $HTMLSectioningElements = {
+  $HTML_NS => {qw/body 1 section 1 nav 1 article 1 blockquote 1 aside 1/},
+};
 
 my $HTMLBlockLevelElements = [
   [$HTML_NS, 'section'],
@@ -48,6 +51,12 @@ my $HTMLBlockLevelElements = [
   [$HTML_NS, 'article'],
   [$HTML_NS, 'blockquote'],
   [$HTML_NS, 'aside'],
+  [$HTML_NS, 'h1'],
+  [$HTML_NS, 'h2'],
+  [$HTML_NS, 'h3'],
+  [$HTML_NS, 'h4'],
+  [$HTML_NS, 'h5'],
+  [$HTML_NS, 'h6'],
   [$HTML_NS, 'header'],
   [$HTML_NS, 'footer'],
   [$HTML_NS, 'address'],
@@ -133,10 +142,13 @@ my $HTMLInteractiveElements = [
 my $HTMLTransparentElements = [
   [$HTML_NS, 'ins'],
   [$HTML_NS, 'font'],
+  [$HTML_NS, 'noscript'], ## NOTE: If scripting is disabled.
 ];
-# TODO: script, if scripting is disabled
 
-# TODO: semi-transparent video, audio
+#my $HTMLSemiTransparentElements = [
+#  [$HTML_NS, 'video'],
+#  [$HTML_NS, 'audio'],
+#];
 
 my $HTMLEmbededElements = [
   [$HTML_NS, 'img'],
@@ -150,26 +162,23 @@ my $HTMLEmbededElements = [
 
 ## Empty
 my $HTMLEmptyChecker = sub {
-  my (undef, $el, $onerror) = @_;
+  my ($self, $el) = @_;
   my $children = [];
   my @nodes = (@{$el->child_nodes});
 
   while (@nodes) {
     my $node = shift @nodes;
+    $self->_remove_minuses ($node) and next if ref $node eq 'HASH';
+
     my $nt = $node->node_type;
     if ($nt == 1) {
-      $onerror->(node => $node, type => 'element not allowed');
-      TP: {
-        for (@{$HTMLTransparentElements}) {
-          if ($node->manakai_element_type_match ($_->[0], $_->[1])) {
-            unshift @nodes, @{$node->child_nodes};
-            last TP;
-          }
-        }
-        push @$children, $node;
-      } # TP
+      ## NOTE: |minuses| list is not checked since redundant
+      $self->{onerror}->(node => $node, type => 'element not allowed');
+      my ($sib, $ch) = $self->_check_get_children ($node);
+      unshift @nodes, @$sib;
+      push @$children, @$ch;
     } elsif ($nt == 3 or $nt == 4) {
-      $onerror->(node => $node, type => 'character not allowed');
+      $self->{onerror}->(node => $node, type => 'character not allowed');
     } elsif ($nt == 5) {
       unshift @nodes, @{$node->child_nodes};
     }
@@ -179,24 +188,21 @@ my $HTMLEmptyChecker = sub {
 
 ## Text
 my $HTMLTextChecker = sub {
-  my (undef, $el, $onerror) = @_;
+  my ($self, $el) = @_;
   my $children = [];
   my @nodes = (@{$el->child_nodes});
 
   while (@nodes) {
     my $node = shift @nodes;
+    $self->_remove_minuses ($node) and next if ref $node eq 'HASH';
+
     my $nt = $node->node_type;
     if ($nt == 1) {
-      $onerror->(node => $node, type => 'element not allowed');
-      TP: {
-        for (@{$HTMLTransparentElements}) {
-          if ($node->manakai_element_type_match ($_->[0], $_->[1])) {
-            unshift @nodes, @{$node->child_nodes};
-            last TP;
-          }
-        }
-        push @$children, $node;
-      } # TP
+      ## NOTE: |minuses| list is not checked since redundant
+      $self->{onerror}->(node => $node, type => 'element not allowed');
+      my ($sib, $ch) = $self->_check_get_children ($node);
+      unshift @nodes, @$sib;
+      push @$children, @$ch;
     } elsif ($nt == 5) {
       unshift @nodes, @{$node->child_nodes};
     }
@@ -207,18 +213,26 @@ my $HTMLTextChecker = sub {
 ## Zero or more |html:style| elements,
 ## followed by zero or more block-level elements
 my $HTMLStylableBlockChecker = sub {
-  my (undef, $el, $onerror) = @_;
+  my ($self, $el) = @_;
   my $children = [];
   my @nodes = (@{$el->child_nodes});
   
   my $has_non_style;
   while (@nodes) {
     my $node = shift @nodes;
+    $self->_remove_minuses ($node) and next if ref $node eq 'HASH';
+
     my $nt = $node->node_type;
     if ($nt == 1) {
+      my $node_ns = $node->namespace_uri;
+      $node_ns = '' unless defined $node_ns;
+      my $node_ln = $node->manakai_local_name;
+      if ($self->{minuses}->{$node_ns}->{$node_ln}) {
+        $self->{onerror}->(node => $node, type => 'element not allowed');
+      }
       if ($node->manakai_element_type_match ($HTML_NS, 'style')) {
         if ($has_non_style) {
-          $onerror->(node => $node, type => 'element not allowed');
+          $self->{onerror}->(node => $node, type => 'element not allowed');
         }
       } else {
         $has_non_style = 1;
@@ -228,21 +242,15 @@ my $HTMLStylableBlockChecker = sub {
               last CHK;
             }
           }
-          $onerror->(node => $node, type => 'element not allowed');
+          $self->{onerror}->(node => $node, type => 'element not allowed');
         } # CHK
       }
-      TP: {
-        for (@{$HTMLTransparentElements}) {
-          if ($node->manakai_element_type_match ($_->[0], $_->[1])) {
-            unshift @nodes, @{$node->child_nodes};
-            last TP;
-          }
-        }
-        push @$children, $node;
-      } # TP
+      my ($sib, $ch) = $self->_check_get_children ($node);
+      unshift @nodes, @$sib;
+      push @$children, @$ch;
     } elsif ($nt == 3 or $nt == 4) {
       if ($node->data =~ /[^\x09-\x0D\x20]/) {
-        $onerror->(node => $node, type => 'character not allowed');
+        $self->{onerror}->(node => $node, type => 'character not allowed');
       }
     } elsif ($nt == 5) {
       unshift @nodes, @{$node->child_nodes};
@@ -253,34 +261,36 @@ my $HTMLStylableBlockChecker = sub {
 
 ## Zero or more block-level elements
 my $HTMLBlockChecker = sub {
-  my (undef, $el, $onerror) = @_;
+  my ($self, $el) = @_;
   my $children = [];
   my @nodes = (@{$el->child_nodes});
   
   while (@nodes) {
     my $node = shift @nodes;
+    $self->_remove_minuses ($node) and next if ref $node eq 'HASH'; 
+
     my $nt = $node->node_type;
     if ($nt == 1) {
+      my $node_ns = $node->namespace_uri;
+      $node_ns = '' unless defined $node_ns;
+      my $node_ln = $node->manakai_local_name;
+      if ($self->{minuses}->{$node_ns}->{$node_ln}) {
+        $self->{onerror}->(node => $node, type => 'element not allowed');
+      }
       CHK: {
         for (@{$HTMLBlockLevelElements}) {
           if ($node->manakai_element_type_match ($_->[0], $_->[1])) {
             last CHK;
           }
         }
-        $onerror->(node => $node, type => 'element not allowed');
+        $self->{onerror}->(node => $node, type => 'element not allowed');
       } # CHK
-      TP: {
-        for (@{$HTMLTransparentElements}) {
-          if ($node->manakai_element_type_match ($_->[0], $_->[1])) {
-            unshift @nodes, @{$node->child_nodes};
-            last TP;
-          }
-        }
-        push @$children, $node;
-      } # TP
+      my ($sib, $ch) = $self->_check_get_children ($node);
+      unshift @nodes, @$sib;
+      push @$children, @$ch;
     } elsif ($nt == 3 or $nt == 4) {
       if ($node->data =~ /[^\x09-\x0D\x20]/) {
-        $onerror->(node => $node, type => 'character not allowed');
+        $self->{onerror}->(node => $node, type => 'character not allowed');
       }
     } elsif ($nt == 5) {
       unshift @nodes, @{$node->child_nodes};
@@ -291,14 +301,22 @@ my $HTMLBlockChecker = sub {
 
 ## Inline-level content
 my $HTMLInlineChecker = sub {
-  my (undef, $el, $onerror) = @_;
+  my ($self, $el) = @_;
   my $children = [];
   my @nodes = (@{$el->child_nodes});
   
   while (@nodes) {
     my $node = shift @nodes;
+    $self->_remove_minuses ($node) and next if ref $node eq 'HASH';
+
     my $nt = $node->node_type;
     if ($nt == 1) {
+      my $node_ns = $node->namespace_uri;
+      $node_ns = '' unless defined $node_ns;
+      my $node_ln = $node->manakai_local_name;
+      if ($self->{minuses}->{$node_ns}->{$node_ln}) {
+        $self->{onerror}->(node => $node, type => 'element not allowed');
+      }
       CHK: {
         for (@{$HTMLStrictlyInlineLevelElements},
              @{$HTMLStructuredInlineLevelElements}) {
@@ -306,17 +324,11 @@ my $HTMLInlineChecker = sub {
             last CHK;
           }
         }
-        $onerror->(node => $node, type => 'element not allowed');
+        $self->{onerror}->(node => $node, type => 'element not allowed');
       } # CHK
-      TP: {
-        for (@{$HTMLTransparentElements}) {
-          if ($node->manakai_element_type_match ($_->[0], $_->[1])) {
-            unshift @nodes, @{$node->child_nodes};
-            last TP;
-          }
-        }
-        push @$children, $node;
-      } # TP
+      my ($sib, $ch) = $self->_check_get_children ($node);
+      unshift @nodes, @$sib;
+      push @$children, @$ch;
     } elsif ($nt == 5) {
       unshift @nodes, @{$node->child_nodes};
     }
@@ -329,31 +341,33 @@ my $HTMLSignificantInlineChecker = $HTMLInlineChecker;
 
 ## Strictly inline-level content
 my $HTMLStrictlyInlineChecker = sub {
-  my (undef, $el, $onerror) = @_;
+  my ($self, $el) = @_;
   my $children = [];
   my @nodes = (@{$el->child_nodes});
   
   while (@nodes) {
     my $node = shift @nodes;
+    $self->_remove_minuses ($node) and next if ref $node eq 'HASH';
+
     my $nt = $node->node_type;
     if ($nt == 1) {
+      my $node_ns = $node->namespace_uri;
+      $node_ns = '' unless defined $node_ns;
+      my $node_ln = $node->manakai_local_name;
+      if ($self->{minuses}->{$node_ns}->{$node_ln}) {
+        $self->{onerror}->(node => $node, type => 'element not allowed');
+      }
       CHK: {
         for (@{$HTMLStrictlyInlineLevelElements}) {
           if ($node->manakai_element_type_match ($_->[0], $_->[1])) {
             last CHK;
           }
         }
-        $onerror->(node => $node, type => 'element not allowed');
+        $self->{onerror}->(node => $node, type => 'element not allowed');
       } # CHK
-      TP: {
-        for (@{$HTMLTransparentElements}) {
-          if ($node->manakai_element_type_match ($_->[0], $_->[1])) {
-            unshift @nodes, @{$node->child_nodes};
-            last TP;
-          }
-        }
-        push @$children, $node;
-      } # TP
+      my ($sib, $ch) = $self->_check_get_children ($node);
+      unshift @nodes, @$sib;
+      push @$children, @$ch;
     } elsif ($nt == 5) {
       unshift @nodes, @{$node->child_nodes};
     }
@@ -365,7 +379,7 @@ my $HTMLSignificantStrictlyInlineChecker = $HTMLStrictlyInlineChecker;
 ## TODO: check significant content
 
 my $HTMLBlockOrInlineChecker = sub {
-  my (undef, $el, $onerror) = @_;
+  my ($self, $el) = @_;
   my $children = [];
   my @nodes = (@{$el->child_nodes});
   
@@ -373,8 +387,16 @@ my $HTMLBlockOrInlineChecker = sub {
   my @block_not_inline;
   while (@nodes) {
     my $node = shift @nodes;
+    $self->_remove_minuses ($node) and next if ref $node eq 'HASH';
+
     my $nt = $node->node_type;
     if ($nt == 1) {
+      my $node_ns = $node->namespace_uri;
+      $node_ns = '' unless defined $node_ns;
+      my $node_ln = $node->manakai_local_name;
+      if ($self->{minuses}->{$node_ns}->{$node_ln}) {
+        $self->{onerror}->(node => $node, type => 'element not allowed');
+      }
       if ($content eq 'block') {
         CHK: {
           for (@{$HTMLBlockLevelElements}) {
@@ -382,7 +404,7 @@ my $HTMLBlockOrInlineChecker = sub {
               last CHK;
             }
           }
-          $onerror->(node => $node, type => 'element not allowed');
+          $self->{onerror}->(node => $node, type => 'element not allowed');
         } # CHK
       } elsif ($content eq 'inline') {
         CHK: {
@@ -392,7 +414,7 @@ my $HTMLBlockOrInlineChecker = sub {
               last CHK;
             }
           }
-          $onerror->(node => $node, type => 'element not allowed');
+          $self->{onerror}->(node => $node, type => 'element not allowed');
         } # CHK
       } else {
         my $is_block;
@@ -416,30 +438,24 @@ my $HTMLBlockOrInlineChecker = sub {
         unless ($is_block) {
           $content = 'inline';
           for (@block_not_inline) {
-            $onerror->(node => $_, type => 'element not allowed');
+            $self->{onerror}->(node => $_, type => 'element not allowed');
           }
           unless ($is_inline) {
-            $onerror->(node => $node, type => 'element not allowed');
+            $self->{onerror}->(node => $node, type => 'element not allowed');
           }
         }
       }
-      TP: {
-        for (@{$HTMLTransparentElements}) {
-          if ($node->manakai_element_type_match ($_->[0], $_->[1])) {
-            unshift @nodes, @{$node->child_nodes};
-            last TP;
-          }
-        }
-        push @$children, $node;
-      } # TP
+      my ($sib, $ch) = $self->_check_get_children ($node);
+      unshift @nodes, @$sib;
+      push @$children, @$ch;
     } elsif ($nt == 3 or $nt == 4) {
       if ($node->data =~ /[^\x09-\x0D\x20]/) {
         if ($content eq 'block') {
-          $onerror->(node => $node, type => 'character not allowed');
+          $self->{onerror}->(node => $node, type => 'character not allowed');
         } else {
           $content = 'inline';
           for (@block_not_inline) {
-            $onerror->(node => $_, type => 'element not allowed');
+            $self->{onerror}->(node => $_, type => 'element not allowed');
           }
         }
       }
@@ -450,147 +466,156 @@ my $HTMLBlockOrInlineChecker = sub {
   return ($children);
 };
 
-my $HTMLStyledBlockOrInlineChecker = sub {
-  my (undef, $el, $onerror) = @_;
-  my $children = [];
-  my @nodes = (@{$el->child_nodes});
-  
-  my $has_non_style;
-  my $content = 'block-or-inline'; # or 'block' or 'inline'
-  my @block_not_inline;
-  while (@nodes) {
-    my $node = shift @nodes;
-    my $nt = $node->node_type;
-    if ($nt == 1) {
-      if ($node->manakai_element_type_match ($HTML_NS, 'style')) {
-        if ($has_non_style) {
-          $onerror->(node => $node, type => 'element not allowed');
+## Zero or more XXX element, then either block-level or inline-level
+my $GetHTMLZeroOrMoreThenBlockOrInlineChecker = sub ($$) {
+  my ($elnsuri, $ellname) = @_;
+  return sub {
+    my ($self, $el) = @_;
+    my $children = [];
+    my @nodes = (@{$el->child_nodes});
+    
+    my $has_non_style;
+    my $content = 'block-or-inline'; # or 'block' or 'inline'
+    my @block_not_inline;
+    while (@nodes) {
+      my $node = shift @nodes;
+      $self->_remove_minuses ($node) and next if ref $node eq 'HASH';
+
+      my $nt = $node->node_type;
+      if ($nt == 1) {
+        my $node_ns = $node->namespace_uri;
+        $node_ns = '' unless defined $node_ns;
+        my $node_ln = $node->manakai_local_name;
+        if ($self->{minuses}->{$node_ns}->{$node_ln}) {
+          $self->{onerror}->(node => $node, type => 'element not allowed');
         }
-      } elsif ($content eq 'block') {
-        $has_non_style = 1;
-        CHK: {
+        if ($node->manakai_element_type_match ($elnsuri, $ellname)) {
+          if ($has_non_style) {
+            $self->{onerror}->(node => $node, type => 'element not allowed');
+          }
+        } elsif ($content eq 'block') {
+          $has_non_style = 1;
+          CHK: {
+            for (@{$HTMLBlockLevelElements}) {
+              if ($node->manakai_element_type_match ($_->[0], $_->[1])) {
+                last CHK;
+              }
+            }
+            $self->{onerror}->(node => $node, type => 'element not allowed');
+          } # CHK
+        } elsif ($content eq 'inline') {
+          $has_non_style = 1;
+          CHK: {
+            for (@{$HTMLStrictlyInlineLevelElements},
+                 @{$HTMLStructuredInlineLevelElements}) {
+              if ($node->manakai_element_type_match ($_->[0], $_->[1])) {
+                last CHK;
+              }
+            }
+            $self->{onerror}->(node => $node, type => 'element not allowed');
+          } # CHK
+        } else {
+          $has_non_style = 1;
+          my $is_block;
+          my $is_inline;
           for (@{$HTMLBlockLevelElements}) {
             if ($node->manakai_element_type_match ($_->[0], $_->[1])) {
-              last CHK;
+              $is_block = 1;
+              last;
             }
           }
-          $onerror->(node => $node, type => 'element not allowed');
-        } # CHK
-      } elsif ($content eq 'inline') {
-        $has_non_style = 1;
-        CHK: {
+          
           for (@{$HTMLStrictlyInlineLevelElements},
                @{$HTMLStructuredInlineLevelElements}) {
             if ($node->manakai_element_type_match ($_->[0], $_->[1])) {
-              last CHK;
+              $is_inline = 1;
+              last;
             }
           }
-          $onerror->(node => $node, type => 'element not allowed');
-        } # CHK
-      } else {
-        $has_non_style = 1;
-        my $is_block;
-        my $is_inline;
-        for (@{$HTMLBlockLevelElements}) {
-          if ($node->manakai_element_type_match ($_->[0], $_->[1])) {
-            $is_block = 1;
-            last;
+            
+          push @block_not_inline, $node if $is_block and not $is_inline;
+          unless ($is_block) {
+            $content = 'inline';
+            for (@block_not_inline) {
+              $self->{onerror}->(node => $_, type => 'element not allowed');
+            }
+            unless ($is_inline) {
+              $self->{onerror}->(node => $node, type => 'element not allowed');
+            }
           }
         }
-        
-        for (@{$HTMLStrictlyInlineLevelElements},
-             @{$HTMLStructuredInlineLevelElements}) {
-          if ($node->manakai_element_type_match ($_->[0], $_->[1])) {
-            $is_inline = 1;
-            last;
+        my ($sib, $ch) = $self->_check_get_children ($node);
+        unshift @nodes, @$sib;
+        push @$children, @$ch;
+      } elsif ($nt == 3 or $nt == 4) {
+        if ($node->data =~ /[^\x09-\x0D\x20]/) {
+          $has_non_style = 1;
+          if ($content eq 'block') {
+            $self->{onerror}->(node => $node, type => 'character not allowed');
+          } else {
+            $content = 'inline';
+            for (@block_not_inline) {
+              $self->{onerror}->(node => $_, type => 'element not allowed');
+            }
           }
         }
-        
-        push @block_not_inline, $node if $is_block and not $is_inline;
-        unless ($is_block) {
-          $content = 'inline';
-          for (@block_not_inline) {
-            $onerror->(node => $_, type => 'element not allowed');
-          }
-          unless ($is_inline) {
-            $onerror->(node => $node, type => 'element not allowed');
-          }
-        }
+      } elsif ($nt == 5) {
+        unshift @nodes, @{$node->child_nodes};
       }
-      TP: {
-        for (@{$HTMLTransparentElements}) {
-          if ($node->manakai_element_type_match ($_->[0], $_->[1])) {
-            unshift @nodes, @{$node->child_nodes};
-            last TP;
-          }
-        }
-        push @$children, $node;
-      } # TP
-    } elsif ($nt == 3 or $nt == 4) {
-      if ($node->data =~ /[^\x09-\x0D\x20]/) {
-        $has_non_style = 1;
-        if ($content eq 'block') {
-          $onerror->(node => $node, type => 'character not allowed');
-        } else {
-          $content = 'inline';
-          for (@block_not_inline) {
-            $onerror->(node => $_, type => 'element not allowed');
-          }
-        }
-      }
-    } elsif ($nt == 5) {
-      unshift @nodes, @{$node->child_nodes};
     }
-  }
-  return ($children);
-};
+    return ($children);
+  };
+}; # $GetHTMLZeroOrMoreThenBlockOrInlineChecker
 
 my $HTMLTransparentChecker = $HTMLBlockOrInlineChecker;
 
 $Element->{$HTML_NS}->{html} = {
   checker => sub {
-    my (undef, $el, $onerror) = @_;
+    my ($self, $el) = @_;
     my $children = [];
     my @nodes = (@{$el->child_nodes});
 
     my $phase = 'before head';
     while (@nodes) {
       my $node = shift @nodes;
+      $self->_remove_minuses ($node) and next if ref $node eq 'HASH';
+
       my $nt = $node->node_type;
       if ($nt == 1) {
+        my $node_ns = $node->namespace_uri;
+        $node_ns = '' unless defined $node_ns;
+        my $node_ln = $node->manakai_local_name;
+        if ($self->{minuses}->{$node_ns}->{$node_ln}) {
+          $self->{onerror}->(node => $node, type => 'element not allowed');
+        }
         if ($phase eq 'before head') {
           if ($node->manakai_element_type_match ($HTML_NS, 'head')) {
             $phase = 'after head';            
           } elsif ($node->manakai_element_type_match ($HTML_NS, 'body')) {
-            $onerror->(node => $node, type => 'element missing before:head');
+            $self->{onerror}
+              ->(node => $node, type => 'element missing before:head');
             $phase = 'after body';
           } else {
-            $onerror->(node => $node, type => 'element not allowed');
+            $self->{onerror}->(node => $node, type => 'element not allowed');
             # before head
           }
         } elsif ($phase eq 'after head') {
           if ($node->manakai_element_type_match ($HTML_NS, 'body')) {
             $phase = 'after body';
           } else {
-            $onerror->(node => $node, type => 'element not allowed');
+            $self->{onerror}->(node => $node, type => 'element not allowed');
             # after head
           }
         } else { #elsif ($phase eq 'after body') {
-          $onerror->(node => $node, type => 'element not allowed');
+          $self->{onerror}->(node => $node, type => 'element not allowed');
           # after body
         }
-        TP: {
-          for (@{$HTMLTransparentElements}) {
-            if ($node->manakai_element_type_match ($_->[0], $_->[1])) {
-              unshift @nodes, @{$node->child_nodes};
-              last TP;
-            }
-          }
-          push @$children, $node;
-        } # TP
+        my ($sib, $ch) = $self->_check_get_children ($node);
+        unshift @nodes, @$sib;
+        push @$children, @$ch;
       } elsif ($nt == 3 or $nt == 4) {
         if ($node->data =~ /[^\x09-\x0D\x20]/) {
-          $onerror->(node => $node, type => 'character not allowed');
+          $self->{onerror}->(node => $node, type => 'character not allowed');
         }
       } elsif ($nt == 5) {
         unshift @nodes, @{$node->child_nodes};
@@ -602,7 +627,7 @@ $Element->{$HTML_NS}->{html} = {
 
 $Element->{$HTML_NS}->{head} = {
   checker => sub {
-    my (undef, $el, $onerror) = @_;
+    my ($self, $el) = @_;
     my $children = [];
     my @nodes = (@{$el->child_nodes});
 
@@ -612,26 +637,34 @@ $Element->{$HTML_NS}->{head} = {
     my $has_non_base;
     while (@nodes) {
       my $node = shift @nodes;
+      $self->_remove_minuses ($node) and next if ref $node eq 'HASH';
+
       my $nt = $node->node_type;
       if ($nt == 1) {
+        my $node_ns = $node->namespace_uri;
+        $node_ns = '' unless defined $node_ns;
+        my $node_ln = $node->manakai_local_name;
+        if ($self->{minuses}->{$node_ns}->{$node_ln}) {
+          $self->{onerror}->(node => $node, type => 'element not allowed');
+        }
         if ($node->manakai_element_type_match ($HTML_NS, 'title')) {
           $has_non_base = 1;
           unless ($has_title) {
             $has_title = 1;
           } else {
-            $onerror->(node => $node, type => 'duplicate:title');
+            $self->{onerror}->(node => $node, type => 'element not allowed');
           }
         } elsif ($node->manakai_element_type_match ($HTML_NS, 'meta')) {
           $has_non_base = 1;
           if ($node->has_attribute_ns (undef, 'charset')) {
             unless ($has_meta_charset) {
               if ($has_base) {
-                $onerror->(node => $node, type => 'element not allowed');
+                $self->{onerror}->(node => $node, type => 'element not allowed');
                 ## NOTE: See |base|'s "contexts" field in the spec
               }
               $has_meta_charset = 1;
             } else {
-              $onerror->(node => $node, type => 'duplicate:meta charset');
+              $self->{onerror}->(node => $node, type => 'element not allowed');
             }
           } else {
             # metadata element
@@ -639,11 +672,11 @@ $Element->{$HTML_NS}->{head} = {
         } elsif ($node->manakai_element_type_match ($HTML_NS, 'base')) {
           unless ($has_base) {
             if ($has_non_base) {
-              $onerror->(node => $node, type => 'element not allowed');
+              $self->{onerror}->(node => $node, type => 'element not allowed');
             }
             $has_base = 1;
           } else {
-            $onerror->(node => $node, type => 'duplicate:base');
+            $self->{onerror}->(node => $node, type => 'element not allowed');
           }
         } else {
           $has_non_base = 1;
@@ -653,28 +686,22 @@ $Element->{$HTML_NS}->{head} = {
                 last CHK;
               }
             }
-            $onerror->(node => $node, type => 'element not allowed');
+            $self->{onerror}->(node => $node, type => 'element not allowed');
           } # CHK
         }
-        TP: {
-          for (@{$HTMLTransparentElements}) {
-            if ($node->manakai_element_type_match ($_->[0], $_->[1])) {
-              unshift @nodes, @{$node->child_nodes};
-              last TP;
-            }
-          }
-          push @$children, $node;
-        } # TP
+        my ($sib, $ch) = $self->_check_get_children ($node);
+        unshift @nodes, @$sib;
+        push @$children, @$ch;
       } elsif ($nt == 3 or $nt == 4) {
         if ($node->data =~ /[^\x09-\x0D\x20]/) {
-          $onerror->(node => $node, type => 'character not allowed');
+          $self->{onerror}->(node => $node, type => 'character not allowed');
         }
       } elsif ($nt == 5) {
         unshift @nodes, @{$node->child_nodes};
       }
     }
     unless ($has_title) {
-      $onerror->(node => $el, type => 'element missing in:title');
+      $self->{onerror}->(node => $el, type => 'element missing in:title');
     }
     return ($children);
   },
@@ -719,7 +746,7 @@ $Element->{$HTML_NS}->{blockquote} = {
 };
 
 $Element->{$HTML_NS}->{aside} = {
-  checker => $HTMLStyledBlockOrInlineChecker,
+  checker => $GetHTMLZeroOrMoreThenBlockOrInlineChecker->($HTML_NS, 'style'),
 };
 
 $Element->{$HTML_NS}->{h1} = {
@@ -748,7 +775,108 @@ $Element->{$HTML_NS}->{h6} = {
 
 ## TODO: header
 
-## TODO: footer
+$Element->{$HTML_NS}->{footer} = {
+  checker => sub { ## block -hn -header -footer -sectioning or inline
+    my ($self, $el) = @_;
+    my $children = [];
+    my @nodes = (@{$el->child_nodes});
+  
+    my $content = 'block-or-inline'; # or 'block' or 'inline'
+    my @block_not_inline;
+    while (@nodes) {
+      my $node = shift @nodes;
+      $self->_remove_minuses ($node) and next if ref $node eq 'HASH';
+
+      my $nt = $node->node_type;
+      if ($nt == 1) {
+        my $node_ns = $node->namespace_uri;
+        $node_ns = '' unless defined $node_ns;  
+        my $node_ln = $node->manakai_local_name;
+        if ($self->{minuses}->{$node_ns}->{$node_ln}) {
+          $self->{onerror}->(node => $node, type => 'element not allowed');
+        } elsif ($node_ns eq $HTML_NS and
+                 {
+                   qw/h1 1 h2 1 h3 1 h4 1 h5 1 h6 1 header 1 footer 1/
+                 }->{$node_ln}) {
+          $self->{onerror}->(node => $node, type => 'element not allowed');
+        } elsif ($HTMLSectioningElements->{$node_ns}->{$node_ln}) {
+          $self->{onerror}->(node => $node, type => 'element not allowed');
+        }
+        if ($content eq 'block') {
+          CHK: {
+            for (@{$HTMLBlockLevelElements}) {
+              if ($node->manakai_element_type_match ($_->[0], $_->[1])) {
+                last CHK;
+              }
+            }
+            $self->{onerror}->(node => $node, type => 'element not allowed');
+          } # CHK
+        } elsif ($content eq 'inline') {
+          CHK: {
+            for (@{$HTMLStrictlyInlineLevelElements},
+                 @{$HTMLStructuredInlineLevelElements}) {
+              if ($node->manakai_element_type_match ($_->[0], $_->[1])) {
+                last CHK;
+              }
+            }
+            $self->{onerror}->(node => $node, type => 'element not allowed');
+          } # CHK
+        } else {
+          my $is_block;
+          my $is_inline;
+          for (@{$HTMLBlockLevelElements}) {
+            if ($node->manakai_element_type_match ($_->[0], $_->[1])) {
+              $is_block = 1;
+              last;
+            }
+          }
+          
+          for (@{$HTMLStrictlyInlineLevelElements},
+               @{$HTMLStructuredInlineLevelElements}) {
+            if ($node->manakai_element_type_match ($_->[0], $_->[1])) {
+              $is_inline = 1;
+              last;
+            }
+          }
+          
+          push @block_not_inline, $node if $is_block and not $is_inline;
+          unless ($is_block) {
+            $content = 'inline';
+            for (@block_not_inline) {
+              $self->{onerror}->(node => $_, type => 'element not allowed');
+            }
+            unless ($is_inline) {
+              $self->{onerror}->(node => $node, type => 'element not allowed');
+            }
+          }
+        }
+        my ($sib, $ch) = $self->_check_get_children ($node);
+        unshift @nodes, @$sib;
+        push @$children, @$ch;
+      } elsif ($nt == 3 or $nt == 4) {
+        if ($node->data =~ /[^\x09-\x0D\x20]/) {
+          if ($content eq 'block') {
+            $self->{onerror}->(node => $node, type => 'character not allowed');
+          } else {
+            $content = 'inline';
+            for (@block_not_inline) {
+              $self->{onerror}->(node => $_, type => 'element not allowed');
+            }
+          }
+        }
+      } elsif ($nt == 5) {
+        unshift @nodes, @{$node->child_nodes};
+      }
+    }
+
+    my $end = $self->_add_minuses
+      ({$HTML_NS => {qw/h1 1 h2 1 h3 1 h4 1 h5 1 h6 1/}},
+       $HTMLSectioningElements);
+    push @$children, $end;
+
+    return ($children);
+  },
+};
 
 $Element->{$HTML_NS}->{address} = {
   checker => $HTMLInlineChecker,
@@ -768,53 +896,52 @@ $Element->{$HTML_NS}->{br} = {
 
 $Element->{$HTML_NS}->{dialog} = {
   checker => sub {
-    my (undef, $el, $onerror) = @_;
+    my ($self, $el) = @_;
     my $children = [];
     my @nodes = (@{$el->child_nodes});
 
     my $phase = 'before dt';
     while (@nodes) {
       my $node = shift @nodes;
+      $self->_remove_minuses ($node) and next if ref $node eq 'HASH';
+
       my $nt = $node->node_type;
       if ($nt == 1) {
+        ## NOTE: |minuses| list is not checked since redundant
         if ($phase eq 'before dt') {
           if ($node->manakai_element_type_match ($HTML_NS, 'dt')) {
             $phase = 'before dd';
           } elsif ($node->manakai_element_type_match ($HTML_NS, 'dd')) {
-            $onerror->(node => $node, type => 'element missing before:dt');
+            $self->{onerror}
+              ->(node => $node, type => 'element missing before:dt');
             $phase = 'before dt';
           } else {
-            $onerror->(node => $node, type => 'element not allowed');
+            $self->{onerror}->(node => $node, type => 'element not allowed');
           }
         } else { # before dd
           if ($node->manakai_element_type_match ($HTML_NS, 'dd')) {
             $phase = 'before dt';
           } elsif ($node->manakai_element_type_match ($HTML_NS, 'dt')) {
-            $onerror->(node => $node, type => 'element missing before:dd');
+            $self->{onerror}
+              ->(node => $node, type => 'element missing before:dd');
             $phase = 'before dd';
           } else {
-            $onerror->(node => $node, type => 'element not allowed');
+            $self->{onerror}->(node => $node, type => 'element not allowed');
           }
         }
-        TP: {
-          for (@{$HTMLTransparentElements}) {
-            if ($node->manakai_element_type_match ($_->[0], $_->[1])) {
-              unshift @nodes, @{$node->child_nodes};
-              last TP;
-            }
-          }
-          push @$children, $node;
-        } # TP
+        my ($sib, $ch) = $self->_check_get_children ($node);
+        unshift @nodes, @$sib;
+        push @$children, @$ch;
       } elsif ($nt == 3 or $nt == 4) {
         if ($node->data =~ /[^\x09-\x0D\x20]/) {
-          $onerror->(node => $node, type => 'character not allowed');
+          $self->{onerror}->(node => $node, type => 'character not allowed');
         }
       } elsif ($nt == 5) {
         unshift @nodes, @{$node->child_nodes};
       }
     }
     if ($phase eq 'before dd') {
-      $onerror->(node => $el, type => 'element missing before:dd');
+      $self->{onerror}->(node => $el, type => 'element missing before:dd');
     }
     return ($children);
   },
@@ -826,29 +953,26 @@ $Element->{$HTML_NS}->{pre} = {
 
 $Element->{$HTML_NS}->{ol} = {
   checker => sub {
-    my (undef, $el, $onerror) = @_;
+    my ($self, $el) = @_;
     my $children = [];
     my @nodes = (@{$el->child_nodes});
 
     while (@nodes) {
       my $node = shift @nodes;
+      $self->_remove_minuses ($node) and next if ref $node eq 'HASH';
+
       my $nt = $node->node_type;
       if ($nt == 1) {
+        ## NOTE: |minuses| list is not checked since redundant
         unless ($node->manakai_element_type_match ($HTML_NS, 'li')) {
-          $onerror->(node => $node, type => 'element not allowed');
+          $self->{onerror}->(node => $node, type => 'element not allowed');
         }
-        TP: {
-          for (@{$HTMLTransparentElements}) {
-            if ($node->manakai_element_type_match ($_->[0], $_->[1])) {
-              unshift @nodes, @{$node->child_nodes};
-              last TP;
-            }
-          }
-          push @$children, $node;
-        } # TP
+        my ($sib, $ch) = $self->_check_get_children ($node);
+        unshift @nodes, @$sib;
+        push @$children, @$ch;
       } elsif ($nt == 3 or $nt == 4) {
         if ($node->data =~ /[^\x09-\x0D\x20]/) {
-          $onerror->(node => $node, type => 'character not allowed');
+          $self->{onerror}->(node => $node, type => 'character not allowed');
         }
       } elsif ($nt == 5) {
         unshift @nodes, @{$node->child_nodes};
@@ -866,22 +990,25 @@ $Element->{$HTML_NS}->{ul} = {
 
 $Element->{$HTML_NS}->{dl} = {
   checker => sub {
-    my (undef, $el, $onerror) = @_;
+    my ($self, $el) = @_;
     my $children = [];
     my @nodes = (@{$el->child_nodes});
 
     my $phase = 'before dt';
     while (@nodes) {
       my $node = shift @nodes;
+      $self->_remove_minuses ($node) and next if ref $node eq 'HASH';
+
       my $nt = $node->node_type;
       if ($nt == 1) {
+        ## NOTE: |minuses| list is not checked since redundant
         if ($phase eq 'in dds') {
           if ($node->manakai_element_type_match ($HTML_NS, 'dd')) {
             #$phase = 'in dds';
           } elsif ($node->manakai_element_type_match ($HTML_NS, 'dt')) {
             $phase = 'in dts';
           } else {
-            $onerror->(node => $node, type => 'element not allowed');
+            $self->{onerror}->(node => $node, type => 'element not allowed');
           }
         } elsif ($phase eq 'in dts') {
           if ($node->manakai_element_type_match ($HTML_NS, 'dt')) {
@@ -889,37 +1016,32 @@ $Element->{$HTML_NS}->{dl} = {
           } elsif ($node->manakai_element_type_match ($HTML_NS, 'dd')) {
             $phase = 'in dds';
           } else {
-            $onerror->(node => $node, type => 'element not allowed');
+            $self->{onerror}->(node => $node, type => 'element not allowed');
           }
         } else { # before dt
           if ($node->manakai_element_type_match ($HTML_NS, 'dt')) {
             $phase = 'in dts';
           } elsif ($node->manakai_element_type_match ($HTML_NS, 'dd')) {
-            $onerror->(node => $node, type => 'element missing before:dt');
+            $self->{onerror}
+              ->(node => $node, type => 'element missing before:dt');
             $phase = 'in dds';
           } else {
-            $onerror->(node => $node, type => 'element not allowed');
+            $self->{onerror}->(node => $node, type => 'element not allowed');
           }
         }
-        TP: {
-          for (@{$HTMLTransparentElements}) {
-            if ($node->manakai_element_type_match ($_->[0], $_->[1])) {
-              unshift @nodes, @{$node->child_nodes};
-              last TP;
-            }
-          }
-          push @$children, $node;
-        } # TP
+        my ($sib, $ch) = $self->_check_get_children ($node);
+        unshift @nodes, @$sib;
+        push @$children, @$ch;
       } elsif ($nt == 3 or $nt == 4) {
         if ($node->data =~ /[^\x09-\x0D\x20]/) {
-          $onerror->(node => $node, type => 'character not allowed');
+          $self->{onerror}->(node => $node, type => 'character not allowed');
         }
       } elsif ($nt == 5) {
         unshift @nodes, @{$node->child_nodes};
       }
     }
     if ($phase eq 'in dts') {
-      $onerror->(node => $el, type => 'element missing before:dd');
+      $self->{onerror}->(node => $el, type => 'element missing before:dd');
     }
     return ($children);
   },
@@ -999,7 +1121,7 @@ $Element->{$HTML_NS}->{ins} = {
 
 $Element->{$HTML_NS}->{del} = {
   checker => sub {
-    my ($self, $el, $onerror) = @_;
+    my ($self, $el) = @_;
 
     my $parent = $el->manakai_parent_element;
     if (defined $parent) {
@@ -1009,9 +1131,9 @@ $Element->{$HTML_NS}->{del} = {
       my $eldef = $Element->{$nsuri}->{$ln} ||
         $Element->{$nsuri}->{''} ||
         $ElementDefault;
-      return $eldef->{checker}->($self, $el, $onerror);
+      return $eldef->{checker}->($self, $el);
     } else {
-      return $HTMLBlockOrInlineChecker->($self, $el, $onerror);
+      return $HTMLBlockOrInlineChecker->($self, $el);
     }
   },
 };
@@ -1036,7 +1158,22 @@ $Element->{$HTML_NS}->{param} = {
 
 ## TODO: object
 
-## TODO: video, audio
+$Element->{$HTML_NS}->{video} = {
+  checker => sub {
+    my ($self, $el) = @_;
+
+    if ($el->has_attribute_ns (undef, 'src')) {
+      return $HTMLBlockOrInlineChecker->($self, $el);
+    } else {
+      return $GetHTMLZeroOrMoreThenBlockOrInlineChecker->($HTML_NS, 'source')
+        ->($self, $el);
+    }
+  },
+};
+
+$Element->{$HTML_NS}->{audio} = {
+  checker => $Element->{$HTML_NS}->{audio}->{checker},
+};
 
 $Element->{$HTML_NS}->{source} = {
   checker => $HTMLEmptyChecker,
@@ -1057,7 +1194,7 @@ $Element->{$HTML_NS}->{area} = {
 
 $Element->{$HTML_NS}->{table} = {
   checker => sub {
-    my (undef, $el, $onerror) = @_;
+    my ($self, $el) = @_;
     my $children = [];
     my @nodes = (@{$el->child_nodes});
 
@@ -1065,8 +1202,11 @@ $Element->{$HTML_NS}->{table} = {
     my $has_tfoot;
     while (@nodes) {
       my $node = shift @nodes;
+      $self->_remove_minuses ($node) and next if ref $node eq 'HASH';
+
       my $nt = $node->node_type;
       if ($nt == 1) {
+        ## NOTE: |minuses| list is not checked since redundant
         if ($phase eq 'in tbodys') {
           if ($node->manakai_element_type_match ($HTML_NS, 'tbody')) {
             #$phase = 'in tbodys';
@@ -1075,7 +1215,7 @@ $Element->{$HTML_NS}->{table} = {
             $phase = 'after tfoot';
             $has_tfoot = 1;
           } else {
-            $onerror->(node => $node, type => 'element not allowed');
+            $self->{onerror}->(node => $node, type => 'element not allowed');
           }
         } elsif ($phase eq 'in trs') {
           if ($node->manakai_element_type_match ($HTML_NS, 'tr')) {
@@ -1085,7 +1225,7 @@ $Element->{$HTML_NS}->{table} = {
             $phase = 'after tfoot';
             $has_tfoot = 1;
           } else {
-            $onerror->(node => $node, type => 'element not allowed');
+            $self->{onerror}->(node => $node, type => 'element not allowed');
           }
         } elsif ($phase eq 'after thead') {
           if ($node->manakai_element_type_match ($HTML_NS, 'tbody')) {
@@ -1096,7 +1236,7 @@ $Element->{$HTML_NS}->{table} = {
             $phase = 'in tbodys';
             $has_tfoot = 1;
           } else {
-            $onerror->(node => $node, type => 'element not allowed');
+            $self->{onerror}->(node => $node, type => 'element not allowed');
           }
         } elsif ($phase eq 'in colgroup') {
           if ($node->manakai_element_type_match ($HTML_NS, 'colgroup')) {
@@ -1111,7 +1251,7 @@ $Element->{$HTML_NS}->{table} = {
             $phase = 'in tbodys';
             $has_tfoot = 1;
           } else {
-            $onerror->(node => $node, type => 'element not allowed');
+            $self->{onerror}->(node => $node, type => 'element not allowed');
           }
         } elsif ($phase eq 'before caption') {
           if ($node->manakai_element_type_match ($HTML_NS, 'caption')) {
@@ -1128,23 +1268,17 @@ $Element->{$HTML_NS}->{table} = {
             $phase = 'in tbodys';
             $has_tfoot = 1;
           } else {
-            $onerror->(node => $node, type => 'element not allowed');
+            $self->{onerror}->(node => $node, type => 'element not allowed');
           }
         } else { # after tfoot
-          $onerror->(node => $node, type => 'element not allowed');
+          $self->{onerror}->(node => $node, type => 'element not allowed');
         }
-        TP: {
-          for (@{$HTMLTransparentElements}) {
-            if ($node->manakai_element_type_match ($_->[0], $_->[1])) {
-              unshift @nodes, @{$node->child_nodes};
-              last TP;
-            }
-          }
-          push @$children, $node;
-        } # TP
+        my ($sib, $ch) = $self->_check_get_children ($node);
+        unshift @nodes, @$sib;
+        push @$children, @$ch;
       } elsif ($nt == 3 or $nt == 4) {
         if ($node->data =~ /[^\x09-\x0D\x20]/) {
-          $onerror->(node => $node, type => 'character not allowed');
+          $self->{onerror}->(node => $node, type => 'character not allowed');
         }
       } elsif ($nt == 5) {
         unshift @nodes, @{$node->child_nodes};
@@ -1160,29 +1294,26 @@ $Element->{$HTML_NS}->{caption} = {
 
 $Element->{$HTML_NS}->{colgroup} = {
   checker => sub {
-    my (undef, $el, $onerror) = @_;
+    my ($self, $el) = @_;
     my $children = [];
     my @nodes = (@{$el->child_nodes});
 
     while (@nodes) {
       my $node = shift @nodes;
+      $self->_remove_minuses ($node) and next if ref $node eq 'HASH';
+
       my $nt = $node->node_type;
       if ($nt == 1) {
+        ## NOTE: |minuses| list is not checked since redundant
         unless ($node->manakai_element_type_match ($HTML_NS, 'col')) {
-          $onerror->(node => $node, type => 'element not allowed');
+          $self->{onerror}->(node => $node, type => 'element not allowed');
         }
-        TP: {
-          for (@{$HTMLTransparentElements}) {
-            if ($node->manakai_element_type_match ($_->[0], $_->[1])) {
-              unshift @nodes, @{$node->child_nodes};
-              last TP;
-            }
-          }
-          push @$children, $node;
-        } # TP
+        my ($sib, $ch) = $self->_check_get_children ($node);
+        unshift @nodes, @$sib;
+        push @$children, @$ch;
       } elsif ($nt == 3 or $nt == 4) {
         if ($node->data =~ /[^\x09-\x0D\x20]/) {
-          $onerror->(node => $node, type => 'character not allowed');
+          $self->{onerror}->(node => $node, type => 'character not allowed');
         }
       } elsif ($nt == 5) {
         unshift @nodes, @{$node->child_nodes};
@@ -1198,39 +1329,36 @@ $Element->{$HTML_NS}->{col} = {
 
 $Element->{$HTML_NS}->{tbody} = {
   checker => sub {
-    my (undef, $el, $onerror) = @_;
+    my ($self, $el) = @_;
     my $children = [];
     my @nodes = (@{$el->child_nodes});
 
     my $has_tr;
     while (@nodes) {
       my $node = shift @nodes;
+      $self->_remove_minuses ($node) and next if ref $node eq 'HASH';
+
       my $nt = $node->node_type;
       if ($nt == 1) {
+        ## NOTE: |minuses| list is not checked since redundant
         if ($node->manakai_element_type_match ($HTML_NS, 'tr')) {
           $has_tr = 1;
         } else {
-          $onerror->(node => $node, type => 'element not allowed');
+          $self->{onerror}->(node => $node, type => 'element not allowed');
         }
-        TP: {
-          for (@{$HTMLTransparentElements}) {
-            if ($node->manakai_element_type_match ($_->[0], $_->[1])) {
-              unshift @nodes, @{$node->child_nodes};
-              last TP;
-            }
-          }
-          push @$children, $node;
-        } # TP
+        my ($sib, $ch) = $self->_check_get_children ($node);
+        unshift @nodes, @$sib;
+        push @$children, @$ch;
       } elsif ($nt == 3 or $nt == 4) {
         if ($node->data =~ /[^\x09-\x0D\x20]/) {
-          $onerror->(node => $node, type => 'character not allowed');
+          $self->{onerror}->(node => $node, type => 'character not allowed');
         }
       } elsif ($nt == 5) {
         unshift @nodes, @{$node->child_nodes};
       }
     }
     unless ($has_tr) {
-      $onerror->(node => $el, type => 'element missing in:tr');
+      $self->{onerror}->(node => $el, type => 'element missing in:tr');
     }
     return ($children);
   },
@@ -1246,40 +1374,37 @@ $Element->{$HTML_NS}->{tfoot} = {
 
 $Element->{$HTML_NS}->{tr} = {
   checker => sub {
-    my (undef, $el, $onerror) = @_;
+    my ($self, $el) = @_;
     my $children = [];
     my @nodes = (@{$el->child_nodes});
 
     my $has_td;
     while (@nodes) {
       my $node = shift @nodes;
+      $self->_remove_minuses ($node) and next if ref $node eq 'HASH';
+
       my $nt = $node->node_type;
       if ($nt == 1) {
+        ## NOTE: |minuses| list is not checked since redundant
         if ($node->manakai_element_type_match ($HTML_NS, 'td') or
             $node->manakai_element_type_match ($HTML_NS, 'th')) {
           $has_td = 1;
         } else {
-          $onerror->(node => $node, type => 'element not allowed');
+          $self->{onerror}->(node => $node, type => 'element not allowed');
         }
-        TP: {
-          for (@{$HTMLTransparentElements}) {
-            if ($node->manakai_element_type_match ($_->[0], $_->[1])) {
-              unshift @nodes, @{$node->child_nodes};
-              last TP;
-            }
-          }
-          push @$children, $node;
-        } # TP
+        my ($sib, $ch) = $self->_check_get_children ($node);
+        unshift @nodes, @$sib;
+        push @$children, @$ch;
       } elsif ($nt == 3 or $nt == 4) {
         if ($node->data =~ /[^\x09-\x0D\x20]/) {
-          $onerror->(node => $node, type => 'character not allowed');
+          $self->{onerror}->(node => $node, type => 'character not allowed');
         }
       } elsif ($nt == 5) {
         unshift @nodes, @{$node->child_nodes};
       }
     }
     unless ($has_td) {
-      $onerror->(node => $el, type => 'element missing in:td or th');
+      $self->{onerror}->(node => $el, type => 'element missing in:td or th');
     }
     return ($children);
   },
@@ -1295,8 +1420,30 @@ $Element->{$HTML_NS}->{th} = {
 
 ## TODO: forms
 
-## TODO: script
+$Element->{$HTML_NS}->{script} = {
+  checker => sub {
+    my ($self, $el) = @_;
 
+    if ($el->has_attribute_ns (undef, 'src')) {
+      return $HTMLEmptyChecker->($self, $el);
+    } else {
+      ## NOTE: No content model conformance in HTML5 spec.
+      return $ElementDefault->{checker}->($self, $el);
+    }
+  },
+};
+
+## NOTE: When script is disabled.
+$Element->{$HTML_NS}->{noscript} = {
+  checker => sub {
+    my ($self, $el) = @_;
+
+    my $end = $self->_add_minuses ({$HTML_NS => {noscript => 1}});
+    my ($sib, $ch) = $HTMLBlockOrInlineChecker->($self, $el);
+    push @$sib, $end;
+    return ($sib, $ch);
+  },
+};
 ## TODO: noscript
 
 $Element->{$HTML_NS}->{'event-source'} = {
@@ -1304,106 +1451,7 @@ $Element->{$HTML_NS}->{'event-source'} = {
 };
 
 $Element->{$HTML_NS}->{details} = {
-  checker => sub {
-    my (undef, $el, $onerror) = @_;
-    my $children = [];
-    my @nodes = (@{$el->child_nodes});
-
-    my $has_legend;
-    my $has_non_legend;
-    my $content = 'block-or-inline'; # or 'block' or 'inline'
-    my @block_not_inline;
-    while (@nodes) {
-      my $node = shift @nodes;
-      my $nt = $node->node_type;
-      if ($nt == 1) {
-        if (not $has_legend and
-            $node->manakai_element_type_match ($HTML_NS, 'legend')) {
-          $has_legend = 1;
-          if ($has_non_legend) {
-            $onerror->(node => $node, type => 'element not allowed');
-          }
-        } elsif ($content eq 'block') {
-          $has_non_legend = 1;
-          CHK: {
-            for (@{$HTMLBlockLevelElements}) {
-              if ($node->manakai_element_type_match ($_->[0], $_->[1])) {
-                last CHK;
-              }
-            }
-            $onerror->(node => $node, type => 'element not allowed');
-          } # CHK
-        } elsif ($content eq 'inline') {
-          $has_non_legend = 1;
-          CHK: {
-            for (@{$HTMLStrictlyInlineLevelElements},
-                 @{$HTMLStructuredInlineLevelElements}) {
-              if ($node->manakai_element_type_match ($_->[0], $_->[1])) {
-                last CHK;
-              }
-            }
-            $onerror->(node => $node, type => 'element not allowed');
-          } # CHK
-        } else {
-          $has_non_legend = 1;
-          my $is_block;
-          my $is_inline;
-          for (@{$HTMLBlockLevelElements}) {
-            if ($node->manakai_element_type_match ($_->[0], $_->[1])) {
-              $is_block = 1;
-              last;
-            }
-          }
-          
-          for (@{$HTMLStrictlyInlineLevelElements},
-               @{$HTMLStructuredInlineLevelElements}) {
-            if ($node->manakai_element_type_match ($_->[0], $_->[1])) {
-              $is_inline = 1;
-              last;
-            }
-          }
-
-          push @block_not_inline, $node if $is_block and not $is_inline;
-          unless ($is_block) {
-            $content = 'inline';
-            for (@block_not_inline) {
-              $onerror->(node => $_, type => 'element not allowed');
-            }
-            unless ($is_inline) {
-              $onerror->(node => $node, type => 'element not allowed');
-            }
-          }
-        }
-        TP: {
-          for (@{$HTMLTransparentElements}) {
-            if ($node->manakai_element_type_match ($_->[0], $_->[1])) {
-              unshift @nodes, @{$node->child_nodes};
-              last TP;
-            }
-          }
-          push @$children, $node;
-        } # TP
-      } elsif ($nt == 3 or $nt == 4) {
-        if ($node->data =~ /[^\x09-\x0D\x20]/) {
-          $has_non_legend = 1;
-          if ($content eq 'block') {
-            $onerror->(node => $node, type => 'character not allowed');
-          } else {
-            $content = 'inline';
-            for (@block_not_inline) {
-              $onerror->(node => $_, type => 'element not allowed');
-            }
-          }
-        }
-      } elsif ($nt == 5) {
-        unshift @nodes, @{$node->child_nodes};
-      }
-    }
-    unless ($has_legend) {
-      $onerror->(node => $el, type => 'element missing in:legend');
-    }
-    return ($children);
-  },
+  checker => $GetHTMLZeroOrMoreThenBlockOrInlineChecker->($HTML_NS, 'legend'),
 };
 
 $Element->{$HTML_NS}->{datagrid} = {
@@ -1416,18 +1464,26 @@ $Element->{$HTML_NS}->{command} = {
 
 $Element->{$HTML_NS}->{menu} = {
   checker => sub {
-    my (undef, $el, $onerror) = @_;
+    my ($self, $el) = @_;
     my $children = [];
     my @nodes = (@{$el->child_nodes});
     
     my $content = 'li or inline';
     while (@nodes) {
       my $node = shift @nodes;
+      $self->_remove_minuses ($node) and next if ref $node eq 'HASH';
+
       my $nt = $node->node_type;
       if ($nt == 1) {
+        my $node_ns = $node->namespace_uri;
+        $node_ns = '' unless defined $node_ns;
+        my $node_ln = $node->manakai_local_name;
+        if ($self->{minuses}->{$node_ns}->{$node_ln}) {
+          $self->{onerror}->(node => $node, type => 'element not allowed');
+        }
         if ($node->manakai_element_type_match ($HTML_NS, 'li')) {
           if ($content eq 'inline') {
-            $onerror->(node => $node, type => 'element not allowed');
+            $self->{onerror}->(node => $node, type => 'element not allowed');
           } elsif ($content eq 'li or inline') {
             $content = 'li';
           }
@@ -1440,22 +1496,16 @@ $Element->{$HTML_NS}->{menu} = {
                 last CHK;
               }
             }
-            $onerror->(node => $node, type => 'element not allowed');
+            $self->{onerror}->(node => $node, type => 'element not allowed');
           } # CHK
         }
-        TP: {
-          for (@{$HTMLTransparentElements}) {
-            if ($node->manakai_element_type_match ($_->[0], $_->[1])) {
-              unshift @nodes, @{$node->child_nodes};
-              last TP;
-            }
-          }
-          push @$children, $node;
-        } # TP
+        my ($sib, $ch) = $self->_check_get_children ($node);
+        unshift @nodes, @$sib;
+        push @$children, @$ch;
       } elsif ($nt == 3 or $nt == 4) {
         if ($node->data =~ /[^\x09-\x0D\x20]/) {
           if ($content eq 'li') {
-            $onerror->(node => $node, type => 'character not allowed');
+            $self->{onerror}->(node => $node, type => 'character not allowed');
           } elsif ($content eq 'li or inline') {
             $content = 'inline';
           }
@@ -1471,7 +1521,7 @@ $Element->{$HTML_NS}->{menu} = {
 ## TODO: legend
 
 $Element->{$HTML_NS}->{div} = {
-  checker => $HTMLStyledBlockOrInlineChecker,
+  checker => $GetHTMLZeroOrMoreThenBlockOrInlineChecker->($HTML_NS, 'style'),
 };
 
 $Element->{$HTML_NS}->{font} = {
@@ -1482,22 +1532,107 @@ my $Attr = {
 
 };
 
+sub new ($) {
+  return bless {}, shift;
+} # new
+
 sub check_element ($$$) {
   my ($self, $el, $onerror) = @_;
+
+  $self->{minuses} = {};
+  $self->{onerror} = $onerror;
 
   my @nodes = ($el);
   while (@nodes) {
     my $node = shift @nodes;
+    $self->_remove_minuses ($node) and next if ref $node eq 'HASH';
+
     my $nsuri = $node->namespace_uri;
     $nsuri = '' unless defined $nsuri;
     my $ln = $node->manakai_local_name;
     my $eldef = $Element->{$nsuri}->{$ln} ||
       $Element->{$nsuri}->{''} ||
       $ElementDefault;
-    my ($children) = $eldef->{checker}->($self, $node, $onerror);
+    my ($children) = $eldef->{checker}->($self, $node);
     push @nodes, @$children;
   }
 } # check_element
 
+sub _add_minuses ($@) {
+  my $self = shift;
+  my $r = {};
+  for my $list (@_) {
+    for my $ns (keys %$list) {
+      for my $ln (keys %{$list->{$ns}}) {
+        unless ($self->{minuses}->{$ns}->{$ln}) {
+          $self->{minuses}->{$ns}->{$ln} = 1;
+          $r->{$ns}->{$ln} = 1;
+        }
+      }
+    }
+  }
+  return $r;
+} # _add_minuses
+
+sub _remove_minuses ($$) {
+  my ($self, $list) = @_;
+  for my $ns (keys %{$list}) {
+    for my $ln (keys %{$list->{$ns}}) {
+      delete $self->{minuses}->{$ns}->{$ln} if $list->{$ns}->{$ln};
+    }
+  }
+  1;
+} # _remove_minuses
+
+sub _check_get_children ($$) {
+  my ($self, $node) = @_;
+  my $ch = [];
+  my $sib = [];
+  TP: {
+    my $node_ns = $node->namespace_uri;
+    $node_ns = '' unless defined $node_ns;
+    my $node_ln = $node->manakai_local_name;
+    if ($node_ns eq $HTML_NS) {
+      if ($node_ln eq 'noscript') {
+        my $end = $self->_add_minuses ({$HTML_NS, {noscript => 1}});
+        push @$sib, $end;
+      }
+    }
+    for (@{$HTMLTransparentElements}) {
+      if ($node->manakai_element_type_match ($_->[0], $_->[1])) {
+        unshift @$sib, @{$node->child_nodes};
+        last TP;
+      }
+    }
+    if ($node->manakai_element_type_match ($HTML_NS, 'video') or
+        $node->manakai_element_type_match ($HTML_NS, 'audio')) {
+      if ($node->has_attribute_ns (undef, 'src')) {
+        unshift @$sib, @{$node->child_nodes};
+        last TP;
+      } else {
+        my @cn = @{$node->child_nodes};
+        CN: while (@cn) {
+          my $cn = shift @cn;
+          my $cnt = $cn->node_type;
+          if ($cnt == 1) {
+            if ($cn->manakai_element_type_match ($HTML_NS, 'source')) {
+              #
+            } else {
+              last CN;
+            }
+          } elsif ($cnt == 3 or $cnt == 4) {
+            if ($cn->data =~ /[^\x09-\x0D\x20]/) {
+              last CN;
+            }
+          }
+        } # CN
+        unshift @$sib, @cn;
+      }
+    }
+    push @$ch, $node;
+  } # TP
+  return ($sib, $ch);
+} # _check_get_children
+
 1;
-# $Date: 2007/05/04 09:18:20 $
+# $Date: 2007/05/05 06:51:06 $
