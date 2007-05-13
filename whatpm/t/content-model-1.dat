@@ -436,7 +436,111 @@ p {color: green}
 #data
 <body xmlns="http://www.w3.org/1999/xhtml"><b/></body>
 #errors
-/body/b;character not allowed
+/body/b;element not allowed
 
+#data
+<section xmlns="http://www.w3.org/1999/xhtml"></section>
+#errors
 
+#data
+<section xmlns="http://www.w3.org/1999/xhtml"> </section>
+#errors
 
+#data
+<section xmlns="http://www.w3.org/1999/xhtml">a</section>
+#errors
+/section/"a";character not allowed
+
+#data
+<section xmlns="http://www.w3.org/1999/xhtml"><p/></section>
+#errors
+
+#data
+<section xmlns="http://www.w3.org/1999/xhtml"><blockquote/></section>
+#errors
+
+#data
+<section xmlns="http://www.w3.org/1999/xhtml"><div/></section>
+#errors
+
+#data
+<section xmlns="http://www.w3.org/1999/xhtml">
+<script type="text/javascript"/>
+</section>
+#errors
+
+#data
+<section xmlns="http://www.w3.org/1999/xhtml"><b/></section>
+#errors
+/section/b;element not allowed
+
+#data
+<section xmlns="http://www.w3.org/1999/xhtml">
+<style type="text/css"/>
+</section>
+#errors
+
+#data
+<section xmlns="http://www.w3.org/1999/xhtml">
+<style type="text/css"/>
+<p/>
+</section>
+#errors
+
+#data
+<section xmlns="http://www.w3.org/1999/xhtml">
+<p/>
+<style type="text/css"/>
+</section>
+#errors
+/section/style;element not allowed
+
+#data
+<section xmlns="http://www.w3.org/1999/xhtml">
+<style type="text/css"/>
+<b/>
+</section>
+#errors
+/section/b;element not allowed
+
+#data
+<section xmlns="http://www.w3.org/1999/xhtml">
+<b/>
+<style type="text/css"/>
+</section>
+#errors
+/section/b;element not allowed
+/section/style;element not allowed
+
+#data
+<section xmlns="http://www.w3.org/1999/xhtml">
+<style type="text/css"/>a</section>
+#errors
+/section/"a";character not allowed
+
+#data
+<section xmlns="http://www.w3.org/1999/xhtml">a<style type="text/css"/>
+</section>
+#errors
+/section/"a";character not allowed
+
+#data
+<section xmlns="http://www.w3.org/1999/xhtml">
+<style type="text/css"/>
+<style type="text/css"/>
+<p/>
+</section>
+#errors
+
+#data
+<section xmlns="http://www.w3.org/1999/xhtml">
+<style type="text/css"/>
+<p/><p/>
+</section>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+@@ It is expected that tests for NAV and following elements come here.
+</p>
+#errors
