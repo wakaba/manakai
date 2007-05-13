@@ -45,28 +45,6 @@ for my $file_name (@FILES) {
   }
 } # @FILES
 
-
-  sub Message::DOM::Element::ManakaiDOMElement::manakai_element_type_match {
-    my ($self, $nsuri, $ln) = @_;
-    if (defined $nsuri) {
-      if (defined $self->namespace_uri and $self->namespace_uri eq $nsuri) {
-        if ($self->manakai_local_name eq $ln) {
-          return 1;
-        } else {
-          return 0;
-        }
-      } else {
-        return 0;
-      }
-    } else {
-      if (not defined $self->namespace_uri) {
-        return $self->manakai_local_name eq $ln;
-      } else {
-        return 0;
-      }
-    }
-}
-
 sub test ($) {
   my $test = shift;
 
@@ -107,4 +85,4 @@ sub get_node_path ($) {
 } # get_node_path
 
 ## License: Public Domain.
-## $Date: 2007/05/13 05:35:22 $
+## $Date: 2007/05/13 10:40:07 $

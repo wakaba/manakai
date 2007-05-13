@@ -169,7 +169,7 @@ my $HTMLStylableBlockChecker = sub {
       $node_ns = '' unless defined $node_ns;
       my $node_ln = $node->manakai_local_name;
       my $not_allowed = $self->{minuses}->{$node_ns}->{$node_ln};
-      if ($node->manakai_element_type_match ($HTML_NS, 'style')) {
+      if ($node_ns eq $HTML_NS and $node_ln eq 'style') {
         $not_allowed = 1 if $has_non_style;
       } elsif ($HTMLBlockLevelElements->{$node_ns}->{$node_ln}) {
         $has_non_style = 1;
@@ -444,7 +444,7 @@ my $GetHTMLZeroOrMoreThenBlockOrInlineChecker = sub ($$) {
         $node_ns = '' unless defined $node_ns;
         my $node_ln = $node->manakai_local_name;
         my $not_allowed = $self->{minuses}->{$node_ns}->{$node_ln};
-        if ($node->manakai_element_type_match ($elnsuri, $ellname)) {
+        if ($node_ns eq $elnsuri and $node_ln eq $ellname) {
           $not_allowed = 1 if $has_non_style;
         } elsif ($content eq 'block') {
           $has_non_style = 1;
@@ -524,18 +524,17 @@ $Element->{$HTML_NS}->{html} = {
         my $node_ln = $node->manakai_local_name;
         my $not_allowed = $self->{minuses}->{$node_ns}->{$node_ln};
         if ($phase eq 'before head') {
-          if ($node->manakai_element_type_match ($HTML_NS, 'head')) {
+          if ($node_ns eq $HTML_NS and $node_ln eq 'head') {
             $phase = 'after head';            
-          } elsif ($node->manakai_element_type_match ($HTML_NS, 'body')) {
-            $self->{onerror}
-              ->(node => $node, type => 'ps element missing:head');
+          } elsif ($node_ns eq $HTML_NS and $node_ln eq 'body') {
+            $self->{onerror}->(node => $node, type => 'ps element missing:head');
             $phase = 'after body';
           } else {
             $not_allowed = 1;
             # before head
           }
         } elsif ($phase eq 'after head') {
-          if ($node->manakai_element_type_match ($HTML_NS, 'body')) {
+          if ($node_ns eq $HTML_NS and $node_ln eq 'body') {
             $phase = 'after body';
           } else {
             $not_allowed = 1;
@@ -589,14 +588,14 @@ $Element->{$HTML_NS}->{head} = {
         $node_ns = '' unless defined $node_ns;
         my $node_ln = $node->manakai_local_name;
         my $not_allowed = $self->{minuses}->{$node_ns}->{$node_ln};
-        if ($node->manakai_element_type_match ($HTML_NS, 'title')) {
+        if ($node_ns eq $HTML_NS and $node_ln eq 'title') {
           $phase = 'after base';
           unless ($has_title) {
             $has_title = 1;
           } else {
             $not_allowed = 1;
           }
-        } elsif ($node->manakai_element_type_match ($HTML_NS, 'meta')) {
+        } elsif ($node_ns eq $HTML_NS and $node_ln eq 'meta') {
           if ($node->has_attribute_ns (undef, 'charset')) {
             if ($phase eq 'initial') {
               $phase = 'after charset';
@@ -607,7 +606,7 @@ $Element->{$HTML_NS}->{head} = {
           } else {
             $phase = 'after base';
           }
-        } elsif ($node->manakai_element_type_match ($HTML_NS, 'base')) {
+        } elsif ($node_ns eq $HTML_NS and $node_ln eq 'base') {
           if ($phase eq 'initial' or $phase eq 'after charset') {
             $phase = 'after base';
           } else {
@@ -827,11 +826,14 @@ $Element->{$HTML_NS}->{dialog} = {
 
       my $nt = $node->node_type;
       if ($nt == 1) {
+        my $node_ns = $node->namespace_uri;
+        $node_ns = '' unless defined $node_ns;
+        my $node_ln = $node->manakai_local_name;
         ## NOTE: |minuses| list is not checked since redundant
         if ($phase eq 'before dt') {
-          if ($node->manakai_element_type_match ($HTML_NS, 'dt')) {
+          if ($node_ns eq $HTML_NS and $node_ln eq 'dt') {
             $phase = 'before dd';
-          } elsif ($node->manakai_element_type_match ($HTML_NS, 'dd')) {
+          } elsif ($node_ns eq $HTML_NS and $node_ln eq 'dd') {
             $self->{onerror}
               ->(node => $node, type => 'ps element missing:dt');
             $phase = 'before dt';
@@ -839,9 +841,9 @@ $Element->{$HTML_NS}->{dialog} = {
             $self->{onerror}->(node => $node, type => 'element not allowed');
           }
         } else { # before dd
-          if ($node->manakai_element_type_match ($HTML_NS, 'dd')) {
+          if ($node_ns eq $HTML_NS and $node_ln eq 'dd') {
             $phase = 'before dt';
-          } elsif ($node->manakai_element_type_match ($HTML_NS, 'dt')) {
+          } elsif ($node_ns eq $HTML_NS and $node_ln eq 'dt') {
             $self->{onerror}
               ->(node => $node, type => 'ps element missing:dd');
             $phase = 'before dd';
@@ -884,8 +886,11 @@ $Element->{$HTML_NS}->{ol} = {
 
       my $nt = $node->node_type;
       if ($nt == 1) {
+        my $node_ns = $node->namespace_uri;
+        $node_ns = '' unless defined $node_ns;
+        my $node_ln = $node->manakai_local_name;
         ## NOTE: |minuses| list is not checked since redundant
-        unless ($node->manakai_element_type_match ($HTML_NS, 'li')) {
+        unless ($node_ns eq $HTML_NS and $node_ln eq 'li') {
           $self->{onerror}->(node => $node, type => 'element not allowed');
         }
         my ($sib, $ch) = $self->_check_get_children ($node);
@@ -939,27 +944,30 @@ $Element->{$HTML_NS}->{dl} = {
 
       my $nt = $node->node_type;
       if ($nt == 1) {
+        my $node_ns = $node->namespace_uri;
+        $node_ns = '' unless defined $node_ns;
+        my $node_ln = $node->manakai_local_name;
         ## NOTE: |minuses| list is not checked since redundant
         if ($phase eq 'in dds') {
-          if ($node->manakai_element_type_match ($HTML_NS, 'dd')) {
+          if ($node_ns eq $HTML_NS and $node_ln eq 'dd') {
             #$phase = 'in dds';
-          } elsif ($node->manakai_element_type_match ($HTML_NS, 'dt')) {
+          } elsif ($node_ns eq $HTML_NS and $node_ln eq 'dt') {
             $phase = 'in dts';
           } else {
             $self->{onerror}->(node => $node, type => 'element not allowed');
           }
         } elsif ($phase eq 'in dts') {
-          if ($node->manakai_element_type_match ($HTML_NS, 'dt')) {
+          if ($node_ns eq $HTML_NS and $node_ln eq 'dt') {
             #$phase = 'in dts';
-          } elsif ($node->manakai_element_type_match ($HTML_NS, 'dd')) {
+          } elsif ($node_ns eq $HTML_NS and $node_ln eq 'dd') {
             $phase = 'in dds';
           } else {
             $self->{onerror}->(node => $node, type => 'element not allowed');
           }
         } else { # before dt
-          if ($node->manakai_element_type_match ($HTML_NS, 'dt')) {
+          if ($node_ns eq $HTML_NS and $node_ln eq 'dt') {
             $phase = 'in dts';
-          } elsif ($node->manakai_element_type_match ($HTML_NS, 'dd')) {
+          } elsif ($node_ns eq $HTML_NS and $node_ln eq 'dd') {
             $self->{onerror}
               ->(node => $node, type => 'ps element missing:dt');
             $phase = 'in dds';
@@ -1194,65 +1202,68 @@ $Element->{$HTML_NS}->{table} = {
 
       my $nt = $node->node_type;
       if ($nt == 1) {
+        my $node_ns = $node->namespace_uri;
+        $node_ns = '' unless defined $node_ns;
+        my $node_ln = $node->manakai_local_name;
         ## NOTE: |minuses| list is not checked since redundant
         if ($phase eq 'in tbodys') {
-          if ($node->manakai_element_type_match ($HTML_NS, 'tbody')) {
+          if ($node_ns eq $HTML_NS and $node_ln eq 'tbody') {
             #$phase = 'in tbodys';
           } elsif (not $has_tfoot and
-                   $node->manakai_element_type_match ($HTML_NS, 'tfoot')) {
+                   $node_ns eq $HTML_NS and $node_ln eq 'tfoot') {
             $phase = 'after tfoot';
             $has_tfoot = 1;
           } else {
             $self->{onerror}->(node => $node, type => 'element not allowed');
           }
         } elsif ($phase eq 'in trs') {
-          if ($node->manakai_element_type_match ($HTML_NS, 'tr')) {
+          if ($node_ns eq $HTML_NS and $node_ln eq 'tr') {
             #$phase = 'in trs';
           } elsif (not $has_tfoot and
-                   $node->manakai_element_type_match ($HTML_NS, 'tfoot')) {
+                   $node_ns eq $HTML_NS and $node_ln eq 'tfoot') {
             $phase = 'after tfoot';
             $has_tfoot = 1;
           } else {
             $self->{onerror}->(node => $node, type => 'element not allowed');
           }
         } elsif ($phase eq 'after thead') {
-          if ($node->manakai_element_type_match ($HTML_NS, 'tbody')) {
+          if ($node_ns eq $HTML_NS and $node_ln eq 'tbody') {
             $phase = 'in tbodys';
-          } elsif ($node->manakai_element_type_match ($HTML_NS, 'tr')) {
+          } elsif ($node_ns eq $HTML_NS and $node_ln eq 'tr') {
             $phase = 'in trs';
-          } elsif ($node->manakai_element_type_match ($HTML_NS, 'tfoot')) {
+          } elsif ($node_ns eq $HTML_NS and $node_ln eq 'tfoot') {
             $phase = 'in tbodys';
             $has_tfoot = 1;
           } else {
             $self->{onerror}->(node => $node, type => 'element not allowed');
           }
         } elsif ($phase eq 'in colgroup') {
-          if ($node->manakai_element_type_match ($HTML_NS, 'colgroup')) {
+          if ($node_ns eq $HTML_NS and $node_ln eq 'colgroup') {
             $phase = 'in colgroup';
-          } elsif ($node->manakai_element_type_match ($HTML_NS, 'thead')) {
+          } elsif ($node_ns eq $HTML_NS and $node_ln eq 'thead') {
             $phase = 'after thead';
-          } elsif ($node->manakai_element_type_match ($HTML_NS, 'tbody')) {
+          } elsif ($node_ns eq $HTML_NS and $node_ln eq 'tbody') {
             $phase = 'in tbodys';
-          } elsif ($node->manakai_element_type_match ($HTML_NS, 'tr')) {
+          } elsif ($node_ns eq $HTML_NS and $node_ln eq 'tr') {
             $phase = 'in trs';
-          } elsif ($node->manakai_element_type_match ($HTML_NS, 'tfoot')) {
+          } elsif ($node_ns eq $HTML_NS and $node_ln eq 'tfoot') {
             $phase = 'in tbodys';
             $has_tfoot = 1;
           } else {
             $self->{onerror}->(node => $node, type => 'element not allowed');
           }
         } elsif ($phase eq 'before caption') {
-          if ($node->manakai_element_type_match ($HTML_NS, 'caption')) {
+          if ($node_ns eq $HTML_NS and $node_ln eq 'caption') {
             $phase = 'in colgroup';
-          } elsif ($node->manakai_element_type_match ($HTML_NS, 'colgroup')) {
+          } elsif ($node_ns eq $HTML_NS and $node_ln eq 'colgroup') {
             $phase = 'in colgroup';
-          } elsif ($node->manakai_element_type_match ($HTML_NS, 'thead')) {
+          } elsif ($node_ns eq $HTML_NS and $node_ln eq 'thead') {
             $phase = 'after thead';
-          } elsif ($node->manakai_element_type_match ($HTML_NS, 'tbody')) {
+          } elsif ($node_ns eq $HTML_NS and $node_ln eq 'tbody') {
             $phase = 'in tbodys';
-          } elsif ($node->manakai_element_type_match ($HTML_NS, 'tr')) {
+          } elsif ($node_ns eq $HTML_NS and $node_ln eq 'tr') {
             $phase = 'in trs';
-          } elsif ($node->manakai_element_type_match ($HTML_NS, 'tfoot')) {
+          } elsif ($node_ns eq $HTML_NS and $node_ln eq 'tfoot') {
             $phase = 'in tbodys';
             $has_tfoot = 1;
           } else {
@@ -1293,8 +1304,11 @@ $Element->{$HTML_NS}->{colgroup} = {
 
       my $nt = $node->node_type;
       if ($nt == 1) {
+        my $node_ns = $node->namespace_uri;
+        $node_ns = '' unless defined $node_ns;
+        my $node_ln = $node->manakai_local_name;
         ## NOTE: |minuses| list is not checked since redundant
-        unless ($node->manakai_element_type_match ($HTML_NS, 'col')) {
+        unless ($node_ns eq $HTML_NS and $node_ln eq 'col') {
           $self->{onerror}->(node => $node, type => 'element not allowed');
         }
         my ($sib, $ch) = $self->_check_get_children ($node);
@@ -1330,8 +1344,11 @@ $Element->{$HTML_NS}->{tbody} = {
 
       my $nt = $node->node_type;
       if ($nt == 1) {
+        my $node_ns = $node->namespace_uri;
+        $node_ns = '' unless defined $node_ns;
+        my $node_ln = $node->manakai_local_name;
         ## NOTE: |minuses| list is not checked since redundant
-        if ($node->manakai_element_type_match ($HTML_NS, 'tr')) {
+        if ($node_ns eq $HTML_NS and $node_ln eq 'tr') {
           $has_tr = 1;
         } else {
           $self->{onerror}->(node => $node, type => 'element not allowed');
@@ -1376,9 +1393,11 @@ $Element->{$HTML_NS}->{tr} = {
 
       my $nt = $node->node_type;
       if ($nt == 1) {
+        my $node_ns = $node->namespace_uri;
+        $node_ns = '' unless defined $node_ns;
+        my $node_ln = $node->manakai_local_name;
         ## NOTE: |minuses| list is not checked since redundant
-        if ($node->manakai_element_type_match ($HTML_NS, 'td') or
-            $node->manakai_element_type_match ($HTML_NS, 'th')) {
+        if ($node_ns eq $HTML_NS and ($node_ln eq 'td' or $node_ln eq 'th')) {
           $has_td = 1;
         } else {
           $self->{onerror}->(node => $node, type => 'element not allowed');
@@ -1486,7 +1505,7 @@ $Element->{$HTML_NS}->{menu} = {
         $node_ns = '' unless defined $node_ns;
         my $node_ln = $node->manakai_local_name;
         my $not_allowed = $self->{minuses}->{$node_ns}->{$node_ln};
-        if ($node->manakai_element_type_match ($HTML_NS, 'li')) {
+        if ($node_ns eq $HTML_NS and $node_ln eq 'li') {
           if ($content eq 'inline') {
             $not_allowed = 1;
           } elsif ($content eq 'li or inline') {
@@ -1632,8 +1651,7 @@ sub _check_get_children ($$) {
       unshift @$sib, @{$node->child_nodes};
       last TP;
     }
-    if ($node->manakai_element_type_match ($HTML_NS, 'video') or
-        $node->manakai_element_type_match ($HTML_NS, 'audio')) {
+    if ($node_ns eq $HTML_NS and ($node_ln eq 'video' or $node_ln eq 'audio')) {
       if ($node->has_attribute_ns (undef, 'src')) {
         unshift @$sib, @{$node->child_nodes};
         last TP;
@@ -1643,7 +1661,9 @@ sub _check_get_children ($$) {
           my $cn = shift @cn;
           my $cnt = $cn->node_type;
           if ($cnt == 1) {
-            if ($cn->manakai_element_type_match ($HTML_NS, 'source')) {
+            my $cn_nsuri = $cn->namespace_uri;
+            $cn_nsuri = '' unless defined $cn_nsuri;
+            if ($cn_nsuri eq $HTML_NS and $cn->manakai_local_name eq 'source') {
               #
             } else {
               last CN;
@@ -1663,4 +1683,4 @@ sub _check_get_children ($$) {
 } # _check_get_children
 
 1;
-# $Date: 2007/05/13 10:17:35 $
+# $Date: 2007/05/13 10:40:07 $
