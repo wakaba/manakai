@@ -1,5 +1,15 @@
 2007-05-13  Wakaba  <wakaba@suika.fam.cx>
 
+	* ContentChecker.pm: Don't generate duplicate
+	error when an element type is put in the "minus" list
+	and the element type is not allowed explicitly in the particular
+	element content model.
+	(html:a checker): New checker.
+	(html:details, html:datagrid): New checkers.
+	(html:legend): New checker.
+
+2007-05-13  Wakaba  <wakaba@suika.fam.cx>
+
 	* ContentChecker.pm (html:li checker): Implemented.
 
 2007-05-13  Wakaba  <wakaba@suika.fam.cx>

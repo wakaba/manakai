@@ -2113,6 +2113,128 @@ aaa
 /dialog/dd/p;element not allowed
 
 #data
+<a xmlns="http://www.w3.org/1999/xhtml"></a>
+#errors
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"> </a>
+#errors
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">XXX</a>
+#errors
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"><em>XXX</em></a>
+#errors
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">XXX<em>YYY</em>ZZZ</a>
+#errors
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"><blockquote/></a>
+#errors
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">XXX<blockquote/></a>
+#errors
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"><a>XXX</a></a>
+#errors
+/a/a;element not allowed
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">XXX<a>YYY</a></a>
+#errors
+/a/a;element not allowed
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"><em><a>XXX</a></em></a>
+#errors
+/a/em/a;element not allowed
+
+#data
+<details xmlns="http://www.w3.org/1999/xhtml">
+<legend/>
+<p><a/></p>
+</details>
+#errors
+/details/p/a;element not allowed
+
+#data
+<details xmlns="http://www.w3.org/1999/xhtml">
+<legend><a/></legend>
+</details>
+#errors
+/details/legend/a;element not allowed
+
+#data
+<datagrid xmlns="http://www.w3.org/1999/xhtml">
+<p><a/></p>
+</datagrid>
+#errors
+/datagrid/p/a;element not allowed
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">
+<details>
+<legend/>
+</details>
+</a>
+#errors
+/a/details;element not allowed
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">
+<span>
+<details><legend/></details>
+</span>
+</a>
+#errors
+/a/span/details;element not allowed
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">
+<datagrid/>
+</a>
+#errors
+/a/datagrid;element not allowed
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">
+<span><datagrid/></span>
+</a>
+#errors
+/a/span/datagrid;element not allowed
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"></em>
+#errors
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"> </em>
+#errors
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml">XXX</em>
+#errors
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><blockquote/></em>
+#errors
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml">XXX<blockquote/></em>
+#errors
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><p/></em>
+#errors
+/em/p;element not allowed
+
+#data
 <code xmlns="http://www.w3.org/1999/xhtml">
   <em></em>
 </code>
@@ -2244,4 +2366,67 @@ aaa
 #errors
 /p/dfn/em/dfn;element not allowed
 
+#data
+<fieldset xmlns="http://www.w3.org/1999/xhtml">
+<legend>XXX</legend>
+</fieldset>
+#errors
 
+#data
+<fieldset xmlns="http://www.w3.org/1999/xhtml">
+<legend><p>XXX</p></legend>
+</fieldset>
+#errors
+/fieldset/legend/p;element not allowed
+
+#data
+<fieldset xmlns="http://www.w3.org/1999/xhtml">
+<legend><blockquote><p>XXX</p></blockquote></legend>
+</fieldset>
+#errors
+/fieldset/legend/blockquote;element not allowed
+
+#data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+<legend>XXX</legend>
+<img/>
+</figure>
+#errors
+
+#data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+<legend><p>XXX</p></legend>
+<img/>
+</figure>
+#errors
+/figure/legend/p;element not allowed
+
+#data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+<legend><blockquote><p>XXX</p></blockquote></legend>
+<img/>
+</figure>
+#errors
+
+#data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+<legend>XXX</legend>
+<img/>
+</figure>
+#errors
+
+#data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+<legend><p>XXX</p></legend>
+<img/>
+</figure>
+#errors
+/figure/legend/p;element not allowed
+
+#data
+<figure xmlns="http://www.w3.org/1999/xhtml">
+<legend><blockquote><p>XXX</p></blockquote></legend>
+<img/>
+</figure>
+#errors
+/figure/legend/blockquote;element not allowed
