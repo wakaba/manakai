@@ -541,6 +541,558 @@ p {color: green}
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml">
-@@ It is expected that tests for NAV and following elements come here.
+@@ TODO: It is expected that tests for NAV and following elements come here.
 </p>
 #errors
+
+#data
+<body xmlns="http://www.w3.org/1999/xhtml">
+  <dl>
+    <dt>XXX</dt>
+    <dd></dd>
+  </dl>
+</body>
+#errors
+
+#data
+<body xmlns="http://www.w3.org/1999/xhtml">
+  <dl>
+    <dt>XXX</dt>
+    <dd> </dd>
+  </dl>
+</body>
+#errors
+
+#data
+<body xmlns="http://www.w3.org/1999/xhtml">
+  <dl>
+    <dt>XXX</dt>
+    <dd>YYY</dd>
+  </dl>
+</body>
+#errors
+
+#data
+<body xmlns="http://www.w3.org/1999/xhtml">
+  <dl>
+    <dt>XXX</dt>
+    <dd><p>YYY</p></dd>
+  </dl>
+</body>
+#errors
+
+#data
+<body xmlns="http://www.w3.org/1999/xhtml">
+  <dl>
+    <dt>XXX</dt>
+    <dd>YYY<p>ZZZ</p></dd>
+  </dl>
+</body>
+#errors
+/body/dl/dd/p;element not allowed
+
+#data
+<body xmlns="http://www.w3.org/1999/xhtml">
+  <dl>
+    <dt>XXX</dt>
+    <dd><p>YYY</p>ZZZ</dd>
+  </dl>
+</body>
+#errors
+/body/dl/dd/p;element not allowed
+
+#data
+<dl xmlns="http://www.w3.org/1999/xhtml">
+  <dt>XXX</dt>
+  <dd></dd>
+</dl>
+#errors
+
+#data
+<dl xmlns="http://www.w3.org/1999/xhtml">
+  <dt>XXX</dt>
+  <dd> </dd>
+</dl>
+#errors
+
+#data
+<dl xmlns="http://www.w3.org/1999/xhtml">
+  <dt>XXX</dt>
+  <dd>YYY</dd>
+</dl>
+#errors
+
+#data
+<dl xmlns="http://www.w3.org/1999/xhtml">
+  <dt>XXX</dt>
+  <dd><p>YYY</p></dd>
+</dl>
+#errors
+
+#data
+<dl xmlns="http://www.w3.org/1999/xhtml">
+  <dt>XXX</dt>
+  <dd>YYY<p>ZZZ</p></dd>
+</dl>
+#errors
+/dl/dd/p;element not allowed
+
+#data
+<dl xmlns="http://www.w3.org/1999/xhtml">
+  <dt>XXX</dt>
+  <dd><p>YYY</p>ZZZ</dd>
+</dl>
+#errors
+/dl/dd/p;element not allowed
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+  <dl>
+    <dt>XXX</dt>
+    <dd></dd>
+  </dl>
+</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+  <dl>
+    <dt>XXX</dt>
+    <dd> </dd>
+  </dl>
+</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+  <dl>
+    <dt>XXX</dt>
+    <dd>YYY</dd>
+  </dl>
+</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+  <dl>
+    <dt>XXX</dt>
+    <dd><p>YYY</p></dd>
+  </dl>
+</p>
+#errors
+/p/dl/dd/p;element not allowed
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+  <dl>
+    <dt>XXX</dt>
+    <dd>YYY<p>ZZZ</p></dd>
+  </dl>
+</p>
+#errors
+/p/dl/dd/p;element not allowed
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <p/>
+  <dl>
+    <dt>XXX</dt>
+    <dd></dd>
+  </dl>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <p/>
+  <dl>
+    <dt>XXX</dt>
+    <dd> </dd>
+  </dl>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <p/>
+  <dl>
+    <dt>XXX</dt>
+    <dd>YYY</dd>
+  </dl>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <p/>
+  <dl>
+    <dt>XXX</dt>
+    <dd><p>YYY</p></dd>
+  </dl>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <p/>
+  <dl>
+    <dt>XXX</dt>
+    <dd>YYY<p>ZZZ</p></dd>
+  </dl>
+</div>
+#errors
+/div/dl/dd/p;element not allowed
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <dl>
+    <dt>XXX</dt>
+    <dd></dd>
+  </dl>
+  <p/>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <dl>
+    <dt>XXX</dt>
+    <dd> </dd>
+  </dl>
+  <p/>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <dl>
+    <dt>XXX</dt>
+    <dd>YYY</dd>
+  </dl>
+  <p/>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <dl>
+    <dt>XXX</dt>
+    <dd><p>YYY</p></dd>
+  </dl>
+  <p/>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <dl>
+    <dt>XXX</dt>
+    <dd><p>YYY</p>ZZZ</dd>
+  </dl>
+  <p/>
+</div>
+#errors
+/div/dl/dd/p;element not allowed
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <dl>
+    <dt>XXX</dt>
+    <dd>YYY<p>ZZZ</p></dd>
+  </dl>
+  <p/>
+</div>
+#errors
+/div/dl/dd/p;element not allowed
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  aaa
+  <dl>
+    <dt>XXX</dt>
+    <dd></dd>
+  </dl>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  aaa
+  <dl>
+    <dt>XXX</dt>
+    <dd> </dd>
+  </dl>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  aaa
+  <dl>
+    <dt>XXX</dt>
+    <dd>YYY</dd>
+  </dl>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  aaa
+  <dl>
+    <dt>XXX</dt>
+    <dd><p>YYY</p></dd>
+  </dl>
+</div>
+#errors
+/div/dl/dd/p;element not allowed
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  aaa
+  <dl>
+    <dt>XXX</dt>
+    <dd>YYY<p>ZZZ</p></dd>
+  </dl>
+</div>
+#errors
+/div/dl/dd/p;element not allowed
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <dl>
+    <dt>XXX</dt>
+    <dd></dd>
+  </dl>
+  aaa
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <dl>
+    <dt>XXX</dt>
+    <dd> </dd>
+  </dl>
+  aaa
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <dl>
+    <dt>XXX</dt>
+    <dd>YYY</dd>
+  </dl>
+  aaa
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <dl>
+    <dt>XXX</dt>
+    <dd><p>YYY</p></dd>
+  </dl>
+  aaa
+</div>
+#errors
+/div/dl/dd/p;element not allowed
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <dl>
+    <dt>XXX</dt>
+    <dd>YYY<p>ZZZ</p></dd>
+  </dl>
+  aaa
+</div>
+#errors
+/div/dl/dd/p;element not allowed
+
+#data
+<body xmlns="http://www.w3.org/1999/xhtml">
+  <dl>
+    <dt>XXX</dt>
+    <dd><p>YYY</p>ZZZ</dd>
+  </dl>
+</body>
+#errors
+/body/dl/dd/p;element not allowed
+
+#data
+<dialog xmlns="http://www.w3.org/1999/xhtml">
+  <dt>XXX</dt>
+  <dd></dd>
+</dialog>
+#errors
+
+#data
+<dialog xmlns="http://www.w3.org/1999/xhtml">
+  <dt>XXX</dt>
+  <dd> </dd>
+</dialog>
+#errors
+
+#data
+<dialog xmlns="http://www.w3.org/1999/xhtml">
+  <dt>XXX</dt>
+  <dd>YYY</dd>
+</dialog>
+#errors
+
+#data
+<dialog xmlns="http://www.w3.org/1999/xhtml">
+  <dt>XXX</dt>
+  <dd><p>YYY</p></dd>
+</dialog>
+#errors
+
+#data
+<dialog xmlns="http://www.w3.org/1999/xhtml">
+  <dt>XXX</dt>
+  <dd>YYY<p>ZZZ</p></dd>
+</dialog>
+#errors
+/dialog/dd/p;element not allowed
+
+#data
+<dialog xmlns="http://www.w3.org/1999/xhtml">
+  <dt>XXX</dt>
+  <dd><p>YYY</p>ZZZ</dd>
+</dialog>
+#errors
+/dialog/dd/p;element not allowed
+
+#data
+<code xmlns="http://www.w3.org/1999/xhtml">
+  <em></em>
+</code>
+#errors
+
+#data
+<code xmlns="http://www.w3.org/1999/xhtml">
+  <em> </em>
+</code>
+#errors
+
+#data
+<code xmlns="http://www.w3.org/1999/xhtml">
+  <em>XXX</em>
+</code>
+#errors
+
+#data
+<code xmlns="http://www.w3.org/1999/xhtml">
+  <em>XXX<b/></em>
+</code>
+#errors
+
+#data
+<code xmlns="http://www.w3.org/1999/xhtml">
+  <em>XXX<blockquote/></em>
+</code>
+#errors
+/code/em/blockquote;element not allowed
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+  <em></em>
+</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+  <em> </em>
+</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+  <em>XXX</em>
+</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+  <em>XXX<b>YYY</b></em>
+</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+  <em>XXX<blockquote/></em>
+</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+@@ TODO: strong, small, m 
+</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+<dfn></dfn>
+</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+<dfn> </dfn>
+</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+<dfn>XXX</dfn>
+</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+<dfn><em>XXX</em></dfn>
+</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+<dfn><em><blockquote/></em></dfn>
+</p>
+#errors
+/p/dfn/em/blockquote;element not allowed
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+<dfn><blockquote/></dfn>
+</p>
+#errors
+/p/dfn/blockquote;element not allowed
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+<dfn><h1/></dfn>
+</p>
+#errors
+/p/dfn/h1;element not allowed
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+<dfn><dfn>XXX</dfn></dfn>
+</p>
+#errors
+/p/dfn/dfn;element not allowed
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+<dfn></dfn><dfn/>
+</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+<dfn><em><dfn/></em></dfn>
+</p>
+#errors
+/p/dfn/em/dfn;element not allowed
+
+

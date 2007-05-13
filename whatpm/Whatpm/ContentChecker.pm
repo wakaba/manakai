@@ -3,8 +3,9 @@ use strict;
 
 ## ANY
 my $AnyChecker = sub {
-  my ($self, $el) = @_;
-  my $children = [];
+  my ($self, $todo) = @_;
+  my $el = $todo->{node};
+  my $new_todos = [];
   my @nodes = (@{$el->child_nodes});
   while (@nodes) {
     my $node = shift @nodes;
@@ -18,19 +19,19 @@ my $AnyChecker = sub {
       if ($self->{minuses}->{$node_ns}->{$node_ln}) {
         $self->{onerror}->(node => $node, type => 'element not allowed');
       }
-      push @$children, $node;
+      push @$new_todos, {type => 'element', node => $node};
     } elsif ($nt == 5) {
       unshift @nodes, @{$node->child_nodes};
     }
   }
-  return ($children);
+  return ($new_todos);
 }; # $AnyChecker
 
 my $ElementDefault = {
   checker => sub {
-    my ($self, $el) = @_;
-    $self->{onerror}->(node => $el, type => 'element not supported');
-    return $AnyChecker->($self, $el);
+    my ($self, $todo) = @_;
+    $self->{onerror}->(node => $todo->{node}, type => 'element not supported');
+    return $AnyChecker->($self, $todo);
   },
 };
 
@@ -170,8 +171,9 @@ my $HTMLEmbededElements = [
 
 ## Empty
 my $HTMLEmptyChecker = sub {
-  my ($self, $el) = @_;
-  my $children = [];
+  my ($self, $todo) = @_;
+  my $el = $todo->{node};
+  my $new_todos = [];
   my @nodes = (@{$el->child_nodes});
 
   while (@nodes) {
@@ -184,7 +186,7 @@ my $HTMLEmptyChecker = sub {
       $self->{onerror}->(node => $node, type => 'element not allowed');
       my ($sib, $ch) = $self->_check_get_children ($node);
       unshift @nodes, @$sib;
-      push @$children, @$ch;
+      push @$new_todos, @$ch;
     } elsif ($nt == 3 or $nt == 4) {
       if ($node->data =~ /[^\x09-\x0D\x20]/) {
         $self->{onerror}->(node => $node, type => 'character not allowed');
@@ -193,13 +195,14 @@ my $HTMLEmptyChecker = sub {
       unshift @nodes, @{$node->child_nodes};
     }
   }
-  return ($children);
+  return ($new_todos);
 };
 
 ## Text
 my $HTMLTextChecker = sub {
-  my ($self, $el) = @_;
-  my $children = [];
+  my ($self, $todo) = @_;
+  my $el = $todo->{node};
+  my $new_todos = [];
   my @nodes = (@{$el->child_nodes});
 
   while (@nodes) {
@@ -212,19 +215,20 @@ my $HTMLTextChecker = sub {
       $self->{onerror}->(node => $node, type => 'element not allowed');
       my ($sib, $ch) = $self->_check_get_children ($node);
       unshift @nodes, @$sib;
-      push @$children, @$ch;
+      push @$new_todos, @$ch;
     } elsif ($nt == 5) {
       unshift @nodes, @{$node->child_nodes};
     }
   }
-  return ($children);
+  return ($new_todos);
 };
 
 ## Zero or more |html:style| elements,
 ## followed by zero or more block-level elements
 my $HTMLStylableBlockChecker = sub {
-  my ($self, $el) = @_;
-  my $children = [];
+  my ($self, $todo) = @_;
+  my $el = $todo->{node};
+  my $new_todos = [];
   my @nodes = (@{$el->child_nodes});
   
   my $has_non_style;
@@ -257,7 +261,7 @@ my $HTMLStylableBlockChecker = sub {
       }
       my ($sib, $ch) = $self->_check_get_children ($node);
       unshift @nodes, @$sib;
-      push @$children, @$ch;
+      push @$new_todos, @$ch;
     } elsif ($nt == 3 or $nt == 4) {
       if ($node->data =~ /[^\x09-\x0D\x20]/) {
         $self->{onerror}->(node => $node, type => 'character not allowed');
@@ -266,13 +270,14 @@ my $HTMLStylableBlockChecker = sub {
       unshift @nodes, @{$node->child_nodes};
     }
   }
-  return ($children);
+  return ($new_todos);
 }; # $HTMLStylableBlockChecker
 
 ## Zero or more block-level elements
 my $HTMLBlockChecker = sub {
-  my ($self, $el) = @_;
-  my $children = [];
+  my ($self, $todo) = @_;
+  my $el = $todo->{node};
+  my $new_todos = [];
   my @nodes = (@{$el->child_nodes});
   
   while (@nodes) {
@@ -297,7 +302,7 @@ my $HTMLBlockChecker = sub {
       } # CHK
       my ($sib, $ch) = $self->_check_get_children ($node);
       unshift @nodes, @$sib;
-      push @$children, @$ch;
+      push @$new_todos, @$ch;
     } elsif ($nt == 3 or $nt == 4) {
       if ($node->data =~ /[^\x09-\x0D\x20]/) {
         $self->{onerror}->(node => $node, type => 'character not allowed');
@@ -306,13 +311,14 @@ my $HTMLBlockChecker = sub {
       unshift @nodes, @{$node->child_nodes};
     }
   }
-  return ($children);
+  return ($new_todos);
 }; # $HTMLBlockChecker
 
 ## Inline-level content
 my $HTMLInlineChecker = sub {
-  my ($self, $el) = @_;
-  my $children = [];
+  my ($self, $todo) = @_;
+  my $el = $todo->{node};
+  my $new_todos = [];
   my @nodes = (@{$el->child_nodes});
   
   while (@nodes) {
@@ -338,21 +344,26 @@ my $HTMLInlineChecker = sub {
       } # CHK
       my ($sib, $ch) = $self->_check_get_children ($node);
       unshift @nodes, @$sib;
-      push @$children, @$ch;
+      push @$new_todos, @$ch;
     } elsif ($nt == 5) {
       unshift @nodes, @{$node->child_nodes};
     }
   }
-  return ($children);
-}; # $HTMLStrictlyInlineChecker
+
+  for (@$new_todos) {
+    $_->{inline} = 1;
+  }
+  return ($new_todos);
+}; # $HTMLInlineChecker
 
 my $HTMLSignificantInlineChecker = $HTMLInlineChecker;
 ## TODO: check significant content
 
 ## Strictly inline-level content
 my $HTMLStrictlyInlineChecker = sub {
-  my ($self, $el) = @_;
-  my $children = [];
+  my ($self, $todo) = @_;
+  my $el = $todo->{node};
+  my $new_todos = [];
   my @nodes = (@{$el->child_nodes});
   
   while (@nodes) {
@@ -377,20 +388,69 @@ my $HTMLStrictlyInlineChecker = sub {
       } # CHK
       my ($sib, $ch) = $self->_check_get_children ($node);
       unshift @nodes, @$sib;
-      push @$children, @$ch;
+      push @$new_todos, @$ch;
     } elsif ($nt == 5) {
       unshift @nodes, @{$node->child_nodes};
     }
   }
-  return ($children);
+
+  for (@$new_todos) {
+    $_->{inline} = 1;
+    $_->{strictly_inline} = 1;
+  }
+  return ($new_todos);
 }; # $HTMLStrictlyInlineChecker
 
 my $HTMLSignificantStrictlyInlineChecker = $HTMLStrictlyInlineChecker;
 ## TODO: check significant content
 
+## Inline-level or strictly inline-kevek content
+my $HTMLInlineOrStrictlyInlineChecker = sub {
+  my ($self, $todo) = @_;
+  my $el = $todo->{node};
+  my $new_todos = [];
+  my @nodes = (@{$el->child_nodes});
+  
+  while (@nodes) {
+    my $node = shift @nodes;
+    $self->_remove_minuses ($node) and next if ref $node eq 'HASH';
+
+    my $nt = $node->node_type;
+    if ($nt == 1) {
+      my $node_ns = $node->namespace_uri;
+      $node_ns = '' unless defined $node_ns;
+      my $node_ln = $node->manakai_local_name;
+      if ($self->{minuses}->{$node_ns}->{$node_ln}) {
+        $self->{onerror}->(node => $node, type => 'element not allowed');
+      }
+      CHK: {
+        for (@{$HTMLStrictlyInlineLevelElements},
+             $todo->{strictly_inline} ? () : @{$HTMLStructuredInlineLevelElements}) {
+          if ($node->manakai_element_type_match ($_->[0], $_->[1])) {
+            last CHK;
+          }
+        }
+        $self->{onerror}->(node => $node, type => 'element not allowed');
+      } # CHK
+      my ($sib, $ch) = $self->_check_get_children ($node);
+      unshift @nodes, @$sib;
+      push @$new_todos, @$ch;
+    } elsif ($nt == 5) {
+      unshift @nodes, @{$node->child_nodes};
+    }
+  }
+
+  for (@$new_todos) {
+    $_->{inline} = 1;
+    $_->{strictly_inline} = 1;
+  }
+  return ($new_todos);
+}; # $HTMLInlineOrStrictlyInlineChecker
+
 my $HTMLBlockOrInlineChecker = sub {
-  my ($self, $el) = @_;
-  my $children = [];
+  my ($self, $todo) = @_;
+  my $el = $todo->{node};
+  my $new_todos = [];
   my @nodes = (@{$el->child_nodes});
   
   my $content = 'block-or-inline'; # or 'block' or 'inline'
@@ -457,7 +517,7 @@ my $HTMLBlockOrInlineChecker = sub {
       }
       my ($sib, $ch) = $self->_check_get_children ($node);
       unshift @nodes, @$sib;
-      push @$children, @$ch;
+      push @$new_todos, @$ch;
     } elsif ($nt == 3 or $nt == 4) {
       if ($node->data =~ /[^\x09-\x0D\x20]/) {
         if ($content eq 'block') {
@@ -473,15 +533,22 @@ my $HTMLBlockOrInlineChecker = sub {
       unshift @nodes, @{$node->child_nodes};
     }
   }
-  return ($children);
+
+  if ($content eq 'inline') {
+    for (@$new_todos) {
+      $_->{inline} = 1;
+    }
+  }
+  return ($new_todos);
 };
 
 ## Zero or more XXX element, then either block-level or inline-level
 my $GetHTMLZeroOrMoreThenBlockOrInlineChecker = sub ($$) {
   my ($elnsuri, $ellname) = @_;
   return sub {
-    my ($self, $el) = @_;
-    my $children = [];
+    my ($self, $todo) = @_;
+    my $el = $todo->{node};
+    my $new_todos = [];
     my @nodes = (@{$el->child_nodes});
     
     my $has_non_style;
@@ -556,7 +623,7 @@ my $GetHTMLZeroOrMoreThenBlockOrInlineChecker = sub ($$) {
         }
         my ($sib, $ch) = $self->_check_get_children ($node);
         unshift @nodes, @$sib;
-        push @$children, @$ch;
+        push @$new_todos, @$ch;
       } elsif ($nt == 3 or $nt == 4) {
         if ($node->data =~ /[^\x09-\x0D\x20]/) {
           $has_non_style = 1;
@@ -573,7 +640,13 @@ my $GetHTMLZeroOrMoreThenBlockOrInlineChecker = sub ($$) {
         unshift @nodes, @{$node->child_nodes};
       }
     }
-    return ($children);
+
+    if ($content eq 'inline') {
+      for (@$new_todos) {
+        $_->{inline} = 1;
+      }
+    }
+    return ($new_todos);
   };
 }; # $GetHTMLZeroOrMoreThenBlockOrInlineChecker
 
@@ -581,8 +654,9 @@ my $HTMLTransparentChecker = $HTMLBlockOrInlineChecker;
 
 $Element->{$HTML_NS}->{html} = {
   checker => sub {
-    my ($self, $el) = @_;
-    my $children = [];
+    my ($self, $todo) = @_;
+    my $el = $todo->{node};
+    my $new_todos = [];
     my @nodes = (@{$el->child_nodes});
 
     my $phase = 'before head';
@@ -622,7 +696,7 @@ $Element->{$HTML_NS}->{html} = {
         }
         my ($sib, $ch) = $self->_check_get_children ($node);
         unshift @nodes, @$sib;
-        push @$children, @$ch;
+        push @$new_todos, @$ch;
       } elsif ($nt == 3 or $nt == 4) {
         if ($node->data =~ /[^\x09-\x0D\x20]/) {
           $self->{onerror}->(node => $node, type => 'character not allowed');
@@ -639,14 +713,15 @@ $Element->{$HTML_NS}->{html} = {
       $self->{onerror}->(node => $el, type => 'child element missing:body');
     }
 
-    return ($children);
+    return ($new_todos);
   },
 };
 
 $Element->{$HTML_NS}->{head} = {
   checker => sub {
-    my ($self, $el) = @_;
-    my $children = [];
+    my ($self, $todo) = @_;
+    my $el = $todo->{node};
+    my $new_todos = [];
     my @nodes = (@{$el->child_nodes});
 
     my $has_title;
@@ -700,7 +775,7 @@ $Element->{$HTML_NS}->{head} = {
         }
         my ($sib, $ch) = $self->_check_get_children ($node);
         unshift @nodes, @$sib;
-        push @$children, @$ch;
+        push @$new_todos, @$ch;
       } elsif ($nt == 3 or $nt == 4) {
         if ($node->data =~ /[^\x09-\x0D\x20]/) {
           $self->{onerror}->(node => $node, type => 'character not allowed');
@@ -712,7 +787,7 @@ $Element->{$HTML_NS}->{head} = {
     unless ($has_title) {
       $self->{onerror}->(node => $el, type => 'child element missing:title');
     }
-    return ($children);
+    return ($new_todos);
   },
 };
 
@@ -789,8 +864,9 @@ $Element->{$HTML_NS}->{h6} = {
 
 $Element->{$HTML_NS}->{footer} = {
   checker => sub { ## block -hn -header -footer -sectioning or inline
-    my ($self, $el) = @_;
-    my $children = [];
+    my ($self, $todo) = @_;
+    my $el = $todo->{node};
+    my $new_todos = [];
     my @nodes = (@{$el->child_nodes});
   
     my $content = 'block-or-inline'; # or 'block' or 'inline'
@@ -864,7 +940,7 @@ $Element->{$HTML_NS}->{footer} = {
         }
         my ($sib, $ch) = $self->_check_get_children ($node);
         unshift @nodes, @$sib;
-        push @$children, @$ch;
+        push @$new_todos, @$ch;
       } elsif ($nt == 3 or $nt == 4) {
         if ($node->data =~ /[^\x09-\x0D\x20]/) {
           if ($content eq 'block') {
@@ -884,9 +960,15 @@ $Element->{$HTML_NS}->{footer} = {
     my $end = $self->_add_minuses
       ({$HTML_NS => {qw/h1 1 h2 1 h3 1 h4 1 h5 1 h6 1/}},
        $HTMLSectioningElements);
-    push @$children, $end;
+    push @$new_todos, $end;
 
-    return ($children);
+    if ($content eq 'inline') {
+      for (@$new_todos) {
+        $_->{inline} = 1;
+      }
+    }
+
+    return ($new_todos);
   },
 };
 
@@ -908,8 +990,9 @@ $Element->{$HTML_NS}->{br} = {
 
 $Element->{$HTML_NS}->{dialog} = {
   checker => sub {
-    my ($self, $el) = @_;
-    my $children = [];
+    my ($self, $todo) = @_;
+    my $el = $todo->{node};
+    my $new_todos = [];
     my @nodes = (@{$el->child_nodes});
 
     my $phase = 'before dt';
@@ -943,7 +1026,7 @@ $Element->{$HTML_NS}->{dialog} = {
         }
         my ($sib, $ch) = $self->_check_get_children ($node);
         unshift @nodes, @$sib;
-        push @$children, @$ch;
+        push @$new_todos, @$ch;
       } elsif ($nt == 3 or $nt == 4) {
         if ($node->data =~ /[^\x09-\x0D\x20]/) {
           $self->{onerror}->(node => $node, type => 'character not allowed');
@@ -955,7 +1038,7 @@ $Element->{$HTML_NS}->{dialog} = {
     if ($phase eq 'before dd') {
       $self->{onerror}->(node => $el, type => 'ps element missing:dd');
     }
-    return ($children);
+    return ($new_todos);
   },
 };
 
@@ -965,8 +1048,9 @@ $Element->{$HTML_NS}->{pre} = {
 
 $Element->{$HTML_NS}->{ol} = {
   checker => sub {
-    my ($self, $el) = @_;
-    my $children = [];
+    my ($self, $todo) = @_;
+    my $el = $todo->{node};
+    my $new_todos = [];
     my @nodes = (@{$el->child_nodes});
 
     while (@nodes) {
@@ -981,7 +1065,7 @@ $Element->{$HTML_NS}->{ol} = {
         }
         my ($sib, $ch) = $self->_check_get_children ($node);
         unshift @nodes, @$sib;
-        push @$children, @$ch;
+        push @$new_todos, @$ch;
       } elsif ($nt == 3 or $nt == 4) {
         if ($node->data =~ /[^\x09-\x0D\x20]/) {
           $self->{onerror}->(node => $node, type => 'character not allowed');
@@ -990,7 +1074,13 @@ $Element->{$HTML_NS}->{ol} = {
         unshift @nodes, @{$node->child_nodes};
       }
     }
-    return ($children);
+
+    if ($todo->{inline}) {
+      for (@$new_todos) {
+        $_->{inline} = 1;
+      }
+    }
+    return ($new_todos);
   },
 };
 
@@ -1002,8 +1092,9 @@ $Element->{$HTML_NS}->{ul} = {
 
 $Element->{$HTML_NS}->{dl} = {
   checker => sub {
-    my ($self, $el) = @_;
-    my $children = [];
+    my ($self, $todo) = @_;
+    my $el = $todo->{node};
+    my $new_todos = [];
     my @nodes = (@{$el->child_nodes});
 
     my $phase = 'before dt';
@@ -1043,7 +1134,7 @@ $Element->{$HTML_NS}->{dl} = {
         }
         my ($sib, $ch) = $self->_check_get_children ($node);
         unshift @nodes, @$sib;
-        push @$children, @$ch;
+        push @$new_todos, @$ch;
       } elsif ($nt == 3 or $nt == 4) {
         if ($node->data =~ /[^\x09-\x0D\x20]/) {
           $self->{onerror}->(node => $node, type => 'character not allowed');
@@ -1055,7 +1146,13 @@ $Element->{$HTML_NS}->{dl} = {
     if ($phase eq 'in dts') {
       $self->{onerror}->(node => $el, type => 'ps element missing:dd');
     }
-    return ($children);
+
+    if ($todo->{inline}) {
+      for (@$new_todos) {
+        $_->{inline} = 1;
+      }
+    }
+    return ($new_todos);
   },
 };
 
@@ -1063,19 +1160,53 @@ $Element->{$HTML_NS}->{dt} = {
   checker => $HTMLStrictlyInlineChecker,
 };
 
-## TODO: dd
+$Element->{$HTML_NS}->{dd} = {
+  checker => sub {
+    my ($self, $todo) = @_;
+    if ($todo->{inline}) {
+      return $HTMLInlineChecker->($self, $todo);
+    } else {
+      return $HTMLBlockOrInlineChecker->($self, $todo);
+    }
+  },
+};
 
 ## TODO: a
 
-## TODO: q
+$Element->{$HTML_NS}->{q} = {
+  checker => $HTMLInlineOrStrictlyInlineChecker,
+};
 
 $Element->{$HTML_NS}->{cite} = {
   checker => $HTMLStrictlyInlineChecker,
 };
 
-## TODO: em
+$Element->{$HTML_NS}->{em} = {
+  checker => $HTMLInlineOrStrictlyInlineChecker,
+};
 
-## TODO: strong, small, m, dfn
+$Element->{$HTML_NS}->{strong} = {
+  checker => $HTMLInlineOrStrictlyInlineChecker,
+};
+
+$Element->{$HTML_NS}->{small} = {
+  checker => $HTMLInlineOrStrictlyInlineChecker,
+};
+
+$Element->{$HTML_NS}->{m} = {
+  checker => $HTMLInlineOrStrictlyInlineChecker,
+};
+
+$Element->{$HTML_NS}->{dfn} = {
+  checker => sub {
+    my ($self, $todo) = @_;
+
+    my $end = $self->_add_minuses ({$HTML_NS => {dfn => 1}});
+    my ($sib, $ch) = $HTMLStrictlyInlineChecker->($self, $todo);
+    push @$sib, $end;
+    return ($sib, $ch);
+  },
+};
 
 $Element->{$HTML_NS}->{abbr} = {
   checker => $HTMLStrictlyInlineChecker,
@@ -1093,13 +1224,17 @@ $Element->{$HTML_NS}->{progress} = {
   checker => $HTMLStrictlyInlineChecker,
 };
 
-## TODO: code
+$Element->{$HTML_NS}->{code} = {
+  checker => $HTMLInlineOrStrictlyInlineChecker,
+};
 
 $Element->{$HTML_NS}->{var} = {
   checker => $HTMLStrictlyInlineChecker,
 };
 
-## TODO: samp
+$Element->{$HTML_NS}->{samp} = {
+  checker => $HTMLInlineOrStrictlyInlineChecker,
+};
 
 $Element->{$HTML_NS}->{kbd} = {
   checker => $HTMLStrictlyInlineChecker,
@@ -1113,7 +1248,9 @@ $Element->{$HTML_NS}->{sup} = {
   checker => $HTMLStrictlyInlineChecker,
 };
 
-## TODO: span
+$Element->{$HTML_NS}->{span} = {
+  checker => $HTMLInlineOrStrictlyInlineChecker,
+};
 
 $Element->{$HTML_NS}->{i} = {
   checker => $HTMLStrictlyInlineChecker,
@@ -1133,9 +1270,9 @@ $Element->{$HTML_NS}->{ins} = {
 
 $Element->{$HTML_NS}->{del} = {
   checker => sub {
-    my ($self, $el) = @_;
+    my ($self, $todo) = @_;
 
-    my $parent = $el->manakai_parent_element;
+    my $parent = $todo->{node}->manakai_parent_element;
     if (defined $parent) {
       my $nsuri = $parent->namespace_uri;
       $nsuri = '' unless defined $nsuri;
@@ -1143,9 +1280,9 @@ $Element->{$HTML_NS}->{del} = {
       my $eldef = $Element->{$nsuri}->{$ln} ||
         $Element->{$nsuri}->{''} ||
         $ElementDefault;
-      return $eldef->{checker}->($self, $el);
+      return $eldef->{checker}->($self, $todo);
     } else {
-      return $HTMLBlockOrInlineChecker->($self, $el);
+      return $HTMLBlockOrInlineChecker->($self, $todo);
     }
   },
 };
@@ -1172,13 +1309,13 @@ $Element->{$HTML_NS}->{param} = {
 
 $Element->{$HTML_NS}->{video} = {
   checker => sub {
-    my ($self, $el) = @_;
+    my ($self, $todo) = @_;
 
-    if ($el->has_attribute_ns (undef, 'src')) {
-      return $HTMLBlockOrInlineChecker->($self, $el);
+    if ($todo->{node}->has_attribute_ns (undef, 'src')) {
+      return $HTMLBlockOrInlineChecker->($self, $todo);
     } else {
       return $GetHTMLZeroOrMoreThenBlockOrInlineChecker->($HTML_NS, 'source')
-        ->($self, $el);
+        ->($self, $todo);
     }
   },
 };
@@ -1206,8 +1343,9 @@ $Element->{$HTML_NS}->{area} = {
 
 $Element->{$HTML_NS}->{table} = {
   checker => sub {
-    my ($self, $el) = @_;
-    my $children = [];
+    my ($self, $todo) = @_;
+    my $el = $todo->{node};
+    my $new_todos = [];
     my @nodes = (@{$el->child_nodes});
 
     my $phase = 'before caption';
@@ -1287,7 +1425,7 @@ $Element->{$HTML_NS}->{table} = {
         }
         my ($sib, $ch) = $self->_check_get_children ($node);
         unshift @nodes, @$sib;
-        push @$children, @$ch;
+        push @$new_todos, @$ch;
       } elsif ($nt == 3 or $nt == 4) {
         if ($node->data =~ /[^\x09-\x0D\x20]/) {
           $self->{onerror}->(node => $node, type => 'character not allowed');
@@ -1296,7 +1434,7 @@ $Element->{$HTML_NS}->{table} = {
         unshift @nodes, @{$node->child_nodes};
       }
     }
-    return ($children);
+    return ($new_todos);
   },
 };
 
@@ -1306,8 +1444,9 @@ $Element->{$HTML_NS}->{caption} = {
 
 $Element->{$HTML_NS}->{colgroup} = {
   checker => sub {
-    my ($self, $el) = @_;
-    my $children = [];
+    my ($self, $todo) = @_;
+    my $el = $todo->{node};
+    my $new_todos = [];
     my @nodes = (@{$el->child_nodes});
 
     while (@nodes) {
@@ -1322,7 +1461,7 @@ $Element->{$HTML_NS}->{colgroup} = {
         }
         my ($sib, $ch) = $self->_check_get_children ($node);
         unshift @nodes, @$sib;
-        push @$children, @$ch;
+        push @$new_todos, @$ch;
       } elsif ($nt == 3 or $nt == 4) {
         if ($node->data =~ /[^\x09-\x0D\x20]/) {
           $self->{onerror}->(node => $node, type => 'character not allowed');
@@ -1331,7 +1470,7 @@ $Element->{$HTML_NS}->{colgroup} = {
         unshift @nodes, @{$node->child_nodes};
       }
     }
-    return ($children);
+    return ($new_todos);
   },
 };
 
@@ -1341,8 +1480,9 @@ $Element->{$HTML_NS}->{col} = {
 
 $Element->{$HTML_NS}->{tbody} = {
   checker => sub {
-    my ($self, $el) = @_;
-    my $children = [];
+    my ($self, $todo) = @_;
+    my $el = $todo->{node};
+    my $new_todos = [];
     my @nodes = (@{$el->child_nodes});
 
     my $has_tr;
@@ -1360,7 +1500,7 @@ $Element->{$HTML_NS}->{tbody} = {
         }
         my ($sib, $ch) = $self->_check_get_children ($node);
         unshift @nodes, @$sib;
-        push @$children, @$ch;
+        push @$new_todos, @$ch;
       } elsif ($nt == 3 or $nt == 4) {
         if ($node->data =~ /[^\x09-\x0D\x20]/) {
           $self->{onerror}->(node => $node, type => 'character not allowed');
@@ -1372,7 +1512,7 @@ $Element->{$HTML_NS}->{tbody} = {
     unless ($has_tr) {
       $self->{onerror}->(node => $el, type => 'child element missing:tr');
     }
-    return ($children);
+    return ($new_todos);
   },
 };
 
@@ -1386,8 +1526,9 @@ $Element->{$HTML_NS}->{tfoot} = {
 
 $Element->{$HTML_NS}->{tr} = {
   checker => sub {
-    my ($self, $el) = @_;
-    my $children = [];
+    my ($self, $todo) = @_;
+    my $el = $todo->{node};
+    my $new_todos = [];
     my @nodes = (@{$el->child_nodes});
 
     my $has_td;
@@ -1406,7 +1547,7 @@ $Element->{$HTML_NS}->{tr} = {
         }
         my ($sib, $ch) = $self->_check_get_children ($node);
         unshift @nodes, @$sib;
-        push @$children, @$ch;
+        push @$new_todos, @$ch;
       } elsif ($nt == 3 or $nt == 4) {
         if ($node->data =~ /[^\x09-\x0D\x20]/) {
           $self->{onerror}->(node => $node, type => 'character not allowed');
@@ -1418,7 +1559,7 @@ $Element->{$HTML_NS}->{tr} = {
     unless ($has_td) {
       $self->{onerror}->(node => $el, type => 'child element missing:td|th');
     }
-    return ($children);
+    return ($new_todos);
   },
 };
 
@@ -1434,13 +1575,13 @@ $Element->{$HTML_NS}->{th} = {
 
 $Element->{$HTML_NS}->{script} = {
   checker => sub {
-    my ($self, $el) = @_;
+    my ($self, $todo) = @_;
 
-    if ($el->has_attribute_ns (undef, 'src')) {
-      return $HTMLEmptyChecker->($self, $el);
+    if ($todo->{node}->has_attribute_ns (undef, 'src')) {
+      return $HTMLEmptyChecker->($self, $todo);
     } else {
       ## NOTE: No content model conformance in HTML5 spec.
-      return $AnyChecker->($self, $el);
+      return $AnyChecker->($self, $todo);
     }
   },
 };
@@ -1448,15 +1589,14 @@ $Element->{$HTML_NS}->{script} = {
 ## NOTE: When script is disabled.
 $Element->{$HTML_NS}->{noscript} = {
   checker => sub {
-    my ($self, $el) = @_;
+    my ($self, $todo) = @_;
 
     my $end = $self->_add_minuses ({$HTML_NS => {noscript => 1}});
-    my ($sib, $ch) = $HTMLBlockOrInlineChecker->($self, $el);
+    my ($sib, $ch) = $HTMLBlockOrInlineChecker->($self, $todo);
     push @$sib, $end;
     return ($sib, $ch);
   },
 };
-## TODO: noscript
 
 $Element->{$HTML_NS}->{'event-source'} = {
   checker => $HTMLEmptyChecker,
@@ -1476,8 +1616,9 @@ $Element->{$HTML_NS}->{command} = {
 
 $Element->{$HTML_NS}->{menu} = {
   checker => sub {
-    my ($self, $el) = @_;
-    my $children = [];
+    my ($self, $todo) = @_;
+    my $el = $todo->{node};
+    my $new_todos = [];
     my @nodes = (@{$el->child_nodes});
     
     my $content = 'li or inline';
@@ -1513,7 +1654,7 @@ $Element->{$HTML_NS}->{menu} = {
         }
         my ($sib, $ch) = $self->_check_get_children ($node);
         unshift @nodes, @$sib;
-        push @$children, @$ch;
+        push @$new_todos, @$ch;
       } elsif ($nt == 3 or $nt == 4) {
         if ($node->data =~ /[^\x09-\x0D\x20]/) {
           if ($content eq 'li') {
@@ -1526,7 +1667,11 @@ $Element->{$HTML_NS}->{menu} = {
         unshift @nodes, @{$node->child_nodes};
       }
     }
-    return ($children);
+
+    for (@$new_todos) {
+      $_->{inline} = 1;
+    }
+    return ($new_todos);
   },
 };
 
@@ -1554,19 +1699,21 @@ sub check_element ($$$) {
   $self->{minuses} = {};
   $self->{onerror} = $onerror;
 
-  my @nodes = ($el);
-  while (@nodes) {
-    my $node = shift @nodes;
-    $self->_remove_minuses ($node) and next if ref $node eq 'HASH';
-
-    my $nsuri = $node->namespace_uri;
-    $nsuri = '' unless defined $nsuri;
-    my $ln = $node->manakai_local_name;
-    my $eldef = $Element->{$nsuri}->{$ln} ||
-      $Element->{$nsuri}->{''} ||
-      $ElementDefault;
-    my ($children) = $eldef->{checker}->($self, $node);
-    push @nodes, @$children;
+  my @todo = ({type => 'element', node => $el});
+  while (@todo) {
+    my $todo = shift @todo;
+    if ($todo->{type} eq 'element') {
+      my $nsuri = $todo->{node}->namespace_uri;
+      $nsuri = '' unless defined $nsuri;
+      my $ln = $todo->{node}->manakai_local_name;
+      my $eldef = $Element->{$nsuri}->{$ln} ||
+        $Element->{$nsuri}->{''} ||
+          $ElementDefault;
+      my ($new_todos) = $eldef->{checker}->($self, $todo);
+      push @todo, @$new_todos;
+    } elsif ($todo->{type} eq 'plus') {
+      $self->_remove_minuses ($todo);
+    }
   }
 } # check_element
 
@@ -1583,14 +1730,14 @@ sub _add_minuses ($@) {
       }
     }
   }
-  return $r;
+  return {type => 'plus', list => $r};
 } # _add_minuses
 
 sub _remove_minuses ($$) {
-  my ($self, $list) = @_;
-  for my $ns (keys %{$list}) {
-    for my $ln (keys %{$list->{$ns}}) {
-      delete $self->{minuses}->{$ns}->{$ln} if $list->{$ns}->{$ln};
+  my ($self, $todo) = @_;
+  for my $ns (keys %{$todo->{list}}) {
+    for my $ln (keys %{$todo->{list}->{$ns}}) {
+      delete $self->{minuses}->{$ns}->{$ln} if $todo->{list}->{$ns}->{$ln};
     }
   }
   1;
@@ -1598,7 +1745,7 @@ sub _remove_minuses ($$) {
 
 sub _check_get_children ($$) {
   my ($self, $node) = @_;
-  my $ch = [];
+  my $new_todos = [];
   my $sib = [];
   TP: {
     my $node_ns = $node->namespace_uri;
@@ -1641,10 +1788,10 @@ sub _check_get_children ($$) {
         unshift @$sib, @cn;
       }
     }
-    push @$ch, $node;
+    push @$new_todos, {type => 'element', node => $node};
   } # TP
-  return ($sib, $ch);
+  return ($sib, $new_todos);
 } # _check_get_children
 
 1;
-# $Date: 2007/05/13 05:35:22 $
+# $Date: 2007/05/13 08:09:15 $
