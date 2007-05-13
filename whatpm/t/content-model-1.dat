@@ -1,0 +1,404 @@
+#data
+<html></html>
+#errors
+/html;element not supported
+
+#data
+<html xmlns="http://www.w3.org/1999/xhtml"></html>
+#errors
+/html;child element missing:head
+/html;child element missing:body
+
+#data
+<html xmlns="http://www.w3.org/1999/xhtml"><head></head></html>
+#errors
+/html;child element missing:body
+/html/head;child element missing:title
+
+#data
+<html xmlns="http://www.w3.org/1999/xhtml"><body></body></html>
+#errors
+/html/body;ps element missing:head
+
+#data
+<html xmlns="http://www.w3.org/1999/xhtml"><p></p></html>
+#errors
+/html/p;element not allowed
+/html;child element missing:head
+/html;child element missing:body
+
+#data
+<html xmlns="http://www.w3.org/1999/xhtml">a</html>
+#errors
+/html/"a";character not allowed
+/html;child element missing:head
+/html;child element missing:body
+
+#data
+<html xmlns="http://www.w3.org/1999/xhtml"> </html>
+#errors
+/html;child element missing:head
+/html;child element missing:body
+
+#data
+<html xmlns="http://www.w3.org/1999/xhtml"><head></head><body></body></html>
+#errors
+/html/head;child element missing:title
+
+#data
+<html xmlns="http://www.w3.org/1999/xhtml"><head></head>a<body></body></html>
+#errors
+/html/head;child element missing:title
+/html/"a";character not allowed
+
+#data
+<html xmlns="http://www.w3.org/1999/xhtml">a<head></head><body></body></html>
+#errors
+/html/"a";character not allowed
+/html/head;child element missing:title
+
+#data
+<html xmlns="http://www.w3.org/1999/xhtml"><head></head><body></body>a</html>
+#errors
+/html/head;child element missing:title
+/html/"a";character not allowed
+
+#data
+<html xmlns="http://www.w3.org/1999/xhtml"> <head></head> <body></body> </html>
+#errors
+/html/head;child element missing:title
+
+#data
+<html xmlns="http://www.w3.org/1999/xhtml"><head></head><body></body><p></p></html>
+#errors
+/html/head;child element missing:title
+/html/p;element not allowed
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<base href="http://www.w3.org/"/>
+</head>
+#errors
+/head;child element missing:title
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<command/>
+</head>
+#errors
+/head;child element missing:title
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<event-source/>
+</head>
+#errors
+/head;child element missing:title
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<link/>
+</head>
+#errors
+/head;child element missing:title
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<meta charset="us-ascii"/>
+</head>
+#errors
+/head;child element missing:title
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<meta name="keywords" content="html5"/>
+</head>
+#errors
+/head;child element missing:title
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<script type="text/javascript"/>
+</head>
+#errors
+/head;child element missing:title
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<style type="text/css"/>
+</head>
+#errors
+/head;child element missing:title
+
+#data
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title></title></head><body></body></html>
+#errors
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<base href="http://www.w3.org/"/>
+<title/>
+</head>
+#errors
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title/>
+<base href="http://www.w3.org/"/>
+</head>
+#errors
+/head/base;element not allowed
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<command/>
+<title/>
+</head>
+#errors
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title/>
+<command/>
+</head>
+#errors
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<event-source/>
+<title/>
+</head>
+#errors
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title/>
+<event-source/>
+</head>
+#errors
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<link/>
+<title/>
+</head>
+#errors
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title/>
+<link/>
+</head>
+#errors
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<meta charset="us-ascii"/>
+<title/>
+</head>
+#errors
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title/>
+<meta charset="us-ascii"/>
+</head>
+#errors
+/head/meta;element not allowed
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<meta name="keywords" content="html5"/>
+<title/>
+</head>
+#errors
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title/>
+<meta name="keywords" content="html5"/>
+</head>
+#errors
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<script type="text/javascript"/>
+<title/>
+</head>
+#errors
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title/>
+<script type="text/javascript"/>
+</head>
+#errors
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<style type="text/css"/>
+<title/>
+</head>
+#errors
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title/>
+<style type="text/css"/>
+</head>
+#errors
+
+#data
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title></title><title></title></head><body></body></html>
+#errors
+/html/head/title;element not allowed
+
+#data
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title></title><p></p></head><body></body></html>
+#errors
+/html/head/p;element not allowed
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml"><meta charset="us-ascii"/><base/><title></title></head>
+#errors
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml"><meta charset="us-ascii"/><title/><base/></head>
+#errors
+/head/base;element not allowed
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml"><title/><base/></head>
+#errors
+/head/base;element not allowed
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml"><title/><base/><meta charset="us-ascii"/></head>
+#errors
+/head/base;element not allowed
+/head/meta;element not allowed
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<meta charset="us-ascii"/>
+<title/>
+<base href="http://www.w3.org/"/>
+</head>
+#errors
+/head/base;element not allowed
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<base href="http://www.w3.org/"/>
+<meta charset="us-ascii"/>
+<title/>
+</head>
+#errors
+/head/meta;element not allowed
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<base href="http://www.w3.org/"/>
+<title/>
+<meta charset="us-ascii"/>
+</head>
+#errors
+/head/meta;element not allowed
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<base href="http://www.w3.org/"/>
+<meta name="keywords" content="html5"/>
+<title/>
+</head>
+#errors
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<base href="http://www.w3.org/"/>
+<title/>
+<meta name="keywords" content="html5"/>
+</head>
+#errors
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<meta name="keywords" content="html5"/>
+<meta charset="us-ascii"/>
+<title/>
+</head>
+#errors
+/head/meta;element not allowed
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<meta charset="us-ascii"/>
+<meta name="keywords" content="html5"/>
+<title/>
+</head>
+#errors
+
+#data
+<base href="http://www.w3.org/" xmlns="http://www.w3.org/1999/xhtml"></base>
+#errors
+
+#data
+<base href="http://www.w3.org/" xmlns="http://www.w3.org/1999/xhtml"> </base>
+#errors
+
+#data
+<base href="http://www.w3.org/" xmlns="http://www.w3.org/1999/xhtml">a</base>
+#errors
+/base/"a";character not allowed
+
+#data
+<base href="http://www.w3.org/" xmlns="http://www.w3.org/1999/xhtml"><p/></base>
+#errors
+/base/p;element not allowed
+
+#data
+<link xmlns="http://www.w3.org/1999/xhtml"></link>
+#errors
+
+#data
+<link xmlns="http://www.w3.org/1999/xhtml"> </link>
+#errors
+
+#data
+<link xmlns="http://www.w3.org/1999/xhtml">a</link>
+#errors
+/link/"a";character not allowed
+
+#data
+<link xmlns="http://www.w3.org/1999/xhtml"><p/></link>
+#errors
+/link/p;element not allowed
+
+#data
+<meta charset="us-ascii" xmlns="http://www.w3.org/1999/xhtml"></meta>
+#errors
+
+#data
+<meta charset="us-ascii" xmlns="http://www.w3.org/1999/xhtml"> </meta>
+#errors
+
+#data
+<meta charset="us-ascii" xmlns="http://www.w3.org/1999/xhtml">a</meta>
+#errors
+/meta/"a";character not allowed
+
+#data
+<meta charset="us-ascii" xmlns="http://www.w3.org/1999/xhtml"><p/></meta>
+#errors
+/meta/p;element not allowed
+
+#data
+<style type="text/css" xmlns="http://www.w3.org/1999/xhtml"></style>
+#errors
+
+#data
+<style type="text/css" xmlns="http://www.w3.org/1999/xhtml">
+p {color: green}
+</style>
+#errors
+

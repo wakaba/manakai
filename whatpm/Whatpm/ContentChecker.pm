@@ -1,29 +1,36 @@
 package Whatpm::ContentChecker;
 use strict;
 
+## ANY
+my $AnyChecker = sub {
+  my ($self, $el) = @_;
+  my $children = [];
+  my @nodes = (@{$el->child_nodes});
+  while (@nodes) {
+    my $node = shift @nodes;
+    $self->_remove_minuses ($node) and next if ref $node eq 'HASH';
+
+    my $nt = $node->node_type;
+    if ($nt == 1) {
+      my $node_ns = $node->namespace_uri;
+      $node_ns = '' unless defined $node_ns;
+      my $node_ln = $node->manakai_local_name;
+      if ($self->{minuses}->{$node_ns}->{$node_ln}) {
+        $self->{onerror}->(node => $node, type => 'element not allowed');
+      }
+      push @$children, $node;
+    } elsif ($nt == 5) {
+      unshift @nodes, @{$node->child_nodes};
+    }
+  }
+  return ($children);
+}; # $AnyChecker
+
 my $ElementDefault = {
   checker => sub {
     my ($self, $el) = @_;
-    my $children = [];
-    my @nodes = (@{$el->child_nodes});
-    while (@nodes) {
-      my $node = shift @nodes;
-      $self->_remove_minuses ($node) and next if ref $node eq 'HASH';
-
-      my $nt = $node->node_type;
-      if ($nt == 1) {
-        my $node_ns = $node->namespace_uri;
-        $node_ns = '' unless defined $node_ns;
-        my $node_ln = $node->manakai_local_name;
-        if ($self->{minuses}->{$node_ns}->{$node_ln}) {
-          $self->{onerror}->(node => $node, type => 'element not allowed');
-        }
-        push @$children, $node;
-      } elsif ($nt == 5) {
-        unshift @nodes, @{$node->child_nodes};
-      }
-    }
-    return ($children);
+    $self->{onerror}->(node => $el, type => 'element not supported');
+    return $AnyChecker->($self, $el);
   },
 };
 
@@ -38,6 +45,7 @@ my $HTMLMetadataElements = [
   [$HTML_NS, 'script'],
   [$HTML_NS, 'event-source'],
   [$HTML_NS, 'command'],
+  [$HTML_NS, 'base'],
   [$HTML_NS, 'title'],
 ];
 
@@ -178,7 +186,9 @@ my $HTMLEmptyChecker = sub {
       unshift @nodes, @$sib;
       push @$children, @$ch;
     } elsif ($nt == 3 or $nt == 4) {
-      $self->{onerror}->(node => $node, type => 'character not allowed');
+      if ($node->data =~ /[^\x09-\x0D\x20]/) {
+        $self->{onerror}->(node => $node, type => 'character not allowed');
+      }
     } elsif ($nt == 5) {
       unshift @nodes, @{$node->child_nodes};
     }
@@ -593,7 +603,7 @@ $Element->{$HTML_NS}->{html} = {
             $phase = 'after head';            
           } elsif ($node->manakai_element_type_match ($HTML_NS, 'body')) {
             $self->{onerror}
-              ->(node => $node, type => 'element missing before:head');
+              ->(node => $node, type => 'ps element missing:head');
             $phase = 'after body';
           } else {
             $self->{onerror}->(node => $node, type => 'element not allowed');
@@ -621,6 +631,14 @@ $Element->{$HTML_NS}->{html} = {
         unshift @nodes, @{$node->child_nodes};
       }
     }
+
+    if ($phase eq 'before head') {
+      $self->{onerror}->(node => $el, type => 'child element missing:head');
+      $self->{onerror}->(node => $el, type => 'child element missing:body');
+    } elsif ($phase eq 'after head') {
+      $self->{onerror}->(node => $el, type => 'child element missing:body');
+    }
+
     return ($children);
   },
 };
@@ -631,10 +649,8 @@ $Element->{$HTML_NS}->{head} = {
     my $children = [];
     my @nodes = (@{$el->child_nodes});
 
-    my $has_meta_charset;
     my $has_title;
-    my $has_base;
-    my $has_non_base;
+    my $phase = 'initial'; # 'after charset', 'after base'
     while (@nodes) {
       my $node = shift @nodes;
       $self->_remove_minuses ($node) and next if ref $node eq 'HASH';
@@ -648,38 +664,31 @@ $Element->{$HTML_NS}->{head} = {
           $self->{onerror}->(node => $node, type => 'element not allowed');
         }
         if ($node->manakai_element_type_match ($HTML_NS, 'title')) {
-          $has_non_base = 1;
+          $phase = 'after base';
           unless ($has_title) {
             $has_title = 1;
           } else {
             $self->{onerror}->(node => $node, type => 'element not allowed');
           }
         } elsif ($node->manakai_element_type_match ($HTML_NS, 'meta')) {
-          $has_non_base = 1;
           if ($node->has_attribute_ns (undef, 'charset')) {
-            unless ($has_meta_charset) {
-              if ($has_base) {
-                $self->{onerror}->(node => $node, type => 'element not allowed');
-                ## NOTE: See |base|'s "contexts" field in the spec
-              }
-              $has_meta_charset = 1;
+            if ($phase eq 'initial') {
+              $phase = 'after charset';
             } else {
               $self->{onerror}->(node => $node, type => 'element not allowed');
+              ## NOTE: See also |base|'s "contexts" field in the spec
             }
           } else {
-            # metadata element
+            $phase = 'after base';
           }
         } elsif ($node->manakai_element_type_match ($HTML_NS, 'base')) {
-          unless ($has_base) {
-            if ($has_non_base) {
-              $self->{onerror}->(node => $node, type => 'element not allowed');
-            }
-            $has_base = 1;
+          if ($phase eq 'initial' or $phase eq 'after charset') {
+            $phase = 'after base';
           } else {
             $self->{onerror}->(node => $node, type => 'element not allowed');
           }
         } else {
-          $has_non_base = 1;
+          $phase = 'after base';
           CHK: {
             for (@{$HTMLMetadataElements}) {
               if ($node->manakai_element_type_match ($_->[0], $_->[1])) {
@@ -701,7 +710,7 @@ $Element->{$HTML_NS}->{head} = {
       }
     }
     unless ($has_title) {
-      $self->{onerror}->(node => $el, type => 'element missing in:title');
+      $self->{onerror}->(node => $el, type => 'child element missing:title');
     }
     return ($children);
   },
@@ -724,6 +733,9 @@ $Element->{$HTML_NS}->{meta} = {
 };
 
 ## NOTE: |html:style| has no conformance creteria on content model
+$Element->{$HTML_NS}->{style} = {
+  checker => $AnyChecker,
+};
 
 $Element->{$HTML_NS}->{body} = {
   checker => $HTMLBlockChecker,
@@ -913,7 +925,7 @@ $Element->{$HTML_NS}->{dialog} = {
             $phase = 'before dd';
           } elsif ($node->manakai_element_type_match ($HTML_NS, 'dd')) {
             $self->{onerror}
-              ->(node => $node, type => 'element missing before:dt');
+              ->(node => $node, type => 'ps element missing:dt');
             $phase = 'before dt';
           } else {
             $self->{onerror}->(node => $node, type => 'element not allowed');
@@ -923,7 +935,7 @@ $Element->{$HTML_NS}->{dialog} = {
             $phase = 'before dt';
           } elsif ($node->manakai_element_type_match ($HTML_NS, 'dt')) {
             $self->{onerror}
-              ->(node => $node, type => 'element missing before:dd');
+              ->(node => $node, type => 'ps element missing:dd');
             $phase = 'before dd';
           } else {
             $self->{onerror}->(node => $node, type => 'element not allowed');
@@ -941,7 +953,7 @@ $Element->{$HTML_NS}->{dialog} = {
       }
     }
     if ($phase eq 'before dd') {
-      $self->{onerror}->(node => $el, type => 'element missing before:dd');
+      $self->{onerror}->(node => $el, type => 'ps element missing:dd');
     }
     return ($children);
   },
@@ -1023,7 +1035,7 @@ $Element->{$HTML_NS}->{dl} = {
             $phase = 'in dts';
           } elsif ($node->manakai_element_type_match ($HTML_NS, 'dd')) {
             $self->{onerror}
-              ->(node => $node, type => 'element missing before:dt');
+              ->(node => $node, type => 'ps element missing:dt');
             $phase = 'in dds';
           } else {
             $self->{onerror}->(node => $node, type => 'element not allowed');
@@ -1041,7 +1053,7 @@ $Element->{$HTML_NS}->{dl} = {
       }
     }
     if ($phase eq 'in dts') {
-      $self->{onerror}->(node => $el, type => 'element missing before:dd');
+      $self->{onerror}->(node => $el, type => 'ps element missing:dd');
     }
     return ($children);
   },
@@ -1358,7 +1370,7 @@ $Element->{$HTML_NS}->{tbody} = {
       }
     }
     unless ($has_tr) {
-      $self->{onerror}->(node => $el, type => 'element missing in:tr');
+      $self->{onerror}->(node => $el, type => 'child element missing:tr');
     }
     return ($children);
   },
@@ -1404,7 +1416,7 @@ $Element->{$HTML_NS}->{tr} = {
       }
     }
     unless ($has_td) {
-      $self->{onerror}->(node => $el, type => 'element missing in:td or th');
+      $self->{onerror}->(node => $el, type => 'child element missing:td|th');
     }
     return ($children);
   },
@@ -1428,7 +1440,7 @@ $Element->{$HTML_NS}->{script} = {
       return $HTMLEmptyChecker->($self, $el);
     } else {
       ## NOTE: No content model conformance in HTML5 spec.
-      return $ElementDefault->{checker}->($self, $el);
+      return $AnyChecker->($self, $el);
     }
   },
 };
@@ -1635,4 +1647,4 @@ sub _check_get_children ($$) {
 } # _check_get_children
 
 1;
-# $Date: 2007/05/05 06:51:06 $
+# $Date: 2007/05/13 05:35:22 $

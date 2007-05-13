@@ -1,3 +1,19 @@
+2007-05-13  Wakaba  <wakaba@suika.fam.cx>
+
+	* ContentChecker.pm ($AnyChecker): Renamed
+	from |$ElementDefault->{checker}|.
+	($ElementDefault->{checker}): Throw an error that 
+	the element type is not supported by the checker.
+	($HTMLMetadataElement): |html:base| was missing.
+	($HTMLEmptyChecker): Don't throw an error 
+	for inter-element whitespace nodes.
+	(html:html checker): Errors were not
+	thrown even if |html:head| and/or |html:body|
+	children were missing.
+	(html:head checker): An error was not
+	thrown if <meta charset> appered after other
+	elements.
+
 2007-05-05  Wakaba  <wakaba@suika.fam.cx>
 
 	* ContentChecker.pm: |footer|, |video|, |audio|, |script|,
