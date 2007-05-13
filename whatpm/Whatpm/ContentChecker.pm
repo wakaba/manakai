@@ -39,108 +39,43 @@ my $Element = {};
 
 my $HTML_NS = q<http://www.w3.org/1999/xhtml>;
 
-my $HTMLMetadataElements = [
-  [$HTML_NS, 'link'],
-  [$HTML_NS, 'meta'],
-  [$HTML_NS, 'style'],
-  [$HTML_NS, 'script'],
-  [$HTML_NS, 'event-source'],
-  [$HTML_NS, 'command'],
-  [$HTML_NS, 'base'],
-  [$HTML_NS, 'title'],
-];
+my $HTMLMetadataElements = {
+  $HTML_NS => {
+    qw/link 1 meta 1 style 1 script 1 event-source 1 command 1 base 1 title 1/,
+  },
+};
 
 my $HTMLSectioningElements = {
   $HTML_NS => {qw/body 1 section 1 nav 1 article 1 blockquote 1 aside 1/},
 };
 
-my $HTMLBlockLevelElements = [
-  [$HTML_NS, 'section'],
-  [$HTML_NS, 'nav'],
-  [$HTML_NS, 'article'],
-  [$HTML_NS, 'blockquote'],
-  [$HTML_NS, 'aside'],
-  [$HTML_NS, 'h1'],
-  [$HTML_NS, 'h2'],
-  [$HTML_NS, 'h3'],
-  [$HTML_NS, 'h4'],
-  [$HTML_NS, 'h5'],
-  [$HTML_NS, 'h6'],
-  [$HTML_NS, 'header'],
-  [$HTML_NS, 'footer'],
-  [$HTML_NS, 'address'],
-  [$HTML_NS, 'p'],
-  [$HTML_NS, 'hr'],
-  [$HTML_NS, 'dialog'],
-  [$HTML_NS, 'pre'],
-  [$HTML_NS, 'ol'],
-  [$HTML_NS, 'ul'],
-  [$HTML_NS, 'dl'],
-  [$HTML_NS, 'ins'],
-  [$HTML_NS, 'del'],
-  [$HTML_NS, 'figure'],
-  [$HTML_NS, 'map'],
-  [$HTML_NS, 'table'],
-  [$HTML_NS, 'script'],
-  [$HTML_NS, 'noscript'],
-  [$HTML_NS, 'event-source'],
-  [$HTML_NS, 'details'],
-  [$HTML_NS, 'datagrid'],
-  [$HTML_NS, 'menu'],
-  [$HTML_NS, 'div'],
-  [$HTML_NS, 'font'],
-];
+my $HTMLBlockLevelElements = {
+  $HTML_NS => {
+    qw/
+      section 1 nav 1 article 1 blockquote 1 aside 1 
+      h1 1 h2 1 h3 1 h4 1 h5 1 h6 1 header 1 footer 1
+      address 1 p 1 hr 1 dialog 1 pre 1 ol 1 ul 1 dl 1
+      ins 1 del 1 figure 1 map 1 table 1 script 1 noscript 1
+      event-source 1 details 1 datagrid 1 menu 1 div 1 font 1
+    /,
+  },
+};
 
-my $HTMLStrictlyInlineLevelElements = [
-  [$HTML_NS, 'br'],
-  [$HTML_NS, 'a'],
-  [$HTML_NS, 'q'],
-  [$HTML_NS, 'cite'],
-  [$HTML_NS, 'em'],
-  [$HTML_NS, 'strong'],
-  [$HTML_NS, 'small'],
-  [$HTML_NS, 'm'],
-  [$HTML_NS, 'dfn'],
-  [$HTML_NS, 'abbr'],
-  [$HTML_NS, 'time'],
-  [$HTML_NS, 'meter'],
-  [$HTML_NS, 'progress'],
-  [$HTML_NS, 'code'],
-  [$HTML_NS, 'var'],
-  [$HTML_NS, 'samp'],
-  [$HTML_NS, 'kbd'],
-  [$HTML_NS, 'sub'],
-  [$HTML_NS, 'sup'],
-  [$HTML_NS, 'span'],
-  [$HTML_NS, 'i'],
-  [$HTML_NS, 'b'],
-  [$HTML_NS, 'bdo'],
-  [$HTML_NS, 'ins'],
-  [$HTML_NS, 'del'],
-  [$HTML_NS, 'img'],
-  [$HTML_NS, 'iframe'],
-  [$HTML_NS, 'embed'],
-  [$HTML_NS, 'object'],
-  [$HTML_NS, 'video'],
-  [$HTML_NS, 'audio'],
-  [$HTML_NS, 'canvas'],
-  [$HTML_NS, 'area'],
-  [$HTML_NS, 'script'],
-  [$HTML_NS, 'noscript'],
-  [$HTML_NS, 'event-source'],
-  [$HTML_NS, 'command'],
-  [$HTML_NS, 'font'],
-];
+my $HTMLStrictlyInlineLevelElements = {
+  $HTML_NS => {
+    qw/
+      br 1 a 1 q 1 cite 1 em 1 strong 1 small 1 m 1 dfn 1 abbr 1
+      time 1 meter 1 progress 1 code 1 var 1 samp 1 kbd 1
+      sub 1 sup 1 span 1 i 1 b 1 bdo 1 ins 1 del 1 img 1
+      iframe 1 embed 1 object 1 video 1 audio 1 canvas 1 area 1
+      script 1 noscript 1 event-source 1 command 1 font 1
+    /,
+  },
+};
 
-my $HTMLStructuredInlineLevelElements = [
-  [$HTML_NS, 'blockquote'],
-  [$HTML_NS, 'pre'],
-  [$HTML_NS, 'ol'],
-  [$HTML_NS, 'ul'],
-  [$HTML_NS, 'dl'],
-  [$HTML_NS, 'table'],
-  [$HTML_NS, 'menu'],
-];
+my $HTMLStructuredInlineLevelElements = {
+  $HTML_NS => {qw/blockquote 1 pre 1 ol 1 ul 1 dl 1 table 1 menu 1/},
+};
 
 my $HTMLInteractiveElements = {
   $HTML_NS => {a => 1, details => 1, datagrid => 1},
@@ -148,26 +83,18 @@ my $HTMLInteractiveElements = {
 ## NOTE: |html:a| and |html:datagrid| are not allowed as a descendant
 ## of interactive elements
 
-my $HTMLTransparentElements = [
-  [$HTML_NS, 'ins'],
-  [$HTML_NS, 'font'],
-  [$HTML_NS, 'noscript'], ## NOTE: If scripting is disabled.
-];
+my $HTMLTransparentElements = {
+  $HTML_NS => {qw/ins 1 font 1 noscript 1/},
+  ## NOTE: |html:noscript| is transparent if scripting is disabled.
+};
 
-#my $HTMLSemiTransparentElements = [
-#  [$HTML_NS, 'video'],
-#  [$HTML_NS, 'audio'],
-#];
+#my $HTMLSemiTransparentElements = {
+#  $HTML_NS => {qw/video 1 audio 1/},
+#};
 
-my $HTMLEmbededElements = [
-  [$HTML_NS, 'img'],
-  [$HTML_NS, 'iframe'],
-  [$HTML_NS, 'embed'],
-  [$HTML_NS, 'object'],
-  [$HTML_NS, 'video'],
-  [$HTML_NS, 'audio'],
-  [$HTML_NS, 'canvas'],
-];
+my $HTMLEmbededElements = {
+  $HTML_NS => {qw/img 1 iframe 1 embed 1 object 1 video 1 audio 1 canvas 1/},
+};
 
 ## Empty
 my $HTMLEmptyChecker = sub {
@@ -244,16 +171,11 @@ my $HTMLStylableBlockChecker = sub {
       my $not_allowed = $self->{minuses}->{$node_ns}->{$node_ln};
       if ($node->manakai_element_type_match ($HTML_NS, 'style')) {
         $not_allowed = 1 if $has_non_style;
+      } elsif ($HTMLBlockLevelElements->{$node_ns}->{$node_ln}) {
+        $has_non_style = 1;
       } else {
         $has_non_style = 1;
-        CHK: {
-          for (@{$HTMLBlockLevelElements}) {
-            if ($node->manakai_element_type_match ($_->[0], $_->[1])) {
-              last CHK;
-            }
-          }
-          $not_allowed = 1;
-        } # CHK
+        $not_allowed = 1;
       }
       $self->{onerror}->(node => $node, type => 'element not allowed')
         if $not_allowed;
@@ -288,14 +210,8 @@ my $HTMLBlockChecker = sub {
       $node_ns = '' unless defined $node_ns;
       my $node_ln = $node->manakai_local_name;
       my $not_allowed = $self->{minuses}->{$node_ns}->{$node_ln};
-      CHK: {
-        for (@{$HTMLBlockLevelElements}) {
-          if ($node->manakai_element_type_match ($_->[0], $_->[1])) {
-            last CHK;
-          }
-        }
-        $not_allowed = 1;
-      } # CHK
+      $not_allowed = 1
+        unless $HTMLBlockLevelElements->{$node_ns}->{$node_ln};
       $self->{onerror}->(node => $node, type => 'element not allowed')
         if $not_allowed;
       my ($sib, $ch) = $self->_check_get_children ($node);
@@ -329,15 +245,9 @@ my $HTMLInlineChecker = sub {
       $node_ns = '' unless defined $node_ns;
       my $node_ln = $node->manakai_local_name;
       my $not_allowed = $self->{minuses}->{$node_ns}->{$node_ln};
-      CHK: {
-        for (@{$HTMLStrictlyInlineLevelElements},
-             @{$HTMLStructuredInlineLevelElements}) {
-          if ($node->manakai_element_type_match ($_->[0], $_->[1])) {
-            last CHK;
-          }
-        }
-        $not_allowed = 1;
-      } # CHK
+      $not_allowed = 1
+        unless $HTMLStrictlyInlineLevelElements->{$node_ns}->{$node_ln} or
+          $HTMLStructuredInlineLevelElements->{$node_ns}->{$node_ln};
       $self->{onerror}->(node => $node, type => 'element not allowed')
         if $not_allowed;
       my ($sib, $ch) = $self->_check_get_children ($node);
@@ -374,14 +284,8 @@ my $HTMLStrictlyInlineChecker = sub {
       $node_ns = '' unless defined $node_ns;
       my $node_ln = $node->manakai_local_name;
       my $not_allowed = $self->{minuses}->{$node_ns}->{$node_ln};
-      CHK: {
-        for (@{$HTMLStrictlyInlineLevelElements}) {
-          if ($node->manakai_element_type_match ($_->[0], $_->[1])) {
-            last CHK;
-          }
-        }
-        $not_allowed = 1;
-      } # CHK
+      $not_allowed = 1
+        unless $HTMLStrictlyInlineLevelElements->{$node_ns}->{$node_ln};
       $self->{onerror}->(node => $node, type => 'element not allowed')
         if $not_allowed;
       my ($sib, $ch) = $self->_check_get_children ($node);
@@ -419,15 +323,14 @@ my $HTMLInlineOrStrictlyInlineChecker = sub {
       $node_ns = '' unless defined $node_ns;
       my $node_ln = $node->manakai_local_name;
       my $not_allowed = $self->{minuses}->{$node_ns}->{$node_ln};
-      CHK: {
-        for (@{$HTMLStrictlyInlineLevelElements},
-             $todo->{strictly_inline} ? () : @{$HTMLStructuredInlineLevelElements}) {
-          if ($node->manakai_element_type_match ($_->[0], $_->[1])) {
-            last CHK;
-          }
-        }
-        $not_allowed = 1;
-      } # CHK
+      if ($todo->{strictly_inline}) {
+        $not_allowed = 1
+          unless $HTMLStrictlyInlineLevelElements->{$node_ns}->{$node_ln};
+      } else {
+        $not_allowed = 1
+          unless $HTMLStrictlyInlineLevelElements->{$node_ns}->{$node_ln} or
+            $HTMLStructuredInlineLevelElements->{$node_ns}->{$node_ln};
+      }
       $self->{onerror}->(node => $node, type => 'element not allowed')
         if $not_allowed;
       my ($sib, $ch) = $self->_check_get_children ($node);
@@ -468,41 +371,17 @@ my $HTMLBlockOrInlineChecker = sub {
       my $node_ln = $node->manakai_local_name;
       my $not_allowed = $self->{minuses}->{$node_ns}->{$node_ln};
       if ($content eq 'block') {
-        CHK: {
-          for (@{$HTMLBlockLevelElements}) {
-            if ($node->manakai_element_type_match ($_->[0], $_->[1])) {
-              last CHK;
-            }
-          }
-          $not_allowed = 1;
-        } # CHK
+        $not_allowed = 1
+          unless $HTMLBlockLevelElements->{$node_ns}->{$node_ln};
       } elsif ($content eq 'inline') {
-        CHK: {
-          for (@{$HTMLStrictlyInlineLevelElements},
-               @{$HTMLStructuredInlineLevelElements}) {
-            if ($node->manakai_element_type_match ($_->[0], $_->[1])) {
-              last CHK;
-            }
-          }
-          $not_allowed = 1;
-        } # CHK
+        $not_allowed = 1
+          unless $HTMLStrictlyInlineLevelElements->{$node_ns}->{$node_ln} or
+            $HTMLStructuredInlineLevelElements->{$node_ns}->{$node_ln};
       } else {
-        my $is_block;
-        my $is_inline;
-        for (@{$HTMLBlockLevelElements}) {
-          if ($node->manakai_element_type_match ($_->[0], $_->[1])) {
-            $is_block = 1;
-            last;
-          }
-        }
-        
-        for (@{$HTMLStrictlyInlineLevelElements},
-             @{$HTMLStructuredInlineLevelElements}) {
-          if ($node->manakai_element_type_match ($_->[0], $_->[1])) {
-            $is_inline = 1;
-            last;
-          }
-        }
+        my $is_block = $HTMLBlockLevelElements->{$node_ns}->{$node_ln};
+        my $is_inline
+          = $HTMLStrictlyInlineLevelElements->{$node_ns}->{$node_ln} ||
+            $HTMLStructuredInlineLevelElements->{$node_ns}->{$node_ln};
         
         push @block_not_inline, $node
           if $is_block and not $is_inline and not $not_allowed;
@@ -569,43 +448,19 @@ my $GetHTMLZeroOrMoreThenBlockOrInlineChecker = sub ($$) {
           $not_allowed = 1 if $has_non_style;
         } elsif ($content eq 'block') {
           $has_non_style = 1;
-          CHK: {
-            for (@{$HTMLBlockLevelElements}) {
-              if ($node->manakai_element_type_match ($_->[0], $_->[1])) {
-                last CHK;
-              }
-            }
-            $not_allowed = 1;
-          } # CHK
+          $not_allowed = 1
+            unless $HTMLBlockLevelElements->{$node_ns}->{$node_ln};
         } elsif ($content eq 'inline') {
           $has_non_style = 1;
-          CHK: {
-            for (@{$HTMLStrictlyInlineLevelElements},
-                 @{$HTMLStructuredInlineLevelElements}) {
-              if ($node->manakai_element_type_match ($_->[0], $_->[1])) {
-                last CHK;
-              }
-            }
-            $not_allowed = 1;
-          } # CHK
+          $not_allowed = 1
+            unless $HTMLStrictlyInlineLevelElements->{$node_ns}->{$node_ln} or
+              $HTMLStructuredInlineLevelElements->{$node_ns}->{$node_ln};
         } else {
           $has_non_style = 1;
-          my $is_block;
-          my $is_inline;
-          for (@{$HTMLBlockLevelElements}) {
-            if ($node->manakai_element_type_match ($_->[0], $_->[1])) {
-              $is_block = 1;
-              last;
-            }
-          }
-          
-          for (@{$HTMLStrictlyInlineLevelElements},
-               @{$HTMLStructuredInlineLevelElements}) {
-            if ($node->manakai_element_type_match ($_->[0], $_->[1])) {
-              $is_inline = 1;
-              last;
-            }
-          }
+          my $is_block = $HTMLBlockLevelElements->{$node_ns}->{$node_ln};
+          my $is_inline
+            = $HTMLStrictlyInlineLevelElements->{$node_ns}->{$node_ln} ||
+              $HTMLStructuredInlineLevelElements->{$node_ns}->{$node_ln};
             
           push @block_not_inline, $node
             if $is_block and not $is_inline and not $not_allowed;
@@ -758,16 +613,10 @@ $Element->{$HTML_NS}->{head} = {
           } else {
             $not_allowed = 1;
           }
-        } else {
+        } elsif ($HTMLMetadataElements->{$node_ns}->{$node_ln}) {
           $phase = 'after base';
-          CHK: {
-            for (@{$HTMLMetadataElements}) {
-              if ($node->manakai_element_type_match ($_->[0], $_->[1])) {
-                last CHK;
-              }
-            }
-            $not_allowed = 1;
-          } # CHK
+        } else {
+          $not_allowed = 1;
         }
         $self->{onerror}->(node => $node, type => 'element not allowed')
           if $not_allowed;
@@ -890,41 +739,17 @@ $Element->{$HTML_NS}->{footer} = {
           $not_allowed = 1;
         }
         if ($content eq 'block') {
-          CHK: {
-            for (@{$HTMLBlockLevelElements}) {
-              if ($node->manakai_element_type_match ($_->[0], $_->[1])) {
-                last CHK;
-              }
-            }
-            $not_allowed = 1;
-          } # CHK
+          $not_allowed = 1
+            unless $HTMLBlockLevelElements->{$node_ns}->{$node_ln};
         } elsif ($content eq 'inline') {
-          CHK: {
-            for (@{$HTMLStrictlyInlineLevelElements},
-                 @{$HTMLStructuredInlineLevelElements}) {
-              if ($node->manakai_element_type_match ($_->[0], $_->[1])) {
-                last CHK;
-              }
-            }
-            $not_allowed = 1;
-          } # CHK
+          $not_allowed = 1
+            unless $HTMLStrictlyInlineLevelElements->{$node_ns}->{$node_ln} or
+              $HTMLStructuredInlineLevelElements->{$node_ns}->{$node_ln};
         } else {
-          my $is_block;
-          my $is_inline;
-          for (@{$HTMLBlockLevelElements}) {
-            if ($node->manakai_element_type_match ($_->[0], $_->[1])) {
-              $is_block = 1;
-              last;
-            }
-          }
-          
-          for (@{$HTMLStrictlyInlineLevelElements},
-               @{$HTMLStructuredInlineLevelElements}) {
-            if ($node->manakai_element_type_match ($_->[0], $_->[1])) {
-              $is_inline = 1;
-              last;
-            }
-          }
+          my $is_block = $HTMLBlockLevelElements->{$node_ns}->{$node_ln};
+          my $is_inline
+            = $HTMLStrictlyInlineLevelElements->{$node_ns}->{$node_ln} ||
+              $HTMLStructuredInlineLevelElements->{$node_ns}->{$node_ln};
           
           push @block_not_inline, $node
             if $is_block and not $is_inline and not $not_allowed;
@@ -1668,16 +1493,12 @@ $Element->{$HTML_NS}->{menu} = {
             $content = 'li';
           }
         } else {
-          CHK: {
-            for (@{$HTMLStrictlyInlineLevelElements},
-                 @{$HTMLStructuredInlineLevelElements}) {
-              if ($node->manakai_element_type_match ($_->[0], $_->[1])) {
-                $content = 'inline';
-                last CHK;
-              }
-            }
+          if ($HTMLStrictlyInlineLevelElements->{$node_ns}->{$node_ln} or
+              $HTMLStructuredInlineLevelElements->{$node_ns}->{$node_ln}) {
+            $content = 'inline';
+          } else {
             $not_allowed = 1;
-          } # CHK
+          }
         }
         $self->{onerror}->(node => $node, type => 'element not allowed')
           if $not_allowed;
@@ -1807,11 +1628,9 @@ sub _check_get_children ($$) {
         push @$sib, $end;
       }
     }
-    for (@{$HTMLTransparentElements}) {
-      if ($node->manakai_element_type_match ($_->[0], $_->[1])) {
-        unshift @$sib, @{$node->child_nodes};
-        last TP;
-      }
+    if ($HTMLTransparentElements->{$node_ns}->{$node_ln}) {
+      unshift @$sib, @{$node->child_nodes};
+      last TP;
     }
     if ($node->manakai_element_type_match ($HTML_NS, 'video') or
         $node->manakai_element_type_match ($HTML_NS, 'audio')) {
@@ -1844,4 +1663,4 @@ sub _check_get_children ($$) {
 } # _check_get_children
 
 1;
-# $Date: 2007/05/13 09:52:08 $
+# $Date: 2007/05/13 10:17:35 $
