@@ -402,3 +402,41 @@ p {color: green}
 </style>
 #errors
 
+#data
+<body xmlns="http://www.w3.org/1999/xhtml"></body>
+#errors
+
+#data
+<body xmlns="http://www.w3.org/1999/xhtml"> </body>
+#errors
+
+#data
+<body xmlns="http://www.w3.org/1999/xhtml">a</body>
+#errors
+/body/"a";character not allowed
+
+#data
+<body xmlns="http://www.w3.org/1999/xhtml"><p/></body>
+#errors
+
+#data
+<body xmlns="http://www.w3.org/1999/xhtml"><blockquote/></body>
+#errors
+
+#data
+<body xmlns="http://www.w3.org/1999/xhtml"><div/></body>
+#errors
+
+#data
+<body xmlns="http://www.w3.org/1999/xhtml">
+<script type="text/javascript"/>
+</body>
+#errors
+
+#data
+<body xmlns="http://www.w3.org/1999/xhtml"><b/></body>
+#errors
+/body/b;character not allowed
+
+
+
