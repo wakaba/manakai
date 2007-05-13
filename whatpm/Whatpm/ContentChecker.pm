@@ -1088,7 +1088,17 @@ $Element->{$HTML_NS}->{ul} = {
   checker => $Element->{$HTML_NS}->{ol}->{checker},
 };
 
-## TODO: li
+
+$Element->{$HTML_NS}->{li} = {
+  checker => sub {
+    my ($self, $todo) = @_;
+    if ($todo->{inline}) {
+      return $HTMLInlineChecker->($self, $todo);
+    } else {
+      return $HTMLBlockOrInlineChecker->($self, $todo);
+    }
+  },
+};
 
 $Element->{$HTML_NS}->{dl} = {
   checker => sub {
@@ -1161,14 +1171,7 @@ $Element->{$HTML_NS}->{dt} = {
 };
 
 $Element->{$HTML_NS}->{dd} = {
-  checker => sub {
-    my ($self, $todo) = @_;
-    if ($todo->{inline}) {
-      return $HTMLInlineChecker->($self, $todo);
-    } else {
-      return $HTMLBlockOrInlineChecker->($self, $todo);
-    }
-  },
+  checker => $Element->{$HTML_NS}->{li}->{checker},
 };
 
 ## TODO: a
@@ -1794,4 +1797,4 @@ sub _check_get_children ($$) {
 } # _check_get_children
 
 1;
-# $Date: 2007/05/13 08:09:15 $
+# $Date: 2007/05/13 08:45:47 $
