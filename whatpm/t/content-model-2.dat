@@ -459,3 +459,521 @@ id=""><span id=""></span></p>
 #errors
 /meta/@content;attribute not allowed
 /meta;attribute missing;name|http-equiv
+
+#data
+<body text="red" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/body/@text;attribute not supported
+
+#data
+<blockquote cite="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<h1 align="left" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/h1/@align;attribute not supported
+
+#data
+<address align="left" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/address/@align;attribute not supported
+
+#data
+<p align="left" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/p/@align;attribute not supported
+
+#data
+<hr align="left" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/hr/@align;attribute not supported
+
+#data
+<br clear="left" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/br/@clear;attribute not supported
+
+#data
+<dialog compact="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/dialog/@compact;attribute not supported
+
+#data
+<pre width="4" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/pre/@width;attribute not supported
+
+#data
+<pre xml:space="preserve" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<pre xml:space="default" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<ol start="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/ol/@start;syntax error
+
+#data
+<ol start="0" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<ol start="1" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<ol start="2" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<ol start="10" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<ol start="-0" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<ol start="-1" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<ol start="-10" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<ol start="0000" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<ol start="0001" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<ol start="00001" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<ol start="1000000000000" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<ol start="-100000000000000" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<ol start="1.0" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/ol/@start;syntax error
+
+#data
+<ol start="-1.0" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/ol/@start;syntax error
+
+#data
+<ol start="+0" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/ol/@start;syntax error
+
+#data
+<ol start="+1" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/ol/@start;syntax error
+
+#data
+<ol start="-+1" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/ol/@start;syntax error
+
+#data
+<ol start="1aaa" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/ol/@start;syntax error
+
+#data
+<ol start="xxxxx" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/ol/@start;syntax error
+
+#data
+<ol start=" 1" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/ol/@start;syntax error
+
+#data
+<ol start="1 " xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/ol/@start;syntax error
+
+#data
+<ol start=" 1 " xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/ol/@start;syntax error
+
+#data
+<ol start="_1" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/ol/@start;syntax error
+
+#data
+<ol start="&#x4E00;" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/ol/@start;syntax error
+
+#data
+<ol start="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/ol/@start;syntax error
+
+#data
+<ol start="&#x2212;1" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/ol/@start;syntax error
+
+#data
+<ol xmlns="http://www.w3.org/1999/xhtml">
+<li value=""/>
+</ol>
+#error
+/ol/li/@value;syntax error
+
+#data
+<ol xmlns="http://www.w3.org/1999/xhtml">
+<li value="1"/>
+</ol>
+#error
+
+#data
+<ol xmlns="http://www.w3.org/1999/xhtml">
+<li value="0"/>
+</ol>
+#error
+
+#data
+<ol xmlns="http://www.w3.org/1999/xhtml">
+<li value="-1"/>
+</ol>
+#error
+
+#data
+<ol xmlns="http://www.w3.org/1999/xhtml">
+<li value="+1"/>
+</ol>
+#error
+
+#data
+<ol xmlns="http://www.w3.org/1999/xhtml">
+<li value="xxx"/>
+</ol>
+#error
+/ol/li/@value;syntax error
+
+#data
+<ul xmlns="http://www.w3.org/1999/xhtml">
+<li value=""/>
+</ul>
+#error
+/ul/li/@value;attribute not supported
+/ul/li/@value;syntax error
+
+#data
+<ul xmlns="http://www.w3.org/1999/xhtml">
+<li value="1"/>
+</ul>
+#error
+/ul/li/@value;attribute not supported
+
+#data
+<ul xmlns="http://www.w3.org/1999/xhtml">
+<li value="0"/>
+</ul>
+#error
+/ul/li/@value;attribute not supported
+
+#data
+<ul xmlns="http://www.w3.org/1999/xhtml">
+<li value="-1"/>
+</ul>
+#error
+/ul/li/@value;attribute not supported
+
+#data
+<ul xmlns="http://www.w3.org/1999/xhtml">
+<li value="+1"/>
+</ul>
+#error
+/ul/li/@value;attribute not supported
+
+#data
+<ul xmlns="http://www.w3.org/1999/xhtml">
+<li value="xxx"/>
+</ul>
+#error
+/ul/li/@value;attribute not supported
+/ul/li/@value;syntax error
+
+#data
+<li value="" xmlns="http://www.w3.org/1999/xhtml"/>
+#error
+/li/@value;attribute not supported
+/li/@value;syntax error
+
+#data
+<li value="1" xmlns="http://www.w3.org/1999/xhtml"/>
+#error
+/li/@value;attribute not supported
+
+#data
+<li value="0" xmlns="http://www.w3.org/1999/xhtml"/>
+#error
+/li/@value;attribute not supported
+
+#data
+<li value="-1" xmlns="http://www.w3.org/1999/xhtml"/>
+#error
+/li/@value;attribute not supported
+
+#data
+<li value="+1" xmlns="http://www.w3.org/1999/xhtml"/>
+#error
+/li/@value;attribute not supported
+
+#data
+<li value="xxx" xmlns="http://www.w3.org/1999/xhtml"/>
+#error
+/li/@value;attribute not supported
+/li/@value;syntax error
+
+#data
+<dl compact="" xmlns="http://www.w3.org/1999/xhtml"/>
+#error
+/dl/@compact;attribute not supported
+
+#data
+<q cite="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<meter value="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/meter/@value;syntax error
+
+#data
+<meter value="1" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<meter value="111" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<meter value="0001" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<meter value="0" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<meter value="-1" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<meter value="-1000" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<meter value="-0" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<meter value="0000" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<meter value="0.1" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<meter value="1.1" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<meter value=".1" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<meter value=".0" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<meter value="1." xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<meter value="1.0000" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<meter value="123." xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<meter value="-.1" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<meter value="-1." xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<meter value="1aaaa" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/meter/@value;syntax error
+
+#data
+<meter value="1&#x0D;" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/meter/@value;syntax error
+
+#data
+<meter value="1&#x0A;" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/meter/@value;syntax error
+
+#data
+<meter value="aaaa" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/meter/@value;syntax error
+
+#data
+<meter value="+1" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/meter/@value;syntax error
+
+#data
+<meter value="+1.2" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/meter/@value;syntax error
+
+#data
+<meter value=".-1" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/meter/@value;syntax error
+
+#data
+<meter value="0.-1" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/meter/@value;syntax error
+
+#data
+<meter value="." xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/meter/@value;syntax error
+
+#data
+<meter min="2" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<meter min="aaaa" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/meter/@min;syntax error
+
+#data
+<meter low="2" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<meter low="aaaa" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/meter/@low;syntax error
+
+#data
+<meter high="2" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<meter high="aaaa" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/meter/@high;syntax error
+
+#data
+<meter max="2" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<meter max="aaaa" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/meter/@max;syntax error
+
+#data
+<meter optimum="2" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<meter optimum="aaaa" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/meter/@optimum;syntax error
+
+#data
+<meter min="43" max="2" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<meter value="43" max="2" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<progress max="2" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<progress max="0.0001" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<progress max="0" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/progress/@max;out of range
+
+#data
+<progress max="-1" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/progress/@max;out of range
+
+#data
+<progress max="aaaa" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/progress/@max;syntax error
+
+#data
+<progress value="2" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<progress value="0.0001" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<progress value="0" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<progress value="100" max="2" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<progress value="-1" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/progress/@value;out of range
+
+#data
+<progress value="aaaa" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/progress/@value;syntax error

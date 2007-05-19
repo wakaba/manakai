@@ -575,6 +575,34 @@ my $HTMLUnorderedSetOfSpaceSeparatedTokensAttrChecker = sub {
   }
 }; # $HTMLUnorderedSetOfSpaceSeparatedTokensAttrChecker
 
+my $HTMLURIAttrChecker = sub {
+  my ($self, $attr) = @_;
+  ## TODO: URI or IRI check
+}; # $HTMLURIAttrChecker
+
+my $HTMLIntegerAttrChecker = sub {
+  my ($self, $attr) = @_;
+  my $value = $attr->value;
+  unless ($value =~ /\A-?[0-9]+\z/) {
+    $self->{onerror}->(node => $attr, type => 'syntax error');
+  }
+}; # $HTMLIntegerAttrChecker
+
+my $GetHTMLFloatingPointNumberAttrChecker = sub {
+  my $range_check = shift;
+  return sub {
+    my ($self, $attr) = @_;
+    my $value = $attr->value;
+    if ($value =~ /\A-?[0-9.]+\z/ and $value =~ /[0-9]/) {
+      unless ($range_check->($value + 0)) {
+        $self->{onerror}->(node => $attr, type => 'out of range');
+      }
+    } else {
+      $self->{onerror}->(node => $attr, type => 'syntax error');
+    }
+  };
+}; # $GetHTMLFloatingPointNumberAttrChecker
+
 my $HTMLAttrChecker = {
   id => sub {
     my ($self, $attr) = @_;
@@ -782,7 +810,7 @@ $Element->{$HTML_NS}->{title} = {
 
 $Element->{$HTML_NS}->{base} = {
   attrs_checker => $GetHTMLAttrsChecker->({
-    href => sub {}, ## TODO: IRI
+    href => $HTMLURIAttrChecker,
     ## TODO: target
   }),
   checker => $HTMLEmptyChecker,
@@ -933,7 +961,9 @@ $Element->{$HTML_NS}->{article} = {
 };
 
 $Element->{$HTML_NS}->{blockquote} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}),
+  attrs_checker => $GetHTMLAttrsChecker->({
+    cite => $HTMLURIAttrChecker,
+  }),
   checker => $HTMLBlockChecker,
 };
 
@@ -1147,7 +1177,9 @@ $Element->{$HTML_NS}->{pre} = {
 };
 
 $Element->{$HTML_NS}->{ol} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}),
+  attrs_checker => $GetHTMLAttrsChecker->({
+    start => $HTMLIntegerAttrChecker,
+  }),
   checker => sub {
     my ($self, $todo) = @_;
     my $el = $todo->{node};
@@ -1195,7 +1227,21 @@ $Element->{$HTML_NS}->{ul} = {
 
 
 $Element->{$HTML_NS}->{li} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}),
+  attrs_checker => $GetHTMLAttrsChecker->({
+    start => sub {
+      my ($self, $attr) = @_;
+      my $parent = $attr->owner_element->manakai_parent_element;
+      if (defined $parent) {
+        my $parent_ns = $parent->namespace_uri;
+        $parent_ns = '' unless defined $parent_ns;
+        my $parent_ln = $parent->manakai_local_name;
+        unless ($parent_ns eq $HTML_NS and $parent_ln eq 'ol') {
+          $self->{onerror}->(node => $attr, type => 'attribute not supported');
+        }
+      }
+      $HTMLIntegerAttrChecker->($self, $attr);
+    },
+  }),
   checker => sub {
     my ($self, $todo) = @_;
     if ($todo->{inline}) {
@@ -1287,7 +1333,7 @@ $Element->{$HTML_NS}->{dd} = {
 };
 
 $Element->{$HTML_NS}->{a} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}),
+  attrs_checker => $GetHTMLAttrsChecker->({}), ## TODO
   checker => sub {
     my ($self, $todo) = @_;
 
@@ -1300,7 +1346,9 @@ $Element->{$HTML_NS}->{a} = {
 };
 
 $Element->{$HTML_NS}->{q} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}),
+  attrs_checker => $GetHTMLAttrsChecker->({
+    cite => $HTMLURIAttrChecker,
+  }),
   checker => $HTMLInlineOrStrictlyInlineChecker,
 };
 
@@ -1329,7 +1377,7 @@ $Element->{$HTML_NS}->{m} = {
   checker => $HTMLInlineOrStrictlyInlineChecker,
 };
 
-$Element->{$HTML_NS}->{dfn} = {
+$Element->{$HTML_NS}->{dfn} = { ## TODO: term duplication
   attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => sub {
     my ($self, $todo) = @_;
@@ -1342,22 +1390,37 @@ $Element->{$HTML_NS}->{dfn} = {
 };
 
 $Element->{$HTML_NS}->{abbr} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}),
+  attrs_checker => $GetHTMLAttrsChecker->({
+    ## NOTE: |title| has special semantics for |abbr|s, but is syntactically
+    ## not different.  The spec says that the |title| MAY be omitted
+    ## if there is a |dfn| whose defining term is the abbreviation,
+    ## but it does not prohibit |abbr| w/o |title| in other cases.
+  }),
   checker => $HTMLStrictlyInlineChecker,
 };
 
-$Element->{$HTML_NS}->{time} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}),
+$Element->{$HTML_NS}->{time} = { ## TODO: validate content
+  attrs_checker => $GetHTMLAttrsChecker->({}), ## TODO: datetime
   checker => $HTMLStrictlyInlineChecker,
 };
 
-$Element->{$HTML_NS}->{meter} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}),
+$Element->{$HTML_NS}->{meter} = { ## TODO: "The recommended way of giving the value is to include it as contents of the element"
+  attrs_checker => $GetHTMLAttrsChecker->({
+    value => $GetHTMLFloatingPointNumberAttrChecker->(sub { 1 }),
+    min => $GetHTMLFloatingPointNumberAttrChecker->(sub { 1 }),
+    low => $GetHTMLFloatingPointNumberAttrChecker->(sub { 1 }),
+    high => $GetHTMLFloatingPointNumberAttrChecker->(sub { 1 }),
+    max => $GetHTMLFloatingPointNumberAttrChecker->(sub { 1 }),
+    optimum => $GetHTMLFloatingPointNumberAttrChecker->(sub { 1 }),
+  }),
   checker => $HTMLStrictlyInlineChecker,
 };
 
-$Element->{$HTML_NS}->{progress} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}),
+$Element->{$HTML_NS}->{progress} = { ## TODO: recommended to use content
+  attrs_checker => $GetHTMLAttrsChecker->({
+    value => $GetHTMLFloatingPointNumberAttrChecker->(sub { shift >= 0 }),
+    max => $GetHTMLFloatingPointNumberAttrChecker->(sub { shift > 0 }),
+  }),
   checker => $HTMLStrictlyInlineChecker,
 };
 
@@ -2024,4 +2087,4 @@ sub _check_get_children ($$) {
 } # _check_get_children
 
 1;
-# $Date: 2007/05/19 06:02:36 $
+# $Date: 2007/05/19 07:55:43 $
