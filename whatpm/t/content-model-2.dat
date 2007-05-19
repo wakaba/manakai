@@ -44,6 +44,12 @@
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"
+    a:b="" xmlns:a="http://www.example.test/"/>
+#errors
+/p/@b;attribute not supported
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
 id=""></p>
 #errors
 /p/@id;attribute value is empty
@@ -458,7 +464,7 @@ id=""><span id=""></span></p>
 <meta content="example.net" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /meta/@content;attribute not allowed
-/meta;attribute missing;name|http-equiv
+/meta;attribute missing:name|http-equiv
 
 #data
 <body text="red" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -977,3 +983,407 @@ id=""><span id=""></span></p>
 <progress value="aaaa" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /progress/@value;syntax error
+
+#data
+<bdo xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/bdo;attribute missing:dir
+
+#data
+<bdo dir="ltr" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<bdo dir="rtl" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<bdo dir="RTL" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<bdo dir="xxx" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/bdo/@dir;invalid enumerated attribute value
+
+#data
+<ins cite="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<del cite="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<iframe src="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<param xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/param;attribute missing:name
+/param;attribute missing:value
+
+#data
+<param name="a" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/param;attribute missing:value
+
+#data
+<param value="a" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/param;attribute missing:name
+
+#data
+<param name="a" value="b" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<param name="" value="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<param name="a" value="b" valuetype="text" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/param/@valuetype;attribute not supported
+
+#data
+<video xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<video src="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<video autoplay="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<video autoplay="autoplay" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<video autoplay="true" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/video/@autoplay;invalid boolean attribute value
+
+#data
+<video controls="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<video controls="controls" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<video controls="true" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/video/@controls;invalid boolean attribute value
+
+#data
+<audio xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<audio src="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<audio autoplay="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<audio autoplay="autoplay" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<audio autoplay="true" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/audio/@autoplay;invalid boolean attribute value
+
+#data
+<audio controls="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<audio controls="controls" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<audio controls="true" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/audio/@controls;invalid boolean attribute value
+
+#data
+<canvas xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<canvas width="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/canvas/@width;syntax error
+
+#data
+<canvas width="1" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<canvas width="0" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<canvas width="100" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<canvas width="-1" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/canvas/@width;syntax error
+
+#data
+<canvas width="saaa" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/canvas/@width;syntax error
+
+#data
+<canvas width="1&#xA;" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/canvas/@width;syntax error
+
+#data
+<canvas width="13344aa" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/canvas/@width;syntax error
+
+#data
+<canvas height="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/canvas/@height;syntax error
+
+#data
+<canvas height="0" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<canvas height="1" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<canvas height="-2" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/canvas/@height;syntax error
+
+#data
+<canvas height="1&#xA;" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/canvas/@height;syntax error
+
+#data
+<canvas height="xxx" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/canvas/@height;syntax error
+
+#data
+<canvas width="44" height="14" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<map xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<map name="aa" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/map/@name;attribute not supported
+
+#data
+<map id="aa" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<table border="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/table/@border;attribute not supported
+
+#data
+<table frame="border" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/table/@frame;attribute not supported
+
+#data
+<table border="1" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/table/@border;attribute not supported
+
+#data
+<caption align="top" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/caption/@align;attribute not supported
+
+#data
+<col xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<col span="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/col/@span;syntax error
+
+#data
+<col span="0" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/col/@span;out of range
+
+#data
+<col span="1" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<col span="10" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<col span="-1" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/col/@span;syntax error
+
+#data
+<td colspan="1" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<td colspan="0" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/td/@colspan;out of range
+
+#data
+<td rowspan="1" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<td rowspan="0" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/td/@rowspan;out of range
+
+#data
+<th colspan="1" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<th colspan="0" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/th/@colspan;out of range
+
+#data
+<th rowspan="1" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<th rowspan="0" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/th/@rowspan;out of range
+
+#data
+<th scope="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/th/@scope;invalid enumerated attribute value
+
+#data
+<th scope="row" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<th scope="col" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<th scope="Col" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<th scope="rowgroup" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<th scope="colgroup" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<td scope="row" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/td/@scope;attribute not supported
+
+#data
+<event-source xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<event-source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<details xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<details open="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<details open="open" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<details open="OPEN" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/details/@open;invalid boolean attribute value
+
+#data
+<details open="true" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/details/@open;invalid boolean attribute value
+
+#data
+<datagrid xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<datagrid disabled="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<datagrid disabled="disabled" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<datagrid disabled="true" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/datagrid/@disabled;invalid boolean attribute value
+
+#data
+<datagrid multiple="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<datagrid multiple="multiple" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<datagrid multiple="true" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/datagrid/@multiple;invalid boolean attribute value
+
+#data
+<div align="center" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/div/@align;attribute not supported
+
