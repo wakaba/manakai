@@ -140,6 +140,14 @@ sub previous_sibling ($) {
   return undef;
 } # previous_sibling
 
+sub prefix ($;$) {
+  my $self = shift;
+  if (@_) {
+    $self->{prefix} = shift;
+  }
+  return $self->{prefix};
+} # prefix
+
 sub ELEMENT_NODE () { 1 }
 sub ATTRIBUTE_NODE () { 2 }
 sub TEXT_NODE () { 3 }
@@ -441,4 +449,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2007/05/19 06:02:36 $
+# $Date: 2007/05/19 14:29:09 $

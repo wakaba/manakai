@@ -1,19 +1,103 @@
 package Whatpm::ContentChecker;
 use strict;
 
+## ISSUE: How XML and XML Namespaces conformance can (or cannot)
+## be applied to an in-memory representation (i.e. DOM)?
+
 my $XML_NS = q<http://www.w3.org/XML/1998/namespace>;
 my $XMLNS_NS = q<http://www.w3.org/2000/xmlns/>;
 
 my $AttrChecker = {
   $XML_NS => {
-    ## TODO: xml:space, xml:base, xml:lang, xml:id
-    ## TODO: xml:lang MUST NOT in HTML document
+    space => sub {
+      my ($self, $attr) = @_;
+      my $value = $attr->value;
+      if ($value eq 'default' or $value eq 'preserve') {
+        #
+      } else {
+        ## NOTE: An XML "error"
+        $self->{onerror}->(node => $attr,
+                           type => 'XML error:invalid xml:space value');
+      }
+    },
+    lang => sub {
+      ## NOTE: "The values of the attribute are language identifiers
+      ## as defined by [IETF RFC 3066], Tags for the Identification
+      ## of Languages, or its successor; in addition, the empty string
+      ## may be specified." ("may" in lower case)
+      ## TODO: xml:lang MUST NOT in HTML document
+    },
+    base => sub {
+      my ($self, $attr) = @_;
+      my $value = $attr->value;
+      if ($value =~ /[^\x{0000}-\x{10FFFF}]/) { ## ISSUE: Should we disallow noncharacters?
+        $self->{onerror}->(node => $attr,
+                           type => 'syntax error');
+      }
+      ## NOTE: Conformance to URI standard is not checked.
+    },
+    id => sub {
+      my ($self, $attr) = @_;
+      my $value = $attr->value;
+      $value =~ s/[\x09\x0A\x0D\x20]+/ /g;
+      $value =~ s/^\x20//;
+      $value =~ s/\x20$//;
+      ## TODO: NCName in XML 1.0 or 1.1
+      ## TODO: declared type is ID?
+      if ($self->{id}->{$value}) {
+        $self->{onerror}->(node => $attr, type => 'xml:id error:duplicate ID');
+      } else {
+        $self->{id}->{$value} = 1;
+      }
+    },
   },
   $XMLNS_NS => {
-    '' => sub {}, ## TODO: implement
-    xmlns => sub {}, ## TODO: implement
+    '' => sub {
+      my ($self, $attr) = @_;
+      my $ln = $attr->manakai_local_name;
+      my $value = $attr->value;
+      if ($value eq $XML_NS and $ln ne 'xml') {
+        $self->{onerror}
+          ->(node => $attr,
+             type => 'NC:Reserved Prefixes and Namespace Names:=xml');
+      } elsif ($value eq $XMLNS_NS) {
+        $self->{onerror}
+          ->(node => $attr,
+             type => 'NC:Reserved Prefixes and Namespace Names:=xmlns');
+      }
+      if ($ln eq 'xml' and $value ne $XML_NS) {
+        $self->{onerror}
+          ->(node => $attr,
+             type => 'NC:Reserved Prefixes and Namespace Names:xmlns:xml=');
+      } elsif ($ln eq 'xmlns') {
+        $self->{onerror}
+          ->(node => $attr,
+             type => 'NC:Reserved Prefixes and Namespace Names:xmlns:xmlns=');
+      }
+      ## TODO: If XML 1.0 and empty
+    },
+    xmlns => sub {
+      my ($self, $attr) = @_;
+      ## TODO: In XML 1.0, URI reference [RFC 3986] or an empty string
+      ## TODO: In XML 1.1, IRI reference [RFC 3987] or an empty string
+      my $value = $attr->value;
+      if ($value eq $XML_NS) {
+        $self->{onerror}
+          ->(node => $attr,
+             type => 'NC:Reserved Prefixes and Namespace Names:=xml');
+      } elsif ($value eq $XMLNS_NS) {
+        $self->{onerror}
+          ->(node => $attr,
+             type => 'NC:Reserved Prefixes and Namespace Names:=xmlns');
+      }
+    },
   },
 };
+
+$AttrChecker->{''}->{'xml:space'} = $AttrChecker->{$XML_NS}->{space};
+$AttrChecker->{''}->{'xml:lang'} = $AttrChecker->{$XML_NS}->{lang};
+$AttrChecker->{''}->{'xml:base'} = $AttrChecker->{$XML_NS}->{base};
+$AttrChecker->{''}->{'xml:id'} = $AttrChecker->{$XML_NS}->{id};
 
 ## ANY
 my $AnyChecker = sub {
@@ -2069,6 +2153,12 @@ sub check_element ($$$) {
   while (@todo) {
     my $todo = shift @todo;
     if ($todo->{type} eq 'element') {
+      my $prefix = $todo->{node}->prefix;
+      if (defined $prefix and $prefix eq 'xmlns') {
+        $self->{onerror}
+          ->(node => $todo->{node},
+             type => 'NC:Reserved Prefixes and Namespace Names:<xmlns:>');
+      }
       my $nsuri = $todo->{node}->namespace_uri;
       $nsuri = '' unless defined $nsuri;
       my $ln = $todo->{node}->manakai_local_name;
@@ -2079,6 +2169,12 @@ sub check_element ($$$) {
       my ($new_todos) = $eldef->{checker}->($self, $todo);
       push @todo, @$new_todos;
     } elsif ($todo->{type} eq 'element-attributes') {
+      my $prefix = $todo->{node}->prefix;
+      if (defined $prefix and $prefix eq 'xmlns') {
+        $self->{onerror}
+          ->(node => $todo->{node},
+             type => 'NC:Reserved Prefixes and Namespace Names:<xmlns:>');
+      }
       my $nsuri = $todo->{node}->namespace_uri;
       $nsuri = '' unless defined $nsuri;
       my $ln = $todo->{node}->manakai_local_name;
@@ -2170,4 +2266,4 @@ sub _check_get_children ($$) {
 } # _check_get_children
 
 1;
-# $Date: 2007/05/19 10:11:32 $
+# $Date: 2007/05/19 14:29:09 $

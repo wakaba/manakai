@@ -1,0 +1,100 @@
+#data
+<p xml:space="default" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<p xml:space="preserve" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<p xml:space=" default" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/p/@space;XML error:invalid xml:space value
+
+#data
+<p xml:space="DEfault" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/p/@space;XML error:invalid xml:space value
+
+#data
+<p xml:space="normal" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/p/@space;XML error:invalid xml:space value
+
+#data
+<p xml:lang="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<p xml:lang="en" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<p xml:lang="ja-JP" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<p xmlns:xml="http://www.w3.org/XML/1998/namespace"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<p xmlns:a="http://www.example.org/"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<xmlns:a/>
+#errors
+/a;NC:Reserved Prefixes and Namespace Names:<xmlns:>
+/a;element not supported
+
+#data
+<xmlns/>
+#errors
+/xmlns;element not supported
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml" xml:base=""/>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml" xml:base="http://test/"/>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml" xml:base="test"/>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml" xml:base="&#x4E00;"/>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml" xml:id="aa"/>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml" xml:id="aa" id="bb"/>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml" xml:id="aa">
+  <span id="bb"/>
+</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml" xml:id="aa">
+  <span id="aa"/>
+</p>
+#errors
+/p/span/@id;duplicate ID
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml" id="aa">
+  <span xml:id="aa"/>
+</p>
+#errors
+/p/span/@id;xml:id error:duplicate ID
+

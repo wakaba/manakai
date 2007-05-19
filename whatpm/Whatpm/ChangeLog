@@ -1,5 +1,13 @@
 2007-05-19  Wakaba  <wakaba@suika.fam.cx>
 
+	* ContentChecker.pm: Support |xml:*| and |xmlns:*|
+	attributes.  Report an error if |Element.prefix|
+	is |xmlns|.
+
+	* NanoDOM.pm (prefix): New attribute.
+
+2007-05-19  Wakaba  <wakaba@suika.fam.cx>
+
 	* HTML.pm.src: In |main| phase, |in body| insertion
 	mode, action for |<iframe>| was missing.
 
