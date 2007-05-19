@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## This is an early version of an HTML parser.
 
@@ -3485,6 +3485,7 @@ sub _tree_construction_main ($) {
         }
       } elsif ({
                 textarea => 1,
+                iframe => 1,
                 noembed => 1,
                 noframes => 1,
                 noscript => 0, ## TODO: 1 if scripting is enabled
@@ -3725,7 +3726,7 @@ sub _tree_construction_main ($) {
                 thead => 1, tr => 1,
                 area => 1, basefont => 1, bgsound => 1, br => 1,
                 embed => 1, hr => 1, iframe => 1, image => 1,
-                img => 1, input => 1, isindex=> 1, noembed => 1,
+                img => 1, input => 1, isindex => 1, noembed => 1,
                 noframes => 1, param => 1, select => 1, spacer => 1,
                 table => 1, textarea => 1, wbr => 1,
                 noscript => 0, ## TODO: if scripting is enabled
@@ -6124,4 +6125,4 @@ sub get_inner_html ($$$) {
 } # get_inner_html
 
 1;
-# $Date: 2007/05/04 09:16:04 $
+# $Date: 2007/05/19 11:37:24 $

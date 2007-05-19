@@ -290,3 +290,131 @@ base in body
 |       <noscript>
 |         "bbb"
 |       "ccc"
+
+#data
+<!DOCTYPE html><iframe>
+#errors
+no </iframe>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <iframe>
+
+#data
+<!DOCTYPE html><iframe></iframe>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <iframe>
+
+#data
+<!DOCTYPE html><iframe>a</iframe>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <iframe>
+|       "a"
+
+#data
+<!DOCTYPE html><noframes>
+#errors
+no </noframes>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <noframes>
+
+#data
+<!DOCTYPE html><noframes></noframes>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <noframes>
+
+#data
+<!DOCTYPE html><noframes>a</noframes>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <noframes>
+|       "a"
+
+#data
+<!DOCTYPE html><noframes>
+#errors
+no </noframes>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <noframes>
+
+#data
+<!DOCTYPE html><noframes></noframes>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <noframes>
+
+#data
+<!DOCTYPE html><noframes>a</noframes>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <noframes>
+|       "a"
+
+#data
+<!DOCTYPE html><xmp>
+#errors
+no </xmp>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <xmp>
+
+#data
+<!DOCTYPE html><xmp></xmp>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <xmp>
+
+#data
+<!DOCTYPE html><xmp>a</xmp>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <xmp>
+|       "a"
