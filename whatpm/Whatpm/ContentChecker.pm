@@ -7,6 +7,7 @@ my $XMLNS_NS = q<http://www.w3.org/2000/xmlns/>;
 my $AttrChecker = {
   $XML_NS => {
     ## TODO: xml:space, xml:base, xml:lang, xml:id
+    ## TODO: xml:lang MUST NOT in HTML document
   },
   $XMLNS_NS => {
     '' => sub {}, ## TODO: implement
@@ -533,35 +534,115 @@ my $GetHTMLZeroOrMoreThenBlockOrInlineChecker = sub ($$) {
 
 my $HTMLTransparentChecker = $HTMLBlockOrInlineChecker;
 
-my $HTMLAttrChecker = {
-
-};
-
-my $HTMLAttrsChecker = sub {
-  my ($self, $todo) = @_;
-  for my $attr (@{$todo->{node}->attributes}) {
-    my $attr_ns = $attr->namespace_uri;
-    $attr_ns = '' unless defined $attr_ns;
-    my $attr_ln = $attr->manakai_local_name;
-    my $checker = $attr_ns eq '' ? $HTMLAttrChecker->{$attr_ln} : undef
-      || $AttrChecker->{$attr_ns}->{$attr_ln}
-      || $AttrChecker->{$attr_ns}->{''};
-    if ($checker) {
-      $checker->($self, $attr);
+my $GetHTMLEnumeratedAttrChecker = sub {
+  my $states = shift; # {value => conforming ? 1 : -1}
+  return sub {
+    my ($self, $attr) = @_;
+    my $value = lc $attr->value; ## TODO: ASCII case insensitibility?
+    if ($states->{$value} > 0) {
+      #
+    } elsif ($states->{$value}) {
+      $self->{onerror}->(node => $attr,
+                         type => 'non-conforming enumerated attribute value');
     } else {
-      $self->{onerror}->(node => $attr, type => 'attribute not supported');
-      ## ISSUE: No comformance createria for unknown attributes in the spec
+      $self->{onerror}->(node => $attr,
+                         type => 'invalid enumerated attribute value');
+    }
+  };
+}; # $GetHTMLEnumeratedAttrChecker
+
+my $GetHTMLBooleanAttrChecker = sub {
+  my $local_name = shift;
+  return sub {
+    my ($self, $attr) = @_;
+    my $value = $attr->value;
+    unless ($value eq $local_name or $value eq '') {
+      $self->{onerror}->(node => $attr,
+                         type => 'invalid boolean attribute value');
+    }
+  };
+}; # $GetHTMLBooleanAttrChecker
+
+my $HTMLUnorderedSetOfSpaceSeparatedTokensAttrChecker = sub {
+  my ($self, $attr) = @_;
+  my %word;
+  for my $word (grep {length $_} split /[\x09-\x0D\x20]/, $attr->value) {
+    unless ($word{$word}) {
+      $word{$word} = 1;
+    } else {
+      $self->{onerror}->(node => $attr, type => 'duplicate token:'.$word);
     }
   }
-}; # $HTMLAttrsChecker
+}; # $HTMLUnorderedSetOfSpaceSeparatedTokensAttrChecker
+
+my $HTMLAttrChecker = {
+  id => sub {
+    my ($self, $attr) = @_;
+    my $value = $attr->value;
+    unless (length $value > 0) {
+      ## NOTE: MUST contain at least one character
+      $self->{onerror}->(node => $attr, type => 'attribute value is empty');
+    } else {
+      if ($self->{id}->{$value}) {
+        $self->{onerror}->(node => $attr, type => 'duplicate ID');
+      } else {
+        $self->{id}->{$value} = 1;
+      }
+    }
+  },
+  title => sub {}, ## NOTE: No conformance creteria
+  lang => sub {
+    ## TODO: RFC 3066 test
+    ## ISSUE: RFC 4646 (3066bis)?
+    ## TODO: HTML vs XHTML
+  },
+  dir => $GetHTMLEnumeratedAttrChecker->({ltr => 1, rtl => 1}),
+  class => $HTMLUnorderedSetOfSpaceSeparatedTokensAttrChecker,
+  irrelevant => $GetHTMLBooleanAttrChecker->('irrelevant'),
+  ## TODO: tabindex
+};
+
+my $GetHTMLAttrsChecker = sub {
+  my $element_specific_checker = shift;
+  return sub {
+    my ($self, $todo) = @_;
+    for my $attr (@{$todo->{node}->attributes}) {
+      my $attr_ns = $attr->namespace_uri;
+      $attr_ns = '' unless defined $attr_ns;
+      my $attr_ln = $attr->manakai_local_name;
+      my $checker;
+      if ($attr_ns eq '') {
+        $checker = $element_specific_checker->{$attr_ln}
+          || $HTMLAttrChecker->{$attr_ln};
+      }
+      $checker ||= $AttrChecker->{$attr_ns}->{$attr_ln}
+        || $AttrChecker->{$attr_ns}->{''};
+      if ($checker) {
+        $checker->($self, $attr);
+      } else {
+        $self->{onerror}->(node => $attr, type => 'attribute not supported');
+        ## ISSUE: No comformance createria for unknown attributes in the spec
+      }
+    }
+  };
+}; # $GetHTMLAttrsChecker
 
 $Element->{$HTML_NS}->{''} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => $ElementDefault->{checker},
 };
 
 $Element->{$HTML_NS}->{html} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({
+    xmlns => sub {
+      my ($self, $attr) = @_;
+      my $value = $attr->value;
+      unless ($value eq $HTML_NS) {
+        $self->{onerror}->(node => $attr, type => 'syntax error');
+        ## TODO: only in HTML documents
+      }
+    },
+  }),
   checker => sub {
     my ($self, $todo) = @_;
     my $el = $todo->{node};
@@ -626,7 +707,7 @@ $Element->{$HTML_NS}->{html} = {
 };
 
 $Element->{$HTML_NS}->{head} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => sub {
     my ($self, $todo) = @_;
     my $el = $todo->{node};
@@ -695,95 +776,206 @@ $Element->{$HTML_NS}->{head} = {
 };
 
 $Element->{$HTML_NS}->{title} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => $HTMLTextChecker,
 };
 
 $Element->{$HTML_NS}->{base} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({
+    href => sub {}, ## TODO: IRI
+    ## TODO: target
+  }),
   checker => $HTMLEmptyChecker,
 };
 
 $Element->{$HTML_NS}->{link} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}), ## TODO
   checker => $HTMLEmptyChecker,
 };
 
 $Element->{$HTML_NS}->{meta} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => sub {
+    my ($self, $todo) = @_;
+    my $name_attr;
+    my $http_equiv_attr;
+    my $charset_attr;
+    my $content_attr;
+    for my $attr (@{$todo->{node}->attributes}) {
+      my $attr_ns = $attr->namespace_uri;
+      $attr_ns = '' unless defined $attr_ns;
+      my $attr_ln = $attr->manakai_local_name;
+      my $checker;
+      if ($attr_ns eq '') {
+        if ($attr_ln eq 'content') {
+          $content_attr = $attr;
+          $checker = 1;
+        } elsif ($attr_ln eq 'name') {
+          $name_attr = $attr;
+          $checker = 1;
+        } elsif ($attr_ln eq 'http-equiv') {
+          $http_equiv_attr = $attr;
+          $checker = 1;
+        } elsif ($attr_ln eq 'charset') {
+          $charset_attr = $attr;
+          $checker = 1;
+        } else {
+          $checker = $HTMLAttrChecker->{$attr_ln}
+            || $AttrChecker->{$attr_ns}->{$attr_ln}
+              || $AttrChecker->{$attr_ns}->{''};
+        }
+      } else {
+        $checker ||= $AttrChecker->{$attr_ns}->{$attr_ln}
+          || $AttrChecker->{$attr_ns}->{''};
+      }
+      if ($checker) {
+        $checker->($self, $attr) if ref $checker;
+      } else {
+        $self->{onerror}->(node => $attr, type => 'attribute not supported');
+        ## ISSUE: No comformance createria for unknown attributes in the spec
+      }
+    }
+    
+    if (defined $name_attr) {
+      if (defined $http_equiv_attr) {
+        $self->{onerror}->(node => $http_equiv_attr,
+                           type => 'attribute not allowed');
+      } elsif (defined $charset_attr) {
+        $self->{onerror}->(node => $charset_attr,
+                           type => 'attribute not allowed');
+      }
+      my $metadata_name = $name_attr->value;
+      my $metadata_value;
+      if (defined $content_attr) {
+        $metadata_value = $content_attr->value;
+      } else {
+        $self->{onerror}->(node => $todo->{node},
+                           type => 'attribute missing:content');
+        $metadata_value = '';
+      }
+    } elsif (defined $http_equiv_attr) {
+      if (defined $charset_attr) {
+        $self->{onerror}->(node => $charset_attr,
+                           type => 'attribute not allowed');
+      }
+      unless (defined $content_attr) {
+        $self->{onerror}->(node => $todo->{node},
+                           type => 'attribute missing:content');
+      }
+    } elsif (defined $charset_attr) {
+      if (defined $content_attr) {
+        $self->{onerror}->(node => $content_attr,
+                           type => 'attribute not allowed');
+      }
+      ## TODO: Allowed only in HTML documents
+    } else {
+      if (defined $content_attr) {
+        $self->{onerror}->(node => $content_attr,
+                           type => 'attribute not allowed');
+        $self->{onerror}->(node => $todo->{node},
+                           type => 'attribute missing:name|http-equiv');
+      } else {
+        $self->{onerror}->(node => $todo->{node},
+                           type => 'attribute missing:name|http-equiv|charset');
+      }
+    }
+
+    ## TODO: metadata conformance
+
+    ## TODO: pragma conformance
+    if (defined $http_equiv_attr) { ## An enumerated attribute
+      my $keyword = lc $http_equiv_attr->value; ## TODO: ascii case?
+      if ({
+           'refresh' => 1,
+           'default-style' => 1,
+          }->{$keyword}) {
+        #
+      } else {
+        $self->{onerror}->(node => $http_equiv_attr,
+                           type => 'invalid enumerated attribute value');
+      }
+    }
+
+    ## TODO: charset
+  },
   checker => $HTMLEmptyChecker,
 };
 
 ## NOTE: |html:style| has no conformance creteria on content model
 $Element->{$HTML_NS}->{style} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({
+    ## TODO: type
+    ## TODO: media
+    scoped => $GetHTMLBooleanAttrChecker->('scoped'),
+    ## NOTE: |title| has special semantics for |style|s, but is syntactically
+    ## not different
+  }),
   checker => $AnyChecker,
 };
 
 $Element->{$HTML_NS}->{body} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => $HTMLBlockChecker,
 };
 
 $Element->{$HTML_NS}->{section} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => $HTMLStylableBlockChecker,
 };
 
 $Element->{$HTML_NS}->{nav} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => $HTMLBlockOrInlineChecker,
 };
 
 $Element->{$HTML_NS}->{article} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => $HTMLStylableBlockChecker,
 };
 
 $Element->{$HTML_NS}->{blockquote} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => $HTMLBlockChecker,
 };
 
 $Element->{$HTML_NS}->{aside} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => $GetHTMLZeroOrMoreThenBlockOrInlineChecker->($HTML_NS, 'style'),
 };
 
 $Element->{$HTML_NS}->{h1} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => $HTMLSignificantStrictlyInlineChecker,
 };
 
 $Element->{$HTML_NS}->{h2} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => $HTMLSignificantStrictlyInlineChecker,
 };
 
 $Element->{$HTML_NS}->{h3} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => $HTMLSignificantStrictlyInlineChecker,
 };
 
 $Element->{$HTML_NS}->{h4} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => $HTMLSignificantStrictlyInlineChecker,
 };
 
 $Element->{$HTML_NS}->{h5} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => $HTMLSignificantStrictlyInlineChecker,
 };
 
 $Element->{$HTML_NS}->{h6} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => $HTMLSignificantStrictlyInlineChecker,
 };
 
 ## TODO: header
 
 $Element->{$HTML_NS}->{footer} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => sub { ## block -hn -header -footer -sectioning or inline
     my ($self, $todo) = @_;
     my $el = $todo->{node};
@@ -872,27 +1064,27 @@ $Element->{$HTML_NS}->{footer} = {
 };
 
 $Element->{$HTML_NS}->{address} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => $HTMLInlineChecker,
 };
 
 $Element->{$HTML_NS}->{p} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => $HTMLSignificantInlineChecker,
 };
 
 $Element->{$HTML_NS}->{hr} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => $HTMLEmptyChecker,
 };
 
 $Element->{$HTML_NS}->{br} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => $HTMLEmptyChecker,
 };
 
 $Element->{$HTML_NS}->{dialog} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => sub {
     my ($self, $todo) = @_;
     my $el = $todo->{node};
@@ -950,12 +1142,12 @@ $Element->{$HTML_NS}->{dialog} = {
 };
 
 $Element->{$HTML_NS}->{pre} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => $HTMLStrictlyInlineChecker,
 };
 
 $Element->{$HTML_NS}->{ol} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => sub {
     my ($self, $todo) = @_;
     my $el = $todo->{node};
@@ -997,13 +1189,13 @@ $Element->{$HTML_NS}->{ol} = {
 };
 
 $Element->{$HTML_NS}->{ul} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => $Element->{$HTML_NS}->{ol}->{checker},
 };
 
 
 $Element->{$HTML_NS}->{li} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => sub {
     my ($self, $todo) = @_;
     if ($todo->{inline}) {
@@ -1015,7 +1207,7 @@ $Element->{$HTML_NS}->{li} = {
 };
 
 $Element->{$HTML_NS}->{dl} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => sub {
     my ($self, $todo) = @_;
     my $el = $todo->{node};
@@ -1085,17 +1277,17 @@ $Element->{$HTML_NS}->{dl} = {
 };
 
 $Element->{$HTML_NS}->{dt} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => $HTMLStrictlyInlineChecker,
 };
 
 $Element->{$HTML_NS}->{dd} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => $Element->{$HTML_NS}->{li}->{checker},
 };
 
 $Element->{$HTML_NS}->{a} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => sub {
     my ($self, $todo) = @_;
 
@@ -1108,37 +1300,37 @@ $Element->{$HTML_NS}->{a} = {
 };
 
 $Element->{$HTML_NS}->{q} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => $HTMLInlineOrStrictlyInlineChecker,
 };
 
 $Element->{$HTML_NS}->{cite} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => $HTMLStrictlyInlineChecker,
 };
 
 $Element->{$HTML_NS}->{em} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => $HTMLInlineOrStrictlyInlineChecker,
 };
 
 $Element->{$HTML_NS}->{strong} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => $HTMLInlineOrStrictlyInlineChecker,
 };
 
 $Element->{$HTML_NS}->{small} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => $HTMLInlineOrStrictlyInlineChecker,
 };
 
 $Element->{$HTML_NS}->{m} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => $HTMLInlineOrStrictlyInlineChecker,
 };
 
 $Element->{$HTML_NS}->{dfn} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => sub {
     my ($self, $todo) = @_;
 
@@ -1150,82 +1342,82 @@ $Element->{$HTML_NS}->{dfn} = {
 };
 
 $Element->{$HTML_NS}->{abbr} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => $HTMLStrictlyInlineChecker,
 };
 
 $Element->{$HTML_NS}->{time} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => $HTMLStrictlyInlineChecker,
 };
 
 $Element->{$HTML_NS}->{meter} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => $HTMLStrictlyInlineChecker,
 };
 
 $Element->{$HTML_NS}->{progress} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => $HTMLStrictlyInlineChecker,
 };
 
 $Element->{$HTML_NS}->{code} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => $HTMLInlineOrStrictlyInlineChecker,
 };
 
 $Element->{$HTML_NS}->{var} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => $HTMLStrictlyInlineChecker,
 };
 
 $Element->{$HTML_NS}->{samp} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => $HTMLInlineOrStrictlyInlineChecker,
 };
 
 $Element->{$HTML_NS}->{kbd} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => $HTMLStrictlyInlineChecker,
 };
 
 $Element->{$HTML_NS}->{sub} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => $HTMLStrictlyInlineChecker,
 };
 
 $Element->{$HTML_NS}->{sup} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => $HTMLStrictlyInlineChecker,
 };
 
 $Element->{$HTML_NS}->{span} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => $HTMLInlineOrStrictlyInlineChecker,
 };
 
 $Element->{$HTML_NS}->{i} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => $HTMLStrictlyInlineChecker,
 };
 
 $Element->{$HTML_NS}->{b} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => $HTMLStrictlyInlineChecker,
 };
 
 $Element->{$HTML_NS}->{bdo} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => $HTMLStrictlyInlineChecker,
 };
 
 $Element->{$HTML_NS}->{ins} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => $HTMLTransparentChecker,
 };
 
 $Element->{$HTML_NS}->{del} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => sub {
     my ($self, $todo) = @_;
 
@@ -1247,29 +1439,29 @@ $Element->{$HTML_NS}->{del} = {
 ## TODO: figure
 
 $Element->{$HTML_NS}->{img} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => $HTMLEmptyChecker,
 };
 
 $Element->{$HTML_NS}->{iframe} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => $HTMLTextChecker,
 };
 
 $Element->{$HTML_NS}->{embed} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => $HTMLEmptyChecker,
 };
 
 $Element->{$HTML_NS}->{param} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => $HTMLEmptyChecker,
 };
 
 ## TODO: object
 
 $Element->{$HTML_NS}->{video} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => sub {
     my ($self, $todo) = @_;
 
@@ -1283,33 +1475,33 @@ $Element->{$HTML_NS}->{video} = {
 };
 
 $Element->{$HTML_NS}->{audio} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => $Element->{$HTML_NS}->{audio}->{checker},
 };
 
 $Element->{$HTML_NS}->{source} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => $HTMLEmptyChecker,
 };
 
 $Element->{$HTML_NS}->{canvas} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => $HTMLInlineChecker,
 };
 
 $Element->{$HTML_NS}->{map} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => $HTMLBlockChecker,
 };
 
 $Element->{$HTML_NS}->{area} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => $HTMLEmptyChecker,
 };
 ## TODO: only in map
 
 $Element->{$HTML_NS}->{table} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => sub {
     my ($self, $todo) = @_;
     my $el = $todo->{node};
@@ -1410,12 +1602,12 @@ $Element->{$HTML_NS}->{table} = {
 };
 
 $Element->{$HTML_NS}->{caption} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => $HTMLSignificantStrictlyInlineChecker,
 };
 
 $Element->{$HTML_NS}->{colgroup} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => sub {
     my ($self, $todo) = @_;
     my $el = $todo->{node};
@@ -1451,12 +1643,12 @@ $Element->{$HTML_NS}->{colgroup} = {
 };
 
 $Element->{$HTML_NS}->{col} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => $HTMLEmptyChecker,
 };
 
 $Element->{$HTML_NS}->{tbody} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => sub {
     my ($self, $todo) = @_;
     my $el = $todo->{node};
@@ -1498,17 +1690,17 @@ $Element->{$HTML_NS}->{tbody} = {
 };
 
 $Element->{$HTML_NS}->{thead} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => $Element->{$HTML_NS}->{tbody},
 };
 
 $Element->{$HTML_NS}->{tfoot} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => $Element->{$HTML_NS}->{tbody},
 };
 
 $Element->{$HTML_NS}->{tr} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => sub {
     my ($self, $todo) = @_;
     my $el = $todo->{node};
@@ -1550,19 +1742,19 @@ $Element->{$HTML_NS}->{tr} = {
 };
 
 $Element->{$HTML_NS}->{td} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => $HTMLBlockOrInlineChecker,
 };
 
 $Element->{$HTML_NS}->{th} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => $HTMLBlockOrInlineChecker,
 };
 
 ## TODO: forms
 
 $Element->{$HTML_NS}->{script} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => sub {
     my ($self, $todo) = @_;
 
@@ -1577,7 +1769,7 @@ $Element->{$HTML_NS}->{script} = {
 
 ## NOTE: When script is disabled.
 $Element->{$HTML_NS}->{noscript} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => sub {
     my ($self, $todo) = @_;
 
@@ -1589,12 +1781,12 @@ $Element->{$HTML_NS}->{noscript} = {
 };
 
 $Element->{$HTML_NS}->{'event-source'} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => $HTMLEmptyChecker,
 };
 
 $Element->{$HTML_NS}->{details} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => sub {
     my ($self, $todo) = @_;
 
@@ -1608,7 +1800,7 @@ $Element->{$HTML_NS}->{details} = {
 };
 
 $Element->{$HTML_NS}->{datagrid} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => sub {
     my ($self, $todo) = @_;
 
@@ -1620,12 +1812,12 @@ $Element->{$HTML_NS}->{datagrid} = {
 };
 
 $Element->{$HTML_NS}->{command} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => $HTMLEmptyChecker,
 };
 
 $Element->{$HTML_NS}->{menu} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => sub {
     my ($self, $todo) = @_;
     my $el = $todo->{node};
@@ -1683,7 +1875,7 @@ $Element->{$HTML_NS}->{menu} = {
 };
 
 $Element->{$HTML_NS}->{legend} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => sub {
     my ($self, $todo) = @_;
 
@@ -1707,12 +1899,12 @@ $Element->{$HTML_NS}->{legend} = {
 };
 
 $Element->{$HTML_NS}->{div} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => $GetHTMLZeroOrMoreThenBlockOrInlineChecker->($HTML_NS, 'style'),
 };
 
 $Element->{$HTML_NS}->{font} = {
-  attrs_checker => $HTMLAttrsChecker,
+  attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => $HTMLTransparentChecker,
 };
 
@@ -1725,6 +1917,7 @@ sub check_element ($$$) {
 
   $self->{minuses} = {};
   $self->{onerror} = $onerror;
+  $self->{id} = {};
 
   my @todo = ({type => 'element', node => $el});
   while (@todo) {
@@ -1831,4 +2024,4 @@ sub _check_get_children ($$) {
 } # _check_get_children
 
 1;
-# $Date: 2007/05/19 03:49:58 $
+# $Date: 2007/05/19 06:02:36 $

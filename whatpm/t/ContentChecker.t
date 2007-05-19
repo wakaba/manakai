@@ -12,6 +12,8 @@ require Whatpm::ContentChecker;
 use lib qw[/home/wakaba/work/manakai/lib];
 require Message::DOM::DOMCore;
 require Message::DOM::XMLParser;
+require Whatpm::HTML;
+require Whatpm::NanoDOM;
 
 my $dom = $Message::DOM::DOMImplementationRegistry->get_dom_implementation;
 my $parser = $dom->create_ls_parser (1);
@@ -27,6 +29,12 @@ for my $file_name (@FILES) {
       undef $test;
       $test->{data} = '';
       $mode = 'data';
+      $test->{parse_as} = 'xml';
+    } elsif (/^#data html$/) {
+      undef $test;
+      $test->{data} = '';
+      $mode = 'data';
+      $test->{parse_as} = 'html';
     } elsif (/^#errors$/) {
       $test->{errors} = [];
       $mode = 'errors';
@@ -48,9 +56,15 @@ for my $file_name (@FILES) {
 sub test ($) {
   my $test = shift;
 
-  my $doc = $parser->parse ({string_data => $test->{data}});
-  ## NOTE: There should be no well-formedness error; if there is,
-  ## then it is an error of the test case itself.
+  my $doc;
+  if ($test->{parse_as} eq 'xml') {
+    $doc = $parser->parse ({string_data => $test->{data}});
+    ## NOTE: There should be no well-formedness error; if there is,
+    ## then it is an error of the test case itself.
+  } else {
+    $doc = Whatpm::NanoDOM::Document->new;
+    Whatpm::HTML->parse_string ($test->{data} => $doc);
+  }
 
   my @error;
   my $cc = Whatpm::ContentChecker->new;
@@ -71,20 +85,24 @@ sub get_node_path ($) {
     my $rs;
     if ($node->node_type == 1) {
       $rs = $node->manakai_local_name;
+      $node = $node->parent_node;
     } elsif ($node->node_type == 2) {
       $rs = '@' . $node->manakai_local_name;
+      $node = $node->owner_element;
     } elsif ($node->node_type == 3) {
       $rs = '"' . $node->data . '"';
+      $node = $node->parent_node;
     } elsif ($node->node_type == 9) {
       $rs = '';
+      $node = $node->parent_node;
     } else {
       $rs = '#' . $node->node_type;
+      $node = $node->parent_node;
     }
     unshift @r, $rs;
-    $node = $node->parent_node;
   }
   return join '/', @r;
 } # get_node_path
 
 ## License: Public Domain.
-## $Date: 2007/05/19 03:49:58 $
+## $Date: 2007/05/19 06:02:36 $

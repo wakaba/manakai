@@ -95,7 +95,8 @@ sub insert_before ($$;$) {
     }
   }
   splice @{$self->{child_nodes}}, $i, 0, $new_child;
-  $new_child->{parent_node} = $self; ## TODO: weaken this ref
+  $new_child->{parent_node} = $self;
+  Scalar::Util::weaken ($new_child->{parent_node});
   return $new_child;
 } # insert_before
 
@@ -333,20 +334,30 @@ sub has_attribute_ns ($$$) {
 sub set_attribute_ns ($$$$) {
   my ($self, $nsuri, $qn, $value) = @_;
   $self->{attributes}->{$nsuri}->{$qn->[1]}
-    = Whatpm::NanoDOM::Attr->new ($nsuri, $qn->[0], $qn->[1], $value);
+    = Whatpm::NanoDOM::Attr->new ($self, $nsuri, $qn->[0], $qn->[1], $value);
 } # set_attribute_ns
 
 package Whatpm::NanoDOM::Attr;
 push our @ISA, 'Whatpm::NanoDOM::Node';
 
-sub new ($$$$$) {
+sub new ($$$$$$) {
   my $self = shift->SUPER::new;
+  $self->{owner_element} = shift;
+  Scalar::Util::weaken ($self->{owner_element});
   $self->{namespace_uri} = shift;
   $self->{prefix} = shift;
   $self->{local_name} = shift;
   $self->{value} = shift;
   return $self;
 } # new
+
+sub namespace_uri ($) {
+  return shift->{namespace_uri};
+} # namespace_uri
+
+sub manakai_local_name ($) {
+  return shift->{local_name};
+} # manakai_local_name
 
 sub node_type { 2 }
 
@@ -363,6 +374,10 @@ sub name ($) {
 sub value ($) {
   return shift->{value};
 } # value
+
+sub owner_element ($) {
+  return shift->{owner_element};
+} # owner_element
 
 package Whatpm::NanoDOM::CharacterData;
 push our @ISA, 'Whatpm::NanoDOM::Node';
@@ -426,4 +441,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2007/05/04 09:16:04 $
+# $Date: 2007/05/19 06:02:36 $

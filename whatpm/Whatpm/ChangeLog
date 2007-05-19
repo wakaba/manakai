@@ -1,5 +1,16 @@
 2007-05-19  Wakaba  <wakaba@suika.fam.cx>
 
+	* ContentChecker.pm: Attribute checkers 
+	for global attributes, |html|, |base|, |style|, and |meta|.
+
+	* NanoDOM.pm (insert_before): Weaken reference
+	to the parent node.
+	(Attr::new): Set |owner_element| attribute.
+	(namespace_uri, manakai_local_name): New attribute implementations.
+	(owner_element): New attribute.
+
+2007-05-19  Wakaba  <wakaba@suika.fam.cx>
+
 	* ContentChecker.pm ($AttrChecker, $HTMLAttrChecker,
 	$AnyChecker->{attr_checker}, $HTMLAttrsChecker,
 	$Element->{$HTML_NS}->{''}): New.

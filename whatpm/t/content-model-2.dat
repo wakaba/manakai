@@ -41,3 +41,421 @@
 #errors
 /unknown;element not supported
 /unknown/@lang;syntax error
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+id=""></p>
+#errors
+/p/@id;attribute value is empty
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+id="a"></p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+id="aaaaaaa"></p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+id="a"><span id="a"></span></p>
+#errors
+/p/span/@id;duplicate ID
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+id=""><span id=""></span></p>
+#errors
+/p/@id;attribute value is empty
+/p/span/@id;attribute value is empty
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+  <span id="a"/>
+  <span id="b"/>
+  <span id="c"/>
+</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+  <span id="a "/>
+  <span id=" a"/>
+  <span id=" a "/>
+</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+  <span id="i"/>
+  <span id="I"/>
+  <span id="&#x0131;"/>
+</p>
+#errors
+
+#data
+<p title="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<p title="a" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<p title="AAAAAA" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<p title="XXXX&#x0A;YYYY" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<p title="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<p title="AAA" xmlns="http://www.w3.org/1999/xhtml">
+  <span title="BBB"/>
+</p>
+#errors
+
+#data
+<p dir="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/p/@dir;invalid enumerated attribute value
+
+#data
+<p dir="ltr" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<p dir=" ltr" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/p/@dir;invalid enumerated attribute value
+
+#data
+<p dir="ltr " xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/p/@dir;invalid enumerated attribute value
+
+#data
+<!DOCTYPE p [<!ATTLIST p dir (ltr|rtl) #IMPLIED>]>
+<p dir="ltr " xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<?xml version="1.1"?>
+<!DOCTYPE p [<!ATTLIST p dir (ltr|rtl) #IMPLIED>]>
+<p dir="ltr&#x0C;" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/p/@dir;invalid enumerated attribute value
+
+#data
+<p dir="LTR" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<p dir="LtR" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<p dir="rtl" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<p dir="Rtl" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<p dir="rtltr" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/p/@dir;invalid enumerated attribute value
+
+#data
+<p dir="XXXXXX" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/p/@dir;invalid enumerated attribute value
+
+#data
+<p class="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<p class="  " xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<?xml version="1.1"?>
+<p class="&#xD;&#xB;" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<p class="a b c d ef g h" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<?xml version="1.1"?>
+<p class="  a b c  d   &#xC;  efg h &#xC;" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<p class="a a" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/p/@class;duplicate token:a
+
+#data
+<?xml version="1.1"?>
+<p class="  aa&#xC; aa" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/p/@class;duplicate token:aa
+
+#data
+<p class="a a a" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/p/@class;duplicate token:a
+/p/@class;duplicate token:a
+
+#data
+<p class="I i &#x0131;" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<p irrelevant="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<p irrelevant=" " xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/p/@irrelevant;invalid boolean attribute value
+
+#data
+<p irrelevant="irrelevant" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<p irrelevant=" irrelevant" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/p/@irrelevant;invalid boolean attribute value
+
+#data
+<p irrelevant="irrelevant " xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/p/@irrelevant;invalid boolean attribute value
+
+#data
+<p irrelevant=" irrelevant " xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/p/@irrelevant;invalid boolean attribute value
+
+#data
+<p irrelevant="Irrelevant" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/p/@irrelevant;invalid boolean attribute value
+
+#data
+<p irrelevant="IRRELEVANT" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/p/@irrelevant;invalid boolean attribute value
+
+#data
+<p irrelevant="relevant" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/p/@irrelevant;invalid boolean attribute value
+
+#data
+<p irrelevant="irrelevants" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/p/@irrelevant;invalid boolean attribute value
+
+#data
+<p irrelevant="false" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/p/@irrelevant;invalid boolean attribute value
+
+#data
+<p irrelevant="true" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/p/@irrelevant;invalid boolean attribute value
+
+#data
+<p irrelevant="yes" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/p/@irrelevant;invalid boolean attribute value
+
+#data
+<p irrelevant="on" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/p/@irrelevant;invalid boolean attribute value
+
+#data html
+<!DOCTYPE html>
+<html>
+<head><title></title></head>
+<body></body>
+</html>
+#errors
+
+#data html
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title></head>
+<body></body>
+</html>
+#errors
+
+#data html
+<!DOCTYPE html>
+<html xmlns="">
+<head><title></title></head>
+<body></body>
+</html>
+#errors
+/html/@xmlns;syntax error
+
+#data html
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/TR/xhtml1/strict">
+<head><title></title></head>
+<body></body>
+</html>
+#errors
+/html/@xmlns;syntax error
+
+#data html
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/TR/REC-html40">
+<head><title></title></head>
+<body></body>
+</html>
+#errors
+/html/@xmlns;syntax error
+
+#data html
+<!DOCTYPE html>
+<html xmlns=" http://www.w3.org/1999/xhtml ">
+<head><title></title></head>
+<body></body>
+</html>
+#errors
+/html/@xmlns;syntax error
+
+#data html
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/XHTML">
+<head><title></title></head>
+<body></body>
+</html>
+#errors
+/html/@xmlns;syntax error
+
+#data html
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/html">
+<head><title></title></head>
+<body></body>
+</html>
+#errors
+/html/@xmlns;syntax error
+
+#data
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title></head>
+<body></body>
+</html>
+#errors
+
+#data
+<html xmlns="http://www.w3.org/1999/xhtml ">
+<head><title></title></head>
+<body></body>
+</html>
+#errors
+/html;element not supported
+/html/head;element not supported
+/html/head/title;element not supported
+/html/body;element not supported
+
+#data html
+<!DOCTYPE html>
+<html>
+<head xmlns="http://www.w3.org/1999/xhtml"><title></title></head>
+<body></body>
+</html>
+#errors
+/html/head/@xmlns;attribute not supported
+
+#data
+<head profile="http://www.test/" xmlns="http://www.w3.org/1999/xhtml">
+  <title/>
+</head>
+#errors
+/head/@profile;attribute not supported
+
+#data
+<meta xmlns="http://www.w3.org/1999/xhtml">
+  <!-- TODO: <meta> tests are not complete -->
+</meta>
+#errors
+/meta;attribute missing:name|http-equiv|charset
+
+#data
+<meta name="dns" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/meta;attribute missing:content
+
+#data
+<meta name="dns" content="example.net" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<meta charset="us-ascii" name="dns" content="example.net"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/meta/@charset;attribute not allowed
+
+#data
+<meta http-equiv="refresh" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/meta;attribute missing:content
+
+#data
+<meta http-equiv="refresh" content="10; a.html"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<meta http-equiv="refresh" content="10; a.html" name="dns"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/meta/@http-equiv;attribute not allowed
+
+#data
+<meta http-equiv="refresh" content="10; a.html" charset="us-ascii"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/meta/@charset;attribute not allowed
+
+#data
+<meta http-equiv="" content="example.net" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/meta/@http-equiv;invalid enumerated attribute value
+
+#data
+<meta content="example.net" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/meta/@content;attribute not allowed
+/meta;attribute missing:name|http-equiv
+
+#data
+<meta charset="us-ascii" content="example.net"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/meta/@content;attribute not allowed
+
+#data
+<meta content="example.net" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/meta/@content;attribute not allowed
+/meta;attribute missing;name|http-equiv
