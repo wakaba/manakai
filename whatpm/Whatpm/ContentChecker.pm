@@ -94,6 +94,7 @@ my $AttrChecker = {
   },
 };
 
+## ISSUE: Should we really allow these attributes?
 $AttrChecker->{''}->{'xml:space'} = $AttrChecker->{$XML_NS}->{space};
 $AttrChecker->{''}->{'xml:lang'} = $AttrChecker->{$XML_NS}->{lang};
 $AttrChecker->{''}->{'xml:base'} = $AttrChecker->{$XML_NS}->{base};
@@ -2167,7 +2168,7 @@ sub check_element ($$$) {
           $ElementDefault;
       $eldef->{attrs_checker}->($self, $todo);
       my ($new_todos) = $eldef->{checker}->($self, $todo);
-      push @todo, @$new_todos;
+      unshift @todo, @$new_todos;
     } elsif ($todo->{type} eq 'element-attributes') {
       my $prefix = $todo->{node}->prefix;
       if (defined $prefix and $prefix eq 'xmlns') {
@@ -2266,4 +2267,4 @@ sub _check_get_children ($$) {
 } # _check_get_children
 
 1;
-# $Date: 2007/05/19 14:29:09 $
+# $Date: 2007/05/19 15:31:07 $

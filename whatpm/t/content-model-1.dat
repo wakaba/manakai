@@ -2167,6 +2167,24 @@ aaa
 /a/em/a;element not allowed
 
 #data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<p><a></a></p><ul><li><a></a></li></ul>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<p><a></a></p><ol><li><a></a></li></ol>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<p><a></a></p><ol><li><datagrid/></li></ol>
+</div>
+#errors
+
+#data
 <details xmlns="http://www.w3.org/1999/xhtml">
 <legend/>
 <p><a/></p>
