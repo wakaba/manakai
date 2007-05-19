@@ -4,7 +4,7 @@ use strict;
 use Test;
 BEGIN { plan tests => 34 }
 
-my @FILES = qw[t/content-model-1.dat];
+my @FILES = qw[t/content-model-1.dat t/content-model-2.dat];
 
 require Whatpm::ContentChecker;
 
@@ -71,6 +71,8 @@ sub get_node_path ($) {
     my $rs;
     if ($node->node_type == 1) {
       $rs = $node->manakai_local_name;
+    } elsif ($node->node_type == 2) {
+      $rs = '@' . $node->manakai_local_name;
     } elsif ($node->node_type == 3) {
       $rs = '"' . $node->data . '"';
     } elsif ($node->node_type == 9) {
@@ -85,4 +87,4 @@ sub get_node_path ($) {
 } # get_node_path
 
 ## License: Public Domain.
-## $Date: 2007/05/13 10:40:07 $
+## $Date: 2007/05/19 03:49:58 $

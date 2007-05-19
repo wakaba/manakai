@@ -1,3 +1,10 @@
+2007-05-19  Wakaba  <wakaba@suika.fam.cx>
+
+	* ContentChecker.pm ($AttrChecker, $HTMLAttrChecker,
+	$AnyChecker->{attr_checker}, $HTMLAttrsChecker,
+	$Element->{$HTML_NS}->{''}): New.
+	(check_element): Invoke attrs_checker for each element.
+
 2007-05-13  Wakaba  <wakaba@suika.fam.cx>
 
 	* ContentChecker.pm: Don't use |manakai_element_type_match|.

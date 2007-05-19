@@ -4,6 +4,16 @@
 /html;element not supported
 
 #data
+<unknown xmlns="http://www.w3.org/1999/xhtml"></unknown>
+#errors
+/unknown;element not supported
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"><unknown/></p>
+#errors
+/p/unknown;element not supported
+
+#data
 <html xmlns="http://www.w3.org/1999/xhtml"></html>
 #errors
 /html;child element missing:head
