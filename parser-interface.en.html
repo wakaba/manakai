@@ -39,16 +39,16 @@
   button:after {
     content: " ->";
   }
-  fieldset fieldset {
+  form > fieldset > fieldset {
     display: block;
     position: absolute;
     top: 11em;
-    left: 110%;
+    left: 103%;
+    border-style: none;
     padding: 0;
-    min-width: 5em;
+    min-width: 7em;
   }
-  fieldset fieldset legend,
-  fieldset fieldset p {
+  form > fieldset > fieldset fieldset {
     font-size: 60%;
   }
   fieldset p {
@@ -58,7 +58,7 @@
 </style>
 </head>
 <body>
-<h1>HTML5 Parser Web Interface</h1>
+<h1>HTML5 Parser (<em>beta</em>) Web Interface</h1>
 
 <form action="parser/html"
     method="post" accept-charset="utf-8" target="result"
@@ -80,11 +80,17 @@
 </textarea></p>
 <p><button type="submit">Parse</button></p>
 <fieldset>
+<fieldset>
+<p><label title="Show any HTML5 parse errors if checked"><input type="checkbox" disabled name="html5" checked"> HTML5</label></p>
+<p><label title="Show any conformance error of the parsed DOM tree if checked"><input type="checkbox" name="dom5"> DOM5 HTML</label></p>
+</fieldset>
+<fieldset>
 <legend>Output format</legend>
-<p><label><input type="radio" name="format" value="html" checked id="format-html"> 
-  <code>document<wbr>.innerHTML</code></label></p>
-<p><label><input type="radio" name="format" value="test" id="format-test">
+<p><label title="Show the value of |document.innerHTML| if checked"><input type="radio" name="format" value="html" checked id="format-html"> 
+  <code>innerHTML</code></label></p>
+<p><label title="Show the parsed DOM in the format used in html5lib tests"><input type="radio" name="format" value="test" id="format-test">
   parser test</label></p>
+</fieldset>
 </fieldset>
 
 </fieldset>

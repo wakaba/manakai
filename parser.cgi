@@ -31,7 +31,8 @@ if ($mode eq '/html' or $mode eq '/test') {
   print STDOUT "#errors\n";
 
   my $onerror = sub {
-    print STDOUT "0,0,", $_[0], "\n";
+    my (%opt) = @_;
+    print STDOUT "$opt{line},$opt{column},$opt{type}\n";
   };
 
   my $doc = Whatpm::HTML->parse_string
@@ -46,6 +47,26 @@ if ($mode eq '/html' or $mode eq '/test') {
     $out = test_serialize ($doc);
   }
   print STDOUT Encode::encode ('utf-8', $$out);
+  print STDOUT "\n";
+
+  if ($http->parameter ('dom5')) {
+    require Whatpm::ContentChecker;
+    print STDOUT "#domerrors\n";
+    my $docel = $doc->document_element;
+    my $docel_nsuri = $docel->namespace_uri;
+    if (defined $docel_nsuri and 
+        $docel_nsuri eq q<http://www.w3.org/1999/xhtml> and
+        $docel->manakai_local_name eq 'html') {
+      #
+    } else {
+      print STDOUT get_node_path ($docel) . ";element not allowed\n";
+    }
+    my $cc = Whatpm::ContentChecker->new;
+    $cc->check_element ($docel, sub {
+      my %opt = @_;
+      print STDOUT get_node_path ($opt{node}) . ';' . $opt{type} . "\n";
+    });
+  }
 } else {
   print STDOUT "Status: 404 Not Found\nContent-Type: text/plain; charset=us-ascii\n\n404";
 }
@@ -84,3 +105,44 @@ sub test_serialize ($) {
   
   return \$r;
 } # test_serialize
+
+sub get_node_path ($) {
+  my $node = shift;
+  my @r;
+  while (defined $node) {
+    my $rs;
+    if ($node->node_type == 1) {
+      $rs = $node->manakai_local_name;
+      $node = $node->parent_node;
+    } elsif ($node->node_type == 2) {
+      $rs = '@' . $node->manakai_local_name;
+      $node = $node->owner_element;
+    } elsif ($node->node_type == 3) {
+      $rs = '"' . $node->data . '"';
+      $node = $node->parent_node;
+    } elsif ($node->node_type == 9) {
+      $rs = '';
+      $node = $node->parent_node;
+    } else {
+      $rs = '#' . $node->node_type;
+      $node = $node->parent_node;
+    }
+    unshift @r, $rs;
+  }
+  return join '/', @r;
+} # get_node_path
+
+=head1 AUTHOR
+
+Wakaba <w@suika.fam.cx>.
+
+=head1 LICENSE
+
+Copyright 2007 Wakaba <w@suika.fam.cx>
+
+This library is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+=cut
+
+## $Date: 2007/05/20 08:14:48 $
