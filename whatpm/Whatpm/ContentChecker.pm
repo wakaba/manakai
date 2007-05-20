@@ -663,13 +663,25 @@ my $HTMLUnorderedSetOfSpaceSeparatedTokensAttrChecker = sub {
 my $HTMLURIAttrChecker = sub {
   my ($self, $attr) = @_;
   ## TODO: URI or IRI check
+  ## ISSUE: Relative references are allowed? (RFC 3987 "IRI" is an absolute reference with optional fragment identifier.)
 }; # $HTMLURIAttrChecker
+
+## A space separated list of one or more URIs (or IRIs)
+my $HTMLSpaceURIsAttrChecker = sub {
+  my ($self, $attr) = @_;
+  ## TODO: URI or IRI check
+  ## ISSUE: Relative references?
+  ## ISSUE: Leading or trailing white spaces are conformant?
+  ## ISSUE: A sequence of white space characters are conformant?
+  ## ISSUE: A zero-length string is conformant? (It does contain a relative reference, i.e. same as base URI.)
+  ## NOTE: Duplication seems not an error.
+}; # $HTMLSpaceURIsAttrChecker
 
 my $HTMLIntegerAttrChecker = sub {
   my ($self, $attr) = @_;
   my $value = $attr->value;
   unless ($value =~ /\A-?[0-9]+\z/) {
-    $self->{onerror}->(node => $attr, type => 'syntax error');
+    $self->{onerror}->(node => $attr, type => 'integer syntax error');
   }
 }; # $HTMLIntegerAttrChecker
 
@@ -683,7 +695,8 @@ my $GetHTMLNonNegativeIntegerAttrChecker = sub {
         $self->{onerror}->(node => $attr, type => 'out of range');
       }
     } else {
-      $self->{onerror}->(node => $attr, type => 'syntax error');
+      $self->{onerror}->(node => $attr,
+                         type => 'non-negative integer syntax error');
     }
   };
 }; # $GetHTMLNonNegativeIntegerAttrChecker
@@ -698,10 +711,30 @@ my $GetHTMLFloatingPointNumberAttrChecker = sub {
         $self->{onerror}->(node => $attr, type => 'out of range');
       }
     } else {
-      $self->{onerror}->(node => $attr, type => 'syntax error');
+      $self->{onerror}->(node => $attr,
+                         type => 'floating point number syntax error');
     }
   };
 }; # $GetHTMLFloatingPointNumberAttrChecker
+
+## "A valid MIME type, optionally with parameters. [RFC 2046]"
+## ISSUE: RFC 2046 does not define syntax of media types.
+## ISSUE: The definition of "a valid MIME type" is unknown.
+## Syntactical correctness?
+my $HTMLIMTAttrChecker = sub {
+  my ($self, $attr) = @_;
+  my $value = $attr->value;
+  ## ISSUE: RFC 2045 Content-Type header field allows insertion
+  ## of LWS/comments between tokens.  Is it allowed in HTML?  Maybe no.
+  ## ISSUE: RFC 2231 extension?  Maybe no.
+  my $lws0 = qr/(?>(?>\x0D\x0A)?[\x09\x20])*/;
+  my $token = qr/[\x21\x23-\x27\x2A\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7E]+/;
+  my $qs = qr/"(?>[\x00-\x0C\x0E-\x21\x23-\x5B\x5D-\x7E]|\x0D\x0A[\x09\x20]|\x5C[\x00-\x7F])*"/;
+  unless ($value =~ m#\A$lws0$token$lws0/$lws0$token$lws0(?>;$lws0$token$lws0=$lws0(?>$token|$qs)$lws0)*\z#) {
+    $self->{onerror}->(node => $attr, type => 'IMT syntax error');
+  }
+  ## TODO: Warn unless registered
+}; # $HTMLIMTAttrChecker
 
 my $HTMLAttrChecker = {
   id => sub {
@@ -917,7 +950,15 @@ $Element->{$HTML_NS}->{base} = {
 };
 
 $Element->{$HTML_NS}->{link} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}), ## TODO
+  attrs_checker => $GetHTMLAttrsChecker->({
+    href => $HTMLURIAttrChecker, ## TODO: required
+    rel => $HTMLUnorderedSetOfSpaceSeparatedTokensAttrChecker, ## TODO: registered? check ## TODO: required
+    ## TODO: media (required)
+    ## TODO: hreflang (required)
+    type => $HTMLIMTAttrChecker,
+    ## NOTE: Though |title| has special semantics,
+    ## syntactically same as the |title| as global attribute.
+  }),
   checker => $HTMLEmptyChecker,
 };
 
@@ -1031,7 +1072,7 @@ $Element->{$HTML_NS}->{meta} = {
 ## NOTE: |html:style| has no conformance creteria on content model
 $Element->{$HTML_NS}->{style} = {
   attrs_checker => $GetHTMLAttrsChecker->({
-    ## TODO: type
+    type => $HTMLIMTAttrChecker, ## TODO: MUST be a styling language
     ## TODO: media
     scoped => $GetHTMLBooleanAttrChecker->('scoped'),
     ## NOTE: |title| has special semantics for |style|s, but is syntactically
@@ -1433,7 +1474,33 @@ $Element->{$HTML_NS}->{dd} = {
 };
 
 $Element->{$HTML_NS}->{a} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}), ## TODO
+  attrs_checker => do {
+    my %attr;
+    my $all_checker = $GetHTMLAttrsChecker->({
+      href => sub { $HTMLURIAttrChecker->(@_); $attr{href} = $_[1] },
+      ## TODO: target
+      ping => sub { $HTMLSpaceURIsAttrChecker->(@_); $attr{ping} = $_[1] },
+      rel => sub {
+        $HTMLUnorderedSetOfSpaceSeparatedTokensAttrChecker->(@_); ## TODO: registered? check
+        $attr{rel} = $_[1];
+      },
+      ## TODO: media
+      ## TODO: hreflang
+      type => sub { $HTMLIMTAttrChecker->(@_); $attr{type} = $_[1] },
+    });
+    sub {
+      $all_checker->(@_);
+      unless (defined $attr{href}) {
+        for (qw/target ping rel media hreflang type/) {
+          if (defined $attr{$_}) {
+            $_[0]->{onerror}->(node => $attr{$_},
+                               type => 'attribute not allowed');
+          }
+        }
+      }
+      %attr = ();
+    };
+  },
   checker => sub {
     my ($self, $todo) = @_;
 
@@ -1637,8 +1704,25 @@ $Element->{$HTML_NS}->{iframe} = {
 };
 
 $Element->{$HTML_NS}->{embed} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}), ## TODO
+  attrs_checker => $GetHTMLAttrsChecker->({
+    src => $HTMLURIAttrChecker, ## TODO: required
+    type => $HTMLIMTAttrChecker,
+    ## TODO: height
+    ## TODO: width
+    ## TODO: any other w/o namespace
+  }),
   checker => $HTMLEmptyChecker,
+};
+
+$Element->{$HTML_NS}->{object} = {
+  attrs_checker => $GetHTMLAttrsChecker->({
+    data => $HTMLURIAttrChecker,
+    type => $HTMLIMTAttrChecker, ## TODO: one of |data| and |type| is required
+    ## TODO: usemap
+    ## TODO: width
+    ## TODO: height
+  }),
+  checker => $ElementDefault->{checker}, ## TODO
 };
 
 $Element->{$HTML_NS}->{param} = {
@@ -1659,8 +1743,6 @@ $Element->{$HTML_NS}->{param} = {
   },
   checker => $HTMLEmptyChecker,
 };
-
-## TODO: object
 
 $Element->{$HTML_NS}->{video} = {
   attrs_checker => $GetHTMLAttrsChecker->({
@@ -1689,7 +1771,11 @@ $Element->{$HTML_NS}->{audio} = {
 };
 
 $Element->{$HTML_NS}->{source} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}), ## TODO
+  attrs_checker => $GetHTMLAttrsChecker->({
+    src => $HTMLURIAttrChecker, # TODO: REQUIRED
+    type => $HTMLIMTAttrChecker,
+    ## TODO: media
+  }),
   checker => $HTMLEmptyChecker,
 };
 
@@ -1707,7 +1793,153 @@ $Element->{$HTML_NS}->{map} = {
 };
 
 $Element->{$HTML_NS}->{area} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}), ## TODO
+  attrs_checker => sub {
+    my ($self, $todo) = @_;
+    my %attr;
+    my $coords;
+    for my $attr (@{$todo->{node}->attributes}) {
+      my $attr_ns = $attr->namespace_uri;
+      $attr_ns = '' unless defined $attr_ns;
+      my $attr_ln = $attr->manakai_local_name;
+      my $checker;
+      if ($attr_ns eq '') {
+        $checker = {
+                     alt => sub { },
+                         ## NOTE: |alt| value has no conformance creteria.
+                     shape => $GetHTMLEnumeratedAttrChecker->({
+                       circ => -1, circle => 1,
+                       default => 1,
+                       poly => 1, polygon => -1,
+                       rect => 1, rectangle => -1,
+                     }),
+                     coords => sub {
+                       my ($self, $attr) = @_;
+                       my $value = $attr->value;
+                       if ($value =~ /\A-?[0-9]+(?>,-?[0-9]+)*\z/) {
+                         $coords = [split /,/, $value];
+                       } else {
+                         $self->{onerror}->(node => $attr,
+                                            type => 'syntax error');
+                       }
+                     },
+                     ## TODO: coords
+                     target => sub { $self->{onerror}->(node => $attr, type => 'attribute not supported') }, ## TODO
+                     href => $HTMLURIAttrChecker,
+                     ping => $HTMLSpaceURIsAttrChecker,
+                     rel => $HTMLUnorderedSetOfSpaceSeparatedTokensAttrChecker, ## TODO: registered? check
+                     media => sub { $self->{onerror}->(node => $attr, type => 'attribute not supported') }, ## TODO
+                     hreflang => sub { $self->{onerror}->(node => $attr, type => 'attribute not supported') }, ## TODO
+                     type => $HTMLIMTAttrChecker,
+                   }->{$attr_ln};
+        if ($checker) {
+          $attr{$attr_ln} = $attr;
+        } else {
+          $checker = $HTMLAttrChecker->{$attr_ln};
+        }
+      }
+      $checker ||= $AttrChecker->{$attr_ns}->{$attr_ln}
+        || $AttrChecker->{$attr_ns}->{''};
+      if ($checker) {
+        $checker->($self, $attr) if ref $checker;
+      } else {
+        $self->{onerror}->(node => $attr, type => 'attribute not supported');
+        ## ISSUE: No comformance createria for unknown attributes in the spec
+      }
+    }
+
+    if (defined $attr{href}) {
+      unless (defined $attr{alt}) {
+        $self->{onerror}->(node => $todo->{node},
+                           type => 'attribute missing:alt');
+      }
+    } else {
+      for (qw/target ping rel media hreflang type alt/) {
+        if (defined $attr{$_}) {
+          $self->{onerror}->(node => $attr{$_},
+                             type => 'attribute not allowed');
+        }
+      }
+    }
+
+    my $shape = 'rectangle';
+    if (defined $attr{shape}) {
+      $shape = {
+                circ => 'circle', circle => 'circle',
+                default => 'default',
+                poly => 'polygon', polygon => 'polygon',
+                rect => 'rectangle', rectangle => 'rectangle',
+               }->{lc $attr{shape}->value} || 'rectangle';
+      ## TODO: ASCII lowercase?
+    }
+
+    if ($shape eq 'circle') {
+      if (defined $attr{coords}) {
+        if (defined $coords) {
+          if (@$coords == 3) {
+            if ($coords->[2] < 0) {
+              $self->{onerror}->(node => $attr{coords},
+                                 type => 'out of range:2');
+            }
+          } else {
+            $self->{onerror}->(node => $attr{coords},
+                               type => 'list item number:3:'.@$coords);
+          }
+        } else {
+          ## NOTE: A syntax error has been reported.
+        }
+      } else {
+        $self->{onerror}->(node => $todo->{node},
+                           type => 'attribute missing:coords');
+      }
+    } elsif ($shape eq 'default') {
+      if (defined $attr{coords}) {
+        $self->{onerror}->(node => $attr{coords},
+                           type => 'attribute not allowed');
+      }
+    } elsif ($shape eq 'polygon') {
+      if (defined $attr{coords}) {
+        if (defined $coords) {
+          if (@$coords >= 6) {
+            unless (@$coords % 2 == 0) {
+              $self->{onerror}->(node => $attr{coords},
+                                 type => 'list item number:even:'.@$coords);
+            }
+          } else {
+            $self->{onerror}->(node => $attr{coords},
+                               type => 'list item number:>=6:'.@$coords);
+          }
+        } else {
+          ## NOTE: A syntax error has been reported.
+        }
+      } else {
+        $self->{onerror}->(node => $todo->{node},
+                           type => 'attribute missing:coords');
+      }
+    } elsif ($shape eq 'rectangle') {
+      if (defined $attr{coords}) {
+        if (defined $coords) {
+          if (@$coords == 4) {
+            unless ($coords->[0] < $coords->[2]) {
+              $self->{onerror}->(node => $attr{coords},
+                                 type => 'out of range:0');
+            }
+            unless ($coords->[1] < $coords->[3]) {
+              $self->{onerror}->(node => $attr{coords},
+                                 type => 'out of range:1');
+            }
+          } else {
+            $self->{onerror}->(node => $attr{coords},
+                               type => 'list item number:4:'.@$coords);
+          }
+        } else {
+          ## NOTE: A syntax error has been reported.
+        }
+      } else {
+        $self->{onerror}->(node => $todo->{node},
+                           type => 'attribute missing:coords');
+      }
+    }
+  },
   checker => $HTMLEmptyChecker,
 };
 ## TODO: only in map
@@ -1978,7 +2210,12 @@ $Element->{$HTML_NS}->{th} = {
 ## TODO: forms
 
 $Element->{$HTML_NS}->{script} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}), ## TODO
+  attrs_checker => $GetHTMLAttrsChecker->({
+    src => $HTMLURIAttrChecker,
+    defer => $GetHTMLBooleanAttrChecker->('defer'), ## TODO: if src ## ISSUE: no MUST NOT
+    async => $GetHTMLBooleanAttrChecker->('async'), ## TODO: if src ## ISSUE: no MUST NOT
+    type => $HTMLIMTAttrChecker,
+  }),
   checker => sub {
     my ($self, $todo) = @_;
 
@@ -2267,4 +2504,4 @@ sub _check_get_children ($$) {
 } # _check_get_children
 
 1;
-# $Date: 2007/05/19 15:31:07 $
+# $Date: 2007/05/20 05:07:12 $
