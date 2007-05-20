@@ -13,10 +13,10 @@ Technologies (beta)</title>
 <div class="section" id="introduction">
 <h2>Introduction</h2>
 
-<p><dfn>Whatpm</dfn> is a set of Perl modules for
+<p><dfn>Whatpm</dfn> is a <em>work-in-progress</em> set of Perl modules for
 Web hypertext application technologies.</p>
 
-<p>It currently contains two Perl modules:</p>
+<p>It currently contains three Perl modules:</p>
 
 <dl>
 <dt><a href="Whatpm/ContentType.html"><code>Whatpm::ContentType</code></a></dt>
@@ -24,6 +24,9 @@ Web hypertext application technologies.</p>
 <dt><a href="Whatpm/HTML.html"><code>Whatpm::HTML</code></a></dt>
   <dd>An implementation of HTML5 parsing algorithm and
   <code>innerHTML</code> serialization.</dd>
+<dt><a href="Whatpm/ContentChecker.html"><code>Whatpm::ContentChecker</code></a></dt>
+  <dd>A DOM5 HTML (in-memory representation of a document) conformance
+  checker.</dd>
 </dl>
 </div>
 
@@ -31,14 +34,11 @@ Web hypertext application technologies.</p>
 <h2>Demo</h2>
 
 <p><a href="http://suika.fam.cx/gate/2007/html/parser-interface">HTML5 parser 
-demo</a></p>
+and checker demo</a></p>
 </div>
 
 <div class="section" id="download">
 <h2>Distribution</h2>
-
-<p>Tarball will be available when setter for <code>innerHTML</code>
-is implemented.</p>
 
 <p>The development version of Whatpm may be found in the 
 <a href="http://suika.fam.cx/gate/cvs/markup/html/whatpm/">CVS 
@@ -51,13 +51,19 @@ repository</a>.</p>
 
 <ul>
   <li>Bug fix (Test results: 
+    <a href="t/content-type-result"><code>Whatpm::ContentType</code></a>,
     <a href="t/tokenizer-result">HTML tokenization</a>,
-    <a href="t/tree-construction-result">HTML tree construction</a>)</li>
-  <li><code>innerHTML</code> setter</li>
-  <li>Charset detection</li>
+    <a href="t/tree-construction-result">HTML tree construction</a>,
+    <a href="t/content-checker-result"><code>Whatpm::ContentChecker</code></a>).</li>
+  <li>Charset detection.</li>
+  <li>Table validation.</li>
+  <li>Validation for <code>rel</code>, <code>meta</code>.</li>
+  <li>Validation for media types, media queries, IRIs, language tags,
+    and so on.</li>
   <li><q>Whatpm</q> is a code name in fact.  Please let me know
     if you have a better name.</li>
-  <li>Each module has its own TO DO list.</li>
+  <li>In addition, each module has its own TO DO items.
+    (Search for <q>## TODO</q> and <q>## ISSUE</q> in each module.)</li>
 </ul>
 </div>
 

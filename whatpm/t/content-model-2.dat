@@ -2,16 +2,20 @@
 <unknown u1=""></unknown>
 #errors
 /unknown;element not supported
+/unknown/@u1;attribute not supported
 
 #data
 <unknown u1="" u2=""></unknown>
 #errors
 /unknown;element not supported
+/unknown/@u1;attribute not supported
+/unknown/@u2;attribute not supported
 
 #data
 <unknown u1="" xmlns=""></unknown>
 #errors
 /unknown;element not supported
+/unknown/@u1;attribute not supported
 
 #data
 <unknown xml:lang="!" xmlns=""></unknown>
@@ -24,23 +28,27 @@
 #errors
 /unknown;element not supported
 /unknown/@lang;syntax error
+/unknown/@u1;attribute not supported
 
 #data
 <unknown u1="" xmlns="http://www.w3.org/1999/xhtml"></unknown>
 #errors
 /unknown;element not supported
+/unknown/@u1;attribute not supported
 
 #data
 <unknown u1="" xml:lang="!" xmlns="http://www.w3.org/1999/xhtml"></unknown>
 #errors
 /unknown;element not supported
 /unknown/@lang;syntax error
+/unknown/@u1;attribute not supported
 
 #data
 <unknown u1="" xml:lang="!" xmlns="http://www.w3.org/1999/xhtml"></unknown>
 #errors
 /unknown;element not supported
 /unknown/@lang;syntax error
+/unknown/@u1;attribute not supported
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"
@@ -425,6 +433,39 @@ id=""><span id=""></span></p>
 /head/@profile;attribute not supported
 
 #data
+<base xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<base href="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<base href="test" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<base href="http://test/#a" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<base href="http://test/" target="_self" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<base target="_self" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<base target="_blank" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/base/@target;reserved browsing context name
+
+#data
+<base target="blank" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
 <link xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /link;attribute missing:href
@@ -492,6 +533,35 @@ id=""><span id=""></span></p>
 <link rel="alternate stylesheet" href="http://test/" title=""
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+
+#data
+<link rel="author" href="http://test/" hreflang=""
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link/@hreflang;language tag syntax error
+
+#data
+<link rel="author" href="http://test/" hreflang="en"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<link media="all"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link;attribute missing:href
+/link;attribute missing:rel
+
+#data
+<link rel="author" href="http://test/" media="all"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<link href="http://test/" rel="author" target="_self"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link/@target;attribute not supported
 
 #data
 <meta xmlns="http://www.w3.org/1999/xhtml">
@@ -587,6 +657,14 @@ id=""><span id=""></span></p>
   <!-- NOTE: |charset| parameter here is meaningless (or harmful?),
        but syntactically correct. -->
 </style>
+#errors
+
+#data
+<style media="all" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<style media="screen" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 
 #data
@@ -925,6 +1003,70 @@ id=""><span id=""></span></p>
 #errors
 
 #data
+<a href="http://test/" hreflang=""
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/a/@hreflang;language tag syntax error
+
+#data
+<a href="http://test/" hreflang="en"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<a href="http://test/" media="all"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<a href="http://test/" target="_self"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<a href="http://test/" target="_parent"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<a href="http://test/" target="_top"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<a href="http://test/" target="_Top"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<a href="http://test/" target="_TOP"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<a href="http://test/" target="_blank"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/a/@target;reserved browsing context name
+
+#data
+<a href="http://test/" target="_main"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/a/@target;reserved browsing context name
+
+#data
+<a href="http://test/" target="abcde"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<a href="http://test/" target="_"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/a/@target;reserved browsing context name
+
+#data
 <a type="text/css" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /a/@type;attribute not allowed
@@ -938,6 +1080,22 @@ id=""><span id=""></span></p>
 <a ping="a" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /a/@ping;attribute not allowed
+
+#data
+<a hreflang="en" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/a/@hreflang;attribute not allowed
+
+#data
+<a media="screen" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/a/@media;attribute not allowed
+
+#data
+<a target="_self"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/a/@target;attribute not allowed
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml">
@@ -1202,6 +1360,132 @@ id=""><span id=""></span></p>
 #errors
 
 #data
+<img xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img;attribute missing:alt
+/img;attribute missing:src
+
+#data
+<img alt="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img;attribute missing:src
+
+#data
+<img src="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img;attribute missing:alt
+
+#data
+<img alt="" src="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">
+<img alt="" src="http://test/" ismap="ismap"/>
+</a>
+#errors
+
+#data
+<a href="http://link.test/" xmlns="http://www.w3.org/1999/xhtml">
+<img alt="" src="http://test/" ismap=""/>
+</a>
+#errors
+
+#data
+<a href="http://link.test/" xmlns="http://www.w3.org/1999/xhtml">
+<img alt="" src="http://test/" ismap="ismap"/>
+</a>
+#errors
+
+#data
+<a href="http://link.test/" xmlns="http://www.w3.org/1999/xhtml">
+<img alt="" src="http://test/" ismap="true"/>
+</a>
+#errors
+/a/img/@ismap;invalid boolean attribute value
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<p><img src="http://test/" alt="" usemap=""/></p>
+</div>
+#errors
+/div/p/img/@usemap;hashed idref syntax error
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<p><img src="http://test/" alt="" usemap="abc"/></p>
+</div>
+#errors
+/div/p/img/@usemap;hashed idref syntax error
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<p><img src="http://test/" alt="" usemap="abc#"/></p>
+</div>
+#errors
+/div/p/img/@usemap;hashed idref syntax error
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<p><img src="http://test/" alt="" usemap="&#x0A;#abc"/></p>
+</div>
+#errors
+/div/p/img/@usemap;hashed idref syntax error
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<p><img src="http://test/" alt="" usemap="#aa"/></p>
+<map id="aa"/>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<map id="aa"/>
+<p><img src="http://test/" alt="" usemap="#aa"/></p>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<map id="&#x4E00;"/>
+<p><img src="http://test/" alt="" usemap="#&#x4E00;"/></p>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<map id="aa"/>
+<p><img src="http://test/" alt="" usemap="#bb"/></p>
+</div>
+#errors
+/div/p/img/@usemap;no referenced map
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<map id="aa"/>
+<p><img src="http://test/" alt="" usemap="#aa"/></p>
+<p><img src="http://test/" alt="" usemap="#aa"/></p>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<map id="aa"/>
+<p><img src="http://test/" alt="" usemap="#AA"/></p>
+</div>
+#errors
+/div/p/img/@usemap;no referenced map
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<map id="AA"/>
+<p><img src="http://test/" alt="" usemap="#aa"/></p>
+</div>
+#errors
+/div/p/img/@usemap;no referenced map
+
+#data
 <iframe xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 
@@ -1246,6 +1530,11 @@ id=""><span id=""></span></p>
 #errors
 
 #data
+<object xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/object;attribute missing:data|type
+
+#data
 <object data="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 
@@ -1262,6 +1551,87 @@ id=""><span id=""></span></p>
 <object type="text/css" data="http://test/"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<p><object data="http://test/" usemap=""/></p>
+</div>
+#errors
+/div/p/object/@usemap;hashed idref syntax error
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<p><object data="http://test/" usemap="abc"/></p>
+</div>
+#errors
+/div/p/object/@usemap;hashed idref syntax error
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<p><object data="http://test/" usemap="abc#"/></p>
+</div>
+#errors
+/div/p/object/@usemap;hashed idref syntax error
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<p><object data="http://test/" usemap="&#x0A;#abc"/></p>
+</div>
+#errors
+/div/p/object/@usemap;hashed idref syntax error
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<p><object data="http://test/" usemap="#aa"/></p>
+<map id="aa"/>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<map id="aa"/>
+<p><object data="http://test/" usemap="#aa"/></p>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<map id="&#x4E00;"/>
+<p><object data="http://test/" usemap="#&#x4E00;"/></p>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<map id="aa"/>
+<p><object data="http://test/" usemap="#bb"/></p>
+</div>
+#errors
+/div/p/object/@usemap;no referenced map
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<map id="aa"/>
+<p><object data="http://test/" usemap="#aa"/></p>
+<p><object data="http://test/" usemap="#aa"/></p>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<map id="aa"/>
+<p><object data="http://test/" usemap="#AA"/></p>
+</div>
+#errors
+/div/p/object/@usemap;no referenced map
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<map id="AA"/>
+<p><object data="http://test/" usemap="#aa"/></p>
+</div>
+#errors
+/div/p/object/@usemap;no referenced map
 
 #data
 <param xmlns="http://www.w3.org/1999/xhtml"/>
@@ -1361,6 +1731,11 @@ id=""><span id=""></span></p>
 /audio/@controls;invalid boolean attribute value
 
 #data
+<source xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/source;attribute missing:src
+
+#data
 <source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 
@@ -1400,6 +1775,11 @@ id=""><span id=""></span></p>
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /source/@type;IMT syntax error
+
+#data
+<source src="http://test/" media="screen"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
 
 #data
 <canvas xmlns="http://www.w3.org/1999/xhtml"/>
@@ -1488,6 +1868,27 @@ id=""><span id=""></span></p>
 #errors
 
 #data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<map id="aa"/>
+<p id="aa"/>
+</div>
+#errors
+/div/p/@id;duplicate ID
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<p id="aa"/>
+<map id="aa"/>
+</div>
+#errors
+/div/map/@id;duplicate ID
+
+#data
+<map id="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/map/@id;attribute value is empty
+
+#data
 <area xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /area;attribute missing:coords
@@ -1513,6 +1914,59 @@ id=""><span id=""></span></p>
 <area href="http://test/" alt="" coords="1,2,3,4"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+
+#data
+<area href="http://test/" alt="" coords="1,2,3,4"
+    hreflang=""
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@hreflang;language tag syntax error
+
+#data
+<area href="http://test/" alt="" coords="1,2,3,4"
+    hreflang="en"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<area coords="1,2,3,4" hreflang="en"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@hreflang;attribute not allowed
+
+#data
+<area href="http://test/" alt="" coords="1,2,3,4"
+    media="screen"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<area coords="1,2,3,4" media="screen"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@media;attribute not allowed
+
+#data
+<area href="http://test/" coords="1,2,3,4" alt="" target="_self"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<area href="http://test/" coords="1,2,3,4" alt="" target="self"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<area href="http://test/" coords="1,2,3,4" alt="" target="_any"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@target;reserved browsing context name
+
+#data
+<area coords="1,2,3,4" target="_self"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@target;attribute not allowed
 
 #data
 <area coords="1,2,3,4"
@@ -1838,6 +2292,52 @@ id=""><span id=""></span></p>
 <caption align="top" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /caption/@align;attribute not supported
+
+#data
+<colgroup xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<colgroup span="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/colgroup/@span;non-negative integer syntax error
+
+#data
+<colgroup span="1" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<colgroup span="0000000000001" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<colgroup span="1000000000000" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<colgroup span="0" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/colgroup/@span;out of range
+
+#data
+<colgroup span="-1" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/colgroup/@span;non-negative integer syntax error
+
+#data
+<colgroup span="+1" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/colgroup/@span;non-negative integer syntax error
+
+#data
+<colgroup span="111.1" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/colgroup/@span;non-negative integer syntax error
+
+#data
+<colgroup span="haergrghra" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/colgroup/@span;non-negative integer syntax error
 
 #data
 <col xmlns="http://www.w3.org/1999/xhtml"/>

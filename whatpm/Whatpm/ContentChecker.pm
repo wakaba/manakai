@@ -142,9 +142,9 @@ my $ElementDefault = {
         || $AttrChecker->{$attr_ns}->{''};
       if ($checker) {
         $checker->($self, $attr);
+      } else {
+        $self->{onerror}->(node => $attr, type => 'attribute not supported');
       }
-      ## Don't check otherwise, since "element type not supported" warning
-      ## will be reported by the element checker.
     }
   },
 };
@@ -736,6 +736,20 @@ my $HTMLIMTAttrChecker = sub {
   ## TODO: Warn unless registered
 }; # $HTMLIMTAttrChecker
 
+my $HTMLLanguageTagAttrChecker = sub {
+  my ($self, $attr) = @_;
+  if ($attr->value eq '') {
+    $self->{onerror}->(node => $attr, type => 'language tag syntax error');
+  }
+  ## TODO: RFC 3066 test
+  ## ISSUE: RFC 4646 (3066bis)?
+}; # $HTMLLanguageTagAttrChecker
+
+## "A valid media query [MQ]"
+my $HTMLMQAttrChecker = sub {
+  ## ISSUE: What is "a valid media query"?
+}; # $HTMLMQAttrChecker
+
 my $HTMLEventHandlerAttrChecker = sub {
   ## TODO: MUST contain valid ECMAScript code matching the
   ## ECMAScript |FunctionBody| production. [ECMA262]
@@ -744,24 +758,53 @@ my $HTMLEventHandlerAttrChecker = sub {
   ## ISSUE: Other script languages?
 }; # $HTMLEventHandlerAttrChecker
 
+my $HTMLUsemapAttrChecker = sub {
+  my ($self, $attr) = @_;
+  ## MUST be a valid hashed ID reference to a |map| element
+  my $value = $attr->value;
+  if ($value =~ s/^#//) {
+    ## ISSUE: Is |usemap="#"| conformant? (c.f. |id=""| is non-conformant.)
+    push @{$self->{usemap}}, [$value => $attr];
+  } else {
+    $self->{onerror}->(node => $attr, type => 'hashed idref syntax error');
+  }
+}; # $HTMLUsemapAttrChecker
+
+my $HTMLTargetAttrChecker = sub {
+  my ($self, $attr) = @_;
+  my $value = $attr->value;
+  if ($value =~ /^_/) {
+    $value = lc $value; ## ISSUE: ASCII case-insentitive?
+    unless ({
+             _self => 1, _parent => 1, _top => 1,
+            }->{$value}) {
+      $self->{onerror}->(node => $attr,
+                         type => 'reserved browsing context name');
+    }
+  } else {
+    #$ ISSUE: An empty string is conforming?
+  }
+}; # $HTMLTargetAttrChecker
+
 my $HTMLAttrChecker = {
   id => sub {
+    ## NOTE: |map| has its own variant of |id=""| checker
     my ($self, $attr) = @_;
     my $value = $attr->value;
-    unless (length $value > 0) {
-      ## NOTE: MUST contain at least one character
-      $self->{onerror}->(node => $attr, type => 'attribute value is empty');
-    } else {
+    if (length $value > 0) {
       if ($self->{id}->{$value}) {
         $self->{onerror}->(node => $attr, type => 'duplicate ID');
       } else {
         $self->{id}->{$value} = 1;
       }
+    } else {
+      ## NOTE: MUST contain at least one character
+      $self->{onerror}->(node => $attr, type => 'attribute value is empty');
     }
   },
   title => sub {}, ## NOTE: No conformance creteria
   lang => sub {
-    ## TODO: RFC 3066 test
+    ## TODO: RFC 3066 or empty test
     ## ISSUE: RFC 4646 (3066bis)?
     ## TODO: HTML vs XHTML
   },
@@ -963,7 +1006,7 @@ $Element->{$HTML_NS}->{title} = {
 $Element->{$HTML_NS}->{base} = {
   attrs_checker => $GetHTMLAttrsChecker->({
     href => $HTMLURIAttrChecker,
-    ## TODO: target
+    target => $HTMLTargetAttrChecker,
   }),
   checker => $HTMLEmptyChecker,
 };
@@ -974,8 +1017,8 @@ $Element->{$HTML_NS}->{link} = {
     $GetHTMLAttrsChecker->({
       href => $HTMLURIAttrChecker,
       rel => $HTMLUnorderedSetOfSpaceSeparatedTokensAttrChecker, ## TODO: registered? check
-      ## TODO: media
-      ## TODO: hreflang
+      media => $HTMLMQAttrChecker,
+      hreflang => $HTMLLanguageTagAttrChecker,
       type => $HTMLIMTAttrChecker,
       ## NOTE: Though |title| has special semantics,
       ## syntactically same as the |title| as global attribute.
@@ -1103,7 +1146,7 @@ $Element->{$HTML_NS}->{meta} = {
 $Element->{$HTML_NS}->{style} = {
   attrs_checker => $GetHTMLAttrsChecker->({
     type => $HTMLIMTAttrChecker, ## TODO: MUST be a styling language
-    ## TODO: media
+    media => $HTMLMQAttrChecker,
     scoped => $GetHTMLBooleanAttrChecker->('scoped'),
     ## NOTE: |title| has special semantics for |style|s, but is syntactically
     ## not different
@@ -1504,32 +1547,48 @@ $Element->{$HTML_NS}->{dd} = {
 };
 
 $Element->{$HTML_NS}->{a} = {
-  attrs_checker => do {
+  attrs_checker => sub {
+    my ($self, $todo) = @_;
     my %attr;
-    my $all_checker = $GetHTMLAttrsChecker->({
-      href => sub { $HTMLURIAttrChecker->(@_); $attr{href} = $_[1] },
-      ## TODO: target
-      ping => sub { $HTMLSpaceURIsAttrChecker->(@_); $attr{ping} = $_[1] },
-      rel => sub {
-        $HTMLUnorderedSetOfSpaceSeparatedTokensAttrChecker->(@_); ## TODO: registered? check
-        $attr{rel} = $_[1];
-      },
-      ## TODO: media
-      ## TODO: hreflang
-      type => sub { $HTMLIMTAttrChecker->(@_); $attr{type} = $_[1] },
-    });
-    sub {
-      $all_checker->(@_);
-      unless (defined $attr{href}) {
-        for (qw/target ping rel media hreflang type/) {
-          if (defined $attr{$_}) {
-            $_[0]->{onerror}->(node => $attr{$_},
-                               type => 'attribute not allowed');
-          }
+    for my $attr (@{$todo->{node}->attributes}) {
+      my $attr_ns = $attr->namespace_uri;
+      $attr_ns = '' unless defined $attr_ns;
+      my $attr_ln = $attr->manakai_local_name;
+      my $checker;
+      if ($attr_ns eq '') {
+        $checker = {
+                     target => $HTMLTargetAttrChecker,
+                     href => $HTMLURIAttrChecker,
+                     ping => $HTMLSpaceURIsAttrChecker,
+                     rel => $HTMLUnorderedSetOfSpaceSeparatedTokensAttrChecker, ## TODO: registered? check
+                     media => $HTMLMQAttrChecker,
+                     hreflang => $HTMLLanguageTagAttrChecker,
+                     type => $HTMLIMTAttrChecker,
+                   }->{$attr_ln};
+        if ($checker) {
+          $attr{$attr_ln} = $attr;
+        } else {
+          $checker = $HTMLAttrChecker->{$attr_ln};
         }
       }
-      %attr = ();
-    };
+      $checker ||= $AttrChecker->{$attr_ns}->{$attr_ln}
+        || $AttrChecker->{$attr_ns}->{''};
+      if ($checker) {
+        $checker->($self, $attr) if ref $checker;
+      } else {
+        $self->{onerror}->(node => $attr, type => 'attribute not supported');
+        ## ISSUE: No comformance createria for unknown attributes in the spec
+      }
+    }
+
+    unless (defined $attr{href}) {
+      for (qw/target ping rel media hreflang type/) {
+        if (defined $attr{$_}) {
+          $self->{onerror}->(node => $attr{$_},
+                             type => 'attribute not allowed');
+        }
+      }
+    }
   },
   checker => sub {
     my ($self, $todo) = @_;
@@ -1722,7 +1781,23 @@ $Element->{$HTML_NS}->{del} = {
 ## TODO: figure
 
 $Element->{$HTML_NS}->{img} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}), ## TODO
+  attrs_checker => sub {
+    my ($self, $todo) = @_;
+    $GetHTMLAttrsChecker->({
+      alt => sub { }, ## NOTE: No syntactical requirement
+      src => $HTMLURIAttrChecker,
+      usemap => $HTMLUsemapAttrChecker,
+      ismap => $GetHTMLBooleanAttrChecker->('ismap'), ## TODO: MUST ancestor <a>
+      ## TODO: height
+      ## TODO: width
+    })->($self, $todo);
+    unless ($todo->{node}->has_attribute_ns (undef, 'alt')) {
+      $self->{onerror}->(node => $todo->{node}, type => 'attribute missing:alt');
+    }
+    unless ($todo->{node}->has_attribute_ns (undef, 'src')) {
+      $self->{onerror}->(node => $todo->{node}, type => 'attribute missing:src');
+    }
+  },
   checker => $HTMLEmptyChecker,
 };
 
@@ -1774,13 +1849,22 @@ $Element->{$HTML_NS}->{embed} = {
 };
 
 $Element->{$HTML_NS}->{object} = {
-  attrs_checker => $GetHTMLAttrsChecker->({
-    data => $HTMLURIAttrChecker,
-    type => $HTMLIMTAttrChecker, ## TODO: one of |data| and |type| is required
-    ## TODO: usemap
-    ## TODO: width
-    ## TODO: height
-  }),
+  attrs_checker => sub {
+    my ($self, $todo) = @_;
+    $GetHTMLAttrsChecker->({
+      data => $HTMLURIAttrChecker,
+      type => $HTMLIMTAttrChecker,
+      usemap => $HTMLUsemapAttrChecker,
+      ## TODO: width
+      ## TODO: height
+    })->($self, $todo);
+    unless ($todo->{node}->has_attribute_ns (undef, 'data')) {
+      unless ($todo->{node}->has_attribute_ns (undef, 'type')) {
+        $self->{onerror}->(node => $todo->{node},
+                           type => 'attribute missing:data|type');
+      }
+    }
+  },
   checker => $ElementDefault->{checker}, ## TODO
 };
 
@@ -1830,11 +1914,18 @@ $Element->{$HTML_NS}->{audio} = {
 };
 
 $Element->{$HTML_NS}->{source} = {
-  attrs_checker => $GetHTMLAttrsChecker->({
-    src => $HTMLURIAttrChecker, # TODO: REQUIRED
-    type => $HTMLIMTAttrChecker,
-    ## TODO: media
-  }),
+  attrs_checker => sub {
+    my ($self, $todo) = @_;
+    $GetHTMLAttrsChecker->({
+      src => $HTMLURIAttrChecker,
+      type => $HTMLIMTAttrChecker,
+      media => $HTMLMQAttrChecker,
+    })->($self, $todo);
+    unless ($todo->{node}->has_attribute_ns (undef, 'src')) {
+      $self->{onerror}->(node => $todo->{node},
+                         type => 'attribute missing:src');
+    }
+  },
   checker => $HTMLEmptyChecker,
 };
 
@@ -1847,7 +1938,24 @@ $Element->{$HTML_NS}->{canvas} = {
 };
 
 $Element->{$HTML_NS}->{map} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}),
+  attrs_checker => $GetHTMLAttrsChecker->({
+    id => sub {
+      ## NOTE: same as global |id=""|, with |$self->{map}| registeration
+      my ($self, $attr) = @_;
+      my $value = $attr->value;
+      if (length $value > 0) {
+        if ($self->{id}->{$value}) {
+          $self->{onerror}->(node => $attr, type => 'duplicate ID');
+        } else {
+          $self->{id}->{$value} = 1;
+        }
+      } else {
+        ## NOTE: MUST contain at least one character
+        $self->{onerror}->(node => $attr, type => 'attribute value is empty');
+      }
+      $self->{map}->{$value} ||= $attr;
+    },
+  }),
   checker => $HTMLBlockChecker,
 };
 
@@ -1881,13 +1989,12 @@ $Element->{$HTML_NS}->{area} = {
                                             type => 'syntax error');
                        }
                      },
-                     ## TODO: coords
-                     target => sub { $self->{onerror}->(node => $attr, type => 'attribute not supported') }, ## TODO
+                     target => $HTMLTargetAttrChecker,
                      href => $HTMLURIAttrChecker,
                      ping => $HTMLSpaceURIsAttrChecker,
                      rel => $HTMLUnorderedSetOfSpaceSeparatedTokensAttrChecker, ## TODO: registered? check
-                     media => sub { $self->{onerror}->(node => $attr, type => 'attribute not supported') }, ## TODO
-                     hreflang => sub { $self->{onerror}->(node => $attr, type => 'attribute not supported') }, ## TODO
+                     media => $HTMLMQAttrChecker,
+                     hreflang => $HTMLLanguageTagAttrChecker,
                      type => $HTMLIMTAttrChecker,
                    }->{$attr_ln};
         if ($checker) {
@@ -2110,7 +2217,13 @@ $Element->{$HTML_NS}->{caption} = {
 };
 
 $Element->{$HTML_NS}->{colgroup} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}), ## TODO
+  attrs_checker => $GetHTMLAttrsChecker->({
+    span => $GetHTMLNonNegativeIntegerAttrChecker->(sub { shift > 0 }),
+      ## NOTE: Defined only if "the |colgroup| element contains no |col| elements"
+      ## TODO: "attribute not supported" if |col|.
+      ## ISSUE: MUST NOT if any |col|?
+      ## ISSUE: MUST NOT for |<colgroup span="1"><any><col/></any></colgroup>| (though non-conforming)?
+  }),
   checker => sub {
     my ($self, $todo) = @_;
     my $el = $todo->{node};
@@ -2445,6 +2558,8 @@ sub check_element ($$$) {
   $self->{minuses} = {};
   $self->{onerror} = $onerror;
   $self->{id} = {};
+  $self->{usemap} = [];
+  $self->{map} = {};
 
   my @todo = ({type => 'element', node => $el});
   while (@todo) {
@@ -2483,6 +2598,18 @@ sub check_element ($$$) {
       $self->_remove_minuses ($todo);
     }
   }
+
+  for (@{$self->{usemap}}) {
+    unless ($self->{map}->{$_->[0]}) {
+      $self->{onerror}->(node => $_->[1], type => 'no referenced map');
+    }
+  }
+
+  delete $self->{minuses};
+  delete $self->{onerror};
+  delete $self->{id};
+  delete $self->{usemap};
+  delete $self->{map};
 } # check_element
 
 sub _add_minuses ($@) {
@@ -2563,4 +2690,4 @@ sub _check_get_children ($$) {
 } # _check_get_children
 
 1;
-# $Date: 2007/05/20 07:12:11 $
+# $Date: 2007/05/20 11:12:25 $

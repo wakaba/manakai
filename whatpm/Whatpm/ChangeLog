@@ -1,5 +1,15 @@
 2007-05-20  Wakaba  <wakaba@suika.fam.cx>
 
+	* ContentChecker.pm: Now most attributes are implemented
+	or associated to some placeholder.
+	($ElementDefault): Warn unknown attributes
+	for unknown elements as "attribute not supported".
+	($HTMLLanguageTagAttrChecker, $HTMLMQAttrChecker): New placeholders.
+	($HTMLUsemapAttrChecker, $HTMLTargetAttrChecker): New checkers.
+	(|a| attribute checker): Reimplemented.
+
+2007-05-20  Wakaba  <wakaba@suika.fam.cx>
+
 	* ContentChecker.pm ($HTMLEventHandlerAttrChecker): New placeholder.
 	($HTMLAttrChecker): Event handler content attributes
 	are added.

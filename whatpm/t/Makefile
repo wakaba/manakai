@@ -1,7 +1,16 @@
 WGET = wget
 MKDIR = mkdir
 
-all: tokenizer-files tree-construction-files
+all: \
+  content-type-files \
+  tokenizer-files \
+  tree-construction-files \
+  content-checker-files
+
+content-type-files: content-type-result.txt
+
+content-type-result.txt: always
+	cd .. && perl t/ContentType.t &> t/$@
 
 tokenizer-files: tokenizer \
   tokenizer/test1.test tokenizer/test2.test tokenizer/contentModelFlags.test \
@@ -32,7 +41,12 @@ tree-construction/%.dat:
 tree-construction-result.txt: always
 	cd .. && perl t/HTML-tree.t &> t/$@
 
+content-checker-files: content-checker-result.txt
+
+content-checker-result.txt: always
+	cd .. && perl t/ContentChecker.t &> t/$@
+
 always:
 
 ## License: Public Domain.
-## $Date: 2007/05/02 13:44:35 $
+## $Date: 2007/05/20 11:12:25 $
