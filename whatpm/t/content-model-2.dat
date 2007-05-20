@@ -295,6 +295,31 @@ id=""><span id=""></span></p>
 #errors
 /p/@irrelevant;invalid boolean attribute value
 
+#data
+<p onabort="alert(1);" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<p onbeforeunload="alert(1);" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<p onblur="alert(1);" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<p onchange="alert(1);" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<p onclick="alert(1);" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<p onxxxx="alert(1);" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/p/@onxxxx;attribute not supported
+
 #data html
 <!DOCTYPE html>
 <html>
@@ -398,6 +423,22 @@ id=""><span id=""></span></p>
 </head>
 #errors
 /head/@profile;attribute not supported
+
+#data
+<link xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link;attribute missing:href
+/link;attribute missing:rel
+
+#data
+<link href="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link;attribute missing:rel
+
+#data
+<link rel="author" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link;attribute missing:href
 
 #data
 <link rel="stylesheet" href="http://www.test/"
@@ -1169,6 +1210,11 @@ id=""><span id=""></span></p>
 #errors
 
 #data
+<embed xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/embed;attribute missing:src
+
+#data
 <embed src="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 
@@ -1185,6 +1231,17 @@ id=""><span id=""></span></p>
 
 #data
 <embed src="http://test/" type="text/plain"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<embed src="http://test/" id=""
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/embed/@id;attribute value is empty
+
+#data
+<embed src="http://test/" a="b" c="d" checked="checked"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 

@@ -736,6 +736,14 @@ my $HTMLIMTAttrChecker = sub {
   ## TODO: Warn unless registered
 }; # $HTMLIMTAttrChecker
 
+my $HTMLEventHandlerAttrChecker = sub {
+  ## TODO: MUST contain valid ECMAScript code matching the
+  ## ECMAScript |FunctionBody| production. [ECMA262]
+  ## ISSUE: MUST be ES3? E4X? ES4? JS1.x?
+  ## ISSUE: Automatic semicolon insertion does not apply?
+  ## ISSUE: Other script languages?
+}; # $HTMLEventHandlerAttrChecker
+
 my $HTMLAttrChecker = {
   id => sub {
     my ($self, $attr) = @_;
@@ -762,6 +770,17 @@ my $HTMLAttrChecker = {
   irrelevant => $GetHTMLBooleanAttrChecker->('irrelevant'),
   ## TODO: tabindex
 };
+
+for (qw/
+         onabort onbeforeunload onblur onchange onclick oncontextmenu
+         ondblclick ondrag ondragend ondragenter ondragleave ondragover
+         ondragstart ondrop onerror onfocus onkeydown onkeypress
+         onkeyup onload onmessage onmousedown onmousemove onmouseout
+         onmouseover onmouseup onmousewheel onresize onscroll onselect
+         onsubmit onunload 
+     /) {
+  $HTMLAttrChecker->{$_} = $HTMLEventHandlerAttrChecker;
+}
 
 my $GetHTMLAttrsChecker = sub {
   my $element_specific_checker = shift;
@@ -950,15 +969,26 @@ $Element->{$HTML_NS}->{base} = {
 };
 
 $Element->{$HTML_NS}->{link} = {
-  attrs_checker => $GetHTMLAttrsChecker->({
-    href => $HTMLURIAttrChecker, ## TODO: required
-    rel => $HTMLUnorderedSetOfSpaceSeparatedTokensAttrChecker, ## TODO: registered? check ## TODO: required
-    ## TODO: media (required)
-    ## TODO: hreflang (required)
-    type => $HTMLIMTAttrChecker,
-    ## NOTE: Though |title| has special semantics,
-    ## syntactically same as the |title| as global attribute.
-  }),
+  attrs_checker => sub {
+    my ($self, $todo) = @_;
+    $GetHTMLAttrsChecker->({
+      href => $HTMLURIAttrChecker,
+      rel => $HTMLUnorderedSetOfSpaceSeparatedTokensAttrChecker, ## TODO: registered? check
+      ## TODO: media
+      ## TODO: hreflang
+      type => $HTMLIMTAttrChecker,
+      ## NOTE: Though |title| has special semantics,
+      ## syntactically same as the |title| as global attribute.
+    })->($self, $todo);
+    unless ($todo->{node}->has_attribute_ns (undef, 'href')) {
+      $self->{onerror}->(node => $todo->{node},
+                         type => 'attribute missing:href');
+    }
+    unless ($todo->{node}->has_attribute_ns (undef, 'rel')) {
+      $self->{onerror}->(node => $todo->{node},
+                         type => 'attribute missing:rel');
+    }
+  },
   checker => $HTMLEmptyChecker,
 };
 
@@ -1704,13 +1734,42 @@ $Element->{$HTML_NS}->{iframe} = {
 };
 
 $Element->{$HTML_NS}->{embed} = {
-  attrs_checker => $GetHTMLAttrsChecker->({
-    src => $HTMLURIAttrChecker, ## TODO: required
-    type => $HTMLIMTAttrChecker,
-    ## TODO: height
-    ## TODO: width
-    ## TODO: any other w/o namespace
-  }),
+  attrs_checker => sub {
+    my ($self, $todo) = @_;
+    my $has_src;
+    for my $attr (@{$todo->{node}->attributes}) {
+      my $attr_ns = $attr->namespace_uri;
+      $attr_ns = '' unless defined $attr_ns;
+      my $attr_ln = $attr->manakai_local_name;
+      my $checker;
+      if ($attr_ns eq '') {
+        if ($attr_ln eq 'src') {
+          $checker = $HTMLURIAttrChecker;
+          $has_src = 1;
+        } elsif ($attr_ln eq 'type') {
+          $checker = $HTMLIMTAttrChecker;
+        } else {
+          ## TODO: height
+          ## TODO: width
+          $checker = $HTMLAttrChecker->{$attr_ln}
+            || sub { }; ## NOTE: Any local attribute is ok.
+        }
+      }
+      $checker ||= $AttrChecker->{$attr_ns}->{$attr_ln}
+        || $AttrChecker->{$attr_ns}->{''};
+      if ($checker) {
+        $checker->($self, $attr);
+      } else {
+        $self->{onerror}->(node => $attr, type => 'attribute not supported');
+        ## ISSUE: No comformance createria for global attributes in the spec
+      }
+    }
+
+    unless ($has_src) {
+      $self->{onerror}->(node => $todo->{node},
+                         type => 'attribute missing:src');
+    }
+  },
   checker => $HTMLEmptyChecker,
 };
 
@@ -2504,4 +2563,4 @@ sub _check_get_children ($$) {
 } # _check_get_children
 
 1;
-# $Date: 2007/05/20 05:07:12 $
+# $Date: 2007/05/20 07:12:11 $

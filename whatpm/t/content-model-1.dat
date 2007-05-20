@@ -108,7 +108,7 @@
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
-<link/>
+<link rel="author" href="mailto:a@example.com"/>
 </head>
 #errors
 /head;child element missing:title
@@ -190,7 +190,7 @@
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
-<link/>
+<link rel="author" href="mailto:a@example.com"/>
 <title/>
 </head>
 #errors
@@ -198,7 +198,7 @@
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
 <title/>
-<link/>
+<link rel="author" href="mailto:a@example.com"/>
 </head>
 #errors
 
@@ -368,20 +368,24 @@
 /base/p;element not allowed
 
 #data
-<link xmlns="http://www.w3.org/1999/xhtml"></link>
+<link rel="author" href="mailto:a@example.com"
+    xmlns="http://www.w3.org/1999/xhtml"></link>
 #errors
 
 #data
-<link xmlns="http://www.w3.org/1999/xhtml"> </link>
+<link rel="author" href="mailto:a@example.com"
+    xmlns="http://www.w3.org/1999/xhtml"> </link>
 #errors
 
 #data
-<link xmlns="http://www.w3.org/1999/xhtml">a</link>
+<link rel="author" href="mailto:a@example.com"
+    xmlns="http://www.w3.org/1999/xhtml">a</link>
 #errors
 /link/"a";character not allowed
 
 #data
-<link xmlns="http://www.w3.org/1999/xhtml"><p/></link>
+<link rel="author" href="mailto:a@example.com"
+    xmlns="http://www.w3.org/1999/xhtml"><p/></link>
 #errors
 /link/p;element not allowed
 
