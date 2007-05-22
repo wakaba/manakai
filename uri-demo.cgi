@@ -7,6 +7,9 @@ use CGI::Carp qw/fatalsToBrowser/;
 use SuikaWiki::Input::HTTP; ## TODO: Use some better CGI module
 my $http = SuikaWiki::Input::HTTP->new;
 
+print STDOUT "Status: 404 Not Found\nContent-Type: text/plain; charset=us-ascii\n\n404" and exit
+  unless $http->meta_variable ('PATH_INFO') eq '/';
+
 use Message::URI::URIReference;
 use Encode;
 use encoding 'utf8', STDOUT => 'utf8';
@@ -67,3 +70,6 @@ for (
   my $value = $uri->$method_name ($baseuri);
   print STDOUT $_->[0] . ': ' . (defined $value ? '"' . $value . '"' : '(undef)') . "\n";
 }
+
+## License: Public Domain.
+# $Date: 2007/05/22 11:28:56 $
