@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>manakai's URI module demo</title>
+<style type="text/css">
+  p {
+    margin: 0;
+  }
+  input[type=url] {
+    width: 80%;
+  }
+  iframe {
+    display: block;
+    position: absolute;
+    left: 0; right: 0; bottom: 0; top: 5em;
+  }
+</style>
+</head>
+<body>
+<form action="uri-demo" target="result" method="get" accept-charset="utf-8">
+<p><label>URI: <input type="url" name="uri" value="http://www.example.com:80/path?query#fragment"></label>
+<input type="submit"></p>
+<p><label>Base URI: <input type="url" name="baseuri" value="http://www.example.com:80/"></label></p>
+</form>
+
+<p><iframe src="about:blank" name="result"></iframe></p>
+</body>
+</html>
