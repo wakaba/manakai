@@ -12,7 +12,7 @@ Module:
   @DISCore:author: DISCore|Wakaba
   @License: license|Perl+MPL
   @Date:
-    $Date: 2006/12/31 09:11:55 $
+    $Date: 2007/05/22 10:22:58 $
 
   @Require:
     @@Module:
@@ -945,6 +945,38 @@ IFCls1Def:
         for my $node (<Code::tc|createNodesForTest-el-attr>) {
           $test->id ($node-><AG::Node.nodeType>);
           $test->assert_null ($node-><AG::Node.localName>);
+        }
+
+  @Attr:
+    @@Name: manakaiLocalName
+    @@enDesc:
+      The local part of the qualified name of the node.
+
+      This attribute contains the canonical local name of 
+      the node, even if it is part of an HTML document,
+      where <A::Node.localName> might contain the uppercased
+      version of the local name.
+    @@DOMMain:isNamespaceAware:1
+    @@Type: DOMString
+    @@Get:
+      @@@nullCase:
+        @@@@enDesc:
+          If the type of the node is different from <C::Node.ELEMENT_NODE>
+          and <C::Node.ATTRIBUTE_NODE>.
+      @@@PerlDef:
+        my $v = $$self->{<H::infoset|localName>};
+        $r = defined $v ? $$v : undef;
+
+    @@Test:
+      @@@QName: Node.manakaiLocalName.test
+      @@@PerlDef:
+        my $doc;
+        __CODE{tc|createEmptyDocumentForTest:: $doc => $doc}__;
+        my $docx = $doc-><M::Node.getFeature> (<Q::fe|XDoctype>);
+
+        for my $node (<Code::tc|createNodesForTest-el-attr>) {
+          $test->id ($node-><AG::Node.nodeType>);
+          $test->assert_null ($node->manakai_local_name);
         }
 
   @L2Attr:
