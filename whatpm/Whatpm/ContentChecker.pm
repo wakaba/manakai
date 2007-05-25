@@ -1,6 +1,8 @@
 package Whatpm::ContentChecker;
 use strict;
 
+require Whatpm::URIChecker;
+
 ## ISSUE: How XML and XML Namespaces conformance can (or cannot)
 ## be applied to an in-memory representation (i.e. DOM)?
 
@@ -34,7 +36,8 @@ my $AttrChecker = {
         $self->{onerror}->(node => $attr,
                            type => 'syntax error');
       }
-      ## NOTE: Conformance to URI standard is not checked.
+      ## NOTE: Conformance to URI standard is not checked since there is
+      ## no author requirement on conformance in the XML Base specification.
     },
     id => sub {
       my ($self, $attr) = @_;
@@ -80,6 +83,7 @@ my $AttrChecker = {
       my ($self, $attr) = @_;
       ## TODO: In XML 1.0, URI reference [RFC 3986] or an empty string
       ## TODO: In XML 1.1, IRI reference [RFC 3987] or an empty string
+      ## TODO: relative references are deprecated
       my $value = $attr->value;
       if ($value eq $XML_NS) {
         $self->{onerror}
@@ -660,10 +664,15 @@ my $HTMLUnorderedSetOfSpaceSeparatedTokensAttrChecker = sub {
   }
 }; # $HTMLUnorderedSetOfSpaceSeparatedTokensAttrChecker
 
+## URI (or IRI)
 my $HTMLURIAttrChecker = sub {
   my ($self, $attr) = @_;
-  ## TODO: URI or IRI check
   ## ISSUE: Relative references are allowed? (RFC 3987 "IRI" is an absolute reference with optional fragment identifier.)
+  my $value = $attr->value;
+  Whatpm::URIChecker->check_iri_reference ($value, sub {
+    my %opt = @_;
+    $self->{onerror}->(node => $attr, type => 'URI:'.$opt{level}.':'.$opt{type});
+  });
 }; # $HTMLURIAttrChecker
 
 ## A space separated list of one or more URIs (or IRIs)
@@ -2690,4 +2699,4 @@ sub _check_get_children ($$) {
 } # _check_get_children
 
 1;
-# $Date: 2007/05/20 11:12:25 $
+# $Date: 2007/05/25 14:46:54 $

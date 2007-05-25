@@ -437,6 +437,11 @@ id=""><span id=""></span></p>
 #errors
 
 #data
+<base href="http://[test]/" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/base/@href;URI:m:syntax error
+
+#data
 <base href="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 
@@ -485,6 +490,12 @@ id=""><span id=""></span></p>
 <link rel="stylesheet" href="http://www.test/"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+
+#data
+<link rel="stylesheet" href="://www.test/"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link/@href;URI:m:syntax error
 
 #data
 <link rel="stylesheet" href="http://www.test/" type=""
@@ -675,6 +686,11 @@ id=""><span id=""></span></p>
 #data
 <blockquote cite="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+
+#data
+<blockquote cite="http://test/%" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/blockquote/@cite;URI:m:syntax error
 
 #data
 <h1 align="left" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -970,6 +986,11 @@ id=""><span id=""></span></p>
 #errors
 
 #data
+<a href="http://test/[44::]/" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/a/@href;URI:m:syntax error
+
+#data
 <a href="http://test/" type="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /a/@type;IMT syntax error
@@ -1108,6 +1129,11 @@ id=""><span id=""></span></p>
 #data
 <q cite="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+
+#data
+<q cite="http://test/%" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/q/@cite;URI:m:syntax error
 
 #data
 <meter value="" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -1356,8 +1382,18 @@ id=""><span id=""></span></p>
 #errors
 
 #data
+<ins cite="http://test/100%/" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/ins/@cite;URI:m:syntax error
+
+#data
 <del cite="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+
+#data
+<del cite='"about:"' xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/del/@cite;URI:m:syntax error
 
 #data
 <img xmlns="http://www.w3.org/1999/xhtml"/>
@@ -1378,6 +1414,11 @@ id=""><span id=""></span></p>
 #data
 <img alt="" src="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+
+#data
+<img alt="" src="http://test/`" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@src;URI:m:syntax error
 
 #data
 <a xmlns="http://www.w3.org/1999/xhtml">
@@ -1494,6 +1535,11 @@ id=""><span id=""></span></p>
 #errors
 
 #data
+<iframe src="&lt;http://test/>" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/iframe/@src;URI:m:syntax error
+
+#data
 <embed xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /embed;attribute missing:src
@@ -1501,6 +1547,11 @@ id=""><span id=""></span></p>
 #data
 <embed src="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+
+#data
+<embed src="[http://test/]" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/embed/@src;URI:m:syntax error
 
 #data
 <embed src="http://test/" type="" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -1537,6 +1588,11 @@ id=""><span id=""></span></p>
 #data
 <object data="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+
+#data
+<object data="`http://test/`" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/object/@data;URI:m:syntax error
 
 #data
 <object type="" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -1671,6 +1727,11 @@ id=""><span id=""></span></p>
 #errors
 
 #data
+<video src="``http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/video/@src;URI:m:syntax error
+
+#data
 <video autoplay="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 
@@ -1703,6 +1764,11 @@ id=""><span id=""></span></p>
 #data
 <audio src="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+
+#data
+<audio src="http://[test]/" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/audio/@src;URI:m:syntax error
 
 #data
 <audio autoplay="" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -1738,6 +1804,11 @@ id=""><span id=""></span></p>
 #data
 <source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+
+#data
+<source src="%http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/source/@src;URI:m:syntax error
 
 #data
 <source src="http://test/" type="" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -1914,6 +1985,12 @@ id=""><span id=""></span></p>
 <area href="http://test/" alt="" coords="1,2,3,4"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+
+#data
+<area href="%%http://test/" alt="" coords="1,2,3,4"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@href;URI:m:syntax error
 
 #data
 <area href="http://test/" alt="" coords="1,2,3,4"
@@ -2469,6 +2546,12 @@ id=""><span id=""></span></p>
 #errors
 
 #data
+<script src="http://test/%" type="text/javascript"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/script/@src;URI:m:syntax error
+
+#data
 <script src="http://test/" defer=""
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
@@ -2507,6 +2590,11 @@ id=""><span id=""></span></p>
 #data
 <event-source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+
+#data
+<event-source src="http://test/`" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/event-source/@src;URI:m:syntax error
 
 #data
 <details xmlns="http://www.w3.org/1999/xhtml"/>
