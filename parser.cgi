@@ -3,6 +3,7 @@ use strict;
 
 use lib qw[/home/httpd/html/www/markup/html/whatpm
            /home/wakaba/public_html/-temp/wiki/lib];
+use CGI::Carp qw[fatalsToBrowser];
 
 use SuikaWiki::Input::HTTP; ## TODO: Use some better CGI module
 
@@ -145,4 +146,4 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2007/05/20 08:14:48 $
+## $Date: 2007/05/25 14:24:31 $
