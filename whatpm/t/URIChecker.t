@@ -5,7 +5,7 @@ use lib qw[/home/wakaba/work/manakai/lib];
 ## ISSUE: Message::URI::URIReference module.
 
 use Test;
-BEGIN { plan tests => 49 }
+BEGIN { plan tests => 81 }
 
 my $Cases = [
   {
@@ -89,24 +89,26 @@ my $Cases = [
   },
   {
     data => q<HTTP://example/>,
-    errors => ['s:1:uppercase scheme name'],
+    errors => ['s::uppercase scheme name'],
   },
   {
     data => q<Http://example/>,
-    errors => ['s:1:uppercase scheme name'],
+    errors => ['s::uppercase scheme name'],
   },
   {
     data => q<datA:,>,
-    errors => ['s:1:uppercase scheme name'],
+    errors => ['s::uppercase scheme name'],
   },
   {
     data => q<dat%41:,>,
     errors => ['m::syntax error',
+               's::uppercase scheme name',
                's:4:percent-encoded unreserved'],
   },
   {
     data => q<g%5A:,>,
     errors => ['m::syntax error',
+               's::uppercase scheme name',
                's:2:percent-encoded unreserved'],
   },
   {
@@ -149,6 +151,11 @@ my $Cases = [
   {
     data => q<http://user@[v0.aaa]/>,
     errors => ['w::address format not supported:v0'],
+  },
+  {
+    data => q<http://user@[V0A.aaa]/>,
+    errors => ['w::address format not supported:V0A',
+               's::uppercase host'],
   },
   {
     data => q<http://127.0.0.1/>,
@@ -212,6 +219,144 @@ my $Cases = [
   },
   {
     data => q<http://a.b-c.test/>,
+    errors => [],
+  },
+  {
+    data => qq<http://\x{123}\x{456}.test/>,
+    errors => ['s::non-DNS host'],
+  },
+  {
+    data => qq<http://\x{4E00}%80.test/>,
+    errors => ['s::non-DNS host',
+               'm::non UTF-8 host'],
+  },
+  {
+    data => q<http://a.%E3%81%82%E3%81%84.test/>,
+    errors => ['s::non-DNS host'],
+  },
+  {
+    data => q<example://a/b/c/%7Bfoo%7D>,
+    errors => [],
+  },
+  {
+    data => q<eXAMPLE://a/./b/../b/%63/%7bfoo%7d>,
+    errors => ['s::uppercase scheme name',
+               's:22:percent-encoded unreserved',
+               's:26:lowercase hexadecimal digit',
+               's:32:lowercase hexadecimal digit',
+               's::dot-segment'],
+  },
+  {
+    data => q<example://a/.htaccess>,
+    errors => [],
+  },
+  {
+    data => q<example://a/.>,
+    errors => ['s::dot-segment'],
+  },
+  {
+    data => q<http://example.com>,
+    errors => ['s::empty path'],
+  },
+  {
+    data => q<http://example.com/>,
+    errors => [],
+  },
+  {
+    data => q<http://example.com:/>,
+    errors => ['s::empty port'],
+  },
+  {
+    data => q<http://example.com:80/>,
+    errors => ['s::default port'],
+  },
+  {
+    data => q<hTTP://example.com:80/>,
+    errors => ['s::uppercase scheme name',
+               's::default port'],
+  },
+  {
+    data => q<%68ttp://example.com:80/>,
+    errors => ['m::syntax error',
+               's:1:percent-encoded unreserved',
+               's::default port'],
+  },
+  {
+    data => q<file://user@/>,
+    errors => ['s::empty host'],
+  },
+  {
+    data => q<http://example.com/?>,
+    errors => [],
+  },
+  {
+    data => q<mailto:Joe@Example.COM>,
+    errors => [],
+  },
+  {
+    data => q<mailto:Joe@example.com>,
+    errors => [],
+  },
+  {
+    data => q<http://example.com/data>,
+    errors => [],
+  },
+  {
+    data => q<ftp://cnn.example.com&story=breaking_news@10.0.0.1/top_story.htm>,
+    errors => [],
+  },
+  {
+    data => qq<http://r\xE9sum\xE9.example.org>,
+    errors => ['s::non-DNS host',
+               's::empty path'],
+  },
+  {
+    data => qq<http://validator.w3.org/check?uri=http%3A%2F%2Fr\xE9;sum\xE9.example.com>,
+    errors => [],
+  },
+  {
+    data => q<http://validator.w3.org/check?uri=http%3A%2F%2Fr%C3%A9sum%C3%A9.example.com>,
+    errors => [],
+  },
+  {
+    data => qq<http://example.com/\x{10300}\x{10301}\x{10302}>,
+    errors => [],
+  },
+  {
+    data => q<http://example.com/%F0%90%8C%80%F0%90%8C%81%F0%90%8C%82>,
+    errors => [],
+  },
+  {
+    data => q<http://www.example.org/r%E9sum%E9.html>,
+    errors => [],
+  },
+  {
+    data => q<http://xn--99zt52a.example.org/%e2%80%ae>,
+    errors => ['s:32:lowercase hexadecimal digit',
+               's:38:lowercase hexadecimal digit'],
+  },
+  {
+    data => qq<example://a/b/c/%7Bfoo%7D/ros\xE9>,
+    errors => [],
+  },
+  {
+    data => qq<eXAMPLE://a/./b/../b/%63/%7bfoo%7d/ros%C3%A9>,
+    errors => ['s::uppercase scheme name',
+               's:22:percent-encoded unreserved',
+               's:26:lowercase hexadecimal digit',
+               's:32:lowercase hexadecimal digit',
+               's::dot-segment'],
+  },
+  {
+    data => qq<http://www.example.org/r\xE9sum\xE9.html>,
+    errors => [],
+  },
+  {
+    data => qq<http://www.example.org/re\x{301}sume\x{301}.html>,
+    errors => [], ## TODO: not in NFC
+  },
+  {
+    data => q<http://www.example.org/r%E9sum%E9.xml#r%C3%A9sum%C3%A9>,
     errors => [],
   },
 ];
