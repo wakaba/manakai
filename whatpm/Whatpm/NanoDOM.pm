@@ -118,6 +118,12 @@ sub has_child_nodes ($) {
 } # has_child_nodes
 
 ## NOTE: Only applied to Elements and Documents
+sub first_child ($) {
+  my $self = shift;
+  return $self->{child_nodes}->[0];
+} # first_child
+
+## NOTE: Only applied to Elements and Documents
 sub last_child ($) {
   my $self = shift;
   return @{$self->{child_nodes}} ? $self->{child_nodes}->[-1] : undef;
@@ -344,8 +350,16 @@ sub tag_name ($) {
   }
 } # tag_name
 
+sub get_attribute_ns ($$$) {
+  my ($self, $nsuri, $ln) = @_;
+  $nsuri = '' unless defined $nsuri;
+  return defined $self->{attributes}->{$nsuri}->{$ln}
+    ? $self->{attributes}->{$nsuri}->{$ln}->value : undef;
+} # get_attribute_ns
+
 sub has_attribute_ns ($$$) {
   my ($self, $nsuri, $ln) = @_;
+  $nsuri = '' unless defined $nsuri;
   return defined $self->{attributes}->{$nsuri}->{$ln};
 } # has_attribute_ns
 
@@ -461,4 +475,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2007/05/26 12:33:04 $
+# $Date: 2007/05/26 16:33:53 $

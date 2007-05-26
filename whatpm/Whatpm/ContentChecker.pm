@@ -2298,6 +2298,14 @@ $Element->{$HTML_NS}->{table} = {
         unshift @nodes, @{$node->child_nodes};
       }
     }
+
+    ## Table model errors
+    require Whatpm::HTMLTable;
+    Whatpm::HTMLTable->form_table ($todo->{node}, sub {
+      my %opt = @_;
+      $self->{onerror}->(type => 'table:'.$opt{type}, node => $opt{node});
+    });
+
     return ($new_todos);
   },
 };
@@ -2782,4 +2790,4 @@ sub _check_get_children ($$) {
 } # _check_get_children
 
 1;
-# $Date: 2007/05/26 12:33:04 $
+# $Date: 2007/05/26 16:33:53 $
