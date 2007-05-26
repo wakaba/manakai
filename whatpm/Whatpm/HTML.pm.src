@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## This is an early version of an HTML parser.
 
@@ -1920,7 +1920,7 @@ sub _tree_construction_main ($) {
   }; # $clear_up_to_marker
 
   my $style_start_tag = sub {
-    my $style_el; !!!create-element ($style_el, 'style');
+    my $style_el; !!!create-element ($style_el, 'style', $token->{attributes});
     ## $self->{insertion_mode} eq 'in head' and ... (always true)
     (($self->{insertion_mode} eq 'in head' and defined $self->{head_element})
      ? $self->{head_element} : $self->{open_elements}->[-1]->[0])
@@ -5070,4 +5070,4 @@ sub get_inner_html ($$$) {
 } # get_inner_html
 
 1;
-# $Date: 2007/05/19 11:37:24 $
+# $Date: 2007/05/26 08:12:34 $

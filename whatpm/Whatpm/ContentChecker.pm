@@ -739,10 +739,28 @@ my $HTMLIMTAttrChecker = sub {
   my $lws0 = qr/(?>(?>\x0D\x0A)?[\x09\x20])*/;
   my $token = qr/[\x21\x23-\x27\x2A\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7E]+/;
   my $qs = qr/"(?>[\x00-\x0C\x0E-\x21\x23-\x5B\x5D-\x7E]|\x0D\x0A[\x09\x20]|\x5C[\x00-\x7F])*"/;
-  unless ($value =~ m#\A$lws0$token$lws0/$lws0$token$lws0(?>;$lws0$token$lws0=$lws0(?>$token|$qs)$lws0)*\z#) {
+  if ($value =~ m#\A$lws0($token)$lws0/$lws0($token)$lws0((?>;$lws0$token$lws0=$lws0(?>$token|$qs)$lws0)*)\z#) {
+    my @type = ($1, $2);
+    my $param = $3;
+    while ($param =~ s/^;$lws0($token)$lws0=$lws0(?>($token)|($qs))$lws0//) {
+      if (defined $2) {
+        push @type, $1 => $2;
+      } else {
+        my $n = $1;
+        my $v = $2;
+        $v =~ s/\\(.)/$1/gs;
+        push @type, $n => $v;
+      }
+    }
+    require Whatpm::IMTChecker;
+    Whatpm::IMTChecker->check_imt (sub {
+      my %opt = @_;
+      $self->{onerror}->(node => $attr,
+                         type => 'IMT:'.$opt{level}.':'.$opt{type});
+    }, @type);
+  } else {
     $self->{onerror}->(node => $attr, type => 'IMT syntax error');
   }
-  ## TODO: Warn unless registered
 }; # $HTMLIMTAttrChecker
 
 my $HTMLLanguageTagAttrChecker = sub {
@@ -2699,4 +2717,4 @@ sub _check_get_children ($$) {
 } # _check_get_children
 
 1;
-# $Date: 2007/05/25 14:46:54 $
+# $Date: 2007/05/26 08:12:34 $

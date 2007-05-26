@@ -418,3 +418,77 @@ no </xmp>
 |   <body>
 |     <xmp>
 |       "a"
+
+#data
+<!DOCTYPE html><html><head><title></title><style></style></head><body>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <title>
+|     <style>
+|   <body>
+
+#data
+<!DOCTYPE html><html><head><title></title><style type="text/css"></style></head><body>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <title>
+|     <style>
+|       type="text/css"
+|   <body>
+
+#data
+<!DOCTYPE html><html><head><title></title><style type="text/css">p {}</style></head><body>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <title>
+|     <style>
+|       type="text/css"
+|       "p {}"
+|   <body>
+
+#data
+<!DOCTYPE html><html><style type="text/css"></style><title></title></head><body>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <style>
+|       type="text/css"
+|     <title>
+|   <body>
+
+#data
+<!DOCTYPE html><style type="text/css"></style><title></title><body>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <style>
+|       type="text/css"
+|     <title>
+|   <body>
+
+#data
+<!DOCTYPE html><title></title><body><p>a<style type="text/css"></style>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <title>
+|   <body>
+|     <p>
+|       "a"
+|       <style>
+|         type="text/css"

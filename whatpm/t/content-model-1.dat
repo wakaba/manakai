@@ -133,6 +133,7 @@
 </head>
 #errors
 /head;child element missing:title
+/head/script/@type;IMT:s:obsolete subtype
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -237,6 +238,7 @@
 <title/>
 </head>
 #errors
+/head/script/@type;IMT:s:obsolete subtype
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -244,6 +246,7 @@
 <script type="text/javascript"/>
 </head>
 #errors
+/head/script/@type;IMT:s:obsolete subtype
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -447,6 +450,7 @@ p {color: green}
 <script type="text/javascript"/>
 </body>
 #errors
+/body/script/@type;IMT:s:obsolete subtype
 
 #data
 <body xmlns="http://www.w3.org/1999/xhtml"><b/></body>
@@ -483,6 +487,7 @@ p {color: green}
 <script type="text/javascript"/>
 </section>
 #errors
+/section/script/@type;IMT:s:obsolete subtype
 
 #data
 <section xmlns="http://www.w3.org/1999/xhtml"><b/></section>

@@ -1,3 +1,13 @@
+2007-05-26  Wakaba  <wakaba@suika.fam.cx>
+
+	* IMTChecker.pm: New module.
+
+	* ContentChecker.pm ($HTMLIMTAttrChecker): Call IMTChecker
+	to test parameter value validity.
+
+	* HTML.pm.src ($style_start_tag): Attributes were
+	discarded.
+
 2007-05-25  Wakaba  <wakaba@suika.fam.cx>
 
 	* ContentChecker.pm ($HTMLURIAttrChecker): Implemented.
