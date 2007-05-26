@@ -1,6 +1,6 @@
 package Message::URI::URIReference;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::Util::Error::DOMException;
 
@@ -2496,6 +2496,10 @@ undef
 }
 $r}
 
+sub ___report_error ($$) {
+  $_[1]->throw;
+} # ___report_error
+
 sub clone ($) {
   my $self = shift;
   my $v = $$self;
@@ -2545,4 +2549,4 @@ fallback => 1;
 
 1;
 ## License: <http://suika.fam.cx/~wakaba/archive/2004/8/18/license#Perl+MPL>
-## $Date: 2007/05/22 11:23:24 $
+## $Date: 2007/05/26 06:34:46 $
