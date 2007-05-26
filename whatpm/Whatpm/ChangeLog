@@ -1,5 +1,22 @@
 2007-05-26  Wakaba  <wakaba@suika.fam.cx>
 
+	* ContentChecker.pm ($HTMLLinkTypesAttrChecker): New checker.
+	(link/@rel, a/@rel, area/@rel): Use new checker.
+
+	* Makefile (_LinkTypeList.pm, RelExtensions.html): New rules.
+
+	* _LinkTypeList.pm: New file.
+
+	* mklinktypelist.pl: New file.
+
+	* .cvsignore: |RelExtensions.html| added.
+
+	* NanoDOM.pm (child_nodes): Returns an empty array
+	for non-child-containing node types.
+	(text_content): New attribute.
+
+2007-05-26  Wakaba  <wakaba@suika.fam.cx>
+
 	* IMTChecker.pm: New module.
 
 	* ContentChecker.pm ($HTMLIMTAttrChecker): Call IMTChecker

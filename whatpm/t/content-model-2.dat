@@ -541,6 +541,36 @@ id=""><span id=""></span></p>
 /link/@rel;duplicate token:author
 
 #data
+<link rel="bookmark" href="http://test/"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link/@rel;link type bad context:bookmark
+
+#data
+<link rel="previous" href="http://test/"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link/@rel;non-conforming link type:previous
+
+#data
+<link rel="edit" href="http://test/"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link/@rel;proposed link type:edit
+
+#data
+<link rel="script" href="http://test/"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link/@rel;non-conforming link type:script
+
+#data
+<link rel="example-link-type" href="http://test/"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link/@rel;link type not supported:example-link-type
+
+#data
 <link rel="alternate stylesheet" href="http://test/" title=""
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
@@ -573,6 +603,24 @@ id=""><span id=""></span></p>
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /link/@target;attribute not supported
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+  <link rel="pingback" href="a"/>
+  <link rel="pingback" href="b"/>
+  <title/>
+</head>
+#errors
+/head/link/@rel;link with type not unique:pingback
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+  <link rel="pingback" href="a"/>
+  <link rel="pingback feed" href="b"/>
+  <title/>
+</head>
+#errors
+/head/link/@rel;link with type not unique:pingback
 
 #data
 <meta xmlns="http://www.w3.org/1999/xhtml">
@@ -1012,6 +1060,35 @@ id=""><span id=""></span></p>
 <a href="http://test/" rel="author author" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /a/@rel;duplicate token:author
+
+#data
+<a href="http://test/" rel="bookmark" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<a href="http://test/" rel="previous" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/a/@rel;non-conforming link type:previous
+
+#data
+<a href="http://test/" rel="edit" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/a/@rel;proposed link type:edit
+
+#data
+<a href="http://test/" rel="script" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/a/@rel;non-conforming link type:script
+
+#data
+<a href="http://test/" rel="stylesheet" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/a/@rel;link type bad context:stylesheet
+
+#data
+<a href="http://test/" rel="test-type" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/a/@rel;link type not supported:test-type
 
 #data
 <a href="http://test/" ping="http://a.test/"
@@ -2345,6 +2422,47 @@ id=""><span id=""></span></p>
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /area/@rel;duplicate token:author
+
+#data
+<area shape="rect" coords="1,2,3,4"
+    href="http://test/" rel="bookmark" alt=""
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<area shape="rect" coords="1,2,3,4"
+    href="http://test/" rel="previous" alt=""
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@rel;non-conforming link type:previous
+
+#data
+<area shape="rect" coords="1,2,3,4"
+    href="http://test/" rel="edit" alt=""
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@rel;proposed link type:edit
+
+#data
+<area shape="rect" coords="1,2,3,4"
+    href="http://test/" rel="script" alt=""
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@rel;non-conforming link type:script
+
+#data
+<area shape="rect" coords="1,2,3,4"
+    href="http://test/" rel="icon" alt=""
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@rel;link type bad context:icon
+
+#data
+<area shape="rect" coords="1,2,3,4"
+    href="http://test/" rel="example-link-type" alt=""
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@rel;link type not supported:example-link-type
 
 #data
 <table xmlns="http://www.w3.org/1999/xhtml"/>

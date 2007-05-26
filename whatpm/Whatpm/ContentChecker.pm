@@ -664,6 +664,69 @@ my $HTMLUnorderedSetOfSpaceSeparatedTokensAttrChecker = sub {
   }
 }; # $HTMLUnorderedSetOfSpaceSeparatedTokensAttrChecker
 
+## |rel| attribute (unordered set of space separated tokens,
+## whose allowed values are defined by the section on link types)
+my $HTMLLinkTypesAttrChecker = sub {
+  my ($a_or_area, $self, $attr) = @_;
+  my %word;
+  for my $word (grep {length $_} split /[\x09-\x0D\x20]/, $attr->value) {
+    unless ($word{$word}) {
+      $word{$word} = 1;
+    } else {
+      $self->{onerror}->(node => $attr, type => 'duplicate token:'.$word);
+    }
+  }
+  ## NOTE: Case sensitive match (since HTML5 spec does not say link
+  ## types are case-insensitive and it says "The value should not 
+  ## be confusingly similar to any other defined value (e.g.
+  ## differing only in case).").
+  ## NOTE: Though there is no explicit "MUST NOT" for undefined values,
+  ## "MAY"s and "only ... MAY" restrict non-standard non-registered
+  ## values to be used conformingly.
+  require Whatpm::_LinkTypeList;
+  our $LinkType;
+  for my $word (keys %word) {
+    my $def = $LinkType->{$word};
+    if (defined $def) {
+      if ($def->{status} eq 'accepted') {
+        if (defined $def->{effect}->[$a_or_area]) {
+          #
+        } else {
+          $self->{onerror}->(node => $attr,
+                             type => 'link type bad context:'.$word);
+        }
+      } elsif ($def->{status} eq 'proposal') {
+        $self->{onerror}->(node => $attr,
+                           type => 'proposed link type:'.$word);
+      } else { # rejected or synonym
+        $self->{onerror}->(node => $attr,
+                           type => 'non-conforming link type:'.$word);
+      }
+      if ($def->{unique}) {
+        unless ($self->{has_link_type}->{$word}) {
+          $self->{has_link_type}->{$word} = 1;
+        } else {
+          $self->{onerror}->(node => $attr,
+                             type => 'link with type not unique:'.$word);
+        }
+      }
+    } else {
+      $self->{onerror}->(node => $attr,
+                         type => 'link type not supported:'.$word);
+    }
+  }
+  ## TODO: The Pingback 1.0 specification, which is referenced by HTML5,
+  ## says that using both X-Pingback: header field and HTML
+  ## <link rel=pingback> is deprecated and if both appears they
+  ## SHOULD contain exactly the same value.
+  ## ISSUE: Pingback 1.0 specification defines the exact representation
+  ## of its link element, which cannot be tested by the current arch.
+  ## ISSUE: Pingback 1.0 specification says that the document MUST NOT
+  ## include any string that matches to the pattern for the rel=pingback link,
+  ## which again inpossible to test.
+  ## ISSUE: rel=pingback href MUST NOT include entities other than predefined 4.
+}; # $HTMLLinkTypesAttrChecker
+
 ## URI (or IRI)
 my $HTMLURIAttrChecker = sub {
   my ($self, $attr) = @_;
@@ -795,6 +858,7 @@ my $HTMLUsemapAttrChecker = sub {
   } else {
     $self->{onerror}->(node => $attr, type => 'hashed idref syntax error');
   }
+  ## ISSUE: UA algorithm for matching is case-insensitive; IDs only different in cases should be reported
 }; # $HTMLUsemapAttrChecker
 
 my $HTMLTargetAttrChecker = sub {
@@ -1043,7 +1107,7 @@ $Element->{$HTML_NS}->{link} = {
     my ($self, $todo) = @_;
     $GetHTMLAttrsChecker->({
       href => $HTMLURIAttrChecker,
-      rel => $HTMLUnorderedSetOfSpaceSeparatedTokensAttrChecker, ## TODO: registered? check
+      rel => sub { $HTMLLinkTypesAttrChecker->(0, @_) },
       media => $HTMLMQAttrChecker,
       hreflang => $HTMLLanguageTagAttrChecker,
       type => $HTMLIMTAttrChecker,
@@ -1587,7 +1651,7 @@ $Element->{$HTML_NS}->{a} = {
                      target => $HTMLTargetAttrChecker,
                      href => $HTMLURIAttrChecker,
                      ping => $HTMLSpaceURIsAttrChecker,
-                     rel => $HTMLUnorderedSetOfSpaceSeparatedTokensAttrChecker, ## TODO: registered? check
+                     rel => sub { $HTMLLinkTypesAttrChecker->(1, @_) },
                      media => $HTMLMQAttrChecker,
                      hreflang => $HTMLLanguageTagAttrChecker,
                      type => $HTMLIMTAttrChecker,
@@ -2019,7 +2083,7 @@ $Element->{$HTML_NS}->{area} = {
                      target => $HTMLTargetAttrChecker,
                      href => $HTMLURIAttrChecker,
                      ping => $HTMLSpaceURIsAttrChecker,
-                     rel => $HTMLUnorderedSetOfSpaceSeparatedTokensAttrChecker, ## TODO: registered? check
+                     rel => sub { $HTMLLinkTypesAttrChecker->(1, @_) },
                      media => $HTMLMQAttrChecker,
                      hreflang => $HTMLLanguageTagAttrChecker,
                      type => $HTMLIMTAttrChecker,
@@ -2587,6 +2651,7 @@ sub check_element ($$$) {
   $self->{id} = {};
   $self->{usemap} = [];
   $self->{map} = {};
+  $self->{has_link_type} = {};
 
   my @todo = ({type => 'element', node => $el});
   while (@todo) {
@@ -2717,4 +2782,4 @@ sub _check_get_children ($$) {
 } # _check_get_children
 
 1;
-# $Date: 2007/05/26 08:12:34 $
+# $Date: 2007/05/26 12:33:04 $

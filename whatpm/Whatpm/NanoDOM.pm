@@ -52,9 +52,8 @@ sub manakai_parent_element ($) {
   return undef;
 } # manakai_parent_element
 
-## NOTE: Only applied to Elements and Documents
 sub child_nodes ($) {
-  return shift->{child_nodes};
+  return shift->{child_nodes} || [];
 } # child_nodes
 
 ## NOTE: Only applied to Elements and Documents
@@ -278,6 +277,19 @@ sub manakai_append_text ($$) {
   }
 } # manakai_append_text
 
+sub text_content ($) {
+  my $self = shift;
+  my $r = '';
+  for my $child (@{$self->child_nodes}) {
+    if ($child->can ('data')) {
+      $r .= $child->data;
+    } else {
+      $r .= $child->text_content;
+    }
+  }
+  return $r;
+} # text_content
+
 sub attributes ($) {
   my $self = shift;
   my $r = [];
@@ -449,4 +461,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2007/05/19 14:29:09 $
+# $Date: 2007/05/26 12:33:04 $
