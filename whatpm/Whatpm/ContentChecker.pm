@@ -734,7 +734,10 @@ my $HTMLURIAttrChecker = sub {
   my $value = $attr->value;
   Whatpm::URIChecker->check_iri_reference ($value, sub {
     my %opt = @_;
-    $self->{onerror}->(node => $attr, type => 'URI:'.$opt{level}.':'.$opt{type});
+    $self->{onerror}->(node => $attr,
+                       type => 'URI:'.$opt{level}.':'.
+                       (defined $opt{position} ? $opt{position} : '').':'.
+                       $opt{type});
   });
 }; # $HTMLURIAttrChecker
 
@@ -2790,4 +2793,4 @@ sub _check_get_children ($$) {
 } # _check_get_children
 
 1;
-# $Date: 2007/05/26 16:33:53 $
+# $Date: 2007/05/27 06:38:58 $

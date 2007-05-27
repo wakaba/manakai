@@ -4,6 +4,7 @@ use strict;
 ## An implementation of "Forming a table" algorithm in HTML5
 sub form_table ($$$) {
   my (undef, $table_el, $onerror) = @_;
+  $onerror ||= sub { };
   
   ## Step 1
   my $x_max = 0;
@@ -17,7 +18,7 @@ sub form_table ($$$) {
     #caption
     column => [],
     column_group => [],
-    # no |row|
+    # no |row| since HTML5 algorithm doesn't associate rows with <tr>s
     row_group => [],
     cell => [],
   };
@@ -113,7 +114,8 @@ sub form_table ($$$) {
       ## Step 7
       my $cg = {element => $current_element,
                 x => $x_start, y => 1,
-                width => $x_max - $x_start - 1};
+                width => $x_max - $x_start - 1}; ## ISSUE: Spec incorrect
+      $cg->{width} = $x_max - $x_start + 1;
       $table->{column_group}->[$_] = $cg for $x_start .. $x_max;
     } else { # no <col> children
       ## Step 1
@@ -260,7 +262,7 @@ sub form_table ($$$) {
       
       ## Step 13
       my $cell = {
-                  is_header => ($current_ln eq 'th'),
+                  is_header => ($current_cell->manakai_local_name eq 'th'),
                   element => $current_cell,
                   x => $x_current, y => $y_current,
                   width => $colspan, height => $rowspan,
@@ -383,4 +385,4 @@ sub form_table ($$$) {
 ## TODO: Implement scope="" algorithm
 
 1;
-## $Date: 2007/05/26 16:33:53 $
+## $Date: 2007/05/27 06:38:58 $

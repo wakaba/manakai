@@ -226,7 +226,9 @@ sub check_iri_reference ($$$) {
   ## IDN (ireg-name or elsewhere) SHOULD be validated by ToASCII(UseSTD3ASCIIRules, AllowUnassigned)
   ## SHOULD be normalized by Nameprep
   ## TODO
+
+  ## TODO: If it is a relative reference, then resolve and then check against scheme dependent requirements
 } # check_iri_reference
 
 1;
-## $Date: 2007/05/25 14:16:29 $
+## $Date: 2007/05/27 06:38:58 $
