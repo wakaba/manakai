@@ -950,6 +950,7 @@ $Element->{$HTML_NS}->{''} = {
 };
 
 $Element->{$HTML_NS}->{html} = {
+  is_root => 1,
   attrs_checker => $GetHTMLAttrsChecker->({
     xmlns => sub {
       my ($self, $attr) = @_;
@@ -2650,15 +2651,35 @@ $Element->{$HTML_NS}->{font} = {
   checker => $HTMLTransparentChecker,
 };
 
-sub new ($) {
-  return bless {}, shift;
-} # new
+sub check_document ($$$) {
+  my ($self, $doc, $onerror) = @_;
+  $self = bless {}, $self unless ref $self;
+  $self->{onerror} = $onerror;
+
+  my $docel = $doc->document_element;
+  my $docel_nsuri = $docel->namespace_uri;
+  $docel_nsuri = '' unless defined $docel_nsuri;
+  my $docel_def = $Element->{$docel_nsuri}->{$docel->manakai_local_name} ||
+    $Element->{$docel_nsuri}->{''} ||
+    $ElementDefault;
+  if ($docel_def->{is_root}) {
+    #
+  } else {
+    $onerror->(node => $docel, type => 'element not allowed');
+  }
+
+  ## TODO: Check for other items other than document element
+  ## (second (errorous) element, text nodes, PI nodes, doctype nodes)
+
+  $self->check_element ($docel, $onerror);
+} # check_document
 
 sub check_element ($$$) {
   my ($self, $el, $onerror) = @_;
+  $self = bless {}, $self unless ref $self;
+  $self->{onerror} = $onerror;
 
   $self->{minuses} = {};
-  $self->{onerror} = $onerror;
   $self->{id} = {};
   $self->{usemap} = [];
   $self->{map} = {};
@@ -2793,4 +2814,4 @@ sub _check_get_children ($$) {
 } # _check_get_children
 
 1;
-# $Date: 2007/05/27 10:28:01 $
+# $Date: 2007/05/27 11:14:55 $
