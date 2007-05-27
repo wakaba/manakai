@@ -16,25 +16,39 @@ Technologies (beta)</title>
 <p><dfn>Whatpm</dfn> is a <em>work-in-progress</em> set of Perl modules for
 Web hypertext application technologies.</p>
 
-<p>It currently contains three Perl modules:</p>
+<p>It currently contains six Perl modules:</p>
 
 <dl>
+<dt><a href="Whatpm/ContentChecker.html"><code>Whatpm::ContentChecker</code></a></dt>
+  <dd>A DOM5 HTML (in-memory representation of a document) conformance
+  checker.</dd>
 <dt><a href="Whatpm/ContentType.html"><code>Whatpm::ContentType</code></a></dt>
   <dd>An implementation of HTML5 Content Type sniffing algorithm.</dd>
 <dt><a href="Whatpm/HTML.html"><code>Whatpm::HTML</code></a></dt>
   <dd>An implementation of HTML5 parsing algorithm and
   <code>innerHTML</code> serialization.</dd>
-<dt><a href="Whatpm/ContentChecker.html"><code>Whatpm::ContentChecker</code></a></dt>
-  <dd>A DOM5 HTML (in-memory representation of a document) conformance
-  checker.</dd>
+<dt><a href="Whatpm/HTMLTable.html"><code>Whatpm::HTMLTable</code></a></dt>
+  <dd>An implementation of the HTML5 table algorithm.</dd>
+<dt><a href="Whatpm/IMTChecker.html"><code>Whatpm::IMTChecker</code></a></dt>
+  <dd>An Internet Media Type (aka MIME type) specification
+  conformance checker.</dd>
+<dt><a href="Whatpm/URIChecker.html"><code>Whatpm::URIChecker</code></a></dt>
+  <dd>An IRI reference conformance checker.</dd>
 </dl>
+
+<p>Note that all of these modules are <em>work in progress</em>
+and have <a href="#todo">a number of unresolved problems</a>.</p>
 </div>
 
 <div class="section" id="demo">
 <h2>Demo</h2>
 
-<p><a href="http://suika.fam.cx/gate/2007/html/parser-interface">HTML5 parser 
-and checker demo</a></p>
+<ul>
+<li><a href="http://suika.fam.cx/gate/2007/html/parser-interface">HTML5 parser 
+and checker demo</a></li>
+<li><a href="http://suika.fam.cx/gate/2007/html/table-interface">HTML5 table
+structure visualization demo</a></li>
+</ul>
 </div>
 
 <div class="section" id="download">
@@ -56,10 +70,10 @@ repository</a>.</p>
     <a href="t/tree-construction-result">HTML tree construction</a>,
     <a href="t/content-checker-result"><code>Whatpm::ContentChecker</code></a>).</li>
   <li>Charset detection.</li>
-  <li>Table validation.</li>
-  <li>Validation for <code>rel</code>, <code>meta</code>.</li>
-  <li>Validation for media types, media queries, IRIs, language tags,
+  <li>Validation for <code>meta</code>.</li>
+  <li>Validation for media queries, IRIs (against URI schemes), language tags,
     and so on.</li>
+  <li>Documentations are missing for some features.</li>
   <li><q>Whatpm</q> is a code name in fact.  Please let me know
     if you have a better name.</li>
   <li>In addition, each module has its own TO DO items.
@@ -70,13 +84,15 @@ repository</a>.</p>
 <div class="section" id="author">
 <h2>Author</h2>
 
-<p><a href="http://suika.fam.cx/~wakaba/who?">Wakaba</a>.</p>
+<p><a href="http://suika.fam.cx/~wakaba/who?" rel="author">Wakaba</a>.</p>
 </div>
 
 <div class="section" id="license">
 <h2>License</h2>
 
-<p>Copyright 2007 Wakaba &lt;w@suika.fam.cx></p>
+<p>Copyright 2007 Wakaba 
+<code class="mail">&lt;<a href="mailto:w@suika.fam.cx"
+    rel="author">w@suika.fam.cx</a>></code>.</p>
 
 <p>This library is free software; you can redistribute it and/or modify 
 it under the same terms as Perl itself.</p>
