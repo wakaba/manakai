@@ -51,10 +51,11 @@ if ($mode eq '/table') {
 <html lang="en">
 <head>
 <title>HTML5 Table Structure Viewer</title>
+<!--[if IE]><script type="text/javascript" src="../excanvas.js"></script><![endif]-->
 <script src="../table-script.js" type="text/javascript"></script>
 </head>
 <body>
-<noscript><p>How great the world without any script were!</p></noscript>
+<noscript><p>How great if there were no script at all!</p></noscript>
 ';
 
   my $i = 0;
@@ -63,7 +64,7 @@ if ($mode eq '/table') {
 
     my $table = Whatpm::HTMLTable->form_table ($table_el);
 
-    for (@{$table->{column_group}}, @{$table->{column}}) {
+    for (@{$table->{column_group}}, @{$table->{column}}, $table->{caption}) {
       next unless $_;
       delete $_->{element};
     }
@@ -85,7 +86,7 @@ if ($mode eq '/table') {
       }
     }
 
-    print STDOUT '<script type="text/javascript">
+    print STDOUT '<script type="text/javascript"> 
   tableToCanvas (
 ';
     print STDOUT objToJson ($table);
@@ -113,4 +114,4 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2007/05/27 06:37:05 $
+## $Date: 2007/05/27 10:00:48 $

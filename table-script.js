@@ -1,6 +1,9 @@
 function tableToCanvas (table) {
   var canvas = document.createElement ('canvas');
   document.body.appendChild (canvas);
+  if (window.G_vmlCanvasManager) {
+    canvas = G_vmlCanvasManager.initElement (canvas);
+  }
   var c2d = canvas.getContext ('2d');
 
   var param = {
@@ -46,14 +49,15 @@ for (var i = 1; i < table.cell.length; i++) {
   }
 }
 
+canvas.style.width = 'auto'; // NOTE: Opera9 has default style=""
+canvas.style.height = 'auto';
+// NOTE: Set style="" before width/height="" for ExplorerCanvas compatibility
 canvas.width = param.cellLeft
     + (param.columnWidth + param.columnSpacing) * columnNumber
     + param.cellRight;
 canvas.height = param.cellTop
     + (param.rowHeight + param.rowSpacing) * rowNumber
     + param.cellBottom;
-canvas.style.width = 'auto'; // NOTE: Opera9 has default style=""
-canvas.style.height = 'auto';
 
 var y = param.rowTop;
 for (var i = 1; i < table.row_group.length; i++) {
@@ -170,4 +174,4 @@ This library is free software; you can redistribute it
 and/or modify it under the same terms as Perl itself.
 
 */
-/* $Date: 2007/05/27 06:37:05 $ */
+/* $Date: 2007/05/27 10:00:48 $ */
