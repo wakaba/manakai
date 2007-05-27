@@ -439,7 +439,7 @@ id=""><span id=""></span></p>
 #data
 <base href="http://[test]/" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/base/@href;URI:m:syntax error
+/base/@href;URI:m::syntax error
 
 #data
 <base href="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -495,7 +495,7 @@ id=""><span id=""></span></p>
 <link rel="stylesheet" href="://www.test/"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/link/@href;URI:m:syntax error
+/link/@href;URI:m::syntax error
 
 #data
 <link rel="stylesheet" href="http://www.test/" type=""
@@ -738,7 +738,7 @@ id=""><span id=""></span></p>
 #data
 <blockquote cite="http://test/%" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/blockquote/@cite;URI:m:syntax error
+/blockquote/@cite;URI:m::syntax error
 
 #data
 <h1 align="left" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -1036,7 +1036,7 @@ id=""><span id=""></span></p>
 #data
 <a href="http://test/[44::]/" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/a/@href;URI:m:syntax error
+/a/@href;URI:m::syntax error
 
 #data
 <a href="http://test/" type="" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -1210,7 +1210,7 @@ id=""><span id=""></span></p>
 #data
 <q cite="http://test/%" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/q/@cite;URI:m:syntax error
+/q/@cite;URI:m::syntax error
 
 #data
 <meter value="" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -1461,7 +1461,7 @@ id=""><span id=""></span></p>
 #data
 <ins cite="http://test/100%/" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/ins/@cite;URI:m:syntax error
+/ins/@cite;URI:m::syntax error
 
 #data
 <del cite="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -1470,7 +1470,7 @@ id=""><span id=""></span></p>
 #data
 <del cite='"about:"' xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/del/@cite;URI:m:syntax error
+/del/@cite;URI:m::syntax error
 
 #data
 <img xmlns="http://www.w3.org/1999/xhtml"/>
@@ -1495,7 +1495,7 @@ id=""><span id=""></span></p>
 #data
 <img alt="" src="http://test/`" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/img/@src;URI:m:syntax error
+/img/@src;URI:m::syntax error
 
 #data
 <a xmlns="http://www.w3.org/1999/xhtml">
@@ -1614,7 +1614,7 @@ id=""><span id=""></span></p>
 #data
 <iframe src="&lt;http://test/>" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/iframe/@src;URI:m:syntax error
+/iframe/@src;URI:m::syntax error
 
 #data
 <embed xmlns="http://www.w3.org/1999/xhtml"/>
@@ -1628,7 +1628,7 @@ id=""><span id=""></span></p>
 #data
 <embed src="[http://test/]" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/embed/@src;URI:m:syntax error
+/embed/@src;URI:m::syntax error
 
 #data
 <embed src="http://test/" type="" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -1669,7 +1669,7 @@ id=""><span id=""></span></p>
 #data
 <object data="`http://test/`" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/object/@data;URI:m:syntax error
+/object/@data;URI:m::syntax error
 
 #data
 <object type="" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -1806,7 +1806,7 @@ id=""><span id=""></span></p>
 #data
 <video src="``http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/video/@src;URI:m:syntax error
+/video/@src;URI:m::syntax error
 
 #data
 <video autoplay="" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -1845,7 +1845,7 @@ id=""><span id=""></span></p>
 #data
 <audio src="http://[test]/" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/audio/@src;URI:m:syntax error
+/audio/@src;URI:m::syntax error
 
 #data
 <audio autoplay="" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -1885,7 +1885,7 @@ id=""><span id=""></span></p>
 #data
 <source src="%http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/source/@src;URI:m:syntax error
+/source/@src;URI:m::syntax error
 
 #data
 <source src="http://test/" type="" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -2067,7 +2067,7 @@ id=""><span id=""></span></p>
 <area href="%%http://test/" alt="" coords="1,2,3,4"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/area/@href;URI:m:syntax error
+/area/@href;URI:m::syntax error
 
 #data
 <area href="http://test/" alt="" coords="1,2,3,4"
@@ -2673,7 +2673,7 @@ id=""><span id=""></span></p>
 <script src="http://test/%" type="text/javascript"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/script/@src;URI:m:syntax error
+/script/@src;URI:m::syntax error
 /script/@type;IMT:s:obsolete subtype
 
 #data
@@ -2719,7 +2719,7 @@ id=""><span id=""></span></p>
 #data
 <event-source src="http://test/`" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/event-source/@src;URI:m:syntax error
+/event-source/@src;URI:m::syntax error
 
 #data
 <details xmlns="http://www.w3.org/1999/xhtml"/>

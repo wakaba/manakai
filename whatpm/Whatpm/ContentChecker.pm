@@ -2411,12 +2411,12 @@ $Element->{$HTML_NS}->{tbody} = {
 
 $Element->{$HTML_NS}->{thead} = {
   attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => $Element->{$HTML_NS}->{tbody},
+  checker => $Element->{$HTML_NS}->{tbody}->{checker},
 };
 
 $Element->{$HTML_NS}->{tfoot} = {
   attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => $Element->{$HTML_NS}->{tbody},
+  checker => $Element->{$HTML_NS}->{tbody}->{checker},
 };
 
 $Element->{$HTML_NS}->{tr} = {
@@ -2793,4 +2793,4 @@ sub _check_get_children ($$) {
 } # _check_get_children
 
 1;
-# $Date: 2007/05/27 06:38:58 $
+# $Date: 2007/05/27 10:28:01 $

@@ -226,6 +226,7 @@ sub form_table ($$$) {
       ## Step 8
       ## ISSUE: How to parse |colspan| is not explicitly specified
       ## (while |span| was).
+      ## <http://lists.whatwg.org/pipermail/whatwg-whatwg.org/2006-November/007981.html>
       my $colspan = 1;
       my $attr_value = $current_cell->get_attribute_ns (undef, 'colspan');
       if (defined $attr_value and $attr_value =~ /^[\x09-\x0D\x20]*([0-9]+)/) {
@@ -235,6 +236,7 @@ sub form_table ($$$) {
       ## Step 9
       my $rowspan = 1;
       ## ISSUE: How to parse
+      ## <http://lists.whatwg.org/pipermail/whatwg-whatwg.org/2006-November/007981.html>
       my $attr_value = $current_cell->get_attribute_ns (undef, 'rowspan');
       if (defined $attr_value and $attr_value =~ /^[\x09-\x0D\x20]*([0-9]+)/) {
         $rowspan = $1;
@@ -385,4 +387,4 @@ sub form_table ($$$) {
 ## TODO: Implement scope="" algorithm
 
 1;
-## $Date: 2007/05/27 06:38:58 $
+## $Date: 2007/05/27 10:28:01 $
