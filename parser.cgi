@@ -30,6 +30,7 @@ if ($mode eq '/html' or $mode eq '/test') {
   $s = Encode::decode ('utf-8', $s);
   my $time2 = time;
   my %time = (decode => $time2 - $time1);
+  my $char_length = length $s;
   
   print STDOUT "Content-Type: text/plain; charset=utf-8\n\n";
 
@@ -77,6 +78,11 @@ if ($mode eq '/html' or $mode eq '/test') {
   print STDOUT "html5->dom5\t", $time{parse}, "s\n";
   print STDOUT "dom5->serialize\t", $time{serialize}, "s\n";
   print STDOUT "dom5 check\t", $time{check}, "s\n" if defined $time{check};
+  for (qw/decode parse serialize check/) {
+    next unless defined $time{$_};
+    open my $file, '>>', ".$_.txt" or die ".$_.txt: $!";
+    print $file $char_length, "\t", $time{$_}, "\n";
+  }
 } else {
   print STDOUT "Status: 404 Not Found\nContent-Type: text/plain; charset=us-ascii\n\n404";
 }
@@ -155,4 +161,4 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2007/05/27 11:16:02 $
+## $Date: 2007/05/28 14:04:57 $
