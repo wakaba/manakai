@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## This is an early version of an HTML parser.
 
@@ -2922,6 +2922,8 @@ sub _tree_construction_main ($) {
         if (defined $self->{form_element}) {
           $self->{parse_error}-> (type => 'in form:form');
           ## Ignore the token
+          $token = $self->_get_next_token;
+          return;
         } else {
           ## has a p element in scope
           INSCOPE: for (reverse @{$self->{open_elements}}) {
@@ -6130,4 +6132,4 @@ sub get_inner_html ($$$) {
 } # get_inner_html
 
 1;
-# $Date: 2007/05/26 08:12:34 $
+# $Date: 2007/05/30 12:24:49 $

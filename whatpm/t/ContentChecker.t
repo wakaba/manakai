@@ -71,8 +71,7 @@ sub test ($) {
   }
 
   my @error;
-  my $cc = Whatpm::ContentChecker->new;
-  $cc->check_element
+  Whatpm::ContentChecker->check_element
     ($doc->document_element, sub {
        my %opt = @_;
        push @error, get_node_path ($opt{node}) . ';' . $opt{type};
@@ -109,4 +108,4 @@ sub get_node_path ($) {
 } # get_node_path
 
 ## License: Public Domain.
-## $Date: 2007/05/27 10:28:01 $
+## $Date: 2007/05/30 12:24:50 $

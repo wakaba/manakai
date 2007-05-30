@@ -1,7 +1,7 @@
 1..864
 # Running under perl version 5.008007 for linux
-# Current time local: Sun May 27 19:26:56 2007
-# Current time GMT:   Sun May 27 10:26:56 2007
+# Current time local: Wed May 30 11:23:37 2007
+# Current time GMT:   Wed May 30 02:23:37 2007
 # Using Test.pm version 1.25
 ok 1
 ok 2
@@ -328,47 +328,47 @@ ok 322
 ok 323
 ok 324
 not ok 325
-# Test 325 got: "/fieldset;element not supported" (t/ContentChecker.t at line 82 fail #325)
+# Test 325 got: "/fieldset;element not supported" (t/ContentChecker.t at line 81 fail #325)
 #     Expected: "" (<fieldset xmlns="http://www.w3.org/1999/xhtml">
 #<legend>XXX</legend>
 #</fieldset>)
-#  t/ContentChecker.t line 82 is:     join ("\n", sort {$a cmp $b} @{$test->{errors}}), $test->{data};
+#  t/ContentChecker.t line 81 is:     join ("\n", sort {$a cmp $b} @{$test->{errors}}), $test->{data};
 not ok 326
-# Test 326 got: "/fieldset/legend/p;element not allowed\n/fieldset;element not supported" (t/ContentChecker.t at line 82 fail #326)
+# Test 326 got: "/fieldset/legend/p;element not allowed\n/fieldset;element not supported" (t/ContentChecker.t at line 81 fail #326)
 #     Expected: "/fieldset/legend/p;element not allowed" (<fieldset xmlns="http://www.w3.org/1999/xhtml">
 #<legend><p>XXX</p></legend>
 #</fieldset>)
 not ok 327
-# Test 327 got: "/fieldset/legend/blockquote;element not allowed\n/fieldset;element not supported" (t/ContentChecker.t at line 82 fail #327)
+# Test 327 got: "/fieldset/legend/blockquote;element not allowed\n/fieldset;element not supported" (t/ContentChecker.t at line 81 fail #327)
 #     Expected: "/fieldset/legend/blockquote;element not allowed" (<fieldset xmlns="http://www.w3.org/1999/xhtml">
 #<legend><blockquote><p>XXX</p></blockquote></legend>
 #</fieldset>)
 not ok 328
-# Test 328 got: "/figure/img;attribute missing:alt\n/figure/img;attribute missing:src\n/figure;element not supported" (t/ContentChecker.t at line 82 fail #328)
+# Test 328 got: "/figure/img;attribute missing:alt\n/figure/img;attribute missing:src\n/figure;element not supported" (t/ContentChecker.t at line 81 fail #328)
 #     Expected: "" (<figure xmlns="http://www.w3.org/1999/xhtml">
 #<legend>XXX</legend>
 #<img/>
 #</figure>)
 not ok 329
-# Test 329 got: "/figure/img;attribute missing:alt\n/figure/img;attribute missing:src\n/figure/legend/p;element not allowed\n/figure;element not supported" (t/ContentChecker.t at line 82 fail #329)
+# Test 329 got: "/figure/img;attribute missing:alt\n/figure/img;attribute missing:src\n/figure/legend/p;element not allowed\n/figure;element not supported" (t/ContentChecker.t at line 81 fail #329)
 #     Expected: "/figure/legend/p;element not allowed" (<figure xmlns="http://www.w3.org/1999/xhtml">
 #<legend><p>XXX</p></legend>
 #<img/>
 #</figure>)
 not ok 330
-# Test 330 got: "/figure/img;attribute missing:alt\n/figure/img;attribute missing:src\n/figure;element not supported" (t/ContentChecker.t at line 82 fail #330)
+# Test 330 got: "/figure/img;attribute missing:alt\n/figure/img;attribute missing:src\n/figure;element not supported" (t/ContentChecker.t at line 81 fail #330)
 #     Expected: "" (<figure xmlns="http://www.w3.org/1999/xhtml">
 #<legend><blockquote><p>XXX</p></blockquote></legend>
 #<img/>
 #</figure>)
 not ok 331
-# Test 331 got: "/figure/img;attribute missing:alt\n/figure/img;attribute missing:src\n/figure;element not supported" (t/ContentChecker.t at line 82 fail #331)
+# Test 331 got: "/figure/img;attribute missing:alt\n/figure/img;attribute missing:src\n/figure;element not supported" (t/ContentChecker.t at line 81 fail #331)
 #     Expected: "" (<figure xmlns="http://www.w3.org/1999/xhtml">
 #<legend>XXX</legend>
 #<img/>
 #</figure>)
 not ok 332
-# Test 332 got: "/figure/img;attribute missing:alt\n/figure/img;attribute missing:src\n/figure/legend/p;element not allowed\n/figure;element not supported" (t/ContentChecker.t at line 82 fail #332)
+# Test 332 got: "/figure/img;attribute missing:alt\n/figure/img;attribute missing:src\n/figure/legend/p;element not allowed\n/figure;element not supported" (t/ContentChecker.t at line 81 fail #332)
 #     Expected: "/figure/legend/p;element not allowed" (<figure xmlns="http://www.w3.org/1999/xhtml">
 #<legend><p>XXX</p></legend>
 #<img/>
@@ -377,17 +377,17 @@ ok 333
 ok 334
 ok 335
 not ok 336
-# Test 336 got: "/unknown;element not supported" (t/ContentChecker.t at line 82 fail #336)
+# Test 336 got: "/unknown;element not supported" (t/ContentChecker.t at line 81 fail #336)
 #     Expected: "/unknown/@lang;syntax error\n/unknown;element not supported" (<unknown xml:lang="!" xmlns=""></unknown>)
 not ok 337
-# Test 337 got: "/unknown/@u1;attribute not supported\n/unknown;element not supported" (t/ContentChecker.t at line 82 fail #337)
+# Test 337 got: "/unknown/@u1;attribute not supported\n/unknown;element not supported" (t/ContentChecker.t at line 81 fail #337)
 #     Expected: "/unknown/@lang;syntax error\n/unknown/@u1;attribute not supported\n/unknown;element not supported" (<unknown u1="" xml:lang="!" xmlns=""></unknown>)
 ok 338
 not ok 339
-# Test 339 got: "/unknown/@u1;attribute not supported\n/unknown;element not supported" (t/ContentChecker.t at line 82 fail #339)
+# Test 339 got: "/unknown/@u1;attribute not supported\n/unknown;element not supported" (t/ContentChecker.t at line 81 fail #339)
 #     Expected: "/unknown/@lang;syntax error\n/unknown/@u1;attribute not supported\n/unknown;element not supported" (<unknown u1="" xml:lang="!" xmlns="http://www.w3.org/1999/xhtml"></unknown>)
 not ok 340
-# Test 340 got: "/unknown/@u1;attribute not supported\n/unknown;element not supported" (t/ContentChecker.t at line 82 fail #340)
+# Test 340 got: "/unknown/@u1;attribute not supported\n/unknown;element not supported" (t/ContentChecker.t at line 81 fail #340)
 #     Expected: "/unknown/@lang;syntax error\n/unknown/@u1;attribute not supported\n/unknown;element not supported" (<unknown u1="" xml:lang="!" xmlns="http://www.w3.org/1999/xhtml"></unknown>)
 ok 341
 ok 342
@@ -679,83 +679,83 @@ ok 627
 ok 628
 ok 629
 not ok 630
-# Test 630 got: "/object;attribute missing:data|type\n/object;element not supported" (t/ContentChecker.t at line 82 fail #630)
+# Test 630 got: "/object;attribute missing:data|type\n/object;element not supported" (t/ContentChecker.t at line 81 fail #630)
 #     Expected: "/object;attribute missing:data|type" (<object xmlns="http://www.w3.org/1999/xhtml"/>)
 not ok 631
-# Test 631 got: "/object;element not supported" (t/ContentChecker.t at line 82 fail #631)
+# Test 631 got: "/object;element not supported" (t/ContentChecker.t at line 81 fail #631)
 #     Expected: "" (<object data="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>)
 not ok 632
-# Test 632 got: "/object/@data;URI:m::syntax error\n/object;element not supported" (t/ContentChecker.t at line 82 fail #632)
+# Test 632 got: "/object/@data;URI:m::syntax error\n/object;element not supported" (t/ContentChecker.t at line 81 fail #632)
 #     Expected: "/object/@data;URI:m::syntax error" (<object data="`http://test/`" xmlns="http://www.w3.org/1999/xhtml"/>)
 not ok 633
-# Test 633 got: "/object/@type;IMT syntax error\n/object;element not supported" (t/ContentChecker.t at line 82 fail #633)
+# Test 633 got: "/object/@type;IMT syntax error\n/object;element not supported" (t/ContentChecker.t at line 81 fail #633)
 #     Expected: "/object/@type;IMT syntax error" (<object type="" xmlns="http://www.w3.org/1999/xhtml"/>)
 not ok 634
-# Test 634 got: "/object;element not supported" (t/ContentChecker.t at line 82 fail #634)
+# Test 634 got: "/object;element not supported" (t/ContentChecker.t at line 81 fail #634)
 #     Expected: "" (<object type="text/css" xmlns="http://www.w3.org/1999/xhtml"/>)
 not ok 635
-# Test 635 got: "/object;element not supported" (t/ContentChecker.t at line 82 fail #635)
+# Test 635 got: "/object;element not supported" (t/ContentChecker.t at line 81 fail #635)
 #     Expected: "" (<object type="text/css" data="http://test/"
 #    xmlns="http://www.w3.org/1999/xhtml"/>)
 not ok 636
-# Test 636 got: "/div/p/object/@usemap;hashed idref syntax error\n/div/p/object;element not supported" (t/ContentChecker.t at line 82 fail #636)
+# Test 636 got: "/div/p/object/@usemap;hashed idref syntax error\n/div/p/object;element not supported" (t/ContentChecker.t at line 81 fail #636)
 #     Expected: "/div/p/object/@usemap;hashed idref syntax error" (<div xmlns="http://www.w3.org/1999/xhtml">
 #<p><object data="http://test/" usemap=""/></p>
 #</div>)
 not ok 637
-# Test 637 got: "/div/p/object/@usemap;hashed idref syntax error\n/div/p/object;element not supported" (t/ContentChecker.t at line 82 fail #637)
+# Test 637 got: "/div/p/object/@usemap;hashed idref syntax error\n/div/p/object;element not supported" (t/ContentChecker.t at line 81 fail #637)
 #     Expected: "/div/p/object/@usemap;hashed idref syntax error" (<div xmlns="http://www.w3.org/1999/xhtml">
 #<p><object data="http://test/" usemap="abc"/></p>
 #</div>)
 not ok 638
-# Test 638 got: "/div/p/object/@usemap;hashed idref syntax error\n/div/p/object;element not supported" (t/ContentChecker.t at line 82 fail #638)
+# Test 638 got: "/div/p/object/@usemap;hashed idref syntax error\n/div/p/object;element not supported" (t/ContentChecker.t at line 81 fail #638)
 #     Expected: "/div/p/object/@usemap;hashed idref syntax error" (<div xmlns="http://www.w3.org/1999/xhtml">
 #<p><object data="http://test/" usemap="abc#"/></p>
 #</div>)
 not ok 639
-# Test 639 got: "/div/p/object/@usemap;hashed idref syntax error\n/div/p/object;element not supported" (t/ContentChecker.t at line 82 fail #639)
+# Test 639 got: "/div/p/object/@usemap;hashed idref syntax error\n/div/p/object;element not supported" (t/ContentChecker.t at line 81 fail #639)
 #     Expected: "/div/p/object/@usemap;hashed idref syntax error" (<div xmlns="http://www.w3.org/1999/xhtml">
 #<p><object data="http://test/" usemap="&#x0A;#abc"/></p>
 #</div>)
 not ok 640
-# Test 640 got: "/div/p/object;element not supported" (t/ContentChecker.t at line 82 fail #640)
+# Test 640 got: "/div/p/object;element not supported" (t/ContentChecker.t at line 81 fail #640)
 #     Expected: "" (<div xmlns="http://www.w3.org/1999/xhtml">
 #<p><object data="http://test/" usemap="#aa"/></p>
 #<map id="aa"/>
 #</div>)
 not ok 641
-# Test 641 got: "/div/p/object;element not supported" (t/ContentChecker.t at line 82 fail #641)
+# Test 641 got: "/div/p/object;element not supported" (t/ContentChecker.t at line 81 fail #641)
 #     Expected: "" (<div xmlns="http://www.w3.org/1999/xhtml">
 #<map id="aa"/>
 #<p><object data="http://test/" usemap="#aa"/></p>
 #</div>)
 not ok 642
-# Test 642 got: "/div/p/object;element not supported" (t/ContentChecker.t at line 82 fail #642)
+# Test 642 got: "/div/p/object;element not supported" (t/ContentChecker.t at line 81 fail #642)
 #     Expected: "" (<div xmlns="http://www.w3.org/1999/xhtml">
 #<map id="&#x4E00;"/>
 #<p><object data="http://test/" usemap="#&#x4E00;"/></p>
 #</div>)
 not ok 643
-# Test 643 got: "/div/p/object/@usemap;no referenced map\n/div/p/object;element not supported" (t/ContentChecker.t at line 82 fail #643)
+# Test 643 got: "/div/p/object/@usemap;no referenced map\n/div/p/object;element not supported" (t/ContentChecker.t at line 81 fail #643)
 #     Expected: "/div/p/object/@usemap;no referenced map" (<div xmlns="http://www.w3.org/1999/xhtml">
 #<map id="aa"/>
 #<p><object data="http://test/" usemap="#bb"/></p>
 #</div>)
 not ok 644
-# Test 644 got: "/div/p/object;element not supported\n/div/p/object;element not supported" (t/ContentChecker.t at line 82 fail #644)
+# Test 644 got: "/div/p/object;element not supported\n/div/p/object;element not supported" (t/ContentChecker.t at line 81 fail #644)
 #     Expected: "" (<div xmlns="http://www.w3.org/1999/xhtml">
 #<map id="aa"/>
 #<p><object data="http://test/" usemap="#aa"/></p>
 #<p><object data="http://test/" usemap="#aa"/></p>
 #</div>)
 not ok 645
-# Test 645 got: "/div/p/object/@usemap;no referenced map\n/div/p/object;element not supported" (t/ContentChecker.t at line 82 fail #645)
+# Test 645 got: "/div/p/object/@usemap;no referenced map\n/div/p/object;element not supported" (t/ContentChecker.t at line 81 fail #645)
 #     Expected: "/div/p/object/@usemap;no referenced map" (<div xmlns="http://www.w3.org/1999/xhtml">
 #<map id="aa"/>
 #<p><object data="http://test/" usemap="#AA"/></p>
 #</div>)
 not ok 646
-# Test 646 got: "/div/p/object/@usemap;no referenced map\n/div/p/object;element not supported" (t/ContentChecker.t at line 82 fail #646)
+# Test 646 got: "/div/p/object/@usemap;no referenced map\n/div/p/object;element not supported" (t/ContentChecker.t at line 81 fail #646)
 #     Expected: "/div/p/object/@usemap;no referenced map" (<div xmlns="http://www.w3.org/1999/xhtml">
 #<map id="AA"/>
 #<p><object data="http://test/" usemap="#aa"/></p>
