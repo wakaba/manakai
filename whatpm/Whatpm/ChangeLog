@@ -1,3 +1,11 @@
+2007-06-05  Wakaba  <wakaba@suika.fam.cx>
+
+	* NanoDOM.pm (get_attribute_node_ns): New method.
+
+	* ContentChecker.pm: |script| |async| and |defer|
+	no longer require |src|.  |async| MUST NOT be
+	specified if |defer|.  (HTML5 revision 858).
+
 2007-05-30  Wakaba  <wakaba@suika.fam.cx>
 
 	* HTML.pm.src: |<form><form>| went to inifinite loop.

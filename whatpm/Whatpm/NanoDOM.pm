@@ -357,6 +357,12 @@ sub get_attribute_ns ($$$) {
     ? $self->{attributes}->{$nsuri}->{$ln}->value : undef;
 } # get_attribute_ns
 
+sub get_attribute_node_ns ($$$) {
+  my ($self, $nsuri, $ln) = @_;
+  $nsuri = '' unless defined $nsuri;
+  return $self->{attributes}->{$nsuri}->{$ln};
+} # get_attribute_node_ns
+
 sub has_attribute_ns ($$$) {
   my ($self, $nsuri, $ln) = @_;
   $nsuri = '' unless defined $nsuri;
@@ -475,4 +481,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2007/05/26 16:33:53 $
+# $Date: 2007/06/05 00:56:42 $

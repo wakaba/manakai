@@ -2677,8 +2677,16 @@ id=""><span id=""></span></p>
 /script/@type;IMT:s:obsolete subtype
 
 #data
+<script defer="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
 <script src="http://test/" defer=""
     xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<script defer="defer" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 
 #data
@@ -2687,14 +2695,27 @@ id=""><span id=""></span></p>
 #errors
 
 #data
+<script defer="true" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/script/@defer;invalid boolean attribute value
+
+#data
 <script src="http://test/" defer="true"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script/@defer;invalid boolean attribute value
 
 #data
+<script async="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
 <script src="http://test/" async=""
     xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<script async="async" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 
 #data
@@ -2703,10 +2724,30 @@ id=""><span id=""></span></p>
 #errors
 
 #data
+<script async="true" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/script/@async;invalid boolean attribute value
+
+#data
 <script src="http://test/" async="true"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script/@async;invalid boolean attribute value
+
+#data
+<script defer="" async="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/script/@async;attribute not allowed
+
+#data
+<script defer="defer" async="async" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/script/@async;attribute not allowed
+
+#data
+<script src="" defer="" async="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/script/@async;attribute not allowed
 
 #data
 <event-source xmlns="http://www.w3.org/1999/xhtml"/>

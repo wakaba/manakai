@@ -2485,12 +2485,22 @@ $Element->{$HTML_NS}->{th} = {
 ## TODO: forms
 
 $Element->{$HTML_NS}->{script} = {
-  attrs_checker => $GetHTMLAttrsChecker->({
-    src => $HTMLURIAttrChecker,
-    defer => $GetHTMLBooleanAttrChecker->('defer'), ## TODO: if src ## ISSUE: no MUST NOT
-    async => $GetHTMLBooleanAttrChecker->('async'), ## TODO: if src ## ISSUE: no MUST NOT
-    type => $HTMLIMTAttrChecker,
-  }),
+  attrs_checker => sub {
+    my ($self, $todo) = @_;
+    $GetHTMLAttrsChecker->({
+      src => $HTMLURIAttrChecker,
+      defer => $GetHTMLBooleanAttrChecker->('defer'),
+      async => $GetHTMLBooleanAttrChecker->('async'),
+      type => $HTMLIMTAttrChecker,
+    })->($self, $todo);
+    if ($todo->{node}->has_attribute_ns (undef, 'defer')) {
+      my $async_attr = $todo->{node}->get_attribute_node_ns (undef, 'async');
+      if ($async_attr) {
+        $self->{onerror}->(node => $async_attr,
+                           type => 'attribute not allowed'); # MUST NOT
+      }
+    }
+  },
   checker => sub {
     my ($self, $todo) = @_;
 
@@ -2549,6 +2559,7 @@ $Element->{$HTML_NS}->{datagrid} = {
 
     my $end = $self->_add_minuses ({$HTML_NS => {a => 1, datagrid => 1}});
     my ($sib, $ch) = $HTMLBlockChecker->($self, $todo);
+    ## TODO: (Block-table)+ | table | select | datalist
     push @$sib, $end;
     return ($sib, $ch);
   },
@@ -2814,4 +2825,4 @@ sub _check_get_children ($$) {
 } # _check_get_children
 
 1;
-# $Date: 2007/05/27 11:14:55 $
+# $Date: 2007/06/05 00:56:42 $
