@@ -46,5 +46,11 @@ ok $imt.'', 'text/plain; format="in\\\\valid"';
 $imt->remove_parameter ('format');
 ok $imt.'', 'text/plain';
 
+$imt->add_parameter (charset => 'utf-8');
+$imt->add_parameter (charset => 'utf-8');
+$imt->add_parameter (format => 'fixed');
+$imt->add_parameter (charset => 'us-ascii');
+ok $imt.'', 'text/plain; charset=utf-8; charset=utf-8; format=fixed; charset=us-ascii';
+
 ## License: Public Domain.
-## $Date: 2007/05/26 06:34:46 $
+## $Date: 2007/06/13 12:04:51 $

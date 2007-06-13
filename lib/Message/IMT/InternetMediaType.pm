@@ -1,6 +1,6 @@
 package Message::IMT::InternetMediaType;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::Util::Error::DOMException;
 
@@ -159,6 +159,13 @@ sub set_parameter ($$$) {
   ## NOTE: MAY throw a NO_MODIFICATION_ALLOWED_ERR
 } # set_parameter
 
+sub add_parameter ($$$) {
+  my ($self, $attr, $value) = @_;
+  $attr =~ tr/A-Z/a-z/;
+  push @{$self->{parameter}}, [$attr => $value];
+  ## NOTE: MAY throw a NO_MODIFICATION_ALLOWED_ERR
+} # add_parameter
+
 sub remove_parameter ($$) {
   my ($self, $attr) = @_;
   $attr =~ tr/A-Z/a-z/;
@@ -175,4 +182,4 @@ sub ___report_error ($$) {
 } # ___report_error
 
 1;
-## $Date: 2007/05/26 06:34:46 $
+## $Date: 2007/06/13 12:04:51 $

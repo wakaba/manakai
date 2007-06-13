@@ -1,15 +1,15 @@
 package Message::URI::URIReference;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Message::Util::Error::DOMException;
 
-package Message::DOM::IF::URIImplementation;
+package Message::IF::URIImplementation;
 package Message::DOM::DOMImplementation;
-push our @ISA, 'Message::DOM::IF::URIImplementation';
+push our @ISA, 'Message::IF::URIImplementation';
 
 sub create_uri_reference ($$) {
-  if (UNIVERSAL::isa ($_[1], 'Message::DOM::IF::URIReference')) {
+  if (UNIVERSAL::isa ($_[1], 'Message::IF::URIReference')) {
     local $Error::Depth = $Error::Depth + 1;
     return $_[1]->clone_uri_reference;
   } elsif (ref $_[1] eq 'SCALAR') {
@@ -25,9 +25,9 @@ our $HasFeature;
 $HasFeature->{'http://suika.fam.cx/www/2006/feature/uri'}->{''} = 1;
 $HasFeature->{'http://suika.fam.cx/www/2006/feature/uri'}->{'4.0'} = 1;
 
-package Message::DOM::IF::URIReference;
+package Message::IF::URIReference;
 package Message::URI::URIReference;
-push our @ISA, 'Message::DOM::IF::URIReference';
+push our @ISA, 'Message::IF::URIReference';
 
 sub uri_reference ($;$) {
 if (@_ == 1) {my ($self) = @_;
@@ -2549,4 +2549,4 @@ fallback => 1;
 
 1;
 ## License: <http://suika.fam.cx/~wakaba/archive/2004/8/18/license#Perl+MPL>
-## $Date: 2007/05/26 06:34:46 $
+## $Date: 2007/06/13 12:04:51 $
