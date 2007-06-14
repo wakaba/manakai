@@ -15,6 +15,14 @@ ok $dom->can ('create_uri_reference');
 my $uri = $dom->create_uri_reference ('http://www.uri.test/');
 ok UNIVERSAL::isa ($uri, 'Message::IF::URIReference');
 
+ok $dom->can ('create_document');
+my $doc = $dom->create_document;
+ok UNIVERSAL::isa ($doc, 'Message::IF::Document');
+
+ok $dom->can ('create_document_type');
+my $doc = $dom->create_document_type;
+ok UNIVERSAL::isa ($doc, 'Message::IF::DocumentType');
+
 ok $dom->can ('no_such_method') ? 1 : 0, 0;
 my $something_called = 0;
 eval {
@@ -24,4 +32,4 @@ eval {
 ok $something_called, 0;
 
 ## License: Public Domain.
-## $Date: 2007/06/13 12:04:51 $
+## $Date: 2007/06/14 13:10:07 $

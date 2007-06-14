@@ -1,7 +1,10 @@
 package Message::DOM::DOMImplementation;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::IF::DOMImplementation';
+
+## Spec:
+## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-102161490>
 
 sub ____new ($) {
   my $self = bless {}, shift;
@@ -15,6 +18,7 @@ sub AUTOLOAD {
 
   my $module_name = {
     create_document => 'Message::DOM::DOMDocument', ## TODO: New module name
+    create_document_type => 'Message::DOM::DocumentType',
     create_uri_reference => 'Message::URI::URIReference',  
   }->{$method_name};
   if ($module_name) {
@@ -28,6 +32,7 @@ sub AUTOLOAD {
 } # AUTOLOAD
 ## DOMImplementation
 sub create_document ($;$$$);
+sub create_document_type ($$;$$);
 ## URIImplementation
 sub create_uri_reference ($$);
 
@@ -42,4 +47,4 @@ package Message::IF::DOMImplementation;
 
 1;
 ## License: <http://suika.fam.cx/~wakaba/archive/2004/8/18/license#Perl+MPL>
-## $Date: 2007/06/13 12:04:50 $
+## $Date: 2007/06/14 13:10:07 $

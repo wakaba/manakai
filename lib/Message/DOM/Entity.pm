@@ -1,19 +1,15 @@
-package Message::DOM::DocumentType;
+package Message::DOM::Notation;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
-push our @ISA, 'Message::DOM::Node', 'Message::IF::DocumentType',
-    'Message::IF::DocumentTypeDefinition',
-    'Message::IF::DocumentTypeDeclaration';
+our $VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+push our @ISA, 'Message::DOM::Node', 'Message::IF::Notation';
 require Message::DOM::Node;
 
 ## Spec:
-## <http://suika.fam.cx/gate/2005/sw/DocumentTypeDefinition>
-## <http://suika.fam.cx/gate/2005/sw/DocumentTypeDeclaration>
+## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-527DCFF2>
 
-sub ____new ($$$$) {
+sub ____new ($$$) {
   my $self = shift->SUPER::____new (shift);
-  $$self->{implementation} = $_[0] if defined $_[0];
-  $$self->{name} = $_[1];
+  $$self->{node_name} = $_[0];
   return $self;
 } # ____new
              
@@ -24,7 +20,6 @@ sub AUTOLOAD {
 
   if ({
     ## Read-only attributes (trivial accessors)
-    name => 1,
   }->{$method_name}) {
     no strict 'refs';
     eval qq{
@@ -39,11 +34,14 @@ sub AUTOLOAD {
     goto &{ $AUTOLOAD };
   } elsif ({
     ## Read-write attributes (DOMString, trivial accessors)
+    public_id => 1,
+    system_id => 1,
   }->{$method_name}) {
     no strict 'refs';
     eval qq{
       sub $method_name (\$) {
         if (\@_ > 1) {
+          ## TODO: read-only, undef
           \${\$_[0]}->{$method_name} = ''.$_[1];
         }
         return \${\$_[0]}->{$method_name}; 
@@ -55,30 +53,23 @@ sub AUTOLOAD {
     Carp::croak (qq<Can't locate method "$AUTOLOAD">);
   }
 } # AUTOLOAD
-sub name ($;$);
+sub public_id ($;$);
+sub system_id ($;$);
 
 ## The |Node| interface - attribute
 
-sub node_type () { 10 } # DOCUMENT_TYPE_NODE
+sub node_type { 6 } # ENTITY_NODE
 
-package Message::IF::DocumentType;
-package Message::IF::DocumentTypeDefinition;
-package Message::IF::DocumentTypeDeclaration;
-
-package Message::DOM::DOMImplementation;
-
-sub create_document_type ($$;$$) {
-  return Message::DOM::DocumentType->____new (undef, @_[0, 1]);
-} # create_document_type
+package Message::IF::Entity;
 
 package Message::DOM::Document;
 
 ## Spec: 
 ## <http://suika.fam.cx/gate/2005/sw/DocumentXDoctype>
 
-sub create_document_type_definition ($$) {
-  return Message::DOM::DocumentType->____new ($_[0], undef, $_[1]);
-} # create_document_type_definition
+sub create_general_entity ($$$) {
+  return Message::DOM::Entity->____new (@_[0, 1]);
+} # create_general_entity
 
 1;
 ## License: <http://suika.fam.cx/~wakaba/archive/2004/8/18/license#Perl+MPL>

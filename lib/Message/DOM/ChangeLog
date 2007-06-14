@@ -1,3 +1,22 @@
+2007-06-14  Wakaba  <wakaba@suika.fam.cx>
+
+	* Notation.pm, Entity.pm, EntityReference.pm, ProcessingInstruction.pm,
+	CDATASection.pm, DocumentFragment.pm, ElementTypeDefinition.pm,
+	AttributeDefinition.pm: New modules.
+
+	* DOMDocument.pm (@ISA): 'Message::IF::DocumentXDoctype' added.
+	(create_attribute_definition, create_element_type_definition,
+	create_document_type_definition, create_cdata_section,
+	create_processing_instruction, create_entity_reference,
+	create_general_entity, create_notation): Prototypes added.
+
+	* DOMImplementation.pm (create_document_type): Prototype added.
+
+	* DocumentType.pm (@ISA), 'Message::IF::DocumentTypeDefinition'
+	and 'Message::IF::DocumentTypeDeclaration' added.
+	(create_document_type, create_document_type_definition):
+	New methods.
+
 2007-06-13  Wakaba  <wakaba@suika.fam.cx>
 
 	* DOMImplementation.pm, Node.pm, DOMDocument.pm,
