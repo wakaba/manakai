@@ -1,6 +1,6 @@
 package Message::DOM::ProcessingInstruction;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::ProcessingInstruction';
 require Message::DOM::Node;
 
@@ -57,7 +57,28 @@ sub data ($);
 
 ## The |Node| interface - attribute
 
-sub node_type { 7 } # PROCESSING_INSTRUCTION_NODE
+## Spec:
+## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-F68D095>
+## Modified: <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061>
+
+## The target of the processing instruction [DOM1, DOM2].
+## Same as |ProcessingInstruction.target| [DOM3].
+
+*node_name = \&target;
+
+## Spec:
+## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-111237558>
+
+sub node_type ($) { 7 } # PROCESSING_INSTRUCTION_NODE
+
+## Spec:
+## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-F68D080>
+## Modified: <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061>
+
+## The entire content exclude the target [DOM1, DOM2].
+## Same as |ProcessingInstruction.data| [DOM3].
+
+*node_value = \&data;
 
 package Message::IF::ProcessingInstruction;
 
@@ -74,4 +95,4 @@ sub create_processing_instruction ($$$) {
 
 1;
 ## License: <http://suika.fam.cx/~wakaba/archive/2004/8/18/license#Perl+MPL>
-## $Date: 2007/06/14 13:10:07 $
+## $Date: 2007/06/15 14:32:50 $

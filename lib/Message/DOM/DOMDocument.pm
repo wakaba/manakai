@@ -2,7 +2,7 @@
 
 package Message::DOM::Document;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::Document',
     'Message::IF::DocumentXDoctype';
 require Message::DOM::Node;
@@ -13,7 +13,7 @@ require Message::DOM::Node;
 
 sub ____new ($$) {
   my $self = shift->SUPER::____new (undef);
-  $$self->{dom_implementation} = $_[0];
+  $$self->{implementation} = $_[0];
   $$self->{strict_error_checking} = 1;
   $$self->{child_nodes} = [];
   return $self;
@@ -97,7 +97,18 @@ sub create_text_node ($$);
 
 ## The |Node| interface - attribute
 
-sub node_type () { 9 } # DOCUMENT_NODE
+## Spec:
+## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-F68D095>
+## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1950641247>
+
+sub node_name ($) {
+  return '#document';
+} # node_name
+
+## Spec:
+## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-111237558>
+
+sub node_type ($) { 9 } # DOCUMENT_NODE
 
 ## The |Node| interface - method
 
@@ -140,4 +151,4 @@ sub create_document ($;$$$) {
 
 1;
 ## License: <http://suika.fam.cx/~wakaba/archive/2004/8/18/license#Perl+MPL>
-## $Date: 2007/06/14 13:10:07 $
+## $Date: 2007/06/15 14:32:50 $

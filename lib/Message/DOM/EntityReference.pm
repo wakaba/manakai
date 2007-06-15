@@ -1,6 +1,6 @@
 package Message::DOM::EntityReference;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::EntityReference';
 require Message::DOM::Node;
 
@@ -9,7 +9,7 @@ require Message::DOM::Node;
 
 sub ____new ($$$) {
   my $self = shift->SUPER::____new (shift);
-  $$self->{name} = $_[0];
+  $$self->{node_name} = $_[0];
   return $self;
 } # ____new
              
@@ -20,7 +20,7 @@ sub AUTOLOAD {
 
   if ({
     ## Read-only attributes (trivial accessors)
-    name => 1,
+    node_name => 1,
   }->{$method_name}) {
     no strict 'refs';
     eval qq{
@@ -51,11 +51,19 @@ sub AUTOLOAD {
     Carp::croak (qq<Can't locate method "$AUTOLOAD">);
   }
 } # AUTOLOAD
-sub name ($);
 
 ## The |Node| interface - attribute
 
-sub node_type { 5 } # ENTITY_REFERENCE_NODE
+## Spec:
+## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-F68D095>
+## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1950641247>
+
+sub node_name ($); # read-only trivial accessor
+
+## Spec:
+## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-111237558>
+
+sub node_type ($) { 5 } # ENTITY_REFERENCE_NODE
 
 package Message::IF::EntityReference;
 
@@ -72,4 +80,4 @@ sub create_entity_reference ($$) {
 
 1;
 ## License: <http://suika.fam.cx/~wakaba/archive/2004/8/18/license#Perl+MPL>
-## $Date: 2007/06/14 13:10:07 $
+## $Date: 2007/06/15 14:32:50 $

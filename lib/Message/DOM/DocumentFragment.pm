@@ -1,6 +1,6 @@
 package Message::DOM::DocumentFragment;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::DocumentFragment';
 require Message::DOM::Node;
 
@@ -52,7 +52,18 @@ sub AUTOLOAD {
 
 ## The |Node| interface - attribute
 
-sub node_type { 11 } # DOCUMENT_FRAGMENT_NODE
+## Spec:
+## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-F68D095>
+## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1950641247>
+
+sub node_name ($) {
+  return '#document-fragment';
+} # node_name
+
+## Spec:
+## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-111237558>
+
+sub node_type ($) { 11 } # DOCUMENT_FRAGMENT_NODE
 
 package Message::IF::DocumentFragment;
 
@@ -61,10 +72,10 @@ package Message::DOM::Document;
 ## Spec:
 ## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-35CB04B5>
 
-sub create_document_fragment ($$) {
+sub create_document_fragment ($) {
   return Message::DOM::DocumentFragment->____new ($_[0]);
 } # create_document_fragment
 
 1;
 ## License: <http://suika.fam.cx/~wakaba/archive/2004/8/18/license#Perl+MPL>
-## $Date: 2007/06/14 13:10:07 $
+## $Date: 2007/06/15 14:32:50 $

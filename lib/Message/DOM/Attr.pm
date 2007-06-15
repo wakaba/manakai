@@ -1,6 +1,6 @@
 package Message::DOM::Attr;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::Attr';
 require Message::DOM::Node;
 
@@ -56,7 +56,25 @@ sub owner_element ($);
 
 ## The |Node| interface - attribute
 
-sub node_type { 2 } # ATTRIBUTE_NODE
+## Spec:
+## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-F68D095>
+## Modified: <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061>
+
+## The name of the attribute [DOM1, DOM2].
+## Same as |Attr.name| [DOM3].
+
+*node_name = \&name;
+
+sub node_type () { 2 } # ATTRIBUTE_NODE
+
+## Spec:
+## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-F68D080>
+## Modified: <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061>
+
+## The value of the attribute [DOM1, DOM2].
+## Same as |Attr.value| [DOM3].
+
+*node_value = \&value;
 
 ## The |Attr| interface - attribute
 
@@ -99,4 +117,4 @@ sub create_attribute_ns ($$$) {
 
 1;
 ## License: <http://suika.fam.cx/~wakaba/archive/2004/8/18/license#Perl+MPL>
-## $Date: 2007/06/13 12:05:35 $
+## $Date: 2007/06/15 14:32:49 $

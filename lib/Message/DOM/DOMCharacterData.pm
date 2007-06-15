@@ -2,7 +2,7 @@
 
 package Message::DOM::CharacterData;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::CharacterData';
 require Message::DOM::Node;
 
@@ -37,9 +37,9 @@ sub AUTOLOAD {
   }->{$method_name}) {
     no strict 'refs';
     eval qq{
-      sub $method_name (\$) {
+      sub $method_name (\$;\$) {
         if (\@_ > 1) {
-          \${\$_[0]}->{$method_name} = ''.$_[1];
+          \${\$_[0]}->{$method_name} = ''.\$_[1];
         }
         return \${\$_[0]}->{$method_name}; 
       }
@@ -51,6 +51,26 @@ sub AUTOLOAD {
   }
 } # AUTOLOAD
 sub data ($;$);
+
+## The |Node| interface - attribute
+
+## Spec:
+## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-F68D080>
+## Modified: <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061>
+
+## |CDATASection|:
+## The content of the CDATA section [DOM1, DOM2, DOM3].
+## Same as |CharacterData.data| [DOM3].
+
+## |Comment|:
+## The content of the comment [DOM1, DOM2, DOM3].
+## Same as |CharacterData.data| [DOM3].
+
+## |Text|:
+## The content of the text node [DOM1, DOM2, DOM3].
+## Same as |CharacterData.data| [DOM3].
+
+*node_value = \&data; # For |CDATASection|, |Comment|, and |Text|.
 
 ## The |Node| interface - method
 
@@ -64,4 +84,4 @@ package Message::IF::CharacterData;
 
 1;
 ## License: <http://suika.fam.cx/~wakaba/archive/2004/8/18/license#Perl+MPL>
-## $Date: 2007/06/13 12:04:50 $
+## $Date: 2007/06/15 14:32:50 $

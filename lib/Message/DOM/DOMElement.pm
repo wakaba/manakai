@@ -2,7 +2,7 @@
 
 package Message::DOM::Element;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::Element';
 require Message::DOM::Node;
 
@@ -56,18 +56,6 @@ sub AUTOLOAD {
 
 ## The |Node| interface - attributes
 
-sub text_content ($) {
-  my $self = shift;
-  my $r = '';
-  for my $child (@{$self->child_nodes}) {
-    if ($child->can ('data')) {
-      $r .= $child->data;
-    } else {
-      $r .= $child->text_content;
-    }
-  }
-  return $r;
-} # text_content
 
 sub attributes ($) {
   my $self = shift;
@@ -82,11 +70,36 @@ sub attributes ($) {
   return $r;
 } # attributes
 
+sub text_content ($) {
+  my $self = shift;
+  my $r = '';
+  for my $child (@{$self->child_nodes}) {
+    if ($child->can ('data')) {
+      $r .= $child->data;
+    } else {
+      $r .= $child->text_content;
+    }
+  }
+  return $r;
+} # text_content
+
 sub local_name ($) { # TODO: HTML5 case
   return ${+shift}->{local_name};
 } # local_name
 
-sub node_type { 1 } # ELEMENT_NODE
+## Spec:
+## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-F68D095>
+## Modified: <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061>
+
+## The tag name of the element [DOM1, DOM2].
+## Same as |Element.tagName| [DOM3].
+
+*node_name = \&tag_name;
+
+## Spec:
+## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-111237558>
+
+sub node_type ($) { 1 } # ELEMENT_NODE
 
 ## The |Node| interface - method
 
@@ -208,4 +221,4 @@ sub create_element_ns ($$$) {
 
 1;
 ## License: <http://suika.fam.cx/~wakaba/archive/2004/8/18/license#Perl+MPL>
-## $Date: 2007/06/13 12:04:50 $
+## $Date: 2007/06/15 14:32:50 $

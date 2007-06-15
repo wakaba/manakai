@@ -1,8 +1,45 @@
 package Message::DOM::Node;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::IF::Node';
 require Scalar::Util;
+
+## The |Node| interface - constants
+
+## Definition group NodeType
+
+## Spec: 
+## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061>
+## <http://suika.fam.cx/gate/2005/sw/manakai/DOM%20Extensions#anchor-23>
+
+## NOTE: Numeric codes up to 200 are reserved by W3C [DOM1SE, DOM2, DOM3].
+
+sub ELEMENT_NODE () { 1 }
+sub ATTRIBUTE_NODE () { 2 }
+sub TEXT_NODE () { 3 }
+sub CDATA_SECTION_NODE () { 4 }
+sub ENTITY_REFERENCE_NODE () { 5 }
+sub ENTITY_NODE () { 6 }
+sub PROCESSING_INSTRUCTION_NODE () { 7 }
+sub COMMENT_NODE () { 8 }
+sub DOCUMENT_NODE () { 9 }
+sub DOCUMENT_TYPE_NODE () { 10 }
+sub DOCUMENT_FRAGMENT_NODE () { 11 }
+sub NOTATION_NODE () { 12 }
+sub ELEMENT_TYPE_DEFINITION_NODE () { 81001 }
+sub ATTRIBUTE_DEFINITION_NODE () { 81002 }
+
+## Definition group DocumentPosition
+
+## Spec:
+## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#DocumentPosition>
+
+sub DOCUMENT_POSITION_DISCONNECTED () { 0x01 }
+sub DOCUMENT_POSITION_PRECEDING () { 0x02 }
+sub DOCUMENT_POSITION_FOLLOWING () { 0x04 }
+sub DOCUMENT_POSITION_CONTAINS () { 0x08 }
+sub DOCUMENT_POSITION_CONTAINED_BY () { 0x10 }
+sub DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC () { 0x20 }
 
 sub ____new ($$) {
   my $self = bless \({}), shift;
@@ -40,9 +77,9 @@ sub AUTOLOAD {
   }->{$method_name}) {
     no strict 'refs';
     eval qq{
-      sub $method_name (\$) {
+      sub $method_name (\$;\$) {
         if (\@_ > 1) {
-          \${\$_[0]}->{$method_name} = ''.$_[1];
+          \${\$_[0]}->{$method_name} = ''.\$_[1];
         }
         return \${\$_[0]}->{$method_name}; 
       }
@@ -60,6 +97,41 @@ sub parent_node ($);
 sub prefix ($;$);
 
 ## The |Node| interface - attribute
+
+## Spec:
+## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-84CF096>
+## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1950641247>
+
+sub attributes ($) {
+  ## NOTE: Overloaded by |Message::DOM::Element|.
+  return undef;
+} # attributes
+
+## Spec:
+## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-F68D095>
+## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1950641247>
+
+sub node_name ($) {
+  ## NOTE: Overloaded by subclasses.
+  return undef;
+} # node_name
+
+## Spec:
+## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-111237558>
+
+sub node_type ($) {
+  ## NOTE: Overloaded by subclasses.
+  die "Node->node_type is not defined";
+} # node_type
+
+## Spec:
+## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-F68D080>
+## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1950641247>
+
+sub node_value ($;$) {
+  ## NOTE: Overloaded by subclasses.
+  return undef;
+} # node_value
 
 sub is_equal_node ($$) {
   return shift eq shift;
@@ -180,21 +252,8 @@ sub previous_sibling ($) {
   return undef;
 } # previous_sibling
 
-sub ELEMENT_NODE () { 1 }
-sub ATTRIBUTE_NODE () { 2 }
-sub TEXT_NODE () { 3 }
-sub CDATA_SECTION_NODE () { 4 }
-sub ENTITY_REFERENCE_NODE () { 5 }
-sub ENTITY_NODE () { 6 }
-sub PROCESSING_INSTRUCTION_NODE () { 7 }
-sub COMMENT_NODE () { 8 }
-sub DOCUMENT_NODE () { 9 }
-sub DOCUMENT_TYPE_NODE () { 10 }
-sub DOCUMENT_FRAGMENT_NODE () { 11 }
-sub NOTATION_NODE () { 12 }
-
 package Message::IF::Node;
 
 1;
 ## License: <http://suika.fam.cx/~wakaba/archive/2004/8/18/license#Perl+MPL>
-## $Date: 2007/06/13 12:04:50 $
+## $Date: 2007/06/15 14:32:50 $

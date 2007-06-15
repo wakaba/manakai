@@ -1,6 +1,6 @@
 package Message::DOM::ElementTypeDefinition;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::ElementTypeDefinition';
 require Message::DOM::Node;
 
@@ -20,6 +20,7 @@ sub AUTOLOAD {
 
   if ({
     ## Read-only attributes (trivial accessors)
+    node_name => 1,
   }->{$method_name}) {
     no strict 'refs';
     eval qq{
@@ -53,7 +54,16 @@ sub AUTOLOAD {
 
 ## The |Node| interface - attribute
 
-sub node_type { 81001 } # ELEMENT_TYPE_DEFINITION_NODE
+## Spec:
+## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-F68D095>
+## <http://suika.fam.cx/gate/2005/sw/ElementTypeDefinition>
+
+sub node_name ($); # read-only trivial accessor
+
+## Spec:
+## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-111237558>
+
+sub node_type ($) { 81001 } # ELEMENT_TYPE_DEFINITION_NODE
 
 package Message::IF::ElementTypeDefinition;
 
@@ -62,10 +72,10 @@ package Message::DOM::Document;
 ## Spec: 
 ## <http://suika.fam.cx/gate/2005/sw/DocumentXDoctype>
 
-sub create_element_type_definition ($$$) {
+sub create_element_type_definition ($$) {
   return Message::DOM::ElementTypeDefinition->____new (@_[0, 1]);
 } # create_element_type_definition
 
 1;
 ## License: <http://suika.fam.cx/~wakaba/archive/2004/8/18/license#Perl+MPL>
-## $Date: 2007/06/14 13:10:07 $
+## $Date: 2007/06/15 14:32:50 $
