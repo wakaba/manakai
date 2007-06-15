@@ -1,6 +1,6 @@
 package Message::DOM::Node;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::IF::Node';
 require Scalar::Util;
 
@@ -55,25 +55,18 @@ sub AUTOLOAD {
 
   if ({
     ## Read-only attributes (trivial accessors)
-    local_name => 1,
-    namespace_uri => 1,
     owner_document => 1,
     parent_node => 1,
   }->{$method_name}) {
     no strict 'refs';
     eval qq{
       sub $method_name (\$) {
-        if (\@_ > 1) {
-          require Carp;
-          Carp::croak (qq<Can't modify read-only attribute>);
-        }
         return \${\$_[0]}->{$method_name}; 
       }
     };
     goto &{ $AUTOLOAD };
   } elsif ({
     ## Read-write attributes (DOMString, trivial accessors)
-    prefix => 1,
   }->{$method_name}) {
     no strict 'refs';
     eval qq{
@@ -90,60 +83,99 @@ sub AUTOLOAD {
     Carp::croak (qq<Can't locate method "$AUTOLOAD">);
   }
 } # AUTOLOAD
-sub local_name ($);
-sub namespace_uri ($);
-sub owner_document ($);
-sub parent_node ($);
-sub prefix ($;$);
 
 ## The |Node| interface - attribute
-
-## Spec:
-## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-84CF096>
-## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1950641247>
 
 sub attributes ($) {
   ## NOTE: Overloaded by |Message::DOM::Element|.
   return undef;
 } # attributes
 
-## Spec:
-## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-F68D095>
-## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1950641247>
+## TODO: baseURI
+
+## TODO: childNodes
+sub child_nodes ($) {
+  my $self = shift;
+  return $$self->{child_nodes} || [];
+} # child_nodes
+
+sub first_child ($) {
+  my $self = shift;
+  return $$self->{child_nodes} ? $$self->{child_nodes}->[0] : undef;
+} # first_child
+
+sub last_child ($) {
+  my $self = shift;
+  return $$self->{child_nodes} && $$self->{child_nodes}->[0]
+    ? $$self->{child_nodes}->[-1] : undef;
+} # last_child
+
+sub local_name ($) { undef }
+sub manakai_local_name ($) { undef }
+
+sub namespace_uri ($) { undef }
+
+sub next_sibling ($) {
+  my $self = shift;
+  my $parent = $$self->{parent_node};
+  return undef unless defined $parent;
+  my $has_self;
+  for (@{$parent->child_nodes}) {
+    if ($_ eq $self) {
+      $has_self = 1;
+    } elsif ($has_self) {
+      return $_;
+    }
+  }
+  return undef;
+} # next_sibling
 
 sub node_name ($) {
   ## NOTE: Overloaded by subclasses.
   return undef;
 } # node_name
 
-## Spec:
-## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-111237558>
-
 sub node_type ($) {
   ## NOTE: Overloaded by subclasses.
   die "Node->node_type is not defined";
 } # node_type
-
-## Spec:
-## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-F68D080>
-## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1950641247>
 
 sub node_value ($;$) {
   ## NOTE: Overloaded by subclasses.
   return undef;
 } # node_value
 
+## TODO: node_value setter
+
+sub owner_document ($);
+
+sub parent_node ($);
+
+sub prefix ($;$) { undef }
+
+sub previous_sibling ($) {
+  my $self = shift;
+  my $parent = $$self->{parent_node};
+  return undef unless defined $parent;
+  my $prev;
+  for (@{$parent->child_nodes}) {
+    if ($_ eq $self) {
+      return $prev;
+    } else {
+      $prev = $_;
+    }
+  }
+  return undef;
+} # previous_sibling
+
+sub text_content ($;$) {
+  ## TODO: 
+} # text_content
+
 sub is_equal_node ($$) {
   return shift eq shift;
 } # is_equal_node
 
-sub manakai_local_name ($) {
-  if (@_ > 1) {
-    require Carp;
-    Carp::croak (qq<Can't modify read-only attribute>);  
-  }
-  return ${$_[0]}->{local_name};
-} # manakai_local_name
 
 sub manakai_parent_element ($) {
   my $self = shift;
@@ -256,4 +288,4 @@ package Message::IF::Node;
 
 1;
 ## License: <http://suika.fam.cx/~wakaba/archive/2004/8/18/license#Perl+MPL>
-## $Date: 2007/06/15 14:32:50 $
+## $Date: 2007/06/15 16:12:28 $

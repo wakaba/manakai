@@ -1,6 +1,6 @@
 package Message::DOM::Attr;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::Attr';
 require Message::DOM::Node;
 
@@ -21,15 +21,12 @@ sub AUTOLOAD {
 
   if ({
     ## Read-only attributes (trivial accessors)
+    namespace_uri => 1,
     owner_element => 1,
   }->{$method_name}) {
     no strict 'refs';
     eval qq{
       sub $method_name (\$) {
-        if (\@_ > 1) {
-          require Carp;
-          Carp::croak (qq<Can't modify read-only attribute>);
-        }
         return \${\$_[0]}->{$method_name}; 
       }
     };
@@ -41,7 +38,7 @@ sub AUTOLOAD {
     eval qq{
       sub $method_name (\$) {
         if (\@_ > 1) {
-          \${\$_[0]}->{$method_name} = ''.$_[1];
+          \${\$_[0]}->{$method_name} = ''.\$_[1];
         }
         return \${\$_[0]}->{$method_name}; 
       }
@@ -56,9 +53,16 @@ sub owner_element ($);
 
 ## The |Node| interface - attribute
 
-## Spec:
-## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-F68D095>
-## Modified: <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061>
+sub local_name ($) {
+  ## TODO: HTML5
+  return ${+shift}->{local_name};
+} # local_name
+
+sub manakai_local_name ($) {
+  return ${+shift}->{local_name};
+} # manakai_local_name
+
+sub namespace_uri ($);
 
 ## The name of the attribute [DOM1, DOM2].
 ## Same as |Attr.name| [DOM3].
@@ -67,14 +71,15 @@ sub owner_element ($);
 
 sub node_type () { 2 } # ATTRIBUTE_NODE
 
-## Spec:
-## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-F68D080>
-## Modified: <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061>
-
 ## The value of the attribute [DOM1, DOM2].
 ## Same as |Attr.value| [DOM3].
 
 *node_value = \&value;
+
+sub prefix ($;$) {
+  ## TODO: setter
+  return ${+shift}->{prefix};
+} # prefix
 
 ## The |Attr| interface - attribute
 
@@ -117,4 +122,4 @@ sub create_attribute_ns ($$$) {
 
 1;
 ## License: <http://suika.fam.cx/~wakaba/archive/2004/8/18/license#Perl+MPL>
-## $Date: 2007/06/15 14:32:49 $
+## $Date: 2007/06/15 16:12:28 $

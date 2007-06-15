@@ -34,9 +34,19 @@ my $tests = {
       return $attr;
     },
     attr_get => {
+      first_child => undef,
+      last_child => undef,
+      local_name => 'a',
+      manakai_local_name => 'a',
+      namespace_uri => undef,
+      next_sibling => undef,
       node_name => 'a',
       name => 'a',
       node_value => 'b',
+      owner_document => $doc,
+      parent_node => undef,
+      prefix => undef,
+      previous_sibling => undef,
       value => 'b',
       attributes => undef,
     },
@@ -48,11 +58,21 @@ my $tests = {
       return $attr;
     },
     attr_get => {
+      first_child => undef,
+      last_child => undef,
+      local_name => 'a',
+      manakai_local_name => 'a',
+      namespace_uri => undef,
+      next_sibling => undef,
       node_name => 'a',
       name => 'a',
       node_value => 'b',
+      owner_document => $doc,
+      parent_node => undef,
+      prefix => undef,
       value => 'b',
       attributes => undef,
+      previous_sibling => undef,
     },
   },
   attr_ns_prefixed => {
@@ -62,172 +82,367 @@ my $tests = {
       return $attr;
     },
     attr_get => {
+      first_child => undef,
+      last_child => undef,
+      local_name => 'b',
+      manakai_local_name => 'b',
+      namespace_uri => 'http://test/',
+      next_sibling => undef,
       node_name => 'a:b',
       name => 'a:b',
       node_value => 'c',
+      owner_document => $doc,
+      parent_node => undef,
+      prefix => 'a',
       value => 'c',
       attributes => undef,
+      previous_sibling => undef,
     },
   },
   cdatasection => {
     node => sub { return $doc->create_cdata_section ('cdatadata') },
     attr_get => {
+      first_child => undef,
+      last_child => undef,
+      local_name => undef,
+      manakai_local_name => undef,
+      namespace_uri => undef,
+      next_sibling => undef,
       node_name => '#cdata-section',
       node_value => 'cdatadata',
+      owner_document => $doc,
+      parent_node => undef,
+      prefix => undef,
       data => 'cdatadata',
       attributes => undef,
+      previous_sibling => undef,
     },
   },
   cdatasectionmde => {
     node => sub { return $doc->create_cdata_section ('cdata]]>data') },
     attr_get => {
+      first_child => undef,
+      last_child => undef,
+      local_name => undef,
+      manakai_local_name => undef,
+      namespace_uri => undef,
+      next_sibling => undef,
       node_name => '#cdata-section',
       node_value => 'cdata]]>data',
+      owner_document => $doc,
+      parent_node => undef,
+      prefix => undef,
       data => 'cdata]]>data',
       attributes => undef,
+      previous_sibling => undef,
     },
   },
   comment => {
     node => sub { return $doc->create_comment ('commentdata') },
     attr_get => {
+      first_child => undef,
+      last_child => undef,
+      local_name => undef,
+      manakai_local_name => undef,
+      namespace_uri => undef,
+      next_sibling => undef,
       node_name => '#comment',
       node_value => 'commentdata',
+      owner_document => $doc,
+      parent_node => undef,
+      prefix => undef,
       data => 'commentdata',
       attributes => undef,
+      previous_sibling => undef,
     },
   },
   commentcom1 => {
     node => sub { return $doc->create_comment ('comment--data') },
     attr_get => {
+      first_child => undef,
+      last_child => undef,
+      local_name => undef,
+      manakai_local_name => undef,
+      namespace_uri => undef,
+      next_sibling => undef,
       node_name => '#comment',
       node_value => 'comment--data',
+      owner_document => $doc,
+      parent_node => undef,
+      prefix => undef,
       data => 'comment--data',
       attributes => undef,
+      previous_sibling => undef,
     },
   },
   commentcom2 => {
     node => sub { return $doc->create_comment ('commentdata-') },
     attr_get => {
+      first_child => undef,
+      last_child => undef,
+      local_name => undef,
+      manakai_local_name => undef,
+      namespace_uri => undef,
+      next_sibling => undef,
       node_name => '#comment',
       node_value => 'commentdata-',
+      owner_document => $doc,
+      parent_node => undef,
+      prefix => undef,
       data => 'commentdata-',
       attributes => undef,
+      previous_sibling => undef,
     },
   },
   document => {
     node => sub { return $doc },
     attr_get => {
       attributes => undef,
+      first_child => undef,
+      implementation => $dom,
+      last_child => undef,
       local_name => undef,
+      manakai_local_name => undef,
       namespace_uri => undef,
+      next_sibling => undef,
       node_name => '#document',
       node_value => undef,
+      owner_document => undef,
       parent_node => undef,
       prefix => undef,
+      previous_sibling => undef,
     },
   },
   document_fragment => {
     node => sub { return $doc->create_document_fragment },
     attr_get => {
       attributes => undef,
+      first_child => undef,
+      last_child => undef,
+      local_name => undef,
+      manakai_local_name => undef,
+      namespace_uri => undef,
+      next_sibling => undef,
       node_name => '#document-fragment',
       node_value => undef,
+      owner_document => $doc,
+      parent_node => undef,
+      prefix => undef,
+      previous_sibling => undef,
     },
   },
   document_type => {
     node => sub { return $doc->implementation->create_document_type ('n') },
     attr_get => {
       attributes => undef,
+      first_child => undef,
+      implementation => $dom,
+      last_child => undef,
+      local_name => undef,
+      manakai_local_name => undef,
+      namespace_uri => undef,
+      next_sibling => undef,
       node_name => 'n',
       node_value => undef,
+      owner_document => undef,
+      parent_node => undef,
+      prefix => undef,
+      previous_sibling => undef,
     },
   },
   document_type_definition => {
     node => sub { return $doc->create_document_type_definition ('n') },
     attr_get => {
       attributes => undef,
+      first_child => undef,
+      implementation => $dom,
+      last_child => undef,
+      local_name => undef,
+      manakai_local_name => undef,
+      namespace_uri => undef,
+      next_sibling => undef,
       node_name => 'n',
       node_value => undef,
+      owner_document => $doc,
+      parent_node => undef,
+      prefix => undef,
+      previous_sibling => undef,
     },
   },
   element => {
     node => sub { return $doc->create_element ('e') },
     attr_get => {
       ## TODO: attributes => 
+      first_child => undef,
+      last_child => undef,
+      local_name => 'e',
+      manakai_local_name => 'e',
+      namespace_uri => undef,
+      next_sibling => undef,
       node_name => 'e',
       node_value => undef,
+      owner_document => $doc,
+      parent_node => undef,
+      prefix => undef,
+      previous_sibling => undef,
     },
   },
   element_ns_default => {
     node => sub { return $doc->create_element_ns ('http://test/', 'f') },
     attr_get => {
       ## TODO: attributes => 
+      first_child => undef,
+      last_child => undef,
+      local_name => 'f',
+      manakai_local_name => 'f',
+      namespace_uri => 'http://test/',
+      next_sibling => undef,
       node_name => 'f',
       node_value => undef,
+      owner_document => $doc,
+      parent_node => undef,
+      prefix => undef,
+      previous_sibling => undef,
     },
   },
   element_ns_prefiexed => {
     node => sub { return $doc->create_element_ns ('http://test/', 'e:f') },
     attr_get => {
       ## TODO: attributes => 
+      first_child => undef,
+      last_child => undef,
+      local_name => 'f',
+      manakai_local_name => 'f',
+      namespace_uri => 'http://test/',
+      next_sibling => undef,
       node_name => 'e:f',
       node_value => undef,
+      owner_document => $doc,
+      parent_node => undef,
+      prefix => 'e',
+      previous_sibling => undef,
     },
   },
   entity => {
     node => sub { return $doc->create_general_entity ('e') },
     attr_get => {
       attributes => undef,
+      first_child => undef,
+      last_child => undef,
+      next_sibling => undef,
       node_name => 'e',
       node_value => undef,
+      owner_document => $doc,
+      parent_node => undef,
+      previous_sibling => undef,
     },
   },
   entity_reference => {
     node => sub { return $doc->create_entity_reference ('e') },
     attr_get => {
       attributes => undef,
+      first_child => undef,
+      last_child => undef,
+      local_name => undef,
+      manakai_local_name => undef,
+      namespace_uri => undef,
+      next_sibling => undef,
       node_name => 'e',
       node_value => undef,
+      owner_document => $doc,
+      parent_node => undef,
+      prefix => undef,
+      previous_sibling => undef,
     },
   },
   notation => {
     node => sub { return $doc->create_notation ('e') },
     attr_get => {
       attributes => undef,
+      first_child => undef,
+      last_child => undef,
+      local_name => undef,
+      manakai_local_name => undef,
+      namespace_uri => undef,
+      next_sibling => undef,
       node_name => 'e',
       node_value => undef,
+      owner_document => $doc,
+      parent_node => undef,
+      prefix => undef,
+      previous_sibling => undef,
     },
   },
   processing_instruction => {
     node => sub { return $doc->create_processing_instruction ('t', 'd') },
     attr_get => {
       attributes => undef,
+      first_child => undef,
+      last_child => undef,
+      local_name => undef,
+      manakai_local_name => undef,
+      namespace_uri => undef,
+      next_sibling => undef,
       node_name => 't',
       node_value => 'd',
+      owner_document => $doc,
+      parent_node => undef,
+      prefix => undef,
+      previous_sibling => undef,
     },
   },
   text => {
     node => sub { return $doc->create_text_node ('textdata') },
     attr_get => {
       attributes => undef,
+      first_child => undef,
+      last_child => undef,
+      local_name => undef,
+      manakai_local_name => undef,
+      namespace_uri => undef,
+      next_sibling => undef,
       node_name => '#text',
       node_value => 'textdata',
+      owner_document => $doc,
+      parent_node => undef,
+      prefix => undef,
+      previous_sibling => undef,
     },
   },
   element_type_definition => {
     node => sub { return $doc->create_element_type_definition ('e') },
     attr_get => {
       attributes => undef,
+      first_child => undef,
+      last_child => undef,
+      local_name => undef,
+      manakai_local_name => undef,
+      namespace_uri => undef,
+      next_sibling => undef,
       node_name => 'e',
       node_value => undef,
+      owner_document => $doc,
+      parent_node => undef,
+      prefix => undef,
+      previous_sibling => undef,
     },
   },
   attribute_definition => {
     node => sub { return $doc->create_attribute_definition ('e') },
     attr_get => {
       attributes => undef,
+      first_child => undef,
+      last_child => undef,
+      local_name => undef,
+      manakai_local_name => undef,
+      namespace_uri => undef,
+      next_sibling => undef,
       node_name => 'e',
       node_value => undef,
+      owner_document => $doc,
+      parent_node => undef,
+      prefix => undef,
+      previous_sibling => undef,
     },
   },
 };
@@ -250,5 +465,83 @@ for my $test_id (sort {$a cmp $b} keys %$tests) {
   }
 }
 
+## Child node accessors' tests
+for my $parent (create_parent_nodes ()) {
+  my $node1;
+  my $node2;
+  my $node3;
+  if ($parent->node_type == $parent->DOCUMENT_TYPE_NODE) {
+    $node1 = $doc->create_processing_instruction ('pi1', 'data1');
+    $node2 = $doc->create_processing_instruction ('pi2', 'data2');
+    $node3 = $doc->create_processing_instruction ('pi3', 'data3');
+  } elsif ($parent->node_type == $parent->DOCUMENT_NODE) {
+    $node1 = $doc->create_comment ('comment1');
+    $node2 = $doc->create_comment ('comment2');
+    $node3 = $doc->create_comment ('comment3');
+  } else {
+    $node1 = $doc->create_text_node ('text1');
+    $node2 = $doc->create_text_node ('text2');
+    $node3 = $doc->create_text_node ('text3');
+  }
+
+  $parent->append_child ($node1);
+  ok $parent->first_child, $node1, $parent->node_name."->first_child [1]";
+  ok $parent->last_child, $node1, $parent->node_name."->last_child [1]";
+  ok $node1->next_sibling, undef, $parent->node_name."->next_sibling [1]";
+  ok $node1->previous_sibling, undef, $parent->node_name."->previous_sibling [1]";
+
+  $parent->append_child ($node2);
+  ok $parent->first_child, $node1, $parent->node_name."->first_child [2]";
+  ok $parent->last_child, $node2, $parent->node_name."->last_child [2]";
+  ok $node1->next_sibling, $node2, $parent->node_name."1->next_sibling [2]";
+  ok $node1->previous_sibling, undef, $parent->node_name."1->previous_sibling [2]";
+  ok $node2->next_sibling, undef, $parent->node_name."2->next_sibling [2]";
+  ok $node2->previous_sibling, $node1, $parent->node_name."2->previous_sibling [2]";
+
+  $parent->append_child ($node3);
+  ok $parent->first_child, $node1, $parent->node_name."->first_child [3]";
+  ok $parent->last_child, $node3, $parent->node_name."->last_child [3]";
+  ok $node1->next_sibling, $node2, $parent->node_name."1->next_sibling [3]";
+  ok $node1->previous_sibling, undef, $parent->node_name."1->previous_sibling [3]";
+  ok $node2->next_sibling, $node3, $parent->node_name."2->next_sibling [3]";
+  ok $node2->previous_sibling, $node1, $parent->node_name."2->previous_sibling [3]";
+  ok $node3->next_sibling, undef, $parent->node_name."3->next_sibling [3]";
+  ok $node3->previous_sibling, $node2, $parent->node_name."3->previous_sibling [3]";
+}
+
+## TODO: parent_node tests, as with append_child tests
+
+sub create_nodes () {
+  (
+   $doc->create_attribute ('attr1'),
+   $doc->create_attribute_definition ('at1'),
+   $doc->create_cdata_section ('cdata1'),
+   $doc->create_comment ('comment1'),
+   $doc->create_element ('element1'),
+   $doc->create_element_type_definition ('et1'),
+   $doc->create_general_entity ('entity1'),
+   $doc->create_entity_reference ('entity-reference1'),
+   $doc->implementation->create_document,
+   $doc->create_document_fragment,
+   $doc->create_document_type_definition ('dt1'),
+   $doc->create_notation ('notation1'),
+   $doc->create_processing_instruction ('pi1', 'pi1data'),
+   $doc->create_text_node ('text1'),
+  );
+} # create_nodes
+
+sub create_parent_nodes () {
+  (
+   $doc->create_attribute ('attr1'),
+   $doc->create_attribute_definition ('at1'),
+   $doc->create_element ('element1'),
+   $doc->create_general_entity ('entity1'),
+   $doc->create_entity_reference ('entity-reference1'),
+   $doc->implementation->create_document,
+   $doc->create_document_fragment,
+   $doc->create_document_type_definition ('dt1'),
+  );
+} # create_parent_nodes
+
 ## License: Public Domain.
-## $Date: 2007/06/15 14:32:50 $
+## $Date: 2007/06/15 16:12:28 $

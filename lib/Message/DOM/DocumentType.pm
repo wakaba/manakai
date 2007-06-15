@@ -1,14 +1,10 @@
 package Message::DOM::DocumentType;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::DocumentType',
     'Message::IF::DocumentTypeDefinition',
     'Message::IF::DocumentTypeDeclaration';
 require Message::DOM::Node;
-
-## Spec:
-## <http://suika.fam.cx/gate/2005/sw/DocumentTypeDefinition>
-## <http://suika.fam.cx/gate/2005/sw/DocumentTypeDeclaration>
 
 sub ____new ($$$$) {
   my $self = shift->SUPER::____new (shift);
@@ -59,19 +55,25 @@ sub name ($);
 
 ## The |Node| interface - attribute
 
-## Spec:
-## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-F68D095>
-## Modified: <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061>
+## NOTE: A manakai extension
+sub implementation ($) {
+  my $self = shift;
+  if (defined $$self->{implementation}) {
+    return $$self->{implementation};
+  } elsif (defined $$self->{owner_document}) {
+    local $Error::Depth = $Error::Depth + 1;
+    return $$self->{owner_document}->implementation;
+  } else {
+    die "DocumentType with no implementation, no owner_document";
+  }
+} # implementation
 
 ## The document type name [DOM1, DOM2].
-## Same as |DocumentType.nam| [DOM3].
+## Same as |DocumentType.name| [DOM3].
 
 *node_name = \&name;
 
-## Spec:
-## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-111237558>
-
-sub node_type ($) { 10 } # DOCUMENT_TYPE_NODE
+sub node_type { 10 } # DOCUMENT_TYPE_NODE
 
 package Message::IF::DocumentType;
 package Message::IF::DocumentTypeDefinition;
@@ -94,4 +96,4 @@ sub create_document_type_definition ($$) {
 
 1;
 ## License: <http://suika.fam.cx/~wakaba/archive/2004/8/18/license#Perl+MPL>
-## $Date: 2007/06/15 14:32:50 $
+## $Date: 2007/06/15 16:12:28 $
