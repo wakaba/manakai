@@ -1,6 +1,6 @@
 package Message::DOM::Attr;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::Attr';
 require Message::DOM::Node;
 
@@ -11,6 +11,7 @@ sub ____new ($$$$$$) {
    $$self->{prefix},
    $$self->{local_name}) = @_;
   Scalar::Util::weaken ($$self->{owner_element});
+  $$self->{child_nodes} = [];
   return $self;
 } # ____new
              
@@ -122,4 +123,4 @@ sub create_attribute_ns ($$$) {
 
 1;
 ## License: <http://suika.fam.cx/~wakaba/archive/2004/8/18/license#Perl+MPL>
-## $Date: 2007/06/15 16:12:28 $
+## $Date: 2007/06/16 08:05:48 $

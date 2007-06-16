@@ -1,6 +1,6 @@
 package Message::DOM::ProcessingInstruction;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::ProcessingInstruction';
 require Message::DOM::Node;
 
@@ -57,9 +57,10 @@ sub data ($);
 
 ## The |Node| interface - attribute
 
-## Spec:
-## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-F68D095>
-## Modified: <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061>
+sub child_nodes ($) {
+  require Message::DOM::NodeList;
+  return bless \\($_[0]), 'Message::DOM::NodeList::EmptyNodeList';
+} # child_nodes
 
 ## The target of the processing instruction [DOM1, DOM2].
 ## Same as |ProcessingInstruction.target| [DOM3].
@@ -95,4 +96,4 @@ sub create_processing_instruction ($$$) {
 
 1;
 ## License: <http://suika.fam.cx/~wakaba/archive/2004/8/18/license#Perl+MPL>
-## $Date: 2007/06/15 14:32:50 $
+## $Date: 2007/06/16 08:05:48 $

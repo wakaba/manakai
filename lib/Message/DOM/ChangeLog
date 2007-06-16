@@ -1,5 +1,24 @@
 2007-06-16  Wakaba  <wakaba@suika.fam.cx>
 
+	* Attr.pm, AttributeDefinition.pm, DocumentFragment.pm,
+	DocumentType.pm, Entity.pm,
+	EntityReference.pm (____new): Initialize |child_nodes| by an empty list.
+
+	* Node.pm, DOMCharacterData.pm, ElementTypeDefinition.pm,
+	Notation.pm, ProcessingInstruction.pm (child_nodes): Implemetned.
+
+	* DOMDocument.pm (AUTOLOAD): Typo fixed.
+
+	* Node.pm (==, !=): Implemented.
+	(manakai_read_only): Implemented.
+	(is_same_node): Implemented.
+	(is_equal_node): Alpha version.
+	(manakai_set_read_only): Alpha version.
+	(child_nodes, first_child, last_child, previous_sibling): Duplicate
+	definitions are removed.
+
+2007-06-16  Wakaba  <wakaba@suika.fam.cx>
+
 	* Node.pm: First alpha version of implementation of attributes.
 
 2007-06-15  Wakaba  <wakaba@suika.fam.cx>

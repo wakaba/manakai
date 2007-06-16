@@ -1,6 +1,6 @@
 package Message::DOM::ElementTypeDefinition;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::ElementTypeDefinition';
 require Message::DOM::Node;
 
@@ -54,9 +54,10 @@ sub AUTOLOAD {
 
 ## The |Node| interface - attribute
 
-## Spec:
-## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-F68D095>
-## <http://suika.fam.cx/gate/2005/sw/ElementTypeDefinition>
+sub child_nodes ($) {
+  require Message::DOM::NodeList;
+  return bless \\($_[0]), 'Message::DOM::NodeList::EmptyNodeList';
+} # child_nodes
 
 sub node_name ($); # read-only trivial accessor
 
@@ -78,4 +79,4 @@ sub create_element_type_definition ($$) {
 
 1;
 ## License: <http://suika.fam.cx/~wakaba/archive/2004/8/18/license#Perl+MPL>
-## $Date: 2007/06/15 14:32:50 $
+## $Date: 2007/06/16 08:05:48 $

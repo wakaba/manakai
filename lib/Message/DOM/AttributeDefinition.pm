@@ -1,6 +1,6 @@
 package Message::DOM::AttributeDefinition;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::AttributeDefinition';
 require Message::DOM::Node;
 
@@ -10,6 +10,7 @@ require Message::DOM::Node;
 sub ____new ($$$) {
   my $self = shift->SUPER::____new (shift);
   $$self->{node_name} = $_[0];
+  $$self->{child_nodes} = [];
   return $self;
 } # ____new
              
@@ -83,4 +84,4 @@ sub create_attribute_definition ($$) {
 
 1;
 ## License: <http://suika.fam.cx/~wakaba/archive/2004/8/18/license#Perl+MPL>
-## $Date: 2007/06/15 14:32:50 $
+## $Date: 2007/06/16 08:05:48 $

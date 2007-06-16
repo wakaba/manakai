@@ -1,16 +1,41 @@
 package Message::DOM::Node;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::IF::Node';
 require Scalar::Util;
+
+## NOTE:
+##   Node
+##   + Attr (2)
+##   + AttributeDefinition (81002)
+##   + CharacterData
+##     + Comment (8)
+##     + Text (3)
+##       + CDATASection (4)
+##   + Document (9)
+##   + DocumentFragment (11)
+##   + DocumentType (10)
+##   + Element (1)
+##   + ElementTypeDefinition (81001)
+##   + Entity (6)
+##   + EntityReference (5)
+##   + Notation (12)
+##   + ProcessingInstruction (7)
+
+use overload
+    '==' => sub {
+      return 0 unless UNIVERSAL::isa ($_[0], 'Message::IF::Node');
+      ## TODO: implement is_equal_node
+      return $_[0]->is_equal_node ($_[1]);
+    },
+    '!=' => sub {
+      return not ($_[0] == $_[1]);
+    },
+    fallback => 1;
 
 ## The |Node| interface - constants
 
 ## Definition group NodeType
-
-## Spec: 
-## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061>
-## <http://suika.fam.cx/gate/2005/sw/manakai/DOM%20Extensions#anchor-23>
 
 ## NOTE: Numeric codes up to 200 are reserved by W3C [DOM1SE, DOM2, DOM3].
 
@@ -57,6 +82,7 @@ sub AUTOLOAD {
     ## Read-only attributes (trivial accessors)
     owner_document => 1,
     parent_node => 1,
+    manakai_read_only => 1,
   }->{$method_name}) {
     no strict 'refs';
     eval qq{
@@ -93,10 +119,9 @@ sub attributes ($) {
 
 ## TODO: baseURI
 
-## TODO: childNodes
 sub child_nodes ($) {
-  my $self = shift;
-  return $$self->{child_nodes} || [];
+  require Message::DOM::NodeList;
+  return bless \\($_[0]), 'Message::DOM::NodeList::ChildNodeList';
 } # child_nodes
 
 sub first_child ($) {
@@ -168,14 +193,22 @@ sub previous_sibling ($) {
   return undef;
 } # previous_sibling
 
+sub manakai_read_only ($);
+
 sub text_content ($;$) {
   ## TODO: 
 } # text_content
 
-sub is_equal_node ($$) {
-  return shift eq shift;
-} # is_equal_node
+## TODO:
+sub is_same_node ($$) {
+  return $_[0] eq $_[1];
+} # is_same_node
 
+## TODO:
+sub is_equal_node ($$) {
+  return $_[0]->node_name eq $_[1]->node_name &&
+    $_[0]->node_value eq $_[1]->node_value;
+} # is_equal_node
 
 sub manakai_parent_element ($) {
   my $self = shift;
@@ -189,11 +222,6 @@ sub manakai_parent_element ($) {
   }
   return undef;
 } # manakai_parent_element
-
-sub child_nodes ($) {
-  ## TODO: NodeList
-  return ${+shift}->{child_nodes} || [];
-} # child_nodes
 
 ## NOTE: Only applied to Elements and Documents
 sub append_child ($$) {
@@ -256,36 +284,22 @@ sub has_child_nodes ($) {
   return @{${+shift}->{child_nodes}} > 0;
 } # has_child_nodes
 
-## NOTE: Only applied to Elements and Documents
-sub first_child ($) {
-  my $self = shift;
-  return $$self->{child_nodes}->[0];
-} # first_child
-
-## NOTE: Only applied to Elements and Documents
-sub last_child ($) {
-  my $self = shift;
-  return @{$$self->{child_nodes}} ? $$self->{child_nodes}->[-1] : undef;
-} # last_child
-
-## NOTE: Only applied to Elements and Documents
-sub previous_sibling ($) {
-  my $self = shift;
-  my $parent = $$self->{parent_node};
-  return undef unless defined $parent;
-  my $r;
-  for (@{$$parent->{child_nodes}}) {
-    if ($_ eq $self) {
-      return $r;
-    } else {
-      $r = $_;
-    }
-  }
-  return undef;
-} # previous_sibling
+sub manakai_set_read_only ($;$$) {
+  my ($self, $value, $deep) = @_;
+  ## TODO: deep
+  $$self->{manakai_read_only} = $value;
+} # manakai_set_read_only
 
 package Message::IF::Node;
 
+=head1 LICENSE
+
+Copyright 2007 Wakaba <w@suika.fam.cx>
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut
+
 1;
-## License: <http://suika.fam.cx/~wakaba/archive/2004/8/18/license#Perl+MPL>
-## $Date: 2007/06/15 16:12:28 $
+## $Date: 2007/06/16 08:05:48 $

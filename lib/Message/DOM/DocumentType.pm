@@ -1,6 +1,6 @@
 package Message::DOM::DocumentType;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::DocumentType',
     'Message::IF::DocumentTypeDefinition',
     'Message::IF::DocumentTypeDeclaration';
@@ -10,6 +10,7 @@ sub ____new ($$$$) {
   my $self = shift->SUPER::____new (shift);
   $$self->{implementation} = $_[0] if defined $_[0];
   $$self->{name} = $_[1];
+  $$self->{child_nodes} = [];
   return $self;
 } # ____new
              
@@ -96,4 +97,4 @@ sub create_document_type_definition ($$) {
 
 1;
 ## License: <http://suika.fam.cx/~wakaba/archive/2004/8/18/license#Perl+MPL>
-## $Date: 2007/06/15 16:12:28 $
+## $Date: 2007/06/16 08:05:48 $

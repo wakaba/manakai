@@ -1,11 +1,8 @@
 package Message::DOM::Notation;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::Notation';
 require Message::DOM::Node;
-
-## Spec:
-## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-5431D1B9>
 
 sub ____new ($$$) {
   my $self = shift->SUPER::____new (shift);
@@ -58,28 +55,31 @@ sub system_id ($;$);
 
 ## The |Node| interface - attribute
 
-## Spec:
-## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-F68D095>
-## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1950641247>
+sub child_nodes ($) {
+  require Message::DOM::NodeList;
+  return bless \\($_[0]), 'Message::DOM::NodeList::EmptyNodeList';
+} # child_nodes
 
 sub node_name ($); # read-only trivial accessor
 
-## Spec:
-## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-111237558>
-
-sub node_type ($) { 12 } # NOTATION_NODE
+sub node_type () { 12 } # NOTATION_NODE
 
 package Message::IF::Notation;
 
 package Message::DOM::Document;
 
-## Spec: 
-## <http://suika.fam.cx/gate/2005/sw/DocumentXDoctype>
-
 sub create_notation ($$) {
   return Message::DOM::Notation->____new (@_[0, 1]);
 } # create_notation
 
+=head1 LICENSE
+
+Copyright 2007 Wakaba <w@suika.fam.cx>
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut
+
 1;
-## License: <http://suika.fam.cx/~wakaba/archive/2004/8/18/license#Perl+MPL>
-## $Date: 2007/06/15 14:32:50 $
+## $Date: 2007/06/16 08:05:48 $

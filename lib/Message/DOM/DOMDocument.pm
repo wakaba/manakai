@@ -2,7 +2,7 @@
 
 package Message::DOM::Document;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::Document',
     'Message::IF::DocumentXDoctype';
 require Message::DOM::Node;
@@ -60,7 +60,7 @@ sub AUTOLOAD {
     create_cdata_section => 'Message::DOM::CDATASection',
     create_comment => 'Message::DOM::Comment',
     create_document_fragment => 'Message::DOM::DocumentFragment',
-    create_document_type_definition => 'Message::DOM::DocumentTypeDefinition',
+    create_document_type_definition => 'Message::DOM::DocumentType',
     create_element => 'Message::DOM::DOMElement', ## TODO: change module name
     create_element_ns => 'Message::DOM::DOMElement', ## TODO: change module name
     create_element_type_definition => 'Message::DOM::ElementTypeDefinition',
@@ -151,4 +151,4 @@ sub create_document ($;$$$) {
 
 1;
 ## License: <http://suika.fam.cx/~wakaba/archive/2004/8/18/license#Perl+MPL>
-## $Date: 2007/06/15 14:32:50 $
+## $Date: 2007/06/16 08:05:48 $
