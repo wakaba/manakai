@@ -1,21 +1,6 @@
-
-=head1 NAME
-
-Message::Util::Error --- manakai: Common error handler wrapper
-
-=head1 DESCRIPTION
-
-This module provides common error handler (error reporting wrapper
-module).  With this module, flexible error reporting method
-can be easily implemented.
-
-This module is part of manakai.
-
-=cut
-
 package Message::Util::Error;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.12 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.13 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 use Error;
 push our @ISA, 'Error';
 our $DEBUG;
@@ -33,8 +18,8 @@ sub import {
 
 sub ___error_def () {+{
  UNKNOWN => {
-             description => '"%name;": Unknown error',
-             level       => 'fatal',
+             -code => 0,
+             -description => '"%name;": Unknown error',
             },
 }}
 
@@ -57,6 +42,7 @@ sub ___get_error_def ($$) {
 sub new ($;%) {
   my $class = shift;
   my %opt = @_;
+  die qq(Error type is not specified) unless defined $opt{-type};
   $opt{-def} = $class->___get_error_def ($opt{-type})
             || $class->___get_error_def ('UNKNOWN')
             or die qq(Error definition for "$opt{-type}" not found);
@@ -77,9 +63,46 @@ sub new ($;%) {
 
 sub text {
   my $self = shift;
-  $self->_FORMATTER_PACKAGE_->new
-       ->replace ($self->{-def}->{description}, param => $self);
-}
+  my $template;
+  if (defined $self->{-subtype}) {
+    my $subtype_def = $self->{-def}->{-subtype}->{$self->{-subtype}};
+    if (defined $subtype_def) {
+      $template = $subtype_def->{-description};
+    }
+  }
+  unless (defined $template) {
+    $template = $self->{-def}->{-description};
+  }
+  unless (defined $template) {
+    return $self->SUPER::text;
+  }
+  return $self->_FORMATTER_PACKAGE_->new->replace ($template, param => $self);
+} # text
+
+sub value ($) {
+  my $self = shift;
+  if (defined $self->{-def}->{-code}) {
+    return $self->{-def}->{-code};
+  } else {
+    return $self->SUPER::value;
+  }
+} # value
+
+sub code ($) {
+  return shift->{-def}->{-code} || 0;
+} # code
+
+sub type ($) {
+  return shift->{-type};
+} # type
+
+sub subtype ($) {
+  return shift->{-subtype};
+} # subtype
+
+sub type_def ($) {
+  return shift->{-def};
+} # type_def
 
 sub stringify {
   my $self = shift;
@@ -125,53 +148,7 @@ sub throw ($@) {
 ## Disables since Error::associate makes looping reference
 sub associate {}
 
-=head1 ERROR MESSAGE CONSTRUCTING
-
-Human readable error message text, returned by C<text> method,
-is generated from C<description> parameter of error definition.
-
-Format defined by L<Message::Util::Formatter> is used to specify
-C<description> parameter and it is processed by the formatter.
-
-=over 4
-
-=item sub ERROR_SUBCLASS::_FORMATTER_PACKAGE_ { return $class_name }
-
-Subclass can define C<_FORMATTER_PACKAGE_> method
-to define class name of the formatter.  Defaulted to
-C<Message::Util::Error::formatter>.
-
-Unless you wish to use additional rules in template text 
-(C<description> parameter), you don't need to define this
-method in your subclass.
-
-Class returned by this method MUST be a subclass (descender class) of
-C<Message::Util::Formatter::Base>.
-
-=cut
-
 sub _FORMATTER_PACKAGE_ () { 'Message::Util::Error::formatter' }
-
-=back
-
-=head2 Formatter Message::Util::Error::formatter
-
-In addition to rules defined in C<Message::Util::Formatter::Text>,
-formatter C<Message::Util::Error::formatter> defines some rules:
-
-=over 4
-
-=item %name;
-
-Error type name (C<-type> parameter specified when error is thrown)
-
-=item %t (name => parameter-name);
-
-Parameter value specified when error is thrown
-
-=back
-
-=cut
 
 package Message::Util::Error::formatter;
 use Message::Util::Formatter::Text;
@@ -217,87 +194,13 @@ sub ___rule_def () {+{
   },
 }}
 
-=head1 EXAMPLE
-
-To make a new error class:
-
-  package SomeExceptionClass;
-  use Message::Util::Error;
-  push our @ISA, 'Message::Util::Error';
-  
-  ## [REQUIRED] Error types
-  sub ___error_def {
-    ## Returns a reference to hash defining error type
-    return {
-      ERROR_NAME => {
-        description => q(%name;: %t (name => what); is bad),
-        level => 'fatal',
-        ...
-      },
-      WARNING_NAME => {
-        description => q(%name;: %t (name => what); might be bad),
-        level => 'warn',
-        ...
-      },
-      ...
-    };
-  }
-  
-  ## [OPTIONAL] Package name of formatter constructing error message
-  ##            (Default: Message::Util::Error::formatter)
-  sub _FORMATTER_PACKAGE_ () { 'SomeFormatterClass' }
-
-Throwing exception:
-
-  use SomeExceptionClass;
-  ...
-  do something;
-  ...
-  throw SomeExceptionClass -type => 'ERROR_NAME',
-                           what => 'Example';
-
-If you implements an object-oriented class:
-
-  package SomeModule;
-  use SomeExceptionClass;
-  
-  sub some_method {
-    my $self = shift;
-    ...
-    report SomeExceptionClass
-      -type => 'ERROR_NAME',
-      what => 'Non-oo programing',
-      -object => $self, method => 'some_method'
-        unless $oo;
-    ...
-    report SomeExceptionClass
-      -type => 'WARNING_NAME',
-      what => 'This module',
-      -object => $self, method => 'some_method';
-    ...
-  }
-  
-  ## If you use "report", you must implements this internal method
-  sub ___report_error ($$;%) {
-    my ($self, $err, %option) = @_;
-    ## Throwing if fatal
-    if ($err->{def}->{level} eq 'fatal') {
-      $err->throw;
-      print "This text never printed";
-    ## Otherwise warning only
-    } else {
-      warn $err->stringify;
-      print "This text IS printed";
-    }
-  }
-
 =head1 LICENSE
 
-Copyright 2003-2005 Wakaba <w@suika.fam.cx>
+Copyright 2003-2007 Wakaba <w@suika.fam.cx>
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2005/11/23 11:21:39 $
+1; # $Date: 2007/06/16 05:30:37 $

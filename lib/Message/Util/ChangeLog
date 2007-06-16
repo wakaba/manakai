@@ -1,3 +1,15 @@
+2007-06-16  Wakaba  <wakaba@suika.fam.cx>
+
+	* Error.pod: New documentation, split from |Error.pm|.
+
+	* Error.pm: Documentations are removed.
+	(new): |die| if |-type| option is not specified.
+	(text, value, type): Do what |Message::Util::Error::DOMException| does,
+	with some modification for compatibility with |Error| and 
+	new naming convention for error type/subtype definitions.
+	(code): New method.
+	(subtype, type_def): New methods.
+
 2006-12-31  Wakaba  <wakaba@suika.fam.cx>
 
 	* DIS.dis: Support for |for| is entirely removed.  |forArg|

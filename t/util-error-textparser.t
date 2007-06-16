@@ -1,3 +1,4 @@
+#!/usr/bin/perl
 use strict;
 use Message::Util::Error;
 
@@ -37,18 +38,18 @@ sub ___report_error ($$) {
 
 sub ___error_def () {+{
   ERROR_1 => {
-    description => q(%err-line;-%err-char;),
+    -description => q(%err-line;-%err-char;),
   },
 }}
 }
 
 =head1 LICENSE
 
-Copyright 2003 Wakaba <w@suika.fam.cx>
+Copyright 2003-2007 Wakaba <w@suika.fam.cx>
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2003/12/26 07:09:42 $
+1; # $Date: 2007/06/16 05:30:37 $

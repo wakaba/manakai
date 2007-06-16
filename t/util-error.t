@@ -2,7 +2,7 @@
 use strict;
 use Message::Util::Error;
 use Test;
-plan tests => 11;
+plan tests => 25;
 
 try {
   throw Message::Util::Error -type => 'SOMETHING_UNKNOWN';
@@ -26,19 +26,55 @@ try {
   ok $err->text, qq(Param1 "VAL1"; Param2 "VAL2");
 };
 
+try {
+  throw test_error -type => 'error_with_code';
+} catch test_error with {
+  my $err = shift;
+  ok $err->code, 128, "error_with_code->code";
+  ok $err->value, 128, "error_with_code->value";
+  ok 0+$err->value, 128, "0+error_with_code";
+  ok $err->text, "error", "error_with_code->text";
+  ok $err->type, "error_with_code", "error_with_code->type";
+  ok $err->subtype, undef, "error_with_code->subtype";
+  ok $err->type_def->{-description}, "error", "error_with_code->type_def";
+};
+
+try {
+  throw test_error -type => 'error_with_code', -subtype => 'suberror';
+} catch test_error with {
+  my $err = shift;
+  ok $err->code, 128, "error_with_code->code";
+  ok $err->value, 128, "error_with_code->value";
+  ok 0+$err->value, 128, "0+error_with_code";
+  ok $err->text, "suberror", "error_with_code->text";
+  ok $err->type, "error_with_code", "error_with_code->type";
+  ok $err->subtype, "suberror", "error_with_code->subtype";
+  ok $err->type_def->{-description}, "error", "error_with_code->type_def";
+};
+
 package test_error;
 BEGIN {
 our @ISA = 'Message::Util::Error';
 }
 sub ___error_def () {+{
   ERR1 => {
-    description => q(Param1 "%t(name=>param1);"; Param2 "%t(name=>param2);"),
+    -description => q(Param1 "%t(name=>param1);"; Param2 "%t(name=>param2);"),
   },
   fatal => {
-    description => q(fatal error),
+    -description => q(fatal error),
   },
   warn => {
-    description => q(warn msg),
+    -description => q(warn msg),
+  },
+  error_with_code => {
+    -code => 128,
+    -description => q(error),
+    -subtype => {
+      suberror => {
+        -description => q(suberror),
+        -code => 100,
+      },
+    },
   },
 }}
 
@@ -155,3 +191,14 @@ try {
   my $err = shift;
   ok $err->file, "main";
 };
+
+=head1 LICENSE
+
+Copyright 2003-2007 Wakaba <w@suika.fam.cx>
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut
+
+1; # $Date: 2007/06/16 05:30:37 $

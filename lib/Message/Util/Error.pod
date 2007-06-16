@@ -1,0 +1,493 @@
+=head1 NAME
+
+Message::Util::Error - manakai's Common Error Handling Module
+
+=head1 SYNOPSIS
+
+If you want to catch an exception, whose class
+is I<YourExceptionClass>, throwed by a class I<YourClass>:
+
+  use YourClass;
+  use Message::Util::Error;
+  
+  my $obj = YourClass->new;
+  
+  try {
+    $obj->method_that_throw_an_eception;
+  } catch YourExceptionClass with {
+    my $err = shift;
+    if ($err->type eq 'NOT_SUPPORTED_ERR') {
+      $err->throw; # die unless catched by upper-level |try| clause (if any)
+    } else {
+      warn $err;
+    }
+  };
+
+If you want to build a class I<YourClass> that
+throws an exception based on C<Message::Util::Error>:
+
+  package YourClass;
+  
+  sub method_that_throw_an_exception ($) {
+    my $self = shift;
+    report YourExceptionClass
+        -object => $self,
+        -type => 'EXAMPLE_ERR',
+        -subtype => 'EXAMPLE_SPECIFIC_ERR';
+  } # method_that_throw_an_exception
+  
+  ## |report| calls back this method.  If this method |throw|s
+  ## the exception, then it is really thrown.
+  sub ___report_error ($$) {
+    my ($self, $err) = @_;
+    if ($err->type_def->{level} eq 'warning') {
+      warn $err;
+    } else {
+      $err->throw;
+    }
+  } # ___report_error
+  
+  package YourExceptionClass;
+  use Message::Util::Error;
+  push our @ISA, 'Message::Util::Error';
+  
+  sub ___error_def () {
+    return {
+      EXAMPLE_ERR => {
+        -description => q<An example error condition>,
+        -subtype => {
+          EXAMPLE_SPECIFIC_ERR => {
+            -description => q<A specific example error condition>,
+          },
+        },
+        level => 'fatal',
+      },
+    };
+  } # ___error_def
+
+=head1 DESCRIPTION
+
+Various manakai classes throws exceptions, in particular
+C<DOMException>s in DOM implementation classes.  In addition,
+it might report other kinds of errors, such as C<DOMError>
+as defined in DOM Level 3 Core specification.  This module,
+C<Message::Util::Error>, provides an integrated framework
+for reporting exceptions, errors, warnings, and so on.
+
+The C<Message::Util::Error> exception framework is built on
+the top of the Perl module C<Error>, which apply to Perl scripts
+the C<try> and C<catch> functionalities.  Exceptions
+thrown using C<Message::Util::Error> exception framework
+are also able to be catched by the C<catch> clause as in
+the original C<Error> module.  For more information on
+usage for C<try>, C<catch>, and other clauses, see
+the documentatin for the C<Error> module.  This document
+describes some C<Message::Util::Error>-specific conventions,
+mainly targeted for manakai module authors.
+
+For other usages of the framework, such as C<DOMError>,
+see documentation for each module.
+
+This module is part of manakai.
+
+=head1 ACCESSING ERROR INFORMATION
+
+=head2 Loading C<try> and C<catch> Support
+
+If you'd like to use C<try> and C<catch> clauses, you
+have to import these names by:
+
+  use Message::Util::Error;
+
+Note that the example above is equivalent to:
+
+  use Error qw(:try);
+
+except that in the former example C<Message::Util::Error>
+module is also loaded if not yet.
+
+=head2 Methods on Error Objects
+
+I<Any method defined on an C<Error> object is also available>
+for C<Message::Util::Error> objects with the same semantics
+(though some might be overridden).  In addition,
+a few methods are added for C<Message::Util::Error> objects.
+
+=over 4
+
+=item I<$code> = I<$err>->code;
+
+Returns the code of the error.
+
+If the definition for the error type has a code associated,
+then it is returned.  Otherwise, C<0> is returned.
+
+This method is added for DOM compatibility.
+
+=item I<$subtype> = I<$err>->subtype;
+
+Returns the subtype of the error, if specified when the
+error object is created, or C<undef> otherwise.
+
+=item I<$text> = I<$err>->text;
+
+Returns the text of the error.
+
+I<This method is defined in C<Error> module but overridden.>
+If the definition for the error subtype, if any, has a description,
+then it is returned.  Otherwise, if the definition for the error type
+has a description, then it is returned.  Otherwise, 
+same as C<Error>'s definition, i.e. the text specified
+when the C<Error> object is created, if any, or C<undef> otherwise,
+is returned.
+
+=item I<$text> = I<$err>->type;
+
+Returns the type of the error specified when the error is created.
+
+=item I<$def> = I<$err>->type_def;
+
+Returns the definition for the error type, if any, 
+or the definition for the C<UNKNOWN> type, otherwise.
+For the content of the error type definition,
+see L</Error Type Definitions>.  Applications
+MUST NOT modify the error type definition.  If modified
+then the result is undefined and it might make the error handling
+behaviour inconsistent or incorrect.
+
+=item I<$value> = I<$err>->value; I<$value> = 0+I<$err>;
+
+Returns the value that can be associated with the error.
+
+I<This method is defined in C<Error> module but overridden.>
+If the definition for the error type has a code associated,
+then it is returned.  Otherwise, 
+same as C<Error>'s definition, i.e. the value specified
+when the C<Error> object is created, if any, or C<undef> otherwise,
+is returned.
+
+=back
+
+=head1 THROWING ERRORS
+
+@@
+
+1. Define an error class.
+
+2. Define the C<___report_error> method to the class
+whose methods will report errors.  (REQUIRED
+if you use C<report>.)
+
+3. Define an error message template class.  (REQUIRED
+if you want to extend the error message parameter set.)
+
+4. Put C<report> or C<throw> where you want to report
+or throw an error.
+
+5. Ensure the error class is loaded when any statement
+added by Step 4 is executed.
+
+=head2 Error Classes
+
+@@
+
+=head2 Error Type Definitions
+
+@@
+
+Error type:
+
+=over 4
+
+=item -code
+
+Numeric error code for the type.  If specified,
+it MUST be a number.
+
+=item -description
+
+A template that is used to create the description
+for an error with that type.
+@@ See @@ for template syntax.
+
+=item -subtype
+
+A reference to hash that contains pairs of 
+error subtype nams and error subtype definitions.
+It MAY contain zero or more error subtypes.
+
+=back
+
+Error subtype:
+
+=over 4
+
+=item -description
+
+A template that is used to create the description
+for an error with that subtype.
+@@ See @@ for template syntax.
+
+=back
+
+Any other value starts with C<-> is reserved for future extension
+and MUST NOT be used for any purpose until it is eventually defined.
+Values I<not> start with C<-> MAY be used for subclass-specific
+error type/subtype properties.
+
+=head2 Throwing an Error
+
+@@
+
+=over 4
+
+=item -def (MUST NOT be specified)
+
+The definition for the error type.  
+
+This parameter MUST NOT be specified when a 
+C<Message::Util::Error> object is created.
+It will be supplied by the constructor of the error object.
+If any value is specified, it will be ignored.
+
+If no definition for the error type is found,
+then the definition for the C<UNKNOWN> type is used;
+if there is no such definition, then the error constructor
+C<die>s.
+
+=item -file (MUST NOT be specified)
+
+The file name where an error is reported.
+
+This parameter MUST NOT be specified when a
+C<Message::Util::Error> object is created.
+It will be supplied by the constructor of the error object.
+If any value is specified, it will be ignored.
+
+=item -line (MUST NOT be specified)
+
+The line number where an error is reported.
+
+This parameter MUST NOT be specified when a
+C<Message::Util::Error> object is created.
+It will be supplied by the constructor of the error object.
+If any value is specified, it will be ignored.
+
+=item -object
+
+The object for which an error is reported.
+
+If specified, the value MUST be an object
+that has a C<___report_error> method.
+Otherwise, Perl will report some error.
+
+=item -package (MUST NOT be specified)
+
+The package name where an error is reported.
+
+This parameter MUST NOT be specified when a
+C<Message::Util::Error> object is created.
+It will be supplied by the constructor of the error object.
+If any value is specified, it will be ignored.
+
+=item -stacktrace (MUST NOT be specified)
+
+The trace of the function call stack (used by C<Error> module).
+
+This parameter MUST NOT be specified when a
+C<Message::Util::Error> object is created.
+It will be supplied by the constructor of the error object.
+If any value is specified, it will be ignored.
+
+=item -stacktrace_ (MUST NOT be specified)
+
+The trace of the function call stack (used by C<Message::Util::Error>
+module).
+
+This parameter MUST NOT be specified when a
+C<Message::Util::Error> object is created.
+It will be supplied by the constructor of the error object.
+If any value is specified, it will be ignored.
+
+=item -subtype
+
+The subtype of the error.  It may or may not be specified.
+
+=item -text
+
+The text of the error.  Note that this option is less
+useful in C<Message::Util::Error> where C<-description>
+in error type/subtype definitions take precedence in the C<text> method.
+
+=item -type (REQUIRED)
+
+The error type.
+
+This parameter MUST be specified when
+a C<Message::Util::Error> object is created.
+If this option is missing when creating an error object,
+then the error constructor C<die>s.
+
+=item -value
+
+The value of the error.  Note that this option is less
+useful in C<Message::Util::Error> where C<-code>
+in error type definition take precedence in the C<value> method.
+
+=back
+
+Any other value starts with C<-> is reserved for future extension
+and MUST NOT be used for any purpose until it is eventually defined.
+Values I<not> start with C<-> MAY be used for subclass-specific
+error properties.
+
+=head2 C<___report_error> Method
+
+@@
+
+=head2 Error Message Construction
+
+@@ NEED TO BE REWRITTEN
+
+Human readable error message text, returned by C<text> method,
+is generated from C<description> parameter of error definition.
+
+Format defined by L<Message::Util::Formatter> is used to specify
+C<description> parameter and it is processed by the formatter.
+
+=over 4
+
+=item sub ERROR_SUBCLASS::_FORMATTER_PACKAGE_ { return $class_name }
+
+Subclass can define C<_FORMATTER_PACKAGE_> method
+to define class name of the formatter.  Defaulted to
+C<Message::Util::Error::formatter>.
+
+Unless you wish to use additional rules in template text 
+(C<description> parameter), you don't need to define this
+method in your subclass.
+
+Class returned by this method MUST be a subclass (descender class) of
+C<Message::Util::Formatter::Base>.
+
+=cut
+
+=back
+
+=head2 Formatter Message::Util::Error::formatter
+
+In addition to rules defined in C<Message::Util::Formatter::Text>,
+formatter C<Message::Util::Error::formatter> defines some rules:
+
+=over 4
+
+=item %name;
+
+Error type name (C<-type> parameter specified when error is thrown)
+
+=item %t (name => parameter-name);
+
+Parameter value specified when error is thrown
+
+=back
+
+=cut
+
+=head1 EXAMPLE
+
+@@ MAYBE WE CAN REMOVE THIS SECTION
+
+To make a new error class:
+
+  package SomeExceptionClass;
+  use Message::Util::Error;
+  push our @ISA, 'Message::Util::Error';
+  
+  ## [REQUIRED] Error types
+  sub ___error_def {
+    ## Returns a reference to hash defining error type
+    return {
+      ERROR_NAME => {
+        description => q(%name;: %t (name => what); is bad),
+        level => 'fatal',
+        ...
+      },
+      WARNING_NAME => {
+        description => q(%name;: %t (name => what); might be bad),
+        level => 'warn',
+        ...
+      },
+      ...
+    };
+  }
+  
+  ## [OPTIONAL] Package name of formatter constructing error message
+  ##            (Default: Message::Util::Error::formatter)
+  sub _FORMATTER_PACKAGE_ () { 'SomeFormatterClass' }
+
+Throwing exception:
+
+  use SomeExceptionClass;
+  ...
+  do something;
+  ...
+  throw SomeExceptionClass -type => 'ERROR_NAME',
+                           what => 'Example';
+
+If you implements an object-oriented class:
+
+  package SomeModule;
+  use SomeExceptionClass;
+  
+  sub some_method {
+    my $self = shift;
+    ...
+    report SomeExceptionClass
+      -type => 'ERROR_NAME',
+      what => 'Non-oo programing',
+      -object => $self, method => 'some_method'
+        unless $oo;
+    ...
+    report SomeExceptionClass
+      -type => 'WARNING_NAME',
+      what => 'This module',
+      -object => $self, method => 'some_method';
+    ...
+  }
+  
+  ## If you use "report", you must implements this internal method
+  sub ___report_error ($$;%) {
+    my ($self, $err, %option) = @_;
+    ## Throwing if fatal
+    if ($err->{def}->{level} eq 'fatal') {
+      $err->throw;
+      print "This text never printed";
+    ## Otherwise warning only
+    } else {
+      warn $err->stringify;
+      print "This text IS printed";
+    }
+  }
+
+=head1 SEE ALSO
+
+L<Error>
+
+L<Message::DOM::DOMException>
+
+L<Message::DOM::DOMError>
+
+=head1 AUTHOR
+
+Wakaba <w@suika.fam.cx>
+
+=head1 LICENSE
+
+Copyright 2003-2007 Wakaba <w@suika.fam.cx>
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut
+
+## $Date: 2007/06/16 05:30:37 $
