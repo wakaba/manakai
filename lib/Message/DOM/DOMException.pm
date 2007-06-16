@@ -1,6 +1,6 @@
 package Message::DOM::DOMException;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::Util::Error', 'Message::IF::DOMException';
 require Message::Util::Error;
 
@@ -16,6 +16,7 @@ sub ___error_def () {+{
 }} # ___error_def
 
 package Message::IF::DOMException;
+push our @ISA, 'Message::Util::Error';
 
 ## DOM1
 sub INDEX_SIZE_ERR () { 1 }
@@ -48,4 +49,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/06/16 08:05:48 $
+## $Date: 2007/06/16 08:49:00 $

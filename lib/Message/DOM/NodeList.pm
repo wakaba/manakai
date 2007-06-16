@@ -1,8 +1,9 @@
 package Message::DOM::NodeList;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
-push our @ISA, 'Message::IF::NodeList';
+our $VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+push our @ISA, 'Tie::Array', 'Message::IF::NodeList';
 require Message::DOM::DOMException;
+require Tie::Array;
 
 use overload
     '@{}' => sub {
@@ -118,7 +119,7 @@ sub CLEAR ($) {
   my $list = ${$$$self}->{child_nodes};
 
   local $Error::Depth = $Error::Depth + 1;
-  for (@$list) {
+  for (my @a = @$list) {
     $$$self->remove_child ($_);
   }
 } # CLEAR
@@ -177,4 +178,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/06/16 08:05:48 $
+## $Date: 2007/06/16 08:49:00 $

@@ -1,6 +1,6 @@
 package Message::DOM::Node;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::IF::Node';
 require Scalar::Util;
 
@@ -227,7 +227,7 @@ sub manakai_parent_element ($) {
 sub append_child ($$) {
   my ($self, $new_child) = @_;
   if (defined $$new_child->{parent_node}) {
-    my $parent_list = $$new_child->{parent_node}->{child_nodes};
+    my $parent_list = ${$$new_child->{parent_node}}->{child_nodes};
     for (0..$#$parent_list) {
       if ($parent_list->[$_] eq $new_child) {
         splice @$parent_list, $_, 1;
@@ -244,7 +244,7 @@ sub append_child ($$) {
 sub insert_before ($$;$) {
   my ($self, $new_child, $ref_child) = @_;
   if (defined $$new_child->{parent_node}) {
-    my $parent_list = $$new_child->{parent_node}->{child_nodes};
+    my $parent_list = ${$$new_child->{parent_node}}->{child_nodes};
     for (0..$#$parent_list) {
       if ($parent_list->[$_] eq $new_child) {
         splice @$parent_list, $_, 1;
@@ -302,4 +302,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/06/16 08:05:48 $
+## $Date: 2007/06/16 08:49:00 $

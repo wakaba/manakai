@@ -1,5 +1,13 @@
 2007-06-16  Wakaba  <wakaba@suika.fam.cx>
 
+	* DOMException.pm (Message::IF::DOMException): Extends 
+	the |Message::Util::Error| class.
+
+	* NodeList.pm (Message::DOM::NodeList): Extends the |Tie::Array| class.
+	(CLEAR): Not all items were removed.
+
+2007-06-16  Wakaba  <wakaba@suika.fam.cx>
+
 	* Attr.pm, AttributeDefinition.pm, DocumentFragment.pm,
 	DocumentType.pm, Entity.pm,
 	EntityReference.pm (____new): Initialize |child_nodes| by an empty list.
