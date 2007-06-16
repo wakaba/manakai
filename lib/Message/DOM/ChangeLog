@@ -1,5 +1,43 @@
 2007-06-16  Wakaba  <wakaba@suika.fam.cx>
 
+	* DOMConfiguration.pm: New module.
+
+	* Attr.pm (trivial accessor for read-write attributes): Throw
+	an exception if the node is read-only.  Delete the property
+	if undef is specified.
+	(prefix): Implemented.
+
+	* DOMElement.pm (trivial accessor for read-write attributes): Throw
+        an exception if the node is read-only.  Delete the property
+        if undef is specified.
+        (prefix): Implemented.
+	(text_content, manakai_append_text): Old implementations are removed.
+
+	* DOMCharacterData.pm (text_content): Implemented.
+
+	* DOMDocument.pm (____new): Initialize the strict-document-children
+	parameter by true.
+	(text_content): Reimplemented.
+	(dom_config): New.
+
+	* DOMException.pm (READ_ONLY_NODE_ERR): New subtype.
+
+	* DocumentType.pm (text_content): Implemented.
+
+	* ElementTypeDefinition.pm (text_content): Implemented.
+
+	* Node.pm (___report_error): New method.
+	(text_content): Implemented.
+	(manakai_append_text): Copied from |DOMElement.pm|.
+
+	* Notation.pm (text_content): Implemented.
+
+	* ProcessingInstruction.pm (text_content): Implemented.
+
+	* Text.pm (is_element_content_whitespace): Alpha version.
+
+2007-06-16  Wakaba  <wakaba@suika.fam.cx>
+
 	* DOMException.pm (Message::IF::DOMException): Extends 
 	the |Message::Util::Error| class.
 

@@ -1,6 +1,6 @@
 package Message::DOM::ElementTypeDefinition;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::ElementTypeDefinition';
 require Message::DOM::Node;
 
@@ -61,10 +61,9 @@ sub child_nodes ($) {
 
 sub node_name ($); # read-only trivial accessor
 
-## Spec:
-## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-111237558>
+sub node_type () { 81001 } # ELEMENT_TYPE_DEFINITION_NODE
 
-sub node_type ($) { 81001 } # ELEMENT_TYPE_DEFINITION_NODE
+sub text_content () { undef }
 
 package Message::IF::ElementTypeDefinition;
 
@@ -79,4 +78,4 @@ sub create_element_type_definition ($$) {
 
 1;
 ## License: <http://suika.fam.cx/~wakaba/archive/2004/8/18/license#Perl+MPL>
-## $Date: 2007/06/16 08:05:48 $
+## $Date: 2007/06/16 15:27:45 $

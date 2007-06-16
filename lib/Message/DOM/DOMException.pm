@@ -1,6 +1,6 @@
 package Message::DOM::DOMException;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::Util::Error', 'Message::IF::DOMException';
 require Message::Util::Error;
 
@@ -8,6 +8,9 @@ sub ___error_def () {+{
   NO_MODIFICATION_ALLOWED_ERR => {
     -code => 7,
     -subtype => {
+      READ_ONLY_NODE_ERR => {
+        -description => q(Can't modify read-only node),
+      },
       READ_ONLY_NODE_LIST_ERR => {
         -description => q(Can't modify read-only node list),
       },
@@ -49,4 +52,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/06/16 08:49:00 $
+## $Date: 2007/06/16 15:27:45 $

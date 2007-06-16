@@ -2,20 +2,17 @@
 
 package Message::DOM::Document;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::Document',
     'Message::IF::DocumentXDoctype';
 require Message::DOM::Node;
-
-## Spec:
-## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#i-Document>
-## <http://suika.fam.cx/gate/2005/sw/DocumentXDoctype>
 
 sub ____new ($$) {
   my $self = shift->SUPER::____new (undef);
   $$self->{implementation} = $_[0];
   $$self->{strict_error_checking} = 1;
   $$self->{child_nodes} = [];
+  $$self->{'http://suika.fam.cx/www/2006/dom-config/strict-document-children'} = 1;
   return $self;
 } # ____new
              
@@ -95,33 +92,21 @@ sub create_notation ($$);
 sub create_processing_instruction ($$$);
 sub create_text_node ($$);
 
-## The |Node| interface - attribute
+## |Node| attributes
 
-## Spec:
-## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-F68D095>
-## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1950641247>
+sub node_name () { '#document' }
 
-sub node_name ($) {
-  return '#document';
-} # node_name
+sub node_type () { 9 } # DOCUMENT_NODE
 
-## Spec:
-## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-111237558>
-
-sub node_type ($) { 9 } # DOCUMENT_NODE
-
-## The |Node| interface - method
-
-sub manakai_append_text ($$) {
+sub text_content ($;$) {
   my $self = shift;
-  if (@{$$self->{child_nodes}} and
-      $$self->{child_nodes}->[-1]->node_type == 3) { # TEXT_NODE
-    $$self->{child_nodes}->[-1]->manakai_append_text (shift);
+  if ($$self->{'http://suika.fam.cx/www/2006/dom-config/strict-document-children'}) {
+    return undef;
   } else {
-    my $text = $self->create_text_node (shift);
-    $self->append_child ($text);
+    local $Error::Depth = $Error::Depth + 1;
+    return $self->SUPER::text_content (@_);
   }
-} # manakai_append_text
+} # text_content
 
 ## The |Document| interface - attribute
 
@@ -134,6 +119,11 @@ sub document_element ($) {
   }
   return undef;
 } # document_element
+
+sub dom_config ($) {
+  require Message::DOM::DOMConfiguration;
+  return bless \\($_[0]), 'Message::DOM::DOMConfiguration';
+} # dom_config
 
 package Message::IF::Document;
 package Message::IF::DocumentXDoctype;
@@ -151,4 +141,4 @@ sub create_document ($;$$$) {
 
 1;
 ## License: <http://suika.fam.cx/~wakaba/archive/2004/8/18/license#Perl+MPL>
-## $Date: 2007/06/16 08:05:48 $
+## $Date: 2007/06/16 15:27:45 $

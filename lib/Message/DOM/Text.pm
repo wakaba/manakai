@@ -1,6 +1,6 @@
 package Message::DOM::Text;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::CharacterData', 'Message::IF::Text';
 require Message::DOM::DOMCharacterData; ## TODO: Change to new module name
 
@@ -42,20 +42,16 @@ sub AUTOLOAD {
   }
 } # AUTOLOAD
 
-## The |Node| interface - attribute
+## |Node| attributes
 
-## Spec:
-## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-F68D095>
-## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1950641247>
+sub node_name () { '#text' }
 
-sub node_name ($) {
-  return '#text';
-} # node_name
+sub node_type { 3 } # TEXT_NODE
 
-## Spec:
-## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-111237558>
-
-sub node_type ($) { 3 } # TEXT_NODE
+sub is_element_content_whitespace ($;$) {
+  ## TODO:
+  return 0;
+} # is_element_content_whitespace
 
 package Message::IF::Text;
 
@@ -67,4 +63,4 @@ sub create_text_node ($$) {
 
 1;
 ## License: <http://suika.fam.cx/~wakaba/archive/2004/8/18/license#Perl+MPL>
-## $Date: 2007/06/15 14:32:50 $
+## $Date: 2007/06/16 15:27:45 $

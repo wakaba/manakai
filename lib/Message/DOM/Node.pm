@@ -1,8 +1,9 @@
 package Message::DOM::Node;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::IF::Node';
 require Scalar::Util;
+require Message::DOM::DOMException;
 
 ## NOTE:
 ##   Node
@@ -73,6 +74,10 @@ sub ____new ($$) {
   return $self;
 } # ____new
 
+sub ___report_error ($$) {
+  $_[1]->throw;
+} # ___report_error
+
 sub AUTOLOAD {
   my $method_name = our $AUTOLOAD;
   $method_name =~ s/.*:://;
@@ -110,16 +115,16 @@ sub AUTOLOAD {
   }
 } # AUTOLOAD
 
-## The |Node| interface - attribute
+## |Node| attributes
 
-sub attributes ($) {
-  ## NOTE: Overloaded by |Message::DOM::Element|.
-  return undef;
-} # attributes
+## NOTE: Overridden by |Element|.
+sub attributes () { undef }
 
 ## TODO: baseURI
 
 sub child_nodes ($) {
+  ## NOTE: Overridden by |CharacterData|, |ElementTypeDefinition|,
+  ## |Notation|, and |ProcessingInstruction|.
   require Message::DOM::NodeList;
   return bless \\($_[0]), 'Message::DOM::NodeList::ChildNodeList';
 } # child_nodes
@@ -135,10 +140,11 @@ sub last_child ($) {
     ? $$self->{child_nodes}->[-1] : undef;
 } # last_child
 
-sub local_name ($) { undef }
-sub manakai_local_name ($) { undef }
+sub local_name { undef }
 
-sub namespace_uri ($) { undef }
+sub manakai_local_name { undef }
+
+sub namespace_uri { undef }
 
 sub next_sibling ($) {
   my $self = shift;
@@ -155,27 +161,21 @@ sub next_sibling ($) {
   return undef;
 } # next_sibling
 
-sub node_name ($) {
-  ## NOTE: Overloaded by subclasses.
-  return undef;
-} # node_name
+## NOTE: Overridden by subclasses.
+sub node_name () { undef }
 
-sub node_type ($) {
-  ## NOTE: Overloaded by subclasses.
-  die "Node->node_type is not defined";
-} # node_type
+## NOTE: Overridden by subclasses.
+sub node_type () { }
 
-sub node_value ($;$) {
-  ## NOTE: Overloaded by subclasses.
-  return undef;
-} # node_value
-
-## TODO: node_value setter
+## NOTE: Overridden by |Attr|, |AttributeDefinition|,
+## |CharacterData|, and |ProcessingInstruction|.
+sub node_value () { undef }
 
 sub owner_document ($);
 
 sub parent_node ($);
 
+## NOTE: Overridden by |Element| and |Attr|.
 sub prefix ($;$) { undef }
 
 sub previous_sibling ($) {
@@ -196,7 +196,51 @@ sub previous_sibling ($) {
 sub manakai_read_only ($);
 
 sub text_content ($;$) {
-  ## TODO: 
+  ## NOTE: For |Element|, |Attr|, |Entity|, |EntityReference|,
+  ## |DocumentFragment|, and |AttributeDefinition|.  In addition,
+  ## |Document|'s |text_content| might call this attribute.
+  
+  ## NOTE: Overridden by |Document|, |DocumentType|, |Notation|,
+  ## |CharacterData|, |ProcessingInstruction|, and |ElementTypeDefinition|.
+
+  my $self = $_[0];
+
+  if (@_ > 1) {
+    if ($$self->{manakai_read_only}) {
+      report Message::DOM::DOMException
+          -object => $self,
+          -type => 'NO_MODIFICATION_ALLOWED_ERR',
+          -subtype => 'READ_ONLY_NODE_ERR';
+    }
+    
+    local $Error::Depth = $Error::Depth + 1;
+    @{$self->child_nodes} = ();
+    if (defined $_[1] and length $_[1]) {
+      ## NOTE: |DocumentType| don't use this code.
+      my $text = ($$self->{owner_document} || $self)->create_text_node ($_[1]);
+      $self->append_child ($text);
+    }    
+  }
+
+  if (defined wantarray) {
+    local $Error::Depth = $Error::Depth + 1;
+    my $r = '';
+    my @node = @{$self->child_nodes};
+    while (@node) {
+      my $child = shift @node;
+      my $child_nt = $child->node_type;
+      if ($child_nt == TEXT_NODE or $child_nt == CDATA_SECTION_NODE) {
+        $r .= $child->node_value unless $child->is_element_content_whitespace;
+      } elsif ($child_nt == COMMENT_NODE or
+               $child_nt == PROCESSING_INSTRUCTION_NODE or
+               $child_nt == DOCUMENT_TYPE_NODE) {
+        #
+      } else {
+        unshift @node, @{$child->child_nodes};
+      }
+    }
+    return $r;
+  }
 } # text_content
 
 ## TODO:
@@ -266,6 +310,19 @@ sub insert_before ($$;$) {
   return $new_child;
 } # insert_before
 
+## NOTE: For nodeTypes with childNodes
+sub manakai_append_text ($$) {
+  my $self = shift;
+  local $Error::Depth = $Error::Depth + 1;
+  if (@{$$self->{child_nodes}} and
+      $$self->{child_nodes}->[-1]->node_type == 3) {
+    $$self->{child_nodes}->[-1]->manakai_append_text (shift);
+  } else {
+    my $text = $$self->{owner_document}->create_text_node ($_[0]);
+    $self->append_child ($text);
+  }
+} # manakai_append_text
+
 ## NOTE: Only applied to Elements and Documents
 sub remove_child ($$) {
   my ($self, $old_child) = @_;
@@ -302,4 +359,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/06/16 08:49:00 $
+## $Date: 2007/06/16 15:27:45 $

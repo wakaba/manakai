@@ -4,6 +4,7 @@ use Test;
 BEGIN { plan tests => 4 } 
 
 require Message::DOM::DOMImplementation;
+use Message::Util::Error;
 
 my $dom = Message::DOM::DOMImplementation->____new;
 my $doc = $dom->create_document;
@@ -509,7 +510,165 @@ for my $parent (create_parent_nodes ()) {
   ok $node3->previous_sibling, $node2, $parent->node_name."3->previous_sibling [3]";
 }
 
+## |prefix| setter
+for my $node (create_nodes ()) {
+  $node->manakai_set_read_only (0);
+
+  $node->prefix ('non-null');
+  if ($node->node_type == $node->ELEMENT_NODE or
+      $node->node_type == $node->ATTRIBUTE_NODE) {
+    ok $node->prefix, 'non-null', $node->node_name . '->prefix (non-null)';
+  } else {
+    ok $node->prefix, undef, $node->node_name . '->prefix (non-null)';
+  }
+
+  $node->prefix (undef);
+  if ($node->node_type == $node->ELEMENT_NODE or
+      $node->node_type == $node->ATTRIBUTE_NODE) {
+    ok $node->prefix, undef, $node->node_name . '->prefix (null)';
+  } else {
+    ok $node->prefix, undef, $node->node_name . '->prefix (null)';
+  }
+
+  $node->manakai_set_read_only (1);
+  my $err_type;
+  try {
+    $node->prefix ('non-null');
+  } catch Message::IF::DOMException with {
+    my $err = shift;
+    $err_type = $err->type;
+  };
+  if ($node->node_type == $node->ELEMENT_NODE or
+      $node->node_type == $node->ATTRIBUTE_NODE) {
+    ok $err_type, 'NO_MODIFICATION_ALLOWED_ERR',
+        $node->node_name . '->prefix exception (read-only)';
+    ok $node->prefix, undef, $node->node_name . '->prefix (read-only)';
+  } else {
+    ok $err_type, undef, $node->node_name . '->prefix exception (read-only)';
+    ok $node->prefix, undef, $node->node_name . '->prefix (read-only)';
+  }
+}
+
+## |text_content|
+{
+  my $doc2 = $doc->implementation->create_document;
+  $doc2->dom_config->set_parameter
+      ('http://suika.fam.cx/www/2006/dom-config/strict-document-children' => 1);
+  for my $node (
+                $doc2,
+                $doc->create_document_type_definition ('dt1'),
+                $doc->implementation->create_document_type ('doctype1'),
+                $doc->create_notation ('notation1'),
+                $doc->create_element_type_definition ('et1'),
+               ) {
+    ok $node->can ('text_content') ? 1 : 0, 1,
+        $node->node_name . '->can text_content';
+
+    ok $node->text_content, undef, $node->node_name . '->text_content';
+
+    $node->manakai_set_read_only (0);
+    $node->text_content ('new-text-content');
+    ok $node->text_content, undef, $node->node_name . '->text_content set';
+
+    $node->manakai_set_read_only (1);
+    $node->text_content ('new-text-content');
+    ok $node->text_content, undef,
+        $node->node_name . '->text_content set (read-only)';
+  }
+
+  $doc2->dom_config->set_parameter
+      ('http://suika.fam.cx/www/2006/dom-config/strict-document-children' => 0);
+  for my $node (
+                $doc2,
+                $doc->create_attribute ('attr1'),
+                $doc->create_attribute_definition ('at1'),
+                $doc->create_element ('element1'),
+                $doc->create_general_entity ('entity1'),
+                $doc->create_entity_reference ('entity-reference1'),
+                $doc->create_document_fragment,
+               ) {
+    ok $node->can ('text_content') ? 1 : 0, 1,
+        $node->node_name . '->can text_content';
+
+    ok $node->text_content, '', $node->node_name . '->text_content';
+
+    $node->manakai_set_read_only (0);
+    $node->text_content ('text1');
+    ok $node->text_content, 'text1', $node->node_name . '->text_content set';
+    ok 0+@{$node->child_nodes}, 1,
+        $node->node_name . '->text_content set child_nodes length';
+
+    $node->text_content ('');
+    ok $node->text_content, '', $node->node_name . '->text_content set empty';
+    ok 0+@{$node->child_nodes}, 0,
+        $node->node_name . '->text_content set empty child_nodes length';
+
+    $node->text_content ('text2');
+    $node->text_content ('');
+    ok $node->text_content, '', $node->node_name . '->text_content set empty';
+    ok 0+@{$node->child_nodes}, 0,
+        $node->node_name . '->text_content set empty child_nodes length';
+
+    $node->text_content ('text3');
+    $node->manakai_set_read_only (1);
+    try {
+      $node->text_content ('new-text-content');
+      ok undef, 'NO_MODIFICATION_ALLOWED_ERR', 
+          $node->node_name . '->text_content set (read-only)';
+    } catch Message::IF::DOMException with {
+      my $err = shift;
+      ok $err->type, 'NO_MODIFICATION_ALLOWED_ERR', 
+          $node->node_name . '->text_content set (read-only)';
+    };
+    ok $node->text_content, 'text3',
+        $node->node_name . '->text_content set (read-only) text_content';
+  }
+
+
+  for (0..2) {
+    my $el;
+    my $ce;
+
+    [
+     sub {
+       $el = $doc->create_element ('nestingElement');
+       $ce = $doc->create_element ('el2');
+     },
+     sub {
+       $el = $doc->create_element ('elementWithEntityReference');
+       $ce = $doc->create_entity_reference ('ent');
+       $ce->manakai_set_read_only (0, 1);
+     },
+     sub {
+       $el = $doc->create_general_entity ('generalEntityWithChild');
+       $ce = $doc->create_element ('el');
+       $el->manakai_set_read_only (0, 1);
+     },
+    ]->[$_]->();
+    $el->append_child ($ce);
+
+    ok $el->text_content, '', $el->node_name . '->text_content [1]';
+
+    $ce->text_content ('gc');
+    ok $el->text_content, 'gc', $el->node_name . '->text_content [2]';
+
+    $el->manakai_append_text ('cc');
+    ok $el->text_content, 'gccc', $el->node_name . '->text_content [3]';
+
+    $el->text_content ('nc');
+    ok $el->text_content, 'nc', $el->node_name . '->text_content [4]';
+    ok 0+@{$el->child_nodes}, 1,
+        $el->node_name . '->text_content child_nodes length [4]';
+    ok $ce->parent_node, undef,
+        $el->node_name . '->text_content old_child parent_node [4]';
+  }
+}
+
 ## TODO: parent_node tests, as with append_child tests
+
+## TODO: text_content tests for CharacterData and PI
+
+## TODO: manakai_read_only tests
 
 sub create_nodes () {
   (
@@ -544,4 +703,4 @@ sub create_parent_nodes () {
 } # create_parent_nodes
 
 ## License: Public Domain.
-## $Date: 2007/06/15 16:12:28 $
+## $Date: 2007/06/16 15:27:45 $

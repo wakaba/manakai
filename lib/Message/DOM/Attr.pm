@@ -1,6 +1,6 @@
 package Message::DOM::Attr;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::Attr';
 require Message::DOM::Node;
 
@@ -37,9 +37,19 @@ sub AUTOLOAD {
   }->{$method_name}) {
     no strict 'refs';
     eval qq{
-      sub $method_name (\$) {
+      sub $method_name (\$;\$) {
         if (\@_ > 1) {
-          \${\$_[0]}->{$method_name} = ''.\$_[1];
+          if (\${\$_[0]}->{manakai_read_only}) {
+            report Message::DOM::DOMException
+                -object => \$_[0],
+                -type => 'NO_MODIFICATION_ALLOWED_ERR',
+                -subtype => 'READ_ONLY_NODE_ERR';
+          }
+          if (defined \$_[1]) {
+            \${\$_[0]}->{$method_name} = ''.\$_[1];
+          } else {
+            delete \${\$_[0]}->{$method_name};
+          }
         }
         return \${\$_[0]}->{$method_name}; 
       }
@@ -78,8 +88,27 @@ sub node_type () { 2 } # ATTRIBUTE_NODE
 *node_value = \&value;
 
 sub prefix ($;$) {
-  ## TODO: setter
-  return ${+shift}->{prefix};
+  ## NOTE: No check for new value as Firefox doesn't do.
+  ## See <http://suika.fam.cx/gate/2005/sw/prefix>.
+
+  ## NOTE: Same as trivial setter except "" -> undef
+
+  ## NOTE: Same as |Element|'s |prefix|.
+  
+  if (@_ > 1) {
+    if (${$_[0]}->{manakai_read_only}) {
+      report Message::DOM::DOMException
+          -object => $_[0],
+          -type => 'NO_MODIFICATION_ALLOWED_ERR',
+          -subtype => 'READ_ONLY_NODE_ERR';
+    }
+    if (defined $_[1] and $_[1] ne '') {
+      ${$_[0]}->{prefix} = ''.$_[1];
+    } else {
+      delete ${$_[0]}->{prefix};
+    }
+  }
+  return ${$_[0]}->{prefix}; 
 } # prefix
 
 ## The |Attr| interface - attribute
@@ -123,4 +152,4 @@ sub create_attribute_ns ($$$) {
 
 1;
 ## License: <http://suika.fam.cx/~wakaba/archive/2004/8/18/license#Perl+MPL>
-## $Date: 2007/06/16 08:05:48 $
+## $Date: 2007/06/16 15:27:45 $

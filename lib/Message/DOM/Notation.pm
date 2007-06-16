@@ -1,6 +1,6 @@
 package Message::DOM::Notation;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::Notation';
 require Message::DOM::Node;
 
@@ -64,6 +64,8 @@ sub node_name ($); # read-only trivial accessor
 
 sub node_type () { 12 } # NOTATION_NODE
 
+sub text_content ($;$) { undef }
+
 package Message::IF::Notation;
 
 package Message::DOM::Document;
@@ -82,4 +84,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/06/16 08:05:48 $
+## $Date: 2007/06/16 15:27:45 $

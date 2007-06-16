@@ -1,11 +1,8 @@
 package Message::DOM::ProcessingInstruction;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::ProcessingInstruction';
 require Message::DOM::Node;
-
-## Spec:
-## 
 
 sub ____new ($$$$) {
   my $self = shift->SUPER::____new (shift);
@@ -72,14 +69,12 @@ sub child_nodes ($) {
 
 sub node_type ($) { 7 } # PROCESSING_INSTRUCTION_NODE
 
-## Spec:
-## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-F68D080>
-## Modified: <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1841493061>
-
 ## The entire content exclude the target [DOM1, DOM2].
 ## Same as |ProcessingInstruction.data| [DOM3].
 
 *node_value = \&data;
+
+*text_content = \&node_value;
 
 package Message::IF::ProcessingInstruction;
 
@@ -96,4 +91,4 @@ sub create_processing_instruction ($$$) {
 
 1;
 ## License: <http://suika.fam.cx/~wakaba/archive/2004/8/18/license#Perl+MPL>
-## $Date: 2007/06/16 08:05:48 $
+## $Date: 2007/06/16 15:27:45 $
