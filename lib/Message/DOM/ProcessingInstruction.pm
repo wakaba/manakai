@@ -1,6 +1,6 @@
 package Message::DOM::ProcessingInstruction;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::ProcessingInstruction';
 require Message::DOM::Node;
 
@@ -33,14 +33,26 @@ sub AUTOLOAD {
     goto &{ $AUTOLOAD };
   } elsif ({
     ## Read-write attributes (DOMString, trivial accessors)
+    manakai_base_uri => 1,
   }->{$method_name}) {
     no strict 'refs';
     eval qq{
-      sub $method_name (\$) {
+      sub $method_name (\$;\$) {
         if (\@_ > 1) {
-          \${\$_[0]}->{$method_name} = ''.$_[1];
+          if (\${\${\$_[0]}->{owner_document}}->{strict_error_checking} and
+              \${\$_[0]}->{manakai_read_only}) {
+            report Message::DOM::DOMException
+                -object => \$_[0],
+                -type => 'NO_MODIFICATION_ALLOWED_ERR',
+                -subtype => 'READ_ONLY_NODE_ERR';
+          }
+          if (defined \$_[1]) {
+            \${\$_[0]}->{$method_name} = ''.\$_[1];
+          } else {
+            delete \${\$_[0]}->{$method_name};
+          }
         }
-        return \${\$_[0]}->{$method_name}; 
+        return \${\$_[0]}->{$method_name};
       }
     };
     goto &{ $AUTOLOAD };
@@ -52,7 +64,28 @@ sub AUTOLOAD {
 sub target ($);
 sub data ($);
 
-## The |Node| interface - attribute
+## |Node| attributes
+
+sub base_uri ($) {
+  my $self = $_[0];
+  return $$self->{manakai_base_uri} if defined $$self->{manakai_base_uri};
+  
+  local $Error::Depth = $Error::Depth + 1;
+  my $node = $$self->{parent_node};
+  while (defined $node) {
+    my $nt = $node->node_type;
+    if ($nt == 1 or $nt == 6 or $nt == 9 or $nt == 10 or $nt == 11) {
+      ## Element, Entity, Document, DocumentType, or DocumentFragment
+      return $node->base_uri;
+    } elsif ($nt == 5) {
+      ## EntityReference
+      return $node->manakai_entity_base_uri if $node->manakai_external;
+    }
+    $node = $$node->{parent_node};
+  }
+  return $node->base_uri if $node;
+  return $self->owner_document->base_uri;
+} # base_uri
 
 sub child_nodes ($) {
   require Message::DOM::NodeList;
@@ -64,10 +97,7 @@ sub child_nodes ($) {
 
 *node_name = \&target;
 
-## Spec:
-## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-111237558>
-
-sub node_type ($) { 7 } # PROCESSING_INSTRUCTION_NODE
+sub node_type () { 7 } # PROCESSING_INSTRUCTION_NODE
 
 ## The entire content exclude the target [DOM1, DOM2].
 ## Same as |ProcessingInstruction.data| [DOM3].
@@ -76,19 +106,40 @@ sub node_type ($) { 7 } # PROCESSING_INSTRUCTION_NODE
 
 *text_content = \&node_value;
 
+## |Node| methods
+
+sub manakai_append_text ($$) {
+  ## NOTE: Same as |CharacterData|'s.
+  if (${${$_[0]}->{owner_document}}->{strict_error_checking} and
+      ${$_[0]}->{manakai_read_only}) {
+    report Message::DOM::DOMException
+        -object => $_[0],
+        -type => 'NO_MODIFICATION_ALLOWED_ERR',
+        -subtype => 'READ_ONLY_NODE_ERR';
+  }
+  ${$_[0]}->{data} .= ref $_[1] eq 'SCALAR' ? ${$_[1]} : $_[1];
+} # manakai_append_text
+
+## |ProcessingInstruction| attributes
+
+sub manakai_base_uri ($;$);
+
 package Message::IF::ProcessingInstruction;
 
 package Message::DOM::Document;
-
-## Spec:
-## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-135944439>
-## Compatibility note:
-## <http://suika.fam.cx/gate/2005/sw/createProcessingInstruction>
 
 sub create_processing_instruction ($$$) {
   return Message::DOM::ProcessingInstruction->____new (@_[0, 1, 2]);
 } # create_processing_instruction
 
+=head1 LICENSE
+
+Copyright 2007 Wakaba <w@suika.fam.cx>
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut
+
 1;
-## License: <http://suika.fam.cx/~wakaba/archive/2004/8/18/license#Perl+MPL>
-## $Date: 2007/06/16 15:27:45 $
+## $Date: 2007/06/17 13:37:40 $

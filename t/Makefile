@@ -125,7 +125,10 @@ $(NS_CHARSET_PT_FILES): charset-%$(PT_SUFFIX): \
 	$(DAF) --create-perl-test="$(NS_CHARSET)$* $@"
 	$(PERL_CHK) $@
 
-test-module-dom: $(NS_MDOM_PT_FILES) $(TEST_PM_FILES)
+test-module-dom: 
+	$(PERL_TEST_) DOM-*$(PT_SUFFIX)
+
+test-module-dom-old: $(NS_MDOM_PT_FILES) $(TEST_PM_FILES)
 	$(PERL_TEST_) dom-*$(PT_SUFFIX)
 
 $(NS_MDOM_PT_FILES): dom-%$(PT_SUFFIX): \

@@ -1,6 +1,6 @@
 package Message::DOM::ElementTypeDefinition;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::ElementTypeDefinition';
 require Message::DOM::Node;
 
@@ -52,7 +52,7 @@ sub AUTOLOAD {
   }
 } # AUTOLOAD
 
-## The |Node| interface - attribute
+## |Node| attributes
 
 sub child_nodes ($) {
   require Message::DOM::NodeList;
@@ -64,6 +64,26 @@ sub node_name ($); # read-only trivial accessor
 sub node_type () { 81001 } # ELEMENT_TYPE_DEFINITION_NODE
 
 sub text_content () { undef }
+
+## |Node| methods
+
+sub manakai_append_text () { }
+
+## |ElementTypeDefinition| attributes
+
+## TODO:
+sub attribute_definitions {
+  return [values %{${$_[0]}->{attribute_definitions} or {}}];
+}
+
+## |ElementTypeDefinition| methods
+
+## TODO:
+sub set_attribute_definition_node {
+  ${$_[0]}->{attribute_definitions}->{$_[1]->node_name} = $_[1];
+  ${$_[1]}->{owner_element_type_definition} = $_[0];
+  Scalar::Util::weaken (${$_[1]}->{owner_element_type_definition});
+}
 
 package Message::IF::ElementTypeDefinition;
 
@@ -78,4 +98,4 @@ sub create_element_type_definition ($$) {
 
 1;
 ## License: <http://suika.fam.cx/~wakaba/archive/2004/8/18/license#Perl+MPL>
-## $Date: 2007/06/16 15:27:45 $
+## $Date: 2007/06/17 13:37:40 $

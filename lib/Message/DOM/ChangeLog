@@ -1,3 +1,65 @@
+2007-06-17  Wakaba  <wakaba@suika.fam.cx>
+
+	* Attr.pm (____new): Initialize |specified| as 1.
+	(base_uri, manakai_attribute_type, specified): Implemented.
+	(prefix): Don't check read-only flag unless |strict_error_checking|.
+	(value): Call |text_content| for now.
+
+	* AttributeDefinition.pm (DeclaredValueType, DefaultValueType): Added.
+	(declared_type, default_type): Implemented. 
+
+	* CharacterData.pm (____new): Allow a scalar reference 
+	as an input for the |data| attribute.
+	(base_uri, manakai_append_text): Implemented.
+
+	* DOMConfiguration.pm (set_parameter): Resetting implemented.
+
+	* DOMDocument.pm (____new): Set default values to
+	configuration parameter whose default is true.
+	(document_uri, input_encoding): Implemented.
+	(all_declarations_processed, manakai_is_html): Implemented.
+	(base_uri, manakai_append_text, 
+	manakai_entity_base_uri, strict_error_checking,
+	xml_encoding, xml_version, xml_standalone): Implemented.
+
+	* DOMElement.pm (manakai_base_uri, base_uri): Implemented.
+	(get_attribute, get_attribute_node): Alpha version.
+	(set_attribute_node, set_attribute_node_ns): Implemented.
+	(set_attribute_ns): Accept non-ARRAY qualified name.
+
+	* DOMException.pm (___error_def): |WRONG_DOCUMENT_ERR|,
+	|NOT_SUPPORTED_ERR|, and |INUSE_ATTRIBUTE_ERR| are added.
+
+	* DocumentType.pm (public_id, system_id): Implemented.
+	(base_uri, declaration_base_uri, manakai_declaration_base_uri,
+	manakai_append_text): Implemented.
+	(element_types, general_entities, notations, 
+	set_element_type_definition_node, set_general_entity_node,
+	set_notation_node): Alpha version.
+
+	* ElementTypeDefinition.pm (manakai_append_text): Implemented.
+	(attribute_definitions, set_attribute_definition_node): Alpha version.
+
+	* Entity.pm (has_replacement_tree, public_id, system_id, 
+	manakai_declaration_base_uri, manakai_entity_base_uri,
+	manakai_entity_uri): Implemented.
+
+	* EntityReference.pm (manakai_expanded, manakai_external): Implemented.
+	(base_uri, manakai_entity_base_uri): Implemented.
+
+	* Node.pm (base_uri): Implemented.
+	(text_content): Don't check read-only or not
+	unless |strict_error_checking|.
+	(manakai_append_text): Implemented.
+	(get_feature): Alpha.
+	(manakai_set_read_only): Implemented.
+
+	* Notation.pm (public_id, system_id, manakai_append_text,
+	manakai_declaration_base_uri): Implemented.
+
+	* ProcessingInstruction.pm (manakai_base_uri,
+	base_uri, manakai_append_text): Implemented.
+
 2007-06-16  Wakaba  <wakaba@suika.fam.cx>
 
 	* DOMConfiguration.pm: New module.

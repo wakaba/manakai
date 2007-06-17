@@ -1,13 +1,36 @@
 #!/usr/bin/perl
 use strict;
 use Test;
-BEGIN { plan tests => 10 }
+BEGIN { plan tests => 706 }
 
 require Message::DOM::DOMImplementation;
 use Message::Util::Error;
 
 my $dom = Message::DOM::DOMImplementation->____new;
 my $doc = $dom->create_document;
+
+sub create_leaf_nodes () {
+  (
+   $doc->create_cdata_section ('cdata1'),
+   $doc->create_comment ('comment1'),
+   $doc->create_notation ('notation1'),
+   $doc->create_processing_instruction ('pi1', 'pi1data'),
+   $doc->create_text_node ('text1'),
+  );
+} # create_leaf_nodes
+
+sub create_parent_nodes () {
+  (
+   $doc->create_attribute ('attr1'),
+   $doc->create_attribute_definition ('at1'),
+   $doc->create_element ('element1'),
+   $doc->create_general_entity ('entity1'),
+   $doc->create_entity_reference ('entity-reference1'),
+   $doc->implementation->create_document,
+   $doc->create_document_fragment,
+   $doc->create_document_type_definition ('dt1'),
+  );
+} # create_parent_nodes
 
 for my $parent (create_parent_nodes ()) {
   my $node1;
@@ -50,7 +73,10 @@ for my $parent (create_parent_nodes ()) {
   ok $cn->item (0), undef, 'childNodes.item (0) [0]';
   ok $cn->item (1), undef, 'childNodes.item (1) [0]';
   ok $cn->item (-1), undef, 'childNodes.item (-1) [0]';
-  ok $cn->item (undef), undef, 'childNodes.item (undef) [0]';
+  {
+    local $^W = 0;
+    ok $cn->item (undef), undef, 'childNodes.item (undef) [0]';
+  }
   ok $cn->[0], undef, 'child_nodes->[0] [0]';
   ok $cn->[1], undef, 'child_nodes->[1] [0]';
 
@@ -61,7 +87,10 @@ for my $parent (create_parent_nodes ()) {
   ok $cn->item (0), $node1, 'childNodes.item (0) [1]';
   ok $cn->item (1), undef, 'childNodes.item (1) [1]';
   ok $cn->item (-1), undef, 'childNodes.item (-1) [1]';
-  ok $cn->item (undef), $node1, 'childNodes.item (undef) [1]';
+  {
+    local $^W = 0;
+    ok $cn->item (undef), $node1, 'childNodes.item (undef) [1]';
+  }
   ok $cn->[0], $node1, 'child_nodes->[0] [1]';
   ok $cn->[1], undef, 'child_nodes->[1] [1]';
   ok exists $cn->[0] ? 1 : 0, 1, 'exists child_nodes->[0] [1]';
@@ -74,7 +103,10 @@ for my $parent (create_parent_nodes ()) {
   ok $cn->item (0), $node1, 'childNodes.item (0) [2]';
   ok $cn->item (1), $node2, 'childNodes.item (1) [2]';
   ok $cn->item (-1), undef, 'childNodes.item (-1) [2]';
-  ok $cn->item (undef), $node1, 'childNodes.item (undef) [2]';
+  {
+    local $^W = 0;
+    ok $cn->item (undef), $node1, 'childNodes.item (undef) [2]';
+  }
   ok $cn->[0], $node1, 'child_nodes->[0] [2]';
   ok $cn->[1], $node2, 'child_nodes->[1] [2]';
 
@@ -166,7 +198,10 @@ for my $parent (create_leaf_nodes ()) {
   ok $cn->item (0), undef, 'childNodes.item (0) [0]';
   ok $cn->item (1), undef, 'childNodes.item (1) [0]';
   ok $cn->item (-1), undef, 'childNodes.item (-1) [0]';
-  ok $cn->item (undef), undef, 'childNodes.item (undef) [0]';
+  {
+    local $^W = 0;
+    ok $cn->item (undef), undef, 'childNodes.item (undef) [0]';
+  }
   ok $cn->[0], undef, 'child_nodes->[0] [0]';
   ok $cn->[1], undef, 'child_nodes->[1] [0]';
   ok exists $cn->[0] ? 1 : 0, 0, 'exists child_nodes->[0] [1]';
@@ -222,29 +257,6 @@ for my $parent (create_leaf_nodes ()) {
   };
 }
 
-sub create_leaf_nodes () {
-  (
-   $doc->create_cdata_section ('cdata1'),
-   $doc->create_comment ('comment1'),
-   $doc->create_notation ('notation1'),
-   $doc->create_processing_instruction ('pi1', 'pi1data'),
-   $doc->create_text_node ('text1'),
-  );
-} # create_leaf_nodes
-
-sub create_parent_nodes () {
-  (
-   $doc->create_attribute ('attr1'),
-   $doc->create_attribute_definition ('at1'),
-   $doc->create_element ('element1'),
-   $doc->create_general_entity ('entity1'),
-   $doc->create_entity_reference ('entity-reference1'),
-   $doc->implementation->create_document,
-   $doc->create_document_fragment,
-   $doc->create_document_type_definition ('dt1'),
-  );
-} # create_parent_nodes
-
 =head1 LICENSE
 
 Copyright 2007 Wakaba <w@suika.fam.cx>
@@ -254,4 +266,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2007/06/16 08:49:00 $
+## $Date: 2007/06/17 13:37:42 $

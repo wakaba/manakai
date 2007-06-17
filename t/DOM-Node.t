@@ -1,13 +1,46 @@
 #!/usr/bin/perl
 use strict;
 use Test;
-BEGIN { plan tests => 4 } 
+BEGIN { plan tests => 1921 } 
 
 require Message::DOM::DOMImplementation;
 use Message::Util::Error;
 
 my $dom = Message::DOM::DOMImplementation->____new;
 my $doc = $dom->create_document;
+
+
+sub create_nodes () {
+  (
+   $doc->create_attribute ('attr1'),
+   $doc->create_attribute_definition ('at1'),
+   $doc->create_cdata_section ('cdata1'),
+   $doc->create_comment ('comment1'),
+   $doc->create_element ('element1'),
+   $doc->create_element_type_definition ('et1'),
+   $doc->create_general_entity ('entity1'),
+   $doc->create_entity_reference ('entity-reference1'),
+   $doc->implementation->create_document,
+   $doc->create_document_fragment,
+   $doc->create_document_type_definition ('dt1'),
+   $doc->create_notation ('notation1'),
+   $doc->create_processing_instruction ('pi1', 'pi1data'),
+   $doc->create_text_node ('text1'),
+  );
+} # create_nodes
+
+sub create_parent_nodes () {
+  (
+   $doc->create_attribute ('attr1'),
+   $doc->create_attribute_definition ('at1'),
+   $doc->create_element ('element1'),
+   $doc->create_general_entity ('entity1'),
+   $doc->create_entity_reference ('entity-reference1'),
+   $doc->implementation->create_document,
+   $doc->create_document_fragment,
+   $doc->create_document_type_definition ('dt1'),
+  );
+} # create_parent_nodes
 
 ## Constants
 my $constants = [
@@ -28,15 +61,40 @@ my $constants = [
 ];
 
 my $tests = {
-  attr => {
+  attr1 => {
+    node => sub { return $doc->create_attribute ('a') },
+    attr_get => {
+      manakai_attribute_type => 0,
+      base_uri => undef,
+      first_child => undef,
+      last_child => undef,
+      local_name => 'a',
+      manakai_local_name => 'a',
+      namespace_uri => undef,
+      next_sibling => undef,
+      node_name => 'a',
+      name => 'a',
+      node_value => '',
+      owner_document => $doc,
+      parent_node => undef,
+      prefix => undef,
+      previous_sibling => undef,
+      value => '',
+      attributes => undef,
+    },
+    attr_get_bool => {
+      specified => 1,
+    },
+  },
+  attr2 => {
     node => sub {
       my $attr = $doc->create_attribute ('a');
       $attr->value ('b');
       return $attr;
     },
     attr_get => {
-      first_child => undef,
-      last_child => undef,
+      manakai_attribute_type => 0,
+      base_uri => undef,
       local_name => 'a',
       manakai_local_name => 'a',
       namespace_uri => undef,
@@ -51,51 +109,44 @@ my $tests = {
       value => 'b',
       attributes => undef,
     },
+    attr_get_bool => {
+      specified => 1,
+    },
   },
   attr_ns_default => {
-    node => sub {
-      my $attr = $doc->create_attribute_ns (undef, 'a');
-      $attr->value ('b');
-      return $attr;
-    },
+    node => sub { return $doc->create_attribute_ns (undef, 'a') },
     attr_get => {
-      first_child => undef,
-      last_child => undef,
+      base_uri => undef,
       local_name => 'a',
       manakai_local_name => 'a',
       namespace_uri => undef,
       next_sibling => undef,
       node_name => 'a',
       name => 'a',
-      node_value => 'b',
+      node_value => '',
       owner_document => $doc,
       parent_node => undef,
       prefix => undef,
-      value => 'b',
+      value => '',
       attributes => undef,
       previous_sibling => undef,
     },
   },
   attr_ns_prefixed => {
-    node => sub {
-      my $attr = $doc->create_attribute_ns ('http://test/', 'a:b');
-      $attr->value ('c');
-      return $attr;
-    },
+    node => sub { return $doc->create_attribute_ns ('http://test/', 'a:b') },
     attr_get => {
-      first_child => undef,
-      last_child => undef,
+      base_uri => undef,
       local_name => 'b',
       manakai_local_name => 'b',
       namespace_uri => 'http://test/',
       next_sibling => undef,
       node_name => 'a:b',
       name => 'a:b',
-      node_value => 'c',
+      node_value => '',
       owner_document => $doc,
       parent_node => undef,
       prefix => 'a',
-      value => 'c',
+      value => '',
       attributes => undef,
       previous_sibling => undef,
     },
@@ -103,6 +154,7 @@ my $tests = {
   cdatasection => {
     node => sub { return $doc->create_cdata_section ('cdatadata') },
     attr_get => {
+      base_uri => undef,
       first_child => undef,
       last_child => undef,
       local_name => undef,
@@ -122,6 +174,7 @@ my $tests = {
   cdatasectionmde => {
     node => sub { return $doc->create_cdata_section ('cdata]]>data') },
     attr_get => {
+      base_uri => undef,
       first_child => undef,
       last_child => undef,
       local_name => undef,
@@ -141,6 +194,7 @@ my $tests = {
   comment => {
     node => sub { return $doc->create_comment ('commentdata') },
     attr_get => {
+      base_uri => undef,
       first_child => undef,
       last_child => undef,
       local_name => undef,
@@ -160,6 +214,7 @@ my $tests = {
   commentcom1 => {
     node => sub { return $doc->create_comment ('comment--data') },
     attr_get => {
+      base_uri => undef,
       first_child => undef,
       last_child => undef,
       local_name => undef,
@@ -179,6 +234,7 @@ my $tests = {
   commentcom2 => {
     node => sub { return $doc->create_comment ('commentdata-') },
     attr_get => {
+      base_uri => undef,
       first_child => undef,
       last_child => undef,
       local_name => undef,
@@ -199,6 +255,9 @@ my $tests = {
     node => sub { return $doc },
     attr_get => {
       attributes => undef,
+      base_uri => undef,
+      document_uri => undef,
+      manakai_entity_base_uri => undef,
       first_child => undef,
       implementation => $dom,
       last_child => undef,
@@ -212,12 +271,21 @@ my $tests = {
       parent_node => undef,
       prefix => undef,
       previous_sibling => undef,
+      xml_encoding => undef,
+      xml_version => '1.0',
+    },
+    attr_get_bool => {
+      all_declarations_processed => 0,
+      manakai_is_html => 0,
+      strict_error_checking => 1,
+      xml_standalone => 0,
     },
   },
   document_fragment => {
     node => sub { return $doc->create_document_fragment },
     attr_get => {
       attributes => undef,
+      base_uri => undef,
       first_child => undef,
       last_child => undef,
       local_name => undef,
@@ -236,6 +304,9 @@ my $tests = {
     node => sub { return $doc->implementation->create_document_type ('n') },
     attr_get => {
       attributes => undef,
+      base_uri => undef,
+      declaration_base_uri => undef,
+      manakai_declaration_base_uri => undef,
       first_child => undef,
       implementation => $dom,
       last_child => undef,
@@ -249,12 +320,17 @@ my $tests = {
       parent_node => undef,
       prefix => undef,
       previous_sibling => undef,
+      public_id => undef,
+      system_id => undef,
     },
   },
   document_type_definition => {
     node => sub { return $doc->create_document_type_definition ('n') },
     attr_get => {
       attributes => undef,
+      base_uri => undef,
+      declaration_base_uri => undef,
+      manakai_declaration_base_uri => undef,
       first_child => undef,
       implementation => $dom,
       last_child => undef,
@@ -268,12 +344,16 @@ my $tests = {
       parent_node => undef,
       prefix => undef,
       previous_sibling => undef,
+      public_id => undef,
+      system_id => undef,
     },
   },
   element => {
     node => sub { return $doc->create_element ('e') },
     attr_get => {
       ## TODO: attributes => 
+      base_uri => undef,
+      manakai_base_uri => undef,
       first_child => undef,
       last_child => undef,
       local_name => 'e',
@@ -292,6 +372,8 @@ my $tests = {
     node => sub { return $doc->create_element_ns ('http://test/', 'f') },
     attr_get => {
       ## TODO: attributes => 
+      base_uri => undef,
+      manakai_base_uri => undef,
       first_child => undef,
       last_child => undef,
       local_name => 'f',
@@ -310,6 +392,8 @@ my $tests = {
     node => sub { return $doc->create_element_ns ('http://test/', 'e:f') },
     attr_get => {
       ## TODO: attributes => 
+      base_uri => undef,
+      manakai_base_uri => undef,
       first_child => undef,
       last_child => undef,
       local_name => 'f',
@@ -328,6 +412,10 @@ my $tests = {
     node => sub { return $doc->create_general_entity ('e') },
     attr_get => {
       attributes => undef,
+      base_uri => undef,
+      manakai_declaration_base_uri => undef,
+      manakai_entity_base_uri => undef,
+      manakai_entity_uri => undef,
       first_child => undef,
       last_child => undef,
       next_sibling => undef,
@@ -336,12 +424,16 @@ my $tests = {
       owner_document => $doc,
       parent_node => undef,
       previous_sibling => undef,
+      public_id => undef,
+      system_id => undef,
     },
   },
   entity_reference => {
     node => sub { return $doc->create_entity_reference ('e') },
     attr_get => {
       attributes => undef,
+      base_uri => undef,
+      manakai_entity_base_uri => undef,
       first_child => undef,
       last_child => undef,
       local_name => undef,
@@ -354,12 +446,18 @@ my $tests = {
       parent_node => undef,
       prefix => undef,
       previous_sibling => undef,
+    },
+    attr_get_bool => {
+      manakai_expanded => 0,
+      manakai_external => 0,
     },
   },
   notation => {
     node => sub { return $doc->create_notation ('e') },
     attr_get => {
       attributes => undef,
+      base_uri => undef,
+      manakai_declaration_base_uri => undef,
       first_child => undef,
       last_child => undef,
       local_name => undef,
@@ -372,12 +470,16 @@ my $tests = {
       parent_node => undef,
       prefix => undef,
       previous_sibling => undef,
+      public_id => undef,
+      system_id => undef,
     },
   },
   processing_instruction => {
     node => sub { return $doc->create_processing_instruction ('t', 'd') },
     attr_get => {
       attributes => undef,
+      base_uri => undef,
+      manakai_base_uri => undef,
       first_child => undef,
       last_child => undef,
       local_name => undef,
@@ -396,6 +498,7 @@ my $tests = {
     node => sub { return $doc->create_text_node ('textdata') },
     attr_get => {
       attributes => undef,
+      base_uri => undef,
       first_child => undef,
       last_child => undef,
       local_name => undef,
@@ -414,6 +517,7 @@ my $tests = {
     node => sub { return $doc->create_element_type_definition ('e') },
     attr_get => {
       attributes => undef,
+      base_uri => undef,
       first_child => undef,
       last_child => undef,
       local_name => undef,
@@ -432,6 +536,9 @@ my $tests = {
     node => sub { return $doc->create_attribute_definition ('e') },
     attr_get => {
       attributes => undef,
+      base_uri => undef,
+      declared_type => 0,
+      default_type => 0,
       first_child => undef,
       last_child => undef,
       local_name => undef,
@@ -462,6 +569,13 @@ for my $test_id (sort {$a cmp $b} keys %$tests) {
     my $expected = $test_def->{attr_get}->{$attr_name};
     ok $node->can ($attr_name) ? 1 : 0, 1, "$test_id->can ($attr_name)";
     my $actual = $node->$attr_name;
+    ok $actual, $expected, "$test_id.$attr_name.get";
+  }
+
+  for my $attr_name (sort {$a cmp $b} keys %{$test_def->{attr_get_bool} or {}}) {
+    my $expected = $test_def->{attr_get_bool}->{$attr_name} ? 1 : 0;
+    ok $node->can ($attr_name) ? 1 : 0, 1, "$test_id->can ($attr_name)";
+    my $actual = $node->$attr_name ? 1 : 0;
     ok $actual, $expected, "$test_id.$attr_name.get";
   }
 }
@@ -664,43 +778,460 @@ for my $node (create_nodes ()) {
   }
 }
 
+## |manakaiReadOnly| and |manakaiSetReadOnly|
+{
+  for my $node (create_nodes ()) {
+    $node->manakai_set_read_only (1, 0);
+    ok $node->manakai_read_only ? 1 : 0, 1, 
+        $node->node_name . '->manakai_set_read_only (1, 0) [1]';
+
+    $node->manakai_set_read_only (0, 0);
+    ok $node->manakai_read_only ? 1 : 0, 0, 
+        $node->node_name . '->manakai_set_read_only (0, 0)';
+
+    $node->manakai_set_read_only (1, 0);
+    ok $node->manakai_read_only ? 1 : 0, 1,
+        $node->node_name . '->manakai_set_read_only (1, 0) [2]';
+  }
+
+  {
+    my $el = $doc->create_element ('readOnlyElement1');
+    my $c1 = $doc->create_element ('c1');
+    $el->append_child ($c1);
+    my $c2 = $doc->create_text_node ('c2');
+    $el->append_child ($c2);
+    my $c3 = $doc->create_element ('c3');
+    $el->append_child ($c3);
+    my $c4 = $doc->create_attribute ('c4');
+    $el->set_attribute_node ($c4);
+    my $c5 = $doc->create_entity_reference ('c5');
+    $el->append_child ($c5);
+    
+    $el->manakai_set_read_only (1, 1);
+    for ($c1, $c2, $c3, $c4, $c5) {
+      ok $_->manakai_read_only ? 1 : 0, 1,
+          $el->node_name . '->read_only (1, 1) ' . $_->node_name . ' [1]';
+    }
+    
+    $el->manakai_set_read_only (0, 1);
+    for ($c1, $c2, $c3, $c4, $c5) {
+      ok $_->manakai_read_only ? 1 : 0, 0,
+          $el->node_name . '->read_only (1, 0) ' . $_->node_name;
+    }
+    
+    $el->manakai_set_read_only (1, 1);
+    for ($c1, $c2, $c3, $c4, $c5) {
+      ok $_->manakai_read_only ? 1 : 0, 1,
+          $el->node_name . '->read_only (1, 1) ' . $_->node_name . ' [2]';
+    }
+  }
+
+  {
+    my $dtd = $doc->create_document_type_definition ('readOnlyDTDef1');
+    my $c1 = $doc->create_processing_instruction ('c1', '');
+    $dtd->append_child ($c1);
+    my $c2 = $doc->create_element_type_definition ('c2');
+    $dtd->set_element_type_definition_node ($c2);
+    my $c3 = $doc->create_general_entity ('c3');
+    $dtd->set_general_entity_node ($c3);
+    my $c4 = $doc->create_notation ('c4');
+    $dtd->set_notation_node ($c4);
+    my $c5 = $doc->create_text_node ('c5');
+    $c3->append_child ($c5);
+
+    $dtd->manakai_set_read_only (1, 1);
+    for ($c1, $c2, $c3, $c4, $c5) {
+      ok $_->manakai_read_only ? 1 : 0, 1,
+          $dtd->node_name . '->read_only (1, 1) ' . $_->node_name . ' [1]';
+    }
+    
+    $dtd->manakai_set_read_only (0, 1);
+    for ($c1, $c2, $c3, $c4, $c5) {
+      ok $_->manakai_read_only ? 1 : 0, 0,
+          $dtd->node_name . '->read_only (1, 0) ' . $_->node_name;
+    }
+    
+    $dtd->manakai_set_read_only (1, 1);
+    for ($c1, $c2, $c3, $c4, $c5) {
+      ok $_->manakai_read_only ? 1 : 0, 1,
+          $dtd->node_name . '->read_only (1, 1) ' . $_->node_name . ' [2]';
+    }
+  }
+
+  {
+    my $et = $doc->create_element_type_definition ('readOnlyETDef1');
+    my $c1 = $doc->create_element ('c1');
+    $et->set_attribute_definition_node ($c1);
+    my $c2 = $doc->create_text_node ('c2');
+    $c1->append_child ($c2);
+
+    $et->manakai_set_read_only (1, 1);
+    for ($c1, $c2) {
+      ok $_->manakai_read_only ? 1 : 0, 1,
+          $et->node_name . '->read_only (1, 1) ' . $_->node_name . ' [1]';
+    }
+    
+    $et->manakai_set_read_only (0, 1);
+    for ($c1, $c2) {
+      ok $_->manakai_read_only ? 1 : 0, 0,
+          $et->node_name . '->read_only (1, 0) ' . $_->node_name;
+    }
+    
+    $et->manakai_set_read_only (1, 1);
+    for ($c1, $c2) {
+      ok $_->manakai_read_only ? 1 : 0, 1,
+          $et->node_name . '->read_only (1, 1) ' . $_->node_name . ' [2]';
+    }
+  }
+}
+
+## |manakaiAppendText|
+{
+  my $doc2 = $doc->implementation->create_document;
+
+  $doc2->dom_config->set_parameter
+      ('http://suika.fam.cx/www/2006/dom-config/strict-document-children' => 1);
+  for my $node (
+                $doc2,
+                $doc->create_notation ('Notation_manakaiAppendText'),
+                $doc->create_document_type_definition ('DT_manakaiAppendText'),
+                $doc->create_element_type_definition ('ET_manakaiAppendText'),
+               ) {
+    ok $node->can ('manakai_append_text') ? 1 : 0, 1, $node->node_name . 'can';
+
+    $node->manakai_append_text ('aaaa');
+    ok $node->text_content, undef, $node->node_name . ' [1]';
+    ok 0+@{$node->child_nodes}, 0, $node->node_name . ' childNodes @{} 0+ [1]';
+  }
+
+  $doc2->dom_config->set_parameter
+      ('http://suika.fam.cx/www/2006/dom-config/strict-document-children' => 0);
+  for my $node (
+                $doc->create_attribute ('Attr_manakaiAppendText'),
+                $doc->create_element ('Element_manakaiAppendText'),
+                $doc2,
+                $doc->create_document_fragment,
+                $doc->create_general_entity ('Entity_manakaiAppendText'),
+                $doc->create_entity_reference ('ER_manakaiAppendText'),
+                $doc->create_attribute_definition ('AT_manakaiAppendText'),
+               ) {
+    $node->manakai_set_read_only (0, 1);
+    ok $node->can ('manakai_append_text') ? 1 : 0, 1, $node->node_name . 'can';
+
+    $node->manakai_append_text ('string');
+    ok $node->text_content, 'string', $node->node_name . ' [1]';
+    ok 0+@{$node->child_nodes}, 1, $node->node_name . ' childNodes @{} 0+ [1]';
+
+    $node->manakai_append_text ('STRING');
+    ok $node->text_content, 'stringSTRING', $node->node_name . ' [2]';
+    ok 0+@{$node->child_nodes}, 1, $node->node_name . ' childNodes @{} 0+ [2]';
+
+    my $er = $doc->create_entity_reference ('er');
+    $node->append_child ($er);
+
+    $node->manakai_append_text ('text');
+    ok $node->text_content, 'stringSTRINGtext', $node->node_name . ' [3]';
+    ok 0+@{$node->child_nodes}, 3, $node->node_name . ' childNodes @{} 0+ [3]';
+  }
+
+  for my $node (
+                $doc->create_text_node (''),
+                $doc->create_cdata_section (''),
+                $doc->create_comment (''),
+                $doc->create_processing_instruction ('PI_manakaiAppendText'),
+               ) {
+    ok $node->can ('manakai_append_text') ? 1 : 0, 1, $node->node_name . 'can';
+
+    $node->manakai_append_text ('aaaa');
+    ok $node->text_content, 'aaaa', $node->node_name . ' [1]';
+    ok 0+@{$node->child_nodes}, 0, $node->node_name . ' childNodes @{} 0+ [1]';
+
+    $node->manakai_append_text ('bbbb');
+    ok $node->text_content, 'aaaabbbb', $node->node_name . ' [1]';
+    ok 0+@{$node->child_nodes}, 0, $node->node_name . ' childNodes @{} 0+ [1]';
+  }
+}
+
+## |baseURI|
+{
+  my $doc2 = $doc->implementation->create_document;
+
+  $doc2->document_uri (q<ftp://suika.fam.cx/>);
+  ok $doc2->base_uri, q<ftp://suika.fam.cx/>, 'Document->base_uri [1]';
+
+  $doc2->document_uri (undef);
+  ok $doc2->base_uri, undef, 'Document->base_uri [2]';
+  ok $doc2->manakai_entity_base_uri, undef, 'Document->base_uri ebu [2]';
+
+  $doc2->manakai_entity_base_uri (q<https://suika.fam.cx/>);
+  ok $doc2->base_uri, q<https://suika.fam.cx/>, 'Document->base_uri [3]';
+  ok $doc2->manakai_entity_base_uri, q<https://suika.fam.cx/>,
+      'Document->base_uri ebu [3]';
+
+  $doc2->manakai_entity_base_uri (undef);
+  ok $doc2->base_uri, undef, 'Document->base_uri [4]';
+  ok $doc2->manakai_entity_base_uri, undef, 'Document->base_uri ebu [4]';
+
+  $doc2->document_uri (q<ftp://suika.fam.cx/>);
+  $doc2->manakai_entity_base_uri (q<https://suika.fam.cx/>);
+  ok $doc2->base_uri, q<https://suika.fam.cx/>, 'Document->base_uri [5]';
+  ok $doc2->manakai_entity_base_uri, q<https://suika.fam.cx/>,
+      'Document->base_uri ebu [5]';
+}
+
+for my $method (qw/
+                create_document_fragment
+                create_element_type_definition
+                create_attribute_definition
+                /) {
+  my $doc2 = $doc->implementation->create_document;  
+
+  my $node = $doc2->$method ('a');
+
+  $doc2->document_uri (q<ftp://doc.test/>);
+  ok $node->base_uri, q<ftp://doc.test/>, $node->node_name . '->base_uri [1]';
+
+  $doc2->manakai_entity_base_uri (q<ftp://suika.fam.cx/>);
+  ok $node->base_uri, q<ftp://suika.fam.cx/>,
+      $node->node_name . '->base_uri [2]';
+}
+
+{
+  my $doc2 = $doc->implementation->create_document;
+
+  my $attr = $doc2->create_attribute_ns (undef, 'attr');
+  
+  $doc2->document_uri (q<http://www.example.com/>);
+  ok $attr->base_uri, q<http://www.example.com/>, 'Attr->base_uri [1]';
+
+  my $el = $doc2->create_element_ns (undef, 'element');
+  $el->set_attribute_ns ('http://www.w3.org/XML/1998/namespace',
+                         'xml:base' => q<http://www.example.org/>);
+  $el->set_attribute_node_ns ($attr);
+  ok $attr->base_uri, q<http://www.example.org/>, 'Attr->base_uri [2]';
+}
+
+for my $i (0..1) {
+  my $xb = [
+            ['http://www.w3.org/XML/1998/namespace', 'xml:base'],
+            [undef, [undef, 'xml:base']],
+           ]->[$i];
+
+  my $doc2 = $doc->implementation->create_document;
+
+  my $attr = $doc2->create_attribute_ns (@$xb);
+  $attr->value (q<http://attr.test/>);
+
+  ok $attr->base_uri, undef, 'xml:base->base_uri [0]' . $i;
+
+  $doc2->document_uri (q<http://doc.test/>);
+  ok $attr->base_uri, q<http://doc.test/>, 'xml:base->base_uri [1]' . $i;
+
+  my $el = $doc2->create_element_ns (undef, 'e');
+  $el->set_attribute_node_ns ($attr);
+  ok $attr->base_uri, q<http://doc.test/>, 'xml:base->base_uri [2]' . $i;
+
+  my $pel = $doc2->create_element_ns (undef, 'e');
+  $pel->set_attribute_ns (@$xb, q<http://pel.test/>);
+  $pel->append_child ($el);
+  ok $attr->base_uri, q<http://pel.test/>, 'xml:base->base_uri [3]' . $i;
+}
+
+for my $i (0..1) {
+  my $xb = [
+            ['http://www.w3.org/XML/1998/namespace', 'xml:base'],
+            [undef, [undef, 'xml:base']],
+           ]->[$i];
+
+  my $doc2 = $doc->implementation->create_document;
+  
+  my $el = $doc2->create_element_ns (undef, 'el');
+
+  ok $el->base_uri, undef, "Element->base_uri [0]";
+  ok $el->manakai_base_uri, undef, "Element->manakai_base_uri [0]";
+
+  $doc2->document_uri (q<http://foo.example/>);
+  ok $el->base_uri, q<http://foo.example/>, "Element->base_uri [1]";
+  ok $el->manakai_base_uri, undef, "Element->manakai_base_uri [1]";
+
+  $el->set_attribute_ns (@$xb => q<http://www.example.com/>);
+  ok $el->base_uri, q<http://www.example.com/>, "Element->base_uri [2]";
+  ok $el->manakai_base_uri, undef, "Element->manakai_base_uri [2]";
+
+  $el->set_attribute_ns (@$xb => q<bar>);
+  ok $el->base_uri, q<http://foo.example/bar>, "Element->base_uri [3]";
+  ok $el->manakai_base_uri, undef, "Element->manakai_base_uri [3]";
+
+  $el->manakai_base_uri (q<http://baz.example/>);
+  ok $el->base_uri, q<http://baz.example/>, "Element->base_uri [4]";
+  ok $el->manakai_base_uri, q<http://baz.example/>,
+      "Element->manakai_base_uri [4]";
+
+  $el->manakai_base_uri (undef);
+  ok $el->base_uri, q<http://foo.example/bar>, "Element->base_uri [5]";
+  ok $el->manakai_base_uri, undef, "Element->manakai_base_uri [5]";
+}
+
+{
+  my $doc2 = $doc->implementation->create_document;
+  
+  my $el = $doc2->create_element_ns (undef, 'el');
+
+  ok $el->base_uri, undef, "Element->base_uri [6]";
+
+  $doc2->document_uri (q<http://doc.test/>);
+  ok $el->base_uri, q<http://doc.test/>, "Element->base_uri [7]";
+
+  my $el0 = $doc2->create_element_ns (undef, 'e');
+  $el0->set_attribute_ns ('http://www.w3.org/XML/1998/namespace', 'xml:base',
+                          q<http://el.test/>);
+  $el0->append_child ($el);
+  ok $el->base_uri, q<http://el.test/>, "Element->base_uri [8]";
+
+  my $ent = $doc2->create_entity_reference ('ent');
+  $ent->manakai_set_read_only (0, 1);
+  $ent->manakai_external (1);
+  $ent->manakai_entity_base_uri (q<http://ent.test/>);
+  $el0->append_child ($ent);
+  $ent->append_child ($el);
+  ok $el->base_uri, q<http://ent.test/>, "Element->base_uri [9]";
+}
+
+for (qw/create_text_node create_cdata_section create_comment/) {
+  my $doc2 = $doc->implementation->create_document;
+  my $node = $doc2->$_ ('');
+
+  $doc2->document_uri (q<http://doc.test/>);
+  ok $node->base_uri, q<http://doc.test/>, $node->node_name . "->base_uri [0]";
+
+  my $el = $doc2->create_element_ns (undef, 'e');
+  $el->set_attribute_ns ('http://www.w3.org/XML/1998/namespace', 'xml:base',
+                         q<http://el.test/>);
+  $el->append_child ($node);
+  ok $node->base_uri, q<http://el.test/>, $node->node_name . "->base_uri [1]";
+
+  my $ent = $doc2->create_entity_reference ('ent');
+  $ent->manakai_set_read_only (0, 1);
+  $ent->manakai_external (1);
+  $ent->manakai_entity_base_uri (q<http://ent.test/>);
+  $el->append_child ($ent);
+  $ent->append_child ($node);
+  ok $node->base_uri, q<http://ent.test/>, $node->node_name . "->base_uri [2]";
+}
+
+{
+  my $doc2 = $doc->implementation->create_document;
+  my $ent = $doc2->create_general_entity ('ent');
+
+  $doc2->document_uri (q<http://base.example/>);
+  ok $ent->base_uri, q<http://base.example/>, "Entity->base_uri [1]";
+  
+  $ent->manakai_entity_base_uri (q<http://www.example.com/>);
+  ok $ent->base_uri, q<http://base.example/>, "Entity->base_uri [2]";
+
+  $ent->manakai_declaration_base_uri (q<http://www.example/>);
+  ok $ent->base_uri, q<http://base.example/>, "Entity->base_uri [3]";
+}
+
+{
+  my $doc2 = $doc->implementation->create_document;
+
+  my $ent = $doc2->create_entity_reference ('ent');
+  $ent->manakai_set_read_only (0, 1);
+
+  $doc2->document_uri (q<http://base.example/>);
+  ok $ent->base_uri, q<http://base.example/>, "ER->base_uri [1]";
+
+  $ent->manakai_entity_base_uri (q<http://www.example.com/>);
+  ok $ent->base_uri, q<http://base.example/>;
+
+  my $el = $doc2->create_element_ns (undef, 'el');
+  $el->set_attribute_ns ('http://www.w3.org/XML/1998/namespace', 'xml:base',
+                         q<http://el.test/>);
+  $el->append_child ($ent);
+  ok $ent->base_uri, q<http://el.test/>, "ER->base_uri [2]";
+
+  my $xent = $doc2->create_entity_reference ('ext');
+  $xent->manakai_set_read_only (0, 1);
+  $xent->manakai_entity_base_uri (q<http://ent.test/>);
+  $xent->manakai_external (1);
+  $el->append_child ($xent);
+  $xent->append_child ($ent);
+  ok $ent->base_uri, q<http://ent.test/>, "ER->base_uri [3]";
+}
+
+{
+  my $doc2 = $doc->implementation->create_document;
+
+  my $pi = $doc2->create_processing_instruction ('i');
+
+  ok $pi->base_uri, undef, "PI->base_uri [0]";
+  ok $pi->manakai_base_uri, undef, "PI->manakai_base_uri [0]";
+
+  $doc2->document_uri (q<http://doc.test/>);
+  ok $pi->base_uri, q<http://doc.test/>, "PI->base_uri [1]";
+  ok $pi->manakai_base_uri, undef, "PI->manakai_base_uri [1]";
+
+  my $el = $doc2->create_element_ns (undef, 'e');
+  $el->set_attribute_ns ('http://www.w3.org/XML/1998/namespace', 'xml:base',
+                         q<http://el.test/>);
+  $el->append_child ($pi);
+  ok $pi->base_uri, q<http://el.test/>, "PI->base_uri [2]";
+  ok $pi->manakai_base_uri, undef, "PI->manakai_base_uri [2]";
+
+  my $ent = $doc2->create_entity_reference ('ent');
+  $ent->manakai_set_read_only (0, 1);
+  $ent->manakai_external (1);
+  $ent->manakai_entity_base_uri (q<http://ent.test/>);
+  $el->append_child ($ent);
+  $ent->append_child ($pi);
+  ok $pi->base_uri, q<http://ent.test/>, "PI->base_uri [3]";
+  ok $pi->manakai_base_uri, undef, "PI->manakai_base_uri [3]";
+  
+  $pi->manakai_base_uri (q<http://pi.ent/>);
+  ok $pi->base_uri, q<http://pi.ent/>, "PI->base_uri [4]";
+  ok $pi->manakai_base_uri, q<http://pi.ent/>, "PI->manakai_base_uri [4]";
+
+  $pi->manakai_base_uri (undef);
+  ok $pi->base_uri, q<http://ent.test/>, "PI->base_uri [5]";
+  ok $pi->manakai_base_uri, undef, "PI->manakai_base_uri [5]";
+}
+
+{
+  my $doc2 = $doc->implementation->create_document;
+
+  my $pi = $doc2->create_notation ('i');
+
+  $doc2->document_uri (q<http://doc.test/>);
+  ok $pi->base_uri, q<http://doc.test/>, "Notation->base_uri [1]";
+  
+  $pi->manakai_declaration_base_uri (q<http://www.example/>);
+  ok $pi->base_uri, q<http://doc.test/>, "Notation->base_uri [2]";
+}
+
+{
+  my $dt = $doc->implementation->create_document_type ('name');
+  ok $dt->base_uri, undef, "DT->base_uri [0]";
+
+  my $doc2 = $doc->implementation->create_document;
+  $doc2->append_child ($dt);
+  $doc2->document_uri (q<http://doc.test/>);
+  ok $dt->owner_document, $doc2;
+  ok $dt->base_uri, q<http://doc.test/>, "DT->base_uri [1]";
+}
+
+
 ## TODO: parent_node tests, as with append_child tests
 
 ## TODO: text_content tests for CharacterData and PI
 
-## TODO: manakai_read_only tests
+=head1 LICENSE
 
-sub create_nodes () {
-  (
-   $doc->create_attribute ('attr1'),
-   $doc->create_attribute_definition ('at1'),
-   $doc->create_cdata_section ('cdata1'),
-   $doc->create_comment ('comment1'),
-   $doc->create_element ('element1'),
-   $doc->create_element_type_definition ('et1'),
-   $doc->create_general_entity ('entity1'),
-   $doc->create_entity_reference ('entity-reference1'),
-   $doc->implementation->create_document,
-   $doc->create_document_fragment,
-   $doc->create_document_type_definition ('dt1'),
-   $doc->create_notation ('notation1'),
-   $doc->create_processing_instruction ('pi1', 'pi1data'),
-   $doc->create_text_node ('text1'),
-  );
-} # create_nodes
+Copyright 2007 Wakaba <w@suika.fam.cx>
 
-sub create_parent_nodes () {
-  (
-   $doc->create_attribute ('attr1'),
-   $doc->create_attribute_definition ('at1'),
-   $doc->create_element ('element1'),
-   $doc->create_general_entity ('entity1'),
-   $doc->create_entity_reference ('entity-reference1'),
-   $doc->implementation->create_document,
-   $doc->create_document_fragment,
-   $doc->create_document_type_definition ('dt1'),
-  );
-} # create_parent_nodes
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
 
-## License: Public Domain.
-## $Date: 2007/06/16 15:27:45 $
+=cut
+
+## $Date: 2007/06/17 13:37:42 $

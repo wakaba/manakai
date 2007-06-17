@@ -1,6 +1,6 @@
 package Message::DOM::Node;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::IF::Node';
 require Scalar::Util;
 require Message::DOM::DOMException;
@@ -120,7 +120,13 @@ sub AUTOLOAD {
 ## NOTE: Overridden by |Element|.
 sub attributes () { undef }
 
-## TODO: baseURI
+sub base_uri ($) {
+  ## NOTE: Overridden by |Attr|, |CharacterData|, |Document|, |DocumentType|,
+  ## |Element|, |EntityReference|, and |ProcessingInstruction|.
+
+  local $Error::Depth = $Error::Depth + 1;
+  return $_[0]->owner_document->base_uri;
+} # base_uri
 
 sub child_nodes ($) {
   ## NOTE: Overridden by |CharacterData|, |ElementTypeDefinition|,
@@ -206,7 +212,8 @@ sub text_content ($;$) {
   my $self = $_[0];
 
   if (@_ > 1) {
-    if ($$self->{manakai_read_only}) {
+    if (${$$self->{owner_document} or $self}->{strict_error_checking} and
+        $$self->{manakai_read_only}) {
       report Message::DOM::DOMException
           -object => $self,
           -type => 'NO_MODIFICATION_ALLOWED_ERR',
@@ -243,6 +250,8 @@ sub text_content ($;$) {
   }
 } # text_content
 
+## |Node| methods
+
 ## TODO:
 sub is_same_node ($$) {
   return $_[0] eq $_[1];
@@ -275,14 +284,41 @@ sub append_child ($$) {
     for (0..$#$parent_list) {
       if ($parent_list->[$_] eq $new_child) {
         splice @$parent_list, $_, 1;
+        last;
       }
     }
   }
   push @{$$self->{child_nodes}}, $new_child;
   $$new_child->{parent_node} = $self;
   Scalar::Util::weaken ($$new_child->{parent_node});
+  ## TODO:
+  $$new_child->{owner_document} = $self if $self->node_type == DOCUMENT_NODE;
   return $new_child;
 } # append_child
+
+sub manakai_append_text ($$) {
+  ## NOTE: For |Element|, |Attr|, |Entity|, |EntityReference|,
+  ## |DocumentFragment|, and |AttributeDefinition|.  In addition,
+  ## |Document|'s |text_content| might call this attribute.
+  
+  ## NOTE: Overridden by |Document|, |DocumentType|, |CharacterData|, 
+  ## |ElementTypeDefinition|, |Notation|, and |ProcessingInstruction|.
+
+  my $self = $_[0];
+  local $Error::Depth = $Error::Depth + 1;
+  if (@{$$self->{child_nodes}} and
+      $$self->{child_nodes}->[-1]->node_type == TEXT_NODE) {
+    $$self->{child_nodes}->[-1]->manakai_append_text ($_[1]);
+  } else {
+    my $text = ($$self->{owner_document} or $self)->create_text_node ($_[1]);
+    $self->append_child ($text);
+  }
+} # manakai_append_text
+
+sub get_feature {
+  ## TODO:
+  return $_[0];
+}
 
 ## NOTE: Only applied to Elements and Documents
 sub insert_before ($$;$) {
@@ -292,6 +328,7 @@ sub insert_before ($$;$) {
     for (0..$#$parent_list) {
       if ($parent_list->[$_] eq $new_child) {
         splice @$parent_list, $_, 1;
+        last;
       }
     }
   }
@@ -310,19 +347,6 @@ sub insert_before ($$;$) {
   return $new_child;
 } # insert_before
 
-## NOTE: For nodeTypes with childNodes
-sub manakai_append_text ($$) {
-  my $self = shift;
-  local $Error::Depth = $Error::Depth + 1;
-  if (@{$$self->{child_nodes}} and
-      $$self->{child_nodes}->[-1]->node_type == 3) {
-    $$self->{child_nodes}->[-1]->manakai_append_text (shift);
-  } else {
-    my $text = $$self->{owner_document}->create_text_node ($_[0]);
-    $self->append_child ($text);
-  }
-} # manakai_append_text
-
 ## NOTE: Only applied to Elements and Documents
 sub remove_child ($$) {
   my ($self, $old_child) = @_;
@@ -330,6 +354,7 @@ sub remove_child ($$) {
   for (0..$#$parent_list) {
     if ($parent_list->[$_] eq $old_child) {
       splice @$parent_list, $_, 1;
+      last;
     }
   }
   delete $$old_child->{parent_node};
@@ -342,9 +367,36 @@ sub has_child_nodes ($) {
 } # has_child_nodes
 
 sub manakai_set_read_only ($;$$) {
-  my ($self, $value, $deep) = @_;
-  ## TODO: deep
-  $$self->{manakai_read_only} = $value;
+  my $value = 1 if $_[1];
+  if ($_[2]) {
+    my @target = ($_[0]);
+    while (@target) {
+      my $target = shift @target;
+      if ($value) {
+        $$target->{manakai_read_only} = 1;
+      } else {
+        delete $$target->{manakai_read_only};
+      }
+      push @target, @{$target->child_nodes};
+      
+      my $nt = $target->node_type;
+      if ($nt == ELEMENT_NODE) {
+        push @target, @{$target->attributes};
+      } elsif ($nt == ELEMENT_TYPE_DEFINITION_NODE) {
+        push @target, @{$target->attribute_definitions};
+      } elsif ($nt == DOCUMENT_TYPE_NODE) {
+        push @target, @{$target->element_types};
+        push @target, @{$target->general_entities};
+        push @target, @{$target->notations};
+      }
+    }
+  } else { # not deep
+    if ($value) {
+      ${$_[0]}->{manakai_read_only} = 1;
+    } else {
+      delete ${$_[0]}->{manakai_read_only};
+    }
+  }
 } # manakai_set_read_only
 
 package Message::IF::Node;
@@ -359,4 +411,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/06/16 15:27:45 $
+## $Date: 2007/06/17 13:37:40 $

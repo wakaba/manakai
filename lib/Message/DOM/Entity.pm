@@ -1,11 +1,8 @@
 package Message::DOM::Entity;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::Entity';
 require Message::DOM::Node;
-
-## Spec:
-## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-527DCFF2>
 
 sub ____new ($$$) {
   my $self = shift->SUPER::____new (shift);
@@ -35,18 +32,53 @@ sub AUTOLOAD {
     };
     goto &{ $AUTOLOAD };
   } elsif ({
+    ## Read-write attributes (boolean, trivial accessors)
+    has_replacement_tree => 1,
+  }->{$method_name}) {
+    no strict 'refs';
+    eval qq{
+      sub $method_name (\$;\$) {
+        if (\@_ > 1) {
+          if (\${\${\$_[0]}->{owner_document}}->{manakai_strict_error_checking} and
+              \${\$_[0]}->{manakai_read_only}) {
+            report Message::DOM::DOMException
+                -object => \$_[0],
+                -type => 'NO_MODIFICATION_ALLOWED_ERR',
+                -subtype => 'READ_ONLY_NODE_ERR';
+          }
+          if (\$_[1]) {
+            \${\$_[0]}->{$method_name} = 1;
+          } else {
+            delete \${\$_[0]}->{$method_name};
+          }
+        }
+        return \${\$_[0]}->{$method_name};
+      }
+    };
+    goto &{ $AUTOLOAD };
+  } elsif ({
     ## Read-write attributes (DOMString, trivial accessors)
     public_id => 1,
     system_id => 1,
   }->{$method_name}) {
     no strict 'refs';
     eval qq{
-      sub $method_name (\$) {
+      sub $method_name (\$;\$) {
         if (\@_ > 1) {
-          ## TODO: read-only, undef
-          \${\$_[0]}->{$method_name} = ''.$_[1];
+          if (\${\$_[0]}->{strict_error_checking} and
+              \${\$_[0]}->{manakai_read_only}) {
+            report Message::DOM::DOMException
+                -object => \$_[0],
+                -type => 'NO_MODIFICATION_ALLOWED_ERR',
+                -subtype => 'READ_ONLY_NODE_ERR';
+          }
+          if (defined \$_[1]) {
+            \${\$_[0]}->{$method_name} = ''.\$_[1];
+          } else {
+            delete \${\$_[0]}->{$method_name};
+          }
         }
-        return \${\$_[0]}->{$method_name}; 
+        return \${\$_[0]}->{$method_name};
       }
     };
     goto &{ $AUTOLOAD };
@@ -55,33 +87,138 @@ sub AUTOLOAD {
     Carp::croak (qq<Can't locate method "$AUTOLOAD">);
   }
 } # AUTOLOAD
-sub public_id ($;$);
-sub system_id ($;$);
 
-## The |Node| interface - attribute
-
-## Spec:
-## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-F68D095>
-## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1950641247>
+## |Node| attributes
 
 sub node_name ($); # read-only trivial accessor
 
-## Spec:
-## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-111237558>
+sub node_type () { 6 } # ENTITY_NODE
 
-sub node_type ($) { 6 } # ENTITY_NODE
+## |Entity| attributes
+
+sub manakai_declaration_base_uri ($;$) {
+  ## NOTE: Same as |Notation|'s.
+
+  if (@_ > 1) {
+    if (${${$_[0]}->{owner_document}}->{strict_error_checking} and 
+        ${$_[0]}->{manakai_read_only}) {
+      report Message::DOM::DOMException
+          -object => $_[0],
+          -type => 'NO_MODIFICATION_ALLOWED_ERR',
+          -subtype => 'READ_ONLY_NODE_ERR';
+    }
+    if (defined $_[1]) {
+      ${$_[0]}->{manakai_declaration_base_uri} = ''.$_[1];
+    } else {
+      delete ${$_[0]}->{manakai_declaration_base_uri};
+    }
+  }
+  
+  if (defined wantarray) {
+    if (defined ${$_[0]}->{manakai_declaration_base_uri}) {
+      return ${$_[0]}->{manakai_declaration_base_uri};
+    } else {
+      local $Error::Depth = $Error::Depth + 1;
+      return $_[0]->base_uri;
+    }  
+  }
+} # manakai_declaration_base_uri
+
+sub manakai_entity_base_uri ($;$) {
+  my $self = $_[0];
+  if (@_ > 1) {
+    if (${$$self->{owner_document}}->{strict_error_checking}) {
+      if ($$self->{manakai_read_only}) {
+        report Message::DOM::DOMException
+            -object => $self,
+            -type => 'NO_MODIFICATION_ALLOWED_ERR',
+            -subtype => 'READ_ONLY_NODE_ERR';
+      }
+    }
+    if (defined $_[1]) {
+      $$self->{manakai_entity_base_uri} = ''.$_[1];
+    } else {
+      delete $$self->{manakai_entity_base_uri};
+    }
+  }
+
+  if (defined wantarray) {
+    if (defined $$self->{manakai_entity_base_uri}) {
+      return $$self->{manakai_entity_base_uri};
+    } else {
+      local $Error::Depth = $Error::Depth + 1;
+      my $v = $self->manakai_entity_uri;
+      return $v if defined $v;
+      return $self->base_uri;
+    }
+  }
+} # manakai_entity_base_uri
+
+sub manakai_entity_uri ($;$) {
+  my $self = $_[0];
+  if (@_ > 1) {
+    if (${$$self->{owner_document}}->{strict_error_checking}) {
+      if ($$self->{manakai_read_only}) {
+        report Message::DOM::DOMException
+            -object => $self,
+            -type => 'NO_MODIFICATION_ALLOWED_ERR',
+            -subtype => 'READ_ONLY_NODE_ERR';
+      }
+    }
+    if (defined $_[1]) {
+      $$self->{manakai_entity_uri} = ''.$_[1];
+    } else {
+      delete $$self->{manakai_entity_uri};
+    }
+  }
+
+  if (defined wantarray) {
+    return $$self->{manakai_entity_uri} if defined $$self->{manakai_entity_uri};
+
+    local $Error::Depth = $Error::Depth + 1;
+    my $v = $$self->{system_id};
+    if (defined $v) {
+      $v = ${$$self->{owner_document}}->{implementation}->create_uri_reference
+        ($v);
+      if (not defined $v->uri_scheme) {
+        my $base = $self->manakai_declaration_base_uri;
+        return $v->get_absolute_reference ($base)->uri_reference
+            if defined $base;
+      }
+      return $v->uri_reference;
+    } else {
+      return undef;
+    }
+  }
+} # manakai_entity_uri
+
+## NOTE: Setter is a manakai extension.
+sub public_id ($;$);
+
+## NOTE: Setter is a manakai extension.
+sub system_id ($;$);
+
+## |Entity| methods
+
+## NOTE: A manakai extension
+sub has_replacement_tree ($;$);
 
 package Message::IF::Entity;
 
 package Message::DOM::Document;
 
-## Spec: 
-## <http://suika.fam.cx/gate/2005/sw/DocumentXDoctype>
-
 sub create_general_entity ($$) {
   return Message::DOM::Entity->____new (@_[0, 1]);
 } # create_general_entity
 
+=head1 LICENSE
+
+Copyright 2007 Wakaba <w@suika.fam.cx>
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut
+
 1;
-## License: <http://suika.fam.cx/~wakaba/archive/2004/8/18/license#Perl+MPL>
-## $Date: 2007/06/16 08:05:48 $
+## $Date: 2007/06/17 13:37:40 $

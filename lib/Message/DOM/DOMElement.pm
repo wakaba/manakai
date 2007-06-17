@@ -2,7 +2,7 @@
 
 package Message::DOM::Element;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::Element';
 require Message::DOM::Node;
 
@@ -38,12 +38,14 @@ sub AUTOLOAD {
     goto &{ $AUTOLOAD };
   } elsif ({
     ## Read-write attributes (DOMString, trivial accessors)
+    manakai_base_uri => 1,
   }->{$method_name}) {
     no strict 'refs';
     eval qq{
       sub $method_name (\$;\$) {
         if (\@_ > 1) {
-          if (\${\$_[0]}->{manakai_read_only}) {
+          if (\${\${\$_[0]}->{owner_document}}->{strict_error_checking} and
+              \${\$_[0]}->{manakai_read_only}) {
             report Message::DOM::DOMException
                 -object => \$_[0],
                 -type => 'NO_MODIFICATION_ALLOWED_ERR',
@@ -55,7 +57,7 @@ sub AUTOLOAD {
             delete \${\$_[0]}->{$method_name};
           }
         }
-        return \${\$_[0]}->{$method_name}; 
+        return \${\$_[0]}->{$method_name};
       }
     };
     goto &{ $AUTOLOAD };
@@ -80,6 +82,47 @@ sub attributes ($) {
   return $r;
 } # attributes
 
+sub base_uri ($) {
+  my $self = $_[0];
+  return $$self->{manakai_base_uri} if defined $$self->{manakai_base_uri};
+
+  local $Error::Depth = $Error::Depth + 1;
+  my $xb = $self->get_attribute_node_ns
+    ('http://www.w3.org/XML/1998/namespace', 'base');
+  unless (defined $xb) {
+    $xb = $self->get_attribute_node_ns (undef, 'xml:base');
+  }
+
+  if ($xb) {
+    my $v = $self->owner_document->implementation->create_uri_reference
+      ($xb->value);
+    if (not defined $v->uri_scheme) { # Relative reference
+      my $xbbase = $xb->base_uri;
+      if (defined $xbbase) {
+        return $v->get_absolute_reference ($xbbase)->uri_reference;
+      }
+    }
+    return $v->uri_reference;
+  }
+
+  my $pe = $$self->{parent_node};
+  while (defined $pe) {
+    my $nt = $pe->node_type;
+    if ($nt == 1 or $nt == 6 or $nt == 9 or $nt == 11) {
+      ## Element, Entity, Document, or DocumentFragment
+      return $pe->base_uri;
+    } elsif ($nt == 5) {
+      ## EntityReference
+      if ($pe->manakai_external) {
+        return $pe->manakai_entity_base_uri;
+      }
+    }
+    $pe = $$pe->{parent_node};
+  }
+  return $pe->base_uri if $pe;
+  return $$self->{owner_document}->base_uri;
+} # base_uri
+
 sub local_name ($) { # TODO: HTML5 case
   return ${$_[0]}->{local_name};
 } # local_name
@@ -96,7 +139,6 @@ sub namespace_uri ($);
 *node_name = \&tag_name;
 
 sub node_type () { 1 } # ELEMENT_NODE
-
 
 sub prefix ($;$) {
   ## NOTE: No check for new value as Firefox doesn't do.
@@ -150,6 +192,8 @@ sub clone_node ($$) {
 
 ## The |Element| interface - attribute
 
+sub manakai_base_uri ($;$);
+
 ## TODO: HTML5 capitalization
 sub tag_name ($) {
   my $self = shift;
@@ -179,6 +223,16 @@ sub manakai_element_type_match ($$$) {
   }
 } # manakai_element_type_match
 
+sub get_attribute {
+  ## TODO
+  return $_[0]->get_attribute_ns (undef, $_[1]);
+}
+
+sub get_attribute_node {
+  ## TODO
+  return $_[0]->get_attribute_node_ns (undef, $_[1]);
+}
+
 sub get_attribute_ns ($$$) {
   my ($self, $nsuri, $ln) = @_;
   $nsuri = '' unless defined $nsuri;
@@ -198,13 +252,66 @@ sub has_attribute_ns ($$$) {
   return defined $$self->{attributes}->{$nsuri}->{$ln};
 } # has_attribute_ns
 
+sub set_attribute_node ($$) {
+  my ($self, $new_attr) = @_;
+  local $Error::Depth = $Error::Depth + 1;
+  my $check = ${$$self->{owner_document}}->{strict_error_checking};
+  if ($check and $$self->{owner_document} ne $new_attr->owner_document) {
+    local $Error::Depth = $Error::Depth - 1;
+    report Message::DOM::DOMException
+        -object => $self,
+        -type => 'WRONG_DOCUMENT_ERR';
+  }
+
+  my $nsuri = $$new_attr->{namespace_uri};
+  $nsuri = '' unless defined $nsuri;
+  my $ln = $$new_attr->{local_name};
+
+  delete $$self->{____content_attribute_list};
+  my $attrs = $$self->{attributes};
+  my $current = $attrs->{$nsuri}->{$ln};
+
+  if (defined $$new_attr->{owner_element}) {
+    if (defined $current and $current eq $new_attr) {
+      ## No effect
+      return undef; # no return value
+    } else {
+      local $Error::Depth = $Error::Depth - 1;
+      report Message::DOM::DOMException
+          -object => $self,
+          -type => 'INUSE_ATTRIBUTE_ERR';
+    }
+  } elsif ($check and $$self->{manakai_read_only}) {
+    report Message::DOM::DOMException
+        -object => $self,
+        -type => 'NO_MODIFICATION_ALLOWED_ERR',
+        -subtype => 'READ_ONLY_NODE_ERR';
+  }
+
+  $attrs->{$nsuri}->{$ln} = $new_attr;
+  $$new_attr->{owner_element} = $self;
+  Scalar::Util::weaken ($$new_attr->{owner_element});
+  $$new_attr->{specified} = 1;
+
+  if (defined $current) {
+    delete $$current->{owner_element};
+    $$current->{specified} = 1;
+  }
+  return $current;
+} # set_attribute_node
+
+*set_attribute_node_ns = \&set_attribute_node;
+
 ## The second parameter only supports manakai extended way
 ## to specify qualified name - "[$prefix, $local_name]"
 sub set_attribute_ns ($$$$) {
   my ($self, $nsuri, $qn, $value) = @_;
+  $qn = [split /:/, $qn, 2] unless ref $qn;
+  $qn = [undef, $qn->[0]] if not defined $qn->[1];
   require Message::DOM::Attr;
   my $attr = Message::DOM::Attr->____new
     ($$self->{owner_document}, $self, $nsuri, $qn->[0], $qn->[1]);
+  $nsuri = '' unless defined $nsuri;
   $$self->{attributes}->{$nsuri}->{$qn->[1]} = $attr;
   $attr->value ($value);
 } # set_attribute_ns
@@ -231,4 +338,4 @@ sub create_element_ns ($$$) {
 
 1;
 ## License: <http://suika.fam.cx/~wakaba/archive/2004/8/18/license#Perl+MPL>
-## $Date: 2007/06/16 15:27:45 $
+## $Date: 2007/06/17 13:37:40 $

@@ -1,10 +1,14 @@
 package Message::DOM::DOMException;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::Util::Error', 'Message::IF::DOMException';
 require Message::Util::Error;
 
 sub ___error_def () {+{
+  WRONG_DOCUMENT_ERR => {
+    -code => 4,
+    -description => q(Can't insert into different document),
+  },
   NO_MODIFICATION_ALLOWED_ERR => {
     -code => 7,
     -subtype => {
@@ -15,6 +19,21 @@ sub ___error_def () {+{
         -description => q(Can't modify read-only node list),
       },
     },
+  },
+  NOT_SUPPORTED_ERR => {
+    -code => 9,
+    -subtype => {
+      NON_HTML_OPERATION_ERR => {
+        -description => q(Can't apply to HTML document),
+      },
+      UNKNOWN_XML_VERSION_ERR => {
+        -description => q(Specified version of XML is not supported),
+      },
+    },
+  },
+  INUSE_ATTRIBUTE_ERR => {
+    -code => 10,
+    -description => q(Attribute is already in use),
   },
 }} # ___error_def
 
@@ -52,4 +71,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/06/16 15:27:45 $
+## $Date: 2007/06/17 13:37:40 $

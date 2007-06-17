@@ -1,6 +1,6 @@
 package Message::DOM::Attr;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::Attr';
 require Message::DOM::Node;
 
@@ -12,6 +12,7 @@ sub ____new ($$$$$$) {
    $$self->{local_name}) = @_;
   Scalar::Util::weaken ($$self->{owner_element});
   $$self->{child_nodes} = [];
+  $$self->{specified} = 1;
   return $self;
 } # ____new
              
@@ -32,29 +33,6 @@ sub AUTOLOAD {
       }
     };
     goto &{ $AUTOLOAD };
-  } elsif ({
-    ## Read-write attributes (DOMString, trivial accessors)
-  }->{$method_name}) {
-    no strict 'refs';
-    eval qq{
-      sub $method_name (\$;\$) {
-        if (\@_ > 1) {
-          if (\${\$_[0]}->{manakai_read_only}) {
-            report Message::DOM::DOMException
-                -object => \$_[0],
-                -type => 'NO_MODIFICATION_ALLOWED_ERR',
-                -subtype => 'READ_ONLY_NODE_ERR';
-          }
-          if (defined \$_[1]) {
-            \${\$_[0]}->{$method_name} = ''.\$_[1];
-          } else {
-            delete \${\$_[0]}->{$method_name};
-          }
-        }
-        return \${\$_[0]}->{$method_name}; 
-      }
-    };
-    goto &{ $AUTOLOAD };
   } else {
     require Carp;
     Carp::croak (qq<Can't locate method "$AUTOLOAD">);
@@ -62,7 +40,31 @@ sub AUTOLOAD {
 } # AUTOLOAD
 sub owner_element ($);
 
-## The |Node| interface - attribute
+## |Node| attributes
+
+sub base_uri ($) {
+  my $self = $_[0];
+  local $Error::Depth = $Error::Depth + 1;
+  my $oe = $self->owner_element;
+  if ($oe) {
+    my $ln = $self->local_name;
+    my $nsuri = $self->namespace_uri;
+    if (($ln eq 'base' and
+         defined $nsuri and $nsuri eq 'http://www.w3.org/XML/1998/namespace') or
+        ($ln eq 'xml:base' and not defined $nsuri)) {
+      my $oep = $oe->parent_node;
+      if ($oep) {
+        return $oep->base_uri;
+      } else {
+        return $self->owner_document->base_uri;
+      }
+    } else {
+      return $oe->base_uri;
+    }
+  } else {
+    return $self->owner_document->base_uri;
+  }
+} # base_uri
 
 sub local_name ($) {
   ## TODO: HTML5
@@ -70,7 +72,7 @@ sub local_name ($) {
 } # local_name
 
 sub manakai_local_name ($) {
-  return ${+shift}->{local_name};
+  return ${$_[0]}->{local_name};
 } # manakai_local_name
 
 sub namespace_uri ($);
@@ -96,7 +98,8 @@ sub prefix ($;$) {
   ## NOTE: Same as |Element|'s |prefix|.
   
   if (@_ > 1) {
-    if (${$_[0]}->{manakai_read_only}) {
+    if (${${$_[0]}->{owner_document}}->{strict_error_checking} and 
+        ${$_[0]}->{manakai_read_only}) {
       report Message::DOM::DOMException
           -object => $_[0],
           -type => 'NO_MODIFICATION_ALLOWED_ERR',
@@ -111,7 +114,28 @@ sub prefix ($;$) {
   return ${$_[0]}->{prefix}; 
 } # prefix
 
-## The |Attr| interface - attribute
+## |Attr| attributes
+
+sub manakai_attribute_type ($;$) {
+  my $self = $_[0];
+  if (@_ > 1) {
+    if (${$$self->{owner_document}}->{strict_error_checking}) {
+      if ($$self->{manakai_read_only}) {
+        report Message::DOM::DOMException
+            -object => $self,
+            -type => 'NO_MODIFICATION_ALLOWED_ERR',
+            -subtype => 'READ_ONLY_NODE_ERR';
+      }
+    }
+    if ($_[1]) {
+      $$self->{manakai_attribute_type} = 0+$_[1];
+    } else {
+      delete $$self->{manakai_attribute_type};
+    }
+  }
+  
+  return $$self->{manakai_attribute_type} || 0;
+} # manakai_attribute_type
 
 ## TODO: HTML5 case stuff?
 sub name ($) {
@@ -123,11 +147,28 @@ sub name ($) {
   }
 } # name
 
-sub value ($;$) {
+sub specified ($;$) {
   if (@_ > 1) {
-    ${$_[0]}->{value} = $_[1];
+    ## NOTE: A manakai extension.
+    if (${${$_[0]}->{owner_document}}->{strict_error_checking} and 
+        ${$_[0]}->{manakai_read_only}) {
+      report Message::DOM::DOMException
+          -object => $_[0],
+          -type => 'NO_MODIFICATION_ALLOWED_ERR',
+          -subtype => 'READ_ONLY_NODE_ERR';
+    }
+    if ($_[1] or not defined ${$_[0]}->{owner_element}) {
+      ${$_[0]}->{specified} = 1;
+    } else {
+      delete ${$_[0]}->{specified};
+    }
   }
-  return ${$_[0]}->{value};
+  return ${$_[0]}->{specified}; 
+} # specified
+
+sub value ($;$) {
+  ## TODO:
+  shift->text_content (@_);
 } # value
 
 package Message::IF::Attr;
@@ -152,4 +193,4 @@ sub create_attribute_ns ($$$) {
 
 1;
 ## License: <http://suika.fam.cx/~wakaba/archive/2004/8/18/license#Perl+MPL>
-## $Date: 2007/06/16 15:27:45 $
+## $Date: 2007/06/17 13:37:40 $

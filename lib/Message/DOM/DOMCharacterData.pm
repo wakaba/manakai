@@ -2,13 +2,13 @@
 
 package Message::DOM::CharacterData;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::CharacterData';
 require Message::DOM::Node;
 
 sub ____new ($$$) {
   my $self = shift->SUPER::____new (shift);
-  $$self->{data} = $_[0];
+  $$self->{data} = ''.(ref $_[0] eq 'SCALAR' ? ${$_[0]} : $_[0]);
   return $self;
 } # ____new
              
@@ -54,6 +54,27 @@ sub data ($;$);
 
 ## The |Node| interface - attribute
 
+sub base_uri ($) {
+  ## NOTE: Same as |EntityReference|'s.
+
+  my $self = $_[0];
+  local $Error::Depth = $Error::Depth + 1;
+  my $pe = $$self->{parent_node};
+  while (defined $pe) {
+    my $nt = $pe->node_type;
+    if ($nt == 1 or $nt == 2 or $nt == 6 or $nt == 9 or $nt == 11) {
+      ## Element, Attr, Entity, Document, or DocumentFragment
+      return $pe->base_uri;
+    } elsif ($nt == 5) {
+      ## EntityReference
+      return $pe->manakai_entity_base_uri if $pe->manakai_external;
+    }
+    $pe = $$pe->{parent_node};
+  }
+  return $pe->base_uri if $pe;
+  return $$self->{owner_document}->base_uri;
+} # base_uri
+
 sub child_nodes ($) {
   require Message::DOM::NodeList;
   return bless \\($_[0]), 'Message::DOM::NodeList::EmptyNodeList';
@@ -79,16 +100,30 @@ sub child_nodes ($) {
 
 *text_content = \&node_value; # For |CDATASection|, |Comment|, and |Text|.
 
-## The |Node| interface - method
+## |Node| methods
 
-## A manakai extension
 sub manakai_append_text ($$) {
-  my ($self, $s) = @_;
-  $$self->{data} .= $s;
+  ## NOTE: Same as |ProcessingInstruction|'s.
+  if (${${$_[0]}->{owner_document}}->{strict_error_checking} and
+      ${$_[0]}->{manakai_read_only}) {
+    report Message::DOM::DOMException
+        -object => $_[0],
+        -type => 'NO_MODIFICATION_ALLOWED_ERR',
+        -subtype => 'READ_ONLY_NODE_ERR';
+  }
+  ${$_[0]}->{data} .= ref $_[1] eq 'SCALAR' ? ${$_[1]} : $_[1];
 } # manakai_append_text
 
 package Message::IF::CharacterData;
 
+=head1 LICENSE
+
+Copyright 2007 Wakaba <w@suika.fam.cx>
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut
+
 1;
-## License: <http://suika.fam.cx/~wakaba/archive/2004/8/18/license#Perl+MPL>
-## $Date: 2007/06/16 15:27:45 $
+## $Date: 2007/06/17 13:37:40 $

@@ -1,11 +1,8 @@
 package Message::DOM::DocumentFragment;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::DocumentFragment';
 require Message::DOM::Node;
-
-## Spec:
-## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-B63ED1A3>
 
 sub ____new ($$) {
   my $self = shift->SUPER::____new (shift);
@@ -51,11 +48,7 @@ sub AUTOLOAD {
   }
 } # AUTOLOAD
 
-## The |Node| interface - attribute
-
-## Spec:
-## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-F68D095>
-## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-1950641247>
+## |Node| attributes
 
 sub node_name ($) {
   return '#document-fragment';
@@ -79,4 +72,4 @@ sub create_document_fragment ($) {
 
 1;
 ## License: <http://suika.fam.cx/~wakaba/archive/2004/8/18/license#Perl+MPL>
-## $Date: 2007/06/16 08:05:48 $
+## $Date: 2007/06/17 13:37:40 $

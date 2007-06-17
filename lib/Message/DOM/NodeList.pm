@@ -1,6 +1,6 @@
 package Message::DOM::NodeList;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Tie::Array', 'Message::IF::NodeList';
 require Message::DOM::DOMException;
 require Tie::Array;
@@ -96,6 +96,7 @@ sub STORE ($$$) {
   local $Error::Depth = $Error::Depth + 1;
   if (exists $list->[$index]) {
     $$$self->replace_child ($_[2], $list->[$index]);
+    ## ISSUE: This might not work if new_child is a sibling of ref_child
   } else {
     $$$self->append_child ($_[2]);
   }
@@ -178,4 +179,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/06/16 08:49:00 $
+## $Date: 2007/06/17 13:37:40 $

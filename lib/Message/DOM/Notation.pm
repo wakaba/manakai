@@ -1,6 +1,6 @@
 package Message::DOM::Notation;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::Notation';
 require Message::DOM::Node;
 
@@ -37,11 +37,22 @@ sub AUTOLOAD {
   }->{$method_name}) {
     no strict 'refs';
     eval qq{
-      sub $method_name (\$) {
+      sub $method_name (\$;\$) {
         if (\@_ > 1) {
-          \${\$_[0]}->{$method_name} = ''.$_[1];
+          if (\${\$_[0]}->{strict_error_checking} and
+              \${\$_[0]}->{manakai_read_only}) {
+            report Message::DOM::DOMException
+                -object => \$_[0],
+                -type => 'NO_MODIFICATION_ALLOWED_ERR',
+                -subtype => 'READ_ONLY_NODE_ERR';
+          }
+          if (defined \$_[1]) {
+            \${\$_[0]}->{$method_name} = ''.\$_[1];
+          } else {
+            delete \${\$_[0]}->{$method_name};
+          }
         }
-        return \${\$_[0]}->{$method_name}; 
+        return \${\$_[0]}->{$method_name};
       }
     };
     goto &{ $AUTOLOAD };
@@ -50,10 +61,8 @@ sub AUTOLOAD {
     Carp::croak (qq<Can't locate method "$AUTOLOAD">);
   }
 } # AUTOLOAD
-sub public_id ($;$);
-sub system_id ($;$);
 
-## The |Node| interface - attribute
+## |Node| attributes
 
 sub child_nodes ($) {
   require Message::DOM::NodeList;
@@ -64,7 +73,47 @@ sub node_name ($); # read-only trivial accessor
 
 sub node_type () { 12 } # NOTATION_NODE
 
-sub text_content ($;$) { undef }
+sub text_content () { undef }
+
+## |Node| methods
+
+sub manakai_append_text () { }
+
+## |Notation| attributes
+
+sub manakai_declaration_base_uri ($;$) {
+  ## NOTE: Same as |Notation|'s.
+
+  if (@_ > 1) {
+    if (${${$_[0]}->{owner_document}}->{strict_error_checking} and 
+        ${$_[0]}->{manakai_read_only}) {
+      report Message::DOM::DOMException
+          -object => $_[0],
+          -type => 'NO_MODIFICATION_ALLOWED_ERR',
+          -subtype => 'READ_ONLY_NODE_ERR';
+    }
+    if (defined $_[1]) {
+      ${$_[0]}->{manakai_declaration_base_uri} = ''.$_[1];
+    } else {
+      delete ${$_[0]}->{manakai_declaration_base_uri};
+    }
+  }
+  
+  if (defined wantarray) {
+    if (defined ${$_[0]}->{manakai_declaration_base_uri}) {
+      return ${$_[0]}->{manakai_declaration_base_uri};
+    } else {
+      local $Error::Depth = $Error::Depth + 1;
+      return $_[0]->base_uri;
+    }  
+  }
+} # manakai_declaration_base_uri
+
+## NOTE: Setter is a manakai extension.
+sub public_id ($;$);
+
+## NOTE: Setter is a manakai extension.
+sub system_id ($;$);
 
 package Message::IF::Notation;
 
@@ -84,4 +133,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/06/16 15:27:45 $
+## $Date: 2007/06/17 13:37:40 $

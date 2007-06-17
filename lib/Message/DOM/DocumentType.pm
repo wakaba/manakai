@@ -1,6 +1,6 @@
 package Message::DOM::DocumentType;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::DocumentType',
     'Message::IF::DocumentTypeDefinition',
     'Message::IF::DocumentTypeDeclaration';
@@ -36,14 +36,27 @@ sub AUTOLOAD {
     goto &{ $AUTOLOAD };
   } elsif ({
     ## Read-write attributes (DOMString, trivial accessors)
+    public_id => 1,
+    system_id => 1,
   }->{$method_name}) {
     no strict 'refs';
     eval qq{
-      sub $method_name (\$) {
+      sub $method_name (\$;\$) {
         if (\@_ > 1) {
-          \${\$_[0]}->{$method_name} = ''.$_[1];
+          if (\${\$_[0]}->{strict_error_checking} and
+              \${\$_[0]}->{manakai_read_only}) {
+            report Message::DOM::DOMException
+                -object => \$_[0],
+                -type => 'NO_MODIFICATION_ALLOWED_ERR',
+                -subtype => 'READ_ONLY_NODE_ERR';
+          }
+          if (defined \$_[1]) {
+            \${\$_[0]}->{$method_name} = ''.\$_[1];
+          } else {
+            delete \${\$_[0]}->{$method_name};
+          }
         }
-        return \${\$_[0]}->{$method_name}; 
+        return \${\$_[0]}->{$method_name};
       }
     };
     goto &{ $AUTOLOAD };
@@ -54,7 +67,9 @@ sub AUTOLOAD {
 } # AUTOLOAD
 sub name ($);
 
-## The |Node| interface - attribute
+## |Node| attributes
+
+*base_uri = \&declaration_base_uri;
 
 ## NOTE: A manakai extension
 sub implementation ($) {
@@ -78,6 +93,69 @@ sub node_type () { 10 } # DOCUMENT_TYPE_NODE
 
 sub text_content ($;$) { undef }
 
+## |Node| methods
+
+sub manakai_append_text () { }
+
+## |DocumentType| attributes
+
+## NOTE: A manakai extension.
+sub declaration_base_uri ($;$) {
+  if (${$_[0]}->{owner_document}) {
+    local $Error::Depth = $Error::Depth + 1;
+    return ${$_[0]}->{owner_document}->base_uri;
+  }
+  return undef;
+} # declaration_base_uri
+
+*manakai_declaration_base_uri = \&declaration_base_uri;
+
+## NOTE: Setter is a manakai extension.
+sub public_id ($;$);
+
+## NOTE: Setter is a manakai extension.
+sub system_id ($;$);
+
+## |DocumentTypeDefinition| attributes
+
+## TODO:
+sub element_types {
+  return [values %{${$_[0]}->{element_types} or {}}];
+}
+
+## TODO:
+sub general_entities {
+  return [values %{${$_[0]}->{entities} or {}}];
+}
+
+## TODO:
+sub notations {
+  return [values %{${$_[0]}->{notations} or {}}];
+}
+
+## |DocumentTypeDefinition| methods
+
+## TODO:
+sub set_element_type_definition_node {
+  ${$_[0]}->{element_types}->{$_[1]->node_name} = $_[1];
+  ${$_[1]}->{owner_document_type_definition} = $_[0];
+  Scalar::Util::weaken (${$_[1]}->{owner_document_type_definition});
+}
+
+## TODO:
+sub set_general_entity_node {
+  ${$_[0]}->{entities}->{$_[1]->node_name} = $_[1];
+  ${$_[1]}->{owner_document_type_definition} = $_[0];
+  Scalar::Util::weaken (${$_[1]}->{owner_document_type_definition});
+}
+
+## TODO:
+sub set_notation_node {
+  ${$_[0]}->{notations}->{$_[1]->node_name} = $_[1];
+  ${$_[1]}->{owner_document_type_definition} = $_[0];
+  Scalar::Util::weaken (${$_[1]}->{owner_document_type_definition});
+}
+
 package Message::IF::DocumentType;
 package Message::IF::DocumentTypeDefinition;
 package Message::IF::DocumentTypeDeclaration;
@@ -99,4 +177,4 @@ sub create_document_type_definition ($$) {
 
 1;
 ## License: <http://suika.fam.cx/~wakaba/archive/2004/8/18/license#Perl+MPL>
-## $Date: 2007/06/16 15:27:45 $
+## $Date: 2007/06/17 13:37:40 $
