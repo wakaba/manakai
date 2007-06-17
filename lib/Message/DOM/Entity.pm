@@ -1,6 +1,6 @@
 package Message::DOM::Entity;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::Entity';
 require Message::DOM::Node;
 
@@ -58,8 +58,10 @@ sub AUTOLOAD {
     goto &{ $AUTOLOAD };
   } elsif ({
     ## Read-write attributes (DOMString, trivial accessors)
+    notation_name => 1,
     public_id => 1,
     system_id => 1,
+    xml_encoding => 1,
   }->{$method_name}) {
     no strict 'refs';
     eval qq{
@@ -193,10 +195,16 @@ sub manakai_entity_uri ($;$) {
 } # manakai_entity_uri
 
 ## NOTE: Setter is a manakai extension.
+sub notation_name ($;$);
+
+## NOTE: Setter is a manakai extension.
 sub public_id ($;$);
 
 ## NOTE: Setter is a manakai extension.
 sub system_id ($;$);
+
+## NOTE: Setter is a manakai extension.
+sub xml_encoding ($;$);
 
 ## |Entity| methods
 
@@ -221,4 +229,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/06/17 13:37:40 $
+## $Date: 2007/06/17 14:15:39 $

@@ -2,7 +2,7 @@
 
 package Message::DOM::CharacterData;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::CharacterData';
 require Message::DOM::Node;
 
@@ -97,6 +97,7 @@ sub child_nodes ($) {
 ## ISSUE: DOM3 Core does not explicitly say setting |null|
 ## on read-only node is ignored.  Strictly speaking, it does not even
 ## say what the setter does for |CharacterData| and PI nodes.
+## What if setting |null| to non read-only |CharacterData| or PI?
 
 *text_content = \&node_value; # For |CDATASection|, |Comment|, and |Text|.
 
@@ -126,4 +127,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/06/17 13:37:40 $
+## $Date: 2007/06/17 14:15:39 $

@@ -421,6 +421,7 @@ my $tests = {
       next_sibling => undef,
       node_name => 'e',
       node_value => undef,
+      notation_name => undef,
       owner_document => $doc,
       parent_node => undef,
       previous_sibling => undef,
@@ -1234,4 +1235,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2007/06/17 13:37:42 $
+## $Date: 2007/06/17 14:15:39 $

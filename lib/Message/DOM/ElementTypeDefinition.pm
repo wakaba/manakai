@@ -1,6 +1,6 @@
 package Message::DOM::ElementTypeDefinition;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::ElementTypeDefinition';
 require Message::DOM::Node;
 
@@ -73,6 +73,8 @@ sub manakai_append_text () { }
 
 ## TODO:
 sub attribute_definitions {
+  use Want;
+  return ${$_[0]}->{attribute_definitions} if want ('HASH');
   return [values %{${$_[0]}->{attribute_definitions} or {}}];
 }
 
@@ -98,4 +100,4 @@ sub create_element_type_definition ($$) {
 
 1;
 ## License: <http://suika.fam.cx/~wakaba/archive/2004/8/18/license#Perl+MPL>
-## $Date: 2007/06/17 13:37:40 $
+## $Date: 2007/06/17 14:15:39 $

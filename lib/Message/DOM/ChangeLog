@@ -1,5 +1,19 @@
 2007-06-17  Wakaba  <wakaba@suika.fam.cx>
 
+	* AttributeDefinition.pm (____new): Set an empty list
+	to the |allowed_tokens| attribute.
+	(allowed_token): Alpha version.
+
+	* DocumentType.pm (get_element_type_definition_node,
+	get_notation_node): ALpha version.
+
+	* ElementTypeDefinition.pm (attribute_definitions): Alpha 2
+	version.
+
+	* Entity.pm (notation_name): Implemented.
+
+2007-06-17  Wakaba  <wakaba@suika.fam.cx>
+
 	* Attr.pm (____new): Initialize |specified| as 1.
 	(base_uri, manakai_attribute_type, specified): Implemented.
 	(prefix): Don't check read-only flag unless |strict_error_checking|.
