@@ -58,6 +58,13 @@ my $constants = [
   [NOTATION_NODE => 12],
   [ELEMENT_TYPE_DEFINITION_NODE => 81001],
   [ATTRIBUTE_DEFINITION_NODE => 81002],
+
+  [DOCUMENT_POSITION_DISCONNECTED => 0x01],
+  [DOCUMENT_POSITION_PRECEDING => 0x02],
+  [DOCUMENT_POSITION_FOLLOWING => 0x04],
+  [DOCUMENT_POSITION_CONTAINS => 0x08],
+  [DOCUMENT_POSITION_CONTAINED_BY => 0x10],
+  [DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC => 0x20],
 ];
 
 my $tests = {
@@ -66,6 +73,7 @@ my $tests = {
     attr_get => {
       manakai_attribute_type => 0,
       base_uri => undef,
+      manakai_expanded_uri => 'a',
       first_child => undef,
       last_child => undef,
       local_name => 'a',
@@ -83,6 +91,8 @@ my $tests = {
       attributes => undef,
     },
     attr_get_bool => {
+      has_attributes => 0,
+      has_child_nodes => 0,
       specified => 1,
     },
   },
@@ -95,6 +105,7 @@ my $tests = {
     attr_get => {
       manakai_attribute_type => 0,
       base_uri => undef,
+      manakai_expanded_uri => 'a',
       local_name => 'a',
       manakai_local_name => 'a',
       namespace_uri => undef,
@@ -110,6 +121,8 @@ my $tests = {
       attributes => undef,
     },
     attr_get_bool => {
+      has_attributes => 0,
+      has_child_nodes => 1,
       specified => 1,
     },
   },
@@ -117,6 +130,7 @@ my $tests = {
     node => sub { return $doc->create_attribute_ns (undef, 'a') },
     attr_get => {
       base_uri => undef,
+      manakai_expanded_uri => 'a',
       local_name => 'a',
       manakai_local_name => 'a',
       namespace_uri => undef,
@@ -131,11 +145,17 @@ my $tests = {
       attributes => undef,
       previous_sibling => undef,
     },
+    attr_get_bool => {
+      has_attributes => 0,
+      has_child_nodes => 0,
+      specified => 1,
+    },
   },
   attr_ns_prefixed => {
     node => sub { return $doc->create_attribute_ns ('http://test/', 'a:b') },
     attr_get => {
       base_uri => undef,
+      manakai_expanded_uri => 'http://test/b',
       local_name => 'b',
       manakai_local_name => 'b',
       namespace_uri => 'http://test/',
@@ -150,11 +170,17 @@ my $tests = {
       attributes => undef,
       previous_sibling => undef,
     },
+    attr_get_bool => {
+      has_attributes => 0,
+      has_child_nodes => 0,
+      specified => 1,
+    },
   },
   cdatasection => {
     node => sub { return $doc->create_cdata_section ('cdatadata') },
     attr_get => {
       base_uri => undef,
+      manakai_expanded_uri => undef,
       first_child => undef,
       last_child => undef,
       local_name => undef,
@@ -170,11 +196,16 @@ my $tests = {
       attributes => undef,
       previous_sibling => undef,
     },
+    attr_get_bool => {
+      has_attributes => 0,
+      has_child_nodes => 0,
+    },
   },
   cdatasectionmde => {
     node => sub { return $doc->create_cdata_section ('cdata]]>data') },
     attr_get => {
       base_uri => undef,
+      manakai_expanded_uri => undef,
       first_child => undef,
       last_child => undef,
       local_name => undef,
@@ -190,11 +221,16 @@ my $tests = {
       attributes => undef,
       previous_sibling => undef,
     },
+    attr_get_bool => {
+      has_attributes => 0,
+      has_child_nodes => 0,
+    },
   },
   comment => {
     node => sub { return $doc->create_comment ('commentdata') },
     attr_get => {
       base_uri => undef,
+      manakai_expanded_uri => undef,
       first_child => undef,
       last_child => undef,
       local_name => undef,
@@ -209,12 +245,17 @@ my $tests = {
       data => 'commentdata',
       attributes => undef,
       previous_sibling => undef,
+    }, 
+    attr_get_bool => {
+      has_attributes => 0,
+      has_child_nodes => 0,
     },
   },
   commentcom1 => {
     node => sub { return $doc->create_comment ('comment--data') },
     attr_get => {
       base_uri => undef,
+      manakai_expanded_uri => undef,
       first_child => undef,
       last_child => undef,
       local_name => undef,
@@ -230,11 +271,16 @@ my $tests = {
       attributes => undef,
       previous_sibling => undef,
     },
+    attr_get_bool => {
+      has_attributes => 0,
+      has_child_nodes => 0,
+    },
   },
   commentcom2 => {
     node => sub { return $doc->create_comment ('commentdata-') },
     attr_get => {
       base_uri => undef,
+      manakai_expanded_uri => undef,
       first_child => undef,
       last_child => undef,
       local_name => undef,
@@ -250,6 +296,10 @@ my $tests = {
       attributes => undef,
       previous_sibling => undef,
     },
+    attr_get_bool => {
+      has_attributes => 0,
+      has_child_nodes => 0,
+    },
   },
   document => {
     node => sub { return $doc },
@@ -258,6 +308,7 @@ my $tests = {
       base_uri => undef,
       document_uri => undef,
       manakai_entity_base_uri => undef,
+      manakai_expanded_uri => undef,
       first_child => undef,
       implementation => $dom,
       last_child => undef,
@@ -276,6 +327,8 @@ my $tests = {
     },
     attr_get_bool => {
       all_declarations_processed => 0,
+      has_attributes => 0,
+      has_child_nodes => 0,
       manakai_is_html => 0,
       strict_error_checking => 1,
       xml_standalone => 0,
@@ -286,6 +339,7 @@ my $tests = {
     attr_get => {
       attributes => undef,
       base_uri => undef,
+      manakai_expanded_uri => undef,
       first_child => undef,
       last_child => undef,
       local_name => undef,
@@ -299,6 +353,10 @@ my $tests = {
       prefix => undef,
       previous_sibling => undef,
     },
+    attr_get_bool => {
+      has_attributes => 0,
+      has_child_nodes => 0,
+    },
   },
   document_type => {
     node => sub { return $doc->implementation->create_document_type ('n') },
@@ -307,6 +365,7 @@ my $tests = {
       base_uri => undef,
       declaration_base_uri => undef,
       manakai_declaration_base_uri => undef,
+      manakai_expanded_uri => undef,
       first_child => undef,
       implementation => $dom,
       last_child => undef,
@@ -323,6 +382,10 @@ my $tests = {
       public_id => undef,
       system_id => undef,
     },
+    attr_get_bool => {
+      has_attributes => 0,
+      has_child_nodes => 0,
+    },
   },
   document_type_definition => {
     node => sub { return $doc->create_document_type_definition ('n') },
@@ -331,6 +394,7 @@ my $tests = {
       base_uri => undef,
       declaration_base_uri => undef,
       manakai_declaration_base_uri => undef,
+      manakai_expanded_uri => undef,
       first_child => undef,
       implementation => $dom,
       last_child => undef,
@@ -347,6 +411,10 @@ my $tests = {
       public_id => undef,
       system_id => undef,
     },
+    attr_get_bool => {
+      has_attributes => 0,
+      has_child_nodes => 0,
+    },
   },
   element => {
     node => sub { return $doc->create_element ('e') },
@@ -354,6 +422,7 @@ my $tests = {
       ## TODO: attributes => 
       base_uri => undef,
       manakai_base_uri => undef,
+      manakai_expanded_uri => 'e',
       first_child => undef,
       last_child => undef,
       local_name => 'e',
@@ -367,6 +436,10 @@ my $tests = {
       prefix => undef,
       previous_sibling => undef,
     },
+    attr_get_bool => {
+      has_attributes => 0,
+      has_child_nodes => 0,
+    },
   },
   element_ns_default => {
     node => sub { return $doc->create_element_ns ('http://test/', 'f') },
@@ -374,6 +447,7 @@ my $tests = {
       ## TODO: attributes => 
       base_uri => undef,
       manakai_base_uri => undef,
+      manakai_expanded_uri => 'http://test/f',
       first_child => undef,
       last_child => undef,
       local_name => 'f',
@@ -387,6 +461,10 @@ my $tests = {
       prefix => undef,
       previous_sibling => undef,
     },
+    attr_get_bool => {
+      has_attributes => 0,
+      has_child_nodes => 0,
+    },
   },
   element_ns_prefiexed => {
     node => sub { return $doc->create_element_ns ('http://test/', 'e:f') },
@@ -394,6 +472,7 @@ my $tests = {
       ## TODO: attributes => 
       base_uri => undef,
       manakai_base_uri => undef,
+      manakai_expanded_uri => 'http://test/f',
       first_child => undef,
       last_child => undef,
       local_name => 'f',
@@ -407,6 +486,10 @@ my $tests = {
       prefix => 'e',
       previous_sibling => undef,
     },
+    attr_get_bool => {
+      has_attributes => 0,
+      has_child_nodes => 0,
+    },
   },
   entity => {
     node => sub { return $doc->create_general_entity ('e') },
@@ -416,6 +499,7 @@ my $tests = {
       manakai_declaration_base_uri => undef,
       manakai_entity_base_uri => undef,
       manakai_entity_uri => undef,
+      manakai_expanded_uri => undef,
       first_child => undef,
       last_child => undef,
       next_sibling => undef,
@@ -428,6 +512,10 @@ my $tests = {
       public_id => undef,
       system_id => undef,
     },
+    attr_get_bool => {
+      has_attributes => 0,
+      has_child_nodes => 0,
+    },
   },
   entity_reference => {
     node => sub { return $doc->create_entity_reference ('e') },
@@ -435,6 +523,7 @@ my $tests = {
       attributes => undef,
       base_uri => undef,
       manakai_entity_base_uri => undef,
+      manakai_expanded_uri => undef,
       first_child => undef,
       last_child => undef,
       local_name => undef,
@@ -451,6 +540,8 @@ my $tests = {
     attr_get_bool => {
       manakai_expanded => 0,
       manakai_external => 0,
+      has_attributes => 0,
+      has_child_nodes => 0,
     },
   },
   notation => {
@@ -459,6 +550,7 @@ my $tests = {
       attributes => undef,
       base_uri => undef,
       manakai_declaration_base_uri => undef,
+      manakai_expanded_uri => undef,
       first_child => undef,
       last_child => undef,
       local_name => undef,
@@ -474,6 +566,10 @@ my $tests = {
       public_id => undef,
       system_id => undef,
     },
+    attr_get_bool => {
+      has_attributes => 0,
+      has_child_nodes => 0,
+    },
   },
   processing_instruction => {
     node => sub { return $doc->create_processing_instruction ('t', 'd') },
@@ -481,6 +577,7 @@ my $tests = {
       attributes => undef,
       base_uri => undef,
       manakai_base_uri => undef,
+      manakai_expanded_uri => undef,
       first_child => undef,
       last_child => undef,
       local_name => undef,
@@ -494,12 +591,17 @@ my $tests = {
       prefix => undef,
       previous_sibling => undef,
     },
+    attr_get_bool => {
+      has_attributes => 0,
+      has_child_nodes => 0,
+    },
   },
   text => {
     node => sub { return $doc->create_text_node ('textdata') },
     attr_get => {
       attributes => undef,
       base_uri => undef,
+      manakai_expanded_uri => undef,
       first_child => undef,
       last_child => undef,
       local_name => undef,
@@ -513,12 +615,17 @@ my $tests = {
       prefix => undef,
       previous_sibling => undef,
     },
+    attr_get_bool => {
+      has_attributes => 0,
+      has_child_nodes => 0,
+    },
   },
   element_type_definition => {
     node => sub { return $doc->create_element_type_definition ('e') },
     attr_get => {
       attributes => undef,
       base_uri => undef,
+      manakai_expanded_uri => undef,
       first_child => undef,
       last_child => undef,
       local_name => undef,
@@ -532,6 +639,10 @@ my $tests = {
       prefix => undef,
       previous_sibling => undef,
     },
+    attr_get_bool => {
+      has_attributes => 0,
+      has_child_nodes => 0,
+    },
   },
   attribute_definition => {
     node => sub { return $doc->create_attribute_definition ('e') },
@@ -540,6 +651,7 @@ my $tests = {
       base_uri => undef,
       declared_type => 0,
       default_type => 0,
+      manakai_expanded_uri => undef,
       first_child => undef,
       last_child => undef,
       local_name => undef,
@@ -552,6 +664,10 @@ my $tests = {
       parent_node => undef,
       prefix => undef,
       previous_sibling => undef,
+    },
+    attr_get_bool => {
+      has_attributes => 0,
+      has_child_nodes => 0,
     },
   },
 };
@@ -1221,6 +1337,363 @@ for (qw/create_text_node create_cdata_section create_comment/) {
   ok $dt->base_uri, q<http://doc.test/>, "DT->base_uri [1]";
 }
 
+## |hasAttribute|
+{
+  my $el = $doc->create_element ('e');
+  ok $el->has_attributes ? 1 : 0, 0, "Element->has_attributes [0]";
+
+  $el->set_attribute (a => 'b');
+  ok $el->has_attributes ? 1 : 0, 1, "Element->has_attributes [1]";
+
+  $el->set_attribute (c => 'd');
+  ok $el->has_attributes ? 1 : 0, 1, "Element->has_attributes [2]";
+
+  $el->remove_attribute ('c');
+  ok $el->has_attributes ? 1 : 0, 1, "Element->has_attributes [3]";
+
+  $el->get_attribute_node ('a')->specified (0);
+  ok $el->has_attributes ? 1 : 0, 1, "Element->has_attributes [4]";
+
+  $el->remove_attribute ('a');
+  ok $el->has_attributes ? 1 : 0, 0, "Element->has_attributes [5]";
+}
+
+## |hasChildNodes|
+{
+  my $doc2 = $doc->implementation->create_document;
+  
+  ok $doc2->has_child_nodes ? 1 : 0, 0, "Document->has_child_nodes [0]";
+
+  $doc2->append_child ($doc2->create_comment (''));
+  ok $doc2->has_child_nodes ? 1 : 0, 1, "Document->has_child_nodes [1]";
+
+  $doc2->append_child ($doc2->create_comment (''));
+  ok $doc2->has_child_nodes ? 1 : 0, 1, "Document->has_child_nodes [2]";
+
+  $doc2->remove_child ($doc2->first_child);
+  ok $doc2->has_child_nodes ? 1 : 0, 1, "Document->has_child_nodes [3]";
+
+  $doc2->remove_child ($doc2->first_child);
+  ok $doc2->has_child_nodes ? 1 : 0, 0, "Document->has_child_nodes [4]";
+}
+
+## |compareDocumentPosition|
+{
+  my $e1 = $doc->create_element ('e1');
+  my $e2 = $doc->create_element ('e2');
+  
+  my $dp2 = $e1->compare_document_position ($e2);
+  
+  ok $dp2 & $e1->DOCUMENT_POSITION_DISCONNECTED ? 1 : 0, 1, "cdp [1]";
+  ok $dp2 & $e1->DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC ? 1 : 0, 1, "edp [2]";
+  ok (($dp2 & $e1->DOCUMENT_POSITION_PRECEDING ||
+       $dp2 & $e1->DOCUMENT_POSITION_FOLLOWING) ? 1 : 0, 1, "cdp [3]");
+
+  my $dp1 = $e2->compare_document_position ($e1);
+  
+  ok $dp1 & $e1->DOCUMENT_POSITION_DISCONNECTED ? 1 : 0, 1, "cdp [4]";
+  ok $dp1 & $e1->DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC ? 1 : 0, 1, "cdp [5]";
+  ok (($dp1 & $e1->DOCUMENT_POSITION_PRECEDING ||
+       $dp1 & $e1->DOCUMENT_POSITION_FOLLOWING) ? 1 : 0, 1, "cdp [6]");
+}
+
+{
+  my $e1 = $doc->create_element ('e1');
+  my $e2 = $doc->create_element ('e2');
+
+  my $pe = $doc->create_element ('pe');
+  $pe->append_child ($e1);
+  $pe->append_child ($e2);
+
+  my $dp2 = $e1->compare_document_position ($e2);
+
+  ok $dp2 & $e1->DOCUMENT_POSITION_FOLLOWING ? 1 : 0, 1, "cde [7]";
+
+  my $dp1 = $e2->compare_document_position ($e1);
+
+  ok $dp1 & $e1->DOCUMENT_POSITION_PRECEDING ? 1 : 0, 1, "cde [8]";
+}
+## TODO: Apparently compare_document_position requires more tests.
+
+## |lookupNamespaceURI|
+{
+  for my $node (create_nodes ()) {
+    ok $node->lookup_namespace_uri ('ns1'), undef, $node->node_name . " lnu [0]";
+    ok $node->lookup_namespace_uri ('xml'), undef, $node->node_name . " lnu [1]";
+    ok $node->lookup_namespace_uri ('xmlns'), undef, $node->node_name . " lnu [2]";
+    ok $node->lookup_namespace_uri (''), undef, $node->node_name . " lnu [3]";
+    ok $node->lookup_namespace_uri (undef), undef, $node->node_name . " lnu [4]";
+  }
+
+  my $el = $doc->create_element_ns ('about:', 'el');
+  ok $el->lookup_namespace_uri ('ns1'), undef, 'Element->lnu [0]';
+
+  $el->prefix ('ns1');
+  ok $el->lookup_namespace_uri ('ns1'), 'about:', 'Element->lnu [1]';
+
+  $el->set_attribute_ns ('http://www.w3.org/2000/xmlns/', 'xmlns:ns1', 'DAV:');
+  ok $el->lookup_namespace_uri ('ns1'), 'about:', 'Element->lnu [2]';
+
+  $el->prefix (undef);
+  ok $el->lookup_namespace_uri ('ns1'), 'DAV:', 'Element->lnu [3]';
+}
+
+## |lookupPrefix|
+{
+  for my $node (create_nodes ()) {
+    ok $node->lookup_prefix ('http://test/'), undef, $node->node_name . "lp [0]";
+    ok $node->lookup_prefix ('http://www.w3.org/XML/1998/namespace'), undef, $node->node_name . "lp [1]";
+    ok $node->lookup_prefix ('http://www.w3.org/2000/xmlns/'), undef, $node->node_name . "lp [2]";
+    ok $node->lookup_prefix ('http://www.w3.org/1999/xhtml'), undef, $node->node_name . "lp [3]";
+    ok $node->lookup_prefix (''), undef, $node->node_name . "lp [4]";
+    ok $node->lookup_prefix (undef), undef, $node->node_name . "lp [5]";
+  }
+
+  my $el = $doc->create_element_ns ('http://test/', 'e');
+  ok $el->lookup_prefix ('ns'), undef, "Element->lp [0]";;
+
+  my $el2 = $doc->create_element_ns ('http://test/', 'f');
+  $el2->append_child ($el);
+  $el2->prefix ('ns');
+  ok $el->lookup_prefix ('http://test/'), 'ns', "Element->lp [1]";
+
+  $el->set_attribute_ns ('http://www.w3.org/2000/xmlns/', 'xmlns:a',
+                         'http://test/');
+  ok $el->lookup_prefix ('http://test/'), 'a', "Element->lp [2]";
+
+  $el->prefix ('b');
+  ok $el->lookup_prefix ('http://test/'), 'b', "Element->lp [3]";
+}
+
+## |isDefaultNamespace|
+{
+  for my $node (create_nodes ()) {
+    next if $node->node_type == 1;
+    ok $node->is_default_namespace ('about:') ? 1 : 0, 0, $node->node_name."idn[0]";
+    ok $node->is_default_namespace ('http://www.w3.org/XML/1998/namespace') ? 1 : 0, 0, $node->node_name."idn[2]";
+    ok $node->is_default_namespace ('http://www.w3.org/2000/xmlns/') ? 1 : 0, 0, $node->node_name."idn[3]";
+    ok $node->is_default_namespace ('') ? 1 : 0, 0, $node->node_name."idn[4]";
+    ok $node->is_default_namespace (undef) ? 1 : 0, 0, $node->node_name."idn[5]";
+  }
+  
+  my $el = $doc->create_element_ns ('about:', 'el');
+  ok $el->is_default_namespace ('about:') ? 1 : 0, 1, "Element->idn [0]";
+  
+  $el->prefix ('ns1');
+  ok $el->is_default_namespace ('about:') ? 1 : 0, 0, "Element->idn [1]";
+
+  $el->set_attribute_ns ('http://www.w3.org/2000/xmlns/', 'xmlns', 'DAV:');
+  ok $el->is_default_namespace ('about:') ? 1 : 0, 0, "Element->idn [2]";
+  
+  $el->set_attribute_ns ('http://www.w3.org/2000/xmlns/', 'xmlns', 'about:');
+  ok $el->is_default_namespace ('about:') ? 1 : 0, 1, "Element->idn [3]";
+
+  $el->set_attribute_ns ('http://www.w3.org/2000/xmlns/', 'xmlns', '');
+  ok $el->is_default_namespace ('about:') ? 1 : 0, 0, "Element->idn [4]";
+}
+
+{
+  my $el = $doc->create_element_ns ('about:', 'p:el');
+  ok $el->is_default_namespace ('about:') ? 1 : 0, 0, "Element->idn [5]";
+  
+  $el->prefix ('ns1');
+  ok $el->is_default_namespace ('about:') ? 1 : 0, 0, "Element->idn [6]";
+
+  $el->set_attribute_ns ('http://www.w3.org/2000/xmlns/', 'xmlns', 'DAV:');
+  ok $el->is_default_namespace ('about:') ? 1 : 0, 0, "Element->idn [7]";
+  
+  $el->set_attribute_ns ('http://www.w3.org/2000/xmlns/', 'xmlns', 'about:');
+  ok $el->is_default_namespace ('about:') ? 1 : 0, 1, "Element->idn [8]";
+
+  $el->set_attribute_ns ('http://www.w3.org/2000/xmlns/', 'xmlns', '');
+  ok $el->is_default_namespace ('about:') ? 1 : 0, 0, "Element->idn [9]";
+}
+
+{
+  my $el = $doc->create_element ('e');
+
+  ## NOTE: This might look like strange, but it is how it is defined!
+  ok $el->is_default_namespace (undef) ? 1 : 0, 0, "Element->idn [10]";
+  ok $el->is_default_namespace ('') ? 1 : 0, 0, "Element->idn [11]";
+
+  $el->set_attribute_ns ('http://www.w3.org/2000/xmlns/', 'xmlns', 'DAV:');
+  ok $el->is_default_namespace (undef) ? 1 : 0, 0, "Element->idn [12]";
+  ok $el->is_default_namespace ('') ? 1 : 0, 0, "Element->idn [13]";
+
+  $el->set_attribute_ns ('http://www.w3.org/2000/xmlns/', 'xmlns', '');
+  ok $el->is_default_namespace (undef) ? 1 : 0, 0, "Element->idn [14]";
+  ok $el->is_default_namespace ('') ? 1 : 0, 0, "Element->idn [15]";
+}
+
+## |manakaiParentElement|
+{
+  my $el = $doc->create_element ('el');
+  ok $el->manakai_parent_element, undef, "mpe [0]";
+
+  my $el2 = $doc->create_element ('el2');
+  $el->append_child ($el2);
+  ok $el2->manakai_parent_element, $el, "mpe [1]";
+  
+  my $er1 = $doc->create_entity_reference ('er1');
+  $er1->manakai_set_read_only (0, 1);
+  $el->append_child ($er1);
+  $er1->append_child ($el2);
+  ok $el2->manakai_parent_element, $el, "mpe [1]";
+}
+
+{
+  my $el = $doc->create_element ('el');
+  my $t1 = $doc->create_text_node ('t1');
+  my $t2 = $doc->create_text_node ('t2');
+  $el->append_child ($t1);
+  $el->append_child ($t2);
+  $el->normalize;
+  
+  ok $el->text_content, 't1t2', 'normalize [0]';
+  ok 0+@{$el->child_nodes}, 1, 'normalize [1]';
+}
+
+{
+  my $el = $doc->create_element ('el');
+  my $t1 = $doc->create_text_node ('t1');
+  my $t2 = $doc->create_text_node ('t2');
+  my $t3 = $doc->create_text_node ('t3');
+  my $t4 = $doc->create_text_node ('t4');
+  $el->append_child ($t1);
+  $el->append_child ($t2);
+  $el->append_child ($t3);
+  $el->append_child ($t4);
+  $el->normalize;
+  
+  ok $el->text_content, 't1t2t3t4', 'normalize [2]';
+  ok 0+@{$el->child_nodes}, 1, 'normalize [3]';
+}
+
+{
+  my $el = $doc->create_element ('el');
+  my $t1 = $doc->create_text_node ('t1');
+  my $t2 = $doc->create_text_node ('t2');
+  my $c1 = $doc->create_cdata_section ('c1');
+  my $t3 = $doc->create_text_node ('t3');
+  my $t4 = $doc->create_text_node ('t4');
+  $el->append_child ($t1);
+  $el->append_child ($t2);
+  $el->append_child ($c1);
+  $el->append_child ($t3);
+  $el->append_child ($t4);
+  $el->normalize;
+  
+  ok $el->text_content, 't1t2c1t3t4', 'normalize [4]';
+  ok 0+@{$el->child_nodes}, 3, 'normalize [5]';
+  ok $el->first_child->text_content, 't1t2', 'normalize [6]';
+  ok $el->last_child->text_content, 't3t4', 'normalize [7]';
+}
+
+{
+  my $el = $doc->create_element ('el');
+  my $t1 = $doc->create_text_node ('t1');
+  my $t2 = $doc->create_text_node ('');
+  $el->append_child ($t1);
+  $el->append_child ($t2);
+  $el->normalize;
+  
+  ok $el->text_content, 't1', 'normalize [8]';
+  ok 0+@{$el->child_nodes}, 1, 'normalize [9]';
+}
+
+{
+  my $el = $doc->create_element ('el');
+  my $t1 = $doc->create_text_node ('');
+  my $t2 = $doc->create_text_node ('t2');
+  $el->append_child ($t1);
+  $el->append_child ($t2);
+  $el->normalize;
+  
+  ok $el->text_content, 't2', 'normalize [10]';
+  ok 0+@{$el->child_nodes}, 1, 'normalize [11]';
+}
+
+{
+  my $el = $doc->create_element ('el');
+  my $t1 = $doc->create_text_node ('');
+  $el->append_child ($t1);
+  $el->normalize;
+  
+  ok $el->text_content, '', 'normalize [12]';
+  ok 0+@{$el->child_nodes}, 0, 'normalize [13]';
+}
+
+{
+  my $pe = $doc->create_element ('pe');
+  my $el = $doc->create_element ('el');
+  my $t1 = $doc->create_text_node ('t1');
+  my $t2 = $doc->create_text_node ('t2');
+  $el->append_child ($t1);
+  $el->append_child ($t2);
+  $pe->append_child ($el);
+  $pe->normalize;
+  
+  ok $el->text_content, 't1t2', 'normalize [14]';
+  ok 0+@{$el->child_nodes}, 1, 'normalize [15]';
+}
+
+{
+  my $pe = $doc->create_element ('pe');
+  my $el = $doc->create_attribute ('a');
+  my $t1 = $doc->create_text_node ('t1');
+  my $t2 = $doc->create_text_node ('t2');
+  $el->append_child ($t1);
+  $el->append_child ($t2);
+  $pe->set_attribute_node ($el);
+  $pe->normalize;
+  
+  ok $el->text_content, 't1t2', 'normalize [16]';
+  ok 0+@{$el->child_nodes}, 1, 'normalize [17]';
+}
+
+{
+  my $pe = $doc->create_element_type_definition ('pe');
+  my $el = $doc->create_attribute_definition ('a');
+  my $t1 = $doc->create_text_node ('t1');
+  my $t2 = $doc->create_text_node ('t2');
+  $el->append_child ($t1);
+  $el->append_child ($t2);
+  $pe->set_attribute_definition_node ($el);
+  $pe->normalize;
+  
+  ok $el->text_content, 't1t2', 'normalize [16]';
+  ok 0+@{$el->child_nodes}, 1, 'normalize [17]';
+}
+
+{
+  my $dt = $doc->create_document_type_definition ('dt');
+  my $pe = $doc->create_element_type_definition ('pe');
+  my $el = $doc->create_attribute_definition ('a');
+  my $t1 = $doc->create_text_node ('t1');
+  my $t2 = $doc->create_text_node ('t2');
+  $el->append_child ($t1);
+  $el->append_child ($t2);
+  $pe->set_attribute_definition_node ($el);
+  $dt->set_element_type_definition_node ($pe);
+  $dt->normalize;
+  
+  ok $el->text_content, 't1t2', 'normalize [18]';
+  ok 0+@{$el->child_nodes}, 1, 'normalize [19]';
+}
+
+{
+  my $pe = $doc->create_document_type_definition ('pe');
+  my $el = $doc->create_general_entity ('a');
+  my $t1 = $doc->create_text_node ('t1');
+  my $t2 = $doc->create_text_node ('t2');
+  $el->append_child ($t1);
+  $el->append_child ($t2);
+  $pe->set_general_entity_node ($el);
+  $pe->normalize;
+  
+  ok $el->text_content, 't1t2', 'normalize [20]';
+  ok 0+@{$el->child_nodes}, 1, 'normalize [21]';
+}
 
 ## TODO: parent_node tests, as with append_child tests
 
@@ -1235,4 +1708,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2007/06/17 14:15:39 $
+## $Date: 2007/06/20 13:41:16 $

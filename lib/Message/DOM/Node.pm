@@ -1,6 +1,6 @@
 package Message::DOM::Node;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::IF::Node';
 require Scalar::Util;
 require Message::DOM::DOMException;
@@ -135,6 +135,22 @@ sub child_nodes ($) {
   return bless \\($_[0]), 'Message::DOM::NodeList::ChildNodeList';
 } # child_nodes
 
+sub manakai_expanded_uri ($) {
+  my $self = shift;
+  local $Error::Depth = $Error::Depth + 1;
+  my $ln = $self->local_name;
+  if (defined $ln) {
+    my $nsuri = $self->namespace_uri;
+    if (defined $nsuri) {
+      return $nsuri . $ln;
+    } else {
+      return $ln;
+    }
+  } else {
+    return undef;
+  } 
+} # manakai_expanded_uri
+
 sub first_child ($) {
   my $self = shift;
   return $$self->{child_nodes} ? $$self->{child_nodes}->[0] : undef;
@@ -178,6 +194,19 @@ sub node_type () { }
 sub node_value () { undef }
 
 sub owner_document ($);
+
+sub manakai_parent_element ($) {
+  my $self = shift;
+  my $parent = $$self->{parent_node};
+  while (defined $parent) {
+    if ($parent->node_type == ELEMENT_NODE) {
+      return $parent;
+    } else {
+      $parent = $$parent->{parent_node};
+    }
+  }
+  return undef;
+} # manakai_parent_element
 
 sub parent_node ($);
 
@@ -252,6 +281,312 @@ sub text_content ($;$) {
 
 ## |Node| methods
 
+sub clone_node ($;$) {
+  my ($self, $deep) = @_;
+
+  ## ISSUE: Need definitions for the cloning operation
+  ## for ElementTypeDefinition, and AttributeDefinition nodes,
+  ## as well as new attributes introduced in DOM XML Document Type Definition
+  ## module.
+  ## ISSUE: Define if default attributes and attributedefinition are inconsistent
+
+  local $Error::Depth = $Error::Depth + 1;
+  my $od = $self->owner_document;
+  my $strict_check = $od->strict_error_checking;
+  $od->strict_error_checking (0);
+  my $cfg = $od->dom_config;
+  my $er_copy_asis = $cfg->{'http://suika.fam.cx/www/2006/dom-config/clone-entity-reference-subtree'};
+
+  my $r;
+  my @udh;
+  my @node = ([$self]);
+  while (@node) {
+    my ($node, $parent) = @{shift @node};
+    my $nt = $node->node_type;
+    my $clone;
+    if ($nt == ELEMENT_NODE) {
+      $clone = $od->create_element_ns
+        ($node->namespace_uri, [$node->prefix, $node->local_name]);
+      if ($parent) {
+        $parent->append_child ($clone);
+      } else {
+        $r = $clone;
+      }
+      my $attrs = $node->attributes;
+      my $attrsMax = @$attrs - 1;
+      for my $i (0..$attrsMax) {
+        my $attr = $attrs->[$i];
+        push @node, [$attr, $clone] if $attr->specified;
+      }
+      if ($deep) {
+        push @node, map {[$_, $clone]} @{$node->child_nodes};
+      }
+    } elsif ($nt == TEXT_NODE) {
+      $clone = $od->create_text_node ($node->data);
+      if ($parent) {
+        $parent->append_child ($clone);
+      } else {
+        $r = $clone;
+      }
+      $clone->element_content_whitespace (1)
+        if $node->element_content_whitespace;
+    } elsif ($nt == ATTRIBUTE_NODE) {
+      $clone = $od->create_attribute_ns
+        ($node->namespace_uri, [$node->prefix, $node->local_name]);
+      if ($parent) {
+        $parent->set_attribute_node_ns ($clone);
+      } else {
+        $r = $clone;
+      }
+      $clone->specified (1);
+      push @node, map {[$_, $clone]} @{$node->child_nodes};
+    } elsif ($nt == COMMENT_NODE) {
+      $clone = $od->create_comment ($node->data);
+      if ($parent) {
+        $parent->append_child ($clone);
+      } else {
+        $r = $clone;
+      }
+    } elsif ($nt == CDATA_SECTION_NODE) {
+      $clone = $od->create_cdata_section ($node->data);
+      if ($parent) {
+        $parent->append_child ($clone);
+      } else {
+        $r = $clone;
+      }
+    } elsif ($nt == PROCESSING_INSTRUCTION_NODE) {
+      $clone = $od->create_processing_instruction
+        ($node->target, $node->data);
+      if ($parent) {
+        $parent->append_child ($clone);
+      } else {
+        $r = $clone;
+      }
+    } elsif ($nt == ENTITY_REFERENCE_NODE) {
+      $clone = $od->create_entity_reference ($node->node_name);
+      if ($er_copy_asis) {
+        $clone->manakai_set_read_only (0);
+        $clone->text_content (0);
+        for (@{$node->child_nodes}) {
+          $clone->append_child ($_->clone_node (1));
+        }
+        $clone->manakai_expanded ($node->manakai_expanded);
+        $clone->manakai_set_read_only (1, 1);
+      } # copy asis
+      if ($parent) {
+        $parent->append_child ($clone);
+      } else {
+        $r = $clone;
+      }
+    } elsif ($nt == DOCUMENT_FRAGMENT_NODE) {
+      $clone = $od->create_document_fragment;
+      $r = $clone;
+      push @node, map {[$_, $clone]} @{$node->child_nodes};
+    } elsif ($nt == DOCUMENT_NODE) {
+      $od->strict_error_checking ($strict_check);
+      report Message::DOM::DOMException
+          -object => $self,
+          -type => 'NOT_SUPPORTED_ERR',
+          -subtype => 'CLONE_NODE_NOT_SUPPORTED_ERR';
+    } elsif ($nt == DOCUMENT_TYPE_NODE) {
+      $od->strict_error_checking ($strict_check);
+      report Message::DOM::DOMException
+          -object => $self,
+          -type => 'NOT_SUPPORTED_ERR',
+          -subtype => 'CLONE_NODE_NOT_SUPPORTED_ERR';
+    } elsif ($nt == ENTITY_NODE) {
+      $od->strict_error_checking ($strict_check);
+      report Message::DOM::DOMException
+          -object => $self,
+          -type => 'NOT_SUPPORTED_ERR',
+          -subtype => 'CLONE_NODE_NOT_SUPPORTED_ERR';
+    } elsif ($nt == NOTATION_NODE) {
+      $od->strict_error_checking ($strict_check);
+      report Message::DOM::DOMException
+          -object => $self,
+          -type => 'NOT_SUPPORTED_ERR',
+          -subtype => 'CLONE_NODE_NOT_SUPPORTED_ERR';
+    } else {
+      $od->strict_error_checking ($strict_check);
+      report Message::DOM::DOMException
+          -object => $self,
+          -type => 'NOT_SUPPORTED_ERR',
+          -subtype => 'CLONE_NODE_NOT_SUPPORTED_ERR';
+    }
+
+    my $udhs = $$self->{user_data};
+    push @udh, [$node => $clone, $udhs] if $udhs and %$udhs;
+  } # @node
+  $od->strict_error_checking (1) if $strict_check;
+  
+  ## Calling user data handlers if any
+  for my $sd (@udh) {
+    my $src = $sd->[0];
+    my $src_ud = $sd->[2];
+    for my $key (keys %{$src_ud}) {
+      my $dh = $src_ud->{$key}->[1];
+      if ($dh) {     ## NODE_CLONED
+        $dh->handle (1, $key, $src_ud->{$key}->[0], $src, $sd->[1]);
+        ## ISSUE: |handler| method? CODE?
+      }
+    }
+  }
+
+  return $r;
+} # clone_node
+
+sub compare_document_position ($$) {
+  ## ISSUE: There are implementation specifics
+  ## (see what Gecko does if it implement this method...)
+
+  ## ISSUE: Maybe we should overload <=> or cmp
+
+  ## TODO: Too long method name!  Too long constant names!
+  ## Too many thing to be done by a method!
+  ## Maybe we should import simpler method implemented by IE.
+
+  ## ISSUE: Need documentation for ElementTypeDefinition and AttributeDefinition
+  ## concerns
+
+  my @acontainer = ($_[0]);
+  my @bcontainer = ($_[1]);
+  F: {
+    A: while (1) {
+      if ($acontainer[-1] eq $bcontainer[-1]) {
+        last F;
+      } else {
+        my $ap;
+        my $atype = $acontainer[-1]->node_type;
+        if ($atype == ATTRIBUTE_NODE) {
+          $ap = $acontainer[-1]->owner_element;
+        } elsif ($atype == ENTITY_NODE or $atype == NOTATION_NODE or
+                 $atype == ELEMENT_TYPE_DEFINITION_NODE) {
+          $ap = $acontainer[-1]->owner_document_type_definition;
+        } elsif ($atype == ATTRIBUTE_DEFINITION_NODE) {
+          $ap = $acontainer[-1]->owner_element_type_definition;
+        } else {
+          $ap = $acontainer[-1]->parent_node;
+        }
+        if (defined $ap) {
+          push @acontainer, $ap;
+        } else {
+          last A;
+        }
+      }
+    } # A
+
+    B: while (1) {
+      if ($acontainer[-1] eq $bcontainer[-1]) {
+        last F;
+      } else {
+        my $bp;
+        my $btype = $bcontainer[-1]->node_type;
+        if ($btype == ATTRIBUTE_NODE) {
+          $bp = $bcontainer[-1]->owner_element;
+        } elsif ($btype == ENTITY_NODE or $btype == NOTATION_NODE or
+                 $btype == ELEMENT_TYPE_DEFINITION_NODE) {
+          $bp = $bcontainer[-1]->owner_document_type_definition;
+        } elsif ($btype == ATTRIBUTE_DEFINITION_NODE) {
+          $bp = $bcontainer[-1]->owner_element_type_definition;
+        } else {
+          $bp = $bcontainer[-1]->parent_node;
+        }
+        if (defined $bp) {
+          push @bcontainer, $bp;
+        } else {
+          last B;
+        }
+      }
+    } # B
+      
+    ## Disconnected
+    if ($bcontainer[-1]->isa ('Message::IF::Node')) {
+      ## ISSUE: Document this in manakai's DOM Perl Binding?
+      return DOCUMENT_POSITION_DISCONNECTED
+        | DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC
+        | ((${$acontainer[-1]} cmp ${$bcontainer[-1]}) > 0
+             ? DOCUMENT_POSITION_FOLLOWING
+             : DOCUMENT_POSITION_PRECEDING);
+    } else {
+      ## TODO: Is there test cases for this?
+      return DOCUMENT_POSITION_DISCONNECTED
+        | DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC
+        | DOCUMENT_POSITION_FOLLOWING;
+    }
+  } # F
+
+  ## Common container found
+  if (@acontainer >= 2) {
+    if (@bcontainer >= 2) {
+      my $acnt = $acontainer[-2]->node_type;
+      my $bcnt = $bcontainer[-2]->node_type;
+      if ($acnt == ATTRIBUTE_NODE or
+          $acnt == NOTATION_NODE or 
+          $acnt == ELEMENT_TYPE_DEFINITION_NODE or
+          $acnt == ATTRIBUTE_DEFINITION_NODE) {
+        if ($acnt == $bcnt) {
+          return DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC
+            | (($acontainer[-2]->node_name cmp
+                $bcontainer[-2]->node_name) > 0
+               ? DOCUMENT_POSITION_FOLLOWING
+               : DOCUMENT_POSITION_PRECEDING);
+        } elsif ($bcnt == ATTRIBUTE_NODE or
+                 $bcnt == NOTATION_NODE or
+                 $bcnt == ELEMENT_TYPE_DEFINITION_NODE or
+                 $bcnt == ATTRIBUTE_DEFINITION_NODE) {
+          return (($acnt < $bcnt)
+                  ? DOCUMENT_POSITION_FOLLOWING
+                  : DOCUMENT_POSITION_PRECEDING);
+        } else {
+          ## A: Non-child and B: child
+          return DOCUMENT_POSITION_FOLLOWING;
+        }
+      } elsif ($bcnt == ATTRIBUTE_NODE or
+               $bcnt == NOTATION_NODE or
+               $bcnt == ELEMENT_TYPE_DEFINITION_NODE or
+               $bcnt == ATTRIBUTE_DEFINITION_NODE) {
+        ## A: Child and B: non-child
+        return DOCUMENT_POSITION_PRECEDING;
+      } else {
+        ## A and B are both children
+        for my $cn (@{$acontainer[-1]->child_nodes}) {
+          if ($cn eq $acontainer[-2]) {
+            return DOCUMENT_POSITION_FOLLOWING;
+          } elsif ($cn eq $bcontainer[-2]) {
+            return DOCUMENT_POSITION_PRECEDING;
+          }
+        }
+        die "compare_document_position: Something wrong (1)";
+      }
+    } else {
+      ## B contains A
+      return DOCUMENT_POSITION_CONTAINS
+        | DOCUMENT_POSITION_PRECEDING;
+    }
+  } else {
+    if (@bcontainer >= 2) {
+      ## A contains B
+      return DOCUMENT_POSITION_CONTAINED_BY
+        | DOCUMENT_POSITION_FOLLOWING;
+    } else {
+      ## A eq B
+      return 0;
+    }
+  }
+  die "compare_document_position: Something wrong (2)";
+} # compare_document_position
+
+sub has_attributes ($) {
+  for (values %{${$_[0]}->{attributes} or {}}) {
+    return 1 if keys %$_;
+  }
+  return 0;
+} # has_attributes
+
+sub has_child_nodes ($) {
+  return (@{${$_[0]}->{child_nodes} or []} > 0);
+} # has_child_nodes
+
 ## TODO:
 sub is_same_node ($$) {
   return $_[0] eq $_[1];
@@ -262,19 +597,6 @@ sub is_equal_node ($$) {
   return $_[0]->node_name eq $_[1]->node_name &&
     $_[0]->node_value eq $_[1]->node_value;
 } # is_equal_node
-
-sub manakai_parent_element ($) {
-  my $self = shift;
-  my $parent = $$self->{parent_node};
-  while (defined $parent) {
-    if ($parent->node_type == 1) { # ELEMENT_NODE
-      return $parent;
-    } else {
-      $parent = $$parent->{parent_node};
-    }
-  }
-  return undef;
-} # manakai_parent_element
 
 ## NOTE: Only applied to Elements and Documents
 sub append_child ($$) {
@@ -347,6 +669,216 @@ sub insert_before ($$;$) {
   return $new_child;
 } # insert_before
 
+sub is_default_namespace ($$) {
+  ## TODO: Document that ElementTypeDefinition and AttributeDefinition
+  ## are same as DocumentType
+
+  local $Error::Depth = $Error::Depth + 1;
+  my $namespace_uri = defined $_[1] ? $_[1] : '';
+  my $nt = $_[0]->node_type;
+  if ($nt == ELEMENT_NODE) {
+    my $el = $_[0];
+    EL: {
+      unless (defined $el->prefix) {
+        my $elns = $el->namespace_uri;
+        if ($namespace_uri ne '' and defined $elns) {
+          return $namespace_uri eq $elns;
+        } else {
+          return not ($namespace_uri eq '' or defined $elns);
+        }
+      }
+      my $xmlns = $el->get_attribute_ns
+        ('http://www.w3.org/2000/xmlns/', 'xmlns');
+      if (defined $xmlns) {
+        if ($namespace_uri ne '') {
+          return ($namespace_uri eq $xmlns);
+        } else {
+          return ($xmlns eq '');
+        }
+      }
+      $el = $el->manakai_parent_element;
+      redo EL if defined $el;
+      return 0;
+    } # EL;
+  } else {
+    my $el = $nt == DOCUMENT_NODE
+      ? $_[0]->document_element
+      : $nt == ATTRIBUTE_NODE
+        ? $_[0]->owner_element
+        : $_[0]->manakai_parent_element;
+    if (defined $el) {
+      return $el->is_default_namespace ($_[1]);
+    } else {
+      return 0;
+    }
+  }
+} # is_default_namespace
+
+sub lookup_namespace_uri ($$) {
+  ## TODO: Need definition for ElementTypeDefinition and AttributeDefinition
+
+  my ($self, $prefix) = @_;
+  $prefix = undef if defined $prefix and $prefix eq '';
+      ## NOTE: Implementation dependent.
+      ## TODO: Check what Gecko does.
+  local $Error::Depth = $Error::Depth + 1;
+  my $nt = $self->node_type;
+  if ($nt == ELEMENT_NODE) {
+    my $el = $self;
+    EL: {
+      my $elns = $el->namespace_uri;
+      if (defined $elns) {
+        my $elpfx = $el->prefix;
+        if ((not defined $prefix and not defined $elpfx) or
+            (defined $prefix and defined $elpfx and $prefix eq $elpfx)) {
+          return $elns;
+        }
+      }
+      AT: for my $attr (@{$el->attributes}) {
+        my $attrns = $attr->namespace_uri;
+        next AT if not defined $attrns or
+          $attrns ne 'http://www.w3.org/2000/xmlns/';
+        my $attrpfx = $attr->prefix;
+        if (not defined $prefix) {
+          my $attrln = $attr->local_name;
+          if ($attrln eq 'xmlns') {
+            my $attrval = $attr->value;
+            return length $attrval ? $attrval : undef;
+          }
+        } elsif (defined $prefix and
+                 defined $attrpfx and $attrpfx eq 'xmlns') {
+          my $attrln = $attr->local_name;
+          if ($attrln eq $prefix) {
+            my $attrval = $attr->value;
+            return length $attrval ? $attrval : undef;
+          }
+        }
+      } # AT
+      $el = $el->manakai_parent_element;
+      redo EL if defined $el;
+      return undef;
+    } # EL;
+  } else {
+    my $el = $nt == DOCUMENT_NODE
+      ? $self->document_element
+      : $nt == ATTRIBUTE_NODE
+        ? $self->owner_element
+        : $self->manakai_parent_element;
+    if (defined $el) {
+      return $el->lookup_namespace_uri ($prefix);
+    } else {
+      return undef;
+    }
+  }
+} # lookup_namespace_uri
+
+sub lookup_prefix ($$) {
+  ## ISSUE: Document ElementTypeDefinition and AttributeDefinition
+  ## behavior (i.e. same as DocumentType)
+
+  my $namespace_uri = defined $_[1] ? $_[1] : '';
+  if ($namespace_uri eq '') {
+    return undef;
+  }
+
+  local $Error::Depth = $Error::Depth + 1;
+  my $nt = $_[0]->node_type;
+  if ($nt == ELEMENT_NODE) {
+    my $el = $_[0];
+    EL: {
+      my $elns = $el->namespace_uri;
+      if (defined $elns and $elns eq $namespace_uri) {
+        my $elpfx = $el->prefix;
+        if (defined $elpfx) {
+          my $oeluri = $_[0]->lookup_namespace_uri ($elpfx);
+          if (defined $oeluri and $oeluri eq $namespace_uri) {
+            return $elpfx;
+          }
+        }
+      }
+      AT: for my $attr (@{$el->attributes}) {
+        my $attrpfx = $attr->prefix;
+        next AT if not defined $attrpfx or $attrpfx ne 'xmlns';
+        my $attrns = $attr->namespace_uri;
+        next AT if not defined $attrns or
+          $attrns ne 'http://www.w3.org/2000/xmlns/';
+        next AT unless $attr->value eq $namespace_uri;
+        my $attrln = $attr->local_name;
+        my $oeluri = $el->lookup_namespace_uri ($attrln);
+        next AT unless defined $oeluri;
+        if ($oeluri eq $namespace_uri) {
+          return $attrln;
+        }
+      }
+      $el = $el->manakai_parent_element;
+      redo EL if defined $el;
+      return undef;
+    } # EL
+  } else {
+    my $el = $nt == DOCUMENT_NODE
+      ? $_[0]->document_element
+      : $nt == ATTRIBUTE_NODE
+        ? $_[0]->owner_element
+        : $_[0]->manakai_parent_element;
+    if (defined $el) {
+      return $el->lookup_prefix ($_[1]);
+    } else { 
+      return undef;
+    }
+  }
+} # lookup_prefix
+
+sub normalize ($) {
+  my $self = shift;
+  my $ptext;
+  local $Error::Depth = $Error::Depth + 1;
+  
+  ## Children
+  my @remove;
+  for my $cn (@{$self->child_nodes}) {
+    if ($cn->node_type == TEXT_NODE) {
+      my $nv = $cn->node_value;
+      if (length $nv) {
+        if (defined $ptext) {
+          $ptext->manakai_append_text ($nv);
+          $ptext->is_element_content_whitespace (1)
+            if $cn->is_element_content_whitespace and
+              $ptext->is_element_content_whitespace;
+          push @remove, $cn;
+        } else {
+          $ptext = $cn;
+        }
+      } else {
+        push @remove, $cn;
+      }
+    } else {
+      $cn->normalize;
+      undef $ptext;
+    }
+  }
+  $self->remove_child ($_) for @remove;
+
+  my $nt = $self->node_type;
+  if ($nt == ELEMENT_NODE) {
+    ## Attributes
+    $_->normalize for @{$self->attributes};
+  } elsif ($nt == DOCUMENT_TYPE_NODE) {
+    ## ISSUE: Document these explicitly in DOM XML Document Type Definitions spec
+    ## Element type definitions
+    $_->normalize for @{$self->element_types};
+    ## General entities
+    $_->normalize for @{$self->general_entities};
+  } elsif ($nt == ELEMENT_TYPE_DEFINITION_NODE) {
+    ## Attribute definitions
+    $_->normalize for @{$self->attribute_definitions};
+  }
+  ## TODO: normalize-characters
+
+  ## TODO: In this implementation, if a modification raises a 
+  ## |NO_MODIFICATION_ALLOWED_ERR|, then any modification before it
+  ## is not reverted.
+} # normalize
+
 ## NOTE: Only applied to Elements and Documents
 sub remove_child ($$) {
   my ($self, $old_child) = @_;
@@ -360,11 +892,6 @@ sub remove_child ($$) {
   delete $$old_child->{parent_node};
   return $old_child;
 } # remove_child
-
-## NOTE: Only applied to Elements and Documents
-sub has_child_nodes ($) {
-  return @{${+shift}->{child_nodes}} > 0;
-} # has_child_nodes
 
 sub manakai_set_read_only ($;$$) {
   my $value = 1 if $_[1];
@@ -411,4 +938,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/06/17 13:37:40 $
+## $Date: 2007/06/20 13:41:16 $

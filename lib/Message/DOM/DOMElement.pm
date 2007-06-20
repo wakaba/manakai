@@ -2,7 +2,7 @@
 
 package Message::DOM::Element;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::Element';
 require Message::DOM::Node;
 
@@ -252,6 +252,16 @@ sub has_attribute_ns ($$$) {
   return defined $$self->{attributes}->{$nsuri}->{$ln};
 } # has_attribute_ns
 
+sub remove_attribute {
+## TODO:
+  delete ${$_[0]}->{attributes}->{''}->{$_[1]};
+}
+
+sub set_attribute {
+  ## TODO:
+  shift->set_attribute_ns (undef, [undef, $_[0]]);
+}
+
 sub set_attribute_node ($$) {
   my ($self, $new_attr) = @_;
   local $Error::Depth = $Error::Depth + 1;
@@ -338,4 +348,4 @@ sub create_element_ns ($$$) {
 
 1;
 ## License: <http://suika.fam.cx/~wakaba/archive/2004/8/18/license#Perl+MPL>
-## $Date: 2007/06/17 13:37:40 $
+## $Date: 2007/06/20 13:41:16 $

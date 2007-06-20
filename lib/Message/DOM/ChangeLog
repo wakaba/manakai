@@ -1,3 +1,14 @@
+2007-06-20  Wakaba  <wakaba@suika.fam.cx>
+
+	* Node.pm (manakai_expanded_uri, manakai_parent_element,
+	clone_node, compare_document_position, has_attributes,
+	has_child_nodes, is_default_namespace, lookup_namespace_uri,
+	lookup_prefix, normalize): Implemented.
+
+	* DOMElement.pm (remove_attribute, set_attribute): Alpha version.
+
+	* DOMException.pm (CLONE_NODE_TYPE_NOT_SUPPORTED_ERR): New error.
+
 2007-06-17  Wakaba  <wakaba@suika.fam.cx>
 
 	* AttributeDefinition.pm (____new): Set an empty list
