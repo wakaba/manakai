@@ -1,6 +1,6 @@
 package Message::DOM::DOMConfiguration;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::IF::DOMConfiguration';
 require Message::DOM::DOMException;
 
@@ -19,6 +19,10 @@ sub ___report_error ($$) {
 } # ___report_error
 
 ## |DOMConfiguration| methods
+
+sub get_parameter ($$) {
+  return ${$${$_[0]}}->{$_[1]};
+} # get_parameter
 
 sub set_parameter ($$;$) {
   if (defined $_[2]) {
@@ -54,4 +58,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/06/17 13:37:40 $
+## $Date: 2007/06/21 14:57:53 $

@@ -1,5 +1,20 @@
 2007-06-21  Wakaba  <wakaba@suika.fam.cx>
 
+	* Comment.pm (node_type): Node type was incorrect!
+
+	* DOMConfiguration.pm (get_parameter): Alpha.
+
+	* DOMImplementation.pm (create_mc_decode_handler,
+	create_charset_name_from_uri, create_uri_from_charset_name):
+	New autoload configuration.  Note that the Message::Charset::Encode
+	module is subject to change.
+
+	* XMLParserTemp.pm: Now it can be used with new version
+	of DOM implementation.  Current plan is to replace it by
+	an XML5 parser someday.
+
+2007-06-21  Wakaba  <wakaba@suika.fam.cx>
+
 	* DOMLocator.pm: New module.
 
 	* DOMError.pm: New module.

@@ -1,10 +1,7 @@
 package Message::DOM::DOMImplementation;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::IF::DOMImplementation';
-
-## Spec:
-## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-102161490>
 
 sub ____new ($) {
   my $self = bless {}, shift;
@@ -19,7 +16,10 @@ sub AUTOLOAD {
   my $module_name = {
     create_document => 'Message::DOM::DOMDocument', ## TODO: New module name
     create_document_type => 'Message::DOM::DocumentType',
+    create_mc_decode_handler => 'Message::Charset::Encode',
     create_uri_reference => 'Message::URI::URIReference',  
+    get_charset_name_from_uri => 'Message::Charset::Encode',
+    get_uri_from_charset_name => 'Message::Charset::Encode',
   }->{$method_name};
   if ($module_name) {
     eval qq{ require $module_name } or die $@;
@@ -33,6 +33,10 @@ sub AUTOLOAD {
 ## DOMImplementation
 sub create_document ($;$$$);
 sub create_document_type ($$;$$);
+## MCImplementation
+sub create_mc_decode_handler;
+sub get_charset_name_from_uri;
+sub get_uri_from_charset_name;
 ## URIImplementation
 sub create_uri_reference ($$);
 
@@ -47,4 +51,4 @@ package Message::IF::DOMImplementation;
 
 1;
 ## License: <http://suika.fam.cx/~wakaba/archive/2004/8/18/license#Perl+MPL>
-## $Date: 2007/06/14 13:10:07 $
+## $Date: 2007/06/21 14:57:53 $
