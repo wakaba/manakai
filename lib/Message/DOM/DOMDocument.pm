@@ -2,9 +2,10 @@
 
 package Message::DOM::Document;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::Document',
-    'Message::IF::DocumentXDoctype';
+    'Message::IF::DocumentXDoctype',
+    'Message::IF::HTMLDocument';
 require Message::DOM::Node;
 
 sub ____new ($$) {
@@ -64,7 +65,6 @@ sub AUTOLOAD {
   } elsif ({
     ## Read-write attributes (boolean, trivial accessors)
     all_declarations_processed => 1,
-    manakai_is_html => 1,
   }->{$method_name}) {
     no strict 'refs';
     eval qq{
@@ -156,6 +156,20 @@ sub text_content ($;$) {
 
 ## |Node| methods
 
+sub adopt_node ($$) {
+  ## TODO: Implement
+
+  my @node = ($_[1]);
+  while (@node) {
+    my $node = shift @node;
+    $$node->{owner_document} = $_[0];
+    Scalar::Util::weaken ($$node->{owner_document});
+    push @node, @{$node->child_nodes};
+    push @node, @{$node->attributes or []};
+  }
+  return $_[1];
+} # adopt_node
+
 sub manakai_append_text ($$) {
   my $self = shift;
   if ($$self->{'http://suika.fam.cx/www/2006/dom-config/strict-document-children'}) {
@@ -214,8 +228,6 @@ sub manakai_entity_base_uri ($;$) {
 } # manakai_entity_base_uri
 
 sub input_encoding ($;$);
-
-sub manakai_is_html ($;$);
 
 sub strict_error_checking ($;$) {
   ## NOTE: Same as trivial boolean accessor, except no read-only checking.
@@ -335,13 +347,46 @@ sub xml_version ($;$) {
   }
 } # xml_version
 
+## |HTMLDocument| interface
+
+sub compat_mode ($) {
+  if (${$_[0]}->{manakai_is_html}) {
+    if (${$_[0]}->{manakai_compat_mode} eq 'quirks') {
+      return 'BackCompat';
+    }
+  }
+  return 'CSS1Compat';
+} # compat_mode
+
+sub manakai_compat_mode ($;$) {
+  if (${$_[0]}->{manakai_is_html}) {
+    if (@_ > 1 and defined $_[1] and
+        {'no quirks' => 1, 'limited quirks' => 1, 'quirks' => 1}->{$_[1]}) {
+      ${$_[0]}->{manakai_compat_mode} = $_[1];
+    }
+    return ${$_[0]}->{manakai_compat_mode} || 'no quirks';
+  } else {
+    return 'no quirks';
+  }
+} # manakai_compat_mode
+
+sub manakai_is_html ($;$) {
+  if (@_ > 1) {
+    if ($_[1]) {
+      ${$_[0]}->{manakai_is_html} = 1;
+    } else {
+      delete ${$_[0]}->{manakai_is_html};
+      delete ${$_[0]}->{manakai_compat_mode};
+    }
+  }
+  return ${$_[0]}->{manakai_is_html};
+} # manakai_is_html
+
 package Message::IF::Document;
 package Message::IF::DocumentXDoctype;
+package Message::IF::HTMLDocument;
 
 package Message::DOM::DOMImplementation;
-
-## Spec:
-## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#Level-2-Core-DOM-createDocument>
 
 sub create_document ($;$$$) {
   my ($self, $nsuri, $qn, $doctype) = @_;
@@ -349,6 +394,14 @@ sub create_document ($;$$$) {
   return Message::DOM::Document->____new ($self);
 } # create_document
 
+=head1 LICENSE
+
+Copyright 2007 Wakaba <w@suika.fam.cx>
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut
+
 1;
-## License: <http://suika.fam.cx/~wakaba/archive/2004/8/18/license#Perl+MPL>
-## $Date: 2007/06/17 13:37:40 $
+## $Date: 2007/06/23 12:47:13 $

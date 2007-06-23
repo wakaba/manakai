@@ -180,6 +180,73 @@ for my $prop (qw/all_declarations_processed/) {
   ok $doc->$prop ? 1 : 0, 0, $prop . ' undef';
 }
 
+## |manakaiIsHTML|, |compatMode|, and |manakaiCompatMode|
+{
+  my $doc2 = $doc->implementation->create_document;
+  ok $doc2->can ('manakai_is_html') ? 1 : 0, 1, "can manakai_is_html";
+  ok $doc2->can ('compat_mode') ? 1 : 0, 1, "can compat_mode";
+  ok $doc2->can ('manakai_compat_mode') ? 1 : 0, 1, "can manakai_compat_mode";
+  ok $doc2->manakai_is_html ? 1 : 0, 0, "manakai_is_html [0]";
+  ok $doc2->compat_mode, 'CSS1Compat', 'compat_mode [0]';
+  ok $doc2->manakai_compat_mode, 'no quirks', 'manakai_compat_mode [0]';
+
+  $doc2->manakai_compat_mode ('quirks');
+  ok $doc2->manakai_is_html ? 1 : 0, 0, "manakai_is_html [1]";
+  ok $doc2->compat_mode, 'CSS1Compat', 'compat_mode [1]';
+  ok $doc2->manakai_compat_mode, 'no quirks', 'manakai_compat_mode [1]';
+
+  $doc2->manakai_compat_mode ('limited quirks');
+  ok $doc2->manakai_is_html ? 1 : 0, 0, "manakai_is_html [2]";
+  ok $doc2->compat_mode, 'CSS1Compat', 'compat_mode [2]';
+  ok $doc2->manakai_compat_mode, 'no quirks', 'manakai_compat_mode [2]';
+
+  $doc2->manakai_compat_mode ('no quirks');
+  ok $doc2->manakai_is_html ? 1 : 0, 0, "manakai_is_html [3]";
+  ok $doc2->compat_mode, 'CSS1Compat', 'compat_mode [3]';
+  ok $doc2->manakai_compat_mode, 'no quirks', 'manakai_compat_mode [3]';
+
+  $doc2->manakai_compat_mode ('bogus');
+  ok $doc2->manakai_is_html ? 1 : 0, 0, "manakai_is_html [4]";
+  ok $doc2->compat_mode, 'CSS1Compat', 'compat_mode [4]';
+  ok $doc2->manakai_compat_mode, 'no quirks', 'manakai_compat_mode [4]';
+
+  $doc2->manakai_is_html (1);
+  ok $doc2->manakai_is_html ? 1 : 0, 1, "manakai_is_html [5]";
+  ok $doc2->compat_mode, 'CSS1Compat', 'compat_mode [5]';
+  ok $doc2->manakai_compat_mode, 'no quirks', 'manakai_compat_mode [5]';
+
+  $doc2->manakai_compat_mode ('quirks');
+  ok $doc2->manakai_is_html ? 1 : 0, 1, "manakai_is_html [6]";
+  ok $doc2->compat_mode, 'BackCompat', 'compat_mode [6]';
+  ok $doc2->manakai_compat_mode, 'quirks', 'manakai_compat_mode [6]';
+
+  $doc2->manakai_compat_mode ('limited quirks');
+  ok $doc2->manakai_is_html ? 1 : 0, 1, "manakai_is_html [7]";
+  ok $doc2->compat_mode, 'CSS1Compat', 'compat_mode [7]';
+  ok $doc2->manakai_compat_mode, 'limited quirks', 'manakai_compat_mode [7]';
+
+  $doc2->manakai_compat_mode ('no quirks');
+  ok $doc2->manakai_is_html ? 1 : 0, 1, "manakai_is_html [8]";
+  ok $doc2->compat_mode, 'CSS1Compat', 'compat_mode [8]';
+  ok $doc2->manakai_compat_mode, 'no quirks', 'manakai_compat_mode [8]';
+
+  $doc2->manakai_compat_mode ('bogus');
+  ok $doc2->manakai_is_html ? 1 : 0, 1, "manakai_is_html [9]";
+  ok $doc2->compat_mode, 'CSS1Compat', 'compat_mode [9]';
+  ok $doc2->manakai_compat_mode, 'no quirks', 'manakai_compat_mode [9]';
+
+  $doc2->manakai_compat_mode ('quirks');
+  $doc2->manakai_is_html (0);
+  ok $doc2->manakai_is_html ? 1 : 0, 0, "manakai_is_html [10]";
+  ok $doc2->compat_mode, 'CSS1Compat', 'compat_mode [10]';
+  ok $doc2->manakai_compat_mode, 'no quirks', 'manakai_compat_mode [10]';
+
+  $doc2->manakai_is_html (1);
+  ok $doc2->manakai_is_html ? 1 : 0, 1, "manakai_is_html [11]";
+  ok $doc2->compat_mode, 'CSS1Compat', 'compat_mode [11]';
+  ok $doc2->manakai_compat_mode, 'no quirks', 'manakai_compat_mode [11]';
+}
+
 ## TODO: manakai_entity_base_uri
 
 =head1 LICENSE
@@ -191,4 +258,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2007/06/17 13:37:42 $
+## $Date: 2007/06/23 12:47:13 $

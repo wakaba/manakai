@@ -1,3 +1,17 @@
+2007-06-23  Wakaba  <wakaba@suika.fam.cx>
+
+	* DOMDocument.pm (compat_mode, manakai_compat_mode): Implemented.
+	(manakai_is_html): Revised.
+	(Document): Now it implements the |HTMLDocument| interface.
+	(adopt_node): Alpha version.
+
+	* AttributeDefinition.pm (allowed_tokens): |allowed_tokens|,
+	not |allowed_token|!
+
+	* ElementTypeDefinition.pm (attribute_definitions): Don't
+	return an |undef| even if its |attribute_definitions|
+	list is not created.
+
 2007-06-21  Wakaba  <wakaba@suika.fam.cx>
 
 	* Comment.pm (node_type): Node type was incorrect!
