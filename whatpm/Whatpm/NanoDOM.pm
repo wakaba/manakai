@@ -31,10 +31,6 @@ sub new ($) {
   return $self;
 } # new
 
-sub is_equal_node ($$) {
-  return shift eq shift;
-} # is_equal_node
-
 sub parent_node ($) {
   return shift->{parent_node};
 } # parent_node
@@ -481,4 +477,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2007/06/05 00:56:42 $
+# $Date: 2007/06/23 02:26:51 $

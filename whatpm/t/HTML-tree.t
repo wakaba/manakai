@@ -35,6 +35,8 @@ for my $file_name (grep {$_} split /\s+/, qq[
                       ${dir_name}tests2.dat
                       ${dir_name}tests3.dat
                       ${dir_name}tests4.dat
+                      ${dir_name}tests5.dat
+                      ${dir_name}tests6.dat
                       ${test_dir_name}tree-test-1.dat
                      ]) {
   open my $file, '<', $file_name
@@ -144,4 +146,4 @@ sub serialize ($) {
 } # serialize
 
 ## License: Public Domain.
-## $Date: 2007/05/30 12:24:50 $
+## $Date: 2007/06/23 02:26:51 $

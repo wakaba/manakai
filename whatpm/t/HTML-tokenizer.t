@@ -40,6 +40,7 @@ for my $file_name (grep {$_} split /\s+/, qq[
                       ${dir_name}test1.test
                       ${dir_name}test2.test
                       ${dir_name}contentModelFlags.test
+                      ${dir_name}escapeFlag.test
                       ${test_dir_name}tokenizer-test-1.test
                      ]) {
   open my $file, '<', $file_name
@@ -139,4 +140,4 @@ for my $file_name (grep {$_} split /\s+/, qq[
   }
 }
 
-## $Date: 2007/05/20 11:12:25 $
+## $Date: 2007/06/23 02:26:51 $

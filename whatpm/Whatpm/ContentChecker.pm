@@ -891,6 +891,7 @@ my $HTMLAttrChecker = {
       } else {
         $self->{id}->{$value} = 1;
       }
+      ## TODO: no space characters <http://html5.org/tools/web-apps-tracker?from=880&to=881>
     } else {
       ## NOTE: MUST contain at least one character
       $self->{onerror}->(node => $attr, type => 'attribute value is empty');
@@ -2668,6 +2669,15 @@ sub check_document ($$$) {
   $self->{onerror} = $onerror;
 
   my $docel = $doc->document_element;
+  unless (defined $docel) {
+    ## ISSUE: Should we check content of Document node?
+    $onerror->(node => $doc, type => 'no document element');
+    ## ISSUE: Is this non-conforming (to what spec)?  Or just a warning?
+    return;
+  }
+
+  ## ISSUE: Unexpanded entity references and HTML5 conformance
+  
   my $docel_nsuri = $docel->namespace_uri;
   $docel_nsuri = '' unless defined $docel_nsuri;
   my $docel_def = $Element->{$docel_nsuri}->{$docel->manakai_local_name} ||
@@ -2825,4 +2835,4 @@ sub _check_get_children ($$) {
 } # _check_get_children
 
 1;
-# $Date: 2007/06/05 00:56:42 $
+# $Date: 2007/06/23 02:26:51 $
