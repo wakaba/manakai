@@ -11,3 +11,90 @@ NULL
 |     <p>
 |       "\uFFFD"
 
+#data escaped
+\u0000
+#errors
+NULL
+#document-fragment p escaped
+| "\uFFFD"
+
+#data escaped
+<!DOCTYPE HTML><p>\u000D
+#errors
+#document escaped
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <p>
+|       "\u000A"
+
+#data escaped
+<!DOCTYPE HTML><p>\u000D</p>
+#errors
+#document escaped
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <p>
+|       "\u000A"
+
+#data escaped
+\u000D
+#errors
+#document-fragment p escaped
+| "\u000A"
+
+#data escaped
+\u000Da
+#errors
+#document-fragment p escaped
+| "\u000Aa"
+
+#data escaped
+<!DOCTYPE HTML><p>\u000D\u000A</p>
+#errors
+#document escaped
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <p>
+|       "\u000A"
+
+#data escaped
+\u000D\u000A
+#errors
+#document-fragment p escaped
+| "\u000A"
+
+#data escaped
+<!DOCTYPE HTML><p>\u000A</p>
+#errors
+#document escaped
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <p>
+|       "\u000A"
+
+#data escaped
+\u000A
+#errors
+#document-fragment p escaped
+| "\u000A"
+
+#data
+<script><!-- </script> --></script>
+#errors
+#document-fragment p
+
+#data
+<style><!-- </style> --></style>
+#errors
+#document-fragment p
+| <style>
+|   "<!-- </style> -->"
+

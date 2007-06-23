@@ -42,6 +42,7 @@ for my $file_name (grep {$_} split /\s+/, qq[
                      ]) {
   open my $file, '<', $file_name
     or die "$0: $file_name: $!";
+  print "# $file_name\n";
 
   my $test;
   my $mode = 'data';
@@ -61,8 +62,9 @@ for my $file_name (grep {$_} split /\s+/, qq[
     } elsif (/^#errors$/) {
       $test->{errors} = [];
       $mode = 'errors';
-      undef $escaped;
       $test->{data} =~ s/\x0D?\x0A\z//;       
+      $test->{data} =~ s/\\u([0-9A-Fa-f]{4})/chr hex $1/ge if $escaped;
+      undef $escaped;
     } elsif (/^#document$/) {
       $test->{document} = '';
       $mode = 'document';
@@ -82,13 +84,12 @@ for my $file_name (grep {$_} split /\s+/, qq[
       $test->{element} = $1;
       $escaped = 1;
     } elsif (defined $test->{document} and /^$/) {
+      $test->{document} =~ s/\\u([0-9A-Fa-f]{4})/chr hex $1/ge if $escaped;
       test ($test);
       undef $test;
     } else {
       if ($mode eq 'data' or $mode eq 'document') {
-        my $s = $_;
-        $s =~ s/\\u([0-9A-Fa-f]{4})/chr hex $1/ge if $escaped;
-        $test->{$mode} .= $s;
+        $test->{$mode} .= $_;
       } elsif ($mode eq 'errors') {
         tr/\x0D\x0A//d;
         push @{$test->{errors}}, $_;
@@ -168,4 +169,4 @@ sub serialize ($) {
 } # serialize
 
 ## License: Public Domain.
-## $Date: 2007/06/23 03:53:35 $
+## $Date: 2007/06/23 06:38:12 $

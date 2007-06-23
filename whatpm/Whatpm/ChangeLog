@@ -1,5 +1,13 @@
 2007-06-23  Wakaba  <wakaba@suika.fam.cx>
 
+	* HTML.pm.src (set_inner_html): HTML5 revision 892 (adopt
+	nodes before appended).  Parser was not ready for NULL
+	parse error and escape flag.
+
+	* NanoDOM.pm (adopt_node): New.
+
+2007-06-23  Wakaba  <wakaba@suika.fam.cx>
+
 	* HTML.pm.src: HTML5 revision 886 (insane comment in
 	CDATA and RCDATA).  Note that current implementation
 	is simply repeating what the spec says and it is maybe not

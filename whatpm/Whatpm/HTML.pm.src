@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.13 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.14 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## This is an early version of an HTML parser.
 
@@ -4935,7 +4935,8 @@ sub set_inner_html ($$$) {
     ## NOTE: Most of this code is copied from |parse_string|
 
     ## Step 1 # MUST
-    my $doc = $node->owner_document->implementation->create_document;
+    my $this_doc = $node->owner_document;
+    my $doc = $this_doc->implementation->create_document;
     ## TODO: Mark as HTML document
     my $p = $class->new;
     $p->{document} = $doc;
@@ -4946,6 +4947,10 @@ sub set_inner_html ($$$) {
     my $column = 0;
     $p->{set_next_input_character} = sub {
       my $self = shift;
+
+      pop @{$self->{prev_input_character}};
+      unshift @{$self->{prev_input_character}}, $self->{next_input_character};
+
       $self->{next_input_character} = -1 and return if $i >= length $$s;
       $self->{next_input_character} = ord substr $$s, $i++, 1;
       $column++;
@@ -4962,6 +4967,7 @@ sub set_inner_html ($$$) {
             #
           } else {
             push @{$self->{char}}, $next_char;
+            ## TODO: This is incorrect, since $next_char might be e.g. CR.
           }
         }
         $self->{next_input_character} = 0x000A; # LF # MUST
@@ -4970,9 +4976,12 @@ sub set_inner_html ($$$) {
       } elsif ($self->{next_input_character} > 0x10FFFF) {
         $self->{next_input_character} = 0xFFFD; # REPLACEMENT CHARACTER # MUST
       } elsif ($self->{next_input_character} == 0x0000) { # NULL
+        !!!parse-error (type => 'NULL');
         $self->{next_input_character} = 0xFFFD; # REPLACEMENT CHARACTER # MUST
       }
     };
+    $p->{prev_input_character} = [-1, -1, -1];
+    $p->{next_input_character} = -1;
     
     my $ponerror = $onerror || sub {
       my (%opt) = @_;
@@ -5051,9 +5060,10 @@ sub set_inner_html ($$$) {
     ## Step 12 # MUST
     @cn = @{$root->child_nodes};
     for (@cn) {
+      $this_doc->adopt_node ($_);
       $node->append_child ($_);
     }
-    ## ISSUE: adopt_node? mutation events?
+    ## ISSUE: mutation events?
 
     $p->_terminate_tree_constructor;
   } else {
@@ -5161,4 +5171,4 @@ sub get_inner_html ($$$) {
 } # get_inner_html
 
 1;
-# $Date: 2007/06/23 05:29:48 $
+# $Date: 2007/06/23 06:38:12 $

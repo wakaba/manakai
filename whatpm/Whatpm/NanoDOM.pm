@@ -226,6 +226,18 @@ sub document_element ($) {
   return undef;
 } # document_element
 
+sub adopt_node {
+  my @node = ($_[1]);
+  while (@node) {
+    my $node = shift @node;
+    $node->{owner_document} = $_[0];
+    Scalar::Util::weaken ($node->{owner_document});
+    push @node, @{$node->child_nodes};
+    push @node, @{$node->attributes or []} if $node->can ('attributes');
+  }
+  return $_[1];
+} # adopt_node
+
 package Whatpm::NanoDOM::Element;
 push our @ISA, 'Whatpm::NanoDOM::Node';
 
@@ -477,4 +489,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2007/06/23 02:26:51 $
+# $Date: 2007/06/23 06:38:12 $
