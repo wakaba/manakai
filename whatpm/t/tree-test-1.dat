@@ -669,3 +669,16 @@ div closed by dd
 |         "c"
 |     "d"
 
+#data
+<!DOCTYPE HTML><body><form><div>a</form>b
+#errors
+div not closed before </form>
+div not closed before EOF
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <form>
+|       <div>
+|         "ab"

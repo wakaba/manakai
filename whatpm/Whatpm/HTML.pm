@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.12 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## This is an early version of an HTML parser.
 
@@ -3654,7 +3654,6 @@ sub _tree_construction_main ($) {
                 address => 1, blockquote => 1, center => 1, dir => 1,
                 div => 1, dl => 1, fieldset => 1, listing => 1,
                 menu => 1, ol => 1, pre => 1, ul => 1,
-                form => 1,
                 p => 1,
                 dd => 1, dt => 1, li => 1,
                 button => 1, marquee => 1, object => 1,
@@ -3692,11 +3691,43 @@ sub _tree_construction_main ($) {
         }
         
         splice @{$self->{open_elements}}, $i if defined $i;
-        undef $self->{form_element} if $token->{tag_name} eq 'form';
         $clear_up_to_marker->()
           if {
             button => 1, marquee => 1, object => 1,
           }->{$token->{tag_name}};
+        $token = $self->_get_next_token;
+        return;
+      } elsif ($token->{tag_name} eq 'form') {
+        ## has an element in scope
+        INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
+          my $node = $self->{open_elements}->[$_];
+          if ($node->[1] eq $token->{tag_name}) {
+            ## generate implied end tags
+            if ({
+                 dd => 1, dt => 1, li => 1, p => 1,
+                 td => 1, th => 1, tr => 1,
+                }->{$self->{open_elements}->[-1]->[1]}) {
+              unshift @{$self->{token}}, $token;
+              $token = {type => 'end tag',
+                        tag_name => $self->{open_elements}->[-1]->[1]}; # MUST
+              return;
+            }
+            last INSCOPE;
+          } elsif ({
+                    table => 1, caption => 1, td => 1, th => 1,
+                    button => 1, marquee => 1, object => 1, html => 1,
+                   }->{$node->[1]}) {
+            last INSCOPE;
+          }
+        } # INSCOPE
+        
+        if ($self->{open_elements}->[-1]->[1] eq $token->{tag_name}) {
+          pop @{$self->{open_elements}};
+        } else {
+          $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
+        }
+
+        undef $self->{form_element};
         $token = $self->_get_next_token;
         return;
       } elsif ({
@@ -6151,4 +6182,4 @@ sub get_inner_html ($$$) {
 } # get_inner_html
 
 1;
-# $Date: 2007/06/23 04:09:38 $
+# $Date: 2007/06/23 04:38:50 $
