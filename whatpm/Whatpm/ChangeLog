@@ -1,5 +1,11 @@
 2007-06-23  Wakaba  <wakaba@suika.fam.cx>
 
+	* HTML.pm.src: Parse errors immediately after U+000D
+	were ignored and U+000D immediately following another
+	U+000D was not converted to U+000A.
+
+2007-06-23  Wakaba  <wakaba@suika.fam.cx>
+
 	* HTML.pm.src (set_inner_html): HTML5 revision 892 (adopt
 	nodes before appended).  Parser was not ready for NULL
 	parse error and escape flag.

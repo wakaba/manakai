@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.14 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.15 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## This is an early version of an HTML parser.
 
@@ -361,16 +361,7 @@ sub parse_string ($$$;$) {
       $line++;
       $column = 0;
     } elsif ($self->{next_input_character} == 0x000D) { # CR
-      if ($i >= length $$s) {
-        #
-      } else {
-        my $next_char = ord substr $$s, $i++, 1;
-        if ($next_char == 0x000A) { # LF
-          #
-        } else {
-          push @{$self->{char}}, $next_char;
-        }
-      }
+      $i++ if substr ($$s, $i, 1) eq "\x0A";
       $self->{next_input_character} = 0x000A; # LF # MUST
       $line++;
       $column = 0;
@@ -4959,17 +4950,7 @@ sub set_inner_html ($$$) {
         $line++;
         $column = 0;
       } elsif ($self->{next_input_character} == 0x000D) { # CR
-        if ($i >= length $$s) {
-          #
-        } else {
-          my $next_char = ord substr $$s, $i++, 1;
-          if ($next_char == 0x000A) { # LF
-            #
-          } else {
-            push @{$self->{char}}, $next_char;
-            ## TODO: This is incorrect, since $next_char might be e.g. CR.
-          }
-        }
+        $i++ if substr ($$s, $i, 1) eq "\x0A";
         $self->{next_input_character} = 0x000A; # LF # MUST
         $line++;
         $column = 0;
@@ -5171,4 +5152,4 @@ sub get_inner_html ($$$) {
 } # get_inner_html
 
 1;
-# $Date: 2007/06/23 06:38:12 $
+# $Date: 2007/06/23 06:48:24 $
