@@ -14,6 +14,7 @@ content-type-result.txt: always
 
 tokenizer-files: tokenizer \
   tokenizer/test1.test tokenizer/test2.test tokenizer/contentModelFlags.test \
+  tokenizer/LICENSE \
   tokenizer-result.txt
 
 tokenizer:
@@ -21,6 +22,9 @@ tokenizer:
 
 tokenizer/%.test:
 	$(WGET) -O $@ http://html5lib.googlecode.com/svn/trunk/tests/$@
+
+tokenizer/LICENSE:
+	$(WGET) -O $@ http://html5lib.googlecode.com/svn/trunk/LICENSE
 
 tokenizer-result.txt: always
 	cd .. && perl t/HTML-tokenizer.t &> t/$@
@@ -30,6 +34,7 @@ tree-construction-files: tree-construction \
   tree-construction/tests2.dat \
   tree-construction/tests3.dat \
   tree-construction/tests4.dat \
+  tree-construction/LICENSE \
   tree-construction-result.txt
 
 tree-construction:
@@ -37,6 +42,9 @@ tree-construction:
 
 tree-construction/%.dat:
 	$(WGET) -O $@ http://html5lib.googlecode.com/svn/trunk/tests/$@
+
+tree-construction/LICENSE:
+	$(WGET) -O $@ http://html5lib.googlecode.com/svn/trunk/LICENSE
 
 tree-construction-result.txt: always
 	cd .. && perl t/HTML-tree.t &> t/$@
@@ -49,4 +57,4 @@ content-checker-result.txt: always
 always:
 
 ## License: Public Domain.
-## $Date: 2007/05/20 11:12:25 $
+## $Date: 2007/06/23 02:09:06 $
