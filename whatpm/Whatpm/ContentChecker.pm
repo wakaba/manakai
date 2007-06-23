@@ -288,7 +288,8 @@ my $HTMLStylableBlockChecker = sub {
       my $node_ln = $node->manakai_local_name;
       my $not_allowed = $self->{minuses}->{$node_ns}->{$node_ln};
       if ($node_ns eq $HTML_NS and $node_ln eq 'style') {
-        $not_allowed = 1 if $has_non_style;
+        $not_allowed = 1 if $has_non_style or
+            not $node->has_attribute_ns (undef, 'scoped');
       } elsif ($HTMLBlockLevelElements->{$node_ns}->{$node_ln}) {
         $has_non_style = 1;
       } else {
@@ -564,6 +565,10 @@ my $GetHTMLZeroOrMoreThenBlockOrInlineChecker = sub ($$) {
         my $not_allowed = $self->{minuses}->{$node_ns}->{$node_ln};
         if ($node_ns eq $elnsuri and $node_ln eq $ellname) {
           $not_allowed = 1 if $has_non_style;
+          if ($ellname eq 'style' and
+              not $node->has_attribute_ns (undef, 'scoped')) {
+            $not_allowed = 1;
+          }
         } elsif ($content eq 'block') {
           $has_non_style = 1;
           $not_allowed = 1
@@ -1070,6 +1075,11 @@ $Element->{$HTML_NS}->{head} = {
           if ($phase eq 'initial' or $phase eq 'after charset') {
             $phase = 'after base';
           } else {
+            $not_allowed = 1;
+          }
+        } elsif ($node_ns eq $HTML_NS and $node_ln eq 'style') {
+          $phase = 'after base';
+          if ($node->has_attribute_ns (undef, 'scoped')) {
             $not_allowed = 1;
           }
         } elsif ($HTMLMetadataElements->{$node_ns}->{$node_ln}) {
@@ -2841,4 +2851,4 @@ sub _check_get_children ($$) {
 } # _check_get_children
 
 1;
-# $Date: 2007/06/23 04:22:57 $
+# $Date: 2007/06/23 16:42:43 $

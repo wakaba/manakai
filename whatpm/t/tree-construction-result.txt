@@ -1,7 +1,7 @@
 1..472
 # Running under perl version 5.008007 for linux
-# Current time local: Sun Jun 24 00:56:39 2007
-# Current time GMT:   Sat Jun 23 15:56:39 2007
+# Current time local: Sun Jun 24 01:40:56 2007
+# Current time GMT:   Sat Jun 23 16:40:56 2007
 # Using Test.pm version 1.25
 # t/tokenizer-test-2.dat
 ok 1
@@ -331,19 +331,9 @@ not ok 198
 ok 199
 ok 200
 not ok 201
-# Test 201 got: "8" (t/HTML-tree.t at line 133 fail #101)
-#     Expected: "7" (Parse error: <body><body><base><link><meta><title><p></title><body><p></body>; 1:7:no DOCTYPE, 1:13:in body:body, 1:19:in body:base, 1:25:in body:link, 1:31:in body:meta, 1:38:in body:title, 1:55:in body:body, 1:64:after body:/p;6: missing document type declaration, 12: unexpected body element start tag, 18: base element start tag out of place, 24: link element start tag out of place, 30: meta element start tag out of place, 37: title element start tag out of place, 54: unexpected body element start tag)
-not ok 202
-# Test 202 got: "| <html>\n|   <head>\n|     <base>\n|     <link>\n|     <meta>\n|     <title>\n|       \"<p>\"\n|   <body>\n|     <p>\n" (t/HTML-tree.t at line 135 fail #101)
-#     Expected: "| <html>\n|   <head>\n|     <title>\n|       \"<p>\"\n|   <body>\n|     <base>\n|     <link>\n|     <meta>\n|     <p>\n" (Document tree: <body><body><base><link><meta><title><p></title><body><p></body>)
-#     Got 3 extra lines at line 3:
-#      + "|     <base>\n"
-#      + "|     <link>\n"
-#      + "|     <meta>\n"
-#     Lines 9-9 are missing:
-#      - "|     <base>\n"
-#      - "|     <link>\n"
-#      - "|     <meta>\n"
+# Test 201 got: "5" (t/HTML-tree.t at line 133 fail #101)
+#     Expected: "7" (Parse error: <body><body><base><link><meta><title><p></title><body><p></body>; 1:7:no DOCTYPE, 1:13:in body:body, 1:38:in body:title, 1:55:in body:body, 1:64:after body:/p;6: missing document type declaration, 12: unexpected body element start tag, 18: base element start tag out of place, 24: link element start tag out of place, 30: meta element start tag out of place, 37: title element start tag out of place, 54: unexpected body element start tag)
+ok 202
 ok 203
 ok 204
 ok 205
@@ -354,16 +344,8 @@ not ok 207
 ok 208
 ok 209
 ok 210
-not ok 211
-# Test 211 got: "4" (t/HTML-tree.t at line 133 fail #106)
-#     Expected: "3" (Parse error: <head></html><meta><p>; 1:7:no DOCTYPE, 1:20:after html:meta, 1:20:after body:meta, 1:20:in body:meta;6: missing document type declaration, 19: unexpected node at end of document, 19: unexpected node after body element end tag)
-not ok 212
-# Test 212 got: "| <html>\n|   <head>\n|     <meta>\n|   <body>\n|     <p>\n" (t/HTML-tree.t at line 135 fail #106)
-#     Expected: "| <html>\n|   <head>\n|   <body>\n|     <meta>\n|     <p>\n" (Document tree: <head></html><meta><p>)
-#     Got 1 extra line at line 3:
-#      + "|     <meta>\n"
-#     Line 5 is missing:
-#      - "|     <meta>\n"
+ok 211
+ok 212
 ok 213
 ok 214
 ok 215
@@ -614,17 +596,10 @@ not ok 343
 #     Expected: "2" (Parse error: <!DOCTYPE HTML><body><title>test</body></title>; 1:29:in body:title;Unexpected start tag that belongs in the head., Expected closing tag after </.)
 ok 344
 not ok 345
-# Test 345 got: "3" (t/HTML-tree.t at line 133 fail #173)
+# Test 345 got: "1" (t/HTML-tree.t at line 133 fail #173)
 #     Expected: "4" (Parse error: <!DOCTYPE HTML><body><title>X</title><meta name=z><link rel=foo><style>
-#x { content:"</style" } </style>; 1:29:in body:title, 1:51:in body:meta, 1:65:in body:link;Unexpected start tag that belongs in head., Unexpected start tag that belongs in head., Unexpected start tag that belongs in head., Expected closing tag after </.)
-not ok 346
-# Test 346 got: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|     <title>\n|       \"X\"\n|     <meta>\n|       name=\"z\"\n|     <link>\n|       rel=\"foo\"\n|   <body>\n|     <style>\n|       \"\nx { content:\"</style\" } \"\n" (t/HTML-tree.t at line 135 fail #173)
-#     Expected: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|     <title>\n|       \"X\"\n|   <body>\n|     <meta>\n|       name=\"z\"\n|     <link>\n|       rel=\"foo\"\n|     <style>\n|       \"\nx { content:\"</style\" } \"\n" (Document tree: <!DOCTYPE HTML><body><title>X</title><meta name=z><link rel=foo><style>
-#x { content:"</style" } </style>)
-#     Line 6 is missing:
-#      - "|   <body>\n"
-#     Got 1 extra line at line 10:
-#      + "|   <body>\n"
+#x { content:"</style" } </style>; 1:29:in body:title;Unexpected start tag that belongs in head., Unexpected start tag that belongs in head., Unexpected start tag that belongs in head., Expected closing tag after </.)
+ok 346
 ok 347
 ok 348
 ok 349
@@ -845,15 +820,9 @@ not ok 447
 #     Expected: "0" (Parse error: <!doctype html></html> <head>; 1:29:after html:head, 1:29:after body:head, 1:29:in body:head;)
 ok 448
 not ok 449
-# Test 449 got: "2" (t/HTML-tree.t at line 133 fail #225)
-#     Expected: "0" (Parse error: <!doctype html></body><meta>; 1:28:after body:meta, 1:28:in body:meta;)
-not ok 450
-# Test 450 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|     <meta>\n|   <body>\n" (t/HTML-tree.t at line 135 fail #225)
-#     Expected: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <meta>\n" (Document tree: <!doctype html></body><meta>)
-#     Got 1 extra line at line 4:
-#      + "|     <meta>\n"
-#     Line 6 is missing:
-#      - "|     <meta>\n"
+# Test 449 got: "1" (t/HTML-tree.t at line 133 fail #225)
+#     Expected: "0" (Parse error: <!doctype html></body><meta>; 1:28:after body:meta;)
+ok 450
 # t/tree-test-1.dat
 ok 451
 ok 452

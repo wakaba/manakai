@@ -82,29 +82,27 @@ title in body
 #data
 <!DOCTYPE HTML><html><head><title></title></head><body><meta name="a"></body></html>
 #errors
-meta in body
 #document
 | <!DOCTYPE HTML>
 | <html>
 |   <head>
 |     <title>
+|   <body>
 |     <meta>
 |       name="a"
-|   <body>
 
 #data
 <!DOCTYPE HTML><html><head><title></title></head><body></body><meta name="a"></html>
 #errors
 data after body
-meta in body
 #document
 | <!DOCTYPE HTML>
 | <html>
 |   <head>
 |     <title>
+|   <body>
 |     <meta>
 |       name="a"
-|   <body>
 
 #data
 <!DOCTYPE HTML><html><head><title></title><link rel="a"></head><body></body></html>
@@ -121,29 +119,27 @@ meta in body
 #data
 <!DOCTYPE HTML><html><head><title></title></head><body><link rel="a"></body></html>
 #errors
-link in body
 #document
 | <!DOCTYPE HTML>
 | <html>
 |   <head>
 |     <title>
+|   <body>
 |     <link>
 |       rel="a"
-|   <body>
 
 #data
 <!DOCTYPE HTML><html><head><title></title></head><body></body><link rel="a"></html>
 #errors
 data after body
-link in body
 #document
 | <!DOCTYPE HTML>
 | <html>
 |   <head>
 |     <title>
+|   <body>
 |     <link>
 |       rel="a"
-|   <body>
 
 #data
 <!DOCTYPE HTML><html><head><title></title><base href="http://"></head><body></body></html>
@@ -160,29 +156,27 @@ link in body
 #data
 <!DOCTYPE HTML><html><head><title></title></head><body><base href="http://"></body></html>
 #errors
-base in body
 #document
 | <!DOCTYPE HTML>
 | <html>
 |   <head>
 |     <title>
+|   <body>
 |     <base>
 |       href="http://"
-|   <body>
 
 #data
 <!DOCTYPE HTML><html><head><title></title></head><body></body><base href="http://"></html>
 #errors
 data after body
-base in body
 #document
 | <!DOCTYPE HTML>
 | <html>
 |   <head>
 |     <title>
+|   <body>
 |     <base>
 |       href="http://"
-|   <body>
 
 #data
 <!DOCTYPE HTML><p><b><p>X
@@ -228,7 +222,6 @@ base in body
 #data
 <link rel="a" href="b">
 #errors
-link in body
 #document-fragment head
 | <link>
 |   href="b"
@@ -237,7 +230,6 @@ link in body
 #data
 <meta name="a" content="b">
 #errors
-meta in body
 #document-fragment head
 | <meta>
 |   content="b"
@@ -246,7 +238,6 @@ meta in body
 #data
 <base href="a" target="b">
 #errors
-base in body
 #document-fragment head
 | <base>
 |   href="a"
@@ -255,7 +246,6 @@ base in body
 #data
 <base href="a" target="b">a
 #errors
-base in body
 #document-fragment head
 | <base>
 |   href="a"

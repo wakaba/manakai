@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.23 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.24 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## ISSUE:
 ## var doc = implementation.createDocument (null, null, null);
@@ -3257,7 +3257,6 @@ sub _tree_construction_main ($) {
       } elsif ({
                 base => 1, link => 1, meta => 1,
                }->{$token->{tag_name}}) {
-        $self->{parse_error}-> (type => 'in body:'.$token->{tag_name});
         ## NOTE: This is an "as if in head" code clone
         my $el;
         
@@ -3269,7 +3268,8 @@ sub _tree_construction_main ($) {
                                  $token->{attributes} ->{$attr_name}->{value});
         }
       
-        if (defined $self->{head_element}) {
+        if ($self->{insertion_mode} eq 'in head' and
+            defined $self->{head_element}) {
           $self->{head_element}->append_child ($el);
         } else {
           $insert->($el);
@@ -4562,8 +4562,12 @@ sub _tree_construction_main ($) {
                                  $token->{attributes} ->{$attr_name}->{value});
         }
       
-              (defined $self->{head_element} ? $self->{head_element} : $self->{open_elements}->[-1]->[0])
-                ->append_child ($el);
+              if ($self->{insertion_mode} eq 'in head' and
+                  defined $self->{head_element}) {
+                $self->{head_element}->append_child ($el);
+              } else {
+                $self->{open_elements}->[-1]->[0]->append_child ($el);
+              }
 
               $token = $self->_get_next_token;
               redo B;
@@ -6710,4 +6714,4 @@ sub get_inner_html ($$$) {
 } # get_inner_html
 
 1;
-# $Date: 2007/06/23 16:01:36 $
+# $Date: 2007/06/23 16:42:43 $

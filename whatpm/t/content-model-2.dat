@@ -788,6 +788,66 @@ id=""><span id=""></span></p>
 #errors
 
 #data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title/>
+<style scoped=""/>
+</head>
+#errors
+/head/style;element not allowed
+
+#data
+<article xmlns="http://www.w3.org/1999/xhtml">
+<style/>
+</article>
+#errors
+/article/style;element not allowed
+
+#data
+<article xmlns="http://www.w3.org/1999/xhtml">
+<style scoped=""/>
+</article>
+#errors
+
+#data
+<aside xmlns="http://www.w3.org/1999/xhtml">
+<style/>
+</aside>
+#errors
+/aside/style;element not allowed
+
+#data
+<aside xmlns="http://www.w3.org/1999/xhtml">
+<style scoped=""/>
+</aside>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<style/>
+</div>
+#errors
+/div/style;element not allowed
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<style scoped=""/>
+</div>
+#errors
+
+#data
+<section xmlns="http://www.w3.org/1999/xhtml">
+<style/>
+</section>
+#errors
+/section/style;element not allowed
+
+#data
+<section xmlns="http://www.w3.org/1999/xhtml">
+<style scoped=""/>
+</section>
+#errors
+
+#data
 <body text="red" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /body/@text;attribute not supported
