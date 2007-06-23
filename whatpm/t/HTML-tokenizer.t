@@ -75,6 +75,10 @@ for my $file_name (grep {$_} split /\s+/, qq[
       my @token;
       $p->{set_next_input_character} = sub {
         my $self = shift;
+
+        pop @{$self->{prev_input_character}};
+        unshift @{$self->{prev_input_character}}, $self->{next_input_character};
+
         $self->{next_input_character} = -1 and return if $i >= length $s;
         $self->{next_input_character} = ord substr $s, $i++, 1;
 
@@ -98,6 +102,8 @@ for my $file_name (grep {$_} split /\s+/, qq[
           push @token, 'ParseError';
         }
       };
+      $p->{prev_input_character} = [-1, -1, -1];
+      $p->{next_input_character} = -1;
       
       $p->{parse_error} = sub {
         push @token, 'ParseError';
@@ -143,4 +149,4 @@ for my $file_name (grep {$_} split /\s+/, qq[
   }
 }
 
-## $Date: 2007/06/23 03:53:35 $
+## $Date: 2007/06/23 05:29:48 $

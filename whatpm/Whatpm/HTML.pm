@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.12 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.13 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## This is an early version of an HTML parser.
 
@@ -349,6 +349,10 @@ sub parse_string ($$$;$) {
   my $column = 0;
   $self->{set_next_input_character} = sub {
     my $self = shift;
+
+    pop @{$self->{prev_input_character}};
+    unshift @{$self->{prev_input_character}}, $self->{next_input_character};
+
     $self->{next_input_character} = -1 and return if $i >= length $$s;
     $self->{next_input_character} = ord substr $$s, $i++, 1;
     $column++;
@@ -377,6 +381,8 @@ sub parse_string ($$$;$) {
       $self->{next_input_character} = 0xFFFD; # REPLACEMENT CHARACTER # MUST
     }
   };
+  $self->{prev_input_character} = [-1, -1, -1];
+  $self->{next_input_character} = -1;
 
   my $onerror = $_[2] || sub {
     my (%opt) = @_;
@@ -473,8 +479,24 @@ sub _get_next_token ($) {
         } else {
           #
         }
+      } elsif ($self->{next_input_character} == 0x002D) { # -
+        if ($self->{content_model_flag} eq 'RCDATA' or
+            $self->{content_model_flag} eq 'CDATA') {
+          unless ($self->{escape}) {
+            if ($self->{prev_input_character}->[0] == 0x002D and # -
+                $self->{prev_input_character}->[1] == 0x0021 and # !
+                $self->{prev_input_character}->[2] == 0x003C) { # <
+              $self->{escape} = 1;
+            }
+          }
+        }
+        
+        #
       } elsif ($self->{next_input_character} == 0x003C) { # <
-        if ($self->{content_model_flag} ne 'PLAINTEXT') {
+        if ($self->{content_model_flag} eq 'PCDATA' or
+            (($self->{content_model_flag} eq 'CDATA' or
+              $self->{content_model_flag} eq 'RCDATA') and
+             not $self->{escape})) {
           $self->{state} = 'tag open';
           
       if (@{$self->{char}}) {
@@ -487,6 +509,17 @@ sub _get_next_token ($) {
         } else {
           #
         }
+      } elsif ($self->{next_input_character} == 0x003E) { # >
+        if ($self->{escape} and
+            ($self->{content_model_flag} eq 'RCDATA' or
+             $self->{content_model_flag} eq 'CDATA')) {
+          if ($self->{prev_input_character}->[0] == 0x002D and # -
+              $self->{prev_input_character}->[1] == 0x002D) { # -
+            delete $self->{escape};
+          }
+        }
+        
+        #
       } elsif ($self->{next_input_character} == -1) {
         return  ({type => 'end-of-file'});
         last A; ## TODO: ok?
@@ -2487,6 +2520,7 @@ sub _tree_construction_main ($) {
      ? $self->{head_element} : $self->{open_elements}->[-1]->[0])
       ->append_child ($style_el);
     $self->{content_model_flag} = 'CDATA';
+    delete $self->{escape}; # MUST
               
     my $text = '';
     $token = $self->_get_next_token;
@@ -2523,6 +2557,7 @@ sub _tree_construction_main ($) {
     ## TODO: mark as "parser-inserted"
 
     $self->{content_model_flag} = 'CDATA';
+    delete $self->{escape}; # MUST
     
     my $text = '';
     $token = $self->_get_next_token;
@@ -2828,6 +2863,7 @@ sub _tree_construction_main ($) {
         (defined $self->{head_element} ? $self->{head_element} : $self->{open_elements}->[-1]->[0])
           ->append_child ($title_el);
         $self->{content_model_flag} = 'RCDATA';
+        delete $self->{escape}; # MUST
         
         my $text = '';
         $token = $self->_get_next_token;
@@ -3339,6 +3375,7 @@ sub _tree_construction_main ($) {
   
         
         $self->{content_model_flag} = 'CDATA';
+        delete $self->{escape}; # MUST
         
         $token = $self->_get_next_token;
         return;
@@ -3523,6 +3560,7 @@ sub _tree_construction_main ($) {
         } else {
           $self->{content_model_flag} = 'CDATA';
         }
+        delete $self->{escape}; # MUST
         
         $insert->($el);
         
@@ -3997,6 +4035,7 @@ sub _tree_construction_main ($) {
               (defined $self->{head_element} ? $self->{head_element} : $self->{open_elements}->[-1]->[0])
                 ->append_child ($title_el);
               $self->{content_model_flag} = 'RCDATA';
+              delete $self->{escape}; # MUST
 
               my $text = '';
               $token = $self->_get_next_token;
@@ -6182,4 +6221,4 @@ sub get_inner_html ($$$) {
 } # get_inner_html
 
 1;
-# $Date: 2007/06/23 04:38:50 $
+# $Date: 2007/06/23 05:29:48 $
