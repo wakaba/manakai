@@ -1,5 +1,15 @@
 2007-06-23  Wakaba  <wakaba@suika.fam.cx>
 
+	* tokenizer-test-2.dat: New test.  This test file contains
+	some tests that cannot be reliably tested by |HTML-tokenize.t|,
+	since they depends on how characeters are supplied to the 
+	tokenizer.
+
+	* HTML-tree.t: |tokenizer-test-2.dat| added.  |#data escaped|
+	etc. supported.
+
+2007-06-23  Wakaba  <wakaba@suika.fam.cx>
+
 	* tokenizer-test-1.test: Tests for C1 character
 	references are added.
 

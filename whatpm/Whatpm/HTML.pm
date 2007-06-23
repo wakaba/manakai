@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## This is an early version of an HTML parser.
 
@@ -374,7 +374,6 @@ sub parse_string ($$$;$) {
       $self->{next_input_character} = 0xFFFD; # REPLACEMENT CHARACTER # MUST
     } elsif ($self->{next_input_character} == 0x0000) { # NULL
       $self->{parse_error}-> (type => 'NULL');
-## TODO: test
       $self->{next_input_character} = 0xFFFD; # REPLACEMENT CHARACTER # MUST
     }
   };
@@ -450,8 +449,6 @@ sub _initialize_tokenizer ($) {
 ## script in the "list of scripts that will execute asynchronously",
 ## has completed loading.  If one has, then it MUST be executed
 ## and removed from the list.
-
-## ISSUE: <http://html5.org/tools/web-apps-tracker?from=874&to=876>
 
 sub _get_next_token ($) {
   my $self = shift;
@@ -3555,11 +3552,10 @@ sub _tree_construction_main ($) {
             $token->{tag_name} eq $tag_name) {
           ## Ignore the token
         } else {
-          if ($token->{tag_name} eq 'textarea') { ## TODO: This is incorrect maybe
-## TODO: <http://html5.org/tools/web-apps-tracker?from=866&to=867>
-            $self->{parse_error}-> (type => 'in CDATA:#'.$token->{type});
-          } else {
+          if ($token->{tag_name} eq 'textarea') {
             $self->{parse_error}-> (type => 'in RCDATA:#'.$token->{type});
+          } else {
+            $self->{parse_error}-> (type => 'in CDATA:#'.$token->{type});
           }
           ## ISSUE: And ignore?
         }
@@ -6155,4 +6151,4 @@ sub get_inner_html ($$$) {
 } # get_inner_html
 
 1;
-# $Date: 2007/06/23 03:30:05 $
+# $Date: 2007/06/23 03:53:34 $

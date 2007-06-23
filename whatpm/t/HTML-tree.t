@@ -31,6 +31,7 @@ sub Data::Dumper::qquote {
 } # Data::Dumper::qquote
 
 for my $file_name (grep {$_} split /\s+/, qq[
+                      ${test_dir_name}tokenizer-test-2.dat
                       ${dir_name}tests1.dat
                       ${dir_name}tests2.dat
                       ${dir_name}tests3.dat
@@ -44,29 +45,50 @@ for my $file_name (grep {$_} split /\s+/, qq[
 
   my $test;
   my $mode = 'data';
+  my $escaped;
   while (<$file>) {
     s/\x0D\x0A/\x0A/;
     if (/^#data$/) {
       undef $test;
       $test->{data} = '';
       $mode = 'data';
+      undef $escaped;
+    } elsif (/^#data escaped$/) {
+      undef $test;
+      $test->{data} = '';
+      $mode = 'data';
+      $escaped = 1;
     } elsif (/^#errors$/) {
       $test->{errors} = [];
       $mode = 'errors';
+      undef $escaped;
       $test->{data} =~ s/\x0D?\x0A\z//;       
     } elsif (/^#document$/) {
       $test->{document} = '';
       $mode = 'document';
+      undef $escaped;
+    } elsif (/^#document escaped$/) {
+      $test->{document} = '';
+      $mode = 'document';
+      $escaped = 1;
     } elsif (/^#document-fragment (\S+)$/) {
       $test->{document} = '';
       $mode = 'document';
       $test->{element} = $1;
+      undef $escaped;
+    } elsif (/^#document-fragment (\S+) escaped$/) {
+      $test->{document} = '';
+      $mode = 'document';
+      $test->{element} = $1;
+      $escaped = 1;
     } elsif (defined $test->{document} and /^$/) {
       test ($test);
       undef $test;
     } else {
       if ($mode eq 'data' or $mode eq 'document') {
-        $test->{$mode} .= $_;
+        my $s = $_;
+        $s =~ s/\\u([0-9A-Fa-f]{4})/chr hex $1/ge if $escaped;
+        $test->{$mode} .= $s;
       } elsif ($mode eq 'errors') {
         tr/\x0D\x0A//d;
         push @{$test->{errors}}, $_;
@@ -146,4 +168,4 @@ sub serialize ($) {
 } # serialize
 
 ## License: Public Domain.
-## $Date: 2007/06/23 02:26:51 $
+## $Date: 2007/06/23 03:53:35 $

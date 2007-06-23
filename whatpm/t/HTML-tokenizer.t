@@ -48,7 +48,8 @@ for my $file_name (grep {$_} split /\s+/, qq[
   local $/ = undef;
   my $js = <$file>;
   close $file;
-  
+
+  print "# $file_name\n";
   my $tests = jsonToObj ($js)->{tests};
   TEST: for my $test (@$tests) {
     my $s = $test->{input};
@@ -71,6 +72,7 @@ for my $file_name (grep {$_} split /\s+/, qq[
     for my $cm (@cm) {
       my $p = Whatpm::HTML->new;
       my $i = 0;
+      my @token;
       $p->{set_next_input_character} = sub {
         my $self = shift;
         $self->{next_input_character} = -1 and return if $i >= length $s;
@@ -90,12 +92,13 @@ for my $file_name (grep {$_} split /\s+/, qq[
           $self->{next_input_character} = 0x000A; # LF # MUST
         } elsif ($self->{next_input_character} > 0x10FFFF) {
           $self->{next_input_character} = 0xFFFD; # REPLACEMENT CHARACTER # MUST
+          push @token, 'ParseError';
         } elsif ($self->{next_input_character} == 0x0000) { # NULL
           $self->{next_input_character} = 0xFFFD; # REPLACEMENT CHARACTER # MUST
+          push @token, 'ParseError';
         }
       };
       
-      my @token;
       $p->{parse_error} = sub {
         push @token, 'ParseError';
       };
@@ -140,4 +143,4 @@ for my $file_name (grep {$_} split /\s+/, qq[
   }
 }
 
-## $Date: 2007/06/23 02:26:51 $
+## $Date: 2007/06/23 03:53:35 $
