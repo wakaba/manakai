@@ -41,10 +41,27 @@ NULL
 |       "\u000A"
 
 #data escaped
+<!DOCTYPE HTML><p>\u000D\u000D</p>
+#errors
+#document escaped
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <p>
+|       "\u000A\u000A"
+
+#data escaped
 \u000D
 #errors
 #document-fragment p escaped
 | "\u000A"
+
+#data escaped
+\u000D\u000D
+#errors
+#document-fragment p escaped
+| "\u000A\u000A"
 
 #data escaped
 \u000Da
