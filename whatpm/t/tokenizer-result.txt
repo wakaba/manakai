@@ -1,7 +1,7 @@
 1..94
 # Running under perl version 5.008007 for linux
-# Current time local: Sat Jun 23 11:14:46 2007
-# Current time GMT:   Sat Jun 23 02:14:46 2007
+# Current time local: Sat Jun 23 11:35:39 2007
+# Current time GMT:   Sat Jun 23 02:35:39 2007
 # Using Test.pm version 1.25
 not ok 1
 # Test 1 got: "$VAR1 = [\n          [\n            qq'DOCTYPE',\n            qq'HTML',\n            0\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 137)
@@ -241,16 +241,8 @@ ok 52
 ok 53
 ok 54
 ok 55
-not ok 56
-# Test 56 got: "$VAR1 = [\n          [\n            qq'Character',\n            qq'\\x{2030}'\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 137 fail #56)
-#    Expected: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\\x{2030}'\n          ]\n        ];\n" (Numeric entity representing a Windows-1252 'codepoint': &#137;)
-#    Line 2 is missing:
-#     - "          qq'ParseError',\n"
-not ok 57
-# Test 57 got: "$VAR1 = [\n          [\n            qq'Character',\n            qq'\\x{2030}'\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 137 fail #57)
-#    Expected: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\\x{2030}'\n          ]\n        ];\n" (Hexadecimal entity representing a Windows-1252 'codepoint': &#x89;)
-#    Line 2 is missing:
-#     - "          qq'ParseError',\n"
+ok 56
+ok 57
 ok 58
 ok 59
 ok 60

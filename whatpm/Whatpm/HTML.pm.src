@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## This is an early version of an HTML parser.
 
@@ -2704,7 +2704,6 @@ sub _tree_construction_main ($) {
         
         if ($token->{tag_name} eq 'textarea') {
           ## TODO: $self->{form_element} if defined
-          ## TODO: ignore first LF <http://html5.org/tools/web-apps-tracker?from=866&to=867>
           $self->{content_model_flag} = 'RCDATA';
         } else {
           $self->{content_model_flag} = 'CDATA';
@@ -2713,7 +2712,17 @@ sub _tree_construction_main ($) {
         $insert->($el);
         
         my $text = '';
-        !!!next-token;
+	if ($token->{tag_name} eq 'textarea') {
+          !!!next-token;
+          if ($token->{type} eq 'character') {
+            $token->{data} =~ s/^\x0A//;
+            unless (length $token->{data}) {
+              !!!next-token;
+            }
+          }
+        } else {
+          !!!next-token;
+        }
         while ($token->{type} eq 'character') {
           $text .= $token->{data};
           !!!next-token;
@@ -5088,4 +5097,4 @@ sub get_inner_html ($$$) {
 } # get_inner_html
 
 1;
-# $Date: 2007/06/23 02:26:51 $
+# $Date: 2007/06/23 02:41:51 $

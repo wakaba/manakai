@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## This is an early version of an HTML parser.
 
@@ -280,6 +280,7 @@ my $entity_char = {
   zwnj => "\x{200C}",
 }; # $entity_char
 
+## TODO: Ensure that this table match to <http://html5.org/tools/web-apps-tracker?from=868&to=869>.
 ## <http://lists.whatwg.org/pipermail/whatwg-whatwg.org/2006-December/thread.html#8562>
 my $c1_entity_char = {
      128, 8364,
@@ -374,6 +375,8 @@ sub parse_string ($$$;$) {
     } elsif ($self->{next_input_character} > 0x10FFFF) {
       $self->{next_input_character} = 0xFFFD; # REPLACEMENT CHARACTER # MUST
     } elsif ($self->{next_input_character} == 0x0000) { # NULL
+      $self->{parse_error}-> (type => 'NULL');
+## TODO: test
       $self->{next_input_character} = 0xFFFD; # REPLACEMENT CHARACTER # MUST
     }
   };
@@ -449,6 +452,8 @@ sub _initialize_tokenizer ($) {
 ## script in the "list of scripts that will execute asynchronously",
 ## has completed loading.  If one has, then it MUST be executed
 ## and removed from the list.
+
+## ISSUE: <http://html5.org/tools/web-apps-tracker?from=874&to=876>
 
 sub _get_next_token ($) {
   my $self = shift;
@@ -2054,8 +2059,7 @@ sub _tokenize_attempt_to_consume_an_entity ($) {
           $num = 0xFFFD; # REPLACEMENT CHARACTER
           ## ISSUE: Why this is not an error?
         } elsif (0x80 <= $num and $num <= 0x9F) {
-          ## NOTE: <http://lists.whatwg.org/pipermail/whatwg-whatwg.org/2006-December/thread.html#8562>
-          ## ISSUE: Not in the spec yet; parse error?
+          $self->{parse_error}-> (type => sprintf 'c1 entity:U+%04X', $num);
           $num = $c1_entity_char->{$num};
         }
 
@@ -2103,8 +2107,7 @@ sub _tokenize_attempt_to_consume_an_entity ($) {
         $code = 0xFFFD; # REPLACEMENT CHARACTER
         ## ISSUE: Why this is not an error?
       } elsif (0x80 <= $code and $code <= 0x9F) {
-        ## NOTE: <http://lists.whatwg.org/pipermail/whatwg-whatwg.org/2006-December/thread.html#8562>
-        ## ISSUE: Not in the spec yet; parse error?
+        $self->{parse_error}-> (type => sprintf 'c1 entity:U+%04X', $code);
         $code = $c1_entity_char->{$code};
       }
       
@@ -2980,6 +2983,11 @@ sub _tree_construction_main ($) {
         LI: {
           ## Step 2
           if ($node->[1] eq 'li') {
+            if ($i != -1) {
+              $self->{parse_error}-> (type => 'end tag missing:'.
+                              $self->{open_elements}->[-1]->[1]);
+              ## TODO: test
+            }
             splice @{$self->{open_elements}}, $i;
             last LI;
           }
@@ -3038,6 +3046,11 @@ sub _tree_construction_main ($) {
         LI: {
           ## Step 2
           if ($node->[1] eq 'dt' or $node->[1] eq 'dd') {
+            if ($i != -1) {
+              $self->{parse_error}-> (type => 'end tag missing:'.
+                              $self->{open_elements}->[-1]->[1]);
+              ## TODO: test
+            }
             splice @{$self->{open_elements}}, $i;
             last LI;
           }
@@ -3519,7 +3532,17 @@ sub _tree_construction_main ($) {
         $insert->($el);
         
         my $text = '';
-        $token = $self->_get_next_token;
+	if ($token->{tag_name} eq 'textarea') {
+          $token = $self->_get_next_token;
+          if ($token->{type} eq 'character') {
+            $token->{data} =~ s/^\x0A//;
+            unless (length $token->{data}) {
+              $token = $self->_get_next_token;
+            }
+          }
+        } else {
+          $token = $self->_get_next_token;
+        }
         while ($token->{type} eq 'character') {
           $text .= $token->{data};
           $token = $self->_get_next_token;
@@ -3534,7 +3557,8 @@ sub _tree_construction_main ($) {
             $token->{tag_name} eq $tag_name) {
           ## Ignore the token
         } else {
-          if ($token->{tag_name} eq 'textarea') {
+          if ($token->{tag_name} eq 'textarea') { ## TODO: This is incorrect maybe
+## TODO: <http://html5.org/tools/web-apps-tracker?from=866&to=867>
             $self->{parse_error}-> (type => 'in CDATA:#'.$token->{type});
           } else {
             $self->{parse_error}-> (type => 'in RCDATA:#'.$token->{type});
@@ -3725,6 +3749,7 @@ sub _tree_construction_main ($) {
                 strong => 1, tt => 1, u => 1,
                }->{$token->{tag_name}}) {
         $formatting_end_tag->($token->{tag_name});
+## TODO: <http://html5.org/tools/web-apps-tracker?from=883&to=884>
         return;
       } elsif ({
                 caption => 1, col => 1, colgroup => 1, frame => 1,
@@ -6132,4 +6157,4 @@ sub get_inner_html ($$$) {
 } # get_inner_html
 
 1;
-# $Date: 2007/05/30 12:24:49 $
+# $Date: 2007/06/23 02:41:51 $

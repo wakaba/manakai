@@ -1,7 +1,7 @@
 1..472
 # Running under perl version 5.008007 for linux
-# Current time local: Sat Jun 23 11:16:53 2007
-# Current time GMT:   Sat Jun 23 02:16:53 2007
+# Current time local: Sat Jun 23 11:35:48 2007
+# Current time GMT:   Sat Jun 23 02:35:48 2007
 # Using Test.pm version 1.25
 ok 1
 ok 2
@@ -395,7 +395,9 @@ ok 203
 ok 204
 ok 205
 ok 206
-ok 207
+not ok 207
+# Test 207 got: "4" (t/HTML-tree.t at line 110 fail #104)
+#     Expected: "2" (Parse error: <ul><li></li><div><li></div><li><li><div><li><address><li><b><em></b><li></ul>; 1:5:missing DOCTYPE, 1:46:end tag missing:div, 1:59:end tag missing:address, 1:70:not closed:em;4: missing document type declaration, 69: mismatched b element end tag (misnested tags))
 ok 208
 ok 209
 ok 210
@@ -450,7 +452,9 @@ not ok 239
 # Test 239 got: "1" (t/HTML-tree.t at line 110 fail #120)
 #     Expected: "0" (Parse error: <!DOCTYPE HTML><font><p><b>test</font>; 1:38:not closed:b;)
 ok 240
-ok 241
+not ok 241
+# Test 241 got: "1" (t/HTML-tree.t at line 110 fail #121)
+#     Expected: "0" (Parse error: <!DOCTYPE HTML><dt><div><dd>; 1:28:end tag missing:div;)
 ok 242
 not ok 243
 # Test 243 got: "4" (t/HTML-tree.t at line 110 fail #122)
@@ -831,18 +835,15 @@ not ok 372
 #      - "|   <body>\n"
 ok 373
 not ok 374
-# Test 374 got: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|   <body>\n|     <textarea>\n|       \"\n\"\n" (t/HTML-tree.t at line 112 fail #187)
+# Test 374 got: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|   <body>\n|     <textarea>\n" (t/HTML-tree.t at line 112 fail #187)
 #     Expected: "| <!DOCTYPE htML>\n| <html>\n|   <head>\n|   <body>\n|     <textarea>\n" (Document tree: <!DOCTYPE htML><textarea>
 #</textarea>)
 #     Line 1 is changed:
 #      - "| <!DOCTYPE htML>\n"
 #      + "| <!DOCTYPE HTML>\n"
-#     Got 2 extra lines at line 6:
-#      + "|       \"\n"
-#      + "\"\n"
 ok 375
 not ok 376
-# Test 376 got: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|   <body>\n|     <textarea>\n|       \"\n\nfoo\"\n" (t/HTML-tree.t at line 112 fail #188)
+# Test 376 got: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|   <body>\n|     <textarea>\n|       \"\nfoo\"\n" (t/HTML-tree.t at line 112 fail #188)
 #     Expected: "| <!DOCTYPE htML>\n| <html>\n|   <head>\n|   <body>\n|     <textarea>\n|       \"foo\"\n" (Document tree: <!DOCTYPE htML><textarea>
 #
 #foo</textarea>)
@@ -852,12 +853,9 @@ not ok 376
 #     Line 6 is changed:
 #      - "|       \"foo\"\n"
 #      + "|       \"\n"
-#     Got 2 extra lines at line 7:
-#      + "\n"
+#     Got 1 extra line at line 7:
 #      + "foo\"\n"
-not ok 377
-# Test 377 got: "0" (t/HTML-tree.t at line 110 fail #189)
-#     Expected: "1" (Parse error: <!DOCTYPE htML><html><head></head><body><ul><li><div><p><li></ul></body></html>; ;Missing end tag (div))
+ok 377
 not ok 378
 # Test 378 got: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|   <body>\n|     <ul>\n|       <li>\n|         <div>\n|           <p>\n|       <li>\n" (t/HTML-tree.t at line 112 fail #189)
 #     Expected: "| <!DOCTYPE htML>\n| <html>\n|   <head>\n|   <body>\n|     <ul>\n|       <li>\n|         <div>\n|           <p>\n|       <li>\n" (Document tree: <!DOCTYPE htML><html><head></head><body><ul><li><div><p><li></ul></body></html>)
