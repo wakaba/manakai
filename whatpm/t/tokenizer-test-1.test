@@ -2,91 +2,131 @@
 
 {"description":"<!DOCTYPE",
 "input":"<!DOCTYPE",
-"output":["ParseError","ParseError",["DOCTYPE", "", true]]},
+"output":["ParseError","ParseError",["DOCTYPE", null, null, null, false]]},
 
 {"description":"<!DOCTYPE ",
 "input":"<!DOCTYPE ",
-"output":["ParseError",["DOCTYPE", "", true]]},
+"output":["ParseError",["DOCTYPE", null, null, null, false]]},
 
 {"description":"<!DOCTYPE >",
 "input":"<!DOCTYPE >",
-"output":["ParseError",["DOCTYPE", "", true]]},
+"output":["ParseError",["DOCTYPE", null, null, null, false]]},
 
 {"description":"<!DOCTYPE h",
 "input":"<!DOCTYPE h",
-"output":["ParseError",["DOCTYPE", "H", true]]},
+"output":["ParseError",["DOCTYPE", "h", null, null, false]]},
 
 {"description":"<!DOCTYPE H",
 "input":"<!DOCTYPE H",
-"output":["ParseError",["DOCTYPE", "H", true]]},
+"output":["ParseError",["DOCTYPE", "H", null, null, false]]},
 
 {"description":"<!DOCTYPE h>",
 "input":"<!DOCTYPE h>",
-"output":[["DOCTYPE", "H", true]]},
+"output":[["DOCTYPE", "h", null, null, true]]},
 
 {"description":"<!DOCTYPE H>",
 "input":"<!DOCTYPE H>",
-"output":[["DOCTYPE", "H", true]]},
+"output":[["DOCTYPE", "H", null, null, true]]},
 
 {"description":"<!DOCTYPE ht",
 "input":"<!DOCTYPE ht",
-"output":["ParseError",["DOCTYPE", "HT", true]]},
+"output":["ParseError",["DOCTYPE", "ht", null, null, false]]},
 
 {"description":"<!DOCTYPE Ht",
 "input":"<!DOCTYPE Ht",
-"output":["ParseError",["DOCTYPE", "HT", true]]},
+"output":["ParseError",["DOCTYPE", "Ht", null, null, false]]},
 
 {"description":"<!DOCTYPE hT",
 "input":"<!DOCTYPE hT",
-"output":["ParseError",["DOCTYPE", "HT", true]]},
+"output":["ParseError",["DOCTYPE", "hT", null, null, false]]},
 
 {"description":"<!DOCTYPE ht>",
 "input":"<!DOCTYPE ht>",
-"output":[["DOCTYPE", "HT", true]]},
+"output":[["DOCTYPE", "ht", null, null, true]]},
 
 {"description":"<!DOCTYPE Ht>",
 "input":"<!DOCTYPE Ht>",
-"output":[["DOCTYPE", "HT", true]]},
+"output":[["DOCTYPE", "Ht", null, null, true]]},
 
 {"description":"<!DOCTYPE hT>",
 "input":"<!DOCTYPE hT>",
-"output":[["DOCTYPE", "HT", true]]},
+"output":[["DOCTYPE", "hT", null, null, true]]},
 
 {"description":"<!DOCTYPE hT>",
 "input":"<!DOCTYPE hT>",
-"output":[["DOCTYPE", "HT", true]]},
+"output":[["DOCTYPE", "hT", null, null, true]]},
 
 {"description":"<!DOCTYPE htm",
 "input":"<!DOCTYPE htm",
-"output":["ParseError",["DOCTYPE", "HTM", true]]},
+"output":["ParseError",["DOCTYPE", "htm", null, null, false]]},
 
 {"description":"<!DOCTYPE Htm",
 "input":"<!DOCTYPE Htm",
-"output":["ParseError",["DOCTYPE", "HTM", true]]},
+"output":["ParseError",["DOCTYPE", "Htm", null, null, false]]},
 
 {"description":"<!DOCTYPE hTM",
 "input":"<!DOCTYPE hTM",
-"output":["ParseError",["DOCTYPE", "HTM", true]]},
+"output":["ParseError",["DOCTYPE", "hTM", null, null, false]]},
 
 {"description":"<!DOCTYPE htm>",
 "input":"<!DOCTYPE htm>",
-"output":[["DOCTYPE", "HTM", true]]},
+"output":[["DOCTYPE", "htm", null, null, true]]},
 
 {"description":"<!DOCTYPE Htm>",
 "input":"<!DOCTYPE Htm>",
-"output":[["DOCTYPE", "HTM", true]]},
+"output":[["DOCTYPE", "Htm", null, null, true]]},
 
 {"description":"<!DOCTYPE hTM>",
 "input":"<!DOCTYPE hTM>",
-"output":[["DOCTYPE", "HTM", true]]},
+"output":[["DOCTYPE", "hTM", null, null, true]]},
 
 {"description":"<!DOCTYPE html5",
 "input":"<!DOCTYPE html5",
-"output":["ParseError",["DOCTYPE", "HTML5", true]]},
+"output":["ParseError",["DOCTYPE", "html5", null, null, false]]},
 
 {"description":"<!DOCTYPE html5>",
 "input":"<!DOCTYPE html5>",
-"output":[["DOCTYPE", "HTML5", true]]},
+"output":[["DOCTYPE", "html5", null, null, true]]},
+
+{"description":"PUBLIC\u0022\u0022",
+"input":"<!DOCTYPE html PUBLIC\u0022\u0022>",
+"output":[["DOCTYPE", "html", "", null, true]]},
+
+{"description":"PUBLIC''",
+"input":"<!DOCTYPE html PUBLIC''>",
+"output":[["DOCTYPE", "html", "", null, true]]},
+
+{"description":"PUBLICbogus",
+"input":"<!DOCTYPE html PUBLICbogus>",
+"output":["ParseError",["DOCTYPE", "html", null, null, false]]},
+
+{"description":"PUBLIC bogus",
+"input":"<!DOCTYPE html PUBLIC bogus>",
+"output":["ParseError",["DOCTYPE", "html", null, null, false]]},
+
+{"description":"PUBLIC \u0022\u0022bogus",
+"input":"<!DOCTYPE html PUBLIC \u0022\u0022bogus>",
+"output":["ParseError",["DOCTYPE", "html", "", null, false]]},
+
+{"description":"PUBLIC \u0022\u0022 bogus",
+"input":"<!DOCTYPE html PUBLIC \u0022\u0022 bogus>",
+"output":["ParseError",["DOCTYPE", "html", "", null, false]]},
+
+{"description":"PUBLIC \u0022\u0022 \u0022\u0022bogus",
+"input":"<!DOCTYPE html PUBLIC \u0022\u0022 \u0022\u0022bogus>",
+"output":["ParseError",["DOCTYPE", "html", "", "", false]]},
+
+{"description":"PUBLIC \u0022\u0022 \u0022\u0022 bogus",
+"input":"<!DOCTYPE html PUBLIC \u0022\u0022 \u0022\u0022 bogus>",
+"output":["ParseError",["DOCTYPE", "html", "", "", false]]},
+
+{"description":"PUBLIC \u0022\u0022\u0022\u0022>",
+"input":"<!DOCTYPE html PUBLIC \u0022\u0022\u0022\u0022>",
+"output":[["DOCTYPE", "html", "", "", true]]},
+
+{"description":"PUBLIC \u0022\u0022''>",
+"input":"<!DOCTYPE html PUBLIC \u0022\u0022''>",
+"output":[["DOCTYPE", "html", "", "", true]]},
 
 {"description":"non-PCDATA content model flag, start tag-like string",
 "contentModelFlags":["PLAINTEXT","RCDATA","CDATA"],

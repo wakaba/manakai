@@ -226,7 +226,7 @@ sub document_element ($) {
   return undef;
 } # document_element
 
-sub adopt_node {
+sub adopt_node ($$) {
   my @node = ($_[1]);
   while (@node) {
     my $node = shift @node;
@@ -237,6 +237,38 @@ sub adopt_node {
   }
   return $_[1];
 } # adopt_node
+
+sub manakai_is_html ($;$) {
+  if (@_ > 1) {
+    if ($_[1]) {
+      $_[0]->{manakai_is_html} = 1;
+    } else {
+      delete $_[0]->{manakai_compat_mode};
+    }
+  }
+  return $_[0]->{manakai_is_html};
+} # manakai_is_html
+
+sub compat_mode ($) {
+  if ($_[0]->{manakai_is_html}) {
+    if ($_[0]->{manakai_compat_mode} eq 'quirks') {
+      return 'BackCompat';
+    }
+  }
+  return 'CSS1Compat';
+} # compat_mode
+
+sub manakai_compat_mode ($;$) {
+  if ($_[0]->{manakai_is_html}) {
+    if (@_ > 1 and defined $_[1] and
+        {'no quirks' => 1, 'limited quirks' => 1, 'quirks' => 1}->{$_[1]}) {
+      $_[0]->{manakai_compat_mode} = $_[1];
+    }
+    return $_[0]->{manakai_compat_mode} || 'no quirks';
+  } else {
+    return 'no quirks';
+  }
+} # manakai_compat_mode
 
 package Whatpm::NanoDOM::Element;
 push our @ISA, 'Whatpm::NanoDOM::Node';
@@ -489,4 +521,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2007/06/23 06:38:12 $
+# $Date: 2007/06/23 12:21:01 $

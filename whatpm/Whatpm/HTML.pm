@@ -1,8 +1,11 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.17 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.18 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
-## This is an early version of an HTML parser.
+## ISSUE:
+## var doc = implementation.createDocument (null, null, null);
+## doc.write ('');
+## alert (doc.compatMode);
 
 my $permitted_slash_tag_name = {
   base => 1,
@@ -161,21 +164,18 @@ sub _initialize_tokenizer ($) {
       }
   
   $self->{token} = [];
+  # $self->{escape}
 } # _initialize_tokenizer
 
 ## A token has:
 ##   ->{type} eq 'DOCTYPE', 'start tag', 'end tag', 'comment',
 ##       'character', or 'end-of-file'
-##   ->{name} (DOCTYPE, start tag (tagname), end tag (tagname))
-    ## ISSUE: the spec need s/tagname/tag name/
-##   ->{error} == 1 or 0 (DOCTYPE)
+##   ->{name} (DOCTYPE, start tag (tag name), end tag (tag name))
+##   ->{public_identifier} (DOCTYPE)
+##   ->{system_identifier} (DOCTYPE)
+##   ->{correct} == 1 or 0 (DOCTYPE)
 ##   ->{attributes} isa HASH (start tag, end tag)
 ##   ->{data} (comment, character)
-
-## Macros
-##   Macros MUST be preceded by three EXCLAMATION MARKs.
-##   emit ($token)
-##     Emits the specified token.
 
 ## Emitted token MUST immediately be handled by the tree construction state.
 
@@ -1529,21 +1529,6 @@ sub _get_next_token ($) {
       }
   
         redo A;
-      } elsif (0x0061 <= $self->{next_input_character} and
-               $self->{next_input_character} <= 0x007A) { # a..z
-## ISSUE: "Set the token's name name to the" in the spec
-        $self->{current_token} = {type => 'DOCTYPE',
-                          name => chr ($self->{next_input_character} - 0x0020),
-                          error => 1};
-        $self->{state} = 'DOCTYPE name';
-        
-      if (@{$self->{char}}) {
-        $self->{next_input_character} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_input_character}->($self);
-      }
-  
-        redo A;
       } elsif ($self->{next_input_character} == 0x003E) { # >
         $self->{parse_error}-> (type => 'no DOCTYPE name');
         $self->{state} = 'data';
@@ -1555,7 +1540,7 @@ sub _get_next_token ($) {
       }
   
 
-        return  ({type => 'DOCTYPE', name => '', error => 1});
+        return  ({type => 'DOCTYPE'}); # incorrect
 
         redo A;
       } elsif ($self->{next_input_character} == -1) { 
@@ -1563,13 +1548,14 @@ sub _get_next_token ($) {
         $self->{state} = 'data';
         ## reconsume
 
-        return  ({type => 'DOCTYPE', name => '', error => 1});
+        return  ({type => 'DOCTYPE'}); # incorrect
 
         redo A;
       } else {
-        $self->{current_token} = {type => 'DOCTYPE',
-                          name => chr ($self->{next_input_character}),
-                          error => 1};
+        $self->{current_token}
+            = {type => 'DOCTYPE',
+               name => chr ($self->{next_input_character}),
+               correct => 1};
 ## ISSUE: "Set the token's name name to the" in the spec
         $self->{state} = 'DOCTYPE name';
         
@@ -1582,12 +1568,12 @@ sub _get_next_token ($) {
         redo A;
       }
     } elsif ($self->{state} eq 'DOCTYPE name') {
+## ISSUE: Redundant "First," in the spec.
       if ($self->{next_input_character} == 0x0009 or # HT
           $self->{next_input_character} == 0x000A or # LF
           $self->{next_input_character} == 0x000B or # VT
           $self->{next_input_character} == 0x000C or # FF
           $self->{next_input_character} == 0x0020) { # SP
-        $self->{current_token}->{error} = ($self->{current_token}->{name} ne 'HTML'); # DOCTYPE
         $self->{state} = 'after DOCTYPE name';
         
       if (@{$self->{char}}) {
@@ -1598,7 +1584,6 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif ($self->{next_input_character} == 0x003E) { # >
-        $self->{current_token}->{error} = ($self->{current_token}->{name} ne 'HTML'); # DOCTYPE
         $self->{state} = 'data';
         
       if (@{$self->{char}}) {
@@ -1612,33 +1597,19 @@ sub _get_next_token ($) {
         undef $self->{current_token};
 
         redo A;
-      } elsif (0x0061 <= $self->{next_input_character} and
-               $self->{next_input_character} <= 0x007A) { # a..z
-        $self->{current_token}->{name} .= chr ($self->{next_input_character} - 0x0020); # DOCTYPE
-        #$self->{current_token}->{error} = ($self->{current_token}->{name} ne 'HTML');
-        ## Stay in the state
-        
-      if (@{$self->{char}}) {
-        $self->{next_input_character} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_input_character}->($self);
-      }
-  
-        redo A;
       } elsif ($self->{next_input_character} == -1) {
         $self->{parse_error}-> (type => 'unclosed DOCTYPE');
-        $self->{current_token}->{error} = ($self->{current_token}->{name} ne 'HTML'); # DOCTYPE
         $self->{state} = 'data';
         ## reconsume
 
-        return  ($self->{current_token});
+        delete $self->{current_token}->{correct};
+        return  ($self->{current_token}); # DOCTYPE
         undef $self->{current_token};
 
         redo A;
       } else {
         $self->{current_token}->{name}
           .= chr ($self->{next_input_character}); # DOCTYPE
-        #$self->{current_token}->{error} = ($self->{current_token}->{name} ne 'HTML');
         ## Stay in the state
         
       if (@{$self->{char}}) {
@@ -1683,13 +1654,557 @@ sub _get_next_token ($) {
         $self->{state} = 'data';
         ## reconsume
 
+        delete $self->{current_token}->{correct};
+        return  ($self->{current_token}); # DOCTYPE
+        undef $self->{current_token};
+
+        redo A;
+      } elsif ($self->{next_input_character} == 0x0050 or # P
+               $self->{next_input_character} == 0x0070) { # p
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
+        if ($self->{next_input_character} == 0x0055 or # U
+            $self->{next_input_character} == 0x0075) { # u
+          
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
+          if ($self->{next_input_character} == 0x0042 or # B
+              $self->{next_input_character} == 0x0062) { # b
+            
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
+            if ($self->{next_input_character} == 0x004C or # L
+                $self->{next_input_character} == 0x006C) { # l
+              
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
+              if ($self->{next_input_character} == 0x0049 or # I
+                  $self->{next_input_character} == 0x0069) { # i
+                
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
+                if ($self->{next_input_character} == 0x0043 or # C
+                    $self->{next_input_character} == 0x0063) { # c
+                  $self->{state} = 'before DOCTYPE public identifier';
+                  
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
+                  redo A;
+                }
+              }
+            }
+          }
+        }
+
+        #
+      } elsif ($self->{next_input_character} == 0x0053 or # S
+               $self->{next_input_character} == 0x0073) { # s
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
+        if ($self->{next_input_character} == 0x0059 or # Y
+            $self->{next_input_character} == 0x0079) { # y
+          
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
+          if ($self->{next_input_character} == 0x0053 or # S
+              $self->{next_input_character} == 0x0073) { # s
+            
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
+            if ($self->{next_input_character} == 0x0054 or # T
+                $self->{next_input_character} == 0x0074) { # t
+              
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
+              if ($self->{next_input_character} == 0x0045 or # E
+                  $self->{next_input_character} == 0x0065) { # e
+                
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
+                if ($self->{next_input_character} == 0x004D or # M
+                    $self->{next_input_character} == 0x006D) { # m
+                  $self->{state} = 'before DOCTYPE system identifier';
+                  
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
+                  redo A;
+                }
+              }
+            }
+          }
+        }
+
+        #
+      } else {
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
+        #
+      }
+
+      $self->{parse_error}-> (type => 'string after DOCTYPE name');
+      $self->{state} = 'bogus DOCTYPE';
+      # next-input-character is already done
+      redo A;
+    } elsif ($self->{state} eq 'before DOCTYPE public identifier') {
+      if ({
+            0x0009 => 1, 0x000A => 1, 0x000B => 1, 0x000C => 1, 0x0020 => 1,
+            #0x000D => 1, # HT, LF, VT, FF, SP, CR
+          }->{$self->{next_input_character}}) {
+        ## Stay in the state
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
+        redo A;
+      } elsif ($self->{next_input_character} eq 0x0022) { # "
+        $self->{current_token}->{public_identifier} = ''; # DOCTYPE
+        $self->{state} = 'DOCTYPE public identifier (double-quoted)';
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
+        redo A;
+      } elsif ($self->{next_input_character} eq 0x0027) { # '
+        $self->{current_token}->{public_identifier} = ''; # DOCTYPE
+        $self->{state} = 'DOCTYPE public identifier (single-quoted)';
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
+        redo A;
+      } elsif ($self->{next_input_character} eq 0x003E) { # >
+        $self->{parse_error}-> (type => 'no PUBLIC literal');
+
+        $self->{state} = 'data';
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
+
+        delete $self->{current_token}->{correct};
+        return  ($self->{current_token}); # DOCTYPE
+        undef $self->{current_token};
+
+        redo A;
+      } elsif ($self->{next_input_character} == -1) {
+        $self->{parse_error}-> (type => 'unclosed DOCTYPE');
+
+        $self->{state} = 'data';
+        ## reconsume
+
+        delete $self->{current_token}->{correct};
         return  ($self->{current_token}); # DOCTYPE
         undef $self->{current_token};
 
         redo A;
       } else {
-        $self->{parse_error}-> (type => 'string after DOCTYPE name');
-        $self->{current_token}->{error} = 1; # DOCTYPE
+        $self->{parse_error}-> (type => 'string after PUBLIC');
+        $self->{state} = 'bogus DOCTYPE';
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
+        redo A;
+      }
+    } elsif ($self->{state} eq 'DOCTYPE public identifier (double-quoted)') {
+      if ($self->{next_input_character} == 0x0022) { # "
+        $self->{state} = 'after DOCTYPE public identifier';
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
+        redo A;
+      } elsif ($self->{next_input_character} == -1) {
+        $self->{parse_error}-> (type => 'unclosed PUBLIC literal');
+
+        $self->{state} = 'data';
+        ## reconsume
+
+        delete $self->{current_token}->{correct};
+        return  ($self->{current_token}); # DOCTYPE
+        undef $self->{current_token};
+
+        redo A;
+      } else {
+        $self->{current_token}->{public_identifier} # DOCTYPE
+            .= chr $self->{next_input_character};
+        ## Stay in the state
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
+        redo A;
+      }
+    } elsif ($self->{state} eq 'DOCTYPE public identifier (single-quoted)') {
+      if ($self->{next_input_character} == 0x0027) { # '
+        $self->{state} = 'after DOCTYPE public identifier';
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
+        redo A;
+      } elsif ($self->{next_input_character} == -1) {
+        $self->{parse_error}-> (type => 'unclosed PUBLIC literal');
+
+        $self->{state} = 'data';
+        ## reconsume
+
+        delete $self->{current_token}->{correct};
+        return  ($self->{current_token}); # DOCTYPE
+        undef $self->{current_token};
+
+        redo A;
+      } else {
+        $self->{current_token}->{public_identifier} # DOCTYPE
+            .= chr $self->{next_input_character};
+        ## Stay in the state
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
+        redo A;
+      }
+    } elsif ($self->{state} eq 'after DOCTYPE public identifier') {
+      if ({
+            0x0009 => 1, 0x000A => 1, 0x000B => 1, 0x000C => 1, 0x0020 => 1,
+            #0x000D => 1, # HT, LF, VT, FF, SP, CR
+          }->{$self->{next_input_character}}) {
+        ## Stay in the state
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
+        redo A;
+      } elsif ($self->{next_input_character} == 0x0022) { # "
+        $self->{current_token}->{system_identifier} = ''; # DOCTYPE
+        $self->{state} = 'DOCTYPE system identifier (double-quoted)';
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
+        redo A;
+      } elsif ($self->{next_input_character} == 0x0027) { # '
+        $self->{current_token}->{system_identifier} = ''; # DOCTYPE
+        $self->{state} = 'DOCTYPE system identifier (single-quoted)';
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
+        redo A;
+      } elsif ($self->{next_input_character} == 0x003E) { # >
+        $self->{state} = 'data';
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
+
+        return  ($self->{current_token}); # DOCTYPE
+        undef $self->{current_token};
+
+        redo A;
+      } elsif ($self->{next_input_character} == -1) {
+        $self->{parse_error}-> (type => 'unclosed DOCTYPE');
+
+        $self->{state} = 'data';
+        ## recomsume
+
+        delete $self->{current_token}->{correct};
+        return  ($self->{current_token}); # DOCTYPE
+        undef $self->{current_token};
+
+        redo A;
+      } else {
+        $self->{parse_error}-> (type => 'string after PUBLIC literal');
+        $self->{state} = 'bogus DOCTYPE';
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
+        redo A;
+      }
+    } elsif ($self->{state} eq 'before DOCTYPE system identifier') {
+      if ({
+            0x0009 => 1, 0x000A => 1, 0x000B => 1, 0x000C => 1, 0x0020 => 1,
+            #0x000D => 1, # HT, LF, VT, FF, SP, CR
+          }->{$self->{next_input_character}}) {
+        ## Stay in the state
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
+        redo A;
+      } elsif ($self->{next_input_character} == 0x0022) { # "
+        $self->{current_token}->{system_identifier} = ''; # DOCTYPE
+        $self->{state} = 'DOCTYPE system identifier (double-quoted)';
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
+        redo A;
+      } elsif ($self->{next_input_character} == 0x0027) { # '
+        $self->{current_token}->{system_identifier} = ''; # DOCTYPE
+        $self->{state} = 'DOCTYPE system identifier (single-quoted)';
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
+        redo A;
+      } elsif ($self->{next_input_character} == 0x003E) { # >
+        $self->{parse_error}-> (type => 'no SYSTEM literal');
+        $self->{state} = 'data';
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
+
+        delete $self->{current_token}->{correct};
+        return  ($self->{current_token}); # DOCTYPE
+        undef $self->{current_token};
+
+        redo A;
+      } elsif ($self->{next_input_character} == -1) {
+        $self->{parse_error}-> (type => 'unclosed DOCTYPE');
+
+        $self->{state} = 'data';
+        ## recomsume
+
+        delete $self->{current_token}->{correct};
+        return  ($self->{current_token}); # DOCTYPE
+        undef $self->{current_token};
+
+        redo A;
+      } else {
+        $self->{parse_error}-> (type => 'string after PUBLIC literal');
+        $self->{state} = 'bogus DOCTYPE';
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
+        redo A;
+      }
+    } elsif ($self->{state} eq 'DOCTYPE system identifier (double-quoted)') {
+      if ($self->{next_input_character} == 0x0022) { # "
+        $self->{state} = 'after DOCTYPE system identifier';
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
+        redo A;
+      } elsif ($self->{next_input_character} == -1) {
+        $self->{parse_error}-> (type => 'unclosed SYSTEM literal');
+
+        $self->{state} = 'data';
+        ## reconsume
+
+        delete $self->{current_token}->{correct};
+        return  ($self->{current_token}); # DOCTYPE
+        undef $self->{current_token};
+
+        redo A;
+      } else {
+        $self->{current_token}->{system_identifier} # DOCTYPE
+            .= chr $self->{next_input_character};
+        ## Stay in the state
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
+        redo A;
+      }
+    } elsif ($self->{state} eq 'DOCTYPE system identifier (single-quoted)') {
+      if ($self->{next_input_character} == 0x0027) { # '
+        $self->{state} = 'after DOCTYPE system identifier';
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
+        redo A;
+      } elsif ($self->{next_input_character} == -1) {
+        $self->{parse_error}-> (type => 'unclosed SYSTEM literal');
+
+        $self->{state} = 'data';
+        ## reconsume
+
+        delete $self->{current_token}->{correct};
+        return  ($self->{current_token}); # DOCTYPE
+        undef $self->{current_token};
+
+        redo A;
+      } else {
+        $self->{current_token}->{system_identifier} # DOCTYPE
+            .= chr $self->{next_input_character};
+        ## Stay in the state
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
+        redo A;
+      }
+    } elsif ($self->{state} eq 'after DOCTYPE system identifier') {
+      if ({
+            0x0009 => 1, 0x000A => 1, 0x000B => 1, 0x000C => 1, 0x0020 => 1,
+            #0x000D => 1, # HT, LF, VT, FF, SP, CR
+          }->{$self->{next_input_character}}) {
+        ## Stay in the state
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
+        redo A;
+      } elsif ($self->{next_input_character} == 0x003E) { # >
+        $self->{state} = 'data';
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
+
+        return  ($self->{current_token}); # DOCTYPE
+        undef $self->{current_token};
+
+        redo A;
+      } elsif ($self->{next_input_character} == -1) {
+        $self->{parse_error}-> (type => 'unclosed DOCTYPE');
+
+        $self->{state} = 'data';
+        ## recomsume
+
+        delete $self->{current_token}->{correct};
+        return  ($self->{current_token}); # DOCTYPE
+        undef $self->{current_token};
+
+        redo A;
+      } else {
+        $self->{parse_error}-> (type => 'string after SYSTEM literal');
         $self->{state} = 'bogus DOCTYPE';
         
       if (@{$self->{char}}) {
@@ -1711,6 +2226,7 @@ sub _get_next_token ($) {
       }
   
 
+        delete $self->{current_token}->{correct};
         return  ($self->{current_token}); # DOCTYPE
         undef $self->{current_token};
 
@@ -1720,6 +2236,7 @@ sub _get_next_token ($) {
         $self->{state} = 'data';
         ## reconsume
 
+        delete $self->{current_token}->{correct};
         return  ($self->{current_token}); # DOCTYPE
         undef $self->{current_token};
 
@@ -1947,7 +2464,7 @@ sub _initialize_tree_constructor ($) {
   $self->{document}->strict_error_checking (0);
   ## TODO: Turn mutation events off # MUST
   ## TODO: Turn loose Document option (manakai extension) on
-  ## TODO: Mark the Document as an HTML document # MUST
+  $self->{document}->manakai_is_html (1); # MUST
 } # _initialize_tree_constructor
 
 sub _terminate_tree_constructor ($) {
@@ -1987,51 +2504,169 @@ sub _construct_tree ($) {
 
 sub _tree_construction_initial ($) {
   my $self = shift;
-  B: {
-      if ($token->{type} eq 'DOCTYPE') {
-        if ($token->{error}) {
-          ## ISSUE: Spec currently left this case undefined.
-          $self->{parse_error}-> (type => 'bogus DOCTYPE');
-        }
-        my $doctype = $self->{document}->create_document_type_definition
-          ($token->{name});
-        $self->{document}->append_child ($doctype);
-        #$phase = 'root element';
-        $token = $self->_get_next_token;
-        #redo B;
-        return;
-      } elsif ({
-                comment => 1,
-                'start tag' => 1,
-                'end tag' => 1,
-                'end-of-file' => 1,
-               }->{$token->{type}}) {
-        ## ISSUE: Spec currently left this case undefined.
-        $self->{parse_error}-> (type => 'missing DOCTYPE');
-        #$phase = 'root element';
-        ## reprocess
-        #redo B;
-        return;
-      } elsif ($token->{type} eq 'character') {
-        if ($token->{data} =~ s/^([\x09\x0A\x0B\x0C\x20]+)//) {
-          $self->{document}->manakai_append_text ($1);
-          ## ISSUE: DOM3 Core does not allow Document > Text
-          unless (length $token->{data}) {
-            ## Stay in the phase
-            $token = $self->_get_next_token;
-            redo B;
-          }
-        }
-        ## ISSUE: Spec currently left this case undefined.
-        $self->{parse_error}-> (type => 'missing DOCTYPE');
-        #$phase = 'root element';
-        ## reprocess
-        #redo B;
-        return;
-      } else {
-        die "$0: $token->{type}: Unknown token";
+  INITIAL: {
+    if ($token->{type} eq 'DOCTYPE') {
+      ## NOTE: Conformance checkers MAY, instead of reporting "not HTML5"
+      ## error, switch to a conformance checking mode for another 
+      ## language.
+      my $doctype_name = $token->{name};
+      $doctype_name = '' unless defined $doctype_name;
+      $doctype_name =~ tr/a-z/A-Z/; 
+      if (not defined $token->{name} or # <!DOCTYPE>
+          defined $token->{public_identifier} or
+          defined $token->{system_identifier}) {
+        $self->{parse_error}-> (type => 'not HTML5');
+      } elsif ($doctype_name ne 'HTML') {
+        ## ISSUE: ASCII case-insensitive? (in fact it does not matter)
+        $self->{parse_error}-> (type => 'not HTML5');
       }
-    } # B
+      
+      my $doctype = $self->{document}->create_document_type_definition
+        ($token->{name}); ## ISSUE: If name is missing (e.g. <!DOCTYPE>)?
+      $doctype->public_id ($token->{public_identifier})
+          if defined $token->{public_identifier};
+      $doctype->system_id ($token->{system_identifier})
+          if defined $token->{system_identifier};
+      ## NOTE: Other DocumentType attributes are null or empty lists.
+      ## ISSUE: internalSubset = null??
+      $self->{document}->append_child ($doctype);
+      
+      if (not $token->{correct} or $doctype_name ne 'HTML') {
+        $self->{document}->manakai_compat_mode ('quirks');
+      } elsif (defined $token->{public_identifier}) {
+        my $pubid = $token->{public_identifier};
+        $pubid =~ tr/a-z/A-z/;
+        if ({
+          "+//SILMARIL//DTD HTML PRO V0R11 19970101//EN" => 1,
+          "-//ADVASOFT LTD//DTD HTML 3.0 ASWEDIT + EXTENSIONS//EN" => 1,
+          "-//AS//DTD HTML 3.0 ASWEDIT + EXTENSIONS//EN" => 1,
+          "-//IETF//DTD HTML 2.0 LEVEL 1//EN" => 1,
+          "-//IETF//DTD HTML 2.0 LEVEL 2//EN" => 1,
+          "-//IETF//DTD HTML 2.0 STRICT LEVEL 1//EN" => 1,
+          "-//IETF//DTD HTML 2.0 STRICT LEVEL 2//EN" => 1,
+          "-//IETF//DTD HTML 2.0 STRICT//EN" => 1,
+          "-//IETF//DTD HTML 2.0//EN" => 1,
+          "-//IETF//DTD HTML 2.1E//EN" => 1,
+          "-//IETF//DTD HTML 3.0//EN" => 1,
+          "-//IETF//DTD HTML 3.0//EN//" => 1,
+          "-//IETF//DTD HTML 3.2 FINAL//EN" => 1,
+          "-//IETF//DTD HTML 3.2//EN" => 1,
+          "-//IETF//DTD HTML 3//EN" => 1,
+          "-//IETF//DTD HTML LEVEL 0//EN" => 1,
+          "-//IETF//DTD HTML LEVEL 0//EN//2.0" => 1,
+          "-//IETF//DTD HTML LEVEL 1//EN" => 1,
+          "-//IETF//DTD HTML LEVEL 1//EN//2.0" => 1,
+          "-//IETF//DTD HTML LEVEL 2//EN" => 1,
+          "-//IETF//DTD HTML LEVEL 2//EN//2.0" => 1,
+          "-//IETF//DTD HTML LEVEL 3//EN" => 1,
+          "-//IETF//DTD HTML LEVEL 3//EN//3.0" => 1,
+          "-//IETF//DTD HTML STRICT LEVEL 0//EN" => 1,
+          "-//IETF//DTD HTML STRICT LEVEL 0//EN//2.0" => 1,
+          "-//IETF//DTD HTML STRICT LEVEL 1//EN" => 1,
+          "-//IETF//DTD HTML STRICT LEVEL 1//EN//2.0" => 1,
+          "-//IETF//DTD HTML STRICT LEVEL 2//EN" => 1,
+          "-//IETF//DTD HTML STRICT LEVEL 2//EN//2.0" => 1,
+          "-//IETF//DTD HTML STRICT LEVEL 3//EN" => 1,
+          "-//IETF//DTD HTML STRICT LEVEL 3//EN//3.0" => 1,
+          "-//IETF//DTD HTML STRICT//EN" => 1,
+          "-//IETF//DTD HTML STRICT//EN//2.0" => 1,
+          "-//IETF//DTD HTML STRICT//EN//3.0" => 1,
+          "-//IETF//DTD HTML//EN" => 1,
+          "-//IETF//DTD HTML//EN//2.0" => 1,
+          "-//IETF//DTD HTML//EN//3.0" => 1,
+          "-//METRIUS//DTD METRIUS PRESENTATIONAL//EN" => 1,
+          "-//MICROSOFT//DTD INTERNET EXPLORER 2.0 HTML STRICT//EN" => 1,
+          "-//MICROSOFT//DTD INTERNET EXPLORER 2.0 HTML//EN" => 1,
+          "-//MICROSOFT//DTD INTERNET EXPLORER 2.0 TABLES//EN" => 1,
+          "-//MICROSOFT//DTD INTERNET EXPLORER 3.0 HTML STRICT//EN" => 1,
+          "-//MICROSOFT//DTD INTERNET EXPLORER 3.0 HTML//EN" => 1,
+          "-//MICROSOFT//DTD INTERNET EXPLORER 3.0 TABLES//EN" => 1,
+          "-//NETSCAPE COMM. CORP.//DTD HTML//EN" => 1,
+          "-//NETSCAPE COMM. CORP.//DTD STRICT HTML//EN" => 1,
+          "-//O'REILLY AND ASSOCIATES//DTD HTML 2.0//EN" => 1,
+          "-//O'REILLY AND ASSOCIATES//DTD HTML EXTENDED 1.0//EN" => 1,
+          "-//SPYGLASS//DTD HTML 2.0 EXTENDED//EN" => 1,
+          "-//SQ//DTD HTML 2.0 HOTMETAL + EXTENSIONS//EN" => 1,
+          "-//SUN MICROSYSTEMS CORP.//DTD HOTJAVA HTML//EN" => 1,
+          "-//SUN MICROSYSTEMS CORP.//DTD HOTJAVA STRICT HTML//EN" => 1,
+          "-//W3C//DTD HTML 3 1995-03-24//EN" => 1,
+          "-//W3C//DTD HTML 3.2 DRAFT//EN" => 1,
+          "-//W3C//DTD HTML 3.2 FINAL//EN" => 1,
+          "-//W3C//DTD HTML 3.2//EN" => 1,
+          "-//W3C//DTD HTML 3.2S DRAFT//EN" => 1,
+          "-//W3C//DTD HTML 4.0 FRAMESET//EN" => 1,
+          "-//W3C//DTD HTML 4.0 TRANSITIONAL//EN" => 1,
+          "-//W3C//DTD HTML EXPERIMETNAL 19960712//EN" => 1,
+          "-//W3C//DTD HTML EXPERIMENTAL 970421//EN" => 1,
+          "-//W3C//DTD W3 HTML//EN" => 1,
+          "-//W3O//DTD W3 HTML 3.0//EN" => 1,
+          "-//W3O//DTD W3 HTML 3.0//EN//" => 1,
+          "-//W3O//DTD W3 HTML STRICT 3.0//EN//" => 1,
+          "-//WEBTECHS//DTD MOZILLA HTML 2.0//EN" => 1,
+          "-//WEBTECHS//DTD MOZILLA HTML//EN" => 1,
+          "-/W3C/DTD HTML 4.0 TRANSITIONAL/EN" => 1,
+          "HTML" => 1,
+        }->{$pubid}) {
+          $self->{document}->manakai_compat_mode ('quirks');
+        } elsif ($pubid eq "-//W3C//DTD HTML 4.01 FRAMESET//EN" or
+                 $pubid eq "-//W3C//DTD HTML 4.01 TRANSITIONAL//EN") {
+          if (defined $token->{system_identifier}) {
+            $self->{document}->manakai_compat_mode ('quirks');
+          } else {
+            $self->{document}->manakai_compat_mode ('limited quirks');
+          }
+        } elsif ($pubid eq "-//W3C//DTD XHTML 1.0 Frameset//EN" or
+                 $pubid eq "-//W3C//DTD XHTML 1.0 Transitional//EN") {
+          $self->{document}->manakai_compat_mode ('limited quirks');
+        }
+      }
+      if (defined $token->{system_identifier}) {
+        my $sysid = $token->{system_identifier};
+        $sysid =~ tr/A-Z/a-z/;
+        if ($sysid eq "http://www.ibm.com/data/dtd/v11/ibmxhtml1-transitional.dtd") {
+          $self->{document}->manakai_compat_mode ('quirks');
+        }
+      }
+      
+      ## Go to the root element phase.
+      $token = $self->_get_next_token;
+      return;
+    } elsif ({
+              'start tag' => 1,
+              'end tag' => 1,
+              'end-of-file' => 1,
+             }->{$token->{type}}) {
+      $self->{parse_error}-> (type => 'no DOCTYPE');
+      $self->{document}->manakai_compat_mode ('quirks');
+      ## Go to the root element phase
+      ## reprocess
+      return;
+    } elsif ($token->{type} eq 'character') {
+      if ($token->{data} =~ s/^([\x09\x0A\x0B\x0C\x20]+)//) { # \x0D
+        ## Ignore the token
+        unless (length $token->{data}) {
+          ## Stay in the phase
+          $token = $self->_get_next_token;
+          redo INITIAL;
+        }
+      }
+
+      $self->{parse_error}-> (type => 'no DOCTYPE');
+      $self->{document}->manakai_compat_mode ('quirks');
+      ## Go to the root element phase
+      ## reprocess
+      return;
+    } elsif ($token->{type} eq 'comment') {
+      my $comment = $self->{document}->create_comment ($token->{data});
+      $self->{document}->append_child ($comment);
+      
+      ## Stay in the phase.
+      $token = $self->_get_next_token;
+      redo INITIAL;
+    } else {
+      die "$0: $token->{type}: Unknown token";
+    }
+  } # INITIAL
 } # _tree_construction_initial
 
 sub _tree_construction_root_element ($) {
@@ -5725,7 +6360,7 @@ sub set_inner_html ($$$) {
     ## Step 1 # MUST
     my $this_doc = $node->owner_document;
     my $doc = $this_doc->implementation->create_document;
-    ## TODO: Mark as HTML document
+    $doc->manakai_is_html (1);
     my $p = $class->new;
     $p->{document} = $doc;
 
@@ -5949,4 +6584,4 @@ sub get_inner_html ($$$) {
 } # get_inner_html
 
 1;
-# $Date: 2007/06/23 08:15:21 $
+# $Date: 2007/06/23 12:21:00 $

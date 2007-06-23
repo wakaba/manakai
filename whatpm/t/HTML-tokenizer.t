@@ -126,13 +126,17 @@ for my $file_name (grep {$_} split /\s+/, qq[
           character => 'Character',
          }->{$token->{type}} || $token->{type},
         ];
-        $test_token->[1] = $token->{name} if defined $token->{name};
         $test_token->[1] = $token->{tag_name} if defined $token->{tag_name};
         $test_token->[1] = $token->{data} if defined $token->{data};
-        $test_token->[2] = $token->{error} ? 1 : 0 if $token->{type} eq 'DOCTYPE';
-        $test_token->[2] = {map {$_->{name} => $_->{value}} values %{$token->{attributes}}}
-          if $token->{type} eq 'start tag';
-        
+        if ($token->{type} eq 'start tag') {
+          $test_token->[2] = {map {$_->{name} => $_->{value}} values %{$token->{attributes}}};
+        } elsif ($token->{type} eq 'DOCTYPE') {
+          $test_token->[1] = $token->{name};
+          $test_token->[2] = $token->{public_identifier};
+          $test_token->[3] = $token->{system_identifier};
+          $test_token->[4] = $token->{correct} ? 1 : 0;
+        }
+
         if (@token and ref $token[-1] and $token[-1]->[0] eq 'Character' and
             $test_token->[0] eq 'Character') {
           $token[-1]->[1] .= $test_token->[1];
@@ -149,4 +153,4 @@ for my $file_name (grep {$_} split /\s+/, qq[
   }
 }
 
-## $Date: 2007/06/23 05:29:48 $
+## $Date: 2007/06/23 12:21:01 $
