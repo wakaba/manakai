@@ -503,3 +503,169 @@ form in form
 |   <head>
 |   <body>
 |     <form>
+
+#data
+<!DOCTYPE HTML><ul><li>a<li>c</ul>d
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <ul>
+|       <li>
+|         "a"
+|       <li>
+|         "c"
+|     "d"
+
+#data
+<!DOCTYPE HTML><ul><li>a<div>b<li>c</ul>d
+#errors
+div closed by li
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <ul>
+|       <li>
+|         "a"
+|         <div>
+|           "b"
+|       <li>
+|         "c"
+|     "d"
+
+#data
+<!DOCTYPE HTML><dl><dt>a<dt>c</dl>d
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <dl>
+|       <dt>
+|         "a"
+|       <dt>
+|         "c"
+|     "d"
+
+#data
+<!DOCTYPE HTML><dl><dt>a<dd>c</dl>d
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <dl>
+|       <dt>
+|         "a"
+|       <dd>
+|         "c"
+|     "d"
+
+#data
+<!DOCTYPE HTML><dl><dd>a<dt>c</dl>d
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <dl>
+|       <dd>
+|         "a"
+|       <dt>
+|         "c"
+|     "d"
+
+#data
+<!DOCTYPE HTML><dl><dd>a<dd>c</dl>d
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <dl>
+|       <dd>
+|         "a"
+|       <dd>
+|         "c"
+|     "d"
+
+#data
+<!DOCTYPE HTML><dl><dt>a<div>b<dt>c</dl>d
+#errors
+div closed by dt
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <dl>
+|       <dt>
+|         "a"
+|         <div>
+|           "b"
+|       <dt>
+|         "c"
+|     "d"
+
+#data
+<!DOCTYPE HTML><dl><dt>a<div>b<dd>c</dl>d
+#errors
+div closed by dd
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <dl>
+|       <dt>
+|         "a"
+|         <div>
+|           "b"
+|       <dd>
+|         "c"
+|     "d"
+
+#data
+<!DOCTYPE HTML><dl><dd>a<div>b<dt>c</dl>d
+#errors
+div closed by dt
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <dl>
+|       <dd>
+|         "a"
+|         <div>
+|           "b"
+|       <dt>
+|         "c"
+|     "d"
+
+#data
+<!DOCTYPE HTML><dl><dd>a<div>b<dd>c</dl>d
+#errors
+div closed by dd
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <dl>
+|       <dd>
+|         "a"
+|         <div>
+|           "b"
+|       <dd>
+|         "c"
+|     "d"
+
