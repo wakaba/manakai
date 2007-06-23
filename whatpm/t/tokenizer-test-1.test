@@ -97,6 +97,104 @@
 "contentModelFlags":["RCDATA","CDATA"],
 "lastStartTag":"xxx",
 "input":"AB</xxx>CD",
-"output":[["Character", "AB"],["EndTag", "xxx"],["Character", "CD"]]}
+"output":[["Character", "AB"],["EndTag", "xxx"],["Character", "CD"]]},
+
+{"description":"c1 character references",
+"input":"&#128;&#129;&#130;&#131;&#132;&#133;&#134;&#135;",
+"output":[
+  "ParseError", ["Character", "\u20AC"],
+  "ParseError", ["Character", "\uFFFD"],
+  "ParseError", ["Character", "\u201A"],
+  "ParseError", ["Character", "\u0192"],
+  "ParseError", ["Character", "\u201E"],
+  "ParseError", ["Character", "\u2026"],
+  "ParseError", ["Character", "\u2020"],
+  "ParseError", ["Character", "\u2021"]
+]},
+{"description":"c1 character references",
+"input":"&#136;&#137;&#138;&#139;&#140;&#141;&#142;&#143;",
+"output":[
+  "ParseError", ["Character", "\u02C6"],
+  "ParseError", ["Character", "\u2030"],
+  "ParseError", ["Character", "\u0160"],
+  "ParseError", ["Character", "\u2039"],
+  "ParseError", ["Character", "\u0152"],
+  "ParseError", ["Character", "\uFFFD"],
+  "ParseError", ["Character", "\u017D"],
+  "ParseError", ["Character", "\uFFFD"]
+]},
+{"description":"c1 character references",
+"input":"&#144;&#145;&#146;&#147;&#148;&#149;&#150;&#151;",
+"output":[
+  "ParseError", ["Character", "\uFFFD"],
+  "ParseError", ["Character", "\u2018"],
+  "ParseError", ["Character", "\u2019"],
+  "ParseError", ["Character", "\u201C"],
+  "ParseError", ["Character", "\u201D"],
+  "ParseError", ["Character", "\u2022"],
+  "ParseError", ["Character", "\u2013"],
+  "ParseError", ["Character", "\u2014"]
+]},
+{"description":"c1 character references",
+"input":"&#152;&#153;&#154;&#155;&#156;&#157;&#158;&#159;",
+"output":[
+  "ParseError", ["Character", "\u02DC"],
+  "ParseError", ["Character", "\u2122"],
+  "ParseError", ["Character", "\u0161"],
+  "ParseError", ["Character", "\u203A"],
+  "ParseError", ["Character", "\u0153"],
+  "ParseError", ["Character", "\uFFFD"],
+  "ParseError", ["Character", "\u017E"],
+  "ParseError", ["Character", "\u0178"]
+]},
+
+{"description":"c1 character references",
+"input":"&#x80;&#x81;&#x82;&#x83;&#x84;&#x85;&#x86;&#x87;",
+"output":[
+  "ParseError", ["Character", "\u20AC"],
+  "ParseError", ["Character", "\uFFFD"],
+  "ParseError", ["Character", "\u201A"],
+  "ParseError", ["Character", "\u0192"],
+  "ParseError", ["Character", "\u201E"],
+  "ParseError", ["Character", "\u2026"],
+  "ParseError", ["Character", "\u2020"],
+  "ParseError", ["Character", "\u2021"]
+]},
+{"description":"c1 character references",
+"input":"&#x88;&#x89;&#x8a;&#x8b;&#x8c;&#x8d;&#x8e;&#x8f;",
+"output":[
+  "ParseError", ["Character", "\u02C6"],
+  "ParseError", ["Character", "\u2030"],
+  "ParseError", ["Character", "\u0160"],
+  "ParseError", ["Character", "\u2039"],
+  "ParseError", ["Character", "\u0152"],
+  "ParseError", ["Character", "\uFFFD"],
+  "ParseError", ["Character", "\u017D"],
+  "ParseError", ["Character", "\uFFFD"]
+]},
+{"description":"c1 character references",
+"input":"&#x90;&#x91;&#x92;&#x93;&#x94;&#x95;&#x96;&#x97;",
+"output":[
+  "ParseError", ["Character", "\uFFFD"],
+  "ParseError", ["Character", "\u2018"],
+  "ParseError", ["Character", "\u2019"],
+  "ParseError", ["Character", "\u201C"],
+  "ParseError", ["Character", "\u201D"],
+  "ParseError", ["Character", "\u2022"],
+  "ParseError", ["Character", "\u2013"],
+  "ParseError", ["Character", "\u2014"]
+]},
+{"description":"c1 character references",
+"input":"&#x98;&#x99;&#x9a;&#x9b;&#x9c;&#x9d;&#x9e;&#x9f;",
+"output":[
+  "ParseError", ["Character", "\u02DC"],
+  "ParseError", ["Character", "\u2122"],
+  "ParseError", ["Character", "\u0161"],
+  "ParseError", ["Character", "\u203A"],
+  "ParseError", ["Character", "\u0153"],
+  "ParseError", ["Character", "\uFFFD"],
+  "ParseError", ["Character", "\u017E"],
+  "ParseError", ["Character", "\u0178"]
+]}
 
 ]}
