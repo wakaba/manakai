@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.20 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.21 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## ISSUE:
 ## var doc = implementation.createDocument (null, null, null);
@@ -4395,7 +4395,7 @@ sub _tree_construction_main ($) {
             }
             redo B;
           } elsif ($token->{type} eq 'end tag') {
-            if ($token->{tag_name} eq 'html') {
+            if ({head => 1, body => 1, html => 1}->{$token->{tag_name}}) {
               ## As if <head>
               
       $self->{head_element} = $self->{document}->create_element_ns
@@ -4408,7 +4408,7 @@ sub _tree_construction_main ($) {
               redo B;
             } else {
               $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
-              ## Ignore the token
+              ## Ignore the token ## ISSUE: An issue in the spec.
               $token = $self->_get_next_token;
               redo B;
             }
@@ -4511,7 +4511,8 @@ sub _tree_construction_main ($) {
               $self->{insertion_mode} = 'after head';
               $token = $self->_get_next_token;
               redo B;
-            } elsif ($token->{tag_name} eq 'html') {
+            } elsif ($token->{tag_name} eq 'body' or
+                     $token->{tag_name} eq 'html') {
               #
             } else {
               $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
@@ -6633,4 +6634,4 @@ sub get_inner_html ($$$) {
 } # get_inner_html
 
 1;
-# $Date: 2007/06/23 14:25:05 $
+# $Date: 2007/06/23 14:34:39 $

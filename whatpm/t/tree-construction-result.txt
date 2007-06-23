@@ -1,7 +1,7 @@
 1..472
 # Running under perl version 5.008007 for linux
-# Current time local: Sat Jun 23 23:21:17 2007
-# Current time GMT:   Sat Jun 23 14:21:17 2007
+# Current time local: Sat Jun 23 23:30:22 2007
+# Current time GMT:   Sat Jun 23 14:30:22 2007
 # Using Test.pm version 1.25
 # t/tokenizer-test-2.dat
 ok 1
@@ -78,7 +78,9 @@ ok 47
 ok 48
 ok 49
 ok 50
-ok 51
+not ok 51
+# Test 51 got: "1" (t/HTML-tree.t at line 133 fail #26)
+#    Expected: "2" (Parse error: <html><head></body></html>; 1:7:no DOCTYPE;6: missing document type declaration, 19: unexpected body element end tag in head)
 ok 52
 ok 53
 ok 54
@@ -88,20 +90,18 @@ ok 57
 ok 58
 ok 59
 ok 60
-ok 61
+not ok 61
+# Test 61 got: "1" (t/HTML-tree.t at line 133 fail #31)
+#    Expected: "2" (Parse error: </head>; 1:7:no DOCTYPE;7: missing document type declaration, 7: unexpected head element end tag)
 not ok 62
-# Test 62 got: "| <html>\n" (t/HTML-tree.t at line 135 fail #31)
+# Test 62 got: "| <html>\n|   <head>\n" (t/HTML-tree.t at line 135 fail #31)
 #    Expected: "| <html>\n|   <head>\n|   <body>\n" (Document tree: </head>)
-#    Lines 2-2 are missing:
-#     - "|   <head>\n"
+#    Line 3 is missing:
 #     - "|   <body>\n"
-ok 63
-not ok 64
-# Test 64 got: "| <html>\n" (t/HTML-tree.t at line 135 fail #32)
-#    Expected: "| <html>\n|   <head>\n|   <body>\n" (Document tree: </body>)
-#    Lines 2-2 are missing:
-#     - "|   <head>\n"
-#     - "|   <body>\n"
+not ok 63
+# Test 63 got: "1" (t/HTML-tree.t at line 133 fail #32)
+#    Expected: "2" (Parse error: </body>; 1:7:no DOCTYPE;7: missing document type declaration, 7: unexpected body element end tag)
+ok 64
 ok 65
 ok 66
 ok 67
@@ -871,28 +871,23 @@ not ok 443
 ok 444
 # t/tree-construction/tests6.dat
 not ok 445
-# Test 445 got: "2" (t/HTML-tree.t at line 133 fail #223)
-#     Expected: "0" (Parse error: <!doctype html></head> <head>; 1:23:unmatched end tag:head, 1:29:not closed:head;)
-not ok 446
-# Test 446 got: "| <!DOCTYPE html>\n| <html>\n|   \" \"\n|   <head>\n" (t/HTML-tree.t at line 135 fail #223)
-#     Expected: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   \" \"\n|   <body>\n" (Document tree: <!doctype html></head> <head>)
-#     Got 1 extra line at line 3:
-#      + "|   \" \"\n"
-#     Lines 5-5 are missing:
-#      - "|   \" \"\n"
-#      - "|   <body>\n"
+# Test 445 got: "1" (t/HTML-tree.t at line 133 fail #223)
+#     Expected: "0" (Parse error: <!doctype html></head> <head>; 1:29:in body:head;)
+ok 446
 not ok 447
 # Test 447 got: "3" (t/HTML-tree.t at line 133 fail #224)
 #     Expected: "0" (Parse error: <!doctype html></html> <head>; 1:29:after html:head, 1:29:after body:head, 1:29:in body:head;)
 ok 448
 not ok 449
 # Test 449 got: "2" (t/HTML-tree.t at line 133 fail #225)
-#     Expected: "0" (Parse error: <!doctype html></body><meta>; 1:23:unmatched end tag:body, 1:28:not closed:head;)
+#     Expected: "0" (Parse error: <!doctype html></body><meta>; 1:28:after body:meta, 1:28:in body:meta;)
 not ok 450
-# Test 450 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|     <meta>\n" (t/HTML-tree.t at line 135 fail #225)
+# Test 450 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|     <meta>\n|   <body>\n" (t/HTML-tree.t at line 135 fail #225)
 #     Expected: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <meta>\n" (Document tree: <!doctype html></body><meta>)
-#     Line 4 is missing:
-#      - "|   <body>\n"
+#     Got 1 extra line at line 4:
+#      + "|     <meta>\n"
+#     Line 6 is missing:
+#      - "|     <meta>\n"
 # t/tree-test-1.dat
 ok 451
 ok 452
