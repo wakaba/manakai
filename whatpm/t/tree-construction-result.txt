@@ -1,7 +1,7 @@
 1..472
 # Running under perl version 5.008007 for linux
-# Current time local: Sat Jun 23 21:18:26 2007
-# Current time GMT:   Sat Jun 23 12:18:26 2007
+# Current time local: Sat Jun 23 22:02:40 2007
+# Current time GMT:   Sat Jun 23 13:02:40 2007
 # Using Test.pm version 1.25
 # t/tokenizer-test-2.dat
 ok 1
@@ -337,8 +337,8 @@ not ok 194
 #     Line 8 is missing:
 #      - "|   <body>\n"
 not ok 195
-# Test 195 got: "4" (t/HTML-tree.t at line 133 fail #98)
-#     Expected: "2" (Parse error: <style><!--</style><meta><script>--><link></script>; 1:8:no DOCTYPE, 1:46:unmatched end tag, 1:51:in CDATA:#end-of-file, 1:51:not closed:head;missing document type declaration, unexpected EOF)
+# Test 195 got: "3" (t/HTML-tree.t at line 133 fail #98)
+#     Expected: "2" (Parse error: <style><!--</style><meta><script>--><link></script>; 1:8:no DOCTYPE, 1:51:in CDATA:#end-of-file, 1:51:not closed:head;missing document type declaration, unexpected EOF)
 not ok 196
 # Test 196 got: "| <html>\n|   <head>\n|     <style>\n|       \"<!--</style><meta><script>--><link></script>\"\n" (t/HTML-tree.t at line 135 fail #98)
 #     Expected: "| <html>\n|   <head>\n|     <style>\n|       \"<!--</style><meta><script>--><link></script>\"\n|   <body>\n" (Document tree: <style><!--</style><meta><script>--><link></script>)
@@ -421,7 +421,9 @@ not ok 235
 ok 236
 ok 237
 ok 238
-ok 239
+not ok 239
+# Test 239 got: "10" (t/HTML-tree.t at line 133 fail #120)
+#     Expected: "11" (Parse error: <body><frame></frame></frame><frameset><frame><frameset><frame></frameset><noframes></frameset><noframes>; 1:7:no DOCTYPE, 1:14:in body:frame, 1:22:unmatched end tag:frame, 1:30:unmatched end tag:frame, 1:40:in body:frameset, 1:47:in body:frame, 1:57:in body:frameset, 1:64:in body:frame, 1:75:unmatched end tag:frameset, 1:105:in CDATA:#end-of-file;6: missing document type declaration, 13: unexpected frame element start tag in body, 21: unexpected frame element end tag, 29: unexpected frame element end tag, 39: unexpected frameset element start tag in body, 46: unexpected frame element start tag in body, 56: unexpected frameset element start tag in body, 63: unexpected frame element start tag in body, 74: unexpected frameset element end tag, 87: unescaped '</' in CDATA or RCDATA block, 106: unexpected end of file while parsing CDATA section for element noframes)
 ok 240
 not ok 241
 # Test 241 got: "5" (t/HTML-tree.t at line 133 fail #121)
@@ -455,7 +457,9 @@ not ok 252
 # t/tree-construction/tests2.dat
 ok 253
 ok 254
-ok 255
+not ok 255
+# Test 255 got: "2" (t/HTML-tree.t at line 133 fail #128)
+#     Expected: "3" (Parse error: <textarea>test</div>test; 1:11:no DOCTYPE, 1:24:in CDATA:#end-of-file;10: missing document type declaration., 17: unescaped '</' in CDATA or RCDATA block., 25: unexpected end of file while parsing CDATA section for element textarea.)
 ok 256
 ok 257
 ok 258
@@ -477,9 +481,7 @@ not ok 269
 # Test 269 got: "1" (t/HTML-tree.t at line 133 fail #135)
 #     Expected: "0" (Parse error: <!DOCTYPE HTML><dt><div><dd>; 1:28:end tag missing:div;)
 ok 270
-not ok 271
-# Test 271 got: "4" (t/HTML-tree.t at line 133 fail #136)
-#     Expected: "3" (Parse error: <script></x; 1:9:no DOCTYPE, 1:11:unmatched end tag, 1:11:in CDATA:#end-of-file, 1:11:not closed:head;no document type, </ in script, Unexpected end of file. Expected </script> end tag.)
+ok 271
 not ok 272
 # Test 272 got: "| <html>\n|   <head>\n|     <script>\n|       \"</x\"\n" (t/HTML-tree.t at line 135 fail #136)
 #     Expected: "| <html>\n|   <head>\n|     <script>\n|       \"</x\"\n|   <body>\n" (Document tree: <script></x)
@@ -639,9 +641,14 @@ not ok 342
 #      - "|       <b>\n"
 #      - "|         <i>\n"
 #      - "|           <u>\n"
-ok 343
+not ok 343
+# Test 343 got: "1" (t/HTML-tree.t at line 133 fail #172)
+#     Expected: "2" (Parse error: <!DOCTYPE HTML><body><title>test</body></title>; 1:29:in body:title;Unexpected start tag that belongs in the head., Expected closing tag after </.)
 ok 344
-ok 345
+not ok 345
+# Test 345 got: "3" (t/HTML-tree.t at line 133 fail #173)
+#     Expected: "4" (Parse error: <!DOCTYPE HTML><body><title>X</title><meta name=z><link rel=foo><style>
+#x { content:"</style" } </style>; 1:29:in body:title, 1:51:in body:meta, 1:65:in body:link;Unexpected start tag that belongs in head., Unexpected start tag that belongs in head., Unexpected start tag that belongs in head., Expected closing tag after </.)
 not ok 346
 # Test 346 got: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|     <title>\n|       \"X\"\n|     <meta>\n|       name=\"z\"\n|     <link>\n|       rel=\"foo\"\n|   <body>\n|     <style>\n|       \"\nx { content:\"</style\" } \"\n" (t/HTML-tree.t at line 135 fail #173)
 #     Expected: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|     <title>\n|       \"X\"\n|   <body>\n|     <meta>\n|       name=\"z\"\n|     <link>\n|       rel=\"foo\"\n|     <style>\n|       \"\nx { content:\"</style\" } \"\n" (Document tree: <!DOCTYPE HTML><body><title>X</title><meta name=z><link rel=foo><style>
@@ -784,12 +791,12 @@ not ok 395
 #     Expected: "0" (Parse error: <!DOCTYPE htML><HTML><HEAD><head></HEAD></HTML>; 1:34:in head:head;)
 ok 396
 not ok 397
-# Test 397 got: "3" (t/HTML-tree.t at line 133 fail #199)
-#     Expected: "0" (Parse error: <textarea>foo<span>bar</span><i>baz; 1:11:no DOCTYPE, 1:25:unmatched end tag, 1:35:in CDATA:#end-of-file;)
+# Test 397 got: "2" (t/HTML-tree.t at line 133 fail #199)
+#     Expected: "0" (Parse error: <textarea>foo<span>bar</span><i>baz; 1:11:no DOCTYPE, 1:35:in CDATA:#end-of-file;)
 ok 398
 not ok 399
-# Test 399 got: "4" (t/HTML-tree.t at line 133 fail #200)
-#     Expected: "0" (Parse error: <title>foo<span>bar</em><i>baz; 1:8:no DOCTYPE, 1:22:unmatched end tag, 1:30:in RCDATA:#end-of-file, 1:30:not closed:head;)
+# Test 399 got: "3" (t/HTML-tree.t at line 133 fail #200)
+#     Expected: "0" (Parse error: <title>foo<span>bar</em><i>baz; 1:8:no DOCTYPE, 1:30:in RCDATA:#end-of-file, 1:30:not closed:head;)
 not ok 400
 # Test 400 got: "| <html>\n|   <head>\n|     <title>\n|       \"foo<span>bar</em><i>baz\"\n" (t/HTML-tree.t at line 135 fail #200)
 #     Expected: "| <html>\n|   <head>\n|     <title>\n|       \"foo<span>bar</em><i>baz\"\n|   <body>\n" (Document tree: <title>foo<span>bar</em><i>baz)
@@ -811,31 +818,15 @@ not ok 404
 ok 405
 ok 406
 ok 407
-not ok 408
-# Test 408 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <nobr>\n|       <nobr>\n|         <nobr>\n" (t/HTML-tree.t at line 135 fail #204)
-#     Expected: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <nobr>\n|     <nobr>\n|     <nobr>\n" (Document tree: <!doctype html><nobr><nobr><nobr>)
-#     Lines 6-7 are changed:
-#      - "|     <nobr>\n"
-#      + "|       <nobr>\n"
-#      - "|     <nobr>\n"
-#      + "|         <nobr>\n"
+ok 408
 ok 409
-not ok 410
-# Test 410 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <nobr>\n|       <nobr>\n|       <nobr>\n" (t/HTML-tree.t at line 135 fail #205)
-#     Expected: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <nobr>\n|     <nobr>\n|     <nobr>\n" (Document tree: <!doctype html><nobr><nobr></nobr><nobr>)
-#     Lines 6-7 are changed:
-#      - "|     <nobr>\n"
-#      + "|       <nobr>\n"
-#      - "|     <nobr>\n"
-#      + "|       <nobr>\n"
+ok 410
 # t/tree-construction/tests4.dat
 ok 411
 ok 412
 ok 413
 ok 414
-not ok 415
-# Test 415 got: "1" (t/HTML-tree.t at line 133 fail #208)
-#     Expected: "0" (Parse error: textarea content with <em>pseudo</em> <foo>markup; 1:35:unmatched end tag;)
+ok 415
 ok 416
 ok 417
 ok 418
@@ -872,7 +863,9 @@ ok 439
 ok 440
 ok 441
 ok 442
-ok 443
+not ok 443
+# Test 443 got: "1" (t/HTML-tree.t at line 133 fail #222)
+#     Expected: "2" (Parse error: <style> <!</-- </style>x; 1:8:no DOCTYPE;No DOCTYPE, Unexpected end of file)
 ok 444
 # t/tree-construction/tests6.dat
 not ok 445
@@ -900,131 +893,41 @@ not ok 450
 #      - "|   <body>\n"
 # t/tree-test-1.dat
 ok 451
-not ok 452
-# Test 452 got: "| <!DOCTYPE html>\n| <html>\n|   title=\"t\"\n|   <head>\n|     <title>\n|   <body>\n" (t/HTML-tree.t at line 135 fail #226)
-#     Expected: "| <!DOCTYPE HTML>\n| <html>\n|   title=\"t\"\n|   <head>\n|     <title>\n|   <body>\n" (Document tree: <!DOCTYPE html><html title="t"><head><title></title></head><body></body></html>)
-#     Line 1 is changed:
-#      - "| <!DOCTYPE HTML>\n"
-#      + "| <!DOCTYPE html>\n"
+ok 452
 ok 453
-not ok 454
-# Test 454 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|     title=\"t\"\n|     <title>\n|   <body>\n" (t/HTML-tree.t at line 135 fail #227)
-#     Expected: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|     title=\"t\"\n|     <title>\n|   <body>\n" (Document tree: <!DOCTYPE html><html><head title="t"><title></title></head><body></body></html>)
-#     Line 1 is changed:
-#      - "| <!DOCTYPE HTML>\n"
-#      + "| <!DOCTYPE html>\n"
+ok 454
 ok 455
-not ok 456
-# Test 456 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|     <title>\n|       class=\"t\"\n|   <body>\n" (t/HTML-tree.t at line 135 fail #228)
-#     Expected: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|     <title>\n|       class=\"t\"\n|   <body>\n" (Document tree: <!DOCTYPE html><html><head><title class="t"></title></head><body></body></html>)
-#     Line 1 is changed:
-#      - "| <!DOCTYPE HTML>\n"
-#      + "| <!DOCTYPE html>\n"
+ok 456
 ok 457
-not ok 458
-# Test 458 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|     <title>\n|       class=\"a\"\n|   <body>\n" (t/HTML-tree.t at line 135 fail #229)
-#     Expected: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|     <title>\n|       class=\"a\"\n|   <body>\n" (Document tree: <!DOCTYPE html><html><head></head><body><title class="a"></title></body></html>)
-#     Line 1 is changed:
-#      - "| <!DOCTYPE HTML>\n"
-#      + "| <!DOCTYPE html>\n"
+ok 458
 ok 459
-not ok 460
-# Test 460 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|     <title>\n|       class=\"a\"\n|   <body>\n" (t/HTML-tree.t at line 135 fail #230)
-#     Expected: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|     <title>\n|       class=\"a\"\n|   <body>\n" (Document tree: <!DOCTYPE html><html><head></head><body></body><title class="a"></title></html>)
-#     Line 1 is changed:
-#      - "| <!DOCTYPE HTML>\n"
-#      + "| <!DOCTYPE html>\n"
+ok 460
 ok 461
-not ok 462
-# Test 462 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|     <title>\n|   <body>\n|     title=\"t\"\n" (t/HTML-tree.t at line 135 fail #231)
-#     Expected: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|     <title>\n|   <body>\n|     title=\"t\"\n" (Document tree: <!DOCTYPE html><html><head><title></title></head><body title="t"></body></html>)
-#     Line 1 is changed:
-#      - "| <!DOCTYPE HTML>\n"
-#      + "| <!DOCTYPE html>\n"
+ok 462
 ok 463
-not ok 464
-# Test 464 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|     <title>\n|     <meta>\n|       name=\"a\"\n|   <body>\n" (t/HTML-tree.t at line 135 fail #232)
-#     Expected: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|     <title>\n|     <meta>\n|       name=\"a\"\n|   <body>\n" (Document tree: <!DOCTYPE html><html><head><title></title><meta name="a"></head><body></body></html>)
-#     Line 1 is changed:
-#      - "| <!DOCTYPE HTML>\n"
-#      + "| <!DOCTYPE html>\n"
+ok 464
 ok 465
-not ok 466
-# Test 466 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|     <title>\n|     <meta>\n|       name=\"a\"\n|   <body>\n" (t/HTML-tree.t at line 135 fail #233)
-#     Expected: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|     <title>\n|     <meta>\n|       name=\"a\"\n|   <body>\n" (Document tree: <!DOCTYPE html><html><head><title></title></head><body><meta name="a"></body></html>)
-#     Line 1 is changed:
-#      - "| <!DOCTYPE HTML>\n"
-#      + "| <!DOCTYPE html>\n"
+ok 466
 ok 467
-not ok 468
-# Test 468 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|     <title>\n|     <meta>\n|       name=\"a\"\n|   <body>\n" (t/HTML-tree.t at line 135 fail #234)
-#     Expected: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|     <title>\n|     <meta>\n|       name=\"a\"\n|   <body>\n" (Document tree: <!DOCTYPE html><html><head><title></title></head><body></body><meta name="a"></html>)
-#     Line 1 is changed:
-#      - "| <!DOCTYPE HTML>\n"
-#      + "| <!DOCTYPE html>\n"
+ok 468
 ok 469
-not ok 470
-# Test 470 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|     <title>\n|     <link>\n|       rel=\"a\"\n|   <body>\n" (t/HTML-tree.t at line 135 fail #235)
-#     Expected: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|     <title>\n|     <link>\n|       rel=\"a\"\n|   <body>\n" (Document tree: <!DOCTYPE html><html><head><title></title><link rel="a"></head><body></body></html>)
-#     Line 1 is changed:
-#      - "| <!DOCTYPE HTML>\n"
-#      + "| <!DOCTYPE html>\n"
+ok 470
 ok 471
-not ok 472
-# Test 472 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|     <title>\n|     <link>\n|       rel=\"a\"\n|   <body>\n" (t/HTML-tree.t at line 135 fail #236)
-#     Expected: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|     <title>\n|     <link>\n|       rel=\"a\"\n|   <body>\n" (Document tree: <!DOCTYPE html><html><head><title></title></head><body><link rel="a"></body></html>)
-#     Line 1 is changed:
-#      - "| <!DOCTYPE HTML>\n"
-#      + "| <!DOCTYPE html>\n"
+ok 472
 ok 473
-not ok 474
-# Test 474 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|     <title>\n|     <link>\n|       rel=\"a\"\n|   <body>\n" (t/HTML-tree.t at line 135 fail #237)
-#     Expected: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|     <title>\n|     <link>\n|       rel=\"a\"\n|   <body>\n" (Document tree: <!DOCTYPE html><html><head><title></title></head><body></body><link rel="a"></html>)
-#     Line 1 is changed:
-#      - "| <!DOCTYPE HTML>\n"
-#      + "| <!DOCTYPE html>\n"
+ok 474
 ok 475
-not ok 476
-# Test 476 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|     <title>\n|     <base>\n|       href=\"http://\"\n|   <body>\n" (t/HTML-tree.t at line 135 fail #238)
-#     Expected: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|     <title>\n|     <base>\n|       href=\"http://\"\n|   <body>\n" (Document tree: <!DOCTYPE html><html><head><title></title><base href="http://"></head><body></body></html>)
-#     Line 1 is changed:
-#      - "| <!DOCTYPE HTML>\n"
-#      + "| <!DOCTYPE html>\n"
+ok 476
 ok 477
-not ok 478
-# Test 478 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|     <title>\n|     <base>\n|       href=\"http://\"\n|   <body>\n" (t/HTML-tree.t at line 135 fail #239)
-#     Expected: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|     <title>\n|     <base>\n|       href=\"http://\"\n|   <body>\n" (Document tree: <!DOCTYPE html><html><head><title></title></head><body><base href="http://"></body></html>)
-#     Line 1 is changed:
-#      - "| <!DOCTYPE HTML>\n"
-#      + "| <!DOCTYPE html>\n"
+ok 478
 ok 479
-not ok 480
-# Test 480 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|     <title>\n|     <base>\n|       href=\"http://\"\n|   <body>\n" (t/HTML-tree.t at line 135 fail #240)
-#     Expected: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|     <title>\n|     <base>\n|       href=\"http://\"\n|   <body>\n" (Document tree: <!DOCTYPE html><html><head><title></title></head><body></body><base href="http://"></html>)
-#     Line 1 is changed:
-#      - "| <!DOCTYPE HTML>\n"
-#      + "| <!DOCTYPE html>\n"
+ok 480
 ok 481
-not ok 482
-# Test 482 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <p>\n|       <b>\n|     <p>\n|       <b>\n|         \"X\"\n" (t/HTML-tree.t at line 135 fail #241)
-#     Expected: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|   <body>\n|     <p>\n|       <b>\n|     <p>\n|       <b>\n|         \"X\"\n" (Document tree: <!DOCTYPE html><p><b><p>X)
-#     Line 1 is changed:
-#      - "| <!DOCTYPE HTML>\n"
-#      + "| <!DOCTYPE html>\n"
+ok 482
 ok 483
-not ok 484
-# Test 484 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <b>\n|       <p>\n" (t/HTML-tree.t at line 135 fail #242)
-#     Expected: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|   <body>\n|     <b>\n|       <p>\n" (Document tree: <!DOCTYPE html><b><p>)
-#     Line 1 is changed:
-#      - "| <!DOCTYPE HTML>\n"
-#      + "| <!DOCTYPE html>\n"
+ok 484
 ok 485
-not ok 486
-# Test 486 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <b>\n|       <p>\n|         \"X\"\n" (t/HTML-tree.t at line 135 fail #243)
-#     Expected: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|   <body>\n|     <b>\n|       <p>\n|         \"X\"\n" (Document tree: <!DOCTYPE html><b><p>X)
-#     Line 1 is changed:
-#      - "| <!DOCTYPE HTML>\n"
-#      + "| <!DOCTYPE html>\n"
+ok 486
 ok 487
 ok 488
 ok 489
@@ -1034,152 +937,47 @@ ok 492
 ok 493
 ok 494
 ok 495
-not ok 496
-# Test 496 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <ins>\n|       <p>\n|         \"XXYYY\"\n" (t/HTML-tree.t at line 135 fail #248)
-#     Expected: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|   <body>\n|     <ins>\n|       <p>\n|         \"XXYYY\"\n" (Document tree: <!DOCTYPE html><ins><p>XX</ins>YYY)
-#     Line 1 is changed:
-#      - "| <!DOCTYPE HTML>\n"
-#      + "| <!DOCTYPE html>\n"
+ok 496
 ok 497
-not ok 498
-# Test 498 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <noscript>\n|       \"aaa\"\n|       <noscript>\n|         \"bbb\"\n|       \"ccc\"\n" (t/HTML-tree.t at line 135 fail #249)
-#     Expected: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|   <body>\n|     <noscript>\n|       \"aaa\"\n|       <noscript>\n|         \"bbb\"\n|       \"ccc\"\n" (Document tree: <!DOCTYPE html><noscript>aaa<noscript>bbb</noscript>ccc</noscript>)
-#     Line 1 is changed:
-#      - "| <!DOCTYPE HTML>\n"
-#      + "| <!DOCTYPE html>\n"
+ok 498
 ok 499
-not ok 500
-# Test 500 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <iframe>\n" (t/HTML-tree.t at line 135 fail #250)
-#     Expected: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|   <body>\n|     <iframe>\n" (Document tree: <!DOCTYPE html><iframe>)
-#     Line 1 is changed:
-#      - "| <!DOCTYPE HTML>\n"
-#      + "| <!DOCTYPE html>\n"
+ok 500
 ok 501
-not ok 502
-# Test 502 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <iframe>\n" (t/HTML-tree.t at line 135 fail #251)
-#     Expected: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|   <body>\n|     <iframe>\n" (Document tree: <!DOCTYPE html><iframe></iframe>)
-#     Line 1 is changed:
-#      - "| <!DOCTYPE HTML>\n"
-#      + "| <!DOCTYPE html>\n"
+ok 502
 ok 503
-not ok 504
-# Test 504 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <iframe>\n|       \"a\"\n" (t/HTML-tree.t at line 135 fail #252)
-#     Expected: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|   <body>\n|     <iframe>\n|       \"a\"\n" (Document tree: <!DOCTYPE html><iframe>a</iframe>)
-#     Line 1 is changed:
-#      - "| <!DOCTYPE HTML>\n"
-#      + "| <!DOCTYPE html>\n"
+ok 504
 ok 505
-not ok 506
-# Test 506 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <noframes>\n" (t/HTML-tree.t at line 135 fail #253)
-#     Expected: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|   <body>\n|     <noframes>\n" (Document tree: <!DOCTYPE html><noframes>)
-#     Line 1 is changed:
-#      - "| <!DOCTYPE HTML>\n"
-#      + "| <!DOCTYPE html>\n"
+ok 506
 ok 507
-not ok 508
-# Test 508 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <noframes>\n" (t/HTML-tree.t at line 135 fail #254)
-#     Expected: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|   <body>\n|     <noframes>\n" (Document tree: <!DOCTYPE html><noframes></noframes>)
-#     Line 1 is changed:
-#      - "| <!DOCTYPE HTML>\n"
-#      + "| <!DOCTYPE html>\n"
+ok 508
 ok 509
-not ok 510
-# Test 510 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <noframes>\n|       \"a\"\n" (t/HTML-tree.t at line 135 fail #255)
-#     Expected: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|   <body>\n|     <noframes>\n|       \"a\"\n" (Document tree: <!DOCTYPE html><noframes>a</noframes>)
-#     Line 1 is changed:
-#      - "| <!DOCTYPE HTML>\n"
-#      + "| <!DOCTYPE html>\n"
+ok 510
 ok 511
-not ok 512
-# Test 512 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <noframes>\n" (t/HTML-tree.t at line 135 fail #256)
-#     Expected: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|   <body>\n|     <noframes>\n" (Document tree: <!DOCTYPE html><noframes>)
-#     Line 1 is changed:
-#      - "| <!DOCTYPE HTML>\n"
-#      + "| <!DOCTYPE html>\n"
+ok 512
 ok 513
-not ok 514
-# Test 514 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <noframes>\n" (t/HTML-tree.t at line 135 fail #257)
-#     Expected: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|   <body>\n|     <noframes>\n" (Document tree: <!DOCTYPE html><noframes></noframes>)
-#     Line 1 is changed:
-#      - "| <!DOCTYPE HTML>\n"
-#      + "| <!DOCTYPE html>\n"
+ok 514
 ok 515
-not ok 516
-# Test 516 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <noframes>\n|       \"a\"\n" (t/HTML-tree.t at line 135 fail #258)
-#     Expected: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|   <body>\n|     <noframes>\n|       \"a\"\n" (Document tree: <!DOCTYPE html><noframes>a</noframes>)
-#     Line 1 is changed:
-#      - "| <!DOCTYPE HTML>\n"
-#      + "| <!DOCTYPE html>\n"
+ok 516
 ok 517
-not ok 518
-# Test 518 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <xmp>\n" (t/HTML-tree.t at line 135 fail #259)
-#     Expected: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|   <body>\n|     <xmp>\n" (Document tree: <!DOCTYPE html><xmp>)
-#     Line 1 is changed:
-#      - "| <!DOCTYPE HTML>\n"
-#      + "| <!DOCTYPE html>\n"
+ok 518
 ok 519
-not ok 520
-# Test 520 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <xmp>\n" (t/HTML-tree.t at line 135 fail #260)
-#     Expected: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|   <body>\n|     <xmp>\n" (Document tree: <!DOCTYPE html><xmp></xmp>)
-#     Line 1 is changed:
-#      - "| <!DOCTYPE HTML>\n"
-#      + "| <!DOCTYPE html>\n"
+ok 520
 ok 521
-not ok 522
-# Test 522 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <xmp>\n|       \"a\"\n" (t/HTML-tree.t at line 135 fail #261)
-#     Expected: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|   <body>\n|     <xmp>\n|       \"a\"\n" (Document tree: <!DOCTYPE html><xmp>a</xmp>)
-#     Line 1 is changed:
-#      - "| <!DOCTYPE HTML>\n"
-#      + "| <!DOCTYPE html>\n"
+ok 522
 ok 523
-not ok 524
-# Test 524 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|     <title>\n|     <style>\n|   <body>\n" (t/HTML-tree.t at line 135 fail #262)
-#     Expected: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|     <title>\n|     <style>\n|   <body>\n" (Document tree: <!DOCTYPE html><html><head><title></title><style></style></head><body>)
-#     Line 1 is changed:
-#      - "| <!DOCTYPE HTML>\n"
-#      + "| <!DOCTYPE html>\n"
+ok 524
 ok 525
-not ok 526
-# Test 526 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|     <title>\n|     <style>\n|       type=\"text/css\"\n|   <body>\n" (t/HTML-tree.t at line 135 fail #263)
-#     Expected: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|     <title>\n|     <style>\n|       type=\"text/css\"\n|   <body>\n" (Document tree: <!DOCTYPE html><html><head><title></title><style type="text/css"></style></head><body>)
-#     Line 1 is changed:
-#      - "| <!DOCTYPE HTML>\n"
-#      + "| <!DOCTYPE html>\n"
+ok 526
 ok 527
-not ok 528
-# Test 528 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|     <title>\n|     <style>\n|       type=\"text/css\"\n|       \"p {}\"\n|   <body>\n" (t/HTML-tree.t at line 135 fail #264)
-#     Expected: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|     <title>\n|     <style>\n|       type=\"text/css\"\n|       \"p {}\"\n|   <body>\n" (Document tree: <!DOCTYPE html><html><head><title></title><style type="text/css">p {}</style></head><body>)
-#     Line 1 is changed:
-#      - "| <!DOCTYPE HTML>\n"
-#      + "| <!DOCTYPE html>\n"
+ok 528
 ok 529
-not ok 530
-# Test 530 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|     <style>\n|       type=\"text/css\"\n|     <title>\n|   <body>\n" (t/HTML-tree.t at line 135 fail #265)
-#     Expected: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|     <style>\n|       type=\"text/css\"\n|     <title>\n|   <body>\n" (Document tree: <!DOCTYPE html><html><style type="text/css"></style><title></title></head><body>)
-#     Line 1 is changed:
-#      - "| <!DOCTYPE HTML>\n"
-#      + "| <!DOCTYPE html>\n"
+ok 530
 ok 531
-not ok 532
-# Test 532 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|     <style>\n|       type=\"text/css\"\n|     <title>\n|   <body>\n" (t/HTML-tree.t at line 135 fail #266)
-#     Expected: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|     <style>\n|       type=\"text/css\"\n|     <title>\n|   <body>\n" (Document tree: <!DOCTYPE html><style type="text/css"></style><title></title><body>)
-#     Line 1 is changed:
-#      - "| <!DOCTYPE HTML>\n"
-#      + "| <!DOCTYPE html>\n"
+ok 532
 ok 533
-not ok 534
-# Test 534 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|     <title>\n|   <body>\n|     <p>\n|       \"a\"\n|       <style>\n|         type=\"text/css\"\n" (t/HTML-tree.t at line 135 fail #267)
-#     Expected: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|     <title>\n|   <body>\n|     <p>\n|       \"a\"\n|       <style>\n|         type=\"text/css\"\n" (Document tree: <!DOCTYPE html><title></title><body><p>a<style type="text/css"></style>)
-#     Line 1 is changed:
-#      - "| <!DOCTYPE HTML>\n"
-#      + "| <!DOCTYPE html>\n"
+ok 534
 ok 535
-not ok 536
-# Test 536 got: "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <form>\n" (t/HTML-tree.t at line 135 fail #268)
-#     Expected: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|   <body>\n|     <form>\n" (Document tree: <!DOCTYPE html><form><form></form>)
-#     Line 1 is changed:
-#      - "| <!DOCTYPE HTML>\n"
-#      + "| <!DOCTYPE html>\n"
+ok 536
 ok 537
 ok 538
 ok 539

@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.18 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.19 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## ISSUE:
 ## var doc = implementation.createDocument (null, null, null);
@@ -335,7 +335,6 @@ sub _get_next_token ($) {
             !!!next-input-character;
             next TAGNAME;
           } else {
-            !!!parse-error (type => 'unmatched end tag');
             $self->{next_input_character} = shift @next_char; # reconsume
             !!!back-next-input-character (@next_char);
             $self->{state} = 'data';
@@ -355,7 +354,6 @@ sub _get_next_token ($) {
                 $self->{next_input_character} == 0x003E or # >
                 $self->{next_input_character} == 0x002F or # /
                 $self->{next_input_character} == -1) {
-          !!!parse-error (type => 'unmatched end tag');
           $self->{next_input_character} = shift @next_char; # reconsume
           !!!back-next-input-character (@next_char);
           $self->{state} = 'data';
@@ -2721,10 +2719,33 @@ sub _tree_construction_main ($) {
         return;
       } elsif ({
                 b => 1, big => 1, em => 1, font => 1, i => 1,
-                nobr => 1, s => 1, small => 1, strile => 1, 
+                s => 1, small => 1, strile => 1, 
                 strong => 1, tt => 1, u => 1,
                }->{$token->{tag_name}}) {
         $reconstruct_active_formatting_elements->($insert_to_current);
+        
+        !!!insert-element-t ($token->{tag_name}, $token->{attributes});
+        push @$active_formatting_elements, $self->{open_elements}->[-1];
+        
+        !!!next-token;
+        return;
+      } elsif ($token->{tag_name} eq 'nobr') {
+        $reconstruct_active_formatting_elements->($insert_to_current);
+
+        ## has a |nobr| element in scope
+        INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
+          my $node = $self->{open_elements}->[$_];
+          if ($node->[1] eq 'nobr') {
+            !!!back-token;
+            $token = {type => 'end tag', tag_name => 'nobr'};
+            return;
+          } elsif ({
+                    table => 1, caption => 1, td => 1, th => 1,
+                    button => 1, marquee => 1, object => 1, html => 1,
+                   }->{$node->[1]}) {
+            last INSCOPE;
+          }
+        } # INSCOPE
         
         !!!insert-element-t ($token->{tag_name}, $token->{attributes});
         push @$active_formatting_elements, $self->{open_elements}->[-1];
@@ -5308,4 +5329,4 @@ sub get_inner_html ($$$) {
 } # get_inner_html
 
 1;
-# $Date: 2007/06/23 12:21:01 $
+# $Date: 2007/06/23 13:05:16 $

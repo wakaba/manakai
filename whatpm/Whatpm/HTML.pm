@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.18 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.19 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## ISSUE:
 ## var doc = implementation.createDocument (null, null, null);
@@ -401,7 +401,6 @@ sub _get_next_token ($) {
   
             next TAGNAME;
           } else {
-            $self->{parse_error}-> (type => 'unmatched end tag');
             $self->{next_input_character} = shift @next_char; # reconsume
             unshift @{$self->{char}},  (@next_char);
             $self->{state} = 'data';
@@ -421,7 +420,6 @@ sub _get_next_token ($) {
                 $self->{next_input_character} == 0x003E or # >
                 $self->{next_input_character} == 0x002F or # /
                 $self->{next_input_character} == -1) {
-          $self->{parse_error}-> (type => 'unmatched end tag');
           $self->{next_input_character} = shift @next_char; # reconsume
           unshift @{$self->{char}},  (@next_char);
           $self->{state} = 'data';
@@ -3629,10 +3627,48 @@ sub _tree_construction_main ($) {
         return;
       } elsif ({
                 b => 1, big => 1, em => 1, font => 1, i => 1,
-                nobr => 1, s => 1, small => 1, strile => 1, 
+                s => 1, small => 1, strile => 1, 
                 strong => 1, tt => 1, u => 1,
                }->{$token->{tag_name}}) {
         $reconstruct_active_formatting_elements->($insert_to_current);
+        
+        
+    {
+      my $el;
+      
+      $el = $self->{document}->create_element_ns
+        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
+    
+        for my $attr_name (keys %{  $token->{attributes}}) {
+          $el->set_attribute_ns (undef, [undef, $attr_name],
+                                  $token->{attributes} ->{$attr_name}->{value});
+        }
+      
+      $insert->($el);
+      push @{$self->{open_elements}}, [$el, $token->{tag_name}];
+    }
+  
+        push @$active_formatting_elements, $self->{open_elements}->[-1];
+        
+        $token = $self->_get_next_token;
+        return;
+      } elsif ($token->{tag_name} eq 'nobr') {
+        $reconstruct_active_formatting_elements->($insert_to_current);
+
+        ## has a |nobr| element in scope
+        INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
+          my $node = $self->{open_elements}->[$_];
+          if ($node->[1] eq 'nobr') {
+            unshift @{$self->{token}}, $token;
+            $token = {type => 'end tag', tag_name => 'nobr'};
+            return;
+          } elsif ({
+                    table => 1, caption => 1, td => 1, th => 1,
+                    button => 1, marquee => 1, object => 1, html => 1,
+                   }->{$node->[1]}) {
+            last INSCOPE;
+          }
+        } # INSCOPE
         
         
     {
@@ -6584,4 +6620,4 @@ sub get_inner_html ($$$) {
 } # get_inner_html
 
 1;
-# $Date: 2007/06/23 12:21:00 $
+# $Date: 2007/06/23 13:05:16 $

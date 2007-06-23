@@ -243,6 +243,7 @@ sub manakai_is_html ($;$) {
     if ($_[1]) {
       $_[0]->{manakai_is_html} = 1;
     } else {
+      delete $_[0]->{manakai_is_html};
       delete $_[0]->{manakai_compat_mode};
     }
   }
@@ -521,4 +522,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2007/06/23 12:21:01 $
+# $Date: 2007/06/23 13:05:16 $
