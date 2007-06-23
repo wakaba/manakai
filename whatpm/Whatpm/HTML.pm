@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.19 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.20 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## ISSUE:
 ## var doc = implementation.createDocument (null, null, null);
@@ -2260,8 +2260,15 @@ sub _get_next_token ($) {
 
 sub _tokenize_attempt_to_consume_an_entity ($) {
   my $self = shift;
-  
-  if ($self->{next_input_character} == 0x0023) { # #
+
+  if ({
+       0x0009 => 1, 0x000A => 1, 0x000B => 1, 0x000C => 1, # HT, LF, VT, FF,
+       0x0020 => 1, 0x003C => 1, 0x0026 => 1, -1 => 1, # SP, <, & # 0x000D # CR
+      }->{$self->{next_input_character}}) {
+    ## Don't consume
+    ## No error
+    return undef;
+  } elsif ($self->{next_input_character} == 0x0023) { # #
     
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -4058,11 +4065,17 @@ sub _tree_construction_main ($) {
       }
     } elsif ($token->{type} eq 'end tag') {
       if ($token->{tag_name} eq 'body') {
-        if (@{$self->{open_elements}} > 1 and $self->{open_elements}->[1]->[1] eq 'body') {
-          ## ISSUE: There is an issue in the spec.
-          if ($self->{open_elements}->[-1]->[1] ne 'body') {
-            $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
+        if (@{$self->{open_elements}} > 1 and
+            $self->{open_elements}->[1]->[1] eq 'body') {
+          for (@{$self->{open_elements}}) {
+            unless ({
+                       dd => 1, dt => 1, li => 1, p => 1, td => 1,
+                       th => 1, tr => 1, body => 1, html => 1,
+                    }->{$_->[1]}) {
+              $self->{parse_error}-> (type => 'not closed:'.$_->[1]);
+            }
           }
+
           $self->{insertion_mode} = 'after body';
           $token = $self->_get_next_token;
           return;
@@ -6620,4 +6633,4 @@ sub get_inner_html ($$$) {
 } # get_inner_html
 
 1;
-# $Date: 2007/06/23 13:05:16 $
+# $Date: 2007/06/23 14:25:05 $

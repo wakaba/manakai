@@ -257,6 +257,46 @@
 "input":"&amp;;",
 "output":[["Character", "&;"]]},
 
+{"description":"&HT",
+"input":"&\u0009",
+"output":[["Character", "&\u0009"]]},
+
+{"description":"&LF",
+"input":"&\u000A",
+"output":[["Character", "&\u000A"]]},
+
+{"description":"&VT",
+"input":"&\u000B",
+"output":[["Character", "&\u000B"]]},
+
+{"description":"&FF",
+"input":"&\u000C",
+"output":[["Character", "&\u000C"]]},
+
+{"description":"&SP",
+"input":"& ",
+"output":[["Character", "& "]]},
+
+{"description":"&<",
+"input":"&<",
+"output":["ParseError", ["Character", "&<"]]},
+
+{"description":"&<p>",
+"input":"&<p>",
+"output":[["Character", "&"], ["StartTag", "p", {}]]},
+
+{"description":"&&",
+"input":"&&",
+"output":[["Character", "&&"]]},
+
+{"description":"&&amp;",
+"input":"&&amp;",
+"output":[["Character", "&&"]]},
+
+{"description":"&",
+"input":"&",
+"output":[["Character", "&"]]},
+
 {"description":"cdata end tag containing <",
 "contentModelFlags":["RCDATA","CDATA"],
 "lastStartTag":"xxx",

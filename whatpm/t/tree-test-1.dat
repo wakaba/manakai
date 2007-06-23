@@ -682,3 +682,113 @@ div not closed before EOF
 |     <form>
 |       <div>
 |         "ab"
+
+#data
+<!DOCTYPE HTML><ul></body>
+#errors
+ul not closed
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <ul>
+
+#data
+<!DOCTYPE HTML><ul><li></body>
+#errors
+ul not closed
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <ul>
+|       <li>
+
+#data
+<!DOCTYPE HTML><dl></body>
+#errors
+dl not closed
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <dl>
+
+#data
+<!DOCTYPE HTML><dl><dt></body>
+#errors
+dl not closed
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <dl>
+|       <dt>
+
+#data
+<!DOCTYPE HTML><dl><dd></body>
+#errors
+dl not closed
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <dl>
+|       <dd>
+
+#data
+<!DOCTYPE HTML><p></body>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <p>
+
+#data
+<!DOCTYPE HTML><table><tr><td></body>
+#errors
+table not closed
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|         <tr>
+|           <td>
+
+#data
+<!DOCTYPE HTML><table><tr><th></body>
+#errors
+table not closed
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|         <tr>
+|           <th>
+
+#data
+<!DOCTYPE HTML><table><thead><tr><td></body>
+#errors
+table not closed
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <thead>
+|         <tr>
+|           <td>
