@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.22 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.23 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## ISSUE:
 ## var doc = implementation.createDocument (null, null, null);
@@ -386,51 +386,57 @@ sub _get_next_token ($) {
     } elsif ($self->{state} eq 'close tag open') {
       if ($self->{content_model_flag} eq 'RCDATA' or
           $self->{content_model_flag} eq 'CDATA') {
-        my @next_char;
-        TAGNAME: for (my $i = 0; $i < length $self->{last_emitted_start_tag_name}; $i++) {
-          push @next_char, $self->{next_input_character};
-          my $c = ord substr ($self->{last_emitted_start_tag_name}, $i, 1);
-          my $C = 0x0061 <= $c && $c <= 0x007A ? $c - 0x0020 : $c;
-          if ($self->{next_input_character} == $c or $self->{next_input_character} == $C) {
-            
+        if (defined $self->{last_emitted_start_tag_name}) {
+          my @next_char;
+          TAGNAME: for (my $i = 0; $i < length $self->{last_emitted_start_tag_name}; $i++) {
+            push @next_char, $self->{next_input_character};
+            my $c = ord substr ($self->{last_emitted_start_tag_name}, $i, 1);
+            my $C = 0x0061 <= $c && $c <= 0x007A ? $c - 0x0020 : $c;
+            if ($self->{next_input_character} == $c or $self->{next_input_character} == $C) {
+              
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
       } else {
         $self->{set_next_input_character}->($self);
       }
   
-            next TAGNAME;
-          } else {
+              next TAGNAME;
+            } else {
+              $self->{next_input_character} = shift @next_char; # reconsume
+              unshift @{$self->{char}},  (@next_char);
+              $self->{state} = 'data';
+
+              return  ({type => 'character', data => '</'});
+  
+              redo A;
+            }
+          }
+          push @next_char, $self->{next_input_character};
+      
+          unless ($self->{next_input_character} == 0x0009 or # HT
+                  $self->{next_input_character} == 0x000A or # LF
+                  $self->{next_input_character} == 0x000B or # VT
+                  $self->{next_input_character} == 0x000C or # FF
+                  $self->{next_input_character} == 0x0020 or # SP 
+                  $self->{next_input_character} == 0x003E or # >
+                  $self->{next_input_character} == 0x002F or # /
+                  $self->{next_input_character} == -1) {
             $self->{next_input_character} = shift @next_char; # reconsume
             unshift @{$self->{char}},  (@next_char);
             $self->{state} = 'data';
-
             return  ({type => 'character', data => '</'});
-
             redo A;
+          } else {
+            $self->{next_input_character} = shift @next_char;
+            unshift @{$self->{char}},  (@next_char);
+            # and consume...
           }
-        }
-        push @next_char, $self->{next_input_character};
-    
-        unless ($self->{next_input_character} == 0x0009 or # HT
-                $self->{next_input_character} == 0x000A or # LF
-                $self->{next_input_character} == 0x000B or # VT
-                $self->{next_input_character} == 0x000C or # FF
-                $self->{next_input_character} == 0x0020 or # SP 
-                $self->{next_input_character} == 0x003E or # >
-                $self->{next_input_character} == 0x002F or # /
-                $self->{next_input_character} == -1) {
-          $self->{next_input_character} = shift @next_char; # reconsume
-          unshift @{$self->{char}},  (@next_char);
-          $self->{state} = 'data';
-
-          return  ({type => 'character', data => '</'});
-
-          redo A;
         } else {
-          $self->{next_input_character} = shift @next_char;
-          unshift @{$self->{char}},  (@next_char);
-          # and consume...
+          ## No start tag token has ever been emitted
+          # next-input-character is already done
+          $self->{state} = 'data';
+          return  ({type => 'character', data => '</'});
+          redo A;
         }
       }
       
@@ -521,7 +527,6 @@ sub _get_next_token ($) {
   
 
         return  ($self->{current_token}); # start tag or end tag
-        undef $self->{current_token};
 
         redo A;
       } elsif (0x0041 <= $self->{next_input_character} and
@@ -553,7 +558,6 @@ sub _get_next_token ($) {
         # reconsume
 
         return  ($self->{current_token}); # start tag or end tag
-        undef $self->{current_token};
 
         redo A;
       } elsif ($self->{next_input_character} == 0x002F) { # /
@@ -624,7 +628,6 @@ sub _get_next_token ($) {
   
 
         return  ($self->{current_token}); # start tag or end tag
-        undef $self->{current_token};
 
         redo A;
       } elsif (0x0041 <= $self->{next_input_character} and
@@ -675,7 +678,6 @@ sub _get_next_token ($) {
         # reconsume
 
         return  ($self->{current_token}); # start tag or end tag
-        undef $self->{current_token};
 
         redo A;
       } else {
@@ -751,7 +753,6 @@ sub _get_next_token ($) {
   
 
         return  ($self->{current_token}); # start tag or end tag
-        undef $self->{current_token};
 
         redo A;
       } elsif (0x0041 <= $self->{next_input_character} and
@@ -803,7 +804,6 @@ sub _get_next_token ($) {
         # reconsume
 
         return  ($self->{current_token}); # start tag or end tag
-        undef $self->{current_token};
 
         redo A;
       } else {
@@ -864,7 +864,6 @@ sub _get_next_token ($) {
   
 
         return  ($self->{current_token}); # start tag or end tag
-        undef $self->{current_token};
 
         redo A;
       } elsif (0x0041 <= $self->{next_input_character} and
@@ -915,7 +914,6 @@ sub _get_next_token ($) {
         # reconsume
 
         return  ($self->{current_token}); # start tag or end tag
-        undef $self->{current_token};
 
         redo A;
       } else {
@@ -991,7 +989,6 @@ sub _get_next_token ($) {
   
 
         return  ($self->{current_token}); # start tag or end tag
-        undef $self->{current_token};
 
         redo A;
       } elsif ($self->{next_input_character} == -1) {
@@ -1010,7 +1007,6 @@ sub _get_next_token ($) {
         ## reconsume
 
         return  ($self->{current_token}); # start tag or end tag
-        undef $self->{current_token};
 
         redo A;
       } else {
@@ -1063,7 +1059,6 @@ sub _get_next_token ($) {
         ## reconsume
 
         return  ($self->{current_token}); # start tag or end tag
-        undef $self->{current_token};
 
         redo A;
       } else {
@@ -1116,7 +1111,6 @@ sub _get_next_token ($) {
         ## reconsume
 
         return  ($self->{current_token}); # start tag or end tag
-        undef $self->{current_token};
 
         redo A;
       } else {
@@ -1178,7 +1172,6 @@ sub _get_next_token ($) {
   
 
         return  ($self->{current_token}); # start tag or end tag
-        undef $self->{current_token};
 
         redo A;
       } elsif ($self->{next_input_character} == -1) {
@@ -1197,7 +1190,6 @@ sub _get_next_token ($) {
         ## reconsume
 
         return  ($self->{current_token}); # start tag or end tag
-        undef $self->{current_token};
 
         redo A;
       } else {
@@ -1280,7 +1272,7 @@ sub _get_next_token ($) {
         push @next_char, $self->{next_input_character};
         if ($self->{next_input_character} == 0x002D) { # -
           $self->{current_token} = {type => 'comment', data => ''};
-          $self->{state} = 'comment';
+          $self->{state} = 'comment start';
           
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -1378,9 +1370,101 @@ sub _get_next_token ($) {
       
       ## ISSUE: typos in spec: chacacters, is is a parse error
       ## ISSUE: spec is somewhat unclear on "is the first character that will be in the comment"; what is "that will be in the comment" is what the algorithm defines, isn't it?
+    } elsif ($self->{state} eq 'comment start') {
+      if ($self->{next_input_character} == 0x002D) { # -
+        $self->{state} = 'comment start dash';
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
+        redo A;
+      } elsif ($self->{next_input_character} == 0x003E) { # >
+        $self->{parse_error}-> (type => 'bogus comment');
+        $self->{state} = 'data';
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
+
+        return  ($self->{current_token}); # comment
+
+        redo A;
+      } elsif ($self->{next_input_character} == -1) {
+        $self->{parse_error}-> (type => 'unclosed comment');
+        $self->{state} = 'data';
+        ## reconsume
+
+        return  ($self->{current_token}); # comment
+
+        redo A;
+      } else {
+        $self->{current_token}->{data} # comment
+            .= chr ($self->{next_input_character});
+        $self->{state} = 'comment';
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
+        redo A;
+      }
+    } elsif ($self->{state} eq 'comment start dash') {
+      if ($self->{next_input_character} == 0x002D) { # -
+        $self->{state} = 'comment end';
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
+        redo A;
+      } elsif ($self->{next_input_character} == 0x003E) { # >
+        $self->{parse_error}-> (type => 'bogus comment');
+        $self->{state} = 'data';
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
+
+        return  ($self->{current_token}); # comment
+
+        redo A;
+      } elsif ($self->{next_input_character} == -1) {
+        $self->{parse_error}-> (type => 'unclosed comment');
+        $self->{state} = 'data';
+        ## reconsume
+
+        return  ($self->{current_token}); # comment
+
+        redo A;
+      } else {
+        $self->{current_token}->{data} # comment
+            .= chr ($self->{next_input_character});
+        $self->{state} = 'comment';
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
+        redo A;
+      }
     } elsif ($self->{state} eq 'comment') {
       if ($self->{next_input_character} == 0x002D) { # -
-        $self->{state} = 'comment dash';
+        $self->{state} = 'comment end dash';
         
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -1395,7 +1479,6 @@ sub _get_next_token ($) {
         ## reconsume
 
         return  ($self->{current_token}); # comment
-        undef $self->{current_token};
 
         redo A;
       } else {
@@ -1410,7 +1493,7 @@ sub _get_next_token ($) {
   
         redo A;
       }
-    } elsif ($self->{state} eq 'comment dash') {
+    } elsif ($self->{state} eq 'comment end dash') {
       if ($self->{next_input_character} == 0x002D) { # -
         $self->{state} = 'comment end';
         
@@ -1427,7 +1510,6 @@ sub _get_next_token ($) {
         ## reconsume
 
         return  ($self->{current_token}); # comment
-        undef $self->{current_token};
 
         redo A;
       } else {
@@ -1454,7 +1536,6 @@ sub _get_next_token ($) {
   
 
         return  ($self->{current_token}); # comment
-        undef $self->{current_token};
 
         redo A;
       } elsif ($self->{next_input_character} == 0x002D) { # -
@@ -1475,7 +1556,6 @@ sub _get_next_token ($) {
         ## reconsume
 
         return  ($self->{current_token}); # comment
-        undef $self->{current_token};
 
         redo A;
       } else {
@@ -1592,7 +1672,6 @@ sub _get_next_token ($) {
   
 
         return  ($self->{current_token}); # DOCTYPE
-        undef $self->{current_token};
 
         redo A;
       } elsif ($self->{next_input_character} == -1) {
@@ -1602,7 +1681,6 @@ sub _get_next_token ($) {
 
         delete $self->{current_token}->{correct};
         return  ($self->{current_token}); # DOCTYPE
-        undef $self->{current_token};
 
         redo A;
       } else {
@@ -1644,7 +1722,6 @@ sub _get_next_token ($) {
   
 
         return  ($self->{current_token}); # DOCTYPE
-        undef $self->{current_token};
 
         redo A;
       } elsif ($self->{next_input_character} == -1) {
@@ -1654,7 +1731,6 @@ sub _get_next_token ($) {
 
         delete $self->{current_token}->{correct};
         return  ($self->{current_token}); # DOCTYPE
-        undef $self->{current_token};
 
         redo A;
       } elsif ($self->{next_input_character} == 0x0050 or # P
@@ -1848,7 +1924,6 @@ sub _get_next_token ($) {
 
         delete $self->{current_token}->{correct};
         return  ($self->{current_token}); # DOCTYPE
-        undef $self->{current_token};
 
         redo A;
       } elsif ($self->{next_input_character} == -1) {
@@ -1859,7 +1934,6 @@ sub _get_next_token ($) {
 
         delete $self->{current_token}->{correct};
         return  ($self->{current_token}); # DOCTYPE
-        undef $self->{current_token};
 
         redo A;
       } else {
@@ -1893,7 +1967,6 @@ sub _get_next_token ($) {
 
         delete $self->{current_token}->{correct};
         return  ($self->{current_token}); # DOCTYPE
-        undef $self->{current_token};
 
         redo A;
       } else {
@@ -1928,7 +2001,6 @@ sub _get_next_token ($) {
 
         delete $self->{current_token}->{correct};
         return  ($self->{current_token}); # DOCTYPE
-        undef $self->{current_token};
 
         redo A;
       } else {
@@ -1991,7 +2063,6 @@ sub _get_next_token ($) {
   
 
         return  ($self->{current_token}); # DOCTYPE
-        undef $self->{current_token};
 
         redo A;
       } elsif ($self->{next_input_character} == -1) {
@@ -2002,7 +2073,6 @@ sub _get_next_token ($) {
 
         delete $self->{current_token}->{correct};
         return  ($self->{current_token}); # DOCTYPE
-        undef $self->{current_token};
 
         redo A;
       } else {
@@ -2066,7 +2136,6 @@ sub _get_next_token ($) {
 
         delete $self->{current_token}->{correct};
         return  ($self->{current_token}); # DOCTYPE
-        undef $self->{current_token};
 
         redo A;
       } elsif ($self->{next_input_character} == -1) {
@@ -2077,7 +2146,6 @@ sub _get_next_token ($) {
 
         delete $self->{current_token}->{correct};
         return  ($self->{current_token}); # DOCTYPE
-        undef $self->{current_token};
 
         redo A;
       } else {
@@ -2111,7 +2179,6 @@ sub _get_next_token ($) {
 
         delete $self->{current_token}->{correct};
         return  ($self->{current_token}); # DOCTYPE
-        undef $self->{current_token};
 
         redo A;
       } else {
@@ -2146,7 +2213,6 @@ sub _get_next_token ($) {
 
         delete $self->{current_token}->{correct};
         return  ($self->{current_token}); # DOCTYPE
-        undef $self->{current_token};
 
         redo A;
       } else {
@@ -2187,7 +2253,6 @@ sub _get_next_token ($) {
   
 
         return  ($self->{current_token}); # DOCTYPE
-        undef $self->{current_token};
 
         redo A;
       } elsif ($self->{next_input_character} == -1) {
@@ -2198,7 +2263,6 @@ sub _get_next_token ($) {
 
         delete $self->{current_token}->{correct};
         return  ($self->{current_token}); # DOCTYPE
-        undef $self->{current_token};
 
         redo A;
       } else {
@@ -2226,7 +2290,6 @@ sub _get_next_token ($) {
 
         delete $self->{current_token}->{correct};
         return  ($self->{current_token}); # DOCTYPE
-        undef $self->{current_token};
 
         redo A;
       } elsif ($self->{next_input_character} == -1) {
@@ -2236,7 +2299,6 @@ sub _get_next_token ($) {
 
         delete $self->{current_token}->{correct};
         return  ($self->{current_token}); # DOCTYPE
-        undef $self->{current_token};
 
         redo A;
       } else {
@@ -3541,27 +3603,28 @@ sub _tree_construction_main ($) {
           }
         } # INSCOPE
           
+        ## NOTE: See <http://html5.org/tools/web-apps-tracker?from=925&to=926>
         ## has an element in scope
-        my $i;
-        INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
-          my $node = $self->{open_elements}->[$_];
-          if ({
-               h1 => 1, h2 => 1, h3 => 1, h4 => 1, h5 => 1, h6 => 1,
-              }->{$node->[1]}) {
-            $i = $_;
-            last INSCOPE;
-          } elsif ({
-                    table => 1, caption => 1, td => 1, th => 1,
-                    button => 1, marquee => 1, object => 1, html => 1,
-                   }->{$node->[1]}) {
-            last INSCOPE;
-          }
-        } # INSCOPE
-          
-        if (defined $i) {
-          $self->{parse_error}-> (type => 'in hn:hn');
-          splice @{$self->{open_elements}}, $i;
-        }
+        #my $i;
+        #INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
+        #  my $node = $self->{open_elements}->[$_];
+        #  if ({
+        #       h1 => 1, h2 => 1, h3 => 1, h4 => 1, h5 => 1, h6 => 1,
+        #      }->{$node->[1]}) {
+        #    $i = $_;
+        #    last INSCOPE;
+        #  } elsif ({
+        #            table => 1, caption => 1, td => 1, th => 1,
+        #            button => 1, marquee => 1, object => 1, html => 1,
+        #           }->{$node->[1]}) {
+        #    last INSCOPE;
+        #  }
+        #} # INSCOPE
+        #  
+        #if (defined $i) {
+        #  !!! parse-error (type => 'in hn:hn');
+        #  splice @{$self->{open_elements}}, $i;
+        #}
           
         
     {
@@ -6608,6 +6671,8 @@ sub get_inner_html ($$$) {
         spacer => 1, wbr => 1,
       }->{$tag_name};
 
+      $s .= "\x0A" if $tag_name eq 'pre' or $tag_name eq 'textarea';
+
       if (not $in_cdata and {
         style => 1, script => 1, xmp => 1, iframe => 1,
         noembed => 1, noframes => 1, noscript => 1,
@@ -6645,4 +6710,4 @@ sub get_inner_html ($$$) {
 } # get_inner_html
 
 1;
-# $Date: 2007/06/23 14:55:45 $
+# $Date: 2007/06/23 16:01:36 $

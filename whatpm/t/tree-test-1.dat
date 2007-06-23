@@ -895,3 +895,54 @@ isindex
 |   <head>
 |   <body>
 |     <form>
+
+#data
+</style>
+#errors
+#document-fragment style
+| "</style>"
+
+#data
+</style>abc
+#errors
+#document-fragment style
+| "</style>abc"
+
+#data
+</stylesheet
+#errors
+#document-fragment style
+| "</stylesheet"
+
+#data
+</title>
+#errors
+#document-fragment title
+| "</title>"
+
+#data
+</title>abc
+#errors
+#document-fragment title
+| "</title>abc"
+
+#data
+</titletext
+#errors
+#document-fragment title
+| "</titletext"
+
+#data
+<!DOCTYPE HTML><h1><a><h2>
+#errors
+h1 not closed
+a not closed
+h2 not closed
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <h1>
+|       <a>
+|         <h2>

@@ -1,7 +1,7 @@
 1..472
 # Running under perl version 5.008007 for linux
-# Current time local: Sat Jun 23 23:52:17 2007
-# Current time GMT:   Sat Jun 23 14:52:17 2007
+# Current time local: Sun Jun 24 00:56:39 2007
+# Current time GMT:   Sat Jun 23 15:56:39 2007
 # Using Test.pm version 1.25
 # t/tokenizer-test-2.dat
 ok 1
@@ -108,17 +108,8 @@ ok 67
 ok 68
 ok 69
 ok 70
-not ok 71
-# Test 71 got: "3" (t/HTML-tree.t at line 133 fail #36)
-#    Expected: "2" (Parse error: <h1>Hello<h2>World; 1:5:no DOCTYPE, 1:14:in hn:hn, 1:18:not closed:h2;4: missing document type declaration, 19: mismatched body element end tag (premature end of file?))
-not ok 72
-# Test 72 got: "| <html>\n|   <head>\n|   <body>\n|     <h1>\n|       \"Hello\"\n|     <h2>\n|       \"World\"\n" (t/HTML-tree.t at line 135 fail #36)
-#    Expected: "| <html>\n|   <head>\n|   <body>\n|     <h1>\n|       \"Hello\"\n|       <h2>\n|         \"World\"\n" (Document tree: <h1>Hello<h2>World)
-#    Lines 6-7 are changed:
-#     - "|       <h2>\n"
-#     + "|     <h2>\n"
-#     - "|         \"World\"\n"
-#     + "|       \"World\"\n"
+ok 71
+ok 72
 ok 73
 ok 74
 ok 75
@@ -127,21 +118,8 @@ ok 77
 ok 78
 ok 79
 ok 80
-not ok 81
-# Test 81 got: "2" (t/HTML-tree.t at line 133 fail #41)
-#    Expected: "4" (Parse error: <!--><div>--<!-->; 1:13:dash in comment, 1:17:no DOCTYPE;Incorrect comment token, Missing document type declaration, Incorrect comment token, Unexpected end of file)
-not ok 82
-# Test 82 got: "| <!-- ><div>--<! -->\n| <html>\n" (t/HTML-tree.t at line 135 fail #41)
-#    Expected: "| <!--  -->\n| <html>\n|   <head>\n|   <body>\n|     <div>\n|       \"--\"\n|       <!--  -->\n" (Document tree: <!--><div>--<!-->)
-#    Line 1 is changed:
-#     - "| <!--  -->\n"
-#     + "| <!-- ><div>--<! -->\n"
-#    Lines 3-3 are missing:
-#     - "|   <head>\n"
-#     - "|   <body>\n"
-#     - "|     <div>\n"
-#     - "|       \"--\"\n"
-#     - "|       <!--  -->\n"
+ok 81
+ok 82
 ok 83
 ok 84
 ok 85
@@ -390,15 +368,8 @@ ok 213
 ok 214
 ok 215
 ok 216
-not ok 217
-# Test 217 got: "3" (t/HTML-tree.t at line 133 fail #109)
-#     Expected: "2" (Parse error: <h1><h2>; 1:5:no DOCTYPE, 1:8:in hn:hn, 1:8:not closed:h2;4: missing document type declaration, 9: mismatched body element end tag (premature end of file?))
-not ok 218
-# Test 218 got: "| <html>\n|   <head>\n|   <body>\n|     <h1>\n|     <h2>\n" (t/HTML-tree.t at line 135 fail #109)
-#     Expected: "| <html>\n|   <head>\n|   <body>\n|     <h1>\n|       <h2>\n" (Document tree: <h1><h2>)
-#     Line 5 is changed:
-#      - "|       <h2>\n"
-#      + "|     <h2>\n"
+ok 217
+ok 218
 ok 219
 ok 220
 ok 221
@@ -427,13 +398,8 @@ not ok 239
 ok 240
 not ok 241
 # Test 241 got: "5" (t/HTML-tree.t at line 133 fail #121)
-#     Expected: "4" (Parse error: <h1><table><td><h3></table><h3></h1>; 1:5:no DOCTYPE, 1:16:missing start tag:tr, 1:28:not closed:h3, 1:32:in hn:hn, 1:36:not closed:h3;4: missing document type declaration, 15: required tr element start tag implied by unexpected td element start tag, 27: unexpected td element end tag implied other end tags, Unexpected EOF)
-not ok 242
-# Test 242 got: "| <html>\n|   <head>\n|   <body>\n|     <h1>\n|       <table>\n|         <tbody>\n|           <tr>\n|             <td>\n|               <h3>\n|     <h3>\n" (t/HTML-tree.t at line 135 fail #121)
-#     Expected: "| <html>\n|   <head>\n|   <body>\n|     <h1>\n|       <table>\n|         <tbody>\n|           <tr>\n|             <td>\n|               <h3>\n|       <h3>\n" (Document tree: <h1><table><td><h3></table><h3></h1>)
-#     Line 10 is changed:
-#      - "|       <h3>\n"
-#      + "|     <h3>\n"
+#     Expected: "4" (Parse error: <h1><table><td><h3></table><h3></h1>; 1:5:no DOCTYPE, 1:16:missing start tag:tr, 1:28:not closed:h3, 1:36:not closed:h3, 1:36:not closed:h1;4: missing document type declaration, 15: required tr element start tag implied by unexpected td element start tag, 27: unexpected td element end tag implied other end tags, Unexpected EOF)
+ok 242
 ok 243
 ok 244
 ok 245
@@ -1043,7 +1009,21 @@ ok 583
 ok 584
 ok 585
 ok 586
-not ok 587
-# Test 587 got: "2" (t/HTML-tree.t at line 133 fail #294)
-#     Expected: "1" (Parse error: <!DOCTYPE HTML><form><isindex>; 1:30:isindex, 1:30:not closed:form;isindex)
+ok 587
 ok 588
+ok 589
+ok 590
+ok 591
+ok 592
+ok 593
+ok 594
+ok 595
+ok 596
+ok 597
+ok 598
+ok 599
+ok 600
+not ok 601
+# Test 601 got: "1" (t/HTML-tree.t at line 133 fail #301)
+#     Expected: "3" (Parse error: <!DOCTYPE HTML><h1><a><h2>; 1:26:not closed:h2;h1 not closed, a not closed, h2 not closed)
+ok 602
