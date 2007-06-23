@@ -1,7 +1,7 @@
 1..94
 # Running under perl version 5.008007 for linux
-# Current time local: Sat Jun 23 16:35:39 2007
-# Current time GMT:   Sat Jun 23 07:35:39 2007
+# Current time local: Sat Jun 23 17:13:44 2007
+# Current time GMT:   Sat Jun 23 08:13:44 2007
 # Using Test.pm version 1.25
 # t/tokenizer/test1.test
 not ok 1
@@ -243,20 +243,7 @@ ok 57
 ok 58
 ok 59
 ok 60
-not ok 61
-# Test 61 got: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'StartTag',\n            qq'a',\n            {}\n          ],\n          [\n            qq'StartTag',\n            qq'b',\n            {}\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 146 fail #61)
-#    Expected: "$VAR1 = [\n          [\n            qq'StartTag',\n            qq'a<b',\n            {}\n          ]\n        ];\n" (StartTag containing <: <a<b>)
-#    Got 1 extra line at line 2:
-#     + "          qq'ParseError',\n"
-#    Line 5 is changed:
-#     - "            qq'a<b',\n"
-#     + "            qq'a',\n"
-#    Got 5 extra lines at line 6:
-#     + "            {}\n"
-#     + "          ],\n"
-#     + "          [\n"
-#     + "            qq'StartTag',\n"
-#     + "            qq'b',\n"
+ok 61
 ok 62
 ok 63
 ok 64
@@ -365,3 +352,27 @@ ok 123
 ok 124
 ok 125
 ok 126
+not ok 127
+# Test 127 got: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'</xxx<div>'\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 146 fail #127)
+#     Expected: "$VAR1 = [\n          [\n            qq'Character',\n            qq'</xxx<div'\n          ]\n        ];\n" (cdata end tag containing <: </xxx<div>)
+#     Got 1 extra line at line 2:
+#      + "          qq'ParseError',\n"
+#     Line 5 is changed:
+#      - "            qq'</xxx<div'\n"
+#      + "            qq'</xxx<div>'\n"
+not ok 128
+# Test 128 got: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'</xxx<div>'\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 146 fail #128)
+#     Expected: "$VAR1 = [\n          [\n            qq'Character',\n            qq'</xxx<div'\n          ]\n        ];\n" (cdata end tag containing <: </xxx<div>)
+#     Got 1 extra line at line 2:
+#      + "          qq'ParseError',\n"
+#     Line 5 is changed:
+#      - "            qq'</xxx<div'\n"
+#      + "            qq'</xxx<div>'\n"
+ok 129
+ok 130
+ok 131
+ok 132
+ok 133
+ok 134
+ok 135
+ok 136

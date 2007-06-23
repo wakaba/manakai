@@ -1,7 +1,7 @@
 1..472
 # Running under perl version 5.008007 for linux
-# Current time local: Sat Jun 23 16:35:41 2007
-# Current time GMT:   Sat Jun 23 07:35:41 2007
+# Current time local: Sat Jun 23 17:13:47 2007
+# Current time GMT:   Sat Jun 23 08:13:47 2007
 # Using Test.pm version 1.25
 # t/tokenizer-test-2.dat
 ok 1
@@ -513,17 +513,9 @@ not ok 282
 #      - "|   <head>\n"
 #      - "|   <body>\n"
 not ok 283
-# Test 283 got: "5" (t/HTML-tree.t at line 133 fail #142)
-#     Expected: "4" (Parse error: <!DOCTYPE HTML></b test<b &=&amp>X; 1:24:unclosed tag, 1:24:end tag attribute, 1:24:unmatched end tag:b, 1:33:refc, 1:34:not closed:b;Unexpected < in attribute, End tag contains attributes., Unexpected end tag., Named entity didn't end with ;)
-not ok 284
-# Test 284 got: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|   <body>\n|     <b>\n|       &=\"&\"\n|       \"X\"\n" (t/HTML-tree.t at line 135 fail #142)
-#     Expected: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|   <body>\n|     \"X\"\n" (Document tree: <!DOCTYPE HTML></b test<b &=&amp>X)
-#     Line 5 is changed:
-#      - "|     \"X\"\n"
-#      + "|     <b>\n"
-#     Got 2 extra lines at line 6:
-#      + "|       &=\"&\"\n"
-#      + "|       \"X\"\n"
+# Test 283 got: "3" (t/HTML-tree.t at line 133 fail #142)
+#     Expected: "4" (Parse error: <!DOCTYPE HTML></b test<b &=&amp>X; 1:33:refc, 1:33:end tag attribute, 1:34:unmatched end tag:b;Unexpected < in attribute, End tag contains attributes., Unexpected end tag., Named entity didn't end with ;)
+ok 284
 not ok 285
 # Test 285 got: "3" (t/HTML-tree.t at line 133 fail #143)
 #     Expected: "2" (Parse error: <!doctypehtml><scrIPt type=text/x-foobar;baz>X</SCRipt; 1:10:no space before DOCTYPE name, 1:54:unclosed tag, 1:54:not closed:head;No space after literal DOCTYPE., Unexpected EOF in (end) tag name)

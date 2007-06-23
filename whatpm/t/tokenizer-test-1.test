@@ -215,6 +215,44 @@
 
 {"description":"&amp;;",
 "input":"&amp;;",
-"output":[["Character", "&;"]]}
+"output":[["Character", "&;"]]},
+
+{"description":"cdata end tag containing <",
+"contentModelFlags":["RCDATA","CDATA"],
+"lastStartTag":"xxx",
+"input":"</xxx<div>",
+"output":[["Character", "</xxx<div"]]},
+
+{"description":"< in tag name state",
+"input":"<p<div>",
+"output":[["StartTag", "p<div", {}]]},
+
+{"description":"< in before attribute name state",
+"input":"<p <div>",
+"output":[["StartTag", "p", {"<div":""}]]},
+
+{"description":"< in attribute name state",
+"input":"<p align<div>",
+"output":[["StartTag", "p", {"align<div":""}]]},
+
+{"description":"< in after attribute name state",
+"input":"<p align <div>",
+"output":[["StartTag", "p", {"align":"","<div":""}]]},
+
+{"description":"< in before attribute value state",
+"input":"<p align=<div>",
+"output":[["StartTag", "p", {"align":"<div"}]]},
+
+{"description":"< in attribute value (unquoted) state",
+"input":"<p align=left<div>",
+"output":[["StartTag", "p", {"align":"left<div"}]]},
+
+{"description":"< in attribute value (single-unquoted) state",
+"input":"<p align='left<div>",
+"output":["ParseError", ["StartTag", "p", {"align":"left<div>"}]]},
+
+{"description":"< in attribute value (double-unquoted) state",
+"input":"<p align=\u0022left<div>",
+"output":["ParseError", ["StartTag", "p", {"align":"left<div>"}]]}
 
 ]}

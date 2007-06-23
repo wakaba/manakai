@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.16 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.17 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## This is an early version of an HTML parser.
 
@@ -420,7 +420,6 @@ sub _get_next_token ($) {
                 $self->{next_input_character} == 0x0020 or # SP 
                 $self->{next_input_character} == 0x003E or # >
                 $self->{next_input_character} == 0x002F or # /
-                $self->{next_input_character} == 0x003C or # <
                 $self->{next_input_character} == -1) {
           $self->{parse_error}-> (type => 'unmatched end tag');
           $self->{next_input_character} = shift @next_char; # reconsume
@@ -540,8 +539,7 @@ sub _get_next_token ($) {
       }
   
         redo A;
-      } elsif ($self->{next_input_character} == 0x003C or # <
-               $self->{next_input_character} == -1) {
+      } elsif ($self->{next_input_character} == -1) {
         $self->{parse_error}-> (type => 'unclosed tag');
         if ($self->{current_token}->{type} eq 'start tag') {
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
@@ -663,8 +661,7 @@ sub _get_next_token ($) {
         ## Stay in the state
         # next-input-character is already done
         redo A;
-      } elsif ($self->{next_input_character} == 0x003C or # <
-               $self->{next_input_character} == -1) {
+      } elsif ($self->{next_input_character} == -1) {
         $self->{parse_error}-> (type => 'unclosed tag');
         if ($self->{current_token}->{type} eq 'start tag') {
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
@@ -791,8 +788,7 @@ sub _get_next_token ($) {
         $self->{state} = 'before attribute name';
         # next-input-character is already done
         redo A;
-      } elsif ($self->{next_input_character} == 0x003C or # <
-               $self->{next_input_character} == -1) {
+      } elsif ($self->{next_input_character} == -1) {
         $self->{parse_error}-> (type => 'unclosed tag');
         $before_leave->();
         if ($self->{current_token}->{type} eq 'start tag') {
@@ -905,8 +901,7 @@ sub _get_next_token ($) {
         $self->{state} = 'before attribute name';
         # next-input-character is already done
         redo A;
-      } elsif ($self->{next_input_character} == 0x003C or # <
-               $self->{next_input_character} == -1) {
+      } elsif ($self->{next_input_character} == -1) {
         $self->{parse_error}-> (type => 'unclosed tag');
         if ($self->{current_token}->{type} eq 'start tag') {
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
@@ -1001,8 +996,7 @@ sub _get_next_token ($) {
         undef $self->{current_token};
 
         redo A;
-      } elsif ($self->{next_input_character} == 0x003C or # <
-               $self->{next_input_character} == -1) {
+      } elsif ($self->{next_input_character} == -1) {
         $self->{parse_error}-> (type => 'unclosed tag');
         if ($self->{current_token}->{type} eq 'start tag') {
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
@@ -1189,8 +1183,7 @@ sub _get_next_token ($) {
         undef $self->{current_token};
 
         redo A;
-      } elsif ($self->{next_input_character} == 0x003C or # <
-               $self->{next_input_character} == -1) {
+      } elsif ($self->{next_input_character} == -1) {
         $self->{parse_error}-> (type => 'unclosed tag');
         if ($self->{current_token}->{type} eq 'start tag') {
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
@@ -5956,4 +5949,4 @@ sub get_inner_html ($$$) {
 } # get_inner_html
 
 1;
-# $Date: 2007/06/23 07:42:11 $
+# $Date: 2007/06/23 08:15:21 $
