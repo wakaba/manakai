@@ -14,13 +14,12 @@ require Whatpm::ContentChecker;
 
 ## ISSUE: Currently we require manakai XML parser to test arbitrary XML tree.
 use lib qw[/home/wakaba/work/manakai/lib];
-require Message::DOM::DOMCore;
-require Message::DOM::XMLParser;
+require Message::DOM::DOMImplementation;
+require Message::DOM::XMLParserTemp;
 require Whatpm::HTML;
 require Whatpm::NanoDOM;
 
-my $dom = $Message::DOM::DOMImplementationRegistry->get_dom_implementation;
-my $parser = $dom->create_ls_parser (1);
+my $dom = Message::DOM::DOMImplementation->____new;
 
 for my $file_name (@FILES) {
   open my $file, '<', $file_name or die "$0: $file_name: $!";
@@ -62,7 +61,9 @@ sub test ($) {
 
   my $doc;
   if ($test->{parse_as} eq 'xml') {
-    $doc = $parser->parse ({string_data => $test->{data}});
+    open my $fh, '<', \($test->{data});
+    $doc = Message::DOM::XMLParserTemp->parse_byte_stream
+      ($fh => $dom, sub { }, charset => 'utf-8');
     ## NOTE: There should be no well-formedness error; if there is,
     ## then it is an error of the test case itself.
   } else {
@@ -108,4 +109,4 @@ sub get_node_path ($) {
 } # get_node_path
 
 ## License: Public Domain.
-## $Date: 2007/06/05 00:56:43 $
+## $Date: 2007/06/23 02:59:48 $

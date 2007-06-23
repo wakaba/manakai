@@ -1,5 +1,15 @@
 2007-06-23  Wakaba  <wakaba@suika.fam.cx>
 
+	* ContentChecker.t: Use NanoDOM-based manakai for XHTML.
+	Note that a test fails that assumes XML attribute value
+	normalization fails since XMLParserTemp.pm does
+	not normalize white space in attribute value when
+	creating an attribute node (and new NanoDOM-based
+	manakai's Attr.value does not normalize white space
+	for more Web compatibility).
+
+2007-06-23  Wakaba  <wakaba@suika.fam.cx>
+
 	* Makefile, HTML-tokenizer.t, HTML-tree.t: New test
 	files are added.
 
