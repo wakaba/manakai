@@ -69,6 +69,56 @@ id="a"></p>
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"
+id=" "></p>
+#errors
+/p/@id;space in ID
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+id="&#x9;"></p>
+#errors
+/p/@id;space in ID
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+id="&#xA;"></p>
+#errors
+/p/@id;space in ID
+
+#data
+<?xml version="1.1"?>
+<p xmlns="http://www.w3.org/1999/xhtml"
+id="&#xB;"></p>
+#errors
+/p/@id;space in ID
+
+#data
+<?xml version="1.1"?>
+<p xmlns="http://www.w3.org/1999/xhtml"
+id="&#xC;"></p>
+#errors
+/p/@id;space in ID
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+id="&#xD;"></p>
+#errors
+/p/@id;space in ID
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+id="a "></p>
+#errors
+/p/@id;space in ID
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+id="a b"></p>
+#errors
+/p/@id;space in ID
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
 id="aaaaaaa"></p>
 #errors
 
@@ -77,6 +127,14 @@ id="aaaaaaa"></p>
 id="a"><span id="a"></span></p>
 #errors
 /p/span/@id;duplicate ID
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"
+id="a b"><span id="a b"></span></p>
+#errors
+/p/@id;space in ID
+/p/span/@id;duplicate ID
+/p/span/@id;space in ID
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"
@@ -100,6 +158,9 @@ id=""><span id=""></span></p>
   <span id=" a "/>
 </p>
 #errors
+/p/span/@id;space in ID
+/p/span/@id;space in ID
+/p/span/@id;space in ID
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml">
@@ -1563,6 +1624,23 @@ id=""><span id=""></span></p>
 <p><img src="http://test/" alt="" usemap="#aa"/></p>
 </div>
 #errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<map id="a a"/>
+<p><img src="http://test/" alt="" usemap="#a a"/></p>
+</div>
+#errors
+/div/map/@id;space in ID
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<map id="a a"/>
+<p><img src="http://test/" alt="" usemap="#a%20a"/></p>
+</div>
+#errors
+/div/map/@id;space in ID
+/div/p/img/@usemap;no referenced map
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">

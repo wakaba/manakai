@@ -861,6 +861,7 @@ my $HTMLUsemapAttrChecker = sub {
   } else {
     $self->{onerror}->(node => $attr, type => 'hashed idref syntax error');
   }
+  ## NOTE: Space characters in hashed ID references are conforming.
   ## ISSUE: UA algorithm for matching is case-insensitive; IDs only different in cases should be reported
 }; # $HTMLUsemapAttrChecker
 
@@ -891,7 +892,9 @@ my $HTMLAttrChecker = {
       } else {
         $self->{id}->{$value} = 1;
       }
-      ## TODO: no space characters <http://html5.org/tools/web-apps-tracker?from=880&to=881>
+      if ($value =~ /[\x09-\x0D\x20]/) {
+        $self->{onerror}->(node => $attr, type => 'space in ID');
+      }
     } else {
       ## NOTE: MUST contain at least one character
       $self->{onerror}->(node => $attr, type => 'attribute value is empty');
@@ -2049,6 +2052,9 @@ $Element->{$HTML_NS}->{map} = {
         ## NOTE: MUST contain at least one character
         $self->{onerror}->(node => $attr, type => 'attribute value is empty');
       }
+      if ($value =~ /[\x09-\x0D\x20]/) {
+        $self->{onerror}->(node => $attr, type => 'space in ID');
+      }
       $self->{map}->{$value} ||= $attr;
     },
   }),
@@ -2835,4 +2841,4 @@ sub _check_get_children ($$) {
 } # _check_get_children
 
 1;
-# $Date: 2007/06/23 02:26:51 $
+# $Date: 2007/06/23 04:22:57 $
