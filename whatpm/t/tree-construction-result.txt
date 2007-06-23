@@ -1,7 +1,7 @@
 1..472
 # Running under perl version 5.008007 for linux
-# Current time local: Sat Jun 23 23:30:22 2007
-# Current time GMT:   Sat Jun 23 14:30:22 2007
+# Current time local: Sat Jun 23 23:52:17 2007
+# Current time GMT:   Sat Jun 23 14:52:17 2007
 # Using Test.pm version 1.25
 # t/tokenizer-test-2.dat
 ok 1
@@ -1033,3 +1033,17 @@ not ok 575
 # Test 575 got: "2" (t/HTML-tree.t at line 133 fail #288)
 #     Expected: "1" (Parse error: <!DOCTYPE HTML><table><thead><tr><td></body>; 1:44:unmatched end tag:body, 1:44:not closed:thead;table not closed)
 ok 576
+ok 577
+ok 578
+ok 579
+ok 580
+ok 581
+ok 582
+ok 583
+ok 584
+ok 585
+ok 586
+not ok 587
+# Test 587 got: "2" (t/HTML-tree.t at line 133 fail #294)
+#     Expected: "1" (Parse error: <!DOCTYPE HTML><form><isindex>; 1:30:isindex, 1:30:not closed:form;isindex)
+ok 588

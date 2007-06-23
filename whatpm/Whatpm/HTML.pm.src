@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.21 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.22 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## ISSUE:
 ## var doc = implementation.createDocument (null, null, null);
@@ -2878,22 +2878,33 @@ sub _tree_construction_main ($) {
           return;
         } else {
           my $at = $token->{attributes};
+          my $form_attrs;
+          $form_attrs->{action} = $at->{action} if $at->{action};
+          my $prompt_attr = $at->{prompt};
           $at->{name} = {name => 'name', value => 'isindex'};
+          delete $at->{action};
+          delete $at->{prompt};
           my @tokens = (
-                        {type => 'start tag', tag_name => 'form'},
+                        {type => 'start tag', tag_name => 'form',
+                         attributes => $form_attrs},
                         {type => 'start tag', tag_name => 'hr'},
                         {type => 'start tag', tag_name => 'p'},
                         {type => 'start tag', tag_name => 'label'},
-                        {type => 'character',
-                         data => 'This is a searchable index. Insert your search keywords here: '}, # SHOULD
-                        ## TODO: make this configurable
+                       );
+          if ($prompt_attr) {
+            push @tokens, {type => 'character', data => $prompt_attr->{value}};
+          } else {
+            push @tokens, {type => 'character',
+                           data => 'This is a searchable index. Insert your search keywords here: '}; # SHOULD
+            ## TODO: make this configurable
+          }
+          push @tokens,
                         {type => 'start tag', tag_name => 'input', attributes => $at},
                         #{type => 'character', data => ''}, # SHOULD
                         {type => 'end tag', tag_name => 'label'},
                         {type => 'end tag', tag_name => 'p'},
                         {type => 'start tag', tag_name => 'hr'},
-                        {type => 'end tag', tag_name => 'form'},
-                       );
+                        {type => 'end tag', tag_name => 'form'};
           $token = shift @tokens;
           !!!back-token (@tokens);
           return;
@@ -5343,4 +5354,4 @@ sub get_inner_html ($$$) {
 } # get_inner_html
 
 1;
-# $Date: 2007/06/23 14:34:39 $
+# $Date: 2007/06/23 14:55:45 $
