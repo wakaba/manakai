@@ -1,7 +1,7 @@
 1..94
 # Running under perl version 5.008007 for linux
-# Current time local: Sat Jun 23 15:43:29 2007
-# Current time GMT:   Sat Jun 23 06:43:29 2007
+# Current time local: Sat Jun 23 16:35:39 2007
+# Current time GMT:   Sat Jun 23 07:35:39 2007
 # Using Test.pm version 1.25
 # t/tokenizer/test1.test
 not ok 1
@@ -105,12 +105,7 @@ ok 30
 ok 31
 ok 32
 ok 33
-not ok 34
-# Test 34 got: "$VAR1 = [\n          [\n            qq'Character',\n            qq'I\\x{27}m '\n          ],\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\\x{2209}'\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 146 fail #34)
-#    Expected: "$VAR1 = [\n          [\n            qq'Character',\n            qq'I\\x{27}m '\n          ],\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\\x{AC}in'\n          ]\n        ];\n" (Entity without trailing semicolon (2): I'm &notin)
-#    Line 9 is changed:
-#     - "            qq'\\x{AC}in'\n"
-#     + "            qq'\\x{2209}'\n"
+ok 34
 ok 35
 ok 36
 ok 37
@@ -366,11 +361,7 @@ ok 119
 ok 120
 ok 121
 ok 122
-not ok 123
-# Test 123 got: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'&TRADE;'\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 146 fail #123)
-#     Expected: "$VAR1 = [\n          [\n            qq'Character',\n            qq'\\x{2122}'\n          ]\n        ];\n" (&TRADE;: &TRADE;)
-#     Got 1 extra line at line 2:
-#      + "          qq'ParseError',\n"
-#     Line 5 is changed:
-#      - "            qq'\\x{2122}'\n"
-#      + "            qq'&TRADE;'\n"
+ok 123
+ok 124
+ok 125
+ok 126

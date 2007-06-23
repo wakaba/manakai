@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.15 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.16 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## This is an early version of an HTML parser.
 
@@ -17,268 +17,6 @@ my $permitted_slash_tag_name = {
   col => 1,
   input => 1,
 };
-
-my $entity_char = {
-  AElig => "\x{00C6}",
-  Aacute => "\x{00C1}",
-  Acirc => "\x{00C2}",
-  Agrave => "\x{00C0}",
-  Alpha => "\x{0391}",
-  Aring => "\x{00C5}",
-  Atilde => "\x{00C3}",
-  Auml => "\x{00C4}",
-  Beta => "\x{0392}",
-  Ccedil => "\x{00C7}",
-  Chi => "\x{03A7}",
-  Dagger => "\x{2021}",
-  Delta => "\x{0394}",
-  ETH => "\x{00D0}",
-  Eacute => "\x{00C9}",
-  Ecirc => "\x{00CA}",
-  Egrave => "\x{00C8}",
-  Epsilon => "\x{0395}",
-  Eta => "\x{0397}",
-  Euml => "\x{00CB}",
-  Gamma => "\x{0393}",
-  Iacute => "\x{00CD}",
-  Icirc => "\x{00CE}",
-  Igrave => "\x{00CC}",
-  Iota => "\x{0399}",
-  Iuml => "\x{00CF}",
-  Kappa => "\x{039A}",
-  Lambda => "\x{039B}",
-  Mu => "\x{039C}",
-  Ntilde => "\x{00D1}",
-  Nu => "\x{039D}",
-  OElig => "\x{0152}",
-  Oacute => "\x{00D3}",
-  Ocirc => "\x{00D4}",
-  Ograve => "\x{00D2}",
-  Omega => "\x{03A9}",
-  Omicron => "\x{039F}",
-  Oslash => "\x{00D8}",
-  Otilde => "\x{00D5}",
-  Ouml => "\x{00D6}",
-  Phi => "\x{03A6}",
-  Pi => "\x{03A0}",
-  Prime => "\x{2033}",
-  Psi => "\x{03A8}",
-  Rho => "\x{03A1}",
-  Scaron => "\x{0160}",
-  Sigma => "\x{03A3}",
-  THORN => "\x{00DE}",
-  Tau => "\x{03A4}",
-  Theta => "\x{0398}",
-  Uacute => "\x{00DA}",
-  Ucirc => "\x{00DB}",
-  Ugrave => "\x{00D9}",
-  Upsilon => "\x{03A5}",
-  Uuml => "\x{00DC}",
-  Xi => "\x{039E}",
-  Yacute => "\x{00DD}",
-  Yuml => "\x{0178}",
-  Zeta => "\x{0396}",
-  aacute => "\x{00E1}",
-  acirc => "\x{00E2}",
-  acute => "\x{00B4}",
-  aelig => "\x{00E6}",
-  agrave => "\x{00E0}",
-  alefsym => "\x{2135}",
-  alpha => "\x{03B1}",
-  amp => "\x{0026}",
-  AMP => "\x{0026}",
-  and => "\x{2227}",
-  ang => "\x{2220}",
-  apos => "\x{0027}",
-  aring => "\x{00E5}",
-  asymp => "\x{2248}",
-  atilde => "\x{00E3}",
-  auml => "\x{00E4}",
-  bdquo => "\x{201E}",
-  beta => "\x{03B2}",
-  brvbar => "\x{00A6}",
-  bull => "\x{2022}",
-  cap => "\x{2229}",
-  ccedil => "\x{00E7}",
-  cedil => "\x{00B8}",
-  cent => "\x{00A2}",
-  chi => "\x{03C7}",
-  circ => "\x{02C6}",
-  clubs => "\x{2663}",
-  cong => "\x{2245}",
-  copy => "\x{00A9}",
-  COPY => "\x{00A9}",
-  crarr => "\x{21B5}",
-  cup => "\x{222A}",
-  curren => "\x{00A4}",
-  dArr => "\x{21D3}",
-  dagger => "\x{2020}",
-  darr => "\x{2193}",
-  deg => "\x{00B0}",
-  delta => "\x{03B4}",
-  diams => "\x{2666}",
-  divide => "\x{00F7}",
-  eacute => "\x{00E9}",
-  ecirc => "\x{00EA}",
-  egrave => "\x{00E8}",
-  empty => "\x{2205}",
-  emsp => "\x{2003}",
-  ensp => "\x{2002}",
-  epsilon => "\x{03B5}",
-  equiv => "\x{2261}",
-  eta => "\x{03B7}",
-  eth => "\x{00F0}",
-  euml => "\x{00EB}",
-  euro => "\x{20AC}",
-  exist => "\x{2203}",
-  fnof => "\x{0192}",
-  forall => "\x{2200}",
-  frac12 => "\x{00BD}",
-  frac14 => "\x{00BC}",
-  frac34 => "\x{00BE}",
-  frasl => "\x{2044}",
-  gamma => "\x{03B3}",
-  ge => "\x{2265}",
-  gt => "\x{003E}",
-  GT => "\x{003E}",
-  hArr => "\x{21D4}",
-  harr => "\x{2194}",
-  hearts => "\x{2665}",
-  hellip => "\x{2026}",
-  iacute => "\x{00ED}",
-  icirc => "\x{00EE}",
-  iexcl => "\x{00A1}",
-  igrave => "\x{00EC}",
-  image => "\x{2111}",
-  infin => "\x{221E}",
-  int => "\x{222B}",
-  iota => "\x{03B9}",
-  iquest => "\x{00BF}",
-  isin => "\x{2208}",
-  iuml => "\x{00EF}",
-  kappa => "\x{03BA}",
-  lArr => "\x{21D0}",
-  lambda => "\x{03BB}",
-  lang => "\x{2329}",
-  laquo => "\x{00AB}",
-  larr => "\x{2190}",
-  lceil => "\x{2308}",
-  ldquo => "\x{201C}",
-  le => "\x{2264}",
-  lfloor => "\x{230A}",
-  lowast => "\x{2217}",
-  loz => "\x{25CA}",
-  lrm => "\x{200E}",
-  lsaquo => "\x{2039}",
-  lsquo => "\x{2018}",
-  lt => "\x{003C}",
-  LT => "\x{003C}",
-  macr => "\x{00AF}",
-  mdash => "\x{2014}",
-  micro => "\x{00B5}",
-  middot => "\x{00B7}",
-  minus => "\x{2212}",
-  mu => "\x{03BC}",
-  nabla => "\x{2207}",
-  nbsp => "\x{00A0}",
-  ndash => "\x{2013}",
-  ne => "\x{2260}",
-  ni => "\x{220B}",
-  not => "\x{00AC}",
-  notin => "\x{2209}",
-  nsub => "\x{2284}",
-  ntilde => "\x{00F1}",
-  nu => "\x{03BD}",
-  oacute => "\x{00F3}",
-  ocirc => "\x{00F4}",
-  oelig => "\x{0153}",
-  ograve => "\x{00F2}",
-  oline => "\x{203E}",
-  omega => "\x{03C9}",
-  omicron => "\x{03BF}",
-  oplus => "\x{2295}",
-  or => "\x{2228}",
-  ordf => "\x{00AA}",
-  ordm => "\x{00BA}",
-  oslash => "\x{00F8}",
-  otilde => "\x{00F5}",
-  otimes => "\x{2297}",
-  ouml => "\x{00F6}",
-  para => "\x{00B6}",
-  part => "\x{2202}",
-  permil => "\x{2030}",
-  perp => "\x{22A5}",
-  phi => "\x{03C6}",
-  pi => "\x{03C0}",
-  piv => "\x{03D6}",
-  plusmn => "\x{00B1}",
-  pound => "\x{00A3}",
-  prime => "\x{2032}",
-  prod => "\x{220F}",
-  prop => "\x{221D}",
-  psi => "\x{03C8}",
-  quot => "\x{0022}",
-  QUOT => "\x{0022}",
-  rArr => "\x{21D2}",
-  radic => "\x{221A}",
-  rang => "\x{232A}",
-  raquo => "\x{00BB}",
-  rarr => "\x{2192}",
-  rceil => "\x{2309}",
-  rdquo => "\x{201D}",
-  real => "\x{211C}",
-  reg => "\x{00AE}",
-  REG => "\x{00AE}",
-  rfloor => "\x{230B}",
-  rho => "\x{03C1}",
-  rlm => "\x{200F}",
-  rsaquo => "\x{203A}",
-  rsquo => "\x{2019}",
-  sbquo => "\x{201A}",
-  scaron => "\x{0161}",
-  sdot => "\x{22C5}",
-  sect => "\x{00A7}",
-  shy => "\x{00AD}",
-  sigma => "\x{03C3}",
-  sigmaf => "\x{03C2}",
-  sim => "\x{223C}",
-  spades => "\x{2660}",
-  sub => "\x{2282}",
-  sube => "\x{2286}",
-  sum => "\x{2211}",
-  sup => "\x{2283}",
-  sup1 => "\x{00B9}",
-  sup2 => "\x{00B2}",
-  sup3 => "\x{00B3}",
-  supe => "\x{2287}",
-  szlig => "\x{00DF}",
-  tau => "\x{03C4}",
-  there4 => "\x{2234}",
-  theta => "\x{03B8}",
-  thetasym => "\x{03D1}",
-  thinsp => "\x{2009}",
-  thorn => "\x{00FE}",
-  tilde => "\x{02DC}",
-  times => "\x{00D7}",
-  trade => "\x{2122}",
-  uArr => "\x{21D1}",
-  uacute => "\x{00FA}",
-  uarr => "\x{2191}",
-  ucirc => "\x{00FB}",
-  ugrave => "\x{00F9}",
-  uml => "\x{00A8}",
-  upsih => "\x{03D2}",
-  upsilon => "\x{03C5}",
-  uuml => "\x{00FC}",
-  weierp => "\x{2118}",
-  xi => "\x{03BE}",
-  yacute => "\x{00FD}",
-  yen => "\x{00A5}",
-  yuml => "\x{00FF}",
-  zeta => "\x{03B6}",
-  zwj => "\x{200D}",
-  zwnj => "\x{200C}",
-}; # $entity_char
 
 my $c1_entity_char = {
   0x80 => 0x20AC,
@@ -2152,19 +1890,34 @@ sub _tokenize_attempt_to_consume_an_entity ($) {
 
     my $value = $entity_name;
     my $match;
+    require Whatpm::_NamedEntityList;
+    our $EntityChar;
 
     while (length $entity_name < 10 and
            ## NOTE: Some number greater than the maximum length of entity name
-           ((0x0041 <= $self->{next_input_character} and
-             $self->{next_input_character} <= 0x005A) or
-            (0x0061 <= $self->{next_input_character} and
-             $self->{next_input_character} <= 0x007A) or
-            (0x0030 <= $self->{next_input_character} and
-             $self->{next_input_character} <= 0x0039))) {
+           ((0x0041 <= $self->{next_input_character} and # a
+             $self->{next_input_character} <= 0x005A) or # x
+            (0x0061 <= $self->{next_input_character} and # a
+             $self->{next_input_character} <= 0x007A) or # z
+            (0x0030 <= $self->{next_input_character} and # 0
+             $self->{next_input_character} <= 0x0039) or # 9
+            $self->{next_input_character} == 0x003B)) { # ;
       $entity_name .= chr $self->{next_input_character};
-      if (defined $entity_char->{$entity_name}) {
-        $value = $entity_char->{$entity_name};
-        $match = 1;
+      if (defined $EntityChar->{$entity_name}) {
+        $value = $EntityChar->{$entity_name};
+        if ($self->{next_input_character} == 0x003B) { # ;
+          $match = 1;
+          
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
+          last;
+        } else {
+          $match = -1;
+        }
       } else {
         $value .= chr $self->{next_input_character};
       }
@@ -2177,19 +1930,10 @@ sub _tokenize_attempt_to_consume_an_entity ($) {
   
     }
     
-    if ($match) {
-      if ($self->{next_input_character} == 0x003B) { # ;
-        
-      if (@{$self->{char}}) {
-        $self->{next_input_character} = shift @{$self->{char}};
-      } else {
-        $self->{set_next_input_character}->($self);
-      }
-  
-      } else {
-        $self->{parse_error}-> (type => 'refc');
-      }
-
+    if ($match > 0) {
+      return {type => 'character', data => $value};
+    } elsif ($match < 0) {
+      $self->{parse_error}-> (type => 'refc');
       return {type => 'character', data => $value};
     } else {
       $self->{parse_error}-> (type => 'bare ero');
@@ -6212,4 +5956,4 @@ sub get_inner_html ($$$) {
 } # get_inner_html
 
 1;
-# $Date: 2007/06/23 06:48:24 $
+# $Date: 2007/06/23 07:42:11 $

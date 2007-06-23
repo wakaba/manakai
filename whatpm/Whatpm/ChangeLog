@@ -1,5 +1,19 @@
 2007-06-23  Wakaba  <wakaba@suika.fam.cx>
 
+	* .cvsignore: |Entities.html| is added.
+
+	* HTML.pm.src: |$entity_char| is removed and 
+	requires |Whatpm::_NamedEntityList| instead.
+	HTML5 revision 898 (refc), except that lack of refc
+	is parse error.
+
+	* mkentitylist.pl: New script.
+
+	* Makefile (all): |_NamedEntityList.pm| is added.
+	(_NamedEntityList.pm, Entities.html): New rules.
+
+2007-06-23  Wakaba  <wakaba@suika.fam.cx>
+
 	* HTML.pm.src: Parse errors immediately after U+000D
 	were ignored and U+000D immediately following another
 	U+000D was not converted to U+000A.
