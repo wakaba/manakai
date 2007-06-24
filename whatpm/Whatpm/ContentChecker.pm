@@ -232,7 +232,7 @@ my $HTMLEmptyChecker = sub {
     if ($nt == 1) {
       ## NOTE: |minuses| list is not checked since redundant
       $self->{onerror}->(node => $node, type => 'element not allowed');
-      my ($sib, $ch) = $self->_check_get_children ($node);
+      my ($sib, $ch) = $self->_check_get_children ($node, $todo);
       unshift @nodes, @$sib;
       push @$new_todos, @$ch;
     } elsif ($nt == 3 or $nt == 4) {
@@ -261,7 +261,7 @@ my $HTMLTextChecker = sub {
     if ($nt == 1) {
       ## NOTE: |minuses| list is not checked since redundant
       $self->{onerror}->(node => $node, type => 'element not allowed');
-      my ($sib, $ch) = $self->_check_get_children ($node);
+      my ($sib, $ch) = $self->_check_get_children ($node, $todo);
       unshift @nodes, @$sib;
       push @$new_todos, @$ch;
     } elsif ($nt == 5) {
@@ -301,7 +301,7 @@ my $HTMLStylableBlockChecker = sub {
       }
       $self->{onerror}->(node => $node, type => 'element not allowed')
         if $not_allowed;
-      my ($sib, $ch) = $self->_check_get_children ($node);
+      my ($sib, $ch) = $self->_check_get_children ($node, $todo);
       unshift @nodes, @$sib;
       push @$new_todos, @$ch;
     } elsif ($nt == 3 or $nt == 4) {
@@ -336,7 +336,7 @@ my $HTMLBlockChecker = sub {
         unless $HTMLBlockLevelElements->{$node_ns}->{$node_ln};
       $self->{onerror}->(node => $node, type => 'element not allowed')
         if $not_allowed;
-      my ($sib, $ch) = $self->_check_get_children ($node);
+      my ($sib, $ch) = $self->_check_get_children ($node, $todo);
       unshift @nodes, @$sib;
       push @$new_todos, @$ch;
     } elsif ($nt == 3 or $nt == 4) {
@@ -372,7 +372,7 @@ my $HTMLInlineChecker = sub {
           $HTMLStructuredInlineLevelElements->{$node_ns}->{$node_ln};
       $self->{onerror}->(node => $node, type => 'element not allowed')
         if $not_allowed;
-      my ($sib, $ch) = $self->_check_get_children ($node);
+      my ($sib, $ch) = $self->_check_get_children ($node, $todo);
       unshift @nodes, @$sib;
       push @$new_todos, @$ch;
     } elsif ($nt == 5) {
@@ -410,7 +410,7 @@ my $HTMLStrictlyInlineChecker = sub {
         unless $HTMLStrictlyInlineLevelElements->{$node_ns}->{$node_ln};
       $self->{onerror}->(node => $node, type => 'element not allowed')
         if $not_allowed;
-      my ($sib, $ch) = $self->_check_get_children ($node);
+      my ($sib, $ch) = $self->_check_get_children ($node, $todo);
       unshift @nodes, @$sib;
       push @$new_todos, @$ch;
     } elsif ($nt == 5) {
@@ -455,7 +455,7 @@ my $HTMLInlineOrStrictlyInlineChecker = sub {
       }
       $self->{onerror}->(node => $node, type => 'element not allowed')
         if $not_allowed;
-      my ($sib, $ch) = $self->_check_get_children ($node);
+      my ($sib, $ch) = $self->_check_get_children ($node, $todo);
       unshift @nodes, @$sib;
       push @$new_todos, @$ch;
     } elsif ($nt == 5) {
@@ -517,7 +517,7 @@ my $HTMLBlockOrInlineChecker = sub {
       }
       $self->{onerror}->(node => $node, type => 'element not allowed')
         if $not_allowed;
-      my ($sib, $ch) = $self->_check_get_children ($node);
+      my ($sib, $ch) = $self->_check_get_children ($node, $todo);
       unshift @nodes, @$sib;
       push @$new_todos, @$ch;
     } elsif ($nt == 3 or $nt == 4) {
@@ -600,7 +600,7 @@ my $GetHTMLZeroOrMoreThenBlockOrInlineChecker = sub ($$) {
         }
         $self->{onerror}->(node => $node, type => 'element not allowed')
           if $not_allowed;
-        my ($sib, $ch) = $self->_check_get_children ($node);
+        my ($sib, $ch) = $self->_check_get_children ($node, $todo);
         unshift @nodes, @$sib;
         push @$new_todos, @$ch;
       } elsif ($nt == 3 or $nt == 4) {
@@ -752,13 +752,54 @@ my $HTMLURIAttrChecker = sub {
 ## A space separated list of one or more URIs (or IRIs)
 my $HTMLSpaceURIsAttrChecker = sub {
   my ($self, $attr) = @_;
-  ## TODO: URI or IRI check
+  my $i = 0;
+  for my $value (split /[\x09-\x0D\x20]+/, $attr->value) {
+    Whatpm::URIChecker->check_iri_reference ($value, sub {
+      my %opt = @_;
+      $self->{onerror}->(node => $attr,
+                         type => 'URI['.$i.']:'.$opt{level}.':'.
+                         (defined $opt{position} ? $opt{position} : '').':'.
+                         $opt{type});
+    });
+    $i++;
+  }
   ## ISSUE: Relative references?
   ## ISSUE: Leading or trailing white spaces are conformant?
   ## ISSUE: A sequence of white space characters are conformant?
   ## ISSUE: A zero-length string is conformant? (It does contain a relative reference, i.e. same as base URI.)
   ## NOTE: Duplication seems not an error.
 }; # $HTMLSpaceURIsAttrChecker
+
+my $HTMLDatetimeAttrChecker = sub {
+  my ($self, $attr) = @_;
+  my $value = $attr->value;
+  ## ISSUE: "space", not "space character" (in parsing algorihtm, "space character")
+  if ($value =~ /\A([0-9]{4})-([0-9]{2})-([0-9]{2})(?>[\x09-\x0D\x20]+(?>T[\x09-\x0D\x20]*)?|T[\x09-\x0D\x20]*)([0-9]{2}):([0-9]{2})(?>:([0-9]{2}))?(?>\.([0-9]+))?[\x09-\x0D\x20]*(?>Z|[+-]([0-9]{2}):([0-9]{2}))\z/) {
+    my ($y, $M, $d, $h, $m, $s, $f, $zh, $zm)
+        = ($1, $2, $3, $4, $5, $6, $7, $8, $9);
+    if (0 < $M and $M < 13) { ## ISSUE: This is not explicitly specified (though in parsing algorithm)
+      $self->{onerror}->(node => $attr, type => 'datetime:bad day')
+          if $d < 1 or
+              $d > [0, 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]->[$M];
+      $self->{onerror}->(node => $attr, type => 'datetime:bad day')
+          if $M == 2 and $d == 29 and
+              not ($y % 400 == 0 or ($y % 4 == 0 and $y % 100 != 0));
+    } else {
+      $self->{onerror}->(node => $attr, type => 'datetime:bad month');
+    }
+    $self->{onerror}->(node => $attr, type => 'datetime:bad hour') if $h > 23;
+    $self->{onerror}->(node => $attr, type => 'datetime:bad minute') if $m > 59;
+    $self->{onerror}->(node => $attr, type => 'datetime:bad second')
+        if defined $s and $s > 59;
+    $self->{onerror}->(node => $attr, type => 'datetime:bad timezone hour')
+        if $zh > 23;
+    $self->{onerror}->(node => $attr, type => 'datetime:bad timezone minute')
+        if $zm > 59;
+    ## ISSUE: Maybe timezone -00:00 should have same semantics as in RFC 3339.
+  } else {
+    $self->{onerror}->(node => $attr, type => 'datetime syntax error');
+  }
+}; # $HTMLDatetimeAttrChecker
 
 my $HTMLIntegerAttrChecker = sub {
   my ($self, $attr) = @_;
@@ -917,7 +958,7 @@ my $HTMLAttrChecker = {
   dir => $GetHTMLEnumeratedAttrChecker->({ltr => 1, rtl => 1}),
   class => $HTMLUnorderedSetOfSpaceSeparatedTokensAttrChecker,
   irrelevant => $GetHTMLBooleanAttrChecker->('irrelevant'),
-  ## TODO: tabindex
+  tabindex => $HTMLIntegerAttrChecker,
 };
 
 for (qw/
@@ -1013,7 +1054,7 @@ $Element->{$HTML_NS}->{html} = {
         }
         $self->{onerror}->(node => $node, type => 'element not allowed')
           if $not_allowed;
-        my ($sib, $ch) = $self->_check_get_children ($node);
+        my ($sib, $ch) = $self->_check_get_children ($node, $todo);
         unshift @nodes, @$sib;
         push @$new_todos, @$ch;
       } elsif ($nt == 3 or $nt == 4) {
@@ -1092,7 +1133,7 @@ $Element->{$HTML_NS}->{head} = {
         }
         $self->{onerror}->(node => $node, type => 'element not allowed')
           if $not_allowed;
-        my ($sib, $ch) = $self->_check_get_children ($node);
+        my ($sib, $ch) = $self->_check_get_children ($node, $todo);
         unshift @nodes, @$sib;
         push @$new_todos, @$ch;
       } elsif ($nt == 3 or $nt == 4) {
@@ -1300,35 +1341,62 @@ $Element->{$HTML_NS}->{aside} = {
 
 $Element->{$HTML_NS}->{h1} = {
   attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => $HTMLSignificantStrictlyInlineChecker,
+  checker => sub {
+    my ($self, $todo) = @_;
+    $todo->{flag}->{has_heading}->[0] = 1;
+    return $HTMLSignificantStrictlyInlineChecker->($self, $todo);
+  },
 };
 
 $Element->{$HTML_NS}->{h2} = {
   attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => $HTMLSignificantStrictlyInlineChecker,
+  checker => $Element->{$HTML_NS}->{h1}->{checker},
 };
 
 $Element->{$HTML_NS}->{h3} = {
   attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => $HTMLSignificantStrictlyInlineChecker,
+  checker => $Element->{$HTML_NS}->{h1}->{checker},
 };
 
 $Element->{$HTML_NS}->{h4} = {
   attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => $HTMLSignificantStrictlyInlineChecker,
+  checker => $Element->{$HTML_NS}->{h1}->{checker},
 };
 
 $Element->{$HTML_NS}->{h5} = {
   attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => $HTMLSignificantStrictlyInlineChecker,
+  checker => $Element->{$HTML_NS}->{h1}->{checker},
 };
 
 $Element->{$HTML_NS}->{h6} = {
   attrs_checker => $GetHTMLAttrsChecker->({}),
-  checker => $HTMLSignificantStrictlyInlineChecker,
+  checker => $Element->{$HTML_NS}->{h1}->{checker},
 };
 
-## TODO: header
+$Element->{$HTML_NS}->{header} = {
+  attrs_checker => $GetHTMLAttrsChecker->({}),
+  checker => sub {
+    my ($self, $todo) = @_;
+    my $old_flag = $todo->{flag}->{has_heading} || [];
+    my $new_flag = [];
+    local $todo->{flag}->{has_heading} = $new_flag;
+    my $node = $todo->{node};
+
+    my $end = $self->_add_minuses
+        ({$HTML_NS => {qw/header 1 footer 1/}},
+         $HTMLSectioningElements);
+    my ($new_todos, $ch) = $HTMLBlockChecker->($self, $todo);
+    push @$new_todos, $end, 
+        {type => 'code', code => sub {
+           if ($new_flag->[0]) {
+             $old_flag->[0] = 1;
+           } else {
+             $self->{onerror}->(node => $node, type => 'element missing:hn');
+           }
+         }};
+    return ($new_todos, $ch);
+  },
+};
 
 $Element->{$HTML_NS}->{footer} = {
   attrs_checker => $GetHTMLAttrsChecker->({}),
@@ -1385,7 +1453,7 @@ $Element->{$HTML_NS}->{footer} = {
         }
         $self->{onerror}->(node => $node, type => 'element not allowed')
           if $not_allowed;
-        my ($sib, $ch) = $self->_check_get_children ($node);
+        my ($sib, $ch) = $self->_check_get_children ($node, $todo);
         unshift @nodes, @$sib;
         push @$new_todos, @$ch;
       } elsif ($nt == 3 or $nt == 4) {
@@ -1479,7 +1547,7 @@ $Element->{$HTML_NS}->{dialog} = {
             $self->{onerror}->(node => $node, type => 'element not allowed');
           }
         }
-        my ($sib, $ch) = $self->_check_get_children ($node);
+        my ($sib, $ch) = $self->_check_get_children ($node, $todo);
         unshift @nodes, @$sib;
         push @$new_todos, @$ch;
       } elsif ($nt == 3 or $nt == 4) {
@@ -1525,7 +1593,7 @@ $Element->{$HTML_NS}->{ol} = {
         unless ($node_ns eq $HTML_NS and $node_ln eq 'li') {
           $self->{onerror}->(node => $node, type => 'element not allowed');
         }
-        my ($sib, $ch) = $self->_check_get_children ($node);
+        my ($sib, $ch) = $self->_check_get_children ($node, $todo);
         unshift @nodes, @$sib;
         push @$new_todos, @$ch;
       } elsif ($nt == 3 or $nt == 4) {
@@ -1624,7 +1692,7 @@ $Element->{$HTML_NS}->{dl} = {
             $self->{onerror}->(node => $node, type => 'element not allowed');
           }
         }
-        my ($sib, $ch) = $self->_check_get_children ($node);
+        my ($sib, $ch) = $self->_check_get_children ($node, $todo);
         unshift @nodes, @$sib;
         push @$new_todos, @$ch;
       } elsif ($nt == 3 or $nt == 4) {
@@ -1745,7 +1813,7 @@ $Element->{$HTML_NS}->{m} = {
   checker => $HTMLInlineOrStrictlyInlineChecker,
 };
 
-$Element->{$HTML_NS}->{dfn} = { ## TODO: term duplication
+$Element->{$HTML_NS}->{dfn} = {
   attrs_checker => $GetHTMLAttrsChecker->({}),
   checker => sub {
     my ($self, $todo) = @_;
@@ -1753,6 +1821,43 @@ $Element->{$HTML_NS}->{dfn} = { ## TODO: term duplication
     my $end = $self->_add_minuses ({$HTML_NS => {dfn => 1}});
     my ($sib, $ch) = $HTMLStrictlyInlineChecker->($self, $todo);
     push @$sib, $end;
+
+    my $node = $todo->{node};
+    my $term = $node->get_attribute_ns (undef, 'title');
+    unless (defined $term) {
+      for my $child (@{$node->child_nodes}) {
+        if ($child->node_type == 1) { # ELEMENT_NODE
+          if (defined $term) {
+            undef $term;
+            last;
+          } elsif ($child->manakai_local_name eq 'abbr') {
+            my $nsuri = $child->namespace_uri;
+            if (defined $nsuri and $nsuri eq $HTML_NS) {
+              my $attr = $child->get_attribute_node_ns (undef, 'title');
+              if ($attr) {
+                $term = $attr->value;
+              }
+            }
+          }
+        } elsif ($child->node_type == 3 or $child->node_type == 4) {
+          ## TEXT_NODE or CDATA_SECTION_NODE
+          if ($child->data =~ /\A[\x09-\x0D\x20]+\z/) { # Inter-element whitespace
+            next;
+          }
+          undef $term;
+          last;
+        }
+      }
+      unless (defined $term) {
+        $term = $node->text_content;
+      }
+    }
+    if ($self->{term}->{$term}) {
+      $self->{onerror}->(node => $node, type => 'duplicate term');
+    } else {
+      $self->{term}->{$term} = 1;
+    }
+
     return ($sib, $ch);
   },
 };
@@ -1862,7 +1967,7 @@ $Element->{$HTML_NS}->{bdo} = {
 $Element->{$HTML_NS}->{ins} = {
   attrs_checker => $GetHTMLAttrsChecker->({
     cite => $HTMLURIAttrChecker,
-    ## TODO: datetime
+    datetime => $HTMLDatetimeAttrChecker,
   }),
   checker => $HTMLTransparentChecker,
 };
@@ -1870,7 +1975,7 @@ $Element->{$HTML_NS}->{ins} = {
 $Element->{$HTML_NS}->{del} = {
   attrs_checker => $GetHTMLAttrsChecker->({
     cite => $HTMLURIAttrChecker,
-    ## TODO: datetime
+    datetime => $HTMLDatetimeAttrChecker,
   }),
   checker => sub {
     my ($self, $todo) = @_;
@@ -2311,7 +2416,7 @@ $Element->{$HTML_NS}->{table} = {
         } else { # after tfoot
           $self->{onerror}->(node => $node, type => 'element not allowed');
         }
-        my ($sib, $ch) = $self->_check_get_children ($node);
+        my ($sib, $ch) = $self->_check_get_children ($node, $todo);
         unshift @nodes, @$sib;
         push @$new_todos, @$ch;
       } elsif ($nt == 3 or $nt == 4) {
@@ -2366,7 +2471,7 @@ $Element->{$HTML_NS}->{colgroup} = {
         unless ($node_ns eq $HTML_NS and $node_ln eq 'col') {
           $self->{onerror}->(node => $node, type => 'element not allowed');
         }
-        my ($sib, $ch) = $self->_check_get_children ($node);
+        my ($sib, $ch) = $self->_check_get_children ($node, $todo);
         unshift @nodes, @$sib;
         push @$new_todos, @$ch;
       } elsif ($nt == 3 or $nt == 4) {
@@ -2412,7 +2517,7 @@ $Element->{$HTML_NS}->{tbody} = {
         } else {
           $self->{onerror}->(node => $node, type => 'element not allowed');
         }
-        my ($sib, $ch) = $self->_check_get_children ($node);
+        my ($sib, $ch) = $self->_check_get_children ($node, $todo);
         unshift @nodes, @$sib;
         push @$new_todos, @$ch;
       } elsif ($nt == 3 or $nt == 4) {
@@ -2464,7 +2569,7 @@ $Element->{$HTML_NS}->{tr} = {
         } else {
           $self->{onerror}->(node => $node, type => 'element not allowed');
         }
-        my ($sib, $ch) = $self->_check_get_children ($node);
+        my ($sib, $ch) = $self->_check_get_children ($node, $todo);
         unshift @nodes, @$sib;
         push @$new_todos, @$ch;
       } elsif ($nt == 3 or $nt == 4) {
@@ -2499,8 +2604,6 @@ $Element->{$HTML_NS}->{th} = {
   }),
   checker => $HTMLBlockOrInlineChecker,
 };
-
-## TODO: table model error checking
 
 ## TODO: forms
 
@@ -2626,7 +2729,7 @@ $Element->{$HTML_NS}->{menu} = {
         }
         $self->{onerror}->(node => $node, type => 'element not allowed')
           if $not_allowed;
-        my ($sib, $ch) = $self->_check_get_children ($node);
+        my ($sib, $ch) = $self->_check_get_children ($node, $todo);
         unshift @nodes, @$sib;
         push @$new_todos, @$ch;
       } elsif ($nt == 3 or $nt == 4) {
@@ -2722,6 +2825,7 @@ sub check_element ($$$) {
 
   $self->{minuses} = {};
   $self->{id} = {};
+  $self->{term} = {};
   $self->{usemap} = [];
   $self->{map} = {};
   $self->{has_link_type} = {};
@@ -2761,6 +2865,10 @@ sub check_element ($$$) {
       $eldef->{attrs_checker}->($self, $todo);
     } elsif ($todo->{type} eq 'plus') {
       $self->_remove_minuses ($todo);
+    } elsif ($todo->{type} eq 'code') {
+      $todo->{code}->();
+    } else {
+      die "$0: Internal error: Unsupported checking action type |$todo->{type}|";
     }
   }
 
@@ -2803,8 +2911,8 @@ sub _remove_minuses ($$) {
   1;
 } # _remove_minuses
 
-sub _check_get_children ($$) {
-  my ($self, $node) = @_;
+sub _check_get_children ($$$) {
+  my ($self, $node, $parent_todo) = @_;
   my $new_todos = [];
   my $sib = [];
   TP: {
@@ -2852,8 +2960,13 @@ sub _check_get_children ($$) {
     }
     push @$new_todos, {type => 'element', node => $node};
   } # TP
+  
+  for my $new_todo (@$new_todos) {
+    $new_todo->{flag} = {%{$parent_todo->{flag} or {}}};
+  }
+  
   return ($sib, $new_todos);
 } # _check_get_children
 
 1;
-# $Date: 2007/06/24 05:12:11 $
+# $Date: 2007/06/24 14:24:21 $

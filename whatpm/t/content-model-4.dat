@@ -1,0 +1,200 @@
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+  <dfn/>
+</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+  <dfn> </dfn>
+</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+  <dfn></dfn>
+  <dfn></dfn>
+</p>
+#errors
+/p/dfn;duplicate term
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+  <dfn></dfn>
+  <dfn> </dfn>
+</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+  <dfn>a</dfn>
+</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+  <dfn>a</dfn>
+  <dfn>b</dfn>
+</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+  <dfn>a</dfn>
+  <dfn>b</dfn>
+  <dfn>c</dfn>
+</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+  <dfn>a</dfn>
+  <dfn>a</dfn>
+</p>
+#errors
+/p/dfn;duplicate term
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+  <dfn>a</dfn>
+  <span><dfn>a</dfn></span>
+</p>
+#errors
+/p/span/dfn;duplicate term
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+  <dfn>a</dfn>
+  <dfn title="a">b</dfn>
+</p>
+#errors
+/p/dfn;duplicate term
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+  <dfn>a</dfn>
+  <dfn title="b">a</dfn>
+</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+  <dfn title="a">a<dfn>a</dfn></dfn>
+</p>
+#errors
+/p/dfn/dfn;element not allowed
+/p/dfn/dfn;duplicate term
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+  <dfn><dfn></dfn></dfn>
+</p>
+#errors
+/p/dfn/dfn;element not allowed
+/p/dfn/dfn;duplicate term
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+  <dfn><abbr>a</abbr></dfn>
+</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+  <dfn>a</dfn>
+  <dfn><abbr>a</abbr></dfn>
+</p>
+#errors
+/p/dfn;duplicate term
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+  <dfn>a</dfn>
+  <dfn><abbr title="b">a</abbr></dfn>
+</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+  <dfn>a</dfn>
+  <dfn><abbr title="a">b</abbr></dfn>
+</p>
+#errors
+/p/dfn;duplicate term
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+  <dfn>a</dfn>
+  <dfn title="a"><abbr>b</abbr></dfn>
+</p>
+#errors
+/p/dfn;duplicate term
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+  <dfn>a</dfn>
+  <dfn title="a"><abbr title="b">c</abbr></dfn>
+</p>
+#errors
+/p/dfn;duplicate term
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+  <dfn>a</dfn>
+  <dfn> <abbr>a</abbr></dfn>
+</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+  <dfn>a</dfn>
+  <dfn> <abbr title="a">b</abbr></dfn>
+</p>
+#errors
+/p/dfn;duplicate term
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+  <dfn>a</dfn>
+  <dfn><![CDATA[ ]]><abbr title="a">b</abbr></dfn>
+</p>
+#errors
+/p/dfn;duplicate term
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+  <dfn>a</dfn>
+  <dfn>b<abbr title="a">c</abbr></dfn>
+</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+  <dfn>a</dfn>
+  <dfn><span><abbr title="a"/></span></dfn>
+</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+  <dfn>a</dfn>
+  <dfn><span>a</span></dfn>
+</p>
+#errors
+/p/dfn;duplicate term
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+  <dfn></dfn>
+  <dfn><abbr title="">a</abbr></dfn>
+</p>
+#errors
+/p/dfn;duplicate term
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+  <dfn></dfn>
+  <dfn title=""><abbr>a</abbr></dfn>
+</p>
+#errors
+/p/dfn;duplicate term

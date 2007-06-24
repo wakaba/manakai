@@ -53,7 +53,7 @@ sub check_iri_reference ($$$) {
   my $scheme = $uri_o->uri_scheme;
   my $scheme_canon;
   if (defined $scheme) {
-    $scheme_canon = Encode::decode ('utf8', $scheme);
+    $scheme_canon = Encode::encode ('utf8', $scheme);
     $scheme_canon =~ s/%([0-9A-Fa-f][0-9A-Fa-f])/pack 'C', hex $1/ge;
     if ($scheme_canon =~ tr/A-Z/a-z/) {
       $onerror->(type => 'uppercase scheme name', level => 's');
@@ -231,4 +231,4 @@ sub check_iri_reference ($$$) {
 } # check_iri_reference
 
 1;
-## $Date: 2007/05/27 06:38:58 $
+## $Date: 2007/06/24 14:24:21 $

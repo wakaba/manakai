@@ -562,8 +562,174 @@ p {color: green}
 #data
 <p xmlns="http://www.w3.org/1999/xhtml">
 @@ TODO: It is expected that tests for NAV and following elements come here.
+<![CDATA[
+@@ <nav>
+@@ <article>
+@@ <blockquote>
+## <aside>
+## <h1><h2><h3><h4><h5><h6>
+]]>
 </p>
 #errors
+
+#data
+<header xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/header;element missing:hn
+
+#data
+<header xmlns="http://www.w3.org/1999/xhtml"><h1/></header>
+#errors
+
+#data
+<header xmlns="http://www.w3.org/1999/xhtml"><h2/></header>
+#errors
+
+#data
+<header xmlns="http://www.w3.org/1999/xhtml"><h3/></header>
+#errors
+
+#data
+<header xmlns="http://www.w3.org/1999/xhtml"><h4/></header>
+#errors
+
+#data
+<header xmlns="http://www.w3.org/1999/xhtml"><h5/></header>
+#errors
+
+#data
+<header xmlns="http://www.w3.org/1999/xhtml"><h6/></header>
+#errors
+
+#data
+<header xmlns="http://www.w3.org/1999/xhtml"><div><h1/></div></header>
+#errors
+
+#data
+<header xmlns="http://www.w3.org/1999/xhtml"><div><h2/></div></header>
+#errors
+
+#data
+<header xmlns="http://www.w3.org/1999/xhtml"><div><h3/></div></header>
+#errors
+
+#data
+<header xmlns="http://www.w3.org/1999/xhtml"><div><h4/></div></header>
+#errors
+
+#data
+<header xmlns="http://www.w3.org/1999/xhtml"><div><h5/></div></header>
+#errors
+
+#data
+<header xmlns="http://www.w3.org/1999/xhtml"><div><h6/></div></header>
+#errors
+
+#data
+<header xmlns="http://www.w3.org/1999/xhtml"><div><div><h1/></div></div></header>
+#errors
+
+#data
+<header xmlns="http://www.w3.org/1999/xhtml"><header><h1/></header></header>
+#errors
+/header/header;element not allowed
+
+#data
+<header xmlns="http://www.w3.org/1999/xhtml"><h1/><header/></header>
+#errors
+/header/header;element not allowed
+/header/header;element missing:hn
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><header><h1/></header></div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><h1/><header></header></div>
+#errors
+/div/header;element missing:hn
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><header></header><h1/></div>
+#errors
+/div/header;element missing:hn
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><header><h1/></header>
+<header></header></div>
+#errors
+/div/header;element missing:hn
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><header></header>
+<header><h1/></header></div>
+#errors
+/div/header;element missing:hn
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<header><h1/><header></header></header></div>
+#errors
+/div/header/header;element not allowed
+/div/header/header;element missing:hn
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><header>
+<header/><h1/></header></div>
+#errors
+/div/header/header;element not allowed
+/div/header/header;element missing:hn
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<header><h1><header></header></h1></header></div>
+#errors
+/div/header/h1/header;element missing:hn
+/div/header/h1/header;element not allowed
+
+#data
+<header xmlns="http://www.w3.org/1999/xhtml"><h1/><footer/></header>
+#errors
+/header/footer;element not allowed
+
+#data
+<header xmlns="http://www.w3.org/1999/xhtml"><footer><h1/></footer></header>
+#errors
+/header/footer;element not allowed
+/header/footer/h1;element not allowed
+
+#data
+<header xmlns="http://www.w3.org/1999/xhtml"><h1/><p/></header>
+#errors
+
+#data
+<header xmlns="http://www.w3.org/1999/xhtml"><h1/><p/><blockquote/></header>
+#errors
+/header/blockquote;element not allowed
+
+#data
+<header xmlns="http://www.w3.org/1999/xhtml"><h1/><p/><p/></header>
+#errors
+
+#data
+<header xmlns="http://www.w3.org/1999/xhtml"><h1/><h2/><h4/></header>
+#errors
+
+#data
+<header xmlns="http://www.w3.org/1999/xhtml"><h1/><section/></header>
+#errors
+/header/section;element not allowed
+
+#data
+<header xmlns="http://www.w3.org/1999/xhtml"><section><h1/></section></header>
+#errors
+/header/section;element not allowed
+
+#data
+<header xmlns="http://www.w3.org/1999/xhtml"><aside/></header>
+#errors
+/header/aside;element not allowed
+/header;element missing:hn
 
 #data
 <li xmlns="http://www.w3.org/1999/xhtml"></li>
@@ -2390,12 +2556,14 @@ aaa
 </p>
 #errors
 /p/dfn/dfn;element not allowed
+/p/dfn/dfn;duplicate term
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml">
 <dfn></dfn><dfn/>
 </p>
 #errors
+/p/dfn;duplicate term
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml">
@@ -2403,6 +2571,7 @@ aaa
 </p>
 #errors
 /p/dfn/em/dfn;element not allowed
+/p/dfn/em/dfn;duplicate term
 
 #data
 <table xmlns="http://www.w3.org/1999/xhtml">

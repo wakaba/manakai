@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.26 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.27 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## ISSUE:
 ## var doc = implementation.createDocument (null, null, null);
@@ -5291,14 +5291,14 @@ sub get_inner_html ($$$) {
     
     my $nt = $child->node_type;
     if ($nt == 1) { # Element
-      my $tag_name = lc $child->tag_name; ## ISSUE: Definition of "lowercase"
+      my $tag_name = $child->tag_name; ## TODO: manakai_tag_name
       $s .= '<' . $tag_name;
-
-      ## ISSUE: Non-html elements
+      ## NOTE: Non-HTML case: 
+      ## <http://permalink.gmane.org/gmane.org.w3c.whatwg.discuss/11191>
 
       my @attrs = @{$child->attributes}; # sort order MUST be stable
       for my $attr (@attrs) { # order is implementation dependent
-        my $attr_name = lc $attr->name; ## ISSUE: Definition of "lowercase"
+        my $attr_name = $attr->name; ## TODO: manakai_name
         $s .= ' ' . $attr_name . '="';
         my $attr_value = $attr->value;
         ## escape
@@ -5357,4 +5357,4 @@ sub get_inner_html ($$$) {
 } # get_inner_html
 
 1;
-# $Date: 2007/06/24 06:20:37 $
+# $Date: 2007/06/24 14:24:21 $
