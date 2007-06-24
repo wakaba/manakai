@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.25 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.26 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## ISSUE:
 ## var doc = implementation.createDocument (null, null, null);
@@ -271,7 +271,7 @@ sub _get_next_token ($) {
     } elsif ($self->{state} eq 'entity data') {
       ## (cannot happen in CDATA state)
       
-      my $token = $self->_tokenize_attempt_to_consume_an_entity;
+      my $token = $self->_tokenize_attempt_to_consume_an_entity (0);
 
       $self->{state} = 'data';
       # next-input-character is already done
@@ -1205,7 +1205,7 @@ sub _get_next_token ($) {
         redo A;
       }
     } elsif ($self->{state} eq 'entity in attribute value') {
-      my $token = $self->_tokenize_attempt_to_consume_an_entity;
+      my $token = $self->_tokenize_attempt_to_consume_an_entity (1);
 
       unless (defined $token) {
         $self->{current_attribute}->{value} .= '&';
@@ -2069,7 +2069,7 @@ sub _get_next_token ($) {
         $self->{parse_error}-> (type => 'unclosed DOCTYPE');
 
         $self->{state} = 'data';
-        ## recomsume
+        ## reconsume
 
         delete $self->{current_token}->{correct};
         return  ($self->{current_token}); # DOCTYPE
@@ -2142,7 +2142,7 @@ sub _get_next_token ($) {
         $self->{parse_error}-> (type => 'unclosed DOCTYPE');
 
         $self->{state} = 'data';
-        ## recomsume
+        ## reconsume
 
         delete $self->{current_token}->{correct};
         return  ($self->{current_token}); # DOCTYPE
@@ -2259,7 +2259,7 @@ sub _get_next_token ($) {
         $self->{parse_error}-> (type => 'unclosed DOCTYPE');
 
         $self->{state} = 'data';
-        ## recomsume
+        ## reconsume
 
         delete $self->{current_token}->{correct};
         return  ($self->{current_token}); # DOCTYPE
@@ -2320,8 +2320,8 @@ sub _get_next_token ($) {
   die "$0: _get_next_token: unexpected case";
 } # _get_next_token
 
-sub _tokenize_attempt_to_consume_an_entity ($) {
-  my $self = shift;
+sub _tokenize_attempt_to_consume_an_entity ($$) {
+  my ($self, $in_attr) = @_;
 
   if ({
        0x0009 => 1, 0x000A => 1, 0x000B => 1, 0x000C => 1, # HT, LF, VT, FF,
@@ -2340,7 +2340,7 @@ sub _tokenize_attempt_to_consume_an_entity ($) {
   
     if ($self->{next_input_character} == 0x0078 or # x
         $self->{next_input_character} == 0x0058) { # X
-      my $num;
+      my $code;
       X: {
         my $x_char = $self->{next_input_character};
         
@@ -2352,25 +2352,23 @@ sub _tokenize_attempt_to_consume_an_entity ($) {
   
         if (0x0030 <= $self->{next_input_character} and 
             $self->{next_input_character} <= 0x0039) { # 0..9
-          $num ||= 0;
-          $num *= 0x10;
-          $num += $self->{next_input_character} - 0x0030;
+          $code ||= 0;
+          $code *= 0x10;
+          $code += $self->{next_input_character} - 0x0030;
           redo X;
         } elsif (0x0061 <= $self->{next_input_character} and
                  $self->{next_input_character} <= 0x0066) { # a..f
-          ## ISSUE: the spec says U+0078, which is apparently incorrect
-          $num ||= 0;
-          $num *= 0x10;
-          $num += $self->{next_input_character} - 0x0060 + 9;
+          $code ||= 0;
+          $code *= 0x10;
+          $code += $self->{next_input_character} - 0x0060 + 9;
           redo X;
         } elsif (0x0041 <= $self->{next_input_character} and
                  $self->{next_input_character} <= 0x0046) { # A..F
-          ## ISSUE: the spec says U+0058, which is apparently incorrect
-          $num ||= 0;
-          $num *= 0x10;
-          $num += $self->{next_input_character} - 0x0040 + 9;
+          $code ||= 0;
+          $code *= 0x10;
+          $code += $self->{next_input_character} - 0x0040 + 9;
           redo X;
-        } elsif (not defined $num) { # no hexadecimal digit
+        } elsif (not defined $code) { # no hexadecimal digit
           $self->{parse_error}-> (type => 'bare hcro');
           $self->{next_input_character} = 0x0023; # #
           unshift @{$self->{char}},  ($x_char);
@@ -2387,17 +2385,21 @@ sub _tokenize_attempt_to_consume_an_entity ($) {
           $self->{parse_error}-> (type => 'no refc');
         }
 
-        ## TODO: check the definition for |a valid Unicode character|.
-        ## <http://lists.whatwg.org/pipermail/whatwg-whatwg.org/2006-December/thread.html#8189>
-        if ($num > 1114111 or $num == 0) {
-          $num = 0xFFFD; # REPLACEMENT CHARACTER
-          ## ISSUE: Why this is not an error?
-        } elsif (0x80 <= $num and $num <= 0x9F) {
-          $self->{parse_error}-> (type => sprintf 'c1 entity:U+%04X', $num);
-          $num = $c1_entity_char->{$num};
+        if ($code == 0 or (0xD800 <= $code and $code <= 0xDFFF)) {
+          $self->{parse_error}-> (type => sprintf 'invalid character reference:U+%04X', $code);
+          $code = 0xFFFD;
+        } elsif ($code > 0x10FFFF) {
+          $self->{parse_error}-> (type => sprintf 'invalid character reference:U-%08X', $code);
+          $code = 0xFFFD;
+        } elsif ($code == 0x000D) {
+          $self->{parse_error}-> (type => 'CR character reference');
+          $code = 0x000A;
+        } elsif (0x80 <= $code and $code <= 0x9F) {
+          $self->{parse_error}-> (type => sprintf 'c1 entity:U+%04X', $code);
+          $code = $c1_entity_char->{$code};
         }
 
-        return {type => 'character', data => chr $num};
+        return {type => 'character', data => chr $code};
       } # X
     } elsif (0x0030 <= $self->{next_input_character} and
              $self->{next_input_character} <= 0x0039) { # 0..9
@@ -2436,10 +2438,15 @@ sub _tokenize_attempt_to_consume_an_entity ($) {
         $self->{parse_error}-> (type => 'no refc');
       }
 
-      ## TODO: check the definition for |a valid Unicode character|.
-      if ($code > 1114111 or $code == 0) {
-        $code = 0xFFFD; # REPLACEMENT CHARACTER
-        ## ISSUE: Why this is not an error?
+      if ($code == 0 or (0xD800 <= $code and $code <= 0xDFFF)) {
+        $self->{parse_error}-> (type => sprintf 'invalid character reference:U+%04X', $code);
+        $code = 0xFFFD;
+      } elsif ($code > 0x10FFFF) {
+        $self->{parse_error}-> (type => sprintf 'invalid character reference:U-%08X', $code);
+        $code = 0xFFFD;
+      } elsif ($code == 0x000D) {
+        $self->{parse_error}-> (type => 'CR character reference');
+        $code = 0x000A;
       } elsif (0x80 <= $code and $code <= 0x9F) {
         $self->{parse_error}-> (type => sprintf 'c1 entity:U+%04X', $code);
         $code = $c1_entity_char->{$code};
@@ -2481,8 +2488,8 @@ sub _tokenize_attempt_to_consume_an_entity ($) {
             $self->{next_input_character} == 0x003B)) { # ;
       $entity_name .= chr $self->{next_input_character};
       if (defined $EntityChar->{$entity_name}) {
-        $value = $EntityChar->{$entity_name};
         if ($self->{next_input_character} == 0x003B) { # ;
+          $value = $EntityChar->{$entity_name};
           $match = 1;
           
       if (@{$self->{char}}) {
@@ -2492,8 +2499,11 @@ sub _tokenize_attempt_to_consume_an_entity ($) {
       }
   
           last;
-        } else {
+        } elsif (not $in_attr) {
+          $value = $EntityChar->{$entity_name};
           $match = -1;
+        } else {
+          $value .= chr $self->{next_input_character};
         }
       } else {
         $value .= chr $self->{next_input_character};
@@ -2515,8 +2525,7 @@ sub _tokenize_attempt_to_consume_an_entity ($) {
     } else {
       $self->{parse_error}-> (type => 'bare ero');
       ## NOTE: No characters are consumed in the spec.
-      unshift @{$self->{token}}, ({type => 'character', data => $value});
-      return undef;
+      return {type => 'character', data => '&'.$value};
     }
   } else {
     ## no characters are consumed
@@ -2711,6 +2720,7 @@ sub _tree_construction_initial ($) {
     } elsif ($token->{type} eq 'character') {
       if ($token->{data} =~ s/^([\x09\x0A\x0B\x0C\x20]+)//) { # \x0D
         ## Ignore the token
+
         unless (length $token->{data}) {
           ## Stay in the phase
           $token = $self->_get_next_token;
@@ -2753,9 +2763,9 @@ sub _tree_construction_root_element ($) {
         $token = $self->_get_next_token;
         redo B;
       } elsif ($token->{type} eq 'character') {
-        if ($token->{data} =~ s/^([\x09\x0A\x0B\x0C\x20]+)//) {
-          $self->{document}->manakai_append_text ($1);
-          ## ISSUE: DOM3 Core does not allow Document > Text
+        if ($token->{data} =~ s/^([\x09\x0A\x0B\x0C\x20]+)//) { # \x0D
+          ## Ignore the token.
+
           unless (length $token->{data}) {
             ## Stay in the phase
             $token = $self->_get_next_token;
@@ -3289,6 +3299,7 @@ sub _tree_construction_main ($) {
   
         pop @{$self->{open_elements}}; ## ISSUE: This step is missing in the spec.
         $token = $self->_get_next_token;
+        ## TODO: Extracting |charset| from |meta|.
         return;
       } elsif ($token->{tag_name} eq 'title') {
         $self->{parse_error}-> (type => 'in body:title');
@@ -4480,6 +4491,7 @@ sub _tree_construction_main ($) {
     }
   
               pop @{$self->{open_elements}}; ## ISSUE: This step is missing in the spec.
+              ## TODO: Extracting |charset| from |meta|.
               pop @{$self->{open_elements}}
                   if $self->{insertion_mode} eq 'after head';
               $token = $self->_get_next_token;
@@ -6635,6 +6647,7 @@ sub get_inner_html ($$$) {
       if (not $in_cdata and {
         style => 1, script => 1, xmp => 1, iframe => 1,
         noembed => 1, noframes => 1, noscript => 1,
+        plaintext => 1,
       }->{$tag_name}) {
         unshift @node, 'cdata-out';
         $in_cdata = 1;
@@ -6669,4 +6682,4 @@ sub get_inner_html ($$$) {
 } # get_inner_html
 
 1;
-# $Date: 2007/06/24 05:12:11 $
+# $Date: 2007/06/24 06:20:37 $

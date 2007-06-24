@@ -953,3 +953,44 @@ h2 not closed
 |     <h1>
 |       <a>
 |         <h2>
+
+#data
+  <p>
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <p>
+
+#data
+  a
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     "a"
+
+#data
+<!---->  <p>
+#errors
+no DOCTYPE
+#document
+| <!--  -->
+| <html>
+|   <head>
+|   <body>
+|     <p>
+
+#data
+<!DOCTYPE HTML>  <p>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <p>

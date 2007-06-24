@@ -139,6 +139,30 @@
 "input":"AB</xxx>CD",
 "output":[["Character", "AB"],["EndTag", "xxx"],["Character", "CD"]]},
 
+{"description":"NULL character reference",
+"input":"&#0;",
+"output":["ParseError", ["Character", "\uFFFD"]]},
+
+{"description":"NULL character reference",
+"input":"&#x0;",
+"output":["ParseError", ["Character", "\uFFFD"]]},
+
+{"description":"character entity &#13;",
+"input":"&#13;",
+"output":["ParseError", ["Character", "\u000A"]]},
+
+{"description":"character entity &#xd;",
+"input":"&#xd;",
+"output":["ParseError", ["Character", "\u000A"]]},
+
+{"description":"character entities &#13;&#10;",
+"input":"&#13;&#10;",
+"output":["ParseError", ["Character", "\u000A\u000A"]]},
+
+{"description":"character entity &#13; followed by a LF",
+"input":"&#13;\u000A",
+"output":["ParseError", ["Character", "\u000A\u000A"]]},
+
 {"description":"c1 character references",
 "input":"&#128;&#129;&#130;&#131;&#132;&#133;&#134;&#135;",
 "output":[
@@ -237,6 +261,40 @@
   "ParseError", ["Character", "\u0178"]
 ]},
 
+{"description":"surrogate character reference",
+"input":"&#xD800;",
+"output":["ParseError", ["Character", "\uFFFD"]]},
+
+{"description":"surrogate character references",
+"input":"&#xD800;&#xDFFF;",
+"output":["ParseError", ["Character", "\uFFFD"],
+          "ParseError", ["Character", "\uFFFD"]]},
+
+{"description":"surrogate character reference",
+"input":"\uD800&#xDFFF;",
+"output":[["Character", "\uD800"],
+          "ParseError", ["Character", "\uFFFD"]]},
+
+{"description":"surrogate character reference",
+"input":"&#xD800;\uDFFF",
+"output":["ParseError", ["Character", "\uFFFD\uDFFF"]]},
+
+{"description":"surrogate character reference",
+"input":"&#55296;",
+"output":["ParseError", ["Character", "\uFFFD"]]},
+
+{"description":"surrogate character reference",
+"input":"&#57343;",
+"output":["ParseError", ["Character", "\uFFFD"]]},
+
+{"description":"non-Unicode character reference",
+"input":"&#1114112;",
+"output":["ParseError", ["Character", "\uFFFD"]]},
+
+{"description":"non-Unicode character reference",
+"input":"&#x110000;",
+"output":["ParseError", ["Character", "\uFFFD"]]},
+
 {"description":"NULL character",
 "input":"\u0000",
 "output":["ParseError",["Character", "\uFFFD"]]},
@@ -279,7 +337,7 @@
 
 {"description":"&<",
 "input":"&<",
-"output":["ParseError", ["Character", "&<"]]},
+"output":[["Character", "&"], "ParseError", ["Character", "<"]]},
 
 {"description":"&<p>",
 "input":"&<p>",
@@ -296,6 +354,38 @@
 {"description":"&",
 "input":"&",
 "output":[["Character", "&"]]},
+
+{"description":"named character reference w/o refc",
+"input":"&ampabc",
+"output":["ParseError", ["Character", "&abc"]]},
+
+{"description":"named character reference",
+"input":"&amp;abc",
+"output":[["Character", "&abc"]]},
+
+{"description":"named character reference w/o refc",
+"input":"&abc",
+"output":["ParseError", ["Character", "&abc"]]},
+
+{"description":"unknown named character reference",
+"input":"&abc;",
+"output":["ParseError", ["Character", "&abc;"]]},
+
+{"description":"named character reference w/o refc in attr",
+"input":"<a href='&ampabc'>",
+"output":["ParseError", ["StartTag", "a", {"href": "&ampabc"}]]},
+
+{"description":"named character reference in attr",
+"input":"<a href='&amp;abc'>",
+"output":[["StartTag", "a", {"href": "&abc"}]]},
+
+{"description":"named character reference w/o refc in attr",
+"input":"<a href='&abc'>",
+"output":["ParseError", ["StartTag", "a", {"href": "&abc"}]]},
+
+{"description":"unknown named character reference in attr",
+"input":"<a href='&abc;'>",
+"output":["ParseError", ["StartTag", "a", {"href": "&abc;"}]]},
 
 {"description":"cdata end tag containing <",
 "contentModelFlags":["RCDATA","CDATA"],
