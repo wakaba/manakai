@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.24 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.25 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## ISSUE:
 ## var doc = implementation.createDocument (null, null, null);
@@ -2935,45 +2935,57 @@ sub _tree_construction_main ($) {
     }
   }; # $clear_up_to_marker
 
-  my $style_start_tag = sub {
-    my $style_el; 
-      $style_el = $self->{document}->create_element_ns
-        (q<http://www.w3.org/1999/xhtml>, [undef,  'style']);
+  my $parse_rcdata = sub ($$) {
+    my ($content_model_flag, $insert) = @_;
+
+    ## Step 1
+    my $start_tag_name = $token->{tag_name};
+    my $el;
+    
+      $el = $self->{document}->create_element_ns
+        (q<http://www.w3.org/1999/xhtml>, [undef,  $start_tag_name]);
     
         for my $attr_name (keys %{ $token->{attributes}}) {
-          $style_el->set_attribute_ns (undef, [undef, $attr_name],
+          $el->set_attribute_ns (undef, [undef, $attr_name],
                                  $token->{attributes} ->{$attr_name}->{value});
         }
       
-    ## $self->{insertion_mode} eq 'in head' and ... (always true)
-    (($self->{insertion_mode} eq 'in head' and defined $self->{head_element})
-     ? $self->{head_element} : $self->{open_elements}->[-1]->[0])
-      ->append_child ($style_el);
-    $self->{content_model_flag} = 'CDATA';
+
+    ## Step 2
+    $insert->($el); # /context node/->append_child ($el)
+
+    ## Step 3
+    $self->{content_model_flag} = $content_model_flag; # CDATA or RCDATA
     delete $self->{escape}; # MUST
-              
+
+    ## Step 4
     my $text = '';
     $token = $self->_get_next_token;
-    while ($token->{type} eq 'character') {
+    while ($token->{type} eq 'character') { # or until stop tokenizing
       $text .= $token->{data};
       $token = $self->_get_next_token;
-    } # stop if non-character token or tokenizer stops tokenising
-    if (length $text) {
-      $style_el->manakai_append_text ($text);
     }
-    
+
+    ## Step 5
+    if (length $text) {
+      my $text = $self->{document}->create_text_node ($text);
+      $el->append_child ($text);
+    }
+
+    ## Step 6
     $self->{content_model_flag} = 'PCDATA';
-              
-    if ($token->{type} eq 'end tag' and $token->{tag_name} eq 'style') {
+
+    ## Step 7
+    if ($token->{type} eq 'end tag' and $token->{tag_name} eq $start_tag_name) {
       ## Ignore the token
     } else {
-      $self->{parse_error}-> (type => 'in CDATA:#'.$token->{type});
-      ## ISSUE: And ignore?
+      $self->{parse_error}-> (type => 'in '.$content_model_flag.':#'.$token->{type});
     }
     $token = $self->_get_next_token;
-  }; # $style_start_tag
+  }; # $parse_rcdata
 
-  my $script_start_tag = sub {
+  my $script_start_tag = sub ($) {
+    my $insert = $_[0];
     my $script_el;
     
       $script_el = $self->{document}->create_element_ns
@@ -3015,9 +3027,8 @@ sub _tree_construction_main ($) {
     } else {
       ## TODO: $old_insertion_point = current insertion point
       ## TODO: insertion point = just before the next input character
-      
-      (($self->{insertion_mode} eq 'in head' and defined $self->{head_element})
-       ? $self->{head_element} : $self->{open_elements}->[-1]->[0])->append_child ($script_el);
+
+      $insert->($script_el);
       
       ## TODO: insertion point = $old_insertion_point (might be "undefined")
       
@@ -3211,7 +3222,7 @@ sub _tree_construction_main ($) {
   }; # $formatting_end_tag
 
   my $insert_to_current = sub {
-    $self->{open_elements}->[-1]->[0]->append_child (shift);
+    $self->{open_elements}->[-1]->[0]->append_child ($_[0]);
   }; # $insert_to_current
 
   my $insert_to_foster = sub {
@@ -3249,72 +3260,40 @@ sub _tree_construction_main ($) {
     my $insert = shift;
     if ($token->{type} eq 'start tag') {
       if ($token->{tag_name} eq 'script') {
-        $script_start_tag->();
+        ## NOTE: This is an "as if in head" code clone
+        $script_start_tag->($insert);
         return;
       } elsif ($token->{tag_name} eq 'style') {
-        $style_start_tag->();
+        ## NOTE: This is an "as if in head" code clone
+        $parse_rcdata->('CDATA', $insert);
         return;
       } elsif ({
                 base => 1, link => 1, meta => 1,
                }->{$token->{tag_name}}) {
-        ## NOTE: This is an "as if in head" code clone
-        my $el;
+        ## NOTE: This is an "as if in head" code clone, only "-t" differs
         
+    {
+      my $el;
+      
       $el = $self->{document}->create_element_ns
         (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
     
-        for my $attr_name (keys %{ $token->{attributes}}) {
+        for my $attr_name (keys %{  $token->{attributes}}) {
           $el->set_attribute_ns (undef, [undef, $attr_name],
-                                 $token->{attributes} ->{$attr_name}->{value});
+                                  $token->{attributes} ->{$attr_name}->{value});
         }
       
-        if ($self->{insertion_mode} eq 'in head' and
-            defined $self->{head_element}) {
-          $self->{head_element}->append_child ($el);
-        } else {
-          $insert->($el);
-        }
-        
+      $insert->($el);
+      push @{$self->{open_elements}}, [$el, $token->{tag_name}];
+    }
+  
+        pop @{$self->{open_elements}}; ## ISSUE: This step is missing in the spec.
         $token = $self->_get_next_token;
         return;
       } elsif ($token->{tag_name} eq 'title') {
         $self->{parse_error}-> (type => 'in body:title');
-        ## NOTE: There is an "as if in head" code clone
-        my $title_el;
-        
-      $title_el = $self->{document}->create_element_ns
-        (q<http://www.w3.org/1999/xhtml>, [undef,  'title']);
-    
-        for my $attr_name (keys %{ $token->{attributes}}) {
-          $title_el->set_attribute_ns (undef, [undef, $attr_name],
-                                 $token->{attributes} ->{$attr_name}->{value});
-        }
-      
-        (defined $self->{head_element} ? $self->{head_element} : $self->{open_elements}->[-1]->[0])
-          ->append_child ($title_el);
-        $self->{content_model_flag} = 'RCDATA';
-        delete $self->{escape}; # MUST
-        
-        my $text = '';
-        $token = $self->_get_next_token;
-        while ($token->{type} eq 'character') {
-          $text .= $token->{data};
-          $token = $self->_get_next_token;
-        }
-        if (length $text) {
-          $title_el->manakai_append_text ($text);
-        }
-        
-        $self->{content_model_flag} = 'PCDATA';
-        
-        if ($token->{type} eq 'end tag' and
-            $token->{tag_name} eq 'title') {
-          ## Ignore the token
-        } else {
-          $self->{parse_error}-> (type => 'in RCDATA:#'.$token->{type});
-          ## ISSUE: And ignore?
-        }
-        $token = $self->_get_next_token;
+        ## NOTE: This is an "as if in head" code clone
+        $parse_rcdata->('RCDATA', $insert);
         return;
       } elsif ($token->{tag_name} eq 'body') {
         $self->{parse_error}-> (type => 'in body:body');
@@ -3825,28 +3804,7 @@ sub _tree_construction_main ($) {
         return;
       } elsif ($token->{tag_name} eq 'xmp') {
         $reconstruct_active_formatting_elements->($insert_to_current);
-        
-        
-    {
-      my $el;
-      
-      $el = $self->{document}->create_element_ns
-        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
-    
-        for my $attr_name (keys %{  $token->{attributes}}) {
-          $el->set_attribute_ns (undef, [undef, $attr_name],
-                                  $token->{attributes} ->{$attr_name}->{value});
-        }
-      
-      $insert->($el);
-      push @{$self->{open_elements}}, [$el, $token->{tag_name}];
-    }
-  
-        
-        $self->{content_model_flag} = 'CDATA';
-        delete $self->{escape}; # MUST
-        
-        $token = $self->_get_next_token;
+        $parse_rcdata->('CDATA', $insert);
         return;
       } elsif ($token->{tag_name} eq 'table') {
         ## has a p element in scope
@@ -4015,13 +3973,7 @@ sub _tree_construction_main ($) {
           unshift @{$self->{token}}, (@tokens);
           return;
         }
-      } elsif ({
-                textarea => 1,
-                iframe => 1,
-                noembed => 1,
-                noframes => 1,
-                noscript => 0, ## TODO: 1 if scripting is enabled
-               }->{$token->{tag_name}}) {
+      } elsif ($token->{tag_name} eq 'textarea') {
         my $tag_name = $token->{tag_name};
         my $el;
         
@@ -4034,27 +3986,19 @@ sub _tree_construction_main ($) {
         }
       
         
-        if ($token->{tag_name} eq 'textarea') {
-          ## TODO: $self->{form_element} if defined
-          $self->{content_model_flag} = 'RCDATA';
-        } else {
-          $self->{content_model_flag} = 'CDATA';
-        }
+        ## TODO: $self->{form_element} if defined
+        $self->{content_model_flag} = 'RCDATA';
         delete $self->{escape}; # MUST
         
         $insert->($el);
         
         my $text = '';
-	if ($token->{tag_name} eq 'textarea') {
-          $token = $self->_get_next_token;
-          if ($token->{type} eq 'character') {
-            $token->{data} =~ s/^\x0A//;
-            unless (length $token->{data}) {
-              $token = $self->_get_next_token;
-            }
+        $token = $self->_get_next_token;
+        if ($token->{type} eq 'character') {
+          $token->{data} =~ s/^\x0A//;
+          unless (length $token->{data}) {
+            $token = $self->_get_next_token;
           }
-        } else {
-          $token = $self->_get_next_token;
         }
         while ($token->{type} eq 'character') {
           $text .= $token->{data};
@@ -4070,14 +4014,17 @@ sub _tree_construction_main ($) {
             $token->{tag_name} eq $tag_name) {
           ## Ignore the token
         } else {
-          if ($token->{tag_name} eq 'textarea') {
-            $self->{parse_error}-> (type => 'in RCDATA:#'.$token->{type});
-          } else {
-            $self->{parse_error}-> (type => 'in CDATA:#'.$token->{type});
-          }
-          ## ISSUE: And ignore?
+          $self->{parse_error}-> (type => 'in RCDATA:#'.$token->{type});
         }
         $token = $self->_get_next_token;
+        return;
+      } elsif ({
+                iframe => 1,
+                noembed => 1,
+                noframes => 1,
+                noscript => 0, ## TODO: 1 if scripting is enabled
+               }->{$token->{tag_name}}) {
+        $parse_rcdata->('CDATA', $insert);
         return;
       } elsif ($token->{tag_name} eq 'select') {
         $reconstruct_active_formatting_elements->($insert_to_current);
@@ -4355,7 +4302,7 @@ sub _tree_construction_main ($) {
                 #not $phrasing_category->{$node->[1]} and
                 ($special_category->{$node->[1]} or
                  $scoping_category->{$node->[1]})) {
-              $self->{parse_error}-> (type => 'not closed:'.$node->[1]);
+              $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
               ## Ignore the token
               $token = $self->_get_next_token;
               last S2;
@@ -4489,7 +4436,9 @@ sub _tree_construction_main ($) {
           } else {
             die "$0: $token->{type}: Unknown type";
           }
-        } elsif ($self->{insertion_mode} eq 'in head') {
+        } elsif ($self->{insertion_mode} eq 'in head' or
+                 $self->{insertion_mode} eq 'in head noscript' or
+                 $self->{insertion_mode} eq 'after head') {
           if ($token->{type} eq 'character') {
             if ($token->{data} =~ s/^([\x09\x0A\x0B\x0C\x20]+)//) {
               $self->{open_elements}->[-1]->[0]->manakai_append_text ($1);
@@ -4506,129 +4455,106 @@ sub _tree_construction_main ($) {
             $token = $self->_get_next_token;
             redo B;
           } elsif ($token->{type} eq 'start tag') {
-            if ($token->{tag_name} eq 'title') {
-              ## NOTE: There is an "as if in head" code clone
-              my $title_el;
+            if ({base => ($self->{insertion_mode} eq 'in head' or
+                          $self->{insertion_mode} eq 'after head'),
+                 link => 1, meta => 1}->{$token->{tag_name}}) {
+              ## NOTE: There is a "as if in head" code clone.
+              if ($self->{insertion_mode} eq 'after head') {
+                $self->{parse_error}-> (type => 'after head:'.$token->{tag_name});
+                push @{$self->{open_elements}}, [$self->{head_element}, 'head'];
+              }
               
-      $title_el = $self->{document}->create_element_ns
-        (q<http://www.w3.org/1999/xhtml>, [undef,  'title']);
-    
-        for my $attr_name (keys %{ $token->{attributes}}) {
-          $title_el->set_attribute_ns (undef, [undef, $attr_name],
-                                 $token->{attributes} ->{$attr_name}->{value});
-        }
+    {
+      my $el;
       
-              (defined $self->{head_element} ? $self->{head_element} : $self->{open_elements}->[-1]->[0])
-                ->append_child ($title_el);
-              $self->{content_model_flag} = 'RCDATA';
-              delete $self->{escape}; # MUST
-
-              my $text = '';
-              $token = $self->_get_next_token;
-              while ($token->{type} eq 'character') {
-                $text .= $token->{data};
-                $token = $self->_get_next_token;
-              }
-              if (length $text) {
-                $title_el->manakai_append_text ($text);
-              }
-              
-              $self->{content_model_flag} = 'PCDATA';
-              
-              if ($token->{type} eq 'end tag' and
-                  $token->{tag_name} eq 'title') {
-                ## Ignore the token
-              } else {
-                $self->{parse_error}-> (type => 'in RCDATA:#'.$token->{type});
-                ## ISSUE: And ignore?
-              }
-              $token = $self->_get_next_token;
-              redo B;
-            } elsif ($token->{tag_name} eq 'style') {
-              $style_start_tag->();
-              redo B;
-            } elsif ($token->{tag_name} eq 'script') {
-              $script_start_tag->();
-              redo B;
-            } elsif ({base => 1, link => 1, meta => 1}->{$token->{tag_name}}) {
-              ## NOTE: There are "as if in head" code clones
-              my $el;
-              
       $el = $self->{document}->create_element_ns
         (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
     
-        for my $attr_name (keys %{ $token->{attributes}}) {
+        for my $attr_name (keys %{  $token->{attributes}}) {
           $el->set_attribute_ns (undef, [undef, $attr_name],
-                                 $token->{attributes} ->{$attr_name}->{value});
+                                  $token->{attributes} ->{$attr_name}->{value});
         }
       
-              if ($self->{insertion_mode} eq 'in head' and
-                  defined $self->{head_element}) {
-                $self->{head_element}->append_child ($el);
-              } else {
-                $self->{open_elements}->[-1]->[0]->append_child ($el);
+      $self->{open_elements}->[-1]->[0]->append_child ($el);
+      push @{$self->{open_elements}}, [$el, $token->{tag_name}];
+    }
+  
+              pop @{$self->{open_elements}}; ## ISSUE: This step is missing in the spec.
+              pop @{$self->{open_elements}}
+                  if $self->{insertion_mode} eq 'after head';
+              $token = $self->_get_next_token;
+              redo B;
+            } elsif ($token->{tag_name} eq 'title' and
+                     $self->{insertion_mode} eq 'in head') {
+              ## NOTE: There is a "as if in head" code clone.
+              if ($self->{insertion_mode} eq 'after head') {
+                $self->{parse_error}-> (type => 'after head:'.$token->{tag_name});
+                push @{$self->{open_elements}}, [$self->{head_element}, 'head'];
               }
-
-              $token = $self->_get_next_token;
+              $parse_rcdata->('RCDATA', $insert_to_current);
+              pop @{$self->{open_elements}}
+                  if $self->{insertion_mode} eq 'after head';
               redo B;
-            } elsif ($token->{tag_name} eq 'head') {
-              $self->{parse_error}-> (type => 'in head:head');
-              ## Ignore the token
-              $token = $self->_get_next_token;
-              redo B;
-            } else {
-              #
-            }
-          } elsif ($token->{type} eq 'end tag') {
-            if ($token->{tag_name} eq 'head') {
-              if ($self->{open_elements}->[-1]->[1] eq 'head') {
-                pop @{$self->{open_elements}};
-              } else {
-                $self->{parse_error}-> (type => 'unmatched end tag:head');
+            } elsif ($token->{tag_name} eq 'style') {
+              ## NOTE: Or (scripting is enabled and tag_name eq 'noscript' and
+              ## insertion mode 'in head')
+              ## NOTE: There is a "as if in head" code clone.
+              if ($self->{insertion_mode} eq 'after head') {
+                $self->{parse_error}-> (type => 'after head:'.$token->{tag_name});
+                push @{$self->{open_elements}}, [$self->{head_element}, 'head'];
               }
-              $self->{insertion_mode} = 'after head';
-              $token = $self->_get_next_token;
+              $parse_rcdata->('CDATA', $insert_to_current);
+              pop @{$self->{open_elements}}
+                  if $self->{insertion_mode} eq 'after head';
               redo B;
-            } elsif ($token->{tag_name} eq 'body' or
-                     $token->{tag_name} eq 'html') {
-              #
-            } else {
-              $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
-              ## Ignore the token
-              $token = $self->_get_next_token;
-              redo B;
-            }
-          } else {
-            #
-          }
-
-          if ($self->{open_elements}->[-1]->[1] eq 'head') {
-            ## As if </head>
-            pop @{$self->{open_elements}};
-          }
-          $self->{insertion_mode} = 'after head';
-          ## reprocess
-          redo B;
-
-          ## ISSUE: An issue in the spec.
-        } elsif ($self->{insertion_mode} eq 'after head') {
-          if ($token->{type} eq 'character') {
-            if ($token->{data} =~ s/^([\x09\x0A\x0B\x0C\x20]+)//) {
-              $self->{open_elements}->[-1]->[0]->manakai_append_text ($1);
-              unless (length $token->{data}) {
+            } elsif ($token->{tag_name} eq 'noscript') {
+              if ($self->{insertion_mode} eq 'in head') {
+                ## NOTE: and scripting is disalbed
+                
+    {
+      my $el;
+      
+      $el = $self->{document}->create_element_ns
+        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
+    
+        for my $attr_name (keys %{  $token->{attributes}}) {
+          $el->set_attribute_ns (undef, [undef, $attr_name],
+                                  $token->{attributes} ->{$attr_name}->{value});
+        }
+      
+      $self->{open_elements}->[-1]->[0]->append_child ($el);
+      push @{$self->{open_elements}}, [$el, $token->{tag_name}];
+    }
+  
+                $self->{insertion_mode} = 'in head noscript';
                 $token = $self->_get_next_token;
                 redo B;
+              } elsif ($self->{insertion_mode} eq 'in head noscript') {
+                $self->{parse_error}-> (type => 'noscript in noscript');
+                ## Ignore the token
+                redo B;
+              } else {
+                #
               }
-            }
-            
-            #
-          } elsif ($token->{type} eq 'comment') {
-            my $comment = $self->{document}->create_comment ($token->{data});
-            $self->{open_elements}->[-1]->[0]->append_child ($comment);
-            $token = $self->_get_next_token;
-            redo B;
-          } elsif ($token->{type} eq 'start tag') {
-            if ($token->{tag_name} eq 'body') {
+            } elsif ($token->{tag_name} eq 'head' and
+                     $self->{insertion_mode} ne 'after head') {
+              $self->{parse_error}-> (type => 'in head:head'); # or in head noscript
+              ## Ignore the token
+              $token = $self->_get_next_token;
+              redo B;
+            } elsif ($self->{insertion_mode} ne 'in head noscript' and
+                     $token->{tag_name} eq 'script') {
+              if ($self->{insertion_mode} eq 'after head') {
+                $self->{parse_error}-> (type => 'after head:'.$token->{tag_name});
+                push @{$self->{open_elements}}, [$self->{head_element}, 'head'];
+              }
+              ## NOTE: There is a "as if in head" code clone.
+              $script_start_tag->($insert_to_current);
+              pop @{$self->{open_elements}}
+                  if $self->{insertion_mode} eq 'after head';
+              redo B;
+            } elsif ($self->{insertion_mode} eq 'after head' and
+                     $token->{tag_name} eq 'body') {
               
     {
       my $el;
@@ -4648,7 +4574,8 @@ sub _tree_construction_main ($) {
               $self->{insertion_mode} = 'in body';
               $token = $self->_get_next_token;
               redo B;
-            } elsif ($token->{tag_name} eq 'frameset') {
+            } elsif ($self->{insertion_mode} eq 'after head' and
+                     $token->{tag_name} eq 'frameset') {
               
     {
       my $el;
@@ -4668,23 +4595,48 @@ sub _tree_construction_main ($) {
               $self->{insertion_mode} = 'in frameset';
               $token = $self->_get_next_token;
               redo B;
-            } elsif ({
-                      base => 1, link => 1, meta => 1,
-                      script => 1, style => 1, title => 1,
-                     }->{$token->{tag_name}}) {
-              $self->{parse_error}-> (type => 'after head:'.$token->{tag_name});
+            } else {
+              #
+            }
+          } elsif ($token->{type} eq 'end tag') {
+            if ($self->{insertion_mode} eq 'in head' and
+                $token->{tag_name} eq 'head') {
+              pop @{$self->{open_elements}};
+              $self->{insertion_mode} = 'after head';
+              $token = $self->_get_next_token;
+              redo B;
+            } elsif ($self->{insertion_mode} eq 'in head noscript' and
+                $token->{tag_name} eq 'noscript') {
+              pop @{$self->{open_elements}};
               $self->{insertion_mode} = 'in head';
-              ## reprocess
+              $token = $self->_get_next_token;
+              redo B;
+            } elsif ($self->{insertion_mode} eq 'in head' and
+                     ($token->{tag_name} eq 'body' or
+                      $token->{tag_name} eq 'html')) {
+              #
+            } elsif ($self->{insertion_mode} ne 'after head') {
+              $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
+              ## Ignore the token
+              $token = $self->_get_next_token;
               redo B;
             } else {
-              # 
-            } 
+              #
+            }
           } else {
             #
           }
-          
-          ## As if <body>
-          
+
+          ## As if </head> or </noscript> or <body>
+          if ($self->{insertion_mode} eq 'in head') {
+            pop @{$self->{open_elements}};
+            $self->{insertion_mode} = 'after head';
+          } elsif ($self->{insertion_mode} eq 'in head noscript') {
+            pop @{$self->{open_elements}};
+            $self->{parse_error}-> (type => 'in noscript:'.(defined $token->{tag_name} ? ($token->{type} eq 'end tag' ? '/' : '') . $token->{tag_name} : '#' . $token->{type}));
+            $self->{insertion_mode} = 'in head';
+          } else { # 'after head'
+            
     {
       my $el;
       
@@ -4695,9 +4647,12 @@ sub _tree_construction_main ($) {
       push @{$self->{open_elements}}, [$el, 'body'];
     }
   
-          $self->{insertion_mode} = 'in body';
+            $self->{insertion_mode} = 'in body';
+          }
           ## reprocess
           redo B;
+
+          ## ISSUE: An issue in the spec.
         } elsif ($self->{insertion_mode} eq 'in body') {
           if ($token->{type} eq 'character') {
             ## NOTE: There is a code clone of "character in body".
@@ -6714,4 +6669,4 @@ sub get_inner_html ($$$) {
 } # get_inner_html
 
 1;
-# $Date: 2007/06/23 16:42:43 $
+# $Date: 2007/06/24 05:12:11 $

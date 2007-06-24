@@ -159,7 +159,9 @@ my $HTML_NS = q<http://www.w3.org/1999/xhtml>;
 
 my $HTMLMetadataElements = {
   $HTML_NS => {
-    qw/link 1 meta 1 style 1 script 1 event-source 1 command 1 base 1 title 1/,
+    qw/link 1 meta 1 style 1 script 1 event-source 1 command 1 base 1 title 1
+       noscript 1
+      /,
   },
 };
 
@@ -203,7 +205,8 @@ my $HTMLInteractiveElements = {
 
 my $HTMLTransparentElements = {
   $HTML_NS => {qw/ins 1 font 1 noscript 1/},
-  ## NOTE: |html:noscript| is transparent if scripting is disabled.
+  ## NOTE: |html:noscript| is transparent if scripting is disabled
+  ## and not in |head|.
 };
 
 #my $HTMLSemiTransparentElements = {
@@ -2542,6 +2545,7 @@ $Element->{$HTML_NS}->{noscript} = {
     return ($sib, $ch);
   },
 };
+## TODO: noscript in head
 
 $Element->{$HTML_NS}->{'event-source'} = {
   attrs_checker => $GetHTMLAttrsChecker->({
@@ -2813,6 +2817,7 @@ sub _check_get_children ($$) {
         push @$sib, $end;
       }
     }
+    ## TODO: |script| is not a transparent element in |head|.
     if ($HTMLTransparentElements->{$node_ns}->{$node_ln}) {
       unshift @$sib, @{$node->child_nodes};
       push @$new_todos, {type => 'element-attributes', node => $node};
@@ -2851,4 +2856,4 @@ sub _check_get_children ($$) {
 } # _check_get_children
 
 1;
-# $Date: 2007/06/23 16:42:43 $
+# $Date: 2007/06/24 05:12:11 $

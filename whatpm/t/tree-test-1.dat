@@ -39,9 +39,9 @@ title in body
 | <!DOCTYPE HTML>
 | <html>
 |   <head>
+|   <body>
 |     <title>
 |       class="a"
-|   <body>
 
 #data
 <!DOCTYPE HTML><html><head></head><body></body><title class="a"></title></html>
@@ -52,9 +52,9 @@ title in body
 | <!DOCTYPE HTML>
 | <html>
 |   <head>
+|   <body>
 |     <title>
 |       class="a"
-|   <body>
 
 #data
 <!DOCTYPE HTML><html><head><title></title></head><body title="t"></body></html>
@@ -269,6 +269,23 @@ data after body
 ## when script is disabled
 #data
 <!DOCTYPE HTML><noscript>aaa<noscript>bbb</noscript>ccc</noscript>
+#errors
+in noscript:#character
+unmacthed noscript end tag
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <noscript>
+|   <body>
+|     "aaa"
+|     <noscript>
+|       "bbb"
+|     "ccc"
+
+## when script is disabled
+#data
+<!DOCTYPE HTML><body><noscript>aaa<noscript>bbb</noscript>ccc</noscript>
 #errors
 #document
 | <!DOCTYPE HTML>
