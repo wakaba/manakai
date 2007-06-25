@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.27 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.28 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## ISSUE:
 ## var doc = implementation.createDocument (null, null, null);
@@ -508,6 +508,8 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($self->{next_input_character} == 0x003E) { # >
         if ($self->{current_token}->{type} eq 'start tag') {
+          $self->{current_token}->{first_start_tag}
+              = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} eq 'end tag') {
           $self->{content_model_flag} = 'PCDATA'; # MUST
@@ -545,6 +547,8 @@ sub _get_next_token ($) {
       } elsif ($self->{next_input_character} == -1) {
         $self->{parse_error}-> (type => 'unclosed tag');
         if ($self->{current_token}->{type} eq 'start tag') {
+          $self->{current_token}->{first_start_tag}
+              = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} eq 'end tag') {
           $self->{content_model_flag} = 'PCDATA'; # MUST
@@ -609,6 +613,8 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($self->{next_input_character} == 0x003E) { # >
         if ($self->{current_token}->{type} eq 'start tag') {
+          $self->{current_token}->{first_start_tag}
+              = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} eq 'end tag') {
           $self->{content_model_flag} = 'PCDATA'; # MUST
@@ -665,6 +671,8 @@ sub _get_next_token ($) {
       } elsif ($self->{next_input_character} == -1) {
         $self->{parse_error}-> (type => 'unclosed tag');
         if ($self->{current_token}->{type} eq 'start tag') {
+          $self->{current_token}->{first_start_tag}
+              = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} eq 'end tag') {
           $self->{content_model_flag} = 'PCDATA'; # MUST
@@ -734,6 +742,8 @@ sub _get_next_token ($) {
       } elsif ($self->{next_input_character} == 0x003E) { # >
         $before_leave->();
         if ($self->{current_token}->{type} eq 'start tag') {
+          $self->{current_token}->{first_start_tag}
+              = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} eq 'end tag') {
           $self->{content_model_flag} = 'PCDATA'; # MUST
@@ -791,6 +801,8 @@ sub _get_next_token ($) {
         $self->{parse_error}-> (type => 'unclosed tag');
         $before_leave->();
         if ($self->{current_token}->{type} eq 'start tag') {
+          $self->{current_token}->{first_start_tag}
+              = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} eq 'end tag') {
           $self->{content_model_flag} = 'PCDATA'; # MUST
@@ -845,6 +857,8 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($self->{next_input_character} == 0x003E) { # >
         if ($self->{current_token}->{type} eq 'start tag') {
+          $self->{current_token}->{first_start_tag}
+              = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} eq 'end tag') {
           $self->{content_model_flag} = 'PCDATA'; # MUST
@@ -901,6 +915,8 @@ sub _get_next_token ($) {
       } elsif ($self->{next_input_character} == -1) {
         $self->{parse_error}-> (type => 'unclosed tag');
         if ($self->{current_token}->{type} eq 'start tag') {
+          $self->{current_token}->{first_start_tag}
+              = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} eq 'end tag') {
           $self->{content_model_flag} = 'PCDATA'; # MUST
@@ -970,6 +986,8 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($self->{next_input_character} == 0x003E) { # >
         if ($self->{current_token}->{type} eq 'start tag') {
+          $self->{current_token}->{first_start_tag}
+              = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} eq 'end tag') {
           $self->{content_model_flag} = 'PCDATA'; # MUST
@@ -994,6 +1012,8 @@ sub _get_next_token ($) {
       } elsif ($self->{next_input_character} == -1) {
         $self->{parse_error}-> (type => 'unclosed tag');
         if ($self->{current_token}->{type} eq 'start tag') {
+          $self->{current_token}->{first_start_tag}
+              = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} eq 'end tag') {
           $self->{content_model_flag} = 'PCDATA'; # MUST
@@ -1046,6 +1066,8 @@ sub _get_next_token ($) {
       } elsif ($self->{next_input_character} == -1) {
         $self->{parse_error}-> (type => 'unclosed attribute value');
         if ($self->{current_token}->{type} eq 'start tag') {
+          $self->{current_token}->{first_start_tag}
+              = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} eq 'end tag') {
           $self->{content_model_flag} = 'PCDATA'; # MUST
@@ -1098,6 +1120,8 @@ sub _get_next_token ($) {
       } elsif ($self->{next_input_character} == -1) {
         $self->{parse_error}-> (type => 'unclosed attribute value');
         if ($self->{current_token}->{type} eq 'start tag') {
+          $self->{current_token}->{first_start_tag}
+              = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} eq 'end tag') {
           $self->{content_model_flag} = 'PCDATA'; # MUST
@@ -1153,6 +1177,8 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($self->{next_input_character} == 0x003E) { # >
         if ($self->{current_token}->{type} eq 'start tag') {
+          $self->{current_token}->{first_start_tag}
+              = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} eq 'end tag') {
           $self->{content_model_flag} = 'PCDATA'; # MUST
@@ -1177,6 +1203,8 @@ sub _get_next_token ($) {
       } elsif ($self->{next_input_character} == -1) {
         $self->{parse_error}-> (type => 'unclosed tag');
         if ($self->{current_token}->{type} eq 'start tag') {
+          $self->{current_token}->{first_start_tag}
+              = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} eq 'end tag') {
           $self->{content_model_flag} = 'PCDATA'; # MUST
@@ -3437,7 +3465,6 @@ sub _tree_construction_main ($) {
             if ($i != -1) {
               $self->{parse_error}-> (type => 'end tag missing:'.
                               $self->{open_elements}->[-1]->[1]);
-              ## TODO: test
             }
             splice @{$self->{open_elements}}, $i;
             last LI;
@@ -3500,7 +3527,6 @@ sub _tree_construction_main ($) {
             if ($i != -1) {
               $self->{parse_error}-> (type => 'end tag missing:'.
                               $self->{open_elements}->[-1]->[1]);
-              ## TODO: test
             }
             splice @{$self->{open_elements}}, $i;
             last LI;
@@ -4342,7 +4368,9 @@ sub _tree_construction_main ($) {
         redo B;
       } elsif ($token->{type} eq 'start tag' and
                $token->{tag_name} eq 'html') {
-        ## TODO: unless it is the first start tag token, parse-error
+        unless ($token->{first_start_tag}) {
+          $self->{parse_error}-> (type => 'not first start tag');
+        }
         my $top_el = $self->{open_elements}->[0]->[0];
         for my $attr_name (keys %{$token->{attributes}}) {
           unless ($top_el->has_attribute_ns (undef, $attr_name)) {
@@ -6682,4 +6710,4 @@ sub get_inner_html ($$$) {
 } # get_inner_html
 
 1;
-# $Date: 2007/06/24 14:24:21 $
+# $Date: 2007/06/25 00:14:39 $

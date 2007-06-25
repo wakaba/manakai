@@ -1,7 +1,7 @@
 1..472
 # Running under perl version 5.008007 for linux
-# Current time local: Sun Jun 24 23:22:52 2007
-# Current time GMT:   Sun Jun 24 14:22:52 2007
+# Current time local: Mon Jun 25 09:09:26 2007
+# Current time GMT:   Mon Jun 25 00:09:26 2007
 # Using Test.pm version 1.25
 # t/tokenizer-test-2.dat
 ok 1
@@ -650,15 +650,15 @@ not ok 354
 #</script>  <title>x</title>  </head>)
 #     Line 11 is missing:
 #      - "|   <body>\n"
-not ok 355
-# Test 355 got: "0" (t/HTML-tree.t at line 133 fail #178)
-#     Expected: "1" (Parse error: <!DOCTYPE HTML><html><body><html id=x>; ;duplicate html start tag)
+ok 355
 ok 356
 not ok 357
 # Test 357 got: "0" (t/HTML-tree.t at line 133 fail #179)
 #     Expected: "2" (Parse error: <!DOCTYPE HTML>X</body><html id="x">; ;Unexpected html start tag in the after body phase., html needs to be the first start tag.)
 ok 358
-ok 359
+not ok 359
+# Test 359 got: "2" (t/HTML-tree.t at line 133 fail #180)
+#     Expected: "1" (Parse error: <!DOCTYPE HTML><head><html id=x>; 1:32:not first start tag, 1:32:not closed:head;html start tag too late)
 not ok 360
 # Test 360 got: "| <!DOCTYPE HTML>\n| <html>\n|   id=\"x\"\n|   <head>\n" (t/HTML-tree.t at line 135 fail #180)
 #     Expected: "| <!DOCTYPE HTML>\n| <html>\n|   id=\"x\"\n|   <head>\n|   <body>\n" (Document tree: <!DOCTYPE HTML><head><html id=x>)
@@ -1019,15 +1019,19 @@ ok 599
 ok 600
 ok 601
 ok 602
-not ok 603
-# Test 603 got: "1" (t/HTML-tree.t at line 133 fail #302)
-#     Expected: "3" (Parse error: <!DOCTYPE HTML><h1><a><h2>; 1:26:not closed:h2;h1 not closed, a not closed, h2 not closed)
+ok 603
 ok 604
 ok 605
 ok 606
-ok 607
+not ok 607
+# Test 607 got: "1" (t/HTML-tree.t at line 133 fail #304)
+#     Expected: "3" (Parse error: <!DOCTYPE HTML><h1><a><h2>; 1:26:not closed:h2;h1 not closed, a not closed, h2 not closed)
 ok 608
 ok 609
 ok 610
 ok 611
 ok 612
+ok 613
+ok 614
+ok 615
+ok 616

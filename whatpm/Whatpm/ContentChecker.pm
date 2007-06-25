@@ -2925,7 +2925,7 @@ sub _check_get_children ($$$) {
         push @$sib, $end;
       }
     }
-    ## TODO: |script| is not a transparent element in |head|.
+    ## TODO: |noscript| is not a transparent element in |head|.
     if ($HTMLTransparentElements->{$node_ns}->{$node_ln}) {
       unshift @$sib, @{$node->child_nodes};
       push @$new_todos, {type => 'element-attributes', node => $node};
@@ -2969,4 +2969,4 @@ sub _check_get_children ($$$) {
 } # _check_get_children
 
 1;
-# $Date: 2007/06/24 14:24:21 $
+# $Date: 2007/06/25 00:14:39 $

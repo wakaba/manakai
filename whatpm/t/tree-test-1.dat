@@ -916,6 +916,20 @@ isindex
 | "</style>abc"
 
 #data
+<style>ABC</style>abc
+#errors
+#document-fragment style
+| "<style>ABC</style>abc"
+
+#data
+<style>ABC</style>abc
+#errors
+#document-fragment div
+| <style>
+|   "ABC"
+| "abc"
+
+#data
 </stylesheet
 #errors
 #document-fragment style
