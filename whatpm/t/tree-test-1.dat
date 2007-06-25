@@ -220,39 +220,6 @@ data after body
 |         "X"
 
 #data
-<link rel="a" href="b">
-#errors
-#document-fragment head
-| <link>
-|   href="b"
-|   rel="a"
-
-#data
-<meta name="a" content="b">
-#errors
-#document-fragment head
-| <meta>
-|   content="b"
-|   name="a"
-
-#data
-<base href="a" target="b">
-#errors
-#document-fragment head
-| <base>
-|   href="a"
-|   target="b"
-
-#data
-<base href="a" target="b">a
-#errors
-#document-fragment head
-| <base>
-|   href="a"
-|   target="b"
-| "a"
-
-#data
 <!DOCTYPE HTML><ins><p>XX</ins>YYY
 #errors
 1,32,not closed:p
@@ -902,56 +869,6 @@ isindex
 |   <head>
 |   <body>
 |     <form>
-
-#data
-</style>
-#errors
-#document-fragment style
-| "</style>"
-
-#data
-</style>abc
-#errors
-#document-fragment style
-| "</style>abc"
-
-#data
-<style>ABC</style>abc
-#errors
-#document-fragment style
-| "<style>ABC</style>abc"
-
-#data
-<style>ABC</style>abc
-#errors
-#document-fragment div
-| <style>
-|   "ABC"
-| "abc"
-
-#data
-</stylesheet
-#errors
-#document-fragment style
-| "</stylesheet"
-
-#data
-</title>
-#errors
-#document-fragment title
-| "</title>"
-
-#data
-</title>abc
-#errors
-#document-fragment title
-| "</title>abc"
-
-#data
-</titletext
-#errors
-#document-fragment title
-| "</titletext"
 
 #data
 <!DOCTYPE HTML><h1><a><h2>

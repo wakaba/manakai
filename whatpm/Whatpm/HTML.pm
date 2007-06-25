@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.28 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.29 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## ISSUE:
 ## var doc = implementation.createDocument (null, null, null);
@@ -2836,13 +2836,20 @@ sub _reset_insertion_mode ($) {
     
     ## Step 3
     S3: {
-      $last = 1 if $self->{open_elements}->[0]->[0] eq $node->[0];
-      if (defined $self->{inner_html_node}) {
-        if ($self->{inner_html_node}->[1] eq 'td' or
-            $self->{inner_html_node}->[1] eq 'th') {
-          #
-        } else {
-          $node = $self->{inner_html_node};
+      ## ISSUE: Oops! "If node is the first node in the stack of open
+      ## elements, then set last to true. If the context element of the
+      ## HTML fragment parsing algorithm is neither a td element nor a
+      ## th element, then set node to the context element. (fragment case)":
+      ## The second "if" is in the scope of the first "if"!?
+      if ($self->{open_elements}->[0]->[0] eq $node->[0]) {
+        $last = 1;
+        if (defined $self->{inner_html_node}) {
+          if ($self->{inner_html_node}->[1] eq 'td' or
+              $self->{inner_html_node}->[1] eq 'th') {
+            #
+          } else {
+            $node = $self->{inner_html_node};
+          }
         }
       }
     
@@ -4368,6 +4375,8 @@ sub _tree_construction_main ($) {
         redo B;
       } elsif ($token->{type} eq 'start tag' and
                $token->{tag_name} eq 'html') {
+## ISSUE: "aa<html>" is not a parse error.
+## ISSUE: "<html>" in fragment is not a parse error.
         unless ($token->{first_start_tag}) {
           $self->{parse_error}-> (type => 'not first start tag');
         }
@@ -6710,4 +6719,4 @@ sub get_inner_html ($$$) {
 } # get_inner_html
 
 1;
-# $Date: 2007/06/25 00:14:39 $
+# $Date: 2007/06/25 11:05:57 $
