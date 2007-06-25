@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/perl -d:DProf
 use strict;
 
 use lib qw[/home/httpd/html/www/markup/html/whatpm
@@ -13,7 +13,8 @@ my $http = SuikaWiki::Input::HTTP->new;
 
 ## TODO: _charset_
 
-my $mode = $http->meta_variable ('PATH_INFO');
+my @mode = split m#/#, scalar $http->meta_variable ('PATH_INFO'), -1;
+shift @mode if @mode and $mode[0] == '';
 ## TODO: decode unreserved characters
 
   my $s = $http->parameter ('s');
@@ -28,10 +29,12 @@ my $mode = $http->meta_variable ('PATH_INFO');
 
   require Message::DOM::DOMImplementation;
   my $dom = Message::DOM::DOMImplementation->____new;
-  $| = 1;
+#  $| = 1;
   my $doc;
+  my $el;
 
-if ($mode eq '/html/html' or $mode eq '/html/test') {
+if (@mode == 3 and $mode[0] eq 'html' and
+    ($mode[2] eq 'html' or $mode[2] eq 'test')) {
   print STDOUT "Content-Type: text/plain; charset=utf-8\n\n";
 
   require Encode;
@@ -50,25 +53,36 @@ if ($mode eq '/html/html' or $mode eq '/html/test') {
     print STDOUT "$opt{line},$opt{column},$opt{type}\n";
   };
 
+  $doc = $dom->create_document;
   $time1 = time;
-  $doc = Whatpm::HTML->parse_string ($s => $dom->create_document, $onerror);
+  if (length $mode[1]) {
+    $el = $doc->create_element_ns
+        ('http://www.w3.org/1999/xhtml', [undef, $mode[1]]);
+    Whatpm::HTML->set_inner_html ($el, $s, $onerror);
+  } else {
+    Whatpm::HTML->parse_string ($s => $doc, $onerror);
+  }
   $time2 = time;
   $time{parse} = $time2 - $time1;
 
   print "#document\n";
 
   my $out;
-  $time1 = time;
-  if ($mode eq '/html/html') {
-    $out = Whatpm::HTML->get_inner_html ($doc);
+  if ($mode[2] eq 'html') {
+    $time1 = time;
+    $out = Whatpm::HTML->get_inner_html ($el || $doc);
+    $time2 = time;
+    $time{serialize_html} = $time2 - $time1;
   } else { # test
-    $out = test_serialize ($doc);
+    $time1 = time;
+    $out = test_serialize ($el || $doc);
+    $time2 = time;
+    $time{serialize_test} = $time2 - $time1;
   }
-  $time2 = time;
-  $time{serialize} = $time2 - $time1;
   print STDOUT Encode::encode ('utf-8', $$out);
   print STDOUT "\n";
-} elsif ($mode eq '/xhtml/html' or $mode eq '/xhtml/test') {
+} elsif (@mode == 3 and $mode[0] eq 'xhtml' and
+         ($mode[2] eq 'html' or $mode[2] eq 'test')) {
   print STDOUT "Content-Type: text/plain; charset=utf-8\n\n";
 
   require Message::DOM::XMLParserTemp;
@@ -77,7 +91,7 @@ if ($mode eq '/html/html' or $mode eq '/html/test') {
   my $onerror = sub {
     my $err = shift;
     print STDOUT $err->location->line_number, ",";
-    print STDOUT $err->location->column_number, " ";
+    print STDOUT $err->location->column_number, ",";
     print STDOUT $err->text, "\n";
     return 1;
   };
@@ -92,7 +106,7 @@ if ($mode eq '/html/html' or $mode eq '/html/test') {
   print "#document\n";
 
   my $out;
-  if ($mode eq '/xhtml/html') {
+  if ($mode[2] eq 'html') {
     ## TODO: Use XHTML serializer
     #$out = Whatpm::HTML->get_inner_html ($doc);
   } else { # test
@@ -110,12 +124,17 @@ if ($mode eq '/html/html' or $mode eq '/html/test') {
 
   if ($http->parameter ('dom5')) {
     require Whatpm::ContentChecker;
-    print STDOUT "#domerrors\n";
-    $time1 = time;
-    Whatpm::ContentChecker->check_document ($doc, sub {
+    my $onerror = sub {
       my %opt = @_;
       print STDOUT get_node_path ($opt{node}) . ';' . $opt{type} . "\n";
-    });
+    };
+    print STDOUT "#domerrors\n";
+    $time1 = time;
+    if ($el) {
+      Whatpm::ContentChecker->check_element ($el, $onerror);
+    } else {
+      Whatpm::ContentChecker->check_document ($doc, $onerror);
+    }
     $time2 = time;
     $time{check} = $time2 - $time1;
   }
@@ -128,9 +147,9 @@ if ($mode eq '/html/html' or $mode eq '/html/test') {
       decode => 'bytes->chars',
       parse => 'html5(chars)->dom5',
       parse_xml => 'xml1(chars)->dom5',
-      serialize_html => 'dom5->html5',
-      serialize_xml => 'dom5->xml',
-      serialize_test => 'dom5->test',
+      serialize_html => 'dom5->html5(char)',
+      serialize_xml => 'dom5->xml1(char)',
+      serialize_test => 'dom5->test(char)',
       check => 'dom5 check',
     }->{$_};
     print STDOUT "\t", $time{$_}, "s\n";
@@ -217,4 +236,4 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2007/06/21 14:54:14 $
+## $Date: 2007/06/25 00:15:12 $

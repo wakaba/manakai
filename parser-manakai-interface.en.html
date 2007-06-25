@@ -55,9 +55,12 @@
     margin-top: 0;
     margin-bottom: 0;
   }
+  #element {
+    width: 5em;
+  }
 </style>
 </head>
-<body>
+<body onload="document.getElementById('element').disabled=!document.getElementById('html5').checked">
 <h1>HTML5 Parser (<em>beta</em>) Web Interface
 (manakai Version)</h1>
 
@@ -67,8 +70,10 @@
       var uri = 'parser-manakai/';
       if (document.getElementById ('html5').checked) {
         uri += 'html/';
+        uri += document.getElementById ('element').value + '/';
       } else {
         uri += 'xhtml/';
+        uri += '/';
       }
       if (document.getElementById ('format-test').checked) {
         this.action = uri + 'test';
@@ -88,9 +93,9 @@
 <p><button type="submit">Parse</button></p>
 <fieldset>
 <fieldset>
-<p><label title="Show any HTML5 parse errors if checked"><input type="radio" name="input-format" id="html5" checked> HTML5</label></p>
-<p><label title="Show any XML 1.0/1.1 parse errors if checked (using a non-validating parser)"><input type="radio" name="input-format" id="xhtml5"> XHTML5</label>
-(<em>slow</em>)</p>
+<p><label title="Show any HTML5 parse errors if checked"><input type="radio" name="input-format" id="html5" onchange="element.disabled = false" checked> HTML5</label></p>
+<p><label title="Show any XML 1.0/1.1 parse errors if checked (using a non-validating parser)"><input type="radio" name="input-format" onchange="element.disabled = true" id="xhtml5"> XHTML5</label></p>
+<p><input type="text" name="element" id="element" value="" title="If specified, the input is parsed by the fragment parsing (innerHTML) algorithm."></p>
 <p><label title="Show any conformance error of the parsed DOM tree if checked"><input type="checkbox" name="dom5"> DOM5 HTML</label></p>
 </fieldset>
 <fieldset>
