@@ -957,6 +957,15 @@ my $HTMLAttrChecker = {
   },
   dir => $GetHTMLEnumeratedAttrChecker->({ltr => 1, rtl => 1}),
   class => $HTMLUnorderedSetOfSpaceSeparatedTokensAttrChecker,
+  contextmenu => sub {
+    my ($self, $attr) = @_;
+    my $value = $attr->value;
+    push @{$self->{contextmenu}}, [$value => $attr];
+    ## ISSUE: "The value must be the ID of a menu element in the DOM."
+    ## What is "in the DOM"?  A menu Element node that is not part
+    ## of the Document tree is in the DOM?  A menu Element node that
+    ## belong to another Document tree is in the DOM?
+  },
   irrelevant => $GetHTMLBooleanAttrChecker->('irrelevant'),
   tabindex => $HTMLIntegerAttrChecker,
 };
@@ -988,7 +997,7 @@ my $GetHTMLAttrsChecker = sub {
       $checker ||= $AttrChecker->{$attr_ns}->{$attr_ln}
         || $AttrChecker->{$attr_ns}->{''};
       if ($checker) {
-        $checker->($self, $attr);
+        $checker->($self, $attr, $todo);
       } else {
         $self->{onerror}->(node => $attr, type => 'attribute not supported');
         ## ISSUE: No comformance createria for unknown attributes in the spec
@@ -1774,10 +1783,13 @@ $Element->{$HTML_NS}->{a} = {
     my ($self, $todo) = @_;
 
     my $end = $self->_add_minuses ($HTMLInteractiveElements);
-    my ($sib, $ch)
+    my ($new_todos, $ch)
       = $HTMLSignificantInlineOrStrictlyInlineChecker->($self, $todo);
-    push @$sib, $end;
-    return ($sib, $ch);
+    push @$new_todos, $end;
+
+    $_->{flag}->{has_a} = 1 for @$new_todos;
+
+    return ($new_todos, $ch);
   },
 };
 
@@ -2004,7 +2016,13 @@ $Element->{$HTML_NS}->{img} = {
       alt => sub { }, ## NOTE: No syntactical requirement
       src => $HTMLURIAttrChecker,
       usemap => $HTMLUsemapAttrChecker,
-      ismap => $GetHTMLBooleanAttrChecker->('ismap'), ## TODO: MUST ancestor <a>
+      ismap => sub {
+        my ($self, $attr, $parent_todo) = @_;
+        if (not $todo->{flag}->{has_a}) {
+          $self->{onerror}->(node => $attr, type => 'attribute not allowed');
+        }
+        $GetHTMLBooleanAttrChecker->('ismap')->($self, $attr, $parent_todo);
+      },
       ## TODO: height
       ## TODO: width
     })->($self, $todo);
@@ -2680,22 +2698,105 @@ $Element->{$HTML_NS}->{datagrid} = {
   }),
   checker => sub {
     my ($self, $todo) = @_;
+    my $el = $todo->{node};
+    my $new_todos = [];
+    my @nodes = (@{$el->child_nodes});
 
     my $end = $self->_add_minuses ({$HTML_NS => {a => 1, datagrid => 1}});
-    my ($sib, $ch) = $HTMLBlockChecker->($self, $todo);
-    ## TODO: (Block-table)+ | table | select | datalist
-    push @$sib, $end;
-    return ($sib, $ch);
+    
+    ## Block-table Block* | table | select | datalist | Empty
+    my $mode = 'any';
+    while (@nodes) {
+      my $node = shift @nodes;
+      $self->_remove_minuses ($node) and next if ref $node eq 'HASH'; 
+      
+      my $nt = $node->node_type;
+      if ($nt == 1) {
+        my $node_ns = $node->namespace_uri;
+        $node_ns = '' unless defined $node_ns;
+        my $node_ln = $node->manakai_local_name;
+        my $not_allowed = $self->{minuses}->{$node_ns}->{$node_ln};
+        if ($mode eq 'block') {
+          $not_allowed = 1
+              unless $HTMLBlockLevelElements->{$node_ns}->{$node_ln};
+        } elsif ($mode eq 'any') {
+          if ($node_ns eq $HTML_NS and
+              {table => 1, select => 1, datalist => 1}->{$node_ln}) {
+            $mode = 'none';
+          } elsif ($HTMLBlockLevelElements->{$node_ns}->{$node_ln}) {
+            $mode = 'block';
+          } else {
+            $not_allowed = 1;
+          }
+        } else {
+          $not_allowed = 1;
+        }
+        $self->{onerror}->(node => $node, type => 'element not allowed')
+            if $not_allowed;
+        my ($sib, $ch) = $self->_check_get_children ($node, $todo);
+        unshift @nodes, @$sib;
+        push @$new_todos, @$ch;
+      } elsif ($nt == 3 or $nt == 4) {
+        if ($node->data =~ /[^\x09-\x0D\x20]/) {
+          $self->{onerror}->(node => $node, type => 'character not allowed');
+        }
+      } elsif ($nt == 5) {
+        unshift @nodes, @{$node->child_nodes};
+      }
+    }
+
+    push @$new_todos, $end;
+    return ($new_todos);
   },
 };
 
 $Element->{$HTML_NS}->{command} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}), ## TODO
+  attrs_checker => $GetHTMLAttrsChecker->({
+    checked => $GetHTMLBooleanAttrChecker->('checked'),
+    default => $GetHTMLBooleanAttrChecker->('default'),
+    disabled => $GetHTMLBooleanAttrChecker->('disabled'),
+    hidden => $GetHTMLBooleanAttrChecker->('hidden'),
+    icon => $HTMLURIAttrChecker,
+    label => sub { }, ## NOTE: No conformance creteria
+    radiogroup => sub { }, ## NOTE: No conformance creteria
+    ## NOTE: |title| has special semantics, but no syntactical difference
+    type => sub {
+      my ($self, $attr) = @_;
+      my $value = $attr->value;
+      unless ({command => 1, checkbox => 1, radio => 1}->{$value}) {
+        $self->{onerror}->(node => $attr, type => 'attribute value not allowed');
+      }
+    },
+  }),
   checker => $HTMLEmptyChecker,
 };
 
 $Element->{$HTML_NS}->{menu} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}), ## TODO
+  attrs_checker => $GetHTMLAttrsChecker->({
+    autosubmit => $GetHTMLBooleanAttrChecker->('autosubmit'),
+    id => sub {
+      ## NOTE: same as global |id=""|, with |$self->{menu}| registeration
+      my ($self, $attr) = @_;
+      my $value = $attr->value;
+      if (length $value > 0) {
+        if ($self->{id}->{$value}) {
+          $self->{onerror}->(node => $attr, type => 'duplicate ID');
+        } else {
+          $self->{id}->{$value} = 1;
+        }
+      } else {
+        ## NOTE: MUST contain at least one character
+        $self->{onerror}->(node => $attr, type => 'attribute value is empty');
+      }
+      if ($value =~ /[\x09-\x0D\x20]/) {
+        $self->{onerror}->(node => $attr, type => 'space in ID');
+      }
+      $self->{menu}->{$value} ||= $attr;
+      ## ISSUE: <menu id=""><p contextmenu=""> match?
+    },
+    label => sub { }, ## NOTE: No conformance creteria
+    type => $GetHTMLEnumeratedAttrChecker->({context => 1, toolbar => 1}),
+  }),
   checker => sub {
     my ($self, $todo) = @_;
     my $el = $todo->{node};
@@ -2827,7 +2928,9 @@ sub check_element ($$$) {
   $self->{id} = {};
   $self->{term} = {};
   $self->{usemap} = [];
+  $self->{contextmenu} = [];
   $self->{map} = {};
+  $self->{menu} = {};
   $self->{has_link_type} = {};
 
   my @todo = ({type => 'element', node => $el});
@@ -2875,6 +2978,12 @@ sub check_element ($$$) {
   for (@{$self->{usemap}}) {
     unless ($self->{map}->{$_->[0]}) {
       $self->{onerror}->(node => $_->[1], type => 'no referenced map');
+    }
+  }
+
+  for (@{$self->{contextmenu}}) {
+    unless ($self->{menu}->{$_->[0]}) {
+      $self->{onerror}->(node => $_->[1], type => 'no referenced menu');
     }
   }
 
@@ -2969,4 +3078,4 @@ sub _check_get_children ($$$) {
 } # _check_get_children
 
 1;
-# $Date: 2007/06/25 00:14:39 $
+# $Date: 2007/06/25 12:39:11 $

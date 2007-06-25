@@ -1977,6 +1977,26 @@ id=""><span id=""></span></p>
 /img/@src;URI:m::syntax error
 
 #data
+<img alt="" src="http://test/" ismap="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@ismap;attribute not allowed
+
+#data
+<span xmlns="http://www.w3.org/1999/xhtml">
+<img alt="" src="http://test/" ismap="" xmlns="http://www.w3.org/1999/xhtml"/>
+</span>
+#errors
+/span/img/@ismap;attribute not allowed
+
+#data
+<span xmlns="http://www.w3.org/1999/xhtml">
+<a/>
+<img alt="" src="http://test/" ismap="" xmlns="http://www.w3.org/1999/xhtml"/>
+</span>
+#errors
+/span/img/@ismap;attribute not allowed
+
+#data
 <a xmlns="http://www.w3.org/1999/xhtml">
 <img alt="" src="http://test/" ismap="ismap"/>
 </a>
@@ -2094,6 +2114,14 @@ id=""><span id=""></span></p>
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
 <map id="AA"/>
+<p><img src="http://test/" alt="" usemap="#aa"/></p>
+</div>
+#errors
+/div/p/img/@usemap;no referenced map
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<p id="aa"/>
 <p><img src="http://test/" alt="" usemap="#aa"/></p>
 </div>
 #errors
@@ -2261,6 +2289,13 @@ id=""><span id=""></span></p>
 </div>
 #errors
 /div/p/object/@usemap;no referenced map
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<object data="" usemap="#a"/><menu id="a"/>
+</div>
+#errors
+/div/object/@usemap;no referenced map
 
 #data
 <param xmlns="http://www.w3.org/1999/xhtml"/>
@@ -3330,6 +3365,332 @@ id=""><span id=""></span></p>
 <datagrid multiple="true" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /datagrid/@multiple;invalid boolean attribute value
+
+#data
+<command xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<command default="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<command default="default" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<command default="true" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/command/@default;invalid boolean attribute value
+
+#data
+<command checked="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<command checked="checked" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<command checked="true" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/command/@checked;invalid boolean attribute value
+
+#data
+<command hidden="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<command hidden="hidden" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<command hidden="true" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/command/@hidden;invalid boolean attribute value
+
+#data
+<command disabled="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<command disabled="disabled" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<command disabled="true" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/command/@disabled;invalid boolean attribute value
+
+#data
+<command label="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<command label=" " xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<command label="aaa" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<command label="label" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<command label="&#x4E00;" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<command label="&#xA;" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<command title="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<command title="aaa" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<command radiogroup="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<command radiogroup="aa" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<command type="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/command/@type;attribute value not allowed
+
+#data
+<command type=" " xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/command/@type;attribute value not allowed
+
+#data
+<command type="default" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/command/@type;attribute value not allowed
+
+#data
+<command type="command" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<command type="Command" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/command/@type;attribute value not allowed
+
+#data
+<command type=" command" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/command/@type;attribute value not allowed
+
+#data
+<command type="command " xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/command/@type;attribute value not allowed
+
+#data
+<command type="commandline" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/command/@type;attribute value not allowed
+
+#data
+<command type="checkbox" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<command type="check" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/command/@type;attribute value not allowed
+
+#data
+<command type="radio" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<command type="radiobutton" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/command/@type;attribute value not allowed
+
+#data
+<command icon="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<command icon="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<command icon="http://test/#test" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<command icon="test" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<command icon="[]" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/command/@icon;URI:m::syntax error
+
+#data
+<command icon="a b" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/command/@icon;URI:m::syntax error
+
+#data
+<menu xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<menu label="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<menu label=" " xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<menu label="aa" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<menu type="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/menu/@type;invalid enumerated attribute value
+
+#data
+<menu type="type" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/menu/@type;invalid enumerated attribute value
+
+#data
+<menu type="toolbar" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<menu type="Toolbar" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<menu type=" toolbar" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/menu/@type;invalid enumerated attribute value
+
+#data
+<menu type="context" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<menu type="conteXt" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<menu type="context " xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/menu/@type;invalid enumerated attribute value
+
+#data
+<menu autosubmit="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<menu autosubmit="autosubmit" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<menu autosubmit="yes" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/menu/@autosubmit;invalid boolean attribute value
+
+#data
+<menu autosubmit="AutoSubmit" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/menu/@autosubmit;invalid boolean attribute value
+
+#data
+<p contextmenu="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/p/@contextmenu;no referenced menu
+
+#data
+<p contextmenu="aaa" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/p/@contextmenu;no referenced menu
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<p contextmenu=""/><menu id=""/>
+</div>
+#errors
+/div/menu/@id;attribute value is empty
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<p contextmenu="a"/><menu id="a"/>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<p contextmenu="a"/><menu id="A"/>
+</div>
+#errors
+/div/p/@contextmenu;no referenced menu
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<menu id="a"/><p contextmenu="a"/>
+</div>
+#errors
+
+#data
+<div contextmenu="a" xmlns="http://www.w3.org/1999/xhtml">
+<menu id="a"/>
+</div>
+#errors
+
+#data
+<menu id="a" xmlns="http://www.w3.org/1999/xhtml">
+<span contextmenu="a"/>
+</menu>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<p contextmenu="a a"/><menu id="a a"/>
+</div>
+#errors
+/div/menu/@id;space in ID
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<p contextmenu="a a"/><menu id="a"/>
+</div>
+#errors
+/div/p/@contextmenu;no referenced menu
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<p contextmenu="a  a"/><menu id="a a"/>
+</div>
+#errors
+/div/p/@contextmenu;no referenced menu
+/div/menu/@id;space in ID
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<p contextmenu="a"/><ul id="a"/>
+</div>
+#errors
+/div/p/@contextmenu;no referenced menu
 
 #data
 <div align="center" xmlns="http://www.w3.org/1999/xhtml"/>

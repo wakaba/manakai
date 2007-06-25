@@ -2375,11 +2375,103 @@ aaa
 /details/legend/a;element not allowed
 
 #data
+<datagrid xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<datagrid xmlns="http://www.w3.org/1999/xhtml">  </datagrid>
+#errors
+
+#data
+<datagrid xmlns="http://www.w3.org/1999/xhtml">aaa</datagrid>
+#errors
+/datagrid/"aaa";character not allowed
+
+#data
+<datagrid xmlns="http://www.w3.org/1999/xhtml"><p/></datagrid>
+#errors
+
+#data
+<datagrid xmlns="http://www.w3.org/1999/xhtml"><p/><p/></datagrid>
+#errors
+
+#data
+<datagrid xmlns="http://www.w3.org/1999/xhtml">  <p/>  <p/> </datagrid>
+#errors
+
+#data
+<datagrid xmlns="http://www.w3.org/1999/xhtml"><p/>&amp;<p/></datagrid>
+#errors
+/datagrid/"&";character not allowed
+
+#data
+<datagrid xmlns="http://www.w3.org/1999/xhtml"><p/><table/></datagrid>
+#errors
+
+#data
+<datagrid xmlns="http://www.w3.org/1999/xhtml"><ul/></datagrid>
+#errors
+
+#data
+<datagrid xmlns="http://www.w3.org/1999/xhtml"><table/></datagrid>
+#errors
+
+#data
+<datagrid xmlns="http://www.w3.org/1999/xhtml"><table/><table/></datagrid>
+#errors
+/datagrid/table;element not allowed
+
+#data
+<datagrid xmlns="http://www.w3.org/1999/xhtml"><table/><p/><table/></datagrid>
+#errors
+/datagrid/p;element not allowed
+/datagrid/table;element not allowed
+
+#data
+<datagrid xmlns="http://www.w3.org/1999/xhtml"><select/></datagrid>
+#errors
+
+#data
+<datagrid xmlns="http://www.w3.org/1999/xhtml"><datalist/></datagrid>
+#errors
+
+#data
+<datagrid xmlns="http://www.w3.org/1999/xhtml"><table/>aa</datagrid>
+#errors
+/datagrid/"aa";character not allowed
+
+#data
+<datagrid xmlns="http://www.w3.org/1999/xhtml"><select/>aa</datagrid>
+#errors
+/datagrid/"aa";character not allowed
+
+#data
+<datagrid xmlns="http://www.w3.org/1999/xhtml"><datalist/>aa</datagrid>
+#errors
+/datagrid/"aa";character not allowed
+
+#data
+<datagrid xmlns="http://www.w3.org/1999/xhtml"><datagrid/></datagrid>
+#errors
+/datagrid/datagrid;element not allowed
+
+#data
+<datagrid xmlns="http://www.w3.org/1999/xhtml"><div><datagrid/></div></datagrid>
+#errors
+/datagrid/div/datagrid;element not allowed
+
+#data
 <datagrid xmlns="http://www.w3.org/1999/xhtml">
 <p><a/></p>
 </datagrid>
 #errors
 /datagrid/p/a;element not allowed
+
+#data
+<datagrid xmlns="http://www.w3.org/1999/xhtml">
+<details><legend/></details>
+</datagrid>
+#errors
 
 #data
 <a xmlns="http://www.w3.org/1999/xhtml">

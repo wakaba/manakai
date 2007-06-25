@@ -1,0 +1,109 @@
+
+#data
+<link rel="a" href="b">
+#errors
+#document-fragment head
+| <link>
+|   href="b"
+|   rel="a"
+
+#data
+<meta name="a" content="b">
+#errors
+#document-fragment head
+| <meta>
+|   content="b"
+|   name="a"
+
+#data
+<base href="a" target="b">
+#errors
+#document-fragment head
+| <base>
+|   href="a"
+|   target="b"
+
+#data
+<base href="a" target="b">a
+#errors
+#document-fragment head
+| <base>
+|   href="a"
+|   target="b"
+| "a"
+
+
+#data
+</style>
+#errors
+#document-fragment style
+| "</style>"
+
+#data
+</style>abc
+#errors
+#document-fragment style
+| "</style>abc"
+
+#data
+<style>ABC</style>abc
+#errors
+#document-fragment style
+| "<style>ABC</style>abc"
+
+#data
+<style>ABC</style>abc
+#errors
+#document-fragment div
+| <style>
+|   "ABC"
+| "abc"
+
+#data
+</stylesheet
+#errors
+#document-fragment style
+| "</stylesheet"
+
+#data
+</title>
+#errors
+#document-fragment title
+| "</title>"
+
+#data
+</title>abc
+#errors
+#document-fragment title
+| "</title>abc"
+
+#data
+</titletext
+#errors
+#document-fragment title
+| "</titletext"
+
+#data
+<table><tr><td><table></table>
+#errors
+outer <table> not closed
+#document-fragment div
+| <table>
+|   <tbody>
+|     <tr>
+|       <td>
+|         <table>
+
+#data
+<table><caption><table></table><tr><td>
+#errors
+outer <table> not closed
+<caption> not closed
+#document-fragment div
+| <table>
+|   <caption>
+|     <table>
+|   <tbody>
+|     <tr>
+|       <td>
+
