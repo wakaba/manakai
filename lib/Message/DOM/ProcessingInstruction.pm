@@ -1,6 +1,6 @@
 package Message::DOM::ProcessingInstruction;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::ProcessingInstruction';
 require Message::DOM::Node;
 
@@ -18,7 +18,6 @@ sub AUTOLOAD {
   if ({
     ## Read-only attributes (trivial accessors)
     target => 1,
-    data => 1,
   }->{$method_name}) {
     no strict 'refs';
     eval qq{
@@ -34,6 +33,7 @@ sub AUTOLOAD {
   } elsif ({
     ## Read-write attributes (DOMString, trivial accessors)
     manakai_base_uri => 1,
+    data => 1,
   }->{$method_name}) {
     no strict 'refs';
     eval qq{
@@ -142,4 +142,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/06/17 13:37:40 $
+## $Date: 2007/06/26 14:12:55 $

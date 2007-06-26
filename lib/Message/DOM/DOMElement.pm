@@ -2,7 +2,7 @@
 
 package Message::DOM::Element;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::Element';
 require Message::DOM::Node;
 
@@ -169,22 +169,16 @@ sub prefix ($;$) {
 sub clone_node ($$) {
   my ($self, $deep) = @_; ## NOTE: Deep cloning is not supported
 ## TODO: constructor
-  my $clone = bless {
-    namespace_uri => $$self->{namespace_uri},
-    prefix => $$self->{prefix},
-    local_name => $$self->{local_name},      
-    child_nodes => [],
-  }, ref $self;
+  my $clone = $self->owner_document->create_element_ns
+      ($self->namespace_uri, [$self->prefix, $self->local_name]);
   for my $ns (keys %{$$self->{attributes}}) {
     for my $ln (keys %{$$self->{attributes}->{$ns}}) {
       my $attr = $$self->{attributes}->{$ns}->{$ln};
 ## TODO: Attr constructor
-      $$clone->{attributes}->{$ns}->{$ln} = bless {
-        namespace_uri => $$attr->{namespace_uri},
-        prefix => $$attr->{prefix},
-        local_name => $$attr->{local_name},
-        value => $$attr->{value},
-      }, ref $$self->{attributes}->{$ns}->{$ln};
+      my $attr_clone = $clone->owner_document->create_attribute_ns
+          ($attr->namespace_uri, [$attr->prefix, $attr->local_name]);
+      $attr_clone->value ($attr->value);
+      $clone->set_attribute_node_ns ($attr_clone);
     }
   }
   return $clone;
@@ -348,4 +342,4 @@ sub create_element_ns ($$$) {
 
 1;
 ## License: <http://suika.fam.cx/~wakaba/archive/2004/8/18/license#Perl+MPL>
-## $Date: 2007/06/20 13:41:16 $
+## $Date: 2007/06/26 14:12:55 $
