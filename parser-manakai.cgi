@@ -1,4 +1,4 @@
-#!/usr/bin/perl -d:DProf
+#!/usr/bin/perl
 use strict;
 
 use lib qw[/home/httpd/html/www/markup/html/whatpm
@@ -236,4 +236,4 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2007/06/25 00:15:12 $
+## $Date: 2007/06/27 11:08:03 $
