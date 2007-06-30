@@ -90,7 +90,7 @@ if ($mode eq '/table') {
   tableToCanvas (
 ';
     print STDOUT objToJson ($table);
-    print STDOUT ');
+    print STDOUT ', document.body);
 </script>';
   }
 
@@ -114,4 +114,4 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2007/05/27 10:00:48 $
+## $Date: 2007/06/30 08:26:08 $

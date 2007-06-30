@@ -1,6 +1,6 @@
-function tableToCanvas (table) {
+function tableToCanvas (table, parent) {
   var canvas = document.createElement ('canvas');
-  document.body.appendChild (canvas);
+  parent.appendChild (canvas);
   if (window.G_vmlCanvasManager) {
     canvas = G_vmlCanvasManager.initElement (canvas);
   }
@@ -118,6 +118,7 @@ for (var i = 1; i < columnNumber; i++) {
   c2d.closePath ();
 }
 
+var map = document.createElement ('map');
 var x = param.cellLeft;
 for (var i = 1; i < table.cell.length; i++) {
   var y = param.cellTop;
@@ -136,6 +137,15 @@ for (var i = 1; i < table.cell.length; i++) {
             ? param.headerCellFillStyle : param.dataCellFillStyle;
         c2d.strokeStyle = c[0].is_header
             ? param.headerCellStrokeStyle : param.dataCellStrokeStyle;
+        if (c[0].id) {
+          var area = document.createElement ('area');
+          area.shape = 'rect';
+          area.coords = [x, y, x + width, y + height].join (',');
+          area.alt = 'Cell (' + c[0].x + ', ' + c[0].y + ')';
+          area.href = '#node-' + c[0].id;
+          area.id = 'cell-' + c[0].id;
+          map.appendChild (area);
+        }
       } else {
         c2d.rect (x, y, param.columnWidth, param.rowHeight);
         c2d.fillStyle = param.overlappingCellFillStyle;
@@ -164,7 +174,20 @@ for (var i = 1; i < rowNumber; i++) {
   c2d.stroke ();
   c2d.closePath ();
 }
+
+  if (map.hasChildNodes ()) {
+    var mapid = 'table-map-' + ++document.TableMapId;
+    map.name = mapid;
+    parent.appendChild (map);
+    var img = document.createElement ('img');
+    img.src = canvas.toDataURL ();
+    img.useMap = '#' + mapid;
+    parent.appendChild (img);
+    canvas.style.display = 'none';
+  }
 } // tableToCanvas
+
+if (!document.TableMapId) document.TableMapId = 0;
 
 /*
 
@@ -174,4 +197,4 @@ This library is free software; you can redistribute it
 and/or modify it under the same terms as Perl itself.
 
 */
-/* $Date: 2007/05/27 10:00:48 $ */
+/* $Date: 2007/06/30 08:26:08 $ */
