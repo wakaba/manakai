@@ -20,7 +20,7 @@ BEGIN {
 }
 
 use Test;
-BEGIN { plan tests => 626 }
+BEGIN { plan tests => 632 }
 
 use Data::Dumper;
 $Data::Dumper::Useqq = 1;
@@ -170,4 +170,4 @@ sub serialize ($) {
 } # serialize
 
 ## License: Public Domain.
-## $Date: 2007/06/30 13:27:06 $
+## $Date: 2007/06/30 14:13:20 $

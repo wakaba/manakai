@@ -1,11 +1,17 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.30 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.31 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## ISSUE:
 ## var doc = implementation.createDocument (null, null, null);
 ## doc.write ('');
 ## alert (doc.compatMode);
+
+## ISSUE: HTML5 revision 967 says that the encoding layer MUST NOT
+## strip BOM and the HTML layer MUST ignore it.  Whether we can do it
+## is not yet clear.
+## "{U+FEFF}..." in UTF-16BE/UTF-16LE is three or four characters?
+## "{U+FEFF}..." in GB18030?
 
 my $permitted_slash_tag_name = {
   base => 1,
@@ -3340,7 +3346,13 @@ sub _tree_construction_main ($) {
       } elsif ($token->{tag_name} eq 'title') {
         $self->{parse_error}-> (type => 'in body:title');
         ## NOTE: This is an "as if in head" code clone
-        $parse_rcdata->('RCDATA', $insert);
+        $parse_rcdata->('RCDATA', sub {
+          if (defined $self->{head_element}) {
+            $self->{head_element}->append_child ($_[0]);
+          } else {
+            $insert->($_[0]);
+          }
+        });
         return;
       } elsif ($token->{tag_name} eq 'body') {
         $self->{parse_error}-> (type => 'in body:body');
@@ -3753,6 +3765,7 @@ sub _tree_construction_main ($) {
         INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
           my $node = $self->{open_elements}->[$_];
           if ($node->[1] eq 'nobr') {
+            $self->{parse_error}-> (type => 'not closed:nobr');
             unshift @{$self->{token}}, $token;
             $token = {type => 'end tag', tag_name => 'nobr'};
             return;
@@ -3896,7 +3909,8 @@ sub _tree_construction_main ($) {
           $self->{parse_error}-> (type => 'image');
           $token->{tag_name} = 'img';
         }
-        
+
+        ## NOTE: There is an "as if <br>" code clone.
         $reconstruct_active_formatting_elements->($insert_to_current);
         
         
@@ -4137,6 +4151,7 @@ sub _tree_construction_main ($) {
             unless ({
                        dd => 1, dt => 1, li => 1, p => 1, td => 1,
                        th => 1, tr => 1, body => 1, html => 1,
+                     tbody => 1, tfoot => 1, thead => 1,
                     }->{$_->[1]}) {
               $self->{parse_error}-> (type => 'not closed:'.$_->[1]);
             }
@@ -4186,6 +4201,7 @@ sub _tree_construction_main ($) {
                  li => ($token->{tag_name} ne 'li'),
                  p => ($token->{tag_name} ne 'p'),
                  td => 1, th => 1, tr => 1,
+                 tbody => 1, tfoot=> 1, thead => 1,
                 }->{$self->{open_elements}->[-1]->[1]}) {
               unshift @{$self->{token}}, $token;
               $token = {type => 'end tag',
@@ -4206,7 +4222,17 @@ sub _tree_construction_main ($) {
           $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
         }
         
-        splice @{$self->{open_elements}}, $i if defined $i;
+        if (defined $i) {
+          splice @{$self->{open_elements}}, $i;
+        } elsif ($token->{tag_name} eq 'p') {
+          ## As if <p>, then reprocess the current token
+          my $el;
+          
+      $el = $self->{document}->create_element_ns
+        (q<http://www.w3.org/1999/xhtml>, [undef,  'p']);
+    
+          $insert->($el);
+        }
         $clear_up_to_marker->()
           if {
             button => 1, marquee => 1, object => 1,
@@ -4222,6 +4248,7 @@ sub _tree_construction_main ($) {
             if ({
                  dd => 1, dt => 1, li => 1, p => 1,
                  td => 1, th => 1, tr => 1,
+                 tbody => 1, tfoot=> 1, thead => 1,
                 }->{$self->{open_elements}->[-1]->[1]}) {
               unshift @{$self->{token}}, $token;
               $token = {type => 'end tag',
@@ -4260,6 +4287,7 @@ sub _tree_construction_main ($) {
             if ({
                  dd => 1, dt => 1, li => 1, p => 1,
                  td => 1, th => 1, tr => 1,
+                 tbody => 1, tfoot=> 1, thead => 1,
                 }->{$self->{open_elements}->[-1]->[1]}) {
               unshift @{$self->{token}}, $token;
               $token = {type => 'end tag',
@@ -4290,14 +4318,29 @@ sub _tree_construction_main ($) {
                 strong => 1, tt => 1, u => 1,
                }->{$token->{tag_name}}) {
         $formatting_end_tag->($token->{tag_name});
-## TODO: <http://html5.org/tools/web-apps-tracker?from=883&to=884>
+        return;
+      } elsif ($token->{tag_name} eq 'br') {
+        $self->{parse_error}-> (type => 'unmatched end tag:br');
+
+        ## As if <br>
+        $reconstruct_active_formatting_elements->($insert_to_current);
+        
+        my $el;
+        
+      $el = $self->{document}->create_element_ns
+        (q<http://www.w3.org/1999/xhtml>, [undef,  'br']);
+    
+        $insert->($el);
+        
+        ## Ignore the token.
+        $token = $self->_get_next_token;
         return;
       } elsif ({
                 caption => 1, col => 1, colgroup => 1, frame => 1,
                 frameset => 1, head => 1, option => 1, optgroup => 1,
                 tbody => 1, td => 1, tfoot => 1, th => 1,
                 thead => 1, tr => 1,
-                area => 1, basefont => 1, bgsound => 1, br => 1,
+                area => 1, basefont => 1, bgsound => 1,
                 embed => 1, hr => 1, iframe => 1, image => 1,
                 img => 1, input => 1, isindex => 1, noembed => 1,
                 noframes => 1, param => 1, select => 1, spacer => 1,
@@ -4324,6 +4367,7 @@ sub _tree_construction_main ($) {
             if ({
                  dd => 1, dt => 1, li => 1, p => 1,
                  td => 1, th => 1, tr => 1,
+                 tbody => 1, tfoot=> 1, thead => 1,
                 }->{$self->{open_elements}->[-1]->[1]}) {
               unshift @{$self->{token}}, $token;
               $token = {type => 'end tag',
@@ -4395,6 +4439,7 @@ sub _tree_construction_main ($) {
         ## Generate implied end tags
         if ({
              dd => 1, dt => 1, li => 1, p => 1, td => 1, th => 1, tr => 1,
+             tbody => 1, tfoot=> 1, thead => 1,
             }->{$self->{open_elements}->[-1]->[1]}) {
           unshift @{$self->{token}}, $token;
           $token = {type => 'end tag', tag_name => $self->{open_elements}->[-1]->[1]};
@@ -4465,7 +4510,10 @@ sub _tree_construction_main ($) {
             }
             redo B;
           } elsif ($token->{type} eq 'end tag') {
-            if ({head => 1, body => 1, html => 1}->{$token->{tag_name}}) {
+            if ({
+                 head => 1, body => 1, html => 1,
+                 p => 1, br => 1,
+                }->{$token->{tag_name}}) {
               ## As if <head>
               
       $self->{head_element} = $self->{document}->create_element_ns
@@ -4541,7 +4589,9 @@ sub _tree_construction_main ($) {
                 $self->{parse_error}-> (type => 'after head:'.$token->{tag_name});
                 push @{$self->{open_elements}}, [$self->{head_element}, 'head'];
               }
-              $parse_rcdata->('RCDATA', $insert_to_current);
+              my $parent = defined $self->{head_element} ? $self->{head_element}
+                  : $self->{open_elements}->[-1]->[0];
+              $parse_rcdata->('RCDATA', sub { $parent->append_child ($_[0]) });
               pop @{$self->{open_elements}}
                   if $self->{insertion_mode} eq 'after head';
               redo B;
@@ -4662,8 +4712,15 @@ sub _tree_construction_main ($) {
               $token = $self->_get_next_token;
               redo B;
             } elsif ($self->{insertion_mode} eq 'in head' and
-                     ($token->{tag_name} eq 'body' or
-                      $token->{tag_name} eq 'html')) {
+                     {
+                      body => 1, html => 1,
+                      p => 1, br => 1,
+                     }->{$token->{tag_name}}) {
+              #
+            } elsif ($self->{insertion_mode} eq 'in head noscript' and
+                     {
+                      p => 1, br => 1,
+                     }->{$token->{tag_name}}) {
               #
             } elsif ($self->{insertion_mode} ne 'after head') {
               $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
@@ -4882,6 +4939,7 @@ sub _tree_construction_main ($) {
               if ({
                    dd => 1, dt => 1, li => 1, p => 1,
                    td => 1, th => 1, tr => 1,
+                   tbody => 1, tfoot=> 1, thead => 1,
                   }->{$self->{open_elements}->[-1]->[1]}) {
                 unshift @{$self->{token}}, $token; # <table>
                 $token = {type => 'end tag', tag_name => 'table'};
@@ -4930,6 +4988,7 @@ sub _tree_construction_main ($) {
               if ({
                    dd => 1, dt => 1, li => 1, p => 1,
                    td => 1, th => 1, tr => 1,
+                   tbody => 1, tfoot=> 1, thead => 1,
                   }->{$self->{open_elements}->[-1]->[1]}) {
                 unshift @{$self->{token}}, $token;
                 $token = {type => 'end tag',
@@ -5013,6 +5072,7 @@ sub _tree_construction_main ($) {
               if ({
                    dd => 1, dt => 1, li => 1, p => 1,
                    td => 1, th => 1, tr => 1,
+                   tbody => 1, tfoot=> 1, thead => 1,
                   }->{$self->{open_elements}->[-1]->[1]}) {
                 unshift @{$self->{token}}, $token; # <?>
                 $token = {type => 'end tag', tag_name => 'caption'};
@@ -5063,6 +5123,7 @@ sub _tree_construction_main ($) {
               if ({
                    dd => 1, dt => 1, li => 1, p => 1,
                    td => 1, th => 1, tr => 1,
+                   tbody => 1, tfoot=> 1, thead => 1,
                   }->{$self->{open_elements}->[-1]->[1]}) {
                 unshift @{$self->{token}}, $token;
                 $token = {type => 'end tag',
@@ -5110,6 +5171,7 @@ sub _tree_construction_main ($) {
               if ({
                    dd => 1, dt => 1, li => 1, p => 1,
                    td => 1, th => 1, tr => 1,
+                   tbody => 1, tfoot=> 1, thead => 1,
                   }->{$self->{open_elements}->[-1]->[1]}) {
                 unshift @{$self->{token}}, $token; # </table>
                 $token = {type => 'end tag', tag_name => 'caption'};
@@ -5415,6 +5477,7 @@ sub _tree_construction_main ($) {
               if ({
                    dd => 1, dt => 1, li => 1, p => 1,
                    td => 1, th => 1, tr => 1,
+                   tbody => 1, tfoot=> 1, thead => 1,
                   }->{$self->{open_elements}->[-1]->[1]}) {
                 unshift @{$self->{token}}, $token; # <table>
                 $token = {type => 'end tag', tag_name => 'table'};
@@ -5698,6 +5761,7 @@ sub _tree_construction_main ($) {
               if ({
                    dd => 1, dt => 1, li => 1, p => 1,
                    td => 1, th => 1, tr => 1,
+                   tbody => 1, tfoot=> 1, thead => 1,
                   }->{$self->{open_elements}->[-1]->[1]}) {
                 unshift @{$self->{token}}, $token; # <table>
                 $token = {type => 'end tag', tag_name => 'table'};
@@ -5939,6 +6003,7 @@ sub _tree_construction_main ($) {
                    td => ($token->{tag_name} eq 'th'),
                    th => ($token->{tag_name} eq 'td'),
                    tr => 1,
+                   tbody => 1, tfoot=> 1, thead => 1,
                   }->{$self->{open_elements}->[-1]->[1]}) {
                 unshift @{$self->{token}}, $token;
                 $token = {type => 'end tag',
@@ -6720,4 +6785,4 @@ sub get_inner_html ($$$) {
 } # get_inner_html
 
 1;
-# $Date: 2007/06/30 13:12:32 $
+# $Date: 2007/06/30 14:13:19 $

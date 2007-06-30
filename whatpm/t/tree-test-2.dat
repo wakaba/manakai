@@ -107,3 +107,29 @@ outer <table> not closed
 |     <tr>
 |       <td>
 
+#data
+<title>a</title>
+#errors
+<title> in body
+#document-fragment p
+| <title>
+|   "a"
+
+#data
+<table><title>a</title></table>
+#errors
+<title> in table
+<title> in body
+#document-fragment div
+| <title>
+|   "a"
+| <table>
+
+#data
+<title>a</title>
+#errors
+<title> in table
+<title> in body
+#document-fragment table
+| <title>
+|   "a"
