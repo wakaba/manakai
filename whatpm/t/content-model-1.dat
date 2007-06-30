@@ -1,18 +1,18 @@
 #data
 <html></html>
 #errors
-/html;element not supported
+/html;element;unsupported
 
 #data
 <unknown xmlns="http://www.w3.org/1999/xhtml"></unknown>
 #errors
-/unknown;element not supported
+/unknown;element;unsupported
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"><unknown/></p>
 #errors
 /p/unknown;element not allowed
-/p/unknown;element not supported
+/p/unknown;element;unsupported
 
 #data
 <html xmlns="http://www.w3.org/1999/xhtml"></html>
@@ -133,7 +133,7 @@
 </head>
 #errors
 /head;child element missing:title
-/head/script/@type;IMT:s:obsolete subtype
+/head/script/@type;IMT:obsolete subtype;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -238,7 +238,7 @@
 <title/>
 </head>
 #errors
-/head/script/@type;IMT:s:obsolete subtype
+/head/script/@type;IMT:obsolete subtype;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -246,7 +246,7 @@
 <script type="text/javascript"/>
 </head>
 #errors
-/head/script/@type;IMT:s:obsolete subtype
+/head/script/@type;IMT:obsolete subtype;s
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -450,7 +450,7 @@ p {color: green}
 <script type="text/javascript"/>
 </body>
 #errors
-/body/script/@type;IMT:s:obsolete subtype
+/body/script/@type;IMT:obsolete subtype;s
 
 #data
 <body xmlns="http://www.w3.org/1999/xhtml"><b/></body>
@@ -487,7 +487,7 @@ p {color: green}
 <script type="text/javascript"/>
 </section>
 #errors
-/section/script/@type;IMT:s:obsolete subtype
+/section/script/@type;IMT:obsolete subtype;s
 
 #data
 <section xmlns="http://www.w3.org/1999/xhtml"><b/></section>

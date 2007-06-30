@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.29 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.30 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## ISSUE:
 ## var doc = implementation.createDocument (null, null, null);
@@ -387,6 +387,7 @@ sub _get_next_token ($) {
       if ($self->{content_model_flag} eq 'RCDATA' or
           $self->{content_model_flag} eq 'CDATA') {
         if (defined $self->{last_emitted_start_tag_name}) {
+          ## NOTE: <http://krijnhoetmer.nl/irc-logs/whatwg/20070626#l-564>
           my @next_char;
           TAGNAME: for (my $i = 0; $i < length $self->{last_emitted_start_tag_name}; $i++) {
             push @next_char, $self->{next_input_character};
@@ -1390,7 +1391,7 @@ sub _get_next_token ($) {
         }
       }
 
-      $self->{parse_error}-> (type => 'bogus comment open');
+      $self->{parse_error}-> (type => 'bogus comment');
       $self->{next_input_character} = shift @next_char;
       unshift @{$self->{char}},  (@next_char);
       $self->{state} = 'bogus comment';
@@ -2177,7 +2178,7 @@ sub _get_next_token ($) {
 
         redo A;
       } else {
-        $self->{parse_error}-> (type => 'string after PUBLIC literal');
+        $self->{parse_error}-> (type => 'string after SYSTEM');
         $self->{state} = 'bogus DOCTYPE';
         
       if (@{$self->{char}}) {
@@ -2423,7 +2424,7 @@ sub _tokenize_attempt_to_consume_an_entity ($$) {
           $self->{parse_error}-> (type => 'CR character reference');
           $code = 0x000A;
         } elsif (0x80 <= $code and $code <= 0x9F) {
-          $self->{parse_error}-> (type => sprintf 'c1 entity:U+%04X', $code);
+          $self->{parse_error}-> (type => sprintf 'C1 character reference:U+%04X', $code);
           $code = $c1_entity_char->{$code};
         }
 
@@ -2476,7 +2477,7 @@ sub _tokenize_attempt_to_consume_an_entity ($$) {
         $self->{parse_error}-> (type => 'CR character reference');
         $code = 0x000A;
       } elsif (0x80 <= $code and $code <= 0x9F) {
-        $self->{parse_error}-> (type => sprintf 'c1 entity:U+%04X', $code);
+        $self->{parse_error}-> (type => sprintf 'C1 character reference:U+%04X', $code);
         $code = $c1_entity_char->{$code};
       }
       
@@ -2548,7 +2549,7 @@ sub _tokenize_attempt_to_consume_an_entity ($$) {
     if ($match > 0) {
       return {type => 'character', data => $value};
     } elsif ($match < 0) {
-      $self->{parse_error}-> (type => 'refc');
+      $self->{parse_error}-> (type => 'no refc');
       return {type => 'character', data => $value};
     } else {
       $self->{parse_error}-> (type => 'bare ero');
@@ -4579,7 +4580,7 @@ sub _tree_construction_main ($) {
                 $token = $self->_get_next_token;
                 redo B;
               } elsif ($self->{insertion_mode} eq 'in head noscript') {
-                $self->{parse_error}-> (type => 'noscript in noscript');
+                $self->{parse_error}-> (type => 'in noscript:noscript');
                 ## Ignore the token
                 redo B;
               } else {
@@ -6350,7 +6351,7 @@ sub _tree_construction_main ($) {
           }
           
           if (defined $token->{tag_name}) {
-            $self->{parse_error}-> (type => 'in frameset:'.$token->{tag_name});
+            $self->{parse_error}-> (type => 'in frameset:'.($token->{type} eq 'end tag' ? '/' : '').$token->{tag_name});
           } else {
             $self->{parse_error}-> (type => 'in frameset:#'.$token->{type});
           }
@@ -6394,7 +6395,7 @@ sub _tree_construction_main ($) {
           }
           
           if (defined $token->{tag_name}) {
-            $self->{parse_error}-> (type => 'after frameset:'.$token->{tag_name});
+            $self->{parse_error}-> (type => 'after frameset:'.($token->{tag_name} eq 'end tag' ? '/' : '').$token->{tag_name});
           } else {
             $self->{parse_error}-> (type => 'after frameset:#'.$token->{type});
           }
@@ -6444,7 +6445,7 @@ sub _tree_construction_main ($) {
         redo B;
       } elsif ($token->{type} eq 'start tag' or
                $token->{type} eq 'end tag') {
-        $self->{parse_error}-> (type => 'after html:'.$token->{tag_name});
+        $self->{parse_error}-> (type => 'after html:'.($token->{type} eq 'end tag' ? '/' : '').$token->{tag_name});
         $phase = 'main';
         ## reprocess
         redo B;
@@ -6719,4 +6720,4 @@ sub get_inner_html ($$$) {
 } # get_inner_html
 
 1;
-# $Date: 2007/06/25 11:05:57 $
+# $Date: 2007/06/30 13:12:32 $

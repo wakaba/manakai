@@ -9,17 +9,17 @@
 #data
 <p xml:space=" default" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/p/@space;XML error:invalid xml:space value
+/p/@space;invalid attribute value;error
 
 #data
 <p xml:space="DEfault" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/p/@space;XML error:invalid xml:space value
+/p/@space;invalid attribute value;error
 
 #data
 <p xml:space="normal" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/p/@space;XML error:invalid xml:space value
+/p/@space;invalid attribute value;error
 
 #data
 <p xml:lang="" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -46,13 +46,13 @@
 #data
 <xmlns:a/>
 #errors
-/a;NC:Reserved Prefixes and Namespace Names:<xmlns:>
-/a;element not supported
+/a;Reserved Prefixes and Namespace Names:<xmlns:>;NC
+/a;element;unsupported
 
 #data
 <xmlns/>
 #errors
-/xmlns;element not supported
+/xmlns;element;unsupported
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml" xml:base=""/>
@@ -96,5 +96,5 @@
   <span xml:id="aa"/>
 </p>
 #errors
-/p/span/@id;xml:id error:duplicate ID
+/p/span/@id;duplicate ID;error
 

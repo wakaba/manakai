@@ -6,12 +6,48 @@ use strict;
 ## RFC 1521, which contains BNF rules for parameter values.
 
 our $Type;
+
+my $application_xml_charset = { ## TODO: ...
+  syntax => 'token',
+};
+
+$Type->{application}->{registered} = 1;
+
+$Type->{application}->{subtype}->{'rdf+xml'} = { # RFC 3870
+  parameter => {
+    charset => $application_xml_charset,
+  },
+  registered => 1,
+
+  ## RECOMMENDED that an RDF document follows new RDF/XML spec
+  ## rather than 1999 spec - this is not testable in this layer.
+};
+
+$Type->{application}->{subtype}->{'rss+xml'} = {
+  parameter => {
+  },
+  ## NOTE: Not registered
+};
+
+$Type->{audio}->{registered} = 1;
+
+$Type->{image}->{registered} = 1;
+
+$Type->{message}->{registered} = 1;
+
+$Type->{model}->{registered} = 1;
+
+$Type->{multipart}->{registered} = 1;
+
+$Type->{text}->{registered} = 1;
+
 $Type->{text}->{subtype}->{plain} = {
   parameter => {
     charset => {syntax => 'token'}, # RFC 2046 ## TODO: registered?
     'charset-edition' => {}, # RFC 1922
     'charset-extension' => {syntax => 'token'}, # RFC 1922 ## TODO: registered?
   },
+  registered => 1,
 };
 $Type->{text}->{subtype}->{html} = { # RFC 2854
   parameter => {
@@ -19,11 +55,13 @@ $Type->{text}->{subtype}->{html} = { # RFC 2854
     level => {obsolete =>1}, # RFC 1866
     version => {obsolete => 1}, # HTML 3.0
   },
+  registered => 1,
 };
 $Type->{text}->{subtype}->{css} = { # RFC 2318
   parameter => {
     charset => {}, ## TODO: US-ASCII, iso-8859-X, utf-8 are recommended ## TODO: Any charset that is a superset of US-ASCII may be used ## NOTE: Syntax and range are not defined.
   },
+  registered => 1,
 };
 $Type->{text}->{subtype}->{javascript} = { # RFC 4329
   parameter => {
@@ -32,17 +70,22 @@ $Type->{text}->{subtype}->{javascript} = { # RFC 4329
       my ($value, $onerror) = @_;
       unless ($value eq '1') {
         $onerror->(type => 'value syntax error:e4x', level => 'm');
+        ## NOTE: Whether values other than "1" is non-conformant
+        ## or not is not defined actually...
       }
     }},
   },
   obsolete => 1,
+  registered => 1,
 };
 $Type->{text}->{subtype}->{ecmascript} = { # RFC 4329
   parameter => {
     charset => $Type->{text}->{subtype}->{javascript}->{parameter}->{charset},
   },
+  registered => 1,
 };
 $Type->{audio}->{subtype}->{mpeg} = { # RFC 3003
+  registered => 1,
 };
 my $CodecsParameter = { # RFC 4281
   ## TODO: syntax and value check
@@ -51,21 +94,28 @@ $Type->{audio}->{subtype}->{'3gpp'} = {
   parameter => {
     codecs => $CodecsParameter, # RFC 4281
   },
+  registered => 1,
 };
+
+$Type->{video}->{registered} = 1;
+
 $Type->{video}->{subtype}->{'3gpp'} = {
   parameter => {
     codecs => $CodecsParameter, # RFC 4281
   },
+  registered => 1,
 };
 $Type->{audio}->{subtype}->{'3gpp2'} = { # RFC 4393
   parameter => {
     codecs => $CodecsParameter, # RFC 4393 -> RFC 4281
   },
+  registered => 1,
 };
 $Type->{video}->{subtype}->{'3gpp2'} = { # RFC 4393
   parameter => {
     codecs => $CodecsParameter, # RFC 4393 -> RFC 4281
   },
+  registered => 1,
 };
 $Type->{application}->{subtype}->{'octet-stream'} = {
   parameter => {
@@ -74,16 +124,19 @@ $Type->{application}->{subtype}->{'octet-stream'} = {
     padding => {}, # RFC 2046
     type => {}, # RFC 2046
   },
+  registered => 1,
 };
 $Type->{application}->{subtype}->{javascript} = { # RFC 4329
   parameter => {
     charset => $Type->{text}->{subtype}->{javascript}->{parameter}->{charset},
   },
+  registered => 1,
 };
 $Type->{application}->{subtype}->{ecmascript} = { # RFC 4329
   parameter => {
     charset => $Type->{text}->{subtype}->{ecmascript}->{parameter}->{charset},
   },
+  registered => 1,
 };
 $Type->{multipart}->{parameter}->{boundary} = {
   checker => sub {
@@ -100,6 +153,7 @@ $Type->{message}->{subtype}->{partial} = {
     number => {required => 1}, # RFC 2046
     total => {}, # RFC 2046 # required for the last fragment
   },
+  registered => 1,
 };
 $Type->{message}->{subtype}->{'external-body'} = {
   parameter => {
@@ -112,6 +166,7 @@ $Type->{message}->{subtype}->{'external-body'} = {
     size => {}, # RFC 2046
     ## TODO: access-type dependent parameters
   },
+  registered => 1,
 };
 
 sub check_imt ($$$$@) {
@@ -135,8 +190,25 @@ sub check_imt ($$$$@) {
 
   my $type_def = $Type->{$type};
   my $has_param;
+
+  if ($type =~ /^x[-\.]/) { ## TODO: Is there x. tree?
+    $onerror->(type => 'private type', level => 's'); ## TODO: What level?
+  } elsif ($type_def and not $type_def->{registered}) {
+    $onerror->(type => 'unregistered type', level => 's'); ## TODO: What level?
+  }
+
   if ($type_def) {
     my $subtype_def = $type_def->{subtype}->{$subtype};
+
+    if ($subtype =~ /^x[-\.]/) {
+      $onerror->(type => 'private subtype', level => 's'); ## TODO: What level?
+    } elsif ($subtype_def and not $subtype_def->{registered}) {
+      $onerror->(type => 'unregistered subtype', level => 's'); ## TODO: What level?
+    }
+    if ($subtype_def->{obsolete}) {
+      $onerror->(type => 'obsolete subtype', level => 's');
+    }
+    
     if ($subtype_def) {
       for (0..$imt->parameter_length-1) {
         my $attr = $imt->get_attribute ($_);
@@ -164,7 +236,7 @@ sub check_imt ($$$$@) {
             }
           }
         } else {
-          $onerror->(type => 'parameter not supported:'.$attr, level => 'w');
+          $onerror->(type => 'parameter:'.$attr, level => 'unsupported');
         }
       }
 
@@ -174,12 +246,8 @@ sub check_imt ($$$$@) {
           $onerror->(type => 'parameter missing:'.$_, level => 'm');
         }
       }
-        
-      if ($subtype_def->{obsolete}) {
-        $onerror->(type => 'obsolete subtype', level => 's');
-      }
     } else {
-      $onerror->(type => 'subtype not supported', level => 'w');
+      $onerror->(type => 'subtype', level => 'unsupported');
     }
 
     for (keys %{$type_def->{parameter} or {}}) {
@@ -189,10 +257,9 @@ sub check_imt ($$$$@) {
       }
     }
   } else {
-    $onerror->(type => 'type not supported', level => 'w');
+    $onerror->(type => 'type', level => 'unsupported');
   }
-  ## TODO: registered? 
 } # check_imt
 
 1;
-## $Date: 2007/05/26 08:12:34 $
+## $Date: 2007/06/30 13:12:33 $

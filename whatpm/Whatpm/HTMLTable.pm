@@ -32,7 +32,7 @@ sub form_table ($$$) {
           $onerror->(type => 'column with no anchored cell',
                      node => $table->{column}->[$_]->{element});
         } else {
-          $onerror->(type => 'colspan makes column with no anchored cell',
+          $onerror->(type => 'colspan creates column with no anchored cell',
                      node => $column_generated_by[$_]);
         }
       }
@@ -387,4 +387,4 @@ sub form_table ($$$) {
 ## TODO: Implement scope="" algorithm
 
 1;
-## $Date: 2007/05/27 10:28:01 $
+## $Date: 2007/06/30 13:12:33 $

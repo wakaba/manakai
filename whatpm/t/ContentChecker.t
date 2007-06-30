@@ -76,7 +76,8 @@ sub test ($) {
   Whatpm::ContentChecker->check_element
     ($doc->document_element, sub {
        my %opt = @_;
-       push @error, get_node_path ($opt{node}) . ';' . $opt{type};
+       push @error, get_node_path ($opt{node}) . ';' . $opt{type} .
+           (defined $opt{level} ? ';'.$opt{level} : '');
      });
   
   ok join ("\n", sort {$a cmp $b} @error),
@@ -110,4 +111,4 @@ sub get_node_path ($) {
 } # get_node_path
 
 ## License: Public Domain.
-## $Date: 2007/06/24 14:24:22 $
+## $Date: 2007/06/30 13:12:33 $

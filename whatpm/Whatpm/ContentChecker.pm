@@ -18,8 +18,8 @@ my $AttrChecker = {
         #
       } else {
         ## NOTE: An XML "error"
-        $self->{onerror}->(node => $attr,
-                           type => 'XML error:invalid xml:space value');
+        $self->{onerror}->(node => $attr, level => 'error',
+                           type => 'invalid attribute value');
       }
     },
     lang => sub {
@@ -34,7 +34,7 @@ my $AttrChecker = {
       my $value = $attr->value;
       if ($value =~ /[^\x{0000}-\x{10FFFF}]/) { ## ISSUE: Should we disallow noncharacters?
         $self->{onerror}->(node => $attr,
-                           type => 'syntax error');
+                           type => 'invalid attribute value');
       }
       ## NOTE: Conformance to URI standard is not checked since there is
       ## no author requirement on conformance in the XML Base specification.
@@ -47,8 +47,9 @@ my $AttrChecker = {
       $value =~ s/\x20$//;
       ## TODO: NCName in XML 1.0 or 1.1
       ## TODO: declared type is ID?
-      if ($self->{id}->{$value}) {
-        $self->{onerror}->(node => $attr, type => 'xml:id error:duplicate ID');
+      if ($self->{id}->{$value}) { ## NOTE: An xml:id error
+        $self->{onerror}->(node => $attr, level => 'error', 
+                           type => 'duplicate ID');
       } else {
         $self->{id}->{$value} = 1;
       }
@@ -61,21 +62,21 @@ my $AttrChecker = {
       my $value = $attr->value;
       if ($value eq $XML_NS and $ln ne 'xml') {
         $self->{onerror}
-          ->(node => $attr,
-             type => 'NC:Reserved Prefixes and Namespace Names:=xml');
+          ->(node => $attr, level => 'NC',
+             type => 'Reserved Prefixes and Namespace Names:=xml');
       } elsif ($value eq $XMLNS_NS) {
         $self->{onerror}
-          ->(node => $attr,
-             type => 'NC:Reserved Prefixes and Namespace Names:=xmlns');
+          ->(node => $attr, level => 'NC',
+             type => 'Reserved Prefixes and Namespace Names:=xmlns');
       }
       if ($ln eq 'xml' and $value ne $XML_NS) {
         $self->{onerror}
-          ->(node => $attr,
-             type => 'NC:Reserved Prefixes and Namespace Names:xmlns:xml=');
+          ->(node => $attr, level => 'NC',
+             type => 'Reserved Prefixes and Namespace Names:xmlns:xml=');
       } elsif ($ln eq 'xmlns') {
         $self->{onerror}
-          ->(node => $attr,
-             type => 'NC:Reserved Prefixes and Namespace Names:xmlns:xmlns=');
+          ->(node => $attr, level => 'NC',
+             type => 'Reserved Prefixes and Namespace Names:xmlns:xmlns=');
       }
       ## TODO: If XML 1.0 and empty
     },
@@ -87,12 +88,12 @@ my $AttrChecker = {
       my $value = $attr->value;
       if ($value eq $XML_NS) {
         $self->{onerror}
-          ->(node => $attr,
-             type => 'NC:Reserved Prefixes and Namespace Names:=xml');
+          ->(node => $attr, level => 'NC',
+             type => 'Reserved Prefixes and Namespace Names:=xml');
       } elsif ($value eq $XMLNS_NS) {
         $self->{onerror}
-          ->(node => $attr,
-             type => 'NC:Reserved Prefixes and Namespace Names:=xmlns');
+          ->(node => $attr, level => 'NC',
+             type => 'Reserved Prefixes and Namespace Names:=xmlns');
       }
     },
   },
@@ -133,7 +134,8 @@ my $AnyChecker = sub {
 my $ElementDefault = {
   checker => sub {
     my ($self, $todo) = @_;
-    $self->{onerror}->(node => $todo->{node}, type => 'element not supported');
+    $self->{onerror}->(node => $todo->{node}, level => 'unsupported',
+                       type => 'element');
     return $AnyChecker->($self, $todo);
   },
   attrs_checker => sub {
@@ -147,7 +149,8 @@ my $ElementDefault = {
       if ($checker) {
         $checker->($self, $attr);
       } else {
-        $self->{onerror}->(node => $attr, type => 'attribute not supported');
+        $self->{onerror}->(node => $attr, level => 'unsupported',
+                           type => 'attribute');
       }
     }
   },
@@ -639,11 +642,9 @@ my $GetHTMLEnumeratedAttrChecker = sub {
     if ($states->{$value} > 0) {
       #
     } elsif ($states->{$value}) {
-      $self->{onerror}->(node => $attr,
-                         type => 'non-conforming enumerated attribute value');
+      $self->{onerror}->(node => $attr, type => 'enumerated:non-conforming');
     } else {
-      $self->{onerror}->(node => $attr,
-                         type => 'invalid enumerated attribute value');
+      $self->{onerror}->(node => $attr, type => 'enumerated:invalid');
     }
   };
 }; # $GetHTMLEnumeratedAttrChecker
@@ -654,8 +655,7 @@ my $GetHTMLBooleanAttrChecker = sub {
     my ($self, $attr) = @_;
     my $value = $attr->value;
     unless ($value eq $local_name or $value eq '') {
-      $self->{onerror}->(node => $attr,
-                         type => 'invalid boolean attribute value');
+      $self->{onerror}->(node => $attr, type => 'boolean:invalid');
     }
   };
 }; # $GetHTMLBooleanAttrChecker
@@ -701,26 +701,26 @@ my $HTMLLinkTypesAttrChecker = sub {
           #
         } else {
           $self->{onerror}->(node => $attr,
-                             type => 'link type bad context:'.$word);
+                             type => 'link type:bad context:'.$word);
         }
       } elsif ($def->{status} eq 'proposal') {
-        $self->{onerror}->(node => $attr,
-                           type => 'proposed link type:'.$word);
+        $self->{onerror}->(node => $attr, level => 's',
+                           type => 'link type:proposed:'.$word);
       } else { # rejected or synonym
         $self->{onerror}->(node => $attr,
-                           type => 'non-conforming link type:'.$word);
+                           type => 'link type:non-conforming:'.$word);
       }
       if ($def->{unique}) {
         unless ($self->{has_link_type}->{$word}) {
           $self->{has_link_type}->{$word} = 1;
         } else {
           $self->{onerror}->(node => $attr,
-                             type => 'link with type not unique:'.$word);
+                             type => 'link type:duplicate:'.$word);
         }
       }
     } else {
-      $self->{onerror}->(node => $attr,
-                         type => 'link type not supported:'.$word);
+      $self->{onerror}->(node => $attr, level => 'unsupported',
+                         type => 'link type:'.$word);
     }
   }
   ## TODO: The Pingback 1.0 specification, which is referenced by HTML5,
@@ -742,8 +742,8 @@ my $HTMLURIAttrChecker = sub {
   my $value = $attr->value;
   Whatpm::URIChecker->check_iri_reference ($value, sub {
     my %opt = @_;
-    $self->{onerror}->(node => $attr,
-                       type => 'URI:'.$opt{level}.':'.
+    $self->{onerror}->(node => $attr, level => $opt{level},
+                       type => 'URI:'.
                        (defined $opt{position} ? $opt{position} : '').':'.
                        $opt{type});
   });
@@ -756,8 +756,8 @@ my $HTMLSpaceURIsAttrChecker = sub {
   for my $value (split /[\x09-\x0D\x20]+/, $attr->value) {
     Whatpm::URIChecker->check_iri_reference ($value, sub {
       my %opt = @_;
-      $self->{onerror}->(node => $attr,
-                         type => 'URI['.$i.']:'.$opt{level}.':'.
+      $self->{onerror}->(node => $attr, level => $opt{level},
+                         type => 'URIs:'.$i.':'.
                          (defined $opt{position} ? $opt{position} : '').':'.
                          $opt{type});
     });
@@ -797,7 +797,7 @@ my $HTMLDatetimeAttrChecker = sub {
         if $zm > 59;
     ## ISSUE: Maybe timezone -00:00 should have same semantics as in RFC 3339.
   } else {
-    $self->{onerror}->(node => $attr, type => 'datetime syntax error');
+    $self->{onerror}->(node => $attr, type => 'datetime:syntax error');
   }
 }; # $HTMLDatetimeAttrChecker
 
@@ -805,7 +805,7 @@ my $HTMLIntegerAttrChecker = sub {
   my ($self, $attr) = @_;
   my $value = $attr->value;
   unless ($value =~ /\A-?[0-9]+\z/) {
-    $self->{onerror}->(node => $attr, type => 'integer syntax error');
+    $self->{onerror}->(node => $attr, type => 'integer:syntax error');
   }
 }; # $HTMLIntegerAttrChecker
 
@@ -816,11 +816,11 @@ my $GetHTMLNonNegativeIntegerAttrChecker = sub {
     my $value = $attr->value;
     if ($value =~ /\A[0-9]+\z/) {
       unless ($range_check->($value + 0)) {
-        $self->{onerror}->(node => $attr, type => 'out of range');
+        $self->{onerror}->(node => $attr, type => 'nninteger:out of range');
       }
     } else {
       $self->{onerror}->(node => $attr,
-                         type => 'non-negative integer syntax error');
+                         type => 'nninteger:syntax error');
     }
   };
 }; # $GetHTMLNonNegativeIntegerAttrChecker
@@ -832,11 +832,11 @@ my $GetHTMLFloatingPointNumberAttrChecker = sub {
     my $value = $attr->value;
     if ($value =~ /\A-?[0-9.]+\z/ and $value =~ /[0-9]/) {
       unless ($range_check->($value + 0)) {
-        $self->{onerror}->(node => $attr, type => 'out of range');
+        $self->{onerror}->(node => $attr, type => 'float:out of range');
       }
     } else {
       $self->{onerror}->(node => $attr,
-                         type => 'floating point number syntax error');
+                         type => 'float:syntax error');
     }
   };
 }; # $GetHTMLFloatingPointNumberAttrChecker
@@ -870,18 +870,18 @@ my $HTMLIMTAttrChecker = sub {
     require Whatpm::IMTChecker;
     Whatpm::IMTChecker->check_imt (sub {
       my %opt = @_;
-      $self->{onerror}->(node => $attr,
-                         type => 'IMT:'.$opt{level}.':'.$opt{type});
+      $self->{onerror}->(node => $attr, level => $opt{level},
+                         type => 'IMT:'.$opt{type});
     }, @type);
   } else {
-    $self->{onerror}->(node => $attr, type => 'IMT syntax error');
+    $self->{onerror}->(node => $attr, type => 'IMT:syntax error');
   }
 }; # $HTMLIMTAttrChecker
 
 my $HTMLLanguageTagAttrChecker = sub {
   my ($self, $attr) = @_;
   if ($attr->value eq '') {
-    $self->{onerror}->(node => $attr, type => 'language tag syntax error');
+    $self->{onerror}->(node => $attr, type => 'language tag:syntax error');
   }
   ## TODO: RFC 3066 test
   ## ISSUE: RFC 4646 (3066bis)?
@@ -908,7 +908,7 @@ my $HTMLUsemapAttrChecker = sub {
     ## ISSUE: Is |usemap="#"| conformant? (c.f. |id=""| is non-conformant.)
     push @{$self->{usemap}}, [$value => $attr];
   } else {
-    $self->{onerror}->(node => $attr, type => 'hashed idref syntax error');
+    $self->{onerror}->(node => $attr, type => '#idref:syntax error');
   }
   ## NOTE: Space characters in hashed ID references are conforming.
   ## ISSUE: UA algorithm for matching is case-insensitive; IDs only different in cases should be reported
@@ -946,7 +946,7 @@ my $HTMLAttrChecker = {
       }
     } else {
       ## NOTE: MUST contain at least one character
-      $self->{onerror}->(node => $attr, type => 'attribute value is empty');
+      $self->{onerror}->(node => $attr, type => 'empty attribute value');
     }
   },
   title => sub {}, ## NOTE: No conformance creteria
@@ -999,7 +999,8 @@ my $GetHTMLAttrsChecker = sub {
       if ($checker) {
         $checker->($self, $attr, $todo);
       } else {
-        $self->{onerror}->(node => $attr, type => 'attribute not supported');
+        $self->{onerror}->(node => $attr, level => 'unsupported',
+                           type => 'attribute');
         ## ISSUE: No comformance createria for unknown attributes in the spec
       }
     }
@@ -1018,7 +1019,7 @@ $Element->{$HTML_NS}->{html} = {
       my ($self, $attr) = @_;
       my $value = $attr->value;
       unless ($value eq $HTML_NS) {
-        $self->{onerror}->(node => $attr, type => 'syntax error');
+        $self->{onerror}->(node => $attr, type => 'invalid attribute value');
         ## TODO: only in HTML documents
       }
     },
@@ -1234,7 +1235,8 @@ $Element->{$HTML_NS}->{meta} = {
       if ($checker) {
         $checker->($self, $attr) if ref $checker;
       } else {
-        $self->{onerror}->(node => $attr, type => 'attribute not supported');
+        $self->{onerror}->(node => $attr, level => 'unsupported',
+                           type => 'attribute');
         ## ISSUE: No comformance createria for unknown attributes in the spec
       }
     }
@@ -1295,7 +1297,7 @@ $Element->{$HTML_NS}->{meta} = {
         #
       } else {
         $self->{onerror}->(node => $http_equiv_attr,
-                           type => 'invalid enumerated attribute value');
+                           type => 'enumerated:invalid');
       }
     }
 
@@ -1639,7 +1641,8 @@ $Element->{$HTML_NS}->{li} = {
         $parent_ns = '' unless defined $parent_ns;
         my $parent_ln = $parent->manakai_local_name;
         unless ($parent_ns eq $HTML_NS and $parent_ln eq 'ol') {
-          $self->{onerror}->(node => $attr, type => 'attribute not supported');
+          $self->{onerror}->(node => $attr, level => 'unsupported',
+                             type => 'attribute');
         }
       }
       $HTMLIntegerAttrChecker->($self, $attr);
@@ -1765,7 +1768,8 @@ $Element->{$HTML_NS}->{a} = {
       if ($checker) {
         $checker->($self, $attr) if ref $checker;
       } else {
-        $self->{onerror}->(node => $attr, type => 'attribute not supported');
+        $self->{onerror}->(node => $attr, level => 'unsupported',
+                           type => 'attribute');
         ## ISSUE: No comformance createria for unknown attributes in the spec
       }
     }
@@ -2070,7 +2074,8 @@ $Element->{$HTML_NS}->{embed} = {
       if ($checker) {
         $checker->($self, $attr);
       } else {
-        $self->{onerror}->(node => $attr, type => 'attribute not supported');
+        $self->{onerror}->(node => $attr, level => 'unsupported',
+                           type => 'attribute');
         ## ISSUE: No comformance createria for global attributes in the spec
       }
     }
@@ -2186,7 +2191,7 @@ $Element->{$HTML_NS}->{map} = {
         }
       } else {
         ## NOTE: MUST contain at least one character
-        $self->{onerror}->(node => $attr, type => 'attribute value is empty');
+        $self->{onerror}->(node => $attr, type => 'empty attribute value');
       }
       if ($value =~ /[\x09-\x0D\x20]/) {
         $self->{onerror}->(node => $attr, type => 'space in ID');
@@ -2224,7 +2229,7 @@ $Element->{$HTML_NS}->{area} = {
                          $coords = [split /,/, $value];
                        } else {
                          $self->{onerror}->(node => $attr,
-                                            type => 'syntax error');
+                                            type => 'coords:syntax error');
                        }
                      },
                      target => $HTMLTargetAttrChecker,
@@ -2246,7 +2251,8 @@ $Element->{$HTML_NS}->{area} = {
       if ($checker) {
         $checker->($self, $attr) if ref $checker;
       } else {
-        $self->{onerror}->(node => $attr, type => 'attribute not supported');
+        $self->{onerror}->(node => $attr, level => 'unsupported',
+                           type => 'attribute');
         ## ISSUE: No comformance createria for unknown attributes in the spec
       }
     }
@@ -2282,11 +2288,11 @@ $Element->{$HTML_NS}->{area} = {
           if (@$coords == 3) {
             if ($coords->[2] < 0) {
               $self->{onerror}->(node => $attr{coords},
-                                 type => 'out of range:2');
+                                 type => 'coords:out of range:2');
             }
           } else {
             $self->{onerror}->(node => $attr{coords},
-                               type => 'list item number:3:'.@$coords);
+                               type => 'coords:number:3:'.@$coords);
           }
         } else {
           ## NOTE: A syntax error has been reported.
@@ -2306,11 +2312,11 @@ $Element->{$HTML_NS}->{area} = {
           if (@$coords >= 6) {
             unless (@$coords % 2 == 0) {
               $self->{onerror}->(node => $attr{coords},
-                                 type => 'list item number:even:'.@$coords);
+                                 type => 'coords:number:even:'.@$coords);
             }
           } else {
             $self->{onerror}->(node => $attr{coords},
-                               type => 'list item number:>=6:'.@$coords);
+                               type => 'coords:number:>=6:'.@$coords);
           }
         } else {
           ## NOTE: A syntax error has been reported.
@@ -2325,15 +2331,15 @@ $Element->{$HTML_NS}->{area} = {
           if (@$coords == 4) {
             unless ($coords->[0] < $coords->[2]) {
               $self->{onerror}->(node => $attr{coords},
-                                 type => 'out of range:0');
+                                 type => 'coords:out of range:0');
             }
             unless ($coords->[1] < $coords->[3]) {
               $self->{onerror}->(node => $attr{coords},
-                                 type => 'out of range:1');
+                                 type => 'coords:out of range:1');
             }
           } else {
             $self->{onerror}->(node => $attr{coords},
-                               type => 'list item number:4:'.@$coords);
+                               type => 'coords:number:4:'.@$coords);
           }
         } else {
           ## NOTE: A syntax error has been reported.
@@ -2452,6 +2458,7 @@ $Element->{$HTML_NS}->{table} = {
       my %opt = @_;
       $self->{onerror}->(type => 'table:'.$opt{type}, node => $opt{node});
     });
+    push @{$self->{return}->{table}}, $todo->{node};
 
     return ($new_todos);
   },
@@ -2786,7 +2793,7 @@ $Element->{$HTML_NS}->{menu} = {
         }
       } else {
         ## NOTE: MUST contain at least one character
-        $self->{onerror}->(node => $attr, type => 'attribute value is empty');
+        $self->{onerror}->(node => $attr, type => 'empty attribute value');
       }
       if ($value =~ /[\x09-\x0D\x20]/) {
         $self->{onerror}->(node => $attr, type => 'space in ID');
@@ -2916,7 +2923,7 @@ sub check_document ($$$) {
   ## TODO: Check for other items other than document element
   ## (second (errorous) element, text nodes, PI nodes, doctype nodes)
 
-  $self->check_element ($docel, $onerror);
+  return $self->check_element ($docel, $onerror);
 } # check_document
 
 sub check_element ($$$) {
@@ -2932,6 +2939,9 @@ sub check_element ($$$) {
   $self->{map} = {};
   $self->{menu} = {};
   $self->{has_link_type} = {};
+  $self->{return} = {
+    table => [],
+  };
 
   my @todo = ({type => 'element', node => $el});
   while (@todo) {
@@ -2940,8 +2950,8 @@ sub check_element ($$$) {
       my $prefix = $todo->{node}->prefix;
       if (defined $prefix and $prefix eq 'xmlns') {
         $self->{onerror}
-          ->(node => $todo->{node},
-             type => 'NC:Reserved Prefixes and Namespace Names:<xmlns:>');
+          ->(node => $todo->{node}, level => 'NC',
+             type => 'Reserved Prefixes and Namespace Names:<xmlns:>');
       }
       my $nsuri = $todo->{node}->namespace_uri;
       $nsuri = '' unless defined $nsuri;
@@ -2956,8 +2966,8 @@ sub check_element ($$$) {
       my $prefix = $todo->{node}->prefix;
       if (defined $prefix and $prefix eq 'xmlns') {
         $self->{onerror}
-          ->(node => $todo->{node},
-             type => 'NC:Reserved Prefixes and Namespace Names:<xmlns:>');
+          ->(node => $todo->{node}, level => 'NC',
+             type => 'Reserved Prefixes and Namespace Names:<xmlns:>');
       }
       my $nsuri = $todo->{node}->namespace_uri;
       $nsuri = '' unless defined $nsuri;
@@ -2992,6 +3002,7 @@ sub check_element ($$$) {
   delete $self->{id};
   delete $self->{usemap};
   delete $self->{map};
+  return $self->{return};
 } # check_element
 
 sub _add_minuses ($@) {
@@ -3078,4 +3089,4 @@ sub _check_get_children ($$$) {
 } # _check_get_children
 
 1;
-# $Date: 2007/06/25 12:39:11 $
+# $Date: 2007/06/30 13:12:32 $

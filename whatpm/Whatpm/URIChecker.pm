@@ -75,8 +75,7 @@ sub check_iri_reference ($$$) {
   my $host = $uri_o->uri_host;
   if (defined $host) {
     if ($host =~ /^\[([vV][0-9A-Fa-f]+)\./) {
-      $onerror->(type => 'address format not supported:'.$1,
-                 level => 'w');
+      $onerror->(type => 'address format:'.$1, level => 'unsupported');
     }
     my $hostnp = $host;
     $hostnp =~ s/%([0-9A-Fa-f][0-9A-Fa-f])//g;
@@ -231,4 +230,4 @@ sub check_iri_reference ($$$) {
 } # check_iri_reference
 
 1;
-## $Date: 2007/06/24 14:24:21 $
+## $Date: 2007/06/30 13:12:33 $

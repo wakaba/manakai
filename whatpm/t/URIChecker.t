@@ -146,15 +146,15 @@ my $Cases = [
   },
   {
     data => q<http://[v0.aaa]/>,
-    errors => ['w::address format not supported:v0'],
+    errors => ['unsupported::address format not supported:v0'],
   },
   {
     data => q<http://user@[v0.aaa]/>,
-    errors => ['w::address format not supported:v0'],
+    errors => ['unsupported::address format not supported:v0'],
   },
   {
     data => q<http://user@[V0A.aaa]/>,
-    errors => ['w::address format not supported:V0A',
+    errors => ['unsupported::address format not supported:V0A',
                's::uppercase host'],
   },
   {
