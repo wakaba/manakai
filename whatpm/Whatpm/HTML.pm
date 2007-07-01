@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.31 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.32 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## ISSUE:
 ## var doc = implementation.createDocument (null, null, null);
@@ -4219,7 +4219,11 @@ sub _tree_construction_main ($) {
         } # INSCOPE
         
         if ($self->{open_elements}->[-1]->[1] ne $token->{tag_name}) {
-          $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
+          if (defined $i) {
+            $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
+          } else {
+            $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
+          }
         }
         
         if (defined $i) {
@@ -6785,4 +6789,4 @@ sub get_inner_html ($$$) {
 } # get_inner_html
 
 1;
-# $Date: 2007/06/30 14:13:19 $
+# $Date: 2007/07/01 06:18:57 $

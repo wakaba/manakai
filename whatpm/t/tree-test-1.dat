@@ -925,3 +925,26 @@ no DOCTYPE
 |   <head>
 |   <body>
 |     <p>
+
+#data
+<!DOCTYPE HTML><div></div></div>
+#errors
+unmatched </div>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <div>
+
+#data
+<!DOCTYPE HTML><div><span></div>
+#errors
+unclosed <span>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <div>
+|       <span>
