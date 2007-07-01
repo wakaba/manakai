@@ -312,8 +312,7 @@ sub form_table ($$$) {
       } else {
         ## Step 10 2nd sentense
         if ($y_current != $y_max) {
-          $onerror->(type => 'rowspan expands table',
-                     node => $y_max_node);
+          $onerror->(type => 'no cell in last row', node => $table_el);
         }
         ## End of subsection
         $check_empty_column->();
@@ -387,4 +386,4 @@ sub form_table ($$$) {
 ## TODO: Implement scope="" algorithm
 
 1;
-## $Date: 2007/06/30 13:12:33 $
+## $Date: 2007/07/01 04:46:48 $

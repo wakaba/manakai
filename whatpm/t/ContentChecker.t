@@ -2,13 +2,14 @@
 use strict;
 
 use Test;
-BEGIN { plan tests => 873 }
+BEGIN { plan tests => 1127 }
 
 my @FILES = qw[
   t/content-model-1.dat
   t/content-model-2.dat
   t/content-model-3.dat
   t/content-model-4.dat
+  t/table-1.dat
 ];
 
 require Whatpm::ContentChecker;
@@ -111,4 +112,4 @@ sub get_node_path ($) {
 } # get_node_path
 
 ## License: Public Domain.
-## $Date: 2007/06/30 13:12:33 $
+## $Date: 2007/07/01 04:46:48 $

@@ -1,0 +1,89 @@
+#data
+<table xmlns="http://www.w3.org/1999/xhtml"><tbody><tr/></tbody></table>
+#errors
+/table;table:no cell in last row
+/table/tbody/tr;child element missing:td|th
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml"><tbody><tr/></tbody> </table>
+#errors
+/table;table:no cell in last row
+/table/tbody/tr;child element missing:td|th
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml"><tbody><tr/> </tbody></table>
+#errors
+/table;table:no cell in last row
+/table/tbody/tr;child element missing:td|th
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml"><tbody> <tr/></tbody></table>
+#errors
+/table;table:no cell in last row
+/table/tbody/tr;child element missing:td|th
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml"> <tbody><tr/></tbody></table>
+#errors
+/table;table:no cell in last row
+/table/tbody/tr;child element missing:td|th
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml">
+<tbody><tr><td/></tr><tr/></tbody></table>
+#errors
+/table;table:no cell in last row
+/table/tbody/tr;child element missing:td|th
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml">
+<tbody><tr><td rowspan="2"/></tr><tr/></tbody></table>
+#errors
+/table/tbody/tr;child element missing:td|th
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml">
+<tbody><tr><td/></tr><tr/><tr><td/></tr></tbody></table>
+#errors
+/table/tbody/tr;child element missing:td|th
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml">
+<tbody><tr><td/></tr><tr/><tr/></tbody></table>
+#errors
+/table/tbody/tr;child element missing:td|th
+/table/tbody/tr;child element missing:td|th
+/table;table:no cell in last row
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml">
+<thead><tr><td/></tr></thead><tbody><tr/></tbody></table>
+#errors
+/table;table:no cell in last row
+/table/tbody/tr;child element missing:td|th
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml">
+<thead><tr/></thead><tbody><tr/></tbody></table>
+#errors
+/table/thead/tr;child element missing:td|th
+/table;table:no cell in last row
+/table/tbody/tr;child element missing:td|th
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml"><tr/></table>
+#errors
+/table;table:no cell in last row
+/table/tr;child element missing:td|th
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml"><tr/> </table>
+#errors
+/table;table:no cell in last row
+/table/tr;child element missing:td|th
+
+#data
+<table xmlns="http://www.w3.org/1999/xhtml"> <tr/></table>
+#errors
+/table;table:no cell in last row
+/table/tr;child element missing:td|th

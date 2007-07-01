@@ -1,7 +1,7 @@
-1..626
+1..632
 # Running under perl version 5.008007 for linux
-# Current time local: Sat Jun 30 23:06:55 2007
-# Current time GMT:   Sat Jun 30 14:06:55 2007
+# Current time local: Sun Jul  1 13:42:53 2007
+# Current time GMT:   Sun Jul  1 04:42:53 2007
 # Using Test.pm version 1.25
 # t/tokenizer-test-2.dat
 ok 1
@@ -848,21 +848,9 @@ ok 460
 ok 461
 ok 462
 ok 463
-not ok 464
-# Test 464 got: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|     <title>\n|       class=\"a\"\n|   <body>\n" (t/HTML-tree.t at line 136 fail #232)
-#     Expected: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|   <body>\n|     <title>\n|       class=\"a\"\n" (Document tree: <!DOCTYPE HTML><html><head></head><body><title class="a"></title></body></html>)
-#     Line 4 is missing:
-#      - "|   <body>\n"
-#     Got 1 extra line at line 6:
-#      + "|   <body>\n"
+ok 464
 ok 465
-not ok 466
-# Test 466 got: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|     <title>\n|       class=\"a\"\n|   <body>\n" (t/HTML-tree.t at line 136 fail #233)
-#     Expected: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|   <body>\n|     <title>\n|       class=\"a\"\n" (Document tree: <!DOCTYPE HTML><html><head></head><body></body><title class="a"></title></html>)
-#     Line 4 is missing:
-#      - "|   <body>\n"
-#     Got 1 extra line at line 6:
-#      + "|   <body>\n"
+ok 466
 ok 467
 ok 468
 ok 469

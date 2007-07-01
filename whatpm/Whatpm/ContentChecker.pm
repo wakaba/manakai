@@ -1870,8 +1870,9 @@ $Element->{$HTML_NS}->{dfn} = {
     }
     if ($self->{term}->{$term}) {
       $self->{onerror}->(node => $node, type => 'duplicate term');
+      push @{$self->{term}->{$term}}, $node;
     } else {
-      $self->{term}->{$term} = 1;
+      $self->{term}->{$term} = [$node];
     }
 
     return ($sib, $ch);
@@ -2940,7 +2941,7 @@ sub check_element ($$$) {
   $self->{menu} = {};
   $self->{has_link_type} = {};
   $self->{return} = {
-    table => [],
+    table => [], term => $self->{term},
   };
 
   my @todo = ({type => 'element', node => $el});
@@ -3089,4 +3090,4 @@ sub _check_get_children ($$$) {
 } # _check_get_children
 
 1;
-# $Date: 2007/06/30 13:12:32 $
+# $Date: 2007/07/01 04:46:48 $
