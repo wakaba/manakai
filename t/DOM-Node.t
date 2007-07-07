@@ -1772,9 +1772,141 @@ for (qw/create_text_node create_cdata_section create_comment/) {
   ok 0+@{$el->child_nodes}, 1, 'normalize [21]';
 }
 
+## |getFeature| and |isSupported|
+for my $node (create_nodes ()) {
+  for (
+       [Core => '1.0', 1],
+       [Core => '2.0', 1],
+       [Core => '3.0', 1],
+       ['+Core' => '3.0', 1],
+       ['++Core' => '3.0', 0],
+       [Core => '', 1],
+       [Core => undef, 1],
+       [Core => 3, 0],
+       [XML => '1.0', 1],
+       [XML => '2.0', 1],
+       [XML => '3.0', 1],
+       [XML => '', 1],
+       [XML => undef, 1],
+       ['+XML' => undef, 1],
+       [XMLVersion => '1.0', 1],
+       [XMLVersion => '1.1', 1],
+       [XMLVersion => '', 1],
+       [XMLVersion => undef, 1],
+       ['+XMLVersion' => undef, 1],
+       [unknown => 3, 0],
+       [unknown => '', 0],
+       [unknown => undef, 0],
+       ['+unknown' => undef, 0],
+      ) {
+    my $label = $node->node_name . ' ' . $_->[0] . ', ' .
+        (defined $_->[1] ? $_->[1] : 'undef');
+    ok $node->can ('get_feature') ? 1 : 0, 1, 'can get_feature ' . $label;
+    ok $node->get_feature ($_->[0], $_->[1]), $_->[2] ? $node : undef,
+        'get_feature ' . $label;
+    ok $node->can ('is_supported') ? 1 : 0, 1, 'can is_supported ' . $label;
+    ok $node->is_supported ($_->[0], $_->[1]) ? 1 : 0, $_->[2],
+        'is_supported ' . $label;
+  }
+}
+
+## |isEqualNode|
+for my $node (create_nodes ()) {
+  ok $node->can ('is_equal_node') ? 1 : 0, 1, $node->node_name . '->is_eq_n can';
+
+  ok $node->is_equal_node ($node) ? 1 : 0, 1, $node->node_name . '->iseq self';
+  ok $node == $node ? 1 : 0, 1, $node->node_name . ' == self';
+  ok $node != $node ? 1 : 0, 0, $node->node_name . ' != self';
+  ok $node == 'node' ? 1 : 0, 0, $node->node_name . ' == string';
+  ok $node != 'node' ? 1 : 0, 1, $node->node_name . ' != string';
+  ok $node == 0 ? 1 : 0, 0, $node->node_name . ' == num';
+  ok $node != 0 ? 1 : 0, 1, $node->node_name . ' != num';
+  ok $node == '' ? 1 : 0, 0, $node->node_name . ' == empty';
+  ok $node != '' ? 1 : 0, 1, $node->node_name . ' != empty';
+  ok $node == undef () ? 1 : 0, 0, $node->node_name . ' == undef';
+  ok $node != undef () ? 1 : 0, 1, $node->node_name . ' != undef';
+}
+
+{
+  my $el1 = $doc->create_element_ns (undef, 'type');
+  my $el2 = $doc->create_element_ns (undef, 'type');
+  my $el3 = $doc->create_element_ns (undef, 'TYPE');
+
+  ok $el1 == $el2 ? 1 : 0, 1, 'Element == [1]';
+  ok $el1 != $el2 ? 1 : 0, 0, 'Element != [1]';
+  ok $el1 == $el3 ? 1 : 0, 0, 'Element == [2]';
+  ok $el1 != $el3 ? 1 : 0, 1, 'Element != [2]';
+
+  my $el4 = $doc->create_element_ns ('about:', 'type');
+  my $el5 = $doc->create_element_ns ('about:', 'type');
+  my $el6 = $doc->create_element_ns ('about:', 'TYPE');
+  my $el7 = $doc->create_element_ns ('DAV:', 'type');
+
+  ok $el1 == $el4 ? 1 : 0, 0, 'Element == [3]';
+  ok $el1 != $el4 ? 1 : 0, 1, 'Element != [3]';
+  ok $el4 == $el5 ? 1 : 0, 1, 'Element == [4]';
+  ok $el4 != $el5 ? 1 : 0, 0, 'Element != [4]';
+  ok $el4 == $el6 ? 1 : 0, 0, 'Element == [5]';
+  ok $el4 != $el6 ? 1 : 0, 1, 'Element != [5]';
+  ok $el4 == $el7 ? 1 : 0, 0, 'Element == [6]';
+  ok $el4 != $el7 ? 1 : 0, 1, 'Element != [6]';
+
+  $el5->prefix ('prefix');
+  ok $el4 == $el5 ? 1 : 0, 0, 'Element == [7]';
+  ok $el4 != $el5 ? 1 : 0, 1, 'Element != [7]';
+}
+
+## |getUserData|, |setUserData|
+{
+  my $node = $dom->create_document;
+
+  my $data = ['2'];
+  my $handler = sub { 1 };
+
+  ok $node->set_user_data ('key1', $data, $handler), undef,
+      'set_user_data [1]';
+  
+  my $key1_data = $node->get_user_data ('key1');
+  ok $key1_data, $data, 'set_user_data [2]';
+  ok $key1_data->[0], $data->[0], 'set_user_data [3]';
+
+  my $data2 = ['4'];
+  ok $node->set_user_data ('key1', $data2, undef), $data, 'set_user_data [4]';
+  ok $node->get_user_data ('key1'), $data2, 'set_user_data [5]';
+
+  $node->set_user_data (key1 => undef, $handler);
+  ok $node->get_user_data ('key1'), undef, 'set_user_data [6]';
+
+  $node->set_user_data (key1 => undef, undef);
+  ok $node->get_user_data ('key1'), undef, 'set_user_data [7]';
+}
+
 ## TODO: parent_node tests, as with append_child tests
 
 ## TODO: text_content tests for CharacterData and PI
+
+## |UserDataHandler|, |setData|, and |NODE_DELETED|
+## NOTE: This should be the last test, since it does define
+## Node.DESTORY.
+{
+  my $doc = $dom->create_document ('http://test/', 'ex');
+  my $node = $doc->document_element;
+  
+  $node->set_user_data (key => {}, sub {
+    my ($op, $key, $data, $src, $dest) = @_;
+
+    ok $op, 3, 'set_user_data operation [8]'; # NODE_DELETED
+    ok $key, 'key', 'set_user_data key [8]';
+    ok ref $data, 'HASH', 'set_user_data data [8]';
+    ok $src, undef, 'set_user_data src [8]';
+    ok $dest, undef, 'set_user_data dest [8]';
+  });
+
+  undef $node;
+  undef $doc;
+
+  ## NOTE: We cannot control exactly when it is called.
+}
 
 =head1 LICENSE
 
@@ -1785,4 +1917,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2007/07/07 12:26:23 $
+## $Date: 2007/07/07 15:05:01 $

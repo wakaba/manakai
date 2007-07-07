@@ -1,6 +1,6 @@
 package Message::DOM::Node;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::IF::Node';
 require Scalar::Util;
 require Message::DOM::DOMException;
@@ -24,14 +24,12 @@ require Message::DOM::DOMException;
 ##   + ProcessingInstruction (7)
 
 use overload
-    '==' => sub {
-      return 0 unless UNIVERSAL::isa ($_[0], 'Message::IF::Node');
-      ## TODO: implement is_equal_node
-      return $_[0]->is_equal_node ($_[1]);
-    },
+    '==' => 'is_equal_node',
     '!=' => sub {
       return not ($_[0] == $_[1]);
     },
+    #eq => sub { $_[0] eq $_[1] }, ## is_same_node
+    #ne => sub { $_[0] ne $_[1] }, ## not is_same_node
     fallback => 1;
 
 ## The |Node| interface - constants
@@ -578,6 +576,25 @@ sub compare_document_position ($$) {
   die "compare_document_position: Something wrong (2)";
 } # compare_document_position
 
+sub get_feature ($$;$) {
+  my $feature = lc $_[1]; ## TODO: |lc|?
+  $feature =~ s/^\+//;
+  my $version = defined $_[2] ? $_[2] : '';
+  if ($Message::DOM::DOMImplementation::HasFeature->{$feature}->{$version}) {
+    return $_[0];
+  } else {
+    return undef;
+  }
+} # get_feature
+
+sub get_user_data ($$) {
+  if (${$_[0]}->{user_data}->{$_[1]}) {
+    return ${$_[0]}->{user_data}->{$_[1]}->[0];
+  } else {
+    return undef;
+  }
+} # get_user_data
+
 sub has_attributes ($) {
   for (values %{${$_[0]}->{attributes} or {}}) {
     return 1 if keys %$_;
@@ -589,16 +606,56 @@ sub has_child_nodes ($) {
   return (@{${$_[0]}->{child_nodes} or []} > 0);
 } # has_child_nodes
 
-## TODO:
-sub is_same_node ($$) {
-  return $_[0] eq $_[1];
-} # is_same_node
-
-## TODO:
 sub is_equal_node ($$) {
-  return $_[0]->node_name eq $_[1]->node_name &&
-    $_[0]->node_value eq $_[1]->node_value;
+  local $Error::Depth = $Error::Depth + 1;
+
+  return 0 unless UNIVERSAL::isa ($_[1], 'Message::IF::Node');
+
+  my $nt = $_[0]->node_type;
+  return 0 unless $nt == $_[1]->node_type;
+
+  my @str_attr = qw/node_name local_name namespace_uri
+      prefix node_value/;
+  push @str_attr, qw/public_id system_id internal_subset/
+      if $nt == DOCUMENT_TYPE_NODE;
+  for my $attr_name (@str_attr) {
+    my $v1 = $_[0]->can ($attr_name) ? $_[0]->$attr_name : undef;
+    my $v2 = $_[1]->can ($attr_name) ? $_[1]->$attr_name : undef;
+    if (defined $v1 and defined $v2) {
+      return 0 unless ''.$v1 eq ''.$v2;
+    } elsif (defined $v1 or defined $v2) {
+      return 0;
+    }
+  }
+
+  my @num_eq_attr = qw/child_nodes attributes/;
+  push @num_eq_attr, qw/entities notations element_types/
+      if $nt == DOCUMENT_TYPE_NODE;
+  push @num_eq_attr, qw/attribute_definitions/
+      if $nt == ELEMENT_TYPE_DEFINITION_NODE;
+  push @num_eq_attr, qw/declared_type default_type allowed_tokens/
+      if $nt == ATTRIBUTE_DEFINITION_NODE;
+  for my $attr_name (@num_eq_attr) {
+    my $v1 = $_[0]->can ($attr_name) ? $_[0]->$attr_name : undef;
+    my $v2 = $_[1]->can ($attr_name) ? $_[1]->$attr_name : undef;
+    if (defined $v1 and defined $v2) {
+      return 0 unless $v1 == $v2;
+    } elsif (defined $v1 or defined $v2) {
+      return 0;
+    }
+  }
+
+  return 1;
 } # is_equal_node
+
+sub is_same_node ($$) { $_[0] eq $_[1] }
+
+sub is_supported ($$;$) {
+  my $feature = lc $_[1]; ## TODO: |lc|?
+  my $plus = ($feature =~ s/^\+//);
+  my $version = defined $_[2] ? $_[2] : '';
+  return $Message::DOM::DOMImplementation::HasFeature->{$feature}->{$version};
+} # is_supported;
 
 ## NOTE: Only applied to Elements and Documents
 sub append_child ($$) {
@@ -638,11 +695,6 @@ sub manakai_append_text ($$) {
     $self->append_child ($text);
   }
 } # manakai_append_text
-
-sub get_feature {
-  ## TODO:
-  return $_[0];
-}
 
 ## NOTE: Only applied to Elements and Documents
 sub insert_before ($$;$) {
@@ -928,6 +980,16 @@ sub manakai_set_read_only ($;$$) {
   }
 } # manakai_set_read_only
 
+#        {NOTE:: Perl application developers are advised to be careful
+#                to include direct or indirect references to the node
+#                itself as user data or in user data handlers.
+#                They would result in memory leak problems unless
+#                the circular references are removed later.
+#                
+#                It would be a good practive to eusure that every user data
+#                registered to a node is later unregistered by setting
+#                <DOM::null> as a data for the same key.
+#
 sub set_user_data ($$$;$) {
   my ($self, $key, $data, $handler) = @_;
 
@@ -938,12 +1000,14 @@ sub set_user_data ($$$;$) {
     $v->{$key} = [$data, $handler];
 
     if (defined $handler) {
-      $$self->{manakai_onunload} = sub {
-        my $node = $_[0];
-        my $uds = $$node->{user_data};
-        for my $key (keys %$uds) {
-          if (defined $uds->{$key}->[1]) {
-            $uds->{$key}->[1]->(3, $key, $uds->{$key}->[0]); # NODE_DELETED
+      eval q{
+        sub DESTROY {
+          my $uds = ${$_[0]}->{user_data};
+          for my $key (keys %$uds) {
+            if (defined $uds->{$key}->[1]) {
+              local $Error::Depth = $Error::Depth + 1;
+              $uds->{$key}->[1]->(3, $key, $uds->{$key}->[0]); # NODE_DELETED
+            }
           }
         }
       };
@@ -966,4 +1030,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/07 11:11:34 $
+## $Date: 2007/07/07 15:05:01 $
