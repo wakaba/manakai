@@ -1,9 +1,8 @@
 package Message::DOM::DOMStringList;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Tie::Array', 'Message::IF::DOMStringList';
 require Tie::Array;
-require Message::DOM::DOMException;
 
 use overload
     '@{}' => sub {
@@ -35,10 +34,6 @@ use overload
     ne => sub { not $_[0] eq $_[1] },
     fallback => 1;
 
-sub ___report_error ($$) {
-  $_[1]->throw;
-} # ___report_error
-
 ## |DOMStringList| attributes
 
 sub length ($) {
@@ -66,6 +61,7 @@ sub FETCH ($$) {
 sub STORE ($$$) {
   my $self = $_[0];
   if (${$$self->[0]}->{manakai_read_only}) {
+    require Message::DOM::DOMException;
     report Message::DOM::DOMException
         -object => $$self->[0],
         -type => 'NO_MODIFICATION_ALLOWED_ERR',
@@ -86,6 +82,7 @@ sub STORE ($$$) {
 sub DELETE ($$) {
   my $self = $_[0];
   if (${$$self->[0]}->{manakai_read_only}) {
+    require Message::DOM::DOMException;
     report Message::DOM::DOMException
         -object => $$self->[0],
         -type => 'NO_MODIFICATION_ALLOWED_ERR',
@@ -119,6 +116,7 @@ sub STORESIZE ($$) {
   my $v = ${$$self->[0]}->{$$self->[1]};
   if ($_[1] < $#$v) {
     if (${$$self->[0]}->{manakai_read_only}) {
+      require Message::DOM::DOMException;
       report Message::DOM::DOMException
           -object => $$self->[0],
           -type => 'NO_MODIFICATION_ALLOWED_ERR',
@@ -142,4 +140,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/07 04:47:29 $
+## $Date: 2007/07/07 05:58:11 $

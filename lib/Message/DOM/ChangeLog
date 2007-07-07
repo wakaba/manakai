@@ -1,5 +1,20 @@
 2007-07-07  Wakaba  <wakaba@suika.fam.cx>
 
+	* DOMImplementation.pm (new): New method name for |____new|.
+	It will be defined in the DOM Perl Binding specification
+	as part of |DOMImplementation| interface.
+	($HasFeature): Defined for features support.
+	(has_feature, get_feature): Implemented.
+
+	* DOMStringList.pm: Don't load the |Message::DOM::DOMException|
+	module unless necessary.
+	(___report_error): Removed since it is not used in fact.
+
+	* DOMImplementationList.pm, DOMImplementationSource.pm,
+	DOMImplementationRegistry.pm: New modules.
+
+2007-07-07  Wakaba  <wakaba@suika.fam.cx>
+
 	* AttributeDefinition.pm (allowed_tokens): Implemented.
 
 	* DOMStringList.pm: New Perl module.

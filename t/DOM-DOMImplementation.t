@@ -1,11 +1,11 @@
 #!/usr/bin/perl
 use strict;
 use Test;
-BEGIN { plan tests => 10 } 
+BEGIN { plan tests => 21 } 
 
 require Message::DOM::DOMImplementation;
 
-my $dom = Message::DOM::DOMImplementation->____new;
+my $dom = Message::DOM::DOMImplementation->new;
 
 ok $dom->isa ('Message::DOM::DOMImplementation');
 ok $dom->isa ('Message::IF::DOMImplementation');
@@ -37,5 +37,30 @@ eval {
 };
 ok $something_called, 0;
 
-## License: Public Domain.
-## $Date: 2007/06/17 13:37:42 $
+require Message::DOM::DOMImplementationRegistry;
+F: for my $features (
+  {Core => '1.0'}, {XML => '1.0'}, {Core => '1.0', XML => '1.0'},
+  {Core => '2.0'}, {XML => '2.0'}, {Core => '2.0', XML => '2.0'},
+  {Core => '3.0'}, {XML => '3.0'}, {Core => '3.0', XML => '3.0'},
+  {XMLVersion => '1.0'}, {XMLVersion => '1.1'},
+) {
+  my $list = $Message::DOM::DOMImplementationRegistry
+      ->get_dom_implementation_list ($features);
+  for my $impl (@$list) {
+    if ($impl->isa ('Message::DOM::DOMImplementation')) {
+      ok 1, 1, 'features: '. join ',', %$features;
+      next F;
+    }
+  }
+} # F
+
+=head1 LICENSE
+
+Copyright 2007 Wakaba <w@suika.fam.cx>
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut
+
+## $Date: 2007/07/07 05:58:11 $

@@ -1,12 +1,13 @@
 package Message::DOM::DOMImplementation;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::IF::DOMImplementation';
 
 sub ____new ($) {
   my $self = bless {}, shift;
   return $self;
 } # ____new
+*new = \&____new;
 
 sub AUTOLOAD {
   my $method_name = our $AUTOLOAD;
@@ -30,9 +31,7 @@ sub AUTOLOAD {
     Carp::croak (qq<Can't locate method "$AUTOLOAD">);
   }
 } # AUTOLOAD
-## DOMImplementation
-sub create_document ($;$$$);
-sub create_document_type ($$;$$);
+
 ## MCImplementation
 sub create_mc_decode_handler;
 sub get_charset_name_from_uri;
@@ -40,15 +39,58 @@ sub get_uri_from_charset_name;
 ## URIImplementation
 sub create_uri_reference ($$);
 
-#our $HasFeature;
+our $HasFeature;
+$HasFeature->{core}->{''} = 1;
+$HasFeature->{core}->{'1.0'} = 1;
+$HasFeature->{core}->{'2.0'} = 1;
+$HasFeature->{core}->{'3.0'} = 1;
+$HasFeature->{xml}->{''} = 1;
+$HasFeature->{xml}->{'1.0'} = 1;
+$HasFeature->{xml}->{'2.0'} = 1;
+$HasFeature->{xml}->{'3.0'} = 1;
+$HasFeature->{xmlversion}->{''} = 1;
+$HasFeature->{xmlversion}->{'1.0'} = 1;
+$HasFeature->{xmlversion}->{'1.1'} = 1;
+$HasFeature->{q<http://suika.fam.cx/www/2006/feature/min>}->{''} = 1;
+$HasFeature->{q<http://suika.fam.cx/www/2006/feature/min>}->{'3.0'} = 1;
+$HasFeature->{q<http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#minimum>}->{''} = 1;
+$HasFeature->{q<http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#minimum>}->{'3.0'} = 1;
+$HasFeature->{q<http://suika.fam.cx/www/2006/feature/xdoctype>}->{''} = 1;
+$HasFeature->{q<http://suika.fam.cx/www/2006/feature/xdoctype>}->{'3.0'} = 1;
 
-## TODO: getFeature
-## TODO: hasFeature
+## |DOMImplementation| methods
 
-## NOTE: createDocumentType will be defined in DocumentType.pm
+sub create_document ($;$$$);
+
+sub create_document_type ($$;$$);
+
+sub get_feature ($$;$) {
+  my $feature = lc $_[1]; ## TODO: What |lc|?
+  $feature =~ s/^\+//;
+  
+  if ($HasFeature->{$feature}->{defined $_[2] ? $_[2] : ''}) {
+    return $_[0];
+  } else {
+    return undef;
+  }
+} # get_feature
+
+sub has_feature ($$;$) {
+  my $feature = lc $_[1];
+  my $plus = $feature =~ s/^\+// ? 1 : 0;
+  return $HasFeature->{$feature}->{defined $_[2] ? $_[2] : ''};
+} # has_feature
 
 package Message::IF::DOMImplementation;
 
+=head1 LICENSE
+
+Copyright 2007 Wakaba <w@suika.fam.cx>
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut
+
 1;
-## License: <http://suika.fam.cx/~wakaba/archive/2004/8/18/license#Perl+MPL>
-## $Date: 2007/06/21 14:57:53 $
+## $Date: 2007/07/07 05:58:11 $
