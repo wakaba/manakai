@@ -132,6 +132,14 @@
 "input":"<!DOCTYPE html SYSTEM a>",
 "output":["ParseError", ["DOCTYPE", "html", null, null, false]]},
 
+{"description":"<!---x-->",
+"input":"<!---x-->",
+"output":[["Comment", "-x"]]},
+
+{"description":"<!----x-->",
+"input":"<!----x-->",
+"output":["ParseError", ["Comment", "--x"]]},
+
 {"description":"non-PCDATA content model flag, start tag-like string",
 "contentModelFlags":["PLAINTEXT","RCDATA","CDATA"],
 "input":"<div>",

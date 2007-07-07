@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.32 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.33 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## ISSUE:
 ## var doc = implementation.createDocument (null, null, null);
@@ -915,6 +915,7 @@ sub _get_next_token ($) {
           #
         } else {
           $self->{parse_error}-> (type => 'nestc');
+          ## TODO: Different error type for <aa / bb> than <aa/>
         }
         $self->{state} = 'before attribute name';
         # next-input-character is already done
@@ -1486,7 +1487,7 @@ sub _get_next_token ($) {
         redo A;
       } else {
         $self->{current_token}->{data} # comment
-            .= chr ($self->{next_input_character});
+            .= '-' . chr ($self->{next_input_character});
         $self->{state} = 'comment';
         
       if (@{$self->{char}}) {
@@ -6789,4 +6790,4 @@ sub get_inner_html ($$$) {
 } # get_inner_html
 
 1;
-# $Date: 2007/07/01 06:18:57 $
+# $Date: 2007/07/07 13:41:05 $

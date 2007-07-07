@@ -948,3 +948,30 @@ unclosed <span>
 |   <body>
 |     <div>
 |       <span>
+
+#data
+<!DOCTYPE HTML><pre><!---->
+a</pre>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <pre>
+|       <!--  -->
+|       "
+a"
+
+#data
+<!DOCTYPE HTML><textarea><!---->
+a</textarea>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <textarea>
+|       "<!---->
+a"
