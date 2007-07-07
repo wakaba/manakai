@@ -1,6 +1,6 @@
 package Message::DOM::DOMException;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::Util::Error', 'Message::IF::DOMException';
 require Message::Util::Error;
 
@@ -23,6 +23,9 @@ sub ___error_def () {+{
   NOT_SUPPORTED_ERR => {
     -code => 9,
     -subtype => {
+      ADOPT_NODE_TYPE_NOT_SUPPORTED_ERR => {
+        -description => q(Can't adopt specified type of node),
+      },
       CLONE_NODE_TYPE_NOT_SUPPORTED_ERR => {
         -description => q(Can't clone specified type of node),
       },
@@ -74,4 +77,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/06/20 13:41:16 $
+## $Date: 2007/07/07 07:36:58 $

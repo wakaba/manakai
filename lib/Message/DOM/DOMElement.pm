@@ -2,7 +2,7 @@
 
 package Message::DOM::Element;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::Element';
 require Message::DOM::Node;
 
@@ -251,6 +251,12 @@ sub remove_attribute {
   delete ${$_[0]}->{attributes}->{''}->{$_[1]};
 }
 
+sub remove_attribute_node {
+  ## TODO:
+  delete ${$_[0]}->{attributes}->{$_[1]->namespace_uri}->{$_[1]->manakai_local_name};
+  delete ${$_[1]}->{owner_element};
+}
+
 sub set_attribute {
   ## TODO:
   shift->set_attribute_ns (undef, [undef, $_[0]]);
@@ -342,4 +348,4 @@ sub create_element_ns ($$$) {
 
 1;
 ## License: <http://suika.fam.cx/~wakaba/archive/2004/8/18/license#Perl+MPL>
-## $Date: 2007/06/26 14:12:55 $
+## $Date: 2007/07/07 07:36:58 $

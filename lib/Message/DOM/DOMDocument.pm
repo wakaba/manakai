@@ -2,7 +2,7 @@
 
 package Message::DOM::Document;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::Document',
     'Message::IF::DocumentXDoctype',
     'Message::IF::HTMLDocument';
@@ -157,17 +157,98 @@ sub text_content ($;$) {
 ## |Node| methods
 
 sub adopt_node ($$) {
-  ## TODO: Implement
+  my ($self, $source) = @_;
+  ## TODO: Should we apply |copy-asis| configuration parameter to this method?
 
-  my @node = ($_[1]);
-  while (@node) {
-    my $node = shift @node;
-    $$node->{owner_document} = $_[0];
-    Scalar::Util::weaken ($$node->{owner_document});
-    push @node, @{$node->child_nodes};
-    push @node, @{$node->attributes or []};
+  return undef unless UNIVERSAL::isa ($source, 'Message::DOM::Node');
+
+  my $strict = $self->strict_error_checking;
+  if ($strict and $$self->{manakai_read_only}) {
+    report Message::DOM::DOMException
+        -object => $self,
+        -type => 'NO_MODIFICATION_ALLOWED_ERR',
+        -subtype => 'READ_ONLY_NODE_ERR';
   }
-  return $_[1];
+
+  my $parent = $source->parent_node;
+  if ($strict and defined $parent and $$parent->{manakai_read_only}) {
+    report Message::DOM::DOMException
+        -object => $self,
+        -type => 'NO_MODIFICATION_ALLOWED_ERR',
+        -subtype => 'READ_ONLY_NODE_ERR';
+  }
+
+  my $nt = $source->node_type;
+  my $oe;
+  if ($nt == 2) { # ATTRIBUTE_NODE
+    $oe = $source->owner_element;
+    if ($strict and defined $oe and $$oe->{manakai_read_only}) {
+      report Message::DOM::DOMException
+          -object => $self,
+          -type => 'NO_MODIFICATION_ALLOWED_ERR',
+          -subtype => 'READ_ONLY_NODE_ERR';
+    }
+  } elsif ($nt == 9 or $nt == 10 or $nt == 6 or $nt == 12 or
+           $nt == 81001 or $nt == 81002) {
+    # DOCUMENT_NODE, DOCUMENT_TYPE_NODE, ENTITY_NODE, NOTATION_NODE,
+    # ELEMENT_TYPE_DEFINITION_NODE, ATTRIBUTE_DEFINITION_NODE
+    report Message::DOM::DOMException
+        -object => $self,
+        -type => 'NOT_SUPPORTED_ERR',
+        -subtype => 'ADOPT_NODE_TYPE_NOT_SUPPORTED_ERR';
+    ## ISSUE: Define ELEMENT_TYPE_DEFINITION_NODE and ATTRIBUTE_DEFINITION_NODE
+  }
+
+  my @change_od;
+  my @nodes = ($source);
+  while (@nodes) {
+    my $node = shift @nodes;
+    my $nt = $node->node_type;
+    if ($strict and $$node->{manakai_read_only}) {
+      report Message::DOM::DOMException
+          -object => $self,
+          -type => 'NO_MODIFICATION_ALLOWED_ERR',
+          -subtype => 'READ_ONLY_NODE_ERR';
+    }
+
+    push @change_od, $node;
+    push @nodes, @{$node->child_nodes}, @{$node->attributes or []};
+  } # @nodes
+
+  local $Error::Depth = $Error::Depth + 1;
+
+  if (defined $parent) {
+    $parent->remove_child ($source);
+  } elsif (defined $oe) {
+    $oe->remove_attribute_node ($source);
+  }
+
+  return $source if $self eq $change_od[0]->owner_document;
+                         ## NOTE: The array must have more than zero
+                         ##       nodes by definition.  In addition,
+                         ##       it cannot contain document or document
+                         ##       type nodes in current implementation.
+
+  my @ud_node;
+  for my $n (@change_od) {
+    $$n->{owner_document} = $self;
+    Scalar::Util::weaken ($$n->{owner_document});
+    if ($$n->{user_data}) {
+      push @ud_node, $n;
+    }
+  }
+
+  for my $src (@ud_node) {
+    my $src_ud = $$src->{user_data};
+    for my $key (keys %{$src_ud}) {
+      my $dh = $src_ud->{$key}->[1];
+      if ($dh) {
+        $dh->(5, $key, $src_ud->{$key}->[0], $src, undef); # NODE_ADOPTED
+      }
+    }
+  }
+
+  return $source;
 } # adopt_node
 
 sub manakai_append_text ($$) {
@@ -184,6 +265,16 @@ sub manakai_append_text ($$) {
 
 ## NOTE: A manakai extension.
 sub all_declarations_processed ($;$);
+
+sub doctype ($) {
+  my $self = $_[0];
+  for (@{$self->child_nodes}) {
+    if ($_->node_type == 10) { # DOCUMENT_TYPE_NODE
+      return $_;
+    }
+  }
+  return undef;
+} # doctype
 
 sub document_element ($) {
   my $self = shift;
@@ -404,4 +495,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/06/23 12:47:13 $
+## $Date: 2007/07/07 07:36:58 $

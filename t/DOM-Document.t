@@ -247,6 +247,129 @@ for my $prop (qw/all_declarations_processed/) {
   ok $doc2->manakai_compat_mode, 'no quirks', 'manakai_compat_mode [11]';
 }
 
+{
+  ok $doc->can ('implementation') ? 1 : 0, 1, 'Document->implementation can';
+  my $impl = $doc->implementation;
+  ok UNIVERSAL::isa ($impl, 'Message::DOM::DOMImplementation') ? 1 : 0,
+      1, 'Document->implementation class';
+  my $impl2 = $doc->implementation;
+  ok $impl eq $impl2 ? 1 : 0, 1, 'Document->implementation eq D->i';
+  ok $impl ne $impl2 ? 1 : 0, 0, 'Document->implementation ne D->i';
+  ok $impl == $impl2 ? 1 : 0, 1, 'Document->implementation == D->i';
+  ok $impl != $impl2 ? 1 : 0, 0, 'Document->implementation != D->i';
+}
+
+{
+  my $doc2 = $doc->implementation->create_document;
+  ok $doc2->doctype, undef, 'Document->implementation [0]';
+
+  my $doctype = $doc2->implementation->create_document_type ('dt');
+  my $el = $doc2->create_element_ns (undef, 'e');
+  $doc2->append_child ($doctype);
+  $doc2->append_child ($el);
+
+  ok $doc2->doctype, $doctype, 'Document->implementation [1]';
+}
+
+{
+  my $doc2 = $doc->implementation->create_document;
+  my $doctype = $doc2->implementation->create_document_type ('dt');
+  my $el = $doc2->create_element_ns (undef, 'e');
+  my $comment = $doc->create_comment ('');
+  $doc2->append_child ($comment);
+  $doc2->append_child ($doctype);
+  $doc2->append_child ($el);
+
+  ok $doc2->doctype, $doctype, 'Document->implementation [2]';
+}
+
+{
+  my $doc2 = $doc->implementation->create_document;
+  ok $doc2->can ('document_element') ? 1 : 0, 1, 'Document->document_el can';
+  ok $doc2->document_element, undef, 'Document->document_element [0]';
+
+  my $el = $doc2->create_element_ns (undef, 'e');
+  $doc2->append_child ($el);
+
+  ok $doc2->document_element, $el, 'Document->document_element [1]';
+}
+
+{
+  my $doc2 = $doc->implementation->create_document;
+  my $doctype = $doc2->implementation->create_document_type ('dt');
+  $doc2->append_child ($doctype);
+  my $el = $doc2->create_element_ns (undef, 'e');
+  $doc2->append_child ($el);
+
+  ok $doc2->document_element, $el, 'Document->document_element [1]';
+}
+
+{
+  ok $doc->can ('dom_config') ? 1 : 0, 1, 'Document->dom_config can';
+  my $cfg = $doc->dom_config;
+  ok UNIVERSAL::isa ($cfg, 'Message::IF::DOMConfiguration') ? 1 : 0,
+      1, 'Document->dom_config interface';
+}
+
+{
+  my $impl = $doc->implementation;
+  my $doc1 = $impl->create_document;
+  my $doc2 = $impl->create_document;
+
+  ok $doc2->can ('adopt_node') ? 1 : 0, 1, 'Document->adopt_node can';
+
+  my $el1 = $doc1->create_element_ns (undef, 'e');
+  my $el2 = $doc2->adopt_node ($el1);
+
+  ok $el1 eq $el2 ? 1 : 0, 1, 'Document->adopt_node return == source';
+  ok $el2->owner_document, $doc2, 'Document->adopt_node owner_document';
+  
+  my $node = $doc1->create_element ('e');
+  my $udh_called = 0;
+  $node->set_user_data (key => {}, sub {
+    my ($op, $key, $data, $src, $dest) = @_;
+    $udh_called = 1;
+    
+    ok $op, 5, 'adopt_node user data handler operation';
+    ok $key, 'key', 'adopt_node user data handler key';
+    ok ref $data, 'HASH', 'adopt_node user data handler data';
+    ok $src, $node, 'adopt_node user data handler src';
+    ok $dest, undef, 'adopt_node user data handler dest';
+  });
+
+  $doc2->adopt_node ($node);
+
+  ok $udh_called, 1, 'Document->adopt_node udh called';
+
+  $node->set_user_data (key => undef, undef);
+
+  my $el3 = $doc1->create_element_ns (undef, 'e');
+  my $el4 = $doc1->adopt_node ($el3);
+  
+  ok $el4, $el3, 'Document->adopt_node samedoc return';
+  ok $el4->owner_document, $doc1, 'Document->adopt_node samedoc od';
+
+  my $parent = $doc1->create_element ('pa');
+  my $child = $doc1->create_element ('ch');
+  $parent->append_child ($child);
+
+  my $child2 = $doc2->adopt_node ($child);
+  
+  ok $child2, $child, 'Document->adopt_node return [2]';
+  ok $child2->owner_document, $doc2, 'Document->adopt_node->od [2]';
+  ok $child2->parent_node, undef, 'Document->adopt_node->parent_node [2]';
+  ok 0+@{$parent->child_nodes}, 0, 'Document->adopt_node parent->cn @{} 0+ [2]';
+
+  my $attr = $doc1->create_attribute ('e');
+  $parent->set_attribute_node ($attr);
+
+  my $attr2 = $doc2->adopt_node ($attr);
+  ok $attr2, $attr, 'Document->adopt_node return [3]';
+  ok $attr2->owner_document, $doc2, 'Document->adopt_node->od [3]';
+  ok $attr2->owner_element, undef, 'Document->adopt_node->oe [3]';
+  ok 0+@{$parent->attributes}, 0, 'Document->adopt_node parent->a @{} 0+ [3]';
+}
+
 ## TODO: manakai_entity_base_uri
 
 =head1 LICENSE
@@ -258,4 +381,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2007/06/23 12:47:13 $
+## $Date: 2007/07/07 07:36:58 $

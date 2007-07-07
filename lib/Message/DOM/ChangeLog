@@ -1,5 +1,17 @@
 2007-07-07  Wakaba  <wakaba@suika.fam.cx>
 
+	* DOMDocument.pm (adopt_node): Implemented.
+	(doctype): Implemented.
+
+	* DOMElement.pm (remove_attribute_node): Alpha version.
+
+	* DOMException.pm (ADOPT_NODE_TYPE_NOT_SUPPORTED_ERR): New 
+	error type.
+
+	* Node.pm (set_user_data): Implemented.
+
+2007-07-07  Wakaba  <wakaba@suika.fam.cx>
+
 	* DOMImplementation.pm (new): New method name for |____new|.
 	It will be defined in the DOM Perl Binding specification
 	as part of |DOMImplementation| interface.

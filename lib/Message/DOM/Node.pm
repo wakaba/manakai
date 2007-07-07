@@ -1,6 +1,6 @@
 package Message::DOM::Node;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::IF::Node';
 require Scalar::Util;
 require Message::DOM::DOMException;
@@ -926,6 +926,32 @@ sub manakai_set_read_only ($;$$) {
   }
 } # manakai_set_read_only
 
+sub set_user_data ($$$;$) {
+  my ($self, $key, $data, $handler) = @_;
+
+  my $v = ($$self->{user_data} ||= {});
+  my $r = $v->{$key}->[0];
+
+  if (defined $data) {
+    $v->{$key} = [$data, $handler];
+
+    if (defined $handler) {
+      $$self->{manakai_onunload} = sub {
+        my $node = $_[0];
+        my $uds = $$node->{user_data};
+        for my $key (keys %$uds) {
+          if (defined $uds->{$key}->[1]) {
+            $uds->{$key}->[1]->(3, $key, $uds->{$key}->[0]); # NODE_DELETED
+          }
+        }
+      };
+    }
+  } else {
+    delete $v->{$key};
+  }
+  return $r;
+} # set_user_data
+
 package Message::IF::Node;
 
 =head1 LICENSE
@@ -938,4 +964,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/06/20 13:41:16 $
+## $Date: 2007/07/07 07:36:58 $
