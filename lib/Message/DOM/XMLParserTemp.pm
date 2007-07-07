@@ -1,7 +1,7 @@
 # -*- mode: fundamental -*- # cperl-mode takes very long time to parse
 package Message::DOM::XMLParserTemp;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 package Message::DOM::DOMCore::ManakaiDOMError;
 push our @ISA, 'Message::DOM::DOMError';
@@ -17526,7 +17526,6 @@ my $et;
 {
 
 
-
     $et = $doctype->
 get_element_type_definition_node
  ($name);
@@ -17545,7 +17544,6 @@ set_element_type_definition_node
  ($et)
         unless $name eq '#ILLEGAL';
     }
-  
 
 
 }
@@ -17556,6 +17554,7 @@ $token = $self->{scanner}->($self);
 
 
 }
+  
 
 MATCH_6:
 {
@@ -26194,6 +26193,7 @@ last MATCH_6;
 
 }
 # MATCH_6
+
 if ($token->{type} eq 'MDC') 
 {
 
@@ -26295,7 +26295,6 @@ report Message::DOM::DOMLS::ManakaiDOMLSException -object => $self, '-type' => '
 }
 elsif (($token->{type} eq 'Name') and ($token->{value} eq 'ENTITY')) 
 {
-
 
 {
 
@@ -48377,4 +48376,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/06/21 14:57:53 $
+## $Date: 2007/07/07 04:47:29 $
