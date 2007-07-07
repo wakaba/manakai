@@ -1,6 +1,6 @@
 package Message::DOM::Text;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::CharacterData', 'Message::IF::Text';
 require Message::DOM::DOMCharacterData; ## TODO: Change to new module name
 
@@ -50,6 +50,7 @@ sub node_type { 3 } # TEXT_NODE
 
 sub is_element_content_whitespace ($;$) {
   ## TODO:
+  ## TODO: Define this attribute setter for CDATASection
   return 0;
 } # is_element_content_whitespace
 
@@ -63,4 +64,4 @@ sub create_text_node ($$) {
 
 1;
 ## License: <http://suika.fam.cx/~wakaba/archive/2004/8/18/license#Perl+MPL>
-## $Date: 2007/06/16 15:27:45 $
+## $Date: 2007/07/07 11:11:34 $

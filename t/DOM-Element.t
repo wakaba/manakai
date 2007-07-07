@@ -1,14 +1,78 @@
 #!/usr/bin/perl
 use strict;
 use Test;
-BEGIN { plan tests => 38 } 
+BEGIN { plan tests => 52 } 
 
 require Message::DOM::DOMImplementation;
 use Message::Util::Error;
 
 my $dom = Message::DOM::DOMImplementation->____new;
-my $doc = $dom->create_document;
 
+{
+  my $doc = $dom->create_document;
+  my $el = $doc->create_element ('et1');
+
+  ok 0+@{$el->attributes}, 0, 'create_element->attributes @{} 0+ [0]';
+
+  my $dt = $doc->create_document_type_definition ('dt');
+  my $et = $doc->create_element_type_definition ('et1');
+  my $at = $doc->create_attribute_definition ('dattr1');
+  $at->default_type ($at->EXPLICIT_DEFAULT);
+  $at->text_content ('dattr1 default ');
+  $et->set_attribute_definition_node ($at);
+  $dt->set_element_type_definition_node ($et);
+  $doc->append_child ($dt);
+  my $el2 = $doc->create_element ('et1');
+
+  ok 0+@{$el2->attributes}, 1, 'create_element->attributes @{} 0+ [1]';
+
+  ok $el2->has_attribute ('dattr1') ? 1 : 0, 1, 'create_element->has_attr [1]';
+
+  my $an = $el2->get_attribute_node ('dattr1');
+  ok UNIVERSAL::isa ($an, 'Message::IF::Attr') ? 1 : 0, 1, 'ce->def if [1]';
+  ok $an->text_content, 'dattr1 default ', 'ce->def tx [1]';
+  ok $an->specified ? 1 : 0, 0, 'ce->def specified [1]';
+
+  $doc->dom_config->set_parameter 
+      (q<http://suika.fam.cx/www/2006/dom-config/dtd-default-attribute> => 0);
+  
+  my $el3 = $doc->create_element ('et1');
+  ok 0+@{$el3->attributes}, 0, 'create_element->attributes @{} 0+ [2]';
+}
+
+{
+  my $doc = $dom->create_document;
+  my $el = $doc->create_element_ns (undef, 'et1');
+
+  ok 0+@{$el->attributes}, 0, 'create_element->attributes @{} 0+ [0]';
+
+  my $dt = $doc->create_document_type_definition ('dt');
+  my $et = $doc->create_element_type_definition ('et1');
+  my $at = $doc->create_attribute_definition ('dattr1');
+  $at->default_type ($at->EXPLICIT_DEFAULT);
+  $at->text_content ('dattr1 default ');
+  $et->set_attribute_definition_node ($at);
+  $dt->set_element_type_definition_node ($et);
+  $doc->append_child ($dt);
+  my $el2 = $doc->create_element ('et1');
+
+  ok 0+@{$el2->attributes}, 1, 'create_element->attributes @{} 0+ [1]';
+
+  ok $el2->has_attribute ('dattr1') ? 1 : 0, 1, 'create_element->has_attr [1]';
+
+  my $an = $el2->get_attribute_node ('dattr1');
+  ok UNIVERSAL::isa ($an, 'Message::IF::Attr') ? 1 : 0, 1, 'ce->def if [1]';
+  ok $an->text_content, 'dattr1 default ', 'ce->def tx [1]';
+  ok $an->specified ? 1 : 0, 0, 'ce->def specified [1]';
+
+  $doc->dom_config->set_parameter 
+      (q<http://suika.fam.cx/www/2006/dom-config/dtd-default-attribute> => 0);
+  
+  my $el3 = $doc->create_element ('et1');
+  ok 0+@{$el3->attributes}, 0, 'create_element->attributes @{} 0+ [2]';
+}
+
+my $doc = $dom->create_document;
 my $el = $doc->create_element ('element');
 
 for my $prop (qw/manakai_base_uri/) {
@@ -71,4 +135,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2007/06/17 13:37:42 $
+## $Date: 2007/07/07 11:11:34 $

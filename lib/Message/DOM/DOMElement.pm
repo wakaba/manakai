@@ -2,7 +2,7 @@
 
 package Message::DOM::Element;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::Element';
 require Message::DOM::Node;
 
@@ -240,6 +240,10 @@ sub get_attribute_node_ns ($$$) {
   return $$self->{attributes}->{$nsuri}->{$ln};
 } # get_attribute_node_ns
 
+sub has_attribute ($$) {
+  return $_[0]->has_attribute_ns (undef, $_[1]);
+}
+
 sub has_attribute_ns ($$$) {
   my ($self, $nsuri, $ln) = @_;
   $nsuri = '' unless defined $nsuri;
@@ -277,7 +281,7 @@ sub set_attribute_node ($$) {
   $nsuri = '' unless defined $nsuri;
   my $ln = $$new_attr->{local_name};
 
-  delete $$self->{____content_attribute_list};
+  delete $$self->{manakai_content_attribute_list};
   my $attrs = $$self->{attributes};
   my $current = $attrs->{$nsuri}->{$ln};
 
@@ -331,11 +335,133 @@ package Message::IF::Element;
 package Message::DOM::Document;
 
 sub create_element ($$) {
+  my $self = $_[0];
+  if ($$self->{strict_error_checking}) {
+    my $xv = $self->xml_version;
+    ## TODO: HTML Document ??
+    if (defined $xv) {
+      if ($xv eq '1.0' and
+          $_[1] =~ /\A\p{InXML_NameStartChar10}\p{InXMLNameChar10}*\z/) {
+        #
+      } elsif ($xv eq '1.1' and
+               $_[1] =~ /\A\p{InXMLNameStartChar11}\p{InXMLNameChar11}*\z/) {
+        # 
+      } else {
+        report Message::DOM::DOMException
+            -object => $self,
+            -type => 'INVALID_CHARACTER_ERR',
+            -subtype => 'MALFORMED_NAME_ERR';
+      }
+    }
+  }
   ## TODO: HTML5
-  return Message::DOM::Element->____new ($_[0], undef, undef, $_[1]);
+
+  my $r = Message::DOM::Element->____new ($self, undef, undef, $_[1]);
+
+  ## -- Default attributes
+  {
+    local $Error::Depth = $Error::Depth + 1;
+    my $cfg = $self->dom_config;
+    return $r
+        unless $cfg->get_parameter
+            (q<http://suika.fam.cx/www/2006/dom-config/dtd-default-attribute>);
+
+    my $doctype = $self->doctype;
+    return $r unless defined $doctype;
+
+    my $et = $doctype->get_element_type_definition_node ($_[1]);
+    return $r unless defined $et;
+
+    my $orig_strict = $self->strict_error_checking;
+    $self->strict_error_checking (0);
+
+    my %gattr;
+    my %has_attr;
+    my %pfx_to_uri;
+    my $copy_asis = $cfg->get_parameter
+        (q<http://suika.fam.cx/www/2006/dom-config/clone-entity-reference-subtree>);
+    $cfg->set_parameter
+        (q<http://suika.fam.cx/www/2006/dom-config/clone-entity-reference-subtree> => 1);
+    
+    for my $at (@{$et->attribute_definitions}) {
+      my $at_default = $at->default_type;
+      if ($at_default == 4 or $at_default == 1) {
+        # EXPLICIT_DEFAULT, FIXED_DEFAULT
+        my ($nn1, $nn2) = split /:/, $at->node_name;
+        if (defined $nn2) { # prefixed
+          if ($nn1 eq 'xmlns') {
+            ## TODO: NCName check, prefix check and NSURI check
+            my $attr = $self->create_attribute_ns
+                (q<http://www.w3.org/2000/xmlns/>, [$nn1, $nn2]);
+            for my $at_child (@{$at->child_nodes}) {
+              $attr->append_child ($at_child->clone_node (1));
+            }
+            $attr->manakai_attribute_type ($at->declared_type);
+            my $nsuri = $attr->value;
+            ## TODO: Namespace well-formedness check (NSURI), v1.1 chk
+            $pfx_to_uri{$nn2} = $nsuri;
+            $r->set_attribute_node_ns ($attr);
+                ## NOTE: This method changes |specified| flag
+            $attr->specified (0);
+            $has_attr{q<http://www.w3.org/2000/xmlns/>}->{$nn2} = 1;
+          } else {
+            ## TODO: NCName check
+            $gattr{$nn1}->{$nn2} = $at;
+          }
+        } else {            # no prefixed
+          my $attr;
+          if ($nn1 eq 'xmlns') {
+            $attr = $self->create_attribute_ns
+                (q<http://www.w3.org/2000/xmlns/>, 'xmlns');
+            $has_attr{q<http://www.w3.org/2000/xmlns/>}->{xmlns} = 1;
+          } else {
+            $attr = $self->create_attribute_ns (undef, $nn1);
+            ## TODO: NCName check
+          }
+          for my $at_child (@{$at->child_nodes}) {
+            $attr->append_child ($at_child->clone_node (1));
+          }
+          $attr->manakai_attribute_type ($at->declared_type);
+          ## TODO: Namespace well-formedness check (NSURI)
+          $r->set_attribute_node_ns ($attr);
+              ## NOTE: This method changes |specified| flag
+          $attr->specified (0);
+        }
+      }
+    } # attrdefs
+    for my $pfx (keys %gattr) {
+      my $nsuri = $pfx_to_uri{$pfx};
+      unless (defined $nsuri) {
+        ## TODO: Namespace well-formedness error
+      }
+      LN: for my $ln (keys %{$gattr{$pfx}}) {
+        if ($has_attr{defined $nsuri ? $nsuri : ''}->{$ln}) {
+          ## TODO: Namespace well-formedness error
+          next LN;
+        }
+        ## TODO: NCName check, prefix check and NSURI check
+        my $at = $gattr{$pfx}->{$ln};
+        my $attr = $self->create_attribute_ns ($nsuri, [$pfx, $ln]);
+        for my $at_child (@{$at->child_nodes}) {
+          $attr->append_child ($at_child->clone_node (1));
+        }
+        $attr->manakai_attribute_type ($at->declared_type);
+        $r->set_attribute_node_ns ($attr);
+            ## NOTE: This method changes |specified| flag
+        $attr->specified (0);
+        $has_attr{defined $nsuri ? $nsuri : ''}->{$ln} = 1;
+      } # LN
+    } # pfx
+    $cfg->set_parameter
+        (q<http://suika.fam.cx/www/2006/dom-config/clone-entity-reference-subtree> => $copy_asis);
+    $self->strict_error_checking ($orig_strict);
+  }
+
+  return $r;
 } # create_element
 
 sub create_element_ns ($$$) {
+  my $self = $_[0];
   my ($prefix, $lname);
   if (ref $_[2] eq 'ARRAY') {
     ($prefix, $lname) = @{$_[2]};
@@ -343,9 +469,234 @@ sub create_element_ns ($$$) {
     ($prefix, $lname) = split /:/, $_[2], 2;
     ($prefix, $lname) = (undef, $prefix) unless defined $lname;
   }
-  return Message::DOM::Element->____new ($_[0], $_[1], $prefix, $lname);
+
+  if ($$self->{strict_error_checking}) {
+    my $xv = $self->xml_version;
+    ## TODO: HTML Document ?? (NOT_SUPPORTED_ERR is different from what Web browsers do)
+    if (defined $xv) {
+      if ($xv eq '1.0') {
+        if (ref $_[2] eq 'ARRAY' or
+            $_[2] =~ /\A\p{InXML_NameStartChar10}\p{InXMLNameChar10}*\z/) {
+          if (defined $prefix) {
+            if ($prefix =~ /\A\p{InXML_NCNameStartChar10}\p{InXMLNCNameChar10}*\z/) {
+              #
+            } else {
+              report Message::DOM::DOMException
+                  -object => $self,
+                  -type => 'NAMESPACE_ERR',
+                  -subtype => 'MALFORMED_QNAME_ERR';
+            }
+          }
+          if ($lname =~ /\A\p{InXML_NCNameStartChar10}\p{InXMLNCNameChar10}*\z/) {
+            #
+          } else {
+            report Message::DOM::DOMException
+                -object => $self,
+                -type => 'NAMESPACE_ERR',
+                -subtype => 'MALFORMED_QNAME_ERR';
+          }
+        } else {
+          report Message::DOM::DOMException
+              -object => $self,
+              -type => 'INVALID_CHARACTER_ERR',
+              -subtype => 'MALFORMED_NAME_ERR';
+        }
+      } elsif ($xv eq '1.1') {
+        if (ref $_[2] eq 'ARRAY' or
+            $_[2] =~ /\A\p{InXML_NameStartChar10}\p{InXMLNameChar10}*\z/) {
+          if (defined $prefix) {
+            if ($prefix =~ /\A\p{InXMLNCNameStartChar11}\p{InXMLNCNameChar11}*\z/) {
+              #
+            } else {
+              report Message::DOM::DOMException
+                  -object => $self,
+                  -type => 'NAMESPACE_ERR',
+                  -subtype => 'MALFORMED_QNAME_ERR';
+            }
+          }
+          if ($lname =~ /\A\p{InXMLNCNameStartChar11}\p{InXMLNCNameChar11}*\z/) {
+            #
+          } else {
+            report Message::DOM::DOMException
+                -object => $self,
+                -type => 'NAMESPACE_ERR',
+                -subtype => 'MALFORMED_QNAME_ERR';
+          }
+        } else {
+          report Message::DOM::DOMException
+              -object => $self,
+              -type => 'INVALID_CHARACTER_ERR',
+              -subtype => 'MALFORMED_NAME_ERR';
+        }
+      } else {
+        die "create_attribute_ns: XML version |$xv| is not supported";
+      }
+    }
+
+    if (defined $prefix) {
+      if (not defined $_[1]) {
+        report Message::DOM::DOMException
+            -object => $self,
+            -type => 'NAMESPACE_ERR',
+            -subtype => 'PREFIXED_NULLNS_ERR';
+      } elsif ($prefix eq 'xml' and 
+               $_[1] ne q<http://www.w3.org/XML/1998/namespace>) {
+        report Message::DOM::DOMException
+            -object => $self,
+            -type => 'NAMESPACE_ERR',
+            -subtype => 'XMLPREFIX_NONXMLNS_ERR';
+      } elsif ($prefix eq 'xmlns' and
+               $_[1] ne q<http://www.w3.org/2000/xmlns/>) {
+        report Message::DOM::DOMException
+            -object => $self,
+            -type => 'NAMESPACE_ERR',
+            -subtype => 'XMLNSPREFIX_NONXMLNSNS_ERR';
+      } elsif ($_[1] eq q<http://www.w3.org/2000/xmlns/> and
+               $prefix ne 'xmlns') {
+        report Message::DOM::DOMException
+            -object => $self,
+            -type => 'NAMESPACE_ERR',
+            -subtype => 'NONXMLNSPREFIX_XMLNSNS_ERR';
+      }
+    } else { # no prefix
+      if ($lname eq 'xmlns' and
+          (not defined $_[1] or $_[1] ne q<http://www.w3.org/2000/xmlns/>)) {
+        report Message::DOM::DOMException
+            -object => $self,
+            -type => 'NAMESPACE_ERR',
+            -subtype => 'XMLNS_NONXMLNSNS_ERR';
+      } elsif (not defined $_[1]) {
+        #
+      } elsif ($_[1] eq q<http://www.w3.org/2000/xmlns/> and
+               $lname ne 'xmlns') {
+        report Message::DOM::DOMException
+            -object => $self,
+            -type => 'NAMESPACE_ERR',
+            -subtype => 'NONXMLNSPREFIX_XMLNSNS_ERR';
+      }
+    }
+  }
+
+  ## -- Choose the most apppropriate class for the element
+  my $class = 'Message::DOM::Element';
+  my $nsuri = defined $_[1] ? $_[1] : '';
+
+  ## TODO: Choose a class for $nsuri:$lname
+  ## TODO: Choose a class for $nsuri:*
+
+  my $r = $class->____new ($self, $_[1], $prefix, $lname);
+
+  ## -- Default attributes
+  {
+    local $Error::Depth = $Error::Depth + 1;
+    my $cfg = $self->dom_config;
+    return $r
+        unless $cfg->get_parameter
+            (q<http://suika.fam.cx/www/2006/dom-config/dtd-default-attribute>);
+
+    my $doctype = $self->doctype;
+    return $r unless defined $doctype;
+
+    my $et = $doctype->get_element_type_definition_node
+        (defined $prefix ? $prefix . ':' . $lname : $lname);
+    return $r unless defined $et;
+
+    my $orig_strict = $self->strict_error_checking;
+    $self->strict_error_checking (0);
+
+    my %gattr;
+    my %has_attr;
+    my %pfx_to_uri;
+    my $copy_asis = $cfg->get_parameter
+        (q<http://suika.fam.cx/www/2006/dom-config/clone-entity-reference-subtree>);
+    $cfg->set_parameter
+        (q<http://suika.fam.cx/www/2006/dom-config/clone-entity-reference-subtree> => 1);
+    
+    for my $at (@{$et->attribute_definitions}) {
+      my $at_default = $at->default_type;
+      if ($at_default == 4 or $at_default == 1) {
+        # EXPLICIT_DEFAULT, FIXED_DEFAULT
+        my ($nn1, $nn2) = split /:/, $at->node_name;
+        if (defined $nn2) { # prefixed
+          if ($nn1 eq 'xmlns') {
+            ## TODO: NCName check, prefix check and NSURI check
+            my $attr = $self->create_attribute_ns
+                (q<http://www.w3.org/2000/xmlns/>, [$nn1, $nn2]);
+            for my $at_child (@{$at->child_nodes}) {
+              $attr->append_child ($at_child->clone_node (1));
+            }
+            $attr->manakai_attribute_type ($at->declared_type);
+            my $nsuri = $attr->value;
+            ## TODO: Namespace well-formedness check (NSURI), v1.1 chk
+            $pfx_to_uri{$nn2} = $nsuri;
+            $r->set_attribute_node_ns ($attr);
+                ## NOTE: This method changes |specified| flag
+            $attr->specified (0);
+            $has_attr{q<http://www.w3.org/2000/xmlns/>}->{$nn2} = 1;
+          } else {
+            ## TODO: NCName check
+            $gattr{$nn1}->{$nn2} = $at;
+          }
+        } else {            # no prefixed
+          my $attr;
+          if ($nn1 eq 'xmlns') {
+            $attr = $self->create_attribute_ns
+                (q<http://www.w3.org/2000/xmlns/>, 'xmlns');
+            $has_attr{q<http://www.w3.org/2000/xmlns/>}->{xmlns} = 1;
+          } else {
+            $attr = $self->create_attribute_ns (undef, $nn1);
+            ## TODO: NCName check
+          }
+          for my $at_child (@{$at->child_nodes}) {
+            $attr->append_child ($at_child->clone_node (1));
+          }
+          $attr->manakai_attribute_type ($at->declared_type);
+          ## TODO: Namespace well-formedness check (NSURI)
+          $r->set_attribute_node_ns ($attr);
+              ## NOTE: This method changes |specified| flag
+          $attr->specified (0);
+        }
+      }
+    } # attrdefs
+    for my $pfx (keys %gattr) {
+      my $nsuri = $pfx_to_uri{$pfx};
+      unless (defined $nsuri) {
+        ## TODO: Namespace well-formedness error
+      }
+      LN: for my $ln (keys %{$gattr{$pfx}}) {
+        if ($has_attr{defined $nsuri ? $nsuri : ''}->{$ln}) {
+          ## TODO: Namespace well-formedness error
+          next LN;
+        }
+        ## TODO: NCName check, prefix check and NSURI check
+        my $at = $gattr{$pfx}->{$ln};
+        my $attr = $self->create_attribute_ns ($nsuri, [$pfx, $ln]);
+        for my $at_child (@{$at->child_nodes}) {
+          $attr->append_child ($at_child->clone_node (1));
+        }
+        $attr->manakai_attribute_type ($at->declared_type);
+        $r->set_attribute_node_ns ($attr);
+            ## NOTE: This method changes |specified| flag
+        $attr->specified (0);
+        $has_attr{defined $nsuri ? $nsuri : ''}->{$ln} = 1;
+      } # LN
+    } # pfx
+    $cfg->set_parameter
+        (q<http://suika.fam.cx/www/2006/dom-config/clone-entity-reference-subtree> => $copy_asis);
+    $self->strict_error_checking ($orig_strict);
+  }
+
+  return $r;
 } # create_element_ns
 
+=head1 LICENSE
+
+Copyright 2007 Wakaba <w@suika.fam.cx>
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut
+
 1;
-## License: <http://suika.fam.cx/~wakaba/archive/2004/8/18/license#Perl+MPL>
-## $Date: 2007/07/07 07:36:58 $
+## $Date: 2007/07/07 11:11:34 $

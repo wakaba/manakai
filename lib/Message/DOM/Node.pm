@@ -1,6 +1,6 @@
 package Message::DOM::Node;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::IF::Node';
 require Scalar::Util;
 require Message::DOM::DOMException;
@@ -295,7 +295,9 @@ sub clone_node ($;$) {
   my $strict_check = $od->strict_error_checking;
   $od->strict_error_checking (0);
   my $cfg = $od->dom_config;
-  my $er_copy_asis = $cfg->{'http://suika.fam.cx/www/2006/dom-config/clone-entity-reference-subtree'};
+  my $er_copy_asis
+      = $cfg->get_parameter
+          (q<http://suika.fam.cx/www/2006/dom-config/clone-entity-reference-subtree>);
 
   my $r;
   my @udh;
@@ -328,8 +330,8 @@ sub clone_node ($;$) {
       } else {
         $r = $clone;
       }
-      $clone->element_content_whitespace (1)
-        if $node->element_content_whitespace;
+      $clone->is_element_content_whitespace (1)
+        if $node->is_element_content_whitespace;
     } elsif ($nt == ATTRIBUTE_NODE) {
       $clone = $od->create_attribute_ns
         ($node->namespace_uri, [$node->prefix, $node->local_name]);
@@ -964,4 +966,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/07 07:36:58 $
+## $Date: 2007/07/07 11:11:34 $

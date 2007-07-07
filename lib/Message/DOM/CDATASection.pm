@@ -1,6 +1,6 @@
 package Message::DOM::CDATASection;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Text', 'Message::IF::CDATASection';
 require Message::DOM::Text;
 
@@ -57,6 +57,10 @@ sub node_name ($) {
 
 sub node_type ($) { 4 } # CDATA_SECTION_NODE
 
+## |Text| attributes
+
+sub is_element_content_whitespace ($;$) { 0 }
+
 package Message::IF::CDATASection;
 
 package Message::DOM::Document;
@@ -73,4 +77,4 @@ sub create_cdata_section ($$) {
 
 1;
 ## License: <http://suika.fam.cx/~wakaba/archive/2004/8/18/license#Perl+MPL>
-## $Date: 2007/06/15 14:32:50 $
+## $Date: 2007/07/07 11:11:34 $

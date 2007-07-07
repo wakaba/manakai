@@ -230,6 +230,7 @@ my $tests = {
     attr_get_bool => {
       has_attributes => 0,
       has_child_nodes => 0,
+      is_element_content_whitespace => 0,
     },
   },
   cdatasectionmde => {
@@ -256,6 +257,7 @@ my $tests = {
     attr_get_bool => {
       has_attributes => 0,
       has_child_nodes => 0,
+      is_element_content_whitespace => 0,
     },
   },
   comment => {
@@ -665,6 +667,7 @@ my $tests = {
     attr_get_bool => {
       has_attributes => 0,
       has_child_nodes => 0,
+      is_element_content_whitespace => 0,
     },
   },
   element_type_definition => {
@@ -1758,4 +1761,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2007/07/07 09:11:05 $
+## $Date: 2007/07/07 11:11:34 $

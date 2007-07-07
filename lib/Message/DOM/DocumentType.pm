@@ -1,6 +1,6 @@
 package Message::DOM::DocumentType;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::DocumentType',
     'Message::IF::DocumentTypeDefinition',
     'Message::IF::DocumentTypeDeclaration';
@@ -141,6 +141,11 @@ sub get_element_type_definition_node {
 }
 
 ## TODO:
+sub get_general_entity_node {
+  return ${$_[0]}->{entities}->{$_[1]};
+}
+
+## TODO:
 sub get_notation_node {
   return ${$_[0]}->{notations}->{$_[1]};
 }
@@ -187,4 +192,4 @@ sub create_document_type_definition ($$) {
 
 1;
 ## License: <http://suika.fam.cx/~wakaba/archive/2004/8/18/license#Perl+MPL>
-## $Date: 2007/06/17 14:15:39 $
+## $Date: 2007/07/07 11:11:34 $

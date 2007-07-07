@@ -1,6 +1,6 @@
 package Message::DOM::EntityReference;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::EntityReference';
 require Message::DOM::Node;
 
@@ -130,7 +130,58 @@ package Message::IF::EntityReference;
 package Message::DOM::Document;
 
 sub create_entity_reference ($$) {
-  return Message::DOM::EntityReference->____new (@_[0, 1]);
+  our $CreateEntityReference_OpenEntity;
+      ## TODO: This is Multithread unsafe
+
+  my $self = $_[0];
+  my $orig_strict = $self->strict_error_checking;
+  if ($orig_strict) {
+    my $xv = $self->xml_version;
+    if (defined $xv) {
+      if ($xv eq '1.0' and
+          $_[1] =~ /\A\p{InXML_NameStartChar10}\p{InXMLNameChar10}*\z/) {
+        #
+      } elsif ($xv eq '1.1' and
+               $_[1] =~ /\A\p{InXMLNameStartChar11}\p{InXMLNameChar11}*\z/) {
+        #
+      } else {
+        report Message::DOM::DOMException
+            -object => $self,
+            -type => 'INVALID_CHARACTER_ERR',
+            -subtype => 'MALFORMED_NAME_ERR';
+      }
+    }
+  }
+
+  my $r = Message::DOM::EntityReference->____new ($self, $_[1]);
+
+  ## Expansion
+  unless ($CreateEntityReference_OpenEntity->{$_[1]}) {
+    local $CreateEntityReference_OpenEntity->{$_[1]} = 1;
+    local $Error::Depth = $Error::Depth + 1;
+
+    my $doctype = $self->doctype;
+    unless ($doctype) {
+      $r->manakai_set_read_only (1, 1);
+      return $r;
+    }
+
+    my $ent = $doctype->get_general_entity_node ($_[1]);
+    unless ($ent) {
+      $r->manakai_set_read_only (1, 1);
+      return $r;
+    }
+
+    $self->strict_error_checking (0);
+    for my $c (@{$ent->child_nodes}) {
+      my $clone = $c->clone_node (1);
+      $r->append_child ($clone);
+    }
+    $r->manakai_expanded ($ent->has_replacement_tree);
+    $self->strict_error_checking ($orig_strict);
+  }
+  $r->manakai_set_read_only (1, 1);
+  return $r;
 } # create_entity_reference
 
 =head1 LICENSE
@@ -143,4 +194,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/06/17 13:37:40 $
+## $Date: 2007/07/07 11:11:34 $
