@@ -1,6 +1,6 @@
 package Message::DOM::DOMImplementationSource;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::IF::DOMImplementationSource';
 
 $Message::DOM::DOMImplementationRegistry::SourceClass->{''.__PACKAGE__} = 1;
@@ -27,7 +27,6 @@ sub get_dom_implementation ($$) {
 } # get_dom_implementation
 
 sub get_dom_implementation_list ($$) {
-  local $Error::Depth = $Error::Depth + 1;
   require Message::DOM::DOMImplementationList;
   my $list = bless [], 'Message::DOM::DOMImplementationList';
   my $dom = $_[0]->get_dom_implementation ($_[1]);
@@ -89,4 +88,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/07 05:58:11 $
+## $Date: 2007/07/07 09:11:05 $

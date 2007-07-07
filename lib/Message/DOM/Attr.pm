@@ -1,6 +1,6 @@
 package Message::DOM::Attr;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::Attr';
 require Message::DOM::Node;
 
@@ -176,6 +176,24 @@ package Message::IF::Attr;
 package Message::DOM::Document;
 
 sub create_attribute ($$) {
+  if (${$_[0]}->{strict_error_checking}) {
+    my $xv = $_[0]->xml_version;
+    ## TODO: HTML Document ??
+    if (defined $xv) {
+      if ($xv eq '1.0' and
+          $_[1] =~ /\A\p{InXML_NameStartChar10}\p{InXMLNameChar10}*\z/) {
+        #
+      } elsif ($xv eq '1.1' and
+               $_[1] =~ /\A\p{InXMLNameStartChar11}\p{InXMLNameChar11}*\z/) {
+        # 
+      } else {
+        report Message::DOM::DOMException
+            -object => $_[0],
+            -type => 'INVALID_CHARACTER_ERR',
+            -subtype => 'MALFORMED_NAME_ERR';
+      }
+    }
+  }
   ## TODO: HTML5
   return Message::DOM::Attr->____new ($_[0], undef, undef, undef, $_[1]);
 } # create_attribute
@@ -188,9 +206,128 @@ sub create_attribute_ns ($$$) {
     ($prefix, $lname) = split /:/, $_[2], 2;
     ($prefix, $lname) = (undef, $prefix) unless defined $lname;
   }
+
+  if (${$_[0]}->{strict_error_checking}) {
+    my $xv = $_[0]->xml_version;
+    ## TODO: HTML Document ?? (NOT_SUPPORTED_ERR is different from what Web browsers do)
+    if (defined $xv) {
+      if ($xv eq '1.0') {
+        if (ref $_[2] eq 'ARRAY' or
+            $_[2] =~ /\A\p{InXML_NameStartChar10}\p{InXMLNameChar10}*\z/) {
+          if (defined $prefix) {
+            if ($prefix =~ /\A\p{InXML_NCNameStartChar10}\p{InXMLNCNameChar10}*\z/) {
+              #
+            } else {
+              report Message::DOM::DOMException
+                  -object => $_[0],
+                  -type => 'NAMESPACE_ERR',
+                  -subtype => 'MALFORMED_QNAME_ERR';
+            }
+          }
+          if ($lname =~ /\A\p{InXML_NCNameStartChar10}\p{InXMLNCNameChar10}*\z/) {
+            #
+          } else {
+            report Message::DOM::DOMException
+                -object => $_[0],
+                -type => 'NAMESPACE_ERR',
+                -subtype => 'MALFORMED_QNAME_ERR';
+          }
+        } else {
+          report Message::DOM::DOMException
+              -object => $_[0],
+              -type => 'INVALID_CHARACTER_ERR',
+              -subtype => 'MALFORMED_NAME_ERR';
+        }
+      } elsif ($xv eq '1.1') {
+        if (ref $_[2] eq 'ARRAY' or
+            $_[2] =~ /\A\p{InXML_NameStartChar10}\p{InXMLNameChar10}*\z/) {
+          if (defined $prefix) {
+            if ($prefix =~ /\A\p{InXMLNCNameStartChar11}\p{InXMLNCNameChar11}*\z/) {
+              #
+            } else {
+              report Message::DOM::DOMException
+                  -object => $_[0],
+                  -type => 'NAMESPACE_ERR',
+                  -subtype => 'MALFORMED_QNAME_ERR';
+            }
+          }
+          if ($lname =~ /\A\p{InXMLNCNameStartChar11}\p{InXMLNCNameChar11}*\z/) {
+            #
+          } else {
+            report Message::DOM::DOMException
+                -object => $_[0],
+                -type => 'NAMESPACE_ERR',
+                -subtype => 'MALFORMED_QNAME_ERR';
+          }
+        } else {
+          report Message::DOM::DOMException
+              -object => $_[0],
+              -type => 'INVALID_CHARACTER_ERR',
+              -subtype => 'MALFORMED_NAME_ERR';
+        }
+      } else {
+        die "create_attribute_ns: XML version |$xv| is not supported";
+      }
+    }
+
+    if (defined $prefix) {
+      if (not defined $_[1]) {
+        report Message::DOM::DOMException
+            -object => $_[0],
+            -type => 'NAMESPACE_ERR',
+            -subtype => 'PREFIXED_NULLNS_ERR';
+      } elsif ($prefix eq 'xml' and 
+               $_[1] ne q<http://www.w3.org/XML/1998/namespace>) {
+        report Message::DOM::DOMException
+            -object => $_[0],
+            -type => 'NAMESPACE_ERR',
+            -subtype => 'XMLPREFIX_NONXMLNS_ERR';
+      } elsif ($prefix eq 'xmlns' and
+               $_[1] ne q<http://www.w3.org/2000/xmlns/>) {
+        report Message::DOM::DOMException
+            -object => $_[0],
+            -type => 'NAMESPACE_ERR',
+            -subtype => 'XMLNSPREFIX_NONXMLNSNS_ERR';
+      } elsif ($_[1] eq q<http://www.w3.org/2000/xmlns/> and
+               $prefix ne 'xmlns') {
+        report Message::DOM::DOMException
+            -object => $_[0],
+            -type => 'NAMESPACE_ERR',
+            -subtype => 'NONXMLNSPREFIX_XMLNSNS_ERR';
+      }
+    } else { # no prefix
+      if ($lname eq 'xmlns' and
+          (not defined $_[1] or $_[1] ne q<http://www.w3.org/2000/xmlns/>)) {
+        report Message::DOM::DOMException
+            -object => $_[0],
+            -type => 'NAMESPACE_ERR',
+            -subtype => 'XMLNS_NONXMLNSNS_ERR';
+      } elsif (not defined $_[1]) {
+        #
+      } elsif ($_[1] eq q<http://www.w3.org/2000/xmlns/> and
+               $lname ne 'xmlns') {
+        report Message::DOM::DOMException
+            -object => $_[0],
+            -type => 'NAMESPACE_ERR',
+            -subtype => 'NONXMLNSPREFIX_XMLNSNS_ERR';
+      }
+    }
+  }
+
+  ## TODO: Older version of manakai set |attribute_type|
+  ## attribute for |xml:id| attribute.  Should we support this?
+
   return Message::DOM::Attr->____new ($_[0], undef, $_[1], $prefix, $lname);
-} # create_element_ns
+} # create_attribute_ns
+
+=head1 LICENSE
+
+Copyright 2007 Wakaba <w@suika.fam.cx>
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut
 
 1;
-## License: <http://suika.fam.cx/~wakaba/archive/2004/8/18/license#Perl+MPL>
-## $Date: 2007/06/17 13:37:40 $
+## $Date: 2007/07/07 09:11:05 $

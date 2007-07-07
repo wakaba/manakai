@@ -1,6 +1,6 @@
 package Message::DOM::DOMException;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::Util::Error', 'Message::IF::DOMException';
 require Message::Util::Error;
 
@@ -8,6 +8,14 @@ sub ___error_def () {+{
   WRONG_DOCUMENT_ERR => {
     -code => 4,
     -description => q(Can't insert into different document),
+  },
+  INVALID_CHARACTER_ERR => {
+    -code => 5,
+    -subtype => {
+      MALFORMED_NAME_ERR => {
+        -description => q(Not a legal XML |Name|),
+      },
+    },
   },
   NO_MODIFICATION_ALLOWED_ERR => {
     -code => 7,
@@ -40,6 +48,29 @@ sub ___error_def () {+{
   INUSE_ATTRIBUTE_ERR => {
     -code => 10,
     -description => q(Attribute is already in use),
+  },
+  NAMESPACE_ERR => {
+    -code => 14,
+    -subtype => {
+      MALFORMED_QNAME_ERR => {
+        -description => q(Malformed XML qualified name),
+      },
+      NONXMLNSPREFIX_XMLNSNS_ERR => {
+        -description => q(Namespace prefix "xmlns" must be used for namespace URI <http://www.w3.org/2000/xmlns/>),
+      },
+      PREFIXED_NULLNS_ERR => {
+        -description => q(A namespace prefix is specified while namespace URI is null),
+      },
+      XMLNS_NONXMLNSNS_ERR => {
+        -description => q(Qualified name "xmlns" can only be used with namespace URI <http://www.w3.org/2000/xmlns/>),
+      },
+      XMLNSPREFIX_NONXMLNSNS_ERR => {
+        -description => q(Namespace prefix "xmlns" cannot be used for namespace URI other than <http://www.w3.org/2000/xmlns/>),
+      },
+      XMLPREFIX_NONXMLNS_ERR => {
+        -description => q(Namespace prefix "xml" cannot be used for namespace URI other than <http://www.w3.org/XML/1998/namespace>),
+      },
+    },
   },
 }} # ___error_def
 
@@ -77,4 +108,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/07 07:36:58 $
+## $Date: 2007/07/07 09:11:05 $

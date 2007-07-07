@@ -2,11 +2,18 @@
 
 package Message::DOM::Document;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::Document',
     'Message::IF::DocumentXDoctype',
     'Message::IF::HTMLDocument';
 require Message::DOM::Node;
+use Char::Class::XML
+    qw/
+      InXML_NameStartChar10 InXMLNameStartChar11
+      InXMLNameChar10 InXMLNameChar11
+      InXML_NCNameStartChar10 InXMLNCNameStartChar11
+      InXMLNCNameChar10 InXMLNCNameChar11
+    /;
 
 sub ____new ($$) {
   my $self = shift->SUPER::____new (undef);
@@ -442,7 +449,8 @@ sub xml_version ($;$) {
 
 sub compat_mode ($) {
   if (${$_[0]}->{manakai_is_html}) {
-    if (${$_[0]}->{manakai_compat_mode} eq 'quirks') {
+    if (defined ${$_[0]}->{manakai_compat_mode} and
+        ${$_[0]}->{manakai_compat_mode} eq 'quirks') {
       return 'BackCompat';
     }
   }
@@ -495,4 +503,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/07 07:36:58 $
+## $Date: 2007/07/07 09:11:05 $

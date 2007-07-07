@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 use strict;
 use Test;
-BEGIN { plan tests => 1921 } 
+BEGIN { plan tests => 2754 } 
 
 require Message::DOM::DOMImplementation;
 use Message::Util::Error;
@@ -156,6 +156,32 @@ my $tests = {
   },
   attr_ns_prefixed => {
     node => sub { return $doc->create_attribute_ns ('http://test/', 'a:b') },
+    attr_get => {
+      base_uri => undef,
+      manakai_expanded_uri => 'http://test/b',
+      local_name => 'b',
+      manakai_local_name => 'b',
+      namespace_uri => 'http://test/',
+      next_sibling => undef,
+      node_name => 'a:b',
+      node_type => 2,
+      name => 'a:b',
+      node_value => '',
+      owner_document => $doc,
+      parent_node => undef,
+      prefix => 'a',
+      value => '',
+      attributes => undef,
+      previous_sibling => undef,
+    },
+    attr_get_bool => {
+      has_attributes => 0,
+      has_child_nodes => 0,
+      specified => 1,
+    },
+  },
+  attr_ns_prefixed_array => {
+    node => sub { $doc->create_attribute_ns ('http://test/', ['a', 'b']) },
     attr_get => {
       base_uri => undef,
       manakai_expanded_uri => 'http://test/b',
@@ -1158,6 +1184,7 @@ for my $i (0..1) {
            ]->[$i];
 
   my $doc2 = $doc->implementation->create_document;
+  $doc2->strict_error_checking (0);
 
   my $attr = $doc2->create_attribute_ns (@$xb);
   $attr->value (q<http://attr.test/>);
@@ -1731,4 +1758,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2007/06/21 14:57:53 $
+## $Date: 2007/07/07 09:11:05 $

@@ -1,5 +1,22 @@
 2007-07-07  Wakaba  <wakaba@suika.fam.cx>
 
+	* Attr.pm (create_attribute, create_attribute_ns): Implemented.
+
+	* DOMDocument.pm: Load character classes from |Char::Class::XML|.
+	(compat_mode): Check |defined| not to be warned as "uninitialized"
+	when |{manakai_compat_mode}| is |undef|.
+
+	* DOMException.pm (INVALID_CHARACTER_ERR, NAMESPACE_ERR): Added.
+
+	* DOMImplementationRegistry.pm, DOMImplementationSource.pm:
+	Statements to set |$Error::Depth| are removed since they
+	are result in "uninitialized" warnings unless
+	the |Message::DOM::DOMException| module is loaded earlier.
+	Usually methods invoked in these methods does not 
+	raise any exception so that it makes no difference.
+
+2007-07-07  Wakaba  <wakaba@suika.fam.cx>
+
 	* DOMDocument.pm (adopt_node): Implemented.
 	(doctype): Implemented.
 

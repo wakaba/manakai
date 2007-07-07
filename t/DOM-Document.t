@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 use strict;
 use Test;
-BEGIN { plan tests => 55 } 
+BEGIN { plan tests => 128 } 
 
 require Message::DOM::DOMImplementation;
 use Message::Util::Error;
@@ -381,4 +381,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2007/07/07 07:36:58 $
+## $Date: 2007/07/07 09:11:05 $
