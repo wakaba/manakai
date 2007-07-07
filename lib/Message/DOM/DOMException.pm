@@ -1,13 +1,18 @@
 package Message::DOM::DOMException;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::Util::Error', 'Message::IF::DOMException';
 require Message::Util::Error;
 
 sub ___error_def () {+{
   WRONG_DOCUMENT_ERR => {
     -code => 4,
-    -description => q(Can't insert into different document),
+    EXTERNAL_OBJECT_ERR => {
+      -description => q(Can't insert into different document),
+    },
+    INUSE_DOCTYPE_ERR => {
+      -description => q(Document type is already in use),
+    },
   },
   INVALID_CHARACTER_ERR => {
     -code => 5,
@@ -61,6 +66,9 @@ sub ___error_def () {+{
       PREFIXED_NULLNS_ERR => {
         -description => q(A namespace prefix is specified while namespace URI is null),
       },
+      QNAME_NULLNS_ERR => {
+        -description => q(Qualified name is not specified),
+      },
       XMLNS_NONXMLNSNS_ERR => {
         -description => q(Qualified name "xmlns" can only be used with namespace URI <http://www.w3.org/2000/xmlns/>),
       },
@@ -108,4 +116,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/07 09:11:05 $
+## $Date: 2007/07/07 12:26:09 $

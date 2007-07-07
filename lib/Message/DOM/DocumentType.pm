@@ -1,6 +1,6 @@
 package Message::DOM::DocumentType;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::DocumentType',
     'Message::IF::DocumentTypeDefinition',
     'Message::IF::DocumentTypeDeclaration';
@@ -176,20 +176,55 @@ package Message::IF::DocumentTypeDefinition;
 package Message::IF::DocumentTypeDeclaration;
 
 package Message::DOM::DOMImplementation;
+use Char::Class::XML
+    qw/
+      InXML_NameStartChar10
+      InXMLNameChar10
+      InXML_NCNameStartChar10
+      InXMLNCNameChar10
+    /;
 
 sub create_document_type ($$;$$) {
-  return Message::DOM::DocumentType->____new (undef, @_[0, 1]);
+  ## TODO: Manakai allow publicId and systemId to be null
+
+  if ($_[1] =~ /\A\p{InXML_NameStartChar10}\p{InXMLNameChar10}*\z/) {
+    if ($_[1] =~ /\A\p{InXML_NCNameStartChar10}\p{InXMLNCNameChar10}*(?>:\p{InXML_NCNameStartChar10}\p{InXMLNCNameChar10}*)?\z/) {
+      #
+    } else {
+      report Message::DOM::DOMException
+          -object => $_[0],
+          -type => 'NAMESPACE_ERR',
+          -subtype => 'MALFORMED_QNAME_ERR';
+    }
+  } else {
+    report Message::DOM::DOMException
+        -object => $_[0],
+        -type => 'INVALID_CHARACTER_ERR',
+        -subtype => 'MALFORMED_NAME_ERR';
+  }
+
+  local $Error::Depth = $Error::Depth + 1;
+  my $r = Message::DOM::DocumentType->____new (undef, @_[0, 1]);
+  $r->public_id ($_[2]);
+  $r->system_id ($_[3]);
+  $r->manakai_set_read_only (1, 1);
+  return $r;
 } # create_document_type
 
 package Message::DOM::Document;
-
-## Spec: 
-## <http://suika.fam.cx/gate/2005/sw/DocumentXDoctype>
 
 sub create_document_type_definition ($$) {
   return Message::DOM::DocumentType->____new ($_[0], undef, $_[1]);
 } # create_document_type_definition
 
+=head1 LICENSE
+
+Copyright 2007 Wakaba <w@suika.fam.cx>
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut
+
 1;
-## License: <http://suika.fam.cx/~wakaba/archive/2004/8/18/license#Perl+MPL>
-## $Date: 2007/07/07 11:11:34 $
+## $Date: 2007/07/07 12:26:14 $

@@ -25,7 +25,7 @@ ok $dom->isa ('Message::IF::DOMImplementation');
 
 {
   ok $dom->can ('create_document_type') ? 1 : 0, 1, "can create_document_type";
-  my $doc = $dom->create_document_type;
+  my $doc = $dom->create_document_type ('dt');
   ok UNIVERSAL::isa ($doc, 'Message::IF::DocumentType');
 }
 
@@ -63,4 +63,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2007/07/07 05:58:11 $
+## $Date: 2007/07/07 12:26:23 $

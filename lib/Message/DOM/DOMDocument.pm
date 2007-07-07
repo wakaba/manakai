@@ -2,7 +2,7 @@
 
 package Message::DOM::Document;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::Document',
     'Message::IF::DocumentXDoctype',
     'Message::IF::HTMLDocument';
@@ -481,6 +481,24 @@ sub manakai_is_html ($;$) {
   return ${$_[0]}->{manakai_is_html};
 } # manakai_is_html
 
+## |Document| methods
+
+sub get_element_by_id ($$) {
+  local $Error::Depth = $Error::Depth + 1;
+  my @nodes = @{$_[0]->child_nodes};
+  N: while (@nodes) {
+    my $node = shift @nodes;
+    next N unless $node->node_type == 1; # ELEMENT_NODE
+    for my $attr (@{$node->attributes}) {
+      if ($attr->is_id and $attr->value eq $_[1]) {
+        return $node;
+      }
+    }
+    unshift @nodes, @{$node->child_nodes};
+  } # N
+  return undef;
+} # get_element_by_id
+
 package Message::IF::Document;
 package Message::IF::DocumentXDoctype;
 package Message::IF::HTMLDocument;
@@ -488,9 +506,33 @@ package Message::IF::HTMLDocument;
 package Message::DOM::DOMImplementation;
 
 sub create_document ($;$$$) {
-  my ($self, $nsuri, $qn, $doctype) = @_;
-  ## TODO: root element
-  return Message::DOM::Document->____new ($self);
+  my $r = Message::DOM::Document->____new ($_[0]);
+
+  if (defined $_[2]) {
+    local $Error::Depth = $Error::Depth + 1;
+    $r->append_child ($r->create_element_ns ($_[1], $_[2])); # NAMESPACE_ERR
+    ## NOTE: manakai might raise DOMExceptions in cases not defined
+    ## in DOM3Core spec: XMLNSPREFIX_NONXMLNSNS_ERR,
+    ## XMLNS_NONXMLNSNS_ERR, and NONXMLNSPREFIX_XMLNSNS_ERR.
+  } elsif (defined $_[1]) {
+    report Message::DOM::DOMException
+        -object => $_[0],
+        -type => 'NAMESPACE_ERR',
+        -subtype => 'QNAME_NULLNS_ERR';
+  }
+
+  if (defined $_[3]) {
+    if ($_[3]->parent_node) {
+      report Message::DOM::DOMException
+          -object => $_[0],
+          -type => 'WRONG_DOCUMENT_ERR',
+          -subtype => 'INUSE_DOCTYPE_ERR';
+    }
+    local $Error::Depth = $Error::Depth + 1;
+    $r->insert_before ($_[3], $r->first_child); # EXTERNAL_OBJECT_ERR
+  }
+
+  return $r;
 } # create_document
 
 =head1 LICENSE
@@ -503,4 +545,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/07 09:11:05 $
+## $Date: 2007/07/07 12:26:08 $

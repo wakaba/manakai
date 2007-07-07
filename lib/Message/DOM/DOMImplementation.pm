@@ -1,7 +1,8 @@
 package Message::DOM::DOMImplementation;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::IF::DOMImplementation';
+require Message::DOM::DOMException;
 
 sub ____new ($) {
   my $self = bless {}, shift;
@@ -58,6 +59,8 @@ $HasFeature->{q<http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#minimu
 $HasFeature->{q<http://suika.fam.cx/www/2006/feature/xdoctype>}->{''} = 1;
 $HasFeature->{q<http://suika.fam.cx/www/2006/feature/xdoctype>}->{'3.0'} = 1;
 
+sub ___report_error { $_[1]->throw }
+
 ## |DOMImplementation| methods
 
 sub create_document ($;$$$);
@@ -93,4 +96,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/07 05:58:11 $
+## $Date: 2007/07/07 12:26:10 $

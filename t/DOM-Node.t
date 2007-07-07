@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 use strict;
 use Test;
-BEGIN { plan tests => 2754 } 
+BEGIN { plan tests => 2808 } 
 
 require Message::DOM::DOMImplementation;
 use Message::Util::Error;
@@ -94,6 +94,7 @@ my $tests = {
     attr_get_bool => {
       has_attributes => 0,
       has_child_nodes => 0,
+      manakai_read_only => 0,
       specified => 1,
     },
   },
@@ -125,6 +126,7 @@ my $tests = {
     attr_get_bool => {
       has_attributes => 0,
       has_child_nodes => 1,
+      manakai_read_only => 0,
       specified => 1,
     },
   },
@@ -151,6 +153,7 @@ my $tests = {
     attr_get_bool => {
       has_attributes => 0,
       has_child_nodes => 0,
+      manakai_read_only => 0,
       specified => 1,
     },
   },
@@ -177,6 +180,7 @@ my $tests = {
     attr_get_bool => {
       has_attributes => 0,
       has_child_nodes => 0,
+      manakai_read_only => 0,
       specified => 1,
     },
   },
@@ -203,6 +207,7 @@ my $tests = {
     attr_get_bool => {
       has_attributes => 0,
       has_child_nodes => 0,
+      manakai_read_only => 0,
       specified => 1,
     },
   },
@@ -231,6 +236,7 @@ my $tests = {
       has_attributes => 0,
       has_child_nodes => 0,
       is_element_content_whitespace => 0,
+      manakai_read_only => 0,
     },
   },
   cdatasectionmde => {
@@ -258,6 +264,7 @@ my $tests = {
       has_attributes => 0,
       has_child_nodes => 0,
       is_element_content_whitespace => 0,
+      manakai_read_only => 0,
     },
   },
   comment => {
@@ -284,6 +291,7 @@ my $tests = {
     attr_get_bool => {
       has_attributes => 0,
       has_child_nodes => 0,
+      manakai_read_only => 0,
     },
   },
   commentcom1 => {
@@ -310,6 +318,7 @@ my $tests = {
     attr_get_bool => {
       has_attributes => 0,
       has_child_nodes => 0,
+      manakai_read_only => 0,
     },
   },
   commentcom2 => {
@@ -336,6 +345,7 @@ my $tests = {
     attr_get_bool => {
       has_attributes => 0,
       has_child_nodes => 0,
+      manakai_read_only => 0,
     },
   },
   document => {
@@ -368,6 +378,7 @@ my $tests = {
       has_attributes => 0,
       has_child_nodes => 0,
       manakai_is_html => 0,
+      manakai_read_only => 0,
       strict_error_checking => 1,
       xml_standalone => 0,
     },
@@ -395,6 +406,7 @@ my $tests = {
     attr_get_bool => {
       has_attributes => 0,
       has_child_nodes => 0,
+      manakai_read_only => 0,
     },
   },
   document_type => {
@@ -425,6 +437,7 @@ my $tests = {
     attr_get_bool => {
       has_attributes => 0,
       has_child_nodes => 0,
+      manakai_read_only => 1,
     },
   },
   document_type_definition => {
@@ -455,6 +468,7 @@ my $tests = {
     attr_get_bool => {
       has_attributes => 0,
       has_child_nodes => 0,
+      manakai_read_only => 0,
     },
   },
   element => {
@@ -481,6 +495,7 @@ my $tests = {
     attr_get_bool => {
       has_attributes => 0,
       has_child_nodes => 0,
+      manakai_read_only => 0,
     },
   },
   element_ns_default => {
@@ -507,6 +522,7 @@ my $tests = {
     attr_get_bool => {
       has_attributes => 0,
       has_child_nodes => 0,
+      manakai_read_only => 0,
     },
   },
   element_ns_prefiexed => {
@@ -533,6 +549,7 @@ my $tests = {
     attr_get_bool => {
       has_attributes => 0,
       has_child_nodes => 0,
+      manakai_read_only => 0,
     },
   },
   entity => {
@@ -560,6 +577,7 @@ my $tests = {
     attr_get_bool => {
       has_attributes => 0,
       has_child_nodes => 0,
+      manakai_read_only => 0,
     },
   },
   entity_reference => {
@@ -588,6 +606,7 @@ my $tests = {
       manakai_external => 0,
       has_attributes => 0,
       has_child_nodes => 0,
+      manakai_read_only => 1,
     },
   },
   notation => {
@@ -616,6 +635,7 @@ my $tests = {
     attr_get_bool => {
       has_attributes => 0,
       has_child_nodes => 0,
+      manakai_read_only => 0,
     },
   },
   processing_instruction => {
@@ -642,6 +662,7 @@ my $tests = {
     attr_get_bool => {
       has_attributes => 0,
       has_child_nodes => 0,
+      manakai_read_only => 0,
     },
   },
   text => {
@@ -668,6 +689,7 @@ my $tests = {
       has_attributes => 0,
       has_child_nodes => 0,
       is_element_content_whitespace => 0,
+      manakai_read_only => 0,
     },
   },
   element_type_definition => {
@@ -693,6 +715,7 @@ my $tests = {
     attr_get_bool => {
       has_attributes => 0,
       has_child_nodes => 0,
+      manakai_read_only => 0,
     },
   },
   attribute_definition => {
@@ -720,6 +743,7 @@ my $tests = {
     attr_get_bool => {
       has_attributes => 0,
       has_child_nodes => 0,
+      manakai_read_only => 0,
     },
   },
 };
@@ -1761,4 +1785,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2007/07/07 11:11:34 $
+## $Date: 2007/07/07 12:26:23 $
