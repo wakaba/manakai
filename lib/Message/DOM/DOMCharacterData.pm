@@ -2,9 +2,10 @@
 
 package Message::DOM::CharacterData;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::CharacterData';
 require Message::DOM::Node;
+use Message::Util::Error;
 
 sub ____new ($$$) {
   my $self = shift->SUPER::____new (shift);
@@ -12,45 +13,6 @@ sub ____new ($$$) {
   return $self;
 } # ____new
              
-sub AUTOLOAD {
-  my $method_name = our $AUTOLOAD;
-  $method_name =~ s/.*:://;
-  return if $method_name eq 'DESTROY';
-
-  if ({
-    ## Read-only attributes (trivial accessors)
-  }->{$method_name}) {
-    no strict 'refs';
-    eval qq{
-      sub $method_name (\$) {
-        if (\@_ > 1) {
-          require Carp;
-          Carp::croak (qq<Can't modify read-only attribute>);
-        }
-        return \${\$_[0]}->{$method_name}; 
-      }
-    };
-    goto &{ $AUTOLOAD };
-  } elsif ({
-    ## Read-write attributes (DOMString, trivial accessors)
-    data => 1,
-  }->{$method_name}) {
-    no strict 'refs';
-    eval qq{
-      sub $method_name (\$;\$) {
-        if (\@_ > 1) {
-          \${\$_[0]}->{$method_name} = ''.\$_[1];
-        }
-        return \${\$_[0]}->{$method_name}; 
-      }
-    };
-    goto &{ $AUTOLOAD };
-  } else {
-    require Carp;
-    Carp::croak (qq<Can't locate method "$AUTOLOAD">);
-  }
-} # AUTOLOAD
-
 ## |Node| attributes
 
 sub base_uri ($) {
@@ -137,7 +99,25 @@ sub replace_child ($$) {
 
 ## |CharacterData| attributes
 
-sub data ($;$);
+sub data ($;$) {
+  if (@_ > 1) {
+    if (${${$_[0]}->{owner_document}}->{strict_error_checking} and
+        ${$_[0]}->{manakai_read_only}) {
+      report Message::DOM::DOMException
+          -object => $_[0],
+          -type => 'NO_MODIFICATION_ALLOWED_ERR',
+          -subtype => 'READ_ONLY_NODE_ERR';
+    }
+
+    if (defined $_[1]) {
+      ${$_[0]}->{data} = ''.$_[1];
+    } else {
+      ${$_[0]}->{data} = ''; # for |text_content|.
+    }
+  }
+
+  return ${$_[0]}->{data};
+} # data
 
 sub length ($) {
   my $self = $_[0];
@@ -151,79 +131,145 @@ sub length ($) {
 *append_data = \&manakai_append_text;
 
 sub delete_data ($;$) {
-  if (${${$_[0]}->{owner_document}}->{strict_error_checking} and
-                 ${$_[0]}->{manakai_read_only}) {
+  my $self = $_[0];
+  my $offset = 0+$_[1];
+  my $count = 0+$_[2];
+  
+  if ($offset < 0 or $count < 0) {
     report Message::DOM::DOMException
-        -object => $_[0],
-        -type => 'NO_MODIFICATION_ALLOWED_ERR',
-        -subtype => 'READ_ONLY_NODE_ERR';
+        -object => $self,
+        -type => 'INDEX_SIZE_ERR',
+        -subtype => 'INDEX_OUT_OF_BOUND_ERR';
   }
 
   require Message::DOM::StringExtended;
-  local $Error::Depth = $Error::Depth + 1;
-  my $offset32 = Message::DOM::StringExtended::find_offset32
-      (${$_[0]}->{data}, $offset);
-  substr (${$_[0]}->{data}, $offset32, 0) = '';
+
+  my $offset32;
+  try {
+    $offset32 = Message::DOM::StringExtended::find_offset32
+        ($$self->{data}, $offset);
+  } catch Error::Simple with {
+    my $err = shift;
+    if ($err->text eq "String index out of bounds\n") {
+      report Message::DOM::DOMException
+          -object => $self,
+          -type => 'INDEX_SIZE_ERR',
+          -subtype => 'INDEX_OUT_OF_BOUND_ERR';
+    } else {
+      $err->throw;
+    }
+  };
+
+  my $eoffset32;
+  try {
+    $eoffset32 = Message::DOM::StringExtended::find_offset32
+        ($$self->{data}, $offset + $count);
+  } catch Error::Simple with {
+    my $err = shift;
+    if ($err->text eq "String index out of bounds\n") {
+      $eoffset32 = ($offset + $count) * 2;
+    } else {
+      $err->throw;
+    }
+  };
+
+  substr ($$self->{data}, $offset32, $eoffset32 - $offset32) = '';
   return undef;
 } # delete_data
 
 sub insert_data ($$$) {
-  if (${${$_[0]}->{owner_document}}->{strict_error_checking} and
-                 ${$_[0]}->{manakai_read_only}) {
+  my $self = $_[0];
+  my $offset = 0+$_[1];
+
+  if (${$$self->{owner_document}}->{strict_error_checking} and
+      $$self->{manakai_read_only}) {
     report Message::DOM::DOMException
-        -object => $_[0],
+        -object => $self,
         -type => 'NO_MODIFICATION_ALLOWED_ERR',
         -subtype => 'READ_ONLY_NODE_ERR';
   }
 
+  if ($offset < 0) {
+    report Message::DOM::DOMException
+        -object => $self,
+        -type => 'INDEX_SIZE_ERR',
+        -subtype => 'INDEX_OUT_OF_BOUND_ERR';
+  }
+
   require Message::DOM::StringExtended;
-  local $Error::Depth = $Error::Depth + 1;
-  my $offset32 = Message::DOM::StringExtended::find_offset32
-      (${$_[0]}->{data}, $offset);
-  substr (${$_[0]}->{data}, $offset32, 0) = $_[1];
+  my $offset32;
+  try {
+    $offset32 = Message::DOM::StringExtended::find_offset32
+        ($$self->{data}, $offset);
+  } catch Error::Simple with {
+    my $err = shift;
+    if ($err->text eq "String index out of bounds\n") {
+      report Message::DOM::DOMException
+          -object => $self,
+          -type => 'INDEX_SIZE_ERR',
+          -subtype => 'INDEX_OUT_OF_BOUND_ERR';
+    } else {
+      $err->throw;
+    }
+  };
+  substr ($$self->{data}, $offset32, 0) = $_[2];
 } # insert_data
 
 sub replace_data ($;$$) {
+  my $self = $_[0];
   my $offset = 0+$_[1];
   my $count = 0+$_[2];
   
-  if ($count < 0) {
+  if ($offset < 0 or $count < 0) {
     report Message::DOM::DOMException
-        -object => $_[0],
+        -object => $self,
         -type => 'INDEX_SIZE_ERR',
         -subtype => 'INDEX_OUT_OF_BOUND_ERR';
   }
 
   require Message::DOM::StringExtended;
 
+  my $offset32;
+  try {
+    $offset32 = Message::DOM::StringExtended::find_offset32
+        ($$self->{data}, $offset);
+  } catch Error::Simple with {
+    my $err = shift;
+    if ($err->text eq "String index out of bounds\n") {
+      report Message::DOM::DOMException
+          -object => $self,
+          -type => 'INDEX_SIZE_ERR',
+          -subtype => 'INDEX_OUT_OF_BOUND_ERR';
+    } else {
+      $err->throw;
+    }
+  };
+
   my $eoffset32;
   try {
     $eoffset32 = Message::DOM::StringExtended::find_offset32
-        (${$_[0]}->{data}, $offset + $count);
+        ($$self->{data}, $offset + $count);
   } catch Error::Simple with {
     my $err = shift;
-    if ($err->text eq 'String index out of bounds') {
+    if ($err->text eq "String index out of bounds\n") {
       $eoffset32 = ($offset + $count) * 2;
     } else {
       $err->throw;
     }
   };
-   
-  local $Error::Depth = $Error::Depth + 1;
-  my $offset32 = Message::DOM::StringExtended::find_offset32
-      (${$_[0]}->{data}, $offset);
-  my $data = ${$_[0]}->{data};
-  substr ($data, $offset32, $eoffset32 - $offset32) = $_[3];
+
+  substr ($$self->{data}, $offset32, $eoffset32 - $offset32) = $_[3];
   return undef;
 } # replace_data
 
 sub substring_data ($;$$) {
+  my $self = $_[0];
   my $offset = 0+$_[1];
   my $count = 0+$_[2];
   
-  if ($count < 0) {
+  if ($offset < 0 or $count < 0) {
     report Message::DOM::DOMException
-        -object => $_[0],
+        -object => $self,
         -type => 'INDEX_SIZE_ERR',
         -subtype => 'INDEX_OUT_OF_BOUND_ERR';
   }
@@ -233,10 +279,10 @@ sub substring_data ($;$$) {
   my $eoffset32;
   try {
     $eoffset32 = Message::DOM::StringExtended::find_offset32
-        (${$_[0]}->{data}, $offset + $count);
+        ($$self->{data}, $offset + $count);
   } catch Error::Simple with {
     my $err = shift;
-    if ($err->text eq 'String index out of bounds') {
+    if ($err->text eq "String index out of bounds\n") {
       $eoffset32 = ($offset + $count) * 2;
     } else {
       $err->throw;
@@ -245,9 +291,8 @@ sub substring_data ($;$$) {
    
   local $Error::Depth = $Error::Depth + 1;
   my $offset32 = Message::DOM::StringExtended::find_offset32
-      (${$_[0]}->{data}, $offset);
-  my $data = ${$_[0]}->{data};
-  return substr $data, $offset32, $eoffset32 - $offset32;
+      ($$self->{data}, $offset);
+  return substr $$self->{data}, $offset32, $eoffset32 - $offset32;
 } # substring_data
 
 package Message::IF::CharacterData;
@@ -262,4 +307,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/08 09:25:17 $
+## $Date: 2007/07/08 11:28:45 $

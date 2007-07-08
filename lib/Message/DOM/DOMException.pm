@@ -1,6 +1,6 @@
 package Message::DOM::DOMException;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.12 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::Util::Error', 'Message::IF::DOMException';
 require Message::Util::Error;
 
@@ -9,7 +9,7 @@ sub ___error_def () {+{
     -code => 1,
     -subtype => {
       INDEX_OUT_OF_BOUND_ERR => {
-        -description => q(Index is out of bound),
+        -description => q(Specified index is outside of the bounds),
       },
     },
   },
@@ -148,4 +148,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/08 09:25:17 $
+## $Date: 2007/07/08 11:28:45 $

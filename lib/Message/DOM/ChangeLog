@@ -1,5 +1,14 @@
 2007-07-08  Wakaba  <wakaba@suika.fam.cx>
 
+	* DOMCharacterData.pm (AUTOLOAD): Removed.
+	(data): Reimplemented.
+	(delete_data, insert_data, replace_data, substring_data): There were
+	a number of bugs.
+
+	* Text.pm (AUTOLOAD): Removed.  Unused.
+
+2007-07-08  Wakaba  <wakaba@suika.fam.cx>
+
 	* StringExtended.pm: New Perl module.
 
 	* DOMCharacterData.pm (length, append_data, delete_data,

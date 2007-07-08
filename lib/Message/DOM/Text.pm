@@ -1,46 +1,8 @@
 package Message::DOM::Text;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::CharacterData', 'Message::IF::Text';
 require Message::DOM::DOMCharacterData; ## TODO: Change to new module name
-
-sub AUTOLOAD {
-  my $method_name = our $AUTOLOAD;
-  $method_name =~ s/.*:://;
-  return if $method_name eq 'DESTROY';
-
-  if ({
-    ## Read-only attributes (trivial accessors)
-  }->{$method_name}) {
-    no strict 'refs';
-    eval qq{
-      sub $method_name (\$) {
-        if (\@_ > 1) {
-          require Carp;
-          Carp::croak (qq<Can't modify read-only attribute>);
-        }
-        return \${\$_[0]}->{$method_name}; 
-      }
-    };
-    goto &{ $AUTOLOAD };
-  } elsif ({
-    ## Read-write attributes (DOMString, trivial accessors)
-  }->{$method_name}) {
-    no strict 'refs';
-    eval qq{
-      sub $method_name (\$) {
-        if (\@_ > 1) {
-          \${\$_[0]}->{$method_name} = ''.$_[1];
-        }
-        return \${\$_[0]}->{$method_name}; 
-      }
-    };
-    goto &{ $AUTOLOAD };
-  } else {
-    require Carp;
-    Carp::croak (qq<Can't locate method "$AUTOLOAD">);
-  }
-} # AUTOLOAD
 
 ## |Node| attributes
 
@@ -162,4 +124,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/08 09:25:17 $
+## $Date: 2007/07/08 11:28:45 $
