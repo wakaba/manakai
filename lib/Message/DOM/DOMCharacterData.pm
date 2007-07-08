@@ -2,7 +2,7 @@
 
 package Message::DOM::CharacterData;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::CharacterData';
 require Message::DOM::Node;
 
@@ -50,9 +50,8 @@ sub AUTOLOAD {
     Carp::croak (qq<Can't locate method "$AUTOLOAD">);
   }
 } # AUTOLOAD
-sub data ($;$);
 
-## The |Node| interface - attribute
+## |Node| attributes
 
 sub base_uri ($) {
   ## NOTE: Same as |EntityReference|'s.
@@ -136,6 +135,121 @@ sub replace_child ($$) {
       -subtype => 'CHILD_NODE_TYPE_ERR';
 } # replace_child
 
+## |CharacterData| attributes
+
+sub data ($;$);
+
+sub length ($) {
+  my $self = $_[0];
+  my $r = CORE::length $$self->{data};
+  $r++ while $$self->{data} =~ /[\x{10000}-\x{10FFFF}]/g;
+  return $r;
+} # length
+
+## |CharacterData| methods
+
+*append_data = \&manakai_append_text;
+
+sub delete_data ($;$) {
+  if (${${$_[0]}->{owner_document}}->{strict_error_checking} and
+                 ${$_[0]}->{manakai_read_only}) {
+    report Message::DOM::DOMException
+        -object => $_[0],
+        -type => 'NO_MODIFICATION_ALLOWED_ERR',
+        -subtype => 'READ_ONLY_NODE_ERR';
+  }
+
+  require Message::DOM::StringExtended;
+  local $Error::Depth = $Error::Depth + 1;
+  my $offset32 = Message::DOM::StringExtended::find_offset32
+      (${$_[0]}->{data}, $offset);
+  substr (${$_[0]}->{data}, $offset32, 0) = '';
+  return undef;
+} # delete_data
+
+sub insert_data ($$$) {
+  if (${${$_[0]}->{owner_document}}->{strict_error_checking} and
+                 ${$_[0]}->{manakai_read_only}) {
+    report Message::DOM::DOMException
+        -object => $_[0],
+        -type => 'NO_MODIFICATION_ALLOWED_ERR',
+        -subtype => 'READ_ONLY_NODE_ERR';
+  }
+
+  require Message::DOM::StringExtended;
+  local $Error::Depth = $Error::Depth + 1;
+  my $offset32 = Message::DOM::StringExtended::find_offset32
+      (${$_[0]}->{data}, $offset);
+  substr (${$_[0]}->{data}, $offset32, 0) = $_[1];
+} # insert_data
+
+sub replace_data ($;$$) {
+  my $offset = 0+$_[1];
+  my $count = 0+$_[2];
+  
+  if ($count < 0) {
+    report Message::DOM::DOMException
+        -object => $_[0],
+        -type => 'INDEX_SIZE_ERR',
+        -subtype => 'INDEX_OUT_OF_BOUND_ERR';
+  }
+
+  require Message::DOM::StringExtended;
+
+  my $eoffset32;
+  try {
+    $eoffset32 = Message::DOM::StringExtended::find_offset32
+        (${$_[0]}->{data}, $offset + $count);
+  } catch Error::Simple with {
+    my $err = shift;
+    if ($err->text eq 'String index out of bounds') {
+      $eoffset32 = ($offset + $count) * 2;
+    } else {
+      $err->throw;
+    }
+  };
+   
+  local $Error::Depth = $Error::Depth + 1;
+  my $offset32 = Message::DOM::StringExtended::find_offset32
+      (${$_[0]}->{data}, $offset);
+  my $data = ${$_[0]}->{data};
+  substr ($data, $offset32, $eoffset32 - $offset32) = $_[3];
+  return undef;
+} # replace_data
+
+sub substring_data ($;$$) {
+  my $offset = 0+$_[1];
+  my $count = 0+$_[2];
+  
+  if ($count < 0) {
+    report Message::DOM::DOMException
+        -object => $_[0],
+        -type => 'INDEX_SIZE_ERR',
+        -subtype => 'INDEX_OUT_OF_BOUND_ERR';
+  }
+
+  require Message::DOM::StringExtended;
+
+  my $eoffset32;
+  try {
+    $eoffset32 = Message::DOM::StringExtended::find_offset32
+        (${$_[0]}->{data}, $offset + $count);
+  } catch Error::Simple with {
+    my $err = shift;
+    if ($err->text eq 'String index out of bounds') {
+      $eoffset32 = ($offset + $count) * 2;
+    } else {
+      $err->throw;
+    }
+  };
+   
+  local $Error::Depth = $Error::Depth + 1;
+  my $offset32 = Message::DOM::StringExtended::find_offset32
+      (${$_[0]}->{data}, $offset);
+  my $data = ${$_[0]}->{data};
+  return substr $data, $offset32, $eoffset32 - $offset32;
+} # substring_data
+
 package Message::IF::CharacterData;
 
 =head1 LICENSE
@@ -148,4 +262,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/08 05:42:37 $
+## $Date: 2007/07/08 09:25:17 $
