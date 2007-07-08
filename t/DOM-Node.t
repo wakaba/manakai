@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 use strict;
 use Test;
-BEGIN { plan tests => 2808 } 
+BEGIN { plan tests => 4311 } 
 
 require Message::DOM::DOMImplementation;
 use Message::Util::Error;
@@ -775,6 +775,7 @@ for my $test_id (sort {$a cmp $b} keys %$tests) {
 
 ## Child node accessors' tests
 for my $parent (create_parent_nodes ()) {
+  my $doc = $parent->owner_document || $parent;
   my $node1;
   my $node2;
   my $node3;
@@ -792,6 +793,7 @@ for my $parent (create_parent_nodes ()) {
     $node3 = $doc->create_text_node ('text3');
   }
 
+  $parent->manakai_set_read_only (0, 1);
   $parent->append_child ($node1);
   ok $parent->first_child, $node1, $parent->node_name."->first_child [1]";
   ok $parent->last_child, $node1, $parent->node_name."->last_child [1]";
@@ -1119,7 +1121,7 @@ for my $node (create_nodes ()) {
     ok $node->text_content, 'stringSTRING', $node->node_name . ' [2]';
     ok 0+@{$node->child_nodes}, 1, $node->node_name . ' childNodes @{} 0+ [2]';
 
-    my $er = $doc->create_entity_reference ('er');
+    my $er = ($node->owner_document || $node)->create_entity_reference ('er');
     $node->append_child ($er);
 
     $node->manakai_append_text ('text');
@@ -1881,6 +1883,69 @@ for my $node (create_nodes ()) {
   ok $node->get_user_data ('key1'), undef, 'set_user_data [7]';
 }
 
+## |removeChild|
+{
+  my $el = $doc->create_element ('p');
+  my $c1 = $doc->create_element ('e');
+  $el->append_child ($c1);
+  my $c2 = $doc->create_element ('f');
+  $el->append_child ($c2);
+  my $c3 = $doc->create_element ('g');
+  $el->append_child ($c3);
+  ok $el->can ('remove_child') ? 1 : 0, 1, 'Node->remove_child can [0]';
+
+  my $return = $el->remove_child ($c1);
+  ok $return, $c1, 'Node->remove_child return [1]';
+  ok $c1->parent_node, undef, 'Node->remove_child parent_node [1]';
+  ok $el->first_child, $c2, 'Node->remove_child first_child [1]';
+  ok $el->last_child, $c3, 'Node->remove_child last_child [1]';
+  ok 0+@{$el->child_nodes}, 2, 'Node->remove_child child_nodes [1]';
+}
+{
+  my $el = $doc->create_element ('p');
+  my $c1 = $doc->create_element ('e');
+  $el->append_child ($c1);
+  my $c2 = $doc->create_element ('f');
+  $el->append_child ($c2);
+  my $c3 = $doc->create_element ('g');
+  $el->append_child ($c3);
+
+  my $return = $el->remove_child ($c2);
+  ok $return, $c2, 'Node->remove_child return [2]';
+  ok $c2->parent_node, undef, 'Node->remove_child parent_node [2]';
+  ok $el->first_child, $c1, 'Node->remove_child first_child [2]';
+  ok $el->last_child, $c3, 'Node->remove_child last_child [2]';
+  ok 0+@{$el->child_nodes}, 2, 'Node->remove_child child_nodes [2]';
+}
+{
+  my $el = $doc->create_element ('p');
+  my $c1 = $doc->create_element ('e');
+  $el->append_child ($c1);
+  my $c2 = $doc->create_element ('f');
+  $el->append_child ($c2);
+  my $c3 = $doc->create_element ('g');
+  $el->append_child ($c3);
+
+  my $return = $el->remove_child ($c3);
+  ok $return, $c3, 'Node->remove_child return [3]';
+  ok $c3->parent_node, undef, 'Node->remove_child parent_node [3]';
+  ok $el->first_child, $c1, 'Node->remove_child first_child [3]';
+  ok $el->last_child, $c2, 'Node->remove_child last_child [3]';
+  ok 0+@{$el->child_nodes}, 2, 'Node->remove_child child_nodes [3]';
+}
+{
+  my $el = $doc->create_element ('p');
+  my $c1 = $doc->create_element ('e');
+  $el->append_child ($c1);
+
+  my $return = $el->remove_child ($c1);
+  ok $return, $c1, 'Node->remove_child return [4]';
+  ok $c1->parent_node, undef, 'Node->remove_child parent_node [4]';
+  ok $el->first_child, undef, 'Node->remove_child first_child [4]';
+  ok $el->last_child, undef, 'Node->remove_child last_child [4]';
+  ok 0+@{$el->child_nodes}, 0, 'Node->remove_child child_nodes [4]';
+}
+
 ## TODO: parent_node tests, as with append_child tests
 
 ## TODO: text_content tests for CharacterData and PI
@@ -1917,4 +1982,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2007/07/07 15:05:01 $
+## $Date: 2007/07/08 05:42:37 $

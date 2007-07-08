@@ -1,6 +1,6 @@
 package Message::DOM::ProcessingInstruction;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::ProcessingInstruction';
 require Message::DOM::Node;
 
@@ -108,6 +108,13 @@ sub node_type () { 7 } # PROCESSING_INSTRUCTION_NODE
 
 ## |Node| methods
 
+sub append_child ($$) {
+  report Message::DOM::DOMException
+      -object => $_[0],
+      -type => 'HIERARCHY_REQUEST_ERR',
+      -subtype => 'CHILD_NODE_TYPE_ERR';
+} # append_child
+
 sub manakai_append_text ($$) {
   ## NOTE: Same as |CharacterData|'s.
   if (${${$_[0]}->{owner_document}}->{strict_error_checking} and
@@ -119,6 +126,20 @@ sub manakai_append_text ($$) {
   }
   ${$_[0]}->{data} .= ref $_[1] eq 'SCALAR' ? ${$_[1]} : $_[1];
 } # manakai_append_text
+
+sub insert_before ($;$) {
+  report Message::DOM::DOMException
+      -object => $_[0],
+      -type => 'HIERARCHY_REQUEST_ERR',
+      -subtype => 'CHILD_NODE_TYPE_ERR';
+} # insert_before
+
+sub replace_child ($$) {
+  report Message::DOM::DOMException
+      -object => $_[0],
+      -type => 'HIERARCHY_REQUEST_ERR',
+      -subtype => 'CHILD_NODE_TYPE_ERR';
+} # replace_child
 
 ## |ProcessingInstruction| attributes
 
@@ -160,4 +181,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/07 11:11:34 $
+## $Date: 2007/07/08 05:42:37 $

@@ -33,6 +33,7 @@ sub create_parent_nodes () {
 } # create_parent_nodes
 
 for my $parent (create_parent_nodes ()) {
+  my $doc = $parent->owner_document || $parent;
   my $node1;
   my $node2;
   my $node1a;
@@ -266,4 +267,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2007/06/17 13:37:42 $
+## $Date: 2007/07/08 05:42:37 $

@@ -1,6 +1,6 @@
 package Message::DOM::Attr;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::Attr';
 require Message::DOM::Node;
 
@@ -113,6 +113,317 @@ sub prefix ($;$) {
   }
   return ${$_[0]}->{prefix}; 
 } # prefix
+
+## |Node| methods
+
+sub append_child ($$) {
+  my $self = $_[0];
+  
+  ## NOTE: Depends on $self->node_type:
+  my $self_od = $$self->{owner_document};
+
+  ## -- Node Type check
+  my @new_child;
+  my $new_child_parent;
+  if ($_[1]->node_type == 11) { # DOCUMENT_FRAGMENT_NODE
+    push @new_child, @{$_[1]->child_nodes};
+    $new_child_parent = $_[1];
+  } else {
+    @new_child = ($_[1]);
+    $new_child_parent = $_[1]->parent_node;
+  }
+
+  ## NOTE: Depends on $self->node_type:
+  if ($$self_od->{strict_error_checking}) {
+    my $child_od = $_[1]->owner_document || $_[1]; # might be DocumentType
+    if ($self_od ne $child_od and $child_od->node_type != 10) {
+      report Message::DOM::DOMException # DOCUMENT_TYPE_NODE
+          -object => $self,
+          -type => 'WRONG_DOCUMENT_ERR',
+          -subtype => 'EXTERNAL_OBJECT_ERR';
+    }
+
+    if ($$self->{manakai_read_only} or
+        (@new_child and defined $new_child_parent and
+         $$new_child_parent->{manakai_read_only})) {
+      report Message::DOM::DOMException
+          -object => $self,
+          -type => 'NO_MODIFICATION_ALLOWED_ERR',
+          -subtype => 'READ_ONLY_NODE_ERR';
+    }
+
+    ## NOTE: |Document| has children order check here.
+
+    for my $cn (@new_child) {
+      unless ({
+               3, 1, 5, 1, # TEXT_NODE, ENTITY_REFERENCE_NODE
+              }->{$cn->node_type}) {
+        report Message::DOM::DOMException
+            -object => $self,
+            -type => 'HIERARCHY_REQUEST_ERR',
+            -subtype => 'CHILD_NODE_TYPE_ERR';
+      }
+    }
+
+    ## NOTE: Ancestor check here in |Node|.
+  }
+
+  ## NOTE: "Insert at" code only in insert_before and replace_child
+
+  ## -- Removes from parent
+  if ($new_child_parent) {
+    if (@new_child == 1) {
+      my $v = $$new_child_parent->{child_nodes};
+      RP: for my $i (0..$#$v) {
+        if ($v->[$i] eq $new_child[0]) {
+          splice @$v, $i, 1, ();
+          last RP;
+        }
+      } # RP
+    } else {
+      @{$$new_child_parent->{child_nodes}} = ();
+    }
+  }
+
+  ## -- Rewrite the |parentNode| properties
+  for my $nc (@new_child) {
+    $$nc->{parent_node} = $self;
+    Scalar::Util::weaken ($$nc->{parent_node});
+  }
+
+  ## NOTE: Depends on method:
+  push @{$$self->{child_nodes}}, @new_child;
+
+  ## NOTE: Setting |owner_document| in |Document|.
+
+  return $_[1];
+} # apepnd_child
+
+sub insert_before ($$) {
+  my $self = $_[0];
+
+  ## NOTE: Depends on $self->node_type:
+  my $self_od = $$self->{owner_document};
+
+  ## -- Node Type check
+  my @new_child;
+  my $new_child_parent;
+  if ($_[1]->node_type == 11) { # DOCUMENT_FRAGMENT_NODE
+    push @new_child, @{$_[1]->child_nodes};
+    $new_child_parent = $_[1];
+  } else {
+    @new_child = ($_[1]);
+    $new_child_parent = $_[1]->parent_node;
+  }
+
+  ## NOTE: Depends on $self->node_type:
+  if ($$self_od->{strict_error_checking}) {
+    my $child_od = $_[1]->owner_document || $_[1]; # might be DocumentType
+    if ($self_od ne $child_od and $child_od->node_type != 10) {
+      report Message::DOM::DOMException # DOCUMENT_TYPE_NODE
+          -object => $self,
+          -type => 'WRONG_DOCUMENT_ERR',
+          -subtype => 'EXTERNAL_OBJECT_ERR';
+    }
+
+    if ($$self->{manakai_read_only} or
+        (@new_child and defined $new_child_parent and
+         $$new_child_parent->{manakai_read_only})) {
+      report Message::DOM::DOMException
+          -object => $self,
+          -type => 'NO_MODIFICATION_ALLOWED_ERR',
+          -subtype => 'READ_ONLY_NODE_ERR';
+    }
+
+    ## NOTE: |Document| has children order check here.
+
+    for my $cn (@new_child) {
+      unless ({
+               3, 1, 5, 1, # TEXT_NODE, ENTITY_REFERENCE_NODE
+              }->{$cn->node_type}) {
+        report Message::DOM::DOMException
+            -object => $self,
+            -type => 'HIERARCHY_REQUEST_ERR',
+            -subtype => 'CHILD_NODE_TYPE_ERR';
+      }
+    }
+
+    ## NOTE: Ancestor check here in |Node|.
+  }
+  
+  ## -- Insert at... ## NOTE: Only in insert_before and replace_child
+  my $index = -1; # last
+  if (defined $_[2]) {
+    ## error if $_[1] eq $_[2];
+    
+    my $cns = $self->child_nodes;
+    my $cnsl = @$cns;
+    C: {
+      $index = 0;
+      for my $i (0..($cnsl-1)) {
+        my $cn = $cns->[$i];
+        if ($cn eq $_[2]) {
+          $index += $i;
+          last C;
+        } elsif ($cn eq $_[1]) {
+          $index = -1; # offset
+        }
+      }
+      
+      report Message::DOM::DOMException
+          -object => $self,
+          -type => 'NOT_FOUND_ERR',
+          -subtype => 'NOT_CHILD_ERR';
+    } # C
+  }
+  ## NOTE: "else" only in replace_child
+
+  ## -- Removes from parent
+  if ($new_child_parent) {
+    if (@new_child == 1) {
+      my $v = $$new_child_parent->{child_nodes};
+      RP: for my $i (0..$#$v) {
+        if ($v->[$i] eq $new_child[0]) {
+          splice @$v, $i, 1, ();
+          last RP;
+        }
+      } # RP
+    } else {
+      @{$$new_child_parent->{child_nodes}} = ();
+    }
+  }
+
+  ## -- Rewrite the |parentNode| properties
+  for my $nc (@new_child) {
+    $$nc->{parent_node} = $self;
+    Scalar::Util::weaken ($$nc->{parent_node});
+  }
+
+  ## NOTE: Depends on method:
+  if ($index == -1) {
+    push @{$$self->{child_nodes}}, @new_child;
+  } else {
+    splice @{$$self->{child_nodes}}, $index, 0, @new_child;
+  }
+
+  ## NOTE: Setting |owner_document| in |Document|.
+
+  return $_[1];
+} # insert_before
+
+sub replace_child ($$) {
+  my $self = $_[0];
+
+  ## NOTE: Depends on $self->node_type:
+  my $self_od = $$self->{owner_document};
+
+  ## -- Node Type check
+  my @new_child;
+  my $new_child_parent;
+  if ($_[1]->node_type == 11) { # DOCUMENT_FRAGMENT_NODE
+    push @new_child, @{$_[1]->child_nodes};
+    $new_child_parent = $_[1];
+  } else {
+    @new_child = ($_[1]);
+    $new_child_parent = $_[1]->parent_node;
+  }
+
+  ## NOTE: Depends on $self->node_type:
+  if ($$self_od->{strict_error_checking}) {
+    my $child_od = $_[1]->owner_document || $_[1]; # might be DocumentType
+    if ($self_od ne $child_od and $child_od->node_type != 10) {
+      report Message::DOM::DOMException # DOCUMENT_TYPE_NODE
+          -object => $self,
+          -type => 'WRONG_DOCUMENT_ERR',
+          -subtype => 'EXTERNAL_OBJECT_ERR';
+    }
+
+    if ($$self->{manakai_read_only} or
+        (@new_child and defined $new_child_parent and
+         $$new_child_parent->{manakai_read_only})) {
+      report Message::DOM::DOMException
+          -object => $self,
+          -type => 'NO_MODIFICATION_ALLOWED_ERR',
+          -subtype => 'READ_ONLY_NODE_ERR';
+    }
+
+    ## NOTE: |Document| has children order check here.
+
+    for my $cn (@new_child) {
+      unless ({
+               3, 1, 5, 1, # TEXT_NODE, ENTITY_REFERENCE_NODE
+              }->{$cn->node_type}) {
+        report Message::DOM::DOMException
+            -object => $self,
+            -type => 'HIERARCHY_REQUEST_ERR',
+            -subtype => 'CHILD_NODE_TYPE_ERR';
+      }
+    }
+
+    ## NOTE: Ancestor check here in |Node|.
+  }
+  
+  ## -- Insert at... ## NOTE: Only in insertBefore and replaceChild
+  my $index = -1; # last
+  if (defined $_[2]) {
+    ## error if $_[1] eq $_[2];
+    
+    my $cns = $self->child_nodes;
+    my $cnsl = @$cns;
+    C: {
+      $index = 0;
+      for my $i (0..($cnsl-1)) {
+        my $cn = $cns->[$i];
+        if ($cn eq $_[2]) {
+          $index += $i;
+          last C;
+        } elsif ($cn eq $_[1]) {
+          $index = -1; # offset
+        }
+      }
+      
+      report Message::DOM::DOMException
+          -object => $self,
+          -type => 'NOT_FOUND_ERR',
+          -subtype => 'NOT_CHILD_ERR';
+    } # C
+  } else {
+    ## NOTE: Only in replaceChild
+    report Message::DOM::DOMException
+        -object => $self,
+        -type => 'NOT_FOUND_ERR',
+        -subtype => 'NOT_CHILD_ERR';
+  }
+
+  ## -- Removes from parent
+  if ($new_child_parent) {
+    if (@new_child == 1) {
+      my $v = $$new_child_parent->{child_nodes};
+      RP: for my $i (0..$#$v) {
+        if ($v->[$i] eq $new_child[0]) {
+          splice @$v, $i, 1, ();
+          last RP;
+        }
+      } # RP
+    } else {
+      @{$$new_child_parent->{child_nodes}} = ();
+    }
+  }
+
+  ## -- Rewrite the |parentNode| properties
+  for my $nc (@new_child) {
+    $$nc->{parent_node} = $self;
+    Scalar::Util::weaken ($$nc->{parent_node});
+  }
+
+  ## NOTE: Depends on method:
+  splice @{$$self->{child_nodes}}, $index, 1, @new_child;
+  delete ${$_[2]}->{parent_node};
+
+  ## NOTE: Setting |owner_document| in |Document|.
+
+  return $_[2];
+} # replace_child
 
 ## |Attr| attributes
 
@@ -330,4 +641,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/07 09:11:05 $
+## $Date: 2007/07/08 05:42:36 $

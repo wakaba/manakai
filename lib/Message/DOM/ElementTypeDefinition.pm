@@ -1,11 +1,8 @@
 package Message::DOM::ElementTypeDefinition;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::ElementTypeDefinition';
 require Message::DOM::Node;
-
-## Spec:
-## <http://suika.fam.cx/gate/2005/sw/ElementTypeDefinition>
 
 sub ____new ($$$) {
   my $self = shift->SUPER::____new (shift);
@@ -67,7 +64,28 @@ sub text_content () { undef }
 
 ## |Node| methods
 
+sub append_child ($$) {
+  report Message::DOM::DOMException
+      -object => $_[0],
+      -type => 'HIERARCHY_REQUEST_ERR',
+      -subtype => 'CHILD_NODE_TYPE_ERR';
+} # append_child
+
 sub manakai_append_text () { }
+
+sub insert_before ($;$) {
+  report Message::DOM::DOMException
+      -object => $_[0],
+      -type => 'HIERARCHY_REQUEST_ERR',
+      -subtype => 'CHILD_NODE_TYPE_ERR';
+} # insert_before
+
+sub replace_child ($$) {
+  report Message::DOM::DOMException
+      -object => $_[0],
+      -type => 'HIERARCHY_REQUEST_ERR',
+      -subtype => 'CHILD_NODE_TYPE_ERR';
+} # replace_child
 
 ## |ElementTypeDefinition| attributes
 
@@ -100,4 +118,4 @@ sub create_element_type_definition ($$) {
 
 1;
 ## License: <http://suika.fam.cx/~wakaba/archive/2004/8/18/license#Perl+MPL>
-## $Date: 2007/06/23 12:47:13 $
+## $Date: 2007/07/08 05:42:37 $

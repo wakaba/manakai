@@ -275,7 +275,7 @@ for my $prop (qw/all_declarations_processed/) {
   my $doc2 = $doc->implementation->create_document;
   my $doctype = $doc2->implementation->create_document_type ('dt');
   my $el = $doc2->create_element_ns (undef, 'e');
-  my $comment = $doc->create_comment ('');
+  my $comment = $doc2->create_comment ('');
   $doc2->append_child ($comment);
   $doc2->append_child ($doctype);
   $doc2->append_child ($el);
@@ -381,4 +381,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2007/07/07 09:11:05 $
+## $Date: 2007/07/08 05:42:37 $

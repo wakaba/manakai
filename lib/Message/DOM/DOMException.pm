@@ -1,17 +1,30 @@
 package Message::DOM::DOMException;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::Util::Error', 'Message::IF::DOMException';
 require Message::Util::Error;
 
 sub ___error_def () {+{
+  HIERARCHY_REQUEST_ERR => {
+    -code => 3,
+    -subtype => {
+      ANCESTOR_NODE_ERR => {
+        -description => q(Specified node is an ancestor of the node or the node itself),
+      },
+      CHILD_NODE_TYPE_ERR => {
+        -description => q(This type of node cannot be inserted to this point),
+      },
+    },
+  },
   WRONG_DOCUMENT_ERR => {
     -code => 4,
-    EXTERNAL_OBJECT_ERR => {
-      -description => q(Can't insert into different document),
-    },
-    INUSE_DOCTYPE_ERR => {
-      -description => q(Document type is already in use),
+    -subtype => {
+      EXTERNAL_OBJECT_ERR => {
+        -description => q(Can't insert into different document),
+      },
+      INUSE_DOCTYPE_ERR => {
+        -description => q(Document type is already in use),
+      },
     },
   },
   INVALID_CHARACTER_ERR => {
@@ -30,6 +43,14 @@ sub ___error_def () {+{
       },
       READ_ONLY_NODE_LIST_ERR => {
         -description => q(Can't modify read-only node list),
+      },
+    },
+  },
+  NOT_FOUND_ERR => {
+    -code => 8,
+    -subtype => {
+      NOT_CHILD_ERR => {
+        -description => q(Not a child of this node),
       },
     },
   },
@@ -116,4 +137,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/07 12:26:09 $
+## $Date: 2007/07/08 05:42:37 $

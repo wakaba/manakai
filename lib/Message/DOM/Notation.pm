@@ -1,6 +1,6 @@
 package Message::DOM::Notation;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::Notation';
 require Message::DOM::Node;
 
@@ -77,7 +77,28 @@ sub text_content () { undef }
 
 ## |Node| methods
 
+sub append_child ($$) {
+  report Message::DOM::DOMException
+      -object => $_[0],
+      -type => 'HIERARCHY_REQUEST_ERR',
+      -subtype => 'CHILD_NODE_TYPE_ERR';
+} # append_child
+
 sub manakai_append_text () { }
+
+sub insert_before ($;$) {
+  report Message::DOM::DOMException
+      -object => $_[0],
+      -type => 'HIERARCHY_REQUEST_ERR',
+      -subtype => 'CHILD_NODE_TYPE_ERR';
+} # insert_before
+
+sub replace_child ($$) {
+  report Message::DOM::DOMException
+      -object => $_[0],
+      -type => 'HIERARCHY_REQUEST_ERR',
+      -subtype => 'CHILD_NODE_TYPE_ERR';
+} # replace_child
 
 ## |Notation| attributes
 
@@ -133,4 +154,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/06/17 13:37:40 $
+## $Date: 2007/07/08 05:42:37 $

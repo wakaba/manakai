@@ -2,7 +2,7 @@
 
 package Message::DOM::Document;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::Document',
     'Message::IF::DocumentXDoctype',
     'Message::IF::HTMLDocument';
@@ -258,6 +258,161 @@ sub adopt_node ($$) {
   return $source;
 } # adopt_node
 
+sub append_child ($$) {
+  ## NOTE: Overrides |Node|'s implementation.
+  my $self = $_[0];
+  
+  ## NOTE: |$self_od| code here in some $self->node_type.
+
+  ## -- Node Type check
+  my @new_child;
+  my $new_child_parent;
+  if ($_[1]->node_type == 11) { # DOCUMENT_FRAGMENT_NODE
+    push @new_child, @{$_[1]->child_nodes};
+    $new_child_parent = $_[1];
+  } else {
+    @new_child = ($_[1]);
+    $new_child_parent = $_[1]->parent_node;
+  }
+
+  ## NOTE: Depends on $self->node_type:
+  if ($$self->{strict_error_checking}) {
+    my $child_od = $_[1]->owner_document || $_[1]; # might be DocumentType
+    if ($self ne $child_od and $child_od->node_type != 10) {
+      report Message::DOM::DOMException # DOCUMENT_TYPE_NODE
+          -object => $self,
+          -type => 'WRONG_DOCUMENT_ERR',
+          -subtype => 'EXTERNAL_OBJECT_ERR';
+    }
+
+    if ($$self->{manakai_read_only} or
+        (@new_child and defined $new_child_parent and
+         $$new_child_parent->{manakai_read_only})) {
+      report Message::DOM::DOMException
+          -object => $self,
+          -type => 'NO_MODIFICATION_ALLOWED_ERR',
+          -subtype => 'READ_ONLY_NODE_ERR';
+    }
+
+    ## NOTE: Only in |Document|:
+    my $strict_children = $self->dom_config->get_parameter
+        (q<http://suika.fam.cx/www/2006/dom-config/strict-document-children>);
+    if ($strict_children) {
+      my $has_el;
+      my $has_dt;
+      my $child_nt = $_[1]->node_type;
+      if ($child_nt == 1) { # ELEMENT_NODE
+        $has_el = 1;
+      } elsif ($child_nt == 10) { # DOCUMENT_TYPE_NODE
+        $has_dt = 1;
+      } elsif ($child_nt == 11) { # DOCUMENT_FRAGMENT_NODE
+        for my $cn (@{$_[1]->child_nodes}) {
+          my $cnt = $cn->node_type;
+          if ($cnt == 1) { # ELEMENT_NODE
+            if ($has_el) {
+              report Message::DOM::DOMException
+                  -object => $self,
+                  -type => 'HIERARCHY_REQUEST_ERR',
+                  -subtype => 'CHILD_NODE_TYPE_ERR';
+            }
+            $has_el = 1;
+          } elsif ($cnt == 10) { # DOCUMENT_TYPE_NODE
+            ## NOTE: |DocumentType| node cannot be contained in
+            ## |DocumentFragment| in strict mode.
+            if ($has_dt) {
+              report Message::DOM::DOMException
+                  -object => $self,
+                  -type => 'HIERARCHY_REQUEST_ERR',
+                  -subtype => 'CHILD_NODE_TYPE_ERR';
+            }
+            $has_dt = 1;
+          }
+        }
+      }
+  
+      if ($has_el) {
+        my $anode = $self->last_child;
+        while (defined $anode) {
+          if ($anode->node_type == 1) { # ELEMENT_NODE
+            report Message::DOM::DOMException
+                -object => $self,
+                -type => 'HIERARCHY_REQUEST_ERR',
+                -subtype => 'CHILD_NODE_TYPE_ERR';
+          }
+          $anode = $anode->previous_sibling;
+        }
+      } # has_el
+      if ($has_dt) {
+        my $anode = $self->last_child;
+        while (defined $anode) {
+          my $ant = $anode->node_type;
+          if ($ant == 1 or $ant == 10) { # ELEMENT_NODE or DOCUMENT_TYPE_NODE
+            report Message::DOM::DOMException
+                -object => $self,
+                -type => 'HIERARCHY_REQUEST_ERR',
+                -subtype => 'CHILD_NODE_TYPE_ERR';
+          }
+          $anode = $anode->previous_sibling;
+        }
+      } # has_dt
+    }
+
+    for my $cn (@new_child) {
+      unless ({
+               3, (not $strict_children), # TEXT_NODE
+               5, (not $strict_children), # ENTITY_REFERENCE_NODE
+               1, 1, # ELEMENT_NODE
+               4, (not $strict_children), # CDATA_SECTION_NODE
+               7, 1, # PROCESSING_INSTRUCTION_NODE
+               8, 1, # COMMENT_NODE
+               10, 1, # DOCUMENT_TYPE_NODE
+              }->{$cn->node_type}) {
+        report Message::DOM::DOMException
+            -object => $self,
+            -type => 'HIERARCHY_REQUEST_ERR',
+            -subtype => 'CHILD_NODE_TYPE_ERR';
+      }
+    }
+
+    ## NOTE: Ancestor check here in |Node|.
+  }
+
+  ## NOTE: "Insert at" code only in insert_before and replace_child
+
+  ## -- Removes from parent
+  if ($new_child_parent) {
+    if (@new_child == 1) {
+      my $v = $$new_child_parent->{child_nodes};
+      RP: for my $i (0..$#$v) {
+        if ($v->[$i] eq $new_child[0]) {
+          splice @$v, $i, 1, ();
+          last RP;
+        }
+      } # RP
+    } else {
+      @{$$new_child_parent->{child_nodes}} = ();
+    }
+  }
+
+  ## -- Rewrite the |parentNode| properties
+  for my $nc (@new_child) {
+    $$nc->{parent_node} = $self;
+    Scalar::Util::weaken ($$nc->{parent_node});
+  }
+
+  ## NOTE: Depends on method:
+  push @{$$self->{child_nodes}}, @new_child;
+
+  ## NOTE: Only in |Document|.
+  for (@new_child) {
+    delete $$_->{implementation};
+    $$_->{owner_document} = $self;
+    Scalar::Util::weaken ($$_->{owner_document});
+  }
+
+  return $_[1];
+} # apepnd_child
+
 sub manakai_append_text ($$) {
   my $self = shift;
   if ($$self->{'http://suika.fam.cx/www/2006/dom-config/strict-document-children'}) {
@@ -267,6 +422,381 @@ sub manakai_append_text ($$) {
     return $self->SUPER::manakai_append_text (@_);
   }
 } # manakai_append_text
+
+sub insert_before ($$) {
+  ## NOTE: Overrides |Node|'s implementation.
+  my $self = $_[0];
+
+  ## NOTE: |$self_od| code here depending on $self->node_type.
+
+  ## -- Node Type check
+  my @new_child;
+  my $new_child_parent;
+  if ($_[1]->node_type == 11) { # DOCUMENT_FRAGMENT_NODE
+    push @new_child, @{$_[1]->child_nodes};
+    $new_child_parent = $_[1];
+  } else {
+    @new_child = ($_[1]);
+    $new_child_parent = $_[1]->parent_node;
+  }
+
+  ## NOTE: Depends on $self->node_type:
+  if ($$self->{strict_error_checking}) {
+    my $child_od = $_[1]->owner_document || $_[1]; # might be DocumentType
+    if ($self ne $child_od and $child_od->node_type != 10) {
+      report Message::DOM::DOMException # DOCUMENT_TYPE_NODE
+          -object => $self,
+          -type => 'WRONG_DOCUMENT_ERR',
+          -subtype => 'EXTERNAL_OBJECT_ERR';
+    }
+
+    if ($$self->{manakai_read_only} or
+        (@new_child and defined $new_child_parent and
+         $$new_child_parent->{manakai_read_only})) {
+      report Message::DOM::DOMException
+          -object => $self,
+          -type => 'NO_MODIFICATION_ALLOWED_ERR',
+          -subtype => 'READ_ONLY_NODE_ERR';
+    }
+
+    ## NOTE: Only in |Document|:
+    my $strict_children = $self->dom_config->get_parameter
+        (q<http://suika.fam.cx/www/2006/dom-config/strict-document-children>);
+    if ($strict_children) {
+      my $has_el;
+      my $has_dt;
+      my $child_nt = $_[1]->node_type;
+      if ($child_nt == 1) { # ELEMENT_NODE
+        $has_el = 1;
+      } elsif ($child_nt == 10) { # DOCUMENT_TYPE_NODE
+        $has_dt = 1;
+      } elsif ($child_nt == 11) { # DOCUMENT_FRAGMENT_NODE
+        for my $cn (@{$_[1]->child_nodes}) {
+          my $cnt = $cn->node_type;
+          if ($cnt == 1) { # ELEMENT_NODE
+            if ($has_el) {
+              report Message::DOM::DOMException
+                  -object => $self,
+                  -type => 'HIERARCHY_REQUEST_ERR',
+                  -subtype => 'CHILD_NODE_TYPE_ERR';
+            }
+            $has_el = 1;
+          } elsif ($cnt == 10) { # DOCUMENT_TYPE_NODE
+            ## NOTE: |DocumentType| node cannot be contained in
+            ## |DocumentFragment| in strict mode.
+            if ($has_dt) {
+              report Message::DOM::DOMException
+                  -object => $self,
+                  -type => 'HIERARCHY_REQUEST_ERR',
+                  -subtype => 'CHILD_NODE_TYPE_ERR';
+            }
+            $has_dt = 1;
+          }
+        }
+      }
+
+      ## ISSUE: This code is wrong.  Old manakai's implementation
+      ## is better, but it is also wrong in some edge cases.
+      ## Maybe we should remove these code entirely.  DOM3Core
+      ## conformance is not important for this bit.  It only makes
+      ## things too complex.  Same for replace_child's code.
+      if ($has_el) {
+        my $anode = $self->last_child;
+        while (defined $anode) {
+          if ($anode->node_type == 1) { # ELEMENT_NODE
+            report Message::DOM::DOMException
+                -object => $self,
+                -type => 'HIERARCHY_REQUEST_ERR',
+                -subtype => 'CHILD_NODE_TYPE_ERR';
+          }
+          $anode = $anode->previous_sibling;
+        }
+      } # has_el
+      if ($has_dt) {
+        my $anode = $self->last_child;
+        while (defined $anode) {
+          my $ant = $anode->node_type;
+          if ($ant == 1 or $ant == 10) { # ELEMENT_NODE or DOCUMENT_TYPE_NODE
+            report Message::DOM::DOMException
+                -object => $self,
+                -type => 'HIERARCHY_REQUEST_ERR',
+                -subtype => 'CHILD_NODE_TYPE_ERR';
+          }
+          $anode = $anode->previous_sibling;
+        }
+      } # has_dt
+    }
+
+    for my $cn (@new_child) {
+      unless ({
+               3, (not $strict_children), # TEXT_NODE
+               5, (not $strict_children), # ENTITY_REFERENCE_NODE
+               1, 1, # ELEMENT_NODE
+               4, (not $strict_children), # CDATA_SECTION_NODE
+               7, 1, # PROCESSING_INSTRUCTION_NODE
+               8, 1, # COMMENT_NODE
+               10, 1, # DOCUMENT_TYPE_NODE
+              }->{$cn->node_type}) {
+        report Message::DOM::DOMException
+            -object => $self,
+            -type => 'HIERARCHY_REQUEST_ERR',
+            -subtype => 'CHILD_NODE_TYPE_ERR';
+      }
+    }
+
+    ## NOTE: Ancestor check here in |Node|.
+  }
+  
+  ## -- Insert at... ## NOTE: Only in insert_before and replace_child
+  my $index = -1; # last
+  if (defined $_[2]) {
+    ## error if $_[1] eq $_[2];
+    
+    my $cns = $self->child_nodes;
+    my $cnsl = @$cns;
+    C: {
+      $index = 0;
+      for my $i (0..($cnsl-1)) {
+        my $cn = $cns->[$i];
+        if ($cn eq $_[2]) {
+          $index += $i;
+          last C;
+        } elsif ($cn eq $_[1]) {
+          $index = -1; # offset
+        }
+      }
+      
+      report Message::DOM::DOMException
+          -object => $self,
+          -type => 'NOT_FOUND_ERR',
+          -subtype => 'NOT_CHILD_ERR';
+    } # C
+  }
+  ## NOTE: "else" only in replace_child
+
+  ## -- Removes from parent
+  if ($new_child_parent) {
+    if (@new_child == 1) {
+      my $v = $$new_child_parent->{child_nodes};
+      RP: for my $i (0..$#$v) {
+        if ($v->[$i] eq $new_child[0]) {
+          splice @$v, $i, 1, ();
+          last RP;
+        }
+      } # RP
+    } else {
+      @{$$new_child_parent->{child_nodes}} = ();
+    }
+  }
+
+  ## -- Rewrite the |parentNode| properties
+  for my $nc (@new_child) {
+    $$nc->{parent_node} = $self;
+    Scalar::Util::weaken ($$nc->{parent_node});
+  }
+
+  ## NOTE: Depends on method:
+  if ($index == -1) {
+    push @{$$self->{child_nodes}}, @new_child;
+  } else {
+    splice @{$$self->{child_nodes}}, $index, 0, @new_child;
+  }
+
+  ## NOTE: Only in |Document|.
+  for (@new_child) {
+    delete $$_->{implementation};
+    $$_->{owner_document} = $self;
+    Scalar::Util::weaken ($$_->{owner_document});
+  }
+
+  return $_[1];
+} # insert_before
+
+sub replace_child ($$) {
+  ## NOTE: Overrides |Node|'s implementation.
+  my $self = $_[0];
+
+  ## NOTE: |$self_od| code here depending on $self->node_type.
+
+  ## -- Node Type check
+  my @new_child;
+  my $new_child_parent;
+  if ($_[1]->node_type == 11) { # DOCUMENT_FRAGMENT_NODE
+    push @new_child, @{$_[1]->child_nodes};
+    $new_child_parent = $_[1];
+  } else {
+    @new_child = ($_[1]);
+    $new_child_parent = $_[1]->parent_node;
+  }
+
+  ## NOTE: Depends on $self->node_type:
+  if ($$self->{strict_error_checking}) {
+    my $child_od = $_[1]->owner_document || $_[1]; # might be DocumentType
+    if ($self ne $child_od and $child_od->node_type != 10) {
+      report Message::DOM::DOMException # DOCUMENT_TYPE_NODE
+          -object => $self,
+          -type => 'WRONG_DOCUMENT_ERR',
+          -subtype => 'EXTERNAL_OBJECT_ERR';
+    }
+
+    if ($$self->{manakai_read_only} or
+        (@new_child and defined $new_child_parent and
+         $$new_child_parent->{manakai_read_only})) {
+      report Message::DOM::DOMException
+          -object => $self,
+          -type => 'NO_MODIFICATION_ALLOWED_ERR',
+          -subtype => 'READ_ONLY_NODE_ERR';
+    }
+
+    ## NOTE: Only in |Document|:
+    my $strict_children = $self->dom_config->get_parameter
+        (q<http://suika.fam.cx/www/2006/dom-config/strict-document-children>);
+    if ($strict_children) {
+      my $has_el;
+      my $has_dt;
+      my $child_nt = $_[1]->node_type;
+      if ($child_nt == 1) { # ELEMENT_NODE
+        $has_el = 1;
+      } elsif ($child_nt == 10) { # DOCUMENT_TYPE_NODE
+        $has_dt = 1;
+      } elsif ($child_nt == 11) { # DOCUMENT_FRAGMENT_NODE
+        for my $cn (@{$_[1]->child_nodes}) {
+          my $cnt = $cn->node_type;
+          if ($cnt == 1) { # ELEMENT_NODE
+            if ($has_el) {
+              report Message::DOM::DOMException
+                  -object => $self,
+                  -type => 'HIERARCHY_REQUEST_ERR',
+                  -subtype => 'CHILD_NODE_TYPE_ERR';
+            }
+            $has_el = 1;
+          } elsif ($cnt == 10) { # DOCUMENT_TYPE_NODE
+            ## NOTE: |DocumentType| node cannot be contained in
+            ## |DocumentFragment| in strict mode.
+            if ($has_dt) {
+              report Message::DOM::DOMException
+                  -object => $self,
+                  -type => 'HIERARCHY_REQUEST_ERR',
+                  -subtype => 'CHILD_NODE_TYPE_ERR';
+            }
+            $has_dt = 1;
+          }
+        }
+      }
+  
+      if ($has_el) {
+        my $anode = $self->last_child;
+        while (defined $anode) {
+          if ($anode->node_type == 1) { # ELEMENT_NODE
+            report Message::DOM::DOMException
+                -object => $self,
+                -type => 'HIERARCHY_REQUEST_ERR',
+                -subtype => 'CHILD_NODE_TYPE_ERR';
+          }
+          $anode = $anode->previous_sibling;
+        }
+      } # has_el
+      if ($has_dt) {
+        my $anode = $self->last_child;
+        while (defined $anode) {
+          my $ant = $anode->node_type;
+          if ($ant == 1 or $ant == 10) { # ELEMENT_NODE or DOCUMENT_TYPE_NODE
+            report Message::DOM::DOMException
+                -object => $self,
+                -type => 'HIERARCHY_REQUEST_ERR',
+                -subtype => 'CHILD_NODE_TYPE_ERR';
+          }
+          $anode = $anode->previous_sibling;
+        }
+      } # has_dt
+    }
+
+    for my $cn (@new_child) {
+      unless ({
+               3, (not $strict_children), # TEXT_NODE
+               5, (not $strict_children), # ENTITY_REFERENCE_NODE
+               1, 1, # ELEMENT_NODE
+               4, (not $strict_children), # CDATA_SECTION_NODE
+               7, 1, # PROCESSING_INSTRUCTION_NODE
+               8, 1, # COMMENT_NODE
+               10, 1, # DOCUMENT_TYPE_NODE
+              }->{$cn->node_type}) {
+        report Message::DOM::DOMException
+            -object => $self,
+            -type => 'HIERARCHY_REQUEST_ERR',
+            -subtype => 'CHILD_NODE_TYPE_ERR';
+      }
+    }
+
+    ## NOTE: Ancestor check here in |Node|.
+  }
+  
+  ## -- Insert at... ## NOTE: Only in insertBefore and replaceChild
+  my $index = -1; # last
+  if (defined $_[2]) {
+    ## error if $_[1] eq $_[2];
+    
+    my $cns = $self->child_nodes;
+    my $cnsl = @$cns;
+    C: {
+      $index = 0;
+      for my $i (0..($cnsl-1)) {
+        my $cn = $cns->[$i];
+        if ($cn eq $_[2]) {
+          $index += $i;
+          last C;
+        } elsif ($cn eq $_[1]) {
+          $index = -1; # offset
+        }
+      }
+      
+      report Message::DOM::DOMException
+          -object => $self,
+          -type => 'NOT_FOUND_ERR',
+          -subtype => 'NOT_CHILD_ERR';
+    } # C
+  } else {
+    ## NOTE: Only in replaceChild
+    report Message::DOM::DOMException
+        -object => $self,
+        -type => 'NOT_FOUND_ERR',
+        -subtype => 'NOT_CHILD_ERR';
+  }
+
+  ## -- Removes from parent
+  if ($new_child_parent) {
+    if (@new_child == 1) {
+      my $v = $$new_child_parent->{child_nodes};
+      RP: for my $i (0..$#$v) {
+        if ($v->[$i] eq $new_child[0]) {
+          splice @$v, $i, 1, ();
+          last RP;
+        }
+      } # RP
+    } else {
+      @{$$new_child_parent->{child_nodes}} = ();
+    }
+  }
+
+  ## -- Rewrite the |parentNode| properties
+  for my $nc (@new_child) {
+    $$nc->{parent_node} = $self;
+    Scalar::Util::weaken ($$nc->{parent_node});
+  }
+
+  ## NOTE: Depends on method:
+  splice @{$$self->{child_nodes}}, $index, 1, @new_child;
+  delete ${$_[2]}->{parent_node};
+
+  ## NOTE: Only in |Document|.
+  for (@new_child) {
+    delete $$_->{implementation};
+    $$_->{owner_document} = $self;
+    Scalar::Util::weaken ($$_->{owner_document});
+  }
+
+  return $_[2];
+} # replace_child
 
 ## |Document| attributes
 
@@ -545,4 +1075,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/07 12:26:08 $
+## $Date: 2007/07/08 05:42:37 $
