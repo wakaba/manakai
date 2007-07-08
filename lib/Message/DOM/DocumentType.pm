@@ -1,6 +1,6 @@
 package Message::DOM::DocumentType;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.12 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.13 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::DocumentType',
     'Message::IF::DocumentTypeDefinition',
     'Message::IF::DocumentTypeDeclaration';
@@ -36,6 +36,7 @@ sub AUTOLOAD {
     goto &{ $AUTOLOAD };
   } elsif ({
     ## Read-write attributes (DOMString, trivial accessors)
+    internal_subset => 1,
     public_id => 1,
     system_id => 1,
   }->{$method_name}) {
@@ -425,6 +426,10 @@ sub entities ($) {
   return bless \[$_[0], 'entities'], 'Message::DOM::NamedNodeMap';
 } # entities
 
+## NOTE: Setter is a manakai extension.
+## TODO: Document it.
+sub internal_subset ($;$);
+
 sub notations ($) {
   require Message::DOM::NamedNodeMap;
   return bless \[$_[0], 'notations'], 'Message::DOM::NamedNodeMap';
@@ -541,4 +546,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/08 07:59:02 $
+## $Date: 2007/07/08 13:04:37 $

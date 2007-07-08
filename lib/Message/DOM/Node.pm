@@ -1,6 +1,6 @@
 package Message::DOM::Node;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.12 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.13 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::IF::Node';
 require Scalar::Util;
 require Message::DOM::DOMException;
@@ -55,9 +55,6 @@ sub ATTRIBUTE_DEFINITION_NODE () { 81002 }
 
 ## Definition group DocumentPosition
 
-## Spec:
-## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#DocumentPosition>
-
 sub DOCUMENT_POSITION_DISCONNECTED () { 0x01 }
 sub DOCUMENT_POSITION_PRECEDING () { 0x02 }
 sub DOCUMENT_POSITION_FOLLOWING () { 0x04 }
@@ -90,19 +87,6 @@ sub AUTOLOAD {
     no strict 'refs';
     eval qq{
       sub $method_name (\$) {
-        return \${\$_[0]}->{$method_name}; 
-      }
-    };
-    goto &{ $AUTOLOAD };
-  } elsif ({
-    ## Read-write attributes (DOMString, trivial accessors)
-  }->{$method_name}) {
-    no strict 'refs';
-    eval qq{
-      sub $method_name (\$;\$) {
-        if (\@_ > 1) {
-          \${\$_[0]}->{$method_name} = ''.\$_[1];
-        }
         return \${\$_[0]}->{$method_name}; 
       }
     };
@@ -1350,4 +1334,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/08 05:42:37 $
+## $Date: 2007/07/08 13:04:37 $

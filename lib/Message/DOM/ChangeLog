@@ -1,5 +1,22 @@
 2007-07-08  Wakaba  <wakaba@suika.fam.cx>
 
+	* Attr.pm (value, node_value): Now it is defined
+	as |text_content| itself.
+
+	* AttributeDefinition.pm, ElementTypeDefinition.pm,
+	Node.pm (AUTOLOAD): Unused block is removed.
+
+	* CDATASection.pm, DocumentFragment.pm (AUTOLOAD): Removed.  Unused.
+
+	* DocumentType.pm (internal_subset): Implemented.
+
+	* Entity.pm (is_externally_declared, input_encoding,
+	xml_version): Implemented.
+
+	* ProcessingInstruction.pm (target, data): Implemented.
+
+2007-07-08  Wakaba  <wakaba@suika.fam.cx>
+
 	* DOMCharacterData.pm (AUTOLOAD): Removed.
 	(data): Reimplemented.
 	(delete_data, insert_data, replace_data, substring_data): There were

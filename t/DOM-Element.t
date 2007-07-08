@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 use strict;
 use Test;
-BEGIN { plan tests => 52 } 
+BEGIN { plan tests => 55 } 
 
 require Message::DOM::DOMImplementation;
 use Message::Util::Error;
@@ -126,6 +126,19 @@ for my $method (qw/set_attribute_node set_attribute_node_ns/) {
       "$method get_attribute_ns [3]";
 }
 
+## |attributes|
+{
+  my $el = $doc->create_element ('e');
+  ok $el->can ('attributes') ? 1 : 0, 1, 'Element->attributes can';
+
+  my $as = $el->attributes;
+  ok UNIVERSAL::isa ($as, 'Message::IF::NamedNodeMap') ? 1 : 0, 1, 'E->as if';
+  
+  $el->set_attribute (at1 => 'value');
+  ok $as->get_named_item ('at1'), $el->get_attribute_node ('at1'),
+      'Element->attributes get_named_item get_attr_node';
+}
+
 =head1 LICENSE
 
 Copyright 2007 Wakaba <w@suika.fam.cx>
@@ -135,4 +148,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2007/07/07 11:11:34 $
+## $Date: 2007/07/08 13:04:39 $

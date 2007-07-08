@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 use strict;
 use Test;
-BEGIN { plan tests => 4311 } 
+BEGIN { plan tests => 4429 } 
 
 require Message::DOM::DOMImplementation;
 use Message::Util::Error;
@@ -491,6 +491,7 @@ my $tests = {
       parent_node => undef,
       prefix => undef,
       previous_sibling => undef,
+      tag_name => 'e',
     },
     attr_get_bool => {
       has_attributes => 0,
@@ -518,6 +519,7 @@ my $tests = {
       parent_node => undef,
       prefix => undef,
       previous_sibling => undef,
+      tag_name => 'f',
     },
     attr_get_bool => {
       has_attributes => 0,
@@ -545,6 +547,7 @@ my $tests = {
       parent_node => undef,
       prefix => 'e',
       previous_sibling => undef,
+      tag_name => 'e:f',
     },
     attr_get_bool => {
       has_attributes => 0,
@@ -1800,6 +1803,8 @@ for my $node (create_nodes ()) {
        [unknown => '', 0],
        [unknown => undef, 0],
        ['+unknown' => undef, 0],
+       [q<http://suika.fam.cx/www/2006/feature/xdoctype> => '', 1],
+       [q<http://suika.fam.cx/www/2006/feature/xdoctype> => '3.0', 1],
       ) {
     my $label = $node->node_name . ' ' . $_->[0] . ', ' .
         (defined $_->[1] ? $_->[1] : 'undef');
@@ -1982,4 +1987,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2007/07/08 05:42:37 $
+## $Date: 2007/07/08 13:04:39 $

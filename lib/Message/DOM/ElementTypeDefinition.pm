@@ -1,6 +1,6 @@
 package Message::DOM::ElementTypeDefinition;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::ElementTypeDefinition';
 require Message::DOM::Node;
 
@@ -25,19 +25,6 @@ sub AUTOLOAD {
         if (\@_ > 1) {
           require Carp;
           Carp::croak (qq<Can't modify read-only attribute>);
-        }
-        return \${\$_[0]}->{$method_name}; 
-      }
-    };
-    goto &{ $AUTOLOAD };
-  } elsif ({
-    ## Read-write attributes (DOMString, trivial accessors)
-  }->{$method_name}) {
-    no strict 'refs';
-    eval qq{
-      sub $method_name (\$) {
-        if (\@_ > 1) {
-          \${\$_[0]}->{$method_name} = ''.$_[1];
         }
         return \${\$_[0]}->{$method_name}; 
       }
@@ -116,4 +103,4 @@ sub create_element_type_definition ($$) {
 
 1;
 ## License: <http://suika.fam.cx/~wakaba/archive/2004/8/18/license#Perl+MPL>
-## $Date: 2007/07/08 07:59:02 $
+## $Date: 2007/07/08 13:04:37 $

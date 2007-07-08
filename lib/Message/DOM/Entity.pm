@@ -1,6 +1,6 @@
 package Message::DOM::Entity;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::Entity';
 require Message::DOM::Node;
 
@@ -34,6 +34,7 @@ sub AUTOLOAD {
   } elsif ({
     ## Read-write attributes (boolean, trivial accessors)
     has_replacement_tree => 1,
+    is_externally_declared => 1,
   }->{$method_name}) {
     no strict 'refs';
     eval qq{
@@ -58,10 +59,12 @@ sub AUTOLOAD {
     goto &{ $AUTOLOAD };
   } elsif ({
     ## Read-write attributes (DOMString, trivial accessors)
+    input_encoding => 1,
     notation_name => 1,
     public_id => 1,
     system_id => 1,
     xml_encoding => 1,
+    xml_version => 1,
   }->{$method_name}) {
     no strict 'refs';
     eval qq{
@@ -195,6 +198,27 @@ sub manakai_entity_uri ($;$) {
 } # manakai_entity_uri
 
 ## NOTE: Setter is a manakai extension.
+## TODO: Document it.
+sub input_encoding ($;$);
+
+## NOTE: Setter is a manakai extension.
+## TODO: Document it.
+sub is_externally_declared ($;$);
+#    @@enDesc:
+#      Whether the entity is declared by an external markup declaration,
+#      i.e. a markup declaration occuring in the external subset or
+#      in a parameter entity.
+#    @@Type: boolean
+#    @@TrueCase:
+#      @@@enDesc:
+#        If the entity is declared by an external markup declaration.
+#    @@FalseCase:
+#      @@@enDesc:
+#        If the entity is declared by a markup declaration in
+#        the internal subset, or if the <IF::Entity> node
+#        is created in memory.
+
+## NOTE: Setter is a manakai extension.
 sub notation_name ($;$);
 
 ## NOTE: Setter is a manakai extension.
@@ -205,6 +229,12 @@ sub system_id ($;$);
 
 ## NOTE: Setter is a manakai extension.
 sub xml_encoding ($;$);
+
+## NOTE: Setter is a manakai extension.
+## TODO: Document it. ## TODO: e.g. xml_version = '3.7'
+## TODO: Spec does not mention |null| case
+## TODO: Should we provide default?
+sub xml_version ($;$);
 
 ## |Entity| methods
 
@@ -229,4 +259,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/06/17 14:15:39 $
+## $Date: 2007/07/08 13:04:37 $

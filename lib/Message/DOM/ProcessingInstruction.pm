@@ -1,6 +1,6 @@
 package Message::DOM::ProcessingInstruction;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::ProcessingInstruction';
 require Message::DOM::Node;
 
@@ -61,8 +61,6 @@ sub AUTOLOAD {
     Carp::croak (qq<Can't locate method "$AUTOLOAD">);
   }
 } # AUTOLOAD
-sub target ($);
-sub data ($);
 
 ## |Node| attributes
 
@@ -92,15 +90,9 @@ sub child_nodes ($) {
   return bless \\($_[0]), 'Message::DOM::NodeList::EmptyNodeList';
 } # child_nodes
 
-## The target of the processing instruction [DOM1, DOM2].
-## Same as |ProcessingInstruction.target| [DOM3].
-
 *node_name = \&target;
 
 sub node_type () { 7 } # PROCESSING_INSTRUCTION_NODE
-
-## The entire content exclude the target [DOM1, DOM2].
-## Same as |ProcessingInstruction.data| [DOM3].
 
 *node_value = \&data;
 
@@ -145,6 +137,10 @@ sub replace_child ($$) {
 
 sub manakai_base_uri ($;$);
 
+sub data ($;$);
+
+sub target ($);
+
 package Message::IF::ProcessingInstruction;
 
 package Message::DOM::Document;
@@ -181,4 +177,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/08 05:42:37 $
+## $Date: 2007/07/08 13:04:37 $

@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 use strict;
 use Test;
-BEGIN { plan tests => 54 } 
+BEGIN { plan tests => 77 } 
 
 require Message::DOM::DOMImplementation;
 use Message::Util::Error;
@@ -11,7 +11,7 @@ my $doc = $dom->create_document;
 
 my $ent = $doc->create_general_entity ('entity');
 
-for my $prop (qw/has_replacement_tree/) {
+for my $prop (qw/has_replacement_tree is_externally_declared/) {
   ok $ent->can ($prop) ? 1 : 0, 1, 'can ' . $prop;
   
   for (1, 0, '') {
@@ -23,10 +23,11 @@ for my $prop (qw/has_replacement_tree/) {
   ok $ent->$prop ? 1 : 0, 0, $prop . ' undef';
 }
 
-for my $prop (qw/notation_name public_id system_id/) {
+for my $prop (qw/input_encoding notation_name public_id system_id/) {
   ok $ent->can ($prop) ? 1 : 0, 1, 'can ' . $prop;
   
   for ('-//...//EN', 'http://absuri.test/', 'reluri',
+       'utf-8', 'x-sjis',
        qq('illegal"), qq'\x{4E00}', ' ', 0, '') {
     $ent->$prop ($_);
     ok $ent->$prop, $_, $prop . $_;
@@ -124,4 +125,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2007/06/17 14:15:39 $
+## $Date: 2007/07/08 13:04:39 $

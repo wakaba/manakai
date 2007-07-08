@@ -1,6 +1,6 @@
 package Message::DOM::Attr;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::Attr';
 require Message::DOM::Node;
 
@@ -77,17 +77,11 @@ sub manakai_local_name ($) {
 
 sub namespace_uri ($);
 
-## The name of the attribute [DOM1, DOM2].
-## Same as |Attr.name| [DOM3].
-
 *node_name = \&name;
 
 sub node_type () { 2 } # ATTRIBUTE_NODE
 
-## The value of the attribute [DOM1, DOM2].
-## Same as |Attr.value| [DOM3].
-
-*node_value = \&value;
+*node_value = \&Message::DOM::Node::text_content;
 
 sub prefix ($;$) {
   ## NOTE: No check for new value as Firefox doesn't do.
@@ -477,10 +471,7 @@ sub specified ($;$) {
   return ${$_[0]}->{specified}; 
 } # specified
 
-sub value ($;$) {
-  ## TODO:
-  shift->text_content (@_);
-} # value
+*value = \&node_value;
 
 package Message::IF::Attr;
 
@@ -641,4 +632,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/08 05:42:36 $
+## $Date: 2007/07/08 13:04:36 $
