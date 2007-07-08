@@ -1,6 +1,6 @@
 package Message::DOM::ElementTypeDefinition;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::ElementTypeDefinition';
 require Message::DOM::Node;
 
@@ -89,12 +89,10 @@ sub replace_child ($$) {
 
 ## |ElementTypeDefinition| attributes
 
-## TODO:
-sub attribute_definitions {
-  use Want;
-  return {%{${$_[0]}->{attribute_definitions} or {}}} if want ('HASH');
-  return [values %{${$_[0]}->{attribute_definitions} or {}}];
-}
+sub attribute_definitions ($) {
+  require Message::DOM::NamedNodeMap;
+  return bless \[$_[0], 'attribute_definitions'], 'Message::DOM::NamedNodeMap';
+} # attribute_definitions
 
 ## |ElementTypeDefinition| methods
 
@@ -118,4 +116,4 @@ sub create_element_type_definition ($$) {
 
 1;
 ## License: <http://suika.fam.cx/~wakaba/archive/2004/8/18/license#Perl+MPL>
-## $Date: 2007/07/08 05:42:37 $
+## $Date: 2007/07/08 07:59:02 $

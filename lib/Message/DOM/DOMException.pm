@@ -1,6 +1,6 @@
 package Message::DOM::DOMException;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::Util::Error', 'Message::IF::DOMException';
 require Message::Util::Error;
 
@@ -13,6 +13,9 @@ sub ___error_def () {+{
       },
       CHILD_NODE_TYPE_ERR => {
         -description => q(This type of node cannot be inserted to this point),
+      },
+      INUSE_DEFINITION_ERR => {
+        -description => q(The node is already in use),
       },
     },
   },
@@ -137,4 +140,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/08 05:42:37 $
+## $Date: 2007/07/08 07:59:02 $

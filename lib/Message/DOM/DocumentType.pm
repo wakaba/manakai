@@ -1,6 +1,6 @@
 package Message::DOM::DocumentType;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.12 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::DocumentType',
     'Message::IF::DocumentTypeDefinition',
     'Message::IF::DocumentTypeDeclaration';
@@ -420,6 +420,16 @@ sub declaration_base_uri ($;$) {
 
 *manakai_declaration_base_uri = \&declaration_base_uri;
 
+sub entities ($) {
+  require Message::DOM::NamedNodeMap;
+  return bless \[$_[0], 'entities'], 'Message::DOM::NamedNodeMap';
+} # entities
+
+sub notations ($) {
+  require Message::DOM::NamedNodeMap;
+  return bless \[$_[0], 'notations'], 'Message::DOM::NamedNodeMap';
+} # notations
+
 ## NOTE: Setter is a manakai extension.
 sub public_id ($;$);
 
@@ -428,20 +438,14 @@ sub system_id ($;$);
 
 ## |DocumentTypeDefinition| attributes
 
-## TODO:
-sub element_types {
-  return [values %{${$_[0]}->{element_types} or {}}];
-}
+sub element_types ($) {
+  require Message::DOM::NamedNodeMap;
+  return bless \[$_[0], 'element_types'], 'Message::DOM::NamedNodeMap';
+} # element_types
 
-## TODO:
-sub general_entities {
-  return [values %{${$_[0]}->{entities} or {}}];
-}
+*general_entities = \&entities;
 
-## TODO:
-sub notations {
-  return [values %{${$_[0]}->{notations} or {}}];
-}
+# *notations = \&notations;
 
 ## |DocumentTypeDefinition| methods
 
@@ -537,4 +541,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/08 05:42:37 $
+## $Date: 2007/07/08 07:59:02 $

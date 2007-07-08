@@ -2,7 +2,7 @@
 
 package Message::DOM::Element;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::Element';
 require Message::DOM::Node;
 
@@ -67,19 +67,11 @@ sub AUTOLOAD {
   }
 } # AUTOLOAD
 
-## The |Node| interface - attributes
+## |Node| attributes
 
 sub attributes ($) {
-  my $self = shift;
-  my $r = []; ## TODO: NamedNodeMap
-  ## Order MUST be stable
-  for my $ns (sort {$a cmp $b} keys %{$$self->{attributes}}) {
-    for my $ln (sort {$a cmp $b} keys %{$$self->{attributes}->{$ns}}) {
-      push @$r, $$self->{attributes}->{$ns}->{$ln}
-        if defined $$self->{attributes}->{$ns}->{$ln};
-    }
-  }
-  return $r;
+  require Message::DOM::NamedNodeMap;
+  return bless \\($_[0]), 'Message::DOM::NamedNodeMap::AttrMap';
 } # attributes
 
 sub base_uri ($) {
@@ -699,4 +691,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/07 11:11:34 $
+## $Date: 2007/07/08 07:59:02 $
