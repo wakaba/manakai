@@ -1,6 +1,6 @@
 package Message::DOM::DocumentType;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.13 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.14 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::DocumentType',
     'Message::IF::DocumentTypeDefinition',
     'Message::IF::DocumentTypeDeclaration';
@@ -11,6 +11,9 @@ sub ____new ($$$$) {
   $$self->{implementation} = $_[0] if defined $_[0];
   $$self->{name} = $_[1];
   $$self->{child_nodes} = [];
+  $$self->{public_id} = '';
+  $$self->{system_id} = '';
+  $$self->{internal_subset} = '';
   return $self;
 } # ____new
              
@@ -503,8 +506,9 @@ use Char::Class::XML
       InXMLNCNameChar10
     /;
 
-sub create_document_type ($$;$$) {
-  ## TODO: Manakai allow publicId and systemId to be null
+sub create_document_type ($$$$) {
+  ## ISSUE: Old manakai has allowed publicId and systemId to be null.
+  ## Should we continue to do so?
 
   if ($_[1] =~ /\A\p{InXML_NameStartChar10}\p{InXMLNameChar10}*\z/) {
     if ($_[1] =~ /\A\p{InXML_NCNameStartChar10}\p{InXMLNCNameChar10}*(?>:\p{InXML_NCNameStartChar10}\p{InXMLNCNameChar10}*)?\z/) {
@@ -546,4 +550,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/08 13:04:37 $
+## $Date: 2007/07/12 13:54:46 $

@@ -1,3 +1,17 @@
+2007-07-12  Wakaba  <wakaba@suika.fam.cx>
+
+	* AttributeDefinition.pm (owner_element_type_definition): Implemented.
+
+	* DocumentType.pm (create_document_type_definition): Initialize
+	|public_id|, |system_id|, and |internal_subset| attributes
+	by empty strings for compatibility with Web browsers.
+	(create_document_type): Initialize |internal_subset|
+	attribute by an empty string for compatibility with
+	Web browsers.
+
+	* ElementTypeDefinition.pm, Entity.pm, 
+	Notation.pm (owner_document_type_definition): Implemented.
+
 2007-07-08  Wakaba  <wakaba@suika.fam.cx>
 
 	* DOMImplementation.pm ($HasFeature): |fe:XDoctypeDeclaration|

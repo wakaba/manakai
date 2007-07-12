@@ -410,7 +410,9 @@ my $tests = {
     },
   },
   document_type => {
-    node => sub { return $doc->implementation->create_document_type ('n') },
+    node => sub {
+      return $doc->implementation->create_document_type ('n', '', '');
+    },
     attr_get => {
       attributes => undef,
       base_uri => undef,
@@ -419,6 +421,7 @@ my $tests = {
       manakai_expanded_uri => undef,
       first_child => undef,
       implementation => $dom,
+      internal_subset => '',
       last_child => undef,
       local_name => undef,
       manakai_local_name => undef,
@@ -431,8 +434,8 @@ my $tests = {
       parent_node => undef,
       prefix => undef,
       previous_sibling => undef,
-      public_id => undef,
-      system_id => undef,
+      public_id => '',
+      system_id => '',
     },
     attr_get_bool => {
       has_attributes => 0,
@@ -450,6 +453,7 @@ my $tests = {
       manakai_expanded_uri => undef,
       first_child => undef,
       implementation => $dom,
+      internal_subset => '',
       last_child => undef,
       local_name => undef,
       manakai_local_name => undef,
@@ -462,8 +466,8 @@ my $tests = {
       parent_node => undef,
       prefix => undef,
       previous_sibling => undef,
-      public_id => undef,
-      system_id => undef,
+      public_id => '',
+      system_id => '',
     },
     attr_get_bool => {
       has_attributes => 0,
@@ -572,6 +576,7 @@ my $tests = {
       node_value => undef,
       notation_name => undef,
       owner_document => $doc,
+      owner_document_type_definition => undef,
       parent_node => undef,
       previous_sibling => undef,
       public_id => undef,
@@ -629,6 +634,7 @@ my $tests = {
       node_type => 12,
       node_value => undef,
       owner_document => $doc,
+      owner_document_type_definition => undef,
       parent_node => undef,
       prefix => undef,
       previous_sibling => undef,
@@ -711,6 +717,7 @@ my $tests = {
       node_type => 81001,
       node_value => undef,
       owner_document => $doc,
+      owner_document_type_definition => undef,
       parent_node => undef,
       prefix => undef,
       previous_sibling => undef,
@@ -739,6 +746,7 @@ my $tests = {
       node_type => 81002,
       node_value => undef,
       owner_document => $doc,
+      owner_element_type_definition => undef,
       parent_node => undef,
       prefix => undef,
       previous_sibling => undef,
@@ -1987,4 +1995,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2007/07/08 13:04:39 $
+## $Date: 2007/07/12 13:54:47 $

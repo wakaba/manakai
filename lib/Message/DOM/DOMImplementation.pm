@@ -1,6 +1,6 @@
 package Message::DOM::DOMImplementation;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::IF::DOMImplementation';
 require Message::DOM::DOMException;
 
@@ -67,7 +67,7 @@ sub ___report_error { $_[1]->throw }
 
 sub create_document ($;$$$);
 
-sub create_document_type ($$;$$);
+sub create_document_type ($$$$);
 
 sub get_feature ($$;$) {
   my $feature = lc $_[1]; ## TODO: What |lc|?
@@ -98,4 +98,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/08 13:42:42 $
+## $Date: 2007/07/12 13:54:46 $

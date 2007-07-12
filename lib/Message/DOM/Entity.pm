@@ -1,6 +1,6 @@
 package Message::DOM::Entity;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::Entity';
 require Message::DOM::Node;
 
@@ -19,6 +19,7 @@ sub AUTOLOAD {
   if ({
     ## Read-only attributes (trivial accessors)
     node_name => 1,
+    owner_document_type_definition => 1,
   }->{$method_name}) {
     no strict 'refs';
     eval qq{
@@ -221,6 +222,9 @@ sub is_externally_declared ($;$);
 ## NOTE: Setter is a manakai extension.
 sub notation_name ($;$);
 
+## NOTE: A manakai extension.
+sub owner_document_type_definition ($);
+
 ## NOTE: Setter is a manakai extension.
 sub public_id ($;$);
 
@@ -259,4 +263,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/08 13:04:37 $
+## $Date: 2007/07/12 13:54:46 $

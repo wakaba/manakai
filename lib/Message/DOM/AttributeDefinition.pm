@@ -1,6 +1,6 @@
 package Message::DOM::AttributeDefinition;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::AttributeDefinition';
 require Message::DOM::Node;
 require Message::DOM::Attr;
@@ -21,6 +21,7 @@ sub AUTOLOAD {
   if ({
     ## Read-only attributes (trivial accessors)
     node_name => 1,
+    owner_element_type_definition => 1,
   }->{$method_name}) {
     no strict 'refs';
     eval qq{
@@ -137,17 +138,24 @@ sub default_type ($;$) {
   return $$self->{default_type} || 0;
 } # default_type
 
+sub owner_element_type_definition ($);
+
 package Message::IF::AttributeDefinition;
 
 package Message::DOM::Document;
-
-## Spec: 
-## <http://suika.fam.cx/gate/2005/sw/DocumentXDoctype>
 
 sub create_attribute_definition ($$) {
   return Message::DOM::AttributeDefinition->____new (@_[0, 1]);
 } # create_attribute_definition
 
+=head1 LICENSE
+
+Copyright 2007 Wakaba <w@suika.fam.cx>
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut
+
 1;
-## License: <http://suika.fam.cx/~wakaba/archive/2004/8/18/license#Perl+MPL>
-## $Date: 2007/07/08 13:04:36 $
+## $Date: 2007/07/12 13:54:46 $
