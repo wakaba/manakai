@@ -1,6 +1,6 @@
 package Message::DOM::NamedNodeMap;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::IF::NamedNodeMap';
 require Message::DOM::DOMException;
 require Tie::Array;
@@ -47,6 +47,8 @@ use overload
 sub ___report_error ($$) {
   $_[1]->throw;
 } # ___report_error
+
+sub TIEHASH ($$) { $_[1] }
 
 ## |NamedNodeMap| attributes
 
@@ -267,6 +269,8 @@ use overload
     },
     fallback => 1;
 
+sub TIEHASH ($$) { $_[1] }
+
 ## |NamedNodeMap| attributes
 
 sub length ($) {
@@ -439,4 +443,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/08 07:59:02 $
+## $Date: 2007/07/14 10:00:32 $

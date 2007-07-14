@@ -1,6 +1,6 @@
 package Message::DOM::DOMConfiguration;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::IF::DOMConfiguration';
 require Message::DOM::DOMException;
 
@@ -30,13 +30,13 @@ sub TIEHASH ($$) { $_[1] }
 
 my %names = (
              'error-handler' => 1,
+             'schema-type' => 1,
              q<http://suika.fam.cx/www/2006/dom-config/clone-entity-reference-subtree> => 1,
              q<http://suika.fam.cx/www/2006/dom-config/dtd-attribute-type> => 1,
              q<http://suika.fam.cx/www/2006/dom-config/dtd-default-attribute> => 1,
              q<http://suika.fam.cx/www/2006/dom-config/strict-document-children> => 1,
+             q<http://suika.fam.cx/www/2006/dom-config/xml-id> => 1,
 );
-  ## http://suika.fam.cx/www/2006/dom-config/xml-id
-  ## xml-dtd
 
 sub parameter_names ($) {
   require Message::DOM::DOMStringList;
@@ -49,10 +49,12 @@ sub parameter_names ($) {
 sub can_set_parameter ($$;$) {
   my $name = ''.$_[1];
   if ({
+       'schema-type' => 1,
        q<http://suika.fam.cx/www/2006/dom-config/clone-entity-reference-subtree> => 1,
        q<http://suika.fam.cx/www/2006/dom-config/dtd-attribute-type> => 1,
        q<http://suika.fam.cx/www/2006/dom-config/dtd-default-attribute> => 1,
        q<http://suika.fam.cx/www/2006/dom-config/strict-document-children> => 1,
+       q<http://suika.fam.cx/www/2006/dom-config/xml-id> => 1,
       }->{$name}) {
     return 1;
   } elsif ($name eq 'error-handler') {
@@ -66,10 +68,12 @@ sub can_set_parameter ($$;$) {
 sub get_parameter ($$) {
   my $name = ''.$_[1];
   if ({
+       'schema-type' => 1,
        q<http://suika.fam.cx/www/2006/dom-config/clone-entity-reference-subtree> => 1,
        q<http://suika.fam.cx/www/2006/dom-config/dtd-attribute-type> => 1,
        q<http://suika.fam.cx/www/2006/dom-config/dtd-default-attribute> => 1,
        q<http://suika.fam.cx/www/2006/dom-config/strict-document-children> => 1,
+       q<http://suika.fam.cx/www/2006/dom-config/xml-id> => 1,
        'error-handler' => 1,
       }->{$name}) {
     return ${$${$_[0]}}->{$name};    
@@ -92,6 +96,7 @@ sub set_parameter ($$;$) {
          q<http://suika.fam.cx/www/2006/dom-config/dtd-attribute-type> => 1,
          q<http://suika.fam.cx/www/2006/dom-config/dtd-default-attribute> => 1,
          q<http://suika.fam.cx/www/2006/dom-config/strict-document-children> => 1,
+         q<http://suika.fam.cx/www/2006/dom-config/xml-id> => 1,
         }->{$name}) {
       if ($_[2]) {
         ${$${$_[0]}}->{$name} = 1;
@@ -107,20 +112,27 @@ sub set_parameter ($$;$) {
             -type => 'TYPE_MISMATCH_ERR',
             -subtype => 'CONFIGURATION_PARAMETER_TYPE_ERR';
       }
+    } elsif ($name eq 'schema-type') {
+      ${$${$_[0]}}->{$name} = ''.$_[2];
     } else {
       report Message::DOM::DOMException
           -object => $_[0],
           -type => 'NOT_FOUND_ERR',
           -subtype => 'UNRECOGNIZED_CONFIGURATION_PARAMETER_ERR';
     }
-  } else {
+  } else { # reset
     if ({
          q<http://suika.fam.cx/www/2006/dom-config/clone-entity-reference-subtree> => 1,
          q<http://suika.fam.cx/www/2006/dom-config/dtd-attribute-type> => 1,
          q<http://suika.fam.cx/www/2006/dom-config/dtd-default-attribute> => 1,
          q<http://suika.fam.cx/www/2006/dom-config/strict-document-children> => 1,
+         q<http://suika.fam.cx/www/2006/dom-config/xml-id> => 1,
         }->{$name}) {
       ${$${$_[0]}}->{$name} = 1;
+    } elsif ({
+              'schema-type' => 1,
+        }->{$name}) {
+      delete ${$${$_[0]}}->{$name};
     } elsif ($_[1] eq 'error-handler') {
       ${$${$_[0]}}->{$name} = sub ($) {
         ## NOTE: Same as one set by |Document| constructor.
@@ -166,4 +178,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/14 09:19:11 $
+## $Date: 2007/07/14 10:00:32 $

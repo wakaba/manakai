@@ -1,6 +1,6 @@
 package Message::DOM::Text;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::CharacterData', 'Message::IF::Text';
 require Message::DOM::DOMCharacterData; ## TODO: Change to new module name
 
@@ -69,6 +69,8 @@ sub whole_text ($) {
 
 ## |Text| methods
 
+## TODO: replace_whole_text
+
 sub split_text ($;$) {
   my $parent = $_[0]->parent_node;
   if (${${$_[0]}->{owner_document}}->{strict_error_checking}) {
@@ -124,4 +126,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/08 13:04:37 $
+## $Date: 2007/07/14 10:00:32 $
