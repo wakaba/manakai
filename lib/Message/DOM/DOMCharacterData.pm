@@ -2,7 +2,7 @@
 
 package Message::DOM::CharacterData;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::CharacterData';
 require Message::DOM::Node;
 use Message::Util::Error;
@@ -295,7 +295,23 @@ sub substring_data ($;$$) {
   return substr $$self->{data}, $offset32, $eoffset32 - $offset32;
 } # substring_data
 
+package Message::DOM::CharacterData::Comment;
+push our @ISA, 'Message::DOM::CharacterData', 'Message::IF::Comment';
+
+## |Node| attributes
+
+sub node_name () { '#comment' }
+
+sub node_type () { 8 } # COMMENT_NODE
+
 package Message::IF::CharacterData;
+package Message::IF::Comment;
+
+package Message::DOM::Document;
+
+sub create_comment ($$) {
+  return Message::DOM::CharacterData::Comment->____new ($_[0], $_[1]);
+} # create_comment
 
 =head1 LICENSE
 
@@ -307,4 +323,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/08 11:28:45 $
+## $Date: 2007/07/14 10:28:52 $

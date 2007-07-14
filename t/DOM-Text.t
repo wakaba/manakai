@@ -92,6 +92,30 @@ my $doc = $dom->create_document;
   ok $text4->whole_text, 'text1text3text4', 'whole_text [17]';
 }
 
+## |CDATASection| |splitText|
+{
+  my $node = $doc->create_cdata_section ('abcdefg');
+
+  my $return = $node->split_text (3);
+  
+  ok $node->node_value, 'abc', 'split_text A [1]';
+  ok $return->node_type, 4, 'split_text B.node_type [1]';
+  ok $return->node_value, 'defg', 'split_text B [1]';
+  ok $return->parent_node, undef, 'split_text B.parent_node [1]';
+
+  $node->node_value ('abcdefg');
+  my $el = $doc->create_element ('e');
+  $el->append_child ($node);
+
+  $return = $node->split_text (3);
+
+  ok $node->node_value, 'abc', 'split_text A [2]';
+  ok $return->node_type, 4, 'split_text B.node_type [2]';
+  ok $return->node_value, 'defg', 'split_text B [2]';
+  ok $return->parent_node, $el, 'split_text B.parent_node [2]';
+  ok $return->previous_sibling, $node, 'split_text B.ps [2]';
+}
+
 =head1 LICENSE
 
 Copyright 2007 Wakaba <w@suika.fam.cx>
@@ -101,4 +125,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2007/07/08 11:28:45 $
+## $Date: 2007/07/14 10:28:52 $

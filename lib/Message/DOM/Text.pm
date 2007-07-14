@@ -1,6 +1,6 @@
 package Message::DOM::Text;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::CharacterData', 'Message::IF::Text';
 require Message::DOM::DOMCharacterData; ## TODO: Change to new module name
 
@@ -108,9 +108,27 @@ sub split_text ($;$) {
   return $r;
 } # split_text
 
+package Message::DOM::Text::CDATASection;
+push our @ISA, 'Message::DOM::Text', 'Message::IF::CDATASection';
+
+## |Node| attributes
+
+sub node_name () { '#cdata-section' }
+
+sub node_type () { 4 } # CDATA_SECTION_NODE
+
+## |Text| attribute
+
+sub is_element_content_whitespace () { 0 }
+
 package Message::IF::Text;
+package Message::IF::CDATASection;
 
 package Message::DOM::Document;
+
+sub create_cdata_section ($$) {
+  return Message::DOM::Text::CDATASection->____new (@_[0, 1]);
+} # create_cdata_section
 
 sub create_text_node ($$) {
   return Message::DOM::Text->____new ($_[0], $_[1]);
@@ -126,4 +144,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/14 10:00:32 $
+## $Date: 2007/07/14 10:28:52 $

@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 use strict;
 use Test;
-BEGIN { plan tests => 4693 } 
+BEGIN { plan tests => 4918 } 
 
 require Message::DOM::DOMImplementation;
 use Message::Util::Error;
@@ -41,6 +41,16 @@ sub create_parent_nodes () {
    $doc->create_document_type_definition ('dt1'),
   );
 } # create_parent_nodes
+
+sub create_leaf_nodes () {
+  (
+   $doc->create_cdata_section ('cdata1'),
+   $doc->create_comment ('comment1'),
+   $doc->create_notation ('notation1'),
+   $doc->create_processing_instruction ('pi1', 'pi1data'),
+   $doc->create_text_node ('text1'),
+  );
+} # create_leaf_nodes
 
 ## Constants
 my $constants = [
@@ -489,7 +499,6 @@ my $tests = {
   element => {
     node => sub { return $doc->create_element ('e') },
     attr_get => {
-      ## TODO: attributes => 
       base_uri => undef,
       manakai_base_uri => undef,
       manakai_expanded_uri => 'e',
@@ -517,7 +526,6 @@ my $tests = {
   element_ns_default => {
     node => sub { return $doc->create_element_ns ('http://test/', 'f') },
     attr_get => {
-      ## TODO: attributes => 
       base_uri => undef,
       manakai_base_uri => undef,
       manakai_expanded_uri => 'http://test/f',
@@ -545,7 +553,6 @@ my $tests = {
   element_ns_prefiexed => {
     node => sub { return $doc->create_element_ns ('http://test/', 'e:f') },
     attr_get => {
-      ## TODO: attributes => 
       base_uri => undef,
       manakai_base_uri => undef,
       manakai_expanded_uri => 'http://test/f',
@@ -1972,6 +1979,35 @@ for my $node (create_nodes ()) {
   ok 0+@{$el->child_nodes}, 0, 'Node->remove_child child_nodes [4]';
 }
 
+## |appendChild|, |insertBefore|, |replaceChild|
+for my $node (create_leaf_nodes) {
+  for my $method_name (qw/append_child insert_before replace_child/) {
+    ok $node->can ($method_name) ? 1 : 0, 1,
+        $node->node_name . '->can ' . $method_name;
+
+    for my $node2 (create_nodes) {
+      try {
+        if ($method_name eq 'replace_child') {
+          $node->replace_child ($node2, $node2);
+        } else {
+          $node->$method_name ($node2);
+        }
+        ok 1, 0,
+            $node->node_name . '->' . $method_name . ' ' . $node2->node_name;
+      } catch Message::IF::DOMException with {
+        if ($_[0]->type eq 'HIERARCHY_REQUEST_ERR' or
+            ($_[0]->type eq 'WRONG_DOCUMENT_ERR' and
+             ($node2->owner_document or $node2) ne $doc) or
+            ($_[0]->type eq 'NOT_FOUND_ERR' and
+             $method_name eq 'replace_child')) {
+          ok 1, 1,
+            $node->node_name . '->' . $method_name . ' ' . $node2->node_name;
+        }
+      };
+    }
+  }
+}
+
 ## TODO: parent_node tests, as with append_child tests
 
 ## TODO: text_content tests for CharacterData and PI
@@ -2008,4 +2044,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2007/07/14 09:19:11 $
+## $Date: 2007/07/14 10:28:52 $

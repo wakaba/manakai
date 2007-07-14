@@ -2,7 +2,7 @@
 
 package Message::DOM::Document;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.12 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.13 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::Document',
     'Message::IF::DocumentXDoctype',
     'Message::IF::HTMLDocument';
@@ -102,8 +102,8 @@ sub AUTOLOAD {
     create_attribute => 'Message::DOM::Attr',
     create_attribute_ns => 'Message::DOM::Attr',
     create_attribute_definition => 'Message::DOM::AttributeDefinition',
-    create_cdata_section => 'Message::DOM::CDATASection',
-    create_comment => 'Message::DOM::Comment',
+    create_cdata_section => 'Message::DOM::Text',
+    create_comment => 'Message::DOM::DOMCharacterData', ## TODO: change module name
     create_document_fragment => 'Message::DOM::DocumentFragment',
     create_document_type_definition => 'Message::DOM::DocumentType',
     create_element => 'Message::DOM::DOMElement', ## TODO: change module name
@@ -1143,4 +1143,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/14 09:19:11 $
+## $Date: 2007/07/14 10:28:52 $
