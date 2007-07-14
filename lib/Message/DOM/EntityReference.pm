@@ -1,11 +1,8 @@
 package Message::DOM::EntityReference;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::EntityReference';
 require Message::DOM::Node;
-
-## Spec:
-## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-11C98490>
 
 sub ____new ($$$) {
   my $self = shift->SUPER::____new (shift);
@@ -194,4 +191,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/07 11:11:34 $
+## $Date: 2007/07/14 09:19:11 $

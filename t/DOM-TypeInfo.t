@@ -1,13 +1,26 @@
 #!/usr/bin/perl
 use strict;
 use Test;
-BEGIN { plan tests => 50 } 
+BEGIN { plan tests => 58 } 
 
 require Message::DOM::DOMImplementation;
 use Message::Util::Error;
 
 my $dom = Message::DOM::DOMImplementation->____new;
 my $doc = $dom->create_document;
+
+for (
+     [DERIVATION_RESTRICTION => 0x00000001],
+     [DERIVATION_EXTENSION => 0x00000002],
+     [DERIVATION_UNION => 0x00000004],
+     [DERIVATION_LIST => 0x00000008],
+    ) {
+  my $el = $doc->create_element ('e');
+  my $ti = $el->schema_type_info;
+  my $name = $_->[0];
+  ok $ti->can ($name) ? 1 : 0, 1, 'TypeInfo->can ' . $name;
+  ok $ti->$name, $_->[1], 'TypeInfo->' . $name;
+}
 
 ## "eq" and "ne"
 {
@@ -52,4 +65,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2007/07/14 06:12:56 $
+## $Date: 2007/07/14 09:19:11 $

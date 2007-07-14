@@ -1,6 +1,6 @@
 package Message::DOM::Node;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.13 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.14 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::IF::Node';
 require Scalar::Util;
 require Message::DOM::DOMException;
@@ -61,6 +61,14 @@ sub DOCUMENT_POSITION_FOLLOWING () { 0x04 }
 sub DOCUMENT_POSITION_CONTAINS () { 0x08 }
 sub DOCUMENT_POSITION_CONTAINED_BY () { 0x10 }
 sub DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC () { 0x20 }
+
+## TODO: Define |UserDataHandler| Perl bindig
+## OperationType
+sub NODE_CLONED () { 1 }
+sub NODE_IMPORTED () { 2 }
+sub NODE_DELETED () { 3 }
+sub NODE_RENAMED () { 4 }
+sub NODE_ADOPTED () { 5 }
 
 sub ____new ($$) {
   my $self = bless \({}), shift;
@@ -137,6 +145,52 @@ sub first_child ($) {
   my $self = shift;
   return $$self->{child_nodes} ? $$self->{child_nodes}->[0] : undef;
 } # first_child
+
+sub manakai_language ($;$) {
+  my $self = $_[0];
+
+  if (@_ > 1) {
+    local $Error::Depth = $Error::Depth + 1;
+    if ($self->node_type == 1) { # ELEMENT_NODE
+      if (defined $_[1]) {
+        if ($self->has_attribute_ns (undef, 'xml:lang')) {
+          $self->set_attribute_ns (undef, [undef, 'xml:lang'] => $_[1]);
+              # or exception
+        } else {
+          $self->set_attribute_ns
+              (q<http://www.w3.org/XML/1998/namespace>, 'xml:lang', $_[1]);
+        }
+      } else {
+        $self->remove_attribute_ns
+            (q<http://www.w3.org/XML/1998/namespace>, 'lang');
+        $self->remove_attribute_ns (undef, 'xml:lang');
+      }
+    }
+    
+    return undef unless defined wantarray;
+  }
+
+  my $target = $self;
+  while (defined $target) {
+    if ($target->node_Type == 1) { # ELEMENT_NODE
+      my $r = $target->get_attribute_ns
+          (q<http://www.w3.org/XML/1998/namespace>, 'lang');
+      return $r if defined $r;
+      
+      $r = $target->get_attribute_ns (undef, 'xml:lang');
+      return $r if defined $r;
+    }
+    
+    $target = $target->parent_node;
+  }
+
+  ## TODO: from ownerDocument
+  ## TODO: from upper-level protocol
+
+  ## TODO: Documentation
+   
+  return '';
+} # manakai_language
 
 sub last_child ($) {
   my $self = shift;
@@ -1334,4 +1388,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/08 13:04:37 $
+## $Date: 2007/07/14 09:19:11 $

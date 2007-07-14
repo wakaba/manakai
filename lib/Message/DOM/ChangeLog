@@ -1,5 +1,47 @@
 2007-07-14  Wakaba  <wakaba@suika.fam.cx>
 
+	* AttributeDefinition.pm (node_value): Implemented.
+	(create_attribute_definition): Implemented.
+
+	* DOMConfiguration.pm (%{}, TIEHASH,
+	get_parameter, set_parameter, can_set_parameter,
+	EXISTS, DELETE, parameter_names, FETCH, STORE,
+	FIRSTKEY, LASTKEY): Implemented.
+
+	* DOMDocument.pm (____new): Set |error-handler| default.
+	(get_elements_by_tag_name, get_elements_by_tag_name_ns): Implemented.
+
+	* DOMElement.pm (get_elements_by_tag_name, get_elements_by_tag_name_ns):
+	Implemented.
+
+	* DOMException.pm: Error types for |DOMConfiguration|
+	are added.
+
+	* DOMStringList.pm (Message::DOM::DOMStringList::StaticList): New
+	class.
+
+	* DocumentType.pm (get_element_type_definition_node,
+	get_general_entity_node, get_notation_node,
+	set_element_type_definition_node, set_general_entity_node,
+	set_notation_node, create_document_type_definition): Implemented.
+
+	* ElementTypeDefinition.pm (get_attribute_definition_node,
+	set_attribute_definition_node, create_element_type_definition):
+	Implemented.
+
+	* Entity.pm (create_general_entity): Implemented.
+
+	* Node.pm: Constants in |OperationType| definition
+	group are added.
+	(manakai_language): Implemented.
+
+	* NodeList.pm (Message::DOM::NodeList::GetElementsList): New
+	class.
+
+	* Notation.pm (create_notation): Implemented.
+
+2007-07-14  Wakaba  <wakaba@suika.fam.cx>
+
 	* TypeInfo.pm: New Perl module.
 
 	* Attr.pm: Use |manakai_local_name| rather than |local_name|

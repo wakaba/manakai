@@ -1,6 +1,6 @@
 package Message::DOM::DocumentType;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.14 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.15 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::DocumentType',
     'Message::IF::DocumentTypeDefinition',
     'Message::IF::DocumentTypeDeclaration';
@@ -457,41 +457,155 @@ sub element_types ($) {
 
 ## |DocumentTypeDefinition| methods
 
-## TODO:
-sub get_element_type_definition_node {
+sub get_element_type_definition_node ($$) {
   return ${$_[0]}->{element_types}->{$_[1]};
-}
+} # get_element_type_definition_node
 
-## TODO:
-sub get_general_entity_node {
+sub get_general_entity_node ($$) {
   return ${$_[0]}->{entities}->{$_[1]};
-}
+} # get_general_entity_node
 
-## TODO:
-sub get_notation_node {
+sub get_notation_node ($$) {
   return ${$_[0]}->{notations}->{$_[1]};
-}
+} # get_notation_node
 
-## TODO:
-sub set_element_type_definition_node {
-  ${$_[0]}->{element_types}->{$_[1]->node_name} = $_[1];
-  ${$_[1]}->{owner_document_type_definition} = $_[0];
-  Scalar::Util::weaken (${$_[1]}->{owner_document_type_definition});
-}
+sub set_element_type_definition_node ($$) {
+  my $self = $_[0];
+  my $node = $_[1];
 
-## TODO:
-sub set_general_entity_node {
-  ${$_[0]}->{entities}->{$_[1]->node_name} = $_[1];
-  ${$_[1]}->{owner_document_type_definition} = $_[0];
-  Scalar::Util::weaken (${$_[1]}->{owner_document_type_definition});
-}
+  my $name = $node->node_name;
+  my $list = $$self->{element_types} ||= {}; # ***
+  my $r = $list->{$name};
 
-## TODO:
-sub set_notation_node {
-  ${$_[0]}->{notations}->{$_[1]->node_name} = $_[1];
-  ${$_[1]}->{owner_document_type_definition} = $_[0];
-  Scalar::Util::weaken (${$_[1]}->{owner_document_type_definition});
-}
+  if (defined $r and $r eq $node) {
+    return undef; # no effect
+  }
+
+  my $od = $$self->{owner_document};
+  if ($$od->{strict_error_checking}) {
+    if ($$self->{manakai_read_only}) {
+      report Message::DOM::DOMException
+          -object => $self,
+          -type => 'NO_MODIFICATION_ALLOWED_ERR',
+          -subtype => 'READ_ONLY_NODE_ERR';
+    }
+
+    if ($od ne $node->owner_document) {
+      report Message::DOM::DOMException
+          -object => $self,
+          -type => 'WRONG_DOCUMENT_ERR',
+          -subtype => 'EXTERNAL_OBJECT_ERR';
+    }
+
+    my $owner = $$node->{owner_document_type_definition}; # ***
+    if ($owner) {
+      report Message::DOM::DOMException
+          -object => $self,
+          -type => 'HIERARCHY_REQUEST_ERR',
+          -subtype => 'INUSE_DEFINITION_ERR';
+    }
+  }
+
+  if (defined $r) {
+    delete $$r->{owner_document_type_definition}; # ***
+  }
+
+  $list->{$name} = $node;
+  $$node->{owner_document_type_definition} = $self; # ***
+  Scalar::Util::weaken ($$node->{owner_document_type_definition}); # ***
+} # set_element_type_definition_node
+
+sub set_general_entity_node ($$) {
+  my $self = $_[0];
+  my $node = $_[1];
+
+  my $name = $node->node_name;
+  my $list = $$self->{entities} ||= {}; # ***
+  my $r = $list->{$name};
+
+  if (defined $r and $r eq $node) {
+    return undef; # no effect
+  }
+
+  my $od = $$self->{owner_document};
+  if ($$od->{strict_error_checking}) {
+    if ($$self->{manakai_read_only}) {
+      report Message::DOM::DOMException
+          -object => $self,
+          -type => 'NO_MODIFICATION_ALLOWED_ERR',
+          -subtype => 'READ_ONLY_NODE_ERR';
+    }
+
+    if ($od ne $node->owner_document) {
+      report Message::DOM::DOMException
+          -object => $self,
+          -type => 'WRONG_DOCUMENT_ERR',
+          -subtype => 'EXTERNAL_OBJECT_ERR';
+    }
+
+    my $owner = $$node->{owner_document_type_definition}; # ***
+    if ($owner) {
+      report Message::DOM::DOMException
+          -object => $self,
+          -type => 'HIERARCHY_REQUEST_ERR',
+          -subtype => 'INUSE_DEFINITION_ERR';
+    }
+  }
+
+  if (defined $r) {
+    delete $$r->{owner_document_type_definition}; # ***
+  }
+
+  $list->{$name} = $node;
+  $$node->{owner_document_type_definition} = $self; # ***
+  Scalar::Util::weaken ($$node->{owner_document_type_definition}); # ***
+} # set_general_entity_node
+
+sub set_notation_node ($$) {
+  my $self = $_[0];
+  my $node = $_[1];
+
+  my $name = $node->node_name;
+  my $list = $$self->{notations} ||= {}; # ***
+  my $r = $list->{$name};
+
+  if (defined $r and $r eq $node) {
+    return undef; # no effect
+  }
+
+  my $od = $$self->{owner_document};
+  if ($$od->{strict_error_checking}) {
+    if ($$self->{manakai_read_only}) {
+      report Message::DOM::DOMException
+          -object => $self,
+          -type => 'NO_MODIFICATION_ALLOWED_ERR',
+          -subtype => 'READ_ONLY_NODE_ERR';
+    }
+
+    if ($od ne $node->owner_document) {
+      report Message::DOM::DOMException
+          -object => $self,
+          -type => 'WRONG_DOCUMENT_ERR',
+          -subtype => 'EXTERNAL_OBJECT_ERR';
+    }
+
+    my $owner = $$node->{owner_document_type_definition}; # ***
+    if ($owner) {
+      report Message::DOM::DOMException
+          -object => $self,
+          -type => 'HIERARCHY_REQUEST_ERR',
+          -subtype => 'INUSE_DEFINITION_ERR';
+    }
+  }
+
+  if (defined $r) {
+    delete $$r->{owner_document_type_definition}; # ***
+  }
+
+  $list->{$name} = $node;
+  $$node->{owner_document_type_definition} = $self; # ***
+  Scalar::Util::weaken ($$node->{owner_document_type_definition}); # ***
+} # set_notation_node
 
 package Message::IF::DocumentType;
 package Message::IF::DocumentTypeDefinition;
@@ -537,7 +651,27 @@ sub create_document_type ($$$$) {
 package Message::DOM::Document;
 
 sub create_document_type_definition ($$) {
-  return Message::DOM::DocumentType->____new ($_[0], undef, $_[1]);
+  if (${$_[0]}->{strict_error_checking}) {
+    my $xv = $_[0]->xml_version;
+    if (defined $xv) {
+      if ($xv eq '1.0' and
+          $_[1] =~ /\A\p{InXML_NameStartChar10}\p{InXMLNameChar10}*\z/) {
+        #
+      } elsif ($xv eq '1.1' and
+               $_[1] =~ /\A\p{InXMLNameStartChar11}\p{InXMLNameChar11}*\z/) {
+        #
+      } else {
+        report Message::DOM::DOMException
+            -object => $_[0],
+            -type => 'INVALID_CHARACTER_ERR',
+            -subtype => 'MALFORMED_NAME_ERR';
+      }
+    }
+  }
+
+  my $r = Message::DOM::DocumentType->____new ($_[0], undef, $_[1]);
+  $$r->{manakai_has_predefined_entity_declaration} = 1;
+  return $r;
 } # create_document_type_definition
 
 =head1 LICENSE
@@ -550,4 +684,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/12 13:54:46 $
+## $Date: 2007/07/14 09:19:11 $

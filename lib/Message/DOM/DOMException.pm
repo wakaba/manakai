@@ -1,6 +1,6 @@
 package Message::DOM::DOMException;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.12 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.13 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::Util::Error', 'Message::IF::DOMException';
 require Message::Util::Error;
 
@@ -13,6 +13,7 @@ sub ___error_def () {+{
       },
     },
   },
+  # DOMSTRING_SIZE_ERR == 2
   HIERARCHY_REQUEST_ERR => {
     -code => 3,
     -subtype => {
@@ -46,6 +47,7 @@ sub ___error_def () {+{
       },
     },
   },
+  # NO_DATA_ALLOWED_ERR == 6
   NO_MODIFICATION_ALLOWED_ERR => {
     -code => 7,
     -subtype => {
@@ -63,6 +65,9 @@ sub ___error_def () {+{
       NOT_CHILD_ERR => {
         -description => q(Not a child of this node),
       },
+      UNRECOGNIZED_CONFIGURATION_PARAMETER_ERR => {
+        -description => q(Unrecognized configuration parameter is specified),
+      },
     },
   },
   NOT_SUPPORTED_ERR => {
@@ -73,6 +78,9 @@ sub ___error_def () {+{
       },
       CLONE_NODE_TYPE_NOT_SUPPORTED_ERR => {
         -description => q(Can't clone specified type of node),
+      },
+      CONFIGURATION_PARAMETER_VALUE_ERR => { ## TODO: Necessary?
+        -description => q(Can't set the value to the configuration parameter),
       },
       NON_HTML_OPERATION_ERR => {
         -description => q(Can't apply to HTML document),
@@ -86,6 +94,9 @@ sub ___error_def () {+{
     -code => 10,
     -description => q(Attribute is already in use),
   },
+  # INVALID_STATE_ERR == 11
+  # SYNTAX_ERR == 12
+  # INVALID_MODIFICATION_ERR == 13
   NAMESPACE_ERR => {
     -code => 14,
     -subtype => {
@@ -109,6 +120,16 @@ sub ___error_def () {+{
       },
       XMLPREFIX_NONXMLNS_ERR => {
         -description => q(Namespace prefix "xml" cannot be used for namespace URI other than <http://www.w3.org/XML/1998/namespace>),
+      },
+    },
+  },
+  # INVALID_ACCESS_ERR == 15
+  # VALIDATION_ERR == 16
+  TYPE_MISMATCH_ERR => {
+    -code => 17,
+    -subtype => {
+      CONFIGURATION_PARAMETER_TYPE_ERR => {
+        -description => q(The value type for this configuration parameter is incompatible with the specified value),
       },
     },
   },
@@ -148,4 +169,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/08 11:28:45 $
+## $Date: 2007/07/14 09:19:11 $

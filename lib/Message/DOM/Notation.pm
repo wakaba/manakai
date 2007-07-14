@@ -1,6 +1,6 @@
 package Message::DOM::Notation;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::Notation';
 require Message::DOM::Node;
 
@@ -145,6 +145,24 @@ package Message::IF::Notation;
 package Message::DOM::Document;
 
 sub create_notation ($$) {
+  if (${$_[0]}->{strict_error_checking}) {
+    my $xv = $_[0]->xml_version;
+    if (defined $xv) {
+      if ($xv eq '1.0' and
+          $_[1] =~ /\A\p{InXML_NameStartChar10}\p{InXMLNameChar10}*\z/) {
+        #
+      } elsif ($xv eq '1.1' and
+               $_[1] =~ /\A\p{InXMLNameStartChar11}\p{InXMLNameChar11}*\z/) {
+        #
+      } else {
+        report Message::DOM::DOMException
+            -object => $_[0],
+            -type => 'INVALID_CHARACTER_ERR',
+            -subtype => 'MALFORMED_NAME_ERR';
+      }
+    }
+  }
+
   return Message::DOM::Notation->____new (@_[0, 1]);
 } # create_notation
 
@@ -158,4 +176,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/12 13:54:46 $
+## $Date: 2007/07/14 09:19:11 $

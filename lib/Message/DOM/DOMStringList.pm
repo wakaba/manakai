@@ -1,6 +1,6 @@
 package Message::DOM::DOMStringList;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Tie::Array', 'Message::IF::DOMStringList';
 require Tie::Array;
 
@@ -128,6 +128,68 @@ sub STORESIZE ($$) {
 
 sub TIEARRAY ($$) { $_[1] }
 
+package Message::DOM::DOMStringList::StaticList;
+push our @ISA, 'Message::DOM::DOMStringList';
+use Scalar::Util;
+
+use overload
+    eq => sub {
+      return 0 unless UNIVERSAL::isa ($_[1], 'Message::DOM::DOMStringList');
+
+      return refaddr ($_[0]) eq refaddr ($_[1]);
+    },
+    fallback => 1;
+
+sub ___report_error ($$) {
+  $_[1]->throw;
+} # ___report_error
+
+## |DOMStringList| attributes
+
+sub length ($) {
+  return scalar @{$_[0]};
+} # length
+*FETCHSIZE = \&length;
+
+## |DOMStringList| methods
+
+sub item ($$) {
+  my $index = 0+($_[1] or 0);
+  if ($index < 0 or $index > $#{$_[0]}) {
+    return undef;
+  } else {
+    return $_[0]->[$index];
+  }
+} # item
+
+sub FETCH ($$) { $_[0]->[$_[1]] }
+
+sub STORE ($$$) {
+  require Message::DOM::DOMException;
+  report Message::DOM::DOMException
+      -object => $_[0],
+      -type => 'NO_MODIFICATION_ALLOWED_ERR',
+      -subtype => 'READ_ONLY_NODE_ERR';
+} # STORE
+
+*DELETE = \&STORE;
+
+sub EXISTS ($$) { exists $_[0]->[$_[1]] }
+
+sub contains ($$) {
+  my $str = ''.$_[1];
+  for (@{$_[0]}) {
+    if ($_ eq $str) {
+      return 1;
+    }
+  }
+  return 0;
+} # contains
+
+*STORESIZE = \&STORE;
+
+sub TIEARRAY ($$) { $_[1] }
+
 package Message::IF::DOMStringList;
 
 =head1 LICENSE
@@ -140,4 +202,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/07 05:58:11 $
+## $Date: 2007/07/14 09:19:11 $

@@ -2,9 +2,9 @@
 
 package Message::DOM::Element;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.12 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::Element';
-require Message::DOM::Node;
+require Message::DOM::Document;
 
 sub ____new ($$$$$) {
   my $self = shift->SUPER::____new (shift);
@@ -269,138 +269,10 @@ sub get_attribute_node_ns ($$$) {
   return ${$_[0]}->{attributes}->{defined $_[1] ? ''.$_[1] : ''}->{''.$_[2]};
 } # get_attribute_node_ns
 
-=pod
+*get_elements_by_tag_name = \&Message::DOM::Document::get_elements_by_tag_name;
 
- TODO:
-
-  @Method:
-    @@Name: getElementsByTagName
-    @@enDesc:
-      Returns a <IF::NodeList> of all descendant <IF::Element>s
-      with a given tag name, in the order in which they are
-      encountered in a preorder traversal of the <IF::Element> tree.
-    @@NSVersion: .getElementsByTagNameNS
-    @@Param:
-      @@@Name: name
-      @@@Type: DOMString
-      @@@enDesc:
-        The name of the tag to match on.
-      @@@InCase:
-        @@@@Value:
-          @@@@@@: *
-          @@@@@ContentType: DISCore|String
-        @@@@enDesc:
-          Matches all tags.
-    @@Return:
-      @@@Type: NodeList
-      @@@enDesc:
-        A live list of matching <IF::Element> nodes.
-      @@@PerlDef:
-        $name = "$name";
-        my $chk;
-        if ($name eq '*') {
-          $chk = sub { true };
-        } else {
-          $chk = sub {
-            my $node = shift;
-            my $nodeName = $node-><AG::Node.nodeName>;
-            ($nodeName eq $name);
-          };
-        }
-        __CODE{tc|createGetElementsNodeList::
-          $node => $self, $chk => $chk, $r => $r,
-        }__;
-  @L2Method:
-    @@Name: getElementsByTagNameNS
-    @@enDesc:
-      Returns a <IF::NodeList> of all the descendant <IF::Element>s
-      with a given namespace URI and local name in document order.
-    @@NoNSVersion: .getElementsByTagName
-    @@XML2Feature:
-    @@Param:
-      @@@Name: namespaceURI
-      @@@Type: DOMString
-      @@@dis:actualType: ManakaiDOM|ManakaiDOMNamespaceURI
-      @@@enDesc:
-        The namespace URI of the elements to match on.
-      @@@InCase:
-        @@@@Value:
-          @@@@@@: *
-          @@@@@ContentType: DISCore|String
-        @@@@enDesc:
-          Matches all namespaces.
-    @@Param:
-      @@@Name: localName
-      @@@Type: DOMString
-      @@@dis:actualType:
-        @@@@@: DOMMain|ManakaiDOMXMLLocalName
-        @@@@ManakaiDOM:noInputNormalize: 1
-      @@@enDesc:
-        The local name of the elements to match on.
-      @@@InCase:
-        @@@@Value:
-          @@@@@@: *
-          @@@@@ContentType: DISCore|String
-        @@@@enDesc:
-          Matches all local names.
-    @@Return:
-      @@@Type: NodeList
-      @@@enDesc:
-        A new <IF::NodeList> object containing all the matched 
-        <IF::Element>s.
-      @@@iRaises:
-        @@@@@: MDOMX|MDOM_IMPL_NOSUPPORT_XML
-        @@@@enDesc:
-          If the implementation does not support the feature
-          <Feature;;XML> and the language exposed through the 
-          <IF::Document> does not support XML namespaces.
-      @@@PerlDef:
-        $namespaceURI = "$namespaceURI" if defined $namespaceURI;
-        $localName = "$localName";
-        my $chk;
-        if (not defined $namespaceURI) {
-          if ($localName eq '*') {
-            $chk = sub {
-              my $node = shift;
-              (not defined $node-><AG::Node.namespaceURI>);
-            };
-          } else {
-            $chk = sub {
-              my $node = shift;
-              (not defined $node-><AG::Node.namespaceURI> and
-               $node-><AG::Node.localName> eq $localName);
-            };
-          }
-        } elsif ($namespaceURI eq '*') {
-          if ($localName eq '*') {
-            $chk = sub { true };
-          } else {
-            $chk = sub {
-              my $node = shift;
-              ($node-><AG::Node.localName> eq $localName);
-            };
-          }
-        } else {
-          if ($localName eq '*') {
-            $chk = sub {
-              my $node = shift;
-              my $nsuri = $node-><AG::Node.namespaceURI>;
-              (defined $nsuri and $nsuri eq $namespaceURI);
-            };
-          } else {
-            $chk = sub {
-              my $node = shift;
-              my $nsuri = $node-><AG::Node.namespaceURI>;
-              (defined $nsuri and $nsuri eq $namespaceURI and
-               $node-><AG::Node.localName> eq $localName);
-            };
-          }
-        }
-        __CODE{tc|createGetElementsNodeList::
-          $node => $self, $chk => $chk, $r => $r,
-        }__;
-
-=cut
+*get_elements_by_tag_name_ns
+    = \&Message::DOM::Document::get_elements_by_tag_name_ns;
 
 sub has_attribute ($$) {
   my $attr = ${$_[0]}->{attributes};
@@ -1303,4 +1175,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/14 06:12:56 $
+## $Date: 2007/07/14 09:19:11 $

@@ -2,7 +2,7 @@
 
 package Message::DOM::Document;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.12 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::Document',
     'Message::IF::DocumentXDoctype',
     'Message::IF::HTMLDocument';
@@ -23,7 +23,11 @@ sub ____new ($$) {
   $$self->{'http://suika.fam.cx/www/2006/dom-config/strict-document-children'} = 1;
   $$self->{'http://suika.fam.cx/www/2006/dom-config/dtd-default-attribute'} = 1;
   $$self->{'http://suika.fam.cx/www/2006/dom-config/clone-entity-reference-subtree'} = 1;
-  $$self->{'error-handler'} = sub { };
+  $$self->{'error-handler'} = sub ($) {
+    ## NOTE: Same as one set by |setParameter| with |undef| value.
+    warn $_[0];
+    return $_[0]->severity != 3; # SEVERITY_FATAL_ERROR
+  };
   return $self;
 } # ____new
              
@@ -1029,6 +1033,70 @@ sub get_element_by_id ($$) {
   return undef;
 } # get_element_by_id
 
+## TODO: HTML5 case normalization
+sub get_elements_by_tag_name ($$) {
+  my $name = ''.$_[1];
+  my $chk;
+  if ($name eq '*') {
+    $chk = sub () { 1 };
+  } else {
+    $chk = sub ($) {
+      return $_[0]->manakai_tag_name eq $name;
+    };
+  }
+
+  require Message::DOM::NodeList;
+  return bless \[$_[0], $chk], 'Message::DOM::NodeList::GetElementsList';
+} # get_elements_by_tag_name
+
+sub get_elements_by_tag_name_ns ($$$) {
+  my $nsuri = defined $_[1] ? ''.$_[1] : '';
+  my $lname = ''.$_[2];
+  my $chk;
+  if ($nsuri eq '*') {
+    if ($lname eq '*') {
+      $chk = sub () { 1 };
+    } else {
+      $chk = sub ($) {
+        return $_[0]->manakai_local_name eq $lname;
+      };
+    }
+  } elsif ($nsuri eq '') {
+    if ($lname eq '*') {
+      $chk = sub ($) {
+        return not defined $_[0]->namespace_uri;
+      };
+    } else {
+      $chk = sub ($) {
+        return (not defined $_[0]->namespace_uri and
+                $_[0]->manakai_local_name eq $lname);
+      };
+    }
+  } else {
+    if ($lname eq '*') {
+      $chk = sub ($) {
+        my $ns = $_[0]->namespace_uri;
+        return (defined $ns and $ns eq $nsuri);
+      };
+    } else {
+      $chk = sub ($) {
+        my $ns = $_[0]->namespace_uri;
+        return (defined $ns and $ns eq $nsuri and
+                $_[0]->manakai_local_name eq $lname);
+      };
+    }
+  }
+
+  require Message::DOM::NodeList;
+  return bless \[$_[0], $chk], 'Message::DOM::NodeList::GetElementsList';
+} # get_elements_by_tag_name
+
+## TODO: import_node
+
+## TODO: normalize_document
+
+## TODO: rename_node
+
 package Message::IF::Document;
 package Message::IF::DocumentXDoctype;
 package Message::IF::HTMLDocument;
@@ -1075,4 +1143,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/08 05:42:37 $
+## $Date: 2007/07/14 09:19:11 $

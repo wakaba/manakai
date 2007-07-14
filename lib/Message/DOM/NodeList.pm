@@ -1,6 +1,6 @@
 package Message::DOM::NodeList;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Tie::Array', 'Message::IF::NodeList';
 require Message::DOM::DOMException;
 require Tie::Array;
@@ -167,6 +167,66 @@ sub STORE ($$$) {
 
 *CLEAR = \&STORE;
 
+package Message::DOM::NodeList::GetElementsList;
+push our @ISA, 'Message::DOM::NodeList::EmptyNodeList';
+
+sub ___report_error ($$) {
+  $_[1]->throw;
+} # ___report_error
+
+## |NodeList| attributes
+
+sub length ($) {
+  my $self = $_[0];
+  my $r = 0;
+
+  ## TODO: Improve!
+  local $Error::Depth = $Error::Depth + 1;
+  my @target = @{$$self->[0]->child_nodes};
+  while (@target) {
+    my $target = shift @target;
+    if ($target->node_type == 1) { # ELEMENT_NODE
+      if ($$self->[1]->($target)) {
+        $r++;
+      }
+    }
+    unshift @target, @{$target->child_nodes};
+  }
+
+  return $r;
+} # length
+*FETCHSIZE = \&length;
+
+## |NodeList| methods
+
+sub item ($;$) {
+  my $self = $_[0];
+  my $index = 0+($_[1] or 0);
+
+  ## TODO: Improve!
+  local $Error::Depth = $Error::Depth + 1;
+  my @target = @{$$self->[0]->child_nodes};
+  my $i = -1;
+  while (@target) {
+    my $target = shift @target;
+    if ($target->node_type == 1) { # ELEMENT_NODE
+      if ($$self->[1]->($target)) {
+        if (++$i == $index) {
+          return $target;
+        }
+      }
+    }
+    unshift @target, @{$target->child_nodes};
+  }
+
+  return undef;
+} # item
+*FETCH = \&item;
+
+sub EXISTS ($$) {
+  return defined $_[0]->item ($_[1]);
+} # EXISTS
+
 package Message::IF::NodeList;
 
 =head1 LICENSE
@@ -179,4 +239,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/06/17 13:37:40 $
+## $Date: 2007/07/14 09:19:11 $

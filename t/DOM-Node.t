@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 use strict;
 use Test;
-BEGIN { plan tests => 4451 } 
+BEGIN { plan tests => 4693 } 
 
 require Message::DOM::DOMImplementation;
 use Message::Util::Error;
@@ -65,6 +65,12 @@ my $constants = [
   [DOCUMENT_POSITION_CONTAINS => 0x08],
   [DOCUMENT_POSITION_CONTAINED_BY => 0x10],
   [DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC => 0x20],
+
+  [NODE_CLONED => 1],
+  [NODE_IMPORTED => 2],
+  [NODE_DELETED => 3],
+  [NODE_RENAMED => 4],
+  [NODE_ADOPTED => 5],
 ];
 
 my $tests = {
@@ -749,12 +755,13 @@ my $tests = {
       next_sibling => undef,
       node_name => 'e',
       node_type => 81002,
-      node_value => undef,
+      node_value => '',
       owner_document => $doc,
       owner_element_type_definition => undef,
       parent_node => undef,
       prefix => undef,
       previous_sibling => undef,
+      text_content => '',
     },
     attr_get_bool => {
       has_attributes => 0,
@@ -2001,4 +2008,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2007/07/14 06:12:56 $
+## $Date: 2007/07/14 09:19:11 $

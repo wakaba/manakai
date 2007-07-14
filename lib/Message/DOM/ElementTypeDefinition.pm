@@ -1,6 +1,6 @@
 package Message::DOM::ElementTypeDefinition;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.12 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::ElementTypeDefinition';
 require Message::DOM::Node;
 
@@ -86,18 +86,79 @@ sub owner_document_type_definition ($);
 
 ## |ElementTypeDefinition| methods
 
-## TODO:
-sub set_attribute_definition_node {
-  ${$_[0]}->{attribute_definitions}->{$_[1]->node_name} = $_[1];
-  ${$_[1]}->{owner_element_type_definition} = $_[0];
-  Scalar::Util::weaken (${$_[1]}->{owner_element_type_definition});
-}
+sub get_attribute_definition_node ($$) {
+  return ${$_[0]}->{attribute_definitions}->{$_[1]};
+} # get_attribute_definition_node
+
+sub set_attribute_definition_node ($$) {
+  my $self = $_[0];
+  my $node = $_[1];
+
+  my $name = $node->node_name;
+  my $list = $$self->{attribute_definitions} ||= {}; # ***
+  my $r = $list->{$name};
+
+  if (defined $r and $r eq $node) {
+    return undef; # no effect
+  }
+
+  my $od = $$self->{owner_document};
+  if ($$od->{strict_error_checking}) {
+    if ($$self->{manakai_read_only}) {
+      report Message::DOM::DOMException
+          -object => $self,
+          -type => 'NO_MODIFICATION_ALLOWED_ERR',
+          -subtype => 'READ_ONLY_NODE_ERR';
+    }
+
+    if ($od ne $node->owner_document) {
+      report Message::DOM::DOMException
+          -object => $self,
+          -type => 'WRONG_DOCUMENT_ERR',
+          -subtype => 'EXTERNAL_OBJECT_ERR';
+    }
+
+    my $owner = $$node->{owner_element_type_definition}; # ***
+    if ($owner) {
+      report Message::DOM::DOMException
+          -object => $self,
+          -type => 'HIERARCHY_REQUEST_ERR',
+          -subtype => 'INUSE_DEFINITION_ERR';
+    }
+  }
+
+  if (defined $r) {
+    delete $$r->{owner_element_type_definition}; # ***
+  }
+
+  $list->{$name} = $node;
+  $$node->{owner_element_type_definition} = $self; # ***
+  Scalar::Util::weaken ($$node->{owner_element_type_definition}); # ***
+} # set_attribute_definition_node
 
 package Message::IF::ElementTypeDefinition;
 
 package Message::DOM::Document;
 
 sub create_element_type_definition ($$) {
+  if (${$_[0]}->{strict_error_checking}) {
+    my $xv = $_[0]->xml_version;
+    if (defined $xv) {
+      if ($xv eq '1.0' and
+          $_[1] =~ /\A\p{InXML_NameStartChar10}\p{InXMLNameChar10}*\z/) {
+        #
+      } elsif ($xv eq '1.1' and
+               $_[1] =~ /\A\p{InXMLNameStartChar11}\p{InXMLNameChar11}*\z/) {
+        #
+      } else {
+        report Message::DOM::DOMException
+            -object => $_[0],
+            -type => 'INVALID_CHARACTER_ERR',
+            -subtype => 'MALFORMED_NAME_ERR';
+      }
+    }
+  }
+
   return Message::DOM::ElementTypeDefinition->____new (@_[0, 1]);
 } # create_element_type_definition
 
@@ -111,4 +172,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/12 13:54:46 $
+## $Date: 2007/07/14 09:19:11 $

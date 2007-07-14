@@ -1,6 +1,6 @@
 package Message::DOM::AttributeDefinition;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::AttributeDefinition';
 require Message::DOM::Node;
 require Message::DOM::Attr;
@@ -63,23 +63,13 @@ sub REQUIRED_DEFAULT () { 2 }
 sub IMPLIED_DEFAULT () { 3 }
 sub EXPLICIT_DEFAULT () { 4 }
 
-## The |Node| interface - attribute
-
-## Spec:
-## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-F68D095>
-## <http://suika.fam.cx/gate/2005/sw/AttributeDefinition>
+## |Node| attributes
 
 sub node_name ($); # read-only trivial accessor
 
-## Spec:
-## <http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#ID-111237558>
+sub node_type () { 81002 } # ATTRIBUTE_DEFINITION_NODE
 
-sub node_type ($) { 81002 } # ATTRIBUTE_DEFINITION_NODE
-
-## Spec:
-## <http://suika.fam.cx/gate/2005/sw/AttributeDefinition#anchor-2>
-
-## TODO: node_value
+*node_value = \&Message::DOM::Node::text_content;
 
 ## |Node| methods
 
@@ -145,6 +135,24 @@ package Message::IF::AttributeDefinition;
 package Message::DOM::Document;
 
 sub create_attribute_definition ($$) {
+  if (${$_[0]}->{strict_error_checking}) {
+    my $xv = $_[0]->xml_version;
+    if (defined $xv) {
+      if ($xv eq '1.0' and
+          $_[1] =~ /\A\p{InXML_NameStartChar10}\p{InXMLNameChar10}*\z/) {
+        #
+      } elsif ($xv eq '1.1' and
+               $_[1] =~ /\A\p{InXMLNameStartChar11}\p{InXMLNameChar11}*\z/) {
+        #
+      } else {
+        report Message::DOM::DOMException
+            -object => $_[0],
+            -type => 'INVALID_CHARACTER_ERR',
+            -subtype => 'MALFORMED_NAME_ERR';
+      }
+    }
+  }
+
   return Message::DOM::AttributeDefinition->____new (@_[0, 1]);
 } # create_attribute_definition
 
@@ -158,4 +166,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/12 13:54:46 $
+## $Date: 2007/07/14 09:19:11 $
