@@ -1,3 +1,28 @@
+2007-07-14  Wakaba  <wakaba@suika.fam.cx>
+
+	* TypeInfo.pm: New Perl module.
+
+	* Attr.pm: Use |manakai_local_name| rather than |local_name|
+	to avoid HTML5 case normalization.
+	(is_id): Implemented.
+	(manakai_name): New attribute.
+	(schema_type_info): Implemented.
+	(create_attribute_ns): Empty string as namespace URI
+	was not supported.
+
+	* DOMElement.pm (clone_node): Removed since now it is
+	defined in |Node.pm|.
+	(schema_type_info): Implemented.
+	(manakai_tag_name): New attribute.
+	(get_attribute, get_attribute_node, get_attribute_ns,
+	get_attribute_node_ns, has_attribute, has_attribute_ns,
+	remove_attribute, remove_attribute_ns,
+	remove_attribute_node, set_attribute, set_attribute_ns,
+	set_id_attribute, set_id_attribute_node,
+	set_id_attribute_ns): Implemented.
+	(create_element_ns): Empty string as namespace URI
+	was not supported.
+
 2007-07-12  Wakaba  <wakaba@suika.fam.cx>
 
 	* AttributeDefinition.pm (owner_element_type_definition): Implemented.

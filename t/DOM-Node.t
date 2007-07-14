@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 use strict;
 use Test;
-BEGIN { plan tests => 4429 } 
+BEGIN { plan tests => 4451 } 
 
 require Message::DOM::DOMImplementation;
 use Message::Util::Error;
@@ -94,6 +94,7 @@ my $tests = {
     attr_get_bool => {
       has_attributes => 0,
       has_child_nodes => 0,
+      is_id => 0,
       manakai_read_only => 0,
       specified => 1,
     },
@@ -126,6 +127,7 @@ my $tests = {
     attr_get_bool => {
       has_attributes => 0,
       has_child_nodes => 1,
+      is_id => 0,
       manakai_read_only => 0,
       specified => 1,
     },
@@ -153,6 +155,7 @@ my $tests = {
     attr_get_bool => {
       has_attributes => 0,
       has_child_nodes => 0,
+      is_id => 0,
       manakai_read_only => 0,
       specified => 1,
     },
@@ -180,6 +183,7 @@ my $tests = {
     attr_get_bool => {
       has_attributes => 0,
       has_child_nodes => 0,
+      is_id => 0,
       manakai_read_only => 0,
       specified => 1,
     },
@@ -207,6 +211,7 @@ my $tests = {
     attr_get_bool => {
       has_attributes => 0,
       has_child_nodes => 0,
+      is_id => 0,
       manakai_read_only => 0,
       specified => 1,
     },
@@ -1251,6 +1256,7 @@ for my $i (0..1) {
            ]->[$i];
 
   my $doc2 = $doc->implementation->create_document;
+  $doc2->strict_error_checking (0);
   
   my $el = $doc2->create_element_ns (undef, 'el');
 
@@ -1995,4 +2001,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2007/07/12 13:54:47 $
+## $Date: 2007/07/14 06:12:56 $

@@ -2,7 +2,7 @@
 
 package Message::DOM::Element;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::Element';
 require Message::DOM::Node;
 
@@ -66,6 +66,8 @@ sub AUTOLOAD {
     Carp::croak (qq<Can't locate method "$AUTOLOAD">);
   }
 } # AUTOLOAD
+
+## TODO: Test for create_element_ns ('', ...)
 
 ## |Node| attributes
 
@@ -158,27 +160,20 @@ sub prefix ($;$) {
 
 ## The |Node| interface - method
 
-sub clone_node ($$) {
-  my ($self, $deep) = @_; ## NOTE: Deep cloning is not supported
-## TODO: constructor
-  my $clone = $self->owner_document->create_element_ns
-      ($self->namespace_uri, [$self->prefix, $self->local_name]);
-  for my $ns (keys %{$$self->{attributes}}) {
-    for my $ln (keys %{$$self->{attributes}->{$ns}}) {
-      my $attr = $$self->{attributes}->{$ns}->{$ln};
-## TODO: Attr constructor
-      my $attr_clone = $clone->owner_document->create_attribute_ns
-          ($attr->namespace_uri, [$attr->prefix, $attr->local_name]);
-      $attr_clone->value ($attr->value);
-      $clone->set_attribute_node_ns ($attr_clone);
-    }
-  }
-  return $clone;
-} # clone_node
-
 ## The |Element| interface - attribute
 
 sub manakai_base_uri ($;$);
+
+sub schema_type_info ($) {
+  require Message::DOM::TypeInfo;
+  my $v = 0;
+  return bless \$v, 'Message::DOM::TypeInfo';
+## NOTE: Currently manakai does not support XML Schema, so it is 
+## always a no-type |TypeInfo|.  It is expected that
+## a future version of the implementation will return an
+## element type definition node that also implement the
+## |TypeInfo| interface when the schema language is XML DTD.
+} # schema_type_info
 
 ## TODO: HTML5 capitalization
 sub tag_name ($) {
@@ -189,6 +184,16 @@ sub tag_name ($) {
     return $$self->{local_name};
   }
 } # tag_name
+
+## TODO: Documentation
+sub manakai_tag_name ($) {
+  my $self = shift;
+  if (defined $$self->{prefix}) {
+    return $$self->{prefix} . ':' . $$self->{local_name};
+  } else {
+    return $$self->{local_name};
+  }
+} # manakai_tag_name
 
 ## The |Element| interface - methods
 
@@ -209,54 +214,549 @@ sub manakai_element_type_match ($$$) {
   }
 } # manakai_element_type_match
 
-sub get_attribute {
-  ## TODO
-  return $_[0]->get_attribute_ns (undef, $_[1]);
-}
+sub get_attribute ($$) {
+  my $attr = ${$_[0]}->{attributes};
+  my $name = ''.$_[1];
 
-sub get_attribute_node {
-  ## TODO
-  return $_[0]->get_attribute_node_ns (undef, $_[1]);
-}
+  ## NOTE: |sort|ing is required so that every |getAttribute|, |setAttribute|,
+  ## |hasAttribute|, |removeAttribute|, or any other namespace unaware
+  ## methods operates on the same node even if there is 
+  ## multiple nodes with the same qualified name.
+
+  ## NOTE: Same as |get_attribute_node|, except what is returned.
+
+  for my $ns (sort {$a cmp $b} keys %$attr) {
+    for my $ln (sort {$a cmp $b} keys %{$attr->{$ns}}) {
+      my $node = $attr->{$ns}->{$ln};
+      if ($node->manakai_name eq $name) {
+        return $node->value;
+      }
+    }
+  }
+
+  return undef;
+} # get_attribute
+
+sub get_attribute_node ($$) {
+  my $attr = ${$_[0]}->{attributes};
+  my $name = ''.$_[1];
+
+  ## NOTE: Same as |get_attribute|, except what is returned.
+
+  for my $ns (sort {$a cmp $b} keys %$attr) {
+    for my $ln (sort {$a cmp $b} keys %{$attr->{$ns}}) {
+      my $node = $attr->{$ns}->{$ln};
+      if ($node->manakai_name eq $name) {
+        return $node;
+      }
+    }
+  }
+
+  return undef;
+} # get_attribute_node
 
 sub get_attribute_ns ($$$) {
-  my ($self, $nsuri, $ln) = @_;
-  $nsuri = '' unless defined $nsuri;
-  return defined $$self->{attributes}->{$nsuri}->{$ln}
-    ? $$self->{attributes}->{$nsuri}->{$ln}->value : undef;
+  my $nsuri = defined $_[1] ? ''.$_[1] : '';
+  my $ln = ''.$_[2];
+  if (my $attr = ${$_[0]}->{attributes}->{$nsuri}->{$ln}) {
+    return $attr->value;
+  } else {
+    return undef;
+  }
 } # get_attribute_ns
 
 sub get_attribute_node_ns ($$$) {
-  my ($self, $nsuri, $ln) = @_;
-  $nsuri = '' unless defined $nsuri;
-  return $$self->{attributes}->{$nsuri}->{$ln};
+  return ${$_[0]}->{attributes}->{defined $_[1] ? ''.$_[1] : ''}->{''.$_[2]};
 } # get_attribute_node_ns
 
+=pod
+
+ TODO:
+
+  @Method:
+    @@Name: getElementsByTagName
+    @@enDesc:
+      Returns a <IF::NodeList> of all descendant <IF::Element>s
+      with a given tag name, in the order in which they are
+      encountered in a preorder traversal of the <IF::Element> tree.
+    @@NSVersion: .getElementsByTagNameNS
+    @@Param:
+      @@@Name: name
+      @@@Type: DOMString
+      @@@enDesc:
+        The name of the tag to match on.
+      @@@InCase:
+        @@@@Value:
+          @@@@@@: *
+          @@@@@ContentType: DISCore|String
+        @@@@enDesc:
+          Matches all tags.
+    @@Return:
+      @@@Type: NodeList
+      @@@enDesc:
+        A live list of matching <IF::Element> nodes.
+      @@@PerlDef:
+        $name = "$name";
+        my $chk;
+        if ($name eq '*') {
+          $chk = sub { true };
+        } else {
+          $chk = sub {
+            my $node = shift;
+            my $nodeName = $node-><AG::Node.nodeName>;
+            ($nodeName eq $name);
+          };
+        }
+        __CODE{tc|createGetElementsNodeList::
+          $node => $self, $chk => $chk, $r => $r,
+        }__;
+  @L2Method:
+    @@Name: getElementsByTagNameNS
+    @@enDesc:
+      Returns a <IF::NodeList> of all the descendant <IF::Element>s
+      with a given namespace URI and local name in document order.
+    @@NoNSVersion: .getElementsByTagName
+    @@XML2Feature:
+    @@Param:
+      @@@Name: namespaceURI
+      @@@Type: DOMString
+      @@@dis:actualType: ManakaiDOM|ManakaiDOMNamespaceURI
+      @@@enDesc:
+        The namespace URI of the elements to match on.
+      @@@InCase:
+        @@@@Value:
+          @@@@@@: *
+          @@@@@ContentType: DISCore|String
+        @@@@enDesc:
+          Matches all namespaces.
+    @@Param:
+      @@@Name: localName
+      @@@Type: DOMString
+      @@@dis:actualType:
+        @@@@@: DOMMain|ManakaiDOMXMLLocalName
+        @@@@ManakaiDOM:noInputNormalize: 1
+      @@@enDesc:
+        The local name of the elements to match on.
+      @@@InCase:
+        @@@@Value:
+          @@@@@@: *
+          @@@@@ContentType: DISCore|String
+        @@@@enDesc:
+          Matches all local names.
+    @@Return:
+      @@@Type: NodeList
+      @@@enDesc:
+        A new <IF::NodeList> object containing all the matched 
+        <IF::Element>s.
+      @@@iRaises:
+        @@@@@: MDOMX|MDOM_IMPL_NOSUPPORT_XML
+        @@@@enDesc:
+          If the implementation does not support the feature
+          <Feature;;XML> and the language exposed through the 
+          <IF::Document> does not support XML namespaces.
+      @@@PerlDef:
+        $namespaceURI = "$namespaceURI" if defined $namespaceURI;
+        $localName = "$localName";
+        my $chk;
+        if (not defined $namespaceURI) {
+          if ($localName eq '*') {
+            $chk = sub {
+              my $node = shift;
+              (not defined $node-><AG::Node.namespaceURI>);
+            };
+          } else {
+            $chk = sub {
+              my $node = shift;
+              (not defined $node-><AG::Node.namespaceURI> and
+               $node-><AG::Node.localName> eq $localName);
+            };
+          }
+        } elsif ($namespaceURI eq '*') {
+          if ($localName eq '*') {
+            $chk = sub { true };
+          } else {
+            $chk = sub {
+              my $node = shift;
+              ($node-><AG::Node.localName> eq $localName);
+            };
+          }
+        } else {
+          if ($localName eq '*') {
+            $chk = sub {
+              my $node = shift;
+              my $nsuri = $node-><AG::Node.namespaceURI>;
+              (defined $nsuri and $nsuri eq $namespaceURI);
+            };
+          } else {
+            $chk = sub {
+              my $node = shift;
+              my $nsuri = $node-><AG::Node.namespaceURI>;
+              (defined $nsuri and $nsuri eq $namespaceURI and
+               $node-><AG::Node.localName> eq $localName);
+            };
+          }
+        }
+        __CODE{tc|createGetElementsNodeList::
+          $node => $self, $chk => $chk, $r => $r,
+        }__;
+
+=cut
+
 sub has_attribute ($$) {
-  return $_[0]->has_attribute_ns (undef, $_[1]);
-}
+  my $attr = ${$_[0]}->{attributes};
+  my $name = ''.$_[1];
+
+  for my $ns (keys %$attr) {
+    for my $ln (keys %{$attr->{$ns}}) {
+      my $node = $attr->{$ns}->{$ln};
+      if ($node->manakai_name eq $name) {
+        return 1;
+      }
+    }
+  }
+
+  return 0;
+} # has_attribute
 
 sub has_attribute_ns ($$$) {
-  my ($self, $nsuri, $ln) = @_;
-  $nsuri = '' unless defined $nsuri;
-  return defined $$self->{attributes}->{$nsuri}->{$ln};
+  return ${$_[0]}->{attributes}->{defined $_[1] ? ''.$_[1] : ''}->{''.$_[2]}?1:0;
 } # has_attribute_ns
 
-sub remove_attribute {
-## TODO:
-  delete ${$_[0]}->{attributes}->{''}->{$_[1]};
-}
+sub remove_attribute ($$) {
+  my $attr = ${$_[0]}->{attributes};
+  my $name = ''.$_[1];
 
-sub remove_attribute_node {
-  ## TODO:
-  delete ${$_[0]}->{attributes}->{$_[1]->namespace_uri}->{$_[1]->manakai_local_name};
-  delete ${$_[1]}->{owner_element};
-}
+  my $list;
+  my $key;
+  my $attr_node;
+  ATTR: {
+    for my $ns (keys %$attr) {
+      $list = $attr->{$ns};
+      for my $ln (keys %$list) {
+        $attr_node = $list->{$ln};
+        if ($attr_node->manakai_name eq $name) {
+          $key = $ln;
+          last ATTR;
+        }
+      }
+    }
+    
+    return undef; # not found
+  } # ATTR
 
-sub set_attribute {
-  ## TODO:
-  shift->set_attribute_ns (undef, [undef, $_[0]]);
-}
+  my $od = ${$_[0]}->{owner_document};
+  if ($$od->{strict_error_checking} and ${$_[0]}->{manakai_read_only}) {
+    report Message::DOM::DOMException
+        -object => $_[0],
+        -type => 'NO_MODIFICATION_ALLOWED_ERR',
+        -subtype => 'READ_ONLY_NODE_ERR';
+  }
+
+  delete $list->{$key};
+  delete $$attr_node->{owner_element};
+  $$attr_node->{specified} = 1;
+  delete ${$_[0]}->{manakai_content_attribute_list};
+
+  ## Default attribute
+  local $Error::Depth = $Error::Depth + 1;
+  my $cfg = $od->dom_config;
+  if ($cfg->get_parameter 
+      (q<http://suika.fam.cx/www/2006/dom-config/dtd-default-attribute>)) {
+    my $doctype = $od->doctype;
+    if ($doctype) {
+      my $et = $doctype->get_element_type_definition_node
+          ($_[0]->manakai_tag_name);
+      if ($et) {
+        my $at = $et->get_attribute_definition_node ($name);
+        if ($at) {
+          local $$od->{strict_error_checking} = 0;
+          my $copy_asis = $cfg->get_parameter
+              (q<http://suika.fam.cx/www/2006/dom-config/clone-entity-reference-subtree>);
+          $cfg->set_parameter
+              (q<http://suika.fam.cx/www/2006/dom-config/clone-entity-reference-subtree> => 1);
+          ADD: {
+            my $def_attr_node;
+            my $def_prefix = $attr_node->prefix;
+            my $def_nsuri = '';
+            my $def_ln;
+            if (defined $def_prefix) {
+              $def_nsuri =
+                  $def_prefix eq 'xml' ? q<http://www.w3.org/XML/1998/namespace>:
+                  $def_prefix eq 'xmlns' ? q<http://www.w3.org/2000/xmlns/>:
+                  $_[0]->lookup_namespace_uri ($def_prefix);
+              unless (defined $def_nsuri) {
+                ## TODO: Namespace well-formedness error...
+              }
+              $def_ln = $attr_node->manakai_local_name;
+            } else {
+              $def_nsuri = $name eq 'xmlns'
+                  ? q<http://www.w3.org/2000/xmlns/> : undef;
+              $def_ln = $name;
+            }
+            if ($attr->{defined $def_nsuri ? $def_nsuri : ''}->{$def_ln}) {
+              ## TODO: Namespace well-formedness warning?
+              last ADD;
+            }
+            $def_attr_node = $od->create_attribute_ns
+                ($def_nsuri, [$def_prefix, $def_ln]);
+          
+            for my $child (@{$at->child_nodes}) {
+              $def_attr_node->append_child ($child->clone_node (1));
+            }
+            $def_attr_node->manakai_attribute_type ($at->declared_type);
+            $attr->{defined $def_nsuri ? $def_nsuri : ''}->{$def_ln}
+                = $def_attr_node;
+            $$def_attr_node->{owner_element} = $_[0];
+            Scalar::Util::weaken ($$def_attr_node->{owner_element});
+            delete $$def_attr_node->{specified};
+          } # ADD
+          $cfg->set_parameter
+              (q<http://suika.fam.cx/www/2006/dom-config/clone-entity-reference-subtree> => $copy_asis);
+        }
+      }
+    }
+  }
+
+  return undef;
+} # remove_attribute
+
+sub remove_attribute_node ($$) {
+  my $od = ${$_[0]}->{owner_document};
+  if ($$od->{strict_error_checking} and ${$_[0]}->{manakai_read_only}) {
+    report Message::DOM::DOMException
+        -object => $_[0],
+        -type => 'NO_MODIFICATION_ALLOWED_ERR',
+        -subtype => 'READ_ONLY_NODE_ERR';
+  }
+
+  my $attr_node = $_[1];
+  my $ln = $attr_node->manakai_local_name;
+  my $attr = ${$_[0]}->{attributes};
+  FIND: {
+    my $nsuri = $attr_node->namespace_uri;
+    my $list = $attr->{defined $nsuri ? $nsuri : ''};
+    my $list_node = $list->{$ln};
+    if (defined $list_node and $list_node eq $attr_node) {
+      delete $list->{$ln};
+      last FIND;
+    }
+
+    report Message::DOM::DOMException
+        -object => $_[0],
+        -type => 'NOT_FOUND_ERR',
+        -subtype => 'NOT_CHILD_ERR';
+  } # FIND
+
+  delete ${$_[0]}->{manakai_content_attribute_list};
+  delete $$attr_node->{owner_element};
+  $$attr_node->{specified} = 1;
+      
+  ## Default attribute
+  ## Same as |remove_attribute|'s, except where marked as "***".
+  local $Error::Depth = $Error::Depth + 1;
+  my $cfg = $od->dom_config;
+  if ($cfg->get_parameter 
+      (q<http://suika.fam.cx/www/2006/dom-config/dtd-default-attribute>)) {
+    my $doctype = $od->doctype;
+    if ($doctype) {
+      my $et = $doctype->get_element_type_definition_node
+          ($_[0]->manakai_tag_name);
+      if ($et) {
+        my $at = $et->get_attribute_definition_node ($_[1]->manakai_name); # ***
+        if ($at) {
+          local $$od->{strict_error_checking} = 0;
+          my $copy_asis = $cfg->get_parameter
+              (q<http://suika.fam.cx/www/2006/dom-config/clone-entity-reference-subtree>);
+          $cfg->set_parameter
+              (q<http://suika.fam.cx/www/2006/dom-config/clone-entity-reference-subtree> => 1);
+          ADD: {
+            my $def_attr_node;
+            my $def_prefix = $attr_node->prefix;
+            my $def_nsuri = '';
+            my $def_ln;
+            if (defined $def_prefix) {
+              $def_nsuri =
+                  $def_prefix eq 'xml' ? q<http://www.w3.org/XML/1998/namespace>:
+                  $def_prefix eq 'xmlns' ? q<http://www.w3.org/2000/xmlns/>:
+                  $_[0]->lookup_namespace_uri ($def_prefix);
+              unless (defined $def_nsuri) {
+                ## TODO: Namespace well-formedness error...
+              }
+              $def_ln = $attr_node->manakai_local_name;
+            } else {
+              $def_nsuri = $attr_node->manakai_name eq 'xmlns'
+                  ? q<http://www.w3.org/2000/xmlns/> : undef;
+              $def_ln = $attr_node->manakai_local_name; ## ***
+            }
+            if ($attr->{defined $def_nsuri ? $def_nsuri : ''}->{$def_ln}) {
+              ## TODO: Namespace well-formedness warning?
+              last ADD;
+            }
+            $def_attr_node = $od->create_attribute_ns
+                ($def_nsuri, [$def_prefix, $def_ln]);
+          
+            for my $child (@{$at->child_nodes}) {
+              $def_attr_node->append_child ($child->clone_node (1));
+            }
+            $def_attr_node->manakai_attribute_type ($at->declared_type);
+            $attr->{defined $def_nsuri ? $def_nsuri : ''}->{$def_ln}
+                = $def_attr_node;
+            $$def_attr_node->{owner_element} = $_[0];
+            Scalar::Util::weaken ($$def_attr_node->{owner_element});
+            delete $$def_attr_node->{specified};
+          } # ADD
+          $cfg->set_parameter
+              (q<http://suika.fam.cx/www/2006/dom-config/clone-entity-reference-subtree> => $copy_asis);
+        }
+      }
+    }
+  }
+
+  return $_[1];
+} # remove_attribute_node
+
+sub remove_attribute_ns ($$$) {
+  my $attr = ${$_[0]}->{attributes};
+
+  my $list = $attr->{defined $_[1] ? $_[1] : ''};
+  my $key = ''.$_[2];
+  my $attr_node = $list->{$key};
+  return undef unless defined $attr_node;
+
+  ## NOTE: Anything below is same as |remove_attribute|'s except "***"
+
+  my $od = ${$_[0]}->{owner_document};
+  if ($$od->{strict_error_checking} and ${$_[0]}->{manakai_read_only}) {
+    report Message::DOM::DOMException
+        -object => $_[0],
+        -type => 'NO_MODIFICATION_ALLOWED_ERR',
+        -subtype => 'READ_ONLY_NODE_ERR';
+  }
+
+  delete $list->{$key};
+  delete $$attr_node->{owner_element};
+  $$attr_node->{specified} = 1;
+  delete ${$_[0]}->{manakai_content_attribute_list};
+
+  ## Default attribute
+  local $Error::Depth = $Error::Depth + 1;
+  my $cfg = $od->dom_config;
+  if ($cfg->get_parameter 
+      (q<http://suika.fam.cx/www/2006/dom-config/dtd-default-attribute>)) {
+    my $doctype = $od->doctype;
+    if ($doctype) {
+      my $et = $doctype->get_element_type_definition_node
+          ($_[0]->manakai_tag_name);
+      if ($et) {
+        my $at = $et->get_attribute_definition_node
+            ($attr_node->manakai_name); # ***
+        if ($at) {
+          local $$od->{strict_error_checking} = 0;
+          my $copy_asis = $cfg->get_parameter
+              (q<http://suika.fam.cx/www/2006/dom-config/clone-entity-reference-subtree>);
+          $cfg->set_parameter
+              (q<http://suika.fam.cx/www/2006/dom-config/clone-entity-reference-subtree> => 1);
+          ADD: {
+            my $def_attr_node;
+            my $def_prefix = $attr_node->prefix;
+            my $def_nsuri = '';
+            my $def_ln;
+            if (defined $def_prefix) {
+              $def_nsuri =
+                  $def_prefix eq 'xml' ? q<http://www.w3.org/XML/1998/namespace>:
+                  $def_prefix eq 'xmlns' ? q<http://www.w3.org/2000/xmlns/>:
+                  $_[0]->lookup_namespace_uri ($def_prefix);
+              unless (defined $def_nsuri) {
+                ## TODO: Namespace well-formedness error...
+              }
+            } else {
+              $def_nsuri = $attr_node->manakai_name eq 'xmlns'
+                  ? q<http://www.w3.org/2000/xmlns/> : undef;
+            }
+            $def_ln = $attr_node->manakai_local_name; # ***
+            if ($attr->{defined $def_nsuri ? $def_nsuri : ''}->{$def_ln}) {
+              ## TODO: Namespace well-formedness warning?
+              last ADD;
+            }
+            $def_attr_node = $od->create_attribute_ns
+                ($def_nsuri, [$def_prefix, $def_ln]);
+          
+            for my $child (@{$at->child_nodes}) {
+              $def_attr_node->append_child ($child->clone_node (1));
+            }
+            $def_attr_node->manakai_attribute_type ($at->declared_type);
+            $attr->{defined $def_nsuri ? $def_nsuri : ''}->{$def_ln}
+                = $def_attr_node;
+            $$def_attr_node->{owner_element} = $_[0];
+            Scalar::Util::weaken ($$def_attr_node->{owner_element});
+            delete $$def_attr_node->{specified};
+          } # ADD
+          $cfg->set_parameter
+              (q<http://suika.fam.cx/www/2006/dom-config/clone-entity-reference-subtree> => $copy_asis);
+        }
+      }
+    }
+  }
+
+  return undef;
+} # remove_attribute_ns
+
+sub set_attribute ($$$) {
+  my $od = ${$_[0]}->{owner_document};
+  if ($$od->{strict_error_checking}) {
+    if (${$_[0]}->{manakai_read_only}) {
+      report Message::DOM::DOMException
+          -object => $_[0],
+          -type => 'NO_MODIFICATION_ALLOWED_ERR',
+          -subtype => 'READ_ONLY_NODE_ERR';
+    }
+  }
+
+  my $name = ''.$_[1];
+  my $attr = ${$_[0]}->{attributes};  
+  my $attr_node;
+  NS: for my $ns (keys %$attr) {
+    for my $ln (keys %{$attr->{$ns}}) {
+      my $node = $attr->{$ns}->{$ln};
+      if ($node->manakai_name eq $name) {
+        $attr_node = $node;
+        last NS;
+      }
+    }
+  }
+  
+  local $Error::Depth = $Error::Depth + 1;
+  if (defined $attr_node) {
+    if ($$od->{strict_error_checking}) {
+      $od->create_attribute ($name); # or exception
+    }
+  } else {
+    $attr_node = $od->create_attribute ($name); # return or exception
+    delete ${$_[0]}->{manakai_content_attribute_list};
+    $attr->{''}->{$name} = $attr_node;
+    $$attr_node->{owner_element} = $_[0];
+    Scalar::Util::weaken ($$attr_node->{owner_element});
+
+    if ($od->dom_config->get_parameter
+          (q<http://suika.fam.cx/www/2006/dom-config/dtd-attribute-type>)) {
+      my $doctype = $od->doctype;
+      if (defined $doctype) {
+        my $et = $doctype->get_element_type_definition_node
+            ($_[0]->manakai_tag_name);
+        if (defined $et) {
+          my $at = $et->get_attribute_definition_node ($attr_node->manakai_name);
+          if (defined $at) {
+            $attr_node->manakai_attribute_type ($at->declared_type);
+          }
+        }
+      }
+    }
+  }
+
+  $attr_node->value ($_[2]); # set or exception
+  $attr_node->specified (1);
+  return undef;
+} # set_attribute
 
 sub set_attribute_node ($$) {
   my ($self, $new_attr) = @_;
@@ -309,18 +809,130 @@ sub set_attribute_node ($$) {
 *set_attribute_node_ns = \&set_attribute_node;
 
 ## The second parameter only supports manakai extended way
-## to specify qualified name - "[$prefix, $local_name]"
+## to specify qualified name - "[$prefix, $local_name]" ## TODO: Document
 sub set_attribute_ns ($$$$) {
-  my ($self, $nsuri, $qn, $value) = @_;
-  $qn = [split /:/, $qn, 2] unless ref $qn;
-  $qn = [undef, $qn->[0]] if not defined $qn->[1];
-  require Message::DOM::Attr;
-  my $attr = Message::DOM::Attr->____new
-    ($$self->{owner_document}, $self, $nsuri, $qn->[0], $qn->[1]);
-  $nsuri = '' unless defined $nsuri;
-  $$self->{attributes}->{$nsuri}->{$qn->[1]} = $attr;
-  $attr->value ($value);
+  my $prefix;
+  my $lname;
+  if (ref $_[2] eq 'ARRAY') {
+    ($prefix, $lname) = @{$_[2]};
+  } else {
+    ($prefix, $lname) = split /:/, $_[2], 2;
+    ($prefix, $lname) = (undef, $prefix) unless defined $lname;
+  }
+
+  my $od = ${$_[0]}->{owner_document};
+  if ($$od->{strict_error_checking}) {
+    if (${$_[0]}->{manakai_read_only}) {
+      report Message::DOM::DOMException
+          -object => $_[0],
+          -type => 'NO_MODIFICATION_ALLOWED_ERR',
+          -subtype => 'READ_ONLY_NODE_ERR';
+    }
+  }
+
+  my $attr = ${$_[0]}->{attributes};  
+  my $attr_node = $attr->{defined $_[1] ? ''.$_[1] : ''}->{$lname};
+  
+  local $Error::Depth = $Error::Depth + 1;
+  if (defined $attr_node) {
+    if ($$od->{strict_error_checking}) {
+      $od->create_attribute_ns ($_[1], [$prefix, $lname]); # name exception
+    }
+  } else {
+    $attr_node = $od->create_attribute_ns
+        ($_[1], [$prefix, $lname]); # or exception
+    delete ${$_[0]}->{manakai_content_attribute_list};
+    $attr->{defined $_[1] ? ''.$_[1] : ''}->{$lname} = $attr_node;
+    $$attr_node->{owner_element} = $_[0];
+    Scalar::Util::weaken ($$attr_node->{owner_element});
+
+    if ($od->dom_config->get_parameter
+          (q<http://suika.fam.cx/www/2006/dom-config/dtd-attribute-type>)) {
+      my $doctype = $od->doctype;
+      if (defined $doctype) {
+        my $et = $doctype->get_element_type_definition_node
+            ($_[0]->manakai_tag_name);
+        if (defined $et) {
+          my $at = $et->get_attribute_definition_node ($attr_node->manakai_name);
+          if (defined $at) {
+            $attr_node->manakai_attribute_type ($at->declared_type);
+          }
+        }
+      }
+    }
+  }
+
+  $attr_node->value ($_[3]); # set or exception
+  $attr_node->prefix ($prefix);
+  $attr_node->specified (1);
+  return undef;
 } # set_attribute_ns
+
+sub set_id_attribute ($$$) {
+  if (${${$_[0]}->{owner_document}}->{strict_error_checking} and
+      ${$_[0]}->{manakai_read_only}) {
+    report Message::DOM::DOMException
+        -object => $_[0],
+        -type => 'NO_MODIFICATION_ALLOWED_ERR',
+        -subtype => 'READ_ONLY_NODE_ERR';
+  }
+  
+  my $attr = $_[0]->get_attribute_node ($_[1]);
+  if (not defined $attr) {
+    report Message::DOM::DOMException
+        -object => $_[0],
+        -type => 'NOT_FOUND_ERR',
+        -subtype => 'NOT_CHILD_ERR';
+  } else {
+    local $Error::Depth = $Error::Depth + 1;
+    $attr->is_id ($_[2]); # or exception
+  }
+  return;
+} # set_id_attribute
+
+sub set_id_attribute_ns ($$$$) {
+  if (${${$_[0]}->{owner_document}}->{strict_error_checking} and
+      ${$_[0]}->{manakai_read_only}) {
+    report Message::DOM::DOMException
+        -object => $_[0],
+        -type => 'NO_MODIFICATION_ALLOWED_ERR',
+        -subtype => 'READ_ONLY_NODE_ERR';
+  }
+  
+  my $attr = $_[0]->get_attribute_node_ns ($_[1], $_[2]);
+  if (not defined $attr) {
+    report Message::DOM::DOMException
+        -object => $_[0],
+        -type => 'NOT_FOUND_ERR',
+        -subtype => 'NOT_CHILD_ERR';
+  } else {
+    local $Error::Depth = $Error::Depth + 1;
+    $attr->is_id ($_[2]);
+  }
+  return;
+} # set_id_attribute_ns
+
+sub set_id_attribute_node ($$$$) {
+  if (${${$_[0]}->{owner_document}}->{strict_error_checking} and
+      ${$_[0]}->{manakai_read_only}) {
+    report Message::DOM::DOMException
+        -object => $_[0],
+        -type => 'NO_MODIFICATION_ALLOWED_ERR',
+        -subtype => 'READ_ONLY_NODE_ERR';
+  }
+
+  my $oe = $_[1]->owner_element;  
+  if ($oe ne $_[0]) {
+    report Message::DOM::DOMException
+        -object => $_[0],
+        -type => 'NOT_FOUND_ERR',
+        -subtype => 'NOT_CHILD_ERR';
+  } else {
+    local $Error::Depth = $Error::Depth + 1;
+    $_[1]->is_id ($_[2]);
+  }
+  return;
+} # set_id_attribute_node
 
 package Message::IF::Element;
 
@@ -461,6 +1073,7 @@ sub create_element_ns ($$$) {
     ($prefix, $lname) = split /:/, $_[2], 2;
     ($prefix, $lname) = (undef, $prefix) unless defined $lname;
   }
+  my $nsuri = defined $_[1] ? $_[1] eq '' ? undef : $_[1] : undef;
 
   if ($$self->{strict_error_checking}) {
     my $xv = $self->xml_version;
@@ -526,24 +1139,24 @@ sub create_element_ns ($$$) {
     }
 
     if (defined $prefix) {
-      if (not defined $_[1]) {
+      if (not defined $nsuri) {
         report Message::DOM::DOMException
             -object => $self,
             -type => 'NAMESPACE_ERR',
             -subtype => 'PREFIXED_NULLNS_ERR';
       } elsif ($prefix eq 'xml' and 
-               $_[1] ne q<http://www.w3.org/XML/1998/namespace>) {
+               $nsuri ne q<http://www.w3.org/XML/1998/namespace>) {
         report Message::DOM::DOMException
             -object => $self,
             -type => 'NAMESPACE_ERR',
             -subtype => 'XMLPREFIX_NONXMLNS_ERR';
       } elsif ($prefix eq 'xmlns' and
-               $_[1] ne q<http://www.w3.org/2000/xmlns/>) {
+               $nsuri ne q<http://www.w3.org/2000/xmlns/>) {
         report Message::DOM::DOMException
             -object => $self,
             -type => 'NAMESPACE_ERR',
             -subtype => 'XMLNSPREFIX_NONXMLNSNS_ERR';
-      } elsif ($_[1] eq q<http://www.w3.org/2000/xmlns/> and
+      } elsif ($nsuri eq q<http://www.w3.org/2000/xmlns/> and
                $prefix ne 'xmlns') {
         report Message::DOM::DOMException
             -object => $self,
@@ -552,14 +1165,14 @@ sub create_element_ns ($$$) {
       }
     } else { # no prefix
       if ($lname eq 'xmlns' and
-          (not defined $_[1] or $_[1] ne q<http://www.w3.org/2000/xmlns/>)) {
+          (not defined $nsuri or $nsuri ne q<http://www.w3.org/2000/xmlns/>)) {
         report Message::DOM::DOMException
             -object => $self,
             -type => 'NAMESPACE_ERR',
             -subtype => 'XMLNS_NONXMLNSNS_ERR';
-      } elsif (not defined $_[1]) {
+      } elsif (not defined $nsuri) {
         #
-      } elsif ($_[1] eq q<http://www.w3.org/2000/xmlns/> and
+      } elsif ($nsuri eq q<http://www.w3.org/2000/xmlns/> and
                $lname ne 'xmlns') {
         report Message::DOM::DOMException
             -object => $self,
@@ -571,12 +1184,11 @@ sub create_element_ns ($$$) {
 
   ## -- Choose the most apppropriate class for the element
   my $class = 'Message::DOM::Element';
-  my $nsuri = defined $_[1] ? $_[1] : '';
 
   ## TODO: Choose a class for $nsuri:$lname
   ## TODO: Choose a class for $nsuri:*
 
-  my $r = $class->____new ($self, $_[1], $prefix, $lname);
+  my $r = $class->____new ($self, $nsuri, $prefix, $lname);
 
   ## -- Default attributes
   {
@@ -691,4 +1303,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/08 07:59:02 $
+## $Date: 2007/07/14 06:12:56 $

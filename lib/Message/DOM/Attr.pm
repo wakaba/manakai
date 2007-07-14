@@ -1,6 +1,6 @@
 package Message::DOM::Attr;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::Attr';
 require Message::DOM::Node;
 
@@ -47,7 +47,7 @@ sub base_uri ($) {
   local $Error::Depth = $Error::Depth + 1;
   my $oe = $self->owner_element;
   if ($oe) {
-    my $ln = $self->local_name;
+    my $ln = $self->manakai_local_name;
     my $nsuri = $self->namespace_uri;
     if (($ln eq 'base' and
          defined $nsuri and $nsuri eq 'http://www.w3.org/XML/1998/namespace') or
@@ -442,6 +442,71 @@ sub manakai_attribute_type ($;$) {
   return $$self->{manakai_attribute_type} || 0;
 } # manakai_attribute_type
 
+sub is_id ($;$) {
+  my $self = $_[0];
+
+  if (@_ > 1) {
+    ## NOTE: The setter is a manakai extension.
+    ## TODO: Document.
+
+    if (${$$self->{owner_document}}->{strict_error_checking}) {
+      if ($$self->{manakai_read_only}) {
+        report Message::DOM::DOMException
+              -object => $self,
+              -type => 'NO_MODIFICATION_ALLOWED_ERR',
+              -subtype => 'READ_ONLY_NODE_ERR';
+      }
+    }
+
+    if ($_[1]) {
+      $$self->{manakai_user_determined_id} = 1;
+    } else {
+      delete $$self->{manakai_user_determined_id};
+    }
+  }
+  return unless defined wantarray;
+  
+  ## DTD Attribute Type
+  my $type = $$self->{manakai_attribute_type};
+  if (defined $type and $type == 2) { # ID_ATTR
+    return 1;
+  }
+  
+  ## User-determined ID
+  if ($$self->{manakai_user_determined_id}) {
+    return 1;
+  }
+
+  ## Application-determined ID
+  my $nsuri = $self->namespace_uri;
+  my $ln = $self->manakai_local_name;
+  if (defined $nsuri) {
+    if ($ln eq 'id') {
+      if ($nsuri eq q<http://www.w3.org/XML/1998/namespace>) {
+        return 1;
+      }
+    }
+  } else {
+    if ($ln eq 'xml:id') {
+      return 1;
+    }
+
+    my $oe = $$self->{owner_element};
+    if ($oe) {
+      my $oe_nsuri = $oe->namespace_uri;
+      if (defined $oe_nsuri) {
+        if ($ln eq 'id') {
+          if ($oe_nsuri eq q<http://www.w3.org/1999/xhtml>) {
+            return 1;
+          }
+        }
+      }
+    }
+  }
+
+  return 0;
+} # is_id
+
 ## TODO: HTML5 case stuff?
 sub name ($) {
   my $self = shift;
@@ -451,6 +516,22 @@ sub name ($) {
     return $$self->{local_name};
   }
 } # name
+
+## TODO: Documentation
+sub manakai_name ($) {
+  my $self = shift;
+  if (defined $$self->{prefix}) {
+    return $$self->{prefix} . ':' . $$self->{local_name};
+  } else {
+    return $$self->{local_name};
+  }
+} # manakai_name
+
+sub schema_type_info ($) {
+  require Message::DOM::TypeInfo;
+  my $v = ${$_[0]}->{manakai_attribute_type} || 0;
+  return bless \$v, 'Message::DOM::TypeInfo';
+} # schema_type_info
 
 sub specified ($;$) {
   if (@_ > 1) {
@@ -508,6 +589,7 @@ sub create_attribute_ns ($$$) {
     ($prefix, $lname) = split /:/, $_[2], 2;
     ($prefix, $lname) = (undef, $prefix) unless defined $lname;
   }
+  my $nsuri = defined $_[1] ? $_[1] eq '' ? undef : $_[1] : undef;
 
   if (${$_[0]}->{strict_error_checking}) {
     my $xv = $_[0]->xml_version;
@@ -573,24 +655,24 @@ sub create_attribute_ns ($$$) {
     }
 
     if (defined $prefix) {
-      if (not defined $_[1]) {
+      if (not defined $nsuri) {
         report Message::DOM::DOMException
             -object => $_[0],
             -type => 'NAMESPACE_ERR',
             -subtype => 'PREFIXED_NULLNS_ERR';
       } elsif ($prefix eq 'xml' and 
-               $_[1] ne q<http://www.w3.org/XML/1998/namespace>) {
+               $nsuri ne q<http://www.w3.org/XML/1998/namespace>) {
         report Message::DOM::DOMException
             -object => $_[0],
             -type => 'NAMESPACE_ERR',
             -subtype => 'XMLPREFIX_NONXMLNS_ERR';
       } elsif ($prefix eq 'xmlns' and
-               $_[1] ne q<http://www.w3.org/2000/xmlns/>) {
+               $nsuri ne q<http://www.w3.org/2000/xmlns/>) {
         report Message::DOM::DOMException
             -object => $_[0],
             -type => 'NAMESPACE_ERR',
             -subtype => 'XMLNSPREFIX_NONXMLNSNS_ERR';
-      } elsif ($_[1] eq q<http://www.w3.org/2000/xmlns/> and
+      } elsif ($nsuri eq q<http://www.w3.org/2000/xmlns/> and
                $prefix ne 'xmlns') {
         report Message::DOM::DOMException
             -object => $_[0],
@@ -599,14 +681,14 @@ sub create_attribute_ns ($$$) {
       }
     } else { # no prefix
       if ($lname eq 'xmlns' and
-          (not defined $_[1] or $_[1] ne q<http://www.w3.org/2000/xmlns/>)) {
+          (not defined $nsuri or $nsuri ne q<http://www.w3.org/2000/xmlns/>)) {
         report Message::DOM::DOMException
             -object => $_[0],
             -type => 'NAMESPACE_ERR',
             -subtype => 'XMLNS_NONXMLNSNS_ERR';
-      } elsif (not defined $_[1]) {
+      } elsif (not defined $nsuri) {
         #
-      } elsif ($_[1] eq q<http://www.w3.org/2000/xmlns/> and
+      } elsif ($nsuri eq q<http://www.w3.org/2000/xmlns/> and
                $lname ne 'xmlns') {
         report Message::DOM::DOMException
             -object => $_[0],
@@ -619,7 +701,7 @@ sub create_attribute_ns ($$$) {
   ## TODO: Older version of manakai set |attribute_type|
   ## attribute for |xml:id| attribute.  Should we support this?
 
-  return Message::DOM::Attr->____new ($_[0], undef, $_[1], $prefix, $lname);
+  return Message::DOM::Attr->____new ($_[0], undef, $nsuri, $prefix, $lname);
 } # create_attribute_ns
 
 =head1 LICENSE
@@ -632,4 +714,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/08 13:04:36 $
+## $Date: 2007/07/14 06:12:56 $
