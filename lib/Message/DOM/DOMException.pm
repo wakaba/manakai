@@ -1,6 +1,6 @@
 package Message::DOM::DOMException;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.13 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.14 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::Util::Error', 'Message::IF::DOMException';
 require Message::Util::Error;
 
@@ -79,11 +79,14 @@ sub ___error_def () {+{
       CLONE_NODE_TYPE_NOT_SUPPORTED_ERR => {
         -description => q(Can't clone specified type of node),
       },
-      CONFIGURATION_PARAMETER_VALUE_ERR => { ## TODO: Necessary?
+      CONFIGURATION_PARAMETER_VALUE_ERR => {
         -description => q(Can't set the value to the configuration parameter),
       },
       NON_HTML_OPERATION_ERR => {
         -description => q(Can't apply to HTML document),
+      },
+      NULLPO_ERR => {
+        -description => q(NULLPO),
       },
       UNKNOWN_XML_VERSION_ERR => {
         -description => q(Specified version of XML is not supported),
@@ -169,4 +172,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/14 09:19:11 $
+## $Date: 2007/07/14 16:32:28 $

@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 use strict;
 use Test;
-BEGIN { plan tests => 4918 } 
+BEGIN { plan tests => 5086 } 
 
 require Message::DOM::DOMImplementation;
 use Message::Util::Error;
@@ -1816,6 +1816,7 @@ for my $node (create_nodes ()) {
        [Core => '', 1],
        [Core => undef, 1],
        [Core => 3, 0],
+       [Traversal => '2.0', 1], [Traversal => '', 1], [Traversal => '1.0', 0],
        [XML => '1.0', 1],
        [XML => '2.0', 1],
        [XML => '3.0', 1],
@@ -2044,4 +2045,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2007/07/14 10:28:52 $
+## $Date: 2007/07/14 16:32:28 $

@@ -1,6 +1,6 @@
 package Message::DOM::DOMConfiguration;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::IF::DOMConfiguration';
 require Message::DOM::DOMException;
 
@@ -49,7 +49,6 @@ sub parameter_names ($) {
 sub can_set_parameter ($$;$) {
   my $name = ''.$_[1];
   if ({
-       'schema-type' => 1,
        q<http://suika.fam.cx/www/2006/dom-config/clone-entity-reference-subtree> => 1,
        q<http://suika.fam.cx/www/2006/dom-config/dtd-attribute-type> => 1,
        q<http://suika.fam.cx/www/2006/dom-config/dtd-default-attribute> => 1,
@@ -60,6 +59,10 @@ sub can_set_parameter ($$;$) {
   } elsif ($name eq 'error-handler') {
     return 1 unless defined $_[2];
     return ref $_[2] eq 'CODE';
+  } elsif ($name eq 'schema-type') {
+    return 1 unless defined $_[2];
+    return 1 if ''.$_[2] eq q<http://www.w3.org/TR/REC-xml>;
+    return 0;
   } else {
     return 0;
   }
@@ -113,7 +116,15 @@ sub set_parameter ($$;$) {
             -subtype => 'CONFIGURATION_PARAMETER_TYPE_ERR';
       }
     } elsif ($name eq 'schema-type') {
-      ${$${$_[0]}}->{$name} = ''.$_[2];
+      my $value = ''.$_[2];
+      if ($value eq q<http://www.w3.org/TR/REC-xml>) {
+        ${$${$_[0]}}->{$name} = ''.$_[2];
+      } else {
+        report Message::DOM::DOMException
+            -object => $_[0],
+            -type => 'NOT_SUPPORTED_ERR',
+            -subtype => 'CONFIGURATION_PARAMETER_VALUE_ERR';
+      }
     } else {
       report Message::DOM::DOMException
           -object => $_[0],
@@ -178,4 +189,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/14 10:00:32 $
+## $Date: 2007/07/14 16:32:28 $

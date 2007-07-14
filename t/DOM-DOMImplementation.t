@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 use strict;
 use Test;
-BEGIN { plan tests => 21 } 
+BEGIN { plan tests => 23 } 
 
 require Message::DOM::DOMImplementation;
 
@@ -43,6 +43,7 @@ F: for my $features (
   {Core => '2.0'}, {XML => '2.0'}, {Core => '2.0', XML => '2.0'},
   {Core => '3.0'}, {XML => '3.0'}, {Core => '3.0', XML => '3.0'},
   {XMLVersion => '1.0'}, {XMLVersion => '1.1'},
+  {Traversal => '2.0'}, {Traversal => ''},
 ) {
   my $list = $Message::DOM::DOMImplementationRegistry
       ->get_dom_implementation_list ($features);
@@ -63,4 +64,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2007/07/07 12:26:23 $
+## $Date: 2007/07/14 16:32:28 $

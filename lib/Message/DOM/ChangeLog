@@ -1,3 +1,30 @@
+2007-07-15  Wakaba  <wakaba@suika.fam.cx>
+
+	* TreeWalker.pm, SerialWalker.pm: New Perl modules.
+
+	* Text.pm (whole_text): Parameter index number has
+	been changed to support new |NodeFilter| Perl binding
+	definition.
+
+2007-07-14  Wakaba  <wakaba@suika.fam.cx>
+
+	* AttributeDefinition.pm, DOMElement.pm, DocumentType.pm,
+	ElementTypeDefinition.pm, Entity.pm, EntityReference.pm,
+	Notation.pm, ProcessingInstruction.pm (AUTOLOAD): Don't croak even if an attempt is made to modify a read-only attribute.
+
+	* DOMConfiguration.pm (can_set_parameter,
+	set_parameter): Don't allow to set the value
+	to a string other than <http://www.w3.org/TR/REC-xml> (XML 1.0 DTD).
+
+	* DOMDocument.pm (Message::IF::DocumentTraversal): New interface.
+	(create_tree_walker, manakai_create_serial_walker): References
+	and prototypes are added.
+
+	* DOMException.pm (NULLPO_ERR): New error type:-).
+
+	* DOMImplementation.pm ($HasFeature): Feature |Traversal|,
+	version |2.0|, is added.
+
 2007-07-14  Wakaba  <wakaba@suika.fam.cx>
 
 	* CDATASection.pm: Removed (merged with |Text.pm|).

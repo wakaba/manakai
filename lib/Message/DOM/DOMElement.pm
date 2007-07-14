@@ -2,7 +2,7 @@
 
 package Message::DOM::Element;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.12 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.13 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::Element';
 require Message::DOM::Document;
 
@@ -28,10 +28,6 @@ sub AUTOLOAD {
     no strict 'refs';
     eval qq{
       sub $method_name (\$) {
-        if (\@_ > 1) {
-          require Carp;
-          Carp::croak (qq<Can't modify read-only attribute>);
-        }
         return \${\$_[0]}->{$method_name}; 
       }
     };
@@ -1175,4 +1171,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/14 09:19:11 $
+## $Date: 2007/07/14 16:32:28 $

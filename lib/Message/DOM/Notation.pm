@@ -1,6 +1,6 @@
 package Message::DOM::Notation;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::Notation';
 require Message::DOM::Node;
 
@@ -23,10 +23,6 @@ sub AUTOLOAD {
     no strict 'refs';
     eval qq{
       sub $method_name (\$) {
-        if (\@_ > 1) {
-          require Carp;
-          Carp::croak (qq<Can't modify read-only attribute>);
-        }
         return \${\$_[0]}->{$method_name}; 
       }
     };
@@ -70,7 +66,7 @@ sub child_nodes ($) {
   return bless \\($_[0]), 'Message::DOM::NodeList::EmptyNodeList';
 } # child_nodes
 
-sub node_name ($); # read-only trivial accessor
+sub node_name ($);
 
 sub node_type () { 12 } # NOTATION_NODE
 
@@ -176,4 +172,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/14 09:19:11 $
+## $Date: 2007/07/14 16:32:28 $

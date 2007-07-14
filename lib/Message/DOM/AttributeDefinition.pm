@@ -1,6 +1,6 @@
 package Message::DOM::AttributeDefinition;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.12 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::AttributeDefinition';
 require Message::DOM::Node;
 require Message::DOM::Attr;
@@ -26,10 +26,6 @@ sub AUTOLOAD {
     no strict 'refs';
     eval qq{
       sub $method_name (\$) {
-        if (\@_ > 1) {
-          require Carp;
-          Carp::croak (qq<Can't modify read-only attribute>);
-        }
         return \${\$_[0]}->{$method_name}; 
       }
     };
@@ -166,4 +162,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/14 09:19:11 $
+## $Date: 2007/07/14 16:32:27 $
