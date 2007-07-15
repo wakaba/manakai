@@ -1,7 +1,7 @@
-1..180
+1..182
 # Running under perl version 5.008007 for linux
-# Current time local: Sat Jul  7 22:35:53 2007
-# Current time GMT:   Sat Jul  7 13:35:53 2007
+# Current time local: Sat Jul 14 18:54:33 2007
+# Current time GMT:   Sat Jul 14 09:54:33 2007
 # Using Test.pm version 1.25
 # t/tokenizer/test1.test
 ok 1
@@ -140,11 +140,7 @@ ok 118
 ok 119
 ok 120
 ok 121
-not ok 122
-# Test 122 got: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'Comment',\n            qq'--x'\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 150 fail #122)
-#     Expected: "$VAR1 = [\n          [\n            qq'Comment',\n            qq'--x'\n          ]\n        ];\n" (<!----x-->: <!----x-->)
-#     Got 1 extra line at line 2:
-#      + "          qq'ParseError',\n"
+ok 122
 ok 123
 ok 124
 ok 125
