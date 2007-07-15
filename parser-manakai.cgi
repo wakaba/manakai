@@ -28,7 +28,7 @@ shift @mode if @mode and $mode[0] == '';
   my $time2;
 
   require Message::DOM::DOMImplementation;
-  my $dom = Message::DOM::DOMImplementation->____new;
+  my $dom = Message::DOM::DOMImplementation->new;
 #  $| = 1;
   my $doc;
   my $el;
@@ -54,6 +54,7 @@ if (@mode == 3 and $mode[0] eq 'html' and
   };
 
   $doc = $dom->create_document;
+  $doc->manakai_is_html (1);
   $time1 = time;
   if (length $mode[1]) {
     $el = $doc->create_element_ns
@@ -70,7 +71,7 @@ if (@mode == 3 and $mode[0] eq 'html' and
   my $out;
   if ($mode[2] eq 'html') {
     $time1 = time;
-    $out = Whatpm::HTML->get_inner_html ($el || $doc);
+    $out = \( ($el or $doc)->inner_html );
     $time2 = time;
     $time{serialize_html} = $time2 - $time1;
   } else { # test
@@ -107,8 +108,10 @@ if (@mode == 3 and $mode[0] eq 'html' and
 
   my $out;
   if ($mode[2] eq 'html') {
-    ## TODO: Use XHTML serializer
-    #$out = Whatpm::HTML->get_inner_html ($doc);
+    $time1 = time;
+    $out = \( $doc->inner_html ); ## TODO: $el case
+    $time2 = time;
+    $time{serialize_xml} = $time2 - $time1;
   } else { # test
     $time1 = time;
     $out = test_serialize ($doc);
@@ -236,4 +239,4 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2007/06/27 11:08:03 $
+## $Date: 2007/07/15 06:14:30 $
