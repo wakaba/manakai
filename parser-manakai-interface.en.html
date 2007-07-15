@@ -71,6 +71,9 @@
       if (document.getElementById ('html5').checked) {
         uri += 'html/';
         uri += document.getElementById ('element').value + '/';
+      } else if (document.getElementById ('h2h').checked) {
+        uri += 'h2h/';
+        uri += document.getElementById ('element').value + '/';
       } else {
         uri += 'xhtml/';
         uri += '/';
@@ -95,6 +98,7 @@
 <fieldset>
 <p><label title="Show any HTML5 parse errors if checked"><input type="radio" name="input-format" id="html5" onchange="element.disabled = false" checked> HTML5</label></p>
 <p><label title="Show any XML 1.0/1.1 parse errors if checked (using a non-validating parser)"><input type="radio" name="input-format" onchange="element.disabled = true" id="xhtml5"> XHTML5</label></p>
+<p><label title="Parse as H2H document if checked"><input type="radio" name="input-format" id="h2h" onchange="element.disabled = true"> H2H</label></p>
 <p><input type="text" name="element" id="element" value="" title="If specified, the input is parsed by the fragment parsing (innerHTML) algorithm."></p>
 <p><label title="Show any conformance error of the parsed DOM tree if checked"><input type="checkbox" name="dom5"> DOM5 HTML</label></p>
 </fieldset>

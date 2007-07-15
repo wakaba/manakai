@@ -120,6 +120,36 @@ if (@mode == 3 and $mode[0] eq 'html' and
   }
   print STDOUT Encode::encode ('utf-8', $$out);
   print STDOUT "\n";
+} elsif (@mode == 3 and $mode[0] eq 'h2h' and $mode[1] eq '' and
+         ($mode[2] eq 'html' or $mode[2] eq 'test')) {
+  print STDOUT "Content-Type: text/plain; charset=utf-8\n\n";
+
+  require Encode;
+  $time1 = time;
+  $s = Encode::decode ('utf-8', $s);
+  $time2 = time;
+  $time{decode} = $time2 - $time1;
+
+  require Whatpm::H2H;
+  $doc = $dom->create_document;
+  Whatpm::H2H->parse_string ($s => $doc);
+
+  print "#document\n";
+
+  my $out;
+  if ($mode[2] eq 'html') {
+    $time1 = time;
+    $out = \( $doc->inner_html );
+    $time2 = time;
+    $time{serialize_xml} = $time2 - $time1;
+  } else { # test
+    $time1 = time;
+    $out = test_serialize ($doc);
+    $time2 = time;
+    $time{serialize_test} = $time2 - $time1;
+  }
+  print STDOUT Encode::encode ('utf-8', $$out);
+  print STDOUT "\n";
 } else {
   print STDOUT "Status: 404 Not Found\nContent-Type: text/plain; charset=us-ascii\n\n404";
   exit;
@@ -239,4 +269,4 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2007/07/15 06:14:30 $
+## $Date: 2007/07/15 07:53:00 $
