@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 use strict;
 use Test;
-BEGIN { plan tests => 5086 } 
+BEGIN { plan tests => 5310 } 
 
 require Message::DOM::DOMImplementation;
 use Message::Util::Error;
@@ -1834,6 +1834,10 @@ for my $node (create_nodes ()) {
        ['+unknown' => undef, 0],
        [q<http://suika.fam.cx/www/2006/feature/xdoctype> => '', 1],
        [q<http://suika.fam.cx/www/2006/feature/xdoctype> => '3.0', 1],
+       [q<http://suika.fam.cx/www/2006/feature/Atom> => '', 1],
+       [q<http://suika.fam.cx/www/2006/feature/Atom> => '1.0', 1],
+       [q<http://suika.fam.cx/www/2006/feature/AtomThreading> => '', 1],
+       [q<http://suika.fam.cx/www/2006/feature/AtomThreading> => '1.0', 1],
       ) {
     my $label = $node->node_name . ' ' . $_->[0] . ', ' .
         (defined $_->[1] ? $_->[1] : 'undef');
@@ -2045,4 +2049,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2007/07/14 16:32:28 $
+## $Date: 2007/07/15 12:54:07 $

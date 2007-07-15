@@ -1,17 +1,18 @@
 package Message::DOM::Atom::AtomElement;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Element';
-require Message::DOM::Element;
+require Message::DOM::DOMElement;
 
 my $ATOM_NS = q<http://www.w3.org/2005/Atom>;
 my $CREATE_CHILD_URI = q<http://suika.fam.cx/www/2006/dom-config/create-child-element>;
-             
+
 sub AUTOLOAD {
   my $method_name = our $AUTOLOAD;
   return if $method_name =~ /::DESTROY$/;
 
-  if (my $ln = {  ## Reflecting the string value of a content attribute
+  my $ln;
+  if ($ln = {  ## Reflecting the string value of a content attribute
     'Message::DOM::Atom::AtomElement::AtomCategoryElement::label' => 'label',
     'Message::DOM::Atom::AtomElement::AtomCategoryElement::term' => 'term',
     'Message::DOM::Atom::AtomElement::AtomGeneratorElement::version' => 'version',
@@ -37,7 +38,7 @@ sub AUTOLOAD {
       }
     };
     goto &{ $AUTOLOAD };
-  } elsif (my $ln = {  ## Reflecting the URI value of a content attribute
+  } elsif ($ln = {  ## Reflecting the URI value of a content attribute
     'Message::DOM::Atom::AtomElement::AtomContentElement::src' => 'src',
     'Message::DOM::Atom::AtomElement::AtomCategoryElement::scheme' => 'scheme',
     'Message::DOM::Atom::AtomElement::AtomGeneratorElement::uri' => 'uri',
@@ -73,7 +74,7 @@ sub AUTOLOAD {
       }
     };
     goto &{ $AUTOLOAD };
-  } elsif (my $ln = {  ## Reflecting the string value of a child element
+  } elsif ($ln = {  ## Reflecting the string value of a child element
     'Message::DOM::Atom::AtomElement::AtomPersonConstruct::email' => 'email',
     'Message::DOM::Atom::AtomElement::AtomPersonConstruct::name' => 'name',
     'Message::DOM::Atom::AtomElement::AtomFeedElement::id' => 'id',
@@ -87,30 +88,30 @@ sub AUTOLOAD {
         local \$Error::Depth = \$Error::Depth + 1;
 
         if (\@_ > 1) {
-          if (defined \$_[0]) {
+          if (defined \$_[1]) {
             my \$target;
             E: {
-              for my \$cl (@{\$_[0]->child_nodes}) {
+              for my \$cl (\@{\$_[0]->child_nodes}) {
                 if (\$cl->node_type == 1 and # ELEMENT_NODE
                     \$cl->manakai_local_name eq '$ln' and
-                    \$cl->namespace_uri eq \$ATOM_NS) {
+                    \$cl->namespace_uri eq '$ATOM_NS') {
                   \$target = \$cl;
                   last E;
                 }
               }
 
               \$target = \$_[0]->owner_document->create_element_ns
-                  (\$ATOM_NS, '$ln');
+                  ('$ATOM_NS', '$ln');
               \$_[0]->append_child (\$target);
             } # E
  
-            return \$target->text_content (\$_[0]);
+            return \$target->text_content (\$_[1]);
           } else {
             my \@remove;
-            for my \$cl (@{\$_[0]->child_nodes}) {
+            for my \$cl (\@{\$_[0]->child_nodes}) {
               if (\$cl->node_type == 1 and # ELEMENT_NODE
                   \$cl->manakai_local_name eq '$ln' and
-                  \$cl->namespace_uri eq \$ATOM_NS) {
+                  \$cl->namespace_uri eq '$ATOM_NS') {
                 push \@remove, \$cl;
               }
             }
@@ -120,10 +121,10 @@ sub AUTOLOAD {
           }
         }
 
-        for my \$cl (@{\$_[0]->child_nodes}) {
+        for my \$cl (\@{\$_[0]->child_nodes}) {
           if (\$cl->node_type == 1 and # ELEMENT_NODE
               \$cl->manakai_local_name eq '$ln' and
-              \$cl->namespace_uri eq \$ATOM_NS) {
+              \$cl->namespace_uri eq '$ATOM_NS') {
             return \$cl->text_content;
           }
         }
@@ -132,7 +133,7 @@ sub AUTOLOAD {
       }
     };
     goto &{ $AUTOLOAD };
-  } elsif (my $ln = {  ## Reflecting the URI value of a child element
+  } elsif ($ln = {  ## Reflecting the URI value of a child element
     'Message::DOM::Atom::AtomElement::AtomPersonConstruct::uri' => 'uri',
     'Message::DOM::Atom::AtomElement::AtomFeedElement::icon' => 'icon',
     'Message::DOM::Atom::AtomElement::AtomFeedElement::logo' => 'logo',
@@ -146,31 +147,31 @@ sub AUTOLOAD {
         local \$Error::Depth = \$Error::Depth + 1;
 
         if (\@_ > 1) {
-          if (defined \$_[0]) {
+          if (defined \$_[1]) {
             my \$target;
             E: {
-              for my \$cl (@{\$_[0]->child_nodes}) {
+              for my \$cl (\@{\$_[0]->child_nodes}) {
                 if (\$cl->node_type == 1 and # ELEMENT_NODE
                     \$cl->manakai_local_name eq '$ln' and
-                    \$cl->namespace_uri eq \$ATOM_NS) {
+                    \$cl->namespace_uri eq '$ATOM_NS') {
                   \$target = \$cl;
                   last E;
                 }
               }
 
               \$target = \$_[0]->owner_document->create_element_ns
-                  (\$ATOM_NS, '$ln');
+                  ('$ATOM_NS', '$ln');
               \$_[0]->append_child (\$target);
             } # E
  
-            \$target->text_content (\$_[0]);
+            \$target->text_content (\$_[1]);
             return unless defined wantarray;
           } else {
             my \@remove;
-            for my \$cl (@{\$_[0]->child_nodes}) {
+            for my \$cl (\@{\$_[0]->child_nodes}) {
               if (\$cl->node_type == 1 and # ELEMENT_NODE
                   \$cl->manakai_local_name eq '$ln' and
-                  \$cl->namespace_uri eq \$ATOM_NS) {
+                  \$cl->namespace_uri eq '$ATOM_NS') {
                 push \@remove, \$cl;
               }
             }
@@ -180,10 +181,10 @@ sub AUTOLOAD {
           }
         }
 
-        for my \$cl (@{\$_[0]->child_nodes}) {
+        for my \$cl (\@{\$_[0]->child_nodes}) {
           if (\$cl->node_type == 1 and # ELEMENT_NODE
               \$cl->manakai_local_name eq '$ln' and
-              \$cl->namespace_uri eq \$ATOM_NS) {
+              \$cl->namespace_uri eq '$ATOM_NS') {
             my \$base = \$cl->base_uri;
             if (defined \$base) {
               return \$cl->owner_document->implementation
@@ -199,7 +200,7 @@ sub AUTOLOAD {
       }
     };
     goto &{ $AUTOLOAD };
-  } elsif (my $ln = {  ## Return the child element
+  } elsif ($ln = {  ## Return the child element
     'Message::DOM::Atom::AtomElement::AtomPersonConstruct::name_element' => 'name',
     'Message::DOM::Atom::AtomElement::AtomFeedElement::generator_element' => 'generator',
     'Message::DOM::Atom::AtomElement::AtomFeedElement::rights_element' => 'rights',
@@ -225,25 +226,25 @@ sub AUTOLOAD {
         no warnings 'uninitialized';
         local \$Error::Depth = \$Error::Depth + 1;
 
-        for my \$el (@{\$_[0]->child_nodes}) {
+        for my \$el (\@{\$_[0]->child_nodes}) {
           if (\$el->node_type == 1 and # ELEMENT_NODE
               \$el->manakai_local_name eq '$ln' and
-              \$el->namespace_uri eq \$ATOM_NS) {
+              \$el->namespace_uri eq '$ATOM_NS') {
             return \$el;
           }
         }
         
         my \$od = \$_[0]->owner_document;
-        if (\$od->dom_config->get_parameter (\$CREATE_CHILD_URI)) {
+        if (\$od->dom_config->get_parameter ('$CREATE_CHILD_URI')) {
           return \$_[0]->append_child
-             (\$od->create_element_ns (\$ATOM_NS, '$ln'));
+             (\$od->create_element_ns ('$ATOM_NS', '$ln'));
         } else {
           return undef;
         }
       }
     };
     goto &{ $AUTOLOAD };
-  } elsif (my $ln = {  ## Return a child element list
+  } elsif ($ln = {  ## Return a child element list
     'Message::DOM::Atom::AtomElement::AtomFeedElement::author_elements' => 'author',
     'Message::DOM::Atom::AtomElement::AtomFeedElement::category_elements' => 'category',
     'Message::DOM::Atom::AtomElement::AtomFeedElement::contributor_elements' => 'contributor',
@@ -267,7 +268,7 @@ sub AUTOLOAD {
         for my \$el (\@{\$_[0]->child_nodes}) {
           if (\$el->node_type == 1 and # ELEMENT_NODE
               \$el->manakai_local_name eq '$ln' and
-              \$el->namespace_uri eq \$ATOM_NS) {
+              \$el->namespace_uri eq '$ATOM_NS') {
             push \@\$r, \$el;
           }
         }
@@ -340,7 +341,7 @@ sub name_element ($);
 
 sub uri ($;$);
 
-package Message::DOM::AtomElement::AtomDateConstruct;
+package Message::DOM::Atom::AtomElement::AtomDateConstruct;
 push our @ISA, 'Message::DOM::Atom::AtomElement';
 
 ## TODO: Use HTML5 algorithm
@@ -746,4 +747,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/15 06:16:08 $
+## $Date: 2007/07/15 12:54:06 $

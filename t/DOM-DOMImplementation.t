@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 use strict;
 use Test;
-BEGIN { plan tests => 23 } 
+BEGIN { plan tests => 31 } 
 
 require Message::DOM::DOMImplementation;
 
@@ -44,6 +44,14 @@ F: for my $features (
   {Core => '3.0'}, {XML => '3.0'}, {Core => '3.0', XML => '3.0'},
   {XMLVersion => '1.0'}, {XMLVersion => '1.1'},
   {Traversal => '2.0'}, {Traversal => ''},
+  {q<http://suika.fam.cx/www/2006/feature/XDoctype> => '3.0'},
+  {q<http://suika.fam.cx/www/2006/feature/XDoctype> => ''},
+  {q<http://suika.fam.cx/www/2006/feature/Atom> => '1.0'},
+  {q<http://suika.fam.cx/www/2006/feature/Atom> => ''},
+  {XML => '3.0', q<http://suika.fam.cx/www/2006/feature/Atom> => '1.0'},
+  {Core => '3.0', q<http://suika.fam.cx/www/2006/feature/Atom> => ''},
+  {q<http://suika.fam.cx/www/2006/feature/AtomThreading> => '1.0'},
+  {q<http://suika.fam.cx/www/2006/feature/AtomThreading> => ''},
 ) {
   my $list = $Message::DOM::DOMImplementationRegistry
       ->get_dom_implementation_list ($features);
@@ -64,4 +72,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2007/07/14 16:32:28 $
+## $Date: 2007/07/15 12:54:07 $

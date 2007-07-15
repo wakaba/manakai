@@ -1,7 +1,7 @@
 # -*- mode: fundamental -*- # cperl-mode takes very long time to parse
 package Message::DOM::XMLParserTemp;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 package Message::DOM::DOMCore::ManakaiDOMError;
 push our @ISA, 'Message::DOM::DOMError';
@@ -381,39 +381,36 @@ sub parse_byte_stream ($$$$%) {
 
   $self->{onerror} = $onerror || sub { warn $_[0] };
 
-  require Message::Charset::Encode;
+  require Whatpm::Charset::DecodeHandle;
   my $encode_uri = defined $opt{charset}
-      ? $impl->get_uri_from_charset_name
-            ('http://suika.fam.cx/~wakaba/archive/2004/dis/Charset/xmlName',
-             $opt{charset})
+      ? Whatpm::Charset::DecodeHandle->name_to_uri (xml => $opt{charset})
       : 'http://suika.fam.cx/www/2006/03/xml-entity/';
-  my $filehandle_char = $impl->create_mc_decode_handle
+  my $filehandle_char = Whatpm::Charset::DecodeHandle->create_decode_handle
       ($encode_uri, $filehandle_byte, sub {
-         ## TODO: Remove |$selfx| below once it is implemented
-         my ($selfx, $fh, $type, %opt) = @_;
+         my ($fh, $type, %opt) = @_;
          my $continue = 1;
-         if ($type eq 'http://suika.fam.cx/~wakaba/archive/2004/dis/Charset/illegal-octets-error') {
+         if ($type eq 'illegal-octets-error') {
            $continue = report Message::DOM::DOMCore::ManakaiDOMError
                -object => $self, ## ISSUE: Memory leak?
                -type => 'http://suika.fam.cx/~wakaba/archive/2004/dom/xml-parser#fatal-illegal-byte-sequence',
                'http://suika.fam.cx/~wakaba/archive/2004/dom/xml-parser#byte-sequence' => $opt{octets};
-         } elsif ($type eq 'http://suika.fam.cx/~wakaba/archive/2004/dis/Charset/unassigned-code-point-error') {
+         } elsif ($type eq 'unassigned-code-point-error') {
            $continue = report Message::DOM::DOMCore::ManakaiDOMError
                -object => $self, ## ISSUE: Memory leak?
                -type => 'http://suika.fam.cx/~wakaba/archive/2004/dom/xml-parser#warning-unassigned-code-point',
                byte_sequence => $opt{octets};
            $opt{octets} = \"\x{FFFD}";
-         } elsif ($type eq 'http://suika.fam.cx/~wakaba/archive/2004/dis/Charset/invalid-state-error') {
+         } elsif ($type eq 'invalid-state-error') {
            $continue = report Message::DOM::DOMCore::ManakaiDOMError
                -object => $self, ## ISSUE: Memory leak?
                -type => 'http://suika.fam.cx/~wakaba/archive/2004/dom/xml-parser#fatal-illegal-byte-sequence',
                code_state => $opt{state};
-         } elsif ($type eq 'http://suika.fam.cx/~wakaba/archive/2004/dis/Charset/charset-not-supported-error') {
+         } elsif ($type eq 'charset-not-supported-error') {
            $continue = report Message::DOM::DOMCore::ManakaiDOMError
                -object => $self, ## ISSUE: Memory leak?
                -type => 'http://suika.fam.cx/~wakaba/archive/2004/dom/xml-parser#fatal-unprocessable-encoding',
                charset_uri => $opt{charset_uri};
-         } elsif ($type eq 'http://suika.fam.cx/~wakaba/archive/2004/dis/Charset/no-bom-error') {
+         } elsif ($type eq 'no-bom-error') {
            if ($opt{charset_uri} eq 'http://suika.fam.cx/~wakaba/archive/2004/dis/Charset/XML.utf-16') {
              $continue = report Message::DOM::DOMCore::ManakaiDOMError
                  -object => $self, ## ISSUE: Memory leak?
@@ -424,7 +421,7 @@ sub parse_byte_stream ($$$$%) {
                  -type => 'http://suika.fam.cx/~wakaba/archive/2004/dom/xml-parser#fatal-illegal-byte-sequence',
                  code_state => 'bom';
            }
-         } elsif ($type eq 'http://suika.fam.cx/~wakaba/archive/2004/dis/Charset/charset-name-mismatch-error') {
+         } elsif ($type eq 'charset-name-mismatch-error') {
            $continue = report Message::DOM::DOMCore::ManakaiDOMError
                -object => $self, ## ISSUE: Memory leak?
                -type => 'http://suika.fam.cx/~wakaba/archive/2004/dom/xml-parser#fatal-encoding-mismatch',
@@ -48376,4 +48373,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/07 04:47:29 $
+## $Date: 2007/07/15 12:54:06 $
