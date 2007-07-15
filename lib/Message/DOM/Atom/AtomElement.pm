@@ -1,6 +1,6 @@
 package Message::DOM::Atom::AtomElement;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Element';
 require Message::DOM::Element;
 
@@ -690,6 +690,8 @@ sub title_element ($);
 
 sub updated_element ($);
 
+## TODO: Threading extension
+
 package Message::DOM::DOMImplementation;
 
 sub create_atom_entry_document ($$;$$) {
@@ -744,4 +746,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/15 05:18:46 $
+## $Date: 2007/07/15 06:16:08 $

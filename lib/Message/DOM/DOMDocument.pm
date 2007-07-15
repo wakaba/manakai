@@ -2,7 +2,7 @@
 
 package Message::DOM::Document;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.14 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.15 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::Document',
     'Message::IF::DocumentTraversal', 'Message::IF::DocumentXDoctype',
     'Message::IF::HTMLDocument';
@@ -981,42 +981,6 @@ sub xml_version ($;$) {
   }
 } # xml_version
 
-## |HTMLDocument| interface
-
-sub compat_mode ($) {
-  if (${$_[0]}->{manakai_is_html}) {
-    if (defined ${$_[0]}->{manakai_compat_mode} and
-        ${$_[0]}->{manakai_compat_mode} eq 'quirks') {
-      return 'BackCompat';
-    }
-  }
-  return 'CSS1Compat';
-} # compat_mode
-
-sub manakai_compat_mode ($;$) {
-  if (${$_[0]}->{manakai_is_html}) {
-    if (@_ > 1 and defined $_[1] and
-        {'no quirks' => 1, 'limited quirks' => 1, 'quirks' => 1}->{$_[1]}) {
-      ${$_[0]}->{manakai_compat_mode} = $_[1];
-    }
-    return ${$_[0]}->{manakai_compat_mode} || 'no quirks';
-  } else {
-    return 'no quirks';
-  }
-} # manakai_compat_mode
-
-sub manakai_is_html ($;$) {
-  if (@_ > 1) {
-    if ($_[1]) {
-      ${$_[0]}->{manakai_is_html} = 1;
-    } else {
-      delete ${$_[0]}->{manakai_is_html};
-      delete ${$_[0]}->{manakai_compat_mode};
-    }
-  }
-  return ${$_[0]}->{manakai_is_html};
-} # manakai_is_html
-
 ## |Document| methods
 
 sub get_element_by_id ($$) {
@@ -1107,6 +1071,64 @@ sub manakai_create_serial_walker ($$;$$$);
 
 sub create_tree_walker ($$;$$$);
 
+## |HTMLDocument| attributes
+
+sub compat_mode ($) {
+  if (${$_[0]}->{manakai_is_html}) {
+    if (defined ${$_[0]}->{manakai_compat_mode} and
+        ${$_[0]}->{manakai_compat_mode} eq 'quirks') {
+      return 'BackCompat';
+    }
+  }
+  return 'CSS1Compat';
+} # compat_mode
+
+sub manakai_compat_mode ($;$) {
+  if (${$_[0]}->{manakai_is_html}) {
+    if (@_ > 1 and defined $_[1] and
+        {'no quirks' => 1, 'limited quirks' => 1, 'quirks' => 1}->{$_[1]}) {
+      ${$_[0]}->{manakai_compat_mode} = $_[1];
+    }
+    return ${$_[0]}->{manakai_compat_mode} || 'no quirks';
+  } else {
+    return 'no quirks';
+  }
+} # manakai_compat_mode
+
+sub inner_html ($;$) {
+  my $self = $_[0];
+  local $Error::Depth = $Error::Depth + 1;
+
+  ## TODO: Setter
+
+  if ($$self->{manakai_is_html}) {
+    require Whatpm::HTML;
+    return ${ Whatpm::HTML->get_inner_html ($self) };
+  } else {
+    ## TODO: This serializer is currently not conformant to HTML5 spec.
+    require Whatpm::XMLSerializer;
+    my $r = '';
+    for (@{$self->child_nodes}) {
+      $r .= ${ Whatpm::XMLSerializer->get_outer_xml ($_, sub {
+        ## TODO: INVALID_STATE_ERR
+      }) };
+    }
+    return $r;
+  }
+} # inner_html
+
+sub manakai_is_html ($;$) {
+  if (@_ > 1) {
+    if ($_[1]) {
+      ${$_[0]}->{manakai_is_html} = 1;
+    } else {
+      delete ${$_[0]}->{manakai_is_html};
+      delete ${$_[0]}->{manakai_compat_mode};
+    }
+  }
+  return ${$_[0]}->{manakai_is_html};
+} # manakai_is_html
+
 package Message::IF::Document;
 package Message::IF::DocumentTraversal;
 package Message::IF::DocumentXDoctype;
@@ -1154,4 +1176,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/14 16:32:28 $
+## $Date: 2007/07/15 06:16:08 $

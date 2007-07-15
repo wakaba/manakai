@@ -2,7 +2,7 @@
 
 package Message::DOM::Element;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.14 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.15 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::Element';
 require Message::DOM::Document;
 
@@ -154,11 +154,29 @@ sub prefix ($;$) {
   return ${$_[0]}->{prefix}; 
 } # prefix
 
-## The |Node| interface - method
-
-## The |Element| interface - attribute
+## |Element| attributes
 
 sub manakai_base_uri ($;$);
+
+## Defined in |HTMLElement| interface of HTML5
+sub inner_html ($;$) {
+  my $self = $_[0];
+
+  ## TODO: Setter
+
+  if (${$$self->{owner_document}}->{manakai_is_html}) {
+    require Whatpm::HTML;
+    return ${ Whatpm::HTML->get_inner_html ($self) };
+  } else {
+    ## TODO: This serializer is not currenly conformant to HTML5.
+    require Whatpm::XMLSerializer;
+    my $r = '';
+    for (@{$self->child_nodes}) {
+      $r .= ${ Whatpm::XMLSerializer->get_outer_xml ($_) };
+    }
+    return $r;
+  }
+} # inner_html
 
 sub schema_type_info ($) {
   require Message::DOM::TypeInfo;
@@ -1190,4 +1208,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/15 05:18:46 $
+## $Date: 2007/07/15 06:16:08 $
