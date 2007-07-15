@@ -1,6 +1,6 @@
 package Message::DOM::NodeList;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Tie::Array', 'Message::IF::NodeList';
 require Message::DOM::DOMException;
 require Tie::Array;
@@ -18,6 +18,7 @@ use overload
       return not ($_[0] eq $_[1]);
     },
     '==' => sub {
+      ## NOTE: Same as |StaticNodeList|'s.
       return 0 unless UNIVERSAL::isa ($_[1], 'Message::IF::NodeList');
       
       local $Error::Depth = $Error::Depth + 1;
@@ -227,7 +228,49 @@ sub EXISTS ($$) {
   return defined $_[0]->item ($_[1]);
 } # EXISTS
 
+package Message::DOM::NodeList::StaticNodeList;
+push our @ISA, 'Messaeg::IF::StaticNodeList';
+
+use overload
+    '==' => sub {
+      ## NOTE: Same as |NodeList|'s.
+      return 0 unless UNIVERSAL::isa ($_[1], 'Message::IF::NodeList');
+      
+      local $Error::Depth = $Error::Depth + 1;
+      my $l1 = $_[0]->length;
+      my $l2 = $_[1]->length;
+      return 0 unless $l1 == $l2;
+      
+      for my $i (0 .. ($l1-1)) {
+        return 0 unless $_[0]->item ($i) == $_[1]->item ($i);
+      }
+      
+      return 1;
+    },
+    '!=' => sub {
+      return not ($_[0] == $_[1]);
+    },
+    fallback => 1;
+
+## |NodeList| attributes
+
+sub length ($) {
+  return scalar @{$_[0]};
+} # length
+
+sub manakai_read_only () { 0 }
+
+## |NodeList| methods
+
+sub item ($;$) {
+  my $index = int ($_[1] or 0);
+  return $_[0]->[$index] if $index >= 0;
+} # item
+
 package Message::IF::NodeList;
+
+package Message::IF::StaticNodeList;
+push our @ISA, 'Message::IF::NodeList';
 
 =head1 LICENSE
 
@@ -239,4 +282,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/14 09:19:11 $
+## $Date: 2007/07/15 05:18:46 $

@@ -2,7 +2,7 @@
 
 package Message::DOM::Element;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.13 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.14 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::Element';
 require Message::DOM::Document;
 
@@ -1052,9 +1052,28 @@ sub create_element_ns ($$$) {
 
   ## -- Choose the most apppropriate class for the element
   my $class = 'Message::DOM::Element';
-
-  ## TODO: Choose a class for $nsuri:$lname
-  ## TODO: Choose a class for $nsuri:*
+  if (defined $nsuri) {
+    if ($nsuri eq q<http://www.w3.org/2005/Atom>) {
+      require Message::DOM::Atom::AtomElement;
+      $class = {
+                author => 'Message::DOM::Atom::AtomElement::AtomPersonConstruct',
+                category => 'Message::DOM::Atom::AtomElement::AtomCategoryElement',
+                content => 'Message::DOM::Atom::AtomElement::AtomContentElement',
+                contributor => 'Message::DOM::Atom::AtomElement::AtomPersonConstruct',
+                entry => 'Message::DOM::Atom::AtomElement::AtomEntryElement',
+                feed => 'Message::DOM::Atom::AtomElement::AtomFeedElement',
+                generator => 'Message::DOM::Atom::AtomElement::AtomGeneratorElement',
+                link => 'Message::DOM::Atom::AtomElement::AtomLinkElement',
+                published => 'Message::DOM::Atom::AtomElement::AtomDateConstruct',
+                rights => 'Message::DOM::Atom::AtomElement::AtomTextConstruct',
+                source => 'Message::DOM::Atom::AtomElement::AtomSourceElement',
+                subtitle => 'Message::DOM::Atom::AtomElement::AtomTextConstruct',
+                summary => 'Message::DOM::Atom::AtomElement::AtomTextConstruct',
+                title => 'Message::DOM::Atom::AtomElement::AtomTextConstruct',
+                updated => 'Message::DOM::Atom::AtomElement::AtomDateConstruct',
+               }->{$lname} || 'Message::DOM::Atom::AtomElement';
+    }
+  }
 
   my $r = $class->____new ($self, $nsuri, $prefix, $lname);
 
@@ -1171,4 +1190,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/14 16:32:28 $
+## $Date: 2007/07/15 05:18:46 $

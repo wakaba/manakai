@@ -1,5 +1,23 @@
 2007-07-15  Wakaba  <wakaba@suika.fam.cx>
 
+	* DOMConfiguration.pm: Configuration parameter |create-child-element| 
+	implemented.
+
+	* DOMElement.pm (create_element_ns): Support for Atom
+	subclasses.
+
+	* DOMImplementation.pm (DOMImplementation): Now
+	implements the |AtomDOMImplementation| interface.
+	($HasFeature): Features |atom| and |atomthreading| are added.
+
+	* NodeList.pm (StaticNodeList): Implemented.
+
+2007-07-15  Wakaba  <wakaba@suika.fam.cx>
+
+	* Atom/: New directory.
+
+2007-07-15  Wakaba  <wakaba@suika.fam.cx>
+
 	* TreeWalker.pm, SerialWalker.pm: New Perl modules.
 
 	* Text.pm (whole_text): Parameter index number has

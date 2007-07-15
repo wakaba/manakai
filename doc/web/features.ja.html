@@ -53,6 +53,9 @@
   <code class="DOM">normalize-character</code> は未実装</li>
   <li>一部の操作は <code class="DOMa">specified</code>
   を自動的に真にしない</li>
+  <li>設定引数のうち <code lang="en" class="DOM">error-handler</code> と
+  <code lang="en" class="DOM">schema-type</code> <em>以外</em> は未実装</li>
+  <li><code lang="en" class="DOMi">NameList</code> は未実装</li>
   </ul>
   </div>
 </td>
@@ -66,14 +69,7 @@
 <td>
   <a href="http://www.w3.org/TR/2000/REC-DOM-Level-2-Core-20001113/core.html"
       title="DOM 水準 2 XML">水準 2</a>, 3</td>
-<td>
-  <p>ほぼ実装済</p>
-  <div class="not-implemented">
-  <ul>
-  <li><code class="DOMa">internal_subset</code> は未実装</li>
-  </ul>
-  </div>
-</td>
+<td>実装済</td>
 </tr>
 <tr>
 <th scope="row">XDoctype 定義</th>
@@ -84,16 +80,7 @@
   <li><code class="DOMi" lang="en">DocumentTypeDefinition</code></li>
   <li><code class="DOMi" lang="en">ElementTypeDefinition</code></li>
   <li><code class="DOMi" lang="en">AttributeDefinition</code></li>
-  </ul>
-</td>
-</tr>
-<tr>
-<th scope="row">XDoctype 宣言</th>
-<td>水準 3 案 (manakai 独自)</td>
-<td>
-  <p>次のすべてを実装:</p>
-  <ul>
-  <li><code class="DOMi" lang="en">DocumentTypeDeclaration</code></li>
+  <li><code class="DOMi" lang="en">DocumentXDoctype</code></li>
   </ul>
 </td>
 </tr>

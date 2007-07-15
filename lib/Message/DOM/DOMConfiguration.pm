@@ -1,6 +1,6 @@
 package Message::DOM::DOMConfiguration;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::IF::DOMConfiguration';
 require Message::DOM::DOMException;
 
@@ -33,6 +33,7 @@ my %names = (
              'schema-type' => 1,
              q<http://suika.fam.cx/www/2006/dom-config/clone-entity-reference-subtree> => 1,
              q<http://suika.fam.cx/www/2006/dom-config/dtd-attribute-type> => 1,
+             q<http://suika.fam.cx/www/2006/dom-config/create-child-element> => 1,
              q<http://suika.fam.cx/www/2006/dom-config/dtd-default-attribute> => 1,
              q<http://suika.fam.cx/www/2006/dom-config/strict-document-children> => 1,
              q<http://suika.fam.cx/www/2006/dom-config/xml-id> => 1,
@@ -50,6 +51,7 @@ sub can_set_parameter ($$;$) {
   my $name = ''.$_[1];
   if ({
        q<http://suika.fam.cx/www/2006/dom-config/clone-entity-reference-subtree> => 1,
+       q<http://suika.fam.cx/www/2006/dom-config/create-child-element> => 1,
        q<http://suika.fam.cx/www/2006/dom-config/dtd-attribute-type> => 1,
        q<http://suika.fam.cx/www/2006/dom-config/dtd-default-attribute> => 1,
        q<http://suika.fam.cx/www/2006/dom-config/strict-document-children> => 1,
@@ -73,6 +75,7 @@ sub get_parameter ($$) {
   if ({
        'schema-type' => 1,
        q<http://suika.fam.cx/www/2006/dom-config/clone-entity-reference-subtree> => 1,
+       q<http://suika.fam.cx/www/2006/dom-config/create-child-element> => 1,
        q<http://suika.fam.cx/www/2006/dom-config/dtd-attribute-type> => 1,
        q<http://suika.fam.cx/www/2006/dom-config/dtd-default-attribute> => 1,
        q<http://suika.fam.cx/www/2006/dom-config/strict-document-children> => 1,
@@ -96,6 +99,7 @@ sub set_parameter ($$;$) {
   if (defined $_[2]) {
     if ({
          q<http://suika.fam.cx/www/2006/dom-config/clone-entity-reference-subtree> => 1,
+         q<http://suika.fam.cx/www/2006/dom-config/create-child-element> => 1,
          q<http://suika.fam.cx/www/2006/dom-config/dtd-attribute-type> => 1,
          q<http://suika.fam.cx/www/2006/dom-config/dtd-default-attribute> => 1,
          q<http://suika.fam.cx/www/2006/dom-config/strict-document-children> => 1,
@@ -142,6 +146,7 @@ sub set_parameter ($$;$) {
       ${$${$_[0]}}->{$name} = 1;
     } elsif ({
               'schema-type' => 1,
+              q<http://suika.fam.cx/www/2006/dom-config/create-child-element> => 1,
         }->{$name}) {
       delete ${$${$_[0]}}->{$name};
     } elsif ($_[1] eq 'error-handler') {
@@ -189,4 +194,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/14 16:32:28 $
+## $Date: 2007/07/15 05:18:46 $
