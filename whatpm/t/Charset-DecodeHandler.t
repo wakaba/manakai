@@ -75,7 +75,7 @@ for (
 }
 
 for (
-          [$XML_CHARSET.'utf-8', 'utf-8'],
+          [$XML_CHARSET.'utf-8', 'UTF-8'],
           [$XML_CHARSET.'x-no-such-charset', 'x-no-such-charset'],
           [q<http://charset.example/>, undef],
 ) {
@@ -412,115 +412,115 @@ sub check_charset ($$$) {
           id => q<l=0>,
           in => q<>,
           out => [undef],
-          name => 'utf-8', bom => 0,
+          name => 'UTF-8', bom => 0,
         },
         {
           id => q<l=1>,
           in => "a",
           out => [undef, "a", undef],
-          name => 'utf-8', bom => 0,
+          name => 'UTF-8', bom => 0,
         },
         {
           id => q<bom8.l=0>,
           in => "\xEF\xBB\xBF",
           out => [undef],
-          name => 'utf-8', bom => 1,
+          name => 'UTF-8', bom => 1,
         },
         {
           id => q<bom8.l=1>,
           in => "\xEF\xBB\xBFa",
           out => [undef, "a", undef],
-          name => 'utf-8', bom => 1,
+          name => 'UTF-8', bom => 1,
         },
         {
           id => q<bom8.zwnbsp>,
           in => "\xEF\xBB\xBF\xEF\xBB\xBF",
           out => [undef, "\x{FEFF}", undef],
-          name => 'utf-8', bom => 1,
+          name => 'UTF-8', bom => 1,
         },
         {
           id => q<bom16be.l=0>,
           in => "\xFE\xFF",
           out => [undef],
-          name => 'utf-16', bom => 1,
+          name => 'UTF-16', bom => 1,
         },
         {
           id => q<bom16le.l=0>,
           in => "\xFF\xFE",
           out => [undef],
-          name => 'utf-16', bom => 1,
+          name => 'UTF-16', bom => 1,
         },
         {
           id => q<bom16be.l=1>,
           in => "\xFE\xFFa",
           out => [undef, "a", [q<illegal-octets-error>]],
-          name => 'utf-16', bom => 1,
+          name => 'UTF-16', bom => 1,
         },
         {
           id => q<bom16le.l=1>,
           in => "\xFF\xFEa",
           out => [undef, "a", [q<illegal-octets-error>]],
-          name => 'utf-16', bom => 1,
+          name => 'UTF-16', bom => 1,
         },
         {
           id => q<bom16be.l=2>,
           in => "\xFE\xFF\x4E\x00",
           out => [undef, "\x{4E00}", undef],
-          name => 'utf-16', bom => 1,
+          name => 'UTF-16', bom => 1,
         },
         {
           id => q<bom16le.l=2>,
           in => "\xFF\xFE\x00\x4E",
           out => [undef, "\x{4E00}", undef],
-          name => 'utf-16', bom => 1,
+          name => 'UTF-16', bom => 1,
         },
         {
           id => q<bom16be.l=2lt>,
           in => "\xFE\xFF\x00<",
           out => [undef, "<", undef],
-          name => 'utf-16', bom => 1,
+          name => 'UTF-16', bom => 1,
         },
         {
           id => q<bom16le.l=2lt>,
           in => "\xFF\xFE<\x00",
           out => [undef, "<", undef],
-          name => 'utf-16', bom => 1,
+          name => 'UTF-16', bom => 1,
         },
         {
           id => q<bom16be.zwnbsp>,
           in => "\xFE\xFF\xFE\xFF",
           out => [undef, "\x{FEFF}", undef],
-          name => 'utf-16', bom => 1,
+          name => 'UTF-16', bom => 1,
         },
         {
           id => q<bom16le.zwnbsp>,
           in => "\xFF\xFE\xFF\xFE",
           out => [undef, "\x{FEFF}", undef],
-          name => 'utf-16', bom => 1,
+          name => 'UTF-16', bom => 1,
         },
         {
           id => q<bom32e3412.l=0>,
           in => "\xFE\xFF\x00\x00",
           out => [undef, "\x00", undef],
-          name => 'utf-16', bom => 1,
+          name => 'UTF-16', bom => 1,
         },
         {
           id => q<bom32e4321.l=0>,
           in => "\xFF\xFE\x00\x00",
           out => [undef, "\x00", undef],
-          name => 'utf-16', bom => 1,
+          name => 'UTF-16', bom => 1,
         },
         {
           id => q<bom16be.l=4ltq>,
           in => "\xFE\xFF\x00<\x00?",
           out => [undef, "<", undef, "?", undef],
-          name => 'utf-16', bom => 1,
+          name => 'UTF-16', bom => 1,
         },
         {
           id => q<bom16le.l=4ltq>,
           in => "\xFF\xFE<\x00?\x00",
           out => [undef, "<", undef, "?", undef],
-          name => 'utf-16', bom => 1,
+          name => 'UTF-16', bom => 1,
         },
         {
           id => q<bom16be.decl.1>,
@@ -668,7 +668,7 @@ sub check_charset ($$$) {
                   "i", undef, "o", undef, "n", undef, "=", undef, '"', undef,
                   "1", undef, ".", undef, "0", undef, '"', undef, 
                   "?", undef, ">", undef],
-          name => 'utf-8', bom => 0,
+          name => 'UTF-8', bom => 0,
         },
         {
           id => q<bom8.decl.1>,
@@ -703,7 +703,7 @@ sub check_charset ($$$) {
                   "U", undef, "S", undef, "-", undef, "a", undef, "s", undef,
                   "c", undef, "i", undef, "i", undef,
                   '"', undef, "?", undef, ">", undef],
-          name => 'us-ascii', bom => 0,
+          name => 'US-ascii', bom => 0,
         },
         {
           id => q<us-ascii.decl.3>,
@@ -1036,7 +1036,8 @@ sub check_charset ($$$) {
                         "\xAF\xA1", [q<unassigned-code-point-error>]],
         },
       );
-  check_charset ('XML-EUC-JP', $XML_CHARSET.'euc-jp', \@testdata);
+  check_charset ('XML-EUC-JP', $XML_CHARSET.'euc-jp',
+                 [map {$_->{name} = 'EUC-JP'; $_} @testdata]);
 }
 
 ## Shift_JIS
@@ -1412,7 +1413,8 @@ sub check_charset ($$$) {
         },
       );
 
-  check_charset ('XML-Shift_JIS', $XML_CHARSET.'shift_jis', \@testdata);
+  check_charset ('XML-Shift_JIS', $XML_CHARSET.'shift_jis',
+                 [map {$_->{name} = 'Shift_JIS'; $_} @testdata]);
 }
 
 ## ISO-2022-JP
@@ -1815,7 +1817,9 @@ sub check_charset ($$$) {
       );
 
   check_charset ('IETF-ISO-2022-JP', $IANA_CHARSET.'iso-2022-jp',
-                 [map {$_->{out} = $_->{out1}; $_} @testdata]);
+                 [map {$_->{out} = $_->{out1}; $_->{name} = 'iso-2022-jp'; $_}
+                  @testdata]);
   check_charset ('XML-ISO-2022-JP', $XML_CHARSET.'iso-2022-jp',
-                 [map {$_->{out} = $_->{out2}; $_} @testdata]);
+                 [map {$_->{out} = $_->{out2}; $_->{name} = 'ISO-2022-JP'; $_}
+                  @testdata]);
 }

@@ -20,7 +20,7 @@ sub create_decode_handle ($$$;$) {
       $obj->{charset} eq $XML_AUTO_CHARSET) {
     my $b = ''; # UTF-8 w/o BOM
     $csdef = $Whatpm::Charset::CharsetDef->{$PERL_CHARSET.'utf-8'};
-    $obj->{input_encoding} = 'utf-8';
+    $obj->{input_encoding} = 'UTF-8';
     if (read $obj->{filehandle}, $b, 256) {
       no warnings "substr";
       no warnings "uninitialized";
@@ -28,7 +28,7 @@ sub create_decode_handle ($$$;$) {
         if (substr ($b, 1, 1) eq "?") { # ASCII8
           if ($b =~ /^<\?xml\s+(?:version\s*=\s*["'][^"']*["']\s*)?
               encoding\s*=\s*["']([^"']*)/x) {
-            $obj->{input_encoding} = lc $1;
+            $obj->{input_encoding} = $1;
             my $uri = name_to_uri (undef, 'xml', $obj->{input_encoding});
             $csdef = $Whatpm::Charset::CharsetDef->{$uri};
             if (not $csdef->{ascii8} or $csdef->{bom_required}) {
@@ -38,7 +38,7 @@ sub create_decode_handle ($$$;$) {
             }
           } else {
             $csdef = $Whatpm::Charset::CharsetDef->{$PERL_CHARSET.'utf-8'};
-            $obj->{input_encoding} = 'utf-8';
+            $obj->{input_encoding} = 'UTF-8';
           }
           if (defined $csdef->{no_bom_variant}) {
             $csdef = $Whatpm::Charset::CharsetDef->{$csdef->{no_bom_variant}};
@@ -48,7 +48,7 @@ sub create_decode_handle ($$$;$) {
             my $c = $b; $c =~ tr/\x00//d;
             if ($c =~ /^<\?xml\s+(?:version\s*=\s*["'][^"']*["']\s*)?
                 encoding\s*=\s*["']([^"']*)/x) {
-              $obj->{input_encoding} = lc $1;
+              $obj->{input_encoding} = $1;
               my $uri = name_to_uri (undef, 'xml', $obj->{input_encoding});
               $csdef = $Whatpm::Charset::CharsetDef->{$uri};
               if (not $csdef->{ascii16} or $csdef->{ascii16be} or
@@ -59,7 +59,7 @@ sub create_decode_handle ($$$;$) {
               }
             } else {
               $csdef = $Whatpm::Charset::CharsetDef->{$PERL_CHARSET.'utf-8'};
-              $obj->{input_encoding} = 'utf-8';
+              $obj->{input_encoding} = 'UTF-8';
             }
             if (defined $csdef->{no_bom_variant16le}) {
               $csdef = $Whatpm::Charset::CharsetDef->{$csdef->{no_bom_variant16le}};
@@ -68,7 +68,7 @@ sub create_decode_handle ($$$;$) {
             my $c = $b; $c =~ tr/\x00//d;
             if ($c =~ /^<\?xml\s+(?:version\s*=\s*["'][^"']*["']\s*)?
                 encoding\s*=\s*["']([^"']*)/x) {
-              $obj->{input_encoding} = lc $1;
+              $obj->{input_encoding} = $1;
               my $uri = name_to_uri (undef, 'xml', $obj->{input_encoding});
               $csdef = $Whatpm::Charset::CharsetDef->{$uri};
               if (not $csdef->{ascii32} or 
@@ -82,7 +82,7 @@ sub create_decode_handle ($$$;$) {
               }
             } else {
               $csdef = $Whatpm::Charset::CharsetDef->{$PERL_CHARSET.'utf-8'};
-              $obj->{input_encoding} = 'utf-8';
+              $obj->{input_encoding} = 'UTF-8';
             }
             if (defined $csdef->{no_bom_variant32endian4321}) {
               $csdef = $Whatpm::Charset::CharsetDef->{$csdef->{no_bom_variant32endian4321}};
@@ -95,7 +95,7 @@ sub create_decode_handle ($$$;$) {
         my $c = $b;
         if ($c =~ /^<\?xml\s+(?:version\s*=\s*["'][^"']*["']\s*)?
             encoding\s*=\s*["']([^"']*)/x) {
-          $obj->{input_encoding} = lc $1;
+          $obj->{input_encoding} = $1;
           my $uri = name_to_uri (undef, 'xml', $obj->{input_encoding});
           $csdef = $Whatpm::Charset::CharsetDef->{$uri};
           if (not $csdef->{utf8_encoding_scheme} or
@@ -106,7 +106,7 @@ sub create_decode_handle ($$$;$) {
           }
         } else {
           $csdef = $Whatpm::Charset::CharsetDef->{$PERL_CHARSET.'utf-8'};
-          $obj->{input_encoding} = 'utf-8';
+          $obj->{input_encoding} = 'UTF-8';
         }
         if (defined $csdef->{no_bom_variant}) {
           $csdef = $Whatpm::Charset::CharsetDef->{$csdef->{no_bom_variant}};
@@ -116,7 +116,7 @@ sub create_decode_handle ($$$;$) {
           my $c = $b; $c =~ tr/\x00//d;
           if ($c =~ /^<\?xml\s+(?:version\s*=\s*["'][^"']*["']\s*)?
               encoding\s*=\s*["']([^"']*)/x) {
-            $obj->{input_encoding} = lc $1;
+            $obj->{input_encoding} = $1;
             my $uri = name_to_uri (undef, 'xml', $obj->{input_encoding});
             $csdef = $Whatpm::Charset::CharsetDef->{$uri};
             if (not $csdef->{ascii16} or $csdef->{ascii16le} or
@@ -127,7 +127,7 @@ sub create_decode_handle ($$$;$) {
             }
           } else {
             $csdef = $Whatpm::Charset::CharsetDef->{$PERL_CHARSET.'utf-8'};
-            $obj->{input_encoding} = 'utf-8';
+            $obj->{input_encoding} = 'UTF-8';
           }
           if (defined $csdef->{no_bom_variant16be}) {
             $csdef = $Whatpm::Charset::CharsetDef->{$csdef->{no_bom_variant16be}};
@@ -136,7 +136,7 @@ sub create_decode_handle ($$$;$) {
           my $c = $b; $c =~ tr/\x00//d;
           if ($c =~ /^<\?xml\s+(?:version\s*=\s*["'][^"']*["']\s*)?
               encoding\s*=\s*["']([^"']*)/x) {
-            $obj->{input_encoding} = lc $1;
+            $obj->{input_encoding} = $1;
             my $uri = name_to_uri (undef, 'xml', $obj->{input_encoding});
             $csdef = $Whatpm::Charset::CharsetDef->{$uri};
             if (not $csdef->{ascii32} or 
@@ -150,7 +150,7 @@ sub create_decode_handle ($$$;$) {
             }
           } else {
             $csdef = $Whatpm::Charset::CharsetDef->{$PERL_CHARSET.'utf-8'};
-            $obj->{input_encoding} = 'utf-8';
+            $obj->{input_encoding} = 'UTF-8';
           }
           if (defined $csdef->{no_bom_variant32endian3412}) {
             $csdef = $Whatpm::Charset::CharsetDef->{$csdef->{no_bom_variant32endian3412}};
@@ -163,7 +163,7 @@ sub create_decode_handle ($$$;$) {
           my $c = $b; $c =~ tr/\x00//d;
           if ($c =~ /^<\?xml\s+(?:version\s*=\s*["'][^"']*["']\s*)?
               encoding\s*=\s*["']([^"']*)/x) {
-            $obj->{input_encoding} = lc $1;
+            $obj->{input_encoding} = $1;
             my $uri = name_to_uri (undef, 'xml', $obj->{input_encoding});
             $csdef = $Whatpm::Charset::CharsetDef->{$uri};
             if (not $csdef->{ascii16} or
@@ -175,7 +175,7 @@ sub create_decode_handle ($$$;$) {
             }
           } else {
             $csdef = $Whatpm::Charset::CharsetDef->{$PERL_CHARSET.'utf-16be'};
-            $obj->{input_encoding} = 'utf-16';
+            $obj->{input_encoding} = 'UTF-16';
           }
           if (defined $csdef->{no_bom_variant16be}) {
             $csdef = $Whatpm::Charset::CharsetDef->{$csdef->{no_bom_variant16be}};
@@ -186,7 +186,7 @@ sub create_decode_handle ($$$;$) {
           my $c = $b; $c =~ tr/\x00//d;
           if ($c =~ /^<\?xml\s+(?:version\s*=\s*["'][^"']*["']\s*)?
               encoding\s*=\s*["']([^"']*)/x) {
-            $obj->{input_encoding} = lc $1;
+            $obj->{input_encoding} = $1;
             my $uri = name_to_uri (undef, 'xml', $obj->{input_encoding});
             $csdef = $Whatpm::Charset::CharsetDef->{$uri};
             if (not $csdef->{ascii32} or
@@ -200,7 +200,7 @@ sub create_decode_handle ($$$;$) {
             }
           } else {
             $csdef = $Whatpm::Charset::CharsetDef->{$PERL_CHARSET.'utf-16be'};
-            $obj->{input_encoding} = 'utf-16';
+            $obj->{input_encoding} = 'UTF-16';
             $obj->{byte_buffer} .= "\x00\x00";
           }
           if (defined $csdef->{no_bom_variant32endian3412}) {
@@ -208,7 +208,7 @@ sub create_decode_handle ($$$;$) {
           }
         } else {
           $csdef = $Whatpm::Charset::CharsetDef->{$PERL_CHARSET.'utf-16be'};
-          $obj->{input_encoding} = 'utf-16';
+          $obj->{input_encoding} = 'UTF-16';
           substr ($b, 0, 2) = '';
           $obj->{has_bom} = 1;
         }
@@ -219,7 +219,7 @@ sub create_decode_handle ($$$;$) {
           my $c = $b; $c =~ tr/\x00//d;
           if ($c =~ /^<\?xml\s+(?:version\s*=\s*["'][^"']*["']\s*)?
               encoding\s*=\s*["']([^"']*)/x) {
-            $obj->{input_encoding} = lc $1;
+            $obj->{input_encoding} = $1;
             my $uri = name_to_uri (undef, 'xml', $obj->{input_encoding});
             $csdef = $Whatpm::Charset::CharsetDef->{$uri};
             if (not $csdef->{ascii16} or
@@ -231,7 +231,7 @@ sub create_decode_handle ($$$;$) {
             }
           } else {
             $csdef = $Whatpm::Charset::CharsetDef->{$PERL_CHARSET.'utf-16le'};
-            $obj->{input_encoding} = 'utf-16';
+            $obj->{input_encoding} = 'UTF-16';
           }
           if (defined $csdef->{no_bom_variant16le}) {
             $csdef = $Whatpm::Charset::CharsetDef->{$csdef->{no_bom_variant16le}};
@@ -242,7 +242,7 @@ sub create_decode_handle ($$$;$) {
           my $c = $b; $c =~ tr/\x00//d;
           if ($c =~ /^<\?xml\s+(?:version\s*=\s*["'][^"']*["']\s*)?
               encoding\s*=\s*["']([^"']*)/x) {
-            $obj->{input_encoding} = lc $1;
+            $obj->{input_encoding} = $1;
             my $uri = name_to_uri (undef, 'xml', $obj->{input_encoding});
             $csdef = $Whatpm::Charset::CharsetDef->{$uri};
             if (not $csdef->{ascii32} or
@@ -256,7 +256,7 @@ sub create_decode_handle ($$$;$) {
             }
           } else {
             $csdef = $Whatpm::Charset::CharsetDef->{$PERL_CHARSET.'utf-16le'};
-            $obj->{input_encoding} = 'utf-16';
+            $obj->{input_encoding} = 'UTF-16';
             $obj->{byte_buffer} .= "\x00\x00";
           }
           if (defined $csdef->{no_bom_variant32endian4321}) {
@@ -264,7 +264,7 @@ sub create_decode_handle ($$$;$) {
           }
         } else {
           $csdef = $Whatpm::Charset::CharsetDef->{$PERL_CHARSET.'utf-16le'};
-          $obj->{input_encoding} = 'utf-16';
+          $obj->{input_encoding} = 'UTF-16';
           substr ($b, 0, 2) = '';
           $obj->{has_bom} = 1;
         }
@@ -273,7 +273,7 @@ sub create_decode_handle ($$$;$) {
           my $c = $b; $c =~ tr/\x00//d;
           if ($c =~ /^<\?xml\s+(?:version\s*=\s*["'][^"']*["']\s*)?
               encoding\s*=\s*["']([^"']*)/x) {
-            $obj->{input_encoding} = lc $1;
+            $obj->{input_encoding} = $1;
             my $uri = name_to_uri (undef, 'xml', $obj->{input_encoding});
             $csdef = $Whatpm::Charset::CharsetDef->{$uri};
             if (not $csdef->{ascii32} or
@@ -287,7 +287,7 @@ sub create_decode_handle ($$$;$) {
             }
           } else {
             $csdef = $Whatpm::Charset::CharsetDef->{$PERL_CHARSET.'utf-8'};
-            $obj->{input_encoding} = 'utf-8';
+            $obj->{input_encoding} = 'UTF-8';
           }
           if (defined $csdef->{no_bom_variant32endian1234}) {
             $csdef = $Whatpm::Charset::CharsetDef->{$csdef->{no_bom_variant32endian1234}};
@@ -296,7 +296,7 @@ sub create_decode_handle ($$$;$) {
           my $c = $b; $c =~ tr/\x00//d;
           if ($c =~ /^<\?xml\s+(?:version\s*=\s*["'][^"']*["']\s*)?
               encoding\s*=\s*["']([^"']*)/x) {
-            $obj->{input_encoding} = lc $1;
+            $obj->{input_encoding} = $1;
             my $uri = name_to_uri (undef, 'xml', $obj->{input_encoding});
             $csdef = $Whatpm::Charset::CharsetDef->{$uri};
             if (not $csdef->{ascii32} or
@@ -310,7 +310,7 @@ sub create_decode_handle ($$$;$) {
             }
           } else {
             $csdef = $Whatpm::Charset::CharsetDef->{$PERL_CHARSET.'utf-8'};
-            $obj->{input_encoding} = 'utf-8';
+            $obj->{input_encoding} = 'UTF-8';
           }
           if (defined $csdef->{no_bom_variant32endian2143}) {
             $csdef = $Whatpm::Charset::CharsetDef->{$csdef->{no_bom_variant32endian2143}};
@@ -321,7 +321,7 @@ sub create_decode_handle ($$$;$) {
           my $c = $b; $c =~ tr/\x00//d;
           if ($c =~ /^<\?xml\s+(?:version\s*=\s*["'][^"']*["']\s*)?
               encoding\s*=\s*["']([^"']*)/x) {
-            $obj->{input_encoding} = lc $1;
+            $obj->{input_encoding} = $1;
             my $uri = name_to_uri (undef, 'xml', $obj->{input_encoding});
             $csdef = $Whatpm::Charset::CharsetDef->{$uri};
             if (not $csdef->{ascii32} or
@@ -335,7 +335,7 @@ sub create_decode_handle ($$$;$) {
             }
           } else {
             $csdef = $Whatpm::Charset::CharsetDef->{$PERL_CHARSET.'utf-8'};
-            $obj->{input_encoding} = 'utf-8';
+            $obj->{input_encoding} = 'UTF-8';
             $obj->{has_bom} = 0;
             $obj->{byte_buffer} .= "\x00\x00\xFE\xFF";
          }
@@ -348,7 +348,7 @@ sub create_decode_handle ($$$;$) {
           my $c = $b; $c =~ tr/\x00//d;
           if ($c =~ /^<\?xml\s+(?:version\s*=\s*["'][^"']*["']\s*)?
               encoding\s*=\s*["']([^"']*)/x) {
-            $obj->{input_encoding} = lc $1;
+            $obj->{input_encoding} = $1;
             my $uri = name_to_uri (undef, 'xml', $obj->{input_encoding});
             $csdef = $Whatpm::Charset::CharsetDef->{$uri};
             if (not $csdef->{ascii32} or
@@ -362,7 +362,7 @@ sub create_decode_handle ($$$;$) {
             }
           } else {
             $csdef = $Whatpm::Charset::CharsetDef->{$PERL_CHARSET.'utf-8'};
-            $obj->{input_encoding} = 'utf-8';
+            $obj->{input_encoding} = 'UTF-8';
             $obj->{has_bom} = 0;
             $obj->{byte_buffer} .= "\x00\x00\xFF\xFE";
           }
@@ -502,22 +502,24 @@ sub name_to_uri ($$$) {
 
 sub uri_to_name ($$$) {
   my (undef, $domain, $uri) = @_;
-  if ({
-       ietf => 1,
-       xml => 1,
-      }->{$domain}) {
-    my $r = $Whatpm::Charset::CharsetDef->{$uri}->{+{
-      ietf => 'ietf_name',
-      xml => 'xml_name',
-    }->{$domain}}->[0];
-    return $r if defined $r;
-    
-    if ($domain eq 'ietf' and
-        substr ($uri, 0, length $IANA_CHARSET) eq $IANA_CHARSET) {
-      return substr ($uri, length $IANA_CHARSET);
-    } elsif ($domain eq 'xml' and
-             substr ($uri, 0, length $XML_CHARSET) eq $XML_CHARSET) {
+  
+  if ($domain eq 'xml') {
+    my $v = $Whatpm::Charset::CharsetDef->{$uri}->{xml_name};
+    return $v if defined $v;
+
+    if (substr ($uri, 0, length $XML_CHARSET) eq $XML_CHARSET) {
       return substr ($uri, length $XML_CHARSET);
+    }
+
+    $domain = 'ietf'; ## TODO: XML encoding name has smaller range
+  }
+
+  if ($domain eq 'ietf') {
+    my $v = $Whatpm::Charset::CharsetDef->{$uri}->{iana_name};
+    return $v->[0] if defined $v;
+
+    if (substr ($uri, 0, length $IANA_CHARSET) eq $IANA_CHARSET) {
+      return substr ($uri, length $IANA_CHARSET);
     }
   }
 
@@ -578,7 +580,17 @@ sub getc ($) {
 
 sub has_bom ($) { $_[0]->{has_bom} }
 
-sub input_encoding ($) { $_[0]->{input_encoding} }
+sub input_encoding ($) {
+  my $v = $_[0]->{input_encoding};
+  return $v if defined $v;
+
+  my $uri = $_[0]->{charset};
+  if (defined $uri) {
+    return Whatpm::Charset::DecodeHandle->uri_to_name (xml => $uri);
+  }
+
+  return undef;
+} # input_encoding
 
 sub onerror ($;$) {
   if (@_ > 1) {
@@ -892,19 +904,8 @@ utf8_encoding_scheme =>
 '1',
 'urn:x-suika-fam-cx:charset:us-ascii',
 '1'},
-xml_name =>
-['ansi_x3.4-1968',
-'ansi_x3.4-1986',
-'ascii',
-'cp367',
-'csascii',
-'ibm367',
-'iso-ir-6',
-'iso646-us',
-'iso_646.irv:1991',
-'us',
-'us-ascii',
-'us-ascii']};
+};
+
 $Whatpm::Charset::CharsetDef->{'http://suika.fam.cx/~wakaba/archive/2004/dis/Charset/Perl.ascii-ctrl'} = {perl_name =>
 ['ascii-ctrl'],
 'uri',
@@ -926,8 +927,9 @@ utf8_encoding_scheme =>
 'uri',
 {'http://suika.fam.cx/~wakaba/archive/2004/dis/Charset/XML.utf-8',
 '1'},
-xml_name =>
-['utf-8']};
+  xml_name => 'UTF-8',
+};
+
 $Whatpm::Charset::CharsetDef->{'http://suika.fam.cx/~wakaba/archive/2004/dis/Charset/UTF-8.RFC2279'} = {ascii8 =>
 '1',
 bom_allowed =>
@@ -965,8 +967,8 @@ utf8_encoding_scheme =>
 'uri',
 {'urn:x-suika-fam-cx:charset:utf-8',
 '1'},
-xml_name =>
-['utf-8']};
+};
+
 $Whatpm::Charset::CharsetDef->{'http://suika.fam.cx/~wakaba/archive/2004/dis/Charset/Perl.utf8'} = {ascii8 =>
 '1',
 is_block_safe =>
@@ -995,8 +997,9 @@ perl_name =>
 'uri',
 {'http://suika.fam.cx/~wakaba/archive/2004/dis/Charset/XML.utf-16',
 '1'},
-xml_name =>
-['utf-16']};
+  xml_name => 'UTF-16',
+};
+
 $Whatpm::Charset::CharsetDef->{'urn:x-suika-fam-cx:charset:utf-16'} = {
   ascii16 => 1,
 bom_allowed =>
@@ -1014,8 +1017,8 @@ mime_name =>
 'uri',
 {'urn:x-suika-fam-cx:charset:utf-16',
 '1'},
-xml_name =>
-['utf-16']};
+};
+
 $Whatpm::Charset::CharsetDef->{'urn:x-suika-fam-cx:charset:utf-16be'} = {
   ascii16 => 1,
   ascii16be => 1,
@@ -1032,8 +1035,8 @@ mime_name =>
 'uri',
 {'urn:x-suika-fam-cx:charset:utf-16be',
 '1'},
-xml_name =>
-['utf-16be']};
+};
+
 $Whatpm::Charset::CharsetDef->{'urn:x-suika-fam-cx:charset:utf-16le'} = {
   ascii16 => 1,
   ascii16le => 1,
@@ -1050,8 +1053,8 @@ mime_name =>
 'uri',
 {'urn:x-suika-fam-cx:charset:utf-16le',
 '1'},
-xml_name =>
-['utf-16le']};
+};
+
 $Whatpm::Charset::CharsetDef->{'http://suika.fam.cx/~wakaba/archive/2004/dis/Charset/Perl.utf-16be'} = {
   ascii16 => 1,
   ascii16be => 1,
@@ -1092,10 +1095,9 @@ mime_name =>
 '1',
 'urn:x-suika-fam-cx:charset:iso-10646-ucs-2',
 '1'},
-xml_name =>
-['csunicode',
-'iso-10646-ucs-2',
-'iso-10646-ucs-2']};
+  xml_name => 'ISO-10646-UCS-2',
+};
+
 $Whatpm::Charset::CharsetDef->{'http://suika.fam.cx/~wakaba/archive/2004/dis/Charset/Perl.ucs-2be'} = {
   ascii16 => 1,
   ascii16be => 1,
@@ -1136,10 +1138,9 @@ mime_name =>
 '1',
 'urn:x-suika-fam-cx:charset:iso-10646-ucs-4',
 '1'},
-xml_name =>
-['csucs4',
-'iso-10646-ucs-4',
-'iso-10646-ucs-4']};
+  xml_name => 'ISO-10646-UCS-4',
+};
+
 $Whatpm::Charset::CharsetDef->{'http://suika.fam.cx/~wakaba/archive/2004/dis/Charset/Perl.utf-32be'} = {
   ascii32 => 1,
   ascii32endian1234 => 1,
@@ -1187,18 +1188,9 @@ perl_name =>
 '1',
 'urn:x-suika-fam-cx:charset:iso_8859-1:1987',
 '1'},
-xml_name =>
-['cp819',
-'csisolatin1',
-'ibm819',
-'iso-8859-1',
-'iso-8859-1',
-'iso-8859-1',
-'iso-ir-100',
-'iso_8859-1',
-'iso_8859-1:1987',
-'l1',
-'latin1']};
+  xml_name => 'ISO-8859-1',
+};
+
 $Whatpm::Charset::CharsetDef->{'http://suika.fam.cx/~wakaba/archive/2004/dis/Charset/XML.iso-8859-2'} = {ascii8 =>
 '1',
 is_block_safe =>
@@ -1206,8 +1198,9 @@ is_block_safe =>
 'uri',
 {'http://suika.fam.cx/~wakaba/archive/2004/dis/Charset/XML.iso-8859-2',
 '1'},
-xml_name =>
-['iso-8859-2']};
+  xml_name => 'ISO-8859-2',
+};
+
 $Whatpm::Charset::CharsetDef->{'http://suika.fam.cx/~wakaba/archive/2004/dis/Charset/XML.iso-8859-3'} = {ascii8 =>
 '1',
 is_block_safe =>
@@ -1215,8 +1208,9 @@ is_block_safe =>
 'uri',
 {'http://suika.fam.cx/~wakaba/archive/2004/dis/Charset/XML.iso-8859-3',
 '1'},
-xml_name =>
-['iso-8859-3']};
+  xml_name => 'ISO-8859-3',
+};
+
 $Whatpm::Charset::CharsetDef->{'http://suika.fam.cx/~wakaba/archive/2004/dis/Charset/XML.iso-8859-4'} = {ascii8 =>
 '1',
 is_block_safe =>
@@ -1224,8 +1218,9 @@ is_block_safe =>
 'uri',
 {'http://suika.fam.cx/~wakaba/archive/2004/dis/Charset/XML.iso-8859-4',
 '1'},
-xml_name =>
-['iso-8859-4']};
+  xml_name => 'ISO-8859-4',
+};
+
 $Whatpm::Charset::CharsetDef->{'http://suika.fam.cx/~wakaba/archive/2004/dis/Charset/XML.iso-8859-5'} = {ascii8 =>
 '1',
 is_block_safe =>
@@ -1233,8 +1228,9 @@ is_block_safe =>
 'uri',
 {'http://suika.fam.cx/~wakaba/archive/2004/dis/Charset/XML.iso-8859-5',
 '1'},
-xml_name =>
-['iso-8859-5']};
+  xml_name => 'ISO-8859-5',
+};
+
 $Whatpm::Charset::CharsetDef->{'http://suika.fam.cx/~wakaba/archive/2004/dis/Charset/XML.iso-8859-6'} = {ascii8 =>
 '1',
 is_block_safe =>
@@ -1242,8 +1238,9 @@ is_block_safe =>
 'uri',
 {'http://suika.fam.cx/~wakaba/archive/2004/dis/Charset/XML.iso-8859-6',
 '1'},
-xml_name =>
-['iso-8859-6']};
+  xml_name => 'ISO-8859-6',
+};
+
 $Whatpm::Charset::CharsetDef->{'http://suika.fam.cx/~wakaba/archive/2004/dis/Charset/XML.iso-8859-7'} = {ascii8 =>
 '1',
 is_block_safe =>
@@ -1251,8 +1248,9 @@ is_block_safe =>
 'uri',
 {'http://suika.fam.cx/~wakaba/archive/2004/dis/Charset/XML.iso-8859-7',
 '1'},
-xml_name =>
-['iso-8859-7']};
+  xml_name => 'ISO-8859-7',
+};
+
 $Whatpm::Charset::CharsetDef->{'http://suika.fam.cx/~wakaba/archive/2004/dis/Charset/XML.iso-8859-8'} = {ascii8 =>
 '1',
 is_block_safe =>
@@ -1260,8 +1258,9 @@ is_block_safe =>
 'uri',
 {'http://suika.fam.cx/~wakaba/archive/2004/dis/Charset/XML.iso-8859-8',
 '1'},
-xml_name =>
-['iso-8859-8']};
+  xml_name => 'ISO-8859-8',
+};
+
 $Whatpm::Charset::CharsetDef->{'http://suika.fam.cx/~wakaba/archive/2004/dis/Charset/XML.iso-8859-9'} = {ascii8 =>
 '1',
 is_block_safe =>
@@ -1269,8 +1268,9 @@ is_block_safe =>
 'uri',
 {'http://suika.fam.cx/~wakaba/archive/2004/dis/Charset/XML.iso-8859-9',
 '1'},
-xml_name =>
-['iso-8859-9']};
+  xml_name => 'ISO-8859-9',
+};
+
 $Whatpm::Charset::CharsetDef->{'http://suika.fam.cx/~wakaba/archive/2004/dis/Charset/XML.iso-8859-10'} = {ascii8 =>
 '1',
 is_block_safe =>
@@ -1278,8 +1278,9 @@ is_block_safe =>
 'uri',
 {'http://suika.fam.cx/~wakaba/archive/2004/dis/Charset/XML.iso-8859-10',
 '1'},
-xml_name =>
-['iso-8859-10']};
+  xml_name => 'ISO-8859-10',
+};
+
 $Whatpm::Charset::CharsetDef->{'http://suika.fam.cx/~wakaba/archive/2004/dis/Charset/XML.iso-8859-11'} = {ascii8 =>
 '1',
 is_block_safe =>
@@ -1287,8 +1288,9 @@ is_block_safe =>
 'uri',
 {'http://suika.fam.cx/~wakaba/archive/2004/dis/Charset/XML.iso-8859-11',
 '1'},
-xml_name =>
-['iso-8859-11']};
+  xml_name => 'ISO-8859-11',
+};
+
 $Whatpm::Charset::CharsetDef->{'http://suika.fam.cx/~wakaba/archive/2004/dis/Charset/XML.iso-8859-13'} = {ascii8 =>
 '1',
 is_block_safe =>
@@ -1296,8 +1298,9 @@ is_block_safe =>
 'uri',
 {'http://suika.fam.cx/~wakaba/archive/2004/dis/Charset/XML.iso-8859-13',
 '1'},
-xml_name =>
-['iso-8859-13']};
+  xml_name => 'ISO-8859-13',
+};
+
 $Whatpm::Charset::CharsetDef->{'http://suika.fam.cx/~wakaba/archive/2004/dis/Charset/XML.iso-8859-14'} = {ascii8 =>
 '1',
 is_block_safe =>
@@ -1305,8 +1308,9 @@ is_block_safe =>
 'uri',
 {'http://suika.fam.cx/~wakaba/archive/2004/dis/Charset/XML.iso-8859-14',
 '1'},
-xml_name =>
-['iso-8859-14']};
+  xml_name => 'ISO-8859-14',
+};
+
 $Whatpm::Charset::CharsetDef->{'http://suika.fam.cx/~wakaba/archive/2004/dis/Charset/XML.iso-8859-15'} = {ascii8 =>
 '1',
 is_block_safe =>
@@ -1314,8 +1318,9 @@ is_block_safe =>
 'uri',
 {'http://suika.fam.cx/~wakaba/archive/2004/dis/Charset/XML.iso-8859-15',
 '1'},
-xml_name =>
-['iso-8859-15']};
+  xml_name => 'ISO-8859-15',
+};
+
 $Whatpm::Charset::CharsetDef->{'http://suika.fam.cx/~wakaba/archive/2004/dis/Charset/XML.iso-8859-16'} = {ascii8 =>
 '1',
 is_block_safe =>
@@ -1323,15 +1328,17 @@ is_block_safe =>
 'uri',
 {'http://suika.fam.cx/~wakaba/archive/2004/dis/Charset/XML.iso-8859-16',
 '1'},
-xml_name =>
-['iso-8859-16']};
+  xml_name => 'ISO-8859-16',
+};
+
 $Whatpm::Charset::CharsetDef->{'http://suika.fam.cx/~wakaba/archive/2004/dis/Charset/XML.iso-2022-jp'} = {ascii8 =>
 '1',
 'uri',
 {'http://suika.fam.cx/~wakaba/archive/2004/dis/Charset/XML.iso-2022-jp',
 '1'},
-xml_name =>
-['iso-2022-jp']};
+  xml_name => 'ISO-2022-JP',
+};
+
 $Whatpm::Charset::CharsetDef->{'urn:x-suika-fam-cx:charset:iso-2022-jp'} = {ascii8 =>
 '1',
 ietf_name =>
@@ -1343,10 +1350,8 @@ mime_name =>
 'uri',
 {'urn:x-suika-fam-cx:charset:iso-2022-jp',
 '1'},
-xml_name =>
-['csiso2022jp',
-'iso-2022-jp',
-'iso-2022-jp']};
+};
+
 $Whatpm::Charset::CharsetDef->{'http://suika.fam.cx/~wakaba/archive/2004/dis/Charset/Perl.iso-2022-jp'} = {ascii8 =>
 '1',
 perl_name =>
@@ -1372,12 +1377,9 @@ perl_name =>
 '1',
 'urn:x-suika-fam-cx:charset:shift_jis',
 '1'},
-xml_name =>
-['csshiftjis',
-'ms_kanji',
-'shift_jis',
-'shift_jis',
-'shift_jis']};
+  xml_name => 'Shift_JIS',
+};
+
 $Whatpm::Charset::CharsetDef->{'http://suika.fam.cx/~wakaba/archive/2004/dis/Charset/Perl.shiftjis'} = {ascii8 =>
 '1',
 is_block_safe =>
@@ -1408,12 +1410,9 @@ perl_name =>
 '1',
 'urn:x-suika-fam-cx:charset:extended_unix_code_packed_format_for_japanese',
 '1'},
-xml_name =>
-['cseucpkdfmtjapanese',
-'euc-jp',
-'euc-jp',
-'euc-jp',
-'extended_unix_code_packed_format_for_japanese']};
+  xml_name => 'EUC-JP',
+};
+
 $Whatpm::Charset::CharsetDef->{'http://suika.fam.cx/~wakaba/archive/2004/dis/Charset/Perl.euc-jp'} = {ascii8 =>
 '1',
 is_block_safe =>
@@ -1426,4 +1425,4 @@ perl_name =>
 '1'}};
 
 1;
-## $Date: 2007/07/15 12:41:51 $
+## $Date: 2007/07/15 16:51:14 $

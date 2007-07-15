@@ -1,5 +1,15 @@
 2007-07-15  Wakaba  <wakaba@suika.fam.cx>
 
+	* DecodeHandle.pm (create_decode_handle): Set canonical
+	or specified name to |input_encoding| attribute.
+	(uri_to_name): Reimplemented.
+	(input_encoding): Return charset name returned
+	by |uri_to_name| if available.
+	($CharsetDef): Property |xml_name| is now contain
+	only name defined in XML specifications.
+
+2007-07-15  Wakaba  <wakaba@suika.fam.cx>
+
 	* DecodeHandle.pm: New Perl module (created
 	from manakai's |Encode.dis|).
 
