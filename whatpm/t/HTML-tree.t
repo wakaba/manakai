@@ -74,6 +74,10 @@ for my $file_name (grep {$_} split /\s+/, qq[
       $test->{document} = '';
       $mode = 'document';
       $escaped = 1;
+    } elsif (/^#document-fragment$/) {
+      $test->{element} = '';
+      $mode = 'element';
+      undef $escaped;
     } elsif (/^#document-fragment (\S+)$/) {
       $test->{document} = '';
       $mode = 'document';
@@ -90,6 +94,9 @@ for my $file_name (grep {$_} split /\s+/, qq[
       undef $test;
     } else {
       if ($mode eq 'data' or $mode eq 'document') {
+        $test->{$mode} .= $_;
+      } elsif ($mode eq 'element') {
+        tr/\x0D\x0A//d;
         $test->{$mode} .= $_;
       } elsif ($mode eq 'errors') {
         tr/\x0D\x0A//d;
@@ -170,4 +177,4 @@ sub serialize ($) {
 } # serialize
 
 ## License: Public Domain.
-## $Date: 2007/07/07 13:41:06 $
+## $Date: 2007/07/16 07:03:09 $

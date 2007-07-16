@@ -8,7 +8,7 @@ BEGIN {
   $dir_name = 't/tokenizer/';
   my $skip = "You don't have JSON module";
   eval q{
-         use JSON 1.00;
+         use JSON 1.07;
          $skip = "You don't have make command";
          system ("cd $test_dir_name; make tokenizer-files") == 0 or die
            unless -f $dir_name.'test1.test';
@@ -39,6 +39,8 @@ use Whatpm::HTML;
 for my $file_name (grep {$_} split /\s+/, qq[
                       ${dir_name}test1.test
                       ${dir_name}test2.test
+                      ${dir_name}test3.test
+                      ${dir_name}test4.test
                       ${dir_name}contentModelFlags.test
                       ${dir_name}escapeFlag.test
                       ${test_dir_name}tokenizer-test-1.test
@@ -50,6 +52,16 @@ for my $file_name (grep {$_} split /\s+/, qq[
   close $file;
 
   print "# $file_name\n";
+  $js =~ s{\\u[Dd]([89A-Fa-f][0-9A-Fa-f][0-9A-Fa-f])
+      \\u[Dd]([89A-Fa-f][0-9A-Fa-f][0-9A-Fa-f])}{
+    ## NOTE: JSON::Parser does not decode surrogate pair escapes
+    ## NOTE: In older version of JSON::Parser, utf8 string will be broken
+    ## by parsing.  Use latest version!
+    ## NOTE: Encode.pm is broken; it converts e.g. U+10FFFF to U+FFFD.
+    my $c = 0x10000;
+    $c += ((((hex $1) & 0b1111111111) << 10) | ((hex $2) & 0b1111111111));
+    chr $c;
+  }gex;
   my $tests = jsonToObj ($js)->{tests};
   TEST: for my $test (@$tests) {
     my $s = $test->{input};
@@ -83,16 +95,7 @@ for my $file_name (grep {$_} split /\s+/, qq[
         $self->{next_input_character} = ord substr $s, $i++, 1;
 
         if ($self->{next_input_character} == 0x000D) { # CR
-          if ($i >= length $s) {
-            #
-          } else {
-            my $next_char = ord substr $s, $i++, 1;
-            if ($next_char == 0x000A) { # LF
-              #
-            } else {
-              push @{$self->{char}}, $next_char;
-            }
-          }
+          $i++ if substr ($s, $i, 1) eq "\x0A";
           $self->{next_input_character} = 0x000A; # LF # MUST
         } elsif ($self->{next_input_character} > 0x10FFFF) {
           $self->{next_input_character} = 0xFFFD; # REPLACEMENT CHARACTER # MUST
@@ -153,4 +156,4 @@ for my $file_name (grep {$_} split /\s+/, qq[
   }
 }
 
-## $Date: 2007/07/07 13:41:06 $
+## $Date: 2007/07/16 07:03:09 $

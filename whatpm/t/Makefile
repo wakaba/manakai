@@ -15,6 +15,8 @@ content-type-result.txt: always
 tokenizer-files: tokenizer \
   tokenizer/test1.test tokenizer/test2.test tokenizer/contentModelFlags.test \
   tokenizer/escapeFlag.test \
+  tokenizer/test3.test \
+  tokenizer/test4.test \
   tokenizer/LICENSE \
   tokenizer-result.txt
 
@@ -60,4 +62,4 @@ content-checker-result.txt: always
 always:
 
 ## License: Public Domain.
-## $Date: 2007/06/23 02:26:51 $
+## $Date: 2007/07/16 07:03:09 $

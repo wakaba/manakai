@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.36 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.37 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## ISSUE:
 ## var doc = implementation.createDocument (null, null, null);
@@ -1644,8 +1644,8 @@ sub _tokenize_attempt_to_consume_an_entity ($$) {
           redo X;
         } elsif (not defined $code) { # no hexadecimal digit
           !!!parse-error (type => 'bare hcro');
+          !!!back-next-input-character ($x_char, $self->{next_input_character});
           $self->{next_input_character} = 0x0023; # #
-          !!!back-next-input-character ($x_char);
           return undef;
         } elsif ($self->{next_input_character} == 0x003B) { # ;
           !!!next-input-character;
@@ -1717,7 +1717,7 @@ sub _tokenize_attempt_to_consume_an_entity ($$) {
     !!!next-input-character;
 
     my $value = $entity_name;
-    my $match;
+    my $match = 0;
     require Whatpm::_NamedEntityList;
     our $EntityChar;
 
@@ -1737,23 +1737,27 @@ sub _tokenize_attempt_to_consume_an_entity ($$) {
           $match = 1;
           !!!next-input-character;
           last;
-        } elsif (not $in_attr) {
+        } else {
           $value = $EntityChar->{$entity_name};
           $match = -1;
-        } else {
-          $value .= chr $self->{next_input_character};
+          !!!next-input-character;
         }
       } else {
         $value .= chr $self->{next_input_character};
+        $match *= 2;
+        !!!next-input-character;
       }
-      !!!next-input-character;
     }
     
     if ($match > 0) {
       return {type => 'character', data => $value};
     } elsif ($match < 0) {
       !!!parse-error (type => 'no refc');
-      return {type => 'character', data => $value};
+      if ($in_attr and $match < -1) {
+        return {type => 'character', data => '&'.$entity_name};
+      } else {
+        return {type => 'character', data => $value};
+      }
     } else {
       !!!parse-error (type => 'bare ero');
       ## NOTE: No characters are consumed in the spec.
@@ -5458,4 +5462,4 @@ sub get_inner_html ($$$) {
 } # get_inner_html
 
 1;
-# $Date: 2007/07/16 04:51:22 $
+# $Date: 2007/07/16 07:03:09 $

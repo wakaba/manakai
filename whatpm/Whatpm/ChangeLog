@@ -1,5 +1,11 @@
 2007-07-16  Wakaba  <wakaba@suika.fam.cx>
 
+	* HTML.pm.src: The character immediately following
+	a bare |hcro| was discarded.  Fix handling of
+	entity references in attribute values.
+
+2007-07-16  Wakaba  <wakaba@suika.fam.cx>
+
 	* HTML.pm.src (main and trailin end phases): Token
 	types |DOCTYPE|, |comment|, |end-of-file|, and |<html>| are 
 	factored out.  Error types |in html:#DOCTYPE|

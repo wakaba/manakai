@@ -307,6 +307,46 @@
 "input":"&#x110000;",
 "output":["ParseError", ["Character", "\uFFFD"]]},
 
+{"description":"Broken hcro (&#x)",
+"input":"&#x",
+"output":["ParseError", ["Character", "&#x"]]},
+
+{"description":"Broken hcro (&#X)",
+"input":"&#X",
+"output":["ParseError", ["Character", "&#X"]]},
+
+{"description":"Broken hcro (&#x;)",
+"input":"&#x;",
+"output":["ParseError", ["Character", "&#x;"]]},
+
+{"description":"Broken hcro (&#X;)",
+"input":"&#X;",
+"output":["ParseError", ["Character", "&#X;"]]},
+
+{"description":"Broken hcro (&#xg)",
+"input":"&#xg",
+"output":["ParseError", ["Character", "&#xg"]]},
+
+{"description":"Broken hcro (&#Xg)",
+"input":"&#Xg",
+"output":["ParseError", ["Character", "&#Xg"]]},
+
+{"description":"Broken hcro (&#xg;)",
+"input":"&#xg;",
+"output":["ParseError", ["Character", "&#xg;"]]},
+
+{"description":"Broken hcro (&#Xg;)",
+"input":"&#Xg;",
+"output":["ParseError", ["Character", "&#Xg;"]]},
+
+{"description":"Broken hcro (&#x!)",
+"input":"&#x!",
+"output":["ParseError", ["Character", "&#x!"]]},
+
+{"description":"Broken hcro (&#X!)",
+"input":"&#X!",
+"output":["ParseError", ["Character", "&#X!"]]},
+
 {"description":"NULL character",
 "input":"\u0000",
 "output":["ParseError",["Character", "\uFFFD"]]},
@@ -398,6 +438,42 @@
 {"description":"unknown named character reference in attr",
 "input":"<a href='&abc;'>",
 "output":["ParseError", ["StartTag", "a", {"href": "&abc;"}]]},
+
+{"description":"entity w/o refc at the end of unterminated attribute value",
+"input":"<a href='&COPY",
+"output":["ParseError", "ParseError", ["StartTag", "a", {"href": "\u00A9"}]]},
+
+{"description":"entity w/o refc at the end of attribute value",
+"input":"<a href='&COPY'>",
+"output":["ParseError", ["StartTag", "a", {"href": "\u00A9"}]]},
+
+{"description":"entity w/refc at the end of attribute value",
+"input":"<a href='&COPY;'>",
+"output":[["StartTag", "a", {"href": "\u00A9"}]]},
+
+{"description":"entity w/o refc href='&COPY!'",
+"input":"<a href='&COPY!'>",
+"output":["ParseError", ["StartTag", "a", {"href": "\u00A9!"}]]},
+
+{"description":"entity w/o refc href='&COPY=ok'",
+"input":"<a href='&COPY=ok'>",
+"output":["ParseError", ["StartTag", "a", {"href": "\u00A9=ok"}]]},
+
+{"description":"entity w/o refc href='&COPYright'",
+"input":"<a href='&COPYright'>",
+"output":["ParseError", ["StartTag", "a", {"href": "&COPYright"}]]},
+
+{"description":"entity w/o refc href='&COPYright;'",
+"input":"<a href='&COPYright;'>",
+"output":["ParseError", ["StartTag", "a", {"href": "&COPYright;"}]]},
+
+{"description":"entity w/o refc href='&COPYrightc'",
+"input":"<a href='&COPYrightc'>",
+"output":["ParseError", ["StartTag", "a", {"href": "&COPYrightc"}]]},
+
+{"description":"entity w/o refc href='&COPYrightcd'",
+"input":"<a href='&COPYrightcd'>",
+"output":["ParseError", ["StartTag", "a", {"href": "&COPYrightcd"}]]},
 
 {"description":"cdata end tag containing <",
 "contentModelFlags":["RCDATA","CDATA"],

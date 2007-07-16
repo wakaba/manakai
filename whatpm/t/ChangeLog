@@ -1,5 +1,26 @@
 2007-07-16  Wakaba  <wakaba@suika.fam.cx>
 
+	* HTML-tokenizer.t: It now requires newer version
+	of JSON.pm due to the broken handling for utf8 string
+	of older version.  Test data files |test3.test|
+	and |test4.test| are added.  Convert surrogate
+	pair |\u| escapes in JSON file before it is input
+	into JSON.pm parser since it does not decode
+	them correctly.  U+000D convertion was incorrect.
+
+	* HTML-tree.t: Support for new format for fragment
+	parsing tests.
+
+	* Makefile (tokenizer-files): New test
+	data files |test3.test| and |test4.test| are added.
+
+	* tokenizer-test-1.test: Test data for bare |hcro| and
+	entity references in attribute values are added.
+
+	* tokenizer-test-2.dat: Test data for U+000D are added.
+
+2007-07-16  Wakaba  <wakaba@suika.fam.cx>
+
 	* tree-test-1.dat: Tests for |<html>| in trailing
 	end phase and |</frameset>| in after frameset mode
 	are added.

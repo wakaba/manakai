@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.36 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.37 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## ISSUE:
 ## var doc = implementation.createDocument (null, null, null);
@@ -2406,8 +2406,8 @@ sub _tokenize_attempt_to_consume_an_entity ($$) {
           redo X;
         } elsif (not defined $code) { # no hexadecimal digit
           $self->{parse_error}-> (type => 'bare hcro');
+          unshift @{$self->{char}},  ($x_char, $self->{next_input_character});
           $self->{next_input_character} = 0x0023; # #
-          unshift @{$self->{char}},  ($x_char);
           return undef;
         } elsif ($self->{next_input_character} == 0x003B) { # ;
           
@@ -2509,7 +2509,7 @@ sub _tokenize_attempt_to_consume_an_entity ($$) {
   
 
     my $value = $entity_name;
-    my $match;
+    my $match = 0;
     require Whatpm::_NamedEntityList;
     our $EntityChar;
 
@@ -2535,29 +2535,39 @@ sub _tokenize_attempt_to_consume_an_entity ($$) {
       }
   
           last;
-        } elsif (not $in_attr) {
+        } else {
           $value = $EntityChar->{$entity_name};
           $match = -1;
-        } else {
-          $value .= chr $self->{next_input_character};
-        }
-      } else {
-        $value .= chr $self->{next_input_character};
-      }
-      
+          
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
       } else {
         $self->{set_next_input_character}->($self);
       }
   
+        }
+      } else {
+        $value .= chr $self->{next_input_character};
+        $match *= 2;
+        
+      if (@{$self->{char}}) {
+        $self->{next_input_character} = shift @{$self->{char}};
+      } else {
+        $self->{set_next_input_character}->($self);
+      }
+  
+      }
     }
     
     if ($match > 0) {
       return {type => 'character', data => $value};
     } elsif ($match < 0) {
       $self->{parse_error}-> (type => 'no refc');
-      return {type => 'character', data => $value};
+      if ($in_attr and $match < -1) {
+        return {type => 'character', data => '&'.$entity_name};
+      } else {
+        return {type => 'character', data => $value};
+      }
     } else {
       $self->{parse_error}-> (type => 'bare ero');
       ## NOTE: No characters are consumed in the spec.
@@ -6819,4 +6829,4 @@ sub get_inner_html ($$$) {
 } # get_inner_html
 
 1;
-# $Date: 2007/07/16 04:51:22 $
+# $Date: 2007/07/16 07:03:08 $
