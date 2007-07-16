@@ -28,9 +28,10 @@ my $AttrChecker = {
       ## as defined by [IETF RFC 3066], Tags for the Identification
       ## of Languages, or its successor; in addition, the empty string
       ## may be specified." ("may" in lower case)
+      $self->{onerror}->(node => $attr, level => 'unsupported',
+                         type => 'language tag');
       if ($attr->owner_document->manakai_is_html) { # MUST NOT
-        $self->{onerror}->(node => $attr, level => 'error',
-                           type => 'in HTML:xml:lang');
+        $self->{onerror}->(node => $attr, type => 'in HTML:xml:lang');
 ## TODO: Test data...
       }
     },
@@ -748,9 +749,8 @@ my $HTMLURIAttrChecker = sub {
   Whatpm::URIChecker->check_iri_reference ($value, sub {
     my %opt = @_;
     $self->{onerror}->(node => $attr, level => $opt{level},
-                       type => 'URI:'.
-                       (defined $opt{position} ? $opt{position} : '').':'.
-                       $opt{type});
+                       type => 'URI::'.$opt{type}.
+                       (defined $opt{position} ? ':'.$opt{position} : ''));
   });
 }; # $HTMLURIAttrChecker
 
@@ -762,9 +762,9 @@ my $HTMLSpaceURIsAttrChecker = sub {
     Whatpm::URIChecker->check_iri_reference ($value, sub {
       my %opt = @_;
       $self->{onerror}->(node => $attr, level => $opt{level},
-                         type => 'URIs:'.$i.':'.
-                         (defined $opt{position} ? $opt{position} : '').':'.
-                         $opt{type});
+                         type => 'URIs:'.$i.'::'.
+                         $opt{type}.
+                         (defined $opt{position} ? ':'.$opt{position} : ''));
     });
     $i++;
   }
@@ -885,6 +885,8 @@ my $HTMLIMTAttrChecker = sub {
 
 my $HTMLLanguageTagAttrChecker = sub {
   my ($self, $attr) = @_;
+  $self->{onerror}->(node => $attr, level => 'unsupported',
+                     type => 'language tag');
   if ($attr->value eq '') {
     $self->{onerror}->(node => $attr, type => 'language tag:syntax error');
   }
@@ -894,10 +896,16 @@ my $HTMLLanguageTagAttrChecker = sub {
 
 ## "A valid media query [MQ]"
 my $HTMLMQAttrChecker = sub {
+  my ($self, $attr) = @_;
+  $self->{onerror}->(node => $attr, level => 'unsupported',
+                     type => 'media query');
   ## ISSUE: What is "a valid media query"?
 }; # $HTMLMQAttrChecker
 
 my $HTMLEventHandlerAttrChecker = sub {
+  my ($self, $attr) = @_;
+  $self->{onerror}->(node => $attr, level => 'unsupported',
+                     type => 'event handler');
   ## TODO: MUST contain valid ECMAScript code matching the
   ## ECMAScript |FunctionBody| production. [ECMA262]
   ## ISSUE: MUST be ES3? E4X? ES4? JS1.x?
@@ -957,6 +965,8 @@ my $HTMLAttrChecker = {
   title => sub {}, ## NOTE: No conformance creteria
   lang => sub {
     my ($self, $attr) = @_;
+    $self->{onerror}->(node => $attr, level => 'unsupported',
+                       type => 'language tag');
     ## TODO: RFC 3066 or empty test
     ## ISSUE: RFC 4646 (3066bis)?
     unless ($attr->owner_document->manakai_is_html) {
@@ -1322,7 +1332,6 @@ $Element->{$HTML_NS}->{meta} = {
   checker => $HTMLEmptyChecker,
 };
 
-## NOTE: |html:style| has no conformance creteria on content model
 $Element->{$HTML_NS}->{style} = {
   attrs_checker => $GetHTMLAttrsChecker->({
     type => $HTMLIMTAttrChecker, ## TODO: MUST be a styling language
@@ -1331,7 +1340,15 @@ $Element->{$HTML_NS}->{style} = {
     ## NOTE: |title| has special semantics for |style|s, but is syntactically
     ## not different
   }),
-  checker => $AnyChecker,
+  checker => sub {
+    ## NOTE: |html:style| has no conformance creteria on content model
+    my ($self, $todo) = @_;
+    my $type = $todo->{node}->get_attribute_ns (undef, 'type');
+    $type = 'text/css' unless defined $type;
+    $self->{onerror}->(node => $todo->{node}, level => 'unsupported',
+                       type => 'style:'.$type); ## TODO: $type normalization
+    return $AnyChecker->($self, $todo);
+  },
 };
 
 $Element->{$HTML_NS}->{body} = {
@@ -2673,6 +2690,20 @@ $Element->{$HTML_NS}->{script} = {
       return $HTMLEmptyChecker->($self, $todo);
     } else {
       ## NOTE: No content model conformance in HTML5 spec.
+      my $type = $todo->{node}->get_attribute_ns (undef, 'type');
+      my $language = $todo->{node}->get_attribute_ns (undef, 'language');
+      if ((defined $type and $type eq '') or
+          (defined $language and $language eq '')) {
+        $type = 'text/javascript';
+      } elsif (defined $type) {
+        #
+      } elsif (defined $language) {
+        $type = 'text/' . $language;
+      } else {
+        $type = 'text/javascript';
+      }
+      $self->{onerror}->(node => $todo->{node}, level => 'unsupported',
+                         type => 'script:'.$type); ## TODO: $type normalization
       return $AnyChecker->($self, $todo);
     }
   },
@@ -3107,4 +3138,4 @@ sub _check_get_children ($$$) {
 } # _check_get_children
 
 1;
-# $Date: 2007/07/16 07:48:19 $
+# $Date: 2007/07/16 14:28:35 $

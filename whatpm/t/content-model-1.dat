@@ -135,6 +135,7 @@
 #errors
 /head;child element missing:title
 /head/script/@type;IMT:obsolete subtype;s
+/head/script;script:text/javascript;unsupported
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -142,6 +143,7 @@
 </head>
 #errors
 /head;child element missing:title
+/head/style;style:text/css;unsupported
 
 #data
 <html xmlns="http://www.w3.org/1999/xhtml"><head><title></title></head><body></body></html>
@@ -242,6 +244,7 @@
 </head>
 #errors
 /head/script/@type;IMT:obsolete subtype;s
+/head/script;script:text/javascript;unsupported
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -250,6 +253,7 @@
 </head>
 #errors
 /head/script/@type;IMT:obsolete subtype;s
+/head/script;script:text/javascript;unsupported
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -257,6 +261,7 @@
 <title/>
 </head>
 #errors
+/head/style;style:text/css;unsupported
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -264,6 +269,7 @@
 <style type="text/css"/>
 </head>
 #errors
+/head/style;style:text/css;unsupported
 
 #data
 <html xmlns="http://www.w3.org/1999/xhtml"><head><title></title><title></title></head><body></body></html>
@@ -428,12 +434,14 @@
 #data
 <style type="text/css" xmlns="http://www.w3.org/1999/xhtml"></style>
 #errors
+/style;style:text/css;unsupported
 
 #data
 <style type="text/css" xmlns="http://www.w3.org/1999/xhtml">
 p {color: green}
 </style>
 #errors
+/style;style:text/css;unsupported
 
 #data
 <body xmlns="http://www.w3.org/1999/xhtml"></body>
@@ -466,6 +474,7 @@ p {color: green}
 </body>
 #errors
 /body/script/@type;IMT:obsolete subtype;s
+/body/script;script:text/javascript;unsupported
 
 #data
 <body xmlns="http://www.w3.org/1999/xhtml"><b/></body>
@@ -503,6 +512,7 @@ p {color: green}
 </section>
 #errors
 /section/script/@type;IMT:obsolete subtype;s
+/section/script;script:text/javascript;unsupported
 
 #data
 <section xmlns="http://www.w3.org/1999/xhtml"><b/></section>
@@ -514,6 +524,7 @@ p {color: green}
 <style type="text/css" scoped=""/>
 </section>
 #errors
+/section/style;style:text/css;unsupported
 
 #data
 <section xmlns="http://www.w3.org/1999/xhtml">
@@ -521,6 +532,7 @@ p {color: green}
 <p/>
 </section>
 #errors
+/section/style;style:text/css;unsupported
 
 #data
 <section xmlns="http://www.w3.org/1999/xhtml">
@@ -529,6 +541,7 @@ p {color: green}
 </section>
 #errors
 /section/style;element not allowed
+/section/style;style:text/css;unsupported
 
 #data
 <section xmlns="http://www.w3.org/1999/xhtml">
@@ -537,6 +550,7 @@ p {color: green}
 </section>
 #errors
 /section/b;element not allowed
+/section/style;style:text/css;unsupported
 
 #data
 <section xmlns="http://www.w3.org/1999/xhtml">
@@ -546,18 +560,21 @@ p {color: green}
 #errors
 /section/b;element not allowed
 /section/style;element not allowed
+/section/style;style:text/css;unsupported
 
 #data
 <section xmlns="http://www.w3.org/1999/xhtml">
 <style type="text/css" scoped=""/>a</section>
 #errors
 /section/"a";character not allowed
+/section/style;style:text/css;unsupported
 
 #data
 <section xmlns="http://www.w3.org/1999/xhtml">a<style type="text/css" scoped=""/>
 </section>
 #errors
 /section/"a";character not allowed
+/section/style;style:text/css;unsupported
 
 #data
 <section xmlns="http://www.w3.org/1999/xhtml">
@@ -566,6 +583,8 @@ p {color: green}
 <p/>
 </section>
 #errors
+/section/style;style:text/css;unsupported
+/section/style;style:text/css;unsupported
 
 #data
 <section xmlns="http://www.w3.org/1999/xhtml">
@@ -573,6 +592,7 @@ p {color: green}
 <p/><p/>
 </section>
 #errors
+/section/style;style:text/css;unsupported
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml">

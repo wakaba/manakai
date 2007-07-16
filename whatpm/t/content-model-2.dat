@@ -200,15 +200,18 @@ id=""><span id=""></span></p>
 <p lang="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /p/@lang;in XML:lang
+/p/@lang;language tag;unsupported
 
 #data
 <p xml:lang="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/p/@lang;language tag;unsupported
 
 #data html
 <!DOCTYPE HTML><title></title><p xml:lang=""></p>
 #errors
-/p/@lang;in HTML:xml:lang
+/html/body/p/@lang;in HTML:xml:lang
+/html/body/p/@lang;language tag;unsupported
 
 #data
 <p dir="" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -417,22 +420,27 @@ id=""><span id=""></span></p>
 #data
 <p onabort="alert(1);" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/p/@onabort;event handler;unsupported
 
 #data
 <p onbeforeunload="alert(1);" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/p/@onbeforeunload;event handler;unsupported
 
 #data
 <p onblur="alert(1);" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/p/@onblur;event handler;unsupported
 
 #data
 <p onchange="alert(1);" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/p/@onchange;event handler;unsupported
 
 #data
 <p onclick="alert(1);" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/p/@onclick;event handler;unsupported
 
 #data
 <p onxxxx="alert(1);" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -691,11 +699,13 @@ id=""><span id=""></span></p>
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /link/@hreflang;language tag:syntax error
+/link/@hreflang;language tag;unsupported
 
 #data
 <link rel="author" href="http://test/" hreflang="en"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/link/@hreflang;language tag;unsupported
 
 #data
 <link media="all"
@@ -703,11 +713,13 @@ id=""><span id=""></span></p>
 #errors
 /link;attribute missing:href
 /link;attribute missing:rel
+/link/@media;media query;unsupported
 
 #data
 <link rel="author" href="http://test/" media="all"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/link/@media;media query;unsupported
 
 #data
 <link href="http://test/" rel="author" target="_self"
@@ -816,23 +828,28 @@ id=""><span id=""></span></p>
 <style type="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /style/@type;IMT:syntax error
+/style;style:;unsupported
 
 #data
 <style type="text" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /style/@type;IMT:syntax error
+/style;style:text;unsupported
 
 #data
 <style type="text/css" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/style;style:text/css;unsupported
 
 #data
 <style type="Text/CSS" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/style;style:Text/CSS;unsupported
 
 #data
 <style type="TEXT/CSS" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/style;style:TEXT/CSS;unsupported
 
 #data
 <style type="text/css; charset=us-ascii" xmlns="http://www.w3.org/1999/xhtml">
@@ -840,14 +857,19 @@ id=""><span id=""></span></p>
        but syntactically correct. -->
 </style>
 #errors
+/style;style:text/css; charset=us-ascii;unsupported
 
 #data
 <style media="all" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/style;style:text/css;unsupported
+/style/@media;media query;unsupported
 
 #data
 <style media="screen" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/style;style:text/css;unsupported
+/style/@media;media query;unsupported
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
@@ -856,6 +878,7 @@ id=""><span id=""></span></p>
 </head>
 #errors
 /head/style;element not allowed
+/head/style;style:text/css;unsupported
 
 #data
 <article xmlns="http://www.w3.org/1999/xhtml">
@@ -863,12 +886,14 @@ id=""><span id=""></span></p>
 </article>
 #errors
 /article/style;element not allowed
+/article/style;style:text/css;unsupported
 
 #data
 <article xmlns="http://www.w3.org/1999/xhtml">
 <style scoped=""/>
 </article>
 #errors
+/article/style;style:text/css;unsupported
 
 #data
 <aside xmlns="http://www.w3.org/1999/xhtml">
@@ -876,12 +901,14 @@ id=""><span id=""></span></p>
 </aside>
 #errors
 /aside/style;element not allowed
+/aside/style;style:text/css;unsupported
 
 #data
 <aside xmlns="http://www.w3.org/1999/xhtml">
 <style scoped=""/>
 </aside>
 #errors
+/aside/style;style:text/css;unsupported
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -889,12 +916,14 @@ id=""><span id=""></span></p>
 </div>
 #errors
 /div/style;element not allowed
+/div/style;style:text/css;unsupported
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
 <style scoped=""/>
 </div>
 #errors
+/div/style;style:text/css;unsupported
 
 #data
 <section xmlns="http://www.w3.org/1999/xhtml">
@@ -902,12 +931,14 @@ id=""><span id=""></span></p>
 </section>
 #errors
 /section/style;element not allowed
+/section/style;style:text/css;unsupported
 
 #data
 <section xmlns="http://www.w3.org/1999/xhtml">
 <style scoped=""/>
 </section>
 #errors
+/section/style;style:text/css;unsupported
 
 #data
 <body text="red" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -1294,16 +1325,19 @@ id=""><span id=""></span></p>
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /a/@hreflang;language tag:syntax error
+/a/@hreflang;language tag;unsupported
 
 #data
 <a href="http://test/" hreflang="en"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/a/@hreflang;language tag;unsupported
 
 #data
 <a href="http://test/" media="all"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/a/@media;media query;unsupported
 
 #data
 <a href="http://test/" target="_self"
@@ -1372,11 +1406,13 @@ id=""><span id=""></span></p>
 <a hreflang="en" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /a/@hreflang;attribute not allowed
+/a/@hreflang;language tag;unsupported
 
 #data
 <a media="screen" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /a/@media;attribute not allowed
+/a/@media;media query;unsupported
 
 #data
 <a target="_self"
@@ -2485,6 +2521,7 @@ id=""><span id=""></span></p>
 <source src="http://test/" media="screen"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/source/@media;media query;unsupported
 
 #data
 <canvas xmlns="http://www.w3.org/1999/xhtml"/>
@@ -2632,30 +2669,35 @@ id=""><span id=""></span></p>
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /area/@hreflang;language tag:syntax error
+/area/@hreflang;language tag;unsupported
 
 #data
 <area href="http://test/" alt="" coords="1,2,3,4"
     hreflang="en"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/area/@hreflang;language tag;unsupported
 
 #data
 <area coords="1,2,3,4" hreflang="en"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /area/@hreflang;attribute not allowed
+/area/@hreflang;language tag;unsupported
 
 #data
 <area href="http://test/" alt="" coords="1,2,3,4"
     media="screen"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/area/@media;media query;unsupported
 
 #data
 <area coords="1,2,3,4" media="screen"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /area/@media;attribute not allowed
+/area/@media;media query;unsupported
 
 #data
 <area href="http://test/" coords="1,2,3,4" alt="" target="_self"
@@ -3208,38 +3250,45 @@ id=""><span id=""></span></p>
 #data
 <script xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/script;script:text/javascript;unsupported
 
 #data
 <script type="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script/@type;IMT:syntax error
+/script;script:text/javascript;unsupported
 
 #data
 <script type="text/javascript" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script/@type;IMT:obsolete subtype;s
+/script;script:text/javascript;unsupported
 
 #data
 <script type="text/javascript;e4x=1" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script/@type;IMT:obsolete subtype;s
+/script;script:text/javascript;e4x=1;unsupported
 
 #data
 <script type="text/JavaScript;E4X=1" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script/@type;IMT:obsolete subtype;s
+/script;script:text/JavaScript;E4X=1;unsupported
 
 #data
 <script type="text/javascript;e4x=&quot;1&quot;"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script/@type;IMT:obsolete subtype;s
+/script;script:text/javascript;e4x="1";unsupported
 
 #data
 <script type="text/javascript;e4x=&quot;\1&quot;"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script/@type;IMT:obsolete subtype;s
+/script;script:text/javascript;e4x="\1";unsupported
 
 #data
 <script src="http://test/" type="text/javascript"
@@ -3257,6 +3306,7 @@ id=""><span id=""></span></p>
 #data
 <script defer="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/script;script:text/javascript;unsupported
 
 #data
 <script src="http://test/" defer=""
@@ -3266,6 +3316,7 @@ id=""><span id=""></span></p>
 #data
 <script defer="defer" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/script;script:text/javascript;unsupported
 
 #data
 <script src="http://test/" defer="defer"
@@ -3276,6 +3327,7 @@ id=""><span id=""></span></p>
 <script defer="true" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script/@defer;boolean:invalid
+/script;script:text/javascript;unsupported
 
 #data
 <script src="http://test/" defer="true"
@@ -3286,6 +3338,7 @@ id=""><span id=""></span></p>
 #data
 <script async="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/script;script:text/javascript;unsupported
 
 #data
 <script src="http://test/" async=""
@@ -3295,6 +3348,7 @@ id=""><span id=""></span></p>
 #data
 <script async="async" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/script;script:text/javascript;unsupported
 
 #data
 <script src="http://test/" async="async"
@@ -3305,6 +3359,7 @@ id=""><span id=""></span></p>
 <script async="true" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script/@async;boolean:invalid
+/script;script:text/javascript;unsupported
 
 #data
 <script src="http://test/" async="true"
@@ -3316,11 +3371,13 @@ id=""><span id=""></span></p>
 <script defer="" async="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script/@async;attribute not allowed
+/script;script:text/javascript;unsupported
 
 #data
 <script defer="defer" async="async" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script/@async;attribute not allowed
+/script;script:text/javascript;unsupported
 
 #data
 <script src="" defer="" async="" xmlns="http://www.w3.org/1999/xhtml"/>

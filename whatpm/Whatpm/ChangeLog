@@ -1,5 +1,13 @@
 2007-07-16  Wakaba  <wakaba@suika.fam.cx>
 
+	* ContentChecker.pm: Drop wrong |level => 'error'| specification
+	from "in HTML:xml:lang" error.  Character position
+	is now the last part of the error type in the URI error
+	description.  Report "unsupported" status for language
+	tags, media queries, script codes, and style sheets.
+
+2007-07-16  Wakaba  <wakaba@suika.fam.cx>
+
 	* ContentChecker.pm: Report error if |xml:lang|
 	in HTML, |lang| in XML, |xmlns| in XML, and |meta| |charset|
 	in XML.
