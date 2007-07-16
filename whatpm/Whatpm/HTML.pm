@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.33 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.34 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## ISSUE:
 ## var doc = implementation.createDocument (null, null, null);
@@ -3344,6 +3344,45 @@ sub _tree_construction_main ($) {
         $token = $self->_get_next_token;
         ## TODO: Extracting |charset| from |meta|.
         return;
+      } elsif ($token->{tag_name} eq 'meta') {
+        ## NOTE: This is an "as if in head" code clone, only "-t" differs
+        
+    {
+      my $el;
+      
+      $el = $self->{document}->create_element_ns
+        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
+    
+        for my $attr_name (keys %{  $token->{attributes}}) {
+          $el->set_attribute_ns (undef, [undef, $attr_name],
+                                  $token->{attributes} ->{$attr_name}->{value});
+        }
+      
+      $insert->($el);
+      push @{$self->{open_elements}}, [$el, $token->{tag_name}];
+    }
+  
+        pop @{$self->{open_elements}}; ## ISSUE: This step is missing in the spec.
+
+        unless ($self->{confident}) {
+          my $charset;
+          if ($token->{attributes}->{charset}) { ## TODO: And if supported
+            $charset = $token->{attributes}->{charset}->{value};
+          }
+          if ($token->{attributes}->{'http-equiv'}) {
+            if ($token->{attributes}->{'http-equiv'}->{value}
+                =~ /\A[^;]*;[\x09-\x0D\x20]*charset[\x09-\x0D\x20]*=
+                    [\x09-\x0D\x20]*(?>"([^"]*)"|'([^']*)'|
+                    ([^"'\x09-\x0D\x20][^\x09-\x0D\x20]*))/x) {
+              $charset = defined $1 ? $1 : defined $2 ? $2 : $3;
+            } ## TODO: And if supported
+          }
+          ## TODO: Change the encoding
+        }
+
+        $token = $self->_get_next_token;
+        ## TODO: Extracting |charset| from |meta|.
+        return;
       } elsif ($token->{tag_name} eq 'title') {
         $self->{parse_error}-> (type => 'in body:title');
         ## NOTE: This is an "as if in head" code clone
@@ -4559,7 +4598,7 @@ sub _tree_construction_main ($) {
           } elsif ($token->{type} eq 'start tag') {
             if ({base => ($self->{insertion_mode} eq 'in head' or
                           $self->{insertion_mode} eq 'after head'),
-                 link => 1, meta => 1}->{$token->{tag_name}}) {
+                 link => 1}->{$token->{tag_name}}) {
               ## NOTE: There is a "as if in head" code clone.
               if ($self->{insertion_mode} eq 'after head') {
                 $self->{parse_error}-> (type => 'after head:'.$token->{tag_name});
@@ -4582,6 +4621,51 @@ sub _tree_construction_main ($) {
     }
   
               pop @{$self->{open_elements}}; ## ISSUE: This step is missing in the spec.
+              ## TODO: Extracting |charset| from |meta|.
+              pop @{$self->{open_elements}}
+                  if $self->{insertion_mode} eq 'after head';
+              $token = $self->_get_next_token;
+              redo B;
+            } elsif ($token->{tag_name} eq 'meta') {
+              ## NOTE: There is a "as if in head" code clone.
+              if ($self->{insertion_mode} eq 'after head') {
+                $self->{parse_error}-> (type => 'after head:'.$token->{tag_name});
+                push @{$self->{open_elements}}, [$self->{head_element}, 'head'];
+              }
+              
+    {
+      my $el;
+      
+      $el = $self->{document}->create_element_ns
+        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
+    
+        for my $attr_name (keys %{  $token->{attributes}}) {
+          $el->set_attribute_ns (undef, [undef, $attr_name],
+                                  $token->{attributes} ->{$attr_name}->{value});
+        }
+      
+      $self->{open_elements}->[-1]->[0]->append_child ($el);
+      push @{$self->{open_elements}}, [$el, $token->{tag_name}];
+    }
+  
+              pop @{$self->{open_elements}}; ## ISSUE: This step is missing in the spec.
+
+              unless ($self->{confident}) {
+                my $charset;
+                if ($token->{attributes}->{charset}) { ## TODO: And if supported
+                  $charset = $token->{attributes}->{charset}->{value};
+                }
+                if ($token->{attributes}->{'http-equiv'}) {
+                  if ($token->{attributes}->{'http-equiv'}->{value}
+                      =~ /\A[^;]*;[\x09-\x0D\x20]*charset[\x09-\x0D\x20]*=
+                          [\x09-\x0D\x20]*(?>"([^"]*)"|'([^']*)'|
+                          ([^"'\x09-\x0D\x20][^\x09-\x0D\x20]*))/x) {
+                    $charset = defined $1 ? $1 : defined $2 ? $2 : $3;
+                  } ## TODO: And if supported
+                }
+                ## TODO: Change the encoding
+              }
+
               ## TODO: Extracting |charset| from |meta|.
               pop @{$self->{open_elements}}
                   if $self->{insertion_mode} eq 'after head';
@@ -6790,4 +6874,4 @@ sub get_inner_html ($$$) {
 } # get_inner_html
 
 1;
-# $Date: 2007/07/07 13:41:05 $
+# $Date: 2007/07/16 01:52:27 $
