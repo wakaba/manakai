@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.34 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.35 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## ISSUE:
 ## var doc = implementation.createDocument (null, null, null);
@@ -2825,10 +2825,9 @@ sub _tree_construction_root_element ($) {
     
       $self->{document}->append_child ($root_element);
       push @{$self->{open_elements}}, [$root_element, 'html'];
-      #$phase = 'main';
       ## reprocess
       #redo B;
-      return;
+      return; ## Go to the main phase.
   } # B
 } # _tree_construction_root_element
 
@@ -2904,7 +2903,7 @@ sub _reset_insertion_mode ($) {
 sub _tree_construction_main ($) {
   my $self = shift;
 
-  my $phase = 'main';
+  my $previous_insertion_mode;
 
   my $active_formatting_elements = [];
 
@@ -3321,7 +3320,7 @@ sub _tree_construction_main ($) {
         $parse_rcdata->('CDATA', $insert);
         return;
       } elsif ({
-                base => 1, link => 1, meta => 1,
+                base => 1, link => 1,
                }->{$token->{tag_name}}) {
         ## NOTE: This is an "as if in head" code clone, only "-t" differs
         
@@ -3342,7 +3341,6 @@ sub _tree_construction_main ($) {
   
         pop @{$self->{open_elements}}; ## ISSUE: This step is missing in the spec.
         $token = $self->_get_next_token;
-        ## TODO: Extracting |charset| from |meta|.
         return;
       } elsif ($token->{tag_name} eq 'meta') {
         ## NOTE: This is an "as if in head" code clone, only "-t" differs
@@ -3370,6 +3368,7 @@ sub _tree_construction_main ($) {
             $charset = $token->{attributes}->{charset}->{value};
           }
           if ($token->{attributes}->{'http-equiv'}) {
+            ## ISSUE: Algorithm name in the spec was incorrect so that not linked to the definition.
             if ($token->{attributes}->{'http-equiv'}->{value}
                 =~ /\A[^;]*;[\x09-\x0D\x20]*charset[\x09-\x0D\x20]*=
                     [\x09-\x0D\x20]*(?>"([^"]*)"|'([^']*)'|
@@ -3381,7 +3380,6 @@ sub _tree_construction_main ($) {
         }
 
         $token = $self->_get_next_token;
-        ## TODO: Extracting |charset| from |meta|.
         return;
       } elsif ($token->{tag_name} eq 'title') {
         $self->{parse_error}-> (type => 'in body:title');
@@ -4455,7 +4453,7 @@ sub _tree_construction_main ($) {
   }; # $in_body
 
   B: {
-    if ($phase eq 'main') {
+    if ($self->{insertion_mode} ne 'trailing end') {
       if ($token->{type} eq 'DOCTYPE') {
         $self->{parse_error}-> (type => 'in html:#DOCTYPE');
         ## Ignore the token
@@ -4621,7 +4619,6 @@ sub _tree_construction_main ($) {
     }
   
               pop @{$self->{open_elements}}; ## ISSUE: This step is missing in the spec.
-              ## TODO: Extracting |charset| from |meta|.
               pop @{$self->{open_elements}}
                   if $self->{insertion_mode} eq 'after head';
               $token = $self->_get_next_token;
@@ -4656,6 +4653,7 @@ sub _tree_construction_main ($) {
                   $charset = $token->{attributes}->{charset}->{value};
                 }
                 if ($token->{attributes}->{'http-equiv'}) {
+                  ## ISSUE: Algorithm name in the spec was incorrect so that not linked to the definition.
                   if ($token->{attributes}->{'http-equiv'}->{value}
                       =~ /\A[^;]*;[\x09-\x0D\x20]*charset[\x09-\x0D\x20]*=
                           [\x09-\x0D\x20]*(?>"([^"]*)"|'([^']*)'|
@@ -6374,10 +6372,11 @@ sub _tree_construction_main ($) {
         } elsif ($self->{insertion_mode} eq 'after body') {
           if ($token->{type} eq 'character') {
             if ($token->{data} =~ s/^([\x09\x0A\x0B\x0C\x20]+)//) {
+              my $data = $1;
               ## As if in body
               $reconstruct_active_formatting_elements->($insert_to_current);
               
-              $self->{open_elements}->[-1]->[0]->manakai_append_text ($token->{data});
+              $self->{open_elements}->[-1]->[0]->manakai_append_text ($1);
 
               unless (length $token->{data}) {
                 $token = $self->_get_next_token;
@@ -6403,7 +6402,8 @@ sub _tree_construction_main ($) {
                 $token = $self->_get_next_token;
                 redo B;
               } else {
-                $phase = 'trailing end';
+                $previous_insertion_mode = $self->{insertion_mode};
+                $self->{insertion_mode} = 'trailing end';
                 $token = $self->_get_next_token;
                 redo B;
               }
@@ -6420,7 +6420,7 @@ sub _tree_construction_main ($) {
         } elsif ($self->{insertion_mode} eq 'in frameset') {
           if ($token->{type} eq 'character') {
             if ($token->{data} =~ s/^([\x09\x0A\x0B\x0C\x20]+)//) {
-              $self->{open_elements}->[-1]->[0]->manakai_append_text ($token->{data});
+              $self->{open_elements}->[-1]->[0]->manakai_append_text ($1);
 
               unless (length $token->{data}) {
                 $token = $self->_get_next_token;
@@ -6515,7 +6515,7 @@ sub _tree_construction_main ($) {
         } elsif ($self->{insertion_mode} eq 'after frameset') {
           if ($token->{type} eq 'character') {
             if ($token->{data} =~ s/^([\x09\x0A\x0B\x0C\x20]+)//) {
-              $self->{open_elements}->[-1]->[0]->manakai_append_text ($token->{data});
+              $self->{open_elements}->[-1]->[0]->manakai_append_text ($1);
 
               unless (length $token->{data}) {
                 $token = $self->_get_next_token;
@@ -6523,7 +6523,17 @@ sub _tree_construction_main ($) {
               }
             }
 
-            #
+            if ($token->{data} =~ s/^[^\x09\x0A\x0B\x0C\x20]+//) {
+              $self->{parse_error}-> (type => 'after frameset:#character');
+
+              ## Ignore the token.
+              if (length $token->{data}) {
+                ## reprocess the rest of characters
+              } else {
+                $token = $self->_get_next_token;
+              }
+              redo B;
+            }
           } elsif ($token->{type} eq 'comment') {
             my $comment = $self->{document}->create_comment ($token->{data});
             $self->{open_elements}->[-1]->[0]->append_child ($comment);
@@ -6538,21 +6548,18 @@ sub _tree_construction_main ($) {
             }
           } elsif ($token->{type} eq 'end tag') {
             if ($token->{tag_name} eq 'html') {
-              $phase = 'trailing end';
+              $previous_insertion_mode = $self->{insertion_mode};
+              $self->{insertion_mode} = 'trailing end';
               $token = $self->_get_next_token;
               redo B;
             } else {
               #
             }
           } else {
-            #
+            die "$0: $token->{type}: Unknown token type";
           }
           
-          if (defined $token->{tag_name}) {
-            $self->{parse_error}-> (type => 'after frameset:'.($token->{tag_name} eq 'end tag' ? '/' : '').$token->{tag_name});
-          } else {
-            $self->{parse_error}-> (type => 'after frameset:#'.$token->{type});
-          }
+          $self->{parse_error}-> (type => 'after frameset:'.($token->{tag_name} eq 'end tag' ? '/' : '').$token->{tag_name});
           ## Ignore the token
           $token = $self->_get_next_token;
           redo B;
@@ -6562,7 +6569,7 @@ sub _tree_construction_main ($) {
           die "$0: $self->{insertion_mode}: Unknown insertion mode";
         }
       }
-    } elsif ($phase eq 'trailing end') {
+    } elsif ($self->{insertion_mode} eq 'trailing end') {
       ## states in the main stage is preserved yet # MUST
       
       if ($token->{type} eq 'DOCTYPE') {
@@ -6582,8 +6589,7 @@ sub _tree_construction_main ($) {
           ## NOTE: The insertion mode in the main phase
           ## just before the phase has been changed to the trailing
           ## end phase is either "after body" or "after frameset".
-          $reconstruct_active_formatting_elements->($insert_to_current)
-            if $phase eq 'main';
+          $reconstruct_active_formatting_elements->($insert_to_current);
           
           $self->{open_elements}->[-1]->[0]->manakai_append_text ($data);
           
@@ -6594,13 +6600,13 @@ sub _tree_construction_main ($) {
         }
 
         $self->{parse_error}-> (type => 'after html:#character');
-        $phase = 'main';
+        $self->{insertion_mode} = $previous_insertion_mode;
         ## reprocess
         redo B;
       } elsif ($token->{type} eq 'start tag' or
                $token->{type} eq 'end tag') {
         $self->{parse_error}-> (type => 'after html:'.($token->{type} eq 'end tag' ? '/' : '').$token->{tag_name});
-        $phase = 'main';
+        $self->{insertion_mode} = $previous_insertion_mode;
         ## reprocess
         redo B;
       } elsif ($token->{type} eq 'end-of-file') {
@@ -6874,4 +6880,4 @@ sub get_inner_html ($$$) {
 } # get_inner_html
 
 1;
-# $Date: 2007/07/16 01:52:27 $
+# $Date: 2007/07/16 03:21:04 $

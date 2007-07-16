@@ -975,3 +975,455 @@ a</textarea>
 |     <textarea>
 |       "<!---->
 a"
+
+#data
+<!DOCTYPE HTML><html><head><title></title></head><body></body></html> 
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <title>
+|   <body>
+|     " "
+
+#data
+<!DOCTYPE HTML><html><head><title></title></head><body></body></html>  
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <title>
+|   <body>
+|     "  "
+
+#data
+<!DOCTYPE HTML><html><head><title></title></head><body></body></html>a
+#errors
+char after </body>
+char after </html>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <title>
+|   <body>
+|     "a"
+
+#data
+<!DOCTYPE HTML><html><head><title></title></head><body></body></html> a
+#errors
+char after </html>
+char after </body>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <title>
+|   <body>
+|     " a"
+
+#data
+<!DOCTYPE HTML><html><head><title></title></head><body></body></html>a 
+#errors
+char after </html>
+char after </body>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <title>
+|   <body>
+|     "a "
+
+#data
+<!DOCTYPE HTML><html><head><title></title></head><body></body></html>aaa
+#errors
+char after </html>
+char after </body>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <title>
+|   <body>
+|     "aaa"
+
+#data
+<!DOCTYPE HTML><html><head><title></title></head><body></body></html><!---->
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <title>
+|   <body>
+| <!--  -->
+
+#data
+<!DOCTYPE HTML><html><head><title></title></head><body></body></html><!--aa-->
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <title>
+|   <body>
+| <!-- aa -->
+
+#data
+<!DOCTYPE HTML><html><head><title></title></head><body></body></html><!DOCTYPE HTML>
+#errors
+<!DOCTYPE> after </html>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <title>
+|   <body>
+
+#data
+<!DOCTYPE HTML><html><head><title></title></head><body></body></html><p>
+#errors
+start tag after </html>
+start tag after </body>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <title>
+|   <body>
+|     <p>
+
+#data
+<!DOCTYPE HTML><html><head><title></title></head><body></body></html></p>
+#errors
+end tag after </html>
+end tag after </body>
+</p> interpreted as <p></p>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <title>
+|   <body>
+|     <p>
+
+#data
+<!DOCTYPE HTML><html><head><title></title></head><body></body></html>  <p>
+#errors
+start tag after </html>
+start tag after </body>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <title>
+|   <body>
+|     "  "
+|     <p>
+
+#data
+<!DOCTYPE HTML><html><head><title></title></head><body></body></html>aa<p>
+#errors
+char after </html>
+char after </body>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <title>
+|   <body>
+|     "aa"
+|     <p>
+
+#data
+<!DOCTYPE HTML><html><head><title></title></head><frameset></frameset></html> 
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <title>
+|   <frameset>
+|   " "
+
+#data
+<!DOCTYPE HTML><html><head><title></title></head><frameset></frameset></html>  
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <title>
+|   <frameset>
+|   "  "
+
+#data
+<!DOCTYPE HTML><html><head><title></title></head><frameset></frameset></html>a
+#errors
+char after </html>
+char after </frameset>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <title>
+|   <frameset>
+
+#data
+<!DOCTYPE HTML><html><head><title></title></head><frameset></frameset></html> a
+#errors
+char after </html>
+char after </frameset>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <title>
+|   <frameset>
+|   " "
+
+#data
+<!DOCTYPE HTML><html><head><title></title></head><frameset></frameset></html>a 
+#errors
+char after </html>
+char after </frameset>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <title>
+|   <frameset>
+|   " "
+
+#data
+<!DOCTYPE HTML><html><head><title></title></head><frameset></frameset></html><!---->
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <title>
+|   <frameset>
+| <!--  -->
+
+#data
+<!DOCTYPE HTML><html><head><title></title></head><frameset></frameset></html><!--a-->
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <title>
+|   <frameset>
+| <!-- a -->
+
+#data
+<!DOCTYPE HTML><html><head><title></title></head><frameset></frameset></html> <!---->
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <title>
+|   <frameset>
+|   " "
+| <!--  -->
+
+#data
+<!DOCTYPE HTML><html><head><title></title></head><frameset></frameset></html>a<!---->
+#errors
+char after </html>
+char after </frameset>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <title>
+|   <frameset>
+|   <!--  -->
+
+#data
+<!DOCTYPE HTML><html><head><title></title></head><frameset></frameset></html><!DOCTYPE HTML>
+#errors
+<!DOCTYPE> after </html>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <title>
+|   <frameset>
+
+#data
+<!DOCTYPE HTML><html><head><title></title></head><frameset></frameset></html> <!DOCTYPE HTML>
+#errors
+<!DOCTYPE> after </html>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <title>
+|   <frameset>
+|   " "
+
+#data
+<!DOCTYPE HTML><html><head><title></title></head><frameset></frameset></html><p>
+#errors
+start tag after </html>
+start tag after </frameset>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <title>
+|   <frameset>
+
+#data
+<!DOCTYPE HTML><html><head><title></title></head><frameset></frameset></html> <p>
+#errors
+start tag after </html>
+start tag after </frameset>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <title>
+|   <frameset>
+|   " "
+
+#data
+<!DOCTYPE HTML><html><head><title></title></head><frameset></frameset></html></p>
+#errors
+end tag after </html>
+end tag after </frameset>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <title>
+|   <frameset>
+
+#data
+<!DOCTYPE HTML><html><head><title></title></head><frameset></frameset></html> </p>
+#errors
+end tag after </html>
+end tag after </frameset>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <title>
+|   <frameset>
+|   " "
+
+#data
+<!DOCTYPE HTML><html><head><title></title></head><frameset></frameset></html></html>
+#errors
+</html> after </html>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <title>
+|   <frameset>
+
+#data
+<!DOCTYPE HTML><html><head><title></title></head><frameset></frameset></html>a</html>
+#errors
+char after </html>
+char after </frameset>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <title>
+|   <frameset>
+
+#data
+<!DOCTYPE HTML><html><head><title></title></head><frameset></frameset></html><noframes></noframes>
+#errors
+<noframes> after </html>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <title>
+|   <frameset>
+|   <noframes>
+
+#data
+<!DOCTYPE HTML><html><head><title></title></head><frameset></frameset></html><noframes>
+#errors
+<noframes> after </html>
+no </noframes>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <title>
+|   <frameset>
+|   <noframes>
+
+#data
+<!DOCTYPE HTML><html><head><title></title></head><frameset></frameset></html><noframes><p></noframes>
+#errors
+<noframes> after </html>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <title>
+|   <frameset>
+|   <noframes>
+|     "<p>"
+
+#data
+<!DOCTYPE HTML><html><head><title></title></head><frameset></frameset></html><noframes></noframes>a
+#errors
+<noframes> after </html>
+char after </frameset>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <title>
+|   <frameset>
+|   <noframes>
+
+#data
+<!DOCTYPE HTML><html><head><title></title></head><frameset></frameset></html> <noframes></noframes> 
+#errors
+<noframes> after </html>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <title>
+|   <frameset>
+|   " "
+|   <noframes>
+|   " "
+
+#data
+<!DOCTYPE HTML><html><head><title></title></head><frameset> </frameset></html>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <title>
+|   <frameset>
+|     " "
+
+#data
+<!DOCTYPE HTML><html><head><title></title></head><body></body> </html>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <title>
+|   <body>
+|     " "

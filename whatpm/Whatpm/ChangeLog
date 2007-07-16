@@ -1,5 +1,12 @@
 2007-07-16  Wakaba  <wakaba@suika.fam.cx>
 
+	* HTML.pm.src: |$phase| has been removed; The |trailing end|
+	phase is now an insertion mode.  Treatments for white
+	space character tokens were incorrect for some
+	insertion modes.  An old |meta| case was not removed.
+
+2007-07-16  Wakaba  <wakaba@suika.fam.cx>
+
 	* HTML.pm.src: |meta| charset declaration extraction
 	implemented (but changing the encoding is not yet:-).
 
