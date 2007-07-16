@@ -1,6 +1,6 @@
 package Message::DOM::DOMImplementation;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.9 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::IF::DOMImplementation',
     'Message::IF::AtomDOMImplementation';
 
@@ -20,10 +20,7 @@ sub AUTOLOAD {
     create_atom_feed_document => 'Message::DOM::Atom::AtomElement',
     create_document => 'Message::DOM::DOMDocument', ## TODO: New module name
     create_document_type => 'Message::DOM::DocumentType',
-    create_mc_decode_handler => 'Message::Charset::Encode',
     create_uri_reference => 'Message::URI::URIReference',  
-    get_charset_name_from_uri => 'Message::Charset::Encode',
-    get_uri_from_charset_name => 'Message::Charset::Encode',
   }->{$method_name};
   if ($module_name) {
     eval qq{ require $module_name } or die $@;
@@ -35,10 +32,6 @@ sub AUTOLOAD {
   }
 } # AUTOLOAD
 
-## MCImplementation
-sub create_mc_decode_handler;
-sub get_charset_name_from_uri;
-sub get_uri_from_charset_name;
 ## URIImplementation
 sub create_uri_reference ($$);
 
@@ -113,4 +106,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/15 05:18:46 $
+## $Date: 2007/07/16 11:58:02 $

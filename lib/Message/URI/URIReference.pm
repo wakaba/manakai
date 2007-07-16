@@ -1,8 +1,6 @@
 package Message::URI::URIReference;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
-
-require Message::Util::Error::DOMException;
+our $VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 package Message::IF::URIImplementation;
 package Message::DOM::DOMImplementation;
@@ -765,44 +763,11 @@ uri_path
 
 ## TODO: An attribute that returns the number of path segments is necessary.
 
-sub is_uri ($;$) {
-if (@_ == 1) {my ($self) = @_;
-my $r = 0;
+*is_uri = \&is_uri_3986;
 
-{
-
-
-{
-
-local $Error::Depth = $Error::Depth + 1;
-
-{
-
-
-
-  $r = $self->
-is_uri_3986
-;
-
-
-
-}
-
-
-;}
-
-;
-
-
-}
-$r;
-} else {my ($self) = @_;
-report Message::Util::Error::DOMException::CoreException -object => $self, '-type' => 'NO_MODIFICATION_ALLOWED_ERR', 'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#on' => 'get', 'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#subtype' => 'http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#READ_ONLY_ATTRIBUTE_ERR', 'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#class' => 'Message::URI::Generic::ManakaiURIReference', 'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#attr' => 'is_uri';
-}
-}
-sub is_uri_3986 ($;$) {
-if (@_ == 1) {my ($self) = @_;
-my $r = 0;
+sub is_uri_3986 ($) {
+  my $self = $_[0];
+  my $r = 0;
 
 {
 
@@ -899,47 +864,12 @@ if ($x =~ s/(?:$ipv4|$h16)\z//o) {
 
 }
 $r;
-} else {my ($self) = @_;
-report Message::Util::Error::DOMException::CoreException -object => $self, '-type' => 'NO_MODIFICATION_ALLOWED_ERR', 'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#on' => 'get', 'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#subtype' => 'http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#READ_ONLY_ATTRIBUTE_ERR', 'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#class' => 'Message::URI::Generic::ManakaiURIReference', 'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#attr' => 'is_uri_3986';
-}
-}
-sub is_relative_reference ($;$) {
-if (@_ == 1) {my ($self) = @_;
-my $r = 0;
+} # is_uri_3986
 
-{
+*is_relative_reference = \&is_relative_reference_3986;
 
-
-{
-
-local $Error::Depth = $Error::Depth + 1;
-
-{
-
-
-
-  $r = $self->
-is_relative_reference_3986
-;
-
-
-
-}
-
-
-;}
-
-;
-
-
-}
-$r;
-} else {my ($self) = @_;
-report Message::Util::Error::DOMException::CoreException -object => $self, '-type' => 'NO_MODIFICATION_ALLOWED_ERR', 'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#on' => 'get', 'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#subtype' => 'http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#READ_ONLY_ATTRIBUTE_ERR', 'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#class' => 'Message::URI::Generic::ManakaiURIReference', 'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#attr' => 'is_relative_reference';
-}
-}
-sub is_relative_reference_3986 ($;$) {
-if (@_ == 1) {my ($self) = @_;
+sub is_relative_reference_3986 ($) {
+  my $self = $_[0];
 my $r = 0;
 
 {
@@ -1037,47 +967,12 @@ if ($x =~ s/(?:$ipv4|$h16)\z//o) {
 
 }
 $r;
-} else {my ($self) = @_;
-report Message::Util::Error::DOMException::CoreException -object => $self, '-type' => 'NO_MODIFICATION_ALLOWED_ERR', 'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#on' => 'get', 'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#subtype' => 'http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#READ_ONLY_ATTRIBUTE_ERR', 'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#class' => 'Message::URI::Generic::ManakaiURIReference', 'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#attr' => 'is_relative_reference_3986';
-}
-}
-sub is_uri_reference ($;$) {
-if (@_ == 1) {my ($self) = @_;
-my $r = 0;
+} # is_relative_reference_3986
 
-{
+*is_uri_reference = \&is_uri_reference_3986;
 
-
-{
-
-local $Error::Depth = $Error::Depth + 1;
-
-{
-
-
-
-  $r = $self->
-is_uri_reference_3986
-;
-
-
-
-}
-
-
-;}
-
-;
-
-
-}
-$r;
-} else {my ($self) = @_;
-report Message::Util::Error::DOMException::CoreException -object => $self, '-type' => 'NO_MODIFICATION_ALLOWED_ERR', 'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#on' => 'get', 'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#subtype' => 'http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#READ_ONLY_ATTRIBUTE_ERR', 'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#class' => 'Message::URI::Generic::ManakaiURIReference', 'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#attr' => 'is_uri_reference';
-}
-}
-sub is_uri_reference_3986 ($;$) {
-if (@_ == 1) {my ($self) = @_;
+sub is_uri_reference_3986 ($) {
+  my $self = $_[0];
 my $r = 0;
 
 {
@@ -1110,47 +1005,12 @@ is_relative_reference_3986
 
 }
 $r;
-} else {my ($self) = @_;
-report Message::Util::Error::DOMException::CoreException -object => $self, '-type' => 'NO_MODIFICATION_ALLOWED_ERR', 'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#on' => 'get', 'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#subtype' => 'http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#READ_ONLY_ATTRIBUTE_ERR', 'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#class' => 'Message::URI::Generic::ManakaiURIReference', 'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#attr' => 'is_uri_reference_3986';
-}
-}
-sub is_absolute_uri ($;$) {
-if (@_ == 1) {my ($self) = @_;
-my $r = 0;
+} # is_uri_reference_3986
 
-{
+*is_absolute_uri = \&is_absolute_uri_3986;
 
-
-{
-
-local $Error::Depth = $Error::Depth + 1;
-
-{
-
-
-
-  $r = $self->
-is_absolute_uri_3986
-;
-
-
-
-}
-
-
-;}
-
-;
-
-
-}
-$r;
-} else {my ($self) = @_;
-report Message::Util::Error::DOMException::CoreException -object => $self, '-type' => 'NO_MODIFICATION_ALLOWED_ERR', 'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#on' => 'get', 'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#subtype' => 'http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#READ_ONLY_ATTRIBUTE_ERR', 'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#class' => 'Message::URI::Generic::ManakaiURIReference', 'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#attr' => 'is_absolute_uri';
-}
-}
-sub is_absolute_uri_3986 ($;$) {
-if (@_ == 1) {my ($self) = @_;
+sub is_absolute_uri_3986 ($) {
+  my $self = $_[0];
 my $r = 0;
 
 {
@@ -1180,63 +1040,16 @@ is_uri_3986
 
 }
 $r;
-} else {my ($self) = @_;
-report Message::Util::Error::DOMException::CoreException -object => $self, '-type' => 'NO_MODIFICATION_ALLOWED_ERR', 'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#on' => 'get', 'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#subtype' => 'http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#READ_ONLY_ATTRIBUTE_ERR', 'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#class' => 'Message::URI::Generic::ManakaiURIReference', 'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#attr' => 'is_absolute_uri_3986';
-}
-}
-sub is_empty_reference ($;$) {
-if (@_ == 1) {my ($self) = @_;
-my $r = 0;
+} # is_uri_reference_3986
 
-{
+sub is_empty_reference ($) {
+  return ${$_[0]} eq '';
+} # is_empty_reference
 
+*is_iri = \&is_iri_3987;
 
-$r = ($$self eq '');
-
-
-}
-$r;
-} else {my ($self) = @_;
-report Message::Util::Error::DOMException::CoreException -object => $self, '-type' => 'NO_MODIFICATION_ALLOWED_ERR', 'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#on' => 'get', 'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#subtype' => 'http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#READ_ONLY_ATTRIBUTE_ERR', 'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#class' => 'Message::URI::Generic::ManakaiURIReference', 'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#attr' => 'is_empty_reference';
-}
-}
-sub is_iri ($;$) {
-if (@_ == 1) {my ($self) = @_;
-my $r = 0;
-
-{
-
-
-{
-
-local $Error::Depth = $Error::Depth + 1;
-
-{
-
-
-
-  $r = $self->
-is_iri_3987
-;
-
-
-
-}
-
-
-;}
-
-;
-
-
-}
-$r;
-} else {my ($self) = @_;
-report Message::Util::Error::DOMException::CoreException -object => $self, '-type' => 'NO_MODIFICATION_ALLOWED_ERR', 'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#on' => 'get', 'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#subtype' => 'http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#READ_ONLY_ATTRIBUTE_ERR', 'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#class' => 'Message::URI::Generic::ManakaiURIReference', 'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#attr' => 'is_iri';
-}
-}
-sub is_iri_3987 ($;$) {
-if (@_ == 1) {my ($self) = @_;
+sub is_iri_3987 ($) {
+  my $self = $_[0];
 my $r = 0;
 
 {
@@ -1338,47 +1151,12 @@ if ($x =~ s/(?:$ipv4|$h16)\z//o) {
 
 }
 $r;
-} else {my ($self) = @_;
-report Message::Util::Error::DOMException::CoreException -object => $self, '-type' => 'NO_MODIFICATION_ALLOWED_ERR', 'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#on' => 'get', 'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#subtype' => 'http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#READ_ONLY_ATTRIBUTE_ERR', 'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#class' => 'Message::URI::Generic::ManakaiURIReference', 'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#attr' => 'is_iri_3987';
-}
-}
-sub is_relative_iri_reference ($;$) {
-if (@_ == 1) {my ($self) = @_;
-my $r = 0;
+} # is_iri_3987
 
-{
+*is_relative_iri_reference = \&is_relative_iri_reference_3987;
 
-
-{
-
-local $Error::Depth = $Error::Depth + 1;
-
-{
-
-
-
-  $r = $self->
-is_relative_iri_reference_3987
-;
-
-
-
-}
-
-
-;}
-
-;
-
-
-}
-$r;
-} else {my ($self) = @_;
-report Message::Util::Error::DOMException::CoreException -object => $self, '-type' => 'NO_MODIFICATION_ALLOWED_ERR', 'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#on' => 'get', 'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#subtype' => 'http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#READ_ONLY_ATTRIBUTE_ERR', 'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#class' => 'Message::URI::Generic::ManakaiURIReference', 'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#attr' => 'is_relative_iri_reference';
-}
-}
-sub is_relative_iri_reference_3987 ($;$) {
-if (@_ == 1) {my ($self) = @_;
+sub is_relative_iri_reference_3987 ($) {
+  my $self = $_[0];
 my $r = 0;
 
 {
@@ -1480,47 +1258,12 @@ if ($x =~ s/(?:$ipv4|$h16)\z//o) {
 
 }
 $r;
-} else {my ($self) = @_;
-report Message::Util::Error::DOMException::CoreException -object => $self, '-type' => 'NO_MODIFICATION_ALLOWED_ERR', 'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#on' => 'get', 'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#subtype' => 'http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#READ_ONLY_ATTRIBUTE_ERR', 'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#class' => 'Message::URI::Generic::ManakaiURIReference', 'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#attr' => 'is_relative_iri_reference_3987';
-}
-}
-sub is_iri_reference ($;$) {
-if (@_ == 1) {my ($self) = @_;
-my $r = 0;
+} # is_relative_iri_reference_3987
 
-{
+*is_iri_reference = \&is_iri_reference_3987;
 
-
-{
-
-local $Error::Depth = $Error::Depth + 1;
-
-{
-
-
-
-  $r = $self->
-is_iri_reference_3987
-;
-
-
-
-}
-
-
-;}
-
-;
-
-
-}
-$r;
-} else {my ($self) = @_;
-report Message::Util::Error::DOMException::CoreException -object => $self, '-type' => 'NO_MODIFICATION_ALLOWED_ERR', 'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#on' => 'get', 'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#subtype' => 'http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#READ_ONLY_ATTRIBUTE_ERR', 'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#class' => 'Message::URI::Generic::ManakaiURIReference', 'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#attr' => 'is_iri_reference';
-}
-}
-sub is_iri_reference_3987 ($;$) {
-if (@_ == 1) {my ($self) = @_;
+sub is_iri_reference_3987 ($) {
+  my $self = $_[0];
 my $r = 0;
 
 {
@@ -1553,47 +1296,12 @@ is_relative_iri_reference_3987
 
 }
 $r;
-} else {my ($self) = @_;
-report Message::Util::Error::DOMException::CoreException -object => $self, '-type' => 'NO_MODIFICATION_ALLOWED_ERR', 'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#on' => 'get', 'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#subtype' => 'http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#READ_ONLY_ATTRIBUTE_ERR', 'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#class' => 'Message::URI::Generic::ManakaiURIReference', 'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#attr' => 'is_iri_reference_3987';
-}
-}
-sub is_absolute_iri ($;$) {
-if (@_ == 1) {my ($self) = @_;
-my $r = 0;
+} # is_iri_reference_3987
 
-{
+*is_absolute_iri = \&is_absolute_iri_3987;
 
-
-{
-
-local $Error::Depth = $Error::Depth + 1;
-
-{
-
-
-
-  $r = $self->
-is_absolute_iri_3987
-;
-
-
-
-}
-
-
-;}
-
-;
-
-
-}
-$r;
-} else {my ($self) = @_;
-report Message::Util::Error::DOMException::CoreException -object => $self, '-type' => 'NO_MODIFICATION_ALLOWED_ERR', 'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#on' => 'get', 'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#subtype' => 'http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#READ_ONLY_ATTRIBUTE_ERR', 'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#class' => 'Message::URI::Generic::ManakaiURIReference', 'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#attr' => 'is_absolute_iri';
-}
-}
-sub is_absolute_iri_3987 ($;$) {
-if (@_ == 1) {my ($self) = @_;
+sub is_absolute_iri_3987 ($) {
+  my $self = $_[0];
 my $r = 0;
 
 {
@@ -1623,10 +1331,8 @@ is_iri_3987
 
 }
 $r;
-} else {my ($self) = @_;
-report Message::Util::Error::DOMException::CoreException -object => $self, '-type' => 'NO_MODIFICATION_ALLOWED_ERR', 'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#on' => 'get', 'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#subtype' => 'http://suika.fam.cx/~wakaba/archive/2005/manakai/Util/Error/DOMException#READ_ONLY_ATTRIBUTE_ERR', 'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#class' => 'Message::URI::Generic::ManakaiURIReference', 'http://suika.fam.cx/~wakaba/archive/2004/8/4/manakai-dom-exception#attr' => 'is_absolute_iri_3987';
-}
-}
+} # is_absolute_iri_3987
+
 sub get_uri_reference ($) {
 my ($self) = @_;
 my $r;
@@ -2549,4 +2255,4 @@ fallback => 1;
 
 1;
 ## License: <http://suika.fam.cx/~wakaba/archive/2004/8/18/license#Perl+MPL>
-## $Date: 2007/06/13 12:04:51 $
+## $Date: 2007/07/16 11:58:02 $

@@ -2,9 +2,9 @@
 
 package Message::DOM::Element;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.15 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.16 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::Element';
-require Message::DOM::Document;
+require Message::DOM::DOMDocument; ## TODO: New module name.
 
 sub ____new ($$$$$) {
   my $self = shift->SUPER::____new (shift);
@@ -1208,4 +1208,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/15 06:16:08 $
+## $Date: 2007/07/16 11:58:00 $
