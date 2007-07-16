@@ -82,6 +82,7 @@ if ($mode eq '/table') {
         next unless $_;
         for (@$_) {
           delete $_->{element};
+          $_->{is_header} = $_->{is_header} ? 1 : 0;
         }
       }
     }
@@ -114,4 +115,4 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2007/06/30 08:26:08 $
+## $Date: 2007/07/16 10:55:11 $
