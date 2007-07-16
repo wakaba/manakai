@@ -197,6 +197,20 @@ id=""><span id=""></span></p>
 #errors
 
 #data
+<p lang="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/p/@lang;in XML:lang
+
+#data
+<p xml:lang="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data html
+<!DOCTYPE HTML><title></title><p xml:lang=""></p>
+#errors
+/p/@lang;in HTML:xml:lang
+
+#data
 <p dir="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /p/@dir;enumerated:invalid
@@ -740,6 +754,7 @@ id=""><span id=""></span></p>
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /meta/@charset;attribute not allowed
+/meta/@charset;in XML:charset
 
 #data
 <meta http-equiv="refresh" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -762,6 +777,7 @@ id=""><span id=""></span></p>
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /meta/@charset;attribute not allowed
+/meta/@charset;in XML:charset
 
 #data
 <meta http-equiv="" content="example.net" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -779,12 +795,22 @@ id=""><span id=""></span></p>
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /meta/@content;attribute not allowed
+/meta/@charset;in XML:charset
 
 #data
 <meta content="example.net" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /meta/@content;attribute not allowed
 /meta;attribute missing:name|http-equiv
+
+#data html
+<!DOCTYPE HTML><html><head><meta charset="us-ascii"><title></title></head><body>
+#errors
+
+#data
+<meta charset="us-ascii" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/meta/@charset;in XML:charset
 
 #data
 <style type="" xmlns="http://www.w3.org/1999/xhtml"/>

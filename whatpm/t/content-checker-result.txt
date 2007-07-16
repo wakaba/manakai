@@ -1,7 +1,7 @@
 1..1127
 # Running under perl version 5.008007 for linux
-# Current time local: Mon Jul 16 15:53:08 2007
-# Current time GMT:   Mon Jul 16 06:53:08 2007
+# Current time local: Mon Jul 16 16:29:09 2007
+# Current time GMT:   Mon Jul 16 07:29:09 2007
 # Using Test.pm version 1.25
 Prototype mismatch: sub Message::DOM::DOMCore::ManakaiDOMError::location: none vs ($;$) at /home/wakaba/work/manakai/lib/Message/DOM/DOMCore.pm line 1931, <$file> line 5.
 Prototype mismatch: sub Message::DOM::DOMCore::ManakaiDOMError::___error_def: none vs ($;$) at /home/wakaba/work/manakai/lib/Message/DOM/DOMCore.pm line 1947, <$file> line 5.
@@ -25,7 +25,12 @@ ok 16
 ok 17
 ok 18
 ok 19
-ok 20
+not ok 20
+# Test 20 got: "/head/meta/@charset;in XML:charset\n/head;child element missing:title" (t/ContentChecker.t at line 85 fail #20)
+#    Expected: "/head;child element missing:title" (<head xmlns="http://www.w3.org/1999/xhtml">
+#<meta charset="us-ascii"/>
+#</head>)
+#  t/ContentChecker.t line 85 is:     join ("\n", sort {$a cmp $b} @{$test->{errors}}), $test->{data};
 ok 21
 ok 22
 ok 23
@@ -38,8 +43,18 @@ ok 29
 ok 30
 ok 31
 ok 32
-ok 33
-ok 34
+not ok 33
+# Test 33 got: "/head/meta/@charset;in XML:charset" (t/ContentChecker.t at line 85 fail #33)
+#    Expected: "" (<head xmlns="http://www.w3.org/1999/xhtml">
+#<meta charset="us-ascii"/>
+#<title/>
+#</head>)
+not ok 34
+# Test 34 got: "/head/meta/@charset;in XML:charset\n/head/meta;element not allowed" (t/ContentChecker.t at line 85 fail #34)
+#    Expected: "/head/meta;element not allowed" (<head xmlns="http://www.w3.org/1999/xhtml">
+#<title/>
+#<meta charset="us-ascii"/>
+#</head>)
 ok 35
 ok 36
 ok 37
@@ -48,17 +63,53 @@ ok 39
 ok 40
 ok 41
 ok 42
-ok 43
-ok 44
+not ok 43
+# Test 43 got: "/head/meta/@charset;in XML:charset" (t/ContentChecker.t at line 85 fail #43)
+#    Expected: "" (<head xmlns="http://www.w3.org/1999/xhtml"><meta charset="us-ascii"/><base/><title></title></head>)
+not ok 44
+# Test 44 got: "/head/base;element not allowed\n/head/meta/@charset;in XML:charset" (t/ContentChecker.t at line 85 fail #44)
+#    Expected: "/head/base;element not allowed" (<head xmlns="http://www.w3.org/1999/xhtml"><meta charset="us-ascii"/><title/><base/></head>)
 ok 45
-ok 46
-ok 47
-ok 48
-ok 49
+not ok 46
+# Test 46 got: "/head/base;element not allowed\n/head/meta/@charset;in XML:charset\n/head/meta;element not allowed" (t/ContentChecker.t at line 85 fail #46)
+#    Expected: "/head/base;element not allowed\n/head/meta;element not allowed" (<head xmlns="http://www.w3.org/1999/xhtml"><title/><base/><meta charset="us-ascii"/></head>)
+not ok 47
+# Test 47 got: "/head/base;element not allowed\n/head/meta/@charset;in XML:charset" (t/ContentChecker.t at line 85 fail #47)
+#    Expected: "/head/base;element not allowed" (<head xmlns="http://www.w3.org/1999/xhtml">
+#<meta charset="us-ascii"/>
+#<title/>
+#<base href="http://www.w3.org/"/>
+#</head>)
+not ok 48
+# Test 48 got: "/head/meta/@charset;in XML:charset\n/head/meta;element not allowed" (t/ContentChecker.t at line 85 fail #48)
+#    Expected: "/head/meta;element not allowed" (<head xmlns="http://www.w3.org/1999/xhtml">
+#<base href="http://www.w3.org/"/>
+#<meta charset="us-ascii"/>
+#<title/>
+#</head>)
+not ok 49
+# Test 49 got: "/head/meta/@charset;in XML:charset\n/head/meta;element not allowed" (t/ContentChecker.t at line 85 fail #49)
+#    Expected: "/head/meta;element not allowed" (<head xmlns="http://www.w3.org/1999/xhtml">
+#<base href="http://www.w3.org/"/>
+#<title/>
+#<meta charset="us-ascii"/>
+#</head>)
 ok 50
 ok 51
-ok 52
-ok 53
+not ok 52
+# Test 52 got: "/head/meta/@charset;in XML:charset\n/head/meta;element not allowed" (t/ContentChecker.t at line 85 fail #52)
+#    Expected: "/head/meta;element not allowed" (<head xmlns="http://www.w3.org/1999/xhtml">
+#<meta name="keywords" content="html5"/>
+#<meta charset="us-ascii"/>
+#<title/>
+#</head>)
+not ok 53
+# Test 53 got: "/head/meta/@charset;in XML:charset" (t/ContentChecker.t at line 85 fail #53)
+#    Expected: "" (<head xmlns="http://www.w3.org/1999/xhtml">
+#<meta charset="us-ascii"/>
+#<meta name="keywords" content="html5"/>
+#<title/>
+#</head>)
 ok 54
 ok 55
 ok 56
@@ -67,10 +118,18 @@ ok 58
 ok 59
 ok 60
 ok 61
-ok 62
-ok 63
-ok 64
-ok 65
+not ok 62
+# Test 62 got: "/meta/@charset;in XML:charset" (t/ContentChecker.t at line 85 fail #62)
+#    Expected: "" (<meta charset="us-ascii" xmlns="http://www.w3.org/1999/xhtml"></meta>)
+not ok 63
+# Test 63 got: "/meta/@charset;in XML:charset" (t/ContentChecker.t at line 85 fail #63)
+#    Expected: "" (<meta charset="us-ascii" xmlns="http://www.w3.org/1999/xhtml"> </meta>)
+not ok 64
+# Test 64 got: "/meta/\"a\";character not allowed\n/meta/@charset;in XML:charset" (t/ContentChecker.t at line 85 fail #64)
+#    Expected: "/meta/\"a\";character not allowed" (<meta charset="us-ascii" xmlns="http://www.w3.org/1999/xhtml">a</meta>)
+not ok 65
+# Test 65 got: "/meta/@charset;in XML:charset\n/meta/p;element not allowed" (t/ContentChecker.t at line 85 fail #65)
+#    Expected: "/meta/p;element not allowed" (<meta charset="us-ascii" xmlns="http://www.w3.org/1999/xhtml"><p/></meta>)
 ok 66
 ok 67
 ok 68
@@ -345,7 +404,6 @@ ok 336
 not ok 337
 # Test 337 got: "/datagrid/select;element;unsupported" (t/ContentChecker.t at line 85 fail #337)
 #     Expected: "" (<datagrid xmlns="http://www.w3.org/1999/xhtml"><select/></datagrid>)
-#  t/ContentChecker.t line 85 is:     join ("\n", sort {$a cmp $b} @{$test->{errors}}), $test->{data};
 not ok 338
 # Test 338 got: "/datagrid/datalist;element;unsupported" (t/ContentChecker.t at line 85 fail #338)
 #     Expected: "" (<datagrid xmlns="http://www.w3.org/1999/xhtml"><datalist/></datagrid>)
@@ -479,15 +537,18 @@ ok 416
 ok 417
 ok 418
 ok 419
-ok 420
+Parse error (no DOCTYPE) at line 1 column 16
+not ok 420
+# Test 420 got: "/html/body/p/@xml:lang;in HTML:xml:lang;error\n/html/head;child element missing:title" (t/ContentChecker.t at line 85 fail #420)
+#     Expected: "/p/@lang;in HTML:xml:lang" (<p xml:lang=""></p>)
 ok 421
-not ok 422
-# Test 422 got: "/p/@dir;enumerated:invalid" (t/ContentChecker.t at line 85 fail #422)
-#     Expected: "" (<!DOCTYPE p [<!ATTLIST p dir (ltr|rtl) #IMPLIED>]>
-#<p dir="ltr " xmlns="http://www.w3.org/1999/xhtml"/>)
+ok 422
 ok 423
 ok 424
-ok 425
+not ok 425
+# Test 425 got: "/p/@dir;enumerated:invalid" (t/ContentChecker.t at line 85 fail #425)
+#     Expected: "" (<!DOCTYPE p [<!ATTLIST p dir (ltr|rtl) #IMPLIED>]>
+#<p dir="ltr " xmlns="http://www.w3.org/1999/xhtml"/>)
 ok 426
 ok 427
 ok 428
@@ -582,16 +643,24 @@ ok 516
 ok 517
 ok 518
 ok 519
-ok 520
+not ok 520
+# Test 520 got: "/meta/@charset;attribute not allowed" (t/ContentChecker.t at line 85 fail #520)
+#     Expected: "/meta/@charset;attribute not allowed\n/meta/@charset;in XML:charset" (<meta charset="us-ascii" name="dns" content="example.net"
+#    xmlns="http://www.w3.org/1999/xhtml"/>)
 ok 521
 ok 522
 ok 523
-ok 524
+not ok 524
+# Test 524 got: "/meta/@charset;attribute not allowed" (t/ContentChecker.t at line 85 fail #524)
+#     Expected: "/meta/@charset;attribute not allowed\n/meta/@charset;in XML:charset" (<meta http-equiv="refresh" content="10; a.html" charset="us-ascii"
+#    xmlns="http://www.w3.org/1999/xhtml"/>)
 ok 525
 ok 526
 ok 527
 ok 528
-ok 529
+not ok 529
+# Test 529 got: "/html/head/meta;element not allowed" (t/ContentChecker.t at line 85 fail #529)
+#     Expected: "" (<!DOCTYPE HTML><html><head><title></title><meta charset="us-ascii"></head><body>)
 ok 530
 ok 531
 ok 532
@@ -834,98 +903,98 @@ ok 768
 ok 769
 ok 770
 ok 771
-not ok 772
-# Test 772 got: "/object;attribute missing:data|type\n/object;element;unsupported" (t/ContentChecker.t at line 85 fail #772)
-#     Expected: "/object;attribute missing:data|type" (<object xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 773
-# Test 773 got: "/object;element;unsupported" (t/ContentChecker.t at line 85 fail #773)
-#     Expected: "" (<object data="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 774
-# Test 774 got: "/object/@data;URI::syntax error;m\n/object;element;unsupported" (t/ContentChecker.t at line 85 fail #774)
-#     Expected: "/object/@data;URI::syntax error;m" (<object data="`http://test/`" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 775
-# Test 775 got: "/object/@type;IMT:syntax error\n/object;element;unsupported" (t/ContentChecker.t at line 85 fail #775)
-#     Expected: "/object/@type;IMT:syntax error" (<object type="" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 776
-# Test 776 got: "/object;element;unsupported" (t/ContentChecker.t at line 85 fail #776)
-#     Expected: "" (<object type="text/css" xmlns="http://www.w3.org/1999/xhtml"/>)
+ok 772
+ok 773
+ok 774
+ok 775
+ok 776
 not ok 777
-# Test 777 got: "/object;element;unsupported" (t/ContentChecker.t at line 85 fail #777)
+# Test 777 got: "/object;attribute missing:data|type\n/object;element;unsupported" (t/ContentChecker.t at line 85 fail #777)
+#     Expected: "/object;attribute missing:data|type" (<object xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 778
+# Test 778 got: "/object;element;unsupported" (t/ContentChecker.t at line 85 fail #778)
+#     Expected: "" (<object data="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 779
+# Test 779 got: "/object/@data;URI::syntax error;m\n/object;element;unsupported" (t/ContentChecker.t at line 85 fail #779)
+#     Expected: "/object/@data;URI::syntax error;m" (<object data="`http://test/`" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 780
+# Test 780 got: "/object/@type;IMT:syntax error\n/object;element;unsupported" (t/ContentChecker.t at line 85 fail #780)
+#     Expected: "/object/@type;IMT:syntax error" (<object type="" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 781
+# Test 781 got: "/object;element;unsupported" (t/ContentChecker.t at line 85 fail #781)
+#     Expected: "" (<object type="text/css" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 782
+# Test 782 got: "/object;element;unsupported" (t/ContentChecker.t at line 85 fail #782)
 #     Expected: "" (<object type="text/css" data="http://test/"
 #    xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 778
-# Test 778 got: "/div/p/object/@usemap;#idref:syntax error\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 85 fail #778)
+not ok 783
+# Test 783 got: "/div/p/object/@usemap;#idref:syntax error\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 85 fail #783)
 #     Expected: "/div/p/object/@usemap;#idref:syntax error" (<div xmlns="http://www.w3.org/1999/xhtml">
 #<p><object data="http://test/" usemap=""/></p>
 #</div>)
-not ok 779
-# Test 779 got: "/div/p/object/@usemap;#idref:syntax error\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 85 fail #779)
+not ok 784
+# Test 784 got: "/div/p/object/@usemap;#idref:syntax error\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 85 fail #784)
 #     Expected: "/div/p/object/@usemap;#idref:syntax error" (<div xmlns="http://www.w3.org/1999/xhtml">
 #<p><object data="http://test/" usemap="abc"/></p>
 #</div>)
-not ok 780
-# Test 780 got: "/div/p/object/@usemap;#idref:syntax error\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 85 fail #780)
+not ok 785
+# Test 785 got: "/div/p/object/@usemap;#idref:syntax error\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 85 fail #785)
 #     Expected: "/div/p/object/@usemap;#idref:syntax error" (<div xmlns="http://www.w3.org/1999/xhtml">
 #<p><object data="http://test/" usemap="abc#"/></p>
 #</div>)
-not ok 781
-# Test 781 got: "/div/p/object/@usemap;#idref:syntax error\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 85 fail #781)
+not ok 786
+# Test 786 got: "/div/p/object/@usemap;#idref:syntax error\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 85 fail #786)
 #     Expected: "/div/p/object/@usemap;#idref:syntax error" (<div xmlns="http://www.w3.org/1999/xhtml">
 #<p><object data="http://test/" usemap="&#x0A;#abc"/></p>
 #</div>)
-not ok 782
-# Test 782 got: "/div/p/object;element;unsupported" (t/ContentChecker.t at line 85 fail #782)
+not ok 787
+# Test 787 got: "/div/p/object;element;unsupported" (t/ContentChecker.t at line 85 fail #787)
 #     Expected: "" (<div xmlns="http://www.w3.org/1999/xhtml">
 #<p><object data="http://test/" usemap="#aa"/></p>
 #<map id="aa"/>
 #</div>)
-not ok 783
-# Test 783 got: "/div/p/object;element;unsupported" (t/ContentChecker.t at line 85 fail #783)
+not ok 788
+# Test 788 got: "/div/p/object;element;unsupported" (t/ContentChecker.t at line 85 fail #788)
 #     Expected: "" (<div xmlns="http://www.w3.org/1999/xhtml">
 #<map id="aa"/>
 #<p><object data="http://test/" usemap="#aa"/></p>
 #</div>)
-not ok 784
-# Test 784 got: "/div/p/object;element;unsupported" (t/ContentChecker.t at line 85 fail #784)
+not ok 789
+# Test 789 got: "/div/p/object;element;unsupported" (t/ContentChecker.t at line 85 fail #789)
 #     Expected: "" (<div xmlns="http://www.w3.org/1999/xhtml">
 #<map id="&#x4E00;"/>
 #<p><object data="http://test/" usemap="#&#x4E00;"/></p>
 #</div>)
-not ok 785
-# Test 785 got: "/div/p/object/@usemap;no referenced map\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 85 fail #785)
+not ok 790
+# Test 790 got: "/div/p/object/@usemap;no referenced map\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 85 fail #790)
 #     Expected: "/div/p/object/@usemap;no referenced map" (<div xmlns="http://www.w3.org/1999/xhtml">
 #<map id="aa"/>
 #<p><object data="http://test/" usemap="#bb"/></p>
 #</div>)
-not ok 786
-# Test 786 got: "/div/p/object;element;unsupported\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 85 fail #786)
+not ok 791
+# Test 791 got: "/div/p/object;element;unsupported\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 85 fail #791)
 #     Expected: "" (<div xmlns="http://www.w3.org/1999/xhtml">
 #<map id="aa"/>
 #<p><object data="http://test/" usemap="#aa"/></p>
 #<p><object data="http://test/" usemap="#aa"/></p>
 #</div>)
-not ok 787
-# Test 787 got: "/div/p/object/@usemap;no referenced map\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 85 fail #787)
+not ok 792
+# Test 792 got: "/div/p/object/@usemap;no referenced map\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 85 fail #792)
 #     Expected: "/div/p/object/@usemap;no referenced map" (<div xmlns="http://www.w3.org/1999/xhtml">
 #<map id="aa"/>
 #<p><object data="http://test/" usemap="#AA"/></p>
 #</div>)
-not ok 788
-# Test 788 got: "/div/p/object/@usemap;no referenced map\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 85 fail #788)
+not ok 793
+# Test 793 got: "/div/p/object/@usemap;no referenced map\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 85 fail #793)
 #     Expected: "/div/p/object/@usemap;no referenced map" (<div xmlns="http://www.w3.org/1999/xhtml">
 #<map id="AA"/>
 #<p><object data="http://test/" usemap="#aa"/></p>
 #</div>)
-not ok 789
-# Test 789 got: "/div/object/@usemap;no referenced map\n/div/object;element;unsupported" (t/ContentChecker.t at line 85 fail #789)
+not ok 794
+# Test 794 got: "/div/object/@usemap;no referenced map\n/div/object;element;unsupported" (t/ContentChecker.t at line 85 fail #794)
 #     Expected: "/div/object/@usemap;no referenced map" (<div xmlns="http://www.w3.org/1999/xhtml">
 #<object data="" usemap="#a"/><menu id="a"/>
 #</div>)
-ok 790
-ok 791
-ok 792
-ok 793
-ok 794
 ok 795
 ok 796
 ok 797
@@ -1259,3 +1328,8 @@ ok 1124
 ok 1125
 ok 1126
 ok 1127
+ok 1128
+ok 1129
+ok 1130
+ok 1131
+ok 1132

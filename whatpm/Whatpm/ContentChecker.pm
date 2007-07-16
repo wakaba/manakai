@@ -23,11 +23,16 @@ my $AttrChecker = {
       }
     },
     lang => sub {
+      my ($self, $attr) = @_;
       ## NOTE: "The values of the attribute are language identifiers
       ## as defined by [IETF RFC 3066], Tags for the Identification
       ## of Languages, or its successor; in addition, the empty string
       ## may be specified." ("may" in lower case)
-      ## TODO: xml:lang MUST NOT in HTML document
+      if ($attr->owner_document->manakai_is_html) { # MUST NOT
+        $self->{onerror}->(node => $attr, level => 'error',
+                           type => 'in HTML:xml:lang');
+## TODO: Test data...
+      }
     },
     base => sub {
       my ($self, $attr) = @_;
@@ -951,9 +956,12 @@ my $HTMLAttrChecker = {
   },
   title => sub {}, ## NOTE: No conformance creteria
   lang => sub {
+    my ($self, $attr) = @_;
     ## TODO: RFC 3066 or empty test
     ## ISSUE: RFC 4646 (3066bis)?
-    ## TODO: HTML vs XHTML
+    unless ($attr->owner_document->manakai_is_html) {
+      $self->{onerror}->(node => $attr, type => 'in XML:lang');
+    }
   },
   dir => $GetHTMLEnumeratedAttrChecker->({ltr => 1, rtl => 1}),
   class => $HTMLUnorderedSetOfSpaceSeparatedTokensAttrChecker,
@@ -1020,7 +1028,10 @@ $Element->{$HTML_NS}->{html} = {
       my $value = $attr->value;
       unless ($value eq $HTML_NS) {
         $self->{onerror}->(node => $attr, type => 'invalid attribute value');
-        ## TODO: only in HTML documents
+      }
+      unless ($attr->owner_document->manakai_is_html) {
+        $self->{onerror}->(node => $attr, type => 'in XML:xmlns');
+  ## TODO: Test
       }
     },
   }),
@@ -1272,7 +1283,6 @@ $Element->{$HTML_NS}->{meta} = {
         $self->{onerror}->(node => $content_attr,
                            type => 'attribute not allowed');
       }
-      ## TODO: Allowed only in HTML documents
     } else {
       if (defined $content_attr) {
         $self->{onerror}->(node => $content_attr,
@@ -1301,7 +1311,13 @@ $Element->{$HTML_NS}->{meta} = {
       }
     }
 
-    ## TODO: charset
+    if (defined $charset_attr) {
+      unless ($todo->{node}->owner_document->manakai_is_html) {
+        $self->{onerror}->(node => $charset_attr,
+                           type => 'in XML:charset');
+      }
+      ## TODO: charset
+    }
   },
   checker => $HTMLEmptyChecker,
 };
@@ -2675,6 +2691,7 @@ $Element->{$HTML_NS}->{noscript} = {
   },
 };
 ## TODO: noscript in head
+## TODO: noscript in XHTML
 
 $Element->{$HTML_NS}->{'event-source'} = {
   attrs_checker => $GetHTMLAttrsChecker->({
@@ -3090,4 +3107,4 @@ sub _check_get_children ($$$) {
 } # _check_get_children
 
 1;
-# $Date: 2007/07/01 04:46:48 $
+# $Date: 2007/07/16 07:48:19 $

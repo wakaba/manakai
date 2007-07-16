@@ -1,5 +1,13 @@
 2007-07-16  Wakaba  <wakaba@suika.fam.cx>
 
+	* ContentChecker.pm: Report error if |xml:lang|
+	in HTML, |lang| in XML, |xmlns| in XML, and |meta| |charset|
+	in XML.
+
+	* NanoDOM.pm (Attr.owner_document): New attribute.
+
+2007-07-16  Wakaba  <wakaba@suika.fam.cx>
+
 	* HTML.pm.src: The character immediately following
 	a bare |hcro| was discarded.  Fix handling of
 	entity references in attribute values.

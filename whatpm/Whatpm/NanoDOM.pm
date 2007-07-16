@@ -442,6 +442,10 @@ sub manakai_local_name ($) {
 
 sub node_type { 2 }
 
+sub owner_document ($) {
+  return shift->owner_element->owner_document;
+} # owner_document
+
 ## TODO: HTML5 case stuff?
 sub name ($) {
   my $self = shift;
@@ -522,4 +526,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2007/06/23 13:05:16 $
+# $Date: 2007/07/16 07:48:19 $
