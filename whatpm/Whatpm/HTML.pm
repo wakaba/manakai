@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.35 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.36 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## ISSUE:
 ## var doc = implementation.createDocument (null, null, null);
@@ -4453,31 +4453,14 @@ sub _tree_construction_main ($) {
   }; # $in_body
 
   B: {
-    if ($self->{insertion_mode} ne 'trailing end') {
-      if ($token->{type} eq 'DOCTYPE') {
-        $self->{parse_error}-> (type => 'in html:#DOCTYPE');
-        ## Ignore the token
-        ## Stay in the phase
-        $token = $self->_get_next_token;
-        redo B;
-      } elsif ($token->{type} eq 'start tag' and
-               $token->{tag_name} eq 'html') {
-## ISSUE: "aa<html>" is not a parse error.
-## ISSUE: "<html>" in fragment is not a parse error.
-        unless ($token->{first_start_tag}) {
-          $self->{parse_error}-> (type => 'not first start tag');
-        }
-        my $top_el = $self->{open_elements}->[0]->[0];
-        for my $attr_name (keys %{$token->{attributes}}) {
-          unless ($top_el->has_attribute_ns (undef, $attr_name)) {
-            $top_el->set_attribute_ns
-              (undef, [undef, $attr_name], 
-               $token->{attributes}->{$attr_name}->{value});
-          }
-        }
-        $token = $self->_get_next_token;
-        redo B;
-      } elsif ($token->{type} eq 'end-of-file') {
+    if ($token->{type} eq 'DOCTYPE') {
+      $self->{parse_error}-> (type => 'DOCTYPE in the middle');
+      ## Ignore the token
+      ## Stay in the phase
+      $token = $self->_get_next_token;
+      redo B;
+    } elsif ($token->{type} eq 'end-of-file') {
+      if ($token->{insertion_mode} ne 'trailing end') {
         ## Generate implied end tags
         if ({
              dd => 1, dt => 1, li => 1, p => 1, td => 1, th => 1, tr => 1,
@@ -4497,12 +4480,46 @@ sub _tree_construction_main ($) {
           $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
         }
 
-        ## Stop parsing
-        last B;
-
         ## ISSUE: There is an issue in the spec.
+      }
+
+      ## Stop parsing
+      last B;
+    } elsif ($token->{type} eq 'start tag' and
+             $token->{tag_name} eq 'html') {
+      if ($self->{insertion_mode} eq 'trailing end') {
+        ## Turn into the main phase
+        $self->{parse_error}-> (type => 'after html:html');
+        $self->{insertion_mode} = $previous_insertion_mode;
+      }
+
+## ISSUE: "aa<html>" is not a parse error.
+## ISSUE: "<html>" in fragment is not a parse error.
+      unless ($token->{first_start_tag}) {
+        $self->{parse_error}-> (type => 'not first start tag');
+      }
+      my $top_el = $self->{open_elements}->[0]->[0];
+      for my $attr_name (keys %{$token->{attributes}}) {
+        unless ($top_el->has_attribute_ns (undef, $attr_name)) {
+          $top_el->set_attribute_ns
+            (undef, [undef, $attr_name], 
+             $token->{attributes}->{$attr_name}->{value});
+        }
+      }
+      $token = $self->_get_next_token;
+      redo B;
+    } elsif ($token->{type} eq 'comment') {
+      my $comment = $self->{document}->create_comment ($token->{data});
+      if ($self->{insertion_mode} eq 'trailing end') {
+        $self->{document}->append_child ($comment);
+      } elsif ($self->{insertion_mode} eq 'after body') {
+        $self->{open_elements}->[0]->[0]->append_child ($comment);
       } else {
-        if ($self->{insertion_mode} eq 'before head') {
+        $self->{open_elements}->[-1]->[0]->append_child ($comment);
+      }
+      $token = $self->_get_next_token;
+      redo B;
+    } elsif ($self->{insertion_mode} eq 'before head') {
           if ($token->{type} eq 'character') {
             if ($token->{data} =~ s/^([\x09\x0A\x0B\x0C\x20]+)//) {
               $self->{open_elements}->[-1]->[0]->manakai_append_text ($1);
@@ -4520,11 +4537,6 @@ sub _tree_construction_main ($) {
             push @{$self->{open_elements}}, [$self->{head_element}, 'head'];
             $self->{insertion_mode} = 'in head';
             ## reprocess
-            redo B;
-          } elsif ($token->{type} eq 'comment') {
-            my $comment = $self->{document}->create_comment ($token->{data});
-            $self->{open_elements}->[-1]->[0]->append_child ($comment);
-            $token = $self->_get_next_token;
             redo B;
           } elsif ($token->{type} eq 'start tag') {
             my $attr = $token->{tag_name} eq 'head' ? $token->{attributes} : {};
@@ -4588,11 +4600,6 @@ sub _tree_construction_main ($) {
             }
             
             #
-          } elsif ($token->{type} eq 'comment') {
-            my $comment = $self->{document}->create_comment ($token->{data});
-            $self->{open_elements}->[-1]->[0]->append_child ($comment);
-            $token = $self->_get_next_token;
-            redo B;
           } elsif ($token->{type} eq 'start tag') {
             if ({base => ($self->{insertion_mode} eq 'in head' or
                           $self->{insertion_mode} eq 'after head'),
@@ -4856,12 +4863,6 @@ sub _tree_construction_main ($) {
 
             $token = $self->_get_next_token;
             redo B;
-          } elsif ($token->{type} eq 'comment') {
-            ## NOTE: There is a code clone of "comment in body".
-            my $comment = $self->{document}->create_comment ($token->{data});
-            $self->{open_elements}->[-1]->[0]->append_child ($comment);
-            $token = $self->_get_next_token;
-            redo B;
           } else {
             $in_body->($insert_to_current);
             redo B;
@@ -4923,11 +4924,6 @@ sub _tree_construction_main ($) {
               $self->{open_elements}->[-1]->[0]->manakai_append_text ($token->{data});
             }
             
-            $token = $self->_get_next_token;
-            redo B;
-          } elsif ($token->{type} eq 'comment') {
-            my $comment = $self->{document}->create_comment ($token->{data});
-            $self->{open_elements}->[-1]->[0]->append_child ($comment);
             $token = $self->_get_next_token;
             redo B;
           } elsif ($token->{type} eq 'start tag') {
@@ -5121,12 +5117,6 @@ sub _tree_construction_main ($) {
 
             $token = $self->_get_next_token;
             redo B;
-          } elsif ($token->{type} eq 'comment') {
-            ## NOTE: This is a code clone of "comment in body".
-            my $comment = $self->{document}->create_comment ($token->{data});
-            $self->{open_elements}->[-1]->[0]->append_child ($comment);
-            $token = $self->_get_next_token;
-            redo B;
           } elsif ($token->{type} eq 'start tag') {
             if ({
                  caption => 1, col => 1, colgroup => 1, tbody => 1,
@@ -5308,11 +5298,6 @@ sub _tree_construction_main ($) {
             }
             
             #
-          } elsif ($token->{type} eq 'comment') {
-            my $comment = $self->{document}->create_comment ($token->{data});
-            $self->{open_elements}->[-1]->[0]->append_child ($comment);
-            $token = $self->_get_next_token;
-            redo B;
           } elsif ($token->{type} eq 'start tag') {
             if ($token->{tag_name} eq 'col') {
               
@@ -5431,12 +5416,6 @@ sub _tree_construction_main ($) {
               $self->{open_elements}->[-1]->[0]->manakai_append_text ($token->{data});
             }
             
-            $token = $self->_get_next_token;
-            redo B;
-          } elsif ($token->{type} eq 'comment') {
-            ## Copied from 'in table'
-            my $comment = $self->{document}->create_comment ($token->{data});
-            $self->{open_elements}->[-1]->[0]->append_child ($comment);
             $token = $self->_get_next_token;
             redo B;
           } elsif ($token->{type} eq 'start tag') {
@@ -5743,12 +5722,6 @@ sub _tree_construction_main ($) {
             
             $token = $self->_get_next_token;
             redo B;
-          } elsif ($token->{type} eq 'comment') {
-            ## Copied from 'in table'
-            my $comment = $self->{document}->create_comment ($token->{data});
-            $self->{open_elements}->[-1]->[0]->append_child ($comment);
-            $token = $self->_get_next_token;
-            redo B;
           } elsif ($token->{type} eq 'start tag') {
             if ($token->{tag_name} eq 'th' or
                 $token->{tag_name} eq 'td') {
@@ -6023,12 +5996,6 @@ sub _tree_construction_main ($) {
 
             $token = $self->_get_next_token;
             redo B;
-          } elsif ($token->{type} eq 'comment') {
-            ## NOTE: This is a code clone of "comment in body".
-            my $comment = $self->{document}->create_comment ($token->{data});
-            $self->{open_elements}->[-1]->[0]->append_child ($comment);
-            $token = $self->_get_next_token;
-            redo B;
           } elsif ($token->{type} eq 'start tag') {
             if ({
                  caption => 1, col => 1, colgroup => 1,
@@ -6163,11 +6130,6 @@ sub _tree_construction_main ($) {
         } elsif ($self->{insertion_mode} eq 'in select') {
           if ($token->{type} eq 'character') {
             $self->{open_elements}->[-1]->[0]->manakai_append_text ($token->{data});
-            $token = $self->_get_next_token;
-            redo B;
-          } elsif ($token->{type} eq 'comment') {
-            my $comment = $self->{document}->create_comment ($token->{data});
-            $self->{open_elements}->[-1]->[0]->append_child ($comment);
             $token = $self->_get_next_token;
             redo B;
           } elsif ($token->{type} eq 'start tag') {
@@ -6385,12 +6347,7 @@ sub _tree_construction_main ($) {
             }
             
             #
-            $self->{parse_error}-> (type => 'after body:#'.$token->{type});
-          } elsif ($token->{type} eq 'comment') {
-            my $comment = $self->{document}->create_comment ($token->{data});
-            $self->{open_elements}->[0]->[0]->append_child ($comment);
-            $token = $self->_get_next_token;
-            redo B;
+            $self->{parse_error}-> (type => 'after body:#character');
           } elsif ($token->{type} eq 'start tag') {
             $self->{parse_error}-> (type => 'after body:'.$token->{tag_name});
             #
@@ -6411,109 +6368,104 @@ sub _tree_construction_main ($) {
               $self->{parse_error}-> (type => 'after body:/'.$token->{tag_name});
             }
           } else {
-            $self->{parse_error}-> (type => 'after body:#'.$token->{type});
+            die "$0: $token->{type}: Unknown token type";
           }
 
           $self->{insertion_mode} = 'in body';
           ## reprocess
           redo B;
-        } elsif ($self->{insertion_mode} eq 'in frameset') {
-          if ($token->{type} eq 'character') {
-            if ($token->{data} =~ s/^([\x09\x0A\x0B\x0C\x20]+)//) {
-              $self->{open_elements}->[-1]->[0]->manakai_append_text ($1);
+    } elsif ($self->{insertion_mode} eq 'in frameset') {
+      if ($token->{type} eq 'character') {
+        if ($token->{data} =~ s/^([\x09\x0A\x0B\x0C\x20]+)//) {
+          $self->{open_elements}->[-1]->[0]->manakai_append_text ($1);
 
-              unless (length $token->{data}) {
-                $token = $self->_get_next_token;
-                redo B;
-              }
-            }
-
-            #
-          } elsif ($token->{type} eq 'comment') {
-            my $comment = $self->{document}->create_comment ($token->{data});
-            $self->{open_elements}->[-1]->[0]->append_child ($comment);
+          unless (length $token->{data}) {
             $token = $self->_get_next_token;
             redo B;
-          } elsif ($token->{type} eq 'start tag') {
-            if ($token->{tag_name} eq 'frameset') {
-              
-    {
-      my $el;
-      
-      $el = $self->{document}->create_element_ns
-        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
-    
-        for my $attr_name (keys %{  $token->{attributes}}) {
-          $el->set_attribute_ns (undef, [undef, $attr_name],
-                                  $token->{attributes} ->{$attr_name}->{value});
-        }
-      
-      $self->{open_elements}->[-1]->[0]->append_child ($el);
-      push @{$self->{open_elements}}, [$el, $token->{tag_name}];
-    }
-  
-              $token = $self->_get_next_token;
-              redo B;
-            } elsif ($token->{tag_name} eq 'frame') {
-              
-    {
-      my $el;
-      
-      $el = $self->{document}->create_element_ns
-        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
-    
-        for my $attr_name (keys %{  $token->{attributes}}) {
-          $el->set_attribute_ns (undef, [undef, $attr_name],
-                                  $token->{attributes} ->{$attr_name}->{value});
-        }
-      
-      $self->{open_elements}->[-1]->[0]->append_child ($el);
-      push @{$self->{open_elements}}, [$el, $token->{tag_name}];
-    }
-  
-              pop @{$self->{open_elements}};
-              $token = $self->_get_next_token;
-              redo B;
-            } elsif ($token->{tag_name} eq 'noframes') {
-              $in_body->($insert_to_current);
-              redo B;
-            } else {
-              #
-            }
-          } elsif ($token->{type} eq 'end tag') {
-            if ($token->{tag_name} eq 'frameset') {
-              if ($self->{open_elements}->[-1]->[1] eq 'html' and
-                  @{$self->{open_elements}} == 1) {
-                $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
-                ## Ignore the token
-                $token = $self->_get_next_token;
-              } else {
-                pop @{$self->{open_elements}};
-                $token = $self->_get_next_token;
-              }
-              
-              ## if not inner_html and
-              if ($self->{open_elements}->[-1]->[1] ne 'frameset') {
-                $self->{insertion_mode} = 'after frameset';
-              }
-              redo B;
-            } else {
-              #
-            }
-          } else {
-            #
           }
+        }
+
+        $self->{parse_error}-> (type => 'in frameset:#character');
+        ## Ignore the token
+        $token = $self->_get_next_token;
+        redo B;
+      } elsif ($token->{type} eq 'start tag') {
+        if ($token->{tag_name} eq 'frameset') {
           
-          if (defined $token->{tag_name}) {
-            $self->{parse_error}-> (type => 'in frameset:'.($token->{type} eq 'end tag' ? '/' : '').$token->{tag_name});
-          } else {
-            $self->{parse_error}-> (type => 'in frameset:#'.$token->{type});
-          }
+    {
+      my $el;
+      
+      $el = $self->{document}->create_element_ns
+        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
+    
+        for my $attr_name (keys %{  $token->{attributes}}) {
+          $el->set_attribute_ns (undef, [undef, $attr_name],
+                                  $token->{attributes} ->{$attr_name}->{value});
+        }
+      
+      $self->{open_elements}->[-1]->[0]->append_child ($el);
+      push @{$self->{open_elements}}, [$el, $token->{tag_name}];
+    }
+  
+          $token = $self->_get_next_token;
+          redo B;
+        } elsif ($token->{tag_name} eq 'frame') {
+          
+    {
+      my $el;
+      
+      $el = $self->{document}->create_element_ns
+        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
+    
+        for my $attr_name (keys %{  $token->{attributes}}) {
+          $el->set_attribute_ns (undef, [undef, $attr_name],
+                                  $token->{attributes} ->{$attr_name}->{value});
+        }
+      
+      $self->{open_elements}->[-1]->[0]->append_child ($el);
+      push @{$self->{open_elements}}, [$el, $token->{tag_name}];
+    }
+  
+          pop @{$self->{open_elements}};
+          $token = $self->_get_next_token;
+          redo B;
+        } elsif ($token->{tag_name} eq 'noframes') {
+          $in_body->($insert_to_current);
+          redo B;
+        } else {
+          $self->{parse_error}-> (type => 'in frameset:'.$token->{tag_name});
           ## Ignore the token
           $token = $self->_get_next_token;
           redo B;
-        } elsif ($self->{insertion_mode} eq 'after frameset') {
-          if ($token->{type} eq 'character') {
+        }
+      } elsif ($token->{type} eq 'end tag') {
+        if ($token->{tag_name} eq 'frameset') {
+          if ($self->{open_elements}->[-1]->[1] eq 'html' and
+              @{$self->{open_elements}} == 1) {
+            $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
+            ## Ignore the token
+            $token = $self->_get_next_token;
+          } else {
+            pop @{$self->{open_elements}};
+            $token = $self->_get_next_token;
+          }
+
+          if (not defined $self->{inner_html_node} and
+              $self->{open_elements}->[-1]->[1] ne 'frameset') {
+            $self->{insertion_mode} = 'after frameset';
+          }
+          redo B;
+        } else {
+          $self->{parse_error}-> (type => 'in frameset:/'.$token->{tag_name});
+          ## Ignore the token
+          $token = $self->_get_next_token;
+          redo B;
+        }
+      } else {
+        die "$0: $token->{type}: Unknown token type";
+      }
+    } elsif ($self->{insertion_mode} eq 'after frameset') {
+      if ($token->{type} eq 'character') {
             if ($token->{data} =~ s/^([\x09\x0A\x0B\x0C\x20]+)//) {
               $self->{open_elements}->[-1]->[0]->manakai_append_text ($1);
 
@@ -6534,55 +6486,39 @@ sub _tree_construction_main ($) {
               }
               redo B;
             }
-          } elsif ($token->{type} eq 'comment') {
-            my $comment = $self->{document}->create_comment ($token->{data});
-            $self->{open_elements}->[-1]->[0]->append_child ($comment);
-            $token = $self->_get_next_token;
-            redo B;
-          } elsif ($token->{type} eq 'start tag') {
-            if ($token->{tag_name} eq 'noframes') {
-              $in_body->($insert_to_current);
-              redo B;
-            } else {
-              #
-            }
-          } elsif ($token->{type} eq 'end tag') {
-            if ($token->{tag_name} eq 'html') {
-              $previous_insertion_mode = $self->{insertion_mode};
-              $self->{insertion_mode} = 'trailing end';
-              $token = $self->_get_next_token;
-              redo B;
-            } else {
-              #
-            }
-          } else {
-            die "$0: $token->{type}: Unknown token type";
-          }
-          
-          $self->{parse_error}-> (type => 'after frameset:'.($token->{tag_name} eq 'end tag' ? '/' : '').$token->{tag_name});
+
+        die qq[$0: Character "$token->{data}"];
+      } elsif ($token->{type} eq 'start tag') {
+        if ($token->{tag_name} eq 'noframes') {
+          $in_body->($insert_to_current);
+          redo B;
+        } else {
+          $self->{parse_error}-> (type => 'after frameset:'.$token->{tag_name});
           ## Ignore the token
           $token = $self->_get_next_token;
           redo B;
-
-          ## ISSUE: An issue in spec there
-        } else {
-          die "$0: $self->{insertion_mode}: Unknown insertion mode";
         }
+      } elsif ($token->{type} eq 'end tag') {
+        if ($token->{tag_name} eq 'html') {
+          $previous_insertion_mode = $self->{insertion_mode};
+          $self->{insertion_mode} = 'trailing end';
+          $token = $self->_get_next_token;
+          redo B;
+        } else {
+          $self->{parse_error}-> (type => 'after frameset:/'.$token->{tag_name});
+          ## Ignore the token
+          $token = $self->_get_next_token;
+          redo B;
+        }
+      } else {
+        die "$0: $token->{type}: Unknown token type";
       }
+
+      ## ISSUE: An issue in spec here
     } elsif ($self->{insertion_mode} eq 'trailing end') {
       ## states in the main stage is preserved yet # MUST
       
-      if ($token->{type} eq 'DOCTYPE') {
-        $self->{parse_error}-> (type => 'after html:#DOCTYPE');
-        ## Ignore the token
-        $token = $self->_get_next_token;
-        redo B;
-      } elsif ($token->{type} eq 'comment') {
-        my $comment = $self->{document}->create_comment ($token->{data});
-        $self->{document}->append_child ($comment);
-        $token = $self->_get_next_token;
-        redo B;
-      } elsif ($token->{type} eq 'character') {
+      if ($token->{type} eq 'character') {
         if ($token->{data} =~ s/^([\x09\x0A\x0B\x0C\x20]+)//) {
           my $data = $1;
           ## As if in the main phase.
@@ -6603,18 +6539,21 @@ sub _tree_construction_main ($) {
         $self->{insertion_mode} = $previous_insertion_mode;
         ## reprocess
         redo B;
-      } elsif ($token->{type} eq 'start tag' or
-               $token->{type} eq 'end tag') {
-        $self->{parse_error}-> (type => 'after html:'.($token->{type} eq 'end tag' ? '/' : '').$token->{tag_name});
+      } elsif ($token->{type} eq 'start tag') {
+        $self->{parse_error}-> (type => 'after html:'.$token->{tag_name});
         $self->{insertion_mode} = $previous_insertion_mode;
         ## reprocess
         redo B;
-      } elsif ($token->{type} eq 'end-of-file') {
-        ## Stop parsing
-        last B;
+      } elsif ($token->{type} eq 'end tag') {
+        $self->{parse_error}-> (type => 'after html:/'.$token->{tag_name});
+        $self->{insertion_mode} = $previous_insertion_mode;
+        ## reprocess
+        redo B;
       } else {
         die "$0: $token->{type}: Unknown token";
       }
+    } else {
+      die "$0: $self->{insertion_mode}: Unknown insertion mode";
     }
   } # B
 
@@ -6880,4 +6819,4 @@ sub get_inner_html ($$$) {
 } # get_inner_html
 
 1;
-# $Date: 2007/07/16 03:21:04 $
+# $Date: 2007/07/16 04:51:22 $

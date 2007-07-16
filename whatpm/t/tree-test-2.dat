@@ -133,3 +133,61 @@ outer <table> not closed
 #document-fragment table
 | <title>
 |   "a"
+
+#data
+</frameset>
+#errors
+unmatched </frameset>
+#document-fragment frameset
+
+#data
+</frameset></frameset>
+#errors
+unmatched </frameset>
+unmatched </frameset>
+#document-fragment frameset
+
+#data
+</frameset></frameset></frameset>
+#errors
+unmatched </frameset>
+unmatched </frameset>
+unmatched </frameset>
+#document-fragment frameset
+
+#data
+</frameset></html>
+#errors
+unmatched </frameset>
+unmatched </html>
+#document-fragment frameset
+
+#data
+</frameset></frameset></html>
+#errors
+unmatched </frameset>
+unmatched </frameset>
+unmatched </html>
+#document-fragment frameset
+
+#data
+</frameset><frame>
+#errors
+unmatched </frameset>
+#document-fragment frameset
+| <frame>
+
+#data
+</frameset><!---->
+#errors
+unmatched </frameset>
+#document-fragment frameset
+| <!--  -->
+
+#data
+</frameset></html><!---->
+#errors
+unmatched </frameset>
+unmatched </html>
+#document-fragment frameset
+| <!--  -->

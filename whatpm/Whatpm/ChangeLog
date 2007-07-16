@@ -1,5 +1,15 @@
 2007-07-16  Wakaba  <wakaba@suika.fam.cx>
 
+	* HTML.pm.src (main and trailin end phases): Token
+	types |DOCTYPE|, |comment|, |end-of-file|, and |<html>| are 
+	factored out.  Error types |in html:#DOCTYPE|
+	and |after html:#DOCTYPE| are merged
+	into |DOCTYPE in the middle|.  |</frameset>|
+	in fragment parsing mode changed the
+	insertion mode.
+
+2007-07-16  Wakaba  <wakaba@suika.fam.cx>
+
 	* HTML.pm.src: |$phase| has been removed; The |trailing end|
 	phase is now an insertion mode.  Treatments for white
 	space character tokens were incorrect for some

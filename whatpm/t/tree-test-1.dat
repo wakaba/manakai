@@ -1427,3 +1427,80 @@ char after </frameset>
 |     <title>
 |   <body>
 |     " "
+
+#data
+</body></html><html a>
+#errors
+no <!DOCTYPE>
+<html> after </html>
+#document
+| <html>
+|   a=""
+|   <head>
+|   <body>
+
+#data
+<body></body></html><html a>
+#errors
+no <!DOCTYPE>
+<html> after </html>
+<html> is not the first start tag
+#document
+| <html>
+|   a=""
+|   <head>
+|   <body>
+
+#data
+<frameset></frameset></html><html a>
+#errors
+no <!DOCTYPE>
+<html> after </html>
+<html> is not the first start tag
+#document
+| <html>
+|   a=""
+|   <head>
+|   <frameset>
+
+#data
+<!DOCTYPE HTML><html><head></head><frameset></frameset></html><html a>
+#errors
+<html> after </html>
+<html> is not the first start tag
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   a=""
+|   <head>
+|   <frameset>
+
+#data
+<frameset></frameset>
+#errors
+no <!DOCTYPE>
+#document
+| <html>
+|   <head>
+|   <frameset>
+
+#data
+<frameset></frameset></frameset>
+#errors
+no <!DOCTYPE>
+unmatched </frameset>
+#document
+| <html>
+|   <head>
+|   <frameset>
+
+#data
+<frameset></frameset></frameset></frameset>
+#errors
+no <!DOCTYPE>
+unmatched </frameset>
+unmatched </frameset>
+#document
+| <html>
+|   <head>
+|   <frameset>
