@@ -667,18 +667,6 @@ my $GetHTMLBooleanAttrChecker = sub {
   };
 }; # $GetHTMLBooleanAttrChecker
 
-my $HTMLUnorderedSetOfSpaceSeparatedTokensAttrChecker = sub {
-  my ($self, $attr) = @_;
-  my %word;
-  for my $word (grep {length $_} split /[\x09-\x0D\x20]/, $attr->value) {
-    unless ($word{$word}) {
-      $word{$word} = 1;
-    } else {
-      $self->{onerror}->(node => $attr, type => 'duplicate token:'.$word);
-    }
-  }
-}; # $HTMLUnorderedSetOfSpaceSeparatedTokensAttrChecker
-
 ## |rel| attribute (unordered set of space separated tokens,
 ## whose allowed values are defined by the section on link types)
 my $HTMLLinkTypesAttrChecker = sub {
@@ -976,7 +964,18 @@ my $HTMLAttrChecker = {
     }
   },
   dir => $GetHTMLEnumeratedAttrChecker->({ltr => 1, rtl => 1}),
-  class => $HTMLUnorderedSetOfSpaceSeparatedTokensAttrChecker,
+  class => sub {
+    my ($self, $attr) = @_;
+    my %word;
+    for my $word (grep {length $_} split /[\x09-\x0D\x20]/, $attr->value) {
+      unless ($word{$word}) {
+        $word{$word} = 1;
+        push @{$self->{return}->{class}->{$word}||=[]}, $attr;
+      } else {
+        $self->{onerror}->(node => $attr, type => 'duplicate token:'.$word);
+      }
+    }
+  },
   contextmenu => sub {
     my ($self, $attr) = @_;
     my $value = $attr->value;
@@ -2993,6 +2992,7 @@ sub check_element ($$$) {
   $self->{menu} = {};
   $self->{has_link_type} = {};
   $self->{return} = {
+    class => {},
     id => $self->{id}, table => [], term => $self->{term},
   };
 
@@ -3142,4 +3142,4 @@ sub _check_get_children ($$$) {
 } # _check_get_children
 
 1;
-# $Date: 2007/07/17 13:54:57 $
+# $Date: 2007/07/17 14:26:48 $
