@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.38 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.39 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## ISSUE:
 ## var doc = implementation.createDocument (null, null, null);
@@ -712,7 +712,7 @@ sub _get_next_token ($) {
       my $before_leave = sub {
         if (exists $self->{current_token}->{attributes} # start tag or end tag
             ->{$self->{current_attribute}->{name}}) { # MUST
-          $self->{parse_error}-> (type => 'dupulicate attribute');
+          $self->{parse_error}-> (type => 'duplicate attribute');
           ## Discard $self->{current_attribute} # MUST
         } else {
           $self->{current_token}->{attributes}->{$self->{current_attribute}->{name}}
@@ -6829,4 +6829,4 @@ sub get_inner_html ($$$) {
 } # get_inner_html
 
 1;
-# $Date: 2007/07/16 07:48:19 $
+# $Date: 2007/07/17 13:54:57 $

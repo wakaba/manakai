@@ -56,8 +56,9 @@ my $AttrChecker = {
       if ($self->{id}->{$value}) { ## NOTE: An xml:id error
         $self->{onerror}->(node => $attr, level => 'error', 
                            type => 'duplicate ID');
+        push @{$self->{id}->{$value}}, $attr;
       } else {
-        $self->{id}->{$value} = 1;
+        $self->{id}->{$value} = [$attr];
       }
     },
   },
@@ -951,8 +952,9 @@ my $HTMLAttrChecker = {
     if (length $value > 0) {
       if ($self->{id}->{$value}) {
         $self->{onerror}->(node => $attr, type => 'duplicate ID');
+        push @{$self->{id}->{$value}}, $attr;
       } else {
-        $self->{id}->{$value} = 1;
+        $self->{id}->{$value} = [$attr];
       }
       if ($value =~ /[\x09-\x0D\x20]/) {
         $self->{onerror}->(node => $attr, type => 'space in ID');
@@ -2220,8 +2222,9 @@ $Element->{$HTML_NS}->{map} = {
       if (length $value > 0) {
         if ($self->{id}->{$value}) {
           $self->{onerror}->(node => $attr, type => 'duplicate ID');
+          push @{$self->{id}->{$value}}, $attr;
         } else {
-          $self->{id}->{$value} = 1;
+          $self->{id}->{$value} = [$attr];
         }
       } else {
         ## NOTE: MUST contain at least one character
@@ -2837,8 +2840,9 @@ $Element->{$HTML_NS}->{menu} = {
       if (length $value > 0) {
         if ($self->{id}->{$value}) {
           $self->{onerror}->(node => $attr, type => 'duplicate ID');
+          push @{$self->{id}->{$value}}, $attr;
         } else {
-          $self->{id}->{$value} = 1;
+          $self->{id}->{$value} = [$attr];
         }
       } else {
         ## NOTE: MUST contain at least one character
@@ -2989,7 +2993,7 @@ sub check_element ($$$) {
   $self->{menu} = {};
   $self->{has_link_type} = {};
   $self->{return} = {
-    table => [], term => $self->{term},
+    id => $self->{id}, table => [], term => $self->{term},
   };
 
   my @todo = ({type => 'element', node => $el});
@@ -3138,4 +3142,4 @@ sub _check_get_children ($$$) {
 } # _check_get_children
 
 1;
-# $Date: 2007/07/16 14:28:35 $
+# $Date: 2007/07/17 13:54:57 $
