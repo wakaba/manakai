@@ -39,6 +39,44 @@ manakai の DOM 対応状況は次の各表をご覧下さい。</p>
 <p>manakai の RFC 2822 系インターネット・メッセージを操作するためのモジュール群は、
 現在整理中です。</p>
 
+<p><a href="http://suika.fam.cx/www/markup/html/whatpm/readme">Whatpm</a>
+サブプロジェクト</p>
+
+<div class="section" id="documentation">
+<h2>文書</h2>
+
+<ul>
+<li>実装に関するメモ
+  <ul>
+  <li><a href="http://suika.fam.cx/gate/2005/sw/manakai/Namespaces">XML
+      名前空間関連の実装に関するメモ</a></li>
+  <li><a href="http://suika.fam.cx/gate/2005/sw/manakai/Error%20Types">誤り型一覧</a></li>
+  </ul>
+</li>
+<li>仕様書
+  <ul>
+  <li><a href="http://suika.fam.cx/gate/2005/sw/manakai/DOM%20Perl%20Binding">manakai の DOM Perl 束縛</a> (案)</li>
+  <li><a href="http://suika.fam.cx/gate/cvs/*checkout*/messaging/manakai/lib/Message/Markup/Atom.dis?rev=HEAD&content-type=text/plain">Atom DOM 1.0</a> (案)</li>
+  <li><a href="http://suika.fam.cx/gate/2005/sw/SerialWalker"><code>SerialWalker</code></a> (案)</li>
+  <li><a href="http://suika.fam.cx/gate/2005/sw/manakai/DOM%20Extensions">manakai の DOM 拡張</a></li>
+  </ul>
+</li>
+</ul>
+</div>
+
+<div class="section" id="dependency">
+<h2>他のモジュールへの依存性</h2>
+
+<dl>
+<dt>Perl 5.8.7</dt>
+    <dd>古い版の Perl では動作しません。 5.8.4 くらいでも動くかもしれませんが、
+    未確認です。</dd>
+<dt><a href="http://suika.fam.cx/www/charclass/readme">CharClass</a></dt>
+    <dd>XML 構文解析器を使用する場合に <code>Char::Class::XML</code>
+    が必要です。</dd>
+</dl>
+</div>
+
 <div class="section" id="download">
 <h2 lang="en">ダウンロード</h2>
 
