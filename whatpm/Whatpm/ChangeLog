@@ -1,5 +1,14 @@
 2007-07-21  Wakaba  <wakaba@suika.fam.cx>
 
+	* HTML.pm.src: The "trailing end" insertion mode
+	is split into "after html body" and "after html frameset"
+	insertion modes.  Their codes are merged with "after body"
+	and "after frameset" codes.  |$previous_insertion_mode|
+	has been removed.  "after frameset" code is 
+	merged with "in frameset" code.
+
+2007-07-21  Wakaba  <wakaba@suika.fam.cx>
+
 	* HTML.pm.src: The "before head" insertion mode is 
 	merged with the "in head" insertion mode.
 

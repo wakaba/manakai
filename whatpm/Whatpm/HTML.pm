@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.52 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.53 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## ISSUE:
 ## var doc = implementation.createDocument (null, null, null);
@@ -2916,8 +2916,6 @@ sub _reset_insertion_mode ($) {
 sub _tree_construction_main ($) {
   my $self = shift;
 
-  my $previous_insertion_mode;
-
   my $active_formatting_elements = [];
 
   my $reconstruct_active_formatting_elements = sub { # MUST
@@ -4478,7 +4476,10 @@ sub _tree_construction_main ($) {
       $token = $self->_get_next_token;
       redo B;
     } elsif ($token->{type} eq 'end-of-file') {
-      if ($token->{insertion_mode} ne 'trailing end') {
+      if ($self->{insertion_mode} eq 'after html body' or
+          $self->{insertion_mode} eq 'after html frameset') {
+        #
+      } else {
         ## Generate implied end tags
         if ({
              dd => 1, dt => 1, li => 1, p => 1, td => 1, th => 1, tr => 1,
@@ -4505,10 +4506,14 @@ sub _tree_construction_main ($) {
       last B;
     } elsif ($token->{type} eq 'start tag' and
              $token->{tag_name} eq 'html') {
-      if ($self->{insertion_mode} eq 'trailing end') {
+      if ($self->{insertion_mode} eq 'after html body') {
         ## Turn into the main phase
         $self->{parse_error}-> (type => 'after html:html');
-        $self->{insertion_mode} = $previous_insertion_mode;
+        $self->{insertion_mode} = 'after body';
+      } elsif ($self->{insertion_mode} eq 'after html frameset') {
+        ## Turn into the main phase
+        $self->{parse_error}-> (type => 'after html:html');
+        $self->{insertion_mode} = 'after frameset';
       }
 
 ## ISSUE: "aa<html>" is not a parse error.
@@ -4528,7 +4533,8 @@ sub _tree_construction_main ($) {
       redo B;
     } elsif ($token->{type} eq 'comment') {
       my $comment = $self->{document}->create_comment ($token->{data});
-      if ($self->{insertion_mode} eq 'trailing end') {
+      if ($self->{insertion_mode} eq 'after html body' or
+          $self->{insertion_mode} eq 'after html frameset') {
         $self->{document}->append_child ($comment);
       } elsif ($self->{insertion_mode} eq 'after body') {
         $self->{open_elements}->[0]->[0]->append_child ($comment);
@@ -5362,9 +5368,9 @@ sub _tree_construction_main ($) {
           
           $in_body->($insert_to_current);
           redo B;
-        } elsif ($self->{insertion_mode} eq 'in row' or
-                 $self->{insertion_mode} eq 'in table body' or
-                 $self->{insertion_mode} eq 'in table') {
+    } elsif ($self->{insertion_mode} eq 'in row' or
+             $self->{insertion_mode} eq 'in table body' or
+             $self->{insertion_mode} eq 'in table') {
           if ($token->{type} eq 'character') {
             ## NOTE: There are "character in table" code clones.
             if ($token->{data} =~ s/^([\x09\x0A\x0B\x0C\x20]+)//) {
@@ -6003,7 +6009,7 @@ sub _tree_construction_main ($) {
           $self->{parse_error}-> (type => 'in table:'.$token->{tag_name});
           $in_body->($insert_to_foster);
           redo B;
-        } elsif ($self->{insertion_mode} eq 'in column group') {
+    } elsif ($self->{insertion_mode} eq 'in column group') {
           if ($token->{type} eq 'character') {
             if ($token->{data} =~ s/^([\x09\x0A\x0B\x0C\x20]+)//) {
               $self->{open_elements}->[-1]->[0]->manakai_append_text ($1);
@@ -6075,7 +6081,7 @@ sub _tree_construction_main ($) {
             ## reprocess
             redo B;
           }
-        } elsif ($self->{insertion_mode} eq 'in select') {
+    } elsif ($self->{insertion_mode} eq 'in select') {
           if ($token->{type} eq 'character') {
             $self->{open_elements}->[-1]->[0]->manakai_append_text ($token->{data});
             $token = $self->_get_next_token;
@@ -6279,66 +6285,122 @@ sub _tree_construction_main ($) {
           ## Ignore the token
           $token = $self->_get_next_token;
           redo B;
-        } elsif ($self->{insertion_mode} eq 'after body') {
-          if ($token->{type} eq 'character') {
-            if ($token->{data} =~ s/^([\x09\x0A\x0B\x0C\x20]+)//) {
-              my $data = $1;
-              ## As if in body
-              $reconstruct_active_formatting_elements->($insert_to_current);
-              
-              $self->{open_elements}->[-1]->[0]->manakai_append_text ($1);
-
-              unless (length $token->{data}) {
-                $token = $self->_get_next_token;
-                redo B;
-              }
-            }
-            
-            #
-            $self->{parse_error}-> (type => 'after body:#character');
-          } elsif ($token->{type} eq 'start tag') {
-            $self->{parse_error}-> (type => 'after body:'.$token->{tag_name});
-            #
-          } elsif ($token->{type} eq 'end tag') {
-            if ($token->{tag_name} eq 'html') {
-              if (defined $self->{inner_html_node}) {
-                $self->{parse_error}-> (type => 'unmatched end tag:html');
-                ## Ignore the token
-                $token = $self->_get_next_token;
-                redo B;
-              } else {
-                $previous_insertion_mode = $self->{insertion_mode};
-                $self->{insertion_mode} = 'trailing end';
-                $token = $self->_get_next_token;
-                redo B;
-              }
-            } else {
-              $self->{parse_error}-> (type => 'after body:/'.$token->{tag_name});
-            }
-          } else {
-            die "$0: $token->{type}: Unknown token type";
-          }
-
-          $self->{insertion_mode} = 'in body';
-          ## reprocess
-          redo B;
-    } elsif ($self->{insertion_mode} eq 'in frameset') {
+    } elsif ($self->{insertion_mode} eq 'after body' or
+             $self->{insertion_mode} eq 'after html body') {
       if ($token->{type} eq 'character') {
         if ($token->{data} =~ s/^([\x09\x0A\x0B\x0C\x20]+)//) {
+          my $data = $1;
+          ## As if in body
+          $reconstruct_active_formatting_elements->($insert_to_current);
+              
           $self->{open_elements}->[-1]->[0]->manakai_append_text ($1);
-
+          
           unless (length $token->{data}) {
             $token = $self->_get_next_token;
             redo B;
           }
         }
+        
+        if ($self->{insertion_mode} eq 'after html body') {
+          $self->{parse_error}-> (type => 'after html:#character');
 
-        $self->{parse_error}-> (type => 'in frameset:#character');
-        ## Ignore the token
-        $token = $self->_get_next_token;
+          ## Reprocess in the "main" phase, "after body" insertion mode...
+        }
+        
+        ## "after body" insertion mode
+        $self->{parse_error}-> (type => 'after body:#character');
+
+        $self->{insertion_mode} = 'in body';
+        ## reprocess
         redo B;
       } elsif ($token->{type} eq 'start tag') {
-        if ($token->{tag_name} eq 'frameset') {
+        if ($self->{insertion_mode} eq 'after html body') {
+          $self->{parse_error}-> (type => 'after html:'.$token->{tag_name});
+          
+          ## Reprocess in the "main" phase, "after body" insertion mode...
+        }
+
+        ## "after body" insertion mode
+        $self->{parse_error}-> (type => 'after body:'.$token->{tag_name});
+
+        $self->{insertion_mode} = 'in body';
+        ## reprocess
+        redo B;
+      } elsif ($token->{type} eq 'end tag') {
+        if ($self->{insertion_mode} eq 'after html body') {
+          $self->{parse_error}-> (type => 'after html:/'.$token->{tag_name});
+          
+          $self->{insertion_mode} = 'after body';
+          ## Reprocess in the "main" phase, "after body" insertion mode...
+        }
+
+        ## "after body" insertion mode
+        if ($token->{tag_name} eq 'html') {
+          if (defined $self->{inner_html_node}) {
+            $self->{parse_error}-> (type => 'unmatched end tag:html');
+            ## Ignore the token
+            $token = $self->_get_next_token;
+            redo B;
+          } else {
+            $self->{insertion_mode} = 'after html body';
+            $token = $self->_get_next_token;
+            redo B;
+          }
+        } else {
+          $self->{parse_error}-> (type => 'after body:/'.$token->{tag_name});
+
+          $self->{insertion_mode} = 'in body';
+          ## reprocess
+          redo B;
+        }
+      } else {
+        die "$0: $token->{type}: Unknown token type";
+      }
+    } elsif ($self->{insertion_mode} eq 'in frameset' or 
+             $self->{insertion_mode} eq 'after frameset' or
+             $self->{insertion_mode} eq 'after html frameset') {
+      if ($token->{type} eq 'character') {
+        if ($token->{data} =~ s/^([\x09\x0A\x0B\x0C\x20]+)//) {
+          $self->{open_elements}->[-1]->[0]->manakai_append_text ($1);
+          
+          unless (length $token->{data}) {
+            $token = $self->_get_next_token;
+            redo B;
+          }
+        }
+        
+        if ($token->{data} =~ s/^[^\x09\x0A\x0B\x0C\x20]+//) {
+          if ($self->{insertion_mode} eq 'in frameset') {
+            $self->{parse_error}-> (type => 'in frameset:#character');
+          } elsif ($self->{insertion_mode} eq 'after frameset') {
+            $self->{parse_error}-> (type => 'after frameset:#character');
+          } else { # "after html frameset"
+            $self->{parse_error}-> (type => 'after html:#character');
+
+            $self->{insertion_mode} = 'after frameset';
+            ## Reprocess in the "main" phase, "after frameset"...
+            $self->{parse_error}-> (type => 'after frameset:#character');
+          }
+          
+          ## Ignore the token.
+          if (length $token->{data}) {
+            ## reprocess the rest of characters
+          } else {
+            $token = $self->_get_next_token;
+          }
+          redo B;
+        }
+        
+        die qq[$0: Character "$token->{data}"];
+      } elsif ($token->{type} eq 'start tag') {
+        if ($self->{insertion_mode} eq 'after html frameset') {
+          $self->{insertion_mode} = 'after frameset';
+          ## Process in the "main" phase, "after frameset" insertion mode...
+          $self->{parse_error}-> (type => 'after html:'.$token->{tag_name});
+        }
+
+        if ($token->{tag_name} eq 'frameset' and
+            $self->{insertion_mode} eq 'in frameset') {
           
     {
       my $el;
@@ -6357,7 +6419,8 @@ sub _tree_construction_main ($) {
   
           $token = $self->_get_next_token;
           redo B;
-        } elsif ($token->{tag_name} eq 'frame') {
+        } elsif ($token->{tag_name} eq 'frame' and
+                 $self->{insertion_mode} eq 'in frameset') {
           
     {
       my $el;
@@ -6382,13 +6445,24 @@ sub _tree_construction_main ($) {
           $parse_rcdata->(CDATA_CONTENT_MODEL, $insert_to_current);
           redo B;
         } else {
-          $self->{parse_error}-> (type => 'in frameset:'.$token->{tag_name});
+          if ($self->{insertion_mode} eq 'in frameset') {
+            $self->{parse_error}-> (type => 'in frameset:'.$token->{tag_name});
+          } else {
+            $self->{parse_error}-> (type => 'after frameset:'.$token->{tag_name});
+          }
           ## Ignore the token
           $token = $self->_get_next_token;
           redo B;
         }
       } elsif ($token->{type} eq 'end tag') {
-        if ($token->{tag_name} eq 'frameset') {
+        if ($self->{insertion_mode} eq 'after html frameset') {
+          $self->{insertion_mode} = 'after frameset';
+          ## Process in the "main" phase, "after frameset" insertion mode...
+          $self->{parse_error}-> (type => 'after html:/'.$token->{tag_name});
+        }
+
+        if ($token->{tag_name} eq 'frameset' and
+            $self->{insertion_mode} eq 'in frameset') {
           if ($self->{open_elements}->[-1]->[1] eq 'html' and
               @{$self->{open_elements}} == 1) {
             $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
@@ -6404,58 +6478,17 @@ sub _tree_construction_main ($) {
             $self->{insertion_mode} = 'after frameset';
           }
           redo B;
-        } else {
-          $self->{parse_error}-> (type => 'in frameset:/'.$token->{tag_name});
-          ## Ignore the token
-          $token = $self->_get_next_token;
-          redo B;
-        }
-      } else {
-        die "$0: $token->{type}: Unknown token type";
-      }
-    } elsif ($self->{insertion_mode} eq 'after frameset') {
-      if ($token->{type} eq 'character') {
-            if ($token->{data} =~ s/^([\x09\x0A\x0B\x0C\x20]+)//) {
-              $self->{open_elements}->[-1]->[0]->manakai_append_text ($1);
-
-              unless (length $token->{data}) {
-                $token = $self->_get_next_token;
-                redo B;
-              }
-            }
-
-            if ($token->{data} =~ s/^[^\x09\x0A\x0B\x0C\x20]+//) {
-              $self->{parse_error}-> (type => 'after frameset:#character');
-
-              ## Ignore the token.
-              if (length $token->{data}) {
-                ## reprocess the rest of characters
-              } else {
-                $token = $self->_get_next_token;
-              }
-              redo B;
-            }
-
-        die qq[$0: Character "$token->{data}"];
-      } elsif ($token->{type} eq 'start tag') {
-        if ($token->{tag_name} eq 'noframes') {
-          ## NOTE: As if in body.
-          $parse_rcdata->(CDATA_CONTENT_MODEL, $insert_to_current);
-          redo B;
-        } else {
-          $self->{parse_error}-> (type => 'after frameset:'.$token->{tag_name});
-          ## Ignore the token
-          $token = $self->_get_next_token;
-          redo B;
-        }
-      } elsif ($token->{type} eq 'end tag') {
-        if ($token->{tag_name} eq 'html') {
-          $previous_insertion_mode = $self->{insertion_mode};
-          $self->{insertion_mode} = 'trailing end';
+        } elsif ($token->{tag_name} eq 'html' and
+                 $self->{insertion_mode} eq 'after frameset') {
+          $self->{insertion_mode} = 'after html frameset';
           $token = $self->_get_next_token;
           redo B;
         } else {
-          $self->{parse_error}-> (type => 'after frameset:/'.$token->{tag_name});
+          if ($self->{insertion_mode} eq 'in frameset') {
+            $self->{parse_error}-> (type => 'in frameset:/'.$token->{tag_name});
+          } else {
+            $self->{parse_error}-> (type => 'after frameset:/'.$token->{tag_name});
+          }
           ## Ignore the token
           $token = $self->_get_next_token;
           redo B;
@@ -6465,47 +6498,15 @@ sub _tree_construction_main ($) {
       }
 
       ## ISSUE: An issue in spec here
-    } elsif ($self->{insertion_mode} eq 'trailing end') {
-      ## states in the main stage is preserved yet # MUST
-      
-      if ($token->{type} eq 'character') {
-        if ($token->{data} =~ s/^([\x09\x0A\x0B\x0C\x20]+)//) {
-          my $data = $1;
-          ## As if in the main phase.
-          ## NOTE: The insertion mode in the main phase
-          ## just before the phase has been changed to the trailing
-          ## end phase is either "after body" or "after frameset".
-          $reconstruct_active_formatting_elements->($insert_to_current);
-          
-          $self->{open_elements}->[-1]->[0]->manakai_append_text ($data);
-          
-          unless (length $token->{data}) {
-            $token = $self->_get_next_token;
-            redo B;
-          }
-        }
-
-        $self->{parse_error}-> (type => 'after html:#character');
-        $self->{insertion_mode} = $previous_insertion_mode;
-        ## reprocess
-        redo B;
-      } elsif ($token->{type} eq 'start tag') {
-        $self->{parse_error}-> (type => 'after html:'.$token->{tag_name});
-        $self->{insertion_mode} = $previous_insertion_mode;
-        ## reprocess
-        redo B;
-      } elsif ($token->{type} eq 'end tag') {
-        $self->{parse_error}-> (type => 'after html:/'.$token->{tag_name});
-        $self->{insertion_mode} = $previous_insertion_mode;
-        ## reprocess
-        redo B;
-      } else {
-        die "$0: $token->{type}: Unknown token";
-      }
     } else {
       die "$0: $self->{insertion_mode}: Unknown insertion mode";
     }
   } # B
+
+  ## NOTE: The "trailing end" phase in HTML5 is split into
+  ## two insertion modes: "after html body" and "after html frameset".
+  ## NOTE: States in the main stage is preserved while
+  ## the parser stays in the trailing end phase. # MUST
 
   ## Stop parsing # MUST
   
@@ -6771,4 +6772,4 @@ sub get_inner_html ($$$) {
 } # get_inner_html
 
 1;
-# $Date: 2007/07/21 10:59:39 $
+# $Date: 2007/07/21 11:46:40 $
