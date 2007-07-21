@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.43 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.44 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## ISSUE:
 ## var doc = implementation.createDocument (null, null, null);
@@ -4874,6 +4874,7 @@ sub _tree_construction_main ($) {
 
           ## ISSUE: An issue in the spec.
         } elsif ($self->{insertion_mode} eq 'in body' or
+                 $self->{insertion_mode} eq 'in cell' or
                  $self->{insertion_mode} eq 'in caption') {
           if ($token->{type} eq 'character') {
             ## NOTE: There is a code clone of "character in body".
@@ -4887,70 +4888,216 @@ sub _tree_construction_main ($) {
             if ({
                  caption => 1, col => 1, colgroup => 1, tbody => 1,
                  td => 1, tfoot => 1, th => 1, thead => 1, tr => 1,
-                }->{$token->{tag_name}} and
-                $self->{insertion_mode} eq 'in caption') {
-              $self->{parse_error}-> (type => 'not closed:caption');
-
-              ## As if </caption>
-              ## have a table element in table scope
-              my $i;
-              INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
-                my $node = $self->{open_elements}->[$_];
-                if ($node->[1] eq 'caption') {
-                  $i = $_;
-                  last INSCOPE;
-                } elsif ({
-                          table => 1, html => 1,
-                         }->{$node->[1]}) {
-                  last INSCOPE;
-                }
-              } # INSCOPE
-              unless (defined $i) {
-                $self->{parse_error}-> (type => 'unmatched end tag:caption');
-                ## Ignore the token
-                $token = $self->_get_next_token;
-                redo B;
-              }
-              
-              ## generate implied end tags
-              if ({
-                   dd => 1, dt => 1, li => 1, p => 1,
-                   td => 1, th => 1, tr => 1,
-                   tbody => 1, tfoot=> 1, thead => 1,
-                  }->{$self->{open_elements}->[-1]->[1]}) {
+                }->{$token->{tag_name}}) {
+              if ($self->{insertion_mode} eq 'in cell') {
+                ## have an element in table scope
+                my $tn;
+                INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
+                  my $node = $self->{open_elements}->[$_];
+                  if ($node->[1] eq 'td' or $node->[1] eq 'th') {
+                    $tn = $node->[1];
+                    last INSCOPE;
+                  } elsif ({
+                            table => 1, html => 1,
+                           }->{$node->[1]}) {
+                    last INSCOPE;
+                  }
+                } # INSCOPE
+                  unless (defined $tn) {
+                    $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
+                    ## Ignore the token
+                    $token = $self->_get_next_token;
+                    redo B;
+                  }
+                
+                ## Close the cell
                 unshift @{$self->{token}}, $token; # <?>
-                $token = {type => 'end tag', tag_name => 'caption'};
-                unshift @{$self->{token}}, $token;
-                $token = {type => 'end tag',
-                          tag_name => $self->{open_elements}->[-1]->[1]}; # MUST
+                $token = {type => 'end tag', tag_name => $tn};
                 redo B;
+              } elsif ($self->{insertion_mode} eq 'in caption') {
+                $self->{parse_error}-> (type => 'not closed:caption');
+                
+                ## As if </caption>
+                ## have a table element in table scope
+                my $i;
+                INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
+                  my $node = $self->{open_elements}->[$_];
+                  if ($node->[1] eq 'caption') {
+                    $i = $_;
+                    last INSCOPE;
+                  } elsif ({
+                            table => 1, html => 1,
+                           }->{$node->[1]}) {
+                    last INSCOPE;
+                  }
+                } # INSCOPE
+                  unless (defined $i) {
+                    $self->{parse_error}-> (type => 'unmatched end tag:caption');
+                    ## Ignore the token
+                    $token = $self->_get_next_token;
+                    redo B;
+                  }
+                
+                ## generate implied end tags
+                if ({
+                     dd => 1, dt => 1, li => 1, p => 1,
+                     td => 1, th => 1, tr => 1,
+                     tbody => 1, tfoot=> 1, thead => 1,
+                    }->{$self->{open_elements}->[-1]->[1]}) {
+                  unshift @{$self->{token}}, $token; # <?>
+                  $token = {type => 'end tag', tag_name => 'caption'};
+                  unshift @{$self->{token}}, $token;
+                  $token = {type => 'end tag',
+                            tag_name => $self->{open_elements}->[-1]->[1]}; # MUST
+                  redo B;
+                }
+
+                if ($self->{open_elements}->[-1]->[1] ne 'caption') {
+                  $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
+                }
+                
+                splice @{$self->{open_elements}}, $i;
+                
+                $clear_up_to_marker->();
+                
+                $self->{insertion_mode} = 'in table';
+                
+                ## reprocess
+                redo B;
+              } else {
+                #
               }
-
-              if ($self->{open_elements}->[-1]->[1] ne 'caption') {
-                $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
-              }
-
-              splice @{$self->{open_elements}}, $i;
-
-              $clear_up_to_marker->();
-
-              $self->{insertion_mode} = 'in table';
-
-              ## reprocess
-              redo B;
             } else {
               #
             }
           } elsif ($token->{type} eq 'end tag') {
-            if ($token->{tag_name} eq 'caption' and
-                $self->{insertion_mode} eq 'in caption') {
-              ## have a table element in table scope
+            if ($token->{tag_name} eq 'td' or $token->{tag_name} eq 'th') {
+              if ($self->{insertion_mode} eq 'in cell') {
+                ## have an element in table scope
+                my $i;
+                INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
+                  my $node = $self->{open_elements}->[$_];
+                  if ($node->[1] eq $token->{tag_name}) {
+                    $i = $_;
+                    last INSCOPE;
+                  } elsif ({
+                            table => 1, html => 1,
+                           }->{$node->[1]}) {
+                    last INSCOPE;
+                  }
+                } # INSCOPE
+                  unless (defined $i) {
+                    $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
+                    ## Ignore the token
+                    $token = $self->_get_next_token;
+                    redo B;
+                  }
+                
+                ## generate implied end tags
+                if ({
+                     dd => 1, dt => 1, li => 1, p => 1,
+                     td => ($token->{tag_name} eq 'th'),
+                     th => ($token->{tag_name} eq 'td'),
+                     tr => 1,
+                     tbody => 1, tfoot=> 1, thead => 1,
+                    }->{$self->{open_elements}->[-1]->[1]}) {
+                  unshift @{$self->{token}}, $token;
+                  $token = {type => 'end tag',
+                            tag_name => $self->{open_elements}->[-1]->[1]}; # MUST
+                  redo B;
+                }
+                
+                if ($self->{open_elements}->[-1]->[1] ne $token->{tag_name}) {
+                  $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
+                }
+                
+                splice @{$self->{open_elements}}, $i;
+                
+                $clear_up_to_marker->();
+                
+                $self->{insertion_mode} = 'in row';
+                
+                $token = $self->_get_next_token;
+                redo B;
+              } elsif ($self->{insertion_mode} eq 'in caption') {
+                $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
+                ## Ignore the token
+                $token = $self->_get_next_token;
+                redo B;
+              } else {
+                #
+              }
+            } elsif ($token->{tag_name} eq 'caption') {
+              if ($self->{insertion_mode} eq 'in caption') {
+                ## have a table element in table scope
+                my $i;
+                INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
+                  my $node = $self->{open_elements}->[$_];
+                  if ($node->[1] eq $token->{tag_name}) {
+                    $i = $_;
+                    last INSCOPE;
+                  } elsif ({
+                            table => 1, html => 1,
+                           }->{$node->[1]}) {
+                    last INSCOPE;
+                  }
+                } # INSCOPE
+                  unless (defined $i) {
+                    $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
+                    ## Ignore the token
+                    $token = $self->_get_next_token;
+                    redo B;
+                  }
+                
+                ## generate implied end tags
+                if ({
+                     dd => 1, dt => 1, li => 1, p => 1,
+                     td => 1, th => 1, tr => 1,
+                     tbody => 1, tfoot=> 1, thead => 1,
+                    }->{$self->{open_elements}->[-1]->[1]}) {
+                  unshift @{$self->{token}}, $token;
+                  $token = {type => 'end tag',
+                            tag_name => $self->{open_elements}->[-1]->[1]}; # MUST
+                  redo B;
+                }
+                
+                if ($self->{open_elements}->[-1]->[1] ne 'caption') {
+                  $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
+                }
+                
+                splice @{$self->{open_elements}}, $i;
+                
+                $clear_up_to_marker->();
+                
+                $self->{insertion_mode} = 'in table';
+                
+                $token = $self->_get_next_token;
+                redo B;
+              } elsif ($self->{insertion_mode} eq 'in cell') {
+                $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
+                ## Ignore the token
+                $token = $self->_get_next_token;
+                redo B;
+              } else {
+                #
+              }
+            } elsif ({
+                      table => 1, tbody => 1, tfoot => 1, 
+                      thead => 1, tr => 1,
+                     }->{$token->{tag_name}} and
+                     $self->{insertion_mode} eq 'in cell') {
+              ## have an element in table scope
               my $i;
+              my $tn;
               INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
                 my $node = $self->{open_elements}->[$_];
                 if ($node->[1] eq $token->{tag_name}) {
                   $i = $_;
                   last INSCOPE;
+                } elsif ($node->[1] eq 'td' or $node->[1] eq 'th') {
+                  $tn = $node->[1];
+                  ## NOTE: There is exactly one |td| or |th| element
+                  ## in scope in the stack of open elements by definition.
                 } elsif ({
                           table => 1, html => 1,
                          }->{$node->[1]}) {
@@ -4963,30 +5110,10 @@ sub _tree_construction_main ($) {
                 $token = $self->_get_next_token;
                 redo B;
               }
-              
-              ## generate implied end tags
-              if ({
-                   dd => 1, dt => 1, li => 1, p => 1,
-                   td => 1, th => 1, tr => 1,
-                   tbody => 1, tfoot=> 1, thead => 1,
-                  }->{$self->{open_elements}->[-1]->[1]}) {
-                unshift @{$self->{token}}, $token;
-                $token = {type => 'end tag',
-                          tag_name => $self->{open_elements}->[-1]->[1]}; # MUST
-                redo B;
-              }
 
-              if ($self->{open_elements}->[-1]->[1] ne 'caption') {
-                $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
-              }
-
-              splice @{$self->{open_elements}}, $i;
-
-              $clear_up_to_marker->();
-
-              $self->{insertion_mode} = 'in table';
-
-              $token = $self->_get_next_token;
+              ## Close the cell
+              unshift @{$self->{token}}, $token; # </?>
+              $token = {type => 'end tag', tag_name => $tn};
               redo B;
             } elsif ($token->{tag_name} eq 'table' and
                      $self->{insertion_mode} eq 'in caption') {
@@ -5040,9 +5167,20 @@ sub _tree_construction_main ($) {
               ## reprocess
               redo B;
             } elsif ({
-                      body => 1, col => 1, colgroup => 1,
-                      html => 1, tbody => 1, td => 1, tfoot => 1,
-                      th => 1, thead => 1, tr => 1,
+                      body => 1, col => 1, colgroup => 1, html => 1,
+                     }->{$token->{tag_name}}) {
+              if ($self->{insertion_mode} eq 'in cell' or
+                  $self->{insertion_mode} eq 'in caption') {
+                $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
+                ## Ignore the token
+                $token = $self->_get_next_token;
+                redo B;
+              } else {
+                #
+              }
+            } elsif ({
+                      tbody => 1, tfoot => 1,
+                      thead => 1, tr => 1,
                      }->{$token->{tag_name}} and
                      $self->{insertion_mode} eq 'in caption') {
               $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
@@ -5055,7 +5193,7 @@ sub _tree_construction_main ($) {
           } else {
             #
           }
-
+          
           $in_body->($insert_to_current);
           redo B;
         } elsif ($self->{insertion_mode} eq 'in table') {
@@ -5999,146 +6137,6 @@ sub _tree_construction_main ($) {
           $self->{parse_error}-> (type => 'in table:'.$token->{tag_name});
           $in_body->($insert_to_foster);
           redo B;
-        } elsif ($self->{insertion_mode} eq 'in cell') {
-          if ($token->{type} eq 'character') {
-            ## NOTE: This is a code clone of "character in body".
-            $reconstruct_active_formatting_elements->($insert_to_current);
-            
-            $self->{open_elements}->[-1]->[0]->manakai_append_text ($token->{data});
-
-            $token = $self->_get_next_token;
-            redo B;
-          } elsif ($token->{type} eq 'start tag') {
-            if ({
-                 caption => 1, col => 1, colgroup => 1,
-                 tbody => 1, td => 1, tfoot => 1, th => 1,
-                 thead => 1, tr => 1,
-                }->{$token->{tag_name}}) {
-              ## have an element in table scope
-              my $tn;
-              INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
-                my $node = $self->{open_elements}->[$_];
-                if ($node->[1] eq 'td' or $node->[1] eq 'th') {
-                  $tn = $node->[1];
-                  last INSCOPE;
-                } elsif ({
-                          table => 1, html => 1,
-                         }->{$node->[1]}) {
-                  last INSCOPE;
-                }
-              } # INSCOPE
-              unless (defined $tn) {
-                $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
-                ## Ignore the token
-                $token = $self->_get_next_token;
-                redo B;
-              }
-
-              ## Close the cell
-              unshift @{$self->{token}}, $token; # <?>
-              $token = {type => 'end tag', tag_name => $tn};
-              redo B;
-            } else {
-              #
-            }
-          } elsif ($token->{type} eq 'end tag') {
-            if ($token->{tag_name} eq 'td' or $token->{tag_name} eq 'th') {
-              ## have an element in table scope
-              my $i;
-              INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
-                my $node = $self->{open_elements}->[$_];
-                if ($node->[1] eq $token->{tag_name}) {
-                  $i = $_;
-                  last INSCOPE;
-                } elsif ({
-                          table => 1, html => 1,
-                         }->{$node->[1]}) {
-                  last INSCOPE;
-                }
-              } # INSCOPE
-              unless (defined $i) {
-                $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
-                ## Ignore the token
-                $token = $self->_get_next_token;
-                redo B;
-              }
-              
-              ## generate implied end tags
-              if ({
-                   dd => 1, dt => 1, li => 1, p => 1,
-                   td => ($token->{tag_name} eq 'th'),
-                   th => ($token->{tag_name} eq 'td'),
-                   tr => 1,
-                   tbody => 1, tfoot=> 1, thead => 1,
-                  }->{$self->{open_elements}->[-1]->[1]}) {
-                unshift @{$self->{token}}, $token;
-                $token = {type => 'end tag',
-                          tag_name => $self->{open_elements}->[-1]->[1]}; # MUST
-                redo B;
-              }
-
-              if ($self->{open_elements}->[-1]->[1] ne $token->{tag_name}) {
-                $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
-              }
-
-              splice @{$self->{open_elements}}, $i;
-
-              $clear_up_to_marker->();
-
-              $self->{insertion_mode} = 'in row';
-
-              $token = $self->_get_next_token;
-              redo B;
-            } elsif ({
-                      body => 1, caption => 1, col => 1,
-                      colgroup => 1, html => 1,
-                     }->{$token->{tag_name}}) {
-              $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
-              ## Ignore the token
-              $token = $self->_get_next_token;
-              redo B;
-            } elsif ({
-                      table => 1, tbody => 1, tfoot => 1, 
-                      thead => 1, tr => 1,
-                     }->{$token->{tag_name}}) {
-              ## have an element in table scope
-              my $i;
-              my $tn;
-              INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
-                my $node = $self->{open_elements}->[$_];
-                if ($node->[1] eq $token->{tag_name}) {
-                  $i = $_;
-                  last INSCOPE;
-                } elsif ($node->[1] eq 'td' or $node->[1] eq 'th') {
-                  $tn = $node->[1];
-                  ## NOTE: There is exactly one |td| or |th| element
-                  ## in scope in the stack of open elements by definition.
-                } elsif ({
-                          table => 1, html => 1,
-                         }->{$node->[1]}) {
-                  last INSCOPE;
-                }
-              } # INSCOPE
-              unless (defined $i) {
-                $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
-                ## Ignore the token
-                $token = $self->_get_next_token;
-                redo B;
-              }
-
-              ## Close the cell
-              unshift @{$self->{token}}, $token; # </?>
-              $token = {type => 'end tag', tag_name => $tn};
-              redo B;
-            } else {
-              #
-            }
-          } else {
-            #
-          }
-          
-          $in_body->($insert_to_current);
-          redo B;
         } elsif ($self->{insertion_mode} eq 'in select') {
           if ($token->{type} eq 'character') {
             $self->{open_elements}->[-1]->[0]->manakai_append_text ($token->{data});
@@ -6833,4 +6831,4 @@ sub get_inner_html ($$$) {
 } # get_inner_html
 
 1;
-# $Date: 2007/07/21 06:59:16 $
+# $Date: 2007/07/21 07:21:44 $
