@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.54 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.55 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## ISSUE:
 ## var doc = implementation.createDocument (null, null, null);
@@ -5363,16 +5363,15 @@ sub _tree_construction_main ($) {
     }
 
     ## "in body" insertion mode
-  my $in_body = sub {
     if ($token->{type} eq 'start tag') {
       if ($token->{tag_name} eq 'script') {
         ## NOTE: This is an "as if in head" code clone
         $script_start_tag->($insert);
-        return;
+        redo B;
       } elsif ($token->{tag_name} eq 'style') {
         ## NOTE: This is an "as if in head" code clone
         $parse_rcdata->(CDATA_CONTENT_MODEL, $insert);
-        return;
+        redo B;
       } elsif ({
                 base => 1, link => 1,
                }->{$token->{tag_name}}) {
@@ -5395,7 +5394,7 @@ sub _tree_construction_main ($) {
   
         pop @{$self->{open_elements}}; ## ISSUE: This step is missing in the spec.
         $token = $self->_get_next_token;
-        return;
+        redo B;
       } elsif ($token->{tag_name} eq 'meta') {
         ## NOTE: This is an "as if in head" code clone, only "-t" differs
         
@@ -5434,7 +5433,7 @@ sub _tree_construction_main ($) {
         }
 
         $token = $self->_get_next_token;
-        return;
+        redo B;
       } elsif ($token->{tag_name} eq 'title') {
         $self->{parse_error}-> (type => 'in body:title');
         ## NOTE: This is an "as if in head" code clone
@@ -5445,7 +5444,7 @@ sub _tree_construction_main ($) {
             $insert->($_[0]);
           }
         });
-        return;
+        redo B;
       } elsif ($token->{tag_name} eq 'body') {
         $self->{parse_error}-> (type => 'in body:body');
               
@@ -5463,7 +5462,7 @@ sub _tree_construction_main ($) {
           }
         }
         $token = $self->_get_next_token;
-        return;
+        redo B;
       } elsif ({
                 address => 1, blockquote => 1, center => 1, dir => 1, 
                 div => 1, dl => 1, fieldset => 1, listing => 1,
@@ -5475,7 +5474,7 @@ sub _tree_construction_main ($) {
           if ($_->[1] eq 'p') {
             unshift @{$self->{token}}, $token;
             $token = {type => 'end tag', tag_name => 'p'};
-            return;
+            redo B;
           } elsif ({
                     table => 1, caption => 1, td => 1, th => 1,
                     button => 1, marquee => 1, object => 1, html => 1,
@@ -5511,20 +5510,20 @@ sub _tree_construction_main ($) {
         } else {
           $token = $self->_get_next_token;
         }
-        return;
+        redo B;
       } elsif ($token->{tag_name} eq 'form') {
         if (defined $self->{form_element}) {
           $self->{parse_error}-> (type => 'in form:form');
           ## Ignore the token
           $token = $self->_get_next_token;
-          return;
+          redo B;
         } else {
           ## has a p element in scope
           INSCOPE: for (reverse @{$self->{open_elements}}) {
             if ($_->[1] eq 'p') {
               unshift @{$self->{token}}, $token;
               $token = {type => 'end tag', tag_name => 'p'};
-              return;
+              redo B;
             } elsif ({
                       table => 1, caption => 1, td => 1, th => 1,
                       button => 1, marquee => 1, object => 1, html => 1,
@@ -5551,7 +5550,7 @@ sub _tree_construction_main ($) {
   
           $self->{form_element} = $self->{open_elements}->[-1]->[0];
           $token = $self->_get_next_token;
-          return;
+          redo B;
         }
       } elsif ($token->{tag_name} eq 'li') {
         ## has a p element in scope
@@ -5559,7 +5558,7 @@ sub _tree_construction_main ($) {
           if ($_->[1] eq 'p') {
             unshift @{$self->{token}}, $token;
             $token = {type => 'end tag', tag_name => 'p'};
-            return;
+            redo B;
           } elsif ({
                     table => 1, caption => 1, td => 1, th => 1,
                     button => 1, marquee => 1, object => 1, html => 1,
@@ -5614,14 +5613,14 @@ sub _tree_construction_main ($) {
     }
   
         $token = $self->_get_next_token;
-        return;
+        redo B;
       } elsif ($token->{tag_name} eq 'dd' or $token->{tag_name} eq 'dt') {
         ## has a p element in scope
         INSCOPE: for (reverse @{$self->{open_elements}}) {
           if ($_->[1] eq 'p') {
             unshift @{$self->{token}}, $token;
             $token = {type => 'end tag', tag_name => 'p'};
-            return;
+            redo B;
           } elsif ({
                     table => 1, caption => 1, td => 1, th => 1,
                     button => 1, marquee => 1, object => 1, html => 1,
@@ -5676,14 +5675,14 @@ sub _tree_construction_main ($) {
     }
   
         $token = $self->_get_next_token;
-        return;
+        redo B;
       } elsif ($token->{tag_name} eq 'plaintext') {
         ## has a p element in scope
         INSCOPE: for (reverse @{$self->{open_elements}}) {
           if ($_->[1] eq 'p') {
             unshift @{$self->{token}}, $token;
             $token = {type => 'end tag', tag_name => 'p'};
-            return;
+            redo B;
           } elsif ({
                     table => 1, caption => 1, td => 1, th => 1,
                     button => 1, marquee => 1, object => 1, html => 1,
@@ -5712,7 +5711,7 @@ sub _tree_construction_main ($) {
         $self->{content_model} = PLAINTEXT_CONTENT_MODEL;
           
         $token = $self->_get_next_token;
-        return;
+        redo B;
       } elsif ({
                 h1 => 1, h2 => 1, h3 => 1, h4 => 1, h5 => 1, h6 => 1,
                }->{$token->{tag_name}}) {
@@ -5722,7 +5721,7 @@ sub _tree_construction_main ($) {
           if ($node->[1] eq 'p') {
             unshift @{$self->{token}}, $token;
             $token = {type => 'end tag', tag_name => 'p'};
-            return;
+            redo B;
           } elsif ({
                     table => 1, caption => 1, td => 1, th => 1,
                     button => 1, marquee => 1, object => 1, html => 1,
@@ -5772,7 +5771,7 @@ sub _tree_construction_main ($) {
   
           
         $token = $self->_get_next_token;
-        return;
+        redo B;
       } elsif ($token->{tag_name} eq 'a') {
         AFE: for my $i (reverse 0..$#$active_formatting_elements) {
           my $node = $active_formatting_elements->[$i];
@@ -5822,7 +5821,7 @@ sub _tree_construction_main ($) {
         push @$active_formatting_elements, $self->{open_elements}->[-1];
 
         $token = $self->_get_next_token;
-        return;
+        redo B;
       } elsif ({
                 b => 1, big => 1, em => 1, font => 1, i => 1,
                 s => 1, small => 1, strile => 1, 
@@ -5849,7 +5848,7 @@ sub _tree_construction_main ($) {
         push @$active_formatting_elements, $self->{open_elements}->[-1];
         
         $token = $self->_get_next_token;
-        return;
+        redo B;
       } elsif ($token->{tag_name} eq 'nobr') {
         $reconstruct_active_formatting_elements->($insert_to_current);
 
@@ -5860,7 +5859,7 @@ sub _tree_construction_main ($) {
             $self->{parse_error}-> (type => 'not closed:nobr');
             unshift @{$self->{token}}, $token;
             $token = {type => 'end tag', tag_name => 'nobr'};
-            return;
+            redo B;
           } elsif ({
                     table => 1, caption => 1, td => 1, th => 1,
                     button => 1, marquee => 1, object => 1, html => 1,
@@ -5888,7 +5887,7 @@ sub _tree_construction_main ($) {
         push @$active_formatting_elements, $self->{open_elements}->[-1];
         
         $token = $self->_get_next_token;
-        return;
+        redo B;
       } elsif ($token->{tag_name} eq 'button') {
         ## has a button element in scope
         INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
@@ -5897,7 +5896,7 @@ sub _tree_construction_main ($) {
             $self->{parse_error}-> (type => 'in button:button');
             unshift @{$self->{token}}, $token;
             $token = {type => 'end tag', tag_name => 'button'};
-            return;
+            redo B;
           } elsif ({
                     table => 1, caption => 1, td => 1, th => 1,
                     button => 1, marquee => 1, object => 1, html => 1,
@@ -5927,7 +5926,7 @@ sub _tree_construction_main ($) {
         push @$active_formatting_elements, ['#marker', ''];
 
         $token = $self->_get_next_token;
-        return;
+        redo B;
       } elsif ($token->{tag_name} eq 'marquee' or 
                $token->{tag_name} eq 'object') {
         $reconstruct_active_formatting_elements->($insert_to_current);
@@ -5951,18 +5950,18 @@ sub _tree_construction_main ($) {
         push @$active_formatting_elements, ['#marker', ''];
         
         $token = $self->_get_next_token;
-        return;
+        redo B;
       } elsif ($token->{tag_name} eq 'xmp') {
         $reconstruct_active_formatting_elements->($insert_to_current);
         $parse_rcdata->(CDATA_CONTENT_MODEL, $insert);
-        return;
+        redo B;
       } elsif ($token->{tag_name} eq 'table') {
         ## has a p element in scope
         INSCOPE: for (reverse @{$self->{open_elements}}) {
           if ($_->[1] eq 'p') {
             unshift @{$self->{token}}, $token;
             $token = {type => 'end tag', tag_name => 'p'};
-            return;
+            redo B;
           } elsif ({
                     table => 1, caption => 1, td => 1, th => 1,
                     button => 1, marquee => 1, object => 1, html => 1,
@@ -5991,7 +5990,7 @@ sub _tree_construction_main ($) {
         $self->{insertion_mode} = 'in table';
           
         $token = $self->_get_next_token;
-        return;
+        redo B;
       } elsif ({
                 area => 1, basefont => 1, bgsound => 1, br => 1,
                 embed => 1, img => 1, param => 1, spacer => 1, wbr => 1,
@@ -6024,14 +6023,14 @@ sub _tree_construction_main ($) {
         pop @{$self->{open_elements}};
         
         $token = $self->_get_next_token;
-        return;
+        redo B;
       } elsif ($token->{tag_name} eq 'hr') {
         ## has a p element in scope
         INSCOPE: for (reverse @{$self->{open_elements}}) {
           if ($_->[1] eq 'p') {
             unshift @{$self->{token}}, $token;
             $token = {type => 'end tag', tag_name => 'p'};
-            return;
+            redo B;
           } elsif ({
                     table => 1, caption => 1, td => 1, th => 1,
                     button => 1, marquee => 1, object => 1, html => 1,
@@ -6059,7 +6058,7 @@ sub _tree_construction_main ($) {
         pop @{$self->{open_elements}};
           
         $token = $self->_get_next_token;
-        return;
+        redo B;
       } elsif ($token->{tag_name} eq 'input') {
         $reconstruct_active_formatting_elements->($insert_to_current);
         
@@ -6083,14 +6082,14 @@ sub _tree_construction_main ($) {
         pop @{$self->{open_elements}};
         
         $token = $self->_get_next_token;
-        return;
+        redo B;
       } elsif ($token->{tag_name} eq 'isindex') {
         $self->{parse_error}-> (type => 'isindex');
         
         if (defined $self->{form_element}) {
           ## Ignore the token
           $token = $self->_get_next_token;
-          return;
+          redo B;
         } else {
           my $at = $token->{attributes};
           my $form_attrs;
@@ -6122,7 +6121,7 @@ sub _tree_construction_main ($) {
                         {type => 'end tag', tag_name => 'form'};
           $token = shift @tokens;
           unshift @{$self->{token}}, (@tokens);
-          return;
+          redo B;
         }
       } elsif ($token->{tag_name} eq 'textarea') {
         my $tag_name = $token->{tag_name};
@@ -6168,7 +6167,7 @@ sub _tree_construction_main ($) {
           $self->{parse_error}-> (type => 'in RCDATA:#'.$token->{type});
         }
         $token = $self->_get_next_token;
-        return;
+        redo B;
       } elsif ({
                 iframe => 1,
                 noembed => 1,
@@ -6177,7 +6176,7 @@ sub _tree_construction_main ($) {
                }->{$token->{tag_name}}) {
         ## NOTE: There are two "as if in body" code clones.
         $parse_rcdata->(CDATA_CONTENT_MODEL, $insert);
-        return;
+        redo B;
       } elsif ($token->{tag_name} eq 'select') {
         $reconstruct_active_formatting_elements->($insert_to_current);
         
@@ -6200,7 +6199,7 @@ sub _tree_construction_main ($) {
         
         $self->{insertion_mode} = 'in select';
         $token = $self->_get_next_token;
-        return;
+        redo B;
       } elsif ({
                 caption => 1, col => 1, colgroup => 1, frame => 1,
                 frameset => 1, head => 1, option => 1, optgroup => 1,
@@ -6210,7 +6209,7 @@ sub _tree_construction_main ($) {
         $self->{parse_error}-> (type => 'in body:'.$token->{tag_name});
         ## Ignore the token
         $token = $self->_get_next_token;
-        return;
+        redo B;
         
         ## ISSUE: An issue on HTML5 new elements in the spec.
       } else {
@@ -6234,7 +6233,7 @@ sub _tree_construction_main ($) {
   
         
         $token = $self->_get_next_token;
-        return;
+        redo B;
       }
     } elsif ($token->{type} eq 'end tag') {
       if ($token->{tag_name} eq 'body') {
@@ -6252,12 +6251,12 @@ sub _tree_construction_main ($) {
 
           $self->{insertion_mode} = 'after body';
           $token = $self->_get_next_token;
-          return;
+          redo B;
         } else {
           $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
           ## Ignore the token
           $token = $self->_get_next_token;
-          return;
+          redo B;
         }
       } elsif ($token->{tag_name} eq 'html') {
         if (@{$self->{open_elements}} > 1 and $self->{open_elements}->[1]->[1] eq 'body') {
@@ -6267,12 +6266,12 @@ sub _tree_construction_main ($) {
           }
           $self->{insertion_mode} = 'after body';
           ## reprocess
-          return;
+          redo B;
         } else {
           $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
           ## Ignore the token
           $token = $self->_get_next_token;
-          return;
+          redo B;
         }
       } elsif ({
                 address => 1, blockquote => 1, center => 1, dir => 1,
@@ -6299,7 +6298,7 @@ sub _tree_construction_main ($) {
               unshift @{$self->{token}}, $token;
               $token = {type => 'end tag',
                         tag_name => $self->{open_elements}->[-1]->[1]}; # MUST
-              return;
+              redo B;
             }
             $i = $_;
             last INSCOPE unless $token->{tag_name} eq 'p';
@@ -6335,7 +6334,7 @@ sub _tree_construction_main ($) {
             button => 1, marquee => 1, object => 1,
           }->{$token->{tag_name}};
         $token = $self->_get_next_token;
-        return;
+        redo B;
       } elsif ($token->{tag_name} eq 'form') {
         ## has an element in scope
         INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
@@ -6350,7 +6349,7 @@ sub _tree_construction_main ($) {
               unshift @{$self->{token}}, $token;
               $token = {type => 'end tag',
                         tag_name => $self->{open_elements}->[-1]->[1]}; # MUST
-              return;
+              redo B;
             }
             last INSCOPE;
           } elsif ({
@@ -6369,7 +6368,7 @@ sub _tree_construction_main ($) {
 
         undef $self->{form_element};
         $token = $self->_get_next_token;
-        return;
+        redo B;
       } elsif ({
                 h1 => 1, h2 => 1, h3 => 1, h4 => 1, h5 => 1, h6 => 1,
                }->{$token->{tag_name}}) {
@@ -6389,7 +6388,7 @@ sub _tree_construction_main ($) {
               unshift @{$self->{token}}, $token;
               $token = {type => 'end tag',
                         tag_name => $self->{open_elements}->[-1]->[1]}; # MUST
-              return;
+              redo B;
             }
             $i = $_;
             last INSCOPE;
@@ -6407,7 +6406,7 @@ sub _tree_construction_main ($) {
         
         splice @{$self->{open_elements}}, $i if defined $i;
         $token = $self->_get_next_token;
-        return;
+        redo B;
       } elsif ({
                 a => 1,
                 b => 1, big => 1, em => 1, font => 1, i => 1,
@@ -6415,7 +6414,7 @@ sub _tree_construction_main ($) {
                 strong => 1, tt => 1, u => 1,
                }->{$token->{tag_name}}) {
         $formatting_end_tag->($token->{tag_name});
-        return;
+        redo B;
       } elsif ($token->{tag_name} eq 'br') {
         $self->{parse_error}-> (type => 'unmatched end tag:br');
 
@@ -6431,7 +6430,7 @@ sub _tree_construction_main ($) {
         
         ## Ignore the token.
         $token = $self->_get_next_token;
-        return;
+        redo B;
       } elsif ({
                 caption => 1, col => 1, colgroup => 1, frame => 1,
                 frameset => 1, head => 1, option => 1, optgroup => 1,
@@ -6447,7 +6446,7 @@ sub _tree_construction_main ($) {
         $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
         ## Ignore the token
         $token = $self->_get_next_token;
-        return;
+        redo B;
         
         ## ISSUE: Issue on HTML5 new elements in spec
         
@@ -6469,7 +6468,7 @@ sub _tree_construction_main ($) {
               unshift @{$self->{token}}, $token;
               $token = {type => 'end tag',
                         tag_name => $self->{open_elements}->[-1]->[1]}; # MUST
-              return;
+              redo B;
             }
         
             ## Step 2
@@ -6502,11 +6501,9 @@ sub _tree_construction_main ($) {
           ## Step 5;
           redo S2;
         } # S2
-	return;
+	redo B;
       }
     }
-  }; # $in_body
-    $in_body->($insert_to_current);
     redo B;
   } # B
 
@@ -6779,4 +6776,4 @@ sub get_inner_html ($$$) {
 } # get_inner_html
 
 1;
-# $Date: 2007/07/21 12:27:22 $
+# $Date: 2007/07/21 12:37:57 $
