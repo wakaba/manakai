@@ -265,6 +265,44 @@ unmacthed noscript end tag
 |         "bbb"
 |       "ccc"
 
+## when script is disabled
+#data
+<!DOCTYPE HTML><head><noscript><noscript>
+#errors
+<noscript> in noscript
+no </noscript>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <noscript>
+
+## when script is disabled
+#data
+<!DOCTYPE HTML><head><noscript><noscript> 
+#errors
+<noscript> in noscript
+no </noscript>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <noscript>
+|       " "
+
+## when script is disabled
+#data
+<!DOCTYPE HTML><head><noscript> <noscript> 
+#errors
+<noscript> in noscript
+no </noscript>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|     <noscript>
+|       "  "
+
 #data
 <!DOCTYPE HTML><iframe>
 #errors
@@ -1504,3 +1542,185 @@ unmatched </frameset>
 | <html>
 |   <head>
 |   <frameset>
+
+#data
+<!DOCTYPE HTML><table><caption>test</caption>a</table>
+#errors
+a in <table>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     "a"
+|     <table>
+|       <caption>
+|         "test"
+
+#data
+<!DOCTYPE HTML><table><caption>test</table>a
+#errors
+no </caption>
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <caption>
+|         "test"
+|     "a"
+
+#data
+<!DOCTYPE HTML><table><caption>test</body>a
+#errors
+unmatched </body>
+unexpected end of file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <caption>
+|         "testa"
+
+#data
+<!DOCTYPE HTML><table><caption>test</col>a
+#errors
+unmatched </col>
+unexpected end of file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <caption>
+|         "testa"
+
+#data
+<!DOCTYPE HTML><table><caption>test</colgroup>a
+#errors
+unmatched </colgroup>
+unexpected end of file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <caption>
+|         "testa"
+
+#data
+<!DOCTYPE HTML><table><caption>test</html>a
+#errors
+unmatched </html>
+unexpected end of file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <caption>
+|         "testa"
+
+#data
+<!DOCTYPE HTML><table><caption>test</html> 
+#errors
+unmatched </html>
+unexpected end of file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <caption>
+|         "test "
+
+#data
+<!DOCTYPE HTML><table><caption>test</tbody>a
+#errors
+unmatched </tbody>
+unexpected end of file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <caption>
+|         "testa"
+
+#data
+<!DOCTYPE HTML><table><caption>test</thead>a
+#errors
+unmatched </thead>
+unexpected end of file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <caption>
+|         "testa"
+
+#data
+<!DOCTYPE HTML><table><caption>test</tfoot>a
+#errors
+unmatched </tfoot>
+unexpected end of file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <caption>
+|         "testa"
+
+#data
+<!DOCTYPE HTML><table><caption>test</tr>a
+#errors
+unmatched </tr>
+unexpected end of file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <caption>
+|         "testa"
+
+#data
+<!DOCTYPE HTML><table><caption>test</td>a
+#errors
+unmatched </td>
+unexpected end of file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <caption>
+|         "testa"
+
+#data
+<!DOCTYPE HTML><table><caption>test</th>a
+#errors
+unmatched </th>
+unexpected end of file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <caption>
+|         "testa"

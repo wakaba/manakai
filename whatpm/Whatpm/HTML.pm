@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.41 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.42 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## ISSUE:
 ## var doc = implementation.createDocument (null, null, null);
@@ -4744,6 +4744,7 @@ sub _tree_construction_main ($) {
               } elsif ($self->{insertion_mode} eq 'in head noscript') {
                 $self->{parse_error}-> (type => 'in noscript:noscript');
                 ## Ignore the token
+                $token = $self->_get_next_token;
                 redo B;
               } else {
                 #
@@ -5295,6 +5296,7 @@ sub _tree_construction_main ($) {
                      }->{$token->{tag_name}}) {
               $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
               ## Ignore the token
+              $token = $self->_get_next_token;
               redo B;
             } else {
               #
@@ -6839,4 +6841,4 @@ sub get_inner_html ($$$) {
 } # get_inner_html
 
 1;
-# $Date: 2007/07/21 05:36:50 $
+# $Date: 2007/07/21 06:04:07 $
