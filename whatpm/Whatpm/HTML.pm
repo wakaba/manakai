@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.49 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.50 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## ISSUE:
 ## var doc = implementation.createDocument (null, null, null);
@@ -5367,98 +5367,101 @@ sub _tree_construction_main ($) {
               redo B;
             } elsif ({
                       caption => 1, col => 1, colgroup => 1,
-                      tbody => 1, tfoot => 1, thead => 1, tr => 1,
-                     }->{$token->{tag_name}} and
-                     $self->{insertion_mode} eq 'in row') {
-              ## As if </tr>
-              ## have an element in table scope
-              my $i;
-              INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
-                my $node = $self->{open_elements}->[$_];
-                if ($node->[1] eq 'tr') {
-                  $i = $_;
-                  last INSCOPE;
-                } elsif ({
-                          table => 1, html => 1,
-                         }->{$node->[1]}) {
-                  last INSCOPE;
-                }
-              } # INSCOPE
-              unless (defined $i) {
-                $self->{parse_error}-> (type => 'unmacthed end tag:'.$token->{tag_name});
-                ## Ignore the token
-                $token = $self->_get_next_token;
-                redo B;
-              }
-
-              ## Clear back to table row context
-              while (not {
-                tr => 1, html => 1,
-              }->{$self->{open_elements}->[-1]->[1]}) {
-                $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
-                pop @{$self->{open_elements}};
-              }
-
-              pop @{$self->{open_elements}}; # tr
-              $self->{insertion_mode} = 'in table body';
-              ## reprocess
-              redo B;
-            } elsif ({
-                      caption => 1, col => 1, colgroup => 1,
                       tbody => 1, tfoot => 1, thead => 1,
-                     }->{$token->{tag_name}} and
-                     $self->{insertion_mode} eq 'in table body') {
-              ## have an element in table scope
-              my $i;
-              INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
-                my $node = $self->{open_elements}->[$_];
-                if ({
-                     tbody => 1, thead => 1, tfoot => 1,
-                    }->{$node->[1]}) {
-                  $i = $_;
-                  last INSCOPE;
-                } elsif ({
-                          table => 1, html => 1,
-                         }->{$node->[1]}) {
-                  last INSCOPE;
+                      tr => 1, # $self->{insertion_mode} eq 'in row'
+                     }->{$token->{tag_name}}) {
+              if ($self->{insertion_mode} eq 'in row') {
+                ## As if </tr>
+                ## have an element in table scope
+                my $i;
+                INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
+                  my $node = $self->{open_elements}->[$_];
+                  if ($node->[1] eq 'tr') {
+                    $i = $_;
+                    last INSCOPE;
+                  } elsif ({
+                            table => 1, html => 1,
+                           }->{$node->[1]}) {
+                    last INSCOPE;
+                  }
+                } # INSCOPE
+                unless (defined $i) {
+                  $self->{parse_error}-> (type => 'unmacthed end tag:'.$token->{tag_name});
+                  ## Ignore the token
+                  $token = $self->_get_next_token;
+                  redo B;
                 }
-              } # INSCOPE
-              unless (defined $i) {
-                $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
-                ## Ignore the token
-                $token = $self->_get_next_token;
-                redo B;
+                
+                ## Clear back to table row context
+                while (not {
+                  tr => 1, html => 1,
+                }->{$self->{open_elements}->[-1]->[1]}) {
+                  $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
+                  pop @{$self->{open_elements}};
+                }
+                
+                pop @{$self->{open_elements}}; # tr
+                $self->{insertion_mode} = 'in table body';
+                if ($token->{tag_name} eq 'tr') {
+                  ## reprocess
+                  redo B;
+                } else {
+                  ## reprocess in the "in table body" insertion mode...
+                }
               }
 
-              ## Clear back to table body context
-              while (not {
-                tbody => 1, tfoot => 1, thead => 1, html => 1,
-              }->{$self->{open_elements}->[-1]->[1]}) {
-                $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
+              if ($self->{insertion_mode} eq 'in table body') {
+                ## have an element in table scope
+                my $i;
+                INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
+                  my $node = $self->{open_elements}->[$_];
+                  if ({
+                       tbody => 1, thead => 1, tfoot => 1,
+                      }->{$node->[1]}) {
+                    $i = $_;
+                    last INSCOPE;
+                  } elsif ({
+                            table => 1, html => 1,
+                           }->{$node->[1]}) {
+                    last INSCOPE;
+                  }
+                } # INSCOPE
+                unless (defined $i) {
+                  $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
+                  ## Ignore the token
+                  $token = $self->_get_next_token;
+                  redo B;
+                }
+
+                ## Clear back to table body context
+                while (not {
+                  tbody => 1, tfoot => 1, thead => 1, html => 1,
+                }->{$self->{open_elements}->[-1]->[1]}) {
+                  $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
+                  pop @{$self->{open_elements}};
+                }
+                
+                ## As if <{current node}>
+                ## have an element in table scope
+                ## true by definition
+                
+                ## Clear back to table body context
+                ## nop by definition
+                
                 pop @{$self->{open_elements}};
+                $self->{insertion_mode} = 'in table';
+                ## reprocess in "in table" insertion mode...
               }
 
-              ## As if <{current node}>
-              ## have an element in table scope
-              ## true by definition
-
-              ## Clear back to table body context
-              ## nop by definition
-
-              pop @{$self->{open_elements}};
-              $self->{insertion_mode} = 'in table';
-              ## reprocess
-              redo B;
-            } elsif ($token->{tag_name} eq 'col' and
-                     $self->{insertion_mode} eq 'in table') {
-              ## Clear back to table context
-              while ($self->{open_elements}->[-1]->[1] ne 'table' and
-                     $self->{open_elements}->[-1]->[1] ne 'html') {
-                $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
-                pop @{$self->{open_elements}};
-              }
-
-              
+              if ($token->{tag_name} eq 'col') {
+                ## Clear back to table context
+                while ($self->{open_elements}->[-1]->[1] ne 'table' and
+                       $self->{open_elements}->[-1]->[1] ne 'html') {
+                  $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
+                  pop @{$self->{open_elements}};
+                }
+                
+                
     {
       my $el;
       
@@ -5469,26 +5472,25 @@ sub _tree_construction_main ($) {
       push @{$self->{open_elements}}, [$el, 'colgroup'];
     }
   
-              $self->{insertion_mode} = 'in column group';
-              ## reprocess
-              redo B;
-            } elsif ({
-                      caption => 1,
-                      colgroup => 1,
-                      tbody => 1, tfoot => 1, thead => 1,
-                     }->{$token->{tag_name}} and
-                    $self->{insertion_mode} eq 'in table') {
-              ## Clear back to table context
-              while ($self->{open_elements}->[-1]->[1] ne 'table' and
-                     $self->{open_elements}->[-1]->[1] ne 'html') {
-                $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
-                pop @{$self->{open_elements}};
-              }
-
-              push @$active_formatting_elements, ['#marker', '']
-                if $token->{tag_name} eq 'caption';
-
-              
+                $self->{insertion_mode} = 'in column group';
+                ## reprocess
+                redo B;
+              } elsif ({
+                        caption => 1,
+                        colgroup => 1,
+                        tbody => 1, tfoot => 1, thead => 1,
+                       }->{$token->{tag_name}}) {
+                ## Clear back to table context
+                while ($self->{open_elements}->[-1]->[1] ne 'table' and
+                       $self->{open_elements}->[-1]->[1] ne 'html') {
+                  $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
+                  pop @{$self->{open_elements}};
+                }
+                
+                push @$active_formatting_elements, ['#marker', '']
+                    if $token->{tag_name} eq 'caption';
+                
+                
     {
       my $el;
       
@@ -5504,15 +5506,18 @@ sub _tree_construction_main ($) {
       push @{$self->{open_elements}}, [$el, $token->{tag_name}];
     }
   
-              $self->{insertion_mode} = {
-                                 caption => 'in caption',
-                                 colgroup => 'in column group',
-                                 tbody => 'in table body',
-                                 tfoot => 'in table body',
-                                 thead => 'in table body',
-                                }->{$token->{tag_name}};
-              $token = $self->_get_next_token;
-              redo B;
+                $self->{insertion_mode} = {
+                                           caption => 'in caption',
+                                           colgroup => 'in column group',
+                                           tbody => 'in table body',
+                                           tfoot => 'in table body',
+                                           thead => 'in table body',
+                                          }->{$token->{tag_name}};
+                $token = $self->_get_next_token;
+                redo B;
+              } else {
+                die "$0: in table: <>: $token->{tag_name}";
+              }
             } elsif ($token->{tag_name} eq 'table') {
               ## NOTE: There are code clones for this "table in table"
               $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
@@ -5616,12 +5621,12 @@ sub _tree_construction_main ($) {
                     last INSCOPE;
                   }
                 } # INSCOPE
-                  unless (defined $i) {
-                    $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{type});
-                    ## Ignore the token
-                    $token = $self->_get_next_token;
-                    redo B;
-                  }
+                unless (defined $i) {
+                  $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{type});
+                  ## Ignore the token
+                  $token = $self->_get_next_token;
+                  redo B;
+                }
                 
                 ## Clear back to table row context
                 while (not {
@@ -6601,4 +6606,4 @@ sub get_inner_html ($$$) {
 } # get_inner_html
 
 1;
-# $Date: 2007/07/21 09:12:41 $
+# $Date: 2007/07/21 09:54:45 $
