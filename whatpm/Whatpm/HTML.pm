@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.50 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.51 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## ISSUE:
 ## var doc = implementation.createDocument (null, null, null);
@@ -4572,11 +4572,6 @@ sub _tree_construction_main ($) {
             $self->{insertion_mode} = 'in head';
             if ($token->{tag_name} eq 'head') {
               $token = $self->_get_next_token;
-            #} elsif ({
-            #          base => 1, link => 1, meta => 1,
-            #          script => 1, style => 1, title => 1,
-            #         }->{$token->{tag_name}}) {
-            #  ## reprocess
             } else {
               ## reprocess
             }
@@ -4617,11 +4612,76 @@ sub _tree_construction_main ($) {
               }
             }
             
-            #
+            if ($self->{insertion_mode} eq 'in head noscript') {
+              ## As if </noscript>
+              pop @{$self->{open_elements}};
+              $self->{parse_error}-> (type => 'in noscript:#character');
+              
+              ## Reprocess in the "in head" insertion mode...
+              ## As if </head>
+              pop @{$self->{open_elements}};
+
+              ## Reprocess in the "after head" insertion mode...
+            } elsif ($self->{insertion_mode} eq 'in head') {
+              pop @{$self->{open_elements}};
+
+              ## Reprocess in the "after head" insertion mode...
+            }
+
+            ## 'after head' insertion mode
+            ## As if <body>
+            
+    {
+      my $el;
+      
+      $el = $self->{document}->create_element_ns
+        (q<http://www.w3.org/1999/xhtml>, [undef,  'body']);
+    
+      $self->{open_elements}->[-1]->[0]->append_child ($el);
+      push @{$self->{open_elements}}, [$el, 'body'];
+    }
+  
+            $self->{insertion_mode} = 'in body';
+            ## reprocess
+            redo B;
           } elsif ($token->{type} eq 'start tag') {
-            if ({base => ($self->{insertion_mode} eq 'in head' or
-                          $self->{insertion_mode} eq 'after head'),
-                 link => 1}->{$token->{tag_name}}) {
+            if ($token->{tag_name} eq 'base') {
+              if ($self->{insertion_mode} eq 'in head noscript') {
+                ## As if </noscript>
+                pop @{$self->{open_elements}};
+                $self->{parse_error}-> (type => 'in noscript:base');
+              
+                $self->{insertion_mode} = 'in head';
+                ## Reprocess in the "in head" insertion mode...
+              }
+
+              ## NOTE: There is a "as if in head" code clone.
+              if ($self->{insertion_mode} eq 'after head') {
+                $self->{parse_error}-> (type => 'after head:'.$token->{tag_name});
+                push @{$self->{open_elements}}, [$self->{head_element}, 'head'];
+              }
+              
+    {
+      my $el;
+      
+      $el = $self->{document}->create_element_ns
+        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
+    
+        for my $attr_name (keys %{  $token->{attributes}}) {
+          $el->set_attribute_ns (undef, [undef, $attr_name],
+                                  $token->{attributes} ->{$attr_name}->{value});
+        }
+      
+      $self->{open_elements}->[-1]->[0]->append_child ($el);
+      push @{$self->{open_elements}}, [$el, $token->{tag_name}];
+    }
+  
+              pop @{$self->{open_elements}}; ## ISSUE: This step is missing in the spec.
+              pop @{$self->{open_elements}}
+                  if $self->{insertion_mode} eq 'after head';
+              $token = $self->_get_next_token;
+              redo B;
+            } elsif ($token->{tag_name} eq 'link') {
               ## NOTE: There is a "as if in head" code clone.
               if ($self->{insertion_mode} eq 'after head') {
                 $self->{parse_error}-> (type => 'after head:'.$token->{tag_name});
@@ -4694,13 +4754,20 @@ sub _tree_construction_main ($) {
                   if $self->{insertion_mode} eq 'after head';
               $token = $self->_get_next_token;
               redo B;
-            } elsif ($token->{tag_name} eq 'title' and
-                     $self->{insertion_mode} eq 'in head') {
-              ## NOTE: There is a "as if in head" code clone.
-              if ($self->{insertion_mode} eq 'after head') {
+            } elsif ($token->{tag_name} eq 'title') {
+              if ($self->{insertion_mode} eq 'in head noscript') {
+                ## As if </noscript>
+                pop @{$self->{open_elements}};
+                $self->{parse_error}-> (type => 'in noscript:title');
+              
+                $self->{insertion_mode} = 'in head';
+                ## Reprocess in the "in head" insertion mode...
+              } elsif ($self->{insertion_mode} eq 'after head') {
                 $self->{parse_error}-> (type => 'after head:'.$token->{tag_name});
                 push @{$self->{open_elements}}, [$self->{head_element}, 'head'];
               }
+
+              ## NOTE: There is a "as if in head" code clone.
               my $parent = defined $self->{head_element} ? $self->{head_element}
                   : $self->{open_elements}->[-1]->[0];
               $parse_rcdata->(RCDATA_CONTENT_MODEL,
@@ -4750,52 +4817,58 @@ sub _tree_construction_main ($) {
               } else {
                 #
               }
-            } elsif ($token->{tag_name} eq 'head' and
-                     $self->{insertion_mode} ne 'after head') {
-              $self->{parse_error}-> (type => 'in head:head'); # or in head noscript
-              ## Ignore the token
-              $token = $self->_get_next_token;
-              redo B;
-            } elsif ($self->{insertion_mode} ne 'in head noscript' and
-                     $token->{tag_name} eq 'script') {
-              if ($self->{insertion_mode} eq 'after head') {
+            } elsif ($token->{tag_name} eq 'head') {
+              if ($self->{insertion_mode} ne 'after head') {
+                $self->{parse_error}-> (type => 'in head:head'); # or in head noscript
+                ## Ignore the token
+                $token = $self->_get_next_token;
+                redo B;
+              } else {
+                #
+              }
+            } elsif ($token->{tag_name} eq 'script') {
+              if ($self->{insertion_mode} eq 'in head noscript') {
+                ## As if </noscript>
+                pop @{$self->{open_elements}};
+                $self->{parse_error}-> (type => 'in noscript:script');
+              
+                $self->{insertion_mode} = 'in head';
+                ## Reprocess in the "in head" insertion mode...
+              } elsif ($self->{insertion_mode} eq 'after head') {
                 $self->{parse_error}-> (type => 'after head:'.$token->{tag_name});
                 push @{$self->{open_elements}}, [$self->{head_element}, 'head'];
               }
+
               ## NOTE: There is a "as if in head" code clone.
               $script_start_tag->($insert_to_current);
               pop @{$self->{open_elements}}
                   if $self->{insertion_mode} eq 'after head';
               redo B;
-            } elsif ($self->{insertion_mode} eq 'after head' and
-                     $token->{tag_name} eq 'body') {
-              
-    {
-      my $el;
-      
-      $el = $self->{document}->create_element_ns
-        (q<http://www.w3.org/1999/xhtml>, [undef,  'body']);
-    
-        for my $attr_name (keys %{  $token->{attributes}}) {
-          $el->set_attribute_ns (undef, [undef, $attr_name],
-                                  $token->{attributes} ->{$attr_name}->{value});
-        }
-      
-      $self->{open_elements}->[-1]->[0]->append_child ($el);
-      push @{$self->{open_elements}}, [$el, 'body'];
-    }
-  
-              $self->{insertion_mode} = 'in body';
-              $token = $self->_get_next_token;
-              redo B;
-            } elsif ($self->{insertion_mode} eq 'after head' and
+            } elsif ($token->{tag_name} eq 'body' or
                      $token->{tag_name} eq 'frameset') {
+              if ($self->{insertion_mode} eq 'in head noscript') {
+                ## As if </noscript>
+                pop @{$self->{open_elements}};
+                $self->{parse_error}-> (type => 'in noscript:'.$token->{tag_name});
+                
+                ## Reprocess in the "in head" insertion mode...
+                ## As if </head>
+                pop @{$self->{open_elements}};
+                
+                ## Reprocess in the "after head" insertion mode...
+              } elsif ($self->{insertion_mode} eq 'in head') {
+                pop @{$self->{open_elements}};
+                
+                ## Reprocess in the "after head" insertion mode...
+              }
+
+              ## "after head" insertion mode
               
     {
       my $el;
       
       $el = $self->{document}->create_element_ns
-        (q<http://www.w3.org/1999/xhtml>, [undef,  'frameset']);
+        (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
     
         for my $attr_name (keys %{  $token->{attributes}}) {
           $el->set_attribute_ns (undef, [undef, $attr_name],
@@ -4803,60 +4876,35 @@ sub _tree_construction_main ($) {
         }
       
       $self->{open_elements}->[-1]->[0]->append_child ($el);
-      push @{$self->{open_elements}}, [$el, 'frameset'];
+      push @{$self->{open_elements}}, [$el, $token->{tag_name}];
     }
   
-              $self->{insertion_mode} = 'in frameset';
+              $self->{insertion_mode} = 'in '.$token->{tag_name};
               $token = $self->_get_next_token;
               redo B;
             } else {
               #
             }
-          } elsif ($token->{type} eq 'end tag') {
-            if ($self->{insertion_mode} eq 'in head' and
-                $token->{tag_name} eq 'head') {
-              pop @{$self->{open_elements}};
-              $self->{insertion_mode} = 'after head';
-              $token = $self->_get_next_token;
-              redo B;
-            } elsif ($self->{insertion_mode} eq 'in head noscript' and
-                $token->{tag_name} eq 'noscript') {
-              pop @{$self->{open_elements}};
-              $self->{insertion_mode} = 'in head';
-              $token = $self->_get_next_token;
-              redo B;
-            } elsif ($self->{insertion_mode} eq 'in head' and
-                     {
-                      body => 1, html => 1,
-                      p => 1, br => 1,
-                     }->{$token->{tag_name}}) {
-              #
-            } elsif ($self->{insertion_mode} eq 'in head noscript' and
-                     {
-                      p => 1, br => 1,
-                     }->{$token->{tag_name}}) {
-              #
-            } elsif ($self->{insertion_mode} ne 'after head') {
-              $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
-              ## Ignore the token
-              $token = $self->_get_next_token;
-              redo B;
-            } else {
-              #
-            }
-          } else {
-            #
-          }
 
-          ## As if </head> or </noscript> or <body>
-          if ($self->{insertion_mode} eq 'in head') {
-            pop @{$self->{open_elements}};
-            $self->{insertion_mode} = 'after head';
-          } elsif ($self->{insertion_mode} eq 'in head noscript') {
-            pop @{$self->{open_elements}};
-            $self->{parse_error}-> (type => 'in noscript:'.(defined $token->{tag_name} ? ($token->{type} eq 'end tag' ? '/' : '') . $token->{tag_name} : '#' . $token->{type}));
-            $self->{insertion_mode} = 'in head';
-          } else { # 'after head'
+            if ($self->{insertion_mode} eq 'in head noscript') {
+              ## As if </noscript>
+              pop @{$self->{open_elements}};
+              $self->{parse_error}-> (type => 'in noscript:/'.$token->{tag_name});
+              
+              ## Reprocess in the "in head" insertion mode...
+              ## As if </head>
+              pop @{$self->{open_elements}};
+
+              ## Reprocess in the "after head" insertion mode...
+            } elsif ($self->{insertion_mode} eq 'in head') {
+              ## As if </head>
+              pop @{$self->{open_elements}};
+
+              ## Reprocess in the "after head" insertion mode...
+            }
+
+            ## "after head" insertion mode
+            ## As if <body>
             
     {
       my $el;
@@ -4869,9 +4917,98 @@ sub _tree_construction_main ($) {
     }
   
             $self->{insertion_mode} = 'in body';
+            ## reprocess
+            redo B;
+          } elsif ($token->{type} eq 'end tag') {
+            if ($token->{tag_name} eq 'head') {
+              if ($self->{insertion_mode} eq 'in head noscript') {
+                ## As if </noscript>
+                pop @{$self->{open_elements}};
+                $self->{parse_error}-> (type => 'in noscript:script');
+                
+                $self->{insertion_mode} = 'in head';
+                ## Reprocess in the "in head" insertion mode...
+              }
+              
+              if ($self->{insertion_mode} eq 'in head') {
+                pop @{$self->{open_elements}};
+                $self->{insertion_mode} = 'after head';
+                $token = $self->_get_next_token;
+                redo B;
+              } else {
+                #
+              }
+            } elsif ($token->{tag_name} eq 'noscript') {
+              if ($self->{insertion_mode} eq 'in head noscript') {
+                pop @{$self->{open_elements}};
+                $self->{insertion_mode} = 'in head';
+                $token = $self->_get_next_token;
+                redo B;
+              } else {
+                #
+              }
+            } elsif ({
+                      body => 1, html => 1,
+                     }->{$token->{tag_name}}) {
+              if ($self->{insertion_mode} eq 'in head noscript') {
+                $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
+                ## Ignore the token
+                $token = $self->_get_next_token;
+                redo B;
+              } else { # 'in head', 'after head'
+                #
+              }
+            } elsif ({
+                      p => 1, br => 1,
+                     }->{$token->{tag_name}}) {
+              #
+            } else {
+              if ($self->{insertion_mode} ne 'after head') {
+                $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
+                ## Ignore the token
+                $token = $self->_get_next_token;
+                redo B;
+              } else {
+                #
+              }
+            }
+
+            if ($self->{insertion_mode} eq 'in head noscript') {
+              ## As if </noscript>
+              pop @{$self->{open_elements}};
+              $self->{parse_error}-> (type => 'in noscript:/'.$token->{tag_name});
+              
+              ## Reprocess in the "in head" insertion mode...
+              ## As if </head>
+              pop @{$self->{open_elements}};
+
+              ## Reprocess in the "after head" insertion mode...
+            } elsif ($self->{insertion_mode} eq 'in head') {
+              ## As if </head>
+              pop @{$self->{open_elements}};
+
+              ## Reprocess in the "after head" insertion mode...
+            }
+
+            ## "after head" insertion mode
+            ## As if <body>
+            
+    {
+      my $el;
+      
+      $el = $self->{document}->create_element_ns
+        (q<http://www.w3.org/1999/xhtml>, [undef,  'body']);
+    
+      $self->{open_elements}->[-1]->[0]->append_child ($el);
+      push @{$self->{open_elements}}, [$el, 'body'];
+    }
+  
+            $self->{insertion_mode} = 'in body';
+            ## reprocess
+            redo B;
+          } else {
+            die "$0: $token->{type}: Unknown token type";
           }
-          ## reprocess
-          redo B;
 
           ## ISSUE: An issue in the spec.
         } elsif ($self->{insertion_mode} eq 'in body' or
@@ -6606,4 +6743,4 @@ sub get_inner_html ($$$) {
 } # get_inner_html
 
 1;
-# $Date: 2007/07/21 09:54:45 $
+# $Date: 2007/07/21 10:39:45 $
