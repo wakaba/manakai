@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.44 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.45 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## ISSUE:
 ## var doc = implementation.createDocument (null, null, null);
@@ -4138,6 +4138,7 @@ sub _tree_construction_main ($) {
                 noframes => 1,
                 noscript => 0, ## TODO: 1 if scripting is enabled
                }->{$token->{tag_name}}) {
+        ## NOTE: There are two "as if in body" code clones.
         $parse_rcdata->(CDATA_CONTENT_MODEL, $insert);
         return;
       } elsif ($token->{tag_name} eq 'select') {
@@ -6440,7 +6441,8 @@ sub _tree_construction_main ($) {
           $token = $self->_get_next_token;
           redo B;
         } elsif ($token->{tag_name} eq 'noframes') {
-          $in_body->($insert_to_current);
+          ## NOTE: As if in body.
+          $parse_rcdata->(CDATA_CONTENT_MODEL, $insert_to_current);
           redo B;
         } else {
           $self->{parse_error}-> (type => 'in frameset:'.$token->{tag_name});
@@ -6500,7 +6502,8 @@ sub _tree_construction_main ($) {
         die qq[$0: Character "$token->{data}"];
       } elsif ($token->{type} eq 'start tag') {
         if ($token->{tag_name} eq 'noframes') {
-          $in_body->($insert_to_current);
+          ## NOTE: As if in body.
+          $parse_rcdata->(CDATA_CONTENT_MODEL, $insert_to_current);
           redo B;
         } else {
           $self->{parse_error}-> (type => 'after frameset:'.$token->{tag_name});
@@ -6831,4 +6834,4 @@ sub get_inner_html ($$$) {
 } # get_inner_html
 
 1;
-# $Date: 2007/07/21 07:21:44 $
+# $Date: 2007/07/21 07:34:32 $

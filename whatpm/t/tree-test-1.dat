@@ -1467,6 +1467,83 @@ char after </frameset>
 |     " "
 
 #data
+<!DOCTYPE HTML><frameset></frameset><noframes>
+#errors
+unexpected end of file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <frameset>
+|   <noframes>
+
+#data
+<!DOCTYPE HTML><frameset></frameset><noframes></noframes>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <frameset>
+|   <noframes>
+
+#data
+<!DOCTYPE HTML><frameset></frameset><noframes>abcdefg
+#errors
+unexpected end of file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <frameset>
+|   <noframes>
+|     "abcdefg"
+
+#data
+<!DOCTYPE HTML><frameset></frameset><noframes>abcdefg</noframes>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <frameset>
+|   <noframes>
+|     "abcdefg"
+
+#data
+<!DOCTYPE HTML><frameset></frameset><noframes>aa<p>bb</noframes>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <frameset>
+|   <noframes>
+|     "aa<p>bb"
+
+#data
+<!DOCTYPE HTML><frameset></frameset><noframes><noframes></noframes>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <frameset>
+|   <noframes>
+|     "<noframes>"
+
+#data
+<!DOCTYPE HTML><frameset></frameset><noframes></noframe></noframes>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <frameset>
+|   <noframes>
+|     "</noframe>"
+
+#data
 </body></html><html a>
 #errors
 no <!DOCTYPE>
