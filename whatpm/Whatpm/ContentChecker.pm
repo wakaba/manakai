@@ -1908,6 +1908,8 @@ $Element->{$HTML_NS}->{dfn} = {
     } else {
       $self->{term}->{$term} = [$node];
     }
+## ISSUE: The HTML5 algorithm does not work with |ruby| unless |dfn|
+## has |title|.
 
     return ($sib, $ch);
   },
@@ -3142,4 +3144,4 @@ sub _check_get_children ($$$) {
 } # _check_get_children
 
 1;
-# $Date: 2007/07/17 14:26:48 $
+# $Date: 2007/07/21 04:55:20 $

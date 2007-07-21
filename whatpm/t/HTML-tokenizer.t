@@ -151,9 +151,9 @@ for my $file_name (grep {$_} split /\s+/, qq[
       my $expected_dump = Dumper ($test->{output});
       my $parser_dump = Dumper (\@token);
       ok $parser_dump, $expected_dump,
-        $test->{description} . ': ' . $test->{input};
+        $test->{description} . ': ' . Data::Dumper::qquote ($test->{input});
     }
   }
 }
 
-## $Date: 2007/07/16 07:48:19 $
+## $Date: 2007/07/21 04:55:20 $
