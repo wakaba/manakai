@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.46 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.47 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## ISSUE:
 ## var doc = implementation.createDocument (null, null, null);
@@ -2880,8 +2880,8 @@ sub _reset_insertion_mode ($) {
                       th => 'in cell',
                       tr => 'in row',
                       tbody => 'in table body',
-                      thead => 'in table head',
-                      tfoot => 'in table foot',
+                      thead => 'in table body',
+                      tfoot => 'in table body',
                       caption => 'in caption',
                       colgroup => 'in column group',
                       table => 'in table',
@@ -6834,4 +6834,4 @@ sub get_inner_html ($$$) {
 } # get_inner_html
 
 1;
-# $Date: 2007/07/21 08:11:47 $
+# $Date: 2007/07/21 08:17:43 $
