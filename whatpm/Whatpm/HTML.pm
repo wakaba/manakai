@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.40 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.41 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## ISSUE:
 ## var doc = implementation.createDocument (null, null, null);
@@ -150,12 +150,21 @@ sub new ($) {
   return $self;
 } # new
 
+sub CM_ENTITY () { 0b001 } # & markup in data
+sub CM_LIMITED_MARKUP () { 0b010 } # < markup in data (limited)
+sub CM_FULL_MARKUP () { 0b100 } # < markup in data (any)
+
+sub PLAINTEXT_CONTENT_MODEL () { 0 }
+sub CDATA_CONTENT_MODEL () { CM_LIMITED_MARKUP }
+sub RCDATA_CONTENT_MODEL () { CM_ENTITY | CM_LIMITED_MARKUP }
+sub PCDATA_CONTENT_MODEL () { CM_ENTITY | CM_FULL_MARKUP }
+
 ## Implementations MUST act as if state machine in the spec
 
 sub _initialize_tokenizer ($) {
   my $self = shift;
   $self->{state} = 'data'; # MUST
-  $self->{content_model_flag} = 'PCDATA'; # be
+  $self->{content_model} = PCDATA_CONTENT_MODEL; # be
   undef $self->{current_token}; # start tag, end tag, comment, or DOCTYPE
   undef $self->{current_attribute};
   undef $self->{last_emitted_start_tag_name};
@@ -200,8 +209,7 @@ sub _get_next_token ($) {
   A: {
     if ($self->{state} eq 'data') {
       if ($self->{next_input_character} == 0x0026) { # &
-        if ($self->{content_model_flag} eq 'PCDATA' or
-            $self->{content_model_flag} eq 'RCDATA') {
+	if ($self->{content_model} & CM_ENTITY) { # PCDATA | RCDATA
           $self->{state} = 'entity data';
           
       if (@{$self->{char}}) {
@@ -215,8 +223,7 @@ sub _get_next_token ($) {
           #
         }
       } elsif ($self->{next_input_character} == 0x002D) { # -
-        if ($self->{content_model_flag} eq 'RCDATA' or
-            $self->{content_model_flag} eq 'CDATA') {
+	if ($self->{content_model} & CM_LIMITED_MARKUP) { # RCDATA | CDATA
           unless ($self->{escape}) {
             if ($self->{prev_input_character}->[0] == 0x002D and # -
                 $self->{prev_input_character}->[1] == 0x0021 and # !
@@ -228,9 +235,8 @@ sub _get_next_token ($) {
         
         #
       } elsif ($self->{next_input_character} == 0x003C) { # <
-        if ($self->{content_model_flag} eq 'PCDATA' or
-            (($self->{content_model_flag} eq 'CDATA' or
-              $self->{content_model_flag} eq 'RCDATA') and
+        if ($self->{content_model} & CM_FULL_MARKUP or # PCDATA
+            (($self->{content_model} & CM_LIMITED_MARKUP) and # CDATA | RCDATA
              not $self->{escape})) {
           $self->{state} = 'tag open';
           
@@ -246,8 +252,7 @@ sub _get_next_token ($) {
         }
       } elsif ($self->{next_input_character} == 0x003E) { # >
         if ($self->{escape} and
-            ($self->{content_model_flag} eq 'RCDATA' or
-             $self->{content_model_flag} eq 'CDATA')) {
+            ($self->{content_model} & CM_LIMITED_MARKUP)) { # RCDATA | CDATA
           if ($self->{prev_input_character}->[0] == 0x002D and # -
               $self->{prev_input_character}->[1] == 0x002D) { # -
             delete $self->{escape};
@@ -290,8 +295,7 @@ sub _get_next_token ($) {
 
       redo A;
     } elsif ($self->{state} eq 'tag open') {
-      if ($self->{content_model_flag} eq 'RCDATA' or
-          $self->{content_model_flag} eq 'CDATA') {
+      if ($self->{content_model} & CM_LIMITED_MARKUP) { # RCDATA | CDATA
         if ($self->{next_input_character} == 0x002F) { # /
           
       if (@{$self->{char}}) {
@@ -310,7 +314,7 @@ sub _get_next_token ($) {
 
           redo A;
         }
-      } elsif ($self->{content_model_flag} eq 'PCDATA') {
+      } elsif ($self->{content_model} & CM_FULL_MARKUP) { # PCDATA
         if ($self->{next_input_character} == 0x0021) { # !
           $self->{state} = 'markup declaration open';
           
@@ -387,11 +391,10 @@ sub _get_next_token ($) {
           redo A;
         }
       } else {
-        die "$0: $self->{content_model_flag}: Unknown content model flag";
+        die "$0: $self->{content_model} in tag open";
       }
     } elsif ($self->{state} eq 'close tag open') {
-      if ($self->{content_model_flag} eq 'RCDATA' or
-          $self->{content_model_flag} eq 'CDATA') {
+      if ($self->{content_model} & CM_LIMITED_MARKUP) { # RCDATA | CDATA
         if (defined $self->{last_emitted_start_tag_name}) {
           ## NOTE: <http://krijnhoetmer.nl/irc-logs/whatwg/20070626#l-564>
           my @next_char;
@@ -519,7 +522,7 @@ sub _get_next_token ($) {
               = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} eq 'end tag') {
-          $self->{content_model_flag} = 'PCDATA'; # MUST
+          $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
           if ($self->{current_token}->{attributes}) {
             $self->{parse_error}-> (type => 'end tag attribute');
           }
@@ -558,7 +561,7 @@ sub _get_next_token ($) {
               = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} eq 'end tag') {
-          $self->{content_model_flag} = 'PCDATA'; # MUST
+          $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
           if ($self->{current_token}->{attributes}) {
             $self->{parse_error}-> (type => 'end tag attribute');
           }
@@ -624,7 +627,7 @@ sub _get_next_token ($) {
               = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} eq 'end tag') {
-          $self->{content_model_flag} = 'PCDATA'; # MUST
+          $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
           if ($self->{current_token}->{attributes}) {
             $self->{parse_error}-> (type => 'end tag attribute');
           }
@@ -682,7 +685,7 @@ sub _get_next_token ($) {
               = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} eq 'end tag') {
-          $self->{content_model_flag} = 'PCDATA'; # MUST
+          $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
           if ($self->{current_token}->{attributes}) {
             $self->{parse_error}-> (type => 'end tag attribute');
           }
@@ -753,7 +756,7 @@ sub _get_next_token ($) {
               = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} eq 'end tag') {
-          $self->{content_model_flag} = 'PCDATA'; # MUST
+          $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
           if ($self->{current_token}->{attributes}) {
             $self->{parse_error}-> (type => 'end tag attribute');
           }
@@ -812,7 +815,7 @@ sub _get_next_token ($) {
               = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} eq 'end tag') {
-          $self->{content_model_flag} = 'PCDATA'; # MUST
+          $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
           if ($self->{current_token}->{attributes}) {
             $self->{parse_error}-> (type => 'end tag attribute');
           }
@@ -868,7 +871,7 @@ sub _get_next_token ($) {
               = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} eq 'end tag') {
-          $self->{content_model_flag} = 'PCDATA'; # MUST
+          $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
           if ($self->{current_token}->{attributes}) {
             $self->{parse_error}-> (type => 'end tag attribute');
           }
@@ -927,7 +930,7 @@ sub _get_next_token ($) {
               = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} eq 'end tag') {
-          $self->{content_model_flag} = 'PCDATA'; # MUST
+          $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
           if ($self->{current_token}->{attributes}) {
             $self->{parse_error}-> (type => 'end tag attribute');
           }
@@ -998,7 +1001,7 @@ sub _get_next_token ($) {
               = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} eq 'end tag') {
-          $self->{content_model_flag} = 'PCDATA'; # MUST
+          $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
           if ($self->{current_token}->{attributes}) {
             $self->{parse_error}-> (type => 'end tag attribute');
           }
@@ -1024,7 +1027,7 @@ sub _get_next_token ($) {
               = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} eq 'end tag') {
-          $self->{content_model_flag} = 'PCDATA'; # MUST
+          $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
           if ($self->{current_token}->{attributes}) {
             $self->{parse_error}-> (type => 'end tag attribute');
           }
@@ -1078,7 +1081,7 @@ sub _get_next_token ($) {
               = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} eq 'end tag') {
-          $self->{content_model_flag} = 'PCDATA'; # MUST
+          $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
           if ($self->{current_token}->{attributes}) {
             $self->{parse_error}-> (type => 'end tag attribute');
           }
@@ -1132,7 +1135,7 @@ sub _get_next_token ($) {
               = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} eq 'end tag') {
-          $self->{content_model_flag} = 'PCDATA'; # MUST
+          $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
           if ($self->{current_token}->{attributes}) {
             $self->{parse_error}-> (type => 'end tag attribute');
           }
@@ -1189,7 +1192,7 @@ sub _get_next_token ($) {
               = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} eq 'end tag') {
-          $self->{content_model_flag} = 'PCDATA'; # MUST
+          $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
           if ($self->{current_token}->{attributes}) {
             $self->{parse_error}-> (type => 'end tag attribute');
           }
@@ -1215,7 +1218,7 @@ sub _get_next_token ($) {
               = not defined $self->{last_emitted_start_tag_name};
           $self->{last_emitted_start_tag_name} = $self->{current_token}->{tag_name};
         } elsif ($self->{current_token}->{type} eq 'end tag') {
-          $self->{content_model_flag} = 'PCDATA'; # MUST
+          $self->{content_model} = PCDATA_CONTENT_MODEL; # MUST
           if ($self->{current_token}->{attributes}) {
             $self->{parse_error}-> (type => 'end tag attribute');
           }
@@ -3017,7 +3020,7 @@ sub _tree_construction_main ($) {
     $insert->($el); # /context node/->append_child ($el)
 
     ## Step 3
-    $self->{content_model_flag} = $content_model_flag; # CDATA or RCDATA
+    $self->{content_model} = $content_model_flag; # CDATA or RCDATA
     delete $self->{escape}; # MUST
 
     ## Step 4
@@ -3035,13 +3038,17 @@ sub _tree_construction_main ($) {
     }
 
     ## Step 6
-    $self->{content_model_flag} = 'PCDATA';
+    $self->{content_model} = PCDATA_CONTENT_MODEL;
 
     ## Step 7
     if ($token->{type} eq 'end tag' and $token->{tag_name} eq $start_tag_name) {
       ## Ignore the token
+    } elsif ($content_model_flag == CDATA_CONTENT_MODEL) {
+      $self->{parse_error}-> (type => 'in CDATA:#'.$token->{type});
+    } elsif ($content_model_flag == RCDATA_CONTENT_MODEL) {
+      $self->{parse_error}-> (type => 'in RCDATA:#'.$token->{type});
     } else {
-      $self->{parse_error}-> (type => 'in '.$content_model_flag.':#'.$token->{type});
+      die "$0: $content_model_flag in parse_rcdata";
     }
     $token = $self->_get_next_token;
   }; # $parse_rcdata
@@ -3060,7 +3067,7 @@ sub _tree_construction_main ($) {
       
     ## TODO: mark as "parser-inserted"
 
-    $self->{content_model_flag} = 'CDATA';
+    $self->{content_model} = CDATA_CONTENT_MODEL;
     delete $self->{escape}; # MUST
     
     my $text = '';
@@ -3073,7 +3080,7 @@ sub _tree_construction_main ($) {
       $script_el->manakai_append_text ($text);
     }
               
-    $self->{content_model_flag} = 'PCDATA';
+    $self->{content_model} = PCDATA_CONTENT_MODEL;
 
     if ($token->{type} eq 'end tag' and
         $token->{tag_name} eq 'script') {
@@ -3327,7 +3334,7 @@ sub _tree_construction_main ($) {
         return;
       } elsif ($token->{tag_name} eq 'style') {
         ## NOTE: This is an "as if in head" code clone
-        $parse_rcdata->('CDATA', $insert);
+        $parse_rcdata->(CDATA_CONTENT_MODEL, $insert);
         return;
       } elsif ({
                 base => 1, link => 1,
@@ -3394,7 +3401,7 @@ sub _tree_construction_main ($) {
       } elsif ($token->{tag_name} eq 'title') {
         $self->{parse_error}-> (type => 'in body:title');
         ## NOTE: This is an "as if in head" code clone
-        $parse_rcdata->('RCDATA', sub {
+        $parse_rcdata->(RCDATA_CONTENT_MODEL, sub {
           if (defined $self->{head_element}) {
             $self->{head_element}->append_child ($_[0]);
           } else {
@@ -3665,7 +3672,7 @@ sub _tree_construction_main ($) {
     }
   
           
-        $self->{content_model_flag} = 'PLAINTEXT';
+        $self->{content_model} = PLAINTEXT_CONTENT_MODEL;
           
         $token = $self->_get_next_token;
         return;
@@ -3910,7 +3917,7 @@ sub _tree_construction_main ($) {
         return;
       } elsif ($token->{tag_name} eq 'xmp') {
         $reconstruct_active_formatting_elements->($insert_to_current);
-        $parse_rcdata->('CDATA', $insert);
+        $parse_rcdata->(CDATA_CONTENT_MODEL, $insert);
         return;
       } elsif ($token->{tag_name} eq 'table') {
         ## has a p element in scope
@@ -4094,7 +4101,7 @@ sub _tree_construction_main ($) {
       
         
         ## TODO: $self->{form_element} if defined
-        $self->{content_model_flag} = 'RCDATA';
+        $self->{content_model} = RCDATA_CONTENT_MODEL;
         delete $self->{escape}; # MUST
         
         $insert->($el);
@@ -4115,7 +4122,7 @@ sub _tree_construction_main ($) {
           $el->manakai_append_text ($text);
         }
         
-        $self->{content_model_flag} = 'PCDATA';
+        $self->{content_model} = PCDATA_CONTENT_MODEL;
         
         if ($token->{type} eq 'end tag' and
             $token->{tag_name} eq $tag_name) {
@@ -4131,7 +4138,7 @@ sub _tree_construction_main ($) {
                 noframes => 1,
                 noscript => 0, ## TODO: 1 if scripting is enabled
                }->{$token->{tag_name}}) {
-        $parse_rcdata->('CDATA', $insert);
+        $parse_rcdata->(CDATA_CONTENT_MODEL, $insert);
         return;
       } elsif ($token->{tag_name} eq 'select') {
         $reconstruct_active_formatting_elements->($insert_to_current);
@@ -4695,7 +4702,8 @@ sub _tree_construction_main ($) {
               }
               my $parent = defined $self->{head_element} ? $self->{head_element}
                   : $self->{open_elements}->[-1]->[0];
-              $parse_rcdata->('RCDATA', sub { $parent->append_child ($_[0]) });
+              $parse_rcdata->(RCDATA_CONTENT_MODEL,
+                              sub { $parent->append_child ($_[0]) });
               pop @{$self->{open_elements}}
                   if $self->{insertion_mode} eq 'after head';
               redo B;
@@ -4707,7 +4715,7 @@ sub _tree_construction_main ($) {
                 $self->{parse_error}-> (type => 'after head:'.$token->{tag_name});
                 push @{$self->{open_elements}}, [$self->{head_element}, 'head'];
               }
-              $parse_rcdata->('CDATA', $insert_to_current);
+              $parse_rcdata->(CDATA_CONTENT_MODEL, $insert_to_current);
               pop @{$self->{open_elements}}
                   if $self->{insertion_mode} eq 'after head';
               redo B;
@@ -6651,19 +6659,21 @@ sub set_inner_html ($$$) {
 
     ## Step 2
     my $node_ln = $node->local_name;
-    $p->{content_model_flag} = {
-      title => 'RCDATA',
-      textarea => 'RCDATA',
-      style => 'CDATA',
-      script => 'CDATA',
-      xmp => 'CDATA',
-      iframe => 'CDATA',
-      noembed => 'CDATA',
-      noframes => 'CDATA',
-      noscript => 'CDATA',
-      plaintext => 'PLAINTEXT',
-    }->{$node_ln} || 'PCDATA';
-       ## ISSUE: What is "the name of the element"? local name?
+    $p->{content_model} = {
+      title => RCDATA_CONTENT_MODEL,
+      textarea => RCDATA_CONTENT_MODEL,
+      style => CDATA_CONTENT_MODEL,
+      script => CDATA_CONTENT_MODEL,
+      xmp => CDATA_CONTENT_MODEL,
+      iframe => CDATA_CONTENT_MODEL,
+      noembed => CDATA_CONTENT_MODEL,
+      noframes => CDATA_CONTENT_MODEL,
+      noscript => CDATA_CONTENT_MODEL,
+      plaintext => PLAINTEXT_CONTENT_MODEL,
+    }->{$node_ln};
+    $p->{content_model} = PCDATA_CONTENT_MODEL
+        unless defined $p->{content_model};
+        ## ISSUE: What is "the name of the element"? local name?
 
     $p->{inner_html_node} = [$node, $node_ln];
 
@@ -6829,4 +6839,4 @@ sub get_inner_html ($$$) {
 } # get_inner_html
 
 1;
-# $Date: 2007/07/21 04:55:20 $
+# $Date: 2007/07/21 05:36:50 $

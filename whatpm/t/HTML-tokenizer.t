@@ -113,7 +113,12 @@ for my $file_name (grep {$_} split /\s+/, qq[
       };
       
       $p->_initialize_tokenizer;
-      $p->{content_model_flag} = $cm;
+      $p->{content_model} = {
+        CDATA => Whatpm::HTML::CDATA_CONTENT_MODEL (),
+        RCDATA => Whatpm::HTML::RCDATA_CONTENT_MODEL (),
+        PCDATA => Whatpm::HTML::PCDATA_CONTENT_MODEL (),
+        PLAINTEXT => Whatpm::HTML::PLAINTEXT_CONTENT_MODEL (),
+      }->{$cm};
       $p->{last_emitted_start_tag_name} = $last_start_tag;
 
       while (1) {
@@ -156,4 +161,4 @@ for my $file_name (grep {$_} split /\s+/, qq[
   }
 }
 
-## $Date: 2007/07/21 04:55:20 $
+## $Date: 2007/07/21 05:36:50 $

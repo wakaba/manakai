@@ -1,7 +1,7 @@
 1..337
 # Running under perl version 5.008007 for linux
-# Current time local: Sat Jul 21 13:52:49 2007
-# Current time GMT:   Sat Jul 21 04:52:49 2007
+# Current time local: Sat Jul 21 14:33:21 2007
+# Current time GMT:   Sat Jul 21 05:33:21 2007
 # Using Test.pm version 1.25
 # t/tokenizer/test1.test
 ok 1
@@ -48,12 +48,12 @@ ok 41
 ok 42
 # t/tokenizer/test2.test
 not ok 43
-# Test 43 got: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError',\n          [\n            qq'DOCTYPE',\n            undef,\n            undef,\n            undef,\n            0\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 153 fail #43)
+# Test 43 got: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError',\n          [\n            qq'DOCTYPE',\n            undef,\n            undef,\n            undef,\n            0\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 158 fail #43)
 #    Expected: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError',\n          [\n            qq'DOCTYPE',\n            qq'',\n            undef,\n            undef,\n            0\n          ]\n        ];\n" (DOCTYPE without name: qq'<!DOCTYPE>')
 #    Line 6 is changed:
 #     - "            qq'',\n"
 #     + "            undef,\n"
-#  t/HTML-tokenizer.t line 153 is:       ok $parser_dump, $expected_dump,
+#  t/HTML-tokenizer.t line 158 is:       ok $parser_dump, $expected_dump,
 ok 44
 ok 45
 ok 46
@@ -114,13 +114,13 @@ ok 99
 ok 100
 ok 101
 not ok 102
-# Test 102 got: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'DOCTYPE',\n            undef,\n            undef,\n            undef,\n            0\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 153 fail #102)
+# Test 102 got: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'DOCTYPE',\n            undef,\n            undef,\n            undef,\n            0\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 158 fail #102)
 #     Expected: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'DOCTYPE',\n            qq'',\n            undef,\n            undef,\n            0\n          ]\n        ];\n" (<!doctype >: qq'<!doctype >')
 #     Line 5 is changed:
 #      - "            qq'',\n"
 #      + "            undef,\n"
 not ok 103
-# Test 103 got: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'DOCTYPE',\n            undef,\n            undef,\n            undef,\n            0\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 153 fail #103)
+# Test 103 got: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'DOCTYPE',\n            undef,\n            undef,\n            undef,\n            0\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 158 fail #103)
 #     Expected: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'DOCTYPE',\n            qq'',\n            undef,\n            undef,\n            0\n          ]\n        ];\n" (<!doctype  : qq'<!doctype  ')
 #     Line 5 is changed:
 #      - "            qq'',\n"
@@ -222,7 +222,7 @@ ok 196
 ok 197
 ok 198
 not ok 199
-# Test 199 got: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError',\n          [\n            qq'Comment',\n            qq'doc'\n          ],\n          [\n            qq'Character',\n            qq'\\x{FFFD}'\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 153 fail #199)
+# Test 199 got: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError',\n          [\n            qq'Comment',\n            qq'doc'\n          ],\n          [\n            qq'Character',\n            qq'\\x{FFFD}'\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 158 fail #199)
 #     Expected: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'Comment',\n            qq'doc'\n          ],\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\\x{FFFD}'\n          ]\n        ];\n" (U+0000 in lookahead region after non-matching character: qq'<!doc>\x{00}')
 #     Got 1 extra line at line 3:
 #      + "          qq'ParseError',\n"
