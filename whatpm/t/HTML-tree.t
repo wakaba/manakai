@@ -137,10 +137,11 @@ sub test ($) {
   }
     
   ok scalar @errors, scalar @{$test->{errors}},
-    'Parse error: ' . $test->{data} . '; ' . 
+    'Parse error: ' . Data::Dumper::qquote ($test->{data}) . '; ' . 
     join (', ', @errors) . ';' . join (', ', @{$test->{errors}});
 
-  ok $result, $test->{document}, 'Document tree: ' . $test->{data};
+  ok $result, $test->{document},
+      'Document tree: ' . Data::Dumper::qquote ($test->{data});
 } # test
 
 sub serialize ($) {
@@ -177,4 +178,4 @@ sub serialize ($) {
 } # serialize
 
 ## License: Public Domain.
-## $Date: 2007/07/16 07:48:19 $
+## $Date: 2007/07/21 08:11:48 $

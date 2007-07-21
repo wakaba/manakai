@@ -2446,3 +2446,398 @@ unexpected end of file
 |         <tr>
 |           <td>
 |             "a"
+
+#data
+<!DOCTYPE HTML><table><tbody><caption>a</caption>
+#errors
+unexpected end of file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|       <caption>
+|         "a"
+
+#data
+<!DOCTYPE HTML><table><tbody><thead><tr></table>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|       <thead>
+|         <tr>
+
+#data
+<!DOCTYPE HTML><table><tbody><tfoot><tr></table>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|       <tfoot>
+|         <tr>
+
+#data
+<!DOCTYPE HTML><table><tbody><tbody><tr></table>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|       <tbody>
+|         <tr>
+
+#data
+<!DOCTYPE HTML><table><thead><tfoot><tr></table>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <thead>
+|       <tfoot>
+|         <tr>
+
+#data
+<!DOCTYPE HTML><table><thead><tbody><tr></table>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <thead>
+|       <tbody>
+|         <tr>
+
+#data
+<!DOCTYPE HTML><table><thead><thead><tr></table>
+#errors
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <thead>
+|       <thead>
+|         <tr>
+
+#data
+<!DOCTYPE HTML><table a><thead><table b>
+#errors
+<table> in table row group
+unexpected end of file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       a=""
+|       <thead>
+|     <table>
+|       b=""
+
+#data
+<!DOCTYPE HTML><table a><tbody><table b>
+#errors
+<table> in table row group
+unexpected end of file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       a=""
+|       <tbody>
+|     <table>
+|       b=""
+
+#data
+<!DOCTYPE HTML><table a><tfoot><table b>
+#errors
+<table> in table row group
+unexpected end of file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       a=""
+|       <tfoot>
+|     <table>
+|       b=""
+
+#data
+<!DOCTYPE HTML><table a><tr><table b>
+#errors
+<table> in table row
+unexpected end of file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       a=""
+|       <tbody>
+|         <tr>
+|     <table>
+|       b=""
+
+#data
+<!DOCTYPE HTML><table><thead></tbody><tr>
+#errors
+unmatched end tag
+unexpected end of file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <thead>
+|         <tr>
+
+#data
+<!DOCTYPE HTML><table><thead></thead><tr>
+#errors
+unexpected end of file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <thead>
+|       <tbody>
+|         <tr>
+
+#data
+<!DOCTYPE HTML><table><thead></tfoot><tr>
+#errors
+unmatched end tag
+unexpected end of file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <thead>
+|         <tr>
+
+#data
+<!DOCTYPE HTML><table><tbody></thead><tr>
+#errors
+unmatched end tag
+unexpected end of file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|         <tr>
+
+#data
+<!DOCTYPE HTML><table><tbody></tbody><tr>
+#errors
+unexpected end of file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|       <tbody>
+|         <tr>
+
+#data
+<!DOCTYPE HTML><table><tbody></tfoot><tr>
+#errors
+unmatched end tag
+unexpected end of file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|         <tr>
+
+#data
+<!DOCTYPE HTML><table><tfoot></thead><tr>
+#errors
+unmatched end tag
+unexpected end of file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tfoot>
+|         <tr>
+
+#data
+<!DOCTYPE HTML><table><tfoot></tbody><tr>
+#errors
+unmatched end tag
+unexpected end of file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tfoot>
+|         <tr>
+
+#data
+<!DOCTYPE HTML><table><tfoot></tfoot><tr>
+#errors
+unexpected end of file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tfoot>
+|       <tbody>
+|         <tr>
+
+#data
+<!DOCTYPE HTML><table><tbody></tr><tr>
+#errors
+unmatched end tag
+unexpected end of file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|         <tr>
+
+#data
+<!DOCTYPE HTML><table><tbody></body><tr>
+#errors
+unmatched end tag
+unexpected end of file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|         <tr>
+
+#data
+<!DOCTYPE HTML><table><tbody></html><tr>
+#errors
+unmatched end tag
+unexpected end of file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|         <tr>
+
+#data
+<!DOCTYPE HTML><table><tbody></td><tr>
+#errors
+unmatched end tag
+unexpected end of file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|         <tr>
+
+#data
+<!DOCTYPE HTML><table><tbody></th><tr>
+#errors
+unmatched end tag
+unexpected end of file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|         <tr>
+
+#data
+<!DOCTYPE HTML><table><tbody></caption><tr>
+#errors
+unmatched end tag
+unexpected end of file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|         <tr>
+
+#data
+<!DOCTYPE HTML><table><tbody></col><tr>
+#errors
+unmatched end tag
+unexpected end of file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|         <tr>
+
+#data
+<!DOCTYPE HTML><table><tbody></colgroup><tr>
+#errors
+unmatched end tag
+unexpected end of file
+#document
+| <!DOCTYPE HTML>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|         <tr>
