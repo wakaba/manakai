@@ -2,7 +2,7 @@
 
 package Message::DOM::Document;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.16 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.17 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::Document',
     'Message::IF::DocumentTraversal', 'Message::IF::DocumentXDoctype',
     'Message::IF::HTMLDocument';
@@ -1099,10 +1099,28 @@ sub inner_html ($;$) {
   my $self = $_[0];
   local $Error::Depth = $Error::Depth + 1;
 
-  ## TODO: Setter
-
   if ($$self->{manakai_is_html}) {
     require Whatpm::HTML;
+    if (@_ > 1) {
+      ## Step 1
+      ## TODO: Stop parsing and ...
+      
+      ## Step 2
+      my @cn = @{$self->child_nodes};
+      for (@cn) { ## NOTE: Might throw a |NO_MODIFICATION_ALLOWED_ERR|.
+        $self->remove_child ($_); #
+      }
+
+      ## Step 3, 4, 5
+      Whatpm::HTML->parse_string ($_[1] => $self);
+
+      ## TODO:
+      ## <script>var input = function_to_do_xmlhttprequest (location.href);
+      ## document.innerHTML = input</script>
+
+      return unless defined wantarray;
+    }
+
     return ${ Whatpm::HTML->get_inner_html ($self) };
   } else {
     if (@_ > 1) {
@@ -1123,7 +1141,6 @@ sub inner_html ($;$) {
       ## TODO: ill-formed -> SYNTAX_ERR # MUST
 
       ## Step 6 # MUST
-      local $Error::Depth = $Error::Depth + 1;
       my @cn = @{$self->child_nodes}; ## TODO: If read-only
       for (@cn) {
         $self->remove_child ($_);
@@ -1208,4 +1225,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/29 06:35:16 $
+## $Date: 2007/07/29 06:46:25 $
