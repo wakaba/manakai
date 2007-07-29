@@ -13,7 +13,9 @@ Technologies (beta)</title>
 <div class="section" id="introduction">
 <h2>Introduction</h2>
 
-<p><dfn>Whatpm</dfn> is a <em>work-in-progress</em> set of Perl modules for
+<p><dfn>Whatpm</dfn>, a subproject of 
+<a href="http://suika.fam.cx/www/2006/manakai/" rel=up>manakai</a>,
+is a <em>work-in-progress</em> set of Perl modules for
 Web hypertext application technologies.</p>
 
 <dl>
@@ -50,6 +52,40 @@ and checker demo</a></li>
 <li><a href="http://suika.fam.cx/gate/2007/html/table-interface">HTML5 table
 structure visualization demo</a></li>
 </ul>
+</div>
+
+<div class="section" id="dependency">
+<h2>Dependency</h2>
+
+<dl>
+<dt>Perl 5.8 or later</dt>
+  <dd>It is recommended to use newer release of Perl 5.8 or later.</dd>
+<dt><code>Message::IMT::InternetMediaType</code></dt>
+  <dd><code>Whatpm::IMTChecker</code> depends on
+  <code>Message::IMT::InternetMediaType</code>, which is part of 
+  <a href="http://suika.fam.cx/www/2006/manakai/">manakai</a>.</dd>
+<dt><code>Message::URI::URIReference</code></dt>
+  <dd><code>Whatpm::URIChecker</code> depends on
+  <code>Message::URI::URIReference</code>, which is part of 
+  <a href="http://suika.fam.cx/www/2006/manakai/">manakai</a>.</dd>
+<dt><a href="http://suika.fam.cx/www/manakai-charlib/readme">manakai 
+charlib</a></dt>
+  <dd><code>Whatpm::Charset::DeocdeHandle</code> depends on
+  modules in <a href="http://suika.fam.cx/www/manakai-charlib/readme">manakai
+  charlib</a> for <em>decoding Japanese character encodings</em>.
+  See the documentation for 
+  <a href="http://suika.fam.cx/www/manakai-charlib/readme">manakai
+  charlib</a> for more information.</dd>
+<dt><code>Message::DOM::DOMImplementation</code> and related modules</dt>
+  <dd><em>Testing</em> for <code>Whatpm::ContentChecker</code>
+  depends on <code>Message::DOM::DOMImplementation</code> and related modules
+  in <a href="http://suika.fam.cx/www/2006/manakai/">manakai</a>.
+  They are not required in practice.</dd>
+<dt><a href="http://search.cpan.org/~makamaka/JSON-1.14/"><code>JSON</code></a></dt>
+  <dd><em>Testing</em> for <code>Whatpm::HTML</code>
+  depends on <a href="http://search.cpan.org/~makamaka/JSON-1.14/"><code>JSON</code> and related modules</a>.
+  They are not required in practice.</dd>
+</dl>
 </div>
 
 <div class="section" id="download">

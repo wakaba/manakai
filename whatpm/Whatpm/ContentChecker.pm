@@ -2958,7 +2958,10 @@ sub check_document ($$$) {
     ## ISSUE: Should we check content of Document node?
     $onerror->(node => $doc, type => 'no document element');
     ## ISSUE: Is this non-conforming (to what spec)?  Or just a warning?
-    return;
+    return {
+            class => {},
+            id => {}, table => [], term => {},
+           };
   }
 
   ## ISSUE: Unexpanded entity references and HTML5 conformance
@@ -3144,4 +3147,4 @@ sub _check_get_children ($$$) {
 } # _check_get_children
 
 1;
-# $Date: 2007/07/21 04:55:20 $
+# $Date: 2007/07/29 05:20:12 $
