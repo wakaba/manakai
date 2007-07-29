@@ -1,0 +1,58 @@
+=head1 NAME
+
+Message::DOM::DOMImplementation - manakai - The C<DOMImplementation> Interface
+
+=head1 SYNOPSIS
+
+  use Message::DOM::DOMImplementation;
+  my $impl = Message::DOM::DOMImplementation->new;
+  
+  my $doc = $impl->create_document;
+
+=head1 DESCRIPTION
+
+The C<Message::DOM::DOMImplementation> module conatins an
+implementation of C<DOMImplementation> interface as defined
+in the DOM Level 3 Core specification.
+
+This module is part of manakai.
+
+=head1 METHODS
+
+=over 4
+
+=item I<$impl> = Message::DOM::DOMImplementation->new;
+
+Creates a new instance of the DOM implementation
+and returns it.
+
+=back
+
+Any methods defined for C<DOMImplementation> interface
+and other interface such as C<URIImplementation> can
+be invoked via the object returned by the C<new> method.
+For example, a DOM C<Document> object can be created by:
+
+  $doc = $impl->create_document;
+
+=head1 SEE ALSO
+
+DOM Level 3 Core specification
+<http://www.w3.org/TR/DOM-Level-3-Core/core.html#ID-102161490>.
+
+L<Message::DOM::DOMImplementationRegistry>.
+
+=head1 AUTHOR
+
+Wakaba <w@suika.fam.cx>.
+
+=head1 LICENSE
+
+Copyright 2007 Wakaba <w@suika.fam.cx>
+
+This library is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+=cut
+
+## $Date: 2007/07/29 09:44:24 $

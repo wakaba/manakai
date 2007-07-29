@@ -1,0 +1,88 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Message::DOM::DOMImplementation - manakai - The C&lt;DOMImplementation&gt; Interface</title>
+<link rel="stylesheet" href="http://suika.fam.cx/www/style/html/pod.css" type="text/css" />
+<link rev="made" href="mailto:admin@suika.fam.cx" />
+</head>
+
+<body>
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#methods">METHODS</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#license">LICENSE</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Message::DOM::DOMImplementation - manakai - The <code>DOMImplementation</code> Interface</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+  use Message::DOM::DOMImplementation;
+  my $impl = Message::DOM::DOMImplementation-&gt;new;
+  
+  my $doc = $impl-&gt;create_document;</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>The <code>Message::DOM::DOMImplementation</code> module conatins an
+implementation of <code>DOMImplementation</code> interface as defined
+in the DOM Level 3 Core specification.</p>
+<p>This module is part of manakai.</p>
+<p>
+</p>
+<hr />
+<h1><a name="methods">METHODS</a></h1>
+<dl>
+<dt><strong><a name="item_new"><em>$impl</em> = Message::DOM::DOMImplementation-&gt;new;</a></strong><br />
+</dt>
+<dd>
+Creates a new instance of the DOM implementation
+and returns it.
+</dd>
+<p></p></dl>
+<p>Any methods defined for <code>DOMImplementation</code> interface
+and other interface such as <code>URIImplementation</code> can
+be invoked via the object returned by the <a href="#item_new"><code>new</code></a> method.
+For example, a DOM <code>Document</code> object can be created by:</p>
+<pre>
+  $doc = $impl-&gt;create_document;</pre>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p>DOM Level 3 Core specification
+&lt;http://www.w3.org/TR/DOM-Level-3-Core/core.html#ID-102161490&gt;.</p>
+<p><a href="../../../Message/DOM/DOMImplementationRegistry.html">the Message::DOM::DOMImplementationRegistry manpage</a>.</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;.</p>
+<p>
+</p>
+<hr />
+<h1><a name="license">LICENSE</a></h1>
+<p>Copyright 2007 Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;</p>
+<p>This library is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.</p>
+
+</body>
+
+</html>

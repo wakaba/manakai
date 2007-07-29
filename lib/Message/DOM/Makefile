@@ -1,14 +1,20 @@
+POD2HTML = pod2html --css "http://suika.fam.cx/www/style/html/pod.css" \
+  --htmlroot "../../.."
 RM = rm
 RMALL = $(RM) -fv
 
-GENERATED_FILES = 
+HTML_FILES = DOMImplementation.html
 
-all:
+all: $(HTML_FILES)
+
+%.html: %.pod
+	$(POD2HTML) $< > $@
 
 clean:
-	$(RMALL) $(GENERATED_FILES) .*.tmp *~ .*~ *.BAK .*.BAK
+	$(RMALL) *.tmp .*.tmp *~ .*~ *.BAK .*.BAK
 
 distclean: clean
+	$(RMALL) $(HTML_FILES)
 
-## $Date: 2007/07/29 08:20:00 $
+## $Date: 2007/07/29 09:44:24 $
 ## License: Public Domain.
