@@ -2,7 +2,7 @@
 
 package Message::DOM::Element;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.22 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.23 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::Element';
 require Message::DOM::Document;
 
@@ -1071,7 +1071,55 @@ sub create_element_ns ($$$) {
   ## -- Choose the most apppropriate class for the element
   my $class = 'Message::DOM::Element';
   if (defined $nsuri) {
-    if ($nsuri eq q<http://www.w3.org/2005/Atom>) {
+    if ($nsuri eq q<http://www.w3.org/1999/xhtml>) {
+      require Message::DOM::HTML::HTMLElement;
+      $class = {
+        a => 'Message::DOM::HTML::HTMLAnchorElement',
+        area => 'Message::DOM::HTML::HTMLAreaElement',
+        audio => 'Message::DOM::HTML::HTMLAudioElement',
+        base => 'Message::DOM::HTML::HTMLBaseElement',
+        body => 'Message::DOM::HTML::HTMLBodyElement',
+        canvas => 'Message::DOM::HTML::HTMLCanvasElement',
+        command => 'Message::DOM::HTML::HTMLCommandElement',
+        datagrid => 'Message::DOM::HTML::HTMLDataGridElement',
+        details => 'Message::DOM::HTML::HTMLDetailsElement',
+        embed => 'Message::DOM::HTML::HTMLEmbedElement',
+        'event-source' => 'Message::DOM::HTML::HTMLEventSourceElement',
+        font => 'Message::DOM::HTML::HTMLFontElement',
+        head => 'Message::DOM::HTML::HTMLHeadElement',
+        html => 'Message::DOM::HTML::HTMLHtmlElement',
+        iframe => 'Message::DOM::HTML::HTMLIFrameElement',
+        img => 'Message::DOM::HTML::HTMLImageElement',
+        li => 'Message::DOM::HTML::HTMLLIElement',
+        link => 'Message::DOM::HTML::HTMLLinkElement',
+        map => 'Message::DOM::HTML::HTMLMapElement',
+        menu => 'Message::DOM::HTML::HTMLMenuElement',
+        meta => 'Message::DOM::HTML::HTMLMetaElement',
+        meter => 'Message::DOM::HTML::HTMLMeterElement',
+        del => 'Message::DOM::HTML::HTMLModElement',
+        ins => 'Message::DOM::HTML::HTMLModElement',
+        object => 'Message::DOM::HTML::HTMLObjectElement', 
+        ol => 'Message::DOM::HTML::HTMLOListElement',
+        param => 'Message::DOM::HTML::HTMLParamElement',
+        progress => 'Message::DOM::HTML::HTMLProgressElement',
+        blockquote => 'Message::DOM::HTML::HTMLQuoteElement',
+        q => 'Message::DOM::HTML::HTMLQuoteElement',
+        script => 'Message::DOM::HTML::HTMLScriptElement',
+        source => 'Message::DOM::HTML::HTMLSourceElement',
+        style => 'Message::DOM::HTML::HTMLStyleElement',
+        table => 'Message::DOM::HTML::HTMLTableElement',
+        td => 'Message::DOM::HTML::HTMLTableCellElement',
+        col => 'Message::DOM::HTML::HTMLTableColElement',
+        colgroup => 'Message::DOM::HTML::HTMLTableColElement',
+        th => 'Message::DOM::HTML::HTMLTableHeaderCellElement',
+        tr => 'Message::DOM::HTML::HTMLTableRowElement',
+        tbody => 'Message::DOM::HTML::HTMLTableSectionElement',
+        tfoot => 'Message::DOM::HTML::HTMLTableSectionElement',
+        thead => 'Message::DOM::HTML::HTMLTableSectionElement',
+        time => 'Message::DOM::HTML::HTMLTimeElement',
+        video => 'Message::DOM::HTML::HTMLVideoElement',
+      }->{$lname} || 'Message::DOM::HTML::HTMLElement';
+    } elsif ($nsuri eq q<http://www.w3.org/2005/Atom>) {
       require Message::DOM::Atom::AtomElement;
       $class = {
                 author => 'Message::DOM::Atom::AtomElement::AtomPersonConstruct',
@@ -1208,4 +1256,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/29 08:31:14 $
+## $Date: 2007/07/29 11:38:57 $
