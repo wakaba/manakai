@@ -1,6 +1,6 @@
 package Message::DOM::Attr;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::Attr';
 require Message::DOM::Node;
 
@@ -38,7 +38,22 @@ sub AUTOLOAD {
     Carp::croak (qq<Can't locate method "$AUTOLOAD">);
   }
 } # AUTOLOAD
-sub owner_element ($);
+
+## |AttributeDefinition| constants
+
+## |DeclaredValueType|
+sub NO_TYPE_ATTR () { 0 }
+sub CDATA_ATTR () { 1 }
+sub ID_ATTR () { 2 }
+sub IDREF_ATTR () { 3 }
+sub IDREFS_ATTR () { 4 }
+sub ENTITY_ATTR () { 5 }
+sub ENTITIES_ATTR () { 6 }
+sub NMTOKEN_ATTR () { 7 }
+sub NMTOKENS_ATTR () { 8 }
+sub NOTATION_ATTR () { 9 }
+sub ENUMERATION_ATTR () { 10 }
+sub UNKNOWN_ATTR () { 11 }
 
 ## |Node| attributes
 
@@ -82,6 +97,8 @@ sub namespace_uri ($);
 sub node_type () { 2 } # ATTRIBUTE_NODE
 
 *node_value = \&Message::DOM::Node::text_content;
+
+sub owner_element ($);
 
 sub prefix ($;$) {
   ## NOTE: No check for new value as Firefox doesn't do.
@@ -714,4 +731,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/14 06:12:56 $
+## $Date: 2007/07/29 03:48:59 $

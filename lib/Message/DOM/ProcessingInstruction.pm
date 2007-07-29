@@ -1,6 +1,6 @@
 package Message::DOM::ProcessingInstruction;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::ProcessingInstruction';
 require Message::DOM::Node;
 
@@ -29,7 +29,6 @@ sub AUTOLOAD {
   } elsif ({
     ## Read-write attributes (DOMString, trivial accessors)
     manakai_base_uri => 1,
-    data => 1,
   }->{$method_name}) {
     no strict 'refs';
     eval qq{
@@ -133,7 +132,25 @@ sub replace_child ($$) {
 
 sub manakai_base_uri ($;$);
 
-sub data ($;$);
+sub data ($;$) {
+  if (@_ > 1) {
+    if (${${$_[0]}->{owner_document}}->{strict_error_checking} and
+        ${$_[0]}->{manakai_read_only}) {
+      report Message::DOM::DOMException
+          -object => $_[0],
+          -type => 'NO_MODIFICATION_ALLOWED_ERR',
+          -subtype => 'READ_ONLY_NODE_ERR';
+    }
+    
+    if (defined $_[1]) {
+      ${$_[0]}->{data} = ''.$_[1];
+    } else {
+      ${$_[0]}->{data} = '';
+    }
+  }
+
+  return ${$_[0]}->{data};
+} # data
 
 sub target ($);
 
@@ -173,4 +190,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/14 16:32:28 $
+## $Date: 2007/07/29 03:49:00 $

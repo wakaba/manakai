@@ -1,12 +1,12 @@
 #!/usr/bin/perl
 use strict;
 use Test;
-BEGIN { plan tests => 77 } 
+BEGIN { plan tests => 81 } 
 
 require Message::DOM::DOMImplementation;
 use Message::Util::Error;
 
-my $dom = Message::DOM::DOMImplementation->____new;
+my $dom = Message::DOM::DOMImplementation->new;
 my $doc = $dom->create_document;
 
 my $ent = $doc->create_general_entity ('entity');
@@ -116,6 +116,18 @@ for my $prop (qw/input_encoding notation_name public_id system_id/) {
       "Entity->manakai_entity_uri [5]";
 }
 
+## |xmlVersion|
+{
+   my $node = $doc->create_general_entity ('ent');
+   ok $node->xml_version, undef, 'xml_version [1]';
+   $node->xml_version ('1.0');
+   ok $node->xml_version, '1.0', 'xml_version [2]';
+   $node->xml_version ('1.1');
+   ok $node->xml_version, '1.1', 'xml_version [3]';
+   $node->xml_version (undef);
+   ok $node->xml_version, undef, 'xml_version [4]';
+}
+
 =head1 LICENSE
 
 Copyright 2007 Wakaba <w@suika.fam.cx>
@@ -125,4 +137,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2007/07/08 13:04:39 $
+## $Date: 2007/07/29 03:49:00 $

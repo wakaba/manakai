@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 use strict;
 use Test;
-BEGIN { plan tests => 55 } 
+BEGIN { plan tests => 61 } 
 
 require Message::DOM::DOMImplementation;
 use Message::Util::Error;
@@ -139,6 +139,25 @@ for my $method (qw/set_attribute_node set_attribute_node_ns/) {
       'Element->attributes get_named_item get_attr_node';
 }
 
+## |schemaTypeInfo|
+{
+  my $el = $doc->create_element ('el');
+  $el->owner_document->dom_config->set_parameter ('schema-type' => undef);
+  my $sti = $el->schema_type_info;
+  ok UNIVERSAL::isa ($sti, 'Message::IF::TypeInfo') ? 1 : 0, 1, 'sti if [1]';
+  ok $sti->type_name, undef, 'sti type_name [1]';
+  ok $sti->type_namespace, undef, 'sti type_namespace [1]';
+}
+{
+  my $el = $doc->create_element ('el');
+  $el->owner_document->dom_config->set_parameter
+      ('schema-type' => q<http://www.w3.org/TR/REC-xml>);
+  my $sti = $el->schema_type_info;
+  ok UNIVERSAL::isa ($sti, 'Message::IF::TypeInfo') ? 1 : 0, 1, 'sti if [2]';
+  ok $sti->type_name, undef, 'sti type_name [2]';
+  ok $sti->type_namespace, undef, 'sti type_namespace [2]';
+}
+
 =head1 LICENSE
 
 Copyright 2007 Wakaba <w@suika.fam.cx>
@@ -148,4 +167,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2007/07/08 13:04:39 $
+## $Date: 2007/07/29 03:49:00 $

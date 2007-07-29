@@ -1,6 +1,6 @@
 package Message::DOM::TypeInfo;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::IF::TypeInfo';
 
 use overload
@@ -39,7 +39,7 @@ sub type_name ($) {
 } # type_name
 
 sub type_namespace ($) {
-  return [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0]
+  return [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0]->[${$_[0]}]
       ? q<http://www.w3.org/TR/REC-xml> : undef;
 } # type_namespace
 
@@ -59,4 +59,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/14 06:12:56 $
+## $Date: 2007/07/29 03:49:00 $
