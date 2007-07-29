@@ -1,3 +1,6 @@
+POD2HTML = pod2html --css "http://suika.fam.cx/www/style/html/pod.css" \
+  --htmlroot "../../.."
+
 MANAKAI_ROOT_DIR = ../../../
 MANAKAI_BIN_DIR = $(MANAKAI_ROOT_DIR)bin/
 MANAKAI_LIB_DIR = $(MANAKAI_ROOT_DIR)lib/
@@ -74,7 +77,17 @@ NS_UTIL_DIS_PM_FILES = \
 GENERATED_FILES = \
   $(NS_UTIL_PM_FILES) $(NS_UTIL_ERR_PM_FILES) $(NS_UTIL_DIS_PM_FILES)
 
-all: PerlCode$(PM_SUFFIX) .discore$(PM_SUFFIX) $(GENERATED_FILES)
+all: all-document PerlCode$(PM_SUFFIX) .discore$(PM_SUFFIX) $(GENERATED_FILES)
+
+all-document: Error.html \
+  Formatter/Base.html Formatter/Boolean.html Formatter/Text.html \
+  HostPermit.html QName/Filter.html
+
+Error.html:: %.html: %.pod
+	$(POD2HTML) $< > $@	
+
+%.html: %.pm
+	$(POD2HTML) $< > $@	
 
 $(NS_UTIL_PM_FILES): %$(PM_SUFFIX): %$(DIS_SUFFIX) $(DAF_PL)
 	$(DAF) --create-perl-module="$(NS_UTIL)$* $@"
@@ -151,7 +164,7 @@ $(NS_UTIL_DIS_PM_FILES): %$(PM_SUFFIX): %$(DIS_SUFFIX) $(DAF_PL)
 
 clean:
 	$(RMALL) $(GENERATED_FILES)
-	$(RMALL) .*.tmp *~ .*~ .discore$(PM_SUFFIX) .discore-all$(PM_SUFFIX)
+	$(RMALL) *.tmp .*.tmp *~ .*~ .discore$(PM_SUFFIX) .discore-all$(PM_SUFFIX)
 	$(RMALL) Error/*~ Error/.*~
 	$(RMALL) Formatter/*~ Formatter/.*~
 	$(RMALL) DIS/*~ DIS/.*~
@@ -164,5 +177,5 @@ clean-db:
 
 distclean: clean clean-db
 
-## $Date: 2006/12/02 12:46:25 $
+## $Date: 2007/07/29 07:25:06 $
 ## License: Public Domain.

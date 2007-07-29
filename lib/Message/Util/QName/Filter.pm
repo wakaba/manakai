@@ -1,6 +1,6 @@
 package Message::Util::QName::Filter;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 require Carp;
 use Filter::Util::Call;
 our $DEBUG;
@@ -35,7 +35,7 @@ sub filter ($) {
   $status;
 } # filter
 
-1; # $Date: 2004/11/22 12:54:48 $
+1; # $Date: 2007/07/29 07:25:06 $
 __END__
 
 =head1 NAME
@@ -68,15 +68,11 @@ is expanded to the namespace URI and it includes C</> (SOLIDUS)
 characters so that it is treated as a terminator by Perl parser. 
 Use non-URI characters to delimit, e.g.: 
 
-  s{rdf:}{ExpandedURi q<rdf:>}g
-
-=head1 SEE ALSO
-
-L<Message::Util::QName::General>.
+  s{rdf:}{ExpandedURI q<rdf:>}g
 
 =head1 LICENSE
 
-Copyright 2004 Wakaba <w@suika.fam.cx>.  All rights reserved.
+Copyright 2004, 2007 Wakaba <w@suika.fam.cx>.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

@@ -1,0 +1,358 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Error - Error/exception handling in an OO-ish way</title>
+<link rel="stylesheet" href="http://suika.fam.cx/www/style/html/pod.css" type="text/css" />
+<link rev="made" href="mailto:admin@suika.fam.cx" />
+</head>
+
+<body>
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#procedural_interface">PROCEDURAL INTERFACE</a></li>
+	<li><a href="#class_interface">CLASS INTERFACE</a></li>
+	<ul>
+
+		<li><a href="#constructors">CONSTRUCTORS</a></li>
+		<li><a href="#static_methods">STATIC METHODS</a></li>
+		<li><a href="#object_methods">OBJECT METHODS</a></li>
+		<li><a href="#overload_methods">OVERLOAD METHODS</a></li>
+	</ul>
+
+	<li><a href="#predefined_error_classes">PRE-DEFINED ERROR CLASSES</a></li>
+	<li><a href="#known_bugs">KNOWN BUGS</a></li>
+	<li><a href="#authors">AUTHORS</a></li>
+	<li><a href="#maintainer">MAINTAINER</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Error - Error/exception handling in an OO-ish way</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+    use Error qw(:try);</pre>
+<pre>
+    throw Error::Simple( &quot;A simple error&quot;);</pre>
+<pre>
+    sub xyz {
+        ...
+        record Error::Simple(&quot;A simple error&quot;)
+            and return;
+    }
+ 
+    unlink($file) or throw Error::Simple(&quot;$file: $!&quot;,$!);</pre>
+<pre>
+    try {
+        do_some_stuff();
+        die &quot;error!&quot; if $condition;
+        throw Error::Simple -text =&gt; &quot;Oops!&quot; if $other_condition;
+    }
+    catch Error::IO with {
+        my $E = shift;
+        print STDERR &quot;File &quot;, $E-&gt;{'-file'}, &quot; had a problem\n&quot;;
+    }
+    except {
+        my $E = shift;
+        my $general_handler=sub {send_message $E-&gt;{-description}};
+        return {
+            UserException1 =&gt; $general_handler,
+            UserException2 =&gt; $general_handler
+        };
+    }
+    otherwise {
+        print STDERR &quot;Well I don't know what to say\n&quot;;
+    }
+    finally {
+        close_the_garage_door_already(); # Should be reliable
+    }; # Don't forget the trailing ; or you might be surprised</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>The <code>Error</code> package provides two interfaces. Firstly <code>Error</code> provides
+a procedural interface to exception handling. Secondly <code>Error</code> is a
+base class for errors/exceptions that can either be thrown, for
+subsequent catch, or can simply be recorded.</p>
+<p>Errors in the class <code>Error</code> should not be thrown directly, but the
+user should throw errors from a sub-class of <code>Error</code>.</p>
+<p>
+</p>
+<hr />
+<h1><a name="procedural_interface">PROCEDURAL INTERFACE</a></h1>
+<p><code>Error</code> exports subroutines to perform exception handling. These will
+be exported if the <code>:try</code> tag is used in the <code>use</code> line.</p>
+<dl>
+<dt><strong><a name="item_try">try BLOCK CLAUSES</a></strong><br />
+</dt>
+<dd>
+<a href="#item_try"><code>try</code></a> is the main subroutine called by the user. All other subroutines
+exported are clauses to the try subroutine.
+</dd>
+<dd>
+<p>The BLOCK will be evaluated and, if no error is throw, try will return
+the result of the block.</p>
+</dd>
+<dd>
+<p><code>CLAUSES</code> are the subroutines below, which describe what to do in the
+event of an error being thrown within BLOCK.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_catch_class_with_block">catch CLASS with BLOCK</a></strong><br />
+</dt>
+<dd>
+This clauses will cause all errors that satisfy <code>$err-&gt;isa(CLASS)</code>
+to be caught and handled by evaluating <code>BLOCK</code>.
+</dd>
+<dd>
+<p><code>BLOCK</code> will be passed two arguments. The first will be the error
+being thrown. The second is a reference to a scalar variable. If this
+variable is set by the catch block then, on return from the catch
+block, try will continue processing as if the catch block was never
+found.</p>
+</dd>
+<dd>
+<p>To propagate the error the catch block may call <a href="#item_throw"><code>$err-&gt;throw</code></a></p>
+</dd>
+<dd>
+<p>If the scalar reference by the second argument is not set, and the
+error is not thrown. Then the current try block will return with the
+result from the catch block.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_except">except BLOCK</a></strong><br />
+</dt>
+<dd>
+When <a href="#item_try"><code>try</code></a> is looking for a handler, if an except clause is found
+<code>BLOCK</code> is evaluated. The return value from this block should be a
+HASHREF or a list of key-value pairs, where the keys are class names
+and the values are CODE references for the handler of errors of that
+type.
+</dd>
+<p></p>
+<dt><strong><a name="item_otherwise">otherwise BLOCK</a></strong><br />
+</dt>
+<dd>
+Catch any error by executing the code in <code>BLOCK</code>
+</dd>
+<dd>
+<p>When evaluated <code>BLOCK</code> will be passed one argument, which will be the
+error being processed.</p>
+</dd>
+<dd>
+<p>Only one otherwise block may be specified per try block</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_finally">finally BLOCK</a></strong><br />
+</dt>
+<dd>
+Execute the code in <code>BLOCK</code> either after the code in the try block has
+successfully completed, or if the try block throws an error then
+<code>BLOCK</code> will be executed after the handler has completed.
+</dd>
+<dd>
+<p>If the handler throws an error then the error will be caught, the
+finally block will be executed and the error will be re-thrown.</p>
+</dd>
+<dd>
+<p>Only one finally block may be specified per try block</p>
+</dd>
+<p></p></dl>
+<p>
+</p>
+<hr />
+<h1><a name="class_interface">CLASS INTERFACE</a></h1>
+<p>
+</p>
+<h2><a name="constructors">CONSTRUCTORS</a></h2>
+<p>The <code>Error</code> object is implemented as a HASH. This HASH is initialized
+with the arguments that are passed to it's constructor. The elements
+that are used by, or are retrievable by the <code>Error</code> class are listed
+below, other classes may add to these.</p>
+<pre>
+        -file
+        -line
+        -text
+        -value
+        -object</pre>
+<p>If <code>-file</code> or <code>-line</code> are not specified in the constructor arguments
+then these will be initialized with the file name and line number where
+the constructor was called from.</p>
+<p>If the error is associated with an object then the object should be
+passed as the <code>-object</code> argument. This will allow the <code>Error</code> package
+to associate the error with the object.</p>
+<p>The <code>Error</code> package remembers the last error created, and also the
+last error associated with a package. This could either be the last
+error created by a sub in that package, or the last error which passed
+an object blessed into that package as the <code>-object</code> argument.</p>
+<dl>
+<dt><strong><a name="item_throw">throw ( [ ARGS ] )</a></strong><br />
+</dt>
+<dd>
+Create a new <code>Error</code> object and throw an error, which will be caught
+by a surrounding <a href="#item_try"><code>try</code></a> block, if there is one. Otherwise it will cause
+the program to exit.
+</dd>
+<dd>
+<p><a href="#item_throw"><code>throw</code></a> may also be called on an existing error to re-throw it.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_with">with ( [ ARGS ] )</a></strong><br />
+</dt>
+<dd>
+Create a new <code>Error</code> object and returns it. This is defined for
+syntactic sugar, eg
+</dd>
+<dd>
+<pre>
+    die with Some::Error ( ... );</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item_record">record ( [ ARGS ] )</a></strong><br />
+</dt>
+<dd>
+Create a new <code>Error</code> object and returns it. This is defined for
+syntactic sugar, eg
+</dd>
+<dd>
+<pre>
+    record Some::Error ( ... )
+        and return;</pre>
+</dd>
+<p></p></dl>
+<p>
+</p>
+<h2><a name="static_methods">STATIC METHODS</a></h2>
+<dl>
+<dt><strong><a name="item_prior">prior ( [ PACKAGE ] )</a></strong><br />
+</dt>
+<dd>
+Return the last error created, or the last error associated with
+<code>PACKAGE</code>
+</dd>
+<p></p></dl>
+<p>
+</p>
+<h2><a name="object_methods">OBJECT METHODS</a></h2>
+<dl>
+<dt><strong><a name="item_stacktrace">stacktrace</a></strong><br />
+</dt>
+<dd>
+If the variable <code>$Error::Debug</code> was non-zero when the error was
+created, then <a href="#item_stacktrace"><code>stacktrace</code></a> returns a string created by calling
+<code>Carp::longmess</code>. If the variable was zero the <a href="#item_stacktrace"><code>stacktrace</code></a> returns
+the text of the error appended with the filename and line number of
+where the error was created, providing the text does not end with a
+newline.
+</dd>
+<p></p>
+<dt><strong><a name="item_object">object</a></strong><br />
+</dt>
+<dd>
+The object this error was associated with
+</dd>
+<p></p>
+<dt><strong><a name="item_file">file</a></strong><br />
+</dt>
+<dd>
+The file where the constructor of this error was called from
+</dd>
+<p></p>
+<dt><strong><a name="item_line">line</a></strong><br />
+</dt>
+<dd>
+The line where the constructor of this error was called from
+</dd>
+<p></p>
+<dt><strong><a name="item_text">text</a></strong><br />
+</dt>
+<dd>
+The text of the error
+</dd>
+<p></p></dl>
+<p>
+</p>
+<h2><a name="overload_methods">OVERLOAD METHODS</a></h2>
+<dl>
+<dt><strong><a name="item_stringify">stringify</a></strong><br />
+</dt>
+<dd>
+A method that converts the object into a string. This method may simply
+return the same as the <a href="#item_text"><code>text</code></a> method, or it may append more
+information. For example the file name and line number.
+</dd>
+<dd>
+<p>By default this method returns the <code>-text</code> argument that was passed to
+the constructor, or the string <code>&quot;Died&quot;</code> if none was given.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_value">value</a></strong><br />
+</dt>
+<dd>
+A method that will return a value that can be associated with the
+error. For example if an error was created due to the failure of a
+system call, then this may return the numeric value of <code>$!</code> at the
+time.
+</dd>
+<dd>
+<p>By default this method returns the <code>-value</code> argument that was passed
+to the constructor.</p>
+</dd>
+<p></p></dl>
+<p>
+</p>
+<hr />
+<h1><a name="predefined_error_classes">PRE-DEFINED ERROR CLASSES</a></h1>
+<dl>
+<dt><strong><a name="item_error_3a_3asimple">Error::Simple</a></strong><br />
+</dt>
+<dd>
+This class can be used to hold simple error strings and values. It's
+constructor takes two arguments. The first is a text value, the second
+is a numeric value. These values are what will be returned by the
+overload methods.
+</dd>
+<dd>
+<p>If the text value ends with <code>at file line 1</code> as $@ strings do, then
+this infomation will be used to set the <code>-file</code> and <code>-line</code> arguments
+of the error object.</p>
+</dd>
+<dd>
+<p>This class is used internally if an eval'd block die's with an error
+that is a plain string.</p>
+</dd>
+<p></p></dl>
+<p>
+</p>
+<hr />
+<h1><a name="known_bugs">KNOWN BUGS</a></h1>
+<p>None, but that does not mean there are not any.</p>
+<p>
+</p>
+<hr />
+<h1><a name="authors">AUTHORS</a></h1>
+<p>Graham Barr &lt;<a href="mailto:gbarr@pobox.com">gbarr@pobox.com</a>&gt;</p>
+<p>The code that inspired me to write this was originally written by
+Peter Seibel &lt;<a href="mailto:peter@weblogic.com">peter@weblogic.com</a>&gt; and adapted by Jesse Glick
+&lt;<a href="mailto:jglick@sig.bsh.com">jglick@sig.bsh.com</a>&gt;.</p>
+<p>
+</p>
+<hr />
+<h1><a name="maintainer">MAINTAINER</a></h1>
+<p>Arun Kumar U &lt;<a href="mailto:u_arunkumar@yahoo.com">u_arunkumar@yahoo.com</a>&gt;</p>
+
+</body>
+
+</html>
