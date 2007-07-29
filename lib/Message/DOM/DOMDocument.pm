@@ -2,7 +2,7 @@
 
 package Message::DOM::Document;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.15 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.16 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Node', 'Message::IF::Document',
     'Message::IF::DocumentTraversal', 'Message::IF::DocumentXDoctype',
     'Message::IF::HTMLDocument';
@@ -1105,6 +1105,38 @@ sub inner_html ($;$) {
     require Whatpm::HTML;
     return ${ Whatpm::HTML->get_inner_html ($self) };
   } else {
+    if (@_ > 1) {
+      ## Step 1
+      require Whatpm::XMLParser; # MUST
+      my $doc = $self->implementation->create_document;
+      
+      ## Step 2
+      #
+
+      ## Step 3
+      $doc = Whatpm::XMLParser->parse_string ($_[1] => $doc); # MUST
+
+      ## Step 4
+      #
+
+      ## Step 5
+      ## TODO: ill-formed -> SYNTAX_ERR # MUST
+
+      ## Step 6 # MUST
+      local $Error::Depth = $Error::Depth + 1;
+      my @cn = @{$self->child_nodes}; ## TODO: If read-only
+      for (@cn) {
+        $self->remove_child ($_);
+      }
+
+      ## Step 7, 8, 9, 10
+      for my $node (@{$doc->child_nodes}) {
+        $self->append_child ($self->adopt_node ($node));
+      }
+
+      return unless defined wantarray;
+    }
+
     ## TODO: This serializer is currently not conformant to HTML5 spec.
     require Whatpm::XMLSerializer;
     my $r = '';
@@ -1176,4 +1208,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/15 06:16:08 $
+## $Date: 2007/07/29 06:35:16 $
