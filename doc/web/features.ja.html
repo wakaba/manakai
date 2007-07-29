@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<title>manakai 0.3.3 が実装している機能</title>
+<title>manakai 0.4.0 が実装している機能</title>
 <link rel="stylesheet" href="http://suika.fam.cx/www/style/html/xhtml">
 <link rel="copyright" href="http://suika.fam.cx/c/pd" title="Public Domain">
 <link rel="contents" href="./">
@@ -16,7 +16,7 @@
 </style>
 </head>
 <body>
-<h1>manakai 0.3.3 の機能</h1>
+<h1>manakai 0.4.0 の機能</h1>
 
 <div class="note memo">
 <p>
@@ -26,7 +26,7 @@
 </p>
 </div>
 
-<p>manakai 0.3.3 は、次の表に示す DOM モジュールを実装しています。</p>
+<p>manakai 0.4.0 は、次の表に示す DOM モジュールを実装しています。</p>
 
 <table>
 <thead>
@@ -38,14 +38,13 @@
 </thead>
 <tbody>
 <tr>
-<th scope="row">中核</th>
+<th scope="row" rowspan=2>中核</th>
 <td>水準 1, 2, 3</td>
 <td>
   <p>ほぼ実装済</p>
   <div class="not-implemented">
   <ul>
-  <li><code class="DOMa">whole_text</code>,
-  <code class="DOMm">replace_whole_text</code>,
+  <li><code class="DOMm">replace_whole_text</code>,
   <code class="DOMm">normalize_document</code>,
   <code class="DOMm">rename_node</code>,
   <code class="DOMm">import_node</code> は未実装</li>
@@ -57,22 +56,34 @@
   <code lang="en" class="DOM">schema-type</code> <em>以外</em> は未実装</li>
   <li><code lang="en" class="DOMi">NameList</code> は未実装</li>
   </ul>
+
+  <div class="note memo">
+  <p><code class="DOMm">replace_whole_text</code> と
+  <code class="DOMm">import_node</code> と
+  <code class="DOMa">specified</code> はいつか実装する予定です。
+  それ以外の実装の予定はありません。</p>
+  </div>
   </div>
 </td>
 </tr>
 <tr>
-<th scope="row" lang="en" rowspan="2">XML</th>
-<td>水準 1</td>
+<td>manakai 拡張</td>
 <td></td>
 </tr>
 <tr>
+<th scope="row" lang="en" rowspan=2>XML</th>
 <td>
+  水準 1,
   <a href="http://www.w3.org/TR/2000/REC-DOM-Level-2-Core-20001113/core.html"
-      title="DOM 水準 2 XML">水準 2</a>, 3</td>
+      title="DOM 水準 2 XML">2</a>, 3</td>
 <td>実装済</td>
 </tr>
 <tr>
-<th scope="row">XDoctype 定義</th>
+<td>manakai 拡張</td>
+<td></td>
+</tr>
+<tr>
+<th scope="row">XML 文書型定義</th>
 <td>水準 3 案 (manakai 独自)</td>
 <td>
   <p>次のすべてを実装:</p>
@@ -84,15 +95,11 @@
   </ul>
 </td>
 </tr>
+<!--
 <tr>
 <th scope="row"><abbr lang="en"
     title="XML DTD Physical Structure Object Model">XDP</abbr></th>
 <td>第 1.0 版案 (manakai 独自)</td>
-<td></td>
-</tr>
-<tr>
-<th scope="row">共通 <abbr lang="en" title="Load and Save">LS</abbr></th>
-<td>水準 3 (manakai 独自)</td>
 <td></td>
 </tr>
 <tr>
@@ -119,7 +126,7 @@
   </ul>
   <div class="not-implemented">
     <ul>
-    <li>名前空間<em>非</em>製形式には未対応</li>
+    <li>名前空間<em>非</em>整形式には未対応</li>
     <li>妥当性は検証しない</li>
     <li>外部実体は読み込まない</li>
     <li><a href="http://www.w3.org/TR/2006/REC-xml11-20060816/#dt-fullnorm"
@@ -159,16 +166,7 @@
   </div>
 </td>
 </tr>
-<tr>
-<th scope="row">単純 <abbr lang="en" title="Load and Save">LS</abbr></th>
-<td>第 1.0 版案 (manakai 独自)</td>
-<td>
-  <p>次のすべてを実装:</p>
-  <ul>
-  <li><code class="DOMi" lang="en">SimpleXMLSerializer</code></li>
-  </ul>
-</td>
-</tr>
+-->
 <tr>
 <th scope="row">URI 共通</th>
 <td>第 4.0 版 (manakai 独自)</td>
@@ -177,6 +175,17 @@
   <ul>
   <li><code class="DOMi" lang="en">URIImplementation</code></li>
   <li><code class="DOMi" lang="en">URIReference</code></li>
+  </ul>
+</td>
+</tr>
+<tr>
+<th scope="row">媒体型</th>
+<td>第 1.0 版 (manakai 独自)</td>
+<td>
+  <p>次のすべてを実装:</p>
+  <ul>
+  <li><code class="DOMi" lang="en">IMTImplementation</code></li>
+  <li><code class="DOMi" lang="en">InternetMediaType</code></li>
   </ul>
 </td>
 </tr>
@@ -199,9 +208,19 @@
 </td>
 </tr>
 <tr>
-<td>(manakai 独自)</td>
+<td>manakai 拡張</td>
 <td><a href="http://suika.fam.cx/gate/2005/sw/SerialWalker"
     ><code class="DOMi" lang="en">SerialWalker</code></a>。</td>
+</tr>
+<tr>
+<th scope=row lang=en rowspan=2>HTML</th>
+<td>HTML5</td>
+<td><code>compat_mode</code> を実装。
+<code>inner_html</code> を一部実装。</td>
+</tr>
+<tr>
+<td>manakai 拡張</td>
+<td></td>
 </tr>
 <tr>
 <th scope="row" lang="en">Atom</th>
@@ -209,11 +228,13 @@
     title="SuikaWiki : Atom DOM">第 1.0 版案</a> (manakai 独自)</td>
 <td></td>
 </tr>
+<!--
 <tr>
 <th scope="row">SuikaWiki/0.9 構文解析</th>
 <td>第 1.0 版案 (manakai 独自)</td>
 <td></td>
 </tr>
+-->
 <tr>
 <th scope="row"><a href="http://suika.fam.cx/gate/2005/sw/H2H"
     title="SuikaWiki : H2H">H2H</a> 構文解析</th>
