@@ -1,6 +1,6 @@
 package Message::DOM::Text;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::CharacterData', 'Message::IF::Text';
 require Message::DOM::DOMCharacterData; ## TODO: Change to new module name
 
@@ -32,7 +32,6 @@ sub is_element_content_whitespace ($;$) {
 } # is_element_content_whitespace
 
 sub whole_text ($) {
-  require Message::DOM::Traversal;
   local $Error::Depth = $Error::Depth + 1;
   my $doc = $_[0]->owner_document;
   my $tw1 = $doc->create_tree_walker
@@ -144,4 +143,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/14 16:32:28 $
+## $Date: 2007/07/29 08:04:42 $

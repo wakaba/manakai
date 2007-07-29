@@ -6,11 +6,10 @@ RMALL = $(RM) -fv
 PM_SUFFIX = .pm
 
 all:
-	$(CD) Util && $(MAKE) .discore-all$(PM_SUFFIX) all
+	$(CD) Util && $(MAKE) all
 	$(CD) Markup && $(MAKE) all
 	$(CD) DOM && $(MAKE) all
 	$(CD) URI && $(MAKE) all
-	$(CD) Charset && $(MAKE) all
 
 clean:
 	$(RMALL) *.BAK .*.BAK *~ .*~
@@ -21,7 +20,6 @@ clean:
 	$(CD) Markup && $(MAKE) clean
 	$(CD) DOM && $(MAKE) clean
 	$(CD) URI && $(MAKE) clean
-	$(CD) Charset && $(MAKE) clean
 
 clean-db:
 #	$(CD) Body && $(MAKE) clean-db
@@ -31,7 +29,6 @@ clean-db:
 	$(CD) Markup && $(MAKE) clean-db
 	$(CD) DOM && $(MAKE) clean-db
 	$(CD) URI && $(MAKE) clean-db
-	$(CD) Charset && $(MAKE) clean-db
 
 distclean:
 	$(RMALL) *.BAK .*.BAK *~ .*~
@@ -42,7 +39,6 @@ distclean:
 	$(CD) Markup && $(MAKE) distclean
 	$(CD) DOM && $(MAKE) distclean
 	$(CD) URI && $(MAKE) distclean
-	$(CD) Charset && $(MAKE) distclean
 
-## $Date: 2006/03/31 16:44:23 $
+## $Date: 2007/07/29 08:04:40 $
 ## License: Public Domain.
