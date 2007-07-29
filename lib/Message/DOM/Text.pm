@@ -1,8 +1,8 @@
 package Message::DOM::Text;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.12 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::CharacterData', 'Message::IF::Text';
-require Message::DOM::DOMCharacterData; ## TODO: Change to new module name
+require Message::DOM::CharacterData;
 
 ## |Node| attributes
 
@@ -143,4 +143,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/29 08:04:42 $
+## $Date: 2007/07/29 08:31:14 $

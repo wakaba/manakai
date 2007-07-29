@@ -1,8 +1,8 @@
 package Message::DOM::Atom::AtomElement;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Element';
-require Message::DOM::DOMElement;
+require Message::DOM::Element;
 
 my $ATOM_NS = q<http://www.w3.org/2005/Atom>;
 my $CREATE_CHILD_URI = q<http://suika.fam.cx/www/2006/dom-config/create-child-element>;
@@ -747,4 +747,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/15 12:54:06 $
+## $Date: 2007/07/29 08:31:17 $

@@ -1,6 +1,6 @@
 package Message::DOM::DOMImplementation;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.10 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::IF::DOMImplementation',
     'Message::IF::AtomDOMImplementation';
 
@@ -18,7 +18,7 @@ sub AUTOLOAD {
   my $module_name = {
     create_atom_entry_document => 'Message::DOM::Atom::AtomElement',
     create_atom_feed_document => 'Message::DOM::Atom::AtomElement',
-    create_document => 'Message::DOM::DOMDocument', ## TODO: New module name
+    create_document => 'Message::DOM::Document',
     create_document_type => 'Message::DOM::DocumentType',
     create_uri_reference => 'Message::URI::URIReference',  
   }->{$method_name};
@@ -106,4 +106,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/16 11:58:02 $
+## $Date: 2007/07/29 08:31:14 $
