@@ -1925,9 +1925,135 @@ $Element->{$HTML_NS}->{abbr} = {
   checker => $HTMLStrictlyInlineChecker,
 };
 
-$Element->{$HTML_NS}->{time} = { ## TODO: validate content
-  attrs_checker => $GetHTMLAttrsChecker->({}), ## TODO: datetime
-  checker => $HTMLStrictlyInlineChecker,
+$Element->{$HTML_NS}->{time} = {
+  attrs_checker => $GetHTMLAttrsChecker->({
+    datetime => sub { 1 }, # checked in |checker|
+  }),
+  ## TODO: Write tests
+  checker => sub {
+    my ($self, $todo) = @_;
+
+    my $attr = $todo->{node}->get_attribute_node_ns (undef, 'datetime');
+    my $input;
+    my $reg_sp;
+    my $input_node;
+    if ($attr) {
+      $input = $attr->value;
+      $reg_sp = qr/[\x09-\x0D\x20]*/;
+      $input_node = $attr;
+    } else {
+      $input = $todo->{node}->text_content;
+      $reg_sp = qr/\p{Zs}*/;
+      $input_node = $todo->{node};
+
+      ## ISSUE: What is the definition for "successfully extracts a date
+      ## or time"?  If the algorithm says the string is invalid but
+      ## return some date or time, is it "successfully"?
+    }
+
+    my $hour;
+    my $minute;
+    my $second;
+    if ($input =~ /
+      \A
+      [\x09-\x0D\x20]*
+      ([0-9]+) # 1
+      (?>
+        -([0-9]+) # 2
+        -([0-9]+) # 3
+        [\x09-\x0D\x20]*
+        (?>
+          T
+          [\x09-\x0D\x20]*
+        )?
+        ([0-9]+) # 4
+        :([0-9]+) # 5
+        (?>
+          :([0-9]+(?>\.[0-9]*)?|\.[0-9]*) # 6
+        )?
+        [\x09-\x0D\x20]*
+        (?>
+          Z
+          [\x09-\x0D\x20]*
+        |
+          [+-]([0-9]+):([0-9]+) # 7, 8
+          [\x09-\x0D\x20]*
+        )?
+        \z
+      |
+        :([0-9]+) # 9
+        (?>
+          :([0-9]+(?>\.[0-9]*)?|\.[0-9]*) # 10
+        )?
+        [\x09-\x0D\x20]*\z
+      )
+    /x) {
+      if (defined $2) { ## YYYY-MM-DD T? hh:mm
+        if (length $1 != 4 or length $2 != 2 or length $3 != 2 or
+            length $4 != 2 or length $5 != 2) {
+          $self->{onerror}->(node => $input_node,
+                             type => 'dateortime:syntax error');
+        }
+
+        if (1 <= $2 and $2 <= 12) {
+          $self->{onerror}->(node => $input_node, type => 'datetime:bad day')
+              if $3 < 1 or
+                  $3 > [0, 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]->[$2];
+          $self->{onerror}->(node => $input_node, type => 'datetime:bad day')
+              if $2 == 2 and $3 == 29 and
+                  not ($1 % 400 == 0 or ($1 % 4 == 0 and $1 % 100 != 0));
+        } else {
+          $self->{onerror}->(node => $input_node,
+                             type => 'datetime:bad month');
+        }
+
+        ($hour, $minute, $second) = ($4, $5, $6);
+          
+        if (defined $7) { ## [+-]hh:mm
+          if (length $7 != 2 or length $8 != 2) {
+            $self->{onerror}->(node => $input_node,
+                               type => 'dateortime:syntax error');
+          }
+
+          $self->{onerror}->(node => $input_node,
+                             type => 'datetime:bad timezone hour')
+              if $7 > 23;
+          $self->{onerror}->(node => $input_node,
+                             type => 'datetime:bad timezone minute')
+              if $8 > 59;
+        }
+      } else { ## hh:mm
+        if (length $1 != 2 or length $9 != 2) {
+          $self->{onerror}->(node => $input_node,
+                             type => qq'dateortime:syntax error');
+        }
+
+        ($hour, $minute, $second) = ($1, $9, $10);
+      }
+
+      $self->{onerror}->(node => $input_node, type => 'datetime:bad hour')
+          if $hour > 23;
+      $self->{onerror}->(node => $input_node, type => 'datetime:bad minute')
+          if $minute > 59;
+
+      if (defined $second) { ## s
+        ## NOTE: Integer part of second don't have to have length of two.
+          
+        if (substr ($second, 0, 1) eq '.') {
+          $self->{onerror}->(node => $input_node,
+                             type => 'dateortime:syntax error');
+        }
+          
+        $self->{onerror}->(node => $input_node, type => 'datetime:bad second')
+            if $second >= 60;
+      }        
+    } else {
+      $self->{onerror}->(node => $input_node,
+                         type => 'dateortime:syntax error');
+    }
+
+    return $HTMLStrictlyInlineChecker->($self, $todo);
+  },
 };
 
 $Element->{$HTML_NS}->{meter} = { ## TODO: "The recommended way of giving the value is to include it as contents of the element"
@@ -3147,4 +3273,4 @@ sub _check_get_children ($$$) {
 } # _check_get_children
 
 1;
-# $Date: 2007/07/29 05:20:12 $
+# $Date: 2007/08/04 13:23:36 $

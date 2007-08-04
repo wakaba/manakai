@@ -79,11 +79,9 @@ sub form_table ($$$) {
     }
   } # NEXT_CHILD
 
-  ## ISSUE: Step 9.1 /next column/ is not used.
-
   ## Step 9
-  while ($current_ln eq 'colgroup') { # Step 9, Step 9.5
-    ## Step 2: column groups
+  while ($current_ln eq 'colgroup') { # Step 9, Step 9.4
+    ## Step 9.1: column groups
     my @col = grep {
       $_->node_type == 1 and
       defined $_->namespace_uri and
@@ -137,7 +135,7 @@ sub form_table ($$$) {
       $table->{column_group}->[$_] = $cg for (($x_max - $span + 1) .. $x_max);
     }
     
-    ## Step 3, 4
+    ## Step 9.2, 9.3
     NEXT_CHILD: {
       $current_element = shift @table_child;
       if (defined $current_element) {
@@ -386,4 +384,4 @@ sub form_table ($$$) {
 ## TODO: Implement scope="" algorithm
 
 1;
-## $Date: 2007/07/01 04:46:48 $
+## $Date: 2007/08/04 13:23:36 $
