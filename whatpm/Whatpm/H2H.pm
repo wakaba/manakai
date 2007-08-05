@@ -443,6 +443,7 @@ sub _construct_tree ($) {
               rp => [HTML_NS, 'rp', $parent->{text}, 'data'],
               rt => [HTML_NS, 'rt', $parent->{text}, 'data'],
               ruby => [HTML_NS, 'ruby', $parent->{text}, 'data'],
+              samp => [HTML_NS, 'samp', $parent->{text}, 'data'],
               span => [HTML_NS, 'span', $parent->{text}, 'data'],
               strong => [HTML_NS, 'strong', $parent->{text}, 'data'],
               sup => [HTML_NS, 'sup', $parent->{text}, 'data'],
@@ -564,4 +565,4 @@ sub _construct_tree ($) {
 } # _construct_tree
 
 1;
-## $Date: 2007/07/15 07:52:01 $
+## $Date: 2007/08/05 07:12:45 $

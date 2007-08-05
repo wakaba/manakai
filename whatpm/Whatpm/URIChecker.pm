@@ -7,12 +7,27 @@ our $DefaultPort = {
   http => 80,
 };
 
+sub check_iri ($$$) {
+  require Message::URI::URIReference;
+  my $dom = Message::DOM::DOMImplementation->new;
+  my $uri_o = $dom->create_uri_reference ($_[1]);
+  my $uri_s = $uri_o->uri_reference;
+
+  local $Error::Depth = $Error::Depth + 1;
+
+  unless ($uri_o->is_iri_3987) {
+    $_[2]->(type => 'syntax error:iri3987', level => 'm');
+    ## MUST
+  }
+
+  Whatpm::URIChecker->check_iri_reference ($_[1], $_[2]);
+} # check_iri
+
 sub check_iri_reference ($$$) {
   my $onerror = $_[2];
 
-  require Message::URI::URIReference; ## From manakai
-  my $dom = 'Message::DOM::DOMImplementation'; ## ISSUE: This is not a formal way to instantiate it.
-
+  require Message::URI::URIReference;
+  my $dom = Message::DOM::DOMImplementation->new;
   my $uri_o = $dom->create_uri_reference ($_[1]);
   my $uri_s = $uri_o->uri_reference;
 
@@ -20,7 +35,7 @@ sub check_iri_reference ($$$) {
 
   ## RFC 3987 4.1.
   unless ($uri_o->is_iri_reference_3987) {
-    $onerror->(type => 'syntax error', level => 'm');
+    $onerror->(type => 'syntax error:iriref3987', level => 'm');
     ## MUST
   }
   
@@ -230,4 +245,4 @@ sub check_iri_reference ($$$) {
 } # check_iri_reference
 
 1;
-## $Date: 2007/06/30 13:12:33 $
+## $Date: 2007/08/05 07:12:45 $

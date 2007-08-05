@@ -2,6 +2,8 @@ package Whatpm::ContentChecker;
 use strict;
 require Whatpm::ContentChecker;
 
+require Whatpm::URIChecker;
+
 my $ATOM_NS = q<http://www.w3.org/2005/Atom>;
 
 ## MUST be well-formed XML (RFC 4287 references XML 1.0 REC 20040204)
@@ -177,14 +179,12 @@ my $AtomPersonConstruct = {
             }
           } elsif ($ln eq 'uri') {
             unless ($has_uri) {
-              ## TODO: MUST be an IRI
               $has_uri = 1;
             } else {
               $not_allowed = 1; # MUST NOT
             }
           } elsif ($ln eq 'email') {
             unless ($has_email) {
-              ## TODO: MUST be an addr-spec
               $has_email = 1;
             } else {
               $not_allowed = 1; # MUST NOT
@@ -218,12 +218,121 @@ my $AtomPersonConstruct = {
   },
 }; # $AtomPersonConstruct
 
-## MUST NOT be any white space
-my $AtomDateConstruct = {
+our $Element;
+
+$Element->{$ATOM_NS}->{name} = {
+  ## NOTE: Strictly speaking, structure and semantics for atom:name
+  ## element outside of Person construct is not defined.
   attrs_checker => $GetAtomAttrsChecker->({}),
   checker => sub {
     my ($self, $todo) = @_;
 
+    my @nodes = (@{$todo->{node}->child_nodes});
+    my $new_todos = [];
+
+    while (@nodes) {
+      my $node = shift @nodes;
+      $self->_remove_minuses ($node) and next if ref $node eq 'HASH';
+        
+      my $nt = $node->node_type;
+      if ($nt == 1) {
+        ## NOTE: No constraint.
+        my ($sib, $ch) = $self->_check_get_children ($node, $todo);
+        unshift @nodes, @$sib;
+        push @$new_todos, @$ch;
+      } elsif ($nt == 3 or $nt == 4) {
+        #
+      } elsif ($nt == 5) {
+        unshift @nodes, @{$node->child_nodes};
+      }
+    }
+
+    return ($new_todos);
+  },
+};
+
+$Element->{$ATOM_NS}->{uri} = {
+  ## NOTE: Strictly speaking, structure and semantics for atom:uri
+  ## element outside of Person construct is not defined.
+  attrs_checker => $GetAtomAttrsChecker->({}),
+  checker => sub {
+    my ($self, $todo) = @_;
+
+    my @nodes = (@{$todo->{node}->child_nodes});
+    my $new_todos = [];
+
+    my $s = '';
+    while (@nodes) {
+      my $node = shift @nodes;
+      $self->_remove_minuses ($node) and next if ref $node eq 'HASH';
+        
+      my $nt = $node->node_type;
+      if ($nt == 1) {
+        ## NOTE: Not explicitly disallowed.
+        $self->{onerror}->(node => $node, type => 'element not allowed');
+        my ($sib, $ch) = $self->_check_get_children ($node, $todo);
+        unshift @nodes, @$sib;
+        push @$new_todos, @$ch;
+      } elsif ($nt == 3 or $nt == 4) {
+        $s .= $node->data;
+      } elsif ($nt == 5) {
+        unshift @nodes, @{$node->child_nodes};
+      }
+    }
+
+    ## NOTE: There MUST NOT be any white space.
+    Whatpm::URIChecker->check_iri_reference ($s, sub {
+      my %opt = @_;
+      $self->{onerror}->(node => $todo->{node}, level => $opt{level},
+                         type => 'URI::'.$opt{type}.
+                         (defined $opt{position} ? ':'.$opt{position} : ''));
+    });
+
+    return ($new_todos);
+  },
+};
+
+$Element->{$ATOM_NS}->{email} = {
+  ## NOTE: Strictly speaking, structure and semantics for atom:email
+  ## element outside of Person construct is not defined.
+  attrs_checker => $GetAtomAttrsChecker->({}),
+  checker => sub {
+    my ($self, $todo) = @_;
+
+    my @nodes = (@{$todo->{node}->child_nodes});
+    my $new_todos = [];
+
+    my $s = '';
+    while (@nodes) {
+      my $node = shift @nodes;
+      $self->_remove_minuses ($node) and next if ref $node eq 'HASH';
+        
+      my $nt = $node->node_type;
+      if ($nt == 1) {
+        ## NOTE: Not explicitly disallowed.
+        $self->{onerror}->(node => $node, type => 'element not allowed');
+        my ($sib, $ch) = $self->_check_get_children ($node, $todo);
+        unshift @nodes, @$sib;
+        push @$new_todos, @$ch;
+      } elsif ($nt == 3 or $nt == 4) {
+        $s .= $node->data;
+      } elsif ($nt == 5) {
+        unshift @nodes, @{$node->child_nodes};
+      }
+    }
+
+    ## TODO: addr-spec
+    $self->{onerror}->(node => $todo->{node}, type => 'addr-spec',
+                       level => 'unsupported');
+
+    return ($new_todos);
+  },
+};
+
+## MUST NOT be any white space
+my $AtomDateConstruct = {
+  attrs_checker => $GetAtomAttrsChecker->({}),
+  checker => sub {
     my ($self, $todo) = @_;
 
     my @nodes = (@{$todo->{node}->child_nodes});
@@ -255,14 +364,7 @@ my $AtomDateConstruct = {
   },
 }; # $AtomDateConstruct
 
-## MUST NOT be any IRI
-my $AtomIRIChecker = sub {
-
-}; # $AtomIRIChecker
-
-our $Element;
-
-$Element->{$ATOM_NS}->{entryXXX} = {
+$Element->{$ATOM_NS}->{entry} = {
   is_root => 1,
   attrs_checker => $GetAtomAttrsChecker->({}),
   checker => sub {
@@ -375,7 +477,6 @@ $Element->{$ATOM_NS}->{feed} = {
         
       my $nt = $node->node_type;
       if ($nt == 1) {
-        # MUST
         my $nsuri = $node->namespace_uri;
         $nsuri = '' unless defined $nsuri;
         my $not_allowed;
@@ -483,8 +584,13 @@ $Element->{$ATOM_NS}->{content} = {
     ## TODO: This implementation is not optimal.
 
     if ($src_attr) {
-      ## TODO: MUST be an IRI reference
-
+      ## NOTE: There MUST NOT be any white space.
+      Whatpm::URIChecker->check_iri_reference ($src_attr->value, sub {
+        my %opt = @_;
+        $self->{onerror}->(node => $todo->{node}, level => $opt{level},
+                           type => 'URI::'.$opt{type}.
+                           (defined $opt{position} ? ':'.$opt{position} : ''));
+      });
 
       ## NOTE: If @src, the element MUST be empty.  What is "empty"?
       ## Is |<e><!----></e>| empty?  |<e>&e;</e>| where |&e;| has
@@ -694,7 +800,16 @@ $Element->{$ATOM_NS}->{author} = $AtomPersonConstruct;
 $Element->{$ATOM_NS}->{category} = {
   attrs_checker => $GetAtomAttrsChecker->({
     label => sub { 1 }, # no value constraint
-    scheme => sub { }, ## TODO: IRI # No MUST
+    scheme => sub { # NOTE: No MUST.
+      my ($self, $attr) = @_;
+      ## NOTE: There MUST NOT be any white space.
+      Whatpm::URIChecker->check_iri ($attr->value, sub {
+        my %opt = @_;
+        $self->{onerror}->(node => $attr, level => $opt{level},
+                           type => 'URI::'.$opt{type}.
+                           (defined $opt{position} ? ':'.$opt{position} : ''));
+      });
+    },
     term => sub { 1 }, # no value constraint
   }),
   checker => sub {
@@ -732,7 +847,18 @@ $Element->{$ATOM_NS}->{contributor} = $AtomPersonConstruct;
 
 $Element->{$ATOM_NS}->{generator} = {
   attrs_checker => $GetAtomAttrsChecker->({
-    uri => sub { }, ## TODO: IRI reference # MUST # SHOULD produce a representation that is relevant to the agent
+    uri => sub { # MUST
+      my ($self, $attr) = @_;
+      ## NOTE: There MUST NOT be any white space.
+      Whatpm::URIChecker->check_iri_reference ($attr->value, sub {
+        my %opt = @_;
+        $self->{onerror}->(node => $attr, level => $opt{level},
+                           type => 'URI::'.$opt{type}.
+                           (defined $opt{position} ? ':'.$opt{position} : ''));
+      });
+      ## NOTE: Dereferencing SHOULD produce a representation
+      ## that is relevant to the agent.
+    },
     version => sub { 1 }, # no value constraint
   }),
   checker => sub {
@@ -772,6 +898,7 @@ $Element->{$ATOM_NS}->{icon} = {
     my @nodes = (@{$todo->{node}->child_nodes});
     my $new_todos = [];
     
+    my $s = '';
     while (@nodes) {
       my $node = shift @nodes;
       $self->_remove_minuses ($node) and next if ref $node eq 'HASH';
@@ -784,13 +911,21 @@ $Element->{$ATOM_NS}->{icon} = {
         unshift @nodes, @$sib;
         push @$new_todos, @$ch;
       } elsif ($nt == 3 or $nt == 4) {
-        #
+        $s .= $node->data;
       } elsif ($nt == 5) {
         unshift @nodes, @{$node->child_nodes};
       }
     }
 
-    ## TODO: an IRI reference (no MUST)
+    ## NOTE: No MUST.
+    ## NOTE: There MUST NOT be any white space.
+    Whatpm::URIChecker->check_iri_reference ($s, sub {
+      my %opt = @_;
+      $self->{onerror}->(node => $todo->{node}, level => $opt{level},
+                         type => 'URI::'.$opt{type}.
+                         (defined $opt{position} ? ':'.$opt{position} : ''));
+    });
+
     ## NOTE: Image SHOULD be 1:1 and SHOULD be small
 
     return ($new_todos);
@@ -804,7 +939,8 @@ $Element->{$ATOM_NS}->{id} = {
 
     my @nodes = (@{$todo->{node}->child_nodes});
     my $new_todos = [];
-    
+
+    my $s = '';
     while (@nodes) {
       my $node = shift @nodes;
       $self->_remove_minuses ($node) and next if ref $node eq 'HASH';
@@ -817,18 +953,224 @@ $Element->{$ATOM_NS}->{id} = {
         unshift @nodes, @$sib;
         push @$new_todos, @$ch;
       } elsif ($nt == 3 or $nt == 4) {
+        $s .= $node->data;
+      } elsif ($nt == 5) {
+        unshift @nodes, @{$node->child_nodes};
+      }
+    }
+
+    ## NOTE: There MUST NOT be any white space.
+    Whatpm::URIChecker->check_iri ($s, sub { # MUST
+      my %opt = @_;
+      $self->{onerror}->(node => $todo->{node}, level => $opt{level},
+                         type => 'URI::'.$opt{type}.
+                         (defined $opt{position} ? ':'.$opt{position} : ''));
+    });
+    ## TODO: SHOULD be normalized
+
+    return ($new_todos);
+  },
+};
+
+$Element->{$ATOM_NS}->{link} = {
+  attrs_checker => $GetAtomAttrsChecker->({
+    href => sub {
+      my ($self, $attr) = @_;
+      ## NOTE: There MUST NOT be any white space.
+      Whatpm::URIChecker->check_iri_reference ($attr->value, sub {
+        my %opt = @_;
+        $self->{onerror}->(node => $attr, level => $opt{level},
+                           type => 'URI::'.$opt{type}.
+                           (defined $opt{position} ? ':'.$opt{position} : ''));
+      });
+    },
+    hreflang => sub { }, # TODO: MUST be an RFC 3066 language tag
+    length => sub { }, # No MUST; in octets.
+    rel => sub { # MUST
+      my ($self, $attr) = @_;
+      my $value = $attr->value;
+      if ($value =~ /\A(?>[0-9A-Za-z._~!\$&'()*+,;=\x{A0}-\x{D7FF}\x{F900}-\x{FDCF}\x{FDF0}-\x{FFEF}\x{10000}-\x{1FFFD}\x{20000}-\x{2FFFD}\x{30000}-\x{3FFFD}\x{40000}-\x{4FFFD}\x{50000}-\x{5FFFD}\x{60000}-\x{6FFFD}\x{70000}-\x{7FFFD}\x{80000}-\x{8FFFD}\x{90000}-\x{9FFFD}\x{A0000}-\x{AFFFD}\x{B0000}-\x{BFFFD}\x{C0000}-\x{CFFFD}\x{D0000}-\x{DFFFD}\x{E1000}-\x{EFFFD}-]|%[0-9A-Fa-f][0-9A-Fa-f]|\@)+\z/) {
+        $value = q<http://www.iana.org/assignments/relation/> . $value;
+      }
+
+      ## NOTE: There MUST NOT be any white space.
+      Whatpm::URIChecker->check_iri ($value, sub {
+        my %opt = @_;
+        $self->{onerror}->(node => $attr, level => $opt{level},
+                           type => 'URI::'.$opt{type}.
+                           (defined $opt{position} ? ':'.$opt{position} : ''));
+      });
+
+      ## TODO: Warn if unregistered
+    },
+    type => sub { }, # TODO: MUST be a MIME media type
+  }),
+  checker => sub {
+    my ($self, $todo) = @_;
+
+    unless ($todo->{node}->has_attribute_ns (undef, 'href')) { # MUST
+      $self->{onerror}->(node => $todo->{node},
+                         type => 'attribute missing:href');
+    }
+
+    if ($todo->{node}->rel eq
+            q<http://www.iana.org/assignments/relation/enclosure> and
+        not $todo->{node}->has_attribute_ns (undef, 'length')) {
+      $self->{onerror}->(node => $todo->{node}, level => 's',
+                         type => 'attribute missing:length');
+    }
+
+    my @nodes = (@{$todo->{node}->child_nodes});
+    my $new_todos = [];
+    
+    while (@nodes) {
+      my $node = shift @nodes;
+      $self->_remove_minuses ($node) and next if ref $node eq 'HASH';
+      
+      my $nt = $node->node_type;
+      if ($nt == 1) {
+        my ($sib, $ch) = $self->_check_get_children ($node, $todo);
+        unshift @nodes, @$sib;
+        push @$new_todos, @$ch;
+      } elsif ($nt == 3 or $nt == 4) {
         #
       } elsif ($nt == 5) {
         unshift @nodes, @{$node->child_nodes};
       }
     }
 
-    ## TODO: MUST be an IRI (absolute)
-    ## TODO: SHOULD be normalized
+    return ($new_todos);
+  },
+};
+
+$Element->{$ATOM_NS}->{logo} = {
+  attrs_checker => $GetAtomAttrsChecker->({}),
+  checker => sub {
+    my ($self, $todo) = @_;
+
+    my @nodes = (@{$todo->{node}->child_nodes});
+    my $new_todos = [];
+
+    my $s = '';
+    while (@nodes) {
+      my $node = shift @nodes;
+      $self->_remove_minuses ($node) and next if ref $node eq 'HASH';
+      
+      my $nt = $node->node_type;
+      if ($nt == 1) {
+        ## not explicitly disallowed
+        $self->{onerror}->(node => $node, type => 'element not allowed');
+        my ($sib, $ch) = $self->_check_get_children ($node, $todo);
+        unshift @nodes, @$sib;
+        push @$new_todos, @$ch;
+      } elsif ($nt == 3 or $nt == 4) {
+        $s .= $node->data;
+      } elsif ($nt == 5) {
+        unshift @nodes, @{$node->child_nodes};
+      }
+    }
+
+    ## NOTE: There MUST NOT be any white space.
+    Whatpm::URIChecker->check_iri_reference ($s, sub {
+      my %opt = @_;
+      $self->{onerror}->(node => $todo->{node}, level => $opt{level},
+                         type => 'URI::'.$opt{type}.
+                         (defined $opt{position} ? ':'.$opt{position} : ''));
+    });
+    
+    ## NOTE: Image SHOULD be 2:1
 
     return ($new_todos);
   },
 };
+
+$Element->{$ATOM_NS}->{published} = $AtomDateConstruct;
+
+$Element->{$ATOM_NS}->{rights} = $AtomDateConstruct;
+## SHOULD NOT be used to convey machine-readable information.
+
+$Element->{$ATOM_NS}->{source} = {
+  attrs_checker => $GetAtomAttrsChecker->({}),
+  checker => sub {
+    my ($self, $todo) = @_;
+
+    my @nodes = (@{$todo->{node}->child_nodes});
+    my $new_todos = [];
+    my $has_element = {};
+    while (@nodes) {
+      my $node = shift @nodes;
+      $self->_remove_minuses ($node) and next if ref $node eq 'HASH';
+        
+      my $nt = $node->node_type;
+      if ($nt == 1) {
+        my $nsuri = $node->namespace_uri;
+        $nsuri = '' unless defined $nsuri;
+        my $not_allowed;
+        if ($nsuri eq $ATOM_NS) {
+          my $ln = $node->manakai_local_name;
+          if ($ln eq 'entry') {
+            $has_element->{entry} = 1;
+          } elsif ({
+               generator => 1,
+               icon => 1,
+               id => 1,
+               logo => 1,
+               rights => 1,
+               subtitle => 1,
+               title => 1,
+               updated => 1,
+              }->{$ln}) {
+            unless ($has_element->{$ln}) {
+              $has_element->{$ln} = 1;
+              $not_allowed = $has_element->{entry};
+            } else {
+              $not_allowed = 1;
+            }
+          } elsif ($ln eq 'link') {
+            ## TODO: MUST NOT rel=alternate with same (type, hreflang)
+            # 
+            $not_allowed = $has_element->{entry};
+          } elsif ({
+                    author => 1,
+                    category => 1,
+                    contributor => 1,
+                   }->{$ln}) {
+            $not_allowed = $has_element->{entry};
+          } else {
+            $not_allowed = 1;
+          }
+        } else {
+          ## TODO: extension element
+          $not_allowed = 1;
+        }
+        $self->{onerror}->(node => $node, type => 'element not allowed')
+            if $not_allowed;
+        my ($sib, $ch) = $self->_check_get_children ($node, $todo);
+        unshift @nodes, @$sib;
+        push @$new_todos, @$ch;
+      } elsif ($nt == 3 or $nt == 4) {
+        ## TODO: Are white spaces allowed?
+        $self->{onerror}->(node => $node, type => 'character not allowed');
+      } elsif ($nt == 5) {
+        unshift @nodes, @{$node->child_nodes};
+      }
+    }
+
+    return ($new_todos);
+  },
+};
+
+$Element->{$ATOM_NS}->{subtitle} = $AtomTextConstruct;
+
+$Element->{$ATOM_NS}->{summary} = $AtomTextConstruct;
+
+$Element->{$ATOM_NS}->{title} = $AtomTextConstruct;
+
+$Element->{$ATOM_NS}->{updated} = $AtomDateConstruct;
+
+## TODO: signature element
+
+## TODO: simple extension element and structured extension element
 
 $Whatpm::ContentChecker::Namespace->{$ATOM_NS}->{loaded} = 1;
 
