@@ -413,6 +413,7 @@ sub _construct_tree ($) {
               a => [HTML_NS, 'a', $parent->{text}, 'data'],
               abbr => [HTML_NS, 'abbr', $parent->{text}, 'data'],
               acronym => [HTML_NS, 'abbr', $parent->{text}, 'data'],
+              b => [HTML_NS, 'b', $parent->{text}, 'data'],
               blockquote => [HTML_NS, 'blockquote', $parent->{text}, 'data'],
               br => [HTML_NS, 'br', $parent->{text}, 'br'],
               caption => [HTML_NS, 'caption', $parent->{text}, 'data'],
@@ -429,6 +430,7 @@ sub _construct_tree ($) {
               h2 => [HTML_NS, 'h2', $parent->{text}, 'data'],
               h3 => [HTML_NS, 'h3', $parent->{text}, 'data'],
               h4 => [HTML_NS, 'h4', $parent->{text}, 'data'],
+              i => [HTML_NS, 'i', $parent->{text}, 'data'],
               img => [HTML_NS, 'img', $parent->{text}, 'data'],
               input => [HTML_NS, 'input', $parent->{text}, 'data'],
               ins => [HTML_NS, 'ins', $parent->{text}, 'data'],
@@ -446,6 +448,7 @@ sub _construct_tree ($) {
               samp => [HTML_NS, 'samp', $parent->{text}, 'data'],
               span => [HTML_NS, 'span', $parent->{text}, 'data'],
               strong => [HTML_NS, 'strong', $parent->{text}, 'data'],
+              sub => [HTML_NS, 'sub', $parent->{text}, 'data'],
               sup => [HTML_NS, 'sup', $parent->{text}, 'data'],
               table => [HTML_NS, 'table', $parent->{text}, 'data'],
               tbody => [HTML_NS, 'tbody', $parent->{text}, 'data'],
@@ -565,4 +568,4 @@ sub _construct_tree ($) {
 } # _construct_tree
 
 1;
-## $Date: 2007/08/05 07:12:45 $
+## $Date: 2007/08/05 09:24:56 $

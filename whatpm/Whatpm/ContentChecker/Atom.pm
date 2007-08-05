@@ -5,6 +5,7 @@ require Whatpm::ContentChecker;
 require Whatpm::URIChecker;
 
 my $ATOM_NS = q<http://www.w3.org/2005/Atom>;
+my $LINK_REL = q<http://www.iana.org/assignments/relation/>;
 
 ## MUST be well-formed XML (RFC 4287 references XML 1.0 REC 20040204)
 
@@ -407,11 +408,23 @@ $Element->{$ATOM_NS}->{entry} = {
               $not_allowed = 1;
             }
           } elsif ($ln eq 'link') { # MAY
-            ## TODO: MUST link rel=alternate + unless child::content
-            ## TODO: MUST NOT rel=alternate with same (type, hreflang) +
+            if ($node->rel eq $LINK_REL . 'alternate') {
+              my $type = $node->get_attribute_ns (undef, 'type');
+              $type = '' unless defined $type;
+              my $hreflang = $node->get_attribute_ns (undef, 'hreflang');
+              $hreflang = '' unless defined $hreflang;
+              my $key = 'link:'.(defined $type ? ':'.$type : '').':'.
+                  (defined $hreflang ? ':'.$hreflang : '');
+              unless ($has_element->{$key}) {
+                $has_element->{$key} = 1;
+                $has_element->{'link.alternate'} = 1;
+              } else {
+                $not_allowed = 1;
+              }
+            }
+            
             ## NOTE: MAY
-            # 
-            $not_allowed = $has_element->{entry};
+            $not_allowed ||= $has_element->{entry};
           } elsif ({ # MAY
                     author => 1,
                     category => 1,
@@ -453,6 +466,11 @@ $Element->{$ATOM_NS}->{entry} = {
     unless ($has_element->{updated}) { # MUST
       $self->{onerror}->(node => $todo->{node},
                          type => 'element missing:atom.updated');
+    }
+    if (not $has_element->{content} and
+        not $has_element->{'link.alternate'}) {
+      $self->{onerror}->(node => $todo->{node},
+                         type => 'element missing:atom.link.alternate');
     }
 
     return ($new_todos);
@@ -500,10 +518,25 @@ $Element->{$ATOM_NS}->{feed} = {
             } else {
               $not_allowed = 1;
             }
-          } elsif ($ln eq 'link') { # MAY
-            ## TODO: SHOULD rel=self
-            ## TODO: MUST NOT rel=alternate with same (type, hreflang)
-            # 
+          } elsif ($ln eq 'link') {
+            my $rel = $node->rel;
+            if ($rel eq $LINK_REL . 'alternate') {
+              my $type = $node->get_attribute_ns (undef, 'type');
+              $type = '' unless defined $type;
+              my $hreflang = $node->get_attribute_ns (undef, 'hreflang');
+              $hreflang = '' unless defined $hreflang;
+              my $key = 'link:'.(defined $type ? ':'.$type : '').':'.
+                  (defined $hreflang ? ':'.$hreflang : '');
+              unless ($has_element->{$key}) {
+                $has_element->{$key} = 1;
+              } else {
+                $not_allowed = 1;
+              }
+            } elsif ($rel eq $LINK_REL . 'self') {
+              $has_element->{'link.self'} = 1;
+            }
+            
+            ## NOTE: MAY
             $not_allowed = $has_element->{entry};
           } elsif ({ # MAY
                     author => 1,
@@ -547,6 +580,10 @@ $Element->{$ATOM_NS}->{feed} = {
       $self->{onerror}->(node => $todo->{node},
                          type => 'element missing:atom.updated');
     }
+    unless ($has_element->{'link.self'}) {
+      $self->{onerror}->(node => $todo->{node}, level => 's',
+                         type => 'child element missing:atom.link.self');
+    }
 
     return ($new_todos);
   },
@@ -568,9 +605,34 @@ $Element->{$ATOM_NS}->{content} = {
       if ($value eq 'text' or $value eq 'html' or $value eq 'xhtml') {
         # MUST
       } else {
-
+        ## NOTE: MUST be a MIME media type.  What is "MIME media type"?
+        my $value = $attr->value;
+        my $lws0 = qr/(?>(?>\x0D\x0A)?[\x09\x20])*/;
+        my $token = qr/[\x21\x23-\x27\x2A\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7E]+/;
+        my $qs = qr/"(?>[\x00-\x0C\x0E-\x21\x23-\x5B\x5D-\x7E]|\x0D\x0A[\x09\x20]|\x5C[\x00-\x7F])*"/;
+        if ($value =~ m#\A$lws0($token)$lws0/$lws0($token)$lws0((?>;$lws0$token$lws0=$lws0(?>$token|$qs)$lws0)*)\z#) {
+          my @type = ($1, $2);
+          my $param = $3;
+          while ($param =~ s/^;$lws0($token)$lws0=$lws0(?>($token)|($qs))$lws0//) {
+            if (defined $2) {
+              push @type, $1 => $2;
+            } else {
+              my $n = $1;
+              my $v = $2;
+              $v =~ s/\\(.)/$1/gs;
+              push @type, $n => $v;
+            }
+          }
+          require Whatpm::IMTChecker;
+          Whatpm::IMTChecker->check_imt (sub {
+            my %opt = @_;
+            $self->{onerror}->(node => $attr, level => $opt{level},
+                               type => 'IMT:'.$opt{type});
+          }, @type);
+        } else {
+          $self->{onerror}->(node => $attr, type => 'IMT:syntax error');
+        }
       }
-      # IMT MUST NOT be used
     } elsif ($src_attr) {
       $value = '';
       $self->{onerror}->(node => $todo->{node},
@@ -578,8 +640,6 @@ $Element->{$ATOM_NS}->{content} = {
     } else {
       $value = 'text';
     }
-
-    ## TODO: type MUST be text/html/xhtml or MIME media type
 
     ## TODO: This implementation is not optimal.
 
@@ -725,9 +785,11 @@ $Element->{$ATOM_NS}->{content} = {
         }
       }
 
-      ## TODO: SHOULD be suitable for handling as $value.
+      ## NOTE: SHOULD be suitable for handling as $value.
       ## If no @src, this would normally mean it contains a 
       ## single child element that would serve as the root element.
+      $self->{onerror}->(node => $todo->{node}, level => 'unsupported',
+                         type => 'content:'.$value);
 
       return ($new_todos);
     } elsif ($value =~ m!^[Tt][Ee][Xx][Tt]/!) {
@@ -788,7 +850,10 @@ $Element->{$ATOM_NS}->{content} = {
       ## TODO: $s = valid Base64ed [RFC 3548] where 
       ## MAY leading and following "white space" (what?)
       ## and lines separated by a single U+000A
-      ## SHOULD be suitable for the indicated media type
+
+      ## NOTE: SHOULD be suitable for the indicated media type.
+      $self->{onerror}->(node => $todo->{node}, level => 'unsupported',
+                         type => 'content:'.$value);
 
       return ($new_todos);
     }
@@ -984,13 +1049,18 @@ $Element->{$ATOM_NS}->{link} = {
                            (defined $opt{position} ? ':'.$opt{position} : ''));
       });
     },
-    hreflang => sub { }, # TODO: MUST be an RFC 3066 language tag
+    hreflang => sub {
+      my ($self, $attr) = @_;
+      ## TODO: MUST be an RFC 3066 language tag
+      $self->{onerror}->(node => $attr, level => 'unsupported',
+                         type => 'language tag');
+    },
     length => sub { }, # No MUST; in octets.
     rel => sub { # MUST
       my ($self, $attr) = @_;
       my $value = $attr->value;
       if ($value =~ /\A(?>[0-9A-Za-z._~!\$&'()*+,;=\x{A0}-\x{D7FF}\x{F900}-\x{FDCF}\x{FDF0}-\x{FFEF}\x{10000}-\x{1FFFD}\x{20000}-\x{2FFFD}\x{30000}-\x{3FFFD}\x{40000}-\x{4FFFD}\x{50000}-\x{5FFFD}\x{60000}-\x{6FFFD}\x{70000}-\x{7FFFD}\x{80000}-\x{8FFFD}\x{90000}-\x{9FFFD}\x{A0000}-\x{AFFFD}\x{B0000}-\x{BFFFD}\x{C0000}-\x{CFFFD}\x{D0000}-\x{DFFFD}\x{E1000}-\x{EFFFD}-]|%[0-9A-Fa-f][0-9A-Fa-f]|\@)+\z/) {
-        $value = q<http://www.iana.org/assignments/relation/> . $value;
+        $value = $LINK_REL . $value;
       }
 
       ## NOTE: There MUST NOT be any white space.
@@ -1003,7 +1073,36 @@ $Element->{$ATOM_NS}->{link} = {
 
       ## TODO: Warn if unregistered
     },
-    type => sub { }, # TODO: MUST be a MIME media type
+    type => sub {
+      ## NOTE: MUST be a MIME media type.  What is "MIME media type"?
+      my ($self, $attr) = @_;
+      my $value = $attr->value;
+      my $lws0 = qr/(?>(?>\x0D\x0A)?[\x09\x20])*/;
+      my $token = qr/[\x21\x23-\x27\x2A\x2B\x2D\x2E\x30-\x39\x41-\x5A\x5E-\x7E]+/;
+      my $qs = qr/"(?>[\x00-\x0C\x0E-\x21\x23-\x5B\x5D-\x7E]|\x0D\x0A[\x09\x20]|\x5C[\x00-\x7F])*"/;
+      if ($value =~ m#\A$lws0($token)$lws0/$lws0($token)$lws0((?>;$lws0$token$lws0=$lws0(?>$token|$qs)$lws0)*)\z#) {
+        my @type = ($1, $2);
+        my $param = $3;
+        while ($param =~ s/^;$lws0($token)$lws0=$lws0(?>($token)|($qs))$lws0//) {
+          if (defined $2) {
+            push @type, $1 => $2;
+          } else {
+            my $n = $1;
+            my $v = $2;
+            $v =~ s/\\(.)/$1/gs;
+            push @type, $n => $v;
+          }
+        }
+        require Whatpm::IMTChecker;
+        Whatpm::IMTChecker->check_imt (sub {
+          my %opt = @_;
+          $self->{onerror}->(node => $attr, level => $opt{level},
+                             type => 'IMT:'.$opt{type});
+        }, @type);
+      } else {
+        $self->{onerror}->(node => $attr, type => 'IMT:syntax error');
+      }
+    },
   }),
   checker => sub {
     my ($self, $todo) = @_;
@@ -1013,8 +1112,7 @@ $Element->{$ATOM_NS}->{link} = {
                          type => 'attribute missing:href');
     }
 
-    if ($todo->{node}->rel eq
-            q<http://www.iana.org/assignments/relation/enclosure> and
+    if ($todo->{node}->rel eq $LINK_REL . 'enclosure' and
         not $todo->{node}->has_attribute_ns (undef, 'length')) {
       $self->{onerror}->(node => $todo->{node}, level => 's',
                          type => 'attribute missing:length');
@@ -1087,7 +1185,7 @@ $Element->{$ATOM_NS}->{logo} = {
 $Element->{$ATOM_NS}->{published} = $AtomDateConstruct;
 
 $Element->{$ATOM_NS}->{rights} = $AtomDateConstruct;
-## SHOULD NOT be used to convey machine-readable information.
+## NOTE: SHOULD NOT be used to convey machine-readable information.
 
 $Element->{$ATOM_NS}->{source} = {
   attrs_checker => $GetAtomAttrsChecker->({}),
@@ -1127,9 +1225,20 @@ $Element->{$ATOM_NS}->{source} = {
               $not_allowed = 1;
             }
           } elsif ($ln eq 'link') {
-            ## TODO: MUST NOT rel=alternate with same (type, hreflang)
-            # 
-            $not_allowed = $has_element->{entry};
+            if ($node->rel eq $LINK_REL . 'alternate') {
+              my $type = $node->get_attribute_ns (undef, 'type');
+              $type = '' unless defined $type;
+              my $hreflang = $node->get_attribute_ns (undef, 'hreflang');
+              $hreflang = '' unless defined $hreflang;
+              my $key = 'link:'.(defined $type ? ':'.$type : '').':'.
+                  (defined $hreflang ? ':'.$hreflang : '');
+              unless ($has_element->{$key}) {
+                $has_element->{$key} = 1;
+              } else {
+                $not_allowed = 1;
+              }
+            }
+            $not_allowed ||= $has_element->{entry};
           } elsif ({
                     author => 1,
                     category => 1,
