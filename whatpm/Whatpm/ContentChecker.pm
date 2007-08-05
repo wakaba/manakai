@@ -11,6 +11,7 @@ my $XML_NS = q<http://www.w3.org/XML/1998/namespace>;
 my $XMLNS_NS = q<http://www.w3.org/2000/xmlns/>;
 
 my $Namespace = {
+  q<http://www.w3.org/2005/Atom> => {module => 'Whatpm::ContentChecker::Atom'},
   $HTML_NS => {module => 'Whatpm::ContentChecker::HTML'},
   $XML_NS => {loaded => 1},
   $XMLNS_NS => {loaded => 1},
@@ -198,6 +199,13 @@ sub check_document ($$$) {
   
   my $docel_nsuri = $docel->namespace_uri;
   $docel_nsuri = '' unless defined $docel_nsuri;
+  unless ($Namespace->{$docel_nsuri}->{loaded}) {
+    if ($Namespace->{$docel_nsuri}->{module}) {
+      eval qq{ require $Namespace->{$docel_nsuri}->{module} } or die $@;
+    } else {
+      $Namespace->{$docel_nsuri}->{loaded} = 1;
+    }
+  }
   my $docel_def = $Element->{$docel_nsuri}->{$docel->manakai_local_name} ||
     $Element->{$docel_nsuri}->{''} ||
     $ElementDefault;
@@ -391,4 +399,4 @@ sub _check_get_children ($$$) {
 } # _check_get_children
 
 1;
-# $Date: 2007/08/04 13:48:25 $
+# $Date: 2007/08/05 04:50:57 $
