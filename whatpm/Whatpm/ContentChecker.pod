@@ -1,0 +1,101 @@
+=head1 NAME
+
+Whatpm::ContentChecker - DOM Conformance Checker
+
+=head1 SYNOPSIS
+
+  use Whatpm::ContentChecker;
+  
+  Whatpm::ContentChecker->check_document ($doc, sub {
+    my %arg = @_;
+    warn get_node_path ($arg{node}), ": ",
+        ($arg{level} || "Error"), ": ",
+        $arg{type}, "\n";
+  });
+  
+  Whatpm::ContentChecker->check_element ($doc, sub {
+    my %arg = @_;
+    warn get_node_path ($arg{node}), ": ",
+        ($arg{level} || "Error"), ": ",
+        $arg{type}, "\n";
+  });
+
+=head1 DESCRIPTION
+
+The C<Whatpm::ContentChecker> Perl module contains two methods
+to validate DOM tree for its conformance to the markup language
+in use.
+
+This module is part of Whatpm, Perl Modules for
+Web Hypertext Application Technologies, which is a subproject
+of manakai.
+
+=head1 METHODS
+
+This module contains two static methods:
+
+=over 4
+
+=item Whatpm::ContentChecker->check_document (I<$document>, I<$onerror>);
+
+Checks a document, I<$document>, and its descendant for their
+conformance.  If there is an error or a warnign, then the
+I<$onerror> C<CODE> is invoked with named arguments same
+as ones for the method C<check_element>.
+
+=item Whatpm::ContentChecker->check_element (I<$element>, I<$onerror>);
+
+Checks an element, I<$element>, and its descendant for their conformance.
+If there is an error or a warning, then the I<$onerror> C<CODE>
+is invoked with named arguments:
+
+=over 4
+
+=item level (Might be C<undef>)
+
+A string which describes the severity of the error or warning.
+For the list of the severities, see
+<http://suika.fam.cx/gate/2005/sw/Whatpm%20Error%20Types>.
+
+=item node (Always specified)
+
+The node with which the error is detected.
+
+=item type (Always specified)
+
+A string which describes the type of the error or warning.
+For the list of the errors and warnings, see
+<http://suika.fam.cx/gate/2005/sw/Whatpm%20Error%20Types>.
+
+=back
+
+=back
+
+=head1 BUGS
+
+This conformance checker is work in progress; it I<might> not be
+able to detect all the errors in the DOM tree, and it I<might> 
+detect an error for a node that is conforming in fact.
+
+=head1 SEE ALSO
+
+L<Whatpm::ContentChecker::Atom>
+
+L<Whatpm::ContentChecker::HTML>
+
+<http://suika.fam.cx/gate/2005/sw/Whatpm%20Error%20Types>
+
+=head1 AUTHOR
+
+Wakaba <w@suika.fam.cx>
+
+=head1 LICENSE
+
+Copyright 2007 Wakaba <w@suika.fam.cx>
+
+This library is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+=cut
+
+# $Date: 2007/08/06 10:56:50 $

@@ -14,6 +14,7 @@ See source code if you would like to know what it does.
 
 package Whatpm::NanoDOM;
 use strict;
+our $VERSION=do{my @r=(q$Revision: 1.15 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Scalar::Util;
 
@@ -526,4 +527,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2007/07/16 07:48:19 $
+# $Date: 2007/08/06 10:56:50 $

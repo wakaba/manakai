@@ -4,7 +4,7 @@ WGET = wget
 
 all: \
   HTML.pm _NamedEntityList.pm _LinkTypeList.pm \
-  ContentType.html HTML.html NanoDOM.html
+  ContentType.html HTML.html NanoDOM.html ContentChecker.html
 
 HTML.pm: HTML.pm.src mkhtmlparser.pl
 	perl mkhtmlparser.pl $< > $@
@@ -13,7 +13,7 @@ HTML.pm: HTML.pm.src mkhtmlparser.pl
 %.html: %.pm
 	$(POD2HTML) $< > $@
 
-HTML.html: HTML.pod
+HTML.html ContentChecker.html:: %.html: %.pod
 	$(POD2HTML) $< > $@
 
 _NamedEntityList.pm: mkentitylist.pl Entities.html
@@ -33,4 +33,4 @@ RelExtensions.html:
 	$(WGET) http://wiki.whatwg.org/wiki/RelExtensions -O $@
 
 ## License: Public Domain.
-## $Date: 2007/06/23 07:42:11 $
+## $Date: 2007/08/06 10:56:50 $

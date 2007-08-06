@@ -1,0 +1,137 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Whatpm::ContentChecker - DOM Conformance Checker</title>
+<link rel="stylesheet" href="http://suika.fam.cx/www/style/html/pod.css" type="text/css" />
+<link rev="made" href="mailto:admin@suika.fam.cx" />
+</head>
+
+<body>
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#methods">METHODS</a></li>
+	<li><a href="#bugs">BUGS</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#license">LICENSE</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Whatpm::ContentChecker - DOM Conformance Checker</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+  use Whatpm::ContentChecker;
+  
+  Whatpm::ContentChecker-&gt;check_document ($doc, sub {
+    my %arg = @_;
+    warn get_node_path ($arg{node}), &quot;: &quot;,
+        ($arg{level} || &quot;Error&quot;), &quot;: &quot;,
+        $arg{type}, &quot;\n&quot;;
+  });
+  
+  Whatpm::ContentChecker-&gt;check_element ($doc, sub {
+    my %arg = @_;
+    warn get_node_path ($arg{node}), &quot;: &quot;,
+        ($arg{level} || &quot;Error&quot;), &quot;: &quot;,
+        $arg{type}, &quot;\n&quot;;
+  });</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>The <code>Whatpm::ContentChecker</code> Perl module contains two methods
+to validate DOM tree for its conformance to the markup language
+in use.</p>
+<p>This module is part of Whatpm, Perl Modules for
+Web Hypertext Application Technologies, which is a subproject
+of manakai.</p>
+<p>
+</p>
+<hr />
+<h1><a name="methods">METHODS</a></h1>
+<p>This module contains two static methods:</p>
+<dl>
+<dt><strong><a name="item_check_document">Whatpm::ContentChecker-&gt;check_document (<em>$document</em>, <em>$onerror</em>);</a></strong><br />
+</dt>
+<dd>
+Checks a document, <em>$document</em>, and its descendant for their
+conformance.  If there is an error or a warnign, then the
+<em>$onerror</em> <code>CODE</code> is invoked with named arguments same
+as ones for the method <a href="#item_check_element"><code>check_element</code></a>.
+</dd>
+<p></p>
+<dt><strong><a name="item_check_element">Whatpm::ContentChecker-&gt;check_element (<em>$element</em>, <em>$onerror</em>);</a></strong><br />
+</dt>
+<dd>
+Checks an element, <em>$element</em>, and its descendant for their conformance.
+If there is an error or a warning, then the <em>$onerror</em> <code>CODE</code>
+is invoked with named arguments:
+</dd>
+<dl>
+<dt><strong><a name="item_level">level (Might be <code>undef</code>)</a></strong><br />
+</dt>
+<dd>
+A string which describes the severity of the error or warning.
+For the list of the severities, see
+&lt;http://suika.fam.cx/gate/2005/sw/Whatpm%20Error%20Types&gt;.
+</dd>
+<p></p>
+<dt><strong><a name="item_node">node (Always specified)</a></strong><br />
+</dt>
+<dd>
+The node with which the error is detected.
+</dd>
+<p></p>
+<dt><strong><a name="item_type">type (Always specified)</a></strong><br />
+</dt>
+<dd>
+A string which describes the type of the error or warning.
+For the list of the errors and warnings, see
+&lt;http://suika.fam.cx/gate/2005/sw/Whatpm%20Error%20Types&gt;.
+</dd>
+<p></p></dl>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="bugs">BUGS</a></h1>
+<p>This conformance checker is work in progress; it <em>might</em> not be
+able to detect all the errors in the DOM tree, and it <em>might</em> 
+detect an error for a node that is conforming in fact.</p>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p><a href="../Whatpm/ContentChecker/Atom.html">the Whatpm::ContentChecker::Atom manpage</a></p>
+<p><a href="../Whatpm/ContentChecker/HTML.html">the Whatpm::ContentChecker::HTML manpage</a></p>
+<p>&lt;http://suika.fam.cx/gate/2005/sw/Whatpm%20Error%20Types&gt;</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;</p>
+<p>
+</p>
+<hr />
+<h1><a name="license">LICENSE</a></h1>
+<p>Copyright 2007 Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;</p>
+<p>This library is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.</p>
+
+</body>
+
+</html>

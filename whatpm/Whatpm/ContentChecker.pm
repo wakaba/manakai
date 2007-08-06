@@ -1,5 +1,6 @@
 package Whatpm::ContentChecker;
 use strict;
+our $VERSION=do{my @r=(q$Revision: 1.44 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Whatpm::URIChecker;
 
@@ -398,5 +399,14 @@ sub _check_get_children ($$$) {
   return ($sib, $new_todos);
 } # _check_get_children
 
+=head1 LICENSE
+
+Copyright 2007 Wakaba <w@suika.fam.cx>
+
+This library is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+=cut
+
 1;
-# $Date: 2007/08/05 04:50:57 $
+# $Date: 2007/08/06 10:56:50 $
