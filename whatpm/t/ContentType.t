@@ -1,7 +1,7 @@
 use strict;
 use Test;
 
-BEGIN { plan tests => 780 }
+BEGIN { plan tests => 876 }
 
 use Whatpm::ContentType;
 
@@ -294,9 +294,65 @@ for my $v (
     q<text/html>,
   ],
   [
+    qq[<script],
+    q<text/plain>, 0,
+    q<text/plain>, '<script',
+    q<text/html>,
+    q<text/html>,
+  ],
+  [
+    qq[<scripT],
+    q<text/plain>, 0,
+    q<text/plain>, '<scripT',
+    q<text/html>,
+    q<text/html>,
+  ],
+  [
+    qq[<SCRIPT],
+    q<text/plain>, 0,
+    q<text/plain>, '<SCRIPT',
+    q<text/html>,
+    q<text/html>,
+  ],
+  [
+    qq[<script>],
+    q<text/plain>, 0,
+    q<text/plain>, '<script>',
+    q<text/html>,
+    q<text/html>,
+  ],
+  [
+    qq[<scriptcode>],
+    q<text/plain>, 0,
+    q<text/plain>, '<scriptcode>',
+    q<text/html>,
+    q<text/html>,
+  ],
+  [
+    qq[<script language="JavaScript">],
+    q<text/plain>, 0,
+    q<text/plain>, '<script language="JavaScript">',
+    q<text/html>,
+    q<text/html>,
+  ],
+  [
     qq<<p><!DOCTYPE html></p>>,
     q<text/plain>, 0,
     q<text/plain>, '<p><!DOCTYPE html></p>',
+    q<text/plain>,
+    q<text/html>,
+  ],
+  [
+    qq<</script>>,
+    q<text/plain>, 0,
+    q<text/plain>, '</script>',
+    q<text/plain>,
+    q<text/html>,
+  ],
+  [
+    qq<</script><script>>,
+    q<text/plain>, 0,
+    q<text/plain>, '</script><script>',
     q<text/plain>,
     q<text/html>,
   ],
@@ -547,5 +603,5 @@ for my $v (
 }
 
 ## License: Public Domain.
-## $Date: 2007/05/01 10:47:37 $
+## $Date: 2007/08/08 12:39:00 $
 1;

@@ -586,8 +586,8 @@ my $HTMLSpaceURIsAttrChecker = sub {
     Whatpm::URIChecker->check_iri_reference ($value, sub {
       my %opt = @_;
       $self->{onerror}->(node => $attr, level => $opt{level},
-                         type => 'URIs:'.$i.'::'.
-                         $opt{type}.
+                         type => 'URIs:'.':'.
+                         $opt{type}.':'.$i.
                          (defined $opt{position} ? ':'.$opt{position} : ''));
     });
     $i++;
@@ -1027,6 +1027,9 @@ $Element->{$HTML_NS}->{title} = {
   checker => $HTMLTextChecker,
 };
 
+## TODO: |base| with |href| MUST come before elements with URI attributes.
+## For example: <title xml:base=""/><base href=""/> is non-conformant.
+## TODO: |base| with |target| MUST come before any hyperlink.
 $Element->{$HTML_NS}->{base} = {
   attrs_checker => $GetHTMLAttrsChecker->({
     href => $HTMLURIAttrChecker,
@@ -2203,6 +2206,7 @@ $Element->{$HTML_NS}->{map} = {
     },
   }),
   checker => $HTMLBlockChecker,
+  ## TODO: |id| is required.
 };
 
 $Element->{$HTML_NS}->{area} = {

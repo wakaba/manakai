@@ -40,7 +40,7 @@ Web Hypertext Application Technologies.
 
 package Whatpm::ContentType;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## Table in <http://www.whatwg.org/specs/web-apps/current-work/#content-type1>.
 ##
@@ -60,6 +60,11 @@ our @UnknownSniffingTable = (
   [
     "\xFF\xDF\xDF\xDF\xDF",
     "\x3C\x48\x54\x4D\x4C",
+    "text/html",
+  ],
+  [
+    "\xFF\xDF\xDF\xDF\xDF\xDF\xDF",
+    "\x3C\x53\x43\x52\x49\x50\x54",
     "text/html",
   ],
   [
@@ -390,4 +395,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2007/05/02 13:44:33 $
+# $Date: 2007/08/08 12:39:00 $

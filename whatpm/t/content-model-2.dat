@@ -558,7 +558,7 @@ id=""><span id=""></span></p>
 #data
 <base href="http://[test]/" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/base/@href;URI::syntax error;m
+/base/@href;URI::syntax error:iriref3987;m
 
 #data
 <base href="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -614,7 +614,7 @@ id=""><span id=""></span></p>
 <link rel="stylesheet" href="://www.test/"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/link/@href;URI::syntax error;m
+/link/@href;URI::syntax error:iriref3987;m
 
 #data
 <link rel="stylesheet" href="http://www.test/" type=""
@@ -952,7 +952,7 @@ id=""><span id=""></span></p>
 #data
 <blockquote cite="http://test/%" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/blockquote/@cite;URI::syntax error;m
+/blockquote/@cite;URI::syntax error:iriref3987;m
 
 #data
 <h1 align="left" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -1250,7 +1250,7 @@ id=""><span id=""></span></p>
 #data
 <a href="http://test/[44::]/" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/a/@href;URI::syntax error;m
+/a/@href;URI::syntax error:iriref3987;m
 
 #data
 <a href="http://test/" type="" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -1318,7 +1318,7 @@ id=""><span id=""></span></p>
 <a href="http://test/" ping="http://a.test/ [b.test]"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/a/@ping;URIs:1::syntax error;m
+/a/@ping;URIs::syntax error:iriref3987:1;m
 
 #data
 <a href="http://test/" hreflang=""
@@ -1435,7 +1435,7 @@ id=""><span id=""></span></p>
 #data
 <q cite="http://test/%" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/q/@cite;URI::syntax error;m
+/q/@cite;URI::syntax error:iriref3987;m
 
 #data
 <meter value="" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -1686,7 +1686,7 @@ id=""><span id=""></span></p>
 #data
 <ins cite="http://test/100%/" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/ins/@cite;URI::syntax error;m
+/ins/@cite;URI::syntax error:iriref3987;m
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
@@ -2000,7 +2000,7 @@ id=""><span id=""></span></p>
 #data
 <del cite='"about:"' xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/del/@cite;URI::syntax error;m
+/del/@cite;URI::syntax error:iriref3987;m
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
@@ -2036,7 +2036,7 @@ id=""><span id=""></span></p>
 #data
 <img alt="" src="http://test/`" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/img/@src;URI::syntax error;m
+/img/@src;URI::syntax error:iriref3987;m
 
 #data
 <img alt="" src="http://test/" ismap="" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -2200,7 +2200,7 @@ id=""><span id=""></span></p>
 #data
 <iframe src="&lt;http://test/>" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/iframe/@src;URI::syntax error;m
+/iframe/@src;URI::syntax error:iriref3987;m
 
 #data
 <embed xmlns="http://www.w3.org/1999/xhtml"/>
@@ -2214,7 +2214,7 @@ id=""><span id=""></span></p>
 #data
 <embed src="[http://test/]" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/embed/@src;URI::syntax error;m
+/embed/@src;URI::syntax error:iriref3987;m
 
 #data
 <embed src="http://test/" type="" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -2255,7 +2255,7 @@ id=""><span id=""></span></p>
 #data
 <object data="`http://test/`" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/object/@data;URI::syntax error;m
+/object/@data;URI::syntax error:iriref3987;m
 
 #data
 <object type="" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -2399,7 +2399,7 @@ id=""><span id=""></span></p>
 #data
 <video src="``http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/video/@src;URI::syntax error;m
+/video/@src;URI::syntax error:iriref3987;m
 
 #data
 <video autoplay="" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -2438,7 +2438,7 @@ id=""><span id=""></span></p>
 #data
 <audio src="http://[test]/" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/audio/@src;URI::syntax error;m
+/audio/@src;URI::syntax error:iriref3987;m
 
 #data
 <audio autoplay="" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -2478,7 +2478,7 @@ id=""><span id=""></span></p>
 #data
 <source src="%http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/source/@src;URI::syntax error;m
+/source/@src;URI::syntax error:iriref3987;m
 
 #data
 <source src="http://test/" type="" xmlns="http://www.w3.org/1999/xhtml"/>
@@ -2661,7 +2661,7 @@ id=""><span id=""></span></p>
 <area href="%%http://test/" alt="" coords="1,2,3,4"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/area/@href;URI::syntax error;m
+/area/@href;URI::syntax error:iriref3987;m
 
 #data
 <area href="http://test/" alt="" coords="1,2,3,4"
@@ -3074,15 +3074,15 @@ id=""><span id=""></span></p>
     href="http://test/" ping="a [b]" alt=""
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/area/@ping;URIs:1::syntax error;m
+/area/@ping;URIs::syntax error:iriref3987:1;m
 
 #data
 <area shape="rect" coords="1,2,3,4"
     href="http://test/" ping="a [b] [@c]" alt=""
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/area/@ping;URIs:1::syntax error;m
-/area/@ping;URIs:2::syntax error;m
+/area/@ping;URIs::syntax error:iriref3987:1;m
+/area/@ping;URIs::syntax error:iriref3987:2;m
 
 #data
 <table xmlns="http://www.w3.org/1999/xhtml"/>
@@ -3300,7 +3300,7 @@ id=""><span id=""></span></p>
 <script src="http://test/%" type="text/javascript"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/script/@src;URI::syntax error;m
+/script/@src;URI::syntax error:iriref3987;m
 /script/@type;IMT:obsolete subtype;s
 
 #data
@@ -3395,7 +3395,7 @@ id=""><span id=""></span></p>
 #data
 <event-source src="http://test/`" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/event-source/@src;URI::syntax error;m
+/event-source/@src;URI::syntax error:iriref3987;m
 
 #data
 <details xmlns="http://www.w3.org/1999/xhtml"/>
@@ -3621,12 +3621,12 @@ id=""><span id=""></span></p>
 #data
 <command icon="[]" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/command/@icon;URI::syntax error;m
+/command/@icon;URI::syntax error:iriref3987;m
 
 #data
 <command icon="a b" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/command/@icon;URI::syntax error;m
+/command/@icon;URI::syntax error:iriref3987;m
 
 #data
 <menu xmlns="http://www.w3.org/1999/xhtml"/>
