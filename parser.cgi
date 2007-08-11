@@ -2,17 +2,16 @@
 use strict;
 
 use lib qw[/home/httpd/html/www/markup/html/whatpm
-           /home/wakaba/public_html/-temp/wiki/lib];
+           /home/wakaba/work/manakai2/lib];
 use CGI::Carp qw[fatalsToBrowser];
 use Time::HiRes qw/time/;
 
-use SuikaWiki::Input::HTTP; ## TODO: Use some better CGI module
-
-my $http = SuikaWiki::Input::HTTP->new;
+use Message::CGI::HTTP;
+my $http = Message::CGI::HTTP->new;
 
 ## TODO: _charset_
 
-my $mode = $http->meta_variable ('PATH_INFO');
+my $mode = $http->get_meta_variable ('PATH_INFO');
 ## TODO: decode unreserved characters
 
 if ($mode eq '/html' or $mode eq '/test') {
@@ -20,7 +19,7 @@ if ($mode eq '/html' or $mode eq '/test') {
   require Whatpm::HTML;
   require Whatpm::NanoDOM;
 
-  my $s = $http->parameter ('s');
+  my $s = $http->get_parameter ('s');
   if (length $s > 1000_000) {
     print STDOUT "Status: 400 Document Too Long\nContent-Type: text/plain; charset=us-ascii\n\nToo long";
     exit;
@@ -61,7 +60,7 @@ if ($mode eq '/html' or $mode eq '/test') {
   print STDOUT Encode::encode ('utf-8', $$out);
   print STDOUT "\n";
 
-  if ($http->parameter ('dom5')) {
+  if ($http->get_parameter ('dom5')) {
     require Whatpm::ContentChecker;
     print STDOUT "#domerrors\n";
     $time1 = time;
@@ -161,4 +160,4 @@ and/or modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2007/05/28 14:04:57 $
+## $Date: 2007/08/11 13:54:55 $
