@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.55 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.56 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## ISSUE:
 ## var doc = implementation.createDocument (null, null, null);
@@ -158,6 +158,33 @@ sub PLAINTEXT_CONTENT_MODEL () { 0 }
 sub CDATA_CONTENT_MODEL () { CM_LIMITED_MARKUP }
 sub RCDATA_CONTENT_MODEL () { CM_ENTITY | CM_LIMITED_MARKUP }
 sub PCDATA_CONTENT_MODEL () { CM_ENTITY | CM_FULL_MARKUP }
+
+sub AFTER_HTML_IMS () { 0b100 }
+sub HEAD_IMS ()       { 0b1000 }
+sub BODY_IMS ()       { 0b10000 }
+sub BODY_TABLE_IMS () { 0b100000 | BODY_IMS }
+sub TABLE_IMS ()      { 0b1000000 }
+sub ROW_IMS ()        { 0b10000000 | TABLE_IMS }
+sub BODY_AFTER_IMS () { 0b100000000 }
+sub FRAME_IMS ()      { 0b1000000000 }
+
+sub AFTER_HTML_BODY_IM () { AFTER_HTML_IMS | BODY_AFTER_IMS }
+sub AFTER_HTML_FRAMESET_IM () { AFTER_HTML_IMS | FRAME_IMS }
+sub IN_HEAD_IM () { HEAD_IMS | 0b00 }
+sub IN_HEAD_NOSCRIPT_IM () { HEAD_IMS | 0b01 }
+sub AFTER_HEAD_IM () { HEAD_IMS | 0b10 }
+sub BEFORE_HEAD_IM () { HEAD_IMS | 0b11 }
+sub IN_BODY_IM () { BODY_IMS }
+sub IN_CELL_IM () { BODY_TABLE_IMS | 0b01 }
+sub IN_CAPTION_IM () { BODY_TABLE_IMS | 0b10 }
+sub IN_ROW_IM () { ROW_IMS | 0b01 }
+sub IN_TABLE_BODY_IM () { ROW_IMS | 0b10 }
+sub IN_TABLE_IM () { TABLE_IMS }
+sub AFTER_BODY_IM () { BODY_AFTER_IMS }
+sub IN_FRAMESET_IM () { FRAME_IMS | 0b01 }
+sub AFTER_FRAMESET_IM () { FRAME_IMS | 0b10 }
+sub IN_SELECT_IM () { 0b01 }
+sub IN_COLUMN_GROUP_IM () { 0b10 }
 
 ## Implementations MUST act as if state machine in the spec
 
@@ -2616,7 +2643,7 @@ sub _construct_tree ($) {
   
   $token = $self->_get_next_token;
 
-  $self->{insertion_mode} = 'before head';
+  $self->{insertion_mode} = BEFORE_HEAD_IM;
   undef $self->{form_element};
   undef $self->{head_element};
   $self->{open_elements} = [];
@@ -2875,34 +2902,34 @@ sub _reset_insertion_mode ($) {
     
       ## Step 4..13
       my $new_mode = {
-                      select => 'in select',
-                      td => 'in cell',
-                      th => 'in cell',
-                      tr => 'in row',
-                      tbody => 'in table body',
-                      thead => 'in table body',
-                      tfoot => 'in table body',
-                      caption => 'in caption',
-                      colgroup => 'in column group',
-                      table => 'in table',
-                      head => 'in body', # not in head!
-                      body => 'in body',
-                      frameset => 'in frameset',
+                      select => IN_SELECT_IM,
+                      td => IN_CELL_IM,
+                      th => IN_CELL_IM,
+                      tr => IN_ROW_IM,
+                      tbody => IN_TABLE_BODY_IM,
+                      thead => IN_TABLE_BODY_IM,
+                      tfoot => IN_TABLE_BODY_IM,
+                      caption => IN_CAPTION_IM,
+                      colgroup => IN_COLUMN_GROUP_IM,
+                      table => IN_TABLE_IM,
+                      head => IN_BODY_IM, # not in head!
+                      body => IN_BODY_IM,
+                      frameset => IN_FRAMESET_IM,
                      }->{$node->[1]};
       $self->{insertion_mode} = $new_mode and return if defined $new_mode;
       
       ## Step 14
       if ($node->[1] eq 'html') {
         unless (defined $self->{head_element}) {
-          $self->{insertion_mode} = 'before head';
+          $self->{insertion_mode} = BEFORE_HEAD_IM;
         } else {
-          $self->{insertion_mode} = 'after head';
+          $self->{insertion_mode} = AFTER_HEAD_IM;
         }
         return;
       }
       
       ## Step 15
-      $self->{insertion_mode} = 'in body' and return if $last;
+      $self->{insertion_mode} = IN_BODY_IM and return if $last;
       
       ## Step 16
       $i--;
@@ -3333,8 +3360,8 @@ sub _tree_construction_main ($) {
       $token = $self->_get_next_token;
       redo B;
     } elsif ($token->{type} eq 'end-of-file') {
-      if ($self->{insertion_mode} eq 'after html body' or
-          $self->{insertion_mode} eq 'after html frameset') {
+      if ($self->{insertion_mode} == AFTER_HTML_BODY_IM or
+          $self->{insertion_mode} == AFTER_HTML_FRAMESET_IM) {
         #
       } else {
         ## Generate implied end tags
@@ -3363,14 +3390,14 @@ sub _tree_construction_main ($) {
       last B;
     } elsif ($token->{type} eq 'start tag' and
              $token->{tag_name} eq 'html') {
-      if ($self->{insertion_mode} eq 'after html body') {
+      if ($self->{insertion_mode} == AFTER_HTML_BODY_IM) {
         ## Turn into the main phase
         $self->{parse_error}-> (type => 'after html:html');
-        $self->{insertion_mode} = 'after body';
-      } elsif ($self->{insertion_mode} eq 'after html frameset') {
+        $self->{insertion_mode} = AFTER_BODY_IM;
+      } elsif ($self->{insertion_mode} == AFTER_HTML_FRAMESET_IM) {
         ## Turn into the main phase
         $self->{parse_error}-> (type => 'after html:html');
-        $self->{insertion_mode} = 'after frameset';
+        $self->{insertion_mode} = AFTER_FRAMESET_IM;
       }
 
 ## ISSUE: "aa<html>" is not a parse error.
@@ -3390,20 +3417,20 @@ sub _tree_construction_main ($) {
       redo B;
     } elsif ($token->{type} eq 'comment') {
       my $comment = $self->{document}->create_comment ($token->{data});
-      if ($self->{insertion_mode} eq 'after html body' or
-          $self->{insertion_mode} eq 'after html frameset') {
+      if ($self->{insertion_mode} == AFTER_HTML_BODY_IM or
+          $self->{insertion_mode} == AFTER_HTML_FRAMESET_IM) {
         $self->{document}->append_child ($comment);
-      } elsif ($self->{insertion_mode} eq 'after body') {
+      } elsif ($self->{insertion_mode} == AFTER_BODY_IM) {
         $self->{open_elements}->[0]->[0]->append_child ($comment);
       } else {
         $self->{open_elements}->[-1]->[0]->append_child ($comment);
       }
       $token = $self->_get_next_token;
       redo B;
-    } elsif ($self->{insertion_mode} eq 'in head' or
-             $self->{insertion_mode} eq 'in head noscript' or
-             $self->{insertion_mode} eq 'after head' or
-             $self->{insertion_mode} eq 'before head') {
+    } elsif ($self->{insertion_mode} == IN_HEAD_IM or
+             $self->{insertion_mode} == IN_HEAD_NOSCRIPT_IM or
+             $self->{insertion_mode} == AFTER_HEAD_IM or
+             $self->{insertion_mode} == BEFORE_HEAD_IM) {
       if ($token->{type} eq 'character') {
         if ($token->{data} =~ s/^([\x09\x0A\x0B\x0C\x20]+)//) {
           $self->{open_elements}->[-1]->[0]->manakai_append_text ($1);
@@ -3413,7 +3440,7 @@ sub _tree_construction_main ($) {
           }
         }
 
-        if ($self->{insertion_mode} eq 'before head') {
+        if ($self->{insertion_mode} == BEFORE_HEAD_IM) {
           ## As if <head>
           
       $self->{head_element} = $self->{document}->create_element_ns
@@ -3426,7 +3453,7 @@ sub _tree_construction_main ($) {
           pop @{$self->{open_elements}};
 
           ## Reprocess in the "after head" insertion mode...
-        } elsif ($self->{insertion_mode} eq 'in head noscript') {
+        } elsif ($self->{insertion_mode} == IN_HEAD_NOSCRIPT_IM) {
           ## As if </noscript>
           pop @{$self->{open_elements}};
           $self->{parse_error}-> (type => 'in noscript:#character');
@@ -3436,7 +3463,7 @@ sub _tree_construction_main ($) {
           pop @{$self->{open_elements}};
 
           ## Reprocess in the "after head" insertion mode...
-        } elsif ($self->{insertion_mode} eq 'in head') {
+        } elsif ($self->{insertion_mode} == IN_HEAD_IM) {
           pop @{$self->{open_elements}};
 
           ## Reprocess in the "after head" insertion mode...
@@ -3455,12 +3482,12 @@ sub _tree_construction_main ($) {
       push @{$self->{open_elements}}, [$el, 'body'];
     }
   
-            $self->{insertion_mode} = 'in body';
+            $self->{insertion_mode} = IN_BODY_IM;
             ## reprocess
             redo B;
           } elsif ($token->{type} eq 'start tag') {
             if ($token->{tag_name} eq 'head') {
-              if ($self->{insertion_mode} eq 'before head') {
+              if ($self->{insertion_mode} == BEFORE_HEAD_IM) {
                 
       $self->{head_element} = $self->{document}->create_element_ns
         (q<http://www.w3.org/1999/xhtml>, [undef,  $token->{tag_name}]);
@@ -3472,18 +3499,18 @@ sub _tree_construction_main ($) {
       
                 $self->{open_elements}->[-1]->[0]->append_child ($self->{head_element});
                 push @{$self->{open_elements}}, [$self->{head_element}, $token->{tag_name}];
-                $self->{insertion_mode} = 'in head';
+                $self->{insertion_mode} = IN_HEAD_IM;
                 $token = $self->_get_next_token;
                 redo B;
-              } elsif ($self->{insertion_mode} ne 'after head') {
+              } elsif ($self->{insertion_mode} == AFTER_HEAD_IM) {
+                #
+              } else {
                 $self->{parse_error}-> (type => 'in head:head'); # or in head noscript
                 ## Ignore the token
                 $token = $self->_get_next_token;
                 redo B;
-              } else {
-                #
               }
-            } elsif ($self->{insertion_mode} eq 'before head') {
+            } elsif ($self->{insertion_mode} == BEFORE_HEAD_IM) {
               ## As if <head>
               
       $self->{head_element} = $self->{document}->create_element_ns
@@ -3492,22 +3519,22 @@ sub _tree_construction_main ($) {
               $self->{open_elements}->[-1]->[0]->append_child ($self->{head_element});
               push @{$self->{open_elements}}, [$self->{head_element}, 'head'];
 
-              $self->{insertion_mode} = 'in head';
+              $self->{insertion_mode} = IN_HEAD_IM;
               ## Reprocess in the "in head" insertion mode...
             }
 
             if ($token->{tag_name} eq 'base') {
-              if ($self->{insertion_mode} eq 'in head noscript') {
+              if ($self->{insertion_mode} == IN_HEAD_NOSCRIPT_IM) {
                 ## As if </noscript>
                 pop @{$self->{open_elements}};
                 $self->{parse_error}-> (type => 'in noscript:base');
               
-                $self->{insertion_mode} = 'in head';
+                $self->{insertion_mode} = IN_HEAD_IM;
                 ## Reprocess in the "in head" insertion mode...
               }
 
               ## NOTE: There is a "as if in head" code clone.
-              if ($self->{insertion_mode} eq 'after head') {
+              if ($self->{insertion_mode} == AFTER_HEAD_IM) {
                 $self->{parse_error}-> (type => 'after head:'.$token->{tag_name});
                 push @{$self->{open_elements}}, [$self->{head_element}, 'head'];
               }
@@ -3529,12 +3556,12 @@ sub _tree_construction_main ($) {
   
               pop @{$self->{open_elements}}; ## ISSUE: This step is missing in the spec.
               pop @{$self->{open_elements}}
-                  if $self->{insertion_mode} eq 'after head';
+                  if $self->{insertion_mode} == AFTER_HEAD_IM;
               $token = $self->_get_next_token;
               redo B;
             } elsif ($token->{tag_name} eq 'link') {
               ## NOTE: There is a "as if in head" code clone.
-              if ($self->{insertion_mode} eq 'after head') {
+              if ($self->{insertion_mode} == AFTER_HEAD_IM) {
                 $self->{parse_error}-> (type => 'after head:'.$token->{tag_name});
                 push @{$self->{open_elements}}, [$self->{head_element}, 'head'];
               }
@@ -3556,12 +3583,12 @@ sub _tree_construction_main ($) {
   
               pop @{$self->{open_elements}}; ## ISSUE: This step is missing in the spec.
               pop @{$self->{open_elements}}
-                  if $self->{insertion_mode} eq 'after head';
+                  if $self->{insertion_mode} == AFTER_HEAD_IM;
               $token = $self->_get_next_token;
               redo B;
             } elsif ($token->{tag_name} eq 'meta') {
               ## NOTE: There is a "as if in head" code clone.
-              if ($self->{insertion_mode} eq 'after head') {
+              if ($self->{insertion_mode} == AFTER_HEAD_IM) {
                 $self->{parse_error}-> (type => 'after head:'.$token->{tag_name});
                 push @{$self->{open_elements}}, [$self->{head_element}, 'head'];
               }
@@ -3602,18 +3629,18 @@ sub _tree_construction_main ($) {
 
               ## TODO: Extracting |charset| from |meta|.
               pop @{$self->{open_elements}}
-                  if $self->{insertion_mode} eq 'after head';
+                  if $self->{insertion_mode} == AFTER_HEAD_IM;
               $token = $self->_get_next_token;
               redo B;
             } elsif ($token->{tag_name} eq 'title') {
-              if ($self->{insertion_mode} eq 'in head noscript') {
+              if ($self->{insertion_mode} == IN_HEAD_NOSCRIPT_IM) {
                 ## As if </noscript>
                 pop @{$self->{open_elements}};
                 $self->{parse_error}-> (type => 'in noscript:title');
               
-                $self->{insertion_mode} = 'in head';
+                $self->{insertion_mode} = IN_HEAD_IM;
                 ## Reprocess in the "in head" insertion mode...
-              } elsif ($self->{insertion_mode} eq 'after head') {
+              } elsif ($self->{insertion_mode} == AFTER_HEAD_IM) {
                 $self->{parse_error}-> (type => 'after head:'.$token->{tag_name});
                 push @{$self->{open_elements}}, [$self->{head_element}, 'head'];
               }
@@ -3624,22 +3651,22 @@ sub _tree_construction_main ($) {
               $parse_rcdata->(RCDATA_CONTENT_MODEL,
                               sub { $parent->append_child ($_[0]) });
               pop @{$self->{open_elements}}
-                  if $self->{insertion_mode} eq 'after head';
+                  if $self->{insertion_mode} == AFTER_HEAD_IM;
               redo B;
             } elsif ($token->{tag_name} eq 'style') {
               ## NOTE: Or (scripting is enabled and tag_name eq 'noscript' and
-              ## insertion mode 'in head')
+              ## insertion mode IN_HEAD_IM)
               ## NOTE: There is a "as if in head" code clone.
-              if ($self->{insertion_mode} eq 'after head') {
+              if ($self->{insertion_mode} == AFTER_HEAD_IM) {
                 $self->{parse_error}-> (type => 'after head:'.$token->{tag_name});
                 push @{$self->{open_elements}}, [$self->{head_element}, 'head'];
               }
               $parse_rcdata->(CDATA_CONTENT_MODEL, $insert_to_current);
               pop @{$self->{open_elements}}
-                  if $self->{insertion_mode} eq 'after head';
+                  if $self->{insertion_mode} == AFTER_HEAD_IM;
               redo B;
             } elsif ($token->{tag_name} eq 'noscript') {
-              if ($self->{insertion_mode} eq 'in head') {
+              if ($self->{insertion_mode} == IN_HEAD_IM) {
                 ## NOTE: and scripting is disalbed
                 
     {
@@ -3657,10 +3684,10 @@ sub _tree_construction_main ($) {
       push @{$self->{open_elements}}, [$el, $token->{tag_name}];
     }
   
-                $self->{insertion_mode} = 'in head noscript';
+                $self->{insertion_mode} = IN_HEAD_NOSCRIPT_IM;
                 $token = $self->_get_next_token;
                 redo B;
-              } elsif ($self->{insertion_mode} eq 'in head noscript') {
+              } elsif ($self->{insertion_mode} == IN_HEAD_NOSCRIPT_IM) {
                 $self->{parse_error}-> (type => 'in noscript:noscript');
                 ## Ignore the token
                 $token = $self->_get_next_token;
@@ -3669,14 +3696,14 @@ sub _tree_construction_main ($) {
                 #
               }
             } elsif ($token->{tag_name} eq 'script') {
-              if ($self->{insertion_mode} eq 'in head noscript') {
+              if ($self->{insertion_mode} == IN_HEAD_NOSCRIPT_IM) {
                 ## As if </noscript>
                 pop @{$self->{open_elements}};
                 $self->{parse_error}-> (type => 'in noscript:script');
               
-                $self->{insertion_mode} = 'in head';
+                $self->{insertion_mode} = IN_HEAD_IM;
                 ## Reprocess in the "in head" insertion mode...
-              } elsif ($self->{insertion_mode} eq 'after head') {
+              } elsif ($self->{insertion_mode} == AFTER_HEAD_IM) {
                 $self->{parse_error}-> (type => 'after head:'.$token->{tag_name});
                 push @{$self->{open_elements}}, [$self->{head_element}, 'head'];
               }
@@ -3684,11 +3711,11 @@ sub _tree_construction_main ($) {
               ## NOTE: There is a "as if in head" code clone.
               $script_start_tag->($insert_to_current);
               pop @{$self->{open_elements}}
-                  if $self->{insertion_mode} eq 'after head';
+                  if $self->{insertion_mode} == AFTER_HEAD_IM;
               redo B;
             } elsif ($token->{tag_name} eq 'body' or
                      $token->{tag_name} eq 'frameset') {
-              if ($self->{insertion_mode} eq 'in head noscript') {
+              if ($self->{insertion_mode} == IN_HEAD_NOSCRIPT_IM) {
                 ## As if </noscript>
                 pop @{$self->{open_elements}};
                 $self->{parse_error}-> (type => 'in noscript:'.$token->{tag_name});
@@ -3698,7 +3725,7 @@ sub _tree_construction_main ($) {
                 pop @{$self->{open_elements}};
                 
                 ## Reprocess in the "after head" insertion mode...
-              } elsif ($self->{insertion_mode} eq 'in head') {
+              } elsif ($self->{insertion_mode} == IN_HEAD_IM) {
                 pop @{$self->{open_elements}};
                 
                 ## Reprocess in the "after head" insertion mode...
@@ -3721,14 +3748,20 @@ sub _tree_construction_main ($) {
       push @{$self->{open_elements}}, [$el, $token->{tag_name}];
     }
   
-              $self->{insertion_mode} = 'in '.$token->{tag_name};
+              if ($token->{tag_name} eq 'body') {
+                $self->{insertion_mode} = IN_BODY_IM;
+              } elsif ($token->{tag_name} eq 'frameset') {
+                $self->{insertion_mode} = IN_FRAMESET_IM;
+              } else {
+                die "$0: tag name: $self->{tag_name}";
+              }
               $token = $self->_get_next_token;
               redo B;
             } else {
               #
             }
 
-            if ($self->{insertion_mode} eq 'in head noscript') {
+            if ($self->{insertion_mode} == IN_HEAD_NOSCRIPT_IM) {
               ## As if </noscript>
               pop @{$self->{open_elements}};
               $self->{parse_error}-> (type => 'in noscript:/'.$token->{tag_name});
@@ -3738,7 +3771,7 @@ sub _tree_construction_main ($) {
               pop @{$self->{open_elements}};
 
               ## Reprocess in the "after head" insertion mode...
-            } elsif ($self->{insertion_mode} eq 'in head') {
+            } elsif ($self->{insertion_mode} == IN_HEAD_IM) {
               ## As if </head>
               pop @{$self->{open_elements}};
 
@@ -3758,12 +3791,12 @@ sub _tree_construction_main ($) {
       push @{$self->{open_elements}}, [$el, 'body'];
     }
   
-            $self->{insertion_mode} = 'in body';
+            $self->{insertion_mode} = IN_BODY_IM;
             ## reprocess
             redo B;
           } elsif ($token->{type} eq 'end tag') {
             if ($token->{tag_name} eq 'head') {
-              if ($self->{insertion_mode} eq 'before head') {
+              if ($self->{insertion_mode} == BEFORE_HEAD_IM) {
                 ## As if <head>
                 
       $self->{head_element} = $self->{document}->create_element_ns
@@ -3774,34 +3807,34 @@ sub _tree_construction_main ($) {
 
                 ## Reprocess in the "in head" insertion mode...
                 pop @{$self->{open_elements}};
-                $self->{insertion_mode} = 'after head';
+                $self->{insertion_mode} = AFTER_HEAD_IM;
                 $token = $self->_get_next_token;
                 redo B;
-              } elsif ($self->{insertion_mode} eq 'in head noscript') {
+              } elsif ($self->{insertion_mode} == IN_HEAD_NOSCRIPT_IM) {
                 ## As if </noscript>
                 pop @{$self->{open_elements}};
                 $self->{parse_error}-> (type => 'in noscript:script');
                 
                 ## Reprocess in the "in head" insertion mode...
                 pop @{$self->{open_elements}};
-                $self->{insertion_mode} = 'after head';
+                $self->{insertion_mode} = AFTER_HEAD_IM;
                 $token = $self->_get_next_token;
                 redo B;
-              } elsif ($self->{insertion_mode} eq 'in head') {
+              } elsif ($self->{insertion_mode} == IN_HEAD_IM) {
                 pop @{$self->{open_elements}};
-                $self->{insertion_mode} = 'after head';
+                $self->{insertion_mode} = AFTER_HEAD_IM;
                 $token = $self->_get_next_token;
                 redo B;
               } else {
                 #
               }
             } elsif ($token->{tag_name} eq 'noscript') {
-              if ($self->{insertion_mode} eq 'in head noscript') {
+              if ($self->{insertion_mode} == IN_HEAD_NOSCRIPT_IM) {
                 pop @{$self->{open_elements}};
-                $self->{insertion_mode} = 'in head';
+                $self->{insertion_mode} = IN_HEAD_IM;
                 $token = $self->_get_next_token;
                 redo B;
-              } elsif ($self->{insertion_mode} eq 'before head') {
+              } elsif ($self->{insertion_mode} == BEFORE_HEAD_IM) {
                 $self->{parse_error}-> (type => 'unmatched end tag:noscript');
                 ## Ignore the token ## ISSUE: An issue in the spec.
                 $token = $self->_get_next_token;
@@ -3812,7 +3845,7 @@ sub _tree_construction_main ($) {
             } elsif ({
                       body => 1, html => 1,
                      }->{$token->{tag_name}}) {
-              if ($self->{insertion_mode} eq 'before head') {
+              if ($self->{insertion_mode} == BEFORE_HEAD_IM) {
                 ## As if <head>
                 
       $self->{head_element} = $self->{document}->create_element_ns
@@ -3821,9 +3854,9 @@ sub _tree_construction_main ($) {
                 $self->{open_elements}->[-1]->[0]->append_child ($self->{head_element});
                 push @{$self->{open_elements}}, [$self->{head_element}, 'head'];
 
-                $self->{insertion_mode} = 'in head';
+                $self->{insertion_mode} = IN_HEAD_IM;
                 ## Reprocess in the "in head" insertion mode...
-              } elsif ($self->{insertion_mode} eq 'in head noscript') {
+              } elsif ($self->{insertion_mode} == IN_HEAD_NOSCRIPT_IM) {
                 $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
                 ## Ignore the token
                 $token = $self->_get_next_token;
@@ -3834,7 +3867,7 @@ sub _tree_construction_main ($) {
             } elsif ({
                       p => 1, br => 1,
                      }->{$token->{tag_name}}) {
-              if ($self->{insertion_mode} eq 'before head') {
+              if ($self->{insertion_mode} == BEFORE_HEAD_IM) {
                 ## As if <head>
                 
       $self->{head_element} = $self->{document}->create_element_ns
@@ -3843,23 +3876,23 @@ sub _tree_construction_main ($) {
                 $self->{open_elements}->[-1]->[0]->append_child ($self->{head_element});
                 push @{$self->{open_elements}}, [$self->{head_element}, 'head'];
 
-                $self->{insertion_mode} = 'in head';
+                $self->{insertion_mode} = IN_HEAD_IM;
                 ## Reprocess in the "in head" insertion mode...
               }
 
               #
             } else {
-              if ($self->{insertion_mode} ne 'after head') {
+              if ($self->{insertion_mode} == AFTER_HEAD_IM) {
+                #
+              } else {
                 $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
                 ## Ignore the token
                 $token = $self->_get_next_token;
                 redo B;
-              } else {
-                #
               }
             }
 
-            if ($self->{insertion_mode} eq 'in head noscript') {
+            if ($self->{insertion_mode} == IN_HEAD_NOSCRIPT_IM) {
               ## As if </noscript>
               pop @{$self->{open_elements}};
               $self->{parse_error}-> (type => 'in noscript:/'.$token->{tag_name});
@@ -3869,12 +3902,12 @@ sub _tree_construction_main ($) {
               pop @{$self->{open_elements}};
 
               ## Reprocess in the "after head" insertion mode...
-            } elsif ($self->{insertion_mode} eq 'in head') {
+            } elsif ($self->{insertion_mode} == IN_HEAD_IM) {
               ## As if </head>
               pop @{$self->{open_elements}};
 
               ## Reprocess in the "after head" insertion mode...
-            } elsif ($self->{insertion_mode} eq 'before head') {
+            } elsif ($self->{insertion_mode} == BEFORE_HEAD_IM) {
               $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
               ## Ignore the token ## ISSUE: An issue in the spec.
               $token = $self->_get_next_token;
@@ -3894,7 +3927,7 @@ sub _tree_construction_main ($) {
       push @{$self->{open_elements}}, [$el, 'body'];
     }
   
-            $self->{insertion_mode} = 'in body';
+            $self->{insertion_mode} = IN_BODY_IM;
             ## reprocess
             redo B;
           } else {
@@ -3902,9 +3935,9 @@ sub _tree_construction_main ($) {
           }
 
           ## ISSUE: An issue in the spec.
-    } elsif ($self->{insertion_mode} eq 'in body' or
-             $self->{insertion_mode} eq 'in cell' or
-             $self->{insertion_mode} eq 'in caption') {
+    } elsif ($self->{insertion_mode} == IN_BODY_IM or
+             $self->{insertion_mode} == IN_CELL_IM or
+             $self->{insertion_mode} == IN_CAPTION_IM) {
           if ($token->{type} eq 'character') {
             ## NOTE: There is a code clone of "character in body".
             $reconstruct_active_formatting_elements->($insert_to_current);
@@ -3918,7 +3951,7 @@ sub _tree_construction_main ($) {
                  caption => 1, col => 1, colgroup => 1, tbody => 1,
                  td => 1, tfoot => 1, th => 1, thead => 1, tr => 1,
                 }->{$token->{tag_name}}) {
-              if ($self->{insertion_mode} eq 'in cell') {
+              if ($self->{insertion_mode} == IN_CELL_IM) {
                 ## have an element in table scope
                 my $tn;
                 INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
@@ -3943,7 +3976,7 @@ sub _tree_construction_main ($) {
                 unshift @{$self->{token}}, $token; # <?>
                 $token = {type => 'end tag', tag_name => $tn};
                 redo B;
-              } elsif ($self->{insertion_mode} eq 'in caption') {
+              } elsif ($self->{insertion_mode} == IN_CAPTION_IM) {
                 $self->{parse_error}-> (type => 'not closed:caption');
                 
                 ## As if </caption>
@@ -3989,7 +4022,7 @@ sub _tree_construction_main ($) {
                 
                 $clear_up_to_marker->();
                 
-                $self->{insertion_mode} = 'in table';
+                $self->{insertion_mode} = IN_TABLE_IM;
                 
                 ## reprocess
                 redo B;
@@ -4001,7 +4034,7 @@ sub _tree_construction_main ($) {
             }
           } elsif ($token->{type} eq 'end tag') {
             if ($token->{tag_name} eq 'td' or $token->{tag_name} eq 'th') {
-              if ($self->{insertion_mode} eq 'in cell') {
+              if ($self->{insertion_mode} == IN_CELL_IM) {
                 ## have an element in table scope
                 my $i;
                 INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
@@ -4044,11 +4077,11 @@ sub _tree_construction_main ($) {
                 
                 $clear_up_to_marker->();
                 
-                $self->{insertion_mode} = 'in row';
+                $self->{insertion_mode} = IN_ROW_IM;
                 
                 $token = $self->_get_next_token;
                 redo B;
-              } elsif ($self->{insertion_mode} eq 'in caption') {
+              } elsif ($self->{insertion_mode} == IN_CAPTION_IM) {
                 $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
                 ## Ignore the token
                 $token = $self->_get_next_token;
@@ -4057,7 +4090,7 @@ sub _tree_construction_main ($) {
                 #
               }
             } elsif ($token->{tag_name} eq 'caption') {
-              if ($self->{insertion_mode} eq 'in caption') {
+              if ($self->{insertion_mode} == IN_CAPTION_IM) {
                 ## have a table element in table scope
                 my $i;
                 INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
@@ -4098,11 +4131,11 @@ sub _tree_construction_main ($) {
                 
                 $clear_up_to_marker->();
                 
-                $self->{insertion_mode} = 'in table';
+                $self->{insertion_mode} = IN_TABLE_IM;
                 
                 $token = $self->_get_next_token;
                 redo B;
-              } elsif ($self->{insertion_mode} eq 'in cell') {
+              } elsif ($self->{insertion_mode} == IN_CELL_IM) {
                 $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
                 ## Ignore the token
                 $token = $self->_get_next_token;
@@ -4114,7 +4147,7 @@ sub _tree_construction_main ($) {
                       table => 1, tbody => 1, tfoot => 1, 
                       thead => 1, tr => 1,
                      }->{$token->{tag_name}} and
-                     $self->{insertion_mode} eq 'in cell') {
+                     $self->{insertion_mode} == IN_CELL_IM) {
               ## have an element in table scope
               my $i;
               my $tn;
@@ -4145,7 +4178,7 @@ sub _tree_construction_main ($) {
               $token = {type => 'end tag', tag_name => $tn};
               redo B;
             } elsif ($token->{tag_name} eq 'table' and
-                     $self->{insertion_mode} eq 'in caption') {
+                     $self->{insertion_mode} == IN_CAPTION_IM) {
               $self->{parse_error}-> (type => 'not closed:caption');
 
               ## As if </caption>
@@ -4191,15 +4224,15 @@ sub _tree_construction_main ($) {
 
               $clear_up_to_marker->();
 
-              $self->{insertion_mode} = 'in table';
+              $self->{insertion_mode} = IN_TABLE_IM;
 
               ## reprocess
               redo B;
             } elsif ({
                       body => 1, col => 1, colgroup => 1, html => 1,
                      }->{$token->{tag_name}}) {
-              if ($self->{insertion_mode} eq 'in cell' or
-                  $self->{insertion_mode} eq 'in caption') {
+              if ($self->{insertion_mode} == IN_CELL_IM or
+                  $self->{insertion_mode} == IN_CAPTION_IM) {
                 $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
                 ## Ignore the token
                 $token = $self->_get_next_token;
@@ -4211,7 +4244,7 @@ sub _tree_construction_main ($) {
                       tbody => 1, tfoot => 1,
                       thead => 1, tr => 1,
                      }->{$token->{tag_name}} and
-                     $self->{insertion_mode} eq 'in caption') {
+                     $self->{insertion_mode} == IN_CAPTION_IM) {
               $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
               ## Ignore the token
               $token = $self->_get_next_token;
@@ -4225,9 +4258,9 @@ sub _tree_construction_main ($) {
 
       $insert = $insert_to_current;
       #
-    } elsif ($self->{insertion_mode} eq 'in row' or
-             $self->{insertion_mode} eq 'in table body' or
-             $self->{insertion_mode} eq 'in table') {
+    } elsif ($self->{insertion_mode} == IN_ROW_IM or
+             $self->{insertion_mode} == IN_TABLE_BODY_IM or
+             $self->{insertion_mode} == IN_TABLE_IM) {
           if ($token->{type} eq 'character') {
             ## NOTE: There are "character in table" code clones.
             if ($token->{data} =~ s/^([\x09\x0A\x0B\x0C\x20]+)//) {
@@ -4288,10 +4321,10 @@ sub _tree_construction_main ($) {
             redo B;
           } elsif ($token->{type} eq 'start tag') {
             if ({
-                 tr => ($self->{insertion_mode} ne 'in row'),
+                 tr => ($self->{insertion_mode} != IN_ROW_IM),
                  th => 1, td => 1,
                 }->{$token->{tag_name}}) {
-              if ($self->{insertion_mode} eq 'in table') {
+              if ($self->{insertion_mode} == IN_TABLE_IM) {
                 ## Clear back to table context
                 while ($self->{open_elements}->[-1]->[1] ne 'table' and
                        $self->{open_elements}->[-1]->[1] ne 'html') {
@@ -4310,11 +4343,11 @@ sub _tree_construction_main ($) {
       push @{$self->{open_elements}}, [$el, 'tbody'];
     }
   
-                $self->{insertion_mode} = 'in table body';
+                $self->{insertion_mode} = IN_TABLE_BODY_IM;
                 ## reprocess in the "in table body" insertion mode...
               }
 
-              if ($self->{insertion_mode} eq 'in table body') {
+              if ($self->{insertion_mode} == IN_TABLE_BODY_IM) {
                 unless ($token->{tag_name} eq 'tr') {
                   $self->{parse_error}-> (type => 'missing start tag:tr');
                 }
@@ -4327,7 +4360,7 @@ sub _tree_construction_main ($) {
                   pop @{$self->{open_elements}};
                 }
                 
-                $self->{insertion_mode} = 'in row';
+                $self->{insertion_mode} = IN_ROW_IM;
                 if ($token->{tag_name} eq 'tr') {
                   
     {
@@ -4387,7 +4420,7 @@ sub _tree_construction_main ($) {
       push @{$self->{open_elements}}, [$el, $token->{tag_name}];
     }
   
-              $self->{insertion_mode} = 'in cell';
+              $self->{insertion_mode} = IN_CELL_IM;
 
               push @$active_formatting_elements, ['#marker', ''];
               
@@ -4396,9 +4429,9 @@ sub _tree_construction_main ($) {
             } elsif ({
                       caption => 1, col => 1, colgroup => 1,
                       tbody => 1, tfoot => 1, thead => 1,
-                      tr => 1, # $self->{insertion_mode} eq 'in row'
+                      tr => 1, # $self->{insertion_mode} == IN_ROW_IM
                      }->{$token->{tag_name}}) {
-              if ($self->{insertion_mode} eq 'in row') {
+              if ($self->{insertion_mode} == IN_ROW_IM) {
                 ## As if </tr>
                 ## have an element in table scope
                 my $i;
@@ -4429,7 +4462,7 @@ sub _tree_construction_main ($) {
                 }
                 
                 pop @{$self->{open_elements}}; # tr
-                $self->{insertion_mode} = 'in table body';
+                $self->{insertion_mode} = IN_TABLE_BODY_IM;
                 if ($token->{tag_name} eq 'tr') {
                   ## reprocess
                   redo B;
@@ -4438,7 +4471,7 @@ sub _tree_construction_main ($) {
                 }
               }
 
-              if ($self->{insertion_mode} eq 'in table body') {
+              if ($self->{insertion_mode} == IN_TABLE_BODY_IM) {
                 ## have an element in table scope
                 my $i;
                 INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
@@ -4477,7 +4510,7 @@ sub _tree_construction_main ($) {
                 ## nop by definition
                 
                 pop @{$self->{open_elements}};
-                $self->{insertion_mode} = 'in table';
+                $self->{insertion_mode} = IN_TABLE_IM;
                 ## reprocess in "in table" insertion mode...
               }
 
@@ -4500,7 +4533,7 @@ sub _tree_construction_main ($) {
       push @{$self->{open_elements}}, [$el, 'colgroup'];
     }
   
-                $self->{insertion_mode} = 'in column group';
+                $self->{insertion_mode} = IN_COLUMN_GROUP_IM;
                 ## reprocess
                 redo B;
               } elsif ({
@@ -4535,11 +4568,11 @@ sub _tree_construction_main ($) {
     }
   
                 $self->{insertion_mode} = {
-                                           caption => 'in caption',
-                                           colgroup => 'in column group',
-                                           tbody => 'in table body',
-                                           tfoot => 'in table body',
-                                           thead => 'in table body',
+                                           caption => IN_CAPTION_IM,
+                                           colgroup => IN_COLUMN_GROUP_IM,
+                                           tbody => IN_TABLE_BODY_IM,
+                                           tfoot => IN_TABLE_BODY_IM,
+                                           thead => IN_TABLE_BODY_IM,
                                           }->{$token->{tag_name}};
                 $token = $self->_get_next_token;
                 redo B;
@@ -4600,7 +4633,7 @@ sub _tree_construction_main ($) {
             }
           } elsif ($token->{type} eq 'end tag') {
             if ($token->{tag_name} eq 'tr' and
-                $self->{insertion_mode} eq 'in row') {
+                $self->{insertion_mode} == IN_ROW_IM) {
               ## have an element in table scope
               my $i;
               INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
@@ -4630,11 +4663,11 @@ sub _tree_construction_main ($) {
               }
 
               pop @{$self->{open_elements}}; # tr
-              $self->{insertion_mode} = 'in table body';
+              $self->{insertion_mode} = IN_TABLE_BODY_IM;
               $token = $self->_get_next_token;
               redo B;
             } elsif ($token->{tag_name} eq 'table') {
-              if ($self->{insertion_mode} eq 'in row') {
+              if ($self->{insertion_mode} == IN_ROW_IM) {
                 ## As if </tr>
                 ## have an element in table scope
                 my $i;
@@ -4665,11 +4698,11 @@ sub _tree_construction_main ($) {
                 }
                 
                 pop @{$self->{open_elements}}; # tr
-                $self->{insertion_mode} = 'in table body';
+                $self->{insertion_mode} = IN_TABLE_BODY_IM;
                 ## reprocess in the "in table body" insertion mode...
               }
 
-              if ($self->{insertion_mode} eq 'in table body') {
+              if ($self->{insertion_mode} == IN_TABLE_BODY_IM) {
                 ## have an element in table scope
                 my $i;
                 INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
@@ -4708,7 +4741,7 @@ sub _tree_construction_main ($) {
                 ## nop by definition
                 
                 pop @{$self->{open_elements}};
-                $self->{insertion_mode} = 'in table';
+                $self->{insertion_mode} = IN_TABLE_IM;
                 ## reprocess in the "in table" insertion mode...
               }
 
@@ -4757,9 +4790,9 @@ sub _tree_construction_main ($) {
             } elsif ({
                       tbody => 1, tfoot => 1, thead => 1,
                      }->{$token->{tag_name}} and
-                     ($self->{insertion_mode} eq 'in row' or
-                      $self->{insertion_mode} eq 'in table body')) {
-              if ($self->{insertion_mode} eq 'in row') {
+                     ($self->{insertion_mode} == IN_ROW_IM or
+                      $self->{insertion_mode} == IN_TABLE_BODY_IM)) {
+              if ($self->{insertion_mode} == IN_ROW_IM) {
                 ## have an element in table scope
                 my $i;
                 INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
@@ -4810,7 +4843,7 @@ sub _tree_construction_main ($) {
                 }
                 
                 pop @{$self->{open_elements}}; # tr
-                $self->{insertion_mode} = 'in table body';
+                $self->{insertion_mode} = IN_TABLE_BODY_IM;
                 ## reprocess in the "in table body" insertion mode...
               }
 
@@ -4843,14 +4876,14 @@ sub _tree_construction_main ($) {
               }
 
               pop @{$self->{open_elements}};
-              $self->{insertion_mode} = 'in table';
+              $self->{insertion_mode} = IN_TABLE_IM;
               $token = $self->_get_next_token;
               redo B;
             } elsif ({
                       body => 1, caption => 1, col => 1, colgroup => 1,
                       html => 1, td => 1, th => 1,
-                      tr => 1, # $self->{insertion_mode} eq 'in row'
-                      tbody => 1, tfoot => 1, thead => 1, # $self->{insertion_mode} eq 'in table'
+                      tr => 1, # $self->{insertion_mode} == IN_ROW_IM
+                      tbody => 1, tfoot => 1, thead => 1, # $self->{insertion_mode} == IN_TABLE_IM
                      }->{$token->{tag_name}}) {
               $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
               ## Ignore the token
@@ -4867,7 +4900,7 @@ sub _tree_construction_main ($) {
 
       $insert = $insert_to_foster;
       #
-    } elsif ($self->{insertion_mode} eq 'in column group') {
+    } elsif ($self->{insertion_mode} == IN_COLUMN_GROUP_IM) {
           if ($token->{type} eq 'character') {
             if ($token->{data} =~ s/^([\x09\x0A\x0B\x0C\x20]+)//) {
               $self->{open_elements}->[-1]->[0]->manakai_append_text ($1);
@@ -4911,7 +4944,7 @@ sub _tree_construction_main ($) {
                 redo B;
               } else {
                 pop @{$self->{open_elements}}; # colgroup
-                $self->{insertion_mode} = 'in table';
+                $self->{insertion_mode} = IN_TABLE_IM;
                 $token = $self->_get_next_token;
                 redo B;             
               }
@@ -4935,11 +4968,11 @@ sub _tree_construction_main ($) {
             redo B;
           } else {
             pop @{$self->{open_elements}}; # colgroup
-            $self->{insertion_mode} = 'in table';
+            $self->{insertion_mode} = IN_TABLE_IM;
             ## reprocess
             redo B;
           }
-    } elsif ($self->{insertion_mode} eq 'in select') {
+    } elsif ($self->{insertion_mode} == IN_SELECT_IM) {
           if ($token->{type} eq 'character') {
             $self->{open_elements}->[-1]->[0]->manakai_append_text ($token->{data});
             $token = $self->_get_next_token;
@@ -5143,8 +5176,8 @@ sub _tree_construction_main ($) {
           ## Ignore the token
           $token = $self->_get_next_token;
           redo B;
-    } elsif ($self->{insertion_mode} eq 'after body' or
-             $self->{insertion_mode} eq 'after html body') {
+    } elsif ($self->{insertion_mode} == AFTER_BODY_IM or
+             $self->{insertion_mode} == AFTER_HTML_BODY_IM) {
       if ($token->{type} eq 'character') {
         if ($token->{data} =~ s/^([\x09\x0A\x0B\x0C\x20]+)//) {
           my $data = $1;
@@ -5159,7 +5192,7 @@ sub _tree_construction_main ($) {
           }
         }
         
-        if ($self->{insertion_mode} eq 'after html body') {
+        if ($self->{insertion_mode} == AFTER_HTML_BODY_IM) {
           $self->{parse_error}-> (type => 'after html:#character');
 
           ## Reprocess in the "main" phase, "after body" insertion mode...
@@ -5168,11 +5201,11 @@ sub _tree_construction_main ($) {
         ## "after body" insertion mode
         $self->{parse_error}-> (type => 'after body:#character');
 
-        $self->{insertion_mode} = 'in body';
+        $self->{insertion_mode} = IN_BODY_IM;
         ## reprocess
         redo B;
       } elsif ($token->{type} eq 'start tag') {
-        if ($self->{insertion_mode} eq 'after html body') {
+        if ($self->{insertion_mode} == AFTER_HTML_BODY_IM) {
           $self->{parse_error}-> (type => 'after html:'.$token->{tag_name});
           
           ## Reprocess in the "main" phase, "after body" insertion mode...
@@ -5181,14 +5214,14 @@ sub _tree_construction_main ($) {
         ## "after body" insertion mode
         $self->{parse_error}-> (type => 'after body:'.$token->{tag_name});
 
-        $self->{insertion_mode} = 'in body';
+        $self->{insertion_mode} = IN_BODY_IM;
         ## reprocess
         redo B;
       } elsif ($token->{type} eq 'end tag') {
-        if ($self->{insertion_mode} eq 'after html body') {
+        if ($self->{insertion_mode} == AFTER_HTML_BODY_IM) {
           $self->{parse_error}-> (type => 'after html:/'.$token->{tag_name});
           
-          $self->{insertion_mode} = 'after body';
+          $self->{insertion_mode} = AFTER_BODY_IM;
           ## Reprocess in the "main" phase, "after body" insertion mode...
         }
 
@@ -5200,23 +5233,23 @@ sub _tree_construction_main ($) {
             $token = $self->_get_next_token;
             redo B;
           } else {
-            $self->{insertion_mode} = 'after html body';
+            $self->{insertion_mode} = AFTER_HTML_BODY_IM;
             $token = $self->_get_next_token;
             redo B;
           }
         } else {
           $self->{parse_error}-> (type => 'after body:/'.$token->{tag_name});
 
-          $self->{insertion_mode} = 'in body';
+          $self->{insertion_mode} = IN_BODY_IM;
           ## reprocess
           redo B;
         }
       } else {
         die "$0: $token->{type}: Unknown token type";
       }
-    } elsif ($self->{insertion_mode} eq 'in frameset' or 
-             $self->{insertion_mode} eq 'after frameset' or
-             $self->{insertion_mode} eq 'after html frameset') {
+    } elsif ($self->{insertion_mode} == IN_FRAMESET_IM or 
+             $self->{insertion_mode} == AFTER_FRAMESET_IM or
+             $self->{insertion_mode} == AFTER_HTML_FRAMESET_IM) {
       if ($token->{type} eq 'character') {
         if ($token->{data} =~ s/^([\x09\x0A\x0B\x0C\x20]+)//) {
           $self->{open_elements}->[-1]->[0]->manakai_append_text ($1);
@@ -5228,14 +5261,14 @@ sub _tree_construction_main ($) {
         }
         
         if ($token->{data} =~ s/^[^\x09\x0A\x0B\x0C\x20]+//) {
-          if ($self->{insertion_mode} eq 'in frameset') {
+          if ($self->{insertion_mode} == IN_FRAMESET_IM) {
             $self->{parse_error}-> (type => 'in frameset:#character');
-          } elsif ($self->{insertion_mode} eq 'after frameset') {
+          } elsif ($self->{insertion_mode} == AFTER_FRAMESET_IM) {
             $self->{parse_error}-> (type => 'after frameset:#character');
           } else { # "after html frameset"
             $self->{parse_error}-> (type => 'after html:#character');
 
-            $self->{insertion_mode} = 'after frameset';
+            $self->{insertion_mode} = AFTER_FRAMESET_IM;
             ## Reprocess in the "main" phase, "after frameset"...
             $self->{parse_error}-> (type => 'after frameset:#character');
           }
@@ -5251,15 +5284,15 @@ sub _tree_construction_main ($) {
         
         die qq[$0: Character "$token->{data}"];
       } elsif ($token->{type} eq 'start tag') {
-        if ($self->{insertion_mode} eq 'after html frameset') {
+        if ($self->{insertion_mode} == AFTER_HTML_FRAMESET_IM) {
           $self->{parse_error}-> (type => 'after html:'.$token->{tag_name});
 
-          $self->{insertion_mode} = 'after frameset';
+          $self->{insertion_mode} = AFTER_FRAMESET_IM;
           ## Process in the "main" phase, "after frameset" insertion mode...
         }
 
         if ($token->{tag_name} eq 'frameset' and
-            $self->{insertion_mode} eq 'in frameset') {
+            $self->{insertion_mode} == IN_FRAMESET_IM) {
           
     {
       my $el;
@@ -5279,7 +5312,7 @@ sub _tree_construction_main ($) {
           $token = $self->_get_next_token;
           redo B;
         } elsif ($token->{tag_name} eq 'frame' and
-                 $self->{insertion_mode} eq 'in frameset') {
+                 $self->{insertion_mode} == IN_FRAMESET_IM) {
           
     {
       my $el;
@@ -5304,7 +5337,7 @@ sub _tree_construction_main ($) {
           $parse_rcdata->(CDATA_CONTENT_MODEL, $insert_to_current);
           redo B;
         } else {
-          if ($self->{insertion_mode} eq 'in frameset') {
+          if ($self->{insertion_mode} == IN_FRAMESET_IM) {
             $self->{parse_error}-> (type => 'in frameset:'.$token->{tag_name});
           } else {
             $self->{parse_error}-> (type => 'after frameset:'.$token->{tag_name});
@@ -5314,15 +5347,15 @@ sub _tree_construction_main ($) {
           redo B;
         }
       } elsif ($token->{type} eq 'end tag') {
-        if ($self->{insertion_mode} eq 'after html frameset') {
+        if ($self->{insertion_mode} == AFTER_HTML_FRAMESET_IM) {
           $self->{parse_error}-> (type => 'after html:/'.$token->{tag_name});
 
-          $self->{insertion_mode} = 'after frameset';
+          $self->{insertion_mode} = AFTER_FRAMESET_IM;
           ## Process in the "main" phase, "after frameset" insertion mode...
         }
 
         if ($token->{tag_name} eq 'frameset' and
-            $self->{insertion_mode} eq 'in frameset') {
+            $self->{insertion_mode} == IN_FRAMESET_IM) {
           if ($self->{open_elements}->[-1]->[1] eq 'html' and
               @{$self->{open_elements}} == 1) {
             $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
@@ -5335,16 +5368,16 @@ sub _tree_construction_main ($) {
 
           if (not defined $self->{inner_html_node} and
               $self->{open_elements}->[-1]->[1] ne 'frameset') {
-            $self->{insertion_mode} = 'after frameset';
+            $self->{insertion_mode} = AFTER_FRAMESET_IM;
           }
           redo B;
         } elsif ($token->{tag_name} eq 'html' and
-                 $self->{insertion_mode} eq 'after frameset') {
-          $self->{insertion_mode} = 'after html frameset';
+                 $self->{insertion_mode} == AFTER_FRAMESET_IM) {
+          $self->{insertion_mode} = AFTER_HTML_FRAMESET_IM;
           $token = $self->_get_next_token;
           redo B;
         } else {
-          if ($self->{insertion_mode} eq 'in frameset') {
+          if ($self->{insertion_mode} == IN_FRAMESET_IM) {
             $self->{parse_error}-> (type => 'in frameset:/'.$token->{tag_name});
           } else {
             $self->{parse_error}-> (type => 'after frameset:/'.$token->{tag_name});
@@ -5987,7 +6020,7 @@ sub _tree_construction_main ($) {
     }
   
           
-        $self->{insertion_mode} = 'in table';
+        $self->{insertion_mode} = IN_TABLE_IM;
           
         $token = $self->_get_next_token;
         redo B;
@@ -6197,7 +6230,7 @@ sub _tree_construction_main ($) {
     }
   
         
-        $self->{insertion_mode} = 'in select';
+        $self->{insertion_mode} = IN_SELECT_IM;
         $token = $self->_get_next_token;
         redo B;
       } elsif ({
@@ -6249,7 +6282,7 @@ sub _tree_construction_main ($) {
             }
           }
 
-          $self->{insertion_mode} = 'after body';
+          $self->{insertion_mode} = AFTER_BODY_IM;
           $token = $self->_get_next_token;
           redo B;
         } else {
@@ -6264,7 +6297,7 @@ sub _tree_construction_main ($) {
           if ($self->{open_elements}->[-1]->[1] ne 'body') {
             $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[1]->[1]);
           }
-          $self->{insertion_mode} = 'after body';
+          $self->{insertion_mode} = AFTER_BODY_IM;
           ## reprocess
           redo B;
         } else {
@@ -6776,4 +6809,4 @@ sub get_inner_html ($$$) {
 } # get_inner_html
 
 1;
-# $Date: 2007/07/21 12:37:57 $
+# $Date: 2007/08/11 06:37:12 $

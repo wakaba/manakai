@@ -40,7 +40,7 @@ Web Hypertext Application Technologies.
 
 package Whatpm::ContentType;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## Table in <http://www.whatwg.org/specs/web-apps/current-work/#content-type1>.
 ##
@@ -383,13 +383,10 @@ Add method for charset detection.
 
 =head1 SEE ALSO
 
-Whatpm
-<http://suika.fam.cx/www/markup/html/whatpm/readme>
-
-Web Applications 1.0 Working Draft - 
+HTML 5 Working Draft - 
 Determining the type of a new resource in a browsing context
 <http://www.whatwg.org/specs/web-apps/current-work/#content-type-sniffing>
-(Revision 792, 1 May 2007)
+(Revision 999, 10 Aug 2007)
 
 =head1 AUTHOR
 
@@ -405,4 +402,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2007/08/11 05:44:51 $
+# $Date: 2007/08/11 06:37:12 $
