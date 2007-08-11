@@ -13,7 +13,7 @@ This module is part of manakai.
 
 package Message::CGI::HTTP;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::IF::CGIRequest';
 
 =head1 METHODS
@@ -71,7 +71,7 @@ NOTE: Some application might use an environmental variable named
 for HTTP 'Home:' header field.  Fortunately, such name of HTTP
 header field is not intoroduced as far as I know.
 
-This method returns a C<L<Message::DOM::DOMStringList>>.
+This method returns a C<Message::DOM::DOMStringList>.
 
 =cut
 
@@ -108,7 +108,7 @@ sub get_parameter ($$) {
 
 Returnes a list of parameter names provided.
 
-This method returns a C<L<Message::DOM::DOMStringList>>.
+This method returns a C<Message::DOM::DOMStringList>.
 
 =cut
 
@@ -126,14 +126,14 @@ sub __get_parameter ($) {
   my @src;
   
   ## Query-string of Request-URI
-  my $qs = $self->meta_variable ('QUERY_STRING');
+  my $qs = $self->get_meta_variable ('QUERY_STRING');
   push @src, $qs if (index ($qs, '=') > -1);
   
   ## Entity-body
-  if ($self->meta_variable ('REQUEST_METHOD') eq 'POST') {
-    my $mt = $self->meta_variable ('CONTENT_TYPE');
+  if ($self->get_meta_variable ('REQUEST_METHOD') eq 'POST') {
+    my $mt = $self->get_meta_variable ('CONTENT_TYPE');
     if ($mt =~ m<^application/(?:x-www|sgml)-form-urlencoded\b>) {
-      push @src, $self->body_text;
+      push @src, $self->entity_body;
     }
     ## TODO: support non-standard "charset" parameter
   }
@@ -159,7 +159,7 @@ sub __get_parameter ($) {
            ||$self->{decoder}->{'#default'}} ($self, $_, \%temp_params);
     }
   }
-} # _get_parameter
+} # __get_parameter
 
 =item I<$body> = I<$cgi>->entity_body;
 
@@ -178,13 +178,13 @@ sub __get_entity_body ($) {
   my $self = shift;
   binmode $self->{-in_handle};
   read $self->{-in_handle}, $self->{body}, 
-                            $self->meta_variable ('CONTENT_LENGTH');
+                            $self->get_meta_variable ('CONTENT_LENGTH');
 } # __get_entity_body
 ## TODO: Entity too large
 
 =item I<$uri> = I<$cgi>->request_uri;
 
-Returns Request-URI as a C<L<Message::URI::URIReference>> object.
+Returns Request-URI as a C<Message::URI::URIReference> object.
 
 Note that stringified value of returned value might not be same as the
 URI specified as the Request-URI of HTTP request or (possibly pseudo-)
@@ -197,7 +197,7 @@ sub request_uri ($;%) {
   my ($self, %opt) = @_;
   require Message::URI::URIReference;
   my $uri = $opt{no_path_info} ? undef
-          : $self->meta_variable ('REQUEST_URI'); # non-standard
+          : $self->get_meta_variable ('REQUEST_URI'); # non-standard
   if ($uri) {
     $uri =~ s/\#[^#]*$//;  ## Fragment identifier not allowed here
     $uri =~ s/\?[^?]*$// if $opt{no_query};
@@ -206,35 +206,35 @@ sub request_uri ($;%) {
     }
   } else {  ## REQUEST_URI is not provided
     my $pi = $opt{no_path_info} ? q<>
-           : $self->meta_variable ('PATH_INFO');
-    $uri = $self->__uri_encode ($self->meta_variable ('SCRIPT_NAME').$pi,
+           : $self->get_meta_variable ('PATH_INFO');
+    $uri = $self->__uri_encode ($self->get_meta_variable ('SCRIPT_NAME').$pi,
                                 qr([^0-9A-Za-z_.!~*'();/:\@&=\$,-]));
-    my $qs = $self->meta_variable ('QUERY_STRING');
+    my $qs = $self->get_meta_variable ('QUERY_STRING');
     $uri .= '?' . $qs if not $opt{no_query} and defined $qs;
   }
   
   ## REQUEST_URI is a relative URI or
   ## REQUEST_URI is not provided
   my $scheme = 'http';
-  my $port = ':' . $self->meta_variable ('SERVER_PORT');
+  my $port = ':' . $self->get_meta_variable ('SERVER_PORT');
   ## TODO: HTTPS=off
-  if (   $self->meta_variable ('HTTPS')
-      || $self->meta_variable ('CERT_SUBJECT')
-      || $self->meta_variable ('SSL_VERSION')) {
+  if (   $self->get_meta_variable ('HTTPS')
+      || $self->get_meta_variable ('CERT_SUBJECT')
+      || $self->get_meta_variable ('SSL_VERSION')) {
     $scheme = 'https';
     $port = '' if $port eq ':443';
   } else {
     $port = '' if $port eq ':80';
   }
   
-  my $host_and_port = $self->meta_variable ('HTTP_HOST');
+  my $host_and_port = $self->get_meta_variable ('HTTP_HOST');
   if ($host_and_port) {
     $uri = $scheme . '://'
          . $self->__uri_encode ($host_and_port, qr/[^0-9A-Za-z.:-]/)
          . $uri;  ## ISSUE: Should we allow "[" / "]" for IPv6 here?
   } else {
     $uri = $scheme . '://'
-         . $self->__uri_encode ($self->meta_variable ('SERVER_NAME'),
+         . $self->__uri_encode ($self->get_meta_variable ('SERVER_NAME'),
                                 qr/[^0-9A-Za-z.-]/)
          . $port . $uri;
   }
@@ -273,6 +273,8 @@ specification, however.)
 
 Wakaba <w@suika.fam.cx>
 
+This module was originally developed as part of SuikaWiki.
+
 =head1 LICENSE
 
 Copyright 2003, 2007 Wakaba <w@suika.fam.cx>
@@ -283,4 +285,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2007/08/11 13:37:09 $
+# $Date: 2007/08/11 13:51:36 $
