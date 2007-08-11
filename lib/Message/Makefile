@@ -10,6 +10,7 @@ all:
 	$(CD) Markup && $(MAKE) all
 	$(CD) DOM && $(MAKE) all
 	$(CD) URI && $(MAKE) all
+	$(CD) CGI && $(MAKE) all
 
 clean:
 	$(RMALL) *.BAK .*.BAK *~ .*~
@@ -20,15 +21,7 @@ clean:
 	$(CD) Markup && $(MAKE) clean
 	$(CD) DOM && $(MAKE) clean
 	$(CD) URI && $(MAKE) clean
-
-clean-db:
-#	$(CD) Body && $(MAKE) clean-db
-#	$(CD) Field && $(MAKE) clean-db
-#	$(CD) MIME && $(MAKE) clean-db
-	$(CD) Util && $(MAKE) clean-db
-	$(CD) Markup && $(MAKE) clean-db
-	$(CD) DOM && $(MAKE) clean-db
-	$(CD) URI && $(MAKE) clean-db
+	$(CD) CGI && $(MAKE) clean
 
 distclean:
 	$(RMALL) *.BAK .*.BAK *~ .*~
@@ -39,6 +32,7 @@ distclean:
 	$(CD) Markup && $(MAKE) distclean
 	$(CD) DOM && $(MAKE) distclean
 	$(CD) URI && $(MAKE) distclean
+	$(CD) CGI && $(MAKE) distclean
 
-## $Date: 2007/07/29 08:04:40 $
+## $Date: 2007/08/11 13:37:09 $
 ## License: Public Domain.

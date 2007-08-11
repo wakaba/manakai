@@ -1,28 +1,28 @@
-
 =head1 NAME
 
-SuikaWiki::Input::HTTP - SuikaWiki: HTTP or HTTP CGI input support
+Message::CGI::HTTP - An Object-Oriented HTTP CGI Interface
 
 =head1 DESCRIPTION
 
-This module provides HTTP or HTTP CGI input support,
-although current version of this module supports HTTP CGI only.
+The C<Message::CGI::HTTP> module provides an object-oriented
+interface for inputs and outputs as defined by CGI specification.
 
-This module is part of SuikaWiki.
+This module is part of manakai.
 
 =cut
 
-package SuikaWiki::Input::HTTP;
+package Message::CGI::HTTP;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION = do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+push our @ISA, 'Message::IF::CGIRequest';
 
 =head1 METHODS
 
 =over 4
 
-=item $http = SuikaWiki::Input::HTTP->new
+=item I<$cgi> = Message::CGI::HTTP->new;
 
-Constructs new instance of HTTP input implementation
+Creates and returns a new instance of HTTP CGI interface object.
 
 =cut
 
@@ -33,23 +33,32 @@ sub new ($;%) {
                                },
                    }, shift;
   my %opt = @_;
-  $self->{wiki} = $opt{wiki};
-  $self->{-in_handle} = $opt{input_handle} || *STDIN;
+  $self->{-in_handle} = *main::STDIN;
   $self;
-}
+} # new
 
-=item $value = $http->meta_variable ($name)
+=item I<$value> = I<$cgi>->get_meta_variable (I<$name>)
 
-Returns variable value.  $name should be a meta-variable name
-defined by CGI specification, eg. CONTENT_TYPE, HTTP_USER_AGENT and so on.
+Returns the value of the meta-variable I<$name>.  The name
+specified by the I<$name> SHOULD be a meta-variable name
+defined by a CGI specification, e.g. C<CONTENT_TYPE> or
+C<HTTP_USER_AGENT>.  Otherwise, the result is implementation
+dependent.  In an environment where meta-variables are supplied
+as envirnoment variables, specifying an environment variable
+that is not a meta-variable, such as C<PATH>, results in the
+value of that environment variable.  However, CGI scripts
+SHOULD NOT depend on such behavior.
+
+This method might return C<undef> when the meta-variable
+is not defined or is defined but its value is C<undef>.
 
 =cut
 
-sub meta_variable ($$) {
-  $main::ENV{ $_[1] };
-}
+sub get_meta_variable ($$) {
+  return $main::ENV{ $_[1] };
+} # get_meta_variable
 
-=item @list = $http->meta_variable_list
+=item I<$list> = I<$cgi>->meta_variable_names;
 
 Returns list of meta variables.  Note that this list might contain
 other environmental variables than CGI meta variables, since
@@ -57,21 +66,21 @@ they cannot distinglish unless we know what is CGI meta variable
 and what is not.  Unfortunately, there is no complete list of CGI
 meta variables, whilst list of standarized meta variables is available.
 
-Future version of this module, which implements non-CGI HTTP request,
-will not return non-CGI environmental variable names in non-CGI mode.
-
 NOTE: Some application might use an environmental variable named
 'HTTP_HOME', which might make some confusion with CGI meta variable
 for HTTP 'Home:' header field.  Fortunately, such name of HTTP
 header field is not intoroduced as far as I know.
 
+This method returns a C<L<Message::DOM::DOMStringList>>.
+
 =cut
 
-sub meta_variable_list ($) {
-  keys %main::ENV;
-}
+sub meta_variable_names ($) {
+  require Message::DOM::DOMStringList;
+  bless [keys %main::ENV], 'Message::DOM::DOMStringList::StaticList';
+} # meta_variable_names
 
-=item $value = $http->parameter ($name)
+=item I<$value> = C<$cgi>->get_parameter ($name);
 
 Returns parameter value if any.
 Parameter value is set by query-string of Request-URI
@@ -82,24 +91,35 @@ the first one is returned in scalar context or
 an array reference of all values is returned in array context.
 (Note that query-string is "earlier" than entity-body.)
 
-=item @keys = $http->parameter_names
+=cut
+
+sub get_parameter ($$) {
+  my ($self, $name) = @_;
+  $self->__get_parameter unless $self->{param};
+
+  if (wantarray) {
+    return @{$self->{param}->{$name}||[]};
+  } else {
+    return ${$self->{param}->{$name}||[]}[0];
+  }
+} # get_parameter
+
+=item I<$keys> = I<$cgi>->parameter_names;
 
 Returnes a list of parameter names provided.
 
-=cut
+This method returns a C<L<Message::DOM::DOMStringList>>.
 
-sub parameter ($$) {
-  my ($self, $name) = @_;
-  $self->__get_parameter unless $self->{param};
-  wantarray ? ( @{$self->{param}->{$name}||[]} ) :
-              ${$self->{param}->{$name}||[]}[0];
-}
+=cut
 
 sub parameter_names ($) {
   my $self = shift;
   $self->__get_parameter unless $self->{param};
-  return keys %{$self->{param}};
-}
+  
+  require Message::DOM::DOMStringList;
+  return bless [keys %{$self->{param}}],
+      'Message::DOM::DOMStringList::StaticList';
+} # parameter_names
 
 sub __get_parameter ($) {
   my $self = shift;
@@ -139,43 +159,32 @@ sub __get_parameter ($) {
            ||$self->{decoder}->{'#default'}} ($self, $_, \%temp_params);
     }
   }
-}
+} # _get_parameter
 
-=item $body = $http->body
+=item I<$body> = I<$cgi>->entity_body;
 
 Returns entity-body content if any.
 
-It is expected that in future version of this module,
-this method returns an object instantiated with body content
-rather than body text itself.
-
-=item $body = $http->body_text
-
-Returnes entity-body context as a string.
-
 =cut
 
-sub body ($) {
+sub entity_body ($) {
   my $self = shift;
   $self->__get_entity_body unless defined $self->{body};
-  $self->{body};
-}
 
-sub body_text ($) {
-  $_[0]->body;
-}
+  return $self->{body};
+} # entity_body
          
 sub __get_entity_body ($) {
   my $self = shift;
   binmode $self->{-in_handle};
   read $self->{-in_handle}, $self->{body}, 
                             $self->meta_variable ('CONTENT_LENGTH');
-}
+} # __get_entity_body
 ## TODO: Entity too large
 
-=item $uri = $http->request_uri
+=item I<$uri> = I<$cgi>->request_uri;
 
-Returns Request-URI as a URI object.
+Returns Request-URI as a C<L<Message::URI::URIReference>> object.
 
 Note that stringified value of returned value might not be same as the
 URI specified as the Request-URI of HTTP request or (possibly pseudo-)
@@ -186,14 +195,14 @@ defined by HTTP and CGI/1.1 specifications.
 
 sub request_uri ($;%) {
   my ($self, %opt) = @_;
-  require URI;
+  require Message::URI::URIReference;
   my $uri = $opt{no_path_info} ? undef
           : $self->meta_variable ('REQUEST_URI'); # non-standard
   if ($uri) {
     $uri =~ s/\#[^#]*$//;  ## Fragment identifier not allowed here
     $uri =~ s/\?[^?]*$// if $opt{no_query};
     if ($uri =~ /^[0-9A-Za-z.%+-]+:/) {    ## REQUEST_URI is an absolute URI
-      return URI->new ($uri);
+      return Message::DOM::DOMImplementation->create_uri_reference ($uri);
     }
   } else {  ## REQUEST_URI is not provided
     my $pi = $opt{no_path_info} ? q<>
@@ -229,9 +238,8 @@ sub request_uri ($;%) {
                                 qr/[^0-9A-Za-z.-]/)
          . $port . $uri;
   }
-  return URI->new ($uri);
-}
-
+  return Message::DOM::DOMImplementation->create_uri_reference ($uri);
+} # request_uri
 
 sub __uri_encode ($$;$) {
   my ($self, $s, $char) = @_;
@@ -239,47 +247,40 @@ sub __uri_encode ($$;$) {
   require Encode;
   $s = Encode::decode ('utf8', $s);
   $s =~ s/($char)/sprintf '%%%02X', ord $1/ge;
-  $s;
-}
+  return $s;
+} # __uri_encode
 
-=item $http->exit
+package Message::IF::CGIRequest;
 
-Declares that user no longer thinks the instance ($http) is interesting.
-Usually, this method is automatically called.
-
-=cut
-
-sub exit ($) {
-  my $self = shift;
-  delete $self->{wiki};
-  $self->{exited} = 1;
-  1;
-}
-
-sub DESTORY ($) {
-  my $self = shift;
-  $self->exit unless $self->{exited};
-}
+=back
 
 =head1 TODO
 
 =over 4
 
-=item Use manakai
-
 =item multipart/form-data support
 
-=item HTTP (non-CGI) support
+=back
 
-=cut
+=head1 SEE ALSO
+
+A draft specification for DOM CGI Module
+<http://suika.fam.cx/gate/2005/sw/manakai/%E3%83%A1%E3%83%A2/2005-07-04>
+(This module does not implement the interface defined in this
+specification, however.)
+
+=head1 AUTHOR
+
+Wakaba <w@suika.fam.cx>
 
 =head1 LICENSE
 
-Copyright 2003 Wakaba <w@suika.fam.cx>
+Copyright 2003, 2007 Wakaba <w@suika.fam.cx>
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
 =cut
 
-1; # $Date: 2007/08/11 13:06:39 $
+1;
+# $Date: 2007/08/11 13:37:09 $

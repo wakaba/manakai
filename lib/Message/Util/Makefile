@@ -18,7 +18,7 @@ PERLC_OPTIONS_ALL = $(PERLC_OPTIONS) -I$(MANAKAI_LIB_DIR)
 PERL_CHK = $(PERLC) $(PERLC_OPTIONS_ALL)
 TOUCH = touch
 
-HTM_FILES = Error.html \
+HTML_FILES = Error.html \
   Formatter/Base.html Formatter/Boolean.html Formatter/Text.html \
   HostPermit.html QName/Filter.html
 
@@ -40,5 +40,5 @@ clean:
 
 distclean: clean
 
-## $Date: 2007/07/29 08:04:42 $
+## $Date: 2007/08/11 13:37:09 $
 ## License: Public Domain.

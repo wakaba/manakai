@@ -1,0 +1,164 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Message::CGI::HTTP - An Object-Oriented HTTP CGI Interface</title>
+<link rel="stylesheet" href="http://suika.fam.cx/www/style/html/pod.css" type="text/css" />
+<link rev="made" href="mailto:admin@suika.fam.cx" />
+</head>
+
+<body>
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#methods">METHODS</a></li>
+	<li><a href="#todo">TODO</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#license">LICENSE</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Message::CGI::HTTP - An Object-Oriented HTTP CGI Interface</p>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>The <code>Message::CGI::HTTP</code> module provides an object-oriented
+interface for inputs and outputs as defined by CGI specification.</p>
+<p>This module is part of manakai.</p>
+<p>
+</p>
+<hr />
+<h1><a name="methods">METHODS</a></h1>
+<dl>
+<dt><strong><a name="item_new"><em>$cgi</em> = Message::CGI::HTTP-&gt;new;</a></strong><br />
+</dt>
+<dd>
+Creates and returns a new instance of HTTP CGI interface object.
+</dd>
+<p></p>
+<dt><strong><a name="item_get_meta_variable"><em>$value</em> = <em>$cgi</em>-&gt;get_meta_variable (<em>$name</em>)</a></strong><br />
+</dt>
+<dd>
+Returns the value of the meta-variable <em>$name</em>.  The name
+specified by the <em>$name</em> SHOULD be a meta-variable name
+defined by a CGI specification, e.g. <code>CONTENT_TYPE</code> or
+<code>HTTP_USER_AGENT</code>.  Otherwise, the result is implementation
+dependent.  In an environment where meta-variables are supplied
+as envirnoment variables, specifying an environment variable
+that is not a meta-variable, such as <code>PATH</code>, results in the
+value of that environment variable.  However, CGI scripts
+SHOULD NOT depend on such behavior.
+</dd>
+<dd>
+<p>This method might return <code>undef</code> when the meta-variable
+is not defined or is defined but its value is <code>undef</code>.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_meta_variable_names"><em>$list</em> = <em>$cgi</em>-&gt;meta_variable_names;</a></strong><br />
+</dt>
+<dd>
+Returns list of meta variables.  Note that this list might contain
+other environmental variables than CGI meta variables, since
+they cannot distinglish unless we know what is CGI meta variable
+and what is not.  Unfortunately, there is no complete list of CGI
+meta variables, whilst list of standarized meta variables is available.
+</dd>
+<dd>
+<p>NOTE: Some application might use an environmental variable named
+'HTTP_HOME', which might make some confusion with CGI meta variable
+for HTTP 'Home:' header field.  Fortunately, such name of HTTP
+header field is not intoroduced as far as I know.</p>
+</dd>
+<dd>
+<p>This method returns a <code>Message::DOM::DOMStringList</code>.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_get_parameter"><em>$value</em> = <code>$cgi</code>-&gt;get_parameter ($name);</a></strong><br />
+</dt>
+<dd>
+Returns parameter value if any.
+Parameter value is set by query-string of Request-URI
+and/or entity-body value.
+</dd>
+<dd>
+<p>When multiple values with same parameter name is specified,
+the first one is returned in scalar context or
+an array reference of all values is returned in array context.
+(Note that query-string is ``earlier'' than entity-body.)</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_parameter_names"><em>$keys</em> = <em>$cgi</em>-&gt;parameter_names;</a></strong><br />
+</dt>
+<dd>
+Returnes a list of parameter names provided.
+</dd>
+<dd>
+<p>This method returns a <code>Message::DOM::DOMStringList</code>.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_entity_body"><em>$body</em> = <em>$cgi</em>-&gt;entity_body;</a></strong><br />
+</dt>
+<dd>
+Returns entity-body content if any.
+</dd>
+<p></p>
+<dt><strong><a name="item_request_uri"><em>$uri</em> = <em>$cgi</em>-&gt;request_uri;</a></strong><br />
+</dt>
+<dd>
+Returns Request-URI as a <code>Message::URI::URIReference</code> object.
+</dd>
+<dd>
+<p>Note that stringified value of returned value might not be same as the
+URI specified as the Request-URI of HTTP request or (possibly pseudo-)
+URI entered by the user, since no standarized way to get it is
+defined by HTTP and CGI/1.1 specifications.</p>
+</dd>
+<p></p></dl>
+<p>
+</p>
+<hr />
+<h1><a name="todo">TODO</a></h1>
+<dl>
+<dt><strong><a name="item_multipart_2fform_2ddata_support">multipart/form-data support</a></strong><br />
+</dt>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p>A draft specification for DOM CGI Module
+&lt;http://suika.fam.cx/gate/2005/sw/manakai/%E3%83%A1%E3%83%A2/2005-07-04&gt;
+(This module does not implement the interface defined in this
+specification, however.)</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;
+
+</p>
+<p>
+</p>
+<hr />
+<h1><a name="license">LICENSE</a></h1>
+<p>Copyright 2003, 2007 Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;
+
+</p>
+<p>This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+</p>
+
+</body>
+
+</html>
