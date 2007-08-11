@@ -1,7 +1,7 @@
 use strict;
 use Test;
 
-BEGIN { plan tests => 876 }
+BEGIN { plan tests => 888 }
 
 use Whatpm::ContentType;
 
@@ -434,6 +434,13 @@ for my $v (
     q<text/html>,
   ],
   [
+    x (qw(42 4d b6 2a 00 00 00 00 00 00 36 00 00 00 28 00)),
+    q<text/plain>, 0,
+    q<application/octet-stream>, 'BMP',
+    q<image/bmp>,
+    q<text/html>,
+  ],
+  [
     q<<rss><title>RSS feed</title></rss>>,
     q<text/plain>, 0,
     q<text/plain>, 'RSS unversioned',
@@ -588,7 +595,8 @@ for my $v (
       return $v->[0];
     },
     http_content_type_byte => $img_type,
-    supported_image_types => {qw(image/png 1 image/jpeg 1 image/gif 1)});
+    supported_image_types => {qw(image/png 1 image/jpeg 1 image/gif 1
+                                 image/bmp 1)});
     ok $st, $v->[5] =~ m#^image/# ? $v->[5] : $img_type,
         'Image (all): ' . $v->[4];
   }
@@ -603,5 +611,5 @@ for my $v (
 }
 
 ## License: Public Domain.
-## $Date: 2007/08/08 12:39:00 $
+## $Date: 2007/08/11 05:44:51 $
 1;

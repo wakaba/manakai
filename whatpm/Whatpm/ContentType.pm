@@ -40,7 +40,7 @@ Web Hypertext Application Technologies.
 
 package Whatpm::ContentType;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.5 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## Table in <http://www.whatwg.org/specs/web-apps/current-work/#content-type1>.
 ##
@@ -97,11 +97,17 @@ our @UnknownSniffingTable = (
     "\xFF\xD8\xFF",
     "image/jpeg",
   ],
+  [
+    "\xFF\xFF",
+    "\x42\x4D",
+    "image/bmp",
+  ],
 );
 
 ## Table in <http://www.whatwg.org/specs/web-apps/current-work/#content-type2>.
 ## 
-## User agents are not (at least explicitly) allowed to add rows to this table.
+## NOTE: User agents are not allowed (at least in an explicit way) to add
+## rows to this table.
 my @ImageSniffingTable = (
   ## Pattern, Sniffed Type
   [
@@ -119,6 +125,10 @@ my @ImageSniffingTable = (
   [
     "\xFF\xD8\xFF",
     "image/jpeg",
+  ],
+  [
+    "\x42\x4D",
+    "image/bmp",
   ],
 );
 ## NOTE: Ensure |$bytes| to be longer than pattern when a new image type
@@ -395,4 +405,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2007/08/08 12:39:00 $
+# $Date: 2007/08/11 05:44:51 $
