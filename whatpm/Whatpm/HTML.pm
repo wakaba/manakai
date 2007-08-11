@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.58 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.59 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## ISSUE:
 ## var doc = implementation.createDocument (null, null, null);
@@ -159,6 +159,40 @@ sub CDATA_CONTENT_MODEL () { CM_LIMITED_MARKUP }
 sub RCDATA_CONTENT_MODEL () { CM_ENTITY | CM_LIMITED_MARKUP }
 sub PCDATA_CONTENT_MODEL () { CM_ENTITY | CM_FULL_MARKUP }
 
+sub DATA_STATE () { 0 }
+sub ENTITY_DATA_STATE () { 1 }
+sub TAG_OPEN_STATE () { 2 }
+sub CLOSE_TAG_OPEN_STATE () { 3 }
+sub TAG_NAME_STATE () { 4 }
+sub BEFORE_ATTRIBUTE_NAME_STATE () { 5 }
+sub ATTRIBUTE_NAME_STATE () { 6 }
+sub AFTER_ATTRIBUTE_NAME_STATE () { 7 }
+sub BEFORE_ATTRIBUTE_VALUE_STATE () { 8 }
+sub ATTRIBUTE_VALUE_DOUBLE_QUOTED_STATE () { 9 }
+sub ATTRIBUTE_VALUE_SINGLE_QUOTED_STATE () { 10 }
+sub ATTRIBUTE_VALUE_UNQUOTED_STATE () { 11 }
+sub ENTITY_IN_ATTRIBUTE_VALUE_STATE () { 12 }
+sub MARKUP_DECLARATION_OPEN_STATE () { 13 }
+sub COMMENT_START_STATE () { 14 }
+sub COMMENT_START_DASH_STATE () { 15 }
+sub COMMENT_STATE () { 16 }
+sub COMMENT_END_STATE () { 17 }
+sub COMMENT_END_DASH_STATE () { 18 }
+sub BOGUS_COMMENT_STATE () { 19 }
+sub DOCTYPE_STATE () { 20 }
+sub BEFORE_DOCTYPE_NAME_STATE () { 21 }
+sub DOCTYPE_NAME_STATE () { 22 }
+sub AFTER_DOCTYPE_NAME_STATE () { 23 }
+sub BEFORE_DOCTYPE_PUBLIC_IDENTIFIER_STATE () { 24 }
+sub DOCTYPE_PUBLIC_IDENTIFIER_DOUBLE_QUOTED_STATE () { 25 }
+sub DOCTYPE_PUBLIC_IDENTIFIER_SINGLE_QUOTED_STATE () { 26 }
+sub AFTER_DOCTYPE_PUBLIC_IDENTIFIER_STATE () { 27 }
+sub BEFORE_DOCTYPE_SYSTEM_IDENTIFIER_STATE () { 28 }
+sub DOCTYPE_SYSTEM_IDENTIFIER_DOUBLE_QUOTED_STATE () { 29 }
+sub DOCTYPE_SYSTEM_IDENTIFIER_SINGLE_QUOTED_STATE () { 30 }
+sub AFTER_DOCTYPE_SYSTEM_IDENTIFIER_STATE () { 31 }
+sub BOGUS_DOCTYPE_STATE () { 32 }
+
 sub DOCTYPE_TOKEN () { 1 }
 sub COMMENT_TOKEN () { 2 }
 sub START_TAG_TOKEN () { 3 }
@@ -197,7 +231,7 @@ sub IN_COLUMN_GROUP_IM () { 0b10 }
 
 sub _initialize_tokenizer ($) {
   my $self = shift;
-  $self->{state} = 'data'; # MUST
+  $self->{state} = DATA_STATE; # MUST
   $self->{content_model} = PCDATA_CONTENT_MODEL; # be
   undef $self->{current_token}; # start tag, end tag, comment, or DOCTYPE
   undef $self->{current_attribute};
@@ -242,10 +276,10 @@ sub _get_next_token ($) {
   }
 
   A: {
-    if ($self->{state} eq 'data') {
+    if ($self->{state} == DATA_STATE) {
       if ($self->{next_input_character} == 0x0026) { # &
 	if ($self->{content_model} & CM_ENTITY) { # PCDATA | RCDATA
-          $self->{state} = 'entity data';
+          $self->{state} = ENTITY_DATA_STATE;
           
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -273,7 +307,7 @@ sub _get_next_token ($) {
         if ($self->{content_model} & CM_FULL_MARKUP or # PCDATA
             (($self->{content_model} & CM_LIMITED_MARKUP) and # CDATA | RCDATA
              not $self->{escape})) {
-          $self->{state} = 'tag open';
+          $self->{state} = TAG_OPEN_STATE;
           
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -314,12 +348,12 @@ sub _get_next_token ($) {
       return  ($token);
 
       redo A;
-    } elsif ($self->{state} eq 'entity data') {
+    } elsif ($self->{state} == ENTITY_DATA_STATE) {
       ## (cannot happen in CDATA state)
       
       my $token = $self->_tokenize_attempt_to_consume_an_entity (0);
 
-      $self->{state} = 'data';
+      $self->{state} = DATA_STATE;
       # next-input-character is already done
 
       unless (defined $token) {
@@ -329,7 +363,7 @@ sub _get_next_token ($) {
       }
 
       redo A;
-    } elsif ($self->{state} eq 'tag open') {
+    } elsif ($self->{state} == TAG_OPEN_STATE) {
       if ($self->{content_model} & CM_LIMITED_MARKUP) { # RCDATA | CDATA
         if ($self->{next_input_character} == 0x002F) { # /
           
@@ -339,11 +373,11 @@ sub _get_next_token ($) {
         $self->{set_next_input_character}->($self);
       }
   
-          $self->{state} = 'close tag open';
+          $self->{state} = CLOSE_TAG_OPEN_STATE;
           redo A;
         } else {
           ## reconsume
-          $self->{state} = 'data';
+          $self->{state} = DATA_STATE;
 
           return  ({type => CHARACTER_TOKEN, data => '<'});
 
@@ -351,7 +385,7 @@ sub _get_next_token ($) {
         }
       } elsif ($self->{content_model} & CM_FULL_MARKUP) { # PCDATA
         if ($self->{next_input_character} == 0x0021) { # !
-          $self->{state} = 'markup declaration open';
+          $self->{state} = MARKUP_DECLARATION_OPEN_STATE;
           
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -361,7 +395,7 @@ sub _get_next_token ($) {
   
           redo A;
         } elsif ($self->{next_input_character} == 0x002F) { # /
-          $self->{state} = 'close tag open';
+          $self->{state} = CLOSE_TAG_OPEN_STATE;
           
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -375,7 +409,7 @@ sub _get_next_token ($) {
           $self->{current_token}
             = {type => START_TAG_TOKEN,
                tag_name => chr ($self->{next_input_character} + 0x0020)};
-          $self->{state} = 'tag name';
+          $self->{state} = TAG_NAME_STATE;
           
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -388,7 +422,7 @@ sub _get_next_token ($) {
                  $self->{next_input_character} <= 0x007A) { # a..z
           $self->{current_token} = {type => START_TAG_TOKEN,
                             tag_name => chr ($self->{next_input_character})};
-          $self->{state} = 'tag name';
+          $self->{state} = TAG_NAME_STATE;
           
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -399,7 +433,7 @@ sub _get_next_token ($) {
           redo A;
         } elsif ($self->{next_input_character} == 0x003E) { # >
           $self->{parse_error}-> (type => 'empty start tag');
-          $self->{state} = 'data';
+          $self->{state} = DATA_STATE;
           
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -413,12 +447,12 @@ sub _get_next_token ($) {
           redo A;
         } elsif ($self->{next_input_character} == 0x003F) { # ?
           $self->{parse_error}-> (type => 'pio');
-          $self->{state} = 'bogus comment';
+          $self->{state} = BOGUS_COMMENT_STATE;
           ## $self->{next_input_character} is intentionally left as is
           redo A;
         } else {
           $self->{parse_error}-> (type => 'bare stago');
-          $self->{state} = 'data';
+          $self->{state} = DATA_STATE;
           ## reconsume
 
           return  ({type => CHARACTER_TOKEN, data => '<'});
@@ -428,7 +462,7 @@ sub _get_next_token ($) {
       } else {
         die "$0: $self->{content_model} in tag open";
       }
-    } elsif ($self->{state} eq 'close tag open') {
+    } elsif ($self->{state} == CLOSE_TAG_OPEN_STATE) {
       if ($self->{content_model} & CM_LIMITED_MARKUP) { # RCDATA | CDATA
         if (defined $self->{last_emitted_start_tag_name}) {
           ## NOTE: <http://krijnhoetmer.nl/irc-logs/whatwg/20070626#l-564>
@@ -449,7 +483,7 @@ sub _get_next_token ($) {
             } else {
               $self->{next_input_character} = shift @next_char; # reconsume
               unshift @{$self->{char}},  (@next_char);
-              $self->{state} = 'data';
+              $self->{state} = DATA_STATE;
 
               return  ({type => CHARACTER_TOKEN, data => '</'});
   
@@ -468,7 +502,7 @@ sub _get_next_token ($) {
                   $self->{next_input_character} == -1) {
             $self->{next_input_character} = shift @next_char; # reconsume
             unshift @{$self->{char}},  (@next_char);
-            $self->{state} = 'data';
+            $self->{state} = DATA_STATE;
             return  ({type => CHARACTER_TOKEN, data => '</'});
             redo A;
           } else {
@@ -479,7 +513,7 @@ sub _get_next_token ($) {
         } else {
           ## No start tag token has ever been emitted
           # next-input-character is already done
-          $self->{state} = 'data';
+          $self->{state} = DATA_STATE;
           return  ({type => CHARACTER_TOKEN, data => '</'});
           redo A;
         }
@@ -489,7 +523,7 @@ sub _get_next_token ($) {
           $self->{next_input_character} <= 0x005A) { # A..Z
         $self->{current_token} = {type => END_TAG_TOKEN,
                           tag_name => chr ($self->{next_input_character} + 0x0020)};
-        $self->{state} = 'tag name';
+        $self->{state} = TAG_NAME_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -502,7 +536,7 @@ sub _get_next_token ($) {
                $self->{next_input_character} <= 0x007A) { # a..z
         $self->{current_token} = {type => END_TAG_TOKEN,
                           tag_name => chr ($self->{next_input_character})};
-        $self->{state} = 'tag name';
+        $self->{state} = TAG_NAME_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -513,7 +547,7 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($self->{next_input_character} == 0x003E) { # >
         $self->{parse_error}-> (type => 'empty end tag');
-        $self->{state} = 'data';
+        $self->{state} = DATA_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -524,7 +558,7 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($self->{next_input_character} == -1) {
         $self->{parse_error}-> (type => 'bare etago');
-        $self->{state} = 'data';
+        $self->{state} = DATA_STATE;
         # reconsume
 
         return  ({type => CHARACTER_TOKEN, data => '</'});
@@ -532,17 +566,17 @@ sub _get_next_token ($) {
         redo A;
       } else {
         $self->{parse_error}-> (type => 'bogus end tag');
-        $self->{state} = 'bogus comment';
+        $self->{state} = BOGUS_COMMENT_STATE;
         ## $self->{next_input_character} is intentionally left as is
         redo A;
       }
-    } elsif ($self->{state} eq 'tag name') {
+    } elsif ($self->{state} == TAG_NAME_STATE) {
       if ($self->{next_input_character} == 0x0009 or # HT
           $self->{next_input_character} == 0x000A or # LF
           $self->{next_input_character} == 0x000B or # VT
           $self->{next_input_character} == 0x000C or # FF
           $self->{next_input_character} == 0x0020) { # SP
-        $self->{state} = 'before attribute name';
+        $self->{state} = BEFORE_ATTRIBUTE_NAME_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -564,7 +598,7 @@ sub _get_next_token ($) {
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
         }
-        $self->{state} = 'data';
+        $self->{state} = DATA_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -603,7 +637,7 @@ sub _get_next_token ($) {
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
         }
-        $self->{state} = 'data';
+        $self->{state} = DATA_STATE;
         # reconsume
 
         return  ($self->{current_token}); # start tag or end tag
@@ -625,7 +659,7 @@ sub _get_next_token ($) {
         } else {
           $self->{parse_error}-> (type => 'nestc');
         }
-        $self->{state} = 'before attribute name';
+        $self->{state} = BEFORE_ATTRIBUTE_NAME_STATE;
         # next-input-character is already done
         redo A;
       } else {
@@ -641,7 +675,7 @@ sub _get_next_token ($) {
   
         redo A;
       }
-    } elsif ($self->{state} eq 'before attribute name') {
+    } elsif ($self->{state} == BEFORE_ATTRIBUTE_NAME_STATE) {
       if ($self->{next_input_character} == 0x0009 or # HT
           $self->{next_input_character} == 0x000A or # LF
           $self->{next_input_character} == 0x000B or # VT
@@ -669,7 +703,7 @@ sub _get_next_token ($) {
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
         }
-        $self->{state} = 'data';
+        $self->{state} = DATA_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -685,7 +719,7 @@ sub _get_next_token ($) {
                $self->{next_input_character} <= 0x005A) { # A..Z
         $self->{current_attribute} = {name => chr ($self->{next_input_character} + 0x0020),
                               value => ''};
-        $self->{state} = 'attribute name';
+        $self->{state} = ATTRIBUTE_NAME_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -727,7 +761,7 @@ sub _get_next_token ($) {
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
         }
-        $self->{state} = 'data';
+        $self->{state} = DATA_STATE;
         # reconsume
 
         return  ($self->{current_token}); # start tag or end tag
@@ -736,7 +770,7 @@ sub _get_next_token ($) {
       } else {
         $self->{current_attribute} = {name => chr ($self->{next_input_character}),
                               value => ''};
-        $self->{state} = 'attribute name';
+        $self->{state} = ATTRIBUTE_NAME_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -746,7 +780,7 @@ sub _get_next_token ($) {
   
         redo A;
       }
-    } elsif ($self->{state} eq 'attribute name') {
+    } elsif ($self->{state} == ATTRIBUTE_NAME_STATE) {
       my $before_leave = sub {
         if (exists $self->{current_token}->{attributes} # start tag or end tag
             ->{$self->{current_attribute}->{name}}) { # MUST
@@ -764,7 +798,7 @@ sub _get_next_token ($) {
           $self->{next_input_character} == 0x000C or # FF
           $self->{next_input_character} == 0x0020) { # SP
         $before_leave->();
-        $self->{state} = 'after attribute name';
+        $self->{state} = AFTER_ATTRIBUTE_NAME_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -775,7 +809,7 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($self->{next_input_character} == 0x003D) { # =
         $before_leave->();
-        $self->{state} = 'before attribute value';
+        $self->{state} = BEFORE_ATTRIBUTE_VALUE_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -798,7 +832,7 @@ sub _get_next_token ($) {
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
         }
-        $self->{state} = 'data';
+        $self->{state} = DATA_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -839,7 +873,7 @@ sub _get_next_token ($) {
         } else {
           $self->{parse_error}-> (type => 'nestc');
         }
-        $self->{state} = 'before attribute name';
+        $self->{state} = BEFORE_ATTRIBUTE_NAME_STATE;
         # next-input-character is already done
         redo A;
       } elsif ($self->{next_input_character} == -1) {
@@ -857,7 +891,7 @@ sub _get_next_token ($) {
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
         }
-        $self->{state} = 'data';
+        $self->{state} = DATA_STATE;
         # reconsume
 
         return  ($self->{current_token}); # start tag or end tag
@@ -875,7 +909,7 @@ sub _get_next_token ($) {
   
         redo A;
       }
-    } elsif ($self->{state} eq 'after attribute name') {
+    } elsif ($self->{state} == AFTER_ATTRIBUTE_NAME_STATE) {
       if ($self->{next_input_character} == 0x0009 or # HT
           $self->{next_input_character} == 0x000A or # LF
           $self->{next_input_character} == 0x000B or # VT
@@ -891,7 +925,7 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif ($self->{next_input_character} == 0x003D) { # =
-        $self->{state} = 'before attribute value';
+        $self->{state} = BEFORE_ATTRIBUTE_VALUE_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -913,7 +947,7 @@ sub _get_next_token ($) {
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
         }
-        $self->{state} = 'data';
+        $self->{state} = DATA_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -929,7 +963,7 @@ sub _get_next_token ($) {
                $self->{next_input_character} <= 0x005A) { # A..Z
         $self->{current_attribute} = {name => chr ($self->{next_input_character} + 0x0020),
                               value => ''};
-        $self->{state} = 'attribute name';
+        $self->{state} = ATTRIBUTE_NAME_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -955,7 +989,7 @@ sub _get_next_token ($) {
           $self->{parse_error}-> (type => 'nestc');
           ## TODO: Different error type for <aa / bb> than <aa/>
         }
-        $self->{state} = 'before attribute name';
+        $self->{state} = BEFORE_ATTRIBUTE_NAME_STATE;
         # next-input-character is already done
         redo A;
       } elsif ($self->{next_input_character} == -1) {
@@ -972,7 +1006,7 @@ sub _get_next_token ($) {
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
         }
-        $self->{state} = 'data';
+        $self->{state} = DATA_STATE;
         # reconsume
 
         return  ($self->{current_token}); # start tag or end tag
@@ -981,7 +1015,7 @@ sub _get_next_token ($) {
       } else {
         $self->{current_attribute} = {name => chr ($self->{next_input_character}),
                               value => ''};
-        $self->{state} = 'attribute name';
+        $self->{state} = ATTRIBUTE_NAME_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -991,7 +1025,7 @@ sub _get_next_token ($) {
   
         redo A;        
       }
-    } elsif ($self->{state} eq 'before attribute value') {
+    } elsif ($self->{state} == BEFORE_ATTRIBUTE_VALUE_STATE) {
       if ($self->{next_input_character} == 0x0009 or # HT
           $self->{next_input_character} == 0x000A or # LF
           $self->{next_input_character} == 0x000B or # VT
@@ -1007,7 +1041,7 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif ($self->{next_input_character} == 0x0022) { # "
-        $self->{state} = 'attribute value (double-quoted)';
+        $self->{state} = ATTRIBUTE_VALUE_DOUBLE_QUOTED_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -1017,11 +1051,11 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif ($self->{next_input_character} == 0x0026) { # &
-        $self->{state} = 'attribute value (unquoted)';
+        $self->{state} = ATTRIBUTE_VALUE_UNQUOTED_STATE;
         ## reconsume
         redo A;
       } elsif ($self->{next_input_character} == 0x0027) { # '
-        $self->{state} = 'attribute value (single-quoted)';
+        $self->{state} = ATTRIBUTE_VALUE_SINGLE_QUOTED_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -1043,7 +1077,7 @@ sub _get_next_token ($) {
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
         }
-        $self->{state} = 'data';
+        $self->{state} = DATA_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -1069,7 +1103,7 @@ sub _get_next_token ($) {
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
         }
-        $self->{state} = 'data';
+        $self->{state} = DATA_STATE;
         ## reconsume
 
         return  ($self->{current_token}); # start tag or end tag
@@ -1077,7 +1111,7 @@ sub _get_next_token ($) {
         redo A;
       } else {
         $self->{current_attribute}->{value} .= chr ($self->{next_input_character});
-        $self->{state} = 'attribute value (unquoted)';
+        $self->{state} = ATTRIBUTE_VALUE_UNQUOTED_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -1087,9 +1121,9 @@ sub _get_next_token ($) {
   
         redo A;
       }
-    } elsif ($self->{state} eq 'attribute value (double-quoted)') {
+    } elsif ($self->{state} == ATTRIBUTE_VALUE_DOUBLE_QUOTED_STATE) {
       if ($self->{next_input_character} == 0x0022) { # "
-        $self->{state} = 'before attribute name';
+        $self->{state} = BEFORE_ATTRIBUTE_NAME_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -1099,8 +1133,8 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif ($self->{next_input_character} == 0x0026) { # &
-        $self->{last_attribute_value_state} = 'attribute value (double-quoted)';
-        $self->{state} = 'entity in attribute value';
+        $self->{last_attribute_value_state} = $self->{state};
+        $self->{state} = ENTITY_IN_ATTRIBUTE_VALUE_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -1123,7 +1157,7 @@ sub _get_next_token ($) {
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
         }
-        $self->{state} = 'data';
+        $self->{state} = DATA_STATE;
         ## reconsume
 
         return  ($self->{current_token}); # start tag or end tag
@@ -1141,9 +1175,9 @@ sub _get_next_token ($) {
   
         redo A;
       }
-    } elsif ($self->{state} eq 'attribute value (single-quoted)') {
+    } elsif ($self->{state} == ATTRIBUTE_VALUE_SINGLE_QUOTED_STATE) {
       if ($self->{next_input_character} == 0x0027) { # '
-        $self->{state} = 'before attribute name';
+        $self->{state} = BEFORE_ATTRIBUTE_NAME_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -1153,8 +1187,8 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif ($self->{next_input_character} == 0x0026) { # &
-        $self->{last_attribute_value_state} = 'attribute value (single-quoted)';
-        $self->{state} = 'entity in attribute value';
+        $self->{last_attribute_value_state} = $self->{state};
+        $self->{state} = ENTITY_IN_ATTRIBUTE_VALUE_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -1177,7 +1211,7 @@ sub _get_next_token ($) {
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
         }
-        $self->{state} = 'data';
+        $self->{state} = DATA_STATE;
         ## reconsume
 
         return  ($self->{current_token}); # start tag or end tag
@@ -1195,13 +1229,13 @@ sub _get_next_token ($) {
   
         redo A;
       }
-    } elsif ($self->{state} eq 'attribute value (unquoted)') {
+    } elsif ($self->{state} == ATTRIBUTE_VALUE_UNQUOTED_STATE) {
       if ($self->{next_input_character} == 0x0009 or # HT
           $self->{next_input_character} == 0x000A or # LF
           $self->{next_input_character} == 0x000B or # HT
           $self->{next_input_character} == 0x000C or # FF
           $self->{next_input_character} == 0x0020) { # SP
-        $self->{state} = 'before attribute name';
+        $self->{state} = BEFORE_ATTRIBUTE_NAME_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -1211,8 +1245,8 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif ($self->{next_input_character} == 0x0026) { # &
-        $self->{last_attribute_value_state} = 'attribute value (unquoted)';
-        $self->{state} = 'entity in attribute value';
+        $self->{last_attribute_value_state} = $self->{state};
+        $self->{state} = ENTITY_IN_ATTRIBUTE_VALUE_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -1234,7 +1268,7 @@ sub _get_next_token ($) {
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
         }
-        $self->{state} = 'data';
+        $self->{state} = DATA_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -1260,7 +1294,7 @@ sub _get_next_token ($) {
         } else {
           die "$0: $self->{current_token}->{type}: Unknown token type";
         }
-        $self->{state} = 'data';
+        $self->{state} = DATA_STATE;
         ## reconsume
 
         return  ($self->{current_token}); # start tag or end tag
@@ -1278,7 +1312,7 @@ sub _get_next_token ($) {
   
         redo A;
       }
-    } elsif ($self->{state} eq 'entity in attribute value') {
+    } elsif ($self->{state} == ENTITY_IN_ATTRIBUTE_VALUE_STATE) {
       my $token = $self->_tokenize_attempt_to_consume_an_entity (1);
 
       unless (defined $token) {
@@ -1291,14 +1325,14 @@ sub _get_next_token ($) {
       $self->{state} = $self->{last_attribute_value_state};
       # next-input-character is already done
       redo A;
-    } elsif ($self->{state} eq 'bogus comment') {
+    } elsif ($self->{state} == BOGUS_COMMENT_STATE) {
       ## (only happen if PCDATA state)
       
       my $token = {type => COMMENT_TOKEN, data => ''};
 
       BC: {
         if ($self->{next_input_character} == 0x003E) { # >
-          $self->{state} = 'data';
+          $self->{state} = DATA_STATE;
           
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -1311,7 +1345,7 @@ sub _get_next_token ($) {
 
           redo A;
         } elsif ($self->{next_input_character} == -1) { 
-          $self->{state} = 'data';
+          $self->{state} = DATA_STATE;
           ## reconsume
 
           return  ($token);
@@ -1329,7 +1363,7 @@ sub _get_next_token ($) {
           redo BC;
         }
       } # BC
-    } elsif ($self->{state} eq 'markup declaration open') {
+    } elsif ($self->{state} == MARKUP_DECLARATION_OPEN_STATE) {
       ## (only happen if PCDATA state)
 
       my @next_char;
@@ -1346,7 +1380,7 @@ sub _get_next_token ($) {
         push @next_char, $self->{next_input_character};
         if ($self->{next_input_character} == 0x002D) { # -
           $self->{current_token} = {type => COMMENT_TOKEN, data => ''};
-          $self->{state} = 'comment start';
+          $self->{state} = COMMENT_START_STATE;
           
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -1419,7 +1453,7 @@ sub _get_next_token ($) {
                   if ($self->{next_input_character} == 0x0045 or # E
                       $self->{next_input_character} == 0x0065) { # e
                     ## ISSUE: What a stupid code this is!
-                    $self->{state} = 'DOCTYPE';
+                    $self->{state} = DOCTYPE_STATE;
                     
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -1439,14 +1473,14 @@ sub _get_next_token ($) {
       $self->{parse_error}-> (type => 'bogus comment');
       $self->{next_input_character} = shift @next_char;
       unshift @{$self->{char}},  (@next_char);
-      $self->{state} = 'bogus comment';
+      $self->{state} = BOGUS_COMMENT_STATE;
       redo A;
       
       ## ISSUE: typos in spec: chacacters, is is a parse error
       ## ISSUE: spec is somewhat unclear on "is the first character that will be in the comment"; what is "that will be in the comment" is what the algorithm defines, isn't it?
-    } elsif ($self->{state} eq 'comment start') {
+    } elsif ($self->{state} == COMMENT_START_STATE) {
       if ($self->{next_input_character} == 0x002D) { # -
-        $self->{state} = 'comment start dash';
+        $self->{state} = COMMENT_START_DASH_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -1457,7 +1491,7 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($self->{next_input_character} == 0x003E) { # >
         $self->{parse_error}-> (type => 'bogus comment');
-        $self->{state} = 'data';
+        $self->{state} = DATA_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -1471,7 +1505,7 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($self->{next_input_character} == -1) {
         $self->{parse_error}-> (type => 'unclosed comment');
-        $self->{state} = 'data';
+        $self->{state} = DATA_STATE;
         ## reconsume
 
         return  ($self->{current_token}); # comment
@@ -1480,7 +1514,7 @@ sub _get_next_token ($) {
       } else {
         $self->{current_token}->{data} # comment
             .= chr ($self->{next_input_character});
-        $self->{state} = 'comment';
+        $self->{state} = COMMENT_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -1490,9 +1524,9 @@ sub _get_next_token ($) {
   
         redo A;
       }
-    } elsif ($self->{state} eq 'comment start dash') {
+    } elsif ($self->{state} == COMMENT_START_DASH_STATE) {
       if ($self->{next_input_character} == 0x002D) { # -
-        $self->{state} = 'comment end';
+        $self->{state} = COMMENT_END_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -1503,7 +1537,7 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($self->{next_input_character} == 0x003E) { # >
         $self->{parse_error}-> (type => 'bogus comment');
-        $self->{state} = 'data';
+        $self->{state} = DATA_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -1517,7 +1551,7 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($self->{next_input_character} == -1) {
         $self->{parse_error}-> (type => 'unclosed comment');
-        $self->{state} = 'data';
+        $self->{state} = DATA_STATE;
         ## reconsume
 
         return  ($self->{current_token}); # comment
@@ -1526,7 +1560,7 @@ sub _get_next_token ($) {
       } else {
         $self->{current_token}->{data} # comment
             .= '-' . chr ($self->{next_input_character});
-        $self->{state} = 'comment';
+        $self->{state} = COMMENT_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -1536,9 +1570,9 @@ sub _get_next_token ($) {
   
         redo A;
       }
-    } elsif ($self->{state} eq 'comment') {
+    } elsif ($self->{state} == COMMENT_STATE) {
       if ($self->{next_input_character} == 0x002D) { # -
-        $self->{state} = 'comment end dash';
+        $self->{state} = COMMENT_END_DASH_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -1549,7 +1583,7 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($self->{next_input_character} == -1) {
         $self->{parse_error}-> (type => 'unclosed comment');
-        $self->{state} = 'data';
+        $self->{state} = DATA_STATE;
         ## reconsume
 
         return  ($self->{current_token}); # comment
@@ -1567,9 +1601,9 @@ sub _get_next_token ($) {
   
         redo A;
       }
-    } elsif ($self->{state} eq 'comment end dash') {
+    } elsif ($self->{state} == COMMENT_END_DASH_STATE) {
       if ($self->{next_input_character} == 0x002D) { # -
-        $self->{state} = 'comment end';
+        $self->{state} = COMMENT_END_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -1580,7 +1614,7 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($self->{next_input_character} == -1) {
         $self->{parse_error}-> (type => 'unclosed comment');
-        $self->{state} = 'data';
+        $self->{state} = DATA_STATE;
         ## reconsume
 
         return  ($self->{current_token}); # comment
@@ -1588,7 +1622,7 @@ sub _get_next_token ($) {
         redo A;
       } else {
         $self->{current_token}->{data} .= '-' . chr ($self->{next_input_character}); # comment
-        $self->{state} = 'comment';
+        $self->{state} = COMMENT_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -1598,9 +1632,9 @@ sub _get_next_token ($) {
   
         redo A;
       }
-    } elsif ($self->{state} eq 'comment end') {
+    } elsif ($self->{state} == COMMENT_END_STATE) {
       if ($self->{next_input_character} == 0x003E) { # >
-        $self->{state} = 'data';
+        $self->{state} = DATA_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -1626,7 +1660,7 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($self->{next_input_character} == -1) {
         $self->{parse_error}-> (type => 'unclosed comment');
-        $self->{state} = 'data';
+        $self->{state} = DATA_STATE;
         ## reconsume
 
         return  ($self->{current_token}); # comment
@@ -1635,7 +1669,7 @@ sub _get_next_token ($) {
       } else {
         $self->{parse_error}-> (type => 'dash in comment');
         $self->{current_token}->{data} .= '--' . chr ($self->{next_input_character}); # comment
-        $self->{state} = 'comment';
+        $self->{state} = COMMENT_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -1645,13 +1679,13 @@ sub _get_next_token ($) {
   
         redo A;
       } 
-    } elsif ($self->{state} eq 'DOCTYPE') {
+    } elsif ($self->{state} == DOCTYPE_STATE) {
       if ($self->{next_input_character} == 0x0009 or # HT
           $self->{next_input_character} == 0x000A or # LF
           $self->{next_input_character} == 0x000B or # VT
           $self->{next_input_character} == 0x000C or # FF
           $self->{next_input_character} == 0x0020) { # SP
-        $self->{state} = 'before DOCTYPE name';
+        $self->{state} = BEFORE_DOCTYPE_NAME_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -1662,11 +1696,11 @@ sub _get_next_token ($) {
         redo A;
       } else {
         $self->{parse_error}-> (type => 'no space before DOCTYPE name');
-        $self->{state} = 'before DOCTYPE name';
+        $self->{state} = BEFORE_DOCTYPE_NAME_STATE;
         ## reconsume
         redo A;
       }
-    } elsif ($self->{state} eq 'before DOCTYPE name') {
+    } elsif ($self->{state} == BEFORE_DOCTYPE_NAME_STATE) {
       if ($self->{next_input_character} == 0x0009 or # HT
           $self->{next_input_character} == 0x000A or # LF
           $self->{next_input_character} == 0x000B or # VT
@@ -1683,7 +1717,7 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($self->{next_input_character} == 0x003E) { # >
         $self->{parse_error}-> (type => 'no DOCTYPE name');
-        $self->{state} = 'data';
+        $self->{state} = DATA_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -1697,7 +1731,7 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($self->{next_input_character} == -1) { 
         $self->{parse_error}-> (type => 'no DOCTYPE name');
-        $self->{state} = 'data';
+        $self->{state} = DATA_STATE;
         ## reconsume
 
         return  ({type => DOCTYPE_TOKEN}); # incorrect
@@ -1709,7 +1743,7 @@ sub _get_next_token ($) {
                name => chr ($self->{next_input_character}),
                correct => 1};
 ## ISSUE: "Set the token's name name to the" in the spec
-        $self->{state} = 'DOCTYPE name';
+        $self->{state} = DOCTYPE_NAME_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -1719,14 +1753,14 @@ sub _get_next_token ($) {
   
         redo A;
       }
-    } elsif ($self->{state} eq 'DOCTYPE name') {
+    } elsif ($self->{state} == DOCTYPE_NAME_STATE) {
 ## ISSUE: Redundant "First," in the spec.
       if ($self->{next_input_character} == 0x0009 or # HT
           $self->{next_input_character} == 0x000A or # LF
           $self->{next_input_character} == 0x000B or # VT
           $self->{next_input_character} == 0x000C or # FF
           $self->{next_input_character} == 0x0020) { # SP
-        $self->{state} = 'after DOCTYPE name';
+        $self->{state} = AFTER_DOCTYPE_NAME_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -1736,7 +1770,7 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif ($self->{next_input_character} == 0x003E) { # >
-        $self->{state} = 'data';
+        $self->{state} = DATA_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -1750,7 +1784,7 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($self->{next_input_character} == -1) {
         $self->{parse_error}-> (type => 'unclosed DOCTYPE');
-        $self->{state} = 'data';
+        $self->{state} = DATA_STATE;
         ## reconsume
 
         delete $self->{current_token}->{correct};
@@ -1770,7 +1804,7 @@ sub _get_next_token ($) {
   
         redo A;
       }
-    } elsif ($self->{state} eq 'after DOCTYPE name') {
+    } elsif ($self->{state} == AFTER_DOCTYPE_NAME_STATE) {
       if ($self->{next_input_character} == 0x0009 or # HT
           $self->{next_input_character} == 0x000A or # LF
           $self->{next_input_character} == 0x000B or # VT
@@ -1786,7 +1820,7 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif ($self->{next_input_character} == 0x003E) { # >
-        $self->{state} = 'data';
+        $self->{state} = DATA_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -1800,7 +1834,7 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($self->{next_input_character} == -1) {
         $self->{parse_error}-> (type => 'unclosed DOCTYPE');
-        $self->{state} = 'data';
+        $self->{state} = DATA_STATE;
         ## reconsume
 
         delete $self->{current_token}->{correct};
@@ -1854,7 +1888,7 @@ sub _get_next_token ($) {
   
                 if ($self->{next_input_character} == 0x0043 or # C
                     $self->{next_input_character} == 0x0063) { # c
-                  $self->{state} = 'before DOCTYPE public identifier';
+                  $self->{state} = BEFORE_DOCTYPE_PUBLIC_IDENTIFIER_STATE;
                   
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -1917,7 +1951,7 @@ sub _get_next_token ($) {
   
                 if ($self->{next_input_character} == 0x004D or # M
                     $self->{next_input_character} == 0x006D) { # m
-                  $self->{state} = 'before DOCTYPE system identifier';
+                  $self->{state} = BEFORE_DOCTYPE_SYSTEM_IDENTIFIER_STATE;
                   
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -1945,10 +1979,10 @@ sub _get_next_token ($) {
       }
 
       $self->{parse_error}-> (type => 'string after DOCTYPE name');
-      $self->{state} = 'bogus DOCTYPE';
+      $self->{state} = BOGUS_DOCTYPE_STATE;
       # next-input-character is already done
       redo A;
-    } elsif ($self->{state} eq 'before DOCTYPE public identifier') {
+    } elsif ($self->{state} == BEFORE_DOCTYPE_PUBLIC_IDENTIFIER_STATE) {
       if ({
             0x0009 => 1, 0x000A => 1, 0x000B => 1, 0x000C => 1, 0x0020 => 1,
             #0x000D => 1, # HT, LF, VT, FF, SP, CR
@@ -1964,7 +1998,7 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($self->{next_input_character} eq 0x0022) { # "
         $self->{current_token}->{public_identifier} = ''; # DOCTYPE
-        $self->{state} = 'DOCTYPE public identifier (double-quoted)';
+        $self->{state} = DOCTYPE_PUBLIC_IDENTIFIER_DOUBLE_QUOTED_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -1975,7 +2009,7 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($self->{next_input_character} eq 0x0027) { # '
         $self->{current_token}->{public_identifier} = ''; # DOCTYPE
-        $self->{state} = 'DOCTYPE public identifier (single-quoted)';
+        $self->{state} = DOCTYPE_PUBLIC_IDENTIFIER_SINGLE_QUOTED_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -1987,7 +2021,7 @@ sub _get_next_token ($) {
       } elsif ($self->{next_input_character} eq 0x003E) { # >
         $self->{parse_error}-> (type => 'no PUBLIC literal');
 
-        $self->{state} = 'data';
+        $self->{state} = DATA_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -2003,7 +2037,7 @@ sub _get_next_token ($) {
       } elsif ($self->{next_input_character} == -1) {
         $self->{parse_error}-> (type => 'unclosed DOCTYPE');
 
-        $self->{state} = 'data';
+        $self->{state} = DATA_STATE;
         ## reconsume
 
         delete $self->{current_token}->{correct};
@@ -2012,7 +2046,7 @@ sub _get_next_token ($) {
         redo A;
       } else {
         $self->{parse_error}-> (type => 'string after PUBLIC');
-        $self->{state} = 'bogus DOCTYPE';
+        $self->{state} = BOGUS_DOCTYPE_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -2022,9 +2056,9 @@ sub _get_next_token ($) {
   
         redo A;
       }
-    } elsif ($self->{state} eq 'DOCTYPE public identifier (double-quoted)') {
+    } elsif ($self->{state} == DOCTYPE_PUBLIC_IDENTIFIER_DOUBLE_QUOTED_STATE) {
       if ($self->{next_input_character} == 0x0022) { # "
-        $self->{state} = 'after DOCTYPE public identifier';
+        $self->{state} = AFTER_DOCTYPE_PUBLIC_IDENTIFIER_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -2036,7 +2070,7 @@ sub _get_next_token ($) {
       } elsif ($self->{next_input_character} == -1) {
         $self->{parse_error}-> (type => 'unclosed PUBLIC literal');
 
-        $self->{state} = 'data';
+        $self->{state} = DATA_STATE;
         ## reconsume
 
         delete $self->{current_token}->{correct};
@@ -2056,9 +2090,9 @@ sub _get_next_token ($) {
   
         redo A;
       }
-    } elsif ($self->{state} eq 'DOCTYPE public identifier (single-quoted)') {
+    } elsif ($self->{state} == DOCTYPE_PUBLIC_IDENTIFIER_SINGLE_QUOTED_STATE) {
       if ($self->{next_input_character} == 0x0027) { # '
-        $self->{state} = 'after DOCTYPE public identifier';
+        $self->{state} = AFTER_DOCTYPE_PUBLIC_IDENTIFIER_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -2070,7 +2104,7 @@ sub _get_next_token ($) {
       } elsif ($self->{next_input_character} == -1) {
         $self->{parse_error}-> (type => 'unclosed PUBLIC literal');
 
-        $self->{state} = 'data';
+        $self->{state} = DATA_STATE;
         ## reconsume
 
         delete $self->{current_token}->{correct};
@@ -2090,7 +2124,7 @@ sub _get_next_token ($) {
   
         redo A;
       }
-    } elsif ($self->{state} eq 'after DOCTYPE public identifier') {
+    } elsif ($self->{state} == AFTER_DOCTYPE_PUBLIC_IDENTIFIER_STATE) {
       if ({
             0x0009 => 1, 0x000A => 1, 0x000B => 1, 0x000C => 1, 0x0020 => 1,
             #0x000D => 1, # HT, LF, VT, FF, SP, CR
@@ -2106,7 +2140,7 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($self->{next_input_character} == 0x0022) { # "
         $self->{current_token}->{system_identifier} = ''; # DOCTYPE
-        $self->{state} = 'DOCTYPE system identifier (double-quoted)';
+        $self->{state} = DOCTYPE_SYSTEM_IDENTIFIER_DOUBLE_QUOTED_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -2117,7 +2151,7 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($self->{next_input_character} == 0x0027) { # '
         $self->{current_token}->{system_identifier} = ''; # DOCTYPE
-        $self->{state} = 'DOCTYPE system identifier (single-quoted)';
+        $self->{state} = DOCTYPE_SYSTEM_IDENTIFIER_SINGLE_QUOTED_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -2127,7 +2161,7 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif ($self->{next_input_character} == 0x003E) { # >
-        $self->{state} = 'data';
+        $self->{state} = DATA_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -2142,7 +2176,7 @@ sub _get_next_token ($) {
       } elsif ($self->{next_input_character} == -1) {
         $self->{parse_error}-> (type => 'unclosed DOCTYPE');
 
-        $self->{state} = 'data';
+        $self->{state} = DATA_STATE;
         ## reconsume
 
         delete $self->{current_token}->{correct};
@@ -2151,7 +2185,7 @@ sub _get_next_token ($) {
         redo A;
       } else {
         $self->{parse_error}-> (type => 'string after PUBLIC literal');
-        $self->{state} = 'bogus DOCTYPE';
+        $self->{state} = BOGUS_DOCTYPE_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -2161,7 +2195,7 @@ sub _get_next_token ($) {
   
         redo A;
       }
-    } elsif ($self->{state} eq 'before DOCTYPE system identifier') {
+    } elsif ($self->{state} == BEFORE_DOCTYPE_SYSTEM_IDENTIFIER_STATE) {
       if ({
             0x0009 => 1, 0x000A => 1, 0x000B => 1, 0x000C => 1, 0x0020 => 1,
             #0x000D => 1, # HT, LF, VT, FF, SP, CR
@@ -2177,7 +2211,7 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($self->{next_input_character} == 0x0022) { # "
         $self->{current_token}->{system_identifier} = ''; # DOCTYPE
-        $self->{state} = 'DOCTYPE system identifier (double-quoted)';
+        $self->{state} = DOCTYPE_SYSTEM_IDENTIFIER_DOUBLE_QUOTED_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -2188,7 +2222,7 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($self->{next_input_character} == 0x0027) { # '
         $self->{current_token}->{system_identifier} = ''; # DOCTYPE
-        $self->{state} = 'DOCTYPE system identifier (single-quoted)';
+        $self->{state} = DOCTYPE_SYSTEM_IDENTIFIER_SINGLE_QUOTED_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -2199,7 +2233,7 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($self->{next_input_character} == 0x003E) { # >
         $self->{parse_error}-> (type => 'no SYSTEM literal');
-        $self->{state} = 'data';
+        $self->{state} = DATA_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -2215,7 +2249,7 @@ sub _get_next_token ($) {
       } elsif ($self->{next_input_character} == -1) {
         $self->{parse_error}-> (type => 'unclosed DOCTYPE');
 
-        $self->{state} = 'data';
+        $self->{state} = DATA_STATE;
         ## reconsume
 
         delete $self->{current_token}->{correct};
@@ -2224,7 +2258,7 @@ sub _get_next_token ($) {
         redo A;
       } else {
         $self->{parse_error}-> (type => 'string after SYSTEM');
-        $self->{state} = 'bogus DOCTYPE';
+        $self->{state} = BOGUS_DOCTYPE_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -2234,9 +2268,9 @@ sub _get_next_token ($) {
   
         redo A;
       }
-    } elsif ($self->{state} eq 'DOCTYPE system identifier (double-quoted)') {
+    } elsif ($self->{state} == DOCTYPE_SYSTEM_IDENTIFIER_DOUBLE_QUOTED_STATE) {
       if ($self->{next_input_character} == 0x0022) { # "
-        $self->{state} = 'after DOCTYPE system identifier';
+        $self->{state} = AFTER_DOCTYPE_SYSTEM_IDENTIFIER_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -2248,7 +2282,7 @@ sub _get_next_token ($) {
       } elsif ($self->{next_input_character} == -1) {
         $self->{parse_error}-> (type => 'unclosed SYSTEM literal');
 
-        $self->{state} = 'data';
+        $self->{state} = DATA_STATE;
         ## reconsume
 
         delete $self->{current_token}->{correct};
@@ -2268,9 +2302,9 @@ sub _get_next_token ($) {
   
         redo A;
       }
-    } elsif ($self->{state} eq 'DOCTYPE system identifier (single-quoted)') {
+    } elsif ($self->{state} == DOCTYPE_SYSTEM_IDENTIFIER_SINGLE_QUOTED_STATE) {
       if ($self->{next_input_character} == 0x0027) { # '
-        $self->{state} = 'after DOCTYPE system identifier';
+        $self->{state} = AFTER_DOCTYPE_SYSTEM_IDENTIFIER_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -2282,7 +2316,7 @@ sub _get_next_token ($) {
       } elsif ($self->{next_input_character} == -1) {
         $self->{parse_error}-> (type => 'unclosed SYSTEM literal');
 
-        $self->{state} = 'data';
+        $self->{state} = DATA_STATE;
         ## reconsume
 
         delete $self->{current_token}->{correct};
@@ -2302,7 +2336,7 @@ sub _get_next_token ($) {
   
         redo A;
       }
-    } elsif ($self->{state} eq 'after DOCTYPE system identifier') {
+    } elsif ($self->{state} == AFTER_DOCTYPE_SYSTEM_IDENTIFIER_STATE) {
       if ({
             0x0009 => 1, 0x000A => 1, 0x000B => 1, 0x000C => 1, 0x0020 => 1,
             #0x000D => 1, # HT, LF, VT, FF, SP, CR
@@ -2317,7 +2351,7 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif ($self->{next_input_character} == 0x003E) { # >
-        $self->{state} = 'data';
+        $self->{state} = DATA_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -2332,7 +2366,7 @@ sub _get_next_token ($) {
       } elsif ($self->{next_input_character} == -1) {
         $self->{parse_error}-> (type => 'unclosed DOCTYPE');
 
-        $self->{state} = 'data';
+        $self->{state} = DATA_STATE;
         ## reconsume
 
         delete $self->{current_token}->{correct};
@@ -2341,7 +2375,7 @@ sub _get_next_token ($) {
         redo A;
       } else {
         $self->{parse_error}-> (type => 'string after SYSTEM literal');
-        $self->{state} = 'bogus DOCTYPE';
+        $self->{state} = BOGUS_DOCTYPE_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -2351,9 +2385,9 @@ sub _get_next_token ($) {
   
         redo A;
       }
-    } elsif ($self->{state} eq 'bogus DOCTYPE') {
+    } elsif ($self->{state} == BOGUS_DOCTYPE_STATE) {
       if ($self->{next_input_character} == 0x003E) { # >
-        $self->{state} = 'data';
+        $self->{state} = DATA_STATE;
         
       if (@{$self->{char}}) {
         $self->{next_input_character} = shift @{$self->{char}};
@@ -2368,7 +2402,7 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($self->{next_input_character} == -1) {
         $self->{parse_error}-> (type => 'unclosed DOCTYPE');
-        $self->{state} = 'data';
+        $self->{state} = DATA_STATE;
         ## reconsume
 
         delete $self->{current_token}->{correct};
@@ -6803,4 +6837,4 @@ sub get_inner_html ($$$) {
 } # get_inner_html
 
 1;
-# $Date: 2007/08/11 07:19:18 $
+# $Date: 2007/08/11 08:08:12 $
