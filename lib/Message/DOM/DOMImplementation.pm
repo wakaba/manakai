@@ -1,6 +1,6 @@
 package Message::DOM::DOMImplementation;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.12 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::IF::DOMImplementation',
     'Message::IF::AtomDOMImplementation';
 
@@ -40,6 +40,10 @@ $HasFeature->{core}->{''} = 1;
 $HasFeature->{core}->{'1.0'} = 1;
 $HasFeature->{core}->{'2.0'} = 1;
 $HasFeature->{core}->{'3.0'} = 1;
+$HasFeature->{html}->{''} = 1;
+$HasFeature->{html}->{'5.0'} = 1; ## TODO: 1.0, 2.0
+$HasFeature->{xhtml}->{''} = 1;
+$HasFeature->{xhtml}->{'5.0'} = 1; ## TODO: 2.0
 $HasFeature->{traversal}->{''} = 1;
 $HasFeature->{traversal}->{'2.0'} = 1;
 $HasFeature->{xml}->{''} = 1;
@@ -55,6 +59,8 @@ $HasFeature->{q<http://suika.fam.cx/www/2006/feature/atomthreading>}->{''} = 1;
 $HasFeature->{q<http://suika.fam.cx/www/2006/feature/atomthreading>}->{'1.0'} = 1;
 $HasFeature->{q<http://suika.fam.cx/www/2006/feature/min>}->{''} = 1;
 $HasFeature->{q<http://suika.fam.cx/www/2006/feature/min>}->{'3.0'} = 1;
+$HasFeature->{q<http://suika.fam.cx/www/2006/feature/uri>}->{''} = 1;
+$HasFeature->{q<http://suika.fam.cx/www/2006/feature/uri>}->{'4.0'} = 1;
 $HasFeature->{q<http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#minimum>}->{''} = 1;
 $HasFeature->{q<http://suika.fam.cx/~wakaba/archive/2004/8/18/manakai-dom#minimum>}->{'3.0'} = 1;
 $HasFeature->{q<http://suika.fam.cx/www/2006/feature/xdoctype>}->{''} = 1;
@@ -106,4 +112,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/29 08:31:14 $
+## $Date: 2007/08/11 13:06:39 $

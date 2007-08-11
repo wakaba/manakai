@@ -1,6 +1,6 @@
 package Message::DOM::HTML::HTMLElement;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.1 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::DOM::Element';
 require Message::DOM::Element;
 
@@ -68,6 +68,7 @@ sub AUTOLOAD {
           return unless defined wantarray;
         }
 
+        ## ISSUE: If missing?
         return \$_[0]->get_attribute_ns (undef, '$ln');
       }
     };
@@ -458,5 +459,5 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/29 11:38:57 $
+## $Date: 2007/08/11 13:06:39 $
 
