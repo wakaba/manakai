@@ -1,7 +1,7 @@
 1..774
 # Running under perl version 5.008007 for linux
-# Current time local: Sat Aug 11 15:34:38 2007
-# Current time GMT:   Sat Aug 11 06:34:38 2007
+# Current time local: Sat Aug 11 15:51:25 2007
+# Current time GMT:   Sat Aug 11 06:51:25 2007
 # Using Test.pm version 1.25
 # t/tokenizer-test-2.dat
 ok 1
@@ -225,7 +225,7 @@ not ok 134
 #      - "|   <body>\n"
 not ok 135
 # Test 135 got: "2" (t/HTML-tree.t at line 141 fail #68)
-#     Expected: "1" (Parse error: qq'<!DOCTYPE HTML><style> EOF'; 1:26:in CDATA:#end-of-file, 1:26:not closed:head;27: unexpected end of file while parsing CDATA section for element style)
+#     Expected: "1" (Parse error: qq'<!DOCTYPE HTML><style> EOF'; 1:26:in CDATA:#5, 1:26:not closed:head;27: unexpected end of file while parsing CDATA section for element style)
 not ok 136
 # Test 136 got: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|     <style>\n|       \" EOF\"\n" (t/HTML-tree.t at line 143 fail #68)
 #     Expected: "| <!DOCTYPE HTML>\n| <html>\n|   <head>\n|     <style>\n|       \" EOF\"\n|   <body>\n" (Document tree: qq'<!DOCTYPE HTML><style> EOF')
@@ -318,7 +318,7 @@ not ok 204
 #      - "|   <body>\n"
 not ok 205
 # Test 205 got: "3" (t/HTML-tree.t at line 141 fail #103)
-#     Expected: "2" (Parse error: qq'<style><!--</style><meta><script>--><link></script>'; 1:8:no DOCTYPE, 1:51:in CDATA:#end-of-file, 1:51:not closed:head;missing document type declaration, unexpected EOF)
+#     Expected: "2" (Parse error: qq'<style><!--</style><meta><script>--><link></script>'; 1:8:no DOCTYPE, 1:51:in CDATA:#5, 1:51:not closed:head;missing document type declaration, unexpected EOF)
 not ok 206
 # Test 206 got: "| <html>\n|   <head>\n|     <style>\n|       \"<!--</style><meta><script>--><link></script>\"\n" (t/HTML-tree.t at line 143 fail #103)
 #     Expected: "| <html>\n|   <head>\n|     <style>\n|       \"<!--</style><meta><script>--><link></script>\"\n|   <body>\n" (Document tree: qq'<style><!--</style><meta><script>--><link></script>')
@@ -411,7 +411,7 @@ ok 281
 ok 282
 not ok 283
 # Test 283 got: "3" (t/HTML-tree.t at line 141 fail #142)
-#     Expected: "2" (Parse error: qq'<script></x'; 1:9:no DOCTYPE, 1:11:in CDATA:#end-of-file, 1:11:not closed:head;no document type, Unexpected end of file. Expected </script> end tag.)
+#     Expected: "2" (Parse error: qq'<script></x'; 1:9:no DOCTYPE, 1:11:in CDATA:#5, 1:11:not closed:head;no document type, Unexpected end of file. Expected </script> end tag.)
 not ok 284
 # Test 284 got: "| <html>\n|   <head>\n|     <script>\n|       \"</x\"\n" (t/HTML-tree.t at line 143 fail #142)
 #     Expected: "| <html>\n|   <head>\n|     <script>\n|       \"</x\"\n|   <body>\n" (Document tree: qq'<script></x')
@@ -624,7 +624,7 @@ ok 411
 ok 412
 not ok 413
 # Test 413 got: "3" (t/HTML-tree.t at line 141 fail #207)
-#     Expected: "2" (Parse error: qq'<title>foo<span>bar</em><i>baz'; 1:8:no DOCTYPE, 1:30:in RCDATA:#end-of-file, 1:30:not closed:head;Unexpected start tag. Expected DOCTYPE., Unexpected end of file.)
+#     Expected: "2" (Parse error: qq'<title>foo<span>bar</em><i>baz'; 1:8:no DOCTYPE, 1:30:in RCDATA:#5, 1:30:not closed:head;Unexpected start tag. Expected DOCTYPE., Unexpected end of file.)
 not ok 414
 # Test 414 got: "| <html>\n|   <head>\n|     <title>\n|       \"foo<span>bar</em><i>baz\"\n" (t/HTML-tree.t at line 143 fail #207)
 #     Expected: "| <html>\n|   <head>\n|     <title>\n|       \"foo<span>bar</em><i>baz\"\n|   <body>\n" (Document tree: qq'<title>foo<span>bar</em><i>baz')
@@ -662,7 +662,7 @@ ok 440
 # t/tree-construction/tests5.dat
 not ok 441
 # Test 441 got: "3" (t/HTML-tree.t at line 141 fail #221)
-#     Expected: "2" (Parse error: qq'<style> <!-- </style>x'; 1:8:no DOCTYPE, 1:22:in CDATA:#end-of-file, 1:22:not closed:head;No DOCTYPE, Unexpected end of file)
+#     Expected: "2" (Parse error: qq'<style> <!-- </style>x'; 1:8:no DOCTYPE, 1:22:in CDATA:#5, 1:22:not closed:head;No DOCTYPE, Unexpected end of file)
 not ok 442
 # Test 442 got: "| <html>\n|   <head>\n|     <style>\n|       \" <!-- </style>x\"\n" (t/HTML-tree.t at line 143 fail #221)
 #     Expected: "| <html>\n|   <head>\n|     <style>\n|       \" <!-- </style>x\"\n|   <body>\n" (Document tree: qq'<style> <!-- </style>x')
@@ -709,7 +709,7 @@ not ok 466
 #      - "|   <body>\n"
 not ok 467
 # Test 467 got: "3" (t/HTML-tree.t at line 141 fail #234)
-#     Expected: "2" (Parse error: qq'<title><!--</title>'; 1:8:no DOCTYPE, 1:19:in RCDATA:#end-of-file, 1:19:not closed:head;No DOCTYPE, Unexpected EOF)
+#     Expected: "2" (Parse error: qq'<title><!--</title>'; 1:8:no DOCTYPE, 1:19:in RCDATA:#5, 1:19:not closed:head;No DOCTYPE, Unexpected EOF)
 not ok 468
 # Test 468 got: "| <html>\n|   <head>\n|     <title>\n|       \"<!--</title>\"\n" (t/HTML-tree.t at line 143 fail #234)
 #     Expected: "| <html>\n|   <head>\n|     <title>\n|       \"<!--</title>\"\n|   <body>\n" (Document tree: qq'<title><!--</title>')

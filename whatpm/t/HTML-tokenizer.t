@@ -123,22 +123,22 @@ for my $file_name (grep {$_} split /\s+/, qq[
 
       while (1) {
         my $token = $p->_get_next_token;
-        last if $token->{type} eq 'end-of-file';
+        last if $token->{type} == Whatpm::HTML::END_OF_FILE_TOKEN ();
         
         my $test_token = [
          {
-          DOCTYPE => 'DOCTYPE',
-          'start tag' => 'StartTag',
-          'end tag' => 'EndTag',
-          comment => 'Comment',
-          character => 'Character',
+          Whatpm::HTML::DOCTYPE_TOKEN () => 'DOCTYPE',
+          Whatpm::HTML::START_TAG_TOKEN () => 'StartTag',
+          Whatpm::HTML::END_TAG_TOKEN () => 'EndTag',
+          Whatpm::HTML::COMMENT_TOKEN () => 'Comment',
+          Whatpm::HTML::CHARACTER_TOKEN () => 'Character',
          }->{$token->{type}} || $token->{type},
         ];
         $test_token->[1] = $token->{tag_name} if defined $token->{tag_name};
         $test_token->[1] = $token->{data} if defined $token->{data};
-        if ($token->{type} eq 'start tag') {
+        if ($token->{type} == Whatpm::HTML::START_TAG_TOKEN ()) {
           $test_token->[2] = {map {$_->{name} => $_->{value}} values %{$token->{attributes}}};
-        } elsif ($token->{type} eq 'DOCTYPE') {
+        } elsif ($token->{type} == Whatpm::HTML::DOCTYPE_TOKEN ()) {
           $test_token->[1] = $token->{name};
           $test_token->[2] = $token->{public_identifier};
           $test_token->[3] = $token->{system_identifier};
@@ -161,4 +161,5 @@ for my $file_name (grep {$_} split /\s+/, qq[
   }
 }
 
-## $Date: 2007/07/21 05:36:50 $
+## License: Public Domain.
+## $Date: 2007/08/11 06:53:38 $
