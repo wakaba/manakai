@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.57 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.58 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## ISSUE:
 ## var doc = implementation.createDocument (null, null, null);
@@ -169,9 +169,9 @@ sub CHARACTER_TOKEN () { 6 }
 sub AFTER_HTML_IMS () { 0b100 }
 sub HEAD_IMS ()       { 0b1000 }
 sub BODY_IMS ()       { 0b10000 }
-sub BODY_TABLE_IMS () { 0b100000 | BODY_IMS }
+sub BODY_TABLE_IMS () { 0b100000 }
 sub TABLE_IMS ()      { 0b1000000 }
-sub ROW_IMS ()        { 0b10000000 | TABLE_IMS }
+sub ROW_IMS ()        { 0b10000000 }
 sub BODY_AFTER_IMS () { 0b100000000 }
 sub FRAME_IMS ()      { 0b1000000000 }
 
@@ -182,10 +182,10 @@ sub IN_HEAD_NOSCRIPT_IM () { HEAD_IMS | 0b01 }
 sub AFTER_HEAD_IM () { HEAD_IMS | 0b10 }
 sub BEFORE_HEAD_IM () { HEAD_IMS | 0b11 }
 sub IN_BODY_IM () { BODY_IMS }
-sub IN_CELL_IM () { BODY_TABLE_IMS | 0b01 }
-sub IN_CAPTION_IM () { BODY_TABLE_IMS | 0b10 }
-sub IN_ROW_IM () { ROW_IMS | 0b01 }
-sub IN_TABLE_BODY_IM () { ROW_IMS | 0b10 }
+sub IN_CELL_IM () { BODY_IMS | BODY_TABLE_IMS | 0b01 }
+sub IN_CAPTION_IM () { BODY_IMS | BODY_TABLE_IMS | 0b10 }
+sub IN_ROW_IM () { TABLE_IMS | ROW_IMS | 0b01 }
+sub IN_TABLE_BODY_IM () { TABLE_IMS | ROW_IMS | 0b10 }
 sub IN_TABLE_IM () { TABLE_IMS }
 sub AFTER_BODY_IM () { BODY_AFTER_IMS }
 sub IN_FRAMESET_IM () { FRAME_IMS | 0b01 }
@@ -3368,8 +3368,7 @@ sub _tree_construction_main ($) {
       $token = $self->_get_next_token;
       redo B;
     } elsif ($token->{type} == END_OF_FILE_TOKEN) {
-      if ($self->{insertion_mode} == AFTER_HTML_BODY_IM or
-          $self->{insertion_mode} == AFTER_HTML_FRAMESET_IM) {
+      if ($self->{insertion_mode} & AFTER_HTML_IMS) {
         #
       } else {
         ## Generate implied end tags
@@ -3425,8 +3424,7 @@ sub _tree_construction_main ($) {
       redo B;
     } elsif ($token->{type} == COMMENT_TOKEN) {
       my $comment = $self->{document}->create_comment ($token->{data});
-      if ($self->{insertion_mode} == AFTER_HTML_BODY_IM or
-          $self->{insertion_mode} == AFTER_HTML_FRAMESET_IM) {
+      if ($self->{insertion_mode} & AFTER_HTML_IMS) {
         $self->{document}->append_child ($comment);
       } elsif ($self->{insertion_mode} == AFTER_BODY_IM) {
         $self->{open_elements}->[0]->[0]->append_child ($comment);
@@ -3435,10 +3433,7 @@ sub _tree_construction_main ($) {
       }
       $token = $self->_get_next_token;
       redo B;
-    } elsif ($self->{insertion_mode} == IN_HEAD_IM or
-             $self->{insertion_mode} == IN_HEAD_NOSCRIPT_IM or
-             $self->{insertion_mode} == AFTER_HEAD_IM or
-             $self->{insertion_mode} == BEFORE_HEAD_IM) {
+    } elsif ($self->{insertion_mode} & HEAD_IMS) {
       if ($token->{type} == CHARACTER_TOKEN) {
         if ($token->{data} =~ s/^([\x09\x0A\x0B\x0C\x20]+)//) {
           $self->{open_elements}->[-1]->[0]->manakai_append_text ($1);
@@ -3943,9 +3938,7 @@ sub _tree_construction_main ($) {
           }
 
           ## ISSUE: An issue in the spec.
-    } elsif ($self->{insertion_mode} == IN_BODY_IM or
-             $self->{insertion_mode} == IN_CELL_IM or
-             $self->{insertion_mode} == IN_CAPTION_IM) {
+    } elsif ($self->{insertion_mode} & BODY_IMS) {
           if ($token->{type} == CHARACTER_TOKEN) {
             ## NOTE: There is a code clone of "character in body".
             $reconstruct_active_formatting_elements->($insert_to_current);
@@ -4239,8 +4232,7 @@ sub _tree_construction_main ($) {
             } elsif ({
                       body => 1, col => 1, colgroup => 1, html => 1,
                      }->{$token->{tag_name}}) {
-              if ($self->{insertion_mode} == IN_CELL_IM or
-                  $self->{insertion_mode} == IN_CAPTION_IM) {
+              if ($self->{insertion_mode} & BODY_TABLE_IMS) {
                 $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
                 ## Ignore the token
                 $token = $self->_get_next_token;
@@ -4266,9 +4258,7 @@ sub _tree_construction_main ($) {
 
       $insert = $insert_to_current;
       #
-    } elsif ($self->{insertion_mode} == IN_ROW_IM or
-             $self->{insertion_mode} == IN_TABLE_BODY_IM or
-             $self->{insertion_mode} == IN_TABLE_IM) {
+    } elsif ($self->{insertion_mode} & TABLE_IMS) {
           if ($token->{type} == CHARACTER_TOKEN) {
             ## NOTE: There are "character in table" code clones.
             if ($token->{data} =~ s/^([\x09\x0A\x0B\x0C\x20]+)//) {
@@ -4798,8 +4788,7 @@ sub _tree_construction_main ($) {
             } elsif ({
                       tbody => 1, tfoot => 1, thead => 1,
                      }->{$token->{tag_name}} and
-                     ($self->{insertion_mode} == IN_ROW_IM or
-                      $self->{insertion_mode} == IN_TABLE_BODY_IM)) {
+                     $self->{insertion_mode} & ROW_IMS) {
               if ($self->{insertion_mode} == IN_ROW_IM) {
                 ## have an element in table scope
                 my $i;
@@ -5184,8 +5173,7 @@ sub _tree_construction_main ($) {
           ## Ignore the token
           $token = $self->_get_next_token;
           redo B;
-    } elsif ($self->{insertion_mode} == AFTER_BODY_IM or
-             $self->{insertion_mode} == AFTER_HTML_BODY_IM) {
+    } elsif ($self->{insertion_mode} & BODY_AFTER_IMS) {
       if ($token->{type} == CHARACTER_TOKEN) {
         if ($token->{data} =~ s/^([\x09\x0A\x0B\x0C\x20]+)//) {
           my $data = $1;
@@ -5255,9 +5243,7 @@ sub _tree_construction_main ($) {
       } else {
         die "$0: $token->{type}: Unknown token type";
       }
-    } elsif ($self->{insertion_mode} == IN_FRAMESET_IM or 
-             $self->{insertion_mode} == AFTER_FRAMESET_IM or
-             $self->{insertion_mode} == AFTER_HTML_FRAMESET_IM) {
+    } elsif ($self->{insertion_mode} & FRAME_IMS) {
       if ($token->{type} == CHARACTER_TOKEN) {
         if ($token->{data} =~ s/^([\x09\x0A\x0B\x0C\x20]+)//) {
           $self->{open_elements}->[-1]->[0]->manakai_append_text ($1);
@@ -6817,4 +6803,4 @@ sub get_inner_html ($$$) {
 } # get_inner_html
 
 1;
-# $Date: 2007/08/11 06:53:38 $
+# $Date: 2007/08/11 07:19:18 $
