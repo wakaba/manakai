@@ -1004,6 +1004,7 @@ $Element->{$HTML_NS}->{head} = {
         }
         $self->{onerror}->(node => $node, type => 'element not allowed')
           if $not_allowed;
+        local $todo->{flag}->{in_head} = 1;
         my ($sib, $ch) = $self->_check_get_children ($node, $todo);
         unshift @nodes, @$sib;
         push @$new_todos, @$ch;
@@ -2684,18 +2685,72 @@ $Element->{$HTML_NS}->{script} = {
 
 ## NOTE: When script is disabled.
 $Element->{$HTML_NS}->{noscript} = {
-  attrs_checker => $GetHTMLAttrsChecker->({}),
+  attrs_checker => sub {
+    my ($self, $todo) = @_;
+
+    ## NOTE: This check is inserted in |attrs_checker|, rather than |checker|,
+    ## since the later is not invoked when the |noscript| is used as a
+    ## transparent element.
+    unless ($todo->{node}->owner_document->manakai_is_html) {
+      $self->{onerror}->(node => $todo->{node}, type => 'in XML:noscript');
+    }
+
+    $GetHTMLAttrsChecker->({})->($self, $todo);
+  },
   checker => sub {
     my ($self, $todo) = @_;
 
-    my $end = $self->_add_minuses ({$HTML_NS => {noscript => 1}});
-    my ($sib, $ch) = $HTMLBlockOrInlineChecker->($self, $todo);
-    push @$sib, $end;
-    return ($sib, $ch);
+    if ($todo->{flag}->{in_head}) {
+      my $new_todos = [];
+      my @nodes = (@{$todo->{node}->child_nodes});
+      
+      while (@nodes) {
+        my $node = shift @nodes;
+        $self->_remove_minuses ($node) and next if ref $node eq 'HASH'; 
+        
+        my $nt = $node->node_type;
+        if ($nt == 1) {
+          my $node_ns = $node->namespace_uri;
+          $node_ns = '' unless defined $node_ns;
+          my $node_ln = $node->manakai_local_name;
+          if ($node_ns eq $HTML_NS) {
+            if ({link => 1, style => 1}->{$node_ln}) {
+              #
+            } elsif ($node_ln eq 'meta') {
+              if ($node->has_attribute_ns (undef, 'charset')) {
+                $self->{onerror}->(node => $node, type => 'element not allowed');
+              } else {
+                #
+              }
+            } else {
+              $self->{onerror}->(node => $node, type => 'element not allowed');
+            }
+          } else {
+            $self->{onerror}->(node => $node, type => 'element not allowed');
+          }
+
+          my ($sib, $ch) = $self->_check_get_children ($node, $todo);
+          unshift @nodes, @$sib;
+          push @$new_todos, @$ch;
+        } elsif ($nt == 3 or $nt == 4) {
+          if ($node->data =~ /[^\x09-\x0D\x20]/) {
+            $self->{onerror}->(node => $node, type => 'character not allowed');
+          }
+        } elsif ($nt == 5) {
+          unshift @nodes, @{$node->child_nodes};
+        }
+      }
+      return ($new_todos);
+    } else {
+      my $end = $self->_add_minuses ({$HTML_NS => {noscript => 1}});
+      my ($sib, $ch) = $HTMLBlockOrInlineChecker->($self, $todo);
+      push @$sib, $end;
+      return ($sib, $ch);
+    }
   },
 };
-## TODO: noscript in head
-## TODO: noscript in XHTML
+
+## ISSUE: Scripting is disabled: <head><noscript><html a></noscript></head>
 
 $Element->{$HTML_NS}->{'event-source'} = {
   attrs_checker => $GetHTMLAttrsChecker->({

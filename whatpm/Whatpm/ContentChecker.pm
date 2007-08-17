@@ -1,6 +1,6 @@
 package Whatpm::ContentChecker;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.44 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.45 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Whatpm::URIChecker;
 
@@ -350,17 +350,23 @@ sub _check_get_children ($$$) {
     my $node_ns = $node->namespace_uri;
     $node_ns = '' unless defined $node_ns;
     my $node_ln = $node->manakai_local_name;
-    if ($node_ns eq $HTML_NS) {
-      if ($node_ln eq 'noscript') {
-        my $end = $self->_add_minuses ({$HTML_NS, {noscript => 1}});
-        push @$sib, $end;
-      }
-    }
-    ## TODO: |noscript| is not a transparent element in |head|.
     if ($HTMLTransparentElements->{$node_ns}->{$node_ln}) {
-      unshift @$sib, @{$node->child_nodes};
-      push @$new_todos, {type => 'element-attributes', node => $node};
-      last TP;
+      if ($node_ns eq $HTML_NS and $node_ln eq 'noscript') {
+        if ($parent_todo->{flag}->{in_head}) {
+          #
+        } else {
+          my $end = $self->_add_minuses ({$HTML_NS, {noscript => 1}});
+          push @$sib, $end;
+          
+          unshift @$sib, @{$node->child_nodes};
+          push @$new_todos, {type => 'element-attributes', node => $node};
+          last TP;
+        }
+      } else {
+        unshift @$sib, @{$node->child_nodes};
+        push @$new_todos, {type => 'element-attributes', node => $node};
+        last TP;
+      }
     }
     if ($node_ns eq $HTML_NS and ($node_ln eq 'video' or $node_ln eq 'audio')) {
       if ($node->has_attribute_ns (undef, 'src')) {
@@ -409,4 +415,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2007/08/06 10:56:50 $
+# $Date: 2007/08/17 05:55:44 $

@@ -432,6 +432,18 @@
 /meta/@charset;in XML:charset
 
 #data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title/>
+<noscript>
+<meta charset="us-ascii"/>
+</noscript>
+</head>
+#errors
+/head/noscript;in XML:noscript
+/head/noscript/meta;element not allowed
+/head/noscript/meta/@charset;in XML:charset
+
+#data
 <style type="text/css" xmlns="http://www.w3.org/1999/xhtml"></style>
 #errors
 /style;style:text/css;unsupported
@@ -2772,3 +2784,213 @@ aaa
 </figure>
 #errors
 /figure/legend/blockquote;element not allowed
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title/>
+<noscript>
+<p/>
+</noscript>
+</head>
+#errors
+/head/noscript;in XML:noscript
+/head/noscript/p;element not allowed
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title/>
+<noscript>
+<noscript/>
+</noscript>
+</head>
+#errors
+/head/noscript;in XML:noscript
+/head/noscript/noscript;element not allowed
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title/>
+<noscript>
+<link rel="stylesheet" href=""/>
+</noscript>
+</head>
+#errors
+/head/noscript;in XML:noscript
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title/>
+<noscript>
+<style/>
+</noscript>
+</head>
+#errors
+/head/noscript;in XML:noscript
+/head/noscript/style;style:text/css;unsupported
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title/>
+<noscript>
+<script/>
+</noscript>
+</head>
+#errors
+/head/noscript;in XML:noscript
+/head/noscript/script;element not allowed
+/head/noscript/script;script:text/javascript;unsupported
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title/>
+<noscript>
+<meta name="keywords" content=""/>
+</noscript>
+</head>
+#errors
+/head/noscript;in XML:noscript
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title/>
+<noscript>
+<base href=""/>
+</noscript>
+</head>
+#errors
+/head/noscript;in XML:noscript
+/head/noscript/base;element not allowed
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title/>
+<noscript>
+<event-source src=""/>
+</noscript>
+</head>
+#errors
+/head/noscript;in XML:noscript
+/head/noscript/event-source;element not allowed
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title/>
+<noscript>
+<title/>
+</noscript>
+</head>
+#errors
+/head/noscript;in XML:noscript
+/head/noscript/title;element not allowed
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title/>
+<noscript>
+<link rel="stylesheet" href=""/>
+<style/>
+</noscript>
+</head>
+#errors
+/head/noscript;in XML:noscript
+/head/noscript/style;style:text/css;unsupported
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title/>
+<noscript>
+<link rel="stylesheet" href=""/>
+<noscript>
+<style/>
+</noscript>
+</noscript>
+</head>
+#errors
+/head/noscript;in XML:noscript
+/head/noscript/noscript;in XML:noscript
+/head/noscript/noscript;element not allowed
+/head/noscript/noscript/style;style:text/css;unsupported
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title/>
+<noscript>
+<link rel="stylesheet" href=""/>
+<noscript>
+<p/>
+</noscript>
+</noscript>
+</head>
+#errors
+/head/noscript;in XML:noscript
+/head/noscript/noscript;in XML:noscript
+/head/noscript/noscript;element not allowed
+/head/noscript/noscript/p;element not allowed
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title/>
+<noscript>
+<link rel="stylesheet" href=""/>
+<noscript>
+<meta charset="us-ascii"/>
+</noscript>
+</noscript>
+</head>
+#errors
+/head/noscript;in XML:noscript
+/head/noscript/noscript;in XML:noscript
+/head/noscript/noscript;element not allowed
+/head/noscript/noscript/meta;element not allowed
+/head/noscript/noscript/meta/@charset;in XML:charset
+
+#data
+<noscript xmlns="http://www.w3.org/1999/xhtml">
+<meta name="keywords" content=""/>
+</noscript>
+#errors
+/noscript;in XML:noscript
+/noscript/meta;element not allowed
+
+#data
+<noscript xmlns="http://www.w3.org/1999/xhtml">
+<title/>
+</noscript>
+#errors
+/noscript;in XML:noscript
+/noscript/title;element not allowed
+
+#data
+<noscript xmlns="http://www.w3.org/1999/xhtml">
+<link rel="stylesheet" href=""/>
+</noscript>
+#errors
+/noscript;in XML:noscript
+/noscript/link;element not allowed
+
+#data
+<noscript xmlns="http://www.w3.org/1999/xhtml">
+<style/>
+</noscript>
+#errors
+/noscript;in XML:noscript
+/noscript/style;element not allowed
+/noscript/style;style:text/css;unsupported
+
+#data
+<noscript xmlns="http://www.w3.org/1999/xhtml">
+<meta charset="us-ascii"/>
+</noscript>
+#errors
+/noscript;in XML:noscript
+/noscript/meta;element not allowed
+/noscript/meta/@charset;in XML:charset
+
+#data
+<noscript xmlns="http://www.w3.org/1999/xhtml">
+<noscript/>
+</noscript>
+#errors
+/noscript;in XML:noscript
+/noscript/noscript;element not allowed
+/noscript/noscript;in XML:noscript
