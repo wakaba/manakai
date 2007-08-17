@@ -505,7 +505,7 @@ my $GetHTMLBooleanAttrChecker = sub {
 ## |rel| attribute (unordered set of space separated tokens,
 ## whose allowed values are defined by the section on link types)
 my $HTMLLinkTypesAttrChecker = sub {
-  my ($a_or_area, $self, $attr) = @_;
+  my ($a_or_area, $todo, $self, $attr) = @_;
   my %word;
   for my $word (grep {length $_} split /[\x09-\x0D\x20]/, $attr->value) {
     unless ($word{$word}) {
@@ -540,6 +540,13 @@ my $HTMLLinkTypesAttrChecker = sub {
         $self->{onerror}->(node => $attr,
                            type => 'link type:non-conforming:'.$word);
       }
+      if (defined $def->{effect}->[$a_or_area]) {
+        if ($word eq 'alternate') {
+          #
+        } elsif ($def->{effect}->[$a_or_area] eq 'hyperlink') {
+          $todo->{has_hyperlink_link_type} = 1;
+        }
+      }
       if ($def->{unique}) {
         unless ($self->{has_link_type}->{$word}) {
           $self->{has_link_type}->{$word} = 1;
@@ -553,6 +560,8 @@ my $HTMLLinkTypesAttrChecker = sub {
                          type => 'link type:'.$word);
     }
   }
+  $todo->{has_hyperlink_link_type} = 1
+      if $word{alternate} and not $word{stylesheet};
   ## TODO: The Pingback 1.0 specification, which is referenced by HTML5,
   ## says that using both X-Pingback: header field and HTML
   ## <link rel=pingback> is deprecated and if both appears they
@@ -576,6 +585,7 @@ my $HTMLURIAttrChecker = sub {
                        type => 'URI::'.$opt{type}.
                        (defined $opt{position} ? ':'.$opt{position} : ''));
   });
+  $self->{has_uri_attr} = 1;
 }; # $HTMLURIAttrChecker
 
 ## A space separated list of one or more URIs (or IRIs)
@@ -597,6 +607,7 @@ my $HTMLSpaceURIsAttrChecker = sub {
   ## ISSUE: A sequence of white space characters are conformant?
   ## ISSUE: A zero-length string is conformant? (It does contain a relative reference, i.e. same as base URI.)
   ## NOTE: Duplication seems not an error.
+  $self->{has_uri_attr} = 1;
 }; # $HTMLSpaceURIsAttrChecker
 
 my $HTMLDatetimeAttrChecker = sub {
@@ -1028,14 +1039,43 @@ $Element->{$HTML_NS}->{title} = {
   checker => $HTMLTextChecker,
 };
 
-## TODO: |base| with |href| MUST come before elements with URI attributes.
-## For example: <title xml:base=""/><base href=""/> is non-conformant.
-## TODO: |base| with |target| MUST come before any hyperlink.
 $Element->{$HTML_NS}->{base} = {
-  attrs_checker => $GetHTMLAttrsChecker->({
-    href => $HTMLURIAttrChecker,
-    target => $HTMLTargetAttrChecker,
-  }),
+  attrs_checker => sub {
+    my ($self, $todo) = @_;
+
+    if ($self->{has_uri_attr} and
+        $todo->{node}->has_attribute_ns (undef, 'href')) {
+      ## ISSUE: Are these examples conforming?
+      ## <head profile="a b c"><base href> (except for |profile|'s 
+      ## non-conformance)
+      ## <title xml:base="relative"/><base href/> (maybe it should be)
+      ## <unknown xmlns="relative"/><base href/> (assuming that
+      ## |{relative}:unknown| is allowed before XHTML |base| (unlikely, though))
+      ## <?xml-stylesheet href="relative"?>...<base href=""/>
+      ## NOTE: These are non-conformant anyway because of |head|'s content model:
+      ## <style>@import 'relative';</style><base href>
+      ## <script>location.href = 'relative';</script><base href>
+      $self->{onerror}->(node => $todo->{node},
+                         type => 'basehref after URI attribute');
+    }
+    if ($self->{has_hyperlink_element} and
+        $todo->{node}->has_attribute_ns (undef, 'target')) {
+      ## ISSUE: Are these examples conforming?
+      ## <head><title xlink:href=""/><base target="name"/></head>
+      ## <xbl:xbl>...<svg:a href=""/>...</xbl:xbl><base target="name"/>
+      ## (assuming that |xbl:xbl| is allowed before |base|)
+      ## NOTE: These are non-conformant anyway because of |head|'s content model:
+      ## <link href=""/><base target="name"/>
+      ## <link rel=unknown href=""><base target=name>
+      $self->{onerror}->(node => $todo->{node},
+                         type => 'basetarget after hyperlink');
+    }
+
+    return $GetHTMLAttrsChecker->({
+      href => $HTMLURIAttrChecker,
+      target => $HTMLTargetAttrChecker,
+    })->($self, $todo);
+  },
   checker => $HTMLEmptyChecker,
 };
 
@@ -1044,14 +1084,16 @@ $Element->{$HTML_NS}->{link} = {
     my ($self, $todo) = @_;
     $GetHTMLAttrsChecker->({
       href => $HTMLURIAttrChecker,
-      rel => sub { $HTMLLinkTypesAttrChecker->(0, @_) },
+      rel => sub { $HTMLLinkTypesAttrChecker->(0, $todo, @_) },
       media => $HTMLMQAttrChecker,
       hreflang => $HTMLLanguageTagAttrChecker,
       type => $HTMLIMTAttrChecker,
       ## NOTE: Though |title| has special semantics,
       ## syntactically same as the |title| as global attribute.
     })->($self, $todo);
-    unless ($todo->{node}->has_attribute_ns (undef, 'href')) {
+    if ($todo->{node}->has_attribute_ns (undef, 'href')) {
+      $self->{has_hyperlink_element} = 1 if $todo->{has_hyperlink_link_type};
+    } else {
       $self->{onerror}->(node => $todo->{node},
                          type => 'attribute missing:href');
     }
@@ -1629,7 +1671,7 @@ $Element->{$HTML_NS}->{a} = {
                      target => $HTMLTargetAttrChecker,
                      href => $HTMLURIAttrChecker,
                      ping => $HTMLSpaceURIsAttrChecker,
-                     rel => sub { $HTMLLinkTypesAttrChecker->(1, @_) },
+                     rel => sub { $HTMLLinkTypesAttrChecker->(1, $todo, @_) },
                      media => $HTMLMQAttrChecker,
                      hreflang => $HTMLLanguageTagAttrChecker,
                      type => $HTMLIMTAttrChecker,
@@ -1651,7 +1693,9 @@ $Element->{$HTML_NS}->{a} = {
       }
     }
 
-    unless (defined $attr{href}) {
+    if (defined $attr{href}) {
+      $self->{has_hyperlink_element} = 1;
+    } else {
       for (qw/target ping rel media hreflang type/) {
         if (defined $attr{$_}) {
           $self->{onerror}->(node => $attr{$_},
@@ -2019,6 +2063,7 @@ $Element->{$HTML_NS}->{del} = {
 
 ## TODO: figure
 
+## TODO: |alt|
 $Element->{$HTML_NS}->{img} = {
   attrs_checker => sub {
     my ($self, $todo) = @_;
@@ -2184,30 +2229,36 @@ $Element->{$HTML_NS}->{canvas} = {
 };
 
 $Element->{$HTML_NS}->{map} = {
-  attrs_checker => $GetHTMLAttrsChecker->({
-    id => sub {
-      ## NOTE: same as global |id=""|, with |$self->{map}| registeration
-      my ($self, $attr) = @_;
-      my $value = $attr->value;
-      if (length $value > 0) {
-        if ($self->{id}->{$value}) {
-          $self->{onerror}->(node => $attr, type => 'duplicate ID');
-          push @{$self->{id}->{$value}}, $attr;
+  attrs_checker => sub {
+    my ($self, $todo) = @_;
+    my $has_id;
+    $GetHTMLAttrsChecker->({
+      id => sub {
+        ## NOTE: same as global |id=""|, with |$self->{map}| registeration
+        my ($self, $attr) = @_;
+        my $value = $attr->value;
+        if (length $value > 0) {
+          if ($self->{id}->{$value}) {
+            $self->{onerror}->(node => $attr, type => 'duplicate ID');
+            push @{$self->{id}->{$value}}, $attr;
+          } else {
+            $self->{id}->{$value} = [$attr];
+          }
         } else {
-          $self->{id}->{$value} = [$attr];
+          ## NOTE: MUST contain at least one character
+          $self->{onerror}->(node => $attr, type => 'empty attribute value');
         }
-      } else {
-        ## NOTE: MUST contain at least one character
-        $self->{onerror}->(node => $attr, type => 'empty attribute value');
-      }
-      if ($value =~ /[\x09-\x0D\x20]/) {
-        $self->{onerror}->(node => $attr, type => 'space in ID');
-      }
-      $self->{map}->{$value} ||= $attr;
-    },
-  }),
+        if ($value =~ /[\x09-\x0D\x20]/) {
+          $self->{onerror}->(node => $attr, type => 'space in ID');
+        }
+        $self->{map}->{$value} ||= $attr;
+        $has_id = 1;
+      },
+    })->($self, $todo);
+    $self->{onerror}->(node => $todo->{node}, type => 'attribute missing:id')
+        unless $has_id;
+  },
   checker => $HTMLBlockChecker,
-  ## TODO: |id| is required.
 };
 
 $Element->{$HTML_NS}->{area} = {
@@ -2243,7 +2294,7 @@ $Element->{$HTML_NS}->{area} = {
                      target => $HTMLTargetAttrChecker,
                      href => $HTMLURIAttrChecker,
                      ping => $HTMLSpaceURIsAttrChecker,
-                     rel => sub { $HTMLLinkTypesAttrChecker->(1, @_) },
+                     rel => sub { $HTMLLinkTypesAttrChecker->(1, $todo, @_) },
                      media => $HTMLMQAttrChecker,
                      hreflang => $HTMLLanguageTagAttrChecker,
                      type => $HTMLIMTAttrChecker,
@@ -2266,6 +2317,7 @@ $Element->{$HTML_NS}->{area} = {
     }
 
     if (defined $attr{href}) {
+      $self->{has_hyperlink_element} = 1;
       unless (defined $attr{alt}) {
         $self->{onerror}->(node => $todo->{node},
                            type => 'attribute missing:alt');

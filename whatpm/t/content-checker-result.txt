@@ -1,7 +1,7 @@
-1..1132
+1..1175
 # Running under perl version 5.008007 for linux
-# Current time local: Fri Aug 17 14:51:04 2007
-# Current time GMT:   Fri Aug 17 05:51:04 2007
+# Current time local: Fri Aug 17 16:05:53 2007
+# Current time GMT:   Fri Aug 17 07:05:53 2007
 # Using Test.pm version 1.25
 ok 1
 ok 2
@@ -868,116 +868,116 @@ ok 793
 ok 794
 ok 795
 ok 796
-not ok 797
-# Test 797 got: "/object;attribute missing:data|type\n/object;element;unsupported" (t/ContentChecker.t at line 85 fail #797)
-#     Expected: "/object;attribute missing:data|type" (<object xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 798
-# Test 798 got: "/object;element;unsupported" (t/ContentChecker.t at line 85 fail #798)
-#     Expected: "" (<object data="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 799
-# Test 799 got: "/object/@data;URI::syntax error:iriref3987;m\n/object;element;unsupported" (t/ContentChecker.t at line 85 fail #799)
-#     Expected: "/object/@data;URI::syntax error:iriref3987;m" (<object data="`http://test/`" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 800
-# Test 800 got: "/object/@type;IMT:syntax error\n/object;element;unsupported" (t/ContentChecker.t at line 85 fail #800)
-#     Expected: "/object/@type;IMT:syntax error" (<object type="" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 801
-# Test 801 got: "/object;element;unsupported" (t/ContentChecker.t at line 85 fail #801)
-#     Expected: "" (<object type="text/css" xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 802
-# Test 802 got: "/object;element;unsupported" (t/ContentChecker.t at line 85 fail #802)
-#     Expected: "" (<object type="text/css" data="http://test/"
-#    xmlns="http://www.w3.org/1999/xhtml"/>)
-not ok 803
-# Test 803 got: "/div/p/object/@usemap;#idref:syntax error\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 85 fail #803)
-#     Expected: "/div/p/object/@usemap;#idref:syntax error" (<div xmlns="http://www.w3.org/1999/xhtml">
-#<p><object data="http://test/" usemap=""/></p>
-#</div>)
-not ok 804
-# Test 804 got: "/div/p/object/@usemap;#idref:syntax error\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 85 fail #804)
-#     Expected: "/div/p/object/@usemap;#idref:syntax error" (<div xmlns="http://www.w3.org/1999/xhtml">
-#<p><object data="http://test/" usemap="abc"/></p>
-#</div>)
-not ok 805
-# Test 805 got: "/div/p/object/@usemap;#idref:syntax error\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 85 fail #805)
-#     Expected: "/div/p/object/@usemap;#idref:syntax error" (<div xmlns="http://www.w3.org/1999/xhtml">
-#<p><object data="http://test/" usemap="abc#"/></p>
-#</div>)
-not ok 806
-# Test 806 got: "/div/p/object/@usemap;#idref:syntax error\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 85 fail #806)
-#     Expected: "/div/p/object/@usemap;#idref:syntax error" (<div xmlns="http://www.w3.org/1999/xhtml">
-#<p><object data="http://test/" usemap="&#x0A;#abc"/></p>
-#</div>)
-not ok 807
-# Test 807 got: "/div/p/object;element;unsupported" (t/ContentChecker.t at line 85 fail #807)
-#     Expected: "" (<div xmlns="http://www.w3.org/1999/xhtml">
-#<p><object data="http://test/" usemap="#aa"/></p>
-#<map id="aa"/>
-#</div>)
-not ok 808
-# Test 808 got: "/div/p/object;element;unsupported" (t/ContentChecker.t at line 85 fail #808)
-#     Expected: "" (<div xmlns="http://www.w3.org/1999/xhtml">
-#<map id="aa"/>
-#<p><object data="http://test/" usemap="#aa"/></p>
-#</div>)
-not ok 809
-# Test 809 got: "/div/p/object;element;unsupported" (t/ContentChecker.t at line 85 fail #809)
-#     Expected: "" (<div xmlns="http://www.w3.org/1999/xhtml">
-#<map id="&#x4E00;"/>
-#<p><object data="http://test/" usemap="#&#x4E00;"/></p>
-#</div>)
-not ok 810
-# Test 810 got: "/div/p/object/@usemap;no referenced map\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 85 fail #810)
-#     Expected: "/div/p/object/@usemap;no referenced map" (<div xmlns="http://www.w3.org/1999/xhtml">
-#<map id="aa"/>
-#<p><object data="http://test/" usemap="#bb"/></p>
-#</div>)
-not ok 811
-# Test 811 got: "/div/p/object;element;unsupported\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 85 fail #811)
-#     Expected: "" (<div xmlns="http://www.w3.org/1999/xhtml">
-#<map id="aa"/>
-#<p><object data="http://test/" usemap="#aa"/></p>
-#<p><object data="http://test/" usemap="#aa"/></p>
-#</div>)
-not ok 812
-# Test 812 got: "/div/p/object/@usemap;no referenced map\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 85 fail #812)
-#     Expected: "/div/p/object/@usemap;no referenced map" (<div xmlns="http://www.w3.org/1999/xhtml">
-#<map id="aa"/>
-#<p><object data="http://test/" usemap="#AA"/></p>
-#</div>)
-not ok 813
-# Test 813 got: "/div/p/object/@usemap;no referenced map\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 85 fail #813)
-#     Expected: "/div/p/object/@usemap;no referenced map" (<div xmlns="http://www.w3.org/1999/xhtml">
-#<map id="AA"/>
-#<p><object data="http://test/" usemap="#aa"/></p>
-#</div>)
-not ok 814
-# Test 814 got: "/div/object/@usemap;no referenced map\n/div/object;element;unsupported" (t/ContentChecker.t at line 85 fail #814)
-#     Expected: "/div/object/@usemap;no referenced map" (<div xmlns="http://www.w3.org/1999/xhtml">
-#<object data="" usemap="#a"/><menu id="a"/>
-#</div>)
+ok 797
+ok 798
+ok 799
+ok 800
+ok 801
+ok 802
+ok 803
+ok 804
+ok 805
+ok 806
+ok 807
+ok 808
+ok 809
+ok 810
+ok 811
+ok 812
+ok 813
+ok 814
 ok 815
 ok 816
 ok 817
 ok 818
 ok 819
-ok 820
-ok 821
-ok 822
-ok 823
-ok 824
-ok 825
-ok 826
-ok 827
-ok 828
-ok 829
-ok 830
-ok 831
-ok 832
-ok 833
-ok 834
-ok 835
-ok 836
-ok 837
+not ok 820
+# Test 820 got: "/object;attribute missing:data|type\n/object;element;unsupported" (t/ContentChecker.t at line 85 fail #820)
+#     Expected: "/object;attribute missing:data|type" (<object xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 821
+# Test 821 got: "/object;element;unsupported" (t/ContentChecker.t at line 85 fail #821)
+#     Expected: "" (<object data="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 822
+# Test 822 got: "/object/@data;URI::syntax error:iriref3987;m\n/object;element;unsupported" (t/ContentChecker.t at line 85 fail #822)
+#     Expected: "/object/@data;URI::syntax error:iriref3987;m" (<object data="`http://test/`" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 823
+# Test 823 got: "/object/@type;IMT:syntax error\n/object;element;unsupported" (t/ContentChecker.t at line 85 fail #823)
+#     Expected: "/object/@type;IMT:syntax error" (<object type="" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 824
+# Test 824 got: "/object;element;unsupported" (t/ContentChecker.t at line 85 fail #824)
+#     Expected: "" (<object type="text/css" xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 825
+# Test 825 got: "/object;element;unsupported" (t/ContentChecker.t at line 85 fail #825)
+#     Expected: "" (<object type="text/css" data="http://test/"
+#    xmlns="http://www.w3.org/1999/xhtml"/>)
+not ok 826
+# Test 826 got: "/div/p/object/@usemap;#idref:syntax error\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 85 fail #826)
+#     Expected: "/div/p/object/@usemap;#idref:syntax error" (<div xmlns="http://www.w3.org/1999/xhtml">
+#<p><object data="http://test/" usemap=""/></p>
+#</div>)
+not ok 827
+# Test 827 got: "/div/p/object/@usemap;#idref:syntax error\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 85 fail #827)
+#     Expected: "/div/p/object/@usemap;#idref:syntax error" (<div xmlns="http://www.w3.org/1999/xhtml">
+#<p><object data="http://test/" usemap="abc"/></p>
+#</div>)
+not ok 828
+# Test 828 got: "/div/p/object/@usemap;#idref:syntax error\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 85 fail #828)
+#     Expected: "/div/p/object/@usemap;#idref:syntax error" (<div xmlns="http://www.w3.org/1999/xhtml">
+#<p><object data="http://test/" usemap="abc#"/></p>
+#</div>)
+not ok 829
+# Test 829 got: "/div/p/object/@usemap;#idref:syntax error\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 85 fail #829)
+#     Expected: "/div/p/object/@usemap;#idref:syntax error" (<div xmlns="http://www.w3.org/1999/xhtml">
+#<p><object data="http://test/" usemap="&#x0A;#abc"/></p>
+#</div>)
+not ok 830
+# Test 830 got: "/div/p/object;element;unsupported" (t/ContentChecker.t at line 85 fail #830)
+#     Expected: "" (<div xmlns="http://www.w3.org/1999/xhtml">
+#<p><object data="http://test/" usemap="#aa"/></p>
+#<map id="aa"/>
+#</div>)
+not ok 831
+# Test 831 got: "/div/p/object;element;unsupported" (t/ContentChecker.t at line 85 fail #831)
+#     Expected: "" (<div xmlns="http://www.w3.org/1999/xhtml">
+#<map id="aa"/>
+#<p><object data="http://test/" usemap="#aa"/></p>
+#</div>)
+not ok 832
+# Test 832 got: "/div/p/object;element;unsupported" (t/ContentChecker.t at line 85 fail #832)
+#     Expected: "" (<div xmlns="http://www.w3.org/1999/xhtml">
+#<map id="&#x4E00;"/>
+#<p><object data="http://test/" usemap="#&#x4E00;"/></p>
+#</div>)
+not ok 833
+# Test 833 got: "/div/p/object/@usemap;no referenced map\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 85 fail #833)
+#     Expected: "/div/p/object/@usemap;no referenced map" (<div xmlns="http://www.w3.org/1999/xhtml">
+#<map id="aa"/>
+#<p><object data="http://test/" usemap="#bb"/></p>
+#</div>)
+not ok 834
+# Test 834 got: "/div/p/object;element;unsupported\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 85 fail #834)
+#     Expected: "" (<div xmlns="http://www.w3.org/1999/xhtml">
+#<map id="aa"/>
+#<p><object data="http://test/" usemap="#aa"/></p>
+#<p><object data="http://test/" usemap="#aa"/></p>
+#</div>)
+not ok 835
+# Test 835 got: "/div/p/object/@usemap;no referenced map\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 85 fail #835)
+#     Expected: "/div/p/object/@usemap;no referenced map" (<div xmlns="http://www.w3.org/1999/xhtml">
+#<map id="aa"/>
+#<p><object data="http://test/" usemap="#AA"/></p>
+#</div>)
+not ok 836
+# Test 836 got: "/div/p/object/@usemap;no referenced map\n/div/p/object;element;unsupported" (t/ContentChecker.t at line 85 fail #836)
+#     Expected: "/div/p/object/@usemap;no referenced map" (<div xmlns="http://www.w3.org/1999/xhtml">
+#<map id="AA"/>
+#<p><object data="http://test/" usemap="#aa"/></p>
+#</div>)
+not ok 837
+# Test 837 got: "/div/object/@usemap;no referenced map\n/div/object;element;unsupported" (t/ContentChecker.t at line 85 fail #837)
+#     Expected: "/div/object/@usemap;no referenced map" (<div xmlns="http://www.w3.org/1999/xhtml">
+#<object data="" usemap="#a"/><menu id="a"/>
+#</div>)
 ok 838
 ok 839
 ok 840
@@ -1293,3 +1293,26 @@ ok 1149
 ok 1150
 ok 1151
 ok 1152
+ok 1153
+ok 1154
+ok 1155
+ok 1156
+ok 1157
+ok 1158
+ok 1159
+ok 1160
+ok 1161
+ok 1162
+ok 1163
+ok 1164
+ok 1165
+ok 1166
+ok 1167
+ok 1168
+ok 1169
+ok 1170
+ok 1171
+ok 1172
+ok 1173
+ok 1174
+ok 1175

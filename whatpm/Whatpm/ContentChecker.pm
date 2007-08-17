@@ -1,6 +1,6 @@
 package Whatpm::ContentChecker;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.45 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.46 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 require Whatpm::URIChecker;
 
@@ -235,6 +235,8 @@ sub check_element ($$$) {
   $self->{map} = {};
   $self->{menu} = {};
   $self->{has_link_type} = {};
+  #$self->{has_uri_attr};
+  #$self->{has_hyperlink_element};
   $self->{return} = {
     class => {},
     id => $self->{id}, table => [], term => $self->{term},
@@ -415,4 +417,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2007/08/17 05:55:44 $
+# $Date: 2007/08/17 11:53:52 $

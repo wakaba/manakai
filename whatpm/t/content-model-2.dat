@@ -590,6 +590,224 @@ id=""><span id=""></span></p>
 #errors
 
 #data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<link rel="stylesheet" href=""/>
+<base href=""/>
+<title/>
+</head>
+#errors
+/head/base;element not allowed
+/head/base;basehref after URI attribute
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<base href=""/>
+<link rel="stylesheet" href=""/>
+<title/>
+</head>
+#errors
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<link rel="stylesheet" href=""/>
+<base target="_self"/>
+<title/>
+</head>
+#errors
+/head/base;element not allowed
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<base target="_self"/>
+<link rel="stylesheet" href=""/>
+<title/>
+</head>
+#errors
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<link rel="stylesheet" href=""/>
+<base target="_self" href=""/>
+<title/>
+</head>
+#errors
+/head/base;element not allowed
+/head/base;basehref after URI attribute
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<base target="_self" href=""/>
+<link rel="stylesheet" href=""/>
+<title/>
+</head>
+#errors
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<link rel="up" href=""/>
+<base href=""/>
+<title/>
+</head>
+#errors
+/head/base;element not allowed
+/head/base;basehref after URI attribute
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<base href=""/>
+<link rel="up" href=""/>
+<title/>
+</head>
+#errors
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<link rel="up" href=""/>
+<base target="_self"/>
+<title/>
+</head>
+#errors
+/head/base;element not allowed
+/head/base;basetarget after hyperlink
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<base target="_self"/>
+<link rel="up" href=""/>
+<title/>
+</head>
+#errors
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<link rel="up" href=""/>
+<base target="_self" href=""/>
+<title/>
+</head>
+#errors
+/head/base;element not allowed
+/head/base;basehref after URI attribute
+/head/base;basetarget after hyperlink
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<base target="_self" href=""/>
+<link rel="up" href=""/>
+<title/>
+</head>
+#errors
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<link rel="alternate stylesheet" href=""/>
+<base target="_self"/>
+<title/>
+</head>
+#errors
+/head/base;element not allowed
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<link rel="stylesheet alternate" href=""/>
+<base target="_self"/>
+<title/>
+</head>
+#errors
+/head/base;element not allowed
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<link rel="alternate stylesheet stylesheet" href=""/>
+<base target="_self"/>
+<title/>
+</head>
+#errors
+/head/base;element not allowed
+/head/link/@rel;duplicate token:stylesheet
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<link rel="alternate" type="application/atom+xml" href=""/>
+<base target="_self"/>
+<title/>
+</head>
+#errors
+/head/base;element not allowed
+/head/base;basetarget after hyperlink
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<link rel="alternate up stylesheet" href=""/>
+<base target="_self"/>
+<title/>
+</head>
+#errors
+/head/base;element not allowed
+/head/base;basetarget after hyperlink
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<link rel="up stylesheet" href=""/>
+<base target="_self"/>
+<title/>
+</head>
+#errors
+/head/base;element not allowed
+/head/base;basetarget after hyperlink
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<a href=""/>
+<base target="_self"/>
+<title/>
+</head>
+#errors
+/head/a;element not allowed
+/head/base;basetarget after hyperlink
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<area shape="default" href="" alt=""/>
+<base target="_self"/>
+<title/>
+</head>
+#errors
+/head/area;element not allowed
+/head/base;basetarget after hyperlink
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<area shape="default" href="" alt=""/>
+<base href=""/>
+<title/>
+</head>
+#errors
+/head/area;element not allowed
+/head/base;basehref after URI attribute
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<video src=""/>
+<base href=""/>
+<title/>
+</head>
+#errors
+/head/video;element not allowed
+/head/base;basehref after URI attribute
+
+#data
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<base href=""/>
+<title/>
+</head>
+<body>
+<p><a href=""/></p>
+</body>
+</html>
+#errors
+
+#data
 <link xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /link;attribute missing:href
@@ -2599,10 +2817,12 @@ id=""><span id=""></span></p>
 #data
 <map xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/map;attribute missing:id
 
 #data
 <map name="aa" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/map;attribute missing:id
 /map/@name;attribute;unsupported
 
 #data
