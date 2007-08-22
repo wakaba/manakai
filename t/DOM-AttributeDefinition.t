@@ -1,13 +1,49 @@
 #!/usr/bin/perl
 use strict;
 use Test;
-BEGIN { plan tests => 79 } 
+BEGIN { plan tests => 99 } 
 
 require Message::DOM::DOMImplementation;
 use Message::Util::Error;
 
 my $dom = Message::DOM::DOMImplementation->____new;
 my $doc = $dom->create_document;
+
+for my $v (
+  [a => undef],
+  [abc => undef],
+  ['a:b' => undef],
+  [1 => 'INVALID_CHARACTER_ERR'],
+  [1234 => 'INVALID_CHARACTER_ERR'],
+  ["\x{3001}\x{3002}" => 'INVALID_CHARACTER_ERR'], ## XML 1.1 Name
+  [':aa' => undef],
+  [':1' => undef],
+  ['a:' => undef],
+  ["a:\x{3005}b" => undef], ## XML 1.0 Name, XML 1.1 QName
+) {
+  $doc->strict_error_checking (1);
+  if (not defined $v->[1]) {
+    try {
+      my $dt = $doc->create_attribute_definition ($v->[0]);
+      ok $dt->node_name, $v->[0], 'create_attribute_definition '.$v->[0];
+    } catch Message::IF::DOMException with {
+      my $e = shift;
+      ok $e->type, undef, 'create_attribute_definition '.$v->[0];
+    };
+  } else {
+    try {
+      $doc->create_attribute_definition ($v->[0]);
+      ok 0, 1, 'create_attribute_definition '.$v->[0];
+    } catch Message::IF::DOMException with {
+      my $e = shift;
+      ok $e->type, $v->[1], 'create_attribute_definition '.$v->[0];
+    };
+  }
+  $doc->strict_error_checking (0);
+  my $dt = $doc->create_attribute_definition ($v->[0]);
+  ok $dt->node_name, $v->[0], 'create_attribute_definition s '.$v->[0];
+}
+$doc->strict_error_checking (1);
 
 my $ent = $doc->create_attribute_definition ('ad');
 
@@ -87,4 +123,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2007/07/07 04:47:30 $
+## $Date: 2007/08/22 10:59:43 $

@@ -13,8 +13,8 @@ This module is part of manakai.
 
 package Message::CGI::HTTP;
 use strict;
-our $VERSION = do{my @r=(q$Revision: 1.3 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
-push our @ISA, 'Message::IF::CGIRequest';
+our $VERSION = do{my @r=(q$Revision: 1.4 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+push our @ISA, 'Message::IF::CGIRequest', 'Message::IF::HTTPCGIRequest';
 
 =head1 METHODS
 
@@ -250,7 +250,34 @@ sub __uri_encode ($$;$) {
   return $s;
 } # __uri_encode
 
+=item I<$value> = I<$cgi>->path_info ([I<$new_value>]);
+
+This method reflects the meta-variable with the same name (in uppercase).
+
+=cut
+
+for (
+  [path_info => 'PATH_INFO'],
+  [query_string => 'QUERY_STRING'],
+  [request_method => 'REQUEST_METHOD'],
+  [script_name => 'SCRIPT_NAME'],
+) {
+  eval qq{
+    sub $_->[0] (\$;\$) {
+      if (\@_ > 1) {
+        if (defined \$_[1]) {
+          \$main::ENV{'$_->[1]'} = ''.\$_[1];
+        } else {
+          delete \$main::ENV{'$_->[1]'};
+        }
+      }
+      return \$main::ENV{'$_->[1]'};
+    }
+  };
+}
+
 package Message::IF::CGIRequest;
+package Message::IF::HTTPCGIRequest;
 
 =back
 
@@ -285,4 +312,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2007/08/11 13:51:36 $
+# $Date: 2007/08/22 10:59:43 $
