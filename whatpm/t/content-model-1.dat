@@ -208,6 +208,15 @@
 
 #data
 <head xmlns="http://www.w3.org/1999/xhtml">
+<meta/>
+<title/>
+</head>
+#errors
+/head/meta;element not allowed
+/head/meta;attribute missing:name|http-equiv|charset
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
 <meta charset="us-ascii"/>
 <title/>
 </head>
@@ -442,6 +451,52 @@
 /head/noscript;in XML:noscript
 /head/noscript/meta;element not allowed
 /head/noscript/meta/@charset;in XML:charset
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title/>
+<noscript>
+<meta/>
+</noscript>
+</head>
+#errors
+/head/noscript;in XML:noscript
+/head/noscript/meta;element not allowed
+/head/noscript/meta;attribute missing:name|http-equiv|charset
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title/>
+<noscript>
+<meta http-equiv="content-style-type" content="text/css"/>
+</noscript>
+</head>
+#errors
+/head/noscript;in XML:noscript
+/head/noscript/meta;element not allowed
+/head/noscript/meta/@http-equiv;enumerated:invalid
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title/>
+<noscript>
+<meta name="keywords" content=""/>
+</noscript>
+</head>
+#errors
+/head/noscript;in XML:noscript
+
+#data
+<head xmlns="http://www.w3.org/1999/xhtml">
+<title/>
+<noscript>
+<meta name="keywords" content="" http-equiv="keywords"/>
+</noscript>
+</head>
+#errors
+/head/noscript;in XML:noscript
+/head/noscript/meta/@http-equiv;attribute not allowed
+/head/noscript/meta/@http-equiv;enumerated:invalid
 
 #data
 <style type="text/css" xmlns="http://www.w3.org/1999/xhtml"></style>

@@ -212,3 +212,46 @@ a
 character in table body
 #document-fragment tfoot
 | "a"
+
+#data
+a
+#errors
+#document-fragment html
+| <head>
+| <body>
+|   "a"
+
+#data
+<p>
+#errors
+#document-fragment html
+| <head>
+| <body>
+|   <p>
+
+#data
+<title>aa
+#errors
+EOF in <title>
+unexpected end of file
+#document-fragment html
+| <head>
+|   <title>
+|     "aa"
+
+#data
+<title>aa</title>
+#errors
+unexpected end of file
+#document-fragment html
+| <head>
+|   <title>
+|     "aa"
+
+#data
+<style></style>
+#errors
+unexpected end of file
+#document-fragment html
+| <head>
+|   <style>

@@ -994,8 +994,12 @@ $Element->{$HTML_NS}->{head} = {
               $not_allowed = 1;
               ## NOTE: See also |base|'s "contexts" field in the spec
             }
+          } elsif ($node->has_attribute_ns (undef, 'name') or
+                   $node->has_attribute_ns (undef, 'http-equiv')) {
+            $phase = 'after base';
           } else {
             $phase = 'after base';
+            $not_allowed = 1;
           }
         } elsif ($node_ns eq $HTML_NS and $node_ln eq 'base') {
           if ($phase eq 'initial' or $phase eq 'after charset') {
@@ -2769,10 +2773,11 @@ $Element->{$HTML_NS}->{noscript} = {
             if ({link => 1, style => 1}->{$node_ln}) {
               #
             } elsif ($node_ln eq 'meta') {
-              if ($node->has_attribute_ns (undef, 'charset')) {
-                $self->{onerror}->(node => $node, type => 'element not allowed');
-              } else {
+              if ($node->has_attribute_ns (undef, 'name')) {
                 #
+              } else {
+                $self->{onerror}->(node => $node,
+                                   type => 'element not allowed');
               }
             } else {
               $self->{onerror}->(node => $node, type => 'element not allowed');

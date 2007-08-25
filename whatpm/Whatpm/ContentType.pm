@@ -38,9 +38,11 @@ Web Hypertext Application Technologies.
 
 =cut
 
+## TODO: HTML5 revision 1013
+
 package Whatpm::ContentType;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.7 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## Table in <http://www.whatwg.org/specs/web-apps/current-work/#content-type1>.
 ##
@@ -402,4 +404,4 @@ and/or modify it under the same terms as Perl itself.
 =cut
 
 1;
-# $Date: 2007/08/11 06:37:12 $
+# $Date: 2007/08/25 02:44:38 $
