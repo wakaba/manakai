@@ -1,7 +1,7 @@
-1..774
+1..980
 # Running under perl version 5.008007 for linux
-# Current time local: Sat Aug 25 11:39:03 2007
-# Current time GMT:   Sat Aug 25 02:39:03 2007
+# Current time local: Sat Aug 25 11:50:27 2007
+# Current time GMT:   Sat Aug 25 02:50:27 2007
 # Using Test.pm version 1.25
 # t/tokenizer-test-2.dat
 ok 1
@@ -757,10 +757,7 @@ not ok 482
 ok 483
 not ok 484
 # Test 484 got: "| <!DOCTYPE >\n| <html>\n" (t/HTML-tree.t at line 143 fail #242)
-#     Expected: "| <!DOCTYPE>\n| <html>\n|   <head>\n|   <body>\n" (Document tree: qq'<!doctype>')
-#     Line 1 is changed:
-#      - "| <!DOCTYPE>\n"
-#      + "| <!DOCTYPE >\n"
+#     Expected: "| <!DOCTYPE >\n| <html>\n|   <head>\n|   <body>\n" (Document tree: qq'<!doctype>')
 #     Lines 3-3 are missing:
 #      - "|   <head>\n"
 #      - "|   <body>\n"

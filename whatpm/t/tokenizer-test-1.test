@@ -273,6 +273,14 @@
   "ParseError", ["Character", "\u0178"]
 ]},
 
+{"description":"Numeric entity representing a Windows-1252 'codepoint'",
+"input":"&#137;",
+"output":["ParseError", ["Character", "\u2030"]]},
+
+{"description":"Hexadecimal entity representing a Windows-1252 'codepoint'",
+"input":"&#x89;",
+"output":["ParseError", ["Character", "\u2030"]]},
+
 {"description":"surrogate character reference",
 "input":"&#xD800;",
 "output":["ParseError", ["Character", "\uFFFD"]]},

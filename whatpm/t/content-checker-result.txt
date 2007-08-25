@@ -1,7 +1,7 @@
-1..1175
+1..1180
 # Running under perl version 5.008007 for linux
-# Current time local: Sat Aug 25 11:39:10 2007
-# Current time GMT:   Sat Aug 25 02:39:10 2007
+# Current time local: Sat Aug 25 11:50:38 2007
+# Current time GMT:   Sat Aug 25 02:50:38 2007
 # Using Test.pm version 1.25
 ok 1
 ok 2
@@ -73,15 +73,7 @@ ok 67
 ok 68
 ok 69
 ok 70
-not ok 71
-# Test 71 got: "/head/noscript/meta/@http-equiv;attribute not allowed\n/head/noscript/meta/@http-equiv;enumerated:invalid\n/head/noscript;in XML:noscript" (t/ContentChecker.t at line 85 fail #71)
-#    Expected: "/head/noscript/meta/@http-equiv;enumerated:invalid\n/head/noscript;in XML:noscript" (<head xmlns="http://www.w3.org/1999/xhtml">
-#<title/>
-#<noscript>
-#<meta name="keywords" content="" http-equiv="keywords"/>
-#</noscript>
-#</head>)
-#  t/ContentChecker.t line 85 is:     join ("\n", sort {$a cmp $b} @{$test->{errors}}), $test->{data};
+ok 71
 ok 72
 ok 73
 ok 74
@@ -356,6 +348,7 @@ ok 342
 not ok 343
 # Test 343 got: "/datagrid/select;element;unsupported" (t/ContentChecker.t at line 85 fail #343)
 #     Expected: "" (<datagrid xmlns="http://www.w3.org/1999/xhtml"><select/></datagrid>)
+#  t/ContentChecker.t line 85 is:     join ("\n", sort {$a cmp $b} @{$test->{errors}}), $test->{data};
 not ok 344
 # Test 344 got: "/datagrid/datalist;element;unsupported" (t/ContentChecker.t at line 85 fail #344)
 #     Expected: "" (<datagrid xmlns="http://www.w3.org/1999/xhtml"><datalist/></datagrid>)

@@ -1,7 +1,7 @@
-1..337
+1..345
 # Running under perl version 5.008007 for linux
-# Current time local: Sat Aug 25 11:39:00 2007
-# Current time GMT:   Sat Aug 25 02:39:00 2007
+# Current time local: Sat Aug 25 11:50:20 2007
+# Current time GMT:   Sat Aug 25 02:50:20 2007
 # Using Test.pm version 1.25
 # t/tokenizer/test1.test
 ok 1
@@ -84,8 +84,8 @@ ok 70
 ok 71
 ok 72
 ok 73
-ok 74
 # t/tokenizer/test3.test
+ok 74
 ok 75
 ok 76
 ok 77
@@ -112,19 +112,19 @@ ok 97
 ok 98
 ok 99
 ok 100
-ok 101
-not ok 102
-# Test 102 got: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'DOCTYPE',\n            undef,\n            undef,\n            undef,\n            0\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 158 fail #102)
+not ok 101
+# Test 101 got: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'DOCTYPE',\n            undef,\n            undef,\n            undef,\n            0\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 158 fail #101)
 #     Expected: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'DOCTYPE',\n            qq'',\n            undef,\n            undef,\n            0\n          ]\n        ];\n" (<!doctype >: qq'<!doctype >')
 #     Line 5 is changed:
 #      - "            qq'',\n"
 #      + "            undef,\n"
-not ok 103
-# Test 103 got: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'DOCTYPE',\n            undef,\n            undef,\n            undef,\n            0\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 158 fail #103)
+not ok 102
+# Test 102 got: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'DOCTYPE',\n            undef,\n            undef,\n            undef,\n            0\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 158 fail #102)
 #     Expected: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'DOCTYPE',\n            qq'',\n            undef,\n            undef,\n            0\n          ]\n        ];\n" (<!doctype  : qq'<!doctype  ')
 #     Line 5 is changed:
 #      - "            qq'',\n"
 #      + "            undef,\n"
+ok 103
 ok 104
 ok 105
 ok 106
@@ -186,8 +186,8 @@ ok 161
 ok 162
 ok 163
 ok 164
-ok 165
 # t/tokenizer/test4.test
+ok 165
 ok 166
 ok 167
 ok 168
@@ -220,14 +220,14 @@ ok 194
 ok 195
 ok 196
 ok 197
-ok 198
-not ok 199
-# Test 199 got: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError',\n          [\n            qq'Comment',\n            qq'doc'\n          ],\n          [\n            qq'Character',\n            qq'\\x{FFFD}'\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 158 fail #199)
+not ok 198
+# Test 198 got: "$VAR1 = [\n          qq'ParseError',\n          qq'ParseError',\n          [\n            qq'Comment',\n            qq'doc'\n          ],\n          [\n            qq'Character',\n            qq'\\x{FFFD}'\n          ]\n        ];\n" (t/HTML-tokenizer.t at line 158 fail #198)
 #     Expected: "$VAR1 = [\n          qq'ParseError',\n          [\n            qq'Comment',\n            qq'doc'\n          ],\n          qq'ParseError',\n          [\n            qq'Character',\n            qq'\\x{FFFD}'\n          ]\n        ];\n" (U+0000 in lookahead region after non-matching character: qq'<!doc>\x{00}')
 #     Got 1 extra line at line 3:
 #      + "          qq'ParseError',\n"
 #     Line 8 is missing:
 #      - "          qq'ParseError',\n"
+ok 199
 ok 200
 ok 201
 ok 202
@@ -237,32 +237,32 @@ ok 205
 ok 206
 ok 207
 ok 208
-# t/tokenizer/contentModelFlags.test
 ok 209
 ok 210
 ok 211
 ok 212
+# t/tokenizer/contentModelFlags.test
 ok 213
 ok 214
 ok 215
 ok 216
 ok 217
-# t/tokenizer/escapeFlag.test
 ok 218
 ok 219
 ok 220
 ok 221
 ok 222
 ok 223
-# t/tokenizer-test-1.test
 ok 224
 ok 225
+# t/tokenizer/escapeFlag.test
 ok 226
 ok 227
 ok 228
 ok 229
 ok 230
 ok 231
+# t/tokenizer-test-1.test
 ok 232
 ok 233
 ok 234
@@ -369,3 +369,13 @@ ok 334
 ok 335
 ok 336
 ok 337
+ok 338
+ok 339
+ok 340
+ok 341
+ok 342
+ok 343
+ok 344
+ok 345
+ok 346
+ok 347
