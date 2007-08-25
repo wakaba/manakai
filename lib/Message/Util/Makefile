@@ -1,4 +1,6 @@
 POD2HTML = pod2html --css "http://suika.fam.cx/www/style/html/pod.css" \
+  --htmlroot "../.."
+POD2HTML2 = pod2html --css "http://suika.fam.cx/www/style/html/pod.css" \
   --htmlroot "../../.."
 
 MANAKAI_ROOT_DIR = ../../../
@@ -32,6 +34,9 @@ Error.html:: %.html: %.pod
 %.html: %.pm
 	$(POD2HTML) $< > $@	
 
+Formatter/%.html: %.pm
+	$(POD2HTML2) $< > $@	
+
 clean:
 	$(RMALL) $(GENERATED_FILES)
 	$(RMALL) *.tmp .*.tmp *~ .*~
@@ -40,5 +45,5 @@ clean:
 
 distclean: clean
 
-## $Date: 2007/08/11 13:37:09 $
+## $Date: 2007/08/25 07:02:11 $
 ## License: Public Domain.

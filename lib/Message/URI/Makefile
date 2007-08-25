@@ -1,5 +1,5 @@
 POD2HTML = pod2html --css "http://suika.fam.cx/www/style/html/pod.css" \
-  --htmlroot "../../.."
+  --htmlroot "../.."
 RM = rm
 RMALL = $(RM) -fv
 
@@ -16,5 +16,5 @@ clean:
 distclean: clean
 	$(RMALL) $(HTML_FILES)
 
-## $Date: 2007/08/25 06:54:30 $
+## $Date: 2007/08/25 07:02:11 $
 ## License: Public Domain.
