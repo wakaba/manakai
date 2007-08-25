@@ -1,0 +1,55 @@
+=head1 NAME
+
+Message::URI::URIReferemce - URI Reference Object Class
+
+=head1 SYNOPSIS
+
+  ## Invoke constructor via DOM Interface
+  require Message::DOM::DOMImplementation;
+  my $dom = Message::DOM::DOMImplementation->new;
+  
+  my $uri = $dom->create_uri_reference ($uri_string);
+
+  ## Invoke constructor directly
+  require Message::URI::URIReference;
+  
+  my $uri = Message::DOM::DOMImplementation
+      ->create_uri_reference ($uri_string);
+
+  ## Methods and attributes
+  print $uri->uri_scheme;
+  print $uri->uri_authority;
+  print $uri->get_absolute_reference ($base_uri);
+
+=head1 CONSTRUCTORS
+
+@@ TBD
+
+=head1 ATTRIBUTES
+
+@@ TBD
+
+=head1 METHODS
+
+@@ TBD
+
+=head1 SEE ALSO
+
+Manakai DOM URI Module.
+
+L<Message::DOM::DOMImplementation>.
+
+=head1 AUTHOR
+
+Wakaba <w@suika.fam.cx>.
+
+=head1 LICENSE
+
+Copyright 2007 Wakaba <w@suika.fam.cx>
+
+This library is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+=cut
+
+## $Date: 2007/08/25 06:54:30 $
