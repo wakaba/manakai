@@ -1,6 +1,6 @@
 package Message::DOM::Node;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.14 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.15 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 push our @ISA, 'Message::IF::Node';
 require Scalar::Util;
 require Message::DOM::DOMException;
@@ -62,8 +62,7 @@ sub DOCUMENT_POSITION_CONTAINS () { 0x08 }
 sub DOCUMENT_POSITION_CONTAINED_BY () { 0x10 }
 sub DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC () { 0x20 }
 
-## TODO: Define |UserDataHandler| Perl bindig
-## OperationType
+## |OperationType| from the |UserDataHandler| interface.
 sub NODE_CLONED () { 1 }
 sub NODE_IMPORTED () { 2 }
 sub NODE_DELETED () { 3 }
@@ -148,9 +147,9 @@ sub first_child ($) {
 
 sub manakai_language ($;$) {
   my $self = $_[0];
+  local $Error::Depth = $Error::Depth + 1;
 
   if (@_ > 1) {
-    local $Error::Depth = $Error::Depth + 1;
     if ($self->node_type == 1) { # ELEMENT_NODE
       if (defined $_[1]) {
         if ($self->has_attribute_ns (undef, 'xml:lang')) {
@@ -172,23 +171,33 @@ sub manakai_language ($;$) {
 
   my $target = $self;
   while (defined $target) {
-    if ($target->node_Type == 1) { # ELEMENT_NODE
+    if ($target->node_type == 1) { # ELEMENT_NODE
+      ## Step 1
+
+      ## Step 1.1
       my $r = $target->get_attribute_ns
           (q<http://www.w3.org/XML/1998/namespace>, 'lang');
       return $r if defined $r;
-      
+
+      ## Step 1.2
       $r = $target->get_attribute_ns (undef, 'xml:lang');
       return $r if defined $r;
     }
-    
+
+    ## Step 2
     $target = $target->parent_node;
   }
 
-  ## TODO: from ownerDocument
-  ## TODO: from upper-level protocol
+  ## Step 3
+  my $od = $self->owner_document;
+  if (defined $od) {
+    return $od->manakai_language;
+  }
 
-  ## TODO: Documentation
-   
+  ## Step 4
+  ## TODO: from upper-level protocol, if $self isa Document
+
+  ## Step 5
   return '';
 } # manakai_language
 
@@ -1388,4 +1397,4 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/07/14 09:19:11 $
+## $Date: 2007/08/25 08:41:00 $

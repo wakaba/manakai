@@ -1,12 +1,12 @@
 #!/usr/bin/perl
 use strict;
 use Test;
-BEGIN { plan tests => 5310 } 
+BEGIN { plan tests => 5329 } 
 
 require Message::DOM::DOMImplementation;
 use Message::Util::Error;
 
-my $dom = Message::DOM::DOMImplementation->____new;
+my $dom = Message::DOM::DOMImplementation->new;
 my $doc = $dom->create_document;
 
 
@@ -2040,6 +2040,63 @@ for my $node (create_leaf_nodes) {
   ## NOTE: We cannot control exactly when it is called.
 }
 
+## |manakaiLanguage|
+{
+  my $el = $doc->create_element_ns (undef, 'e');
+  $doc->strict_error_checking (0);
+
+  ok $el->manakai_language, '', 'mlanguage [0]';
+
+  my $xml_ns = q<http://www.w3.org/XML/1998/namespace>;
+  
+  my $parent = $doc->create_element ('e');
+  $parent->set_attribute_ns ($xml_ns, 'xml:lang', 'en');
+  $parent->append_child ($el);
+  ok $el->manakai_language, 'en', 'mlanguage [1]';
+
+  my $parent2 = $doc->create_element_ns (undef, 'e');
+  $parent2->set_attribute_ns (undef, [undef, 'xml:lang'], 'ja');
+  $parent2->append_child ($el);
+  ok $el->manakai_language, 'ja', 'mlanguage [2]';
+
+  $el->set_attribute_ns ($xml_ns, 'xml:lang', 'en');
+  ok $el->manakai_language, 'en', 'mlanguage [3]';
+
+  $el->set_attribute_ns ($xml_ns, 'xml:lang', 'fr');
+  $el->set_attribute_ns (undef, [undef, 'xml:lang'], 'es');
+  ok $el->manakai_language, 'fr', 'mlanguage [4]';
+
+  $el->remove_attribute_ns ($xml_ns, 'lang');
+  ok $el->manakai_language, 'es', 'mlanguage [5]';
+}
+{
+  my $el = $doc->create_element_ns (undef, 'e');
+  my $xml_ns = q<http://www.w3.org/XML/1998/namespace>;
+
+  $el->manakai_language ('ja');
+  ok $el->manakai_language, 'ja', 'mlanguage [6]';
+
+  my $attr = $el->get_attribute_node_ns ($xml_ns, 'lang');
+  ok $attr->value, 'ja', 'mlanguage [7]';
+  ok $attr->specified ? 1 : 0, 1, 'mlanguage [8]';
+
+  $el->manakai_language ('en');
+  ok $el->manakai_language, 'en', 'mlanguage [9]';
+  ok $attr->value, 'en', 'mlanguage [a]';
+
+  $el->manakai_language ('');
+  ok $attr->value, '', 'mlanguage [b]';
+  ok $attr->owner_element, $el, 'mlanguage [c]';
+  ok $el->get_attribute_ns ($xml_ns, 'lang'), '', 'mlanguage [d]';
+  ok $el->manakai_language, '', 'mlanguage [e]';
+
+  $el->manakai_language (undef);
+  ok $attr->value, '', 'mlanguage [f]';
+  ok $attr->owner_element, undef, 'mlanguage [g]';
+  ok $el->get_attribute_ns ($xml_ns, 'lang'), undef, 'mlanguage [h]';
+  ok $el->manakai_language, '', 'mlanguage [i]';
+}
+
 =head1 LICENSE
 
 Copyright 2007 Wakaba <w@suika.fam.cx>
@@ -2049,4 +2106,4 @@ modify it under the same terms as Perl itself.
 
 =cut
 
-## $Date: 2007/07/15 12:54:07 $
+## $Date: 2007/08/25 08:41:01 $
