@@ -1,6 +1,6 @@
 package Whatpm::HTML;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.59 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+our $VERSION=do{my @r=(q$Revision: 1.60 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
 
 ## ISSUE:
 ## var doc = implementation.createDocument (null, null, null);
@@ -4293,8 +4293,7 @@ sub _tree_construction_main ($) {
       $insert = $insert_to_current;
       #
     } elsif ($self->{insertion_mode} & TABLE_IMS) {
-          if ($token->{type} == CHARACTER_TOKEN) {
-            ## NOTE: There are "character in table" code clones.
+      if ($token->{type} == CHARACTER_TOKEN) {
             if ($token->{data} =~ s/^([\x09\x0A\x0B\x0C\x20]+)//) {
               $self->{open_elements}->[-1]->[0]->manakai_append_text ($1);
               
@@ -4351,7 +4350,7 @@ sub _tree_construction_main ($) {
             
             $token = $self->_get_next_token;
             redo B;
-          } elsif ($token->{type} == START_TAG_TOKEN) {
+      } elsif ($token->{type} == START_TAG_TOKEN) {
             if ({
                  tr => ($self->{insertion_mode} != IN_ROW_IM),
                  th => 1, td => 1,
@@ -4612,7 +4611,6 @@ sub _tree_construction_main ($) {
                 die "$0: in table: <>: $token->{tag_name}";
               }
             } elsif ($token->{tag_name} eq 'table') {
-              ## NOTE: There are code clones for this "table in table"
               $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
 
               ## As if </table>
@@ -4660,10 +4658,13 @@ sub _tree_construction_main ($) {
 
               ## reprocess
               redo B;
-            } else {
-              #
-            }
-          } elsif ($token->{type} == END_TAG_TOKEN) {
+        } else {
+          $self->{parse_error}-> (type => 'in table:'.$token->{tag_name});
+
+          $insert = $insert_to_foster;
+          #
+        }
+      } elsif ($token->{type} == END_TAG_TOKEN) {
             if ($token->{tag_name} eq 'tr' and
                 $self->{insertion_mode} == IN_ROW_IM) {
               ## have an element in table scope
@@ -4920,17 +4921,15 @@ sub _tree_construction_main ($) {
               ## Ignore the token
               $token = $self->_get_next_token;
               redo B;
-            } else {
-              #
-            }
-          } else {
-            die "$0: $token->{type}: Unknown token type";
-          }
+        } else {
+          $self->{parse_error}-> (type => 'in table:/'.$token->{tag_name});
 
-      $self->{parse_error}-> (type => 'in table:'.$token->{tag_name});
-
-      $insert = $insert_to_foster;
-      #
+          $insert = $insert_to_foster;
+          #
+        }
+      } else {
+        die "$0: $token->{type}: Unknown token type";
+      }
     } elsif ($self->{insertion_mode} == IN_COLUMN_GROUP_IM) {
           if ($token->{type} == CHARACTER_TOKEN) {
             if ($token->{data} =~ s/^([\x09\x0A\x0B\x0C\x20]+)//) {
@@ -5004,11 +5003,11 @@ sub _tree_construction_main ($) {
             redo B;
           }
     } elsif ($self->{insertion_mode} == IN_SELECT_IM) {
-          if ($token->{type} == CHARACTER_TOKEN) {
-            $self->{open_elements}->[-1]->[0]->manakai_append_text ($token->{data});
-            $token = $self->_get_next_token;
-            redo B;
-          } elsif ($token->{type} == START_TAG_TOKEN) {
+      if ($token->{type} == CHARACTER_TOKEN) {
+        $self->{open_elements}->[-1]->[0]->manakai_append_text ($token->{data});
+        $token = $self->_get_next_token;
+        redo B;
+      } elsif ($token->{type} == START_TAG_TOKEN) {
             if ($token->{tag_name} eq 'option') {
               if ($self->{open_elements}->[-1]->[1] eq 'option') {
                 ## As if </option>
@@ -5091,10 +5090,13 @@ sub _tree_construction_main ($) {
 
               $token = $self->_get_next_token;
               redo B;
-            } else {
-              #
-            }
-          } elsif ($token->{type} == END_TAG_TOKEN) {
+        } else {
+          $self->{parse_error}-> (type => 'in select:'.$token->{tag_name});
+          ## Ignore the token
+          $token = $self->_get_next_token;
+          redo B;
+        }
+      } elsif ($token->{type} == END_TAG_TOKEN) {
             if ($token->{tag_name} eq 'optgroup') {
               if ($self->{open_elements}->[-1]->[1] eq 'option' and
                   $self->{open_elements}->[-2]->[1] eq 'optgroup') {
@@ -5196,17 +5198,15 @@ sub _tree_construction_main ($) {
 
               ## reprocess
               redo B;
-            } else {
-              # 
-            }
-          } else {
-            #
-          }
-
-          $self->{parse_error}-> (type => 'in select:'.$token->{tag_name});
+        } else {
+          $self->{parse_error}-> (type => 'in select:/'.$token->{tag_name});
           ## Ignore the token
           $token = $self->_get_next_token;
           redo B;
+        }
+      } else {
+        die "$0: $token->{type}: Unknown token type";
+      }
     } elsif ($self->{insertion_mode} & BODY_AFTER_IMS) {
       if ($token->{type} == CHARACTER_TOKEN) {
         if ($token->{data} =~ s/^([\x09\x0A\x0B\x0C\x20]+)//) {
@@ -5917,7 +5917,7 @@ sub _tree_construction_main ($) {
         INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
           my $node = $self->{open_elements}->[$_];
           if ($node->[1] eq 'nobr') {
-            $self->{parse_error}-> (type => 'not closed:nobr');
+            $self->{parse_error}-> (type => 'in nobr:nobr');
             unshift @{$self->{token}}, $token;
             $token = {type => END_TAG_TOKEN, tag_name => 'nobr'};
             redo B;
@@ -6235,7 +6235,7 @@ sub _tree_construction_main ($) {
                 noframes => 1,
                 noscript => 0, ## TODO: 1 if scripting is enabled
                }->{$token->{tag_name}}) {
-        ## NOTE: There are two "as if in body" code clones.
+        ## NOTE: There is an "as if in body" code clone.
         $parse_rcdata->(CDATA_CONTENT_MODEL, $insert);
         redo B;
       } elsif ($token->{tag_name} eq 'select') {
@@ -6424,7 +6424,7 @@ sub _tree_construction_main ($) {
         if ($self->{open_elements}->[-1]->[1] eq $token->{tag_name}) {
           pop @{$self->{open_elements}};
         } else {
-          $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
+          $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
         }
 
         undef $self->{form_element};
@@ -6462,7 +6462,7 @@ sub _tree_construction_main ($) {
         } # INSCOPE
         
         if ($self->{open_elements}->[-1]->[1] ne $token->{tag_name}) {
-          $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
+          $self->{parse_error}-> (type => 'unmatched end tag:'.$token->{tag_name});
         }
         
         splice @{$self->{open_elements}}, $i if defined $i;
@@ -6534,6 +6534,7 @@ sub _tree_construction_main ($) {
         
             ## Step 2
             if ($token->{tag_name} ne $self->{open_elements}->[-1]->[1]) {
+              ## NOTE: <x><y></x>
               $self->{parse_error}-> (type => 'not closed:'.$self->{open_elements}->[-1]->[1]);
             }
             
@@ -6837,4 +6838,4 @@ sub get_inner_html ($$$) {
 } # get_inner_html
 
 1;
-# $Date: 2007/08/11 08:08:12 $
+# $Date: 2007/09/04 11:19:07 $
