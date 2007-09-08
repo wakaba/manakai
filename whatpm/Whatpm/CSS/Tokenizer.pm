@@ -803,13 +803,13 @@ sub get_next_token ($) {
               URI_PREFIX_TOKEN, URI_PREFIX_INVALID_TOKEN,
               URI_PREFIX_INVALID_TOKEN, URI_PREFIX_INVALID_TOKEN,
           }->{$self->{t}->{type}};
-          $self->{t}->{value} .= "\x0D\x0A";
-          $self->{state} = URI_UNQUOTED_STATE;
+          $self->{t}->{value} .= "\x0D";
+          $self->{state} = ESCAPE_BEFORE_LF_STATE;
           $self->{c} = $self->{get_char}->();
           redo A;
         } else {
           ## Note: In |nl| in ... in |string| or |ident|.
-          $self->{t}->{value} .= "\x0D\x0A";
+          $self->{t}->{value} .= "\x0D";
           $self->{state} = ESCAPE_BEFORE_LF_STATE;
           $self->{c} = $self->{get_char}->();
           redo A;
@@ -840,10 +840,21 @@ sub get_next_token ($) {
           return {type => DELIM_TOKEN, value => '\\'};
           #redo A;
         }
-      } else {
-        $self->{state} = $q == 1 ? URI_UNQUOTED_STATE : STRING_STATE;
+      } elsif ($q == 1) {
+        $self->{state} = URI_UNQUOTED_STATE;
         $self->{c} = $self->{get_char}->();
         redo A;
+      } else {
+        unshift @{$self->{token}}, {type => DELIM_TOKEN, value => '\\'};
+        $self->{t}->{type} = {
+          STRING_TOKEN, INVALID_TOKEN,
+          URI_TOKEN, URI_INVALID_TOKEN,
+          URI_PREFIX_TOKEN, URI_PREFIX_INVALID_TOKEN,
+        }->{$self->{t}->{type}} || $self->{t}->{type};
+        $self->{state} = BEFORE_TOKEN_STATE;
+        # reprocess
+        return $self->{t};
+        #redo A;
       }
     } elsif ($self->{state} == ESCAPE_STATE) {
       ## NOTE: third..seventh character of |unicode| in |escape|.
@@ -907,16 +918,15 @@ sub get_next_token ($) {
     } elsif ($self->{state} == ESCAPE_BEFORE_LF_STATE) {
       ## NOTE: |\n| in |\r\n| in |unicode| in |escape|.
       if ($self->{c} == 0x000A) { # \n
-        $self->{t}->{value} .= chr $char;
+        $self->{t}->{value} .= chr $self->{c};
         $self->{state} = $q == 0 ? NAME_STATE :
             $q == 1 ? URI_UNQUOTED_STATE : STRING_STATE;
         $self->{c} = $self->{get_char}->();
         redo A;
       } else {
-        $self->{t}->{value} .= chr $char;
         $self->{state} = $q == 0 ? NAME_STATE :
             $q == 1 ? URI_UNQUOTED_STATE : STRING_STATE;
-        # reconsume
+        # reprocess
         redo A;
       }
     } elsif ($self->{state} == STRING_STATE) {
@@ -1022,4 +1032,4 @@ sub get_next_token ($) {
 } # get_next_token
 
 1;
-# $Date: 2007/09/08 10:21:04 $
+# $Date: 2007/09/08 11:09:41 $
