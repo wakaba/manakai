@@ -1,8 +1,74 @@
 package Whatpm::CSS::Tokenizer;
 use strict;
 
+sub BEFORE_TOKEN_STATE () { 0 }
+sub BEFORE_NMSTART_STATE () { 1 }
+sub NAME_STATE () { 2 }
+sub ESCAPE_OPEN_STATE () { 3 }
+sub STRING_STATE () { 4 }
+sub HASH_OPEN_STATE () { 5 }
+sub NUMBER_STATE () { 6 }
+sub NUMBER_FRACTION_STATE () { 7 }
+sub AFTER_NUMBER_STATE () { 8 }
+sub URI_BEFORE_WSP_STATE () { 9 }
+sub ESCAPE_STATE () { 10 }
+sub ESCAPE_BEFORE_LF_STATE () { 11 }
+sub ESCAPE_BEFORE_NL_STATE () { 12 }
+sub NUMBER_DOT_STATE () { 13 }
+sub NUMBER_DOT_NUMBER_STATE () { 14 }
+sub DELIM_STATE () { 15 }
+
+sub IDENT_TOKEN () { 1 }
+sub ATKEYWORD_TOKEN () { 2 }
+sub HASH_TOKEN () { 3 }
+sub FUNCTION_TOKEN () { 4 }
+sub URI_TOKEN () { 5 }
+sub URI_INVALID_TOKEN () { 6 }
+sub URI_PREFIX_TOKEN () { 7 }
+sub URI_PREFIX_INVALID_TOKEN () { 8 }
+sub STRING_TOKEN () { 9 }
+sub INVALID_TOKEN () { 10 }
+sub NUMBER_TOKEN () { 11 }
+sub DIMENSION_TOKEN () { 12 }
+sub PERCENTAGE_TOKEN () { 13 }
+sub UNICODE_RANGE_TOKEN () { 14 }
+sub UNICODE_RANGE_INVALID_TOKEN () { 15 }
+sub DELIM_TOKEN () { 16 }
+sub PLUS_TOKEN () { 17 }
+sub GREATER_TOKEN () { 18 }
+sub COMMA_TOKEN () { 19 }
+sub TILDE_TOKEN () { 20 }
+sub DASHMATCH_TOKEN () { 21 }
+sub PREFIXMATCH_TOKEN () { 22 }
+sub SUFFIXMATCH_TOKEN () { 23 }
+sub SUBSTRINGMATCH_TOKEN () { 24 }
+sub INCLUDES_TOKEN () { 25 }
+sub SEMICOLON_TOKEN () { 26 }
+sub LBRACE_TOKEN () { 27 }
+sub RBRACE_TOKEN () { 28 }
+sub LPAREN_TOKEN () { 29 }
+sub RPAREN_TOKEN () { 30 }
+sub LBRACKET_TOKEN () { 31 }
+sub RBRACKET_TOKEN () { 32 }
+sub S_TOKEN () { 33 }
+sub CDO_TOKEN () { 34 }
+sub CDC_TOKEN () { 35 }
+sub COMMENT_TOKEN () { 36 }
+sub COMMENT_INVALID_TOKEN () { 37 }
+sub EOF_TOKEN () { 38 }
+
+our @TokenName = qw(
+  0 IDENT ATKWTWORD HASH FUNCTION URI URI_INVALID URI_PREFIX URI_PREFIX_INVALID
+  STRING INVALID NUMBER DIMENSION PERCENTAGE UNICODE_RANGE
+  UNICODE_RANGE_INVALID DELIM PLUS GREATER COMMA TILDE DASHMATCH
+  PREFIXMATCH SUFFIXMATCH SUBSTRINGMATCH INCLUDES SEMICOLON
+  LBRACE RBRACE LPAREN RPAREN LBRACKET RBRACKET S CDO CDC COMMENT
+  COMMENT_INVALID EOF
+);
+
 sub new ($) {
-  my $self = bless {token => []}, shift;
+  my $self = bless {token => [], get_char => sub { -1 },
+                    onerror => sub { }}, shift;
   return $self;
 } # new
 
@@ -32,12 +98,12 @@ sub get_next_token ($) {
         $self->{state} = BEFORE_NMSTART_STATE;
         $self->{c} = $self->{get_char}->();
         redo A;
-      } elsif ((0x0041 <= $self->{c} or $self->{c} <= 0x005A) or # A..Z
-               (0x0061 <= $self->{c} or $self->{c} <= 0x007A) or # a..z
+      } elsif ((0x0041 <= $self->{c} and $self->{c} <= 0x005A) or # A..Z
+               (0x0061 <= $self->{c} and $self->{c} <= 0x007A) or # a..z
                $self->{c} == 0x005F or # _
                $self->{c} > 0x007F) { # nonascii
         ## NOTE: |nmstart| in |ident| in |IDENT|
-        $current_token = {type => IDENT_TOKEN, value => chr $self->{char}};
+        $current_token = {type => IDENT_TOKEN, value => chr $self->{c}};
         $self->{state} = NAME_STATE;
         $self->{c} = $self->{get_char}->();
         redo A;
@@ -81,7 +147,7 @@ sub get_next_token ($) {
         redo A;
       } elsif ($self->{c} == 0x002E) { # .
         ## NOTE: |num|.
-        $current_token = {type => NUMBER_TOKEN, value => '.'};
+        $current_token = {type => NUMBER_TOKEN, value => '0'};
         $self->{state} = NUMBER_FRACTION_STATE;
         $self->{c} = $self->{get_char}->();
         redo A;
@@ -119,18 +185,18 @@ sub get_next_token ($) {
           return {type => DELIM_TOKEN, value => '<'};
           #redo A;
         }
-      } elsif ({
-                0x003B => 1, # ;
-                0x007B => 1, # {
-                0x007D => 1, # }
-                0x0028 => 1, # (
-                0x0029 => 1, # )
-                0x005B => 1, # [
-                0x005D => 1, # ]
+      } elsif (my $t = {
+                0x003B => SEMICOLON_TOKEN, # ;
+                0x007B => LBRACE_TOKEN, # {
+                0x007D => RBRACE_TOKEN, # }
+                0x0028 => LPAREN_TOKEN, # (
+                0x0029 => RPAREN_TOKEN, # )
+                0x005B => LBRACKET_TOKEN, # [
+                0x005D => RBRACKET_TOKEN, # ]
                }->{$self->{c}}) {
         # stay in the state
         $self->{c} = $self->{get_char}->();
-        return {type => chr $self->{c}};
+        return {type => $t};
         # redo A;
       } elsif ({
                 0x0020 => 1, # SP
@@ -172,6 +238,7 @@ sub get_next_token ($) {
                         0x0024 => SUFFIXMATCH_TOKEN, # $
                         0x002A => SUBSTRINGMATCH_TOKEN, # *
                        }->{$self->{c}}) {
+        my $c = $self->{c};
         $self->{c} = $self->{get_char}->();
         if ($self->{c} == 0x003D) { # =
           # stay in the state
@@ -181,7 +248,7 @@ sub get_next_token ($) {
         } else {
           # stay in the state
           # reprocess
-          return {type => DELIM_TOKEN, value => chr $self->{c}};
+          return {type => DELIM_TOKEN, value => chr $c};
           #redo A;
         }
       } elsif ($self->{c} == 0x002B) { # +
@@ -225,16 +292,19 @@ sub get_next_token ($) {
         #redo A;
       }
     } elsif ($self->{state} == BEFORE_NMSTART_STATE) {
-      ## NOTE: |nmstart| in |ident| in (|IDENT| or |ATKEYWORD|)
-      if ((0x0041 <= $self->{c} or $self->{c} <= 0x005A) or # A..Z
-          (0x0061 <= $self->{c} or $self->{c} <= 0x007A) or # a..z
+      ## NOTE: |nmstart| in |ident| in (|IDENT|, |DIMENSION|, or |ATKEYWORD|)
+      if ((0x0041 <= $self->{c} and $self->{c} <= 0x005A) or # A..Z
+          (0x0061 <= $self->{c} and $self->{c} <= 0x007A) or # a..z
           $self->{c} == 0x005F or # _
           $self->{c} > 0x007F) { # nonascii
-        $current_token->{value} .= chr $self->{char};
+        $current_token->{value} .= chr $self->{c};
+        $current_token->{type} = DIMENSION_TOKEN
+            if $current_token->{type} == NUMBER_TOKEN;
         $self->{state} = NAME_STATE;
         $self->{c} = $self->{get_char}->();
         redo A;
       } elsif ($self->{c} == 0x005C) { # \
+## TODO: 12-\X, 12-\{nl}
         $self->{state} = ESCAPE_OPEN_STATE; $q = 0;
         $self->{c} = $self->{get_char}->();
         redo A;
@@ -267,6 +337,14 @@ sub get_next_token ($) {
           $self->{state} = BEFORE_TOKEN_STATE;
           $self->{c} = $self->{get_char}->();
           return $current_token;
+        } elsif ($current_token->{type} == NUMBER_TOKEN) {
+          ## NOTE: |-| after |NUMBER|.
+          unshift @{$self->{token}}, {type => DELIM_TOKEN, value => '-'};
+          $self->{state} = BEFORE_TOKEN_STATE;
+          # reconsume
+          $current_token->{value} = $current_token->{number};
+          delete $current_token->{number};
+          return $current_token;
         } else {
           ## NOTE: |-| not followed by |nmstart|.
           $self->{state} = BEFORE_TOKEN_STATE;
@@ -281,12 +359,13 @@ sub get_next_token ($) {
         $self->{state} = BEFORE_NMSTART_STATE;
         $self->{c} = $self->{get_char}->();
         redo A;
-      } elsif ((0x0041 <= $self->{c} or $self->{c} <= 0x005A) or # A..Z
-               (0x0061 <= $self->{c} or $self->{c} <= 0x007A) or # a..z
+      } elsif ((0x0041 <= $self->{c} and $self->{c} <= 0x005A) or # A..Z
+               (0x0061 <= $self->{c} and $self->{c} <= 0x007A) or # a..z
                $self->{c} == 0x005F or # _
                $self->{c} > 0x007F) { # nonascii
         ## NOTE: |nmstart| in |ident|.
-        $current_token->{value} = chr $self->{char};
+        $current_token->{value} = chr $self->{c};
+        $current_token->{type} = DIMENSION_TOKEN;
         $self->{state} = NAME_STATE;
         $self->{c} = $self->{get_char}->();
         redo A;
@@ -310,13 +389,13 @@ sub get_next_token ($) {
       }
     } elsif ($self->{state} == HASH_OPEN_STATE) {
       ## NOTE: The first |nmchar| in |name| in |HASH|.
-      if ((0x0041 <= $self->{c} or $self->{c} <= 0x005A) or # A..Z
-          (0x0061 <= $self->{c} or $self->{c} <= 0x007A) or # a..z
-          (0x0030 <= $self->{c} or $self->{c} <= 0x0039) or # 0..9
+      if ((0x0041 <= $self->{c} and $self->{c} <= 0x005A) or # A..Z
+          (0x0061 <= $self->{c} and $self->{c} <= 0x007A) or # a..z
+          (0x0030 <= $self->{c} and $self->{c} <= 0x0039) or # 0..9
           $self->{c} == 0x002D or # -
           $self->{c} == 0x005F or # _
           $self->{c} > 0x007F) { # nonascii
-        $current_token->{value} .= chr $self->{char};
+        $current_token->{value} .= chr $self->{c};
         $self->{state} = NAME_STATE;
         $self->{c} = $self->{get_char}->();
         redo A;
@@ -332,13 +411,13 @@ sub get_next_token ($) {
       }
     } elsif ($self->{state} == NAME_STATE) {
       ## NOTE: |nmchar| in (|ident| or |name|).
-      if ((0x0041 <= $self->{c} or $self->{c} <= 0x005A) or # A..Z
-          (0x0061 <= $self->{c} or $self->{c} <= 0x007A) or # a..z
-          (0x0030 <= $self->{c} or $self->{c} <= 0x0039) or # 0..9
+      if ((0x0041 <= $self->{c} and $self->{c} <= 0x005A) or # A..Z
+          (0x0061 <= $self->{c} and $self->{c} <= 0x007A) or # a..z
+          (0x0030 <= $self->{c} and $self->{c} <= 0x0039) or # 0..9
           $self->{c} == 0x005F or # _
           $self->{c} == 0x002D or # -
           $self->{c} > 0x007F) { # nonascii
-        $current_token->{value} .= chr $self->{char};
+        $current_token->{value} .= chr $self->{c};
         # stay in the state
         $self->{c} = $self->{get_char}->();
         redo A;
@@ -392,7 +471,7 @@ sub get_next_token ($) {
         $self->{state} = ESCAPE_STATE; $i = 2;
         $self->{c} = $self->{get_char}->();
         redo A;
-      } elsif (0x0061 <= $self->{c} or $self->{c} <= 0x0066) { # a..f
+      } elsif (0x0061 <= $self->{c} and $self->{c} <= 0x0066) { # a..f
         ## NOTE: second character of |unicode| in |escape|.
         $char = $self->{c} - 0x0061 - 0xA;
         $self->{state} = ESCAPE_STATE; $i = 2;
@@ -448,7 +527,7 @@ sub get_next_token ($) {
         $self->{state} = ++$i == 7 ? ESCAPE_BEFORE_NL_STATE : ESCAPE_STATE;
         $self->{c} = $self->{get_char}->();
         redo A;
-      } elsif (0x0061 <= $self->{c} or $self->{c} <= 0x0066) { # a..f
+      } elsif (0x0061 <= $self->{c} and $self->{c} <= 0x0066) { # a..f
         $char = $char * 0x10 + $self->{c} - 0x0061 - 0xA;
         $self->{state} = ++$i == 7 ? ESCAPE_BEFORE_NL_STATE : ESCAPE_STATE;
         $self->{c} = $self->{get_char}->();
@@ -544,24 +623,23 @@ sub get_next_token ($) {
         $self->{c} = $self->{get_char}->();
         redo A;
       } else {
-        $self->{number} = $self->{value};
-        $self->{value} = '';
+        $current_token->{number} = $current_token->{value};
+        $current_token->{value} = '';
         $self->{state} = AFTER_NUMBER_STATE;
         # reprocess
-        return $current_token;
-        #redo A;
+        redo A;
       }
     } elsif ($self->{state} == NUMBER_DOT_STATE) {
       ## NOTE: The character immediately following |.| in |num|.
       if (0x0030 <= $self->{c} and $self->{c} <= 0x0039) {
-        $current_token->{value} .= chr $self->{c};
+        $current_token->{value} .= '.' . chr $self->{c};
         $self->{state} = NUMBER_DOT_NUMBER_STATE;
         $self->{c} = $self->{get_char}->();
         redo A;
       } else {
         unshift @{$self->{token}}, {type => DELIM_STATE, value => '.'};
-        $self->{number} = $self->{value};
-        $self->{value} = '';
+        $current_token->{number} = $current_token->{value};
+        $current_token->{value} = '';
         $self->{state} = BEFORE_TOKEN_STATE;
         # reprocess
         return $current_token;
@@ -570,7 +648,7 @@ sub get_next_token ($) {
     } elsif ($self->{state} == NUMBER_FRACTION_STATE) {
       ## NOTE: The character immediately following |.| at the beginning of |num|.
       if (0x0030 <= $self->{c} and $self->{c} <= 0x0039) {
-        $current_token->{value} .= chr $self->{c};
+        $current_token->{value} .= '.' . chr $self->{c};
         $self->{state} = NUMBER_DOT_NUMBER_STATE;
         $self->{c} = $self->{get_char}->();
         redo A;
@@ -588,12 +666,11 @@ sub get_next_token ($) {
         $self->{c} = $self->{get_char}->();
         redo A;
       } else {
-        $self->{number} = $self->{value};
-        $self->{value} = '';
+        $current_token->{number} = $current_token->{value};
+        $current_token->{value} = '';
         $self->{state} = AFTER_NUMBER_STATE;
         # reprocess
-        return $current_token;
-        #redo A;
+        redo A;
       }
     } else {
       die "$0: Unknown state |$self->{state}|";
@@ -605,4 +682,4 @@ sub get_next_token ($) {
 } # get_next_token
 
 1;
-# $Date: 2007/08/17 11:53:52 $
+# $Date: 2007/09/08 01:31:44 $
