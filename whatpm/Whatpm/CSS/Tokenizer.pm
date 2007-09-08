@@ -151,6 +151,41 @@ sub get_next_token ($) {
         $self->{state} = NUMBER_FRACTION_STATE;
         $self->{c} = $self->{get_char}->();
         redo A;
+      } elsif ($self->{c} == 0x002F) { # /
+        $self->{c} = $self->{get_char}->();
+        if ($self->{c} == 0x002A) { # *
+          C: {
+            $self->{c} = $self->{get_char}->();
+            if ($self->{c} == 0x002A) { # *
+              D: {
+                $self->{c} = $self->{get_char}->();
+                if ($self->{c} == 0x002F) { # /
+                  #
+                } elsif ($self->{c} == 0x002A) { # *
+                  redo D;
+                } else {
+                  redo C;
+                }
+              } # D
+            } elsif ($self->{c} == -1) {
+              # stay in the state
+              # reprocess
+              return {type => COMMENT_INVALID_TOKEN};
+              #redo A;
+            } else {
+              redo C;
+            }
+          } # C
+
+          # stay in the state.
+          $self->{c} = $self->{get_char}->();
+          redo A;
+        } else {
+          # stay in the state.
+          # reprocess
+          return {type => DELIM_STATE, value => '/'};
+          #redo A;
+        }         
       } elsif ($self->{c} == 0x003C) { # <
         ## NOTE: |CDO|
         $self->{c} = $self->{get_char}->();
@@ -376,9 +411,10 @@ sub get_next_token ($) {
       } elsif ($self->{c} == 0x002D) { # -
         $self->{c} = $self->{get_char}->();
         if ($self->{c} == 0x003E) { # >
+          unshift @{$self->{token}}, {type => CDC_TOKEN};
           $self->{state} = BEFORE_TOKEN_STATE;
           $self->{c} = $self->{get_char}->();
-          return {type => CDC_TOKEN};
+          return {type => DELIM_TOKEN, value => '@'};
           #redo A;
         } else {
           unshift @{$self->{token}}, {type => DELIM_TOKEN, value => '-'};
@@ -907,4 +943,4 @@ sub get_next_token ($) {
 } # get_next_token
 
 1;
-# $Date: 2007/09/08 02:40:47 $
+# $Date: 2007/09/08 02:58:24 $
