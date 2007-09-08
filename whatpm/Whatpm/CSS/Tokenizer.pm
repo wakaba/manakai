@@ -251,7 +251,7 @@ sub get_next_token ($) {
         } else {
           # stay in the state.
           # reprocess
-          return {type => DELIM_STATE, value => '/'};
+          return {type => DELIM_TOKEN, value => '/'};
           #redo A;
         }         
       } elsif ($self->{c} == 0x003C) { # <
@@ -259,9 +259,9 @@ sub get_next_token ($) {
         $self->{c} = $self->{get_char}->();
         if ($self->{c} == 0x0021) { # !
           $self->{c} = $self->{get_char}->();
-          if ($self->{c} == 0x002C) { # -
+          if ($self->{c} == 0x002D) { # -
             $self->{c} = $self->{get_char}->();
-            if ($self->{c} == 0x002C) { # -
+            if ($self->{c} == 0x002D) { # -
               $self->{state} = BEFORE_TOKEN_STATE;
               $self->{c} = $self->{get_char}->();
               return {type => CDO_TOKEN};
@@ -556,7 +556,7 @@ sub get_next_token ($) {
         redo A;
       } else {
         $self->{state} = BEFORE_TOKEN_STATE;
-        $self->{c} = $self->{get_char}->();
+        # reprocess
         return {type => DELIM_TOKEN, value => '#'};
         #redo A;
       }
@@ -990,7 +990,7 @@ sub get_next_token ($) {
         $self->{c} = $self->{get_char}->();
         redo A;
       } else {
-        unshift @{$self->{token}}, {type => DELIM_STATE, value => '.'};
+        unshift @{$self->{token}}, {type => DELIM_TOKEN, value => '.'};
         $self->{t}->{number} = $self->{t}->{value};
         $self->{t}->{value} = '';
         $self->{state} = BEFORE_TOKEN_STATE;
@@ -1007,7 +1007,7 @@ sub get_next_token ($) {
         redo A;
       } else {
         $self->{state} = BEFORE_TOKEN_STATE;
-        $self->{c} = $self->{get_char}->();
+        # reprocess
         return {type => DELIM_TOKEN, value => '.'};
         #redo A;
       }
@@ -1032,4 +1032,4 @@ sub get_next_token ($) {
 } # get_next_token
 
 1;
-# $Date: 2007/09/08 11:09:41 $
+# $Date: 2007/09/08 11:44:32 $

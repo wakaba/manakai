@@ -665,5 +665,181 @@
 
   {"description": "#\\a b",
   "input": "#\\a b",
-  "output": [["HASH", "\u000ab"]]}
+  "output": [["HASH", "\u000ab"]]},
+
+  {"description": "#!",
+  "input": "#!",
+  "output": [["DELIM", "#"], ["DELIM", "!"]]},
+
+  {"description": "#-",
+  "input": "#-",
+  "output": [["HASH", "-"]]},
+
+  {"description": "#--",
+  "input": "#--",
+  "output": [["HASH", "--"]]},
+
+  {"description": "#-->",
+  "input": "#-->",
+  "output": [["HASH", "--"], ["GREATER"]]},
+
+  {"description": "0",
+  "input": "0",
+  "output": [["NUMBER", "0"]]},
+
+  {"description": "1",
+  "input": "1",
+  "output": [["NUMBER", "1"]]},
+
+  {"description": "111",
+  "input": "111",
+  "output": [["NUMBER", "111"]]},
+
+  {"description": "0001",
+  "input": "0001",
+  "output": [["NUMBER", "0001"]]},
+
+  {"description": "1e",
+  "input": "1e",
+  "output": [["DIMENSION", "1", "e"]]},
+
+  {"description": "1e4",
+  "input": "1e4",
+  "output": [["DIMENSION", "1", "e4"]]},
+
+  {"description": "1n+2",
+  "input": "1n+2",
+  "output": [["DIMENSION", "1", "n"], ["PLUS"], ["NUMBER", "2"]]},
+
+  {"description": "0.",
+  "input": "0.",
+  "output": [["NUMBER", "0"], ["DELIM", "."]]},
+
+  {"description": "1.",
+  "input": "1.",
+  "output": [["NUMBER", "1"], ["DELIM", "."]]},
+
+  {"description": "144.",
+  "input": "144.",
+  "output": [["NUMBER", "144"], ["DELIM", "."]]},
+
+  {"description": "0.1",
+  "input": "0.1",
+  "output": [["NUMBER", "0.1"]]},
+
+  {"description": "1.1",
+  "input": "1.1",
+  "output": [["NUMBER", "1.1"]]},
+
+  {"description": "0.1000",
+  "input": "0.1000",
+  "output": [["NUMBER", "0.1000"]]},
+
+  {"description": "0.0001",
+  "input": "0.0001",
+  "output": [["NUMBER", "0.0001"]]},
+
+  {"description": ".",
+  "input": ".",
+  "output": [["DELIM", "."]]},
+
+  {"description": ".1",
+  "input": ".1",
+  "output": [["NUMBER", "0.1"]]},
+
+  {"description": ".0",
+  "input": ".0",
+  "output": [["NUMBER", "0.0"]]},
+
+  {"description": ".1234",
+  "input": ".1234",
+  "output": [["NUMBER", "0.1234"]]},
+
+  {"description": ".1ab",
+  "input": ".1ab",
+  "output": [["DIMENSION", "0.1", "ab"]]},
+
+  {"description": ".1.2",
+  "input": ".1.2",
+  "output": [["NUMBER", "0.1"], ["NUMBER", "0.2"]]},
+
+  {"description": ".a",
+  "input": ".a",
+  "output": [["DELIM", "."], ["IDENT", "a"]]},
+
+  {"description": "3.11.66",
+  "input": "3.11.66",
+  "output": [["NUMBER", "3.11"], ["NUMBER", "0.66"]]},
+
+  {"description": "..",
+  "input": "..",
+  "output": [["DELIM", "."], ["DELIM", "."]]},
+
+  {"description": "...",
+  "input": "...",
+  "output": [["DELIM", "."], ["DELIM", "."], ["DELIM", "."]]},
+
+  {"description": "...1",
+  "input": "...1",
+  "output": [["DELIM", "."], ["DELIM", "."], ["NUMBER", "0.1"]]},
+
+  {"description": "...a",
+  "input": "...a",
+  "output": [["DELIM", "."], ["DELIM", "."], ["DELIM", "."], ["IDENT", "a"]]},
+
+  {"description": "+0",
+  "input": "+0",
+  "output": [["PLUS"], ["NUMBER", "0"]]},
+
+  {"description": "+1",
+  "input": "+1",
+  "output": [["PLUS"], ["NUMBER", "1"]]},
+
+  {"description": "+1.15",
+  "input": "+1.15",
+  "output": [["PLUS"], ["NUMBER", "1.15"]]},
+
+  {"description": "-.55",
+  "input": "-.55",
+  "output": [["DELIM", "-"], ["NUMBER", "0.55"]]},
+
+  {"description": "-0",
+  "input": "-0",
+  "output": [["DELIM", "-"], ["NUMBER", "0"]]},
+
+  {"description": "-0.2",
+  "input": "-0.2",
+  "output": [["DELIM", "-"], ["NUMBER", "0.2"]]},
+
+  {"description": "-.1",
+  "input": "-.1",
+  "output": [["DELIM", "-"], ["NUMBER", "0.1"]]},
+
+  {"description": "+-0",
+  "input": "+-0",
+  "output": [["PLUS"], ["DELIM", "-"], ["NUMBER", "0"]]},
+
+  {"description": "a-0",
+  "input": "a-0",
+  "output": [["IDENT", "a-0"]]},
+
+  {"description": "@a-0",
+  "input": "@a-0",
+  "output": [["ATKEYWORD", "a-0"]]},
+
+  {"description": "#a-0",
+  "input": "#a-0",
+  "output": [["HASH", "a-0"]]},
+
+  {"description": "<!-0",
+  "input": "<!-0",
+  "output": [["DELIM", "<"], ["DELIM", "!"], ["DELIM", "-"], ["NUMBER", "0"]]},
+
+  {"description": "<!--0",
+  "input": "<!--0",
+  "output": [["CDO"], ["NUMBER", "0"]]},
+
+  {"description": "<!---0",
+  "input": "<!---0",
+  "output": [["CDO"], ["DELIM", "-"], ["NUMBER", "0"]]}
 ]}
