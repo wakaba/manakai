@@ -80,6 +80,7 @@ sub init ($) {
   my $self = shift;
   $self->{state} = BEFORE_TOKEN_STATE;
   $self->{c} = $self->{get_char}->();
+  #$self->{t} = {type => token-type, value => value, number => number};
 } # init
 
 sub get_next_token ($) {
@@ -88,7 +89,6 @@ sub get_next_token ($) {
     return shift @{$self->{token}};
   }
 
-  my $current_token;
   my $char;
   my $num; # |{num}|, if any.
   my $i; # |$i + 1|th character in |unicode| in |escape|.
@@ -103,51 +103,120 @@ sub get_next_token ($) {
     if ($self->{state} == BEFORE_TOKEN_STATE) {
       if ($self->{c} == 0x002D) { # -
         ## NOTE: |-| in |ident| in |IDENT|
-        $current_token = {type => IDENT_TOKEN, value => '-'};
+        $self->{t} = {type => IDENT_TOKEN, value => '-'};
         $self->{state} = BEFORE_NMSTART_STATE;
         $self->{c} = $self->{get_char}->();
         redo A;
+      } elsif ($self->{c} == 0x0055 or $self->{c} == 0x0075) { # U or u
+        $self->{t} = {type => IDENT_TOKEN, value => chr $self->{c}};
+        $self->{c} = $self->{get_char}->();
+        if ($self->{c} == 0x002B) { # +
+          $self->{c} = $self->{get_char}->();
+          if ((0x0030 <= $self->{c} and $self->{c} <= 0x0039) or # 0..9
+              (0x0041 <= $self->{c} and $self->{c} <= 0x0046) or # A..F
+              (0x0061 <= $self->{c} and $self->{c} <= 0x0066) or # a..f
+              $self->{c} == 0x003F) { # ?
+            $self->{t}->{value} .= '+' . chr $self->{c};
+            $self->{t}->{type} = UNICODE_RANGE_TOKEN;
+            $self->{c} = $self->{get_char}->();
+            C: for (2..6) {
+              if ((0x0030 <= $self->{c} and $self->{c} <= 0x0039) or # 0..9
+                  (0x0041 <= $self->{c} and $self->{c} <= 0x0046) or # A..F
+                  (0x0061 <= $self->{c} and $self->{c} <= 0x0066) or # a..f
+                  $self->{c} == 0x003F) { # ?
+                $self->{t}->{value} .= chr $self->{c};
+                $self->{c} = $self->{get_char}->();
+              } else {
+                last C;
+              }
+            } # C
+
+            if ($self->{c} == 0x002D) { # -
+              $self->{c} = $self->{get_char}->();
+              if ((0x0030 <= $self->{c} and $self->{c} <= 0x0039) or # 0..9
+                  (0x0041 <= $self->{c} and $self->{c} <= 0x0046) or # A..F
+                  (0x0061 <= $self->{c} and $self->{c} <= 0x0066)) { # a..f
+                $self->{t}->{value} .= '-' . chr $self->{c};
+                $self->{c} = $self->{get_char}->();
+                C: for (2..6) {
+                  if ((0x0030 <= $self->{c} and $self->{c} <= 0x0039) or # 0..9
+                      (0x0041 <= $self->{c} and $self->{c} <= 0x0046) or # A..F
+                      (0x0061 <= $self->{c} and $self->{c} <= 0x0066)) { # a..f
+                    $self->{t}->{value} .= chr $self->{c};
+                    $self->{c} = $self->{get_char}->();
+                  } else {
+                    last C;
+                  }
+                } # C
+                
+                #
+              } else {
+                my $token = $self->{t};
+                $self->{t} = {type => IDENT_TOKEN, value => '-'};
+                $self->{state} = BEFORE_NMSTART_STATE;
+                # reprocess
+                return $token;
+                #redo A;
+              }
+            }
+
+            $self->{state} = BEFORE_TOKEN_STATE;
+            # reprocess
+            return $self->{t};
+            #redo A;
+          } else {
+            unshift @{$self->{token}}, {type => PLUS_TOKEN};
+            $self->{state} = BEFORE_TOKEN_STATE;
+            # reprocess
+            return $self->{t};
+            #redo A;
+          }
+        } else {
+          $self->{state} = NAME_STATE;
+          # reprocess
+          redo A;
+        }
       } elsif ((0x0041 <= $self->{c} and $self->{c} <= 0x005A) or # A..Z
                (0x0061 <= $self->{c} and $self->{c} <= 0x007A) or # a..z
                $self->{c} == 0x005F or # _
                $self->{c} > 0x007F) { # nonascii
         ## NOTE: |nmstart| in |ident| in |IDENT|
-        $current_token = {type => IDENT_TOKEN, value => chr $self->{c}};
+        $self->{t} = {type => IDENT_TOKEN, value => chr $self->{c}};
         $self->{state} = NAME_STATE;
         $self->{c} = $self->{get_char}->();
         redo A;
       } elsif ($self->{c} == 0x005C) { # \
         ## NOTE: |nmstart| in |ident| in |IDENT|
-        $current_token = {type => IDENT_TOKEN, value => ''};
+        $self->{t} = {type => IDENT_TOKEN, value => ''};
         $self->{state} = ESCAPE_OPEN_STATE; $q = 0;
         $self->{c} = $self->{get_char}->();
         redo A;
       } elsif ($self->{c} == 0x0040) { # @
         ## NOTE: |@| in |ATKEYWORD|
-        $current_token = {type => ATKEYWORD_TOKEN, value => ''};
+        $self->{t} = {type => ATKEYWORD_TOKEN, value => ''};
         $self->{state} = AFTER_AT_STATE;
         $self->{c} = $self->{get_char}->();
         redo A;
       } elsif ($self->{c} == 0x0022 or $self->{c} == 0x0027) { # " or '
-        $current_token = {type => STRING_TOKEN, value => ''};
+        $self->{t} = {type => STRING_TOKEN, value => ''};
         $self->{state} = STRING_STATE; $q = $self->{c};
         $self->{c} = $self->{get_char}->();
         redo A;
       } elsif ($self->{c} == 0x0023) { # #
         ## NOTE: |#| in |HASH|.
-        $current_token = {type => HASH_TOKEN, value => ''};
+        $self->{t} = {type => HASH_TOKEN, value => ''};
         $self->{state} = HASH_OPEN_STATE;
         $self->{c} = $self->{get_char}->();
         redo A;
       } elsif (0x0030 <= $self->{c} and $self->{c} <= 0x0039) { # 0..9
         ## NOTE: |num|.
-        $current_token = {type => NUMBER_TOKEN, value => chr $self->{c}};
+        $self->{t} = {type => NUMBER_TOKEN, value => chr $self->{c}};
         $self->{state} = NUMBER_STATE;
         $self->{c} = $self->{get_char}->();
         redo A;
       } elsif ($self->{c} == 0x002E) { # .
         ## NOTE: |num|.
-        $current_token = {type => NUMBER_TOKEN, value => '0'};
+        $self->{t} = {type => NUMBER_TOKEN, value => '0'};
         $self->{state} = NUMBER_FRACTION_STATE;
         $self->{c} = $self->{get_char}->();
         redo A;
@@ -201,7 +270,7 @@ sub get_next_token ($) {
             } else {
               unshift @{$self->{token}}, {type => DELIM_TOKEN, value => '!'};
               ## NOTE: |-| in |ident| in |IDENT|
-              $current_token = {type => IDENT_TOKEN, value => '-'};
+              $self->{t} = {type => IDENT_TOKEN, value => '-'};
               $self->{state} = BEFORE_NMSTART_STATE;
               #reprocess
               return {type => DELIM_TOKEN, value => '<'};
@@ -321,9 +390,9 @@ sub get_next_token ($) {
         #redo A;
       } else {
         # stay in the state
-        $current_token = {type => DELIM_TOKEN, value => chr $self->{c}};
+        $self->{t} = {type => DELIM_TOKEN, value => chr $self->{c}};
         $self->{c} = $self->{get_char}->();
-        return $current_token;
+        return $self->{t};
         #redo A;
       }
     } elsif ($self->{state} == BEFORE_NMSTART_STATE) {
@@ -333,9 +402,9 @@ sub get_next_token ($) {
           (0x0061 <= $self->{c} and $self->{c} <= 0x007A) or # a..z
           $self->{c} == 0x005F or # _
           $self->{c} > 0x007F) { # nonascii
-        $current_token->{value} .= chr $self->{c};
-        $current_token->{type} = DIMENSION_TOKEN
-            if $current_token->{type} == NUMBER_TOKEN;
+        $self->{t}->{value} .= chr $self->{c};
+        $self->{t}->{type} = DIMENSION_TOKEN
+            if $self->{t}->{type} == NUMBER_TOKEN;
         $self->{state} = NAME_STATE;
         $self->{c} = $self->{get_char}->();
         redo A;
@@ -345,7 +414,7 @@ sub get_next_token ($) {
         $self->{c} = $self->{get_char}->();
         redo A;
       } elsif ($self->{c} == 0x002D and # -
-               $current_token->{type} == IDENT_TOKEN) {
+               $self->{t}->{type} == IDENT_TOKEN) {
         $self->{c} = $self->{get_char}->();
         if ($self->{c} == 0x003E) { # >
           $self->{state} = BEFORE_TOKEN_STATE;
@@ -354,21 +423,21 @@ sub get_next_token ($) {
           #redo A;
         } else {
           ## NOTE: |-|, |-|, $self->{c}
-          #$current_token = {type => IDENT_TOKEN, value => '-'};
+          #$self->{t} = {type => IDENT_TOKEN, value => '-'};
           # stay in the state
           # reconsume
           return {type => DELIM_TOKEN, value => '-'};
           #redo A;
         }
       } else {
-        if ($current_token->{type} == NUMBER_TOKEN) {
+        if ($self->{t}->{type} == NUMBER_TOKEN) {
           ## NOTE: |-| after |NUMBER|.
           unshift @{$self->{token}}, {type => DELIM_TOKEN, value => '-'};
           $self->{state} = BEFORE_TOKEN_STATE;
           # reconsume
-          $current_token->{value} = $current_token->{number};
-          delete $current_token->{number};
-          return $current_token;
+          $self->{t}->{value} = $self->{t}->{number};
+          delete $self->{t}->{number};
+          return $self->{t};
         } else {
           ## NOTE: |-| not followed by |nmstart|.
           $self->{state} = BEFORE_TOKEN_STATE;
@@ -381,12 +450,12 @@ sub get_next_token ($) {
           (0x0061 <= $self->{c} and $self->{c} <= 0x007A) or # a..z
           $self->{c} == 0x005F or # _
           $self->{c} > 0x007F) { # nonascii
-        $current_token->{value} .= chr $self->{c};
+        $self->{t}->{value} .= chr $self->{c};
         $self->{state} = NAME_STATE;
         $self->{c} = $self->{get_char}->();
         redo A;
       } elsif ($self->{c} == 0x002D) { # -
-        $current_token->{value} .= '-';
+        $self->{t}->{value} .= '-';
         $self->{state} = AFTER_AT_HYPHEN_STATE;
         $self->{c} = $self->{get_char}->();
         redo A;
@@ -404,7 +473,7 @@ sub get_next_token ($) {
           (0x0061 <= $self->{c} and $self->{c} <= 0x007A) or # a..z
           $self->{c} == 0x005F or # _
           $self->{c} > 0x007F) { # nonascii
-        $current_token->{value} .= chr $self->{c};
+        $self->{t}->{value} .= chr $self->{c};
         $self->{state} = NAME_STATE;
         $self->{c} = $self->{get_char}->();
         redo A;
@@ -418,7 +487,7 @@ sub get_next_token ($) {
           #redo A;
         } else {
           unshift @{$self->{token}}, {type => DELIM_TOKEN, value => '-'};
-          $current_token = {type => IDENT_TOKEN, value => '-'};
+          $self->{t} = {type => IDENT_TOKEN, value => '-'};
           $self->{state} = BEFORE_NMSTART_STATE;
           # reprocess
           return {type => DELIM_TOKEN, value => '@'};
@@ -438,7 +507,7 @@ sub get_next_token ($) {
     } elsif ($self->{state} == AFTER_NUMBER_STATE) {
       if ($self->{c} == 0x002D) { # -
         ## NOTE: |-| in |ident|.
-        $current_token->{value} = '-';
+        $self->{t}->{value} = '-';
         $self->{state} = BEFORE_NMSTART_STATE;
         $self->{c} = $self->{get_char}->();
         redo A;
@@ -447,27 +516,27 @@ sub get_next_token ($) {
                $self->{c} == 0x005F or # _
                $self->{c} > 0x007F) { # nonascii
         ## NOTE: |nmstart| in |ident|.
-        $current_token->{value} = chr $self->{c};
-        $current_token->{type} = DIMENSION_TOKEN;
+        $self->{t}->{value} = chr $self->{c};
+        $self->{t}->{type} = DIMENSION_TOKEN;
         $self->{state} = NAME_STATE;
         $self->{c} = $self->{get_char}->();
         redo A;
       } elsif ($self->{c} == 0x005C) { # \
         ## NOTE: |nmstart| in |ident| in |IDENT|
-        $current_token->{value} = '';
+        $self->{t}->{value} = '';
         $self->{state} = ESCAPE_OPEN_STATE; $q = 0;
         $self->{c} = $self->{get_char}->();
         redo A;
       } elsif ($self->{c} == 0x0025) { # %
-        $current_token->{type} = PERCENTAGE_TOKEN;
+        $self->{t}->{type} = PERCENTAGE_TOKEN;
         $self->{state} = BEFORE_TOKEN_STATE;
         $self->{c} = $self->{get_char}->();
-        return $current_token;
+        return $self->{t};
         #redo A;
       } else {
         $self->{state} = BEFORE_TOKEN_STATE;
         # reprocess
-        return $current_token;
+        return $self->{t};
         #redo A;
       }
     } elsif ($self->{state} == HASH_OPEN_STATE) {
@@ -478,7 +547,7 @@ sub get_next_token ($) {
           $self->{c} == 0x002D or # -
           $self->{c} == 0x005F or # _
           $self->{c} > 0x007F) { # nonascii
-        $current_token->{value} .= chr $self->{c};
+        $self->{t}->{value} .= chr $self->{c};
         $self->{state} = NAME_STATE;
         $self->{c} = $self->{get_char}->();
         redo A;
@@ -500,7 +569,7 @@ sub get_next_token ($) {
           $self->{c} == 0x005F or # _
           $self->{c} == 0x002D or # -
           $self->{c} > 0x007F) { # nonascii
-        $current_token->{value} .= chr $self->{c};
+        $self->{t}->{value} .= chr $self->{c};
         # stay in the state
         $self->{c} = $self->{get_char}->();
         redo A;
@@ -509,30 +578,30 @@ sub get_next_token ($) {
         $self->{c} = $self->{get_char}->();
         redo A;
       } elsif ($self->{c} == 0x0028 and # (
-               $current_token->{type} == IDENT_TOKEN) { # (
-        my $func_name = $current_token->{value};
+               $self->{t}->{type} == IDENT_TOKEN) { # (
+        my $func_name = $self->{t}->{value};
         $func_name =~ tr/A-Z/a-z/; ## TODO: Unicode or ASCII case-insensitive?
         if ($func_name eq 'url' or $func_name eq 'url-prefix') {
-          if ($current_token->{has_escape}) {
+          if ($self->{t}->{has_escape}) {
             ## TODO: warn
           }
-          $current_token->{type}
+          $self->{t}->{type}
               = $func_name eq 'url' ? URI_TOKEN : URI_PREFIX_TOKEN;
-          $current_token->{value} = '';
+          $self->{t}->{value} = '';
           $self->{state} = URI_BEFORE_WSP_STATE;
           $self->{c} = $self->{get_char}->();
           redo A;
         } else {
-          $current_token->{type} = FUNCTION_TOKEN;
+          $self->{t}->{type} = FUNCTION_TOKEN;
           $self->{state} = BEFORE_TOKEN_STATE;
           $self->{c} = $self->{get_char}->();
-          return $current_token;
+          return $self->{t};
           #redo A;
         }
       } else {
         $self->{state} = BEFORE_TOKEN_STATE;
         # reconsume
-        return $current_token;
+        return $self->{t};
         #redo A;
       }
     } elsif ($self->{state} == URI_BEFORE_WSP_STATE) {
@@ -546,24 +615,24 @@ sub get_next_token ($) {
         $self->{c} = $self->{get_char}->();
       }
       if ($self->{c} == -1) {
-        $current_token->{type} = {
+        $self->{t}->{type} = {
             URI_TOKEN, URI_INVALID_TOKEN,
             URI_INVALID_TOKEN, URI_INVALID_TOKEN,
             URI_PREFIX_TOKEN, URI_PREFIX_INVALID_TOKEN,
             URI_PREFIX_INVALID_TOKEN, URI_PREFIX_INVALID_TOKEN,
-        }->{$current_token->{type}};        
+        }->{$self->{t}->{type}};        
         $self->{state} = BEFORE_TOKEN_STATE;
         $self->{c} = $self->{get_char}->();
-        return $current_token;
+        return $self->{t};
         #redo A;
       } elsif ($self->{c} < 0x0020 or $self->{c} == 0x0028) { # C0 or (
         ## TODO: Should we consider matches of "(" and ")"?
-        $current_token->{type} = {
+        $self->{t}->{type} = {
             URI_TOKEN, URI_INVALID_TOKEN,
             URI_INVALID_TOKEN, URI_INVALID_TOKEN,
             URI_PREFIX_TOKEN, URI_PREFIX_INVALID_TOKEN,
             URI_PREFIX_INVALID_TOKEN, URI_PREFIX_INVALID_TOKEN,
-        }->{$current_token->{type}};
+        }->{$self->{t}->{type}};
         $self->{state} = URI_UNQUOTED_STATE;
         $self->{c} = $self->{get_char}->();
         redo A;
@@ -574,14 +643,14 @@ sub get_next_token ($) {
       } elsif ($self->{c} == 0x0029) { # )
         $self->{state} = BEFORE_TOKEN_STATE;
         $self->{c} = $self->{get_char}->();
-        return $current_token;
+        return $self->{t};
         #redo A;
       } elsif ($self->{c} == 0x005C) { # \
         $self->{state} = ESCAPE_OPEN_STATE; $q = 1;
         $self->{c} = $self->{get_char}->();
         redo A;
       } else {
-        $current_token->{value} .= chr $self->{c};
+        $self->{t}->{value} .= chr $self->{c};
         $self->{state} = URI_UNQUOTED_STATE;
         $self->{c} = $self->{get_char}->();
         redo A;
@@ -598,15 +667,15 @@ sub get_next_token ($) {
         $self->{c} = $self->{get_char}->();
         redo A;
       } elsif ($self->{c} == -1) {
-        $current_token->{type} = {
+        $self->{t}->{type} = {
             URI_TOKEN, URI_INVALID_TOKEN,
             URI_INVALID_TOKEN, URI_INVALID_TOKEN,
             URI_PREFIX_TOKEN, URI_PREFIX_INVALID_TOKEN,
             URI_PREFIX_INVALID_TOKEN, URI_PREFIX_INVALID_TOKEN,
-        }->{$current_token->{type}};        
+        }->{$self->{t}->{type}};        
         $self->{state} = BEFORE_TOKEN_STATE;
         $self->{c} = $self->{get_char}->();
-        return $current_token;
+        return $self->{t};
         #redo A;
       } elsif ($self->{c} < 0x0020 or {
           0x0022 => 1, # "
@@ -614,26 +683,26 @@ sub get_next_token ($) {
           0x0028 => 1, # (
       }->{$self->{c}}) { # C0 or (
         ## TODO: Should we consider matches of "(" and ")", '"', or "'"?
-        $current_token->{type} = {
+        $self->{t}->{type} = {
             URI_TOKEN, URI_INVALID_TOKEN,
             URI_INVALID_TOKEN, URI_INVALID_TOKEN,
             URI_PREFIX_TOKEN, URI_PREFIX_INVALID_TOKEN,
             URI_PREFIX_INVALID_TOKEN, URI_PREFIX_INVALID_TOKEN,
-        }->{$current_token->{type}};
+        }->{$self->{t}->{type}};
         # stay in the state.
         $self->{c} = $self->{get_char}->();
         redo A;
       } elsif ($self->{c} == 0x0029) { # )
         $self->{state} = BEFORE_TOKEN_STATE;
         $self->{c} = $self->{get_char}->();
-        return $current_token;
+        return $self->{t};
         #redo A;
       } elsif ($self->{c} == 0x005C) { # \
         $self->{state} = ESCAPE_OPEN_STATE; $q = 1;
         $self->{c} = $self->{get_char}->();
         redo A;
       } else {
-        $current_token->{value} .= chr $self->{c};
+        $self->{t}->{value} .= chr $self->{c};
         # stay in the state.
         $self->{c} = $self->{get_char}->();
         redo A;
@@ -650,20 +719,20 @@ sub get_next_token ($) {
         $self->{c} = $self->{get_char}->();
         redo A;
       } elsif ($self->{c} == -1) {
-        $current_token->{type} = {
+        $self->{t}->{type} = {
             URI_TOKEN, URI_INVALID_TOKEN,
             URI_INVALID_TOKEN, URI_INVALID_TOKEN,
             URI_PREFIX_TOKEN, URI_PREFIX_INVALID_TOKEN,
             URI_PREFIX_INVALID_TOKEN, URI_PREFIX_INVALID_TOKEN,
-        }->{$current_token->{type}};        
+        }->{$self->{t}->{type}};        
         $self->{state} = BEFORE_TOKEN_STATE;
         $self->{c} = $self->{get_char}->();
-        return $current_token;
+        return $self->{t};
         #redo A;
       } elsif ($self->{c} == 0x0029) { # )
         $self->{state} = BEFORE_TOKEN_STATE;
         $self->{c} = $self->{get_char}->();
-        return $current_token;
+        return $self->{t};
         #redo A;
       } elsif ($self->{c} == 0x005C) { # \
         $self->{state} = ESCAPE_OPEN_STATE; $q = 1;
@@ -671,18 +740,18 @@ sub get_next_token ($) {
         redo A;
       } else {
         ## TODO: Should we consider matches of "(" and ")", '"', or "'"?
-        $current_token->{type} = {
+        $self->{t}->{type} = {
             URI_TOKEN, URI_INVALID_TOKEN,
             URI_INVALID_TOKEN, URI_INVALID_TOKEN,
             URI_PREFIX_TOKEN, URI_PREFIX_INVALID_TOKEN,
             URI_PREFIX_INVALID_TOKEN, URI_PREFIX_INVALID_TOKEN,
-        }->{$current_token->{type}};
+        }->{$self->{t}->{type}};
         # stay in the state.
         $self->{c} = $self->{get_char}->();
         redo A;
       }
     } elsif ($self->{state} == ESCAPE_OPEN_STATE) {
-      $current_token->{has_escape} = 1;
+      $self->{t}->{has_escape} = 1;
       if (0x0030 <= $self->{c} and $self->{c} <= 0x0039) { # 0..9
         ## NOTE: second character of |unicode| in |escape|.
         $char = $self->{c} - 0x0030;
@@ -707,24 +776,24 @@ sub get_next_token ($) {
           ## NOTE: In |escape| in ... in |ident|.
           $self->{state} = BEFORE_TOKEN_STATE;
           unshift @{$self->{token}}, {type => DELIM_TOKEN, value => '\\'};
-          return $current_token;
+          return $self->{t};
           # reconsume
           #redo A;
         } elsif ($q == 1) {
           ## NOTE: In |escape| in |URI|.
-          $current_token->{type} = {
+          $self->{t}->{type} = {
               URI_TOKEN, URI_INVALID_TOKEN,
               URI_INVALID_TOKEN, URI_INVALID_TOKEN,
               URI_PREFIX_TOKEN, URI_PREFIX_INVALID_TOKEN,
               URI_PREFIX_INVALID_TOKEN, URI_PREFIX_INVALID_TOKEN,
-          }->{$current_token->{type}};
-          $current_token->{value} .= chr $self->{c};
+          }->{$self->{t}->{type}};
+          $self->{t}->{value} .= chr $self->{c};
           $self->{state} = URI_UNQUOTED_STATE;
           $self->{c} = $self->{get_char}->();
           redo A;
         } else {
           ## Note: In |nl| in ... in |string| or |ident|.
-          $current_token->{value} .= chr $self->{c};
+          $self->{t}->{value} .= chr $self->{c};
           $self->{state} = STRING_STATE;
           $self->{c} = $self->{get_char}->();
           redo A;
@@ -734,30 +803,30 @@ sub get_next_token ($) {
           ## NOTE: In |escape| in ... in |ident|.
           $self->{state} = BEFORE_TOKEN_STATE;
           unshift @{$self->{token}}, {type => DELIM_TOKEN, value => '\\'};
-          return $current_token;
+          return $self->{t};
           # reconsume
           #redo A;
         } elsif ($q == 1) {
-          $current_token->{type} = {
+          $self->{t}->{type} = {
               URI_TOKEN, URI_INVALID_TOKEN,
               URI_INVALID_TOKEN, URI_INVALID_TOKEN,
               URI_PREFIX_TOKEN, URI_PREFIX_INVALID_TOKEN,
               URI_PREFIX_INVALID_TOKEN, URI_PREFIX_INVALID_TOKEN,
-          }->{$current_token->{type}};
-          $current_token->{value} .= "\x0D\x0A";
+          }->{$self->{t}->{type}};
+          $self->{t}->{value} .= "\x0D\x0A";
           $self->{state} = URI_UNQUOTED_STATE;
           $self->{c} = $self->{get_char}->();
           redo A;
         } else {
           ## Note: In |nl| in ... in |string| or |ident|.
-          $current_token->{value} .= "\x0D\x0A";
+          $self->{t}->{value} .= "\x0D\x0A";
           $self->{state} = ESCAPE_BEFORE_LF_STATE;
           $self->{c} = $self->{get_char}->();
           redo A;
         }
       } else {
         ## NOTE: second character of |escape|.
-        $current_token->{value} .= chr $self->{c};
+        $self->{t}->{value} .= chr $self->{c};
         $self->{state} = $q == 0 ? NAME_STATE :
             $q == 1 ? URI_UNQUOTED_STATE : STRING_STATE;
         $self->{c} = $self->{get_char}->();
@@ -784,7 +853,7 @@ sub get_next_token ($) {
                $self->{c} == 0x000A or # \n
                $self->{c} == 0x0009 or # \t
                $self->{c} == 0x000C) { # \f
-        $current_token->{value} .= chr $char;
+        $self->{t}->{value} .= chr $char;
         $self->{state} = $q == 0 ? NAME_STATE :
             $q == 1 ? URI_UNQUOTED_STATE : STRING_STATE;
         $self->{c} = $self->{get_char}->();
@@ -794,7 +863,7 @@ sub get_next_token ($) {
         $self->{c} = $self->{get_char}->();
         redo A;
       } else {
-        $current_token->{value} .= chr $char;
+        $self->{t}->{value} .= chr $char;
         $self->{state} = $q == 0 ? NAME_STATE :
             $q == 1 ? URI_UNQUOTED_STATE : STRING_STATE;
         # reconsume
@@ -806,7 +875,7 @@ sub get_next_token ($) {
           $self->{c} == 0x000A or # \n
           $self->{c} == 0x0009 or # \t
           $self->{c} == 0x000C) { # \f
-        $current_token->{value} .= chr $char;
+        $self->{t}->{value} .= chr $char;
         $self->{state} = $q == 0 ? NAME_STATE :
             $q == 1 ? URI_UNQUOTED_STATE : STRING_STATE;
         $self->{c} = $self->{get_char}->();
@@ -816,7 +885,7 @@ sub get_next_token ($) {
         $self->{c} = $self->{get_char}->();
         redo A;
       } else {
-        $current_token->{value} .= chr $char;
+        $self->{t}->{value} .= chr $char;
         $self->{state} = $q == 0 ? NAME_STATE :
             $q == 1 ? URI_UNQUOTED_STATE : STRING_STATE;
         # reconsume
@@ -825,13 +894,13 @@ sub get_next_token ($) {
     } elsif ($self->{state} == ESCAPE_BEFORE_LF_STATE) {
       ## NOTE: |\n| in |\r\n| in |unicode| in |escape|.
       if ($self->{c} == 0x000A) { # \n
-        $current_token->{value} .= chr $char;
+        $self->{t}->{value} .= chr $char;
         $self->{state} = $q == 0 ? NAME_STATE :
             $q == 1 ? URI_UNQUOTED_STATE : STRING_STATE;
         $self->{c} = $self->{get_char}->();
         redo A;
       } else {
-        $current_token->{value} .= chr $char;
+        $self->{t}->{value} .= chr $char;
         $self->{state} = $q == 0 ? NAME_STATE :
             $q == 1 ? URI_UNQUOTED_STATE : STRING_STATE;
         # reconsume
@@ -847,10 +916,10 @@ sub get_next_token ($) {
         $self->{c} = $self->{get_char}->();
         redo A;
       } elsif ($self->{c} == $q) { # " | '
-        if ($current_token->{type} == STRING_TOKEN) {
+        if ($self->{t}->{type} == STRING_TOKEN) {
           $self->{state} = BEFORE_TOKEN_STATE;
           $self->{c} = $self->{get_char}->();
-          return $current_token;
+          return $self->{t};
           #redo A;
         } else {
           $self->{state} = URI_AFTER_WSP_STATE;
@@ -861,13 +930,13 @@ sub get_next_token ($) {
                $self->{c} == 0x000D or # \r
                $self->{c} == 0x000C or # \f
                $self->{c} == -1) {
-        $current_token->{type} = INVALID_TOKEN;
+        $self->{t}->{type} = INVALID_TOKEN;
         $self->{state} = BEFORE_TOKEN_STATE;
         # reconsume
-        return $current_token;
+        return $self->{t};
         #redo A;
       } else {
-        $current_token->{value} .= chr $self->{c};
+        $self->{t}->{value} .= chr $self->{c};
         # stay in the state
         $self->{c} = $self->{get_char}->();
         redo A;
@@ -875,7 +944,7 @@ sub get_next_token ($) {
     } elsif ($self->{state} == NUMBER_STATE) {
       ## NOTE: 2nd, 3rd, or ... character in |num| before |.|.
       if (0x0030 <= $self->{c} and $self->{c} <= 0x0039) {
-        $current_token->{value} .= chr $self->{c};
+        $self->{t}->{value} .= chr $self->{c};
         # stay in the state
         $self->{c} = $self->{get_char}->();
         redo A;
@@ -884,8 +953,8 @@ sub get_next_token ($) {
         $self->{c} = $self->{get_char}->();
         redo A;
       } else {
-        $current_token->{number} = $current_token->{value};
-        $current_token->{value} = '';
+        $self->{t}->{number} = $self->{t}->{value};
+        $self->{t}->{value} = '';
         $self->{state} = AFTER_NUMBER_STATE;
         # reprocess
         redo A;
@@ -893,23 +962,23 @@ sub get_next_token ($) {
     } elsif ($self->{state} == NUMBER_DOT_STATE) {
       ## NOTE: The character immediately following |.| in |num|.
       if (0x0030 <= $self->{c} and $self->{c} <= 0x0039) {
-        $current_token->{value} .= '.' . chr $self->{c};
+        $self->{t}->{value} .= '.' . chr $self->{c};
         $self->{state} = NUMBER_DOT_NUMBER_STATE;
         $self->{c} = $self->{get_char}->();
         redo A;
       } else {
         unshift @{$self->{token}}, {type => DELIM_STATE, value => '.'};
-        $current_token->{number} = $current_token->{value};
-        $current_token->{value} = '';
+        $self->{t}->{number} = $self->{t}->{value};
+        $self->{t}->{value} = '';
         $self->{state} = BEFORE_TOKEN_STATE;
         # reprocess
-        return $current_token;
+        return $self->{t};
         #redo A;
       }
     } elsif ($self->{state} == NUMBER_FRACTION_STATE) {
       ## NOTE: The character immediately following |.| at the beginning of |num|.
       if (0x0030 <= $self->{c} and $self->{c} <= 0x0039) {
-        $current_token->{value} .= '.' . chr $self->{c};
+        $self->{t}->{value} .= '.' . chr $self->{c};
         $self->{state} = NUMBER_DOT_NUMBER_STATE;
         $self->{c} = $self->{get_char}->();
         redo A;
@@ -922,13 +991,13 @@ sub get_next_token ($) {
     } elsif ($self->{state} == NUMBER_DOT_NUMBER_STATE) {
       ## NOTE: |[0-9]| in |num| after |.|.
       if (0x0030 <= $self->{c} and $self->{c} <= 0x0039) {
-        $current_token->{value} .= chr $self->{c};
+        $self->{t}->{value} .= chr $self->{c};
         # stay in the state
         $self->{c} = $self->{get_char}->();
         redo A;
       } else {
-        $current_token->{number} = $current_token->{value};
-        $current_token->{value} = '';
+        $self->{t}->{number} = $self->{t}->{value};
+        $self->{t}->{value} = '';
         $self->{state} = AFTER_NUMBER_STATE;
         # reprocess
         redo A;
@@ -937,10 +1006,7 @@ sub get_next_token ($) {
       die "$0: Unknown state |$self->{state}|";
     }
   } # A
-
-  ## TODO: |URI|, |UNICODE-RANGE|, |COMMENT|
-
 } # get_next_token
 
 1;
-# $Date: 2007/09/08 02:58:24 $
+# $Date: 2007/09/08 03:25:05 $
